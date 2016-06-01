@@ -108,7 +108,7 @@ int main(int argc, char *argv[])
     QString method("dSPM"); //"MNE" | "dSPM" | "sLORETA"
 
     // Load data
-    fiff_int_t setno = 1;
+    fiff_int_t setno = 3;
     QPair<QVariant, QVariant> baseline(QVariant(), 0);
     FiffEvoked evoked(t_fileEvoked, setno, baseline);
     if(evoked.isEmpty())
@@ -163,9 +163,9 @@ int main(int argc, char *argv[])
     //########################################################################################
 
     View3D::SPtr testWindow = View3D::SPtr(new View3D());
-    testWindow->addBrainData("HemiLRSet", t_surfSet, t_annotationSet);
+    testWindow->addBrainData("Subject01", "HemiLRSet", t_surfSet, t_annotationSet);
 
-    QList<BrainRTSourceLocDataTreeItem*> rtItemList = testWindow->addRtBrainData("HemiLRSet", sourceEstimate, t_clusteredFwd);
+    QList<BrainRTSourceLocDataTreeItem*> rtItemList = testWindow->addRtBrainData("Subject01", "HemiLRSet", sourceEstimate, t_clusteredFwd);
 
     testWindow->show();
 

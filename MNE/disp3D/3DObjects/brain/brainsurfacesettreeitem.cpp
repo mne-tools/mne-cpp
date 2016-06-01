@@ -78,7 +78,7 @@ BrainSurfaceSetTreeItem::~BrainSurfaceSetTreeItem()
 QVariant BrainSurfaceSetTreeItem::data(int role) const
 {
     switch(role) {
-        case BrainSurfaceSetTreeItemRoles::SurfaceSetName:
+        case Data3DTreeModelItemRoles::SurfaceSetName:
             return QVariant();
     }
 
@@ -101,7 +101,7 @@ bool BrainSurfaceSetTreeItem::addData(const SurfaceSet& tSurfaceSet, const Annot
     //Generate child items based on surface set input parameters
     bool state = false;
 
-    QList<QStandardItem*> itemList = this->findChildren(BrainTreeModelItemTypes::HemisphereItem);
+    QList<QStandardItem*> itemList = this->findChildren(Data3DTreeModelItemTypes::HemisphereItem);
 
     //If there are more hemispheres in tSourceSpace than in the tree model
     bool hemiItemFound = false;
@@ -111,7 +111,7 @@ bool BrainSurfaceSetTreeItem::addData(const SurfaceSet& tSurfaceSet, const Annot
         for(int j = 0; j<itemList.size(); j++) {
             BrainHemisphereTreeItem* pHemiItem = dynamic_cast<BrainHemisphereTreeItem*>(itemList.at(j));
 
-            if(pHemiItem->data(BrainHemisphereTreeItemRoles::SurfaceHemi).toInt() == tSurfaceSet[i].hemi()) {
+            if(pHemiItem->data(Data3DTreeModelItemRoles::SurfaceHemi).toInt() == tSurfaceSet[i].hemi()) {
                 hemiItemFound = true;
 
                 if(i < tAnnotationSet.size()) {
@@ -128,7 +128,12 @@ bool BrainSurfaceSetTreeItem::addData(const SurfaceSet& tSurfaceSet, const Annot
 
         if(!hemiItemFound) {
             //Item does not exist yet, create it here.
-            BrainHemisphereTreeItem* pHemiItem = new BrainHemisphereTreeItem(BrainTreeModelItemTypes::HemisphereItem);
+            BrainHemisphereTreeItem* pHemiItem = new BrainHemisphereTreeItem(Data3DTreeModelItemTypes::HemisphereItem);
+
+            QList<QStandardItem*> list;
+            list << pHemiItem;
+            list << new QStandardItem(pHemiItem->toolTip());
+            this->appendRow(list);
 
             if(i < tAnnotationSet.size()) {
                 if(tAnnotationSet[i].hemi() == tSurfaceSet[i].hemi()) {
@@ -139,8 +144,6 @@ bool BrainSurfaceSetTreeItem::addData(const SurfaceSet& tSurfaceSet, const Annot
             } else {
                 state = pHemiItem->addData(tSurfaceSet[i], Annotation(), p3DEntityParent);
             }
-
-            *this<<pHemiItem; //same as this->appendRow(pSurfaceItem)
         }
 
         hemiItemFound = false;
@@ -157,7 +160,7 @@ bool BrainSurfaceSetTreeItem::addData(const Surface& tSurface, const Annotation&
     //Generate child items based on surface set input parameters
     bool state = false;
 
-    QList<QStandardItem*> itemList = this->findChildren(BrainTreeModelItemTypes::HemisphereItem);
+    QList<QStandardItem*> itemList = this->findChildren(Data3DTreeModelItemTypes::HemisphereItem);
 
     bool hemiItemFound = false;
 
@@ -165,7 +168,7 @@ bool BrainSurfaceSetTreeItem::addData(const Surface& tSurface, const Annotation&
     for(int j = 0; j<itemList.size(); j++) {
         BrainHemisphereTreeItem* pHemiItem = dynamic_cast<BrainHemisphereTreeItem*>(itemList.at(j));
 
-        if(pHemiItem->data(BrainHemisphereTreeItemRoles::SurfaceHemi).toInt() == tSurface.hemi()) {
+        if(pHemiItem->data(Data3DTreeModelItemRoles::SurfaceHemi).toInt() == tSurface.hemi()) {
             hemiItemFound = true;
 
             if(tAnnotation.hemi() == tSurface.hemi()) {
@@ -178,7 +181,7 @@ bool BrainSurfaceSetTreeItem::addData(const Surface& tSurface, const Annotation&
 
     if(!hemiItemFound) {
         //Item does not exist yet, create it here.
-        BrainHemisphereTreeItem* pHemiItem = new BrainHemisphereTreeItem(BrainTreeModelItemTypes::HemisphereItem);
+        BrainHemisphereTreeItem* pHemiItem = new BrainHemisphereTreeItem(Data3DTreeModelItemTypes::HemisphereItem);
 
         if(tAnnotation.hemi() == tSurface.hemi()) {
             state = pHemiItem->addData(tSurface, tAnnotation, p3DEntityParent);
@@ -186,7 +189,10 @@ bool BrainSurfaceSetTreeItem::addData(const Surface& tSurface, const Annotation&
             state = pHemiItem->addData(tSurface, Annotation(), p3DEntityParent);
         }
 
-        *this<<pHemiItem; //same as this->appendRow(pSurfaceItem)
+        QList<QStandardItem*> list;
+        list << pHemiItem;
+        list << new QStandardItem(pHemiItem->toolTip());
+        this->appendRow(list);
     }
 
     return state;
@@ -200,7 +206,7 @@ bool BrainSurfaceSetTreeItem::addData(const MNESourceSpace& tSourceSpace, Qt3DCo
     //Generate child items based on surface set input parameters
     bool state = false;
 
-    QList<QStandardItem*> itemList = this->findChildren(BrainTreeModelItemTypes::HemisphereItem);
+    QList<QStandardItem*> itemList = this->findChildren(Data3DTreeModelItemTypes::HemisphereItem);
 
     //If there are more hemispheres in tSourceSpace than in the tree model
     bool hemiItemFound = false;
@@ -210,7 +216,7 @@ bool BrainSurfaceSetTreeItem::addData(const MNESourceSpace& tSourceSpace, Qt3DCo
         for(int j = 0; j<itemList.size(); j++) {
             BrainHemisphereTreeItem* pHemiItem = dynamic_cast<BrainHemisphereTreeItem*>(itemList.at(j));
 
-            if(pHemiItem->data(BrainHemisphereTreeItemRoles::SurfaceHemi).toInt() == i) {
+            if(pHemiItem->data(Data3DTreeModelItemRoles::SurfaceHemi).toInt() == i) {
                 hemiItemFound = true;
                 state = pHemiItem->addData(tSourceSpace[i], p3DEntityParent);
             }
@@ -218,11 +224,14 @@ bool BrainSurfaceSetTreeItem::addData(const MNESourceSpace& tSourceSpace, Qt3DCo
 
         if(!hemiItemFound) {
             //Item does not exist yet, create it here.
-            BrainHemisphereTreeItem* pHemisphereItem = new BrainHemisphereTreeItem(BrainTreeModelItemTypes::HemisphereItem);
+            BrainHemisphereTreeItem* pHemiItem = new BrainHemisphereTreeItem(Data3DTreeModelItemTypes::HemisphereItem);
 
-            state = pHemisphereItem->addData(tSourceSpace[i], p3DEntityParent);
+            state = pHemiItem->addData(tSourceSpace[i], p3DEntityParent);
 
-            *this<<pHemisphereItem; //same as this->appendRow(pSurfaceItem)
+            QList<QStandardItem*> list;
+            list << pHemiItem;
+            list << new QStandardItem(pHemiItem->toolTip());
+            this->appendRow(list);
         }
 
         hemiItemFound = false;

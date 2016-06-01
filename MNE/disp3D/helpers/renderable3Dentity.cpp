@@ -142,7 +142,7 @@ bool Renderable3DEntity::setAlpha(float fAlpha)
         }
     }
 
-    qWarning()<<"Renderable3DEntity::setAlpha - Could not set alpha value to material, since it does not support it (use i.e ShaderMaterial).";
+    qWarning() << "Renderable3DEntity::setAlpha - Could not set alpha value to material, since it does not support it (use i.e ShaderMaterial).";
 
     return false;
 }

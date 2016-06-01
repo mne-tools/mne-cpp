@@ -55,7 +55,8 @@ contains(MNECPP_CONFIG, BuildBasicMNEXVersion) {
         neuromag \
         babymeg \
         triggercontrol \
-        gusbamp
+        #gusbamp \
+        #eegosports
 
     #Algorithms
     SUBDIRS += \
@@ -68,8 +69,7 @@ contains(MNECPP_CONFIG, BuildBasicMNEXVersion) {
         # bci \
         rtsss \
         rthpi \
-        noisereduction \
-        # eegosports
+        noisereduction
 
     win32 { #Only compile the TMSI plugin if a windows system is used - TMSi driver is not available for linux yet
         contains(QMAKE_HOST.arch, x86_64) { #Compiling MNE-X FOR a 64bit system

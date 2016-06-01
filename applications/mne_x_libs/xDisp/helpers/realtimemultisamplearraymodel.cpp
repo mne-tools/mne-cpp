@@ -84,10 +84,11 @@ RealTimeMultiSampleArrayModel::RealTimeMultiSampleArrayModel(QObject *parent)
 //virtual functions
 int RealTimeMultiSampleArrayModel::rowCount(const QModelIndex & /*parent*/) const
 {
-    if(!m_pFiffInfo->chs.empty())
+    if(!m_pFiffInfo->chs.empty()) {
         return m_pFiffInfo->chs.size();
-    else
+    } else {
         return 0;
+    }
 
 //    if(!m_qMapIdxRowSelection.empty())
 //        return m_qMapIdxRowSelection.size();
@@ -119,7 +120,7 @@ QVariant RealTimeMultiSampleArrayModel::data(const QModelIndex &index, int role)
             return QVariant(m_qListChInfo[row].getChannelName());
 
         //******** second column (data plot) ********
-        if(index.column()==1) {
+        if(index.column() == 1) {
             QVariant v;
             RowVectorPair rowVectorPair;
 
@@ -230,17 +231,19 @@ void RealTimeMultiSampleArrayModel::init()
 void RealTimeMultiSampleArrayModel::initSphara()
 {
     //Load SPHARA matrices for babymeg and vectorview
-    IOUtils::read_eigen_matrix(m_matSpharaVVGradLoaded, QString(":/sphara/SPHARA/Vectorview_SPHARA_InvEuclidean_Grad.txt"));
-    IOUtils::read_eigen_matrix(m_matSpharaVVMagLoaded, QString(":/sphara/SPHARA/Vectorview_SPHARA_InvEuclidean_Mag.txt"));
+    IOUtils::read_eigen_matrix(m_matSpharaVVGradLoaded, QString("./mne_x_plugins/resources/noisereduction/SPHARA/Vectorview_SPHARA_InvEuclidean_Grad.txt"));
+    IOUtils::read_eigen_matrix(m_matSpharaVVMagLoaded, QString("./mne_x_plugins/resources/noisereduction/SPHARA/Vectorview_SPHARA_InvEuclidean_Mag.txt"));
 
-    IOUtils::read_eigen_matrix(m_matSpharaBabyMEGInnerLoaded, QString(":/sphara/SPHARA/BabyMEG_SPHARA_InvEuclidean_Inner.txt"));
-    IOUtils::read_eigen_matrix(m_matSpharaBabyMEGOuterLoaded, QString(":/sphara/SPHARA/BabyMEG_SPHARA_InvEuclidean_Outer.txt"));
+    IOUtils::read_eigen_matrix(m_matSpharaBabyMEGInnerLoaded, QString("./mne_x_plugins/resources/noisereduction/SPHARA/BabyMEG_SPHARA_InvEuclidean_Inner.txt"));
+    IOUtils::read_eigen_matrix(m_matSpharaBabyMEGOuterLoaded, QString("./mne_x_plugins/resources/noisereduction/SPHARA/BabyMEG_SPHARA_InvEuclidean_Outer.txt"));
 
-    //Generate indices used to create the SPHARA operators.
+    IOUtils::read_eigen_matrix(m_matSpharaEEGLoaded, QString("./mne_x_plugins/resources/noisereduction/SPHARA/Current_SPHARA_EEG.txt"));
+
+    //Generate indices used to create the SPHARA operators for VectorView
     m_vecIndicesFirstVV.resize(0);
     m_vecIndicesSecondVV.resize(0);
 
-    for(int r = 0; r<m_pFiffInfo->chs.size(); r++) {
+    for(int r = 0; r < m_pFiffInfo->chs.size(); ++r) {
         //Find GRADIOMETERS
         if(m_pFiffInfo->chs.at(r).coil_type == 3012) {
             m_vecIndicesFirstVV.conservativeResize(m_vecIndicesFirstVV.rows()+1);
@@ -254,8 +257,9 @@ void RealTimeMultiSampleArrayModel::initSphara()
         }
     }
 
+    //Generate indices used to create the SPHARA operators for babyMEG
     m_vecIndicesFirstBabyMEG.resize(0);
-    for(int r = 0; r<m_pFiffInfo->chs.size(); r++) {
+    for(int r = 0; r < m_pFiffInfo->chs.size(); ++r) {
         //Find INNER LAYER
         if(m_pFiffInfo->chs.at(r).coil_type == 7002) {
             m_vecIndicesFirstBabyMEG.conservativeResize(m_vecIndicesFirstBabyMEG.rows()+1);
@@ -265,11 +269,21 @@ void RealTimeMultiSampleArrayModel::initSphara()
         //TODO: Find outer layer
     }
 
+    //Generate indices used to create the SPHARA operators for EEG layouts
+    m_vecIndicesFirstEEG.resize(0);
+    for(int r = 0; r < m_pFiffInfo->chs.size(); ++r) {
+        //Find EEG
+        if(m_pFiffInfo->chs.at(r).kind == FIFFV_EEG_CH) {
+            m_vecIndicesFirstEEG.conservativeResize(m_vecIndicesFirstEEG.rows()+1);
+            m_vecIndicesFirstEEG(m_vecIndicesFirstEEG.rows()-1) = r;
+        }
+    }
+
     //Create Sphara operator for the first time
     updateSpharaOptions("BabyMEG", 270, 105);
 
-    qDebug()<<"RealTimeMultiSampleArrayModel::initSphara - Read VectorView mag matrix "<<m_matSpharaVVMagLoaded.rows()<<m_matSpharaVVMagLoaded.cols()<<"and grad matrix"<<m_matSpharaVVGradLoaded.rows()<<m_matSpharaVVGradLoaded.cols();
-    qDebug()<<"RealTimeMultiSampleArrayModel::initSphara - Read BabyMEG inner layer matrix "<<m_matSpharaBabyMEGInnerLoaded.rows()<<m_matSpharaBabyMEGInnerLoaded.cols()<<"and outer layer matrix"<<m_matSpharaBabyMEGOuterLoaded.rows()<<m_matSpharaBabyMEGOuterLoaded.cols();
+//    qDebug()<<"RealTimeMultiSampleArrayModel::initSphara - Read VectorView mag matrix "<<m_matSpharaVVMagLoaded.rows()<<m_matSpharaVVMagLoaded.cols()<<"and grad matrix"<<m_matSpharaVVGradLoaded.rows()<<m_matSpharaVVGradLoaded.cols();
+//    qDebug()<<"RealTimeMultiSampleArrayModel::initSphara - Read BabyMEG inner layer matrix "<<m_matSpharaBabyMEGInnerLoaded.rows()<<m_matSpharaBabyMEGInnerLoaded.cols()<<"and outer layer matrix"<<m_matSpharaBabyMEGOuterLoaded.rows()<<m_matSpharaBabyMEGOuterLoaded.cols();
 }
 
 
@@ -317,18 +331,14 @@ void RealTimeMultiSampleArrayModel::setFiffInfo(FiffInfo::SPtr& p_pFiffInfo)
 
         m_matOverlap.conservativeResize(m_pFiffInfo->chs.size(), m_iMaxFilterLength);
 
-        m_matSparseProj = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
-        m_matSparseComp = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
+        m_matSparseProjMult = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
+        m_matSparseCompMult = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
         m_matSparseSpharaMult = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
-        m_matSparseSpharaProjMult = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
-        m_matSparseSpharaCompMult = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
         m_matSparseProjCompMult = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
 
-        m_matSparseProj.setIdentity();
-        m_matSparseComp.setIdentity();
+        m_matSparseProjMult.setIdentity();
+        m_matSparseCompMult.setIdentity();
         m_matSparseSpharaMult.setIdentity();
-        m_matSparseSpharaProjMult.setIdentity();
-        m_matSparseSpharaCompMult.setIdentity();
         m_matSparseProjCompMult.setIdentity();
 
         //Create the initial Compensator projector
@@ -338,7 +348,7 @@ void RealTimeMultiSampleArrayModel::setFiffInfo(FiffInfo::SPtr& p_pFiffInfo)
         int visibleInit = 20;
         QStringList filterChannels;
 
-        if(visibleInit>m_pFiffInfo->chs.size()) {
+        if(visibleInit > m_pFiffInfo->chs.size()) {
             while(visibleInit>m_pFiffInfo->chs.size())
                 visibleInit--;
         }
@@ -350,7 +360,7 @@ void RealTimeMultiSampleArrayModel::setFiffInfo(FiffInfo::SPtr& p_pFiffInfo)
 
         //Look for trigger channels and initialise detected trigger map
         QList<int> temp;
-        for(int i = 0; i<m_pFiffInfo->chs.size(); i++) {
+        for(int i = 0; i<m_pFiffInfo->chs.size(); ++i) {
             if(m_pFiffInfo->chs[i].kind == FIFFV_STIM_CH/* && m_pFiffInfo->chs[i].ch_name == "STI 001"*/)
                 m_qMapDetectedTrigger.insert(i, temp);
         }
@@ -404,57 +414,43 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
 
     //Copy new data into the global data matrix
     for(qint32 b = 0; b < data.size(); ++b) {
-        if(data.at(b).rows() != m_matDataRaw.rows()) {
+        int nCol = data.at(b).cols();
+        int nRow = data.at(b).rows();
+
+        if(nRow != m_matDataRaw.rows()) {
             std::cout<<"incoming data does not match internal data row size. Returning..."<<std::endl;
             return;
         }
 
-        //Reset m_iCurrentSample and start filling the data matrix from the beginning again. Also add residual  amount of data to the end of the matrix.
-        if(m_iCurrentSample+data.at(b).cols() > m_matDataRaw.cols()) {
-            m_iResidual = data.at(b).cols() - ((m_iCurrentSample+data.at(b).cols()) % m_matDataRaw.cols());
-            if(m_iResidual == data.at(b).cols())
-                m_iResidual = 0;
+        //Reset m_iCurrentSample and start filling the data matrix from the beginning again. Also add residual amount of data to the end of the matrix.
+        if(m_iCurrentSample+nCol > m_matDataRaw.cols()) {
+            m_iResidual = nCol - ((m_iCurrentSample+nCol) % m_matDataRaw.cols());
 
-//            std::cout<<"incoming data exceeds internal data cols by: "<<(m_iCurrentSample+data.at(b).cols()) % m_matDataRaw.cols()<<std::endl;
-//            std::cout<<"m_iCurrentSample+data.at(b).cols(): "<<m_iCurrentSample+data.at(b).cols()<<std::endl;
+            if(m_iResidual == nCol) {
+                m_iResidual = 0;
+            }
+
+//            std::cout<<"incoming data exceeds internal data cols by: "<<(m_iCurrentSample+nCol) % m_matDataRaw.cols()<<std::endl;
+//            std::cout<<"m_iCurrentSample+nCol: "<<m_iCurrentSample+nCol<<std::endl;
 //            std::cout<<"m_matDataRaw.cols(): "<<m_matDataRaw.cols()<<std::endl;
-//            std::cout<<"data.at(b).cols()-m_iResidual: "<<data.at(b).cols()-m_iResidual<<std::endl<<std::endl;
+//            std::cout<<"nCol-m_iResidual: "<<nCol-m_iResidual<<std::endl<<std::endl;
 
             if(doComp) {
                 if(doProj) {
-                    if(doSphara) {
-                        //Comp + Proj + Sphara
-                        m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), m_iResidual) = m_matSparseFull * data.at(b).block(0,0,data.at(b).rows(),m_iResidual);
-                    } else {
-                        //Comp + Proj
-                        m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), m_iResidual) = m_matSparseProjCompMult * data.at(b).block(0,0,data.at(b).rows(),m_iResidual);
-                    }
+                    //Comp + Proj
+                    m_matDataRaw.block(0, m_iCurrentSample, nRow, m_iResidual) = m_matSparseProjCompMult * data.at(b).block(0,0,nRow,m_iResidual);
                 } else {
-                    if(doSphara) {
-                        //Comp + Sphara
-                        m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), m_iResidual) = m_matSparseSpharaCompMult * data.at(b).block(0,0,data.at(b).rows(),m_iResidual);
-                    } else {
-                        //Comp
-                        m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), m_iResidual) = m_matSparseComp * data.at(b).block(0,0,data.at(b).rows(),m_iResidual);
-                    }
+                    //Comp
+                    m_matDataRaw.block(0, m_iCurrentSample, nRow, m_iResidual) = m_matSparseCompMult * data.at(b).block(0,0,nRow,m_iResidual);
                 }
             } else {
-                if(doProj) {
-                    if(doSphara) {
-                        //Proj + Sphara
-                        m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), m_iResidual) = m_matSparseSpharaProjMult * data.at(b).block(0,0,data.at(b).rows(),m_iResidual);
-                    } else {
-                        //Proj
-                        m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), m_iResidual) = m_matSparseProj * data.at(b).block(0,0,data.at(b).rows(),m_iResidual);
-                    }
+                if(doProj)
+                {
+                    //Proj
+                    m_matDataRaw.block(0, m_iCurrentSample, nRow, m_iResidual) = m_matSparseProjMult * data.at(b).block(0,0,nRow,m_iResidual);
                 } else {
-                    if(doSphara) {
-                        //Sphara
-                        m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), m_iResidual) = m_matSparseSpharaMult * data.at(b).block(0,0,data.at(b).rows(),m_iResidual);
-                    } else {
-                        //None - Raw
-                        m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), m_iResidual) = data.at(b).block(0,0,data.at(b).rows(),m_iResidual);
-                    }
+                    //None - Raw
+                    m_matDataRaw.block(0, m_iCurrentSample, nRow, m_iResidual) = data.at(b).block(0,0,nRow,m_iResidual);
                 }
             }
 
@@ -476,65 +472,65 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
                     i.value().clear();
                 }
             }
-        } else
+        } else {
             m_iResidual = 0;
+        }
 
         //std::cout<<"incoming data is ok"<<std::endl;
 
         if(doComp) {
             if(doProj) {
-                if(doSphara) {
-                    //Comp + Proj + Sphara
-                    m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()) = m_matSparseFull * data.at(b);
-                } else {
-                    //Comp + Proj
-                    m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()) = m_matSparseProjCompMult * data.at(b);
-                }
+                //Comp + Proj
+                m_matDataRaw.block(0, m_iCurrentSample, nRow, nCol) = m_matSparseProjCompMult * data.at(b);
             } else {
-                if(doSphara) {
-                    //Comp + Sphara
-                    m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()) = m_matSparseSpharaCompMult * data.at(b);
-                } else {
-                    //Comp
-                    m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()) = m_matSparseComp * data.at(b);
-                }
+                //Comp
+                m_matDataRaw.block(0, m_iCurrentSample, nRow, nCol) = m_matSparseCompMult * data.at(b);
             }
         } else {
             if(doProj) {
-                if(doSphara) {
-                    //Proj + Sphara
-                    m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()) = m_matSparseSpharaProjMult * data.at(b);
-                } else {
-                    //Proj
-                    m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()) = m_matSparseProj * data.at(b);
-                }
+                //Proj
+                m_matDataRaw.block(0, m_iCurrentSample, nRow, nCol) = m_matSparseProjMult * data.at(b);
             } else {
-                if(doSphara) {
-                    //Sphara
-                    m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()) = m_matSparseSpharaMult * data.at(b);
-                } else {
-                    //None - Raw
-                    m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()) = data.at(b);
-                }
+                //None - Raw
+                m_matDataRaw.block(0, m_iCurrentSample, nRow, nCol) = data.at(b);
             }
         }
 
-        //Filter if neccessary else set to zero
-        if(!m_filterData.isEmpty())
-            filterChannelsConcurrently(m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()), m_iCurrentSample);
-        else
-            m_matDataFiltered.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()).setZero();// = m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols());
+        //Filter if neccessary else set filtered data matrix to zero
+        if(!m_filterData.isEmpty()) {
+            filterChannelsConcurrently(m_matDataRaw.block(0, m_iCurrentSample, nRow, nCol), m_iCurrentSample);
 
-        m_iCurrentSample += data.at(b).cols();
+            //Perform SPHARA on filtered data after actual filtering - SPHARA should be applied on the best possible data
+            if(doSphara) {
+                if(m_iCurrentSample-m_iMaxFilterLength/2 >= 0) {
+                    m_matDataFiltered.block(0, m_iCurrentSample-m_iMaxFilterLength/2, nRow, nCol) = m_matSparseSpharaMult * m_matDataFiltered.block(0, m_iCurrentSample-m_iMaxFilterLength/2, nRow, nCol);
+                }
+                else {
+                    if(m_iCurrentSample-m_iMaxFilterLength/2 < 0) {
+                        m_matDataFiltered.block(0, 0, nRow, nCol) = m_matSparseSpharaMult * m_matDataFiltered.block(0, 0, nRow, nCol);
+                        int iResidual = m_iResidual+m_iMaxFilterLength/2;
+                        m_matDataFiltered.block(0, m_matDataFiltered.cols()-iResidual, nRow, iResidual) = m_matSparseSpharaMult * m_matDataFiltered.block(0, m_matDataFiltered.cols()-iResidual, nRow, iResidual);
+                    }
+                }
+            }
+        } else {
+            m_matDataFiltered.block(0, m_iCurrentSample, nRow, nCol).setZero();// = m_matDataRaw.block(0, m_iCurrentSample, nRow, nCol);
 
-        m_iCurrentBlockSize = data.at(b).cols();
+            //Perform SPHARA on raw data data
+            if(doSphara) {
+                m_matDataRaw.block(0, m_iCurrentSample, nRow, nCol) = m_matSparseSpharaMult * m_matDataRaw.block(0, m_iCurrentSample, nRow, nCol);
+            }
+        }
+
+        m_iCurrentSample += nCol;
+        m_iCurrentBlockSize = nCol;
 
         //detect the trigger flanks in the trigger channels
         if(m_bTriggerDetectionActive) {
             int iOldDetectedTriggers = m_qMapDetectedTrigger[m_iCurrentTriggerChIndex].size();
 
-            //DetectTrigger::detectTriggerFlanksMax(data.at(b), m_qMapDetectedTrigger, m_iCurrentSample-data.at(b).cols(), m_dTriggerThreshold, true);
-            DetectTrigger::detectTriggerFlanksGrad(data.at(b), m_qMapDetectedTrigger, m_iCurrentSample-data.at(b).cols(), m_dTriggerThreshold, "Falling");
+            //DetectTrigger::detectTriggerFlanksMax(data.at(b), m_qMapDetectedTrigger, m_iCurrentSample-nCol, m_dTriggerThreshold, true);
+            DetectTrigger::detectTriggerFlanksGrad(data.at(b), m_qMapDetectedTrigger, m_iCurrentSample-nCol, m_dTriggerThreshold, "Falling");
 
             //Compute newly counted triggers
             int newTriggers = m_qMapDetectedTrigger[m_iCurrentTriggerChIndex].size() - iOldDetectedTriggers;
@@ -725,20 +721,20 @@ void RealTimeMultiSampleArrayModel::updateProjection()
 
         tripletList.clear();
         tripletList.reserve(m_matProj.rows()*m_matProj.cols());
-        for(i = 0; i < m_matProj.rows(); ++i)
-            for(k = 0; k < m_matProj.cols(); ++k)
-                if(m_matProj(i,k) != 0)
+        for(i = 0; i < m_matProj.rows(); ++i) {
+            for(k = 0; k < m_matProj.cols(); ++k) {
+                if(m_matProj(i,k) != 0) {
                     tripletList.push_back(T(i, k, m_matProj(i,k)));
+                }
+            }
+        }
 
-        m_matSparseProj = SparseMatrix<double>(m_matProj.rows(),m_matProj.cols());
+        m_matSparseProjMult = SparseMatrix<double>(m_matProj.rows(),m_matProj.cols());
         if(tripletList.size() > 0)
-            m_matSparseProj.setFromTriplets(tripletList.begin(), tripletList.end());
+            m_matSparseProjMult.setFromTriplets(tripletList.begin(), tripletList.end());
 
         //Create full multiplication matrix
-        m_matSparseSpharaProjMult = m_matSparseSpharaMult * m_matSparseProj;
-        m_matSparseProjCompMult = m_matSparseProj * m_matSparseComp;
-
-        m_matSparseFull = m_matSparseSpharaMult * m_matSparseProj * m_matSparseComp;
+        m_matSparseProjCompMult = m_matSparseProjMult * m_matSparseCompMult;
     }
 }
 
@@ -752,10 +748,11 @@ void RealTimeMultiSampleArrayModel::updateCompensator(int to)
     //
     if(m_pFiffInfo)
     {
-        if(to == 0)
+        if(to == 0) {
             m_bCompActivated = false;
-        else
+        } else {
             m_bCompActivated = true;
+        }
 
 //        qDebug()<<"to"<<to;
 //        qDebug()<<"from"<<from;
@@ -781,20 +778,20 @@ void RealTimeMultiSampleArrayModel::updateCompensator(int to)
 
         tripletList.clear();
         tripletList.reserve(m_matComp.rows()*m_matComp.cols());
-        for(i = 0; i < m_matComp.rows(); ++i)
-            for(k = 0; k < m_matComp.cols(); ++k)
-                if(m_matComp(i,k) != 0)
+        for(i = 0; i < m_matComp.rows(); ++i) {
+            for(k = 0; k < m_matComp.cols(); ++k) {
+                if(m_matComp(i,k) != 0) {
                     tripletList.push_back(T(i, k, m_matComp(i,k)));
+                }
+            }
+        }
 
-        m_matSparseComp = SparseMatrix<double>(m_matComp.rows(),m_matComp.cols());
+        m_matSparseCompMult = SparseMatrix<double>(m_matComp.rows(),m_matComp.cols());
         if(tripletList.size() > 0)
-            m_matSparseComp.setFromTriplets(tripletList.begin(), tripletList.end());
+            m_matSparseCompMult.setFromTriplets(tripletList.begin(), tripletList.end());
 
         //Create full multiplication matrix
-        m_matSparseSpharaCompMult = m_matSparseSpharaMult * m_matSparseComp;
-        m_matSparseProjCompMult = m_matSparseProj * m_matSparseComp;
-
-        m_matSparseFull = m_matSparseSpharaMult * m_matSparseProj * m_matSparseComp;
+        m_matSparseProjCompMult = m_matSparseProjMult * m_matSparseCompMult;
     }
 }
 
@@ -826,9 +823,14 @@ void RealTimeMultiSampleArrayModel::updateSpharaOptions(const QString& sSytemTyp
             matSpharaMultFirst = Sphara::makeSpharaProjector(m_matSpharaBabyMEGInnerLoaded, m_vecIndicesFirstBabyMEG, m_pFiffInfo->nchan, nBaseFctsFirst, 0); //InnerLayer
         }
 
+        if(sSytemType == "EEG") {
+            matSpharaMultFirst = Sphara::makeSpharaProjector(m_matSpharaEEGLoaded, m_vecIndicesFirstEEG, m_pFiffInfo->nchan, nBaseFctsFirst, 0); //InnerLayer
+        }
+
         //Write final operator matrices to file
-        IOUtils::write_eigen_matrix(matSpharaMultFirst, QString(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/noisereduction/SPHARA/matSpharaMultFirst.txt"));
-        IOUtils::write_eigen_matrix(matSpharaMultSecond, QString(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/noisereduction/SPHARA/matSpharaMultSecond.txt"));
+//        IOUtils::write_eigen_matrix(matSpharaMultFirst, QString(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/noisereduction/SPHARA/matSpharaMultFirst.txt"));
+//        IOUtils::write_eigen_matrix(matSpharaMultSecond, QString(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/noisereduction/SPHARA/matSpharaMultSecond.txt"));
+//        IOUtils::write_eigen_matrix(m_matSpharaEEGLoaded, QString(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/noisereduction/SPHARA/m_matSpharaEEGLoaded.txt"));
 
         //
         // Make operators sparse
@@ -843,37 +845,41 @@ void RealTimeMultiSampleArrayModel::updateSpharaOptions(const QString& sSytemTyp
         //First operator
         tripletList.clear();
         tripletList.reserve(matSpharaMultFirst.rows()*matSpharaMultFirst.cols());
-        for(i = 0; i < matSpharaMultFirst.rows(); ++i)
-            for(k = 0; k < matSpharaMultFirst.cols(); ++k)
-                if(matSpharaMultFirst(i,k) != 0)
+        for(i = 0; i < matSpharaMultFirst.rows(); ++i) {
+            for(k = 0; k < matSpharaMultFirst.cols(); ++k) {
+                if(matSpharaMultFirst(i,k) != 0) {
                     tripletList.push_back(T(i, k, matSpharaMultFirst(i,k)));
+                }
+            }
+        }
 
         Eigen::SparseMatrix<double> matSparseSpharaMultFirst = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
 
         matSparseSpharaMultFirst = SparseMatrix<double>(matSpharaMultFirst.rows(),matSpharaMultFirst.cols());
-        if(tripletList.size() > 0)
+        if(tripletList.size() > 0) {
             matSparseSpharaMultFirst.setFromTriplets(tripletList.begin(), tripletList.end());
+        }
 
         //Second operator
         tripletList.clear();
         tripletList.reserve(matSpharaMultSecond.rows()*matSpharaMultSecond.cols());
 
-        for(i = 0; i < matSpharaMultSecond.rows(); ++i)
-            for(k = 0; k < matSpharaMultSecond.cols(); ++k)
-                if(matSpharaMultSecond(i,k) != 0)
+        for(i = 0; i < matSpharaMultSecond.rows(); ++i) {
+            for(k = 0; k < matSpharaMultSecond.cols(); ++k) {
+                if(matSpharaMultSecond(i,k) != 0) {
                     tripletList.push_back(T(i, k, matSpharaMultSecond(i,k)));
+                }
+            }
+        }
 
         Eigen::SparseMatrix<double>matSparseSpharaMultSecond = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
 
-        if(tripletList.size() > 0)
+        if(tripletList.size() > 0) {
             matSparseSpharaMultSecond.setFromTriplets(tripletList.begin(), tripletList.end());
+        }
 
         //Create full multiplication matrix
         m_matSparseSpharaMult = matSparseSpharaMultFirst * matSparseSpharaMultSecond;
-        m_matSparseSpharaProjMult = m_matSparseSpharaMult * m_matSparseProj;
-        m_matSparseSpharaCompMult = m_matSparseSpharaMult * m_matSparseComp;
-
-        m_matSparseFull = m_matSparseSpharaMult * m_matSparseProj * m_matSparseComp;
     }
 }
 
@@ -885,9 +891,11 @@ void RealTimeMultiSampleArrayModel::filterChanged(QList<FilterData> filterData)
     m_filterData = filterData;
 
     m_iMaxFilterLength = 1;
-    for(int i=0; i<filterData.size(); i++)
-        if(m_iMaxFilterLength<filterData.at(i).m_iFilterOrder)
+    for(int i=0; i<filterData.size(); ++i) {
+        if(m_iMaxFilterLength<filterData.at(i).m_iFilterOrder) {
             m_iMaxFilterLength = filterData.at(i).m_iFilterOrder;
+        }
+    }
 
     m_matOverlap.conservativeResize(m_pFiffInfo->chs.size(), m_iMaxFilterLength);
     m_matOverlap.setZero();
@@ -922,14 +930,15 @@ void RealTimeMultiSampleArrayModel::setFilterChannelType(QString channelType)
     //Create channel filter list independent from channelNames
     m_filterChannelList.clear();
 
-    for(int i = 0; i<m_pFiffInfo->chs.size(); i++) {
+    for(int i = 0; i<m_pFiffInfo->chs.size(); ++i) {
         if((m_pFiffInfo->chs.at(i).kind == FIFFV_MEG_CH || m_pFiffInfo->chs.at(i).kind == FIFFV_EEG_CH ||
             m_pFiffInfo->chs.at(i).kind == FIFFV_EOG_CH || m_pFiffInfo->chs.at(i).kind == FIFFV_ECG_CH ||
-            m_pFiffInfo->chs.at(i).kind == FIFFV_EMG_CH) && !m_pFiffInfo->bads.contains(m_pFiffInfo->chs.at(i).ch_name)) {
-            if(m_sFilterChannelType == "All")
+            m_pFiffInfo->chs.at(i).kind == FIFFV_EMG_CH)/* && !m_pFiffInfo->bads.contains(m_pFiffInfo->chs.at(i).ch_name)*/) {
+            if(m_sFilterChannelType == "All") {
                 m_filterChannelList << m_pFiffInfo->chs.at(i).ch_name;
-            else if(m_pFiffInfo->chs.at(i).ch_name.contains(m_sFilterChannelType))
+            } else if(m_pFiffInfo->chs.at(i).ch_name.contains(m_sFilterChannelType)) {
                 m_filterChannelList << m_pFiffInfo->chs.at(i).ch_name;
+            }
         }
     }
 
@@ -958,7 +967,7 @@ void RealTimeMultiSampleArrayModel::createFilterChannelList(QStringList channelN
     m_visibleChannelList = channelNames;
 
 //    //Create channel fiter list based on channelNames
-//    for(int i = 0; i<m_pFiffInfo->chs.size(); i++) {
+//    for(int i = 0; i<m_pFiffInfo->chs.size(); ++i) {
 //        if((m_pFiffInfo->chs.at(i).kind == FIFFV_MEG_CH || m_pFiffInfo->chs.at(i).kind == FIFFV_EEG_CH ||
 //            m_pFiffInfo->chs.at(i).kind == FIFFV_EOG_CH || m_pFiffInfo->chs.at(i).kind == FIFFV_ECG_CH ||
 //            m_pFiffInfo->chs.at(i).kind == FIFFV_EMG_CH) && !m_pFiffInfo->bads.contains(m_pFiffInfo->chs.at(i).ch_name)) {
@@ -970,20 +979,21 @@ void RealTimeMultiSampleArrayModel::createFilterChannelList(QStringList channelN
 //    }
 
     //Create channel filter list independent from channelNames
-    for(int i = 0; i<m_pFiffInfo->chs.size(); i++) {
+    for(int i = 0; i < m_pFiffInfo->chs.size(); ++i) {
         if((m_pFiffInfo->chs.at(i).kind == FIFFV_MEG_CH || m_pFiffInfo->chs.at(i).kind == FIFFV_EEG_CH ||
             m_pFiffInfo->chs.at(i).kind == FIFFV_EOG_CH || m_pFiffInfo->chs.at(i).kind == FIFFV_ECG_CH ||
-            m_pFiffInfo->chs.at(i).kind == FIFFV_EMG_CH) && !m_pFiffInfo->bads.contains(m_pFiffInfo->chs.at(i).ch_name)) {
-            if(m_sFilterChannelType == "All")
+            m_pFiffInfo->chs.at(i).kind == FIFFV_EMG_CH)/* && !m_pFiffInfo->bads.contains(m_pFiffInfo->chs.at(i).ch_name)*/) {
+            if(m_sFilterChannelType == "All") {
                 m_filterChannelList << m_pFiffInfo->chs.at(i).ch_name;
-            else if(m_pFiffInfo->chs.at(i).ch_name.contains(m_sFilterChannelType))
+            } else if(m_pFiffInfo->chs.at(i).ch_name.contains(m_sFilterChannelType)) {
                 m_filterChannelList << m_pFiffInfo->chs.at(i).ch_name;
+            }
         }
     }
 
 //    m_bDrawFilterFront = false;
 
-//    for(int i = 0; i<m_filterChannelList.size(); i++)
+//    for(int i = 0; i<m_filterChannelList.size(); ++i)
 //        std::cout<<m_filterChannelList.at(i).toStdString()<<std::endl;
 
     //Filter all visible data channels at once
@@ -1029,13 +1039,13 @@ void RealTimeMultiSampleArrayModel::triggerInfoChanged(const QMap<QString, QColo
     m_dTriggerThreshold = threshold;
 
     //Find channel index and initialise detected trigger map if channel name changed
-    if(m_sCurrentTriggerCh!=triggerCh) {
+    if(m_sCurrentTriggerCh != triggerCh) {
         m_sCurrentTriggerCh = triggerCh;
 
         QList<int> temp;
         m_qMapDetectedTrigger.clear();
 
-        for(int i = 0; i<m_pFiffInfo->chs.size(); i++) {
+        for(int i = 0; i < m_pFiffInfo->chs.size(); ++i) {
             if(m_pFiffInfo->chs[i].ch_name == m_sCurrentTriggerCh) {
                 m_iCurrentTriggerChIndex = i;
                 m_qMapDetectedTrigger.insert(i, temp);
@@ -1070,7 +1080,7 @@ void RealTimeMultiSampleArrayModel::markChBad(QModelIndexList chlist, bool statu
 {
     QList<FiffChInfo> chInfolist = m_pFiffInfo->chs;
 
-    for(int i=0; i < chlist.size(); ++i) {
+    for(int i = 0; i < chlist.size(); ++i) {
         if(status) {
             if(!m_pFiffInfo->bads.contains(chInfolist[chlist[i].row()].ch_name))
                 m_pFiffInfo->bads.append(chInfolist[chlist[i].row()].ch_name);
@@ -1097,7 +1107,7 @@ void RealTimeMultiSampleArrayModel::markChBad(QModelIndexList chlist, bool statu
 
 void doFilterPerChannelRTMSA(QPair<QList<FilterData>,QPair<int,RowVectorXd> > &channelDataTime)
 {
-    for(int i=0; i<channelDataTime.first.size(); i++)
+    for(int i = 0; i < channelDataTime.first.size(); ++i)
         //channelDataTime.second.second = channelDataTime.first.at(i).applyConvFilter(channelDataTime.second.second, true, FilterData::ZeroPad);
         channelDataTime.second.second = channelDataTime.first.at(i).applyFFTFilter(channelDataTime.second.second, true, FilterData::ZeroPad); //FFT Convolution for rt is not suitable. FFT make the signal filtering non causal.
 }
@@ -1117,9 +1127,9 @@ void RealTimeMultiSampleArrayModel::filterChannelsConcurrently()
 
     int fftLength = m_matDataRaw.row(0).cols() + 4 * m_iMaxFilterLength;
     int exp = ceil(MNEMath::log2(fftLength));
-    fftLength = pow(2, exp) <512 ? 512 : pow(2, exp);
+    fftLength = pow(2, exp) < 512 ? 512 : pow(2, exp);
 
-    for(int i = 0; i<m_filterData.size(); i++) {
+    for(int i = 0; i<m_filterData.size(); ++i) {
         FilterData tempFilter(m_filterData.at(i).m_sName,
                               m_filterData.at(i).m_Type,
                               m_filterData.at(i).m_iFilterOrder,
@@ -1155,14 +1165,14 @@ void RealTimeMultiSampleArrayModel::filterChannelsConcurrently()
 
         future.waitForFinished();
 
-        for(int r = 0; r<timeData.size(); r++) {
+        for(int r = 0; r < timeData.size(); ++r) {
             m_matDataFiltered.row(timeData.at(r).second.first) = timeData.at(r).second.second.segment(m_iMaxFilterLength+m_iMaxFilterLength/2, m_matDataRaw.cols());
             m_matOverlap.row(timeData.at(r).second.first) = timeData.at(r).second.second.tail(m_iMaxFilterLength);
         }
     }
 
     //Fill filtered data with raw data if the channel was not filtered
-    for(int i = 0; i<notFilterChannelIndex.size(); i++)
+    for(int i = 0; i < notFilterChannelIndex.size(); ++i)
         m_matDataFiltered.row(notFilterChannelIndex.at(i)) = m_matDataRaw.row(notFilterChannelIndex.at(i));
 
     if(!m_bIsFreezed) {
@@ -1175,23 +1185,18 @@ void RealTimeMultiSampleArrayModel::filterChannelsConcurrently()
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayModel::filterChannelsConcurrently(const MatrixXd &data, int dataIndex)
+void RealTimeMultiSampleArrayModel::filterChannelsConcurrently(const MatrixXd &data, int iDataIndex)
 {
     //std::cout<<"START RealTimeMultiSampleArrayModel::filterChannelsConcurrently"<<std::endl;
 
-    if(dataIndex >= m_matDataFiltered.cols() || data.cols()<m_iMaxFilterLength)
+    if(iDataIndex >= m_matDataFiltered.cols() || data.cols() < m_iMaxFilterLength)
         return;
-
-    if(data.rows() != m_matDataFiltered.rows()) {
-        m_matDataFiltered = m_matDataRaw;
-        return;
-    }
 
     //Generate QList structure which can be handled by the QConcurrent framework
     QList<QPair<QList<FilterData>,QPair<int,RowVectorXd> > > timeData;
     QList<int> notFilterChannelIndex;
 
-    for(qint32 i=0; i<data.rows(); ++i) {
+    for(qint32 i = 0; i < data.rows(); ++i) {
         if(m_filterChannelList.contains(m_pFiffInfo->chs.at(i).ch_name))
             timeData.append(QPair<QList<FilterData>,QPair<int,RowVectorXd> >(m_filterData,QPair<int,RowVectorXd>(i,data.row(i))));
         else
@@ -1209,8 +1214,8 @@ void RealTimeMultiSampleArrayModel::filterChannelsConcurrently(const MatrixXd &d
         int iFilterDelay = m_iMaxFilterLength/2;
         int iFilteredNumberCols = timeData.at(0).second.second.cols();
 
-        for(int r = 0; r<timeData.size(); r++) {
-            if(m_iCurrentSample+2*data.cols() > m_matDataRaw.cols()) {
+        for(int r = 0; r<timeData.size(); ++r) {
+            if(iDataIndex+2*data.cols() > m_matDataRaw.cols()) {
                 //Handle last data block
                 //std::cout<<"Handle last data block"<<std::endl;
 
@@ -1222,17 +1227,17 @@ void RealTimeMultiSampleArrayModel::filterChannelsConcurrently(const MatrixXd &d
                     tempData.head(m_iMaxFilterLength) += m_matOverlap.row(timeData.at(r).second.first);
 
                     //Write the newly calulated filtered data to the filter data matrix. Keep in mind that the current block also effect last part of the last block (begin at dataIndex-iFilterDelay).
-                    int start = dataIndex-iFilterDelay < 0 ? 0 : dataIndex-iFilterDelay;
+                    int start = iDataIndex-iFilterDelay < 0 ? 0 : iDataIndex-iFilterDelay;
                     m_matDataFiltered.row(timeData.at(r).second.first).segment(start,iFilteredNumberCols-m_iMaxFilterLength) = tempData.head(iFilteredNumberCols-m_iMaxFilterLength);
                 } else {
                     //Perform this else case everytime the filter was changed. Do not begin to plot from dataIndex-iFilterDelay because the impsulse response and m_matOverlap do not match with the new filter anymore.
-                    m_matDataFiltered.row(timeData.at(r).second.first).segment(dataIndex-iFilterDelay,m_iMaxFilterLength) = timeData.at(r).second.second.segment(m_iMaxFilterLength,m_iMaxFilterLength);
-                    m_matDataFiltered.row(timeData.at(r).second.first).segment(dataIndex+iFilterDelay,iFilteredNumberCols-2*m_iMaxFilterLength) = timeData.at(r).second.second.segment(m_iMaxFilterLength,iFilteredNumberCols-2*m_iMaxFilterLength);
+                    m_matDataFiltered.row(timeData.at(r).second.first).segment(iDataIndex-iFilterDelay,m_iMaxFilterLength) = timeData.at(r).second.second.segment(m_iMaxFilterLength,m_iMaxFilterLength);
+                    m_matDataFiltered.row(timeData.at(r).second.first).segment(iDataIndex+iFilterDelay,iFilteredNumberCols-2*m_iMaxFilterLength) = timeData.at(r).second.second.segment(m_iMaxFilterLength,iFilteredNumberCols-2*m_iMaxFilterLength);
                 }
 
                 //Refresh the m_matOverlap with the new calculated filtered data.
                 m_matOverlap.row(timeData.at(r).second.first) = timeData.at(r).second.second.tail(m_iMaxFilterLength);
-            } else if(m_iCurrentSample == 0) {
+            } else if(iDataIndex == 0) {
                 //Handle first data block
                 //std::cout<<"Handle first data block"<<std::endl;
 
@@ -1269,11 +1274,11 @@ void RealTimeMultiSampleArrayModel::filterChannelsConcurrently(const MatrixXd &d
                     tempData.head(m_iMaxFilterLength) += m_matOverlap.row(timeData.at(r).second.first);
 
                     //Write the newly calulated filtered data to the filter data matrix. Keep in mind that the current block also effect last part of the last block (begin at dataIndex-iFilterDelay).
-                    m_matDataFiltered.row(timeData.at(r).second.first).segment(dataIndex-iFilterDelay,iFilteredNumberCols-m_iMaxFilterLength) = tempData.head(iFilteredNumberCols-m_iMaxFilterLength);
+                    m_matDataFiltered.row(timeData.at(r).second.first).segment(iDataIndex-iFilterDelay,iFilteredNumberCols-m_iMaxFilterLength) = tempData.head(iFilteredNumberCols-m_iMaxFilterLength);
                 } else {
                     //Perform this else case everytime the filter was changed. Do not begin to plot from dataIndex-iFilterDelay because the impsulse response and m_matOverlap do not match with the new filter anymore.
-                    m_matDataFiltered.row(timeData.at(r).second.first).segment(dataIndex-iFilterDelay,m_iMaxFilterLength).setZero();// = timeData.at(r).second.second.segment(m_iMaxFilterLength,m_iMaxFilterLength);
-                    m_matDataFiltered.row(timeData.at(r).second.first).segment(dataIndex+iFilterDelay,iFilteredNumberCols-2*m_iMaxFilterLength) = timeData.at(r).second.second.segment(m_iMaxFilterLength,iFilteredNumberCols-2*m_iMaxFilterLength);
+                    m_matDataFiltered.row(timeData.at(r).second.first).segment(iDataIndex-iFilterDelay,m_iMaxFilterLength).setZero();// = timeData.at(r).second.second.segment(m_iMaxFilterLength,m_iMaxFilterLength);
+                    m_matDataFiltered.row(timeData.at(r).second.first).segment(iDataIndex+iFilterDelay,iFilteredNumberCols-2*m_iMaxFilterLength) = timeData.at(r).second.second.segment(m_iMaxFilterLength,iFilteredNumberCols-2*m_iMaxFilterLength);
                 }
 
                 //Refresh the m_matOverlap with the new calculated filtered data.
@@ -1285,8 +1290,9 @@ void RealTimeMultiSampleArrayModel::filterChannelsConcurrently(const MatrixXd &d
     m_bDrawFilterFront = true;
 
     //Fill filtered data with raw data if the channel was not filtered
-    for(int i = 0; i<notFilterChannelIndex.size(); i++)
-        m_matDataFiltered.row(notFilterChannelIndex.at(i)).segment(dataIndex,data.row(notFilterChannelIndex.at(i)).cols()) = data.row(notFilterChannelIndex.at(i));
+    for(int i = 0; i < notFilterChannelIndex.size(); ++i) {
+        m_matDataFiltered.row(notFilterChannelIndex.at(i)).segment(iDataIndex,data.row(notFilterChannelIndex.at(i)).cols()) = data.row(notFilterChannelIndex.at(i));
+    }
 
     //std::cout<<"END RealTimeMultiSampleArrayModel::filterChannelsConcurrently"<<std::endl;
 }

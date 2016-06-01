@@ -59,8 +59,6 @@
 
 #include <iostream>
 
-#include <stdlib.h>     //for using the function sleep
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -154,12 +152,12 @@ int main(int argc, char *argv[])
     //########################################################################################
 
     if(bAddRtSourceLoc) {
-        double snr = 1.0;
+        double snr = 3.0;
         double lambda2 = 1.0 / pow(snr, 2);
         QString method("dSPM"); //"MNE" | "dSPM" | "sLORETA"
 
         // Load data
-        fiff_int_t setno = 1;
+        fiff_int_t setno = 3;
         QPair<QVariant, QVariant> baseline(QVariant(), 0);
         FiffEvoked evoked(t_fileEvoked, setno, baseline);
         if(evoked.isEmpty())
@@ -234,22 +232,43 @@ int main(int argc, char *argv[])
 //    Annotation tAnnotLeft ("sample", 0, "aparc.a2009s", "./MNE-sample-data/subjects");
 
     View3D::SPtr testWindow = View3D::SPtr(new View3D());
-//    testWindow->addBrainData("HemiLRSet", tSurfLeft, tAnnotLeft);
-//    testWindow->addBrainData("HemiLRSet", tSurfRight, tAnnotRight);
-    testWindow->addBrainData("HemiLRSet", tSurfSet, tAnnotSet);
+//    testWindow->addBrainData("Subject01", "HemiLRSet", tSurfLeft, tAnnotLeft);
+//    testWindow->addBrainData("Subject01", "HemiLRSet", tSurfRight, tAnnotRight);
+    testWindow->addBrainData("Subject01", "HemiLRSet", tSurfSet, tAnnotSet);
+
+    //Read & show BEM
+    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif");
+    MNEBem t_Bem(t_fileBem);
+
+    QFile t_fileBem2("./MNE-sample-data/subjects/sample/bem/sample-head.fif");
+    MNEBem t_Bem2(t_fileBem2);
+    testWindow->addBemData("Subject01", "BEM", t_Bem2);
+
+    testWindow->addBemData("Subject01", "BEM", t_Bem);
 
     if(bAddRtSourceLoc) {
-        QList<BrainRTSourceLocDataTreeItem*> rtItemList = testWindow->addRtBrainData("HemiLRSet", sourceEstimate, t_clusteredFwd);
-        //testWindow->addBrainData("HemiLRSet", t_clusteredFwd);
+        QList<BrainRTSourceLocDataTreeItem*> rtItemList = testWindow->addRtBrainData("Subject01", "HemiLRSet", sourceEstimate, t_clusteredFwd);
 
-        //testWindow->addRtBrainData("HemiLRSet", sourceEstimate);
+        //testWindow->addBrainData("Subject01", "HemiLRSet", t_clusteredFwd);
+
+        //testWindow->addRtBrainData("Subject01", "HemiLRSet", sourceEstimate);
         //rtItemList.at(0)->addData(sourceEstimate);
+
+        //Init some rt related values
+        for(int i = 0; i < rtItemList.size(); ++i) {
+            rtItemList.at(i)->setLoopState(true);
+            rtItemList.at(i)->setTimeInterval(10);
+            rtItemList.at(i)->setNumberAverages(1);
+            rtItemList.at(i)->setStreamingActive(true);
+            rtItemList.at(i)->setNormalization(1.0);
+            rtItemList.at(i)->setVisualizationType("Annotation based");
+            rtItemList.at(i)->setColortable("Hot Negative 2");
+        }
     }
 
     testWindow->show();    
 
     Control3DWidget::SPtr control3DWidget = Control3DWidget::SPtr(new Control3DWidget());
-    control3DWidget->setWindowFlags(Qt::WindowStaysOnTopHint);
     control3DWidget->setView3D(testWindow);
     control3DWidget->show();
 

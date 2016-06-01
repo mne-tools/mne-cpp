@@ -79,7 +79,6 @@ ShaderMaterial::~ShaderMaterial()
     delete m_ambientParameter;
     delete m_diffuseParameter;
     delete m_specularParameter;
-    delete m_specularParameter;
     delete m_shininessParameter;
     delete m_alphaParameter;
     delete m_vertexGL3Technique;

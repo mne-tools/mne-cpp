@@ -246,7 +246,6 @@ void BabyMEG::init()
 
     //Init projection dialog
     m_pBabyMEGProjectDialog = QSharedPointer<BabyMEGProjectDialog>(new BabyMEGProjectDialog(this));
-
 }
 
 

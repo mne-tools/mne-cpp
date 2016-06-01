@@ -44,16 +44,21 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
-//=============================================================================================================
-
-
-//*************************************************************************************************************
-//=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace UTILSLIB;
+using namespace Eigen;
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINES
+//=============================================================================================================
+
+#define ALPHA 1.0
+#define BETA 0.5
+#define GAMMA 2.0
 
 
 //*************************************************************************************************************
@@ -68,38 +73,34 @@ MinimizerSimplex::MinimizerSimplex()
 
 //*************************************************************************************************************
 
-int MinimizerSimplex::mne_simplex_minimize(MatrixXf p,
-                                           VectorXf y,
-                                           int   ndim,
-                                           float ftol,
-                                           float (*func)(const VectorXf &x,
-                                                         int npar,
-                                                         void *user_data),
-                                           void  *user_data,
-                                           int   max_eval,
-                                           int   &neval,
-                                           int   report,
-                                           int   (*report_func)(int loop,
+bool MinimizerSimplex::mne_simplex_minimize(    MatrixXf& p,
+                                                VectorXf& y,
+                                                float ftol,
+                                                float (*func)(  const VectorXf &x,
+                                                                const void *user_data),
+                                                const void  *user_data,
+                                                int   max_eval,
+                                                int   &neval,
+                                                int   report,
+                                                bool   (*report_func)(int loop,
                                                         const VectorXf &fitpar,
-                                                        int npar,
                                                         double fval))
 {
-    int   i,j,ilo,ihi,inhi;
+    int   ndim = p.cols();  /* Number of variables */
+    int   i,ilo,ihi,inhi;
     int   mpts = ndim+1;
-    float ytry,ysave,sum,rtol;
+    float ytry,ysave,rtol;
     VectorXf psum(ndim);
-    int   result = 0;
+    bool  result = true;
     int   count = 0;
     int   loop  = 1;
 
     neval = 0;
-    for (j = 0; j < ndim; j++) {
-        for (i = 0,sum = 0.0; i<mpts; i++)
-            sum +=  p(i,j);
-        psum[j] = sum;
+    psum = p.colwise().sum();
+
+    if (report_func != NULL && report > 0) {
+        report_func(0,static_cast<VectorXf>(p.row(0)),-1.0);
     }
-    if (report_func != NULL && report > 0)
-        (void)report_func(0,static_cast<VectorXf>(p.row(0)),ndim,-1.0);
 
     for (;;count++,loop++) {
         ilo = 1;
@@ -119,9 +120,9 @@ int MinimizerSimplex::mne_simplex_minimize(MatrixXf p,
         * Report that we are proceeding...
         */
         if (count == report && report_func != NULL) {
-            if (report_func(loop,static_cast<VectorXf>(p.row(ilo)),ndim,y[ilo])) {
+            if (!report_func(loop,static_cast<VectorXf>(p.row(ilo)),y[ilo])) {
                 std::cout<<"Interation interrupted.";
-                result = -1;
+                result = false;
                 break;
             }
             count = 0;
@@ -130,71 +131,61 @@ int MinimizerSimplex::mne_simplex_minimize(MatrixXf p,
             break;
         if (neval >=  max_eval) {
             std::cout<<"Maximum number of evaluations exceeded.";
-            result  =  -1;
+            result  =  false;
             break;
         }
-        ytry = tryit(p,y,psum,ndim,func,user_data,ihi,neval,-ALPHA);
+        ytry = tryit(p,y,psum,func,user_data,ihi,neval,-ALPHA);
         if (ytry <= y[ilo])
-            ytry = tryit(p,y,psum,ndim,func,user_data,ihi,neval,GAMMA);
+            ytry = tryit(p,y,psum,func,user_data,ihi,neval,GAMMA);
         else if (ytry >= y[inhi]) {
             ysave = y[ihi];
-            ytry = tryit(p,y,psum,ndim,func,user_data,ihi,neval,BETA);
+            ytry = tryit(p,y,psum,func,user_data,ihi,neval,BETA);
             if (ytry >= ysave) {
                 for (i = 0; i < mpts; i++) {
                     if (i !=  ilo) {
-                        for (j = 0; j < ndim; j++) {
-                            psum[j] = 0.5*(p(i,j)+p(ilo,j));
-                            p(i,j) = psum[j];
-                        }
-                        y[i] = (*func)(psum,ndim,user_data);
+                        psum = 0.5 * ( p.row(i) + p.row(ilo) );
+                        p.row(i) = psum;
+                        y[i] = (*func)(psum,user_data);
                     }
                 }
                 neval +=  ndim;
-                for (j = 0; j < ndim; j++) {
-                    for (i = 0,sum = 0.0; i < mpts; i++)
-                        sum +=  p(i,j);
-                    psum[j] = sum;
-                }
+                psum = p.colwise().sum();
             }
         }
     }
 
-    return (result);
+    return result;
 }
 
 
 //*************************************************************************************************************
 
-float MinimizerSimplex::tryit(MatrixXf p,
-                              VectorXf y,
-                              VectorXf psum,
-                              int   ndim,
-                              float (*func)(const VectorXf &x,int npar,void *user_data),
-                              void  *user_data,
+float MinimizerSimplex::tryit(MatrixXf& p,
+                              VectorXf& y,
+                              VectorXf& psum,
+                              float (*func)(const VectorXf &x, const void *user_data),
+                              const void  *user_data,
                               int   ihi,
                               int &neval,
                               float fac)
 {
-    int j;
+    int ndim = p.cols();
     float fac1,fac2,ytry;
     VectorXf ptry(ndim);
 
     fac1 = (1.0-fac)/ndim;
     fac2 = fac1-fac;
 
-    for (j = 0; j < ndim; j++)
-        ptry[j] = psum[j]*fac1-p(ihi,j)*fac2;
+    ptry = psum * fac1 - p.row(ihi).transpose() * fac2;
 
-    ytry = (*func)(ptry,ndim,user_data);
-    ++(neval);
+    ytry = (*func)(ptry,user_data);
+    ++neval;
 
     if (ytry < y[ihi]) {
         y[ihi] = ytry;
 
-        for (j = 0; j < ndim; j++) {
-            psum[j] +=  ptry[j]-p(ihi,j);
-            p(ihi,j) = ptry[j];
-        }
+        psum += ptry - p.row(ihi).transpose();
+        p.row(ihi) = ptry;
     }
 
     return ytry;
@@ -203,4 +194,3 @@ float MinimizerSimplex::tryit(MatrixXf p,
 #undef ALPHA
 #undef BETA
 #undef GAMMA
-

@@ -101,7 +101,7 @@ namespace DISP3DLIB
 */
 class DISP3DNEWSHARED_EXPORT BrainHemisphereTreeItem : public AbstractTreeItem
 {
-    Q_OBJECT;
+    Q_OBJECT
 
 public:
     typedef QSharedPointer<BrainHemisphereTreeItem> SPtr;             /**< Shared pointer type for BrainHemisphereTreeItem class. */
@@ -114,7 +114,7 @@ public:
     * @param[in] iType      The type of the item. See types.h for declaration and definition.
     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
     */
-    explicit BrainHemisphereTreeItem(int iType = BrainTreeModelItemTypes::HemisphereItem, const QString& text = "Unknown");
+    explicit BrainHemisphereTreeItem(int iType = Data3DTreeModelItemTypes::HemisphereItem, const QString& text = "Unknown");
 
     //=========================================================================================================
     /**
@@ -128,6 +128,7 @@ public:
     */
     QVariant data(int role = Qt::UserRole + 1) const;
     void setData(const QVariant& value, int role = Qt::UserRole + 1);
+    int	columnCount() const;
 
     //=========================================================================================================
     /**

@@ -96,14 +96,6 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Ne
     addDisplayAction(m_pActionSelectSensors);
     m_pActionSelectSensors->setVisible(true);
 
-    m_pActionFiltering = new QAction(QIcon(":/images/showFilterWindow.png"), tr("Shows the filter window (F11)"),this);
-    m_pActionFiltering->setShortcut(tr("F11"));
-    m_pActionFiltering->setStatusTip(tr("Shows the filter window (F11)"));
-    connect(m_pActionFiltering, &QAction::triggered,
-            this, &RealTimeMultiSampleArrayWidget::showFilterWidget);
-    addDisplayAction(m_pActionFiltering);
-    m_pActionFiltering->setVisible(false);
-
     m_pActionHideBad = new QAction(QIcon(":/images/hideBad.png"), tr("Toggle all bad channels"),this);
     m_pActionHideBad->setStatusTip(tr("Toggle all bad channels"));
     connect(m_pActionHideBad, &QAction::triggered,
@@ -180,6 +172,7 @@ RealTimeMultiSampleArrayWidget::~RealTimeMultiSampleArrayWidget()
             settings.setValue(QString("RTMSAW/%1/filterDesignMethod").arg(t_sRTMSAWName), (int)filter.m_designMethod);
             settings.setValue(QString("RTMSAW/%1/filterTransition").arg(t_sRTMSAWName), filter.m_dParksWidth*(filter.m_sFreq/2));
             settings.setValue(QString("RTMSAW/%1/filterUserDesignActive").arg(t_sRTMSAWName), m_pFilterWindow->userDesignedFiltersIsActive());
+            settings.setValue(QString("RTMSAW/%1/filterChannelType").arg(t_sRTMSAWName), m_pFilterWindow->getChannelType());
         }
 
         //Store view
@@ -406,7 +399,8 @@ void RealTimeMultiSampleArrayWidget::init()
                                                 settings.value(QString("RTMSAW/%1/filterType").arg(t_sRTMSAWName), 2).toInt(),
                                                 settings.value(QString("RTMSAW/%1/filterDesignMethod").arg(t_sRTMSAWName), 0).toInt(),
                                                 settings.value(QString("RTMSAW/%1/filterTransition").arg(t_sRTMSAWName), 5.0).toDouble(),
-                                                settings.value(QString("RTMSAW/%1/filterUserDesignActive").arg(t_sRTMSAWName), false).toBool());
+                                                settings.value(QString("RTMSAW/%1/filterUserDesignActive").arg(t_sRTMSAWName), false).toBool(),
+                                                settings.value(QString("RTMSAW/%1/filterChannelType").arg(t_sRTMSAWName), "MEG").toString());
 
         //
         //-------- Init channel selection manager --------

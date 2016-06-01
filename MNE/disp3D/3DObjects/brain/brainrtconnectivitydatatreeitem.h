@@ -47,7 +47,7 @@
 #include "../../helpers/types.h"
 #include "../../rt/rtSourceLoc/rtsourcelocdataworker.h"
 
-#include "braintreemetaitem.h"
+#include "../common/metatreeitem.h"
 
 #include "fiff/fiff_types.h"
 
@@ -99,7 +99,7 @@ namespace DISP3DLIB
 */
 class DISP3DNEWSHARED_EXPORT BrainRTConnectivityDataTreeItem : public AbstractTreeItem
 {
-    Q_OBJECT;
+    Q_OBJECT
 
 public:
     typedef QSharedPointer<BrainRTConnectivityDataTreeItem> SPtr;             /**< Shared pointer type for BrainRTConnectivityDataTreeItem class. */
@@ -112,7 +112,7 @@ public:
     * @param[in] iType      The type of the item. See types.h for declaration and definition.
     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
     */
-    explicit BrainRTConnectivityDataTreeItem(int iType = BrainTreeModelItemTypes::RTConnectivityDataItem, const QString& text = "RT Connectivity Data");
+    explicit BrainRTConnectivityDataTreeItem(int iType = Data3DTreeModelItemTypes::RTConnectivityDataItem, const QString& text = "RT Connectivity Data");
 
     //=========================================================================================================
     /**

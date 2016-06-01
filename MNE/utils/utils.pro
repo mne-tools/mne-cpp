@@ -89,7 +89,8 @@ SOURCES += \
     detecttrigger.cpp \
     spectrogram.cpp \
     warp.cpp \
-    filterTools/sphara.cpp
+    filterTools/sphara.cpp \
+    sphere.cpp
 
 HEADERS += \
     kmeans.h\
@@ -111,7 +112,8 @@ HEADERS += \
     detecttrigger.h \
     spectrogram.h \
     warp.h \
-    filterTools/sphara.h
+    filterTools/sphara.h \
+    sphere.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
@@ -140,5 +142,5 @@ win32 {
 
     #  # Uncomment the following line to help debug the deploy command when running qmake
     #  warning($${DEPLOY_COMMAND} $${DEPLOY_TARGET})
-    QMAKE_POST_LINK = $${DEPLOY_COMMAND} $${DEPLOY_TARGET}
+    QMAKE_POST_LINK += $${DEPLOY_COMMAND} $${DEPLOY_TARGET}
 }

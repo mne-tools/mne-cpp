@@ -42,7 +42,6 @@
 
 #include <iostream>
 #include <mne/mne.h>
-#include <utils/ioutils.h>
 
 
 //*************************************************************************************************************
@@ -51,6 +50,7 @@
 //=============================================================================================================
 
 #include <QtCore/QCoreApplication>
+#include <QCommandLineParser>
 
 
 //*************************************************************************************************************
@@ -78,72 +78,45 @@ using namespace MNELIB;
 
 int main(int argc, char *argv[])
 {
-    QCoreApplication a(argc, argv);
+    QCoreApplication app(argc, argv);
 
-    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif");
-//    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-all-src.fif");
-//    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-5120-bem-sol.fif");
-//    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-5120-bem.fif");
-//    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-head.fif");
+    // Command Line Parser
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Read BEM Example");
+    parser.addHelpOption();
+    QCommandLineOption sampleBEMFileOption("f", "Path to BEM <file>.", "file", "./MNE-sample-data/subjects/sample/bem/sample-head.fif");
+//    "./MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif"
+//    "./MNE-sample-data/subjects/sample/bem/sample-all-src.fif"
+//    "./MNE-sample-data/subjects/sample/bem/sample-5120-bem-sol.fif"
+//    "./MNE-sample-data/subjects/sample/bem/sample-5120-bem.fif"
+    parser.addOption(sampleBEMFileOption);
+    parser.process(app);
 
+    //########################################################################################
+    // Read the BEM
+    QFile t_fileBem(parser.value(sampleBEMFileOption));
+    MNEBem t_Bem(t_fileBem);
 
-    MNEBem t_Bem (t_fileBem) ;
+    if( t_Bem.size() > 0 )
+    {
+        qDebug() << "t_Bem[0].tri_nn:" << t_Bem[0].tri_nn(0,0) << t_Bem[0].tri_nn(0,1) << t_Bem[0].tri_nn(0,2);
+        qDebug() << "t_Bem[0].tri_nn:" << t_Bem[0].tri_nn(2,0) << t_Bem[0].tri_nn(2,1) << t_Bem[0].tri_nn(2,2);
+    }
 
-    QString folder = "C:/Users/Jana/Documents/MATLAB/AVG4-0Years_segmented_BEM3/";
-
-    MatrixXd help;
-
-    MNEBem t_BemIso2Mesh;
-    MNEBemSurface  p_Brain;
-    p_Brain.id = FIFFV_BEM_SURF_ID_BRAIN;
-    QString path=folder;
-    IOUtils::read_eigen_matrix(help, path.append("brain_vert.txt"));
-    p_Brain.rr= help.cast<float>();
-    path=folder;
-    IOUtils::read_eigen_matrix(help, path.append("brain_tri.txt"));
-    p_Brain.tris = help.cast<int>();
-    p_Brain.np = p_Brain.rr.rows();
-    p_Brain.ntri = p_Brain.tris.rows();
-    p_Brain.addTriangleData();
-    p_Brain.addVertexNormals();
-    t_BemIso2Mesh<<p_Brain;
-
-    MNEBemSurface  p_Skull;
-    p_Skull.id = FIFFV_BEM_SURF_ID_SKULL;
-    path=folder;
-    IOUtils::read_eigen_matrix(help,path.append("skull_vert.txt"));
-    p_Skull.rr =  help.cast<float>();
-    path=folder;
-    IOUtils::read_eigen_matrix(help,path.append("skull_tri.txt"));
-    p_Skull.tris =  help.cast<int>();
-    p_Skull.np = p_Skull.rr.rows();
-    p_Skull.ntri = p_Skull.tris.rows();
-    p_Skull.addTriangleData();
-    p_Skull.addVertexNormals();
-    t_BemIso2Mesh<<p_Skull;
-
-    MNEBemSurface  p_Head;
-    p_Head.id = FIFFV_BEM_SURF_ID_HEAD;
-    path=folder;
-    IOUtils::read_eigen_matrix(help,path.append("head_vert.txt"));
-    p_Head.rr =  help.cast<float>();
-    path=folder;
-    IOUtils::read_eigen_matrix(help,path.append("head_tri.txt"));
-    p_Head.tris =  help.cast<int>();
-    p_Head.np = p_Head.rr.rows();
-    p_Head.ntri = p_Head.tris.rows();
-    p_Head.addTriangleData();
-    p_Head.addVertexNormals();
-    t_BemIso2Mesh<<p_Head;
-
-    QFile t_fileBemTest("D:/Studium/Master/Masterarbeit/Programming/Iso2MeshBem/AVG4-0Years_segmented_BEM3.fif");
-    t_BemIso2Mesh.write(t_fileBemTest);
+    // Write the BEM
+    QFile t_fileBemTest("./MNE-sample-data/subjects/sample/bem/sample-head-test.fif");
+    t_Bem.write(t_fileBemTest);
     t_fileBemTest.close();
-
 
     MNEBem t_BemTest (t_fileBemTest) ;
 
+    if( t_BemTest.size() > 0 )
+    {
+        qDebug() << "t_BemTest[0].tri_nn:" << t_BemTest[0].tri_nn(0,0) << t_BemTest[0].tri_nn(0,1) << t_BemTest[0].tri_nn(0,2);
+        qDebug() << "t_BemTest[0].tri_nn:" << t_BemTest[0].tri_nn(2,0) << t_BemTest[0].tri_nn(2,1) << t_BemTest[0].tri_nn(2,2);
+    }
+
     qDebug() << "Put your stuff your interest in here";
 
-    return a.exec();
+    return app.exec();
 }

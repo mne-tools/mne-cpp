@@ -59,7 +59,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace RTINVLIB;
+using namespace RTPROCLIB;
 using namespace FIFFLIB;
 
 

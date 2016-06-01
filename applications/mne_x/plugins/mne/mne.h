@@ -89,7 +89,7 @@ using namespace FSLIB;
 using namespace FIFFLIB;
 using namespace MNELIB;
 using namespace INVERSELIB;
-using namespace RTINVLIB;
+using namespace RTPROCLIB;
 using namespace MNEX;
 using namespace XMEASLIB;
 using namespace IOBuffer;
@@ -238,7 +238,6 @@ private:
     AnnotationSet::SPtr         m_pAnnotationSet;   /**< Annotation set. */
     QString                     m_sSurfaceDir;      /**< File to Surface. */
     SurfaceSet::SPtr            m_pSurfaceSet;      /**< Surface set. */
-
 
     FiffInfo::SPtr              m_pFiffInfo;        /**< Fiff information. */
     FiffInfo::SPtr              m_pFiffInfoInput;  /**< Fiff information of the evoked. */

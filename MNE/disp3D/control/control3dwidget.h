@@ -45,7 +45,7 @@
 
 #include "disp/helpers/roundededgeswidget.h"
 #include "../view3D.h"
-#include "../3DObjects/brain/braintreedelegate.h"
+#include "../3DObjects/data3Dtreedelegate.h"
 
 
 //*************************************************************************************************************
@@ -54,6 +54,7 @@
 //=============================================================================================================
 
 #include <QWidget>
+#include <QMenu>
 
 
 //*************************************************************************************************************
@@ -87,7 +88,7 @@ namespace DISP3DLIB
 *
 * @brief User GUI control for the View3D.
 */
-class DISP3DNEWSHARED_EXPORT Control3DWidget : public DISPLIB::RoundedEdgesWidget
+class DISP3DNEWSHARED_EXPORT Control3DWidget : public QWidget/*, public DISPLIB::RoundedEdgesWidget*/
 {
     Q_OBJECT
 
@@ -139,6 +140,31 @@ protected slots:
     * Slot called when the scene color changed.
     */
     void onSceneColorPicker();
+
+    //=========================================================================================================
+    /**
+    * @brief customContextMenuRequested
+    * @param[in] pos    The position, where the right-click occurred
+    */
+    void onCustomContextMenuRequested(QPoint pos);
+
+    //=========================================================================================================
+    /**
+    * Slot called when tree view header visibilty changed.
+    */
+    void onTreeViewHeaderHide();
+
+    //=========================================================================================================
+    /**
+    * Slot called when tree view description visibilty changed.
+    */
+    void onTreeViewDescriptionHide();
+
+    //=========================================================================================================
+    /**
+    * Slot called when the user wants to change the always on top window flag.
+    */
+    void onAlwaysOnTop(bool state);
 
 protected:
     Ui::Control3DWidget*    ui;                         /**< The pointer to the QtDesigner ui class. */

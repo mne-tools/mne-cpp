@@ -60,6 +60,7 @@ RealTimeEvokedModel::RealTimeEvokedModel(QObject *parent)
 , m_fSps(1024.0f)
 , m_bIsFreezed(false)
 , m_bProjActivated(false)
+, m_bCompActivated(false)
 {
 
 }
@@ -77,10 +78,11 @@ RealTimeEvokedModel::~RealTimeEvokedModel()
 //virtual functions
 int RealTimeEvokedModel::rowCount(const QModelIndex & /*parent*/) const
 {
-    if(!m_qMapIdxRowSelection.empty())
+    if(!m_qMapIdxRowSelection.empty()) {
         return m_qMapIdxRowSelection.size();
-    else
-        return 0;
+    }
+
+    return 0;
 }
 
 
@@ -96,15 +98,17 @@ int RealTimeEvokedModel::columnCount(const QModelIndex & /*parent*/) const
 
 QVariant RealTimeEvokedModel::data(const QModelIndex &index, int role) const
 {
-    if(role != Qt::DisplayRole && role != Qt::BackgroundRole && role != RealTimeEvokedModelRoles::GetAverageData)
+    if(role != Qt::DisplayRole && role != Qt::BackgroundRole && role != RealTimeEvokedModelRoles::GetAverageData) {
         return QVariant();
+    }
 
-    if (index.isValid()) {
+    if(index.isValid()) {
         qint32 row = m_qMapIdxRowSelection[index.row()];
 
         //******** first column (chname) ********
-        if(index.column() == 0 && role == Qt::DisplayRole)
+        if(index.column() == 0 && role == Qt::DisplayRole) {
             return QVariant(m_pRTE->info()->ch_names[row]);
+        }
 
         //******** second column (butterfly data plot) ********
         //TODO: Bring this into a better structure see colum three
@@ -118,17 +122,18 @@ QVariant RealTimeEvokedModel::data(const QModelIndex &index, int role) const
 
                     if(m_bIsFreezed) {
                         // data freeze
-                        if(m_filterData.isEmpty())
+                        if(m_filterData.isEmpty()) {
                             rowVec = m_matDataFreeze.row(row);
-                        else
+                        } else {
                             rowVec = m_matDataFilteredFreeze.row(row);
-                    }
-                    else {
+                        }
+                    } else {
                         // data stream
-                        if(m_filterData.isEmpty())
+                        if(m_filterData.isEmpty()) {
                             rowVec = m_matData.row(row);
-                        else
+                        } else {
                             rowVec = m_matDataFiltered.row(row);
+                        }
                     }
 
                     v.setValue(rowVec);
@@ -164,8 +169,7 @@ QVariant RealTimeEvokedModel::data(const QModelIndex &index, int role) const
                         if(m_filterData.isEmpty()) {
                             averagedData.first = m_matDataFreeze.data();
                             averagedData.second = m_matDataFreeze.cols();
-                        }
-                        else {
+                        } else {
                             averagedData.first = m_matDataFilteredFreeze.data();
                             averagedData.second = m_matDataFilteredFreeze.cols();
                         }
@@ -177,8 +181,7 @@ QVariant RealTimeEvokedModel::data(const QModelIndex &index, int role) const
                         if(m_filterData.isEmpty()) {
                             averagedData.first = m_matData.data();
                             averagedData.second = m_matData.cols();
-                        }
-                        else {
+                        } else {
                             averagedData.first = m_matDataFiltered.data();
                             averagedData.second = m_matDataFiltered.cols();
                         }
@@ -201,8 +204,9 @@ QVariant RealTimeEvokedModel::data(const QModelIndex &index, int role) const
 
 QVariant RealTimeEvokedModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
-    if(role != Qt::DisplayRole && role != Qt::TextAlignmentRole)
+    if(role != Qt::DisplayRole && role != Qt::TextAlignmentRole) {
         return QVariant();
+    }
 
     if(orientation == Qt::Horizontal) {
         switch(section) {
@@ -241,8 +245,9 @@ void RealTimeEvokedModel::setRTE(QSharedPointer<RealTimeEvoked> &pRTE)
     RowVectorXi sel;// = RowVectorXi(0,0);
     QStringList emptyExclude;
 
-    if(m_pRTE->info()->bads.size() > 0)
+    if(m_pRTE->info()->bads.size() > 0) {
         sel = FiffInfoBase::pick_channels(m_pRTE->info()->ch_names, m_pRTE->info()->bads, emptyExclude);
+    }
 
     m_vecBadIdcs = sel;
 
@@ -278,15 +283,31 @@ void RealTimeEvokedModel::updateData()
 
     bool doProj = m_bProjActivated && m_matData.cols() > 0 && m_matData.rows() == m_matProj.cols() ? true : false;
 
-    if(!doProj)
-        m_matData = m_pRTE->getValue()->data;
-    else
-        m_matData = m_matSparseProj * m_pRTE->getValue()->data;
+    bool doComp = m_bCompActivated && m_matData.cols() > 0 && m_matData.rows() == m_matComp.cols() ? true : false;
+
+    if(doComp) {
+        if(doProj) {
+            //Comp + Proj
+            m_matData = m_matSparseProjCompMult * m_pRTE->getValue()->data;
+        } else {
+            //Comp
+            m_matData = m_matSparseCompMult * m_pRTE->getValue()->data;
+        }
+    } else {
+        if(doProj) {
+            //Proj
+            m_matData = m_matSparseProjMult * m_pRTE->getValue()->data;
+        } else {
+            //None - Raw
+            m_matData = m_pRTE->getValue()->data;
+        }
+    }
 
     m_pairBaseline = m_pRTE->getValue()->baseline;
 
-    if(!m_filterData.isEmpty())
+    if(!m_filterData.isEmpty()) {
         filterChannelsConcurrently();
+    }
 
     m_bIsInit = true;
 
@@ -302,13 +323,12 @@ void RealTimeEvokedModel::updateData()
 
 QColor RealTimeEvokedModel::getColor(qint32 row) const
 {
-    if(row < m_qMapIdxRowSelection.size())
-    {
+    if(row < m_qMapIdxRowSelection.size()) {
         qint32 chRow = m_qMapIdxRowSelection[row];
         return m_pRTE->chColor()[chRow];
     }
-    else
-        return QColor();
+
+    return QColor();
 }
 
 
@@ -316,13 +336,12 @@ QColor RealTimeEvokedModel::getColor(qint32 row) const
 
 fiff_int_t RealTimeEvokedModel::getKind(qint32 row) const
 {
-    if(row < m_qMapIdxRowSelection.size())
-    {
+    if(row < m_qMapIdxRowSelection.size()) {
         qint32 chRow = m_qMapIdxRowSelection[row];
         return m_pRTE->info()->chs[chRow].kind;
     }
-    else
-        return 0;
+
+    return 0;
 }
 
 
@@ -330,13 +349,12 @@ fiff_int_t RealTimeEvokedModel::getKind(qint32 row) const
 
 fiff_int_t RealTimeEvokedModel::getUnit(qint32 row) const
 {
-    if(row < m_qMapIdxRowSelection.size())
-    {
+    if(row < m_qMapIdxRowSelection.size()) {
         qint32 chRow = m_qMapIdxRowSelection[row];
         return m_pRTE->info()->chs[chRow].unit;
     }
-    else
-        return FIFF_UNIT_NONE;
+
+    return FIFF_UNIT_NONE;
 }
 
 
@@ -344,13 +362,12 @@ fiff_int_t RealTimeEvokedModel::getUnit(qint32 row) const
 
 fiff_int_t RealTimeEvokedModel::getCoil(qint32 row) const
 {
-    if(row < m_qMapIdxRowSelection.size())
-    {
+    if(row < m_qMapIdxRowSelection.size()) {
         qint32 chRow = m_qMapIdxRowSelection[row];
         return m_pRTE->info()->chs[chRow].coil_type;
     }
-    else
-        return FIFFV_COIL_NONE;
+
+    return FIFFV_COIL_NONE;
 }
 
 
@@ -363,10 +380,8 @@ void RealTimeEvokedModel::selectRows(const QList<qint32> &selection)
     m_qMapIdxRowSelection.clear();
 
     qint32 count = 0;
-    for(qint32 i = 0; i < selection.size(); ++i)
-    {
-        if(selection[i] < m_pRTE->info()->nchan)
-        {
+    for(qint32 i = 0; i < selection.size(); ++i) {
+        if(selection[i] < m_pRTE->info()->nchan) {
             m_qMapIdxRowSelection.insert(count,selection[i]);
             ++count;
         }
@@ -386,8 +401,9 @@ void RealTimeEvokedModel::resetSelection()
 
     m_qMapIdxRowSelection.clear();
 
-    for(qint32 i = 0; i < m_pRTE->info()->nchan; ++i)
+    for(qint32 i = 0; i < m_pRTE->info()->nchan; ++i) {
         m_qMapIdxRowSelection.insert(i,i);
+    }
 
     endResetModel();
 }
@@ -410,12 +426,13 @@ void RealTimeEvokedModel::updateProjection()
     //
     //  Update the SSP projector
     //
-    if(m_pRTE->info()->chs.size()>0)
-    {
+    if(m_pRTE->info()->chs.size()>0) {
         m_bProjActivated = false;
-        for(qint32 i = 0; i < m_pRTE->info()->projs.size(); ++i)
-            if(m_pRTE->info()->projs[i].active)
+        for(qint32 i = 0; i < m_pRTE->info()->projs.size(); ++i) {
+            if(m_pRTE->info()->projs[i].active) {
                 m_bProjActivated = true;
+            }
+        }
 
         m_pRTE->info()->make_projector(m_matProj);
         qDebug() << "updateProjection :: New projection calculated :: m_bProjActivated is "<<m_bProjActivated;
@@ -424,13 +441,15 @@ void RealTimeEvokedModel::updateProjection()
         RowVectorXi sel;// = RowVectorXi(0,0);
         QStringList emptyExclude;
 
-        if(m_pRTE->info()->bads.size() > 0)
+        if(m_pRTE->info()->bads.size() > 0) {
             sel = FiffInfoBase::pick_channels(m_pRTE->info()->ch_names, m_pRTE->info()->bads, emptyExclude);
+        }
 
         m_vecBadIdcs = sel;
 
-        for(qint32 j = 0; j < m_vecBadIdcs.cols(); ++j)
+        for(qint32 j = 0; j < m_vecBadIdcs.cols(); ++j) {
             m_matProj.col(m_vecBadIdcs[j]).setZero();
+        }
 
 //        std::cout << "Bads\n" << m_vecBadIdcs << std::endl;
 //        std::cout << "Proj\n";
@@ -448,14 +467,79 @@ void RealTimeEvokedModel::updateProjection()
         //
         tripletList.clear();
         tripletList.reserve(m_matProj.rows()*m_matProj.cols());
-        for(i = 0; i < m_matProj.rows(); ++i)
-            for(k = 0; k < m_matProj.cols(); ++k)
-                if(m_matProj(i,k) != 0)
+        for(i = 0; i < m_matProj.rows(); ++i) {
+            for(k = 0; k < m_matProj.cols(); ++k) {
+                if(m_matProj(i,k) != 0) {
                     tripletList.push_back(T(i, k, m_matProj(i,k)));
+                }
+            }
+        }
 
-        m_matSparseProj = SparseMatrix<double>(m_matProj.rows(),m_matProj.cols());
-        if(tripletList.size() > 0)
-            m_matSparseProj.setFromTriplets(tripletList.begin(), tripletList.end());
+        m_matSparseProjMult = SparseMatrix<double>(m_matProj.rows(),m_matProj.cols());
+        if(tripletList.size() > 0) {
+            m_matSparseProjMult.setFromTriplets(tripletList.begin(), tripletList.end());
+        }
+
+        //Create full multiplication matrix
+        m_matSparseProjCompMult = m_matSparseProjMult * m_matSparseCompMult;
+    }
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeEvokedModel::updateCompensator(int to)
+{
+    //
+    //  Update the compensator
+    //
+    if(m_pRTE->info())
+    {
+        if(to == 0) {
+            m_bCompActivated = false;
+        } else {
+            m_bCompActivated = true;
+        }
+
+//        qDebug()<<"to"<<to;
+//        qDebug()<<"from"<<from;
+//        qDebug()<<"m_bCompActivated"<<m_bCompActivated;
+
+        FiffCtfComp newComp;
+        m_pRTE->info()->make_compensator(0, to, newComp);//Do this always from 0 since we always read new raw data, we never actually perform a multiplication on already existing data
+
+        //We do not need to call this->m_pFiffInfo->set_current_comp(to);
+        //Because we will set the compensators to the coil in the same FiffInfo which is already used to write to file.
+        //Note that the data is written in raw form not in compensated form.
+        m_matComp = newComp.data->data;
+
+        //
+        // Make proj sparse
+        //
+        qint32 nchan = m_pRTE->info()->nchan;
+        qint32 i, k;
+
+        typedef Eigen::Triplet<double> T;
+        std::vector<T> tripletList;
+        tripletList.reserve(nchan);
+
+        tripletList.clear();
+        tripletList.reserve(m_matComp.rows()*m_matComp.cols());
+        for(i = 0; i < m_matComp.rows(); ++i) {
+            for(k = 0; k < m_matComp.cols(); ++k) {
+                if(m_matComp(i,k) != 0) {
+                    tripletList.push_back(T(i, k, m_matComp(i,k)));
+                }
+            }
+        }
+
+        m_matSparseCompMult = SparseMatrix<double>(m_matComp.rows(),m_matComp.cols());
+        if(tripletList.size() > 0) {
+            m_matSparseCompMult.setFromTriplets(tripletList.begin(), tripletList.end());
+        }
+
+        //Create full multiplication matrix
+        m_matSparseProjCompMult = m_matSparseProjMult * m_matSparseCompMult;
     }
 }
 
@@ -486,9 +570,11 @@ void RealTimeEvokedModel::filterChanged(QList<FilterData> filterData)
     m_filterData = filterData;
 
     m_iMaxFilterLength = 1;
-    for(int i=0; i<filterData.size(); i++)
-        if(m_iMaxFilterLength<filterData.at(i).m_iFilterOrder)
+    for(int i=0; i<filterData.size(); i++) {
+        if(m_iMaxFilterLength<filterData.at(i).m_iFilterOrder) {
             m_iMaxFilterLength = filterData.at(i).m_iFilterOrder;
+        }
+    }
 
     //Filter all visible data channels at once
     //filterChannelsConcurrently();
@@ -510,10 +596,11 @@ void RealTimeEvokedModel::setFilterChannelType(QString channelType)
         if((m_pRTE->info()->chs.at(i).kind == FIFFV_MEG_CH || m_pRTE->info()->chs.at(i).kind == FIFFV_EEG_CH ||
             m_pRTE->info()->chs.at(i).kind == FIFFV_EOG_CH || m_pRTE->info()->chs.at(i).kind == FIFFV_ECG_CH ||
             m_pRTE->info()->chs.at(i).kind == FIFFV_EMG_CH) && !m_pRTE->info()->bads.contains(m_pRTE->info()->chs.at(i).ch_name)) {
-            if(m_sFilterChannelType == "All")
+            if(m_sFilterChannelType == "All") {
                 m_filterChannelList << m_pRTE->info()->chs.at(i).ch_name;
-            else if(m_pRTE->info()->chs.at(i).ch_name.contains(m_sFilterChannelType))
+            } else if(m_pRTE->info()->chs.at(i).ch_name.contains(m_sFilterChannelType)) {
                 m_filterChannelList << m_pRTE->info()->chs.at(i).ch_name;
+            }
         }
     }
 
@@ -558,10 +645,11 @@ void RealTimeEvokedModel::createFilterChannelList(QStringList channelNames)
         if((m_pRTE->info()->chs.at(i).kind == FIFFV_MEG_CH || m_pRTE->info()->chs.at(i).kind == FIFFV_EEG_CH ||
             m_pRTE->info()->chs.at(i).kind == FIFFV_EOG_CH || m_pRTE->info()->chs.at(i).kind == FIFFV_ECG_CH ||
             m_pRTE->info()->chs.at(i).kind == FIFFV_EMG_CH) && !m_pRTE->info()->bads.contains(m_pRTE->info()->chs.at(i).ch_name)) {
-            if(m_sFilterChannelType == "All")
+            if(m_sFilterChannelType == "All") {
                 m_filterChannelList << m_pRTE->info()->chs.at(i).ch_name;
-            else if(m_pRTE->info()->chs.at(i).ch_name.contains(m_sFilterChannelType))
+            } else if(m_pRTE->info()->chs.at(i).ch_name.contains(m_sFilterChannelType)) {
                 m_filterChannelList << m_pRTE->info()->chs.at(i).ch_name;
+            }
         }
     }
 
@@ -577,9 +665,10 @@ void RealTimeEvokedModel::createFilterChannelList(QStringList channelNames)
 
 void doFilterPerChannelRTE(QPair<QList<FilterData>,QPair<int,RowVectorXd> > &channelDataTime)
 {
-    for(int i=0; i<channelDataTime.first.size(); i++)
+    for(int i=0; i<channelDataTime.first.size(); i++) {
         //channelDataTime.second.second = channelDataTime.first.at(i).applyConvFilter(channelDataTime.second.second, true, FilterData::ZeroPad);
         channelDataTime.second.second = channelDataTime.first.at(i).applyFFTFilter(channelDataTime.second.second, true, FilterData::ZeroPad); //FFT Convolution for rt is not suitable. FFT make the signal filtering non causal.
+    }
 }
 
 
@@ -589,8 +678,9 @@ void RealTimeEvokedModel::filterChannelsConcurrently()
 {    
     //std::cout<<"START RealTimeEvokedModel::filterChannelsConcurrently()"<<std::endl;
 
-    if(m_filterData.isEmpty())
+    if(m_filterData.isEmpty()) {
         return;
+    }
 
     //Generate QList structure which can be handled by the QConcurrent framework
     QList<QPair<QList<FilterData>,QPair<int,RowVectorXd> > > timeData;
@@ -602,9 +692,9 @@ void RealTimeEvokedModel::filterChannelsConcurrently()
             RowVectorXd datTemp(m_matData.row(i).cols() + 2 * m_iMaxFilterLength);
             datTemp << m_matData.row(i).head(m_iMaxFilterLength).reverse(), m_matData.row(i), m_matData.row(i).tail(m_iMaxFilterLength).reverse();
             timeData.append(QPair<QList<FilterData>,QPair<int,RowVectorXd> >(m_filterData,QPair<int,RowVectorXd>(i,datTemp)));
-        }
-        else
+        } else {
             notFilterChannelIndex.append(i);
+        }
     }
 
     //Do the concurrent filtering
@@ -614,13 +704,15 @@ void RealTimeEvokedModel::filterChannelsConcurrently()
 
         future.waitForFinished();
 
-        for(int r = 0; r<timeData.size(); r++)
+        for(int r = 0; r<timeData.size(); r++) {
             m_matDataFiltered.row(timeData.at(r).second.first) = timeData.at(r).second.second.segment(m_iMaxFilterLength+m_iMaxFilterLength/2, m_matData.cols());
+        }
     }
 
     //Fill filtered data with raw data if the channel was not filtered
-    for(int i = 0; i<notFilterChannelIndex.size(); i++)
+    for(int i = 0; i<notFilterChannelIndex.size(); i++) {
         m_matDataFiltered.row(notFilterChannelIndex.at(i)) = m_matData.row(notFilterChannelIndex.at(i));
+    }
 
     //std::cout<<"END RealTimeEvokedModel::filterChannelsConcurrently()"<<std::endl;
 }
