@@ -264,7 +264,7 @@ int main(int argc, char *argv[])
     QFile t_fileBem2("./MNE-sample-data/subjects/sample/bem/sample-head.fif");
     MNEBem t_Bem2(t_fileBem2);
     testWindow->addBemData("Subject01", "BEM", t_Bem2);
-    testWindow->addBemData("Subject01", "BEM", t_Bem);
+    //testWindow->addBemData("Subject01", "BEM", t_Bem);
 
     if(bAddRtSourceLoc) {
         QList<BrainRTSourceLocDataTreeItem*> rtItemList = testWindow->addRtBrainData("Subject01", "HemiLRSet", sourceEstimate, t_clusteredFwd);
@@ -283,23 +283,23 @@ int main(int argc, char *argv[])
         //Init some rt related values
         for(int i = 0; i < rtItemList_RA.size(); ++i) {
             rtItemList_RA.at(i)->setLoopState(true);
-            rtItemList_RA.at(i)->setTimeInterval(10);
-            rtItemList_RA.at(i)->setNumberAverages(1);
-            rtItemList_RA.at(i)->setStreamingActive(false);
+            rtItemList_RA.at(i)->setTimeInterval(75);
+            rtItemList_RA.at(i)->setNumberAverages(7);
+            rtItemList_RA.at(i)->setStreamingActive(true);
             rtItemList_RA.at(i)->setNormalization(1.0);
             rtItemList_RA.at(i)->setVisualizationType("Annotation based");
-            rtItemList_RA.at(i)->setColortable("Hot Negative 2");
+            rtItemList_RA.at(i)->setColortable("Hot");
         }
 
         //Init some rt related values
         for(int i = 0; i < rtItemList_RV.size(); ++i) {
             rtItemList_RV.at(i)->setLoopState(true);
-            rtItemList_RV.at(i)->setTimeInterval(10);
-            rtItemList_RV.at(i)->setNumberAverages(1);
-            rtItemList_RV.at(i)->setStreamingActive(false);
+            rtItemList_RV.at(i)->setTimeInterval(75);
+            rtItemList_RV.at(i)->setNumberAverages(7);
+            rtItemList_RV.at(i)->setStreamingActive(true);
             rtItemList_RV.at(i)->setNormalization(1.0);
             rtItemList_RV.at(i)->setVisualizationType("Annotation based");
-            rtItemList_RV.at(i)->setColortable("Hot Negative 2");
+            rtItemList_RV.at(i)->setColortable("Hot");
         }
     }
 
