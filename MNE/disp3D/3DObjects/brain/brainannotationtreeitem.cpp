@@ -103,7 +103,7 @@ bool BrainAnnotationTreeItem::addData(const Surface& tSurface, const Annotation&
 
         tAnnotation.toLabels(tSurface, qListLabels, qListLabelRGBAs);
 
-        for(int i = 0; i<qListLabels.size(); i++) {
+        for(int i = 0; i < qListLabels.size(); ++i) {
             FSLIB::Label label = qListLabels.at(i);
             for(int j = 0; j<label.vertices.rows(); j++) {
                 rawArrayColors[label.vertices(j)*3+0] = qListLabelRGBAs.at(i)(0)/255.0;
@@ -115,26 +115,33 @@ bool BrainAnnotationTreeItem::addData(const Surface& tSurface, const Annotation&
         //Add data which is held by this BrainAnnotationTreeItem
         QVariant data;
         data.setValue(arrayColorsAnnot);
-        this->setData(data, BrainAnnotationTreeItemRoles::AnnotColors);
+        this->setData(data, Data3DTreeModelItemRoles::AnnotColors);
 
         data.setValue(qListLabels);
-        this->setData(data, BrainAnnotationTreeItemRoles::LabeList);
+        this->setData(data, Data3DTreeModelItemRoles::LabeList);
 
         data.setValue(tAnnotation.getLabelIds());
-        this->setData(data, BrainAnnotationTreeItemRoles::LabeIds);
+        this->setData(data, Data3DTreeModelItemRoles::LabeIds);
 
         //Add annotation meta information as item children
-        BrainTreeMetaItem *itemAnnotFileName = new BrainTreeMetaItem(BrainTreeMetaItemTypes::AnnotFileName, tAnnotation.fileName());
-        itemAnnotFileName->setEditable(false);
-        *this<<itemAnnotFileName;
-        data.setValue(tAnnotation.fileName());
-        itemAnnotFileName->setData(data, BrainAnnotationTreeItemRoles::AnnotFileName);
+        QList<QStandardItem*> list;
 
-        BrainTreeMetaItem *itemAnnotPath = new BrainTreeMetaItem(BrainTreeMetaItemTypes::AnnotFilePath, tAnnotation.filePath());
+        MetaTreeItem *itemAnnotFileName = new MetaTreeItem(MetaTreeItemTypes::FileName, tAnnotation.fileName());
+        itemAnnotFileName->setEditable(false);
+        list << itemAnnotFileName;
+        list << new QStandardItem(itemAnnotFileName->toolTip());
+        this->appendRow(list);
+        data.setValue(tAnnotation.fileName());
+        itemAnnotFileName->setData(data, Data3DTreeModelItemRoles::FileName);
+
+        list.clear();
+        MetaTreeItem *itemAnnotPath = new MetaTreeItem(MetaTreeItemTypes::FilePath, tAnnotation.filePath());
         itemAnnotPath->setEditable(false);
-        *this<<itemAnnotPath;
+        list << itemAnnotPath;
+        list << new QStandardItem(itemAnnotPath->toolTip());
+        this->appendRow(list);
         data.setValue(tAnnotation.filePath());
-        itemAnnotFileName->setData(data, BrainAnnotationTreeItemRoles::AnnotFilePath);
+        itemAnnotFileName->setData(data, Data3DTreeModelItemRoles::FilePath);
     }
 
     return true;

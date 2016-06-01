@@ -86,7 +86,7 @@ namespace CovariancePlugin
 using namespace MNEX;
 using namespace XMEASLIB;
 using namespace IOBuffer;
-using namespace RTINVLIB;
+using namespace RTPROCLIB;
 using namespace FIFFLIB;
 
 

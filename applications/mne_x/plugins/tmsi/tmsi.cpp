@@ -148,7 +148,7 @@ void TMSI::init()
     QDate date;
     m_sOutputFilePath = QString ("%1Sequence_01/Subject_01/%2_%3_%4_EEG_001_raw.fif").arg(m_qStringResourcePath).arg(date.currentDate().year()).arg(date.currentDate().month()).arg(date.currentDate().day());
 
-    m_sElcFilePath = QString("./mne_x_plugins/resources/tmsi/loc_files/Lorenz-Duke128-28-11-2013.elc");
+    m_sElcFilePath = QString("./Resources/3DLayouts/standard_waveguard128_duke.elc");
 
     m_pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo());
 
@@ -186,8 +186,8 @@ void TMSI::setUpFiffInfo()
     //
     //Read electrode positions from .elc file
     //
-    QVector< QVector<double> > elcLocation3D;
-    QVector< QVector<double> > elcLocation2D;
+    QList<QVector<double> > elcLocation3D;
+    QList<QVector<double> > elcLocation2D;
     QString unit;
     QStringList elcChannelNames;
 

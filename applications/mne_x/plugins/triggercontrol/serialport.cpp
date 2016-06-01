@@ -132,8 +132,14 @@ void SerialPort::decodeana(QByteArray &t_incomingArray)
     void* voidVal = (void*)&cVal;
     unsigned char* ucVal = (unsigned char*)voidVal;
 
+//    //Option 2
+//    unsigned char ucVal = static_cast<unsigned char> (t_incomingArray[0]); // also possible
 
 // decode channel
+
+//    //Option 2
+//    if (ucVal== 0x00) {AnChannel=1;} -> use a lookup table instead
+
          if (*ucVal== 0x00) {AnChannel=1;}
     else if (*ucVal==0x10) {AnChannel=2;}
     else if (*ucVal==0x20) {AnChannel=3;}

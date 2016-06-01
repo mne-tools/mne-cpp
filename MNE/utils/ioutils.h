@@ -207,7 +207,7 @@ public:
     * @param[in] path       path and file name to write to
     */
     template<typename T>
-    static bool write_eigen_matrix(const Matrix<T, Dynamic, Dynamic>& in, const QString& path);
+    static bool write_eigen_matrix(const Matrix<T, Dynamic, Dynamic>& in, const QString& sPath, const QString& sDescription = QString());
 
     //=========================================================================================================
     /**
@@ -227,13 +227,14 @@ public:
 //*************************************************************************************************************
 
 template<typename T>
-bool IOUtils::write_eigen_matrix(const Matrix<T, Dynamic, Dynamic>& in, const QString& path)
+bool IOUtils::write_eigen_matrix(const Matrix<T, Dynamic, Dynamic>& in, const QString& sPath, const QString& sDescription)
 {
-    QFile file(path);
+    QFile file(sPath);
     if(file.open(QIODevice::WriteOnly|QIODevice::Truncate))
     {
         QTextStream stream(&file);
-        stream<<"Dimensions (rows x cols): "<<in.rows()<<" x "<<in.cols()<<"\n";
+        stream<<"# Dimensions (rows x cols): "<<in.rows()<<" x "<<in.cols()<<"\n";
+        stream<<"# Description: "<<sDescription<<"\n";
         for(int row = 0; row<in.rows(); row++) {
             for(int col = 0; col<in.cols(); col++)
                 stream << in(row, col)<<" ";
@@ -260,27 +261,26 @@ bool IOUtils::read_eigen_matrix(Matrix<T, Dynamic, Dynamic>& out, const QString&
     if(file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         //Start reading from file
         QTextStream in(&file);
-        int i=0;
         QList<VectorXd> help;
 
         while(!in.atEnd())
         {
             QString line = in.readLine();
-            QStringList fields = line.split(QRegExp("\\s+"));
+            if(!line.contains("#")) {
+                QStringList fields = line.split(QRegExp("\\s+"));
 
-            //Delete last element if it is a blank character
-            if(fields.at(fields.size()-1) == "")
-                fields.removeLast();
+                //Delete last element if it is a blank character
+                if(fields.at(fields.size()-1) == "")
+                    fields.removeLast();
 
-            VectorXd x (fields.size());
-            //Read actual electrode position
-            for (int j=0; j<fields.size(); j++) {
-                x(j)=fields.at(j).toDouble();
+                VectorXd x (fields.size());
+
+                for (int j=0; j<fields.size(); j++) {
+                    x(j)=fields.at(j).toDouble();
+                }
+
+                help.append(x);
             }
-
-            help.append(x);
-
-            i++;
         }
 
         int rows = help.size();
