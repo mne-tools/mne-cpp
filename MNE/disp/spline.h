@@ -171,9 +171,9 @@ private:
     QLineSeries     *leftThreshold;         /**< Vertical line series for the left threshold */
     QLineSeries     *middleThreshold;       /**< Vertical line series for the middle threshold */
     QLineSeries     *rightThreshold;        /**< Vertical line series for the right threshold */
-    QLineSeries     *newLeftThreshold;         /**< Vertical line series for the left threshold */
-    QLineSeries     *newMiddleThreshold;       /**< Vertical line series for the middle threshold */
-    QLineSeries     *newRightThreshold;        /**< Vertical line series for the right threshold */
+    QLineSeries     *newLeftThreshold;      /**< Vertical line series for the left threshold */
+    QLineSeries     *newMiddleThreshold;    /**< Vertical line series for the middle threshold */
+    QLineSeries     *newRightThreshold;     /**< Vertical line series for the right threshold */
 
     QLegendMarker   *marker;                /**< Variable to specify the legend of the threshold line */
     double          minAxisX;               /**< Value of the smallest point of the series in x-axis */
