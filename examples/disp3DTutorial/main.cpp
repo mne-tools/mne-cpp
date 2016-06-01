@@ -143,8 +143,6 @@ int main(int argc, char *argv[])
     QFile t_fileCov("./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
     QFile t_fileEvoked("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
 
-    MNESourceEstimate sourceEstimate;
-
     //########################################################################################
     //
     // Source Estimate START
@@ -267,8 +265,6 @@ int main(int argc, char *argv[])
     //testWindow->addBemData("Subject01", "BEM", t_Bem);
 
     if(bAddRtSourceLoc) {
-        QList<BrainRTSourceLocDataTreeItem*> rtItemList = testWindow->addRtBrainData("Subject01", "HemiLRSet", sourceEstimate, t_clusteredFwd);
-
         //testWindow->addBrainData("Subject01", "HemiLRSet", t_clusteredFwd);
 
         //testWindow->addRtBrainData("Subject01", "HemiLRSet", sourceEstimate);
