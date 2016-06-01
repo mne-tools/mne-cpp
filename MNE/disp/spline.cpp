@@ -86,8 +86,9 @@ void Spline::mousePressEvent(QMouseEvent *event)
 {
     if (series->count() == 0)               //protect integrity of the histogram widget in case series contain no data values
     {
-        QWidget::mousePressEvent(event);    //calls the predefined mousepressevent from QWidget
+        qDebug() << "Data set not found.";  //do nothing
     }
+
     else
     {
         QXYSeries *shadowSeries = qobject_cast<QXYSeries *>(sender());
@@ -126,7 +127,6 @@ void Spline::mousePressEvent(QMouseEvent *event)
                         m_pChart->removeSeries(leftThreshold);
                         leftThreshold=verticalLine;
                         leftThreshold->setColor("red");
-                        leftThreshold->setName("left threshold");
                         m_pChart->addSeries(leftThreshold);
                         m_pChart->legend()->markers().at(m_pChart->legend()->markers().size()-1)->setVisible(false);
                         m_pChart->createDefaultAxes();
@@ -185,8 +185,13 @@ void Spline::createThreshold(QVector3D vecThresholdValues)
 
     if (series->count() == 0)               //protect integrity of the histogram widget in case series contain no data values
     {
-        qDebug()<< "No data set";
-        //do nothing
+        qDebug() << "Data set not found.";
+    }
+
+    //the condition below tests the threshold values given and ensures that all three must be within minAxisX and maxAxisX
+    else if (vecThresholdValues.x() < minAxisX || vecThresholdValues.y() < minAxisX || vecThresholdValues.z() < minAxisX || vecThresholdValues.x() > maxAxisX || vecThresholdValues.y() > maxAxisX || vecThresholdValues.z() > maxAxisX)
+    {
+        qDebug() << "One or more of the values given are out of the minimum and maximum range.";
     }
 
     else
@@ -194,61 +199,46 @@ void Spline::createThreshold(QVector3D vecThresholdValues)
         if ((vecThresholdValues.x() < vecThresholdValues.y()) && (vecThresholdValues.x() < vecThresholdValues.z()))
         {
             leftThresholdValue = vecThresholdValues.x();
-            qDebug()<< "leftThresholdValue = " << leftThresholdValue;
 
             if(vecThresholdValues.y() < vecThresholdValues.z())
             {
                 middleThresholdValue = vecThresholdValues.y();
                 rightThresholdValue = vecThresholdValues.z();
-                qDebug()<< "middleThresholdValue = " << middleThresholdValue;
-                qDebug()<< "rightThresholdValue = " << rightThresholdValue;
             }
             else
             {
                 middleThresholdValue = vecThresholdValues.z();
                 rightThresholdValue = vecThresholdValues.y();
-                qDebug()<< "middleThresholdValue = " << middleThresholdValue;
-                qDebug()<< "rightThresholdValue = " << rightThresholdValue;
             }
         }
         if ((vecThresholdValues.y() < vecThresholdValues.x()) && (vecThresholdValues.y() < vecThresholdValues.z()))
         {
             leftThresholdValue = vecThresholdValues.y();
-            qDebug()<< "leftThresholdValue = " << leftThresholdValue;
 
             if(vecThresholdValues.x() < vecThresholdValues.z())
             {
                 middleThresholdValue = vecThresholdValues.x();
                 rightThresholdValue = vecThresholdValues.z();
-                   qDebug()<< "middleThresholdValue = " << middleThresholdValue;
-                   qDebug()<< "rightThresholdValue = " << rightThresholdValue;
             }
             else
             {
                 middleThresholdValue = vecThresholdValues.z();
                 rightThresholdValue = vecThresholdValues.x();
-                   qDebug()<< "middleThresholdValue = " << middleThresholdValue;
-                   qDebug()<< "rightThresholdValue = " << rightThresholdValue;
             }
         }
         if ((vecThresholdValues.z() < vecThresholdValues.x()) && (vecThresholdValues.z() < vecThresholdValues.y()))
         {
             leftThresholdValue = vecThresholdValues.z();
-            qDebug()<< "leftThresholdValue = " << leftThresholdValue;
 
             if(vecThresholdValues.x() < vecThresholdValues.y())
             {
                 middleThresholdValue = vecThresholdValues.x();
                 rightThresholdValue = vecThresholdValues.y();
-                   qDebug()<< "middleThresholdValue = " << middleThresholdValue;
-                   qDebug()<< "rightThresholdValue = " << rightThresholdValue;
             }
             else
             {
                 middleThresholdValue = vecThresholdValues.y();
                 rightThresholdValue = vecThresholdValues.x();
-                   qDebug()<< "middleThresholdValue = " << middleThresholdValue;
-                   qDebug()<< "rightThresholdValue = " << rightThresholdValue;
             }
         }
         m_pChart->removeSeries(leftThreshold);
@@ -262,9 +252,10 @@ void Spline::createThreshold(QVector3D vecThresholdValues)
         leftThresholdPoint.setX(leftThresholdValue);
         middleThresholdPoint.setX(middleThresholdValue);
         rightThresholdPoint.setX(rightThresholdValue);
-        qDebug()<< "leftThresholdPoint = "<<  leftThresholdPoint;
-        qDebug()<< "middleThresholdPoint = "<<  middleThresholdPoint;
-        qDebug()<< "rightThresholdPoint = "<<  rightThresholdPoint;
+
+        leftThreshold->clear();
+        middleThreshold->clear();
+        rightThreshold->clear();
 
         leftThreshold->append(leftThresholdPoint.x(), 0);
         leftThreshold->append(leftThresholdPoint.x(), maximumFrequency);
@@ -272,17 +263,19 @@ void Spline::createThreshold(QVector3D vecThresholdValues)
         middleThreshold->append(middleThresholdPoint.x(), maximumFrequency);
         rightThreshold->append(rightThresholdPoint.x(), 0);
         rightThreshold->append(rightThresholdPoint.x(), maximumFrequency);
-        qDebug()<< "Threshold lines created!";
 
         leftThreshold->setColor("red");
         middleThreshold->setColor("green");
         rightThreshold->setColor("blue");
+        leftThreshold->setVisible(true);
+        middleThreshold->setVisible(true);
+        rightThreshold->setVisible(true);
         m_pChart->addSeries(leftThreshold);
+        m_pChart->legend()->markers().at(m_pChart->legend()->markers().size()-1)->setVisible(false);
         m_pChart->addSeries(middleThreshold);
+        m_pChart->legend()->markers().at(m_pChart->legend()->markers().size()-1)->setVisible(false);
         m_pChart->addSeries(rightThreshold);
         m_pChart->legend()->markers().at(m_pChart->legend()->markers().size()-1)->setVisible(false);
-        m_pChart->legend()->markers().at(m_pChart->legend()->markers().size()-2)->setVisible(false);
-        m_pChart->legend()->markers().at(m_pChart->legend()->markers().size()-3)->setVisible(false);
         m_pChart->createDefaultAxes();
     }
 }

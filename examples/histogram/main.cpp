@@ -357,12 +357,13 @@ int main(int argc, char *argv[])
     QTime myTimerHistogram;
     myTimerHistogram.start();
     displayObj->setData(resultClassLimit, resultFrequency, precision);
-    QVector3D thresholdLines(22.0f, 42.0f, 62.0f);
+    QVector3D thresholdLines(10.0f, 32.0f, 65.0f);
     displayObj->createThreshold(thresholdLines);
     qDebug()<<"Histogram timer:"<<myTimerHistogram.elapsed();
 
     displayObj->resize(400,300);
     displayObj->show();
+
 
     //std::cout << data.block(0,0,10,10);
     return a.exec();
