@@ -45,8 +45,14 @@ TEMPLATE = subdirs
 
 SUBDIRS += \
     MNE \
-    testframes \
-    examples \
     applications
+
+contains(MNECPP_CONFIG, withExamples) {
+    SUBDIRS += examples
+}
+
+contains(MNECPP_CONFIG, withTests) {
+    SUBDIRS += testframes
+}
 
 CONFIG += ordered

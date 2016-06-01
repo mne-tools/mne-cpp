@@ -103,7 +103,7 @@ void Window::keyPressEvent(QKeyEvent* e)
 
 void Window::mousePressEvent(QMouseEvent* e)
 {
-    //qDebug()<<"mouse press";
+    //qDebug() << "mouse press";
     QWindow::mousePressEvent(e);
 }
 
@@ -112,7 +112,7 @@ void Window::mousePressEvent(QMouseEvent* e)
 
 void Window::wheelEvent(QWheelEvent* e)
 {
-    //qDebug()<<"mouse wheel";
+    //qDebug() << "mouse wheel";
     QWindow::wheelEvent(e);
 }
 
@@ -121,6 +121,6 @@ void Window::wheelEvent(QWheelEvent* e)
 
 void Window::mouseMoveEvent(QMouseEvent* e)
 {
-    //qDebug()<<"mouse move";
+    //qDebug() << "mouse move";
     QWindow::mouseMoveEvent(e);
 }
