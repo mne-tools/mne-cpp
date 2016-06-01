@@ -275,9 +275,9 @@ int main(int argc, char *argv[])
         //rtItemList.at(0)->addData(sourceEstimate);
 
         //RA
-        //QList<BrainRTSourceLocDataTreeItem*> rtItemList_LA = testWindow->addRtBrainData("Subject01", "Right Auditory", sourceEstimate_LA, t_clusteredFwd);
+        //QList<BrainRTSourceLocDataTreeItem*> rtItemList_LA = testWindow->addRtBrainData("Subject01", "Left Auditory", sourceEstimate_LA, t_clusteredFwd);
         QList<BrainRTSourceLocDataTreeItem*> rtItemList_RA = testWindow->addRtBrainData("Subject01", "Right Auditory", sourceEstimate_RA, t_clusteredFwd);
-        //QList<BrainRTSourceLocDataTreeItem*> rtItemList_LV = testWindow->addRtBrainData("Subject01", "Right Auditory", sourceEstimate_LV, t_clusteredFwd);
+        //QList<BrainRTSourceLocDataTreeItem*> rtItemList_LV = testWindow->addRtBrainData("Subject01", "Left Visual", sourceEstimate_LV, t_clusteredFwd);
         QList<BrainRTSourceLocDataTreeItem*> rtItemList_RV = testWindow->addRtBrainData("Subject01", "Right Visual", sourceEstimate_RV, t_clusteredFwd);
 
         //Init some rt related values

@@ -396,8 +396,8 @@ void View3D::createCoordSystem(Qt3DCore::QEntity* parent)
 {
     // Y - red
     Qt3DRender::QCylinderMesh *YAxis = new Qt3DRender::QCylinderMesh();
-    YAxis->setRadius(0.1f);
-    YAxis->setLength(3);
+    YAxis->setRadius(0.001f);
+    YAxis->setLength(30);
     YAxis->setRings(100);
     YAxis->setSlices(20);
 
@@ -413,13 +413,13 @@ void View3D::createCoordSystem(Qt3DCore::QEntity* parent)
 
     // Z - blue
     Qt3DRender::QCylinderMesh *ZAxis = new Qt3DRender::QCylinderMesh();
-    ZAxis->setRadius(0.1f);
-    ZAxis->setLength(3);
+    ZAxis->setRadius(0.001f);
+    ZAxis->setLength(30);
     ZAxis->setRings(100);
     ZAxis->setSlices(20);
 
     Qt3DCore::QTransform *transformZ = new Qt3DCore::QTransform();
-    transformZ->setRotation(QQuaternion::fromAxisAndAngle(QVector3D(1,0,0), 90));
+    transformZ->setRotation(QQuaternion::fromAxisAndAngle(QVector3D(0,0,1), 90));
 
     m_ZAxisEntity = QSharedPointer<Qt3DCore::QEntity>(new Qt3DCore::QEntity(parent));
     m_ZAxisEntity->addComponent(ZAxis);
@@ -434,13 +434,13 @@ void View3D::createCoordSystem(Qt3DCore::QEntity* parent)
 
     // X - green
     Qt3DRender::QCylinderMesh *XAxis = new Qt3DRender::QCylinderMesh();
-    XAxis->setRadius(0.1f);
-    XAxis->setLength(3);
+    XAxis->setRadius(0.001f);
+    XAxis->setLength(30);
     XAxis->setRings(100);
     XAxis->setSlices(20);
 
     Qt3DCore::QTransform *transformX = new Qt3DCore::QTransform();
-    transformX->setRotation(QQuaternion::fromAxisAndAngle(QVector3D(0,0,1), 90));
+    transformX->setRotation(QQuaternion::fromAxisAndAngle(QVector3D(1,0,0), 90));
 
     m_XAxisEntity = QSharedPointer<Qt3DCore::QEntity>(new Qt3DCore::QEntity(parent));
     m_XAxisEntity->addComponent(XAxis);

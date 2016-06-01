@@ -129,7 +129,7 @@ bool BrainSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* p
 //        m_pRenderable3DEntity->setPosition(QVector3D(tSurface.offset()(0), tSurface.offset()(1), tSurface.offset()(2)));
 //    }
 
-    m_pRenderable3DEntity->setPosition(QVector3D(tSurface.offset()(0), tSurface.offset()(1), tSurface.offset()(2)));
+    m_pRenderable3DEntity->setPosition(QVector3D(-tSurface.offset()(0), -tSurface.offset()(1), -tSurface.offset()(2)));
 
     m_pRenderable3DEntity->setRotX(90);
     m_pRenderable3DEntity->setRotY(180);
