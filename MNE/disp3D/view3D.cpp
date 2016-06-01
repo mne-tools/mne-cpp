@@ -362,6 +362,7 @@ void View3D::mouseMoveEvent(QMouseEvent* e)
         m_vecCameraRotation.setX(((e->pos().y() - m_mousePressPositon.y()) * 0.1f) + m_vecCameraRotationOld.x());
         m_vecCameraRotation.setY(((e->pos().x() - m_mousePressPositon.x()) * 0.1f) + m_vecCameraRotationOld.y());
 
+        //Rotate all surface objects
         if(!m_bModelRotationMode) {
             //Rotate camera
             m_pCameraTransform->setRotationX(m_vecCameraRotation.x());
