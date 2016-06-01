@@ -245,11 +245,12 @@ void Renderable3DEntity::setPosition(QVector3D position)
 void Renderable3DEntity::updateTransform()
 {
     QMatrix4x4 m;
+
+    //Do the translation after rotating, otherwise rotation around the x,y,z axis would be screwed up
+    m.translate(m_position);
     m.rotate(m_fRotX, QVector3D(1.0f, 0.0f, 0.0f));
     m.rotate(m_fRotY, QVector3D(0.0f, 1.0f, 0.0f));
     m.rotate(m_fRotZ, QVector3D(0.0f, 0.0f, 1.0f));
 
-    //Do the translation after rotating, otherwise rotation around the x,y,z axis would be screwed up
-    m.translate(m_position);
     m_pTransform->setMatrix(m);
 }
