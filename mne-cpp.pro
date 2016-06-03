@@ -47,11 +47,11 @@ SUBDIRS += \
     MNE \
     applications
 
-contains(MNECPP_CONFIG, withExamples) {
+!contains(MNECPP_CONFIG, noExamples) {
     SUBDIRS += examples
 }
 
-contains(MNECPP_CONFIG, withTests) {
+!contains(MNECPP_CONFIG, noTests) {
     SUBDIRS += testframes
 }
 
