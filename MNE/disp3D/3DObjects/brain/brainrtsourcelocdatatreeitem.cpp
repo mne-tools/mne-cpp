@@ -393,6 +393,9 @@ void BrainRTSourceLocDataTreeItem::setNormalization(const QVector3D& vecThreshol
             QVariant data;
             data.setValue(vecThresholds);
             pAbstractItem->setData(data, MetaTreeItemRoles::RTDataNormalizationValue);
+
+            QString sTemp = QString("%1,%2,%3").arg(vecThresholds.x()).arg(vecThresholds.y()).arg(vecThresholds.z());
+            data.setValue(sTemp);
             pAbstractItem->setData(data, Qt::DisplayRole);
         }
     }
