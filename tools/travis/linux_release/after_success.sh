@@ -9,10 +9,4 @@ doxygen mne-cpp_doxyfile_release
 tar cfvz mne-cpp_doc.tar.gz ./html ./qt-creator_doc
 
 # upload documentation
-ftp -n $DOC_REMOTE_SERVER <<INPUT_END
-quote user $DOC_LOGIN
-quote pass $DOC_PASSWORD
-prompt off
-mput mne-cpp_doc.tar.gz
-exit
-INPUT_END
+curl -T mne-cpp_doc.tar.gz -u $DOC_LOGIN:$DOC_PASSWORD $DOC_REMOTE_SERVER
