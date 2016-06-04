@@ -268,6 +268,11 @@ bool BrainRTSourceLocDataTreeItem::addData(const MNESourceEstimate& tSourceEstim
 
     MatrixXd subData = tSourceEstimate.data.block(iStartIdx, 0, iEndIdx-iStartIdx+1, tSourceEstimate.data.cols());
 
+    //Set new data into item's data. The set data is for eample needed in the delegate to calculate the histogram.
+    QVariant data;
+    data.setValue(subData);
+    this->setData(data, MetaTreeItemRoles::RTData);
+
     m_pSourceLocRtDataWorker->addData(subData);
 
     return true;
