@@ -1,9 +1,6 @@
 #!/bin/bash
 #set -ev
 
-# add path to qhelpgenerator
-PATH=$PATH:/usr/lib/x86_64-linux-gnu/qt5/bin/
-
 # Run Doxygen
 cd doc
 doxygen mne-cpp_doxyfile_release
