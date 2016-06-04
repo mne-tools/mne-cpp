@@ -4,6 +4,9 @@ language: cpp
 env:
   global:
     - secure: O7DzRo9YOK8YR/gNhVrYKZjOVTscbZI5WhSzNWl+PX8y+fFYBJ8z6s4SMC+NfOw1rK7DOXPbHbaVLFRmSHpBoQGzfbAtfgEOzVpdvSmZQCAr8wbYXatuSCr0X1DYLcVwjS2Nss+HUvcwUo7/UqF2Cc66Pa0E5U04RQDgxP3eff8=
+    - secure: TAPFBO9Un7Nnf4r/4TdSfQZv+HjFVImjERbTjxIAYM8olZrWrYeQvXTB0PJ98eXjE3u29fHhAy5oHNRim3B3ghttpcHLmDcuZt/5RjHFiZ0BBGfFH5hejYxAC+UsKfopP2Nj+0eibIInKGCY2sOd3OAhk2cYEJ6bct3pdwN6E4Q=
+    - secure: R2uq/PNfvDjOf0wJwL43d6ApJdc+UMh27vlNCp6W4DZVF3sjghF2vBqQZezFzrQIqPvmY+yEzjwsezPaq4ajUgrGCmMa2WewEf+ZLDOQL5W2PU2ie4h9vfkgm9fYxv1W4l10c52lH14YoGIJ9v1oobTlKLkqBVGXsmQPibiIGis=
+    - secure: LRW0C9LXDSl8nXT1BA09yybSSuBViJUDmuFzdHZiuF7dv+wHkFIWdTfQs3TVbIzeOKA5GXqMpTnL/fUBP13N/DW90CgWYG3AO3FsSeqpMEfSNnjV/1+PpjhOd7UMRVxM858PQvDWkbOoqHWrX1K7fIPiEDadaXLHAYT/IvRuFQM=
 
 matrix:
   include:
@@ -12,15 +15,15 @@ matrix:
       sudo: required
       compiler: gcc
       env: BUILD=linux_release
-    - os: osx
-      osx_image: xcode7.3
-      compiler: clang
-      env: BUILD=osx_release
-    - os: linux
-      dist: trusty
-      sudo: required
-      compiler: gcc
-      env: BUILD=linux_tests
+#    - os: osx
+#      osx_image: xcode7.3
+#      compiler: clang
+#      env: BUILD=osx_release
+#    - os: linux
+#      dist: trusty
+#      sudo: required
+#      compiler: gcc
+#      env: BUILD=linux_tests
 #    - os: linux
 #      dist: trusty
 #      sudo: required
