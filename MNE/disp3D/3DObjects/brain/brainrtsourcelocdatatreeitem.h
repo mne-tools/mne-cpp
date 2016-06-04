@@ -211,9 +211,9 @@ public:
     /**
     * This function set the normalization value.
     *
-    * @param[in] dNormalization     The new normalization value.
+    * @param[in] vecThresholds     The new threshold values used for normalizing the data.
     */
-    void setNormalization(double dNormalization);
+    void setNormalization(const QVector3D& vecThresholds);
 
 public slots:
     //=========================================================================================================
@@ -261,9 +261,9 @@ private slots:
     /**
     * This slot gets called whenever the normaization value changed. The normalization value is used to normalize the estimated source activation.
     *
-    * @param[in] iMSec     The new time normalization value.
+    * @param[in] vecThresholds     The new threshold values used for normalizing the data.
     */
-    void onDataNormalizationValueChanged(double dValue);
+    void onDataNormalizationValueChanged(const QVector3D& vecThresholds);
 
     //=========================================================================================================
     /**

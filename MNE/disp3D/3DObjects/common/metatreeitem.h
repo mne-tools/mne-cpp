@@ -136,9 +136,9 @@ signals:
     /**
     * Emit this signal whenever the normalization value of the data streaming changed.
     *
-    * @param[in] dValue     The new normalization value.
+    * @param[in] vecThresholds     The new threshold values used for normalizing the data.
     */
-    void rtDataNormalizationValueChanged(double dValue);
+    void rtDataNormalizationValueChanged(const QVector3D& vecThresholds);
 
     //=========================================================================================================
     /**

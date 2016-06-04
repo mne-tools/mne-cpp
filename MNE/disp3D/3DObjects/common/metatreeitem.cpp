@@ -160,7 +160,8 @@ void  MetaTreeItem::setData(const QVariant& value, int role)
         }
 
         case MetaTreeItemRoles::RTDataNormalizationValue: {
-            emit rtDataNormalizationValueChanged(value.toDouble());
+            QVector3D vecTemp = value.value<QVector3D>();
+            emit rtDataNormalizationValueChanged(vecTemp);
             break;
         }
 
