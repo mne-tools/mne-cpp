@@ -282,7 +282,7 @@ int main(int argc, char *argv[])
             rtItemList_RA.at(i)->setTimeInterval(75);
             rtItemList_RA.at(i)->setNumberAverages(7);
             rtItemList_RA.at(i)->setStreamingActive(true);
-            rtItemList_RA.at(i)->setNormalization(QVector3D(0.0,0.5,15));
+            rtItemList_RA.at(i)->setNormalization(QVector3D(5.0,0.5,15));
             rtItemList_RA.at(i)->setVisualizationType("Annotation based");
             rtItemList_RA.at(i)->setColortable("Hot");
         }
@@ -293,7 +293,7 @@ int main(int argc, char *argv[])
             rtItemList_RV.at(i)->setTimeInterval(75);
             rtItemList_RV.at(i)->setNumberAverages(7);
             rtItemList_RV.at(i)->setStreamingActive(true);
-            rtItemList_RV.at(i)->setNormalization(QVector3D(0.0,0.5,15));
+            rtItemList_RV.at(i)->setNormalization(QVector3D(5.0,0.5,15));
             rtItemList_RV.at(i)->setVisualizationType("Annotation based");
             rtItemList_RV.at(i)->setColortable("Hot");
         }
