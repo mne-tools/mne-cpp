@@ -4,4 +4,4 @@
 qmake -r MNECPP_CONFIG+=noTests
 
 # Build
-#make -j2
+make -j2
