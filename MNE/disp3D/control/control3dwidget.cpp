@@ -246,7 +246,7 @@ void Control3DWidget::onAlwaysOnTop(bool state)
 void Control3DWidget::onShowFullScreen(bool checked)
 {
     //Update all connected View3D's scene colors
-    for(int i = 0; i<m_lView3D.size(); i++) {
+    for(int i = 0; i < m_lView3D.size(); ++i) {
         if(checked) {
             m_lView3D.at(i)->showFullScreen();
         } else {

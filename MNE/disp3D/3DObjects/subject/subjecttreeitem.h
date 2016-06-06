@@ -117,10 +117,10 @@ public:
     QVariant data(int role = Qt::UserRole + 1) const;
     void setData(const QVariant& value, int role = Qt::UserRole + 1);
 
-private slots:
+private:
     //=========================================================================================================
     /**
-    * Call this slot whenever the check box of this item was checked.
+    * Call this function whenever the check box of this item was checked.
     *
     * @param[in] checkState        The current checkstate.
     */

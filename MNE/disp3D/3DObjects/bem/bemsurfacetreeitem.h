@@ -138,16 +138,16 @@ public:
 
     //=========================================================================================================
     /**
-    * Call this slot whenever you want to change the visibilty of the 3D rendered content.
+    * Call this function whenever you want to change the visibilty of the 3D rendered content.
     *
     * @param[in] state     The visiblity flag.
     */
     void setVisible(bool state);
 
-private slots:
+private:
     //=========================================================================================================
     /**
-    * Call this slot whenever the curvature color or origin of color information (curvature or annotation) changed.
+    * Call this function whenever the curvature color or origin of color information (curvature or annotation) changed.
     *
     * @param[in] fAlpha     The new alpha value.
     */
@@ -155,7 +155,7 @@ private slots:
 
     //=========================================================================================================
     /**
-    * Call this slot whenever the surface color was changed.
+    * Call this function whenever the surface color was changed.
     *
     * @param[in] color        The new surface color.
     */
@@ -163,7 +163,7 @@ private slots:
 
     //=========================================================================================================
     /**
-    * Call this slot whenever the check box of this item was checked.
+    * Call this function whenever the check box of this item was checked.
     *
     * @param[in] checkState        The current checkstate.
     */
@@ -171,7 +171,7 @@ private slots:
 
     //=========================================================================================================
     /**
-    * Call this slot whenever the the translation x of this item changed.
+    * Call this function whenever the the translation x of this item changed.
     *
     * @param[in] fTransX        The current x translation.
     */
@@ -179,7 +179,7 @@ private slots:
 
     //=========================================================================================================
     /**
-    * Call this slot whenever the the translation y of this item changed.
+    * Call this function whenever the the translation y of this item changed.
     *
     * @param[in] fTransY        The current y translation.
     */
@@ -187,13 +187,12 @@ private slots:
 
     //=========================================================================================================
     /**
-    * Call this slot whenever the the translation z of this item changed.
+    * Call this function whenever the the translation z of this item changed.
     *
     * @param[in] fTransZ        The current z translation.
     */
     void onSurfaceTranslationZChanged(float fTransZ);
 
-private:
     //=========================================================================================================
     /**
     * Creates a QByteArray of colors for given color for the input vertices.

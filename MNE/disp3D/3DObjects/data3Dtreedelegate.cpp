@@ -292,7 +292,10 @@ void Data3DTreeDelegate::setEditorData(QWidget* editor, const QModelIndex& index
             QDoubleSpinBox* pDoubleSpinBox = static_cast<QDoubleSpinBox*>(editor);
             pDoubleSpinBox->setValue(value);
             break;
-        }
+        }        
+
+        default: // do nothing;
+            break;
     }
 
     QItemDelegate::setEditorData(editor, index);
@@ -431,6 +434,9 @@ void Data3DTreeDelegate::setModelData(QWidget* editor, QAbstractItemModel* model
             model->setData(index, data, Qt::DisplayRole);
             break;
         }
+
+        default: // do nothing;
+            break;
     }
 
     QItemDelegate::setModelData(editor, model, index);

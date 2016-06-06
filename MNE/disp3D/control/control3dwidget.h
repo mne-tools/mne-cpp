@@ -118,7 +118,7 @@ public:
     */
     void setView3D(View3D::SPtr view3D);
 
-protected slots:
+protected:
     //=========================================================================================================
     /**
     * Minimizes th ewidget and all its contents.
@@ -178,7 +178,6 @@ protected slots:
     */
     void onRotationClicked(bool checked);
 
-protected:
     Ui::Control3DWidget*    ui;                         /**< The pointer to the QtDesigner ui class. */
 
     QList<View3D::SPtr>     m_lView3D;                  /**< List of all connected view3D's. */
