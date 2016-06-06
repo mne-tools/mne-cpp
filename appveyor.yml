@@ -30,7 +30,7 @@ build_script:
 after_build:
     # -- Copy Files --
     # -MNE Lib-
-    - rmdir "..\mne-cpp\tools\ifw_installer\windows\packages\org.mne_cpp.suite\data" /s /q
+    #- rmdir "..\mne-cpp\tools\ifw_installer\windows\packages\org.mne_cpp.suite\data" /s /q
     - mkdir -p "..\mne-cpp\tools\ifw_installer\windows\packages\org.mne_cpp.suite\data\bearer"
     - xcopy "..\mne-cpp\bin\bearer" "..\mne-cpp\tools\ifw_installer\windows\packages\org.mne_cpp.suite\data\bearer" /s /e /y
     - mkdir -p "..\mne-cpp\tools\ifw_installer\windows\packages\org.mne_cpp.suite\data\iconengines"
@@ -46,7 +46,7 @@ after_build:
     - xcopy "..\mne-cpp\bin\vcredist_x64.exe" "..\mne-cpp\tools\ifw_installer\windows\packages\org.mne_cpp.suite\data" /y
 
     # -MNE-X-
-    - rmdir "..\mne-cpp\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_x\data" /s /q
+    #- rmdir "..\mne-cpp\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_x\data" /s /q
     - mkdir -p "..\mne-cpp\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_x\data"
     #mne_x
     - xcopy "..\mne-cpp\bin\mne_x.exe" "..\mne-cpp\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_x\data" /y
@@ -65,12 +65,12 @@ after_build:
     - xcopy "..\mne-cpp\bin\mne_rt_server_plugins" "..\mne-cpp\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_x\data\mne_rt_server_plugins" /s /e /y
 
     # -MNE Browse Raw Qt-
-    - rmdir "..\mne-cpp\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_browse_raw_qt\data" /s /q
+    #- rmdir "..\mne-cpp\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_browse_raw_qt\data" /s /q
     - mkdir -p "..\mne-cpp\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_browse_raw_qt\data"
     - xcopy "..\mne-cpp\bin\mne_browse_raw_qt.exe" "..\mne-cpp\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_browse_raw_qt\data" /y
 
     # -MNE Analyze Qt-
-    - rmdir "..\mne-cpp\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_analyze_qt\data" /s /q
+    #- rmdir "..\mne-cpp\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_analyze_qt\data" /s /q
     - mkdir -p "..\mne-cpp\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_analyze_qt\data"
     - xcopy "..\mne-cpp\bin\mne_analyze_qt.exe" "..\mne-cpp\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_analyze_qt\data" /y
 
