@@ -774,6 +774,28 @@ void NoiseReduction::run()
             t_mat = m_matSparseSpharaMult * t_mat;
         }
 
+//        //Common average
+//        MatrixXd commonAvr = MatrixXd(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
+//        commonAvr.setZero();
+
+//        int nEEGCh = 0;
+
+//        for(int i = 0; i <m_pFiffInfo->chs.size(); ++i) {
+//            if(m_pFiffInfo->chs.at(i).ch_name.contains("EEG") && !m_pFiffInfo->bads.contains(m_pFiffInfo->chs.at(i).ch_name)) {
+//                nEEGCh++;
+//            }
+//        }
+
+//        for(int i = 0; i <m_pFiffInfo->chs.size(); ++i) {
+//            for(int j = 0; j < m_pFiffInfo->chs.size(); ++j) {
+//                if(m_pFiffInfo->chs.at(j).ch_name.contains("EEG") && !m_pFiffInfo->bads.contains(m_pFiffInfo->chs.at(j).ch_name)) {
+//                    commonAvr(i,j) = 1/nEEGCh;
+//                }
+//            }
+//        }
+
+//        UTILSLIB::IOUtils::write_eigen_matrix(commonAvr, "commonAvr.txt", "common vaergae matrix");
+
         m_mutex.unlock();
 
         //Send the data to the connected plugins and the online display

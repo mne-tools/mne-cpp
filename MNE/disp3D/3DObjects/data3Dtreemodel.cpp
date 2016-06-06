@@ -69,7 +69,7 @@ Data3DTreeModel::Data3DTreeModel(QObject* parent, Qt3DCore::QEntity* parentEntit
 
 Data3DTreeModel::~Data3DTreeModel()
 {
-    delete m_pRootItem;
+    //delete m_pRootItem;
 }
 
 

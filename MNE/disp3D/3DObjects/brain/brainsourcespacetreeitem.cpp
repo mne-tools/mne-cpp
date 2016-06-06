@@ -177,10 +177,7 @@ bool BrainSourceSpaceTreeItem::addData(const MNEHemisphere& tHemisphere, Qt3DCor
     QByteArray arrayVertColor = createVertColor(tHemisphere.rr);
 
     //Set renderable 3D entity mesh and color data
-    Vector3f offset(3);
-    offset << 0.0, 0.0, 0.0;
-
-    m_pRenderable3DEntity->setMeshData(tHemisphere.rr, tHemisphere.nn, tHemisphere.tris, offset, arrayVertColor);
+    m_pRenderable3DEntity->setMeshData(tHemisphere.rr, tHemisphere.nn, tHemisphere.tris, arrayVertColor);
 
     //Add data which is held by this BrainSourceSpaceTreeItem
     QVariant data;
@@ -196,9 +193,6 @@ bool BrainSourceSpaceTreeItem::addData(const MNEHemisphere& tHemisphere, Qt3DCor
 
     data.setValue(tHemisphere.nn);
     this->setData(data, Data3DTreeModelItemRoles::SurfaceNorm);
-
-    data.setValue(offset);
-    this->setData(data, Data3DTreeModelItemRoles::SurfaceOffset);
 
     data.setValue(m_pRenderable3DEntity);
     this->setData(data, Data3DTreeModelItemRoles::SurfaceRenderable3DEntity);

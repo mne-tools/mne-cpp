@@ -136,10 +136,9 @@ public:
     */
     bool addData(const FSLIB::Surface& tSurface, Qt3DCore::QEntity* parent);
 
-public slots:
     //=========================================================================================================
     /**
-    * Call this slot whenever new colors for the activation data plotting are available.
+    * Call this function whenever new colors for the activation data plotting are available.
     *
     * @param[in] sourceColorSamples     The color values for each estimated source.
     */
@@ -147,7 +146,7 @@ public slots:
 
     //=========================================================================================================
     /**
-    * Call this slot whenever visibilty of teh annoation has changed.
+    * Call this function whenever visibilty of teh annoation has changed.
     *
     * @param[in] isVisible     The visibility flag.
     */
@@ -155,22 +154,22 @@ public slots:
 
     //=========================================================================================================
     /**
-    * Call this slot whenever you want to change the visibilty of the 3D rendered content.
+    * Call this function whenever you want to change the visibilty of the 3D rendered content.
     *
     * @param[in] state     The visiblity flag.
     */
     void setVisible(bool state);
 
-private slots:
+private:
     //=========================================================================================================
     /**
-    * Call this slot whenever the curvature color or origin of color information (curvature or annotation) changed.
+    * Call this function whenever the curvature color or origin of color information (curvature or annotation) changed.
     */
     void onColorInfoOriginOrCurvColorChanged();
 
     //=========================================================================================================
     /**
-    * Call this slot whenever the curvature color or origin of color information (curvature or annotation) changed.
+    * Call this function whenever the curvature color or origin of color information (curvature or annotation) changed.
     *
     * @param[in] fAlpha     The new alpha value.
     */
@@ -178,13 +177,36 @@ private slots:
 
     //=========================================================================================================
     /**
-    * Call this slot whenever the check box of this item was checked.
+    * Call this function whenever the check box of this item was checked.
     *
     * @param[in] checkState        The current checkstate.
     */
     virtual void onCheckStateChanged(const Qt::CheckState& checkState);
 
-private:
+    //=========================================================================================================
+    /**
+    * Call this function whenever the the translation x of this item changed.
+    *
+    * @param[in] fTransX        The current x translation.
+    */
+    void onSurfaceTranslationXChanged(float fTransX);
+
+    //=========================================================================================================
+    /**
+    * Call this function whenever the the translation y of this item changed.
+    *
+    * @param[in] fTransY        The current y translation.
+    */
+    void onSurfaceTranslationYChanged(float fTransY);
+
+    //=========================================================================================================
+    /**
+    * Call this function whenever the the translation z of this item changed.
+    *
+    * @param[in] fTransZ        The current z translation.
+    */
+    void onSurfaceTranslationZChanged(float fTransZ);
+
     //=========================================================================================================
     /**
     * Creates a QByteArray of colors for given curvature and color data.
