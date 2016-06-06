@@ -29,7 +29,7 @@ build_script:
 
 #after_build:
     - cd ..
-    - call ".\mne-cpp\tools\appveyor\after_build.bat" 
+    - call ".\mne-cpp\tools\appveyor\build_win_installer.bat master" 
 
 
 notifications: 
