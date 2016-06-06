@@ -162,19 +162,31 @@ public:
     *
     * @param[in]  vecThresholdValues      QVector3D consisting of 3 values corresponding to the x-axis value of the threshold lines
     */
-    void createThreshold (QVector3D vecThresholdValues);
+    void setThreshold (const QVector3D& vecThresholdValues);
+
+    //=========================================================================================================
+    /**
+    * getThreshold takes in QVector value from outside sources and create the corresponding lines in the histogram
+    *
+    * @return      returns QVector3D consisting of 3 values corresponding to the x-axis value of the threshold lines
+    */
+    const QVector3D& getThreshold ();
 
 private:
-    //=========================================================================================================
+//    //=========================================================================================================
+//    /**
+//    * updateThreshold takes in string name of threshold and its corresponding Qlineseries and creates the line in the QChart
+//    *
+//    * @return      returns QVector3D consisting of 3 values corresponding to the x-axis value of the threshold lines
+//    */
+//    void updateThreshold ();
+//    //=========================================================================================================
+
     QChart          *m_pChart;              /**< Qchart object that will be shown in the widget */
     QSplineSeries   *series;                /**< Spline data series that will contain the histogram data*/
     QLineSeries     *leftThreshold;         /**< Vertical line series for the left threshold */
     QLineSeries     *middleThreshold;       /**< Vertical line series for the middle threshold */
     QLineSeries     *rightThreshold;        /**< Vertical line series for the right threshold */
-    QLineSeries     *newLeftThreshold;      /**< Vertical line series for the left threshold */
-    QLineSeries     *newMiddleThreshold;    /**< Vertical line series for the middle threshold */
-    QLineSeries     *newRightThreshold;     /**< Vertical line series for the right threshold */
-
     QLegendMarker   *marker;                /**< Variable to specify the legend of the threshold line */
     double          minAxisX;               /**< Value of the smallest point of the series in x-axis */
     double          maxAxisX;               /**< Value of the largest point on the series in x-axis */
