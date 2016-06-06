@@ -213,7 +213,7 @@ public:
     *
     * @param[in] dNormalization     The new normalization value.
     */
-    void setNormalization(double vecNormalization);
+    void setNormalization(QVector3D vecNormalization);
 
 public slots:
     //=========================================================================================================
