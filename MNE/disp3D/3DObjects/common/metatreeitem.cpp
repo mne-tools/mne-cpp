@@ -204,6 +204,9 @@ void  MetaTreeItem::setData(const QVariant& value, int role)
             emit surfaceTranslationZChanged(value.toFloat());
             break;
         }
+
+        default: // do nothing;
+            break;
     }
 }
 

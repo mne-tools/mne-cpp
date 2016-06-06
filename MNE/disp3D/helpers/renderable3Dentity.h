@@ -208,7 +208,6 @@ public:
     */
     QVector3D position() const;
 
-public slots:
     //=========================================================================================================
     /**
     * Sets the current rotation around the x-axis.
