@@ -16,9 +16,6 @@ echo Starting MNE-CPP Windows Installer Build; file name: %filename%
 mkdir mne-cpp_installer_shadow_build
 cd mne-cpp_installer_shadow_build
 
-:: Visual Studio 2015
-:: call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" amd64
-
 :: -- Copy Files --
 :: -MNE Lib-
 rmdir "..\mne-cpp\tools\ifw_installer\windows\packages\org.mne_cpp.suite\data" /s /q
@@ -76,3 +73,4 @@ cd ".\mne-cpp_installer_shadow_build\"
 ren mne-cpp-windows-x86_64.exe %filename%
 cd ..
 copy ".\mne-cpp_installer_shadow_build\%filename%" ".\"
+dir
