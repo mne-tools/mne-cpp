@@ -379,18 +379,18 @@ void BrainRTSourceLocDataTreeItem::setVisualizationType(const QString& sVisualiz
 
 //*************************************************************************************************************
 
-void BrainRTSourceLocDataTreeItem::setNormalization(double vecNormalization)
+void BrainRTSourceLocDataTreeItem::setNormalization(QVector3D vecNormalization)
 {
-    QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::RTDataNormalizationValue);
+//    QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::RTDataNormalizationValue);
 
-    for(int i = 0; i < lItems.size(); i++) {
-        if(MetaTreeItem* pAbstractItem = dynamic_cast<MetaTreeItem*>(lItems.at(i))) {
-            QVariant data;
-            data.setValue(vecNormalization);
-            pAbstractItem->setData(data, MetaTreeItemRoles::RTDataNormalizationValue);
-            pAbstractItem->setData(data, Qt::DisplayRole);
-        }
-    }
+//    for(int i = 0; i < lItems.size(); i++) {
+//        if(MetaTreeItem* pAbstractItem = dynamic_cast<MetaTreeItem*>(lItems.at(i))) {
+//            QVariant data;
+//            data.setValue(vecNormalization);
+//            pAbstractItem->setData(data, MetaTreeItemRoles::RTDataNormalizationValue);
+//            pAbstractItem->setData(data, Qt::DisplayRole);
+//        }
+//    }
 }
 
 

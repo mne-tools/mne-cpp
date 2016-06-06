@@ -138,7 +138,7 @@ signals:
     *
     * @param[in] dValue     The new normalization value.
     */
-    void rtDataNormalizationValueChanged(double vecThresholdValues);
+    void rtDataNormalizationValueChanged(QVector3D vecThresholdValues);
 
     //=========================================================================================================
     /**

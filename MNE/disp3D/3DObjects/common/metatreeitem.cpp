@@ -151,7 +151,7 @@ void  MetaTreeItem::setData(const QVariant& value, int role)
         }
 
         case MetaTreeItemRoles::RTDataNormalizationValue: {
-            emit rtDataNormalizationValueChanged(value.toDouble());
+            //emit rtDataNormalizationValueChanged(value.toDouble());
             break;
         }
 
