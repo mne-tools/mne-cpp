@@ -22,10 +22,10 @@ before_build:
     - cd ..
     - if not exist "mne-cpp_shadow_build" mkdir mne-cpp_shadow_build
     - cd mne-cpp_shadow_build
-    - qmake ../mne-cpp/mne-cpp.pro -r MNECPP_CONFIG+=noTests
+    #- qmake ../mne-cpp/mne-cpp.pro -r MNECPP_CONFIG+=noTests
 
 build_script:
-    - jom
+    #- jom
 
 after_build:
     # -- Copy Files --
