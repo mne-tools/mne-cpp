@@ -136,9 +136,9 @@ signals:
     /**
     * Emit this signal whenever the normalization value of the data streaming changed.
     *
-    * @param[in] dValue     The new normalization value.
+    * @param[in] vecThresholds     The new threshold values used for normalizing the data.
     */
-    void rtDataNormalizationValueChanged(double dValue);
+    void rtDataNormalizationValueChanged(const QVector3D& vecThresholds);
 
     //=========================================================================================================
     /**
@@ -179,6 +179,30 @@ signals:
     * @param[in] fAlpha     The new alpha value.
     */
     void surfaceAlphaChanged(float fAlpha);
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the surface translation x value changed has changed.
+    *
+    * @param[in] xTrans     The new translation x value.
+    */
+    void surfaceTranslationXChanged(float xTrans);
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the surface translation y value changed has changed.
+    *
+    * @param[in] yTrans     The new translation y value.
+    */
+    void surfaceTranslationYChanged(float yTrans);
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the surface translation z value changed has changed.
+    *
+    * @param[in] zTrans     The new translation z value.
+    */
+    void surfaceTranslationZChanged(float zTrans);
 };
 
 } //NAMESPACE DISP3DLIB

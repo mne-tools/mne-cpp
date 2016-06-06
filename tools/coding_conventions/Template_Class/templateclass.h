@@ -142,25 +142,16 @@ public:
     OtherClass*    m_pOtherClassObject;       /**< m_pOtherClassObject description goes here. */
 
     //Put your other public members here. Try NOT to define member variables as public. It is always more safe to declare them under protected or private.
-
-	public slots:
-    ///Put your public slots
-
-protected slots:
-	//Put your protected slots
 	
 protected:
     //Put your protected member functions here
 
-    //Put your protected members here
-
-private slots:
-	//Put your private slots
+    //Put your protected member variables here
 	
 private:
     //Put your private member functions here
 
-    //Put your private members here
+    //Put your private member variables here
 	
 signals: //If you want to use signal/slot system you need to specify the Q_Object flag above
     //Put your signals which you want to emit from this class here
