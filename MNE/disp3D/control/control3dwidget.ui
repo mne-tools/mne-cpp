@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>385</width>
-    <height>284</height>
+    <height>367</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -122,17 +122,31 @@
           <string>View options</string>
          </property>
          <layout class="QFormLayout" name="formLayout">
-          <item row="0" column="0">
+          <item row="2" column="0">
            <widget class="QLabel" name="m_label_sceneColorPicker">
             <property name="text">
              <string>Change scene color:</string>
             </property>
            </widget>
           </item>
-          <item row="0" column="1">
+          <item row="2" column="1">
            <widget class="QPushButton" name="m_pushButton_sceneColorPicker">
             <property name="text">
              <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0" colspan="2">
+           <widget class="QCheckBox" name="m_checkBox_showFullScreen">
+            <property name="text">
+             <string>Show full screen</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0" colspan="2">
+           <widget class="QCheckBox" name="m_checkBox_rotate">
+            <property name="text">
+             <string>Rotate</string>
             </property>
            </widget>
           </item>

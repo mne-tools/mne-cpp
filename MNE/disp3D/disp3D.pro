@@ -94,7 +94,6 @@ SOURCES += \
     3DObjects/data3Dtreemodel.cpp \
     3DObjects/data3Dtreedelegate.cpp \
     3DObjects/subject/subjecttreeitem.cpp \
-    3DObjects/subject/subjecttreemetaitem.cpp \
     3DObjects/common/metatreeitem.cpp \
     3DObjects/brain/brainsurfacetreeitem.cpp \
     3DObjects/brain/brainsurfacesettreeitem.cpp \
@@ -118,7 +117,6 @@ HEADERS += \
     3DObjects/data3Dtreemodel.h \
     3DObjects/data3Dtreedelegate.h \
     3DObjects/subject/subjecttreeitem.h \
-    3DObjects/subject/subjecttreemetaitem.h \
     3DObjects/common/metatreeitem.h \
     3DObjects/brain/brainsurfacetreeitem.h \
     3DObjects/brain/brainsurfacesettreeitem.h \

@@ -114,35 +114,20 @@ bool BrainSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* p
 {
     //Create renderable 3D entity
     m_pParentEntity = parent;
-    m_pRenderable3DEntity = new Renderable3DEntity(parent);
+    m_pRenderable3DEntity = new Renderable3DEntity(m_pParentEntity);
     m_pRenderable3DEntityActivationOverlay = new Renderable3DEntity(parent);
 
-    if(tSurface.hemi() == -1) {
-        QMatrix4x4 m;
-        Qt3DCore::QTransform* transform =  new Qt3DCore::QTransform();
-        m.rotate(180, QVector3D(0.0f, 1.0f, 0.0f));
-        m.rotate(-90, QVector3D(1.0f, 0.0f, 0.0f));
-        m.translate(-0.035f,-0.01f,0.04f);
-        m.scale(0.65f);
-        transform->setMatrix(m);
-        m_pRenderable3DEntity->addComponent(transform);
-        m_pRenderable3DEntityActivationOverlay->addComponent(transform);
-    } else {
-        QMatrix4x4 m;
-        Qt3DCore::QTransform* transform =  new Qt3DCore::QTransform();
-        m.rotate(180, QVector3D(0.0f, 1.0f, 0.0f));
-        m.rotate(-90, QVector3D(1.0f, 0.0f, 0.0f));
-        transform->setMatrix(m);
-        m_pRenderable3DEntity->addComponent(transform);
-        m_pRenderable3DEntityActivationOverlay->addComponent(transform);
-    }
+    //Initial transformation also regarding the surface offset
+    m_pRenderable3DEntity->setPosition(QVector3D(tSurface.offset()(0), tSurface.offset()(1), tSurface.offset()(2)));
 
+    m_pRenderable3DEntity->setRotX(90);
+    m_pRenderable3DEntity->setRotY(180);
 
     //Create color from curvature information with default gyri and sulcus colors
     QByteArray arrayCurvatureColor = createCurvatureVertColor(tSurface.curv());
 
     //Set renderable 3D entity mesh and color data
-    m_pRenderable3DEntity->setMeshData(tSurface.rr(), tSurface.nn(), tSurface.tris(), -tSurface.offset(), arrayCurvatureColor);
+    m_pRenderable3DEntity->setMeshData(tSurface.rr(), tSurface.nn(), tSurface.tris(), arrayCurvatureColor);
 
     //Generate activation overlay surface
 //    MatrixX3f overlayAdds = tSurface.rr();
@@ -207,14 +192,14 @@ bool BrainSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* p
     m_pItemSurfColGyri->setData(data, MetaTreeItemRoles::SurfaceColorGyri);
     m_pItemSurfColGyri->setData(data, Qt::DecorationRole);
 
-    MetaTreeItem *itemAlpha = new MetaTreeItem(MetaTreeItemTypes::SurfaceAlpha, "0.5");
+    MetaTreeItem *itemAlpha = new MetaTreeItem(MetaTreeItemTypes::SurfaceAlpha, "1.0");
     connect(itemAlpha, &MetaTreeItem::surfaceAlphaChanged,
             this, &BrainSurfaceTreeItem::onSurfaceAlphaChanged);
     list.clear();
     list << itemAlpha;
     list << new QStandardItem(itemAlpha->toolTip());
     this->appendRow(list);
-    data.setValue(0.5);
+    data.setValue(1.0);
     itemAlpha->setData(data, MetaTreeItemRoles::SurfaceAlpha);
 
     MetaTreeItem *itemSurfFileName = new MetaTreeItem(MetaTreeItemTypes::FileName, tSurface.fileName());
@@ -243,6 +228,33 @@ bool BrainSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* p
     this->appendRow(list);
     data.setValue(tSurface.filePath());
     itemSurfPath->setData(data, MetaTreeItemRoles::SurfaceFilePath);
+
+    MetaTreeItem *itemXTrans = new MetaTreeItem(MetaTreeItemTypes::SurfaceTranslateX, QString::number(tSurface.offset()(0)));
+    itemXTrans->setEditable(true);
+    connect(itemXTrans, &MetaTreeItem::surfaceTranslationXChanged,
+            this, &BrainSurfaceTreeItem::onSurfaceTranslationXChanged);
+    list.clear();
+    list << itemXTrans;
+    list << new QStandardItem(itemXTrans->toolTip());
+    this->appendRow(list);
+
+    MetaTreeItem *itemYTrans = new MetaTreeItem(MetaTreeItemTypes::SurfaceTranslateY, QString::number(tSurface.offset()(1)));
+    itemYTrans->setEditable(true);
+    connect(itemYTrans, &MetaTreeItem::surfaceTranslationYChanged,
+            this, &BrainSurfaceTreeItem::onSurfaceTranslationYChanged);
+    list.clear();
+    list << itemYTrans;
+    list << new QStandardItem(itemYTrans->toolTip());
+    this->appendRow(list);
+
+    MetaTreeItem *itemZTrans = new MetaTreeItem(MetaTreeItemTypes::SurfaceTranslateZ, QString::number(tSurface.offset()(2)));
+    itemZTrans->setEditable(true);
+    connect(itemZTrans, &MetaTreeItem::surfaceTranslationZChanged,
+            this, &BrainSurfaceTreeItem::onSurfaceTranslationZChanged);
+    list.clear();
+    list << itemZTrans;
+    list << new QStandardItem(itemZTrans->toolTip());
+    this->appendRow(list);
 
     return true;
 }
@@ -346,6 +358,36 @@ void BrainSurfaceTreeItem::onSurfaceAlphaChanged(float fAlpha)
 void BrainSurfaceTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
 {
     this->setVisible(checkState == Qt::Unchecked ? false : true);
+}
+
+
+//*************************************************************************************************************
+
+void BrainSurfaceTreeItem::onSurfaceTranslationXChanged(float fTransX)
+{
+    QVector3D position = m_pRenderable3DEntity->position();
+    position.setX(fTransX);
+    m_pRenderable3DEntity->setPosition(position);
+}
+
+
+//*************************************************************************************************************
+
+void BrainSurfaceTreeItem::onSurfaceTranslationYChanged(float fTransY)
+{
+    QVector3D position = m_pRenderable3DEntity->position();
+    position.setY(fTransY);
+    m_pRenderable3DEntity->setPosition(position);
+}
+
+
+//*************************************************************************************************************
+
+void BrainSurfaceTreeItem::onSurfaceTranslationZChanged(float fTransZ)
+{
+    QVector3D position = m_pRenderable3DEntity->position();
+    position.setZ(fTransZ);
+    m_pRenderable3DEntity->setPosition(position);
 }
 
 

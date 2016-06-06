@@ -268,6 +268,11 @@ bool BrainRTSourceLocDataTreeItem::addData(const MNESourceEstimate& tSourceEstim
 
     MatrixXd subData = tSourceEstimate.data.block(iStartIdx, 0, iEndIdx-iStartIdx+1, tSourceEstimate.data.cols());
 
+    //Set new data into item's data. The set data is for eample needed in the delegate to calculate the histogram.
+    QVariant data;
+    data.setValue(subData);
+    this->setData(data, Data3DTreeModelItemRoles::RTData);
+
     m_pSourceLocRtDataWorker->addData(subData);
 
     return true;
@@ -379,18 +384,21 @@ void BrainRTSourceLocDataTreeItem::setVisualizationType(const QString& sVisualiz
 
 //*************************************************************************************************************
 
-void BrainRTSourceLocDataTreeItem::setNormalization(QVector3D vecNormalization)
+void BrainRTSourceLocDataTreeItem::setNormalization(const QVector3D& vecThresholds)
 {
-//    QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::RTDataNormalizationValue);
+    QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::RTDataNormalizationValue);
 
-//    for(int i = 0; i < lItems.size(); i++) {
-//        if(MetaTreeItem* pAbstractItem = dynamic_cast<MetaTreeItem*>(lItems.at(i))) {
-//            QVariant data;
-//            data.setValue(vecNormalization);
-//            pAbstractItem->setData(data, MetaTreeItemRoles::RTDataNormalizationValue);
-//            pAbstractItem->setData(data, Qt::DisplayRole);
-//        }
-//    }
+    for(int i = 0; i < lItems.size(); i++) {
+        if(MetaTreeItem* pAbstractItem = dynamic_cast<MetaTreeItem*>(lItems.at(i))) {
+            QVariant data;
+            data.setValue(vecThresholds);
+            pAbstractItem->setData(data, MetaTreeItemRoles::RTDataNormalizationValue);
+
+            QString sTemp = QString("%1,%2,%3").arg(vecThresholds.x()).arg(vecThresholds.y()).arg(vecThresholds.z());
+            data.setValue(sTemp);
+            pAbstractItem->setData(data, Qt::DisplayRole);
+        }
+    }
 }
 
 
@@ -437,16 +445,14 @@ void BrainRTSourceLocDataTreeItem::onColormapTypeChanged(const QString& sColorma
 void BrainRTSourceLocDataTreeItem::onTimeIntervalChanged(int iMSec)
 {
     m_pSourceLocRtDataWorker->setInterval(iMSec);
-
-
 }
 
 
 //*************************************************************************************************************
 
-void BrainRTSourceLocDataTreeItem::onDataNormalizationValueChanged(double dValue)
+void BrainRTSourceLocDataTreeItem::onDataNormalizationValueChanged(const QVector3D& vecThresholds)
 {
-    m_pSourceLocRtDataWorker->setNormalization(dValue);
+    m_pSourceLocRtDataWorker->setNormalization(vecThresholds);
 }
 
 

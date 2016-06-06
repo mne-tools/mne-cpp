@@ -35,13 +35,8 @@ isEmpty( MNE_BINARY_DIR ) {
 MNECPP_CONFIG += withGui
 ## To set CodeCov coverage compiler flag run: qmake MNECPP_CONFIG+=withCodeCov
 ## To disable tests run: qmake MNECPP_CONFIG+=noTests
-!contains(MNECPP_CONFIG,noTests) {
-    MNECPP_CONFIG += withTests
-}
 ## To disable examples run: qmake MNECPP_CONFIG+=noExamples
-!contains(MNECPP_CONFIG,noExamples) {
-    MNECPP_CONFIG += withExamples
-}
+
 ## To build basic MNE-X version run: qmake MNECPP_CONFIG+=BuildBasicMNEXVersion
 #MNECPP_CONFIG += BuildBasicMNEXVersion
 

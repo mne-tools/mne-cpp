@@ -118,7 +118,7 @@ public:
     */
     void setView3D(View3D::SPtr view3D);
 
-protected slots:
+protected:
     //=========================================================================================================
     /**
     * Minimizes th ewidget and all its contents.
@@ -166,7 +166,18 @@ protected slots:
     */
     void onAlwaysOnTop(bool state);
 
-protected:
+    //=========================================================================================================
+    /**
+    * Slot called when the user wants to show the view in full screen.
+    */
+    void onShowFullScreen(bool checked);
+
+    //=========================================================================================================
+    /**
+    * Slot called when the user wants to rotate the models.
+    */
+    void onRotationClicked(bool checked);
+
     Ui::Control3DWidget*    ui;                         /**< The pointer to the QtDesigner ui class. */
 
     QList<View3D::SPtr>     m_lView3D;                  /**< List of all connected view3D's. */
