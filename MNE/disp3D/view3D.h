@@ -76,6 +76,8 @@
 
 #include <Qt3DInput/QInputAspect>
 
+#include <QPropertyAnimation>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -216,32 +218,27 @@ public:
     */
     void setSceneColor(const QColor& colSceneColor);
 
+    //=========================================================================================================
+    /**
+    * Return the Qt3D root entity.
+    *
+    * @return          The SubjectTreeModel pointer.
+    */
+    Qt3DCore::QEntity* get3DRootEntity();
+
+    //=========================================================================================================
+    /**
+    * Starts to rotate all loaded 3D models.
+    */
+    void startModelRotation();
+
+    //=========================================================================================================
+    /**
+    * Stops to rotate all loaded 3D models.
+    */
+    void stopModelRotation();
+
 protected:
-    Qt3DCore::QAspectEngine             m_aspectEngine;                 /**< The aspect engine. */
-    Qt3DCore::QEntity*                  m_pRootEntity;                  /**< The root/most top level entity buffer. */
-    Qt3DInput::QInputAspect*            m_pInputAspect;                 /**< The input aspect. */
-    Qt3DCore::QCamera*                  m_pCameraEntity;                /**< The camera entity. */
-    Qt3DRender::QFrameGraph*            m_pFrameGraph;                  /**< The frame graph holding the render information. */
-    Qt3DRender::QForwardRenderer*       m_pForwardRenderer;             /**< The renderer (here forward renderer). */
-
-    QSharedPointer<Qt3DCore::QEntity>   m_XAxisEntity;                  /**< The entity representing a torus in x direction. */
-    QSharedPointer<Qt3DCore::QEntity>   m_YAxisEntity;                  /**< The entity representing a torus in y direction. */
-    QSharedPointer<Qt3DCore::QEntity>   m_ZAxisEntity;                  /**< The entity representing a torus in z direction. */
-
-    Qt3DCore::QTransform*               m_pCameraTransform;             /**< The main camera transform. */
-
-    Data3DTreeModel::SPtr               m_pData3DTreeModel;             /**< Pointer to the data3D class, which holds all 3D data. */
-
-    bool            m_bCameraTransMode;         /**< Flag for activating/deactivating the translation camera mode. */
-    bool            m_bCameraRotationMode;      /**< Flag for activating/deactivating the rotation camera mode. */
-
-    QPoint          m_mousePressPositon;        /**< Position when the mouse was pressed. */
-
-    QVector3D       m_vecCameraTrans;           /**< The camera translation vector. */
-    QVector3D       m_vecCameraTransOld;        /**< The camera old translation vector. */
-    QVector3D       m_vecCameraRotation;        /**< The camera rotation vector. */
-    QVector3D       m_vecCameraRotationOld;     /**< The camera old rotation vector. */
-
     //=========================================================================================================
     /**
     * Init the meta types
@@ -265,6 +262,7 @@ protected:
     * Window functions
     */
     void keyPressEvent(QKeyEvent* e);
+    void keyReleaseEvent(QKeyEvent* e);
     void mousePressEvent(QMouseEvent* e);
     void wheelEvent(QWheelEvent* e);
     void mouseReleaseEvent(QMouseEvent* e);
@@ -277,6 +275,34 @@ protected:
     * @param[in] parent         The parent identity which will "hold" the coordinate system.
     */
     void createCoordSystem(Qt3DCore::QEntity *parent);
+
+    Qt3DCore::QAspectEngine             m_aspectEngine;                 /**< The aspect engine. */
+    Qt3DCore::QEntity*                  m_pRootEntity;                  /**< The root/most top level entity buffer. */
+    Qt3DInput::QInputAspect*            m_pInputAspect;                 /**< The input aspect. */
+    Qt3DCore::QCamera*                  m_pCameraEntity;                /**< The camera entity. */
+    Qt3DRender::QFrameGraph*            m_pFrameGraph;                  /**< The frame graph holding the render information. */
+    Qt3DRender::QForwardRenderer*       m_pForwardRenderer;             /**< The renderer (here forward renderer). */
+
+    QSharedPointer<Qt3DCore::QEntity>   m_XAxisEntity;                  /**< The entity representing a torus in x direction. */
+    QSharedPointer<Qt3DCore::QEntity>   m_YAxisEntity;                  /**< The entity representing a torus in y direction. */
+    QSharedPointer<Qt3DCore::QEntity>   m_ZAxisEntity;                  /**< The entity representing a torus in z direction. */
+
+    Qt3DCore::QTransform*               m_pCameraTransform;             /**< The main camera transform. */
+
+    Data3DTreeModel::SPtr               m_pData3DTreeModel;             /**< Pointer to the data3D class, which holds all 3D data. */
+
+    bool                                m_bCameraTransMode;             /**< Flag for activating/deactivating the translation camera mode. */
+    bool                                m_bCameraRotationMode;          /**< Flag for activating/deactivating the rotation camera mode. */
+    bool                                m_bModelRotationMode;           /**< Flag for activating/deactivating the rotation model mode. */
+
+    QPoint                              m_mousePressPositon;            /**< Position when the mouse was pressed. */
+
+    QVector3D                           m_vecCameraTrans;               /**< The camera translation vector. */
+    QVector3D                           m_vecCameraTransOld;            /**< The camera old translation vector. */
+    QVector3D                           m_vecCameraRotation;            /**< The camera rotation vector. */
+    QVector3D                           m_vecCameraRotationOld;         /**< The camera old rotation vector. */
+
+    QList<QPropertyAnimation*>          m_lPropertyAnimations;          /**< The animations for each 3D object. */
 };
 
 } // NAMESPACE
