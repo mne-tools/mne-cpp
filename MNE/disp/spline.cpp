@@ -177,11 +177,11 @@ void Spline::mousePressEvent(QMouseEvent *event)
 
 //*************************************************************************************************************
 
-void Spline::createThreshold(QVector3D vecThresholdValues)
+void Spline::setThreshold(const QVector3D& vecThresholdValues)
 {
-    int leftThresholdValue;
-    int middleThresholdValue;
-    int rightThresholdValue;
+    float leftThresholdValue;
+    float middleThresholdValue;
+    float rightThresholdValue;
 
     if (series->count() == 0)               //protect integrity of the histogram widget in case series contain no data values
     {
@@ -278,4 +278,17 @@ void Spline::createThreshold(QVector3D vecThresholdValues)
         m_pChart->legend()->markers().at(m_pChart->legend()->markers().size()-1)->setVisible(false);
         m_pChart->createDefaultAxes();
     }
+}
+
+
+//*************************************************************************************************************
+
+const QVector3D& Spline::getThreshold()
+{
+    QVector3D vec3DReturnVector;
+
+    vec3DReturnVector.setX(leftThreshold->at(0).x());
+    vec3DReturnVector.setY(middleThreshold->at(0).x());
+    vec3DReturnVector.setZ(rightThreshold->at(0).x());
+    return vec3DReturnVector;
 }
