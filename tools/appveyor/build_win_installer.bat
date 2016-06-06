@@ -73,4 +73,3 @@ cd ".\mne-cpp_installer_shadow_build\"
 ren mne-cpp-windows-x86_64.exe %filename%
 cd ..
 copy ".\mne-cpp_installer_shadow_build\%filename%" ".\"
-dir
