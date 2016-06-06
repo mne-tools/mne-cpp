@@ -27,7 +27,7 @@ before_build:
 build_script:
     #- jom
 
-after_build:
+#after_build:
     # -- Copy Files --
     # -MNE Lib-
     #- rmdir "..\mne-cpp\tools\ifw_installer\windows\packages\org.mne_cpp.suite\data" /s /q
