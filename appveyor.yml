@@ -29,7 +29,7 @@ build_script:
 
 #after_build:
     - cd ..
-    - call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" 
+    - call ".\mne-cpp\tools\appveyor\after_build.bat" 
 
 
 notifications: 
