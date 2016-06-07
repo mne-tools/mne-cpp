@@ -268,11 +268,15 @@ void Spline::setThreshold(const QVector3D& vecThresholdValues)
 
 const QVector3D& Spline::getThreshold()
 {
-    QVector3D vec3DReturnVector;
-
-    vec3DReturnVector.setX(leftThreshold->at(0).x());
-    vec3DReturnVector.setY(middleThreshold->at(0).x());
-    vec3DReturnVector.setZ(rightThreshold->at(0).x());
+    QVector<QPointF> middlePoint = middleThreshold->pointsVector();   //Point values need to be updated before tested and displayed on the widget
+    QVector<QPointF> rightPoint = rightThreshold->pointsVector();
+    QVector<QPointF> leftPoint = leftThreshold->pointsVector();
+    float emitLeft = (leftPoint[0].x() * (pow(10, resultExponentValues[0])));
+    float emitMiddle = (middlePoint[0].x() * (pow(10, resultExponentValues[0])));
+    float emitRight = (rightPoint[0].x() * (pow(10, resultExponentValues[0])));
+    vec3DReturnVector.setX(emitLeft);
+    vec3DReturnVector.setY(emitMiddle);
+    vec3DReturnVector.setZ(emitRight);
     return vec3DReturnVector;
 }
 

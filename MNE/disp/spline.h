@@ -194,6 +194,7 @@ private:
     double          maxAxisX;               /**< Value of the largest point on the series in x-axis */
     int             maximumFrequency;       /**< Highest value of frequency (y-axis) */
     Eigen::VectorXi resultExponentValues;   /**< Common exponent values for the entire */
+    QVector3D       vec3DReturnVector;      /**< vector used in the getThreshold function and implemented in disp3D */
 
 signals:
     //=========================================================================================================

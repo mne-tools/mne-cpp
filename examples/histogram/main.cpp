@@ -55,7 +55,6 @@
 #include <fs/label.h>
 #include <fs/surface.h>
 #include <fs/annotationset.h>
-
 #include <fiff/fiff_evoked.h>
 #include <mne/mne_sourceestimate.h>
 #include <inverse/minimumNorm/minimumnorm.h>
@@ -344,10 +343,12 @@ int main(int argc, char *argv[])
     myTimerHistCounts.start();
     Eigen::VectorXd dataSine;
     dataSine = sineWaveGenerator(1.0e-30,(1.0/1e6), 0.0, 1.0);  //creates synthetic data using sineWaveGenerator function
+    qDebug()<< "sourceEstimateData.rows = " << sourceEstimateData.rows();
+    qDebug()<< "sourceEstaimateData.cols = " << sourceEstimateData.cols();
     MNEMath::histcounts(sourceEstimateData, bMakeSymmetrical, classAmount, resultClassLimit, resultFrequency, inputGlobalMin, inputGlobalMax);   //user input to normalize and sort the data matrix
     qDebug()<<"HistCounts timer:"<<myTimerHistCounts.elapsed();
-    std::cout << "resultClassLimits = " << resultClassLimit << std::endl;
-    std::cout << "resultFrequency = " << resultFrequency << std::endl;
+//    std::cout << "resultClassLimits = " << resultClassLimit << std::endl;
+//    std::cout << "resultFrequency = " << resultFrequency << std::endl;
     int precision = 2;             //format for the amount digits of coefficient shown in the Bar Histogram (does not affect Spline)
 
     //displayObj can be in either Bar or Spline form; uncomment the preferred one and comment the other
