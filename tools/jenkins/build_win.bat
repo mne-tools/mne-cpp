@@ -20,5 +20,6 @@ nmake clean
 nmake
 
 cd "..\mne-cpp"
+dir
 del %filename%
 call 7z a %filename% ./bin

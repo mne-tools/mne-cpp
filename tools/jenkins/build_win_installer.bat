@@ -71,7 +71,9 @@ qmake ../mne-cpp/tools/ifw_installer/windows/windows.pro -r
 nmake clean
 nmake
 
+dir
 cd "..\mne-cpp_installer_shadow_build\"
+dir
 ren mne-cpp-windows-x86_64.exe %filename%
 cd "..\mne-cpp"
 copy "..\mne-cpp_installer_shadow_build\%filename%" ".\"
