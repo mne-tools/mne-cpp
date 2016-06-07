@@ -8,15 +8,15 @@ os: Visual Studio 2015
 platform: x64
 configuration: Release
 
+install:
+    - set QTDIR=C:\Qt\5.6\msvc2015_64
+    - set PATH=%PATH%;%QTDIR%\bin;C:\Qt\Tools\QtCreator\bin;C:\Qt\QtIFW2.0.1\bin
+    - call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" amd64
+
 build:
   parallel: true
   #quiet|minimal|normal|detailed
   verbosity: detailed 
-   
-install:
-    - set QTDIR=C:\Qt\5.6\msvc2015_64
-    - set PATH=%PATH%;%QTDIR%\bin;C:\Qt\Tools\QtCreator\bin
-    - call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" amd64
 
 before_build:
     - cd ..
@@ -26,6 +26,12 @@ before_build:
 
 build_script:
     - jom
+    - cd ..
+
+after_build:
+    - call .\mne-cpp\tools\appveyor\compress_binaries.bat master
+    - call .\mne-cpp\tools\appveyor\build_installer.bat master
+    - dir
 
 notifications: 
   - provider: Email 
