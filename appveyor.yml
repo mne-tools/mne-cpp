@@ -33,6 +33,9 @@ build_script:
     - call .\mne-cpp\tools\appveyor\build_installer.bat master
     - dir
 
+artifacts:
+  - path: '../mne-cpp-windows-x86_64-master.exe'
+
 deploy:
   - provider: FTP
     protocol: ftp
@@ -42,7 +45,7 @@ deploy:
       secure: aUqYXjXjd4dh3sO18+x8qw==
     password:
       secure: u8DCGb7s6kuPyjybX/THWFQ0VMCfpLD5IsB/9nzGnvk=
-    artifact: mne-cpp-windows-x86_64-master.exe
+    debug: true
     on:
       branch: master
 
