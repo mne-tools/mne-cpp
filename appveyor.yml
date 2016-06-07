@@ -35,6 +35,7 @@ build_script:
 
 artifacts:
   - path: '..\mne-cpp-windows-x86_64-master.zip'
+    name: mne-cpp-windows-x86_64-master.zip
 
 deploy:
   - provider: FTP
@@ -45,7 +46,7 @@ deploy:
       secure: aUqYXjXjd4dh3sO18+x8qw==
     password:
       secure: u8DCGb7s6kuPyjybX/THWFQ0VMCfpLD5IsB/9nzGnvk=
-    artifact:
+    artifact: mne-cpp-windows-x86_64-master.zip
     debug: true
     on:
       branch: master
