@@ -19,7 +19,6 @@ build:
   verbosity: detailed 
 
 before_build:
-    - dir
     - if not exist "mne-cpp_shadow_build" mkdir mne-cpp_shadow_build
     - cd mne-cpp_shadow_build
     #- qmake ../mne-cpp.pro -r MNECPP_CONFIG+=noTests
@@ -34,8 +33,10 @@ build_script:
     - dir
 
 artifacts:
+  - path: mne-cpp-windows-x86_64-master.exe
+    name: master_installer
   - path: mne-cpp-windows-x86_64-master.zip
-    name: setup
+    name: master_bin_archive
 
 deploy:
   - provider: FTP
@@ -46,7 +47,7 @@ deploy:
       secure: aUqYXjXjd4dh3sO18+x8qw==
     password:
       secure: u8DCGb7s6kuPyjybX/THWFQ0VMCfpLD5IsB/9nzGnvk=
-    artifact: setup
+    artifact: master_installer,master_bin_archive
     debug: true
     on:
       branch: master
