@@ -34,9 +34,9 @@ build_script:
     - dir
 
 artifacts:
-  - path: ..\mne-cpp-windows-x86_64-master.exe
+  - path: "..\mne-cpp-windows-x86_64-master.exe"
     name: master_installer
-  - path: mne-cpp-windows-x86_64-master.zip
+  - path: "..\mne-cpp-windows-x86_64-master.zip"
     name: master_bin_archive
 
 deploy:
