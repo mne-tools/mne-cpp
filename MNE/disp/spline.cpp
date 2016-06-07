@@ -126,10 +126,8 @@ void Spline::mousePressEvent(QMouseEvent *event)
                     {
                         m_pChart->removeSeries(leftThreshold);
                         leftThreshold=verticalLine;
-                        leftThreshold->setColor("red");
-                        m_pChart->addSeries(leftThreshold);
-                        m_pChart->legend()->markers().at(m_pChart->legend()->markers().size()-1)->setVisible(false);
-                        m_pChart->createDefaultAxes();
+                        leftThreshold->setName("left");
+                        updateThreshold(leftThreshold);
                         emitLeft = (leftPoint[0].x() * (pow(10, resultExponentValues[0])));
                         emit borderChanged(emitLeft, emitMiddle, emitRight);
                         qDebug() << "Border = " << emitLeft << " , " << emitMiddle << " , " << emitRight;
@@ -143,10 +141,8 @@ void Spline::mousePressEvent(QMouseEvent *event)
                     {
                         m_pChart->removeSeries(middleThreshold);
                         middleThreshold=verticalLine;
-                        middleThreshold->setColor("green");
-                        m_pChart->addSeries(middleThreshold);
-                        m_pChart->legend()->markers().at(m_pChart->legend()->markers().size()-1)->setVisible(false);
-                        m_pChart->createDefaultAxes();
+                        middleThreshold->setName("middle");
+                        updateThreshold(middleThreshold);
                         emitMiddle = (middlePoint[0].x() * (pow(10, resultExponentValues[0])));
                         emit borderChanged(emitLeft, emitMiddle, emitRight);
                         qDebug() << "Border = " << emitLeft << " , " << emitMiddle << " , " << emitRight;
@@ -160,10 +156,8 @@ void Spline::mousePressEvent(QMouseEvent *event)
                     {
                         m_pChart->removeSeries(rightThreshold);
                         rightThreshold=verticalLine;
-                        rightThreshold->setColor("blue");
-                        m_pChart->addSeries(rightThreshold);
-                        m_pChart->legend()->markers().at(m_pChart->legend()->markers().size()-1)->setVisible(false);
-                        m_pChart->createDefaultAxes();
+                        rightThreshold->setName("right");
+                        updateThreshold(rightThreshold);
                         emitRight = (rightPoint[0].x() * (pow(10, resultExponentValues[0])));
                         emit borderChanged(emitLeft, emitMiddle, emitRight);
                         qDebug() << "Border = " << emitLeft << " , " << emitMiddle << " , " << emitRight;
@@ -241,21 +235,20 @@ void Spline::setThreshold(const QVector3D& vecThresholdValues)
                 rightThresholdValue = vecThresholdValues.x();
             }
         }
-        m_pChart->removeSeries(leftThreshold);
-        m_pChart->removeSeries(middleThreshold);
-        m_pChart->removeSeries(rightThreshold);
-
         QPointF leftThresholdPoint;
         QPointF middleThresholdPoint;
         QPointF rightThresholdPoint;
 
-        leftThresholdPoint.setX(leftThresholdValue);
-        middleThresholdPoint.setX(middleThresholdValue);
-        rightThresholdPoint.setX(rightThresholdValue);
-
+        m_pChart->removeSeries(leftThreshold);
+        m_pChart->removeSeries(middleThreshold);
+        m_pChart->removeSeries(rightThreshold);
         leftThreshold->clear();
         middleThreshold->clear();
         rightThreshold->clear();
+
+        leftThresholdPoint.setX(leftThresholdValue);
+        middleThresholdPoint.setX(middleThresholdValue);
+        rightThresholdPoint.setX(rightThresholdValue);
 
         leftThreshold->append(leftThresholdPoint.x(), 0);
         leftThreshold->append(leftThresholdPoint.x(), maximumFrequency);
@@ -264,19 +257,9 @@ void Spline::setThreshold(const QVector3D& vecThresholdValues)
         rightThreshold->append(rightThresholdPoint.x(), 0);
         rightThreshold->append(rightThresholdPoint.x(), maximumFrequency);
 
-        leftThreshold->setColor("red");
-        middleThreshold->setColor("green");
-        rightThreshold->setColor("blue");
-        leftThreshold->setVisible(true);
-        middleThreshold->setVisible(true);
-        rightThreshold->setVisible(true);
-        m_pChart->addSeries(leftThreshold);
-        m_pChart->legend()->markers().at(m_pChart->legend()->markers().size()-1)->setVisible(false);
-        m_pChart->addSeries(middleThreshold);
-        m_pChart->legend()->markers().at(m_pChart->legend()->markers().size()-1)->setVisible(false);
-        m_pChart->addSeries(rightThreshold);
-        m_pChart->legend()->markers().at(m_pChart->legend()->markers().size()-1)->setVisible(false);
-        m_pChart->createDefaultAxes();
+        updateThreshold(leftThreshold);
+        updateThreshold(middleThreshold);
+        updateThreshold(rightThreshold);
     }
 }
 
@@ -291,4 +274,31 @@ const QVector3D& Spline::getThreshold()
     vec3DReturnVector.setY(middleThreshold->at(0).x());
     vec3DReturnVector.setZ(rightThreshold->at(0).x());
     return vec3DReturnVector;
+}
+
+
+//*************************************************************************************************************
+
+void Spline::updateThreshold (QLineSeries* lineSeries)
+{
+    if (lineSeries->name() == "left")
+    {
+        lineSeries->setColor("red") ;
+    }
+    else if (lineSeries->name() == "middle")
+    {
+        lineSeries->setColor("green");
+    }
+    else if (lineSeries->name() == "right")
+    {
+        lineSeries->setColor("blue");
+    }
+    else
+    {
+        qDebug()<< "Error: lineSeries->name() is not 'left', 'middle' or 'right'.";
+    }
+    lineSeries->setVisible(true);
+    m_pChart->addSeries(lineSeries);
+    m_pChart->legend()->markers().at(m_pChart->legend()->markers().size()-1)->setVisible(false);
+    m_pChart->createDefaultAxes();
 }
