@@ -173,14 +173,16 @@ public:
     const QVector3D& getThreshold ();
 
 private:
-//    //=========================================================================================================
-//    /**
-//    * updateThreshold takes in string name of threshold and its corresponding Qlineseries and creates the line in the QChart
-//    *
-//    * @return      returns QVector3D consisting of 3 values corresponding to the x-axis value of the threshold lines
-//    */
-//    void updateThreshold ();
-//    //=========================================================================================================
+    //=========================================================================================================
+    /**
+    * updateThreshold takes in string name of threshold and its corresponding Qlineseries and creates the line in the QChart
+    *
+    * @param[in]  cThresholdName    name of the Line
+    * @param[in]  lineSeries        qlineseries of the corresponding threshold line
+    */
+    void updateThreshold (QLineSeries *lineSeries);
+
+    //=========================================================================================================
 
     QChart          *m_pChart;              /**< Qchart object that will be shown in the widget */
     QSplineSeries   *series;                /**< Spline data series that will contain the histogram data*/
@@ -268,6 +270,9 @@ void Spline::updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& 
     leftThreshold = new QLineSeries();
     middleThreshold = new QLineSeries();
     rightThreshold = new QLineSeries();
+    leftThreshold->setName("left");
+    middleThreshold->setName("middle");
+    rightThreshold->setName("right");
     leftThreshold->append(minAxisX, 0);                     //initialize threshold lines
     middleThreshold->append(maxAxisX, 0);
     rightThreshold->append(maxAxisX, 0);
