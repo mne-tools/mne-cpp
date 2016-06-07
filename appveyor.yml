@@ -20,18 +20,17 @@ build:
 
 before_build:
     - dir
-    - cd ..
     - if not exist "mne-cpp_shadow_build" mkdir mne-cpp_shadow_build
     - cd mne-cpp_shadow_build
-    #- qmake ../mne-cpp/mne-cpp.pro -r MNECPP_CONFIG+=noTests
+    #- qmake ../mne-cpp.pro -r MNECPP_CONFIG+=noTests
 
 build_script:
     #- jom
     - cd ..
 
 #after_build:
-    - call .\mne-cpp\tools\appveyor\compress_binaries.bat master
-    - call .\mne-cpp\tools\appveyor\build_installer.bat master
+    - call .\tools\appveyor\compress_binaries.bat master
+    - call .\tools\appveyor\build_installer.bat master
     - dir
 
 artifacts:
