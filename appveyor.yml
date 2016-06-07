@@ -29,8 +29,8 @@ build_script:
     - cd ..
 
 #after_build:
-    - call .\tools\appveyor\compress_binaries.bat master
-    - call .\tools\appveyor\build_installer.bat master
+    - call .\mne-cpp\tools\appveyor\compress_binaries.bat master
+    - call .\mne-cpp\tools\appveyor\build_installer.bat master
     - dir
 
 artifacts:
