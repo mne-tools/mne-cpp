@@ -19,6 +19,6 @@ qmake ../mne-cpp/mne-cpp.pro -r
 nmake clean
 nmake
 
-cd ..
+cd "..\mne-cpp"
 del %filename%
-call 7z a %filename% ./mne-cpp/bin
+call 7z a %filename% ./bin
