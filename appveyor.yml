@@ -19,6 +19,7 @@ build:
   verbosity: detailed 
 
 before_build:
+    - dir
     - cd ..
     - if not exist "mne-cpp_shadow_build" mkdir mne-cpp_shadow_build
     - cd mne-cpp_shadow_build
