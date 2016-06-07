@@ -238,9 +238,7 @@ void Data3DTreeDelegate::setEditorData(QWidget* editor, const QModelIndex& index
             MatrixXd matRTData = index.model()->data(indexParent, Data3DTreeModelItemRoles::RTData).value<MatrixXd>();
 
             QVector3D vecThresholdValues = index.model()->data(index, MetaTreeItemRoles::RTDataNormalizationValue).value<QVector3D>();
-            pSpline->createThreshold(vecThresholdValues);
-
-
+            pSpline->setThreshold(vecThresholdValues);
 
 //            QVector3D vecThresholdValues = index.model()->data(index, MetaTreeItemRoles::RTDataNormalizationValue());
 //            double value = index.model()->data(index, MetaTreeItemRoles::RTDataNormalizationValue).toDouble();
@@ -354,7 +352,10 @@ void Data3DTreeDelegate::setModelData(QWidget* editor, QAbstractItemModel* model
         }
 
         case MetaTreeItemTypes::RTDataNormalizationValue: {
-            //turn 3 double threshold values to QVector3d with getThreshold
+        //turn 3 double threshold values to QVector3d with getThreshold
+//        QVector3D vecUpdatedThreshold;
+//        vecUpdatedThreshold = Spline::getThreshold();
+
 //            QDoubleSpinBox* pDoubleSpinBox = static_cast<QDoubleSpinBox*>(editor);
 //            QVariant data;
 //            data.setValue(pDoubleSpinBox->value());

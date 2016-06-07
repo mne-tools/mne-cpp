@@ -158,7 +158,7 @@ public:
 
     //=========================================================================================================
     /**
-    * createThreshold takes in QVector value from outside sources and create the corresponding lines in the histogram
+    * setThreshold takes in QVector value from outside sources and create the corresponding lines in the histogram
     *
     * @param[in]  vecThresholdValues      QVector3D consisting of 3 values corresponding to the x-axis value of the threshold lines
     */
