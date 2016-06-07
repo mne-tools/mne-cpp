@@ -37,7 +37,7 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = lib
 
-QT       += widgets 3dcore 3drender 3dinput
+QT       += widgets 3dcore 3drender 3dinput charts
 
 DEFINES += DISP3DNEW_LIBRARY
 

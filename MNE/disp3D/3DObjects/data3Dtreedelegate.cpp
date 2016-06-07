@@ -242,6 +242,8 @@ void Data3DTreeDelegate::setEditorData(QWidget* editor, const QModelIndex& index
             Eigen::VectorXd resultClassLimit;
             Eigen::VectorXi resultFrequency;
             MNEMath::histcounts(matRTData, false, 50, resultClassLimit, resultFrequency, 0.0, 0.0);
+            std::cout << "resultClassLimit = " << resultClassLimit;
+            std::cout << "resultFrequency = " << resultFrequency;
             pSpline->setData(resultClassLimit, resultFrequency, 0);
             //pSpline->setThreshold(vecThresholdValues);
             break;
@@ -352,18 +354,19 @@ void Data3DTreeDelegate::setModelData(QWidget* editor, QAbstractItemModel* model
         }
 
         case MetaTreeItemTypes::RTDataNormalizationValue: {
-            //turn 3 double threshold values to QVector3d with getThreshold
-//            Spline* pSpline = static_cast<Spline*>(editor);
-//            QVariant data;
-//            data = pSpline->getThreshold();
+            std::cout << "set data threshold";
+            Spline* pSpline = static_cast<Spline*>(editor);
+            QVariant data;
+            QVector3D vecThreshold;
+            vecThreshold = pSpline->getThreshold();
+            data.setValue(vecThreshold);
 
-//            QDoubleSpinBox* pDoubleSpinBox = static_cast<QDoubleSpinBox*>(editor);
-//            QVariant data;
-//            data.setValue(pDoubleSpinBox->value());
-
-//            model->setData(index, data, MetaTreeItemRoles::RTDataNormalizationValue);
+            QString displayThreshold;
+            displayThreshold = QString("%1,%2,%3").arg(vecThreshold.x()).arg(vecThreshold.y()).arg(vecThreshold.z());
+            model->setData(index, data, MetaTreeItemRoles::RTDataNormalizationValue);
+            data.setValue(displayThreshold);
 //            model->setData(index, data, Qt::DisplayRole);
-            break;
+            return;
         }
 
         case MetaTreeItemTypes::RTDataTimeInterval: {
