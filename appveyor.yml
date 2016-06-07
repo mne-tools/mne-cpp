@@ -34,7 +34,7 @@ build_script:
     - dir
 
 artifacts:
-  - path: ../mne-cpp-windows-x86_64-master.zip
+  - path: '..\mne-cpp-windows-x86_64-master.zip'
 
 deploy:
   - provider: FTP
