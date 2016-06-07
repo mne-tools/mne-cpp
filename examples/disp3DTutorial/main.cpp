@@ -195,6 +195,7 @@ int main(int argc, char *argv[])
             t_clusteredFwd = t_Fwd;
         }
 
+
         //
         // make an inverse operators
         //
@@ -226,6 +227,7 @@ int main(int argc, char *argv[])
         std::cout << "timeMin\n" << sourceEstimate_LA.times[0] << std::endl;
         std::cout << "timeMax\n" << sourceEstimate_LA.times[sourceEstimate_LA.times.size()-1] << std::endl;
         std::cout << "time step\n" << sourceEstimate_LA.tstep << std::endl;
+        std::cout << "number of sources\n" << sourceEstimate_LA.data.rows() << std::endl;
     }
 
     //########################################################################################
@@ -250,8 +252,8 @@ int main(int argc, char *argv[])
     View3D::SPtr testWindow = View3D::SPtr(new View3D());
 //    testWindow->addBrainData("Subject01", "HemiLRSet", tSurfLeft, tAnnotLeft);
 //    testWindow->addBrainData("Subject01", "HemiLRSet", tSurfRight, tAnnotRight);
-    testWindow->addBrainData("Subject01", "Surface", tSurfSet, tAnnotSet);
-    testWindow->addBrainData("Subject01", "Right Auditory", tSurfSet, tAnnotSet);
+//    testWindow->addBrainData("Subject01", "Surface", tSurfSet, tAnnotSet);
+//    testWindow->addBrainData("Subject01", "Right Auditory", tSurfSet, tAnnotSet);
     testWindow->addBrainData("Subject01", "Right Visual", tSurfSet, tAnnotSet);
     //testWindow->addBrainData("Subject01", "Left Auditory", tSurfSet, tAnnotSet);
     //testWindow->addBrainData("Subject01", "Left Visual", tSurfSet, tAnnotSet);
@@ -272,20 +274,20 @@ int main(int argc, char *argv[])
 
         //RA
         //QList<BrainRTSourceLocDataTreeItem*> rtItemList_LA = testWindow->addRtBrainData("Subject01", "Left Auditory", sourceEstimate_LA, t_clusteredFwd);
-        QList<BrainRTSourceLocDataTreeItem*> rtItemList_RA = testWindow->addRtBrainData("Subject01", "Right Auditory", sourceEstimate_RA, t_clusteredFwd);
+//        QList<BrainRTSourceLocDataTreeItem*> rtItemList_RA = testWindow->addRtBrainData("Subject01", "Right Auditory", sourceEstimate_RA, t_clusteredFwd);
         //QList<BrainRTSourceLocDataTreeItem*> rtItemList_LV = testWindow->addRtBrainData("Subject01", "Left Visual", sourceEstimate_LV, t_clusteredFwd);
         QList<BrainRTSourceLocDataTreeItem*> rtItemList_RV = testWindow->addRtBrainData("Subject01", "Right Visual", sourceEstimate_RV, t_clusteredFwd);
 
-        //Init some rt related values
-        for(int i = 0; i < rtItemList_RA.size(); ++i) {
-            rtItemList_RA.at(i)->setLoopState(true);
-            rtItemList_RA.at(i)->setTimeInterval(75);
-            rtItemList_RA.at(i)->setNumberAverages(7);
-            rtItemList_RA.at(i)->setStreamingActive(true);
-            rtItemList_RA.at(i)->setNormalization(QVector3D(5.0,0.5,15));
-            rtItemList_RA.at(i)->setVisualizationType("Annotation based");
-            rtItemList_RA.at(i)->setColortable("Hot");
-        }
+//        //Init some rt related values
+//        for(int i = 0; i < rtItemList_RA.size(); ++i) {
+//            rtItemList_RA.at(i)->setLoopState(true);
+//            rtItemList_RA.at(i)->setTimeInterval(75);
+//            rtItemList_RA.at(i)->setNumberAverages(7);
+//            rtItemList_RA.at(i)->setStreamingActive(true);
+//            rtItemList_RA.at(i)->setNormalization(QVector3D(5.0,0.5,15));
+//            rtItemList_RA.at(i)->setVisualizationType("Annotation based");
+//            rtItemList_RA.at(i)->setColortable("Hot");
+//        }
 
         //Init some rt related values
         for(int i = 0; i < rtItemList_RV.size(); ++i) {
