@@ -10,4 +10,4 @@ set filename=mne-cpp-windows-x86_64-%arg1%.zip
 
 echo Start Compressing MNE-CPP Win Build; file name: %filename%
 
-call 7z a %filename% ./bin
+call 7z a %filename% ./mne-cpp/bin
