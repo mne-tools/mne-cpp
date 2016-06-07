@@ -42,7 +42,7 @@ deploy:
       secure: aUqYXjXjd4dh3sO18+x8qw==
     password:
       secure: u8DCGb7s6kuPyjybX/THWFQ0VMCfpLD5IsB/9nzGnvk=
-    artifact: mne-cpp-windows-x86_64-master.exe mne-cpp-windows-x86_64-master.zip
+    artifact: ..\mne-cpp-windows-x86_64-master.exe ..\mne-cpp-windows-x86_64-master.zip
     on:
       branch: master
 
