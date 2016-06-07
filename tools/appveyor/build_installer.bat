@@ -8,10 +8,7 @@ set arg1=%1
 if "%arg1%"=="" set arg1=default
 set filename=mne-cpp-windows-x86_64-%arg1%.exe
 
-::Set path to installer framework
-set PATH=%PATH%;C:\Qt\QtIFW2.0.1\bin
-
-echo Starting MNE-CPP Windows Installer Build; file name: %filename%
+echo Start MNE-CPP Windows Installer Build; file name: %filename%
 
 mkdir mne-cpp_installer_shadow_build
 cd mne-cpp_installer_shadow_build
