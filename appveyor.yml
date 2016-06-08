@@ -25,29 +25,29 @@ build_script:
 #    - jom
 
 #after_build:
-    - call .\tools\appveyor\compress_binaries.bat master
-    - call .\tools\appveyor\build_installer.bat master
+    - call .\tools\appveyor\compress_binaries.bat %APPVEYOR_REPO_BRANCH%
+    - call .\tools\appveyor\build_installer.bat %APPVEYOR_REPO_BRANCH%
     - dir
     - echo Builded branch %APPVEYOR_REPO_BRANCH%
 
 artifacts:
-  - path: mne-cpp-windows-x86_64-master.exe
-    name: master_installer
-  - path: mne-cpp-windows-x86_64-master.zip
-    name: master_bin_archive
+  - path: mne-cpp-windows-x86_64-%APPVEYOR_REPO_BRANCH%.exe
+    name: %APPVEYOR_REPO_BRANCH%_installer
+  - path: mne-cpp-windows-x86_64-%APPVEYOR_REPO_BRANCH%.zip
+    name: %APPVEYOR_REPO_BRANCH%_bin_archive
 
-#deploy:
-#  - provider: FTP
-#    protocol: ftp
-#    host:
-#      secure: ckK4+pPybTYYRiKxXpZScwZlxRmpxUgTvZaTN+vVAfU=
-#    username:
-#      secure: aUqYXjXjd4dh3sO18+x8qw==
-#    password:
-#      secure: u8DCGb7s6kuPyjybX/THWFQ0VMCfpLD5IsB/9nzGnvk=
-#    artifact: master_installer,master_bin_archive
-#    on:
-#      branch: master
+deploy:
+  - provider: FTP
+    protocol: ftp
+    host:
+      secure: ckK4+pPybTYYRiKxXpZScwZlxRmpxUgTvZaTN+vVAfU=
+    username:
+      secure: aUqYXjXjd4dh3sO18+x8qw==
+    password:
+      secure: u8DCGb7s6kuPyjybX/THWFQ0VMCfpLD5IsB/9nzGnvk=
+    artifact: master_installer,master_bin_archive
+    on:
+      branch: master
 
 notifications: 
   - provider: Email 
