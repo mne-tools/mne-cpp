@@ -25,17 +25,18 @@ build_script:
     - jom
 
 after_build:
-    - call .\tools\appveyor\compress_binaries.bat master
-    - call .\tools\appveyor\build_installer.bat master
+    - call .\tools\appveyor\compress_binaries.bat %APPVEYOR_REPO_BRANCH%
+    - call .\tools\appveyor\build_installer.bat %APPVEYOR_REPO_BRANCH%
     - dir
 
 artifacts:
-  - path: mne-cpp-windows-x86_64-master.exe
-    name: master_installer
-  - path: mne-cpp-windows-x86_64-master.zip
-    name: master_bin_archive
+  - path: mne-cpp-windows-x86_64-$(APPVEYOR_REPO_BRANCH).exe
+    name: installer
+  - path: mne-cpp-windows-x86_64-$(APPVEYOR_REPO_BRANCH).zip
+    name: bin_archive
 
 deploy:
+  # master
   - provider: FTP
     protocol: ftp
     host:
@@ -44,9 +45,22 @@ deploy:
       secure: aUqYXjXjd4dh3sO18+x8qw==
     password:
       secure: u8DCGb7s6kuPyjybX/THWFQ0VMCfpLD5IsB/9nzGnvk=
-    artifact: master_installer,master_bin_archive
+    artifact: installer,bin_archive
     on:
       branch: master
+
+  # 1.0.0
+  - provider: FTP
+    protocol: ftp
+    host:
+      secure: ckK4+pPybTYYRiKxXpZScwZlxRmpxUgTvZaTN+vVAfU=
+    username:
+      secure: OjcVi/WSo4rGcclzEOQCEw==
+    password:
+      secure: 8mgxeu0zEr2vEble0FcDE0BlVbw+4zo1j+J4QigGUvk=
+    artifact: installer,bin_archive
+    on:
+      branch: 1.0.0
 
 notifications: 
   - provider: Email 
