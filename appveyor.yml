@@ -49,6 +49,19 @@ deploy:
     on:
       branch: master
 
+deploy:
+  - provider: FTP
+    protocol: ftp
+    host:
+      secure: ckK4+pPybTYYRiKxXpZScwZlxRmpxUgTvZaTN+vVAfU=
+    username:
+      secure: OjcVi/WSo4rGcclzEOQCEw==
+    password:
+      secure: 8mgxeu0zEr2vEble0FcDE0BlVbw+4zo1j+J4QigGUvk=
+    artifact: installer,bin_archive
+    on:
+      branch: 1.0.0
+
 notifications: 
   - provider: Email 
     to: 
