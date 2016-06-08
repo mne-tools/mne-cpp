@@ -32,9 +32,9 @@ build_script:
 
 artifacts:
   - path: mne-cpp-windows-x86_64-%APPVEYOR_REPO_BRANCH%.exe
-    name: %APPVEYOR_REPO_BRANCH%_installer
+    name: $(APPVEYOR_REPO_BRANCH)_installer
   - path: mne-cpp-windows-x86_64-%APPVEYOR_REPO_BRANCH%.zip
-    name: %APPVEYOR_REPO_BRANCH%_bin_archive
+    name: $(APPVEYOR_REPO_BRANCH)_bin_archive
 
 deploy:
   - provider: FTP
