@@ -247,6 +247,7 @@ void Spline::updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& 
     QString histogramExponent;
     histogramExponent = "X-axis scale: 10e" + QString::number(resultExponentValues(0));   //used to tell the user the exponential scale used in the histogram
     series->clear();
+    //m_pChart->removeSeries(series);              //create new series and then clear the plot and update with new data
     series->setName(histogramExponent);
 
     minAxisX = resultDisplayValues(0);
@@ -266,7 +267,6 @@ void Spline::updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& 
         }
     }
 
-    m_pChart->removeAllSeries();              //create new series and then clear the plot and update with new data
     m_pChart->addSeries(series);
     leftThreshold = new QLineSeries();
     middleThreshold = new QLineSeries();

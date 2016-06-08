@@ -230,7 +230,6 @@ void Data3DTreeDelegate::setEditorData(QWidget* editor, const QModelIndex& index
         }
 
         case MetaTreeItemTypes::RTDataNormalizationValue: {
-            //get current source localization data
             Spline* pSpline = static_cast<Spline*>(editor);
             QStandardItem* pParentItem = static_cast<QStandardItem*>(pAbstractItem->QStandardItem::parent());
             QModelIndex indexParent = pData3DTreeModel->indexFromItem(pParentItem);
@@ -239,14 +238,14 @@ void Data3DTreeDelegate::setEditorData(QWidget* editor, const QModelIndex& index
             qDebug() << "matRTData.cols = " << matRTData.cols();
             QVector3D vecThresholdValues = index.model()->data(index, MetaTreeItemRoles::RTDataNormalizationValue).value<QVector3D>();
             qDebug() << "vecThresholdValues = " << vecThresholdValues;
+            //pSpline->setThreshold(vecThresholdValues);
             Eigen::VectorXd resultClassLimit;
             Eigen::VectorXi resultFrequency;
             MNEMath::histcounts(matRTData, false, 50, resultClassLimit, resultFrequency, 0.0, 0.0);
             std::cout << "resultClassLimit = " << resultClassLimit;
             std::cout << "resultFrequency = " << resultFrequency;
             pSpline->setData(resultClassLimit, resultFrequency, 0);
-            //pSpline->setThreshold(vecThresholdValues);
-            break;
+            return;
         }
 
         case MetaTreeItemTypes::RTDataTimeInterval: {
@@ -359,13 +358,15 @@ void Data3DTreeDelegate::setModelData(QWidget* editor, QAbstractItemModel* model
             QVariant data;
             QVector3D vecThreshold;
             vecThreshold = pSpline->getThreshold();
+            qDebug()<< "pspline->getThreshold() = " << pSpline->getThreshold();
             data.setValue(vecThreshold);
 
             QString displayThreshold;
             displayThreshold = QString("%1,%2,%3").arg(vecThreshold.x()).arg(vecThreshold.y()).arg(vecThreshold.z());
+            qDebug()<< "Display Threshold = " << displayThreshold;
             model->setData(index, data, MetaTreeItemRoles::RTDataNormalizationValue);
             data.setValue(displayThreshold);
-//            model->setData(index, data, Qt::DisplayRole);
+            model->setData(index, data, Qt::DisplayRole);
             return;
         }
 
