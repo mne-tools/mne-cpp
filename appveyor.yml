@@ -31,9 +31,9 @@ build_script:
     - echo Builded branch %APPVEYOR_REPO_BRANCH%
 
 artifacts:
-  - path: mne-cpp-windows-x86_64-%APPVEYOR_REPO_BRANCH%.exe
+  - path: mne-cpp-windows-x86_64-$(APPVEYOR_REPO_BRANCH).exe
     name: installer
-  - path: mne-cpp-windows-x86_64-%APPVEYOR_REPO_BRANCH%.zip
+  - path: mne-cpp-windows-x86_64-$(APPVEYOR_REPO_BRANCH).zip
     name: bin_archive
 
 deploy:
