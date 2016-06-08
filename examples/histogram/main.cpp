@@ -358,7 +358,9 @@ int main(int argc, char *argv[])
     QTime myTimerHistogram;
     myTimerHistogram.start();
     displayObj->setData(resultClassLimit, resultFrequency, precision);
-    QVector3D thresholdLines(50.1, 32.2, 80.3);
+    qDebug() << "debug before new setdata";
+    displayObj->setData(dataSine, resultFrequency, precision);
+    QVector3D thresholdLines(5.0, 15.0, 25.0);
     displayObj->setThreshold(thresholdLines);
     qDebug()<<"Histogram timer:"<<myTimerHistogram.elapsed();
 
