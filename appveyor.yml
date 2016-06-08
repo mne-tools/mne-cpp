@@ -19,17 +19,15 @@ build:
   verbosity: detailed 
 
 before_build:
-    - mkdir mne-cpp_shadow_build
-    - cd mne-cpp_shadow_build
-    - qmake ../mne-cpp/mne-cpp.pro -r MNECPP_CONFIG+=noTests
+    - qmake mne-cpp.pro -r MNECPP_CONFIG+=noTests
 
 build_script:
     - jom
-    - cd ..
 
 after_build:
     - call .\tools\appveyor\compress_binaries.bat master
     - call .\tools\appveyor\build_installer.bat master
+    - dir
 
 artifacts:
   - path: mne-cpp-windows-x86_64-master.exe
