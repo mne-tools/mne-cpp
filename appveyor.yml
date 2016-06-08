@@ -37,6 +37,7 @@ artifacts:
     name: bin_archive
 
 deploy:
+  # master
   - provider: FTP
     protocol: ftp
     host:
@@ -49,7 +50,7 @@ deploy:
     on:
       branch: master
 
-deploy:
+  # 1.0.0
   - provider: FTP
     protocol: ftp
     host:
