@@ -22,13 +22,12 @@ before_build:
     - qmake mne-cpp.pro -r MNECPP_CONFIG+=noTests
 
 build_script:
-#    - jom
+    - jom
 
-#after_build:
+after_build:
     - call .\tools\appveyor\compress_binaries.bat %APPVEYOR_REPO_BRANCH%
     - call .\tools\appveyor\build_installer.bat %APPVEYOR_REPO_BRANCH%
     - dir
-    - echo Builded branch %APPVEYOR_REPO_BRANCH%
 
 artifacts:
   - path: mne-cpp-windows-x86_64-$(APPVEYOR_REPO_BRANCH).exe
