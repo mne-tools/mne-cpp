@@ -19,7 +19,6 @@ build:
   verbosity: detailed 
 
 before_build:
-    - cd ..
     - if not exist "mne-cpp_shadow_build" mkdir mne-cpp_shadow_build
     - cd mne-cpp_shadow_build
     #- qmake ../mne-cpp/mne-cpp.pro -r MNECPP_CONFIG+=noTests
@@ -29,14 +28,14 @@ build_script:
     - cd ..
 
 #after_build:
-    - call .\mne-cpp\tools\appveyor\compress_binaries.bat master
-    - call .\mne-cpp\tools\appveyor\build_installer.bat master
+    - call .\tools\appveyor\compress_binaries.bat master
+    - call .\tools\appveyor\build_installer.bat master
     - dir
 
 artifacts:
-  - path: ../mne-cpp-windows-x86_64-master.exe
+  - path: mne-cpp-windows-x86_64-master.exe
     name: master_installer
-  - path: ../mne-cpp-windows-x86_64-master.zip
+  - path: mne-cpp-windows-x86_64-master.zip
     name: master_bin_archive
 
 deploy:
