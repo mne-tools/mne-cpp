@@ -32,9 +32,9 @@ build_script:
 
 artifacts:
   - path: mne-cpp-windows-x86_64-%APPVEYOR_REPO_BRANCH%.exe
-    name: $(APPVEYOR_REPO_BRANCH)_installer
+    name: installer
   - path: mne-cpp-windows-x86_64-%APPVEYOR_REPO_BRANCH%.zip
-    name: $(APPVEYOR_REPO_BRANCH)_bin_archive
+    name: bin_archive
 
 deploy:
   - provider: FTP
@@ -45,7 +45,7 @@ deploy:
       secure: aUqYXjXjd4dh3sO18+x8qw==
     password:
       secure: u8DCGb7s6kuPyjybX/THWFQ0VMCfpLD5IsB/9nzGnvk=
-    artifact: master_installer,master_bin_archive
+    artifact: installer,bin_archive
     on:
       branch: master
 
