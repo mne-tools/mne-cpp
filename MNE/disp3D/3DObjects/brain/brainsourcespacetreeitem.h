@@ -142,16 +142,16 @@ public:
 
     //=========================================================================================================
     /**
-    * Call this slot whenever you want to change the visibilty of the 3D rendered content.
+    * Call this function whenever you want to change the visibilty of the 3D rendered content.
     *
     * @param[in] state     The visiblity flag.
     */
     void setVisible(bool state);
 
-private slots:
+private:
     //=========================================================================================================
     /**
-    * Call this slot whenever the surface color was changed.
+    * Call this function whenever the surface color was changed.
     *
     * @param[in] color        The new surface color.
     */
@@ -159,13 +159,12 @@ private slots:
 
     //=========================================================================================================
     /**
-    * Call this slot whenever the check box of this item was checked.
+    * Call this function whenever the check box of this item was checked.
     *
     * @param[in] checkState        The current checkstate.
     */
     virtual void onCheckStateChanged(const Qt::CheckState& checkState);
 
-private:
     //=========================================================================================================
     /**
     * Creates a QByteArray of colors for given color for the input vertices.

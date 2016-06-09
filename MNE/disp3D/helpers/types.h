@@ -113,7 +113,10 @@ namespace MetaTreeItemTypes
                     RTDataNormalizationValue = QStandardItem::UserType + 113,
                     RTDataVisualizationType = QStandardItem::UserType + 114,
                     SurfaceColor = QStandardItem::UserType + 115,
-                    UnknownItem = QStandardItem::UserType + 116};
+                    UnknownItem = QStandardItem::UserType + 116,
+                    SurfaceTranslateX = QStandardItem::UserType + 117,
+                    SurfaceTranslateY = QStandardItem::UserType + 118,
+                    SurfaceTranslateZ = QStandardItem::UserType + 119};
 }
 
 // Model item roles
@@ -167,7 +170,10 @@ namespace MetaTreeItemRoles
                     RTDataNumberAverages = Qt::UserRole + 14,
                     RTDataNormalizationValue = Qt::UserRole + 15,
                     RTDataVisualizationType = Qt::UserRole + 16,
-                    SurfaceColor = Qt::UserRole + 17};
+                    SurfaceColor = Qt::UserRole + 17,
+                    SurfaceTranslateX = Qt::UserRole + 18,
+                    SurfaceTranslateY = Qt::UserRole + 19,
+                    SurfaceTranslateZ = Qt::UserRole + 20};
 }
 
 } //NAMESPACE DISP3DLIB
