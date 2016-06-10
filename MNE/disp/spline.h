@@ -217,8 +217,26 @@ signals:
 template <typename T>
 void Spline::setData(const Eigen::Matrix<T, Eigen::Dynamic, 1>& matClassLimitData, const Eigen::Matrix<int, Eigen::Dynamic, 1>& matClassFrequencyData, int iPrecisionValue)
 {
+    qDebug()<< "SetData (Dynamic, 1) function starts!";
     Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrixName(matClassLimitData.rows(),1);
     matrixName.col(0) = matClassLimitData;
+    if (series != 0)
+    {
+        m_pChart->removeSeries(series);
+    }
+    if (leftThreshold != 0)
+    {
+        m_pChart->removeSeries(leftThreshold);
+    }
+    if (middleThreshold != 0)
+    {
+        m_pChart->removeSeries(middleThreshold);
+    }
+    if (rightThreshold !=0)
+    {
+        m_pChart->removeSeries(rightThreshold);
+    }
+
     this->updatePlot(matrixName, matClassFrequencyData, iPrecisionValue);
 }
 
@@ -228,8 +246,26 @@ void Spline::setData(const Eigen::Matrix<T, Eigen::Dynamic, 1>& matClassLimitDat
 template <typename T>
 void Spline::setData(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matClassLimitData, const Eigen::Matrix<int, 1, Eigen::Dynamic>& matClassFrequencyData, int iPrecisionValue)
 {
+    qDebug()<< "SetData (1, Dynamic) function starts!";
     Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrixName(1, matClassLimitData.cols());
     matrixName.row(0) = matClassLimitData;
+    if (series != 0)
+    {
+        m_pChart->removeSeries(series);
+    }
+    if (leftThreshold != 0)
+    {
+        m_pChart->removeSeries(leftThreshold);
+    }
+    if (middleThreshold != 0)
+    {
+        m_pChart->removeSeries(middleThreshold);
+    }
+    if (rightThreshold !=0)
+    {
+        m_pChart->removeSeries(rightThreshold);
+    }
+
     this->updatePlot(matrixName, matClassFrequencyData, iPrecisionValue);
 }
 
@@ -239,6 +275,7 @@ void Spline::setData(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matClassLimitDat
 template<typename T>
 void Spline::updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData, const Eigen::VectorXi& matClassFrequencyData, int iPrecisionValue)
 {
+    qDebug()<< "UpdatePlot function starts!";
     Eigen::VectorXd resultDisplayValues;
     int iClassAmount = matClassFrequencyData.rows();
     this->splitCoefficientAndExponent (matClassLimitData, iClassAmount, resultDisplayValues, resultExponentValues);
@@ -247,12 +284,15 @@ void Spline::updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& 
     QString histogramExponent;
     histogramExponent = "X-axis scale: 10e" + QString::number(resultExponentValues(0));   //used to tell the user the exponential scale used in the histogram
     series->clear();
-    //m_pChart->removeSeries(series);              //create new series and then clear the plot and update with new data
+//    m_pChart->removeSeries(leftThreshold);              //create new series and then clear the plot and update with new data
+//    m_pChart->removeSeries(middleThreshold);
+//    m_pChart->removeSeries(rightThreshold);
+    m_pChart->removeSeries(series);
     series->setName(histogramExponent);
 
     minAxisX = resultDisplayValues(0);
     maxAxisX = resultDisplayValues(iClassAmount);
-    std::cout << "resultDisplayValues = " << resultDisplayValues;
+    //std::cout << "resultDisplayValues = " << resultDisplayValues;
     double classMark;                         //class mark is the middle point between lower and upper class limit
     maximumFrequency = 0;                     //maximumFrequency used to create an intuitive histogram
 
@@ -260,7 +300,7 @@ void Spline::updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& 
     {
         classMark = (resultDisplayValues(ir) + resultDisplayValues(ir+1))/2 ;
         series->append(classMark, matClassFrequencyData(ir));
-        std::cout << "Spline data points = " << classMark << ", " << matClassFrequencyData(ir) << std::endl;
+        //std::cout << "Spline data points = " << classMark << ", " << matClassFrequencyData(ir) << std::endl;
         if (matClassFrequencyData(ir) > maximumFrequency)
         {
             maximumFrequency = matClassFrequencyData(ir);
@@ -274,18 +314,19 @@ void Spline::updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& 
     leftThreshold->setName("left");
     middleThreshold->setName("middle");
     rightThreshold->setName("right");
-    leftThreshold->append(minAxisX, 0);                     //initialize threshold lines
-    middleThreshold->append(maxAxisX, 0);
-    rightThreshold->append(maxAxisX, 0);
+    m_pChart->addSeries(leftThreshold);
+    m_pChart->addSeries(middleThreshold);
+    m_pChart->addSeries(rightThreshold);
+//    leftThreshold->append(minAxisX, 0);                     //initialize threshold lines
+//    middleThreshold->append(maxAxisX, 0);
+//    rightThreshold->append(maxAxisX, 0);
     leftThreshold->setVisible(false);                       //threshold lines intially invisible
     middleThreshold->setVisible(false);
     rightThreshold->setVisible(false);
 
     m_pChart->legend()->setVisible(true);
     m_pChart->legend()->setAlignment(Qt::AlignBottom);
-    m_pChart->addSeries(leftThreshold);
-    m_pChart->addSeries(middleThreshold);
-    m_pChart->addSeries(rightThreshold);
+
     m_pChart->createDefaultAxes();
     m_pChart->axisX()->setRange(minAxisX, maxAxisX);
 }
@@ -296,6 +337,7 @@ void Spline::updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& 
 template <typename T>
 void Spline::splitCoefficientAndExponent (const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData, int iClassAmount, Eigen::VectorXd& vecCoefficientResults, Eigen::VectorXi& vecExponentValues)
 {
+    qDebug()<< "splitCoefficientAndExponent function starts!";
     vecCoefficientResults.resize(iClassAmount + 1);
     vecExponentValues.resize(iClassAmount + 1);
     double originalValue(0.0),

@@ -124,10 +124,13 @@ void Spline::mousePressEvent(QMouseEvent *event)
                     leftPoint = verticalLine->pointsVector();
                     if((leftPoint[0].x() < middlePoint[0].x()) && (leftPoint[0].x() < rightPoint[0].x()))
                     {
+                        leftThreshold->clear();
                         m_pChart->removeSeries(leftThreshold);
                         leftThreshold=verticalLine;
                         leftThreshold->setName("left");
                         updateThreshold(leftThreshold);
+                        QVector3D updatedVector(leftPoint[0].x(), middlePoint[0].x(), rightPoint[0].x());
+                        this->setThreshold(updatedVector);
                         emitLeft = (leftPoint[0].x() * (pow(10, resultExponentValues[0])));
                         emit borderChanged(emitLeft, emitMiddle, emitRight);
                         qDebug() << "Border = " << emitLeft << " , " << emitMiddle << " , " << emitRight;
@@ -139,10 +142,13 @@ void Spline::mousePressEvent(QMouseEvent *event)
                     middlePoint = verticalLine->pointsVector();
                     if((middlePoint[0].x() > leftPoint[0].x()) && (middlePoint[0].x() < rightPoint[0].x()))
                     {
+                        middleThreshold->clear();
                         m_pChart->removeSeries(middleThreshold);
                         middleThreshold=verticalLine;
                         middleThreshold->setName("middle");
                         updateThreshold(middleThreshold);
+                        QVector3D updatedVector(leftPoint[0].x(), middlePoint[0].x(), rightPoint[0].x());
+                        this->setThreshold(updatedVector);
                         emitMiddle = (middlePoint[0].x() * (pow(10, resultExponentValues[0])));
                         emit borderChanged(emitLeft, emitMiddle, emitRight);
                         qDebug() << "Border = " << emitLeft << " , " << emitMiddle << " , " << emitRight;
@@ -154,10 +160,13 @@ void Spline::mousePressEvent(QMouseEvent *event)
                     rightPoint = verticalLine->pointsVector();
                     if((rightPoint[0].x() > leftPoint[0].x()) && (rightPoint[0].x() > middlePoint[0].x()))
                     {
+                        rightThreshold->clear();
                         m_pChart->removeSeries(rightThreshold);
                         rightThreshold=verticalLine;
                         rightThreshold->setName("right");
                         updateThreshold(rightThreshold);
+                        QVector3D updatedVector(leftPoint[0].x(), middlePoint[0].x(), rightPoint[0].x());
+                        this->setThreshold(updatedVector);
                         emitRight = (rightPoint[0].x() * (pow(10, resultExponentValues[0])));
                         emit borderChanged(emitLeft, emitMiddle, emitRight);
                         qDebug() << "Border = " << emitLeft << " , " << emitMiddle << " , " << emitRight;
@@ -173,20 +182,21 @@ void Spline::mousePressEvent(QMouseEvent *event)
 
 void Spline::setThreshold(const QVector3D& vecThresholdValues)
 {
+    qDebug() << "SET THRESHOLD FUNCTION STARTS!";
     float leftThresholdValue;
     float middleThresholdValue;
     float rightThresholdValue;
 
     if (series->count() == 0)               //protect integrity of the histogram widget in case series contain no data values
     {
-        qDebug() << "Data set not found.";
+        qDebug() << "setThreshold error: Data set not found.";
     }
 
     //the condition below tests the threshold values given and ensures that all three must be within minAxisX and maxAxisX
-    else if (vecThresholdValues.x() < minAxisX || vecThresholdValues.y() < minAxisX || vecThresholdValues.z() < minAxisX || vecThresholdValues.x() > maxAxisX || vecThresholdValues.y() > maxAxisX || vecThresholdValues.z() > maxAxisX)
-    {
-        qDebug() << "One or more of the values given are out of the minimum and maximum range.";
-    }
+//    else if (vecThresholdValues.x() < minAxisX || vecThresholdValues.y() < minAxisX || vecThresholdValues.z() < minAxisX || vecThresholdValues.x() > maxAxisX || vecThresholdValues.y() > maxAxisX || vecThresholdValues.z() > maxAxisX)
+//    {
+//        qDebug() << "One or more of the values given are out of the minimum and maximum range.";
+//    }
 
     else
     {

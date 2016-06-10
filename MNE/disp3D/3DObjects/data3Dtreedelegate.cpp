@@ -234,17 +234,17 @@ void Data3DTreeDelegate::setEditorData(QWidget* editor, const QModelIndex& index
             QStandardItem* pParentItem = static_cast<QStandardItem*>(pAbstractItem->QStandardItem::parent());
             QModelIndex indexParent = pData3DTreeModel->indexFromItem(pParentItem);
             MatrixXd matRTData = index.model()->data(indexParent, Data3DTreeModelItemRoles::RTData).value<MatrixXd>();
-            qDebug() << "matRTData.rows = " << matRTData.rows();
-            qDebug() << "matRTData.cols = " << matRTData.cols();
-            QVector3D vecThresholdValues = index.model()->data(index, MetaTreeItemRoles::RTDataNormalizationValue).value<QVector3D>();
-            qDebug() << "vecThresholdValues = " << vecThresholdValues;
-            //pSpline->setThreshold(vecThresholdValues);
             Eigen::VectorXd resultClassLimit;
             Eigen::VectorXi resultFrequency;
             MNEMath::histcounts(matRTData, false, 50, resultClassLimit, resultFrequency, 0.0, 0.0);
-            std::cout << "resultClassLimit = " << resultClassLimit;
-            std::cout << "resultFrequency = " << resultFrequency;
+            std::cout << "resultClassLimit = ";
+            std::cout << "resultFrequency = ";
+            qDebug()<< "debug before setData.";
             pSpline->setData(resultClassLimit, resultFrequency, 0);
+            QVector3D vecThresholdValues = index.model()->data(index, MetaTreeItemRoles::RTDataNormalizationValue).value<QVector3D>();
+            qDebug()<< "debug before setThreshold.";
+            pSpline->setThreshold(vecThresholdValues);
+
             return;
         }
 
@@ -358,7 +358,7 @@ void Data3DTreeDelegate::setModelData(QWidget* editor, QAbstractItemModel* model
             QVariant data;
             QVector3D vecThreshold;
             vecThreshold = pSpline->getThreshold();
-            qDebug()<< "pspline->getThreshold() = " << pSpline->getThreshold();
+            qDebug()<< "vecThreshold = " << vecThreshold;
             data.setValue(vecThreshold);
 
             QString displayThreshold;
