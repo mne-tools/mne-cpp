@@ -188,11 +188,11 @@ private:
     void setClassificationOptions();
 
 
-    ssvepBCI* m_pBCI;                                    /**< a pointer to corresponding BCI.*/
+    ssvepBCI* m_pBCI;                                       /**< a pointer to corresponding BCI.*/
 
-    QStringList m_vAvailableFeaturesSensor;         /**< QStringList holding available features to select on sensor level (electrodes).*/
+    QStringList m_vAvailableFeaturesSensor;                 /**< QStringList holding available features to select on sensor level (electrodes).*/
 
-    Ui::ssvepBCISetupClass ui;                           /**< the user interface for the ssvepBCISetupWidget.*/
+    Ui::ssvepBCISetupClass ui;                              /**< the user interface for the ssvepBCISetupWidget.*/
 };
 
 } // NAMESPACE
