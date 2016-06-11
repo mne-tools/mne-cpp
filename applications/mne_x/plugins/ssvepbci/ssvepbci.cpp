@@ -76,6 +76,11 @@ ssvepBCI::ssvepBCI()
     m_pActionSetupStimulus->setStatusTip(tr("Setup stimulus feature"));
     connect(m_pActionSetupStimulus, &QAction::triggered, this, &ssvepBCI::showSetupStimulus);
     addPluginAction(m_pActionSetupStimulus);
+
+    // Intitalise BCI data
+    m_slChosenFeatureSensor << "9Z" << "8Z" << "7Z" << "6Z" << "9L" << "8L" << "9R" << "8R"; //<< "TEST";
+
+    m_lElectrodeNumbers << 33 << 34 << 35 << 36 << 40 << 41 << 42 << 43;
 }
 
 
@@ -149,36 +154,8 @@ void ssvepBCI::init()
     // Delete fiff info because the initialisation of the fiff info is seen as the first data acquisition from the input stream
     m_pFiffInfo_Sensor = FiffInfo::SPtr();
 
-//    // Intitalise GUI stuff
-//    m_bSubtractMean = true;
-//    m_bUseFilter = true;
+    // Intitalise GUI stuff
     m_bUseSensorData = true;
-//    m_bUseSourceData = false;
-//    m_bDisplayFeatures = true;
-//    m_bUseArtefactThresholdReduction = false;
-//    m_dSlidingWindowSize = 0.5;
-//    m_dTimeBetweenWindows = 0.5;
-//    m_dDisplayRangeBoundary = 15;
-//    m_dDisplayRangeVariances = 5;
-//    m_dDisplayRangeElectrodes = 7;
-//    m_iNumberFeatures = 1;
-//    m_dThresholdValue = 30;
-//    m_iNumberFeaturesToDisplay = 30;
-//    m_iFeatureCalculationType = 0;
-
-//    // Intitalise feature selection
-//    m_slChosenFeatureSensor << "LA4" << "RA4"; //<< "TEST";
-
-//    // Initalise sliding window stuff
-//    m_bFillSensorWindowFirstTime = true;
-
-    // Initialise filter stuff
-    m_filterOperator = QSharedPointer<FilterData>(new FilterData());
-
-    m_dFilterLowerBound = 7.0;
-    m_dFilterUpperBound = 14.0;
-    m_dParcksWidth = m_dFilterLowerBound-1; // (m_dFilterUpperBound-m_dFilterLowerBound)/2;
-    m_iFilterOrder = 256;
 
 //    // Init BCIFeatureWindow for visualization
 //    m_BCIFeatureWindow = QSharedPointer<BCIFeatureWindow>(new BCIFeatureWindow(this));
@@ -229,56 +206,7 @@ bool ssvepBCI::start()
 
     m_pFiffInfo_Sensor = FiffInfo::SPtr();
 
-//    m_bFillSensorWindowFirstTime = true;
-
-////    // Set display ranges for output channels
-////    m_pBCIOutputOne->data()->setMaxValue(m_dDisplayRangeBoundary);
-////    m_pBCIOutputOne->data()->setMinValue(-m_dDisplayRangeBoundary);
-
-////    m_pBCIOutputTwo->data()->setMaxValue(m_dDisplayRangeVariances);
-////    m_pBCIOutputTwo->data()->setMinValue(0);
-
-////    m_pBCIOutputThree->data()->setMaxValue(m_dDisplayRangeVariances);
-////    m_pBCIOutputThree->data()->setMinValue(0);
-
-////    m_pBCIOutputFour->data()->setMaxValue(m_dDisplayRangeElectrodes);
-////    m_pBCIOutputFour->data()->setMinValue(-m_dDisplayRangeElectrodes);
-
-////    m_pBCIOutputFive->data()->setMaxValue(m_dDisplayRangeElectrodes);
-////    m_pBCIOutputFive->data()->setMinValue(-m_dDisplayRangeElectrodes);
-
-//    // variance
-//    m_pBCIOutputOne->data()->setMaxValue(5);
-//    m_pBCIOutputOne->data()->setMinValue(-5);
-
-//    m_pBCIOutputTwo->data()->setMaxValue(10);
-//    m_pBCIOutputTwo->data()->setMinValue(0);
-
-//    m_pBCIOutputThree->data()->setMaxValue(10);
-//    m_pBCIOutputThree->data()->setMinValue(0);
-
-//    m_pBCIOutputFour->data()->setMaxValue(1e-05);
-//    m_pBCIOutputFour->data()->setMinValue(-1e-05);
-
-//    m_pBCIOutputFive->data()->setMaxValue(1e-05);
-//    m_pBCIOutputFive->data()->setMinValue(-1e-05);
-
-////    // log variance
-////    m_pBCIOutputOne->data()->setMaxValue(10);
-////    m_pBCIOutputOne->data()->setMinValue(-10);
-
-////    m_pBCIOutputTwo->data()->setMaxValue(15);
-////    m_pBCIOutputTwo->data()->setMinValue(0);
-
-////    m_pBCIOutputThree->data()->setMaxValue(15);
-////    m_pBCIOutputThree->data()->setMinValue(0);
-
-////    m_pBCIOutputFour->data()->setMaxValue(10e-04);
-////    m_pBCIOutputFour->data()->setMinValue(-10e-04);
-
-////    m_pBCIOutputFive->data()->setMaxValue(10e-04);
-////    m_pBCIOutputFive->data()->setMinValue(-10e-04);
-
+    m_iWriteTimeWindowIncrementIndex = 0;
     m_bIsRunning = true;
 
     QThread::start();
@@ -359,72 +287,46 @@ QWidget* ssvepBCI::setupWidget()
 
 void ssvepBCI::updateSensor(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 {
+
+
     QSharedPointer<NewRealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<NewRealTimeMultiSampleArray>();
     if(pRTMSA)
     {
         //Check if buffer initialized
+
+        m_qMutex.lock();
         if(!m_pBCIBuffer_Sensor)
-            m_pBCIBuffer_Sensor = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, pRTMSA->getNumChannels(), pRTMSA->getMultiArraySize()));
+            m_pBCIBuffer_Sensor = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, pRTMSA->getNumChannels(), pRTMSA->getMultiSampleArray()[0].cols()));
+    }
 
-        // Load Fiff information on sensor level
-        if(!m_pFiffInfo_Sensor)
+    //Fiff information
+    if(!m_pFiffInfo_Sensor)
+    {
+        m_pFiffInfo_Sensor = pRTMSA->info();
+        //emit fiffInfoAvailable();
+
+        //loading the fiff information
+        m_iSampleFrequency = m_pFiffInfo_Sensor->sfreq;
+        int rows = 8;
+        m_iTimeWindowIncrementLength = int(4*m_iSampleFrequency / pRTMSA->getMultiSampleArray()[0].cols());        // calculating the number of increments of the sliding time window (about 4s)
+        m_matSlidingTimeWindow.resize(rows, m_iTimeWindowIncrementLength*pRTMSA->getMultiSampleArray()[0].cols());
+    }
+    m_qMutex.unlock();
+
+
+
+
+    if(m_bProcessData)
+    {
+        MatrixXd t_mat;
+
+        for(qint32 i = 0; i < pRTMSA->getMultiArraySize(); ++i)
         {
-            //m_pFiffInfo_Sensor = pRTMSA->getFiffInfo();
-            m_pFiffInfo_Sensor = pRTMSA->info(); //new command is called info() instead of getFiffInfo() ?
-
-            // Adjust working matrixes (sliding window and time between windows matrix) size so that the samples from the tmsi plugin stream fit in the matrix perfectly
-            int arraySize = pRTMSA->getMultiArraySize();
-            int modulo = int(m_pFiffInfo_Sensor->sfreq*m_dSlidingWindowSize) % arraySize;
-            int rows = m_slChosenFeatureSensor.size();
-            int cols = m_pFiffInfo_Sensor->sfreq*m_dSlidingWindowSize-modulo;
-            m_matSlidingWindowSensor.resize(rows, cols);
-
-            m_matStimChannelSensor.resize(1,cols);
-
-            modulo = int(m_pFiffInfo_Sensor->sfreq*m_dTimeBetweenWindows) % arraySize;
-            rows = m_slChosenFeatureSensor.size();
-            cols = m_pFiffInfo_Sensor->sfreq*m_dTimeBetweenWindows-modulo;
-            m_matTimeBetweenWindowsSensor.resize(rows, cols);
-
-            m_matTimeBetweenWindowsStimSensor.resize(1,cols);
-
-            // Build filter operator
-            double dCenterFreqNyq = (m_dFilterLowerBound+((m_dFilterUpperBound - m_dFilterLowerBound)/2))/(m_pFiffInfo_Sensor->sfreq/2);
-            double dBandwidthNyq = (m_dFilterUpperBound - m_dFilterLowerBound)/(m_pFiffInfo_Sensor->sfreq/2);
-            double dParksWidth = m_dParcksWidth/(m_pFiffInfo_Sensor->sfreq/2);
-
-////            // Calculate needed fft length
-////            int exponent = ceil(log10(m_matSlidingWindowSensor.cols())/log10(2));
-////            int fftLength = pow(2,exponent+1);
-
-            // Initialise filter operator
-            m_filterOperator = QSharedPointer<FilterData>(new FilterData(QString("BPF"),FilterData::BPF,m_iFilterOrder,dCenterFreqNyq,dBandwidthNyq,dParksWidth,m_matSlidingWindowSensor.cols()+m_iFilterOrder)); // letztes Argument muss 2er potenz sein - fft länge
-
-            // Write filter coefficients to debug file
-            for(int i = 0; i<m_filterOperator->m_dCoeffA.cols(); i++)
-                m_outStreamDebug << m_filterOperator->m_dFFTCoeffA(0,i).real() <<"+" << m_filterOperator->m_dFFTCoeffA(0,i).imag() << "i "  << endl;
-
-            m_outStreamDebug << endl << endl;
-
-            for(int i = 0; i<m_filterOperator->m_dCoeffA.cols(); i++)
-                m_outStreamDebug << m_filterOperator->m_dCoeffA(0,i) << endl;
-
-            m_outStreamDebug << "---------------------------------------------------------------------" << endl;
-        }
-
-        // Only process data when fiff info has been initialised in run() method
-        if(m_bProcessData)
-        {
-            MatrixXd t_mat(pRTMSA->getNumChannels(), pRTMSA->getMultiArraySize());
-
-            for(unsigned char i = 0; i < pRTMSA->getMultiArraySize(); ++i)
-                t_mat.col(i) = pRTMSA->getMultiSampleArray()[i];
-
-
+            t_mat = pRTMSA->getMultiSampleArray()[i];
             m_pBCIBuffer_Sensor->push(&t_mat);
         }
-
     }
+
 }
 
 
@@ -541,8 +443,26 @@ void ssvepBCI::BCIOnSensorLevel()
 
     // Start filling buffers with data from the inputs
     m_bProcessData = true;
-
     MatrixXd t_mat = m_pBCIBuffer_Sensor->pop();
+
+    int timeIncrement = t_mat.cols();
+
+    cout << "Sliding Window Rows:" << m_matSlidingTimeWindow.rows() << endl;
+    cout << "Sliding Window Collumns:" << m_matSlidingTimeWindow.cols() << endl;
+
+    // writing selected feature channels to the time window storage
+    for(int i = 0; i < 8; i++)
+        m_matSlidingTimeWindow.block(i, m_iWriteTimeWindowIncrementIndex*timeIncrement, 1, timeIncrement) = t_mat.block(m_lElectrodeNumbers.at(i), 0, 1, timeIncrement);
+    m_iWriteTimeWindowIncrementIndex = (m_iWriteTimeWindowIncrementIndex + 1) % m_iTimeWindowIncrementLength;
+
+
+    cout << "Write Index:" << m_iWriteTimeWindowIncrementIndex << endl;
+    cout << "Window Length:" << m_iTimeWindowIncrementLength << endl;
+    cout << "time increments:" << timeIncrement << endl;
+
+    // std::cout << "Matrix:\n" << m_matSlidingTimeWindow.block(0, 0, m_matSlidingTimeWindow.rows(), 5) << endl;
+
+
 
 
 }

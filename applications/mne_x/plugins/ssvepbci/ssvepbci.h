@@ -234,6 +234,14 @@ private:
     PluginInputData<NewRealTimeMultiSampleArray>::SPtr  m_pRTMSAInput;          /**< The RealTimeMultiSampleArray input.*/
     PluginInputData<RealTimeSourceEstimate>::SPtr       m_pRTSEInput;           /**< The RealTimeSourceEstimate input.*/
 
+    // sliding Window
+    int                     m_iTimeWindowIncrementLength;       /**< maximal window size in increments of the incoming buffer window size */
+    int                     m_iWriteTimeWindowIncrementIndex;   /**< Index for writing a new increment from the buffer to the time window */
+    int                     m_iSampleFrequency;                 /**< sample frequency of the device [Hz] */
+    int                     m_iIncrSlidingTimeWindow;           /**< Increment for sliding Time Window */
+    //int                     m_iThrottle;                        /**< increment for throtteling sample rate */
+
+
     // Sensor level
     FiffInfo::SPtr          m_pFiffInfo_Sensor;                 /**< Sensor level: Fiff information for sensor data. */
     bool                    m_bFiffInfoInitialised_Sensor;      /**< Sensor level: Fiff information initialised. */
@@ -249,8 +257,9 @@ private:
     QList<double>           m_lClassResultsSensor;              /**< Sensor level: Classification results on sensor level. */
     MatrixXd                m_matStimChannelSensor;             /**< Sensor level: Stim channel. */
     MatrixXd                m_matTimeBetweenWindowsStimSensor;  /**< Sensor level: Stim channel. */
+    QList<int>              m_lElectrodeNumbers;                /**< Sensor level: number of chosen electrodes */
 
-
+    MatrixXd                m_matSlidingTimeWindow;             /**< Sensor Level: adaptational sliding time window. */
 
 
 
@@ -283,26 +292,9 @@ private:
     QStringList             m_slChosenFeatureSource;            /**< Source level: Features used to calculate data points in feature space on source level. */
     QMap<QString, int>      m_mapDestrieuxAtlasRegions;         /**< Source level: Loaded Destrieux atlas regions. */
 
-    // GUI stuff
-    bool                    m_bSubtractMean;                    /**< GUI input: Subtract mean from window. */
-    bool                    m_bUseFilter;                       /**< GUI input: Use filtering. */
+    // GUI variables
     bool                    m_bUseSensorData;                   /**< GUI input: Use sensor data stream. */
-    bool                    m_bUseSourceData;                   /**< GUI input: Use source data stream. */
-    bool                    m_bDisplayFeatures;                 /**< GUI input: Display features in feature window. */
-    bool                    m_bUseArtefactThresholdReduction;   /**< GUI input: Whether BCI uses a threshold to obmit atrefacts.*/
-    double                  m_dSlidingWindowSize;               /**< GUI input: Size of the sliding window in s. */
-    double                  m_dTimeBetweenWindows;              /**< GUI input: Time between windows/feature calculation in s. */
-    double                  m_dFilterLowerBound;                /**< GUI input: Filter lower bound in Hz. */
-    double                  m_dFilterUpperBound;                /**< GUI input: Filter upper bound in Hz. */
-    double                  m_dParcksWidth;                     /**< GUI input: Parck filter algorithm width in Hz. */
-    double                  m_dThresholdValue;                  /**< GUI input: Threshold in micro volts. */
-    double                  m_dDisplayRangeBoundary;            /**< GUI input: Display range for the boundary values. */
-    double                  m_dDisplayRangeVariances;           /**< GUI input: Display range for the variance values. */
-    double                  m_dDisplayRangeElectrodes;          /**< GUI input: Display range for the electrode time values. */
-    int                     m_iFilterOrder;                     /**< GUI input: Filter order. */
-    int                     m_iNumberFeatures;                  /**< GUI input: Number of classifactions to store until they get averaged. */
-    int                     m_iNumberFeaturesToDisplay;         /**< GUI input: Number of features to display. */
-    int                     m_iFeatureCalculationType;          /**< GUI input: Type of feature calculation (variance/log of variance/...). */
+
 };
 
 } // NAMESPACE
