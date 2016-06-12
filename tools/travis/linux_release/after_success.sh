@@ -12,18 +12,16 @@ if [[ "${TRAVIS_PULL_REQUEST}" == "false" ]]; then
         cp $libpath ./lib
     done
 
+    # === user package ===
+    archive_name="mne-cpp-linux-x86_64-$TRAVIS_BRANCH.tar.gz"
+    tar cfvz $archive_name ./bin ./lib
+
     #Master
     if [[ $TRAVIS_BRANCH == 'master' ]]; then
-        # === user package ===
-        tar cfvz mne-cpp-linux-x86_64-master.tar.gz ./bin ./lib
-
         # upload artifacts
-        curl -u $MASTER_LOGIN:$MASTER_PASSWORD -T mne-cpp-linux-x86_64-master.tar.gz ftp://$REMOTE_SERVER/
+        curl -u $MASTER_LOGIN:$MASTER_PASSWORD -T $archive_name ftp://$REMOTE_SERVER/
     elif [[ $TRAVIS_BRANCH == '1.0.0' ]]; then
-        # === user package ===
-        tar cfvz mne-cpp-linux-x86_64-1.0.0.tar.gz ./bin ./lib
-
         # upload artifacts
-        curl -u $ONEOO_LOGIN:$ONEOO_PASSWORD -T mne-cpp-linux-x86_64-1.0.0.tar.gz ftp://$REMOTE_SERVER/
+        curl -u $ONEOO_LOGIN:$ONEOO_PASSWORD -T $archive_name ftp://$REMOTE_SERVER/
     fi
 fi
