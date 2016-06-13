@@ -209,6 +209,13 @@ protected:
 
     //=========================================================================================================
     /**
+    * reading from sliding time window and write it to the data Matrix
+    *
+    */
+    void readFromSlidingTimeWindow(MatrixXd &data);
+
+    //=========================================================================================================
+    /**
     * The starting point for the thread. After calling start(), the newly created thread calls this function.
     * Returning from this method will end the execution of the thread.
     * Pure virtual method inherited by QThread.
@@ -235,10 +242,17 @@ private:
     PluginInputData<RealTimeSourceEstimate>::SPtr       m_pRTSEInput;           /**< The RealTimeSourceEstimate input.*/
 
     // sliding Window
-    int                     m_iTimeWindowIncrementLength;       /**< maximal window size in increments of the incoming buffer window size */
-    int                     m_iWriteTimeWindowIncrementIndex;   /**< Index for writing a new increment from the buffer to the time window */
+    int                     m_iCounter;                         /**< iterative index for counting the time segments in the time window */
     int                     m_iSampleFrequency;                 /**< sample frequency of the device [Hz] */
-    int                     m_iIncrSlidingTimeWindow;           /**< Increment for sliding Time Window */
+    int                     m_iReadSampleSize;             /**< numbers of sample for one time segment (about 0.1 seconds) */
+    int                     m_iWriteSampleSize;            /**< numbers of sample for writing to the time window  */
+    int                     m_iTimeWindowSegmentSize;     /**< needed size of the buffer for reading with an adaptable sliding window */
+    int                     m_iWriteIndex;   /**< Index for writing a new increment from the buffer to the time window */
+    int                     m_iReadIndex;                       /**< index for reading from the time window */
+    int                     m_iReadToWriteBuffer;               /**< number of samples from the current readindex to current write index */
+    int                     m_iWindowSize;
+//    QFile                   m_qFile;
+//    QTextStream             m_sOut;
     //int                     m_iThrottle;                        /**< increment for throtteling sample rate */
 
 
