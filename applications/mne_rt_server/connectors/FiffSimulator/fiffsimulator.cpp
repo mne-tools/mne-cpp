@@ -101,7 +101,7 @@ const QString FiffSimulator::Commands::SIMFILE      = "simfile";
 
 FiffSimulator::FiffSimulator()
 : m_pFiffProducer(new FiffProducer(this))
-, m_sResourceDataPath(QString("D:/Clouds/CloudStation/Studium/Master/Masterarbeit/measurements/SSVEP_test_1/Lorenz/2016_04_21_SSVEP_15Hz_raw.fif").arg(QCoreApplication::applicationDirPath()))
+, m_sResourceDataPath(QString("D:/Clouds/CloudStation/Studium/Master/Masterarbeit/measurements/SSVEP_test_1/Lorenz/2016_05_19_visual_test4_raw.fif").arg(QCoreApplication::applicationDirPath()))
 //, m_sResourceDataPath(QString("%1/MNE-sample-data/MEG/sample/sample_audvis_raw.fif").arg(QCoreApplication::applicationDirPath()))
 , m_uiBufferSampleSize(100)//(4)
 , m_AccelerationFactor(1.0)

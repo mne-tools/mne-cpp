@@ -70,6 +70,8 @@ using namespace UTILSLIB;
 ssvepBCI::ssvepBCI()
 : m_qStringResourcePath(qApp->applicationDirPath()+"/mne_x_plugins/resources/ssvepbci/")
 , m_bProcessData(false)
+//, m_qFile("out.txt")
+//, m_sOut(&m_qFile)
 {
     // Create start Stimuli action bar item/button
     m_pActionSetupStimulus = new QAction(QIcon(":/images/stimulus.png"),tr("setup stimulus feature"),this);
@@ -206,10 +208,16 @@ bool ssvepBCI::start()
 
     m_pFiffInfo_Sensor = FiffInfo::SPtr();
 
-    m_iWriteTimeWindowIncrementIndex = 0;
-    m_bIsRunning = true;
+    m_iWriteIndex   = 0;
+    m_iReadIndex    = 0;
+    m_iCounter      = 0;
+    m_iReadToWriteBuffer = 0;
+    m_iWindowSize        = 8;
+    m_bIsRunning    = true;
 
     QThread::start();
+
+//    if (!m_qFile.open(QIODevice::WriteOnly | QIODevice::Text))
 
     return true;
 }
@@ -249,6 +257,12 @@ bool ssvepBCI::stop()
     // Delete all features and classification results
     clearFeatures();
     clearClassifications();
+
+    // set counters to zero
+    m_iWriteIndex   = 0;
+    m_iReadIndex    = 0;
+    m_iCounter      = 0;
+    m_iReadToWriteBuffer = 0;
 
     return true;
 }
@@ -305,11 +319,15 @@ void ssvepBCI::updateSensor(XMEASLIB::NewMeasurement::SPtr pMeasurement)
         m_pFiffInfo_Sensor = pRTMSA->info();
         //emit fiffInfoAvailable();
 
-        //loading the fiff information
+        //loading fiff information
         m_iSampleFrequency = m_pFiffInfo_Sensor->sfreq;
+
+        // determine sliding time window parameters
         int rows = 8;
-        m_iTimeWindowIncrementLength = int(4*m_iSampleFrequency / pRTMSA->getMultiSampleArray()[0].cols());        // calculating the number of increments of the sliding time window (about 4s)
-        m_matSlidingTimeWindow.resize(rows, m_iTimeWindowIncrementLength*pRTMSA->getMultiSampleArray()[0].cols());
+        m_iReadSampleSize = 0.1*m_iSampleFrequency;    // about 0.1 second long time segment as basic read increment
+        m_iWriteSampleSize = pRTMSA->getMultiSampleArray()[0].cols();
+        m_iTimeWindowSegmentSize  = int(4*m_iSampleFrequency / m_iWriteSampleSize) + 1;   // 4 seconds long maximal sized window
+        m_matSlidingTimeWindow.resize(rows, m_iTimeWindowSegmentSize*pRTMSA->getMultiSampleArray()[0].cols());
     }
     m_qMutex.unlock();
 
@@ -432,6 +450,19 @@ void ssvepBCI::run()
     }
 }
 
+void ssvepBCI::readFromSlidingTimeWindow(MatrixXd &data)
+{
+    // consider matrix overflow case
+    if(data.cols() > m_iReadIndex){
+        int width1 = data.cols() - m_iReadIndex;
+        data.block(0, 0, 8, width1) = m_matSlidingTimeWindow.block(0, m_matSlidingTimeWindow.cols() - 1 - width1, 8, width1 );
+        data.block(0, width1, 8, m_iReadIndex) = m_matSlidingTimeWindow.block(0, 0, 8, m_iReadIndex);
+    }
+    else
+        data = m_matSlidingTimeWindow.block(0, m_iReadIndex - data.cols(), 8 , data.cols());
+
+}
+
 
 //*************************************************************************************************************
 
@@ -445,24 +476,62 @@ void ssvepBCI::BCIOnSensorLevel()
     m_bProcessData = true;
     MatrixXd t_mat = m_pBCIBuffer_Sensor->pop();
 
-    int timeIncrement = t_mat.cols();
-
-    cout << "Sliding Window Rows:" << m_matSlidingTimeWindow.rows() << endl;
-    cout << "Sliding Window Collumns:" << m_matSlidingTimeWindow.cols() << endl;
-
-    // writing selected feature channels to the time window storage
+    // writing selected feature channels to the time window storage and increase the segment index
     for(int i = 0; i < 8; i++)
-        m_matSlidingTimeWindow.block(i, m_iWriteTimeWindowIncrementIndex*timeIncrement, 1, timeIncrement) = t_mat.block(m_lElectrodeNumbers.at(i), 0, 1, timeIncrement);
-    m_iWriteTimeWindowIncrementIndex = (m_iWriteTimeWindowIncrementIndex + 1) % m_iTimeWindowIncrementLength;
+        m_matSlidingTimeWindow.block(i, m_iWriteIndex, 1, m_iWriteSampleSize) = t_mat.block(m_lElectrodeNumbers.at(i), 0, 1, m_iWriteSampleSize);
+    m_iWriteIndex = (m_iWriteIndex + m_iWriteSampleSize) % (m_iWriteSampleSize*m_iTimeWindowSegmentSize);
+
+    // calculate buffer between read- and write index
+    m_iReadToWriteBuffer = m_iReadToWriteBuffer + m_iWriteSampleSize;
+    cout << "Read to Write buffer:" << m_iReadToWriteBuffer << endl;
+    // execute processing loop as long as there is new data to read from the time window
+    while(m_iReadToWriteBuffer >= m_iReadSampleSize)
+    {
+        if(m_iCounter > 8)
+        {
+            // determine window size according to former success of former classifications
+            if(m_iCounter <= 24)
+                m_iWindowSize = 8;
+            if(m_iCounter <= 44 && m_iCounter > 24)
+                m_iWindowSize = 20;
+            if(m_iCounter > 44)
+                m_iWindowSize = 40;
+
+            MatrixXd Y_data;
+            Y_data.resize(8, m_iWindowSize*m_iReadSampleSize);
+            readFromSlidingTimeWindow(Y_data);
+
+            //std::cout << "Matrix:\n" << m_matSlidingTimeWindow.block(0, m_iReadIndex, 8, 5) << endl;
+
+            cout << "Window Size:" << m_iWindowSize << endl;
+            cout << "Y_data rows" << Y_data.rows() << endl;
+            cout << "Y_data cols" << Y_data.cols() << endl;
 
 
-    cout << "Write Index:" << m_iWriteTimeWindowIncrementIndex << endl;
-    cout << "Window Length:" << m_iTimeWindowIncrementLength << endl;
-    cout << "time increments:" << timeIncrement << endl;
-
-    // std::cout << "Matrix:\n" << m_matSlidingTimeWindow.block(0, 0, m_matSlidingTimeWindow.rows(), 5) << endl;
 
 
+        }
+
+        // update counter variables
+        m_iCounter++;
+        m_iReadToWriteBuffer = m_iReadToWriteBuffer - m_iReadSampleSize;
+        m_iReadIndex = (m_iReadIndex + m_iReadSampleSize) % (m_iWriteSampleSize*m_iTimeWindowSegmentSize);
+    }
+    
+
+
+
+    cout << "Write Sample Size:" << m_iWriteSampleSize << endl;
+    cout << "Read Sample Size:" << m_iReadSampleSize << endl;
+    cout << "Write Index:" << m_iWriteIndex << endl;
+    cout << "Read Index:" << m_iReadIndex << endl;
+    cout << "Time Window Segment Size:" << m_iTimeWindowSegmentSize << endl;
+    cout << "Window Size" << m_iWriteSampleSize*m_iTimeWindowSegmentSize << endl << endl;
+
+
+
+
+    // increase ringbuffer increment
 
 
 }
