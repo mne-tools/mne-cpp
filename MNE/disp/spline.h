@@ -104,6 +104,7 @@ class DISPSHARED_EXPORT Spline: public QWidget
     Q_OBJECT
 
 public:
+    Eigen::VectorXi resultExponentValues;   /**< Common exponent values for the entire histogram*/
     //=========================================================================================================
     /**
     * The constructor for Spline
@@ -193,7 +194,6 @@ private:
     double          minAxisX;               /**< Value of the smallest point of the series in x-axis */
     double          maxAxisX;               /**< Value of the largest point on the series in x-axis */
     int             maximumFrequency;       /**< Highest value of frequency (y-axis) */
-    Eigen::VectorXi resultExponentValues;   /**< Common exponent values for the entire */
     QVector3D       vec3DReturnVector;      /**< vector used in the getThreshold function and implemented in disp3D */
 
 signals:
@@ -220,22 +220,6 @@ void Spline::setData(const Eigen::Matrix<T, Eigen::Dynamic, 1>& matClassLimitDat
     qDebug()<< "SetData (Dynamic, 1) function starts!";
     Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrixName(matClassLimitData.rows(),1);
     matrixName.col(0) = matClassLimitData;
-    if (series != 0)
-    {
-        m_pChart->removeSeries(series);
-    }
-    if (leftThreshold != 0)
-    {
-        m_pChart->removeSeries(leftThreshold);
-    }
-    if (middleThreshold != 0)
-    {
-        m_pChart->removeSeries(middleThreshold);
-    }
-    if (rightThreshold !=0)
-    {
-        m_pChart->removeSeries(rightThreshold);
-    }
 
     this->updatePlot(matrixName, matClassFrequencyData, iPrecisionValue);
 }
@@ -249,23 +233,6 @@ void Spline::setData(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matClassLimitDat
     qDebug()<< "SetData (1, Dynamic) function starts!";
     Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrixName(1, matClassLimitData.cols());
     matrixName.row(0) = matClassLimitData;
-    if (series != 0)
-    {
-        m_pChart->removeSeries(series);
-    }
-    if (leftThreshold != 0)
-    {
-        m_pChart->removeSeries(leftThreshold);
-    }
-    if (middleThreshold != 0)
-    {
-        m_pChart->removeSeries(middleThreshold);
-    }
-    if (rightThreshold !=0)
-    {
-        m_pChart->removeSeries(rightThreshold);
-    }
-
     this->updatePlot(matrixName, matClassFrequencyData, iPrecisionValue);
 }
 
@@ -283,12 +250,12 @@ void Spline::updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& 
     //  Start of Qtchart histogram display
     QString histogramExponent;
     histogramExponent = "X-axis scale: 10e" + QString::number(resultExponentValues(0));   //used to tell the user the exponential scale used in the histogram
-    series->clear();
-//    m_pChart->removeSeries(leftThreshold);              //create new series and then clear the plot and update with new data
-//    m_pChart->removeSeries(middleThreshold);
-//    m_pChart->removeSeries(rightThreshold);
-    m_pChart->removeSeries(series);
     series->setName(histogramExponent);
+    series->clear();
+    m_pChart->removeSeries(series);
+    m_pChart->removeSeries(leftThreshold);              //create new series and then clear the plot and update with new data
+    m_pChart->removeSeries(middleThreshold);
+    m_pChart->removeSeries(rightThreshold);
 
     minAxisX = resultDisplayValues(0);
     maxAxisX = resultDisplayValues(iClassAmount);
@@ -306,23 +273,19 @@ void Spline::updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& 
             maximumFrequency = matClassFrequencyData(ir);
         }
     }
-
-    m_pChart->addSeries(series);
     leftThreshold = new QLineSeries();
     middleThreshold = new QLineSeries();
     rightThreshold = new QLineSeries();
     leftThreshold->setName("left");
     middleThreshold->setName("middle");
     rightThreshold->setName("right");
-    m_pChart->addSeries(leftThreshold);
-    m_pChart->addSeries(middleThreshold);
-    m_pChart->addSeries(rightThreshold);
-//    leftThreshold->append(minAxisX, 0);                     //initialize threshold lines
-//    middleThreshold->append(maxAxisX, 0);
-//    rightThreshold->append(maxAxisX, 0);
-    leftThreshold->setVisible(false);                       //threshold lines intially invisible
-    middleThreshold->setVisible(false);
-    rightThreshold->setVisible(false);
+//    m_pChart->addSeries(leftThreshold);
+//    m_pChart->addSeries(middleThreshold);
+//    m_pChart->addSeries(rightThreshold);
+    m_pChart->addSeries(series);
+//    leftThreshold->setVisible(false);                       //threshold lines intially invisible
+//    middleThreshold->setVisible(false);
+//    rightThreshold->setVisible(false);
 
     m_pChart->legend()->setVisible(true);
     m_pChart->legend()->setAlignment(Qt::AlignBottom);

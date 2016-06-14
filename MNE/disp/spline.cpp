@@ -84,6 +84,23 @@ Spline::Spline(const QString& title, QWidget* parent): QWidget(parent)
 
 void Spline::mousePressEvent(QMouseEvent *event)
 {
+//    if (leftThreshold->count() != 0)
+//    {
+//                qDebug() << "leftThreshold removed!";
+//        m_pChart->removeSeries(leftThreshold);
+//    }
+//    if (middleThreshold->count() != 0)
+//    {
+//                qDebug() << "middleThreshold removed!";
+//        m_pChart->removeSeries(middleThreshold);
+//    }
+//    if (rightThreshold->count() !=0)
+//    {
+//                qDebug() << "rightThreshold removed!";
+//        m_pChart->removeSeries(rightThreshold);
+//    }
+
+    qDebug() << "MousePressEvent started!";
     if (series->count() == 0)               //protect integrity of the histogram widget in case series contain no data values
     {
         qDebug() << "Data set not found.";  //do nothing
@@ -124,13 +141,10 @@ void Spline::mousePressEvent(QMouseEvent *event)
                     leftPoint = verticalLine->pointsVector();
                     if((leftPoint[0].x() < middlePoint[0].x()) && (leftPoint[0].x() < rightPoint[0].x()))
                     {
-                        leftThreshold->clear();
                         m_pChart->removeSeries(leftThreshold);
                         leftThreshold=verticalLine;
                         leftThreshold->setName("left");
                         updateThreshold(leftThreshold);
-                        QVector3D updatedVector(leftPoint[0].x(), middlePoint[0].x(), rightPoint[0].x());
-                        this->setThreshold(updatedVector);
                         emitLeft = (leftPoint[0].x() * (pow(10, resultExponentValues[0])));
                         emit borderChanged(emitLeft, emitMiddle, emitRight);
                         qDebug() << "Border = " << emitLeft << " , " << emitMiddle << " , " << emitRight;
@@ -142,13 +156,10 @@ void Spline::mousePressEvent(QMouseEvent *event)
                     middlePoint = verticalLine->pointsVector();
                     if((middlePoint[0].x() > leftPoint[0].x()) && (middlePoint[0].x() < rightPoint[0].x()))
                     {
-                        middleThreshold->clear();
                         m_pChart->removeSeries(middleThreshold);
                         middleThreshold=verticalLine;
                         middleThreshold->setName("middle");
                         updateThreshold(middleThreshold);
-                        QVector3D updatedVector(leftPoint[0].x(), middlePoint[0].x(), rightPoint[0].x());
-                        this->setThreshold(updatedVector);
                         emitMiddle = (middlePoint[0].x() * (pow(10, resultExponentValues[0])));
                         emit borderChanged(emitLeft, emitMiddle, emitRight);
                         qDebug() << "Border = " << emitLeft << " , " << emitMiddle << " , " << emitRight;
@@ -160,13 +171,10 @@ void Spline::mousePressEvent(QMouseEvent *event)
                     rightPoint = verticalLine->pointsVector();
                     if((rightPoint[0].x() > leftPoint[0].x()) && (rightPoint[0].x() > middlePoint[0].x()))
                     {
-                        rightThreshold->clear();
                         m_pChart->removeSeries(rightThreshold);
                         rightThreshold=verticalLine;
                         rightThreshold->setName("right");
                         updateThreshold(rightThreshold);
-                        QVector3D updatedVector(leftPoint[0].x(), middlePoint[0].x(), rightPoint[0].x());
-                        this->setThreshold(updatedVector);
                         emitRight = (rightPoint[0].x() * (pow(10, resultExponentValues[0])));
                         emit borderChanged(emitLeft, emitMiddle, emitRight);
                         qDebug() << "Border = " << emitLeft << " , " << emitMiddle << " , " << emitRight;
@@ -182,14 +190,14 @@ void Spline::mousePressEvent(QMouseEvent *event)
 
 void Spline::setThreshold(const QVector3D& vecThresholdValues)
 {
-    qDebug() << "SET THRESHOLD FUNCTION STARTS!";
+    qDebug() << "setThreshold function starts!";
     float leftThresholdValue;
     float middleThresholdValue;
     float rightThresholdValue;
 
     if (series->count() == 0)               //protect integrity of the histogram widget in case series contain no data values
     {
-        qDebug() << "setThreshold error: Data set not found.";
+        qDebug() << "Data set not found.";
     }
 
     //the condition below tests the threshold values given and ensures that all three must be within minAxisX and maxAxisX
@@ -203,7 +211,6 @@ void Spline::setThreshold(const QVector3D& vecThresholdValues)
         if ((vecThresholdValues.x() < vecThresholdValues.y()) && (vecThresholdValues.x() < vecThresholdValues.z()))
         {
             leftThresholdValue = vecThresholdValues.x();
-
             if(vecThresholdValues.y() < vecThresholdValues.z())
             {
                 middleThresholdValue = vecThresholdValues.y();
@@ -249,13 +256,6 @@ void Spline::setThreshold(const QVector3D& vecThresholdValues)
         QPointF middleThresholdPoint;
         QPointF rightThresholdPoint;
 
-        m_pChart->removeSeries(leftThreshold);
-        m_pChart->removeSeries(middleThreshold);
-        m_pChart->removeSeries(rightThreshold);
-        leftThreshold->clear();
-        middleThreshold->clear();
-        rightThreshold->clear();
-
         leftThresholdPoint.setX(leftThresholdValue);
         middleThresholdPoint.setX(middleThresholdValue);
         rightThresholdPoint.setX(rightThresholdValue);
@@ -278,12 +278,13 @@ void Spline::setThreshold(const QVector3D& vecThresholdValues)
 
 const QVector3D& Spline::getThreshold()
 {
+    qDebug() << "getThreshold function starts!";
     QVector<QPointF> middlePoint = middleThreshold->pointsVector();   //Point values need to be updated before tested and displayed on the widget
     QVector<QPointF> rightPoint = rightThreshold->pointsVector();
     QVector<QPointF> leftPoint = leftThreshold->pointsVector();
-    float emitLeft = (leftPoint[0].x() * (pow(10, resultExponentValues[0])));
-    float emitMiddle = (middlePoint[0].x() * (pow(10, resultExponentValues[0])));
-    float emitRight = (rightPoint[0].x() * (pow(10, resultExponentValues[0])));
+    float emitLeft = leftPoint[0].x();// * (pow(10, resultExponentValues[0])));
+    float emitMiddle = middlePoint[0].x();// * (pow(10, resultExponentValues[0])));
+    float emitRight = rightPoint[0].x();// * (pow(10, resultExponentValues[0])));
     vec3DReturnVector.setX(emitLeft);
     vec3DReturnVector.setY(emitMiddle);
     vec3DReturnVector.setZ(emitRight);
@@ -295,6 +296,7 @@ const QVector3D& Spline::getThreshold()
 
 void Spline::updateThreshold (QLineSeries* lineSeries)
 {
+    qDebug() << "updateThreshold function starts!";
     if (lineSeries->name() == "left")
     {
         lineSeries->setColor("red") ;
