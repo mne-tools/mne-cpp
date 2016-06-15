@@ -365,7 +365,7 @@ void Data3DTreeDelegate::setModelData(QWidget* editor, QAbstractItemModel* model
             QString displayThreshold;
             displayThreshold = QString("%1,%2,%3").arg(vecNormalizedThreshold.x()).arg(vecNormalizedThreshold.y()).arg(vecNormalizedThreshold.z());
             model->setData(index, data, MetaTreeItemRoles::RTDataNormalizationValue);
-            qDebug()<< "model->setData RTDataNormalizationValue= " << data;
+            qDebug()<< "model->setData = " << displayThreshold;
             data.setValue(displayThreshold);
             model->setData(index, data, Qt::DisplayRole);
             qDebug() << "model->setData DisplayRole" << data;

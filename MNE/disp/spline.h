@@ -55,12 +55,14 @@
 #include <QtCharts/QSplineSeries>
 #include <QtCharts/QLineSeries>
 #include <QtCharts/QChart>
-#include <QtGui/QMouseEvent>
-#include <QDebug>
 #include <QtCharts/QLegendMarker>
 #include <QtCharts/QLegend>
+#include <QtGui/QMouseEvent>
+#include <QtGui/QResizeEvent>
+#include <QtWidgets/QGraphicsScene>
+#include <QtWidgets/QGraphicsTextItem>
+#include <QDebug>
 #include <QVector3D>
-#include <iostream>
 
 
 //*************************************************************************************************************
@@ -78,14 +80,6 @@
 
 namespace DISPLIB
 {
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace Eigen;
 QT_CHARTS_USE_NAMESPACE
 
 
