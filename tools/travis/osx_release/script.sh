@@ -6,4 +6,10 @@
 # Build
 # make -j2
 
+qmake -v
 which qmake
+
+QT_BIN_DIR=`which qmake`
+
+echo "QT_BIN_DIR="
+echo $QT_BIN_DIR
