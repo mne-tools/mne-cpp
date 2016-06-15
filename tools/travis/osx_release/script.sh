@@ -6,10 +6,9 @@
 # Build
 # make -j2
 
-qmake -v
-which qmake
-
-QT_BIN_DIR=`qmake -v`
-
-echo ${QT_BIN_DIR##*in }
+QMAKE_VERSION=`qmake -v`
+QT_LIB_DIR=${QMAKE_VERSION##*in }
+QT_BIN_DIR=$QT_LIB_DIR/../bin/
+echo $QT_LIB_DIR
 echo $QT_BIN_DIR
+echo $PATH
