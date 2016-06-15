@@ -43,17 +43,6 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QtGui/QResizeEvent>
-#include <QtWidgets/QGraphicsScene>
-#include <QtWidgets/QGraphicsTextItem>
-#include <QtGui/QMouseEvent>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
@@ -84,22 +73,6 @@ Spline::Spline(const QString& title, QWidget* parent): QWidget(parent)
 
 void Spline::mousePressEvent(QMouseEvent *event)
 {
-//    if (leftThreshold->count() != 0)
-//    {
-//                qDebug() << "leftThreshold removed!";
-//        m_pChart->removeSeries(leftThreshold);
-//    }
-//    if (middleThreshold->count() != 0)
-//    {
-//                qDebug() << "middleThreshold removed!";
-//        m_pChart->removeSeries(middleThreshold);
-//    }
-//    if (rightThreshold->count() !=0)
-//    {
-//                qDebug() << "rightThreshold removed!";
-//        m_pChart->removeSeries(rightThreshold);
-//    }
-
     qDebug() << "MousePressEvent started!";
     if (series->count() == 0)               //protect integrity of the histogram widget in case series contain no data values
     {
@@ -200,7 +173,7 @@ void Spline::setThreshold(const QVector3D& vecThresholdValues)
         qDebug() << "Data set not found.";
     }
 
-    //the condition below tests the threshold values given and ensures that all three must be within minAxisX and maxAxisX
+//    //the condition below tests the threshold values given and ensures that all three must be within minAxisX and maxAxisX
 //    else if (vecThresholdValues.x() < minAxisX || vecThresholdValues.y() < minAxisX || vecThresholdValues.z() < minAxisX || vecThresholdValues.x() > maxAxisX || vecThresholdValues.y() > maxAxisX || vecThresholdValues.z() > maxAxisX)
 //    {
 //        qDebug() << "One or more of the values given are out of the minimum and maximum range.";
@@ -288,6 +261,7 @@ const QVector3D& Spline::getThreshold()
     vec3DReturnVector.setX(emitLeft);
     vec3DReturnVector.setY(emitMiddle);
     vec3DReturnVector.setZ(emitRight);
+    qDebug() << "getThreshold: vec3DReturnVector = " << vec3DReturnVector;
     return vec3DReturnVector;
 }
 
