@@ -9,7 +9,7 @@
 qmake -v
 which qmake
 
-QT_BIN_DIR=`which qmake`
+QT_BIN_DIR=`qmake -v`
 
-echo "QT_BIN_DIR="
+echo ${QT_BIN_DIR##*in }
 echo $QT_BIN_DIR
