@@ -16,6 +16,8 @@ export PATH
 MNE_LIB_DIR=$(pwd)/lib
 
 echo $MNE_LIB_DIR
+echo $QT_LIB_DIR
+echo $QT_BIN_DIR
 echo $PATH
 
 
