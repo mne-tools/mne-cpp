@@ -59,7 +59,6 @@
 
 #include <iostream>
 
-
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
@@ -157,7 +156,7 @@ int main(int argc, char *argv[])
     if(bAddRtSourceLoc) {
         double snr = 3.0;
         double lambda2 = 1.0 / pow(snr, 2);
-        QString method("dSPM"); //"MNE" | "dSPM" | "sLORETA"
+        QString method("MNE"); //"MNE" | "dSPM" | "sLORETA"
 
         // Load data
         QPair<QVariant, QVariant> baseline(QVariant(), 0);
@@ -295,7 +294,7 @@ int main(int argc, char *argv[])
             rtItemList_RV.at(i)->setTimeInterval(75);
             rtItemList_RV.at(i)->setNumberAverages(7);
             rtItemList_RV.at(i)->setStreamingActive(true);
-            rtItemList_RV.at(i)->setNormalization(QVector3D(5.0,0.5,15));
+            rtItemList_RV.at(i)->setNormalization(QVector3D(1.0e-12,10.0e-12,100.0e-12));
             rtItemList_RV.at(i)->setVisualizationType("Annotation based");
             rtItemList_RV.at(i)->setColortable("Hot");
         }

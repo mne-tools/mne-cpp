@@ -173,12 +173,44 @@ void Spline::setThreshold(const QVector3D& vecThresholdValues)
         qDebug() << "Data set not found.";
     }
 
-//    //the condition below tests the threshold values given and ensures that all three must be within minAxisX and maxAxisX
-//    else if (vecThresholdValues.x() < minAxisX || vecThresholdValues.y() < minAxisX || vecThresholdValues.z() < minAxisX || vecThresholdValues.x() > maxAxisX || vecThresholdValues.y() > maxAxisX || vecThresholdValues.z() > maxAxisX)
-//    {
-//        qDebug() << "One or more of the values given are out of the minimum and maximum range.";
-//    }
-
+//    the condition below tests the threshold values given and ensures that all three must be within minAxisX and maxAxisX otherwise they will be given either minAxisX or maxAxisX value
+    else if (vecThresholdValues.x() < minAxisX || vecThresholdValues.y() < minAxisX || vecThresholdValues.z() < minAxisX || vecThresholdValues.x() > maxAxisX || vecThresholdValues.y() > maxAxisX || vecThresholdValues.z() > maxAxisX)
+    {
+        qDebug() << "One or more of the values given are out of the minimum and maximum range. Changed to default thresholds.";
+        leftThresholdValue = minAxisX + (0.01 * minAxisX);
+        middleThresholdValue = (minAxisX + maxAxisX)/2;
+        rightThresholdValue = maxAxisX - (0.01 * maxAxisX);
+//        if(vecThresholdValues.x() < minAxisX)
+//        {
+//            leftThresholdValue = minAxisX;
+//            qDebug() << "first threshold changed to minimum X-Axis value = " << leftThresholdValue;
+//        }
+//        else if(vecThresholdValues.x() > maxAxisX)
+//        {
+//            leftThresholdValue = maxAxisX;
+//            qDebug() << "first threshold changed to maximum X-Axis value = " << leftThresholdValue;
+//        }
+//        if(vecThresholdValues.y() < minAxisX)
+//        {
+//            middleThresholdValue = minAxisX;
+//            qDebug() << "second threshold changed to minimum X-Axis value.= " << middleThresholdValue;
+//        }
+//        else if(vecThresholdValues.y() > maxAxisX)
+//        {
+//            middleThresholdValue = maxAxisX;
+//            qDebug() << "second threshold changed to maximum X-Axis value.= " << middleThresholdValue;
+//        }
+//        if(vecThresholdValues.z() < minAxisX)
+//        {
+//            rightThresholdValue = minAxisX;
+//            qDebug() << "third threshold changed to minimum X-Axis value.= " << rightThresholdValue;
+//        }
+//        else if(vecThresholdValues.z() > maxAxisX)
+//        {
+//            rightThresholdValue = maxAxisX;
+//            qDebug() << "third threshold changed to maximum X-Axis value.= " << rightThresholdValue;
+//        }
+    }
     else
     {
         if ((vecThresholdValues.x() < vecThresholdValues.y()) && (vecThresholdValues.x() < vecThresholdValues.z()))
@@ -225,6 +257,7 @@ void Spline::setThreshold(const QVector3D& vecThresholdValues)
                 rightThresholdValue = vecThresholdValues.x();
             }
         }
+    }
         QPointF leftThresholdPoint;
         QPointF middleThresholdPoint;
         QPointF rightThresholdPoint;
@@ -240,29 +273,11 @@ void Spline::setThreshold(const QVector3D& vecThresholdValues)
         rightThreshold->append(rightThresholdPoint.x(), 0);
         rightThreshold->append(rightThresholdPoint.x(), maximumFrequency);
 
+        qDebug() << "CURRENT THRESHOLD = " << leftThreshold << middleThreshold << rightThreshold;
+
         updateThreshold(leftThreshold);
         updateThreshold(middleThreshold);
         updateThreshold(rightThreshold);
-    }
-}
-
-
-//*************************************************************************************************************
-
-const QVector3D& Spline::getThreshold()
-{
-    qDebug() << "getThreshold function starts!";
-    QVector<QPointF> middlePoint = middleThreshold->pointsVector();   //Point values need to be updated before tested and displayed on the widget
-    QVector<QPointF> rightPoint = rightThreshold->pointsVector();
-    QVector<QPointF> leftPoint = leftThreshold->pointsVector();
-    float emitLeft = leftPoint[0].x();// * (pow(10, resultExponentValues[0])));
-    float emitMiddle = middlePoint[0].x();// * (pow(10, resultExponentValues[0])));
-    float emitRight = rightPoint[0].x();// * (pow(10, resultExponentValues[0])));
-    vec3DReturnVector.setX(emitLeft);
-    vec3DReturnVector.setY(emitMiddle);
-    vec3DReturnVector.setZ(emitRight);
-    qDebug() << "getThreshold: vec3DReturnVector = " << vec3DReturnVector;
-    return vec3DReturnVector;
 }
 
 
@@ -291,4 +306,60 @@ void Spline::updateThreshold (QLineSeries* lineSeries)
     m_pChart->addSeries(lineSeries);
     m_pChart->legend()->markers().at(m_pChart->legend()->markers().size()-1)->setVisible(false);
     m_pChart->createDefaultAxes();
+}
+
+
+//*************************************************************************************************************
+
+const QList<QVector3D> &Spline::getThreshold()
+{
+    qDebug() << "getThreshold function starts!";
+    QVector<QPointF> middlePoint = middleThreshold->pointsVector();   //Point values need to be updated before tested and displayed on the widget
+    QVector<QPointF> rightPoint = rightThreshold->pointsVector();
+    QVector<QPointF> leftPoint = leftThreshold->pointsVector();
+    float emitLeft = leftPoint[0].x();
+    float emitMiddle = middlePoint[0].x();
+    float emitRight = rightPoint[0].x();
+    QVector3D vec3DDisplayVector;
+    vec3DDisplayVector.setX(emitLeft);
+    vec3DDisplayVector.setY(emitMiddle);
+    vec3DDisplayVector.setZ(emitRight);
+    QVector3D vec3DRealVector = correctionDisplayTrueValue(vec3DDisplayVector, "down");
+//    vec3DRealVector.setX(emitLeft * (pow(10, resultExponentValues[0])));
+//    vec3DRealVector.setY(emitMiddle * (pow(10, resultExponentValues[0])));
+//    vec3DRealVector.setZ(emitRight * (pow(10, resultExponentValues[0])));
+    qDebug() << "getThreshold: vec3DDisplayVector = " << vec3DDisplayVector;
+    qDebug() << "getThreshold: vec3DReturnVector = " << vec3DRealVector;
+    returnList.clear();
+    returnList.append(vec3DDisplayVector);
+    returnList.append(vec3DRealVector);
+    return (returnList);
+}
+
+
+//*************************************************************************************************************
+
+const QVector3D &Spline::correctionDisplayTrueValue(QVector3D vecOriginalValues, QString upOrDown)
+{
+    qDebug() << "correctionDisplayTrueValue function starts!";
+    QVector3D returnCorrectedVector;
+    int exponent;
+    if (upOrDown == "up")
+    {
+        exponent = abs(resultExponentValues[0]);
+    }
+    else if (upOrDown == "down")
+    {
+        exponent = -(abs(resultExponentValues[0]));
+    }
+    else
+    {
+        qDebug() << "Spline::correctionDisplayTrueValue error.";
+    }
+    returnCorrectedVector.setX(vecOriginalValues.x() * (pow(10, exponent)));
+    returnCorrectedVector.setY(vecOriginalValues.y() * (pow(10, exponent)));
+    returnCorrectedVector.setZ(vecOriginalValues.z() * (pow(10, exponent)));
+    qDebug() << "Original Vector = " << vecOriginalValues;
+    qDebug() << "Corrected Vector = " << returnCorrectedVector;
+    return (returnCorrectedVector);
 }
