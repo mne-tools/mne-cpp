@@ -63,6 +63,7 @@
 #include <QtWidgets/QGraphicsTextItem>
 #include <QDebug>
 #include <QVector3D>
+#include <QList>
 
 
 //*************************************************************************************************************
@@ -98,7 +99,6 @@ class DISPSHARED_EXPORT Spline: public QWidget
     Q_OBJECT
 
 public:
-    Eigen::VectorXi resultExponentValues;   /**< Common exponent values for the entire histogram*/
     //=========================================================================================================
     /**
     * The constructor for Spline
@@ -163,9 +163,27 @@ public:
     /**
     * getThreshold takes in QVector value from outside sources and create the corresponding lines in the histogram
     *
-    * @return      returns QVector3D consisting of 3 values corresponding to the x-axis value of the threshold lines
+    * @return      returns QList consisting of QVector3D corresponding to the x-axis value of the threshold lines
     */
-    const QVector3D& getThreshold ();
+    const QList<QVector3D> &getThreshold();
+
+    //=========================================================================================================
+    /**
+    * correctionDisplayTrueValue takes in QVector value from outside sources and create the necessary adjustment of exponential multiplication with base 10
+    *
+    * @param[in]  vecOriginalValues     QVector3D consisting of 3 original values
+    * @param[in]  upOrDown              User input to either multiply with positive or negative 10 to the power of exponent
+    * @return     returns QVector3D after necessary adjustment
+    */
+    const QVector3D &correctionDisplayTrueValue(QVector3D vecOriginalValues, QString upOrDown);
+
+    //=========================================================================================================
+
+    Eigen::VectorXi resultExponentValues;   /**< Common exponent values for the entire histogram*/
+    double          minAxisX;               /**< Display value of the smallest point of the series in x-axis */
+    double          maxAxisX;               /**< Display value of the largest point on the series in x-axis */
+
+
 
 private:
     //=========================================================================================================
@@ -185,10 +203,9 @@ private:
     QLineSeries     *middleThreshold;       /**< Vertical line series for the middle threshold */
     QLineSeries     *rightThreshold;        /**< Vertical line series for the right threshold */
     QLegendMarker   *marker;                /**< Variable to specify the legend of the threshold line */
-    double          minAxisX;               /**< Value of the smallest point of the series in x-axis */
-    double          maxAxisX;               /**< Value of the largest point on the series in x-axis */
     int             maximumFrequency;       /**< Highest value of frequency (y-axis) */
-    QVector3D       vec3DReturnVector;      /**< vector used in the getThreshold function and implemented in disp3D */
+    QVector<double> returnVector;           /**< QVector consisting of 6 double values used in getThreshold function*/
+    QList<QVector3D> returnList;            /**< QList consisting of 2 QVector3D used in getThreshold function*/
 
 signals:
     //=========================================================================================================
@@ -214,7 +231,6 @@ void Spline::setData(const Eigen::Matrix<T, Eigen::Dynamic, 1>& matClassLimitDat
     qDebug()<< "SetData (Dynamic, 1) function starts!";
     Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrixName(matClassLimitData.rows(),1);
     matrixName.col(0) = matClassLimitData;
-
     this->updatePlot(matrixName, matClassFrequencyData, iPrecisionValue);
 }
 
@@ -253,7 +269,6 @@ void Spline::updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& 
 
     minAxisX = resultDisplayValues(0);
     maxAxisX = resultDisplayValues(iClassAmount);
-    //std::cout << "resultDisplayValues = " << resultDisplayValues;
     double classMark;                         //class mark is the middle point between lower and upper class limit
     maximumFrequency = 0;                     //maximumFrequency used to create an intuitive histogram
 

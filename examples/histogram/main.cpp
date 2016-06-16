@@ -346,6 +346,8 @@ int main(int argc, char *argv[])
     qDebug()<< "sourceEstimateData.rows = " << sourceEstimateData.rows();
     qDebug()<< "sourceEstaimateData.cols = " << sourceEstimateData.cols();
     MNEMath::histcounts(sourceEstimateData, bMakeSymmetrical, classAmount, resultClassLimit, resultFrequency, inputGlobalMin, inputGlobalMax);   //user input to normalize and sort the data matrix
+    std::cout<< "resultClassLimit =" << resultClassLimit;
+    std::cout<< "resultFrequency =" << resultFrequency;
     qDebug()<<"HistCounts timer:"<<myTimerHistCounts.elapsed();
 //    std::cout << "resultClassLimits = " << resultClassLimit << std::endl;
 //    std::cout << "resultFrequency = " << resultFrequency << std::endl;
@@ -358,12 +360,15 @@ int main(int argc, char *argv[])
     QTime myTimerHistogram;
     myTimerHistogram.start();
     displayObj->setData(resultClassLimit, resultFrequency, precision);
-    QVector3D thresholdLines1(9.0, 19.0, 20.0);
+
+    QVector3D thresholdLines1(9.0e-21, 19.0e-21, 20.0e-21);
     displayObj->setThreshold(thresholdLines1);
     qDebug() << "debug before new setdata";
     displayObj->setData(dataSine, resultFrequency, precision);
     QVector3D thresholdLines2(5.0, 15.0, 25.0);
     displayObj->setThreshold(thresholdLines2);
+    QList<QVector3D> foo = displayObj->getThreshold();
+    qDebug()<< "getThreshold = " << foo;
     qDebug()<<"Histogram timer:"<<myTimerHistogram.elapsed();
 
     displayObj->resize(400,300);
