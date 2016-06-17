@@ -223,7 +223,7 @@ void AverageSceneItem::paintAveragePath(QPainter *painter)
 
     //Plot averaged data
     QRectF boundingRect = this->boundingRect();
-    double dScaleY = (boundingRect.height()*10)/(2*dMaxValue);
+    double dScaleY = (boundingRect.height())/(2*dMaxValue);
     QPointF qSamplePosition;
 
     //do for all currently stored evoked set data
