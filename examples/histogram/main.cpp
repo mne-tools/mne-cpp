@@ -49,7 +49,6 @@
 #include <utils/mnemath.h>
 #include <disp/bar.h>
 #include <disp/spline.h>
-#include <disp/view.h>
 
 //includes for source localization data
 #include <fs/label.h>
