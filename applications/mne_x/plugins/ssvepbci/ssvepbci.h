@@ -167,6 +167,15 @@ public:
 
     virtual QWidget* setupWidget();
 
+public slots:
+
+    //=========================================================================================================
+    /**
+    * updates the parameter of the SSVEP
+    *
+    */
+    void updateBCIParameter(void);
+
 
 protected:
     /**
@@ -209,7 +218,8 @@ protected:
 
     //=========================================================================================================
     /**
-    * reading from sliding time window and write it to the data Matrix
+    * reading actual segment from the sliding time window and write it to the data Matrix
+    *
     *
     */
     void readFromSlidingTimeWindow(MatrixXd &data);
@@ -242,18 +252,29 @@ private:
     PluginInputData<RealTimeSourceEstimate>::SPtr       m_pRTSEInput;           /**< The RealTimeSourceEstimate input.*/
 
     // sliding Window
-    int                     m_iCounter;                         /**< iterative index for counting the time segments in the time window */
-    int                     m_iSampleFrequency;                 /**< sample frequency of the device [Hz] */
-    int                     m_iReadSampleSize;             /**< numbers of sample for one time segment (about 0.1 seconds) */
-    int                     m_iWriteSampleSize;            /**< numbers of sample for writing to the time window  */
-    int                     m_iTimeWindowSegmentSize;     /**< needed size of the buffer for reading with an adaptable sliding window */
-    int                     m_iWriteIndex;   /**< Index for writing a new increment from the buffer to the time window */
+    int                     m_iCounter;                         /**< iterative index for counting the miss classifications */
+    double                  m_dSampleFrequency;                 /**< sample frequency of the device [Hz] */
+    int                     m_iReadSampleSize;                  /**< numbers of sample for one time segment (about 0.1 seconds) */
+    int                     m_iWriteSampleSize;                 /**< numbers of sample for writing to the time window  */
+    int                     m_iTimeWindowSegmentSize;           /**< needed size of the buffer for reading with an adaptable sliding window */
+    int                     m_iTimeWindowLength;                /**< required length of the time window */
+    int                     m_iWriteIndex;                      /**< Index for writing a new increment from the buffer to the time window */
     int                     m_iReadIndex;                       /**< index for reading from the time window */
+    int                     m_iDownSampleIncrement;                  /**< Rate of downsampling from current sample rate to 128 Hz */
+    int                     m_iDownSampleIndex;                 /**< index for reading from the raw buffer in order to downsample to 128 Hz */
+    int                     m_iFormerDownSampleIndex;           /**< former downsampling Index: serves as flag for managing storage overflow */
     int                     m_iReadToWriteBuffer;               /**< number of samples from the current readindex to current write index */
     int                     m_iWindowSize;
 //    QFile                   m_qFile;
 //    QTextStream             m_sOut;
     //int                     m_iThrottle;                        /**< increment for throtteling sample rate */
+
+    // SSVEP parameter
+    QList<double>           m_lDesFrequencies;                  /**< contains searched frequencies */
+    QList<double>           m_lAllFrequencies;                  /**< contains all serched frequencies and reference frequencies */
+    int                     m_iNumberOfHarmonics;                 /**< number of harmonics which will be searched for */
+    double                  m_dAlpha;                           /**< parameter for softmax function */
+    QList<double>           m_lBetha;                           /**< threshold value for normalized energy probabilities */
 
 
     // Sensor level
