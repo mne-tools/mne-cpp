@@ -44,7 +44,7 @@
 #include "../../disp3D_global.h"
 
 #include "../../helpers/abstracttreeitem.h"
-#include "braintreemetaitem.h"
+#include "../common/metatreeitem.h"
 
 #include "../../helpers/types.h"
 #include "../../helpers/renderable3Dentity.h"
@@ -101,7 +101,7 @@ namespace DISP3DLIB
 */
 class DISP3DNEWSHARED_EXPORT BrainSourceSpaceTreeItem : public AbstractTreeItem
 {
-    Q_OBJECT;
+    Q_OBJECT
 
 public:
     typedef QSharedPointer<BrainSourceSpaceTreeItem> SPtr;             /**< Shared pointer type for BrainSourceSpaceTreeItem class. */
@@ -114,7 +114,7 @@ public:
     * @param[in] iType      The type of the item. See types.h for declaration and definition.
     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
     */
-    explicit BrainSourceSpaceTreeItem(int iType = BrainTreeModelItemTypes::SourceSpaceItem, const QString& text = "Source space");
+    explicit BrainSourceSpaceTreeItem(int iType = Data3DTreeModelItemTypes::SourceSpaceItem, const QString& text = "Source space");
 
     //=========================================================================================================
     /**
@@ -142,16 +142,16 @@ public:
 
     //=========================================================================================================
     /**
-    * Call this slot whenever you want to change the visibilty of the 3D rendered content.
+    * Call this function whenever you want to change the visibilty of the 3D rendered content.
     *
     * @param[in] state     The visiblity flag.
     */
     void setVisible(bool state);
 
-private slots:
+private:
     //=========================================================================================================
     /**
-    * Call this slot whenever the surface color was changed.
+    * Call this function whenever the surface color was changed.
     *
     * @param[in] color        The new surface color.
     */
@@ -159,13 +159,12 @@ private slots:
 
     //=========================================================================================================
     /**
-    * Call this slot whenever the check box of this item was checked.
+    * Call this function whenever the check box of this item was checked.
     *
     * @param[in] checkState        The current checkstate.
     */
     virtual void onCheckStateChanged(const Qt::CheckState& checkState);
 
-private:
     //=========================================================================================================
     /**
     * Creates a QByteArray of colors for given color for the input vertices.
@@ -177,6 +176,8 @@ private:
 
     Qt3DCore::QEntity*      m_pParentEntity;                            /**< The parent 3D entity. */
     Renderable3DEntity*     m_pRenderable3DEntity;                      /**< The renderable 3D entity. */
+
+    QObjectList             m_lChildren;
 
 signals:
     //=========================================================================================================

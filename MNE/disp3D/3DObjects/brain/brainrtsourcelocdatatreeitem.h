@@ -47,7 +47,7 @@
 #include "../../helpers/types.h"
 #include "../../rt/rtSourceLoc/rtsourcelocdataworker.h"
 
-#include "braintreemetaitem.h"
+#include "../common/metatreeitem.h"
 
 #include "fiff/fiff_types.h"
 
@@ -99,7 +99,7 @@ namespace DISP3DLIB
 */
 class DISP3DNEWSHARED_EXPORT BrainRTSourceLocDataTreeItem : public AbstractTreeItem
 {
-    Q_OBJECT;
+    Q_OBJECT
 
 public:
     typedef QSharedPointer<BrainRTSourceLocDataTreeItem> SPtr;             /**< Shared pointer type for BrainRTSourceLocDataTreeItem class. */
@@ -112,7 +112,7 @@ public:
     * @param[in] iType      The type of the item. See types.h for declaration and definition.
     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
     */
-    explicit BrainRTSourceLocDataTreeItem(int iType = BrainTreeModelItemTypes::RTSourceLocDataItem, const QString& text = "RT Source Loc Data");
+    explicit BrainRTSourceLocDataTreeItem(int iType = Data3DTreeModelItemTypes::RTSourceLocDataItem, const QString& text = "RT Source Loc Data");
 
     //=========================================================================================================
     /**
@@ -211,23 +211,22 @@ public:
     /**
     * This function set the normalization value.
     *
-    * @param[in] dNormalization     The new normalization value.
+    * @param[in] vecThresholds     The new threshold values used for normalizing the data.
     */
-    void setNormalization(double dNormalization);
+    void setNormalization(const QVector3D& vecThresholds);
 
-public slots:
     //=========================================================================================================
     /**
-    * This slot gets called whenever the origin of the surface vertex color (curvature, annoation, etc.) changed.
+    * This function gets called whenever the origin of the surface vertex color (curvature, annoation, etc.) changed.
     *
     * @param[in] arrayVertColor     The new vertex colors.
     */
     void onColorInfoOriginChanged(const QByteArray& arrayVertColor);
 
-private slots:
+private:
     //=========================================================================================================
     /**
-    * This slot gets called whenever the check/actiation state of the rt data worker changed.
+    * This function gets called whenever the check/actiation state of the rt data worker changed.
     *
     * @param[in] checkState     The check state of the worker.
     */
@@ -235,7 +234,7 @@ private slots:
 
     //=========================================================================================================
     /**
-    * This slot gets called whenever this item receives new color values for each estimated source.
+    * This function gets called whenever this item receives new color values for each estimated source.
     *
     * @param[in] sourceColorSamples     The color values for each estimated source.
     */
@@ -243,7 +242,7 @@ private slots:
 
     //=========================================================================================================
     /**
-    * This slot gets called whenever the used colormap type changed.
+    * This function gets called whenever the used colormap type changed.
     *
     * @param[in] sColormapType     The name of the new colormap type.
     */
@@ -251,7 +250,7 @@ private slots:
 
     //=========================================================================================================
     /**
-    * This slot gets called whenever the time interval in between the streamed samples changed.
+    * This function gets called whenever the time interval in between the streamed samples changed.
     *
     * @param[in] iMSec     The new time in milliseconds waited in between each streamed sample.
     */
@@ -259,15 +258,15 @@ private slots:
 
     //=========================================================================================================
     /**
-    * This slot gets called whenever the normaization value changed. The normalization value is used to normalize the estimated source activation.
+    * This function gets called whenever the normaization value changed. The normalization value is used to normalize the estimated source activation.
     *
-    * @param[in] iMSec     The new time normalization value.
+    * @param[in] vecThresholds     The new threshold values used for normalizing the data.
     */
-    void onDataNormalizationValueChanged(double dValue);
+    void onDataNormalizationValueChanged(const QVector3D& vecThresholds);
 
     //=========================================================================================================
     /**
-    * This slot gets called whenever the preferred visualization type changes (single vertex, smoothing, annotation based). This functions translates from QString to m_iVisualizationType.
+    * This function gets called whenever the preferred visualization type changes (single vertex, smoothing, annotation based). This functions translates from QString to m_iVisualizationType.
     *
     * @param[in] sVisType     The new visualization type.
     */
@@ -275,7 +274,7 @@ private slots:
 
     //=========================================================================================================
     /**
-    * This slot gets called whenever the check/actiation state of the looped streaming state changed.
+    * This function gets called whenever the check/actiation state of the looped streaming state changed.
     *
     * @param[in] checkState     The check state of the looped streaming state.
     */
@@ -283,13 +282,12 @@ private slots:
 
     //=========================================================================================================
     /**
-    * This slot gets called whenever the number of averages of the streamed samples changed.
+    * This function gets called whenever the number of averages of the streamed samples changed.
     *
     * @param[in] iNumAvr     The new number of averages.
     */
     void onNumberAveragesChanged(int iNumAvr);
 
-private:
     bool                        m_bIsInit;                      /**< The init flag. */
 
     RtSourceLocDataWorker*      m_pSourceLocRtDataWorker;       /**< The source data worker. This worker streams the rt data to this item.*/

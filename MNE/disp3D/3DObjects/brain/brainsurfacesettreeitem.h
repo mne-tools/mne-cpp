@@ -94,7 +94,7 @@ namespace DISP3DLIB
 */
 class DISP3DNEWSHARED_EXPORT BrainSurfaceSetTreeItem : public AbstractTreeItem
 {
-    Q_OBJECT;
+    Q_OBJECT
 
 public:
     typedef QSharedPointer<BrainSurfaceSetTreeItem> SPtr;             /**< Shared pointer type for BrainSurfaceSetTreeItem class. */
@@ -107,7 +107,7 @@ public:
     * @param[in] iType      The type of the item. See types.h for declaration and definition.
     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
     */
-    explicit BrainSurfaceSetTreeItem(int iType = BrainTreeModelItemTypes::SurfaceSetItem, const QString& text = "");
+    explicit BrainSurfaceSetTreeItem(int iType = Data3DTreeModelItemTypes::SurfaceSetItem, const QString& text = "");
 
     //=========================================================================================================
     /**
@@ -157,10 +157,10 @@ public:
     */
     bool addData(const MNELIB::MNESourceSpace& tSourceSpace, Qt3DCore::QEntity* p3DEntityParent = 0);
 
-private slots:
+private:
     //=========================================================================================================
     /**
-    * Call this slot whenever the check box of this item was checked.
+    * Call this function whenever the check box of this item was checked.
     *
     * @param[in] checkState        The current checkstate.
     */

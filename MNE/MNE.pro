@@ -46,9 +46,9 @@ SUBDIRS += \
     inverse \
     rtCommand \
     rtClient \
-    rtProcessing\
+    rtProcessing \
 
-contains(MNECPP_CONFIG, withGui) {
+!contains(MNECPP_CONFIG, minimalVersion) {
     SUBDIRS += disp
 
     qtHaveModule(3dcore,3drender,3dinput) {
@@ -56,10 +56,6 @@ contains(MNECPP_CONFIG, withGui) {
         SUBDIRS += \
             disp3D \
     }
-}
-
-contains(MNECPP_CONFIG, withPython) {
-    SUBDIRS += pyio
 }
 
 CONFIG += ordered

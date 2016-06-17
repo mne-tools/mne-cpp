@@ -109,7 +109,7 @@ public:
     *
     * @param[in] parent      The parent of the QObject.
     */
-    RtSourceLocDataWorker(QObject* parent = 0);
+    explicit RtSourceLocDataWorker(QObject* parent = 0);
 
     //=========================================================================================================
     /**
@@ -185,9 +185,9 @@ public:
     /**
     * Set the normalization value.
     *
-    * @param[in] dValue                 The new normalization value.
+    * @param[in] dValue                 The new threshold values used for normalizing the data.
     */
-    void setNormalization(const double& dValue);
+    void setNormalization(const QVector3D &vecThresholds);
 
     //=========================================================================================================
     /**
@@ -252,6 +252,8 @@ private:
     double                  m_dNormalizationMax;    /**< Value to normalize to. */
 
     QString                 m_sColormap;            /**< The type of colormap ("Hot", "Hot Negative 1", etc.). */
+
+    QVector3D               m_vecThresholds;        /**< The threshold values used for normalizing the data. */
 
     QList<FSLIB::Label>     m_lLabels;              /**< The list of current labels. */
     QMap<qint32, qint32>    m_mapLabelIdSources;    /**< The sources mapped to their corresponding labels. */

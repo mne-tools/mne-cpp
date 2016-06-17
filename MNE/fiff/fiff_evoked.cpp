@@ -478,7 +478,7 @@ bool FiffEvoked::read(QIODevice& p_IODevice, FiffEvoked& p_FiffEvoked, QVariant 
 
     // Run baseline correction
     all_data = MNEMath::rescale(all_data, times, t_baseline, QString("mean"));
-    printf("Applying baseline correction ... (mode: mean)");
+    printf("Applying baseline correction ... (mode: mean)\n");
 
     // Put it all together
     p_FiffEvoked.info = info;
