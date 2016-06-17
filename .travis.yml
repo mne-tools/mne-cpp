@@ -30,6 +30,11 @@ matrix:
       dist: trusty
       sudo: required
       compiler: gcc
+      env: BUILD=linux_minimal
+    - os: linux
+      dist: trusty
+      sudo: required
+      compiler: gcc
       env: BUILD=linux_tests
     - os: linux
       dist: trusty
