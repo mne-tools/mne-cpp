@@ -168,93 +168,65 @@ void Spline::setThreshold(const QVector3D& vecThresholdValues)
     float middleThresholdValue;
     float rightThresholdValue;
 
+    QVector3D correctedVectorThreshold = correctionDisplayTrueValue(vecThresholdValues, "up");
+
     if (series->count() == 0)               //protect integrity of the histogram widget in case series contain no data values
     {
         qDebug() << "Data set not found.";
     }
 
 //    the condition below tests the threshold values given and ensures that all three must be within minAxisX and maxAxisX otherwise they will be given either minAxisX or maxAxisX value
-    else if (vecThresholdValues.x() < minAxisX || vecThresholdValues.y() < minAxisX || vecThresholdValues.z() < minAxisX || vecThresholdValues.x() > maxAxisX || vecThresholdValues.y() > maxAxisX || vecThresholdValues.z() > maxAxisX)
+    else if (correctedVectorThreshold.x() < minAxisX || correctedVectorThreshold.y() < minAxisX || correctedVectorThreshold.z() < minAxisX || correctedVectorThreshold.x() > maxAxisX || correctedVectorThreshold.y() > maxAxisX || correctedVectorThreshold.z() > maxAxisX)
     {
         qDebug() << "One or more of the values given are out of the minimum and maximum range. Changed to default thresholds.";
-        leftThresholdValue = minAxisX + (0.01 * minAxisX);
+        leftThresholdValue = 1.01 * minAxisX;
         middleThresholdValue = (minAxisX + maxAxisX)/2;
-        rightThresholdValue = maxAxisX - (0.01 * maxAxisX);
-//        if(vecThresholdValues.x() < minAxisX)
-//        {
-//            leftThresholdValue = minAxisX;
-//            qDebug() << "first threshold changed to minimum X-Axis value = " << leftThresholdValue;
-//        }
-//        else if(vecThresholdValues.x() > maxAxisX)
-//        {
-//            leftThresholdValue = maxAxisX;
-//            qDebug() << "first threshold changed to maximum X-Axis value = " << leftThresholdValue;
-//        }
-//        if(vecThresholdValues.y() < minAxisX)
-//        {
-//            middleThresholdValue = minAxisX;
-//            qDebug() << "second threshold changed to minimum X-Axis value.= " << middleThresholdValue;
-//        }
-//        else if(vecThresholdValues.y() > maxAxisX)
-//        {
-//            middleThresholdValue = maxAxisX;
-//            qDebug() << "second threshold changed to maximum X-Axis value.= " << middleThresholdValue;
-//        }
-//        if(vecThresholdValues.z() < minAxisX)
-//        {
-//            rightThresholdValue = minAxisX;
-//            qDebug() << "third threshold changed to minimum X-Axis value.= " << rightThresholdValue;
-//        }
-//        else if(vecThresholdValues.z() > maxAxisX)
-//        {
-//            rightThresholdValue = maxAxisX;
-//            qDebug() << "third threshold changed to maximum X-Axis value.= " << rightThresholdValue;
-//        }
+        rightThresholdValue = 0.99 * maxAxisX;
     }
     else
     {
-        if ((vecThresholdValues.x() < vecThresholdValues.y()) && (vecThresholdValues.x() < vecThresholdValues.z()))
+        if ((correctedVectorThreshold.x() < correctedVectorThreshold.y()) && (correctedVectorThreshold.x() < correctedVectorThreshold.z()))
         {
-            leftThresholdValue = vecThresholdValues.x();
-            if(vecThresholdValues.y() < vecThresholdValues.z())
+            leftThresholdValue = correctedVectorThreshold.x();
+            if(correctedVectorThreshold.y() < correctedVectorThreshold.z())
             {
-                middleThresholdValue = vecThresholdValues.y();
-                rightThresholdValue = vecThresholdValues.z();
+                middleThresholdValue = correctedVectorThreshold.y();
+                rightThresholdValue = correctedVectorThreshold.z();
             }
             else
             {
-                middleThresholdValue = vecThresholdValues.z();
-                rightThresholdValue = vecThresholdValues.y();
+                middleThresholdValue = correctedVectorThreshold.z();
+                rightThresholdValue = correctedVectorThreshold.y();
             }
         }
-        if ((vecThresholdValues.y() < vecThresholdValues.x()) && (vecThresholdValues.y() < vecThresholdValues.z()))
+        if ((correctedVectorThreshold.y() < correctedVectorThreshold.x()) && (correctedVectorThreshold.y() < correctedVectorThreshold.z()))
         {
-            leftThresholdValue = vecThresholdValues.y();
+            leftThresholdValue = correctedVectorThreshold.y();
 
-            if(vecThresholdValues.x() < vecThresholdValues.z())
+            if(correctedVectorThreshold.x() < correctedVectorThreshold.z())
             {
-                middleThresholdValue = vecThresholdValues.x();
-                rightThresholdValue = vecThresholdValues.z();
+                middleThresholdValue = correctedVectorThreshold.x();
+                rightThresholdValue = correctedVectorThreshold.z();
             }
             else
             {
-                middleThresholdValue = vecThresholdValues.z();
-                rightThresholdValue = vecThresholdValues.x();
+                middleThresholdValue = correctedVectorThreshold.z();
+                rightThresholdValue = correctedVectorThreshold.x();
             }
         }
-        if ((vecThresholdValues.z() < vecThresholdValues.x()) && (vecThresholdValues.z() < vecThresholdValues.y()))
+        if ((correctedVectorThreshold.z() < correctedVectorThreshold.x()) && (correctedVectorThreshold.z() < correctedVectorThreshold.y()))
         {
-            leftThresholdValue = vecThresholdValues.z();
+            leftThresholdValue = correctedVectorThreshold.z();
 
-            if(vecThresholdValues.x() < vecThresholdValues.y())
+            if(correctedVectorThreshold.x() < correctedVectorThreshold.y())
             {
-                middleThresholdValue = vecThresholdValues.x();
-                rightThresholdValue = vecThresholdValues.y();
+                middleThresholdValue = correctedVectorThreshold.x();
+                rightThresholdValue = correctedVectorThreshold.y();
             }
             else
             {
-                middleThresholdValue = vecThresholdValues.y();
-                rightThresholdValue = vecThresholdValues.x();
+                middleThresholdValue = correctedVectorThreshold.y();
+                rightThresholdValue = correctedVectorThreshold.x();
             }
         }
     }
@@ -311,7 +283,7 @@ void Spline::updateThreshold (QLineSeries* lineSeries)
 
 //*************************************************************************************************************
 
-const QList<QVector3D> &Spline::getThreshold()
+const QVector3D &Spline::getThreshold()
 {
     qDebug() << "getThreshold function starts!";
     QVector<QPointF> middlePoint = middleThreshold->pointsVector();   //Point values need to be updated before tested and displayed on the widget
@@ -320,20 +292,13 @@ const QList<QVector3D> &Spline::getThreshold()
     float emitLeft = leftPoint[0].x();
     float emitMiddle = middlePoint[0].x();
     float emitRight = rightPoint[0].x();
-    QVector3D vec3DDisplayVector;
-    vec3DDisplayVector.setX(emitLeft);
-    vec3DDisplayVector.setY(emitMiddle);
-    vec3DDisplayVector.setZ(emitRight);
-    QVector3D vec3DRealVector = correctionDisplayTrueValue(vec3DDisplayVector, "down");
-//    vec3DRealVector.setX(emitLeft * (pow(10, resultExponentValues[0])));
-//    vec3DRealVector.setY(emitMiddle * (pow(10, resultExponentValues[0])));
-//    vec3DRealVector.setZ(emitRight * (pow(10, resultExponentValues[0])));
-    qDebug() << "getThreshold: vec3DDisplayVector = " << vec3DDisplayVector;
-    qDebug() << "getThreshold: vec3DReturnVector = " << vec3DRealVector;
-    returnList.clear();
-    returnList.append(vec3DDisplayVector);
-    returnList.append(vec3DRealVector);
-    return (returnList);
+    QVector3D originalVector;
+    originalVector.setX(emitLeft);
+    originalVector.setY(emitMiddle);
+    originalVector.setZ(emitRight);
+    QVector3D returnVector = correctionDisplayTrueValue(originalVector, "down");
+    qDebug() << "getThreshold: returnVector = " << returnVector;
+    return returnVector;
 }
 
 

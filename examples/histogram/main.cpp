@@ -366,8 +366,6 @@ int main(int argc, char *argv[])
     displayObj->setData(dataSine, resultFrequency, precision);
     QVector3D thresholdLines2(5.0, 15.0, 25.0);
     displayObj->setThreshold(thresholdLines2);
-    QList<QVector3D> foo = displayObj->getThreshold();
-    qDebug()<< "getThreshold = " << foo;
     qDebug()<<"Histogram timer:"<<myTimerHistogram.elapsed();
 
     displayObj->resize(400,300);

@@ -104,6 +104,7 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
              Spline* pSpline = new Spline("Spline Histogram", 0);
              connect(pSpline, static_cast<void (Spline::*)(double, double, double)>(&Spline::borderChanged),
                      this, &Data3DTreeDelegate::onEditorEdited);
+             pSpline->resize(600,800);
              return pSpline;
         }
 
@@ -237,12 +238,9 @@ void Data3DTreeDelegate::setEditorData(QWidget* editor, const QModelIndex& index
             Eigen::VectorXd resultClassLimit;
             Eigen::VectorXi resultFrequency;
             MNEMath::histcounts(matRTData, false, 50, resultClassLimit, resultFrequency, 0.0, 0.0);
-            qDebug()<< "debug before setData.";
             pSpline->setData(resultClassLimit, resultFrequency, 0);
             QVector3D vecThresholdValues = index.model()->data(index, MetaTreeItemRoles::RTDataNormalizationValue).value<QVector3D>();
-            QVector3D vecCorrectedThreshold = pSpline->correctionDisplayTrueValue(vecThresholdValues, "up");
-            qDebug()<< "VECTHRESHOLDVALUES (RTDATANORMALIZATIONVALUE) = " << vecCorrectedThreshold;
-            pSpline->setThreshold(vecCorrectedThreshold);
+            pSpline->setThreshold(vecThresholdValues);
             return;
         }
 
@@ -351,24 +349,18 @@ void Data3DTreeDelegate::setModelData(QWidget* editor, QAbstractItemModel* model
         }
 
         case MetaTreeItemTypes::RTDataNormalizationValue: {
-            qDebug() << "MetaTreeItemTypes::RTDataNormalizationValue starts!";
+            //qDebug() << "MetaTreeItemTypes::RTDataNormalizationValue starts!";
             Spline* pSpline = static_cast<Spline*>(editor);
-            QVariant dataDisplay;
-            QList<QVector3D> returnVector;
+            QVector3D returnVector;
             returnVector = pSpline->getThreshold();
-            QVector3D vecDisplayThreshold;
-            vecDisplayThreshold = returnVector.at(0);
 
             QString displayThreshold;
-            displayThreshold = QString("%1,%2,%3").arg(vecDisplayThreshold.x()).arg(vecDisplayThreshold.y()).arg(vecDisplayThreshold.z());
+            displayThreshold = QString("%1,%2,%3").arg(returnVector.x()).arg(returnVector.y()).arg(returnVector.z());
+            QVariant dataDisplay;
             dataDisplay.setValue(displayThreshold);
             model->setData(index, dataDisplay, Qt::DisplayRole);
 
-            QVariant dataNormalization;
-            dataNormalization.setValue(returnVector.at(1));
-            model->setData(index, dataNormalization, MetaTreeItemRoles::RTDataNormalizationValue);
-            qDebug() << "model->setData DisplayRole = " << dataDisplay;
-            qDebug()<< "RTDataNormalizationValue = " << dataNormalization;
+            model->setData(index, returnVector, MetaTreeItemRoles::RTDataNormalizationValue);
             return;
         }
 
