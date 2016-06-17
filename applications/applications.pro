@@ -40,7 +40,7 @@ TEMPLATE = subdirs
 SUBDIRS += \
     mne_rt_server\
 
-!contains(MNECPP_CONFIG, noGui) {
+!contains(MNECPP_CONFIG, minimalVersion) {
     SUBDIRS += \
         mne_x_libs \
         mne_x
