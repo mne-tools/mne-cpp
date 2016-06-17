@@ -44,7 +44,7 @@
 #include "../../disp3D_global.h"
 
 #include "../../helpers/abstracttreeitem.h"
-#include "braintreemetaitem.h"
+#include "../common/metatreeitem.h"
 
 #include "../../helpers/types.h"
 
@@ -97,7 +97,7 @@ namespace DISP3DLIB
 */
 class DISP3DNEWSHARED_EXPORT BrainAnnotationTreeItem : public AbstractTreeItem
 {
-    Q_OBJECT;
+    Q_OBJECT
 
 public:
     typedef QSharedPointer<BrainAnnotationTreeItem> SPtr;             /**< Shared pointer type for BrainAnnotationTreeItem class. */
@@ -110,7 +110,7 @@ public:
     * @param[in] iType      The type of the item. See types.h for declaration and definition.
     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
     */
-    explicit BrainAnnotationTreeItem(int iType = BrainTreeModelItemTypes::AnnotationItem, const QString& text = "Annotation" );
+    explicit BrainAnnotationTreeItem(int iType = Data3DTreeModelItemTypes::AnnotationItem, const QString& text = "Annotation" );
 
     //=========================================================================================================
     /**
@@ -136,10 +136,10 @@ public:
     */
     bool addData(const FSLIB::Surface& tSurface, const FSLIB::Annotation& tAnnotation);
 
-private slots:
+private:
     //=========================================================================================================
     /**
-    * Call this slot whenever the check box of this item was checked.
+    * Call this function whenever the check box of this item was checked.
     *
     * @param[in] checkState        The current checkstate.
     */

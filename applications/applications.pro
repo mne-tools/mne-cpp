@@ -40,7 +40,7 @@ TEMPLATE = subdirs
 SUBDIRS += \
     mne_rt_server\
 
-contains(MNECPP_CONFIG, withGui) {
+!contains(MNECPP_CONFIG, minimalVersion) {
     SUBDIRS += \
         mne_x_libs \
         mne_x
@@ -54,8 +54,6 @@ contains(MNECPP_CONFIG, withGui) {
     qtHaveModule(3dcore,3drender,3dinput) {
         message(applications.pro - Qt3D available)
         SUBDIRS += \
-            mne_viewer \
-            mne_viewer_parent \
             mne_matching_pursuit \
             mne_analyze_qt
     }

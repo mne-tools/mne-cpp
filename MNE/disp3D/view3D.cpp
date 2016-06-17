@@ -63,9 +63,10 @@ View3D::View3D()
 , m_pCameraEntity(new Qt3DCore::QCamera(m_pRootEntity))
 , m_pFrameGraph(new Qt3DRender::QFrameGraph())
 , m_pForwardRenderer(new Qt3DRender::QForwardRenderer())
-, m_pBrain(Brain::SPtr(new Brain(m_pRootEntity)))
+, m_pData3DTreeModel(Data3DTreeModel::SPtr(new Data3DTreeModel(0, m_pRootEntity)))
 , m_bCameraRotationMode(false)
 , m_bCameraTransMode(false)
+, m_bModelRotationMode(false)
 , m_vecCameraTrans(QVector3D(0.0,0.0,-0.5))
 , m_vecCameraTransOld(QVector3D(0.0,0.0,-0.5))
 , m_vecCameraRotation(QVector3D(0.0,0.0,0.0))
@@ -169,49 +170,57 @@ void View3D::initTransformations()
 
 //*************************************************************************************************************
 
-bool View3D::addBrainData(const QString& text, const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet)
+bool View3D::addBrainData(const QString& subject, const QString& set, const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet)
 {
-    return m_pBrain->addData(text, tSurfaceSet, tAnnotationSet);
+    return m_pData3DTreeModel->addData(subject, set, tSurfaceSet, tAnnotationSet);
 }
 
 
 //*************************************************************************************************************
 
-bool View3D::addBrainData(const QString& text, const Surface& tSurface, const Annotation& tAnnotation)
+bool View3D::addBrainData(const QString& subject, const QString& set, const Surface& tSurface, const Annotation& tAnnotation)
 {
-    return m_pBrain->addData(text, tSurface, tAnnotation);
+    return m_pData3DTreeModel->addData(subject, set, tSurface, tAnnotation);
 }
 
 
 //*************************************************************************************************************
 
-bool View3D::addBrainData(const QString& text, const MNESourceSpace& tSourceSpace)
+bool View3D::addBrainData(const QString& subject, const QString& set, const MNESourceSpace& tSourceSpace)
 {
-    return m_pBrain->addData(text, tSourceSpace);
+    return m_pData3DTreeModel->addData(subject, set, tSourceSpace);
 }
 
 
 //*************************************************************************************************************
 
-bool View3D::addBrainData(const QString& text, const MNEForwardSolution& tForwardSolution)
+bool View3D::addBrainData(const QString& subject, const QString& set, const MNEForwardSolution& tForwardSolution)
 {
-    return m_pBrain->addData(text, tForwardSolution.src);
+    return m_pData3DTreeModel->addData(subject, set, tForwardSolution.src);
 }
 
 
 //*************************************************************************************************************
 
-QList<BrainRTSourceLocDataTreeItem*> View3D::addRtBrainData(const QString& text, const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution)
+QList<BrainRTSourceLocDataTreeItem*> View3D::addRtBrainData(const QString& subject, const QString& set, const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution)
 {
-    return m_pBrain->addData(text, tSourceEstimate, tForwardSolution);
+    return m_pData3DTreeModel->addData(subject, set, tSourceEstimate, tForwardSolution);
 }
 
 
 //*************************************************************************************************************
 
-BrainTreeModel* View3D::getBrainTreeModel()
+bool View3D::addBemData(const QString& subject, const QString& set, const MNELIB::MNEBem& tBem)
 {
-    return m_pBrain->getBrainTreeModel();
+    return m_pData3DTreeModel->addData(subject, set, tBem);
+}
+
+
+//*************************************************************************************************************
+
+Data3DTreeModel* View3D::getData3DTreeModel()
+{
+    return m_pData3DTreeModel.data();
 }
 
 
@@ -225,13 +234,67 @@ void View3D::setSceneColor(const QColor& colSceneColor)
 
 //*************************************************************************************************************
 
+Qt3DCore::QEntity* View3D::get3DRootEntity()
+{
+    return m_pRootEntity;
+}
+
+
+//*************************************************************************************************************
+
+void View3D::startModelRotation()
+{
+    //Start animation
+    m_lPropertyAnimations.clear();
+
+    for(int i = 0; i < m_pRootEntity->children().size(); ++i) {
+        if(Renderable3DEntity* pItem = dynamic_cast<Renderable3DEntity*>(m_pRootEntity->children().at(i))) {
+            QPropertyAnimation *anim = new QPropertyAnimation(pItem, QByteArrayLiteral("rotZ"));
+            anim->setDuration(30000);
+            anim->setStartValue(QVariant::fromValue(pItem->rotZ()));
+            anim->setEndValue(QVariant::fromValue(pItem->rotZ() + 360.0f));
+            anim->setLoopCount(-1);
+            anim->start();
+            m_lPropertyAnimations << anim;
+        }
+    }
+}
+
+
+//*************************************************************************************************************
+
+void View3D::stopModelRotation()
+{
+    for(int i = 0; i < m_lPropertyAnimations.size(); ++i) {
+        m_lPropertyAnimations.at(i)->stop();
+    }
+}
+
+
+//*************************************************************************************************************
+
 void View3D::keyPressEvent(QKeyEvent* e)
 {
-    qDebug()<<"key press";
     switch ( e->key() )
     {
         case Qt::Key_Space:
-            //Translate
+            m_bModelRotationMode = true;
+            break;
+
+        default:
+            Window::keyPressEvent(e);
+    }
+}
+
+
+//*************************************************************************************************************
+
+void View3D::keyReleaseEvent(QKeyEvent* e)
+{
+    switch ( e->key() )
+    {
+        case Qt::Key_Space:
+            m_bModelRotationMode = false;
             break;
 
         default:
@@ -299,8 +362,20 @@ void View3D::mouseMoveEvent(QMouseEvent* e)
         m_vecCameraRotation.setX(((e->pos().y() - m_mousePressPositon.y()) * 0.1f) + m_vecCameraRotationOld.x());
         m_vecCameraRotation.setY(((e->pos().x() - m_mousePressPositon.x()) * 0.1f) + m_vecCameraRotationOld.y());
 
-        m_pCameraTransform->setRotationX(m_vecCameraRotation.x());
-        m_pCameraTransform->setRotationY(m_vecCameraRotation.y());
+        //Rotate all surface objects
+        if(!m_bModelRotationMode) {
+            //Rotate camera
+            m_pCameraTransform->setRotationX(m_vecCameraRotation.x());
+            m_pCameraTransform->setRotationY(m_vecCameraRotation.y());
+        } else {
+            //Rotate all surface objects
+            for(int i = 0; i < m_pRootEntity->children().size(); ++i) {
+                if(Renderable3DEntity* pItem = dynamic_cast<Renderable3DEntity*>(m_pRootEntity->children().at(i))) {
+                    pItem->setRotZ(m_vecCameraRotation.y());
+                    pItem->setRotX(90+m_vecCameraRotation.x());
+                }
+            }
+        }
     }
 
     if(m_bCameraTransMode) {
@@ -321,8 +396,8 @@ void View3D::createCoordSystem(Qt3DCore::QEntity* parent)
 {
     // Y - red
     Qt3DRender::QCylinderMesh *YAxis = new Qt3DRender::QCylinderMesh();
-    YAxis->setRadius(0.1f);
-    YAxis->setLength(3);
+    YAxis->setRadius(0.001f);
+    YAxis->setLength(30);
     YAxis->setRings(100);
     YAxis->setSlices(20);
 
@@ -338,13 +413,13 @@ void View3D::createCoordSystem(Qt3DCore::QEntity* parent)
 
     // Z - blue
     Qt3DRender::QCylinderMesh *ZAxis = new Qt3DRender::QCylinderMesh();
-    ZAxis->setRadius(0.1f);
-    ZAxis->setLength(3);
+    ZAxis->setRadius(0.001f);
+    ZAxis->setLength(30);
     ZAxis->setRings(100);
     ZAxis->setSlices(20);
 
     Qt3DCore::QTransform *transformZ = new Qt3DCore::QTransform();
-    transformZ->setRotation(QQuaternion::fromAxisAndAngle(QVector3D(1,0,0), 90));
+    transformZ->setRotation(QQuaternion::fromAxisAndAngle(QVector3D(0,0,1), 90));
 
     m_ZAxisEntity = QSharedPointer<Qt3DCore::QEntity>(new Qt3DCore::QEntity(parent));
     m_ZAxisEntity->addComponent(ZAxis);
@@ -359,13 +434,13 @@ void View3D::createCoordSystem(Qt3DCore::QEntity* parent)
 
     // X - green
     Qt3DRender::QCylinderMesh *XAxis = new Qt3DRender::QCylinderMesh();
-    XAxis->setRadius(0.1f);
-    XAxis->setLength(3);
+    XAxis->setRadius(0.001f);
+    XAxis->setLength(30);
     XAxis->setRings(100);
     XAxis->setSlices(20);
 
     Qt3DCore::QTransform *transformX = new Qt3DCore::QTransform();
-    transformX->setRotation(QQuaternion::fromAxisAndAngle(QVector3D(0,0,1), 90));
+    transformX->setRotation(QQuaternion::fromAxisAndAngle(QVector3D(1,0,0), 90));
 
     m_XAxisEntity = QSharedPointer<Qt3DCore::QEntity>(new Qt3DCore::QEntity(parent));
     m_XAxisEntity->addComponent(XAxis);
@@ -378,5 +453,3 @@ void View3D::createCoordSystem(Qt3DCore::QEntity* parent)
     phongMaterialX->setShininess(50.0f);
     m_XAxisEntity->addComponent(phongMaterialX);
 }
-
-

@@ -61,7 +61,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace RTINVLIB;
+using namespace RTPROCLIB;
 using namespace FIFFLIB;
 using namespace UTILSLIB;
 
@@ -464,6 +464,7 @@ bool RtAve::checkForArtifact(MatrixXd& data, double dThreshold)
 //        }
 //    }
 
+    //This is the channel index to scan for artifacts
     int i = 5;
 
     min = data.row(i).minCoeff();

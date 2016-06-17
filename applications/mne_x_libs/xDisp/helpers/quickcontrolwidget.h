@@ -333,7 +333,6 @@ protected slots:
     */
     void onUserFilterToggled(bool state);
 
-
     //=========================================================================================================
     /**
     * Slot called when the sphara tool was toggled

@@ -92,6 +92,10 @@ namespace DISP3DLIB
 class DISP3DNEWSHARED_EXPORT Renderable3DEntity : public Qt3DCore::QEntity
 {
     Q_OBJECT
+    Q_PROPERTY(float rotX READ rotX WRITE setRotX NOTIFY rotXChanged)
+    Q_PROPERTY(float rotY READ rotY WRITE setRotY NOTIFY rotYChanged)
+    Q_PROPERTY(float rotZ READ rotZ WRITE setRotZ NOTIFY rotZChanged)
+    Q_PROPERTY(QVector3D position READ position WRITE setPosition NOTIFY positionChanged)
 
 public:
     typedef QSharedPointer<Renderable3DEntity> SPtr;             /**< Shared pointer type for Renderable3DEntity class. */
@@ -103,7 +107,7 @@ public:
     *
     * @param[in] parent         The parent of this entity.
     */
-    Renderable3DEntity(Qt3DCore::QEntity* parent = 0);
+    explicit Renderable3DEntity(Qt3DCore::QEntity* parent = 0);
 
     //=========================================================================================================
     /**
@@ -112,10 +116,9 @@ public:
     * @param[in] tMatVert       Vertices in form of a matrix.
     * @param[in] tMatNorm       Normals in form of a matrix.
     * @param[in] tMatTris       Tris/Faces in form of a matrix.
-    * @param[in] tVecOffset     The offset which is to be used on all the vertices.
     * @param[in] parent         The parent of this class.
     */
-    Renderable3DEntity(const Eigen::MatrixX3f& tMatVert, const Eigen::MatrixX3f& tMatNorm, const Eigen::MatrixX3i& tMatTris, const Eigen::Vector3f& tVecOffset, Qt3DCore::QEntity* parent = 0);
+    Renderable3DEntity(const Eigen::MatrixX3f& tMatVert, const Eigen::MatrixX3f& tMatNorm, const Eigen::MatrixX3i& tMatTris, Qt3DCore::QEntity* parent = 0);
 
     //=========================================================================================================
     /**
@@ -138,11 +141,10 @@ public:
     * @param[in] tMatVert       Vertices in form of a matrix.
     * @param[in] tMatNorm       Normals in form of a matrix.
     * @param[in] tMatTris       Tris/Faces in form of a matrix.
-    * @param[in] tVecOffset     The offset which is to be used on all the vertices.
     *
     * @return If successful returns true, false otherwise.
     */
-    bool setMeshData(const Eigen::MatrixX3f& tMatVert, const Eigen::MatrixX3f& tMatNorm, const Eigen::MatrixX3i& tMatTris, const Eigen::Vector3f& tVecOffset, const QByteArray &tArrayColors = QByteArray());
+    bool setMeshData(const Eigen::MatrixX3f& tMatVert, const Eigen::MatrixX3f& tMatNorm, const Eigen::MatrixX3i& tMatTris, const QByteArray &tArrayColors = QByteArray());
 
     //=========================================================================================================
     /**
@@ -172,14 +174,122 @@ public:
     *
     * @return If successful returns true, false otherwise.
     */
-   bool setAlpha(float fAlpha);
+    bool setAlpha(float fAlpha);
 
-protected:
-    CustomMesh::SPtr                                m_pCustomMesh;          /**< The actual mesh information (vertices, normals, colors). */
-    QSharedPointer<Qt3DCore::QTransform>            m_pTransform;           /**< The main transformation. */
-    QSharedPointer<Qt3DRender::QMaterial>           m_pMaterial;            /**< The material to be used for this entity. */
+    //=========================================================================================================
+    /**
+    * Returns the current rotation around the x-axis.
+    *
+    * @return The x-axis rotation value.
+    */
+    float rotX() const;
 
-    float                                           m_fAlpha;               /**< The alpha value. */
+    //=========================================================================================================
+    /**
+    * Returns the current rotation around the y-axis.
+    *
+    * @return The y-axis rotation value.
+    */
+    float rotY() const;
+
+    //=========================================================================================================
+    /**
+    * Returns the current rotation around the z-axis.
+    *
+    * @return The z-axis rotation value.
+    */
+    float rotZ() const;
+
+    //=========================================================================================================
+    /**
+    * Returns the current position/translation.
+    *
+    * @return The position/translation value.
+    */
+    QVector3D position() const;
+
+    //=========================================================================================================
+    /**
+    * Sets the current rotation around the x-axis.
+    *
+    * @param[in] rotX     The x-axis rotation value.
+    */
+    void setRotX(float rotX);
+
+    //=========================================================================================================
+    /**
+    * Sets the current rotation around the y-axis.
+    *
+    * @param[in] rotY     The y-axis rotation value.
+    */
+    void setRotY(float rotY);
+
+    //=========================================================================================================
+    /**
+    * Sets the current rotation around the z-axis.
+    *
+    * @param[in] rotZ     The z-axis rotation value.
+    */
+    void setRotZ(float rotZ);
+
+    //=========================================================================================================
+    /**
+    * Sets the current position/translation.
+    *
+    * @param[in] position     The position/translation value.
+    */
+    void setPosition(QVector3D position);
+
+protected: 
+    CustomMesh::SPtr                                m_pCustomMesh;           /**< The actual mesh information (vertices, normals, colors). */
+    QSharedPointer<Qt3DCore::QTransform>            m_pTransform;            /**< The main transformation. */
+    QSharedPointer<Qt3DRender::QMaterial>           m_pMaterial;             /**< The material to be used for this entity. */
+
+    float                                           m_fRotX;                 /**< The x axis rotation value. */
+    float                                           m_fRotY;                 /**< The y axis rotation value. */
+    float                                           m_fRotZ;                 /**< The z axis rotation value. */
+    QVector3D                                       m_position;              /**< The position/translation value. */
+    float                                           m_fAlpha;                /**< The alpha value. */
+
+    //=========================================================================================================
+    /**
+    * Update the set transformation with the currently set translation and rotation values.
+    */
+    void updateTransform();
+
+signals:
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the x-axis rotation changed.
+    *
+    * @param[in] rotX     The x-axis rotation value.
+    */
+    void rotXChanged(float rotX);
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the y-axis rotation changed.
+    *
+    * @param[in] rotY     The y-axis rotation value.
+    */
+    void rotYChanged(float rotY);
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the z-axis rotation changed.
+    *
+    * @param[in] rotZ     The z-axis rotation value.
+    */
+    void rotZChanged(float rotZ);
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the position/translation changed.
+    *
+    * @param[in] position     The position/translation value.
+    */
+    void positionChanged(QVector3D position);
+
 };
 
 } // NAMESPACE

@@ -81,7 +81,7 @@ namespace DISP3DLIB
 */
 class AbstractTreeItem : public QObject, public QStandardItem
 {
-    Q_OBJECT;
+    Q_OBJECT
 
 public :
     //=========================================================================================================
@@ -138,16 +138,15 @@ public :
     */
     AbstractTreeItem &operator<<(AbstractTreeItem& newItem);
 
-protected slots:
+protected:
     //=========================================================================================================
     /**
-    * Call this slot whenever the check box of this item was checked.
+    * Call this function whenever the check box of this item was checked.
     *
     * @param[in] checkState        The current checkstate.
     */
     virtual void onCheckStateChanged(const Qt::CheckState& checkState);
 
-protected:
     int     m_iType;        /**< This item's type. */
 
 signals:

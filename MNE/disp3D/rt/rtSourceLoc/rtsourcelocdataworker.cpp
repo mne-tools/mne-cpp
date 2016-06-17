@@ -72,7 +72,7 @@ RtSourceLocDataWorker::RtSourceLocDataWorker(QObject* parent)
 , m_bIsLooping(true)
 , m_iAverageSamples(1)
 , m_iCurrentSample(0)
-, m_iVisualizationType(BrainRTDataVisualizationTypes::VertexBased)
+, m_iVisualizationType(Data3DTreeModelItemRoles::VertexBased)
 , m_iMSecIntervall(1000)
 , m_sColormap("Hot Negative 2")
 , m_dNormalization(1.0)
@@ -123,7 +123,7 @@ void RtSourceLocDataWorker::setSurfaceData(const QByteArray& arraySurfaceVertCol
     QMutexLocker locker(&m_qMutex);
 
     if(arraySurfaceVertColor.size() == 0 || vecVertNo.rows() == 0) {
-        qDebug()<<"RtSourceLocDataWorker::setSurfaceData - Surface data is empty. Returning ...";
+        qDebug() << "RtSourceLocDataWorker::setSurfaceData - Surface data is empty. Returning ...";
         return;
     }
 
@@ -141,7 +141,7 @@ void RtSourceLocDataWorker::setAnnotationData(const VectorXi& vecLabelIds, const
     QMutexLocker locker(&m_qMutex);
 
     if(vecLabelIds.rows() == 0 || lLabels.isEmpty()) {
-        qDebug()<<"RtSourceLocDataWorker::setAnnotationData - Annotation data is empty. Returning ...";
+        qDebug() << "RtSourceLocDataWorker::setAnnotationData - Annotation data is empty. Returning ...";
         return;
     }
 
@@ -193,10 +193,12 @@ void RtSourceLocDataWorker::setColormapType(const QString& sColormapType)
 
 //*************************************************************************************************************
 
-void RtSourceLocDataWorker::setNormalization(const double& dValue)
+void RtSourceLocDataWorker::setNormalization(const QVector3D& vecThresholds)
 {
     QMutexLocker locker(&m_qMutex);
-    m_dNormalization = (m_dNormalizationMax/100.0) * dValue;
+    m_vecThresholds = vecThresholds;
+
+    //m_dNormalization = (m_dNormalizationMax/100.0) * dValue;
 }
 
 
@@ -299,7 +301,7 @@ void RtSourceLocDataWorker::run()
             m_qMutex.unlock();
         }
 
-//        qDebug()<<"RtSourceLocDataWorker::run()"<<timer.elapsed()<<"msecs";
+//        qDebug() << "RtSourceLocDataWorker::run()" << timer.elapsed() << "msecs";
         QThread::msleep(m_iMSecIntervall);
     }
 }
@@ -311,45 +313,49 @@ QByteArray RtSourceLocDataWorker::performVisualizationTypeCalculation(const Vect
 {
     //NOTE: This function is called for every new sample point and therefore must be kept highly efficient!
     if(sourceColorSamples.rows() != m_vecVertNo.rows()) {
-        qDebug()<<"RtSourceLocDataWorker::performVisualizationTypeCalculation - number of rows in sample ("<<sourceColorSamples.rows()<<") do not not match with idx/no number of rows in vertex ("<<m_vecVertNo.rows()<<"). Returning...";
+        qDebug() << "RtSourceLocDataWorker::performVisualizationTypeCalculation - number of rows in sample (" << sourceColorSamples.rows() << ") do not not match with idx/no number of rows in vertex (" << m_vecVertNo.rows() << "). Returning...";
         return QByteArray();
     }
 
     //Generate color data for vertices
     switch(m_iVisualizationType) {
-        case BrainRTDataVisualizationTypes::VertexBased: {
+        case Data3DTreeModelItemRoles::VertexBased: {
             if(!m_bSurfaceDataIsInit) {
-                qDebug()<<"RtSourceLocDataWorker::performVisualizationTypeCalculation - Surface data was not initialized. Returning ...";
+                qDebug() << "RtSourceLocDataWorker::performVisualizationTypeCalculation - Surface data was not initialized. Returning ...";
                 return m_arraySurfaceVertColor;
             }
 
             QByteArray arrayCurrentVertColor = m_arraySurfaceVertColor;
-
-            //Create final QByteArray with colors based on the current anatomical information
-            QByteArray sourceColorSamplesColor = transformDataToColor(sourceColorSamples);
-            const float *rawSourceColorSamplesColor = reinterpret_cast<const float *>(sourceColorSamplesColor.data());
-            int idxSourceColorSamples = 0;
             float *rawArrayCurrentVertColor = reinterpret_cast<float *>(arrayCurrentVertColor.data());
 
-            for(int i = 0; i<m_vecVertNo.rows(); i++) {
-                rawArrayCurrentVertColor[m_vecVertNo(i)*3+0] = rawSourceColorSamplesColor[idxSourceColorSamples++];
-                rawArrayCurrentVertColor[m_vecVertNo(i)*3+1] = rawSourceColorSamplesColor[idxSourceColorSamples++];
-                rawArrayCurrentVertColor[m_vecVertNo(i)*3+2] = rawSourceColorSamplesColor[idxSourceColorSamples++];
+            //Create final QByteArray with colors based on the current anatomical information
+            for(int i = 0; i < m_vecVertNo.rows(); ++i) {
+                VectorXd vecActivation(1);
+                vecActivation(0) = sourceColorSamples(i);
+
+                if(vecActivation(0) >= m_vecThresholds.x()) {
+                    QByteArray sourceColorSamplesColor = transformDataToColor(vecActivation);
+                    const float *rawSourceColorSamplesColor = reinterpret_cast<const float *>(sourceColorSamplesColor.data());
+
+                    rawArrayCurrentVertColor[m_vecVertNo(i)*3+0] = rawSourceColorSamplesColor[0];
+                    rawArrayCurrentVertColor[m_vecVertNo(i)*3+1] = rawSourceColorSamplesColor[1];
+                    rawArrayCurrentVertColor[m_vecVertNo(i)*3+2] = rawSourceColorSamplesColor[2];
+                }
             }
 
             return arrayCurrentVertColor;
         }
 
-        case BrainRTDataVisualizationTypes::AnnotationBased: {
+        case Data3DTreeModelItemRoles::AnnotationBased: {
             if(!m_bAnnotationDataIsInit) {
-                qDebug()<<"RtSourceLocDataWorker::performVisualizationTypeCalculation - Annotation data was not initialized. Returning ...";
+                qDebug() << "RtSourceLocDataWorker::performVisualizationTypeCalculation - Annotation data was not initialized. Returning ...";
                 return m_arraySurfaceVertColor;
             }
 
             //Find maximum actiavtion for each label
             QMap<qint32, double> vecLabelActivation;
 
-            for(int i = 0; i<m_vecVertNo.rows(); i++) {
+            for(int i = 0; i < m_vecVertNo.rows(); ++i) {
                 //Find out label for source
                 qint32 labelIdx = m_mapLabelIdSources[m_vecVertNo(i)];
 
@@ -359,7 +365,8 @@ QByteArray RtSourceLocDataWorker::performVisualizationTypeCalculation(const Vect
 
             //Color all labels respectivley to their activation
             QByteArray arrayCurrentVertColor;
-            arrayCurrentVertColor.resize(m_arraySurfaceVertColor.size());
+            //arrayCurrentVertColor.resize(m_arraySurfaceVertColor.size());
+            arrayCurrentVertColor = m_arraySurfaceVertColor;
 
             float *rawArrayCurrentVertColor = reinterpret_cast<float *>(arrayCurrentVertColor.data());
 
@@ -370,20 +377,23 @@ QByteArray RtSourceLocDataWorker::performVisualizationTypeCalculation(const Vect
                 VectorXd vecActivation(1);
                 vecActivation(0) = vecLabelActivation[label.label_id];
 
-                QByteArray arrayLabelColors = transformDataToColor(vecActivation);
-                float *rawArrayLabelColors = reinterpret_cast<float *>(arrayLabelColors.data());
+                //Check if value is bigger than lower threshold. If not, don't plot activation
+                if(vecActivation(0) >= m_vecThresholds.x()) {
+                    QByteArray arrayLabelColors = transformDataToColor(vecActivation);
+                    float *rawArrayLabelColors = reinterpret_cast<float *>(arrayLabelColors.data());
 
-                for(int j = 0; j<label.vertices.rows(); j++) {
-                    rawArrayCurrentVertColor[label.vertices(j)*3+0] = rawArrayLabelColors[0];
-                    rawArrayCurrentVertColor[label.vertices(j)*3+1] = rawArrayLabelColors[1];
-                    rawArrayCurrentVertColor[label.vertices(j)*3+2] = rawArrayLabelColors[2];
+                    for(int j = 0; j<label.vertices.rows(); j++) {
+                        rawArrayCurrentVertColor[label.vertices(j)*3+0] = rawArrayLabelColors[0];
+                        rawArrayCurrentVertColor[label.vertices(j)*3+1] = rawArrayLabelColors[1];
+                        rawArrayCurrentVertColor[label.vertices(j)*3+2] = rawArrayLabelColors[2];
+                    }
                 }
             }
 
             return arrayCurrentVertColor;
         }        
 
-        case BrainRTDataVisualizationTypes::SmoothingBased: {
+        case Data3DTreeModelItemRoles::SmoothingBased: {
             //TODO: Smooth here!
             break;
         }
@@ -405,12 +415,24 @@ QByteArray RtSourceLocDataWorker::transformDataToColor(const VectorXd& data)
         arrayColor.resize(data.rows() * 3 * (int)sizeof(float));
         float *rawArrayColors = reinterpret_cast<float *>(arrayColor.data());
 
-        for(int r = 0; r<data.rows(); r++) {
-            double dSample = data(r)/m_dNormalization;
-            qint32 iVal = dSample > 255 ? 255 : dSample < 0 ? 0 : dSample;
+        for(int r = 0; r < data.rows(); ++r) {
+            float dSample = data(r);
+
+            //Check lower and upper thresholds and normalize to one
+            if(dSample > m_vecThresholds.z()) {
+                dSample = 1.0;
+            } else if(dSample < m_vecThresholds.x()) {
+                dSample = 0.0;
+            } else {
+                dSample = (dSample - m_vecThresholds.x()) / (m_vecThresholds.z() - m_vecThresholds.x());
+            }
+
+//            qDebug() << "dSample" << dSample;
+//            qDebug() << "data(r)" << data(r);
+//            qDebug() << "m_vecThresholds" << m_vecThresholds;
 
             QRgb qRgb;
-            qRgb = ColorMap::valueToHotNegative1((float)iVal/255.0);
+            qRgb = ColorMap::valueToHotNegative1(dSample);
 
             QColor colSample(qRgb);
             rawArrayColors[idxColor++] = colSample.redF();
@@ -425,12 +447,20 @@ QByteArray RtSourceLocDataWorker::transformDataToColor(const VectorXd& data)
         arrayColor.resize(data.rows() * 3 * (int)sizeof(float));
         float *rawArrayColors = reinterpret_cast<float *>(arrayColor.data());
 
-        for(int r = 0; r<data.rows(); r++) {
-            double dSample = data(r)/m_dNormalization;
-            qint32 iVal = dSample > 255 ? 255 : dSample < 0 ? 0 : dSample;
+        for(int r = 0; r < data.rows(); ++r) {
+            float dSample = data(r);
+
+            //Check lower and upper thresholds and normalize to one
+            if(dSample > m_vecThresholds.z()) {
+                dSample = 1.0;
+            } else if(dSample < m_vecThresholds.x()) {
+                dSample = 0.0;
+            } else {
+                dSample = (dSample - m_vecThresholds.x()) / (m_vecThresholds.z() - m_vecThresholds.x());
+            }
 
             QRgb qRgb;
-            qRgb = ColorMap::valueToHotNegative2((float)iVal/255.0);
+            qRgb = ColorMap::valueToHotNegative2(dSample);
 
             QColor colSample(qRgb);
             rawArrayColors[idxColor++] = colSample.redF();
@@ -445,12 +475,20 @@ QByteArray RtSourceLocDataWorker::transformDataToColor(const VectorXd& data)
         arrayColor.resize(data.rows() * 3 * (int)sizeof(float));
         float *rawArrayColors = reinterpret_cast<float *>(arrayColor.data());
 
-        for(int r = 0; r<data.rows(); r++) {
-            double dSample = data(r)/m_dNormalization;
-            qint32 iVal = dSample > 255 ? 255 : dSample < 0 ? 0 : dSample;
+        for(int r = 0; r < data.rows(); ++r) {
+            float dSample = data(r);
+
+            //Check lower and upper thresholds and normalize to one
+            if(dSample > m_vecThresholds.z()) {
+                dSample = 1.0;
+            } else if(dSample < m_vecThresholds.x()) {
+                dSample = 0.0;
+            } else {
+                dSample = (dSample - m_vecThresholds.x()) / (m_vecThresholds.z() - m_vecThresholds.x());
+            }
 
             QRgb qRgb;
-            qRgb = ColorMap::valueToHot((float)iVal/255.0);
+            qRgb = ColorMap::valueToHot(dSample);
 
             QColor colSample(qRgb);
             rawArrayColors[idxColor++] = colSample.redF();

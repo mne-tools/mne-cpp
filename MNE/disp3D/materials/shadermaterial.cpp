@@ -75,16 +75,15 @@ ShaderMaterial::ShaderMaterial(QNode *parent)
 
 ShaderMaterial::~ShaderMaterial()
 {
-    delete m_vertexEffect;
-    delete m_ambientParameter;
-    delete m_diffuseParameter;
-    delete m_specularParameter;
-    delete m_specularParameter;
-    delete m_shininessParameter;
-    delete m_alphaParameter;
-    delete m_vertexGL3Technique;
-    delete m_vertexGL3RenderPass;
-    delete m_vertexGL3Shader;
+//    delete m_vertexEffect;
+//    delete m_ambientParameter;
+//    delete m_diffuseParameter;
+//    delete m_specularParameter;
+//    delete m_shininessParameter;
+//    delete m_alphaParameter;
+//    delete m_vertexGL3Technique;
+//    delete m_vertexGL3RenderPass;
+//    delete m_vertexGL3Shader;
 }
 
 
@@ -121,11 +120,11 @@ void ShaderMaterial::init()
     QBlendEquation* pBlendEquation = new QBlendEquation();
     pBlendEquation->setMode(QBlendEquation::FuncAdd);
 
-//    m_vertexGL3RenderPass->addRenderState(pBlendState);
-//    m_vertexGL3RenderPass->addRenderState(pCullFace);
-//    m_vertexGL3RenderPass->addRenderState(pDepthTest);
-//    m_vertexGL3RenderPass->addRenderState(pDepthMask);
-//    m_vertexGL3RenderPass->addRenderState(pBlendEquation);
+    m_vertexGL3RenderPass->addRenderState(pBlendState);
+    m_vertexGL3RenderPass->addRenderState(pCullFace);
+    m_vertexGL3RenderPass->addRenderState(pDepthTest);
+    m_vertexGL3RenderPass->addRenderState(pDepthMask);
+    m_vertexGL3RenderPass->addRenderState(pBlendEquation);
 
     m_vertexGL3Technique->addPass(m_vertexGL3RenderPass);
 

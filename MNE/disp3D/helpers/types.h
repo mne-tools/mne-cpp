@@ -80,7 +80,7 @@ namespace DISP3DLIB
 // Typedefs
 
 // Model item types
-namespace BrainTreeModelItemTypes
+namespace Data3DTreeModelItemTypes
 {
     enum ItemType{UnknownItem = QStandardItem::UserType,
                     SurfaceSetItem = QStandardItem::UserType + 1,
@@ -89,34 +89,70 @@ namespace BrainTreeModelItemTypes
                     AnnotationItem = QStandardItem::UserType + 4,
                     RTSourceLocDataItem = QStandardItem::UserType + 5,
                     SourceSpaceItem = QStandardItem::UserType + 6,
-                    RTConnectivityDataItem = QStandardItem::UserType + 7};
+                    RTConnectivityDataItem = QStandardItem::UserType + 7,
+                    SubjectItem = QStandardItem::UserType + 8,
+                    BemItem = QStandardItem::UserType + 9,
+                    BemSurfaceItem = QStandardItem::UserType + 10};
 }
 
-namespace BrainTreeMetaItemTypes
+namespace MetaTreeItemTypes
 {
-  enum ItemType{SurfaceFileName = QStandardItem::UserType + 100,
-                    SurfaceFilePath = QStandardItem::UserType + 101,
-                    AnnotFileName = QStandardItem::UserType + 102,
-                    AnnotFilePath = QStandardItem::UserType + 103,
-                    SurfaceType = QStandardItem::UserType + 104,
-                    SurfaceColorGyri = QStandardItem::UserType + 105,
-                    SurfaceColorSulci = QStandardItem::UserType + 106,
-                    SurfaceColorVert = QStandardItem::UserType + 107,
-                    SurfaceAlpha = QStandardItem::UserType + 108,
-                    RTDataStreamStatus = QStandardItem::UserType + 109,
-                    RTDataSourceSpaceType = QStandardItem::UserType + 110,
-                    RTDataColormapType = QStandardItem::UserType + 111,
-                    RTDataTimeInterval = QStandardItem::UserType + 112,
-                    RTDataLoopedStreaming = QStandardItem::UserType + 113,
-                    RTDataNumberAverages = QStandardItem::UserType + 114,
-                    RTDataNormalizationValue = QStandardItem::UserType + 115,
-                    RTDataVisualizationType = QStandardItem::UserType + 116,
-                    SurfaceColorItem = QStandardItem::UserType + 117,
-                    UnknownItem = QStandardItem::UserType + 118};
+    enum ItemType{FileName = QStandardItem::UserType + 100,
+                    FilePath = QStandardItem::UserType + 101,
+                    SurfaceType = QStandardItem::UserType + 102,
+                    SurfaceColorGyri = QStandardItem::UserType + 103,
+                    SurfaceColorSulci = QStandardItem::UserType + 104,
+                    SurfaceColorVert = QStandardItem::UserType + 105,
+                    SurfaceAlpha = QStandardItem::UserType + 106,
+                    RTDataStreamStatus = QStandardItem::UserType + 107,
+                    RTDataSourceSpaceType = QStandardItem::UserType + 108,
+                    RTDataColormapType = QStandardItem::UserType + 109,
+                    RTDataTimeInterval = QStandardItem::UserType + 110,
+                    RTDataLoopedStreaming = QStandardItem::UserType + 111,
+                    RTDataNumberAverages = QStandardItem::UserType + 112,
+                    RTDataNormalizationValue = QStandardItem::UserType + 113,
+                    RTDataVisualizationType = QStandardItem::UserType + 114,
+                    SurfaceColor = QStandardItem::UserType + 115,
+                    UnknownItem = QStandardItem::UserType + 116,
+                    SurfaceTranslateX = QStandardItem::UserType + 117,
+                    SurfaceTranslateY = QStandardItem::UserType + 118,
+                    SurfaceTranslateZ = QStandardItem::UserType + 119};
 }
 
 // Model item roles
-namespace BrainTreeMetaItemRoles
+namespace Data3DTreeModelItemRoles
+{
+    enum ItemRole{SurfaceCurrentColorVert = Qt::UserRole + 100,
+                    SurfaceVert = Qt::UserRole + 101,
+                    SurfaceTris = Qt::UserRole + 102,
+                    SurfaceNorm = Qt::UserRole + 103,
+                    SurfaceCurv = Qt::UserRole + 104,
+                    SurfaceOffset = Qt::UserRole + 105,
+                    SurfaceRenderable3DEntity = Qt::UserRole + 106,
+                    SurfaceCurvatureColorVert = Qt::UserRole + 107,
+                    SurfaceRTSourceLocColor = Qt::UserRole + 108,
+                    SurfaceAnnotationColorVert = Qt::UserRole + 109,
+                    SurfaceRenderable3DEntityAcivationOverlay = Qt::UserRole + 110,
+                    SurfaceSetName = Qt::UserRole + 111,
+                    SurfaceHemi = Qt::UserRole + 112,
+                    AnnotColors = Qt::UserRole + 113,
+                    FileName = Qt::UserRole + 114,
+                    FilePath = Qt::UserRole + 115,
+                    LabeList = Qt::UserRole + 116,
+                    LabeIds = Qt::UserRole + 117,
+                    RTData = Qt::UserRole + 118,
+                    RTVertNo = Qt::UserRole + 119,
+                    RTTimes = Qt::UserRole + 120,
+                    RTHemi = Qt::UserRole + 121,
+                    RTStartIdx = Qt::UserRole + 122,
+                    RTEndIdx = Qt::UserRole + 123,
+                    VertexBased = Qt::UserRole + 124,
+                    SmoothingBased = Qt::UserRole + 125,
+                    AnnotationBased = Qt::UserRole + 126,
+                    BemName = Qt::UserRole + 127};
+}
+
+namespace MetaTreeItemRoles
 {
     enum ItemRole{SurfaceFileName = Qt::UserRole,
                     SurfaceType = Qt::UserRole + 1,
@@ -134,73 +170,10 @@ namespace BrainTreeMetaItemRoles
                     RTDataNumberAverages = Qt::UserRole + 14,
                     RTDataNormalizationValue = Qt::UserRole + 15,
                     RTDataVisualizationType = Qt::UserRole + 16,
-                    SurfaceColor = Qt::UserRole + 17};
-}
-
-namespace BrainSurfaceTreeItemRoles
-{
-    enum ItemRole{SurfaceCurrentColorVert = Qt::UserRole + 100,
-                    SurfaceVert = Qt::UserRole + 101,
-                    SurfaceTris = Qt::UserRole + 102,
-                    SurfaceNorm = Qt::UserRole + 103,
-                    SurfaceCurv = Qt::UserRole + 104,
-                    SurfaceOffset = Qt::UserRole + 105,
-                    SurfaceRenderable3DEntity = Qt::UserRole + 106,
-                    SurfaceCurvatureColorVert = Qt::UserRole + 107,
-                    SurfaceRTSourceLocColor = Qt::UserRole + 108,
-                    SurfaceAnnotationColorVert = Qt::UserRole + 109,
-                    SurfaceRenderable3DEntityAcivationOverlay = Qt::UserRole + 110};
-}
-
-namespace BrainSourceSpaceTreeItemRoles
-{
-    enum ItemRole{SurfaceCurrentColorVert = Qt::UserRole + 100,
-                    SurfaceVert = Qt::UserRole + 101,
-                    SurfaceTris = Qt::UserRole + 102,
-                    SurfaceNorm = Qt::UserRole + 103,
-                    SurfaceOffset = Qt::UserRole + 104,
-                    SurfaceRenderable3DEntity = Qt::UserRole + 105};
-}
-
-namespace BrainSurfaceSetTreeItemRoles
-{
-    enum ItemRole{SurfaceSetName = Qt::UserRole + 200};
-}
-
-namespace BrainHemisphereTreeItemRoles
-{
-    enum ItemRole{SurfaceHemi = Qt::UserRole + 300};
-}
-
-namespace BrainAnnotationTreeItemRoles
-{
-    enum ItemRole{AnnotColors = Qt::UserRole + 400,
-                    AnnotFileName = Qt::UserRole + 401,
-                    AnnotFilePath = Qt::UserRole + 402,
-                    LabeList = Qt::UserRole + 403,
-                    LabeIds = Qt::UserRole + 404};
-}
-
-namespace BrainRTSourceLocDataTreeItemRoles
-{
-    enum ItemRole{RTData = Qt::UserRole + 500,
-                    RTVertNo = Qt::UserRole + 501,
-                    RTTimes = Qt::UserRole + 502,
-                    RTHemi = Qt::UserRole + 503,
-                    RTStartIdx = Qt::UserRole + 504,
-                    RTEndIdx = Qt::UserRole + 505};
-}
-
-namespace BrainRTDataVisualizationTypes
-{
-    enum ItemRole{VertexBased = Qt::UserRole + 600,
-                    SmoothingBased = Qt::UserRole + 601,
-                    AnnotationBased = Qt::UserRole + 602};
-}
-
-namespace BrainRTConnectivityDataTreeItemRoles
-{
-    enum ItemRole{RTHemi = Qt::UserRole + 700};
+                    SurfaceColor = Qt::UserRole + 17,
+                    SurfaceTranslateX = Qt::UserRole + 18,
+                    SurfaceTranslateY = Qt::UserRole + 19,
+                    SurfaceTranslateZ = Qt::UserRole + 20};
 }
 
 } //NAMESPACE DISP3DLIB
