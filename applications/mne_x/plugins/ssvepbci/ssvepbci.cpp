@@ -51,6 +51,7 @@
 #include <QtCore/QtPlugin>
 #include <QtCore/QTextStream>
 #include <QDebug>
+#include <utils/ioutils.h>
 
 
 //*************************************************************************************************************
@@ -70,6 +71,8 @@ using namespace UTILSLIB;
 ssvepBCI::ssvepBCI()
 : m_qStringResourcePath(qApp->applicationDirPath()+"/mne_x_plugins/resources/ssvepbci/")
 , m_bProcessData(false)
+, m_dAlpha(0.25)
+, m_iNumberOfHarmonics(2)
 //, m_qFile("out.txt")
 //, m_sOut(&m_qFile)
 {
@@ -81,8 +84,13 @@ ssvepBCI::ssvepBCI()
 
     // Intitalise BCI data
     m_slChosenFeatureSensor << "9Z" << "8Z" << "7Z" << "6Z" << "9L" << "8L" << "9R" << "8R"; //<< "TEST";
-
     m_lElectrodeNumbers << 33 << 34 << 35 << 36 << 40 << 41 << 42 << 43;
+    m_lDesFrequencies << 6 << 7.5 << 10 << 15;
+    //m_lDesFrequencies << 6.67 << 7.5 << 8.57 << 10 << 12;
+
+    updateBCIParameter();
+
+    qDebug() <<"List of all frequencies:" <<  m_lAllFrequencies;
 }
 
 
@@ -212,9 +220,12 @@ bool ssvepBCI::start()
     m_iReadIndex    = 0;
     m_iCounter      = 0;
     m_iReadToWriteBuffer = 0;
+    m_iDownSampleIndex   = 0;
+    m_iFormerDownSampleIndex = 0;
     m_iWindowSize        = 8;
     m_bIsRunning    = true;
 
+    // starting the thread for data processing
     QThread::start();
 
 //    if (!m_qFile.open(QIODevice::WriteOnly | QIODevice::Text))
@@ -258,11 +269,11 @@ bool ssvepBCI::stop()
     clearFeatures();
     clearClassifications();
 
-    // set counters to zero
-    m_iWriteIndex   = 0;
-    m_iReadIndex    = 0;
-    m_iCounter      = 0;
-    m_iReadToWriteBuffer = 0;
+//    // set counters to zero
+//    m_iWriteIndex   = 0;
+//    m_iReadIndex    = 0;
+//    m_iCounter      = 0;
+//    m_iReadToWriteBuffer = 0;
 
     return true;
 }
@@ -313,22 +324,32 @@ void ssvepBCI::updateSensor(XMEASLIB::NewMeasurement::SPtr pMeasurement)
             m_pBCIBuffer_Sensor = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, pRTMSA->getNumChannels(), pRTMSA->getMultiSampleArray()[0].cols()));
     }
 
+
     //Fiff information
     if(!m_pFiffInfo_Sensor)
     {
         m_pFiffInfo_Sensor = pRTMSA->info();
         //emit fiffInfoAvailable();
 
-        //loading fiff information
-        m_iSampleFrequency = m_pFiffInfo_Sensor->sfreq;
+        //calculating downsampling parameter for incoming data
+        m_iDownSampleIncrement = m_pFiffInfo_Sensor->sfreq/128;
+        m_dSampleFrequency = m_pFiffInfo_Sensor->sfreq/m_iDownSampleIncrement;//m_pFiffInfo_Sensor->sfreq;
 
         // determine sliding time window parameters
-        int rows = 8;
-        m_iReadSampleSize = 0.1*m_iSampleFrequency;    // about 0.1 second long time segment as basic read increment
+        m_iReadSampleSize = 0.1*m_dSampleFrequency;    // about 0.1 second long time segment as basic read increment
         m_iWriteSampleSize = pRTMSA->getMultiSampleArray()[0].cols();
-        m_iTimeWindowSegmentSize  = int(4*m_iSampleFrequency / m_iWriteSampleSize) + 1;   // 4 seconds long maximal sized window
-        m_matSlidingTimeWindow.resize(rows, m_iTimeWindowSegmentSize*pRTMSA->getMultiSampleArray()[0].cols());
+        m_iTimeWindowLength = int(5*m_dSampleFrequency) + int(pRTMSA->getMultiSampleArray()[0].cols()/m_iDownSampleIncrement) + 1 ;
+        //m_iTimeWindowSegmentSize  = int(5*m_dSampleFrequency / m_iWriteSampleSize) + 1;   // 4 seconds long maximal sized window
+        m_matSlidingTimeWindow.resize(8, m_iTimeWindowLength);//m_matSlidingTimeWindow.resize(rows, m_iTimeWindowSegmentSize*pRTMSA->getMultiSampleArray()[0].cols());
+
+        cout << "Down Sample Increment:" << m_iDownSampleIncrement << endl;
+        cout << "Read Sample Size:" << m_iReadSampleSize << endl;
+        cout << "Downsampled Frequency:" << m_dSampleFrequency << endl;
+        cout << "Write Sample SIze :" << m_iWriteSampleSize<< endl;
+        cout << "Length of the time window:" << m_iTimeWindowLength << endl;
     }
+
+
     m_qMutex.unlock();
 
 
@@ -344,7 +365,6 @@ void ssvepBCI::updateSensor(XMEASLIB::NewMeasurement::SPtr pMeasurement)
             m_pBCIBuffer_Sensor->push(&t_mat);
         }
     }
-
 }
 
 
@@ -405,6 +425,7 @@ bool ssvepBCI::lookForTrigger(const MatrixXd &data)
     return false;
 }
 
+
 //*************************************************************************************************************
 
 void ssvepBCI::showSetupStimulus()
@@ -450,17 +471,39 @@ void ssvepBCI::run()
     }
 }
 
+//*************************************************************************************************************
+
+void ssvepBCI::updateBCIParameter()
+{
+    // update the list of frequencies
+    m_lAllFrequencies.clear();
+    m_lAllFrequencies = m_lDesFrequencies;
+
+    for(int i = 0; i < m_lDesFrequencies.size() - 1; i++)
+        m_lAllFrequencies.append((m_lDesFrequencies.at(i) + m_lDesFrequencies.at(i + 1) ) / 2);
+}
+
+
+//*************************************************************************************************************
+
 void ssvepBCI::readFromSlidingTimeWindow(MatrixXd &data)
 {
+    data.resize(8, m_iWindowSize*m_iReadSampleSize);
+    cout << "Window Size:" << data.cols() << endl;
     // consider matrix overflow case
-    if(data.cols() > m_iReadIndex){
-        int width1 = data.cols() - m_iReadIndex;
-        data.block(0, 0, 8, width1) = m_matSlidingTimeWindow.block(0, m_matSlidingTimeWindow.cols() - 1 - width1, 8, width1 );
-        data.block(0, width1, 8, m_iReadIndex) = m_matSlidingTimeWindow.block(0, 0, 8, m_iReadIndex);
+    if(data.cols() > m_iReadIndex + 1){
+        int width = data.cols() - (m_iReadIndex + 1);
+        data.block(0, 0, 8, width) = m_matSlidingTimeWindow.block(0, m_matSlidingTimeWindow.cols() - width , 8, width );
+        data.block(0, width, 8, m_iReadIndex + 1) = m_matSlidingTimeWindow.block(0, 0, 8, m_iReadIndex + 1);
+        cout << "Read index" << m_iReadIndex << endl;
+        cout << "width" << width << endl;
     }
-    else
-        data = m_matSlidingTimeWindow.block(0, m_iReadIndex - data.cols(), 8 , data.cols());
-
+    else{
+        // consider case without matrix overflow
+        data = m_matSlidingTimeWindow.block(0, m_iReadIndex - (data.cols() - 1), 8 , data.cols());
+    }
+    // transpose in the same data space and avoiding aliasing
+    data.transposeInPlace();
 }
 
 
@@ -472,24 +515,41 @@ void ssvepBCI::BCIOnSensorLevel()
     while(!m_pFiffInfo_Sensor)
         msleep(10);
 
+
     // Start filling buffers with data from the inputs
     m_bProcessData = true;
     MatrixXd t_mat = m_pBCIBuffer_Sensor->pop();
+    int   writtenSamples = 0;
 
     // writing selected feature channels to the time window storage and increase the segment index
-    for(int i = 0; i < 8; i++)
-        m_matSlidingTimeWindow.block(i, m_iWriteIndex, 1, m_iWriteSampleSize) = t_mat.block(m_lElectrodeNumbers.at(i), 0, 1, m_iWriteSampleSize);
-    m_iWriteIndex = (m_iWriteIndex + m_iWriteSampleSize) % (m_iWriteSampleSize*m_iTimeWindowSegmentSize);
+    while(m_iDownSampleIndex >= m_iFormerDownSampleIndex)
+    {
+        m_iFormerDownSampleIndex = m_iDownSampleIndex;
+        cout << "Down Sample Index:" << m_iDownSampleIndex << endl;
+        for(int i = 0; i < 8; i++)
+            m_matSlidingTimeWindow(i, m_iWriteIndex) = t_mat(m_lElectrodeNumbers.at(i), m_iDownSampleIndex);
+        writtenSamples++;
+
+        // update counter variables
+        m_iWriteIndex = (m_iWriteIndex + 1) % m_iTimeWindowLength;
+        m_iDownSampleIndex = (m_iDownSampleIndex + m_iDownSampleIncrement ) % m_iWriteSampleSize;
+
+        cout << "m_iFormer Downsample Index:" << m_iFormerDownSampleIndex << endl;
+    }
+    m_iFormerDownSampleIndex = m_iDownSampleIndex;
+
+
+    //cout << "Matrix:" << endl << m_matSlidingTimeWindow << endl;
 
     // calculate buffer between read- and write index
-    m_iReadToWriteBuffer = m_iReadToWriteBuffer + m_iWriteSampleSize;
-    cout << "Read to Write buffer:" << m_iReadToWriteBuffer << endl;
+    m_iReadToWriteBuffer = m_iReadToWriteBuffer + writtenSamples;
+    //cout << "Read to Write buffer:" << m_iReadToWriteBuffer << endl;
     // execute processing loop as long as there is new data to read from the time window
     while(m_iReadToWriteBuffer >= m_iReadSampleSize)
     {
         if(m_iCounter > 8)
         {
-            // determine window size according to former success of former classifications
+            // determine window size according to former counted miss classifications
             if(m_iCounter <= 24)
                 m_iWindowSize = 8;
             if(m_iCounter <= 44 && m_iCounter > 24)
@@ -497,15 +557,55 @@ void ssvepBCI::BCIOnSensorLevel()
             if(m_iCounter > 44)
                 m_iWindowSize = 40;
 
+            // create current data matrix
             MatrixXd Y_data;
-            Y_data.resize(8, m_iWindowSize*m_iReadSampleSize);
+            //cout << "m_iReadIndex:" << m_iReadIndex << endl;
             readFromSlidingTimeWindow(Y_data);
+
+
+            // create realtive timeline according to Y_data
+            int samples = Y_data.rows();
+            ArrayXd t = 2*M_PI/m_dSampleFrequency * ArrayXd::LinSpaced(samples, 1, samples);
+            
+            // Remove 50 Hz Power line signal
+            MatrixXd Zp(samples,2);
+            ArrayXd t_50 = t*50;
+            Zp.col(0) = t_50.sin();
+            Zp.col(1) = t_50.cos();
+            MatrixXd Zp_help = Zp.transpose()*Zp; 
+            MatrixXd Y = Y_data - Zp*Zp_help.inverse()*Zp.transpose()*Y_data; //
+
+            if(m_iCounter == 60){
+                UTILSLIB::IOUtils::write_eigen_matrix(Y, "Y.txt");
+                UTILSLIB::IOUtils::write_eigen_matrix(Y_data, "Y_data.txt");
+            }
+
+            // apply feature extraction and classification procedure for all frequencies of interest
+            for(int i = 0; i < m_lAllFrequencies.size(); i++)
+            {
+                // create reference signal matrix X and current timeline t
+                MatrixXd X(samples, 2*m_iNumberOfHarmonics);
+                for(int k = 0; k < m_iNumberOfHarmonics; k++){
+                    ArrayXd t_k = t*(k+1)*m_lAllFrequencies.at(i);
+                    X.col(2*k)      = t_k.sin();
+                    X.col(2*k+1)    = t_k.cos();
+                }
+
+
+
+//                cout << t(0) << "   ";
+//                cout << X.row(0) << endl;
+
+
+            }
+
 
             //std::cout << "Matrix:\n" << m_matSlidingTimeWindow.block(0, m_iReadIndex, 8, 5) << endl;
 
-            cout << "Window Size:" << m_iWindowSize << endl;
-            cout << "Y_data rows" << Y_data.rows() << endl;
-            cout << "Y_data cols" << Y_data.cols() << endl;
+//            cout << "Window Size:" << m_iWindowSize << endl;
+//            cout << "Y_data rows:" << Y_data.rows() << endl;
+//            cout << "Y_data cols:" << Y_data.cols() << endl;
+//            cout << "counter:"     << m_iCounter << endl;
 
 
 
@@ -515,23 +615,18 @@ void ssvepBCI::BCIOnSensorLevel()
         // update counter variables
         m_iCounter++;
         m_iReadToWriteBuffer = m_iReadToWriteBuffer - m_iReadSampleSize;
-        m_iReadIndex = (m_iReadIndex + m_iReadSampleSize) % (m_iWriteSampleSize*m_iTimeWindowSegmentSize);
+        m_iReadIndex = (m_iReadIndex + m_iReadSampleSize) % (m_iTimeWindowLength);
+
+        qDebug()<< "Write Index:" << m_iWriteIndex;
+        qDebug()<< "Read Index:" << m_iReadIndex;
+        qDebug()<< "Read to Write Buffer:" << m_iReadToWriteBuffer;
     }
     
 
 
 
-    cout << "Write Sample Size:" << m_iWriteSampleSize << endl;
-    cout << "Read Sample Size:" << m_iReadSampleSize << endl;
-    cout << "Write Index:" << m_iWriteIndex << endl;
-    cout << "Read Index:" << m_iReadIndex << endl;
-    cout << "Time Window Segment Size:" << m_iTimeWindowSegmentSize << endl;
-    cout << "Window Size" << m_iWriteSampleSize*m_iTimeWindowSegmentSize << endl << endl;
 
 
-
-
-    // increase ringbuffer increment
 
 
 }
