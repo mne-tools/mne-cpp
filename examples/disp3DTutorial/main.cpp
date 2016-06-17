@@ -294,7 +294,7 @@ int main(int argc, char *argv[])
             rtItemList_RV.at(i)->setTimeInterval(75);
             rtItemList_RV.at(i)->setNumberAverages(7);
             rtItemList_RV.at(i)->setStreamingActive(true);
-            rtItemList_RV.at(i)->setNormalization(QVector3D(1.0e-12,10.0e-12,100.0e-12));
+            rtItemList_RV.at(i)->setNormalization(QVector3D(0.5,1.5,5.0));
             rtItemList_RV.at(i)->setVisualizationType("Annotation based");
             rtItemList_RV.at(i)->setColortable("Hot");
         }

@@ -165,17 +165,17 @@ public:
     *
     * @return      returns QList consisting of QVector3D corresponding to the x-axis value of the threshold lines
     */
-    const QList<QVector3D> &getThreshold();
+    const QVector3D &getThreshold();
 
     //=========================================================================================================
     /**
     * correctionDisplayTrueValue takes in QVector value from outside sources and create the necessary adjustment of exponential multiplication with base 10
     *
     * @param[in]  vecOriginalValues     QVector3D consisting of 3 original values
-    * @param[in]  upOrDown              User input to either multiply with positive or negative 10 to the power of exponent
+    * @param[in]  functionName          Choice between getThreshold or setThreshold
     * @return     returns QVector3D after necessary adjustment
     */
-    const QVector3D &correctionDisplayTrueValue(QVector3D vecOriginalValues, QString upOrDown);
+    const QVector3D &correctionDisplayTrueValue(QVector3D vecOriginalValues, QString functionName);
 
     //=========================================================================================================
 
