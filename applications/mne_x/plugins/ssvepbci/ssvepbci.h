@@ -216,13 +216,18 @@ protected:
     */
     bool lookForTrigger(const MatrixXd &data);
 
+
     //=========================================================================================================
     /**
-    * reading actual segment from the sliding time window and write it to the data Matrix
+    * getting the signal power of the reference signal frequency in the measured signal.
     *
+    * @param [in]   Y           measured signal.
+    * @param [in]   X           reference signal.
+    *
+    * @return       signal power of the reference signal in the measured signal.
     *
     */
-    void readFromSlidingTimeWindow(MatrixXd &data);
+    double MEC(MatrixXd &Y, MatrixXd &X);
 
     //=========================================================================================================
     /**
@@ -244,6 +249,15 @@ signals:
     void paintFeatures(MyQList features, bool bTrigerActivated);
 
 private:
+    //=========================================================================================================
+    /**
+    * reading actual segment from the sliding time window and write it to the data Matrix
+    *
+    *
+    */
+    void readFromSlidingTimeWindow(MatrixXd &data);
+
+
     QAction*                                            m_pActionSetupStimulus;             /**< starts stimulus feature */
 
     QSharedPointer<ssvepBCISetupStimulusWidget>         m_pssvepBCISetupStimulusWidget; /**< Widget for stimulus setup */
@@ -251,7 +265,7 @@ private:
     PluginInputData<NewRealTimeMultiSampleArray>::SPtr  m_pRTMSAInput;          /**< The RealTimeMultiSampleArray input.*/
     PluginInputData<RealTimeSourceEstimate>::SPtr       m_pRTSEInput;           /**< The RealTimeSourceEstimate input.*/
 
-    // sliding Window
+    // adaptable sliding Window with downsampling function
     int                     m_iCounter;                         /**< iterative index for counting the miss classifications */
     double                  m_dSampleFrequency;                 /**< sample frequency of the device [Hz] */
     int                     m_iReadSampleSize;                  /**< numbers of sample for one time segment (about 0.1 seconds) */
@@ -260,7 +274,7 @@ private:
     int                     m_iTimeWindowLength;                /**< required length of the time window */
     int                     m_iWriteIndex;                      /**< Index for writing a new increment from the buffer to the time window */
     int                     m_iReadIndex;                       /**< index for reading from the time window */
-    int                     m_iDownSampleIncrement;                  /**< Rate of downsampling from current sample rate to 128 Hz */
+    int                     m_iDownSampleIncrement;             /**< Rate of downsampling from current sample rate to 128 Hz */
     int                     m_iDownSampleIndex;                 /**< index for reading from the raw buffer in order to downsample to 128 Hz */
     int                     m_iFormerDownSampleIndex;           /**< former downsampling Index: serves as flag for managing storage overflow */
     int                     m_iReadToWriteBuffer;               /**< number of samples from the current readindex to current write index */
@@ -272,9 +286,10 @@ private:
     // SSVEP parameter
     QList<double>           m_lDesFrequencies;                  /**< contains searched frequencies */
     QList<double>           m_lAllFrequencies;                  /**< contains all serched frequencies and reference frequencies */
-    int                     m_iNumberOfHarmonics;                 /**< number of harmonics which will be searched for */
+    int                     m_iNumberOfHarmonics;               /**< number of harmonics which will be searched for */
     double                  m_dAlpha;                           /**< parameter for softmax function */
     QList<double>           m_lBetha;                           /**< threshold value for normalized energy probabilities */
+    QList<double>           m_iSSVEPsignalPower;                      /**< power of the different SSVEP signals */
 
 
     // Sensor level

@@ -486,22 +486,61 @@ void ssvepBCI::updateBCIParameter()
 
 //*************************************************************************************************************
 
+double ssvepBCI::MEC(MatrixXd &Y, MatrixXd &X)
+{
+
+    // Remove SSVEP harmonic frequencies
+    MatrixXd X_help = X.transpose()*X;
+    MatrixXd Ytilde = Y - X*X_help.inverse()*X.transpose()*Y;
+
+    // Find eigenvalues and eigenvectors
+    SelfAdjointEigenSolver<MatrixXd> eigensolver(Ytilde.transpose()*Ytilde);    
+
+    // Determine number of channels Ns
+    int Ns;
+    VectorXd cumsum = eigensolver.eigenvalues();
+    for(int j = 1; j < eigensolver.eigenvalues().size(); j++)
+        cumsum(j) += cumsum(j - 1);
+    for(Ns = 0; Ns < eigensolver.eigenvalues().size() ; Ns++)
+        if(cumsum(Ns)/eigensolver.eigenvalues().sum() > 0.1)
+            break;
+    Ns +=1;
+
+    // Determine spatial filter matrix W
+    MatrixXd W = eigensolver.eigenvectors().block(0, 0, eigensolver.eigenvectors().rows(), Ns);   
+    for(int k = 0; k < Ns; k++)
+        W.col(k) = W.col(k)*(1/sqrt(eigensolver.eigenvalues()(k)));
+    // Calcuclate channel signals
+    MatrixXd S = Y*W;
+
+    // Calculate signal power
+    MatrixXd P(2, Ns);
+    double power = 0;
+    for(int k = 0; k < m_iNumberOfHarmonics; k++){
+        P = X.block(0, 2*k, X.rows(), 2).transpose()*S;
+        P = P.array()*P.array();
+        power += 1 / double(m_iNumberOfHarmonics*Ns) * P.sum();
+    }
+
+    cout << "power" << endl << power << endl<< endl;
+    return power;
+}
+
+
+//*************************************************************************************************************
+
 void ssvepBCI::readFromSlidingTimeWindow(MatrixXd &data)
 {
     data.resize(8, m_iWindowSize*m_iReadSampleSize);
-    cout << "Window Size:" << data.cols() << endl;
     // consider matrix overflow case
     if(data.cols() > m_iReadIndex + 1){
         int width = data.cols() - (m_iReadIndex + 1);
         data.block(0, 0, 8, width) = m_matSlidingTimeWindow.block(0, m_matSlidingTimeWindow.cols() - width , 8, width );
         data.block(0, width, 8, m_iReadIndex + 1) = m_matSlidingTimeWindow.block(0, 0, 8, m_iReadIndex + 1);
-        cout << "Read index" << m_iReadIndex << endl;
-        cout << "width" << width << endl;
     }
-    else{
-        // consider case without matrix overflow
-        data = m_matSlidingTimeWindow.block(0, m_iReadIndex - (data.cols() - 1), 8 , data.cols());
-    }
+    else
+        data = m_matSlidingTimeWindow.block(0, m_iReadIndex - (data.cols() - 1), 8 , data.cols());  // consider case without matrix overflow
+
     // transpose in the same data space and avoiding aliasing
     data.transposeInPlace();
 }
@@ -525,7 +564,6 @@ void ssvepBCI::BCIOnSensorLevel()
     while(m_iDownSampleIndex >= m_iFormerDownSampleIndex)
     {
         m_iFormerDownSampleIndex = m_iDownSampleIndex;
-        cout << "Down Sample Index:" << m_iDownSampleIndex << endl;
         for(int i = 0; i < 8; i++)
             m_matSlidingTimeWindow(i, m_iWriteIndex) = t_mat(m_lElectrodeNumbers.at(i), m_iDownSampleIndex);
         writtenSamples++;
@@ -533,17 +571,11 @@ void ssvepBCI::BCIOnSensorLevel()
         // update counter variables
         m_iWriteIndex = (m_iWriteIndex + 1) % m_iTimeWindowLength;
         m_iDownSampleIndex = (m_iDownSampleIndex + m_iDownSampleIncrement ) % m_iWriteSampleSize;
-
-        cout << "m_iFormer Downsample Index:" << m_iFormerDownSampleIndex << endl;
     }
     m_iFormerDownSampleIndex = m_iDownSampleIndex;
 
-
-    //cout << "Matrix:" << endl << m_matSlidingTimeWindow << endl;
-
     // calculate buffer between read- and write index
     m_iReadToWriteBuffer = m_iReadToWriteBuffer + writtenSamples;
-    //cout << "Read to Write buffer:" << m_iReadToWriteBuffer << endl;
     // execute processing loop as long as there is new data to read from the time window
     while(m_iReadToWriteBuffer >= m_iReadSampleSize)
     {
@@ -558,27 +590,23 @@ void ssvepBCI::BCIOnSensorLevel()
                 m_iWindowSize = 40;
 
             // create current data matrix
-            MatrixXd Y_data;
-            //cout << "m_iReadIndex:" << m_iReadIndex << endl;
-            readFromSlidingTimeWindow(Y_data);
+            MatrixXd Y;
+            readFromSlidingTimeWindow(Y);
 
 
             // create realtive timeline according to Y_data
-            int samples = Y_data.rows();
+            int samples = Y.rows();
             ArrayXd t = 2*M_PI/m_dSampleFrequency * ArrayXd::LinSpaced(samples, 1, samples);
             
-            // Remove 50 Hz Power line signal
-            MatrixXd Zp(samples,2);
-            ArrayXd t_50 = t*50;
-            Zp.col(0) = t_50.sin();
-            Zp.col(1) = t_50.cos();
-            MatrixXd Zp_help = Zp.transpose()*Zp; 
-            MatrixXd Y = Y_data - Zp*Zp_help.inverse()*Zp.transpose()*Y_data; //
+//            // Remove 50 Hz Power line signal
+//            MatrixXd Zp(samples,2);
+//            ArrayXd t_50 = t*50;
+//            Zp.col(0) = t_50.sin();
+//            Zp.col(1) = t_50.cos();
+//            MatrixXd Zp_help = Zp.transpose()*Zp;
+//            MatrixXd Y = Y_data - Zp*Zp_help.inverse()*Zp.transpose()*Y_data;
 
-            if(m_iCounter == 60){
-                UTILSLIB::IOUtils::write_eigen_matrix(Y, "Y.txt");
-                UTILSLIB::IOUtils::write_eigen_matrix(Y_data, "Y_data.txt");
-            }
+
 
             // apply feature extraction and classification procedure for all frequencies of interest
             for(int i = 0; i < m_lAllFrequencies.size(); i++)
@@ -591,22 +619,16 @@ void ssvepBCI::BCIOnSensorLevel()
                     X.col(2*k+1)    = t_k.cos();
                 }
 
+                if(m_iCounter == 80){
+                    UTILSLIB::IOUtils::write_eigen_matrix(Y, QString::number(m_lAllFrequencies.at(i)).append("Hz_Y.txt"));
+                    UTILSLIB::IOUtils::write_eigen_matrix(X, QString::number(m_lAllFrequencies.at(i)).append("Hz_X.txt"));
+                    cout << "Frequency " << m_lAllFrequencies.at(i) << " Hz:" << endl;
+                    cout << "=======================================================" << endl;
+                    double P = MEC(Y, X);
 
-
-//                cout << t(0) << "   ";
-//                cout << X.row(0) << endl;
-
+                }
 
             }
-
-
-            //std::cout << "Matrix:\n" << m_matSlidingTimeWindow.block(0, m_iReadIndex, 8, 5) << endl;
-
-//            cout << "Window Size:" << m_iWindowSize << endl;
-//            cout << "Y_data rows:" << Y_data.rows() << endl;
-//            cout << "Y_data cols:" << Y_data.cols() << endl;
-//            cout << "counter:"     << m_iCounter << endl;
-
 
 
 
@@ -617,16 +639,11 @@ void ssvepBCI::BCIOnSensorLevel()
         m_iReadToWriteBuffer = m_iReadToWriteBuffer - m_iReadSampleSize;
         m_iReadIndex = (m_iReadIndex + m_iReadSampleSize) % (m_iTimeWindowLength);
 
-        qDebug()<< "Write Index:" << m_iWriteIndex;
-        qDebug()<< "Read Index:" << m_iReadIndex;
-        qDebug()<< "Read to Write Buffer:" << m_iReadToWriteBuffer;
+//        qDebug()<< "Write Index:" << m_iWriteIndex;
+//        qDebug()<< "Read Index:" << m_iReadIndex;
+//        qDebug()<< "Read to Write Buffer:" << m_iReadToWriteBuffer;
     }
     
-
-
-
-
-
 
 
 }
