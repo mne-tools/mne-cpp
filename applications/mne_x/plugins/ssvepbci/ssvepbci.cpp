@@ -86,6 +86,7 @@ ssvepBCI::ssvepBCI()
     m_slChosenFeatureSensor << "9Z" << "8Z" << "7Z" << "6Z" << "9L" << "8L" << "9R" << "8R"; //<< "TEST";
     m_lElectrodeNumbers << 33 << 34 << 35 << 36 << 40 << 41 << 42 << 43;
     m_lDesFrequencies << 6 << 7.5 << 10 << 15;
+    m_lBetha << 0.15 << 0.14 << 0.155 << 0.15;
     //m_lDesFrequencies << 6.67 << 7.5 << 8.57 << 10 << 12;
 
     updateBCIParameter();
@@ -522,7 +523,7 @@ double ssvepBCI::MEC(MatrixXd &Y, MatrixXd &X)
         power += 1 / double(m_iNumberOfHarmonics*Ns) * P.sum();
     }
 
-    cout << "power" << endl << power << endl<< endl;
+    //cout << "power" << endl << power << endl<< endl;
     return power;
 }
 
@@ -553,7 +554,7 @@ void ssvepBCI::BCIOnSensorLevel()
     // Wait for fiff Info if not yet received - this is needed because we have to wait until the buffers are firstly initiated in the update functions
     while(!m_pFiffInfo_Sensor)
         msleep(10);
-
+    m_lClassResultsSensor.clear();
 
     // Start filling buffers with data from the inputs
     m_bProcessData = true;
@@ -582,8 +583,7 @@ void ssvepBCI::BCIOnSensorLevel()
         if(m_iCounter > 8)
         {
             // determine window size according to former counted miss classifications
-            if(m_iCounter <= 24)
-                m_iWindowSize = 8;
+            m_iWindowSize = 8;
             if(m_iCounter <= 44 && m_iCounter > 24)
                 m_iWindowSize = 20;
             if(m_iCounter > 44)
@@ -592,7 +592,6 @@ void ssvepBCI::BCIOnSensorLevel()
             // create current data matrix
             MatrixXd Y;
             readFromSlidingTimeWindow(Y);
-
 
             // create realtive timeline according to Y_data
             int samples = Y.rows();
@@ -606,12 +605,11 @@ void ssvepBCI::BCIOnSensorLevel()
 //            MatrixXd Zp_help = Zp.transpose()*Zp;
 //            MatrixXd Y = Y_data - Zp*Zp_help.inverse()*Zp.transpose()*Y_data;
 
-
-
             // apply feature extraction and classification procedure for all frequencies of interest
+            VectorXd ssvepProbabilities(m_lAllFrequencies.size());
             for(int i = 0; i < m_lAllFrequencies.size(); i++)
             {
-                // create reference signal matrix X and current timeline t
+                // create reference signal matrix X
                 MatrixXd X(samples, 2*m_iNumberOfHarmonics);
                 for(int k = 0; k < m_iNumberOfHarmonics; k++){
                     ArrayXd t_k = t*(k+1)*m_lAllFrequencies.at(i);
@@ -619,25 +617,53 @@ void ssvepBCI::BCIOnSensorLevel()
                     X.col(2*k+1)    = t_k.cos();
                 }
 
-                if(m_iCounter == 80){
-                    UTILSLIB::IOUtils::write_eigen_matrix(Y, QString::number(m_lAllFrequencies.at(i)).append("Hz_Y.txt"));
-                    UTILSLIB::IOUtils::write_eigen_matrix(X, QString::number(m_lAllFrequencies.at(i)).append("Hz_X.txt"));
-                    cout << "Frequency " << m_lAllFrequencies.at(i) << " Hz:" << endl;
-                    cout << "=======================================================" << endl;
-                    double P = MEC(Y, X);
-
-                }
-
+//                // extracting the features from the data Y with the reference signal X
+//                if(m_iCounter == 80){
+//                    UTILSLIB::IOUtils::write_eigen_matrix(Y, QString::number(m_lAllFrequencies.at(i)).append("Hz_Y.txt"));
+//                    UTILSLIB::IOUtils::write_eigen_matrix(X, QString::number(m_lAllFrequencies.at(i)).append("Hz_X.txt"));
+//                    cout << "Frequency " << m_lAllFrequencies.at(i) << " Hz:" << endl;
+//                    cout << "=======================================================" << endl;
+//                }
+                ssvepProbabilities(i) = MEC(Y, X); // using Minimum Energy Combination as feature-extraction tool
             }
+//            if(m_iCounter == 80)
+//                cout << "ssvepProbabilities" << endl << ssvepProbabilities <<endl;
+            // normalize probabilities and adding the softmax coefficient
+            ssvepProbabilities = m_dAlpha / ssvepProbabilities.sum() * ssvepProbabilities;
+//            if(m_iCounter == 80)
+//                cout << "normalized ssvepProbabilities" << endl << ssvepProbabilities <<endl;
+            // softmax function for better distinguishability between the probabilities
+            ssvepProbabilities = ssvepProbabilities.array().exp();
+//            if(m_iCounter == 80)
+//                cout << "exponential softmax ssvep Probabilities" << endl << ssvepProbabilities <<endl;
+            ssvepProbabilities = 1 / ssvepProbabilities.sum() * ssvepProbabilities;
+//            if(m_iCounter == 80)
+//                cout << "softmax normalized ssvep Probabilities" << endl << ssvepProbabilities <<endl;
 
-
-
+            // classify probabilites
+            int index;
+            double maxProbability = ssvepProbabilities.maxCoeff(&index);
+//            if(m_iCounter == 80){
+//                cout << "maxProbability" << endl << maxProbability <<endl;
+//                cout << "index" << endl << index <<endl;
+//            }
+            if(index < m_lDesFrequencies.size()){
+                if(m_lBetha.at(index) < maxProbability){
+                    m_lClassResultsSensor.append(index+1);
+                    m_iCounter = 0;
+                }
+            }
+            else
+                m_lClassResultsSensor.append(0);
+            qDebug() <<"classification results" << m_lClassResultsSensor.last();
         }
 
         // update counter variables
         m_iCounter++;
         m_iReadToWriteBuffer = m_iReadToWriteBuffer - m_iReadSampleSize;
         m_iReadIndex = (m_iReadIndex + m_iReadSampleSize) % (m_iTimeWindowLength);
+
+
 
 //        qDebug()<< "Write Index:" << m_iWriteIndex;
 //        qDebug()<< "Read Index:" << m_iReadIndex;

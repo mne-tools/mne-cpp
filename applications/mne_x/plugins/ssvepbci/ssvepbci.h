@@ -289,7 +289,7 @@ private:
     int                     m_iNumberOfHarmonics;               /**< number of harmonics which will be searched for */
     double                  m_dAlpha;                           /**< parameter for softmax function */
     QList<double>           m_lBetha;                           /**< threshold value for normalized energy probabilities */
-    QList<double>           m_iSSVEPsignalPower;                      /**< power of the different SSVEP signals */
+    QList<int>           m_lClassResultsSensor;              /**< Sensor level: Classification results on sensor level. */
 
 
     // Sensor level
@@ -304,7 +304,7 @@ private:
     QStringList             m_slChosenFeatureSensor;            /**< Sensor level: Features used to calculate data points in feature space on sensor level. */
     QMap<QString, int>      m_mapElectrodePinningScheme;        /**< Sensor level: Loaded pinning scheme of the Duke 128 EEG cap. */
     QList< QPair< int,QList<double> > >  m_lFeaturesSensor;     /**< Sensor level: Features calculated on sensor level. */
-    QList<double>           m_lClassResultsSensor;              /**< Sensor level: Classification results on sensor level. */
+
     MatrixXd                m_matStimChannelSensor;             /**< Sensor level: Stim channel. */
     MatrixXd                m_matTimeBetweenWindowsStimSensor;  /**< Sensor level: Stim channel. */
     QList<int>              m_lElectrodeNumbers;                /**< Sensor level: number of chosen electrodes */
