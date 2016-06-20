@@ -73,6 +73,7 @@ ssvepBCI::ssvepBCI()
 , m_bProcessData(false)
 , m_dAlpha(0.25)
 , m_iNumberOfHarmonics(2)
+, m_bUseMEC(false)
 //, m_qFile("out.txt")
 //, m_sOut(&m_qFile)
 {
@@ -86,8 +87,12 @@ ssvepBCI::ssvepBCI()
     m_slChosenFeatureSensor << "9Z" << "8Z" << "7Z" << "6Z" << "9L" << "8L" << "9R" << "8R"; //<< "TEST";
     m_lElectrodeNumbers << 33 << 34 << 35 << 36 << 40 << 41 << 42 << 43;
     m_lDesFrequencies << 6 << 7.5 << 10 << 15;
-    m_lBetha << 0.15 << 0.14 << 0.155 << 0.15;
     //m_lDesFrequencies << 6.67 << 7.5 << 8.57 << 10 << 12;
+    if(m_bUseMEC)
+        m_lThresholdValues << 0.15 << 0.14 << 0.155 << 0.15;
+    else
+        m_lThresholdValues << 0.145 << 0.145 << 0.145 << 0.14;
+
 
     updateBCIParameter();
 
@@ -505,7 +510,7 @@ double ssvepBCI::MEC(MatrixXd &Y, MatrixXd &X)
     for(Ns = 0; Ns < eigensolver.eigenvalues().size() ; Ns++)
         if(cumsum(Ns)/eigensolver.eigenvalues().sum() > 0.1)
             break;
-    Ns +=1;
+    Ns += 1;
 
     // Determine spatial filter matrix W
     MatrixXd W = eigensolver.eigenvectors().block(0, 0, eigensolver.eigenvectors().rows(), Ns);   
@@ -525,6 +530,37 @@ double ssvepBCI::MEC(MatrixXd &Y, MatrixXd &X)
 
     //cout << "power" << endl << power << endl<< endl;
     return power;
+}
+
+
+//*************************************************************************************************************
+
+double ssvepBCI::CCA(MatrixXd &Y, MatrixXd &X)
+{
+    // CCA parameter
+    int n  = X.rows();
+    int p1 = X.cols();
+    int p2 = Y.cols();
+
+    // center data sets
+    MatrixXd X_center(n, p1);
+    MatrixXd Y_center(n, p2);
+    for(int i = 0; i < p1; i++)
+        X_center.col(i) = X.col(i).array() - X.col(i).mean();
+    for(int i = 0; i < p2; i++)
+        Y_center.col(i) = Y.col(i).array() - Y.col(i).mean();
+
+    // QR decomposition
+    MatrixXd Q1, Q2;
+    ColPivHouseholderQR<MatrixXd> qr1(X_center), qr2(Y_center);
+    Q1 = qr1.householderQ() * MatrixXd::Identity(n, p1);
+    Q2 = qr2.householderQ() * MatrixXd::Identity(n, p2);
+
+    // SVD decomposition and determine max correlation
+    JacobiSVD<MatrixXd> svd(Q1.transpose()*Q2); // ComputeThinU | ComputeThinV
+    double r = svd.singularValues().maxCoeff();
+
+    return r;
 }
 
 
@@ -618,39 +654,26 @@ void ssvepBCI::BCIOnSensorLevel()
                 }
 
 //                // extracting the features from the data Y with the reference signal X
-//                if(m_iCounter == 80){
-//                    UTILSLIB::IOUtils::write_eigen_matrix(Y, QString::number(m_lAllFrequencies.at(i)).append("Hz_Y.txt"));
-//                    UTILSLIB::IOUtils::write_eigen_matrix(X, QString::number(m_lAllFrequencies.at(i)).append("Hz_X.txt"));
-//                    cout << "Frequency " << m_lAllFrequencies.at(i) << " Hz:" << endl;
-//                    cout << "=======================================================" << endl;
-//                }
-                ssvepProbabilities(i) = MEC(Y, X); // using Minimum Energy Combination as feature-extraction tool
+                if(m_bUseMEC)
+                    ssvepProbabilities(i) = MEC(Y, X); // using Minimum Energy Combination as feature-extraction tool
+                else
+                    ssvepProbabilities(i) = CCA(Y, X);
             }
-//            if(m_iCounter == 80)
-//                cout << "ssvepProbabilities" << endl << ssvepProbabilities <<endl;
+
             // normalize probabilities and adding the softmax coefficient
             ssvepProbabilities = m_dAlpha / ssvepProbabilities.sum() * ssvepProbabilities;
-//            if(m_iCounter == 80)
-//                cout << "normalized ssvepProbabilities" << endl << ssvepProbabilities <<endl;
             // softmax function for better distinguishability between the probabilities
             ssvepProbabilities = ssvepProbabilities.array().exp();
-//            if(m_iCounter == 80)
-//                cout << "exponential softmax ssvep Probabilities" << endl << ssvepProbabilities <<endl;
             ssvepProbabilities = 1 / ssvepProbabilities.sum() * ssvepProbabilities;
-//            if(m_iCounter == 80)
-//                cout << "softmax normalized ssvep Probabilities" << endl << ssvepProbabilities <<endl;
 
             // classify probabilites
             int index;
             double maxProbability = ssvepProbabilities.maxCoeff(&index);
-//            if(m_iCounter == 80){
-//                cout << "maxProbability" << endl << maxProbability <<endl;
-//                cout << "index" << endl << index <<endl;
-//            }
+
             if(index < m_lDesFrequencies.size()){
-                if(m_lBetha.at(index) < maxProbability){
+                if(m_lThresholdValues.at(index) < maxProbability){
                     m_lClassResultsSensor.append(index+1);
-                    m_iCounter = 0;
+                    m_iCounter = -1;
                 }
             }
             else
@@ -663,11 +686,6 @@ void ssvepBCI::BCIOnSensorLevel()
         m_iReadToWriteBuffer = m_iReadToWriteBuffer - m_iReadSampleSize;
         m_iReadIndex = (m_iReadIndex + m_iReadSampleSize) % (m_iTimeWindowLength);
 
-
-
-//        qDebug()<< "Write Index:" << m_iWriteIndex;
-//        qDebug()<< "Read Index:" << m_iReadIndex;
-//        qDebug()<< "Read to Write Buffer:" << m_iReadToWriteBuffer;
     }
     
 

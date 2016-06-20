@@ -219,15 +219,28 @@ protected:
 
     //=========================================================================================================
     /**
-    * getting the signal power of the reference signal frequency in the measured signal.
+    * Applying the Minimum Energy Combination approach in order to get the signal energy in Y detected by the
+    * reference signyl X.
     *
     * @param [in]   Y           measured signal.
     * @param [in]   X           reference signal.
     *
-    * @return       signal power of the reference signal in the measured signal.
+    * @return       signal energy of the reference signal in the measured signal.
     *
     */
     double MEC(MatrixXd &Y, MatrixXd &X);
+
+    //=========================================================================================================
+    /**
+    * Applying Canoncial Correlation Analysis to get the correlation between the sets of signals of X and Y
+    *
+    * @param [in]   Y           measured signal.
+    * @param [in]   X           reference signal.
+    *
+    * @return       maximal correlation between the signals.
+    *
+    */
+    double CCA(MatrixXd &Y, MatrixXd &X);
 
     //=========================================================================================================
     /**
@@ -283,13 +296,14 @@ private:
 //    QTextStream             m_sOut;
     //int                     m_iThrottle;                        /**< increment for throtteling sample rate */
 
-    // SSVEP parameter
+    // SSVEP parameter                 
     QList<double>           m_lDesFrequencies;                  /**< contains searched frequencies */
     QList<double>           m_lAllFrequencies;                  /**< contains all serched frequencies and reference frequencies */
     int                     m_iNumberOfHarmonics;               /**< number of harmonics which will be searched for */
     double                  m_dAlpha;                           /**< parameter for softmax function */
-    QList<double>           m_lBetha;                           /**< threshold value for normalized energy probabilities */
-    QList<int>           m_lClassResultsSensor;              /**< Sensor level: Classification results on sensor level. */
+    QList<double>           m_lThresholdValues;                 /**< threshold value for normalized energy probabilities */
+    bool                    m_bUseMEC;                          /**< flag for feature extractiong. If true: use MEC; If false: use CCA */
+    QList<int>              m_lClassResultsSensor;              /**< Sensor level: Classification results on sensor level. */
 
 
     // Sensor level
