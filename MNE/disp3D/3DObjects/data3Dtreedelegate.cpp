@@ -104,6 +104,15 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
              Spline* pSpline = new Spline("Spline Histogram", 0);
              connect(pSpline, static_cast<void (Spline::*)(double, double, double)>(&Spline::borderChanged),
                      this, &Data3DTreeDelegate::onEditorEdited);
+             QStandardItem* pParentItem = static_cast<QStandardItem*>(pAbstractItem->QStandardItem::parent());
+             QModelIndex indexParent = pData3DTreeModel->indexFromItem(pParentItem);
+             MatrixXd matRTData = index.model()->data(indexParent, Data3DTreeModelItemRoles::RTData).value<MatrixXd>();
+             Eigen::VectorXd resultClassLimit;
+             Eigen::VectorXi resultFrequency;
+             MNEMath::histcounts(matRTData, false, 50, resultClassLimit, resultFrequency, 0.0, 0.0);
+             pSpline->setData(resultClassLimit, resultFrequency, 0);
+             QVector3D vecThresholdValues = index.model()->data(index, MetaTreeItemRoles::RTDataNormalizationValue).value<QVector3D>();
+             pSpline->setThreshold(vecThresholdValues);
              return pSpline;
         }
 
@@ -231,16 +240,7 @@ void Data3DTreeDelegate::setEditorData(QWidget* editor, const QModelIndex& index
 
         case MetaTreeItemTypes::RTDataNormalizationValue: {
             Spline* pSpline = static_cast<Spline*>(editor);
-            pSpline->resize(800,600);
-            QStandardItem* pParentItem = static_cast<QStandardItem*>(pAbstractItem->QStandardItem::parent());
-            QModelIndex indexParent = pData3DTreeModel->indexFromItem(pParentItem);
-            MatrixXd matRTData = index.model()->data(indexParent, Data3DTreeModelItemRoles::RTData).value<MatrixXd>();
-            Eigen::VectorXd resultClassLimit;
-            Eigen::VectorXi resultFrequency;
-            MNEMath::histcounts(matRTData, false, 50, resultClassLimit, resultFrequency, 0.0, 0.0);
-            pSpline->setData(resultClassLimit, resultFrequency, 0);
-            QVector3D vecThresholdValues = index.model()->data(index, MetaTreeItemRoles::RTDataNormalizationValue).value<QVector3D>();
-            pSpline->setThreshold(vecThresholdValues);
+             pSpline->resize(800,600);
             return;
         }
 

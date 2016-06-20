@@ -156,7 +156,7 @@ int main(int argc, char *argv[])
     if(bAddRtSourceLoc) {
         double snr = 3.0;
         double lambda2 = 1.0 / pow(snr, 2);
-        QString method("MNE"); //"MNE" | "dSPM" | "sLORETA"
+        QString method("sLORETA"); //"MNE" | "dSPM" | "sLORETA"
 
         // Load data
         QPair<QVariant, QVariant> baseline(QVariant(), 0);
