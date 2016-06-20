@@ -102,8 +102,7 @@ HEADERS +=  \
         rtave.h \
         rtnoise.h \
         rthpis.h \
-        rtfilter.h \
-        ttt.h
+        rtfilter.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
