@@ -241,7 +241,7 @@ int main(int argc, char *argv[])
     QTime myTimerHistCounts;
     myTimerHistCounts.start();
     Eigen::VectorXd dataSine;
-    dataSine = sineWaveGenerator(1.0e6,(1.0/1.0e6), 0.0, 1.0);  //creates synthetic data using sineWaveGenerator function
+    dataSine = sineWaveGenerator(1.0e-6,(1.0/1.0e6), 0.0, 1.0);  //creates synthetic data using sineWaveGenerator function
     qDebug()<< "sourceEstimateData.rows = " << sourceEstimateData.rows();
     qDebug()<< "sourceEstaimateData.cols = " << sourceEstimateData.cols();
     MNEMath::histcounts(dataSine, bMakeSymmetrical, classAmount, resultClassLimit, resultFrequency, inputGlobalMin, inputGlobalMax);   //user input to normalize and sort the data matrix
@@ -264,7 +264,7 @@ int main(int argc, char *argv[])
 //    qDebug() << "debug before new setdata";
 
     displayObj->setData(resultClassLimit, resultFrequency, precision);
-    QVector3D thresholdLines2(-0.51, 0.5, 0.9);
+    QVector3D thresholdLines2(-0.51e-6, 0.5e-6, 0.9e-6);
     displayObj->setThreshold(thresholdLines2);
     qDebug()<<"Histogram timer:"<<myTimerHistogram.elapsed();
 
