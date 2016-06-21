@@ -46,7 +46,7 @@ SUBDIRS += \
 #    test_mne_future \
 #    test_ssp \
 
-#contains(MNECPP_CONFIG, withGui) {
+#!contains(MNECPP_CONFIG, minimalVersion) {
 #    SUBDIRS += \
 #        test_mne_graph \
 #        test_mne_cluster_eval \
