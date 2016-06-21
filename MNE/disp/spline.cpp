@@ -308,11 +308,33 @@ const QVector3D &Spline::correctionDisplayTrueValue(QVector3D vecOriginalValues,
     int exponent;
     if (upOrDown == "up")
     {
-        exponent = abs(resultExponentValues[0]);
+        if (resultExponentValues[0] < 0)
+        {
+            exponent = abs(resultExponentValues[0]);
+        }
+        else if (resultExponentValues[0] > 0)
+        {
+            exponent = -(abs(resultExponentValues[0]));
+        }
+        else
+        {
+            exponent = 0;
+        }
     }
     else if (upOrDown == "down")
     {
-        exponent = -(abs(resultExponentValues[0]));
+        if (resultExponentValues[0] < 0)
+        {
+            exponent = -(abs(resultExponentValues[0]));
+        }
+        else if (resultExponentValues[0] > 0)
+        {
+            exponent = abs(resultExponentValues[0]);
+        }
+        else
+        {
+            exponent = 0;
+        }
     }
     else
     {
