@@ -52,6 +52,7 @@
 #include <QSharedPointer>
 #include <QTextStream>
 #include <QFile>
+#include <QDebug>
 
 
 //*************************************************************************************************************
