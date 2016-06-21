@@ -36,8 +36,6 @@
 #ifndef MNEMATH_H
 #define MNEMATH_H
 
-#pragma once
-
 //ToDo move this to the new MNE math library
 
 //*************************************************************************************************************
