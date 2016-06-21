@@ -120,7 +120,6 @@ void Spline::mousePressEvent(QMouseEvent *event)
                         updateThreshold(leftThreshold);
                         emitLeft = (leftPoint[0].x() * (pow(10, resultExponentValues[0])));
                         emit borderChanged(emitLeft, emitMiddle, emitRight);
-                        qDebug() << "Border = " << emitLeft << " , " << emitMiddle << " , " << emitRight;
                     }
                 }
 
@@ -135,7 +134,6 @@ void Spline::mousePressEvent(QMouseEvent *event)
                         updateThreshold(middleThreshold);
                         emitMiddle = (middlePoint[0].x() * (pow(10, resultExponentValues[0])));
                         emit borderChanged(emitLeft, emitMiddle, emitRight);
-                        qDebug() << "Border = " << emitLeft << " , " << emitMiddle << " , " << emitRight;
                     }
                 }
 
@@ -150,7 +148,6 @@ void Spline::mousePressEvent(QMouseEvent *event)
                         updateThreshold(rightThreshold);
                         emitRight = (rightPoint[0].x() * (pow(10, resultExponentValues[0])));
                         emit borderChanged(emitLeft, emitMiddle, emitRight);
-                        qDebug() << "Border = " << emitLeft << " , " << emitMiddle << " , " << emitRight;
                     }
                 }
             }
