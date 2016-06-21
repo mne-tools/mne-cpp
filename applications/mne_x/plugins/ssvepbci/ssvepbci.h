@@ -292,9 +292,6 @@ private:
     int                     m_iFormerDownSampleIndex;           /**< former downsampling Index: serves as flag for managing storage overflow */
     int                     m_iReadToWriteBuffer;               /**< number of samples from the current readindex to current write index */
     int                     m_iWindowSize;
-//    QFile                   m_qFile;
-//    QTextStream             m_sOut;
-    //int                     m_iThrottle;                        /**< increment for throtteling sample rate */
 
     // SSVEP parameter                 
     QList<double>           m_lDesFrequencies;                  /**< contains searched frequencies */
@@ -302,6 +299,7 @@ private:
     int                     m_iNumberOfHarmonics;               /**< number of harmonics which will be searched for */
     double                  m_dAlpha;                           /**< parameter for softmax function */
     QList<double>           m_lThresholdValues;                 /**< threshold value for normalized energy probabilities */
+    bool                    m_bRemove50HzPowerLine;             /**< Flag for removing 50 Hz power line signal */
     bool                    m_bUseMEC;                          /**< flag for feature extractiong. If true: use MEC; If false: use CCA */
     QList<int>              m_lClassResultsSensor;              /**< Sensor level: Classification results on sensor level. */
 

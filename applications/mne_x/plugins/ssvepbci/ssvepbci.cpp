@@ -73,9 +73,8 @@ ssvepBCI::ssvepBCI()
 , m_bProcessData(false)
 , m_dAlpha(0.25)
 , m_iNumberOfHarmonics(2)
-, m_bUseMEC(false)
-//, m_qFile("out.txt")
-//, m_sOut(&m_qFile)
+, m_bUseMEC(true)
+, m_bRemove50HzPowerLine(true)
 {
     // Create start Stimuli action bar item/button
     m_pActionSetupStimulus = new QAction(QIcon(":/images/stimulus.png"),tr("setup stimulus feature"),this);
@@ -234,8 +233,6 @@ bool ssvepBCI::start()
     // starting the thread for data processing
     QThread::start();
 
-//    if (!m_qFile.open(QIODevice::WriteOnly | QIODevice::Text))
-
     return true;
 }
 
@@ -318,6 +315,7 @@ QWidget* ssvepBCI::setupWidget()
 
 void ssvepBCI::updateSensor(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 {
+    //cout << "update Sensor" << endl;
 
 
     QSharedPointer<NewRealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<NewRealTimeMultiSampleArray>();
@@ -358,9 +356,7 @@ void ssvepBCI::updateSensor(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 
     m_qMutex.unlock();
 
-
-
-
+    // filling the matrix buffer
     if(m_bProcessData)
     {
         MatrixXd t_mat;
@@ -519,7 +515,7 @@ double ssvepBCI::MEC(MatrixXd &Y, MatrixXd &X)
     // Calcuclate channel signals
     MatrixXd S = Y*W;
 
-    // Calculate signal power
+    // Calculate signal energy
     MatrixXd P(2, Ns);
     double power = 0;
     for(int k = 0; k < m_iNumberOfHarmonics; k++){
@@ -556,11 +552,10 @@ double ssvepBCI::CCA(MatrixXd &Y, MatrixXd &X)
     Q1 = qr1.householderQ() * MatrixXd::Identity(n, p1);
     Q2 = qr2.householderQ() * MatrixXd::Identity(n, p2);
 
-    // SVD decomposition and determine max correlation
+    // SVD decomposition, determine max correlation
     JacobiSVD<MatrixXd> svd(Q1.transpose()*Q2); // ComputeThinU | ComputeThinV
-    double r = svd.singularValues().maxCoeff();
 
-    return r;
+    return svd.singularValues().maxCoeff();
 }
 
 
@@ -571,6 +566,7 @@ void ssvepBCI::readFromSlidingTimeWindow(MatrixXd &data)
     data.resize(8, m_iWindowSize*m_iReadSampleSize);
     // consider matrix overflow case
     if(data.cols() > m_iReadIndex + 1){
+        //cout << "do splitting" << endl;
         int width = data.cols() - (m_iReadIndex + 1);
         data.block(0, 0, 8, width) = m_matSlidingTimeWindow.block(0, m_matSlidingTimeWindow.cols() - width , 8, width );
         data.block(0, width, 8, m_iReadIndex + 1) = m_matSlidingTimeWindow.block(0, 0, 8, m_iReadIndex + 1);
@@ -590,16 +586,20 @@ void ssvepBCI::BCIOnSensorLevel()
     // Wait for fiff Info if not yet received - this is needed because we have to wait until the buffers are firstly initiated in the update functions
     while(!m_pFiffInfo_Sensor)
         msleep(10);
+
     m_lClassResultsSensor.clear();
 
     // Start filling buffers with data from the inputs
     m_bProcessData = true;
-    MatrixXd t_mat = m_pBCIBuffer_Sensor->pop();
-    int   writtenSamples = 0;
+    MatrixXd t_mat = m_pBCIBuffer_Sensor->pop();  
 
     // writing selected feature channels to the time window storage and increase the segment index
+    int   writtenSamples = 0;
     while(m_iDownSampleIndex >= m_iFormerDownSampleIndex)
     {
+        //cout << "write index:" << m_iWriteIndex << endl;
+        //cout << "downsample index:" << m_iDownSampleIndex << endl;
+
         m_iFormerDownSampleIndex = m_iDownSampleIndex;
         for(int i = 0; i < 8; i++)
             m_matSlidingTimeWindow(i, m_iWriteIndex) = t_mat(m_lElectrodeNumbers.at(i), m_iDownSampleIndex);
@@ -608,11 +608,13 @@ void ssvepBCI::BCIOnSensorLevel()
         // update counter variables
         m_iWriteIndex = (m_iWriteIndex + 1) % m_iTimeWindowLength;
         m_iDownSampleIndex = (m_iDownSampleIndex + m_iDownSampleIncrement ) % m_iWriteSampleSize;
+
     }
     m_iFormerDownSampleIndex = m_iDownSampleIndex;
 
     // calculate buffer between read- and write index
     m_iReadToWriteBuffer = m_iReadToWriteBuffer + writtenSamples;
+    //cout << "read to write buffer:" << m_iReadToWriteBuffer << endl << endl;
     // execute processing loop as long as there is new data to read from the time window
     while(m_iReadToWriteBuffer >= m_iReadSampleSize)
     {
@@ -624,24 +626,29 @@ void ssvepBCI::BCIOnSensorLevel()
                 m_iWindowSize = 20;
             if(m_iCounter > 44)
                 m_iWindowSize = 40;
+            //cout << "Counter:" << m_iCounter << endl;
 
-            // create current data matrix
+            // create current data matrix Y
             MatrixXd Y;
             readFromSlidingTimeWindow(Y);
+            //cout << "Read Index:" << m_iReadIndex <<  endl;
 
-            // create realtive timeline according to Y_data
+            // create realtive timeline according to Y
             int samples = Y.rows();
             ArrayXd t = 2*M_PI/m_dSampleFrequency * ArrayXd::LinSpaced(samples, 1, samples);
             
-//            // Remove 50 Hz Power line signal
-//            MatrixXd Zp(samples,2);
-//            ArrayXd t_50 = t*50;
-//            Zp.col(0) = t_50.sin();
-//            Zp.col(1) = t_50.cos();
-//            MatrixXd Zp_help = Zp.transpose()*Zp;
-//            MatrixXd Y = Y_data - Zp*Zp_help.inverse()*Zp.transpose()*Y_data;
 
-            // apply feature extraction and classification procedure for all frequencies of interest
+            // Remove 50 Hz Power line signal
+            if(m_bRemove50HzPowerLine){
+                MatrixXd Zp(samples,2);
+                ArrayXd t_50 = t*50;
+                Zp.col(0) = t_50.sin();
+                Zp.col(1) = t_50.cos();
+                MatrixXd Zp_help = Zp.transpose()*Zp;
+                Y = Y - Zp*Zp_help.inverse()*Zp.transpose()*Y;
+            }
+
+            // apply feature extraction for all frequencies of interest
             VectorXd ssvepProbabilities(m_lAllFrequencies.size());
             for(int i = 0; i < m_lAllFrequencies.size(); i++)
             {
@@ -653,23 +660,24 @@ void ssvepBCI::BCIOnSensorLevel()
                     X.col(2*k+1)    = t_k.cos();
                 }
 
-//                // extracting the features from the data Y with the reference signal X
+                // extracting the features from the data Y with the reference signal X
                 if(m_bUseMEC)
                     ssvepProbabilities(i) = MEC(Y, X); // using Minimum Energy Combination as feature-extraction tool
                 else
-                    ssvepProbabilities(i) = CCA(Y, X);
+                    ssvepProbabilities(i) = CCA(Y, X); // using Canonical Correlation Analysis as feature-extraction tool
+                //cout << "do feature extraction" << endl;
             }
 
             // normalize probabilities and adding the softmax coefficient
             ssvepProbabilities = m_dAlpha / ssvepProbabilities.sum() * ssvepProbabilities;
-            // softmax function for better distinguishability between the probabilities
-            ssvepProbabilities = ssvepProbabilities.array().exp();
+            ssvepProbabilities = ssvepProbabilities.array().exp();                          // softmax function for better distinguishability between the probabilities
             ssvepProbabilities = 1 / ssvepProbabilities.sum() * ssvepProbabilities;
+            //cout << "probabilites:" << endl << ssvepProbabilities << endl;
 
             // classify probabilites
-            int index;
+            int index = 0;
             double maxProbability = ssvepProbabilities.maxCoeff(&index);
-
+            //cout << "max Probability:" << maxProbability << endl;
             if(index < m_lDesFrequencies.size()){
                 if(m_lThresholdValues.at(index) < maxProbability){
                     m_lClassResultsSensor.append(index+1);
@@ -678,10 +686,11 @@ void ssvepBCI::BCIOnSensorLevel()
             }
             else
                 m_lClassResultsSensor.append(0);
-            qDebug() <<"classification results" << m_lClassResultsSensor.last();
+
+            qDebug() <<"classification results" << m_lClassResultsSensor.last() << endl;
         }
 
-        // update counter variables
+        // update counter and index variables
         m_iCounter++;
         m_iReadToWriteBuffer = m_iReadToWriteBuffer - m_iReadSampleSize;
         m_iReadIndex = (m_iReadIndex + m_iReadSampleSize) % (m_iTimeWindowLength);
