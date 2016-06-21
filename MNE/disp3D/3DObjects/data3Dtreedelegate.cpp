@@ -102,6 +102,7 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
 
         case MetaTreeItemTypes::RTDataNormalizationValue: {
              Spline* pSpline = new Spline("Spline Histogram", 0);
+             pSpline->resize(800,600);
              connect(pSpline, static_cast<void (Spline::*)(double, double, double)>(&Spline::borderChanged),
                      this, &Data3DTreeDelegate::onEditorEdited);
              QStandardItem* pParentItem = static_cast<QStandardItem*>(pAbstractItem->QStandardItem::parent());
@@ -240,7 +241,19 @@ void Data3DTreeDelegate::setEditorData(QWidget* editor, const QModelIndex& index
 
         case MetaTreeItemTypes::RTDataNormalizationValue: {
             Spline* pSpline = static_cast<Spline*>(editor);
-             pSpline->resize(800,600);
+            int width = pSpline->size().width();
+            int height = pSpline->size().height();
+
+            if (pSpline->size().width() == 137 && pSpline->size().height() == 15)   //pSpline initializes with size (137,15)
+            {
+                pSpline->resize(800,600);   //resize histogram to be readable with default size
+            }
+            else
+            {
+                width = pSpline->size().width();   //keeps the size of the histogram
+                height = pSpline->size().height();
+                pSpline->resize(width,height);
+            }
             return;
         }
 
