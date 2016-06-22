@@ -299,6 +299,10 @@ void BabyMEGInfo::MGH_LM_Parse_Para(QByteArray cmdstr)
             ntype = 4;
         else if (type == FIFFV_EEG_CH)
             ntype = 5;
+        else if (type >= FIFFV_QUAT_1 && type <= FIFFV_QUAT_6)
+            ntype = 6;
+        else if (type == FIFFV_HPI_G)
+            ntype = 7;
 
         switch (ntype)
         {
@@ -307,7 +311,6 @@ void BabyMEGInfo::MGH_LM_Parse_Para(QByteArray cmdstr)
             t_ch.unit = FIFF_UNIT_T;
             t_ch.unit_mul = FIFF_UNITM_NONE;
             t_ch.coil_type = FIFFV_COIL_BABY_MAG;
-
             break;
         case 2: // outer layer meg sensors
             t_ch.kind = FIFFV_REF_MEG_CH;
@@ -336,6 +339,21 @@ void BabyMEGInfo::MGH_LM_Parse_Para(QByteArray cmdstr)
             t_ch.coil_type = FIFFV_COIL_EEG;
 
             break;
+        case 6: // HPI channels
+            t_ch.kind = type;
+            t_ch.unit = FIFF_UNIT_V;
+            t_ch.unit_mul = FIFF_UNITM_NONE;
+            t_ch.coil_type = FIFFV_COIL_NONE;
+
+            break;
+        case 7: // HPI G channels
+            t_ch.kind = FIFFV_HPI_G;
+            t_ch.unit = FIFF_UNIT_V;
+            t_ch.unit_mul = FIFF_UNITM_NONE;
+            t_ch.coil_type = FIFFV_COIL_NONE;
+
+            break;
+
         default: // other unknown type sensors
             t_ch.kind = FIFFV_MEG_CH;
             t_ch.unit = FIFF_UNIT_T;
