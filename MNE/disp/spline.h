@@ -196,6 +196,17 @@ private:
     void updateThreshold (QLineSeries *lineSeries);
 
     //=========================================================================================================
+    /**
+    * updateColorMap takes in string name of color map and the three threshold lines and creates the color gradient
+    *
+    * @param[in]  colorMap  qstring of the color gradient from user input
+    * @param[in]  left      qlineseries of the left threshold line
+    * @param[in]  middle    qlineseries of the middle threshold line
+    * @param[in]  right     qlineseries of the right threshold line
+    */
+    void updateColorMap (QString colorMap, QLineSeries *left, QLineSeries *middle, QLineSeries *right);
+
+    //=========================================================================================================
 
     QChart          *m_pChart;              /**< Qchart object that will be shown in the widget */
     QSplineSeries   *series;                /**< Spline data series that will contain the histogram data*/
@@ -228,7 +239,6 @@ signals:
 template <typename T>
 void Spline::setData(const Eigen::Matrix<T, Eigen::Dynamic, 1>& matClassLimitData, const Eigen::Matrix<int, Eigen::Dynamic, 1>& matClassFrequencyData, int iPrecisionValue)
 {
-    qDebug()<< "SetData (Dynamic, 1) function starts!";
     Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrixName(matClassLimitData.rows(),1);
     matrixName.col(0) = matClassLimitData;
     this->updatePlot(matrixName, matClassFrequencyData, iPrecisionValue);
@@ -240,7 +250,6 @@ void Spline::setData(const Eigen::Matrix<T, Eigen::Dynamic, 1>& matClassLimitDat
 template <typename T>
 void Spline::setData(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matClassLimitData, const Eigen::Matrix<int, 1, Eigen::Dynamic>& matClassFrequencyData, int iPrecisionValue)
 {
-    qDebug()<< "SetData (1, Dynamic) function starts!";
     Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrixName(1, matClassLimitData.cols());
     matrixName.row(0) = matClassLimitData;
     this->updatePlot(matrixName, matClassFrequencyData, iPrecisionValue);
@@ -252,7 +261,6 @@ void Spline::setData(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matClassLimitDat
 template<typename T>
 void Spline::updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData, const Eigen::VectorXi& matClassFrequencyData, int iPrecisionValue)
 {
-    qDebug()<< "UpdatePlot function starts!";
     Eigen::VectorXd resultDisplayValues;
     int iClassAmount = matClassFrequencyData.rows();
     this->splitCoefficientAndExponent (matClassLimitData, iClassAmount, resultDisplayValues, resultExponentValues);
@@ -309,7 +317,6 @@ void Spline::updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& 
 template <typename T>
 void Spline::splitCoefficientAndExponent (const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData, int iClassAmount, Eigen::VectorXd& vecCoefficientResults, Eigen::VectorXi& vecExponentValues)
 {
-    qDebug()<< "splitCoefficientAndExponent function starts!";
     vecCoefficientResults.resize(iClassAmount + 1);
     vecExponentValues.resize(iClassAmount + 1);
     double originalValue(0.0),

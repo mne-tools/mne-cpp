@@ -73,7 +73,6 @@ Spline::Spline(const QString& title, QWidget* parent): QWidget(parent)
 
 void Spline::mousePressEvent(QMouseEvent *event)
 {
-    qDebug() << "MousePressEvent started!";
     if (series->count() == 0)               //protect integrity of the histogram widget in case series contain no data values
     {
         qDebug() << "Data set not found.";  //do nothing
@@ -152,6 +151,7 @@ void Spline::mousePressEvent(QMouseEvent *event)
                 }
             }
         }
+        updateColorMap("hot", leftThreshold, middleThreshold, rightThreshold);
     }
 }
 
@@ -160,7 +160,6 @@ void Spline::mousePressEvent(QMouseEvent *event)
 
 void Spline::setThreshold(const QVector3D& vecThresholdValues)
 {
-    qDebug() << "setThreshold function starts!";
     float leftThresholdValue;
     float middleThresholdValue;
     float rightThresholdValue;
@@ -247,6 +246,7 @@ void Spline::setThreshold(const QVector3D& vecThresholdValues)
         updateThreshold(leftThreshold);
         updateThreshold(middleThreshold);
         updateThreshold(rightThreshold);
+        updateColorMap("hot", leftThreshold, middleThreshold, rightThreshold);
 }
 
 
@@ -254,7 +254,6 @@ void Spline::setThreshold(const QVector3D& vecThresholdValues)
 
 void Spline::updateThreshold (QLineSeries* lineSeries)
 {
-    qDebug() << "updateThreshold function starts!";
     if (lineSeries->name() == "left")
     {
         lineSeries->setColor("red") ;
@@ -280,9 +279,49 @@ void Spline::updateThreshold (QLineSeries* lineSeries)
 
 //*************************************************************************************************************
 
+void Spline::updateColorMap (QString colorMap, QLineSeries *left, QLineSeries *middle, QLineSeries *right)
+{
+    double leftThresholdValue = (left->at(0).x())/maxAxisX;
+    double middleThresholdValue = (middle->at(0).x())/maxAxisX;
+    double rightThresholdValue = (right->at(0).x())/maxAxisX;
+    QRgb colorAtMin;
+    QRgb colorAtLeft;
+    QRgb colorAtMiddle;
+    QRgb colorAtRight;
+    QRgb colorAtMax;
+
+    if (colorMap == "hot")
+    {
+        colorAtMin = 0xc3c3c3;
+        colorAtLeft = 0xc3c3c3;
+        colorAtMiddle = 0xff0000;
+        colorAtRight = 0xffff00;
+        colorAtMax = 0xffffff;
+    }
+
+    // Customize plot area background
+    QLinearGradient plotAreaGradient;
+    plotAreaGradient.setStart(QPointF(0, 0));
+    plotAreaGradient.setFinalStop(QPointF(1, 0));
+    plotAreaGradient.setColorAt(0, colorAtMin);
+    plotAreaGradient.setColorAt(leftThresholdValue, colorAtLeft);
+    plotAreaGradient.setColorAt(middleThresholdValue, colorAtMiddle);
+    plotAreaGradient.setColorAt(rightThresholdValue, colorAtRight);
+    plotAreaGradient.setColorAt(1.0, colorAtMax);
+    qDebug()<< "leftThresholdValue = " << leftThresholdValue;
+    qDebug()<< "middleThresholdValue = " << middleThresholdValue;
+    qDebug()<< "rightThresholdValue = " << rightThresholdValue;
+    plotAreaGradient.setCoordinateMode(QGradient::ObjectBoundingMode);
+    m_pChart->setPlotAreaBackgroundBrush(plotAreaGradient);
+    m_pChart->setPlotAreaBackgroundVisible(true);
+
+}
+
+
+//*************************************************************************************************************
+
 const QVector3D &Spline::getThreshold()
 {
-    qDebug() << "getThreshold function starts!";
     QVector<QPointF> middlePoint = middleThreshold->pointsVector();   //Point values need to be updated before tested and displayed on the widget
     QVector<QPointF> rightPoint = rightThreshold->pointsVector();
     QVector<QPointF> leftPoint = leftThreshold->pointsVector();
@@ -303,7 +342,6 @@ const QVector3D &Spline::getThreshold()
 
 const QVector3D &Spline::correctionDisplayTrueValue(QVector3D vecOriginalValues, QString upOrDown)
 {
-    qDebug() << "correctionDisplayTrueValue function starts!";
     QVector3D returnCorrectedVector;
     int exponent;
     if (upOrDown == "up")
