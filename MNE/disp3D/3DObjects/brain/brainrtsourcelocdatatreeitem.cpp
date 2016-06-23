@@ -162,6 +162,7 @@ bool BrainRTSourceLocDataTreeItem::init(const MNEForwardSolution& tForwardSoluti
     this->appendRow(list);
     pItemRTDataStreamStatus->setCheckable(true);
     pItemRTDataStreamStatus->setCheckState(Qt::Unchecked);
+
     data.setValue(false);
     pItemRTDataStreamStatus->setData(data, MetaTreeItemRoles::RTDataStreamStatus);
 

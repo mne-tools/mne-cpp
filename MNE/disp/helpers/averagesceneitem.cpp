@@ -64,7 +64,7 @@ AverageSceneItem::AverageSceneItem(const QString& channelName, int channelNumber
 , m_iChannelUnit(channelUnit)
 , m_iFontTextSize(15)
 , m_iMaxWidth(1000)
-, m_iMaxHeigth(300)
+, m_iMaxHeigth(150)
 {
     m_lAverageColors.append(color);
 
@@ -138,7 +138,7 @@ void AverageSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     painter->setFont(f);
 
     painter->setPen(pen);
-    painter->drawStaticText(boundingRect().x(), boundingRect().y(), staticElectrodeName);
+    painter->drawStaticText(boundingRect().x(), boundingRect().y()-(2*m_iFontTextSize), staticElectrodeName);
     painter->restore();
 
     //Plot bounding rect
@@ -276,7 +276,7 @@ void AverageSceneItem::paintStimLine(QPainter *painter)
     if(m_lAverageData.size() == 0)
         return;
 
-    //Plot averaged data
+    //Plot vertical and horizontal lines
     QRectF boundingRect = this->boundingRect();
     QPainterPath path = QPainterPath(QPointF(boundingRect.x(), boundingRect.y() + boundingRect.height()/2));
 
@@ -293,9 +293,11 @@ void AverageSceneItem::paintStimLine(QPainter *painter)
     pen.setWidthF(3);
     painter->setPen(pen);
 
-    path.moveTo(boundingRect.x()+abs(m_firstLastSample.first)/dsFactor, boundingRect.y()+boundingRect.height()/2-75);
-    path.lineTo(boundingRect.x()+abs(m_firstLastSample.first)/dsFactor, boundingRect.y()+boundingRect.height()/2+75);
+    //Stim line
+    path.moveTo(boundingRect.x()+abs(m_firstLastSample.first)/dsFactor, boundingRect.y());
+    path.lineTo(boundingRect.x()+abs(m_firstLastSample.first)/dsFactor, boundingRect.y()+boundingRect.height());
 
+    //zero line
     path.moveTo(boundingRect.x(),boundingRect.y()+boundingRect.height()/2);
     path.lineTo(boundingRect.x()+m_lAverageData.first().second/dsFactor, boundingRect.y()+boundingRect.height()/2);
 
