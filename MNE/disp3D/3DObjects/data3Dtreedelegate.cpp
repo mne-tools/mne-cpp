@@ -101,19 +101,28 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
         }
 
         case MetaTreeItemTypes::RTDataNormalizationValue: {
-             Spline* pSpline = new Spline("Spline Histogram", 0);
-             connect(pSpline, static_cast<void (Spline::*)(double, double, double)>(&Spline::borderChanged),
-                     this, &Data3DTreeDelegate::onEditorEdited);
-             QStandardItem* pParentItem = static_cast<QStandardItem*>(pAbstractItem->QStandardItem::parent());
-             QModelIndex indexParent = pData3DTreeModel->indexFromItem(pParentItem);
-             MatrixXd matRTData = index.model()->data(indexParent, Data3DTreeModelItemRoles::RTData).value<MatrixXd>();
-             Eigen::VectorXd resultClassLimit;
-             Eigen::VectorXi resultFrequency;
-             MNEMath::histcounts(matRTData, false, 50, resultClassLimit, resultFrequency, 0.0, 0.0);
-             pSpline->setData(resultClassLimit, resultFrequency, 0);
-             QVector3D vecThresholdValues = index.model()->data(index, MetaTreeItemRoles::RTDataNormalizationValue).value<QVector3D>();
-             pSpline->setThreshold(vecThresholdValues);
-             return pSpline;
+            Spline* pSpline = new Spline("Spline Histogram", 0);
+            connect(pSpline, static_cast<void (Spline::*)(double, double, double)>(&Spline::borderChanged),
+            this, &Data3DTreeDelegate::onEditorEdited);
+            QStandardItem* pParentItem = static_cast<QStandardItem*>(pAbstractItem->QStandardItem::parent());
+            QModelIndex indexParent = pData3DTreeModel->indexFromItem(pParentItem);
+            MatrixXd matRTData = index.model()->data(indexParent, Data3DTreeModelItemRoles::RTData).value<MatrixXd>();
+            Eigen::VectorXd resultClassLimit;
+            Eigen::VectorXi resultFrequency;
+            MNEMath::histcounts(matRTData, false, 50, resultClassLimit, resultFrequency, 0.0, 0.0);
+            pSpline->setData(resultClassLimit, resultFrequency, 0);
+            QVector3D vecThresholdValues = index.model()->data(index, MetaTreeItemRoles::RTDataNormalizationValue).value<QVector3D>();
+            pSpline->setThreshold(vecThresholdValues);
+
+            AbstractTreeItem* pParentItemAbstract = static_cast<AbstractTreeItem*>(pParentItem);
+            QList<QStandardItem*> pColormapItem = pParentItemAbstract->findChildren(MetaTreeItemTypes::RTDataColormapType);
+            for(int i = 0; i < pColormapItem.size(); ++i)
+            {
+                QModelIndex indexColormapItem = pData3DTreeModel->indexFromItem(pColormapItem.at(i));
+                QString colorMap = index.model()->data(indexColormapItem, MetaTreeItemRoles::RTDataColormapType).value<QString>();
+                pSpline->setColorMap(colorMap);
+            }
+            return pSpline;
         }
 
         case MetaTreeItemTypes::RTDataTimeInterval: {
@@ -242,7 +251,8 @@ void Data3DTreeDelegate::setEditorData(QWidget* editor, const QModelIndex& index
             Spline* pSpline = static_cast<Spline*>(editor);
             int width = pSpline->size().width();
             int height = pSpline->size().height();
-
+            qDebug()<< "width = " << width;
+            qDebug()<< "height = " << height;
             if (pSpline->size().width() == 137 && pSpline->size().height() == 15)   //pSpline initializes with size (137,15)
             {
                 pSpline->resize(800,600);   //resize histogram to be readable with default size
