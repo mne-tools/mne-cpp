@@ -153,17 +153,6 @@ public:
     */
     bool addData(const MNELIB::MNEHemisphere& tHemisphere, Qt3DCore::QEntity* p3DEntityParent = 0);
 
-    //=========================================================================================================
-    /**
-    * Adds source estimated activation data.
-    *
-    * @param[in] tSourceEstimate    The MNESourceEstimate.
-    * @param[in] tForwardSolution   The MNEForwardSolution.
-    *
-    * @return                       Returns a list with the tree items which now hold the activation data. Use this list to update the data, i.e. during real time applications.
-    */
-    BrainRTSourceLocDataTreeItem* addData(const MNELIB::MNESourceEstimate& tSourceEstimate, const MNELIB::MNEForwardSolution& tForwardSolution = MNELIB::MNEForwardSolution());
-
 private:
     //=========================================================================================================
     /**
@@ -173,10 +162,8 @@ private:
     */
     virtual void onCheckStateChanged(const Qt::CheckState& checkState);
 
-private:
     BrainSurfaceTreeItem*           m_pSurfaceItem;                     /**< The surface item of this hemisphere item. Only one surface item may exists under a hemisphere item. */
     BrainAnnotationTreeItem*        m_pAnnotItem;                       /**< The annotation item of this hemisphere item. Only one annotation item may exists under a hemisphere item. */
-    BrainRTSourceLocDataTreeItem*   m_pBrainRTSourceLocDataTreeItem;    /**< The rt data item of this hemisphere item. Multiple rt data item's can be added to this hemipshere item. */
 };
 
 } //NAMESPACE DISP3DLIB

@@ -290,14 +290,24 @@ QList<BrainRTSourceLocDataTreeItem*> Data3DTreeModel::addData(const QString& sub
             //Find the all the hemispheres of the set "set" and add the source estimates as items
             if(!itemList.isEmpty()) {
                 for(int i = 0; i<itemList.size(); i++) {
-                    for(int j = 0; j<itemList.at(i)->rowCount(); j++) {
-                        if(itemList.at(i)->child(j,0)->type() == Data3DTreeModelItemTypes::HemisphereItem) {
-                            BrainHemisphereTreeItem* pHemiItem = dynamic_cast<BrainHemisphereTreeItem*>(itemList.at(i)->child(j,0));
-                            returnList.append(pHemiItem->addData(tSourceEstimate, tForwardSolution));
-                        }
+                    if(itemList.at(i)->type() == Data3DTreeModelItemTypes::SurfaceSetItem) {
+                        BrainSurfaceSetTreeItem* pSetItem = dynamic_cast<BrainSurfaceSetTreeItem*>(itemList.at(i));
+                        returnList.append(pSetItem->addData(tSourceEstimate, tForwardSolution));
                     }
                 }
             }
+
+//            //Find the all the hemispheres of the set "set" and add the source estimates as items
+//            if(!itemList.isEmpty()) {
+//                for(int i = 0; i<itemList.size(); i++) {
+//                    for(int j = 0; j<itemList.at(i)->rowCount(); j++) {
+//                        if(itemList.at(i)->child(j,0)->type() == Data3DTreeModelItemTypes::HemisphereItem) {
+//                            BrainHemisphereTreeItem* pHemiItem = dynamic_cast<BrainHemisphereTreeItem*>(itemList.at(i)->child(j,0));
+//                            returnList.append(pHemiItem->addData(tSourceEstimate, tForwardSolution));
+//                        }
+//                    }
+//                }
+//            }
         }
     }
 
