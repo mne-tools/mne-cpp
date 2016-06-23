@@ -92,13 +92,13 @@ void Spline::mousePressEvent(QMouseEvent *event)
         QPointF localX = m_pChart->mapToValue(point, shadowSeries);
         QPointF localY = m_pChart->mapToValue(pointY, shadowSeries);
         verticalLine->append(localX.x(), 0);
-        verticalLine->append(localX.x(), maximumFrequency);
+        verticalLine->append(localX.x(), iMaximumFrequency);
         double boundaryX = double(localX.x());   //casting localX.x() from float to double for comparison with minAxisX and maxAxisX
-        double boundaryY = double(localY.y());   //casting localY.y() from float to double for comparison with 0 and maximumFrequency
+        double boundaryY = double(localY.y());   //casting localY.y() from float to double for comparison with 0 and the maximum frequency
 
         if((boundaryX >= float(minAxisX)) && (boundaryX <= float(maxAxisX)))  //this condition ensures that threshold lines can only be created within the boundary of the x-axis
         {
-            if((boundaryY >= 0.0) && (boundaryY <= float(maximumFrequency)))  // this condition ensures that threshold lines can only be created within the boundary of the y-axis
+            if((boundaryY >= 0.0) && (boundaryY <= float(iMaximumFrequency)))  // this condition ensures that threshold lines can only be created within the boundary of the y-axis
             {
                 QVector<QPointF> middlePoint = middleThreshold->pointsVector();   //Point values need to be updated before tested and displayed on the widget
                 QVector<QPointF> rightPoint = rightThreshold->pointsVector();
@@ -151,7 +151,7 @@ void Spline::mousePressEvent(QMouseEvent *event)
                 }
             }
         }
-        updateColorMap("hot", leftThreshold, middleThreshold, rightThreshold);
+        setColorMap(m_colorMap);
     }
 }
 
@@ -235,18 +235,18 @@ void Spline::setThreshold(const QVector3D& vecThresholdValues)
         rightThresholdPoint.setX(rightThresholdValue);
 
         leftThreshold->append(leftThresholdPoint.x(), 0);
-        leftThreshold->append(leftThresholdPoint.x(), maximumFrequency);
+        leftThreshold->append(leftThresholdPoint.x(), iMaximumFrequency);
         middleThreshold->append(middleThresholdPoint.x(), 0);
-        middleThreshold->append(middleThresholdPoint.x(), maximumFrequency);
+        middleThreshold->append(middleThresholdPoint.x(), iMaximumFrequency);
         rightThreshold->append(rightThresholdPoint.x(), 0);
-        rightThreshold->append(rightThresholdPoint.x(), maximumFrequency);
+        rightThreshold->append(rightThresholdPoint.x(), iMaximumFrequency);
 
         qDebug() << "CURRENT THRESHOLD = " << leftThreshold << middleThreshold << rightThreshold;
 
         updateThreshold(leftThreshold);
         updateThreshold(middleThreshold);
         updateThreshold(rightThreshold);
-        updateColorMap("hot", leftThreshold, middleThreshold, rightThreshold);
+        setColorMap(m_colorMap);
 }
 
 
@@ -279,42 +279,68 @@ void Spline::updateThreshold (QLineSeries* lineSeries)
 
 //*************************************************************************************************************
 
-void Spline::updateColorMap (QString colorMap, QLineSeries *left, QLineSeries *middle, QLineSeries *right)
+void Spline::setColorMap (QString colorMap)
 {
-    double leftThresholdValue = (left->at(0).x())/maxAxisX;
-    double middleThresholdValue = (middle->at(0).x())/maxAxisX;
-    double rightThresholdValue = (right->at(0).x())/maxAxisX;
-    QRgb colorAtMin;
-    QRgb colorAtLeft;
-    QRgb colorAtMiddle;
-    QRgb colorAtRight;
-    QRgb colorAtMax;
-
-    if (colorMap == "hot")
-    {
-        colorAtMin = 0xc3c3c3;
-        colorAtLeft = 0xc3c3c3;
-        colorAtMiddle = 0xff0000;
-        colorAtRight = 0xffff00;
-        colorAtMax = 0xffffff;
-    }
-
-    // Customize plot area background
+    m_colorMap = colorMap;
+    double leftThresholdValue = (leftThreshold->at(0).x())/maxAxisX;
+    double middleThresholdValue = (middleThreshold->at(0).x())/maxAxisX;
+    double rightThresholdValue = (rightThreshold->at(0).x())/maxAxisX;
+    qDebug() << "updateColorMap::leftThresholdValue = " << leftThresholdValue;
+    qDebug() << "updateColorMap::middleThresholdValue = " << middleThresholdValue;
+    qDebug() << "updateColorMap::rightThresholdValue = " << rightThresholdValue;
+    int stepsNumber = 25;
+    double stepsSize = (rightThresholdValue - leftThresholdValue) / stepsNumber;
     QLinearGradient plotAreaGradient;
     plotAreaGradient.setStart(QPointF(0, 0));
     plotAreaGradient.setFinalStop(QPointF(1, 0));
-    plotAreaGradient.setColorAt(0, colorAtMin);
-    plotAreaGradient.setColorAt(leftThresholdValue, colorAtLeft);
-    plotAreaGradient.setColorAt(middleThresholdValue, colorAtMiddle);
-    plotAreaGradient.setColorAt(rightThresholdValue, colorAtRight);
-    plotAreaGradient.setColorAt(1.0, colorAtMax);
+
+    if (colorMap == "Hot Negative 1")
+    {
+        plotAreaGradient.setColorAt(leftThresholdValue, ColorMap::valueToHotNegative1(0));
+
+        for (int i = 1; i < stepsNumber; i++)
+        {
+            plotAreaGradient.setColorAt(leftThresholdValue+(stepsSize*i), ColorMap::valueToHotNegative1((double)i*(1/(double)stepsNumber)));
+        }
+        plotAreaGradient.setColorAt(rightThresholdValue, ColorMap::valueToHotNegative1(1));
+    }
+
+    else if (colorMap == "Hot Negative 2")
+    {
+        plotAreaGradient.setColorAt(leftThresholdValue, ColorMap::valueToHotNegative2(0));
+
+        for (int i = 1; i < stepsNumber; i++)
+        {
+            plotAreaGradient.setColorAt(leftThresholdValue+(stepsSize*i), ColorMap::valueToHotNegative2((double)i*(1/(double)stepsNumber)));
+        }
+
+        plotAreaGradient.setColorAt(rightThresholdValue, ColorMap::valueToHotNegative2(1));
+    }
+
+    else if (colorMap == "Hot")
+    {
+        plotAreaGradient.setColorAt(leftThresholdValue, ColorMap::valueToHot(0));
+
+        for (int i = 1; i < stepsNumber; i++)
+        {
+            plotAreaGradient.setColorAt(leftThresholdValue+(stepsSize*i), ColorMap::valueToHot((double)i*(1/(double)stepsNumber)));
+        }
+
+        plotAreaGradient.setColorAt(rightThresholdValue, ColorMap::valueToHot(1));
+    }
+
+    else
+    {
+        qDebug() << "updateColorMap error. Check for correct color map names.";
+    }
+
+    // Customize plot area background
     qDebug()<< "leftThresholdValue = " << leftThresholdValue;
     qDebug()<< "middleThresholdValue = " << middleThresholdValue;
     qDebug()<< "rightThresholdValue = " << rightThresholdValue;
     plotAreaGradient.setCoordinateMode(QGradient::ObjectBoundingMode);
     m_pChart->setPlotAreaBackgroundBrush(plotAreaGradient);
     m_pChart->setPlotAreaBackgroundVisible(true);
-
 }
 
 
