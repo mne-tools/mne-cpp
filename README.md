@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="http://www.mne-cpp.org/wp-content/uploads/2016/06/MNE-CPP_GitHub_Logo.svg" width="600" height="400" alt="MNE-CPP"><br><br>
+  <img src="http://www.mne-cpp.org/wp-content/uploads/2016/06/MNE-CPP_GitHub_Logo.svg" width="600" height="300" alt="MNE-CPP"><br><br>
 </div>
 -----------------
 
