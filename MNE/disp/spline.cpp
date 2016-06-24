@@ -290,6 +290,8 @@ void Spline::setColorMap (QString colorMap)
     qDebug() << "updateColorMap::rightThresholdValue = " << rightThresholdValue;
     int stepsNumber = 25;
     double stepsSize = (rightThresholdValue - leftThresholdValue) / stepsNumber;
+    double stepsSizeLeftMiddle = (middleThresholdValue - leftThresholdValue) / stepsNumber;
+    double stepsSizeMiddleRight = (rightThresholdValue - middleThresholdValue) / stepsNumber;
     QLinearGradient plotAreaGradient;
     plotAreaGradient.setStart(QPointF(0, 0));
     plotAreaGradient.setFinalStop(QPointF(1, 0));
@@ -300,7 +302,8 @@ void Spline::setColorMap (QString colorMap)
 
         for (int i = 1; i < stepsNumber; i++)
         {
-            plotAreaGradient.setColorAt(leftThresholdValue+(stepsSize*i), ColorMap::valueToHotNegative1((double)i*(1/(double)stepsNumber)));
+            plotAreaGradient.setColorAt(leftThresholdValue + (stepsSizeLeftMiddle * i), ColorMap::valueToHotNegative1((double)i * (0.5 / (double)stepsNumber)));
+            plotAreaGradient.setColorAt(middleThresholdValue + (stepsSizeMiddleRight * i), ColorMap::valueToHotNegative1((double)0.5 + (i * (0.5 / (double)stepsNumber))));
         }
         plotAreaGradient.setColorAt(rightThresholdValue, ColorMap::valueToHotNegative1(1));
     }
@@ -311,9 +314,9 @@ void Spline::setColorMap (QString colorMap)
 
         for (int i = 1; i < stepsNumber; i++)
         {
-            plotAreaGradient.setColorAt(leftThresholdValue+(stepsSize*i), ColorMap::valueToHotNegative2((double)i*(1/(double)stepsNumber)));
+            plotAreaGradient.setColorAt(leftThresholdValue + (stepsSizeLeftMiddle * i), ColorMap::valueToHotNegative2((double)i * (0.5 / (double)stepsNumber)));
+            plotAreaGradient.setColorAt(middleThresholdValue + (stepsSizeMiddleRight * i), ColorMap::valueToHotNegative2((double)0.5 + (i * (0.5 / (double)stepsNumber))));
         }
-
         plotAreaGradient.setColorAt(rightThresholdValue, ColorMap::valueToHotNegative2(1));
     }
 
@@ -323,9 +326,9 @@ void Spline::setColorMap (QString colorMap)
 
         for (int i = 1; i < stepsNumber; i++)
         {
-            plotAreaGradient.setColorAt(leftThresholdValue+(stepsSize*i), ColorMap::valueToHot((double)i*(1/(double)stepsNumber)));
+            plotAreaGradient.setColorAt(leftThresholdValue + (stepsSizeLeftMiddle * i), ColorMap::valueToHot((double)i * (0.5 / (double)stepsNumber)));
+            plotAreaGradient.setColorAt(middleThresholdValue + (stepsSizeMiddleRight * i), ColorMap::valueToHot((double)0.5 + (i * (0.5 / (double)stepsNumber))));
         }
-
         plotAreaGradient.setColorAt(rightThresholdValue, ColorMap::valueToHot(1));
     }
 
