@@ -9,8 +9,6 @@ brew link --force qt5
 brew install dylibbundler
 
 # Set Environment -> Extract Qt dirs from actual version
-which qmake
-
 QMAKE_VERSION=`qmake -v`
 QT_LIB_DIR=${QMAKE_VERSION##*in }
 QT_BIN_DIR=${QT_LIB_DIR%/*}/bin
