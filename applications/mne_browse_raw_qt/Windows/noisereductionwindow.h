@@ -109,7 +109,7 @@ public:
     /**
     * Set new fiff info
     */
-    void setFiffInfo(FiffInfo* pFiffInfo);
+    void setFiffInfo(FiffInfo::SPtr& pFiffInfo);
 
 signals:
     //=========================================================================================================
@@ -175,7 +175,7 @@ private:
 
     QSignalMapper*      m_pCompSignalMapper;
 
-    FiffInfo*           m_pFiffInfo;
+    FiffInfo::SPtr      m_pFiffInfo;                    /**< Connected fiff info. */
 };
 
 } // NAMESPACE MNEBrowseRawQt
