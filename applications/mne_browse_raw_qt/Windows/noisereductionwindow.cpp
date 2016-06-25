@@ -246,7 +246,7 @@ void NoiseReductionWindow::checkCompStatusChanged(const QString & compName)
 {
     qDebug()<<compName;
 
-    bool currentState;
+    bool currentState = false;
 
     for(int i = 0; i < m_qListCompCheckBox.size(); ++i)
         if(m_qListCompCheckBox[i]->text() != compName)
