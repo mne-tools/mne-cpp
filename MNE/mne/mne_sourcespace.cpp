@@ -623,7 +623,7 @@ bool MNESourceSpace::patch_info(MNEHemisphere &p_Hemisphere)//VectorXi& nearest,
             t_vfirsti.push_back(current);
         }
     }
-    t_vlasti.push_back(t_vIndn.size()-1);
+    t_vlasti.push_back(static_cast<int>(t_vIndn.size()-1));
 
     for(quint32 k = 0; k < t_vfirsti.size(); ++k)
     {
