@@ -442,7 +442,7 @@ void RealTimeEvokedWidget::init()
         //
         //-------- Init channel selection manager --------
         //
-        m_pChInfoModel = QSharedPointer<ChInfoModel>(new ChInfoModel(m_pFiffInfo.data(), this));
+        m_pChInfoModel = QSharedPointer<ChInfoModel>(new ChInfoModel(m_pFiffInfo, this));
         m_pSelectionManagerWindow = QSharedPointer<SelectionManagerWindow>(new SelectionManagerWindow(this, m_pChInfoModel));
 
         connect(m_pSelectionManagerWindow.data(), &SelectionManagerWindow::showSelectedChannelsOnly,
@@ -455,7 +455,7 @@ void RealTimeEvokedWidget::init()
         connect(m_pChInfoModel.data(), &ChInfoModel::channelsMappedToLayout,
                 m_pSelectionManagerWindow.data(), &SelectionManagerWindow::setCurrentlyMappedFiffChannels);
 
-        m_pChInfoModel->fiffInfoChanged(m_pFiffInfo.data());
+        m_pChInfoModel->fiffInfoChanged(m_pFiffInfo);
 
         m_pSelectionManagerWindow->setCurrentLayoutFile(settings.value(QString("RTEW/%1/selectedLayoutFile").arg(t_sRTEWName), "babymeg-mag-inner-layer.lout").toString());
 

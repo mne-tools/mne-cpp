@@ -474,7 +474,7 @@ void RawModel::loadFiffInfos()
         m_chInfolist.append(m_pfiffIO->m_qlistRaw[0]->info.chs[i]);
 
     //loads fiffInfo
-    m_pFiffInfo = &m_pfiffIO->m_qlistRaw[0]->info;
+    m_pFiffInfo = FiffInfo::SPtr(new FiffInfo(m_pfiffIO->m_qlistRaw[0]->info));
 }
 
 

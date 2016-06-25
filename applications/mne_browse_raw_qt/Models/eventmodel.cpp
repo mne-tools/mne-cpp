@@ -422,7 +422,7 @@ bool EventModel::saveEventData(QFile& qFile)
 
 //*************************************************************************************************************
 
-void EventModel::setFiffInfo(FiffInfo* pFiffInfo)
+void EventModel::setFiffInfo(FiffInfo::SPtr& pFiffInfo)
 {
     m_pFiffInfo = pFiffInfo;
 }
@@ -448,7 +448,7 @@ void EventModel::setCurrentMarkerPos(int markerPos)
 
 //*************************************************************************************************************
 
-FiffInfo* EventModel::getFiffInfo() const
+FiffInfo::SPtr EventModel::getFiffInfo() const
 {
     return m_pFiffInfo;
 }
