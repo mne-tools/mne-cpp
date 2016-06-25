@@ -102,6 +102,14 @@ EventModel::EventModel(QFile &qFile, QObject *parent)
 
 //*************************************************************************************************************
 //virtual functions
+EventModel::~EventModel()
+{
+
+}
+
+
+//*************************************************************************************************************
+//virtual functions
 int EventModel::rowCount(const QModelIndex & /*parent*/) const
 {
     //Always return filtered events so that the qTableView gets the correct number of rows which are to be displayed
