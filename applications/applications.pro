@@ -55,7 +55,7 @@ SUBDIRS += \
         message(applications.pro - Qt3D available)
         SUBDIRS += \
 #            mne_matching_pursuit \
-            mne_analyze_qt
+#            mne_analyze_qt
     }
 }
 
