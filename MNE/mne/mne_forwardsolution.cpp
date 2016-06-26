@@ -863,7 +863,7 @@ FiffCov MNEForwardSolution::compute_depth_prior(const MatrixXd &Gain, const Fiff
     if (!limit_depth_chs)
     {
         // match old mne-python behavor
-        qint32 ind;
+        qint32 ind = 0;
         ws.minCoeff(&ind);
         n_limit = ind;
         limit = ws[ind] * weight_limit;
@@ -872,7 +872,7 @@ FiffCov MNEForwardSolution::compute_depth_prior(const MatrixXd &Gain, const Fiff
     {
         // match C code behavior
         limit = ws[ws.size()-1];
-        qint32 ind;
+        qint32 ind = 0;
         n_limit = d.size();
         if (ws[ws.size()-1] > weight_limit * ws[0])
         {

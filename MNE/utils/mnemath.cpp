@@ -381,14 +381,14 @@ MatrixXd MNEMath::rescale(const MatrixXd &data, const RowVectorXf &times, QPair<
     }
     printf("\tApplying baseline correction ... (mode: %s)\n", mode.toLatin1().constData());
 
-    qint32 imin, imax;
-    float bmin, bmax;
+    qint32 imin = 0;
+    qint32 imax = times.size();
 
     if(!baseline.first.isValid())
         imin = 0;
     else
     {
-        bmin = baseline.first.toFloat();
+        float bmin = baseline.first.toFloat();
         for(qint32 i = 0; i < times.size(); ++i)
         {
             if(times[i] >= bmin)
@@ -402,7 +402,7 @@ MatrixXd MNEMath::rescale(const MatrixXd &data, const RowVectorXf &times, QPair<
         imax = times.size();
     else
     {
-        bmax = baseline.second.toFloat();
+        float bmax = baseline.second.toFloat();
         for(qint32 i = times.size()-1; i >= 0; --i)
         {
             if(times[i] <= bmax)
