@@ -323,6 +323,7 @@ int ParksMcClellan::Remez2(int GridIndex)
     double Deviation, DNUM, DDEN, TempVar;
     double DEVL, COMP, YNZ, Y1, ERR;
 
+    Y1 = 1;
     LUCK = 0;
     DEVL = -1.0;
     NITER = 1; // Init this to 1 to be consistent with the orig code.
@@ -389,19 +390,19 @@ int ParksMcClellan::Remez2(int GridIndex)
 
         if(k < KUP && !ErrTest(k, NUT, COMP, &ERR))
         {
-        L210:
-        COMP = (double)NUT * ERR;
-        for(k++; k<KUP; k++)
-        {
-        if( ErrTest(k, NUT, COMP, &ERR) )break; // for loop
-        COMP = (double)NUT * ERR;
-        }
+            L210:
+            COMP = (double)NUT * ERR;
+            for(k++; k<KUP; k++)
+            {
+                if( ErrTest(k, NUT, COMP, &ERR) )break; // for loop
+                COMP = (double)NUT * ERR;
+            }
 
-        ExchangeIndex[j] = k-1;
-        j++;
-        KLOW = k - 1;
-        JCHNGE++;
-        continue;  // while loop
+            ExchangeIndex[j] = k-1;
+            j++;
+            KLOW = k - 1;
+            JCHNGE++;
+            continue;  // while loop
         }
 
         k--;

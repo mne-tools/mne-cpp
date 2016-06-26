@@ -77,7 +77,7 @@ FiffChPos::FiffChPos(const FiffChPos &p_FiffChPos)
         r0[i] = p_FiffChPos.r0[i];
         ex[i] = p_FiffChPos.ex[i];
         ey[i] = p_FiffChPos.ey[i];
-        ey[i] = p_FiffChPos.ez[i];
+        ez[i] = p_FiffChPos.ez[i];
     }
 }
 
