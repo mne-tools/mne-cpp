@@ -41,11 +41,11 @@ matrix:
       sudo: required
       compiler: gcc
       env: BUILD=documentation
-    - os: linux
-      dist: trusty
-      sudo: required
-      compiler: gcc
-      env: BUILD=coverity
+#    - os: linux
+#      dist: trusty
+#      sudo: required
+#      compiler: gcc
+#      env: BUILD=coverity
 
 
 before_install: . tools/travis/$BUILD/before_install.sh
