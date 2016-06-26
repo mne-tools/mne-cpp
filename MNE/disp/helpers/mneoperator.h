@@ -90,6 +90,12 @@ public:
 
     MNEOperator(OperatorType type);
 
+    //=========================================================================================================
+    /**
+    * Destructor
+    */
+    virtual ~MNEOperator();
+
     QString m_sName;
 };
 
