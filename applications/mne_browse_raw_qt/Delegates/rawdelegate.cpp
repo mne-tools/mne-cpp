@@ -70,6 +70,9 @@ RawDelegate::RawDelegate(QObject *parent)
 , m_bShowSelectedEventsOnly(false)
 , m_bActivateEvents(true)
 , m_bRemoveDC(false)
+, m_dMaxValue(65530)
+, m_dScaleY(1)
+, m_pScaleWindow(Q_NULLPTR)
 {
     m_iDefaultPlotHeight = DELEGATE_PLOT_HEIGHT;
     m_dDx = DELEGATE_DX;
