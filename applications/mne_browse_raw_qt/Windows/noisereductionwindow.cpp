@@ -66,6 +66,8 @@ using namespace MNEBrowseRawQt;
 NoiseReductionWindow::NoiseReductionWindow(QWidget *parent)
 : QDockWidget(parent)
 , ui(new Ui::NoiseReductionWindow)
+, m_enableDisableProjectors(Q_NULLPTR)
+, m_pCompSignalMapper(Q_NULLPTR)
 {
     ui->setupUi(this);
 }
