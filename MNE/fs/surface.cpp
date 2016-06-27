@@ -261,14 +261,16 @@ bool Surface::read(const QString &p_sFile, Surface &p_Surface, bool p_bLoadCurva
 
     qint32 magic = IOUtils::fread3(t_DataStream);
 
-    qint32 nvert, nface;
+    qint32 nvert = 0;
+    qint32 nquad = 0;
+    qint32 nface = 0;
     MatrixXf verts;
     MatrixXi faces;
 
     if(magic == QUAD_FILE_MAGIC_NUMBER || magic == NEW_QUAD_FILE_MAGIC_NUMBER)
     {
-        qint32 nvert = IOUtils::fread3(t_DataStream);
-        qint32 nquad = IOUtils::fread3(t_DataStream);
+        nvert = IOUtils::fread3(t_DataStream);
+        nquad = IOUtils::fread3(t_DataStream);
         if(magic == QUAD_FILE_MAGIC_NUMBER)
             printf("\t%s is a quad file (nvert = %d nquad = %d)\n", p_sFile.toLatin1().constData(),nvert,nquad);
         else
@@ -313,7 +315,6 @@ bool Surface::read(const QString &p_sFile, Surface &p_Surface, bool p_bLoadCurva
         //  Face splitting follows
         //
         faces = MatrixXi::Zero(2*nquad,3);
-        nface = 0;
         for(qint32 k = 0; k < nquad; ++k)
         {
             RowVectorXi quad = quads.row(k);

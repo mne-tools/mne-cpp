@@ -26,7 +26,7 @@ n_elements=${#TANGIBLES[@]}
 for ((i = 0; i < n_elements; i++)); do
     tangibleapp="../mne-cpp/bin/${TANGIBLES[i]}.app"
     tangibledmgbin="../mne-cpp/bin/${TANGIBLES[i]}.dmg"
-    tangibledmg="../${TANGIBLES[i]}-1.0.0-beta.dmg"
+    tangibledmg="../${TANGIBLES[i]}-master.dmg"
     rm -rf $tangibleapp
 	rm $tangibledmgbin
 	rm $tangibledmg
@@ -52,5 +52,5 @@ done
 cd ..
 for ((i = 0; i < n_elements; i++)); do
 	cp "./mne-cpp/bin/${TANGIBLES[i]}.dmg" "./"
-	mv "./${TANGIBLES[i]}.dmg" "./${TANGIBLES[i]}-1.0.0-beta.dmg"
+	mv "./${TANGIBLES[i]}.dmg" "./${TANGIBLES[i]}-master.dmg"
 done

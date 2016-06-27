@@ -130,7 +130,7 @@ bool DacqServer::getMeasInfo(FiffInfo& p_fiffInfo)
             MatrixXd data;
             
             fiff_int_t kind;
-            bool active;
+            bool active = false;
             QString desc; // maybe, in some cases this has to be a struct.
 
             //
