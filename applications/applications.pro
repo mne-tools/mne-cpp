@@ -54,8 +54,8 @@ SUBDIRS += \
     qtHaveModule(3dcore,3drender,3dinput) {
         message(applications.pro - Qt3D available)
         SUBDIRS += \
-#            mne_matching_pursuit \
-#            mne_analyze_qt
+            mne_matching_pursuit \
+            mne_analyze_qt
     }
 }
 
