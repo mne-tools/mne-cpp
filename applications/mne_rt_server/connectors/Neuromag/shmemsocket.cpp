@@ -378,7 +378,6 @@ int ShmemSocket::disconnect_client ()
 void ShmemSocket::set_data_filter (int *kinds, int nkind)
 {
     if (nkind <= 0) {
-        free (filter_kinds);
         delete[] filter_kinds;
         nfilt = 0;
     }

@@ -352,7 +352,7 @@ FilterData::DesignMethod FilterData::getDesignMethodForString(const QString &des
 
 FilterData::FilterType FilterData::getFilterTypeForString(const QString &filterTypeString)
 {
-    FilterData::FilterType filterType;
+    FilterData::FilterType filterType = FilterData::UNKNOWN;
 
     if(filterTypeString == "LPF")
         filterType = FilterData::LPF;

@@ -630,7 +630,7 @@ void FilterWindow::filterParametersChanged()
     }
 
     //set filter design method
-    FilterData::DesignMethod dMethod;
+    FilterData::DesignMethod dMethod = FilterData::Tschebyscheff;
     if(ui->m_comboBox_designMethod->currentText() == "Tschebyscheff")
         dMethod = FilterData::Tschebyscheff;
 
