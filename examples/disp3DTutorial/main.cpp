@@ -151,66 +151,66 @@ int main(int argc, char *argv[])
     //
     //########################################################################################
 
-    if(bAddRtSourceLoc) {
-        double snr = 3.0;
-        double lambda2 = 1.0 / pow(snr, 2);
-        QString method("dSPM"); //"MNE" | "dSPM" | "sLORETA"
+//    if(bAddRtSourceLoc) {
+//        double snr = 3.0;
+//        double lambda2 = 1.0 / pow(snr, 2);
+//        QString method("dSPM"); //"MNE" | "dSPM" | "sLORETA"
 
-        // Load data
-        fiff_int_t setno = 3;
-        QPair<QVariant, QVariant> baseline(QVariant(), 0);
-        FiffEvoked evoked(t_fileEvoked, setno, baseline);
-        if(evoked.isEmpty())
-            return 1;
+//        // Load data
+//        fiff_int_t setno = 3;
+//        QPair<QVariant, QVariant> baseline(QVariant(), 0);
+//        FiffEvoked evoked(t_fileEvoked, setno, baseline);
+//        if(evoked.isEmpty())
+//            return 1;
 
-        std::cout << "Evoked description: " << evoked.comment.toLatin1().constData() << std::endl;
+//        std::cout << "Evoked description: " << evoked.comment.toLatin1().constData() << std::endl;
 
-        if(t_Fwd.isEmpty())
-            return 1;
+//        if(t_Fwd.isEmpty())
+//            return 1;
 
-        FiffCov noise_cov(t_fileCov);
+//        FiffCov noise_cov(t_fileCov);
 
-        // regularize noise covariance
-        noise_cov = noise_cov.regularize(evoked.info, 0.05, 0.05, 0.1, true);
+//        // regularize noise covariance
+//        noise_cov = noise_cov.regularize(evoked.info, 0.05, 0.05, 0.1, true);
 
-        //
-        // Cluster forward solution;
-        //
-        if(bDoClustering) {
-            t_clusteredFwd = t_Fwd.cluster_forward_solution(tAnnotSet, 40);
-        } else {
-            t_clusteredFwd = t_Fwd;
-        }
+//        //
+//        // Cluster forward solution;
+//        //
+//        if(bDoClustering) {
+//            t_clusteredFwd = t_Fwd.cluster_forward_solution(tAnnotSet, 40);
+//        } else {
+//            t_clusteredFwd = t_Fwd;
+//        }
 
-        //
-        // make an inverse operators
-        //
-        FiffInfo info = evoked.info;
+//        //
+//        // make an inverse operators
+//        //
+//        FiffInfo info = evoked.info;
 
-        MNEInverseOperator inverse_operator(info, t_clusteredFwd, noise_cov, 0.2f, 0.8f);
+//        MNEInverseOperator inverse_operator(info, t_clusteredFwd, noise_cov, 0.2f, 0.8f);
 
-        if(!t_sFileClusteredInverse.isEmpty())
-        {
-            QFile t_fileClusteredInverse(t_sFileClusteredInverse);
-            inverse_operator.write(t_fileClusteredInverse);
-        }
+//        if(!t_sFileClusteredInverse.isEmpty())
+//        {
+//            QFile t_fileClusteredInverse(t_sFileClusteredInverse);
+//            inverse_operator.write(t_fileClusteredInverse);
+//        }
 
-        //
-        // Compute inverse solution
-        //
-        MinimumNorm minimumNorm(inverse_operator, lambda2, method);
-        sourceEstimate = minimumNorm.calculateInverse(evoked);
+//        //
+//        // Compute inverse solution
+//        //
+//        MinimumNorm minimumNorm(inverse_operator, lambda2, method);
+//        sourceEstimate = minimumNorm.calculateInverse(evoked);
 
-        if(sourceEstimate.isEmpty())
-            return 1;
+//        if(sourceEstimate.isEmpty())
+//            return 1;
 
-        // View activation time-series
-        std::cout << "\nsourceEstimate:\n" << sourceEstimate.data.block(0,0,10,10) << std::endl;
-        std::cout << "time\n" << sourceEstimate.times.block(0,0,1,10) << std::endl;
-        std::cout << "timeMin\n" << sourceEstimate.times[0] << std::endl;
-        std::cout << "timeMax\n" << sourceEstimate.times[sourceEstimate.times.size()-1] << std::endl;
-        std::cout << "time step\n" << sourceEstimate.tstep << std::endl;
-    }
+//        // View activation time-series
+//        std::cout << "\nsourceEstimate:\n" << sourceEstimate.data.block(0,0,10,10) << std::endl;
+//        std::cout << "time\n" << sourceEstimate.times.block(0,0,1,10) << std::endl;
+//        std::cout << "timeMin\n" << sourceEstimate.times[0] << std::endl;
+//        std::cout << "timeMax\n" << sourceEstimate.times[sourceEstimate.times.size()-1] << std::endl;
+//        std::cout << "time step\n" << sourceEstimate.tstep << std::endl;
+//    }
 
     //########################################################################################
     //
@@ -242,6 +242,12 @@ int main(int argc, char *argv[])
 
     QFile t_fileBem2("./MNE-sample-data/subjects/sample/bem/sample-head.fif");
     MNEBem t_Bem2(t_fileBem2);
+
+    QFile t_fileBem3("./Iso2MeshBem/AVG4-0Years_segmented_BEM3.fiff");
+    MNEBem t_Bem3(t_fileBem3);
+
+    testWindow->addBemData("Subject01", "BEM", t_Bem3);
+
     testWindow->addBemData("Subject01", "BEM", t_Bem2);
 
     testWindow->addBemData("Subject01", "BEM", t_Bem);
