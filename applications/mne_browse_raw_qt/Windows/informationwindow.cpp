@@ -55,9 +55,10 @@ using namespace MNEBrowseRawQt;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-InformationWindow::InformationWindow(QWidget *parent) :
-    QDockWidget(parent),
-    ui(new Ui::InformationWindowWidget)
+InformationWindow::InformationWindow(QWidget *parent)
+: QDockWidget(parent)
+, ui(new Ui::InformationWindowWidget)
+, m_eLogLevelCurrent(LogLevel::_LogLvMin)
 {
     ui->setupUi(this);
 
