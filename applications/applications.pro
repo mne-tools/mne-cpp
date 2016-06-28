@@ -46,16 +46,19 @@ SUBDIRS += \
         mne_x
 
     !contains(MNECPP_CONFIG, oldCompiler) {
-        message(mne_browse_raw_qt configured!)
+        message(mne_browse_raw_qt configured)
         SUBDIRS += \
             mne_browse_raw_qt \
     }
 
-    qtHaveModule(3dcore,3drender,3dinput) {
-        message(applications.pro - Qt3D available)
-        SUBDIRS += \
-#            mne_matching_pursuit \
-#            mne_analyze_qt
+
+    !contains(MNECPP_CONFIG, coverity) {
+        qtHaveModule(3dcore,3drender,3dinput) {
+            message(mne_matching_pursuit & mne_analyze_qt configured)
+            SUBDIRS += \
+                mne_matching_pursuit \
+                mne_analyze_qt
+        }
     }
 }
 

@@ -57,6 +57,7 @@ using namespace XMEASLIB;
 NewMeasurement::NewMeasurement(int type, QObject *parent)
 : QObject(parent)
 , m_iMetaTypeId(type)
+, m_bVisibility(true)
 {
 //    qWarning() << "QMetaType" << type;
 }

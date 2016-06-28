@@ -72,14 +72,15 @@ using namespace NeuromagPlugin;
 ShmemSocket::ShmemSocket(QObject *parent)
 : QObject(parent)
 , shmid(-1)
-, shmptr(NULL)
+, shmptr(Q_NULLPTR)
 , m_iShmemSock(-1)
 , m_iShmemId(CLIENT_ID)
-, fd(NULL)
-, shmem_fd(NULL)
-, filename(NULL)
+, fd(Q_NULLPTR)
+, shmem_fd(Q_NULLPTR)
+, filename(Q_NULLPTR)
+, read_fd(Q_NULLPTR)
 {
-    filter_kinds = NULL;    /* Filter these tags */
+    filter_kinds = Q_NULLPTR;    /* Filter these tags */
     nfilt = 0;              /* How many are they */
 }
 
@@ -114,7 +115,7 @@ int ShmemSocket::receive_tag (FiffTag::SPtr& p_pTag)
     int           k;
 
 
-    long read_loc;
+    long read_loc = 0;
 
     if (m_iShmemSock < 0)
         return (OK);
@@ -354,8 +355,8 @@ bool ShmemSocket::connect_client ()
     else
     {
         m_iShmemSock = sock;
-        return true;
         printf("[done]\r\n");//dacq_log("Connection ok\n");
+        return true;
     }
 }
 

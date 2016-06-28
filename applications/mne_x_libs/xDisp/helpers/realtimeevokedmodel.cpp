@@ -213,13 +213,13 @@ QVariant RealTimeEvokedModel::headerData(int section, Qt::Orientation orientatio
         case 0: //chname column
             return QVariant();
         case 1: //data plot column
-            return QVariant("data plot");
             switch(role) {
             case Qt::DisplayRole:
                 return QVariant("data plot");
             case Qt::TextAlignmentRole:
                 return QVariant(Qt::AlignLeft);
             }
+            return QVariant("data plot");
         }
     }
     else if(orientation == Qt::Vertical) {
