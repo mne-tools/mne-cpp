@@ -129,9 +129,13 @@ int main(int argc, char *argv[])
     //
     // Read Electrode Positions from fiff
     //
-    QFile t_fileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
-    FiffRawData raw(t_fileRaw);
-    QList<FiffChInfo> ChannelInfo= raw.info.chs;
+//    QFile t_fileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
+//    FiffRawData raw(t_fileRaw);
+//    QList<FiffChInfo> ChannelInfo= raw.info.chs;
+
+    QFile t_fileElec("./MNE-sample-data/warping/AVG4-0Years_GSN128.fif");
+    FiffRawData elec(t_fileElec);
+    QList<FiffChInfo> ChannelInfo= elec.info.chs;
     QList<QVector<double>> tempElecInfo;
     QList<QString> ElecChanName;
     for (int i=0; i<ChannelInfo.length();i++)
