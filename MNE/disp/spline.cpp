@@ -289,7 +289,6 @@ void Spline::setColorMap (QString colorMap)
     qDebug() << "updateColorMap::middleThresholdValue = " << middleThresholdValue;
     qDebug() << "updateColorMap::rightThresholdValue = " << rightThresholdValue;
     int stepsNumber = 25;
-    double stepsSize = (rightThresholdValue - leftThresholdValue) / stepsNumber;
     double stepsSizeLeftMiddle = (middleThresholdValue - leftThresholdValue) / stepsNumber;
     double stepsSizeMiddleRight = (rightThresholdValue - middleThresholdValue) / stepsNumber;
     QLinearGradient plotAreaGradient;
