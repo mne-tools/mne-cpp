@@ -3,9 +3,13 @@
 </div>
 -----------------
 
+<center>
+
 |  **`Windows`**   |  **`Linux / Mac OS`** | **`Dynamic Testing`** |  **`Static Testing`** |  **`Cite`** |
 |--------------------|---------------------------|-----------------------|-----------------------|-------------|
 | [![AppVeyor](https://ci.appveyor.com/api/projects/status/b63nawx8mnmmr9rv?svg=true)](https://ci.appveyor.com/project/chdinh/mne-cpp) | [![Travis](https://api.travis-ci.org/mne-tools/mne-cpp.png?branch=master)](https://travis-ci.org/mne-tools/mne-cpp) | [![CodeCov](https://codecov.io/gh/mne-tools/mne-cpp/branch/master/graph/badge.svg)](https://codecov.io/gh/mne-tools/mne-cpp) | [![Coverity](https://scan.coverity.com/projects/8955/badge.svg)](https://scan.coverity.com/projects/mne-tools-mne-cpp) | [![DOI](https://zenodo.org/badge/8729/mne-tools/mne-cpp.svg)](http://dx.doi.org/10.5281/zenodo.17216) |
+
+</center>
 
 Cross-platform medical (real-time) applications for EEG and MEG data analysis.
 
