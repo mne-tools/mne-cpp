@@ -122,6 +122,7 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
                 QString colorMap = index.model()->data(indexColormapItem, MetaTreeItemRoles::RTDataColormapType).value<QString>();
                 pSpline->setColorMap(colorMap);
             }
+            qDebug()<< "pSpline size = " << pSpline->width() << " x " << pSpline->height();
             return pSpline;
         }
 
@@ -253,7 +254,7 @@ void Data3DTreeDelegate::setEditorData(QWidget* editor, const QModelIndex& index
             int height = pSpline->size().height();
             qDebug()<< "width = " << width;
             qDebug()<< "height = " << height;
-            if (pSpline->size().width() == 137 && pSpline->size().height() == 15)   //pSpline initializes with size (137,15)
+            if (pSpline->size().width() < 200 && pSpline->size().height() < 200)   //pSpline initializes with size (137,15)
             {
                 pSpline->resize(800,600);   //resize histogram to be readable with default size
             }
