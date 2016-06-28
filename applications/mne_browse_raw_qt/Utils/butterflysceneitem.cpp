@@ -61,6 +61,7 @@ ButterflySceneItem::ButterflySceneItem(QString setName, int setKind, int setUnit
 , m_iSetKind(setKind)
 , m_iSetUnit(setUnit)
 , m_cAverageColors(defaultColors)
+, m_pFiffInfo(Q_NULLPTR)
 {
     //Init m_scaleMap
     m_scaleMap["MEG_grad"] = 400 * 1e-15 * 100; //*100 because data in fiff files is stored as fT/m not fT/cm
@@ -108,7 +109,7 @@ void ButterflySceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem
 void ButterflySceneItem::paintAveragePaths(QPainter *painter)
 {
     //Create path for all channels
-    for(int i = 0; i<m_pFiffInfo->chs.size() ;i++) {
+    for(int i = 0; i < m_pFiffInfo->chs.size() ;i++) {
 
         FiffChInfo fiffChInfoTemp = m_pFiffInfo->chs.at(i);
 

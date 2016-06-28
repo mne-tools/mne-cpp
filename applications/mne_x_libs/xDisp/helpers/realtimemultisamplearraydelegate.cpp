@@ -609,7 +609,7 @@ void RealTimeMultiSampleArrayDelegate::createGridPath(const QModelIndex &index, 
     if(t_pModel->numVLines() > 0)
     {
         //vertical lines
-        float distance = option.rect.width()/(t_pModel->numVLines()+1);
+        float distance = float (option.rect.width()/(t_pModel->numVLines()+1));
 
         float yStart = option.rect.topLeft().y();
 
@@ -635,7 +635,7 @@ void RealTimeMultiSampleArrayDelegate::createTimeSpacersPath(const QModelIndex &
     if(t_pModel->getNumberOfTimeSpacers() > 0)
     {
         //vertical lines
-        float distanceSec = option.rect.width()/(t_pModel->numVLines()+1);
+        float distanceSec = float (option.rect.width()/(t_pModel->numVLines()+1));
         float distanceSpacers = distanceSec/(t_pModel->getNumberOfTimeSpacers()+1);
 
         float yStart = option.rect.topLeft().y();

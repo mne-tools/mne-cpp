@@ -358,7 +358,7 @@ void FilterWindow::filterParametersChanged()
     ui->m_label_fftLength->setText(QString().number(fftLength));
 
     //set filter design method
-    FilterOperator::DesignMethod dMethod;
+    FilterOperator::DesignMethod dMethod = FilterOperator::Tschebyscheff;
     if(ui->m_comboBox_designMethod->currentText() == "Tschebyscheff")
         dMethod = FilterOperator::Tschebyscheff;
 

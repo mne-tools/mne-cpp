@@ -52,7 +52,7 @@ SUBDIRS += \
     SUBDIRS += disp
 
     qtHaveModule(3dcore,3drender,3dinput) {
-        message(MNE.pro - Qt3D available)
+        message(disp3D configured)
         SUBDIRS += \
             disp3D \
     }

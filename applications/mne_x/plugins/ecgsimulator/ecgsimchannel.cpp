@@ -69,6 +69,8 @@ ECGSimChannel::ECGSimChannel(QString ResourceDataPath, QString ChannelFile, bool
 , m_qStringChannelFile(ChannelFile)
 , m_bIsEnabled(enabled)
 , m_bIsVisible(visible)
+, m_dMin(-65535)
+, m_dMax(65535)
 {
 
 }
