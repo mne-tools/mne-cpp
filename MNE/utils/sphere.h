@@ -67,8 +67,8 @@ namespace UTILSLIB
 //=============================================================================================================
 
 typedef struct {
-  Eigen::MatrixXf rr;
-  bool   report;
+    Eigen::MatrixXf rr;
+     bool   report;
 } *fitUserNew,fitUserRecNew;
 
 

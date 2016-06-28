@@ -55,8 +55,6 @@
 #include <QList>
 #include <QStringList>
 #include <QFile>
-#include <QTextStream>
-#include <QDebug>
 
 
 //*************************************************************************************************************
