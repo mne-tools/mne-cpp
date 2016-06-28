@@ -101,11 +101,6 @@
 
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
-#include <unsupported/Eigen/FFT>
-
-#ifndef EIGEN_FFTW_DEFAULT
-#define EIGEN_FFTW_DEFAULT
-#endif
 
 
 //*************************************************************************************************************

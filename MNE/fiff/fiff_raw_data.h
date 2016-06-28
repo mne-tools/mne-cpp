@@ -155,7 +155,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    bool read_raw_segment(MatrixXd& data, MatrixXd& times, fiff_int_t from = -1, fiff_int_t to = -1, const RowVectorXi& sel = defaultRowVectorXi);
+    bool read_raw_segment(MatrixXd& data, MatrixXd& times, fiff_int_t from = -1, fiff_int_t to = -1, const RowVectorXi& sel = defaultRowVectorXi, bool do_debug = false);
 
     //=========================================================================================================
     /**
@@ -172,7 +172,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    bool read_raw_segment(MatrixXd& data, MatrixXd& times, SparseMatrix<double>& multSegment, fiff_int_t from = -1, fiff_int_t to = -1, const RowVectorXi& sel = defaultRowVectorXi);
+    bool read_raw_segment(MatrixXd& data, MatrixXd& times, SparseMatrix<double>& multSegment, fiff_int_t from = -1, fiff_int_t to = -1, const RowVectorXi& sel = defaultRowVectorXi, bool do_debug = false);
 
     //=========================================================================================================
     /**
