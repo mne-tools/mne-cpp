@@ -264,7 +264,7 @@ public:
     *
     * @param[in] p_FiffInfo    the Fiff Info.
     */
-    void setFiffInfo(FIFFLIB::FiffInfo p_FiffInfo);
+    void setFiffInfo(const FIFFLIB::FiffInfo& p_FiffInfo);
 
     //=========================================================================================================
     /**
@@ -316,7 +316,7 @@ public:
     *
     * @param[in] info   the new fiff info.
     */
-    void RecvHPIFiffInfo(FiffInfo info);
+    void RecvHPIFiffInfo(const FiffInfo& info);
 
     //=========================================================================================================
     /**

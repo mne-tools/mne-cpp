@@ -120,7 +120,7 @@ void FiffRawData::clear()
 
 //*************************************************************************************************************
 
-bool FiffRawData::read_raw_segment(MatrixXd& data, MatrixXd& times, fiff_int_t from, fiff_int_t to, const RowVectorXi& sel)
+bool FiffRawData::read_raw_segment(MatrixXd& data, MatrixXd& times, fiff_int_t from, fiff_int_t to, const RowVectorXi& sel, bool do_debug)
 {
     bool projAvailable = true;
 
@@ -223,7 +223,6 @@ bool FiffRawData::read_raw_segment(MatrixXd& data, MatrixXd& times, fiff_int_t f
         }
     }
 
-    bool do_debug = false;
     //
     // Make mult sparse
     //
@@ -438,7 +437,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data, MatrixXd& times, fiff_int_t f
 
 //*************************************************************************************************************
 
-bool FiffRawData::read_raw_segment(MatrixXd& data, MatrixXd& times, SparseMatrix<double>& multSegment, fiff_int_t from, fiff_int_t to, const RowVectorXi& sel)
+bool FiffRawData::read_raw_segment(MatrixXd& data, MatrixXd& times, SparseMatrix<double>& multSegment, fiff_int_t from, fiff_int_t to, const RowVectorXi& sel, bool do_debug)
 {
     bool projAvailable = true;
 
@@ -541,7 +540,6 @@ bool FiffRawData::read_raw_segment(MatrixXd& data, MatrixXd& times, SparseMatrix
         }
     }
 
-    bool do_debug = false;
     //
     // Make mult sparse
     //
