@@ -6,7 +6,7 @@
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     Day, 2016
+* @date     May, 2016
 *
 * @section  LICENSE
 *
@@ -76,11 +76,18 @@ ssvepBCI::ssvepBCI()
 , m_bUseMEC(true)
 , m_bRemove50HzPowerLine(true)
 {
+    // Create configuration action bar item/button
+    m_pActionBCIConfiguration = new QAction(QIcon(":/images/configuration.png"),tr("BCI configuration feature"),this);
+    m_pActionBCIConfiguration->setStatusTip(tr("BCI configuration feature"));
+    connect(m_pActionBCIConfiguration, &QAction::triggered, this, &ssvepBCI::showBCIConfiguration);
+    addPluginAction(m_pActionBCIConfiguration);
+
     // Create start Stimuli action bar item/button
     m_pActionSetupStimulus = new QAction(QIcon(":/images/stimulus.png"),tr("setup stimulus feature"),this);
     m_pActionSetupStimulus->setStatusTip(tr("Setup stimulus feature"));
     connect(m_pActionSetupStimulus, &QAction::triggered, this, &ssvepBCI::showSetupStimulus);
     addPluginAction(m_pActionSetupStimulus);
+
 
     // Intitalise BCI data
     m_slChosenFeatureSensor << "9Z" << "8Z" << "7Z" << "6Z" << "9L" << "8L" << "9R" << "8R"; //<< "TEST";
@@ -115,8 +122,8 @@ ssvepBCI::~ssvepBCI()
 
 QSharedPointer<IPlugin> ssvepBCI::clone() const
 {
-    QSharedPointer<ssvepBCI> pTMSIClone(new ssvepBCI());
-    return pTMSIClone;
+    QSharedPointer<ssvepBCI> pSSVEPClone(new ssvepBCI());
+    return pSSVEPClone;
 }
 
 
@@ -302,7 +309,7 @@ QString ssvepBCI::getName() const
 
 QWidget* ssvepBCI::setupWidget()
 {
-    ssvepBCISetupWidget* setupWidget = new ssvepBCISetupWidget(this);//widget is later destroyed by CentralWidget - so it has to be created everytime new
+    ssvepBCIWidget* setupWidget = new ssvepBCIWidget(this);//widget is later destroyed by CentralWidget - so it has to be created everytime new
 
     //init properties dialog
     setupWidget->initGui();
@@ -442,7 +449,7 @@ void ssvepBCI::showSetupStimulus()
         if(!m_pssvepBCISetupStimulusWidget->isVisible()){
 
             m_pssvepBCISetupStimulusWidget->setWindowTitle("ssvepBCI - Setup Stimulus");
-            //m_pEEGoSportsSetupStimulusWidget->initGui();
+            //m_pssvepBCISetupStimulusWidget->initGui();
             m_pssvepBCISetupStimulusWidget->show();
             m_pssvepBCISetupStimulusWidget->raise();
 
@@ -450,12 +457,29 @@ void ssvepBCI::showSetupStimulus()
     }
     else{
         QMessageBox msgBox;
-        msgBox.setText("Only one screen detected! For stimulus visualization attach one more.");
+        msgBox.setText("Only one screen detected!\nFor stimulus visualization attach one more.");
         msgBox.exec();
         return;
     }
 }
 
+
+//*************************************************************************************************************
+
+void ssvepBCI::showBCIConfiguration()
+{
+    // Open setup stimulus widget
+    if(m_pssvepBCIConfigurationWidget == NULL)
+        m_pssvepBCIConfigurationWidget = QSharedPointer<ssvepBCIConfigurationWidget>(new ssvepBCIConfigurationWidget(this));
+
+    if(!m_pssvepBCIConfigurationWidget->isVisible()){
+
+        m_pssvepBCIConfigurationWidget->setWindowTitle("ssvepBCI - Setup Stimulus");
+        //m_pEEGoSportsSetupStimulusWidget->initGui();
+        m_pssvepBCIConfigurationWidget->show();
+        m_pssvepBCIConfigurationWidget->raise();
+    }
+}
 
 //*************************************************************************************************************
 

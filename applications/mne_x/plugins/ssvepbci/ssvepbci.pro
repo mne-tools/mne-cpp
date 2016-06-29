@@ -72,26 +72,29 @@ DESTDIR = $${MNE_BINARY_DIR}/mne_x_plugins
 
 SOURCES += \
         ssvepbci.cpp \
-        FormFiles/ssvepbcisetupwidget.cpp \
+        FormFiles/ssvepbciwidget.cpp \
         FormFiles/ssvepbciaboutwidget.cpp \
         FormFiles/ssvepbcisetupstimuluswidget.cpp \
-        FormFiles/ssvepbciscreen.cpp \
-    FormFiles/ssvepbciflickeringitem.cpp
+        ssvepbciscreen.cpp \
+        ssvepbciflickeringitem.cpp \
+        FormFiles/ssvepbciconfigurationwidget.cpp \
 
 
 HEADERS += \
         ssvepbci.h\
         ssvepbci_global.h \
-        FormFiles/ssvepbcisetupwidget.h \
+        FormFiles/ssvepbciwidget.h \
         FormFiles/ssvepbciaboutwidget.h \
         FormFiles/ssvepbcisetupstimuluswidget.h \
-        FormFiles/ssvepbciscreen.h \
-        FormFiles/ssvepbciflickeringitem.h
+        ssvepbciscreen.h \
+        ssvepbciflickeringitem.h \
+        FormFiles/ssvepbciconfigurationwidget.h \
 
 FORMS += \
-        FormFiles/ssvepbcisetup.ui \
-        FormFiles/ssvepbciabout.ui \
-        FormFiles/ssvepbcisetupstimuluswidget.ui
+        FormFiles/ssvepbciwidget.ui \
+        FormFiles/ssvepbcisetupstimuluswidget.ui \
+        FormFiles/ssvepbciaboutwidget.ui \
+        FormFiles/ssvepbciconfigurationwidget.ui \
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
