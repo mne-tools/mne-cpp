@@ -60,7 +60,7 @@ Spline::Spline(const QString& title, QWidget* parent): QWidget(parent)
     m_pChart->setTitle(title);
     m_pChart->setAnimationOptions(QChart::SeriesAnimations);
     m_pChart->setAcceptHoverEvents(false);
-    series = new QSplineSeries();
+    m_pSeries = new QSplineSeries();
     QChartView *chartView = new QChartView(m_pChart);
     chartView->setRenderHint(QPainter::Antialiasing);
     QGridLayout* layout = new QGridLayout();
@@ -73,7 +73,7 @@ Spline::Spline(const QString& title, QWidget* parent): QWidget(parent)
 
 void Spline::mousePressEvent(QMouseEvent *event)
 {
-    if (series->count() == 0)               //protect integrity of the histogram widget in case series contain no data values
+    if (m_pSeries->count() == 0)               //protect integrity of the histogram widget in case series contain no data values
     {
         qDebug() << "Data set not found.";  //do nothing
     }
@@ -84,7 +84,7 @@ void Spline::mousePressEvent(QMouseEvent *event)
         QLineSeries *verticalLine = new QLineSeries();
         QPointF point = event->pos();
         QPointF pointY = point;
-        pointY.setX(minAxisX);
+        pointY.setX(m_dMinAxisX);
         pointY.setY(pointY.y()-10.5);   //-10.5 needed to correctly position the line at mouse position
         point.setX(point.x()-10.5);
         point.setY(0);
@@ -92,32 +92,32 @@ void Spline::mousePressEvent(QMouseEvent *event)
         QPointF localX = m_pChart->mapToValue(point, shadowSeries);
         QPointF localY = m_pChart->mapToValue(pointY, shadowSeries);
         verticalLine->append(localX.x(), 0);
-        verticalLine->append(localX.x(), iMaximumFrequency);
+        verticalLine->append(localX.x(), m_iMaximumFrequency);
         double boundaryX = double(localX.x());   //casting localX.x() from float to double for comparison with minAxisX and maxAxisX
         double boundaryY = double(localY.y());   //casting localY.y() from float to double for comparison with 0 and the maximum frequency
 
-        if((boundaryX >= float(minAxisX)) && (boundaryX <= float(maxAxisX)))  //this condition ensures that threshold lines can only be created within the boundary of the x-axis
+        if((boundaryX >= float(m_dMinAxisX)) && (boundaryX <= float(m_dMaxAxisX)))  //this condition ensures that threshold lines can only be created within the boundary of the x-axis
         {
-            if((boundaryY >= 0.0) && (boundaryY <= float(iMaximumFrequency)))  // this condition ensures that threshold lines can only be created within the boundary of the y-axis
+            if((boundaryY >= 0.0) && (boundaryY <= float(m_iMaximumFrequency)))  // this condition ensures that threshold lines can only be created within the boundary of the y-axis
             {
-                QVector<QPointF> middlePoint = middleThreshold->pointsVector();   //Point values need to be updated before tested and displayed on the widget
-                QVector<QPointF> rightPoint = rightThreshold->pointsVector();
-                QVector<QPointF> leftPoint = leftThreshold->pointsVector();
+                QVector<QPointF> middlePoint = m_pMiddleThreshold->pointsVector();   //Point values need to be updated before tested and displayed on the widget
+                QVector<QPointF> rightPoint = m_pRightThreshold->pointsVector();
+                QVector<QPointF> leftPoint = m_pLeftThreshold->pointsVector();
 
-                double emitLeft = (leftPoint[0].x() * (pow(10, resultExponentValues[0])));
-                double emitMiddle = (middlePoint[0].x() * (pow(10, resultExponentValues[0])));
-                double emitRight = (rightPoint[0].x() * (pow(10, resultExponentValues[0])));
+                double emitLeft = (leftPoint[0].x() * (pow(10, m_vecResultExponentValues[0])));
+                double emitMiddle = (middlePoint[0].x() * (pow(10, m_vecResultExponentValues[0])));
+                double emitRight = (rightPoint[0].x() * (pow(10, m_vecResultExponentValues[0])));
 
                 if (event->buttons() == Qt::LeftButton)
                 {
                     leftPoint = verticalLine->pointsVector();
                     if((leftPoint[0].x() < middlePoint[0].x()) && (leftPoint[0].x() < rightPoint[0].x()))
                     {
-                        m_pChart->removeSeries(leftThreshold);
-                        leftThreshold=verticalLine;
-                        leftThreshold->setName("left");
-                        updateThreshold(leftThreshold);
-                        emitLeft = (leftPoint[0].x() * (pow(10, resultExponentValues[0])));
+                        m_pChart->removeSeries(m_pLeftThreshold);
+                        m_pLeftThreshold = verticalLine;
+                        m_pLeftThreshold->setName("left");
+                        updateThreshold(m_pLeftThreshold);
+                        emitLeft = (leftPoint[0].x() * (pow(10, m_vecResultExponentValues[0])));
                         emit borderChanged(emitLeft, emitMiddle, emitRight);
                     }
                 }
@@ -127,11 +127,11 @@ void Spline::mousePressEvent(QMouseEvent *event)
                     middlePoint = verticalLine->pointsVector();
                     if((middlePoint[0].x() > leftPoint[0].x()) && (middlePoint[0].x() < rightPoint[0].x()))
                     {
-                        m_pChart->removeSeries(middleThreshold);
-                        middleThreshold=verticalLine;
-                        middleThreshold->setName("middle");
-                        updateThreshold(middleThreshold);
-                        emitMiddle = (middlePoint[0].x() * (pow(10, resultExponentValues[0])));
+                        m_pChart->removeSeries(m_pMiddleThreshold);
+                        m_pMiddleThreshold = verticalLine;
+                        m_pMiddleThreshold->setName("middle");
+                        updateThreshold(m_pMiddleThreshold);
+                        emitMiddle = (middlePoint[0].x() * (pow(10, m_vecResultExponentValues[0])));
                         emit borderChanged(emitLeft, emitMiddle, emitRight);
                     }
                 }
@@ -141,11 +141,11 @@ void Spline::mousePressEvent(QMouseEvent *event)
                     rightPoint = verticalLine->pointsVector();
                     if((rightPoint[0].x() > leftPoint[0].x()) && (rightPoint[0].x() > middlePoint[0].x()))
                     {
-                        m_pChart->removeSeries(rightThreshold);
-                        rightThreshold=verticalLine;
-                        rightThreshold->setName("right");
-                        updateThreshold(rightThreshold);
-                        emitRight = (rightPoint[0].x() * (pow(10, resultExponentValues[0])));
+                        m_pChart->removeSeries(m_pRightThreshold);
+                        m_pRightThreshold = verticalLine;
+                        m_pRightThreshold->setName("right");
+                        updateThreshold(m_pRightThreshold);
+                        emitRight = (rightPoint[0].x() * (pow(10, m_vecResultExponentValues[0])));
                         emit borderChanged(emitLeft, emitMiddle, emitRight);
                     }
                 }
@@ -166,18 +166,18 @@ void Spline::setThreshold(const QVector3D& vecThresholdValues)
 
     QVector3D correctedVectorThreshold = correctionDisplayTrueValue(vecThresholdValues, "up");
 
-    if (series->count() == 0)               //protect integrity of the histogram widget in case series contain no data values
+    if (m_pSeries->count() == 0)               //protect integrity of the histogram widget in case series contain no data values
     {
         qDebug() << "Data set not found.";
     }
 
 //    the condition below tests the threshold values given and ensures that all three must be within minAxisX and maxAxisX otherwise they will be given either minAxisX or maxAxisX value
-    else if (correctedVectorThreshold.x() < minAxisX || correctedVectorThreshold.y() < minAxisX || correctedVectorThreshold.z() < minAxisX || correctedVectorThreshold.x() > maxAxisX || correctedVectorThreshold.y() > maxAxisX || correctedVectorThreshold.z() > maxAxisX)
+    else if (correctedVectorThreshold.x() < m_dMinAxisX || correctedVectorThreshold.y() < m_dMinAxisX || correctedVectorThreshold.z() < m_dMinAxisX || correctedVectorThreshold.x() > m_dMaxAxisX || correctedVectorThreshold.y() > m_dMaxAxisX || correctedVectorThreshold.z() > m_dMaxAxisX)
     {
         qDebug() << "One or more of the values given are out of the minimum and maximum range. Changed to default thresholds.";
-        leftThresholdValue = 1.01 * minAxisX;
-        middleThresholdValue = (minAxisX + maxAxisX)/2;
-        rightThresholdValue = 0.99 * maxAxisX;
+        leftThresholdValue = 1.01 * m_dMinAxisX;
+        middleThresholdValue = (m_dMinAxisX + m_dMaxAxisX) / 2;
+        rightThresholdValue = 0.99 * m_dMaxAxisX;
     }
     else
     {
@@ -234,18 +234,18 @@ void Spline::setThreshold(const QVector3D& vecThresholdValues)
         middleThresholdPoint.setX(middleThresholdValue);
         rightThresholdPoint.setX(rightThresholdValue);
 
-        leftThreshold->append(leftThresholdPoint.x(), 0);
-        leftThreshold->append(leftThresholdPoint.x(), iMaximumFrequency);
-        middleThreshold->append(middleThresholdPoint.x(), 0);
-        middleThreshold->append(middleThresholdPoint.x(), iMaximumFrequency);
-        rightThreshold->append(rightThresholdPoint.x(), 0);
-        rightThreshold->append(rightThresholdPoint.x(), iMaximumFrequency);
+        m_pLeftThreshold->append(leftThresholdPoint.x(), 0);
+        m_pLeftThreshold->append(leftThresholdPoint.x(), m_iMaximumFrequency);
+        m_pMiddleThreshold->append(middleThresholdPoint.x(), 0);
+        m_pMiddleThreshold->append(middleThresholdPoint.x(), m_iMaximumFrequency);
+        m_pRightThreshold->append(rightThresholdPoint.x(), 0);
+        m_pRightThreshold->append(rightThresholdPoint.x(), m_iMaximumFrequency);
 
-        qDebug() << "CURRENT THRESHOLD = " << leftThreshold << middleThreshold << rightThreshold;
+        //qDebug() << "CURRENT THRESHOLD = " << m_pLeftThreshold << m_pMiddleThreshold << m_pRightThreshold;
 
-        updateThreshold(leftThreshold);
-        updateThreshold(middleThreshold);
-        updateThreshold(rightThreshold);
+        updateThreshold(m_pLeftThreshold);
+        updateThreshold(m_pMiddleThreshold);
+        updateThreshold(m_pRightThreshold);
         setColorMap(m_colorMap);
 }
 
@@ -282,9 +282,9 @@ void Spline::updateThreshold (QLineSeries* lineSeries)
 void Spline::setColorMap (QString colorMap)
 {
     m_colorMap = colorMap;
-    double leftThresholdValue = (leftThreshold->at(0).x())/maxAxisX;
-    double middleThresholdValue = (middleThreshold->at(0).x())/maxAxisX;
-    double rightThresholdValue = (rightThreshold->at(0).x())/maxAxisX;
+    double leftThresholdValue = (m_pLeftThreshold->at(0).x())/ m_dMaxAxisX;
+    double middleThresholdValue = (m_pMiddleThreshold->at(0).x())/ m_dMaxAxisX;
+    double rightThresholdValue = (m_pRightThreshold->at(0).x())/ m_dMaxAxisX;
     qDebug() << "updateColorMap::leftThresholdValue = " << leftThresholdValue;
     qDebug() << "updateColorMap::middleThresholdValue = " << middleThresholdValue;
     qDebug() << "updateColorMap::rightThresholdValue = " << rightThresholdValue;
@@ -350,9 +350,9 @@ void Spline::setColorMap (QString colorMap)
 
 const QVector3D &Spline::getThreshold()
 {
-    QVector<QPointF> middlePoint = middleThreshold->pointsVector();   //Point values need to be updated before tested and displayed on the widget
-    QVector<QPointF> rightPoint = rightThreshold->pointsVector();
-    QVector<QPointF> leftPoint = leftThreshold->pointsVector();
+    QVector<QPointF> middlePoint = m_pMiddleThreshold->pointsVector();   //Point values need to be updated before tested and displayed on the widget
+    QVector<QPointF> rightPoint = m_pRightThreshold->pointsVector();
+    QVector<QPointF> leftPoint = m_pLeftThreshold->pointsVector();
     float emitLeft = leftPoint[0].x();
     float emitMiddle = middlePoint[0].x();
     float emitRight = rightPoint[0].x();
@@ -374,13 +374,13 @@ const QVector3D &Spline::correctionDisplayTrueValue(QVector3D vecOriginalValues,
     int exponent;
     if (upOrDown == "up")
     {
-        if (resultExponentValues[0] < 0)
+        if (m_vecResultExponentValues[0] < 0)
         {
-            exponent = abs(resultExponentValues[0]);
+            exponent = abs(m_vecResultExponentValues[0]);
         }
-        else if (resultExponentValues[0] > 0)
+        else if (m_vecResultExponentValues[0] > 0)
         {
-            exponent = -(abs(resultExponentValues[0]));
+            exponent = -(abs(m_vecResultExponentValues[0]));
         }
         else
         {
@@ -389,13 +389,13 @@ const QVector3D &Spline::correctionDisplayTrueValue(QVector3D vecOriginalValues,
     }
     else if (upOrDown == "down")
     {
-        if (resultExponentValues[0] < 0)
+        if (m_vecResultExponentValues[0] < 0)
         {
-            exponent = -(abs(resultExponentValues[0]));
+            exponent = -(abs(m_vecResultExponentValues[0]));
         }
-        else if (resultExponentValues[0] > 0)
+        else if (m_vecResultExponentValues[0] > 0)
         {
-            exponent = abs(resultExponentValues[0]);
+            exponent = abs(m_vecResultExponentValues[0]);
         }
         else
         {
