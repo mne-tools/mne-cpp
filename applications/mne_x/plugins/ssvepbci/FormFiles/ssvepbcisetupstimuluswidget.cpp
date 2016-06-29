@@ -73,22 +73,22 @@ ssvepBCISetupStimulusWidget::ssvepBCISetupStimulusWidget(ssvepBCI* pssvepBCI, QW
     m_pssvepBCIScreen->showFullScreen();
 
     //Map for all frequencies according to their key
-    m_idFreqMap.insert(0,  6   );
-    m_idFreqMap.insert(1,  6.66);
-    m_idFreqMap.insert(2,  7.05);
-    m_idFreqMap.insert(3,  7.5 );
-    m_idFreqMap.insert(4,  8   );
-    m_idFreqMap.insert(5,  8.57);
-    m_idFreqMap.insert(6,  9.23);
-    m_idFreqMap.insert(7, 10   );
-    m_idFreqMap.insert(8, 10.91);
-    m_idFreqMap.insert(9, 12   );
-    m_idFreqMap.insert(10,13.33);
-    m_idFreqMap.insert(11,15   );
-    m_idFreqMap.insert(12,17.14);
-    m_idFreqMap.insert(13,20   );
-    m_idFreqMap.insert(14,24   );
-    m_idFreqMap.insert(15,30   );
+    m_idFreqMap.insert(15,  6   );
+    m_idFreqMap.insert(14,  6.66);
+    m_idFreqMap.insert(13,  7.05);
+    m_idFreqMap.insert(12,  7.5 );
+    m_idFreqMap.insert(11,  8   );
+    m_idFreqMap.insert(10,  8.57);
+    m_idFreqMap.insert( 9,  9.23);
+    m_idFreqMap.insert( 8, 10   );
+    m_idFreqMap.insert( 7, 10.91);
+    m_idFreqMap.insert( 6, 12   );
+    m_idFreqMap.insert( 5, 13.33);
+    m_idFreqMap.insert( 4, 15   );
+    m_idFreqMap.insert( 3, 17.14);
+    m_idFreqMap.insert( 2, 20   );
+    m_idFreqMap.insert( 1, 24   );
+    m_idFreqMap.insert( 0, 30   );
 
     //initialize combobox for frequencies
     foreach(int i, m_idFreqMap.keys())
@@ -303,37 +303,37 @@ void ssvepBCISetupStimulusWidget::setFreq(ssvepBCIFlickeringItem &item, int freq
 
     //choose the rendereing orders according to evoked flickerfrequency (being valid for a 60 Hz monitor)
     switch(freqKey){
-    case 15:
-        renderOrder<< 0 << 1;                                                                                break;  // 30 Hz
-    case 14:
-        renderOrder<< 0 << 1 << 0 << 1 << 1;                                                                 break;  // 24 Hz
-    case 13:
-        renderOrder<< 0 << 1 << 1;                                                                           break;  // 20 Hz
-    case 12:
-        renderOrder<< 0 << 0 << 1 << 1 << 0 << 1 << 1;                                                       break;  // 17.14 Hz
-    case 11:
-        renderOrder<< 0 << 0 << 1 << 1;                                                                      break;  // 15 Hz
-    case 10:
-        renderOrder<< 0 << 0 << 1 << 1 << 0 << 0 << 1 << 1 << 1;                                             break;  // 13.33 Hz
-    case 9:
-        renderOrder<< 0 << 0 << 1 << 1 << 1;                                                                 break;  // 12 Hz
-    case 8:
-        renderOrder<< 0 << 0 << 1 << 1 << 1 << 0 << 0 << 0 << 1 << 1 << 1;                                   break;  // 10.91 Hz
-    case 7:
-        renderOrder<< 0 << 0 << 0 << 1 << 1 << 1;                                                            break;  // 10 Hz
-    case 6:
-        renderOrder<< 0 << 0 << 0 << 1 << 1 << 1 << 0 << 0 << 0 << 1 << 1 << 1 << 1;                         break;  // 9.23 Hz
-    case 5:
-        renderOrder<< 0 << 0 << 0 << 1 << 1 << 1 << 1;                                                       break;  // 8.57 Hz
-    case 4:
-        renderOrder<< 0 << 0 << 0 << 1 << 1 << 1 << 1 << 0 << 0 << 0 << 0 << 1 << 1 << 1 << 1;               break;  // 8 Hz
-    case 3:
-        renderOrder<< 0 << 0 << 0 << 0 << 1 << 1 << 1 << 1;                                                  break;  // 7.5 Hz
-    case 2:
-        renderOrder<< 0 << 0 << 0 << 0 << 1 << 1 << 1 << 1 << 0 << 0 << 0 << 0 << 1 << 1 << 1 << 1 << 1;     break;  // 7.05 Hz
-    case 1:
-        renderOrder<< 0 << 0 << 0 << 0 << 1 << 1 << 1 << 1 << 1;                                             break;  // 6.66 Hz
     case 0:
+        renderOrder<< 0 << 1;                                                                                break;  // 30 Hz
+    case 1:
+        renderOrder<< 0 << 1 << 0 << 1 << 1;                                                                 break;  // 24 Hz
+    case 2:
+        renderOrder<< 0 << 1 << 1;                                                                           break;  // 20 Hz
+    case 3:
+        renderOrder<< 0 << 0 << 1 << 1 << 0 << 1 << 1;                                                       break;  // 17.14 Hz
+    case 4:
+        renderOrder<< 0 << 0 << 1 << 1;                                                                      break;  // 15 Hz
+    case 5:
+        renderOrder<< 0 << 0 << 1 << 1 << 0 << 0 << 1 << 1 << 1;                                             break;  // 13.33 Hz
+    case 6:
+        renderOrder<< 0 << 0 << 1 << 1 << 1;                                                                 break;  // 12 Hz
+    case 7:
+        renderOrder<< 0 << 0 << 1 << 1 << 1 << 0 << 0 << 0 << 1 << 1 << 1;                                   break;  // 10.91 Hz
+    case 8:
+        renderOrder<< 0 << 0 << 0 << 1 << 1 << 1;                                                            break;  // 10 Hz
+    case 9:
+        renderOrder<< 0 << 0 << 0 << 1 << 1 << 1 << 0 << 0 << 0 << 1 << 1 << 1 << 1;                         break;  // 9.23 Hz
+    case 10:
+        renderOrder<< 0 << 0 << 0 << 1 << 1 << 1 << 1;                                                       break;  // 8.57 Hz
+    case 11:
+        renderOrder<< 0 << 0 << 0 << 1 << 1 << 1 << 1 << 0 << 0 << 0 << 0 << 1 << 1 << 1 << 1;               break;  // 8 Hz
+    case 12:
+        renderOrder<< 0 << 0 << 0 << 0 << 1 << 1 << 1 << 1;                                                  break;  // 7.5 Hz
+    case 13:
+        renderOrder<< 0 << 0 << 0 << 0 << 1 << 1 << 1 << 1 << 0 << 0 << 0 << 0 << 1 << 1 << 1 << 1 << 1;     break;  // 7.05 Hz
+    case 14:
+        renderOrder<< 0 << 0 << 0 << 0 << 1 << 1 << 1 << 1 << 1;                                             break;  // 6.66 Hz
+    case 15:
         renderOrder<< 0 << 0 << 0 << 0 << 0 << 1 << 1 << 1 << 1 << 1;                                        break;  // 6 Hz
     default:{
         renderOrder<< 0 << 1 ;

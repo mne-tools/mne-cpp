@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     bcisetupwidget.cpp
+* @file     bciwidget.cpp
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>
 *			Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
@@ -39,7 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "ssvepbcisetupwidget.h"
+#include "ssvepbciwidget.h"
 #include "ssvepbciaboutwidget.h"
 #include "../ssvepbci.h"
 
@@ -67,7 +67,7 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ssvepBCISetupWidget::ssvepBCISetupWidget(ssvepBCI* pBCI, QWidget* parent)
+ssvepBCIWidget::ssvepBCIWidget(ssvepBCI* pBCI, QWidget* parent)
 : QWidget(parent)
 , m_pBCI(pBCI)
 {
@@ -137,7 +137,7 @@ ssvepBCISetupWidget::ssvepBCISetupWidget(ssvepBCI* pBCI, QWidget* parent)
 //            this, &BCISetupWidget::setFilterOptions);
 
     //Connect about button
-    connect(ui.m_qPushButton_About, &QPushButton::released, this, &ssvepBCISetupWidget::showAboutDialog);
+    connect(ui.m_qPushButton_About, &QPushButton::released, this, &ssvepBCIWidget::showAboutDialog);
 
     //Fill info box
     QFile file(m_pBCI->m_qStringResourcePath+"readme.txt");
@@ -156,14 +156,14 @@ ssvepBCISetupWidget::ssvepBCISetupWidget(ssvepBCI* pBCI, QWidget* parent)
 
 //*************************************************************************************************************
 
-ssvepBCISetupWidget::~ssvepBCISetupWidget()
+ssvepBCIWidget::~ssvepBCIWidget()
 {
 }
 
 
 //*************************************************************************************************************
 
-void ssvepBCISetupWidget::initGui()
+void ssvepBCIWidget::initGui()
 {
 //    // General options
 //    ui.m_checkBox_UseSensorData->setChecked(m_pBCI->m_bUseSensorData);
@@ -216,7 +216,7 @@ void ssvepBCISetupWidget::initGui()
 
 //*************************************************************************************************************
 
-void ssvepBCISetupWidget::setGeneralOptions()
+void ssvepBCIWidget::setGeneralOptions()
 {
 //    m_pBCI->m_bUseSensorData = ui.m_checkBox_UseSensorData->isChecked();
 //    m_pBCI->m_bUseSourceData = ui.m_checkBox_UseSourceData->isChecked();
@@ -231,7 +231,7 @@ void ssvepBCISetupWidget::setGeneralOptions()
 
 //*************************************************************************************************************
 
-void ssvepBCISetupWidget::setProcessingOptions()
+void ssvepBCIWidget::setProcessingOptions()
 {
 //    m_pBCI->m_bSubtractMean = ui.m_checkBox_SubtractMean->isChecked();
 //    m_pBCI->m_dSlidingWindowSize = ui.m_doubleSpinBox_SlidingWindowSize->value();
@@ -252,7 +252,7 @@ void ssvepBCISetupWidget::setProcessingOptions()
 
 //*************************************************************************************************************
 
-void ssvepBCISetupWidget::changeLoadSensorBoundary()
+void ssvepBCIWidget::changeLoadSensorBoundary()
 {
 //    QString path = QFileDialog::getOpenFileName(
 //                this,
@@ -271,7 +271,7 @@ void ssvepBCISetupWidget::changeLoadSensorBoundary()
 
 //*************************************************************************************************************
 
-void ssvepBCISetupWidget::changeLoadSourceBoundary()
+void ssvepBCIWidget::changeLoadSourceBoundary()
 {
 //    QString path = QFileDialog::getOpenFileName(
 //                this,
@@ -291,7 +291,7 @@ void ssvepBCISetupWidget::changeLoadSourceBoundary()
 
 //*************************************************************************************************************
 
-//QVector<VectorXd> ssvepBCISetupWidget::readBoundaryInformation(QString path)
+//QVector<VectorXd> ssvepBCIWidget::readBoundaryInformation(QString path)
 //{
 //    QVector<VectorXd> boundary_final;
 
@@ -359,7 +359,7 @@ void ssvepBCISetupWidget::changeLoadSourceBoundary()
 
 //*************************************************************************************************************
 
-void ssvepBCISetupWidget::initSelectedFeaturesSensor()
+void ssvepBCIWidget::initSelectedFeaturesSensor()
 {
     // Read electrode pinnig scheme from file and initialise List and store in QMap in BCI object
     QString path;
@@ -402,7 +402,7 @@ void ssvepBCISetupWidget::initSelectedFeaturesSensor()
 
 //*************************************************************************************************************
 
-void ssvepBCISetupWidget::setFeatureSelection()
+void ssvepBCIWidget::setFeatureSelection()
 {
 //    QStringList ChosenFeaturesOnSensorLevel;
 //    for(int i=0; i< ui.m_listWidget_ChosenFeaturesOnSensorLevel->count(); i++)
@@ -419,7 +419,7 @@ void ssvepBCISetupWidget::setFeatureSelection()
 
 //*************************************************************************************************************
 
-void ssvepBCISetupWidget::setFilterOptions()
+void ssvepBCIWidget::setFilterOptions()
 {
 //    m_pBCI->m_bUseFilter = ui.m_checkBox_UseFilter->isChecked();
 //    m_pBCI->m_dFilterLowerBound = ui.m_doubleSpinBox_FilterLowerBound->value();
@@ -431,7 +431,7 @@ void ssvepBCISetupWidget::setFilterOptions()
 
 //*************************************************************************************************************
 
-void ssvepBCISetupWidget::setClassificationOptions()
+void ssvepBCIWidget::setClassificationOptions()
 {
 //    m_pBCI->m_iFeatureCalculationType = ui.m_comboBox_featureCalculationType->currentIndex();
 }
@@ -439,7 +439,7 @@ void ssvepBCISetupWidget::setClassificationOptions()
 
 //*************************************************************************************************************
 
-void ssvepBCISetupWidget::showAboutDialog()
+void ssvepBCIWidget::showAboutDialog()
 {
     ssvepBCIAboutWidget aboutDialog(this);
     aboutDialog.exec();
@@ -448,7 +448,7 @@ void ssvepBCISetupWidget::showAboutDialog()
 
 //*************************************************************************************************************
 
-bool ssvepBCISetupWidget::eventFilter(QObject *object, QEvent *event)
+bool ssvepBCIWidget::eventFilter(QObject *object, QEvent *event)
 {
 //     if ((object == ui.m_listWidget_ChosenFeaturesOnSensorLevel ||
 //          object == ui.m_listWidget_ChosenFeaturesOnSourceLevel ||
