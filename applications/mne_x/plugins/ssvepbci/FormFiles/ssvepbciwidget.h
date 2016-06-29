@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     ssvepbcisetupwidget.h
+* @file     ssvepbciwidget.h
 * @author   Viktor Klüber <viktor.klueber@tu-ilmenau.de>;
 *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
@@ -31,12 +31,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the ssvepBCISetupWidget class.
+* @brief    Contains the declaration of the ssvepBCIWidget class.
 *
 */
 
-#ifndef SSVEPBCISETUPWIDGET_H
-#define SSVEPBCISETUPWIDGET_H
+#ifndef SSVEPBCIWIDGET_H
+#define SSVEPBCIWIDGET_H
 
 
 //*************************************************************************************************************
@@ -51,7 +51,7 @@
 //=============================================================================================================
 
 #include <QtWidgets>
-#include "../ui_ssvepbcisetup.h"
+#include "../ui_ssvepbciwidget.h"
 
 
 
@@ -78,7 +78,7 @@ class ssvepBCI;
 *
 * @brief The TMSISetupWidget class provides the TMSI configuration window.
 */
-class ssvepBCISetupWidget : public QWidget
+class ssvepBCIWidget : public QWidget
 {
     Q_OBJECT
 public:
@@ -90,14 +90,14 @@ public:
     * @param [in] parent pointer to parent widget; If parent is 0, the new BCISetupWidget becomes a window. If parent is another widget, BCISetupWidget becomes a child window inside parent. BCISetupWidget is deleted when its parent is deleted.
     * @param [in] pBCI a pointer to the corresponding BCI.
     */
-    ssvepBCISetupWidget(ssvepBCI* pBCI, QWidget *parent = 0);
+    ssvepBCIWidget(ssvepBCI* pBCI, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
     * Destroys the BCISetupWidget.
     * All BCISetupWidget's children are deleted first. The application exits if BCISetupWidget is the main widget.
     */
-    ~ssvepBCISetupWidget();
+    ~ssvepBCIWidget();
 
     //=========================================================================================================
     /**
@@ -192,9 +192,9 @@ private:
 
     QStringList m_vAvailableFeaturesSensor;                 /**< QStringList holding available features to select on sensor level (electrodes).*/
 
-    Ui::ssvepBCISetupClass ui;                              /**< the user interface for the ssvepBCISetupWidget.*/
+    Ui::ssvepBCISetupClass ui;                              /**< the user interface for the ssvepBCIWidget.*/
 };
 
 } // NAMESPACE
 
-#endif // SSVEPBCISETUPWIDGET_H
+#endif // SSVEPBCIWIDGET_H

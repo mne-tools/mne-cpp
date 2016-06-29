@@ -84,6 +84,7 @@ void ssvepBCIScreen::paintGL() {
     //paint all items to the screen
     for(int i = 0; i < m_Items.size(); i++)
         m_Items[i].paint(this);
+
     //painting red cross as a point of reference for the subject
     QPainter p(this);
     p.fillRect((0.5-0.01/2)*this->width(),(0.5-0.05/2)*this->height(),0.01*this->width(),0.05*this->height(),Qt::red);
