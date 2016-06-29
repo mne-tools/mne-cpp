@@ -88,6 +88,9 @@
 #include "fiff_ch_info.h"
 #include "fiff_ch_pos.h"
 #include "fiff_stream.h"
+#include "fiff_dir_entry.h"
+#include "fiff_tag.h"
+#include "fiff_dig_point.h"
 
 
 //*************************************************************************************************************
