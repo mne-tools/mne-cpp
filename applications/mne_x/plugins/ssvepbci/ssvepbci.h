@@ -65,7 +65,8 @@
 #include <QtWidgets>
 #include <QtConcurrent/QtConcurrent>
 
-#include "FormFiles/ssvepbcisetupwidget.h"
+#include "FormFiles/ssvepbciwidget.h"
+#include "FormFiles/ssvepbciconfigurationwidget.h"
 #include "FormFiles/ssvepbcisetupstimuluswidget.h"
 
 //*************************************************************************************************************
@@ -111,7 +112,8 @@ class SSVEPBCISHARED_EXPORT ssvepBCI : public IAlgorithm
     friend class BCISetupWidget;
     friend class BCIFeatureWindow;
     friend class ssvepBCISetupStimulusWidget;
-    friend class ssvepBCISetupWidget;
+    friend class ssvepBCIConfigurationWidget;
+    friend class ssvepBCIWidget;
 
 public:
     //=========================================================================================================
@@ -140,9 +142,15 @@ public:
 
     //=========================================================================================================
     /**
-    * Starts data recording
+    * Shows Setup of Stimulus Feature.
     */
     void showSetupStimulus();
+
+    //=========================================================================================================
+    /**
+    * Shows configuration panel of BCI.
+    */
+    void showBCIConfiguration();
 
     //=========================================================================================================
     /**
@@ -262,23 +270,17 @@ signals:
     void paintFeatures(MyQList features, bool bTrigerActivated);
 
 private:
-    //=========================================================================================================
-    /**
-    * reading actual segment from the sliding time window and write it to the data Matrix
-    *
-    *
-    */
-    void readFromSlidingTimeWindow(MatrixXd &data);
-
-
+    QAction*                                            m_pActionBCIConfiguration;          /**< start configuration feature */
     QAction*                                            m_pActionSetupStimulus;             /**< starts stimulus feature */
 
-    QSharedPointer<ssvepBCISetupStimulusWidget>         m_pssvepBCISetupStimulusWidget; /**< Widget for stimulus setup */
+    QSharedPointer<ssvepBCIConfigurationWidget>         m_pssvepBCIConfigurationWidget;     /**< hold pointer to Widget for BCI configuration */
+    QSharedPointer<ssvepBCISetupStimulusWidget>         m_pssvepBCISetupStimulusWidget;     /**< Widget for stimulus setup */
 
     PluginInputData<NewRealTimeMultiSampleArray>::SPtr  m_pRTMSAInput;          /**< The RealTimeMultiSampleArray input.*/
     PluginInputData<RealTimeSourceEstimate>::SPtr       m_pRTSEInput;           /**< The RealTimeSourceEstimate input.*/
 
     // adaptable sliding Window with downsampling function
+    MatrixXd                m_matSlidingTimeWindow;             /**< Sensor Level: adaptational sliding time window. */
     int                     m_iCounter;                         /**< iterative index for counting the miss classifications */
     double                  m_dSampleFrequency;                 /**< sample frequency of the device [Hz] */
     int                     m_iReadSampleSize;                  /**< numbers of sample for one time segment (about 0.1 seconds) */
@@ -293,9 +295,10 @@ private:
     int                     m_iReadToWriteBuffer;               /**< number of samples from the current readindex to current write index */
     int                     m_iWindowSize;
 
-    // SSVEP parameter                 
-    QList<double>           m_lDesFrequencies;                  /**< contains searched frequencies */
-    QList<double>           m_lAllFrequencies;                  /**< contains all serched frequencies and reference frequencies */
+    // SSVEP parameter
+    QList<int>              m_lElectrodeNumbers;                /**< Sensor level: numbers of chosen electrode channels */
+    QList<double>           m_lDesFrequencies;                  /**< contains desired frequencies */
+    QList<double>           m_lAllFrequencies;                  /**< contains desired frequencies and reference frequencies */
     int                     m_iNumberOfHarmonics;               /**< number of harmonics which will be searched for */
     double                  m_dAlpha;                           /**< parameter for softmax function */
     QList<double>           m_lThresholdValues;                 /**< threshold value for normalized energy probabilities */
@@ -319,9 +322,16 @@ private:
 
     MatrixXd                m_matStimChannelSensor;             /**< Sensor level: Stim channel. */
     MatrixXd                m_matTimeBetweenWindowsStimSensor;  /**< Sensor level: Stim channel. */
-    QList<int>              m_lElectrodeNumbers;                /**< Sensor level: number of chosen electrodes */
 
-    MatrixXd                m_matSlidingTimeWindow;             /**< Sensor Level: adaptational sliding time window. */
+
+    //=========================================================================================================
+    /**
+    * reading actual segment from the sliding time window and write it to the data Matrix
+    *
+    *
+    */
+    void readFromSlidingTimeWindow(MatrixXd &data);
+
 
 
 
