@@ -115,13 +115,23 @@ public:
     */
     void closeEvent(QCloseEvent *event);
 
+    //=========================================================================================================
+    /**
+    * initialize selected channels-list on sensor level
+    *
+    *
+    */
+    void initSelectedChannelsSensor();
 
 private slots:
 
 
 private:
     Ui::ssvepBCIConfigurationWidget        *ui;
-    ssvepBCI                               *m_pssvepBCI;            /**< a pointer to corresponding ssvepBCI class */
+    ssvepBCI                               *m_pSSVEPBCI;            /**< a pointer to corresponding ssvepBCI class */
+
+    QStringList m_vAvailableChannelsSensor;                 /**< QStringList holding available features to select on sensor level (electrodes).*/
+
 
 };
 

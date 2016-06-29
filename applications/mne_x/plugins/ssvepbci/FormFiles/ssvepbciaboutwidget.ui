@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>BCIAboutWidgetClass</class>
  <widget class="QDialog" name="BCIAboutWidgetClass">
@@ -29,7 +29,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>About TMSI EEG</string>
+   <string>About SSVEP BCI EEG</string>
   </property>
   <widget class="QTextBrowser" name="textBrowser">
    <property name="geometry">

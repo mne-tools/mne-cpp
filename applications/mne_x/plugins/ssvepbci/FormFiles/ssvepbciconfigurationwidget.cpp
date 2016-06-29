@@ -59,11 +59,12 @@ using namespace ssvepBCIPlugin;
 
 ssvepBCIConfigurationWidget::ssvepBCIConfigurationWidget(ssvepBCI* pssvepBCI, QWidget *parent) :
     QDialog(parent),
+    m_pSSVEPBCI(pssvepBCI),
     ui(new Ui::ssvepBCIConfigurationWidget)
 {
     ui->setupUi(this);
 
-
+    initSelectedChannelsSensor();
 }
 
 //*************************************************************************************************************
@@ -79,4 +80,41 @@ ssvepBCIConfigurationWidget::~ssvepBCIConfigurationWidget()
 void ssvepBCIConfigurationWidget::closeEvent(QCloseEvent *event)
 {
     Q_UNUSED(event)
+}
+
+//*************************************************************************************************************
+
+void ssvepBCIConfigurationWidget::initSelectedChannelsSensor()
+{
+    // Read electrode pinnig scheme from file and initialise List and store in QMap in BCI object
+    QString path;
+    path.prepend(m_pSSVEPBCI->m_qStringResourcePath);
+    path.append("Pinning_Scheme_Duke_Dry_64.txt");
+    QFile file(path);
+    if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
+        return;
+
+    //Start reading from file
+    m_vAvailableChannelsSensor.clear();
+    QMap<QString, int>  mapElectrodePinningScheme;
+
+    QTextStream in(&file);
+    while(!in.atEnd())
+    {
+        QString line = in.readLine();
+        QStringList list_temp = line.split(QRegExp("\\s+"));
+
+        if(list_temp.size() >= 2)
+            mapElectrodePinningScheme.insert(list_temp.at(1), list_temp.at(0).toInt()-1); // Decrement by 1 because channels in matrix start with 0
+        m_vAvailableChannelsSensor.append(list_temp.at(1));
+    }
+    file.close();
+    m_pSSVEPBCI->m_mapElectrodePinningScheme = mapElectrodePinningScheme;
+
+    // Remove default items from list
+    for(int i=0; i<m_pSSVEPBCI->m_slChosenFeatureSensor.size(); i++)
+        m_vAvailableChannelsSensor.removeAt(m_vAvailableChannelsSensor.indexOf(m_pSSVEPBCI->m_slChosenFeatureSensor.at(i)));
+
+    ui->m_listWidget_AvailableChannelsOnSensorLevel->addItems(m_vAvailableChannelsSensor);
+    ui->m_listWidget_ChosenChannelsOnSensorLevel->addItems(m_pSSVEPBCI->m_slChosenFeatureSensor);
 }

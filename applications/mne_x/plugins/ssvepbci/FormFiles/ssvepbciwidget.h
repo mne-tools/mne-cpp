@@ -161,13 +161,6 @@ private:
 
     //=========================================================================================================
     /**
-    * Init selected feature list on sensor level
-    *
-    */
-    void initSelectedFeaturesSensor();
-
-    //=========================================================================================================
-    /**
     * Sets feature selections made by the user on source and sensor level
     *
     */
@@ -189,9 +182,6 @@ private:
 
 
     ssvepBCI* m_pBCI;                                       /**< a pointer to corresponding BCI.*/
-
-    QStringList m_vAvailableFeaturesSensor;                 /**< QStringList holding available features to select on sensor level (electrodes).*/
-
     Ui::ssvepBCISetupClass ui;                              /**< the user interface for the ssvepBCIWidget.*/
 };
 
