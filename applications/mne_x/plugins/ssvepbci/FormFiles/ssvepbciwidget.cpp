@@ -210,7 +210,6 @@ void ssvepBCIWidget::initGui()
 //    ui.m_doubleSpinBox_ParcksWidth->setValue(m_pBCI->m_dParcksWidth);
 
     // Selected features on sensor level
-    initSelectedFeaturesSensor();
 }
 
 
@@ -355,49 +354,6 @@ void ssvepBCIWidget::changeLoadSourceBoundary()
 
 //    return boundary_final;
 //}
-
-
-//*************************************************************************************************************
-
-void ssvepBCIWidget::initSelectedFeaturesSensor()
-{
-    // Read electrode pinnig scheme from file and initialise List and store in QMap in BCI object
-    QString path;
-    path.prepend(m_pBCI->m_qStringResourcePath);
-    path.append("Pinning_Scheme_Duke_Dry_64.txt");
-    QFile file(path);
-    if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
-        return;
-
-    //Start reading from file
-    m_vAvailableFeaturesSensor.clear();
-    QMap<QString, int>  mapElectrodePinningScheme;
-
-    QTextStream in(&file);
-
-    while(!in.atEnd())
-    {
-        QString line = in.readLine();
-
-        QStringList list_temp = line.split(QRegExp("\\s+"));
-
-        if(list_temp.size() >= 2)
-            mapElectrodePinningScheme.insert(list_temp.at(1), list_temp.at(0).toInt()-1); // Decrement by 1 because channels in matrix start with 0
-
-        m_vAvailableFeaturesSensor.append(list_temp.at(1));
-    }
-
-    file.close();
-
-    m_pBCI->m_mapElectrodePinningScheme = mapElectrodePinningScheme;
-
-    // Remove default items from list
-    for(int i=0; i<m_pBCI->m_slChosenFeatureSensor.size(); i++)
-        m_vAvailableFeaturesSensor.removeAt(m_vAvailableFeaturesSensor.indexOf(m_pBCI->m_slChosenFeatureSensor.at(i)));
-
-    ui.m_listWidget_AvailableFeaturesOnSensorLevel->addItems(m_vAvailableFeaturesSensor);
-    ui.m_listWidget_ChosenFeaturesOnSensorLevel->addItems(m_pBCI->m_slChosenFeatureSensor);
-}
 
 
 //*************************************************************************************************************
