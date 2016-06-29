@@ -67,8 +67,8 @@ namespace UTILSLIB
 //=============================================================================================================
 
 typedef struct {
-  Eigen::MatrixXf rr;
-  bool   report;
+    Eigen::MatrixXf rr;
+     bool   report;
 } *fitUserNew,fitUserRecNew;
 
 
@@ -129,8 +129,8 @@ public:
     float& radius() { return m_r; }
 
 private:
-    Eigen::Vector3f m_center;  /**< Sphere's center */
-    float m_r;          /**< Sphere's radius */
+    Eigen::Vector3f m_center;   /**< Sphere's center */
+    float m_r;                  /**< Sphere's radius */
 
     //=========================================================================================================
     /**

@@ -238,7 +238,7 @@ public:
     *
     * @param[in] p_pStream  The stream to write to.
     */
-    void writeToStream(FiffStream* p_pStream);
+    void writeToStream(FiffStream* p_pStream) const;
 
 private:
     //=========================================================================================================

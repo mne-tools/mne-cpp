@@ -51,7 +51,6 @@ SUBDIRS += \
             mne_browse_raw_qt \
     }
 
-
     !contains(MNECPP_CONFIG, coverity) {
         qtHaveModule(3dcore,3drender,3dinput) {
             message(mne_matching_pursuit & mne_analyze_qt configured)

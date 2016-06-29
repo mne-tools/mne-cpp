@@ -350,7 +350,7 @@ QList<FiffChInfo> FiffInfo::set_current_comp(QList<FiffChInfo>& chs, fiff_int_t 
 
 //*************************************************************************************************************
 
-void FiffInfo::writeToStream(FiffStream* p_pStream)
+void FiffInfo::writeToStream(FiffStream* p_pStream) const
 {
     //
     //   We will always write floats
