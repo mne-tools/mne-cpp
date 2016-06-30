@@ -364,7 +364,7 @@ void BabyMEG::SetFiffInfoForHPI()
 
 //*************************************************************************************************************
 
-void BabyMEG::RecvHPIFiffInfo(FiffInfo info)
+void BabyMEG::RecvHPIFiffInfo(const FiffInfo& info)
 {
     // show the HPI info
     qDebug()<<"saved HPI" << m_pFiffInfo->dig.at(0).r[0];
@@ -514,7 +514,7 @@ void BabyMEG::setFiffData(QByteArray DATA)
 
 //*************************************************************************************************************
 
-void BabyMEG::setFiffInfo(FiffInfo p_FiffInfo)
+void BabyMEG::setFiffInfo(const FiffInfo& p_FiffInfo)
 {
     m_pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo(p_FiffInfo));
 

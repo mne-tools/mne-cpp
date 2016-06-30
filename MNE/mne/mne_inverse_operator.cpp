@@ -40,8 +40,31 @@
 
 #include "mne_inverse_operator.h"
 #include <fs/label.h>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <iostream>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Qt INCLUDES
+//=============================================================================================================
+
 #include <QFuture>
 #include <QtConcurrent>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
+#include <Eigen/SVD>
 
 
 //*************************************************************************************************************
@@ -87,7 +110,7 @@ MNEInverseOperator::MNEInverseOperator(QIODevice& p_IODevice)
 
 //*************************************************************************************************************
 
-MNEInverseOperator::MNEInverseOperator(const FiffInfo &info, MNEForwardSolution forward, const FiffCov& p_noise_cov, float loose, float depth, bool fixed, bool limit_depth_chs)
+MNEInverseOperator::MNEInverseOperator(const FiffInfo &info, const MNEForwardSolution& forward, const FiffCov& p_noise_cov, float loose, float depth, bool fixed, bool limit_depth_chs)
 {
     *this = MNEInverseOperator::make_inverse_operator(info, forward, p_noise_cov, loose, depth, fixed, limit_depth_chs);
 }
@@ -415,7 +438,7 @@ MatrixXd MNEInverseOperator::cluster_kernel(const AnnotationSet &p_AnnotationSet
             if (label_ids[i] != 0)
             {
                 QString curr_name = t_CurrentColorTable.struct_names[i];//obj.label2AtlasName(label(i));
-                printf("\tCluster %d / %li %s...", i+1, label_ids.rows(), curr_name.toUtf8().constData());
+                printf("\tCluster %d / %lld %s...", i+1, label_ids.rows(), curr_name.toUtf8().constData());
 
                 //
                 // Get source space indeces

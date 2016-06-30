@@ -44,11 +44,6 @@
 #include "fiff_global.h"
 #include "fiff_types.h"
 #include "fiff_id.h"
-#include "fiff_coord_trans.h"
-#include "fiff_ch_info.h"
-#include "fiff_dig_point.h"
-#include "fiff_cov.h"
-#include "fiff_dir_tree.h"
 
 
 //*************************************************************************************************************
@@ -62,23 +57,11 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// STL INCLUDES
-//=============================================================================================================
-
-#include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
 // Qt INCLUDES
 //=============================================================================================================
 
 #include <QByteArray>
 #include <QDataStream>
-#include <QFile>
 #include <QIODevice>
 #include <QList>
 #include <QSharedPointer>
@@ -106,7 +89,13 @@ class FiffRawData;
 class FiffInfo;
 class FiffInfoBase;
 class FiffCov;
-
+class FiffDirTree;
+class FiffDirEntry;
+class FiffProj;
+class FiffNamedMatrix;
+class FiffDigPoint;
+class FiffChInfo;
+class FiffCoordTrans;
 
 static FiffId defaultFiffId;
 
@@ -148,12 +137,6 @@ public:
     * @param[in] mode   The open mode
     */
     explicit FiffStream(QByteArray * a, QIODevice::OpenMode mode);
-
-    //=========================================================================================================
-    /**
-    * Destroys the FiffInfo.
-    */
-    ~FiffStream();
 
     //=========================================================================================================
     /**

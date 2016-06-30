@@ -120,7 +120,7 @@ QMap<QString,double> ScaleWindow::genereateScalingMap()
 
 //*************************************************************************************************************
 
-void ScaleWindow::hideSpinBoxes(FiffInfo* pCurrentFiffInfo)
+void ScaleWindow::hideSpinBoxes(FiffInfo::SPtr& pCurrentFiffInfo)
 {
     //Hide all spin boxes and labels
     ui->m_doubleSpinBox_MEG_grad->hide();

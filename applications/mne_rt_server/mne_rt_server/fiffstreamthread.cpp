@@ -221,7 +221,7 @@ void FiffStreamThread::sendRawBuffer(QSharedPointer<Eigen::MatrixXf> m_pMatRawDa
 
 //*************************************************************************************************************
 
-void FiffStreamThread::sendMeasurementInfo(qint32 ID, FiffInfo p_fiffInfo)
+void FiffStreamThread::sendMeasurementInfo(qint32 ID, const FiffInfo& p_fiffInfo)
 {
     if(ID == m_iDataClientId)
     {

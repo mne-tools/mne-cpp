@@ -80,7 +80,6 @@ namespace MNELIB
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFLIB;
 using namespace Eigen;
 
 
@@ -131,10 +130,10 @@ public:
     }
 
 public:
-    MatrixXd    epoch;  /**< The data */
-    fiff_int_t  event;  /**< The event code */
-    float       tmin;   /**< New start time (must be >= 0). */
-    float       tmax;   /**< New end time of the data (cannot exceed data duration). */
+    MatrixXd    epoch;          /**< The data */
+    FIFFLIB::fiff_int_t  event; /**< The event code */
+    float       tmin;           /**< New start time (must be >= 0). */
+    float       tmax;           /**< New end time of the data (cannot exceed data duration). */
 
 };
 

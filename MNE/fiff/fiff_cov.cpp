@@ -41,6 +41,7 @@
 #include "fiff_cov.h"
 #include "fiff_stream.h"
 #include "fiff_info_base.h"
+#include "fiff_dir_tree.h"
 
 #include <utils/mnemath.h>
 

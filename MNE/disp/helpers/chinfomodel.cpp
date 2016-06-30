@@ -56,7 +56,7 @@ using namespace DISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ChInfoModel::ChInfoModel(FiffInfo* pFiffInfo, QObject *parent)
+ChInfoModel::ChInfoModel(FiffInfo::SPtr& pFiffInfo, QObject *parent)
 : QAbstractTableModel(parent)
 , m_pFiffInfo(pFiffInfo)
 {
@@ -67,7 +67,7 @@ ChInfoModel::ChInfoModel(FiffInfo* pFiffInfo, QObject *parent)
 
 ChInfoModel::ChInfoModel(QObject *parent)
 : QAbstractTableModel(parent)
-, m_pFiffInfo(new FiffInfo)
+, m_pFiffInfo(FiffInfo::SPtr(new FiffInfo))
 {
 }
 
@@ -533,7 +533,7 @@ bool ChInfoModel::setData(const QModelIndex &index, const QVariant &value, int r
 
 //*************************************************************************************************************
 
-void ChInfoModel::fiffInfoChanged(FiffInfo* pFiffInfo)
+void ChInfoModel::fiffInfoChanged(FiffInfo::SPtr& pFiffInfo)
 {
     beginResetModel();
 
@@ -664,7 +664,7 @@ void ChInfoModel::clearModel()
 {
     beginResetModel();
 
-    m_pFiffInfo = new FiffInfo();
+    m_pFiffInfo = FiffInfo::SPtr(new FiffInfo);
     m_layoutMap.clear();
     m_aliasNames.clear();
     m_mappedLayoutChNames.clear();
