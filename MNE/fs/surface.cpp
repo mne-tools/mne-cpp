@@ -52,7 +52,6 @@
 #include <QFile>
 #include <QDataStream>
 #include <QTextStream>
-#include <QDebug>
 
 
 //*************************************************************************************************************

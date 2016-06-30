@@ -39,6 +39,7 @@
 #include "rtsssalgo.h"
 #include <QFuture>
 #include <QtConcurrent/QtConcurrentMap>
+#include <QFile>
 //#include "FormFiles/rtssssetupwidget.h"
 
 RtSssAlgo::RtSssAlgo()

@@ -46,6 +46,9 @@
 #include "fiff_info_base.h"
 #include "fiff_raw_data.h"
 #include "fiff_cov.h"
+#include "fiff_coord_trans.h"
+#include "fiff_ch_info.h"
+#include "fiff_dig_point.h"
 
 #include <utils/mnemath.h>
 
@@ -56,8 +59,6 @@
 //=============================================================================================================
 
 #include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
 #include <time.h>
 
 
@@ -108,21 +109,6 @@ FiffStream::FiffStream(QByteArray * a, QIODevice::OpenMode mode)
     this->setFloatingPointPrecision(QDataStream::SinglePrecision);
     this->setByteOrder(QDataStream::BigEndian);
     this->setVersion(QDataStream::Qt_5_0);
-}
-
-
-//*************************************************************************************************************
-
-FiffStream::~FiffStream()
-{
-    //ToDo check if all IO devices are closed outside --> don't do this here!!
-//    printf("DEBUG: check if FiffStream::IODevice is closed else where. Cause here it's not anymore.");
-
-//    if(this->device()->isOpen())
-//    {
-//        printf("DEBUG: Closing FiffStream %s.\n\n", this->streamName().toUtf8().constData());
-//        this->device()->close();
-//    }
 }
 
 

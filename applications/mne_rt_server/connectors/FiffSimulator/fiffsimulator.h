@@ -101,7 +101,6 @@ class FIFFSIMULATORSHARED_EXPORT FiffSimulator : public IConnector
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
     Q_INTERFACES(RTSERVER::IConnector)
 
-
     friend class FiffProducer;
 
 public:
