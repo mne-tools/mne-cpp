@@ -837,6 +837,7 @@ bool BabyMEG::readBadChannels()
 
 void BabyMEG::run()
 {
+    QQuaternion quaternion;
 
     MatrixXf matValue;
 
@@ -849,9 +850,30 @@ void BabyMEG::run()
             //pop matrix
             matValue = m_pRawMatrixBuffer->pop();
 
+// ***********************************************************************************
+            // ******************* HPI update - by SEOK ********************
+            qDebug() << matValue.rows() << " x " << matValue.cols();
+
+            qDebug() << "dev_to_head (translation): " << m_pFiffInfo->dev_head_t.trans.rows() << " x " << m_pFiffInfo->dev_head_t.trans.cols();
+            qDebug() << m_pFiffInfo->dev_head_t.trans(0,3) << "  " << m_pFiffInfo->dev_head_t.trans(1,3) << "  "  << m_pFiffInfo->dev_head_t.trans(2,3);
+
+//            quat = quaternion.fromRotationMatrix(m_pFiffInfo->dev_head_t.tran);
+
+            matValue(401,100) = 0.000001;
+            matValue(404,400) = m_pFiffInfo->dev_head_t.trans(0,3);
+            matValue(405,500) = m_pFiffInfo->dev_head_t.trans(1,3);
+            matValue(406,600) = m_pFiffInfo->dev_head_t.trans(2,3);
+            matValue(407,600) = 0.00000000001;
+
+
+            // ******************* End of HPI update ***********************
+// ***********************************************************************************
+
             //Write raw data to fif file
             if(m_bWriteToFile)
             {
+                qDebug() << matValue.rows() << " x " << matValue.cols();
+
                 size += matValue.rows()*matValue.cols() * 4;
 
                 if(size > MAX_DATA_LEN)
