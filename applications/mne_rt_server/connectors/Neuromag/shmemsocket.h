@@ -230,7 +230,6 @@ private:
     FILE   *shmem_fd;
     char   *filename;
 
-    long read_loc;
     FILE *read_fd;
 
     

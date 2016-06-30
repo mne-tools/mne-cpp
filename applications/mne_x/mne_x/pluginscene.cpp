@@ -63,6 +63,8 @@ using namespace MNEX;
 PluginScene::PluginScene(QMenu *pMenuPluginItem, PluginGui *pPluginGui)
 : QGraphicsScene(pPluginGui)
 , m_pPluginGui(pPluginGui)
+, m_pActionPluginItem(Q_NULLPTR)
+, leftButtonDown(false)
 {
     m_pMenuPluginItem = pMenuPluginItem;
     m_mode = MovePluginItem;

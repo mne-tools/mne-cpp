@@ -44,6 +44,7 @@
 #include "FormFiles/neuromagsetupwidget.h"
 
 #include <utils/ioutils.h>
+#include <fiff/fiff_dir_tree.h>
 
 
 //*************************************************************************************************************

@@ -70,6 +70,9 @@ RawDelegate::RawDelegate(QObject *parent)
 , m_bShowSelectedEventsOnly(false)
 , m_bActivateEvents(true)
 , m_bRemoveDC(false)
+, m_dMaxValue(65530)
+, m_dScaleY(1)
+, m_pScaleWindow(Q_NULLPTR)
 {
     m_iDefaultPlotHeight = DELEGATE_PLOT_HEIGHT;
     m_dDx = DELEGATE_DX;
@@ -291,7 +294,7 @@ void RawDelegate::createPlotPath(const QModelIndex &index, const QStyleOptionVie
 void RawDelegate::createGridPath(QPainterPath& path, const QStyleOptionViewItem &option, QList<RowVectorPair>& listPairs) const
 {
     //horizontal lines
-    double distance = option.rect.height()/m_nhlines;
+    double distance = double(option.rect.height()) / m_nhlines;
 
     QPointF startpos = path.currentPosition();
     QPointF endpoint(path.currentPosition().x()+listPairs[0].second*listPairs.size()*m_dDx,path.currentPosition().y());

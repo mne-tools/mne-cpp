@@ -61,7 +61,6 @@
 #include <fiff/fiff_constants.h>
 #include <fiff/fiff_cov.h>
 
-
 #include <utils/mnemath.h>
 
 

@@ -409,7 +409,7 @@ void RealTimeMultiSampleArrayWidget::init()
         //
         //-------- Init channel selection manager --------
         //
-        m_pChInfoModel = QSharedPointer<ChInfoModel>(new ChInfoModel(m_pFiffInfo.data(), this));
+        m_pChInfoModel = QSharedPointer<ChInfoModel>(new ChInfoModel(m_pFiffInfo, this));
 
         m_pSelectionManagerWindow = SelectionManagerWindow::SPtr(new SelectionManagerWindow(this, m_pChInfoModel));
         //m_pSelectionManagerWindow->setWindowFlags(Qt::WindowStaysOnTopHint);
@@ -427,7 +427,7 @@ void RealTimeMultiSampleArrayWidget::init()
         connect(m_pChInfoModel.data(), &ChInfoModel::channelsMappedToLayout,
                 m_pSelectionManagerWindow.data(), &SelectionManagerWindow::setCurrentlyMappedFiffChannels);
 
-        m_pChInfoModel->fiffInfoChanged(m_pFiffInfo.data());
+        m_pChInfoModel->fiffInfoChanged(m_pFiffInfo);
 
         m_pSelectionManagerWindow->setCurrentLayoutFile(settings.value(QString("RTMSAW/%1/selectedLayoutFile").arg(t_sRTMSAWName), "babymeg-mag-inner-layer.lout").toString());
 
