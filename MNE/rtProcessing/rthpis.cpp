@@ -273,8 +273,8 @@ void RtHPIS::run()
     qDebug()<< "======= coil driving frequency (Hz)======== ";
     qDebug() << coilfreq[0] << ", " << coilfreq[1] << ", " << coilfreq[2] << ", " << coilfreq[3];
 //    qDebug() << "samLoc (1024): " << samLoc;
-    int OUT_FLAG = 1;
-    int OUT_RAW = 1;
+    int OUT_FLAG = 0;
+    int OUT_RAW = 0;
     std::ofstream outinnerdata;
     outinnerdata.open ("C:/Users/babyMEG/Desktop/Seok/innerdata.txt");
     std::ofstream outtrigdata;
