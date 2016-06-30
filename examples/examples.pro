@@ -57,7 +57,7 @@ SUBDIRS += \
     patientManager \
     testWarp
 
-contains(MNECPP_CONFIG, withGui) {
+!contains(MNECPP_CONFIG, minimalVersion) {
     SUBDIRS += \
 
     qtHaveModule(3dcore,3drender,3dinput) {

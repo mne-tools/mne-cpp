@@ -206,17 +206,17 @@ public:
     void clear();
 
 private:
-    QString m_qStringResourceDataPath;	/**< Holds the path to the resource directory.*/
+    QString m_qStringResourceDataPath;  /**< Holds the path to the resource directory.*/
 
-    QString m_qStringChannelFile;	/**< Holds the channel file.*/
+    QString m_qStringChannelFile;   /**< Holds the channel file.*/
 
-    bool m_bIsEnabled;	/**< Holds whether the channel is enabled.*/
-    bool m_bIsVisible;	/**< Holds whether the channel is visible.*/
+    bool m_bIsEnabled;  /**< Holds whether the channel is enabled.*/
+    bool m_bIsVisible;  /**< Holds whether the channel is visible.*/
 
-    QVector<double> m_vecBuffer;	/**< A vector which holds all simualtion sample values.*/
+    QVector<double> m_vecBuffer;    /**< A vector which holds all simualtion sample values.*/
 
-    double m_dMin;	/**< Holds minimal sample value.*/
-    double m_dMax;	/**< Holds maximal sample value.*/
+    double m_dMin;      /**< Holds minimal sample value.*/
+    double m_dMax;      /**< Holds maximal sample value.*/
 };
 
 

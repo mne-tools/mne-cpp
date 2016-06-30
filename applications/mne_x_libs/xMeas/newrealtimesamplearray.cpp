@@ -67,6 +67,7 @@ NewRealTimeSampleArray::NewRealTimeSampleArray(QObject *parent)
 , m_dMaxValue(65535)
 , m_dSamplingRate(0)
 , m_qString_Unit("")
+, m_dValue(0)
 , m_ucArraySize(10)
 
 {

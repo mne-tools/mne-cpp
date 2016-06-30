@@ -78,9 +78,9 @@
 #include <Eigen/SparseCore>
 #include <unsupported/Eigen/FFT>
 
-#ifndef EIGEN_FFTW_DEFAULT
-#define EIGEN_FFTW_DEFAULT
-#endif
+//#ifndef EIGEN_FFTW_DEFAULT
+//#define EIGEN_FFTW_DEFAULT
+//#endif
 
 
 //*************************************************************************************************************
@@ -137,6 +137,10 @@ public:
     */
     FilterOperator(QString unique_name, FilterType type, int order, double centerfreq, double bandwidth, double parkswidth, double sFreq, qint32 fftlength=4096, DesignMethod method = Cosine);
 
+    //=========================================================================================================
+    /**
+    * Destructor
+    */
     ~FilterOperator();
 
     //=========================================================================================================

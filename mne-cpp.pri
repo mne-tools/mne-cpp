@@ -32,16 +32,16 @@ isEmpty( MNE_BINARY_DIR ) {
 #QT Packages use new qtHaveModule(<package>):
 
 ################# MNE cpp config #################
-MNECPP_CONFIG += withGui
+## To build only the minimal version, i.e, for mne_rt_server run: qmake MNECPP_CONFIG+=minimalVersion
 ## To set CodeCov coverage compiler flag run: qmake MNECPP_CONFIG+=withCodeCov
 ## To disable tests run: qmake MNECPP_CONFIG+=noTests
-!contains(MNECPP_CONFIG,noTests) {
-    MNECPP_CONFIG += withTests
-}
 ## To disable examples run: qmake MNECPP_CONFIG+=noExamples
-!contains(MNECPP_CONFIG,noExamples) {
-    MNECPP_CONFIG += withExamples
+
+contains(MNECPP_CONFIG, coverity) {
+    MNECPP_CONFIG += noTests
+    MNECPP_CONFIG += noExamples
 }
+
 ## To build basic MNE-X version run: qmake MNECPP_CONFIG+=BuildBasicMNEXVersion
 #MNECPP_CONFIG += BuildBasicMNEXVersion
 

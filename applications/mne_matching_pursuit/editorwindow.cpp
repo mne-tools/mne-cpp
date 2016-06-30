@@ -2036,15 +2036,18 @@ void EditorWindow::atom_changed(qint32 atom_number)
 
 void EditorWindow::on_gb_atom_editor_toggled(bool arg1)
 {
+    Q_UNUSED(arg1)
     ui->gb_atom_editor->setChecked(true);
 }
 
 void EditorWindow::on_gb_dict_editor_toggled(bool arg1)
 {
+    Q_UNUSED(arg1)
     ui->gb_dict_editor->setChecked(true);
 }
 
 void EditorWindow::on_gb_atom_viewer_toggled(bool arg1)
 {
+    Q_UNUSED(arg1)
     ui->gb_atom_viewer->setChecked(true);
 }

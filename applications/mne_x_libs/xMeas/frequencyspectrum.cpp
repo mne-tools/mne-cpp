@@ -67,6 +67,7 @@ FrequencySpectrum::FrequencySpectrum(QObject *parent)
 : NewMeasurement(QMetaType::type("FrequencySpectrum::SPtr"), parent)
 , m_bIsInit(false)
 , m_bContainsValues(false)
+, m_xScaleType(0)
 {
 }
 

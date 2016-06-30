@@ -81,6 +81,13 @@ KMeans::KMeans(QString distance, QString start, qint32 replicates, QString empty
 , m_sEmptyact(emptyact)
 , m_iMaxit(maxit)
 , m_bOnline(online)
+, emptyErrCnt(0)
+, iter(0)
+, k(0)
+, n(0)
+, p(0)
+, totsumD(0)
+, prevtotsumD(0)
 {
     // Assume one replicate
     if (m_iReps < 1)
