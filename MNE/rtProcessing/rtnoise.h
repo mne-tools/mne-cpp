@@ -70,6 +70,7 @@
 #include <QThread>
 #include <QMutex>
 #include <QSharedPointer>
+#include <QVector>
 
 
 //*************************************************************************************************************

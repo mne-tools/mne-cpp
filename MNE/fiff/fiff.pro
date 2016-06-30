@@ -126,7 +126,8 @@ HEADERS += fiff.h \
     fiff_stream.h \
     fiff_info_base.h \
     fiff_evoked.h \
-    fiff_evoked_set.h
+    fiff_evoked_set.h \ \
+    fiff_io.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

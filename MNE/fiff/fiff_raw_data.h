@@ -61,7 +61,6 @@
 // Qt INCLUDES
 //=============================================================================================================
 
-#include <QFile>
 #include <QList>
 #include <QSharedPointer>
 
@@ -156,7 +155,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    bool read_raw_segment(MatrixXd& data, MatrixXd& times, fiff_int_t from = -1, fiff_int_t to = -1, const RowVectorXi& sel = defaultRowVectorXi);
+    bool read_raw_segment(MatrixXd& data, MatrixXd& times, fiff_int_t from = -1, fiff_int_t to = -1, const RowVectorXi& sel = defaultRowVectorXi, bool do_debug = false);
 
     //=========================================================================================================
     /**
@@ -173,7 +172,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    bool read_raw_segment(MatrixXd& data, MatrixXd& times, SparseMatrix<double>& multSegment, fiff_int_t from = -1, fiff_int_t to = -1, const RowVectorXi& sel = defaultRowVectorXi);
+    bool read_raw_segment(MatrixXd& data, MatrixXd& times, SparseMatrix<double>& multSegment, fiff_int_t from = -1, fiff_int_t to = -1, const RowVectorXi& sel = defaultRowVectorXi, bool do_debug = false);
 
     //=========================================================================================================
     /**
@@ -196,7 +195,7 @@ public:
     FiffInfo info;              /**< Fiff measurement information */
     fiff_int_t first_samp;      /**< Do we have a skip ToDo... */
     fiff_int_t last_samp;       /**< Do we have a skip ToDo... */
-    RowVectorXd cals;              /**< Calibration matrix: ToDo Check if RowVectorXd is enough */
+    RowVectorXd cals;           /**< Calibration matrix: ToDo Check if RowVectorXd is enough */
     QList<FiffRawDir> rawdir;   /**< Special fiff diretory entry for raw data. */
     MatrixXd proj;              /**< SSP operator to apply to the data. */
     FiffCtfComp comp;           /**< Compensator. */

@@ -1,4 +1,4 @@
-/*! \mainpage MNE-CPP (MNE1) Documentation
+/*! \mainpage MNE-CPP Documentation
  *
  * \section intro_sec Introduction
  *
@@ -40,8 +40,8 @@
  *
  * \section workflow_contribute_sec Workflow to contribute
  *
- * To contribute to MNE-cpp, first create an account on <a href="http://github.com"><b>github</b></a>.
- * Once this is done, fork the <a href="http://github.com/mne-tools/mne-cpp"><b>mne-cpp repository</b></a>
+ * To contribute to MNE-CPP, first create an account on <a href="http://github.com"><b>github</b></a>.
+ * Once this is done, fork the <a href="http://github.com/mne-tools/mne-cpp"><b>MNE-CPP repository</b></a>
  * to have you own repository,
  * clone it using 'git clone' on the computers where you want to work. Make
  * your changes in your clone, push them to your github account, test them
@@ -51,12 +51,12 @@
  *
  * \section licensing_sec Licensing
  *
- * MNE-cpp is <i>BSD-licenced</i> (3 clause):
+ * MNE-CPP is <i>BSD-licenced</i> (3 clause):
  *
  *  This software is OSI Certified Open Source Software.
  *  OSI Certified is a certification mark of the Open Source Initiative.
  *
- *  Copyright (C) 2013, \ref authors_sec of MNE-cpp.
+ *  Copyright (C) 2010-2016, \ref authors_sec of MNE-CPP.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -88,8 +88,8 @@
  *
  * \section authors_sec Authors
  *
- * \li Christoph Dinh chdinh@nmr.mgh.harvard.edu 2012
- * \li Matti Hamalainen msh@nmr.mgh.harvard.edu 2012
+ * \li Christoph Dinh chdinh@nmr.mgh.harvard.edu 2010
+ * \li Matti Hamalainen msh@nmr.mgh.harvard.edu 2010
  * \li Martin Luessi mluessi@nmr.mgh.harvard.edu 2012
  * \li Christof Pieloth pieloth@labp.htwk-leipzig.de 2012
  * \li Limin Sun liminsun@nmr.mgh.harvard.edu 2013

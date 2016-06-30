@@ -42,6 +42,7 @@
 #include "fiff_evoked.h"
 #include "fiff_stream.h"
 #include "fiff_tag.h"
+#include "fiff_dir_tree.h"
 
 #include <utils/mnemath.h>
 
