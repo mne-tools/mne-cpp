@@ -57,6 +57,9 @@
 
 #include <fstream>
 
+#include <iostream>
+#include <Eigen/Dense>
+
 //*************************************************************************************************************
 //=============================================================================================================
 // QT STL INCLUDES
@@ -82,7 +85,7 @@ namespace ssvepBCIPlugin
 // TypeDefs
 //=============================================================================================================
 
-typedef QList< QList<double> > MyQList;
+typedef  QList<double>  MyQList;
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -265,9 +268,15 @@ protected:
     */
     void BCIOnSensorLevel();
 
+public slots:
+    void removePowerLine(bool removePowerLine);
+    void setPowerLine(int powerLine);
+    void setFeatureExtractionMethod(bool useMEC);
+    void setNumberOfHarmonics(int numberOfHarmonics);
 
 signals:
-    void paintFeatures(MyQList features, bool bTrigerActivated);
+    //void paintFeatures(MyQList features, bool bTrigerActivated);
+    void SSVEPprob(MyQList ssvepProb);
 
 private:
     QAction*                                            m_pActionBCIConfiguration;          /**< start configuration feature */
@@ -302,9 +311,11 @@ private:
     int                     m_iNumberOfHarmonics;               /**< number of harmonics which will be searched for */
     double                  m_dAlpha;                           /**< parameter for softmax function */
     QList<double>           m_lThresholdValues;                 /**< threshold value for normalized energy probabilities */
-    bool                    m_bRemove50HzPowerLine;             /**< Flag for removing 50 Hz power line signal */
+    MyQList                 m_lSSVEPProbabilities;              /**< contains SSVEP Probabilities */
+    bool                    m_bRemovePowerLine;                 /**< Flag for removing 50 Hz power line signal */
     bool                    m_bUseMEC;                          /**< flag for feature extractiong. If true: use MEC; If false: use CCA */
     QList<int>              m_lClassResultsSensor;              /**< Sensor level: Classification results on sensor level. */
+    int                     m_iPowerLine;                       /**< frequency of the power line [Hz] */
 
 
     // Sensor level

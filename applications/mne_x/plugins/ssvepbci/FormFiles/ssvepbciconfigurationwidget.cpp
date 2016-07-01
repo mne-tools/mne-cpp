@@ -64,7 +64,7 @@ ssvepBCIConfigurationWidget::ssvepBCIConfigurationWidget(ssvepBCI* pssvepBCI, QW
 {
     ui->setupUi(this);
 
-    //set Style sheet of the QProgressBar (no blinking animation and pointy slider handle)
+    //edit Style sheets of the QProgressBars of threshold values (no blinking animation and pointy slider handle)
     ui->m_ProgressBar_Threshold1->setStyleSheet(" QProgressBar { border: 2px solid grey; border-radius: 2px; } QProgressBar::chunk {background-color: #3add36;}");
     ui->m_ProgressBar_Threshold1->setTextVisible(false);
     ui->m_VerticalSlider_Threshold1->setStyleSheet("QSlider::handle {image: url(:/images/slider_handle.png);}");
@@ -81,7 +81,18 @@ ssvepBCIConfigurationWidget::ssvepBCIConfigurationWidget(ssvepBCI* pssvepBCI, QW
     ui->m_ProgressBar_Threshold5->setTextVisible(false);
     ui->m_VerticalSlider_Threshold5->setStyleSheet("QSlider::handle {image: url(:/images/slider_handle.png);}");
 
+    // connect signals for power line elimination
+    connect(ui->m_GroupBox_RemovePowerLine, &QGroupBox::toggled, m_pSSVEPBCI, &ssvepBCI::removePowerLine);
+    connect(ui->m_SpinBox_PowerLineFrequency, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged) , m_pSSVEPBCI, &ssvepBCI::setPowerLine);
 
+    // connect feature extraction behaviour signal
+    connect(ui->m_RadioButton_MEC, &QRadioButton::toggled, m_pSSVEPBCI, &ssvepBCI::setFeatureExtractionMethod);
+
+    // connect number of harmonicssignal
+
+    // connect SSVEP probabilities for threshold GUI
+    connect(m_pSSVEPBCI, &ssvepBCI::SSVEPprob, this, &ssvepBCIConfigurationWidget::setSSVEPProbabilities);
+    qRegisterMetaType<MyQList>("MyQList");
 
     initSelectedChannelsSensor();
 }
@@ -91,6 +102,14 @@ ssvepBCIConfigurationWidget::ssvepBCIConfigurationWidget(ssvepBCI* pssvepBCI, QW
 ssvepBCIConfigurationWidget::~ssvepBCIConfigurationWidget()
 {
     delete ui;
+}
+
+
+//*************************************************************************************************************
+
+void ssvepBCIConfigurationWidget::setSSVEPProbabilities(MyQList SSVEP){
+    ui->m_ProgressBar_Threshold1->setValue(int(SSVEP.at(0)*100));
+    qDebug() << "value:" << SSVEP.at(0);
 }
 
 
@@ -137,3 +156,5 @@ void ssvepBCIConfigurationWidget::initSelectedChannelsSensor()
     ui->m_listWidget_AvailableChannelsOnSensorLevel->addItems(m_vAvailableChannelsSensor);
     ui->m_listWidget_ChosenChannelsOnSensorLevel->addItems(m_pSSVEPBCI->m_slChosenFeatureSensor);
 }
+
+

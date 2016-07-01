@@ -41,6 +41,8 @@
 //=============================================================================================================
 
 #include "ssvepbci.h"
+#include <iostream>
+#include <Eigen/Dense>
 
 
 //*************************************************************************************************************
@@ -74,7 +76,8 @@ ssvepBCI::ssvepBCI()
 , m_dAlpha(0.25)
 , m_iNumberOfHarmonics(2)
 , m_bUseMEC(true)
-, m_bRemove50HzPowerLine(true)
+, m_bRemovePowerLine(false)
+, m_iPowerLine(50)
 {
     // Create configuration action bar item/button
     m_pActionBCIConfiguration = new QAction(QIcon(":/images/configuration.png"),tr("BCI configuration feature"),this);
@@ -98,6 +101,8 @@ ssvepBCI::ssvepBCI()
         m_lThresholdValues << 0.15 << 0.14 << 0.155 << 0.15;
     else
         m_lThresholdValues << 0.145 << 0.145 << 0.145 << 0.14;
+
+    m_lSSVEPProbabilities << 0 << 0 << 0 << 0 << 0;
 
 
     updateBCIParameter();
@@ -454,6 +459,9 @@ void ssvepBCI::showSetupStimulus()
             m_pssvepBCISetupStimulusWidget->raise();
 
         }
+
+        //sets Window to the foreground and activates it for editing
+        m_pssvepBCISetupStimulusWidget->activateWindow();
     }
     else{
         QMessageBox msgBox;
@@ -461,6 +469,7 @@ void ssvepBCI::showSetupStimulus()
         msgBox.exec();
         return;
     }
+
 }
 
 
@@ -479,6 +488,44 @@ void ssvepBCI::showBCIConfiguration()
         m_pssvepBCIConfigurationWidget->show();
         m_pssvepBCIConfigurationWidget->raise();
     }
+
+    //sets Window to the foreground and activates it for editing
+    m_pssvepBCIConfigurationWidget->activateWindow();
+}
+
+
+//*************************************************************************************************************
+
+void ssvepBCI::removePowerLine(bool removePowerLine){
+    m_qMutex.lock();
+    m_bRemovePowerLine = removePowerLine;
+    m_qMutex.unlock();
+}
+
+
+//*************************************************************************************************************
+
+void ssvepBCI::setPowerLine(int powerLine){
+    m_qMutex.lock();
+    m_iPowerLine = powerLine;
+    m_qMutex.unlock();
+}
+
+
+//*************************************************************************************************************
+
+void ssvepBCI::setFeatureExtractionMethod(bool useMEC){
+    m_qMutex.lock();
+    m_bUseMEC = useMEC;
+    m_qMutex.unlock();
+}
+
+
+//*************************************************************************************************************
+
+void ssvepBCI::setNumberOfHarmonics(int numberOfHarmonics){
+
+
 }
 
 //*************************************************************************************************************
@@ -496,6 +543,7 @@ void ssvepBCI::run()
                 //BCIOnSourceLevel();
     }
 }
+
 
 //*************************************************************************************************************
 
@@ -661,13 +709,13 @@ void ssvepBCI::BCIOnSensorLevel()
             int samples = Y.rows();
             ArrayXd t = 2*M_PI/m_dSampleFrequency * ArrayXd::LinSpaced(samples, 1, samples);
             
-
+            //IOUtils::write_eigen_matrix(Y, "Y_before.txt");
             // Remove 50 Hz Power line signal
-            if(m_bRemove50HzPowerLine){
+            if(m_bRemovePowerLine){
                 MatrixXd Zp(samples,2);
-                ArrayXd t_50 = t*50;
-                Zp.col(0) = t_50.sin();
-                Zp.col(1) = t_50.cos();
+                ArrayXd t_PL = t*m_iPowerLine;
+                Zp.col(0) = t_PL.sin();
+                Zp.col(1) = t_PL.cos();
                 MatrixXd Zp_help = Zp.transpose()*Zp;
                 Y = Y - Zp*Zp_help.inverse()*Zp.transpose()*Y;
             }
@@ -697,6 +745,11 @@ void ssvepBCI::BCIOnSensorLevel()
             ssvepProbabilities = ssvepProbabilities.array().exp();                          // softmax function for better distinguishability between the probabilities
             ssvepProbabilities = 1 / ssvepProbabilities.sum() * ssvepProbabilities;
             //cout << "probabilites:" << endl << ssvepProbabilities << endl;
+
+            // transfer values to MyQList and emit signal for GUI
+            for(int i = 0; i < m_lDesFrequencies.size(); i++)
+                m_lSSVEPProbabilities[i] = ssvepProbabilities(i);
+            emit SSVEPprob(m_lSSVEPProbabilities);
 
             // classify probabilites
             int index = 0;
