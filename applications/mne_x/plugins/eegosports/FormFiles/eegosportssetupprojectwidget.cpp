@@ -63,6 +63,7 @@ EEGoSportsSetupProjectWidget::EEGoSportsSetupProjectWidget(EEGoSports* pEEGoSpor
 {
     ui->setupUi(this);
 
+
     // Connect write to file options
     connect(ui->m_qPushButton_NewProject, &QPushButton::released, this, &EEGoSportsSetupProjectWidget::addProject);
     connect(ui->m_qPushButton_NewSubject, &QPushButton::released, this, &EEGoSportsSetupProjectWidget::addSubject);
