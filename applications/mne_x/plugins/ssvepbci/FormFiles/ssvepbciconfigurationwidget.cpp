@@ -58,13 +58,16 @@ using namespace ssvepBCIPlugin;
 //=============================================================================================================
 
 ssvepBCIConfigurationWidget::ssvepBCIConfigurationWidget(ssvepBCI* pssvepBCI, QWidget *parent) :
-    QDialog(parent),
-    m_pSSVEPBCI(pssvepBCI),
-    ui(new Ui::ssvepBCIConfigurationWidget)
+    QDialog(parent)
+  ,  m_pSSVEPBCI(pssvepBCI)
+  ,  ui(new Ui::ssvepBCIConfigurationWidget)
+  ,  m_bInit(true)
 {
     ui->setupUi(this);
 
-    //edit Style sheets of the QProgressBars of threshold values (no blinking animation and pointy slider handle)
+    m_lSSVEPThresholdValues << 0.15 << 0.14 << 0.155 << 0.15;
+
+    // edit Style sheets of the QProgressBars of threshold values (no blinking animation and pointy slider handle)
     ui->m_ProgressBar_Threshold1->setStyleSheet(" QProgressBar { border: 2px solid grey; border-radius: 2px; } QProgressBar::chunk {background-color: #3add36;}");
     ui->m_ProgressBar_Threshold1->setTextVisible(false);
     ui->m_VerticalSlider_Threshold1->setStyleSheet("QSlider::handle {image: url(:/images/slider_handle.png);}");
@@ -90,9 +93,19 @@ ssvepBCIConfigurationWidget::ssvepBCIConfigurationWidget(ssvepBCI* pssvepBCI, QW
 
     // connect number of harmonicssignal
 
-    // connect SSVEP probabilities for threshold GUI
+    // connect SSVEP values signal to refresh SSVEPProbabilities
     connect(m_pSSVEPBCI, &ssvepBCI::SSVEPprob, this, &ssvepBCIConfigurationWidget::setSSVEPProbabilities);
     qRegisterMetaType<MyQList>("MyQList");
+
+    // connect changed threshold values
+    connect(ui->m_DoubleSpinBox_Threshold1, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &ssvepBCIConfigurationWidget::thresholdChanged);
+    connect(ui->m_DoubleSpinBox_Threshold2, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &ssvepBCIConfigurationWidget::thresholdChanged);
+    connect(ui->m_DoubleSpinBox_Threshold3, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &ssvepBCIConfigurationWidget::thresholdChanged);
+    connect(ui->m_DoubleSpinBox_Threshold4, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &ssvepBCIConfigurationWidget::thresholdChanged);
+
+
+
+
 
     initSelectedChannelsSensor();
 }
@@ -108,8 +121,50 @@ ssvepBCIConfigurationWidget::~ssvepBCIConfigurationWidget()
 //*************************************************************************************************************
 
 void ssvepBCIConfigurationWidget::setSSVEPProbabilities(MyQList SSVEP){
-    ui->m_ProgressBar_Threshold1->setValue(int(SSVEP.at(0)*100));
-    qDebug() << "value:" << SSVEP.at(0);
+
+    // determine scale for threshold status bar
+    if(m_bInit){
+        m_dMaxProbValue = *std::max_element(SSVEP.begin(), SSVEP.end());
+        m_dMinProbValue = *std::min_element(SSVEP.begin(), SSVEP.end());
+        m_bInit = !m_bInit;
+    }
+    else{
+        double min = *std::min_element(SSVEP.begin(), SSVEP.end());
+        double max = *std::max_element(SSVEP.begin(), SSVEP.end());
+        m_dMinProbValue = min < m_dMinProbValue ? min : m_dMinProbValue;
+        m_dMaxProbValue = max > m_dMaxProbValue ? max : m_dMaxProbValue;
+    }
+
+    // scale SSVEP values for status bar
+    QList<int> values;
+    for(int i = 0; i < SSVEP.size(); i++)
+        values << int((SSVEP.at(i) - m_dMinProbValue) / ( m_dMaxProbValue - m_dMinProbValue ) * 100);
+
+    // scale threshold values for slider
+    QList<int> thresholds;
+    for(int i = 0; i < m_lSSVEPThresholdValues.size(); i++)
+        thresholds << int((m_lSSVEPThresholdValues.at(i) - m_dMinProbValue) / ( m_dMaxProbValue - m_dMinProbValue ) * 100);
+
+    // assign SSVEP values to the status bar
+    ui->m_ProgressBar_Threshold1->setValue(values[0]);
+    ui->m_ProgressBar_Threshold2->setValue(values[1]);
+    ui->m_ProgressBar_Threshold3->setValue(values[2]);
+    ui->m_ProgressBar_Threshold4->setValue(values[3]);
+
+    // assign SSVEP thresholds to sliders
+    ui->m_VerticalSlider_Threshold1->setValue(thresholds[0]);
+    ui->m_VerticalSlider_Threshold2->setValue(thresholds[1]);
+    ui->m_VerticalSlider_Threshold3->setValue(thresholds[2]);
+    ui->m_VerticalSlider_Threshold4->setValue(thresholds[3]);
+
+    // assign SSVEP values to the labels
+    ui->m_Label_SSVEP1->setText(QString::number(SSVEP[0]));
+    ui->m_Label_SSVEP2->setText(QString::number(SSVEP[1]));
+    ui->m_Label_SSVEP3->setText(QString::number(SSVEP[2]));
+    ui->m_Label_SSVEP4->setText(QString::number(SSVEP[3]));
+
+    // schedules an repaint event for the whole Threshold group box and all their childs
+    ui->m_GroupBox_Threshold->update();
 }
 
 
@@ -119,6 +174,7 @@ void ssvepBCIConfigurationWidget::closeEvent(QCloseEvent *event)
 {
     Q_UNUSED(event)
 }
+
 
 //*************************************************************************************************************
 
@@ -158,3 +214,25 @@ void ssvepBCIConfigurationWidget::initSelectedChannelsSensor()
 }
 
 
+//*************************************************************************************************************
+
+void ssvepBCIPlugin::ssvepBCIConfigurationWidget::on_m_RadioButton_MEC_toggled(bool checked)
+{
+    Q_UNUSED(checked);
+    m_bInit = true;
+}
+
+
+//*************************************************************************************************************
+
+void ssvepBCIConfigurationWidget::thresholdChanged(double threshold)
+{
+    // save threshold values to member varaible
+    m_lSSVEPThresholdValues[0] = ui->m_DoubleSpinBox_Threshold1->value();
+    m_lSSVEPThresholdValues[1] = ui->m_DoubleSpinBox_Threshold2->value();
+    m_lSSVEPThresholdValues[2] = ui->m_DoubleSpinBox_Threshold3->value();
+    m_lSSVEPThresholdValues[3] = ui->m_DoubleSpinBox_Threshold4->value();
+
+    // emit thresholdValueChanged event
+    emit getThresholdValues(m_lSSVEPThresholdValues);
+}

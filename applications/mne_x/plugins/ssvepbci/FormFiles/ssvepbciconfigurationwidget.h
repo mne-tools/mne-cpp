@@ -132,11 +132,22 @@ public:
 public slots:
     void setSSVEPProbabilities(MyQList SSVEP);
 
+private slots:
+    void on_m_RadioButton_MEC_toggled(bool checked);
+    void thresholdChanged(double threshold);
+
+signals:
+    void getThresholdValues(MyQList Thresholds);
+
 private:
     Ui::ssvepBCIConfigurationWidget        *ui;
     ssvepBCI                               *m_pSSVEPBCI;            /**< a pointer to corresponding ssvepBCI class */
 
-    QStringList m_vAvailableChannelsSensor;                 /**< QStringList holding available features to select on sensor level (electrodes).*/
+    QStringList                             m_vAvailableChannelsSensor;                 /**< QStringList holding available features to select on sensor level (electrodes).*/
+    double                                  m_dMinProbValue;                            /**< minimum border for SSVEP visualization with a status bar */
+    double                                  m_dMaxProbValue;                            /**< maximum border for SSVEP visualization with a status bar */
+    bool                                    m_bInit;                                    /**< flag for first run and so initializing ssvepBCIConfigurationWidget-Class */
+    QList<double>                           m_lSSVEPThresholdValues;                    /**< contains the threshold values for SSVEP classifiaction */
 
 
 };
