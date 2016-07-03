@@ -102,7 +102,7 @@ ssvepBCI::ssvepBCI()
     else
         m_lThresholdValues << 0.145 << 0.145 << 0.145 << 0.14;
 
-    m_lSSVEPProbabilities << 0 << 0 << 0 << 0 << 0;
+    m_lSSVEPProbabilities << 0 << 0 << 0 << 0;
 
 
     updateBCIParameter();
