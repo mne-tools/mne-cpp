@@ -106,7 +106,6 @@ SOURCES += \
     helpers/abstracttreeitem.cpp \
     helpers/renderable3Dentity.cpp \
     helpers/custommesh.cpp \
-    helpers/window.cpp \
     control/control3dwidget.cpp \
     rt/rtSourceLoc/rtsourcelocdataworker.cpp \
     3DObjects/brain/brainsourcespacetreeitem.cpp \
@@ -129,7 +128,6 @@ HEADERS += \
     helpers/abstracttreeitem.h \
     helpers/renderable3Dentity.h \
     helpers/custommesh.h \
-    helpers/window.h \
     helpers/types.h \
     control/control3dwidget.h \
     disp3D_global.h \

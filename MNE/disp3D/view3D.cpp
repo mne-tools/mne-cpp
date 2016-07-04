@@ -40,9 +40,13 @@
 
 #include "view3D.h"
 
-#include <QSharedPointer>
+
+//*************************************************************************************************************
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
 #include <QDebug>
-#include <QWidget>
 #include <QPropertyAnimation>
 
 #include <Qt3DCore/QAspectEngine>
@@ -50,12 +54,10 @@
 #include <Qt3DCore/QTransform>
 #include <Qt3DExtras/QPhongMaterial>
 #include <Qt3DExtras/QPerVertexColorMaterial>
-#include <Qt3DRender/QRenderAspect>
 #include <Qt3DExtras/QFirstPersonCameraController>
-#include <Qt3DExtras/QForwardRenderer>
 #include <Qt3DRender/QPointLight>
 #include <Qt3DExtras/QCylinderMesh>
-#include <Qt3DInput/QInputAspect>
+#include <Qt3DExtras/QForwardRenderer>
 
 
 //*************************************************************************************************************
