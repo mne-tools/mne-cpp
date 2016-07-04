@@ -84,6 +84,7 @@ QRectF AverageSceneItem::boundingRect() const
 
 void AverageSceneItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
+    Q_UNUSED(event)
     m_iFontTextSize = 150;
     emit sceneUpdateRequested();
 }
@@ -93,6 +94,7 @@ void AverageSceneItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
 void AverageSceneItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
+    Q_UNUSED(event)
     m_iFontTextSize = 15;
     emit sceneUpdateRequested();
 }

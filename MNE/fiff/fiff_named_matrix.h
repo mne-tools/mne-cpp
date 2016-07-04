@@ -59,9 +59,6 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QDebug>
-#include <QFile>
-#include <QList>
 #include <QStringList>
 #include <QSharedData>
 #include <QSharedDataPointer>

@@ -316,7 +316,7 @@ void RealTimeSampleArrayWidget::paintEvent(QPaintEvent*)
 
     double dDifferenceToFirstLine = (m_pRTSA->getMaxValue()-floor(m_pRTSA->getMaxValue()/dim)*dim);
 
-    double dNumPixelsY = usHeight/NumOfLines;//10.0f;
+    double dNumPixelsY = double (usHeight)/NumOfLines;//10.0f;
     double dActualPosY = usPosY + dDifferenceToFirstLine * (usHeight/dMinMaxDifference);
 
     for(unsigned char i = 1; i <= NumOfLines; ++i)

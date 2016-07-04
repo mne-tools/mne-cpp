@@ -116,10 +116,12 @@ private:
 
     bool m_bIsRunning;
 
-//public slots: --> in Qt 5 not anymore declared as slot
     void startMeas(qint32 ID);
+
     void stopMeas(qint32 ID);
-    void sendMeasurementInfo(qint32 ID, FiffInfo p_fiffInfo);
+
+    void sendMeasurementInfo(qint32 ID, const FiffInfo& p_fiffInfo);
+
     void sendRawBuffer(QSharedPointer<Eigen::MatrixXf> m_pMatRawData);
     //void readToBuffer1();
 //    void readProc(QTcpSocket& p_qTcpSocket);

@@ -52,11 +52,7 @@
 
 #include <QSharedPointer>
 #include <QVector>
-#include <QFile>
-#include <QTextStream>
 #include <QStringList>
-#include <QDebug>
-#include <QIODevice>
 #include <QString>
 #include <QPoint>
 
