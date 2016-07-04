@@ -36,6 +36,7 @@
 #ifndef RENDERABLE3DENTITY_H
 #define RENDERABLE3DENTITY_H
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
@@ -51,15 +52,8 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QSharedPointer>
-#include <QVector3D>
-
 #include <Qt3DCore/QEntity>
 #include <Qt3DCore/QTransform>
-
-#include <Qt3DRender/QMaterial>
-#include <Qt3DRender/QPerVertexColorMaterial>
-#include <Qt3DRender/QPhongMaterial>
 
 
 //*************************************************************************************************************

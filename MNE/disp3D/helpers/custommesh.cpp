@@ -227,11 +227,13 @@ bool CustomMesh::createCustomMesh(const MatrixX3f& tMatVert, const MatrixX3f& tM
     customGeometry->addAttribute(indexAttribute);
 
     this->setInstanceCount(1);
-    this->setBaseVertex(0);
-    this->setBaseInstance(0);
+    this->setIndexOffset(0);
+    //this->setFirstVertex(0);
+    this->setFirstInstance(0);
     this->setPrimitiveType(Qt3DRender::QGeometryRenderer::Triangles);
     this->setGeometry(customGeometry);
 
-    this->setPrimitiveCount(tMatTris.rows()*3);
+    this->setVertexCount(tMatTris.rows()*3);
+
     return true;
 }

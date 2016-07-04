@@ -40,6 +40,23 @@
 
 #include "shadermaterial.h"
 
+#include <QColor>
+#include <Qt3DRender/qeffect.h>
+#include <Qt3DRender/qtechnique.h>
+#include <Qt3DRender/qshaderprogram.h>
+#include <Qt3DRender/qparameter.h>
+#include <Qt3DRender/qrenderpass.h>
+#include <QFilterKey>
+#include <Qt3DRender/qdepthtest.h>
+#include <Qt3DRender/qblendequation.h>
+#include <Qt3DRender/qblendequationarguments.h>
+#include <Qt3DRender/qnodepthmask.h>
+#include <Qt3DRender/qgraphicsapifilter.h>
+
+#include <QUrl>
+#include <QVector3D>
+#include <QVector4D>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -66,6 +83,10 @@ ShaderMaterial::ShaderMaterial(QNode *parent)
 , m_vertexGL3Technique(new QTechnique())
 , m_vertexGL3RenderPass(new QRenderPass())
 , m_vertexGL3Shader(new QShaderProgram())
+, m_filterKey(new QFilterKey)
+, m_noDepthMask(new QNoDepthMask())
+, m_blendState(new QBlendEquationArguments())
+, m_blendEquation(new QBlendEquation())
 {
     this->init();
 }
@@ -91,8 +112,8 @@ ShaderMaterial::~ShaderMaterial()
 
 void ShaderMaterial::init()
 {
-//    m_vertexGL3Shader->setVertexShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/materials/shaders/gl3/brain.vert"))));
-//    m_vertexGL3Shader->setFragmentShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/materials/shaders/gl3/brain.frag"))));
+    //m_vertexGL3Shader->setVertexShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/materials/shaders/gl3/brain.vert"))));
+    //m_vertexGL3Shader->setFragmentShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/materials/shaders/gl3/brain.frag"))));
 
     m_vertexGL3Shader->setVertexShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/materials/shaders/gl3/pervertexphongalpha.vert"))));
     m_vertexGL3Shader->setFragmentShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/materials/shaders/gl3/pervertexphongalpha.frag"))));
@@ -104,29 +125,21 @@ void ShaderMaterial::init()
 
     m_vertexGL3RenderPass->setShaderProgram(m_vertexGL3Shader);
 
-    QBlendState* pBlendState = new QBlendState();
-    pBlendState->setSrcRGB(QBlendState::SrcAlpha);
-    pBlendState->setDstRGB(QBlendState::OneMinusSrcAlpha);
+    m_blendState->setSourceRgb(QBlendEquationArguments::SourceAlpha);
+    m_blendState->setDestinationRgb(QBlendEquationArguments::OneMinusSourceAlpha);
+    m_blendEquation->setBlendFunction(QBlendEquation::Add);
 
-    QCullFace* pCullFace = new QCullFace();
-    pCullFace->setMode(QCullFace::Back);
+    m_vertexGL3RenderPass->addRenderState(m_blendEquation);
+    m_vertexGL3RenderPass->addRenderState(m_noDepthMask);
+    m_vertexGL3RenderPass->addRenderState(m_blendState);
 
-    QDepthTest* pDepthTest = new QDepthTest();
-    pDepthTest->setFunc(QDepthTest::Less);
+    m_filterKey->setName(QStringLiteral("renderingStyle"));
+    m_filterKey->setValue(QStringLiteral("forward"));
+    m_vertexGL3Technique->addFilterKey(m_filterKey);
 
-    QDepthMask* pDepthMask = new QDepthMask();
-    pDepthMask->setMask(true);
+    m_vertexGL3RenderPass->setShaderProgram(m_vertexGL3Shader);
 
-    QBlendEquation* pBlendEquation = new QBlendEquation();
-    pBlendEquation->setMode(QBlendEquation::FuncAdd);
-
-    m_vertexGL3RenderPass->addRenderState(pBlendState);
-    m_vertexGL3RenderPass->addRenderState(pCullFace);
-    m_vertexGL3RenderPass->addRenderState(pDepthTest);
-    m_vertexGL3RenderPass->addRenderState(pDepthMask);
-    m_vertexGL3RenderPass->addRenderState(pBlendEquation);
-
-    m_vertexGL3Technique->addPass(m_vertexGL3RenderPass);
+    m_vertexGL3Technique->addRenderPass(m_vertexGL3RenderPass);
 
     m_vertexEffect->addTechnique(m_vertexGL3Technique);
 
