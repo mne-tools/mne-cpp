@@ -178,15 +178,13 @@ public:
 
     virtual QWidget* setupWidget();
 
-public slots:
-
     //=========================================================================================================
     /**
-    * updates the parameter of the SSVEP
+    * get a current list of frquencies which are looked for
     *
+    * @return       list of all desired frequencies
     */
-    void updateBCIParameter(void);
-
+    QList<double>  getCurrentListOfFrequencies();
 
 protected:
     /**
@@ -273,10 +271,13 @@ public slots:
     void setPowerLine(int powerLine);
     void setFeatureExtractionMethod(bool useMEC);
     void setNumberOfHarmonics(int numberOfHarmonics);
+    void setThresholdValues(MyQList thresholds);
+    void setFrequencyList(MyQList frequencyList);
 
 signals:
-    //void paintFeatures(MyQList features, bool bTrigerActivated);
     void SSVEPprob(MyQList ssvepProb);
+    void classificationResult(double classResult);
+    void getFrequencyList(MyQList frequencyList);
 
 private:
     QAction*                                            m_pActionBCIConfiguration;          /**< start configuration feature */

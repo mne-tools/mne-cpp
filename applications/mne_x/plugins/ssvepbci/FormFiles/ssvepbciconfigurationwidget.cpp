@@ -62,12 +62,21 @@ ssvepBCIConfigurationWidget::ssvepBCIConfigurationWidget(ssvepBCI* pssvepBCI, QW
   ,  m_pSSVEPBCI(pssvepBCI)
   ,  ui(new Ui::ssvepBCIConfigurationWidget)
   ,  m_bInit(true)
+//  ,  m_palBlackFont(ui->m_GroupBox_Threshold->palette())
 {
     ui->setupUi(this);
 
+    // default threshold values
     m_lSSVEPThresholdValues << 0.15 << 0.14 << 0.155 << 0.15;
 
-    // edit Style sheets of the QProgressBars of threshold values (no blinking animation and pointy slider handle)
+    // set default threshold values
+    ui->m_DoubleSpinBox_Threshold1->setValue(m_lSSVEPThresholdValues.at(0));
+    ui->m_DoubleSpinBox_Threshold2->setValue(m_lSSVEPThresholdValues.at(1));
+    ui->m_DoubleSpinBox_Threshold3->setValue(m_lSSVEPThresholdValues.at(2));
+    ui->m_DoubleSpinBox_Threshold4->setValue(m_lSSVEPThresholdValues.at(3));
+    //    ui->m_DoubleSpinBox_Threshold5->setValue(m_lSSVEPThresholdValues[4]);
+
+    // edit Style sheets of the QProgressBars of threshold values (no blinking animation and pointy slider handle for threshold vixualization)
     ui->m_ProgressBar_Threshold1->setStyleSheet(" QProgressBar { border: 2px solid grey; border-radius: 2px; } QProgressBar::chunk {background-color: #3add36;}");
     ui->m_ProgressBar_Threshold1->setTextVisible(false);
     ui->m_VerticalSlider_Threshold1->setStyleSheet("QSlider::handle {image: url(:/images/slider_handle.png);}");
@@ -93,6 +102,9 @@ ssvepBCIConfigurationWidget::ssvepBCIConfigurationWidget(ssvepBCI* pssvepBCI, QW
 
     // connect number of harmonicssignal
 
+    // connect SSVEP frequency List signal
+    connect(m_pSSVEPBCI, &ssvepBCI::getFrequencyList, this, &ssvepBCIConfigurationWidget::setFrequencyList);
+
     // connect SSVEP values signal to refresh SSVEPProbabilities
     connect(m_pSSVEPBCI, &ssvepBCI::SSVEPprob, this, &ssvepBCIConfigurationWidget::setSSVEPProbabilities);
     qRegisterMetaType<MyQList>("MyQList");
@@ -103,12 +115,24 @@ ssvepBCIConfigurationWidget::ssvepBCIConfigurationWidget(ssvepBCI* pssvepBCI, QW
     connect(ui->m_DoubleSpinBox_Threshold3, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &ssvepBCIConfigurationWidget::thresholdChanged);
     connect(ui->m_DoubleSpinBox_Threshold4, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &ssvepBCIConfigurationWidget::thresholdChanged);
 
+    // connect threshold values to BCI plugin
+    connect(this, &ssvepBCIConfigurationWidget::getThresholdValues, m_pSSVEPBCI, &ssvepBCI::setThresholdValues);
+
+    // connect classifiaction result
+    connect(m_pSSVEPBCI, &ssvepBCI::classificationResult, ui->m_LcdNumber_ClasResult, static_cast<void(QLCDNumber::*)(double)>(&QLCDNumber::display));
+    connect(m_pSSVEPBCI, &ssvepBCI::classificationResult, this, &ssvepBCIConfigurationWidget::setClassResult);
+
+    // set palette for text color change
+    m_palBlackFont.setColor(QPalette::WindowText, Qt::black);
+    m_palRedFont.setColor(QPalette::WindowText, Qt::red);
 
 
-
-
+    // update GUI-surface with initialized values
+    setFrequencyList(m_pSSVEPBCI->getCurrentListOfFrequencies());
+    thresholdChanged(0);
     initSelectedChannelsSensor();
 }
+
 
 //*************************************************************************************************************
 
@@ -140,28 +164,20 @@ void ssvepBCIConfigurationWidget::setSSVEPProbabilities(MyQList SSVEP){
     for(int i = 0; i < SSVEP.size(); i++)
         values << int((SSVEP.at(i) - m_dMinProbValue) / ( m_dMaxProbValue - m_dMinProbValue ) * 100);
 
-    // scale threshold values for slider
-    QList<int> thresholds;
-    for(int i = 0; i < m_lSSVEPThresholdValues.size(); i++)
-        thresholds << int((m_lSSVEPThresholdValues.at(i) - m_dMinProbValue) / ( m_dMaxProbValue - m_dMinProbValue ) * 100);
-
     // assign SSVEP values to the status bar
     ui->m_ProgressBar_Threshold1->setValue(values[0]);
     ui->m_ProgressBar_Threshold2->setValue(values[1]);
     ui->m_ProgressBar_Threshold3->setValue(values[2]);
     ui->m_ProgressBar_Threshold4->setValue(values[3]);
 
-    // assign SSVEP thresholds to sliders
-    ui->m_VerticalSlider_Threshold1->setValue(thresholds[0]);
-    ui->m_VerticalSlider_Threshold2->setValue(thresholds[1]);
-    ui->m_VerticalSlider_Threshold3->setValue(thresholds[2]);
-    ui->m_VerticalSlider_Threshold4->setValue(thresholds[3]);
-
     // assign SSVEP values to the labels
     ui->m_Label_SSVEP1->setText(QString::number(SSVEP[0]));
     ui->m_Label_SSVEP2->setText(QString::number(SSVEP[1]));
     ui->m_Label_SSVEP3->setText(QString::number(SSVEP[2]));
     ui->m_Label_SSVEP4->setText(QString::number(SSVEP[3]));
+
+    // paint novel thresholds to screen
+    updateThresholdsToScreen();
 
     // schedules an repaint event for the whole Threshold group box and all their childs
     ui->m_GroupBox_Threshold->update();
@@ -227,12 +243,84 @@ void ssvepBCIPlugin::ssvepBCIConfigurationWidget::on_m_RadioButton_MEC_toggled(b
 
 void ssvepBCIConfigurationWidget::thresholdChanged(double threshold)
 {
+    Q_UNUSED(threshold);
+
     // save threshold values to member varaible
     m_lSSVEPThresholdValues[0] = ui->m_DoubleSpinBox_Threshold1->value();
     m_lSSVEPThresholdValues[1] = ui->m_DoubleSpinBox_Threshold2->value();
     m_lSSVEPThresholdValues[2] = ui->m_DoubleSpinBox_Threshold3->value();
     m_lSSVEPThresholdValues[3] = ui->m_DoubleSpinBox_Threshold4->value();
 
-    // emit thresholdValueChanged event
+    updateThresholdsToScreen();
+
+    // emit thresholdValueChanged signal
     emit getThresholdValues(m_lSSVEPThresholdValues);
+}
+
+
+//*************************************************************************************************************
+
+void ssvepBCIConfigurationWidget::updateThresholdsToScreen(){
+
+    // scale threshold values for slider
+    QList<int> thresholds;
+    for(int i = 0; i < m_lSSVEPThresholdValues.size(); i++)
+        thresholds << int((m_lSSVEPThresholdValues.at(i) - m_dMinProbValue) / ( m_dMaxProbValue - m_dMinProbValue ) * 100);
+
+    // assign SSVEP thresholds to sliders
+    ui->m_VerticalSlider_Threshold1->setValue(thresholds[0]);
+    ui->m_VerticalSlider_Threshold2->setValue(thresholds[1]);
+    ui->m_VerticalSlider_Threshold3->setValue(thresholds[2]);
+    ui->m_VerticalSlider_Threshold4->setValue(thresholds[3]);
+}
+
+
+//*************************************************************************************************************
+
+void ssvepBCIConfigurationWidget::setFrequencyList(MyQList frequencyList){
+
+    // update frequency list
+    m_lFrequencyList = frequencyList;
+
+    // set labels
+    ui->m_Label_Frequency1->setText(QString::number(m_lFrequencyList[0]).append(" Hz"));
+    ui->m_Label_Frequency2->setText(QString::number(m_lFrequencyList[1]).append(" Hz"));
+    ui->m_Label_Frequency3->setText(QString::number(m_lFrequencyList[2]).append(" Hz"));
+    ui->m_Label_Frequency4->setText(QString::number(m_lFrequencyList[3]).append(" Hz"));
+
+}
+
+
+//*************************************************************************************************************
+
+void ssvepBCIConfigurationWidget::setClassResult(double classResult){
+
+    qDebug() << "process!";
+    // find index of classified frequency
+    int index = m_lFrequencyList.indexOf(classResult);
+    qDebug() << "index:" << index;
+
+    // set all labels to black again
+    ui->m_Label_Frequency1->setPalette(m_palBlackFont);
+    ui->m_Label_Frequency2->setPalette(m_palBlackFont);
+    ui->m_Label_Frequency3->setPalette(m_palBlackFont);
+    ui->m_Label_Frequency4->setPalette(m_palBlackFont);
+    ui->m_Label_Frequency5->setPalette(m_palBlackFont);
+
+    // highlighting the labels according to classifiaction result
+    switch(index){
+    case 0:
+        ui->m_Label_Frequency1->setPalette(m_palRedFont); break;
+    case 1:
+        ui->m_Label_Frequency2->setPalette(m_palRedFont); break;
+    case 2:
+        ui->m_Label_Frequency3->setPalette(m_palRedFont); break;
+    case 3:
+        ui->m_Label_Frequency4->setPalette(m_palRedFont); break;
+    case 4:
+        ui->m_Label_Frequency5->setPalette(m_palRedFont); break;
+    default:
+        break;
+    }
+
 }
