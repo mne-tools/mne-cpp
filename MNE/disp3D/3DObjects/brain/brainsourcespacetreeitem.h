@@ -67,8 +67,8 @@
 #include <QStandardItem>
 #include <QStandardItemModel>
 
-#include <Qt3DRender/QSphereMesh>
-#include <Qt3DRender/QPhongMaterial>
+#include <Qt3DExtras/QSphereMesh>
+#include <Qt3DExtras/QPhongMaterial>
 
 
 //*************************************************************************************************************

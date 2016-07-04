@@ -80,8 +80,6 @@ using namespace XDISPLIB;
 using namespace DISP3DLIB;
 using namespace MNELIB;
 using namespace XMEASLIB;
-
-
 using namespace INVERSELIB;
 
 
@@ -199,14 +197,12 @@ void RealTimeSourceEstimateWidget::init()
 
 void RealTimeSourceEstimateWidget::show3DControlWidget()
 {
-    qDebug()<<"RealTimeSourceEstimateWidget::show3DControlWidget()";
-
-    if(m_pControl3DView->isActiveWindow())
-        m_pControl3DView->hide();
-    else {
-        m_pControl3DView->activateWindow();
-        m_pControl3DView->show();
-    }
+//    if(m_pControl3DView->isActiveWindow())
+//        m_pControl3DView->hide();
+//    else {
+//        m_pControl3DView->activateWindow();
+//        m_pControl3DView->show();
+//    }
 }
 
 
