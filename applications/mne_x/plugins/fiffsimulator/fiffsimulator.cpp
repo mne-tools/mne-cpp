@@ -83,6 +83,7 @@ FiffSimulator::FiffSimulator()
 , m_iBufferSize(-1)
 , m_pRawMatrixBuffer_In(0)
 , m_bIsRunning(false)
+, m_iActiveConnectorId(0)
 {
 
 }

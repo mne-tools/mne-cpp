@@ -44,6 +44,14 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
+// Qt INCLUDES
+//=============================================================================================================
+
+#include <QDebug>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
@@ -58,6 +66,8 @@ using namespace MNEBrowseRawQt;
 NoiseReductionWindow::NoiseReductionWindow(QWidget *parent)
 : QDockWidget(parent)
 , ui(new Ui::NoiseReductionWindow)
+, m_enableDisableProjectors(Q_NULLPTR)
+, m_pCompSignalMapper(Q_NULLPTR)
 {
     ui->setupUi(this);
 }
@@ -79,7 +89,7 @@ NoiseReductionWindow::NoiseReductionWindow(QWidget *parent, FiffInfo* pFiffInfo)
 
 //*************************************************************************************************************
 
-void NoiseReductionWindow::setFiffInfo(FiffInfo* pFiffInfo)
+void NoiseReductionWindow::setFiffInfo(FiffInfo::SPtr& pFiffInfo)
 {
     m_pFiffInfo = pFiffInfo;
 
@@ -246,7 +256,7 @@ void NoiseReductionWindow::checkCompStatusChanged(const QString & compName)
 {
     qDebug()<<compName;
 
-    bool currentState;
+    bool currentState = false;
 
     for(int i = 0; i < m_qListCompCheckBox.size(); ++i)
         if(m_qListCompCheckBox[i]->text() != compName)

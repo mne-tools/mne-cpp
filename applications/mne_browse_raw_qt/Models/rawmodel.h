@@ -85,12 +85,9 @@
 #include <QDebug>
 #include <QAbstractTableModel>
 #include <QMetaEnum>
-
 #include <QBrush>
 #include <QPalette>
-
 #include <QtConcurrent>
-
 #include <QProgressDialog>
 
 
@@ -101,11 +98,6 @@
 
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
-#include <unsupported/Eigen/FFT>
-
-#ifndef EIGEN_FFTW_DEFAULT
-#define EIGEN_FFTW_DEFAULT
-#endif
 
 
 //*************************************************************************************************************
@@ -114,6 +106,7 @@
 //=============================================================================================================
 
 #include <fiff/fiff.h>
+#include <fiff/fiff_io.h>
 #include <mne/mne.h>
 #include <utils/filterTools/parksmcclellan.h>
 
@@ -126,7 +119,17 @@
 using namespace Eigen;
 using namespace MNELIB;
 using namespace UTILSLIB;
-using namespace FIFFLIB;
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Forward Declarations
+//=============================================================================================================
+
+namespace FIFFLIB
+{
+    class FiffIO;
+}
 
 
 //*************************************************************************************************************
@@ -136,6 +139,7 @@ using namespace FIFFLIB;
 
 namespace MNEBrowseRawQt
 {
+
 
 //=============================================================================================================
 /**
@@ -178,8 +182,8 @@ public:
     //VARIABLES
     bool                                        m_bFileloaded;  /**< true when a Fiff file is loaded */
     QList<FiffChInfo>                           m_chInfolist;   /**< List of FiffChInfo objects that holds the corresponding channels information */
-    FiffInfo*                              m_pFiffInfo;     /**< fiff info of whole fiff file */
-    QSharedPointer<FiffIO>                      m_pfiffIO;      /**< FiffIO objects, which holds all the information of the fiff data (excluding the samples!) */
+    FiffInfo::SPtr                              m_pFiffInfo;    /**< fiff info of whole fiff file */
+    QSharedPointer<FIFFLIB::FiffIO>             m_pfiffIO;      /**< FiffIO objects, which holds all the information of the fiff data (excluding the samples!) */
     QMap<QString,QSharedPointer<MNEOperator> >  m_Operators;    /**< generated MNEOperator types (FilterOperator,PCA etc.) */
 
 private:
@@ -275,7 +279,7 @@ signals:
     *
     * @param FiffInfo the current loaded fiffinfo
     */
-    void fileLoaded(FiffInfo*);
+    void fileLoaded(FiffInfo::SPtr&);
 
     //=========================================================================================================
     /**

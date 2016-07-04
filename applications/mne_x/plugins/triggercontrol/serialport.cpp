@@ -69,6 +69,8 @@ using namespace TriggerControlPlugin;
 //=============================================================================================================
 
 SerialPort::SerialPort()
+: m_retrievetyp(0)
+, m_retrievechan(1)
 {
     initSettings();
     initPort();

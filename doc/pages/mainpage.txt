@@ -1,4 +1,4 @@
-/*! \mainpage MNE-CPP (MNE1) Documentation
+/*! \mainpage MNE-CPP Documentation
  *
  * \section intro_sec Introduction
  *
