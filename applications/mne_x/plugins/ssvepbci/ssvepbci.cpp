@@ -105,7 +105,7 @@ ssvepBCI::ssvepBCI()
     m_lSSVEPProbabilities << 0 << 0 << 0 << 0;
 
 
-    updateBCIParameter();
+    setFrequencyList(m_lDesFrequencies);
 
     qDebug() <<"List of all frequencies:" <<  m_lAllFrequencies;
 }
@@ -528,6 +528,16 @@ void ssvepBCI::setNumberOfHarmonics(int numberOfHarmonics){
 
 }
 
+
+//*************************************************************************************************************
+
+void ssvepBCI::setThresholdValues(MyQList thresholds){
+    m_lThresholdValues = thresholds;
+
+    qDebug() << "BCIThresholdList:" << m_lThresholdValues;
+}
+
+
 //*************************************************************************************************************
 
 void ssvepBCI::run()
@@ -547,14 +557,26 @@ void ssvepBCI::run()
 
 //*************************************************************************************************************
 
-void ssvepBCI::updateBCIParameter()
+void ssvepBCI::setFrequencyList(MyQList frequencyList)
 {
-    // update the list of frequencies
+    // update list of desired frequencies
+    m_lDesFrequencies = frequencyList;
+
+    // update the list of all frequencies
     m_lAllFrequencies.clear();
     m_lAllFrequencies = m_lDesFrequencies;
-
     for(int i = 0; i < m_lDesFrequencies.size() - 1; i++)
         m_lAllFrequencies.append((m_lDesFrequencies.at(i) + m_lDesFrequencies.at(i + 1) ) / 2);
+
+    // emit novel frequency list
+    emit getFrequencyList(m_lDesFrequencies);
+}
+
+
+//*************************************************************************************************************
+
+QList<double> ssvepBCI::getCurrentListOfFrequencies(){
+    return m_lDesFrequencies;
 }
 
 
@@ -764,7 +786,12 @@ void ssvepBCI::BCIOnSensorLevel()
             else
                 m_lClassResultsSensor.append(0);
 
+            // emit classifiaction result
             qDebug() <<"classification results" << m_lClassResultsSensor.last() << endl;
+            if(m_lClassResultsSensor.last() == 0)
+                emit classificationResult(0);
+            else
+                emit classificationResult(m_lDesFrequencies[m_lClassResultsSensor.last() - 1]);
         }
 
         // update counter and index variables

@@ -111,7 +111,6 @@ public:
     */
     ~ssvepBCIConfigurationWidget();
 
-
     //=========================================================================================================
     /**
     * close event, when setup-stimulus window is closed.
@@ -129,8 +128,17 @@ public:
     */
     void initSelectedChannelsSensor();
 
+    //=========================================================================================================
+    /**
+    * updates the threshold values of the sliders and paints it to the screen
+    */
+    void updateThresholdsToScreen();
+
+
 public slots:
     void setSSVEPProbabilities(MyQList SSVEP);
+    void setFrequencyList(MyQList frequencyList);
+    void setClassResult(double classResult);
 
 private slots:
     void on_m_RadioButton_MEC_toggled(bool checked);
@@ -140,7 +148,7 @@ signals:
     void getThresholdValues(MyQList Thresholds);
 
 private:
-    Ui::ssvepBCIConfigurationWidget        *ui;
+    Ui::ssvepBCIConfigurationWidget        *ui;                     /**< pointer to corresponding user interface */
     ssvepBCI                               *m_pSSVEPBCI;            /**< a pointer to corresponding ssvepBCI class */
 
     QStringList                             m_vAvailableChannelsSensor;                 /**< QStringList holding available features to select on sensor level (electrodes).*/
@@ -148,8 +156,9 @@ private:
     double                                  m_dMaxProbValue;                            /**< maximum border for SSVEP visualization with a status bar */
     bool                                    m_bInit;                                    /**< flag for first run and so initializing ssvepBCIConfigurationWidget-Class */
     QList<double>                           m_lSSVEPThresholdValues;                    /**< contains the threshold values for SSVEP classifiaction */
-
-
+    QList<double>                           m_lFrequencyList;                           /**< list of desired frequencies */
+    QPalette                                m_palBlackFont;                             /**< setting black font for group box */
+    QPalette                                m_palRedFont;                               /**< setting red font for highlightning label */
 };
 
 } //NAMESPACE
