@@ -1,10 +1,10 @@
 #!/bin/bash
 
-# Install Qt 5.6, cppcheck, lcov
-sudo apt-get install -qq qt56base qt563d qt56svg qt56serialport cppcheck lcov
+# Install Qt 5.7, cppcheck, lcov
+sudo apt-get install -qq qt57base qt573d qt57svg qt57serialport cppcheck lcov
 
 # Setup Qt environment
-source /opt/qt56/bin/qt56-env.sh
+source /opt/qt57/bin/qt57-env.sh
 
 # Install Codecov
 sudo pip install codecov
