@@ -78,6 +78,7 @@ ssvepBCI::ssvepBCI()
 , m_bUseMEC(true)
 , m_bRemovePowerLine(false)
 , m_iPowerLine(50)
+, m_bChangeSSVEPParameterFlag(false)
 {
     // Create configuration action bar item/button
     m_pActionBCIConfiguration = new QAction(QIcon(":/images/configuration.png"),tr("BCI configuration feature"),this);
@@ -425,6 +426,15 @@ void ssvepBCI::clearClassifications()
     m_qMutex.unlock();
 }
 
+
+//*************************************************************************************************************
+
+void  ssvepBCI::setChangeSSVEPParameterFlag(){
+    m_bChangeSSVEPParameterFlag = true;
+
+    qDebug() << "change Flag to:" << m_bChangeSSVEPParameterFlag;
+}
+
 //*************************************************************************************************************
 
 bool ssvepBCI::lookForTrigger(const MatrixXd &data)
@@ -523,9 +533,13 @@ void ssvepBCI::setFeatureExtractionMethod(bool useMEC){
 
 //*************************************************************************************************************
 
-void ssvepBCI::setNumberOfHarmonics(int numberOfHarmonics){
+void ssvepBCI::changeSSVEPParameter(){
 
+    // update number of harmonics of reference signal
+    m_iNumberOfHarmonics = 1 + m_pssvepBCIConfigurationWidget->getNumOfHarmonics();
 
+    // reset flag for changing SSVEP parameter
+    m_bChangeSSVEPParameterFlag = false;
 }
 
 
@@ -759,7 +773,7 @@ void ssvepBCI::BCIOnSensorLevel()
                     ssvepProbabilities(i) = MEC(Y, X); // using Minimum Energy Combination as feature-extraction tool
                 else
                     ssvepProbabilities(i) = CCA(Y, X); // using Canonical Correlation Analysis as feature-extraction tool
-                //cout << "do feature extraction" << endl;
+                // cout << "size of X" << X.cols() << endl;
             }
 
             // normalize probabilities and adding the softmax coefficient
@@ -792,6 +806,7 @@ void ssvepBCI::BCIOnSensorLevel()
                 emit classificationResult(0);
             else
                 emit classificationResult(m_lDesFrequencies[m_lClassResultsSensor.last() - 1]);
+
         }
 
         // update counter and index variables
@@ -801,7 +816,9 @@ void ssvepBCI::BCIOnSensorLevel()
 
     }
     
-
+    // change number of harmonics or channel selection and reset the time window if necessary
+    if(m_bChangeSSVEPParameterFlag)
+        changeSSVEPParameter();
 
 }
 

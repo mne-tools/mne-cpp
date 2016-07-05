@@ -186,6 +186,7 @@ public:
     */
     QList<double>  getCurrentListOfFrequencies();
 
+
 protected:
     /**
     * This update function gets called whenever the input buffer stream from the TMSI plugin is full and need to be emptied by this BCI plugin.
@@ -270,9 +271,9 @@ public slots:
     void removePowerLine(bool removePowerLine);
     void setPowerLine(int powerLine);
     void setFeatureExtractionMethod(bool useMEC);
-    void setNumberOfHarmonics(int numberOfHarmonics);
     void setThresholdValues(MyQList thresholds);
     void setFrequencyList(MyQList frequencyList);
+    void setChangeSSVEPParameterFlag();
 
 signals:
     void SSVEPprob(MyQList ssvepProb);
@@ -317,6 +318,7 @@ private:
     bool                    m_bUseMEC;                          /**< flag for feature extractiong. If true: use MEC; If false: use CCA */
     QList<int>              m_lClassResultsSensor;              /**< Sensor level: Classification results on sensor level. */
     int                     m_iPowerLine;                       /**< frequency of the power line [Hz] */
+    bool                    m_bChangeSSVEPParameterFlag;        /**< flag for chaning SSVEP parameter */
 
 
     // Sensor level
@@ -339,10 +341,14 @@ private:
     //=========================================================================================================
     /**
     * reading actual segment from the sliding time window and write it to the data Matrix
-    *
-    *
     */
     void readFromSlidingTimeWindow(MatrixXd &data);
+
+    //=========================================================================================================
+    /**
+    * updates the parameter of the classifiaction process and resets the time window
+    */
+    void changeSSVEPParameter();
 
 
 
