@@ -230,10 +230,8 @@ signals:
     //=========================================================================================================
     /**
     * Emit this signal whenever the origin of the vertex color (from curvature, from annotation) changed.
-    *
-    * @param[in] arrayVertColor      The new vertex colors.
     */
-    void colorInfoOriginChanged(const QByteArray& arrayVertColor);
+    void colorInfoOriginChanged();
 };
 
 } //NAMESPACE DISP3DLIB

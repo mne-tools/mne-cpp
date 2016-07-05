@@ -188,10 +188,8 @@ private:
     //=========================================================================================================
     /**
     * This function gets called whenever the origin of the surface vertex color (curvature, annoation, etc.) changed.
-    *
-    * @param[in] arrayVertColor     The new vertex colors.
     */
-    void onColorInfoOriginChanged(const QByteArray& arrayVertColor);
+    void onColorInfoOriginChanged();
 
     BrainRTSourceLocDataTreeItem*   m_pBrainRTSourceLocDataTreeItem;        /**< The rt data item of this hemisphere item. Multiple rt data item's can be added to this hemipshere item. */
 

@@ -344,7 +344,7 @@ void BrainSurfaceSetTreeItem::onRtVertColorChanged(const QPair<QByteArray, QByte
 
 //*************************************************************************************************************
 
-void BrainSurfaceSetTreeItem::onColorInfoOriginChanged(const QByteArray& arrayVertColor)
+void BrainSurfaceSetTreeItem::onColorInfoOriginChanged()
 {
     QList<QStandardItem*> itemList = this->findChildren(Data3DTreeModelItemTypes::HemisphereItem);
 
