@@ -149,10 +149,6 @@ int main(int argc, char *argv[])
     //
     //########################################################################################
 
-    if(bAddRtSourceLoc) {
-        double snr = 3.0;
-        double lambda2 = 1.0 / pow(snr, 2);
-        QString method("dSPM"); //"MNE" | "dSPM" | "sLORETA"
     MNESourceEstimate sourceEstimate_LA;
     MNESourceEstimate sourceEstimate_RA;
     MNESourceEstimate sourceEstimate_LV;
