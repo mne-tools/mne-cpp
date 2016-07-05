@@ -315,7 +315,7 @@ void BrainSurfaceTreeItem::onColorInfoOriginOrCurvColorChanged()
             this->setData(data, Data3DTreeModelItemRoles::SurfaceCurrentColorVert);
 
             //Emit the new colors which are to be used during rt source loc plotting
-            emit colorInfoOriginChanged(arrayNewVertColor);
+            emit colorInfoOriginChanged();
 
             //Return here because the new colors will be set to the renderable entity in the setData() function with the role Data3DTreeModelItemRoles::SurfaceCurrentColorVert
             return;
@@ -333,7 +333,7 @@ void BrainSurfaceTreeItem::onColorInfoOriginOrCurvColorChanged()
                     this->setData(data, Data3DTreeModelItemRoles::SurfaceCurrentColorVert);
 
                     //Emit the new colors which are to be used during rt source loc plotting
-                    emit colorInfoOriginChanged(arrayNewVertColor);
+                    emit colorInfoOriginChanged();
 
                     //Return here because the new colors will be set to the renderable entity in the setData() function with the role Data3DTreeModelItemRoles::SurfaceCurrentColorVert
                     return;
