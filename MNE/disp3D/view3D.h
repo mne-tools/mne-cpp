@@ -41,15 +41,12 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <iostream>
-
 #include "disp3D_global.h"
+
 #include "3DObjects/data3Dtreemodel.h"
-
-#include "helpers/window.h"
-#include "helpers/types.h"
-
-#include <mne/mne_sourceestimate.h>
+#include "fs/annotationset.h"
+#include "fs/annotation.h"
+#include "mne/mne_forwardsolution.h"
 
 
 //*************************************************************************************************************
@@ -66,6 +63,23 @@
 //=============================================================================================================
 
 class QPropertyAnimation;
+class QVector3D;
+
+namespace MNELIB{
+    class MNESourceEstimate;
+    class MNESourceSpace;
+    class MNEBem;
+}
+
+namespace FSLIB{
+    class Surface;
+    class SurfaceSet;
+    class Surface;
+}
+
+namespace Qt3DCore {
+    class QTransform;
+}
 
 
 //*************************************************************************************************************
@@ -81,6 +95,8 @@ namespace DISP3DLIB
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
+
+class BrainRTSourceLocDataTreeItem;
 
 
 //=============================================================================================================

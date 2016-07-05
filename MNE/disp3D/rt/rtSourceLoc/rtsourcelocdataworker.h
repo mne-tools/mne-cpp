@@ -135,19 +135,29 @@ public:
     /**
     * Set surface data which the streamed data is plotted on.
     *
-    * @param[in] arraySurfaceVertColor  The vertex colors for the surface where the data is to be plotted on.
-    * @param[in] vecVertNo              The vertex indexes.
+    * @param[in] arraySurfaceVertColorLeftHemi      The vertex colors for the left hemipshere surface where the data is to be plotted on.
+    * @param[in] arraySurfaceVertColorRightHemi     The vertex colors for the right hemipshere surface where the data is to be plotted on.
+    * @param[in] vecVertNoLeftHemi                  The vertex indexes for the left hemipshere.
+    * @param[in] vecVertNoRightHemi                 The vertex indexes for the right hemipshere.
     */
-    void setSurfaceData(const QByteArray& arraySurfaceVertColor, const Eigen::VectorXi& vecVertNo);
+    void setSurfaceData(const QByteArray& arraySurfaceVertColorLeftHemi,
+                        const QByteArray& arraySurfaceVertColorRightHemi,
+                        const Eigen::VectorXi& vecVertNoLeftHemi,
+                        const Eigen::VectorXi& vecVertNoRightHemi);
 
     //=========================================================================================================
     /**
     * Set annotation data.
     *
-    * @param[in] vecLabelIds            The labels ids for each of the surface vertex idx.
-    * @param[in] lLabels                The label information.
+    * @param[in] vecLabelIdsLeftHemi        The labels ids for each of the left hemipshere surface vertex idx.
+    * @param[in] vecLabelIdsRightHemi       The labels ids for each of the right hemipshere surface vertex idx.
+    * @param[in] lLabelsLeftHemi            The label information for the left hemipshere.
+    * @param[in] lLabelsRightHemi           The label information for the right hemipshere.
     */
-    void setAnnotationData(const Eigen::VectorXi& vecLabelIds, const QList<FSLIB::Label>& lLabels);
+    void setAnnotationData(const Eigen::VectorXi& vecLabelIdsLeftHemi,
+                           const Eigen::VectorXi& vecLabelIdsRightHemi,
+                           const QList<FSLIB::Label>& lLabelsLeftHemi,
+                           const QList<FSLIB::Label>& lLabelsRightHemi);
 
     //=========================================================================================================
     /**
@@ -218,9 +228,9 @@ private:
     *
     * @param[in] sourceColorSamples         The color data for the sources.
     *
-    * @return                               Returns the final colors in form of a QByteArray.
+    * @return                               Returns the final colors in form of a QByteArray for the left and right hemisphere.
     */
-    QByteArray performVisualizationTypeCalculation(const Eigen::VectorXd& sourceColorSamples);
+    QPair<QByteArray, QByteArray> performVisualizationTypeCalculation(const Eigen::VectorXd& sourceColorSamples);
 
     //=========================================================================================================
     /**
@@ -232,40 +242,45 @@ private:
     */
     QByteArray transformDataToColor(const Eigen::VectorXd& data);
 
-    QMutex                  m_qMutex;               /**< The thread's mutex. */
+    QMutex                  m_qMutex;                           /**< The thread's mutex. */
 
-    QByteArray              m_arraySurfaceVertColor;/**< The vertex colors for the surface where the data is to be plotted on. */
-    QList<Eigen::VectorXd>  m_lData;                /**< List that holds the fiff matrix data <n_channels x n_samples>. */
-    VectorXi                m_vecVertNo;            /**< Vector with the source vertx indexes. */
+    QByteArray              m_arraySurfaceVertColorLeftHemi;    /**< The vertex colors for the left hemisphere surface where the data is to be plotted on. */
+    QByteArray              m_arraySurfaceVertColorRightHemi;   /**< The vertex colors for the left hemisphere surface where the data is to be plotted on. */
+    VectorXi                m_vecVertNoLeftHemi;                /**< Vector with the source vertx indexes for the left hemisphere. */
+    VectorXi                m_vecVertNoRightHemi;               /**< Vector with the source vertx indexes for the right hemisphere. */
 
-    bool                    m_bIsRunning;           /**< Flag if this thread is running. */
-    bool                    m_bIsLooping;           /**< Flag if this thread should repeat sending the same data over and over again. */
-    bool                    m_bSurfaceDataIsInit;   /**< Flag if this thread's surface data was initialized. This flag is used to decide whether specific visualization types can be computed. */
-    bool                    m_bAnnotationDataIsInit;/**< Flag if this thread's annotation data was initialized. This flag is used to decide whether specific visualization types can be computed. */
+    QList<Eigen::VectorXd>  m_lData;                            /**< List that holds the fiff matrix data <n_channels x n_samples>. */
 
-    int                     m_iAverageSamples;      /**< Number of average to compute. */
-    int                     m_iCurrentSample;       /**< Number of the current sample which is/was streamed. */
-    int                     m_iMSecIntervall;       /**< Length in milli Seconds to wait inbetween data samples. */
-    int                     m_iVisualizationType;   /**< The visualization type (single vertex, smoothing, annotation based). */
+    bool                    m_bIsRunning;                       /**< Flag if this thread is running. */
+    bool                    m_bIsLooping;                       /**< Flag if this thread should repeat sending the same data over and over again. */
+    bool                    m_bSurfaceDataIsInit;               /**< Flag if this thread's surface data was initialized. This flag is used to decide whether specific visualization types can be computed. */
+    bool                    m_bAnnotationDataIsInit;            /**< Flag if this thread's annotation data was initialized. This flag is used to decide whether specific visualization types can be computed. */
 
-    double                  m_dNormalization;       /**< Normalization value. */
-    double                  m_dNormalizationMax;    /**< Value to normalize to. */
+    int                     m_iAverageSamples;                  /**< Number of average to compute. */
+    int                     m_iCurrentSample;                   /**< Number of the current sample which is/was streamed. */
+    int                     m_iMSecIntervall;                   /**< Length in milli Seconds to wait inbetween data samples. */
+    int                     m_iVisualizationType;               /**< The visualization type (single vertex, smoothing, annotation based). */
 
-    QString                 m_sColormap;            /**< The type of colormap ("Hot", "Hot Negative 1", etc.). */
+    double                  m_dNormalization;                   /**< Normalization value. */
+    double                  m_dNormalizationMax;                /**< Value to normalize to. */
 
-    QVector3D               m_vecThresholds;        /**< The threshold values used for normalizing the data. */
+    QString                 m_sColormap;                        /**< The type of colormap ("Hot", "Hot Negative 1", etc.). */
 
-    QList<FSLIB::Label>     m_lLabels;              /**< The list of current labels. */
-    QMap<qint32, qint32>    m_mapLabelIdSources;    /**< The sources mapped to their corresponding labels. */
+    QVector3D               m_vecThresholds;                    /**< The threshold values used for normalizing the data. */
+
+    QList<FSLIB::Label>     m_lLabelsLeftHemi;                  /**< The list of current labels for the left hemisphere. */
+    QList<FSLIB::Label>     m_lLabelsRightHemi;                 /**< The list of current labels for the right hemisphere. */
+    QMap<qint32, qint32>    m_mapLabelIdSourcesLeftHemi;        /**< The sources mapped to their corresponding labels for the left hemisphere. */
+    QMap<qint32, qint32>    m_mapLabelIdSourcesRightHemi;       /**< The sources mapped to their corresponding labels for the right hemisphere. */
 
 signals:
     //=========================================================================================================
     /**
     * Emit this signal whenever this item should send a new sample to its listening threads.
     *
-    * @param[in] colorSample     The samples data in form of rgb colors as QByteArray.
+    * @param[in] colorPair     The samples data in form of a QPair rgb colors as QByteArray.
     */
-    void newRtData(QByteArray colorSample);
+    void newRtData(QPair<QByteArray, QByteArray> colorPair);
 };
 
 } // NAMESPACE

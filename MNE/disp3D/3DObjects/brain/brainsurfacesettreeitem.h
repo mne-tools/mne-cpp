@@ -177,6 +177,22 @@ private:
     */
     virtual void onCheckStateChanged(const Qt::CheckState& checkState);
 
+    //=========================================================================================================
+    /**
+    * Call this function whenever new colors for the activation data plotting are available.
+    *
+    * @param[in] sourceColorSamples     The color values for each estimated source for left and right hemisphere.
+    */
+    void onRtVertColorChanged(const QPair<QByteArray, QByteArray>& sourceColorSamples);
+
+    //=========================================================================================================
+    /**
+    * This function gets called whenever the origin of the surface vertex color (curvature, annoation, etc.) changed.
+    *
+    * @param[in] arrayVertColor     The new vertex colors.
+    */
+    void onColorInfoOriginChanged(const QByteArray& arrayVertColor);
+
     BrainRTSourceLocDataTreeItem*   m_pBrainRTSourceLocDataTreeItem;        /**< The rt data item of this hemisphere item. Multiple rt data item's can be added to this hemipshere item. */
 
 };

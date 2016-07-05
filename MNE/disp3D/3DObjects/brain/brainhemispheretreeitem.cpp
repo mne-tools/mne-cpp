@@ -193,6 +193,30 @@ bool BrainHemisphereTreeItem::addData(const MNEHemisphere& tHemisphere, Qt3DCore
 
 //*************************************************************************************************************
 
+void BrainHemisphereTreeItem::onRtVertColorChanged(const QByteArray& sourceColorSamples)
+{
+    m_pSurfaceItem->onRtVertColorChanged(sourceColorSamples);
+}
+
+
+//*************************************************************************************************************
+
+BrainSurfaceTreeItem* BrainHemisphereTreeItem::getSurfaceItem()
+{
+   return m_pSurfaceItem;
+}
+
+
+//*************************************************************************************************************
+
+BrainAnnotationTreeItem* BrainHemisphereTreeItem::getAnnotItem()
+{
+   return m_pAnnotItem;
+}
+
+
+//*************************************************************************************************************
+
 void BrainHemisphereTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
 {
     for(int i = 0; i < this->rowCount(); i++) {
