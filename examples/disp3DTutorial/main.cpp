@@ -251,10 +251,10 @@ int main(int argc, char *argv[])
 //    testWindow->addBrainData("Subject01", "HemiLRSet", tSurfLeft, tAnnotLeft);
 //    testWindow->addBrainData("Subject01", "HemiLRSet", tSurfRight, tAnnotRight);
 //    testWindow->addBrainData("Subject01", "Surface", tSurfSet, tAnnotSet);
-//    testWindow->addBrainData("Subject01", "Right Auditory", tSurfSet, tAnnotSet);
+    testWindow->addBrainData("Subject01", "Right Auditory", tSurfSet, tAnnotSet);
     testWindow->addBrainData("Subject01", "Right Visual", tSurfSet, tAnnotSet);
-    //testWindow->addBrainData("Subject01", "Left Auditory", tSurfSet, tAnnotSet);
-    //testWindow->addBrainData("Subject01", "Left Visual", tSurfSet, tAnnotSet);
+    testWindow->addBrainData("Subject01", "Left Auditory", tSurfSet, tAnnotSet);
+    testWindow->addBrainData("Subject01", "Left Visual", tSurfSet, tAnnotSet);
 
     //Read & show BEM and sensor surfaces
 //    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif");
@@ -278,9 +278,9 @@ int main(int argc, char *argv[])
         //rtItemList.at(0)->addData(sourceEstimate);
 
         //RA
-        //QList<BrainRTSourceLocDataTreeItem*> rtItemList_LA = testWindow->addRtBrainData("Subject01", "Left Auditory", sourceEstimate_LA, t_clusteredFwd);
-        //QList<BrainRTSourceLocDataTreeItem*> rtItemList_RA = testWindow->addRtBrainData("Subject01", "Right Auditory", sourceEstimate_RA, t_clusteredFwd);
-        //QList<BrainRTSourceLocDataTreeItem*> rtItemList_LV = testWindow->addRtBrainData("Subject01", "Left Visual", sourceEstimate_LV, t_clusteredFwd);
+        QList<BrainRTSourceLocDataTreeItem*> rtItemList_LA = testWindow->addRtBrainData("Subject01", "Left Auditory", sourceEstimate_LA, t_clusteredFwd);
+        QList<BrainRTSourceLocDataTreeItem*> rtItemList_RA = testWindow->addRtBrainData("Subject01", "Right Auditory", sourceEstimate_RA, t_clusteredFwd);
+        QList<BrainRTSourceLocDataTreeItem*> rtItemList_LV = testWindow->addRtBrainData("Subject01", "Left Visual", sourceEstimate_LV, t_clusteredFwd);
         QList<BrainRTSourceLocDataTreeItem*> rtItemList_RV = testWindow->addRtBrainData("Subject01", "Right Visual", sourceEstimate_RV, t_clusteredFwd);
 
 //        //Init some rt related values
@@ -300,7 +300,7 @@ int main(int argc, char *argv[])
             rtItemList_RV.at(i)->setTimeInterval(50);
             rtItemList_RV.at(i)->setNumberAverages(1);
             rtItemList_RV.at(i)->setStreamingActive(true);
-            rtItemList_RV.at(i)->setNormalization(QVector3D(5.0,0.5,15));
+            rtItemList_RV.at(i)->setNormalization(QVector3D(5.0,5.5,15));
             rtItemList_RV.at(i)->setVisualizationType("Vertex based");
             rtItemList_RV.at(i)->setColortable("Hot Negative 1");
         }
