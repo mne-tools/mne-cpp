@@ -40,6 +40,10 @@
 
 #include "view3D.h"
 
+#include <mne/mne_sourceestimate.h>
+#include "helpers/types.h"
+#include <iostream>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -48,6 +52,8 @@
 
 #include <QDebug>
 #include <QPropertyAnimation>
+#include <QVector3D>
+#include <QKeyEvent>
 
 #include <Qt3DCore/QAspectEngine>
 #include <Qt3DRender/QCamera>
@@ -106,6 +112,7 @@ View3D::~View3D()
 void View3D::initMetatypes()
 {
     qRegisterMetaType<QByteArray>();
+    qRegisterMetaType<QPair<QByteArray, QByteArray> >();
 
     qRegisterMetaType<Eigen::MatrixX3i>();
     qRegisterMetaType<Eigen::MatrixXd>();

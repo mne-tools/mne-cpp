@@ -131,15 +131,23 @@ public:
     /**
     * Initializes the rt data item with neccessary information for visualization computations.
     *
-    * @param[in] tForwardSolution       The MNEForwardSolution.
-    * @param[in] hemi                   The hemispehre of this brain rt data item. This information is important in order to cut out the wanted source estimations from the MNESourceEstimate
-    * @param[in] arraySurfaceVertColor  The vertex colors for the surface where the data is to be plotted on.
-    * @param[in] vecLabelIds            The label ids for each surface vertex index.
-    * @param[in] lLabels                The label list.
+    * @param[in] tForwardSolution                   The MNEForwardSolution.
+    * @param[in] arraySurfaceVertColorLeftHemi      The vertex colors for the left hemisphere surface where the data is to be plotted on.
+    * @param[in] arraySurfaceVertColorRightHemi     The vertex colors for the right hemisphere surface where the data is to be plotted on.
+    * @param[in] vecLabelIdsLeftHemi                The label ids for each left hemisphere surface vertex index.
+    * @param[in] vecLabelIdsRightHemi               The label ids for each right hemispheresurface vertex index.
+    * @param[in] lLabelsLeftHemi                    The label list for the left hemisphere.
+    * @param[in] lLabelsRightHemi                   The label list for the right hemisphere.
     *
-    * @return                           Returns true if successful.
+    * @return   Returns true if successful.
     */
-    bool init(const MNELIB::MNEForwardSolution& tForwardSolution, const QByteArray &arraySurfaceVertColor, int iHemi, const Eigen::VectorXi& vecLabelIds = FIFFLIB::defaultVectorXi, const QList<FSLIB::Label>& lLabels = QList<FSLIB::Label>());
+    bool init(const MNELIB::MNEForwardSolution& tForwardSolution,
+            const QByteArray &arraySurfaceVertColorLeftHemi,
+            const QByteArray &arraySurfaceVertColorRightHemi,
+            const Eigen::VectorXi& vecLabelIdsLeftHemi = FIFFLIB::defaultVectorXi,
+            const Eigen::VectorXi &vecLabelIdsRightHemi = FIFFLIB::defaultVectorXi,
+            const QList<FSLIB::Label> &lLabelsRightHemi = QList<FSLIB::Label>(),
+            const QList<FSLIB::Label>& lLabelsLeftHemi = QList<FSLIB::Label>());
 
     //=========================================================================================================
     /**
@@ -217,11 +225,12 @@ public:
 
     //=========================================================================================================
     /**
-    * This function gets called whenever the origin of the surface vertex color (curvature, annoation, etc.) changed.
+    * This function gets called whenever the origin of the surface vertex color changed.
     *
-    * @param[in] arrayVertColor     The new vertex colors.
+    * @param[in] arrayVertColorLeftHemisphere       The new vertex colors for the left hemisphere.
+    * @param[in] arrayVertColorRightHemisphere      The new vertex colors for the right hemisphere.
     */
-    void onColorInfoOriginChanged(const QByteArray& arrayVertColor);
+    void onColorInfoOriginChanged(const QByteArray& arrayVertColorLeftHemisphere, const QByteArray& arrayVertColorRightHemisphere);
 
 private:
     //=========================================================================================================
@@ -236,9 +245,9 @@ private:
     /**
     * This function gets called whenever this item receives new color values for each estimated source.
     *
-    * @param[in] sourceColorSamples     The color values for each estimated source.
+    * @param[in] sourceColorSamples     The color values for each estimated source for left and right hemisphere.
     */
-    void onNewRtData(const QByteArray& sourceColorSamples);
+    void onNewRtData(const QPair<QByteArray, QByteArray> &sourceColorSamples);
 
     //=========================================================================================================
     /**
@@ -297,9 +306,9 @@ signals:
     /**
     * Emit this signal whenever you want to provide newly generated colors from the stream rt data.
     *
-    * @param[in] sourceColorSamples     The color values for each estimated source.
+    * @param[in] sourceColorSamples     The color values for each estimated source for left and right hemisphere.
     */
-    void rtVertColorChanged(const QByteArray& sourceColorSamples);
+    void rtVertColorChanged(const QPair<QByteArray, QByteArray>& sourceColorSamples);
 };
 
 //*************************************************************************************************************

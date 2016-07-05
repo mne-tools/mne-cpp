@@ -142,7 +142,7 @@ bool BemSurfaceTreeItem::addData(const MNEBemSurface& tBemSurface, Qt3DCore::QEn
     //Add surface meta information as item children
     QList<QStandardItem*> list;
 
-    MetaTreeItem *itemAlpha = new MetaTreeItem(MetaTreeItemTypes::SurfaceAlpha, "0.5");
+    MetaTreeItem *itemAlpha = new MetaTreeItem(MetaTreeItemTypes::SurfaceAlpha, "1.0");
     connect(itemAlpha, &MetaTreeItem::surfaceAlphaChanged,
             this, &BemSurfaceTreeItem::onSurfaceAlphaChanged);
     list.clear();

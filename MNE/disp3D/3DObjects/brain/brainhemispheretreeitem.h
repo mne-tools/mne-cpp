@@ -153,6 +153,30 @@ public:
     */
     bool addData(const MNELIB::MNEHemisphere& tHemisphere, Qt3DCore::QEntity* p3DEntityParent = 0);
 
+    //=========================================================================================================
+    /**
+    * Call this function whenever new colors for the activation data plotting are available.
+    *
+    * @param[in] sourceColorSamples     The color values for each estimated source.
+    */
+    void onRtVertColorChanged(const QByteArray& sourceColorSamples);
+
+    //=========================================================================================================
+    /**
+    * Returns the surface tree item.
+    *
+    * @return The current surface tree item.
+    */
+    BrainSurfaceTreeItem* getSurfaceItem();
+
+    //=========================================================================================================
+    /**
+    * Returns the annotation tree item.
+    *
+    * @return The current annotation tree item.
+    */
+    BrainAnnotationTreeItem* getAnnotItem();
+
 private:
     //=========================================================================================================
     /**
