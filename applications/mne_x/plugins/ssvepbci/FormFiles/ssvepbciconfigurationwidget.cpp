@@ -62,12 +62,11 @@ ssvepBCIConfigurationWidget::ssvepBCIConfigurationWidget(ssvepBCI* pssvepBCI, QW
   ,  m_pSSVEPBCI(pssvepBCI)
   ,  ui(new Ui::ssvepBCIConfigurationWidget)
   ,  m_bInit(true)
-//  ,  m_palBlackFont(ui->m_GroupBox_Threshold->palette())
 {
     ui->setupUi(this);
 
     // default threshold values
-    m_lSSVEPThresholdValues << 0.15 << 0.14 << 0.155 << 0.15;
+    m_lSSVEPThresholdValues << 0.15 << 0.146 << 0.155 << 0.15;
 
     // set default threshold values
     ui->m_DoubleSpinBox_Threshold1->setValue(m_lSSVEPThresholdValues.at(0));
@@ -101,6 +100,8 @@ ssvepBCIConfigurationWidget::ssvepBCIConfigurationWidget(ssvepBCI* pssvepBCI, QW
     connect(ui->m_RadioButton_MEC, &QRadioButton::toggled, m_pSSVEPBCI, &ssvepBCI::setFeatureExtractionMethod);
 
     // connect number of harmonicssignal
+    connect(ui->m_SpinBox_NumOfHarmonics, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, &ssvepBCIConfigurationWidget::numOfHarmonicsChanged);
+    connect(this, &ssvepBCIConfigurationWidget::changeSSVEPParameter, m_pSSVEPBCI, &ssvepBCI::setChangeSSVEPParameterFlag);
 
     // connect SSVEP frequency List signal
     connect(m_pSSVEPBCI, &ssvepBCI::getFrequencyList, this, &ssvepBCIConfigurationWidget::setFrequencyList);
@@ -126,8 +127,7 @@ ssvepBCIConfigurationWidget::ssvepBCIConfigurationWidget(ssvepBCI* pssvepBCI, QW
     m_palBlackFont.setColor(QPalette::WindowText, Qt::black);
     m_palRedFont.setColor(QPalette::WindowText, Qt::red);
 
-
-    // update GUI-surface with initialized values
+    // initialize values to GUI-surface
     setFrequencyList(m_pSSVEPBCI->getCurrentListOfFrequencies());
     thresholdChanged(0);
     initSelectedChannelsSensor();
@@ -295,11 +295,6 @@ void ssvepBCIConfigurationWidget::setFrequencyList(MyQList frequencyList){
 
 void ssvepBCIConfigurationWidget::setClassResult(double classResult){
 
-    qDebug() << "process!";
-    // find index of classified frequency
-    int index = m_lFrequencyList.indexOf(classResult);
-    qDebug() << "index:" << index;
-
     // set all labels to black again
     ui->m_Label_Frequency1->setPalette(m_palBlackFont);
     ui->m_Label_Frequency2->setPalette(m_palBlackFont);
@@ -308,6 +303,7 @@ void ssvepBCIConfigurationWidget::setClassResult(double classResult){
     ui->m_Label_Frequency5->setPalette(m_palBlackFont);
 
     // highlighting the labels according to classifiaction result
+    int index = m_lFrequencyList.indexOf(classResult);
     switch(index){
     case 0:
         ui->m_Label_Frequency1->setPalette(m_palRedFont); break;
@@ -322,5 +318,20 @@ void ssvepBCIConfigurationWidget::setClassResult(double classResult){
     default:
         break;
     }
+}
 
+
+//*************************************************************************************************************
+
+int ssvepBCIConfigurationWidget::getNumOfHarmonics(){
+    return ui->m_SpinBox_NumOfHarmonics->value();
+}
+
+
+
+void ssvepBCIConfigurationWidget::numOfHarmonicsChanged(int harmonics){
+    Q_UNUSED(harmonics);
+
+    // emit signal for changing SSVEP Parameter
+    emit changeSSVEPParameter();
 }

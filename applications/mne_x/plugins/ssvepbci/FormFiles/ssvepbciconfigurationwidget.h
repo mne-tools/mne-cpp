@@ -134,6 +134,13 @@ public:
     */
     void updateThresholdsToScreen();
 
+    //=========================================================================================================
+    /**
+    * returns the number of desired harmonics for which will be produced in the reference signal
+    *
+    * @return       number of desired harmonics
+    */
+    int getNumOfHarmonics();
 
 public slots:
     void setSSVEPProbabilities(MyQList SSVEP);
@@ -143,9 +150,11 @@ public slots:
 private slots:
     void on_m_RadioButton_MEC_toggled(bool checked);
     void thresholdChanged(double threshold);
+    void numOfHarmonicsChanged(int harmonics);
 
 signals:
     void getThresholdValues(MyQList Thresholds);
+    void changeSSVEPParameter();
 
 private:
     Ui::ssvepBCIConfigurationWidget        *ui;                     /**< pointer to corresponding user interface */
