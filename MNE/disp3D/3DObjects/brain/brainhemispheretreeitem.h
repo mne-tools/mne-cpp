@@ -45,30 +45,11 @@
 
 #include "../../helpers/abstracttreeitem.h"
 
-#include "brainsurfacetreeitem.h"
-#include "brainannotationtreeitem.h"
-#include "brainrtsourcelocdatatreeitem.h"
-#include "brainsourcespacetreeitem.h"
-
-#include "fs/label.h"
-#include "fs/annotationset.h"
-#include "fs/surfaceset.h"
-
-#include "mne/mne_forwardsolution.h"
-#include "mne/mne_sourceestimate.h"
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // Qt INCLUDES
 //=============================================================================================================
-
-#include <QList>
-#include <QVariant>
-#include <QStringList>
-#include <QColor>
-#include <QStandardItem>
-#include <QStandardItemModel>
 
 
 //*************************************************************************************************************
@@ -76,7 +57,23 @@
 // Eigen INCLUDES
 //=============================================================================================================
 
-#include <Eigen/Core>
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+namespace FSLIB {
+    class Annotation;
+
+}
+
+namespace MNELIB {
+    class MNEHemisphere;
+    class MNESourceSpace;
+    class MNESourceEstimate;
+    class MNEForwardSolution;
+}
 
 
 //*************************************************************************************************************
@@ -91,6 +88,10 @@ namespace DISP3DLIB
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
+
+class BrainRTSourceLocDataTreeItem;
+class BrainSurfaceTreeItem;
+class BrainAnnotationTreeItem;
 
 
 //=============================================================================================================

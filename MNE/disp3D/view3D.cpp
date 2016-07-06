@@ -52,7 +52,6 @@
 
 #include <QDebug>
 #include <QPropertyAnimation>
-#include <QVector3D>
 #include <QKeyEvent>
 
 #include <Qt3DCore/QAspectEngine>

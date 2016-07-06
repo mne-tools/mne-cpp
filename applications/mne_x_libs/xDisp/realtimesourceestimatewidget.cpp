@@ -41,20 +41,18 @@
 //=============================================================================================================
 
 #include "realtimesourceestimatewidget.h"
+
 #include <xMeas/realtimesourceestimate.h>
+
+#include <disp3D/3DObjects/brain/brainrtsourcelocdatatreeitem.h>
 
 #include <mne/mne_forwardsolution.h>
 #include <mne/mne_inverse_operator.h>
 
+#include <fs/surfaceset.h>
+#include <fs/annotationset.h>
+
 #include <inverse/minimumNorm/minimumnorm.h>
-
-#include <Eigen/Core>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// STL INCLUDES
-//=============================================================================================================
 
 #include <math.h>
 
@@ -64,11 +62,20 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QSlider>
+#include <QAction>
 #include <QLabel>
 #include <QGridLayout>
 #include <QSettings>
-
 #include <QDebug>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
 
 
 //*************************************************************************************************************
@@ -197,12 +204,12 @@ void RealTimeSourceEstimateWidget::init()
 
 void RealTimeSourceEstimateWidget::show3DControlWidget()
 {
-//    if(m_pControl3DView->isActiveWindow())
-//        m_pControl3DView->hide();
-//    else {
-//        m_pControl3DView->activateWindow();
-//        m_pControl3DView->show();
-//    }
+    if(m_pControl3DView->isActiveWindow())
+        m_pControl3DView->hide();
+    else {
+        m_pControl3DView->activateWindow();
+        m_pControl3DView->show();
+    }
 }
 
 
