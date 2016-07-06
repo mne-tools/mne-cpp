@@ -50,23 +50,6 @@
 //=============================================================================================================
 
 #include <Qt3DRender/qmaterial.h>
-#include <QColor>
-#include <Qt3DRender/qmaterial.h>
-#include <Qt3DRender/qeffect.h>
-#include <Qt3DRender/qtechnique.h>
-#include <Qt3DRender/qshaderprogram.h>
-#include <Qt3DRender/qparameter.h>
-#include <Qt3DRender/qrenderpass.h>
-#include <Qt3DRender/qgraphicsapifilter.h>
-#include <Qt3DRender/qblendstate.h>
-#include <Qt3DRender/qcullface.h>
-#include <Qt3DRender/qdepthtest.h>
-#include <Qt3DRender/qdepthmask.h>
-#include <Qt3DRender/qblendequation.h>
-
-#include <QUrl>
-#include <QVector3D>
-#include <QVector4D>
 
 
 //*************************************************************************************************************
@@ -79,6 +62,21 @@
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
+
+namespace Qt3DRender {
+    class QMaterial;
+    class QEffect;
+    class QParameter;
+    class QShaderProgram;
+    class QMaterial;
+    class QFilterKey;
+    class QTechnique;
+    class QRenderPass;
+    class QNoDepthMask;
+    class QBlendEquationArguments;
+    class QBlendEquation;
+    class QGraphicsApiFilter;
+}
 
 
 //*************************************************************************************************************
@@ -151,10 +149,15 @@ private:
     Qt3DRender::QParameter*         m_specularParameter;
     Qt3DRender::QParameter*         m_shininessParameter;
     Qt3DRender::QParameter*         m_alphaParameter;
+    Qt3DRender::QFilterKey*         m_filterKey;
 
     Qt3DRender::QTechnique*         m_vertexGL3Technique;
     Qt3DRender::QRenderPass*        m_vertexGL3RenderPass;
     Qt3DRender::QShaderProgram*     m_vertexGL3Shader;
+
+    Qt3DRender::QNoDepthMask*                   m_noDepthMask;
+    Qt3DRender::QBlendEquationArguments*        m_blendState;
+    Qt3DRender::QBlendEquation*                 m_blendEquation;
 };
 
 } // namespace DISP3DLIB

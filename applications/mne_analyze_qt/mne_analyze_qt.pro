@@ -40,7 +40,7 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = app
 
-QT += gui widgets 3dcore 3drender 3dinput
+QT += gui widgets 3dcore 3drender 3dinput 3dextras
 
 TARGET = mne_analyze_qt
 
