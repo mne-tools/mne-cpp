@@ -41,6 +41,7 @@
 
 #include <fs/label.h>
 #include <fs/surface.h>
+#include <fs/surfaceset.h>
 #include <fs/annotationset.h>
 
 #include <disp3D/view3D.h>
