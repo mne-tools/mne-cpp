@@ -33,7 +33,7 @@ Requirements
 
 **Linux**
 
-\>= gcc 4.5
+\>= gcc 4.6.3
 
 **MacOSX**
 
@@ -43,7 +43,7 @@ Requirements
 Dependencies
 ============
 
-[>= Qt5.6](http://download.qt.io/official_releases/qt/)
+[>= Qt5.7](http://download.qt.io/official_releases/qt/)
 
 
 Contact information
