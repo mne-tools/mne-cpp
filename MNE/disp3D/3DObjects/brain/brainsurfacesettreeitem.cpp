@@ -40,6 +40,39 @@
 
 #include "brainsurfacesettreeitem.h"
 
+#include "brainhemispheretreeitem.h"
+#include "brainrtsourcelocdatatreeitem.h"
+#include "brainsurfacetreeitem.h"
+#include "brainannotationtreeitem.h"
+
+#include "fs/label.h"
+#include "fs/annotationset.h"
+#include "fs/surfaceset.h"
+
+#include "mne/mne_sourceestimate.h"
+#include "mne/mne_sourcespace.h"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Qt INCLUDES
+//=============================================================================================================
+
+#include <QList>
+#include <QVariant>
+#include <QStringList>
+#include <QColor>
+#include <QStandardItem>
+#include <QStandardItemModel>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -270,10 +303,10 @@ BrainRTSourceLocDataTreeItem* BrainSurfaceSetTreeItem::addData(const MNESourceEs
                 //Divide into left right hemi
                 QList<QStandardItem*> itemList = this->findChildren(Data3DTreeModelItemTypes::HemisphereItem);
 
-                BrainSurfaceTreeItem* pSurfaceTreeItemLeft = new BrainSurfaceTreeItem();
-                BrainSurfaceTreeItem* pSurfaceTreeItemRight = new BrainSurfaceTreeItem();
-                BrainAnnotationTreeItem* pAnnotTreeItemLeft = new BrainAnnotationTreeItem();
-                BrainAnnotationTreeItem* pAnnotTreeItemRight = new BrainAnnotationTreeItem();
+                BrainSurfaceTreeItem* pSurfaceTreeItemLeft = Q_NULLPTR;
+                BrainSurfaceTreeItem* pSurfaceTreeItemRight = Q_NULLPTR;
+                BrainAnnotationTreeItem* pAnnotTreeItemLeft = Q_NULLPTR;
+                BrainAnnotationTreeItem* pAnnotTreeItemRight = Q_NULLPTR;
 
                 for(int j = 0; j < itemList.size(); j++) {
                     if(BrainHemisphereTreeItem* pHemiItem = dynamic_cast<BrainHemisphereTreeItem*>(itemList.at(j))) {
@@ -287,13 +320,15 @@ BrainRTSourceLocDataTreeItem* BrainSurfaceSetTreeItem::addData(const MNESourceEs
                     }
                 }
 
-                m_pBrainRTSourceLocDataTreeItem->init(tForwardSolution,
-                                                    pSurfaceTreeItemLeft->data(Data3DTreeModelItemRoles::SurfaceCurrentColorVert).value<QByteArray>(),
-                                                    pSurfaceTreeItemRight->data(Data3DTreeModelItemRoles::SurfaceCurrentColorVert).value<QByteArray>(),
-                                                    pAnnotTreeItemLeft->data(Data3DTreeModelItemRoles::LabeIds).value<VectorXi>(),
-                                                    pAnnotTreeItemRight->data(Data3DTreeModelItemRoles::LabeIds).value<VectorXi>(),
-                                                    pAnnotTreeItemLeft->data(Data3DTreeModelItemRoles::LabeList).value<QList<FSLIB::Label>>(),
-                                                    pAnnotTreeItemRight->data(Data3DTreeModelItemRoles::LabeList).value<QList<FSLIB::Label>>());
+                if(pSurfaceTreeItemLeft && pSurfaceTreeItemRight && pAnnotTreeItemLeft && pAnnotTreeItemRight) {
+                    m_pBrainRTSourceLocDataTreeItem->init(tForwardSolution,
+                                                        pSurfaceTreeItemLeft->data(Data3DTreeModelItemRoles::SurfaceCurrentColorVert).value<QByteArray>(),
+                                                        pSurfaceTreeItemRight->data(Data3DTreeModelItemRoles::SurfaceCurrentColorVert).value<QByteArray>(),
+                                                        pAnnotTreeItemLeft->data(Data3DTreeModelItemRoles::LabeIds).value<VectorXi>(),
+                                                        pAnnotTreeItemRight->data(Data3DTreeModelItemRoles::LabeIds).value<VectorXi>(),
+                                                        pAnnotTreeItemLeft->data(Data3DTreeModelItemRoles::LabeList).value<QList<FSLIB::Label>>(),
+                                                        pAnnotTreeItemRight->data(Data3DTreeModelItemRoles::LabeList).value<QList<FSLIB::Label>>());
+                }
 
                 m_pBrainRTSourceLocDataTreeItem->addData(tSourceEstimate);
             } else {
@@ -348,8 +383,8 @@ void BrainSurfaceSetTreeItem::onColorInfoOriginChanged()
 {
     QList<QStandardItem*> itemList = this->findChildren(Data3DTreeModelItemTypes::HemisphereItem);
 
-    BrainSurfaceTreeItem* pSurfaceTreeItemLeft = new BrainSurfaceTreeItem();
-    BrainSurfaceTreeItem* pSurfaceTreeItemRight = new BrainSurfaceTreeItem();
+    BrainSurfaceTreeItem* pSurfaceTreeItemLeft = Q_NULLPTR;
+    BrainSurfaceTreeItem* pSurfaceTreeItemRight = Q_NULLPTR;
 
     for(int j = 0; j < itemList.size(); j++) {
         if(BrainHemisphereTreeItem* pHemiItem = dynamic_cast<BrainHemisphereTreeItem*>(itemList.at(j))) {
