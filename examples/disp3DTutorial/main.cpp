@@ -41,6 +41,7 @@
 
 #include <disp3D/view3D.h>
 #include <disp3D/control/control3dwidget.h>
+#include <disp3D/3DObjects/brain/brainrtsourcelocdatatreeitem.h>
 
 #include <fs/label.h>
 #include <fs/surfaceset.h>
