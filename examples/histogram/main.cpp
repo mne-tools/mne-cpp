@@ -245,11 +245,10 @@ int main(int argc, char *argv[])
     qDebug()<< "sourceEstimateData.rows = " << sourceEstimateData.rows();
     qDebug()<< "sourceEstaimateData.cols = " << sourceEstimateData.cols();
     MNEMath::histcounts(dataSine, bMakeSymmetrical, classAmount, resultClassLimit, resultFrequency, inputGlobalMin, inputGlobalMax);   //user input to normalize and sort the data matrix
-    std::cout<< "resultClassLimit =" << resultClassLimit;
-    std::cout<< "resultFrequency =" << resultFrequency;
+    std::cout << "resultClassLimits = " << resultClassLimit << std::endl;
+    std::cout << "resultFrequency = " << resultFrequency << std::endl;
     qDebug()<<"HistCounts timer:"<<myTimerHistCounts.elapsed();
-//    std::cout << "resultClassLimits = " << resultClassLimit << std::endl;
-//    std::cout << "resultFrequency = " << resultFrequency << std::endl;
+
     int precision = 2;             //format for the amount digits of coefficient shown in the Bar Histogram (does not affect Spline)
 
     //displayObj can be in either Bar or Spline form; uncomment the preferred one and comment the other
