@@ -208,7 +208,6 @@ private:
     QLineSeries*     m_pLeftThreshold;         /**< Vertical line series for the left threshold */
     QLineSeries*     m_pMiddleThreshold;       /**< Vertical line series for the middle threshold */
     QLineSeries*     m_pRightThreshold;        /**< Vertical line series for the right threshold */
-    //QLegendMarker*   m_pMarker;                /**< Variable to specify the legend of the threshold line */
     int              m_iMaximumFrequency;      /**< Highest value of frequency (y-axis) */
     QVector<double>  m_vecReturnVector;          /**< QVector consisting of 6 double values used in getThreshold function*/
     QList<QVector3D> m_pReturnList;            /**< QList consisting of 2 QVector3D used in getThreshold function*/

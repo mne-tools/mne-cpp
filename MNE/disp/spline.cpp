@@ -334,6 +334,7 @@ void Spline::setColorMap (QString colorMap)
     else
     {
         qDebug() << "updateColorMap error. Check for correct color map names.";
+        return;
     }
 
     // Customize plot area background

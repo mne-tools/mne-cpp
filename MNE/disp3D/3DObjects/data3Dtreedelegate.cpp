@@ -113,7 +113,6 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
             pSpline->setData(resultClassLimit, resultFrequency, 0);
             QVector3D vecThresholdValues = index.model()->data(index, MetaTreeItemRoles::RTDataNormalizationValue).value<QVector3D>();
             pSpline->setThreshold(vecThresholdValues);
-
             AbstractTreeItem* pParentItemAbstract = static_cast<AbstractTreeItem*>(pParentItem);
             QList<QStandardItem*> pColormapItem = pParentItemAbstract->findChildren(MetaTreeItemTypes::RTDataColormapType);
             for(int i = 0; i < pColormapItem.size(); ++i)
@@ -122,7 +121,6 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
                 QString colorMap = index.model()->data(indexColormapItem, MetaTreeItemRoles::RTDataColormapType).value<QString>();
                 pSpline->setColorMap(colorMap);
             }
-            qDebug()<< "pSpline size = " << pSpline->width() << " x " << pSpline->height();
             return pSpline;
         }
 
