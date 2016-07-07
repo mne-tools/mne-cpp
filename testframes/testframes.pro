@@ -55,9 +55,9 @@ SUBDIRS += \
 #        test_rap_eval \
 #       test_orig_rap_cluster_eval \
 
-#    qtHaveModule(3dcore,3drender,3dinput) {
+#    qtHaveModule(3dcore,3drender,3dinput,3dextras) {
 #        message(testframes.pro - Qt3D available)
-#        message(Qt3D available && QTVersion >= Qt 5.6: mne 3D tests configured!)
+#        message(Qt3D available && QTVersion >= Qt 5.7: mne 3D tests configured!)
 #        SUBDIRS += \
 #            mne_3d_widget \
 #            test_mne_cluster \
