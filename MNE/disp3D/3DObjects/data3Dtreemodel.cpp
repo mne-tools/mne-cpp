@@ -318,8 +318,9 @@ QList<BrainRTSourceLocDataTreeItem*> Data3DTreeModel::addData(const QString& sub
             if(!itemList.isEmpty()) {
                 for(int i = 0; i<itemList.size(); i++) {
                     if(itemList.at(i)->type() == Data3DTreeModelItemTypes::SurfaceSetItem) {
-                        BrainSurfaceSetTreeItem* pSetItem = dynamic_cast<BrainSurfaceSetTreeItem*>(itemList.at(i));
-                        returnList.append(pSetItem->addData(tSourceEstimate, tForwardSolution));
+                        if(BrainSurfaceSetTreeItem* pSetItem = dynamic_cast<BrainSurfaceSetTreeItem*>(itemList.at(i))) {
+                            returnList.append(pSetItem->addData(tSourceEstimate, tForwardSolution));
+                        }
                     }
                 }
             }

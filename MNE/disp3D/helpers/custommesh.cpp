@@ -175,9 +175,12 @@ bool CustomMesh::createCustomMesh(const MatrixX3f& tMatVert, const MatrixX3f& tM
             rawColorArray[idxColor++] = 0.2f;
             rawColorArray[idxColor++] = 0.2f;
         } else {
-            rawColorArray[idxColor++] = tArrayColors[idxColor];
-            rawColorArray[idxColor++] = tArrayColors[idxColor];
-            rawColorArray[idxColor++] = tArrayColors[idxColor];
+            idxColor++;
+            rawColorArray[idxColor] = tArrayColors[idxColor];
+            idxColor++;
+            rawColorArray[idxColor] = tArrayColors[idxColor];
+            idxColor++;
+            rawColorArray[idxColor] = tArrayColors[idxColor];
         }
     }
 
