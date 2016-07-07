@@ -248,9 +248,7 @@ BrainSurfaceTreeItem* BrainHemisphereTreeItem::getSurfaceItem()
 
 BrainAnnotationTreeItem* BrainHemisphereTreeItem::getAnnotItem()
 {
-    if(m_pAnnotItem) {
-        return m_pAnnotItem;
-    }
+    return m_pAnnotItem;
 }
 
 
