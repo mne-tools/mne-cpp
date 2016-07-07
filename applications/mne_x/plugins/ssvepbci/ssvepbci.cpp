@@ -387,24 +387,24 @@ void ssvepBCI::updateSensor(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 
 void ssvepBCI::updateSource(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 {
-//    cout<<"update source"<<endl;
-//    QSharedPointer<RealTimeSourceEstimate> pRTSE = pMeasurement.dynamicCast<RealTimeSourceEstimate>();
-//    if(pRTSE)
-//    {
-//        //Check if buffer initialized
-//        if(!m_pBCIBuffer_Source)
-//            m_pBCIBuffer_Source = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, pRTSE->getValue().size(), pRTSE->getArraySize()));
+    cout<<"update source"<<endl;
+    QSharedPointer<RealTimeSourceEstimate> pRTSE = pMeasurement.dynamicCast<RealTimeSourceEstimate>();
+    if(pRTSE)
+    {
+        //Check if buffer initialized
+        if(!m_pBCIBuffer_Source)
+            m_pBCIBuffer_Source = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64,  pRTSE->getValue()->data.rows(), pRTSE->getValue()->data.cols()));
 
-//        if(m_bProcessData)
-//        {
-//            MatrixXd t_mat(pRTSE->getValue().size(), pRTSE->getArraySize());
+        if(m_bProcessData)
+        {
+            MatrixXd t_mat(pRTSE->getValue()->data.rows(), pRTSE->getValue()->data.cols());
 
-//            for(unsigned char i = 0; i < pRTSE->getArraySize(); ++i)
-//                t_mat.col(i) = pRTSE->getStc().data.col(i);
+            for(unsigned char i = 0; i < pRTSE->getValue()->data.cols(); ++i)
+                t_mat.col(i) = pRTSE->getValue()->data.col(i);
 
-//            m_pBCIBuffer_Source->push(&t_mat);
-//        }
-//    }
+            m_pBCIBuffer_Source->push(&t_mat);
+        }
+    }
 }
 
 //*************************************************************************************************************
@@ -554,18 +554,17 @@ void ssvepBCI::setThresholdValues(MyQList thresholds){
 
 //*************************************************************************************************************
 
-void ssvepBCI::run()
-{
-    while(m_bIsRunning)
-    {
-        // Decide which data to use - sensor or source level data
+void ssvepBCI::run(){
+    while(m_bIsRunning){
+
         if(m_bUseSensorData)
-            BCIOnSensorLevel();
+            ssvepBCIOnSensor();
         else
-            ;
-//            if(m_bUseSourceData)
-                //BCIOnSourceLevel();
+            ssvepBCIOnSource();
+
     }
+
+
 }
 
 
@@ -689,7 +688,7 @@ void ssvepBCI::readFromSlidingTimeWindow(MatrixXd &data)
 
 //*************************************************************************************************************
 
-void ssvepBCI::BCIOnSensorLevel()
+void ssvepBCI::ssvepBCIOnSensor()
 {
     // Wait for fiff Info if not yet received - this is needed because we have to wait until the buffers are firstly initiated in the update functions
     while(!m_pFiffInfo_Sensor)
@@ -699,7 +698,7 @@ void ssvepBCI::BCIOnSensorLevel()
 
     // Start filling buffers with data from the inputs
     m_bProcessData = true;
-    MatrixXd t_mat = m_pBCIBuffer_Sensor->pop();  
+    MatrixXd t_mat = m_pBCIBuffer_Sensor->pop();
 
     // writing selected feature channels to the time window storage and increase the segment index
     int   writtenSamples = 0;
@@ -723,7 +722,7 @@ void ssvepBCI::BCIOnSensorLevel()
     // calculate buffer between read- and write index
     m_iReadToWriteBuffer = m_iReadToWriteBuffer + writtenSamples;
     //cout << "read to write buffer:" << m_iReadToWriteBuffer << endl << endl;
-    // execute processing loop as long as there is new data to read from the time window
+    // execute processing loop as long as there is new data to be red from the time window
     while(m_iReadToWriteBuffer >= m_iReadSampleSize)
     {
         if(m_iCounter > 8)
@@ -823,3 +822,8 @@ void ssvepBCI::BCIOnSensorLevel()
 }
 
 
+//*************************************************************************************************************
+
+void ssvepBCI::ssvepBCIOnSource(){
+
+}

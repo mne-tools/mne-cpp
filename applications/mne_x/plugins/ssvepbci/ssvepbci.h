@@ -262,10 +262,19 @@ protected:
 
     //=========================================================================================================
     /**
-    * Do BCI stuff with data received from sensor level
+    * executing the ssvep BCI algorithm on sensor level
     *
     */
-    void BCIOnSensorLevel();
+    void ssvepBCIOnSensor();
+
+    //=========================================================================================================
+    /**
+    * executing the ssvep BCI algorithm on source level
+    *
+    */
+    void ssvepBCIOnSource();
+
+
 
 public slots:
     void removePowerLine(bool removePowerLine);
@@ -364,7 +373,7 @@ private:
     CircularMatrixBuffer<double>::SPtr                  m_pBCIBuffer_Sensor;    /**< Holds incoming sensor level data.*/
     CircularMatrixBuffer<double>::SPtr                  m_pBCIBuffer_Source;    /**< Holds incoming source level data.*/
 
-    QSharedPointer<FilterData>                          m_filterOperator;       /**< Holds filter with specified properties by the user.*/
+//    QSharedPointer<FilterData>                          m_filterOperator;       /**< Holds filter with specified properties by the user.*/
 
 //    QSharedPointer<BCIFeatureWindow>                    m_BCIFeatureWindow;     /**< Holds pointer to BCIFeatureWindow for visualization purposes.*/
 
