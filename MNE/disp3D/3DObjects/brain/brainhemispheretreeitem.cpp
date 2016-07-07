@@ -92,6 +92,8 @@ using namespace DISP3DLIB;
 
 BrainHemisphereTreeItem::BrainHemisphereTreeItem(int iType, const QString& text)
 : AbstractTreeItem(iType, text)
+, m_pSurfaceItem(Q_NULLPTR)
+, m_pAnnotItem(Q_NULLPTR)
 {
     this->setEditable(false);    
     this->setCheckable(true);
@@ -228,7 +230,9 @@ bool BrainHemisphereTreeItem::addData(const MNEHemisphere& tHemisphere, Qt3DCore
 
 void BrainHemisphereTreeItem::onRtVertColorChanged(const QByteArray& sourceColorSamples)
 {
-    m_pSurfaceItem->onRtVertColorChanged(sourceColorSamples);
+    if(m_pSurfaceItem) {
+        m_pSurfaceItem->onRtVertColorChanged(sourceColorSamples);
+    }
 }
 
 
@@ -244,7 +248,9 @@ BrainSurfaceTreeItem* BrainHemisphereTreeItem::getSurfaceItem()
 
 BrainAnnotationTreeItem* BrainHemisphereTreeItem::getAnnotItem()
 {
-   return m_pAnnotItem;
+    if(m_pAnnotItem) {
+        return m_pAnnotItem;
+    }
 }
 
 
