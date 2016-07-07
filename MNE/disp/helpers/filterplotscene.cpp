@@ -102,16 +102,15 @@ void FilterPlotScene::updateFilter(const FilterData& operatorFilter, int samplin
 void FilterPlotScene::plotMagnitudeDiagram(int samplingFreq, QString filtername)
 {
     //Get row vector with filter coefficients
-    RowVectorXcd coefficientsAFreq = m_pCurrentFilter.m_dFFTCoeffA;
+    int numberCoeff = m_iPlotLength;
 
-    int numberCoeff = coefficientsAFreq.cols();
-
-    if(coefficientsAFreq.cols() > 2000) {//if to large downsample
-        int dsFactor = coefficientsAFreq.cols()/2000;
-        numberCoeff = coefficientsAFreq.cols()/dsFactor;
-    }
-
-    numberCoeff = m_iPlotLength;
+//    RowVectorXcd coefficientsAFreq = m_pCurrentFilter.m_dFFTCoeffA;
+//    if(coefficientsAFreq.cols() > 2000) {//if to large downsample
+//        int dsFactor = coefficientsAFreq.cols()/2000;
+//        numberCoeff = coefficientsAFreq.cols()/dsFactor;
+//    } else {
+//        numberCoeff = coefficientsAFreq.cols();
+//    }
 
     int fMax = samplingFreq/2; //nyquist frequency
 
