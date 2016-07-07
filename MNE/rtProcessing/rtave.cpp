@@ -93,6 +93,9 @@ RtAve::RtAve(quint32 numAverages, quint32 p_iPreStimSamples, quint32 p_iPostStim
 , m_pStimEvoked(FiffEvoked::SPtr(new FiffEvoked))
 , m_iMatDataPostIdx(0)
 , m_iNumberCalcAverages(0)
+, m_iCurrentBlockSize(0)
+, m_dArtifactThreshold(300e-6)
+, m_bDoArtifactReduction(false)
 {
     qRegisterMetaType<FiffEvoked::SPtr>("FiffEvoked::SPtr");
 
