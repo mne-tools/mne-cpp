@@ -59,7 +59,6 @@
 #include <QObject>
 #include <QList>
 #include <QSharedPointer>
-#include <QMutex>
 #include <QTime>
 #include <QDebug>
 

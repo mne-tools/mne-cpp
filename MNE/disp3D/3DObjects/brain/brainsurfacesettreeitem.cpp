@@ -396,7 +396,9 @@ void BrainSurfaceSetTreeItem::onColorInfoOriginChanged()
         }
     }
 
-    m_pBrainRTSourceLocDataTreeItem->onColorInfoOriginChanged(pSurfaceTreeItemLeft->data(Data3DTreeModelItemRoles::SurfaceCurrentColorVert).value<QByteArray>(),
-                                        pSurfaceTreeItemRight->data(Data3DTreeModelItemRoles::SurfaceCurrentColorVert).value<QByteArray>());
+    if(pSurfaceTreeItemLeft && pSurfaceTreeItemRight) {
+        m_pBrainRTSourceLocDataTreeItem->onColorInfoOriginChanged(pSurfaceTreeItemLeft->data(Data3DTreeModelItemRoles::SurfaceCurrentColorVert).value<QByteArray>(),
+                                            pSurfaceTreeItemRight->data(Data3DTreeModelItemRoles::SurfaceCurrentColorVert).value<QByteArray>());
+    }
 }
 
