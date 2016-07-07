@@ -40,6 +40,37 @@
 
 #include "renderable3Dentity.h"
 
+#include "../materials/shadermaterial.h"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <Qt3DCore/QTransform>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QSharedPointer>
+
+#include <Qt3DRender/QMaterial>
+#include <Qt3DExtras/QPerVertexColorMaterial>
+#include <Qt3DExtras/QPhongMaterial>
+#include <Qt3DCore/QComponent>
+#include <Qt3DRender/QEffect>
+#include <Qt3DRender/QParameter>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -59,8 +90,8 @@ Renderable3DEntity::Renderable3DEntity(Qt3DCore::QEntity* parent)
 : Qt3DCore::QEntity(parent)
 , m_pCustomMesh(CustomMesh::SPtr(new CustomMesh()))
 , m_pTransform(QSharedPointer<Qt3DCore::QTransform>(new Qt3DCore::QTransform()))
-, m_pMaterial(new ShaderMaterial(this))
-//, m_pMaterial(QSharedPointer<Qt3DRender::QMaterial>(new Qt3DRender::QPerVertexColorMaterial))
+, m_pMaterial(QSharedPointer<ShaderMaterial>(new ShaderMaterial(this)))
+//, m_pMaterial(QSharedPointer<Qt3DRender::QMaterial>(new Qt3DExtras::QPerVertexColorMaterial))
 //, m_pMaterial(QSharedPointer<Qt3DRender::QMaterial>(new Qt3DRender::QPhongMaterial(this)))
 , m_fAlpha(1.0f)
 , m_fRotX(0.0f)
@@ -79,9 +110,9 @@ Renderable3DEntity::Renderable3DEntity(const MatrixX3f& tMatVert, const MatrixX3
 : Qt3DCore::QEntity(parent)
 , m_pCustomMesh(new CustomMesh(tMatVert, tMatNorm, tMatTris))
 , m_pTransform(QSharedPointer<Qt3DCore::QTransform>(new Qt3DCore::QTransform()))
-, m_pMaterial(new ShaderMaterial(this))
-//, m_pMaterial(QSharedPointer<Qt3DRender::QMaterial>(new Qt3DRender::QPerVertexColorMaterial))
-//, m_pMaterial(QSharedPointer<Qt3DRender::QMaterial>(new Qt3DRender::QPhongMaterial(this)))
+, m_pMaterial(QSharedPointer<ShaderMaterial>(new ShaderMaterial(this)))
+//, m_pMaterial(QSharedPointer<Qt3DRender::QMaterial>(new Qt3DExtras::QPerVertexColorMaterial))
+//, m_pMaterial(QSharedPointer<Qt3DRender::QMaterial>(new Qt3DExtras::QPhongMaterial(this)))
 , m_fAlpha(1.0f)
 , m_fRotX(0.0f)
 , m_fRotY(0.0f)
@@ -97,7 +128,8 @@ Renderable3DEntity::Renderable3DEntity(const MatrixX3f& tMatVert, const MatrixX3
 
 Renderable3DEntity::~Renderable3DEntity()
 {
-    this->removeAllComponents();
+    //TODO: Port to 5.7
+    //this->removeAllComponents();
 }
 
 

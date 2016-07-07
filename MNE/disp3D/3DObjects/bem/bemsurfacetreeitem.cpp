@@ -40,6 +40,32 @@
 
 #include "bemsurfacetreeitem.h"
 
+#include "../common/metatreeitem.h"
+
+#include "../../helpers/renderable3Dentity.h"
+
+#include "mne/mne_bem.h"
+#include "fiff/fiff_constants.h"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QList>
+#include <QVariant>
+#include <QStringList>
+#include <QColor>
+#include <QStandardItem>
+#include <QStandardItemModel>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -142,7 +168,7 @@ bool BemSurfaceTreeItem::addData(const MNEBemSurface& tBemSurface, Qt3DCore::QEn
     //Add surface meta information as item children
     QList<QStandardItem*> list;
 
-    MetaTreeItem *itemAlpha = new MetaTreeItem(MetaTreeItemTypes::SurfaceAlpha, "0.5");
+    MetaTreeItem *itemAlpha = new MetaTreeItem(MetaTreeItemTypes::SurfaceAlpha, "1.0");
     connect(itemAlpha, &MetaTreeItem::surfaceAlphaChanged,
             this, &BemSurfaceTreeItem::onSurfaceAlphaChanged);
     list.clear();

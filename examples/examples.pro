@@ -61,7 +61,7 @@ SUBDIRS += \
 !contains(MNECPP_CONFIG, minimalVersion) {
     SUBDIRS += \
 
-    qtHaveModule(3dcore,3drender,3dinput) {
+    qtHaveModule(3dcore,3drender,3dinput,3dextras) {
     message(examples.pro - Qt3D available)
     SUBDIRS += \
         clusteredInverse \

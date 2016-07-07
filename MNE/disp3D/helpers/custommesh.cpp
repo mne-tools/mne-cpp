@@ -43,6 +43,25 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QSharedPointer>
+#include <QVector3D>
+
+#include <Qt3DRender/QGeometry>
+#include <Qt3DRender/QAttribute>
+#include <Qt3DRender/QBuffer>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
+
+//*************************************************************************************************************
+//=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
@@ -156,9 +175,12 @@ bool CustomMesh::createCustomMesh(const MatrixX3f& tMatVert, const MatrixX3f& tM
             rawColorArray[idxColor++] = 0.2f;
             rawColorArray[idxColor++] = 0.2f;
         } else {
-            rawColorArray[idxColor++] = tArrayColors[idxColor];
-            rawColorArray[idxColor++] = tArrayColors[idxColor];
-            rawColorArray[idxColor++] = tArrayColors[idxColor];
+            idxColor++;
+            rawColorArray[idxColor] = tArrayColors[idxColor];
+            idxColor++;
+            rawColorArray[idxColor] = tArrayColors[idxColor];
+            idxColor++;
+            rawColorArray[idxColor] = tArrayColors[idxColor];
         }
     }
 
@@ -227,11 +249,13 @@ bool CustomMesh::createCustomMesh(const MatrixX3f& tMatVert, const MatrixX3f& tM
     customGeometry->addAttribute(indexAttribute);
 
     this->setInstanceCount(1);
-    this->setBaseVertex(0);
-    this->setBaseInstance(0);
+    this->setIndexOffset(0);
+    //this->setFirstVertex(0);
+    this->setFirstInstance(0);
     this->setPrimitiveType(Qt3DRender::QGeometryRenderer::Triangles);
     this->setGeometry(customGeometry);
 
-    this->setPrimitiveCount(tMatTris.rows()*3);
+    this->setVertexCount(tMatTris.rows()*3);
+
     return true;
 }

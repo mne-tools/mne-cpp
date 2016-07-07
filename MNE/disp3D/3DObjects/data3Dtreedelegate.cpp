@@ -42,6 +42,26 @@
 
 #include "data3Dtreedelegate.h"
 
+#include "data3Dtreemodel.h"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QSpinBox>
+#include <QDoubleSpinBox>
+#include <QComboBox>
+#include <QDebug>
+#include <QPushButton>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -129,8 +149,8 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
             connect(pSpinBox, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
                     this, &Data3DTreeDelegate::onEditorEdited);
             pSpinBox->setSuffix(" mSec");
-            pSpinBox->setMinimum(1);
-            pSpinBox->setMaximum(5000);
+            pSpinBox->setMinimum(17);
+            pSpinBox->setMaximum(50000);
             pSpinBox->setSingleStep(10);
             pSpinBox->setValue(index.model()->data(index, MetaTreeItemRoles::RTDataTimeInterval).toInt());
             return pSpinBox;
