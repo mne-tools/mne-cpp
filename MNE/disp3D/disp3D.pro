@@ -37,7 +37,7 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = lib
 
-QT       += widgets 3dcore 3drender 3dinput 3dextras
+QT       += widgets 3dcore 3drender 3dinput 3dextras charts
 
 DEFINES += DISP3DNEW_LIBRARY
 
@@ -46,7 +46,7 @@ TARGET = $$join(TARGET,,MNE$${MNE_LIB_VERSION},)
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
-
+.
 RESOURCES += $$PWD/disp3d.qrc \
 
 LIBS += -L$${MNE_LIBRARY_DIR}
