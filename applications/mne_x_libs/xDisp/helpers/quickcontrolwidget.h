@@ -445,7 +445,7 @@ private:
     FiffInfo::SPtr                  m_pFiffInfo;                    /**< Connected fiff info. */
 
     QString                         m_sName;                        /**< Name of the widget which uses this quick control. */
-    QCheckBox *                     m_enableDisableProjectors;      /**< Holds the enable disable all check box. */
+    QCheckBox*                      m_pEnableDisableProjectors;     /**< Holds the enable disable all check box. */
     QPushButton*                    m_pShowFilterOptions;           /**< Holds the show filter options button. */
 
     QSignalMapper*                  m_pCompSignalMapper;            /**< The signal mapper. */

@@ -33,17 +33,17 @@ Requirements
 
 **Linux**
 
-\>= gcc 4.5
+\>= gcc 4.6.3
 
-**MacOSX**
+**OS X**
 
-\>= Clang 3.1
+\>= Clang 3.2
 
 
 Dependencies
 ============
 
-[>= Qt5.6](http://download.qt.io/official_releases/qt/)
+[>= Qt5.7](http://download.qt.io/official_releases/qt/)
 
 
 Contact information
@@ -57,7 +57,7 @@ Mailing List: http://mail.nmr.mgh.harvard.edu/mailman/listinfo/mne_analysis
 Releases
 ========
 
-[MNE1.0 release](https://github.com/mne-tools/mne-cpp/wiki/MNE-1.0-release)
+[1.0.0](http://wiki.mne-cpp.org/index.php/ChangeLog)
 
 
 Licensing

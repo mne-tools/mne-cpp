@@ -60,6 +60,7 @@ EventWindow::EventWindow(QWidget *parent)
 , ui(new Ui::EventWindowDockWidget)
 , m_pMainWindow(static_cast<MainWindow*>(parent))
 , m_pColordialog(new QColorDialog(this))
+, m_pEventDelegate(new EventDelegate(this))
 {
     ui->setupUi(this);
 
