@@ -51,18 +51,16 @@
 
 #include <QWidget>
 #include <QString>
-#include <QGridLayout>
-#include <QSharedPointer>
-#include <QMainWindow>
-#include <QtCharts/QChartView>
+#include <QtCharts/QChart>
 #include <QtCharts/QBarSeries>
 #include <QtCharts/QBarSet>
-#include <QtCharts/QLegend>
+//#include <QtCharts/QLegend>
+//#include <QMainWindow>
 #include <QtCharts/QBarCategoryAxis>
 
 //includes below used for debugging purposes
-#include <QDebug>
-#include <iostream>
+//#include <QDebug>
+//#include <iostream>
 
 
 //*************************************************************************************************************
@@ -75,18 +73,32 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+class QString;
+
+namespace QtCharts
+{
+ class QChartView;
+}
+
+
+//*************************************************************************************************************
+//=============================================================================================================
 // DEFINE NAMESPACE DISPLIB
 //=============================================================================================================
 
 namespace DISPLIB
 {
-QT_CHARTS_USE_NAMESPACE
 
 
 //*************************************************************************************************************
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
+
+
 
 
 //=============================================================================================================
@@ -150,8 +162,8 @@ private:
     * @param[out]   m_pAxis     customized x-axis to be used in m_pChart
     */
 
-    QChart*             m_pChart;
-    QBarCategoryAxis*   m_pAxis;
+    QtCharts::QChart*             m_pChart;
+    QtCharts::QBarCategoryAxis*   m_pAxis;
 };
 
 
@@ -204,7 +216,7 @@ void Bar::updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& mat
         currentLimits = ((QString::number(resultDisplayValues(kr), 'g' ,iPrecisionValue) + " to " + (QString::number(resultDisplayValues(kr+1), 'g', iPrecisionValue))));
         categories << currentLimits;
         *set << classFreq;
-        qDebug() << "Bar data points = " << currentLimits << " , " << classFreq;
+//        qDebug() << "Bar data points = " << currentLimits << " , " << classFreq;
     }
 
     //Create new series, then clear the plot and update with new data
