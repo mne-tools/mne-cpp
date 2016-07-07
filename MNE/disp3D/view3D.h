@@ -41,15 +41,12 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <iostream>
-
 #include "disp3D_global.h"
+
 #include "3DObjects/data3Dtreemodel.h"
-
-#include "helpers/window.h"
-#include "helpers/types.h"
-
-#include <mne/mne_sourceestimate.h>
+#include "fs/annotationset.h"
+#include "fs/annotation.h"
+#include "mne/mne_forwardsolution.h"
 
 
 //*************************************************************************************************************
@@ -57,32 +54,32 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QSharedPointer>
-#include <QWidget>
-#include <QWindow>
-#include <QDebug>
-
-#include <Qt3DCore/QAspectEngine>
-#include <Qt3DCore/QCamera>
-#include <Qt3DCore/QTransform>
-
-#include <Qt3DRender/QPhongMaterial>
-#include <Qt3DRender/QPerVertexColorMaterial>
-#include <Qt3DRender/QRenderAspect>
-#include <Qt3DRender/QFrameGraph>
-#include <Qt3DRender/QForwardRenderer>
-#include <Qt3DRender/QPointLight>
-#include <Qt3DRender/QCylinderMesh>
-
-#include <Qt3DInput/QInputAspect>
-
-#include <QPropertyAnimation>
+#include <Qt3DExtras/Qt3DWindow>
+#include <QVector3D>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
+
+class QPropertyAnimation;
+
+namespace MNELIB{
+    class MNESourceEstimate;
+    class MNESourceSpace;
+    class MNEBem;
+}
+
+namespace FSLIB{
+    class Surface;
+    class SurfaceSet;
+    class Surface;
+}
+
+namespace Qt3DCore {
+    class QTransform;
+}
 
 
 //*************************************************************************************************************
@@ -99,6 +96,8 @@ namespace DISP3DLIB
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+class BrainRTSourceLocDataTreeItem;
+
 
 //=============================================================================================================
 /**
@@ -106,7 +105,7 @@ namespace DISP3DLIB
 *
 * @brief Visualizes 3D data
 */
-class DISP3DNEWSHARED_EXPORT View3D : public Window
+class DISP3DNEWSHARED_EXPORT View3D : public Qt3DExtras::Qt3DWindow
 {
     Q_OBJECT
 
@@ -276,12 +275,8 @@ protected:
     */
     void createCoordSystem(Qt3DCore::QEntity *parent);
 
-    Qt3DCore::QAspectEngine             m_aspectEngine;                 /**< The aspect engine. */
     Qt3DCore::QEntity*                  m_pRootEntity;                  /**< The root/most top level entity buffer. */
-    Qt3DInput::QInputAspect*            m_pInputAspect;                 /**< The input aspect. */
-    Qt3DCore::QCamera*                  m_pCameraEntity;                /**< The camera entity. */
-    Qt3DRender::QFrameGraph*            m_pFrameGraph;                  /**< The frame graph holding the render information. */
-    Qt3DRender::QForwardRenderer*       m_pForwardRenderer;             /**< The renderer (here forward renderer). */
+    Qt3DRender::QCamera*                m_pCameraEntity;                /**< The camera entity. */
 
     QSharedPointer<Qt3DCore::QEntity>   m_XAxisEntity;                  /**< The entity representing a torus in x direction. */
     QSharedPointer<Qt3DCore::QEntity>   m_YAxisEntity;                  /**< The entity representing a torus in y direction. */

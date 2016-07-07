@@ -51,7 +51,7 @@ SUBDIRS += \
 !contains(MNECPP_CONFIG, minimalVersion) {
     SUBDIRS += disp
 
-    qtHaveModule(3dcore,3drender,3dinput) {
+    qtHaveModule(3dcore,3drender,3dinput,3dextras) {
         message(disp3D configured)
         SUBDIRS += \
             disp3D \

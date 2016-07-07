@@ -40,6 +40,33 @@
 
 #include "brainsurfacetreeitem.h"
 
+#include "../common/metatreeitem.h"
+#include "../../helpers/renderable3Dentity.h"
+
+#include "fs/label.h"
+#include "fs/surface.h"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Qt INCLUDES
+//=============================================================================================================
+
+#include <QList>
+#include <QVariant>
+#include <QStringList>
+#include <QColor>
+#include <QStandardItem>
+#include <QStandardItemModel>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -315,7 +342,7 @@ void BrainSurfaceTreeItem::onColorInfoOriginOrCurvColorChanged()
             this->setData(data, Data3DTreeModelItemRoles::SurfaceCurrentColorVert);
 
             //Emit the new colors which are to be used during rt source loc plotting
-            emit colorInfoOriginChanged(arrayNewVertColor);
+            emit colorInfoOriginChanged();
 
             //Return here because the new colors will be set to the renderable entity in the setData() function with the role Data3DTreeModelItemRoles::SurfaceCurrentColorVert
             return;
@@ -333,7 +360,7 @@ void BrainSurfaceTreeItem::onColorInfoOriginOrCurvColorChanged()
                     this->setData(data, Data3DTreeModelItemRoles::SurfaceCurrentColorVert);
 
                     //Emit the new colors which are to be used during rt source loc plotting
-                    emit colorInfoOriginChanged(arrayNewVertColor);
+                    emit colorInfoOriginChanged();
 
                     //Return here because the new colors will be set to the renderable entity in the setData() function with the role Data3DTreeModelItemRoles::SurfaceCurrentColorVert
                     return;
