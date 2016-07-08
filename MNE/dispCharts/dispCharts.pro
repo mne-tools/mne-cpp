@@ -37,7 +37,7 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = lib
 
-QT  += core widgets charts
+QT += core widgets charts
 
 DEFINES += DISPCHARTS_LIBRARY
 
@@ -80,11 +80,9 @@ else {
 }
 
 SOURCES += \
-    test.cpp \
 
 HEADERS += \
     dispCharts_global.h \
-    test.h \
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
