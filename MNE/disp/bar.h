@@ -50,7 +50,6 @@
 //=============================================================================================================
 
 #include <QWidget>
-#include <QString>
 #include <QtCharts/QChart>
 #include <QtCharts/QBarSeries>
 #include <QtCharts/QBarSet>
@@ -58,7 +57,6 @@
 
 //includes below used for debugging purposes
 //#include <QDebug>
-//#include <iostream>
 
 
 //*************************************************************************************************************
@@ -73,18 +71,6 @@
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
-
-class QString;
-
-namespace QWidget
-{
-class QGridLayout;
-}
-
-namespace QtCharts
-{
-class QChartView;
-}
 
 
 //*************************************************************************************************************
@@ -163,8 +149,8 @@ private:
     * @param[out]   m_pAxis     customized x-axis to be used in m_pChart
     */
 
-    QtCharts::QChart*             m_pChart;
-    QtCharts::QBarCategoryAxis*   m_pAxis;
+    QtCharts::QChart*             m_pChart; /**< QChart object that will be shown in the widget */
+    QtCharts::QBarCategoryAxis*   m_pAxis;  /**< Customized axis for bar histogram*/
 };
 
 
@@ -206,7 +192,7 @@ void Bar::updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& mat
     //Setup legends
     QString histogramExponent;
     histogramExponent = "X-axis scale: 10e" + QString::number(resultExponentValues(0));
-    QBarSet* set = new QBarSet(histogramExponent);
+    QtCharts::QBarSet* set = new QtCharts::QBarSet(histogramExponent);
     QStringList categories;
     QString currentLimits;
     int classFreq;
@@ -221,7 +207,7 @@ void Bar::updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& mat
     }
 
     //Create new series, then clear the plot and update with new data
-    QBarSeries *series = new QBarSeries();
+    QtCharts::QBarSeries *series = new QtCharts::QBarSeries();
     series->append(set);
 
     m_pChart->removeAllSeries();
