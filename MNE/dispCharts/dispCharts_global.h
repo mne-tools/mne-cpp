@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     dispCharts_global.h
+* @file     dispcharts_global.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
