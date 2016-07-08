@@ -51,6 +51,11 @@ SUBDIRS += \
 !contains(MNECPP_CONFIG, minimalVersion) {
     SUBDIRS += disp \
             disp3D \
+
+    qtHaveModule(charts) {
+        SUBDIRS += \
+                charts \
+    }
 }
 
 CONFIG += ordered
