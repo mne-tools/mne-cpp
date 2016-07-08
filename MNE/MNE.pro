@@ -51,7 +51,6 @@ SUBDIRS += \
 !contains(MNECPP_CONFIG, minimalVersion) {
     SUBDIRS += disp \
             disp3D \
-    }
 }
 
 CONFIG += ordered

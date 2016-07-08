@@ -127,13 +127,6 @@ FORMS += \
     realtimesamplearraywidget.ui \
     helpers/quickcontrolwidget.ui
 
-qtHaveModule(3dcore, 3drender, 3dinput) {
-    SOURCES +=
-
-    HEADERS +=
-}
-
-
 RESOURCES += \
     xDisp.qrc
 
