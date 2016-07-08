@@ -54,8 +54,6 @@
 #include <QtCharts/QChart>
 #include <QtCharts/QBarSeries>
 #include <QtCharts/QBarSet>
-//#include <QtCharts/QLegend>
-//#include <QMainWindow>
 #include <QtCharts/QBarCategoryAxis>
 
 //includes below used for debugging purposes
@@ -78,9 +76,14 @@
 
 class QString;
 
+namespace QWidget
+{
+class QGridLayout;
+}
+
 namespace QtCharts
 {
- class QChartView;
+class QChartView;
 }
 
 
@@ -97,8 +100,6 @@ namespace DISPLIB
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
-
-
 
 
 //=============================================================================================================
