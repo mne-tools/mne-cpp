@@ -37,11 +37,7 @@ include(../../../mne-cpp.pri)
 
 TEMPLATE = lib
 
-QT += widgets concurrent xml svg
-
-qtHaveModule(3dcore,3drender,3dinput,3dextras) {
-    QT += 3dcore 3drender 3dinput 3dextras
-}
+QT += widgets concurrent xml svg 3dcore 3drender 3dinput 3dextras
 
 DEFINES += XDISP_LIBRARY
 
@@ -59,6 +55,7 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Mned \
             -lMNE$${MNE_LIB_VERSION}Inversed \
             -lMNE$${MNE_LIB_VERSION}Dispd \
+            -lMNE$${MNE_LIB_VERSION}Disp3Dd \
             -lxMeasd \
 }
 else {
@@ -69,16 +66,8 @@ else {
             -lMNE$${MNE_LIB_VERSION}Mne \
             -lMNE$${MNE_LIB_VERSION}Inverse \
             -lMNE$${MNE_LIB_VERSION}Disp \
+            -lMNE$${MNE_LIB_VERSION}Disp3D \
             -lxMeas \
-}
-
-qtHaveModule(3dcore,3drender,3dinput,3dextras) {
-    CONFIG(debug, debug|release) {
-        LIBS += -lMNE$${MNE_LIB_VERSION}Disp3Dd
-    }
-    else {
-        LIBS += -lMNE$${MNE_LIB_VERSION}Disp3D
-    }
 }
 
 DESTDIR = $${MNE_LIBRARY_DIR}
@@ -112,6 +101,7 @@ SOURCES += \
     helpers/frequencyspectrumdelegate.cpp \
     helpers/frequencyspectrumsettingswidget.cpp \
     helpers/quickcontrolwidget.cpp \
+    realtimesourceestimatewidget.cpp\
 
 HEADERS += \
     xdisp_global.h \
@@ -131,15 +121,16 @@ HEADERS += \
     helpers/frequencyspectrummodel.h \
     helpers/frequencyspectrumsettingswidget.h \
     helpers/quickcontrolwidget.h \
+    realtimesourceestimatewidget.h \
 
 FORMS += \
     realtimesamplearraywidget.ui \
     helpers/quickcontrolwidget.ui
 
 qtHaveModule(3dcore, 3drender, 3dinput) {
-    SOURCES += realtimesourceestimatewidget.cpp
+    SOURCES +=
 
-    HEADERS += realtimesourceestimatewidget.h
+    HEADERS +=
 }
 
 
