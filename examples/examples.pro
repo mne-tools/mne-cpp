@@ -59,10 +59,6 @@ SUBDIRS += \
 
 !contains(MNECPP_CONFIG, minimalVersion) {
     SUBDIRS += \
-
-    qtHaveModule(3dcore,3drender,3dinput,3dextras) {
-    message(examples.pro - Qt3D available)
-    SUBDIRS += \
         clusteredInverse \
         rawClusteredInverse \
         rawClusteredInverseEEG \
@@ -77,5 +73,4 @@ SUBDIRS += \
         roiClusteredInversePwlRapMusic \
         fsSurface \
         disp3DTutorial \
-    }
 }
