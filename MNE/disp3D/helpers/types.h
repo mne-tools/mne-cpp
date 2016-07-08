@@ -141,15 +141,18 @@ namespace Data3DTreeModelItemRoles
                     LabeList = Qt::UserRole + 116,
                     LabeIds = Qt::UserRole + 117,
                     RTData = Qt::UserRole + 118,
-                    RTVertNo = Qt::UserRole + 119,
+                    RTVertNoLeftHemi = Qt::UserRole + 119,
                     RTTimes = Qt::UserRole + 120,
                     RTHemi = Qt::UserRole + 121,
-                    RTStartIdx = Qt::UserRole + 122,
-                    RTEndIdx = Qt::UserRole + 123,
+                    RTStartIdxLeftHemi = Qt::UserRole + 122,
+                    RTEndIdxLeftHemi = Qt::UserRole + 123,
                     VertexBased = Qt::UserRole + 124,
                     SmoothingBased = Qt::UserRole + 125,
                     AnnotationBased = Qt::UserRole + 126,
-                    BemName = Qt::UserRole + 127};
+                    BemName = Qt::UserRole + 127,
+                    RTStartIdxRightHemi = Qt::UserRole + 128,
+                    RTEndIdxRightHemi = Qt::UserRole + 129,
+                    RTVertNoRightHemi = Qt::UserRole + 130,};
 }
 
 namespace MetaTreeItemRoles

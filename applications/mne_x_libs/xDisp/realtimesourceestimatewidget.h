@@ -43,10 +43,13 @@
 //=============================================================================================================
 
 #include "xdisp_global.h"
-#include "newmeasurementwidget.h"
 
+#include "newmeasurementwidget.h"
 #include <disp3D/view3D.h>
 #include <disp3D/control/control3dwidget.h>
+
+#include "fs/annotationset.h"
+#include "fs/surfaceset.h"
 
 
 //*************************************************************************************************************
@@ -54,8 +57,11 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QSlider>
-#include <QAction>
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
 
 
 //*************************************************************************************************************
@@ -65,8 +71,11 @@
 
 class QTime;
 
-namespace XMEASLIB
-{
+namespace DISP3DLIB {
+    class BrainRTSourceLocDataTreeItem;
+}
+
+namespace XMEASLIB {
     class RealTimeSourceEstimate;
 }
 
@@ -79,14 +88,11 @@ namespace XMEASLIB
 namespace XDISPLIB
 {
 
+
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// FORWARD DECLARATIONS
 //=============================================================================================================
-
-using namespace XMEASLIB;
-using namespace DISP3DLIB;
-using namespace MNELIB;
 
 
 //*************************************************************************************************************
@@ -125,7 +131,7 @@ public:
     * @param [in] pTime         pointer to application time.
     * @param [in] parent        pointer to parent widget; If parent is 0, the new NumericWidget becomes a window. If parent is another widget, NumericWidget becomes a child window inside parent. NumericWidget is deleted when its parent is deleted.
     */
-    RealTimeSourceEstimateWidget(QSharedPointer<RealTimeSourceEstimate> &pRTSE, QWidget* parent = 0);
+    RealTimeSourceEstimateWidget(QSharedPointer<XMEASLIB::RealTimeSourceEstimate> &pRTSE, QWidget* parent = 0);
 
 //    RealTimeSourceEstimateWidget(QSharedPointer<RealTimeSourceEstimate> pRTMSE, QSharedPointer<QTime> pTime, QWidget* parent = 0);
 
@@ -163,18 +169,18 @@ protected slots:
     void show3DControlWidget();
 
 private:
-    QSharedPointer<RealTimeSourceEstimate> m_pRTSE;     /**< The real-time source estimate measurement. */
+    QSharedPointer<XMEASLIB::RealTimeSourceEstimate>  m_pRTSE;            /**< The real-time source estimate measurement. */
 
-    bool                            m_bInitialized;     /**< Whether init was processed successfully. */
+    bool                                            m_bInitialized;     /**< Whether init was processed successfully. */
 
-    AnnotationSet                   m_annotationSet;
-    SurfaceSet                      m_surfSet;
+    FSLIB::AnnotationSet                            m_annotationSet;    /**< The current annotation set. */
+    FSLIB::SurfaceSet                               m_surfSet;          /**< The current surface set. */
 
-    View3D::SPtr                    m_p3DView;
-    Control3DWidget::SPtr           m_pControl3DView;
-    QList<BrainRTSourceLocDataTreeItem*>     m_lRtItem;
+    DISP3DLIB::View3D::SPtr                         m_p3DView;          /**< The Disp3D view. */
+    DISP3DLIB::Control3DWidget::SPtr                m_pControl3DView;   /**< The Disp3D control. */
+    QList<DISP3DLIB::BrainRTSourceLocDataTreeItem*> m_lRtItem;          /**< The Disp3D real time items. */
 
-    QAction*                        m_pAction3DControl; /**< show 3D View control widget */
+    QAction*                                        m_pAction3DControl; /**< Show 3D View control widget */
 
 signals:
     void startInit();
