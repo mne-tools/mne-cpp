@@ -43,9 +43,7 @@
 
 #include <xDisp/realtimesamplearraywidget.h>
 #include <xDisp/realtimemultisamplearraywidget.h>
-#if defined(QT3D_LIBRARY_AVAILABLE)
 #include <xDisp/realtimesourceestimatewidget.h>
-#endif
 #include <xDisp/realtimeevokedwidget.h>
 #include <xDisp/realtimecovwidget.h>
 #include <xDisp/frequencyspectrumwidget.h>
@@ -154,7 +152,6 @@ QWidget* DisplayManager::show(IPlugin::OutputConnectorList &outputConnectorList,
             vboxLayout->addWidget(rtmsaWidget);
             rtmsaWidget->init();
         }
-    #if defined(QT3D_LIBRARY_AVAILABLE)
         else if(pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeSourceEstimate> >())
         {
             QSharedPointer<RealTimeSourceEstimate>* pRealTimeSourceEstimate = &pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeSourceEstimate> >()->data();
@@ -169,7 +166,6 @@ QWidget* DisplayManager::show(IPlugin::OutputConnectorList &outputConnectorList,
             vboxLayout->addWidget(rtseWidget);
             rtseWidget->init();
         }
-    #endif
         else if(pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeEvoked> >())
         {
             QSharedPointer<RealTimeEvoked>* pRealTimeEvoked = &pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeEvoked> >()->data();
