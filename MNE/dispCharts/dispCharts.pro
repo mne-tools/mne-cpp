@@ -84,7 +84,7 @@ SOURCES += \
 
 HEADERS += \
     test.h \
-    dispCharts_global.h \
+    dispcharts_global.h \
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

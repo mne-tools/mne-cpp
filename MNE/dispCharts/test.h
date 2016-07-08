@@ -1,7 +1,7 @@
 #ifndef TEST_H
 #define TEST_H
 
-#include "dispCharts_global.h"
+#include "dispcharts_global.h"
 #include <QObject>
 #include <QWidget>
 
