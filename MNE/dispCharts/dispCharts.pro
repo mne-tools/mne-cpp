@@ -80,8 +80,10 @@ else {
 }
 
 SOURCES += \
+    test.cpp \
 
 HEADERS += \
+    test.h \
     dispCharts_global.h \
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
