@@ -69,6 +69,9 @@ QuickControlWidget::QuickControlWidget(const QMap<qint32, float>& qMapChScaling,
 , m_pFiffInfo(pFiffInfo)
 , m_slFlags(slFlags)
 , m_sName(name)
+, m_pEnableDisableProjectors(Q_NULLPTR)
+, m_pShowFilterOptions(Q_NULLPTR)
+, m_pCompSignalMapper(Q_NULLPTR)
 {
     ui->setupUi(this);
 
@@ -350,7 +353,9 @@ void QuickControlWidget::onCheckProjStatusChanged(bool status)
         this->m_pFiffInfo->projs[i].active = m_qListProjCheckBox[i]->isChecked();
     }
 
-    m_enableDisableProjectors->setChecked(bAllActivated);
+    if(m_pEnableDisableProjectors) {
+        m_pEnableDisableProjectors->setChecked(bAllActivated);
+    }
 
     emit projSelectionChanged();
 
@@ -370,7 +375,9 @@ void QuickControlWidget::onEnableDisableAllProj(bool status)
     for(int i=0; i < m_pFiffInfo->projs.size(); ++i)
         m_pFiffInfo->projs[i].active = status;
 
-    m_enableDisableProjectors->setChecked(status);
+    if(m_pEnableDisableProjectors) {
+        m_pEnableDisableProjectors->setChecked(status);
+    }
 
     emit projSelectionChanged();
 
@@ -1072,10 +1079,10 @@ void QuickControlWidget::createProjectorGroup()
 
         topLayout->addWidget(line, i+1, 0);
 
-        m_enableDisableProjectors = new QCheckBox("Enable all");
-        m_enableDisableProjectors->setChecked(bAllActivated);
-        topLayout->addWidget(m_enableDisableProjectors, i+2, 0);
-        connect(m_enableDisableProjectors, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
+        m_pEnableDisableProjectors = new QCheckBox("Enable all");
+        m_pEnableDisableProjectors->setChecked(bAllActivated);
+        topLayout->addWidget(m_pEnableDisableProjectors, i+2, 0);
+        connect(m_pEnableDisableProjectors, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
             this, &QuickControlWidget::onEnableDisableAllProj);
 
         //Find SSP tab and add current layout

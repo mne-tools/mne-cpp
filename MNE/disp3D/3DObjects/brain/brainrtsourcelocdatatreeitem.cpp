@@ -40,6 +40,34 @@
 
 #include "brainrtsourcelocdatatreeitem.h"
 
+#include "../../rt/rtSourceLoc/rtsourcelocdataworker.h"
+
+#include "../common/metatreeitem.h"
+
+#include "mne/mne_sourceestimate.h"
+#include "mne/mne_forwardsolution.h"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Qt INCLUDES
+//=============================================================================================================
+
+#include <QList>
+#include <QVariant>
+#include <QStringList>
+#include <QColor>
+#include <QStandardItem>
+#include <QStandardItemModel>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -98,57 +126,56 @@ void BrainRTSourceLocDataTreeItem::setData(const QVariant& value, int role)
 
 //*************************************************************************************************************
 
-bool BrainRTSourceLocDataTreeItem::init(const MNEForwardSolution& tForwardSolution, const QByteArray& arraySurfaceVertColor, int iHemi, const VectorXi& vecLabelIds, const QList<FSLIB::Label>& lLabels)
+bool BrainRTSourceLocDataTreeItem::init(const MNEForwardSolution& tForwardSolution,
+                                        const QByteArray& arraySurfaceVertColorLeftHemi,
+                                        const QByteArray& arraySurfaceVertColorRightHemi,
+                                        const VectorXi& vecLabelIdsLeftHemi,
+                                        const VectorXi& vecLabelIdsRightHemi,
+                                        const QList<FSLIB::Label>& lLabelsLeftHemi,
+                                        const QList<FSLIB::Label>& lLabelsRightHemi)
 {   
-    //Set hemisphere information as item's data
-    this->setData(iHemi, Data3DTreeModelItemRoles::RTHemi);
+    if(tForwardSolution.src.size() < 2) {
+        return false;
+    }
 
     //Set data based on clusterd or full source space
-    bool isClustered = tForwardSolution.src[iHemi].isClustered();
+    bool isClustered = tForwardSolution.src[0].isClustered();
 
     if(isClustered) {
-        //Source Space IS clustered
-        switch(iHemi) {
-            case 0:
-                this->setData(0, Data3DTreeModelItemRoles::RTStartIdx);
-                this->setData(tForwardSolution.src[0].cluster_info.centroidSource_rr.size() - 1, Data3DTreeModelItemRoles::RTEndIdx);
-                break;
+        //Source Space IS clustered        
+        this->setData(0, Data3DTreeModelItemRoles::RTStartIdxLeftHemi);
+        this->setData(tForwardSolution.src[0].cluster_info.centroidSource_rr.size() - 1, Data3DTreeModelItemRoles::RTEndIdxLeftHemi);
 
-            case 1:
-                this->setData(tForwardSolution.src[0].cluster_info.centroidSource_rr.size(), Data3DTreeModelItemRoles::RTStartIdx);
-                this->setData(tForwardSolution.src[0].cluster_info.centroidSource_rr.size() + tForwardSolution.src[1].cluster_info.centroidSource_rr.size() - 1, Data3DTreeModelItemRoles::RTEndIdx);
-                break;
-        }
+        this->setData(tForwardSolution.src[0].cluster_info.centroidSource_rr.size(), Data3DTreeModelItemRoles::RTStartIdxRightHemi);
+        this->setData(tForwardSolution.src[0].cluster_info.centroidSource_rr.size() + tForwardSolution.src[1].cluster_info.centroidSource_rr.size() - 1, Data3DTreeModelItemRoles::RTEndIdxRightHemi);
     } else {
         //Source Space is NOT clustered
-        switch(iHemi) {
-            case 0:
-                this->setData(0, Data3DTreeModelItemRoles::RTStartIdx);
-                this->setData(tForwardSolution.src[0].nuse - 1, Data3DTreeModelItemRoles::RTEndIdx);
-                break;
+        this->setData(0, Data3DTreeModelItemRoles::RTStartIdxLeftHemi);
+        this->setData(tForwardSolution.src[0].nuse - 1, Data3DTreeModelItemRoles::RTEndIdxLeftHemi);
 
-            case 1:
-                this->setData(tForwardSolution.src[0].nuse, Data3DTreeModelItemRoles::RTStartIdx);
-                this->setData(tForwardSolution.src[0].nuse + tForwardSolution.src[1].nuse - 1, Data3DTreeModelItemRoles::RTEndIdx);
-                break;
-        }
+        this->setData(tForwardSolution.src[0].nuse, Data3DTreeModelItemRoles::RTStartIdxRightHemi);
+        this->setData(tForwardSolution.src[0].nuse + tForwardSolution.src[1].nuse - 1, Data3DTreeModelItemRoles::RTEndIdxRightHemi);
     }
 
     QVariant data;
 
-    if(iHemi != -1 && iHemi < tForwardSolution.src.size()) {
+    for(int i = 0; i < tForwardSolution.src.size(); ++i) {
         if(isClustered) {
             //When clustered source space, the idx no's are the annotation labels. Take the .cluster_info.centroidVertno instead.
-            VectorXi clustVertNo(tForwardSolution.src[iHemi].cluster_info.centroidVertno.size());
-            for(int i = 0; i <clustVertNo.rows(); i++) {
-                clustVertNo(i) = tForwardSolution.src[iHemi].cluster_info.centroidVertno.at(i);
+            VectorXi clustVertNo(tForwardSolution.src[i].cluster_info.centroidVertno.size());
+            for(int j = 0; j < clustVertNo.rows(); ++j) {
+                clustVertNo(j) = tForwardSolution.src[i].cluster_info.centroidVertno.at(j);
             }
             data.setValue(clustVertNo);
         } else {
-            data.setValue(tForwardSolution.src[iHemi].vertno);
+            data.setValue(tForwardSolution.src[i].vertno);
         }
 
-        this->setData(data, Data3DTreeModelItemRoles::RTVertNo);
+        if(i == 0) {
+            this->setData(data, Data3DTreeModelItemRoles::RTVertNoLeftHemi);
+        } else if (i == 1) {
+            this->setData(data, Data3DTreeModelItemRoles::RTVertNoRightHemi);
+        }
     }
 
     //Add meta information as item children
@@ -162,6 +189,7 @@ bool BrainRTSourceLocDataTreeItem::init(const MNEForwardSolution& tForwardSoluti
     this->appendRow(list);
     pItemRTDataStreamStatus->setCheckable(true);
     pItemRTDataStreamStatus->setCheckState(Qt::Unchecked);
+
     data.setValue(false);
     pItemRTDataStreamStatus->setData(data, MetaTreeItemRoles::RTDataStreamStatus);
 
@@ -172,7 +200,7 @@ bool BrainRTSourceLocDataTreeItem::init(const MNEForwardSolution& tForwardSoluti
     list << pItemVisuaizationType;
     list << new QStandardItem(pItemVisuaizationType->toolTip());
     this->appendRow(list);
-    data.setValue(QString("Single Vertex"));
+    data.setValue(QString("Vertex based"));
     pItemVisuaizationType->setData(data, MetaTreeItemRoles::RTDataVisualizationType);
 
     QString sIsClustered = isClustered ? "Clustered" : "Full";
@@ -195,14 +223,14 @@ bool BrainRTSourceLocDataTreeItem::init(const MNEForwardSolution& tForwardSoluti
     data.setValue(QString("Hot Negative 2"));
     pItemColormapType->setData(data, MetaTreeItemRoles::RTDataColormapType);
 
-    MetaTreeItem* pItemSourceLocNormValue = new MetaTreeItem(MetaTreeItemTypes::RTDataNormalizationValue, "10.0");
+    MetaTreeItem* pItemSourceLocNormValue = new MetaTreeItem(MetaTreeItemTypes::RTDataNormalizationValue, "5.0,5.5,15");
     connect(pItemSourceLocNormValue, &MetaTreeItem::rtDataNormalizationValueChanged,
             this, &BrainRTSourceLocDataTreeItem::onDataNormalizationValueChanged);
     list.clear();
     list << pItemSourceLocNormValue;
     list << new QStandardItem(pItemSourceLocNormValue->toolTip());
     this->appendRow(list);
-    data.setValue(10.0);
+    data.setValue(QVector3D(5.0,5.5,15));
     pItemSourceLocNormValue->setData(data, MetaTreeItemRoles::RTDataNormalizationValue);
 
     MetaTreeItem *pItemStreamingInterval = new MetaTreeItem(MetaTreeItemTypes::RTDataTimeInterval, "1000");
@@ -236,8 +264,15 @@ bool BrainRTSourceLocDataTreeItem::init(const MNEForwardSolution& tForwardSoluti
     pItemAveragedStreaming->setData(data, MetaTreeItemRoles::RTDataNumberAverages);
 
     //set rt data corresponding to the hemisphere
-    m_pSourceLocRtDataWorker->setSurfaceData(arraySurfaceVertColor, this->data(Data3DTreeModelItemRoles::RTVertNo).value<VectorXi>());
-    m_pSourceLocRtDataWorker->setAnnotationData(vecLabelIds, lLabels);
+    m_pSourceLocRtDataWorker->setSurfaceData(arraySurfaceVertColorLeftHemi,
+                                             arraySurfaceVertColorRightHemi,
+                                             this->data(Data3DTreeModelItemRoles::RTVertNoLeftHemi).value<VectorXi>(),
+                                             this->data(Data3DTreeModelItemRoles::RTVertNoRightHemi).value<VectorXi>());
+
+    m_pSourceLocRtDataWorker->setAnnotationData(vecLabelIdsLeftHemi,
+                                                vecLabelIdsRightHemi,
+                                                lLabelsLeftHemi,
+                                                lLabelsRightHemi);
 
     m_bIsInit = true;
 
@@ -254,26 +289,12 @@ bool BrainRTSourceLocDataTreeItem::addData(const MNESourceEstimate& tSourceEstim
         return false;
     }
 
-    int iStartIdx = this->data(Data3DTreeModelItemRoles::RTStartIdx).toInt();
-    int iEndIdx = this->data(Data3DTreeModelItemRoles::RTEndIdx).toInt();
-
-//    qDebug() << "BrainRTSourceLocDataTreeItem::addData - iStartIdx" << iStartIdx;
-//    qDebug() << "BrainRTSourceLocDataTreeItem::addData - iEndIdx" << iEndIdx;
-//    qDebug() << "BrainRTSourceLocDataTreeItem::addData - tSourceEstimate.data.rows()" << tSourceEstimate.data.rows();
-
-    if(iStartIdx >= tSourceEstimate.data.rows() || iEndIdx >= tSourceEstimate.data.rows()) {
-        qDebug() << "BrainRTSourceLocDataTreeItem::addData - Start and/or end index do not match with incoming data";
-        return false;
-    }
-
-    MatrixXd subData = tSourceEstimate.data.block(iStartIdx, 0, iEndIdx-iStartIdx+1, tSourceEstimate.data.cols());
-
     //Set new data into item's data. The set data is for eample needed in the delegate to calculate the histogram.
     QVariant data;
-    data.setValue(subData);
+    data.setValue(tSourceEstimate.data);
     this->setData(data, Data3DTreeModelItemRoles::RTData);
 
-    m_pSourceLocRtDataWorker->addData(subData);
+    m_pSourceLocRtDataWorker->addData(tSourceEstimate.data);
 
     return true;
 }
@@ -404,9 +425,12 @@ void BrainRTSourceLocDataTreeItem::setNormalization(const QVector3D& vecThreshol
 
 //*************************************************************************************************************
 
-void BrainRTSourceLocDataTreeItem::onColorInfoOriginChanged(const QByteArray& arrayVertColor)
+void BrainRTSourceLocDataTreeItem::onColorInfoOriginChanged(const QByteArray& arrayVertColorLeftHemisphere, const QByteArray& arrayVertColorRightHemisphere)
 {
-    m_pSourceLocRtDataWorker->setSurfaceData(arrayVertColor, this->data(Data3DTreeModelItemRoles::RTVertNo).value<VectorXi>());
+    m_pSourceLocRtDataWorker->setSurfaceData(arrayVertColorLeftHemisphere,
+                                             arrayVertColorRightHemisphere,
+                                             this->data(Data3DTreeModelItemRoles::RTVertNoLeftHemi).value<VectorXi>(),
+                                             this->data(Data3DTreeModelItemRoles::RTVertNoRightHemi).value<VectorXi>());
 }
 
 
@@ -426,7 +450,7 @@ void BrainRTSourceLocDataTreeItem::onCheckStateWorkerChanged(const Qt::CheckStat
 
 //*************************************************************************************************************
 
-void BrainRTSourceLocDataTreeItem::onNewRtData(const QByteArray& sourceColorSamples)
+void BrainRTSourceLocDataTreeItem::onNewRtData(const QPair<QByteArray, QByteArray>& sourceColorSamples)
 {
     emit rtVertColorChanged(sourceColorSamples);
 }

@@ -40,6 +40,7 @@
 
 #include <fs/label.h>
 #include <fs/surface.h>
+#include <fs/surfaceset.h>
 #include <fs/annotationset.h>
 
 #include <fiff/fiff_evoked.h>

@@ -179,14 +179,6 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns if source space is set.
-    *
-    * @return the connected source space
-    */
-    inline MNESourceEstimate& getStc();
-
-    //=========================================================================================================
-    /**
     * Returns whether RealTimeEvoked contains values
     *
     * @return whether RealTimeEvoked contains values.
