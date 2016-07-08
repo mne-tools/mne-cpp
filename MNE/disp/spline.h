@@ -50,18 +50,8 @@
 
 #include <QWidget>
 #include <QString>
-#include <QGridLayout>
-#include <QtCharts/QChartView>
-#include <QtCharts/QSplineSeries>
-#include <QtCharts/QLineSeries>
 #include <QtCharts/QChart>
-#include <QtCharts/QLegendMarker>
-#include <QtCharts/QLegend>
-#include <QtGui/QMouseEvent>
-#include <QtGui/QResizeEvent>
-#include <QtWidgets/QGraphicsScene>
-#include <QtWidgets/QGraphicsTextItem>
-#include <QDebug>
+#include <QtCharts/QSplineSeries>
 #include <QVector3D>
 #include <QList>
 #include <disp/helpers/colormap.h>
@@ -75,6 +65,17 @@
 #include <Eigen/Core>
 
 
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+class QMouseEvent;
+namespace QtCharts
+{
+class QLineSeries;
+}
+
+
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE NAMESPACE DISP3DLIB
@@ -82,7 +83,6 @@
 
 namespace DISPLIB
 {
-QT_CHARTS_USE_NAMESPACE
 
 
 //*************************************************************************************************************
@@ -188,7 +188,7 @@ public:
 
     //=========================================================================================================
 
-    Eigen::VectorXi m_vecResultExponentValues;   /**< Common exponent values for the entire histogram*/
+    Eigen::VectorXi m_vecResultExponentValues; /**< Common exponent values for the entire histogram*/
     double          m_dMinAxisX;               /**< Display value of the smallest point of the series in x-axis */
     double          m_dMaxAxisX;               /**< Display value of the largest point on the series in x-axis */
 
@@ -200,18 +200,18 @@ private:
     * @param[in]  cThresholdName    name of the Line
     * @param[in]  lineSeries        qlineseries of the corresponding threshold line
     */
-    void updateThreshold (QLineSeries *lineSeries);
+    void updateThreshold (QtCharts::QLineSeries *lineSeries);
 
     //=========================================================================================================
-    QChart*          m_pChart;              /**< Qchart object that will be shown in the widget */
-    QSplineSeries*   m_pSeries;                /**< Spline data series that will contain the histogram data*/
-    QLineSeries*     m_pLeftThreshold;         /**< Vertical line series for the left threshold */
-    QLineSeries*     m_pMiddleThreshold;       /**< Vertical line series for the middle threshold */
-    QLineSeries*     m_pRightThreshold;        /**< Vertical line series for the right threshold */
-    int              m_iMaximumFrequency;      /**< Highest value of frequency (y-axis) */
-    QVector<double>  m_vecReturnVector;          /**< QVector consisting of 6 double values used in getThreshold function*/
-    QList<QVector3D> m_pReturnList;            /**< QList consisting of 2 QVector3D used in getThreshold function*/
-    QString          m_colorMap;            /**< QString that will be used to set the color mapping on the histogram*/
+    QtCharts::QChart*        m_pChart;            /**< Qchart object that will be shown in the widget */
+    QtCharts::QSplineSeries* m_pSeries;           /**< Spline data series that will contain the histogram data*/
+    QtCharts::QLineSeries*   m_pLeftThreshold;    /**< Vertical line series for the left threshold */
+    QtCharts::QLineSeries*   m_pMiddleThreshold;  /**< Vertical line series for the middle threshold */
+    QtCharts::QLineSeries*   m_pRightThreshold;   /**< Vertical line series for the right threshold */
+    int                      m_iMaximumFrequency; /**< Highest value of frequency (y-axis) */
+    QVector<double>          m_vecReturnVector;   /**< QVector consisting of 6 double values used in getThreshold function*/
+    QList<QVector3D>         m_pReturnList;       /**< QList consisting of 2 QVector3D used in getThreshold function*/
+    QString                  m_colorMap;          /**< QString that will be used to set the color mapping on the histogram*/
 
 signals:
     //=========================================================================================================
@@ -285,9 +285,9 @@ void Spline::updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& 
             m_iMaximumFrequency = matClassFrequencyData(ir);
         }
     }
-    m_pLeftThreshold = new QLineSeries();
-    m_pMiddleThreshold = new QLineSeries();
-    m_pRightThreshold = new QLineSeries();
+    m_pLeftThreshold = new QtCharts::QLineSeries();
+    m_pMiddleThreshold = new QtCharts::QLineSeries();
+    m_pRightThreshold = new QtCharts::QLineSeries();
     m_pLeftThreshold->setName("left");
     m_pMiddleThreshold->setName("middle");
     m_pRightThreshold->setName("right");

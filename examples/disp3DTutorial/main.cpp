@@ -107,7 +107,7 @@ int main(int argc, char *argv[])
     QCommandLineParser parser;
     parser.setApplicationDescription("Start disp3D tutorial");
     parser.addHelpOption();
-    //change type to either pial or orig for non-flated brain display
+    //change type to either "pial" or "orig" for non-inflated brain model; change type to "inflated" for inflated brain model
     QCommandLineOption sampleSurfOption("surfType", "Surface type <type>.", "type", "inflated");
     QCommandLineOption sampleAnnotOption("annotType", "Annotation type <type>.", "type", "aparc.a2009s");
     QCommandLineOption sampleHemiOption("hemi", "Selected hemisphere <hemi>.", "hemi", "2");
