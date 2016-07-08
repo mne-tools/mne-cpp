@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     charts_global.h
+* @file     dispCharts_global.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    charts library export/import macros.
+* @brief    DispCharts library export/import macros.
 *
 */
 
-#ifndef CHARTS_GLOBAL_H
-#define CHARTS_GLOBAL_H
+#ifndef DISPCHARTS_GLOBAL_H
+#define DISPCHARTS_GLOBAL_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -50,17 +50,17 @@
 //=============================================================================================================
 
 #if defined(BUILD_MNECPP_STATIC_LIB)
-#  define CHARTSSHARED_EXPORT
-#elif defined(CHARTS_LIBRARY)
-#  define CHARTSSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+#  define DISPCHARTSSHARED_EXPORT
+#elif defined(DISPCHARTS_LIBRARY)
+#  define DISPCHARTSSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
 #else
-#  define CHARTSSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+#  define DISPCHARTSSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
 
-//#if defined(CHARTS_LIBRARY)
-//#  define CHARTSSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+//#if defined(DISPCHARTS_LIBRARY)
+//#  define DISPCHARTSSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
 //#else
-//#  define CHARTSSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+//#  define DISPCHARTSSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 //#endif
 
 #endif // CHARTS_GLOBAL_H

@@ -29,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file builds the charts library.
+# @brief    This project file builds the dispCharts library.
 #
 #--------------------------------------------------------------------------------------------------------------
 
@@ -39,9 +39,9 @@ TEMPLATE = lib
 
 QT  += core widgets charts
 
-DEFINES += CHARTS_LIBRARY
+DEFINES += DISPCHARTS_LIBRARY
 
-TARGET = Charts
+TARGET = DispCharts
 TARGET = $$join(TARGET,,MNE$${MNE_LIB_VERSION},)
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
@@ -83,7 +83,7 @@ SOURCES += \
     test.cpp \
 
 HEADERS += \
-    charts_global.h \
+    dispCharts_global.h \
     test.h \
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
@@ -91,7 +91,7 @@ INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
 # Install headers to include directory
 header_files.files = ./*.h
-header_files.path = $${MNE_INCLUDE_DIR}/charts
+header_files.path = $${MNE_INCLUDE_DIR}/dispCharts
 
 INSTALLS += header_files
 

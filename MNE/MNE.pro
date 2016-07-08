@@ -54,7 +54,7 @@ SUBDIRS += \
 
     qtHaveModule(charts) {
         SUBDIRS += \
-                charts \
+                dispCharts \
     }
 }
 
