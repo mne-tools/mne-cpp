@@ -55,6 +55,7 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Fiffd \
             -lMNE$${MNE_LIB_VERSION}Mned \
             -lMNE$${MNE_LIB_VERSION}Dispd \
+            -lMNE$${MNE_LIB_VERSION}Disp3Dd \
             -lxMeasd \
             -lxDispd \
             -lmne_xd
@@ -66,18 +67,10 @@ else {
             -lMNE$${MNE_LIB_VERSION}Fiff \
             -lMNE$${MNE_LIB_VERSION}Mne \
             -lMNE$${MNE_LIB_VERSION}Disp \
+            -lMNE$${MNE_LIB_VERSION}Disp3D \
             -lxMeas \
             -lxDisp \
             -lmne_x
-}
-
-qtHaveModule(3dcore, 3drender, 3dinput) {
-    CONFIG(debug, debug|release) {
-        LIBS += -lMNE$${MNE_LIB_VERSION}Disp3Dd
-    }
-    else {
-        LIBS += -lMNE$${MNE_LIB_VERSION}Disp3D
-    }
 }
 
 DESTDIR = $${MNE_BINARY_DIR}

@@ -1,14 +1,14 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     BabyMEG.pro
-# @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+# @file     dispCharts.pro
+# @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
-# @date     July, 2012
+# @date     July, 2016
 #
 # @section  LICENSE
 #
-# Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+# Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -18,7 +18,7 @@
 #       the following disclaimer in the documentation and/or other materials provided with the distribution.
 #     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 #       to endorse or promote products derived from this software without specific prior written permission.
-#
+# 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 # WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
 # PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
@@ -29,69 +29,89 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file generates the makefile for the BabyMEG plug-in.
+# @brief    This project file builds the dispCharts library.
 #
 #--------------------------------------------------------------------------------------------------------------
 
-include(../../../../mne-cpp.pri)
+include(../../mne-cpp.pri)
 
 TEMPLATE = lib
 
-CONFIG += plugin
+QT += core widgets charts
 
-DEFINES += BABYMEG_LIBRARY
+DEFINES += DISPCHARTS_LIBRARY
 
-#DEFINES += DACQ_OLD_CONNECTION_SCHEME # HP-UX
-
-QT += network
-QT -= gui
-
-TARGET = BabyMEG
-
+TARGET = DispCharts
+TARGET = $$join(TARGET,,MNE$${MNE_LIB_VERSION},)
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
 
 LIBS += -L$${MNE_LIBRARY_DIR}
-
 CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
             -lMNE$${MNE_LIB_VERSION}Utilsd \
-            -lMNE$${MNE_LIB_VERSION}Fiffd \
-            -lMNE$${MNE_LIB_VERSION}Mned \
-            -lMNE$${MNE_LIB_VERSION}RtCommandd
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
             -lMNE$${MNE_LIB_VERSION}Utils \
-            -lMNE$${MNE_LIB_VERSION}Fiff \
-            -lMNE$${MNE_LIB_VERSION}Mne \
-            -lMNE$${MNE_LIB_VERSION}RtCommand
 }
 
-DESTDIR = $${MNE_BINARY_DIR}/mne_rt_server_plugins
+DESTDIR = $${MNE_LIBRARY_DIR}
+
+contains(MNECPP_CONFIG, build_MNECPP_Static_Lib) {
+    CONFIG += staticlib
+    DEFINES += BUILD_MNECPP_STATIC_LIB
+}
+else {
+    CONFIG += dll
+
+    #
+    # win32: copy dll's to bin dir
+    # unix: add lib folder to LD_LIBRARY_PATH
+    #
+    win32 {
+        FILE = $${DESTDIR}/$${TARGET}.dll
+        BINDIR = $${DESTDIR}/../bin
+        FILE ~= s,/,\\,g
+        BINDIR ~= s,/,\\,g
+        QMAKE_POST_LINK += $${QMAKE_COPY} $$quote($${FILE}) $$quote($${BINDIR}) $$escape_expand(\\n\\t)
+    }
+}
 
 SOURCES += \
-    babymeg.cpp \
-    babymeginfo.cpp \
-    babymegclient.cpp
+    test.cpp \
 
 HEADERS += \
-    ../../mne_rt_server/IConnector.h \  #IConnector is a Q_OBJECT and the resulting moc file needs to be known -> that's why inclution is important!
-    babymeg_global.h \
-    babymeg.h \
-    babymeginfo.h \
-    babymegclient.h
+    test.h \
+    dispcharts_global.h \
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
-OTHER_FILES += babymeg.json
+# Install headers to include directory
+header_files.files = ./*.h
+header_files.path = $${MNE_INCLUDE_DIR}/dispCharts
 
-# Put generated form headers into the origin --> cause other src is pointing at them
-UI_DIR = $${PWD}
+INSTALLS += header_files
+
+FORMS += \
 
 unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
 
-# suppress visibility warnings
-unix: QMAKE_CXXFLAGS += -Wno-attributes
+# Deploy Qt Dependencies
+win32 {
+    isEmpty(TARGET_EXT) {
+        TARGET_CUSTOM_EXT = .dll
+    } else {
+        TARGET_CUSTOM_EXT = $${TARGET_EXT}
+    }
+
+    DEPLOY_COMMAND = windeployqt
+
+    DEPLOY_TARGET = $$shell_quote($$shell_path($${MNE_BINARY_DIR}/$${TARGET}$${TARGET_CUSTOM_EXT}))
+
+    #  # Uncomment the following line to help debug the deploy command when running qmake
+    #  warning($${DEPLOY_COMMAND} $${DEPLOY_TARGET})
+    QMAKE_POST_LINK += $${DEPLOY_COMMAND} $${DEPLOY_TARGET}
+}

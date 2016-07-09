@@ -39,12 +39,6 @@ TEMPLATE = lib
 
 QT += widgets svg
 
-qtHaveModule(3dcore, 3drender, 3dinput) {
-    QT += 3dcore 3drender 3dinput 3dextras
-
-    DEFINES += QT3D_LIBRARY_AVAILABLE
-}
-
 DEFINES += MNE_X_LIBRARY
 
 TARGET = mne_x
@@ -68,15 +62,6 @@ else {
             -lMNE$${MNE_LIB_VERSION}Disp \
             -lxMeas \
             -lxDisp
-}
-
-qtHaveModule(3dcore 3drender 3dinput 3dextras) {
-    CONFIG(debug, debug|release) {
-        LIBS += -lMNE$${MNE_LIB_VERSION}Disp3Dd
-    }
-    else {
-        LIBS += -lMNE$${MNE_LIB_VERSION}Disp3D
-    }
 }
 
 DESTDIR = $${MNE_LIBRARY_DIR}

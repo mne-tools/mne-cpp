@@ -52,12 +52,9 @@ SUBDIRS += \
     }
 
     !contains(MNECPP_CONFIG, coverity) {
-        qtHaveModule(3dcore,3drender,3dinput,3dextras) {
-            message(mne_matching_pursuit & mne_analyze_qt configured)
-            SUBDIRS += \
-                mne_matching_pursuit \
-                mne_analyze_qt
-        }
+        SUBDIRS += \
+            mne_matching_pursuit \
+            mne_analyze_qt
     }
 }
 
