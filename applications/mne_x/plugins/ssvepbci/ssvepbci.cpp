@@ -94,14 +94,12 @@ ssvepBCI::ssvepBCI()
 
 
     // Intitalise BCI data
-    m_slChosenFeatureSensor << "9Z" << "8Z" << "7Z" << "6Z" << "9L" << "8L" << "9R" << "8R"; //<< "TEST";
+    m_slChosenChannelsSensor << "9Z" << "8Z" << "7Z" << "6Z" << "9L" << "8L" << "9R" << "8R"; //<< "TEST";
     m_lElectrodeNumbers << 33 << 34 << 35 << 36 << 40 << 41 << 42 << 43;
     m_lDesFrequencies << 6 << 7.5 << 10 << 15;
     //m_lDesFrequencies << 6.67 << 7.5 << 8.57 << 10 << 12;
-    if(m_bUseMEC)
-        m_lThresholdValues << 0.15 << 0.14 << 0.155 << 0.15;
-    else
-        m_lThresholdValues << 0.145 << 0.145 << 0.145 << 0.14;
+    m_lThresholdValues << 0.15 << 0.14 << 0.155 << 0.15;
+
 
     m_lSSVEPProbabilities << 0 << 0 << 0 << 0;
 
@@ -202,30 +200,6 @@ void ssvepBCI::unload()
 
 bool ssvepBCI::start()
 {
-//    // Do not start BCI if the number of chosen electrodes/features is uneven
-//    if(m_slChosenFeatureSensor.size()%2 != 0)
-//    {
-//        if(!m_slChosenFeatureSensor.contains("TEST"))
-//        {
-//            QMessageBox msgBox;
-//            msgBox.setText("The number of selected electrodes needs to be even.");
-//            msgBox.setInformativeText("Please select feautres again");
-//            msgBox.setStandardButtons(QMessageBox::Ok);
-//            msgBox.exec();
-//            return false;
-//        }
-//    }
-
-//    // Initialise index
-//    m_iTBWIndexSensor = 0;
-//    m_iNumberOfCalculatedFeatures = 0;
-
-//    // BCIFeatureWindow show and init
-//    if(m_bDisplayFeatures)
-//    {
-//        m_BCIFeatureWindow->initGui();
-//        m_BCIFeatureWindow->show();
-//    }
 
     // Init debug output stream
     QString path("BCIDebugFile.txt");
@@ -263,8 +237,8 @@ bool ssvepBCI::stop()
     {
         m_pBCIBuffer_Sensor->releaseFromPop();
         m_pBCIBuffer_Sensor->releaseFromPush();
-        //    m_pBCIBuffer_Source->releaseFromPop();
-        //    m_pBCIBuffer_Source->releaseFromPush();
+        m_pBCIBuffer_Source->releaseFromPop();
+        m_pBCIBuffer_Source->releaseFromPush();
     }
 
     // Stop filling buffers with data from the inputs
@@ -285,11 +259,6 @@ bool ssvepBCI::stop()
     clearFeatures();
     clearClassifications();
 
-//    // set counters to zero
-//    m_iWriteIndex   = 0;
-//    m_iReadIndex    = 0;
-//    m_iCounter      = 0;
-//    m_iReadToWriteBuffer = 0;
 
     return true;
 }
@@ -357,7 +326,7 @@ void ssvepBCI::updateSensor(XMEASLIB::NewMeasurement::SPtr pMeasurement)
         m_iWriteSampleSize = pRTMSA->getMultiSampleArray()[0].cols();
         m_iTimeWindowLength = int(5*m_dSampleFrequency) + int(pRTMSA->getMultiSampleArray()[0].cols()/m_iDownSampleIncrement) + 1 ;
         //m_iTimeWindowSegmentSize  = int(5*m_dSampleFrequency / m_iWriteSampleSize) + 1;   // 4 seconds long maximal sized window
-        m_matSlidingTimeWindow.resize(8, m_iTimeWindowLength);//m_matSlidingTimeWindow.resize(rows, m_iTimeWindowSegmentSize*pRTMSA->getMultiSampleArray()[0].cols());
+        m_matSlidingTimeWindow.resize(m_lElectrodeNumbers.size(), m_iTimeWindowLength);//m_matSlidingTimeWindow.resize(rows, m_iTimeWindowSegmentSize*pRTMSA->getMultiSampleArray()[0].cols());
 
         cout << "Down Sample Increment:" << m_iDownSampleIncrement << endl;
         cout << "Read Sample Size:" << m_iReadSampleSize << endl;
@@ -412,7 +381,7 @@ void ssvepBCI::updateSource(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 void ssvepBCI::clearFeatures()
 {
     m_qMutex.lock();
-        m_lFeaturesSensor.clear();
+        m_lChannelsSensor.clear();
     m_qMutex.unlock();
 }
 
@@ -537,6 +506,31 @@ void ssvepBCI::changeSSVEPParameter(){
 
     // update number of harmonics of reference signal
     m_iNumberOfHarmonics = 1 + m_pssvepBCIConfigurationWidget->getNumOfHarmonics();
+
+    // get channel select list from GUI
+    QStringList channelSelectSensor =  m_pssvepBCIConfigurationWidget->getSensorChannelSelection();
+    //QStringList channelSelectSource =  m_pssvepBCIConfigurationWidget->getSourceChannelSelection();
+
+    if(channelSelectSensor.size() > 0){
+
+        // update channel select
+        m_slChosenChannelsSensor = channelSelectSensor;
+
+        // get new list of electrode numbers
+        m_lElectrodeNumbers.clear();
+        foreach(const QString &str, m_slChosenChannelsSensor)
+            m_lElectrodeNumbers << m_mapElectrodePinningScheme.value(str);
+
+        // reset sliding time window parameter
+        m_iWriteIndex   = 0;
+        m_iReadIndex    = 0;
+        m_iCounter      = 0;
+        m_iReadToWriteBuffer = 0;
+        m_iDownSampleIndex   = 0;
+        m_iFormerDownSampleIndex = 0;
+        m_matSlidingTimeWindow.resize(m_lElectrodeNumbers.size(), m_iTimeWindowLength);
+
+    }
 
     // reset flag for changing SSVEP parameter
     m_bChangeSSVEPParameterFlag = false;
@@ -670,16 +664,16 @@ double ssvepBCI::CCA(MatrixXd &Y, MatrixXd &X)
 
 void ssvepBCI::readFromSlidingTimeWindow(MatrixXd &data)
 {
-    data.resize(8, m_iWindowSize*m_iReadSampleSize);
+    data.resize(m_matSlidingTimeWindow.rows(), m_iWindowSize*m_iReadSampleSize);
     // consider matrix overflow case
     if(data.cols() > m_iReadIndex + 1){
         //cout << "do splitting" << endl;
         int width = data.cols() - (m_iReadIndex + 1);
-        data.block(0, 0, 8, width) = m_matSlidingTimeWindow.block(0, m_matSlidingTimeWindow.cols() - width , 8, width );
-        data.block(0, width, 8, m_iReadIndex + 1) = m_matSlidingTimeWindow.block(0, 0, 8, m_iReadIndex + 1);
+        data.block(0, 0, data.rows(), width) = m_matSlidingTimeWindow.block(0, m_matSlidingTimeWindow.cols() - width , data.rows(), width );
+        data.block(0, width, data.rows(), m_iReadIndex + 1) = m_matSlidingTimeWindow.block(0, 0, data.rows(), m_iReadIndex + 1);
     }
     else
-        data = m_matSlidingTimeWindow.block(0, m_iReadIndex - (data.cols() - 1), 8 , data.cols());  // consider case without matrix overflow
+        data = m_matSlidingTimeWindow.block(0, m_iReadIndex - (data.cols() - 1), data.rows(), data.cols());  // consider case without matrix overflow
 
     // transpose in the same data space and avoiding aliasing
     data.transposeInPlace();
@@ -706,9 +700,9 @@ void ssvepBCI::ssvepBCIOnSensor()
     {
         //cout << "write index:" << m_iWriteIndex << endl;
         //cout << "downsample index:" << m_iDownSampleIndex << endl;
-
+        // write from t_mat to the sliding time window while doing channel select and downsampling
         m_iFormerDownSampleIndex = m_iDownSampleIndex;
-        for(int i = 0; i < 8; i++)
+        for(int i = 0; i < m_lElectrodeNumbers.size(); i++)
             m_matSlidingTimeWindow(i, m_iWriteIndex) = t_mat(m_lElectrodeNumbers.at(i), m_iDownSampleIndex);
         writtenSamples++;
 
@@ -800,7 +794,7 @@ void ssvepBCI::ssvepBCIOnSensor()
                 m_lClassResultsSensor.append(0);
 
             // emit classifiaction result
-            qDebug() <<"classification results" << m_lClassResultsSensor.last() << endl;
+            // qDebug() <<"classification results" << m_lClassResultsSensor.last() << endl;
             if(m_lClassResultsSensor.last() == 0)
                 emit classificationResult(0);
             else
@@ -815,7 +809,7 @@ void ssvepBCI::ssvepBCIOnSensor()
 
     }
     
-    // change number of harmonics or channel selection and reset the time window if necessary
+    // change number of harmonics or channel selection and reset the time window if the change flag has been set
     if(m_bChangeSSVEPParameterFlag)
         changeSSVEPParameter();
 

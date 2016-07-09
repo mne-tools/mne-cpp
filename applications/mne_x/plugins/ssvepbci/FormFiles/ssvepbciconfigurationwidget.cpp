@@ -61,7 +61,7 @@ ssvepBCIConfigurationWidget::ssvepBCIConfigurationWidget(ssvepBCI* pssvepBCI, QW
     QDialog(parent)
   ,  m_pSSVEPBCI(pssvepBCI)
   ,  ui(new Ui::ssvepBCIConfigurationWidget)
-  ,  m_bInit(true)
+  ,  m_bInitThresholdDisplay(true)
 {
     ui->setupUi(this);
 
@@ -91,6 +91,10 @@ ssvepBCIConfigurationWidget::ssvepBCIConfigurationWidget(ssvepBCI* pssvepBCI, QW
     ui->m_ProgressBar_Threshold5->setStyleSheet(" QProgressBar { border: 2px solid grey; border-radius: 2px; } QProgressBar::chunk {background-color: #3add36;}");
     ui->m_ProgressBar_Threshold5->setTextVisible(false);
     ui->m_VerticalSlider_Threshold5->setStyleSheet("QSlider::handle {image: url(:/images/slider_handle.png);}");
+
+    // Connect channel selection
+    connect(ui->m_listWidget_ChosenChannelsOnSensorLevel->model(), &QAbstractItemModel::rowsInserted, this, &ssvepBCIConfigurationWidget::channelSelectChanged);
+    connect(ui->m_listWidget_ChosenChannelsOnSensorLevel->model(), &QAbstractItemModel::rowsRemoved, this, &ssvepBCIConfigurationWidget::channelSelectChanged);
 
     // connect signals for power line elimination
     connect(ui->m_GroupBox_RemovePowerLine, &QGroupBox::toggled, m_pSSVEPBCI, &ssvepBCI::removePowerLine);
@@ -147,10 +151,10 @@ ssvepBCIConfigurationWidget::~ssvepBCIConfigurationWidget()
 void ssvepBCIConfigurationWidget::setSSVEPProbabilities(MyQList SSVEP){
 
     // determine scale for threshold status bar
-    if(m_bInit){
+    if(m_bInitThresholdDisplay){
         m_dMaxProbValue = *std::max_element(SSVEP.begin(), SSVEP.end());
         m_dMinProbValue = *std::min_element(SSVEP.begin(), SSVEP.end());
-        m_bInit = !m_bInit;
+        m_bInitThresholdDisplay = false;
     }
     else{
         double min = *std::min_element(SSVEP.begin(), SSVEP.end());
@@ -222,11 +226,11 @@ void ssvepBCIConfigurationWidget::initSelectedChannelsSensor()
     m_pSSVEPBCI->m_mapElectrodePinningScheme = mapElectrodePinningScheme;
 
     // Remove default items from list
-    for(int i=0; i<m_pSSVEPBCI->m_slChosenFeatureSensor.size(); i++)
-        m_vAvailableChannelsSensor.removeAt(m_vAvailableChannelsSensor.indexOf(m_pSSVEPBCI->m_slChosenFeatureSensor.at(i)));
+    for(int i=0; i<m_pSSVEPBCI->m_slChosenChannelsSensor.size(); i++)
+        m_vAvailableChannelsSensor.removeAt(m_vAvailableChannelsSensor.indexOf(m_pSSVEPBCI->m_slChosenChannelsSensor.at(i)));
 
     ui->m_listWidget_AvailableChannelsOnSensorLevel->addItems(m_vAvailableChannelsSensor);
-    ui->m_listWidget_ChosenChannelsOnSensorLevel->addItems(m_pSSVEPBCI->m_slChosenFeatureSensor);
+    ui->m_listWidget_ChosenChannelsOnSensorLevel->addItems(m_pSSVEPBCI->m_slChosenChannelsSensor);
 }
 
 
@@ -235,7 +239,7 @@ void ssvepBCIConfigurationWidget::initSelectedChannelsSensor()
 void ssvepBCIPlugin::ssvepBCIConfigurationWidget::on_m_RadioButton_MEC_toggled(bool checked)
 {
     Q_UNUSED(checked);
-    m_bInit = true;
+    m_bInitThresholdDisplay = true;
 }
 
 
@@ -328,10 +332,55 @@ int ssvepBCIConfigurationWidget::getNumOfHarmonics(){
 }
 
 
+//*************************************************************************************************************
 
 void ssvepBCIConfigurationWidget::numOfHarmonicsChanged(int harmonics){
+
     Q_UNUSED(harmonics);
 
+    // reset scale of the threshold status bar
+    m_bInitThresholdDisplay = true;
+
     // emit signal for changing SSVEP Parameter
+    emit changeSSVEPParameter();
+}
+
+
+//*************************************************************************************************************
+
+QStringList ssvepBCIConfigurationWidget::getSensorChannelSelection(){
+
+    QStringList ChosenSensorChannelSelect;
+    for(int i=0; i< ui->m_listWidget_ChosenChannelsOnSensorLevel->count(); i++)
+        ChosenSensorChannelSelect << ui->m_listWidget_ChosenChannelsOnSensorLevel->item(i)->text();
+
+    return ChosenSensorChannelSelect;
+}
+
+
+//*************************************************************************************************************
+
+QStringList ssvepBCIConfigurationWidget::getSourceChannelSelection(){
+
+    QStringList ChosenSourceChannelSelect;
+    for(int i=0; i< ui->m_listWidget_ChosenChannelsOnSourceLevel->count(); i++)
+        ChosenSourceChannelSelect << ui->m_listWidget_ChosenChannelsOnSourceLevel->item(i)->text();
+
+    return ChosenSourceChannelSelect;
+}
+
+
+//*************************************************************************************************************
+
+void ssvepBCIConfigurationWidget::channelSelectChanged(const QModelIndex &parent, int first, int last){
+
+    Q_UNUSED(parent)
+    Q_UNUSED(first)
+    Q_UNUSED(last)
+
+    // reset threshold display
+    m_bInitThresholdDisplay = true;
+
+    // emit signal for changing ssvep parameter after BCI processing
     emit changeSSVEPParameter();
 }
