@@ -1,15 +1,14 @@
 //=============================================================================================================
 /**
-* @file     babymeg_global.h
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Limin Sun <liminsun@nmr.mgh.harvard.edu>;
+* @file     dispcharts_global.h
+* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     July, 2012
+* @date     July, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -19,7 +18,7 @@
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
 *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
-*
+* 
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
 * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
@@ -30,17 +29,16 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     BabyMEG library export/import macros.
+* @brief    DispCharts library export/import macros.
 *
 */
 
-#ifndef BABYMEG_GLOBAL_H
-#define BABYMEG_GLOBAL_H
-
+#ifndef DISPCHARTS_GLOBAL_H
+#define DISPCHARTS_GLOBAL_H
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// INCLUDES
 //=============================================================================================================
 
 #include <QtCore/qglobal.h>
@@ -48,13 +46,21 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// PREPROCESSOR DEFINES
+// DEFINES
 //=============================================================================================================
 
-#if defined(BABYMEG_LIBRARY)
-#  define BABYMEGSHARED_EXPORT Q_DECL_EXPORT  /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+#if defined(BUILD_MNECPP_STATIC_LIB)
+#  define DISPCHARTSSHARED_EXPORT
+#elif defined(DISPCHARTS_LIBRARY)
+#  define DISPCHARTSSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
 #else
-#  define BABYMEGSHARED_EXPORT Q_DECL_IMPORT  /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+#  define DISPCHARTSSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
 
-#endif // BABYMEG_GLOBAL_H
+//#if defined(DISPCHARTS_LIBRARY)
+//#  define DISPCHARTSSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+//#else
+//#  define DISPCHARTSSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+//#endif
+
+#endif // CHARTS_GLOBAL_H
