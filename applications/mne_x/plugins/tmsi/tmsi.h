@@ -48,7 +48,7 @@
 
 #include "tmsi_global.h"
 
-#include <mne_x/Interfaces/ISensor.h>
+#include <xShared/Interfaces/ISensor.h>
 #include <generics/circularmatrixbuffer.h>
 #include <xMeas/newrealtimemultisamplearray.h>
 

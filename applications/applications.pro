@@ -43,13 +43,8 @@ SUBDIRS += \
 !contains(MNECPP_CONFIG, minimalVersion) {
     SUBDIRS += \
         mne_x_libs \
-        mne_x
-
-    !contains(MNECPP_CONFIG, oldCompiler) {
-        message(mne_browse_raw_qt configured)
-        SUBDIRS += \
-            mne_browse_raw_qt \
-    }
+        mne_x \
+        mne_browse_raw_qt
 
     !contains(MNECPP_CONFIG, coverity) {
         SUBDIRS += \

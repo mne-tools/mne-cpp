@@ -45,7 +45,7 @@
 
 #include "triggercontrol_global.h"
 
-#include <mne_x/Interfaces/IAlgorithm.h>
+#include <xShared/Interfaces/IAlgorithm.h>
 #include <generics/circularbuffer.h>
 #include <generics/circularmatrixbuffer.h>
 #include <xMeas/newrealtimesamplearray.h>
@@ -75,7 +75,7 @@ namespace TriggerControlPlugin
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNEX;
+using namespace XSHAREDLIB;
 using namespace XMEASLIB;
 using namespace IOBuffer;
 
@@ -101,9 +101,9 @@ class SerialPort;
 class TRIGGERCONTROLSHARED_EXPORT TriggerControl : public IAlgorithm
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "mne_x/1.0" FILE "triggercontrol.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    Q_PLUGIN_METADATA(IID "xsharedlib/1.0" FILE "triggercontrol.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(MNEX::IAlgorithm)
+    Q_INTERFACES(XSHAREDLIB::IAlgorithm)
 
     friend class TriggerControlSetupWidget;
     friend class SettingsWidget;
