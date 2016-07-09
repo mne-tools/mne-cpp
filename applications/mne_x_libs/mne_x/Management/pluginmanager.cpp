@@ -96,7 +96,7 @@ void PluginManager::loadPlugins(const QString& dir)
         // IPlugin
         if(pPlugin)
         {
-            qDebug() << "try to load Plugin " << file;
+            qDebug() << "Try to load Plugin " << file;
 
             // plugins are always disabled when they are first loaded
             m_qVecPlugins.push_back(qobject_cast<IPlugin*>(pPlugin));
@@ -137,8 +137,8 @@ void PluginManager::loadPlugins(const QString& dir)
             //ToDo other Plugins - like Visualization
 
         }
-        else
-            qDebug() << "Plugin " << file << " could not be instantiated!";
+//        else
+//            qDebug() << "Plugin " << file << " could not be instantiated!";
     }
 
 }
