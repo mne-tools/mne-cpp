@@ -46,10 +46,10 @@
 #include <xMeas/newrealtimemultisamplearray.h>
 #include <xMeas/newnumeric.h>
 
-#include <mne_x/Management/pluginconnectorconnection.h>
-#include <mne_x/Management/pluginoutputdata.h>
-#include <mne_x/Management/plugininputdata.h>
-#include <mne_x/Interfaces/IPlugin.h>
+#include <xShared/Management/pluginconnectorconnection.h>
+#include <xShared/Management/pluginoutputdata.h>
+#include <xShared/Management/plugininputdata.h>
+#include <xShared/Interfaces/IPlugin.h>
 
 
 #include <Eigen/Core>

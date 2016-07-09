@@ -47,7 +47,7 @@
 //=============================================================================================================
 
 using namespace DummyToolboxPlugin;
-using namespace MNEX;
+using namespace XSHAREDLIB;
 using namespace XMEASLIB;
 using namespace IOBuffer;
 

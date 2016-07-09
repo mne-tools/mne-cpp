@@ -44,8 +44,8 @@
 #include "pluginitem.h"
 #include "pluginscene.h"
 
-#include <mne_x/Management/pluginmanager.h>
-#include <mne_x/Management/pluginscenemanager.h>
+#include <xShared/Management/pluginmanager.h>
+#include <xShared/Management/pluginscenemanager.h>
 
 #include <QMainWindow>
 #include <QMap>
@@ -83,7 +83,7 @@ class PluginGui : public QMainWindow
     Q_OBJECT
     friend class PluginScene;
 public:
-    PluginGui(MNEX::PluginManager *pPluginManager, MNEX::PluginSceneManager *pPluginSceneManager);
+    PluginGui(XSHAREDLIB::PluginManager *pPluginManager, XSHAREDLIB::PluginSceneManager *pPluginSceneManager);
 
     ~PluginGui();
 
@@ -112,21 +112,21 @@ public:
     void saveConfig(const QString& sPath, const QString& sFileName);
 
 
-    inline IPlugin::SPtr getCurrentPlugin();
+    inline XSHAREDLIB::IPlugin::SPtr getCurrentPlugin();
 
     void uiSetupRunningState(bool state);
 
 signals:
-   void selectedPluginChanged(IPlugin::SPtr pPlugin);
+   void selectedPluginChanged(XSHAREDLIB::IPlugin::SPtr pPlugin);
 
-   void selectedConnectionChanged(PluginConnectorConnection::SPtr pConnection);
+   void selectedConnectionChanged(XSHAREDLIB::PluginConnectorConnection::SPtr pConnection);
 
 private:
 
     void pointerGroupClicked(int id);
     void actionGroupTriggered(QAction* action);
 
-    bool removePlugin(IPlugin::SPtr pPlugin);
+    bool removePlugin(XSHAREDLIB::IPlugin::SPtr pPlugin);
 
     void itemInserted(PluginItem *item);
     void newItemSelected();
@@ -141,11 +141,11 @@ private:
 
     QAction* createItemAction(QString name, QMenu* menu);
 
-    PluginManager*          m_pPluginManager;       /**< Corresponding plugin manager. */
-    PluginSceneManager*     m_pPluginSceneManager;  /**< Corresponding plugin scene manager. */
+    XSHAREDLIB::PluginManager*          m_pPluginManager;       /**< Corresponding plugin manager. */
+    XSHAREDLIB::PluginSceneManager*     m_pPluginSceneManager;  /**< Corresponding plugin scene manager. */
 
-    IPlugin::SPtr                   m_pCurrentPlugin;
-    PluginConnectorConnection::SPtr m_pCurrentConnection;
+    XSHAREDLIB::IPlugin::SPtr                   m_pCurrentPlugin;
+    XSHAREDLIB::PluginConnectorConnection::SPtr m_pCurrentConnection;
 
     PluginScene*    m_pPluginScene;         /**< Plugin graph */
     QGraphicsView*  m_pGraphicsView;        /**< View to show graph */
@@ -173,7 +173,7 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline IPlugin::SPtr PluginGui::getCurrentPlugin()
+inline XSHAREDLIB::IPlugin::SPtr PluginGui::getCurrentPlugin()
 {
     return m_pCurrentPlugin;
 }
