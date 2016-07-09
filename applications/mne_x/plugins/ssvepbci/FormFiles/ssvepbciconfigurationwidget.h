@@ -56,6 +56,7 @@
 #include <QScreen>
 #include <QWidget>
 #include <QOpenGLWidget>
+#include <QListWidgetItem>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -142,6 +143,21 @@ public:
     */
     int getNumOfHarmonics();
 
+    //=========================================================================================================
+    /**
+    * getting the string lists for senesor channel selection
+    *
+    */
+    QStringList getSensorChannelSelection();
+
+    //=========================================================================================================
+    /**
+    * getting the string lists for source channel selection
+    *
+    */
+    QStringList getSourceChannelSelection();
+
+
 public slots:
     void setSSVEPProbabilities(MyQList SSVEP);
     void setFrequencyList(MyQList frequencyList);
@@ -151,6 +167,7 @@ private slots:
     void on_m_RadioButton_MEC_toggled(bool checked);
     void thresholdChanged(double threshold);
     void numOfHarmonicsChanged(int harmonics);
+    void channelSelectChanged(const QModelIndex &parent, int first, int last);
 
 signals:
     void getThresholdValues(MyQList Thresholds);
@@ -163,11 +180,15 @@ private:
     QStringList                             m_vAvailableChannelsSensor;                 /**< QStringList holding available features to select on sensor level (electrodes).*/
     double                                  m_dMinProbValue;                            /**< minimum border for SSVEP visualization with a status bar */
     double                                  m_dMaxProbValue;                            /**< maximum border for SSVEP visualization with a status bar */
-    bool                                    m_bInit;                                    /**< flag for first run and so initializing ssvepBCIConfigurationWidget-Class */
+    bool                                    m_bInitThresholdDisplay;                                    /**< flag for first run and so initializing ssvepBCIConfigurationWidget-Class */
     QList<double>                           m_lSSVEPThresholdValues;                    /**< contains the threshold values for SSVEP classifiaction */
     QList<double>                           m_lFrequencyList;                           /**< list of desired frequencies */
     QPalette                                m_palBlackFont;                             /**< setting black font for group box */
     QPalette                                m_palRedFont;                               /**< setting red font for highlightning label */
+
+
+
+
 };
 
 } //NAMESPACE
