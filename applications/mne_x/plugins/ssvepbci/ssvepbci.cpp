@@ -507,13 +507,14 @@ void ssvepBCI::changeSSVEPParameter(){
     // update number of harmonics of reference signal
     m_iNumberOfHarmonics = 1 + m_pssvepBCIConfigurationWidget->getNumOfHarmonics();
 
-    // get channel select list from GUI
-    QStringList channelSelectSensor =  m_pssvepBCIConfigurationWidget->getSensorChannelSelection();
-    //QStringList channelSelectSource =  m_pssvepBCIConfigurationWidget->getSourceChannelSelection();
+    // update frequency list from setup stimulus widget if activated
+    if(m_pssvepBCISetupStimulusWidget)
+        setFrequencyList(m_pssvepBCISetupStimulusWidget->getFrequencies());
 
+    // update channel select
+    QStringList channelSelectSensor =  m_pssvepBCIConfigurationWidget->getSensorChannelSelection();
     if(channelSelectSensor.size() > 0){
 
-        // update channel select
         m_slChosenChannelsSensor = channelSelectSensor;
 
         // get new list of electrode numbers
@@ -567,6 +568,7 @@ void ssvepBCI::run(){
 void ssvepBCI::setFrequencyList(MyQList frequencyList)
 {
     // update list of desired frequencies
+    m_lDesFrequencies.clear();
     m_lDesFrequencies = frequencyList;
 
     // update the list of all frequencies
@@ -819,5 +821,134 @@ void ssvepBCI::ssvepBCIOnSensor()
 //*************************************************************************************************************
 
 void ssvepBCI::ssvepBCIOnSource(){
+
+    // Wait for fiff Info if not yet received - this is needed because we have to wait until the buffers are firstly initiated in the update functions
+    while(!m_pFiffInfo_Sensor)
+        msleep(10);
+
+    m_lClassResultsSensor.clear();
+
+    // Start filling buffers with data from the inputs
+    m_bProcessData = true;
+    MatrixXd t_mat = m_pBCIBuffer_Source->pop();
+
+    // writing selected feature channels to the time window storage and increase the segment index
+    int   writtenSamples = 0;
+    while(m_iDownSampleIndex >= m_iFormerDownSampleIndex)
+    {
+        //cout << "write index:" << m_iWriteIndex << endl;
+        //cout << "downsample index:" << m_iDownSampleIndex << endl;
+        // write from t_mat to the sliding time window while doing channel select and downsampling
+        m_iFormerDownSampleIndex = m_iDownSampleIndex;
+        for(int i = 0; i < m_lElectrodeNumbers.size(); i++)
+            m_matSlidingTimeWindow(i, m_iWriteIndex) = t_mat(m_lElectrodeNumbers.at(i), m_iDownSampleIndex);
+        writtenSamples++;
+
+        // update counter variables
+        m_iWriteIndex = (m_iWriteIndex + 1) % m_iTimeWindowLength;
+        m_iDownSampleIndex = (m_iDownSampleIndex + m_iDownSampleIncrement ) % m_iWriteSampleSize;
+
+    }
+    m_iFormerDownSampleIndex = m_iDownSampleIndex;
+
+    // calculate buffer between read- and write index
+    m_iReadToWriteBuffer = m_iReadToWriteBuffer + writtenSamples;
+    //cout << "read to write buffer:" << m_iReadToWriteBuffer << endl << endl;
+    // execute processing loop as long as there is new data to be red from the time window
+    while(m_iReadToWriteBuffer >= m_iReadSampleSize)
+    {
+        if(m_iCounter > 8)
+        {
+            // determine window size according to former counted miss classifications
+            m_iWindowSize = 8;
+            if(m_iCounter <= 44 && m_iCounter > 24)
+                m_iWindowSize = 20;
+            if(m_iCounter > 44)
+                m_iWindowSize = 40;
+            //cout << "Counter:" << m_iCounter << endl;
+
+            // create current data matrix Y
+            MatrixXd Y;
+            readFromSlidingTimeWindow(Y);
+            //cout << "Read Index:" << m_iReadIndex <<  endl;
+
+            // create realtive timeline according to Y
+            int samples = Y.rows();
+            ArrayXd t = 2*M_PI/m_dSampleFrequency * ArrayXd::LinSpaced(samples, 1, samples);
+
+            //IOUtils::write_eigen_matrix(Y, "Y_before.txt");
+            // Remove 50 Hz Power line signal
+            if(m_bRemovePowerLine){
+                MatrixXd Zp(samples,2);
+                ArrayXd t_PL = t*m_iPowerLine;
+                Zp.col(0) = t_PL.sin();
+                Zp.col(1) = t_PL.cos();
+                MatrixXd Zp_help = Zp.transpose()*Zp;
+                Y = Y - Zp*Zp_help.inverse()*Zp.transpose()*Y;
+            }
+
+            // apply feature extraction for all frequencies of interest
+            VectorXd ssvepProbabilities(m_lAllFrequencies.size());
+            for(int i = 0; i < m_lAllFrequencies.size(); i++)
+            {
+                // create reference signal matrix X
+                MatrixXd X(samples, 2*m_iNumberOfHarmonics);
+                for(int k = 0; k < m_iNumberOfHarmonics; k++){
+                    ArrayXd t_k = t*(k+1)*m_lAllFrequencies.at(i);
+                    X.col(2*k)      = t_k.sin();
+                    X.col(2*k+1)    = t_k.cos();
+                }
+
+                // extracting the features from the data Y with the reference signal X
+                if(m_bUseMEC)
+                    ssvepProbabilities(i) = MEC(Y, X); // using Minimum Energy Combination as feature-extraction tool
+                else
+                    ssvepProbabilities(i) = CCA(Y, X); // using Canonical Correlation Analysis as feature-extraction tool
+                // cout << "size of X" << X.cols() << endl;
+            }
+
+            // normalize probabilities and adding the softmax coefficient
+            ssvepProbabilities = m_dAlpha / ssvepProbabilities.sum() * ssvepProbabilities;
+            ssvepProbabilities = ssvepProbabilities.array().exp();                          // softmax function for better distinguishability between the probabilities
+            ssvepProbabilities = 1 / ssvepProbabilities.sum() * ssvepProbabilities;
+            //cout << "probabilites:" << endl << ssvepProbabilities << endl;
+
+            // transfer values to MyQList and emit signal for GUI
+            for(int i = 0; i < m_lDesFrequencies.size(); i++)
+                m_lSSVEPProbabilities[i] = ssvepProbabilities(i);
+            emit SSVEPprob(m_lSSVEPProbabilities);
+
+            // classify probabilites
+            int index = 0;
+            double maxProbability = ssvepProbabilities.maxCoeff(&index);
+            //cout << "max Probability:" << maxProbability << endl;
+            if(index < m_lDesFrequencies.size()){
+                if(m_lThresholdValues.at(index) < maxProbability){
+                    m_lClassResultsSensor.append(index+1);
+                    m_iCounter = -1;
+                }
+            }
+            else
+                m_lClassResultsSensor.append(0);
+
+            // emit classifiaction result
+            // qDebug() <<"classification results" << m_lClassResultsSensor.last() << endl;
+            if(m_lClassResultsSensor.last() == 0)
+                emit classificationResult(0);
+            else
+                emit classificationResult(m_lDesFrequencies[m_lClassResultsSensor.last() - 1]);
+
+        }
+
+        // update counter and index variables
+        m_iCounter++;
+        m_iReadToWriteBuffer = m_iReadToWriteBuffer - m_iReadSampleSize;
+        m_iReadIndex = (m_iReadIndex + m_iReadSampleSize) % (m_iTimeWindowLength);
+
+    }
+
+    // change number of harmonics or channel selection and reset the time window if the change flag has been set
+    if(m_bChangeSSVEPParameterFlag)
+        changeSSVEPParameter();
 
 }

@@ -118,7 +118,7 @@ void ssvepBCIFlickeringItem::paint(QPaintDevice *paintDevice)
 
 //*************************************************************************************************************
 
-int ssvepBCIFlickeringItem::getFreq()
+int ssvepBCIFlickeringItem::getFreqKey()
 {
     return m_iFreqKey;
 }

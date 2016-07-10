@@ -72,6 +72,9 @@ ssvepBCISetupStimulusWidget::ssvepBCISetupStimulusWidget(ssvepBCI* pssvepBCI, QW
     m_pssvepBCIScreen->move(screen->geometry().x(), screen->geometry().y());
     m_pssvepBCIScreen->showFullScreen();
 
+    // connect signal for frequency change
+    connect(this, &ssvepBCISetupStimulusWidget::frequencyChanged, m_pssvepBCI, &ssvepBCI::setChangeSSVEPParameterFlag);
+
     //Map for all frequencies according to their key
     m_idFreqMap.insert(15,  6   );
     m_idFreqMap.insert(14,  6.66);
@@ -159,7 +162,7 @@ void ssvepBCISetupStimulusWidget::on_pushButton_2_clicked()
 
 void ssvepBCISetupStimulusWidget::on_pushButton_3_clicked()
 {
-    m_pssvepBCIScreen->close();
+    m_pssvepBCIScreen->setWindowState(Qt::WindowMinimized);
 }
 
 //*************************************************************************************************************
@@ -224,23 +227,27 @@ void ssvepBCISetupStimulusWidget::on_pushButton_6_clicked()
     ssvepBCIFlickeringItem item2;
     ssvepBCIFlickeringItem item3;
     ssvepBCIFlickeringItem item4;
+    ssvepBCIFlickeringItem item5;
 
     //set frequencies
-    setFreq(item1,0);
-    setFreq(item2,3);
-    setFreq(item3,7);
-    setFreq(item4,11);
+    setFreq(item1,14);
+    setFreq(item2,12);
+    setFreq(item3,10);
+    setFreq(item4, 8);
+    setFreq(item5, 6);
     //set dimensions and positions
     item1.setDim(0.2,0.2);
     item2.setDim(0.2,0.2);
     item3.setDim(0.2,0.2);
     item4.setDim(0.2,0.2);
-    item1.setPos(0.2,0.2);
-    item2.setPos(1-0.4,0.2);
-    item3.setPos(1-0.4,1-0.4);
-    item4.setPos(0.2,1-0.4);
+    item5.setDim(0.2,0.2);
+    item1.setPos(0.5-0.1,0.1);
+    item2.setPos(1-0.3,0.5-0.1);
+    item3.setPos(0.5-0.1,1-0.3);
+    item4.setPos(0.1,0.5-0.1);
+    item5.setPos(0,0);
     //add items to List
-    m_pssvepBCIScreen->m_Items <<item1<<item2<<item3<<item4 ;
+    m_pssvepBCIScreen->m_Items <<item1<<item2<<item3<<item4<<item5 ;
 
     changeComboBox();
 
@@ -292,7 +299,11 @@ void ssvepBCIPlugin::ssvepBCISetupStimulusWidget::on_comboBox_2_currentIndexChan
         }
     }
 
+    // signal for changing frequency list of ssvepBCI class
+    emit frequencyChanged();
+
 }
+
 
 //*************************************************************************************************************
 
@@ -341,5 +352,18 @@ void ssvepBCISetupStimulusWidget::setFreq(ssvepBCIFlickeringItem &item, int freq
     }
     }
     item.setRenderOrder(renderOrder, freqKey);
+
 }
 
+
+//*************************************************************************************************************
+
+QList<double> ssvepBCISetupStimulusWidget::getFrequencies(){
+
+    // get list of frequencies
+    QList<double> freqList;
+    foreach(ssvepBCIFlickeringItem item, m_pssvepBCIScreen->m_Items)
+        freqList << m_idFreqMap.value(item.getFreqKey());
+
+    return freqList;
+}

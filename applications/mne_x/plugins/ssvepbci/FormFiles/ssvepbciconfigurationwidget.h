@@ -31,7 +31,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the ssvepbcisetupstimulus class.
+* @brief    Contains the declaration of the ssvepBCIConfiguration class.
 *
 */
 
