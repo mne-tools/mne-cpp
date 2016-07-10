@@ -281,7 +281,7 @@ public slots:
     void setPowerLine(int powerLine);
     void setFeatureExtractionMethod(bool useMEC);
     void setThresholdValues(MyQList thresholds);
-    void setFrequencyList(MyQList frequencyList);
+
     void setChangeSSVEPParameterFlag();
 
 signals:
@@ -372,7 +372,14 @@ private:
     */
     void changeSSVEPParameter();
 
-
+    //=========================================================================================================
+    /**
+    * updates the list of desired frequencies and of all frequencies which will be examined
+    *
+    * @param [in]   frequencyList           list of new frequencies
+    *
+    */
+    void setFrequencyList(MyQList frequencyList);
 
 
     // old privates

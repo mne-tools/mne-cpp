@@ -121,6 +121,17 @@ public:
     */
     void closeEvent(QCloseEvent *event);
 
+    //=========================================================================================================
+    /**
+    * gets the list of all displayed freuqnecies
+    *
+    * @return  list of all displayed frequencies
+    *
+    */
+    QList<double> getFrequencies();
+
+signals:
+    void frequencyChanged();
 
 private slots:
 

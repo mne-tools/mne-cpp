@@ -128,7 +128,7 @@ public:
     * @return saved frequency key
     *
     */
-    int getFreq(void);
+    int getFreqKey(void);
 
 private:
     double m_dPosX;                         /**< realtive vertical position according to screen size; [0..1] */

@@ -173,6 +173,7 @@ void ssvepBCIConfigurationWidget::setSSVEPProbabilities(MyQList SSVEP){
     ui->m_ProgressBar_Threshold2->setValue(values[1]);
     ui->m_ProgressBar_Threshold3->setValue(values[2]);
     ui->m_ProgressBar_Threshold4->setValue(values[3]);
+    //ui->m_ProgressBar_Threshold4->setValue(values[4]);
 
     // assign SSVEP values to the labels
     ui->m_Label_SSVEP1->setText(QString::number(SSVEP[0]));
@@ -283,6 +284,11 @@ void ssvepBCIConfigurationWidget::updateThresholdsToScreen(){
 
 void ssvepBCIConfigurationWidget::setFrequencyList(MyQList frequencyList){
 
+    // filling the list with missing zeros
+    if(frequencyList.size()<5)
+        for(int i = 0; i < 5 - frequencyList.size(); i++)
+            frequencyList << 0;
+
     // update frequency list
     m_lFrequencyList = frequencyList;
 
@@ -291,6 +297,7 @@ void ssvepBCIConfigurationWidget::setFrequencyList(MyQList frequencyList){
     ui->m_Label_Frequency2->setText(QString::number(m_lFrequencyList[1]).append(" Hz"));
     ui->m_Label_Frequency3->setText(QString::number(m_lFrequencyList[2]).append(" Hz"));
     ui->m_Label_Frequency4->setText(QString::number(m_lFrequencyList[3]).append(" Hz"));
+    ui->m_Label_Frequency5->setText(QString::number(m_lFrequencyList[4]).append(" Hz"));
 
 }
 
