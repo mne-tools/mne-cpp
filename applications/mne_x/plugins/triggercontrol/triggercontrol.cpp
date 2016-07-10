@@ -74,7 +74,7 @@
 //=============================================================================================================
 
 using namespace TriggerControlPlugin;
-using namespace MNEX;
+using namespace XSHAREDLIB;
 using namespace XMEASLIB;
 
 

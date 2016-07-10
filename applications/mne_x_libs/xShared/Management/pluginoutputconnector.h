@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     plugininputdata.cpp
+* @file     pluginoutputconnector.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,72 +29,81 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the PluginInputData class.
+* @brief    Contains the declaration of the PluginOutputConnector class.
 *
 */
-
-#ifndef PLUGININPUTDATA_CPP //Because this cpp is part of the header -> template
-#define PLUGININPUTDATA_CPP
-
+#ifndef PLUGINOUTPUTCONNECTOR_H
+#define PLUGINOUTPUTCONNECTOR_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "plugininputdata.h"
+#include "../xshared_global.h"
+
+#include "pluginconnector.h"
+#include <xMeas/newmeasurement.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MNEX
+// DEFINE NAMESPACE XSHAREDLIB
 //=============================================================================================================
 
-namespace MNEX
+namespace XSHAREDLIB
 {
 
-//*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE MEMBER METHODS
-//=============================================================================================================
-
-template <class T>
-PluginInputData<T>::PluginInputData(IPlugin *parent, const QString &name, const QString &descr)
-: PluginInputConnector(parent, name, descr)
-, m_pFunc(NULL)
+/**
+* Class to connect plug-in data streams.
+*
+* @brief The PluginConnector class provides the base to connect plug-in data
+*/
+class XSHAREDSHARED_EXPORT PluginOutputConnector : public PluginConnector
 {
-}
+    Q_OBJECT
+public:
+    typedef QSharedPointer<PluginOutputConnector> SPtr;               /**< Shared pointer type for PluginOutputConnector. */
+    typedef QSharedPointer<const PluginOutputConnector> ConstSPtr;    /**< Const shared pointer type for PluginOutputConnector. */
 
+    //=========================================================================================================
+    /**
+    * Constructs a PluginOutputConnector with the given parent.
+    *
+    * @param[in] parent     pointer to parent plugin
+    * @param[in] name       connection name
+    * @param[in] descr      connection description
+    */
+    PluginOutputConnector(IPlugin *parent, const QString &name, const QString &descr);
 
-//*************************************************************************************************************
+    //=========================================================================================================
+    /**
+    * Destructor
+    */
+    virtual ~PluginOutputConnector(){}
 
-template <class T>
-void PluginInputData<T>::setCallbackMethod(callback_function pFunc)
-{
-    m_pFunc = pFunc;
-    connect(this, &PluginInputConnector::notify, this, &PluginInputData<T>::notifyCallbackFunction);
-}
+    //=========================================================================================================
+    /**
+     * Returns false
+     *
+     * @return false
+     */
+    virtual bool isInputConnector() const;
 
+    //=========================================================================================================
+    /**
+     * Returns true
+     *
+     * @return true
+     */
+    virtual bool isOutputConnector() const;
 
-//*************************************************************************************************************
+signals:
+    void notify(XMEASLIB::NewMeasurement::SPtr);
 
-template <class T>
-void PluginInputData<T>::notifyCallbackFunction(XMEASLIB::NewMeasurement::SPtr pMeasurement)
-{
-    qDebug() << "Here in input data.";
-    if(m_pFunc)
-    {
-        QSharedPointer<T> measurement = pMeasurement.dynamicCast<T>();
+};
 
-        (*m_pFunc)(measurement);
-    }
-}
+} // NAMESPACE
 
-}//Namespace
-
-#endif //PLUGININPUTDATA_CPP
+#endif // PLUGINOUTPUTCONNECTOR_H

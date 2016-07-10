@@ -36,7 +36,7 @@
 #ifndef PLUGINITEM_H
 #define PLUGINITEM_H
 
-#include <mne_x/Interfaces/IPlugin.h>
+#include <xShared/Interfaces/IPlugin.h>
 
 #include <QGraphicsPixmapItem>
 #include <QLinearGradient>
@@ -71,14 +71,14 @@ class PluginItem : public QGraphicsPolygonItem
 {
 public:
     enum { Type = UserType + 15 };
-    PluginItem(IPlugin::SPtr pPlugin, QMenu *contextMenu, QGraphicsItem *parent = 0);
+    PluginItem(XSHAREDLIB::IPlugin::SPtr pPlugin, QMenu *contextMenu, QGraphicsItem *parent = 0);
 
     ~PluginItem();
 
     void removeArrow(Arrow *arrow);
     void removeArrows();
-    IPlugin::PluginType diagramType() const { return m_pPlugin->getType(); }
-    IPlugin::SPtr plugin() { return m_pPlugin; }
+    XSHAREDLIB::IPlugin::PluginType diagramType() const { return m_pPlugin->getType(); }
+    XSHAREDLIB::IPlugin::SPtr plugin() { return m_pPlugin; }
 
     QPolygonF polygon() const { return m_qPolygon; }
     void addArrow(Arrow *arrow);
@@ -93,7 +93,7 @@ protected:
     QVariant itemChange(GraphicsItemChange change, const QVariant &value);
 
 private:
-    IPlugin::SPtr m_pPlugin;
+    XSHAREDLIB::IPlugin::SPtr m_pPlugin;
 
     qint32 m_iWidth;
     qint32 m_iHeight;

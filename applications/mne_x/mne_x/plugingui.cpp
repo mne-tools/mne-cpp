@@ -44,10 +44,10 @@
 #include "pluginitem.h"
 #include "pluginscene.h"
 
-#include <mne_x/Interfaces/IPlugin.h>
-#include <mne_x/Interfaces/ISensor.h>
-#include <mne_x/Interfaces/IAlgorithm.h>
-#include <mne_x/Interfaces/IIO.h>
+#include <xShared/Interfaces/IPlugin.h>
+#include <xShared/Interfaces/ISensor.h>
+#include <xShared/Interfaces/IAlgorithm.h>
+#include <xShared/Interfaces/IIO.h>
 
 
 //*************************************************************************************************************
@@ -76,7 +76,7 @@ using namespace MNEX;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-PluginGui::PluginGui(PluginManager *pPluginManager, PluginSceneManager *pPluginSceneManager)
+PluginGui::PluginGui(XSHAREDLIB::PluginManager *pPluginManager, XSHAREDLIB::PluginSceneManager *pPluginSceneManager)
 : m_pPluginManager(pPluginManager)
 , m_pPluginSceneManager(pPluginSceneManager)
 , m_pCurrentPlugin(0)
@@ -275,7 +275,7 @@ void PluginGui::loadConfig(const QString& sPath, const QString& sFileName)
                     if(!startItem || !endItem)
                         continue;
 
-                    PluginConnectorConnection::SPtr pConnection = PluginConnectorConnection::create(startItem->plugin(), endItem->plugin());
+                    XSHAREDLIB::PluginConnectorConnection::SPtr pConnection = XSHAREDLIB::PluginConnectorConnection::create(startItem->plugin(), endItem->plugin());
 
                     if(pConnection->isConnected())
                     {
@@ -310,7 +310,7 @@ void PluginGui::saveConfig(const QString& sPath, const QString& sFileName)
     //
     QDomElement plugins = doc.createElement("Plugins");
     root.appendChild(plugins);
-    IPlugin::SPtr pPlugin;
+    XSHAREDLIB::IPlugin::SPtr pPlugin;
     foreach (QGraphicsItem *item, m_pPluginScene->items())
     {
         if(item->type() == PluginItem::Type)
@@ -330,7 +330,7 @@ void PluginGui::saveConfig(const QString& sPath, const QString& sFileName)
     //
     QDomElement connections = doc.createElement("Connections");
     root.appendChild(connections);
-    PluginConnectorConnection::SPtr pConnection;
+    XSHAREDLIB::PluginConnectorConnection::SPtr pConnection;
     foreach (QGraphicsItem *item, m_pPluginScene->items())
     {
         if(item->type() == Arrow::Type)
@@ -382,7 +382,7 @@ void PluginGui::uiSetupRunningState(bool state)
 
 //*************************************************************************************************************
 
-bool PluginGui::removePlugin(IPlugin::SPtr pPlugin)
+bool PluginGui::removePlugin(XSHAREDLIB::IPlugin::SPtr pPlugin)
 {
     bool bRemoved = m_pPluginSceneManager->removePlugin(pPlugin);
 
@@ -439,8 +439,8 @@ void PluginGui::itemInserted(PluginItem *item)
 
 void PluginGui::newItemSelected()
 {
-    IPlugin::SPtr pPlugin;
-    PluginConnectorConnection::SPtr pConnection;
+    XSHAREDLIB::IPlugin::SPtr pPlugin;
+    XSHAREDLIB::PluginConnectorConnection::SPtr pConnection;
 
     foreach (QGraphicsItem *item, m_pPluginScene->selectedItems())
     {
@@ -454,13 +454,13 @@ void PluginGui::newItemSelected()
     if(!pPlugin.isNull() && pPlugin != m_pCurrentPlugin)
     {
         m_pCurrentPlugin = pPlugin;
-        m_pCurrentConnection = PluginConnectorConnection::SPtr();
+        m_pCurrentConnection = XSHAREDLIB::PluginConnectorConnection::SPtr();
         emit selectedPluginChanged(m_pCurrentPlugin);
     }
     else if(!pConnection.isNull() && pConnection != m_pCurrentConnection)
     {
         m_pCurrentConnection = pConnection;
-        m_pCurrentPlugin = IPlugin::SPtr();
+        m_pCurrentPlugin = XSHAREDLIB::IPlugin::SPtr();
         emit selectedConnectionChanged(m_pCurrentConnection);
     }
 }

@@ -1,10 +1,10 @@
 //=============================================================================================================
 /**
-* @file     pluginconnector.cpp
+* @file     plugininputdata.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     August, 2013
 *
 * @section  LICENSE
 *
@@ -29,25 +29,33 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the PluginConnector class.
+* @brief    Contains the declaration of the PluginInputData class.
 *
 */
+
+#ifndef PLUGININPUTDATA_CPP //Because this cpp is part of the header -> template
+#define PLUGININPUTDATA_CPP
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "pluginconnector.h"
-#include "../Interfaces/IPlugin.h"
+#include "plugininputdata.h"
 
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE XSHAREDLIB
+//=============================================================================================================
+
+namespace XSHAREDLIB
+{
 
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
-
-using namespace MNEX;
 
 
 //*************************************************************************************************************
@@ -55,10 +63,38 @@ using namespace MNEX;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-PluginConnector::PluginConnector(IPlugin *parent, const QString &name, const QString &descr)
-: QObject(parent)
-, m_pPlugin(parent)
-, m_sName(name)
-, m_sDescription(descr)
+template <class T>
+PluginInputData<T>::PluginInputData(IPlugin *parent, const QString &name, const QString &descr)
+: PluginInputConnector(parent, name, descr)
+, m_pFunc(NULL)
 {
 }
+
+
+//*************************************************************************************************************
+
+template <class T>
+void PluginInputData<T>::setCallbackMethod(callback_function pFunc)
+{
+    m_pFunc = pFunc;
+    connect(this, &PluginInputConnector::notify, this, &PluginInputData<T>::notifyCallbackFunction);
+}
+
+
+//*************************************************************************************************************
+
+template <class T>
+void PluginInputData<T>::notifyCallbackFunction(XMEASLIB::NewMeasurement::SPtr pMeasurement)
+{
+    qDebug() << "Here in input data.";
+    if(m_pFunc)
+    {
+        QSharedPointer<T> measurement = pMeasurement.dynamicCast<T>();
+
+        (*m_pFunc)(measurement);
+    }
+}
+
+}//Namespace
+
+#endif //PLUGININPUTDATA_CPP

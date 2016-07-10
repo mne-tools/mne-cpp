@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     pluginconnectorconnection.h
+* @file     plugininputdata.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,22 +29,18 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the PluginConnectorConnection class.
+* @brief    Contains the declaration of the PluginOutputData class.
 *
 */
-#ifndef PLUGINCONNECTORCONNECTION_H
-#define PLUGINCONNECTORCONNECTION_H
+#ifndef PLUGINOUTPUTDATA_H
+#define PLUGINOUTPUTDATA_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../mne_x_global.h"
-
-#include "../Interfaces/IPlugin.h"
-
-#include "plugininputconnector.h"
+#include "../xshared_global.h"
 #include "pluginoutputconnector.h"
 
 
@@ -53,100 +49,72 @@
 // Qt INCLUDES
 //=============================================================================================================
 
-#include <QObject>
-#include <QMetaObject>
 #include <QSharedPointer>
+#include <QMetaType>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MNEX
+// DEFINE NAMESPACE XSHAREDLIB
 //=============================================================================================================
 
-namespace MNEX
+namespace XSHAREDLIB
 {
 
-//*************************************************************************************************************
-/**
-* Connector Data Type
-*/
-enum ConnectorDataType
-{
-    _N,         /**< Numeric */
-    _RTMSA,     /**< Real-Time Multi Sample Array */
-    _RTSA,      /**< Real-Time Sample Array */
-    _RTE,       /**< Real-Time Evoked */
-    _RTC,       /**< Real-Time Covariance */
-    _RTSE,      /**< Real-Time Source Estimate */
-    _None,      /**< None */
-};
 
-
-//=============================================================================================================
+//=========================================================================================================
 /**
-* Class implements plug-in connector connections.
+* Class PluginOutputData provides an output connector with a specified MEasurement type.
 *
-* @brief The PluginConnectorConnection class holds connector connections
+* @brief PluginOutputConnector with specified Measurement
 */
-class MNE_X_SHARED_EXPORT PluginConnectorConnection : public QObject
+template <class T>
+class PluginOutputData : public PluginOutputConnector
 {
-    Q_OBJECT
-
-    friend class PluginConnectorConnectionWidget;
-
 public:
-    typedef QSharedPointer<PluginConnectorConnection> SPtr;             /**< Shared pointer type for PluginConnectorConnection. */
-    typedef QSharedPointer<const PluginConnectorConnection> ConstSPtr;  /**< Const shared pointer type for PluginConnectorConnection. */
+    typedef QSharedPointer<PluginOutputData<T> > SPtr;               /**< Shared pointer type for PluginOutputData. */
+    typedef QSharedPointer<const PluginOutputData<T> > ConstSPtr;    /**< Const shared pointer type for PluginOutputData. */
 
-    explicit PluginConnectorConnection(IPlugin::SPtr sender, IPlugin::SPtr receiver, QObject *parent = 0);
-    
+    //=========================================================================================================
+    /**
+    * Constructs PluginOutputData with the given parent.
+    *
+    * @param[in] parent     pointer to parent plugin
+    * @param[in] name       connection name
+    * @param[in] descr      connection description
+    */
+    PluginOutputData(IPlugin *parent, const QString &name, const QString &descr);
+
     //=========================================================================================================
     /**
     * Destructor
     */
-    virtual ~PluginConnectorConnection();
+    virtual ~PluginOutputData(){}
 
     //=========================================================================================================
     /**
-    * Disconnect connection
-    */
-    void clearConnection();
-
-    //=========================================================================================================
-    /**
-    * Create connection
-    */
-    static inline QSharedPointer<PluginConnectorConnection> create(IPlugin::SPtr sender, IPlugin::SPtr receiver, QObject *parent = 0);
-
-    static ConnectorDataType getDataType(QSharedPointer<PluginConnector> pPluginConnector);
-
-    inline IPlugin::SPtr& getSender();
-
-    inline IPlugin::SPtr& getReceiver();
-
-    inline bool isConnected();
-
-    //=========================================================================================================
-    /**
-    * The connector connection setup widget
+    * Creates PluginOutputData with the given parent.
     *
-    * @return the setup widget
+    * @param[in] parent     pointer to parent plugin
+    * @param[in] name       connection name
+    * @param[in] descr      connection description
+    *
+    * @return the created PluginOutputData
     */
-    QWidget* setupWidget();
+    static inline QSharedPointer< PluginOutputData<T> > create(IPlugin *parent, const QString &name, const QString &descr);
 
-signals:
-    
-private:
     //=========================================================================================================
     /**
-    * Create connection
+    * Returns the measurement
+    *
+    * @return the measurement
     */
-    bool createConnection();
+    inline QSharedPointer<T> &data();
 
-    IPlugin::SPtr m_pSender;
-    IPlugin::SPtr m_pReceiver;
+    void update();
 
-    QHash<QPair<QString, QString>, QMetaObject::Connection> m_qHashConnections; /**< QHash which holds the connections between sender and receiver QHash<QPair<Sender,Receiver>, Connection>. */
+private:
+    QSharedPointer<T> m_pMeasurement;
 };
 
 //*************************************************************************************************************
@@ -154,36 +122,24 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline QSharedPointer<PluginConnectorConnection> PluginConnectorConnection::create(IPlugin::SPtr sender, IPlugin::SPtr receiver, QObject *parent)
+template <class T>
+inline QSharedPointer< PluginOutputData<T> > PluginOutputData<T>::create(IPlugin *parent, const QString &name, const QString &descr)
 {
-    QSharedPointer<PluginConnectorConnection> pPluginConnectorConnection(new PluginConnectorConnection(sender, receiver, parent));
-    return pPluginConnectorConnection;
+    QSharedPointer< PluginOutputData<T> > pPluginOutputData(new PluginOutputData<T>(parent, name, descr));
+    return pPluginOutputData;
 }
-
 
 //*************************************************************************************************************
 
-inline IPlugin::SPtr& PluginConnectorConnection::getSender()
+template <class T>
+inline QSharedPointer<T> &PluginOutputData<T>::data()
 {
-    return m_pSender;
-}
-
-
-//*************************************************************************************************************
-
-inline IPlugin::SPtr& PluginConnectorConnection::getReceiver()
-{
-    return m_pReceiver;
-}
-
-
-//*************************************************************************************************************
-
-inline bool PluginConnectorConnection::isConnected()
-{
-    return m_qHashConnections.size() > 0 ? true : false;
+    return m_pMeasurement;
 }
 
 } // NAMESPACE
 
-#endif // PLUGINCONNECTORCONNECTION_H
+//Make the template definition visible to compiler in the first point of instantiation
+#include "pluginoutputdata.cpp"
+
+#endif // PLUGININPUTDATA_H

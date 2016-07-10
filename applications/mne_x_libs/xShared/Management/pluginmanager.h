@@ -1,10 +1,10 @@
 //=============================================================================================================
 /**
-* @file     pluginconnector.h
+* @file     pluginmanager.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     August, 2013
+* @date     February, 2013
 *
 * @section  LICENSE
 *
@@ -29,38 +29,36 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the PluginConnector class.
+* @brief    Contains the declaration of the PluginManager class.
 *
 */
-#ifndef PLUGINCONNECTOR_H
-#define PLUGINCONNECTOR_H
+
+#ifndef PLUGINMANAGER_H
+#define PLUGINMANAGER_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../mne_x_global.h"
+#include "../xshared_global.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// QT INCLUDES
 //=============================================================================================================
 
-#include <QObject>
-#include <QString>
-#include <QMutex>
-#include <QSet>
-#include <QSharedPointer>
+#include <QVector>
+#include <QPluginLoader>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MNEX
+// DEFINE NAMESPACE XSHAREDLIB
 //=============================================================================================================
 
-namespace MNEX
+namespace XSHAREDLIB
 {
 
 
@@ -70,88 +68,136 @@ namespace MNEX
 //=============================================================================================================
 
 class IPlugin;
+class ISensor;
+class IAlgorithm;
+class IIO;
 
 
 //=============================================================================================================
 /**
-* Class implements plug-in data connections.
+* DECLARE CLASS PluginManager
 *
-* @brief The PluginConnector class provides the base to connect plug-in data
+* @brief The PluginManager class provides a dynamic plugin loader. As well as the handling of the loaded plugins.
 */
-class MNE_X_SHARED_EXPORT PluginConnector : public QObject
+class XSHAREDSHARED_EXPORT PluginManager : public QPluginLoader
 {
     Q_OBJECT
+
+    friend class MainWindow;
+    friend class PluginDockWidget;
+
 public:
-    typedef QSharedPointer<PluginConnector> SPtr;               /**< Shared pointer type for PluginConnector. */
-    typedef QSharedPointer<const PluginConnector> ConstSPtr;    /**< Const shared pointer type for PluginConnector. */
+    typedef QSharedPointer<PluginManager> SPtr;               /**< Shared pointer type for PluginManager. */
+    typedef QSharedPointer<const PluginManager> ConstSPtr;    /**< Const shared pointer type for PluginManager. */
 
     //=========================================================================================================
     /**
-    * Constructs a PluginConnector with the given parent.
+    * Constructs a PluginManager with the given parent.
     *
-    * @param[in] parent     pointer to parent plugin
-    * @param[in] name       connection name
-    * @param[in] descr      connection description
+    * @param[in] parent pointer to parent Object. (It's normally the default value.)
     */
-    PluginConnector(IPlugin *parent, const QString &name, const QString &descr);
-    
+    PluginManager(QObject* parent = 0);
+
     //=========================================================================================================
     /**
-    * Destructor
+    * Destroys the PluginManager.
     */
-    virtual ~PluginConnector(){}
+    virtual ~PluginManager();
 
     //=========================================================================================================
     /**
-     * Returns true if this instance is an PluginInputConnector.
-     *
-     * @return true if castable to PluginInputConnector.
-     */
-    virtual bool isInputConnector() const = 0;
+    * Loads plugins from given directory.
+    *
+    * @param dir the plugin directory.
+    */
+    void loadPlugins(const QString& dir);
 
     //=========================================================================================================
     /**
-     * Returns true if this instance is an PluginOutputConnector.
-     *
-     * @return true if castable to PluginOutputConnector.
-     */
-    virtual bool isOutputConnector() const = 0;
+    * Finds index of plugin by name.
+    *
+    * @return index of plugin.
+    * @param name the plugin name.
+    */
+    int findByName(const QString& name);
 
     //=========================================================================================================
     /**
-     * Returns the PluginConnectors name.
-     *
-     * @return the PluginConnectors name
-     */
-    inline QString getName() const;
+    * Returns vector containing all plugins.
+    *
+    * @return reference to vector containing all plugins.
+    */
+    inline const QVector<IPlugin*>& getPlugins();
 
-signals:
+    //=========================================================================================================
+    /**
+    * Returns vector containing ISensor plugins.
+    *
+    * @return reference to vector containing ISensor plugins.
+    */
+    inline const QVector<ISensor*>& getSensorPlugins();
 
+    //=========================================================================================================
+    /**
+    * Returns vector containing IAlgorithm plugins
+    *
+    * @return reference to vector containing IRTAlgorithm plugins
+    */
+    inline const QVector<IAlgorithm*>& getAlgorithmPlugins();
 
+    //=========================================================================================================
+    /**
+    * Returns vector containing IIO plugins
+    *
+    * @return reference to vector containing IRTVisulaiztaion plugins
+    */
+    inline const QVector<IIO*>& getIOPlugins();
 
-protected:
-    IPlugin* m_pPlugin;  /**< Plugin to which connector belongs to */
-
-    //actual obeserver pattern - think of an other implementation --> currently similiar to OpenWalnut
-    //figure out how to Qt signal/slot
-    QSet<PluginConnector::SPtr> m_setConnections; /**< Set of connectors connected to this connector. */
 
 private:
-    QString m_sName;        /**< Connection name */
-    QString m_sDescription; /**< Connection description */
+    QVector<IPlugin*>    m_qVecPlugins;             /**< Vector of all plugins. */
+
+    QVector<ISensor*>    m_qVecSensorPlugins;       /**< Vector of all ISensor plugins. */
+    QVector<IAlgorithm*> m_qVecAlgorithmPlugins;    /**< Vector of all IAlgorithm plugins. */
+    QVector<IIO*>        m_qVecIOPlugins;           /**< Vector of all IIO plugins. */
 
 };
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-QString PluginConnector::getName() const
+inline const QVector<IPlugin*>& PluginManager::getPlugins()
 {
-    return m_sName;
+    return m_qVecPlugins;
+}
+
+
+//*************************************************************************************************************
+
+inline const QVector<ISensor*>& PluginManager::getSensorPlugins()
+{
+    return m_qVecSensorPlugins;
+}
+
+
+//*************************************************************************************************************
+
+inline const QVector<IAlgorithm*>& PluginManager::getAlgorithmPlugins()
+{
+    return m_qVecAlgorithmPlugins;
+}
+
+
+//*************************************************************************************************************
+
+inline const QVector<IIO*>& PluginManager::getIOPlugins()
+{
+    return m_qVecIOPlugins;
 }
 
 } // NAMESPACE
 
-#endif // PLUGINCONNECTOR_H
+#endif // PLUGINMANAGER_H

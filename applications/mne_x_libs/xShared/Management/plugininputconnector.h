@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     pluginoutputdata.cpp
+* @file     pluginconnector.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,70 +29,96 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the PluginOutputData class.
+* @brief    Contains the declaration of the PluginConnector class.
 *
 */
-
-#ifndef PLUGINOUTPUTDATA_CPP //Because this cpp is part of the header -> template
-#define PLUGINOUTPUTDATA_CPP
-
+#ifndef PLUGININPUTCONNECTOR_H
+#define PLUGININPUTCONNECTOR_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "pluginoutputdata.h"
+#include "../xshared_global.h"
+
+#include "pluginconnector.h"
 
 #include <xMeas/newmeasurement.h>
 
-#include <QDebug>
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Qt INCLUDES
+//=============================================================================================================
+
 #include <QSharedPointer>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MNEX
+// DEFINE NAMESPACE XSHAREDLIB
 //=============================================================================================================
 
-namespace MNEX
+namespace XSHAREDLIB
 {
 
-//*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE MEMBER METHODS
-//=============================================================================================================
-
-template <class T>
-PluginOutputData<T>::PluginOutputData(IPlugin *parent, const QString &name, const QString &descr)
-: PluginOutputConnector(parent, name, descr)
+/**
+* Base class to connect plug-in data streams.
+*
+* @brief The PluginConnector class provides the base to connect plug-in data
+*/
+class XSHAREDSHARED_EXPORT PluginInputConnector : public PluginConnector
 {
-    m_pMeasurement = QSharedPointer<T>(new T);
+    Q_OBJECT
+public:
+    typedef QSharedPointer<PluginInputConnector> SPtr;               /**< Shared pointer type for PluginInputConnector. */
+    typedef QSharedPointer<const PluginInputConnector> ConstSPtr;    /**< Const shared pointer type for PluginInputConnector. */
 
-    QSharedPointer<XMEASLIB::NewMeasurement> t_measurement = qSharedPointerDynamicCast<XMEASLIB::NewMeasurement>(m_pMeasurement);
+    //=========================================================================================================
+    /**
+    * Constructs a PluginInputConnector with the given parent.
+    *
+    * @param[in] parent     pointer to parent plugin
+    * @param[in] name       connection name
+    * @param[in] descr      connection description
+    */
+    PluginInputConnector(IPlugin *parent, const QString &name, const QString &descr);
 
-    if(t_measurement.isNull())
-        qFatal("Template type is not a measurement and therefor not supported!");
-    else
-        connect(t_measurement.data(), &XMEASLIB::NewMeasurement::notify, this, &PluginOutputData<T>::update, Qt::DirectConnection);
-}
+    //=========================================================================================================
+    /**
+    * Destructor
+    */
+    virtual ~PluginInputConnector(){}
+
+    //=========================================================================================================
+    /**
+     * Returns true.
+     *
+     * @return true
+     */
+    virtual bool isInputConnector() const;
+
+    //=========================================================================================================
+    /**
+     * Returns false.
+     *
+     * @return false
+     */
+    virtual bool isOutputConnector() const;
 
 
-//*************************************************************************************************************
+signals:
+    void notify(XMEASLIB::NewMeasurement::SPtr pMeasurement);
 
-template <class T>
-void PluginOutputData<T>::update()
-{
-    emit notify(qSharedPointerDynamicCast<XMEASLIB::NewMeasurement>(m_pMeasurement));
-}
+public slots:
+    void update(XMEASLIB::NewMeasurement::SPtr pMeasurement);
 
-}//Namespace
 
-#endif //PLUGINOUTPUTDATA_CPP
+
+};
+
+} // NAMESPACE
+
+#endif // PLUGININPUTCONNECTOR_H

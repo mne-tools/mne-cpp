@@ -1,10 +1,10 @@
 //=============================================================================================================
 /**
-* @file     plugininputconnector.cpp
+* @file     xshared_global.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     August, 2013
+* @date     March, 2013
 *
 * @section  LICENSE
 *
@@ -29,57 +29,30 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the PluginInputConnector class.
+* @brief    Contains the xshared library export/import macros.
 *
 */
-
-//*************************************************************************************************************
-//=============================================================================================================
-// INCLUDES
-//=============================================================================================================
-
-#include "plugininputconnector.h"
-#include "../Interfaces/IPlugin.h"
+#ifndef XSHARED_GLOBAL_H
+#define XSHARED_GLOBAL_H
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// QT INCLUDES
 //=============================================================================================================
 
-using namespace MNEX;
+#include <QtCore/qglobal.h>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE MEMBER METHODS
+// PREPROCESSOR DEFINES
 //=============================================================================================================
 
-PluginInputConnector::PluginInputConnector(IPlugin *parent, const QString &name, const QString &descr)
-: PluginConnector(parent, name, descr)
-{
-}
+#if defined(XSHARED_LIBRARY)
+#  define XSHAREDSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+#else
+#  define XSHAREDSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+#endif
 
-
-//*************************************************************************************************************
-
-bool PluginInputConnector::isInputConnector() const
-{
-    return true;
-}
-
-
-//*************************************************************************************************************
-
-bool PluginInputConnector::isOutputConnector() const
-{
-    return false;
-}
-
-
-//*************************************************************************************************************
-
-void PluginInputConnector::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
-{
-    emit notify(pMeasurement);
-}
+#endif // XSHARED_GLOBAL_H

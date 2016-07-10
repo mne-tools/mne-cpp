@@ -1,10 +1,10 @@
 //=============================================================================================================
 /**
-* @file     mne_x_global.h
+* @file     pluginoutputconnector.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     March, 2013
+* @date     August, 2013
 *
 * @section  LICENSE
 *
@@ -29,30 +29,50 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the mne_x library export/import macros.
+* @brief    Contains the declaration of the PluginOutputConnector class.
 *
 */
-#ifndef MNE_X_GLOBAL_H
-#define MNE_X_GLOBAL_H
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "pluginoutputconnector.h"
+#include "../Interfaces/IPlugin.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// USED NAMESPACES
 //=============================================================================================================
 
-#include <QtCore/qglobal.h>
+using namespace XSHAREDLIB;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// PREPROCESSOR DEFINES
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-#if defined(MNE_X_LIBRARY)
-#  define MNE_X_SHARED_EXPORT Q_DECL_EXPORT	/**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
-#else
-#  define MNE_X_SHARED_EXPORT Q_DECL_IMPORT	/**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
-#endif
+PluginOutputConnector::PluginOutputConnector(IPlugin *parent, const QString &name, const QString &descr)
+: PluginConnector(parent, name, descr)
+{
+}
 
-#endif // MNE_X_GLOBAL_H
+
+//*************************************************************************************************************
+
+bool PluginOutputConnector::isInputConnector() const
+{
+    return false;
+}
+
+
+//*************************************************************************************************************
+
+bool PluginOutputConnector::isOutputConnector() const
+{
+    return true;
+}
+

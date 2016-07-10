@@ -87,7 +87,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNEX;
+using namespace XSHAREDLIB;
 using namespace XDISPLIB;
 using namespace XMEASLIB;
 
