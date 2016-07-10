@@ -62,7 +62,7 @@ RtSssAlgo rsss;
 
 using namespace RtSssPlugin;
 using namespace FIFFLIB;
-using namespace MNEX;
+using namespace XSHAREDLIB;
 using namespace XMEASLIB;
 
 

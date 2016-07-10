@@ -37,12 +37,11 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = subdirs
 
-contains(MNECPP_CONFIG, withGui) {
+!contains(MNECPP_CONFIG, minimalVersion) {
     SUBDIRS += \
         xMeas \
         xDisp \
-        mne_x
-#        xDtMng \
+        xShared
 }
 
 CONFIG += ordered

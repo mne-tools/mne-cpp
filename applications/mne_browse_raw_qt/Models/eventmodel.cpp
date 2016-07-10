@@ -102,6 +102,14 @@ EventModel::EventModel(QFile &qFile, QObject *parent)
 
 //*************************************************************************************************************
 //virtual functions
+EventModel::~EventModel()
+{
+
+}
+
+
+//*************************************************************************************************************
+//virtual functions
 int EventModel::rowCount(const QModelIndex & /*parent*/) const
 {
     //Always return filtered events so that the qTableView gets the correct number of rows which are to be displayed
@@ -414,7 +422,7 @@ bool EventModel::saveEventData(QFile& qFile)
 
 //*************************************************************************************************************
 
-void EventModel::setFiffInfo(FiffInfo* pFiffInfo)
+void EventModel::setFiffInfo(FiffInfo::SPtr& pFiffInfo)
 {
     m_pFiffInfo = pFiffInfo;
 }
@@ -440,7 +448,7 @@ void EventModel::setCurrentMarkerPos(int markerPos)
 
 //*************************************************************************************************************
 
-FiffInfo* EventModel::getFiffInfo() const
+FiffInfo::SPtr EventModel::getFiffInfo() const
 {
     return m_pFiffInfo;
 }

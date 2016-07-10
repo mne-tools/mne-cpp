@@ -49,7 +49,7 @@
 #include "FormFiles/babymegsquidcontroldgl.h"
 #include "FormFiles/babymeghpidgl.h"
 
-#include <mne_x/Interfaces/ISensor.h>
+#include <xShared/Interfaces/ISensor.h>
 #include <generics/circularbuffer_old.h>
 #include <generics/circularmatrixbuffer.h>
 #include <xMeas/newrealtimemultisamplearray.h>
@@ -109,7 +109,7 @@ namespace BabyMEGPlugin
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNEX;
+using namespace XSHAREDLIB;
 using namespace IOBuffer;
 using namespace RTCLIENTLIB;
 using namespace FIFFLIB;
@@ -134,9 +134,9 @@ class babymeghpidgl;
 class BABYMEGSHARED_EXPORT BabyMEG : public ISensor
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "mne_x/1.0" FILE "babymeg.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    Q_PLUGIN_METADATA(IID "xsharedlib/1.0" FILE "babymeg.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(MNEX::ISensor)
+    Q_INTERFACES(XSHAREDLIB::ISensor)
 
     friend class BabyMEGSetupWidget;
     friend class BabyMEGProjectDialog;
@@ -264,7 +264,7 @@ public:
     *
     * @param[in] p_FiffInfo    the Fiff Info.
     */
-    void setFiffInfo(FIFFLIB::FiffInfo p_FiffInfo);
+    void setFiffInfo(const FIFFLIB::FiffInfo& p_FiffInfo);
 
     //=========================================================================================================
     /**
@@ -316,7 +316,7 @@ public:
     *
     * @param[in] info   the new fiff info.
     */
-    void RecvHPIFiffInfo(FiffInfo info);
+    void RecvHPIFiffInfo(const FiffInfo& info);
 
     //=========================================================================================================
     /**

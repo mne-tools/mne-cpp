@@ -63,6 +63,8 @@ using namespace MNEX;
 PluginScene::PluginScene(QMenu *pMenuPluginItem, PluginGui *pPluginGui)
 : QGraphicsScene(pPluginGui)
 , m_pPluginGui(pPluginGui)
+, m_pActionPluginItem(Q_NULLPTR)
+, leftButtonDown(false)
 {
     m_pMenuPluginItem = pMenuPluginItem;
     m_mode = MovePluginItem;
@@ -85,7 +87,7 @@ PluginScene::~PluginScene()
 void PluginScene::insertItem(const QPointF& pos)
 {
     PluginItem *item;
-    IPlugin::SPtr pPlugin;
+    XSHAREDLIB::IPlugin::SPtr pPlugin;
     QString name;
     switch (m_mode) {
         case InsertPluginItem:
@@ -115,13 +117,13 @@ void PluginScene::insertItem(const QPointF& pos)
 
 //*************************************************************************************************************
 
-bool PluginScene::insertPlugin(QAction* pActionPluginItem, IPlugin::SPtr &pAddedPlugin)
+bool PluginScene::insertPlugin(QAction* pActionPluginItem, XSHAREDLIB::IPlugin::SPtr &pAddedPlugin)
 {
     if(pActionPluginItem->isEnabled())
     {
         QString name = pActionPluginItem->text();
         qint32 idx = m_pPluginGui->m_pPluginManager->findByName(name);
-        IPlugin* pPlugin = m_pPluginGui->m_pPluginManager->getPlugins()[idx];
+        XSHAREDLIB::IPlugin* pPlugin = m_pPluginGui->m_pPluginManager->getPlugins()[idx];
 
         if(m_pPluginGui->m_pPluginSceneManager->addPlugin(pPlugin, pAddedPlugin))
         {
@@ -187,7 +189,7 @@ void PluginScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
             PluginItem *startItem = qgraphicsitem_cast<PluginItem *>(startItems.first());
             PluginItem *endItem = qgraphicsitem_cast<PluginItem *>(endItems.first());
 
-            PluginConnectorConnection::SPtr pConnection = PluginConnectorConnection::create(startItem->plugin(), endItem->plugin());
+            XSHAREDLIB::PluginConnectorConnection::SPtr pConnection = XSHAREDLIB::PluginConnectorConnection::create(startItem->plugin(), endItem->plugin());
 
             if(pConnection->isConnected())
             {

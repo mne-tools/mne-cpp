@@ -8,8 +8,8 @@ echo Starting MNE-CPP Mac Build
 mkdir mne-cpp_shadow_build
 cd mne-cpp_shadow_build
 
-QT_BIN_DIR='/Users/Shared/Jenkins/Qt5.6.0/5.6/clang_64/bin'
-QT_LIB_DIR='/Users/Shared/Jenkins/Qt5.6.0/5.6/clang_64/lib'
+QT_BIN_DIR='/Users/Shared/Jenkins/Qt5.7.0/5.7/clang_64/bin'
+QT_LIB_DIR='/Users/Shared/Jenkins/Qt5.7.0/5.7/clang_64/lib'
 
 TANGIBLES=(mne_x mne_browse_raw_qt mne_analyze_qt)
 
@@ -26,7 +26,7 @@ n_elements=${#TANGIBLES[@]}
 for ((i = 0; i < n_elements; i++)); do
     tangibleapp="../mne-cpp/bin/${TANGIBLES[i]}.app"
     tangibledmgbin="../mne-cpp/bin/${TANGIBLES[i]}.dmg"
-    tangibledmg="../${TANGIBLES[i]}-1.0.0-beta.dmg"
+    tangibledmg="../${TANGIBLES[i]}-master.dmg"
     rm -rf $tangibleapp
 	rm $tangibledmgbin
 	rm $tangibledmg
@@ -52,5 +52,5 @@ done
 cd ..
 for ((i = 0; i < n_elements; i++)); do
 	cp "./mne-cpp/bin/${TANGIBLES[i]}.dmg" "./"
-	mv "./${TANGIBLES[i]}.dmg" "./${TANGIBLES[i]}-1.0.0-beta.dmg"
+	mv "./${TANGIBLES[i]}.dmg" "./${TANGIBLES[i]}-master.dmg"
 done

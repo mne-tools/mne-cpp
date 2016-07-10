@@ -75,6 +75,15 @@ class QTime;
 class QDockWidget;
 class QTextBrowser;
 
+namespace XSHAREDLIB
+{
+class IPlugin;
+class PluginManager;
+class PluginSceneManager;
+class PluginConnectorConnection;
+class DisplayManager;
+}
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -86,25 +95,12 @@ namespace MNEX
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-
-//*************************************************************************************************************
-//=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
 class StartUpWidget;
 
 class PluginGui;
-class PluginManager;
-class PluginSceneManager;
-class DisplayManager;
-
-class IPlugin;
-
-class PluginConnectorConnection;
 
 class RunWidget;
 class PluginDockWidget;
@@ -183,7 +179,7 @@ private:
     //Run
     RunWidget* m_pRunWidget;                            /**< The run widget */
     QShortcut* m_pRunWidgetClose;                       /**< Run widget close shortcut */
-    QSharedPointer<DisplayManager> m_pDisplayManager;   /**< display manager */
+    QSharedPointer<XSHAREDLIB::DisplayManager> m_pDisplayManager;   /**< display manager */
 
     bool m_bDisplayMax;                 /**< whether full screen mode is activated.*/
     bool m_bIsRunning;                  /**< whether program/plugins is/are started.*/
@@ -253,8 +249,8 @@ private:
     //Plugin Management
     QDockWidget*                        m_pPluginGuiDockWidget;         /**< Dock widget which holds the plugin gui. */
     PluginGui*                          m_pPluginGui;
-    QSharedPointer<PluginManager>       m_pPluginManager;               /**< Holds log dock widget.*/
-    QSharedPointer<PluginSceneManager>  m_pPluginSceneManager;          /**< Plugin scene manager which manages the plugin graph */
+    QSharedPointer<XSHAREDLIB::PluginManager>       m_pPluginManager;       /**< Holds log dock widget.*/
+    QSharedPointer<XSHAREDLIB::PluginSceneManager>  m_pPluginSceneManager;  /**< Plugin scene manager which manages the plugin graph */
 
     //Log
     QDockWidget*                        m_pDockWidget_Log;              /**< Holds the dock widget containing the log.*/
@@ -264,9 +260,9 @@ private:
 
     QSharedPointer<QWidget>             m_pAboutWindow;                 /**< Holds the widget containing the about information.*/
 
-    void updatePluginWidget(QSharedPointer<IPlugin> pPlugin);           /**< Sets the plugin widget to central widget of MainWindow class depending on the current plugin selected in m_pDockWidgetPlugins.*/
+    void updatePluginWidget(QSharedPointer<XSHAREDLIB::IPlugin> pPlugin);                           /**< Sets the plugin widget to central widget of MainWindow class depending on the current plugin selected in m_pDockWidgetPlugins.*/
 
-    void updateConnectionWidget(QSharedPointer<PluginConnectorConnection> pConnection);   /**< Sets the connection widget to central widget of MainWindow class depending on the current arrow selected in m_pDockWidgetPlugins.*/
+    void updateConnectionWidget(QSharedPointer<XSHAREDLIB::PluginConnectorConnection> pConnection); /**< Sets the connection widget to central widget of MainWindow class depending on the current arrow selected in m_pDockWidgetPlugins.*/
 
 
 private:

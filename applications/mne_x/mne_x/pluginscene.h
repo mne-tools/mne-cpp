@@ -43,8 +43,8 @@
 
 #include "pluginitem.h"
 
-#include <mne_x/Management/pluginmanager.h>
-#include <mne_x/Management/pluginscenemanager.h>
+#include <xShared/Management/pluginmanager.h>
+#include <xShared/Management/pluginscenemanager.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -115,7 +115,7 @@ public:
     *
     * @return true if successfull
     */
-    bool insertPlugin(QAction* pActionPluginItem, IPlugin::SPtr &pAddedPlugin);
+    bool insertPlugin(QAction* pActionPluginItem, XSHAREDLIB::IPlugin::SPtr &pAddedPlugin);
 
     inline void setMode(Mode mode);
     inline void setActionPluginItem(QAction* pAction);

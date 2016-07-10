@@ -40,6 +40,30 @@
 
 #include "view3D.h"
 
+#include <mne/mne_sourceestimate.h>
+#include "helpers/types.h"
+#include <iostream>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QDebug>
+#include <QPropertyAnimation>
+#include <QKeyEvent>
+
+#include <Qt3DCore/QAspectEngine>
+#include <Qt3DRender/QCamera>
+#include <Qt3DCore/QTransform>
+#include <Qt3DExtras/QPhongMaterial>
+#include <Qt3DExtras/QPerVertexColorMaterial>
+#include <Qt3DExtras/QFirstPersonCameraController>
+#include <Qt3DRender/QPointLight>
+#include <Qt3DExtras/QCylinderMesh>
+#include <Qt3DExtras/QForwardRenderer>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -57,12 +81,9 @@ using namespace FSLIB;
 //=============================================================================================================
 
 View3D::View3D()
-: Window()
+: Qt3DExtras::Qt3DWindow()
 , m_pRootEntity(new Qt3DCore::QEntity())
-, m_pInputAspect(new Qt3DInput::QInputAspect())
-, m_pCameraEntity(new Qt3DCore::QCamera(m_pRootEntity))
-, m_pFrameGraph(new Qt3DRender::QFrameGraph())
-, m_pForwardRenderer(new Qt3DRender::QForwardRenderer())
+, m_pCameraEntity(this->camera())
 , m_pData3DTreeModel(Data3DTreeModel::SPtr(new Data3DTreeModel(0, m_pRootEntity)))
 , m_bCameraRotationMode(false)
 , m_bCameraTransMode(false)
@@ -71,6 +92,7 @@ View3D::View3D()
 , m_vecCameraTransOld(QVector3D(0.0,0.0,-0.5))
 , m_vecCameraRotation(QVector3D(0.0,0.0,0.0))
 , m_vecCameraRotationOld(QVector3D(0.0,0.0,0.0))
+, m_pCameraTransform(new Qt3DCore::QTransform())
 {
     initMetatypes();
     init();
@@ -89,6 +111,7 @@ View3D::~View3D()
 void View3D::initMetatypes()
 {
     qRegisterMetaType<QByteArray>();
+    qRegisterMetaType<QPair<QByteArray, QByteArray> >();
 
     qRegisterMetaType<Eigen::MatrixX3i>();
     qRegisterMetaType<Eigen::MatrixXd>();
@@ -114,17 +137,6 @@ void View3D::initMetatypes()
 
 void View3D::init()
 {
-    //Aspect engine
-    m_aspectEngine.registerAspect(new Qt3DRender::QRenderAspect());
-
-    //m_aspectEngine.registerAspect(m_pInputAspect);
-
-    //Data
-    QVariantMap data;
-    data.insert(QStringLiteral("surface"), QVariant::fromValue(static_cast<QSurface *>(this)));
-    data.insert(QStringLiteral("eventSource"), QVariant::fromValue(this));
-    m_aspectEngine.setData(data);
-
     //Light source
 //    Qt3DRender::QPointLight *light1 = new Qt3DRender::QPointLight();
 //    light1->setColor(Qt::white);
@@ -136,24 +148,19 @@ void View3D::init()
     m_pCameraEntity->setPosition(m_vecCameraTrans);
     m_pCameraEntity->setUpVector(QVector3D(0, 1, 0));
     m_pCameraEntity->setViewCenter(QVector3D(0, 0, 0));
-    //m_pInputAspect->setCamera(m_pCameraEntity);
 
-    // FrameGraph
-    m_pForwardRenderer = new Qt3DRender::QForwardRenderer();
-    m_pForwardRenderer->setClearColor(QColor::fromRgbF(0.0, 0.0, 0.0, 0.5));
-    m_pForwardRenderer->setCamera(m_pCameraEntity);
-    m_pFrameGraph->setActiveFrameGraph(m_pForwardRenderer);
+    Qt3DExtras::QFirstPersonCameraController *camController = new Qt3DExtras::QFirstPersonCameraController(m_pRootEntity);
+    camController->setCamera(m_pCameraEntity);
+
+    this->defaultFramegraph()->setClearColor(QColor::fromRgbF(0.0, 0.0, 0.0, 0.5));
 
     //Init the transforms
     initTransformations();
 
-    // Setting the FrameGraph
-    m_pRootEntity->addComponent(m_pFrameGraph);
-
     // Set root object of the scene
-    m_aspectEngine.setRootEntity(m_pRootEntity);
+    this->setRootEntity(m_pRootEntity);
 
-    //createCoordSystem(m_pRootEntity);
+    createCoordSystem(m_pRootEntity);
 }
 
 
@@ -162,7 +169,6 @@ void View3D::init()
 void View3D::initTransformations()
 {
     // Initialize camera transforms
-    m_pCameraTransform = new Qt3DCore::QTransform;
     m_pCameraTransform->setTranslation(m_vecCameraTrans);
     m_pCameraEntity->addComponent(m_pCameraTransform);
 }
@@ -228,7 +234,7 @@ Data3DTreeModel* View3D::getData3DTreeModel()
 
 void View3D::setSceneColor(const QColor& colSceneColor)
 {
-    m_pForwardRenderer->setClearColor(colSceneColor);
+    this->defaultFramegraph()->setClearColor(colSceneColor);
 }
 
 
@@ -282,7 +288,7 @@ void View3D::keyPressEvent(QKeyEvent* e)
             break;
 
         default:
-            Window::keyPressEvent(e);
+            Qt3DWindow::keyPressEvent(e);
     }
 }
 
@@ -298,7 +304,7 @@ void View3D::keyReleaseEvent(QKeyEvent* e)
             break;
 
         default:
-            Window::keyPressEvent(e);
+            Qt3DWindow::keyPressEvent(e);
     }
 }
 
@@ -319,9 +325,10 @@ void View3D::mousePressEvent(QMouseEvent* e)
         case Qt::RightButton:
             m_bCameraTransMode = true;
             break;
-    }
 
-    Window::mousePressEvent(e);
+        default:
+            Qt3DWindow::mousePressEvent(e);
+    }    
 }
 
 
@@ -337,7 +344,7 @@ void View3D::wheelEvent(QWheelEvent* e)
     // Transform
     m_pCameraTransform->setTranslation(m_vecCameraTrans);
 
-    Window::wheelEvent(e);
+    Qt3DWindow::wheelEvent(e);
 }
 
 
@@ -350,7 +357,7 @@ void View3D::mouseReleaseEvent(QMouseEvent* e)
     m_vecCameraTransOld = m_vecCameraTrans;
     m_vecCameraRotationOld = m_vecCameraRotation;
 
-    Window::mouseReleaseEvent(e);
+    Qt3DWindow::mouseReleaseEvent(e);
 }
 
 
@@ -386,7 +393,7 @@ void View3D::mouseMoveEvent(QMouseEvent* e)
         m_pCameraTransform->setTranslation(m_vecCameraTrans);
     }
 
-    Window::mouseMoveEvent(e);
+    Qt3DWindow::mouseMoveEvent(e);
 }
 
 
@@ -395,7 +402,7 @@ void View3D::mouseMoveEvent(QMouseEvent* e)
 void View3D::createCoordSystem(Qt3DCore::QEntity* parent)
 {
     // Y - red
-    Qt3DRender::QCylinderMesh *YAxis = new Qt3DRender::QCylinderMesh();
+    Qt3DExtras::QCylinderMesh *YAxis = new Qt3DExtras::QCylinderMesh();
     YAxis->setRadius(0.001f);
     YAxis->setLength(30);
     YAxis->setRings(100);
@@ -404,7 +411,7 @@ void View3D::createCoordSystem(Qt3DCore::QEntity* parent)
     m_YAxisEntity = QSharedPointer<Qt3DCore::QEntity>(new Qt3DCore::QEntity(parent));
     m_YAxisEntity->addComponent(YAxis);
 
-    Qt3DRender::QPhongMaterial *phongMaterialY = new Qt3DRender::QPhongMaterial();
+    Qt3DExtras::QPhongMaterial *phongMaterialY = new Qt3DExtras::QPhongMaterial();
     phongMaterialY->setDiffuse(QColor(255, 0, 0));
     phongMaterialY->setAmbient(Qt::gray);
     phongMaterialY->setSpecular(Qt::white);
@@ -412,7 +419,7 @@ void View3D::createCoordSystem(Qt3DCore::QEntity* parent)
     m_YAxisEntity->addComponent(phongMaterialY);
 
     // Z - blue
-    Qt3DRender::QCylinderMesh *ZAxis = new Qt3DRender::QCylinderMesh();
+    Qt3DExtras::QCylinderMesh *ZAxis = new Qt3DExtras::QCylinderMesh();
     ZAxis->setRadius(0.001f);
     ZAxis->setLength(30);
     ZAxis->setRings(100);
@@ -425,7 +432,7 @@ void View3D::createCoordSystem(Qt3DCore::QEntity* parent)
     m_ZAxisEntity->addComponent(ZAxis);
     m_ZAxisEntity->addComponent(transformZ);
 
-    Qt3DRender::QPhongMaterial *phongMaterialZ = new Qt3DRender::QPhongMaterial();
+    Qt3DExtras::QPhongMaterial *phongMaterialZ = new Qt3DExtras::QPhongMaterial();
     phongMaterialZ->setDiffuse(QColor(0, 0, 255));
     phongMaterialZ->setAmbient(Qt::gray);
     phongMaterialZ->setSpecular(Qt::white);
@@ -433,7 +440,7 @@ void View3D::createCoordSystem(Qt3DCore::QEntity* parent)
     m_ZAxisEntity->addComponent(phongMaterialZ);
 
     // X - green
-    Qt3DRender::QCylinderMesh *XAxis = new Qt3DRender::QCylinderMesh();
+    Qt3DExtras::QCylinderMesh *XAxis = new Qt3DExtras::QCylinderMesh();
     XAxis->setRadius(0.001f);
     XAxis->setLength(30);
     XAxis->setRings(100);
@@ -446,7 +453,7 @@ void View3D::createCoordSystem(Qt3DCore::QEntity* parent)
     m_XAxisEntity->addComponent(XAxis);
     m_XAxisEntity->addComponent(transformX);
 
-    Qt3DRender::QPhongMaterial *phongMaterialX = new Qt3DRender::QPhongMaterial();
+    Qt3DExtras::QPhongMaterial *phongMaterialX = new Qt3DExtras::QPhongMaterial();
     phongMaterialX->setDiffuse(QColor(0, 255, 0));
     phongMaterialX->setAmbient(Qt::gray);
     phongMaterialX->setSpecular(Qt::white);

@@ -57,11 +57,7 @@ SUBDIRS += \
     patientManager \
     testWarp
 
-contains(MNECPP_CONFIG, withGui) {
-    SUBDIRS += \
-
-    qtHaveModule(3dcore,3drender,3dinput) {
-    message(examples.pro - Qt3D available)
+!contains(MNECPP_CONFIG, minimalVersion) {
     SUBDIRS += \
         clusteredInverse \
         rawClusteredInverse \
@@ -77,5 +73,4 @@ contains(MNECPP_CONFIG, withGui) {
         roiClusteredInversePwlRapMusic \
         fsSurface \
         disp3DTutorial \
-    }
 }

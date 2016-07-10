@@ -111,7 +111,7 @@ public:
     * @param[in] sel        Which epochs should be averaged (optional)
     * @param[in] proj       Apply SSP projection vectors (optional, default = false)
     */
-    FiffEvoked average(FiffInfo& p_info, fiff_int_t first, fiff_int_t last, VectorXi sel = defaultVectorXi, bool proj = false);
+    FIFFLIB::FiffEvoked average(FIFFLIB::FiffInfo& p_info, FIFFLIB::fiff_int_t first, FIFFLIB::fiff_int_t last, VectorXi sel = FIFFLIB::defaultVectorXi, bool proj = false);
 };
 
 } // NAMESPACE
