@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     pluginconnectorconnectionwidget.h
+* @file     displaymanager.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2014
+* @date     August, 2013
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,18 +29,21 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the PluginConnectorConnectionWidget class.
+* @brief    Declaration of the DisplayManager Class.
 *
 */
-#ifndef PLUGINCONNECTORCONNECTIONWIDGET_H
-#define PLUGINCONNECTORCONNECTIONWIDGET_H
+
+#ifndef DISPLAYMANAGER_H
+#define DISPLAYMANAGER_H
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../mne_x_global.h"
+#include "../xshared_global.h"
+#include "../Interfaces/IPlugin.h"
 
 
 //*************************************************************************************************************
@@ -48,18 +51,12 @@
 // Qt INCLUDES
 //=============================================================================================================
 
-#include <QLabel>
+#include <QSharedPointer>
+#include <QTime>
+#include <QHash>
 #include <QWidget>
-#include <QComboBox>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE MNEX
-//=============================================================================================================
-
-namespace MNEX
-{
+#include <QLabel>
+#include <QString>
 
 
 //*************************************************************************************************************
@@ -67,58 +64,67 @@ namespace MNEX
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class PluginConnectorConnection;
+class QVBoxLayout;
+class QHBoxLayout;
 
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE XSHAREDLIB
+//=============================================================================================================
+
+namespace XSHAREDLIB
+{
 
 //=============================================================================================================
 /**
-* Class implements the plug-in connector connection widget.
+* DECLARE CLASS DisplayManager
 *
-* @brief The PluginConnectorConnectionWidget class provides an user interface for connector connections
+* @brief The DisplayManager class handles current displayed widgets.
 */
-class MNE_X_SHARED_EXPORT PluginConnectorConnectionWidget : public QWidget
+class XSHAREDSHARED_EXPORT DisplayManager : public QObject
 {
     Q_OBJECT
 public:
+    typedef QSharedPointer<DisplayManager> SPtr;               /**< Shared pointer type for DisplayManager. */
+    typedef QSharedPointer<const DisplayManager> ConstSPtr;    /**< Const shared pointer type for DisplayManager. */
 
     //=========================================================================================================
     /**
-    * Constructs a PluginConnectorConnectionWidget which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new PluginConnectorConnectionWidget becomes a window. If parent is another widget, PluginConnectorConnectionWidget becomes a child window inside parent. PluginConnectorConnectionWidget is deleted when its parent is deleted.
-    * @param [in] pPluginConnectorConnection a pointer to the corresponding Connector Connection.
+    * Constructs a DisplayManager.
     */
-    PluginConnectorConnectionWidget(PluginConnectorConnection* pPluginConnectorConnection, QWidget *parent = 0);
+    DisplayManager(QObject* parent = 0);
 
     //=========================================================================================================
     /**
-    * Destructor
-    *
+    * Destroys the DisplayManager.
     */
-    ~PluginConnectorConnectionWidget();
+    virtual ~DisplayManager();
 
     //=========================================================================================================
     /**
-    * New selection in one of the combo box
+    * Shows a widget containing all current measurement widgets.
     *
-    * @param [in] p_sCurrentReceiver   the receivers name
+    * @param [in] outputConnectorList   output connector list
+    * @param [in] pT                    global timer
+    * @param [out] qListActions         a list of actions containing all measurent widget actions
+    * @param [out] qListWidgets         a list of widgets containing all measurent widget tool widgets
+    *
+    * @return a pointer to the widget containing all measurement widgets.
     */
-    void updateReceiver(const QString &p_sCurrentReceiver);
+    QWidget* show(IPlugin::OutputConnectorList &outputConnectorList, QSharedPointer<QTime>& pT, QList< QAction* >& qListActions, QList< QWidget* >& qListWidgets);
 
-signals:
-
-public slots:
-
+    //=========================================================================================================
+    /**
+    * Cleans all measurement widget hash's.
+    */
+    void clean();
 
 private:
-    QLabel* m_pLabel;                                           /**< Holds the start up widget label. */
-
-    PluginConnectorConnection*  m_pPluginConnectorConnection;   /**< a pointer to corresponding PluginConnectorConnection.*/
-
-    QMap<QString, QComboBox*> m_qMapSenderToReceiverConnections;/**< To each output a possible list of inputs. */
+    QList<QMetaObject::Connection>   m_pListWidgetConnections;       /**< all widget connections.*/
 
 };
 
 } // NAMESPACE
 
-#endif // PLUGINCONNECTORCONNECTIONWIDGET_H
+#endif // DISPLAYMANAGER_H

@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     IIO.h
+* @file     IAlgorithm.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains declaration of IIO interface class.
+* @brief    Contains declaration of IAlgorithm interface class.
 *
 */
 
-#ifndef IIO_H
-#define IIO_H
+#ifndef IALGORITHM_H
+#define IALGORITHM_H
 
 
 //*************************************************************************************************************
@@ -44,54 +44,41 @@
 
 #include "IPlugin.h"
 
-#include <generics/circularbuffer_old.h>
-
 
 //*************************************************************************************************************
 //=============================================================================================================
-// STL INCLUDES
+// Qt INCLUDES
 //=============================================================================================================
-
-#include <QMap>
 
 #include <QSharedPointer>
 
-
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// DEFINE NAMESPACE XSHAREDLIB
 //=============================================================================================================
 
-#include <QFile>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE MNEX
-//=============================================================================================================
-
-namespace MNEX
+namespace XSHAREDLIB
 {
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS IIO
+* DECLARE CLASS IAlgorithm
 *
-* @brief The IIO class provides an interface for a real-time record plugin.
+* @brief The IAlgorithm class provides an interface for a real-time algorithm plugin.
 */
-class IIO : public IPlugin
+class IAlgorithm : public IPlugin
 {
-//ToDo virtual methods of IMeasurementSink
+//ToDo virtual methods of IMeasurementSink && IMeasurementSource
 public:
-    typedef QSharedPointer<IIO> SPtr;               /**< Shared pointer type for IIO. */
-    typedef QSharedPointer<const IIO> ConstSPtr;    /**< Const shared pointer type for IIO. */
+    typedef QSharedPointer<IAlgorithm> SPtr;               /**< Shared pointer type for IAlgorithm. */
+    typedef QSharedPointer<const IAlgorithm> ConstSPtr;    /**< Const shared pointer type for IAlgorithm. */
 
     //=========================================================================================================
     /**
-    * Destroys the IIO.
+    * Destroys the IAlgorithm.
     */
-    virtual ~IIO() {};
+    virtual ~IAlgorithm() {};
 
     //=========================================================================================================
     /**
@@ -113,7 +100,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Starts the IIO.
+    * Starts the IAlgorithm.
     * Pure virtual method inherited by IPlugin.
     *
     * @return true if success, false otherwise
@@ -122,7 +109,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Stops the IIO.
+    * Stops the IAlgorithm.
     * Pure virtual method inherited by IPlugin.
     *
     * @return true if success, false otherwise
@@ -134,7 +121,7 @@ public:
     * Returns the plugin type.
     * Pure virtual method inherited by IPlugin.
     *
-    * @return type of the IIO
+    * @return type of the IAlgorithm
     */
     virtual PluginType getType() const = 0;
 
@@ -143,29 +130,28 @@ public:
     * Returns the plugin name.
     * Pure virtual method inherited by IPlugin.
     *
-    * @return the name of the IIO.
+    * @return the name of the IAlgorithm.
     */
     virtual QString getName() const = 0;
 
     //=========================================================================================================
     /**
-    * Returns the set up widget for configuration of IIO.
+    * True if multi instantiation of plugin is allowed.
+    *
+    * @return true if multi instantiation of plugin is allowed.
+    */
+    virtual inline bool multiInstanceAllowed() const;
+
+    //=========================================================================================================
+    /**
+    * Returns the set up widget for configuration of IAlgorithm.
     * Pure virtual method inherited by IPlugin.
     *
     * @return the setup widget.
     */
-    virtual QWidget* setupWidget() const = 0; //setup();
-
-    //=========================================================================================================
-    /**
-    * Sets the name of the RTRecord directory.
-    *
-    * @param [in] dirName name of the RTRecord directory
-    */
-    inline void setRTRecordDirName(const QString& dirName);
+    virtual QWidget* setupWidget() = 0; //setup();
 
 protected:
-
     //=========================================================================================================
     /**
     * The starting point for the thread. After calling start(), the newly created thread calls this function.
@@ -173,25 +159,20 @@ protected:
     * Pure virtual method inherited by QThread
     */
     virtual void run() = 0;
-
-    QString                                 m_RTRecordDirName;  /**< the real-time record sub directory name. */
-    typedef QMap<unsigned short, QFile*>    t_FileMap;          /**< Defines a new file mapping type. */
-    t_FileMap                               m_mapFiles;         /**< the file map. */
 };
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline void IIO::setRTRecordDirName(const QString& dirName)
+inline bool IAlgorithm::multiInstanceAllowed() const
 {
-    m_RTRecordDirName = dirName;
+    return true;
 }
 
 } // NAMESPACE
 
-Q_DECLARE_INTERFACE(MNEX::IIO, "mne_x/1.0")
+Q_DECLARE_INTERFACE(XSHAREDLIB::IAlgorithm, "xsharedlib/1.0")
 
-#endif // IIO_H
+#endif // IALGORITHM_H

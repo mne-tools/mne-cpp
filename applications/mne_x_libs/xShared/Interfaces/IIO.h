@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     IPlugin.h
+* @file     IIO.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,22 +29,32 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains declaration of IPlugin interface class.
+* @brief    Contains declaration of IIO interface class.
 *
 */
 
-#ifndef IPLUGIN_H
-#define IPLUGIN_H
+#ifndef IIO_H
+#define IIO_H
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-//#include "../Management/plugininputconnector.h"
-//#include "../Management/pluginoutputconnector.h"
-#include "../Management/pluginoutputdata.h"
-#include "../Management/plugininputdata.h"
+#include "IPlugin.h"
+
+#include <generics/circularbuffer_old.h>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <QMap>
+
+#include <QSharedPointer>
 
 
 //*************************************************************************************************************
@@ -52,70 +62,36 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QThread>
-#include <QCoreApplication>
-#include <QSharedPointer>
-#include <QAction>
+#include <QFile>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MNEX
+// DEFINE NAMESPACE XSHAREDLIB
 //=============================================================================================================
 
-namespace MNEX
+namespace XSHAREDLIB
 {
 
 
-//*************************************************************************************************************
 //=============================================================================================================
-// ENUMERATIONS
-//=============================================================================================================
-
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-//class PluginInputConnector;
-//class PluginOutputConnector;
-
-
-//=========================================================================================================
 /**
-* DECLARE CLASS IPlugin
+* DECLARE CLASS IIO
 *
-* @brief The IPlugin class is the base interface class of all plugins.
+* @brief The IIO class provides an interface for a real-time record plugin.
 */
-class IPlugin : public QThread
+class IIO : public IPlugin
 {
-//    Q_OBJECT
+//ToDo virtual methods of IMeasurementSink
 public:
-    //=============================================================================================================
-    /**
-    * Plugin Type enumeration.
-    */
-    enum PluginType
-    {
-        _ISensor,       /**< Type for a sensor plugin. */
-        _IAlgorithm,    /**< Type for a real-time algorithm plugin. */
-        _IIO,           /**< Type for a real-time I/O plugin. */
-        _PluginSet      /**< Type for a plugin set which holds different types of plugins. */
-    };
-
-    typedef QSharedPointer<IPlugin> SPtr;               /**< Shared pointer type for IPlugin. */
-    typedef QSharedPointer<const IPlugin> ConstSPtr;    /**< Const shared pointer type for IPlugin. */
-
-    typedef QVector< QSharedPointer< PluginInputConnector > > InputConnectorList;  /**< List of input connectors. */
-    typedef QVector< QSharedPointer< PluginOutputConnector > > OutputConnectorList; /**< List of output connectors. */
+    typedef QSharedPointer<IIO> SPtr;               /**< Shared pointer type for IIO. */
+    typedef QSharedPointer<const IIO> ConstSPtr;    /**< Const shared pointer type for IIO. */
 
     //=========================================================================================================
     /**
-    * Destroys the IPlugin.
+    * Destroys the IIO.
     */
-    virtual ~IPlugin() {};
+    virtual ~IIO() {};
 
     //=========================================================================================================
     /**
@@ -133,12 +109,12 @@ public:
     /**
     * Is called when plugin is detached of the stage. Can be used to safe settings.
     */
-    virtual void unload() = 0;// = 0 call is not longer possible - it has to be reimplemented in child;
+    virtual void unload() = 0;
 
     //=========================================================================================================
     /**
-    * Starts the IPlugin.
-    * Pure virtual method.
+    * Starts the IIO.
+    * Pure virtual method inherited by IPlugin.
     *
     * @return true if success, false otherwise
     */
@@ -146,8 +122,8 @@ public:
 
     //=========================================================================================================
     /**
-    * Stops the IPlugin.
-    * Pure virtual method.
+    * Stops the IIO.
+    * Pure virtual method inherited by IPlugin.
     *
     * @return true if success, false otherwise
     */
@@ -155,53 +131,41 @@ public:
 
     //=========================================================================================================
     /**
-    * A list of actions for the current plugin.
-    *
-    * @return a list of plugin actions
-    */
-    inline QList< QAction* > getPluginActions();
-
-    //=========================================================================================================
-    /**
     * Returns the plugin type.
-    * Pure virtual method.
+    * Pure virtual method inherited by IPlugin.
     *
-    * @return type of the IPlugin
+    * @return type of the IIO
     */
     virtual PluginType getType() const = 0;
 
     //=========================================================================================================
     /**
     * Returns the plugin name.
-    * Pure virtual method.
+    * Pure virtual method inherited by IPlugin.
     *
-    * @return the name of plugin.
+    * @return the name of the IIO.
     */
     virtual QString getName() const = 0;
 
     //=========================================================================================================
     /**
-    * True if multi instantiation of plugin is allowed.
-    *
-    * @return true if multi instantiation of plugin is allowed.
-    */
-    virtual inline bool multiInstanceAllowed() const = 0;
-
-    //=========================================================================================================
-    /**
-    * Returns the set up widget for configuration of the IPlugin.
-    * Pure virtual method.
+    * Returns the set up widget for configuration of IIO.
+    * Pure virtual method inherited by IPlugin.
     *
     * @return the setup widget.
     */
-    virtual QWidget* setupWidget() = 0; //setup()
+    virtual QWidget* setupWidget() const = 0; //setup();
 
-
-    inline InputConnectorList& getInputConnectors(){return m_inputConnectors;}
-    inline OutputConnectorList& getOutputConnectors(){return m_outputConnectors;}
-
+    //=========================================================================================================
+    /**
+    * Sets the name of the RTRecord directory.
+    *
+    * @param [in] dirName name of the RTRecord directory
+    */
+    inline void setRTRecordDirName(const QString& dirName);
 
 protected:
+
     //=========================================================================================================
     /**
     * The starting point for the thread. After calling start(), the newly created thread calls this function.
@@ -210,57 +174,24 @@ protected:
     */
     virtual void run() = 0;
 
-    //=========================================================================================================
-    /**
-    * Adds a plugin action to the current plugin.
-    *
-    * @param [in] pAction  pointer to the action to be added to the plugin
-    */
-    inline void addPluginAction(QAction* pAction);
-
-    InputConnectorList m_inputConnectors;    /**< Set of input connectors associated with this plug-in. */
-    OutputConnectorList m_outputConnectors;  /**< Set of output connectors associated with this plug-in. */
-
-private:
-    QList< QAction* >   m_qListPluginActions;  /**< List of plugin actions */
+    QString                                 m_RTRecordDirName;  /**< the real-time record sub directory name. */
+    typedef QMap<unsigned short, QFile*>    t_FileMap;          /**< Defines a new file mapping type. */
+    t_FileMap                               m_mapFiles;         /**< the file map. */
 };
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline bool IPlugin::multiInstanceAllowed() const
+inline void IIO::setRTRecordDirName(const QString& dirName)
 {
-    return true;
+    m_RTRecordDirName = dirName;
 }
 
+} // NAMESPACE
 
-//*************************************************************************************************************
+Q_DECLARE_INTERFACE(XSHAREDLIB::IIO, "xsharedlib/1.0")
 
-inline QList< QAction* > IPlugin::getPluginActions()
-{
-    return m_qListPluginActions;
-}
-
-
-//*************************************************************************************************************
-
-inline void IPlugin::addPluginAction(QAction* pAction)
-{
-    m_qListPluginActions.append(pAction);
-}
-
-
-//*************************************************************************************************************
-
-//inline void IPlugin::addPluginWidget(QWidget* pWidget)
-//{
-//    m_qListPluginWidgets.append(pWidget);
-//}
-
-} //Namespace
-
-Q_DECLARE_INTERFACE(MNEX::IPlugin, "mne_x/1.0")
-
-#endif //IPLUGIN_H
+#endif // IIO_H

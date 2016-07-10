@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     pluginoutputconnector.h
+* @file     pluginconnectorconnectionwidget.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     August, 2013
+* @date     February, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,81 +29,96 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the PluginOutputConnector class.
+* @brief    Contains the declaration of the PluginConnectorConnectionWidget class.
 *
 */
-#ifndef PLUGINOUTPUTCONNECTOR_H
-#define PLUGINOUTPUTCONNECTOR_H
+#ifndef PLUGINCONNECTORCONNECTIONWIDGET_H
+#define PLUGINCONNECTORCONNECTIONWIDGET_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../mne_x_global.h"
-
-#include "pluginconnector.h"
-#include <xMeas/newmeasurement.h>
+#include "../xshared_global.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MNEX
+// Qt INCLUDES
 //=============================================================================================================
 
-namespace MNEX
+#include <QLabel>
+#include <QWidget>
+#include <QComboBox>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE XSHAREDLIB
+//=============================================================================================================
+
+namespace XSHAREDLIB
 {
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+class PluginConnectorConnection;
+
 
 //=============================================================================================================
 /**
-* Class to connect plug-in data streams.
+* Class implements the plug-in connector connection widget.
 *
-* @brief The PluginConnector class provides the base to connect plug-in data
+* @brief The PluginConnectorConnectionWidget class provides an user interface for connector connections
 */
-class MNE_X_SHARED_EXPORT PluginOutputConnector : public PluginConnector
+class XSHAREDSHARED_EXPORT PluginConnectorConnectionWidget : public QWidget
 {
     Q_OBJECT
 public:
-    typedef QSharedPointer<PluginOutputConnector> SPtr;               /**< Shared pointer type for PluginOutputConnector. */
-    typedef QSharedPointer<const PluginOutputConnector> ConstSPtr;    /**< Const shared pointer type for PluginOutputConnector. */
 
     //=========================================================================================================
     /**
-    * Constructs a PluginOutputConnector with the given parent.
+    * Constructs a PluginConnectorConnectionWidget which is a child of parent.
     *
-    * @param[in] parent     pointer to parent plugin
-    * @param[in] name       connection name
-    * @param[in] descr      connection description
+    * @param [in] parent pointer to parent widget; If parent is 0, the new PluginConnectorConnectionWidget becomes a window. If parent is another widget, PluginConnectorConnectionWidget becomes a child window inside parent. PluginConnectorConnectionWidget is deleted when its parent is deleted.
+    * @param [in] pPluginConnectorConnection a pointer to the corresponding Connector Connection.
     */
-    PluginOutputConnector(IPlugin *parent, const QString &name, const QString &descr);
+    PluginConnectorConnectionWidget(PluginConnectorConnection* pPluginConnectorConnection, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
     * Destructor
+    *
     */
-    virtual ~PluginOutputConnector(){}
+    ~PluginConnectorConnectionWidget();
 
     //=========================================================================================================
     /**
-     * Returns false
-     *
-     * @return false
-     */
-    virtual bool isInputConnector() const;
-
-    //=========================================================================================================
-    /**
-     * Returns true
-     *
-     * @return true
-     */
-    virtual bool isOutputConnector() const;
+    * New selection in one of the combo box
+    *
+    * @param [in] p_sCurrentReceiver   the receivers name
+    */
+    void updateReceiver(const QString &p_sCurrentReceiver);
 
 signals:
-    void notify(XMEASLIB::NewMeasurement::SPtr);
+
+public slots:
+
+
+private:
+    QLabel* m_pLabel;                                           /**< Holds the start up widget label. */
+
+    PluginConnectorConnection*  m_pPluginConnectorConnection;   /**< a pointer to corresponding PluginConnectorConnection.*/
+
+    QMap<QString, QComboBox*> m_qMapSenderToReceiverConnections;/**< To each output a possible list of inputs. */
 
 };
 
 } // NAMESPACE
 
-#endif // PLUGINOUTPUTCONNECTOR_H
+#endif // PLUGINCONNECTORCONNECTIONWIDGET_H

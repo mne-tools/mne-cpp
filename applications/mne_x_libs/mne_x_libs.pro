@@ -41,8 +41,7 @@ TEMPLATE = subdirs
     SUBDIRS += \
         xMeas \
         xDisp \
-        mne_x
-#        xDtMng \
+        xShared
 }
 
 CONFIG += ordered

@@ -1,10 +1,10 @@
 //=============================================================================================================
 /**
-* @file     pluginscenemanager.h
+* @file     ISensor.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     August, 2013
+* @date     February, 2013
 *
 * @section  LICENSE
 *
@@ -29,140 +29,128 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains declaration of PluginSceneManager class.
+* @brief    Contains declaration of ISensor interface class.
 *
 */
 
-#ifndef PLUGINSCENEMANAGER_H
-#define PLUGINSCENEMANAGER_H
+#ifndef ISENSOR_H
+#define ISENSOR_H
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../mne_x_global.h"
-#include "../Interfaces/IPlugin.h"
-#include "pluginconnectorconnection.h"
+#include "IPlugin.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// DEFINE NAMESPACE XSHAREDLIB
 //=============================================================================================================
 
-#include <QObject>
-#include <QSharedPointer>
-#include <QList>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE MNEX
-//=============================================================================================================
-
-namespace MNEX
+namespace XSHAREDLIB
 {
 
-//=========================================================================================================
+
+//=============================================================================================================
 /**
-* PluginSceneManager manages plugins and connections between connectors.
+* DECLARE CLASS IRTAlgorithm
 *
-* @brief The PluginSceneManager class manages plugins and connections of a set of plugins.
+* @brief The ISensor class provides an interface for a sensor plugin.
 */
-class MNE_X_SHARED_EXPORT PluginSceneManager : public QObject
+class ISensor : public IPlugin
 {
-    Q_OBJECT
+//ToDo virtual methods of IMeasurementSource
 public:
-    typedef QSharedPointer<PluginSceneManager> SPtr;            /**< Shared pointer type for PluginSceneManager. */
-    typedef QSharedPointer<const PluginSceneManager> ConstSPtr; /**< Const shared pointer type for PluginSceneManager. */
-
-    typedef QList< IPlugin::SPtr > PluginList;                                      /**< type for a list of plugins. */
-    typedef QList<PluginConnectorConnection::SPtr> PluginConnectorConnectionList;   /**< Shared pointer type for PluginConnectorConnection::SPtr list */
 
     //=========================================================================================================
     /**
-    * Constructs a PluginSceneManager.
+    * Destroys the ISensor.
     */
-    explicit PluginSceneManager(QObject *parent = 0);
+    virtual ~ISensor() {};
 
     //=========================================================================================================
     /**
-    * Destructs a PluginSceneManager.
+    * Clone the plugin
     */
-    ~PluginSceneManager();
+    virtual QSharedPointer<IPlugin> clone() const = 0;
 
     //=========================================================================================================
     /**
-    * Adds a plugin to the stage.
+    * Initializes the plugin.
+    */
+    virtual void init() = 0;
+
+    //=========================================================================================================
+    /**
+    * Is called when plugin is detached of the stage. Can be used to safe settings.
+    */
+    virtual void unload() = 0;
+
+    //=========================================================================================================
+    /**
+    * Starts the ISensor.
+    * Pure virtual method inherited by IModule.
     *
-    * @param[in] pPlugin        plugin to be cloned and added
-    * @param[out] pAddedPlugin  if plugin is successful added, this contains a pointer to the added instance
+    * @return true if success, false otherwise
+    */
+    virtual bool start() = 0;
+
+    //=========================================================================================================
+    /**
+    * Stops the ISensor.
+    * Pure virtual method inherited by IModule.
     *
-    *@return true if plugin is added successful.
+    * @return true if success, false otherwise
     */
-    bool addPlugin(const IPlugin* pPlugin, IPlugin::SPtr &pAddedPlugin);
-
-    inline PluginList& getPlugins();
+    virtual bool stop() = 0;
 
     //=========================================================================================================
     /**
-    * Removes a plugin from the stage.
+    * Returns the plugin type.
+    * Pure virtual method inherited by IModule.
     *
-    * @param[in] pPlugin    plugin to be removed
+    * @return type of the ISensor
+    */
+    virtual PluginType getType() const = 0;
+
+    //=========================================================================================================
+    /**
+    * Returns the plugin name.
+    * Pure virtual method inherited by IModule.
     *
-    *@return true if plugin is removed successful.
+    * @return the name of the ISensor.
     */
-    bool removePlugin(const IPlugin::SPtr pPlugin);
+    virtual QString getName() const = 0;
 
     //=========================================================================================================
     /**
-    * Starts all plugins.
+    * True if multi instantiation of plugin is allowed.
     *
-    * @return true if at least one ISensor plugin was started successfully, false otherwise.
+    * @return true if multi instantiation of plugin is allowed.
     */
-    bool startPlugins();
+    virtual inline bool multiInstanceAllowed() const;
 
     //=========================================================================================================
     /**
-    * Starts ISensor Plugins
+    * Returns the set up widget for configuration of ISensor.
+    * Pure virtual method inherited by IModule.
     *
-    * @return true if at least one ISensor plugin was started successfully, false otherwise.
+    * @return the setup widget.
     */
-    bool startSensorPlugins();
+    virtual QWidget* setupWidget() = 0;
+
+protected:
 
     //=========================================================================================================
     /**
-    * Starts IAlgorithm plugins.
+    * The starting point for the thread. After calling start(), the newly created thread calls this function.
+    * Returning from this method will end the execution of the thread.
+    * Pure virtual method inherited by QThread.
     */
-    void startAlgorithmPlugins();
-
-    //=========================================================================================================
-    /**
-    * Starts IIO plugins.
-    */
-    void startIOPlugins();
-
-    //=========================================================================================================
-    /**
-    * Stops all plugins.
-    */
-    void stopPlugins();
-
-    //=========================================================================================================
-    /**
-    * Clears the PluginStage.
-    */
-    void clear();
-
-signals:
-
-
-private:
-    PluginList m_pluginList;    /**< List of plugins associated with this set. */
-    PluginConnectorConnectionList m_conConList; /**< List of connector connections. */
-
-//    QSharedPointer<PluginSet> m_pPluginSet;     /**< The Plugin set of the stage -> ToDo: check, if more than one set on the stage is usefull. */
+    virtual void run() = 0;
 };
 
 //*************************************************************************************************************
@@ -170,11 +158,13 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline PluginSceneManager::PluginList& PluginSceneManager::getPlugins()
+inline bool ISensor::multiInstanceAllowed() const
 {
-    return m_pluginList;
+    return false;
 }
 
-} //Namespace
+} //NAMESPACE
 
-#endif // PLUGINSCENEMANAGER_H
+Q_DECLARE_INTERFACE(XSHAREDLIB::ISensor, "xsharedlib/1.0")
+
+#endif // ISENSOR_H

@@ -1,10 +1,10 @@
 //=============================================================================================================
 /**
-* @file     pluginmanager.h
+* @file     pluginscenemanager.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     August, 2013
 *
 * @section  LICENSE
 *
@@ -29,175 +29,152 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the PluginManager class.
+* @brief    Contains declaration of PluginSceneManager class.
 *
 */
 
-#ifndef PLUGINMANAGER_H
-#define PLUGINMANAGER_H
+#ifndef PLUGINSCENEMANAGER_H
+#define PLUGINSCENEMANAGER_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../mne_x_global.h"
+#include "../xshared_global.h"
+#include "../Interfaces/IPlugin.h"
+#include "pluginconnectorconnection.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// Qt INCLUDES
 //=============================================================================================================
 
-#include <QVector>
-#include <QPluginLoader>
+#include <QObject>
+#include <QSharedPointer>
+#include <QList>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MNEX
+// DEFINE NAMESPACE XSHAREDLIB
 //=============================================================================================================
 
-namespace MNEX
+namespace XSHAREDLIB
 {
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-class IPlugin;
-class ISensor;
-class IAlgorithm;
-class IIO;
-
-
-//=============================================================================================================
+//=========================================================================================================
 /**
-* DECLARE CLASS PluginManager
+* PluginSceneManager manages plugins and connections between connectors.
 *
-* @brief The PluginManager class provides a dynamic plugin loader. As well as the handling of the loaded plugins.
+* @brief The PluginSceneManager class manages plugins and connections of a set of plugins.
 */
-class MNE_X_SHARED_EXPORT PluginManager : public QPluginLoader
+class XSHAREDSHARED_EXPORT PluginSceneManager : public QObject
 {
     Q_OBJECT
-
-    friend class MainWindow;
-    friend class PluginDockWidget;
-
 public:
-    typedef QSharedPointer<PluginManager> SPtr;               /**< Shared pointer type for PluginManager. */
-    typedef QSharedPointer<const PluginManager> ConstSPtr;    /**< Const shared pointer type for PluginManager. */
+    typedef QSharedPointer<PluginSceneManager> SPtr;            /**< Shared pointer type for PluginSceneManager. */
+    typedef QSharedPointer<const PluginSceneManager> ConstSPtr; /**< Const shared pointer type for PluginSceneManager. */
+
+    typedef QList< IPlugin::SPtr > PluginList;                                      /**< type for a list of plugins. */
+    typedef QList<PluginConnectorConnection::SPtr> PluginConnectorConnectionList;   /**< Shared pointer type for PluginConnectorConnection::SPtr list */
 
     //=========================================================================================================
     /**
-    * Constructs a PluginManager with the given parent.
+    * Constructs a PluginSceneManager.
+    */
+    explicit PluginSceneManager(QObject *parent = 0);
+
+    //=========================================================================================================
+    /**
+    * Destructs a PluginSceneManager.
+    */
+    ~PluginSceneManager();
+
+    //=========================================================================================================
+    /**
+    * Adds a plugin to the stage.
     *
-    * @param[in] parent pointer to parent Object. (It's normally the default value.)
-    */
-    PluginManager(QObject* parent = 0);
-
-    //=========================================================================================================
-    /**
-    * Destroys the PluginManager.
-    */
-    virtual ~PluginManager();
-
-    //=========================================================================================================
-    /**
-    * Loads plugins from given directory.
+    * @param[in] pPlugin        plugin to be cloned and added
+    * @param[out] pAddedPlugin  if plugin is successful added, this contains a pointer to the added instance
     *
-    * @param dir the plugin directory.
+    *@return true if plugin is added successful.
     */
-    void loadPlugins(const QString& dir);
+    bool addPlugin(const IPlugin* pPlugin, IPlugin::SPtr &pAddedPlugin);
+
+    inline PluginList& getPlugins();
 
     //=========================================================================================================
     /**
-    * Finds index of plugin by name.
+    * Removes a plugin from the stage.
     *
-    * @return index of plugin.
-    * @param name the plugin name.
+    * @param[in] pPlugin    plugin to be removed
+    *
+    *@return true if plugin is removed successful.
     */
-    int findByName(const QString& name);
+    bool removePlugin(const IPlugin::SPtr pPlugin);
 
     //=========================================================================================================
     /**
-    * Returns vector containing all plugins.
+    * Starts all plugins.
     *
-    * @return reference to vector containing all plugins.
+    * @return true if at least one ISensor plugin was started successfully, false otherwise.
     */
-    inline const QVector<IPlugin*>& getPlugins();
+    bool startPlugins();
 
     //=========================================================================================================
     /**
-    * Returns vector containing ISensor plugins.
+    * Starts ISensor Plugins
     *
-    * @return reference to vector containing ISensor plugins.
+    * @return true if at least one ISensor plugin was started successfully, false otherwise.
     */
-    inline const QVector<ISensor*>& getSensorPlugins();
+    bool startSensorPlugins();
 
     //=========================================================================================================
     /**
-    * Returns vector containing IAlgorithm plugins
-    *
-    * @return reference to vector containing IRTAlgorithm plugins
+    * Starts IAlgorithm plugins.
     */
-    inline const QVector<IAlgorithm*>& getAlgorithmPlugins();
+    void startAlgorithmPlugins();
 
     //=========================================================================================================
     /**
-    * Returns vector containing IIO plugins
-    *
-    * @return reference to vector containing IRTVisulaiztaion plugins
+    * Starts IIO plugins.
     */
-    inline const QVector<IIO*>& getIOPlugins();
+    void startIOPlugins();
+
+    //=========================================================================================================
+    /**
+    * Stops all plugins.
+    */
+    void stopPlugins();
+
+    //=========================================================================================================
+    /**
+    * Clears the PluginStage.
+    */
+    void clear();
+
+signals:
 
 
 private:
-    QVector<IPlugin*>    m_qVecPlugins;             /**< Vector of all plugins. */
+    PluginList m_pluginList;    /**< List of plugins associated with this set. */
+    PluginConnectorConnectionList m_conConList; /**< List of connector connections. */
 
-    QVector<ISensor*>    m_qVecSensorPlugins;       /**< Vector of all ISensor plugins. */
-    QVector<IAlgorithm*> m_qVecAlgorithmPlugins;    /**< Vector of all IAlgorithm plugins. */
-    QVector<IIO*>        m_qVecIOPlugins;           /**< Vector of all IIO plugins. */
-
+//    QSharedPointer<PluginSet> m_pPluginSet;     /**< The Plugin set of the stage -> ToDo: check, if more than one set on the stage is usefull. */
 };
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline const QVector<IPlugin*>& PluginManager::getPlugins()
+inline PluginSceneManager::PluginList& PluginSceneManager::getPlugins()
 {
-    return m_qVecPlugins;
+    return m_pluginList;
 }
 
+} //Namespace
 
-//*************************************************************************************************************
-
-inline const QVector<ISensor*>& PluginManager::getSensorPlugins()
-{
-    return m_qVecSensorPlugins;
-}
-
-
-//*************************************************************************************************************
-
-inline const QVector<IAlgorithm*>& PluginManager::getAlgorithmPlugins()
-{
-    return m_qVecAlgorithmPlugins;
-}
-
-
-//*************************************************************************************************************
-
-inline const QVector<IIO*>& PluginManager::getIOPlugins()
-{
-    return m_qVecIOPlugins;
-}
-
-} // NAMESPACE
-
-#endif // PLUGINMANAGER_H
+#endif // PLUGINSCENEMANAGER_H

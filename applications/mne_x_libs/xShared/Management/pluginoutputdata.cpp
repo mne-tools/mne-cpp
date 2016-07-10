@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     pluginoutputconnector.cpp
+* @file     pluginoutputdata.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,25 +29,40 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the PluginOutputConnector class.
+* @brief    Contains the declaration of the PluginOutputData class.
 *
 */
+
+#ifndef PLUGINOUTPUTDATA_CPP //Because this cpp is part of the header -> template
+#define PLUGINOUTPUTDATA_CPP
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "pluginoutputconnector.h"
-#include "../Interfaces/IPlugin.h"
+#include "pluginoutputdata.h"
 
+#include <xMeas/newmeasurement.h>
+
+#include <QDebug>
+#include <QSharedPointer>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE XSHAREDLIB
+//=============================================================================================================
+
+namespace XSHAREDLIB
+{
 
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNEX;
 
 
 //*************************************************************************************************************
@@ -55,24 +70,29 @@ using namespace MNEX;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-PluginOutputConnector::PluginOutputConnector(IPlugin *parent, const QString &name, const QString &descr)
-: PluginConnector(parent, name, descr)
+template <class T>
+PluginOutputData<T>::PluginOutputData(IPlugin *parent, const QString &name, const QString &descr)
+: PluginOutputConnector(parent, name, descr)
 {
+    m_pMeasurement = QSharedPointer<T>(new T);
+
+    QSharedPointer<XMEASLIB::NewMeasurement> t_measurement = qSharedPointerDynamicCast<XMEASLIB::NewMeasurement>(m_pMeasurement);
+
+    if(t_measurement.isNull())
+        qFatal("Template type is not a measurement and therefor not supported!");
+    else
+        connect(t_measurement.data(), &XMEASLIB::NewMeasurement::notify, this, &PluginOutputData<T>::update, Qt::DirectConnection);
 }
 
 
 //*************************************************************************************************************
 
-bool PluginOutputConnector::isInputConnector() const
+template <class T>
+void PluginOutputData<T>::update()
 {
-    return false;
+    emit notify(qSharedPointerDynamicCast<XMEASLIB::NewMeasurement>(m_pMeasurement));
 }
 
+}//Namespace
 
-//*************************************************************************************************************
-
-bool PluginOutputConnector::isOutputConnector() const
-{
-    return true;
-}
-
+#endif //PLUGINOUTPUTDATA_CPP

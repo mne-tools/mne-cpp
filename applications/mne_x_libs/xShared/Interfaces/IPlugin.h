@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     ISensor.h
+* @file     IPlugin.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,47 +29,93 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains declaration of ISensor interface class.
+* @brief    Contains declaration of IPlugin interface class.
 *
 */
 
-#ifndef ISENSOR_H
-#define ISENSOR_H
-
+#ifndef IPLUGIN_H
+#define IPLUGIN_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "IPlugin.h"
+//#include "../Management/plugininputconnector.h"
+//#include "../Management/pluginoutputconnector.h"
+#include "../Management/pluginoutputdata.h"
+#include "../Management/plugininputdata.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MNEX
+// QT INCLUDES
 //=============================================================================================================
 
-namespace MNEX
+#include <QThread>
+#include <QCoreApplication>
+#include <QSharedPointer>
+#include <QAction>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE XSHAREDLIB
+//=============================================================================================================
+
+namespace XSHAREDLIB
 {
 
 
+//*************************************************************************************************************
 //=============================================================================================================
+// ENUMERATIONS
+//=============================================================================================================
+
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+//class PluginInputConnector;
+//class PluginOutputConnector;
+
+
+//=========================================================================================================
 /**
-* DECLARE CLASS IRTAlgorithm
+* DECLARE CLASS IPlugin
 *
-* @brief The ISensor class provides an interface for a sensor plugin.
+* @brief The IPlugin class is the base interface class of all plugins.
 */
-class ISensor : public IPlugin
+class IPlugin : public QThread
 {
-//ToDo virtual methods of IMeasurementSource
+//    Q_OBJECT
 public:
+    //=============================================================================================================
+    /**
+    * Plugin Type enumeration.
+    */
+    enum PluginType
+    {
+        _ISensor,       /**< Type for a sensor plugin. */
+        _IAlgorithm,    /**< Type for a real-time algorithm plugin. */
+        _IIO,           /**< Type for a real-time I/O plugin. */
+        _PluginSet      /**< Type for a plugin set which holds different types of plugins. */
+    };
+
+    typedef QSharedPointer<IPlugin> SPtr;               /**< Shared pointer type for IPlugin. */
+    typedef QSharedPointer<const IPlugin> ConstSPtr;    /**< Const shared pointer type for IPlugin. */
+
+    typedef QVector< QSharedPointer< PluginInputConnector > > InputConnectorList;  /**< List of input connectors. */
+    typedef QVector< QSharedPointer< PluginOutputConnector > > OutputConnectorList; /**< List of output connectors. */
 
     //=========================================================================================================
     /**
-    * Destroys the ISensor.
+    * Destroys the IPlugin.
     */
-    virtual ~ISensor() {};
+    virtual ~IPlugin() {};
 
     //=========================================================================================================
     /**
@@ -87,12 +133,12 @@ public:
     /**
     * Is called when plugin is detached of the stage. Can be used to safe settings.
     */
-    virtual void unload() = 0;
+    virtual void unload() = 0;// = 0 call is not longer possible - it has to be reimplemented in child;
 
     //=========================================================================================================
     /**
-    * Starts the ISensor.
-    * Pure virtual method inherited by IModule.
+    * Starts the IPlugin.
+    * Pure virtual method.
     *
     * @return true if success, false otherwise
     */
@@ -100,8 +146,8 @@ public:
 
     //=========================================================================================================
     /**
-    * Stops the ISensor.
-    * Pure virtual method inherited by IModule.
+    * Stops the IPlugin.
+    * Pure virtual method.
     *
     * @return true if success, false otherwise
     */
@@ -109,19 +155,27 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns the plugin type.
-    * Pure virtual method inherited by IModule.
+    * A list of actions for the current plugin.
     *
-    * @return type of the ISensor
+    * @return a list of plugin actions
+    */
+    inline QList< QAction* > getPluginActions();
+
+    //=========================================================================================================
+    /**
+    * Returns the plugin type.
+    * Pure virtual method.
+    *
+    * @return type of the IPlugin
     */
     virtual PluginType getType() const = 0;
 
     //=========================================================================================================
     /**
     * Returns the plugin name.
-    * Pure virtual method inherited by IModule.
+    * Pure virtual method.
     *
-    * @return the name of the ISensor.
+    * @return the name of plugin.
     */
     virtual QString getName() const = 0;
 
@@ -131,26 +185,44 @@ public:
     *
     * @return true if multi instantiation of plugin is allowed.
     */
-    virtual inline bool multiInstanceAllowed() const;
+    virtual inline bool multiInstanceAllowed() const = 0;
 
     //=========================================================================================================
     /**
-    * Returns the set up widget for configuration of ISensor.
-    * Pure virtual method inherited by IModule.
+    * Returns the set up widget for configuration of the IPlugin.
+    * Pure virtual method.
     *
     * @return the setup widget.
     */
-    virtual QWidget* setupWidget() = 0;
+    virtual QWidget* setupWidget() = 0; //setup()
+
+
+    inline InputConnectorList& getInputConnectors(){return m_inputConnectors;}
+    inline OutputConnectorList& getOutputConnectors(){return m_outputConnectors;}
+
 
 protected:
-
     //=========================================================================================================
     /**
     * The starting point for the thread. After calling start(), the newly created thread calls this function.
     * Returning from this method will end the execution of the thread.
-    * Pure virtual method inherited by QThread.
+    * Pure virtual method inherited by QThread
     */
     virtual void run() = 0;
+
+    //=========================================================================================================
+    /**
+    * Adds a plugin action to the current plugin.
+    *
+    * @param [in] pAction  pointer to the action to be added to the plugin
+    */
+    inline void addPluginAction(QAction* pAction);
+
+    InputConnectorList m_inputConnectors;    /**< Set of input connectors associated with this plug-in. */
+    OutputConnectorList m_outputConnectors;  /**< Set of output connectors associated with this plug-in. */
+
+private:
+    QList< QAction* >   m_qListPluginActions;  /**< List of plugin actions */
 };
 
 //*************************************************************************************************************
@@ -158,13 +230,37 @@ protected:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline bool ISensor::multiInstanceAllowed() const
+inline bool IPlugin::multiInstanceAllowed() const
 {
-    return false;
+    return true;
 }
 
-} //NAMESPACE
 
-Q_DECLARE_INTERFACE(MNEX::ISensor, "mne_x/1.0")
+//*************************************************************************************************************
 
-#endif // ISENSOR_H
+inline QList< QAction* > IPlugin::getPluginActions()
+{
+    return m_qListPluginActions;
+}
+
+
+//*************************************************************************************************************
+
+inline void IPlugin::addPluginAction(QAction* pAction)
+{
+    m_qListPluginActions.append(pAction);
+}
+
+
+//*************************************************************************************************************
+
+//inline void IPlugin::addPluginWidget(QWidget* pWidget)
+//{
+//    m_qListPluginWidgets.append(pWidget);
+//}
+
+} //Namespace
+
+Q_DECLARE_INTERFACE(XSHAREDLIB::IPlugin, "xsharedlib/1.0")
+
+#endif //IPLUGIN_H

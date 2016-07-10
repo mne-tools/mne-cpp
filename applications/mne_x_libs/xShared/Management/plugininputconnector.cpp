@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     displaymanager.h
+* @file     plugininputconnector.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,102 +29,57 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Declaration of the DisplayManager Class.
+* @brief    Contains the implementation of the PluginInputConnector class.
 *
 */
-
-#ifndef DISPLAYMANAGER_H
-#define DISPLAYMANAGER_H
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../mne_x_global.h"
+#include "plugininputconnector.h"
 #include "../Interfaces/IPlugin.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// USED NAMESPACES
 //=============================================================================================================
 
-#include <QSharedPointer>
-#include <QTime>
-#include <QHash>
-#include <QWidget>
-#include <QLabel>
-#include <QString>
+using namespace XSHAREDLIB;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-class QVBoxLayout;
-class QHBoxLayout;
+PluginInputConnector::PluginInputConnector(IPlugin *parent, const QString &name, const QString &descr)
+: PluginConnector(parent, name, descr)
+{
+}
 
 
 //*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE MNEX
-//=============================================================================================================
 
-namespace MNEX
+bool PluginInputConnector::isInputConnector() const
 {
+    return true;
+}
 
-//=============================================================================================================
-/**
-* DECLARE CLASS DisplayManager
-*
-* @brief The DisplayManager class handles current displayed widgets.
-*/
-class MNE_X_SHARED_EXPORT DisplayManager : public QObject
+
+//*************************************************************************************************************
+
+bool PluginInputConnector::isOutputConnector() const
 {
-    Q_OBJECT
-public:
-    typedef QSharedPointer<DisplayManager> SPtr;               /**< Shared pointer type for DisplayManager. */
-    typedef QSharedPointer<const DisplayManager> ConstSPtr;    /**< Const shared pointer type for DisplayManager. */
+    return false;
+}
 
-    //=========================================================================================================
-    /**
-    * Constructs a DisplayManager.
-    */
-    DisplayManager(QObject* parent = 0);
 
-    //=========================================================================================================
-    /**
-    * Destroys the DisplayManager.
-    */
-    virtual ~DisplayManager();
+//*************************************************************************************************************
 
-    //=========================================================================================================
-    /**
-    * Shows a widget containing all current measurement widgets.
-    *
-    * @param [in] outputConnectorList   output connector list
-    * @param [in] pT                    global timer
-    * @param [out] qListActions         a list of actions containing all measurent widget actions
-    * @param [out] qListWidgets         a list of widgets containing all measurent widget tool widgets
-    *
-    * @return a pointer to the widget containing all measurement widgets.
-    */
-    QWidget* show(IPlugin::OutputConnectorList &outputConnectorList, QSharedPointer<QTime>& pT, QList< QAction* >& qListActions, QList< QWidget* >& qListWidgets);
-
-    //=========================================================================================================
-    /**
-    * Cleans all measurement widget hash's.
-    */
-    void clean();
-
-private:
-    QList<QMetaObject::Connection>   m_pListWidgetConnections;       /**< all widget connections.*/
-
-};
-
-} // NAMESPACE
-
-#endif // DISPLAYMANAGER_H
+void PluginInputConnector::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
+{
+    emit notify(pMeasurement);
+}

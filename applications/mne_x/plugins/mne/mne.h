@@ -43,7 +43,7 @@
 //=============================================================================================================
 
 #include "mne_global.h"
-#include <mne_x/Interfaces/IAlgorithm.h>
+#include <xShared/Interfaces/IAlgorithm.h>
 
 #include <generics/circularmatrixbuffer.h>
 
@@ -90,7 +90,7 @@ using namespace FIFFLIB;
 using namespace MNELIB;
 using namespace INVERSELIB;
 using namespace RTPROCLIB;
-using namespace MNEX;
+using namespace XSHAREDLIB;
 using namespace XMEASLIB;
 using namespace IOBuffer;
 
@@ -110,9 +110,9 @@ using namespace IOBuffer;
 class MNESHARED_EXPORT MNE : public IAlgorithm
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "mne_x/1.0" FILE "mne.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    Q_PLUGIN_METADATA(IID "xsharedlib/1.0" FILE "mne.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(MNEX::IAlgorithm)
+    Q_INTERFACES(XSHAREDLIB::IAlgorithm)
 
     friend class MNESetupWidget;
 
