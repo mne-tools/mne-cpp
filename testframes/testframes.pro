@@ -48,7 +48,7 @@ SUBDIRS += \
 
 #!contains(MNECPP_CONFIG, minimalVersion) {
     SUBDIRS += \
-        test_mne_graph
+#        test_mne_graph
 #        test_mne_cluster_eval \
 #        test_rap_cluster_eval \
 #        test_rtc_eval \
