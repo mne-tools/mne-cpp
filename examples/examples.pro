@@ -56,7 +56,6 @@ SUBDIRS += \
     readBEM\
     patientManager \
     testWarp \
-    histogram
 
 !contains(MNECPP_CONFIG, minimalVersion) {
     SUBDIRS += \
@@ -72,6 +71,11 @@ SUBDIRS += \
         rawClusteredInversePwlRapMusic \
         stClusteredInversePwlRapMusic  \
         roiClusteredInversePwlRapMusic \
-        fsSurface \
-        disp3DTutorial \
+        fsSurface
+
+        qtHaveModule(charts) {
+            SUBDIRS += \
+                disp3DTutorial \
+                histogram
+        }
 }
