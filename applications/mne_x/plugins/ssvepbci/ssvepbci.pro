@@ -58,7 +58,7 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Mned \
             -lxMeasd \
             -lxDispd \
-            -lmne_xd
+            -lxSharedd
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
@@ -67,7 +67,7 @@ else {
             -lMNE$${MNE_LIB_VERSION}Mne \
             -lxMeas \
             -lxDisp \
-            -lmne_x
+            -lxShared
 }
 
 DESTDIR = $${MNE_BINARY_DIR}/mne_x_plugins

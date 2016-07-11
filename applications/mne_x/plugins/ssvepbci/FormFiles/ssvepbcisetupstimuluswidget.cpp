@@ -251,6 +251,10 @@ void ssvepBCISetupStimulusWidget::on_pushButton_6_clicked()
 
     changeComboBox();
 
+
+    // signal for changing frequency list of ssvepBCI class
+    emit frequencyChanged();
+
 }
 
 //*************************************************************************************************************
@@ -296,11 +300,10 @@ void ssvepBCIPlugin::ssvepBCISetupStimulusWidget::on_comboBox_2_currentIndexChan
             int ItemSelect = ui->comboBox->currentIndex();
             //adjust the rendering order of the selected Plugin
             setFreq(m_pssvepBCIScreen->m_Items[ItemSelect],index);
-        }
-    }
 
-    // signal for changing frequency list of ssvepBCI class
-    emit frequencyChanged();
+        }
+
+    }
 
 }
 
@@ -353,6 +356,7 @@ void ssvepBCISetupStimulusWidget::setFreq(ssvepBCIFlickeringItem &item, int freq
     }
     item.setRenderOrder(renderOrder, freqKey);
 
+
 }
 
 
@@ -360,7 +364,7 @@ void ssvepBCISetupStimulusWidget::setFreq(ssvepBCIFlickeringItem &item, int freq
 
 QList<double> ssvepBCISetupStimulusWidget::getFrequencies(){
 
-    // get list of frequencies
+    // get list of frequencies from the item-list beholding the ssvepBCIScreen class
     QList<double> freqList;
     foreach(ssvepBCIFlickeringItem item, m_pssvepBCIScreen->m_Items)
         freqList << m_idFreqMap.value(item.getFreqKey());

@@ -45,7 +45,7 @@
 //=============================================================================================================
 #include "ssvepbci_global.h"
 
-#include <mne_x/Interfaces/IAlgorithm.h>
+#include <xShared/Interfaces/IAlgorithm.h>
 
 #include <generics/circularmatrixbuffer.h>
 
@@ -92,7 +92,7 @@ typedef  QList<double>  MyQList;
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNEX;
+using namespace XSHAREDLIB;
 using namespace XMEASLIB;
 using namespace IOBuffer;
 using namespace UTILSLIB;
@@ -110,7 +110,7 @@ class SSVEPBCISHARED_EXPORT ssvepBCI : public IAlgorithm
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "mne_x/1.0" FILE "ssvepbci.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(MNEX::IAlgorithm)
+    Q_INTERFACES(XSHAREDLIB::IAlgorithm)
 
     friend class BCISetupWidget;
     friend class BCIFeatureWindow;
@@ -344,22 +344,6 @@ private:
     QMap<QString, int>      m_mapDestrieuxAtlasRegions;         /**< Source level: Loaded Destrieux atlas regions. */
 
 
-    // Sensor level
-
-//    bool                    m_bFiffInfoInitialised_Sensor;      /**< Sensor level: Fiff information initialised. */
-//    bool                    m_bFillSensorWindowFirstTime;       /**< Sensor level: Flag if the working matrix m_mSlidingWindowSensor is being filled for the first time. */
-//    MatrixXd                m_matSlidingWindowSensor;           /**< Sensor level: Working (sliding) matrix, used to store data for feature calculation on sensor level. */
-//    MatrixXd                m_matTimeBetweenWindowsSensor;      /**< Sensor level: Samples stored during time between windows on sensor level. */
-//    int                     m_iTBWIndexSensor;                  /**< Sensor level: Index of the amount of data which was already filled during the time between windows. */
-//    int                     m_iNumberOfCalculatedFeatures;      /**< Sensor level: Index which is iterated until enough features are calculated and classified to generate a final classifcation result.*/
-//    QVector< VectorXd >     m_vLoadedSensorBoundary;            /**< Sensor level: Loaded decision boundary on sensor level. */
-
-//
-
-//    MatrixXd                m_matStimChannelSensor;             /**< Sensor level: Stim channel. */
-//    MatrixXd                m_matTimeBetweenWindowsStimSensor;  /**< Sensor level: Stim channel. */
-
-
     //=========================================================================================================
     /**
     * reading actual segment from the sliding time window and write it to the data Matrix
@@ -393,23 +377,11 @@ private:
     CircularMatrixBuffer<double>::SPtr                  m_pBCIBuffer_Sensor;    /**< Holds incoming sensor level data.*/
     CircularMatrixBuffer<double>::SPtr                  m_pBCIBuffer_Source;    /**< Holds incoming source level data.*/
 
-//    QSharedPointer<FilterData>                          m_filterOperator;       /**< Holds filter with specified properties by the user.*/
-
-//    QSharedPointer<BCIFeatureWindow>                    m_BCIFeatureWindow;     /**< Holds pointer to BCIFeatureWindow for visualization purposes.*/
-
     ofstream                m_outStreamDebug;                   /**< Outputstream to generate debug file.*/
-
     bool                    m_bIsRunning;                       /**< Whether BCI is running.*/
     QString                 m_qStringResourcePath;              /**< The path to the BCI resource directory.*/
     bool                    m_bProcessData;                     /**< Whether BCI is to get data out of the continous input data stream, i.e. the EEG data from sensor level.*/
-    bool                    m_bTriggerActivated;                /**< Whether the trigger was activated.*/
     QMutex                  m_qMutex;                           /**< QMutex to guarantee thread safety.*/
-
-
-    // Source level
-
-
-
 
 };
 
