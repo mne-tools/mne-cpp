@@ -59,9 +59,10 @@ SUBDIRS += \
 
 !contains(MNECPP_CONFIG, minimalVersion) {
     SUBDIRS += \
+    histogram \
 
-    qtHaveModule(3dcore,3drender,3dinput,3dextras,charts) {
-    message(examples.pro - Qt3D and QtCharts available)
+    qtHaveModule(3dcore,3drender,3dinput,3dextras) {
+    message(examples.pro - Qt3D available)
     SUBDIRS += \
         clusteredInverse \
         rawClusteredInverse \
@@ -77,6 +78,5 @@ SUBDIRS += \
         roiClusteredInversePwlRapMusic \
         fsSurface \
         disp3DTutorial \
-        histogram \
     }
 }
