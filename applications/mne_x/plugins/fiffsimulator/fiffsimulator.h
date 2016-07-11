@@ -44,7 +44,7 @@
 
 #include "fiffsimulator_global.h"
 
-#include <mne_x/Interfaces/ISensor.h>
+#include <xShared/Interfaces/ISensor.h>
 #include <generics/circularbuffer_old.h>
 #include <generics/circularmatrixbuffer.h>
 #include <xMeas/newrealtimemultisamplearray.h>
@@ -90,7 +90,7 @@ namespace FiffSimulatorPlugin
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNEX;
+using namespace XSHAREDLIB;
 using namespace IOBuffer;
 using namespace RTCLIENTLIB;
 using namespace FIFFLIB;
@@ -114,9 +114,9 @@ class FiffSimulatorProducer;
 class FIFFSIMULATORSHARED_EXPORT FiffSimulator : public ISensor
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "mne_x/1.0" FILE "fiffsimulator.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    Q_PLUGIN_METADATA(IID "xsharedlib/1.0" FILE "fiffsimulator.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(MNEX::ISensor)
+    Q_INTERFACES(XSHAREDLIB::ISensor)
 
     friend class FiffSimulatorProducer;
     friend class FiffSimulatorSetupWidget;
