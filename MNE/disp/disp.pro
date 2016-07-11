@@ -37,8 +37,7 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = lib
 
-QT  += core gui widgets
-QT  += core widgets svg
+QT  += core gui widgets svg
 
 DEFINES += DISP_LIBRARY
 
