@@ -49,14 +49,16 @@ SUBDIRS += \
     rtProcessing \
 
 !contains(MNECPP_CONFIG, minimalVersion) {
+    SUBDIRS += \
+            disp \
+
     qtHaveModule(charts) {
         SUBDIRS += \
                 dispCharts \
     }
 
-    SUBDIRS += disp \
+    SUBDIRS += \
             disp3D \
-
 }
 
 CONFIG += ordered
