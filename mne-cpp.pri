@@ -50,8 +50,8 @@ contains(MNECPP_CONFIG, coverity) {
 
 linux-g++ {
     system( g++ --version | grep -e "\<4.[0-4]" ) {
-        message( "old g++ version (< 4.5) found!" )
-        MNECPP_CONFIG += oldCompiler
+        message( "Old g++ version (< 4.5) found! Compiling minimal version." )
+        MNECPP_CONFIG += minimalVersion
     }
 }
 

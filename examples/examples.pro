@@ -19,7 +19,7 @@
 #       the following disclaimer in the documentation and/or other materials provided with the distribution.
 #     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 #       to endorse or promote products derived from this software without specific prior written permission.
-#
+# 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 # WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
 # PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
@@ -55,14 +55,9 @@ SUBDIRS += \
     makeLayout\
     readBEM\
     patientManager \
-    testWarp \
+    testWarp
 
 !contains(MNECPP_CONFIG, minimalVersion) {
-    SUBDIRS += \
-    histogram \
-
-    qtHaveModule(3dcore,3drender,3dinput,3dextras) {
-    message(examples.pro - Qt3D available)
     SUBDIRS += \
         clusteredInverse \
         rawClusteredInverse \
@@ -78,5 +73,4 @@ SUBDIRS += \
         roiClusteredInversePwlRapMusic \
         fsSurface \
         disp3DTutorial \
-    }
 }

@@ -45,7 +45,7 @@
 
 #include "rthpi_global.h"
 
-#include <mne_x/Interfaces/IAlgorithm.h>
+#include <xShared/Interfaces/IAlgorithm.h>
 #include <generics/circularmatrixbuffer.h>
 #include <xMeas/newrealtimemultisamplearray.h>
 #include <rtProcessing/rthpis.h>
@@ -81,7 +81,7 @@ namespace RtHpiPlugin
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNEX;
+using namespace XSHAREDLIB;
 using namespace XMEASLIB;
 using namespace IOBuffer;
 using namespace RTPROCLIB;
@@ -119,9 +119,9 @@ struct sens {
 class RTHPISHARED_EXPORT RtHpi : public IAlgorithm
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "mne_x/1.0" FILE "rthpi.json") //NEW Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    Q_PLUGIN_METADATA(IID "xsharedlib/1.0" FILE "rthpi.json") //NEW Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(MNEX::IAlgorithm)
+    Q_INTERFACES(XSHAREDLIB::IAlgorithm)
 
 public:
     //=========================================================================================================

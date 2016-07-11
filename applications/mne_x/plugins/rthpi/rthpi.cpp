@@ -63,7 +63,7 @@
 //=============================================================================================================
 
 using namespace RtHpiPlugin;
-using namespace MNEX;
+using namespace XSHAREDLIB;
 using namespace XMEASLIB;
 using namespace Eigen;
 
