@@ -64,7 +64,7 @@
 //=============================================================================================================
 
 using namespace AveragingPlugin;
-using namespace MNEX;
+using namespace XSHAREDLIB;
 using namespace XMEASLIB;
 
 

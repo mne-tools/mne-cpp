@@ -67,7 +67,7 @@ using namespace MNEX;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Arrow::Arrow(PluginItem *startItem, PluginItem *endItem, PluginConnectorConnection::SPtr &connection, QGraphicsItem *parent)
+Arrow::Arrow(PluginItem *startItem, PluginItem *endItem, XSHAREDLIB::PluginConnectorConnection::SPtr &connection, QGraphicsItem *parent)
 : QGraphicsLineItem(parent)
 , m_StartItem(startItem)
 , m_EndItem(endItem)

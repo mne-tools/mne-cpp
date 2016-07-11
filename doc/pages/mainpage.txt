@@ -106,6 +106,9 @@
  * \li Franco-Joel Polo franco-joel.polo@tu-ilmenau.de 2014
  * \li Carsten Boensel carsten.boensel@tu-ilmenau.de 2015
  * \li Jana Kiesel jana.kiesel@tu-ilmenau.de 2015
- *
+ * \li Martin Henfling martin.henfling@tu-ilmenau.de 2015
+ * \li Daniel Knobl daniel.knobl@tu-ilmenau.de 2015
+ * \li Viktor Klüber viktor.klueber@tu-ilmenau.de 2015 
+ * \li Ricky Tjen Ricky270@student.sgu.ac.id 2016 
  */
 

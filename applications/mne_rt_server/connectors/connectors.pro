@@ -40,11 +40,6 @@ TEMPLATE = subdirs
 SUBDIRS += \
     FiffSimulator \
 
-contains(MNECPP_CONFIG, babyMEG) {
-    SUBDIRS += BabyMEG
-}
-
-
 # Build Neuromag Plugin only for Unix Systems - cause of unix specific shmem commands
 unix:!macx{
     SUBDIRS += \

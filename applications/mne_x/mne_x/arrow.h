@@ -42,7 +42,7 @@
 //=============================================================================================================
 
 #include "pluginitem.h"
-#include <mne_x/Management/pluginconnectorconnection.h>
+#include <xShared/Management/pluginconnectorconnection.h>
 
 
 //*************************************************************************************************************
@@ -80,7 +80,7 @@ class Arrow : public QGraphicsLineItem
 public:
     enum { Type = UserType + 4 };
 
-    Arrow(PluginItem *startItem, PluginItem *endItem, PluginConnectorConnection::SPtr &connection, QGraphicsItem *parent = 0);
+    Arrow(PluginItem *startItem, PluginItem *endItem, XSHAREDLIB::PluginConnectorConnection::SPtr &connection, QGraphicsItem *parent = 0);
 
     int type() const { return Type; }
     QRectF boundingRect() const;
@@ -89,7 +89,7 @@ public:
     PluginItem *startItem() const { return m_StartItem; }
     PluginItem *endItem() const { return m_EndItem; }
 
-    PluginConnectorConnection::SPtr connection() { return m_pConnection; }
+    XSHAREDLIB::PluginConnectorConnection::SPtr connection() { return m_pConnection; }
 
     void updatePosition();
 
@@ -100,7 +100,7 @@ private:
     PluginItem *m_StartItem;
     PluginItem *m_EndItem;
 
-    PluginConnectorConnection::SPtr m_pConnection;
+    XSHAREDLIB::PluginConnectorConnection::SPtr m_pConnection;
 
     QColor m_qColor;
     QPolygonF arrowHead;

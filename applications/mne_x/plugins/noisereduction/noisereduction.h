@@ -49,7 +49,7 @@
 
 #include "disp/filterwindow.h"
 
-#include <mne_x/Interfaces/IAlgorithm.h>
+#include <xShared/Interfaces/IAlgorithm.h>
 
 #include <rtProcessing/rtfilter.h>
 
@@ -92,6 +92,14 @@ namespace NoiseReductionPlugin
 
 //*************************************************************************************************************
 //=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace XSHAREDLIB;
+
+
+//*************************************************************************************************************
+//=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
@@ -102,12 +110,12 @@ namespace NoiseReductionPlugin
 *
 * @brief The NoiseReduction class provides a noisereduction algorithm structure.
 */
-class NOISEREDUCTIONSHARED_EXPORT NoiseReduction : public MNEX::IAlgorithm
+class NOISEREDUCTIONSHARED_EXPORT NoiseReduction : public IAlgorithm
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "mne_x/1.0" FILE "noisereduction.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    Q_PLUGIN_METADATA(IID "xsharedlib/1.0" FILE "noisereduction.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(MNEX::IAlgorithm)
+    Q_INTERFACES(XSHAREDLIB::IAlgorithm)
 
     friend class NoiseReductionOptionsWidget;
 
@@ -128,12 +136,12 @@ public:
     /**
     * IAlgorithm functions
     */
-    virtual QSharedPointer<MNEX::IPlugin> clone() const;
+    virtual QSharedPointer<IPlugin> clone() const;
     virtual void init();
     virtual void unload();
     virtual bool start();
     virtual bool stop();
-    virtual MNEX::IPlugin::PluginType getType() const;
+    virtual IPlugin::PluginType getType() const;
     virtual QString getName() const;
     virtual QWidget* setupWidget();
 
@@ -299,8 +307,8 @@ private:
 
     XMEASLIB::NewRealTimeMultiSampleArray::SPtr     m_pRTMSA;                   /**< the real time multi sample array object. */
 
-    MNEX::PluginInputData<XMEASLIB::NewRealTimeMultiSampleArray>::SPtr      m_pNoiseReductionInput;      /**< The NewRealTimeMultiSampleArray of the NoiseReduction input.*/
-    MNEX::PluginOutputData<XMEASLIB::NewRealTimeMultiSampleArray>::SPtr     m_pNoiseReductionOutput;     /**< The NewRealTimeMultiSampleArray of the NoiseReduction output.*/
+    PluginInputData<XMEASLIB::NewRealTimeMultiSampleArray>::SPtr      m_pNoiseReductionInput;      /**< The NewRealTimeMultiSampleArray of the NoiseReduction input.*/
+    PluginOutputData<XMEASLIB::NewRealTimeMultiSampleArray>::SPtr     m_pNoiseReductionOutput;     /**< The NewRealTimeMultiSampleArray of the NoiseReduction output.*/
 
 signals:
     //=========================================================================================================

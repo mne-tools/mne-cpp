@@ -46,7 +46,7 @@
 
 #include "ecgsimchannel.h"
 
-#include <mne_x/Interfaces/ISensor.h>
+#include <xShared/Interfaces/ISensor.h>
 #include <generics/circularbuffer.h>
 #include <xMeas/newrealtimesamplearray.h>
 
@@ -74,7 +74,7 @@ namespace ECGSimulatorPlugin
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNEX;
+using namespace XSHAREDLIB;
 using namespace XMEASLIB;
 using namespace IOBuffer;
 
@@ -97,9 +97,9 @@ class ECGProducer;
 class ECGSIMULATORSHARED_EXPORT ECGSimulator : public ISensor
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "mne_x/1.0" FILE "ecgsimulator.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    Q_PLUGIN_METADATA(IID "xsharedlib/1.0" FILE "ecgsimulator.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(MNEX::ISensor)
+    Q_INTERFACES(XSHAREDLIB::ISensor)
 
     friend class ECGProducer;
     friend class ECGSetupWidget;
