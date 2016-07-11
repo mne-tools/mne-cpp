@@ -66,14 +66,14 @@ ssvepBCIConfigurationWidget::ssvepBCIConfigurationWidget(ssvepBCI* pssvepBCI, QW
     ui->setupUi(this);
 
     // default threshold values
-    m_lSSVEPThresholdValues << 0.15 << 0.146 << 0.155 << 0.15;
+    m_lSSVEPThresholdValues << 0.12 << 0.12 << 0.12 << 0.12 << 0.12;
 
     // set default threshold values
     ui->m_DoubleSpinBox_Threshold1->setValue(m_lSSVEPThresholdValues.at(0));
     ui->m_DoubleSpinBox_Threshold2->setValue(m_lSSVEPThresholdValues.at(1));
     ui->m_DoubleSpinBox_Threshold3->setValue(m_lSSVEPThresholdValues.at(2));
     ui->m_DoubleSpinBox_Threshold4->setValue(m_lSSVEPThresholdValues.at(3));
-    //    ui->m_DoubleSpinBox_Threshold5->setValue(m_lSSVEPThresholdValues[4]);
+    ui->m_DoubleSpinBox_Threshold5->setValue(m_lSSVEPThresholdValues.at(4));
 
     // edit Style sheets of the QProgressBars of threshold values (no blinking animation and pointy slider handle for threshold vixualization)
     ui->m_ProgressBar_Threshold1->setStyleSheet(" QProgressBar { border: 2px solid grey; border-radius: 2px; } QProgressBar::chunk {background-color: #3add36;}");
@@ -119,6 +119,8 @@ ssvepBCIConfigurationWidget::ssvepBCIConfigurationWidget(ssvepBCI* pssvepBCI, QW
     connect(ui->m_DoubleSpinBox_Threshold2, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &ssvepBCIConfigurationWidget::thresholdChanged);
     connect(ui->m_DoubleSpinBox_Threshold3, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &ssvepBCIConfigurationWidget::thresholdChanged);
     connect(ui->m_DoubleSpinBox_Threshold4, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &ssvepBCIConfigurationWidget::thresholdChanged);
+    connect(ui->m_DoubleSpinBox_Threshold5, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &ssvepBCIConfigurationWidget::thresholdChanged);
+
 
     // connect threshold values to BCI plugin
     connect(this, &ssvepBCIConfigurationWidget::getThresholdValues, m_pSSVEPBCI, &ssvepBCI::setThresholdValues);
@@ -163,6 +165,10 @@ void ssvepBCIConfigurationWidget::setSSVEPProbabilities(MyQList SSVEP){
         m_dMaxProbValue = max > m_dMaxProbValue ? max : m_dMaxProbValue;
     }
 
+    // filling SSVEP with zeros if size of SSVEP < 5
+    for(int i = SSVEP.size(); i < 5; i++)
+        SSVEP << 0;
+
     // scale SSVEP values for status bar
     QList<int> values;
     for(int i = 0; i < SSVEP.size(); i++)
@@ -173,13 +179,14 @@ void ssvepBCIConfigurationWidget::setSSVEPProbabilities(MyQList SSVEP){
     ui->m_ProgressBar_Threshold2->setValue(values[1]);
     ui->m_ProgressBar_Threshold3->setValue(values[2]);
     ui->m_ProgressBar_Threshold4->setValue(values[3]);
-    //ui->m_ProgressBar_Threshold4->setValue(values[4]);
+    ui->m_ProgressBar_Threshold5->setValue(values[4]);
 
     // assign SSVEP values to the labels
     ui->m_Label_SSVEP1->setText(QString::number(SSVEP[0]));
     ui->m_Label_SSVEP2->setText(QString::number(SSVEP[1]));
     ui->m_Label_SSVEP3->setText(QString::number(SSVEP[2]));
     ui->m_Label_SSVEP4->setText(QString::number(SSVEP[3]));
+    ui->m_Label_SSVEP5->setText(QString::number(SSVEP[4]));
 
     // paint novel thresholds to screen
     updateThresholdsToScreen();
@@ -255,6 +262,7 @@ void ssvepBCIConfigurationWidget::thresholdChanged(double threshold)
     m_lSSVEPThresholdValues[1] = ui->m_DoubleSpinBox_Threshold2->value();
     m_lSSVEPThresholdValues[2] = ui->m_DoubleSpinBox_Threshold3->value();
     m_lSSVEPThresholdValues[3] = ui->m_DoubleSpinBox_Threshold4->value();
+    m_lSSVEPThresholdValues[4] = ui->m_DoubleSpinBox_Threshold5->value();
 
     updateThresholdsToScreen();
 
@@ -277,6 +285,7 @@ void ssvepBCIConfigurationWidget::updateThresholdsToScreen(){
     ui->m_VerticalSlider_Threshold2->setValue(thresholds[1]);
     ui->m_VerticalSlider_Threshold3->setValue(thresholds[2]);
     ui->m_VerticalSlider_Threshold4->setValue(thresholds[3]);
+    ui->m_VerticalSlider_Threshold5->setValue(thresholds[4]);
 }
 
 
@@ -286,7 +295,7 @@ void ssvepBCIConfigurationWidget::setFrequencyList(MyQList frequencyList){
 
     // filling the list with missing zeros
     if(frequencyList.size()<5)
-        for(int i = 0; i < 5 - frequencyList.size(); i++)
+        for(int i = 0; i < frequencyList.size(); i++)
             frequencyList << 0;
 
     // update frequency list
@@ -298,6 +307,8 @@ void ssvepBCIConfigurationWidget::setFrequencyList(MyQList frequencyList){
     ui->m_Label_Frequency3->setText(QString::number(m_lFrequencyList[2]).append(" Hz"));
     ui->m_Label_Frequency4->setText(QString::number(m_lFrequencyList[3]).append(" Hz"));
     ui->m_Label_Frequency5->setText(QString::number(m_lFrequencyList[4]).append(" Hz"));
+
+    qDebug() <<"newFreqListsetted to ";
 
 }
 
