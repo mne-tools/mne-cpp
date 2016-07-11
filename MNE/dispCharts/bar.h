@@ -41,7 +41,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "disp_global.h"
+#include "dispcharts_global.h"
 
 
 //*************************************************************************************************************
@@ -75,10 +75,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE DISPLIB
+// DEFINE NAMESPACE DISPCHARTSLIB
 //=============================================================================================================
 
-namespace DISPLIB
+namespace DISPCHARTSLIB
 {
 
 
@@ -94,7 +94,7 @@ namespace DISPLIB
 *
 * @brief Bar class for histogram display using QtCharts
 */
-class DISPSHARED_EXPORT Bar : public QWidget
+class DISPCHARTSSHARED_EXPORT Bar : public QWidget
 {
     Q_OBJECT
 

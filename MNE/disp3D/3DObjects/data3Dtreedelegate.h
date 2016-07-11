@@ -47,7 +47,7 @@
 
 #include "../helpers/abstracttreeitem.h"
 #include <utils/mnemath.h>
-#include <disp/spline.h>
+#include <dispCharts/spline.h>
 
 
 //*************************************************************************************************************
