@@ -48,12 +48,12 @@ contains(MNECPP_CONFIG, coverity) {
 ## Build MNE-CPP libraries as static libs
 #MNECPP_CONFIG += build_MNECPP_Static_Lib
 
-linux-g++ {
-    system( g++ --version | grep -e "\<4.[0-4]" ) {
-        message( "Old g++ version (< 4.5) found! Compiling minimal version." )
-        MNECPP_CONFIG += minimalVersion
-    }
-}
+#linux-g++ {
+#    system( g++ --version | grep -e "\<4.[0-4]" ) {
+#        message( "Old g++ version (< 4.5) found! Compiling minimal version." )
+#        MNECPP_CONFIG += minimalVersion
+#   }
+#}
 
 QMAKE_TARGET_PRODUCT = mne-cpp
 QMAKE_TARGET_DESCRIPTION = MNE Qt 5 based C++ library.

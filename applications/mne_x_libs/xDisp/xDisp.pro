@@ -37,7 +37,7 @@ include(../../../mne-cpp.pri)
 
 TEMPLATE = lib
 
-QT += widgets concurrent xml svg 3dcore 3drender 3dinput 3dextras
+QT += widgets concurrent xml svg
 
 DEFINES += XDISP_LIBRARY
 
