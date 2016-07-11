@@ -32,7 +32,7 @@ rmdir ".\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_x\data" /s /
 mkdir -p ".\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_x\data"
 ::mne_x
 xcopy ".\bin\mne_x.exe" ".\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_x\data" /y
-xcopy ".\bin\mne_x.dll" ".\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_x\data" /y
+xcopy ".\bin\xShared.dll" ".\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_x\data" /y
 xcopy ".\bin\xDisp.dll" ".\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_x\data" /y
 xcopy ".\bin\xMeas.dll" ".\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_x\data" /y
 ::mne_x libs

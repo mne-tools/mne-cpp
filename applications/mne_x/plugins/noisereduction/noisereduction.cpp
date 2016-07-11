@@ -47,7 +47,7 @@
 //=============================================================================================================
 
 using namespace NoiseReductionPlugin;
-using namespace MNEX;
+using namespace XSHAREDLIB;
 using namespace XMEASLIB;
 using namespace UTILSLIB;
 using namespace IOBuffer;

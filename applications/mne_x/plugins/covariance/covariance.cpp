@@ -58,7 +58,7 @@
 //=============================================================================================================
 
 using namespace CovariancePlugin;
-using namespace MNEX;
+using namespace XSHAREDLIB;
 using namespace XMEASLIB;
 
 
