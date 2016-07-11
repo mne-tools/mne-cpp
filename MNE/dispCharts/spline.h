@@ -137,7 +137,7 @@ public:
     *
     * @param[in]  event      mouse press input
     */
-    void Spline::mousePressEvent(QMouseEvent *event);
+    void mousePressEvent(QMouseEvent *event);
 
     //=========================================================================================================
     /**
@@ -208,9 +208,9 @@ private:
     QtCharts::QLineSeries*   m_pMiddleThreshold;  /**< Vertical line series for the middle threshold */
     QtCharts::QLineSeries*   m_pRightThreshold;   /**< Vertical line series for the right threshold */
     int                      m_iMaximumFrequency; /**< Highest value of frequency (y-axis) */
-    QVector<double>          m_vecReturnVector;   /**< QVector consisting of 6 double values used in getThreshold function*/
     QList<QVector3D>         m_pReturnList;       /**< QList consisting of 2 QVector3D used in getThreshold function*/
     QString                  m_colorMap;          /**< QString that will be used to set the color mapping on the histogram*/
+    QVector3D                m_vecReturnVector;   /**< QVector3D after correction with correctionDisplayTrueValue function*/
 
 signals:
     //=========================================================================================================

@@ -383,9 +383,9 @@ const QVector3D &Spline::getThreshold()
     originalVector.setX(emitLeft);
     originalVector.setY(emitMiddle);
     originalVector.setZ(emitRight);
-    QVector3D returnVector = correctionDisplayTrueValue(originalVector, "down");
-    qDebug() << "getThreshold: returnVector = " << returnVector;
-    return returnVector;
+    m_vecReturnVector = correctionDisplayTrueValue(originalVector, "down");
+    qDebug() << "getThreshold: returnVector = " << m_vecReturnVector;
+    return m_vecReturnVector;
 }
 
 
