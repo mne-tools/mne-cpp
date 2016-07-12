@@ -40,7 +40,7 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = app
 
-QT += gui widgets
+QT += gui widgets 3dextras
 
 TARGET = mne_analyze_qt
 
