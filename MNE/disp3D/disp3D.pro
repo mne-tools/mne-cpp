@@ -37,7 +37,7 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = lib
 
-QT       += widgets 3dcore 3drender 3dinput 3dextras charts
+QT       += widgets 3dcore 3drender 3dinput 3dextras
 
 DEFINES += DISP3DNEW_LIBRARY
 
@@ -52,6 +52,7 @@ RESOURCES += $$PWD/disp3d.qrc \
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
+            -lMNE$${MNE_LIB_VERSION}Utilsd \
             -lMNE$${MNE_LIB_VERSION}Fsd \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
             -lMNE$${MNE_LIB_VERSION}Mned \
@@ -61,6 +62,7 @@ CONFIG(debug, debug|release) {
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
+            -lMNE$${MNE_LIB_VERSION}Utils \
             -lMNE$${MNE_LIB_VERSION}Fs \
             -lMNE$${MNE_LIB_VERSION}Fiff \
             -lMNE$${MNE_LIB_VERSION}Mne \
