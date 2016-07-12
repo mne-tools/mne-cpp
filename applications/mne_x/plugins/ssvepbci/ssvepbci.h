@@ -175,7 +175,6 @@ public:
 
     virtual IPlugin::PluginType getType() const;
     virtual QString getName() const;
-
     virtual QWidget* setupWidget();
 
     //=========================================================================================================
@@ -203,13 +202,6 @@ protected:
     */
     void updateSource(XMEASLIB::NewMeasurement::SPtr pMeasurement);
 
-
-    //=========================================================================================================
-    /**
-    * Clears features
-    *
-    */
-    void clearFeatures();
 
     //=========================================================================================================
     /**
@@ -274,20 +266,17 @@ protected:
     */
     void ssvepBCIOnSource();
 
-
-
 public slots:
     void removePowerLine(bool removePowerLine);
     void setPowerLine(int powerLine);
     void setFeatureExtractionMethod(bool useMEC);
     void setThresholdValues(MyQList thresholds);
-
     void setChangeSSVEPParameterFlag();
 
 signals:
     void SSVEPprob(MyQList ssvepProb);
     void classificationResult(double classResult);
-    void getFrequencyList(MyQList frequencyList);
+    void getFrequencyLabels(MyQList frequencyList);
 
 private:
     QAction*                                            m_pActionBCIConfiguration;          /**< start configuration feature */
@@ -299,9 +288,9 @@ private:
     PluginInputData<NewRealTimeMultiSampleArray>::SPtr  m_pRTMSAInput;          /**< The RealTimeMultiSampleArray input.*/
     PluginInputData<RealTimeSourceEstimate>::SPtr       m_pRTSEInput;           /**< The RealTimeSourceEstimate input.*/
 
-    // adaptable sliding Window with downsampling function
+    // adaptable sliding time window with downsampling function
     MatrixXd                m_matSlidingTimeWindow;             /**< Sensor Level: adaptational sliding time window. */
-    int                     m_iCounter;                         /**< iterative index for counting the miss classifications */
+    int                     m_iCounter;                         /**< iterative index for counting the amount of misclassifications */
     double                  m_dSampleFrequency;                 /**< sample frequency of the device [Hz] */
     int                     m_iReadSampleSize;                  /**< numbers of sample for one time segment (about 0.1 seconds) */
     int                     m_iWriteSampleSize;                 /**< numbers of sample for writing to the time window  */
@@ -309,9 +298,9 @@ private:
     int                     m_iTimeWindowLength;                /**< required length of the time window */
     int                     m_iWriteIndex;                      /**< Index for writing a new increment from the buffer to the time window */
     int                     m_iReadIndex;                       /**< index for reading from the time window */
-    int                     m_iDownSampleIncrement;             /**< Rate of downsampling from current sample rate to 128 Hz */
+    int                     m_iDownSampleIncrement;             /**< Increment for downsampling from current sample rate to 128 Hz */
     int                     m_iDownSampleIndex;                 /**< index for reading from the raw buffer in order to downsample to 128 Hz */
-    int                     m_iFormerDownSampleIndex;           /**< former downsampling Index: serves as flag for managing storage overflow */
+    int                     m_iFormerDownSampleIndex;           /**< former downsampling Index: serves as comparison variable for handling storage overflow */
     int                     m_iReadToWriteBuffer;               /**< number of samples from the current readindex to current write index */
     int                     m_iWindowSize;
 
@@ -325,7 +314,7 @@ private:
     MyQList                 m_lSSVEPProbabilities;              /**< contains SSVEP Probabilities */
     bool                    m_bRemovePowerLine;                 /**< Flag for removing 50 Hz power line signal */
     bool                    m_bUseMEC;                          /**< flag for feature extractiong. If true: use MEC; If false: use CCA */
-    QList<int>              m_lClassResultsSensor;              /**< Sensor level: Classification results on sensor level. */
+    QList<int>              m_lIndexOfClassResultSensor;              /**< Sensor level: Classification results on sensor level. */
     int                     m_iPowerLine;                       /**< frequency of the power line [Hz] */
     bool                    m_bChangeSSVEPParameterFlag;        /**< flag for chaning SSVEP parameter */
 
@@ -336,7 +325,6 @@ private:
     FiffInfo::SPtr          m_pFiffInfo_Sensor;                 /**< Sensor level: Fiff information for sensor data. */
     QStringList             m_slChosenChannelsSensor;           /**< Sensor level: Features used to calculate data points in feature space on sensor level. */
     QMap<QString, int>      m_mapElectrodePinningScheme;        /**< Sensor level: Loaded pinning scheme of the Duke 64 Dry EEG cap. */
-    QList< QPair< int,QList<double> > >  m_lChannelsSensor;     /**< Sensor level: Features calculated on sensor level. */
 
     // Source level
     QVector< VectorXd >     m_vLoadedSourceBoundary;            /**< Source level: Loaded decision boundary on source level. */
@@ -363,7 +351,7 @@ private:
     * @param [in]   frequencyList           list of new frequencies
     *
     */
-    void setFrequencyList(MyQList frequencyList);
+    void setFrequencyList(QList<double> frequencyList);
 
 
     // old privates

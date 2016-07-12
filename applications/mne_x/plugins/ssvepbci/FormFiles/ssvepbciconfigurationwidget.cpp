@@ -62,6 +62,8 @@ ssvepBCIConfigurationWidget::ssvepBCIConfigurationWidget(ssvepBCI* pssvepBCI, QW
   ,  m_pSSVEPBCI(pssvepBCI)
   ,  ui(new Ui::ssvepBCIConfigurationWidget)
   ,  m_bInitThresholdDisplay(true)
+  ,  m_dMaxProbValue(1)
+  ,  m_dMinProbValue(0)
 {
     ui->setupUi(this);
 
@@ -108,7 +110,7 @@ ssvepBCIConfigurationWidget::ssvepBCIConfigurationWidget(ssvepBCI* pssvepBCI, QW
     connect(this, &ssvepBCIConfigurationWidget::changeSSVEPParameter, m_pSSVEPBCI, &ssvepBCI::setChangeSSVEPParameterFlag);
 
     // connect SSVEP frequency List signal
-    connect(m_pSSVEPBCI, &ssvepBCI::getFrequencyList, this, &ssvepBCIConfigurationWidget::setFrequencyList);
+    connect(m_pSSVEPBCI, &ssvepBCI::getFrequencyLabels, this, &ssvepBCIConfigurationWidget::setFrequencyLabels);
 
     // connect SSVEP values signal to refresh SSVEPProbabilities
     connect(m_pSSVEPBCI, &ssvepBCI::SSVEPprob, this, &ssvepBCIConfigurationWidget::setSSVEPProbabilities);
@@ -125,7 +127,7 @@ ssvepBCIConfigurationWidget::ssvepBCIConfigurationWidget(ssvepBCI* pssvepBCI, QW
     // connect threshold values to BCI plugin
     connect(this, &ssvepBCIConfigurationWidget::getThresholdValues, m_pSSVEPBCI, &ssvepBCI::setThresholdValues);
 
-    // connect classifiaction result
+    // connect classifiaction result to LCD-Display and colour change for labels
     connect(m_pSSVEPBCI, &ssvepBCI::classificationResult, ui->m_LcdNumber_ClasResult, static_cast<void(QLCDNumber::*)(double)>(&QLCDNumber::display));
     connect(m_pSSVEPBCI, &ssvepBCI::classificationResult, this, &ssvepBCIConfigurationWidget::setClassResult);
 
@@ -134,7 +136,7 @@ ssvepBCIConfigurationWidget::ssvepBCIConfigurationWidget(ssvepBCI* pssvepBCI, QW
     m_palRedFont.setColor(QPalette::WindowText, Qt::red);
 
     // initialize values to GUI-surface
-    setFrequencyList(m_pSSVEPBCI->getCurrentListOfFrequencies());
+    setFrequencyLabels(m_pSSVEPBCI->getCurrentListOfFrequencies());
     thresholdChanged(0);
     initSelectedChannelsSensor();
 }
@@ -154,20 +156,23 @@ void ssvepBCIConfigurationWidget::setSSVEPProbabilities(MyQList SSVEP){
 
     // determine scale for threshold status bar
     if(m_bInitThresholdDisplay){
+        // reset scale for threshold values & status bar
         m_dMaxProbValue = *std::max_element(SSVEP.begin(), SSVEP.end());
         m_dMinProbValue = *std::min_element(SSVEP.begin(), SSVEP.end());
+        resetThresholdValues();
         m_bInitThresholdDisplay = false;
     }
     else{
+        // update scale for threshold status bar
         double min = *std::min_element(SSVEP.begin(), SSVEP.end());
         double max = *std::max_element(SSVEP.begin(), SSVEP.end());
         m_dMinProbValue = min < m_dMinProbValue ? min : m_dMinProbValue;
         m_dMaxProbValue = max > m_dMaxProbValue ? max : m_dMaxProbValue;
     }
 
-    // filling SSVEP with zeros if size of SSVEP < 5
+    // filling rest of SSVEP with zeros if size of SSVEP < 5
     for(int i = SSVEP.size(); i < 5; i++)
-        SSVEP << 0;
+        SSVEP << m_dMinProbValue;
 
     // scale SSVEP values for status bar
     QList<int> values;
@@ -291,12 +296,11 @@ void ssvepBCIConfigurationWidget::updateThresholdsToScreen(){
 
 //*************************************************************************************************************
 
-void ssvepBCIConfigurationWidget::setFrequencyList(MyQList frequencyList){
+void ssvepBCIConfigurationWidget::setFrequencyLabels(MyQList frequencyList){
 
     // filling the list with missing zeros
-    if(frequencyList.size()<5)
-        for(int i = 0; i < frequencyList.size(); i++)
-            frequencyList << 0;
+    for(int i = frequencyList.size(); i < 5; i++)
+        frequencyList << 0;
 
     // update frequency list
     m_lFrequencyList = frequencyList;
@@ -308,7 +312,8 @@ void ssvepBCIConfigurationWidget::setFrequencyList(MyQList frequencyList){
     ui->m_Label_Frequency4->setText(QString::number(m_lFrequencyList[3]).append(" Hz"));
     ui->m_Label_Frequency5->setText(QString::number(m_lFrequencyList[4]).append(" Hz"));
 
-    qDebug() <<"newFreqListsetted to ";
+    // reset borders of status bar
+    m_bInitThresholdDisplay = true;
 
 }
 
@@ -324,21 +329,23 @@ void ssvepBCIConfigurationWidget::setClassResult(double classResult){
     ui->m_Label_Frequency4->setPalette(m_palBlackFont);
     ui->m_Label_Frequency5->setPalette(m_palBlackFont);
 
-    // highlighting the labels according to classifiaction result
-    int index = m_lFrequencyList.indexOf(classResult);
-    switch(index){
-    case 0:
-        ui->m_Label_Frequency1->setPalette(m_palRedFont); break;
-    case 1:
-        ui->m_Label_Frequency2->setPalette(m_palRedFont); break;
-    case 2:
-        ui->m_Label_Frequency3->setPalette(m_palRedFont); break;
-    case 3:
-        ui->m_Label_Frequency4->setPalette(m_palRedFont); break;
-    case 4:
-        ui->m_Label_Frequency5->setPalette(m_palRedFont); break;
-    default:
-        break;
+    // highlighting the labels according to classifiaction result as long the result is not equal 0
+    if(classResult != 0){
+        int index = m_lFrequencyList.indexOf(classResult);
+        switch(index){
+        case 0:
+            ui->m_Label_Frequency1->setPalette(m_palRedFont); break;
+        case 1:
+            ui->m_Label_Frequency2->setPalette(m_palRedFont); break;
+        case 2:
+            ui->m_Label_Frequency3->setPalette(m_palRedFont); break;
+        case 3:
+            ui->m_Label_Frequency4->setPalette(m_palRedFont); break;
+        case 4:
+            ui->m_Label_Frequency5->setPalette(m_palRedFont); break;
+        default:
+            break;
+        }
     }
 }
 
@@ -401,4 +408,17 @@ void ssvepBCIConfigurationWidget::channelSelectChanged(const QModelIndex &parent
 
     // emit signal for changing ssvep parameter after BCI processing
     emit changeSSVEPParameter();
+}
+
+
+//*************************************************************************************************************
+
+void ssvepBCIConfigurationWidget::resetThresholdValues(){
+
+    // assign SSVEP thresholds to sliders
+    ui->m_DoubleSpinBox_Threshold1->setValue(m_dMaxProbValue);
+    ui->m_DoubleSpinBox_Threshold2->setValue(m_dMaxProbValue);
+    ui->m_DoubleSpinBox_Threshold3->setValue(m_dMaxProbValue);
+    ui->m_DoubleSpinBox_Threshold4->setValue(m_dMaxProbValue);
+    ui->m_DoubleSpinBox_Threshold5->setValue(m_dMaxProbValue);
 }

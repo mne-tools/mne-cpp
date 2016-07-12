@@ -57,23 +57,23 @@ using namespace ssvepBCIPlugin;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ssvepBCISetupStimulusWidget::ssvepBCISetupStimulusWidget(ssvepBCI* pssvepBCI, QWidget *parent) :
+ssvepBCISetupStimulusWidget::ssvepBCISetupStimulusWidget(ssvepBCI *pssvepBCI, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::ssvepBCISetupStimulusWidget),
-     m_pssvepBCI(pssvepBCI),
+     m_pssvepBCI(QSharedPointer<ssvepBCI>(pssvepBCI)),
      m_bIsRunning(false),
      m_bReadFreq(false)
 {
     ui->setupUi(this);
 
     //setup the test screen and initialize screen for subject
-    m_pssvepBCIScreen = new ssvepBCIScreen;
-    QScreen *screen  = QGuiApplication::screens()[1]; // specify which screen to use
-    m_pssvepBCIScreen->move(screen->geometry().x(), screen->geometry().y());
+    m_pssvepBCIScreen = QSharedPointer<ssvepBCIScreen>(new ssvepBCIScreen);
+    m_pScreen  =  QSharedPointer<QScreen>(QGuiApplication::screens()[1]); // specify which screen to use
+    m_pssvepBCIScreen->move(m_pScreen->geometry().x(), m_pScreen->geometry().y());
     m_pssvepBCIScreen->showFullScreen();
 
     // connect signal for frequency change
-    connect(this, &ssvepBCISetupStimulusWidget::frequencyChanged, m_pssvepBCI, &ssvepBCI::setChangeSSVEPParameterFlag);
+    connect(this, &ssvepBCISetupStimulusWidget::frequencyChanged, m_pssvepBCI.data(), &ssvepBCI::setChangeSSVEPParameterFlag);
 
     //Map for all frequencies according to their key
     m_idFreqMap.insert(15,  6   );
@@ -98,8 +98,7 @@ ssvepBCISetupStimulusWidget::ssvepBCISetupStimulusWidget(ssvepBCI* pssvepBCI, QW
         ui->comboBox_2->addItem(QString().number(m_idFreqMap[i]));
 
     //getting refreshrate of the subject's screen and add it to the setupWidget
-    ui->label_6->setText(QString().number(screen->refreshRate()));
-    delete screen;
+    ui->label_6->setText(QString().number(m_pScreen->refreshRate()));
 }
 
 //*************************************************************************************************************
@@ -107,7 +106,6 @@ ssvepBCISetupStimulusWidget::ssvepBCISetupStimulusWidget(ssvepBCI* pssvepBCI, QW
 ssvepBCISetupStimulusWidget::~ssvepBCISetupStimulusWidget()
 {
     delete ui;
-    delete m_pssvepBCIScreen;
 }
 
 
@@ -118,6 +116,7 @@ void ssvepBCISetupStimulusWidget::closeEvent(QCloseEvent *event)
     Q_UNUSED(event)
     m_pssvepBCIScreen->close();
 }
+
 
 //*************************************************************************************************************
 
@@ -144,12 +143,14 @@ void ssvepBCISetupStimulusWidget::changeComboBox()
     on_comboBox_currentIndexChanged(0);
 }
 
+
 //*************************************************************************************************************
 
 void ssvepBCISetupStimulusWidget::on_pushButton_clicked()
 {
     m_pssvepBCIScreen->showFullScreen();
 }
+
 
 //*************************************************************************************************************
 
@@ -158,12 +159,14 @@ void ssvepBCISetupStimulusWidget::on_pushButton_2_clicked()
     clear();
 }
 
+
 //*************************************************************************************************************
 
 void ssvepBCISetupStimulusWidget::on_pushButton_3_clicked()
 {
     m_pssvepBCIScreen->setWindowState(Qt::WindowMinimized);
 }
+
 
 //*************************************************************************************************************
 
@@ -196,6 +199,7 @@ void ssvepBCISetupStimulusWidget::on_pushButton_4_clicked()
     m_pssvepBCIScreen->m_Items <<item1<<item2<<item3<<item4 ;
     changeComboBox();
 }
+
 
 //*************************************************************************************************************
 
@@ -252,10 +256,10 @@ void ssvepBCISetupStimulusWidget::on_pushButton_6_clicked()
     changeComboBox();
 
 
-    // signal for changing frequency list of ssvepBCI class
-    emit frequencyChanged();
+
 
 }
+
 
 //*************************************************************************************************************
 
@@ -286,6 +290,7 @@ void ssvepBCISetupStimulusWidget::on_comboBox_currentIndexChanged(int index)
         ui->comboBox_2->setCurrentIndex(m_pssvepBCIScreen->m_Items.at(index).m_iFreqKey);//get key of frequency
     }
 }
+
 
 //*************************************************************************************************************
 
@@ -356,6 +361,8 @@ void ssvepBCISetupStimulusWidget::setFreq(ssvepBCIFlickeringItem &item, int freq
     }
     item.setRenderOrder(renderOrder, freqKey);
 
+    // signal for changing frequency list of ssvepBCI class
+    emit frequencyChanged();
 
 }
 
