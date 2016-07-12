@@ -58,24 +58,22 @@ SUBDIRS += \
     testWarp \
 
 !contains(MNECPP_CONFIG, minimalVersion) {
-    SUBDIRS += \
-        clusteredInverse \
-        rawClusteredInverse \
-        rawClusteredInverseEEG \
-        readFwdDisp3D \
-        plotSurfaces \
-        lnt \
-        computeInverseRapMusic \
-        rawClusteredInverseRapMusic \
-        computeInversePwlRapMusic \
-        rawClusteredInversePwlRapMusic \
-        stClusteredInversePwlRapMusic  \
-        roiClusteredInversePwlRapMusic \
-        fsSurface
-
-        qtHaveModule(charts) {
-            SUBDIRS += \
-                disp3DTutorial \
-                histogram
-        }
+    qtHaveModule(charts) {
+        SUBDIRS += \
+            clusteredInverse \
+            rawClusteredInverse \
+            rawClusteredInverseEEG \
+            readFwdDisp3D \
+            plotSurfaces \
+            lnt \
+            computeInverseRapMusic \
+            rawClusteredInverseRapMusic \
+            computeInversePwlRapMusic \
+            rawClusteredInversePwlRapMusic \
+            stClusteredInversePwlRapMusic  \
+            roiClusteredInversePwlRapMusic \
+            fsSurface \
+            disp3DTutorial \
+            histogram
+    }
 }
