@@ -38,7 +38,7 @@ TEMPLATE = app
 
 VERSION = $${MNE_CPP_VERSION}
 
-QT += widgets 3dcore 3drender 3dinput 3dextras
+QT += widgets 
 
 CONFIG   += console
 CONFIG   -= app_bundle

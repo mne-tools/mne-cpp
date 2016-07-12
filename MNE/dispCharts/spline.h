@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    spline class declaration
+* @brief    Spline class declaration
 */
 
 #ifndef SPLINE_H
@@ -69,9 +69,10 @@
 //=============================================================================================================
 
 class QMouseEvent;
+
 namespace QtCharts
 {
-class QLineSeries;
+    class QLineSeries;
 }
 
 
@@ -149,7 +150,7 @@ public:
     * @param[out] vecExponentResults     vector filled with values of exponent only
     */
     template<typename T>
-    void splitCoefficientAndExponent (const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData, int iClassAmount, Eigen::VectorXd& vecCoefficientResults, Eigen::VectorXi& vecExponentValues);
+    void splitCoefficientAndExponent(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData, int iClassAmount, Eigen::VectorXd& vecCoefficientResults, Eigen::VectorXi& vecExponentValues);
 
     //=========================================================================================================
     /**
@@ -157,7 +158,7 @@ public:
     *
     * @param[in]  vecThresholdValues      QVector3D consisting of 3 values corresponding to the x-axis value of the threshold lines
     */
-    void setThreshold (const QVector3D& vecThresholdValues);
+    void setThreshold(const QVector3D& vecThresholdValues);
 
     //=========================================================================================================
     /**
@@ -165,7 +166,7 @@ public:
     *
     * @return      returns QList consisting of QVector3D corresponding to the x-axis value of the threshold lines
     */
-    const QVector3D &getThreshold();
+    const QVector3D& getThreshold();
 
     //=========================================================================================================
     /**
@@ -175,7 +176,7 @@ public:
     * @param[in]  functionName          Choice between getThreshold or setThreshold
     * @return     returns QVector3D after necessary adjustment
     */
-    const QVector3D &correctionDisplayTrueValue(QVector3D vecOriginalValues, QString functionName);
+    const QVector3D& correctionDisplayTrueValue(QVector3D vecOriginalValues, QString functionName);
 
     //=========================================================================================================
     /**
@@ -201,7 +202,6 @@ private:
     */
     void updateThreshold (QtCharts::QLineSeries *lineSeries);
 
-    //=========================================================================================================
     QtCharts::QChart*        m_pChart;            /**< Qchart object that will be shown in the widget */
     QtCharts::QSplineSeries* m_pSeries;           /**< Spline data series that will contain the histogram data*/
     QtCharts::QLineSeries*   m_pLeftThreshold;    /**< Vertical line series for the left threshold */
@@ -370,7 +370,6 @@ void Spline::splitCoefficientAndExponent (const Eigen::Matrix<T, Eigen::Dynamic,
 }
 }
 
-//=========================================================================================================
 // NAMESPACE
 
 #endif // SPLINE_H
