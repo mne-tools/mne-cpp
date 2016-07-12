@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Configure without tests
-qmake -r MNECPP_CONFIG+=noExamples MNECPP_CONFIG+=noTests
+# Configure without tests MNECPP_CONFIG+=noExamples MNECPP_CONFIG+=noTests
+qmake -r MNECPP_CONFIG+=minimalVersion
 
 # Build
 make -j2
