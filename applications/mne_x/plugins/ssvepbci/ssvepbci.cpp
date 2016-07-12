@@ -99,12 +99,7 @@ ssvepBCI::ssvepBCI()
     m_lDesFrequencies << 6.66 << 7.5 <<8.57 << 10 << 12;
     m_lThresholdValues << 0.12 << 0.12 << 0.12 << 0.12 << 0.12;
 
-    // initialize ssvep propabilities
-    m_lSSVEPProbabilities << 0 << 0 << 0 << 0 << 0;
-
     setFrequencyList(m_lDesFrequencies);
-
-    qDebug() <<"List of all frequencies:" <<  m_lAllFrequencies;
 }
 
 
@@ -234,25 +229,15 @@ bool ssvepBCI::stop()
     {
         m_pBCIBuffer_Sensor->releaseFromPop();
         m_pBCIBuffer_Sensor->releaseFromPush();
-        m_pBCIBuffer_Source->releaseFromPop();
-        m_pBCIBuffer_Source->releaseFromPush();
+//        m_pBCIBuffer_Source->releaseFromPop();
+//        m_pBCIBuffer_Source->releaseFromPush();
     }
 
     // Stop filling buffers with data from the inputs
     m_bProcessData = false;
 
-    // Clear stream
-    m_outStreamDebug.close();
-    m_outStreamDebug.clear();
-
-//    // Hide feature visualization window
-//    if(m_bDisplayFeatures)
-//        m_BCIFeatureWindow->hide();
-
     // Delete all features and classification results
-    clearFeatures();
     clearClassifications();
-
 
     return true;
 }
@@ -291,19 +276,14 @@ QWidget* ssvepBCI::setupWidget()
 
 void ssvepBCI::updateSensor(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 {
-    //cout << "update Sensor" << endl;
-
-
+    // initialize the sample array which will be filled with raw data
     QSharedPointer<NewRealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<NewRealTimeMultiSampleArray>();
-    if(pRTMSA)
-    {
+    if(pRTMSA){
         //Check if buffer initialized
-
         m_qMutex.lock();
         if(!m_pBCIBuffer_Sensor)
             m_pBCIBuffer_Sensor = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, pRTMSA->getNumChannels(), pRTMSA->getMultiSampleArray()[0].cols()));
     }
-
 
     //Fiff information
     if(!m_pFiffInfo_Sensor)
@@ -328,17 +308,12 @@ void ssvepBCI::updateSensor(XMEASLIB::NewMeasurement::SPtr pMeasurement)
         cout << "Write Sample SIze :" << m_iWriteSampleSize<< endl;
         cout << "Length of the time window:" << m_iTimeWindowLength << endl;
     }
-
-
     m_qMutex.unlock();
 
     // filling the matrix buffer
-    if(m_bProcessData)
-    {
+    if(m_bProcessData){
         MatrixXd t_mat;
-
-        for(qint32 i = 0; i < pRTMSA->getMultiArraySize(); ++i)
-        {
+        for(qint32 i = 0; i < pRTMSA->getMultiArraySize(); ++i){
             t_mat = pRTMSA->getMultiSampleArray()[i];
             m_pBCIBuffer_Sensor->push(&t_mat);
         }
@@ -370,22 +345,13 @@ void ssvepBCI::updateSource(XMEASLIB::NewMeasurement::SPtr pMeasurement)
     }
 }
 
-//*************************************************************************************************************
-
-void ssvepBCI::clearFeatures()
-{
-    m_qMutex.lock();
-        m_lChannelsSensor.clear();
-    m_qMutex.unlock();
-}
-
 
 //*************************************************************************************************************
 
 void ssvepBCI::clearClassifications()
 {
     m_qMutex.lock();
-        m_lClassResultsSensor.clear();
+        m_lIndexOfClassResultSensor.clear();
     m_qMutex.unlock();
 }
 
@@ -394,8 +360,6 @@ void ssvepBCI::clearClassifications()
 
 void  ssvepBCI::setChangeSSVEPParameterFlag(){
     m_bChangeSSVEPParameterFlag = true;
-
-    qDebug() << "change Flag to:" << m_bChangeSSVEPParameterFlag;
 }
 
 //*************************************************************************************************************
@@ -430,7 +394,6 @@ void ssvepBCI::showSetupStimulus()
             //m_pssvepBCISetupStimulusWidget->initGui();
             m_pssvepBCISetupStimulusWidget->show();
             m_pssvepBCISetupStimulusWidget->raise();
-
         }
 
         //sets Window to the foreground and activates it for editing
@@ -498,33 +461,38 @@ void ssvepBCI::setFeatureExtractionMethod(bool useMEC){
 
 void ssvepBCI::changeSSVEPParameter(){
 
-    // update number of harmonics of reference signal
-    m_iNumberOfHarmonics = 1 + m_pssvepBCIConfigurationWidget->getNumOfHarmonics();
-
     // update frequency list from setup stimulus widget if activated
-    if(m_pssvepBCISetupStimulusWidget != NULL)
+    if(m_pssvepBCISetupStimulusWidget)
         setFrequencyList(m_pssvepBCISetupStimulusWidget->getFrequencies());
 
-    // update channel select
-    QStringList channelSelectSensor =  m_pssvepBCIConfigurationWidget->getSensorChannelSelection();
-    if(channelSelectSensor.size() > 0){
+    if(m_pssvepBCIConfigurationWidget){
 
-        m_slChosenChannelsSensor = channelSelectSensor;
+        // update number of harmonics of reference signal
+        m_iNumberOfHarmonics = 1 + m_pssvepBCIConfigurationWidget->getNumOfHarmonics();
 
-        // get new list of electrode numbers
-        m_lElectrodeNumbers.clear();
-        foreach(const QString &str, m_slChosenChannelsSensor)
-            m_lElectrodeNumbers << m_mapElectrodePinningScheme.value(str);
+        // update channel select
+        QStringList channelSelectSensor =  m_pssvepBCIConfigurationWidget->getSensorChannelSelection();
+        if(channelSelectSensor.size() > 0){
 
-        // reset sliding time window parameter
-        m_iWriteIndex   = 0;
-        m_iReadIndex    = 0;
-        m_iCounter      = 0;
-        m_iReadToWriteBuffer = 0;
-        m_iDownSampleIndex   = 0;
-        m_iFormerDownSampleIndex = 0;
-        m_matSlidingTimeWindow.resize(m_lElectrodeNumbers.size(), m_iTimeWindowLength);
+            // update the list of selected channels
+            m_slChosenChannelsSensor = channelSelectSensor;
 
+            // get new list of electrode numbers
+            m_lElectrodeNumbers.clear();
+            foreach(const QString &str, m_slChosenChannelsSensor)
+                m_lElectrodeNumbers << m_mapElectrodePinningScheme.value(str);
+
+            // reset sliding time window parameter
+            m_iWriteIndex   = 0;
+            m_iReadIndex    = 0;
+            m_iCounter      = 0;
+            m_iReadToWriteBuffer = 0;
+            m_iDownSampleIndex   = 0;
+            m_iFormerDownSampleIndex = 0;
+
+            // resize the time window with new electrode numbers
+            m_matSlidingTimeWindow.resize(m_lElectrodeNumbers.size(), m_iTimeWindowLength);
+        }
     }
 
     // reset flag for changing SSVEP parameter
@@ -548,31 +516,29 @@ void ssvepBCI::run(){
             ssvepBCIOnSensor();
         else
             ssvepBCIOnSource();
-
     }
-
-
 }
 
 
 //*************************************************************************************************************
 
-void ssvepBCI::setFrequencyList(MyQList frequencyList)
+void ssvepBCI::setFrequencyList(QList<double> frequencyList)
 {
-    // update list of desired frequencies
-    m_lDesFrequencies.clear();
-    m_lDesFrequencies = frequencyList;
+    if(!frequencyList.isEmpty()){
 
-    // update the list of all frequencies
-    m_lAllFrequencies.clear();
-    m_lAllFrequencies = m_lDesFrequencies;
-    for(int i = 0; i < m_lDesFrequencies.size() - 1; i++)
-        m_lAllFrequencies.append((m_lDesFrequencies.at(i) + m_lDesFrequencies.at(i + 1) ) / 2);
+        // update list of desired frequencies
+        m_lDesFrequencies.clear();
+        m_lDesFrequencies = frequencyList;
 
-    // emit novel frequency list
-    emit getFrequencyList(m_lDesFrequencies);
+        // update the list of all frequencies
+        m_lAllFrequencies.clear();
+        m_lAllFrequencies = m_lDesFrequencies;
+        for(int i = 0; i < m_lDesFrequencies.size() - 1; i++)
+            m_lAllFrequencies.append((m_lDesFrequencies.at(i) + m_lDesFrequencies.at(i + 1) ) / 2);
 
-
+        // emit novel frequency list
+        emit getFrequencyLabels(m_lDesFrequencies);
+    }
 }
 
 
@@ -685,7 +651,8 @@ void ssvepBCI::ssvepBCIOnSensor()
     while(!m_pFiffInfo_Sensor)
         msleep(10);
 
-    m_lClassResultsSensor.clear();
+    // reset list of classifiaction results
+    m_lIndexOfClassResultSensor.clear();
 
     // Start filling buffers with data from the inputs
     m_bProcessData = true;
@@ -693,10 +660,8 @@ void ssvepBCI::ssvepBCIOnSensor()
 
     // writing selected feature channels to the time window storage and increase the segment index
     int   writtenSamples = 0;
-    while(m_iDownSampleIndex >= m_iFormerDownSampleIndex)
-    {
-        //cout << "write index:" << m_iWriteIndex << endl;
-        //cout << "downsample index:" << m_iDownSampleIndex << endl;
+    while(m_iDownSampleIndex >= m_iFormerDownSampleIndex){
+
         // write from t_mat to the sliding time window while doing channel select and downsampling
         m_iFormerDownSampleIndex = m_iDownSampleIndex;
         for(int i = 0; i < m_lElectrodeNumbers.size(); i++)
@@ -712,7 +677,7 @@ void ssvepBCI::ssvepBCIOnSensor()
 
     // calculate buffer between read- and write index
     m_iReadToWriteBuffer = m_iReadToWriteBuffer + writtenSamples;
-    //cout << "read to write buffer:" << m_iReadToWriteBuffer << endl << endl;
+
     // execute processing loop as long as there is new data to be red from the time window
     while(m_iReadToWriteBuffer >= m_iReadSampleSize)
     {
@@ -766,16 +731,18 @@ void ssvepBCI::ssvepBCIOnSensor()
                 // cout << "size of X" << X.cols() << endl;
             }
 
-            // normalize probabilities and adding the softmax coefficient
+            // normalize features to probabilities and transfering it into a softmax function
             ssvepProbabilities = m_dAlpha / ssvepProbabilities.sum() * ssvepProbabilities;
             ssvepProbabilities = ssvepProbabilities.array().exp();                          // softmax function for better distinguishability between the probabilities
             ssvepProbabilities = 1 / ssvepProbabilities.sum() * ssvepProbabilities;
             //cout << "probabilites:" << endl << ssvepProbabilities << endl;
 
             // transfer values to MyQList and emit signal for GUI
+            m_lSSVEPProbabilities.clear();
             for(int i = 0; i < m_lDesFrequencies.size(); i++)
-                m_lSSVEPProbabilities[i] = ssvepProbabilities(i);
-            emit SSVEPprob(m_lSSVEPProbabilities);
+                m_lSSVEPProbabilities << ssvepProbabilities(i);
+            if(!m_lSSVEPProbabilities.isEmpty())
+                emit SSVEPprob(m_lSSVEPProbabilities);
 
             // classify probabilites
             int index = 0;
@@ -783,34 +750,14 @@ void ssvepBCI::ssvepBCIOnSensor()
             //cout << "max Probability:" << maxProbability << endl;
             if(index < m_lDesFrequencies.size()){
                 if(m_lThresholdValues.at(index) < maxProbability){
-                    m_lClassResultsSensor.append(index+1);
+                    m_lIndexOfClassResultSensor.append(index+1);
                     m_iCounter = -1;
                 }
             }
             else
-                m_lClassResultsSensor.append(0);
+                m_lIndexOfClassResultSensor.append(0);
 
         }
-
-        m_lClassResultsSensor.removeAll(0);
-        QList<int> freqCount;
-        int i = 1;
-        foreach(double freq, m_lDesFrequencies){
-            freqCount << m_lClassResultsSensor.count(i);
-            i++;
-        }
-        qDebug() << "classResult:" << freqCount;
-
-        int max = *std::max_element(freqCount.begin(), freqCount.end());
-
-        qDebug() << "max" << max;
-
-        // emit classifiaction result
-        // qDebug() <<"classification results" << m_lClassResultsSensor.last() << endl;
-        if(max == 0)
-            emit classificationResult(0);
-        else
-            emit classificationResult(m_lDesFrequencies[freqCount.indexOf(max)]);
 
         // update counter and index variables
         m_iCounter++;
@@ -818,7 +765,18 @@ void ssvepBCI::ssvepBCIOnSensor()
         m_iReadIndex = (m_iReadIndex + m_iReadSampleSize) % (m_iTimeWindowLength);
 
     }
-    // change number of harmonics or channel selection and reset the time window if the change flag has been set
+
+    // emit classifiaction results if any classifiaction has been done
+    if(!m_lIndexOfClassResultSensor.isEmpty()){
+
+        m_lIndexOfClassResultSensor.removeAll(0);
+        if(!m_lIndexOfClassResultSensor.isEmpty())
+            emit classificationResult(m_lDesFrequencies[m_lIndexOfClassResultSensor.last() - 1]);
+        else
+            emit classificationResult(0);
+    }
+
+    // change parameter and reset the time window if the change flag has been set
     if(m_bChangeSSVEPParameterFlag)
         changeSSVEPParameter();
 

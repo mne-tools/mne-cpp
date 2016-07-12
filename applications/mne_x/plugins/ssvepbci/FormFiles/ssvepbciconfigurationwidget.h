@@ -157,10 +157,17 @@ public:
     */
     QStringList getSourceChannelSelection();
 
+    //=========================================================================================================
+    /**
+    * resetting thresholdbars values to maximal statusbar borders
+    *
+    */
+    void resetThresholdValues();
+
 
 public slots:
     void setSSVEPProbabilities(MyQList SSVEP);
-    void setFrequencyList(MyQList frequencyList);
+    void setFrequencyLabels(MyQList frequencyList);
     void setClassResult(double classResult);
 
 private slots:

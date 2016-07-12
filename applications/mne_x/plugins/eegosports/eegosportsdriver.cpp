@@ -126,7 +126,7 @@ bool EEGoSportsDriver::initDevice(int iNumberOfChannels,
             m_pDataStream = m_pAmplifier->OpenEegStream(m_uiSamplingFrequency, reference_range, bipolar_range);
         }
 
-        Sleep(100);
+        Sleep(1000);
     } catch (std::runtime_error& e) {
         std::cout <<"EEGoSportsDriver::initDevice - error " << e.what() << std::endl;
         return false;

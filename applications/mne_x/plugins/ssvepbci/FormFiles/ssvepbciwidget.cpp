@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     bciwidget.cpp
+* @file     ssvepbciwidget.cpp
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>
 *			Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the BCISetupWidget class.
+* @brief    Contains the implementation of the ssvepBCISetupWidget class.
 *
 */
 
@@ -406,6 +406,8 @@ void ssvepBCIWidget::showAboutDialog()
 
 bool ssvepBCIWidget::eventFilter(QObject *object, QEvent *event)
 {
+    Q_UNUSED(object)
+    Q_UNUSED(event)
 //     if ((object == ui.m_listWidget_ChosenFeaturesOnSensorLevel ||
 //          object == ui.m_listWidget_ChosenFeaturesOnSourceLevel ||
 //          object == ui.m_listWidget_AvailableFeaturesOnSensorLevel ||

@@ -96,7 +96,7 @@ public:
     * @param [in] parent pointer to parent widget; If parent is 0, the new EEGoSportsSetupStimulusWidget becomes a window. If parent is another widget, EEGoSportsSetupStimulusWidget becomes a child window inside parent. EEGoSportsSetupStimulusWidget is deleted when its parent is deleted.
     * @param [in] pEEGoSports a pointer to the corresponding ECGSimulator.
     */
-    explicit ssvepBCISetupStimulusWidget(ssvepBCI* pssvepBCI, QWidget *parent = 0);
+    explicit ssvepBCISetupStimulusWidget(ssvepBCI *pssvepBCI, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
@@ -181,8 +181,9 @@ private slots:
 
 private:
     Ui::ssvepBCISetupStimulusWidget        *ui;
-    ssvepBCI                               *m_pssvepBCI;            /**< a pointer to corresponding EEGoSports */
-    ssvepBCIScreen                         *m_pssvepBCIScreen;      /**< pointer to the screen class of the subject (friend class) */
+    QSharedPointer<ssvepBCI>                m_pssvepBCI;            /**< a pointer to corresponding EEGoSports */
+    QSharedPointer<ssvepBCIScreen>          m_pssvepBCIScreen;      /**< pointer to the ssvepBCIscreen class of the subject (friend class) */
+    QSharedPointer<QScreen>                 m_pScreen;              /**< pointer to the QScreen class; */
     bool                                    m_bIsRunning;           /**< Flag for running test */
     bool                                    m_bReadFreq;            /**< Flag for reading the adjusted frequency */
     QMap<int, double>                       m_idFreqMap;            /**< containing frequencies and their corresponding key */
