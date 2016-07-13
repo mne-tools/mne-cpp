@@ -185,10 +185,6 @@ protected:
 private:
     QMutex      mutex;                  /**< Provides access serialization between threads*/
 
-    quint32      m_iMaxSamples;         /**< Maximal amount of samples received, before covariance is estimated.*/
-
-    quint32      m_iNewMaxSamples;      /**< New maximal amount of samples received, before covariance is estimated.*/
-
     FiffInfo::SPtr  m_pFiffInfo;        /**< Holds the fiff measurement information. */
 
     bool        m_bIsRunning;           /**< Holds if real-time Covariance estimation is running.*/
@@ -203,18 +199,18 @@ private:
     qint32 m_dataLength;
 
 protected:
-    int NumOfBlocks;
-    int BlockSize  ;
-    int Sensors    ;
-    int BlockIndex ;
+    int m_iNumOfBlocks;
+    int m_iBlockSize;
+    int m_iSensors;
+    int m_iBlockIndex;
 
-    MatrixXd CircBuf;
+    MatrixXd m_matCircBuf;
 
 public:
-    MatrixXd SpecData;
+    MatrixXd m_matSpecData;
     QMutex ReadMutex;
 
-    bool SendDataToBuffer;
+    bool m_bSendDataToBuffer;
 
 };
 
