@@ -55,7 +55,7 @@ SUBDIRS += \
     makeLayout\
     readBEM\
     patientManager \
-    testWarp
+    testWarp \
 
 !contains(MNECPP_CONFIG, minimalVersion) {
     SUBDIRS += \
@@ -64,7 +64,6 @@ SUBDIRS += \
         rawClusteredInverseEEG \
         readFwdDisp3D \
         plotSurfaces \
-        lnt \
         computeInverseRapMusic \
         rawClusteredInverseRapMusic \
         computeInversePwlRapMusic \
@@ -73,4 +72,5 @@ SUBDIRS += \
         roiClusteredInversePwlRapMusic \
         fsSurface \
         disp3DTutorial \
+        histogram
 }
