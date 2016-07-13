@@ -73,5 +73,4 @@ SUBDIRS += \
         fsSurface \
         disp3DTutorial \
         histogram
-    }
 }
