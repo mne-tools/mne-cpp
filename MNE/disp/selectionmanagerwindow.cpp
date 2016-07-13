@@ -135,11 +135,11 @@ void SelectionManagerWindow::initComboBoxes()
 
     //Initialise layout as neuromag vectorview with all channels
     QString selectionName("babymeg-mag-inner-layer.lout");
-    loadLayout(QCoreApplication::applicationDirPath() + selectionName.prepend("/Resources/Layouts/"));
+    loadLayout(QCoreApplication::applicationDirPath() + selectionName.prepend("/resources/2DLayouts/"));
 
     //Load selection groups again because they need to be reinitialised every time a new layout hase been loaded
     selectionName = QString("mne_browse_raw_babyMEG.sel");
-    loadSelectionGroups(QCoreApplication::applicationDirPath() + selectionName.prepend("/Resources/SelectionGroups/"));
+    loadSelectionGroups(QCoreApplication::applicationDirPath() + selectionName.prepend("/resources/selectionGroups/"));
 }
 
 
@@ -348,7 +348,7 @@ bool SelectionManagerWindow::loadLayout(QString path)
     QList<QVector<double> > inputPoints;
     QList<QVector<double> > outputPoints;
     QStringList names;
-    QFile out("manualLayout.lout");//(/*"./Resources/SelectionGroups/*/"manualLayout.lout");
+    QFile out("manualLayout.lout");//(/*"./resources/selectionGroups/*/"manualLayout.lout");
 
     for(int i = 0; i < m_pChInfoModel->rowCount(); i++) {
         QModelIndex digIndex = m_pChInfoModel->index(i,1);
@@ -430,7 +430,7 @@ bool SelectionManagerWindow::loadSelectionGroups(QString path)
     ui->m_listWidget_selectionGroups->clear();
 
     //Read selection from file and store to map
-    QString newPath = path; //QCoreApplication::applicationDirPath() + path.prepend("/Resources/SelectionGroups/");
+    QString newPath = path; //QCoreApplication::applicationDirPath() + path.prepend("/resources/selectionGroups/");
 
     m_selectionGroupsMap.clear();
 
@@ -620,7 +620,7 @@ void SelectionManagerWindow::onBtnLoadUserSelection()
 {
     QString path = QFileDialog::getOpenFileName(this,
                                                 QString("Open selection file"),
-                                                QString("./Resources/SelectionGroups/"),
+                                                QString("./resources/selectionGroups/"),
                                                 tr("Selection files (*.sel *.mon)"));
 
     if(path.isEmpty())
@@ -637,7 +637,7 @@ void SelectionManagerWindow::onBtnSaveUserSelection()
     QDate date;
     QString path = QFileDialog::getSaveFileName(this,
                                                 "Save user channel selection",
-                                                QString("./Resources/SelectionGroups/%1_%2_%3_UserSelection").arg(date.currentDate().year()).arg(date.currentDate().month()).arg(date.currentDate().day()),
+                                                QString("./resources/selectionGroups/%1_%2_%3_UserSelection").arg(date.currentDate().year()).arg(date.currentDate().month()).arg(date.currentDate().day()),
                                                 tr("MNE selection file(*.sel);; Brainstorm montage file(*.mon)"));
 
     QMap<QString, QStringList> tempMap = m_selectionGroupsMap;
@@ -671,7 +671,7 @@ void SelectionManagerWindow::onBtnAddToSelectionGroups()
 void SelectionManagerWindow::onComboBoxLayoutChanged()
 {
     QString selectionName(ui->m_comboBox_layoutFile->currentText());
-    loadLayout(QCoreApplication::applicationDirPath() + selectionName.prepend("/Resources/2DLayouts/"));
+    loadLayout(QCoreApplication::applicationDirPath() + selectionName.prepend("/resources/2DLayouts/"));
 }
 
 
