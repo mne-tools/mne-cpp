@@ -67,7 +67,7 @@ ssvepBCISetupStimulusWidget::ssvepBCISetupStimulusWidget(ssvepBCI *pssvepBCI, QW
     ui->setupUi(this);
 
     //setup the test screen and initialize screen for subject
-    m_pssvepBCIScreen = QSharedPointer<ssvepBCIScreen>(new ssvepBCIScreen);
+    m_pssvepBCIScreen = QSharedPointer<ssvepBCIScreen>(new ssvepBCIScreen(m_pssvepBCI));
     m_pScreen  =  QSharedPointer<QScreen>(QGuiApplication::screens()[1]); // specify which screen to use
     m_pssvepBCIScreen->move(m_pScreen->geometry().x(), m_pScreen->geometry().y());
     m_pssvepBCIScreen->showFullScreen();

@@ -419,7 +419,7 @@ void ssvepBCI::showBCIConfiguration()
 
     if(!m_pssvepBCIConfigurationWidget->isVisible()){
 
-        m_pssvepBCIConfigurationWidget->setWindowTitle("ssvepBCI - Setup Stimulus");
+        m_pssvepBCIConfigurationWidget->setWindowTitle("ssvepBCI - Configuration");
         //m_pEEGoSportsSetupStimulusWidget->initGui();
         m_pssvepBCIConfigurationWidget->show();
         m_pssvepBCIConfigurationWidget->raise();
@@ -653,6 +653,7 @@ void ssvepBCI::ssvepBCIOnSensor()
 
     // reset list of classifiaction results
     m_lIndexOfClassResultSensor.clear();
+    MatrixXd m_matSSVEPProbabilities(m_lDesFrequencies.size(), 0);
 
     // Start filling buffers with data from the inputs
     m_bProcessData = true;
@@ -728,7 +729,6 @@ void ssvepBCI::ssvepBCIOnSensor()
                     ssvepProbabilities(i) = MEC(Y, X); // using Minimum Energy Combination as feature-extraction tool
                 else
                     ssvepProbabilities(i) = CCA(Y, X); // using Canonical Correlation Analysis as feature-extraction tool
-                // cout << "size of X" << X.cols() << endl;
             }
 
             // normalize features to probabilities and transfering it into a softmax function
@@ -737,12 +737,12 @@ void ssvepBCI::ssvepBCIOnSensor()
             ssvepProbabilities = 1 / ssvepProbabilities.sum() * ssvepProbabilities;
             //cout << "probabilites:" << endl << ssvepProbabilities << endl;
 
-            // transfer values to MyQList and emit signal for GUI
-            m_lSSVEPProbabilities.clear();
-            for(int i = 0; i < m_lDesFrequencies.size(); i++)
-                m_lSSVEPProbabilities << ssvepProbabilities(i);
-            if(!m_lSSVEPProbabilities.isEmpty())
-                emit SSVEPprob(m_lSSVEPProbabilities);
+//            // transfer values to MyQList and emit signal for GUI
+//            m_lSSVEPProbabilities.clear();
+//            for(int i = 0; i < m_lDesFrequencies.size(); i++)
+//                m_lSSVEPProbabilities << ssvepProbabilities(i);
+//            if(!m_lSSVEPProbabilities.isEmpty())
+//                emit SSVEPprob(m_lSSVEPProbabilities);
 
             // classify probabilites
             int index = 0;
@@ -756,6 +756,10 @@ void ssvepBCI::ssvepBCIOnSensor()
             }
             else
                 m_lIndexOfClassResultSensor.append(0);
+
+            // transfer values to matrix containing all SSVEPProabibilities of desired frequencies of one calculationstep
+            m_matSSVEPProbabilities.conservativeResize(m_lDesFrequencies.size(), m_matSSVEPProbabilities.cols() + 1);
+            m_matSSVEPProbabilities.col( m_matSSVEPProbabilities.cols() - 1) = ssvepProbabilities.head(m_lDesFrequencies.size());
 
         }
 
@@ -774,6 +778,14 @@ void ssvepBCI::ssvepBCIOnSensor()
             emit classificationResult(m_lDesFrequencies[m_lIndexOfClassResultSensor.last() - 1]);
         else
             emit classificationResult(0);
+    }
+
+    // calculate and emit signal of mean probabilities
+    if(m_matSSVEPProbabilities.cols() != 0){
+        QList<double> meanSSVEPProbabilities;
+        for(int i = 0; i < m_lDesFrequencies.size(); i++)
+            meanSSVEPProbabilities << m_matSSVEPProbabilities.row(i).mean();
+        emit SSVEPprob(meanSSVEPProbabilities);
     }
 
     // change parameter and reset the time window if the change flag has been set

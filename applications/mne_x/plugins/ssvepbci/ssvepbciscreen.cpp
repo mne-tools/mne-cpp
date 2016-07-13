@@ -58,25 +58,47 @@ using namespace ssvepBCIPlugin;
 //=============================================================================================================
 
 
-ssvepBCIScreen::ssvepBCIScreen(QOpenGLWidget *parent)
+ssvepBCIScreen::ssvepBCIScreen(QSharedPointer<ssvepBCI> pSSVEPBCI, QOpenGLWidget *parent)
+: m_pSSVEPBCI(pSSVEPBCI)
+, m_dXPosCross(0.5)
+, m_dYPosCross(0.5)
+, m_dStep(0.01)
+, m_qCrossColor(Qt::red)
+, m_sBeep(":/sounds/beep.wav")
 {
+    // register Meta Type
+    qRegisterMetaType<MyQList>("MyQList");
+
     //set format of the QOpenGLWidget (enable vsync and setup buffers)
     QSurfaceFormat format;
     format.setDepthBufferSize(24);
     format.setStencilBufferSize(8);
     format.setSwapInterval(1);
     setFormat(format);
+
+    // connect classResult and frequency list signal of SSVEPBCI class to setClassResult slot
+    connect(m_pSSVEPBCI.data(), &ssvepBCI::classificationResult, this, &ssvepBCIScreen::setClassResults);
+    connect(m_pSSVEPBCI.data(), &ssvepBCI::getFrequencyLabels, this, &ssvepBCIScreen::updateFrequencyList);
+
+    // initialize freqList
+    m_lFreqList << 6.66 << 7.5 << 8.57 << 10 << 12;
+
 }
+
 
 //*************************************************************************************************************
 
 void ssvepBCIScreen::resizeGL(int w, int h) {
+    Q_UNUSED(w)
+    Q_UNUSED(h)
 }
+
 
 //*************************************************************************************************************
 
 void ssvepBCIScreen::initializeGL(){
 }
+
 
 //*************************************************************************************************************
 
@@ -87,10 +109,49 @@ void ssvepBCIScreen::paintGL() {
 
     //painting red cross as a point of reference for the subject
     QPainter p(this);
-    p.fillRect((0.5-0.01/2)*this->width(),(0.5-0.05/2)*this->height(),0.01*this->width(),0.05*this->height(),Qt::red);
-    p.fillRect(0.5*this->width()-0.05*this->height()/2,0.5*this->height()-0.01*this->width()/2,0.05*this->height(),0.01*this->width(),Qt::red);
+    p.fillRect((m_dXPosCross-0.01/2)*this->width(),(m_dYPosCross-0.05/2)*this->height(),0.01*this->width(),0.05*this->height(),Qt::red);
+    p.fillRect(m_dXPosCross*this->width()-0.05*this->height()/2,m_dYPosCross*this->height()-0.01*this->width()/2,0.05*this->height(),0.01*this->width(),Qt::red);
 
     update(); //schedules next update directly, without going through signal dispatching
 }
 
 
+//*************************************************************************************************************
+
+void ssvepBCIScreen::setClassResults(double classResult){
+
+    m_qCrossColor = Qt::red;
+
+    if(classResult != 0){
+        int index = m_lFreqList.indexOf(classResult);
+        // assign classifaiction result to an action
+        switch(index){
+        case 0:
+            m_dYPosCross += m_dStep; break;
+        case 1:
+            m_dXPosCross += m_dStep; break;
+        case 2:
+            m_dYPosCross -= m_dStep; break;
+        case 3:
+            m_dXPosCross -= m_dStep; break;
+        case 4:
+            m_qCrossColor = Qt::blue; break;
+        default:
+            qDebug() << "WARNING: no classifiaction could be made!"; break;
+        }
+
+        // generate beep sound
+        //    m_sBeep.play();
+        cout << "\b";
+    }
+    qDebug() << "call:" << classResult;
+}
+
+
+//*************************************************************************************************************
+
+void ssvepBCIScreen::updateFrequencyList(MyQList freqList){
+    m_lFreqList.clear();
+    m_lFreqList = freqList;
+    qDebug() <<"update freqList:" <<freqList;
+}
