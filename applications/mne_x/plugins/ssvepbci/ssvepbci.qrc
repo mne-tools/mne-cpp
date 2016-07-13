@@ -7,4 +7,7 @@
     <qresource prefix="/logos">
         <file alias="logos.png">images/logos/logos.png</file>
     </qresource>
+    <qresource prefix="/sounds">
+        <file alias="beep.wav">sounds/beep.wav</file>
+    </qresource>
 </RCC>

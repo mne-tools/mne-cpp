@@ -44,6 +44,7 @@
 //=============================================================================================================
 
 #include "ssvepbciflickeringitem.h"
+#include "ssvepbci.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -51,6 +52,7 @@
 //=============================================================================================================
 
 #include <QOpenGLWidget>
+#include <QSound>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -62,9 +64,17 @@ namespace ssvepBCIPlugin
 
 //*************************************************************************************************************
 //=============================================================================================================
+// TypeDefs
+//=============================================================================================================
+
+typedef  QList<double>  MyQList;
+
+//*************************************************************************************************************
+//=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+class ssvepBCI;
 
 //=============================================================================================================
 /**
@@ -85,10 +95,26 @@ public:
      * constructs the ssvepBCIScreen object
      *
      */
-    ssvepBCIScreen(QOpenGLWidget *parent = 0 );
+    ssvepBCIScreen(QSharedPointer<ssvepBCI> pSSVEPBCI, QOpenGLWidget *parent = 0 );
+
+public slots:
+    void setClassResults(double classResult);
+    void updateFrequencyList(MyQList freqList);
 
 private:
+    QSharedPointer<ssvepBCI>        m_pSSVEPBCI;        /**< pointer to referring SSVEPBCI class */
+
+    // flickering items
     QList<ssvepBCIFlickeringItem>   m_Items;            /**< QList containing all flickering Items to be painted */
+
+    // classifiaction updates
+    double                          m_dXPosCross;       /**< X position of reference cross */
+    double                          m_dYPosCross;       /**< Y position of reference cross */
+    double                          m_dStep;            /**< moving step increment for reference cross */
+    QList<double>                   m_lFreqList;        /**< list of current flickering frequencies */
+    QColor                          m_qCrossColor;      /**< color of the reference cross */
+    QSound                          m_sBeep;            /**< beep sound for successful classifiaction */
+
 
 protected:
     //=========================================================================================================

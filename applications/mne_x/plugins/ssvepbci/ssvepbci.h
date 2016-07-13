@@ -311,7 +311,7 @@ private:
     int                     m_iNumberOfHarmonics;               /**< number of harmonics which will be searched for */
     double                  m_dAlpha;                           /**< parameter for softmax function */
     QList<double>           m_lThresholdValues;                 /**< threshold value for normalized energy probabilities */
-    MyQList                 m_lSSVEPProbabilities;              /**< contains SSVEP Probabilities */
+    //MyQList                 m_lSSVEPProbabilities;              /**< contains SSVEP Probabilities */
     bool                    m_bRemovePowerLine;                 /**< Flag for removing 50 Hz power line signal */
     bool                    m_bUseMEC;                          /**< flag for feature extractiong. If true: use MEC; If false: use CCA */
     QList<int>              m_lIndexOfClassResultSensor;              /**< Sensor level: Classification results on sensor level. */
