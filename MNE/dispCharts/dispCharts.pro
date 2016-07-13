@@ -90,12 +90,10 @@ else {
 }
 
 SOURCES += \
-    test.cpp \
     bar.cpp \
     spline.cpp
 
 HEADERS += \
-    test.h \
     dispcharts_global.h \
     bar.h \
     spline.h
