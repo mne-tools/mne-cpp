@@ -24,7 +24,6 @@ defineTest(minQtVersion) {
 }
 
 ################# MNE CPP Common Settings ##################
-
 MNE_CPP_VERSION = 0.1.0.252
 MNE_LIB_VERSION = 1
 
