@@ -262,9 +262,9 @@ int main(int argc, char *argv[])
 //    MNEBem t_Bem(t_fileBem);
 //    QFile t_fileBem2("./MNE-sample-data/subjects/sample/bem/sample-head.fif");
 //    MNEBem t_Bem2(t_fileBem2);
-//    QFile t_filesensorSurfaceVV("./Resources/sensorSurfaces/306m_rt.fif");
+//    QFile t_filesensorSurfaceVV("./resources/sensorSurfaces/306m_rt.fif");
 //    MNEBem t_sensorSurfaceVV(t_filesensorSurfaceVV);
-//    QFile t_filesensorSurfaceBM("./Resources/sensorSurfaces/BabyMEG.fif");
+//    QFile t_filesensorSurfaceBM("./resources/sensorSurfaces/BabyMEG.fif");
 //    MNEBem t_sensorSurfaceBM(t_filesensorSurfaceBM);
 
 //    testWindow->addBemData("Subject01", "BEM", t_Bem);
