@@ -182,10 +182,10 @@ void ssvepBCISetupStimulusWidget::on_pushButton_4_clicked()
     ssvepBCIFlickeringItem item4;
 
     //set Frequencies
-    setFreq(item1,1);
-    setFreq(item2,5);
-    setFreq(item3,9);
-    setFreq(item4,13);
+    setFreq(item1,15);
+    setFreq(item2,12);
+    setFreq(item3,8);
+    setFreq(item4,4);
     //set dimensions and positions
     item1.setDim(0.2,0.2);
     item2.setDim(0.2,0.2);

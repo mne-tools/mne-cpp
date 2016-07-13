@@ -109,8 +109,8 @@ void ssvepBCIScreen::paintGL() {
 
     //painting red cross as a point of reference for the subject
     QPainter p(this);
-    p.fillRect((m_dXPosCross-0.01/2)*this->width(),(m_dYPosCross-0.05/2)*this->height(),0.01*this->width(),0.05*this->height(),Qt::red);
-    p.fillRect(m_dXPosCross*this->width()-0.05*this->height()/2,m_dYPosCross*this->height()-0.01*this->width()/2,0.05*this->height(),0.01*this->width(),Qt::red);
+    p.fillRect((m_dXPosCross-0.01/2)*this->width(),(m_dYPosCross-0.05/2)*this->height(),0.01*this->width(),0.05*this->height(), m_qCrossColor);
+    p.fillRect(m_dXPosCross*this->width()-0.05*this->height()/2,m_dYPosCross*this->height()-0.01*this->width()/2,0.05*this->height(),0.01*this->width(),m_qCrossColor);
 
     update(); //schedules next update directly, without going through signal dispatching
 }
@@ -127,11 +127,11 @@ void ssvepBCIScreen::setClassResults(double classResult){
         // assign classifaiction result to an action
         switch(index){
         case 0:
-            m_dYPosCross += m_dStep; break;
+            m_dYPosCross -= m_dStep; break;
         case 1:
             m_dXPosCross += m_dStep; break;
         case 2:
-            m_dYPosCross -= m_dStep; break;
+            m_dYPosCross += m_dStep; break;
         case 3:
             m_dXPosCross -= m_dStep; break;
         case 4:
@@ -140,9 +140,9 @@ void ssvepBCIScreen::setClassResults(double classResult){
             qDebug() << "WARNING: no classifiaction could be made!"; break;
         }
 
-        // generate beep sound
-        //    m_sBeep.play();
-        cout << "\b";
+        //generate beep sound
+        //m_sBeep.play();
+
     }
     qDebug() << "call:" << classResult;
 }
