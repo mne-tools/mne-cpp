@@ -55,7 +55,7 @@ SUBDIRS += \
     makeLayout\
     readBEM\
     patientManager \
-    testWarp
+    testWarp \
 
 !contains(MNECPP_CONFIG, minimalVersion) {
     SUBDIRS += \
@@ -72,4 +72,6 @@ SUBDIRS += \
         roiClusteredInversePwlRapMusic \
         fsSurface \
         disp3DTutorial \
+        histogram
+    }
 }
