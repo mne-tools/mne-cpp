@@ -101,7 +101,6 @@ SOURCES += \
     helpers/frequencyspectrumdelegate.cpp \
     helpers/frequencyspectrumsettingswidget.cpp \
     helpers/quickcontrolwidget.cpp \
-    realtimesourceestimatewidget.cpp\
 
 HEADERS += \
     xdisp_global.h \
@@ -121,11 +120,17 @@ HEADERS += \
     helpers/frequencyspectrummodel.h \
     helpers/frequencyspectrumsettingswidget.h \
     helpers/quickcontrolwidget.h \
-    realtimesourceestimatewidget.h \
 
 FORMS += \
     realtimesamplearraywidget.ui \
     helpers/quickcontrolwidget.ui
+
+qtHaveModule(charts) {
+    SOURCES += \
+        realtimesourceestimatewidget.cpp\
+    HEADERS += \
+        realtimesourceestimatewidget.h \
+}
 
 RESOURCES += \
     xDisp.qrc
