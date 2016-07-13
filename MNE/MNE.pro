@@ -54,11 +54,9 @@ SUBDIRS += \
 
     qtHaveModule(charts) {
         SUBDIRS += \
-                dispCharts \
-    }
-
-    SUBDIRS += \
+            dispCharts \
             disp3D \
+    }
 }
 
 CONFIG += ordered
