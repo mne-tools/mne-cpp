@@ -64,7 +64,6 @@ SUBDIRS += \
         rawClusteredInverseEEG \
         readFwdDisp3D \
         plotSurfaces \
-        lnt \
         computeInverseRapMusic \
         rawClusteredInverseRapMusic \
         computeInversePwlRapMusic \
