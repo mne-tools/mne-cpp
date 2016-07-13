@@ -354,7 +354,6 @@ public:
 
 
     //=========================================================================================================
-
     /**
     * creates a class and frequency distribution from data matrix
     *

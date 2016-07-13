@@ -187,7 +187,6 @@ public:
     void setColorMap (QString colorMap);
 
     //=========================================================================================================
-
     Eigen::VectorXi m_vecResultExponentValues; /**< Common exponent values for the entire histogram*/
     double          m_dMinAxisX;               /**< Display value of the smallest point of the series in x-axis */
     double          m_dMaxAxisX;               /**< Display value of the largest point on the series in x-axis */

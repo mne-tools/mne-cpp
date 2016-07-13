@@ -40,6 +40,7 @@
 
 #include <spline.h>
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
@@ -54,11 +55,11 @@
 #include <QtGui/QMouseEvent>
 #include <QDebug>
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // Eigen INCLUDES
 //=============================================================================================================
-
 
 
 //*************************************************************************************************************
@@ -274,11 +275,11 @@ void Spline::setThreshold(const QVector3D& vecThresholdValues)
 
 //*************************************************************************************************************
 
-void Spline::updateThreshold (QLineSeries* lineSeries)
+void Spline::updateThreshold(QLineSeries* lineSeries)
 {
     if (lineSeries->name() == "left")
     {
-        lineSeries->setColor("red") ;
+        lineSeries->setColor("red");
     }
     else if (lineSeries->name() == "middle")
     {
@@ -301,7 +302,7 @@ void Spline::updateThreshold (QLineSeries* lineSeries)
 
 //*************************************************************************************************************
 
-void Spline::setColorMap (QString colorMap)
+void Spline::setColorMap(QString colorMap)
 {
     m_colorMap = colorMap;
     double leftThresholdValue = (m_pLeftThreshold->at(0).x())/ m_dMaxAxisX;
@@ -321,7 +322,7 @@ void Spline::setColorMap (QString colorMap)
     {
         plotAreaGradient.setColorAt(leftThresholdValue, ColorMap::valueToHotNegative1(0));
 
-        for (int i = 1; i < stepsNumber; i++)
+        for (int i = 1; i < stepsNumber; ++i)
         {
             plotAreaGradient.setColorAt(leftThresholdValue + (stepsSizeLeftMiddle * i), ColorMap::valueToHotNegative1((double)i * (0.5 / (double)stepsNumber)));
             plotAreaGradient.setColorAt(middleThresholdValue + (stepsSizeMiddleRight * i), ColorMap::valueToHotNegative1((double)0.5 + (i * (0.5 / (double)stepsNumber))));
@@ -333,7 +334,7 @@ void Spline::setColorMap (QString colorMap)
     {
         plotAreaGradient.setColorAt(leftThresholdValue, ColorMap::valueToHotNegative2(0));
 
-        for (int i = 1; i < stepsNumber; i++)
+        for (int i = 1; i < stepsNumber; ++i)
         {
             plotAreaGradient.setColorAt(leftThresholdValue + (stepsSizeLeftMiddle * i), ColorMap::valueToHotNegative2((double)i * (0.5 / (double)stepsNumber)));
             plotAreaGradient.setColorAt(middleThresholdValue + (stepsSizeMiddleRight * i), ColorMap::valueToHotNegative2((double)0.5 + (i * (0.5 / (double)stepsNumber))));
@@ -345,7 +346,7 @@ void Spline::setColorMap (QString colorMap)
     {
         plotAreaGradient.setColorAt(leftThresholdValue, ColorMap::valueToHot(0));
 
-        for (int i = 1; i < stepsNumber; i++)
+        for (int i = 1; i < stepsNumber; ++i)
         {
             plotAreaGradient.setColorAt(leftThresholdValue + (stepsSizeLeftMiddle * i), ColorMap::valueToHot((double)i * (0.5 / (double)stepsNumber)));
             plotAreaGradient.setColorAt(middleThresholdValue + (stepsSizeMiddleRight * i), ColorMap::valueToHot((double)0.5 + (i * (0.5 / (double)stepsNumber))));
@@ -371,7 +372,7 @@ void Spline::setColorMap (QString colorMap)
 
 //*************************************************************************************************************
 
-const QVector3D &Spline::getThreshold()
+const QVector3D& Spline::getThreshold()
 {
     QVector<QPointF> middlePoint = m_pMiddleThreshold->pointsVector();   //Point values need to be updated before tested and displayed on the widget
     QVector<QPointF> rightPoint = m_pRightThreshold->pointsVector();
@@ -391,7 +392,7 @@ const QVector3D &Spline::getThreshold()
 
 //*************************************************************************************************************
 
-const QVector3D &Spline::correctionDisplayTrueValue(QVector3D vecOriginalValues, QString upOrDown)
+const QVector3D& Spline::correctionDisplayTrueValue(QVector3D vecOriginalValues, QString upOrDown)
 {
     QVector3D returnCorrectedVector;
     int exponent;
