@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     main.cpp
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+* @file     bar.cpp
+* @author   Ricky Tjen <ricky270@student.sgu.ac.id>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
-* @date     February, 2013
+* @date     April, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Ricky Tjen and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implements the main() application function.
+* @brief    Bar class definition
 *
 */
 
@@ -38,19 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <disp/imagesc.h>
-#include <disp/plot.h>
-#include <disp/rtplot.h>
-
-#include <math.h>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Eigen
-//=============================================================================================================
-
-#include <Eigen/Core>
+#include "bar.h"
 
 
 //*************************************************************************************************************
@@ -58,9 +46,14 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QApplication>
-#include <QImage>
-#include <QGraphicsView>
+#include <QGridLayout>
+#include <QSharedPointer>
+#include <QtCharts/QChartView>
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
 
 
 //*************************************************************************************************************
@@ -68,77 +61,31 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace Eigen;
-using namespace DISPLIB;
+using namespace DISPCHARTSLIB;
+using namespace QtCharts;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// MAIN
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-//=============================================================================================================
-/**
-* The function main marks the entry point of the program.
-* By default, main has the storage class extern.
-*
-* @param [in] argc (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
-* @param [in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
-* @return the value that was set to exit() (which is 0 if exit() is called via quit()).
-*/
-int main(int argc, char *argv[])
+Bar::Bar(const QString& title, QWidget* parent)
+: QWidget(parent)
 {
-    QApplication a(argc, argv);
+    m_pChart = new QChart();
+    m_pChart->setTitle(title);
+    m_pChart->setAnimationOptions(QChart::SeriesAnimations);
 
-    //ImageSc Test
-    qint32 width = 300;
-    qint32 height = 400;
-    MatrixXd mat(width,height);
+    m_pAxis= new QBarCategoryAxis();
+    m_pChart->legend()->setVisible(true);
+    m_pChart->legend()->setAlignment(Qt::AlignBottom);
 
-    for(int i = 0; i < width; ++i)
-        for(int j = 0; j < height; ++j)
-            mat(i,j) = ((double)(i+j))/698.0;//*0.1-1.5;
+    QChartView *chartView = new QChartView(m_pChart);
+    chartView->setRenderHint(QPainter::Antialiasing);
 
-    ImageSc imagesc(mat);
-    imagesc.setTitle("Test Matrix");
-    imagesc.setXLabel("X Axes");
-    imagesc.setYLabel("Y Axes");
+    QGridLayout* layout = new QGridLayout();
 
-    imagesc.setColorMap("Hot");//imagesc.setColorMap("Jet");//imagesc.setColorMap("RedBlue");//imagesc.setColorMap("Bone");//imagesc.setColorMap("Jet");//imagesc.setColorMap("Hot");
-
-    imagesc.setWindowTitle("Corresponding function to MATLABs imagesc");
-    imagesc.show();
-
-    //Plot Test
-    qint32 t_iSize = 100;
-    VectorXd vec(t_iSize);
-    for(int i = 0; i < t_iSize; ++i)
-    {
-        double t = 0.01 * i;
-        vec[i] = sin(2 * 3.1416 * 4 * t); //4 Hz
-    }
-
-    Plot plot(vec);
-
-    plot.setTitle("Test Plot");
-    plot.setXLabel("X Axes");
-    plot.setYLabel("Y Axes");
-
-    plot.setWindowTitle("Corresponding function to MATLABs plot");
-    plot.show();
-
-
-    RtPlot rtplot(vec);
-
-    rtplot.setTitle("Test Plot");
-    rtplot.setXLabel("X Axes");
-    rtplot.setYLabel("Y Axes");
-
-    rtplot.setWindowTitle("Rt Plot");
-    rtplot.show();
-
-
-
-
-    return a.exec();
+    layout->addWidget(chartView,0,0);
+    this->setLayout(layout);
 }

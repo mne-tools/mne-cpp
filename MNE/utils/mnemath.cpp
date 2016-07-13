@@ -447,3 +447,5 @@ MatrixXd MNEMath::rescale(const MatrixXd &data, const RowVectorXf &times, QPair<
 
     return data_out;
 }
+
+//*************************************************************************************************************
