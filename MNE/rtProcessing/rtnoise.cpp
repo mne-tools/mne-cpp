@@ -75,13 +75,17 @@ RtNoise::RtNoise(qint32 p_iMaxSamples, FiffInfo::SPtr p_pFiffInfo, qint32 p_data
 , m_pFiffInfo(p_pFiffInfo)
 , m_dataLength(p_dataLen)
 , m_bIsRunning(false)
+, m_iNumOfBlocks(0)
+, m_iBlockSize(0)
+, m_iSensors(0)
+, m_iBlockIndex(0)
 {
     qRegisterMetaType<Eigen::MatrixXd>("Eigen::MatrixXd");
     //qRegisterMetaType<QVector<double>>("QVector<double>");
 
     m_Fs = m_pFiffInfo->sfreq;
 
-    SendDataToBuffer = true;
+    m_bSendDataToBuffer = true;
 
     m_fWin.clear();
 
@@ -155,7 +159,7 @@ void RtNoise::append(const MatrixXd &p_DataSegment)
     if(!m_pRawMatrixBuffer)
         m_pRawMatrixBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(8, p_DataSegment.rows(), p_DataSegment.cols()));
 
-    if (SendDataToBuffer)
+    if (m_bSendDataToBuffer)
         m_pRawMatrixBuffer->push(&p_DataSegment);
 }
 
@@ -206,53 +210,53 @@ void RtNoise::run()
             if(FirstStart){
                 //init the circ buffer and parameters
                 if(m_dataLength < 0) m_dataLength = 10;
-                NumOfBlocks = m_dataLength;//60;
-                BlockSize =  block.cols();
-                Sensors =  block.rows();
+                m_iNumOfBlocks = m_dataLength;//60;
+                m_iBlockSize =  block.cols();
+                m_iSensors =  block.rows();
 
-                CircBuf.resize(Sensors,NumOfBlocks*BlockSize);
+                m_matCircBuf.resize(m_iSensors,m_iNumOfBlocks*m_iBlockSize);
 
-                BlockIndex = 0;
+                m_iBlockIndex = 0;
                 FirstStart = false;
             }
             //concate blocks
-            for (int i=0; i< Sensors; i++)
-                for (int j=0; j< BlockSize; j++)
-                    CircBuf(i,j+BlockIndex*BlockSize) = block(i,j);
+            for (int i=0; i< m_iSensors; i++)
+                for (int j=0; j< m_iBlockSize; j++)
+                    m_matCircBuf(i,j+m_iBlockIndex*m_iBlockSize) = block(i,j);
 
 
-            BlockIndex ++;
-            if (BlockIndex >= NumOfBlocks){
+            m_iBlockIndex ++;
+            if (m_iBlockIndex >= m_iNumOfBlocks){
 
                 //m_pRawMatrixBuffer.clear(); //empty the buffer
 
-                SendDataToBuffer = false;
+                m_bSendDataToBuffer = false;
                 //stop collect block and start to calculate the spectrum
-                BlockIndex = 0;
+                m_iBlockIndex = 0;
 
-                MatrixXd sum_psdx = MatrixXd::Zero(Sensors,m_iFFTlength/2+1);
+                MatrixXd sum_psdx = MatrixXd::Zero(m_iSensors,m_iFFTlength/2+1);
 
-                int nb = floor(NumOfBlocks*BlockSize/m_iFFTlength)+1;
-                qDebug()<<"nb"<<nb<<"NumOfBlocks"<<NumOfBlocks<<"BlockSize"<<BlockSize;
-                MatrixXd t_mat(Sensors,m_iFFTlength);
-                MatrixXd t_psdx(Sensors,m_iFFTlength/2+1);
+                int nb = floor(m_iNumOfBlocks*m_iBlockSize/m_iFFTlength)+1;
+                qDebug()<<"nb"<<nb<<"NumOfBlocks"<<m_iNumOfBlocks<<"BlockSize"<<m_iBlockSize;
+                MatrixXd t_mat(m_iSensors,m_iFFTlength);
+                MatrixXd t_psdx(m_iSensors,m_iFFTlength/2+1);
                 for (int n = 0; n<nb; n++){
                     //collect a data block with data length of m_iFFTlength;
                     if(n==nb-1)
                     {
-                        for(qint32 ii=0; ii<Sensors; ii++)
+                        for(qint32 ii=0; ii<m_iSensors; ii++)
                         for(qint32 jj=0; jj<m_iFFTlength; jj++)
-                            if(jj+n*m_iFFTlength<NumOfBlocks*BlockSize)
-                                t_mat(ii,jj) = CircBuf(ii,jj+n*m_iFFTlength);
+                            if(jj+n*m_iFFTlength<m_iNumOfBlocks*m_iBlockSize)
+                                t_mat(ii,jj) = m_matCircBuf(ii,jj+n*m_iFFTlength);
                             else
                                 t_mat(ii,jj) = 0.0;
 
                     }
                     else
                     {
-                        for(qint32 ii=0; ii<Sensors; ii++)
+                        for(qint32 ii=0; ii<m_iSensors; ii++)
                         for(qint32 jj=0; jj<m_iFFTlength; jj++)
-                            t_mat(ii,jj) = CircBuf(ii,jj+n*m_iFFTlength);
+                            t_mat(ii,jj) = m_matCircBuf(ii,jj+n*m_iFFTlength);
                     }
 
                     //FFT calculation by row
@@ -288,7 +292,7 @@ void RtNoise::run()
                 }//nb
 
                 //DB-calculation
-                for(qint32 ii=0; ii<Sensors; ii++)
+                for(qint32 ii=0; ii<m_iSensors; ii++)
                     for(qint32 jj=0; jj<m_iFFTlength/2+1; jj++)
                         t_psdx(ii,jj) = 10.0*log10(sum_psdx(ii,jj)/nb);
 
@@ -297,7 +301,7 @@ void RtNoise::run()
                 if(m_pRawMatrixBuffer->size()>0)
                     m_pRawMatrixBuffer->clear();
 
-                SendDataToBuffer = true;
+                m_bSendDataToBuffer = true;
             }
 
         }

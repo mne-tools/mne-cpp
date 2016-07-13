@@ -1,4 +1,4 @@
-################# DEFINE FUNCTIONS #################
+############################################## GLOBAL FUNCTIONS ###############################################
 #Define minQtVersion Test
 defineTest(minQtVersion) {
     maj = $$1
@@ -23,15 +23,19 @@ defineTest(minQtVersion) {
     return(false)
 }
 
-################# MNE CPP Common Settings ##################
-MNE_CPP_VERSION = 0.1.0.252
+
+############################################### GLOBAL DEFINES ################################################
+
+MNE_CPP_VERSION = 1.0.0
 MNE_LIB_VERSION = 1
 
 QMAKE_TARGET_PRODUCT = mne-cpp
 QMAKE_TARGET_DESCRIPTION = MNE Qt 5 based C++ library.
 QMAKE_TARGET_COPYRIGHT = Copyright (C) 2016 Authors of mne-cpp. All rights reserved.
 
-################# MNE CPP Paths #################
+
+########################################### DIRECTORY DEFINITIONS #############################################
+
 # Eigen
 EIGEN_INCLUDE_DIR = $$EIGEN_INCLUDE_DIR
 isEmpty(EIGEN_INCLUDE_DIR) {
@@ -57,7 +61,9 @@ isEmpty( MNE_BINARY_DIR ) {
     MNE_BINARY_DIR = $${PWD}/bin
 }
 
-################# MNE CPP Config #################
+
+########################################### PROJECT CONFIGURATION #############################################
+
 ## To build only the minimal version, i.e, for mne_rt_server run: qmake MNECPP_CONFIG+=minimalVersion
 ## To set CodeCov coverage compiler flag run: qmake MNECPP_CONFIG+=withCodeCov
 ## To disable tests run: qmake MNECPP_CONFIG+=noTests
