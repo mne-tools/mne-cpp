@@ -138,7 +138,6 @@ public:
     * @param[out] vecCoefficientResults  vector filled with values of coefficient only
     * @param[out] vecExponentResults     vector filled with values of exponent only
     */
-
     template<typename T>
     void splitCoefficientAndExponent (const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData, int iClassAmount, Eigen::VectorXd& vecCoefficientResults, Eigen::VectorXi& vecExponentValues);
 
