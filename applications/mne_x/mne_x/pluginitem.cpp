@@ -60,7 +60,7 @@ using namespace MNEX;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-PluginItem::PluginItem(IPlugin::SPtr pPlugin, QMenu *contextMenu, QGraphicsItem *parent)
+PluginItem::PluginItem(XSHAREDLIB::IPlugin::SPtr pPlugin, QMenu *contextMenu, QGraphicsItem *parent)
 : QGraphicsPolygonItem(parent)
 , m_pPlugin(pPlugin)
 , m_iWidth(60)
@@ -78,15 +78,15 @@ PluginItem::PluginItem(IPlugin::SPtr pPlugin, QMenu *contextMenu, QGraphicsItem 
 //            m_qColorContour = QColor(79, 136, 187);
 //            m_qLinearGradientFace.setColorAt(0, QColor(234, 239, 247));
 //            break;
-        case IPlugin::_IAlgorithm:
+        case XSHAREDLIB::IPlugin::_IAlgorithm:
             m_qColorContour = QColor(98, 152, 61);
             m_qLinearGradientFace.setColorAt(0, QColor(235, 241, 233));
             break;
-        case IPlugin::_ISensor:
+        case XSHAREDLIB::IPlugin::_ISensor:
             m_qColorContour = QColor(79, 136, 187);
             m_qLinearGradientFace.setColorAt(0, QColor(234, 239, 247));
             break;
-        case IPlugin::_IIO:
+        case XSHAREDLIB::IPlugin::_IIO:
             m_qColorContour = QColor(224, 169, 0);
             m_qLinearGradientFace.setColorAt(0, QColor(255, 244, 231));
             break;

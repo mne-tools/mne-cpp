@@ -120,6 +120,8 @@ ParksMcClellan::ParksMcClellan(int NumTaps, double OmegaC, double BW, double Par
 , DesiredMag(BIG)
 , Grid(BIG)
 , Weight(BIG)
+, InitDone2(false)
+, HalfTapCount(0)
 {
     FirCoeff = RowVectorXd::Zero(NumTaps);
     init(NumTaps, OmegaC, BW, ParksWidth, PassType);

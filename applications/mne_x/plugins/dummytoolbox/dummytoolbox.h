@@ -44,7 +44,7 @@
 
 #include "dummytoolbox_global.h"
 
-#include <mne_x/Interfaces/IAlgorithm.h>
+#include <xShared/Interfaces/IAlgorithm.h>
 #include <generics/circularmatrixbuffer.h>
 #include <xMeas/newrealtimemultisamplearray.h>
 #include "FormFiles/dummysetupwidget.h"
@@ -72,6 +72,14 @@ namespace DummyToolboxPlugin
 
 //*************************************************************************************************************
 //=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace XSHAREDLIB;
+
+
+//*************************************************************************************************************
+//=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
@@ -82,12 +90,12 @@ namespace DummyToolboxPlugin
 *
 * @brief The DummyToolbox class provides a dummy algorithm structure.
 */
-class DUMMYTOOLBOXSHARED_EXPORT DummyToolbox : public MNEX::IAlgorithm
+class DUMMYTOOLBOXSHARED_EXPORT DummyToolbox : public IAlgorithm
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "mne_x/1.0" FILE "dummytoolbox.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    Q_PLUGIN_METADATA(IID "xsharedlib/1.0" FILE "dummytoolbox.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(MNEX::IAlgorithm)
+    Q_INTERFACES(XSHAREDLIB::IAlgorithm)
 
 public:
     //=========================================================================================================
@@ -106,12 +114,12 @@ public:
     /**
     * IAlgorithm functions
     */
-    virtual QSharedPointer<MNEX::IPlugin> clone() const;
+    virtual QSharedPointer<IPlugin> clone() const;
     virtual void init();
     virtual void unload();
     virtual bool start();
     virtual bool stop();
-    virtual MNEX::IPlugin::PluginType getType() const;
+    virtual IPlugin::PluginType getType() const;
     virtual QString getName() const;
     virtual QWidget* setupWidget();
 
@@ -141,8 +149,8 @@ private:
 
     IOBuffer::CircularMatrixBuffer<double>::SPtr    m_pDummyBuffer;         /**< Holds incoming data.*/
 
-    MNEX::PluginInputData<XMEASLIB::NewRealTimeMultiSampleArray>::SPtr      m_pDummyInput;      /**< The NewRealTimeMultiSampleArray of the DummyToolbox input.*/
-    MNEX::PluginOutputData<XMEASLIB::NewRealTimeMultiSampleArray>::SPtr     m_pDummyOutput;     /**< The NewRealTimeMultiSampleArray of the DummyToolbox output.*/
+    PluginInputData<XMEASLIB::NewRealTimeMultiSampleArray>::SPtr      m_pDummyInput;      /**< The NewRealTimeMultiSampleArray of the DummyToolbox input.*/
+    PluginOutputData<XMEASLIB::NewRealTimeMultiSampleArray>::SPtr     m_pDummyOutput;     /**< The NewRealTimeMultiSampleArray of the DummyToolbox output.*/
 
 signals:
     //=========================================================================================================

@@ -55,27 +55,24 @@ SUBDIRS += \
     makeLayout\
     readBEM\
     patientManager \
-    testWarp
+    testWarp \
 
 !contains(MNECPP_CONFIG, minimalVersion) {
-    SUBDIRS += \
-
-    qtHaveModule(3dcore,3drender,3dinput,3dextras) {
-    message(examples.pro - Qt3D available)
-    SUBDIRS += \
-        clusteredInverse \
-        rawClusteredInverse \
-        rawClusteredInverseEEG \
-        readFwdDisp3D \
-        plotSurfaces \
-        lnt \
-        computeInverseRapMusic \
-        rawClusteredInverseRapMusic \
-        computeInversePwlRapMusic \
-        rawClusteredInversePwlRapMusic \
-        stClusteredInversePwlRapMusic  \
-        roiClusteredInversePwlRapMusic \
-        fsSurface \
-        disp3DTutorial \
+    qtHaveModule(charts) {
+        SUBDIRS += \
+            clusteredInverse \
+            rawClusteredInverse \
+            rawClusteredInverseEEG \
+            readFwdDisp3D \
+            plotSurfaces \
+            computeInverseRapMusic \
+            rawClusteredInverseRapMusic \
+            computeInversePwlRapMusic \
+            rawClusteredInversePwlRapMusic \
+            stClusteredInversePwlRapMusic  \
+            roiClusteredInversePwlRapMusic \
+            fsSurface \
+            disp3DTutorial \
+            histogram
     }
 }

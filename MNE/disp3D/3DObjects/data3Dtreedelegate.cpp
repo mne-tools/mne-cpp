@@ -68,7 +68,9 @@
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace UTILSLIB;
 using namespace DISP3DLIB;
+using namespace DISPCHARTSLIB;
 
 
 //*************************************************************************************************************
@@ -119,14 +121,27 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
         }
 
         case MetaTreeItemTypes::RTDataNormalizationValue: {
-            QDoubleSpinBox* pDoubleSpinBox = new QDoubleSpinBox(parent);
-            connect(pDoubleSpinBox, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-                    this, &Data3DTreeDelegate::onEditorEdited);
-            pDoubleSpinBox->setMinimum(0.0001);
-            pDoubleSpinBox->setMaximum(10000.0);
-            pDoubleSpinBox->setSingleStep(0.01);
-            pDoubleSpinBox->setValue(index.model()->data(index, MetaTreeItemRoles::RTDataNormalizationValue).toDouble());
-            return pDoubleSpinBox;
+            Spline* pSpline = new Spline("Spline Histogram", 0);
+            connect(pSpline, static_cast<void (Spline::*)(double, double, double)>(&Spline::borderChanged),
+            this, &Data3DTreeDelegate::onEditorEdited);
+            QStandardItem* pParentItem = static_cast<QStandardItem*>(pAbstractItem->QStandardItem::parent());
+            QModelIndex indexParent = pData3DTreeModel->indexFromItem(pParentItem);
+            MatrixXd matRTData = index.model()->data(indexParent, Data3DTreeModelItemRoles::RTData).value<MatrixXd>();
+            Eigen::VectorXd resultClassLimit;
+            Eigen::VectorXi resultFrequency;
+            MNEMath::histcounts(matRTData, false, 50, resultClassLimit, resultFrequency, 0.0, 0.0);
+            pSpline->setData(resultClassLimit, resultFrequency, 0);
+            QVector3D vecThresholdValues = index.model()->data(index, MetaTreeItemRoles::RTDataNormalizationValue).value<QVector3D>();
+            pSpline->setThreshold(vecThresholdValues);
+            AbstractTreeItem* pParentItemAbstract = static_cast<AbstractTreeItem*>(pParentItem);
+            QList<QStandardItem*> pColormapItem = pParentItemAbstract->findChildren(MetaTreeItemTypes::RTDataColormapType);
+            for(int i = 0; i < pColormapItem.size(); ++i)
+            {
+                QModelIndex indexColormapItem = pData3DTreeModel->indexFromItem(pColormapItem.at(i));
+                QString colorMap = index.model()->data(indexColormapItem, MetaTreeItemRoles::RTDataColormapType).value<QString>();
+                pSpline->setColorMap(colorMap);
+            }
+            return pSpline;
         }
 
         case MetaTreeItemTypes::RTDataTimeInterval: {
@@ -252,10 +267,22 @@ void Data3DTreeDelegate::setEditorData(QWidget* editor, const QModelIndex& index
         }
 
         case MetaTreeItemTypes::RTDataNormalizationValue: {
-            double value = index.model()->data(index, MetaTreeItemRoles::RTDataNormalizationValue).toDouble();
-            QDoubleSpinBox* pDoubleSpinBox = static_cast<QDoubleSpinBox*>(editor);
-            pDoubleSpinBox->setValue(value);
-            break;
+            Spline* pSpline = static_cast<Spline*>(editor);
+            int width = pSpline->size().width();
+            int height = pSpline->size().height();
+            qDebug()<< "width = " << width;
+            qDebug()<< "height = " << height;
+            if (pSpline->size().width() < 200 && pSpline->size().height() < 200)   //pSpline initializes with size (137,15)
+            {
+                pSpline->resize(800,600);   //resize histogram to be readable with default size
+            }
+            else
+            {
+                width = pSpline->size().width();   //keeps the size of the histogram
+                height = pSpline->size().height();
+                pSpline->resize(width,height);
+            }
+            return;
         }
 
         case MetaTreeItemTypes::RTDataTimeInterval: {
@@ -363,13 +390,19 @@ void Data3DTreeDelegate::setModelData(QWidget* editor, QAbstractItemModel* model
         }
 
         case MetaTreeItemTypes::RTDataNormalizationValue: {
-            QDoubleSpinBox* pDoubleSpinBox = static_cast<QDoubleSpinBox*>(editor);
-            QVariant data;
-            data.setValue(pDoubleSpinBox->value());
+            //qDebug() << "MetaTreeItemTypes::RTDataNormalizationValue starts!";
+            Spline* pSpline = static_cast<Spline*>(editor);
+            QVector3D returnVector;
+            returnVector = pSpline->getThreshold();
 
-            model->setData(index, data, MetaTreeItemRoles::RTDataNormalizationValue);
-            model->setData(index, data, Qt::DisplayRole);
-            break;
+            QString displayThreshold;
+            displayThreshold = QString("%1,%2,%3").arg(returnVector.x()).arg(returnVector.y()).arg(returnVector.z());
+            QVariant dataDisplay;
+            dataDisplay.setValue(displayThreshold);
+            model->setData(index, dataDisplay, Qt::DisplayRole);
+
+            model->setData(index, returnVector, MetaTreeItemRoles::RTDataNormalizationValue);
+            return;
         }
 
         case MetaTreeItemTypes::RTDataTimeInterval: {

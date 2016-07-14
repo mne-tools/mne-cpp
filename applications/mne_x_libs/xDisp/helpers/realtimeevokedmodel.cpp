@@ -61,6 +61,8 @@ RealTimeEvokedModel::RealTimeEvokedModel(QObject *parent)
 , m_bIsFreezed(false)
 , m_bProjActivated(false)
 , m_bCompActivated(false)
+, m_bIsInit(false)
+, m_iMaxFilterLength(100)
 {
 
 }

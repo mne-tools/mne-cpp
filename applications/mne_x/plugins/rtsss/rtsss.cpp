@@ -62,7 +62,7 @@ RtSssAlgo rsss;
 
 using namespace RtSssPlugin;
 using namespace FIFFLIB;
-using namespace MNEX;
+using namespace XSHAREDLIB;
 using namespace XMEASLIB;
 
 
@@ -75,6 +75,10 @@ RtSss::RtSss()
 : m_bIsRunning(false)
 , m_bReceiveData(false)
 , m_bProcessData(false)
+, LinRR(0)
+, LoutRR(0)
+, Lin(0)
+, Lout(0)
 {
 }
 
