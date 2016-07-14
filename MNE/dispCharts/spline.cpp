@@ -77,7 +77,14 @@ using namespace QtCharts;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Spline::Spline(const QString& title, QWidget* parent): QWidget(parent)
+Spline::Spline(const QString& title, QWidget* parent)
+: QWidget(parent)
+, m_dMinAxisX(0)
+, m_dMaxAxisX(0)
+, m_pLeftThreshold(0)
+, m_pMiddleThreshold(0)
+, m_pRightThreshold(0)
+, m_iMaximumFrequency(0)
 {
     m_pChart = new QChart();
     m_pChart->setTitle(title);
@@ -183,9 +190,9 @@ void Spline::mousePressEvent(QMouseEvent *event)
 
 void Spline::setThreshold(const QVector3D& vecThresholdValues)
 {
-    float leftThresholdValue;
-    float middleThresholdValue;
-    float rightThresholdValue;
+    float leftThresholdValue = vecThresholdValues.x();
+    float middleThresholdValue = vecThresholdValues.y();
+    float rightThresholdValue = vecThresholdValues.z();
 
     QVector3D correctedVectorThreshold = correctionDisplayTrueValue(vecThresholdValues, "up");
 
@@ -249,27 +256,28 @@ void Spline::setThreshold(const QVector3D& vecThresholdValues)
             }
         }
     }
-        QPointF leftThresholdPoint;
-        QPointF middleThresholdPoint;
-        QPointF rightThresholdPoint;
 
-        leftThresholdPoint.setX(leftThresholdValue);
-        middleThresholdPoint.setX(middleThresholdValue);
-        rightThresholdPoint.setX(rightThresholdValue);
+    QPointF leftThresholdPoint;
+    QPointF middleThresholdPoint;
+    QPointF rightThresholdPoint;
 
-        m_pLeftThreshold->append(leftThresholdPoint.x(), 0);
-        m_pLeftThreshold->append(leftThresholdPoint.x(), m_iMaximumFrequency);
-        m_pMiddleThreshold->append(middleThresholdPoint.x(), 0);
-        m_pMiddleThreshold->append(middleThresholdPoint.x(), m_iMaximumFrequency);
-        m_pRightThreshold->append(rightThresholdPoint.x(), 0);
-        m_pRightThreshold->append(rightThresholdPoint.x(), m_iMaximumFrequency);
+    leftThresholdPoint.setX(leftThresholdValue);
+    middleThresholdPoint.setX(middleThresholdValue);
+    rightThresholdPoint.setX(rightThresholdValue);
 
-        //qDebug() << "CURRENT THRESHOLD = " << m_pLeftThreshold << m_pMiddleThreshold << m_pRightThreshold;
+    m_pLeftThreshold->append(leftThresholdPoint.x(), 0);
+    m_pLeftThreshold->append(leftThresholdPoint.x(), m_iMaximumFrequency);
+    m_pMiddleThreshold->append(middleThresholdPoint.x(), 0);
+    m_pMiddleThreshold->append(middleThresholdPoint.x(), m_iMaximumFrequency);
+    m_pRightThreshold->append(rightThresholdPoint.x(), 0);
+    m_pRightThreshold->append(rightThresholdPoint.x(), m_iMaximumFrequency);
 
-        updateThreshold(m_pLeftThreshold);
-        updateThreshold(m_pMiddleThreshold);
-        updateThreshold(m_pRightThreshold);
-        setColorMap(m_colorMap);
+    //qDebug() << "CURRENT THRESHOLD = " << m_pLeftThreshold << m_pMiddleThreshold << m_pRightThreshold;
+
+    updateThreshold(m_pLeftThreshold);
+    updateThreshold(m_pMiddleThreshold);
+    updateThreshold(m_pRightThreshold);
+    setColorMap(m_colorMap);
 }
 
 
@@ -392,7 +400,7 @@ const QVector3D& Spline::getThreshold()
 
 //*************************************************************************************************************
 
-const QVector3D& Spline::correctionDisplayTrueValue(QVector3D vecOriginalValues, QString upOrDown)
+QVector3D Spline::correctionDisplayTrueValue(QVector3D vecOriginalValues, QString upOrDown)
 {
     QVector3D returnCorrectedVector;
     int exponent;
@@ -430,10 +438,13 @@ const QVector3D& Spline::correctionDisplayTrueValue(QVector3D vecOriginalValues,
     {
         qDebug() << "Spline::correctionDisplayTrueValue error.";
     }
+
     returnCorrectedVector.setX(vecOriginalValues.x() * (pow(10, exponent)));
     returnCorrectedVector.setY(vecOriginalValues.y() * (pow(10, exponent)));
     returnCorrectedVector.setZ(vecOriginalValues.z() * (pow(10, exponent)));
-    qDebug() << "Original Vector = " << vecOriginalValues;
-    qDebug() << "Corrected Vector = " << returnCorrectedVector;
-    return (returnCorrectedVector);
+
+//    qDebug() << "Original Vector = " << vecOriginalValues;
+//    qDebug() << "Corrected Vector = " << returnCorrectedVector;
+
+    return returnCorrectedVector;
 }

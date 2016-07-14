@@ -60,6 +60,9 @@ NoiseReductionOptionsWidget::NoiseReductionOptionsWidget(NoiseReduction* toolbox
 : QWidget(parent, Qt::Window)
 , ui(new Ui::NoiseReductionOptionsWidgetClass)
 , m_pNoiseReductionToolbox(toolbox)
+, m_enableDisableProjectors(Q_NULLPTR)
+, m_pShowFilterOptions(Q_NULLPTR)
+, m_pCompSignalMapper(Q_NULLPTR)
 {
     this->setWindowTitle("Noise reduction options");
 
@@ -221,7 +224,9 @@ void NoiseReductionOptionsWidget::onCheckProjStatusChanged(bool status)
         this->m_pFiffInfo->projs[i].active = m_qListProjCheckBox[i]->isChecked();
     }
 
-    m_enableDisableProjectors->setChecked(bAllActivated);
+    if(m_enableDisableProjectors) {
+        m_enableDisableProjectors->setChecked(bAllActivated);
+    }
 
     emit projSelectionChanged();
 }
@@ -239,7 +244,9 @@ void NoiseReductionOptionsWidget::onEnableDisableAllProj(bool status)
     for(int i=0; i < m_pFiffInfo->projs.size(); ++i)
         m_pFiffInfo->projs[i].active = status;
 
-    m_enableDisableProjectors->setChecked(status);
+    if(m_enableDisableProjectors) {
+        m_enableDisableProjectors->setChecked(status);
+    }
 
     emit projSelectionChanged();
 }
