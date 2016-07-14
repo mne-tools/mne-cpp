@@ -52,9 +52,9 @@ mkdir -p ".\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_browse_ra
 xcopy ".\bin\mne_browse_raw_qt.exe" ".\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_browse_raw_qt\data" /y
 
 :: -MNE Analyze Qt-
-rmdir ".\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_analyze_qt\data" /s /q
-mkdir -p ".\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_analyze_qt\data"
-xcopy ".\bin\mne_analyze_qt.exe" ".\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_analyze_qt\data" /y
+rmdir ".\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_analyze\data" /s /q
+mkdir -p ".\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_analyze\data"
+xcopy ".\bin\mne_analyze.exe" ".\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_analyze\data" /y
 
 
 :: Build Installer
