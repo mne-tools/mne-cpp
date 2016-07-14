@@ -52,7 +52,7 @@ SUBDIRS += \
 
             qtHaveModule(charts) {
             SUBDIRS += \
-                    mne_analyze_qt \
+                    mne_analyze \
             }
     }
 }
