@@ -63,6 +63,8 @@ DataWindow::DataWindow(QWidget *parent)
 , m_pCurrentDataMarkerLabel(new QLabel(this))
 , m_iCurrentMarkerSample(0)
 , m_bHideBadChannels(false)
+, m_pRawDelegate(Q_NULLPTR)
+, m_pKineticScroller(Q_NULLPTR)
 {
     ui->setupUi(this);
 

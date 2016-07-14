@@ -43,21 +43,17 @@ SUBDIRS += \
 !contains(MNECPP_CONFIG, minimalVersion) {
     SUBDIRS += \
         mne_x_libs \
-        mne_x
-
-    !contains(MNECPP_CONFIG, oldCompiler) {
-        message(mne_browse_raw_qt configured)
-        SUBDIRS += \
-            mne_browse_raw_qt \
-    }
+        mne_x \
+        mne_browse_raw_qt
 
     !contains(MNECPP_CONFIG, coverity) {
-        qtHaveModule(3dcore,3drender,3dinput,3dextras) {
-            message(mne_matching_pursuit & mne_analyze_qt configured)
+        SUBDIRS += \
+            mne_matching_pursuit \
+
+            qtHaveModule(charts) {
             SUBDIRS += \
-                mne_matching_pursuit \
-                mne_analyze_qt
-        }
+                    mne_analyze_qt \
+            }
     }
 }
 

@@ -56,7 +56,7 @@
 //=============================================================================================================
 
 using namespace NoiseEstimatePlugin;
-using namespace MNEX;
+using namespace XSHAREDLIB;
 using namespace XMEASLIB;
 
 

@@ -64,7 +64,7 @@
 //=============================================================================================================
 
 using namespace AveragingPlugin;
-using namespace MNEX;
+using namespace XSHAREDLIB;
 using namespace XMEASLIB;
 
 
@@ -91,6 +91,12 @@ Averaging::Averaging()
 , m_pAveragingWidget(AveragingSettingsWidget::SPtr())
 , m_pActionShowAdjustment(Q_NULLPTR)
 , m_bDoBaselineCorrection(false)
+, m_bDoArtifactReduction(0)
+, m_iPreStimSamples(0)
+, m_iPostStimSamples(0)
+, m_iBaselineFromSamples(0)
+, m_iBaselineToSamples(0)
+, m_iStimChanIdx(0)
 #ifdef DEBUG_AVERAGING
 , m_iTestCount(0)
 , m_iTestCount2(0)

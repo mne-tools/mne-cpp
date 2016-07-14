@@ -38,9 +38,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <mne_x/Management/pluginmanager.h>
-#include <mne_x/Management/pluginscenemanager.h>
-#include <mne_x/Management/displaymanager.h>
+#include <xShared/Management/pluginmanager.h>
+#include <xShared/Management/pluginscenemanager.h>
+#include <xShared/Management/displaymanager.h>
 
 //GUI
 #include "mainwindow.h"
@@ -91,7 +91,7 @@ MainWindow::MainWindow(QWidget *parent)
 : QMainWindow(parent)
 , m_pStartUpWidget(new StartUpWidget(this))
 , m_pRunWidget(NULL)
-, m_pDisplayManager(new DisplayManager(this))
+, m_pDisplayManager(new XSHAREDLIB::DisplayManager(this))
 , m_bDisplayMax(false)
 , m_bIsRunning(false)
 , m_pToolBar(NULL)
@@ -102,8 +102,8 @@ MainWindow::MainWindow(QWidget *parent)
 , m_pTime(new QTime(0, 0))
 , m_iTimeoutMSec(1000)
 , m_pPluginGui(NULL)
-, m_pPluginManager(new PluginManager(this))
-, m_pPluginSceneManager(new PluginSceneManager(this))
+, m_pPluginManager(new XSHAREDLIB::PluginManager(this))
+, m_pPluginSceneManager(new XSHAREDLIB::PluginSceneManager(this))
 , m_eLogLevelCurrent(_LogLvMax)
 {
     qDebug() << "MNE-X - Version" << CInfo::AppVersion();
@@ -587,7 +587,7 @@ void MainWindow::createLogDockWindow()
 
 //*************************************************************************************************************
 //Plugin stuff
-void MainWindow::updatePluginWidget(IPlugin::SPtr pPlugin)
+void MainWindow::updatePluginWidget(XSHAREDLIB::IPlugin::SPtr pPlugin)
 {
     m_qListDynamicPluginActions.clear();
     m_qListDynamicDisplayActions.clear();
@@ -645,7 +645,7 @@ void MainWindow::updatePluginWidget(IPlugin::SPtr pPlugin)
 
 //*************************************************************************************************************
 
-void MainWindow::updateConnectionWidget(PluginConnectorConnection::SPtr pConnection)
+void MainWindow::updateConnectionWidget(XSHAREDLIB::PluginConnectorConnection::SPtr pConnection)
 {
     QWidget* pWidget = pConnection->setupWidget();
     setCentralWidget(pWidget);

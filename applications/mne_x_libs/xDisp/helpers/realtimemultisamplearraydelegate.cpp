@@ -69,6 +69,9 @@ using namespace XDISPLIB;
 
 RealTimeMultiSampleArrayDelegate::RealTimeMultiSampleArrayDelegate(QObject *parent)
 : QAbstractItemDelegate(parent)
+, m_fMaxValue(0.0)
+, m_fScaleY(0.0)
+, m_iActiveRow(0)
 {
 
 }

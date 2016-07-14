@@ -39,6 +39,10 @@ TEMPLATE = app
 
 QT += network core widgets xml
 
+qtHaveModule(3dextras) {
+    QT += 3dextras
+}
+
 TARGET = mne_x
 
 CONFIG(debug, debug|release) {
@@ -57,7 +61,7 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Dispd \
             -lxMeasd \
             -lxDispd \
-            -lmne_xd
+            -lxSharedd
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
@@ -68,14 +72,16 @@ else {
             -lMNE$${MNE_LIB_VERSION}Disp \
             -lxMeas \
             -lxDisp \
-            -lmne_x
+            -lxShared
 }
 
-qtHaveModule(3dcore, 3drender, 3dinput) {
+qtHaveModule(charts) {
     CONFIG(debug, debug|release) {
+        LIBS += -lMNE$${MNE_LIB_VERSION}DispChartsd
         LIBS += -lMNE$${MNE_LIB_VERSION}Disp3Dd
     }
     else {
+        LIBS += -lMNE$${MNE_LIB_VERSION}DispCharts
         LIBS += -lMNE$${MNE_LIB_VERSION}Disp3D
     }
 }

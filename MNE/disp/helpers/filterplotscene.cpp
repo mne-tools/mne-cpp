@@ -69,6 +69,7 @@ FilterPlotScene::FilterPlotScene(QGraphicsView *view, QObject *parent)
 , m_iCutOffLow(5)
 , m_iCutOffHigh(40)
 , m_iCutOffMarkerWidth(3)
+, m_iPlotLength(0)
 {
 }
 

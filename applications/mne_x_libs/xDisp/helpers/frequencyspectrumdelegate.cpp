@@ -70,6 +70,12 @@ using namespace XDISPLIB;
 FrequencySpectrumDelegate::FrequencySpectrumDelegate(QTableView* m_pTableView,QObject *parent)
 : QAbstractItemDelegate(parent)
 , m_iScaleType(0)
+, m_fMaxValue(0.0)
+, m_fScaleY(0.0)
+, m_tableview_row(0)
+, m_mousex(0)
+, m_mousey(0)
+, m_x_rate(0.0)
 {
 
     m_tableview = m_pTableView;
