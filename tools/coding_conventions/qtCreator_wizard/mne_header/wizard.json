@@ -1,0 +1,40 @@
+{
+    "version": 1,
+    "supportedProjectTypes": [ ],
+    "id": "C.MNECPPHeader",
+    "category": "O.MNECPP",
+    "trDescription": "Creates a MNE-CPP header file.",
+    "trDisplayName": "MNE-CPP Header",
+    "trDisplayCategory": "MNE-CPP",
+    "icon": "../../global/genericfilewizard.png",
+    "enabled": "%{JS: [ %{Plugins} ].indexOf('CppEditor') >= 0}",
+
+    "options": { "key": "FileName", "value": "%{JS: Cpp.fileName('%{TargetPath}', '%{JS: Util.preferredSuffix('text/x-c++hdr')}')}" },
+
+    "pages" :
+    [
+        {
+            "trDisplayName": "Location",
+            "trShortTitle": "Location",
+            "typeId": "File"
+        },
+        {
+            "trDisplayName": "Project Management",
+            "trShortTitle": "Summary",
+            "typeId": "Summary"
+        }
+    ],
+    "generators" :
+    [
+        {
+            "typeId": "File",
+            "data":
+            {
+                "source": "../mne_templates/templateclass.h",
+                "target": "%{FileName}",
+                "openInEditor": true,
+                "options": { "key": "Cpp:License:FileName", "value": "%{JS: Util.completeBaseName('%{FileName}')}" }
+            }
+        }
+    ]
+}
