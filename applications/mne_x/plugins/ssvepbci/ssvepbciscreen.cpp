@@ -112,6 +112,8 @@ void ssvepBCIScreen::paintGL() {
     p.fillRect((m_dXPosCross-0.01/2)*this->width(),(m_dYPosCross-0.05/2)*this->height(),0.01*this->width(),0.05*this->height(), m_qCrossColor);
     p.fillRect(m_dXPosCross*this->width()-0.05*this->height()/2,m_dYPosCross*this->height()-0.01*this->width()/2,0.05*this->height(),0.01*this->width(),m_qCrossColor);
 
+    p.drawText(QRect((m_dXPosCross-0.01/2)*this->width(),(m_dYPosCross-0.05/2)*this->height(),0.01*this->width(),0.05*this->height()),Qt::AlignCenter, tr("Qt"));
+
     update(); //schedules next update directly, without going through signal dispatching
 }
 
@@ -141,7 +143,7 @@ void ssvepBCIScreen::setClassResults(double classResult){
         }
 
         //generate beep sound
-        //m_sBeep.play();
+        //m_sBeep.play();  // doesn't work on Windows 10
 
     }
     qDebug() << "call:" << classResult;

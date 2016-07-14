@@ -269,13 +269,7 @@ void ssvepBCIPlugin::ssvepBCISetupStimulusWidget::on_pushButton_7_clicked()
     //clear  Items from screen
     clear();
 
-    ssvepBCIFlickeringItem item1;
-    //whole screen with 15 Hz
-    setFreq(item1,3);
-    item1.setDim(1,1);
-    m_pssvepBCIScreen->m_Items <<item1 ;
-
-    changeComboBox();
+    m_pScreenKeyboard = QSharedPointer<ScreenKeyboard>(new ScreenKeyboard(m_pssvepBCIScreen));
 
 }
 
