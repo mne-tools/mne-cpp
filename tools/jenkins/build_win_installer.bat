@@ -55,10 +55,10 @@ xcopy "..\mne-cpp\bin\mne_rt_server.exe" "..\mne-cpp\tools\ifw_installer\windows
 mkdir -p "..\mne-cpp\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_x\data\mne_rt_server_plugins"
 xcopy "..\mne-cpp\bin\mne_rt_server_plugins" "..\mne-cpp\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_x\data\mne_rt_server_plugins" /s /e /y
 
-:: -MNE Browse Raw Qt-
-rmdir "..\mne-cpp\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_browse_raw_qt\data" /s /q
-mkdir -p "..\mne-cpp\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_browse_raw_qt\data"
-xcopy "..\mne-cpp\bin\mne_browse_raw_qt.exe" "..\mne-cpp\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_browse_raw_qt\data" /y
+:: -MNE Browse-
+rmdir "..\mne-cpp\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_browse\data" /s /q
+mkdir -p "..\mne-cpp\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_browse\data"
+xcopy "..\mne-cpp\bin\mne_browse.exe" "..\mne-cpp\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_browse\data" /y
 
 :: -MNE Analyze-
 rmdir "..\mne-cpp\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_analyze\data" /s /q
