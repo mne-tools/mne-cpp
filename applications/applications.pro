@@ -44,7 +44,7 @@ SUBDIRS += \
     SUBDIRS += \
         mne_x_libs \
         mne_x \
-        mne_browse_raw_qt
+        mne_browse
 
     !contains(MNECPP_CONFIG, coverity) {
         SUBDIRS += \
