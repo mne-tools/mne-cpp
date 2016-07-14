@@ -44,6 +44,7 @@
 //=============================================================================================================
 
 #include "../ssvepbci.h"
+#include "screenkeyboard.h"
 #include "ssvepbciscreen.h"
 
 
@@ -77,6 +78,7 @@ namespace ssvepBCIPlugin
 
 class ssvepBCI;
 class ssvepBCIScreen;
+class ScreenKeyboard;
 
 
 //=============================================================================================================
@@ -184,10 +186,12 @@ private:
     Ui::ssvepBCISetupStimulusWidget        *ui;
     QSharedPointer<ssvepBCI>                m_pssvepBCI;            /**< a pointer to corresponding EEGoSports */
     QSharedPointer<ssvepBCIScreen>          m_pssvepBCIScreen;      /**< pointer to the ssvepBCIscreen class of the subject (friend class) */
+    QSharedPointer<ScreenKeyboard>          m_pScreenKeyboard;      /**< pointer to the Screenkeyboard class */
     QSharedPointer<QScreen>                 m_pScreen;              /**< pointer to the QScreen class; */
     bool                                    m_bIsRunning;           /**< Flag for running test */
     bool                                    m_bReadFreq;            /**< Flag for reading the adjusted frequency */
     QMap<int, double>                       m_idFreqMap;            /**< containing frequencies and their corresponding key */
+
 
     //=========================================================================================================
     /**
