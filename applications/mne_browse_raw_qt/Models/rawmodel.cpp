@@ -77,6 +77,9 @@ RawModel::RawModel(QObject *parent)
 , m_pFiffInfo(new FiffInfo())
 , m_pfiffIO(QSharedPointer<FiffIO>(new FiffIO()))
 , m_filterChType("All")
+, m_bReloadBefore(0)
+, m_iAbsFiffCursor(0)
+, m_iCurAbsScrollPos(0)
 {
     m_iWindowSize = MODEL_WINDOW_SIZE;
     m_reloadPos = MODEL_RELOAD_POS;
