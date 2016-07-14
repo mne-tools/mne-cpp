@@ -4,7 +4,8 @@
 set -e
 
 # Do not run on pull requests
-if [ "$TRAVIS_PULL_REQUEST" = "true" ]; then
+echo $TRAVIS_PULL_REQUEST
+if [ $TRAVIS_PULL_REQUEST == "true" ]; then
   echo -e "\033[33;1mINFO: Skipping Coverity Analysis: branch is a pull request.\033[0m"
   exit 0
 fi
