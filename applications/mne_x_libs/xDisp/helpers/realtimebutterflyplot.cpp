@@ -42,6 +42,11 @@ RealTimeButterflyPlot::RealTimeButterflyPlot(QWidget *parent)
 , m_bShowEOG(true)
 , m_bShowMISC(true)
 , m_colCurrentBackgroundColor(Qt::white)
+, m_fMaxMAG(0.0)
+, m_fMaxGRAD(0.0)
+, m_fMaxEEG(0.0)
+, m_fMaxEOG(0.0)
+, m_fMaxMISC(0.0)
 {
 }
 

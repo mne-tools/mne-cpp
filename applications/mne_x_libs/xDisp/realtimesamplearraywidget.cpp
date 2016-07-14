@@ -98,7 +98,12 @@ RealTimeSampleArrayWidget::RealTimeSampleArrayWidget(QSharedPointer<NewRealTimeS
 , m_pTimerToolDisplay(0)
 , m_pTimerUpdate(new QTimer(this))
 , m_pTime(pTime)
-, m_pTimeCurrentDisplay(0)
+, m_pTimeCurrentDisplay(Q_NULLPTR)
+, m_fScaleFactor(0.0)
+, m_dMinValue_init(0.0)
+, m_dMaxValue_init(0.0)
+, m_dMiddle(0.0)
+, m_dPosition(0.0)
 {
     ui.setupUi(this);
     ui.m_qLabel_Tool->hide();

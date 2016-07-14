@@ -94,6 +94,8 @@ TriggerControl::TriggerControl()
 , m_dt(1/m_fs)
 , m_refFreq(0.5)
 , m_alphaFreq(0.5)
+, m_bBspBool(false)
+, m_isReceived(false)
 {
     connect(this, &TriggerControl::sendByte, this, &TriggerControl::sendByteTo);
 

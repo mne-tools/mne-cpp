@@ -76,6 +76,8 @@ RealTimeMultiSampleArrayModel::RealTimeMultiSampleArrayModel(QObject *parent)
 , m_dTriggerThreshold(0.01)
 , m_iDistanceTimerSpacer(1000)
 , m_iDetectedTriggers(0)
+, m_iCurrentSampleFreeze(0)
+, m_iCurrentTriggerChIndex(0)
 {
     init();
 }

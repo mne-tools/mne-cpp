@@ -58,6 +58,13 @@ using namespace MNEBrowseRawQt;
 
 FilterOperator::FilterOperator()
 : MNEOperator(OperatorType::FILTER)
+, m_designMethod()
+, m_Type(FilterType::HPF)
+, m_sFreq(1024)
+, m_iFilterOrder(512)
+, m_iFFTlength(512)
+, m_dCenterFreq(40)
+, m_dBandwidth(3)
 {
 }
 

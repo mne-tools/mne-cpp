@@ -84,6 +84,9 @@ RtHPIS::RtHPIS(FiffInfo::SPtr p_pFiffInfo, QObject *parent)
 : QThread(parent)
 , m_pFiffInfo(p_pFiffInfo)
 , m_bIsRunning(false)
+, m_iMaxSamples(0)
+, m_iNewMaxSamples(0)
+, simplex_numitr(0)
 {
     qRegisterMetaType<Eigen::MatrixXd>("Eigen::MatrixXd");
     //qRegisterMetaType<QVector<double>>("QVector<double>");

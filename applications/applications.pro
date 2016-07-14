@@ -49,7 +49,11 @@ SUBDIRS += \
     !contains(MNECPP_CONFIG, coverity) {
         SUBDIRS += \
             mne_matching_pursuit \
-            mne_analyze_qt
+
+            qtHaveModule(charts) {
+            SUBDIRS += \
+                    mne_analyze_qt \
+            }
     }
 }
 
