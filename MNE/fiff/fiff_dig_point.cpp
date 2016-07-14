@@ -39,6 +39,11 @@
 //=============================================================================================================
 
 #include "fiff_dig_point.h"
+#include "fiff_coord_trans.h"
+#include "fiff_stream.h"
+#include "fiff_dir_tree.h"
+#include "fiff_tag.h"
+
 
 
 //*************************************************************************************************************
@@ -81,4 +86,81 @@ FiffDigPoint::FiffDigPoint(const FiffDigPoint& p_FiffDigPoint)
 FiffDigPoint::~FiffDigPoint()
 {
 
+}
+
+
+//*************************************************************************************************************
+
+QList<FiffDigPoint> FiffDigPoint::read(QFile &t_fileDig)
+{
+    QList<FiffDigPoint> dig;
+    //
+    //   Open the file
+    //
+    FiffStream::SPtr t_pStream(new FiffStream(&t_fileDig));
+    QString t_sFileName = t_pStream->streamName();
+
+    printf("Opening header data %s...\n",t_sFileName.toUtf8().constData());
+
+    FiffDirTree t_Tree;
+    QList<FiffDirEntry> t_Dir;
+    if(!t_pStream->open(t_Tree, t_Dir))
+    {
+        qDebug()<<"Can not open the Electrode File";
+        return dig;
+    }
+    //
+    //   Read the measurement info
+    //
+    //read_hpi_info(t_pStream,t_Tree, info);
+    fiff_int_t kind = -1;
+    fiff_int_t pos = -1;
+    FiffTag::SPtr t_pTag;
+
+    //
+    //   Locate the Electrodes
+    //
+    QList<FiffDirTree> isotrak = t_Tree.dir_tree_find(FIFFB_ISOTRAK);
+
+    fiff_int_t coord_frame = FIFFV_COORD_HEAD;
+    FiffCoordTrans dig_trans;
+    qint32 k = 0;
+
+    if (isotrak.size() == 1)
+    {
+        for (k = 0; k < isotrak[0].nent; ++k)
+        {
+            kind = isotrak[0].dir[k].kind;
+            pos  = isotrak[0].dir[k].pos;
+            if (kind == FIFF_DIG_POINT)
+            {
+                FiffTag::read_tag(t_pStream.data(), t_pTag, pos);
+                dig.append(t_pTag->toDigPoint());
+            }
+            else
+            {
+                if (kind == FIFF_MNE_COORD_FRAME)
+                {
+                    FiffTag::read_tag(t_pStream.data(), t_pTag, pos);
+                    qDebug() << "NEEDS To BE DEBBUGED: FIFF_MNE_COORD_FRAME" << t_pTag->getType();
+                    coord_frame = *t_pTag->toInt();
+                }
+                else if (kind == FIFF_COORD_TRANS)
+                {
+                    FiffTag::read_tag(t_pStream.data(), t_pTag, pos);
+                    qDebug() << "NEEDS To BE DEBBUGED: FIFF_COORD_TRANS" << t_pTag->getType();
+                    dig_trans = t_pTag->toCoordTrans();
+                }
+            }
+        }
+    }
+    for(k = 0; k < dig.size(); ++k)
+        dig[k].coord_frame = coord_frame;
+
+    //
+    //   All kinds of auxliary stuff
+    //
+
+    t_pStream->device()->close();
+    return dig;
 }

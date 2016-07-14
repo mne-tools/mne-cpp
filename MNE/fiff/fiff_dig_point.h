@@ -45,12 +45,15 @@
 #include "fiff_types.h"
 
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // Qt INCLUDES
 //=============================================================================================================
 
 #include <QSharedPointer>
+#include <QFile>
+#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -106,6 +109,16 @@ public:
     * @return the size of the old struct fiffDigPointRec.
     */
     inline static qint32 storageSize();
+
+    //=========================================================================================================
+    /**
+    * Read Digitizer Points
+    *
+    * @param[in] The QFile Containing the Digitizer Points in fiff format
+    *
+    * @return a QList Containing the Digitizer Points.
+    */
+    static QList<FiffDigPoint> read(QFile &t_fileDig);
 
 public:
     fiff_int_t      kind;           /**< FIFFV_POINT_CARDINAL, FIFFV_POINT_HPI, or FIFFV_POINT_EEG */
