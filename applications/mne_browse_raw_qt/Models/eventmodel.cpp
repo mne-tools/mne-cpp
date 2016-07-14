@@ -62,6 +62,8 @@ EventModel::EventModel(QObject *parent)
 , m_bFileloaded(false)
 , m_sFilterEventType("All")
 , m_pFiffInfo(new FiffInfo)
+, m_iLastSample(0)
+, m_iCurrentMarkerPos(0)
 {
     //Create default event type color map
     m_eventTypeColor[1] = QColor(Qt::black);

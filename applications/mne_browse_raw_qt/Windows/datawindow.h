@@ -234,8 +234,6 @@ private:
     RawDelegate*    m_pRawDelegate;                 /**< the QAbstractDelegate being part of the raw model/view framework of Qt. */
     RawModel*       m_pRawModel;                    /**< the QAbstractTable model being part of the model/view framework of Qt. */
 
-    QVBoxLayout*    m_pUndockedDataViewLayout;      /**< the layout of the undockable widget. */
-
     QScroller*      m_pKineticScroller;             /**< the kinetic scroller of the QTableView. */
 
     QStringList     m_slSelectedChannels;           /**< the currently selected channels from the selection manager window. */

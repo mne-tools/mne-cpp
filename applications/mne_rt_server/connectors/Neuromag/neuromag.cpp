@@ -92,6 +92,7 @@ Neuromag::Neuromag()
 , m_uiBufferSampleSize(100)
 , m_pRawMatrixBuffer(NULL)
 , m_bIsRunning(false)
+, m_iActiveConnectorId(0)
 {
     this->init();
 }
