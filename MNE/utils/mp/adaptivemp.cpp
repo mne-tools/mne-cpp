@@ -88,10 +88,13 @@ using namespace UTILSLIB;
 //=============================================================================================================
 
 AdaptiveMp::AdaptiveMp()
-    : it(0)
-    , max_it(0)
-    , signal_energy(0)
-    , current_energy(0)
+: it(0)
+, max_it(0)
+, signal_energy(0)
+, current_energy(0)
+, fix_phase(0)
+, epsilon(0)
+, max_iterations(0)
 {
 
 }

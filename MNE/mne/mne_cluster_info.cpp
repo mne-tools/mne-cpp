@@ -115,12 +115,14 @@ void MNEClusterInfo::write(QString p_sFileName) const
 
 
     QFile file_centroids("./centroids_"+p_sFileName);
-    file_centroids.open(QIODevice::WriteOnly | QIODevice::Text);
-    QTextStream out_centroids(&file_centroids);
 
-    for(qint32 i = 0; i < clusterLabelIds.size(); ++i)
-        out_centroids << centroidVertno[i] << ", ";
+    if(file_centroids.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QTextStream out_centroids(&file_centroids);
 
-    // optional, as QFile destructor will already do it:
-    file_centroids.close();
+        for(qint32 i = 0; i < clusterLabelIds.size(); ++i)
+            out_centroids << centroidVertno[i] << ", ";
+
+        // optional, as QFile destructor will already do it:
+        file_centroids.close();
+    }
 }

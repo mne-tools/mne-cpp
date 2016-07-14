@@ -127,10 +127,10 @@ void createPaths(const QModelIndex &index, const QStyleOptionViewItem &option, Q
             }
             else if(unit == FIFF_UNIT_T) //magnitometers
             {
-                if(t_pModel->getCoil(index.row()) == FIFFV_COIL_BABY_MAG)
-                    fMaxValue = 1e-11f;
-                else
-                    fMaxValue = 1e-11f;
+//                if(t_pModel->getCoil(index.row()) == FIFFV_COIL_BABY_MAG)
+//                    fMaxValue = 1e-11f;
+//                else
+                fMaxValue = 1e-11f;
 
                 if(t_pModel->getScaling().contains(FIFF_UNIT_T))
                     fMaxValue = t_pModel->getScaling()[FIFF_UNIT_T];
