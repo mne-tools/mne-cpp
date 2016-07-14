@@ -44,6 +44,7 @@
 #include "subject/subjecttreeitem.h"
 #include "brain/brainsurfacetreeitem.h"
 #include "brain/brainsurfacesettreeitem.h"
+#include "digitizer/digitizertreeitem.h"
 
 #include "../helpers/renderable3Dentity.h"
 
@@ -387,3 +388,51 @@ bool Data3DTreeModel::addData(const QString& subject, const QString& set, const 
 
     return state;
 }
+
+
+////*************************************************************************************************************
+
+bool Data3DTreeModel::addData(const QString& subject, const QString& set, const  QList<FIFFLIB::FiffDigPoint>& tDigitizer)
+{
+//    //Find the subject
+//    QList<QStandardItem*> itemSubjectList = this->findItems(subject);
+
+//    //If subject does not exist, create a new one
+//    if(itemSubjectList.size() == 0) {
+//        SubjectTreeItem* subjectItem = new SubjectTreeItem(Data3DTreeModelItemTypes::SubjectItem, subject);
+//        itemSubjectList << subjectItem;
+//        itemSubjectList << new QStandardItem(subjectItem->toolTip());
+//        m_pRootItem->appendRow(itemSubjectList);
+//    }
+
+//    //Iterate through subject items and add new data respectivley
+//    bool state = false;
+
+//    for(int i = 0; i < itemSubjectList.size(); ++i) {
+//        //Check if it is really a subject tree item
+//        if((itemSubjectList.at(i)->type() == Data3DTreeModelItemTypes::SubjectItem)) {
+//            SubjectTreeItem* pSubjectItem = dynamic_cast<SubjectTreeItem*>(itemSubjectList.at(i));
+
+//            //Find already existing digitizer items and add the new data to the first search result
+//            QList<QStandardItem*> itemList = pSubjectItem->findChildren(set);
+
+//            if(!itemList.isEmpty() && (itemList.at(0)->type() == Data3DTreeModelItemTypes::DigitizerItem)) {
+//                DigitizerTreeItem* pDigitizerItem = dynamic_cast<DigitizerTreeItem*>(itemList.at(0));
+//                state = pDigitizerItem->addData(tDigitizer, m_pParentEntity);
+//            } else {
+//                DigitizerTreeItem* pDigitizerItem = new DigitizerTreeItem(Data3DTreeModelItemTypes::DigitizerItem, set);
+
+//                QList<QStandardItem*> list;
+//                list << pDigitizerItem;
+//                list << new QStandardItem(pDigitizerItem->toolTip());
+//                pSubjectItem->appendRow(list);
+
+//                state = pDigitizerItem->addData(tDigitizer, m_pParentEntity);
+//            }
+//        }
+//    }
+
+//    return state;
+    return true;
+}
+

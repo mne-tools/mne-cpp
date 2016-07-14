@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     data3Dtreemodel.h
+* @file     digitizertreeitem.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     May, 2016
+* @date     January, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2015, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,29 +29,28 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Data3DTreeModel class declaration
+* @brief     DigitizerTreeItem class declaration.
 *
 */
 
-#ifndef DATA3DTREEMODEL_H
-#define DATA3DTREEMODEL_H
+#ifndef DIGITIZERTREEITEM_H
+#define DIGITIZERTREEITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../disp3D_global.h"
+#include "../../disp3D_global.h"
 
-#include "mne/mne_forwardsolution.h"
+#include "../../helpers/abstracttreeitem.h"
+#include "../../helpers/types.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// Qt INCLUDES
 //=============================================================================================================
-
-#include <QStandardItemModel>
 
 
 //*************************************************************************************************************
@@ -65,21 +64,8 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace Qt3DCore {
-    class QEntity;
-}
-
-namespace FSLIB {
-    class SurfaceSet;
-    class AnnotationSet;
-    class Annotation;
-    class Surface;
-}
-
-namespace MNELIB {
-    class MNESourceSpace;
-    class MNEBem;
-    class MNESourceEstimate;
+namespace FIFFLIB{
+    class FiffDigPoint;
 }
 
 
@@ -91,135 +77,108 @@ namespace MNELIB {
 namespace DISP3DLIB
 {
 
-
 //*************************************************************************************************************
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class BrainRTSourceLocDataTreeItem;
-
 
 //=============================================================================================================
 /**
-* Data3DTreeModel provides a tree based data model to hold all information about data which was added to the View 3D.
+* DigitizerTreeItem provides a generic brain tree item to hold digitizer data.
 *
-* @brief Data3DTreeModel provides a tree based data model to hold all information about data which was added to the View 3D.
+* @brief Provides a generic brain tree item.
 */
-class DISP3DNEWSHARED_EXPORT Data3DTreeModel : public QStandardItemModel
+class DISP3DNEWSHARED_EXPORT DigitizerTreeItem : public AbstractTreeItem
 {
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<Data3DTreeModel> SPtr;             /**< Shared pointer type for Data3DTreeModel class. */
-    typedef QSharedPointer<const Data3DTreeModel> ConstSPtr;  /**< Const shared pointer type for Data3DTreeModel class. */
+    typedef QSharedPointer<DigitizerTreeItem> SPtr;             /**< Shared pointer type for DigitizerTreeItem class. */
+    typedef QSharedPointer<const DigitizerTreeItem> ConstSPtr;  /**< Const shared pointer type for DigitizerTreeItem class. */
 
     //=========================================================================================================
     /**
     * Default constructor.
     *
-    * @param[in] parent         The parent of this class.
-    * @param[in] parentEntity         The parent of this class.
+    * @param[in] iType      The type of the item. See types.h for declaration and definition.
+    * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
     */
-    explicit Data3DTreeModel(QObject *parent = 0, Qt3DCore::QEntity * parentEntity = 0);
+    explicit DigitizerTreeItem(int iType = Data3DTreeModelItemTypes::SourceSpaceItem, const QString& text = "Source space");
 
     //=========================================================================================================
     /**
-    * Default destructor.
+    * Default destructor
     */
-    ~Data3DTreeModel();
+    ~DigitizerTreeItem();
 
     //=========================================================================================================
     /**
-    * QStandardItemModel functions
+    * AbstractTreeItem functions
     */
-    QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
-    int columnCount(const QModelIndex &parent) const;
-    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
-    Qt::ItemFlags flags(const QModelIndex &index) const;
+    QVariant data(int role = Qt::UserRole + 1) const;
+    void setData(const QVariant& value, int role = Qt::UserRole + 1);
 
     //=========================================================================================================
     /**
-    * Adds FreeSurfer brain data SETS.
+    * Adds FreeSurfer data based on surface and annotation data to this item.
     *
-    * @param[in] subject            The name of the subject.
-    * @param[in] set                The name of the surface set to which the data is to be added.
-    * @param[in] tSurfaceSet        FreeSurfer surface set.
-    * @param[in] tAnnotationSet     FreeSurfer annotation set.
+    * @param[in] tDigitizer         The digitizer data.
+    * @param[in] parent             The Qt3D entity parent of the new item.
     *
     * @return                       Returns true if successful.
     */
-    bool addData(const QString& subject, const QString& set, const FSLIB::SurfaceSet& tSurfaceSet, const FSLIB::AnnotationSet& tAnnotationSet);
+    bool addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer, Qt3DCore::QEntity* parent);
 
     //=========================================================================================================
     /**
-    * Adds FreeSurfer brain data.
+    * Call this function whenever you want to change the visibilty of the 3D rendered content.
     *
-    * @param[in] subject            The name of the subject.
-    * @param[in] set                The name of the surface set to which the data is to be added.
-    * @param[in] pSurface           FreeSurfer surface.
-    * @param[in] pAnnotation        FreeSurfer annotation.
-    *
-    * @return                       Returns true if successful.
+    * @param[in] state     The visiblity flag.
     */
-    bool addData(const QString& subject, const QString& set, const FSLIB::Surface& tSurface, const FSLIB::Annotation& tAnnotation);
+    void setVisible(bool state);
+
+private:
+    //=========================================================================================================
+    /**
+    * Call this function whenever the surface color was changed.
+    *
+    * @param[in] color        The new surface color.
+    */
+    void onSurfaceColorChanged(const QColor &color);
 
     //=========================================================================================================
     /**
-    * Adds source space brain data.
+    * Call this function whenever the check box of this item was checked.
     *
-    * @param[in] subject            The name of the subject.
-    * @param[in] set                The name of the surface set to which the data is to be added.
-    * @param[in] tSourceSpace       The source space information.
-    *
-    * @return                       Returns true if successful.
+    * @param[in] checkState        The current checkstate.
     */
-    bool addData(const QString& subject, const QString& set, const MNELIB::MNESourceSpace& tSourceSpace);
+    virtual void onCheckStateChanged(const Qt::CheckState& checkState);
 
     //=========================================================================================================
     /**
-    * Adds source estimated activation data.
+    * Creates a QByteArray of colors for given color for the input vertices.
     *
-    * @param[in] subject            The name of the subject.
-    * @param[in] set                The name of the surface set to which the actiavtion data is to be added.
-    * @param[in] tSourceEstimate    The MNESourceEstimate.
-    * @param[in] tForwardSolution   The MNEForwardSolution.
-    *
-    * @return                       Returns a list with the tree items which now hold the activation data. Use this list to update the data, i.e. during real time applications.
+    * @param[in] vertices       The vertices information.
+    * @param[in] color          The vertex color information.
     */
-    QList<BrainRTSourceLocDataTreeItem*> addData(const QString& subject, const QString& set, const MNELIB::MNESourceEstimate& tSourceEstimate, const MNELIB::MNEForwardSolution& tForwardSolution = MNELIB::MNEForwardSolution());
+    QByteArray createVertColor(const Eigen::MatrixXf& vertices, const QColor& color = QColor(100,100,100)) const;
 
+    Qt3DCore::QEntity*      m_pParentEntity;                            /**< The parent 3D entity. */
+    Renderable3DEntity*     m_pRenderable3DEntity;                      /**< The renderable 3D entity. */
+
+    QObjectList             m_lChildren;
+
+signals:
     //=========================================================================================================
     /**
-    * Adds BEM data.
+    * Emit this signal whenever the origin of the vertex color (from curvature, from annotation) changed.
     *
-    * @param[in] subject            The name of the subject.
-    * @param[in] set                The name of the bem set to which the data is to be added.
-    * @param[in] tBem               The Bem information.
-    *
-    * @return                       Returns true if successful.
+    * @param[in] arrayVertColor      The new vertex colors.
     */
-    bool addData(const QString& subject, const QString& set, const MNELIB::MNEBem& tBem);
-
-    //=========================================================================================================
-    /**
-    * Adds digitizer data.
-    *
-    * @param[in] subject            The name of the subject.
-    * @param[in] set                The name of the digitizer set to which the data is to be added.
-    * @param[in] tDigitizer         The digitizer information.
-    *
-    * @return                       Returns true if successful.
-    */
-
-    bool addData(const QString& subject, const QString& set, const  QList<FIFFLIB::FiffDigPoint>& tDigitizer);
-
-
-protected:
-    QStandardItem*          m_pRootItem;            /**< The root item of the tree model. */
-    Qt3DCore::QEntity*      m_pParentEntity;        /**< The parent 3D entity. */
+    void colorInfoOriginChanged(const QByteArray& arrayVertColor);
 };
 
-} // NAMESPACE
+} //NAMESPACE DISP3DLIB
 
-#endif // DATA3DTREEMODEL_H
+#endif // DIGITIZERTREEITEM_H
