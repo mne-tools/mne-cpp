@@ -192,7 +192,7 @@ public:
     Eigen::MatrixXd pinv(Eigen::MatrixXd);
     Eigen::Matrix4d computeTransformation(Eigen::MatrixXd, Eigen::MatrixXd);
 
-    void test();
+    //void test();
 
 signals:
     //=========================================================================================================
