@@ -392,47 +392,47 @@ bool Data3DTreeModel::addData(const QString& subject, const QString& set, const 
 
 ////*************************************************************************************************************
 
-bool Data3DTreeModel::addData(const QString& subject, const QString& set, const  QList<FIFFLIB::FiffDigPoint>& tDigitizer)
+bool Data3DTreeModel::addData(const QString& subject, const QString& set, const QList<FIFFLIB::FiffDigPoint>& tDigitizer)
 {
-//    //Find the subject
-//    QList<QStandardItem*> itemSubjectList = this->findItems(subject);
+    //Find the subject
+    QList<QStandardItem*> itemSubjectList = this->findItems(subject);
 
-//    //If subject does not exist, create a new one
-//    if(itemSubjectList.size() == 0) {
-//        SubjectTreeItem* subjectItem = new SubjectTreeItem(Data3DTreeModelItemTypes::SubjectItem, subject);
-//        itemSubjectList << subjectItem;
-//        itemSubjectList << new QStandardItem(subjectItem->toolTip());
-//        m_pRootItem->appendRow(itemSubjectList);
-//    }
+    //If subject does not exist, create a new one
+    if(itemSubjectList.size() == 0) {
+        SubjectTreeItem* subjectItem = new SubjectTreeItem(Data3DTreeModelItemTypes::SubjectItem, subject);
+        itemSubjectList << subjectItem;
+        itemSubjectList << new QStandardItem(subjectItem->toolTip());
+        m_pRootItem->appendRow(itemSubjectList);
+    }
 
-//    //Iterate through subject items and add new data respectivley
-//    bool state = false;
+    //Iterate through subject items and add new data respectivley
+    bool state = false;
 
-//    for(int i = 0; i < itemSubjectList.size(); ++i) {
-//        //Check if it is really a subject tree item
-//        if((itemSubjectList.at(i)->type() == Data3DTreeModelItemTypes::SubjectItem)) {
-//            SubjectTreeItem* pSubjectItem = dynamic_cast<SubjectTreeItem*>(itemSubjectList.at(i));
+    for(int i = 0; i < itemSubjectList.size(); ++i) {
+        //Check if it is really a subject tree item
+        if((itemSubjectList.at(i)->type() == Data3DTreeModelItemTypes::SubjectItem)) {
+            SubjectTreeItem* pSubjectItem = dynamic_cast<SubjectTreeItem*>(itemSubjectList.at(i));
 
-//            //Find already existing digitizer items and add the new data to the first search result
-//            QList<QStandardItem*> itemList = pSubjectItem->findChildren(set);
+            //Find already existing digitizer items and add the new data to the first search result
+            QList<QStandardItem*> itemList = pSubjectItem->findChildren(set);
 
-//            if(!itemList.isEmpty() && (itemList.at(0)->type() == Data3DTreeModelItemTypes::DigitizerItem)) {
-//                DigitizerTreeItem* pDigitizerItem = dynamic_cast<DigitizerTreeItem*>(itemList.at(0));
-//                state = pDigitizerItem->addData(tDigitizer, m_pParentEntity);
-//            } else {
-//                DigitizerTreeItem* pDigitizerItem = new DigitizerTreeItem(Data3DTreeModelItemTypes::DigitizerItem, set);
+            if(!itemList.isEmpty() && (itemList.at(0)->type() == Data3DTreeModelItemTypes::DigitizerItem)) {
+                DigitizerTreeItem* pDigitizerItem = dynamic_cast<DigitizerTreeItem*>(itemList.at(0));
+                state = pDigitizerItem->addData(tDigitizer, m_pParentEntity);
+            } else {
+                DigitizerTreeItem* pDigitizerItem = new DigitizerTreeItem(Data3DTreeModelItemTypes::DigitizerItem, set);
 
-//                QList<QStandardItem*> list;
-//                list << pDigitizerItem;
-//                list << new QStandardItem(pDigitizerItem->toolTip());
-//                pSubjectItem->appendRow(list);
+                QList<QStandardItem*> list;
+                list << pDigitizerItem;
+                list << new QStandardItem(pDigitizerItem->toolTip());
+                pSubjectItem->appendRow(list);
 
-//                state = pDigitizerItem->addData(tDigitizer, m_pParentEntity);
-//            }
-//        }
-//    }
+                state = pDigitizerItem->addData(tDigitizer, m_pParentEntity);
+            }
+        }
+    }
 
-//    return state;
-    return true;
+    return state;/*
+    return true;*/
 }
 
