@@ -174,25 +174,25 @@ void RtHPIS::run()
 
     for (int i = 0;i < samLoc;i++) time[i] = i*1.0/samF;
 
-    std::ofstream outsin;
-    outsin.open ("C:/Users/babyMEG/Desktop/Seok/sin.txt");
-    std::ofstream outcos;
-    outcos.open ("C:/Users/babyMEG/Desktop/Seok/cos.txt");
+//    std::ofstream outsin;
+//    outsin.open ("C:/Users/babyMEG/Desktop/Seok/sin.txt");
+//    std::ofstream outcos;
+//    outcos.open ("C:/Users/babyMEG/Desktop/Seok/cos.txt");
 
     for(int i=0;i<numCoils;i++) {
         for(int j=0;j<samLoc;j++) {
             simsig(j,i) = sin(2*M_PI*coilfreq[i]*time[j]);
             simsig(j,i+numCoils) = cos(2*M_PI*coilfreq[i]*time[j]);
 
-            outsin <<simsig(j,i)<<" ";
-            outcos <<simsig(j,i+numCoils) << " ";
+//            outsin <<simsig(j,i)<<" ";
+//            outcos <<simsig(j,i+numCoils) << " ";
         }
-            outsin <<"\n";
-            outcos <<"\n";
+//            outsin <<"\n";
+//            outcos <<"\n";
     }
 
-    outsin.close();
-    outcos.close();
+//    outsin.close();
+//    outcos.close();
 
     // Get the indices of inner layer channels
     QVector<int> innerind(0);
@@ -207,21 +207,21 @@ void RtHPIS::run()
 
     //====== Seok 2016. 3.25 ==========================================
     // Get the indices of trigger channels
-    QVector<int> trigind(0);
-    for (int i = 0, k = 0 ;i < numCh;i++) {
-        if(m_pFiffInfo->chs[i].coil_type == 3) {
-            k++;
-            if (k >= 9 && k <= 12) {
-                qDebug() << "trigger channel found ..."  << i;
-                trigind.append(i);
-            }
-/*            if (k >=9 && k <=12) {
-                qDebug() << "HPI trigger channel found ..."  << i;
-                trigind.append(i);
-            }
-*/        }
-    }
-    qDebug() << "trigind: " << trigind.length();
+//    QVector<int> trigind(0);
+//    for (int i = 0, k = 0 ;i < numCh;i++) {
+//        if(m_pFiffInfo->chs[i].coil_type == 3) {
+//            k++;
+//            if (k >= 9 && k <= 12) {
+//                qDebug() << "trigger channel found ..."  << i;
+//                trigind.append(i);
+//            }
+//            if (k >=9 && k <=12) {
+//                qDebug() << "HPI trigger channel found ..."  << i;
+//                trigind.append(i);
+//            }
+//        }
+//    }
+//    qDebug() << "trigind: " << trigind.length();
     //==================================================================
 
     // Initialize inner layer sensors
@@ -282,29 +282,29 @@ void RtHPIS::run()
     qDebug()<< "======= coil driving frequency (Hz)======== ";
     qDebug() << coilfreq[0] << ", " << coilfreq[1] << ", " << coilfreq[2] << ", " << coilfreq[3];
 //    qDebug() << "samLoc (1024): " << samLoc;
-    int OUT_FLAG = 1;
-    int OUT_RAW = 1;
-    std::ofstream outinnerdata;
-    outinnerdata.open ("C:/Users/babyMEG/Desktop/Seok/innerdata.txt");
-    std::ofstream outtrigdata;
-    outtrigdata.open ("C:/Users/babyMEG/Desktop/Seok/trigdata.txt");
+//    int OUT_FLAG = 0;
+//    int OUT_RAW = 0;
+//    std::ofstream outinnerdata;
+//    outinnerdata.open ("C:/Users/babyMEG/Desktop/Seok/innerdata.txt");
+//    std::ofstream outtrigdata;
+//    outtrigdata.open ("C:/Users/babyMEG/Desktop/Seok/trigdata.txt");
 
-    std::ofstream outtopo;
-    outtopo.open ("C:/Users/babyMEG/Desktop/Seok/topo.txt");
-    std::ofstream outamp;
-    outamp.open ("C:/Users/babyMEG/Desktop/Seok/amp.txt");
-    std::ofstream outphase;
-    outphase.open ("C:/Users/babyMEG/Desktop/Seok/phase.txt");
-    std::ofstream outxfm;
-    outxfm.open ("C:/Users/babyMEG/Desktop/Seok/xfm.txt");
-    std::ofstream outcoilp;
-    outcoilp.open ("C:/Users/babyMEG/Desktop/Seok/coilp.txt");
-    std::ofstream outcoilm;
-    outcoilm.open ("C:/Users/babyMEG/Desktop/Seok/coilm.txt");
-    std::ofstream outdpfiterror;
-    outdpfiterror.open ("C:/Users/babyMEG/Desktop/Seok/dpfiterror.txt");
-    std::ofstream outdpfitnumitr;
-    outdpfitnumitr.open ("C:/Users/babyMEG/Desktop/Seok/dpfitnumitr.txt");
+//    std::ofstream outtopo;
+//    outtopo.open ("C:/Users/babyMEG/Desktop/Seok/topo.txt");
+//    std::ofstream outamp;
+//    outamp.open ("C:/Users/babyMEG/Desktop/Seok/amp.txt");
+//    std::ofstream outphase;
+//    outphase.open ("C:/Users/babyMEG/Desktop/Seok/phase.txt");
+//    std::ofstream outxfm;
+//    outxfm.open ("C:/Users/babyMEG/Desktop/Seok/xfm.txt");
+//    std::ofstream outcoilp;
+//    outcoilp.open ("C:/Users/babyMEG/Desktop/Seok/coilp.txt");
+//    std::ofstream outcoilm;
+//    outcoilm.open ("C:/Users/babyMEG/Desktop/Seok/coilm.txt");
+//    std::ofstream outdpfiterror;
+//    outdpfiterror.open ("C:/Users/babyMEG/Desktop/Seok/dpfiterror.txt");
+//    std::ofstream outdpfitnumitr;
+//    outdpfitnumitr.open ("C:/Users/babyMEG/Desktop/Seok/dpfitnumitr.txt");
 
     // --------------------------------------
 
@@ -331,9 +331,9 @@ void RtHPIS::run()
                 // Concatenate data into a matrix
                 for(int i=0;i<buffer.size();i++) alldata << buffer[i];
 
-                // Get the data from inner layer channels
+//                // Get the data from inner layer channels
                 Eigen::MatrixXd innerdata(innerind.size(),samLoc);
-                Eigen::MatrixXd trigdata(trigind.size(),samLoc);
+//                Eigen::MatrixXd trigdata(trigind.size(),samLoc);
 
                 numBlock = alldata.cols()/samLoc;
 
@@ -341,22 +341,22 @@ void RtHPIS::run()
                 for(int i = 0;i<numBlock;i++) {
                     for(int j = 0;j < innerind.size();j++){
                         innerdata.row(j) << alldata.block(innerind[j],i*samLoc,1,samLoc);
-                        if (OUT_RAW == 1) {
-                            for (int k = 0; k < innerdata.cols(); k++)
-                                outinnerdata << innerdata(j,k) << " ";
-                        }
+//                        if (OUT_RAW == 1) {
+//                            for (int k = 0; k < innerdata.cols(); k++)
+//                                outinnerdata << innerdata(j,k) << " ";
+//                        }
                    }
-                    for(int j = 0;j < trigind.size();j++){
-                        trigdata.row(j) << alldata.block(trigind[j],i*samLoc,1,samLoc);
-                        if (OUT_RAW == 1) {
-                            for (int k = 0; k < trigdata.cols(); k++)
-                                outtrigdata << trigdata(j,k) << " ";
-                        }
-                   }
-                    if (OUT_RAW == 1) {
-                       outinnerdata << "\n";
-                       outtrigdata << "\n";
-                   }
+//                    for(int j = 0;j < trigind.size();j++){
+//                        trigdata.row(j) << alldata.block(trigind[j],i*samLoc,1,samLoc);
+//                        if (OUT_RAW == 1) {
+//                            for (int k = 0; k < trigdata.cols(); k++)
+//                                outtrigdata << trigdata(j,k) << " ";
+//                        }
+//                   }
+//                    if (OUT_RAW == 1) {
+//                       outinnerdata << "\n";
+//                       outtrigdata << "\n";
+//                   }
                 }
 
 //                    qDebug() << "numBlock: " << numBlock;
@@ -367,20 +367,20 @@ void RtHPIS::run()
                     // topo 247 x 8
                     topo = innerdata * pinv(simsig).transpose();
                     //topo = innerdata * pinv(trigdata.transpose()).transpose();
-                    qDebug() << "topo: " << topo.rows() << " " << topo.cols();
+                    //qDebug() << "topo: " << topo.rows() << " " << topo.cols();
 
-                    for (int i =0; i<numCoils; i++) {
-                        for (int j =0; j< innerind.size(); j++)
-                            outtopo << topo(j,i) << " ";
-
-                        outtopo << "\n";
-                    }
+//                    for (int i =0; i<numCoils; i++) {
+//                        for (int j =0; j< innerind.size(); j++)
+//                            outtopo << topo(j,i) << " ";
+//
+//                        outtopo << "\n";
+//                    }
 
 
                     // amp 247 x 4
                     amp = (topo.leftCols(numCoils).array().square() + topo.rightCols(numCoils).array().square()).array().sqrt();
                     //amp = (topo.array().square()).array().sqrt();
-                    qDebug() << "amp: " << amp.rows() << " " << amp.cols();
+                    //qDebug() << "amp: " << amp.rows() << " " << amp.cols();
 
                     for (int i = 0;i < numCoils;i++) {
                         for (int j = 0;j < innerind.size();j++) {
@@ -392,15 +392,15 @@ void RtHPIS::run()
 
                             amp(j,i) = amp(j,i) * phase;
 
-                            if (OUT_FLAG == 1) {
-                                outamp << amp(j,i) << " ";
-                                outphase << phase << " ";
-                            }
+//                            if (OUT_FLAG == 1) {
+//                                outamp << amp(j,i) << " ";
+//                                outphase << phase << " ";
+//                            }
                         }
-                        if (OUT_FLAG == 1) {
-                            outamp << "\n";
-                            outphase << "\n";
-                        }
+//                        if (OUT_FLAG == 1) {
+//                            outamp << "\n";
+//                            outphase << "\n";
+//                        }
                     }
 
 //                    coil.pos(0,0) = 22; coil.pos(0,1) = 60; coil.pos(0,2) = 20;
@@ -426,25 +426,25 @@ void RtHPIS::run()
 //                    qDebug()<<"HPI dpfit error "<<coil.dpfiterror(0) <<" "<<coil.dpfiterror(1) <<" "<<coil.dpfiterror (2)<<" " << coil.dpfiterror(3);
 
                     //outcoilp << "   coil position" << "\n";
-                    if (OUT_FLAG == 1) {
-                        outcoilp <<coil.pos(0,0)<<" "<<coil.pos(0,1)<<" "<<coil.pos(0,2) <<"\n";
-                        outcoilp <<coil.pos(1,0)<<" "<<coil.pos(1,1)<<" "<<coil.pos(1,2) <<"\n";
-                        outcoilp <<coil.pos(2,0)<<" "<<coil.pos(2,1)<<" "<<coil.pos(2,2) <<"\n";
-                        outcoilp <<coil.pos(3,0)<<" "<<coil.pos(3,1)<<" "<<coil.pos(3,2) <<"\n";
+//                    if (OUT_FLAG == 1) {
+//                        outcoilp <<coil.pos(0,0)<<" "<<coil.pos(0,1)<<" "<<coil.pos(0,2) <<"\n";
+//                        outcoilp <<coil.pos(1,0)<<" "<<coil.pos(1,1)<<" "<<coil.pos(1,2) <<"\n";
+//                        outcoilp <<coil.pos(2,0)<<" "<<coil.pos(2,1)<<" "<<coil.pos(2,2) <<"\n";
+//                        outcoilp <<coil.pos(3,0)<<" "<<coil.pos(3,1)<<" "<<coil.pos(3,2) <<"\n";
 
-                        outcoilm <<coil.mom(0,0)<<" "<<coil.mom(0,1)<<" "<<coil.mom(0,2) <<"\n";
-                        outcoilm <<coil.mom(1,0)<<" "<<coil.mom(1,1)<<" "<<coil.mom(1,2) <<"\n";
-                        outcoilm <<coil.mom(2,0)<<" "<<coil.mom(2,1)<<" "<<coil.mom(2,2) <<"\n";
-                        outcoilm <<coil.mom(3,0)<<" "<<coil.mom(3,1)<<" "<<coil.mom(3,2) <<"\n";
+//                        outcoilm <<coil.mom(0,0)<<" "<<coil.mom(0,1)<<" "<<coil.mom(0,2) <<"\n";
+//                        outcoilm <<coil.mom(1,0)<<" "<<coil.mom(1,1)<<" "<<coil.mom(1,2) <<"\n";
+//                        outcoilm <<coil.mom(2,0)<<" "<<coil.mom(2,1)<<" "<<coil.mom(2,2) <<"\n";
+//                        outcoilm <<coil.mom(3,0)<<" "<<coil.mom(3,1)<<" "<<coil.mom(3,2) <<"\n";
 
-                        outdpfiterror << coil.dpfiterror(0) <<" "<<coil.dpfiterror(1) <<" "<<coil.dpfiterror(2) <<" " << coil.dpfiterror(3) <<"\n";
-                        outdpfitnumitr << coil.dpfitnumitr(0) <<" "<<coil.dpfitnumitr(1) <<" "<<coil.dpfitnumitr(2) <<" " << coil.dpfitnumitr(3) <<"\n";
-                    }
+//                        outdpfiterror << coil.dpfiterror(0) <<" "<<coil.dpfiterror(1) <<" "<<coil.dpfiterror(2) <<" " << coil.dpfiterror(3) <<"\n";
+//                        outdpfitnumitr << coil.dpfitnumitr(0) <<" "<<coil.dpfitnumitr(1) <<" "<<coil.dpfitnumitr(2) <<" " << coil.dpfitnumitr(3) <<"\n";
+//                    }
                     trans = computeTransformation(coil.pos,headHPI);
 
                     for(int ti =0; ti<4;ti++)
                         for(int tj=0;tj<4;tj++)
-                    m_pFiffInfo->dev_head_t.trans(ti,tj) = trans(ti,tj);
+                            m_pFiffInfo->dev_head_t.trans(ti,tj) = trans(ti,tj);
 
 //                    qDebug()<<"**** rotation ------- dev2head transformation ************";
 //                    qDebug()<< trans(0,0)<<" "<<trans(0,1)<<" "<<trans(0,2);
@@ -474,18 +474,19 @@ void RtHPIS::run()
         }//m_pRawMatrixBuffer
 
     } //m_bIsRunning
-    outinnerdata.close();
-    outtrigdata.close();
-    outtopo.close();
-    outamp.close();
-    outphase.close();
-    outxfm.close();
-    outcoilp.close();
-    outcoilm.close();
-    outdpfiterror.close();
-    outdpfitnumitr.close();
+//    outinnerdata.close();
+//    outtrigdata.close();
+//    outtopo.close();
+//    outamp.close();
+//    outphase.close();
+//    outxfm.close();
+//    outcoilp.close();
+//    outcoilm.close();
+//    outdpfiterror.close();
+//    outdpfitnumitr.close();
 
 }
+
 
 
 /*********************************************************************************
@@ -497,9 +498,9 @@ coilParam RtHPIS::dipfit(struct coilParam coil, struct sens sensors, Eigen::Matr
 {
     // Initialize variables
     int display = 0;
-//    int maxiter = 100;
-// Seok
-    int maxiter = 500;
+    int maxiter = 100;
+    // Seok
+    //int maxiter = 500;
 
 
     dipError temp;
@@ -510,8 +511,8 @@ coilParam RtHPIS::dipfit(struct coilParam coil, struct sens sensors, Eigen::Matr
         coil.mom = temp.moment.transpose();
 
         // Seok
-        coil.dpfiterror(i) = temp.error;
-        coil.dpfitnumitr(i) = simplex_numitr;
+//        coil.dpfiterror(i) = temp.error;
+//        coil.dpfitnumitr(i) = simplex_numitr;
     }
 
     return coil;
@@ -534,9 +535,7 @@ Eigen::MatrixXd RtHPIS::fminsearch(Eigen::MatrixXd pos,int maxiter, int maxfun, 
 
     dipError tempdip, fxr, fxe, fxc, fxcc;
 
-    //tolx = tolf = 1e-4;
-    // Seok
-    tolx = tolf = 1e-9;
+    tolx = tolf = 1e-4;
 
     switch(display)
     {
@@ -719,7 +718,7 @@ Eigen::MatrixXd RtHPIS::fminsearch(Eigen::MatrixXd pos,int maxiter, int maxfun, 
     x = v.col(0).transpose();
 
     // Seok
-    simplex_numitr = itercount;
+    //simplex_numitr = itercount;
 
     return x;
 }
