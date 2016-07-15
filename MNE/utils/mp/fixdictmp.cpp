@@ -110,6 +110,8 @@ FixDictMp::~FixDictMp()
 //*************************************************************************************************************
 
 Dictionary::Dictionary()
+: type(AtomType::GABORATOM)
+, sample_count(0)
 {
 
 }
@@ -523,7 +525,7 @@ Dictionary FixDictMp::fill_dict(const QDomNode &pdict)
 
 //*************************************************************************************************************
 
-QString FixDictMp::create_display_text(FixDictAtom global_best_matching)
+QString FixDictMp::create_display_text(const FixDictAtom& global_best_matching)
 {
     QString display_text = "";
     if(global_best_matching.type == GABORATOM)

@@ -126,23 +126,61 @@ MatrixXd Atom::make_tf(qint32 sample_count, qreal scale, quint32 translation, qr
     return tf_matrix;
 }
 
+
 //*************************************************************************************************************
 
 FixDictAtom::FixDictAtom(qint32 _id, qint32 _sample_count, QString _dict_source)
+: id(_id)
+, dict_source(dict_source)
+, type(AtomType::GABORATOM)
+, translation(0)
 {
-    id = _id;
     sample_count = _sample_count;
-    dict_source = _dict_source;
-    energy = 0;
-    max_scalar_product = 0;
+
+    gabor_atom.scale = 0;
+    gabor_atom.modulation = 0;
+    gabor_atom.phase = 0;
+
+    chirp_atom.scale = 0;
+    chirp_atom.modulation = 0;
+    chirp_atom.phase = 0;
+    chirp_atom.chirp = 0;
+
+    formula_atom.a = 0;
+    formula_atom.b = 0;
+    formula_atom.c = 0;
+    formula_atom.d = 0;
+    formula_atom.e = 0;
+    formula_atom.f = 0;
+    formula_atom.g = 0;
+    formula_atom.h = 0;
 }
 
 //*************************************************************************************************************
 
 FixDictAtom::FixDictAtom()
+: id(0)
+, dict_source("")
+, type(AtomType::GABORATOM)
+, translation(0)
 {
-    energy = 0;
-    max_scalar_product = 0;
+    gabor_atom.scale = 0;
+    gabor_atom.modulation = 0;
+    gabor_atom.phase = 0;
+
+    chirp_atom.scale = 0;
+    chirp_atom.modulation = 0;
+    chirp_atom.phase = 0;
+    chirp_atom.chirp = 0;
+
+    formula_atom.a = 0;
+    formula_atom.b = 0;
+    formula_atom.c = 0;
+    formula_atom.d = 0;
+    formula_atom.e = 0;
+    formula_atom.f = 0;
+    formula_atom.g = 0;
+    formula_atom.h = 0;
 }
 
 //*************************************************************************************************************
@@ -152,9 +190,11 @@ FixDictAtom::~FixDictAtom() {}
 //*************************************************************************************************************
 
 GaborAtom::GaborAtom()
+: scale(0)
+, translation(0)
+, modulation(0)
+, phase(0)
 {
-    energy = 0;
-    max_scalar_product = 0;
 }
 
 //*************************************************************************************************************
@@ -163,7 +203,14 @@ GaborAtom::~GaborAtom() {}
 
 //*************************************************************************************************************
 
-ChirpAtom::ChirpAtom() {}
+ChirpAtom::ChirpAtom()
+: scale(0)
+, translation(0)
+, modulation(0)
+, phase(0)
+, chirp(0)
+{
+}
 
 //*************************************************************************************************************
 
