@@ -113,7 +113,7 @@ void RtHPIS::append(const MatrixXd &p_DataSegment)
         m_pRawMatrixBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(80, p_DataSegment.rows(), p_DataSegment.cols()));
 
     if (SendDataToBuffer)
-        m_pRawMatrixBuffer->push(p_DataSegment);
+        m_pRawMatrixBuffer->push(&p_DataSegment);
 }
 
 
@@ -310,6 +310,16 @@ void RtHPIS::run()
 //    outdpfitnumitr.open ("C:/Users/babyMEG/Desktop/Seok/dpfitnumitr.txt");
 
     // --------------------------------------
+    int itimerMatAlloc,itimerLocCoils,itimerTransMulti,itimerPhase,itimerDipFit,itimerCompTrans,itimerBufFull;
+
+    QElapsedTimer timerBufFull;
+    QElapsedTimer timerMatAlloc;
+    QElapsedTimer timerAll;
+    QElapsedTimer timerLocCoils;
+    QElapsedTimer timerTransMulti;
+    QElapsedTimer timerPhase;
+    QElapsedTimer timerDipFit;
+    QElapsedTimer timerCompTrans;
 
     while(m_bIsRunning)
     {
@@ -319,7 +329,6 @@ void RtHPIS::run()
 
             buffer.append(t_mat);
 
-            QElapsedTimer timerAll;
             timerAll.start();
             qDebug() << "buffer(size): " << buffer.length();
             qDebug() << "t_mat(size): " << t_mat.rows() << " x " << t_mat.cols();
@@ -327,11 +336,9 @@ void RtHPIS::run()
             //If enough data has been stored in the buffer
             if(buffer.size()*t_mat.cols() >= samLoc)
             {
-                //QElapsedTimer timerBufFull;
-                //timerBufFull.start();
+                timerBufFull.start();
 
-                //QElapsedTimer timerMatAlloc;
-                //timerMatAlloc.start();
+                timerMatAlloc.start();
 
                 Eigen::MatrixXd alldata(t_mat.rows(),buffer.size()*t_mat.cols());
 
@@ -345,12 +352,11 @@ void RtHPIS::run()
 
                 numBlock = alldata.cols()/samLoc;
 
-                //qDebug() << "RtHPIS::run() - MAtrix data allocation took" << timerMatAlloc.elapsed() << "milliseconds";
+                itimerMatAlloc = timerMatAlloc.elapsed();
 
                 // Loop for localizing coils
 
-                //QElapsedTimer timerLocCoils;
-                //timerLocCoils.start();
+                timerLocCoils.start();
 
                 for(int i = 0;i<numBlock;i++) {
                     for(int j = 0;j < innerind.size();j++){
@@ -373,18 +379,19 @@ void RtHPIS::run()
 //                   }
                 }
 
-                //qDebug() << "RtHPIS::run() - phase localization coils took" << timerLocCoils.elapsed() << "milliseconds";
+                itimerLocCoils = timerLocCoils.elapsed();
 
 //                    qDebug() << "numBlock: " << numBlock;
 //                    qDebug() << "alldata: " << alldata.rows() << " x " << alldata.cols();
 //                    qDebug() << "innerdata: " << innerdata.rows() << " x " << innerdata.cols();
 //                    qDebug() << "trigdata: " << trigdata.rows() << " x " << trigdata.cols();
 
-                //QElapsedTimer timerTransMulti;
-                //timerTransMulti.start();
+                timerTransMulti.start();
                     // topo 247 x 8
                     topo = innerdata * pinv(simsig).transpose();
-                //qDebug() << "RtHPIS::run() - transpose multiplication took" << timerTransMulti.elapsed() << "milliseconds";
+
+                itimerTransMulti = timerTransMulti.elapsed();
+
                     //topo = innerdata * pinv(trigdata.transpose()).transpose();
                     //qDebug() << "topo: " << topo.rows() << " " << topo.cols();
 
@@ -397,8 +404,7 @@ void RtHPIS::run()
 
 
                 // amp 247 x 4
-                //QElapsedTimer timerPhase;
-                //timerPhase.start();
+                timerPhase.start();
 
                 amp = (topo.leftCols(numCoils).array().square() + topo.rightCols(numCoils).array().square()).array().sqrt();
                 //amp = (topo.array().square()).array().sqrt();
@@ -427,7 +433,7 @@ void RtHPIS::run()
 
                 coil = dipfit(coil, sensors, amp, numCoils);
 
-                //qDebug() << "RtHPIS::run() - phase took" << timerPhase.elapsed() << "milliseconds";
+                itimerPhase = timerPhase.elapsed();
 
 //                    coil.pos(0,0) = 22; coil.pos(0,1) = 60; coil.pos(0,2) = 20;
 //                    coil.pos(1,0) = 32; coil.pos(1,1) = 48; coil.pos(1,2) = 34;
@@ -438,10 +444,9 @@ void RtHPIS::run()
 //                    coil.pos(2,0) = 0; coil.pos(2,1) = 0; coil.pos(2,2) = 0;
 //                    coil.pos(3,0) = 0; coil.pos(3,1) = 0; coil.pos(3,2) = 0;
 
-                QElapsedTimer timerDipFit;
                 timerDipFit.start();
                 coil = dipfit(coil, sensors, amp, numCoils);
-                qDebug() << "RtHPIS::run() - dipfit() took" << timerDipFit.elapsed() << "milliseconds";
+                itimerDipFit = timerDipFit.elapsed();
 
 
 //                    qDebug()<<"HPI head "<<headHPI(0,0)<<" "<<headHPI(0,1)<<" "<<headHPI(0,2);
@@ -472,15 +477,14 @@ void RtHPIS::run()
 //                        outdpfitnumitr << coil.dpfitnumitr(0) <<" "<<coil.dpfitnumitr(1) <<" "<<coil.dpfitnumitr(2) <<" " << coil.dpfitnumitr(3) <<"\n";
 //                    }
 
-                //QElapsedTimer timerCompTrans;
-                //timerCompTrans.start();
+                timerCompTrans.start();
                 trans = computeTransformation(coil.pos,headHPI);
 
                 for(int ti =0; ti<4;ti++)
                     for(int tj=0;tj<4;tj++)
                         m_pFiffInfo->dev_head_t.trans(ti,tj) = trans(ti,tj);
 
-                //qDebug() << "RtHPIS::run() - computeTransformation() took" << timerCompTrans.elapsed() << "milliseconds";
+                itimerCompTrans = timerCompTrans.elapsed();
 
 //                    qDebug()<<"**** rotation ------- dev2head transformation ************";
 //                    qDebug()<< trans(0,0)<<" "<<trans(0,1)<<" "<<trans(0,2);
@@ -496,12 +500,19 @@ void RtHPIS::run()
                     outxfm << trans(2,0)<<" "<<trans(2,1)<<" "<<trans(2,2) <<" "<< trans(2,3)<<"\n";
                     }
 */
-                //qDebug() << "RtHPIS::run() - if clause buffer full took" << timerBufFull.elapsed() << "milliseconds";
+                itimerBufFull = timerBufFull.elapsed();
 
                 buffer.clear();
             }
 
-            qDebug() << "RtHPIS::run() - HPI All calculation took" << timerAll.elapsed() << "milliseconds";
+            qDebug() << "RtHPIS::run() - timerAll" << timerAll.elapsed() << "milliseconds";
+            qDebug() << "RtHPIS::run() - itimerMatAlloc" << timerMatAlloc.elapsed() << "milliseconds";
+            qDebug() << "RtHPIS::run() - itimerLocCoils" << timerLocCoils.elapsed() << "milliseconds";
+            qDebug() << "RtHPIS::run() - itimerTransMulti" << timerTransMulti.elapsed() << "milliseconds";
+            qDebug() << "RtHPIS::run() - itimerPhase" << timerPhase.elapsed() << "milliseconds";
+            qDebug() << "RtHPIS::run() - itimerDipFit" << timerDipFit.elapsed() << "milliseconds";
+            qDebug() << "RtHPIS::run() - itimerCompTrans" << timerCompTrans.elapsed() << "milliseconds";
+            qDebug() << "RtHPIS::run() - itimerBufFull" << timerBufFull.elapsed() << "milliseconds";
 
         }//m_pRawMatrixBuffer
     }  //End of while statement
