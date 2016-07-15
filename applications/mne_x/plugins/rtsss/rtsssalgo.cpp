@@ -43,6 +43,13 @@
 //#include "FormFiles/rtssssetupwidget.h"
 
 RtSssAlgo::RtSssAlgo()
+: NumMEGChan(0)
+, NumCoil(0)
+, NumBadCoil(0)
+, LInRR(0)
+, LOutRR(0)
+, LInOLS(0)
+, LOutOLS(0)
 {
 
 }

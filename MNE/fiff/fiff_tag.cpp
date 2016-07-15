@@ -77,6 +77,9 @@ using namespace FIFFLIB;
 FiffTag::FiffTag()
 : m_pComplexFloatData(NULL)
 , m_pComplexDoubleData(NULL)
+, kind(0)
+, type(0)
+, next(0)
 {
 }
 

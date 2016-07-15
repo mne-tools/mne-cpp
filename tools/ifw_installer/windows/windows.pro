@@ -47,12 +47,12 @@ OTHER_FILES = \
     packages/org.mne_cpp.suite.mne_x/meta/package.xml \
     packages/org.mne_cpp.suite.mne_x/meta/license_mne-x.txt \
     packages/org.mne_cpp.suite.mne_x/meta/installscript.qs \
-    packages/org.mne_cpp.suite.mne_browse_raw_qt/meta/package.xml \
-    packages/org.mne_cpp.suite.mne_browse_raw_qt/meta/license_mne_browse_raw_qt.txt \
-    packages/org.mne_cpp.suite.mne_browse_raw_qt/meta/installscript.qs \
-    packages/org.mne_cpp.suite.mne_analyze_qt/meta/package.xml \
-    packages/org.mne_cpp.suite.mne_analyze_qt/meta/license_mne_analyze_qt.txt \
-    packages/org.mne_cpp.suite.mne_analyze_qt/meta/installscript.qs
+    packages/org.mne_cpp.suite.mne_browse/meta/package.xml \
+    packages/org.mne_cpp.suite.mne_browse/meta/license_mne_browse.txt \
+    packages/org.mne_cpp.suite.mne_browse/meta/installscript.qs \
+    packages/org.mne_cpp.suite.mne_analyze/meta/package.xml \
+    packages/org.mne_cpp.suite.mne_analyze/meta/license_mne_analyze.txt \
+    packages/org.mne_cpp.suite.mne_analyze/meta/installscript.qs
 
 FORMS += \
     packages/org.mne_cpp.suite/meta/vcredistcheckboxform.ui

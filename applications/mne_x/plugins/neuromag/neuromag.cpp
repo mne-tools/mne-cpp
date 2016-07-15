@@ -84,6 +84,7 @@ Neuromag::Neuromag()
 , m_pRawMatrixBuffer_In(0)
 , m_bIsRunning(false)
 , m_sFiffHeader(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/neuromag/header.fif")
+, m_iActiveConnectorId(0)
 {
 
 }

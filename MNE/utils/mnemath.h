@@ -351,6 +351,26 @@ public:
     */
     template<typename T>
     static inline double log2( const T d);
+
+
+    //=========================================================================================================
+    /**
+    * creates a class and frequency distribution from data matrix
+    *
+    * @param[in]  matRawData             raw data matrix that needs to be analyzed
+    * @param[in]  bMakeSymmetrical       user input to turn the x-axis symmetric
+    * @param[in]  iClassCount            user input to determine the amount of classes in the histogram
+    * @param[in]  dGlobalMin             user input to determine the maximum value allowed in the histogram
+    * @param[in]  dGlobalMax             user input to determine the minimum value allowed in the histogram
+    * @param[out] vecResultClassLimits   the upper limit of each individual class
+    * @param[out] vecResultFrequency     the amount of data that fits in the appropriate class ranges
+    */
+    template<typename T>
+    static void histcounts(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matRawData, bool bMakeSymmetrical, int iClassAmount, Eigen::VectorXd& vecResultClassLimits, Eigen::VectorXi& vecResultFrequency, double dGlobalMin = 0.0, double dGlobalMax= 0.0);
+    template<typename T>
+    static void histcounts(const Eigen::Matrix<T, Eigen::Dynamic, 1>& matRawData, bool bMakeSymmetrical, int iClassAmount, Eigen::VectorXd& vecResultClassLimits, Eigen::VectorXi& vecResultFrequency, double dGlobalMin = 0.0, double dGlobalMax= 0.0);
+    template<typename T>
+    static void histcounts(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matRawData, bool bMakeSymmetrical, int iClassAmount, Eigen::VectorXd& vecResultClassLimits, Eigen::VectorXi& vecResultFrequency, double dGlobalMin = 0.0, double dGlobalMax= 0.0);
 };
 
 //*************************************************************************************************************
@@ -470,6 +490,128 @@ inline double MNEMath::log2( const T d)
 {
     return log(d)/log(2);
 }
+
+
+//*************************************************************************************************************
+
+template<typename T>
+void MNEMath::histcounts(const Eigen::Matrix<T, Eigen::Dynamic, 1>& matRawData, bool bMakeSymmetrical, int iClassAmount, Eigen::VectorXd& vecResultClassLimits, Eigen::VectorXi& vecResultFrequency, double dGlobalMin, double dGlobalMax)
+{
+    Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrixName(matRawData.rows(),1);
+    matrixName.col(0)= matRawData;
+    MNEMath::histcounts(matrixName, bMakeSymmetrical, iClassAmount, vecResultClassLimits, vecResultFrequency, dGlobalMin, dGlobalMax);
+}
+
+
+//*************************************************************************************************************
+
+template<typename T>
+void MNEMath::histcounts(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matRawData, bool bMakeSymmetrical, int iClassAmount, Eigen::VectorXd& vecResultClassLimits, Eigen::VectorXi& vecResultFrequency, double dGlobalMin, double dGlobalMax)
+{
+    Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrixName(1,matRawData.cols());
+    matrixName.row(0)= matRawData;
+    MNEMath::histcounts(matrixName, bMakeSymmetrical, iClassAmount, vecResultClassLimits, vecResultFrequency, dGlobalMin, dGlobalMax);
+}
+
+
+//*************************************************************************************************************
+
+template<typename T>
+void MNEMath::histcounts(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matRawData, bool bMakeSymmetrical, int iClassAmount, Eigen::VectorXd& vecResultClassLimits, Eigen::VectorXi& vecResultFrequency, double dGlobalMin, double dGlobalMax)
+{
+   vecResultClassLimits.resize(iClassAmount + 1);
+   vecResultFrequency.resize(iClassAmount);
+
+    for (int count = 0; count < iClassAmount; ++count) //initialize the vector with zero values
+    {
+        vecResultFrequency(count) = 0;
+    }
+
+    double desiredMin,
+           desiredMax;
+    double rawMin(0.0),
+           rawMax(0.0),
+           localMin(0.0),
+           localMax(0.0);
+
+    rawMin = matRawData.minCoeff();        //finds the raw matrix minimum value
+    rawMax = matRawData.maxCoeff();        //finds the raw matrix maximum value
+
+    if (bMakeSymmetrical == true)           //in case the user wants the histogram to have symmetrical class ranges
+    {
+        if (abs(rawMin) > rawMax)       //in case the negative side is larger than the positive side
+        {
+            localMax = abs(rawMin);     //positive side is "stretched" to the exact length as negative side
+            localMin = rawMin;
+        }
+        else if (rawMax > abs(rawMin))      //in case the positive side is larger than the negative side
+        {
+            localMin = -(rawMax);           //negative side is "stretched" to the exact length as positive side
+            localMax = rawMax;
+        }
+        else                                //in case both sides are exactly the same
+        {
+            localMin = rawMin;
+            localMax = rawMax;
+        }
+    }
+    else                                    //in case bMakeSymmetrical == false
+    {
+        localMin = rawMin;
+        localMax = rawMax;
+    }
+    //selects either local or global range (according to user preference and input)
+    if (dGlobalMin == 0.0 && dGlobalMax == 0.0)               //if global range is NOT given by the user, use local ranges
+    {
+        desiredMin = localMin;
+        desiredMax = localMax;
+        vecResultClassLimits[0] = desiredMin;                 //replace default value with local minimum at position 0
+        vecResultClassLimits[iClassAmount] = desiredMax;      //replace default value with local maximum at position n
+    }
+    else
+    {
+        desiredMin = dGlobalMin;
+        desiredMax = dGlobalMax;
+        vecResultClassLimits(0)= desiredMin;                 //replace default value with global minimum at position 0
+        vecResultClassLimits(iClassAmount)= desiredMax;      //replace default value with global maximum at position n
+    }
+
+    double	range = (vecResultClassLimits(iClassAmount) - vecResultClassLimits(0)),      //calculates the length from maximum positive value to zero
+            dynamicUpperClassLimit;
+
+    for (int kr = 0; kr < iClassAmount; ++kr)                                               //dynamically initialize the upper class limit values
+    {
+        dynamicUpperClassLimit = (vecResultClassLimits(0) + (kr*(range/iClassAmount)));  //generic formula to determine the upper class limit with respect to range and number of class
+        vecResultClassLimits(kr) = dynamicUpperClassLimit;                               //places the appropriate upper class limit value to the right position in the QVector
+    }
+
+    for (int ir = 0; ir < matRawData.rows(); ++ir)       //iterates through all columns of the data matrix
+    {
+        for (int jr = 0; jr<matRawData.cols(); ++jr)     //iterates through all rows of the data matrix
+        {
+            for (int kr = 0; kr < iClassAmount; ++kr)          //starts iteration from 1 to iClassAmount
+            {
+                if (kr == iClassAmount-1)                    //used for the final iteration; if the data value is exactly the same as the final upper class limit, it will be included in the histogram
+                {
+                    if (matRawData(ir,jr) >= vecResultClassLimits(kr) && matRawData(ir,jr) <= vecResultClassLimits(kr + 1))    //compares value in the matrix with lower and upper limit of each class
+                    {
+                         vecResultFrequency(kr) = vecResultFrequency(kr) + 1 ;           //if the value fits both arguments, the appropriate class frequency is increased by 1
+                    }
+                }
+                else
+                {
+                    if (matRawData(ir,jr) >= vecResultClassLimits(kr) && matRawData(ir,jr) < vecResultClassLimits(kr + 1))    //compares value in the matrix with lower and upper limit of each class
+                    {
+                        vecResultFrequency(kr) = vecResultFrequency(kr) + 1 ;           //if the value fits both arguments, the appropriate class frequency is increased by 1
+                    }
+                }
+             }
+         }
+     }
+}
+
+
+//*************************************************************************************************************
 
 } // NAMESPACE
 

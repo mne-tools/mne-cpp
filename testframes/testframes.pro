@@ -39,7 +39,7 @@ TEMPLATE = subdirs
 
 SUBDIRS += \
     test_codecov \
-    test_fiff_rwr
+    test_fiff_rwr \
 #    test_mne_libs \
 #    test_mne_rt \
 #    mne_x_plugin_com \
@@ -47,8 +47,8 @@ SUBDIRS += \
 #    test_ssp \
 
 #!contains(MNECPP_CONFIG, minimalVersion) {
-#    SUBDIRS += \
-#        test_mne_graph \
+    SUBDIRS += \
+#        test_mne_graph
 #        test_mne_cluster_eval \
 #        test_rap_cluster_eval \
 #        test_rtc_eval \

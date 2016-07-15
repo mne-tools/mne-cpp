@@ -96,6 +96,8 @@ FilterData::FilterData()
 , m_dCenterFreq(0.5)
 , m_dBandwidth(0.1)
 , m_sFreq(1000)
+, m_dLowpassFreq(4)
+, m_dHighpassFreq(40)
 {
 
 }

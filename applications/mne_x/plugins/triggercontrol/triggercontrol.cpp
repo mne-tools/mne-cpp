@@ -94,6 +94,8 @@ TriggerControl::TriggerControl()
 , m_dt(1/m_fs)
 , m_refFreq(0.5)
 , m_alphaFreq(0.5)
+, m_bBspBool(false)
+, m_isReceived(false)
 {
     connect(this, &TriggerControl::sendByte, this, &TriggerControl::sendByteTo);
 
@@ -265,14 +267,15 @@ bool TriggerControl::stop()
     std::cout << "Average time: " << sum/m_vTimes.size() << std::endl;
     std::cout << "Size m_vTimes: " << m_vTimes.size() << std::endl;
 
-    file.open(QIODevice::WriteOnly | QIODevice::Text);
-    QTextStream out(&file);
+    if(file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QTextStream out(&file);
 
-    for(int i=0; i<m_vTimes.size() ;i++)
-        out << m_vTimes[i] << endl;
+        for(int i=0; i<m_vTimes.size() ;i++)
+            out << m_vTimes[i] << endl;
 
-    // optional, as QFile destructor will already do it:
-    file.close();
+        // optional, as QFile destructor will already do it:
+        file.close();
+    }
 
     m_pData.clear();
     m_vTimes.clear();
