@@ -247,8 +247,8 @@ void BabyMEGInfo::MGH_LM_Parse_Para(QByteArray cmdstr)
     m_FiffInfo.filename = QString("");
     m_FiffInfo.meas_id.version = 1;
     m_FiffInfo.nchan = chnNum; //464;
-    m_FiffInfo.dev_head_t.from =4;
-    m_FiffInfo.dev_head_t.to =1;
+    m_FiffInfo.dev_head_t.from =1;
+    m_FiffInfo.dev_head_t.to =4;
 
     //set the identified matrix
     for (int li=0;li<4;li++)
