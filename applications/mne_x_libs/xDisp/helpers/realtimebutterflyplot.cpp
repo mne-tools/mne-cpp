@@ -42,6 +42,11 @@ RealTimeButterflyPlot::RealTimeButterflyPlot(QWidget *parent)
 , m_bShowEOG(true)
 , m_bShowMISC(true)
 , m_colCurrentBackgroundColor(Qt::white)
+, m_fMaxMAG(0.0)
+, m_fMaxGRAD(0.0)
+, m_fMaxEEG(0.0)
+, m_fMaxEOG(0.0)
+, m_fMaxMISC(0.0)
 {
 }
 
@@ -128,7 +133,11 @@ void RealTimeButterflyPlot::paintEvent(QPaintEvent* paintEvent)
 
             float yStart = this->rect().topLeft().y();
             float yEnd = this->rect().bottomRight().y();
-            float fDx = (float)(this->width()) / ((float)m_pRealTimeEvokedModel->getNumSamples());
+
+            float fDx = 1;
+            if(m_pRealTimeEvokedModel->getNumSamples() != 0) {
+                fDx = (float)(this->width()) / ((float)m_pRealTimeEvokedModel->getNumSamples());
+            }
 
             float sampleCounter = m_pRealTimeEvokedModel->getNumPreStimSamples();
             int counter = 1;
@@ -256,10 +265,10 @@ void RealTimeButterflyPlot::createPlotPath(qint32 row, QPainterPath& path) const
             }
             else if(unit == FIFF_UNIT_T) //magnitometers
             {
-                if(m_pRealTimeEvokedModel->getCoil(row) == FIFFV_COIL_BABY_MAG)
-                    fMaxValue = 1e-11f;
-                else
-                    fMaxValue = 1e-11f;
+//                if(m_pRealTimeEvokedModel->getCoil(row) == FIFFV_COIL_BABY_MAG)
+//                    fMaxValue = 1e-11f;
+//                else
+                fMaxValue = 1e-11f;
 
                 if(m_pRealTimeEvokedModel->getScaling().contains(FIFF_UNIT_T))
                     fMaxValue = m_pRealTimeEvokedModel->getScaling()[FIFF_UNIT_T];

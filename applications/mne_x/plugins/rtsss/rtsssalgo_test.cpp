@@ -38,6 +38,7 @@
 //#include "FormFiles/rtssssetupwidget.h"
 
 RtSssAlgoTest::RtSssAlgoTest()
+: NumCoil(0)
 {
 
 }

@@ -92,6 +92,8 @@ BabyMEG::BabyMEG()
 , m_sFiffCompensators(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/babymeg/compensator.fif")
 , m_sBadChannels(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/babymeg/both.bad")
 , m_iRecordingMSeconds(5*60*1000)
+, m_dSfreq(1024)
+, m_iSplitCount(0)
 {
     m_pActionSetupProject = new QAction(QIcon(":/images/database.png"), tr("Setup Project"),this);
 //    m_pActionSetupProject->setShortcut(tr("F12"));

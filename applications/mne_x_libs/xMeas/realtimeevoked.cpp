@@ -66,6 +66,7 @@ RealTimeEvoked::RealTimeEvoked(QObject *parent)
 : NewMeasurement(QMetaType::type("RealTimeEvoked::SPtr"), parent)
 , m_pFiffEvoked(new FiffEvoked)
 , m_bInitialized(false)
+, m_iPreStimSamples(0)
 {
 
 }
