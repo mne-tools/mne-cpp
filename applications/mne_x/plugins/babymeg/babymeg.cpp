@@ -64,6 +64,7 @@
 #include <QDir>
 #include <QDateTime>
 
+#include <QQuaternion>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -838,7 +839,7 @@ bool BabyMEG::readBadChannels()
 void BabyMEG::run()
 {
 
-    MatrixXf matValue;
+    //MatrixXf matValue;
 
     qint32 size = 0;
 
@@ -848,6 +849,8 @@ void BabyMEG::run()
         {
             //pop matrix
             matValue = m_pRawMatrixBuffer->pop();
+
+            //updateHPI();
 
             //Write raw data to fif file
             if(m_bWriteToFile)
@@ -877,6 +880,59 @@ void BabyMEG::run()
         this->toggleRecordingFile();
 }
 
+
+//*************************************************************************************************************
+void BabyMEG::updateHPI()
+{
+    QMatrix3x3 rot;
+    QQuaternion qhpi;
+
+    //int bufsize = 1024;
+    int bufsize = matValue.cols();
+    qDebug() << "bufsize = " << bufsize;
+
+    // ***************  HPI update --- Seok ***********************
+     for (int ir = 0; ir < 3; ir++)
+         for (int ic = 0; ic < 3; ic++)
+             rot(ir,ic) = m_pFiffInfo->dev_head_t.trans(ir,ic);
+
+     // convert rotation matrix to quaternion
+     qhpi.fromRotationMatrix(rot);
+
+     // rotation matrix in quaternion
+     matValue.row(401) = MatrixXf::Constant(1,bufsize, qhpi.x());
+     matValue.row(402) = MatrixXf::Constant(1,bufsize, qhpi.y());
+     matValue.row(403) = MatrixXf::Constant(1,bufsize, qhpi.z());
+
+     // translation vector
+     matValue.row(404) = MatrixXf::Constant(1,bufsize, 100*m_pFiffInfo->dev_head_t.trans(0,3));
+     matValue.row(405) = MatrixXf::Constant(1,bufsize, 100*m_pFiffInfo->dev_head_t.trans(1,3));
+     matValue.row(406) = MatrixXf::Constant(1,bufsize, 100*m_pFiffInfo->dev_head_t.trans(2,3));
+
+     // goodness of fit
+     matValue.row(407) = MatrixXf::Constant(1,bufsize, 1);
+
+     //
+     // debug purpose !   visualize in HPI channels
+     // can be commented out to sppeed up the babymeg plugin
+     matValue(401,100) = 1; matValue(401,101) = 1; matValue(401,102) = 1; matValue(401,103) = 1;
+     matValue(402,200) = 1; matValue(402,201) = 1; matValue(402,202) = 1; matValue(402,203) = 1;
+     matValue(403,300) = 1; matValue(403,301) = 1; matValue(403,302) = 1; matValue(403,303) = 1;
+     matValue(404,400) = 0; matValue(404,401) = 0; matValue(404,402) = 0; matValue(404,403) = 0;
+     matValue(405,500) = 0; matValue(405,501) = 0; matValue(405,502) = 0; matValue(405,503) = 0;
+     matValue(406,600) = 0; matValue(406,601) = 0; matValue(406,602) = 0; matValue(406,603) = 0;
+     matValue(407,700) = 0; matValue(407,701) = 0; matValue(407,702) = 0; matValue(407,703) = 0;
+
+     qDebug() << rot(0,0) << " "  << rot(0,1) << " " << rot(0,2);
+     qDebug() << rot(1,0) << " "  << rot(1,1) << " " << rot(1,2);
+     qDebug() << rot(2,0) << " "  << rot(2,1) << " " << rot(2,2);
+
+     qDebug() << "quaternion x: " << qhpi.x();
+     qDebug() << "quaternion y: " << qhpi.y();
+     qDebug() << "quaternion z: " << qhpi.z();
+
+
+}
 
 //*************************************************************************************************************
 
@@ -921,4 +977,5 @@ void BabyMEG::onRecordingRemainingTimeChange()
 {
     m_pBabyMEGProjectDialog->setRecordingElapsedTime(m_recordingStartedTime.elapsed());
 }
+
 

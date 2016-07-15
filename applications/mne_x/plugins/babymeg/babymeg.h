@@ -421,6 +421,15 @@ private:
     */
     void initConnector();
 
+    //=========================================================================================================
+    /**
+    * Update HPI.
+    */
+    void BabyMEG::updateHPI();
+
+    MatrixXf matValue;
+
+
     PluginOutputData<NewRealTimeMultiSampleArray>::SPtr m_pRTMSABabyMEG;    /**< The NewRealTimeMultiSampleArray to provide the rt_server Channels.*/
 
     QSharedPointer<BabyMEGClient>           m_pMyClient;                    /**< TCP/IP communication between Qt and Labview. */
