@@ -151,8 +151,8 @@ bool BrainSourceSpaceTreeItem::addData(const MNEHemisphere& tHemisphere, Qt3DCor
 //    RowVector3f sourcePos;
 //    QVector3D pos;
 //    Qt3DCore::QEntity* sourceSphereEntity;
-//    Qt3DRender::QSphereMesh* sourceSphere;
-//    Qt3DRender::QPhongMaterial* material;
+//    Qt3DExtras::QSphereMesh* sourceSphere;
+//    Qt3DExtras::QPhongMaterial* material;
 
 //    if(tHemisphere.isClustered()) {
 //        for(int i = 0; i < tHemisphere.cluster_info.centroidVertno.size(); i++) {
@@ -163,7 +163,7 @@ bool BrainSourceSpaceTreeItem::addData(const MNEHemisphere& tHemisphere, Qt3DCor
 
 //            sourceSphereEntity = new Qt3DCore::QEntity();
 
-//            sourceSphere = new Qt3DRender::QSphereMesh();
+//            sourceSphere = new Qt3DExtras::QSphereMesh();
 //            sourceSphere->setRadius(0.001f);
 //            sourceSphereEntity->addComponent(sourceSphere);
 
@@ -173,7 +173,7 @@ bool BrainSourceSpaceTreeItem::addData(const MNEHemisphere& tHemisphere, Qt3DCor
 //            transform->setMatrix(m);
 //            sourceSphereEntity->addComponent(transform);
 
-//            material = new Qt3DRender::QPhongMaterial();
+//            material = new Qt3DExtras::QPhongMaterial();
 //            material->setAmbient(Qt::yellow);
 //            sourceSphereEntity->addComponent(material);
 
@@ -188,7 +188,7 @@ bool BrainSourceSpaceTreeItem::addData(const MNEHemisphere& tHemisphere, Qt3DCor
 
 //            sourceSphereEntity = new Qt3DCore::QEntity();
 
-//            sourceSphere = new Qt3DRender::QSphereMesh();
+//            sourceSphere = new Qt3DExtras::QSphereMesh();
 //            sourceSphere->setRadius(0.001f);
 //            sourceSphereEntity->addComponent(sourceSphere);
 
@@ -198,7 +198,7 @@ bool BrainSourceSpaceTreeItem::addData(const MNEHemisphere& tHemisphere, Qt3DCor
 //            transform->setMatrix(m);
 //            sourceSphereEntity->addComponent(transform);
 
-//            material = new Qt3DRender::QPhongMaterial();
+//            material = new Qt3DExtras::QPhongMaterial();
 //            material->setAmbient(Qt::yellow);
 //            sourceSphereEntity->addComponent(material);
 

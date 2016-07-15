@@ -332,7 +332,8 @@ void RtSss::run()
 
 //    qDebug()<< exclude ;
 
-    RowVectorXi pickedChannels = m_pFiffInfo->pick_types("mag",false, false, QStringList(),exclude);
+    QString chType("mag");
+    RowVectorXi pickedChannels = m_pFiffInfo->pick_types(chType,false, false, QStringList(),exclude);
     qDebug()<< "finished pickedChannels";
     qint32 nmegchanused = pickedChannels.cols();
 

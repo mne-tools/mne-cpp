@@ -96,6 +96,12 @@ class UTILSSHARED_EXPORT Atom// Atom class to build and call atoms or their para
     // Q_OBJECT
 public:
 
+    explicit Atom()
+    : sample_count(0)
+    , energy(0)
+    , max_scalar_product(0)
+    , bm_channel(0) {}
+
     qint32 sample_count;
     qreal energy;
     qreal max_scalar_product;

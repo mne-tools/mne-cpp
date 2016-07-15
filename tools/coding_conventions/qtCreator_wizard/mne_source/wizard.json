@@ -1,0 +1,40 @@
+{
+    "version": 1,
+    "supportedProjectTypes": [ ],
+    "id": "B.MNECPPSource",
+    "category": "O.MNECPP",
+    "trDescription": "Creates a MNE-CPP source file.",
+    "trDisplayName": "MNE-CPP Source File",
+    "trDisplayCategory": "MNE-CPP",
+    "icon": "../../global/genericfilewizard.png",
+    "enabled": "%{JS: [ %{Plugins} ].indexOf('CppEditor') >= 0}",
+
+    "options": { "key": "FileName", "value": "%{JS: Cpp.fileName('%{TargetPath}', '%{JS: Util.preferredSuffix('text/x-c++src')}')}" },
+
+    "pages" :
+    [
+        {
+            "trDisplayName": "Location",
+            "trShortTitle": "Location",
+            "typeId": "File"
+        },
+        {
+            "trDisplayName": "Project Management",
+            "trShortTitle": "Summary",
+            "typeId": "Summary"
+        }
+    ],
+    "generators" :
+    [
+        {
+            "typeId": "File",
+            "data":
+            {
+                "source": "../mne_templates/templateclass.cpp",
+                "target": "%{FileName}",
+                "openInEditor": true,
+                "options": { "key": "Cpp:License:FileName", "value": "%{JS: Util.completeBaseName('%{FileName}')}" }
+            }
+        }
+    ]
+}
