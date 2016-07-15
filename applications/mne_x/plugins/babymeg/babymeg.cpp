@@ -852,7 +852,11 @@ void BabyMEG::run()
             //pop matrix
             matValue = m_pRawMatrixBuffer->pop();
 
-            //updateHPI();
+            //Update and write the HPI information to the current data block
+            QTime timer;
+            timer.start();
+            updateHPI();
+            qDebug() << "BabyMEG::run() - updateHPI() timing" << timer.elapsed() << "msecs";
 
             //Write raw data to fif file
             if(m_bWriteToFile)
