@@ -42,8 +42,7 @@ SUBDIRS += \
 
 !contains(MNECPP_CONFIG, minimalVersion) {
     SUBDIRS += \
-        mne_x_libs \
-        mne_x \
+        mne_scan \
         mne_browse
 
     !contains(MNECPP_CONFIG, coverity) {
