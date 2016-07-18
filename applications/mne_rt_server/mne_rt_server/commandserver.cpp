@@ -75,6 +75,7 @@ using namespace RTSERVER;
 CommandServer::CommandServer(QObject *parent)
 : QTcpServer(parent)
 , m_iThreadCount(0)
+, m_iCurrentCommandThreadID(0)
 {
     QObject::connect(&m_commandParser, &CommandParser::response, this, &CommandServer::prepareReply);
 }

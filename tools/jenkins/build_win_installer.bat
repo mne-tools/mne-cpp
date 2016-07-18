@@ -36,34 +36,34 @@ xcopy "..\mne-cpp\bin\*.dll" "..\mne-cpp\tools\ifw_installer\windows\packages\or
 ::xcopy "..\mne-cpp\bin\vcredist_x86.exe" "..\mne-cpp\tools\ifw_installer\windows\packages\org.mne_cpp.suite\data" /y
 xcopy "..\mne-cpp\bin\vcredist_x64.exe" "..\mne-cpp\tools\ifw_installer\windows\packages\org.mne_cpp.suite\data" /y
 
-:: -MNE-X-
-rmdir "..\mne-cpp\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_x\data" /s /q
-mkdir -p "..\mne-cpp\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_x\data"
-::mne_x
-xcopy "..\mne-cpp\bin\mne_x.exe" "..\mne-cpp\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_x\data" /y
-xcopy "..\mne-cpp\bin\xShared.dll" "..\mne-cpp\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_x\data" /y
-xcopy "..\mne-cpp\bin\xDisp.dll" "..\mne-cpp\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_x\data" /y
-xcopy "..\mne-cpp\bin\xMeas.dll" "..\mne-cpp\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_x\data" /y
-::mne_x libs
-mkdir -p "..\mne-cpp\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_x\data\mne_x_libs"
-xcopy "..\mne-cpp\bin\mne_x_libs" "..\mne-cpp\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_x\data\mne_x_libs" /s /e /y
-::mne_x plugins
-mkdir -p "..\mne-cpp\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_x\data\mne_x_plugins"
-xcopy "..\mne-cpp\bin\mne_x_plugins" "..\mne-cpp\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_x\data\mne_x_plugins" /s /e /y
+:: -MNE Scan-
+rmdir "..\mne-cpp\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_scan\data" /s /q
+mkdir -p "..\mne-cpp\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_scan\data"
+::mne_scan
+xcopy "..\mne-cpp\bin\mne_scan.exe" "..\mne-cpp\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_scan\data" /y
+xcopy "..\mne-cpp\bin\xShared.dll" "..\mne-cpp\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_scan\data" /y
+xcopy "..\mne-cpp\bin\xDisp.dll" "..\mne-cpp\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_scan\data" /y
+xcopy "..\mne-cpp\bin\xMeas.dll" "..\mne-cpp\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_scan\data" /y
+::mne_scan libs
+mkdir -p "..\mne-cpp\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_scan\data\mne_scan_libs"
+xcopy "..\mne-cpp\bin\mne_scan_libs" "..\mne-cpp\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_scan\data\mne_scan_libs" /s /e /y
+::mne_scan plugins
+mkdir -p "..\mne-cpp\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_scan\data\mne_scan_plugins"
+xcopy "..\mne-cpp\bin\mne_scan_plugins" "..\mne-cpp\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_scan\data\mne_scan_plugins" /s /e /y
 ::mne_rt_server
-xcopy "..\mne-cpp\bin\mne_rt_server.exe" "..\mne-cpp\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_x\data" /y
-mkdir -p "..\mne-cpp\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_x\data\mne_rt_server_plugins"
-xcopy "..\mne-cpp\bin\mne_rt_server_plugins" "..\mne-cpp\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_x\data\mne_rt_server_plugins" /s /e /y
+xcopy "..\mne-cpp\bin\mne_rt_server.exe" "..\mne-cpp\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_scan\data" /y
+mkdir -p "..\mne-cpp\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_scan\data\mne_rt_server_plugins"
+xcopy "..\mne-cpp\bin\mne_rt_server_plugins" "..\mne-cpp\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_scan\data\mne_rt_server_plugins" /s /e /y
 
-:: -MNE Browse Raw Qt-
-rmdir "..\mne-cpp\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_browse_raw_qt\data" /s /q
-mkdir -p "..\mne-cpp\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_browse_raw_qt\data"
-xcopy "..\mne-cpp\bin\mne_browse_raw_qt.exe" "..\mne-cpp\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_browse_raw_qt\data" /y
+:: -MNE Browse-
+rmdir "..\mne-cpp\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_browse\data" /s /q
+mkdir -p "..\mne-cpp\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_browse\data"
+xcopy "..\mne-cpp\bin\mne_browse.exe" "..\mne-cpp\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_browse\data" /y
 
-:: -MNE Analyze Qt-
-rmdir "..\mne-cpp\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_analyze_qt\data" /s /q
-mkdir -p "..\mne-cpp\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_analyze_qt\data"
-xcopy "..\mne-cpp\bin\mne_analyze_qt.exe" "..\mne-cpp\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_analyze_qt\data" /y
+:: -MNE Analyze-
+rmdir "..\mne-cpp\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_analyze\data" /s /q
+mkdir -p "..\mne-cpp\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_analyze\data"
+xcopy "..\mne-cpp\bin\mne_analyze.exe" "..\mne-cpp\tools\ifw_installer\windows\packages\org.mne_cpp.suite.mne_analyze\data" /y
 
 
 :: Build Installer

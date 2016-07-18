@@ -69,6 +69,7 @@ FilterPlotScene::FilterPlotScene(QGraphicsView *view, QObject *parent)
 , m_iCutOffLow(5)
 , m_iCutOffHigh(40)
 , m_iCutOffMarkerWidth(3)
+, m_iPlotLength(0)
 {
 }
 
@@ -142,7 +143,7 @@ void FilterPlotScene::plotMagnitudeDiagram(int samplingFreq, QString filtername)
 
     //VERTICAL
     //Draw vertical lines
-    double length = double(numberCoeff) / (m_iNumberVerticalLines+1);
+    double length = double(numberCoeff) / double(m_iNumberVerticalLines+1);
     for(int i = 1; i<=m_iNumberVerticalLines; i++)
         addLine(i*length - m_iDiagramMarginsHoriz,
                 -m_iDiagramMarginsVert,

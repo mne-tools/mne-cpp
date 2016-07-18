@@ -84,6 +84,9 @@ RtHPIS::RtHPIS(FiffInfo::SPtr p_pFiffInfo, QObject *parent)
 : QThread(parent)
 , m_pFiffInfo(p_pFiffInfo)
 , m_bIsRunning(false)
+, m_iMaxSamples(0)
+, m_iNewMaxSamples(0)
+, simplex_numitr(0)
 {
     qRegisterMetaType<Eigen::MatrixXd>("Eigen::MatrixXd");
     //qRegisterMetaType<QVector<double>>("QVector<double>");
@@ -490,7 +493,7 @@ void RtHPIS::run()
 
 /*********************************************************************************
  * dipfit function is adapted from Fieldtrip Software. It has been
- * heavily edited for use with MNE-X Software
+ * heavily edited for use with MNE Scan Software
  *********************************************************************************/
 
 coilParam RtHPIS::dipfit(struct coilParam coil, struct sens sensors, Eigen::MatrixXd data, int numCoils)

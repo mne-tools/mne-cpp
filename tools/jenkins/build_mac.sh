@@ -11,7 +11,7 @@ cd mne-cpp_shadow_build
 QT_BIN_DIR='/Users/Shared/Jenkins/Qt5.7.0/5.7/clang_64/bin'
 QT_LIB_DIR='/Users/Shared/Jenkins/Qt5.7.0/5.7/clang_64/lib'
 
-TANGIBLES=(mne_x mne_browse_raw_qt mne_analyze_qt)
+TANGIBLES=(mne_scan mne_browse mne_analyze)
 
 PATH=$QT_BIN_DIR:$PATH
 export PATH
