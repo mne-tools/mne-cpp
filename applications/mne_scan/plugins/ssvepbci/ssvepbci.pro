@@ -1,15 +1,16 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     eegosports.pro
-# @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+# @file     ssvepbci.pro
+# @author   Viktor Klüber <viktor.klueber@tu-ilmenau.de>
+#           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 #           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
-# @date     July, 2014
+# @date     May, 2016
 #
 # @section  LICENSE
 #
-# Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+# Copyright (C) 2013, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -17,12 +18,12 @@
 #       following disclaimer.
 #     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 #       the following disclaimer in the documentation and/or other materials provided with the distribution.
-#     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
+#     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
 #       to endorse or promote products derived from this software without specific prior written permission.
 #
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 # WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-# PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+# PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
 # INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 # PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 # HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -30,7 +31,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file generates the makefile for the eegosports plug-in.
+# @brief    This project file generates the makefile for the ssvepbci-plugin.
 #
 #--------------------------------------------------------------------------------------------------------------
 
@@ -40,11 +41,12 @@ TEMPLATE = lib
 
 CONFIG += plugin
 
-DEFINES += EEGOSPORTS_LIBRARY
+DEFINES += SSVEPBCI_LIBRARY
 
-QT += core widgets svg
+QT += core widgets concurrent gui multimedia
 
-TARGET = EEGoSports
+
+TARGET = bci
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
@@ -54,7 +56,7 @@ CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
             -lMNE$${MNE_LIB_VERSION}Utilsd \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
-            -lMNE$${MNE_LIB_VERSION}Dispd \
+            -lMNE$${MNE_LIB_VERSION}Mned \
             -lscMeasd \
             -lscDispd \
             -lscSharedd
@@ -63,7 +65,7 @@ else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
             -lMNE$${MNE_LIB_VERSION}Utils \
             -lMNE$${MNE_LIB_VERSION}Fiff \
-            -lMNE$${MNE_LIB_VERSION}Disp \
+            -lMNE$${MNE_LIB_VERSION}Mne \
             -lscMeas \
             -lscDisp \
             -lscShared
@@ -72,54 +74,54 @@ else {
 DESTDIR = $${MNE_BINARY_DIR}/mne_x_plugins
 
 SOURCES += \
-        eegosports.cpp \
-        eegosportsproducer.cpp \
-        FormFiles/eegosportssetupwidget.cpp \
-        FormFiles/eegosportsaboutwidget.cpp \
-        eegosportsdriver.cpp \
-        FormFiles/eegosportssetupprojectwidget.cpp \
-        FormFiles/eegosportssetupstimuluswidget.cpp \
-        flashobject.cpp \
-    FormFiles/ssvepbciflickeringitem.cpp \
-    FormFiles/ssvepbciscreen.cpp \
-    FormFiles/ssvepbcisetupstimuluswidget.cpp
+        ssvepbci.cpp \
+        FormFiles/ssvepbciwidget.cpp \
+        FormFiles/ssvepbciaboutwidget.cpp \
+        FormFiles/ssvepbcisetupstimuluswidget.cpp \
+        ssvepbciscreen.cpp \
+        ssvepbciflickeringitem.cpp \
+        FormFiles/ssvepbciconfigurationwidget.cpp \
+        screenkeyboard.cpp
+
 
 HEADERS += \
-        eegosports.h\
-        eegosports_global.h \
-        eegosportsproducer.h \
-        FormFiles/eegosportssetupwidget.h \
-        FormFiles/eegosportsaboutwidget.h \
-        eegosportsdriver.h \
-        FormFiles/eegosportssetupprojectwidget.h \
-        FormFiles/eegosportssetupstimuluswidget.h \
-        flashobject.h \
-    FormFiles/ssvepbciflickeringitem.h \
-    FormFiles/ssvepbciscreen.h \
-    FormFiles/ssvepbcisetupstimuluswidget.h
+        ssvepbci.h\
+        ssvepbci_global.h \
+        FormFiles/ssvepbciwidget.h \
+        FormFiles/ssvepbciaboutwidget.h \
+        FormFiles/ssvepbcisetupstimuluswidget.h \
+        ssvepbciscreen.h \
+        ssvepbciflickeringitem.h \
+        FormFiles/ssvepbciconfigurationwidget.h \
+        screenkeyboard.h
 
 FORMS += \
-        FormFiles/eegosportssetup.ui \
-        FormFiles/eegosportsabout.ui \
-        FormFiles/eegosportssetupprojectwidget.ui \
-        FormFiles/eegosportssetupstimuluswidget.ui \
-    FormFiles/ssvepbcisetupstimuluswidget.ui
+        FormFiles/ssvepbciwidget.ui \
+        FormFiles/ssvepbcisetupstimuluswidget.ui \
+        FormFiles/ssvepbciaboutwidget.ui \
+        FormFiles/ssvepbciconfigurationwidget.ui \
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_SCAN_INCLUDE_DIR}
 
-OTHER_FILES += eegosports.json
+unix:!macx {
+    QMAKE_CXXFLAGS += -std=c++0x
+    QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
+
+    # suppress visibility warnings
+    QMAKE_CXXFLAGS += -Wno-attributes
+}
+macx {
+    QMAKE_CXXFLAGS = -mmacosx-version-min=10.7 -std=gnu0x -stdlib=libc+
+    CONFIG +=c++11
+}
+
+OTHER_FILES += ssvepbci.json
 
 # Put generated form headers into the origin --> cause other src is pointing at them
 UI_DIR = $${PWD}
 
-unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
-
-# suppress visibility warnings
-unix: QMAKE_CXXFLAGS += -Wno-attributes
 
 RESOURCES += \
-    eegosports.qrc
-
-DISTFILES +=
+        ssvepbci.qrc
