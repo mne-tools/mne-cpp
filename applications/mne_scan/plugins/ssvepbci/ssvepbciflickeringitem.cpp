@@ -132,7 +132,7 @@ void ssvepBCIFlickeringItem::paint(QPaintDevice *paintDevice)
 
     QRect rectangle(m_dPosX*paintDevice->width(),m_dPosY*paintDevice->height(),m_dWidth*paintDevice->width(),m_dHeight*paintDevice->height());
 
-    if(m_bFlickerState){
+    if(true){
         p.fillRect(rectangle,Qt::white);
         p.drawText(rectangle, Qt::AlignCenter, m_sSign);
     }

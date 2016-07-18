@@ -71,7 +71,7 @@ else {
             -lscShared
 }
 
-DESTDIR = $${MNE_BINARY_DIR}/mne_x_plugins
+DESTDIR = $${MNE_BINARY_DIR}/mne_scan_plugins
 
 SOURCES += \
         ssvepbci.cpp \
