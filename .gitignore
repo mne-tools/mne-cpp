@@ -1,4 +1,4 @@
-/bin/mne_analyze_qt
+/bin/mne_analyze
 /bin/disp3DTutorial
 /bin/fsSurface
 /bin/makeLayout
@@ -86,30 +86,30 @@
 /lib/libMNE1Utilsd.so.1
 /lib/libMNE1Utilsd.so.1.0
 /lib/libMNE1Utilsd.so.1.0.0
-/lib/libmne_x.so.1
-/lib/libmne_x.so.1.0
-/lib/libmne_x.so.1.0.0
-/lib/libmne_xd.so.1
-/lib/libmne_xd.so.1.0
-/lib/libmne_xd.so.1.0.0
-/lib/libxDisp.so.1
-/lib/libxDisp.so.1.0
-/lib/libxDisp.so.1.0.0
-/lib/libxDispd.so.1
-/lib/libxDispd.so.1.0
-/lib/libxDispd.so.1.0.0
-/lib/libxDtMng.so.1
-/lib/libxDtMng.so.1.0
-/lib/libxDtMng.so.1.0.0
-/lib/libxDtMngd.so.1
-/lib/libxDtMngd.so.1.0
-/lib/libxDtMngd.so.1.0.0
-/lib/libxMeas.so.1
-/lib/libxMeas.so.1.0
-/lib/libxMeas.so.1.0.0
-/lib/libxMeasd.so.1
-/lib/libxMeasd.so.1.0
-/lib/libxMeasd.so.1.0.0
+/lib/libmne_scan.so.1
+/lib/libmne_scan.so.1.0
+/lib/libmne_scan.so.1.0.0
+/lib/libmne_scand.so.1
+/lib/libmne_scand.so.1.0
+/lib/libmne_scand.so.1.0.0
+/lib/libscDisp.so.1
+/lib/libscDisp.so.1.0
+/lib/libscDisp.so.1.0.0
+/lib/libscDispd.so.1
+/lib/libscDispd.so.1.0
+/lib/libscDispd.so.1.0.0
+/lib/libscShared.so.1
+/lib/libscShared.so.1.0
+/lib/libscShared.so.1.0.0
+/lib/libscSharedd.so.1
+/lib/libscSharedd.so.1.0
+/lib/libscSharedd.so.1.0.0
+/lib/libscMeas.so.1
+/lib/libscMeas.so.1.0
+/lib/libscMeas.so.1.0.0
+/lib/libscMeasd.so.1
+/lib/libscMeasd.so.1.0
+/lib/libscMeasd.so.1.0.0
 /.gitignore~
 /bin/readEpochs
 /bin/computeInverse
@@ -138,8 +138,8 @@
 /bin/makeInverseOperatord
 /bin/mne_3d_widget
 /bin/mne_3d_widgetd
-/bin/mne_browse_raw_qt
-/bin/mne_browse_raw_qtd
+/bin/mne_browse
+/bin/mne_browsed
 /bin/mne_future_test
 /bin/mne_future_testd
 /bin/mne_graph_test
@@ -147,8 +147,8 @@
 /bin/mne_lib_testsd
 /bin/mne_rt_serverd
 /bin/mne_rt_testsd
-/bin/mne_x
-/bin/mne_xd
+/bin/mne_scan
+/bin/mne_scand
 /bin/mne_viewer
 /bin/mne_viewerd
 /bin/mne_viewer_parent
@@ -258,27 +258,27 @@ ui_*.h
 
 /bin/mne_rt_server_plugins/*.pdb
 
-/bin/mne_x_plugins/*.dll
+/bin/mne_scan_plugins/*.dll
 
-/bin/mne_x_plugins/*.manifest
+/bin/mne_scan_plugins/*.manifest
 
-/bin/mne_x_plugins/*.lib
+/bin/mne_scan_plugins/*.lib
 
-/bin/mne_x_plugins/*.exp
+/bin/mne_scan_plugins/*.exp
 
-/bin/mne_x_plugins/*.rc
+/bin/mne_scan_plugins/*.rc
 
-/bin/mne_x_plugins/*.res
+/bin/mne_scan_plugins/*.res
 
-/bin/mne_x_plugins/*.ilk
-/bin/mne_x_plugins/*.pdb
-/bin/mne_x_plugins/mne_rt_server_plugins/*.dll
+/bin/mne_scan_plugins/*.ilk
+/bin/mne_scan_plugins/*.pdb
+/bin/mne_scan_plugins/mne_rt_server_plugins/*.dll
 
-/bin/mne_x_plugins/mne_rt_server_plugins/*.manifest
+/bin/mne_scan_plugins/mne_rt_server_plugins/*.manifest
 
-/bin/mne_x_plugins/mne_rt_server_plugins/*.exp
+/bin/mne_scan_plugins/mne_rt_server_plugins/*.exp
 
-/bin/mne_x_plugins/mne_rt_server_plugins/*.lib
+/bin/mne_scan_plugins/mne_rt_server_plugins/*.lib
 
 /bin/*.fif
 
@@ -310,17 +310,17 @@ bin/plotSurfaces
 
 bin/readFwdDisp3D
 
-bin/mne_x.app/Contents/MacOS/mne_x
+bin/mne_scan.app/Contents/MacOS/mne_scan
 
-bin/mne_x.app/Contents/PkgInfo
+bin/mne_scan.app/Contents/PkgInfo
 
 bin/.DS_Store
 
 /bin/stc.dat
 
-/applications/mne_x/*.user
+/applications/mne_scan/*.user
 
-/applications/mne_x/plugins/tmsi/*.dll
+/applications/mne_scan/plugins/tmsi/*.dll
 
 .directory
 .~lock*
@@ -328,10 +328,10 @@ bin/.DS_Store
 
 .DS_Store
 
-bin/mne_browse_raw_qt.app/Contents/MacOS/mne_browse_raw_qt
+bin/mne_browse.app/Contents/MacOS/mne_browse
 
-bin/mne_browse_raw_qt.app/Contents/PkgInfo
-/bin/mne_x_plugins/resources/tmsi/*.fif
+bin/mne_browse.app/Contents/PkgInfo
+/bin/mne_scan_plugins/resources/tmsi/*.fif
 /bin/*.stc
 /examples/rawClusteredInversePwlRapMusic/*.user
 /bin/ClusterInfoLH.txt
@@ -365,8 +365,8 @@ bin/mne_browse_raw_qt.app/Contents/PkgInfo
 /bin/test_mne_rtd
 /bin/test_mne_stcd
 /bin/test_mne_surfaced
-/bin/mne_x_default.xml
-/bin/mne_x_plugins/resources/babymeg/ERio_P8.fif.gz
+/bin/mne_scan_default.xml
+/bin/mne_scan_plugins/resources/babymeg/ERio_P8.fif.gz
 lib
 /examples/readBEM/*.user
 /bin/iconengines/*.dll
@@ -378,11 +378,11 @@ lib
 /bin/bearer/qnativewifibearer.dll
 /tools/ifw_installer/windows/*.user
 /tools/ifw_installer/windows/packages/org.mne_cpp.suite.mne/data
-/tools/ifw_installer/windows/packages/org.mne_cpp.suite.mne_browse_raw_qt/data
+/tools/ifw_installer/windows/packages/org.mne_cpp.suite.mne_browse/data
 /tools/ifw_installer/build-windows-Qt_5_6_0_MSVC2015_64bit-Release
 /tools/ifw_installer/build-windows-Desktop_Qt_5_6_0_MSVC2013_64bit-Release
 /bin/MNE-test-data
-/tools/ifw_installer/windows/packages/org.mne_cpp.suite.mne_analyze_qt/data
-/tools/ifw_installer/windows/packages/org.mne_cpp.suite.mne_x/data
+/tools/ifw_installer/windows/packages/org.mne_cpp.suite.mne_analyze/data
+/tools/ifw_installer/windows/packages/org.mne_cpp.suite.mne_scan/data
 /tools/ifw_installer/windows/packages/org.mne_cpp.suite/data
 /bin/bearer

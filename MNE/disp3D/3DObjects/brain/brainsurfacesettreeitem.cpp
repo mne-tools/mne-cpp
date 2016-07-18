@@ -203,15 +203,15 @@ bool BrainSurfaceSetTreeItem::addData(const Surface& tSurface, const Annotation&
 
     //Search for already created hemi items and add source space data respectivley
     for(int j = 0; j<itemList.size(); j++) {
-        BrainHemisphereTreeItem* pHemiItem = dynamic_cast<BrainHemisphereTreeItem*>(itemList.at(j));
+        if(BrainHemisphereTreeItem* pHemiItem = dynamic_cast<BrainHemisphereTreeItem*>(itemList.at(j))) {
+            if(pHemiItem->data(Data3DTreeModelItemRoles::SurfaceHemi).toInt() == tSurface.hemi()) {
+                hemiItemFound = true;
 
-        if(pHemiItem->data(Data3DTreeModelItemRoles::SurfaceHemi).toInt() == tSurface.hemi()) {
-            hemiItemFound = true;
-
-            if(tAnnotation.hemi() == tSurface.hemi()) {
-                state = pHemiItem->addData(tSurface, tAnnotation, p3DEntityParent);
-            } else {
-                state = pHemiItem->addData(tSurface, Annotation(), p3DEntityParent);
+                if(tAnnotation.hemi() == tSurface.hemi()) {
+                    state = pHemiItem->addData(tSurface, tAnnotation, p3DEntityParent);
+                } else {
+                    state = pHemiItem->addData(tSurface, Annotation(), p3DEntityParent);
+                }
             }
         }
     }
@@ -254,11 +254,11 @@ bool BrainSurfaceSetTreeItem::addData(const MNESourceSpace& tSourceSpace, Qt3DCo
     //Search for already created hemi items and add source space data respectivley
     for(int i = 0; i < tSourceSpace.size(); i++) {
         for(int j = 0; j<itemList.size(); j++) {
-            BrainHemisphereTreeItem* pHemiItem = dynamic_cast<BrainHemisphereTreeItem*>(itemList.at(j));
-
-            if(pHemiItem->data(Data3DTreeModelItemRoles::SurfaceHemi).toInt() == i) {
-                hemiItemFound = true;
-                state = pHemiItem->addData(tSourceSpace[i], p3DEntityParent);
+            if(BrainHemisphereTreeItem* pHemiItem = dynamic_cast<BrainHemisphereTreeItem*>(itemList.at(j))) {
+                if(pHemiItem->data(Data3DTreeModelItemRoles::SurfaceHemi).toInt() == i) {
+                    hemiItemFound = true;
+                    state = pHemiItem->addData(tSourceSpace[i], p3DEntityParent);
+                }
             }
         }
 

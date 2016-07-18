@@ -89,9 +89,9 @@ int main(int argc, char *argv[])
     testWindow->addBrainData("Subject01", "ForwardSolution", t_forwardSolution);
 
     //Option 2 - Visualize clustered source space
-    //AnnotationSet t_annotationSet ("sample", 2, "aparc.a2009s", "./MNE-sample-data/subjects");
-    //MNEForwardSolution t_clusteredFwd = t_forwardSolution.cluster_forward_solution(t_annotationSet, 40);
-    //testWindow->addBrainData("ForwardSolution", t_clusteredFwd);
+//    AnnotationSet t_annotationSet ("sample", 2, "aparc.a2009s", "./MNE-sample-data/subjects");
+//    MNEForwardSolution t_clusteredFwd = t_forwardSolution.cluster_forward_solution(t_annotationSet, 40);
+//    testWindow->addBrainData("Subject01", "ForwardSolution", t_clusteredFwd);
 
     testWindow->show();
     Control3DWidget::SPtr control3DWidget = Control3DWidget::SPtr(new Control3DWidget());

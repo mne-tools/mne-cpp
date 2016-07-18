@@ -177,9 +177,11 @@ QVariant FilterDataModel::headerData(int section, Qt::Orientation orientation, i
 
 QVariant FilterDataModel::data(const QModelIndex &index, int role) const
 {
-    if(role!=Qt::DisplayRole || role!=Qt::TextAlignmentRole)
-        if(role<Qt::UserRole + 1009 && role > Qt::UserRole + 1019)
+    if(role != Qt::DisplayRole && role != Qt::TextAlignmentRole) {
+        if(role<Qt::UserRole + 1009 && role > Qt::UserRole + 1019) {
             return QVariant();
+        }
+    }
 
     if(index.row() >= m_filterData.size() || index.column()>=columnCount())
         return QVariant();
@@ -314,14 +316,14 @@ QVariant FilterDataModel::data(const QModelIndex &index, int role) const
         }//end column check
 
         //******** seventh column (Filter data) ********
-        if(index.column()==7 && FilterDataModelRoles::GetFilter) {
+        if(index.column()==7 && role == FilterDataModelRoles::GetFilter) {
             QVariant v;
             v.setValue(m_filterData.at(index.row()));
             return v;
         }//end column check
 
         //******** eigth column (Active Filters) ********
-        if(index.column()==8 && FilterDataModelRoles::GetActiveFilters) {
+        if(index.column()==8 && role == FilterDataModelRoles::GetActiveFilters) {
             QVariant v;
 
             QList<FilterData> activeFilters;
@@ -334,7 +336,7 @@ QVariant FilterDataModel::data(const QModelIndex &index, int role) const
         }//end column check
 
         //******** ninth column (All Filters) ********
-        if(index.column()==9 && FilterDataModelRoles::GetAllFilters) {
+        if(index.column()==9 && role == FilterDataModelRoles::GetAllFilters) {
             QVariant v;
 
             v.setValue(m_filterData);
