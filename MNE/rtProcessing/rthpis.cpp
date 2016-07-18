@@ -110,7 +110,7 @@ RtHPIS::~RtHPIS()
 void RtHPIS::append(const MatrixXd &p_DataSegment)
 {
     if(!m_pRawMatrixBuffer)
-        m_pRawMatrixBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(80, p_DataSegment.rows(), p_DataSegment.cols()));
+        m_pRawMatrixBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(8, p_DataSegment.rows(), p_DataSegment.cols()));
 
     if (SendDataToBuffer)
         m_pRawMatrixBuffer->push(&p_DataSegment);
@@ -319,6 +319,7 @@ void RtHPIS::run()
     QElapsedTimer timerTransMulti;
     QElapsedTimer timerPhase;
     QElapsedTimer timerDipFit;
+
     QElapsedTimer timerCompTrans;
 
     while(m_bIsRunning)
@@ -431,8 +432,6 @@ void RtHPIS::run()
 //                        }
                 }
 
-                coil = dipfit(coil, sensors, amp, numCoils);
-
                 itimerPhase = timerPhase.elapsed();
 
 //                    coil.pos(0,0) = 22; coil.pos(0,1) = 60; coil.pos(0,2) = 20;
@@ -445,6 +444,8 @@ void RtHPIS::run()
 //                    coil.pos(3,0) = 0; coil.pos(3,1) = 0; coil.pos(3,2) = 0;
 
                 timerDipFit.start();
+
+                //coil.pos = Eigen::MatrixXd::Zero(numCoils,3);
                 coil = dipfit(coil, sensors, amp, numCoils);
                 itimerDipFit = timerDipFit.elapsed();
 
@@ -505,14 +506,16 @@ void RtHPIS::run()
                 buffer.clear();
             }
 
-            qDebug() << "RtHPIS::run() - timerAll" << timerAll.elapsed() << "milliseconds";
-            qDebug() << "RtHPIS::run() - itimerMatAlloc" << timerMatAlloc.elapsed() << "milliseconds";
-            qDebug() << "RtHPIS::run() - itimerLocCoils" << timerLocCoils.elapsed() << "milliseconds";
-            qDebug() << "RtHPIS::run() - itimerTransMulti" << timerTransMulti.elapsed() << "milliseconds";
-            qDebug() << "RtHPIS::run() - itimerPhase" << timerPhase.elapsed() << "milliseconds";
-            qDebug() << "RtHPIS::run() - itimerDipFit" << timerDipFit.elapsed() << "milliseconds";
-            qDebug() << "RtHPIS::run() - itimerCompTrans" << timerCompTrans.elapsed() << "milliseconds";
-            qDebug() << "RtHPIS::run() - itimerBufFull" << timerBufFull.elapsed() << "milliseconds";
+            qDebug() << "";
+            qDebug() << "RtHPIS::run() - All" << timerAll.elapsed() << "milliseconds";
+            qDebug() << "";
+            qDebug() << "RtHPIS::run() - itimerMatAlloc" << itimerMatAlloc << "milliseconds";
+            qDebug() << "RtHPIS::run() - itimerLocCoils" << itimerLocCoils << "milliseconds";
+            qDebug() << "RtHPIS::run() - itimerTransMulti" << itimerTransMulti << "milliseconds";
+            qDebug() << "RtHPIS::run() - itimerPhase" << itimerPhase << "milliseconds";
+            qDebug() << "RtHPIS::run() - itimerDipFit" << itimerDipFit << "milliseconds";
+            qDebug() << "RtHPIS::run() - itimerCompTrans" << itimerCompTrans << "milliseconds";
+            qDebug() << "RtHPIS::run() - itimerBufFull" << itimerBufFull << "milliseconds";
 
         }//m_pRawMatrixBuffer
     }  //End of while statement
@@ -543,9 +546,6 @@ coilParam RtHPIS::dipfit(struct coilParam coil, struct sens sensors, Eigen::Matr
     // Initialize variables
     int display = 0;
     int maxiter = 100;
-    // Seok
-    //int maxiter = 500;
-
 
     dipError temp;
 
@@ -555,6 +555,7 @@ coilParam RtHPIS::dipfit(struct coilParam coil, struct sens sensors, Eigen::Matr
         coil.mom = temp.moment.transpose();
 
         // Seok
+        qDebug()<<"RtHPIS::dipfit - simplex_numitr"<<simplex_numitr<<"num coil"<<i;
 //        coil.dpfiterror(i) = temp.error;
 //        coil.dpfitnumitr(i) = simplex_numitr;
     }
@@ -756,13 +757,14 @@ Eigen::MatrixXd RtHPIS::fminsearch(Eigen::MatrixXd pos,int maxiter, int maxfun, 
         }
         v = v1;fv = fv1;
         itercount = itercount + 1;
+
     } // end of while loop
 //    }while(dipfitError(x, data, sensors).error > 0.1);
 
     x = v.col(0).transpose();
 
     // Seok
-    //simplex_numitr = itercount;
+    simplex_numitr = itercount;
 
     return x;
 }

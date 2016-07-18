@@ -244,7 +244,7 @@ private:
 //    MatrixXd CircBuf;
 
 public:
-    MatrixXd SpecData;
+    //MatrixXd SpecData;
     QMutex ReadMutex;
 
     bool SendDataToBuffer;
