@@ -130,6 +130,15 @@ public:
     */
     int getFreqKey(void);
 
+    //=========================================================================================================
+    /**
+    * The function adds a sign of the ASCII code into the item
+    *
+    * @param[in] sign  saved frequency key
+    *
+    */
+    void addSign(QString sign);
+
 private:
     double m_dPosX;                         /**< realtive vertical position according to screen size; [0..1] */
     double m_dPosY;                         /**< realtive horizontal position according to screen size; [0..1] */
@@ -139,6 +148,9 @@ private:
     QList<bool>         m_bRenderOrder;     /**< render order of the Item */
     QListIterator<bool> m_bIter;            /**< Iterator of the m_bRenderOrder list */
     bool                m_bFlickerState;    /**< actual Flickerstate [0] paint black [1] paint white */
+    bool                m_bSignFlag;        /**< flag for an item attached sign */
+    QString             m_sSign;            /**< item attached sign */
+    QFont               m_qFont;
 
 };
 

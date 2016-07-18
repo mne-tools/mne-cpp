@@ -123,7 +123,6 @@ ssvepBCIConfigurationWidget::ssvepBCIConfigurationWidget(ssvepBCI* pssvepBCI, QW
     connect(ui->m_DoubleSpinBox_Threshold4, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &ssvepBCIConfigurationWidget::thresholdChanged);
     connect(ui->m_DoubleSpinBox_Threshold5, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &ssvepBCIConfigurationWidget::thresholdChanged);
 
-
     // connect threshold values to BCI plugin
     connect(this, &ssvepBCIConfigurationWidget::getThresholdValues, m_pSSVEPBCI, &ssvepBCI::setThresholdValues);
 

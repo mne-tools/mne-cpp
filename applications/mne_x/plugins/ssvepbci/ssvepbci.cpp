@@ -738,7 +738,7 @@ void ssvepBCI::ssvepBCIOnSensor()
             ssvepProbabilities = m_dAlpha / ssvepProbabilities.sum() * ssvepProbabilities;
             ssvepProbabilities = ssvepProbabilities.array().exp();                          // softmax function for better distinguishability between the probabilities
             ssvepProbabilities = 1 / ssvepProbabilities.sum() * ssvepProbabilities;
-            cout << "probabilites:" << endl << ssvepProbabilities << endl;
+            //cout << "probabilites:" << endl << ssvepProbabilities << endl;
 
 //            // transfer values to MyQList and emit signal for GUI
 //            m_lSSVEPProbabilities.clear();
@@ -753,9 +753,9 @@ void ssvepBCI::ssvepBCIOnSensor()
 //            cout << "index:" << index << endl;
 //            qDebug() << "Thresholds: " << m_lThresholdValues;
             if(index < m_lDesFrequencies.size()){
-                qDebug()<< "index:" << index;
+                //qDebug()<< "index:" << index;
                 if(m_lThresholdValues[index] < maxProbability){
-                    qDebug() << "comparison: "<<  m_lThresholdValues[index] << "and" << maxProbability;
+                    //qDebug() << "comparison: "<<  m_lThresholdValues[index] << "and" << maxProbability;
                     m_lIndexOfClassResultSensor.append(index+1);
                     m_iCounter = -1;
                 }

@@ -70,7 +70,7 @@ ssvepBCISetupStimulusWidget::ssvepBCISetupStimulusWidget(ssvepBCI *pssvepBCI, QW
     m_pssvepBCIScreen = QSharedPointer<ssvepBCIScreen>(new ssvepBCIScreen(m_pssvepBCI));
     m_pScreen  =  QSharedPointer<QScreen>(QGuiApplication::screens()[1]); // specify which screen to use
     m_pssvepBCIScreen->move(m_pScreen->geometry().x(), m_pScreen->geometry().y());
-    m_pssvepBCIScreen->showFullScreen();
+    m_pssvepBCIScreen->showFullScreen(); // showFullScreen();
 
     // connect signal for frequency change
     connect(this, &ssvepBCISetupStimulusWidget::frequencyChanged, m_pssvepBCI.data(), &ssvepBCI::setChangeSSVEPParameterFlag);
@@ -175,6 +175,7 @@ void ssvepBCISetupStimulusWidget::on_pushButton_4_clicked()
     // TEST 3
     //clear  Items from screen
     clear();
+    m_pssvepBCIScreen->useScreenKeyboard(false);
 
     ssvepBCIFlickeringItem item1;
     ssvepBCIFlickeringItem item2;
@@ -208,6 +209,7 @@ void ssvepBCISetupStimulusWidget::on_pushButton_5_clicked()
     // TEST 1
     //clear  Items from screen
     clear();
+    m_pssvepBCIScreen->useScreenKeyboard(false);
 
     ssvepBCIFlickeringItem item1;
     //whole screen with 15 Hz
@@ -226,6 +228,7 @@ void ssvepBCISetupStimulusWidget::on_pushButton_6_clicked()
 
     //clear  Items from screen
     clear();
+    m_pssvepBCIScreen->useScreenKeyboard(false);
 
     ssvepBCIFlickeringItem item1;
     ssvepBCIFlickeringItem item2;
@@ -265,11 +268,48 @@ void ssvepBCISetupStimulusWidget::on_pushButton_6_clicked()
 
 void ssvepBCIPlugin::ssvepBCISetupStimulusWidget::on_pushButton_7_clicked()
 {
-    // TEST 4
+    // Screen Keyboard
     //clear  Items from screen
     clear();
 
-    m_pScreenKeyboard = QSharedPointer<ScreenKeyboard>(new ScreenKeyboard(m_pssvepBCIScreen));
+
+    ssvepBCIFlickeringItem item1;
+    ssvepBCIFlickeringItem item2;
+    ssvepBCIFlickeringItem item3;
+    ssvepBCIFlickeringItem item4;
+    ssvepBCIFlickeringItem item5;
+
+    //set frequencies
+    setFreq(item1,14);
+    setFreq(item2,12);
+    setFreq(item3,10);
+    setFreq(item4, 8);
+    setFreq(item5, 6);
+    //set dimensions and positions
+    item1.setDim(0.2,0.2);
+    item2.setDim(0.2,0.2);
+    item3.setDim(0.2,0.2);
+    item4.setDim(0.2,0.2);
+    item5.setDim(0.2,0.2);
+    item1.setPos(0.5-0.1,0);
+    item2.setPos(1-0.2,0.5-0.1);
+    item3.setPos(0.5-0.1,1-0.2);
+    item4.setPos(0,0.5-0.1);
+    item5.setPos(0,0);
+
+    item1.addSign("↑");
+    item2.addSign("→");
+    item3.addSign("↓");
+    item4.addSign("←");
+    item5.addSign("Select");
+
+    //add items to List
+    m_pssvepBCIScreen->m_Items <<item1<<item2<<item3<<item4<<item5 ;
+
+    changeComboBox();
+
+    m_pssvepBCIScreen->useScreenKeyboard(true);
+
 
 }
 
@@ -372,3 +412,5 @@ QList<double> ssvepBCISetupStimulusWidget::getFrequencies(){
 
     return freqList;
 }
+
+

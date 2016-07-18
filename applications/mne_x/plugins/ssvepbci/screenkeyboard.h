@@ -82,13 +82,36 @@ class ssvepBCIScreen;
 
 
 
-class ScreenKeyboard
+class ScreenKeyboard : public QObject
 {
+    Q_OBJECT
+
 public:
-    ScreenKeyboard(QSharedPointer<ssvepBCIScreen> pSSVEPBCIScreen);
+    ScreenKeyboard(QSharedPointer<ssvepBCI> pSSVEPBCI, QSharedPointer<ssvepBCIScreen> pSSVEPBCIScreen);
+
+    ~ScreenKeyboard();
+
+    //=========================================================================================================
+    /**
+    * painting keyboard update to the screen
+    *
+    */
+    void paint(QPaintDevice *device);
+
+signals:
+    void getLetter(QString letter);
+
+public slots:
+    void updateClassList(MyQList classList);
+    void updateCommand(double value);
 
 private:
+    QSharedPointer<ssvepBCI>                m_pSSVEPBCI;            /**< pointer to the ssvepBCI class */
     QSharedPointer<ssvepBCIScreen>          m_pSSVEPBCIScreen;      /**< holds the pointer to the ssvepBCIScreen class */
+    QPainter                                m_qPainter;             /**< Painter, holding paint device of ssvepBCIScreen class */
+    QMap<QPair<int, int>, QString>          m_mapKeys;              /**< QMap, holding the key-values and according coordinates */
+    QPair<int, int>                         m_qCursorCoord;          /**< current cursor coordinates */
+    QList<double>                           m_lClassList;           /**< list containing all displayed frequencies [Hz] */
 
 };
 
