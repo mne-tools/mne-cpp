@@ -53,7 +53,6 @@
 #include <QSpinBox>
 #include <QDoubleSpinBox>
 #include <QComboBox>
-#include <QDebug>
 #include <QPushButton>
 
 
@@ -270,8 +269,6 @@ void Data3DTreeDelegate::setEditorData(QWidget* editor, const QModelIndex& index
             Spline* pSpline = static_cast<Spline*>(editor);
             int width = pSpline->size().width();
             int height = pSpline->size().height();
-            qDebug()<< "width = " << width;
-            qDebug()<< "height = " << height;
             if (pSpline->size().width() < 200 && pSpline->size().height() < 200)   //pSpline initializes with size (137,15)
             {
                 pSpline->resize(800,600);   //resize histogram to be readable with default size
@@ -390,7 +387,6 @@ void Data3DTreeDelegate::setModelData(QWidget* editor, QAbstractItemModel* model
         }
 
         case MetaTreeItemTypes::RTDataNormalizationValue: {
-            //qDebug() << "MetaTreeItemTypes::RTDataNormalizationValue starts!";
             Spline* pSpline = static_cast<Spline*>(editor);
             QVector3D returnVector;
             returnVector = pSpline->getThreshold();

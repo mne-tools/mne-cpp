@@ -254,6 +254,7 @@ void Spline::setData(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matClassLimitDat
 template<typename T>
 void Spline::updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData, const Eigen::VectorXi& matClassFrequencyData, int iPrecisionValue)
 {
+    iPrecisionValue = 0; //precision is not used in spline class; only in bar class.
     Eigen::VectorXd resultDisplayValues;
     int iClassAmount = matClassFrequencyData.rows();
     this->splitCoefficientAndExponent (matClassLimitData, iClassAmount, resultDisplayValues, m_vecResultExponentValues);
