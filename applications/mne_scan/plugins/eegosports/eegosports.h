@@ -53,7 +53,7 @@
 #include <scMeas/newrealtimemultisamplearray.h>
 
 #include <utils/layoutloader.h>
-#include "utils/layoutmaker.h"
+#include <utils/layoutmaker.h>
 
 #include <unsupported/Eigen/FFT>
 #include <Eigen/Geometry>
@@ -123,7 +123,7 @@ class EEGoSportsProducer;
 class EEGOSPORTSSHARED_EXPORT EEGoSports : public ISensor
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "mne_x/1.0" FILE "eegosports.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    Q_PLUGIN_METADATA(IID "mne_scan/1.0" FILE "eegosports.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
     Q_INTERFACES(SCSHAREDLIB::ISensor)
 
