@@ -538,7 +538,7 @@ void RtHPIS::run()
 
 /*********************************************************************************
  * dipfit function is adapted from Fieldtrip Software. It has been
- * heavily edited for use with MNE-X Software
+ * heavily edited for use with MNE Scan Software
  *********************************************************************************/
 
 coilParam RtHPIS::dipfit(struct coilParam coil, struct sens sensors, Eigen::MatrixXd data, int numCoils)

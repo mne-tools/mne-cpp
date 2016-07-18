@@ -92,7 +92,7 @@ int main(int argc, char *argv[])
     parser.setApplicationDescription("Start disp3D tutorial");
     parser.addHelpOption();
     QCommandLineOption inputOption("in", "The input file <in>.", "in", "./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
-    //QCommandLineOption inputOption("in", "The input file <in>.", "in", "./mne_x_plugins/resources/tmsi/loc_files/standard_waveguard128.elc");
+    //QCommandLineOption inputOption("in", "The input file <in>.", "in", "./mne_scan_plugins/resources/tmsi/loc_files/standard_waveguard128.elc");
     QCommandLineOption chKindOption("coilType", "The coil type <out>.", "coilType", "3012"); // 3012 = FIFFV_COIL_VV_PLANAR_T1, use coil type instead of kind because this way we can distinguish between different layers (outer, inner, etc.), see fiff_constants for details FIFFV_REF_MEG_CH FIFFV_COIL_BABY_REF_MAG FIFFV_COIL_BABY_MAG
     QCommandLineOption outputOption("out", "The output file <out>.", "out", "makeLayout_default.lout");
     QCommandLineOption mirrorxOption("mirrorX", "Mirror final layout along x-axis <mirrorX>.", "mirrorX", "0");
