@@ -48,9 +48,9 @@
 
 #include "eegosports_global.h"
 
-#include <xShared/Interfaces/ISensor.h>
+#include <scShared/Interfaces/ISensor.h>
 #include <generics/circularmatrixbuffer.h>
-#include <xMeas/newrealtimemultisamplearray.h>
+#include <scMeas/newrealtimemultisamplearray.h>
 
 #include <utils/layoutloader.h>
 #include "utils/layoutmaker.h"
@@ -95,8 +95,8 @@ namespace EEGoSportsPlugin
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace XSHAREDLIB;
-using namespace XMEASLIB;
+using namespace SCSHAREDLIB;
+using namespace SCMEASLIB;
 using namespace IOBuffer;
 using namespace FIFFLIB;
 using namespace std;
@@ -123,7 +123,7 @@ class EEGOSPORTSSHARED_EXPORT EEGoSports : public ISensor
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "mne_x/1.0" FILE "eegosports.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(XSHAREDLIB::ISensor)
+    Q_INTERFACES(SCSHAREDLIB::ISensor)
 
     friend class EEGoSportsProducer;
     friend class EEGoSportsSetupWidget;
