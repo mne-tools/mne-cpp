@@ -46,9 +46,9 @@ MNE_INCLUDE_DIR = $$MNE_INCLUDE_DIR
 isEmpty( MNE_INCLUDE_DIR ) {
     MNE_INCLUDE_DIR = $${PWD}/MNE
 }
-MNE_X_INCLUDE_DIR = $$MNE_X_INCLUDE_DIR
-isEmpty( MNE_X_INCLUDE_DIR ) {
-    MNE_X_INCLUDE_DIR = $${PWD}/applications/mne_x_libs
+MNE_SCAN_INCLUDE_DIR = $$MNE_SCAN_INCLUDE_DIR
+isEmpty( MNE_SCAN_INCLUDE_DIR ) {
+    MNE_SCAN_INCLUDE_DIR = $${PWD}/applications/mne_scan/libs
 }
 # lib
 MNE_LIBRARY_DIR = $$MNE_LIBRARY_DIR
@@ -74,8 +74,8 @@ contains(MNECPP_CONFIG, coverity) {
     MNECPP_CONFIG += noExamples
 }
 
-## To build basic MNE-X version run: qmake MNECPP_CONFIG+=BuildBasicMNEXVersion
-#MNECPP_CONFIG += BuildBasicMNEXVersion
+## To build basic MNE-X version run: qmake MNECPP_CONFIG+=BuildBasicMNESCANVersion
+#MNECPP_CONFIG += BuildBasicMNESCANVersion
 
 ## Build MNE-CPP libraries as static libs
 #MNECPP_CONFIG += build_MNECPP_Static_Lib

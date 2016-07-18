@@ -44,9 +44,9 @@ OTHER_FILES = \
     packages/org.mne_cpp.suite/meta/package.xml \
     packages/org.mne_cpp.suite/meta/license_mne.txt \
     packages/org.mne_cpp.suite/meta/installscript.js \
-    packages/org.mne_cpp.suite.mne_x/meta/package.xml \
-    packages/org.mne_cpp.suite.mne_x/meta/license_mne-x.txt \
-    packages/org.mne_cpp.suite.mne_x/meta/installscript.qs \
+    packages/org.mne_cpp.suite.mne_scan/meta/package.xml \
+    packages/org.mne_cpp.suite.mne_scan/meta/license_mne-x.txt \
+    packages/org.mne_cpp.suite.mne_scan/meta/installscript.qs \
     packages/org.mne_cpp.suite.mne_browse/meta/package.xml \
     packages/org.mne_cpp.suite.mne_browse/meta/license_mne_browse.txt \
     packages/org.mne_cpp.suite.mne_browse/meta/installscript.qs \
