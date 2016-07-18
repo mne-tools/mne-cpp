@@ -44,6 +44,7 @@
 //=============================================================================================================
 
 #include "ssvepbciflickeringitem.h"
+#include "screenkeyboard.h"
 #include "ssvepbci.h"
 
 //*************************************************************************************************************
@@ -96,16 +97,26 @@ public:
      *
      */
     ssvepBCIScreen(QSharedPointer<ssvepBCI> pSSVEPBCI, QOpenGLWidget *parent = 0 );
+    //=========================================================================================================
+    /**
+     * deconstructs the ssvepBCIScreen object
+     *
+     */
+    ~ssvepBCIScreen();
 
 public slots:
     void setClassResults(double classResult);
     void updateFrequencyList(MyQList freqList);
+    void useScreenKeyboard(bool useKeyboard);
+
 
 private:
     QSharedPointer<ssvepBCI>        m_pSSVEPBCI;        /**< pointer to referring SSVEPBCI class */
 
-    // flickering items
+    // draw items
     QList<ssvepBCIFlickeringItem>   m_Items;            /**< QList containing all flickering Items to be painted */
+    ScreenKeyboard                 *m_ScreenKeyboard;   /**< pointer that holds the Screenkeyboard */
+
 
     // classifiaction updates
     double                          m_dXPosCross;       /**< X position of reference cross */
@@ -114,6 +125,10 @@ private:
     QList<double>                   m_lFreqList;        /**< list of current flickering frequencies */
     QColor                          m_qCrossColor;      /**< color of the reference cross */
     QSound                          m_sBeep;            /**< beep sound for successful classifiaction */
+    QPainter                        m_qPainter;         /**< painter for drawing items to the widget scene */
+
+    bool                            m_bUseScreenKeyboard;    /**< flag for updating screen keayboard */
+
 
 
 protected:
@@ -125,6 +140,7 @@ protected:
     void resizeGL(int w, int h);
     void paintGL();
     void initializeGL();
+
 };
 
 

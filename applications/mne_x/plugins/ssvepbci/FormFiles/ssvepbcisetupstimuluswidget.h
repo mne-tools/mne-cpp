@@ -96,8 +96,8 @@ public:
     /**
     * Constructs a c which is a child of parent.
     *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new EEGoSportsSetupStimulusWidget becomes a window. If parent is another widget, EEGoSportsSetupStimulusWidget becomes a child window inside parent. EEGoSportsSetupStimulusWidget is deleted when its parent is deleted.
-    * @param [in] pEEGoSports a pointer to the corresponding ECGSimulator.
+    * @param [in] parent        a pointer to parent widget; If parent is 0, the new EEGoSportsSetupStimulusWidget becomes a window. If parent is another widget, EEGoSportsSetupStimulusWidget becomes a child window inside parent. EEGoSportsSetupStimulusWidget is deleted when its parent is deleted.
+    * @param [in] pssvepBCI     a pointer to the corresponding ECGSimulator.
     */
     explicit ssvepBCISetupStimulusWidget(ssvepBCI *pssvepBCI, QWidget *parent = 0);
 

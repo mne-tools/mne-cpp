@@ -47,6 +47,12 @@
           <height>101</height>
          </size>
         </property>
+        <property name="font">
+         <font>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
         <property name="text">
          <string>Test 1</string>
         </property>
@@ -65,6 +71,12 @@
           <width>101</width>
           <height>101</height>
          </size>
+        </property>
+        <property name="font">
+         <font>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
         </property>
         <property name="text">
          <string>Test 2</string>
@@ -85,6 +97,12 @@
           <height>101</height>
          </size>
         </property>
+        <property name="font">
+         <font>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
         <property name="text">
          <string>Test 3</string>
         </property>
@@ -104,8 +122,14 @@
           <height>101</height>
          </size>
         </property>
+        <property name="font">
+         <font>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
         <property name="text">
-         <string>Test 4</string>
+         <string>ScreenKeyboard</string>
         </property>
        </widget>
       </item>
@@ -166,7 +190,7 @@
          <string/>
         </property>
         <property name="pixmap">
-         <pixmap resource="../ssvepbci.qrc">:/logos/logos.png</pixmap>
+         <pixmap resource="../../eegosports/eegosports.qrc">:/logos/logos.png</pixmap>
         </property>
        </widget>
       </item>
@@ -324,7 +348,7 @@
   </layout>
  </widget>
  <resources>
-  <include location="../ssvepbci.qrc"/>
+  <include location="../../eegosports/eegosports.qrc"/>
  </resources>
  <connections/>
 </ui>

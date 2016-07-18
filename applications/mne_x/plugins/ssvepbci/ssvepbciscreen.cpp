@@ -63,6 +63,8 @@ ssvepBCIScreen::ssvepBCIScreen(QSharedPointer<ssvepBCI> pSSVEPBCI, QOpenGLWidget
 , m_dXPosCross(0.5)
 , m_dYPosCross(0.5)
 , m_dStep(0.01)
+, m_bUseScreenKeyboard(false)
+, m_qPainter(this)
 , m_qCrossColor(Qt::red)
 , m_sBeep(":/sounds/beep.wav")
 {
@@ -88,6 +90,12 @@ ssvepBCIScreen::ssvepBCIScreen(QSharedPointer<ssvepBCI> pSSVEPBCI, QOpenGLWidget
 
 //*************************************************************************************************************
 
+ssvepBCIScreen::~ssvepBCIScreen(){
+    delete m_ScreenKeyboard;
+}
+
+//*************************************************************************************************************
+
 void ssvepBCIScreen::resizeGL(int w, int h) {
     Q_UNUSED(w)
     Q_UNUSED(h)
@@ -107,13 +115,15 @@ void ssvepBCIScreen::paintGL() {
     for(int i = 0; i < m_Items.size(); i++)
         m_Items[i].paint(this);
 
+    m_qPainter.begin(this);
     //painting red cross as a point of reference for the subject
-    QPainter p(this);
-    p.fillRect((m_dXPosCross-0.01/2)*this->width(),(m_dYPosCross-0.05/2)*this->height(),0.01*this->width(),0.05*this->height(), m_qCrossColor);
-    p.fillRect(m_dXPosCross*this->width()-0.05*this->height()/2,m_dYPosCross*this->height()-0.01*this->width()/2,0.05*this->height(),0.01*this->width(),m_qCrossColor);
+//    m_qPainter.fillRect((m_dXPosCross-0.01/2)*this->width(),(m_dYPosCross-0.05/2)*this->height(),0.01*this->width(),0.05*this->height(), m_qCrossColor);
+//    m_qPainter.fillRect(m_dXPosCross*this->width()-0.05*this->height()/2,m_dYPosCross*this->height()-0.01*this->width()/2,0.05*this->height(),0.01*this->width(),m_qCrossColor);
 
-    p.drawText(QRect((m_dXPosCross-0.01/2)*this->width(),(m_dYPosCross-0.05/2)*this->height(),0.01*this->width(),0.05*this->height()),Qt::AlignCenter, tr("Qt"));
+    if(m_bUseScreenKeyboard)
+        m_ScreenKeyboard->paint(this);
 
+    m_qPainter.end();
     update(); //schedules next update directly, without going through signal dispatching
 }
 
@@ -146,7 +156,6 @@ void ssvepBCIScreen::setClassResults(double classResult){
         //m_sBeep.play();  // doesn't work on Windows 10
 
     }
-    qDebug() << "call:" << classResult;
 }
 
 
@@ -157,3 +166,20 @@ void ssvepBCIScreen::updateFrequencyList(MyQList freqList){
     m_lFreqList = freqList;
     qDebug() <<"update freqList:" <<freqList;
 }
+
+
+//*************************************************************************************************************
+
+void ssvepBCIScreen::useScreenKeyboard(bool useKeyboard){
+
+    if(m_ScreenKeyboard == NULL)
+        m_ScreenKeyboard = new ScreenKeyboard(m_pSSVEPBCI, QSharedPointer<ssvepBCIScreen>(this));
+
+    m_bUseScreenKeyboard = useKeyboard;
+
+
+}
+
+
+//*************************************************************************************************************
+
