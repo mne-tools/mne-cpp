@@ -53,7 +53,7 @@
 //=============================================================================================================
 
 #include <QOpenGLWidget>
-#include <QSound>
+#include <QMediaPlayer>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -115,7 +115,7 @@ private:
 
     // draw items
     QList<ssvepBCIFlickeringItem>   m_Items;            /**< QList containing all flickering Items to be painted */
-    ScreenKeyboard                 *m_ScreenKeyboard;   /**< pointer that holds the Screenkeyboard */
+    QSharedPointer<ScreenKeyboard>  m_ScreenKeyboard;   /**< pointer that holds the Screen-keyboard */
 
 
     // classifiaction updates
@@ -124,8 +124,9 @@ private:
     double                          m_dStep;            /**< moving step increment for reference cross */
     QList<double>                   m_lFreqList;        /**< list of current flickering frequencies */
     QColor                          m_qCrossColor;      /**< color of the reference cross */
-    QSound                          m_sBeep;            /**< beep sound for successful classifiaction */
+//    QMediaPlayer                    m_qBeep;            /**< beep sound for successful classifiaction */
     QPainter                        m_qPainter;         /**< painter for drawing items to the widget scene */
+//    QString                         m_qSoundPath;       /**< path to sound file for recognition sound */
 
     bool                            m_bUseScreenKeyboard;    /**< flag for updating screen keayboard */
 

@@ -57,13 +57,10 @@
 
 using namespace ssvepBCIPlugin;
 
-
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
-
-
 
 ScreenKeyboard::ScreenKeyboard(QSharedPointer<ssvepBCI> pSSVEPBCI, QSharedPointer<ssvepBCIScreen> pSSVEPBCIScreen)
 : m_pSSVEPBCI(pSSVEPBCI)
@@ -71,7 +68,7 @@ ScreenKeyboard::ScreenKeyboard(QSharedPointer<ssvepBCI> pSSVEPBCI, QSharedPointe
 , m_qPainter(m_pSSVEPBCIScreen.data())
 , m_qCursorCoord(QPair<int, int> (0,0))
 {
-    // initialize map for keyboard values and their relative coordinates
+    // initialize map for keyboard values and their relative coordinates to each other
     m_mapKeys[QPair<int, int>( 0, 0)] = "E";
     m_mapKeys[QPair<int, int>( 0, 1)] = "I";
     m_mapKeys[QPair<int, int>( 0, 2)] = "T";
@@ -152,12 +149,11 @@ void ScreenKeyboard::paint(QPaintDevice *device){
          QPair<int, int> coord = m_mapKeys.key(sign);
          const QRect rectangle = QRect(x + coord.first*width,y - coord.second*width,width,width);
 
-         // painting rectangles and text
+         // painting rectangles and and drawing text into them
          painter.setPen(Qt::red);
          painter.drawRect(rectangle);
          painter.setPen(Qt::black);
          painter.drawText(rectangle, Qt::AlignCenter, sign);
-
     }
 
     // paint cursor
@@ -197,6 +193,7 @@ void ScreenKeyboard::updateCommand(double value){
         deltaX -=1; break;
     case 4:
         emit getLetter(m_mapKeys.value(m_qCursorCoord));
+        qDebug() << "chosen sign:"  << m_mapKeys.value(m_qCursorCoord);
         m_qCursorCoord = QPair<int, int> (0,0);
         break;
     default:
@@ -208,5 +205,4 @@ void ScreenKeyboard::updateCommand(double value){
         m_qCursorCoord.first    += deltaX;
         m_qCursorCoord.second   += deltaY;
     }
-
 }
