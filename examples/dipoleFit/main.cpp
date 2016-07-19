@@ -745,15 +745,15 @@ static fwdCoil fwd_add_coil_to_set(fwdCoilSet set,
     return NULL;
   }
   if (! (acc == FWD_COIL_ACCURACY_POINT ||
-     acc == FWD_COIL_ACCURACY_NORMAL ||
-     acc == FWD_COIL_ACCURACY_ACCURATE) ) {
+        acc == FWD_COIL_ACCURACY_NORMAL ||
+        acc == FWD_COIL_ACCURACY_ACCURATE) ) {
     qDebug() << "err_printf_set_error(Illegal accuracy (type = %d acc = %d),type,acc)";
     return NULL;
   }
   if (! (coil_class == FWD_COILC_MAG ||
-     coil_class == FWD_COILC_AXIAL_GRAD ||
-     coil_class == FWD_COILC_PLANAR_GRAD ||
-     coil_class == FWD_COILC_AXIAL_GRAD2) ) {
+        coil_class == FWD_COILC_AXIAL_GRAD ||
+        coil_class == FWD_COILC_PLANAR_GRAD ||
+        coil_class == FWD_COILC_AXIAL_GRAD2) ) {
     qDebug() << "err_printf_set_error(Illegal coil class (type = %d acc = %d class = %d),type,acc,coil_class)";
     return NULL;
   }
