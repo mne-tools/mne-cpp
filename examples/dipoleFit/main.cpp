@@ -2571,28 +2571,28 @@ int main(int argc, char *argv[])
             measname,fit_data->nmeg,fit_data->neeg);
         }
     else {
-    fprintf(stderr,"\n---- Reading data...\n\n");
-    if ((data = mne_read_meas_data(measname,setno,NULL,NULL,
-    fit_data->ch_names,fit_data->nmeg+fit_data->neeg)) == NULL)
-    goto out;
-    if (do_baseline)
-    mne_adjust_baselines(data,bmin,bmax);
-    else
-    fprintf(stderr,"\tNo baseline setting in effect.\n");
-    if (tmin < data->current->tmin + integ/2.0)
-    tmin = data->current->tmin + integ/2.0;
-    if (tmax > data->current->tmin + (data->current->np-1)*data->current->tstep - integ/2.0)
-    tmax =  data->current->tmin + (data->current->np-1)*data->current->tstep - integ/2.0;
-    if (tstep < 0)
-    tstep = data->current->tstep;
+        fprintf(stderr,"\n---- Reading data...\n\n");
+        if ((data = mne_read_meas_data(measname,setno,NULL,NULL,
+            fit_data->ch_names,fit_data->nmeg+fit_data->neeg)) == NULL)
+            goto out;
+        if (do_baseline)
+            mne_adjust_baselines(data,bmin,bmax);
+        else
+            fprintf(stderr,"\tNo baseline setting in effect.\n");
+        if (tmin < data->current->tmin + integ/2.0)
+            tmin = data->current->tmin + integ/2.0;
+        if (tmax > data->current->tmin + (data->current->np-1)*data->current->tstep - integ/2.0)
+            tmax =  data->current->tmin + (data->current->np-1)*data->current->tstep - integ/2.0;
+        if (tstep < 0)
+            tstep = data->current->tstep;
 
-    fprintf(stderr,"\tRead data set %d from %s : %d MEG and %d EEG \n",
-    setno,measname,fit_data->nmeg,fit_data->neeg);
-    if (noisename) {
-    fprintf(stderr,"\nScaling the noise covariance...\n");
-    if (scale_noise_cov(fit_data,data->current->nave) == FAIL)
-    goto out;
-    }
+        fprintf(stderr,"\tRead data set %d from %s : %d MEG and %d EEG \n",
+        setno,measname,fit_data->nmeg,fit_data->neeg);
+        if (noisename) {
+            fprintf(stderr,"\nScaling the noise covariance...\n");
+            if (scale_noise_cov(fit_data,data->current->nave) == FAIL)
+                goto out;
+        }
     }
     /*
     * Proceed to computing the fits
@@ -2605,14 +2605,14 @@ int main(int argc, char *argv[])
     fprintf (stderr,"\n---- Fitting : %7.1f ... %7.1f ms (step: %6.1f ms integ: %6.1f ms)\n\n",
     1000*tmin,1000*tmax,1000*tstep,1000*integ);
     if (raw) {
-    if (fit_dipoles_raw(measname,raw,sel,fit_data,guess,tmin,tmax,tstep,integ,verbose,NULL) == FAIL)
-    goto out;
+        if (fit_dipoles_raw(measname,raw,sel,fit_data,guess,tmin,tmax,tstep,integ,verbose,NULL) == FAIL)
+            goto out;
     }
     else {
-    if (fit_dipoles(measname,data,fit_data,guess,tmin,tmax,tstep,integ,verbose,&set) == FAIL)
-    goto out;
+        if (fit_dipoles(measname,data,fit_data,guess,tmin,tmax,tstep,integ,verbose,&set) == FAIL)
+            goto out;
     }
-    fprintf(stderr,"%d dipoles fitted\n",set->ndip);
+    printf("%d dipoles fitted\n",set->ndip);
     /*
     * Saving...
     */
@@ -2624,423 +2624,19 @@ int main(int argc, char *argv[])
     res = OK;
 
     out : {
-    if (res == FAIL) {
-    err_print_error();
-    exit(1);
+        if (res == FAIL) {
+//            err_print_error();
+            exit(1);
+        }
+        else
+            exit (0);
     }
-    else
-    exit (0);
-    }
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-////*************************************************************************************************************
-////=============================================================================================================
-//// Old MAIN
-////=============================================================================================================
-
-////=============================================================================================================
-///**
-//* The function main marks the entry point of the program.
-//* By default, main has the storage class extern.
-//*
-//* @param [in] argc (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
-//* @param [in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
-//* @return the value that was set to exit() (which is 0 if exit() is called via quit()).
-//*/
-//int main(int argc, char *argv[])
-//{
-//    QCoreApplication app(argc, argv);
-
-
-//    // Command Line Parser
-//    QCommandLineParser parser;
-//    parser.setApplicationDescription("Clustered Inverse Example");
-//    parser.addHelpOption();
-
-//    QCommandLineOption sampleEvokedFileOption("e", "Path to evoked <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
-//    QCommandLineOption sampleCovFileOption("c", "Path to covariance <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
-//    QCommandLineOption sampleBemFileOption("b", "Path to BEM <file>.", "file", "./MNE-sample-data/subjects/sample/bem/sample-5120-bem-sol.fif");
-//    QCommandLineOption sampleTransFileOption("t", "Path to trans <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis_raw-trans.fif");
-//    parser.addOption(sampleEvokedFileOption);
-//    parser.addOption(sampleCovFileOption);
-//    parser.addOption(sampleBemFileOption);
-//    parser.addOption(sampleTransFileOption);
-//    parser.process(app);
-
-//    //########################################################################################
-//    // Source Estimate
-//    QFile fileEvoked(parser.value(sampleEvokedFileOption));
-//    QFile fileCov(parser.value(sampleCovFileOption));
-//    QFile fileBem(parser.value(sampleBemFileOption));
-//    QFile fileTrans(parser.value(sampleTransFileOption));
-
-
-//    bool include_eeg = false;
-//    bool include_meg = true;
-
-
-//    // === Load data ===
-//    // Evoked
-//    std::cout << std::endl << "### Evoked ###" << std::endl;
-//    fiff_int_t setno = 0;
-//    QPair<QVariant, QVariant> baseline(QVariant(), 0);
-//    FiffEvoked evoked(fileEvoked, setno, baseline);
-//    if(evoked.isEmpty())
-//        return 1;
-
-//    // Cov
-//    std::cout << std::endl << "### Covariance ###" << std::endl;
-//    FiffCov noise_cov(fileCov);
-
-//    // BEM
-//    std::cout << std::endl << "### BEM ###" << std::endl;
-//    MNEBem bem(fileBem);
-//    if( bem.isEmpty() ) {
-//        return -1;
-//    }
-
-//    // Trans
-//    std::cout << std::endl << "### Transformation ###" << std::endl;
-//    FiffCoordTrans mri_head_t(fileTrans);
-//    if( mri_head_t.isEmpty() )
-//    {
-//        mri_head_t.from = FIFFV_COORD_HEAD;
-//        mri_head_t.to = FIFFV_COORD_MRI;
-//    }
-
-//    // === Dipole Fit ===
-
-//    //FIFFV_BEM_SURF_ID_BRAIN      1 -> Inner Skull
-//    //FIFFV_BEM_SURF_ID_SKULL      3 -> Outer Skull
-//    //FIFFV_BEM_SURF_ID_HEAD       4 -> Head
-//    qDebug() << "bem" << bem[0].id;
-
-//    Sphere sp = Sphere::fit_sphere( bem[0].rr );
-
-//    std::cout << "sp center" << std::endl << sp.center() << std::endl;
-//    std::cout << "sp radius" << std::endl << sp.radius() << std::endl;
-
-//    Sphere sp_simplex = Sphere::fit_sphere_simplex( bem[0].rr );
-
-//    std::cout << "sp simplex center" << std::endl << sp_simplex.center() << std::endl;
-//    std::cout << "sp simplex radius" << std::endl << sp_simplex.radius() << std::endl;
-
-////    fwdEegSphereModel eeg_model, /* EEG sphere model definition */
-
-//    //<< TODO: Apply transform function move to class
-//    std::cout << "rr.rows\n" << bem[0].rr.block(0,0,5,3) << std::endl;
-//    std::cout << "trans.trans\n" << mri_head_t.trans << std::endl;
-//    MatrixX3f rr_trans = mri_head_t.apply_trans(bem[0].rr);
-//    std::cout << "rr_trans.rows\n" << rr_trans.block(0,0,5,3) << std::endl;
-
-//    //==== setup.c
-
-//    fwdCoilSet templates = NULL;
-//    dipoleFitData  res = new_dipole_fit_data();
-//    int coord_frame = FIFFV_COORD_HEAD;
-
-//    int accurate_coils = TRUE;
-
-//    float guess_grid = 0.01;
-//    float guess_mindist = 0.005;//max(0.005, min_dist_to_inner_skull)
-//    float guess_exclude = 0.02;
-
-//    mri_head_t.print();
-//    evoked.info.dev_head_t.print();
-
-//    /*
-//    * Read the bad channel lists
-//    */
-//    QStringList badlist = evoked.info.bads;
-
-//    printf((QString("%1 bad channels total\n").arg(badlist.size())).toLatin1().data());
-
-//    /*
-//    * Read the channel information
-//    */
-
-////    if (read_meg_eeg_ch_info(measname,include_meg,include_eeg,badlist,nbad,
-////           &res->chs,&res->nmeg,&res->neeg) != OK)
-////    goto bad;
-
-//    res->nmeg = 0;
-//    res->neeg = 0;
-
-//    QList<FiffChInfo> meg;
-//    QList<FiffChInfo> eeg;
-//    for (int k = 0; k < evoked.info.chs.size(); k++)
-//    {
-//        if (evoked.info.chs[k].kind == FIFFV_MEG_CH) {
-//            res->nmeg++;
-//            meg << evoked.info.chs[k];
-//        }
-//        else if (evoked.info.chs[k].kind == FIFFV_EEG_CH)/*&& is_valid_eeg_ch(chs+k))*/ {
-//            res->neeg++;
-//            eeg << evoked.info.chs[k];
-//        }
-//    }
-
-////      mne_merge_channels(meg,nmeg,eeg,neeg,chsp,&nch);
-//    res->chs << meg << eeg;
-
-//    /*
-//    * Make coil definitions
-//    */
-//    res->coord_frame = coord_frame;
-//    if (coord_frame == FIFFV_COORD_HEAD) {
-
-//        QString coilfile("D:/GitHub/mne-cpp/bin/Resources/CoilDefinitions/coil_def.dat");
-
-//        if ((templates = fwd_read_coil_defs(coilfile.toLatin1().data())) == NULL) {
-////            FREE(coilfile);
-//            return 0;
-//        }
-
-////    qDebug() << "ncoil" << templates->ncoil;
-////    qDebug() << "coord_frame" << templates->coord_frame;
-////    for (qint32 i = 0; i < templates->ncoil; ++i) {
-////        printf ("Channel Name: %s\n",templates->coils[i]->chname);
-////        qDebug() << "coil_class" << templates->coils[i]->coil_class;
-////    }
-
-//        if ((res->meg_coils = fwd_create_meg_coils(templates,res->chs,res->nmeg,
-//                       accurate_coils ? FWD_COIL_ACCURACY_ACCURATE : FWD_COIL_ACCURACY_NORMAL,
-//                       &res->meg_head_t)) == NULL) {
-//            return 0;
-//        }
-
-//        if ((res->eeg_els = fwd_create_eeg_els(res->chs,res->nmeg,res->neeg,NULL)) == NULL) {
-//            return 0;
-//        }
-//        printf("Head coordinate coil definitions created.\n");
-//    }
-//    else {
-//        qDebug() << "err_printf_set_error(Cannot handle computations in %s coordinates,mne_coord_frame_name(coord_frame))";
-//        return 0;
-//    }
-//    /*
-//    * Forward model setup
-//    */
-//    res->bemname   = mne_strdup(fileBem.fileName().toLatin1().data());
-////    if (sp_simplex.radius() > 0){ //(r0) {
-////        res->r0[0]     = sp_simplex.center()[0];//r0[0];
-////        res->r0[1]     = sp_simplex.center()[1];//r0[1];
-////        res->r0[2]     = sp_simplex.center()[2];//r0[2];
-////    }
-////    res->eeg_model = eeg_model;
-////    /*
-////    * Compensation data
-////    */
-////    if ((comp_data = mne_read_ctf_comp_data(measname)) == NULL)
-////        goto bad;
-////    if (comp_data->ncomp > 0) {	/* Compensation channel information may be needed */
-////        fiffChInfo comp_chs = NULL;
-////        int        ncomp    = 0;
-
-////        fprintf(stderr,"%d compensation data sets in %s\n",comp_data->ncomp,measname);
-////        if (mne_read_meg_comp_eeg_ch_info(measname,NULL,0,&comp_chs,&ncomp,NULL,NULL,NULL,NULL) == FAIL)
-////            goto bad;
-////        if (ncomp > 0) {
-////            if ((comp_coils = fwd_create_meg_coils(templates,comp_chs,ncomp,
-////                     FWD_COIL_ACCURACY_NORMAL,res->meg_head_t)) == NULL) {
-////                FREE(comp_chs);
-////                goto bad;
-////            }
-////            fprintf(stderr,"%d compensation channels in %s\n",comp_coils->ncoil,measname);
-////        }
-////        FREE(comp_chs);
-////    }
-////    else {			/* Get rid of the empty data set */
-////        mne_free_ctf_comp_data_set(comp_data);
-////        comp_data = NULL;
-////    }
-////    /*
-////    * Ready to set up the forward model
-////    */
-////    if (setup_forward_model(res,comp_data,comp_coils) == FAIL)
-////        goto bad;
-////    res->column_norm = COLUMN_NORM_LOC;
-////    /*
-////    * Projection data should go here
-////    */
-////    if (make_projection(projnames,nproj,res->chs,res->nmeg+res->neeg,&res->proj) == FAIL)
-////        goto bad;
-////    if (res->proj && res->proj->nitems > 0) {
-////        fprintf(stderr,"Final projection operator is:\n");
-////        mne_proj_op_report(stderr,"\t",res->proj);
-
-////        if (mne_proj_op_chs(res->proj,res->ch_names,res->nmeg+res->neeg) == FAIL)
-////            goto bad;
-////        if (mne_proj_op_make_proj(res->proj) == FAIL)
-////            goto bad;
-////    }
-
-
-
-////    /*
-////    * Noise covariance
-////    */
-////    if (noisename) {
-////        if ((cov = mne_read_cov(noisename,FIFFV_MNE_SENSOR_COV)) == NULL)
-////            goto bad;
-////        fprintf(stderr,"Read a %s noise-covariance matrix from %s\n",
-////        cov->cov_diag ? "diagonal" : "full", noisename);
-////    }
-////    else {
-////        if ((cov = ad_hoc_noise(res->meg_coils,res->eeg_els,grad_std,mag_std,eeg_std)) == NULL)
-////            goto bad;
-////    }
-////    res->noise = mne_pick_chs_cov_omit(cov,res->ch_names,res->nmeg+res->neeg,TRUE,res->chs);
-////    if (res->noise == NULL) {
-////        mne_free_cov(cov);
-////        goto bad;
-////    }
-////    fprintf(stderr,"Picked appropriate channels from the noise-covariance matrix.\n");
-////    mne_free_cov(cov);
-
-
-
-////    /*
-////    * Apply the projection operator to the noise-covariance matrix
-////    */
-////    if (res->proj && res->proj->nitems > 0 && res->proj->nvec > 0) {
-////        if (mne_proj_op_apply_cov(res->proj,res->noise) == FAIL)
-////            goto bad;
-////        fprintf(stderr,"Projection applied to the covariance matrix.\n");
-////    }
-
-
-
-////    /*
-////    * Force diagonal noise covariance?
-////    */
-////    if (diagnoise) {
-////        mne_revert_to_diag_cov(res->noise);
-////        fprintf(stderr,"Using only the main diagonal of the noise-covariance matrix.\n");
-////    }
-
-
-
-////    /*
-////    * Regularize the possibly deficient noise-covariance matrix
-////    */
-////    if (res->noise->cov) {
-////    float regs[3];
-////    int   do_it;
-
-////    regs[MNE_COV_CH_MEG_MAG]  = mag_reg;
-////    regs[MNE_COV_CH_MEG_GRAD] = grad_reg;
-////    regs[MNE_COV_CH_EEG]      = eeg_reg;
-
-
-
-////    /*
-////    * Classify the channels
-////    */
-////    if (mne_classify_channels_cov(res->noise,res->chs,res->nmeg+res->neeg) == FAIL)
-////        goto bad;
-
-
-
-////    /*
-////    * Do we need to do anything?
-////    */
-////    for (k = 0, do_it = 0; k < res->noise->ncov; k++) {
-////    if (res->noise->ch_class[k] != MNE_COV_CH_UNKNOWN &&
-////    regs[res->noise->ch_class[k]] > 0.0)
-////    do_it++;
-////    }
-
-
-
-
-////    /*
-////    * Apply regularization if necessary
-////    */
-////    if (do_it > 0)
-////    mne_regularize_cov(res->noise,regs);
-////    else
-////    fprintf(stderr,"No regularization applied to the noise-covariance matrix\n");
-////    }
-
-
-
-
-////    /*
-////    * Do the decomposition and check that the matrix is positive definite
-////    */
-////    fprintf(stderr,"Decomposing the noise covariance...\n");
-////    if (res->noise->cov) {
-////    if (mne_decompose_eigen_cov(res->noise) == FAIL)
-////    goto bad;
-////    fprintf(stderr,"Eigenvalue decomposition done.\n");
-////    for (k = 0; k < res->noise->ncov; k++) {
-////    if (res->noise->lambda[k] < 0.0)
-////    res->noise->lambda[k] = 0.0;
-////    }
-////    }
-////    else {
-////    fprintf(stderr,"Decomposition not needed for a diagonal covariance matrix.\n");
-////    if (mne_add_inv_cov(res->noise) == FAIL)
-////    goto bad;
-////    }
-////    mne_free_name_list(badlist,nbad);
-////    fwd_free_coil_set(templates);
-////    fwd_free_coil_set(comp_coils);
-////    mne_free_ctf_comp_data_set(comp_data);
-
-
-
-
-
-
-
 
 
 //    return app.exec();
-//}
+}
 
-////*************************************************************************************************************
-////=============================================================================================================
-//// STATIC DEFINITIONS
-////=============================================================================================================
+//*************************************************************************************************************
+//=============================================================================================================
+// STATIC DEFINITIONS
+//=============================================================================================================
