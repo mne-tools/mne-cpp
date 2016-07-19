@@ -66,8 +66,13 @@ ssvepBCIScreen::ssvepBCIScreen(QSharedPointer<ssvepBCI> pSSVEPBCI, QOpenGLWidget
 , m_bUseScreenKeyboard(false)
 , m_qPainter(this)
 , m_qCrossColor(Qt::red)
-, m_sBeep(":/sounds/beep.wav")
+//, m_qSoundPath(m_pSSVEPBCI->getSSVEPBCIResourcePath() + "beep.mp3")
 {
+//      // implementing the sound file
+//    qDebug() << "copying successfull:" << QFile::copy(":/sounds/beep.mp3", m_qSoundPath);
+//    m_qBeep.setMedia(QUrl(m_qSoundPath));
+//    m_qBeep.setVolume(100);
+
     // register Meta Type
     qRegisterMetaType<MyQList>("MyQList");
 
@@ -91,7 +96,7 @@ ssvepBCIScreen::ssvepBCIScreen(QSharedPointer<ssvepBCI> pSSVEPBCI, QOpenGLWidget
 //*************************************************************************************************************
 
 ssvepBCIScreen::~ssvepBCIScreen(){
-    delete m_ScreenKeyboard;
+
 }
 
 //*************************************************************************************************************
@@ -111,6 +116,7 @@ void ssvepBCIScreen::initializeGL(){
 //*************************************************************************************************************
 
 void ssvepBCIScreen::paintGL() {
+
     //paint all items to the screen
     for(int i = 0; i < m_Items.size(); i++)
         m_Items[i].paint(this);
@@ -152,9 +158,8 @@ void ssvepBCIScreen::setClassResults(double classResult){
             qDebug() << "WARNING: no classifiaction could be made!"; break;
         }
 
-        //generate beep sound
-        //m_sBeep.play();  // doesn't work on Windows 10
-
+//        //generate beep sound
+//        m_qBeep.play();  // doesn't work on Windows 10
     }
 }
 
@@ -173,11 +178,9 @@ void ssvepBCIScreen::updateFrequencyList(MyQList freqList){
 void ssvepBCIScreen::useScreenKeyboard(bool useKeyboard){
 
     if(m_ScreenKeyboard == NULL)
-        m_ScreenKeyboard = new ScreenKeyboard(m_pSSVEPBCI, QSharedPointer<ssvepBCIScreen>(this));
+        m_ScreenKeyboard = QSharedPointer<ScreenKeyboard>(new ScreenKeyboard(m_pSSVEPBCI, QSharedPointer<ssvepBCIScreen>(this)));
 
     m_bUseScreenKeyboard = useKeyboard;
-
-
 }
 
 

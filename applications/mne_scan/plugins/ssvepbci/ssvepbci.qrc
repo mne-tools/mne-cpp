@@ -8,6 +8,6 @@
         <file alias="logos.png">images/logos/logos.png</file>
     </qresource>
     <qresource prefix="/sounds">
-        <file alias="beep.wav">sounds/beep.wav</file>
+        <file alias="beep.mp3">sounds/beep.mp3</file>
     </qresource>
 </RCC>

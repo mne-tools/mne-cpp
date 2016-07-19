@@ -185,6 +185,13 @@ public:
     */
     QList<double>  getCurrentListOfFrequencies();
 
+    //=========================================================================================================
+    /**
+    * retruns the ssvep BCI resource path
+    *
+    */
+    QString getSSVEPBCIResourcePath();
+
 
 protected:
     /**
@@ -288,6 +295,17 @@ private:
     PluginInputData<NewRealTimeMultiSampleArray>::SPtr  m_pRTMSAInput;          /**< The RealTimeMultiSampleArray input.*/
     PluginInputData<RealTimeSourceEstimate>::SPtr       m_pRTSEInput;           /**< The RealTimeSourceEstimate input.*/
 
+    CircularMatrixBuffer<double>::SPtr                  m_pBCIBuffer_Sensor;    /**< Holds incoming sensor level data.*/
+    CircularMatrixBuffer<double>::SPtr                  m_pBCIBuffer_Source;    /**< Holds incoming source level data.*/
+
+    // processing parameter
+    bool                    m_bUseSensorData;                   /**< GUI input: Use sensor data stream. */
+    ofstream                m_outStreamDebug;                   /**< Outputstream to generate debug file.*/
+    bool                    m_bIsRunning;                       /**< Whether BCI is running.*/
+    QString                 m_qStringResourcePath;              /**< The path to the BCI resource directory.*/
+    bool                    m_bProcessData;                     /**< Whether BCI is to get data out of the continous input data stream, i.e. the EEG data from sensor level.*/
+    QMutex                  m_qMutex;                           /**< QMutex to guarantee thread safety.*/
+
     // adaptable sliding time window with downsampling function
     MatrixXd                m_matSlidingTimeWindow;             /**< Sensor Level: adaptational sliding time window. */
     int                     m_iCounter;                         /**< iterative index for counting the amount of misclassifications */
@@ -311,15 +329,11 @@ private:
     int                     m_iNumberOfHarmonics;               /**< number of harmonics which will be searched for */
     double                  m_dAlpha;                           /**< parameter for softmax function */
     QList<double>           m_lThresholdValues;                 /**< threshold value for normalized energy probabilities */
-    //MyQList                 m_lSSVEPProbabilities;              /**< contains SSVEP Probabilities */
     bool                    m_bRemovePowerLine;                 /**< Flag for removing 50 Hz power line signal */
     bool                    m_bUseMEC;                          /**< flag for feature extractiong. If true: use MEC; If false: use CCA */
-    QList<int>              m_lIndexOfClassResultSensor;              /**< Sensor level: Classification results on sensor level. */
+    QList<int>              m_lIndexOfClassResultSensor;        /**< Sensor level: Classification results on sensor level. */
     int                     m_iPowerLine;                       /**< frequency of the power line [Hz] */
     bool                    m_bChangeSSVEPParameterFlag;        /**< flag for chaning SSVEP parameter */
-
-    // GUI variables
-    bool                    m_bUseSensorData;                   /**< GUI input: Use sensor data stream. */
 
     // Sensor level
     FiffInfo::SPtr          m_pFiffInfo_Sensor;                 /**< Sensor level: Fiff information for sensor data. */
@@ -330,11 +344,20 @@ private:
     QVector< VectorXd >     m_vLoadedSourceBoundary;            /**< Source level: Loaded decision boundary on source level. */
     QStringList             m_slChosenChannelsSource;           /**< Source level: Features used to calculate data points in feature space on source level. */
     QMap<QString, int>      m_mapDestrieuxAtlasRegions;         /**< Source level: Loaded Destrieux atlas regions. */
+    bool                    m_bInitializeSource;                /**< Source level: initalizie parameter for processing on source level */
 
+    // output
+    PluginOutputData<NewRealTimeSampleArray>::SPtr      m_pBCIOutputOne;        /**< The first RealTimeSampleArray of the BCI output.*/
+    PluginOutputData<NewRealTimeSampleArray>::SPtr      m_pBCIOutputTwo;        /**< The second RealTimeSampleArray of the BCI output.*/
+    PluginOutputData<NewRealTimeSampleArray>::SPtr      m_pBCIOutputThree;      /**< The third RealTimeSampleArray of the BCI output.*/
+    PluginOutputData<NewRealTimeSampleArray>::SPtr      m_pBCIOutputFour;       /**< The fourth RealTimeSampleArray of the BCI output.*/
+    PluginOutputData<NewRealTimeSampleArray>::SPtr      m_pBCIOutputFive;       /**< The fifth RealTimeSampleArray of the BCI output.*/
 
     //=========================================================================================================
     /**
-    * reading actual segment from the sliding time window and write it to the data Matrix
+    * reading actual segment from the sliding time window and write it to a data Matrix
+    *
+    * @param [out] data      data space where current data from the sliding time window will be written to
     */
     void readFromSlidingTimeWindow(MatrixXd &data);
 
@@ -352,24 +375,6 @@ private:
     *
     */
     void setFrequencyList(QList<double> frequencyList);
-
-
-    // old privates
-    PluginOutputData<NewRealTimeSampleArray>::SPtr      m_pBCIOutputOne;        /**< The first RealTimeSampleArray of the BCI output.*/
-    PluginOutputData<NewRealTimeSampleArray>::SPtr      m_pBCIOutputTwo;        /**< The second RealTimeSampleArray of the BCI output.*/
-    PluginOutputData<NewRealTimeSampleArray>::SPtr      m_pBCIOutputThree;      /**< The third RealTimeSampleArray of the BCI output.*/
-    PluginOutputData<NewRealTimeSampleArray>::SPtr      m_pBCIOutputFour;       /**< The fourth RealTimeSampleArray of the BCI output.*/
-    PluginOutputData<NewRealTimeSampleArray>::SPtr      m_pBCIOutputFive;       /**< The fifth RealTimeSampleArray of the BCI output.*/
-
-
-    CircularMatrixBuffer<double>::SPtr                  m_pBCIBuffer_Sensor;    /**< Holds incoming sensor level data.*/
-    CircularMatrixBuffer<double>::SPtr                  m_pBCIBuffer_Source;    /**< Holds incoming source level data.*/
-
-    ofstream                m_outStreamDebug;                   /**< Outputstream to generate debug file.*/
-    bool                    m_bIsRunning;                       /**< Whether BCI is running.*/
-    QString                 m_qStringResourcePath;              /**< The path to the BCI resource directory.*/
-    bool                    m_bProcessData;                     /**< Whether BCI is to get data out of the continous input data stream, i.e. the EEG data from sensor level.*/
-    QMutex                  m_qMutex;                           /**< QMutex to guarantee thread safety.*/
 
 };
 

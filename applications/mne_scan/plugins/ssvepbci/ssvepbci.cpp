@@ -71,7 +71,7 @@ using namespace UTILSLIB;
 //=============================================================================================================
 
 ssvepBCI::ssvepBCI()
-: m_qStringResourcePath(qApp->applicationDirPath()+"/mne_x_plugins/resources/ssvepbci/")
+: m_qStringResourcePath(qApp->applicationDirPath()+"/mne_scan_plugins/resources/ssvepbci/")
 , m_bProcessData(false)
 , m_dAlpha(0.25)
 , m_iNumberOfHarmonics(2)
@@ -79,6 +79,7 @@ ssvepBCI::ssvepBCI()
 , m_bRemovePowerLine(false)
 , m_iPowerLine(50)
 , m_bChangeSSVEPParameterFlag(false)
+, m_bInitializeSource(true)
 {
     // Create configuration action bar item/button
     m_pActionBCIConfiguration = new QAction(QIcon(":/images/configuration.png"),tr("BCI configuration feature"),this);
@@ -293,6 +294,8 @@ void ssvepBCI::updateSensor(SCMEASLIB::NewMeasurement::SPtr pMeasurement)
         m_pFiffInfo_Sensor = pRTMSA->info();
         //emit fiffInfoAvailable();
 
+//        QStringList chs = m_pFiffInfo_Sensor->ch_names;
+
         //calculating downsampling parameter for incoming data
         m_iDownSampleIncrement = m_pFiffInfo_Sensor->sfreq/128;
         m_dSampleFrequency = m_pFiffInfo_Sensor->sfreq/m_iDownSampleIncrement;//m_pFiffInfo_Sensor->sfreq;
@@ -345,6 +348,20 @@ void ssvepBCI::updateSource(SCMEASLIB::NewMeasurement::SPtr pMeasurement)
             m_pBCIBuffer_Source->push(&t_mat);
         }
     }
+
+    // Initalize parameter for processing BCI on source level
+    if(m_bInitializeSource){
+
+        QList<VectorXi> vertNo = pRTSE->getFwdSolution()->src.get_vertno();
+
+        foreach(VectorXi vector, vertNo)
+            cout << "vertNo:" << vector << endl;
+
+        qDebug() << "do processing";
+        m_bInitializeSource = false;
+    }
+
+
 }
 
 
@@ -362,6 +379,13 @@ void ssvepBCI::clearClassifications()
 
 void  ssvepBCI::setChangeSSVEPParameterFlag(){
     m_bChangeSSVEPParameterFlag = true;
+}
+
+
+//*************************************************************************************************************
+
+QString ssvepBCI::getSSVEPBCIResourcePath(){
+    return m_qStringResourcePath;
 }
 
 //*************************************************************************************************************
@@ -422,7 +446,6 @@ void ssvepBCI::showBCIConfiguration()
     if(!m_pssvepBCIConfigurationWidget->isVisible()){
 
         m_pssvepBCIConfigurationWidget->setWindowTitle("ssvepBCI - Configuration");
-        //m_pEEGoSportsSetupStimulusWidget->initGui();
         m_pssvepBCIConfigurationWidget->show();
         m_pssvepBCIConfigurationWidget->raise();
     }
@@ -506,7 +529,6 @@ void ssvepBCI::changeSSVEPParameter(){
 
 void ssvepBCI::setThresholdValues(MyQList thresholds){
     m_lThresholdValues = thresholds;
-    qDebug() << "threshold:" << m_lThresholdValues;
 }
 
 
