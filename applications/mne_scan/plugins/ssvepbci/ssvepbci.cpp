@@ -357,6 +357,9 @@ void ssvepBCI::updateSource(SCMEASLIB::NewMeasurement::SPtr pMeasurement)
         foreach(VectorXi vector, vertNo)
             cout << "vertNo:" << vector << endl;
 
+
+
+
         qDebug() << "do processing";
         m_bInitializeSource = false;
     }

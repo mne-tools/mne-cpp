@@ -67,7 +67,7 @@ ssvepBCISetupStimulusWidget::ssvepBCISetupStimulusWidget(ssvepBCI *pssvepBCI, QW
     ui->setupUi(this);
 
     //setup the test screen and initialize screen for subject
-    m_pssvepBCIScreen = QSharedPointer<ssvepBCIScreen>(new ssvepBCIScreen(m_pssvepBCI));
+    m_pssvepBCIScreen = QSharedPointer<ssvepBCIScreen>(new ssvepBCIScreen(m_pssvepBCI, QSharedPointer<ssvepBCISetupStimulusWidget>(this)));
     m_pScreen  =  QSharedPointer<QScreen>(QGuiApplication::screens()[1]); // specify which screen to use
     m_pssvepBCIScreen->move(m_pScreen->geometry().x(), m_pScreen->geometry().y());
     m_pssvepBCIScreen->showFullScreen(); // showFullScreen();
@@ -414,3 +414,8 @@ QList<double> ssvepBCISetupStimulusWidget::getFrequencies(){
 }
 
 
+//*************************************************************************************************************
+
+void ssvepBCIPlugin::ssvepBCISetupStimulusWidget::on_m_lineEdit_BCISpeller_textChanged(const QString &arg1){
+    emit settledPhrase(arg1);
+}

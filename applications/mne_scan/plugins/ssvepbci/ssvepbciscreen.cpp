@@ -58,8 +58,9 @@ using namespace ssvepBCIPlugin;
 //=============================================================================================================
 
 
-ssvepBCIScreen::ssvepBCIScreen(QSharedPointer<ssvepBCI> pSSVEPBCI, QOpenGLWidget *parent)
+ssvepBCIScreen::ssvepBCIScreen(QSharedPointer<ssvepBCI> pSSVEPBCI, QSharedPointer<ssvepBCISetupStimulusWidget> pSSVEPBCISetupStimulusWidget, QOpenGLWidget *parent)
 : m_pSSVEPBCI(pSSVEPBCI)
+, m_pSSVEPBCISetupStimulusWidget(pSSVEPBCISetupStimulusWidget)
 , m_dXPosCross(0.5)
 , m_dYPosCross(0.5)
 , m_dStep(0.01)
@@ -121,7 +122,7 @@ void ssvepBCIScreen::paintGL() {
     for(int i = 0; i < m_Items.size(); i++)
         m_Items[i].paint(this);
 
-    m_qPainter.begin(this);
+//    m_qPainter.begin(this);
     //painting red cross as a point of reference for the subject
 //    m_qPainter.fillRect((m_dXPosCross-0.01/2)*this->width(),(m_dYPosCross-0.05/2)*this->height(),0.01*this->width(),0.05*this->height(), m_qCrossColor);
 //    m_qPainter.fillRect(m_dXPosCross*this->width()-0.05*this->height()/2,m_dYPosCross*this->height()-0.01*this->width()/2,0.05*this->height(),0.01*this->width(),m_qCrossColor);
@@ -129,7 +130,7 @@ void ssvepBCIScreen::paintGL() {
     if(m_bUseScreenKeyboard)
         m_ScreenKeyboard->paint(this);
 
-    m_qPainter.end();
+//  m_qPainter.end();
     update(); //schedules next update directly, without going through signal dispatching
 }
 
@@ -178,7 +179,7 @@ void ssvepBCIScreen::updateFrequencyList(MyQList freqList){
 void ssvepBCIScreen::useScreenKeyboard(bool useKeyboard){
 
     if(m_ScreenKeyboard == NULL)
-        m_ScreenKeyboard = QSharedPointer<ScreenKeyboard>(new ScreenKeyboard(m_pSSVEPBCI, QSharedPointer<ssvepBCIScreen>(this)));
+        m_ScreenKeyboard = QSharedPointer<ScreenKeyboard>(new ScreenKeyboard(m_pSSVEPBCI, m_pSSVEPBCISetupStimulusWidget, QSharedPointer<ssvepBCIScreen>(this)));
 
     m_bUseScreenKeyboard = useKeyboard;
 }
