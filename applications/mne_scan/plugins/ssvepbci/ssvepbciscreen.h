@@ -43,6 +43,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include "FormFiles/ssvepbcisetupstimuluswidget.h"
 #include "ssvepbciflickeringitem.h"
 #include "screenkeyboard.h"
 #include "ssvepbci.h"
@@ -76,6 +77,7 @@ typedef  QList<double>  MyQList;
 //=============================================================================================================
 
 class ssvepBCI;
+class ssvepBCISetupStimulusWidget;
 
 //=============================================================================================================
 /**
@@ -96,7 +98,7 @@ public:
      * constructs the ssvepBCIScreen object
      *
      */
-    ssvepBCIScreen(QSharedPointer<ssvepBCI> pSSVEPBCI, QOpenGLWidget *parent = 0 );
+    ssvepBCIScreen(QSharedPointer<ssvepBCI> pSSVEPBCI, QSharedPointer<ssvepBCISetupStimulusWidget> pSSVEPBCISetupStimulusWidget, QOpenGLWidget *parent = 0 );
     //=========================================================================================================
     /**
      * deconstructs the ssvepBCIScreen object
@@ -111,7 +113,8 @@ public slots:
 
 
 private:
-    QSharedPointer<ssvepBCI>        m_pSSVEPBCI;        /**< pointer to referring SSVEPBCI class */
+    QSharedPointer<ssvepBCI>                        m_pSSVEPBCI;                        /**< pointer to referring SSVEPBCI class */
+    QSharedPointer<ssvepBCISetupStimulusWidget>     m_pSSVEPBCISetupStimulusWidget;     /**< pointer to referring SSVEPBCISetupStimulusWidget class */
 
     // draw items
     QList<ssvepBCIFlickeringItem>   m_Items;            /**< QList containing all flickering Items to be painted */

@@ -46,6 +46,7 @@
 #include "../ssvepbci.h"
 #include "screenkeyboard.h"
 #include "ssvepbciscreen.h"
+#include "ssvepbciflickeringitem.h"
 
 
 //*************************************************************************************************************
@@ -78,6 +79,7 @@ namespace ssvepBCIPlugin
 
 class ssvepBCI;
 class ssvepBCIScreen;
+class ssvepBCIFlickeringItem;
 class ScreenKeyboard;
 
 
@@ -135,6 +137,7 @@ public:
 
 signals:
     void frequencyChanged();
+    void settledPhrase(QString phrase);
 
 private slots:
 
@@ -181,6 +184,8 @@ private slots:
     void setFreq(ssvepBCIFlickeringItem &item, int freqKey);
 
     void on_pushButton_7_clicked();
+
+    void on_m_lineEdit_BCISpeller_textChanged(const QString &arg1);
 
 private:
     Ui::ssvepBCISetupStimulusWidget        *ui;

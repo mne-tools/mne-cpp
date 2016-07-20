@@ -62,11 +62,13 @@ using namespace ssvepBCIPlugin;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ScreenKeyboard::ScreenKeyboard(QSharedPointer<ssvepBCI> pSSVEPBCI, QSharedPointer<ssvepBCIScreen> pSSVEPBCIScreen)
+ScreenKeyboard::ScreenKeyboard(QSharedPointer<ssvepBCI> pSSVEPBCI, QSharedPointer<ssvepBCISetupStimulusWidget> pSSVEPBCISetupStimulusWidget, QSharedPointer<ssvepBCIScreen> pSSVEPBCIScreen)
 : m_pSSVEPBCI(pSSVEPBCI)
+, m_pSSVEPBCISetupStimulusWidget(pSSVEPBCISetupStimulusWidget)
 , m_pSSVEPBCIScreen(pSSVEPBCIScreen)
 , m_qPainter(m_pSSVEPBCIScreen.data())
 , m_qCursorCoord(QPair<int, int> (0,0))
+, m_bDisplaySpeller(false)
 {
     // initialize map for keyboard values and their relative coordinates to each other
     m_mapKeys[QPair<int, int>( 0, 0)] = "E";
@@ -110,6 +112,8 @@ ScreenKeyboard::ScreenKeyboard(QSharedPointer<ssvepBCI> pSSVEPBCI, QSharedPointe
     connect(m_pSSVEPBCI.data(), &ssvepBCI::getFrequencyLabels, this, &ScreenKeyboard::updateClassList);
     connect(m_pSSVEPBCI.data(), &ssvepBCI::classificationResult, this, &ScreenKeyboard::updateCommand);
 
+    // connect SSVEPBCI speller
+    connect(m_pSSVEPBCISetupStimulusWidget.data(), &ssvepBCISetupStimulusWidget::settledPhrase, this, &ScreenKeyboard::setPhrase);
 }
 
 
@@ -164,6 +168,23 @@ void ScreenKeyboard::paint(QPaintDevice *device){
     painter.setPen(Qt::black);
     painter.drawText(rectangle, Qt::AlignCenter, m_mapKeys.value(m_qCursorCoord));
 
+    if(m_bDisplaySpeller){
+
+        // setting speller box parameter
+        int height = 0.1* m_pSSVEPBCIScreen.data()->height() ;
+        int width = 0.3* m_pSSVEPBCIScreen.data()->width() ;
+        QRect rectangle = QRect(0,m_pSSVEPBCIScreen.data()->height() - height, width, height);
+
+        // drawing speller box
+        painter.setBrush(Qt::white);
+        painter.drawRect(rectangle);
+
+        painter.setPen(Qt::red);
+        painter.drawText(rectangle,Qt::AlignLeft & Qt::AlignTop, m_sSettledPhrase);
+        painter.setPen(Qt::black);
+        painter.drawText(rectangle,Qt::AlignLeft & Qt::AlignBottom, m_sSpelledPhrase);
+    }
+
 }
 
 
@@ -178,10 +199,12 @@ void ScreenKeyboard::updateClassList(MyQList classList){
 
 void ScreenKeyboard::updateCommand(double value){
 
+    // initialize
     int index = m_lClassList.indexOf(value);
     int deltaX = 0;
     int deltaY = 0;
 
+    // set new cursor position
     switch(index){
     case 0:
         deltaY +=1; break;
@@ -192,7 +215,7 @@ void ScreenKeyboard::updateCommand(double value){
     case 3:
         deltaX -=1; break;
     case 4:
-        emit getLetter(m_mapKeys.value(m_qCursorCoord));
+        spellLetter(m_mapKeys.value(m_qCursorCoord));
         qDebug() << "chosen sign:"  << m_mapKeys.value(m_qCursorCoord);
         m_qCursorCoord = QPair<int, int> (0,0);
         break;
@@ -200,9 +223,35 @@ void ScreenKeyboard::updateCommand(double value){
         break;
     }
 
-    // check if cursor keys exist -> then update
+    // check new cursor position -> then update
     if(m_mapKeys.contains(QPair<int, int> (m_qCursorCoord.first + deltaX, m_qCursorCoord.second + deltaY))){
         m_qCursorCoord.first    += deltaX;
         m_qCursorCoord.second   += deltaY;
+    }
+}
+
+
+//*************************************************************************************************************
+
+void ScreenKeyboard::setPhrase(QString phrase){
+
+    // capitalizing the phrase and assign it
+    m_sSettledPhrase = phrase.toUpper();
+    m_bDisplaySpeller = true;
+}
+
+
+//*************************************************************************************************************
+
+void ScreenKeyboard::spellLetter(QString letter){
+
+    // classify the subject's selection
+    if(letter == "Clr")
+        m_sSpelledPhrase.clear();
+    else if(letter == "Del")
+        m_sSpelledPhrase.resize(m_sSpelledPhrase.size() - 1);
+    else{
+        m_sSpelledPhrase.append(letter);
+        emit getLetter(letter);
     }
 }
