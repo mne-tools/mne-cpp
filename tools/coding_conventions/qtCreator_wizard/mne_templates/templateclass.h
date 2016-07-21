@@ -1,10 +1,10 @@
 //=============================================================================================================
 /**
-* @file     templateclass.h
-* @author   Your name <yourname@yourdomain>;
+* @file     %{HdrFileName}
+* @author   %{author} <%{eMail}>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     Month, Year
+* @date     %{currentdate} Month, Year
 *
 * @section  LICENSE
 *
@@ -29,19 +29,18 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     TemplateClass class declaration.
+* @brief     %{CN} class declaration.
 *
 */
 
-#ifndef TEMPLATECLASS
-#define TEMPLATECLASS
+#ifndef %{GUARD}
+#define %{GUARD}
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
-
-//Put all internal includes from mne-cpp here. I.e. everything from the MNE liraries or your application
 
 
 //*************************************************************************************************************
@@ -49,7 +48,14 @@
 // QT INCLUDES
 //=============================================================================================================
 
-//Put all Qt includes here
+%{JS: QtSupport.qtIncludes([ 'QtCore/QSharedPointer' ,
+						     ( '%{IncludeQObject}' )          ? 'QtCore/%{IncludeQObject}'     : '',
+                             ( '%{IncludeQWidget}' )          ? 'QtGui/%{IncludeQWidget}'      : '',
+                             ( '%{IncludeQMainWindow}' )      ? 'QtGui/%{IncludeQMainWindow}'  : '' ],
+						   [ 'QtCore/QSharedPointer',
+						     ( '%{IncludeQObject}' )          ? 'QtCore/%{IncludeQObject}'     : '',
+                             ( '%{IncludeQWidget}' )          ? 'QtGui/%{IncludeQWidget}'      : '',
+                             ( '%{IncludeQMainWindow}' )      ? 'QtGui/%{IncludeQMainWindow}'  : ''])}\
 
 
 //*************************************************************************************************************
@@ -57,38 +63,23 @@
 // Eigen INCLUDES
 //=============================================================================================================
 
-//Put all Eigen includes here
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-//Put all used forward declarations of the diferent namespaces here. 
-//Try not to include too many header with #include -> Keep build time to a minimum
-//Rather use forward declarations and the actual includes in the cpp file.
-//Example:
-//namespace Foo {
-//	class FooDoSomething;
-//}
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE YOURNAMESPACE
+// DEFINE NAMESPACE %{JS: Cpp.namespaces('%{Class}')[0]}
 //=============================================================================================================
-
-namespace YOURNAMESPACE
-{
-
-//PLEAS DO NOT USE ""using namespace"" IN HEADER FILES
+%{JS: Cpp.openNamespaces('%{Class}')}
 
 //*************************************************************************************************************
 //=============================================================================================================
-// YOURNAMESPACE FORWARD DECLARATIONS
+// %{JS: Cpp.namespaces('%{Class}')[0]} FORWARD DECLARATIONS
 //=============================================================================================================
-
-//Put all used forward declarations of the YOURNAMESPACE namespace here
 
 
 //=============================================================================================================
@@ -97,77 +88,39 @@ namespace YOURNAMESPACE
 *
 * @brief Brief description of this class.
 */
-class YOUREXPORT_FLAG TemplateClass //The YOUREXPORT_FLAG flag only needs to be set when this class is part of a library
+
+@if '%{Base}'
+class %{CN} : public %{Base}
+@else
+class %{CN}
+@endif
 {
-    Q_OBJECT //Only set if you want to use qt's signal/slot feature in this class
+@if %{isQObject}
+     Q_OBJECT
+@endif
 
 public:
-    typedef QSharedPointer<TemplateClass> SPtr;            /**< Shared pointer type for TemplateClass. */
-    typedef QSharedPointer<const TemplateClass> ConstSPtr; /**< Const shared pointer type for TemplateClass. */
+    typedef QSharedPointer<%{CN}> SPtr;            /**< Shared pointer type for %{CN}. */
+    typedef QSharedPointer<const %{CN}> ConstSPtr; /**< Const shared pointer type for %{CN}. */
 
     //=========================================================================================================
     /**
-    * Constructs a TemplateClass object.
+    * Constructs a %{CN} object.
     */
-    TemplateClass(OtherClass *pParent);
+@if '%{Base}' === 'QObject'
+    explicit %{CN}(QObject *parent = 0);
+@elsif '%{Base}' === 'QWidget' || '%{Base}' === 'QMainWindow'
+    explicit %{CN}(QWidget *parent = 0);
+@else
+    %{CN}();
+@endif
 
-    //=========================================================================================================
-    /**
-    * Copy constructor.
-    *
-    * @param[in] p_templateClass   TemplateClass which should be copied
-    */
-    TemplateClass(const TemplateClass &pTemplateClass);
-
-    //=========================================================================================================
-    /**
-    * Destroys the TemplateClass object.
-    */
-    ~TemplateClass();
-
-    //=========================================================================================================
-    /**
-    * The function doSomething takes parameterOne and parameterTwo as inputs, writes something to parameterTwo and returns a result as an integer value.
-    *
-    * @param[in]  parameterOne  Description goes here.
-    * @param[out] paramterTwo   Description goes here.
-    *
-    * @return calculated result as an integer
-    */
-    int doSomething(int parameterOne, int &parameterTwo);
-
-    //=========================================================================================================
-    /**
-    * The function doSomethingInline takes parameterOne as input and returns a result as an integer value. This function is defined as an inline function (see below)
-    *
-    * @param[in]  parameterOne  Description goes here.
-    *
-    * @return calculated result as an integer
-    */
-    inline int doSomething(int parameterOne);
-
-    //Put your other public member functions here
-
-    int     m_iParamterOne;         /**< m_iParamterOne description goes here. */
-    double  m_dParamterTwo;         /**< m_dParamterTwo description goes here. */
-    bool    m_bParamterThree;       /**< m_bParamterThree description goes here. */
-
-    OtherClass*    m_pOtherClassObject;       /**< m_pOtherClassObject description goes here. */
-
-    //Put your other public members here. Try NOT to define member variables as public. It is always more safe to declare them under protected or private.
-	
 protected:
-    //Put your protected member functions here
-
-    //Put your protected member variables here
 	
 private:
-    //Put your private member functions here
-
-    //Put your private member variables here
 	
-signals: //If you want to use signal/slot system you need to specify the Q_Object flag above
-    //Put your signals which you want to emit from this class here
+signals:
+
 };
 
 
@@ -176,11 +129,5 @@ signals: //If you want to use signal/slot system you need to specify the Q_Objec
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline int TemplateClass::doSomething(int parameterOne);
-{
-    return parameterOne+1;
-}
-
-} // NAMESPACE YOURNAMESPACE
-
-#endif // TEMPLATECLASS
+%{JS: Cpp.closeNamespaces('%{Class}')}
+#endif // %{GUARD}
