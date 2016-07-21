@@ -67,6 +67,7 @@ ssvepBCIScreen::ssvepBCIScreen(QSharedPointer<ssvepBCI> pSSVEPBCI, QSharedPointe
 , m_bUseScreenKeyboard(false)
 , m_qPainter(this)
 , m_qCrossColor(Qt::red)
+, m_bClearScreen(true)
 //, m_qSoundPath(m_pSSVEPBCI->getSSVEPBCIResourcePath() + "beep.mp3")
 {
 //      // implementing the sound file
@@ -83,6 +84,9 @@ ssvepBCIScreen::ssvepBCIScreen(QSharedPointer<ssvepBCI> pSSVEPBCI, QSharedPointe
     format.setStencilBufferSize(8);
     format.setSwapInterval(1);
     setFormat(format);
+
+    // set update behaviour to preserved-swap-buffer
+    setUpdateBehavior(UpdateBehavior::PartialUpdate);
 
     // connect classResult and frequency list signal of SSVEPBCI class to setClassResult slot
     connect(m_pSSVEPBCI.data(), &ssvepBCI::classificationResult, this, &ssvepBCIScreen::setClassResults);
@@ -118,6 +122,14 @@ void ssvepBCIScreen::initializeGL(){
 
 void ssvepBCIScreen::paintGL() {
 
+    // clear Screen by drawing a black filled rectangle
+    if(m_bClearScreen){
+        QPainter p(this);
+        p.fillRect(0,0,width(),height(), Qt::black);
+        m_bClearScreen = false;
+    }
+
+
     //paint all items to the screen
     for(int i = 0; i < m_Items.size(); i++)
         m_Items[i].paint(this);
@@ -128,9 +140,8 @@ void ssvepBCIScreen::paintGL() {
 //    m_qPainter.fillRect(m_dXPosCross*this->width()-0.05*this->height()/2,m_dYPosCross*this->height()-0.01*this->width()/2,0.05*this->height(),0.01*this->width(),m_qCrossColor);
 
     if(m_bUseScreenKeyboard)
-        m_ScreenKeyboard->paint(this);
+        m_pScreenKeyboard->paint(this);
 
-//  m_qPainter.end();
     update(); //schedules next update directly, without going through signal dispatching
 }
 
@@ -178,12 +189,16 @@ void ssvepBCIScreen::updateFrequencyList(MyQList freqList){
 
 void ssvepBCIScreen::useScreenKeyboard(bool useKeyboard){
 
-    if(m_ScreenKeyboard == NULL)
-        m_ScreenKeyboard = QSharedPointer<ScreenKeyboard>(new ScreenKeyboard(m_pSSVEPBCI, m_pSSVEPBCISetupStimulusWidget, QSharedPointer<ssvepBCIScreen>(this)));
+    if(m_pScreenKeyboard == NULL)
+        m_pScreenKeyboard = QSharedPointer<ScreenKeyboard>(new ScreenKeyboard(m_pSSVEPBCI, m_pSSVEPBCISetupStimulusWidget, QSharedPointer<ssvepBCIScreen>(this)));
 
     m_bUseScreenKeyboard = useKeyboard;
+    m_pScreenKeyboard->initScreenKeyboard();
 }
 
 
 //*************************************************************************************************************
 
+void ssvepBCIScreen::clearScreen(){
+    m_bClearScreen = true;
+}

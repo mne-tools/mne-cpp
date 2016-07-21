@@ -152,6 +152,7 @@ private:
     QString             m_sSign;            /**< item attached sign */
     QFont               m_qFont;
 
+
 };
 
 }       // NAMESPACE

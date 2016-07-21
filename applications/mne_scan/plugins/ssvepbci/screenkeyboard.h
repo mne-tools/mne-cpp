@@ -107,6 +107,7 @@ public slots:
     void updateClassList(MyQList classList);
     void updateCommand(double value);
     void setPhrase(QString phrase);
+    void initScreenKeyboard();
 
 private:
     QSharedPointer<ssvepBCI>                        m_pSSVEPBCI;                        /**< pointer to the ssvepBCI class */
@@ -116,8 +117,11 @@ private:
     // displaying
     QPainter                                m_qPainter;             /**< Painter, holding paint device of ssvepBCIScreen class */
     QMap<QPair<int, int>, QString>          m_mapKeys;              /**< QMap, holding the key-values and according coordinates */
-    QPair<int, int>                         m_qCursorCoord;         /**< current cursor coordinates */
+    QPair<int, int>                         m_qCurCursorCoord;      /**< current cursor coordinates */
+    QPair<int, int>                         m_qOldCursorCoord;      /**< old cursor coordinates */
     QList<double>                           m_lClassList;           /**< list containing all displayed frequencies [Hz] */
+    bool                                    m_bInitializeKeyboard;  /**< initalizes the painting of the screen keyboard */
+    bool                                    m_bUpdatePhraseDisplay; /**< updates the phrases's display */
 
     // speller
     bool                                    m_bDisplaySpeller;      /**< flag for displaying speller panel */
@@ -127,6 +131,8 @@ private:
     //=========================================================================================================
     /**
     * process the spelled letter and emit the classifiaction signal
+    *
+    * @param [in] letter    sign which will be classified
     *
     */
     void spellLetter(QString letter);

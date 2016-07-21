@@ -412,7 +412,7 @@ void ssvepBCI::showSetupStimulus()
 {
     QDesktopWidget Desktop; // Desktop Widget for getting the number of accessible screens
 
-    if(Desktop.numScreens()> 1){
+    if(Desktop.numScreens()> 0){
         // Open setup stimulus widget
         if(m_pssvepBCISetupStimulusWidget == NULL)
             m_pssvepBCISetupStimulusWidget = QSharedPointer<ssvepBCISetupStimulusWidget>(new ssvepBCISetupStimulusWidget(this));
@@ -763,7 +763,8 @@ void ssvepBCI::ssvepBCIOnSensor()
             ssvepProbabilities = m_dAlpha / ssvepProbabilities.sum() * ssvepProbabilities;
             ssvepProbabilities = ssvepProbabilities.array().exp();                          // softmax function for better distinguishability between the probabilities
             ssvepProbabilities = 1 / ssvepProbabilities.sum() * ssvepProbabilities;
-            //cout << "probabilites:" << endl << ssvepProbabilities << endl;
+
+            cout << "probabilites:" << endl << ssvepProbabilities << endl;
 
 //            // transfer values to MyQList and emit signal for GUI
 //            m_lSSVEPProbabilities.clear();

@@ -67,8 +67,11 @@ ScreenKeyboard::ScreenKeyboard(QSharedPointer<ssvepBCI> pSSVEPBCI, QSharedPointe
 , m_pSSVEPBCISetupStimulusWidget(pSSVEPBCISetupStimulusWidget)
 , m_pSSVEPBCIScreen(pSSVEPBCIScreen)
 , m_qPainter(m_pSSVEPBCIScreen.data())
-, m_qCursorCoord(QPair<int, int> (0,0))
+, m_qCurCursorCoord(QPair<int, int> (0,0))
+, m_qOldCursorCoord(QPair<int, int> (1,0))
 , m_bDisplaySpeller(false)
+, m_bInitializeKeyboard(true)
+, m_bUpdatePhraseDisplay(true)
 {
     // initialize map for keyboard values and their relative coordinates to each other
     m_mapKeys[QPair<int, int>( 0, 0)] = "E";
@@ -136,39 +139,64 @@ void ScreenKeyboard::paint(QPaintDevice *device){
     int y = int(0.5*m_pSSVEPBCIScreen.data()->height() - 0.5*width);
 
     // scaling the letter size to the biggest sign "DEL"
-    float factor = width / painter.fontMetrics().width("DEL");
-    if ((factor < 1) || (factor > 1.25))
-    {
-        QFont f = painter.font();
-        f.setBold(true);
-        f.setPointSizeF(f.pointSizeF()*factor);
-        painter.setFont(f);
+//    float factor = width / painter.fontMetrics().width("DEL");
+//    if ((factor < 1) || (factor > 1.25))
+//    {
+//        QFont f = painter.font();
+//        f.setBold(true);
+//        f.setPointSizeF(f.pointSizeF()*factor);
+//        painter.setFont(f);
+//    }
+
+    QFont f = painter.font();
+    f.setBold(true);
+    f.setPointSize(40);
+    painter.setFont(f);
+
+    if(m_bInitializeKeyboard){
+        // setting the painter
+        painter.setBrush(Qt::white);
+
+        foreach(QString sign, m_mapKeys){
+
+            QPair<int, int> coord = m_mapKeys.key(sign);
+            const QRect rectangle = QRect(x + coord.first*width,y - coord.second*width,width,width);
+
+            // painting rectangles and and drawing text into them
+            painter.setPen(Qt::red);
+            painter.drawRect(rectangle);
+            painter.setPen(Qt::black);
+            painter.drawText(rectangle, Qt::AlignCenter, sign);
+        }
+
+        m_bInitializeKeyboard = false;
+        qDebug() << "update BCI Screen";
     }
 
-     // setting the painter
-     painter.setBrush(Qt::white);
+    if(m_qCurCursorCoord != m_qOldCursorCoord){
 
-     foreach(QString sign, m_mapKeys){
+        // refresh old cursor position
+        const QRect oldRect = QRect(x + m_qOldCursorCoord.first*width,y - m_qOldCursorCoord.second*width,width,width);
+        painter.setBrush(Qt::white);
+        painter.setPen(Qt::red);
+        painter.drawRect(oldRect);
 
-         QPair<int, int> coord = m_mapKeys.key(sign);
-         const QRect rectangle = QRect(x + coord.first*width,y - coord.second*width,width,width);
+        // paint current cursor position
+        const QRect curRect = QRect(x + m_qCurCursorCoord.first*width,y - m_qCurCursorCoord.second*width,width,width);
+        painter.setBrush(Qt::red);
+        painter.drawRect(curRect);
 
-         // painting rectangles and and drawing text into them
-         painter.setPen(Qt::red);
-         painter.drawRect(rectangle);
-         painter.setPen(Qt::black);
-         painter.drawText(rectangle, Qt::AlignCenter, sign);
+        // draw Text
+        painter.setPen(Qt::black);
+        painter.drawText(curRect, Qt::AlignCenter, m_mapKeys.value(m_qCurCursorCoord));
+        painter.drawText(oldRect, Qt::AlignCenter, m_mapKeys.value(m_qOldCursorCoord));
+
+        // update old cursor position
+        m_qOldCursorCoord = m_qCurCursorCoord;
+        qDebug() << "update Cursor paint!";
     }
 
-    // paint cursor
-    const QRect rectangle = QRect(x + m_qCursorCoord.first*width,y - m_qCursorCoord.second*width,width,width);
-    painter.setBrush(Qt::red);
-    painter.setPen(Qt::red);
-    painter.drawRect(rectangle);
-    painter.setPen(Qt::black);
-    painter.drawText(rectangle, Qt::AlignCenter, m_mapKeys.value(m_qCursorCoord));
-
-    if(m_bDisplaySpeller){
+    if(m_bDisplaySpeller & m_bUpdatePhraseDisplay){
 
         // setting speller box parameter
         int height = 0.1* m_pSSVEPBCIScreen.data()->height() ;
@@ -182,7 +210,11 @@ void ScreenKeyboard::paint(QPaintDevice *device){
         painter.setPen(Qt::red);
         painter.drawText(rectangle,Qt::AlignLeft & Qt::AlignTop, m_sSettledPhrase);
         painter.setPen(Qt::black);
-        painter.drawText(rectangle,Qt::AlignLeft & Qt::AlignBottom, m_sSpelledPhrase);
+        painter.drawText(rectangle,Qt::AlignBottom, m_sSpelledPhrase);
+
+        qDebug() << "Update Phrase display";
+
+        m_bUpdatePhraseDisplay = false;
     }
 
 }
@@ -215,18 +247,19 @@ void ScreenKeyboard::updateCommand(double value){
     case 3:
         deltaX -=1; break;
     case 4:
-        spellLetter(m_mapKeys.value(m_qCursorCoord));
-        qDebug() << "chosen sign:"  << m_mapKeys.value(m_qCursorCoord);
-        m_qCursorCoord = QPair<int, int> (0,0);
+        spellLetter(m_mapKeys.value(m_qCurCursorCoord));
+        qDebug() << "chosen sign:"  << m_mapKeys.value(m_qCurCursorCoord);
+        m_qCurCursorCoord = QPair<int, int> (0,0);
+        m_bUpdatePhraseDisplay = true;
         break;
     default:
         break;
     }
 
     // check new cursor position -> then update
-    if(m_mapKeys.contains(QPair<int, int> (m_qCursorCoord.first + deltaX, m_qCursorCoord.second + deltaY))){
-        m_qCursorCoord.first    += deltaX;
-        m_qCursorCoord.second   += deltaY;
+    if(m_mapKeys.contains(QPair<int, int> (m_qCurCursorCoord.first + deltaX, m_qCurCursorCoord.second + deltaY))){
+        m_qCurCursorCoord.first    += deltaX;
+        m_qCurCursorCoord.second   += deltaY;
     }
 }
 
@@ -237,7 +270,10 @@ void ScreenKeyboard::setPhrase(QString phrase){
 
     // capitalizing the phrase and assign it
     m_sSettledPhrase = phrase.toUpper();
+
+    // set required flags
     m_bDisplaySpeller = true;
+    m_bUpdatePhraseDisplay = true;
 }
 
 
@@ -254,4 +290,12 @@ void ScreenKeyboard::spellLetter(QString letter){
         m_sSpelledPhrase.append(letter);
         emit getLetter(letter);
     }
+}
+
+
+//*************************************************************************************************************
+
+void ScreenKeyboard::initScreenKeyboard(){
+    m_bInitializeKeyboard = true;
+    m_qOldCursorCoord = QPair<int, int>(100,100);
 }

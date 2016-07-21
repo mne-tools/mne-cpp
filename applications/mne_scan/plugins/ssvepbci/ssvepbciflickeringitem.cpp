@@ -107,38 +107,43 @@ void ssvepBCIFlickeringItem::paint(QPaintDevice *paintDevice)
     //setting the nex flicker state (moving iterater to front if necessary)
     if(!m_bIter.hasNext())
         m_bIter.toFront();
+
+
+    if( m_bIter.peekNext() != m_bFlickerState){
+
+        //painting the itme's shape
+        QPainter p(paintDevice);
+
+
+        if(m_bSignFlag){
+            //        // scaling the letter size to the biggest sign "DEL"
+            //        float factor =0.2* m_dWidth*paintDevice->width() / p.fontMetrics().width(m_sSign);
+            //        if ((factor < 1) || (factor > 1.25))
+            //        {
+            //            QFont f = p.font();
+            //            f.setBold(true);
+            //            f.setPointSizeF(f.pointSizeF()*factor);
+            //            p.setFont(f);
+            //        }
+
+            QFont f = p.font();
+            f.setBold(true);
+            f.setPointSize(30);
+            p.setFont(f);
+        }
+
+        QRect rectangle(m_dPosX*paintDevice->width(),m_dPosY*paintDevice->height(),m_dWidth*paintDevice->width(),m_dHeight*paintDevice->height());
+
+        if(m_bFlickerState){
+            p.fillRect(rectangle,Qt::white);
+            p.drawText(rectangle, Qt::AlignCenter, m_sSign);
+        }
+        else
+            p.fillRect(m_dPosX*paintDevice->width(),m_dPosY*paintDevice->height(),m_dWidth*paintDevice->width(),m_dHeight*paintDevice->height(),Qt::black);
+
+    }
+
     m_bFlickerState = m_bIter.next();
-
-    //painting the itme's shape
-    QPainter p(paintDevice);
-
-
-    if(m_bSignFlag){
-//        // scaling the letter size to the biggest sign "DEL"
-//        float factor =0.2* m_dWidth*paintDevice->width() / p.fontMetrics().width(m_sSign);
-//        if ((factor < 1) || (factor > 1.25))
-//        {
-//            QFont f = p.font();
-//            f.setBold(true);
-//            f.setPointSizeF(f.pointSizeF()*factor);
-//            p.setFont(f);
-//        }
-
-        QFont f = p.font();
-        f.setBold(true);
-        f.setPointSize(30);
-        p.setFont(f);
-    }
-
-    QRect rectangle(m_dPosX*paintDevice->width(),m_dPosY*paintDevice->height(),m_dWidth*paintDevice->width(),m_dHeight*paintDevice->height());
-
-    if(m_bFlickerState){
-        p.fillRect(rectangle,Qt::white);
-        p.drawText(rectangle, Qt::AlignCenter, m_sSign);
-    }
-    else
-        p.fillRect(m_dPosX*paintDevice->width(),m_dPosY*paintDevice->height(),m_dWidth*paintDevice->width(),m_dHeight*paintDevice->height(),Qt::black);
-
 
 }
 
