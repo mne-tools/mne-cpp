@@ -112,7 +112,7 @@ int main(int argc, char *argv[])
     QCommandLineOption sampleHemiOption("hemi", "Selected hemisphere <hemi>.", "hemi", "2");
     QCommandLineOption sampleSubjectOption("subject", "Selected subject <subject>.", "subject", "sample");
     QCommandLineOption sampleSubjectPathOption("subjectPath", "Selected subject path <subjectPath>.", "subjectPath", "./MNE-sample-data/subjects");
-    QCommandLineOption sampleSourceLocOption("doSourceLoc", "Do real time source localization <doSourceLoc>.", "doSourceLoc", "true");
+    QCommandLineOption sampleSourceLocOption("doSourceLoc", "Do real time source localization <doSourceLoc>.", "doSourceLoc", "false");
     QCommandLineOption sampleFwdOption("fwd", "Path to forwad solution <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
     QCommandLineOption sampleInvOpOption("invOp", "Path to inverse operator <file>.", "file", "");
     QCommandLineOption sampleClustOption("doClust", "Path to clustered inverse operator <doClust>.", "doClust", "false");
@@ -271,6 +271,18 @@ int main(int argc, char *argv[])
 //    testWindow->addBemData("Subject01", "BEM", t_Bem2);
 //    testWindow->addBemData("Sensors", "VectorView", t_sensorSurfaceVV);
 //    testWindow->addBemData("Sensors", "BabyMEG", t_sensorSurfaceBM);
+
+    //
+    // Read & show digitizer points
+    //
+
+    QFile t_fileElec("./MNE-sample-data/warping/AVG4-0Years_GSN128.fif");
+    QList<FiffDigPoint> t_Dig=FiffDigPoint::read(t_fileElec);
+    testWindow->addDigitizerData("Subject01", "Left Auditory", t_Dig);
+//    testWindow->addDigitizerData("Subject01", "Left Auditory", t_Dig);
+
+
+
 
     if(bAddRtSourceLoc) {
         //testWindow->addBrainData("Subject01", "HemiLRSet", t_clusteredFwd);

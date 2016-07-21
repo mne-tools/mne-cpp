@@ -206,7 +206,7 @@ public:
     * Adds digitizer data.
     *
     * @param[in] subject            The name of the subject.
-    * @param[in] set                The name of the digitizer set to which the data is to be added.
+    * @param[in] set                The name of the measurment set to which the data is to be added.
     * @param[in] tDigitizer         The digitizer information.
     *
     * @return                       Returns true if successful.

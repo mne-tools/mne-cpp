@@ -1,15 +1,14 @@
 //=============================================================================================================
 /**
-* @file     digitizertreeitem.cpp
-* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
-*           Jana Kiesel <jana.kiesel@tu-ilmenau.de>;
+* @file     digitizersettreeitem.cpp
+* @author   Jana Kiesel <jana.kiesel@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     July, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2015, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Jana Kiesel and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,9 +29,17 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    DigitizerTreeItem class definition.
+* @brief    DigitizerSetTreeItem class definition.
 *
 */
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "digitizersettreeitem.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -45,15 +52,13 @@
 
 #include "../../helpers/renderable3Dentity.h"
 
-#include "fs/label.h"
-#include "fs/surface.h"
 
-#include "mne/mne_hemisphere.h"
-
+#include "fiff/fiff_constants.h"
+#include "fiff/fiff_dig_point.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// QT INCLUDES
 //=============================================================================================================
 
 #include <QList>
@@ -64,9 +69,10 @@
 #include <QStandardItemModel>
 #include <QMatrix4x4>
 
-#include <Qt3DExtras/QSphereMesh>
-#include <Qt3DExtras/QPhongMaterial>
-#include <Qt3DCore/QTransform>
+//#include <Qt3DExtras/QSphereMesh>
+//#include <Qt3DExtras/QPhongMaterial>
+//#include <Qt3DCore/QTransform>
+
 
 
 //*************************************************************************************************************
@@ -83,10 +89,18 @@
 //=============================================================================================================
 
 using namespace Eigen;
-using namespace MNELIB;
+//using namespace MNELIB;
 using namespace DISP3DLIB;
 using namespace FIFFLIB;
 
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE GLOBAL METHODS
+//=============================================================================================================
+
+//Put all globally defined functions here. These functions are not part of your class. I.e. put all functions
+//here which are called by a multithreading framework (QtFramework, etc.)
 
 
 //*************************************************************************************************************
@@ -94,7 +108,7 @@ using namespace FIFFLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-DigitizerTreeItem::DigitizerTreeItem(int iType, const QString& text)
+DigitizerSetTreeItem::DigitizerSetTreeItem(int iType, const QString& text)
 : AbstractTreeItem(iType, text)
 , m_pParentEntity(new Qt3DCore::QEntity())
 , m_pRenderable3DEntity(new Renderable3DEntity())
@@ -102,20 +116,22 @@ DigitizerTreeItem::DigitizerTreeItem(int iType, const QString& text)
     this->setEditable(false);
     this->setCheckable(true);
     this->setCheckState(Qt::Checked);
-    this->setToolTip(text);
+    this->setToolTip("Digitizer Set");
 }
+
 
 
 //*************************************************************************************************************
 
-DigitizerTreeItem::~DigitizerTreeItem()
+DigitizerSetTreeItem::~DigitizerSetTreeItem()
 {
+
 }
 
 
 //*************************************************************************************************************
 
-QVariant DigitizerTreeItem::data(int role) const
+QVariant DigitizerSetTreeItem::data(int role) const
 {
     return AbstractTreeItem::data(role);
 }
@@ -123,7 +139,7 @@ QVariant DigitizerTreeItem::data(int role) const
 
 //*************************************************************************************************************
 
-void  DigitizerTreeItem::setData(const QVariant& value, int role)
+void  DigitizerSetTreeItem::setData(const QVariant& value, int role)
 {
     AbstractTreeItem::setData(value, role);
 
@@ -137,130 +153,103 @@ void  DigitizerTreeItem::setData(const QVariant& value, int role)
 
 //*************************************************************************************************************
 
-bool DigitizerTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer, Qt3DCore::QEntity* parent)
+bool DigitizerSetTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer, Qt3DCore::QEntity* parent)
 {
-    //Create renderable 3D entity
-    m_pParentEntity = parent;
-    m_pRenderable3DEntity = new Renderable3DEntity(parent);
+    bool state = false;
 
-    QMatrix4x4 m;
-    Qt3DCore::QTransform* transform =  new Qt3DCore::QTransform();
-    m.rotate(180, QVector3D(0.0f, 1.0f, 0.0f));
-    m.rotate(-90, QVector3D(1.0f, 0.0f, 0.0f));
-    transform->setMatrix(m);
-    m_pRenderable3DEntity->addComponent(transform);
+    //parsing the digitizer List
+    QList<FIFFLIB::FiffDigPoint> tCardinal;
+    QList<FIFFLIB::FiffDigPoint> tHpi;
+    QList<FIFFLIB::FiffDigPoint> tEeg;
+    QList<FIFFLIB::FiffDigPoint> tExtra;
 
-    //Create sources as small 3D spheres
-    QVector3D pos;
-    Qt3DCore::QEntity* sourceSphereEntity;
-    Qt3DExtras::QSphereMesh* sourceSphere;
-    Qt3DExtras::QPhongMaterial* material;
-
-    for(int i = 0; i < tDigitizer.size(); i++) {
-
-        pos.setX(tDigitizer[i].r[0]);
-        pos.setY(tDigitizer[i].r[1]);
-        pos.setZ(tDigitizer[i].r[2]);
-
-        sourceSphereEntity = new Qt3DCore::QEntity();
-
-        sourceSphere = new Qt3DExtras::QSphereMesh();
-        if (tDigitizer[i].kind==FIFFV_POINT_CARDINAL){
-            sourceSphere->setRadius(0.002f);
-        }
-        else{
-            sourceSphere->setRadius(0.001f);
-        }
-        sourceSphereEntity->addComponent(sourceSphere);
-
-        transform = new Qt3DCore::QTransform();
-        QMatrix4x4 m;
-        m.translate(pos);
-        transform->setMatrix(m);
-        sourceSphereEntity->addComponent(transform);
-
-        material = new Qt3DExtras::QPhongMaterial();
+    for(int i = 0; i<tDigitizer.size(); i++){
         switch (tDigitizer[i].kind) {
         case FIFFV_POINT_CARDINAL:
-            material->setAmbient(Qt::yellow);
+            tCardinal.append(tDigitizer[i]);
             break;
         case FIFFV_POINT_HPI:
-            material->setAmbient(Qt::red);
+            tHpi.append(tDigitizer[i]);
             break;
         case FIFFV_POINT_EEG:
-            material->setAmbient(Qt::green);
+            tEeg.append(tDigitizer[i]);
             break;
         case FIFFV_POINT_EXTRA:
-            material->setAmbient(Qt::blue);
+            tExtra.append(tDigitizer[i]);
             break;
         default:
-            material->setAmbient(Qt::white);
             break;
         }
-        sourceSphereEntity->addComponent(material);
-
-        sourceSphereEntity->setParent(m_pRenderable3DEntity);
     }
 
+    // Find the Digitizer Items
+    QList<QStandardItem*> itemList = this->findChildren(Data3DTreeModelItemTypes::DigitizerItem);
 
-//    m_lChildren = m_pRenderable3DEntity->children();
+    if (!tCardinal.empty()){
 
-//    //Create color from curvature information with default gyri and sulcus colors
-//    QByteArray arrayVertColor = createVertColor(tHemisphere.rr);
+        //Create a cardinal digitizer item
+        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(Data3DTreeModelItemTypes::DigitizerItem,"Cardinal");
+        state = digitizerItem->addData(tCardinal, parent);
+        itemList << digitizerItem;
+        itemList << new QStandardItem(digitizerItem->toolTip());
+        this->appendRow(itemList);
+        itemList.clear();
 
-//    //Set renderable 3D entity mesh and color data
-//    m_pRenderable3DEntity->setMeshData(tHemisphere.rr, tHemisphere.nn, tHemisphere.tris, arrayVertColor);
+    }
+    if (!tHpi.empty()){
 
-//    //Add data which is held by this DigitizerTreeItem
-//    QVariant data;
+        //Create a HPI digitizer item
+        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(Data3DTreeModelItemTypes::DigitizerItem,"HPI");
+        state = digitizerItem->addData(tHpi, parent);
+        itemList << digitizerItem;
+        itemList << new QStandardItem(digitizerItem->toolTip());
+        this->appendRow(itemList);
+        itemList.clear();
+    }
+    if (!tEeg.empty()){
 
-//    data.setValue(arrayVertColor);
-//    this->setData(data, Data3DTreeModelItemRoles::SurfaceCurrentColorVert);
+        //Create a EEG digitizer item
+        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(Data3DTreeModelItemTypes::DigitizerItem,"EEG/ECG");
+        state = digitizerItem->addData(tEeg, parent);
+        itemList << digitizerItem;
+        itemList << new QStandardItem(digitizerItem->toolTip());
+        this->appendRow(itemList);
+        itemList.clear();
+    }
+    if (!tExtra.empty()){
 
-//    data.setValue(tHemisphere.rr);
-//    this->setData(data, Data3DTreeModelItemRoles::SurfaceVert);ok
+        //Create a extra digitizer item
+        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(Data3DTreeModelItemTypes::DigitizerItem,"Extra");
+        state = digitizerItem->addData(tExtra, parent);
+        itemList << digitizerItem;
+        itemList << new QStandardItem(digitizerItem->toolTip());
+        this->appendRow(itemList);
+        itemList.clear();
 
-//    data.setValue(tHemisphere.tris);
-//    this->setData(data, Data3DTreeModelItemRoles::SurfaceTris);
+    }
 
-//    data.setValue(tHemisphere.nn);
-//    this->setData(data, Data3DTreeModelItemRoles::SurfaceNorm);
+//    this->appendRow(itemList);
+    QList<QStandardItem*> test=this->findChildren("EEG/ECG");
 
-//    data.setValue(m_pRenderable3DEntity);
-//    this->setData(data, Data3DTreeModelItemRoles::SurfaceRenderable3DEntity);
-
-//    //Add surface meta information as item children
-//    QList<QStandardItem*> list;
-
-//    MetaTreeItem* pItemSurfCol = new MetaTreeItem(MetaTreeItemTypes::SurfaceColor, "Surface color");
-//    connect(pItemSurfCol, &MetaTreeItem::surfaceColorChanged,
-//            this, &DigitizerTreeItem::onSurfaceColorChanged);
-//    list << pItemSurfCol;
-//    list << new QStandardItem(pItemSurfCol->toolTip());
-//    this->appendRow(list);
-//    data.setValue(QColor(100,100,100));
-//    pItemSurfCol->setData(data, MetaTreeItemRoles::SurfaceColor);
-//    pItemSurfCol->setData(data, Qt::DecorationRole);
-
-    return true;
+    return state;
 }
 
 
 //*************************************************************************************************************
 
-void DigitizerTreeItem::setVisible(bool state)
+void DigitizerSetTreeItem::setVisible(bool state)
 {
-    m_pRenderable3DEntity->setParent(state ? m_pParentEntity : Q_NULLPTR);
+//    m_pRenderable3DEntity->setParent(state ? m_pParentEntity : Q_NULLPTR);
 
-//    for(int i = 0; i<m_lChildren.size(); i++) {
-//        m_lChildren.at(i)->setParent(state ? m_pRenderable3DEntity : Q_NULLPTR);
-//    }
+    for(int i = 0; i<m_lChildren.size(); i++) {
+        m_lChildren.at(i)->setParent(state ? m_pRenderable3DEntity : Q_NULLPTR);
+    }
 }
 
 
 //*************************************************************************************************************
 
-void DigitizerTreeItem::onSurfaceColorChanged(const QColor& color)
+void DigitizerSetTreeItem::onSurfaceColorChanged(const QColor& color)
 {
     QVariant data;
     QByteArray arrayNewVertColor = createVertColor(this->data(Data3DTreeModelItemRoles::SurfaceVert).value<MatrixX3f>(), color);
@@ -272,15 +261,19 @@ void DigitizerTreeItem::onSurfaceColorChanged(const QColor& color)
 
 //*************************************************************************************************************
 
-void DigitizerTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
+void DigitizerSetTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
 {
-    this->setVisible(checkState==Qt::Unchecked ? false : true);
+    for(int i = 0; i<this->rowCount(); i++) {
+        if(this->child(i)->isCheckable()) {
+            this->child(i)->setCheckState(checkState);
+        }
+    }
 }
 
 
 //*************************************************************************************************************
 
-QByteArray DigitizerTreeItem::createVertColor(const MatrixXf& vertices, const QColor& color) const
+QByteArray DigitizerSetTreeItem::createVertColor(const MatrixXf& vertices, const QColor& color) const
 {
     QByteArray arrayCurvatureColor;
     arrayCurvatureColor.resize(vertices.rows() * 3 * (int)sizeof(float));

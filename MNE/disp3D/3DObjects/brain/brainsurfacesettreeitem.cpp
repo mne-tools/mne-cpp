@@ -44,6 +44,9 @@
 #include "brainrtsourcelocdatatreeitem.h"
 #include "brainsurfacetreeitem.h"
 #include "brainannotationtreeitem.h"
+#include "../digitizer/digitizersettreeitem.h"
+#include "../digitizer/digitizertreeitem.h"
+
 
 #include "fs/label.h"
 #include "fs/annotationset.h"
@@ -344,6 +347,37 @@ BrainRTSourceLocDataTreeItem* BrainSurfaceSetTreeItem::addData(const MNESourceEs
     }
 
     return new BrainRTSourceLocDataTreeItem();
+}
+
+
+//*************************************************************************************************************
+
+bool BrainSurfaceSetTreeItem::addData(const QList<FiffDigPoint> &tDigitizer, Qt3DCore::QEntity *p3DEntityParent)
+{
+    //Find the digitizerkind
+    QList<QStandardItem*> itemDigitizerList = this->findChildren(Data3DTreeModelItemTypes::DigitizerSetItem);
+
+    //If digitizer does not exist, create a new one
+    if(itemDigitizerList.size() == 0) {
+        DigitizerSetTreeItem* digitizerSetItem = new DigitizerSetTreeItem(Data3DTreeModelItemTypes::DigitizerSetItem,"Digitizer");
+        itemDigitizerList << digitizerSetItem;
+        itemDigitizerList << new QStandardItem(digitizerSetItem->toolTip());
+        this->appendRow(itemDigitizerList);
+    }
+
+    // Add Data to the first Digitizer Set Item
+    bool state = false;
+
+    //Check if it is really a digitizer tree item
+    if((itemDigitizerList.at(0)->type() == Data3DTreeModelItemTypes::DigitizerSetItem)) {
+        DigitizerSetTreeItem* pDigitizerSetItem = dynamic_cast<DigitizerSetTreeItem*>(itemDigitizerList.at(0));
+        state = pDigitizerSetItem->addData(tDigitizer, p3DEntityParent);
+    }
+    else{
+        state=false;
+    }
+
+    return state;
 }
 
 
