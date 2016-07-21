@@ -413,26 +413,41 @@ bool Data3DTreeModel::addData(const QString& subject, const QString& set, const 
         if((itemSubjectList.at(i)->type() == Data3DTreeModelItemTypes::SubjectItem)) {
             SubjectTreeItem* pSubjectItem = dynamic_cast<SubjectTreeItem*>(itemSubjectList.at(i));
 
-            //Find already existing digitizer items and add the new data to the first search result
+
+            //Find already existing set items and add the new data to the first search result
             QList<QStandardItem*> itemList = pSubjectItem->findChildren(set);
 
-            if(!itemList.isEmpty() && (itemList.at(0)->type() == Data3DTreeModelItemTypes::DigitizerItem)) {
-                DigitizerTreeItem* pDigitizerItem = dynamic_cast<DigitizerTreeItem*>(itemList.at(0));
-                state = pDigitizerItem->addData(tDigitizer, m_pParentEntity);
+            if(!itemList.isEmpty() && (itemList.at(0)->type() == Data3DTreeModelItemTypes::SurfaceSetItem)) {
+                BrainSurfaceSetTreeItem* pSurfaceSetItem = dynamic_cast<BrainSurfaceSetTreeItem*>(itemList.at(0));
+                state = pSurfaceSetItem->addData(tDigitizer, m_pParentEntity);
             } else {
-                DigitizerTreeItem* pDigitizerItem = new DigitizerTreeItem(Data3DTreeModelItemTypes::DigitizerItem, set);
+                BrainSurfaceSetTreeItem* pSurfaceSetItem = new BrainSurfaceSetTreeItem(Data3DTreeModelItemTypes::SurfaceSetItem, set);
 
                 QList<QStandardItem*> list;
-                list << pDigitizerItem;
-                list << new QStandardItem(pDigitizerItem->toolTip());
+                list << pSurfaceSetItem;
+                list << new QStandardItem(pSurfaceSetItem->toolTip());
                 pSubjectItem->appendRow(list);
 
-                state = pDigitizerItem->addData(tDigitizer, m_pParentEntity);
+                state = pSurfaceSetItem->addData(tDigitizer, m_pParentEntity);
             }
+
+
+//            if(!itemList.isEmpty() && (itemList.at(0)->type() == Data3DTreeModelItemTypes::DigitizerItem)) {
+//                DigitizerTreeItem* pDigitizerItem = dynamic_cast<DigitizerTreeItem*>(itemList.at(0));
+//                state = pDigitizerItem->addData(tDigitizer, m_pParentEntity);
+//            } else {
+//                DigitizerTreeItem* pDigitizerItem = new DigitizerTreeItem(Data3DTreeModelItemTypes::DigitizerItem, set);
+
+//                QList<QStandardItem*> list;
+//                list << pDigitizerItem;
+//                list << new QStandardItem(pDigitizerItem->toolTip());
+//                pSubjectItem->appendRow(list);
+
+//                state = pDigitizerItem->addData(tDigitizer, m_pParentEntity);
+//            }
         }
     }
 
-    return state;/*
-    return true;*/
+    return state;
 }
 

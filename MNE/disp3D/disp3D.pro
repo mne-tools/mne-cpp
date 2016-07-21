@@ -114,7 +114,8 @@ SOURCES += \
     control/control3dwidget.cpp \
     rt/rtSourceLoc/rtsourcelocdataworker.cpp \
     3DObjects/brain/brainsourcespacetreeitem.cpp \
-    materials/shadermaterial.cpp
+    materials/shadermaterial.cpp \
+    3DObjects/digitizer/digitizersettreeitem.cpp
 
 HEADERS += \
     view3D.h \
@@ -139,7 +140,8 @@ HEADERS += \
     disp3D_global.h \
     rt/rtSourceLoc/rtsourcelocdataworker.h \
     3DObjects/brain/brainsourcespacetreeitem.h \
-    materials/shadermaterial.h
+    materials/shadermaterial.h \
+    3DObjects/digitizer/digitizersettreeitem.h
 
 FORMS += \
     control/control3dwidget.ui \
