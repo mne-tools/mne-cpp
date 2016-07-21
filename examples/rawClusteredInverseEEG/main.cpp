@@ -746,7 +746,7 @@ int main(int argc, char *argv[])
     // Find rows of interest in stc files
     //
 
-    QFile wrtFWD ("./mne_x_plugins/resources/tmsi/fwd_clustered.txt");
+    QFile wrtFWD ("./mne_scan_plugins/resources/tmsi/fwd_clustered.txt");
     wrtFWD.open(QIODevice::WriteOnly | QIODevice::Text);
     QTextStream out(&wrtFWD);
 
@@ -775,15 +775,15 @@ int main(int argc, char *argv[])
 
     //Find interesting rows in stc files
     // Left hemisphere
-    QFile wrtFWD_28_left ("./mne_x_plugins/resources/tmsi/fwd_clustered_postcentral_28_Left.txt");
+    QFile wrtFWD_28_left ("./mne_scan_plugins/resources/tmsi/fwd_clustered_postcentral_28_Left.txt");
     wrtFWD_28_left.open(QIODevice::WriteOnly | QIODevice::Text);
     QTextStream out_28_left(&wrtFWD_28_left);
 
-    QFile wrtFWD_29_left ("./mne_x_plugins/resources/tmsi/fwd_clustered_precentral_29_Left.txt");
+    QFile wrtFWD_29_left ("./mne_scan_plugins/resources/tmsi/fwd_clustered_precentral_29_Left.txt");
     wrtFWD_29_left.open(QIODevice::WriteOnly | QIODevice::Text);
     QTextStream out_29_left(&wrtFWD_29_left);
 
-    QFile wrtFWD_45_left ("./mne_x_plugins/resources/tmsi/fwd_clustered_central_45_Left.txt");
+    QFile wrtFWD_45_left ("./mne_scan_plugins/resources/tmsi/fwd_clustered_central_45_Left.txt");
     wrtFWD_45_left.open(QIODevice::WriteOnly | QIODevice::Text);
     QTextStream out_45_left(&wrtFWD_45_left);
 
@@ -817,15 +817,15 @@ int main(int argc, char *argv[])
     }
 
     // Right hemisphere
-    QFile wrtFWD_28_right ("./mne_x_plugins/resources/tmsi/fwd_clustered_postcentral_28_Right.txt");
+    QFile wrtFWD_28_right ("./mne_scan_plugins/resources/tmsi/fwd_clustered_postcentral_28_Right.txt");
     wrtFWD_28_right.open(QIODevice::WriteOnly | QIODevice::Text);
     QTextStream out_28_right(&wrtFWD_28_right);
 
-    QFile wrtFWD_29_right ("./mne_x_plugins/resources/tmsi/fwd_clustered_precentral_29_Right.txt");
+    QFile wrtFWD_29_right ("./mne_scan_plugins/resources/tmsi/fwd_clustered_precentral_29_Right.txt");
     wrtFWD_29_right.open(QIODevice::WriteOnly | QIODevice::Text);
     QTextStream out_29_right(&wrtFWD_29_right);
 
-    QFile wrtFWD_45_right ("./mne_x_plugins/resources/tmsi/fwd_clustered_central_45_Right.txt");
+    QFile wrtFWD_45_right ("./mne_scan_plugins/resources/tmsi/fwd_clustered_central_45_Right.txt");
     wrtFWD_45_right.open(QIODevice::WriteOnly | QIODevice::Text);
     QTextStream out_45_right(&wrtFWD_45_right);
 
