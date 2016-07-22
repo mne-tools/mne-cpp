@@ -194,7 +194,7 @@ public:
     coilParam dipfit(struct coilParam, struct sens, Eigen::MatrixXd, int numCoils);
     Eigen::MatrixXd fminsearch(Eigen::MatrixXd,int, int, int, Eigen::MatrixXd, struct sens);
 
-    void test();
+    //void test();
 
 signals:
     //=========================================================================================================
@@ -246,7 +246,7 @@ private:
 //    MatrixXd CircBuf;
 
 public:
-    MatrixXd SpecData;
+    //MatrixXd SpecData;
     QMutex ReadMutex;
 
     bool SendDataToBuffer;
