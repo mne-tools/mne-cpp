@@ -841,18 +841,19 @@ void RtHPIS::run()
                 itimerBufFull = timerBufFull.elapsed();
 
                 buffer.clear();
+
+                qDebug() << "";
+                qDebug() << "RtHPIS::run() - All" << timerAll.elapsed() << "milliseconds";
+                qDebug() << "";
+                qDebug() << "RtHPIS::run() - itimerMatAlloc" << itimerMatAlloc << "milliseconds";
+                qDebug() << "RtHPIS::run() - itimerLocCoils" << itimerLocCoils << "milliseconds";
+                qDebug() << "RtHPIS::run() - itimerTransMulti" << itimerTransMulti << "milliseconds";
+                qDebug() << "RtHPIS::run() - itimerPhase" << itimerPhase << "milliseconds";
+                qDebug() << "RtHPIS::run() - itimerDipFit" << itimerDipFit << "milliseconds";
+                qDebug() << "RtHPIS::run() - itimerCompTrans" << itimerCompTrans << "milliseconds";
+                qDebug() << "RtHPIS::run() - itimerBufFull" << itimerBufFull << "milliseconds";
             }
 
-            qDebug() << "";
-            qDebug() << "RtHPIS::run() - All" << timerAll.elapsed() << "milliseconds";
-            qDebug() << "";
-            qDebug() << "RtHPIS::run() - itimerMatAlloc" << itimerMatAlloc << "milliseconds";
-            qDebug() << "RtHPIS::run() - itimerLocCoils" << itimerLocCoils << "milliseconds";
-            qDebug() << "RtHPIS::run() - itimerTransMulti" << itimerTransMulti << "milliseconds";
-            qDebug() << "RtHPIS::run() - itimerPhase" << itimerPhase << "milliseconds";
-            qDebug() << "RtHPIS::run() - itimerDipFit" << itimerDipFit << "milliseconds";
-            qDebug() << "RtHPIS::run() - itimerCompTrans" << itimerCompTrans << "milliseconds";
-            qDebug() << "RtHPIS::run() - itimerBufFull" << itimerBufFull << "milliseconds";
 
         }//m_pRawMatrixBuffer
     }  //End of while statement
