@@ -161,9 +161,11 @@ void RtHPIS::run()
     int numLoc = 1, numBlock, samLoc; // numLoc : Number of times to localize in a second
     samLoc = samF/numLoc; // minimum samples required to localize numLoc times in a second
     Eigen::VectorXd coilfreq(numCoils);
-//    coilfreq[0] = 155;  coilfreq[1] = 160;  coilfreq[2] = 165;  coilfreq[3] = 170;
 //    coilfreq[0] = 154; coilfreq[1] = 158;coilfreq[2] = 162;coilfreq[3] = 166;
     coilfreq[0] = 155; coilfreq[1] = 165; coilfreq[2] = 190; coilfreq[3] = 200;
+
+    qDebug()<< "======= coil driving frequency (Hz)======== ";
+    qDebug() << coilfreq[0] << ", " << coilfreq[1] << ", " << coilfreq[2] << ", " << coilfreq[3];
 
     // Initialize HPI coils location and moment
     coil.pos = Eigen::MatrixXd::Zero(numCoils,3);
@@ -197,17 +199,6 @@ void RtHPIS::run()
 //    outsin.close();
 //    outcos.close();
 
-    // Get the indices of inner layer channels
-    QVector<int> innerind(0);
-    for (int i = 0;i < numCh;i++) {
-        if(m_pFiffInfo->chs[i].coil_type == 7002) {
-            // Check if the sensor is bad, if not append to innerind
-            if(!(m_pFiffInfo->bads.contains(m_pFiffInfo->ch_names.at(i)))) innerind.append(i);
-        }
-    }
-
-    qDebug() << "innerind (number of inlayer channels): " << innerind.size();
-
     //====== Seok 2016. 3.25 ==========================================
     // Get the indices of trigger channels
 //    QVector<int> trigind(0);
@@ -226,20 +217,6 @@ void RtHPIS::run()
 //    }
 //    qDebug() << "trigind: " << trigind.length();
     //==================================================================
-
-    // Initialize inner layer sensors
-    sensors.coilpos = Eigen::MatrixXd::Zero(innerind.size(),3);
-    sensors.coilori = Eigen::MatrixXd::Zero(innerind.size(),3);
-    sensors.tra = Eigen::MatrixXd::Identity(innerind.size(),innerind.size());
-
-    for(int i=0;i<innerind.size();i++) {
-        sensors.coilpos(i,0) = m_pFiffInfo->chs[innerind.at(i)].loc(0,0);
-        sensors.coilpos(i,1) = m_pFiffInfo->chs[innerind.at(i)].loc(1,0);
-        sensors.coilpos(i,2) = m_pFiffInfo->chs[innerind.at(i)].loc(2,0);
-        sensors.coilori(i,0) = m_pFiffInfo->chs[innerind.at(i)].loc(9,0);
-        sensors.coilori(i,1) = m_pFiffInfo->chs[innerind.at(i)].loc(10,0);
-        sensors.coilori(i,2) = m_pFiffInfo->chs[innerind.at(i)].loc(11,0);
-    }
 
     //load polhemus HPI
     Eigen::MatrixXd headHPI(numCoils,3);
@@ -274,16 +251,10 @@ void RtHPIS::run()
 
     }
 
-    Eigen::MatrixXd topo(innerind.size(),numCoils*2);
-    Eigen::MatrixXd amp(innerind.size(),numCoils);
     Eigen::Matrix4d trans;
-
     QVector<MatrixXd> buffer;
     double phase;
 
-    // Seok ---------------------------------
-    qDebug()<< "======= coil driving frequency (Hz)======== ";
-    qDebug() << coilfreq[0] << ", " << coilfreq[1] << ", " << coilfreq[2] << ", " << coilfreq[3];
 //    qDebug() << "samLoc (1024): " << samLoc;
 //    int OUT_FLAG = 0;
 //    int OUT_RAW = 0;
@@ -324,6 +295,34 @@ void RtHPIS::run()
 
     while(m_bIsRunning)
     {
+        // Get the indices of inner layer channels
+        QVector<int> innerind(0);
+        for (int i = 0;i < numCh;i++) {
+            if(m_pFiffInfo->chs[i].coil_type == 7002) {
+                // Check if the sensor is bad, if not append to innerind
+                if(!(m_pFiffInfo->bads.contains(m_pFiffInfo->ch_names.at(i)))) innerind.append(i);
+            }
+        }
+
+        qDebug() << "innerind (number of inlayer channels): " << innerind.size();
+
+        // Initialize inner layer sensors
+        sensors.coilpos = Eigen::MatrixXd::Zero(innerind.size(),3);
+        sensors.coilori = Eigen::MatrixXd::Zero(innerind.size(),3);
+        sensors.tra = Eigen::MatrixXd::Identity(innerind.size(),innerind.size());
+
+        for(int i=0;i<innerind.size();i++) {
+            sensors.coilpos(i,0) = m_pFiffInfo->chs[innerind.at(i)].loc(0,0);
+            sensors.coilpos(i,1) = m_pFiffInfo->chs[innerind.at(i)].loc(1,0);
+            sensors.coilpos(i,2) = m_pFiffInfo->chs[innerind.at(i)].loc(2,0);
+            sensors.coilori(i,0) = m_pFiffInfo->chs[innerind.at(i)].loc(9,0);
+            sensors.coilori(i,1) = m_pFiffInfo->chs[innerind.at(i)].loc(10,0);
+            sensors.coilori(i,2) = m_pFiffInfo->chs[innerind.at(i)].loc(11,0);
+            }
+
+        Eigen::MatrixXd topo(innerind.size(),numCoils*2);
+        Eigen::MatrixXd amp(innerind.size(),numCoils);
+
         if(m_pRawMatrixBuffer)
         {
             MatrixXd t_mat = m_pRawMatrixBuffer->pop();
@@ -534,6 +533,19 @@ void RtHPIS::run()
 
 }
 
+
+
+/*
+Goodness of fit (for MNE HPI GOF)is
+
+g = 1 - sum(e_k^2)/sum(y_k^2)
+
+where
+
+y_k is the measured signal in channel k
+
+e_k = y_k - y’_k, the difference of y_k and the signal predicted by the model
+*/
 
 
 /*********************************************************************************
