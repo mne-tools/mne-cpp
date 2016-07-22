@@ -447,11 +447,15 @@ RtHPIS::~RtHPIS()
 
 void RtHPIS::append(const MatrixXd &p_DataSegment)
 {
+    m_mutex.lock();
+
     if(!m_pRawMatrixBuffer)
         m_pRawMatrixBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(8, p_DataSegment.rows(), p_DataSegment.cols()));
 
     if (SendDataToBuffer)
         m_pRawMatrixBuffer->push(&p_DataSegment);
+
+    m_mutex.unlock();
 }
 
 
@@ -661,8 +665,9 @@ void RtHPIS::run()
         Eigen::MatrixXd topo(innerind.size(),numCoils*2);
         Eigen::MatrixXd amp(innerind.size(),numCoils);
 
+        m_mutex.lock();
         if(m_pRawMatrixBuffer)
-        {
+        {            
             MatrixXd t_mat = m_pRawMatrixBuffer->pop();
 
             buffer.append(t_mat);
@@ -855,7 +860,9 @@ void RtHPIS::run()
             }
 
 
-        }//m_pRawMatrixBuffer
+        }//m_pRawMatrixBuffer        
+
+        m_mutex.unlock();
     }  //End of while statement
 
     //m_bIsRunning
