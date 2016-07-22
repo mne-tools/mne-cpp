@@ -144,7 +144,7 @@ bool MinimizerSimplex::mne_simplex_minimize(    MatrixXf& p,
         }
         ytry = tryit(p,y,psum,func,user_data,ihi,neval,-ALPHA);
         if (ytry <= y[ilo])
-            ytry = tryit(p,y,psum,func,user_data,ihi,neval,GAMMA);
+            tryit(p,y,psum,func,user_data,ihi,neval,GAMMA);
         else if (ytry >= y[inhi]) {
             ysave = y[ihi];
             ytry = tryit(p,y,psum,func,user_data,ihi,neval,BETA);

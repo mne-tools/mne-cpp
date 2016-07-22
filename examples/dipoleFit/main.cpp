@@ -737,7 +737,7 @@ static fwdCoil fwd_add_coil_to_set(fwdCoilSet set,
   fwdCoil def;
 
   if (set == NULL) {
-    qDebug() << "err_set_error(No coil definition set to augment.)";
+    qDebug() << "qCritical (No coil definition set to augment.)";
     return NULL;
   }
   if (np <= 0) {
@@ -745,15 +745,15 @@ static fwdCoil fwd_add_coil_to_set(fwdCoilSet set,
     return NULL;
   }
   if (! (acc == FWD_COIL_ACCURACY_POINT ||
-     acc == FWD_COIL_ACCURACY_NORMAL ||
-     acc == FWD_COIL_ACCURACY_ACCURATE) ) {
+        acc == FWD_COIL_ACCURACY_NORMAL ||
+        acc == FWD_COIL_ACCURACY_ACCURATE) ) {
     qDebug() << "err_printf_set_error(Illegal accuracy (type = %d acc = %d),type,acc)";
     return NULL;
   }
   if (! (coil_class == FWD_COILC_MAG ||
-     coil_class == FWD_COILC_AXIAL_GRAD ||
-     coil_class == FWD_COILC_PLANAR_GRAD ||
-     coil_class == FWD_COILC_AXIAL_GRAD2) ) {
+        coil_class == FWD_COILC_AXIAL_GRAD ||
+        coil_class == FWD_COILC_PLANAR_GRAD ||
+        coil_class == FWD_COILC_AXIAL_GRAD2) ) {
     qDebug() << "err_printf_set_error(Illegal coil class (type = %d acc = %d class = %d),type,acc,coil_class)";
     return NULL;
   }
@@ -868,7 +868,7 @@ static int get_fval(FILE *in, float *fval)
 {
   char *next = next_word(in);
   if (next == NULL) {
-    qDebug() << "err_set_error(bad integer)";
+    qDebug() << "qCritical (bad integer)";
     return FAIL;
   }
   else if (sscanf(next,"%g",fval) != 1) {
@@ -1440,7 +1440,7 @@ dipoleFitData setup_dipole_fit_data(char  *mriname,		 /* This gives the MRI/head
 //    goto bad;
 //    }
 //    else if (bemname) {
-//    err_set_error("Source of MRI / head transform required for the BEM model is missing");
+//    qCritical ("Source of MRI / head transform required for the BEM model is missing");
 //    goto bad;
 //    }
 //    else {
@@ -1692,371 +1692,948 @@ dipoleFitData setup_dipole_fit_data(char  *mriname,		 /* This gives the MRI/head
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// STATIC DEFINITIONS
+//=============================================================================================================
+
+#ifndef PROGRAM_VERSION
+#define PROGRAM_VERSION     "1.12"
+#endif
+
+
+#ifndef FAIL
+#define FAIL -1
+#endif
+
+#ifndef OK
+#define OK 0
+#endif
+
+#ifndef TRUE
+#define TRUE 1
+#endif
+
+#ifndef FALSE
+#define FALSE 0
+#endif
+
+
+
+#ifdef _POSIX_SOURCE
+extern char *strdup(const char *);
+#endif
+
+#define BIG_TIME 1e6
+
+static char  *bemname     = NULL;		 /* Boundary-element model */
+static float r0[]         = { 0.0,0.0,0.04 };    /* Sphere model origin  */
+static int   accurate     = FALSE;		 /* Use accurate coil definitions? */
+static char  *mriname     = NULL;		 /* Gives the MRI <-> head transform */
+
+static char  *guessname   = NULL;		 /* Initial guess grid (if not present, the values below
+                          * will be employed to generate the grid) */
+static char  *guess_surfname = NULL;		 /* Load the inner skull surface from this BEM file */
+static float guess_mindist = 0.010;		 /* Minimum allowed distance to the surface */
+static float guess_exclude = 0.020;		 /* Exclude points closer than this to the origin */
+static float guess_grid    = 0.010;		 /* Grid spacing */
+
+static char  *noisename   = NULL;		 /* Noise-covariance matrix */
+static float grad_std     = 5e-13;               /* Standard deviations to be used if noise covariance is not specified */
+static float mag_std      = 20e-15;
+static float eeg_std      = 0.2e-6;
+static int   diagnoise    = FALSE;		 /* Use only the diagonals of the noise-covariance matrix */
+
+static char  *measname    = NULL;		 /* Data file */
+static int   is_raw       = FALSE;		 /* Is this a raw data file */
+static char  *badname     = NULL;		 /* Bad channels */
+static int   include_meg  = FALSE;		 /* Use MEG? */
+static int   include_eeg  = FALSE;		 /* Use EEG? */
+static float tmin         = -2*BIG_TIME;	 /* Possibility to set these from the command line */
+static float tmax         = 2*BIG_TIME;
+static float tstep        = -1.0;		 /* Step between fits */
+static float integ        = 0.0;
+static float bmin         = BIG_TIME;	         /* Possibility to set these from the command line */
+static float bmax         = BIG_TIME;
+static int   do_baseline  = FALSE;	         /* Are both baseline limits set? */
+static int   setno        = 1;		         /* Which data set */
+static int   verbose      = FALSE;
+static mneFilterDefRec filter = { TRUE,		 /* Filter on? */
+                  4096,		 /* size */
+                  2048,		 /* taper_size */
+                  0.0, 0.0,	 /* highpass corner and width */
+                  40.0, 5.0,	 /* lowpass corner and width */
+                  0.0, 0.0,	 /* EOG highpass corner and width */
+                  40.0, 5.0 };	 /* EOG Lowpass corner and width */
+static char **projnames   = NULL;                /* Projection file names */
+static int  nproj         = 0;
+static int  omit_data_proj = FALSE;
+
+static char   *eeg_model_file = NULL;            /* File of EEG sphere model specifications */
+static char   *eeg_model_name = NULL;		 /* Name of the EEG model to use */
+static float  eeg_sphere_rad = 0.09;		 /* Scalp radius to use in EEG sphere model */
+static int    scale_eeg_pos  = FALSE;	         /* Scale the electrode locations to scalp in the sphere model */
+static float  mag_reg      = 0.1;                /* Noise-covariance matrix regularization for MEG (magnetometers and axial gradiometers)  */
+static int   fit_mag_dipoles = FALSE;
+
+static float  grad_reg     = 0.1;               /* Noise-covariance matrix regularization for EEG (planar gradiometers) */
+static float  eeg_reg      = 0.1;               /* Noise-covariance matrix regularization for EEG  */
+static char   *dipname     = NULL;		/* Output file in dip format */
+static char   *bdipname    = NULL;		/* Output file in bdip format */
+
+static void usage(char *name)
+
+{
+  fprintf(stderr,"usage: %s [options]\n",name);
+  fprintf(stderr,"This is a program for sequential single dipole fitting.\n");
+  fprintf(stderr,"\nInput data:\n\n");
+  fprintf(stderr,"\t--meas name       specify an evoked-response data file\n");
+  fprintf(stderr,"\t--set   no        evoked data set number to use (default: 1)\n");
+  fprintf(stderr,"\t--bad name        take bad channel list from here\n");
+
+  fprintf(stderr,"\nModality selection:\n\n");
+  fprintf(stderr,"\t--meg             employ MEG data in fitting\n");
+  fprintf(stderr,"\t--eeg             employ EEG data in fitting\n");
+
+  fprintf(stderr,"\nTime scale selection:\n\n");
+  fprintf(stderr,"\t--tmin  time/ms   specify the starting analysis time\n");
+  fprintf(stderr,"\t--tmax  time/ms   specify the ending analysis time\n");
+  fprintf(stderr,"\t--tstep time/ms   specify the time step between frames (default 1/(sampling frequency))\n");
+  fprintf(stderr,"\t--integ time/ms   specify the time integration for each frame (default 0)\n");
+
+  fprintf(stderr,"\nPreprocessing:\n\n");
+  fprintf(stderr,"\t--bmin  time/ms   specify the baseline starting time (evoked data only)\n");
+  fprintf(stderr,"\t--bmax  time/ms   specify the baseline ending time (evoked data only)\n");
+  fprintf(stderr,"\t--proj name       Load the linear projection from here\n");
+  fprintf(stderr,"\t                  Multiple projections can be specified.\n");
+  fprintf(stderr,"\t                  The data file will be automatically included, unless --noproj is present.\n");
+  fprintf(stderr,"\t--noproj          Do not load the projection from the data file, just those given with the --proj option.\n");
+  fprintf(stderr,"\n\tFiltering (raw data only):\n\n");
+  fprintf(stderr,"\t--filtersize size desired filter length (default = %d)\n",filter.size);
+  fprintf(stderr,"\t--highpass val/Hz highpass corner (default = %6.1f Hz)\n",filter.highpass);
+  fprintf(stderr,"\t--lowpass  val/Hz lowpass  corner (default = %6.1f Hz)\n",filter.lowpass);
+  fprintf(stderr,"\t--lowpassw val/Hz lowpass transition width (default = %6.1f Hz)\n",filter.lowpass_width);
+  fprintf(stderr,"\t--filteroff       do not filter the data\n");
+
+  fprintf(stderr,"\nNoise specification:\n\n");
+  fprintf(stderr,"\t--noise name      take the noise-covariance matrix from here\n");
+  fprintf(stderr,"\t--gradnoise val   specify a gradiometer noise value in fT/cm\n");
+  fprintf(stderr,"\t--magnoise val    specify a gradiometer noise value in fT\n");
+  fprintf(stderr,"\t--eegnoise val    specify an EEG value in uV\n");
+  fprintf(stderr,"\t                  NOTE: The above will be used only if --noise is missing\n");
+  fprintf(stderr,"\t--diagnoise       omit off-diagonal terms from the noise-covariance matrix\n");
+  fprintf(stderr,"\t--reg amount      Apply regularization to the noise-covariance matrix (same fraction for all channels).\n");
+  fprintf(stderr,"\t--gradreg amount  Apply regularization to the MEG noise-covariance matrix (planar gradiometers, default = %6.2f).\n",grad_reg);
+  fprintf(stderr,"\t--magreg amount   Apply regularization to the EEG noise-covariance matrix (axial gradiometers and magnetometers, default = %6.2f).\n",mag_reg);
+  fprintf(stderr,"\t--eegreg amount   Apply regularization to the EEG noise-covariance matrix (default = %6.2f).\n",eeg_reg);
+
+
+  fprintf(stderr,"\nForward model:\n\n");
+  fprintf(stderr,"\t--mri name        take head/MRI coordinate transform from here (Neuromag MRI description file)\n");
+  fprintf(stderr,"\t--bem  name       BEM model name\n");
+  fprintf(stderr,"\t--origin x:y:z/mm use a sphere model with this origin (head coordinates/mm)\n");
+  fprintf(stderr,"\t--eegscalp        scale the electrode locations to the surface of the scalp when using a sphere model\n");
+  fprintf(stderr,"\t--eegmodels name  read EEG sphere model specifications from here.\n");
+  fprintf(stderr,"\t--eegmodel  name  name of the EEG sphere model to use (default : Default)\n");
+  fprintf(stderr,"\t--eegrad val      radius of the scalp surface to use in EEG sphere model (default : %7.1f mm)\n",1000*eeg_sphere_rad);
+  fprintf(stderr,"\t--accurate        use accurate coil definitions in MEG forward computation\n");
+
+  fprintf(stderr,"\nFitting parameters:\n\n");
+  fprintf(stderr,"\t--guess name      The source space of initial guesses.\n");
+  fprintf(stderr,"\t                  If not present, the values below are used to generate the guess grid.\n");
+  fprintf(stderr,"\t--gsurf   name    Read the inner skull surface from this fif file to generate the guesses.\n");
+  fprintf(stderr,"\t--exclude dist/mm Exclude points which are closer than this distance from the CM of the inner skull surface (default =  %6.1f mm).\n",1000*guess_exclude);
+  fprintf(stderr,"\t--mindist dist/mm Exclude points which are closer than this distance from the inner skull surface  (default = %6.1f mm).\n",1000*guess_mindist);
+  fprintf(stderr,"\t--grid    dist/mm Source space grid size (default = %6.1f mm).\n",1000*guess_grid);
+  fprintf(stderr,"\t--magdip          Fit magnetic dipoles instead of current dipoles.\n");
+  fprintf(stderr,"\nOutput:\n\n");
+  fprintf(stderr,"\t--dip     name    xfit dip format output file name\n");
+  fprintf(stderr,"\t--bdip    name    xfit bdip format output file name\n");
+  fprintf(stderr,"\nGeneral:\n\n");
+  fprintf(stderr,"\t--help            print this info.\n");
+  fprintf(stderr,"\t--version         print version info.\n\n");
+  return;
+}
+
+static int check_unrecognized_args(int argc, char **argv)
+
+{
+  int k;
+
+  if (argc > 1) {
+    fprintf(stderr,"Unrecognized arguments : ");
+    for (k = 1; k < argc; k++)
+      fprintf(stderr,"%s ",argv[k]);
+    fprintf(stderr,"\n");
+    qCritical ("Check the command line.");
+    return FAIL;
+  }
+  return OK;
+}
+
+static int check_args (int *argc,char **argv)
+
+{
+  int k;
+  int p;
+  int found;
+  float fval;
+  int   ival,filter_size;
+
+  for (k = 0; k < *argc; k++) {
+    found = 0;
+    if (strcmp(argv[k],"--version") == 0) {
+      mne_print_version_info(stderr,argv[0],PROGRAM_VERSION,__DATE__,__TIME__);
+      exit(0);
+    }
+    else if (strcmp(argv[k],"--help") == 0) {
+      usage(argv[0]);
+      exit(1);
+    }
+    else if (strcmp(argv[k],"--guess") == 0) {
+      found = 2;
+      if (k == *argc - 1) {
+    qCritical ("--guess: argument required.");
+    return FAIL;
+      }
+      guessname = strdup(argv[k+1]);
+    }
+    else if (strcmp(argv[k],"--gsurf") == 0) {
+      found = 2;
+      if (k == *argc - 1) {
+    qCritical ("--gsurf: argument required.");
+    return FAIL;
+      }
+      guess_surfname = strdup(argv[k+1]);
+    }
+    else if (strcmp(argv[k],"--mindist") == 0) {
+      found = 2;
+      if (k == *argc - 1) {
+    qCritical ("--mindist: argument required.");
+    return FAIL;
+      }
+      if (sscanf(argv[k+1],"%f",&fval) != 1) {
+    qCritical ("Could not interpret the distance.");
+    return FAIL;
+      }
+      guess_mindist = fval/1000.0;
+      if (guess_mindist <= 0.0)
+    guess_mindist = 0.0;
+    }
+    else if (strcmp(argv[k],"--exclude") == 0) {
+      found = 2;
+      if (k == *argc - 1) {
+    qCritical ("--exclude: argument required.");
+    return FAIL;
+      }
+      if (sscanf(argv[k+1],"%f",&fval) != 1) {
+    qCritical ("Could not interpret the distance.");
+    return FAIL;
+      }
+      guess_exclude = fval/1000.0;
+      if (guess_exclude <= 0.0)
+    guess_exclude = 0.0;
+    }
+    else if (strcmp(argv[k],"--grid") == 0) {
+      found = 2;
+      if (k == *argc - 1) {
+    qCritical ("--grid: argument required.");
+    return FAIL;
+      }
+      if (sscanf(argv[k+1],"%f",&fval) != 1) {
+    qCritical ("Could not interpret the distance.");
+    return FAIL;
+      }
+      if (fval <= 0.0) {
+    qCritical ("Grid spacing should be positive");
+    return FAIL;
+      }
+      guess_grid = guess_grid/1000.0;
+    }
+    else if (strcmp(argv[k],"--mri") == 0) {
+      found = 2;
+      if (k == *argc - 1) {
+    qCritical ("--mri: argument required.");
+    return FAIL;
+      }
+      mriname = strdup(argv[k+1]);
+    }
+    else if (strcmp(argv[k],"--bem") == 0) {
+      found = 2;
+      if (k == *argc - 1) {
+    qCritical ("--bem: argument required.");
+    return FAIL;
+      }
+      bemname = strdup(argv[k+1]);
+    }
+    else if (strcmp(argv[k],"--accurate") == 0) {
+      found = 1;
+      accurate = TRUE;
+    }
+    else if (strcmp(argv[k],"--meg") == 0) {
+      found = 1;
+      include_meg = TRUE;
+    }
+    else if (strcmp(argv[k],"--eeg") == 0) {
+      found = 1;
+      include_eeg = TRUE;
+    }
+    else if (strcmp(argv[k],"--origin") == 0) {
+      found = 2;
+      if (k == *argc - 1) {
+    qCritical ("--origin: argument required.");
+    return FAIL;
+      }
+      if (sscanf(argv[k+1],"%f:%f:%f",r0+X,r0+Y,r0+Z) != 3) {
+    qCritical ("Could not interpret the origin.");
+    return FAIL;
+      }
+      r0[X] = r0[X]/1000.0;
+      r0[Y] = r0[Y]/1000.0;
+      r0[Z] = r0[Z]/1000.0;
+    }
+    else if (strcmp(argv[k],"--eegrad") == 0) {
+      found = 2;
+      if (k == *argc - 1) {
+    qCritical ("--eegrad: argument required.");
+    return FAIL;
+      }
+      if (sscanf(argv[k+1],"%g",&eeg_sphere_rad) != 1) {
+    qCritical () << "Incomprehensible radius:" << argv[k+1];
+    return FAIL;
+      }
+      if (eeg_sphere_rad <= 0) {
+    qCritical ("Radius must be positive");
+    return FAIL;
+      }
+      eeg_sphere_rad = eeg_sphere_rad/1000.0;
+    }
+    else if (strcmp(argv[k],"--eegmodels") == 0) {
+      found = 2;
+      if (k == *argc - 1) {
+    qCritical ("--eegmodels: argument required.");
+    return FAIL;
+      }
+      eeg_model_file = strdup(argv[k+1]);
+    }
+    else if (strcmp(argv[k],"--eegmodel") == 0) {
+      found = 2;
+      if (k == *argc - 1) {
+    qCritical ("--eegmodel: argument required.");
+    return FAIL;
+      }
+      eeg_model_name = strdup(argv[k+1]);
+    }
+    else if (strcmp(argv[k],"--eegscalp") == 0) {
+      found         = 1;
+      scale_eeg_pos = TRUE;
+    }
+    else if (strcmp(argv[k],"--meas") == 0) {
+      found = 2;
+      if (k == *argc - 1) {
+    qCritical ("--meas: argument required.");
+    return FAIL;
+      }
+      measname = strdup(argv[k+1]);
+      is_raw = FALSE;
+    }
+    else if (strcmp(argv[k],"--raw") == 0) {
+      found = 2;
+      if (k == *argc - 1) {
+    qCritical ("--raw: argument required.");
+    return FAIL;
+      }
+      measname = strdup(argv[k+1]);
+      is_raw = TRUE;
+    }
+    else if (strcmp(argv[k],"--proj") == 0) {
+      found = 2;
+      if (k == *argc - 1) {
+    qCritical ("--proj: argument required.");
+    return FAIL;
+      }
+      projnames = REALLOC(projnames,nproj+1,char *);
+      projnames[nproj++] = strdup(argv[k+1]);
+    }
+    else if (strcmp(argv[k],"--noproj") == 0) {
+      found = 1;
+      omit_data_proj = TRUE;
+    }
+    else if (strcmp(argv[k],"--bad") == 0) {
+      found = 2;
+      if (k == *argc - 1) {
+    qCritical ("--bad: argument required.");
+    return FAIL;
+      }
+      badname = strdup(argv[k+1]);
+    }
+    else if (strcmp(argv[k],"--noise") == 0) {
+      found = 2;
+      if (k == *argc - 1) {
+    qCritical ("--noise: argument required.");
+    return FAIL;
+      }
+      noisename = strdup(argv[k+1]);
+    }
+    else if (strcmp(argv[k],"--gradnoise") == 0) {
+      found = 2;
+      if (k == *argc - 1) {
+    qCritical ("--gradnoise: argument required.");
+    return FAIL;
+      }
+      if (sscanf(argv[k+1],"%g",&fval) != 1) {
+    qCritical() << "Incomprehensible value:" << argv[k+1];
+    return FAIL;
+      }
+      if (fval < 0.0) {
+    qCritical ("Value should be positive");
+    return FAIL;
+      }
+      grad_std = 1e-13*fval;
+    }
+    else if (strcmp(argv[k],"--magnoise") == 0) {
+      found = 2;
+      if (k == *argc - 1) {
+    qCritical ("--magnoise: argument required.");
+    return FAIL;
+      }
+      if (sscanf(argv[k+1],"%g",&fval) != 1) {
+    qCritical() << "Incomprehensible value:" << argv[k+1];
+    return FAIL;
+      }
+      if (fval < 0.0) {
+    qCritical ("Value should be positive");
+    return FAIL;
+      }
+      mag_std = 1e-15*fval;
+    }
+    else if (strcmp(argv[k],"--eegnoise") == 0) {
+      found = 2;
+      if (k == *argc - 1) {
+    qCritical ("--eegnoise: argument required.");
+    return FAIL;
+      }
+      if (sscanf(argv[k+1],"%g",&fval) != 1) {
+    qCritical () << "Incomprehensible value:" << argv[k+1];
+    return FAIL;
+      }
+      if (fval < 0.0) {
+    qCritical ("Value should be positive");
+    return FAIL;
+      }
+      eeg_std = 1e-6*fval;
+    }
+    else if (strcmp(argv[k],"--diagnoise") == 0) {
+      found = 1;
+      diagnoise = TRUE;
+    }
+    else if (strcmp(argv[k],"--eegreg") == 0) {
+      found = 2;
+      if (k == *argc - 1) {
+    qCritical ("--eegreg: argument required.");
+    return FAIL;
+      }
+      if (sscanf(argv[k+1],"%g",&fval) != 1) {
+    qCritical () << "Incomprehensible value:" << argv[k+1];
+    return FAIL;
+      }
+      if (fval < 0 || fval > 1) {
+    qCritical ("Regularization value should be positive and smaller than one.");
+    return FAIL;
+      }
+      eeg_reg = fval;
+    }
+    else if (strcmp(argv[k],"--magreg") == 0) {
+      found = 2;
+      if (k == *argc - 1) {
+    qCritical ("--magreg: argument required.");
+    return FAIL;
+      }
+      if (sscanf(argv[k+1],"%g",&fval) != 1) {
+    qCritical () << "Incomprehensible value:" << argv[k+1];
+    return FAIL;
+      }
+      if (fval < 0 || fval > 1) {
+    qCritical ("Regularization value should be positive and smaller than one.");
+    return FAIL;
+      }
+      mag_reg = fval;
+    }
+    else if (strcmp(argv[k],"--gradreg") == 0) {
+      found = 2;
+      if (k == *argc - 1) {
+    qCritical ("--gradreg: argument required.");
+    return FAIL;
+      }
+      if (sscanf(argv[k+1],"%g",&fval) != 1) {
+    qCritical () << "Incomprehensible value: %s",argv[k+1]);
+    return FAIL;
+      }
+      if (fval < 0 || fval > 1) {
+    qCritical ("Regularization value should be positive and smaller than one.");
+    return FAIL;
+      }
+      grad_reg = fval;
+    }
+    else if (strcmp(argv[k],"--reg") == 0) {
+      found = 2;
+      if (k == *argc - 1) {
+    qCritical ("--reg: argument required.");
+    return FAIL;
+      }
+      if (sscanf(argv[k+1],"%g",&fval) != 1) {
+    qCritical () << "Incomprehensible value: %s",argv[k+1]);
+    return FAIL;
+      }
+      if (fval < 0 || fval > 1) {
+    qCritical ("Regularization value should be positive and smaller than one.");
+    return FAIL;
+      }
+      grad_reg = fval;
+      mag_reg = fval;
+      eeg_reg = fval;
+    }
+    else if (strcmp(argv[k],"--tstep") == 0) {
+      found = 2;
+      if (k == *argc - 1) {
+    qCritical ("--tstep: argument required.");
+    return FAIL;
+      }
+      if (sscanf(argv[k+1],"%g",&fval) != 1) {
+    qCritical() << "Incomprehensible tstep:" << argv[k+1];
+    return FAIL;
+      }
+      if (fval < 0.0) {
+    qCritical ("Time step should be positive");
+    return FAIL;
+      }
+      tstep = fval/1000.0;
+    }
+    else if (strcmp(argv[k],"--integ") == 0) {
+      found = 2;
+      if (k == *argc - 1) {
+    qCritical ("--integ: argument required.");
+    return FAIL;
+      }
+      if (sscanf(argv[k+1],"%g",&fval) != 1) {
+    qCritical() << "Incomprehensible integration time:" << argv[k+1];
+    return FAIL;
+      }
+      if (fval <= 0.0) {
+    qCritical ("Integration time should be positive.");
+    return FAIL;
+      }
+      integ = fval/1000.0;
+    }
+    else if (strcmp(argv[k],"--tmin") == 0) {
+      found = 2;
+      if (k == *argc - 1) {
+    qCritical ("--tmin: argument required.");
+    return FAIL;
+      }
+      if (sscanf(argv[k+1],"%g",&fval) != 1) {
+    qCritical() << "Incomprehensible tmin:" << argv[k+1];
+    return FAIL;
+      }
+      tmin = fval/1000.0;
+    }
+    else if (strcmp(argv[k],"--tmax") == 0) {
+      found = 2;
+      if (k == *argc - 1) {
+    qCritical ("--tmax: argument required.");
+    return FAIL;
+      }
+      if (sscanf(argv[k+1],"%g",&fval) != 1) {
+    qCritical() << "Incomprehensible tmax:" << argv[k+1];
+    return FAIL;
+      }
+      tmax = fval/1000.0;
+    }
+    else if (strcmp(argv[k],"--bmin") == 0) {
+      found = 2;
+      if (k == *argc - 1) {
+    qCritical ("--bmin: argument required.");
+    return FAIL;
+      }
+      if (sscanf(argv[k+1],"%g",&fval) != 1) {
+    qCritical() << "Incomprehensible bmin:" << argv[k+1];
+    return FAIL;
+      }
+      bmin = fval/1000.0;
+    }
+    else if (strcmp(argv[k],"--bmax") == 0) {
+      found = 2;
+      if (k == *argc - 1) {
+    qCritical ("--bmax: argument required.");
+    return FAIL;
+      }
+      if (sscanf(argv[k+1],"%g",&fval) != 1) {
+    qCritical() << "Incomprehensible bmax:" << argv[k+1];
+    return FAIL;
+      }
+      bmax = fval/1000.0;
+    }
+    else if (strcmp(argv[k],"--set") == 0) {
+      found = 2;
+      if (k == *argc - 1) {
+    qCritical ("--set: argument required.");
+    return FAIL;
+      }
+      if (sscanf(argv[k+1],"%d",&setno) != 1) {
+    qCritical() << "Incomprehensible data set number:" << argv[k+1];
+    return FAIL;
+      }
+      if (setno <= 0) {
+    qCritical ("Data set number must be > 0");
+    return FAIL;
+      }
+    }
+    else if (strcmp(argv[k],"--filteroff") == 0) {
+      found = 1;
+      filter.filter_on = FALSE;
+    }
+    else if (strcmp(argv[k],"--lowpass") == 0) {
+      found = 2;
+      if (k == *argc - 1) {
+    qCritical ("--lowpass: argument required.");
+    return FAIL;
+      }
+      if (sscanf(argv[k+1],"%g",&fval) != 1) {
+    qCritical() << "Illegal number:" << argv[k+1];
+    return FAIL;
+      }
+      if (fval <= 0) {
+    qCritical ("Lowpass corner must be positive");
+    return FAIL;
+      }
+      filter.lowpass = fval;
+    }
+    else if (strcmp(argv[k],"--lowpassw") == 0) {
+      found = 2;
+      if (k == *argc - 1) {
+    qCritical ("--lowpassw: argument required.");
+    return FAIL;
+      }
+      if (sscanf(argv[k+1],"%g",&fval) != 1) {
+    qCritical() << "Illegal number:" << argv[k+1];
+    return FAIL;
+      }
+      if (fval <= 0) {
+    qCritical ("Lowpass width must be positive");
+    return FAIL;
+      }
+      filter.lowpass_width = fval;
+    }
+    else if (strcmp(argv[k],"--highpass") == 0) {
+      found = 2;
+      if (k == *argc - 1) {
+    qCritical ("--highpass: argument required.");
+    return FAIL;
+      }
+      if (sscanf(argv[k+1],"%g",&fval) != 1) {
+    qCritical() << "Illegal number:" << argv[k+1];
+    return FAIL;
+      }
+        if (fval <= 0) {
+            qCritical ("Highpass corner must be positive");
+            return FAIL;
+        }
+        filter.highpass = fval;
+    }
+    else if (strcmp(argv[k],"--filtersize") == 0) {
+        found = 2;
+    if (k == *argc - 1) {
+        qCritical ("--filtersize: argument required.");
+        return FAIL;
+    }
+    if (sscanf(argv[k+1],"%d",&ival) != 1) {
+        qCritical() << "Illegal number:" << argv[k+1];
+        return FAIL;
+    }
+    if (ival < 1024) {
+        qCritical ("Filtersize should be at least 1024.");
+        return FAIL;
+    }
+    for (filter_size = 1024; filter_size < ival; filter_size = 2*filter_size)
+    ;
+        filter.size       = filter_size;
+        filter.taper_size = filter_size/2;
+    }
+    else if (strcmp(argv[k],"--magdip") == 0) {
+        found = 1;
+        fit_mag_dipoles = TRUE;
+    }
+    else if (strcmp(argv[k],"--dip") == 0) {
+        found = 2;
+        if (k == *argc - 1) {
+            qCritical ("--dip: argument required.");
+            return FAIL;
+    }
+    dipname = strdup(argv[k+1]);
+    }
+    else if (strcmp(argv[k],"--bdip") == 0) {
+      found = 2;
+      if (k == *argc - 1) {
+    qCritical ("--bdip: argument required.");
+    return FAIL;
+      }
+      bdipname = strdup(argv[k+1]);
+    }
+    else if (strcmp(argv[k],"--verbose") == 0) {
+      found = 1;
+      verbose = TRUE;
+    }
+    if (found) {
+      for (p = k; p < *argc-found; p++)
+    argv[p] = argv[p+found];
+      *argc = *argc - found;
+      k = k - found;
+    }
+  }
+  return check_unrecognized_args(*argc,argv);
+}
+
+void print_cov(FILE *out, mneCovMatrix cov)
+{
+    int k;
+    mne_print_dvector(out,NULL,cov->lambda,cov->ncov);
+    if (cov->eigen) {
+        for (k = 0; k < cov->ncov; k++)
+            mne_print_vector(out,NULL,cov->eigen[k],cov->ncov);
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
 //*************************************************************************************************************
 //=============================================================================================================
 // MAIN
 //=============================================================================================================
 
-//=============================================================================================================
-/**
-* The function main marks the entry point of the program.
-* By default, main has the storage class extern.
-*
-* @param [in] argc (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
-* @param [in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
-* @return the value that was set to exit() (which is 0 if exit() is called via quit()).
-*/
 int main(int argc, char *argv[])
 {
     QCoreApplication app(argc, argv);
 
+    int            res      = FAIL;
+    dipoleFitData  fit_data = NULL;
+    mneMeasData    data     = NULL;
+    mneRawData     raw      = NULL;
+    guessData      guess    = NULL;
+    mneChSelection sel      = NULL;
+    ecdSet         set      = NULL;
 
-    // Command Line Parser
-    QCommandLineParser parser;
-    parser.setApplicationDescription("Clustered Inverse Example");
-    parser.addHelpOption();
+    fwdEegSphereModel    eeg_model = NULL;
+    int                  k;
 
-    QCommandLineOption sampleEvokedFileOption("e", "Path to evoked <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
-    QCommandLineOption sampleCovFileOption("c", "Path to covariance <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
-    QCommandLineOption sampleBemFileOption("b", "Path to BEM <file>.", "file", "./MNE-sample-data/subjects/sample/bem/sample-5120-bem-sol.fif");
-    QCommandLineOption sampleTransFileOption("t", "Path to trans <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis_raw-trans.fif");
-    parser.addOption(sampleEvokedFileOption);
-    parser.addOption(sampleCovFileOption);
-    parser.addOption(sampleBemFileOption);
-    parser.addOption(sampleTransFileOption);
-    parser.process(app);
+    if (check_args(&argc,argv) == FAIL)
+        goto out;
 
-    //########################################################################################
-    // Source Estimate
-    QFile fileEvoked(parser.value(sampleEvokedFileOption));
-    QFile fileCov(parser.value(sampleCovFileOption));
-    QFile fileBem(parser.value(sampleBemFileOption));
-    QFile fileTrans(parser.value(sampleTransFileOption));
+    do_baseline = (bmin < BIG_TIME && bmax < BIG_TIME);
 
-
-    bool include_eeg = false;
-    bool include_meg = true;
-
-
-    // === Load data ===
-    // Evoked
-    std::cout << std::endl << "### Evoked ###" << std::endl;
-    fiff_int_t setno = 0;
-    QPair<QVariant, QVariant> baseline(QVariant(), 0);
-    FiffEvoked evoked(fileEvoked, setno, baseline);
-    if(evoked.isEmpty())
-        return 1;
-
-    // Cov
-    std::cout << std::endl << "### Covariance ###" << std::endl;
-    FiffCov noise_cov(fileCov);
-
-    // BEM
-    std::cout << std::endl << "### BEM ###" << std::endl;
-    MNEBem bem(fileBem);
-    if( bem.isEmpty() ) {
-        return -1;
+    if (!measname) {
+        qCritical ("Data file name missing. Please specify one using the --meas option.");
+        goto out;
     }
-
-    // Trans
-    std::cout << std::endl << "### Transformation ###" << std::endl;
-    FiffCoordTrans mri_head_t(fileTrans);
-    if( mri_head_t.isEmpty() )
-    {
-        mri_head_t.from = FIFFV_COORD_HEAD;
-        mri_head_t.to = FIFFV_COORD_MRI;
+    if (!dipname && !bdipname) {
+        qCritical ("Output file name missing. Please use the --dip or --bdip options to do this.");
+        goto out;
     }
-
-    // === Dipole Fit ===
-
-    //FIFFV_BEM_SURF_ID_BRAIN      1 -> Inner Skull
-    //FIFFV_BEM_SURF_ID_SKULL      3 -> Outer Skull
-    //FIFFV_BEM_SURF_ID_HEAD       4 -> Head
-    qDebug() << "bem" << bem[0].id;
-
-    Sphere sp = Sphere::fit_sphere( bem[0].rr );
-
-    std::cout << "sp center" << std::endl << sp.center() << std::endl;
-    std::cout << "sp radius" << std::endl << sp.radius() << std::endl;
-
-    Sphere sp_simplex = Sphere::fit_sphere_simplex( bem[0].rr );
-
-    std::cout << "sp simplex center" << std::endl << sp_simplex.center() << std::endl;
-    std::cout << "sp simplex radius" << std::endl << sp_simplex.radius() << std::endl;
-
-//    fwdEegSphereModel eeg_model, /* EEG sphere model definition */
-
-    //<< TODO: Apply transform function move to class
-    std::cout << "rr.rows\n" << bem[0].rr.block(0,0,5,3) << std::endl;
-    std::cout << "trans.trans\n" << mri_head_t.trans << std::endl;
-    MatrixX3f rr_trans = mri_head_t.apply_trans(bem[0].rr);
-    std::cout << "rr_trans.rows\n" << rr_trans.block(0,0,5,3) << std::endl;
-
-    //==== setup.c
-
-    fwdCoilSet templates = NULL;
-    dipoleFitData  res = new_dipole_fit_data();
-    int coord_frame = FIFFV_COORD_HEAD;
-
-    int accurate_coils = TRUE;
-
-    float guess_grid = 0.01;
-    float guess_mindist = 0.005;//max(0.005, min_dist_to_inner_skull)
-    float guess_exclude = 0.02;
-
-    mri_head_t.print();
-    evoked.info.dev_head_t.print();
-
-    /*
-    * Read the bad channel lists
-    */
-    QStringList badlist = evoked.info.bads;
-
-    printf((QString("%1 bad channels total\n").arg(badlist.size())).toLatin1().data());
-
-    /*
-    * Read the channel information
-    */
-
-//    if (read_meg_eeg_ch_info(measname,include_meg,include_eeg,badlist,nbad,
-//           &res->chs,&res->nmeg,&res->neeg) != OK)
-//    goto bad;
-
-    res->nmeg = 0;
-    res->neeg = 0;
-
-    QList<FiffChInfo> meg;
-    QList<FiffChInfo> eeg;
-    for (int k = 0; k < evoked.info.chs.size(); k++)
-    {
-        if (evoked.info.chs[k].kind == FIFFV_MEG_CH) {
-            res->nmeg++;
-            meg << evoked.info.chs[k];
-        }
-        else if (evoked.info.chs[k].kind == FIFFV_EEG_CH)/*&& is_valid_eeg_ch(chs+k))*/ {
-            res->neeg++;
-            eeg << evoked.info.chs[k];
+    if (!guessname) {
+        if (!bemname && guess_surfname && !mriname) {
+            qCritical ("Please specify the MRI/head coordinate transformation with the --mri option");
+            goto out;
         }
     }
+    if (!include_meg && !include_eeg) {
+        qCritical ("Specify one or both of the --eeg and --meg options");
+        goto out;
+    }
+    if (!omit_data_proj) {
+        projnames = REALLOC(projnames,nproj+1,char *);
+        nproj++;
+        for (k = 1; k < nproj; k++)
+            projnames[k] = projnames[k-1];
+        projnames[0] = mne_strdup(measname);
+    }
+    fprintf(stderr,"\n");
+    mne_print_version_info(stderr,argv[0],PROGRAM_VERSION,__DATE__,__TIME__);
+    fprintf(stderr,"\n");
+    if (bemname)
+        fprintf(stderr,"BEM              : %s\n",bemname);
+    else {
+        fprintf(stderr,"Sphere model     : origin at (% 7.2f % 7.2f % 7.2f) mm\n",
+        1000*r0[X],1000*r0[Y],1000*r0[Z]);
+    }
+    fprintf(stderr,"Using %s MEG coil definitions.\n",accurate ? "accurate" : "standard");
+    if (mriname)
+        fprintf(stderr,"MRI transform    : %s\n",mriname);
+    if (guessname)
+        fprintf(stderr,"Guesses          : %s\n",guessname);
+    else {
+        fprintf(stderr,"Guess grid       : %6.1f mm\n",1000*guess_grid);
+        if (guess_mindist > 0.0)
+            fprintf(stderr,"Guess mindist    : %6.1f mm\n",1000*guess_mindist);
+        if (guess_exclude > 0)
+            fprintf(stderr,"Guess exclude    : %6.1f mm\n",1000*guess_exclude);
+    }
+    fprintf(stderr,"Data             : %s\n",measname);
+    if (nproj > 0) {
+        fprintf(stderr,"SSP sources      :\n");
+    for (k = 0; k < nproj; k++)
+        fprintf(stderr,"\t%s\n",projnames[k]);
+    }
+    if (badname)
+        fprintf(stderr,"Bad channels     : %s\n",badname);
+    if (do_baseline)
+        fprintf(stderr,"Baseline         : %10.2f ... %10.2f ms\n",
+    1000*bmin,1000*bmax);
+    if (noisename) {
+        fprintf(stderr,"Noise covariance : %s\n",noisename);
+        if (include_meg) {
+            if (mag_reg > 0.0)
+                fprintf(stderr,"\tNoise-covariange regularization (mag)     : %-5.2f\n",mag_reg);
+            if (grad_reg > 0.0)
+                fprintf(stderr,"\tNoise-covariange regularization (grad)    : %-5.2f\n",grad_reg);
+        }
+        if (include_eeg && eeg_reg > 0.0)
+            fprintf(stderr,"\tNoise-covariange regularization (EEG)     : %-5.2f\n",eeg_reg);
+    }
+    if (fit_mag_dipoles)
+        fprintf(stderr,"Fit data with magnetic dipoles\n");
+    if (dipname)
+        fprintf(stderr,"dip output      : %s\n",dipname);
+    if (bdipname)
+        fprintf(stderr,"bdip output     : %s\n",bdipname);
+    fprintf(stderr,"\n");
+    fprintf(stderr,"---- Setting up...\n\n");
 
-//      mne_merge_channels(meg,nmeg,eeg,neeg,chsp,&nch);
-    res->chs << meg << eeg;
+    if (include_eeg) {
+        if ((eeg_model = setup_eeg_sphere_model(eeg_model_file,eeg_model_name,eeg_sphere_rad)) == NULL)
+            goto out;
+    }
+    if ((fit_data = setup_dipole_fit_data(mriname,measname,bemname,r0,eeg_model,accurate,
+        badname,noisename,grad_std,mag_std,eeg_std,
+        mag_reg,grad_reg,eeg_reg,
+        diagnoise,projnames,nproj,include_meg,include_eeg)) == NULL)
+        goto out;
+    fit_data->fit_mag_dipoles = fit_mag_dipoles;
+    if (is_raw) {
+        int c;
+        float t1,t2;
 
+        fprintf(stderr,"\n---- Opening a raw data file...\n\n");
+        if ((raw = mne_raw_open_file(measname,TRUE,FALSE,&filter)) == NULL)
+            goto out;
+        /*
+        * A channel selection is needed to access the data
+        */
+        sel = mne_ch_selection_these("fit",fit_data->ch_names,fit_data->nmeg+fit_data->neeg);
+        mne_ch_selection_assign_chs(sel,raw);
+        for (c = 0; c < sel->nchan; c++)
+            if (sel->pick[c] < 0) {
+                qCritical ("All desired channels were not available");
+                goto out;
+            }
+            fprintf(stderr,"\tChannel selection created.\n");
+            /*
+            * Let's be a little generous here
+            */
+            t1 = raw->first_samp/raw->info->sfreq;
+            t2 = (raw->first_samp+raw->nsamp-1)/raw->info->sfreq;
+            if (tmin < t1 + integ)
+            tmin = t1 + integ;
+            if (tmax > t2 - integ)
+            tmax =  t2 - integ;
+            if (tstep < 0)
+            tstep = 1.0/raw->info->sfreq;
+
+            fprintf(stderr,"\tOpened raw data file %s : %d MEG and %d EEG \n",
+            measname,fit_data->nmeg,fit_data->neeg);
+        }
+    else {
+        fprintf(stderr,"\n---- Reading data...\n\n");
+        if ((data = mne_read_meas_data(measname,setno,NULL,NULL,
+            fit_data->ch_names,fit_data->nmeg+fit_data->neeg)) == NULL)
+            goto out;
+        if (do_baseline)
+            mne_adjust_baselines(data,bmin,bmax);
+        else
+            fprintf(stderr,"\tNo baseline setting in effect.\n");
+        if (tmin < data->current->tmin + integ/2.0)
+            tmin = data->current->tmin + integ/2.0;
+        if (tmax > data->current->tmin + (data->current->np-1)*data->current->tstep - integ/2.0)
+            tmax =  data->current->tmin + (data->current->np-1)*data->current->tstep - integ/2.0;
+        if (tstep < 0)
+            tstep = data->current->tstep;
+
+        fprintf(stderr,"\tRead data set %d from %s : %d MEG and %d EEG \n",
+        setno,measname,fit_data->nmeg,fit_data->neeg);
+        if (noisename) {
+            fprintf(stderr,"\nScaling the noise covariance...\n");
+            if (scale_noise_cov(fit_data,data->current->nave) == FAIL)
+                goto out;
+        }
+    }
     /*
-    * Make coil definitions
+    * Proceed to computing the fits
     */
-    res->coord_frame = coord_frame;
-    if (coord_frame == FIFFV_COORD_HEAD) {
-
-        QString coilfile("D:/GitHub/mne-cpp/bin/Resources/CoilDefinitions/coil_def.dat");
-
-        if ((templates = fwd_read_coil_defs(coilfile.toLatin1().data())) == NULL) {
-//            FREE(coilfile);
-            return 0;
-        }
-
-//    qDebug() << "ncoil" << templates->ncoil;
-//    qDebug() << "coord_frame" << templates->coord_frame;
-//    for (qint32 i = 0; i < templates->ncoil; ++i) {
-//        printf ("Channel Name: %s\n",templates->coils[i]->chname);
-//        qDebug() << "coil_class" << templates->coils[i]->coil_class;
-//    }
-
-        if ((res->meg_coils = fwd_create_meg_coils(templates,res->chs,res->nmeg,
-                       accurate_coils ? FWD_COIL_ACCURACY_ACCURATE : FWD_COIL_ACCURACY_NORMAL,
-                       &res->meg_head_t)) == NULL) {
-            return 0;
-        }
-
-        if ((res->eeg_els = fwd_create_eeg_els(res->chs,res->nmeg,res->neeg,NULL)) == NULL) {
-            return 0;
-        }
-        printf("Head coordinate coil definitions created.\n");
+    fprintf(stderr,"\n---- Computing the forward solution for the guesses...\n\n");
+    if ((guess = make_guess_data(guessname,
+    guess_surfname,
+    guess_mindist,guess_exclude,guess_grid,fit_data)) == NULL)
+    goto out;
+    fprintf (stderr,"\n---- Fitting : %7.1f ... %7.1f ms (step: %6.1f ms integ: %6.1f ms)\n\n",
+    1000*tmin,1000*tmax,1000*tstep,1000*integ);
+    if (raw) {
+        if (fit_dipoles_raw(measname,raw,sel,fit_data,guess,tmin,tmax,tstep,integ,verbose,NULL) == FAIL)
+            goto out;
     }
     else {
-        qDebug() << "err_printf_set_error(Cannot handle computations in %s coordinates,mne_coord_frame_name(coord_frame))";
-        return 0;
+        if (fit_dipoles(measname,data,fit_data,guess,tmin,tmax,tstep,integ,verbose,&set) == FAIL)
+            goto out;
     }
+    printf("%d dipoles fitted\n",set->ndip);
     /*
-    * Forward model setup
+    * Saving...
     */
-    res->bemname   = mne_strdup(fileBem.fileName().toLatin1().data());
-//    if (sp_simplex.radius() > 0){ //(r0) {
-//        res->r0[0]     = sp_simplex.center()[0];//r0[0];
-//        res->r0[1]     = sp_simplex.center()[1];//r0[1];
-//        res->r0[2]     = sp_simplex.center()[2];//r0[2];
-//    }
-//    res->eeg_model = eeg_model;
-//    /*
-//    * Compensation data
-//    */
-//    if ((comp_data = mne_read_ctf_comp_data(measname)) == NULL)
-//        goto bad;
-//    if (comp_data->ncomp > 0) {	/* Compensation channel information may be needed */
-//        fiffChInfo comp_chs = NULL;
-//        int        ncomp    = 0;
+    if (save_dipoles_dip(dipname,set) == FAIL)
+    goto out;
+    if (save_dipoles_bdip(bdipname,set) == FAIL)
+    goto out;
+    free_ecd_set(set);
+    res = OK;
 
-//        fprintf(stderr,"%d compensation data sets in %s\n",comp_data->ncomp,measname);
-//        if (mne_read_meg_comp_eeg_ch_info(measname,NULL,0,&comp_chs,&ncomp,NULL,NULL,NULL,NULL) == FAIL)
-//            goto bad;
-//        if (ncomp > 0) {
-//            if ((comp_coils = fwd_create_meg_coils(templates,comp_chs,ncomp,
-//                     FWD_COIL_ACCURACY_NORMAL,res->meg_head_t)) == NULL) {
-//                FREE(comp_chs);
-//                goto bad;
-//            }
-//            fprintf(stderr,"%d compensation channels in %s\n",comp_coils->ncoil,measname);
-//        }
-//        FREE(comp_chs);
-//    }
-//    else {			/* Get rid of the empty data set */
-//        mne_free_ctf_comp_data_set(comp_data);
-//        comp_data = NULL;
-//    }
-//    /*
-//    * Ready to set up the forward model
-//    */
-//    if (setup_forward_model(res,comp_data,comp_coils) == FAIL)
-//        goto bad;
-//    res->column_norm = COLUMN_NORM_LOC;
-//    /*
-//    * Projection data should go here
-//    */
-//    if (make_projection(projnames,nproj,res->chs,res->nmeg+res->neeg,&res->proj) == FAIL)
-//        goto bad;
-//    if (res->proj && res->proj->nitems > 0) {
-//        fprintf(stderr,"Final projection operator is:\n");
-//        mne_proj_op_report(stderr,"\t",res->proj);
-
-//        if (mne_proj_op_chs(res->proj,res->ch_names,res->nmeg+res->neeg) == FAIL)
-//            goto bad;
-//        if (mne_proj_op_make_proj(res->proj) == FAIL)
-//            goto bad;
-//    }
+    out : {
+        if (res == FAIL) {
+//            err_print_error();
+            exit(1);
+        }
+        else
+            exit (0);
+    }
 
 
-
-//    /*
-//    * Noise covariance
-//    */
-//    if (noisename) {
-//        if ((cov = mne_read_cov(noisename,FIFFV_MNE_SENSOR_COV)) == NULL)
-//            goto bad;
-//        fprintf(stderr,"Read a %s noise-covariance matrix from %s\n",
-//        cov->cov_diag ? "diagonal" : "full", noisename);
-//    }
-//    else {
-//        if ((cov = ad_hoc_noise(res->meg_coils,res->eeg_els,grad_std,mag_std,eeg_std)) == NULL)
-//            goto bad;
-//    }
-//    res->noise = mne_pick_chs_cov_omit(cov,res->ch_names,res->nmeg+res->neeg,TRUE,res->chs);
-//    if (res->noise == NULL) {
-//        mne_free_cov(cov);
-//        goto bad;
-//    }
-//    fprintf(stderr,"Picked appropriate channels from the noise-covariance matrix.\n");
-//    mne_free_cov(cov);
-
-
-
-//    /*
-//    * Apply the projection operator to the noise-covariance matrix
-//    */
-//    if (res->proj && res->proj->nitems > 0 && res->proj->nvec > 0) {
-//        if (mne_proj_op_apply_cov(res->proj,res->noise) == FAIL)
-//            goto bad;
-//        fprintf(stderr,"Projection applied to the covariance matrix.\n");
-//    }
-
-
-
-//    /*
-//    * Force diagonal noise covariance?
-//    */
-//    if (diagnoise) {
-//        mne_revert_to_diag_cov(res->noise);
-//        fprintf(stderr,"Using only the main diagonal of the noise-covariance matrix.\n");
-//    }
-
-
-
-//    /*
-//    * Regularize the possibly deficient noise-covariance matrix
-//    */
-//    if (res->noise->cov) {
-//    float regs[3];
-//    int   do_it;
-
-//    regs[MNE_COV_CH_MEG_MAG]  = mag_reg;
-//    regs[MNE_COV_CH_MEG_GRAD] = grad_reg;
-//    regs[MNE_COV_CH_EEG]      = eeg_reg;
-
-
-
-//    /*
-//    * Classify the channels
-//    */
-//    if (mne_classify_channels_cov(res->noise,res->chs,res->nmeg+res->neeg) == FAIL)
-//        goto bad;
-
-
-
-//    /*
-//    * Do we need to do anything?
-//    */
-//    for (k = 0, do_it = 0; k < res->noise->ncov; k++) {
-//    if (res->noise->ch_class[k] != MNE_COV_CH_UNKNOWN &&
-//    regs[res->noise->ch_class[k]] > 0.0)
-//    do_it++;
-//    }
-
-
-
-
-//    /*
-//    * Apply regularization if necessary
-//    */
-//    if (do_it > 0)
-//    mne_regularize_cov(res->noise,regs);
-//    else
-//    fprintf(stderr,"No regularization applied to the noise-covariance matrix\n");
-//    }
-
-
-
-
-//    /*
-//    * Do the decomposition and check that the matrix is positive definite
-//    */
-//    fprintf(stderr,"Decomposing the noise covariance...\n");
-//    if (res->noise->cov) {
-//    if (mne_decompose_eigen_cov(res->noise) == FAIL)
-//    goto bad;
-//    fprintf(stderr,"Eigenvalue decomposition done.\n");
-//    for (k = 0; k < res->noise->ncov; k++) {
-//    if (res->noise->lambda[k] < 0.0)
-//    res->noise->lambda[k] = 0.0;
-//    }
-//    }
-//    else {
-//    fprintf(stderr,"Decomposition not needed for a diagonal covariance matrix.\n");
-//    if (mne_add_inv_cov(res->noise) == FAIL)
-//    goto bad;
-//    }
-//    mne_free_name_list(badlist,nbad);
-//    fwd_free_coil_set(templates);
-//    fwd_free_coil_set(comp_coils);
-//    mne_free_ctf_comp_data_set(comp_data);
-
-
-
-
-
-
-
-
-
-    return app.exec();
+//    return app.exec();
 }
 
 //*************************************************************************************************************
