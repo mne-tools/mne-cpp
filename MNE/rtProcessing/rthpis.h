@@ -112,6 +112,7 @@ struct coilParam {
 struct dipError {
     double error;
     Eigen::MatrixXd moment;
+    int numIterations;
 };
 
 struct sens {
@@ -183,14 +184,15 @@ public:
     */
     virtual bool stop();
 
-    dipError dipfitError (Eigen::MatrixXd, Eigen::MatrixXd, struct sens);
-    Eigen::MatrixXd ft_compute_leadfield(Eigen::MatrixXd, struct sens);
-    Eigen::MatrixXd magnetic_dipole(Eigen::MatrixXd, Eigen::MatrixXd, Eigen::MatrixXd);
+//    dipError dipfitError (Eigen::MatrixXd, Eigen::MatrixXd, struct sens);
+//    Eigen::MatrixXd ft_compute_leadfield(Eigen::MatrixXd, struct sens);
+//    Eigen::MatrixXd magnetic_dipole(Eigen::MatrixXd, Eigen::MatrixXd, Eigen::MatrixXd);
+//    static bool compar (int, int);
+//    Eigen::MatrixXd pinv(Eigen::MatrixXd);
+
+    Eigen::Matrix4d computeTransformation(Eigen::MatrixXd, Eigen::MatrixXd);
     coilParam dipfit(struct coilParam, struct sens, Eigen::MatrixXd, int numCoils);
     Eigen::MatrixXd fminsearch(Eigen::MatrixXd,int, int, int, Eigen::MatrixXd, struct sens);
-    static bool compar (int, int);
-    Eigen::MatrixXd pinv(Eigen::MatrixXd);
-    Eigen::Matrix4d computeTransformation(Eigen::MatrixXd, Eigen::MatrixXd);
 
     void test();
 
