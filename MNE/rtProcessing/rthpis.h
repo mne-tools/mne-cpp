@@ -247,7 +247,7 @@ private:
 
 public:
     //MatrixXd SpecData;
-    QMutex ReadMutex;
+    QMutex m_mutex;
 
     bool SendDataToBuffer;
 
