@@ -64,6 +64,7 @@
 #include <QDir>
 #include <QDateTime>
 
+#include <QQuaternion>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -840,7 +841,7 @@ bool BabyMEG::readBadChannels()
 void BabyMEG::run()
 {
 
-    MatrixXf matValue;
+    //MatrixXf matValue;
 
     qint32 size = 0;
 
@@ -850,6 +851,12 @@ void BabyMEG::run()
         {
             //pop matrix
             matValue = m_pRawMatrixBuffer->pop();
+
+            //Update and write the HPI information to the current data block
+            QTime timer;
+            timer.start();
+            updateHPI();
+            qDebug() << "BabyMEG::run() - updateHPI() timing" << timer.elapsed() << "msecs";
 
             //Write raw data to fif file
             if(m_bWriteToFile)
@@ -877,6 +884,76 @@ void BabyMEG::run()
     //Close the fif output stream
     if(m_bWriteToFile)
         this->toggleRecordingFile();
+}
+
+//*************************************************************************************************************
+void BabyMEG::updateHPI()
+{
+    QMatrix3x3 rot;
+    float t, r, s, qw, qx, qy, qz;
+
+    int bufsize = matValue.cols();
+    qDebug() << "bufsize = " << bufsize;
+
+    // Load device to head transformation matrix from Fiff info
+    for (int ir = 0; ir < 3; ir++)
+        for (int ic = 0; ic < 3; ic++)
+            rot(ir,ic) = m_pFiffInfo->dev_head_t.trans(ir,ic);
+
+    // Convert rotation matrix to quaternion (from Wikipedia)
+    t =rot(0,0) + rot(1,1) + rot(2,2);
+    r = sqrt(1 + t);
+    s = 0.5 / r;
+    qw = 0.5 * r;
+    qx = ( (rot(2,1) - rot(1,2)) / s );
+    qy = ( (rot(0,2) - rot(2,0)) / s );
+    qz = ( (rot(1,0) - rot(0,1)) / s );
+
+    // Write rotation quaternion to HPI Ch #1~3
+    matValue.row(401) = MatrixXf::Constant(1,bufsize, qx);
+    matValue.row(402) = MatrixXf::Constant(1,bufsize, qy);
+    matValue.row(403) = MatrixXf::Constant(1,bufsize, qz);
+
+    // Write translation vector to HPI Ch #4~6
+    matValue.row(404) = MatrixXf::Constant(1,bufsize, m_pFiffInfo->dev_head_t.trans(0,3));
+    matValue.row(405) = MatrixXf::Constant(1,bufsize, m_pFiffInfo->dev_head_t.trans(1,3));
+    matValue.row(406) = MatrixXf::Constant(1,bufsize, m_pFiffInfo->dev_head_t.trans(2,3));
+
+    // Write goodness of fit (GOF)to HPI Ch #7
+    // There must be a way to get the goodness of fit from rtHPI.
+    // Perhaps fiff info structure need to include GOF.
+    // The following line simply output an unity value of 1 to GOF channel.
+    matValue.row(407) = MatrixXf::Constant(1,bufsize, 1);
+
+    //----------------------------------------------------------------------------------------
+    // debug purpose !   visualize in HPI channels
+    // can be commented out to speed up the babymeg plugin
+
+    bool DFLAG = true;
+    //bool DFLAG = false;
+
+    if (DFLAG)
+    {
+        qDebug() << rot(0,0) << " "  << rot(0,1) << " " << rot(0,2);
+        qDebug() << rot(1,0) << " "  << rot(1,1) << " " << rot(1,2);
+        qDebug() << rot(2,0) << " "  << rot(2,1) << " " << rot(2,2);
+
+        qDebug() << "quaternion w: " << qw;
+        qDebug() << "quaternion x: " << qx;
+        qDebug() << "quaternion y: " << qy;
+        qDebug() << "quaternion z: " << qz;
+/*
+        matValue(401,100) = 1; matValue(401,101) = 1; matValue(401,102) = 1; matValue(401,103) = 1;
+        matValue(402,200) = 1; matValue(402,201) = 1; matValue(402,202) = 1; matValue(402,203) = 1;
+        matValue(403,300) = 1; matValue(403,301) = 1; matValue(403,302) = 1; matValue(403,303) = 1;
+        matValue(404,400) = 0; matValue(404,401) = 0; matValue(404,402) = 0; matValue(404,403) = 0;
+        matValue(405,500) = 0; matValue(405,501) = 0; matValue(405,502) = 0; matValue(405,503) = 0;
+        matValue(406,600) = 0; matValue(406,601) = 0; matValue(406,602) = 0; matValue(406,603) = 0;
+        matValue(407,700) = 0; matValue(407,701) = 0; matValue(407,702) = 0; matValue(407,703) = 0;
+*/
+    }
+    // end of debug
+    //----------------------------------------------------------------------------------------
 }
 
 
@@ -923,4 +1000,5 @@ void BabyMEG::onRecordingRemainingTimeChange()
 {
     m_pBabyMEGProjectDialog->setRecordingElapsedTime(m_recordingStartedTime.elapsed());
 }
+
 
