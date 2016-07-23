@@ -55,21 +55,21 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Utilsd \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
             -lMNE$${MNE_LIB_VERSION}Dispd \
-            -lxMeasd \
-            -lxDispd \
-            -lxSharedd
+            -lscMeasd \
+            -lscDispd \
+            -lscSharedd
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
             -lMNE$${MNE_LIB_VERSION}Utils \
             -lMNE$${MNE_LIB_VERSION}Fiff \
             -lMNE$${MNE_LIB_VERSION}Disp \
-            -lxMeas \
-            -lxDisp \
-            -lxShared
+            -lscMeas \
+            -lscDisp \
+            -lscShared
 }
 
-DESTDIR = $${MNE_BINARY_DIR}/mne_x_plugins
+DESTDIR = $${MNE_BINARY_DIR}/mne_scan_plugins
 
 SOURCES += \
         eegosports.cpp \
@@ -95,7 +95,7 @@ FORMS += \
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
-INCLUDEPATH += $${MNE_X_INCLUDE_DIR}
+INCLUDEPATH += $${MNE_SCAN_INCLUDE_DIR}
 
 OTHER_FILES += eegosports.json
 
