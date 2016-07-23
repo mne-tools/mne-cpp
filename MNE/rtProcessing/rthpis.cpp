@@ -915,7 +915,7 @@ void doDipfitConcurrent(QPair<QPair<Eigen::RowVectorXd, Eigen::VectorXd>, QPair<
     int maxiter = 500;
     int simplex_numitr = 0;
 
-    currentCoil.array() = fminsearch(currentCoil, maxiter, 2 * maxiter * currentCoil.cols(), display, currentData, currentSensors, simplex_numitr);
+    lCoilData.first.first = fminsearch(currentCoil, maxiter, 2 * maxiter * currentCoil.cols(), display, currentData, currentSensors, simplex_numitr);
 
     lCoilData.second.first = dipfitError(currentCoil, currentData, currentSensors);
     lCoilData.second.first.numIterations = simplex_numitr;
