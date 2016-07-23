@@ -637,6 +637,7 @@ void RtHPIS::run()
 
     while(m_bIsRunning)
     {
+
         // Get the indices of inner layer channels
         QVector<int> innerind(0);
         for (int i = 0;i < numCh;i++) {
@@ -646,7 +647,7 @@ void RtHPIS::run()
             }
         }
 
-        qDebug() << "innerind (number of inlayer channels): " << innerind.size();
+        //qDebug() << "innerind (number of inlayer channels): " << innerind.size();
 
         // Initialize inner layer sensors
         sensors.coilpos = Eigen::MatrixXd::Zero(innerind.size(),3);
@@ -665,10 +666,12 @@ void RtHPIS::run()
         Eigen::MatrixXd topo(innerind.size(),numCoils*2);
         Eigen::MatrixXd amp(innerind.size(),numCoils);
 
-        m_mutex.lock();
+
         if(m_pRawMatrixBuffer)
-        {            
-            MatrixXd t_mat = m_pRawMatrixBuffer->pop();
+        {
+            //m_mutex.lock();
+            MatrixXd t_mat = m_pRawMatrixBuffer->pop();            
+            //m_mutex.unlock();
 
             buffer.append(t_mat);
 
@@ -730,7 +733,7 @@ void RtHPIS::run()
 //                    qDebug() << "trigdata: " << trigdata.rows() << " x " << trigdata.cols();
 
                 timerTransMulti.start();
-                    // topo 247 x 8
+                    // topo: # of good inner channel x 8
                     topo = innerdata * pinv(simsig).transpose();
 
                 itimerTransMulti = timerTransMulti.elapsed();
@@ -746,7 +749,7 @@ void RtHPIS::run()
 //                    }
 
 
-                // amp 247 x 4
+                // amp: # of good inner channel x 4
                 timerPhase.start();
 
                 amp = (topo.leftCols(numCoils).array().square() + topo.rightCols(numCoils).array().square()).array().sqrt();
@@ -823,18 +826,22 @@ void RtHPIS::run()
                 timerCompTrans.start();
                 trans = computeTransformation(coil.pos,headHPI);
 
+                qDebug()<<"Write to FiffInfo Start";
+
                 for(int ti =0; ti<4;ti++)
                     for(int tj=0;tj<4;tj++)
                         m_pFiffInfo->dev_head_t.trans(ti,tj) = trans(ti,tj);
 
+                qDebug()<<"Write to FiffInfo End";
+
                 itimerCompTrans = timerCompTrans.elapsed();
 
-//                    qDebug()<<"**** rotation ------- dev2head transformation ************";
-//                    qDebug()<< trans(0,0)<<" "<<trans(0,1)<<" "<<trans(0,2);
-//                    qDebug()<< trans(1,0)<<" "<<trans(1,1)<<" "<<trans(1,2);
-//                    qDebug()<< trans(2,0)<<" "<<trans(2,1)<<" "<<trans(2,2);
-//                    qDebug()<<"**** translation(dx,dy,dz) - dev2head transformation ***********";
-//                    qDebug()<< 1e3*trans(0,3)<<" "<<1e3*trans(1,3)<<" "<<1e3*trans(2,3);
+                    qDebug()<<"**** rotation ------- dev2head transformation ************";
+                    qDebug()<< trans(0,0)<<" "<<trans(0,1)<<" "<<trans(0,2);
+                    qDebug()<< trans(1,0)<<" "<<trans(1,1)<<" "<<trans(1,2);
+                    qDebug()<< trans(2,0)<<" "<<trans(2,1)<<" "<<trans(2,2);
+                    qDebug()<<"**** translation(dx,dy,dz) - dev2head transformation ***********";
+                    qDebug()<< 1e3*trans(0,3)<<" "<<1e3*trans(1,3)<<" "<<1e3*trans(2,3);
 
 /*                     if (OUT_FLAG == 1) {
                     //outxfm << "   rotation" << "\n";
@@ -860,9 +867,7 @@ void RtHPIS::run()
             }
 
 
-        }//m_pRawMatrixBuffer        
-
-        m_mutex.unlock();
+        }//m_pRawMatrixBuffer
     }  //End of while statement
 
     //m_bIsRunning

@@ -890,15 +890,18 @@ void BabyMEG::run()
 void BabyMEG::updateHPI()
 {
     QMatrix3x3 rot;
-    float t, r, s, qw, qx, qy, qz;
+    float t, r, s, qw, qx, qy, qz, norm2;
+    float GOF;
 
     int bufsize = matValue.cols();
     qDebug() << "bufsize = " << bufsize;
 
     // Load device to head transformation matrix from Fiff info
+    qDebug() << "BabyMEG::updateHPI - before reading";
     for (int ir = 0; ir < 3; ir++)
         for (int ic = 0; ic < 3; ic++)
             rot(ir,ic) = m_pFiffInfo->dev_head_t.trans(ir,ic);
+    qDebug() << "BabyMEG::updateHPI - after reading";
 
     // Convert rotation matrix to quaternion (from Wikipedia)
     t =rot(0,0) + rot(1,1) + rot(2,2);
@@ -908,6 +911,27 @@ void BabyMEG::updateHPI()
     qx = ( (rot(2,1) - rot(1,2)) / s );
     qy = ( (rot(0,2) - rot(2,0)) / s );
     qz = ( (rot(1,0) - rot(0,1)) / s );
+
+    // Normalize quaternion vectors
+    norm2 = sqrt(qw*qw + qx*qx + qy*qy + qz*qz);
+    //norm2 = sqrt(qx*qx + qy*qy + qz*qz);
+    qw = qw / norm2;
+    qx = qx / norm2;
+    qy = qy / norm2;
+    qz = qz / norm2;
+
+    // Write goodness of fit (GOF)to HPI Ch #7
+    //
+    //  GOF = 1 - dpfitError
+    //
+    //      dpfitError was computed in the rthpis.cpp
+    //      dpfitError must be trasferred to HERE.
+    //      Perhaps new fiff info structure needs to be implemented for the dpfitError,
+    //      so that this babymeg.cpp can read out the dpfitError HERE.
+    //
+    // Temporarily teh GOF is set to 1.
+    float dpfitError = 0.0;
+    GOF = 1 - dpfitError;
 
     // Write rotation quaternion to HPI Ch #1~3
     matValue.row(401) = MatrixXf::Constant(1,bufsize, qx);
@@ -919,11 +943,8 @@ void BabyMEG::updateHPI()
     matValue.row(405) = MatrixXf::Constant(1,bufsize, m_pFiffInfo->dev_head_t.trans(1,3));
     matValue.row(406) = MatrixXf::Constant(1,bufsize, m_pFiffInfo->dev_head_t.trans(2,3));
 
-    // Write goodness of fit (GOF)to HPI Ch #7
-    // There must be a way to get the goodness of fit from rtHPI.
-    // Perhaps fiff info structure need to include GOF.
-    // The following line simply output an unity value of 1 to GOF channel.
-    matValue.row(407) = MatrixXf::Constant(1,bufsize, 1);
+    // Write GOF to HPI Ch #7
+    matValue.row(407) = MatrixXf::Constant(1,bufsize, GOF);
 
     //----------------------------------------------------------------------------------------
     // debug purpose !   visualize in HPI channels
