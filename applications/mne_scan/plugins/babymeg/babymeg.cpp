@@ -697,6 +697,69 @@ QWidget* BabyMEG::setupWidget()
 
 //*************************************************************************************************************
 
+void BabyMEG::run()
+{
+    MatrixXf matValue;
+
+    qint32 size = 0;
+
+    while(m_bIsRunning)
+    {
+        if(m_pRawMatrixBuffer)
+        {
+            //pop matrix
+            matValue = m_pRawMatrixBuffer->pop();
+
+            //create digital trigger information
+            createDigTrig(matValue);
+
+            //Write raw data to fif file
+            if(m_bWriteToFile)
+            {
+                size += matValue.rows()*matValue.cols() * 4;
+
+                if(size > MAX_DATA_LEN)
+                {
+                    size = 0;
+                    this->splitRecordingFile();
+                }
+
+                mutex.lock();
+                m_pOutfid->write_raw_buffer(matValue.cast<double>());
+                mutex.unlock();
+            }
+            else
+            {
+                size = 0;
+            }
+
+            if(m_pRTMSABabyMEG)
+            {
+                m_pRTMSABabyMEG->data()->setValue(this->calibrate(matValue));
+            }
+        }
+    }
+
+    //Close the fif output stream
+    if(m_bWriteToFile)
+    {
+        this->toggleRecordingFile();
+    }
+}
+
+
+//*************************************************************************************************************
+
+void BabyMEG::createDigTrig(MatrixXf& data)
+{
+    //Look for triggers in all trigger channels
+
+    //Write results into data block's digital trigger channel
+}
+
+
+//*************************************************************************************************************
+
 MatrixXd BabyMEG::calibrate(const MatrixXf& data)
 {
     MatrixXd one;
@@ -832,51 +895,6 @@ bool BabyMEG::readBadChannels()
     m_pFiffInfo->bads = t_sListbads;
 
     return true;
-}
-
-
-//*************************************************************************************************************
-
-void BabyMEG::run()
-{
-
-    MatrixXf matValue;
-
-    qint32 size = 0;
-
-    while(m_bIsRunning)
-    {
-        if(m_pRawMatrixBuffer)
-        {
-            //pop matrix
-            matValue = m_pRawMatrixBuffer->pop();
-
-            //Write raw data to fif file
-            if(m_bWriteToFile)
-            {
-                size += matValue.rows()*matValue.cols() * 4;
-
-                if(size > MAX_DATA_LEN)
-                {
-                    size = 0;
-                    this->splitRecordingFile();
-                }
-
-                mutex.lock();
-                m_pOutfid->write_raw_buffer(matValue.cast<double>());
-                mutex.unlock();
-            }
-            else
-                size = 0;
-
-            if(m_pRTMSABabyMEG)
-                m_pRTMSABabyMEG->data()->setValue(this->calibrate(matValue));
-        }
-    }
-
-    //Close the fif output stream
-    if(m_bWriteToFile)
-        this->toggleRecordingFile();
 }
 
 

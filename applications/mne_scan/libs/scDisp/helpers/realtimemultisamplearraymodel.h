@@ -595,6 +595,7 @@ private:
 
     QMap<QString, QColor>               m_qMapTriggerColor;                         /**< Current colors for all trigger channels. */
     QMap<int,QList<int> >               m_qMapDetectedTrigger;                      /**< Detected trigger for each trigger channel. */
+    QList<int>                          m_lTriggerChannelIndices;                   /**< List of all trigger channel indices. */
     QMap<int,QList<int> >               m_qMapDetectedTriggerFreeze;                /**< Detected trigger for each trigger channel while display is freezed. */
     QMap<int,QList<int> >               m_qMapDetectedTriggerOld;                   /**< Old detected trigger for each trigger channel. */
     QMap<int,QList<int> >               m_qMapDetectedTriggerOldFreeze;             /**< Old detected trigger for each trigger channel while display is freezed. */

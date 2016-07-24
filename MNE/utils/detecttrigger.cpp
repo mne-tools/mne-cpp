@@ -80,48 +80,51 @@ DetectTrigger::DetectTrigger()
 
 //*************************************************************************************************************
 
-bool DetectTrigger::detectTriggerFlanksMax(const MatrixXd &data, QMap<int,QList<int> >& qMapDetectedTrigger, int iOffsetIndex, double dThreshold, bool bRemoveOffset)
+QMap<int,QList<int> > DetectTrigger::detectTriggerFlanksMax(const MatrixXd &data, const QList<int>& lTriggerChannels, int iOffsetIndex, double dThreshold, bool bRemoveOffset)
 {
-    bool bFoundTrigger = false;
+    QMap<int,QList<int> > qMapDetectedTrigger;
 
     //TODO: This only can detect one trigger per data block. What if there are more than one trigger in the data block?
-    QMapIterator<int,QList<int> > i(qMapDetectedTrigger);
-    while (i.hasNext()) {
+    for(int i = 0; i < lTriggerChannels.size(); ++i)
+    {
 //        QTime time;
 //        time.start();
 
-        i.next();
         //detect the actual triggers in the current data matrix
-        if(i.key() > data.rows() || i.key() < 0)
-            return false;
+        if(lTriggerChannels.at(i) > data.rows() || lTriggerChannels.at(i) < 0)
+        {
+            return qMapDetectedTrigger;
+        }
 
         RowVectorXd::Index indexMaxCoeff;
-        int dMax = data.row(i.key()).maxCoeff(&indexMaxCoeff);
+        int dMax = data.row(lTriggerChannels.at(i)).maxCoeff(&indexMaxCoeff);
         Q_UNUSED(dMax);
 
         //Find trigger using gradient/difference. Also subtract first value as offset, like in the display
-        double maxValue = data.row(i.key())(indexMaxCoeff);
+        double maxValue = data.row(lTriggerChannels.at(i))(indexMaxCoeff);
         if(bRemoveOffset)
-            maxValue -= data.row(i.key())(0);
+        {
+            maxValue -= data.row(lTriggerChannels.at(i))(0);
+        }
 
-        if(maxValue>dThreshold) {
-            qMapDetectedTrigger[i.key()].append((int)iOffsetIndex+indexMaxCoeff);
-            bFoundTrigger = true;
+        if(maxValue>dThreshold)
+        {
+            qMapDetectedTrigger[lTriggerChannels.at(i)].append((int)iOffsetIndex+indexMaxCoeff);
         }
 
 //        int timeElapsed = time.elapsed();
 //        std::cout<<"timeElapsed: "<<timeElapsed<<std::endl;
     }
 
-    return bFoundTrigger;
+    return qMapDetectedTrigger;
 }
 
 
 //*************************************************************************************************************
 
-bool DetectTrigger::detectTriggerFlanksMax(const MatrixXd &data, int iTriggerChannelIdx, int &iDetectedTrigger, int iOffsetIndex, double dThreshold, bool bRemoveOffset)
+QList<int> DetectTrigger::detectTriggerFlanksMax(const MatrixXd &data, int iTriggerChannelIdx, int iOffsetIndex, double dThreshold, bool bRemoveOffset)
 {
-    bool bFoundTrigger = false;
+    QList<int> lDetectedTriggers;
 
     //TODO: This only can detect one trigger per data block. What if there are more than one trigger in the data block?
 //        QTime time;
@@ -129,7 +132,9 @@ bool DetectTrigger::detectTriggerFlanksMax(const MatrixXd &data, int iTriggerCha
 
     //detect the actual triggers in the current data matrix
     if(iTriggerChannelIdx > data.rows() || iTriggerChannelIdx < 0)
-        return false;
+    {
+        return lDetectedTriggers;
+    }
 
     RowVectorXd::Index indexMaxCoeff;
     int dMax = data.row(iTriggerChannelIdx).maxCoeff(&indexMaxCoeff);
@@ -141,43 +146,46 @@ bool DetectTrigger::detectTriggerFlanksMax(const MatrixXd &data, int iTriggerCha
         maxValue -= data.row(iTriggerChannelIdx)(0);
 
     if(maxValue>dThreshold) {
-        iDetectedTrigger = (int)iOffsetIndex+indexMaxCoeff;
-        bFoundTrigger = true;
+        lDetectedTriggers.append((int)iOffsetIndex+indexMaxCoeff);
     }
 
 //        int timeElapsed = time.elapsed();
 //        std::cout<<"timeElapsed: "<<timeElapsed<<std::endl;
 
-    return bFoundTrigger;
+    return lDetectedTriggers;
 }
 
 
 //*************************************************************************************************************
 
-bool DetectTrigger::detectTriggerFlanksGrad(const MatrixXd &data, QMap<int,QList<int> >& qMapDetectedTrigger, int iOffsetIndex, double dThreshold, bool bRemoveOffset, QString type)
+QMap<int,QList<int> > DetectTrigger::detectTriggerFlanksGrad(const MatrixXd &data, const QList<int>& lTriggerChannels, int iOffsetIndex, double dThreshold, bool bRemoveOffset, const QString& type)
 {
-    bool bFoundTrigger = false;
-
-    //TODO: This only can detect one trigger per data block. What if there are more than one trigger in the data block?
+    QMap<int,QList<int> > qMapDetectedTrigger;
     RowVectorXd tGradient = RowVectorXd::Zero(data.cols());
 
-    QMapIterator<int,QList<int> > i(qMapDetectedTrigger);
-    while (i.hasNext()) {
+    //TODO: This only can detect one trigger per data block. What if there are more than one trigger in the data block?
+    for(int i = 0; i < lTriggerChannels.size(); ++i)
+    {
 //        QTime time;
 //        time.start();
 
-        i.next();
         //detect the actual triggers in the current data matrix
-        if(i.key() > data.rows() || i.key() < 0)
-            return false;
+        if(lTriggerChannels.at(i) > data.rows() || lTriggerChannels.at(i) < 0)
+        {
+            return qMapDetectedTrigger;
+        }
 
         //Compute gradient
         for(int t = 1; t<tGradient.cols(); t++)
-            tGradient(t) = data.row(i.key())(t)-data.row(i.key())(t-1);
+        {
+            tGradient(t) = data.row(lTriggerChannels.at(i))(t)-data.row(lTriggerChannels.at(i))(t-1);
+        }
 
         // If falling flanks are to be detected flip the gradient's sign
         if(type == "Falling")
+        {
             tGradient = tGradient * -1;
+        }
 
         //Find positive maximum in gradient vector. This position is equal to the rising trigger flank.
         RowVectorXd::Index indexMaxGrad;
@@ -185,28 +193,30 @@ bool DetectTrigger::detectTriggerFlanksGrad(const MatrixXd &data, QMap<int,QList
         Q_UNUSED(dMax);
 
         //Compare to calculated threshold
-        double maxValue = data.row(i.key())(indexMaxGrad);
+        double maxValue = data.row(lTriggerChannels.at(i))(indexMaxGrad);
         if(bRemoveOffset)
-            maxValue -= data.row(i.key())(0);
+        {
+            maxValue -= data.row(lTriggerChannels.at(i))(0);
+        }
 
-        if(maxValue>dThreshold) {
-            qMapDetectedTrigger[i.key()].append((int)iOffsetIndex+indexMaxGrad);
-            bFoundTrigger = true;
+        if(maxValue>dThreshold)
+        {
+            qMapDetectedTrigger[lTriggerChannels.at(i)].append((int)iOffsetIndex+indexMaxGrad);
         }
 
 //        int timeElapsed = time.elapsed();
 //        std::cout<<"timeElapsed: "<<timeElapsed<<std::endl;
     }
 
-    return bFoundTrigger;
+    return qMapDetectedTrigger;
 }
 
 
 //*************************************************************************************************************
 
-bool DetectTrigger::detectTriggerFlanksGrad(const MatrixXd &data, int iTriggerChannelIdx, int &iDetectedTrigger, int iOffsetIndex, double dThreshold, bool bRemoveOffset, QString type)
+QList<int> DetectTrigger::detectTriggerFlanksGrad(const MatrixXd &data, int iTriggerChannelIdx, int iOffsetIndex, double dThreshold, bool bRemoveOffset, const QString& type)
 {
-    bool bFoundTrigger = false;
+    QList<int> lDetectedTriggers;
 
     //TODO: This only can detect one trigger per data block. What if there are more than one trigger in the data block?
     RowVectorXd tGradient = RowVectorXd::Zero(data.cols());
@@ -216,15 +226,21 @@ bool DetectTrigger::detectTriggerFlanksGrad(const MatrixXd &data, int iTriggerCh
 
     //detect the actual triggers in the current data matrix
     if(iTriggerChannelIdx > data.rows() || iTriggerChannelIdx < 0)
-        return false;
+    {
+        return lDetectedTriggers;
+    }
 
     //Compute gradient
     for(int t = 1; t<tGradient.cols(); t++)
+    {
         tGradient(t) = data.row(iTriggerChannelIdx)(t)-data.row(iTriggerChannelIdx)(t-1);
+    }
 
     // If falling flanks are to be detected flip the gradient's sign
     if(type == "Falling")
+    {
         tGradient = tGradient * -1;
+    }
 
     //Find positive maximum in gradient vector. This position is equal to the rising trigger flank.
     RowVectorXd::Index indexMaxGrad;
@@ -234,17 +250,19 @@ bool DetectTrigger::detectTriggerFlanksGrad(const MatrixXd &data, int iTriggerCh
     //Compare to calculated threshold
     double maxValue = data.row(iTriggerChannelIdx)(indexMaxGrad);
     if(bRemoveOffset)
+    {
         maxValue -= data.row(iTriggerChannelIdx)(0);
+    }
 
-    if(maxValue>dThreshold) {
-        iDetectedTrigger = (int)iOffsetIndex+indexMaxGrad;
-        bFoundTrigger = true;
+    if(maxValue>dThreshold)
+    {
+        lDetectedTriggers.append((int)iOffsetIndex+indexMaxGrad);
     }
 
 //        int timeElapsed = time.elapsed();
 //        std::cout<<"timeElapsed: "<<timeElapsed<<std::endl;
 
-    return bFoundTrigger;
+    return lDetectedTriggers;
 }
 
 

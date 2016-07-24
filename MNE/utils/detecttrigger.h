@@ -105,39 +105,44 @@ public:
     /**
     * detectTriggerFlanks detects flanks from a given data matrix in row wise order. This function uses a simple maxCoeff function implemented by eigen to locate the triggers.
     *
-    * @param[in]    data  the data used to find the trigger flanks
-    * @param[out]   qMapDetectedTrigger  This map holds the indices of the channels which are to be read from data. For each index/channel the found triggers are written to the value of the map.
-    * @param[in]    iOffsetIndex  the offset index gets added to the found trigger flank index
-    * @param[in]    iThreshold  the signal threshold value used to find the trigger flank
-    * @param[in]    bRemoveOffset  remove the first sample as offset
+    * @param[in]        data  the data used to find the trigger flanks
+    * @param[in]        lTriggerChannels  The indeces of the trigger channels
+    * @param[in]        iOffsetIndex  the offset index gets added to the found trigger flank index
+    * @param[in]        dThreshold  the signal threshold value used to find the trigger flank
+    * @param[in]        bRemoveOffset  remove the first sample as offset
+    *
+    * @param return     This map holds the indices of the channels which are to be read from data. For each index/channel the found triggers are written to the value of the map.
     */
-    static bool detectTriggerFlanksMax(const MatrixXd &data, QMap<int,QList<int> >& qMapDetectedTrigger, int iOffsetIndex, double dThreshold, bool bRemoveOffset);
+    static QMap<int,QList<int> > detectTriggerFlanksMax(const MatrixXd &data, const QList<int>& lTriggerChannels, int iOffsetIndex, double dThreshold, bool bRemoveOffset);
 
     //=========================================================================================================
     /**
     * detectTriggerFlanks detects flanks from a given data matrix in row wise order. This function uses a simple maxCoeff function implemented by eigen to locate the triggers.
     *
-    * @param[in]    data  the data used to find the trigger flanks
-    * @param[in]    iTriggerChannelIdx  the index of the trigger channel in the matrix.
-    * @param[out]   iDetectedTrigger The detected trigger
-    * @param[in]    iOffsetIndex  the offset index gets added to the found trigger flank index
-    * @param[in]    iThreshold  the signal threshold value used to find the trigger flank
-    * @param[in]    bRemoveOffset  remove the first sample as offset
+    * @param[in]        data  the data used to find the trigger flanks
+    * @param[in]        iTriggerChannelIdx  the index of the trigger channel in the matrix.
+    * @param[in]        iOffsetIndex  the offset index gets added to the found trigger flank index
+    * @param[in]        dThreshold  the signal threshold value used to find the trigger flank
+    * @param[in]        bRemoveOffset  remove the first sample as offset
+    *
+    * @param return     This list holds the found trigger indices.
     */
-    static bool detectTriggerFlanksMax(const MatrixXd &data, int iTriggerChannelIdx, int &iDetectedTrigger, int iOffsetIndex, double dThreshold, bool bRemoveOffset);
+    static QList<int> detectTriggerFlanksMax(const MatrixXd &data, int iTriggerChannelIdx, int iOffsetIndex, double dThreshold, bool bRemoveOffset);
 
     //=========================================================================================================
     /**
     * detectTriggerFlanksGrad detects flanks from a given data matrix in row wise order. This function uses a simple gradient to locate the triggers.
     *
     * @param[in]    data  the data used to find the trigger flanks
-    * @param[out]   qMapDetectedTrigger  This map holds the indices of the channels which are to be read from data. For each index/channel the found triggers are written to the value of the map.
+    * @param[in]    lTriggerChannels  The indeces of the trigger channels
     * @param[in]    iOffsetIndex  the offset index gets added to the found trigger flank index
     * @param[in]    iThreshold  the gradient threshold value used to find the trigger flank
     * @param[in]    bRemoveOffset  remove the first sample as offset
     * @param[in]    type  detect rising or falling flank. Use "Rising" or "Falling" as input
+    *
+    * @param return     This map holds the indices of the channels which are to be read from data. For each index/channel the found triggers are written to the value of the map.
     */
-    static bool detectTriggerFlanksGrad(const MatrixXd &data, QMap<int,QList<int> >& qMapDetectedTrigger, int iOffsetIndex, double dThreshold, bool bRemoveOffset, QString type = "Rising");
+    static QMap<int,QList<int> > detectTriggerFlanksGrad(const MatrixXd &data, const QList<int>& lTriggerChannels, int iOffsetIndex, double dThreshold, bool bRemoveOffset, const QString& type);
 
     //=========================================================================================================
     /**
@@ -145,13 +150,14 @@ public:
     *
     * @param[in]    data  the data used to find the trigger flanks
     * @param[in]    iTriggerChannelIdx  the index of the trigger channel in the matrix.
-    * @param[out]   iDetectedTrigger The detected trigger
     * @param[in]    iOffsetIndex  the offset index gets added to the found trigger flank index
     * @param[in]    iThreshold  the gradient threshold value used to find the trigger flank
     * @param[in]    bRemoveOffset  remove the first sample as offset
     * @param[in]    type  detect rising or falling flank. Use "Rising" or "Falling" as input
+    *
+    * @param return     This list holds the found trigger indices.
     */
-    static bool detectTriggerFlanksGrad(const MatrixXd &data, int iTriggerChannelIdx, int &iDetectedTrigger, int iOffsetIndex, double dThreshold, bool bRemoveOffset, QString type = "Rising");
+    static QList<int> detectTriggerFlanksGrad(const MatrixXd &data, int iTriggerChannelIdx, int iOffsetIndex, double dThreshold, bool bRemoveOffset, const QString& type);
 };
 
 //*************************************************************************************************************

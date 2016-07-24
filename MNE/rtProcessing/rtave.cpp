@@ -326,7 +326,12 @@ void RtAve::run()
 
                 //Detect trigger
                 m_iTriggerPos = -1;
-                DetectTrigger::detectTriggerFlanksGrad(rawSegment, m_iTriggerIndex, m_iTriggerPos, 0, m_fTriggerThreshold, true, "Rising");
+                QList<int> lDetectedTriggers= DetectTrigger::detectTriggerFlanksGrad(rawSegment, m_iTriggerIndex, 0, m_fTriggerThreshold, true, "Rising");
+
+                if(lDetectedTriggers.size() > 0)
+                {
+                    m_iTriggerPos = lDetectedTriggers.at(0);
+                }
 
                 //If number of averages is equals zero do not perform averages
                 if(m_iNumAverages == 0) {
