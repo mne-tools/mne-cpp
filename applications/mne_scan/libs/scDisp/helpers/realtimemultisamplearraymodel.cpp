@@ -531,10 +531,10 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
         if(m_bTriggerDetectionActive) {
             int iOldDetectedTriggers = m_qMapDetectedTrigger[m_iCurrentTriggerChIndex].size();
 
-            QString detectionType("Falling");
+            QString detectionType("Rising");
 
             //DetectTrigger::detectTriggerFlanksMax(data.at(b), m_qMapDetectedTrigger, m_iCurrentSample-nCol, m_dTriggerThreshold, true);
-            DetectTrigger::detectTriggerFlanksGrad(data.at(b), m_qMapDetectedTrigger, m_iCurrentSample-nCol, m_dTriggerThreshold, true, detectionType);
+            DetectTrigger::detectTriggerFlanksGrad(data.at(b), m_qMapDetectedTrigger, m_iCurrentSample-nCol, m_dTriggerThreshold, false, detectionType);
 
             //Compute newly counted triggers
             int newTriggers = m_qMapDetectedTrigger[m_iCurrentTriggerChIndex].size() - iOldDetectedTriggers;
