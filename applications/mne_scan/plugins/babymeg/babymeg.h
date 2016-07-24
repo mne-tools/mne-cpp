@@ -373,9 +373,17 @@ protected:
 private:
     //=========================================================================================================
     /**
+    * Combines all analog trigger signals to one single digital trigger line.
+    *
+    * @param[out] data  the data matrix
+    */
+    void createDigTrig(MatrixXf& data);
+
+    //=========================================================================================================
+    /**
     * Calibrate matrix.
     *
-    * @param[out] data  connection status
+    * @param[out] data  the data matrix
     */
     MatrixXd calibrate(const MatrixXf& data);
 
@@ -436,37 +444,37 @@ private:
 
     QSharedPointer<RawMatrixBuffer>         m_pRawMatrixBuffer;             /**< Holds incoming raw data. */
 
-    FiffInfo::SPtr      m_pFiffInfo;    /**< Fiff measurement info.*/
-    FiffStream::SPtr    m_pOutfid;      /**< FiffStream to write to.*/
+    FiffInfo::SPtr                          m_pFiffInfo;                    /**< Fiff measurement info.*/
+    FiffStream::SPtr                        m_pOutfid;                      /**< FiffStream to write to.*/
 
-    qint16      m_iBlinkStatus;         /**< The blink status of the recording button.*/
-    qint32      m_iBufferSize;          /**< The raw data buffer size.*/
-    qint32      m_iSplitCount;          /**< File split count */
-    int         m_iRecordingMSeconds;   /**< Recording length in mseconds.*/
-    bool        m_bWriteToFile;         /**< Flag for for writing the received samples to a file. Defined by the user via the GUI.*/
-    bool        m_bUseRecordTimer;      /**< Flag whether to use data recording timer.*/
-    bool        m_bIsRunning;           /**< If thread is running flag.*/
-    QString     m_sBabyMEGDataPath;     /**< The data storage path.*/
-    QString     m_sCurrentProject;      /**< The current project which is part of the filename to be recorded.*/
-    QString     m_sCurrentSubject;      /**< The current subject which is part of the filename to be recorded.*/
-    QString     m_sCurrentParadigm;     /**< The current paradigm which is part of the filename to be recorded.*/
-    QString     m_sRecordFile;          /**< Current record file. */
-    QString     m_sFiffProjections;     /**< Fiff projection information */
-    QString     m_sFiffCompensators;    /**< Fiff compensator information */
-    QString     m_sBadChannels;         /**< Filename which contains a list of bad channels */
+    qint16                                  m_iBlinkStatus;                 /**< The blink status of the recording button.*/
+    qint32                                  m_iBufferSize;                  /**< The raw data buffer size.*/
+    qint32                                  m_iSplitCount;                  /**< File split count */
+    int                                     m_iRecordingMSeconds;           /**< Recording length in mseconds.*/
+    bool                                    m_bWriteToFile;                 /**< Flag for for writing the received samples to a file. Defined by the user via the GUI.*/
+    bool                                    m_bUseRecordTimer;              /**< Flag whether to use data recording timer.*/
+    bool                                    m_bIsRunning;                   /**< If thread is running flag.*/
+    QString                                 m_sBabyMEGDataPath;             /**< The data storage path.*/
+    QString                                 m_sCurrentProject;              /**< The current project which is part of the filename to be recorded.*/
+    QString                                 m_sCurrentSubject;              /**< The current subject which is part of the filename to be recorded.*/
+    QString                                 m_sCurrentParadigm;             /**< The current paradigm which is part of the filename to be recorded.*/
+    QString                                 m_sRecordFile;                  /**< Current record file. */
+    QString                                 m_sFiffProjections;             /**< Fiff projection information */
+    QString                                 m_sFiffCompensators;            /**< Fiff compensator information */
+    QString                                 m_sBadChannels;                 /**< Filename which contains a list of bad channels */
 
-    QFile       m_qFileOut;             /**< QFile for writing to fif file.*/
-    QMutex      mutex;                  /**< Mutex to guarantee thread safety.*/
-    QTime       m_recordingStartedTime; /**< The time when the recording started.*/
+    QFile                                   m_qFileOut;                     /**< QFile for writing to fif file.*/
+    QMutex                                  mutex;                          /**< Mutex to guarantee thread safety.*/
+    QTime                                   m_recordingStartedTime;         /**< The time when the recording started.*/
 
-    RowVectorXd             m_cals;             /**< Calibration vector.*/
-    SparseMatrix<double>    m_sparseMatCals;    /**< Sparse calibration matrix.*/
+    RowVectorXd                             m_cals;                         /**< Calibration vector.*/
+    SparseMatrix<double>                    m_sparseMatCals;                /**< Sparse calibration matrix.*/
 
-    QAction*                m_pActionSetupProject;          /**< shows setup project dialog */
-    QAction*                m_pActionRecordFile;            /**< start recording action */
-    QAction*                m_pActionSqdCtrl;               /**< show squid control */
-    QAction*                m_pActionUpdateFiffInfo;        /**< Update Fiff Info action */
-    QAction*                m_pActionUpdateFiffInfoForHPI;  /**< Update HPI info into Fiff Info action */
+    QAction*                                m_pActionSetupProject;          /**< shows setup project dialog */
+    QAction*                                m_pActionRecordFile;            /**< start recording action */
+    QAction*                                m_pActionSqdCtrl;               /**< show squid control */
+    QAction*                                m_pActionUpdateFiffInfo;        /**< Update Fiff Info action */
+    QAction*                                m_pActionUpdateFiffInfoForHPI;  /**< Update HPI info into Fiff Info action */
 };
 
 } // NAMESPACE
