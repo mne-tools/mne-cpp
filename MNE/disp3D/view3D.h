@@ -213,7 +213,6 @@ public:
     */
     bool addDigitizerData(const QString& subject, const QString& set, const QList<FIFFLIB::FiffDigPoint>& tDigitizer);
 
-
     //=========================================================================================================
     /**
     * Return the tree model which holds the subject information.

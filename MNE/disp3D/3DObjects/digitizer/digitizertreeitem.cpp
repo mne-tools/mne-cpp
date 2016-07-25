@@ -1,15 +1,14 @@
 //=============================================================================================================
 /**
 * @file     digitizertreeitem.cpp
-* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
-*           Jana Kiesel <jana.kiesel@tu-ilmenau.de>;
+* @author   Jana Kiesel <jana.kiesel@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     July, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2015, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Jana Kiesel and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -41,14 +40,8 @@
 
 #include "digitizertreeitem.h"
 
-#include "../common/metatreeitem.h"
-
-#include "../../helpers/renderable3Dentity.h"
-
-#include "fs/label.h"
-#include "fs/surface.h"
-
-#include "mne/mne_hemisphere.h"
+#include "fiff/fiff_constants.h"
+#include "fiff/fiff_dig_point.h"
 
 
 //*************************************************************************************************************
@@ -56,14 +49,7 @@
 // Qt INCLUDES
 //=============================================================================================================
 
-#include <QList>
-#include <QVariant>
-#include <QStringList>
-#include <QColor>
-#include <QStandardItem>
-#include <QStandardItemModel>
 #include <QMatrix4x4>
-
 #include <Qt3DExtras/QSphereMesh>
 #include <Qt3DExtras/QPhongMaterial>
 #include <Qt3DCore/QTransform>
@@ -74,19 +60,13 @@
 // Eigen INCLUDES
 //=============================================================================================================
 
-#include <Eigen/Core>
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace Eigen;
-using namespace MNELIB;
 using namespace DISP3DLIB;
-using namespace FIFFLIB;
-
 
 
 //*************************************************************************************************************
@@ -201,47 +181,6 @@ bool DigitizerTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer, 
 
         sourceSphereEntity->setParent(m_pRenderable3DEntity);
     }
-
-
-//    m_lChildren = m_pRenderable3DEntity->children();
-
-//    //Create color from curvature information with default gyri and sulcus colors
-//    QByteArray arrayVertColor = createVertColor(tHemisphere.rr);
-
-//    //Set renderable 3D entity mesh and color data
-//    m_pRenderable3DEntity->setMeshData(tHemisphere.rr, tHemisphere.nn, tHemisphere.tris, arrayVertColor);
-
-//    //Add data which is held by this DigitizerTreeItem
-//    QVariant data;
-
-//    data.setValue(arrayVertColor);
-//    this->setData(data, Data3DTreeModelItemRoles::SurfaceCurrentColorVert);
-
-//    data.setValue(tHemisphere.rr);
-//    this->setData(data, Data3DTreeModelItemRoles::SurfaceVert);ok
-
-//    data.setValue(tHemisphere.tris);
-//    this->setData(data, Data3DTreeModelItemRoles::SurfaceTris);
-
-//    data.setValue(tHemisphere.nn);
-//    this->setData(data, Data3DTreeModelItemRoles::SurfaceNorm);
-
-//    data.setValue(m_pRenderable3DEntity);
-//    this->setData(data, Data3DTreeModelItemRoles::SurfaceRenderable3DEntity);
-
-//    //Add surface meta information as item children
-//    QList<QStandardItem*> list;
-
-//    MetaTreeItem* pItemSurfCol = new MetaTreeItem(MetaTreeItemTypes::SurfaceColor, "Surface color");
-//    connect(pItemSurfCol, &MetaTreeItem::surfaceColorChanged,
-//            this, &DigitizerTreeItem::onSurfaceColorChanged);
-//    list << pItemSurfCol;
-//    list << new QStandardItem(pItemSurfCol->toolTip());
-//    this->appendRow(list);
-//    data.setValue(QColor(100,100,100));
-//    pItemSurfCol->setData(data, MetaTreeItemRoles::SurfaceColor);
-//    pItemSurfCol->setData(data, Qt::DecorationRole);
-
     return true;
 }
 
@@ -251,22 +190,6 @@ bool DigitizerTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer, 
 void DigitizerTreeItem::setVisible(bool state)
 {
     m_pRenderable3DEntity->setParent(state ? m_pParentEntity : Q_NULLPTR);
-
-//    for(int i = 0; i<m_lChildren.size(); i++) {
-//        m_lChildren.at(i)->setParent(state ? m_pRenderable3DEntity : Q_NULLPTR);
-//    }
-}
-
-
-//*************************************************************************************************************
-
-void DigitizerTreeItem::onSurfaceColorChanged(const QColor& color)
-{
-    QVariant data;
-    QByteArray arrayNewVertColor = createVertColor(this->data(Data3DTreeModelItemRoles::SurfaceVert).value<MatrixX3f>(), color);
-
-    data.setValue(arrayNewVertColor);
-    this->setData(data, Data3DTreeModelItemRoles::SurfaceCurrentColorVert);
 }
 
 
@@ -275,23 +198,4 @@ void DigitizerTreeItem::onSurfaceColorChanged(const QColor& color)
 void DigitizerTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
 {
     this->setVisible(checkState==Qt::Unchecked ? false : true);
-}
-
-
-//*************************************************************************************************************
-
-QByteArray DigitizerTreeItem::createVertColor(const MatrixXf& vertices, const QColor& color) const
-{
-    QByteArray arrayCurvatureColor;
-    arrayCurvatureColor.resize(vertices.rows() * 3 * (int)sizeof(float));
-    float *rawColorArray = reinterpret_cast<float *>(arrayCurvatureColor.data());
-    int idxColor = 0;
-
-    for(int i = 0; i<vertices.rows(); i++) {
-        rawColorArray[idxColor++] = color.redF();
-        rawColorArray[idxColor++] = color.greenF();
-        rawColorArray[idxColor++] = color.blueF();
-    }
-
-    return arrayCurvatureColor;
 }

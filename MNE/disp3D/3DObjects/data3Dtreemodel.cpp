@@ -390,7 +390,7 @@ bool Data3DTreeModel::addData(const QString& subject, const QString& set, const 
 }
 
 
-////*************************************************************************************************************
+//*************************************************************************************************************
 
 bool Data3DTreeModel::addData(const QString& subject, const QString& set, const QList<FIFFLIB::FiffDigPoint>& tDigitizer)
 {
@@ -430,21 +430,6 @@ bool Data3DTreeModel::addData(const QString& subject, const QString& set, const 
 
                 state = pSurfaceSetItem->addData(tDigitizer, m_pParentEntity);
             }
-
-
-//            if(!itemList.isEmpty() && (itemList.at(0)->type() == Data3DTreeModelItemTypes::DigitizerItem)) {
-//                DigitizerTreeItem* pDigitizerItem = dynamic_cast<DigitizerTreeItem*>(itemList.at(0));
-//                state = pDigitizerItem->addData(tDigitizer, m_pParentEntity);
-//            } else {
-//                DigitizerTreeItem* pDigitizerItem = new DigitizerTreeItem(Data3DTreeModelItemTypes::DigitizerItem, set);
-
-//                QList<QStandardItem*> list;
-//                list << pDigitizerItem;
-//                list << new QStandardItem(pDigitizerItem->toolTip());
-//                pSubjectItem->appendRow(list);
-
-//                state = pDigitizerItem->addData(tDigitizer, m_pParentEntity);
-//            }
         }
     }
 

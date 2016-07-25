@@ -48,31 +48,14 @@
 
 #include "digitizertreeitem.h"
 
-#include "../common/metatreeitem.h"
-
-#include "../../helpers/renderable3Dentity.h"
-
-
 #include "fiff/fiff_constants.h"
 #include "fiff/fiff_dig_point.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
-
-#include <QList>
-#include <QVariant>
-#include <QStringList>
-#include <QColor>
-#include <QStandardItem>
-#include <QStandardItemModel>
-#include <QMatrix4x4>
-
-//#include <Qt3DExtras/QSphereMesh>
-//#include <Qt3DExtras/QPhongMaterial>
-//#include <Qt3DCore/QTransform>
-
 
 
 //*************************************************************************************************************
@@ -80,27 +63,19 @@
 // Eigen INCLUDES
 //=============================================================================================================
 
-#include <Eigen/Core>
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace Eigen;
-//using namespace MNELIB;
 using namespace DISP3DLIB;
-using namespace FIFFLIB;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
-
-//Put all globally defined functions here. These functions are not part of your class. I.e. put all functions
-//here which are called by a multithreading framework (QtFramework, etc.)
 
 
 //*************************************************************************************************************
@@ -118,7 +93,6 @@ DigitizerSetTreeItem::DigitizerSetTreeItem(int iType, const QString& text)
     this->setCheckState(Qt::Checked);
     this->setToolTip("Digitizer Set");
 }
-
 
 
 //*************************************************************************************************************
@@ -186,7 +160,6 @@ bool DigitizerSetTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitize
     QList<QStandardItem*> itemList = this->findChildren(Data3DTreeModelItemTypes::DigitizerItem);
 
     if (!tCardinal.empty()){
-
         //Create a cardinal digitizer item
         DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(Data3DTreeModelItemTypes::DigitizerItem,"Cardinal");
         state = digitizerItem->addData(tCardinal, parent);
@@ -194,10 +167,8 @@ bool DigitizerSetTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitize
         itemList << new QStandardItem(digitizerItem->toolTip());
         this->appendRow(itemList);
         itemList.clear();
-
     }
     if (!tHpi.empty()){
-
         //Create a HPI digitizer item
         DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(Data3DTreeModelItemTypes::DigitizerItem,"HPI");
         state = digitizerItem->addData(tHpi, parent);
@@ -207,7 +178,6 @@ bool DigitizerSetTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitize
         itemList.clear();
     }
     if (!tEeg.empty()){
-
         //Create a EEG digitizer item
         DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(Data3DTreeModelItemTypes::DigitizerItem,"EEG/ECG");
         state = digitizerItem->addData(tEeg, parent);
@@ -217,7 +187,6 @@ bool DigitizerSetTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitize
         itemList.clear();
     }
     if (!tExtra.empty()){
-
         //Create a extra digitizer item
         DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(Data3DTreeModelItemTypes::DigitizerItem,"Extra");
         state = digitizerItem->addData(tExtra, parent);
@@ -225,12 +194,7 @@ bool DigitizerSetTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitize
         itemList << new QStandardItem(digitizerItem->toolTip());
         this->appendRow(itemList);
         itemList.clear();
-
     }
-
-//    this->appendRow(itemList);
-    QList<QStandardItem*> test=this->findChildren("EEG/ECG");
-
     return state;
 }
 
@@ -239,23 +203,9 @@ bool DigitizerSetTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitize
 
 void DigitizerSetTreeItem::setVisible(bool state)
 {
-//    m_pRenderable3DEntity->setParent(state ? m_pParentEntity : Q_NULLPTR);
-
     for(int i = 0; i<m_lChildren.size(); i++) {
         m_lChildren.at(i)->setParent(state ? m_pRenderable3DEntity : Q_NULLPTR);
     }
-}
-
-
-//*************************************************************************************************************
-
-void DigitizerSetTreeItem::onSurfaceColorChanged(const QColor& color)
-{
-    QVariant data;
-    QByteArray arrayNewVertColor = createVertColor(this->data(Data3DTreeModelItemRoles::SurfaceVert).value<MatrixX3f>(), color);
-
-    data.setValue(arrayNewVertColor);
-    this->setData(data, Data3DTreeModelItemRoles::SurfaceCurrentColorVert);
 }
 
 
@@ -268,23 +218,4 @@ void DigitizerSetTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
             this->child(i)->setCheckState(checkState);
         }
     }
-}
-
-
-//*************************************************************************************************************
-
-QByteArray DigitizerSetTreeItem::createVertColor(const MatrixXf& vertices, const QColor& color) const
-{
-    QByteArray arrayCurvatureColor;
-    arrayCurvatureColor.resize(vertices.rows() * 3 * (int)sizeof(float));
-    float *rawColorArray = reinterpret_cast<float *>(arrayCurvatureColor.data());
-    int idxColor = 0;
-
-    for(int i = 0; i<vertices.rows(); i++) {
-        rawColorArray[idxColor++] = color.redF();
-        rawColorArray[idxColor++] = color.greenF();
-        rawColorArray[idxColor++] = color.blueF();
-    }
-
-    return arrayCurvatureColor;
 }
