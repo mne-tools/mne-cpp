@@ -80,7 +80,7 @@ DetectTrigger::DetectTrigger()
 
 //*************************************************************************************************************
 
-QMap<int,QList<int> > DetectTrigger::detectTriggerFlanksMax(const MatrixXd &data, const QList<int>& lTriggerChannels, int iOffsetIndex, double dThreshold, bool bRemoveOffset)
+QMap<int,QList<int> > DetectTrigger::detectTriggerFlanksMax(const MatrixXd &data, const QList<int>& lTriggerChannels, int iOffsetIndex, double dThreshold, bool bRemoveOffset, int iBurstLengthSamp)
 {
     QMap<int,QList<int> > qMapDetectedTrigger;
 
@@ -90,26 +90,25 @@ QMap<int,QList<int> > DetectTrigger::detectTriggerFlanksMax(const MatrixXd &data
 //        QTime time;
 //        time.start();
 
+        int iChIdx = lTriggerChannels.at(i);
+
         //detect the actual triggers in the current data matrix
-        if(lTriggerChannels.at(i) > data.rows() || lTriggerChannels.at(i) < 0)
+        if(iChIdx > data.rows() || iChIdx < 0)
         {
             return qMapDetectedTrigger;
         }
 
-        RowVectorXd::Index indexMaxCoeff;
-        int dMax = data.row(lTriggerChannels.at(i)).maxCoeff(&indexMaxCoeff);
-        Q_UNUSED(dMax);
-
-        //Find trigger using gradient/difference. Also subtract first value as offset, like in the display
-        double maxValue = data.row(lTriggerChannels.at(i))(indexMaxCoeff);
-        if(bRemoveOffset)
+        //Find positive maximum in gradient vector. This position is equal to the rising trigger flank.
+        for(int j = 0; j < data.cols(); ++j)
         {
-            maxValue -= data.row(lTriggerChannels.at(i))(0);
-        }
+            double dMatVal = bRemoveOffset ? data(iChIdx,j) - data(iChIdx,0) : data(iChIdx,j);
 
-        if(maxValue>dThreshold)
-        {
-            qMapDetectedTrigger[lTriggerChannels.at(i)].append((int)iOffsetIndex+indexMaxCoeff);
+            if(dMatVal >= dThreshold)
+            {
+                qMapDetectedTrigger[iChIdx].append(iOffsetIndex+j);
+
+                j += iBurstLengthSamp;
+            }
         }
 
 //        int timeElapsed = time.elapsed();
@@ -122,7 +121,7 @@ QMap<int,QList<int> > DetectTrigger::detectTriggerFlanksMax(const MatrixXd &data
 
 //*************************************************************************************************************
 
-QList<int> DetectTrigger::detectTriggerFlanksMax(const MatrixXd &data, int iTriggerChannelIdx, int iOffsetIndex, double dThreshold, bool bRemoveOffset)
+QList<int> DetectTrigger::detectTriggerFlanksMax(const MatrixXd &data, int iTriggerChannelIdx, int iOffsetIndex, double dThreshold, bool bRemoveOffset, int iBurstLengthSamp)
 {
     QList<int> lDetectedTriggers;
 
@@ -136,17 +135,17 @@ QList<int> DetectTrigger::detectTriggerFlanksMax(const MatrixXd &data, int iTrig
         return lDetectedTriggers;
     }
 
-    RowVectorXd::Index indexMaxCoeff;
-    int dMax = data.row(iTriggerChannelIdx).maxCoeff(&indexMaxCoeff);
-    Q_UNUSED(dMax);
+    //Find positive maximum in gradient vector. This position is equal to the rising trigger flank.
+    for(int j = 0; j < data.cols(); ++j)
+    {
+        double dMatVal = bRemoveOffset ? data(iTriggerChannelIdx,j) - data(iTriggerChannelIdx,0) : data(iTriggerChannelIdx,j);
 
-    //Find trigger using gradient/difference. Also subtract first value as offset, like in the display
-    double maxValue = data.row(iTriggerChannelIdx)(indexMaxCoeff);
-    if(bRemoveOffset)
-        maxValue -= data.row(iTriggerChannelIdx)(0);
+        if(dMatVal >= dThreshold)
+        {
+            lDetectedTriggers.append(iOffsetIndex+j);
 
-    if(maxValue>dThreshold) {
-        lDetectedTriggers.append((int)iOffsetIndex+indexMaxCoeff);
+            j += iBurstLengthSamp;
+        }
     }
 
 //        int timeElapsed = time.elapsed();
@@ -158,7 +157,7 @@ QList<int> DetectTrigger::detectTriggerFlanksMax(const MatrixXd &data, int iTrig
 
 //*************************************************************************************************************
 
-QMap<int,QList<int> > DetectTrigger::detectTriggerFlanksGrad(const MatrixXd &data, const QList<int>& lTriggerChannels, int iOffsetIndex, double dThreshold, bool bRemoveOffset, const QString& type)
+QMap<int,QList<int> > DetectTrigger::detectTriggerFlanksGrad(const MatrixXd &data, const QList<int>& lTriggerChannels, int iOffsetIndex, double dThreshold, bool bRemoveOffset, const QString& type, int iBurstLengthSamp)
 {
     QMap<int,QList<int> > qMapDetectedTrigger;
     RowVectorXd tGradient = RowVectorXd::Zero(data.cols());
@@ -168,9 +167,10 @@ QMap<int,QList<int> > DetectTrigger::detectTriggerFlanksGrad(const MatrixXd &dat
     {
 //        QTime time;
 //        time.start();
+        int iChIdx = lTriggerChannels.at(i);
 
         //detect the actual triggers in the current data matrix
-        if(lTriggerChannels.at(i) > data.rows() || lTriggerChannels.at(i) < 0)
+        if(iChIdx > data.rows() || iChIdx < 0)
         {
             return qMapDetectedTrigger;
         }
@@ -178,7 +178,7 @@ QMap<int,QList<int> > DetectTrigger::detectTriggerFlanksGrad(const MatrixXd &dat
         //Compute gradient
         for(int t = 1; t<tGradient.cols(); t++)
         {
-            tGradient(t) = data.row(lTriggerChannels.at(i))(t)-data.row(lTriggerChannels.at(i))(t-1);
+            tGradient(t) = data(iChIdx,t)-data(iChIdx,t-1);
         }
 
         // If falling flanks are to be detected flip the gradient's sign
@@ -188,20 +188,16 @@ QMap<int,QList<int> > DetectTrigger::detectTriggerFlanksGrad(const MatrixXd &dat
         }
 
         //Find positive maximum in gradient vector. This position is equal to the rising trigger flank.
-        RowVectorXd::Index indexMaxGrad;
-        int dMax = tGradient.maxCoeff(&indexMaxGrad);
-        Q_UNUSED(dMax);
-
-        //Compare to calculated threshold
-        double maxValue = data.row(lTriggerChannels.at(i))(indexMaxGrad);
-        if(bRemoveOffset)
+        for(int j = 0; j < tGradient.cols(); ++j)
         {
-            maxValue -= data.row(lTriggerChannels.at(i))(0);
-        }
+            double dMatVal = bRemoveOffset ? tGradient(j) - data(iChIdx,0) : tGradient(j);
 
-        if(maxValue>dThreshold)
-        {
-            qMapDetectedTrigger[lTriggerChannels.at(i)].append((int)iOffsetIndex+indexMaxGrad);
+            if(dMatVal >= dThreshold)
+            {
+                qMapDetectedTrigger[iChIdx].append(iOffsetIndex+j);
+
+                j += iBurstLengthSamp;
+            }
         }
 
 //        int timeElapsed = time.elapsed();
@@ -214,7 +210,7 @@ QMap<int,QList<int> > DetectTrigger::detectTriggerFlanksGrad(const MatrixXd &dat
 
 //*************************************************************************************************************
 
-QList<int> DetectTrigger::detectTriggerFlanksGrad(const MatrixXd &data, int iTriggerChannelIdx, int iOffsetIndex, double dThreshold, bool bRemoveOffset, const QString& type)
+QList<int> DetectTrigger::detectTriggerFlanksGrad(const MatrixXd &data, int iTriggerChannelIdx, int iOffsetIndex, double dThreshold, bool bRemoveOffset, const QString& type, int iBurstLengthSamp)
 {
     QList<int> lDetectedTriggers;
 
@@ -233,30 +229,26 @@ QList<int> DetectTrigger::detectTriggerFlanksGrad(const MatrixXd &data, int iTri
     //Compute gradient
     for(int t = 1; t<tGradient.cols(); t++)
     {
-        tGradient(t) = data.row(iTriggerChannelIdx)(t)-data.row(iTriggerChannelIdx)(t-1);
+        tGradient(t) = data(iTriggerChannelIdx,t) - data(iTriggerChannelIdx,t-1);
     }
 
-    // If falling flanks are to be detected flip the gradient's sign
+    //If falling flanks are to be detected flip the gradient's sign
     if(type == "Falling")
     {
         tGradient = tGradient * -1;
     }
 
     //Find positive maximum in gradient vector. This position is equal to the rising trigger flank.
-    RowVectorXd::Index indexMaxGrad;
-    int dMax = tGradient.maxCoeff(&indexMaxGrad);
-    Q_UNUSED(dMax);
-
-    //Compare to calculated threshold
-    double maxValue = data.row(iTriggerChannelIdx)(indexMaxGrad);
-    if(bRemoveOffset)
+    for(int j = 0; j < tGradient.cols(); ++j)
     {
-        maxValue -= data.row(iTriggerChannelIdx)(0);
-    }
+        double dMatVal = bRemoveOffset ? tGradient(iTriggerChannelIdx,j) - data(iTriggerChannelIdx,0) : tGradient(iTriggerChannelIdx,j);
 
-    if(maxValue>dThreshold)
-    {
-        lDetectedTriggers.append((int)iOffsetIndex+indexMaxGrad);
+        if(dMatVal >= dThreshold)
+        {
+            lDetectedTriggers.append(iOffsetIndex+j);
+
+            j += iBurstLengthSamp;
+        }
     }
 
 //        int timeElapsed = time.elapsed();

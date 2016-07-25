@@ -46,6 +46,7 @@
 #include "FormFiles/babymegprojectdialog.h"
 
 #include <utils/ioutils.h>
+#include <utils/detecttrigger.h>
 
 #include <iostream>
 
@@ -276,6 +277,12 @@ void BabyMEG::initConnector()
         m_pRTMSABabyMEG->data()->setVisibility(true);
 
         m_outputConnectors.append(m_pRTMSABabyMEG);
+
+        //Look for trigger channels and initialise detected trigger map
+        for(int i = 0; i<m_pFiffInfo->chs.size(); ++i) {
+            if(m_pFiffInfo->chs[i].kind == FIFFV_STIM_CH/* && m_pFiffInfo->chs[i].ch_name == "STI 001"*/)
+                m_lTriggerChannelIndices.append(i);
+        }
     }
 }
 
@@ -753,6 +760,9 @@ void BabyMEG::run()
 void BabyMEG::createDigTrig(MatrixXf& data)
 {
     //Look for triggers in all trigger channels
+
+    //m_qMapDetectedTrigger = DetectTrigger::detectTriggerFlanksMax(data.at(b), m_lTriggerChannelIndices, m_iCurrentSample-nCol, m_dTriggerThreshold, true);
+    QMap<int,QList<int> > qMapDetectedTrigger = DetectTrigger::detectTriggerFlanksGrad(data.cast<double>(), m_lTriggerChannelIndices, 0, 4.8, false, "Rising");
 
     //Write results into data block's digital trigger channel
 }

@@ -444,6 +444,8 @@ private:
 
     QSharedPointer<RawMatrixBuffer>         m_pRawMatrixBuffer;             /**< Holds incoming raw data. */
 
+    QList<int>                              m_lTriggerChannelIndices;       /**< List of all trigger channel indices. */
+
     FiffInfo::SPtr                          m_pFiffInfo;                    /**< Fiff measurement info.*/
     FiffStream::SPtr                        m_pOutfid;                      /**< FiffStream to write to.*/
 
