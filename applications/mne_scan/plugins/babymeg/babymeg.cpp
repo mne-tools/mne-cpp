@@ -279,10 +279,14 @@ void BabyMEG::initConnector()
         m_outputConnectors.append(m_pRTMSABabyMEG);
 
         //Look for trigger channels and initialise detected trigger map
-        for(int i = 0; i<m_pFiffInfo->chs.size(); ++i) {
-            if(m_pFiffInfo->chs[i].kind == FIFFV_STIM_CH/* && m_pFiffInfo->chs[i].ch_name == "STI 001"*/)
-                m_lTriggerChannelIndices.append(i);
-        }
+        m_lTriggerChannelIndices.append(m_pFiffInfo.chNames.indexOf("TRG001"));
+        m_lTriggerChannelIndices.append(m_pFiffInfo.chNames.indexOf("TRG002"));
+        m_lTriggerChannelIndices.append(m_pFiffInfo.chNames.indexOf("TRG003"));
+        m_lTriggerChannelIndices.append(m_pFiffInfo.chNames.indexOf("TRG004"));
+        m_lTriggerChannelIndices.append(m_pFiffInfo.chNames.indexOf("TRG005"));
+        m_lTriggerChannelIndices.append(m_pFiffInfo.chNames.indexOf("TRG006"));
+        m_lTriggerChannelIndices.append(m_pFiffInfo.chNames.indexOf("TRG007"));
+        m_lTriggerChannelIndices.append(m_pFiffInfo.chNames.indexOf("TRG008"));
     }
 }
 
@@ -765,6 +769,26 @@ void BabyMEG::createDigTrig(MatrixXf& data)
     QMap<int,QList<QPair<int,double> > > qMapDetectedTrigger = DetectTrigger::detectTriggerFlanksGrad(data.cast<double>(), m_lTriggerChannelIndices, 0, 4.8, false, "Rising");
 
     //Write results into data block's digital trigger channel
+    QMapIterator<int,QList<QPair<int,double> >> i(qMapDetectedTrigger);
+    int counter = 0;
+    int idxDigTrig = m_pFiffInfo->ch_names.indexOf("DTRG01");
+
+    while (i.hasNext())
+    {
+        i.next();
+
+        QList<QPair<int,double> > lDetectedTriggers = i.value();
+
+        for(int k = 0; k < lDetectedTriggers.size; ++k)
+        {
+            if(lDetectedTriggers.at(k).first < data.cols() && lDetectedTriggers.at(k).first >= 0)
+            {
+                data(idxDigTrig,lDetectedTriggers.at(k).first) = data(idxDigTrig,lDetectedTriggers.at(k).first) + pow(2,counter);
+            }
+        }
+
+        counter++;
+    }
 }
 
 
