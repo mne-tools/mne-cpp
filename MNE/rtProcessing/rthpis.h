@@ -153,17 +153,17 @@ public:
 
     //=========================================================================================================
     /**
-    * Slot to receive incoming data.
+    * Inits the rt HPI processing and performs one single fit.
     *
-    * @param[in] p_DataSegment  Data to estimate the spectrum from -> ToDo Replace this by shared data pointer
+    * @param[in] t_mat  Data to estimate the HPI positions from
     */
-    void init();
+    void singleHPIFit(const MatrixXd& t_mat);
 
     //=========================================================================================================
     /**
     * Slot to receive incoming data.
     *
-    * @param[in] p_DataSegment  Data to estimate the spectrum from -> ToDo Replace this by shared data pointer
+    * @param[in] p_DataSegment  Data to estimate the HPI positions from
     */
     void append(const MatrixXd &p_DataSegment);
 
