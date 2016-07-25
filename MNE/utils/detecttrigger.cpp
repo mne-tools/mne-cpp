@@ -98,7 +98,7 @@ QMap<int,QList<QPair<int,double> > > DetectTrigger::detectTriggerFlanksMax(const
             return qMapDetectedTrigger;
         }
 
-        //Find positive maximum in gradient vector. This position is equal to the rising trigger flank.
+        //Find positive maximum in data vector.
         for(int j = 0; j < data.cols(); ++j)
         {
             double dMatVal = bRemoveOffset ? data(iChIdx,j) - data(iChIdx,0) : data(iChIdx,j);
@@ -139,7 +139,7 @@ QList<QPair<int,double> > DetectTrigger::detectTriggerFlanksMax(const MatrixXd &
         return lDetectedTriggers;
     }
 
-    //Find positive maximum in gradient vector. This position is equal to the rising trigger flank.
+    //Find positive maximum in data vector.
     for(int j = 0; j < data.cols(); ++j)
     {
         double dMatVal = bRemoveOffset ? data(iTriggerChannelIdx,j) - data(iTriggerChannelIdx,0) : data(iTriggerChannelIdx,j);
@@ -226,7 +226,6 @@ QList<QPair<int,double> > DetectTrigger::detectTriggerFlanksGrad(const MatrixXd 
 {
     QList<QPair<int,double> > lDetectedTriggers;
 
-    //TODO: This only can detect one trigger per data block. What if there are more than one trigger in the data block?
     RowVectorXd tGradient = RowVectorXd::Zero(data.cols());
 
 //        QTime time;
