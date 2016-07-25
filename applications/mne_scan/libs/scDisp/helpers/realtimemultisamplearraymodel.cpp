@@ -467,7 +467,7 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
 
             //Clear detected triggers
             if(m_bTriggerDetectionActive) {
-                QMutableMapIterator<int,QList<int> > i(m_qMapDetectedTrigger);
+                QMutableMapIterator<int,QList<QPair<int,double> > > i(m_qMapDetectedTrigger);
                 while (i.hasNext()) {
                     i.next();
                     i.value().clear();
@@ -533,10 +533,10 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
             QString detectionType("Rising");
 
             //m_qMapDetectedTrigger = DetectTrigger::detectTriggerFlanksMax(data.at(b), m_lTriggerChannelIndices, m_iCurrentSample-nCol, m_dTriggerThreshold, true);
-            QMap<int,QList<int> > qMapDetectedTrigger = DetectTrigger::detectTriggerFlanksGrad(data.at(b), m_lTriggerChannelIndices, m_iCurrentSample-nCol, m_dTriggerThreshold, false, detectionType);
+            QMap<int,QList<QPair<int,double> > > qMapDetectedTrigger = DetectTrigger::detectTriggerFlanksGrad(data.at(b), m_lTriggerChannelIndices, m_iCurrentSample-nCol, m_dTriggerThreshold, false, detectionType);
 
             //Append results to already found triggers
-            QMapIterator<int,QList<int> > i(qMapDetectedTrigger);
+            QMapIterator<int,QList<QPair<int,double> > > i(qMapDetectedTrigger);
             while (i.hasNext()) {
                 i.next();
                 m_qMapDetectedTrigger[i.key()].append(i.value());
@@ -1052,7 +1052,7 @@ void RealTimeMultiSampleArrayModel::triggerInfoChanged(const QMap<QString, QColo
     if(m_sCurrentTriggerCh != triggerCh) {
         m_sCurrentTriggerCh = triggerCh;
 
-        QList<int> temp;
+        QList<QPair<int,double> > temp;
         m_qMapDetectedTrigger.clear();
 
         for(int i = 0; i < m_pFiffInfo->chs.size(); ++i) {
