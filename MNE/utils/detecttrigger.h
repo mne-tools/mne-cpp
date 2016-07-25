@@ -110,10 +110,11 @@ public:
     * @param[in]        iOffsetIndex  the offset index gets added to the found trigger flank index
     * @param[in]        dThreshold  the signal threshold value used to find the trigger flank
     * @param[in]        bRemoveOffset  remove the first sample as offset
+    * @param[in]    iBurstLengthMs  The length in samples which is skipped after a trigger was found
     *
     * @param return     This map holds the indices of the channels which are to be read from data. For each index/channel the found triggers are written to the value of the map.
     */
-    static QMap<int,QList<int> > detectTriggerFlanksMax(const MatrixXd &data, const QList<int>& lTriggerChannels, int iOffsetIndex, double dThreshold, bool bRemoveOffset);
+    static QMap<int,QList<int> > detectTriggerFlanksMax(const MatrixXd &data, const QList<int>& lTriggerChannels, int iOffsetIndex, double dThreshold, bool bRemoveOffset, int iBurstLengthSamp = 100);
 
     //=========================================================================================================
     /**
@@ -124,10 +125,11 @@ public:
     * @param[in]        iOffsetIndex  the offset index gets added to the found trigger flank index
     * @param[in]        dThreshold  the signal threshold value used to find the trigger flank
     * @param[in]        bRemoveOffset  remove the first sample as offset
+    * @param[in]    iBurstLengthMs  The length in samples which is skipped after a trigger was found
     *
     * @param return     This list holds the found trigger indices.
     */
-    static QList<int> detectTriggerFlanksMax(const MatrixXd &data, int iTriggerChannelIdx, int iOffsetIndex, double dThreshold, bool bRemoveOffset);
+    static QList<int> detectTriggerFlanksMax(const MatrixXd &data, int iTriggerChannelIdx, int iOffsetIndex, double dThreshold, bool bRemoveOffset, int iBurstLengthSamp = 100);
 
     //=========================================================================================================
     /**
@@ -139,10 +141,11 @@ public:
     * @param[in]    iThreshold  the gradient threshold value used to find the trigger flank
     * @param[in]    bRemoveOffset  remove the first sample as offset
     * @param[in]    type  detect rising or falling flank. Use "Rising" or "Falling" as input
+    * @param[in]    iBurstLengthMs  The length in samples which is skipped after a trigger was found
     *
     * @param return     This map holds the indices of the channels which are to be read from data. For each index/channel the found triggers are written to the value of the map.
     */
-    static QMap<int,QList<int> > detectTriggerFlanksGrad(const MatrixXd &data, const QList<int>& lTriggerChannels, int iOffsetIndex, double dThreshold, bool bRemoveOffset, const QString& type);
+    static QMap<int,QList<int> > detectTriggerFlanksGrad(const MatrixXd &data, const QList<int>& lTriggerChannels, int iOffsetIndex, double dThreshold, bool bRemoveOffset, const QString& type, int iBurstLengthSamp = 100);
 
     //=========================================================================================================
     /**
@@ -154,10 +157,11 @@ public:
     * @param[in]    iThreshold  the gradient threshold value used to find the trigger flank
     * @param[in]    bRemoveOffset  remove the first sample as offset
     * @param[in]    type  detect rising or falling flank. Use "Rising" or "Falling" as input
+    * @param[in]    iBurstLengthMs  The length in samples which is skipped after a trigger was found
     *
     * @param return     This list holds the found trigger indices.
     */
-    static QList<int> detectTriggerFlanksGrad(const MatrixXd &data, int iTriggerChannelIdx, int iOffsetIndex, double dThreshold, bool bRemoveOffset, const QString& type);
+    static QList<int> detectTriggerFlanksGrad(const MatrixXd &data, int iTriggerChannelIdx, int iOffsetIndex, double dThreshold, bool bRemoveOffset, const QString& type, int iBurstLengthSamp = 100);
 };
 
 //*************************************************************************************************************
