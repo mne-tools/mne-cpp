@@ -46,6 +46,7 @@
 #include "FormFiles/babymegprojectdialog.h"
 
 #include <utils/ioutils.h>
+#include <rtProcessing/rthpis.h>
 
 #include <iostream>
 
@@ -66,6 +67,7 @@
 
 #include <QQuaternion>
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
@@ -73,6 +75,7 @@
 
 using namespace BabyMEGPlugin;
 using namespace UTILSLIB;
+using namespace RTPROCLIB;
 
 
 //*************************************************************************************************************
@@ -459,6 +462,12 @@ void BabyMEG::toggleRecordingFile()
         for(int i = 0; i<m_pFiffInfo->projs.size(); i++)
             m_pFiffInfo->projs[i].active = false;
 
+        //Generate/Update current dev/head transfomration. We do not need to make use of rtHPI plugin here since the fitting is only needed once here.
+        //rt head motion correction will be performed using the rtHPI plugin.
+        RtHPIS::SPtr pRtHpis = RtHPIS::SPtr(new RtHPIS(m_pFiffInfo));
+        pRtHpis->singleHPIFit(m_matValue.cast<double>());
+
+        //Start/Prepare writing process. Actual writing is done in run() method.
         mutex.lock();
         m_pOutfid = FiffStream::start_writing_raw(m_qFileOut, *m_pFiffInfo, m_cals, defaultMatrixXi, false);
         fiff_int_t first = 0;
@@ -840,9 +849,6 @@ bool BabyMEG::readBadChannels()
 
 void BabyMEG::run()
 {
-
-    //MatrixXf matValue;
-
     qint32 size = 0;
 
     while(m_bIsRunning)
@@ -850,7 +856,7 @@ void BabyMEG::run()
         if(m_pRawMatrixBuffer)
         {
             //pop matrix
-            matValue = m_pRawMatrixBuffer->pop();
+            m_matValue = m_pRawMatrixBuffer->pop();
 
             //Update and write the HPI information to the current data block
             QTime timer;
@@ -861,7 +867,7 @@ void BabyMEG::run()
             //Write raw data to fif file
             if(m_bWriteToFile)
             {
-                size += matValue.rows()*matValue.cols() * 4;
+                size += m_matValue.rows()*m_matValue.cols() * 4;
 
                 if(size > MAX_DATA_LEN)
                 {
@@ -870,14 +876,14 @@ void BabyMEG::run()
                 }
 
                 mutex.lock();
-                m_pOutfid->write_raw_buffer(matValue.cast<double>());
+                m_pOutfid->write_raw_buffer(m_matValue.cast<double>());
                 mutex.unlock();
             }
             else
                 size = 0;
 
             if(m_pRTMSABabyMEG)
-                m_pRTMSABabyMEG->data()->setValue(this->calibrate(matValue));
+                m_pRTMSABabyMEG->data()->setValue(this->calibrate(m_matValue));
         }
     }
 
@@ -893,7 +899,7 @@ void BabyMEG::updateHPI()
     float t, r, s, qw, qx, qy, qz, norm2;
     float GOF;
 
-    int bufsize = matValue.cols();
+    int bufsize = m_matValue.cols();
     qDebug() << "bufsize = " << bufsize;
 
     // Load device to head transformation matrix from Fiff info
@@ -934,17 +940,17 @@ void BabyMEG::updateHPI()
     GOF = 1 - dpfitError;
 
     // Write rotation quaternion to HPI Ch #1~3
-    matValue.row(401) = MatrixXf::Constant(1,bufsize, qx);
-    matValue.row(402) = MatrixXf::Constant(1,bufsize, qy);
-    matValue.row(403) = MatrixXf::Constant(1,bufsize, qz);
+    m_matValue.row(401) = MatrixXf::Constant(1,bufsize, qx);
+    m_matValue.row(402) = MatrixXf::Constant(1,bufsize, qy);
+    m_matValue.row(403) = MatrixXf::Constant(1,bufsize, qz);
 
     // Write translation vector to HPI Ch #4~6
-    matValue.row(404) = MatrixXf::Constant(1,bufsize, m_pFiffInfo->dev_head_t.trans(0,3));
-    matValue.row(405) = MatrixXf::Constant(1,bufsize, m_pFiffInfo->dev_head_t.trans(1,3));
-    matValue.row(406) = MatrixXf::Constant(1,bufsize, m_pFiffInfo->dev_head_t.trans(2,3));
+    m_matValue.row(404) = MatrixXf::Constant(1,bufsize, m_pFiffInfo->dev_head_t.trans(0,3));
+    m_matValue.row(405) = MatrixXf::Constant(1,bufsize, m_pFiffInfo->dev_head_t.trans(1,3));
+    m_matValue.row(406) = MatrixXf::Constant(1,bufsize, m_pFiffInfo->dev_head_t.trans(2,3));
 
     // Write GOF to HPI Ch #7
-    matValue.row(407) = MatrixXf::Constant(1,bufsize, GOF);
+    m_matValue.row(407) = MatrixXf::Constant(1,bufsize, GOF);
 
     //----------------------------------------------------------------------------------------
     // debug purpose !   visualize in HPI channels
@@ -964,13 +970,13 @@ void BabyMEG::updateHPI()
         qDebug() << "quaternion y: " << qy;
         qDebug() << "quaternion z: " << qz;
 /*
-        matValue(401,100) = 1; matValue(401,101) = 1; matValue(401,102) = 1; matValue(401,103) = 1;
-        matValue(402,200) = 1; matValue(402,201) = 1; matValue(402,202) = 1; matValue(402,203) = 1;
-        matValue(403,300) = 1; matValue(403,301) = 1; matValue(403,302) = 1; matValue(403,303) = 1;
-        matValue(404,400) = 0; matValue(404,401) = 0; matValue(404,402) = 0; matValue(404,403) = 0;
-        matValue(405,500) = 0; matValue(405,501) = 0; matValue(405,502) = 0; matValue(405,503) = 0;
-        matValue(406,600) = 0; matValue(406,601) = 0; matValue(406,602) = 0; matValue(406,603) = 0;
-        matValue(407,700) = 0; matValue(407,701) = 0; matValue(407,702) = 0; matValue(407,703) = 0;
+        m_matValue(401,100) = 1; m_matValue(401,101) = 1; m_matValue(401,102) = 1; m_matValue(401,103) = 1;
+        m_matValue(402,200) = 1; m_matValue(402,201) = 1; m_matValue(402,202) = 1; m_matValue(402,203) = 1;
+        m_matValue(403,300) = 1; m_matValue(403,301) = 1; m_matValue(403,302) = 1; m_matValue(403,303) = 1;
+        m_matValue(404,400) = 0; m_matValue(404,401) = 0; m_matValue(404,402) = 0; m_matValue(404,403) = 0;
+        m_matValue(405,500) = 0; m_matValue(405,501) = 0; m_matValue(405,502) = 0; m_matValue(405,503) = 0;
+        m_matValue(406,600) = 0; m_matValue(406,601) = 0; m_matValue(406,602) = 0; m_matValue(406,603) = 0;
+        m_matValue(407,700) = 0; m_matValue(407,701) = 0; m_matValue(407,702) = 0; m_matValue(407,703) = 0;
 */
     }
     // end of debug
