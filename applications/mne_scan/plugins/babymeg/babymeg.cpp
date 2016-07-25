@@ -762,7 +762,7 @@ void BabyMEG::createDigTrig(MatrixXf& data)
     //Look for triggers in all trigger channels
 
     //m_qMapDetectedTrigger = DetectTrigger::detectTriggerFlanksMax(data.at(b), m_lTriggerChannelIndices, m_iCurrentSample-nCol, m_dTriggerThreshold, true);
-    QMap<int,QList<int> > qMapDetectedTrigger = DetectTrigger::detectTriggerFlanksGrad(data.cast<double>(), m_lTriggerChannelIndices, 0, 4.8, false, "Rising");
+    QMap<int,QList<QPair<int,double> > > qMapDetectedTrigger = DetectTrigger::detectTriggerFlanksGrad(data.cast<double>(), m_lTriggerChannelIndices, 0, 4.8, false, "Rising");
 
     //Write results into data block's digital trigger channel
 }

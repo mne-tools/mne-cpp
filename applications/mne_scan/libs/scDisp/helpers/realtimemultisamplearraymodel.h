@@ -323,7 +323,7 @@ public:
     *
     * @return the current detected trigger flanks
     */
-    inline QList<int> getDetectedTriggers() const;
+    inline QList<QPair<int,double> > getDetectedTriggers() const;
 
     //=========================================================================================================
     /**
@@ -331,7 +331,7 @@ public:
     *
     * @return the old detected trigger flanks
     */
-    inline QList<int> getDetectedTriggersOld() const;
+    inline QList<QPair<int, double> > getDetectedTriggersOld() const;
 
     //=========================================================================================================
     /**
@@ -594,11 +594,11 @@ private:
     Eigen::MatrixXd                     m_matSpharaEEGLoaded;                       /**< The loaded EEG basis functions.*/
 
     QMap<QString, QColor>               m_qMapTriggerColor;                         /**< Current colors for all trigger channels. */
-    QMap<int,QList<int> >               m_qMapDetectedTrigger;                      /**< Detected trigger for each trigger channel. */
+    QMap<int,QList<QPair<int,double> > >m_qMapDetectedTrigger;                      /**< Detected trigger for each trigger channel. */
     QList<int>                          m_lTriggerChannelIndices;                   /**< List of all trigger channel indices. */
-    QMap<int,QList<int> >               m_qMapDetectedTriggerFreeze;                /**< Detected trigger for each trigger channel while display is freezed. */
-    QMap<int,QList<int> >               m_qMapDetectedTriggerOld;                   /**< Old detected trigger for each trigger channel. */
-    QMap<int,QList<int> >               m_qMapDetectedTriggerOldFreeze;             /**< Old detected trigger for each trigger channel while display is freezed. */
+    QMap<int,QList<QPair<int,double> > >m_qMapDetectedTriggerFreeze;                /**< Detected trigger for each trigger channel while display is freezed. */
+    QMap<int,QList<QPair<int,double> > >m_qMapDetectedTriggerOld;                   /**< Old detected trigger for each trigger channel. */
+    QMap<int,QList<QPair<int,double> > >m_qMapDetectedTriggerOldFreeze;             /**< Old detected trigger for each trigger channel while display is freezed. */
     QMap<qint32,float>                  m_qMapChScaling;                            /**< Channel scaling map. */
     QList<FilterData>                   m_filterData;                               /**< List of currently active filters. */
     QList<RealTimeSampleArrayChInfo>    m_qListChInfo;                              /**< Channel info list. ToDo: Obsolete*/
@@ -720,9 +720,9 @@ inline QColor RealTimeMultiSampleArrayModel::getTriggerColor() const
 
 //*************************************************************************************************************
 
-inline QList<int> RealTimeMultiSampleArrayModel::getDetectedTriggers() const
+inline QList<QPair<int,double> >  RealTimeMultiSampleArrayModel::getDetectedTriggers() const
 {
-    QList<int> triggerIndices;
+    QList<QPair<int,double> > triggerIndices;
 
     if(m_bIsFreezed)
         return m_qMapDetectedTriggerFreeze[m_iCurrentTriggerChIndex];
@@ -737,9 +737,9 @@ inline QList<int> RealTimeMultiSampleArrayModel::getDetectedTriggers() const
 
 //*************************************************************************************************************
 
-inline QList<int> RealTimeMultiSampleArrayModel::getDetectedTriggersOld() const
+inline QList<QPair<int,double> > RealTimeMultiSampleArrayModel::getDetectedTriggersOld() const
 {
-    QList<int> triggerIndices;
+    QList<QPair<int,double> > triggerIndices;
 
     if(m_bIsFreezed)
         return m_qMapDetectedTriggerOldFreeze[m_iCurrentTriggerChIndex];
