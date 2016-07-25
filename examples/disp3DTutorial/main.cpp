@@ -276,13 +276,9 @@ int main(int argc, char *argv[])
     // Read & show digitizer points
     //
 
-    QFile t_fileElec("./MNE-sample-data/warping/AVG4-0Years_GSN128.fif");
-    QList<FiffDigPoint> t_Dig=FiffDigPoint::read(t_fileElec);
+    QFile t_fileDig("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    QList<FiffDigPoint> t_Dig=FiffDigPoint::read(t_fileDig);
     testWindow->addDigitizerData("Subject01", "Left Auditory", t_Dig);
-//    testWindow->addDigitizerData("Subject01", "Left Auditory", t_Dig);
-
-
-
 
     if(bAddRtSourceLoc) {
         //testWindow->addBrainData("Subject01", "HemiLRSet", t_clusteredFwd);

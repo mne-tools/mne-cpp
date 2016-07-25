@@ -41,10 +41,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../../disp3D_global.h"
-
 #include "../../helpers/abstracttreeitem.h"
-#include "../../helpers/types.h"
 
 
 //*************************************************************************************************************
@@ -85,9 +82,9 @@ namespace DISP3DLIB
 
 //=============================================================================================================
 /**
-* DigitizerTreeItem provides a generic brain tree item to hold digitizer data.
+* DigitizerTreeItem provides a generic tree item to hold digitizer data.
 *
-* @brief Provides a generic brain tree item.
+* @brief Provides a generic digitizer tree item.
 */
 class DISP3DNEWSHARED_EXPORT DigitizerTreeItem : public AbstractTreeItem
 {
@@ -141,42 +138,17 @@ public:
 private:
     //=========================================================================================================
     /**
-    * Call this function whenever the surface color was changed.
-    *
-    * @param[in] color        The new surface color.
-    */
-    void onSurfaceColorChanged(const QColor &color);
-
-    //=========================================================================================================
-    /**
     * Call this function whenever the check box of this item was checked.
     *
     * @param[in] checkState        The current checkstate.
     */
     virtual void onCheckStateChanged(const Qt::CheckState& checkState);
 
-    //=========================================================================================================
-    /**
-    * Creates a QByteArray of colors for given color for the input vertices.
-    *
-    * @param[in] vertices       The vertices information.
-    * @param[in] color          The vertex color information.
-    */
-    QByteArray createVertColor(const Eigen::MatrixXf& vertices, const QColor& color = QColor(100,100,100)) const;
 
     Qt3DCore::QEntity*      m_pParentEntity;                            /**< The parent 3D entity. */
     Renderable3DEntity*     m_pRenderable3DEntity;                      /**< The renderable 3D entity. */
 
     QObjectList             m_lChildren;
-
-signals:
-    //=========================================================================================================
-    /**
-    * Emit this signal whenever the origin of the vertex color (from curvature, from annotation) changed.
-    *
-    * @param[in] arrayVertColor      The new vertex colors.
-    */
-    void colorInfoOriginChanged(const QByteArray& arrayVertColor);
 };
 
 } //NAMESPACE DISP3DLIB

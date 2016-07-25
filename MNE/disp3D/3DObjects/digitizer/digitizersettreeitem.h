@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
 * @file     digitizersettreeitem.h
-* @author   Your name <yourname@yourdomain>;
+* @author   Jana Kiesel <jana.kiesel@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     Month, Year
+* @date     July, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) Year, Your name and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Jana Kiesel and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -41,11 +41,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../../disp3D_global.h"
-
 #include "../../helpers/abstracttreeitem.h"
-
-#include "../../helpers/types.h"
 
 
 //*************************************************************************************************************
@@ -53,15 +49,11 @@
 // QT INCLUDES
 //=============================================================================================================
 
-//Put all Qt includes here
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // Eigen INCLUDES
 //=============================================================================================================
-
-//Put all Eigen includes here
 
 
 //*************************************************************************************************************
@@ -73,6 +65,7 @@ namespace FIFFLIB{
     class FiffDigPoint;
 }
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE NAMESPACE DISP3DLIB
@@ -81,21 +74,18 @@ namespace FIFFLIB{
 namespace DISP3DLIB
 {
 
-//PLEAS DO NOT USE ""using namespace"" IN HEADER FILES
 
 //*************************************************************************************************************
 //=============================================================================================================
 // DISP3DLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
-//Put all used forward declarations of the DISP3DLIB namespace here
-
 
 //=============================================================================================================
 /**
-* Description of what this class is intended to do (in detail).
+* DigitizerSetTreeItem provides a generic tree item to hold the set of digitizer data.
 *
-* @brief Brief description of this class.
+* @brief Provides a generic digitizer set tree item.
 */
 class DISP3DNEWSHARED_EXPORT DigitizerSetTreeItem : public AbstractTreeItem
 {
@@ -149,43 +139,17 @@ public:
 private:
     //=========================================================================================================
     /**
-    * Call this function whenever the surface color was changed.
-    *
-    * @param[in] color        The new surface color.
-    */
-    void onSurfaceColorChanged(const QColor &color);
-
-    //=========================================================================================================
-    /**
     * Call this function whenever the check box of this item was checked.
     *
     * @param[in] checkState        The current checkstate.
     */
     virtual void onCheckStateChanged(const Qt::CheckState& checkState);
 
-    //=========================================================================================================
-    /**
-    * Creates a QByteArray of colors for given color for the input vertices.
-    *
-    * @param[in] vertices       The vertices information.
-    * @param[in] color          The vertex color information.
-    */
-    QByteArray createVertColor(const Eigen::MatrixXf& vertices, const QColor& color = QColor(100,100,100)) const;
 
     Qt3DCore::QEntity*      m_pParentEntity;                            /**< The parent 3D entity. */
     Renderable3DEntity*     m_pRenderable3DEntity;                      /**< The renderable 3D entity. */
 
     QObjectList             m_lChildren;
-
-signals:
-    //=========================================================================================================
-    /**
-    * Emit this signal whenever the origin of the vertex color (from curvature, from annotation) changed.
-    *
-    * @param[in] arrayVertColor      The new vertex colors.
-    */
-    void colorInfoOriginChanged(const QByteArray& arrayVertColor);
-
 };
 
 } // NAMESPACE DISP3DLIB
