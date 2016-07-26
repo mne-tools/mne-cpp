@@ -86,11 +86,11 @@ else {
 }
 
 SOURCES += \
-    connectivitymeasures.cpp
+    connectivitymeasures.cpp \
 
 HEADERS += \
     connectivity_global.h \
-    connectivitymeasures.h
+    connectivitymeasures.h \
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
