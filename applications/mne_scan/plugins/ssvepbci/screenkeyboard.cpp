@@ -138,29 +138,27 @@ void ScreenKeyboard::paint(QPaintDevice *device){
     int x = int(0.5*m_pSSVEPBCIScreen.data()->width() - 0.5*width);
     int y = int(0.5*m_pSSVEPBCIScreen.data()->height() - 0.5*width);
 
-    // scaling the letter size to the biggest sign "DEL"
-//    float factor = width / painter.fontMetrics().width("DEL");
-//    if ((factor < 1) || (factor > 1.25))
-//    {
-//        QFont f = painter.font();
-//        f.setBold(true);
-//        f.setPointSizeF(f.pointSizeF()*factor);
-//        painter.setFont(f);
-//    }
-
-    QFont f = painter.font();
-    f.setBold(true);
-    f.setPointSize(40);
-    painter.setFont(f);
-
+    // draw screen keyboard
     if(m_bInitializeKeyboard){
+
         // setting the painter
         painter.setBrush(Qt::white);
 
+        // drawing each item in the stored map
         foreach(QString sign, m_mapKeys){
 
             QPair<int, int> coord = m_mapKeys.key(sign);
             const QRect rectangle = QRect(x + coord.first*width,y - coord.second*width,width,width);
+
+            // scaling the letter size to the biggest sign "DEL"
+            float factor = width / painter.fontMetrics().width("DEL");
+            if ((factor < 1) || (factor > 1.25))
+            {
+                QFont f = painter.font();
+                f.setBold(true);
+                f.setPointSizeF(f.pointSizeF()*factor);
+                painter.setFont(f);
+            }
 
             // painting rectangles and and drawing text into them
             painter.setPen(Qt::red);
@@ -173,7 +171,18 @@ void ScreenKeyboard::paint(QPaintDevice *device){
         qDebug() << "update BCI Screen";
     }
 
-    if(m_qCurCursorCoord != m_qOldCursorCoord){
+    // update cursor draw
+    if( (m_qCurCursorCoord != m_qOldCursorCoord) ){
+
+        // scaling the letter size to the biggest sign "DEL"
+        float factor = width / painter.fontMetrics().width("DEL");
+        if ((factor < 1) || (factor > 1.25))
+        {
+            QFont f = painter.font();
+            f.setBold(true);
+            f.setPointSizeF(f.pointSizeF()*factor);
+            painter.setFont(f);
+        }
 
         // refresh old cursor position
         const QRect oldRect = QRect(x + m_qOldCursorCoord.first*width,y - m_qOldCursorCoord.second*width,width,width);
@@ -196,21 +205,33 @@ void ScreenKeyboard::paint(QPaintDevice *device){
         qDebug() << "update Cursor paint!";
     }
 
+    // update speller box
     if(m_bDisplaySpeller & m_bUpdatePhraseDisplay){
 
+        // scaling the letter size to the biggest sign - in this case: "DEL"
+        float factor = width / painter.fontMetrics().width("DEL");
+        if ((factor < 1) || (factor > 1.25))
+        {
+            QFont f = painter.font();
+            f.setBold(true);
+            f.setPointSizeF(f.pointSizeF()*factor);
+            painter.setFont(f);
+        }
+
         // setting speller box parameter
-        int height = 0.1* m_pSSVEPBCIScreen.data()->height() ;
-        int width = 0.3* m_pSSVEPBCIScreen.data()->width() ;
-        QRect rectangle = QRect(0,m_pSSVEPBCIScreen.data()->height() - height, width, height);
+        int heightSpBox = 0.1* m_pSSVEPBCIScreen.data()->height() ;
+        int widthSpBox = 0.3* m_pSSVEPBCIScreen.data()->width() ;
+        QRect rectSpBox = QRect(0,m_pSSVEPBCIScreen.data()->height() - heightSpBox, widthSpBox, heightSpBox);
 
         // drawing speller box
         painter.setBrush(Qt::white);
-        painter.drawRect(rectangle);
+        painter.drawRect(rectSpBox);
 
+        // draw text
         painter.setPen(Qt::red);
-        painter.drawText(rectangle,Qt::AlignLeft & Qt::AlignTop, m_sSettledPhrase);
+        painter.drawText(rectSpBox,Qt::AlignLeft & Qt::AlignTop, m_sSettledPhrase);
         painter.setPen(Qt::black);
-        painter.drawText(rectangle,Qt::AlignBottom, m_sSpelledPhrase);
+        painter.drawText(rectSpBox,Qt::AlignBottom, m_sSpelledPhrase);
 
         qDebug() << "Update Phrase display";
 
@@ -288,6 +309,7 @@ void ScreenKeyboard::spellLetter(QString letter){
         m_sSpelledPhrase.resize(m_sSpelledPhrase.size() - 1);
     else{
         m_sSpelledPhrase.append(letter);
+        m_bUpdatePhraseDisplay = true;
         emit getLetter(letter);
     }
 }

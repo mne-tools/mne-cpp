@@ -96,6 +96,7 @@ using namespace SCSHAREDLIB;
 using namespace SCMEASLIB;
 using namespace IOBuffer;
 using namespace UTILSLIB;
+using namespace FSLIB;
 using namespace std;
 
 
@@ -279,6 +280,7 @@ public slots:
     void setFeatureExtractionMethod(bool useMEC);
     void setThresholdValues(MyQList thresholds);
     void setChangeSSVEPParameterFlag();
+    void setNumClassHits(int NumClassHits);
 
 signals:
     void SSVEPprob(MyQList ssvepProb);
@@ -334,6 +336,7 @@ private:
     QList<int>              m_lIndexOfClassResultSensor;        /**< Sensor level: Classification results on sensor level. */
     int                     m_iPowerLine;                       /**< frequency of the power line [Hz] */
     bool                    m_bChangeSSVEPParameterFlag;        /**< flag for chaning SSVEP parameter */
+    int                     m_iNumberOfClassHits;               /**< Number of required classifiaction hits, before a classifiaction is confirmed */
 
     // Sensor level
     FiffInfo::SPtr          m_pFiffInfo_Sensor;                 /**< Sensor level: Fiff information for sensor data. */

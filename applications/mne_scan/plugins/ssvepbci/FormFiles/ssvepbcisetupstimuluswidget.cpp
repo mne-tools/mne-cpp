@@ -68,9 +68,9 @@ ssvepBCISetupStimulusWidget::ssvepBCISetupStimulusWidget(ssvepBCI *pssvepBCI, QW
 
     //setup the test screen and initialize screen for subject
     m_pssvepBCIScreen = QSharedPointer<ssvepBCIScreen>(new ssvepBCIScreen(m_pssvepBCI, QSharedPointer<ssvepBCISetupStimulusWidget>(this)));
-    m_pScreen  =  QSharedPointer<QScreen>(QGuiApplication::screens()[0]); // specify which screen to use
+    m_pScreen  =  QSharedPointer<QScreen>(QGuiApplication::screens()[1]); // specify which screen to use
     m_pssvepBCIScreen->move(m_pScreen->geometry().x(), m_pScreen->geometry().y());
-    m_pssvepBCIScreen->show(); // showFullScreen();
+    m_pssvepBCIScreen->showFullScreen(); // showFullScreen();
 
     // connect signal for frequency change
     connect(this, &ssvepBCISetupStimulusWidget::frequencyChanged, m_pssvepBCI.data(), &ssvepBCI::setChangeSSVEPParameterFlag);
@@ -149,7 +149,7 @@ void ssvepBCISetupStimulusWidget::changeComboBox()
 
 void ssvepBCISetupStimulusWidget::on_pushButton_clicked()
 {
-    m_pssvepBCIScreen->show();
+    m_pssvepBCIScreen->showFullScreen();
 }
 
 
