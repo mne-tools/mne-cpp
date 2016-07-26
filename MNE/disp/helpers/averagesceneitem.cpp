@@ -65,6 +65,7 @@ AverageSceneItem::AverageSceneItem(const QString& channelName, int channelNumber
 , m_iFontTextSize(15)
 , m_iMaxWidth(1000)
 , m_iMaxHeigth(150)
+, m_iTotalNumberChannels(0)
 {
     m_lAverageColors.append(color);
 

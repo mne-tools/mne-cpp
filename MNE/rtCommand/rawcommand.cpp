@@ -56,6 +56,7 @@ using namespace RTCOMMANDLIB;
 
 RawCommand::RawCommand(QObject *parent)
 : QObject(parent)
+, m_bIsJson(false)
 {
 }
 

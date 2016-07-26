@@ -42,14 +42,17 @@ SUBDIRS += \
 
 !contains(MNECPP_CONFIG, minimalVersion) {
     SUBDIRS += \
-        mne_x_libs \
-        mne_x \
-        mne_browse_raw_qt
+        mne_scan \
+        mne_browse
 
     !contains(MNECPP_CONFIG, coverity) {
         SUBDIRS += \
             mne_matching_pursuit \
-            mne_analyze_qt
+
+            qtHaveModule(charts) {
+            SUBDIRS += \
+                    mne_analyze \
+            }
     }
 }
 
