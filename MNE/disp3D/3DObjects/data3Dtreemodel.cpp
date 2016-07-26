@@ -317,7 +317,7 @@ QList<BrainRTSourceLocDataTreeItem*> Data3DTreeModel::addData(const QString& sub
 
             //Find the all the hemispheres of the set "set" and add the source estimates as items
             if(!itemList.isEmpty()) {
-                for(int i = 0; i<itemList.size(); i++) {
+                for(int i = 0; i < itemList.size(); ++i) {
                     if(itemList.at(i)->type() == Data3DTreeModelItemTypes::SurfaceSetItem) {
                         if(BrainSurfaceSetTreeItem* pSetItem = dynamic_cast<BrainSurfaceSetTreeItem*>(itemList.at(i))) {
                             returnList.append(pSetItem->addData(tSourceEstimate, tForwardSolution));

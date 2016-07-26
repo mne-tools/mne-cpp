@@ -191,9 +191,9 @@ bool MNEBemSurface::addVertexNormals()
 
 //    this->nn.resize(this->np,3);
 
-    for (qint32 p = 0; p < this->ntri; p++)         //check each triangle
+    for (qint32 p = 0; p < this->ntri; ++p)         //check each triangle
     {
-        for (qint32 j=0; j<3 ; j++)
+        for (qint32 j = 0; j < 3 ; ++j)
         {
             int nodenr;
             nodenr = this->tris(p,j);               //find the corners(nodes) of the triangles
@@ -204,7 +204,7 @@ bool MNEBemSurface::addVertexNormals()
     }
 
     // normalize
-    for (qint32 p = 0; p < this->np; p++)
+    for (qint32 p = 0; p < this->np; ++p)
     {
         float size = 0;
         size = this->nn.row(p)*this->nn.row(p).transpose();

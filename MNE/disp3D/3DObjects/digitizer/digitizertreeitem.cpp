@@ -136,7 +136,7 @@ bool DigitizerTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer, 
     Qt3DExtras::QSphereMesh* sourceSphere;
     Qt3DExtras::QPhongMaterial* material;
 
-    for(int i = 0; i < tDigitizer.size(); i++) {
+    for(int i = 0; i < tDigitizer.size(); ++i) {
 
         pos.setX(tDigitizer[i].r[0]);
         pos.setY(tDigitizer[i].r[1]);

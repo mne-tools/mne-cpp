@@ -91,13 +91,13 @@ FiffDigPoint::~FiffDigPoint()
 
 //*************************************************************************************************************
 
-QList<FiffDigPoint> FiffDigPoint::read(QFile &t_fileDig)
+QList<FiffDigPoint> FiffDigPoint::read(QFile &p_fileDig)
 {
     QList<FiffDigPoint> dig;
     //
     //   Open the file
     //
-    FiffStream::SPtr t_pStream(new FiffStream(&t_fileDig));
+    FiffStream::SPtr t_pStream(new FiffStream(&p_fileDig));
     QString t_sFileName = t_pStream->streamName();
 
     printf("Opening header data %s...\n",t_sFileName.toUtf8().constData());
@@ -154,8 +154,9 @@ QList<FiffDigPoint> FiffDigPoint::read(QFile &t_fileDig)
             }
         }
     }
-    for(k = 0; k < dig.size(); ++k)
+    for(k = 0; k < dig.size(); ++k){
         dig[k].coord_frame = coord_frame;
+    }
 
     //
     //   All kinds of auxliary stuff

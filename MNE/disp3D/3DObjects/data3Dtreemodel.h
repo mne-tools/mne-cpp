@@ -211,9 +211,7 @@ public:
     *
     * @return                       Returns true if successful.
     */
-
     bool addData(const QString& subject, const QString& set, const  QList<FIFFLIB::FiffDigPoint>& tDigitizer);
-
 
 protected:
     QStandardItem*          m_pRootItem;            /**< The root item of the tree model. */
