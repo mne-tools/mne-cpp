@@ -2,7 +2,7 @@
 
 if [[ "${TRAVIS_PULL_REQUEST}" == "false" ]]; then
     # === Deployment ===
-    TANGIBLES=(mne_x mne_browse_raw_qt mne_analyze_qt)
+    TANGIBLES=(mne_scan mne_browse mne_analyze)
     n_elements=${#TANGIBLES[@]}
     for ((i = 0; i < n_elements; i++)); do
         fixfile="./bin/${TANGIBLES[i]}.app/Contents/MacOS/${TANGIBLES[i]}"

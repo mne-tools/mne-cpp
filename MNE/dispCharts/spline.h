@@ -176,7 +176,7 @@ public:
     * @param[in]  functionName          Choice between getThreshold or setThreshold
     * @return     returns QVector3D after necessary adjustment
     */
-    const QVector3D& correctionDisplayTrueValue(QVector3D vecOriginalValues, QString functionName);
+    QVector3D correctionDisplayTrueValue(QVector3D vecOriginalValues, QString functionName);
 
     //=========================================================================================================
     /**

@@ -91,13 +91,39 @@ using namespace UTILSLIB;
 FixDictMp::FixDictMp()
 : it(0)
 , signal_energy(0)
-, current_energy(0){}
+, current_energy(0)
+, epsilon(0)
+, max_iterations(0)
+{
 
-FixDictMp::~FixDictMp(){}
+}
 
-Dictionary::Dictionary(){}
 
-Dictionary::~Dictionary(){}
+//*************************************************************************************************************
+
+FixDictMp::~FixDictMp()
+{
+
+}
+
+
+//*************************************************************************************************************
+
+Dictionary::Dictionary()
+: type(AtomType::GABORATOM)
+, sample_count(0)
+{
+
+}
+
+
+//*************************************************************************************************************
+
+Dictionary::~Dictionary()
+{
+
+}
+
 
 //*************************************************************************************************************
 
@@ -255,6 +281,7 @@ void FixDictMp::matching_pursuit(MatrixXd signal, qint32 max_iterations, qreal e
     //return atom_list;
 }
 
+
 //*************************************************************************************************************
 
 // calc scalarproduct of Atom and Signal
@@ -346,6 +373,8 @@ FixDictAtom FixDictMp::correlation(Dictionary current_pdict, MatrixXd current_re
 
     return best_matching;
 }
+
+
 //*************************************************************************************************************
 
 QList<Dictionary> FixDictMp::parse_xml_dict(QString path)
@@ -394,6 +423,8 @@ QList<Dictionary> FixDictMp::parse_xml_dict(QString path)
 
     return parsed_dict;
 }
+
+
 //*************************************************************************************************************
 
 Dictionary FixDictMp::fill_dict(const QDomNode &pdict)
@@ -491,9 +522,10 @@ Dictionary FixDictMp::fill_dict(const QDomNode &pdict)
     return current_dict;
 }
 
+
 //*************************************************************************************************************
 
-QString FixDictMp::create_display_text(FixDictAtom global_best_matching)
+QString FixDictMp::create_display_text(const FixDictAtom& global_best_matching)
 {
     QString display_text = "";
     if(global_best_matching.type == GABORATOM)
@@ -531,6 +563,7 @@ QString FixDictMp::create_display_text(FixDictAtom global_best_matching)
     return display_text;
 }
 
+
 //*************************************************************************************************************
 
 void FixDictMp::recieve_input(MatrixXd signal, qint32 max_iterations, qreal epsilon, qint32 boost, QString path, qreal delta)
@@ -538,12 +571,14 @@ void FixDictMp::recieve_input(MatrixXd signal, qint32 max_iterations, qreal epsi
     matching_pursuit(signal, max_iterations, epsilon, boost, path, delta);
 }
 
+
 //*************************************************************************************************************
 
 qint32 Dictionary::atom_count()
 {
     return atoms.length();
 }
+
 
 //*************************************************************************************************************
 
@@ -554,6 +589,7 @@ qint32 Dictionary::atom_count()
      this->sample_count = 0;
      this->source = "";
  }
+
 
  //*************************************************************************************************************
 
@@ -737,6 +773,7 @@ void FixDictMp::create_tree_dict(QString save_path)
 
 
 }
+
 
 //******************************************************************************************************************
 
