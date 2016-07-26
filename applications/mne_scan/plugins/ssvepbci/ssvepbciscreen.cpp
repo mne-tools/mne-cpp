@@ -61,6 +61,7 @@ using namespace ssvepBCIPlugin;
 ssvepBCIScreen::ssvepBCIScreen(QSharedPointer<ssvepBCI> pSSVEPBCI, QSharedPointer<ssvepBCISetupStimulusWidget> pSSVEPBCISetupStimulusWidget, QOpenGLWidget *parent)
 : m_pSSVEPBCI(pSSVEPBCI)
 , m_pSSVEPBCISetupStimulusWidget(pSSVEPBCISetupStimulusWidget)
+, m_pScreenKeyboard(QSharedPointer<ScreenKeyboard>(new ScreenKeyboard(m_pSSVEPBCI, m_pSSVEPBCISetupStimulusWidget, QSharedPointer<ssvepBCIScreen>(this))))
 , m_dXPosCross(0.5)
 , m_dYPosCross(0.5)
 , m_dStep(0.01)
@@ -109,6 +110,8 @@ ssvepBCIScreen::~ssvepBCIScreen(){
 void ssvepBCIScreen::resizeGL(int w, int h) {
     Q_UNUSED(w)
     Q_UNUSED(h)
+
+    m_pScreenKeyboard->initScreenKeyboard();
 }
 
 
@@ -201,4 +204,5 @@ void ssvepBCIScreen::useScreenKeyboard(bool useKeyboard){
 
 void ssvepBCIScreen::clearScreen(){
     m_bClearScreen = true;
+    m_bUseScreenKeyboard = false;
 }

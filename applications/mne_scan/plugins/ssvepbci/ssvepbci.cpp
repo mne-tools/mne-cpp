@@ -43,6 +43,7 @@
 #include "ssvepbci.h"
 #include <iostream>
 #include <Eigen/Dense>
+#include <utils/ioutils.h>
 
 
 //*************************************************************************************************************
@@ -53,7 +54,7 @@
 #include <QtCore/QtPlugin>
 #include <QtCore/QTextStream>
 #include <QDebug>
-#include <utils/ioutils.h>
+#include <QElapsedTimer>
 
 
 //*************************************************************************************************************
@@ -64,6 +65,7 @@
 using namespace ssvepBCIPlugin;
 using namespace std;
 using namespace UTILSLIB;
+using namespace FSLIB;
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -80,6 +82,7 @@ ssvepBCI::ssvepBCI()
 , m_iPowerLine(50)
 , m_bChangeSSVEPParameterFlag(false)
 , m_bInitializeSource(true)
+, m_iNumberOfClassHits(15)
 {
     // Create configuration action bar item/button
     m_pActionBCIConfiguration = new QAction(QIcon(":/images/configuration.png"),tr("BCI configuration feature"),this);
@@ -330,7 +333,7 @@ void ssvepBCI::updateSensor(SCMEASLIB::NewMeasurement::SPtr pMeasurement)
 
 void ssvepBCI::updateSource(SCMEASLIB::NewMeasurement::SPtr pMeasurement)
 {
-    cout<<"update source"<<endl;
+
     QSharedPointer<RealTimeSourceEstimate> pRTSE = pMeasurement.dynamicCast<RealTimeSourceEstimate>();
     if(pRTSE)
     {
@@ -352,19 +355,34 @@ void ssvepBCI::updateSource(SCMEASLIB::NewMeasurement::SPtr pMeasurement)
     // Initalize parameter for processing BCI on source level
     if(m_bInitializeSource){
 
-        QList<VectorXi> vertNo = pRTSE->getFwdSolution()->src.get_vertno();
 
-        foreach(VectorXi vector, vertNo)
-            cout << "vertNo:" << vector << endl;
-
-
-
-
-        qDebug() << "do processing";
         m_bInitializeSource = false;
     }
 
+    QList<Label> labels;
+    QList<RowVector4i> labelRGBAs;
 
+
+    QSharedPointer<SurfaceSet> SPtrSurfSet = pRTSE->getSurfSet();
+
+    SurfaceSet *pSurf = SPtrSurfSet.data();
+    SurfaceSet surf = *pSurf;
+
+    qDebug() << "label acquisation successful:" << pRTSE->getAnnotSet()->toLabels(surf, labels, labelRGBAs);
+
+    foreach(Label label, labels)
+        qDebug() << "label IDs: " << label.label_id << "\v" << "label name: " << label.name;
+
+
+
+
+
+
+
+
+    QList<VectorXi> vertNo = pRTSE->getFwdSolution()->src.get_vertno();
+    foreach(VectorXi vector, vertNo)
+        cout << "vertNo:" << vector << endl;
 }
 
 
@@ -377,6 +395,12 @@ void ssvepBCI::clearClassifications()
     m_qMutex.unlock();
 }
 
+
+//*************************************************************************************************************
+
+void ssvepBCI::setNumClassHits(int NumClassHits){
+    m_iNumberOfClassHits = NumClassHits;
+}
 
 //*************************************************************************************************************
 
@@ -412,7 +436,7 @@ void ssvepBCI::showSetupStimulus()
 {
     QDesktopWidget Desktop; // Desktop Widget for getting the number of accessible screens
 
-    if(Desktop.numScreens()> 0){
+    if(Desktop.numScreens()> 1){
         // Open setup stimulus widget
         if(m_pssvepBCISetupStimulusWidget == NULL)
             m_pssvepBCISetupStimulusWidget = QSharedPointer<ssvepBCISetupStimulusWidget>(new ssvepBCISetupStimulusWidget(this));
@@ -541,9 +565,16 @@ void ssvepBCI::run(){
     while(m_bIsRunning){
 
         if(m_bUseSensorData)
+        {
+            QElapsedTimer timer;
+            timer.start();
             ssvepBCIOnSensor();
+            qDebug() << "ssvepBCI::run - ssvepBCIOnSensor() took" << timer.elapsed();
+        }
         else
+        {
             ssvepBCIOnSource();
+        }
     }
 }
 
@@ -680,7 +711,7 @@ void ssvepBCI::ssvepBCIOnSensor()
         msleep(10);
 
     // reset list of classifiaction results
-    m_lIndexOfClassResultSensor.clear();
+//    m_lIndexOfClassResultSensor.clear();
     MatrixXd m_matSSVEPProbabilities(m_lDesFrequencies.size(), 0);
 
     // Start filling buffers with data from the inputs
@@ -710,10 +741,10 @@ void ssvepBCI::ssvepBCIOnSensor()
     // execute processing loop as long as there is new data to be red from the time window
     while(m_iReadToWriteBuffer >= m_iReadSampleSize)
     {
-        if(m_iCounter > 8)
+        if(m_iCounter > 30)
         {
             // determine window size according to former counted miss classifications
-            m_iWindowSize = 8;
+            m_iWindowSize = 10;
             if(m_iCounter <= 44 && m_iCounter > 24)
                 m_iWindowSize = 20;
             if(m_iCounter > 44)
@@ -760,11 +791,11 @@ void ssvepBCI::ssvepBCIOnSensor()
             }
 
             // normalize features to probabilities and transfering it into a softmax function
-            ssvepProbabilities = m_dAlpha / ssvepProbabilities.sum() * ssvepProbabilities;
+            ssvepProbabilities = m_dAlpha / ssvepProbabilities.sum() * ssvepProbabilities;  // m_dAlpha;
             ssvepProbabilities = ssvepProbabilities.array().exp();                          // softmax function for better distinguishability between the probabilities
             ssvepProbabilities = 1 / ssvepProbabilities.sum() * ssvepProbabilities;
 
-            cout << "probabilites:" << endl << ssvepProbabilities << endl;
+            //cout << "probabilites:" << endl << ssvepProbabilities << endl;
 
 //            // transfer values to MyQList and emit signal for GUI
 //            m_lSSVEPProbabilities.clear();
@@ -783,7 +814,7 @@ void ssvepBCI::ssvepBCIOnSensor()
                 if(m_lThresholdValues[index] < maxProbability){
                     //qDebug() << "comparison: "<<  m_lThresholdValues[index] << "and" << maxProbability;
                     m_lIndexOfClassResultSensor.append(index+1);
-                    m_iCounter = -1;
+//                    m_iCounter = -1;
                 }
             }
             else
@@ -802,14 +833,27 @@ void ssvepBCI::ssvepBCIOnSensor()
 
     }
 
+
+    qDebug() << "Index-List: " << m_lIndexOfClassResultSensor;
     // emit classifiaction results if any classifiaction has been done
     if(!m_lIndexOfClassResultSensor.isEmpty()){
 
-        m_lIndexOfClassResultSensor.removeAll(0);
-        if(!m_lIndexOfClassResultSensor.isEmpty())
-            emit classificationResult(m_lDesFrequencies[m_lIndexOfClassResultSensor.last() - 1]);
-        else
-            emit classificationResult(0);
+        for(int i = 1; (i <= m_lDesFrequencies.size()) && (!m_lIndexOfClassResultSensor.isEmpty() ); i++){
+
+            if(m_lIndexOfClassResultSensor.count(i) >= m_iNumberOfClassHits){
+                emit classificationResult(m_lDesFrequencies[i - 1]);
+                m_lIndexOfClassResultSensor.clear();
+                m_iCounter = 0;
+                break;
+            }
+            else
+              emit classificationResult(0);
+        }
+//        m_lIndexOfClassResultSensor.removeAll(0);
+//        if(!m_lIndexOfClassResultSensor.isEmpty())
+//            emit classificationResult(m_lDesFrequencies[m_lIndexOfClassResultSensor.last() - 1]);
+//        else
+//            emit classificationResult(0);
     }
 
     // calculate and emit signal of mean probabilities
@@ -818,6 +862,7 @@ void ssvepBCI::ssvepBCIOnSensor()
         for(int i = 0; i < m_lDesFrequencies.size(); i++)
             meanSSVEPProbabilities << m_matSSVEPProbabilities.row(i).mean();
         emit SSVEPprob(meanSSVEPProbabilities);
+        qDebug() << "emit ssvep:" << meanSSVEPProbabilities;
     }
 
     // change parameter and reset the time window if the change flag has been set

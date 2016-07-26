@@ -130,6 +130,9 @@ ssvepBCIConfigurationWidget::ssvepBCIConfigurationWidget(ssvepBCI* pssvepBCI, QW
     connect(m_pSSVEPBCI, &ssvepBCI::classificationResult, ui->m_LcdNumber_ClasResult, static_cast<void(QLCDNumber::*)(double)>(&QLCDNumber::display));
     connect(m_pSSVEPBCI, &ssvepBCI::classificationResult, this, &ssvepBCIConfigurationWidget::setClassResult);
 
+    // connect classifiaction hits-spinbox
+    connect(ui->m_spinBox_ClassificationHits, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged), m_pSSVEPBCI, &ssvepBCI::setNumClassHits);
+
     // set palette for text color change
     m_palBlackFont.setColor(QPalette::WindowText, Qt::black);
     m_palRedFont.setColor(QPalette::WindowText, Qt::red);
