@@ -137,7 +137,7 @@ bool DigitizerSetTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitize
     QList<FIFFLIB::FiffDigPoint> tEeg;
     QList<FIFFLIB::FiffDigPoint> tExtra;
 
-    for(int i = 0; i<tDigitizer.size(); i++){
+    for(int i = 0; i < tDigitizer.size(); ++i){
         switch (tDigitizer[i].kind) {
         case FIFFV_POINT_CARDINAL:
             tCardinal.append(tDigitizer[i]);
@@ -203,7 +203,7 @@ bool DigitizerSetTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitize
 
 void DigitizerSetTreeItem::setVisible(bool state)
 {
-    for(int i = 0; i<m_lChildren.size(); i++) {
+    for(int i = 0; i < m_lChildren.size(); ++i) {
         m_lChildren.at(i)->setParent(state ? m_pRenderable3DEntity : Q_NULLPTR);
     }
 }
@@ -213,7 +213,7 @@ void DigitizerSetTreeItem::setVisible(bool state)
 
 void DigitizerSetTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
 {
-    for(int i = 0; i<this->rowCount(); i++) {
+    for(int i = 0; i < this->rowCount(); ++i) {
         if(this->child(i)->isCheckable()) {
             this->child(i)->setCheckState(checkState);
         }
