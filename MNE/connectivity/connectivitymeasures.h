@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     measures.h
+* @file     connectivitymeasures.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -8,7 +8,7 @@
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,12 +29,13 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Measures class declaration
+* @brief     ConnectivityMeasures class declaration.
 *
 */
 
-#ifndef MEASURES_H
-#define MEASURES_H
+#ifndef CONNECTLIB_CONNECTIVITYMEASURES_H
+#define CONNECTLIB_CONNECTIVITYMEASURES_H
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -57,66 +58,66 @@
 // Eigen INCLUDES
 //=============================================================================================================
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE CONNECTIVITYLIB
-//=============================================================================================================
-
-namespace CONNECTIVITYLIB
-{
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
+#include<Eigen/Core>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
 // FORWARD DECLARATIONS
+//=============================================================================================================
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE CONNECTLIB
+//=============================================================================================================
+
+namespace CONNECTLIB {
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// CONNECTLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
 
 //=============================================================================================================
 /**
-* Basic connectivity measures.
+* Description of what this class is intended to do (in detail).
 *
-* @brief Basic connectivity measures.
+* @brief Brief description of this class.
 */
-class CONNECTIVITYSHARED_EXPORT Measures : QObject
+
+class CONNECTIVITYSHARED_EXPORT ConnectivityMeasures
 {
-    Q_OBJECT
 
 public:
-    typedef QSharedPointer<Measures> SPtr;            /**< Shared pointer type for Measures class. */
-    typedef QSharedPointer<const Measures> ConstSPtr; /**< Const shared pointer type for Measures class. */
+    typedef QSharedPointer<ConnectivityMeasures> SPtr;            /**< Shared pointer type for ConnectivityMeasures. */
+    typedef QSharedPointer<const ConnectivityMeasures> ConstSPtr; /**< Const shared pointer type for ConnectivityMeasures. */
 
     //=========================================================================================================
     /**
-    * Creates the Measure class instance.
-    *
+    * Constructs a ConnectivityMeasures object.
     */
-    explicit Measures();
+    explicit ConnectivityMeasures();
+
+    static Eigen::MatrixXd crossCorrelation();
 
 protected:
 
 private:
 
+signals:
+
 };
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-} // NAMESPACE
 
-#endif // MEASURES_H
+} // namespace CONNECTLIB
+
+#endif // CONNECTLIB_CONNECTIVITYMEASURES_H
