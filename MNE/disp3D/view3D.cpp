@@ -221,12 +221,14 @@ bool View3D::addBemData(const QString& subject, const QString& set, const MNELIB
     return m_pData3DTreeModel->addData(subject, set, tBem);
 }
 
+
 //*************************************************************************************************************
 
 bool View3D::addDigitizerData(const QString& subject, const QString& set, const QList<FIFFLIB::FiffDigPoint>& tDigitizer)
 {
     return m_pData3DTreeModel->addData(subject, set, tDigitizer);
 }
+
 
 //*************************************************************************************************************
 

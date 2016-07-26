@@ -91,7 +91,7 @@ FiffDigPoint::~FiffDigPoint()
 
 //*************************************************************************************************************
 
-QList<FiffDigPoint> FiffDigPoint::read(QFile &p_fileDig)
+QList<FiffDigPoint> FiffDigPoint::read(QIODevice &p_fileDig)
 {
     QList<FiffDigPoint> dig;
     //

@@ -52,7 +52,6 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
-#include <QFile>
 #include <QDebug>
 
 
@@ -118,7 +117,7 @@ public:
     *
     * @return a QList Containing the Digitizer Points.
     */
-    static QList<FiffDigPoint> read(QFile &p_fileDig);
+    static QList<FiffDigPoint> read(QIODevice &p_fileDig);
 
 public:
     fiff_int_t      kind;           /**< FIFFV_POINT_CARDINAL, FIFFV_POINT_HPI, FIFFV_POINT_EXTRA or FIFFV_POINT_EEG */
