@@ -115,7 +115,10 @@ public:
     * @param[in] tVecOffset     The offset which is to be used on all the vertices.
     * @param[in] tArrayColors   The vertex colors. If empty a default value will be used.
     */
-    CustomMesh(const Eigen::MatrixX3f& tMatVert, const Eigen::MatrixX3f& tMatNorm, const Eigen::MatrixX3i& tMatTris, const QByteArray& tArrayColors = QByteArray());
+    CustomMesh(const Eigen::MatrixX3f& tMatVert,
+               const Eigen::MatrixX3f& tMatNorm,
+               const Eigen::MatrixX3i& tMatTris,
+               const QByteArray& tArrayColors = QByteArray());
 
     //=========================================================================================================
     /**
@@ -140,19 +143,35 @@ public:
     * @param[in] tMatTris       Tris/Faces in form of a matrix.
     * @param[in] tVecOffset     The offset which is to be used on all the vertices.
     * @param[in] tArrayColors   The color info of all the vertices.
+    * @param[in] primitiveType  The primitive type of the mesh lines, triangles, etc.
     *
     * @return If successful returns true, false otherwise.
     */
-    bool setMeshData(const Eigen::MatrixX3f& tMatVert, const Eigen::MatrixX3f& tMatNorm, const Eigen::MatrixX3i& tMatTris, const QByteArray &tArrayColors = QByteArray());
+    bool setMeshData(const Eigen::MatrixX3f& tMatVert,
+                     const Eigen::MatrixX3f& tMatNorm,
+                     const Eigen::MatrixX3i& tMatTris,
+                     const QByteArray &tArrayColors = QByteArray(),
+                     Qt3DRender::QGeometryRenderer::PrimitiveType primitiveType = Qt3DRender::QGeometryRenderer::Triangles);
 
 protected:
     //=========================================================================================================
     /**
     * Creates the actual mesh from the set vertex, normals, tris and offset members.
     *
+    * @param[in] tMatVert       Vertices in form of a matrix.
+    * @param[in] tMatNorm       Normals in form of a matrix.
+    * @param[in] tMatTris       Tris/Faces in form of a matrix.
+    * @param[in] tVecOffset     The offset which is to be used on all the vertices.
+    * @param[in] tArrayColors   The color info of all the vertices.
+    * @param[in] primitiveType  The primitive type of the mesh lines, triangles, etc.
+    *
     * @return If successful returns true, false otherwise.
     */
-    bool createCustomMesh(const Eigen::MatrixX3f& tMatVert, const Eigen::MatrixX3f& tMatNorm, const Eigen::MatrixX3i& tMatTris, const QByteArray& tArrayColors = QByteArray());
+    bool createCustomMesh(const Eigen::MatrixX3f& tMatVert,
+                          const Eigen::MatrixX3f& tMatNorm,
+                          const Eigen::MatrixX3i& tMatTris,
+                          const QByteArray& tArrayColors,
+                          Qt3DRender::QGeometryRenderer::PrimitiveType primitiveType);
 
     Qt3DRender::QBuffer*    m_pVertexDataBuffer;    /**< The vertex buffer. */
     Qt3DRender::QBuffer*    m_pNormalDataBuffer;    /**< The normal buffer. */

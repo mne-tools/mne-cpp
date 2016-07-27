@@ -42,6 +42,7 @@
 
 #include "brainhemispheretreeitem.h"
 #include "brainrtsourcelocdatatreeitem.h"
+#include "brainrtconnectivitydatatreeitem.h"
 #include "brainsurfacetreeitem.h"
 #include "brainannotationtreeitem.h"
 
@@ -92,6 +93,7 @@ using namespace DISP3DLIB;
 BrainSurfaceSetTreeItem::BrainSurfaceSetTreeItem(int iType, const QString& text)
 : AbstractTreeItem(iType, text)
 , m_pBrainRTSourceLocDataTreeItem(new BrainRTSourceLocDataTreeItem())
+, m_pBrainRTConnectivityDataTreeItem(new BrainRTConnectivityDataTreeItem())
 {
     this->setEditable(false);
     this->setCheckable(true);
@@ -344,6 +346,39 @@ BrainRTSourceLocDataTreeItem* BrainSurfaceSetTreeItem::addData(const MNESourceEs
     }
 
     return new BrainRTSourceLocDataTreeItem();
+}
+
+
+//*************************************************************************************************************
+
+BrainRTConnectivityDataTreeItem* BrainSurfaceSetTreeItem::addData(const Eigen::MatrixXd& matConnection, const MNEForwardSolution& tForwardSolution)
+{
+    if(matConnection.rows() == 0 && matConnection.cols() == 0) {
+        //Add source estimation data as child
+        if(this->findChildren(Data3DTreeModelItemTypes::RTConnectivityDataItem).size() == 0) {
+            //If rt data item does not exists yet, create it here!
+            if(!tForwardSolution.isEmpty()) {
+                m_pBrainRTConnectivityDataTreeItem = new BrainRTConnectivityDataTreeItem();
+
+                QList<QStandardItem*> list;
+                list << m_pBrainRTConnectivityDataTreeItem;
+                list << new QStandardItem(m_pBrainRTConnectivityDataTreeItem->toolTip());
+                this->appendRow(list);
+
+                m_pBrainRTConnectivityDataTreeItem->addData(matConnection);
+            } else {
+                qDebug() << "BrainSurfaceSetTreeItem::addData - Cannot add real time connectivity data since the forwad solution was not provided and therefore the rt connecntivity data item has not been initilaized yet. Returning...";
+            }
+        } else {
+            m_pBrainRTConnectivityDataTreeItem->addData(matConnection);
+        }
+
+        return m_pBrainRTConnectivityDataTreeItem;
+    } else {
+        qDebug() << "BrainSurfaceSetTreeItem::addData - matConnection is empty";
+    }
+
+    return new BrainRTConnectivityDataTreeItem();
 }
 
 

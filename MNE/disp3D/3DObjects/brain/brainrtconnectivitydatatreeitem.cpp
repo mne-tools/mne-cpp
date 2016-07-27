@@ -62,6 +62,10 @@
 #include <QStandardItem>
 #include <QStandardItemModel>
 
+#include <Qt3DExtras/QSphereMesh>
+#include <Qt3DExtras/QPhongMaterial>
+#include <Qt3DCore/QTransform>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -120,35 +124,19 @@ void  BrainRTConnectivityDataTreeItem::setData(const QVariant& value, int role)
 
 //*************************************************************************************************************
 
-bool BrainRTConnectivityDataTreeItem::init(const MNEForwardSolution& tForwardSolution, const MatrixX3f& matVertLeftHemi, const MatrixX3f& matVertRightHemi, int iHemi)
-{   
-    //Set hemisphere information as item's data
-    this->setData(iHemi, Data3DTreeModelItemRoles::RTHemi);
+bool BrainRTConnectivityDataTreeItem::init(const MNEForwardSolution& tForwardSolution, Qt3DCore::QEntity* parent)
+{
+    //Create renderable 3D entity
+    m_pParentEntity = parent;
+    m_pRenderable3DEntity = new Renderable3DEntity(parent);
 
     //Set data based on clusterd or full source space
-    bool isClustered = tForwardSolution.src[iHemi].isClustered();
+    bool isClustered = tForwardSolution.isClustered();
 
+    //Add source vertices to data
     QVariant data;
-
-    //Store indices for eac source/dipole
-    for(int i = 0; i < tForwardSolution.src.size(); ++i) {
-        if(isClustered) {
-            //When clustered source space, the idx no's are the annotation labels. Take the .cluster_info.centroidVertno instead.
-            VectorXi clustVertNo(tForwardSolution.src[i].cluster_info.centroidVertno.size());
-            for(int j = 0; j < clustVertNo.rows(); ++j) {
-                clustVertNo(j) = tForwardSolution.src[i].cluster_info.centroidVertno.at(j);
-            }
-            data.setValue(clustVertNo);
-        } else {
-            data.setValue(tForwardSolution.src[i].vertno);
-        }
-
-        if(i == 0) {
-            this->setData(data, Data3DTreeModelItemRoles::RTVertNoLeftHemi);
-        } else if (i == 1) {
-            this->setData(data, Data3DTreeModelItemRoles::RTVertNoRightHemi);
-        }
-    }
+    data.setValue(tForwardSolution.source_rr);
+    this->setData(data, Data3DTreeModelItemRoles::SourceVertices);
 
     //Add meta information as item children
     QString sIsClustered = isClustered ? "Clustered" : "Full";
@@ -173,6 +161,59 @@ bool BrainRTConnectivityDataTreeItem::addData(const MatrixXd& matNewConnection)
         qDebug() << "BrainRTConnectivityDataTreeItem::updateData - Rt Item has not been initialized yet!";
         return false;
     }
+
+    MatrixX3f matSourceVert = this->data(Data3DTreeModelItemRoles::SourceVertices).value<MatrixX3f>();
+    MatrixX3f matSourceNorm = MatrixX3f::Zero(matSourceVert.rows(),3);
+
+    if(matSourceVert.rows() != matNewConnection.rows())
+    {
+        qDebug() << "BrainRTConnectivityDataTreeItem::updateData - Number of network nodes and sources do not match!";
+        return false;
+    }
+
+    //Visualize network
+    double dEdgeTrehshold = 500;
+    QMatrix4x4 m;
+    Qt3DCore::QTransform* transform =  new Qt3DCore::QTransform();
+    m.rotate(180, QVector3D(0.0f, 1.0f, 0.0f));
+    m.rotate(-90, QVector3D(1.0f, 0.0f, 0.0f));
+    transform->setMatrix(m);
+    m_pRenderable3DEntity->addComponent(transform);
+
+    RowVector3f sourcePos;
+    QVector3D pos;
+    Qt3DCore::QEntity* sourceSphereEntity;
+    Qt3DExtras::QSphereMesh* sourceSphere;
+    Qt3DExtras::QPhongMaterial* material;
+
+    //Draw network nodes and generate connection indices for Qt3D buffer
+    for(int i = 0; i < matNewConnection.rows(); ++i)
+    {
+        sourcePos = matSourceVert.row(i);
+        pos.setX(sourcePos(0));
+        pos.setY(sourcePos(1));
+        pos.setZ(sourcePos(2));
+
+        sourceSphereEntity = new Qt3DCore::QEntity();
+
+        sourceSphere = new Qt3DExtras::QSphereMesh();
+        sourceSphere->setRadius(0.001f);
+        sourceSphereEntity->addComponent(sourceSphere);
+
+        transform = new Qt3DCore::QTransform();
+        QMatrix4x4 m;
+        m.translate(pos);
+        transform->setMatrix(m);
+        sourceSphereEntity->addComponent(transform);
+
+        material = new Qt3DExtras::QPhongMaterial();
+        material->setAmbient(Qt::yellow);
+        sourceSphereEntity->addComponent(material);
+
+        sourceSphereEntity->setParent(m_pRenderable3DEntity);
+    }
+
+    //m_pRenderable3DEntity->setMeshData(matSourceVert, matSourceNorm, tSurface.tris(), arrayCurvatureColor, Qt3DRender::QGeometryRenderer::Lines);
 
     return true;
 }

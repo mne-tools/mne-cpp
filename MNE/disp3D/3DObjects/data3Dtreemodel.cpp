@@ -345,6 +345,54 @@ QList<BrainRTSourceLocDataTreeItem*> Data3DTreeModel::addData(const QString& sub
 
 //*************************************************************************************************************
 
+QList<BrainRTConnectivityDataTreeItem*> Data3DTreeModel::addData(const QString& subject, const QString& set, const Eigen::MatrixXd& matConnection, const MNEForwardSolution& tForwardSolution)
+{
+    QList<BrainRTConnectivityDataTreeItem*> returnList;
+
+    //Find the subject
+    QList<QStandardItem*> itemSubjectList = this->findItems(subject);
+
+    //Iterate through subject items and add new data respectivley
+
+    for(int i = 0; i < itemSubjectList.size(); ++i) {
+        //Check if it is really a subject tree item
+        if((itemSubjectList.at(i)->type() == Data3DTreeModelItemTypes::SubjectItem)) {
+            SubjectTreeItem* pSubjectItem = dynamic_cast<SubjectTreeItem*>(itemSubjectList.at(i));
+
+            //Find already existing surface items and add the new data to the first search result
+            QList<QStandardItem*> itemList = pSubjectItem->findChildren(set);
+
+            //Find the all the hemispheres of the set "set" and add the source estimates as items
+            if(!itemList.isEmpty()) {
+                for(int i = 0; i<itemList.size(); i++) {
+                    if(itemList.at(i)->type() == Data3DTreeModelItemTypes::SurfaceSetItem) {
+                        if(BrainSurfaceSetTreeItem* pSetItem = dynamic_cast<BrainSurfaceSetTreeItem*>(itemList.at(i))) {
+                            returnList.append(pSetItem->addData(matConnection, tForwardSolution));
+                        }
+                    }
+                }
+            }
+
+//            //Find the all the hemispheres of the set "set" and add the source estimates as items
+//            if(!itemList.isEmpty()) {
+//                for(int i = 0; i<itemList.size(); i++) {
+//                    for(int j = 0; j<itemList.at(i)->rowCount(); j++) {
+//                        if(itemList.at(i)->child(j,0)->type() == Data3DTreeModelItemTypes::HemisphereItem) {
+//                            BrainHemisphereTreeItem* pHemiItem = dynamic_cast<BrainHemisphereTreeItem*>(itemList.at(i)->child(j,0));
+//                            returnList.append(pHemiItem->addData(tSourceEstimate, tForwardSolution));
+//                        }
+//                    }
+//                }
+//            }
+        }
+    }
+
+    return returnList;
+}
+
+
+//*************************************************************************************************************
+
 bool Data3DTreeModel::addData(const QString& subject, const QString& set, const MNELIB::MNEBem& tBem)
 {
     //Find the subject

@@ -92,6 +92,7 @@ namespace DISP3DLIB
 //=============================================================================================================
 
 class BrainRTSourceLocDataTreeItem;
+class BrainRTConnectivityDataTreeItem;
 
 
 //=============================================================================================================
@@ -176,6 +177,17 @@ public:
     */
     BrainRTSourceLocDataTreeItem* addData(const MNELIB::MNESourceEstimate& tSourceEstimate, const MNELIB::MNEForwardSolution& tForwardSolution = MNELIB::MNEForwardSolution());
 
+    //=========================================================================================================
+    /**
+    * Adds connectivity estimation data.
+    *
+    * @param[in] matConnection      The connectivity matrix.
+    * @param[in] tForwardSolution   The MNEForwardSolution.
+    *
+    * @return                       Returns a list with the tree items which now hold the activation data. Use this list to update the data, i.e. during real time applications.
+    */
+    BrainRTConnectivityDataTreeItem* addData(const Eigen::MatrixXd& matConnection,  const MNELIB::MNEForwardSolution& tForwardSolution = MNELIB::MNEForwardSolution());
+
 private:
     //=========================================================================================================
     /**
@@ -199,8 +211,8 @@ private:
     */
     void onColorInfoOriginChanged();
 
-    BrainRTSourceLocDataTreeItem*   m_pBrainRTSourceLocDataTreeItem;        /**< The rt data item of this hemisphere item. Multiple rt data item's can be added to this hemipshere item. */
-
+    BrainRTSourceLocDataTreeItem*       m_pBrainRTSourceLocDataTreeItem;        /**< The rt source loc data item of this hemisphere item. Multiple rt data item's can be added to this hemipshere item. */
+    BrainRTConnectivityDataTreeItem*    m_pBrainRTConnectivityDataTreeItem;     /**< The rt connecntivity data item of this hemisphere item. Multiple rt data item's can be added to this hemipshere item. */
 };
 
 } //NAMESPACE DISP3DLIB

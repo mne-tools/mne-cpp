@@ -208,9 +208,17 @@ bool View3D::addBrainData(const QString& subject, const QString& set, const MNEF
 
 //*************************************************************************************************************
 
-QList<BrainRTSourceLocDataTreeItem*> View3D::addRtBrainData(const QString& subject, const QString& set, const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution)
+QList<BrainRTSourceLocDataTreeItem*> View3D::addRtSourceData(const QString& subject, const QString& set, const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution)
 {
     return m_pData3DTreeModel->addData(subject, set, tSourceEstimate, tForwardSolution);
+}
+
+
+//*************************************************************************************************************
+
+QList<BrainRTConnectivityDataTreeItem*> View3D::addRtConnectivityData(const QString& subject, const QString& set, const Eigen::MatrixXd& matConnection, const MNEForwardSolution& tForwardSolution)
+{
+    return m_pData3DTreeModel->addData(subject, set, matConnection, tForwardSolution);
 }
 
 
