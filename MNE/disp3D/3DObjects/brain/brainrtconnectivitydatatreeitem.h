@@ -68,6 +68,10 @@ namespace MNELIB {
     class MNEForwardSolution;
 }
 
+namespace FSLIB {
+    class Surface;
+}
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -125,11 +129,13 @@ public:
     * Initializes the rt connectivity data item with neccessary information for visualization computations.
     *
     * @param[in] tForwardSolution       The MNEForwardSolution.
+    * @param[in] matVertLeftHemi        The vertices for the left hemisphere.
+    * @param[in] matVertRightHemi       The vertices for the right hemisphere.
     * @param[in] hemi                   The hemispehre of this brain rt connectivity data item.
     *
     * @return                           Returns true if successful.
     */
-    bool init(const MNELIB::MNEForwardSolution& tForwardSolution, int iHemi);
+    bool init(const MNELIB::MNEForwardSolution& tForwardSolution, const MatrixX3f &matVertLeftHemi, const MatrixX3f &matVertRightHemi, int iHemi);
 
     //=========================================================================================================
     /**
