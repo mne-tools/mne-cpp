@@ -261,13 +261,13 @@ inline bool MNEBem::isEmpty() const
     return m_qListBemSurface.size() == 0;
 }
 
-
 //*************************************************************************************************************
 
 inline qint32 MNEBem::size() const
 {
     return m_qListBemSurface.size();
 }
+
 } // NAMESPACE
 
 
