@@ -44,6 +44,7 @@
 #include "disp3D_global.h"
 
 #include "3DObjects/data3Dtreemodel.h"
+
 #include "fs/annotationset.h"
 #include "fs/annotation.h"
 #include "mne/mne_forwardsolution.h"
@@ -97,6 +98,7 @@ namespace DISP3DLIB
 //=============================================================================================================
 
 class BrainRTSourceLocDataTreeItem;
+class BrainRTConnectivityDataTreeItem;
 
 
 //=============================================================================================================
@@ -187,7 +189,20 @@ public:
     *
     * @return                           Returns a list of the BrainRTSourceLocDataTreeItem where the data was appended to.
     */
-    QList<BrainRTSourceLocDataTreeItem*> addRtBrainData(const QString& subject, const QString& set, const MNELIB::MNESourceEstimate& tSourceEstimate, const MNELIB::MNEForwardSolution& tForwardSolution = MNELIB::MNEForwardSolution());
+    QList<BrainRTSourceLocDataTreeItem*> addRtSourceData(const QString& subject, const QString& set, const MNELIB::MNESourceEstimate& tSourceEstimate, const MNELIB::MNEForwardSolution& tForwardSolution = MNELIB::MNEForwardSolution());
+
+    //=========================================================================================================
+    /**
+    * Adds connectivity data to the brain tree model.
+    *
+    * @param[in] subject                The name of the subject.
+    * @param[in] set                    The name of the hemisphere surface set to which this data should be added.
+    * @param[in] matConnection          The connectivity matrix.
+    * @param[in] tForwardSolution       The MNEForwardSolution data.
+    *
+    * @return                           Returns a list of the BrainRTSourceLocDataTreeItem where the data was appended to.
+    */
+    QList<BrainRTConnectivityDataTreeItem*> addRtConnectivityData(const QString& subject, const QString& set, const Eigen::MatrixXd& matConnection, const MNELIB::MNEForwardSolution& tForwardSolution = MNELIB::MNEForwardSolution());
 
     //=========================================================================================================
     /**

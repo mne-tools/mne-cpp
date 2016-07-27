@@ -98,6 +98,7 @@ namespace DISP3DLIB
 //=============================================================================================================
 
 class BrainRTSourceLocDataTreeItem;
+class BrainRTConnectivityDataTreeItem;
 
 
 //=============================================================================================================
@@ -188,6 +189,19 @@ public:
     * @return                       Returns a list with the tree items which now hold the activation data. Use this list to update the data, i.e. during real time applications.
     */
     QList<BrainRTSourceLocDataTreeItem*> addData(const QString& subject, const QString& set, const MNELIB::MNESourceEstimate& tSourceEstimate, const MNELIB::MNEForwardSolution& tForwardSolution = MNELIB::MNEForwardSolution());
+
+    //=========================================================================================================
+    /**
+    * Adds connectivity estimation data.
+    *
+    * @param[in] subject            The name of the subject.
+    * @param[in] set                The name of the surface set to which the actiavtion data is to be added.
+    * @param[in] matConnection      The connectivity matrix.
+    * @param[in] tForwardSolution   The MNEForwardSolution.
+    *
+    * @return                       Returns a list with the tree items which now hold the activation data. Use this list to update the data, i.e. during real time applications.
+    */
+    QList<BrainRTConnectivityDataTreeItem*> addData(const QString& subject, const QString& set, const Eigen::MatrixXd& matConnection, const MNELIB::MNEForwardSolution& tForwardSolution = MNELIB::MNEForwardSolution());
 
     //=========================================================================================================
     /**

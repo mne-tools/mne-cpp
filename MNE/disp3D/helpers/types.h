@@ -152,7 +152,8 @@ namespace Data3DTreeModelItemRoles
                     BemName = Qt::UserRole + 127,
                     RTStartIdxRightHemi = Qt::UserRole + 128,
                     RTEndIdxRightHemi = Qt::UserRole + 129,
-                    RTVertNoRightHemi = Qt::UserRole + 130,};
+                    RTVertNoRightHemi = Qt::UserRole + 130,
+                    SourceVertices = Qt::UserRole + 131,};
 }
 
 namespace MetaTreeItemRoles

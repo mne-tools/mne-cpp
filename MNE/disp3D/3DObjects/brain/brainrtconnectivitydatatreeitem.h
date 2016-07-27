@@ -129,13 +129,11 @@ public:
     * Initializes the rt connectivity data item with neccessary information for visualization computations.
     *
     * @param[in] tForwardSolution       The MNEForwardSolution.
-    * @param[in] matVertLeftHemi        The vertices for the left hemisphere.
-    * @param[in] matVertRightHemi       The vertices for the right hemisphere.
-    * @param[in] hemi                   The hemispehre of this brain rt connectivity data item.
+    * @param[in] parent                 The Qt3D entity parent of the new item.
     *
     * @return                           Returns true if successful.
     */
-    bool init(const MNELIB::MNEForwardSolution& tForwardSolution, const MatrixX3f &matVertLeftHemi, const MatrixX3f &matVertRightHemi, int iHemi);
+    bool init(const MNELIB::MNEForwardSolution& tForwardSolution, Qt3DCore::QEntity *parent);
 
     //=========================================================================================================
     /**
@@ -157,6 +155,10 @@ public:
 
 private:
     bool                        m_bIsInit;                      /**< The init flag. */
+
+    Qt3DCore::QEntity*          m_pParentEntity;                /**< The parent 3D entity. */
+
+    Renderable3DEntity*         m_pRenderable3DEntity;          /**< The renderable 3D entity. */
 
 signals:
 
