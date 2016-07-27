@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     brainsurfacesettreeitem.h
-* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+* @file     fiff_dig_point_set.h
+* @author   Jana Kiesel <jana.kiesel@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     November, 2015
+* @date     Jul, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2015, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Jana Kiesel and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,29 +29,32 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     BrainSurfaceSetTreeItem class declaration.
+* @brief     FiffDigPointSet class declaration.
 *
 */
 
-#ifndef BRAINSURFACESETTREEITEM_H
-#define BRAINSURFACESETTREEITEM_H
+#ifndef FIFFLIB_FIFF_DIG_POINT_SET_H
+#define FIFFLIB_FIFF_DIG_POINT_SET_H
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../../disp3D_global.h"
-
-#include "../../helpers/abstracttreeitem.h"
-
-#include "mne/mne_forwardsolution.h"
+#include "fiff_global.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// QT INCLUDES
 //=============================================================================================================
+
+#include <QSharedPointer>
+#include <QIODevice>
+#include <QList>
+
+#include "fiff_stream.h"
 
 
 //*************************************************************************************************************
@@ -65,160 +68,178 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FSLIB {
-    class SurfaceSet;
-    class AnnotationSet;
-    class Surface;
-    class Annotation;
-}
 
-namespace MNELIB {
-    class MNESourceSpace;
-    class MNESourceEstimate;
-}
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE FIFFLIB
+//=============================================================================================================
 
-namespace FIFFLIB{
-    class FiffDigPointSet;
-}
+namespace FIFFLIB {
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE DISP3DLIB
+// FIFFLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace DISP3DLIB
-{
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-class BrainRTSourceLocDataTreeItem;
+class FiffDigPoint;
+class FiffDirTree;
 
 
 //=============================================================================================================
 /**
-* BrainSurfaceSetTreeItem provides a generic brain tree item to hold of brain data (hemi, vertices, tris, etc.) from different sources (FreeSurfer, etc.).
+* The FiffDigPointSet hold a set of Digitizer Points and read, write and transform function.
 *
-* @brief Provides a generic BrainSurfaceSetTreeItem.
+* @brief Holds a set of digitizer points.
 */
-class DISP3DNEWSHARED_EXPORT BrainSurfaceSetTreeItem : public AbstractTreeItem
+
+class FIFFSHARED_EXPORT FiffDigPointSet
 {
-    Q_OBJECT
 
 public:
-    typedef QSharedPointer<BrainSurfaceSetTreeItem> SPtr;             /**< Shared pointer type for BrainSurfaceSetTreeItem class. */
-    typedef QSharedPointer<const BrainSurfaceSetTreeItem> ConstSPtr;  /**< Const shared pointer type for BrainSurfaceSetTreeItem class. */
+    typedef QSharedPointer<FiffDigPointSet> SPtr;            /**< Shared pointer type for FiffDigPointSet. */
+    typedef QSharedPointer<const FiffDigPointSet> ConstSPtr; /**< Const shared pointer type for FiffDigPointSet. */
 
     //=========================================================================================================
     /**
-    * Default constructor.
-    *
-    * @param[in] iType      The type of the item. See types.h for declaration and definition.
-    * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
+    * Constructs a FiffDigPointSet object.
     */
-    explicit BrainSurfaceSetTreeItem(int iType = Data3DTreeModelItemTypes::SurfaceSetItem, const QString& text = "");
+    FiffDigPointSet();
 
     //=========================================================================================================
     /**
-    * Default destructor
+    * Copy constructor.
+    *
+    * @param[in] p_FiffDigPointSet
     */
-    ~BrainSurfaceSetTreeItem();
+    FiffDigPointSet(const FiffDigPointSet &p_FiffDigPointSet);
 
     //=========================================================================================================
     /**
-    * AbstractTreeItem functions
+    * Default constructor
     */
-    QVariant data(int role = Qt::UserRole + 1) const;
-    void setData(const QVariant& value, int role = Qt::UserRole + 1);
+    FiffDigPointSet(QIODevice &p_IODevice);
 
     //=========================================================================================================
     /**
-    * Adds FreeSurfer data based on surfaces and annotation SETS to this item.
-    *
-    * @param[in] tSurfaceSet        FreeSurfer surface set.
-    * @param[in] tAnnotationSet     FreeSurfer annotation set.
-    * @param[in] p3DEntityParent    The Qt3D entity parent of the new item.
-    *
-    * @return                       Returns true if successful.
+    * Destroys the FiffDigPointSet
     */
-    bool addData(const FSLIB::SurfaceSet& tSurfaceSet, const FSLIB::AnnotationSet& tAnnotationSet, Qt3DCore::QEntity* p3DEntityParent = 0);
+    ~FiffDigPointSet();
 
     //=========================================================================================================
     /**
-    * Adds FreeSurfer data based on surfaces and annotation data to this item.
+    * Reads FiffDigPointSet from a fif file
     *
-    * @param[in] tSurface           FreeSurfer surface.
-    * @param[in] tAnnotation        FreeSurfer annotation.
-    * @param[in] p3DEntityParent    The Qt3D entity parent of the new item.
+    * @param [in, out] p_pStream    The opened fif file
+    * @param [in, out] p_Tree       Search for the bem surface here
     *
-    * @return                       Returns true if successful.
+    * @return true if succeeded, false otherwise
     */
-    bool addData(const FSLIB::Surface& tSurface, const FSLIB::Annotation& tAnnotation, Qt3DCore::QEntity* p3DEntityParent = 0);
+    static bool readFromStream(FiffStream::SPtr& p_pStream, FiffDirTree& p_Tree, FiffDigPointSet& p_Dig);
 
     //=========================================================================================================
     /**
-    * Adds source space data to this item.
-    *
-    * @param[in] tSourceSpace       The source space data.
-    * @param[in] p3DEntityParent    The Qt3D entity parent of the new item.
-    *
-    * @return                       Returns true if successful.
+    * Initializes FiffDigPointSet
     */
-    bool addData(const MNELIB::MNESourceSpace& tSourceSpace, Qt3DCore::QEntity* p3DEntityParent = 0);
+    inline void clear();
 
     //=========================================================================================================
     /**
-    * Adds source estimated activation data.
+    * True if FiffDigPointSet is empty.
     *
-    * @param[in] tSourceEstimate    The MNESourceEstimate.
-    * @param[in] tForwardSolution   The MNEForwardSolution.
-    *
-    * @return                       Returns a list with the tree items which now hold the activation data. Use this list to update the data, i.e. during real time applications.
+    * @return true if MNE Bem is empty
     */
-    BrainRTSourceLocDataTreeItem* addData(const MNELIB::MNESourceEstimate& tSourceEstimate, const MNELIB::MNEForwardSolution& tForwardSolution = MNELIB::MNEForwardSolution());
+    inline bool isEmpty() const;
 
     //=========================================================================================================
     /**
-    * Adds digitizer data to this item.
+    * Returns the number of stored FiffDigPoints
     *
-    * @param[in] digitizerkind      The kind of the digitizer data.
-    * @param[in] tDigitizer         The digitizer data.
-    * @param[in] p3DEntityParent    The Qt3D entity parent of the new item.
-    *
-    * @return                       Returns true if successful.
+    * @return number of stored FiffDigPoints
     */
-    bool addData(const FIFFLIB::FiffDigPointSet& tDigitizer, Qt3DCore::QEntity* p3DEntityParent = 0);
+    inline qint32 size() const;
+
+    //=========================================================================================================
+    /**
+    * Subscript operator [] to access FiffDigPoint by index
+    *
+    * @param[in] idx    the FiffDigPoint index.
+    *
+    * @return FiffDigPoint related to the parameter index.
+    */
+    const FiffDigPoint& operator[] (qint32 idx) const;
+
+    //=========================================================================================================
+    /**
+    * Subscript operator [] to access FiffDigPoint by index
+    *
+    * @param[in] idx    the FiffDigPoint index.
+    *
+    * @return FiffDigPoint related to the parameter index.
+    */
+    FiffDigPoint& operator[] (qint32 idx);
+
+    //=========================================================================================================
+    /**
+    * Subscript operator << to add a new FiffDigPoint
+    *
+    * @param[in] dig    FiffDigPoint to be added
+    *
+    * @return FiffDigPointSet
+    */
+    FiffDigPointSet& operator<< (const FiffDigPoint& dig);
+
+    //=========================================================================================================
+    /**
+    * Subscript operator << to add a new FiffDigPoint
+    *
+    * @param[in] dig    FiffDigPoint to be added
+    *
+    * @return FiffDigPointSet
+    */
+    FiffDigPointSet& operator<< (const FiffDigPoint* dig);
+
+//    ToDo:
+//    //=========================================================================================================
+//    /**
+//    * Write the FiffDigPointSet to a FIF file
+//    *
+//    * @param [in] p_IODevice   IO device to write the FiffDigPointSet to.
+//    */
+//    void write(QIODevice &p_IODevice);
+
+protected:
 
 private:
-    //=========================================================================================================
-    /**
-    * Call this function whenever the check box of this item was checked.
-    *
-    * @param[in] checkState        The current checkstate.
-    */
-    virtual void onCheckStateChanged(const Qt::CheckState& checkState);
-
-    //=========================================================================================================
-    /**
-    * Call this function whenever new colors for the activation data plotting are available.
-    *
-    * @param[in] sourceColorSamples     The color values for each estimated source for left and right hemisphere.
-    */
-    void onRtVertColorChanged(const QPair<QByteArray, QByteArray>& sourceColorSamples);
-
-    //=========================================================================================================
-    /**
-    * This function gets called whenever the origin of the surface vertex color (curvature, annoation, etc.) changed.
-    */
-    void onColorInfoOriginChanged();
-
-    BrainRTSourceLocDataTreeItem*   m_pBrainRTSourceLocDataTreeItem;        /**< The rt data item of this hemisphere item. Multiple rt data item's can be added to this hemipshere item. */
+    QList<FiffDigPoint> m_qListDigPoint;    /**< List of digitizer Points. */
 
 };
 
-} //NAMESPACE DISP3DLIB
 
-#endif // BRAINSURFACESETTREEITEM_H
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+inline void FiffDigPointSet::clear()
+{
+    m_qListDigPoint.clear();
+}
+
+//*************************************************************************************************************
+
+inline bool FiffDigPointSet::isEmpty() const
+{
+    return m_qListDigPoint.size() == 0;
+}
+
+//*************************************************************************************************************
+
+inline qint32 FiffDigPointSet::size() const
+{
+    return m_qListDigPoint.size();
+}
+
+} // namespace FIFFLIB
+
+#endif // FIFFLIB_FIFF_DIG_POINT_SET_H
