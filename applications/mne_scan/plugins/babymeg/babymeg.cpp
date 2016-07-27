@@ -858,11 +858,11 @@ void BabyMEG::run()
             //pop matrix
             m_matValue = m_pRawMatrixBuffer->pop();
 
-            //Update and write the HPI information to the current data block
-            QTime timer;
-            timer.start();
-            updateHPI();
-            qDebug() << "BabyMEG::run() - updateHPI() timing" << timer.elapsed() << "msecs";
+//            //Update and write the HPI information to the current data block
+//            QTime timer;
+//            timer.start();
+//            updateHPI();
+//            qDebug() << "BabyMEG::run() - updateHPI() timing" << timer.elapsed() << "msecs";
 
             //Write raw data to fif file
             if(m_bWriteToFile)
@@ -919,9 +919,7 @@ void BabyMEG::updateHPI()
     qz = ( (rot(1,0) - rot(0,1)) / s );
 
     // Normalize quaternion vectors
-    norm2 = sqrt(qw*qw + qx*qx + qy*qy + qz*qz);
-    //norm2 = sqrt(qx*qx + qy*qy + qz*qz);
-    qw = qw / norm2;
+    norm2 = sqrt(qx*qx + qy*qy + qz*qz);
     qx = qx / norm2;
     qy = qy / norm2;
     qz = qz / norm2;
@@ -931,11 +929,12 @@ void BabyMEG::updateHPI()
     //  GOF = 1 - dpfitError
     //
     //      dpfitError was computed in the rthpis.cpp
-    //      dpfitError must be trasferred to HERE.
+    //      dpfitError must be readable HERE.
     //      Perhaps new fiff info structure needs to be implemented for the dpfitError,
     //      so that this babymeg.cpp can read out the dpfitError HERE.
     //
-    // Temporarily teh GOF is set to 1.
+    // Temporarily the GOF is set to 1.
+    // However,eventually the GOF must be loaded from rthpis.cpp, as described the baove.
     float dpfitError = 0.0;
     GOF = 1 - dpfitError;
 
@@ -965,7 +964,7 @@ void BabyMEG::updateHPI()
         qDebug() << rot(1,0) << " "  << rot(1,1) << " " << rot(1,2);
         qDebug() << rot(2,0) << " "  << rot(2,1) << " " << rot(2,2);
 
-        qDebug() << "quaternion w: " << qw;
+//        qDebug() << "quaternion w: " << qw;
         qDebug() << "quaternion x: " << qx;
         qDebug() << "quaternion y: " << qy;
         qDebug() << "quaternion z: " << qz;
