@@ -92,6 +92,10 @@ QMap<int,QList<QPair<int,double> > > DetectTrigger::detectTriggerFlanksMax(const
 
         int iChIdx = lTriggerChannels.at(i);
 
+        //Add empty list to map
+        QList<QPair<int,double> > temp;
+        qMapDetectedTrigger.insert(iChIdx, temp);
+
         //detect the actual triggers in the current data matrix
         if(iChIdx > data.rows() || iChIdx < 0)
         {
@@ -165,7 +169,7 @@ QList<QPair<int,double> > DetectTrigger::detectTriggerFlanksMax(const MatrixXd &
 
 //*************************************************************************************************************
 
-QMap<int,QList<QPair<int,double> > > DetectTrigger::detectTriggerFlanksGrad(const MatrixXd &data, const QList<int>& lTriggerChannels, int iOffsetIndex, double dThreshold, bool bRemoveOffset, const QString& type, int iBurstLengthSamp)
+QMap<int,QList<QPair<int,double> > > DetectTrigger::detectTriggerFlanksGrad(const MatrixXd& data, const QList<int>& lTriggerChannels, int iOffsetIndex, double dThreshold, bool bRemoveOffset, const QString& type, int iBurstLengthSamp)
 {
     QMap<int,QList<QPair<int,double> > > qMapDetectedTrigger;
     RowVectorXd tGradient = RowVectorXd::Zero(data.cols());
@@ -175,7 +179,12 @@ QMap<int,QList<QPair<int,double> > > DetectTrigger::detectTriggerFlanksGrad(cons
     {
 //        QTime time;
 //        time.start();
+
         int iChIdx = lTriggerChannels.at(i);
+
+        //Add empty list to map
+        QList<QPair<int,double> > temp;
+        qMapDetectedTrigger.insert(iChIdx, temp);
 
         //detect the actual triggers in the current data matrix
         if(iChIdx > data.rows() || iChIdx < 0)
