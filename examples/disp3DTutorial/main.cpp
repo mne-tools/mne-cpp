@@ -49,11 +49,8 @@
 
 #include <fiff/fiff_evoked.h>
 #include <fiff/fiff.h>
-<<<<<<< HEAD
-=======
 #include <fiff/fiff_dig_point_set.h>
 #include <mne/mne.h>
->>>>>>> c9a2cff21e72ae4b0f14dd1a71addd052f036a12
 
 #include <mne/mne.h>
 #include <mne/mne_epoch_data_list.h>
