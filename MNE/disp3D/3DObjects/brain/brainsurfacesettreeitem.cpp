@@ -45,6 +45,9 @@
 #include "brainrtconnectivitydatatreeitem.h"
 #include "brainsurfacetreeitem.h"
 #include "brainannotationtreeitem.h"
+#include "../digitizer/digitizersettreeitem.h"
+#include "../digitizer/digitizertreeitem.h"
+
 
 #include "fs/label.h"
 #include "fs/annotationset.h"
@@ -52,6 +55,8 @@
 
 #include "mne/mne_sourceestimate.h"
 #include "mne/mne_sourcespace.h"
+
+#include <fiff/fiff_dig_point_set.h>
 
 
 //*************************************************************************************************************
@@ -143,8 +148,8 @@ bool BrainSurfaceSetTreeItem::addData(const SurfaceSet& tSurfaceSet, const Annot
     bool hemiItemFound = false;
 
     //Search for already created hemi items and add source space data respectivley
-    for(int i = 0; i < tSurfaceSet.size(); i++) {
-        for(int j = 0; j<itemList.size(); j++) {
+    for(int i = 0; i < tSurfaceSet.size(); ++i) {
+        for(int j = 0; j < itemList.size(); ++j) {
             BrainHemisphereTreeItem* pHemiItem = dynamic_cast<BrainHemisphereTreeItem*>(itemList.at(j));
 
             if(pHemiItem->data(Data3DTreeModelItemRoles::SurfaceHemi).toInt() == tSurfaceSet[i].hemi()) {
@@ -204,7 +209,7 @@ bool BrainSurfaceSetTreeItem::addData(const Surface& tSurface, const Annotation&
     bool hemiItemFound = false;
 
     //Search for already created hemi items and add source space data respectivley
-    for(int j = 0; j<itemList.size(); j++) {
+    for(int j = 0; j < itemList.size(); ++j) {
         if(BrainHemisphereTreeItem* pHemiItem = dynamic_cast<BrainHemisphereTreeItem*>(itemList.at(j))) {
             if(pHemiItem->data(Data3DTreeModelItemRoles::SurfaceHemi).toInt() == tSurface.hemi()) {
                 hemiItemFound = true;
@@ -254,8 +259,8 @@ bool BrainSurfaceSetTreeItem::addData(const MNESourceSpace& tSourceSpace, Qt3DCo
     bool hemiItemFound = false;
 
     //Search for already created hemi items and add source space data respectivley
-    for(int i = 0; i < tSourceSpace.size(); i++) {
-        for(int j = 0; j<itemList.size(); j++) {
+    for(int i = 0; i < tSourceSpace.size(); ++i) {
+        for(int j = 0; j < itemList.size(); ++j) {
             if(BrainHemisphereTreeItem* pHemiItem = dynamic_cast<BrainHemisphereTreeItem*>(itemList.at(j))) {
                 if(pHemiItem->data(Data3DTreeModelItemRoles::SurfaceHemi).toInt() == i) {
                     hemiItemFound = true;
@@ -310,7 +315,7 @@ BrainRTSourceLocDataTreeItem* BrainSurfaceSetTreeItem::addData(const MNESourceEs
                 BrainAnnotationTreeItem* pAnnotTreeItemLeft = Q_NULLPTR;
                 BrainAnnotationTreeItem* pAnnotTreeItemRight = Q_NULLPTR;
 
-                for(int j = 0; j < itemList.size(); j++) {
+                for(int j = 0; j < itemList.size(); ++j) {
                     if(BrainHemisphereTreeItem* pHemiItem = dynamic_cast<BrainHemisphereTreeItem*>(itemList.at(j))) {
                         if(pHemiItem->data(Data3DTreeModelItemRoles::SurfaceHemi).toInt() == 0) {
                             pSurfaceTreeItemLeft = pHemiItem->getSurfaceItem();
@@ -346,6 +351,37 @@ BrainRTSourceLocDataTreeItem* BrainSurfaceSetTreeItem::addData(const MNESourceEs
     }
 
     return new BrainRTSourceLocDataTreeItem();
+}
+
+
+//*************************************************************************************************************
+
+bool BrainSurfaceSetTreeItem::addData(const FiffDigPointSet &tDigitizer, Qt3DCore::QEntity *p3DEntityParent)
+{
+    //Find the digitizerkind
+    QList<QStandardItem*> itemDigitizerList = this->findChildren(Data3DTreeModelItemTypes::DigitizerSetItem);
+
+    //If digitizer does not exist, create a new one
+    if(itemDigitizerList.size() == 0) {
+        DigitizerSetTreeItem* digitizerSetItem = new DigitizerSetTreeItem(Data3DTreeModelItemTypes::DigitizerSetItem,"Digitizer");
+        itemDigitizerList << digitizerSetItem;
+        itemDigitizerList << new QStandardItem(digitizerSetItem->toolTip());
+        this->appendRow(itemDigitizerList);
+    }
+
+    // Add Data to the first Digitizer Set Item
+    bool state = false;
+
+    //Check if it is really a digitizer tree item
+    if((itemDigitizerList.at(0)->type() == Data3DTreeModelItemTypes::DigitizerSetItem)) {
+        DigitizerSetTreeItem* pDigitizerSetItem = dynamic_cast<DigitizerSetTreeItem*>(itemDigitizerList.at(0));
+        state = pDigitizerSetItem->addData(tDigitizer, p3DEntityParent);
+    }
+    else{
+        state = false;
+    }
+
+    return state;
 }
 
 
@@ -387,7 +423,7 @@ BrainRTConnectivityDataTreeItem* BrainSurfaceSetTreeItem::addData(const Eigen::M
 
 void BrainSurfaceSetTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
 {
-    for(int i = 0; i<this->rowCount(); i++) {
+    for(int i = 0; i < this->rowCount(); ++i) {
         if(this->child(i)->isCheckable()) {
             this->child(i)->setCheckState(checkState);
         }
@@ -401,7 +437,7 @@ void BrainSurfaceSetTreeItem::onRtVertColorChanged(const QPair<QByteArray, QByte
 {
     QList<QStandardItem*> itemList = this->findChildren(Data3DTreeModelItemTypes::HemisphereItem);
 
-    for(int j = 0; j < itemList.size(); j++) {
+    for(int j = 0; j < itemList.size(); ++j) {
         if(BrainHemisphereTreeItem* pHemiItem = dynamic_cast<BrainHemisphereTreeItem*>(itemList.at(j))) {
             if(pHemiItem->data(Data3DTreeModelItemRoles::SurfaceHemi).toInt() == 0) {
                 pHemiItem->onRtVertColorChanged(sourceColorSamples.first);
@@ -422,7 +458,7 @@ void BrainSurfaceSetTreeItem::onColorInfoOriginChanged()
     BrainSurfaceTreeItem* pSurfaceTreeItemLeft = Q_NULLPTR;
     BrainSurfaceTreeItem* pSurfaceTreeItemRight = Q_NULLPTR;
 
-    for(int j = 0; j < itemList.size(); j++) {
+    for(int j = 0; j < itemList.size(); ++j) {
         if(BrainHemisphereTreeItem* pHemiItem = dynamic_cast<BrainHemisphereTreeItem*>(itemList.at(j))) {
             if(pHemiItem->data(Data3DTreeModelItemRoles::SurfaceHemi).toInt() == 0) {
                 pSurfaceTreeItemLeft = pHemiItem->getSurfaceItem();

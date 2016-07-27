@@ -41,6 +41,7 @@
 #include "view3D.h"
 
 #include <mne/mne_sourceestimate.h>
+#include <fiff/fiff_dig_point_set.h>
 #include "helpers/types.h"
 #include <iostream>
 
@@ -227,6 +228,14 @@ QList<BrainRTConnectivityDataTreeItem*> View3D::addRtConnectivityData(const QStr
 bool View3D::addBemData(const QString& subject, const QString& set, const MNELIB::MNEBem& tBem)
 {
     return m_pData3DTreeModel->addData(subject, set, tBem);
+}
+
+
+//*************************************************************************************************************
+
+bool View3D::addDigitizerData(const QString& subject, const QString& set, const FiffDigPointSet& tDigitizer)
+{
+    return m_pData3DTreeModel->addData(subject, set, tDigitizer);
 }
 
 
