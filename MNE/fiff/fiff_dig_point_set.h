@@ -42,6 +42,8 @@
 // INCLUDES
 //=============================================================================================================
 
+#include "fiff_global.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -83,12 +85,12 @@ class FiffDigPoint;
 
 //=============================================================================================================
 /**
-* The FiffDigPointSet hold a set of Digetizer Points and read, write and transform function.
+* The FiffDigPointSet hold a set of Digitizer Points and read, write and transform function.
 *
 * @brief Holds a set of digitizer points.
 */
 
-class FiffDigPointSet
+class FIFFSHARED_EXPORT FiffDigPointSet
 {
 
 public:
@@ -143,46 +145,45 @@ public:
     */
     inline qint32 size() const;
 
-//    Not used fuctions:
-//    //=========================================================================================================
-//    /**
-//    * Subscript operator [] to access FiffDigPoint by index
-//    *
-//    * @param[in] idx    the FiffDigPoint index.
-//    *
-//    * @return FiffDigPoint related to the parameter index.
-//    */
-//    const FiffDigPoint& operator[] (qint32 idx) const;
+    //=========================================================================================================
+    /**
+    * Subscript operator [] to access FiffDigPoint by index
+    *
+    * @param[in] idx    the FiffDigPoint index.
+    *
+    * @return FiffDigPoint related to the parameter index.
+    */
+    const FiffDigPoint& operator[] (qint32 idx) const;
 
-//    //=========================================================================================================
-//    /**
-//    * Subscript operator [] to access FiffDigPoint by index
-//    *
-//    * @param[in] idx    the FiffDigPoint index.
-//    *
-//    * @return FiffDigPoint related to the parameter index.
-//    */
-//    FiffDigPoint& operator[] (qint32 idx);
+    //=========================================================================================================
+    /**
+    * Subscript operator [] to access FiffDigPoint by index
+    *
+    * @param[in] idx    the FiffDigPoint index.
+    *
+    * @return FiffDigPoint related to the parameter index.
+    */
+    FiffDigPoint& operator[] (qint32 idx);
 
-//    //=========================================================================================================
-//    /**
-//    * Subscript operator << to add a new FiffDigPoint
-//    *
-//    * @param[in] dig    FiffDigPoint to be added
-//    *
-//    * @return MNEBem
-//    */
-//    FiffDigPointSet& operator<< (const FiffDigPoint& dig);
+    //=========================================================================================================
+    /**
+    * Subscript operator << to add a new FiffDigPoint
+    *
+    * @param[in] dig    FiffDigPoint to be added
+    *
+    * @return FiffDigPointSet
+    */
+    FiffDigPointSet& operator<< (const FiffDigPoint& dig);
 
-//    //=========================================================================================================
-//    /**
-//    * Subscript operator << to add a new FiffDigPoint
-//    *
-//    * @param[in] dig    FiffDigPoint to be added
-//    *
-//    * @return MNEBem
-//    */
-//    FiffDigPointSet& operator<< (const FiffDigPoint* dig);
+    //=========================================================================================================
+    /**
+    * Subscript operator << to add a new FiffDigPoint
+    *
+    * @param[in] dig    FiffDigPoint to be added
+    *
+    * @return FiffDigPointSet
+    */
+    FiffDigPointSet& operator<< (const FiffDigPoint* dig);
 
 //    ToDo:
 //    //=========================================================================================================
@@ -197,8 +198,6 @@ protected:
 
 private:
     QList<FiffDigPoint> m_qListDigPoint;    /**< List of digitizer Points. */
-
-signals:
 
 };
 

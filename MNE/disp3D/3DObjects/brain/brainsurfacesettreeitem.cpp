@@ -55,6 +55,8 @@
 #include "mne/mne_sourceestimate.h"
 #include "mne/mne_sourcespace.h"
 
+#include <fiff/fiff_dig_point_set.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -352,7 +354,7 @@ BrainRTSourceLocDataTreeItem* BrainSurfaceSetTreeItem::addData(const MNESourceEs
 
 //*************************************************************************************************************
 
-bool BrainSurfaceSetTreeItem::addData(const QList<FiffDigPoint> &tDigitizer, Qt3DCore::QEntity *p3DEntityParent)
+bool BrainSurfaceSetTreeItem::addData(const FiffDigPointSet &tDigitizer, Qt3DCore::QEntity *p3DEntityParent)
 {
     //Find the digitizerkind
     QList<QStandardItem*> itemDigitizerList = this->findChildren(Data3DTreeModelItemTypes::DigitizerSetItem);

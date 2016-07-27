@@ -63,6 +63,7 @@
 
 namespace FIFFLIB{
     class FiffDigPoint;
+    class FiffDigPointSet;
 }
 
 
@@ -126,7 +127,7 @@ public:
     *
     * @return                       Returns true if successful.
     */
-    bool addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer, Qt3DCore::QEntity* parent);
+    bool addData(const FIFFLIB::FiffDigPointSet& tDigitizer, Qt3DCore::QEntity* parent);
 
     //=========================================================================================================
     /**

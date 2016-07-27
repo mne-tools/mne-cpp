@@ -109,16 +109,6 @@ public:
     */
     inline static qint32 storageSize();
 
-    //=========================================================================================================
-    /**
-    * Read Digitizer Points
-    *
-    * @param[in] The QFile Containing the Digitizer Points in fiff format
-    *
-    * @return a QList Containing the Digitizer Points.
-    */
-    static QList<FiffDigPoint> read(QIODevice &p_fileDig);
-
 public:
     fiff_int_t      kind;           /**< FIFFV_POINT_CARDINAL, FIFFV_POINT_HPI, FIFFV_POINT_EXTRA or FIFFV_POINT_EEG */
     fiff_int_t      ident;          /**< Number identifying this point */

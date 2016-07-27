@@ -50,6 +50,7 @@
 
 #include "fiff/fiff_constants.h"
 #include "fiff/fiff_dig_point.h"
+#include "fiff/fiff_dig_point_set.h"
 
 
 //*************************************************************************************************************
@@ -127,7 +128,7 @@ void  DigitizerSetTreeItem::setData(const QVariant& value, int role)
 
 //*************************************************************************************************************
 
-bool DigitizerSetTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer, Qt3DCore::QEntity* parent)
+bool DigitizerSetTreeItem::addData(const FIFFLIB::FiffDigPointSet& tDigitizer, Qt3DCore::QEntity* parent)
 {
     bool state = false;
 
