@@ -49,6 +49,7 @@
 
 #include <fiff/fiff_evoked.h>
 #include <fiff/fiff.h>
+#include <fiff/fiff_dig_point_set.h>
 #include <mne/mne.h>
 
 #include <mne/mne_epoch_data_list.h>
@@ -115,7 +116,7 @@ int main(int argc, char *argv[])
     QCommandLineOption sampleSourceLocOption("doSourceLoc", "Do real time source localization <doSourceLoc>.", "doSourceLoc", "false");
     QCommandLineOption sampleFwdOption("fwd", "Path to forwad solution <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
     QCommandLineOption sampleInvOpOption("invOp", "Path to inverse operator <file>.", "file", "");
-    QCommandLineOption sampleClustOption("doClust", "Path to clustered inverse operator <doClust>.", "doClust", "true");
+    QCommandLineOption sampleClustOption("doClust", "Path to clustered inverse operator <doClust>.", "doClust", "false");
 
     parser.addOption(sampleSurfOption);
     parser.addOption(sampleAnnotOption);
@@ -277,7 +278,7 @@ int main(int argc, char *argv[])
     //
 
     QFile t_fileDig("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
-    QList<FiffDigPoint> t_Dig=FiffDigPoint::read(t_fileDig);
+    FiffDigPointSet t_Dig(t_fileDig);
     testWindow->addDigitizerData("Subject01", "Left Auditory", t_Dig);
 
     if(bAddRtSourceLoc) {

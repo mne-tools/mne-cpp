@@ -183,7 +183,6 @@ FiffDigPointSet::~FiffDigPointSet()
 }
 
 
-/*  Not used functions:
 //*************************************************************************************************************
 
 const FiffDigPoint& FiffDigPointSet::operator[] (qint32 idx) const
@@ -226,4 +225,3 @@ FiffDigPointSet &FiffDigPointSet::operator<<(const FiffDigPoint *dig)
     this->m_qListDigPoint.append(*dig);
     return *this;
 }
-*/

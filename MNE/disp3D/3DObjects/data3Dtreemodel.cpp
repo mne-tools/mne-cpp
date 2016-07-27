@@ -51,6 +51,7 @@
 #include <mne/mne_bem.h>
 #include <fs/surfaceset.h>
 #include <fs/annotationset.h>
+#include <fiff/fiff_dig_point_set.h>
 
 
 //*************************************************************************************************************
@@ -392,7 +393,7 @@ bool Data3DTreeModel::addData(const QString& subject, const QString& set, const 
 
 //*************************************************************************************************************
 
-bool Data3DTreeModel::addData(const QString& subject, const QString& set, const QList<FIFFLIB::FiffDigPoint>& tDigitizer)
+bool Data3DTreeModel::addData(const QString& subject, const QString& set, const FIFFLIB::FiffDigPointSet& tDigitizer)
 {
     //Find the subject
     QList<QStandardItem*> itemSubjectList = this->findItems(subject);

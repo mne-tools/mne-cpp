@@ -46,6 +46,7 @@
 
 #include <utils/warp.h>
 #include <fiff/fiff.h>
+#include <fiff/fiff_dig_point_set.h>
 #include <mne/mne_bem.h>
 
 #include <QFile>
@@ -161,20 +162,21 @@ int main(int argc, char *argv[])
     //
 
     QFile t_fileElec("./MNE-sample-data/warping/AVG4-0Years_GSN128.fif");
-    QList<FiffDigPoint> dig = FiffDigPoint::read(t_fileElec);
+//    QList<FiffDigPoint> dig = FiffDigPoint::read(t_fileElec);
+    FiffDigPointSet digset(t_fileElec);
 
 
         QList<QVector<float>> tempElecInfo;
         QList<int> ElecChanName;
-        for (int i = 0; i < dig.length(); ++i)
+        for (int i = 0; i < digset.size(); ++i)
         {
-            if (dig[i].kind == 3)
+            if (digset[i].kind == 3)
             {
                 QVector<float> temp;
-                ElecChanName.append(dig[i].ident);
-                temp.append(dig[i].r[0]);
-                temp.append(dig[i].r[1]);
-                temp.append(dig[i].r[2]);
+                ElecChanName.append(digset[i].ident);
+                temp.append(digset[i].r[0]);
+                temp.append(digset[i].r[1]);
+                temp.append(digset[i].r[2]);
                 tempElecInfo.append(temp);
             }
         }
@@ -185,9 +187,6 @@ int main(int argc, char *argv[])
             ElecPos(i,1) = tempElecInfo[i][1];
             ElecPos(i,2) = tempElecInfo[i][2];
         }
-        pos.setX(tDigitizer[i].r[0]);
-        pos.setY(tDigitizer[i].r[1]);
-        pos.setZ(tDigitizer[i].r[2]);
 
 //    std::cout << "Here is the matrix ElecPos:" << std::endl << ElecPos << std::endl;
 

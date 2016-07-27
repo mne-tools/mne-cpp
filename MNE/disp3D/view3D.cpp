@@ -41,6 +41,7 @@
 #include "view3D.h"
 
 #include <mne/mne_sourceestimate.h>
+#include <fiff/fiff_dig_point_set.h>
 #include "helpers/types.h"
 #include <iostream>
 
@@ -224,7 +225,7 @@ bool View3D::addBemData(const QString& subject, const QString& set, const MNELIB
 
 //*************************************************************************************************************
 
-bool View3D::addDigitizerData(const QString& subject, const QString& set, const QList<FIFFLIB::FiffDigPoint>& tDigitizer)
+bool View3D::addDigitizerData(const QString& subject, const QString& set, const FiffDigPointSet& tDigitizer)
 {
     return m_pData3DTreeModel->addData(subject, set, tDigitizer);
 }

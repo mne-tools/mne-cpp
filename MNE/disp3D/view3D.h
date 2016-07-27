@@ -81,6 +81,9 @@ namespace Qt3DCore {
     class QTransform;
 }
 
+namespace FIFFLIB{
+    class FiffDigPointSet;
+}
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -211,7 +214,7 @@ public:
     *
     * @return                       Returns true if successful.
     */
-    bool addDigitizerData(const QString& subject, const QString& set, const QList<FIFFLIB::FiffDigPoint>& tDigitizer);
+    bool addDigitizerData(const QString& subject, const QString& set, const FIFFLIB::FiffDigPointSet &tDigitizer);
 
     //=========================================================================================================
     /**
