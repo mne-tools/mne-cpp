@@ -135,6 +135,15 @@ public:
     */
     QList<double> getFrequencies();
 
+    //=========================================================================================================
+    /**
+    * gets pointer to private ScreenKeyboard-object
+    *
+    * @return  QSharedPointer to ScreenKeaboard-object
+    *
+    */
+    QSharedPointer<ScreenKeyboard> getScreenKeyboardSPtr();
+
 signals:
     void frequencyChanged();
     void settledPhrase(QString phrase);

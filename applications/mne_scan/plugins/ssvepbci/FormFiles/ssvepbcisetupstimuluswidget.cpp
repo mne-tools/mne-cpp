@@ -421,3 +421,10 @@ QList<double> ssvepBCISetupStimulusWidget::getFrequencies(){
 void ssvepBCIPlugin::ssvepBCISetupStimulusWidget::on_m_lineEdit_BCISpeller_textChanged(const QString &arg1){
     emit settledPhrase(arg1);
 }
+
+
+//*************************************************************************************************************
+
+QSharedPointer<ScreenKeyboard> ssvepBCISetupStimulusWidget::getScreenKeyboardSPtr(){
+    return m_pssvepBCIScreen->m_pScreenKeyboard;
+}

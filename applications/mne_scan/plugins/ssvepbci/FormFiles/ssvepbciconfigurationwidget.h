@@ -176,6 +176,11 @@ private slots:
     void numOfHarmonicsChanged(int harmonics);
     void channelSelectChanged(const QModelIndex &parent, int first, int last);
 
+
+    void on_m_pushButton_StartMeasurement_clicked();
+
+    void on_m_pushButton_StopMeasurement_clicked();
+
 signals:
     void getThresholdValues(MyQList Thresholds);
     void changeSSVEPParameter();

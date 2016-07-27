@@ -102,12 +102,15 @@ public:
 
 signals:
     void getLetter(QString letter);
+    void isCorrectCommand(bool correctCommand);
 
 public slots:
     void updateClassList(MyQList classList);
     void updateCommand(double value);
     void setPhrase(QString phrase);
     void initScreenKeyboard();
+    void initSpellAccuracyFeature();
+    void stopSpellAccuracyFeature();
 
 private:
     QSharedPointer<ssvepBCI>                        m_pSSVEPBCI;                        /**< pointer to the ssvepBCI class */
@@ -125,8 +128,10 @@ private:
 
     // speller
     bool                                    m_bDisplaySpeller;      /**< flag for displaying speller panel */
+    bool                                    m_bUseSpellAccuracy;    /**< flag for determine the spell accuracy */
     QString                                 m_sSettledPhrase;       /**< phrase established by the UI */
     QString                                 m_sSpelledPhrase;       /**< phrase spelled by the user with the SSVEPBCI */
+    QString::Iterator                       m_qSpellIterator;       /**< iterator for spelling */
 
     //=========================================================================================================
     /**

@@ -83,6 +83,7 @@ ssvepBCI::ssvepBCI()
 , m_bChangeSSVEPParameterFlag(false)
 , m_bInitializeSource(true)
 , m_iNumberOfClassHits(15)
+, m_iMaxClassListSize(50)
 {
     // Create configuration action bar item/button
     m_pActionBCIConfiguration = new QAction(QIcon(":/images/configuration.png"),tr("BCI configuration feature"),this);
@@ -566,10 +567,10 @@ void ssvepBCI::run(){
 
         if(m_bUseSensorData)
         {
-            QElapsedTimer timer;
-            timer.start();
+//            QElapsedTimer timer;
+//            timer.start();
             ssvepBCIOnSensor();
-            qDebug() << "ssvepBCI::run - ssvepBCIOnSensor() took" << timer.elapsed();
+//            qDebug() << "ssvepBCI::run - ssvepBCIOnSensor() took" << timer.elapsed();
         }
         else
         {
@@ -745,9 +746,9 @@ void ssvepBCI::ssvepBCIOnSensor()
         {
             // determine window size according to former counted miss classifications
             m_iWindowSize = 10;
-            if(m_iCounter <= 44 && m_iCounter > 24)
+            if(m_iCounter <= 50 && m_iCounter > 40)
                 m_iWindowSize = 20;
-            if(m_iCounter > 44)
+            if(m_iCounter > 50)
                 m_iWindowSize = 40;
             //cout << "Counter:" << m_iCounter << endl;
 
@@ -791,18 +792,9 @@ void ssvepBCI::ssvepBCIOnSensor()
             }
 
             // normalize features to probabilities and transfering it into a softmax function
-            ssvepProbabilities = m_dAlpha / ssvepProbabilities.sum() * ssvepProbabilities;  // m_dAlpha;
+            ssvepProbabilities = m_dAlpha / ssvepProbabilities.sum() * ssvepProbabilities;
             ssvepProbabilities = ssvepProbabilities.array().exp();                          // softmax function for better distinguishability between the probabilities
             ssvepProbabilities = 1 / ssvepProbabilities.sum() * ssvepProbabilities;
-
-            //cout << "probabilites:" << endl << ssvepProbabilities << endl;
-
-//            // transfer values to MyQList and emit signal for GUI
-//            m_lSSVEPProbabilities.clear();
-//            for(int i = 0; i < m_lDesFrequencies.size(); i++)
-//                m_lSSVEPProbabilities << ssvepProbabilities(i);
-//            if(!m_lSSVEPProbabilities.isEmpty())
-//                emit SSVEPprob(m_lSSVEPProbabilities);
 
             // classify probabilites
             int index = 0;
@@ -814,8 +806,9 @@ void ssvepBCI::ssvepBCIOnSensor()
                 if(m_lThresholdValues[index] < maxProbability){
                     //qDebug() << "comparison: "<<  m_lThresholdValues[index] << "and" << maxProbability;
                     m_lIndexOfClassResultSensor.append(index+1);
-//                    m_iCounter = -1;
                 }
+                else
+                    m_lIndexOfClassResultSensor.append(0);
             }
             else
                 m_lIndexOfClassResultSensor.append(0);
@@ -834,12 +827,12 @@ void ssvepBCI::ssvepBCIOnSensor()
     }
 
 
-    qDebug() << "Index-List: " << m_lIndexOfClassResultSensor;
+//    qDebug() << "Index-List: " << m_lIndexOfClassResultSensor;
     // emit classifiaction results if any classifiaction has been done
     if(!m_lIndexOfClassResultSensor.isEmpty()){
 
+        // finding a classifiaction result that satisfies the number of classifiaction hits
         for(int i = 1; (i <= m_lDesFrequencies.size()) && (!m_lIndexOfClassResultSensor.isEmpty() ); i++){
-
             if(m_lIndexOfClassResultSensor.count(i) >= m_iNumberOfClassHits){
                 emit classificationResult(m_lDesFrequencies[i - 1]);
                 m_lIndexOfClassResultSensor.clear();
@@ -849,11 +842,10 @@ void ssvepBCI::ssvepBCIOnSensor()
             else
               emit classificationResult(0);
         }
-//        m_lIndexOfClassResultSensor.removeAll(0);
-//        if(!m_lIndexOfClassResultSensor.isEmpty())
-//            emit classificationResult(m_lDesFrequencies[m_lIndexOfClassResultSensor.last() - 1]);
-//        else
-//            emit classificationResult(0);
+
+        // clear classifiaction if it hits its threshold
+        if(m_lIndexOfClassResultSensor.size() > m_iMaxClassListSize)
+            m_lIndexOfClassResultSensor.clear();
     }
 
     // calculate and emit signal of mean probabilities
@@ -862,7 +854,7 @@ void ssvepBCI::ssvepBCIOnSensor()
         for(int i = 0; i < m_lDesFrequencies.size(); i++)
             meanSSVEPProbabilities << m_matSSVEPProbabilities.row(i).mean();
         emit SSVEPprob(meanSSVEPProbabilities);
-        qDebug() << "emit ssvep:" << meanSSVEPProbabilities;
+        //qDebug() << "emit ssvep:" << meanSSVEPProbabilities;
     }
 
     // change parameter and reset the time window if the change flag has been set

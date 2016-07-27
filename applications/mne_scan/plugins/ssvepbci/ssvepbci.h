@@ -337,6 +337,7 @@ private:
     int                     m_iPowerLine;                       /**< frequency of the power line [Hz] */
     bool                    m_bChangeSSVEPParameterFlag;        /**< flag for chaning SSVEP parameter */
     int                     m_iNumberOfClassHits;               /**< Number of required classifiaction hits, before a classifiaction is confirmed */
+    int                     m_iMaxClassListSize;                /**< maximum size of m_lIndexOfClassResultSensor before it gets deleted */
 
     // Sensor level
     FiffInfo::SPtr          m_pFiffInfo_Sensor;                 /**< Sensor level: Fiff information for sensor data. */

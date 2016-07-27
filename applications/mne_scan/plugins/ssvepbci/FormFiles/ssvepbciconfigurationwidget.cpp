@@ -301,7 +301,7 @@ void ssvepBCIConfigurationWidget::updateThresholdsToScreen(){
 void ssvepBCIConfigurationWidget::setFrequencyLabels(MyQList frequencyList){
 
     // filling the list with missing zeros
-    for(int i = frequencyList.size(); i < 5; i++)
+    for(int i = frequencyList.size(); i < 6; i++)
         frequencyList << 0;
 
     // update frequency list
@@ -423,4 +423,29 @@ void ssvepBCIConfigurationWidget::resetThresholdValues(){
     ui->m_DoubleSpinBox_Threshold3->setValue(m_dMaxProbValue);
     ui->m_DoubleSpinBox_Threshold4->setValue(m_dMaxProbValue);
     ui->m_DoubleSpinBox_Threshold5->setValue(m_dMaxProbValue);
+}
+
+
+//*************************************************************************************************************
+
+void ssvepBCIPlugin::ssvepBCIConfigurationWidget::on_m_pushButton_StartMeasurement_clicked()
+{
+    if(m_pSSVEPBCI->m_pssvepBCISetupStimulusWidget != NULL){
+        QSharedPointer<ScreenKeyboard> pScreenKeyboard = m_pSSVEPBCI->m_pssvepBCISetupStimulusWidget->getScreenKeyboardSPtr();
+        if(pScreenKeyboard != NULL)
+            pScreenKeyboard->initSpellAccuracyFeature();
+    }
+}
+
+
+//*************************************************************************************************************
+
+void ssvepBCIPlugin::ssvepBCIConfigurationWidget::on_m_pushButton_StopMeasurement_clicked()
+{
+    if(m_pSSVEPBCI->m_pssvepBCISetupStimulusWidget != NULL){
+        QSharedPointer<ScreenKeyboard> pScreenKeyboard = m_pSSVEPBCI->m_pssvepBCISetupStimulusWidget->getScreenKeyboardSPtr();
+        if(pScreenKeyboard != NULL)
+            pScreenKeyboard->stopSpellAccuracyFeature();
+    }
+
 }
