@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     ioutils.cpp
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+* @file     digitizertreeitem.cpp
+* @author   Jana Kiesel <jana.kiesel@tu-ilmenau.de>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     March, 2013
+* @date     July, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Jana Kiesel and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the IOUtils class.
+* @brief    DigitizerTreeItem class definition.
 *
 */
 
@@ -38,15 +38,21 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "ioutils.h"
+#include "digitizertreeitem.h"
+
+#include "fiff/fiff_constants.h"
+#include "fiff/fiff_dig_point.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// INCLUDES
+// Qt INCLUDES
 //=============================================================================================================
 
-#include <QDataStream>
+#include <QMatrix4x4>
+#include <Qt3DExtras/QSphereMesh>
+#include <Qt3DExtras/QPhongMaterial>
+#include <Qt3DCore/QTransform>
 
 
 //*************************************************************************************************************
@@ -54,16 +60,13 @@
 // Eigen INCLUDES
 //=============================================================================================================
 
-#include <Eigen/Core>
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace Eigen;
-using namespace UTILSLIB;
+using namespace DISP3DLIB;
 
 
 //*************************************************************************************************************
@@ -71,170 +74,128 @@ using namespace UTILSLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-qint32 IOUtils::fread3(QDataStream &p_qStream)
+DigitizerTreeItem::DigitizerTreeItem(int iType, const QString& text)
+: AbstractTreeItem(iType, text)
+, m_pParentEntity(new Qt3DCore::QEntity())
+, m_pRenderable3DEntity(new Renderable3DEntity())
 {
-    char* bytes = new char[3];
-    p_qStream.readRawData(bytes, 3);
-    qint32 int3 = (((unsigned char) bytes[0]) << 16) + (((unsigned char) bytes[1]) << 8) + ((unsigned char) bytes[2]);
-    delete[] bytes;
-    return int3;
+    this->setEditable(false);
+    this->setCheckable(true);
+    this->setCheckState(Qt::Checked);
+    this->setToolTip(text);
 }
 
 
 //*************************************************************************************************************
 
-VectorXi IOUtils::fread3_many(QDataStream &p_qStream, qint32 count)
+DigitizerTreeItem::~DigitizerTreeItem()
 {
-    VectorXi res(count);
-
-    for(qint32 i = 0; i < count; ++i)
-        res[i] = IOUtils::fread3(p_qStream);
-
-    return res;
-}
-
-
-//*************************************************************************************************************
-//fiff_combat
-qint16 IOUtils::swap_short(qint16 source)
-{
-    unsigned char *csource = (unsigned char *)(&source);
-    qint16 result;
-    unsigned char *cresult =  (unsigned char *)(&result);
-
-    cresult[0] = csource[1];
-    cresult[1] = csource[0];
-    return (result);
 }
 
 
 //*************************************************************************************************************
 
-qint32 IOUtils::swap_int(qint32 source)
+QVariant DigitizerTreeItem::data(int role) const
 {
-    unsigned char *csource =  (unsigned char *)(&source);
-    qint32 result;
-    unsigned char *cresult =  (unsigned char *)(&result);
-
-    cresult[0] = csource[3];
-    cresult[1] = csource[2];
-    cresult[2] = csource[1];
-    cresult[3] = csource[0];
-    return (result);
+    return AbstractTreeItem::data(role);
 }
 
 
 //*************************************************************************************************************
 
-void IOUtils::swap_intp(qint32 *source)
-
+void  DigitizerTreeItem::setData(const QVariant& value, int role)
 {
-  unsigned char *csource =  (unsigned char *)(source);
+    AbstractTreeItem::setData(value, role);
 
-  unsigned char c;
-
-  c = csource[3];
-  csource[3] = csource[0];
-  csource[0] = c;
-  c = csource[2];
-  csource[2] = csource[1];
-  csource[1] = c;
-
-  return;
+    switch(role) {
+    case Data3DTreeModelItemRoles::SurfaceCurrentColorVert:
+        m_pRenderable3DEntity->setVertColor(value.value<QByteArray>());
+        break;
+    }
 }
 
 
 //*************************************************************************************************************
 
-qint64 IOUtils::swap_long(qint64 source)
+bool DigitizerTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer, Qt3DCore::QEntity* parent)
 {
-    unsigned char *csource =  (unsigned char *)(&source);
-    qint64    result;
-    unsigned char *cresult =  (unsigned char *)(&result);
+    //Create renderable 3D entity
+    m_pParentEntity = parent;
+    m_pRenderable3DEntity = new Renderable3DEntity(parent);
 
-    cresult[0] = csource[7];
-    cresult[1] = csource[6];
-    cresult[2] = csource[5];
-    cresult[3] = csource[4];
-    cresult[4] = csource[3];
-    cresult[5] = csource[2];
-    cresult[6] = csource[1];
-    cresult[7] = csource[0];
-    return (result);
+    QMatrix4x4 m;
+    Qt3DCore::QTransform* transform =  new Qt3DCore::QTransform();
+    m.rotate(180, QVector3D(0.0f, 1.0f, 0.0f));
+    m.rotate(-90, QVector3D(1.0f, 0.0f, 0.0f));
+    transform->setMatrix(m);
+    m_pRenderable3DEntity->addComponent(transform);
+
+    //Create sources as small 3D spheres
+    QVector3D pos;
+    Qt3DCore::QEntity* sourceSphereEntity;
+    Qt3DExtras::QSphereMesh* sourceSphere;
+    Qt3DExtras::QPhongMaterial* material;
+
+    for(int i = 0; i < tDigitizer.size(); ++i) {
+
+        pos.setX(tDigitizer[i].r[0]);
+        pos.setY(tDigitizer[i].r[1]);
+        pos.setZ(tDigitizer[i].r[2]);
+
+        sourceSphereEntity = new Qt3DCore::QEntity();
+
+        sourceSphere = new Qt3DExtras::QSphereMesh();
+        if (tDigitizer[i].kind==FIFFV_POINT_CARDINAL){
+            sourceSphere->setRadius(0.002f);
+        }
+        else{
+            sourceSphere->setRadius(0.001f);
+        }
+        sourceSphereEntity->addComponent(sourceSphere);
+
+        transform = new Qt3DCore::QTransform();
+        QMatrix4x4 m;
+        m.translate(pos);
+        transform->setMatrix(m);
+        sourceSphereEntity->addComponent(transform);
+
+        material = new Qt3DExtras::QPhongMaterial();
+        switch (tDigitizer[i].kind) {
+        case FIFFV_POINT_CARDINAL:
+            material->setAmbient(Qt::yellow);
+            break;
+        case FIFFV_POINT_HPI:
+            material->setAmbient(Qt::red);
+            break;
+        case FIFFV_POINT_EEG:
+            material->setAmbient(Qt::green);
+            break;
+        case FIFFV_POINT_EXTRA:
+            material->setAmbient(Qt::blue);
+            break;
+        default:
+            material->setAmbient(Qt::white);
+            break;
+        }
+        sourceSphereEntity->addComponent(material);
+
+        sourceSphereEntity->setParent(m_pRenderable3DEntity);
+    }
+    return true;
 }
 
 
 //*************************************************************************************************************
 
-void IOUtils::swap_longp(qint64 *source)
+void DigitizerTreeItem::setVisible(bool state)
 {
-    unsigned char *csource =  (unsigned char *)(source);
-    unsigned char c;
-
-    c = csource[0];
-    csource[0] = csource[7];
-    csource[7] = c;
-
-    c = csource[1];
-    csource[1] = csource[6];
-    csource[6] = c;
-
-    c = csource[2];
-    csource[2] = csource[5];
-    csource[5] = c;
-
-    c = csource[3];
-    csource[3] = csource[4];
-    csource[4] = c;
-
-    return;
+    m_pRenderable3DEntity->setParent(state ? m_pParentEntity : Q_NULLPTR);
 }
 
 
 //*************************************************************************************************************
 
-void IOUtils::swap_floatp(float *source)
-
+void DigitizerTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
 {
-    unsigned char *csource =  (unsigned char *)(source);
-    unsigned char c;
-
-    c = csource[3];
-    csource[3] = csource[0];
-    csource[0] = c;
-    c = csource[2];
-    csource[2] = csource[1];
-    csource[1] = c;
-
-    return;
+    this->setVisible(checkState==Qt::Unchecked ? false : true);
 }
-
-
-//*************************************************************************************************************
-
-void IOUtils::swap_doublep(double *source)
-
-{
-    unsigned char *csource =  (unsigned char *)(source);
-    unsigned char c;
-
-    c = csource[7];
-    csource[7] = csource[0];
-    csource[0] = c;
-
-    c = csource[6];
-    csource[6] = csource[1];
-    csource[1] = c;
-
-    c = csource[5];
-    csource[5] = csource[2];
-    csource[2] = c;
-
-    c = csource[4];
-    csource[4] = csource[3];
-    csource[3] = c;
-
-    return;
-}
-
-

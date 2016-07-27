@@ -1,15 +1,14 @@
 //=============================================================================================================
 /**
-* @file     mne_bem.h
-* @author   Jana Kiesel<jana.kiesel@tu-ilmenau.de>;
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     fiff_dig_point_set.h
+* @author   Jana Kiesel <jana.kiesel@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     July, 2012
+* @date     Jul, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2015, Jana Kiesel, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Jana Kiesel and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -19,7 +18,7 @@
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
 *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
-* 
+*
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
 * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
@@ -30,39 +29,20 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    MNEBem class declaration.
+* @brief     FiffDigPointSet class declaration.
 *
 */
 
-#ifndef MNE_BEM_H
-#define MNE_BEM_H
-
-//*************************************************************************************************************
-//=============================================================================================================
-// MNE INCLUDES
-//=============================================================================================================
-
-#include "mne_global.h"
-#include "mne_bem_surface.h"
+#ifndef FIFFLIB_FIFF_DIG_POINT_SET_H
+#define FIFFLIB_FIFF_DIG_POINT_SET_H
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FIFF INCLUDES
+// INCLUDES
 //=============================================================================================================
 
-#include <fiff/fiff_types.h>
-#include <fiff/fiff_dir_tree.h>
-#include <fiff/fiff.h>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// STL INCLUDES
-//=============================================================================================================
-
-#include <algorithm>
-#include <vector>
+#include "fiff_global.h"
 
 
 //*************************************************************************************************************
@@ -70,9 +50,17 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QList>
-#include <QIODevice>
 #include <QSharedPointer>
+#include <QIODevice>
+#include <QList>
+
+#include "fiff_stream.h"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
 
 
 //*************************************************************************************************************
@@ -80,72 +68,84 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FSLIB
-{
-class Label;
-}
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE FIFFLIB
+//=============================================================================================================
+
+namespace FIFFLIB {
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MNE
+// FIFFLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace MNELIB
-{
+class FiffDigPoint;
+class FiffDirTree;
 
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
 
 //=============================================================================================================
 /**
-* BEM descritpion
+* The FiffDigPointSet hold a set of Digitizer Points and read, write and transform function.
 *
-* @brief BEM descritpion
+* @brief Holds a set of digitizer points.
 */
-class MNESHARED_EXPORT MNEBem
+
+class FIFFSHARED_EXPORT FiffDigPointSet
 {
+
 public:
-    typedef QSharedPointer<MNEBem> SPtr;            /**< Shared pointer type for MNEBem. */
-    typedef QSharedPointer<const MNEBem> ConstSPtr; /**< Const shared pointer type for MNEBem. */
+    typedef QSharedPointer<FiffDigPointSet> SPtr;            /**< Shared pointer type for FiffDigPointSet. */
+    typedef QSharedPointer<const FiffDigPointSet> ConstSPtr; /**< Const shared pointer type for FiffDigPointSet. */
 
     //=========================================================================================================
     /**
-    * Default constructor
+    * Constructs a FiffDigPointSet object.
     */
-    MNEBem();
+    FiffDigPointSet();
 
     //=========================================================================================================
     /**
     * Copy constructor.
     *
-    * @param[in] p_MNEBem   MNE BEM
+    * @param[in] p_FiffDigPointSet
     */
-    MNEBem(const MNEBem &p_MNEBem);
+    FiffDigPointSet(const FiffDigPointSet &p_FiffDigPointSet);
 
     //=========================================================================================================
     /**
     * Default constructor
     */
-    MNEBem(QIODevice &p_IODevice);
+    FiffDigPointSet(QIODevice &p_IODevice);
 
     //=========================================================================================================
     /**
-    * Destroys the MNE Bem
+    * Destroys the FiffDigPointSet
     */
-    ~MNEBem();
+    ~FiffDigPointSet();
 
     //=========================================================================================================
     /**
-    * Initializes MNE Bem
+    * Reads FiffDigPointSet from a fif file
+    *
+    * @param [in, out] p_pStream    The opened fif file
+    * @param [in, out] p_Tree       Search for the bem surface here
+    *
+    * @return true if succeeded, false otherwise
     */
-    void clear();
+    static bool readFromStream(FiffStream::SPtr& p_pStream, FiffDirTree& p_Tree, FiffDigPointSet& p_Dig);
 
     //=========================================================================================================
     /**
-    * True if MNE Bem is empty.
+    * Initializes FiffDigPointSet
+    */
+    inline void clear();
+
+    //=========================================================================================================
+    /**
+    * True if FiffDigPointSet is empty.
     *
     * @return true if MNE Bem is empty
     */
@@ -153,122 +153,93 @@ public:
 
     //=========================================================================================================
     /**
-    * ### MNE toolbox root function ###: Implementation of the mne_read_bem_surface function
+    * Returns the number of stored FiffDigPoints
     *
-    * Reads Bem surface from a fif file
-    *
-    * @param [in,out] p_pStream     The opened fif file
-    * @param [in] add_geom          Add geometry information to the Bem Surface
-    * @param [in, out] p_Tree       Search for the bem surface here
-    *
-    * @return true if succeeded, false otherwise
-    */
-    static bool readFromStream(FiffStream::SPtr& p_pStream, bool add_geom, FiffDirTree& p_Tree, MNEBem &p_Bem);
-
-    //=========================================================================================================
-    /**
-    * Returns the number of stored bem surfaces
-    *
-    * @return number of stored bem surfaces
+    * @return number of stored FiffDigPoints
     */
     inline qint32 size() const;
 
     //=========================================================================================================
     /**
-    * MNE Toolbox function mne_write_bem_surfaces_block
+    * Subscript operator [] to access FiffDigPoint by index
     *
-    * Write the Bem to a FIF file
+    * @param[in] idx    the FiffDigPoint index.
     *
-    * @param [in] p_IODevice   IO device to write the bem to.
+    * @return FiffDigPoint related to the parameter index.
     */
-    void write(QIODevice &p_IODevice);
+    const FiffDigPoint& operator[] (qint32 idx) const;
 
     //=========================================================================================================
     /**
-    * MNE Toolbox function mne_write_bem_surfaces_block
+    * Subscript operator [] to access FiffDigPoint by index
     *
-    * Write the Bem to a FIF stream
+    * @param[in] idx    the FiffDigPoint index.
     *
-    * @param[in] p_pStream  The stream to write to.
+    * @return FiffDigPoint related to the parameter index.
     */
-    void writeToStream(FiffStream *p_pStream);
+    FiffDigPoint& operator[] (qint32 idx);
 
     //=========================================================================================================
     /**
-    * Subscript operator [] to access bem_surface by index
+    * Subscript operator << to add a new FiffDigPoint
     *
-    * @param[in] idx    the surface index (0,1 or 2).
+    * @param[in] dig    FiffDigPoint to be added
     *
-    * @return MNEBemSurface related to the parameter index.
+    * @return FiffDigPointSet
     */
-    const MNEBemSurface& operator[] (qint32 idx) const;
+    FiffDigPointSet& operator<< (const FiffDigPoint& dig);
 
     //=========================================================================================================
     /**
-    * Subscript operator [] to access bem_surface by index
+    * Subscript operator << to add a new FiffDigPoint
     *
-    * @param[in] idx    the surface index (0,1 or 2).
+    * @param[in] dig    FiffDigPoint to be added
     *
-    * @return MNEBemSurface related to the parameter index.
+    * @return FiffDigPointSet
     */
-    MNEBemSurface& operator[] (qint32 idx);
+    FiffDigPointSet& operator<< (const FiffDigPoint* dig);
 
-    //=========================================================================================================
-    /**
-    * Subscript operator << to add a new bem_surface
-    *
-    * @param[in] surf   BemSurface to be added
-    *
-    * @return MNEBem
-    */
-    MNEBem& operator<< (const MNEBemSurface& surf);
-
-    //=========================================================================================================
-    /**
-    * Subscript operator << to add a new bem_surface
-    *
-    * @param[in] surf   BemSurface to be added
-    *
-    * @return MNEBem
-    */
-    MNEBem& operator<< (const MNEBemSurface* surf);
+//    ToDo:
+//    //=========================================================================================================
+//    /**
+//    * Write the FiffDigPointSet to a FIF file
+//    *
+//    * @param [in] p_IODevice   IO device to write the FiffDigPointSet to.
+//    */
+//    void write(QIODevice &p_IODevice);
 
 protected:
-    //=========================================================================================================
-    /**
-    * Implementation of the read_bem_surface function in e.g. mne_read_bem_surface.m
-    * Reads a single bem surface
-    *
-    * @param [in] p_pStream         The opened fif file
-    * @param [in] p_Tree            Search for the bem surface here
-    * @param [out] p_BemSurface     The read BemSurface
-    *
-    * @return true if succeeded, false otherwise
-    */
-    static bool readBemSurface(FiffStream* p_pStream, const FiffDirTree& p_Tree, MNEBemSurface& p_BemSurface);
 
 private:
-    QList<MNEBemSurface> m_qListBemSurface;    /**< List of the BEM Surfaces. */
+    QList<FiffDigPoint> m_qListDigPoint;    /**< List of digitizer Points. */
+
 };
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline bool MNEBem::isEmpty() const
+inline void FiffDigPointSet::clear()
 {
-    return m_qListBemSurface.size() == 0;
+    m_qListDigPoint.clear();
 }
 
 //*************************************************************************************************************
 
-inline qint32 MNEBem::size() const
+inline bool FiffDigPointSet::isEmpty() const
 {
-    return m_qListBemSurface.size();
+    return m_qListDigPoint.size() == 0;
 }
 
-} // NAMESPACE
+//*************************************************************************************************************
 
+inline qint32 FiffDigPointSet::size() const
+{
+    return m_qListDigPoint.size();
+}
 
-#endif // MNE_BEM_H
+} // namespace FIFFLIB
+
+#endif // FIFFLIB_FIFF_DIG_POINT_SET_H
