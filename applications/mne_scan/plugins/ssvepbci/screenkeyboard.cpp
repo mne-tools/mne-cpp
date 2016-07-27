@@ -72,6 +72,7 @@ ScreenKeyboard::ScreenKeyboard(QSharedPointer<ssvepBCI> pSSVEPBCI, QSharedPointe
 , m_bDisplaySpeller(false)
 , m_bInitializeKeyboard(true)
 , m_bUpdatePhraseDisplay(true)
+, m_bUseSpellAccuracy(false)
 {
     // initialize map for keyboard values and their relative coordinates to each other
     m_mapKeys[QPair<int, int>( 0, 0)] = "E";
@@ -277,11 +278,30 @@ void ScreenKeyboard::updateCommand(double value){
         break;
     }
 
-    // check new cursor position -> then update
+    // accuracy feature of the screen keyboard
+    if(m_bUseSpellAccuracy && index >= 0){
+
+        // determine the next correct index-command
+        QPair<int, int> nextCoord = m_mapKeys.key(*m_qSpellIterator);
+        qDebug() << "next sign:" << *m_qSpellIterator;
+
+        int difX = nextCoord.first - m_qCurCursorCoord.first;
+        int difY = nextCoord.second - m_qCurCursorCoord.second;
+
+        if((difX + deltaX < difX || difY + deltaY < difY) && (m_mapKeys.contains(QPair<int, int> (m_qCurCursorCoord.first + deltaX, m_qCurCursorCoord.second + deltaY))))
+            qDebug() << "correct command";
+        else
+            qDebug() << "wrong command";
+
+
+    }
+
+    // check existence of new cursor position -> then update
     if(m_mapKeys.contains(QPair<int, int> (m_qCurCursorCoord.first + deltaX, m_qCurCursorCoord.second + deltaY))){
         m_qCurCursorCoord.first    += deltaX;
         m_qCurCursorCoord.second   += deltaY;
     }
+
 }
 
 
@@ -295,6 +315,9 @@ void ScreenKeyboard::setPhrase(QString phrase){
     // set required flags
     m_bDisplaySpeller = true;
     m_bUpdatePhraseDisplay = true;
+
+    if(m_bUseSpellAccuracy)
+        initSpellAccuracyFeature();
 }
 
 
@@ -320,4 +343,23 @@ void ScreenKeyboard::spellLetter(QString letter){
 void ScreenKeyboard::initScreenKeyboard(){
     m_bInitializeKeyboard = true;
     m_qOldCursorCoord = QPair<int, int>(100,100);
+}
+
+
+//*************************************************************************************************************
+
+void ScreenKeyboard::initSpellAccuracyFeature(){
+
+    // initialize spell iterator to settled phrase
+    m_qSpellIterator = m_sSettledPhrase.begin();
+
+    m_bUseSpellAccuracy = true;
+}
+
+
+//*************************************************************************************************************
+
+void ScreenKeyboard::stopSpellAccuracyFeature(){
+
+    m_bUseSpellAccuracy = false;
 }
