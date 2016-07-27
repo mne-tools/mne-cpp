@@ -54,6 +54,8 @@
 #include <QIODevice>
 #include <QList>
 
+#include "fiff_stream.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -81,6 +83,7 @@ namespace FIFFLIB {
 //=============================================================================================================
 
 class FiffDigPoint;
+class FiffDirTree;
 
 
 //=============================================================================================================
@@ -122,6 +125,17 @@ public:
     * Destroys the FiffDigPointSet
     */
     ~FiffDigPointSet();
+
+    //=========================================================================================================
+    /**
+    * Reads FiffDigPointSet from a fif file
+    *
+    * @param [in, out] p_pStream    The opened fif file
+    * @param [in, out] p_Tree       Search for the bem surface here
+    *
+    * @return true if succeeded, false otherwise
+    */
+    static bool readFromStream(FiffStream::SPtr& p_pStream, FiffDirTree& p_Tree, FiffDigPointSet& p_Dig);
 
     //=========================================================================================================
     /**
