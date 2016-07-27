@@ -119,7 +119,9 @@ protected:
 	
 private:
 	
+@if %{isQObject}
 signals:
+@endif
 
 };
 

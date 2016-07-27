@@ -59,6 +59,8 @@
 // Eigen INCLUDES
 //=============================================================================================================
 
+#include <unsupported/Eigen/FFT>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -66,6 +68,7 @@
 //=============================================================================================================
 
 using namespace CONNECTLIB;
+using namespace Eigen;
 
 
 //*************************************************************************************************************
@@ -82,3 +85,174 @@ using namespace CONNECTLIB;
 ConnectivityMeasures::ConnectivityMeasures()
 {
 }
+
+
+//*************************************************************************************************************
+
+Eigen::MatrixXd ConnectivityMeasures::crossCorrelation(const Eigen::MatrixXd& matDataIn)
+{
+    MatrixXd matDist(matDataIn.rows(), matDataIn.rows());
+
+    for(int i = 0; i < matDist.rows(); ++i)
+    {
+        for(int j = 0; j < matDist.rows(); ++j)
+        {
+            QPair<double, double> crossCorrPair = eigenCrossCorrelation(matDist.row(i), matDist.row(j));
+            matDist(i,j) = crossCorrPair.second;
+        }
+    }
+
+    return matDist;
+}
+
+
+//*************************************************************************************************************
+
+QPair<double, double> ConnectivityMeasures::eigenCrossCorrelation(const RowVectorXd& xCorrInputVecFirstIn, const RowVectorXd& xCorrInputVecSecondIn)
+//std::pair<double, double> ConnectivityMeasures::eigenCrossCorrelation(std::vector<double>& xCorrInputVecFirst, std::vector<double>& xCorrInputVecSecond)
+{
+//    Eigen::FFT<double> fft;
+//    int N = std::max(xCorrInputVecFirst.size(), xCorrInputVecSecond.size());
+
+//    //Compute the FFT size as the "next power of 2" of the input vector's length (max)
+//    int b = ceil(log2(2.0 * N - 1));
+//    int fftsize = pow(2,b);
+//    int end = fftsize - 1;
+//    int maxlag = N - 1;
+//    size_t firstSize = xCorrInputVecFirst.size();
+//    size_t secondSize = xCorrInputVecSecond.size();
+
+//    //Zero Padd
+//    for (int i = xCorrInputVecFirst.size(); i < fftsize; i++)
+//    {
+//        xCorrInputVecFirst.push_back(0);
+//    }
+
+//    for (int i = xCorrInputVecSecond.size(); i < fftsize; i++)
+//    {
+//        xCorrInputVecSecond.push_back(0);
+//    }
+
+//    std::vector<std::complex<double> > freqvec;
+//    std::vector<std::complex<double> > freqvec2;
+
+//    //FFT for freq domain to both vectors
+//    fft.fwd( freqvec,xCorrInputVecFirst);
+//    fft.fwd( freqvec2,xCorrInputVecSecond);
+
+//    //Main step of cross corr
+//    for (int i = 0; i < fftsize; i++)
+//    {
+//        freqvec[i] = freqvec[i] * std::conj(freqvec2[i]);
+//    }
+
+//    std::vector<double> result;
+//    fft.inv(result, freqvec);
+
+//    //Will get rid of extra zero padding and move minus lags to beginning without copy
+//    std::vector<double> result2(std::make_move_iterator(result.begin() + end - maxlag + 1),
+//                                std::make_move_iterator(result.end()));
+
+//    result2.insert(result2.end(), make_move_iterator(result.begin())
+//                   , make_move_iterator(result.begin()+maxlag));
+
+
+//    auto minMaxRange = std::minmax_element(result2.begin(),
+//                        result2.end());
+
+//    //Will take back the changes which made in input vector
+//    if (xCorrInputVecFirst.size() != firstSize)
+//        xCorrInputVecFirst.resize(firstSize);
+//    if (xCorrInputVecSecond.size() != secondSize)
+//        xCorrInputVecSecond.resize(secondSize);
+
+
+//    //Return val
+//    auto resultIndex = ((minMaxRange.second - result2.begin()) - N + 1);
+
+//    auto maxValue = result[minMaxRange.second - result.begin()];
+//    return std::make_pair (resultIndex, maxValue);
+
+    RowVectorXd xCorrInputVecFirst = xCorrInputVecFirstIn;
+    RowVectorXd xCorrInputVecSecond = xCorrInputVecSecondIn;
+
+    Eigen::FFT<double> fft;
+    int N = std::max(xCorrInputVecFirst.cols(), xCorrInputVecSecond.cols());
+
+    //Compute the FFT size as the "next power of 2" of the input vector's length (max)
+    int b = ceil(log2(2.0 * N - 1));
+    int fftsize = pow(2,b);
+    int end = fftsize - 1;
+    int maxlag = N - 1;
+    int firstSize = xCorrInputVecFirst.cols();
+    int secondSize = xCorrInputVecSecond.cols();
+
+    //Zero Padd
+    for (int i = xCorrInputVecFirst.cols(); i < fftsize; ++i)
+    {
+        xCorrInputVecFirst[i] = 0;
+    }
+
+    for (int i = xCorrInputVecSecond.cols(); i < fftsize; ++i)
+    {
+        xCorrInputVecSecond[i] = 0;
+    }
+
+    VectorXcd freqvec;
+    VectorXcd freqvec2;
+
+    //FFT for freq domain to both vectors
+    fft.fwd( freqvec,xCorrInputVecFirst);
+    fft.fwd( freqvec2,xCorrInputVecSecond);
+
+    //Create conjugate complex
+    freqvec2.conjugate();
+
+    //Main step of cross corr
+    for (int i = 0; i < fftsize; i++)
+    {
+        freqvec[i] = freqvec[i] * freqvec2[i];
+    }
+
+    VectorXd result;
+    fft.inv(result, freqvec);
+
+    //Will get rid of extra zero padding and move minus lags to beginning without copy
+    VectorXd result2 = result.segment( end - maxlag + 1, maxlag);
+
+//            (std::make_move_iterator(result.begin() + end - maxlag + 1),
+//                                std::make_move_iterator(result.end()));
+
+//    result2.insert(result2.end(), make_move_iterator(result.begin())
+//                   , make_move_iterator(result.begin()+maxlag));
+
+    QPair<int,int> minMaxRange;
+    int idx = 0;
+    result2.minCoeff(&idx);
+    minMaxRange.first = idx;
+    result2.maxCoeff(&idx);
+    minMaxRange.second = idx;
+
+    //Will take back the changes which made in input vector
+    if (xCorrInputVecFirst.cols() != firstSize)
+    {
+        xCorrInputVecFirst.resize(firstSize);
+    }
+
+    if (xCorrInputVecSecond.cols() != secondSize)
+    {
+        xCorrInputVecSecond.resize(secondSize);
+    }
+
+    //Return val
+    auto resultIndex = minMaxRange.second;
+    auto maxValue = result2(minMaxRange.second);
+
+    return QPair<int,int>(resultIndex, maxValue);
+}
+
+
+
+
+
+
