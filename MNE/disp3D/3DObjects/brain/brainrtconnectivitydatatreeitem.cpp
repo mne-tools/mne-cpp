@@ -120,7 +120,7 @@ void  BrainRTConnectivityDataTreeItem::setData(const QVariant& value, int role)
 
 //*************************************************************************************************************
 
-bool BrainRTConnectivityDataTreeItem::init(const MNEForwardSolution& tForwardSolution, int iHemi)
+bool BrainRTConnectivityDataTreeItem::init(const MNEForwardSolution& tForwardSolution, const MatrixX3f& matVertLeftHemi, const MatrixX3f& matVertRightHemi, int iHemi)
 {   
     //Set hemisphere information as item's data
     this->setData(iHemi, Data3DTreeModelItemRoles::RTHemi);
@@ -129,6 +129,26 @@ bool BrainRTConnectivityDataTreeItem::init(const MNEForwardSolution& tForwardSol
     bool isClustered = tForwardSolution.src[iHemi].isClustered();
 
     QVariant data;
+
+    //Store indices for eac source/dipole
+    for(int i = 0; i < tForwardSolution.src.size(); ++i) {
+        if(isClustered) {
+            //When clustered source space, the idx no's are the annotation labels. Take the .cluster_info.centroidVertno instead.
+            VectorXi clustVertNo(tForwardSolution.src[i].cluster_info.centroidVertno.size());
+            for(int j = 0; j < clustVertNo.rows(); ++j) {
+                clustVertNo(j) = tForwardSolution.src[i].cluster_info.centroidVertno.at(j);
+            }
+            data.setValue(clustVertNo);
+        } else {
+            data.setValue(tForwardSolution.src[i].vertno);
+        }
+
+        if(i == 0) {
+            this->setData(data, Data3DTreeModelItemRoles::RTVertNoLeftHemi);
+        } else if (i == 1) {
+            this->setData(data, Data3DTreeModelItemRoles::RTVertNoRightHemi);
+        }
+    }
 
     //Add meta information as item children
     QString sIsClustered = isClustered ? "Clustered" : "Full";
