@@ -87,7 +87,6 @@ namespace CONNECTLIB {
 *
 * @brief Brief description of this class.
 */
-
 class CONNECTIVITYSHARED_EXPORT ConnectivityMeasures
 {
 
