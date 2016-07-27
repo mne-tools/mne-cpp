@@ -164,8 +164,6 @@ bool MNEBemSurface::addTriangleData()
 
         this->tri_area(i) = size/2.0f;
         this->tri_nn.row(i) /= size;
-
-
     }
 
     std::fstream doc("./Output/tri_area.dat", std::ofstream::out | std::ofstream::trunc);
@@ -187,30 +185,32 @@ bool MNEBemSurface::addTriangleData()
 bool MNEBemSurface::addVertexNormals()
 {
 
-      //
-      //   Accumulate the vertex normals
-      //
+    //
+    //   Accumulate the vertex normals
+    //
 
-        for (qint32 p = 0; p < this->ntri; p++)         //check each triangle
-        {
-            for (qint32 j=0; j<3 ; j++)
-            {
-                int nodenr;
-                nodenr = this->tris(p,j);               //find the corners(nodes) of the triangles
-                this->nn(nodenr,0) += this->tri_nn(p,0);  //add the triangle normal to the nodenormal
-                this->nn(nodenr,1) += this->tri_nn(p,1);
-                this->nn(nodenr,2) += this->tri_nn(p,2);
-            }
-        }
+//    this->nn.resize(this->np,3);
 
-            // normalize
-        for (qint32 p = 0; p < this->np; p++)
+    for (qint32 p = 0; p < this->ntri; ++p)         //check each triangle
+    {
+        for (qint32 j = 0; j < 3 ; ++j)
         {
-            float size = 0;
-            size = this->nn.row(p)*this->nn.row(p).transpose();
-            size = std::pow(size, 0.5f );
-            this->nn.row(p) /= size;
+            int nodenr;
+            nodenr = this->tris(p,j);               //find the corners(nodes) of the triangles
+            this->nn(nodenr,0) += this->tri_nn(p,0);  //add the triangle normal to the nodenormal
+            this->nn(nodenr,1) += this->tri_nn(p,1);
+            this->nn(nodenr,2) += this->tri_nn(p,2);
         }
+    }
+
+    // normalize
+    for (qint32 p = 0; p < this->np; ++p)
+    {
+        float size = 0;
+        size = this->nn.row(p)*this->nn.row(p).transpose();
+        size = std::pow(size, 0.5f );
+        this->nn.row(p) /= size;
+    }
 
 return true;
 }

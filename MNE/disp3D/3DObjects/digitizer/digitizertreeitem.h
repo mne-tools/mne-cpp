@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     fiff_dig_point.h
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     digitizertreeitem.h
+* @author   Jana Kiesel <jana.kiesel@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     July, 2012
+* @date     July, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Jana Kiesel and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -18,7 +18,7 @@
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
 *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
-* 
+*
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
 * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
@@ -29,21 +29,19 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    FiffDigPoint class declaration.
+* @brief     DigitizerTreeItem class declaration.
 *
 */
 
-#ifndef FIFF_DIG_POINT_H
-#define FIFF_DIG_POINT_H
+#ifndef DIGITIZERTREEITEM_H
+#define DIGITIZERTREEITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FIFF INCLUDES
+// INCLUDES
 //=============================================================================================================
 
-#include "fiff_global.h"
-#include "fiff_types.h"
-
+#include "../../helpers/abstracttreeitem.h"
 
 
 //*************************************************************************************************************
@@ -51,91 +49,107 @@
 // Qt INCLUDES
 //=============================================================================================================
 
-#include <QSharedPointer>
-#include <QDebug>
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE FIFFLIB
+// FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB
+namespace FIFFLIB{
+    class FiffDigPoint;
+}
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE DISP3DLIB
+//=============================================================================================================
+
+namespace DISP3DLIB
 {
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// FORWARD DECLARATIONS
 //=============================================================================================================
 
 
 //=============================================================================================================
 /**
-* Replaces _fiffDigPointRec struct.
+* DigitizerTreeItem provides a generic tree item to hold digitizer data.
 *
-* @brief Digitization point description
+* @brief Provides a generic digitizer tree item.
 */
-class FIFFSHARED_EXPORT FiffDigPoint
+class DISP3DNEWSHARED_EXPORT DigitizerTreeItem : public AbstractTreeItem
 {
-public:
-    typedef QSharedPointer<FiffDigPoint> SPtr;              /**< Shared pointer type for FiffDigPoint. */
-    typedef QSharedPointer<const FiffDigPoint> ConstSPtr;   /**< Const shared pointer type for FiffDigPoint. */
-
-    //=========================================================================================================
-    /**
-    * Constructs the digitization point description
-    */
-    FiffDigPoint();
-
-    //=========================================================================================================
-    /**
-    * Copy constructor.
-    *
-    * @param[in] p_FiffDigPoint   Digitization point descriptor which should be copied
-    */
-    FiffDigPoint(const FiffDigPoint& p_FiffDigPoint);
-
-    //=========================================================================================================
-    /**
-    * Destroys the digitization point description
-    */
-    ~FiffDigPoint();
-
-    //=========================================================================================================
-    /**
-    * Size of the old struct (fiffDigPointRec) 5*int = 5*4 = 20
-    *
-    * @return the size of the old struct fiffDigPointRec.
-    */
-    inline static qint32 storageSize();
+    Q_OBJECT
 
 public:
-    fiff_int_t      kind;           /**< FIFFV_POINT_CARDINAL, FIFFV_POINT_HPI, FIFFV_POINT_EXTRA or FIFFV_POINT_EEG */
-    fiff_int_t      ident;          /**< Number identifying this point */
-    fiff_float_t    r[3];           /**< Point location */
-    fiff_int_t      coord_frame;    /**< Newly added to stay consistent with fiff MATLAB implementation */
+    typedef QSharedPointer<DigitizerTreeItem> SPtr;             /**< Shared pointer type for DigitizerTreeItem class. */
+    typedef QSharedPointer<const DigitizerTreeItem> ConstSPtr;  /**< Const shared pointer type for DigitizerTreeItem class. */
 
-// ### OLD STRUCT ###
-// typedef struct _fiffDigPointRec {
-//  fiff_int_t kind;         /**< FIFFV_POINT_CARDINAL, FIFFV_POINT_HPI, FIFFV_POINT_EXTRA or FIFFV_POINT_EEG *
-//  fiff_int_t ident;        /**< Number identifying this point *
-//  fiff_float_t r[3];       /**< Point location *
-//  fiff_int_t coord_frame;  /**< Newly added to stay consistent with fiff MATLAB implementation *
-// } fiffDigPointRec, *fiffDigPoint; /**< Digitization point description *
-// typedef fiffDigPointRec  fiff_dig_point_t;
+    //=========================================================================================================
+    /**
+    * Default constructor.
+    *
+    * @param[in] iType      The type of the item. See types.h for declaration and definition.
+    * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
+    */
+    explicit DigitizerTreeItem(int iType = Data3DTreeModelItemTypes::SourceSpaceItem, const QString& text = "Source space");
+
+    //=========================================================================================================
+    /**
+    * Default destructor
+    */
+    ~DigitizerTreeItem();
+
+    //=========================================================================================================
+    /**
+    * AbstractTreeItem functions
+    */
+    QVariant data(int role = Qt::UserRole + 1) const;
+    void setData(const QVariant& value, int role = Qt::UserRole + 1);
+
+    //=========================================================================================================
+    /**
+    * Adds FreeSurfer data based on surface and annotation data to this item.
+    *
+    * @param[in] tDigitizer         The digitizer data.
+    * @param[in] parent             The Qt3D entity parent of the new item.
+    *
+    * @return                       Returns true if successful.
+    */
+    bool addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer, Qt3DCore::QEntity* parent);
+
+    //=========================================================================================================
+    /**
+    * Call this function whenever you want to change the visibilty of the 3D rendered content.
+    *
+    * @param[in] state     The visiblity flag.
+    */
+    void setVisible(bool state);
+
+private:
+    //=========================================================================================================
+    /**
+    * Call this function whenever the check box of this item was checked.
+    *
+    * @param[in] checkState        The current checkstate.
+    */
+    virtual void onCheckStateChanged(const Qt::CheckState& checkState);
+
+    Qt3DCore::QEntity*      m_pParentEntity;                            /**< The parent 3D entity. */
+    Renderable3DEntity*     m_pRenderable3DEntity;                      /**< The renderable 3D entity. */
+
+    QObjectList             m_lChildren;
 };
 
+} //NAMESPACE DISP3DLIB
 
-//*************************************************************************************************************
-//=============================================================================================================
-// INLINE DEFINITIONS
-//=============================================================================================================
-
-inline qint32 FiffDigPoint::storageSize()
-{
-    return 20;
-}
-
-} // NAMESPACE
-
-#endif // FIFF_DIG_POINT_H
+#endif // DIGITIZERTREEITEM_H
