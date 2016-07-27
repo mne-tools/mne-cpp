@@ -48,7 +48,6 @@
 //=============================================================================================================
 
 #include "fiff_dig_point.h"
-#include "fiff_stream.h"
 #include "fiff_dir_tree.h"
 #include "fiff_tag.h"
 #include "fiff_types.h"
@@ -102,26 +101,58 @@ FiffDigPointSet::FiffDigPointSet(const FiffDigPointSet &p_FiffDigPointSet)
 //*************************************************************************************************************
 
 FiffDigPointSet::FiffDigPointSet(QIODevice &p_IODevice)   //const FiffDigPointSet &p_FiffDigPointSet
-//: m_qListDigPoint()
 {
     //
     //   Open the file
     //
     FiffStream::SPtr t_pStream(new FiffStream(&p_IODevice));
-    QString t_sFileName = t_pStream->streamName();
-
-    printf("Opening header data %s...\n",t_sFileName.toUtf8().constData());
-
     FiffDirTree t_Tree;
-    QList<FiffDirEntry> t_Dir;
-    if(!t_pStream->open(t_Tree, t_Dir))
+
+    if(!FiffDigPointSet::readFromStream(t_pStream, t_Tree, *this))
     {
-        qDebug()<<"Can not open the Electrode File";
+        t_pStream->device()->close();
+        qDebug() << "Could not read the FiffDigPointSet\n"; // ToDo throw error
     }
+}
+
+
+//*************************************************************************************************************
+
+FiffDigPointSet::~FiffDigPointSet()
+{
+
+}
+
+
+//*************************************************************************************************************
+
+bool FiffDigPointSet::readFromStream(FiffStream::SPtr &p_pStream, FiffDirTree &p_Tree, FiffDigPointSet &p_Dig)
+{
+    //
+    //   Open the file, create directory
+    //
+    bool open_here = false;
+
+    if (!p_pStream->device()->isOpen())
+    {
+        QList<FiffDirEntry> t_Dir;
+        QString t_sFileName = p_pStream->streamName();
+
+        if(!p_pStream->open(p_Tree, t_Dir))
+        {
+            return false;
+        }
+        printf("Opening header data %s...\n",t_sFileName.toUtf8().constData());
+
+        open_here = true;
+//        if(t_pDir)
+//            delete t_pDir;
+    }
+
     //
     //   Read the measurement info
     //
-    //read_hpi_info(t_pStream,t_Tree, info);
+    //read_hpi_info(p_pStream,p_Tree, info);
     fiff_int_t kind = -1;
     fiff_int_t pos = -1;
     FiffTag::SPtr t_pTag;
@@ -129,7 +160,7 @@ FiffDigPointSet::FiffDigPointSet(QIODevice &p_IODevice)   //const FiffDigPointSe
     //
     //   Locate the Electrodes
     //
-    QList<FiffDirTree> isotrak = t_Tree.dir_tree_find(FIFFB_ISOTRAK);
+    QList<FiffDirTree> isotrak = p_Tree.dir_tree_find(FIFFB_ISOTRAK);
 
     fiff_int_t coord_frame = FIFFV_COORD_HEAD;
     FiffCoordTrans dig_trans;
@@ -143,43 +174,39 @@ FiffDigPointSet::FiffDigPointSet(QIODevice &p_IODevice)   //const FiffDigPointSe
             pos  = isotrak[0].dir[k].pos;
             if (kind == FIFF_DIG_POINT)
             {
-                FiffTag::read_tag(t_pStream.data(), t_pTag, pos);
-                this->m_qListDigPoint.append(t_pTag->toDigPoint());
+                FiffTag::read_tag(p_pStream.data(), t_pTag, pos);
+                p_Dig.m_qListDigPoint.append(t_pTag->toDigPoint());
             }
             else
             {
                 if (kind == FIFF_MNE_COORD_FRAME)
                 {
-                    FiffTag::read_tag(t_pStream.data(), t_pTag, pos);
+                    FiffTag::read_tag(p_pStream.data(), t_pTag, pos);
                     qDebug() << "NEEDS To BE DEBBUGED: FIFF_MNE_COORD_FRAME" << t_pTag->getType();
                     coord_frame = *t_pTag->toInt();
                 }
                 else if (kind == FIFF_COORD_TRANS)
                 {
-                    FiffTag::read_tag(t_pStream.data(), t_pTag, pos);
+                    FiffTag::read_tag(p_pStream.data(), t_pTag, pos);
                     qDebug() << "NEEDS To BE DEBBUGED: FIFF_COORD_TRANS" << t_pTag->getType();
                     dig_trans = t_pTag->toCoordTrans();
                 }
             }
         }
     }
-    for(k = 0; k < this->size(); ++k){
-        this->m_qListDigPoint[k].coord_frame = coord_frame;
+    for(k = 0; k < p_Dig.size(); ++k)
+    {
+        p_Dig[k].coord_frame = coord_frame;
     }
 
     //
     //   All kinds of auxliary stuff
     //
-
-    t_pStream->device()->close();
-}
-
-
-//*************************************************************************************************************
-
-FiffDigPointSet::~FiffDigPointSet()
-{
-
+    if(open_here)
+    {
+        p_pStream->device()->close();
+    }
+    return true;
 }
 
 
