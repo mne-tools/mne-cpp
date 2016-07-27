@@ -58,13 +58,13 @@
 // Eigen INCLUDES
 //=============================================================================================================
 
-#include<Eigen/Core>
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
+
+#include<Eigen/Core>
 
 
 //*************************************************************************************************************
@@ -101,13 +101,22 @@ public:
     */
     explicit ConnectivityMeasures();
 
-    static Eigen::MatrixXd crossCorrelation();
+    //=========================================================================================================
+    /**
+    * Calculates the cross correlation between the rows of the data matrix.
+    *
+    * @param[in] matDataIn  The input data for whicht the cross correlation is to be calcualted.
+    *
+    * @return               The connectivity matrix.
+    */
+    static Eigen::MatrixXd crossCorrelation(const Eigen::MatrixXd& matDataIn);
 
 protected:
+    static QPair<double, double> eigenCrossCorrelation(const Eigen::RowVectorXd &xCorrInputVecFirst, const Eigen::RowVectorXd &xCorrInputVecSecond);
+    //std::pair<double, double> eigenCrossCorrelation(std::vector<double>& xCorrInputVecFirs, std::vector<double>& xCorrInputVecSecond);
+
 
 private:
-
-signals:
 
 };
 
