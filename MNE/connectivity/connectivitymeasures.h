@@ -51,6 +51,7 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
+#include <QPair>
 
 
 //*************************************************************************************************************
@@ -58,13 +59,13 @@
 // Eigen INCLUDES
 //=============================================================================================================
 
+#include <Eigen/Core>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
-
-#include<Eigen/Core>
 
 
 //*************************************************************************************************************
@@ -87,8 +88,9 @@ namespace CONNECTLIB {
 *
 * @brief Brief description of this class.
 */
-class CONNECTIVITYSHARED_EXPORT ConnectivityMeasures
-{
+class CONNECTIVITYSHARED_EXPORT ConnectivityMeasures : public QObject
+{    
+    Q_OBJECT
 
 public:
     typedef QSharedPointer<ConnectivityMeasures> SPtr;            /**< Shared pointer type for ConnectivityMeasures. */
@@ -111,9 +113,8 @@ public:
     static Eigen::MatrixXd crossCorrelation(const Eigen::MatrixXd& matDataIn);
 
 protected:
-    static QPair<double, double> eigenCrossCorrelation(const Eigen::RowVectorXd &xCorrInputVecFirst, const Eigen::RowVectorXd &xCorrInputVecSecond);
+    static QPair<int,double> eigenCrossCorrelation(const Eigen::RowVectorXd &xCorrInputVecFirst, const Eigen::RowVectorXd &xCorrInputVecSecond);
     //std::pair<double, double> eigenCrossCorrelation(std::vector<double>& xCorrInputVecFirs, std::vector<double>& xCorrInputVecSecond);
-
 
 private:
 

@@ -247,6 +247,8 @@ int main(int argc, char *argv[])
     //########################################################################################
 
     MatrixXd matConnect_LA = ConnectivityMeasures::crossCorrelation(sourceEstimate_LA.data);
+    std::cout << "\matConnect_LA:\n" << matConnect_LA.block(0,0,10,10) << std::endl;
+
     ImageSc* pPlot = new ImageSc(matConnect_LA);
     pPlot->show();
 
