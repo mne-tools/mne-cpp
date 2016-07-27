@@ -161,14 +161,14 @@ int main(int argc, char *argv[])
     //
 
     QFile t_fileElec("./MNE-sample-data/warping/AVG4-0Years_GSN128.fif");
-    QList<FiffDigPoint> dig=FiffDigPoint::read(t_fileElec);
+    QList<FiffDigPoint> dig = FiffDigPoint::read(t_fileElec);
 
 
         QList<QVector<float>> tempElecInfo;
         QList<int> ElecChanName;
-        for (int i=0; i<dig.length();i++)
+        for (int i = 0; i < dig.length(); ++i)
         {
-            if (dig[i].kind==3)
+            if (dig[i].kind == 3)
             {
                 QVector<float> temp;
                 ElecChanName.append(dig[i].ident);
@@ -178,13 +178,16 @@ int main(int argc, char *argv[])
                 tempElecInfo.append(temp);
             }
         }
-        MatrixXf ElecPos(tempElecInfo.length(),3);
-        for (int i=0; i<tempElecInfo.length();i++)
+        MatrixXf ElecPos(tempElecInfo.length(), 3);
+        for (int i = 0; i < tempElecInfo.length(); ++i)
         {
-            ElecPos(i,0)=tempElecInfo[i][0];
-            ElecPos(i,1)=tempElecInfo[i][1];
-            ElecPos(i,2)=tempElecInfo[i][2];
+            ElecPos(i,0) = tempElecInfo[i][0];
+            ElecPos(i,1) = tempElecInfo[i][1];
+            ElecPos(i,2) = tempElecInfo[i][2];
         }
+        pos.setX(tDigitizer[i].r[0]);
+        pos.setY(tDigitizer[i].r[1]);
+        pos.setZ(tDigitizer[i].r[2]);
 
 //    std::cout << "Here is the matrix ElecPos:" << std::endl << ElecPos << std::endl;
 

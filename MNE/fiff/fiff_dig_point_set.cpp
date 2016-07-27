@@ -93,7 +93,7 @@ FiffDigPointSet::FiffDigPointSet()
 //*************************************************************************************************************
 
 FiffDigPointSet::FiffDigPointSet(const FiffDigPointSet &p_FiffDigPointSet)
-//: m_qListDigPoint(p_FiffDigPointSet.m_qListDigPoint)
+: m_qListDigPoint(p_FiffDigPointSet.m_qListDigPoint)
 {
 
 }
@@ -144,7 +144,7 @@ FiffDigPointSet::FiffDigPointSet(QIODevice &p_IODevice)   //const FiffDigPointSe
             if (kind == FIFF_DIG_POINT)
             {
                 FiffTag::read_tag(t_pStream.data(), t_pTag, pos);
-                this->operator <<(t_pTag->toDigPoint());
+                this->m_qListDigPoint.append(t_pTag->toDigPoint());
             }
             else
             {
@@ -164,7 +164,7 @@ FiffDigPointSet::FiffDigPointSet(QIODevice &p_IODevice)   //const FiffDigPointSe
         }
     }
     for(k = 0; k < this->size(); ++k){
-        this->operator [](k).coord_frame = coord_frame;
+        this->m_qListDigPoint[k].coord_frame = coord_frame;
     }
 
     //
@@ -183,7 +183,7 @@ FiffDigPointSet::~FiffDigPointSet()
 }
 
 
-
+/*  Not used functions:
 //*************************************************************************************************************
 
 const FiffDigPoint& FiffDigPointSet::operator[] (qint32 idx) const
@@ -226,4 +226,4 @@ FiffDigPointSet &FiffDigPointSet::operator<<(const FiffDigPoint *dig)
     this->m_qListDigPoint.append(*dig);
     return *this;
 }
-
+*/

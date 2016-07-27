@@ -143,45 +143,46 @@ public:
     */
     inline qint32 size() const;
 
-    //=========================================================================================================
-    /**
-    * Subscript operator [] to access FiffDigPoint by index
-    *
-    * @param[in] idx    the FiffDigPoint index.
-    *
-    * @return FiffDigPoint related to the parameter index.
-    */
-    const FiffDigPoint& operator[] (qint32 idx) const;
+//    Not used fuctions:
+//    //=========================================================================================================
+//    /**
+//    * Subscript operator [] to access FiffDigPoint by index
+//    *
+//    * @param[in] idx    the FiffDigPoint index.
+//    *
+//    * @return FiffDigPoint related to the parameter index.
+//    */
+//    const FiffDigPoint& operator[] (qint32 idx) const;
 
-    //=========================================================================================================
-    /**
-    * Subscript operator [] to access FiffDigPoint by index
-    *
-    * @param[in] idx    the FiffDigPoint index.
-    *
-    * @return FiffDigPoint related to the parameter index.
-    */
-    FiffDigPoint& operator[] (qint32 idx);
+//    //=========================================================================================================
+//    /**
+//    * Subscript operator [] to access FiffDigPoint by index
+//    *
+//    * @param[in] idx    the FiffDigPoint index.
+//    *
+//    * @return FiffDigPoint related to the parameter index.
+//    */
+//    FiffDigPoint& operator[] (qint32 idx);
 
-    //=========================================================================================================
-    /**
-    * Subscript operator << to add a new FiffDigPoint
-    *
-    * @param[in] dig    FiffDigPoint to be added
-    *
-    * @return MNEBem
-    */
-    FiffDigPointSet& operator<< (const FiffDigPoint& dig);
+//    //=========================================================================================================
+//    /**
+//    * Subscript operator << to add a new FiffDigPoint
+//    *
+//    * @param[in] dig    FiffDigPoint to be added
+//    *
+//    * @return MNEBem
+//    */
+//    FiffDigPointSet& operator<< (const FiffDigPoint& dig);
 
-    //=========================================================================================================
-    /**
-    * Subscript operator << to add a new FiffDigPoint
-    *
-    * @param[in] dig    FiffDigPoint to be added
-    *
-    * @return MNEBem
-    */
-    FiffDigPointSet& operator<< (const FiffDigPoint* dig);
+//    //=========================================================================================================
+//    /**
+//    * Subscript operator << to add a new FiffDigPoint
+//    *
+//    * @param[in] dig    FiffDigPoint to be added
+//    *
+//    * @return MNEBem
+//    */
+//    FiffDigPointSet& operator<< (const FiffDigPoint* dig);
 
 //    ToDo:
 //    //=========================================================================================================
@@ -191,14 +192,6 @@ public:
 //    * @param [in] p_IODevice   IO device to write the FiffDigPointSet to.
 //    */
 //    void write(QIODevice &p_IODevice);
-
-//    //=========================================================================================================
-//    /**
-//    * Write the Bem to a FIF stream
-//    *
-//    * @param[in] p_pStream  The stream to write to.
-//    */
-//    void writeToStream(FiffStream *p_pStream);
 
 protected:
 
