@@ -264,15 +264,18 @@ int main(int argc, char *argv[])
     //
     //########################################################################################
 
-//    std::cout<<"Creating BrainView"<<std::endl;
+    std::cout<<"Creating BrainView"<<std::endl;
 
-//    View3D::SPtr testWindow = View3D::SPtr(new View3D());
+    View3D::SPtr testWindow = View3D::SPtr(new View3D());
+    testWindow->addBrainData("Subject01", "Left Auditory", tSurfSet, tAnnotSet);
 
-//    testWindow->show();
+    QList<BrainRTConnectivityDataTreeItem*> rtItemList_LA = testWindow->addRtConnectivityData("Subject01", "Left Auditory", matConnect_LA, t_clusteredFwd);
 
-//    Control3DWidget::SPtr control3DWidget = Control3DWidget::SPtr(new Control3DWidget());
-//    control3DWidget->setView3D(testWindow);
-//    control3DWidget->show();
+    testWindow->show();
+
+    Control3DWidget::SPtr control3DWidget = Control3DWidget::SPtr(new Control3DWidget());
+    control3DWidget->setView3D(testWindow);
+    control3DWidget->show();
 
     //########################################################################################
     //

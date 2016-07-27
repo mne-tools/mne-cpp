@@ -186,7 +186,7 @@ public:
     *
     * @return                       Returns a list with the tree items which now hold the activation data. Use this list to update the data, i.e. during real time applications.
     */
-    BrainRTConnectivityDataTreeItem* addData(const Eigen::MatrixXd& matConnection,  const MNELIB::MNEForwardSolution& tForwardSolution = MNELIB::MNEForwardSolution());
+    BrainRTConnectivityDataTreeItem* addData(const Eigen::MatrixXd& matConnection,  const MNELIB::MNEForwardSolution& tForwardSolution = MNELIB::MNEForwardSolution(), Qt3DCore::QEntity* p3DEntityParent = 0);
 
 private:
     //=========================================================================================================

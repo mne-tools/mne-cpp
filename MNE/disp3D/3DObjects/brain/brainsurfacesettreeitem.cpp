@@ -351,9 +351,9 @@ BrainRTSourceLocDataTreeItem* BrainSurfaceSetTreeItem::addData(const MNESourceEs
 
 //*************************************************************************************************************
 
-BrainRTConnectivityDataTreeItem* BrainSurfaceSetTreeItem::addData(const Eigen::MatrixXd& matConnection, const MNEForwardSolution& tForwardSolution)
+BrainRTConnectivityDataTreeItem* BrainSurfaceSetTreeItem::addData(const Eigen::MatrixXd& matConnection, const MNEForwardSolution& tForwardSolution, Qt3DCore::QEntity* p3DEntityParent)
 {
-    if(matConnection.rows() == 0 && matConnection.cols() == 0) {
+    if(matConnection.rows() != 0 || matConnection.cols() != 0) {
         //Add source estimation data as child
         if(this->findChildren(Data3DTreeModelItemTypes::RTConnectivityDataItem).size() == 0) {
             //If rt data item does not exists yet, create it here!
@@ -365,6 +365,7 @@ BrainRTConnectivityDataTreeItem* BrainSurfaceSetTreeItem::addData(const Eigen::M
                 list << new QStandardItem(m_pBrainRTConnectivityDataTreeItem->toolTip());
                 this->appendRow(list);
 
+                m_pBrainRTConnectivityDataTreeItem->init(tForwardSolution, p3DEntityParent);
                 m_pBrainRTConnectivityDataTreeItem->addData(matConnection);
             } else {
                 qDebug() << "BrainSurfaceSetTreeItem::addData - Cannot add real time connectivity data since the forwad solution was not provided and therefore the rt connecntivity data item has not been initilaized yet. Returning...";
