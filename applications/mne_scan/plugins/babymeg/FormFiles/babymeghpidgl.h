@@ -29,36 +29,55 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the BabyMEGHPI class.
+* @brief    Declaration of the BabyMEGHPI class.
 *
 */
-
 
 #ifndef BABYMEGHPIDGL_H
 #define BABYMEGHPIDGL_H
 
-#include <QDialog>
-#include <QAbstractButton>
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "babymeg_global.h"
+#include "../babymeg.h"
+
+#include <fiff/fiff_info.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FIFF INCLUDES
+// QT INCLUDES
 //=============================================================================================================
 
-#include <fiff/fiff_info.h>
-#include <fiff/fiff.h>
+#include <QDialog>
+#include <QAbstractButton>
 
 
-#include "../babymeg.h"
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
 
 
-using namespace FIFFLIB;
-
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
 
 namespace Ui {
-class babymeghpidgl;
+    class BabyMEGHPIDgl;
 }
-namespace BabyMEGPlugin
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE BABYMEGPLUGIN
+//=============================================================================================================
+
+namespace BABYMEGPLUGIN
 {
 
 
@@ -68,13 +87,22 @@ namespace BabyMEGPlugin
 //=============================================================================================================
 
 class BabyMEG;
-class babymeghpidgl : public QDialog
+
+
+//=============================================================================================================
+/**
+* DECLARE CLASS BabyMEGHPIDgl
+*
+* @brief The BabyMEGHPIDgl class provides a QDialog for the HPI controls.
+*/
+class BABYMEGSHARED_EXPORT BabyMEGHPIDgl : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit babymeghpidgl(BabyMEG* p_pBabyMEG,QWidget *parent = 0);
-    ~babymeghpidgl();
+    explicit BabyMEGHPIDgl(BabyMEG* p_pBabyMEG,QWidget *parent = 0);
+    ~BabyMEGHPIDgl();
+
     //=========================================================================================================
     /**
     * Read Polhemus data from fif file
@@ -82,10 +110,6 @@ public:
     */
     void ReadPolhemusDig(QString fileName);
 
-protected:
-     virtual void closeEvent( QCloseEvent * event );
-
-public slots:
     //=========================================================================================================
     /**
     * Load a Polhemus file name
@@ -95,15 +119,18 @@ public slots:
     void OKProc(QAbstractButton *b);
     void CancelProc();
 
-signals:
-    void SendHPIFiffInfo(FiffInfo);
+    BabyMEG*                m_pBabyMEG;
+    FIFFLIB::FiffInfo       info;
+    QString                 FileName_HPI;
+
+protected:
+     virtual void closeEvent( QCloseEvent * event );
 
 private:
-    Ui::babymeghpidgl *ui;
-public:
-      BabyMEG*   m_pBabyMEG;
-      FiffInfo info;
-      QString FileName_HPI;
+    Ui::BabyMEGHPIDgl*      ui;
+
+signals:
+    void SendHPIFiffInfo(FIFFLIB::FiffInfo);
 };
 } //NAMESPACE
 #endif // BABYMEGHPIDGL_H

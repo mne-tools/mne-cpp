@@ -41,14 +41,19 @@
 //=============================================================================================================
 
 #include "babymeg.h"
-
 #include "FormFiles/babymegsetupwidget.h"
 #include "FormFiles/babymegprojectdialog.h"
+#include "babymegclient.h"
+#include "babymeginfo.h"
+
+#include <iostream>
 
 #include <utils/ioutils.h>
 #include <utils/detecttrigger.h>
-
-#include <iostream>
+#include <fiff/fiff_types.h>
+#include <fiff/fiff_dir_tree.h>
+#include <rtClient/rtcmdclient.h>
+#include <scMeas/newrealtimemultisamplearray.h>
 
 
 //*************************************************************************************************************
@@ -68,11 +73,20 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
+
+//*************************************************************************************************************
+//=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace BabyMEGPlugin;
+using namespace BABYMEGPLUGIN;
 using namespace UTILSLIB;
+using namespace SCSHAREDLIB;
+using namespace IOBuffer;
+using namespace SCMEASLIB;
 
 
 //*************************************************************************************************************
@@ -364,7 +378,7 @@ void BabyMEG::SetFiffInfoForHPI()
     {
         qDebug()<<" Start to load Polhemus File";
         if (HPIDlg == NULL)
-            HPIDlg = QSharedPointer<babymeghpidgl>(new babymeghpidgl(this));
+            HPIDlg = QSharedPointer<BabyMEGHPIDgl>(new BabyMEGHPIDgl(this));
 
         if (!HPIDlg->isVisible())
         {

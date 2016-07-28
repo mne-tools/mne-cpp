@@ -29,23 +29,22 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the BabyMEGSQUIDControlDGL class.
+* @brief    Declaration of the BabyMEGSQUIDControlDGL class.
 *
 */
-/*
- * revise this component by removing BabyMEG related.
- */
 
 #ifndef BABYMEGSQUIDCONTROLDGL_H
 #define BABYMEGSQUIDCONTROLDGL_H
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-//#include "../ui_babymegsquidcontroldgl.h"
+#include "babymeg_global.h"
+#include "globalobj.h"
+#include "Plotter.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -55,9 +54,7 @@
 #include <QDialog>
 #include <QScrollBar>
 #include <QDebug>
-
 #include <QVector>
-
 #include <qmath.h>
 #include <QGraphicsView>
 #include <QGraphicsScene>
@@ -66,39 +63,35 @@
 #include <QGraphicsRectItem>
 #include <QGraphicsTextItem>
 
-#include "globalobj.h"
-#include "plotter.h"
+
 //*************************************************************************************************************
 //=============================================================================================================
 // Eigen INCLUDES
 //=============================================================================================================
-//#include "include/3rdParty/Eigen/Core"
+
 #include <Eigen/Core>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// FORWARD DECLARATIONS
 //=============================================================================================================
 
-using namespace Eigen;
-
-
-class plotter;
+class Plotter;
 class PlotSettings;
 
 namespace Ui
 {
-class BabyMEGSQUIDControlDgl;
-}//namespace
+    class BabyMEGSQUIDControlDgl;
+}
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE BabyMEGPlugin
+// DEFINE NAMESPACE BABYMEGPLUGIN
 //=============================================================================================================
 
-namespace BabyMEGPlugin
+namespace BABYMEGPLUGIN
 {
 
 
@@ -135,10 +128,12 @@ struct FLLConfig{
     QList < FLLPara > m_Fll;
 };
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // GUI Status Machine Structure definitions
 //=============================================================================================================
+
 struct GUIStatMachine{
     int CommType;
     int ChannelSel;
@@ -179,44 +174,21 @@ struct GUIStatMachine{
     QVector <double> ParaGraph;
 };
 
+
 //=============================================================================================================
 /**
-* DECLARE CLASS BabyMEGSQUIDControlDgl
+* The BabyMEGSQUIDControlDgl class provides the SQUID control dialog.
 *
 * @brief The BabyMEGSQUIDControlDgl class provides the SQUID control dialog.
 */
-class BabyMEGSQUIDControlDgl : public QDialog
+class BABYMEGSHARED_EXPORT BabyMEGSQUIDControlDgl : public QDialog
 {
     Q_OBJECT
-
 
 public:
     explicit BabyMEGSQUIDControlDgl(BabyMEG* p_pBabyMEG,QWidget *parent = 0);
     ~BabyMEGSQUIDControlDgl();
     
-private:
-    Ui::BabyMEGSQUIDControlDgl *ui;
-
-protected:
-     virtual void closeEvent( QCloseEvent * event );
-
-public:
-    BabyMEG*   m_pBabyMEG;
-    FLLConfig m_FLLConfig;
-    GUIStatMachine  m_GUISM;
-    QVector <QGraphicsLineItem * > PolyLinePtr;
-    bool initplotflag;
-    QVector <QGraphicsRectItem * > PolyRectPtr;
-
-    PlotSettings settings;
-    PlotSettings settings_tune;
-
-    plotter *d_timeplot;
-
-    int TableRows;
-    int TableCols;
-    QList < QString > chanNames;
-
     void SendCMD(QString CMDSTR);
     void InitChannels(QString sReply);
     void InitGUIConfig(QString sFLLPara);
@@ -226,12 +198,10 @@ public:
     void UpdateInfo(QString newText);
     void ProcCmd(QString cmd, int index, QString Info);
     void InitTuneGraph();
-    void TuneGraphDispProc(MatrixXf tmp);
+    void TuneGraphDispProc(Eigen::MatrixXf tmp);
     void UpdateParaGraph();
-    float mmin(MatrixXf tmp,int chan);
-    float mmax(MatrixXf tmp,int chan);
-
-public slots:
+    float mmin(Eigen::MatrixXf tmp,int chan);
+    float mmax(Eigen::MatrixXf tmp,int chan);
 
     void RcvCMDData(QByteArray DATA);
 
@@ -273,6 +243,28 @@ public slots:
     void AdOffset();
     void AdjuBias();
     void AdjuModu();
+
+    BabyMEG*                        m_pBabyMEG;
+    FLLConfig                       m_FLLConfig;
+    GUIStatMachine                  m_GUISM;
+    QVector <QGraphicsLineItem * >  PolyLinePtr;
+    bool                            initplotflag;
+    QVector <QGraphicsRectItem * >  PolyRectPtr;
+
+    PlotSettings                    settings;
+    PlotSettings                    settings_tune;
+
+    Plotter*                        d_timeplot;
+
+    int                             TableRows;
+    int                             TableCols;
+    QList<QString>                  chanNames;
+
+protected:
+     virtual void closeEvent( QCloseEvent * event );
+
+private:
+    Ui::BabyMEGSQUIDControlDgl*     ui;
 
 signals:
     void SendCMDToMEGSource(QString CMDSTR);

@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the BabyMEGSetupWidget class.
+* @brief    Declaration of the BabyMEGSetupWidget class.
 *
 */
 
@@ -42,6 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include "babymeg_global.h"
 #include "../ui_babymegsetup.h"
 
 
@@ -55,10 +56,22 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE BabyMEGPlugin
+// Eigen INCLUDES
 //=============================================================================================================
 
-namespace BabyMEGPlugin
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE BABYMEGPLUGIN
+//=============================================================================================================
+
+namespace BABYMEGPLUGIN
 {
 
 
@@ -74,9 +87,9 @@ class BabyMEG;
 /**
 * DECLARE CLASS BabyMEGSetupWidget
 *
-* @brief The BabyMEGSetupWidget class provides the ECG configuration window.
+* @brief The BabyMEGSetupWidget class provides a setup widget for the BabyMEG.
 */
-class BabyMEGSetupWidget : public QWidget
+class BABYMEGSHARED_EXPORT BabyMEGSetupWidget : public QWidget
 {
     Q_OBJECT
 
@@ -107,7 +120,6 @@ public:
     void fiffInfoReceived();        /**< Triggered when new fiff info is recieved by producer and stored intor rt_server */
 
 private:
-
     //=========================================================================================================
     /**
     * Set command connection status
@@ -130,11 +142,11 @@ private:
     */
     void showSqdCtrlDialog();
 
-    BabyMEG*   m_pBabyMEG;      /**< a pointer to corresponding mne rt client.*/
+    BabyMEG*                    m_pBabyMEG;         /**< a pointer to corresponding mne rt client.*/
 
-    Ui::BabyMEGSetupWidgetClass ui; /**< the user interface for the BabyMEGSetupWidget.*/
+    Ui::BabyMEGSetupWidgetClass ui;                 /**< the user interface for the BabyMEGSetupWidget.*/
 
-    bool m_bIsInit;                     /**< false when gui is not initialized jet. Prevents gui from already interacting when not initialized */
+    bool                        m_bIsInit;          /**< false when gui is not initialized jet. Prevents gui from already interacting when not initialized */
 };
 
 } // NAMESPACE
