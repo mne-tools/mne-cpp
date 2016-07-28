@@ -247,7 +247,7 @@ QList<QPair<int,double> > DetectTrigger::detectTriggerFlanksGrad(const MatrixXd 
     }
 
     //Compute gradient
-    for(int t = 1; t<tGradient.cols(); t++)
+    for(int t = 1; t < tGradient.cols(); ++t)
     {
         tGradient(t) = data(iTriggerChannelIdx,t) - data(iTriggerChannelIdx,t-1);
     }
@@ -261,7 +261,7 @@ QList<QPair<int,double> > DetectTrigger::detectTriggerFlanksGrad(const MatrixXd 
     //Find all triggers above threshold in the data block
     for(int j = 0; j < tGradient.cols(); ++j)
     {
-        double dMatVal = bRemoveOffset ? tGradient(iTriggerChannelIdx,j) - data(iTriggerChannelIdx,0) : tGradient(iTriggerChannelIdx,j);
+        double dMatVal = bRemoveOffset ? tGradient(j) - data(iTriggerChannelIdx,0) : tGradient(j);
 
         if(dMatVal >= dThreshold)
         {
