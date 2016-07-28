@@ -135,7 +135,34 @@ bool BrainRTConnectivityDataTreeItem::init(const MNEForwardSolution& tForwardSol
 
     //Add source vertices to data
     QVariant data;
-    data.setValue(tForwardSolution.source_rr);
+    if(isClustered)
+    {
+        MatrixX3f matSourceVert(tForwardSolution.src[0].cluster_info.centroidSource_rr.size() + tForwardSolution.src[1].cluster_info.centroidSource_rr.size(), 3);
+
+        int counter = 0;
+        for(int i = 0; i < tForwardSolution.src[0].cluster_info.centroidSource_rr.size(); ++i)
+        {
+            matSourceVert(counter,0) = tForwardSolution.src[0].cluster_info.centroidSource_rr.at(i)(0);
+            matSourceVert(counter,1) = tForwardSolution.src[0].cluster_info.centroidSource_rr.at(i)(1);
+            matSourceVert(counter,2) = tForwardSolution.src[0].cluster_info.centroidSource_rr.at(i)(2);
+            ++counter;
+        }
+
+        for(int i = 0; i < tForwardSolution.src[1].cluster_info.centroidSource_rr.size(); ++i)
+        {
+            matSourceVert(counter,0) = tForwardSolution.src[1].cluster_info.centroidSource_rr.at(i)(0);
+            matSourceVert(counter,1) = tForwardSolution.src[1].cluster_info.centroidSource_rr.at(i)(1);
+            matSourceVert(counter,2) = tForwardSolution.src[1].cluster_info.centroidSource_rr.at(i)(2);
+            ++counter;
+        }
+
+        data.setValue(matSourceVert);
+    }
+    else
+    {
+        data.setValue(tForwardSolution.source_rr);
+    }
+
     this->setData(data, Data3DTreeModelItemRoles::SourceVertices);
 
     //Add meta information as item children
@@ -165,9 +192,12 @@ bool BrainRTConnectivityDataTreeItem::addData(const MatrixXd& matNewConnection)
     MatrixX3f matSourceVert = this->data(Data3DTreeModelItemRoles::SourceVertices).value<MatrixX3f>();
     MatrixX3f matSourceNorm = MatrixX3f::Zero(matSourceVert.rows(),3);
 
+    qDebug() << "BrainRTConnectivityDataTreeItem::addData - matSourceVert.rows()" << matSourceVert.rows();
+    qDebug() << "BrainRTConnectivityDataTreeItem::addData - matSourceNorm.rows()" << matSourceNorm.rows();
+
     if(matSourceVert.rows() != matNewConnection.rows())
     {
-        qDebug() << "BrainRTConnectivityDataTreeItem::updateData - Number of network nodes and sources do not match!";
+        qDebug() << "BrainRTConnectivityDataTreeItem::addData - Number of network nodes and sources do not match!";
         return false;
     }
 

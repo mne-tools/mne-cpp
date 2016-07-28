@@ -285,7 +285,7 @@ bool BrainRTSourceLocDataTreeItem::init(const MNEForwardSolution& tForwardSoluti
 bool BrainRTSourceLocDataTreeItem::addData(const MNESourceEstimate& tSourceEstimate)
 {
     if(!m_bIsInit) {
-        qDebug() << "BrainRTSourceLocDataTreeItem::updateData - Rt Item has not been initialized yet!";
+        qDebug() << "BrainRTSourceLocDataTreeItem::addData - Rt source loc item has not been initialized yet!";
         return false;
     }
 

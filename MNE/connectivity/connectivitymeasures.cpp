@@ -69,7 +69,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace CONNECTLIB;
+using namespace CONNECTIVITYLIB;
 using namespace Eigen;
 
 
