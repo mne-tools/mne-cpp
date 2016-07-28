@@ -184,5 +184,4 @@ MatrixXd Warp::readsLm(const QString &electrodeFileName)
         i++;
     }
     return electrodes;
-
 }
