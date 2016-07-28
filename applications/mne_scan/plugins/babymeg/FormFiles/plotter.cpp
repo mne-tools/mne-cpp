@@ -1,10 +1,77 @@
+//=============================================================================================================
+/**
+* @file     plotter.h
+* @author   Limin Sun <liminsun@nmr.mgh.harvard.edu>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+* @version  1.0
+* @date     February, 2013
+*
+* @section  LICENSE
+*
+* Copyright (C) 2013, Limin Sun and Matti Hamalainen. All rights reserved.
+*
+* Redistribution and use in source and binary forms, with or without modification, are permitted provided that
+* the following conditions are met:
+*     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
+*       following disclaimer.
+*     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
+*       the following disclaimer in the documentation and/or other materials provided with the distribution.
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
+*       to endorse or promote products derived from this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+* WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+* INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+* PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+* NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+* POSSIBILITY OF SUCH DAMAGE.
+*
+*
+* @brief    Plotter class definition.
+*
+*/
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
 #include "plotter.h"
 
 #include <cmath>
 
 
-plotter::plotter(QWidget *parent)
-    : QWidget(parent)
+//*************************************************************************************************************
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QStylePainter>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace BABYMEGPLUGIN;
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+Plotter::Plotter(QWidget *parent)
+: QWidget(parent)
 {
     setBackgroundRole(QPalette::Dark);
     setAutoFillBackground(true);
@@ -21,10 +88,12 @@ plotter::plotter(QWidget *parent)
 //    connect(zoomOutButton,SIGNAL(clicked()), this, SLOT(zoomOut()));
 
     setPlotSettings(PlotSettings());
-
 }
 
-void plotter::setPlotSettings(const PlotSettings &settings)
+
+//*************************************************************************************************************
+
+void Plotter::setPlotSettings(const PlotSettings &settings)
 {
     zoomStack.clear();
     zoomStack.append(settings);
@@ -35,7 +104,9 @@ void plotter::setPlotSettings(const PlotSettings &settings)
 }
 
 
-//void plotter::zoomOut()
+//*************************************************************************************************************
+
+//void Plotter::zoomOut()
 //{
 //    if(curZoom > 0){
 //        --curZoom;
@@ -46,7 +117,10 @@ void plotter::setPlotSettings(const PlotSettings &settings)
 //    }
 //}
 
-//void plotter::zoomIn()
+
+//*************************************************************************************************************
+
+//void Plotter::zoomIn()
 //{
 //    if(curZoom < zoomStack.count() - 1){
 //        ++curZoom;
@@ -57,29 +131,44 @@ void plotter::setPlotSettings(const PlotSettings &settings)
 //    }
 //}
 
-void plotter::setCurveData(int id, const QVector<QPointF> &data)
+
+//*************************************************************************************************************
+
+void Plotter::setCurveData(int id, const QVector<QPointF> &data)
 {
     curveMap[id] = data;
     refreshPixmap();
 }
 
-void plotter::clearCurve(int id)
+
+//*************************************************************************************************************
+
+void Plotter::clearCurve(int id)
 {
     curveMap.remove(id);
     refreshPixmap();
 }
 
-QSize plotter::minimumSizeHint() const
+
+//*************************************************************************************************************
+
+QSize Plotter::minimumSizeHint() const
 {
     return QSize(6*Margin,4*Margin);
 }
 
-QSize plotter::sizeHint() const
+
+//*************************************************************************************************************
+
+QSize Plotter::sizeHint() const
 {
     return QSize(12*Margin, 8*Margin);
 }
 
-void plotter::paintEvent(QPaintEvent * /*event*/)
+
+//*************************************************************************************************************
+
+void Plotter::paintEvent(QPaintEvent * /*event*/)
 {
     QStylePainter painter(this);
     painter.drawPixmap(0,0,pixmap);
@@ -98,7 +187,10 @@ void plotter::paintEvent(QPaintEvent * /*event*/)
 //    }
 }
 
-void plotter::resizeEvent(QResizeEvent * /*event*/)
+
+//*************************************************************************************************************
+
+void Plotter::resizeEvent(QResizeEvent * /*event*/)
 {
 //    int x = width() - (zoomInButton->width() + zoomOutButton->width() + 10);
 
@@ -107,7 +199,10 @@ void plotter::resizeEvent(QResizeEvent * /*event*/)
     refreshPixmap();
 }
 
-void plotter::refreshPixmap()
+
+//*************************************************************************************************************
+
+void Plotter::refreshPixmap()
 {
     pixmap = QPixmap(size());
     //pixmap.fill(this, 0, 0);
@@ -120,7 +215,10 @@ void plotter::refreshPixmap()
     update();
 }
 
-void plotter::drawGrid(QPainter *painter)
+
+//*************************************************************************************************************
+
+void Plotter::drawGrid(QPainter *painter)
 {
     QRect rect(xMargin+20, Margin-10, width()-2*xMargin, height() -2*Margin);
     if(!rect.isValid()) return;
@@ -163,7 +261,9 @@ void plotter::drawGrid(QPainter *painter)
 }
 
 
-void plotter::drawRotatedText(QPainter *painter, int x, int y, const QString &text)
+//*************************************************************************************************************
+
+void Plotter::drawRotatedText(QPainter *painter, int x, int y, const QString &text)
 {
     painter->save();
     painter->translate(x, y);
@@ -173,7 +273,9 @@ void plotter::drawRotatedText(QPainter *painter, int x, int y, const QString &te
 }
 
 
-void plotter::drawCurve(QPainter *painter)
+//*************************************************************************************************************
+
+void Plotter::drawCurve(QPainter *painter)
 {
     static const QColor colorForIds[6] = {Qt::red,Qt::green,Qt::blue,Qt::cyan,Qt::magenta,Qt::yellow};
 
@@ -200,6 +302,9 @@ void plotter::drawCurve(QPainter *painter)
     }
 }
 
+
+//*************************************************************************************************************
+
 PlotSettings::PlotSettings()
 {
     minX = 0.0;
@@ -210,6 +315,9 @@ PlotSettings::PlotSettings()
     maxY = 10.0;
     numYTicks = 5;
 }
+
+
+//*************************************************************************************************************
 
 void PlotSettings::adjustAxis(double &min, double &max, int &numTicks)
 {

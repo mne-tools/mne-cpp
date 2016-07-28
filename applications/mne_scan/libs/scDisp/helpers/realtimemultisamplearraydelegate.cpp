@@ -664,8 +664,8 @@ void RealTimeMultiSampleArrayDelegate::createTriggerPath(const QModelIndex &inde
 
     const RealTimeMultiSampleArrayModel* t_pModel = static_cast<const RealTimeMultiSampleArrayModel*>(index.model());
 
-    QList<int> detectedTriggers = t_pModel->getDetectedTriggers();
-    QList<int> detectedTriggersOld = t_pModel->getDetectedTriggersOld();
+    QList<QPair<int,double> > detectedTriggers = t_pModel->getDetectedTriggers();
+    QList<QPair<int,double> > detectedTriggersOld = t_pModel->getDetectedTriggersOld();
 
     float yStart = option.rect.topLeft().y();
     float yEnd = option.rect.bottomRight().y();
@@ -675,7 +675,7 @@ void RealTimeMultiSampleArrayDelegate::createTriggerPath(const QModelIndex &inde
 
     //Newly detected triggers
     for(int u = 0; u<detectedTriggers.size(); u++) {
-        int triggerPos = detectedTriggers[u];
+        int triggerPos = detectedTriggers[u].first;
 
         if(triggerPos<=currentSampleIndex+t_pModel->getCurrentOverlapAddDelay()) {
             path.moveTo(triggerPos*fDx,yStart);
@@ -685,7 +685,7 @@ void RealTimeMultiSampleArrayDelegate::createTriggerPath(const QModelIndex &inde
 
     //Old detected triggers
     for(int u = 0; u<detectedTriggersOld.size(); u++) {
-        int triggerPos = detectedTriggersOld[u];
+        int triggerPos = detectedTriggersOld[u].first;
 
         if(triggerPos>currentSampleIndex+t_pModel->getCurrentOverlapAddDelay()) {
             path.moveTo(triggerPos*fDx,yStart);

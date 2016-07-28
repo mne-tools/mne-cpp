@@ -39,18 +39,17 @@
 //=============================================================================================================
 
 #include "brainhemispheretreeitem.h"
-
 #include "brainsurfacetreeitem.h"
 #include "brainannotationtreeitem.h"
 #include "brainrtsourcelocdatatreeitem.h"
 #include "brainsourcespacetreeitem.h"
 
-#include "fs/label.h"
-#include "fs/annotationset.h"
-#include "fs/surfaceset.h"
+#include <fs/label.h>
+#include <fs/annotationset.h>
+#include <fs/surfaceset.h>
 
-#include "mne/mne_forwardsolution.h"
-#include "mne/mne_sourceestimate.h"
+#include <mne/mne_forwardsolution.h>
+#include <mne/mne_sourceestimate.h>
 
 
 //*************************************************************************************************************
