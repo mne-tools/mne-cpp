@@ -301,11 +301,11 @@ signals:
 
 };
 
+} // NAMESPACE
+
 #ifndef metatype_renderable3Dentity
 #define metatype_renderable3Dentity
 Q_DECLARE_METATYPE(DISP3DLIB::Renderable3DEntity*)
 #endif
-
-} // NAMESPACE
 
 #endif // RENDERABLE3DENTITY_H
