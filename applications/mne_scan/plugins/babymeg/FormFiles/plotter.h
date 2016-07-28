@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Declaration of the Plotter class.
+* @brief    Plotter class declaration.
 *
 */
 
@@ -49,13 +49,9 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QMap>
-#include <QPixmap>
-#include <QVector>
+#include <QString>
 #include <QWidget>
-#include <QToolButton>
-#include <QStylePainter>
-#include <QStyleOptionFocusRect>
+#include <QMap>
 
 
 //*************************************************************************************************************

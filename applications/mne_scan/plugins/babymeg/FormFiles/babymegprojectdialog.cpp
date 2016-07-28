@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Definition of the BabyMEGProjectDialog class.
+* @brief    BabyMEGProjectDialog class definition.
 *
 */
 

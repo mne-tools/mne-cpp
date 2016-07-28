@@ -31,7 +31,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the BabyMEG class.
+* @brief    BabyMEG class definition.
 *
 */
 
@@ -43,6 +43,8 @@
 #include "babymeg.h"
 #include "FormFiles/babymegsetupwidget.h"
 #include "FormFiles/babymegprojectdialog.h"
+#include "FormFiles/babymegsquidcontroldgl.h"
+#include "FormFiles/babymeghpidgl.h"
 #include "babymegclient.h"
 #include "babymeginfo.h"
 

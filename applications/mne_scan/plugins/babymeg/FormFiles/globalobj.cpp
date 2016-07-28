@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     definitions of global varables.
+* @brief     Global variable definitions.
 *
 */
 

@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Declaration of the BabyMEGSetupWidget class.
+* @brief    BabyMEGSetupWidget class declaration.
 *
 */
 
