@@ -103,6 +103,9 @@ class BabyMEGProjectDialog;
 class BabyMEGClient;
 class BabyMEGInfo;
 class BabyMEGHPIDgl;
+class BabyMEGSetupWidget;
+class BabyMEGProjectDialog;
+class BabyMEGSQUIDControlDgl;
 
 
 //=============================================================================================================
