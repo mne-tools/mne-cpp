@@ -53,7 +53,7 @@ using namespace UTILSLIB;
 using namespace IOBuffer;
 using namespace Eigen;
 using namespace DISPLIB;
-using namespace RTPROCLIB;
+using namespace RTPROCESSINGLIB;
 
 
 //*************************************************************************************************************

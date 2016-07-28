@@ -42,7 +42,6 @@
 //=============================================================================================================
 
 #include "../../disp3D_global.h"
-
 #include "../../helpers/abstracttreeitem.h"
 
 
@@ -73,6 +72,10 @@ namespace MNELIB {
     class MNESourceSpace;
     class MNESourceEstimate;
     class MNEForwardSolution;
+}
+
+namespace Qt3DCore {
+    class QEntity;
 }
 
 

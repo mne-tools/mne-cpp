@@ -42,11 +42,11 @@
 //=============================================================================================================
 
 #include "disp3D_global.h"
-
 #include "3DObjects/data3Dtreemodel.h"
-#include "fs/annotationset.h"
-#include "fs/annotation.h"
-#include "mne/mne_forwardsolution.h"
+
+#include <fs/annotationset.h>
+#include <fs/annotation.h>
+#include <mne/mne_forwardsolution.h>
 
 
 //*************************************************************************************************************
@@ -81,6 +81,9 @@ namespace Qt3DCore {
     class QTransform;
 }
 
+namespace FIFFLIB{
+    class FiffDigPointSet;
+}
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -195,11 +198,23 @@ public:
     *
     * @param[in] subject            The name of the subject.
     * @param[in] set                The name of the bem set to which the data is to be added.
-    * @param[in] tSourceSpace       The source space information.
+    * @param[in] tBem               The Bem information.
     *
     * @return                       Returns true if successful.
     */
     bool addBemData(const QString& subject, const QString& set, const MNELIB::MNEBem& tBem);
+
+    //=========================================================================================================
+    /**
+    * Adds Digitizer data.
+    *
+    * @param[in] subject            The name of the subject.
+    * @param[in] set                The name of the measurment set to which the data is to be added.
+    * @param[in] tDigitizer         The Digitizer data.
+    *
+    * @return                       Returns true if successful.
+    */
+    bool addDigitizerData(const QString& subject, const QString& set, const FIFFLIB::FiffDigPointSet &tDigitizer);
 
     //=========================================================================================================
     /**

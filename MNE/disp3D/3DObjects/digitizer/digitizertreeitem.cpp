@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     babymegsetupwidget.cpp
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     digitizertreeitem.cpp
+* @author   Jana Kiesel <jana.kiesel@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     July, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Jana Kiesel and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    BabyMEGSetupWidget class definition.
+* @brief    DigitizerTreeItem class definition.
 *
 */
 
@@ -38,22 +38,23 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "babymegsetupwidget.h"
-#include "babymegaboutwidget.h"
+#include "digitizertreeitem.h"
+#include "../../helpers/renderable3Dentity.h"
 
-#include "babymegsquidcontroldgl.h"
-
-#include "../babymeg.h"
+#include <fiff/fiff_constants.h>
+#include <fiff/fiff_dig_point.h>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// Qt INCLUDES
 //=============================================================================================================
 
-#include <QDir>
-#include <QDebug>
-#include <QComboBox>
+#include <QMatrix4x4>
+#include <Qt3DExtras/QSphereMesh>
+#include <Qt3DExtras/QPhongMaterial>
+#include <Qt3DCore/QTransform>
+#include <Qt3DCore/QEntity>
 
 
 //*************************************************************************************************************
@@ -67,7 +68,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace BABYMEGPLUGIN;
+using namespace DISP3DLIB;
 
 
 //*************************************************************************************************************
@@ -75,79 +76,128 @@ using namespace BABYMEGPLUGIN;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-BabyMEGSetupWidget::BabyMEGSetupWidget(BabyMEG* p_pBabyMEG, QWidget* parent)
-: QWidget(parent)
-, m_pBabyMEG(p_pBabyMEG)
-, m_bIsInit(false)
+DigitizerTreeItem::DigitizerTreeItem(int iType, const QString& text)
+: AbstractTreeItem(iType, text)
+, m_pParentEntity(new Qt3DCore::QEntity())
+, m_pRenderable3DEntity(new Renderable3DEntity())
 {
-    ui.setupUi(this);
-
-    connect(m_pBabyMEG, &BabyMEG::cmdConnectionChanged, this,
-            &BabyMEGSetupWidget::cmdConnectionChanged);
-
-    //rt server fiffInfo received
-    connect(m_pBabyMEG, &BabyMEG::fiffInfoAvailable, this,
-            &BabyMEGSetupWidget::fiffInfoReceived);
-
-    //About
-    connect(ui.m_qPushButton_About, &QPushButton::released,
-            this, &BabyMEGSetupWidget::showAboutDialog);
-
-    //SQUID Control
-    connect(ui.m_qPushButtonSqdCtrl, &QPushButton::released,
-            this, &BabyMEGSetupWidget::showSqdCtrlDialog);
-
-    ui.m_qPushButtonSqdCtrl->setVisible(false);
-
-    this->init();
+    this->setEditable(false);
+    this->setCheckable(true);
+    this->setCheckState(Qt::Checked);
+    this->setToolTip(text);
 }
 
 
 //*************************************************************************************************************
 
-BabyMEGSetupWidget::~BabyMEGSetupWidget()
-{
-
-}
-
-
-//*************************************************************************************************************
-
-void BabyMEGSetupWidget::init()
+DigitizerTreeItem::~DigitizerTreeItem()
 {
 }
 
 
 //*************************************************************************************************************
 
-void BabyMEGSetupWidget::cmdConnectionChanged(bool p_bConnectionStatus)
+QVariant DigitizerTreeItem::data(int role) const
 {
-    Q_UNUSED(p_bConnectionStatus)
+    return AbstractTreeItem::data(role);
 }
 
 
 //*************************************************************************************************************
 
-void BabyMEGSetupWidget::fiffInfoReceived()
+void  DigitizerTreeItem::setData(const QVariant& value, int role)
 {
-    if(m_pBabyMEG->m_pFiffInfo)
-        this->ui.m_qLabel_sps->setText(QString("%1").arg(m_pBabyMEG->m_pFiffInfo->sfreq));
+    AbstractTreeItem::setData(value, role);
+
+    switch(role) {
+    case Data3DTreeModelItemRoles::SurfaceCurrentColorVert:
+        m_pRenderable3DEntity->setVertColor(value.value<QByteArray>());
+        break;
+    }
 }
 
 
 //*************************************************************************************************************
 
-void BabyMEGSetupWidget::showAboutDialog()
+bool DigitizerTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer, Qt3DCore::QEntity* parent)
 {
-    BabyMEGAboutWidget aboutDialog(this);
-    aboutDialog.exec();
+    //Create renderable 3D entity
+    m_pParentEntity = parent;
+    m_pRenderable3DEntity = new Renderable3DEntity(parent);
+
+    QMatrix4x4 m;
+    Qt3DCore::QTransform* transform =  new Qt3DCore::QTransform();
+    m.rotate(180, QVector3D(0.0f, 1.0f, 0.0f));
+    m.rotate(-90, QVector3D(1.0f, 0.0f, 0.0f));
+    transform->setMatrix(m);
+    m_pRenderable3DEntity->addComponent(transform);
+
+    //Create sources as small 3D spheres
+    QVector3D pos;
+    Qt3DCore::QEntity* sourceSphereEntity;
+    Qt3DExtras::QSphereMesh* sourceSphere;
+    Qt3DExtras::QPhongMaterial* material;
+
+    for(int i = 0; i < tDigitizer.size(); ++i) {
+
+        pos.setX(tDigitizer[i].r[0]);
+        pos.setY(tDigitizer[i].r[1]);
+        pos.setZ(tDigitizer[i].r[2]);
+
+        sourceSphereEntity = new Qt3DCore::QEntity();
+
+        sourceSphere = new Qt3DExtras::QSphereMesh();
+        if (tDigitizer[i].kind==FIFFV_POINT_CARDINAL){
+            sourceSphere->setRadius(0.002f);
+        }
+        else{
+            sourceSphere->setRadius(0.001f);
+        }
+        sourceSphereEntity->addComponent(sourceSphere);
+
+        transform = new Qt3DCore::QTransform();
+        QMatrix4x4 m;
+        m.translate(pos);
+        transform->setMatrix(m);
+        sourceSphereEntity->addComponent(transform);
+
+        material = new Qt3DExtras::QPhongMaterial();
+        switch (tDigitizer[i].kind) {
+        case FIFFV_POINT_CARDINAL:
+            material->setAmbient(Qt::yellow);
+            break;
+        case FIFFV_POINT_HPI:
+            material->setAmbient(Qt::red);
+            break;
+        case FIFFV_POINT_EEG:
+            material->setAmbient(Qt::green);
+            break;
+        case FIFFV_POINT_EXTRA:
+            material->setAmbient(Qt::blue);
+            break;
+        default:
+            material->setAmbient(Qt::white);
+            break;
+        }
+        sourceSphereEntity->addComponent(material);
+
+        sourceSphereEntity->setParent(m_pRenderable3DEntity);
+    }
+    return true;
 }
 
 
 //*************************************************************************************************************
 
-void BabyMEGSetupWidget::showSqdCtrlDialog()
+void DigitizerTreeItem::setVisible(bool state)
 {
-//    BabyMEGSQUIDControlDgl SQUIDCtrlDlg(m_pBabyMEG,this);
-//    SQUIDCtrlDlg.exec();
+    m_pRenderable3DEntity->setParent(state ? m_pParentEntity : Q_NULLPTR);
+}
+
+
+//*************************************************************************************************************
+
+void DigitizerTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
+{
+    this->setVisible(checkState==Qt::Unchecked ? false : true);
 }

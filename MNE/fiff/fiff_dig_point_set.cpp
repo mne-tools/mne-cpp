@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     BabyMEGHPIDgl.cpp
-* @author   Limin Sun <liminsun@nmr.mgh.harvard.edu>;
+* @file     fiff_dig_point_set.cpp
+* @author   Jana Kiesel <jana.kiesel@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     March, 2015
+* @date     July, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2015, Limin Sun and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Jana Kiesel and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,30 +29,34 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    BabyMEGHPIDgl class definition.
+* @brief    fiff_dig_point_set class definition.
 *
 */
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "babymeghpidgl.h"
-#include "ui_babymeghpidgl.h"
+#include "fiff_dig_point_set.h"
 
-#include <fiff/fiff_dir_tree.h>
-#include <fiff/fiff_tag.h>
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "fiff_dig_point.h"
+#include "fiff_dir_tree.h"
+#include "fiff_tag.h"
+#include "fiff_types.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
-
-#include <QFile>
-#include <QFileDialog>
-#include <QFileInfo>
 
 
 //*************************************************************************************************************
@@ -66,8 +70,13 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace BABYMEGPLUGIN;
 using namespace FIFFLIB;
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE GLOBAL METHODS
+//=============================================================================================================
 
 
 //*************************************************************************************************************
@@ -75,36 +84,15 @@ using namespace FIFFLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-BabyMEGHPIDgl::BabyMEGHPIDgl(BabyMEG* p_pBabyMEG,QWidget *parent)
-: QDialog(parent)
-, ui(new Ui::BabyMEGHPIDgl)
-, m_pBabyMEG(p_pBabyMEG)
+FiffDigPointSet::FiffDigPointSet()
 {
-    ui->setupUi(this);
-
-    connect(ui->bn_PolhemusFile, SIGNAL(released()),
-            this, SLOT(bnLoadPolhemusFile()));
-
-    connect(this, &BabyMEGHPIDgl::SendHPIFiffInfo,
-            m_pBabyMEG, &BabyMEG::RecvHPIFiffInfo);
-
-    connect(ui->buttonBox,SIGNAL(clicked(QAbstractButton *)),
-            this, SLOT(OKProc(QAbstractButton *)));
-//    connect(ui->buttonBox,SIGNAL(rejected()),this,SLOT(CancelProc));
 }
 
 
 //*************************************************************************************************************
 
-BabyMEGHPIDgl::~BabyMEGHPIDgl()
-{
-    delete ui;
-}
-
-
-//*************************************************************************************************************
-
-void BabyMEGHPIDgl::CancelProc()
+FiffDigPointSet::FiffDigPointSet(const FiffDigPointSet &p_FiffDigPointSet)
+: m_qListDigPoint(p_FiffDigPointSet.m_qListDigPoint)
 {
 
 }
@@ -112,101 +100,68 @@ void BabyMEGHPIDgl::CancelProc()
 
 //*************************************************************************************************************
 
-void BabyMEGHPIDgl::OKProc(QAbstractButton *b)
+FiffDigPointSet::FiffDigPointSet(QIODevice &p_IODevice)   //const FiffDigPointSet &p_FiffDigPointSet
 {
-    qDebug()<<"Clicked group button";
-
-    QString s(b->text());
-    qDebug()<<"Clicked group button:"<<s;
-
-    if (s == "OK") {
-        FileName_HPI = ui->ed_PolFileName->text();
-        /* Load Polhemus file*/
-        if (FileName_HPI.isEmpty())
-        {
-            // we do not find a file
-            qDebug()<<"Polhemus File Name is empty. Please input the file name.";
-        }
-        else
-        {
-            FileName_HPI = FileName_HPI.trimmed();
-            QFileInfo checkFile(FileName_HPI);
-
-            if (checkFile.exists() && checkFile.isFile()) {
-                ReadPolhemusDig(FileName_HPI);
-                qDebug()<<"Load file Finish!";
-                m_pBabyMEG->m_pFiffInfo->dig = info.dig;
-                //emit SendHPIFiffInfo(info);
-
-            } else {
-
-                qDebug()<<"Polhemus File is not existed. Please check if it is the full path.";
-            }
-        }
-    }
-
-}
-
-
-//*************************************************************************************************************
-
-void BabyMEGHPIDgl::closeEvent(QCloseEvent *event)
-{
-    Q_UNUSED(event)
-}
-
-
-//*************************************************************************************************************
-
-void BabyMEGHPIDgl::bnLoadPolhemusFile()
-{
-    qDebug()<<" Start to load Polhemus File";
-   // FileName_HPI = QFileDialog::getOpenFileName(this,
-   //      tr("Open Polhemus File"), "C:/Users/babyMEG/Desktop", tr("Fiff file (*.fif)"));
-    FileName_HPI = QFileDialog::getOpenFileName(this,
-            tr("Open Polhemus File"), "", tr("Fiff file (*.fif)"));
-    //display the text on the text control
-    ui->ed_PolFileName->setText(FileName_HPI);
-}
-
-
-//*************************************************************************************************************
-
-void BabyMEGHPIDgl::ReadPolhemusDig(QString fileName)
-{
-    //start to load Polhemus file
-    QFile t_headerFiffFile(fileName);
-
     //
     //   Open the file
     //
-    FiffStream::SPtr t_pStream(new FiffStream(&t_headerFiffFile));
-    QString t_sFileName = t_pStream->streamName();
-
-    printf("Opening header data %s...\n",t_sFileName.toUtf8().constData());
-
+    FiffStream::SPtr t_pStream(new FiffStream(&p_IODevice));
     FiffDirTree t_Tree;
-    QList<FiffDirEntry> t_Dir;
 
-    if(!t_pStream->open(t_Tree, t_Dir))
+    if(!FiffDigPointSet::readFromStream(t_pStream, t_Tree, *this))
     {
-        qDebug()<<"Can not open the Polhemus File";
-        return;
+        t_pStream->device()->close();
+        qDebug() << "Could not read the FiffDigPointSet\n"; // ToDo throw error
     }
+}
+
+
+//*************************************************************************************************************
+
+FiffDigPointSet::~FiffDigPointSet()
+{
+
+}
+
+
+//*************************************************************************************************************
+
+bool FiffDigPointSet::readFromStream(FiffStream::SPtr &p_pStream, FiffDirTree &p_Tree, FiffDigPointSet &p_Dig)
+{
+    //
+    //   Open the file, create directory
+    //
+    bool open_here = false;
+
+    if (!p_pStream->device()->isOpen())
+    {
+        QList<FiffDirEntry> t_Dir;
+        QString t_sFileName = p_pStream->streamName();
+
+        if(!p_pStream->open(p_Tree, t_Dir))
+        {
+            return false;
+        }
+        printf("Opening header data %s...\n",t_sFileName.toUtf8().constData());
+
+        open_here = true;
+//        if(t_pDir)
+//            delete t_pDir;
+    }
+
     //
     //   Read the measurement info
     //
-    //read_hpi_info(t_pStream,t_Tree, info);
+    //read_hpi_info(p_pStream,p_Tree, info);
     fiff_int_t kind = -1;
     fiff_int_t pos = -1;
     FiffTag::SPtr t_pTag;
 
     //
-    //   Locate the Polhemus data
+    //   Locate the Electrodes
     //
-    QList<FiffDirTree> isotrak = t_Tree.dir_tree_find(FIFFB_ISOTRAK);
+    QList<FiffDirTree> isotrak = p_Tree.dir_tree_find(FIFFB_ISOTRAK);
 
-    QList<FiffDigPoint> dig;
     fiff_int_t coord_frame = FIFFV_COORD_HEAD;
     FiffCoordTrans dig_trans;
     qint32 k = 0;
@@ -219,36 +174,81 @@ void BabyMEGHPIDgl::ReadPolhemusDig(QString fileName)
             pos  = isotrak[0].dir[k].pos;
             if (kind == FIFF_DIG_POINT)
             {
-                FiffTag::read_tag(t_pStream.data(), t_pTag, pos);
-                dig.append(t_pTag->toDigPoint());
+                FiffTag::read_tag(p_pStream.data(), t_pTag, pos);
+                p_Dig.m_qListDigPoint.append(t_pTag->toDigPoint());
             }
             else
             {
                 if (kind == FIFF_MNE_COORD_FRAME)
                 {
-                    FiffTag::read_tag(t_pStream.data(), t_pTag, pos);
+                    FiffTag::read_tag(p_pStream.data(), t_pTag, pos);
                     qDebug() << "NEEDS To BE DEBBUGED: FIFF_MNE_COORD_FRAME" << t_pTag->getType();
                     coord_frame = *t_pTag->toInt();
                 }
                 else if (kind == FIFF_COORD_TRANS)
                 {
-                    FiffTag::read_tag(t_pStream.data(), t_pTag, pos);
+                    FiffTag::read_tag(p_pStream.data(), t_pTag, pos);
                     qDebug() << "NEEDS To BE DEBBUGED: FIFF_COORD_TRANS" << t_pTag->getType();
                     dig_trans = t_pTag->toCoordTrans();
                 }
             }
         }
     }
-    for(k = 0; k < dig.size(); ++k)
-        dig[k].coord_frame = coord_frame;
+    for(k = 0; k < p_Dig.size(); ++k)
+    {
+        p_Dig[k].coord_frame = coord_frame;
+    }
 
     //
     //   All kinds of auxliary stuff
     //
-    info.dig   = dig;
-    //garbage collecting
-    t_pStream->device()->close();
-
+    if(open_here)
+    {
+        p_pStream->device()->close();
+    }
+    return true;
 }
 
 
+//*************************************************************************************************************
+
+const FiffDigPoint& FiffDigPointSet::operator[] (qint32 idx) const
+{
+    if (idx>=m_qListDigPoint.length())
+    {
+        qWarning("Warning: Required DigPoint doesn't exist! Returning DigPoint '0'.");
+        idx=0;
+    }
+    return m_qListDigPoint[idx];
+}
+
+
+//*************************************************************************************************************
+
+FiffDigPoint& FiffDigPointSet::operator[] (qint32 idx)
+{
+    if (idx >= m_qListDigPoint.length())
+    {
+        qWarning("Warning: Required DigPoint doesn't exist! Returning DigPoint '0'.");
+        idx = 0;
+    }
+    return m_qListDigPoint[idx];
+}
+
+
+//*************************************************************************************************************
+
+FiffDigPointSet &FiffDigPointSet::operator<<(const FiffDigPoint &dig)
+{
+    this->m_qListDigPoint.append(dig);
+    return *this;
+}
+
+
+//*************************************************************************************************************
+
+FiffDigPointSet &FiffDigPointSet::operator<<(const FiffDigPoint *dig)
+{
+    this->m_qListDigPoint.append(*dig);
+    return *this;
+}

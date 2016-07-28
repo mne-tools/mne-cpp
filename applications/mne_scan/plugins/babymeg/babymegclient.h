@@ -30,12 +30,27 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     implementation of the BabyMEGClient Class.
+* @brief     BabyMEGClient class declaration.
 *
 */
 
 #ifndef BABYMEGCLIENT_H
 #define BABYMEGCLIENT_H
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "babymeginfo.h"
+#include "babymeg_global.h"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -57,8 +72,21 @@
 #include "babymeginfo.h"
 
 
-class QTcpSocket;
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
 class QNetworkSession;
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE BABYMEGPLUGIN
+//=============================================================================================================
+
+namespace BABYMEGPLUGIN
+{
 
 
 //=============================================================================================================
@@ -67,7 +95,7 @@ class QNetworkSession;
 *
 * @brief The BabyMEGClient class provides a TCP/IP communication between Qt and Labview.
 */
-class BabyMEGClient : public QThread
+class BABYMEGSHARED_EXPORT BabyMEGClient : public QThread
 {
     Q_OBJECT
 
@@ -155,13 +183,6 @@ public:
     */
     void handleBuffer();
 
-    inline bool isConnected() const;
-
-signals:
-    void DataAcq();
-    void error(int socketError, const QString &message);
-
-public slots:
     //=========================================================================================================
     /**
     * Connect to BabyMEG server
@@ -185,7 +206,6 @@ public slots:
     * @param[in] void.
     */
     void SendCommandToBabyMEG();
-    void DisplayError(int socketError, const QString &message);
 
     //=========================================================================================================
     /**
@@ -194,7 +214,6 @@ public slots:
     * @param[in] void.
     */
     void ReadToBuffer();
-    void run();
 
     //=========================================================================================================
     /**
@@ -204,23 +223,33 @@ public slots:
     */
     void SendCommandToBabyMEGShortConnection(QByteArray s);
 
-public:
-    QString name;
-    int port;
-    bool SkipLoop;
-    bool DataAcqStartFlag;
-    QSharedPointer<BabyMEGInfo> myBabyMEGInfo;
+    void run();
+    void DisplayError(int socketError, const QString &message);
+    inline bool isConnected() const;
 
-    QByteArray buffer;
-    int numBlock;
-    bool DataACK;
+    QString                     name;
+
+    int                         port;
+    int                         numBlock;
+
+    bool                        SkipLoop;
+    bool                        DataAcqStartFlag;
+    bool                        DataACK;
+
+    QSharedPointer<BabyMEGInfo> myBabyMEGInfo;
+    QByteArray                  buffer;
 
 private:
-    bool m_bSocketIsConnected;
-    QTcpSocket *tcpSocket;
-    QMutex m_qMutex;
+    bool                        m_bSocketIsConnected;
+    QTcpSocket*                 tcpSocket;
 
+    QMutex                      m_qMutex;
+
+signals:
+    void DataAcq();
+    void error(int socketError, const QString &message);
 };
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -231,5 +260,7 @@ inline bool BabyMEGClient::isConnected() const
 {
     return m_bSocketIsConnected;
 }
+
+} // NAMESPACE
 
 #endif // BABYMEGCLIENT_H
