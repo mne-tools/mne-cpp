@@ -42,7 +42,6 @@
 //=============================================================================================================
 
 #include "../../disp3D_global.h"
-
 #include "../../helpers/abstracttreeitem.h"
 #include "../../helpers/types.h"
 
