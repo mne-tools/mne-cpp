@@ -31,7 +31,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the BabyMEG class.
+* @brief    BabyMEG class declaration.
 *
 */
 
@@ -44,42 +44,12 @@
 //=============================================================================================================
 
 #include "babymeg_global.h"
-#include "babymegclient.h"
-
-#include "FormFiles/babymegsquidcontroldgl.h"
-#include "FormFiles/babymeghpidgl.h"
-
-#include <scShared/Interfaces/ISensor.h>
-#include <generics/circularbuffer_old.h>
-#include <generics/circularmatrixbuffer.h>
-#include <scMeas/newrealtimemultisamplearray.h>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FIFF INCLUDES
-//=============================================================================================================
 
 #include <fiff/fiff_info.h>
-#include <fiff/fiff.h>
-#include <fiff/fiff_types.h>
+#include <fiff/fiff_stream.h>
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// MNE INCLUDES
-//=============================================================================================================
-
-#include <rtClient/rtcmdclient.h>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Eigen INCLUDES
-//=============================================================================================================
-
-#include <Eigen/Core>
-#include <Eigen/SparseCore>
+#include <scShared/Interfaces/ISensor.h>
+#include <generics/circularmatrixbuffer.h>
 
 
 //*************************************************************************************************************
@@ -90,36 +60,39 @@
 #include <QtWidgets>
 #include <QVector>
 #include <QTimer>
+#include <QMutex>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
+#include <Eigen/SparseCore>
+#include <QQuaternion>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+namespace SCMEASLIB {
+    class NewRealTimeMultiSampleArray;
+}
 
 #define MAX_DATA_LEN    2000000000L
 #define MAX_POS         2000000000L
 
-//*************************************************************************************************************
-//=============================================================================================================
-// QQuaternion INCLUDES
-//=============================================================================================================
-
-#include <QQuaternion>
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE BabyMEGPlugin
+// DEFINE NAMESPACE BABYMEGPLUGIN
 //=============================================================================================================
 
-namespace BabyMEGPlugin
+namespace BABYMEGPLUGIN
 {
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace SCSHAREDLIB;
-using namespace IOBuffer;
-using namespace RTCLIENTLIB;
-using namespace FIFFLIB;
-using namespace SCMEASLIB;
 
 
 //*************************************************************************************************************
@@ -128,16 +101,21 @@ using namespace SCMEASLIB;
 //=============================================================================================================
 
 class BabyMEGProjectDialog;
-class babymeghpidgl;
+class BabyMEGClient;
+class BabyMEGInfo;
+class BabyMEGHPIDgl;
+class BabyMEGSetupWidget;
+class BabyMEGProjectDialog;
+class BabyMEGSQUIDControlDgl;
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS BabyMEG
+* The BabyMEG class provides a connection to the babyMEG system.
 *
 * @brief The BabyMEG class provides a connection to the babyMEG system.
 */
-class BABYMEGSHARED_EXPORT BabyMEG : public ISensor
+class BABYMEGSHARED_EXPORT BabyMEG : public SCSHAREDLIB::ISensor
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "babymeg.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
@@ -147,7 +125,7 @@ class BABYMEGSHARED_EXPORT BabyMEG : public ISensor
     friend class BabyMEGSetupWidget;
     friend class BabyMEGProjectDialog;
     friend class BabyMEGSQUIDControlDgl;
-    friend class babymeghpidgl;
+    friend class BabyMEGHPIDgl;
 
 public:
     //=========================================================================================================
@@ -172,7 +150,7 @@ public:
     /**
     * Clone the plugin
     */
-    virtual QSharedPointer<IPlugin> clone() const;
+    virtual QSharedPointer<SCSHAREDLIB::IPlugin> clone() const;
 
     //=========================================================================================================
     /**
@@ -246,7 +224,7 @@ public:
     *
     * @return the plugin type in form of a IPlugin::PluginType
     */
-    virtual IPlugin::PluginType getType() const;
+    virtual SCSHAREDLIB::IPlugin::PluginType getType() const;
 
     //=========================================================================================================
     /**
@@ -322,7 +300,7 @@ public:
     *
     * @param[in] info   the new fiff info.
     */
-    void RecvHPIFiffInfo(const FiffInfo& info);
+    void RecvHPIFiffInfo(const FIFFLIB::FiffInfo& info);
 
     //=========================================================================================================
     /**
@@ -342,48 +320,25 @@ public:
 
     double m_dSfreq;        /**< The current sampling frequency. */
 
-signals:
-    //=========================================================================================================
-    /**
-    * Emitted when command clients connection status changed.
-    *
-    * @param[in] p_bStatus  connection status
-    */
-    void cmdConnectionChanged(bool p_bStatus);
-
-    //=========================================================================================================
-    /**
-    * Emitted when fiffInfo is available.
-    */
-    void fiffInfoAvailable();
-
-    //=========================================================================================================
-    /**
-    * Emitted when data is ready.
-    *
-    * @param[in] tmp    data to squid control
-    */
-    void DataToSquidCtrlGUI(MatrixXf tmp);
-
-    //=========================================================================================================
-    /**
-    * Emitted when data received from tcp/ip socket.
-    *
-    * @param[in] DATA    data to squid control
-    */
-    void SendCMDDataToSQUIDControl(QByteArray DATA);
-
 protected:
     virtual void run();
 
 private:
     //=========================================================================================================
     /**
+    * Combines all analog trigger signals to one single digital trigger line.
+    *
+    * @param[out] data  the data matrix
+    */
+    void createDigTrig(Eigen::MatrixXf& data);
+
+    //=========================================================================================================
+    /**
     * Calibrate matrix.
     *
-    * @param[out] data  connection status
+    * @param[out] data  the data matrix
     */
-    MatrixXd calibrate(const MatrixXf& data);
+    Eigen::MatrixXd calibrate(const Eigen::MatrixXf& data);
 
     //=========================================================================================================
     /**
@@ -433,23 +388,25 @@ private:
     */
     void BabyMEG::updateHPI();
 
-    PluginOutputData<NewRealTimeMultiSampleArray>::SPtr m_pRTMSABabyMEG;    /**< The NewRealTimeMultiSampleArray to provide the rt_server Channels.*/
+    SCSHAREDLIB::PluginOutputData<SCMEASLIB::NewRealTimeMultiSampleArray>::SPtr m_pRTMSABabyMEG;    /**< The NewRealTimeMultiSampleArray to provide the rt_server Channels.*/
+
+    QSharedPointer<IOBuffer::RawMatrixBuffer>                                   m_pRawMatrixBuffer; /**< Holds incoming raw data. */
 
     QSharedPointer<BabyMEGClient>           m_pMyClient;                    /**< TCP/IP communication between Qt and Labview. */
     QSharedPointer<BabyMEGClient>           m_pMyClientComm;                /**< TCP/IP communication between Qt and Labview - communication. */
     QSharedPointer<BabyMEGInfo>             pInfo;                          /**< Set up the babyMEG info. */
     QSharedPointer<BabyMEGProjectDialog>    m_pBabyMEGProjectDialog;        /**< Window to setup the recording tiem and fiel name. */
     QSharedPointer<BabyMEGSQUIDControlDgl>  SQUIDCtrlDlg;                   /**< Nonmodal dialog for squid control. */
-    QSharedPointer<babymeghpidgl>           HPIDlg;                         /**< HPI dialog information. */
+    QSharedPointer<BabyMEGHPIDgl>           HPIDlg;                         /**< HPI dialog information. */
 
     QSharedPointer<QTimer>                  m_pUpdateTimeInfoTimer;         /**< timer to control remaining time. */
     QSharedPointer<QTimer>                  m_pBlinkingRecordButtonTimer;   /**< timer to control blinking recording button. */
     QSharedPointer<QTimer>                  m_pRecordTimer;                 /**< timer to control recording time. */
 
-    QSharedPointer<RawMatrixBuffer>         m_pRawMatrixBuffer;             /**< Holds incoming raw data. */
+    QList<int>                              m_lTriggerChannelIndices;       /**< List of all trigger channel indices. */
 
-    FiffInfo::SPtr                          m_pFiffInfo;                    /**< Fiff measurement info.*/
-    FiffStream::SPtr                        m_pOutfid;                      /**< FiffStream to write to.*/
+    FIFFLIB::FiffInfo::SPtr                 m_pFiffInfo;                    /**< Fiff measurement info.*/
+    FIFFLIB::FiffStream::SPtr               m_pOutfid;                      /**< FiffStream to write to.*/
 
     qint16                                  m_iBlinkStatus;                 /**< The blink status of the recording button.*/
     qint32                                  m_iBufferSize;                  /**< The raw data buffer size.*/
@@ -471,15 +428,46 @@ private:
     QMutex                                  mutex;                          /**< Mutex to guarantee thread safety.*/
     QTime                                   m_recordingStartedTime;         /**< The time when the recording started.*/
 
-    RowVectorXd                             m_cals;                         /**< Calibration vector.*/
-    SparseMatrix<double>                    m_sparseMatCals;                /**< Sparse calibration matrix.*/
-    MatrixXf                                m_matValue;                     /**< The current data block.*/
+    Eigen::RowVectorXd                      m_cals;                         /**< Calibration vector.*/
+    Eigen::SparseMatrix<double>             m_sparseMatCals;                /**< Sparse calibration matrix.*/
+    Eigen::MatrixXf                         m_matValue;                     /**< The current data block.*/
 
-    QAction*                                m_pActionSetupProject;          /**< shows setup project dialog */
-    QAction*                                m_pActionRecordFile;            /**< start recording action */
-    QAction*                                m_pActionSqdCtrl;               /**< show squid control */
-    QAction*                                m_pActionUpdateFiffInfo;        /**< Update Fiff Info action */
-    QAction*                                m_pActionUpdateFiffInfoForHPI;  /**< Update HPI info into Fiff Info action */
+    QAction*                m_pActionSetupProject;          /**< shows setup project dialog */
+    QAction*                m_pActionRecordFile;            /**< start recording action */
+    QAction*                m_pActionSqdCtrl;               /**< show squid control */
+    QAction*                m_pActionUpdateFiffInfo;        /**< Update Fiff Info action */
+    QAction*                m_pActionUpdateFiffInfoForHPI;  /**< Update HPI info into Fiff Info action */
+
+signals:
+    //=========================================================================================================
+    /**
+    * Emitted when command clients connection status changed.
+    *
+    * @param[in] p_bStatus  connection status
+    */
+    void cmdConnectionChanged(bool p_bStatus);
+
+    //=========================================================================================================
+    /**
+    * Emitted when fiffInfo is available.
+    */
+    void fiffInfoAvailable();
+
+    //=========================================================================================================
+    /**
+    * Emitted when data is ready.
+    *
+    * @param[in] tmp    data to squid control
+    */
+    void DataToSquidCtrlGUI(Eigen::MatrixXf tmp);
+
+    //=========================================================================================================
+    /**
+    * Emitted when data received from tcp/ip socket.
+    *
+    * @param[in] DATA    data to squid control
+    */
+    void SendCMDDataToSQUIDControl(QByteArray DATA);
 };
 
 } // NAMESPACE

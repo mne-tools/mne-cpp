@@ -43,7 +43,7 @@
 
 #include "../disp3D_global.h"
 
-#include "mne/mne_forwardsolution.h"
+#include <mne/mne_forwardsolution.h>
 
 
 //*************************************************************************************************************
@@ -80,6 +80,10 @@ namespace MNELIB {
     class MNESourceSpace;
     class MNEBem;
     class MNESourceEstimate;
+}
+
+namespace FIFFLIB{
+    class FiffDigPointSet;
 }
 
 
@@ -195,11 +199,23 @@ public:
     *
     * @param[in] subject            The name of the subject.
     * @param[in] set                The name of the bem set to which the data is to be added.
-    * @param[in] tSourceSpace       The source space information.
+    * @param[in] tBem               The Bem information.
     *
     * @return                       Returns true if successful.
     */
     bool addData(const QString& subject, const QString& set, const MNELIB::MNEBem& tBem);
+
+    //=========================================================================================================
+    /**
+    * Adds digitizer data.
+    *
+    * @param[in] subject            The name of the subject.
+    * @param[in] set                The name of the measurment set to which the data is to be added.
+    * @param[in] tDigitizer         The digitizer information.
+    *
+    * @return                       Returns true if successful.
+    */
+    bool addData(const QString& subject, const QString& set, const FIFFLIB::FiffDigPointSet &tDigitizer);
 
 protected:
     QStandardItem*          m_pRootItem;            /**< The root item of the tree model. */

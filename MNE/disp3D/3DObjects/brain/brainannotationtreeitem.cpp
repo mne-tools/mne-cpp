@@ -39,12 +39,11 @@
 //=============================================================================================================
 
 #include "brainannotationtreeitem.h"
-
 #include "../common/metatreeitem.h"
 
-#include "fs/label.h"
-#include "fs/surface.h"
-#include "fs/annotation.h"
+#include <fs/label.h>
+#include <fs/surface.h>
+#include <fs/annotation.h>
 
 
 //*************************************************************************************************************

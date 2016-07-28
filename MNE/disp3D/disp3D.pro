@@ -107,13 +107,15 @@ SOURCES += \
     3DObjects/brain/brainrtconnectivitydatatreeitem.cpp \
     3DObjects/bem/bemtreeitem.cpp \
     3DObjects/bem/bemsurfacetreeitem.cpp \
+    3DObjects/digitizer/digitizertreeitem.cpp \
     helpers/abstracttreeitem.cpp \
     helpers/renderable3Dentity.cpp \
     helpers/custommesh.cpp \
     control/control3dwidget.cpp \
     rt/rtSourceLoc/rtsourcelocdataworker.cpp \
     3DObjects/brain/brainsourcespacetreeitem.cpp \
-    materials/shadermaterial.cpp
+    materials/shadermaterial.cpp \
+    3DObjects/digitizer/digitizersettreeitem.cpp
 
 HEADERS += \
     view3D.h \
@@ -129,6 +131,7 @@ HEADERS += \
     3DObjects/brain/brainrtconnectivitydatatreeitem.h \
     3DObjects/bem/bemtreeitem.h \
     3DObjects/bem/bemsurfacetreeitem.h \
+    3DObjects/digitizer/digitizertreeitem.h \
     helpers/abstracttreeitem.h \
     helpers/renderable3Dentity.h \
     helpers/custommesh.h \
@@ -137,7 +140,8 @@ HEADERS += \
     disp3D_global.h \
     rt/rtSourceLoc/rtsourcelocdataworker.h \
     3DObjects/brain/brainsourcespacetreeitem.h \
-    materials/shadermaterial.h
+    materials/shadermaterial.h \
+    3DObjects/digitizer/digitizersettreeitem.h
 
 FORMS += \
     control/control3dwidget.ui \

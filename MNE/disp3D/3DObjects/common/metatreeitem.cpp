@@ -52,6 +52,7 @@
 #include <QColor>
 #include <QStandardItem>
 #include <QStandardItemModel>
+#include <QVector3D>
 
 
 //*************************************************************************************************************
