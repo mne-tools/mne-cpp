@@ -52,6 +52,7 @@
 
 #include <QSharedPointer>
 #include <QPair>
+#include <QString>
 
 
 //*************************************************************************************************************
@@ -70,10 +71,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE CONNECTLIB
+// DEFINE NAMESPACE CONNECTIVITYLIB
 //=============================================================================================================
 
-namespace CONNECTLIB {
+namespace CONNECTIVITYLIB {
 
 
 //*************************************************************************************************************
@@ -86,11 +87,10 @@ namespace CONNECTLIB {
 /**
 * Description of what this class is intended to do (in detail).
 *
-* @brief Brief description of this class.
+* @brief Description of what this class is intended to do (in detail).
 */
-class CONNECTIVITYSHARED_EXPORT ConnectivityMeasures : public QObject
+class CONNECTIVITYSHARED_EXPORT ConnectivityMeasures
 {    
-    Q_OBJECT
 
 public:
     typedef QSharedPointer<ConnectivityMeasures> SPtr;            /**< Shared pointer type for ConnectivityMeasures. */
@@ -110,12 +110,13 @@ public:
     *
     * @return               The connectivity matrix.
     */
-    static Eigen::MatrixXd crossCorrelation(const Eigen::MatrixXd& matDataIn);
+     Eigen::MatrixXd crossCorrelation(const Eigen::MatrixXd& matDataIn);
 
 protected:
-    static QPair<int,double> eigenCrossCorrelation(const Eigen::RowVectorXd &xCorrInputVecFirst, const Eigen::RowVectorXd &xCorrInputVecSecond);
+     QPair<int,double> eigenCrossCorrelation(const Eigen::RowVectorXd &xCorrInputVecFirst, const Eigen::RowVectorXd &xCorrInputVecSecond);
     //std::pair<double, double> eigenCrossCorrelation(std::vector<double>& xCorrInputVecFirs, std::vector<double>& xCorrInputVecSecond);
 
+     QString m_sDeepThroat;
 private:
 
 };
@@ -127,6 +128,6 @@ private:
 //=============================================================================================================
 
 
-} // namespace CONNECTLIB
+} // namespace CONNECTIVITYLIB
 
 #endif // CONNECTLIB_CONNECTIVITYMEASURES_H
