@@ -42,12 +42,11 @@
 //=============================================================================================================
 
 #include "disp3D_global.h"
-
 #include "3DObjects/data3Dtreemodel.h"
 
-#include "fs/annotationset.h"
-#include "fs/annotation.h"
-#include "mne/mne_forwardsolution.h"
+#include <fs/annotationset.h>
+#include <fs/annotation.h>
+#include <mne/mne_forwardsolution.h>
 
 
 //*************************************************************************************************************

@@ -43,7 +43,6 @@
 //=============================================================================================================
 
 #include "../disp3D_global.h"
-
 #include "custommesh.h"
 
 
@@ -307,5 +306,10 @@ signals:
 };
 
 } // NAMESPACE
+
+#ifndef metatype_renderable3Dentity
+#define metatype_renderable3Dentity
+Q_DECLARE_METATYPE(DISP3DLIB::Renderable3DEntity*)
+#endif
 
 #endif // RENDERABLE3DENTITY_H
