@@ -110,10 +110,10 @@ public:
     *
     * @return               The connectivity matrix.
     */
-     Eigen::MatrixXd crossCorrelation(const Eigen::MatrixXd& matDataIn);
+    static Eigen::MatrixXd crossCorrelation(const Eigen::MatrixXd& matDataIn);
 
 protected:
-     QPair<int,double> eigenCrossCorrelation(const Eigen::RowVectorXd &xCorrInputVecFirst, const Eigen::RowVectorXd &xCorrInputVecSecond);
+    static QPair<int,double> eigenCrossCorrelation(const Eigen::RowVectorXd &xCorrInputVecFirst, const Eigen::RowVectorXd &xCorrInputVecSecond);
     //std::pair<double, double> eigenCrossCorrelation(std::vector<double>& xCorrInputVecFirs, std::vector<double>& xCorrInputVecSecond);
 
      QString m_sDeepThroat;
