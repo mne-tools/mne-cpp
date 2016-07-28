@@ -39,9 +39,10 @@
 //=============================================================================================================
 
 #include "digitizertreeitem.h"
+#include "../../helpers/renderable3Dentity.h"
 
-#include "fiff/fiff_constants.h"
-#include "fiff/fiff_dig_point.h"
+#include <fiff/fiff_constants.h>
+#include <fiff/fiff_dig_point.h>
 
 
 //*************************************************************************************************************
@@ -53,6 +54,7 @@
 #include <Qt3DExtras/QSphereMesh>
 #include <Qt3DExtras/QPhongMaterial>
 #include <Qt3DCore/QTransform>
+#include <Qt3DCore/QEntity>
 
 
 //*************************************************************************************************************

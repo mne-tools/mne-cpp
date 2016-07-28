@@ -39,13 +39,11 @@
 //=============================================================================================================
 
 #include "data3Dtreemodel.h"
-
 #include "bem/bemtreeitem.h"
 #include "subject/subjecttreeitem.h"
 #include "brain/brainsurfacetreeitem.h"
 #include "brain/brainsurfacesettreeitem.h"
 #include "digitizer/digitizertreeitem.h"
-
 #include "../helpers/renderable3Dentity.h"
 
 #include <mne/mne_bem.h>

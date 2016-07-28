@@ -61,7 +61,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace RTPROCLIB;
+using namespace RTPROCESSINGLIB;
 using namespace FIFFLIB;
 using namespace UTILSLIB;
 
@@ -326,7 +326,12 @@ void RtAve::run()
 
                 //Detect trigger
                 m_iTriggerPos = -1;
-                DetectTrigger::detectTriggerFlanksGrad(rawSegment, m_iTriggerIndex, m_iTriggerPos, 0, m_fTriggerThreshold, true, "Rising");
+                QList<QPair<int,double> > lDetectedTriggers = DetectTrigger::detectTriggerFlanksGrad(rawSegment, m_iTriggerIndex, 0, m_fTriggerThreshold, true, "Rising");
+
+                if(!lDetectedTriggers.isEmpty())
+                {
+                    m_iTriggerPos = lDetectedTriggers.at(0).first;
+                }
 
                 //If number of averages is equals zero do not perform averages
                 if(m_iNumAverages == 0) {

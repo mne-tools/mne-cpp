@@ -39,15 +39,13 @@
 //=============================================================================================================
 
 #include "brainrtconnectivitydatatreeitem.h"
-
 #include "../../rt/rtSourceLoc/rtsourcelocdataworker.h"
-
 #include "../common/metatreeitem.h"
 
-#include "fiff/fiff_types.h"
+#include <fiff/fiff_types.h>
 
-#include "mne/mne_sourceestimate.h"
-#include "mne/mne_forwardsolution.h"
+#include <mne/mne_sourceestimate.h>
+#include <mne/mne_forwardsolution.h>
 
 
 //*************************************************************************************************************

@@ -39,7 +39,6 @@
 //=============================================================================================================
 
 #include "brainsurfacesettreeitem.h"
-
 #include "brainhemispheretreeitem.h"
 #include "brainrtsourcelocdatatreeitem.h"
 #include "brainrtconnectivitydatatreeitem.h"
@@ -49,12 +48,12 @@
 #include "../digitizer/digitizertreeitem.h"
 
 
-#include "fs/label.h"
-#include "fs/annotationset.h"
-#include "fs/surfaceset.h"
+#include <fs/label.h>
+#include <fs/annotationset.h>
+#include <fs/surfaceset.h>
 
-#include "mne/mne_sourceestimate.h"
-#include "mne/mne_sourcespace.h"
+#include <mne/mne_sourceestimate.h>
+#include <mne/mne_sourcespace.h>
 
 #include <fiff/fiff_dig_point_set.h>
 
