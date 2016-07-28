@@ -62,6 +62,7 @@
 #include <QQueue>
 #include <QStringList>
 #include <QWaitCondition>
+#include <QMutex>
 
 
 //*************************************************************************************************************
