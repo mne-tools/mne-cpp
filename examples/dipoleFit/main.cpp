@@ -191,14 +191,28 @@ void mne_free_cmatrix (float **m)
 #define FREE_CMATRIX(m) mne_free_cmatrix((m))
 
 
+//=============================fiff_types.h =============================
+
+/** Structure for sparse matrices */
+
+typedef struct _fiff_sparse_matrix {
+ fiff_int_t   coding;          /**< coding (storage) type of the sparse matrix */
+ fiff_int_t   m;	        /**< m rows */
+ fiff_int_t   n;               /**< n columns */
+ fiff_int_t   nz;              /**< nz nonzeros */
+ fiff_float_t *data;           /**< owns the data */
+ fiff_int_t   *inds;           /**< index list, points into data, no dealloc! */
+ fiff_int_t   *ptrs;           /**< pointer list, points into data, no dealloc! */
+} *fiffSparseMatrix, fiffSparseMatrixRec;
+
+
+
 //============================= mne_types.h =============================
 
 typedef void (*mneUserFreeFunc)(void *);  /* General purpose */
 
-
-
-
-
+typedef fiffSparseMatrix mneSparseMatrix;
+typedef fiffSparseMatrixRec mneSparseMatrixRec;
 
 
 typedef struct {		/* Matrix specification with a channel list */
@@ -243,6 +257,64 @@ typedef struct {		/* Collection of projection items and the projector itself */
   float          **proj_data;	/* The orthogonalized projection vectors picked and orthogonalized from the original data */
 } *mneProjOp,mneProjOpRec;
 
+typedef struct {
+  int   filter_on;		/* Is it on? */
+  int   size;			/* Length in samples (must be a power of 2) */
+  int   taper_size;		/* How long a taper in the beginning and end */
+  float highpass;		/* Highpass in Hz */
+  float highpass_width;		/* Highpass transition width in Hz */
+  float lowpass;		/* Lowpass in Hz */
+  float lowpass_width;		/* Lowpass transition width in Hz */
+  float eog_highpass;		/* EOG highpass in Hz */
+  float eog_highpass_width;	/* EOG highpass transition width in Hz */
+  float eog_lowpass;		/* EOG lowpass in Hz */
+  float eog_lowpass_width;	/* EOG lowpass transition width in Hz */
+} *mneFilterDef,mneFilterDefRec;
+
+
+typedef struct {
+  int   job;			/* Value of FIFF_SSS_JOB tag */
+  int   coord_frame;		/* Coordinate frame */
+  float origin[3];		/* The expansion origin */
+  int   nchan;			/* How many channels */
+  int   out_order;		/* Order of the outside expansion */
+  int   in_order;		/* Order of the inside expansion */
+  int   *comp_info;		/* Which components are included */
+  int   ncomp;			/* How many entries in the above */
+  int   in_nuse;		/* How many components included in the inside expansion */
+  int   out_nuse;		/* How many components included in the outside expansion */
+} *mneSssData,mneSssDataRec;	/* Essential information about SSS */
+
+/*
+ * The class field in mneCovMatrix can have these values
+ */
+#define MNE_COV_CH_UNKNOWN  -1	/* No idea */
+#define MNE_COV_CH_MEG_MAG   0  /* Axial gradiometer or magnetometer [T] */
+#define MNE_COV_CH_MEG_GRAD  1  /* Planar gradiometer [T/m] */
+#define MNE_COV_CH_EEG       2  /* EEG [V] */
+
+
+typedef struct {		/* Covariance matrix storage */
+  int        kind;		/* Sensor or source covariance */
+  int        ncov;		/* Dimension */
+  int        nfree;		/* Number of degrees of freedom */
+  int        nproj;		/* Number of dimensions projected out */
+  int        nzero;		/* Number of zero or small eigenvalues */
+  char       **names;		/* Names of the entries (optional) */
+  double     *cov;		/* Covariance matrix in packed representation (lower triangle) */
+  double     *cov_diag;		/* Diagonal covariance matrix */
+  mneSparseMatrix cov_sparse;   /* A sparse covariance matrix
+                 * (Note: data are floats in this which is an inconsistency) */
+  double     *lambda;		/* Eigenvalues of cov */
+  double     *inv_lambda;	/* Inverses of the square roots of the eigenvalues of cov */
+  float      **eigen;		/* Eigenvectors of cov */
+  double     *chol;		/* Cholesky decomposition */
+  mneProjOp  proj;		/* The projection which was active when this matrix was computed */
+  mneSssData sss;		/* The SSS data present in the associated raw data file */
+  int        *ch_class;		/* This will allow grouping of channels for regularization (MEG [T/m], MEG [T], EEG [V] */
+  char       **bads;		/* Which channels were designated bad when this noise covariance matrix was computed? */
+  int        nbad;		/* How many of them */
+} *mneCovMatrix,mneCovMatrixRec;
 
 
 //============================= misc_util.c =============================
@@ -1893,8 +1965,10 @@ static int check_args (int *argc,char **argv)
 
   for (k = 0; k < *argc; k++) {
     found = 0;
-    if (strcmp(argv[k],"--version") == 0) {
-      mne_print_version_info(stderr,argv[0],PROGRAM_VERSION,__DATE__,__TIME__);
+    if (strcmp(argv[k],"--version") == 0) {      
+      printf("%s version %s compiled at %s %s\n",
+          argv[0],PROGRAM_VERSION,__DATE__,__TIME__);
+
       exit(0);
     }
     else if (strcmp(argv[k],"--help") == 0) {
@@ -1902,12 +1976,12 @@ static int check_args (int *argc,char **argv)
       exit(1);
     }
     else if (strcmp(argv[k],"--guess") == 0) {
-      found = 2;
-      if (k == *argc - 1) {
-    qCritical ("--guess: argument required.");
-    return FAIL;
-      }
-      guessname = strdup(argv[k+1]);
+        found = 2;
+        if (k == *argc - 1) {
+            qCritical ("--guess: argument required.");
+            return FAIL;
+        }
+        guessname = strdup(argv[k+1]);
     }
     else if (strcmp(argv[k],"--gsurf") == 0) {
       found = 2;
@@ -2171,49 +2245,49 @@ static int check_args (int *argc,char **argv)
       mag_reg = fval;
     }
     else if (strcmp(argv[k],"--gradreg") == 0) {
-      found = 2;
-      if (k == *argc - 1) {
-    qCritical ("--gradreg: argument required.");
-    return FAIL;
-      }
-      if (sscanf(argv[k+1],"%g",&fval) != 1) {
-    qCritical () << "Incomprehensible value: %s",argv[k+1]);
-    return FAIL;
-      }
-      if (fval < 0 || fval > 1) {
-    qCritical ("Regularization value should be positive and smaller than one.");
-    return FAIL;
-      }
-      grad_reg = fval;
+        found = 2;
+        if (k == *argc - 1) {
+            qCritical ("--gradreg: argument required.");
+            return FAIL;
+        }
+        if (sscanf(argv[k+1],"%g",&fval) != 1) {
+            qCritical () << "Incomprehensible value:" << argv[k+1] ;
+            return FAIL;
+        }
+        if (fval < 0 || fval > 1) {
+            qCritical ("Regularization value should be positive and smaller than one.");
+            return FAIL;
+        }
+        grad_reg = fval;
     }
     else if (strcmp(argv[k],"--reg") == 0) {
-      found = 2;
-      if (k == *argc - 1) {
-    qCritical ("--reg: argument required.");
-    return FAIL;
-      }
-      if (sscanf(argv[k+1],"%g",&fval) != 1) {
-    qCritical () << "Incomprehensible value: %s",argv[k+1]);
-    return FAIL;
-      }
-      if (fval < 0 || fval > 1) {
-    qCritical ("Regularization value should be positive and smaller than one.");
-    return FAIL;
-      }
-      grad_reg = fval;
-      mag_reg = fval;
-      eeg_reg = fval;
+        found = 2;
+        if (k == *argc - 1) {
+            qCritical ("--reg: argument required.");
+            return FAIL;
+        }
+        if (sscanf(argv[k+1],"%g",&fval) != 1) {
+            qCritical () << "Incomprehensible value:" << argv[k+1];
+            return FAIL;
+        }
+        if (fval < 0 || fval > 1) {
+            qCritical ("Regularization value should be positive and smaller than one.");
+            return FAIL;
+        }
+        grad_reg = fval;
+        mag_reg = fval;
+        eeg_reg = fval;
     }
     else if (strcmp(argv[k],"--tstep") == 0) {
-      found = 2;
-      if (k == *argc - 1) {
-    qCritical ("--tstep: argument required.");
-    return FAIL;
-      }
-      if (sscanf(argv[k+1],"%g",&fval) != 1) {
-    qCritical() << "Incomprehensible tstep:" << argv[k+1];
-    return FAIL;
-      }
+        found = 2;
+        if (k == *argc - 1) {
+            qCritical ("--tstep: argument required.");
+            return FAIL;
+        }
+        if (sscanf(argv[k+1],"%g",&fval) != 1) {
+            qCritical() << "Incomprehensible tstep:" << argv[k+1];
+            return FAIL;
+        }
       if (fval < 0.0) {
     qCritical ("Time step should be positive");
     return FAIL;
@@ -2402,16 +2476,6 @@ static int check_args (int *argc,char **argv)
     }
   }
   return check_unrecognized_args(*argc,argv);
-}
-
-void print_cov(FILE *out, mneCovMatrix cov)
-{
-    int k;
-    mne_print_dvector(out,NULL,cov->lambda,cov->ncov);
-    if (cov->eigen) {
-        for (k = 0; k < cov->ncov; k++)
-            mne_print_vector(out,NULL,cov->eigen[k],cov->ncov);
-    }
 }
 
 
