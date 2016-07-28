@@ -43,7 +43,7 @@
 
 #include "babymeg_global.h"
 #include "globalobj.h"
-#include "Plotter.h"
+#include "plotter.h"
 
 
 //*************************************************************************************************************
