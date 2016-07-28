@@ -30,20 +30,27 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     implementation of the BabyMEGInfo Class.
+* @brief     BabyMEGInfo class declaration.
 *
 */
 
 #ifndef BABYMEGINFO_H
 #define BABYMEGINFO_H
 
-
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
+#include "babymeg_global.h"
+
 #include <fiff/fiff_info.h>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
 
 
 //*************************************************************************************************************
@@ -53,12 +60,34 @@
 
 #include <QObject>
 #include <QQueue>
-#include <QtCore>
-
 #include <QStringList>
+#include <QWaitCondition>
+#include <QMutex>
 
 
-using namespace FIFFLIB;
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+namespace FIFFLIB {
+    class FiffInfo;
+}
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE BABYMEGPLUGIN
+//=============================================================================================================
+
+namespace BABYMEGPLUGIN
+{
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
 
 
 //=============================================================================================================
@@ -67,7 +96,7 @@ using namespace FIFFLIB;
 *
 * @brief The BabyMEGClient class provides a TCP/IP communication between Qt and Labview.
 */
-class BabyMEGInfo : public QObject
+class BABYMEGSHARED_EXPORT BabyMEGInfo : public QObject
 {
     Q_OBJECT
 public:
@@ -76,11 +105,77 @@ public:
     * Constructs a BabyMEGInfo class.
     */
     BabyMEGInfo();
-public:
-    int chnNum;
-    int dataLength;
-    double sfreq;
+
+    //=========================================================================================================
+    /**
+    * extract information from string with separate char ":"
+    *
+    * @param[in] cmdstr     QByteArray contains the header information.
+    *
+    * @return QStringList   returned information.
+    */
+    QStringList MGH_LM_Exact_Single_Channel_Info(QByteArray cmdstr);
+
+    //=========================================================================================================
+    /**
+    * extract information from string with separate char ":"
+    *
+    * @param[in] cmdstr         QByteArray contains the header information.
+    *
+    * @return QByteArray        returned information.
+    */
+    QByteArray MGH_LM_Get_Field(QByteArray cmdstr);
+    //=========================================================================================================
+    /**
+    * extract channel information from string with separate char ":","|",";"
+    *
+    * @param[in] cmdstr     QByteArray contains the channel information.
+    */
+    void MGH_LM_Get_Channel_Info(QByteArray cmdstr);
+    //=========================================================================================================
+    /**
+    * Parse the information about header information
+    *
+    * @param[in] cmdstr     QByteArray contains the header information.
+    */
+    void MGH_LM_Parse_Para(QByteArray cmdstr);
+    //=========================================================================================================
+    /**
+    * Send data package
+    *
+    * @param[in] DATA       QByteArray contains MEG data.
+    */
+    void MGH_LM_Send_DataPackage(QByteArray DATA);
+    //=========================================================================================================
+    /**
+    * Send command reply package
+    *
+    * @param[in] DATA       QByteArray contains MEG data.
+    */
+    void MGH_LM_Send_CMDPackage(QByteArray DATA);
+
+    //=========================================================================================================
+    /**
+    * Parse the information about header information
+    *
+    * @param[in] cmdstr     QByteArray contains the header information.
+    */
+    void MGH_LM_Parse_Para_Infg(QByteArray cmdstr);
+    //=========================================================================================================
+    /**
+    * extract channel information from string with separate char ":","|",";"
+    *
+    * @param[in] cmdstr     QByteArray contains the channel information.
+    */
+    void MGH_LM_Get_Channel_Infg(QByteArray cmdstr);
+
+    inline FIFFLIB::FiffInfo getFiffInfo() const;
+
+    int         chnNum;
+    int         dataLength;
+    double      sfreq;
     QStringList lm_ch_names;
+
     // parameters of single channel
     QStringList lm_ch_scales;
     QStringList lm_ch_pos1;
@@ -100,87 +195,20 @@ public:
     QStringList lm_ch_gain;
 
     //BB_QUEUE
-    QQueue<QByteArray> g_queue;
-    int g_maxlen;
-    QMutex g_mutex;
-    QWaitCondition g_queueNotFull;
-    QWaitCondition g_queueNotEmpty;
+    QQueue<QByteArray>  g_queue;
+    int                 g_maxlen;
+    QMutex              g_mutex;
+    QWaitCondition      g_queueNotFull;
+    QWaitCondition      g_queueNotEmpty;
 
-
-
-    inline FiffInfo getFiffInfo() const;
-
+private:
+    FIFFLIB::FiffInfo   m_FiffInfo;
 
 signals:
     void fiffInfoAvailable(FIFFLIB::FiffInfo);
     void SendDataPackage(QByteArray DATA);
     void SendCMDPackage(QByteArray DATA);
     void GainInfoUpdate(QStringList);
-
-public:
-    //=========================================================================================================
-    /**
-    * extract information from string with separate char ":"
-    *
-    * @param[in] cmdstr - QByteArray contains the header information.
-    * @param[out] QByteArray  - returned information.
-    */
-    QStringList MGH_LM_Exact_Single_Channel_Info(QByteArray cmdstr);
-    //=========================================================================================================
-    /**
-    * extract information from string with separate char ":"
-    *
-    * @param[in] cmdstr - QByteArray contains the header information.
-    * @param[out] QByteArray  - returned information.
-    */
-    QByteArray MGH_LM_Get_Field(QByteArray cmdstr);
-    //=========================================================================================================
-    /**
-    * extract channel information from string with separate char ":","|",";"
-    *
-    * @param[in] cmdstr - QByteArray contains the channel information.
-    */
-    void MGH_LM_Get_Channel_Info(QByteArray cmdstr);
-    //=========================================================================================================
-    /**
-    * Parse the information about header information
-    *
-    * @param[in] cmdstr - QByteArray contains the header information.
-    */
-    void MGH_LM_Parse_Para(QByteArray cmdstr);
-    //=========================================================================================================
-    /**
-    * Send data package
-    *
-    * @param[in] DATA - QByteArray contains MEG data.
-    */
-    void MGH_LM_Send_DataPackage(QByteArray DATA);
-    //=========================================================================================================
-    /**
-    * Send command reply package
-    *
-    * @param[in] DATA - QByteArray contains MEG data.
-    */
-    void MGH_LM_Send_CMDPackage(QByteArray DATA);
-
-    //=========================================================================================================
-    /**
-    * Parse the information about header information
-    *
-    * @param[in] cmdstr - QByteArray contains the header information.
-    */
-    void MGH_LM_Parse_Para_Infg(QByteArray cmdstr);
-    //=========================================================================================================
-    /**
-    * extract channel information from string with separate char ":","|",";"
-    *
-    * @param[in] cmdstr - QByteArray contains the channel information.
-    */
-    void MGH_LM_Get_Channel_Infg(QByteArray cmdstr);
-
-
-private:
-    FiffInfo m_FiffInfo;
 
 };
 
@@ -190,9 +218,11 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline FiffInfo BabyMEGInfo::getFiffInfo() const
+inline FIFFLIB::FiffInfo BabyMEGInfo::getFiffInfo() const
 {
     return m_FiffInfo;
 }
+
+} // NAMESPACE
 
 #endif // BABYMEGINFO_H

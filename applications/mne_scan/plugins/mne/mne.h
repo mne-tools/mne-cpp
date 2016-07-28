@@ -89,7 +89,7 @@ using namespace FSLIB;
 using namespace FIFFLIB;
 using namespace MNELIB;
 using namespace INVERSELIB;
-using namespace RTPROCLIB;
+using namespace RTPROCESSINGLIB;
 using namespace SCSHAREDLIB;
 using namespace SCMEASLIB;
 using namespace IOBuffer;

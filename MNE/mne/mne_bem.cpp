@@ -143,7 +143,9 @@ bool MNEBem::readFromStream(FiffStream::SPtr& p_pStream, bool add_geom, FiffDirT
         t_file.setFileName(t_sFileName);
         p_pStream = FiffStream::SPtr(new FiffStream(&t_file));
         if(!p_pStream->open(p_Tree, t_Dir))
+        {
             return false;
+        }
         open_here = true;
 //        if(t_pDir)
 //            delete t_pDir;
@@ -159,7 +161,9 @@ bool MNEBem::readFromStream(FiffStream::SPtr& p_pStream, bool add_geom, FiffDirT
     {
         qCritical() << "No BEM block found!";
         if(open_here)
+        {
             p_pStream->device()->close();
+        }
         return false;
     }
 
@@ -168,7 +172,9 @@ bool MNEBem::readFromStream(FiffStream::SPtr& p_pStream, bool add_geom, FiffDirT
     {
         qCritical() << "No BEM surfaces found!";
         if(open_here)
+        {
             p_pStream->device()->close();
+        }
         return false;
     }
 
@@ -178,8 +184,10 @@ bool MNEBem::readFromStream(FiffStream::SPtr& p_pStream, bool add_geom, FiffDirT
         printf("\tReading a BEM surface...");
         MNEBem::readBemSurface(p_pStream.data(), bemsurf[k], p_BemSurface);
         p_BemSurface.addTriangleData();
-         if (add_geom)
-            p_BemSurface.addVertexNormals();
+        if (add_geom)
+        {
+           p_BemSurface.addVertexNormals();
+        }
         printf("\t[done]\n" );
 
         p_Bem.m_qListBemSurface.append(p_BemSurface);
@@ -189,7 +197,9 @@ bool MNEBem::readFromStream(FiffStream::SPtr& p_pStream, bool add_geom, FiffDirT
     printf("\t%d bem surfaces read\n", bemsurf.size());
 
     if(open_here)
+    {
         p_pStream->device()->close();
+    }
     return true;
 }
 
