@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     Definition of the BabyMEGInfo class.
+* @brief     BabyMEGInfo class definition.
 *
 */
 

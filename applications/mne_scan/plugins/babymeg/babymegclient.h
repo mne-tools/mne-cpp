@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     Declaration of the BabyMEGClient Class.
+* @brief     BabyMEGClient class declaration.
 *
 */
 

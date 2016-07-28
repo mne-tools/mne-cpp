@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the BabyMEGAboutWidget class.
+* @brief    BabyMEGAboutWidget class declaration.
 *
 */
 
@@ -51,7 +51,7 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtWidgets>
+#include <QDialog>
 
 
 //*************************************************************************************************************

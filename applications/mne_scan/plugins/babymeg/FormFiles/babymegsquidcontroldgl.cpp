@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the BabyMEGSQUIDControlDgl class.
+* @brief    BabyMEGSQUIDControlDgl class definition.
 *
 */
 
@@ -49,11 +49,6 @@
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
-
-#include <QPen>
-#include <QGLWidget>
-
-#include <QDebug>
 
 
 //*************************************************************************************************************

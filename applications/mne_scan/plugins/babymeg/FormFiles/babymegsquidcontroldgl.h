@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Declaration of the BabyMEGSQUIDControlDGL class.
+* @brief    BabyMEGSQUIDControlDGL class declaration.
 *
 */
 
@@ -51,17 +51,9 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QDialog>
-#include <QScrollBar>
-#include <QDebug>
-#include <QVector>
-#include <qmath.h>
-#include <QGraphicsView>
-#include <QGraphicsScene>
-#include <QGraphicsItem>
 #include <QGraphicsLineItem>
 #include <QGraphicsRectItem>
-#include <QGraphicsTextItem>
+#include <QDialog>
 
 
 //*************************************************************************************************************
@@ -101,6 +93,7 @@ namespace BABYMEGPLUGIN
 //=============================================================================================================
 
 class BabyMEG;
+class PlotSettings;
 
 
 //*************************************************************************************************************
@@ -247,9 +240,9 @@ public:
     BabyMEG*                        m_pBabyMEG;
     FLLConfig                       m_FLLConfig;
     GUIStatMachine                  m_GUISM;
-    QVector <QGraphicsLineItem * >  PolyLinePtr;
+    QVector <QGraphicsLineItem*>    PolyLinePtr;
     bool                            initplotflag;
-    QVector <QGraphicsRectItem * >  PolyRectPtr;
+    QVector <QGraphicsRectItem*>    PolyRectPtr;
 
     PlotSettings                    settings;
     PlotSettings                    settings_tune;

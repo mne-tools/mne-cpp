@@ -31,7 +31,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Declaration of the BabyMEG class.
+* @brief    BabyMEG class declaration.
 *
 */
 
@@ -44,9 +44,6 @@
 //=============================================================================================================
 
 #include "babymeg_global.h"
-
-#include "FormFiles/babymegsquidcontroldgl.h"
-#include "FormFiles/babymeghpidgl.h"
 
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_stream.h>
@@ -105,6 +102,7 @@ namespace BABYMEGPLUGIN
 class BabyMEGProjectDialog;
 class BabyMEGClient;
 class BabyMEGInfo;
+class BabyMEGHPIDgl;
 
 
 //=============================================================================================================
@@ -318,37 +316,6 @@ public:
 
     double m_dSfreq;        /**< The current sampling frequency. */
 
-signals:
-    //=========================================================================================================
-    /**
-    * Emitted when command clients connection status changed.
-    *
-    * @param[in] p_bStatus  connection status
-    */
-    void cmdConnectionChanged(bool p_bStatus);
-
-    //=========================================================================================================
-    /**
-    * Emitted when fiffInfo is available.
-    */
-    void fiffInfoAvailable();
-
-    //=========================================================================================================
-    /**
-    * Emitted when data is ready.
-    *
-    * @param[in] tmp    data to squid control
-    */
-    void DataToSquidCtrlGUI(Eigen::MatrixXf tmp);
-
-    //=========================================================================================================
-    /**
-    * Emitted when data received from tcp/ip socket.
-    *
-    * @param[in] DATA    data to squid control
-    */
-    void SendCMDDataToSQUIDControl(QByteArray DATA);
-
 protected:
     virtual void run();
 
@@ -459,6 +426,37 @@ private:
     QAction*                                m_pActionSqdCtrl;               /**< show squid control */
     QAction*                                m_pActionUpdateFiffInfo;        /**< Update Fiff Info action */
     QAction*                                m_pActionUpdateFiffInfoForHPI;  /**< Update HPI info into Fiff Info action */
+
+signals:
+    //=========================================================================================================
+    /**
+    * Emitted when command clients connection status changed.
+    *
+    * @param[in] p_bStatus  connection status
+    */
+    void cmdConnectionChanged(bool p_bStatus);
+
+    //=========================================================================================================
+    /**
+    * Emitted when fiffInfo is available.
+    */
+    void fiffInfoAvailable();
+
+    //=========================================================================================================
+    /**
+    * Emitted when data is ready.
+    *
+    * @param[in] tmp    data to squid control
+    */
+    void DataToSquidCtrlGUI(Eigen::MatrixXf tmp);
+
+    //=========================================================================================================
+    /**
+    * Emitted when data received from tcp/ip socket.
+    *
+    * @param[in] DATA    data to squid control
+    */
+    void SendCMDDataToSQUIDControl(QByteArray DATA);
 };
 
 } // NAMESPACE

@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Definition of the BabyMEGHPIDgl class.
+* @brief    BabyMEGHPIDgl class definition.
 *
 */
 

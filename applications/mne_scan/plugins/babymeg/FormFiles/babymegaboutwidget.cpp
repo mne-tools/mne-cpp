@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Definition of the BabyMEGAboutWidget class.
+* @brief    BabyMEGAboutWidget class definition.
 *
 */
 

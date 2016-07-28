@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Declaration of the BabyMEGHPI class.
+* @brief    BabyMEGHPI class declaration.
 *
 */
 

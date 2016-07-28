@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     Definition of the BabyMEGClient class.
+* @brief     BabyMEGClient class definition.
 *
 */
 
