@@ -68,14 +68,17 @@ using namespace BABYMEGPLUGIN;
 BabyMEGClient::BabyMEGClient(int myPort, QObject *parent)
 : QThread(parent)
 {
-    connect(this,SIGNAL(DataAcq()),this,SLOT(run()));
+    connect(this, &BabyMEGClient::DataAcq,
+            this, &BabyMEGClient::run);
+
     tcpSocket = new QTcpSocket(this);
 
-    connect(tcpSocket,SIGNAL(readyRead()),this,SLOT(ReadToBuffer()));
+    connect(tcpSocket, &QTcpSocket::readyRead,
+            this, &BabyMEGClient::ReadToBuffer);
 
+    connect(this, &BabyMEGClient::error,
+            this, &BabyMEGClient::DisplayError);     //find out name of this machine
 
-    connect(this, SIGNAL(error(int,QString)),
-                 this, SLOT(DisplayError(int,QString)));     //find out name of this machine
     name = QHostInfo::localHostName();
     if(!name.isEmpty())
     {

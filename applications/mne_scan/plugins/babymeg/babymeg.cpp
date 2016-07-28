@@ -242,10 +242,14 @@ void BabyMEG::init()
 
     //BabyMEG Inits
     pInfo = QSharedPointer<BabyMEGInfo>(new BabyMEGInfo());
-    connect(pInfo.data(), &BabyMEGInfo::fiffInfoAvailable, this, &BabyMEG::setFiffInfo);
-    connect(pInfo.data(), &BabyMEGInfo::SendDataPackage, this, &BabyMEG::setFiffData);
-    connect(pInfo.data(), &BabyMEGInfo::SendCMDPackage, this, &BabyMEG::setCMDData);
-    connect(pInfo.data(), &BabyMEGInfo::GainInfoUpdate, this, &BabyMEG::setFiffGainInfo);
+    connect(pInfo.data(), &BabyMEGInfo::fiffInfoAvailable,
+            this, &BabyMEG::setFiffInfo);
+    connect(pInfo.data(), &BabyMEGInfo::SendDataPackage,
+            this, &BabyMEG::setFiffData);
+    connect(pInfo.data(), &BabyMEGInfo::SendCMDPackage,
+            this, &BabyMEG::setCMDData);
+    connect(pInfo.data(), &BabyMEGInfo::GainInfoUpdate,
+            this, &BabyMEG::setFiffGainInfo);
 
     m_pMyClient = QSharedPointer<BabyMEGClient>(new BabyMEGClient(6340,this));
     m_pMyClient->SetInfo(pInfo);
