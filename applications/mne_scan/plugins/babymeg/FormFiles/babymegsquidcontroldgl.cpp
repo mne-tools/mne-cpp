@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the BabyMEGSQUIDControlDgl class.
+* @brief    BabyMEGSQUIDControlDgl class definition.
 *
 */
 
@@ -37,36 +37,44 @@
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
-#include <QPen>
-#include <QGLWidget>
-//#include "glwidget_OnDisp.h"
-
-#include <QDebug>
-
-
-#include <iostream>
 
 #include "../babymeg.h"
 #include "babymegsquidcontroldgl.h"
 #include "ui_babymegsquidcontroldgl.h"
+
+#include <iostream>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace BabyMEGPlugin;
+using namespace BABYMEGPLUGIN;
+using namespace Eigen;
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-BabyMEGSQUIDControlDgl::BabyMEGSQUIDControlDgl(BabyMEG* p_pBabyMEG,QWidget *parent) :
-    QDialog(parent)
-  , ui(new Ui::BabyMEGSQUIDControlDgl)
-  , m_pBabyMEG(p_pBabyMEG)
-
+BabyMEGSQUIDControlDgl::BabyMEGSQUIDControlDgl(BabyMEG* p_pBabyMEG,QWidget *parent)
+: QDialog(parent)
+, ui(new Ui::BabyMEGSQUIDControlDgl)
+, m_pBabyMEG(p_pBabyMEG)
 {
     connect(this,&BabyMEGSQUIDControlDgl::SendCMDToMEGSource,p_pBabyMEG,&BabyMEG::comFLL);
     connect(m_pBabyMEG,&BabyMEG::DataToSquidCtrlGUI,this,&BabyMEGSQUIDControlDgl::TuneGraphDispProc);
@@ -141,11 +149,14 @@ BabyMEGSQUIDControlDgl::BabyMEGSQUIDControlDgl(BabyMEG* p_pBabyMEG,QWidget *pare
     // init the plot
     initplotflag = false;
 
-    d_timeplot = new plotter();
+    d_timeplot = new Plotter();
     ui->lay_tune->addWidget(d_timeplot);
 
     //this->Init();
 }
+
+
+//*************************************************************************************************************
 
 BabyMEGSQUIDControlDgl::~BabyMEGSQUIDControlDgl()
 {
@@ -153,11 +164,18 @@ BabyMEGSQUIDControlDgl::~BabyMEGSQUIDControlDgl()
     delete ui;
 }
 
+
+//*************************************************************************************************************
+
 void BabyMEGSQUIDControlDgl::closeEvent(QCloseEvent *event)
 {
     Q_UNUSED(event)
     SendCMD("CANC");
 }
+
+
+//*************************************************************************************************************
+
 void BabyMEGSQUIDControlDgl::UpdateParaGraph()
 {
     int NumRect = m_GUISM.ParaGraph.size();
@@ -172,6 +190,9 @@ void BabyMEGSQUIDControlDgl::UpdateParaGraph()
 
 }
 
+
+//*************************************************************************************************************
+
 float BabyMEGSQUIDControlDgl::mmin(MatrixXf tmp,int chan)
 {
     int cols = tmp.cols();
@@ -185,6 +206,9 @@ float BabyMEGSQUIDControlDgl::mmin(MatrixXf tmp,int chan)
 
     return ret;
 }
+
+
+//*************************************************************************************************************
 
 float BabyMEGSQUIDControlDgl::mmax(MatrixXf tmp,int chan)
 {
@@ -227,30 +251,47 @@ void BabyMEGSQUIDControlDgl::TuneGraphDispProc(MatrixXf tmp)
 }
 
 
+//*************************************************************************************************************
+
 void BabyMEGSQUIDControlDgl::TuneCheck()
 {
     int index;
     index = 0;
     ProcCmd("BUTNTUNECHEC",index,"TuneCheck is processing !");
 }
+
+
+//*************************************************************************************************************
+
 void BabyMEGSQUIDControlDgl::Amp()
 {
     int index;
     index = 0;
     ProcCmd("BUTNDOOOOAMP",index,"Requiring Amp is processing !");
 }
+
+
+//*************************************************************************************************************
+
 void BabyMEGSQUIDControlDgl::IntReset()
 {
     int index;
     index = 0;
     ProcCmd("BUTNINTRESET",index,"IntReset is processing !");
 }
+
+
+//*************************************************************************************************************
+
 void BabyMEGSQUIDControlDgl::MicroReset()
 {
     int index;
     index = 0;
     ProcCmd("BUTNMICRESET",index,"MicroReset is processing !");
 }
+
+
+//*************************************************************************************************************
 
 void BabyMEGSQUIDControlDgl::Save()
 {
@@ -259,12 +300,18 @@ void BabyMEGSQUIDControlDgl::Save()
     ProcCmd("BUTNDOOOSAVE",index,"Save is processing !");
 }
 
+
+//*************************************************************************************************************
+
 void BabyMEGSQUIDControlDgl::Save1()
 {
     int index;
     index = 0;
     ProcCmd("BUTNDOOSAVE1",index,"Save1 is processing !");
 }
+
+
+//*************************************************************************************************************
 
 void BabyMEGSQUIDControlDgl::GroupHeat()
 {
@@ -273,12 +320,18 @@ void BabyMEGSQUIDControlDgl::GroupHeat()
     ProcCmd("BUTNGROUPHEA",index,"GroupHeat is processing !");
 }
 
+
+//*************************************************************************************************************
+
 void BabyMEGSQUIDControlDgl::Last()
 {
     int index;
     index = 0;
     ProcCmd("BUTNDOOOLAST",index,"Last is processing !");
 }
+
+
+//*************************************************************************************************************
 
 void BabyMEGSQUIDControlDgl::Default()
 {
@@ -288,6 +341,8 @@ void BabyMEGSQUIDControlDgl::Default()
 }
 
 
+//*************************************************************************************************************
+
 void BabyMEGSQUIDControlDgl::Retune()
 {
     int index;
@@ -295,24 +350,39 @@ void BabyMEGSQUIDControlDgl::Retune()
     ProcCmd("BUTNDORETUNE",index,"Retune is processing !");
 }
 
+
+//*************************************************************************************************************
+
 void BabyMEGSQUIDControlDgl::Heat()
 {
     int index;
     index = 0;
     ProcCmd("BUTNDOOOHEAT",index,"Heat is processing !");
 }
+
+
+//*************************************************************************************************************
+
 void BabyMEGSQUIDControlDgl::Atune()
 {
     int index;
     index = 0;
     ProcCmd("BUTNDOOATUNE",index,"Atune is processing !");
 }
+
+
+//*************************************************************************************************************
+
 void BabyMEGSQUIDControlDgl::Reset()
 {
     int index;
     index = 0;
     ProcCmd("BUTNDOIRESET",index,"Reset is processing !");
 }
+
+
+//*************************************************************************************************************
+
 void BabyMEGSQUIDControlDgl::HeatTune()
 {
     int index;
@@ -320,6 +390,8 @@ void BabyMEGSQUIDControlDgl::HeatTune()
     ProcCmd("BUTNHEATTUNE",index,"HeatTune is processing !");
 }
 
+
+//*************************************************************************************************************
 
 void BabyMEGSQUIDControlDgl::AdOffset()
 {
@@ -329,6 +401,9 @@ void BabyMEGSQUIDControlDgl::AdOffset()
 
 }
 
+
+//*************************************************************************************************************
+
 void BabyMEGSQUIDControlDgl::AdjuBias()
 {
     int index;
@@ -336,6 +411,9 @@ void BabyMEGSQUIDControlDgl::AdjuBias()
     ProcCmd("UPDEADJUBIAS",index,"Bias is changed !");
 
 }
+
+
+//*************************************************************************************************************
 
 void BabyMEGSQUIDControlDgl::AdjuModu()
 {
@@ -345,12 +423,18 @@ void BabyMEGSQUIDControlDgl::AdjuModu()
 
 }
 
+
+//*************************************************************************************************************
+
 void BabyMEGSQUIDControlDgl::HeatTime()
 {
     int index;
     index = ui->m_Qsb_heattime->value();
     ProcCmd("UPDEHEATTIME",index,"Heat Time is changed !");
 }
+
+
+//*************************************************************************************************************
 
 void BabyMEGSQUIDControlDgl::CoolTime()
 {
@@ -359,25 +443,40 @@ void BabyMEGSQUIDControlDgl::CoolTime()
     ProcCmd("UPDECOOLTIME",index,"Cool Time is changed !");
 }
 
+
+//*************************************************************************************************************
+
 void BabyMEGSQUIDControlDgl::AutoRest(int index)
 {
     ProcCmd("UPDEAUTOREST",index,"Auto Reset is changed !");
 }
+
+
+//*************************************************************************************************************
+
 void BabyMEGSQUIDControlDgl::RestLock(int index)
 {
     ProcCmd("UPDERESTLOCK",index,"Reset Lock is changed !");
 }
+
+
+//*************************************************************************************************************
 
 void BabyMEGSQUIDControlDgl::PreGaini(int index)
 {
     ProcCmd("UPDEPREGAINI",++index,"Pre Gain is changed !");
 }
 
+
+//*************************************************************************************************************
+
 void BabyMEGSQUIDControlDgl::PostGain(int index)
 {
     ProcCmd("UPDEPOSTGAIN",++index,"Post Gain is changed !");
 }
 
+
+//*************************************************************************************************************
 
 void BabyMEGSQUIDControlDgl::SlewSele(int index)
 {
@@ -391,26 +490,39 @@ void BabyMEGSQUIDControlDgl::LowPass1(int index)
 }
 
 
+//*************************************************************************************************************
+
 void BabyMEGSQUIDControlDgl::HighPass(int index)
 {
     ProcCmd("UPDEHIGHPASS",index,"high pass filter is changed !");
 }
 
 
+//*************************************************************************************************************
+
 void BabyMEGSQUIDControlDgl::OperMode(int index)
 {
     ProcCmd("UPDEOPERMODE",index,"Operate Mode is changed !");
 }
+
+
+//*************************************************************************************************************
 
 void BabyMEGSQUIDControlDgl::ChanSele(int index)
 {
     ProcCmd("UPDECHANSELE",index,"Channel is changed !");
 }
 
+
+//*************************************************************************************************************
+
 void BabyMEGSQUIDControlDgl::BarGraph(int index)
 {
     ProcCmd("UPDEBARGRAPH",index,"Bar graph select is changed !");
 }
+
+
+//*************************************************************************************************************
 
 void BabyMEGSQUIDControlDgl::CommType(int index)
 {
@@ -425,6 +537,9 @@ void BabyMEGSQUIDControlDgl::CommType(int index)
     SendCMD(CMDStr);
 }
 
+
+//*************************************************************************************************************
+
 void BabyMEGSQUIDControlDgl::UpdateInfo(QString newText)
 {
     QString content = ui->m_tx_info->toPlainText();
@@ -432,6 +547,9 @@ void BabyMEGSQUIDControlDgl::UpdateInfo(QString newText)
     ui->m_tx_info->setText(content);
     ui->m_tx_info->verticalScrollBar()->setValue(ui->m_tx_info->verticalScrollBar()->maximum());
 }
+
+
+//*************************************************************************************************************
 
 void BabyMEGSQUIDControlDgl::Init()
 {
@@ -441,21 +559,33 @@ void BabyMEGSQUIDControlDgl::Init()
     SendCMD("INIT");
 }
 
+
+//*************************************************************************************************************
+
 void BabyMEGSQUIDControlDgl::Cancel()
 {
     SendCMD("CANC");
     this->close();
 }
 
+
+//*************************************************************************************************************
+
 void BabyMEGSQUIDControlDgl::SyncGUI()
 {
     SendCMD("SYNC");
 }
 
+
+//*************************************************************************************************************
+
 void BabyMEGSQUIDControlDgl::SendCMD(QString CMDSTR)
 {
     emit SendCMDToMEGSource(CMDSTR);
 }
+
+
+//*************************************************************************************************************
 
 void BabyMEGSQUIDControlDgl::RcvCMDData(QByteArray DATA)
 {
@@ -466,6 +596,9 @@ void BabyMEGSQUIDControlDgl::RcvCMDData(QByteArray DATA)
 
     ReplyCmdProc(t_sReply);
 }
+
+
+//*************************************************************************************************************
 
 void BabyMEGSQUIDControlDgl::ReplyCmdProc(QString sReply)
 {
@@ -520,6 +653,10 @@ void BabyMEGSQUIDControlDgl::ReplyCmdProc(QString sReply)
         break;
     }
 }
+
+
+//*************************************************************************************************************
+
 QString BabyMEGSQUIDControlDgl::GenChnInfo(QString nChan)
 {
     QString chaninfo;
@@ -528,6 +665,9 @@ QString BabyMEGSQUIDControlDgl::GenChnInfo(QString nChan)
     }
     return chaninfo;
 }
+
+
+//*************************************************************************************************************
 
 void BabyMEGSQUIDControlDgl::InitChannels(QString sReply)
 {
@@ -553,6 +693,9 @@ void BabyMEGSQUIDControlDgl::InitChannels(QString sReply)
     ui->m_Qcb_channel->addItems(chanNames);
 
 }
+
+
+//*************************************************************************************************************
 
 void BabyMEGSQUIDControlDgl::UpdateGUI()
 {
@@ -703,6 +846,10 @@ void BabyMEGSQUIDControlDgl::UpdateGUI()
     //std::cout << "End Update Para Graph ------------------ \n" <<std::endl;
 
 }
+
+
+//*************************************************************************************************************
+
 void BabyMEGSQUIDControlDgl::InitGUIConfig(QString sReply)
 {
     QList < QString > tmp = sReply.split("|");
@@ -755,6 +902,9 @@ void BabyMEGSQUIDControlDgl::InitGUIConfig(QString sReply)
         m_GUISM.ParaGraph.append(tmp[ind+32+i].toFloat());
 
 }
+
+
+//*************************************************************************************************************
 
 void BabyMEGSQUIDControlDgl::ProcCmd(QString cmd, int index, QString Info)
 {

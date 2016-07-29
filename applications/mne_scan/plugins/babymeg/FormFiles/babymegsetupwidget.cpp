@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the RTServerSetupWidget class.
+* @brief    BabyMEGSetupWidget class definition.
 *
 */
 
@@ -58,10 +58,16 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
+
+//*************************************************************************************************************
+//=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace BabyMEGPlugin;
+using namespace BABYMEGPLUGIN;
 
 
 //*************************************************************************************************************
@@ -76,16 +82,20 @@ BabyMEGSetupWidget::BabyMEGSetupWidget(BabyMEG* p_pBabyMEG, QWidget* parent)
 {
     ui.setupUi(this);
 
-    connect(m_pBabyMEG, &BabyMEG::cmdConnectionChanged, this, &BabyMEGSetupWidget::cmdConnectionChanged);
+    connect(m_pBabyMEG, &BabyMEG::cmdConnectionChanged, this,
+            &BabyMEGSetupWidget::cmdConnectionChanged);
 
     //rt server fiffInfo received
-    connect(m_pBabyMEG, &BabyMEG::fiffInfoAvailable, this, &BabyMEGSetupWidget::fiffInfoReceived);
+    connect(m_pBabyMEG, &BabyMEG::fiffInfoAvailable, this,
+            &BabyMEGSetupWidget::fiffInfoReceived);
 
     //About
-    connect(ui.m_qPushButton_About, &QPushButton::released, this, &BabyMEGSetupWidget::showAboutDialog);
+    connect(ui.m_qPushButton_About, &QPushButton::released,
+            this, &BabyMEGSetupWidget::showAboutDialog);
 
     //SQUID Control
-    connect(ui.m_qPushButtonSqdCtrl, &QPushButton::released, this, &BabyMEGSetupWidget::showSqdCtrlDialog);
+    connect(ui.m_qPushButtonSqdCtrl, &QPushButton::released,
+            this, &BabyMEGSetupWidget::showSqdCtrlDialog);
 
     ui.m_qPushButtonSqdCtrl->setVisible(false);
 
