@@ -156,13 +156,13 @@ bool BrainRTConnectivityDataTreeItem::init(const MNEForwardSolution& tForwardSol
         }
 
         data.setValue(matSourceVert);
+        this->setData(data, Data3DTreeModelItemRoles::SourceVertices);
     }
     else
     {
         data.setValue(tForwardSolution.source_rr);
+        this->setData(data, Data3DTreeModelItemRoles::SourceVertices);
     }
-
-    this->setData(data, Data3DTreeModelItemRoles::SourceVertices);
 
     //Add meta information as item children
     QString sIsClustered = isClustered ? "Clustered" : "Full";
@@ -209,27 +209,25 @@ bool BrainRTConnectivityDataTreeItem::addData(const MatrixXd& matNewConnection)
     transform->setMatrix(m);
     m_pRenderable3DEntity->addComponent(transform);
 
-    RowVector3f sourcePos;
     QVector3D pos;
     Qt3DCore::QEntity* sourceSphereEntity;
     Qt3DExtras::QSphereMesh* sourceSphere;
     Qt3DExtras::QPhongMaterial* material;
 
     //Draw network nodes and generate connection indices for Qt3D buffer
-    for(int i = 0; i < matNewConnection.rows(); ++i)
+    for(int i = 0; i < matSourceVert.rows(); ++i)
     {
-        sourcePos = matSourceVert.row(i);
-        pos.setX(sourcePos(0));
-        pos.setY(sourcePos(1));
-        pos.setZ(sourcePos(2));
+        pos.setX(matSourceVert(i,0));
+        pos.setY(matSourceVert(i,1));
+        pos.setZ(matSourceVert(i,2));
 
-        sourceSphereEntity = new Qt3DCore::QEntity();
+        sourceSphereEntity = new Qt3DCore::QEntity(m_pRenderable3DEntity);
 
         sourceSphere = new Qt3DExtras::QSphereMesh();
         sourceSphere->setRadius(0.001f);
         sourceSphereEntity->addComponent(sourceSphere);
 
-        transform = new Qt3DCore::QTransform();
+        Qt3DCore::QTransform* transform = new Qt3DCore::QTransform();
         QMatrix4x4 m;
         m.translate(pos);
         transform->setMatrix(m);
@@ -238,9 +236,9 @@ bool BrainRTConnectivityDataTreeItem::addData(const MatrixXd& matNewConnection)
         material = new Qt3DExtras::QPhongMaterial();
         material->setAmbient(Qt::yellow);
         sourceSphereEntity->addComponent(material);
+    }    
 
-        sourceSphereEntity->setParent(m_pRenderable3DEntity);
-    }
+    //sourceSphereEntity->setParent(m_pRenderable3DEntity);
 
     //m_pRenderable3DEntity->setMeshData(matSourceVert, matSourceNorm, tSurface.tris(), arrayCurvatureColor, Qt3DRender::QGeometryRenderer::Lines);
 
