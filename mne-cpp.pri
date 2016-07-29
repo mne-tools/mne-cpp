@@ -85,3 +85,7 @@ contains(MNECPP_CONFIG, coverity) {
     message("Building minimal version due to Qt version $${QT_VERSION}.")
     MNECPP_CONFIG += minimalVersion
 }
+
+HEADERS +=
+
+SOURCES +=
