@@ -8,4 +8,4 @@ cppcheck --enable=all -f -q -i./include/3rdParty/eigen3 -i/opt/qt56/include ./MN
 qmake -r MNECPP_CONFIG+=withCodeCov
 
 # Build
-make -j2
+make -j4

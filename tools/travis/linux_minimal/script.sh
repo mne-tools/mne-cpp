@@ -4,4 +4,4 @@
 qmake -r MNECPP_CONFIG+=minimalVersion
 
 # Build
-make -j2
+make -j4
