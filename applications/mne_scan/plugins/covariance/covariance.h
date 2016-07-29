@@ -86,7 +86,7 @@ namespace CovariancePlugin
 using namespace SCSHAREDLIB;
 using namespace SCMEASLIB;
 using namespace IOBuffer;
-using namespace RTPROCLIB;
+using namespace RTPROCESSINGLIB;
 using namespace FIFFLIB;
 
 

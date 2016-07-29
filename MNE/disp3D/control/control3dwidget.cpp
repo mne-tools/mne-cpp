@@ -39,7 +39,6 @@
 //=============================================================================================================
 
 #include "control3dwidget.h"
-
 #include "disp/helpers/roundededgeswidget.h"
 #include "../3DObjects/data3Dtreedelegate.h"
 

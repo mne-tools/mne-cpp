@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     babymeghpidgl.cpp
+* @file     BabyMEGHPIDgl.cpp
 * @author   Limin Sun <liminsun@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,45 +29,90 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the BabyMEGSQUIDControlDgl class.
+* @brief    BabyMEGHPIDgl class definition.
 *
 */
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "babymeghpidgl.h"
+#include "ui_babymeghpidgl.h"
+
+#include <fiff/fiff_dir_tree.h>
+#include <fiff/fiff_tag.h>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
 
 #include <QFile>
 #include <QFileDialog>
 #include <QFileInfo>
 
 
-#include "babymeghpidgl.h"
-#include "ui_babymeghpidgl.h"
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
 
 
-using namespace BabyMEGPlugin;
+//*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
 
-babymeghpidgl::babymeghpidgl(BabyMEG* p_pBabyMEG,QWidget *parent) :
-    QDialog(parent),
-    ui(new Ui::babymeghpidgl),
-    m_pBabyMEG(p_pBabyMEG)
+using namespace BABYMEGPLUGIN;
+using namespace FIFFLIB;
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+BabyMEGHPIDgl::BabyMEGHPIDgl(BabyMEG* p_pBabyMEG,QWidget *parent)
+: QDialog(parent)
+, ui(new Ui::BabyMEGHPIDgl)
+, m_pBabyMEG(p_pBabyMEG)
 {
     ui->setupUi(this);
 
-    connect(ui->bn_PolhemusFile, SIGNAL(released()), this, SLOT(bnLoadPolhemusFile()));
-    connect(this,&babymeghpidgl::SendHPIFiffInfo,m_pBabyMEG,&BabyMEG::RecvHPIFiffInfo);
-    connect(ui->buttonBox,SIGNAL(clicked(QAbstractButton *)),this,SLOT(OKProc(QAbstractButton *)));
+    connect(ui->bn_PolhemusFile, SIGNAL(released()),
+            this, SLOT(bnLoadPolhemusFile()));
+
+    connect(this, &BabyMEGHPIDgl::SendHPIFiffInfo,
+            m_pBabyMEG, &BabyMEG::RecvHPIFiffInfo);
+
+    connect(ui->buttonBox,SIGNAL(clicked(QAbstractButton *)),
+            this, SLOT(OKProc(QAbstractButton *)));
 //    connect(ui->buttonBox,SIGNAL(rejected()),this,SLOT(CancelProc));
 }
 
-babymeghpidgl::~babymeghpidgl()
+
+//*************************************************************************************************************
+
+BabyMEGHPIDgl::~BabyMEGHPIDgl()
 {
     delete ui;
 }
 
-void babymeghpidgl::CancelProc()
+
+//*************************************************************************************************************
+
+void BabyMEGHPIDgl::CancelProc()
 {
 
 }
 
-void babymeghpidgl::OKProc(QAbstractButton *b)
+
+//*************************************************************************************************************
+
+void BabyMEGHPIDgl::OKProc(QAbstractButton *b)
 {
     qDebug()<<"Clicked group button";
 
@@ -103,12 +148,17 @@ void babymeghpidgl::OKProc(QAbstractButton *b)
 }
 
 
-void babymeghpidgl::closeEvent(QCloseEvent *event)
+//*************************************************************************************************************
+
+void BabyMEGHPIDgl::closeEvent(QCloseEvent *event)
 {
     Q_UNUSED(event)
 }
 
-void babymeghpidgl::bnLoadPolhemusFile()
+
+//*************************************************************************************************************
+
+void BabyMEGHPIDgl::bnLoadPolhemusFile()
 {
     qDebug()<<" Start to load Polhemus File";
     FileName_HPI = QFileDialog::getOpenFileName(this,
@@ -117,7 +167,10 @@ void babymeghpidgl::bnLoadPolhemusFile()
     ui->ed_PolFileName->setText(FileName_HPI);
 }
 
-void babymeghpidgl::ReadPolhemusDig(QString fileName)
+
+//*************************************************************************************************************
+
+void BabyMEGHPIDgl::ReadPolhemusDig(QString fileName)
 {
     //start to load Polhemus file
     QFile t_headerFiffFile(fileName);

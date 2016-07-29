@@ -303,7 +303,7 @@ private:
     QAction*                                        m_pActionShowOptionsWidget; /**< The noise reduction option widget action.*/
 
     DISPLIB::FilterWindow::SPtr                     m_pFilterWindow;            /**< Filter window. */
-    RTPROCLIB::RtFilter::SPtr                       m_pRtFilter;                /**< Real time filter object. */
+    RTPROCESSINGLIB::RtFilter::SPtr                       m_pRtFilter;                /**< Real time filter object. */
 
     SCMEASLIB::NewRealTimeMultiSampleArray::SPtr     m_pRTMSA;                   /**< the real time multi sample array object. */
 
