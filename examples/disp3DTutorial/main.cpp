@@ -257,18 +257,18 @@ int main(int argc, char *argv[])
     testWindow->addBrainData("Subject01", "Left Auditory", tSurfSet, tAnnotSet);
     testWindow->addBrainData("Subject01", "Left Visual", tSurfSet, tAnnotSet);
 
-    //Read & show BEM and sensor surfaces
-//    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif");
-//    MNEBem t_Bem(t_fileBem);
-//    QFile t_fileBem2("./MNE-sample-data/subjects/sample/bem/sample-head.fif");
-//    MNEBem t_Bem2(t_fileBem2);
+//    Read & show BEM and sensor surfaces
+    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif");
+    MNEBem t_Bem(t_fileBem);
+    QFile t_fileBem2("./MNE-sample-data/subjects/sample/bem/sample-head.fif");
+    MNEBem t_Bem2(t_fileBem2);
 //    QFile t_filesensorSurfaceVV("./resources/sensorSurfaces/306m_rt.fif");
 //    MNEBem t_sensorSurfaceVV(t_filesensorSurfaceVV);
 //    QFile t_filesensorSurfaceBM("./resources/sensorSurfaces/BabyMEG.fif");
 //    MNEBem t_sensorSurfaceBM(t_filesensorSurfaceBM);
 
-//    testWindow->addBemData("Subject01", "BEM", t_Bem);
-//    testWindow->addBemData("Subject01", "BEM", t_Bem2);
+    testWindow->addBemData("Subject01", "BEM", t_Bem);
+    testWindow->addBemData("Subject01", "BEM", t_Bem2);
 //    testWindow->addBemData("Sensors", "VectorView", t_sensorSurfaceVV);
 //    testWindow->addBemData("Sensors", "BabyMEG", t_sensorSurfaceBM);
 
@@ -300,7 +300,7 @@ int main(int argc, char *argv[])
             rtItemList_RV.at(i)->setLoopState(true);
             rtItemList_RV.at(i)->setTimeInterval(50);
             rtItemList_RV.at(i)->setNumberAverages(1);
-            rtItemList_RV.at(i)->setStreamingActive(true);
+            rtItemList_RV.at(i)->setStreamingActive(false);
             rtItemList_RV.at(i)->setNormalization(QVector3D(5.0,5.5,15));
             rtItemList_RV.at(i)->setVisualizationType("Vertex based");
             rtItemList_RV.at(i)->setColortable("Hot Negative 1");

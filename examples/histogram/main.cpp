@@ -231,7 +231,7 @@ int main(int argc, char *argv[])
 
     bool bMakeSymmetrical;
     bMakeSymmetrical = false;       //bMakeSymmetrical option: false means data is unchanged, true means histogram x axis is symmetrical to the right and left
-    int classAmount = 50;           //initialize the amount of classes and class frequencies
+    int classAmount = 10;           //initialize the amount of classes and class frequencies
     double inputGlobalMin = 0.0,
            inputGlobalMax = 0.0;
     Eigen::VectorXd resultClassLimit;
