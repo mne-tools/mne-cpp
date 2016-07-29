@@ -323,7 +323,13 @@ public:
 protected:
     virtual void run();
 
-private:
+private:    
+    //=========================================================================================================
+    /**
+    * Update HPI.
+    */
+    void BabyMEG::updateHPI();
+
     //=========================================================================================================
     /**
     * Combines all analog trigger signals to one single digital trigger line.
@@ -381,12 +387,6 @@ private:
     * Initialize the connector.
     */
     void initConnector();
-
-    //=========================================================================================================
-    /**
-    * Update HPI.
-    */
-    void BabyMEG::updateHPI();
 
     SCSHAREDLIB::PluginOutputData<SCMEASLIB::NewRealTimeMultiSampleArray>::SPtr m_pRTMSABabyMEG;    /**< The NewRealTimeMultiSampleArray to provide the rt_server Channels.*/
 
