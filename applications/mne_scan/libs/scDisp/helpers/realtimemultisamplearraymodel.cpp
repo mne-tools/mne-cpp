@@ -361,10 +361,9 @@ void RealTimeMultiSampleArrayModel::setFiffInfo(FiffInfo::SPtr& p_pFiffInfo)
         createFilterChannelList(filterChannels);
 
         //Look for trigger channels and initialise detected trigger map
-        QList<int> temp;
         for(int i = 0; i<m_pFiffInfo->chs.size(); ++i) {
             if(m_pFiffInfo->chs[i].kind == FIFFV_STIM_CH/* && m_pFiffInfo->chs[i].ch_name == "STI 001"*/)
-                m_qMapDetectedTrigger.insert(i, temp);
+                m_lTriggerChannelIndices.append(i);
         }
 
         //Init the sphara operators
@@ -468,7 +467,7 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
 
             //Clear detected triggers
             if(m_bTriggerDetectionActive) {
-                QMutableMapIterator<int,QList<int> > i(m_qMapDetectedTrigger);
+                QMutableMapIterator<int,QList<QPair<int,double> > > i(m_qMapDetectedTrigger);
                 while (i.hasNext()) {
                     i.next();
                     i.value().clear();
@@ -531,10 +530,17 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
         if(m_bTriggerDetectionActive) {
             int iOldDetectedTriggers = m_qMapDetectedTrigger[m_iCurrentTriggerChIndex].size();
 
-            QString detectionType("Falling");
+            QString detectionType("Rising");
 
-            //DetectTrigger::detectTriggerFlanksMax(data.at(b), m_qMapDetectedTrigger, m_iCurrentSample-nCol, m_dTriggerThreshold, true);
-            DetectTrigger::detectTriggerFlanksGrad(data.at(b), m_qMapDetectedTrigger, m_iCurrentSample-nCol, m_dTriggerThreshold, true, detectionType);
+            //m_qMapDetectedTrigger = DetectTrigger::detectTriggerFlanksMax(data.at(b), m_lTriggerChannelIndices, m_iCurrentSample-nCol, m_dTriggerThreshold, true);
+            QMap<int,QList<QPair<int,double> > > qMapDetectedTrigger = DetectTrigger::detectTriggerFlanksGrad(data.at(b), m_lTriggerChannelIndices, m_iCurrentSample-nCol, m_dTriggerThreshold, false, detectionType);
+
+            //Append results to already found triggers
+            QMapIterator<int,QList<QPair<int,double> > > i(qMapDetectedTrigger);
+            while (i.hasNext()) {
+                i.next();
+                m_qMapDetectedTrigger[i.key()].append(i.value());
+            }
 
             //Compute newly counted triggers
             int newTriggers = m_qMapDetectedTrigger[m_iCurrentTriggerChIndex].size() - iOldDetectedTriggers;
@@ -1046,7 +1052,7 @@ void RealTimeMultiSampleArrayModel::triggerInfoChanged(const QMap<QString, QColo
     if(m_sCurrentTriggerCh != triggerCh) {
         m_sCurrentTriggerCh = triggerCh;
 
-        QList<int> temp;
+        QList<QPair<int,double> > temp;
         m_qMapDetectedTrigger.clear();
 
         for(int i = 0; i < m_pFiffInfo->chs.size(); ++i) {

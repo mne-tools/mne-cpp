@@ -39,16 +39,11 @@
 //=============================================================================================================
 
 #include "rtsourcelocdataworker.h"
-
-#include "fs/label.h"
-
-#include <iostream>
-
 #include "../../helpers/types.h"
 
 #include <disp/helpers/colormap.h>
-
-#include "fs/annotation.h"
+#include <fs/label.h>
+#include <fs/annotation.h>
 
 
 //*************************************************************************************************************
