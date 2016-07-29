@@ -46,7 +46,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace RTPROCLIB;
+using namespace RTPROCESSINGLIB;
 using namespace Eigen;
 using namespace UTILSLIB;
 using namespace FIFFLIB;

@@ -42,10 +42,9 @@
 //=============================================================================================================
 
 #include "../../disp3D_global.h"
-
 #include "../../helpers/abstracttreeitem.h"
 
-#include "mne/mne_forwardsolution.h"
+#include <mne/mne_forwardsolution.h>
 
 
 //*************************************************************************************************************
@@ -79,6 +78,10 @@ namespace MNELIB {
 
 namespace FIFFLIB{
     class FiffDigPointSet;
+}
+
+namespace Qt3DCore {
+    class QEntity;
 }
 
 

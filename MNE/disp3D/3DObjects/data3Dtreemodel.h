@@ -43,7 +43,7 @@
 
 #include "../disp3D_global.h"
 
-#include "mne/mne_forwardsolution.h"
+#include <mne/mne_forwardsolution.h>
 
 
 //*************************************************************************************************************
