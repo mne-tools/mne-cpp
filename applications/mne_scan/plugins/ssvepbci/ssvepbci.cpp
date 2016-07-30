@@ -83,7 +83,8 @@ ssvepBCI::ssvepBCI()
 , m_bChangeSSVEPParameterFlag(false)
 , m_bInitializeSource(true)
 , m_iNumberOfClassHits(15)
-, m_iMaxClassListSize(50)
+, m_iClassListSize(20)
+, m_iNumberOfClassBreaks(30)
 {
     // Create configuration action bar item/button
     m_pActionBCIConfiguration = new QAction(QIcon(":/images/configuration.png"),tr("BCI configuration feature"),this);
@@ -399,8 +400,15 @@ void ssvepBCI::clearClassifications()
 
 //*************************************************************************************************************
 
-void ssvepBCI::setNumClassHits(int NumClassHits){
-    m_iNumberOfClassHits = NumClassHits;
+void ssvepBCI::setNumClassHits(int numClassHits){
+    m_iNumberOfClassHits = numClassHits;
+}
+
+
+//*************************************************************************************************************
+
+void ssvepBCI::setNumClassBreaks(int numClassBreaks){
+    m_iNumberOfClassBreaks = numClassBreaks;
 }
 
 //*************************************************************************************************************
@@ -409,6 +417,12 @@ void  ssvepBCI::setChangeSSVEPParameterFlag(){
     m_bChangeSSVEPParameterFlag = true;
 }
 
+
+//*************************************************************************************************************
+
+void ssvepBCI::setSizeClassList(int classListSize){
+    m_iClassListSize = classListSize;
+}
 
 //*************************************************************************************************************
 
@@ -742,7 +756,7 @@ void ssvepBCI::ssvepBCIOnSensor()
     // execute processing loop as long as there is new data to be red from the time window
     while(m_iReadToWriteBuffer >= m_iReadSampleSize)
     {
-        if(m_iCounter > 30)
+        if(m_iCounter > m_iNumberOfClassBreaks)
         {
             // determine window size according to former counted miss classifications
             m_iWindowSize = 10;
@@ -813,6 +827,10 @@ void ssvepBCI::ssvepBCIOnSensor()
             else
                 m_lIndexOfClassResultSensor.append(0);
 
+            // clear classifiaction if it hits its threshold
+            if(m_lIndexOfClassResultSensor.size() > m_iClassListSize)
+                m_lIndexOfClassResultSensor.pop_front();
+
             // transfer values to matrix containing all SSVEPProabibilities of desired frequencies of one calculationstep
             m_matSSVEPProbabilities.conservativeResize(m_lDesFrequencies.size(), m_matSSVEPProbabilities.cols() + 1);
             m_matSSVEPProbabilities.col( m_matSSVEPProbabilities.cols() - 1) = ssvepProbabilities.head(m_lDesFrequencies.size());
@@ -824,10 +842,12 @@ void ssvepBCI::ssvepBCIOnSensor()
         m_iReadToWriteBuffer = m_iReadToWriteBuffer - m_iReadSampleSize;
         m_iReadIndex = (m_iReadIndex + m_iReadSampleSize) % (m_iTimeWindowLength);
 
+        //qDebug() << "Index-List: " << m_lIndexOfClassResultSensor;
+
     }
 
 
-//    qDebug() << "Index-List: " << m_lIndexOfClassResultSensor;
+
     // emit classifiaction results if any classifiaction has been done
     if(!m_lIndexOfClassResultSensor.isEmpty()){
 
@@ -843,9 +863,7 @@ void ssvepBCI::ssvepBCIOnSensor()
               emit classificationResult(0);
         }
 
-        // clear classifiaction if it hits its threshold
-        if(m_lIndexOfClassResultSensor.size() > m_iMaxClassListSize)
-            m_lIndexOfClassResultSensor.clear();
+
     }
 
     // calculate and emit signal of mean probabilities

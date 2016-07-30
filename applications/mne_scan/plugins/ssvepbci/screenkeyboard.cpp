@@ -73,6 +73,7 @@ ScreenKeyboard::ScreenKeyboard(QSharedPointer<ssvepBCI> pSSVEPBCI, QSharedPointe
 , m_bInitializeKeyboard(true)
 , m_bUpdatePhraseDisplay(true)
 , m_bUseSpellAccuracy(false)
+, m_qSound(new QMediaPlayer())
 {
     // initialize map for keyboard values and their relative coordinates to each other
     m_mapKeys[QPair<int, int>( 0, 0)] = "E";
@@ -118,6 +119,8 @@ ScreenKeyboard::ScreenKeyboard(QSharedPointer<ssvepBCI> pSSVEPBCI, QSharedPointe
 
     // connect SSVEPBCI speller
     connect(m_pSSVEPBCISetupStimulusWidget.data(), &ssvepBCISetupStimulusWidget::settledPhrase, this, &ScreenKeyboard::setPhrase);
+
+    m_qSound->setMedia(QUrl("qrc:/sounds/beep.mp3"));
 }
 
 
@@ -169,7 +172,7 @@ void ScreenKeyboard::paint(QPaintDevice *device){
         }
 
         m_bInitializeKeyboard = false;
-        qDebug() << "update BCI Screen";
+        //qDebug() << "update BCI Screen";
     }
 
     // update cursor draw
@@ -203,7 +206,7 @@ void ScreenKeyboard::paint(QPaintDevice *device){
 
         // update old cursor position
         m_qOldCursorCoord = m_qCurCursorCoord;
-        qDebug() << "update Cursor paint!";
+        //qDebug() << "update Cursor paint!";
     }
 
     // update speller box
@@ -234,7 +237,7 @@ void ScreenKeyboard::paint(QPaintDevice *device){
         painter.setPen(Qt::black);
         painter.drawText(rectSpBox,Qt::AlignBottom, m_sSpelledPhrase);
 
-        qDebug() << "Update Phrase display";
+        //qDebug() << "Update Phrase display";
 
         m_bUpdatePhraseDisplay = false;
     }
@@ -282,17 +285,63 @@ void ScreenKeyboard::updateCommand(double value){
     if(m_bUseSpellAccuracy && index >= 0){
 
         // determine the next correct index-command
-        QPair<int, int> nextCoord = m_mapKeys.key(*m_qSpellIterator);
-        qDebug() << "next sign:" << *m_qSpellIterator;
 
-        int difX = nextCoord.first - m_qCurCursorCoord.first;
-        int difY = nextCoord.second - m_qCurCursorCoord.second;
+        m_qSound->play();
+        cout << "\a";
 
-        if((difX + deltaX < difX || difY + deltaY < difY) && (m_mapKeys.contains(QPair<int, int> (m_qCurCursorCoord.first + deltaX, m_qCurCursorCoord.second + deltaY))))
-            qDebug() << "correct command";
-        else
+        int difXold = m_qNextCoord.first - m_qCurCursorCoord.first;
+        int difYold = m_qNextCoord.second - m_qCurCursorCoord.second;
+        int difXnew = m_qNextCoord.first - ( m_qCurCursorCoord.first + deltaX);
+        int difYnew = m_qNextCoord.second - ( m_qCurCursorCoord.second + deltaY);
+
+        if((m_mapKeys.contains(QPair<int, int> (m_qCurCursorCoord.first + deltaX, m_qCurCursorCoord.second + deltaY)))){
+
+            if(qFabs( difXnew ) < qFabs(difXold) || qFabs( difYnew ) < qFabs(difYold)){
+
+                emit isCorrectCommand(true);
+                qDebug() << "correct movement";
+            }
+            else if((m_qOldCursorCoord == m_qNextCoord) && (index == 4)){
+
+                qDebug() << "correct select";
+                emit isCorrectCommand(true);
+
+                if(m_qNextCoord == m_mapKeys.key("Del")){
+                    m_qNextCoord = m_mapKeys.key(*m_qSpellIterator);
+                    qDebug() << "correct delete! next coordinate:" << m_qNextCoord;
+                }
+                else if(m_qNextCoord == m_mapKeys.key("Clr")){
+                    m_qSpellIterator = m_sSettledPhrase.begin();
+                    m_qNextCoord = m_mapKeys.key(*m_qSpellIterator);
+                    qDebug() << "correct clear! next coordinate:" << m_qNextCoord;
+                }
+
+                if(m_qSpellIterator != m_sSettledPhrase.end()){
+                    ++m_qSpellIterator;
+                    m_qNextCoord = m_mapKeys.key(*m_qSpellIterator);
+                    qDebug() << "next sign:" << *m_qSpellIterator;
+                    qDebug() << "next coordinate:" << m_qNextCoord;
+                }
+                else
+                    stopSpellAccuracyFeature();
+
+            }
+            else if((m_qCurCursorCoord != m_qNextCoord) && (index == 4)){
+
+                m_qNextCoord = m_mapKeys.key("Del");
+                emit isCorrectCommand(false);
+                qDebug() << "false select! next coordinate is:" << m_qNextCoord;
+            }
+            else{
+                emit isCorrectCommand(false);
+                qDebug() << "wrong command";
+            }
+
+        }
+        else{
+            emit isCorrectCommand(false);
             qDebug() << "wrong command";
-
+        }
 
     }
 
@@ -350,10 +399,15 @@ void ScreenKeyboard::initScreenKeyboard(){
 
 void ScreenKeyboard::initSpellAccuracyFeature(){
 
+    m_sSpelledPhrase.clear();
+
     // initialize spell iterator to settled phrase
     m_qSpellIterator = m_sSettledPhrase.begin();
+    m_qNextCoord = m_mapKeys.key(*m_qSpellIterator);
+    qDebug() << "next coordinate:" << m_qNextCoord;
 
     m_bUseSpellAccuracy = true;
+    m_bUpdatePhraseDisplay = true;
 }
 
 

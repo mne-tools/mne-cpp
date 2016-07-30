@@ -280,7 +280,9 @@ public slots:
     void setFeatureExtractionMethod(bool useMEC);
     void setThresholdValues(MyQList thresholds);
     void setChangeSSVEPParameterFlag();
-    void setNumClassHits(int NumClassHits);
+    void setNumClassHits(int numClassHits);
+    void setNumClassBreaks(int numClassBreaks);
+    void setSizeClassList(int classListSize);
 
 signals:
     void SSVEPprob(MyQList ssvepProb);
@@ -322,7 +324,8 @@ private:
     int                     m_iDownSampleIndex;                 /**< index for reading from the raw buffer in order to downsample to 128 Hz */
     int                     m_iFormerDownSampleIndex;           /**< former downsampling Index: serves as comparison variable for handling storage overflow */
     int                     m_iReadToWriteBuffer;               /**< number of samples from the current readindex to current write index */
-    int                     m_iWindowSize;
+    int                     m_iNumberOfClassBreaks;             /**< number of classifiactions whicht will be skipped if a classifiaction was made */
+    int                     m_iWindowSize;                      /**< size of current time window */
 
     // SSVEP parameter
     QList<int>              m_lElectrodeNumbers;                /**< Sensor level: numbers of chosen electrode channels */
@@ -337,7 +340,7 @@ private:
     int                     m_iPowerLine;                       /**< frequency of the power line [Hz] */
     bool                    m_bChangeSSVEPParameterFlag;        /**< flag for chaning SSVEP parameter */
     int                     m_iNumberOfClassHits;               /**< Number of required classifiaction hits, before a classifiaction is confirmed */
-    int                     m_iMaxClassListSize;                /**< maximum size of m_lIndexOfClassResultSensor before it gets deleted */
+    int                     m_iClassListSize;                /**< maximum size of m_lIndexOfClassResultSensor */
 
     // Sensor level
     FiffInfo::SPtr          m_pFiffInfo_Sensor;                 /**< Sensor level: Fiff information for sensor data. */

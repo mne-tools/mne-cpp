@@ -52,7 +52,7 @@
 // QT INCLUDES
 //=============================================================================================================
 
-
+#include <QMediaPlayer>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -127,11 +127,13 @@ private:
     bool                                    m_bUpdatePhraseDisplay; /**< updates the phrases's display */
 
     // speller
+    QPair<int, int>                         m_qNextCoord;           /**< coordinate of the next sign which has to be picked */
     bool                                    m_bDisplaySpeller;      /**< flag for displaying speller panel */
     bool                                    m_bUseSpellAccuracy;    /**< flag for determine the spell accuracy */
     QString                                 m_sSettledPhrase;       /**< phrase established by the UI */
     QString                                 m_sSpelledPhrase;       /**< phrase spelled by the user with the SSVEPBCI */
     QString::Iterator                       m_qSpellIterator;       /**< iterator for spelling */
+    QMediaPlayer                           *m_qSound;
 
     //=========================================================================================================
     /**
