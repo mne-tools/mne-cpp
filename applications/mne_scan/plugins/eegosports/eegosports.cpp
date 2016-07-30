@@ -155,9 +155,9 @@ void EEGoSports::init()
     //default values used by the setupGUI class must be set here
 
     QSettings settings;
-    m_iSamplingFreq = settings.value(QString("EEGOSPORTS/sFreq"), 1024).toInt();
+    m_iSamplingFreq = settings.value(QString("EEGOSPORTS/sFreq"), 512).toInt();
     m_iNumberOfChannels = 90;
-    m_iSamplesPerBlock = settings.value(QString("EEGOSPORTS/samplesPerBlock"), 1024).toInt();
+    m_iSamplesPerBlock = settings.value(QString("EEGOSPORTS/samplesPerBlock"), 512).toInt();
     m_bWriteToFile = false;
     m_bWriteDriverDebugToFile = false;
     m_bIsRunning = false;

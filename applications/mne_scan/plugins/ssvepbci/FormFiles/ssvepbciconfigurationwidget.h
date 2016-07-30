@@ -175,11 +175,14 @@ private slots:
     void thresholdChanged(double threshold);
     void numOfHarmonicsChanged(int harmonics);
     void channelSelectChanged(const QModelIndex &parent, int first, int last);
+    void evaluateCommand(bool isCorrectCommand);
 
 
     void on_m_pushButton_StartMeasurement_clicked();
 
     void on_m_pushButton_StopMeasurement_clicked();
+
+    void on_m_spinBox_ClassificationListSize_valueChanged(int arg1);
 
 signals:
     void getThresholdValues(MyQList Thresholds);
@@ -192,13 +195,16 @@ private:
     QStringList                             m_vAvailableChannelsSensor;                 /**< QStringList holding available features to select on sensor level (electrodes).*/
     double                                  m_dMinProbValue;                            /**< minimum border for SSVEP visualization with a status bar */
     double                                  m_dMaxProbValue;                            /**< maximum border for SSVEP visualization with a status bar */
-    bool                                    m_bInitThresholdDisplay;                                    /**< flag for first run and so initializing ssvepBCIConfigurationWidget-Class */
+    bool                                    m_bInitThresholdDisplay;                    /**< flag for first run and so initializing ssvepBCIConfigurationWidget-Class */
     QList<double>                           m_lSSVEPThresholdValues;                    /**< contains the threshold values for SSVEP classifiaction */
     QList<double>                           m_lFrequencyList;                           /**< list of desired frequencies */
     QPalette                                m_palBlackFont;                             /**< setting black font for group box */
     QPalette                                m_palRedFont;                               /**< setting red font for highlightning label */
 
-
+    // accuracy feature
+    bool                                    m_bScreenKeyboardConnected;                 /**< flag for connected screen keaboard */
+    int                                     m_iCorrectCommands;                         /**< counter for correct commands */
+    int                                     m_iWrongCommands;                           /**< counter for wrong commands */
 
 
 };

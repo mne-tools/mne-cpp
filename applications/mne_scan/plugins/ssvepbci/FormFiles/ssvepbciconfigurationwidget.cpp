@@ -57,13 +57,16 @@ using namespace ssvepBCIPlugin;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ssvepBCIConfigurationWidget::ssvepBCIConfigurationWidget(ssvepBCI* pssvepBCI, QWidget *parent) :
-    QDialog(parent)
-  ,  m_pSSVEPBCI(pssvepBCI)
-  ,  ui(new Ui::ssvepBCIConfigurationWidget)
-  ,  m_bInitThresholdDisplay(true)
-  ,  m_dMaxProbValue(1)
-  ,  m_dMinProbValue(0)
+ssvepBCIConfigurationWidget::ssvepBCIConfigurationWidget(ssvepBCI* pssvepBCI, QWidget *parent)
+: QDialog(parent)
+, m_pSSVEPBCI(pssvepBCI)
+, ui(new Ui::ssvepBCIConfigurationWidget)
+, m_bInitThresholdDisplay(true)
+, m_dMaxProbValue(1)
+, m_dMinProbValue(0)
+, m_bScreenKeyboardConnected(false)
+, m_iWrongCommands(0)
+, m_iCorrectCommands(0)
 {
     ui->setupUi(this);
 
@@ -130,8 +133,12 @@ ssvepBCIConfigurationWidget::ssvepBCIConfigurationWidget(ssvepBCI* pssvepBCI, QW
     connect(m_pSSVEPBCI, &ssvepBCI::classificationResult, ui->m_LcdNumber_ClasResult, static_cast<void(QLCDNumber::*)(double)>(&QLCDNumber::display));
     connect(m_pSSVEPBCI, &ssvepBCI::classificationResult, this, &ssvepBCIConfigurationWidget::setClassResult);
 
-    // connect classifiaction hits-spinbox
+    // connect classifiaction hits-spinbox and classification breaks-spinbox
     connect(ui->m_spinBox_ClassificationHits, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged), m_pSSVEPBCI, &ssvepBCI::setNumClassHits);
+    connect(ui->m_spinBox_ClassificationBreaks, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged), m_pSSVEPBCI, &ssvepBCI::setNumClassBreaks);
+    connect(ui->m_spinBox_ClassificationListSize, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged), m_pSSVEPBCI, &ssvepBCI::setSizeClassList);
+
+
 
     // set palette for text color change
     m_palBlackFont.setColor(QPalette::WindowText, Qt::black);
@@ -432,9 +439,24 @@ void ssvepBCIPlugin::ssvepBCIConfigurationWidget::on_m_pushButton_StartMeasureme
 {
     if(m_pSSVEPBCI->m_pssvepBCISetupStimulusWidget != NULL){
         QSharedPointer<ScreenKeyboard> pScreenKeyboard = m_pSSVEPBCI->m_pssvepBCISetupStimulusWidget->getScreenKeyboardSPtr();
-        if(pScreenKeyboard != NULL)
+        if(pScreenKeyboard != NULL){
             pScreenKeyboard->initSpellAccuracyFeature();
+
+            if(!m_bScreenKeyboardConnected){
+                connect(pScreenKeyboard.data(), &ScreenKeyboard::isCorrectCommand, this, &ssvepBCIConfigurationWidget::evaluateCommand);
+
+                m_bScreenKeyboardConnected = true;
+            }
+
+        }
     }
+
+    // reset counter for command evaluation
+    m_iWrongCommands = 0;
+    m_iCorrectCommands = 0;
+
+    ui->m_label_CorrectCommands->setText(QString::number(m_iCorrectCommands));
+    ui->m_label_WrongCommands->setText(QString::number(m_iWrongCommands));
 }
 
 
@@ -448,4 +470,28 @@ void ssvepBCIPlugin::ssvepBCIConfigurationWidget::on_m_pushButton_StopMeasuremen
             pScreenKeyboard->stopSpellAccuracyFeature();
     }
 
+}
+
+
+//*************************************************************************************************************
+
+void ssvepBCIConfigurationWidget::evaluateCommand(bool isCorrectCommand){
+
+    if(isCorrectCommand){
+        m_iCorrectCommands += 1;
+        ui->m_label_CorrectCommands->setText(QString::number(m_iCorrectCommands));
+    }
+    else{
+        m_iWrongCommands +=1;
+        ui->m_label_WrongCommands->setText(QString::number(m_iWrongCommands));
+    }
+
+}
+
+
+//*************************************************************************************************************
+
+void ssvepBCIPlugin::ssvepBCIConfigurationWidget::on_m_spinBox_ClassificationListSize_valueChanged(int arg1)
+{
+    ui->m_spinBox_ClassificationHits->setMaximum(arg1);
 }

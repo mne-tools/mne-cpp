@@ -43,7 +43,8 @@ CONFIG += plugin
 
 DEFINES += SSVEPBCI_LIBRARY
 
-QT += core widgets concurrent gui multimedia
+QT += core widgets concurrent gui \
+       multimedia
 
 
 TARGET = bci
