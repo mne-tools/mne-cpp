@@ -47,6 +47,7 @@ SUBDIRS += \
 
     !contains(MNECPP_CONFIG, coverity) {
         SUBDIRS += \
+            mne_dipole_fit \
             mne_matching_pursuit \
 
             qtHaveModule(charts) {
