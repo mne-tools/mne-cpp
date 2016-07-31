@@ -45,10 +45,10 @@
 
 
 #include <fiff/fiff.h>
-#include <mne/mne.h>
+//#include <mne/mne.h>
 #include <utils/sphere.h>
 
-
+#include "fiff_file.h"
 
 
 
@@ -74,7 +74,8 @@
 //=============================================================================================================
 
 using namespace FIFFLIB;
-using namespace MNELIB;
+using namespace UTILSLIB;
+//using namespace MNELIB;
 
 
 
@@ -113,8 +114,11 @@ using namespace MNELIB;
  * Others...
  */
 
-
-
+#define VEC_DIFF(from,to,diff) {\
+(diff)[X] = (to)[X] - (from)[X];\
+(diff)[Y] = (to)[Y] - (from)[Y];\
+(diff)[Z] = (to)[Z] - (from)[Z];\
+}
 
 #define VEC_COPY(to,from) {\
 (to)[X] = (from)[X];\
@@ -122,6 +126,11 @@ using namespace MNELIB;
 (to)[Z] = (from)[Z];\
 }
 
+#define CROSS_PRODUCT(x,y,xy) {\
+(xy)[X] =   (x)[Y]*(y)[Z]-(y)[Y]*(x)[Z];\
+(xy)[Y] = -((x)[X]*(y)[Z]-(y)[X]*(x)[Z]);\
+(xy)[Z] =   (x)[X]*(y)[Y]-(y)[X]*(x)[Y];\
+}
 
 
 //============================= mne_allocs.h =============================
@@ -206,6 +215,1591 @@ void mne_free_cmatrix (float **m)
 
 
 
+//============================= fiff_type_spec.h =============================
+
+/*
+ * These return information about a fiff type.
+ */
+
+fiff_int_t fiff_type_base(fiff_int_t type)
+{
+  return type & FIFFTS_BASE_MASK;
+}
+
+
+fiff_int_t fiff_type_fundamental(fiff_int_t type)
+{
+  return type & FIFFTS_FS_MASK;
+}
+
+
+fiff_int_t fiff_type_matrix_coding(fiff_int_t type)
+{
+  return type & FIFFTS_MC_MASK;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//============================= fiff_combat.c =============================
+
+static short swap_short (fiff_short_t source)
+
+{
+  unsigned char *csource = (unsigned char *)(&source);
+  fiff_short_t result;
+  unsigned char *cresult =  (unsigned char *)(&result);
+
+  cresult[0] = csource[1];
+  cresult[1] = csource[0];
+  return (result);
+}
+
+
+static fiff_int_t swap_int (fiff_int_t source)
+
+{
+  unsigned char *csource =  (unsigned char *)(&source);
+  fiff_int_t result;
+  unsigned char *cresult =  (unsigned char *)(&result);
+
+  cresult[0] = csource[3];
+  cresult[1] = csource[2];
+  cresult[2] = csource[1];
+  cresult[3] = csource[0];
+  return (result);
+}
+
+static fiff_long_t swap_long (fiff_long_t source)
+
+{
+  unsigned char *csource =  (unsigned char *)(&source);
+  fiff_long_t    result;
+  unsigned char *cresult =  (unsigned char *)(&result);
+
+  cresult[0] = csource[7];
+  cresult[1] = csource[6];
+  cresult[2] = csource[5];
+  cresult[3] = csource[4];
+  cresult[4] = csource[3];
+  cresult[5] = csource[2];
+  cresult[6] = csource[1];
+  cresult[7] = csource[0];
+  return (result);
+}
+
+static void swap_longp (fiff_long_t *source)
+
+{
+  unsigned char *csource =  (unsigned char *)(source);
+  unsigned char c;
+
+  c = csource[0];
+  csource[0] = csource[7];
+  csource[7] = c;
+
+  c = csource[1];
+  csource[1] = csource[6];
+  csource[6] = c;
+
+  c = csource[2];
+  csource[2] = csource[5];
+  csource[5] = c;
+
+  c = csource[3];
+  csource[3] = csource[4];
+  csource[4] = c;
+
+  return;
+}
+
+static void swap_intp (fiff_int_t *source)
+
+{
+  unsigned char *csource =  (unsigned char *)(source);
+
+  unsigned char c;
+
+  c = csource[3];
+  csource[3] = csource[0];
+  csource[0] = c;
+  c = csource[2];
+  csource[2] = csource[1];
+  csource[1] = c;
+
+  return;
+}
+
+
+static void swap_floatp (float *source)
+
+{
+  unsigned char *csource =  (unsigned char *)(source);
+  unsigned char c;
+
+  c = csource[3];
+  csource[3] = csource[0];
+  csource[0] = c;
+  c = csource[2];
+  csource[2] = csource[1];
+  csource[1] = c;
+
+  return;
+}
+
+static void swap_doublep(double *source)
+
+{
+  unsigned char *csource =  (unsigned char *)(source);
+  unsigned char c;
+
+  c = csource[7];
+  csource[7] = csource[0];
+  csource[0] = c;
+
+  c = csource[6];
+  csource[6] = csource[1];
+  csource[1] = c;
+
+  c = csource[5];
+  csource[5] = csource[2];
+  csource[2] = c;
+
+  c = csource[4];
+  csource[4] = csource[3];
+  csource[3] = c;
+
+  return;
+}
+
+
+static void convert_ch_pos(fiffChPos pos)
+
+{
+  int k;
+  pos->coil_type  = swap_int(pos->coil_type);
+  for (k = 0; k < 3; k++) {
+    swap_floatp(&pos->r0[k]);
+    swap_floatp(&pos->ex[k]);
+    swap_floatp(&pos->ey[k]);
+    swap_floatp(&pos->ez[k]);
+  }
+  return;
+}
+
+
+
+
+
+/*! Machine dependent data type conversions (tag info only)
+ */
+
+void fiff_convert_tag_info(fiffTag tag)
+
+{
+  tag->kind = swap_int(tag->kind);
+  tag->type = swap_int(tag->type);
+  tag->size = swap_int(tag->size);
+  tag->next = swap_int(tag->next);
+  return;
+}
+
+
+
+
+static void convert_matrix_from_file_data(fiffTag tag)
+/*
+ * Assumes that the input is in the non-native byte order and needs to be swapped to the other one
+ */
+{
+  int ndim;
+  int k;
+  int *dimp,*data,kind,np,nz;
+  float *fdata;
+  double *ddata;
+  unsigned int tsize = tag->size;
+
+  if (fiff_type_fundamental(tag->type) != FIFFTS_FS_MATRIX)
+    return;
+  if (tag->data == NULL)
+    return;
+  if (tsize < sizeof(fiff_int_t))
+    return;
+
+  dimp = ((fiff_int_t *)(((char *)tag->data)+tag->size-sizeof(fiff_int_t)));
+  swap_intp(dimp);
+  ndim = *dimp;
+  if (fiff_type_matrix_coding(tag->type) == FIFFTS_MC_DENSE) {
+    if (tsize < (ndim+1)*sizeof(fiff_int_t))
+      return;
+    dimp = dimp - ndim;
+    for (k = 0, np = 1; k < ndim; k++) {
+      swap_intp(dimp+k);
+      np = np*dimp[k];
+    }
+  }
+  else {
+    if (tsize < (ndim+2)*sizeof(fiff_int_t))
+      return;
+    if (ndim > 2)		/* Not quite sure what to do */
+      return;
+    dimp = dimp - ndim - 1;
+    for (k = 0; k < ndim+1; k++)
+      swap_intp(dimp+k);
+    nz = dimp[0];
+    if (fiff_type_matrix_coding(tag->type) == FIFFTS_MC_CCS)
+      np = nz + dimp[2] + 1; /* nz + n + 1 */
+    else if (fiff_type_matrix_coding(tag->type) == FIFFTS_MC_RCS)
+      np = nz + dimp[1] + 1; /* nz + m + 1 */
+    else
+      return;			/* Don't know what to do */
+    /*
+     * Take care of the indices
+     */
+    for (data = (int *)(tag->data)+nz, k = 0; k < np; k++)
+      swap_intp(data+k);
+    np = nz;
+  }
+  /*
+   * Now convert data...
+   */
+  kind = fiff_type_base(tag->type);
+  if (kind == FIFFT_INT) {
+    for (data = (int *)(tag->data), k = 0; k < np; k++)
+      swap_intp(data+k);
+  }
+  else if (kind == FIFFT_FLOAT) {
+    for (fdata = (float *)(tag->data), k = 0; k < np; k++)
+      swap_floatp(fdata+k);
+  }
+  else if (kind == FIFFT_DOUBLE) {
+    for (ddata = (double *)(tag->data), k = 0; k < np; k++)
+      swap_doublep(ddata+k);
+  }
+  return;
+}
+
+
+static void convert_matrix_to_file_data(fiffTag tag)
+/*
+ * Assumes that the input is in the NATIVE_ENDIAN byte order and needs to be swapped to the other one
+ */
+{
+  int ndim;
+  int k;
+  int *dimp,*data,kind,np;
+  float *fdata;
+  double *ddata;
+  unsigned int tsize = tag->size;
+
+  if (fiff_type_fundamental(tag->type) != FIFFTS_FS_MATRIX)
+    return;
+  if (tag->data == NULL)
+    return;
+  if (tsize < sizeof(fiff_int_t))
+    return;
+
+  dimp = ((fiff_int_t *)(((char *)tag->data)+tag->size-sizeof(fiff_int_t)));
+  ndim = *dimp;
+  swap_intp(dimp);
+
+  if (fiff_type_matrix_coding(tag->type) == FIFFTS_MC_DENSE) {
+    if (tsize < (ndim+1)*sizeof(fiff_int_t))
+      return;
+    dimp = dimp - ndim;
+    for (k = 0, np = 1; k < ndim; k++) {
+      np = np*dimp[k];
+      swap_intp(dimp+k);
+    }
+  }
+  else {
+    if (tsize < (ndim+2)*sizeof(fiff_int_t))
+      return;
+    if (ndim > 2)		/* Not quite sure what to do */
+      return;
+    dimp = dimp - ndim - 1;
+    if (fiff_type_matrix_coding(tag->type) == FIFFTS_MC_CCS)
+      np = dimp[0] + dimp[2] + 1; /* nz + n + 1 */
+    else if (fiff_type_matrix_coding(tag->type) == FIFFTS_MC_RCS)
+      np = dimp[0] + dimp[1] + 1; /* nz + m + 1 */
+    else
+      return;			/* Don't know what to do */
+    for (k = 0; k < ndim+1; k++)
+      swap_intp(dimp+k);
+  }
+  /*
+   * Now convert data...
+   */
+  kind = fiff_type_base(tag->type);
+  if (kind == FIFFT_INT) {
+    for (data = (int *)(tag->data), k = 0; k < np; k++)
+      swap_intp(data+k);
+  }
+  else if (kind == FIFFT_FLOAT) {
+    for (fdata = (float *)(tag->data), k = 0; k < np; k++)
+      swap_floatp(fdata+k);
+  }
+  else if (kind == FIFFT_DOUBLE) {
+    for (ddata = (double *)(tag->data), k = 0; k < np; k++)
+      swap_doublep(ddata+k);
+  }
+  else if (kind == FIFFT_COMPLEX_FLOAT) {
+    for (fdata = (float *)(tag->data), k = 0; k < 2*np; k++)
+      swap_floatp(fdata+k);
+  }
+  else if (kind == FIFFT_COMPLEX_DOUBLE) {
+    for (ddata = (double *)(tag->data), k = 0; k < 2*np; k++)
+      swap_doublep(ddata+k);
+  }
+  return;
+}
+
+
+/*
+ * Data type conversions for the little endian systems.
+ */
+
+/*! Machine dependent data type conversions (tag info only)
+ *
+ * from_endian defines the byte order of the input
+ * to_endian   defines the byte order of the output
+ *
+ * Either of these may be specified as FIFFV_LITTLE_ENDIAN, FIFFV_BIG_ENDIAN, or FIFFV_NATIVE_ENDIAN.
+ * The last choice means that the native byte order value will be substituted here before proceeding
+ */
+
+void fiff_convert_tag_data(fiffTag tag, int from_endian, int to_endian)
+
+{
+  int            np;
+  int            k,r,c;
+  fiff_int_t     *ithis;
+  fiff_short_t   *sthis;
+  fiff_long_t    *lthis;
+  float          *fthis;
+  double         *dthis;
+  fiffDirEntry   dethis;
+  fiffId         idthis;
+  fiffChInfo     chthis;
+  fiffChPos      cpthis;
+  fiffCoordTrans ctthis;
+  fiffDigPoint   dpthis;
+  fiffDataRef    drthis;
+
+  if (tag->data == NULL || tag->size == 0)
+    return;
+
+  if (from_endian == FIFFV_NATIVE_ENDIAN)
+    from_endian = NATIVE_ENDIAN;
+  if (to_endian == FIFFV_NATIVE_ENDIAN)
+    to_endian = NATIVE_ENDIAN;
+
+  if (from_endian == to_endian)
+    return;
+
+  if (fiff_type_fundamental(tag->type) == FIFFTS_FS_MATRIX) {
+    if (from_endian == NATIVE_ENDIAN)
+      convert_matrix_to_file_data(tag);
+    else
+      convert_matrix_from_file_data(tag);
+    return;
+  }
+
+  switch (tag->type) {
+
+  case FIFFT_INT :
+  case FIFFT_JULIAN :
+  case FIFFT_UINT :
+    np = tag->size/sizeof(fiff_int_t);
+    for (ithis = (fiff_int_t *)tag->data, k = 0; k < np; k++, ithis++)
+      swap_intp(ithis);
+    break;
+
+  case FIFFT_LONG :
+  case FIFFT_ULONG :
+    np = tag->size/sizeof(fiff_long_t);
+    for (lthis = (fiff_long_t *)tag->data, k = 0; k < np; k++, lthis++)
+      swap_longp(lthis);
+    break;
+
+  case FIFFT_SHORT :
+  case FIFFT_DAU_PACK16 :
+  case FIFFT_USHORT :
+    np = tag->size/sizeof(fiff_short_t);
+    for (sthis = (fiff_short_t *)tag->data, k = 0; k < np; k++, sthis++)
+      *sthis = swap_short(*sthis);
+    break;
+
+  case FIFFT_FLOAT :
+  case FIFFT_COMPLEX_FLOAT :
+    np = tag->size/sizeof(fiff_float_t);
+    for (fthis = (fiff_float_t *)tag->data, k = 0; k < np; k++, fthis++)
+      swap_floatp(fthis);
+    break;
+
+  case FIFFT_DOUBLE :
+  case FIFFT_COMPLEX_DOUBLE :
+    np = tag->size/sizeof(fiff_double_t);
+    for (dthis = (fiff_double_t *)tag->data, k = 0; k < np; k++, dthis++)
+      swap_doublep(dthis);
+    break;
+
+
+  case FIFFT_OLD_PACK :
+    fthis = (float *)tag->data;
+    /*
+     * Offset and scale...
+     */
+    swap_floatp(fthis+0);
+    swap_floatp(fthis+1);
+    sthis = (short *)(fthis+2);
+    np = (tag->size - 2*sizeof(float))/sizeof(short);
+    for (k = 0; k < np; k++,sthis++)
+      *sthis = swap_short(*sthis);
+    break;
+
+  case FIFFT_DIR_ENTRY_STRUCT :
+    np = tag->size/sizeof(fiffDirEntryRec);
+    for (dethis = (fiffDirEntry)tag->data, k = 0; k < np; k++, dethis++) {
+      dethis->kind = swap_int(dethis->kind);
+      dethis->type = swap_int(dethis->type);
+      dethis->size = swap_int(dethis->size);
+      dethis->pos  = swap_int(dethis->pos);
+    }
+    break;
+
+  case FIFFT_ID_STRUCT :
+    np = tag->size/sizeof(fiffIdRec);
+    for (idthis = (fiffId)tag->data, k = 0; k < np; k++, idthis++) {
+      idthis->version = swap_int(idthis->version);
+      idthis->machid[0] = swap_int(idthis->machid[0]);
+      idthis->machid[1] = swap_int(idthis->machid[1]);
+      idthis->time.secs  = swap_int(idthis->time.secs);
+      idthis->time.usecs = swap_int(idthis->time.usecs);
+    }
+    break;
+
+  case FIFFT_CH_INFO_STRUCT :
+    np = tag->size/sizeof(fiffChInfoRec);
+    for (chthis = (fiffChInfo)tag->data, k = 0; k < np; k++, chthis++) {
+      chthis->scanNo    = swap_int(chthis->scanNo);
+      chthis->logNo     = swap_int(chthis->logNo);
+      chthis->kind      = swap_int(chthis->kind);
+      swap_floatp(&chthis->range);
+      swap_floatp(&chthis->cal);
+      chthis->unit      = swap_int(chthis->unit);
+      chthis->unit_mul  = swap_int(chthis->unit_mul);
+      convert_ch_pos(&(chthis->chpos));
+    }
+    break;
+
+  case FIFFT_CH_POS_STRUCT :
+    np = tag->size/sizeof(fiffChPosRec);
+    for (cpthis = (fiffChPos)tag->data, k = 0; k < np; k++, cpthis++)
+      convert_ch_pos(cpthis);
+    break;
+
+  case FIFFT_DIG_POINT_STRUCT :
+    np = tag->size/sizeof(fiffDigPointRec);
+    for (dpthis = (fiffDigPoint)tag->data, k = 0; k < np; k++, dpthis++) {
+      dpthis->kind = swap_int(dpthis->kind);
+      dpthis->ident = swap_int(dpthis->ident);
+      for (r = 0; r < 3; r++)
+    swap_floatp(&dpthis->r[r]);
+    }
+    break;
+
+  case FIFFT_COORD_TRANS_STRUCT :
+    np = tag->size/sizeof(fiffCoordTransRec);
+    for (ctthis = (fiffCoordTrans)tag->data, k = 0; k < np; k++, ctthis++) {
+      ctthis->from = swap_int(ctthis->from);
+      ctthis->to   = swap_int(ctthis->to);
+      for (r = 0; r < 3; r++) {
+    swap_floatp(&ctthis->move[r]);
+    swap_floatp(&ctthis->invmove[r]);
+    for (c = 0; c < 3; c++) {
+      swap_floatp(&ctthis->rot[r][c]);
+      swap_floatp(&ctthis->invrot[r][c]);
+    }
+      }
+    }
+    break;
+
+  case FIFFT_DATA_REF_STRUCT :
+    np = tag->size/sizeof(fiffDataRefRec);
+    for (drthis = (fiffDataRef)tag->data, k = 0; k < np; k++, drthis++) {
+      drthis->type   = swap_int(drthis->type);
+      drthis->endian = swap_int(drthis->endian);
+      drthis->size   = swap_long(drthis->size);
+      drthis->offset = swap_long(drthis->offset);
+    }
+    break;
+
+  default :
+    break;
+  }
+  return;
+}
+
+
+//============================= fiff_io.c =============================
+
+
+typedef struct {		/* One channel is described here */
+  fiff_int_t scanNo;		/* Scanning order # */
+  fiff_int_t logNo;		/* Logical channel # */
+  fiff_int_t kind;		/* Kind of channel:
+                 * 1 = magnetic
+                 * 2 = electric
+                 * 3 = stimulus */
+  fiff_float_t range;		/* Voltmeter range (-1 = auto ranging) */
+  fiff_float_t cal;		/* Calibration from volts to... */
+  fiff_float_t loc[9];		/* Location for a magnetic channel */
+} oldChInfoRec,*oldChInfo;
+
+
+static void convert_loc (float oldloc[9], /*!< These are the old magic numbers */
+                         float r0[3],     /*!< Coil coordinate system origin */
+                         float *ex,       /*!< Coil coordinate system unit x-vector */
+                         float *ey,       /*!< Coil coordinate system unit y-vector */
+                         float *ez)       /*!< Coil coordinate system unit z-vector */
+     /*
+      * Convert the traditional location
+      * information to new format...
+      */
+{
+  float len;
+  int j;
+  VEC_DIFF(oldloc+3,oldloc,ex);	/* From - coil to + coil */
+  len = VEC_LEN(ex);
+  for (j = 0; j < 3; j++) {
+    ex[j] = ex[j]/len;		/* Normalize ex */
+    ez[j] = oldloc[j+6];	/* ez along coil normal */
+  }
+  CROSS_PRODUCT(ez,ex,ey);	/* ey is defined by the other two */
+  len = VEC_LEN(ey);
+  for (j = 0; j < 3; j++) {
+    ey[j] = ey[j]/len;		/* Normalize ey */
+    r0[j] = (oldloc[j] + oldloc[j+3])/2.0;
+                /* Origin lies halfway between the coils */
+  }
+  return;
+}
+
+
+static void fix_ch_info (fiffTag tag)
+     /*
+      * Fiddle around a little bit...
+      */
+{
+  fiff_ch_info_t *ch;
+  fiff_byte_t *help;
+  oldChInfo old;
+  fiff_ch_pos_t  *pos;
+
+  if (tag->type == FIFFT_CH_INFO_STRUCT) {
+    if (tag->size < (int)sizeof(fiff_ch_info_t)) { /* Old structure */
+      help = (fiff_byte_t *)malloc(sizeof(fiff_ch_info_t));
+      old = (oldChInfo)tag->data;
+      tag->data = (fiff_data_t*) help;
+      ch = (fiff_ch_info_t *)(tag->data);
+      pos = &(ch->chpos);
+      /*
+       * Set up the new structure
+       */
+      ch->scanNo = old->scanNo;
+      ch->logNo  = old->logNo;
+      ch->kind   = old->kind;
+      ch->range  = old->range;
+      ch->cal    = old->cal;
+      if (ch->kind == FIFFV_MAGN_CH) {
+    pos->coil_type = FIFFV_COIL_NM_122;
+    convert_loc (old->loc,pos->r0,pos->ex,pos->ey,pos->ez);
+    sprintf(ch->ch_name,"MEG %03d",ch->logNo % 1000);
+    ch->unit = FIFF_UNIT_T_M;
+      }
+      else if (ch->kind == FIFFV_EL_CH) {
+    pos->coil_type = FIFFV_COIL_EEG;
+    pos->r0[X] = old->loc[X];
+    pos->r0[Y] = old->loc[Y];
+    pos->r0[Z] = old->loc[Z];
+    sprintf(ch->ch_name,"EEG %03d",ch->logNo);
+    ch->unit = FIFF_UNIT_V;
+      }
+      else {
+    pos->coil_type = FIFFV_COIL_NONE;
+    sprintf(ch->ch_name,"STI %03d",ch->logNo);
+    ch->unit = FIFF_UNIT_V;
+      }
+      FREE(old);
+      ch->unit_mul = FIFF_UNITM_NONE;
+    }
+  }
+
+}
+
+int fiff_read_tag_info (FILE *in,fiffTag tag)
+     /*
+      * Read next tag from file
+      * Do not read data
+      */
+{
+  long pos = ftell(in);
+
+  tag->data = NULL;
+  if (fread (tag,FIFFC_TAG_INFO_SIZE,1,in) != 1)
+    return (-1);
+  fiff_convert_tag_info(tag);
+  if (tag->next > 0) {
+    if (fseek(in,tag->next,SEEK_SET) == -1) {
+      qCritical ("fseek");
+      pos = -1;
+    }
+  }
+  else if (tag->size > 0 && tag->next == 0)
+    if (fseek(in,tag->size,SEEK_CUR) == -1) {
+      qCritical ("fseek");
+      pos = -1;
+    }
+  return (pos);
+}
+
+int fiff_read_tag (FILE  *in,
+           fiffTag tag)	/* Note: data member must be initialized
+                 * to NULL on first call.
+                 * This routine automatically reallocs
+                 * the needed space */
+     /*
+      * Read next tag including its data from file
+      */
+{
+  long pos = ftell(in);
+
+  if (fread (tag,FIFFC_TAG_INFO_SIZE,1,in) != 1) {
+    qCritical("Failed to read tag info (pos = %d)",pos);
+    return (-1);
+  }
+  fiff_convert_tag_info(tag);
+  if (tag->size > 0) {
+    if (tag->data == NULL)
+      tag->data = (fiff_data_t*)malloc(tag->size + ((tag->type == FIFFT_STRING) ? 1 : 0));
+    else
+      tag->data = (fiff_data_t*)realloc(tag->data,tag->size +
+              ((tag->type == FIFFT_STRING) ? 1 : 0));
+    if (tag->data == NULL) {
+      qCritical("fiff_read_tag: memory allocation failed.");
+      return -1;
+    }
+    if (fread (tag->data,tag->size,1,in) != 1) {
+      qCritical("Failed to read tag data (pos = %d kind = %d size = %d)",pos,tag->kind,tag->size);
+      return(-1);
+    }
+    if (tag->type == FIFFT_STRING)  /* Null-terminated strings */
+      ((char *)tag->data)[tag->size] = '\0';
+    else if (tag->type == FIFFT_CH_INFO_STRUCT)
+      fix_ch_info (tag);
+  }
+  if (tag->next > 0)
+    if (fseek(in,tag->next,SEEK_SET) == -1) {
+      qCritical ("fseek");
+      pos = -1;
+    }
+  fiff_convert_tag_data(tag,FIFFV_BIG_ENDIAN,FIFFV_NATIVE_ENDIAN);
+  return (pos);
+}
+
+
+int fiff_read_this_tag (FILE *in,		/* Read from here */
+            long pos,		/* File position from beginning */
+            fiffTag tag)		/* Result goes here */
+     /*
+      * Read tag from specified position
+      */
+{
+  if (fseek(in,pos,SEEK_SET) == -1) {
+    qCritical ("fseek");
+    return (-1);
+  }
+  else
+    return (fiff_read_tag(in,tag));
+}
+
+
+
+
+
+
+
+
+
+//============================= fiff_dir_tree.c =============================
+
+/*
+ * Take care of directory trees
+ */
+
+void fiff_dir_tree_free(fiffDirNode node)
+
+{
+  int k;
+  if (node == NULL)
+    return;
+  FREE(node->dir);
+  FREE(node->id);
+  for (k = 0; k < node->nchild; k++)
+    fiff_dir_tree_free(node->children[k]);
+  FREE(node);
+}
+
+
+
+
+
+static fiffDirNode make_subtree(fiffFile file,fiffDirEntry dentry)
+
+{
+  fiffDirNode node = (fiffDirNode)malloc(sizeof(fiffDirNodeRec));
+  fiffDirNode child;
+  fiffTagRec tag;
+  int        k;
+  int        level;
+  fiffDirEntry dir;
+  int          nent;
+
+  dir  = node->dir  = MALLOC(file->nent,fiffDirEntryRec);
+  nent = node->nent = 0;
+  node->dir_tree    = dentry;
+  node->nent_tree   = 1;
+  node->parent      = NULL;
+  node->children    = NULL;
+  node->nchild      = 0;
+  node->id          = NULL;
+  tag.data = NULL;
+
+  node->type = FIFFB_ROOT;
+  if (dentry->kind == FIFF_BLOCK_START) {
+    if (fiff_read_this_tag (file->fd,dentry->pos,&tag) == -1)
+      goto bad;
+    else
+      node->type = *(int *)tag.data;
+  }
+  else {
+    node->id   = (fiffId)malloc(sizeof(fiffIdRec));
+    memcpy(node->id,file->id,sizeof(fiffIdRec));
+  }
+  dentry++;
+
+  for (level = 0,k = dentry-file->dir; k < file->nent; k++,dentry++) {
+    node->nent_tree = node->nent_tree + 1;
+    if (dentry->kind == FIFF_BLOCK_START) {
+      level++;
+      if (level == 1) {
+    if ((child = make_subtree(file,dentry)) == NULL)
+      goto bad;
+    child->parent = node;
+    node->children = REALLOC(node->children,node->nchild+1,fiffDirNode);
+    node->children[node->nchild++] = child;
+      }
+    }
+    else if (dentry->kind == FIFF_BLOCK_END) {
+      level--;
+      if (level < 0)
+    break;
+    }
+    else if (dentry->kind == -1)
+      break;
+    else if (level == 0) {
+      /*
+       * Take the node id from the parent block id,
+       * block id, or file id. Let the block id
+       * take precedence over parent block id and file id
+       */
+      if (((dentry->kind == FIFF_PARENT_BLOCK_ID || dentry->kind == FIFF_FILE_ID)
+       && node->id == NULL) ||
+      dentry->kind == FIFF_BLOCK_ID) {
+    FREE(node->id);
+    node->id = NULL;
+    if (fiff_read_this_tag (file->fd,dentry->pos,&tag) == -1)
+      goto bad;
+    node->id = (fiffId)tag.data;
+    tag.data = NULL;
+      }
+      memcpy(dir+nent,dentry,sizeof(fiffDirEntryRec));
+      nent++;
+    }
+  }
+  /*
+   * Strip unused entries
+   */
+  node->nent = nent;
+  node->dir = REALLOC(node->dir,node->nent,fiffDirEntryRec);
+  FREE(tag.data);
+  return (node);
+
+  bad :
+    fiff_dir_tree_free(node);
+  return (NULL);
+}
+
+
+int fiff_dir_tree_create(fiffFile file)
+     /*
+      * Make a directory tree
+      */
+{
+  fiff_dir_tree_free(file->dirtree);
+  file->dirtree = NULL;
+  if (file->fd == NULL)
+    return (FIFF_FAIL);
+  if ((file->dirtree = make_subtree(file,file->dir)) == NULL)
+    return (FIFF_FAIL);
+  else {
+    file->dirtree->parent = NULL;
+    return (FIFF_OK);
+  }
+}
+
+
+
+
+
+static void print_id (fiffId id)
+
+{
+  printf ("\t%d.%d ",id->version>>16,id->version & 0xFFFF);
+  printf ("0x%x%x ",id->machid[0],id->machid[1]);
+  printf ("%d %d ",id->time.secs,id->time.usecs);
+}
+
+
+static void print_tree(fiffDirNode node,int indent)
+
+{
+  int j,k;
+  int prev_kind,count;
+  fiffDirEntry dentry;
+
+  if (node == NULL)
+    return;
+  for (k = 0; k < indent; k++)
+    putchar(' ');
+//  fiff_explain_block (node->type);
+  printf (" { ");
+  if (node->id != NULL)
+    print_id(node->id);
+  printf ("\n");
+
+  for (j = 0, prev_kind = -1, count = 0, dentry = node->dir;
+       j < node->nent; j++,dentry++) {
+    if (dentry->kind != prev_kind) {
+      if (count > 1)
+    printf (" [%d]\n",count);
+      else if (j > 0)
+    putchar('\n');
+      for (k = 0; k < indent+2; k++)
+    putchar(' ');
+//      fiff_explain (dentry->kind);
+      prev_kind = dentry->kind;
+      count = 1;
+    }
+    else
+      count++;
+    prev_kind = dentry->kind;
+  }
+  if (count > 1)
+    printf (" [%d]\n",count);
+  else if (j > 0)
+    putchar ('\n');
+  for (j = 0; j < node->nchild; j++)
+    print_tree(node->children[j],indent+5);
+  for (k = 0; k < indent; k++)
+    putchar(' ');
+  printf ("}\n");
+}
+
+void fiff_dir_tree_print(fiffDirNode tree)
+     /*
+      * Print contents of the directory tree for
+      * checking
+      */
+{
+  print_tree(tree,0);
+}
+
+int fiff_dir_tree_count(fiffDirNode tree)
+     /*
+      * Find the number of nodes
+      */
+{
+  int res,k;
+  if (tree == NULL)
+    res = 0;
+  else {
+    res = 1;
+    for (k = 0; k < tree->nchild; k++)
+      res = res + fiff_dir_tree_count(tree->children[k]);
+  }
+  return (res);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+static fiffDirNode *found = NULL;
+static int count = 0;
+
+static void find_nodes (fiffDirNode tree,int kind)
+
+{
+  int k;
+  if (tree->type == kind) {
+    found[count++] = tree;
+    found[count] = NULL;
+  }
+  for (k = 0; k < tree->nchild; k++)
+    find_nodes(tree->children[k],kind);
+  return;
+}
+
+fiffDirNode *fiff_dir_tree_find(fiffDirNode tree,
+                int kind)
+
+{
+  /*
+   * Make room for all nodes
+   */
+  found = MALLOC(fiff_dir_tree_count(tree)+1,fiffDirNode);
+  count = 0;
+  found[count] = NULL;
+  find_nodes(tree,kind);
+  /*
+   * Shrink the size
+   */
+  found = REALLOC(found,count+1,fiffDirNode);
+  return (found);
+}
+
+
+
+
+//============================= fiff_dir.c =============================
+
+#define ALLOC_SIZE 100		/* Allocate this many entries at once */
+
+
+fiffDirEntry fiff_make_dir (FILE *fd)
+     /*
+      * Scan the tag list to create a directory
+      */
+{
+  fiffTagRec tag;
+  fiffDirEntry dir = NULL;
+  int nent = 0;
+  int still_free= 0;
+  fiff_int_t pos;
+  /*
+   * Start from the very beginning...
+   */
+  if (fseek(fd,0L,SEEK_SET) == -1)
+    return (NULL);
+  tag.data = NULL;
+  while ((pos = fiff_read_tag_info(fd,&tag)) != -1) {
+    /*
+     * Check that we haven't run into the directory
+     */
+    if (tag.kind == FIFF_DIR)
+      break;
+    /*
+     * Alloc in chunks for better performance...
+     */
+    if (still_free < 1) {
+      dir = REALLOC(dir,nent+ALLOC_SIZE,fiffDirEntryRec);
+      still_free = ALLOC_SIZE;
+    }
+    /*
+     * Put in the new entry
+     */
+    dir[nent].kind = tag.kind;
+    dir[nent].type = tag.type;
+    dir[nent].size = tag.size;
+    dir[nent].pos = pos;
+    nent++; still_free--;
+    if (tag.next < 0)
+      break;
+  }
+  if (ferror(fd)) {
+    FREE(dir);
+    return (NULL);
+  }
+  else {
+    /*
+     * Put in the new the terminating entry
+     */
+    if (still_free < 1) {
+      dir = REALLOC(dir,nent+ALLOC_SIZE,fiffDirEntryRec);
+      still_free = ALLOC_SIZE;
+    }
+    dir[nent].kind = -1;
+    dir[nent].type = -1;
+    dir[nent].size = -1;
+    dir[nent].pos  = -1;
+    nent++; still_free--;
+    /*
+     * Possibly shrink a little bit
+     */
+    if (still_free > 0)
+      dir = REALLOC(dir,nent,fiffDirEntryRec);
+    return (dir);
+  }
+}
+
+
+int fiff_how_many_entries (fiffDirEntry dir)
+     /*
+      * Count directory entries
+      */
+{
+  int nent = 0;
+  if (dir != NULL)
+    for (nent = 1; dir->kind != -1; nent++,dir++)
+      ;
+  return (nent);
+}
+
+
+
+
+//============================= fiff_open.c =============================
+
+
+/*! Check that the file starts properly!
+ */
+
+static int check_beginning (FILE *in, const char *name)
+
+{
+  fiffTagRec tag;
+  if (fread (&tag,FIFFC_TAG_INFO_SIZE,1,in) != 1)
+    return -1;
+  fiff_convert_tag_info(&tag);
+  if (tag.kind != FIFF_FILE_ID ||
+      tag.type != FIFFT_ID_STRUCT ||
+      tag.size != sizeof(fiff_id_t)) {
+    printf("File %s does not start properly!",name);
+    return -1;
+  }
+  rewind(in);
+  return 0;
+}
+
+/*! Close file, free structures
+ *
+ * \param file File to be closed
+ */
+
+void fiff_close (fiffFile file)
+
+{
+  if (file == NULL)
+    return;
+  if (file->fd != NULL)
+    (void)fclose(file->fd);
+  FREE(file->file_name);
+  FREE(file->dir);
+  FREE(file->id);
+  FREE(file->ext_file_name);
+  if (file->ext_fd)
+    (void)fclose(file->ext_fd);
+  /*
+   * Destroy the directory tree
+   */
+  fiff_dir_tree_free(file->dirtree);
+  FREE(file);
+}
+
+
+/*
+ * This is the same for both update open
+ * and read-only open
+ */
+
+static fiffFile open_file (const char *name, const char *mode)
+
+{
+  void fiff_close();
+  fiffFile file = MALLOC(1,fiffFileRec);
+  fiffTagRec tag;
+  long dirpos;
+  /*
+   * Clean fiff file descriptor
+   */
+  file->fd = NULL;
+  file->file_name = NULL;
+  file->id = NULL;
+  file->dir = NULL;
+  file->nent = 0;
+  file->dirtree = NULL;
+  file->ext_file_name = NULL;
+  file->ext_fd        = NULL;
+  /*
+   * Try to open...
+   */
+  if ((file->fd = fopen(name,mode)) == NULL) {
+    qCritical((char *)name);
+    fiff_close(file);
+    return (NULL);
+  }
+  file->file_name = MALLOC(strlen(name)+1,char);
+  strcpy(file->file_name,name);
+  tag.data = NULL;
+
+  if (check_beginning(file->fd,name) == -1)
+    goto bad;
+  /*
+   * Read id and directory pointer
+   */
+  if (fiff_read_tag(file->fd,&tag) == -1)
+    goto bad;
+  if (tag.kind != FIFF_FILE_ID) {
+    qCritical("FIFF file should start with FIFF_FILE_ID!");
+    goto bad;
+  }
+  file->id = (fiffId)tag.data;
+  tag.data = NULL;
+  if (fiff_read_tag(file->fd,&tag) == -1)
+    goto bad;
+  if (tag.kind != FIFF_DIR_POINTER) {
+    qCritical("FIFF_DIR_POINTER should follow FIFF_FILE_ID!");
+    goto bad;
+  }
+  /*
+   * Do we have a directory or not?
+   */
+  dirpos = *(fiff_int_t *)(tag.data);
+  FREE(tag.data); tag.data = NULL;
+  if (dirpos <= 0) {		/* Must do it in the hard way... */
+    if ((file->dir = fiff_make_dir (file->fd)) == NULL) {
+      qCritical ("Could not create tag directory!");
+      goto bad;
+    }
+  }
+  else {			/* Just read the directory */
+    if (fiff_read_this_tag(file->fd,dirpos,&tag) == -1) {
+      qCritical ("Could not read the tag directory (file probably damaged)!");
+      goto bad;
+    }
+    file->dir = (fiffDirEntry)tag.data;
+  }
+  file->nent = fiff_how_many_entries(file->dir);
+  /*
+   * Check for a mistake
+   */
+  if (file->dir[file->nent-2].kind == FIFF_DIR) {
+    file->nent--;
+    file->dir[file->nent-1].kind = -1;
+    file->dir[file->nent-1].type = -1;
+    file->dir[file->nent-1].size = -1;
+    file->dir[file->nent-1].pos  = -1;
+  }
+  if (fiff_dir_tree_create(file) == -1)
+    goto bad;
+  (void)fseek(file->fd,0L,SEEK_SET);
+  return (file);
+
+  bad : {
+    fiff_close(file);
+    return(NULL);
+  }
+}
+
+
+/*! Open fiff file for reading
+ *
+ * \param name File to open
+ * \return Function returns a fiffFile object representing the
+ * open file.
+ */
+
+fiffFile fiff_open (const char *name)
+{
+  fiffFile res = open_file(name,"rb");
+
+  return (res);
+}
+
+
+
+//============================= mne_read_process_forward_solution.c =============================
+
+
+void mne_merge_channels(fiffChInfo chs1, int nch1,
+            fiffChInfo chs2, int nch2,
+            fiffChInfo *resp, int *nresp)
+
+{
+  fiffChInfo res = MALLOC(nch1+nch2,fiffChInfoRec);
+  int k,p;
+  for (p = 0, k = 0; k < nch1; k++)
+    res[p++] = chs1[k];
+  for (k = 0; k < nch2;k++)
+    res[p++] = chs2[k];
+  *resp = res;
+  *nresp = nch1+nch2;
+  return;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//============================= read_ch_info.c =============================
+
+static fiffDirNode find_meas (fiffDirNode node)
+     /*
+      * Find corresponding meas node
+      */
+{
+  while (node->type != FIFFB_MEAS) {
+    if (node->parent == NULL)
+      return (NULL);
+    node = node->parent;
+  }
+  return (node);
+}
+
+static fiffDirNode find_meas_info (fiffDirNode node)
+     /*
+      * Find corresponding meas info node
+      */
+{
+  int k;
+
+  while (node->type != FIFFB_MEAS) {
+    if (node->parent == NULL)
+      return (NULL);
+    node = node->parent;
+  }
+  for (k = 0; k < node->nchild; k++)
+    if (node->children[k]->type == FIFFB_MEAS_INFO)
+      return (node->children[k]);
+  return (NULL);
+}
+
+static int get_all_chs (fiffFile file,	        /* The file we are reading */
+            fiffDirNode node,	/* The directory node containing our data */
+            fiffId *id,		/* The block id from the nearest FIFFB_MEAS
+                           parent */
+            fiffChInfo *chp,	/* Channel descriptions */
+            int *nchan)		/* Number of channels */
+     /*
+      * Find channel information from
+      * nearest FIFFB_MEAS_INFO parent of
+      * node.
+      */
+{
+  fiffTagRec tag;
+  fiffDirEntry this_entry;
+  fiffChInfo ch;
+  fiffChInfo this_ch;
+  int j,k;
+  int to_find = 0;
+  fiffDirNode meas;
+
+  tag.data = NULL;
+  *chp     = NULL;
+  ch       = NULL;
+  *id      = NULL;
+  /*
+   * Find desired parents
+   */
+  if ((meas = find_meas(node)) == NULL) {
+    qCritical ("Meas. block not found!");
+    goto bad;
+  }
+  if ((node = find_meas_info(node)) == NULL) {
+    qCritical ("Meas. info not found!");
+    goto bad;
+  }
+  /*
+   * Is there a block id is in the FIFFB_MEAS node?
+   */
+  if (meas->id != NULL) {
+    *id = MALLOC(1,fiffIdRec);
+    memcpy (*id,meas->id,sizeof(fiffIdRec));
+  }
+  /*
+   * Others from FIFFB_MEAS_INFO
+   */
+  for (k = 0,this_entry = node->dir; k < node->nent; k++,this_entry++)
+    switch (this_entry->kind) {
+
+    case FIFF_NCHAN :
+      if (fiff_read_this_tag (file->fd,this_entry->pos,&tag) == -1)
+    goto bad;
+      *nchan = *(int *)(tag.data);
+      ch = MALLOC(*nchan,fiffChInfoRec);
+      for (j = 0; j < *nchan; j++)
+    ch[j].scanNo = -1;
+      to_find = to_find + *nchan - 1;
+      break;
+
+    case FIFF_CH_INFO :		/* Information about one channel */
+      if (fiff_read_this_tag (file->fd,this_entry->pos,&tag) == -1)
+    goto bad;
+      this_ch = (fiffChInfo)(tag.data);
+      if (this_ch->scanNo <= 0 || this_ch->scanNo > *nchan) {
+          qCritical ("FIFF_CH_INFO : scan # out of range!");
+          goto bad;
+      }
+      else
+    memcpy(ch+this_ch->scanNo-1,this_ch,
+           sizeof(fiffChInfoRec));
+      to_find--;
+      break;
+    }
+  FREE (tag.data);
+  *chp = ch;
+  return FIFF_OK;
+
+  bad : {
+    FREE (ch);
+    FREE (tag.data);
+    return FIFF_FAIL;
+  }
+}
+
+
+static int read_ch_info(char       *name,
+            fiffChInfo *chsp,
+            int        *nchanp,
+            fiffId     *idp)
+     /*
+      * Read channel information from a measurement file
+      */
+{
+  fiffChInfo chs = NULL;
+  int        nchan = 0;
+  fiffId     id = NULL;
+
+  fiffFile       in = NULL;
+  fiffTagRec     tag;
+  fiffDirNode    *meas = NULL;
+  fiffDirNode    node;
+
+  tag.data = NULL;
+  if ((in = fiff_open(name)) == NULL)
+    goto bad;
+  meas = fiff_dir_tree_find(in->dirtree,FIFFB_MEAS);
+  if (meas[0] == NULL) {
+    qCritical ("%s : no MEG data available here",name);
+    goto bad;
+  }
+  node = meas[0]; FREE(meas);
+  if (get_all_chs (in,node,&id,&chs,&nchan) == FIFF_FAIL)
+    goto bad;
+  *chsp   = chs;
+  *nchanp = nchan;
+  *idp = id;
+  fiff_close(in);
+  return FIFF_OK;
+
+  bad : {
+    FREE(tag.data);
+    FREE(chs);
+    FREE(id);
+    fiff_close(in);
+    return FIFF_FAIL;
+  }
+}
+
+
+#define TOO_CLOSE 1e-4
+
+static int at_origin (float *rr)
+
+{
+  return (VEC_LEN(rr) < TOO_CLOSE);
+}
+
+
+
+static int is_valid_eeg_ch(fiffChInfo ch)
+     /*
+      * Is the electrode position information present?
+      */
+{
+  if (ch->kind == FIFFV_EEG_CH) {
+    if (at_origin(ch->chpos.r0) ||
+    ch->chpos.coil_type == FIFFV_COIL_NONE)
+      return FALSE;
+    else
+      return TRUE;
+  }
+  return FALSE;
+}
+
+
+
+static int accept_ch(fiffChInfo ch,
+             char       **bads,
+             int        nbad)
+
+{
+  int k;
+  for (k = 0; k < nbad; k++)
+    if (strcmp(ch->ch_name,bads[k]) == 0)
+      return FALSE;
+  return TRUE;
+}
+
+
+
+int read_meg_eeg_ch_info(char       *name,       /* Input file */
+             int        do_meg,	 /* Use MEG */
+             int        do_eeg,	 /* Use EEG */
+             char       **bads,	 /* List of bad channels */
+             int        nbad,
+             fiffChInfo *chsp,	 /* MEG + EEG channels */
+             int        *nmegp,	 /* Count of each */
+             int        *neegp)
+     /*
+      * Read the channel information and split it into two arrays,
+      * one for MEG and one for EEG
+      */
+{
+  fiffChInfo chs   = NULL;
+  int        nchan = 0;
+  fiffChInfo meg   = NULL;
+  int        nmeg  = 0;
+  fiffChInfo eeg   = NULL;
+  int        neeg  = 0;
+  fiffId     id    = NULL;
+  int        nch;
+
+  int k;
+
+  if (read_ch_info(name,&chs,&nchan,&id) != FIFF_OK)
+    goto bad;
+  /*
+   * Sort out the channels
+   */
+  for (k = 0; k < nchan; k++)
+    if (chs[k].kind == FIFFV_MEG_CH)
+      nmeg++;
+    else if (chs[k].kind == FIFFV_EEG_CH && is_valid_eeg_ch(chs+k))
+      neeg++;
+  if (nmeg > 0)
+    meg = MALLOC(nmeg,fiffChInfoRec);
+  if (neeg > 0)
+    eeg = MALLOC(neeg,fiffChInfoRec);
+  neeg = nmeg = 0;
+  for (k = 0; k < nchan; k++)
+    if (accept_ch(chs+k,bads,nbad)) {
+      if (do_meg && chs[k].kind == FIFFV_MEG_CH)
+    meg[nmeg++] = chs[k];
+      else if (do_eeg && chs[k].kind == FIFFV_EEG_CH && is_valid_eeg_ch(chs+k))
+    eeg[neeg++] = chs[k];
+    }
+  FREE(chs);
+  mne_merge_channels(meg,nmeg,eeg,neeg,chsp,&nch);
+  FREE(meg);
+  FREE(eeg);
+  *nmegp = nmeg;
+  *neegp = neeg;
+  FREE(id);
+  return FIFF_OK;
+
+  bad : {
+    FREE(chs);
+    FREE(meg);
+    FREE(eeg);
+    FREE(id);
+    return FIFF_FAIL;
+  }
+}
+
+
+
+
+//============================= mne_filename_util.c =============================
+
+
+char *mne_compose_mne_name(char *path, char *filename)
+     /*
+      * Compose a filename under the "$MNE_ROOT" directory
+      */
+{
+  char *res;
+  char *mne_root;
+
+  if (filename == NULL) {
+    qCritical("No file name specified to mne_compose_mne_name");
+    return NULL;
+  }
+  mne_root = getenv(MNE_ENV_ROOT);
+  if (mne_root == NULL || strlen(mne_root) == 0) {
+    qCritical("Environment variable MNE_ROOT not set");
+    return NULL;
+  }
+  if (path == NULL || strlen(path) == 0) {
+    res = MALLOC(strlen(mne_root)+strlen(filename)+2,char);
+    strcpy(res,mne_root);
+    strcat(res,"/");
+    strcat(res,filename);
+  }
+  else {
+    res = MALLOC(strlen(mne_root)+strlen(filename)+strlen(path)+3,char);
+    strcpy(res,mne_root);
+    strcat(res,"/");
+    strcat(res,path);
+    strcat(res,"/");
+    strcat(res,filename);
+  }
+  return res;
+}
+
+
 
 
 //============================= misc_util.c =============================
@@ -219,6 +1813,173 @@ char *mne_strdup(const char *s)
   strcpy(res,s);
   return res;
 }
+
+
+
+
+
+
+
+
+//============================= fiff_trans.c =============================
+
+static void add_inverse(fiffCoordTrans t)
+     /*
+      * Add inverse transform to an existing one
+      */
+{
+  int j,k;
+  float res;
+
+  for (j = 0; j < 3; j++)
+    for (k = 0; k < 3; k++)
+      t->invrot[j][k] = t->rot[k][j];
+  for (j = 0; j < 3; j++) {
+    for (res = 0.0, k = 0; k < 3; k++)
+      res += t->invrot[j][k]*t->move[k];
+    t->invmove[j] = -res;
+  }
+}
+
+
+
+
+
+
+
+
+fiffCoordTrans fiff_invert_transform (fiffCoordTrans t)
+
+{
+  fiffCoordTrans ti = (fiffCoordTrans)malloc(sizeof(fiffCoordTransRec));
+  int j,k;
+
+  for (j = 0; j < 3; j++) {
+    ti->move[j] = t->invmove[j];
+    ti->invmove[j] = t->move[j];
+    for (k = 0; k < 3; k++) {
+      ti->rot[j][k]    = t->invrot[j][k];
+      ti->invrot[j][k] = t->rot[j][k];
+    }
+  }
+  ti->from = t->to;
+  ti->to   = t->from;
+  return (ti);
+}
+
+
+
+
+
+
+
+
+fiffCoordTrans fiff_make_transform (int from,int to,float rot[3][3],float move[3])
+     /*
+      * Compose the coordinate transformation structure
+      * from a known forward transform
+      */
+{
+  fiffCoordTrans t = (fiffCoordTrans)malloc(sizeof(fiffCoordTransRec));
+  int j,k;
+
+  t->from = from;
+  t->to   = to;
+
+  for (j = 0; j < 3; j++) {
+    t->move[j] = move[j];
+    for (k = 0; k < 3; k++)
+      t->rot[j][k] = rot[j][k];
+  }
+  add_inverse (t);
+  return (t);
+}
+
+void fiff_coord_trans (float r[3],fiffCoordTrans t,int do_move)
+     /*
+      * Apply coordinate transformation
+      */
+{
+  int j,k;
+  float res[3];
+
+  for (j = 0; j < 3; j++) {
+    res[j] = (do_move ? t->move[j] :  0.0);
+    for (k = 0; k < 3; k++)
+      res[j] += t->rot[j][k]*r[k];
+  }
+  for (j = 0; j < 3; j++)
+    r[j] = res[j];
+}
+
+
+
+
+
+
+//============================= mne_coord_transforms.c =============================
+
+
+fiffCoordTrans mne_read_transform(char *name,int from, int to)
+     /*
+      * Read the specified coordinate transformation
+      */
+{
+  fiffCoordTrans res = NULL;
+  fiffFile       in = NULL;
+  fiffTagRec     tag;
+  fiffDirEntry   dir;
+  int k;
+
+  tag.data = NULL;
+  if ((in = fiff_open(name)) == NULL)
+    goto out;
+  for (k = 0, dir = in->dir; k < in->nent; k++,dir++)
+    if (dir->kind == FIFF_COORD_TRANS) {
+      if (fiff_read_this_tag (in->fd,dir->pos,&tag) == FIFF_FAIL)
+        goto out;
+      res = (fiffCoordTrans)tag.data;
+      if (res->from == from && res->to == to) {
+    tag.data = NULL;
+    goto out;
+      }
+      else if (res->from == to && res->to == from) {
+    res = fiff_invert_transform(res);
+    goto out;
+      }
+      res = NULL;
+    }
+  qCritical("No suitable coordinate transformation found in %s.",name);
+  goto out;
+
+  out : {
+    FREE(tag.data);
+    fiff_close(in);
+    return res;
+  }
+
+  return res;
+}
+
+fiffCoordTrans mne_read_mri_transform(char *name)
+     /*
+      * Read the MRI -> HEAD coordinate transformation
+      */
+{
+  return mne_read_transform(name,FIFFV_COORD_MRI,FIFFV_COORD_HEAD);
+}
+
+
+fiffCoordTrans mne_read_meas_transform(char *name)
+     /*
+      * Read the MEG device -> HEAD coordinate transformation
+      */
+{
+  return mne_read_transform(name,FIFFV_COORD_DEVICE,FIFFV_COORD_HEAD);
+}
+
+
+
 
 
 
@@ -239,30 +2000,6 @@ void free_dipole_forward ( dipoleForward f )
 }
 
 
-
-
-
-
-
-//============================= fiff_trans.c =============================
-
-
-void fiff_coord_trans (float r[3],fiffCoordTrans t,int do_move)
-     /*
-      * Apply coordinate transformation
-      */
-{
-  int j,k;
-  float res[3];
-
-  for (j = 0; j < 3; j++) {
-    res[j] = (do_move ? t->move[j] :  0.0);
-    for (k = 0; k < 3; k++)
-      res[j] += t->rot[j][k]*r[k];
-  }
-  for (j = 0; j < 3; j++)
-    r[j] = res[j];
-}
 
 
 //============================= fwd_coil_def.c =============================
@@ -941,6 +2678,231 @@ void mne_free_named_matrix(mneNamedMatrix mat)
 }
 
 
+char **mne_dup_name_list(char **list, int nlist)
+/*
+ * Duplicate a name list
+ */
+{
+  char **res;
+  int  k;
+  if (list == NULL || nlist == 0)
+    return NULL;
+  res = MALLOC(nlist,char *);
+
+  for (k = 0; k < nlist; k++)
+    res[k] = mne_strdup(list[k]);
+  return res;
+}
+
+
+
+void mne_string_to_name_list(char *s,char ***listp,int *nlistp)
+     /*
+      * Convert a colon-separated list into a string array
+      */
+{
+  char **list = NULL;
+  int  nlist  = 0;
+  char *one,*now=NULL;
+
+  if (s != NULL && strlen(s) > 0) {
+    s = mne_strdup(s);
+    //strtok_r linux variant; strtok_s windows varainat
+    for (one = strtok_s(s,":",&now); one != NULL; one = strtok_s(NULL,":",&now)) {
+      list = REALLOC(list,nlist+1,char *);
+      list[nlist++] = mne_strdup(one);
+    }
+    FREE(s);
+  }
+  *listp  = list;
+  *nlistp = nlist;
+  return;
+}
+
+
+
+
+char *mne_name_list_to_string(char **list,int nlist)
+     /*
+      * Convert a string array to a colon-separated string
+      */
+{
+  int k,len;
+  char *res;
+  if (nlist == 0 || list == NULL)
+    return NULL;
+  for (k = len = 0; k < nlist; k++)
+    len += strlen(list[k])+1;
+  res = MALLOC(len,char);
+  res[0] = '\0';
+  for (k = len = 0; k < nlist-1; k++) {
+    strcat(res,list[k]);
+    strcat(res,":");
+  }
+  strcat(res,list[nlist-1]);
+  return res;
+}
+
+
+
+char *mne_channel_names_to_string(fiffChInfo chs, int nch)
+     /*
+      * Make a colon-separated string out of channel names
+      */
+{
+  char **names = MALLOC(nch,char *);
+  char *res;
+  int  k;
+
+  if (nch <= 0)
+    return NULL;
+  for (k = 0; k < nch; k++)
+    names[k] = chs[k].ch_name;
+  res = mne_name_list_to_string(names,nch);
+  FREE(names);
+  return res;
+}
+
+
+
+void mne_channel_names_to_name_list(fiffChInfo chs, int nch,
+                    char ***listp, int *nlistp)
+
+{
+  char *s = mne_channel_names_to_string(chs,nch);
+  mne_string_to_name_list(s,listp,nlistp);
+  FREE(s);
+  return;
+}
+
+
+
+//============================= mne_process_bads.c =============================
+
+static int whitespace(char *text)
+
+{
+  if (text == NULL || strlen(text) == 0)
+    return TRUE;
+  if (strspn(text," \t\n\r") == strlen(text))
+    return TRUE;
+  return FALSE;
+}
+
+
+static char *next_line(char *line, int n, FILE *in)
+
+{
+  char *res;
+
+  for (res = fgets(line,n,in); res != NULL; res = fgets(line,n,in))
+    if (!whitespace(res))
+      if (res[0] != '#')
+    break;
+  return res;
+}
+
+#define MAXLINE 500
+
+int mne_read_bad_channels(char *name, char ***listp, int *nlistp)
+     /*
+      * Read bad channel names
+      */
+{
+  FILE *in = NULL;
+  char **list = NULL;
+  int  nlist  = 0;
+  char line[MAXLINE+1];
+  char *next;
+
+
+  if (!name || strlen(name) == 0)
+    return OK;
+
+  if ((in = fopen(name,"r")) == NULL) {
+    qCritical(name);
+    goto bad;
+  }
+  while ((next = next_line(line,MAXLINE,in)) != NULL) {
+    if (strlen(next) > 0) {
+      if (next[strlen(next)-1] == '\n')
+    next[strlen(next)-1] = '\0';
+      list = REALLOC(list,nlist+1,char *);
+      list[nlist++] = mne_strdup(next);
+    }
+  }
+  if (ferror(in))
+    goto bad;
+
+  *listp  = list;
+  *nlistp = nlist;
+
+  return OK;
+
+  bad : {
+    mne_free_name_list(list,nlist);
+    if (in != NULL)
+      fclose(in);
+    return FAIL;
+  }
+}
+
+
+
+int mne_read_bad_channel_list_from_node(fiffFile in, fiffDirNode node, char ***listp, int *nlistp)
+
+{
+  qDebug() << "ToDo: int mne_read_bad_channel_list_from_node(fiffFile in, fiffDirNode node, char ***listp, int *nlistp)";
+
+//  fiffDirNode bad,*temp;
+//  char **list = NULL;
+//  int  nlist  = 0;
+//  fiffTag tag;
+//  char *names;
+
+//  if (!node)
+//    node = in->dirtree;
+
+//  temp = fiff_dir_tree_find(node,FIFFB_MNE_BAD_CHANNELS);
+//  if (temp && temp[0]) {
+//    bad = temp[0];
+//    FREE(temp);
+
+//    if ((tag = fiff_dir_tree_get_tag(in,bad,FIFF_MNE_CH_NAME_LIST)) != NULL) {
+//      names = (char *)tag->data;
+//      FREE(tag);
+//      mne_string_to_name_list(names,&list,&nlist);
+//      FREE(names);
+//    }
+//  }
+//  *listp = list;
+//  *nlistp = nlist;
+  return OK;
+}
+
+int mne_read_bad_channel_list(char *name, char ***listp, int *nlistp)
+
+{
+//  fiffFile in = fiff_open(name);
+  int res;
+
+
+  qDebug() << "ToDo: int mne_read_bad_channel_list(char *name, char ***listp, int *nlistp)";
+
+//  if (in == NULL)
+//    return FAIL;
+
+//  res = mne_read_bad_channel_list_from_node(in,in->dirtree,listp,nlistp);
+
+//  fiff_close(in);
+
+  return res;
+}
+
+
+
+
+
 
 
 //============================= mne_lin_proj.c =============================
@@ -997,6 +2959,24 @@ void mne_free_proj_op(mneProjOp op)
 
 
 
+
+static char *add_string(char *old,char *add)
+
+{
+  char *news = NULL;
+  if (!old) {
+    if (add || strlen(add) > 0)
+      news = mne_strdup(add);
+  }
+  else {
+    old = REALLOC(old,strlen(old) + strlen(add) + 1,char);
+    strcat(old,add);
+    news = old;
+  }
+  return news;
+}
+
+
 //============================= mne_sparse_matop.c =============================
 
 void mne_free_sparse(mneSparseMatrix mat)
@@ -1028,6 +3008,51 @@ void mne_free_sss_data(mneSssData s)
 
 //============================= mne_cov_matrix.c =============================
 
+/*
+ * Routines for handling the covariance matrices
+ */
+
+static mneCovMatrix new_cov(int    kind,
+                int    ncov,
+                char   **names,
+                double *cov,
+                double *cov_diag,
+                mneSparseMatrix cov_sparse)
+     /*
+      * Put it together from ingredients
+      */
+{
+  mneCovMatrix new_cov = MALLOC(1,mneCovMatrixRec);
+  new_cov->kind       = kind;
+  new_cov->ncov       = ncov;
+  new_cov->nproj      = 0;
+  new_cov->nzero      = 0;
+  new_cov->names      = names;
+  new_cov->cov        = cov;
+  new_cov->cov_diag   = cov_diag;
+  new_cov->cov_sparse = cov_sparse;
+  new_cov->eigen      = NULL;
+  new_cov->lambda     = NULL;
+  new_cov->chol       = NULL;
+  new_cov->inv_lambda = NULL;
+  new_cov->nfree      = 1;
+  new_cov->ch_class   = NULL;
+  new_cov->proj       = NULL;
+  new_cov->sss        = NULL;
+  new_cov->bads       = NULL;
+  new_cov->nbad       = 0;
+  return new_cov;
+}
+
+mneCovMatrix mne_new_cov(int    kind,
+             int    ncov,
+             char   **names,
+             double *cov,
+             double *cov_diag)
+
+{
+  return new_cov(kind,ncov,names,cov,cov_diag,NULL);
+}
 
 void mne_free_cov(mneCovMatrix c)
      /*
@@ -1051,8 +3076,6 @@ void mne_free_cov(mneCovMatrix c)
   FREE(c);
   return;
 }
-
-
 
 
 
@@ -1431,51 +3454,53 @@ static int make_projection(char       **projnames,
   int       k,found;
   int       neeg;
 
-  for (k = 0, neeg = 0; k < nch; k++)
-    if (chs[k].kind == FIFFV_EEG_CH)
-      neeg++;
+  qDebug() << "ToDo: static int make_projection(char       **projnames,";
 
-  if (nproj == 0 && neeg == 0)
-    return OK;
+//  for (k = 0, neeg = 0; k < nch; k++)
+//    if (chs[k].kind == FIFFV_EEG_CH)
+//      neeg++;
 
-  for (k = 0; k < nproj; k++) {
-    if ((one = mne_read_proj_op(projnames[k])) == NULL)
-      goto bad;
-    if (one->nitems == 0) {
-      printf("No linear projection information in %s.\n",projnames[k]);
-      mne_free_proj_op(one); one = NULL;
-    }
-    else {
-      printf("Loaded projection from %s:\n",projnames[k]);
-      mne_proj_op_report(stderr,"\t",one);
-      all = mne_proj_op_combine(all,one);
-      mne_free_proj_op(one); one = NULL;
-    }
-  }
-  if (neeg > 0) {
-    found = FALSE;
-    if (all) {
-      for (k = 0; k < all->nitems; k++)
-      if (all->items[k]->kind == FIFFV_MNE_PROJ_ITEM_EEG_AVREF) {
-        found = TRUE;
-        break;
-      }
-    }
-    if (!found) {
-      if ((one = mne_proj_op_average_eeg_ref(chs,nch)) != NULL) {
-    printf("Average EEG reference projection added:\n");
-    mne_proj_op_report(stderr,"\t",one);
-    all = mne_proj_op_combine(all,one);
-    mne_free_proj_op(one); one = NULL;
-      }
-    }
-  }
-  if (all && mne_proj_op_affect_chs(all,chs,nch) == 0) {
-    printf("Projection will not have any effect on selected channels. Projection omitted.\n");
-    mne_free_proj_op(all);
-    all = NULL;
-  }
-  *res = all;
+//  if (nproj == 0 && neeg == 0)
+//    return OK;
+
+//  for (k = 0; k < nproj; k++) {
+//    if ((one = mne_read_proj_op(projnames[k])) == NULL)
+//      goto bad;
+//    if (one->nitems == 0) {
+//      printf("No linear projection information in %s.\n",projnames[k]);
+//      mne_free_proj_op(one); one = NULL;
+//    }
+//    else {
+//      printf("Loaded projection from %s:\n",projnames[k]);
+//      mne_proj_op_report(stderr,"\t",one);
+//      all = mne_proj_op_combine(all,one);
+//      mne_free_proj_op(one); one = NULL;
+//    }
+//  }
+//  if (neeg > 0) {
+//    found = FALSE;
+//    if (all) {
+//      for (k = 0; k < all->nitems; k++)
+//      if (all->items[k]->kind == FIFFV_MNE_PROJ_ITEM_EEG_AVREF) {
+//        found = TRUE;
+//        break;
+//      }
+//    }
+//    if (!found) {
+//      if ((one = mne_proj_op_average_eeg_ref(chs,nch)) != NULL) {
+//    printf("Average EEG reference projection added:\n");
+//    mne_proj_op_report(stderr,"\t",one);
+//    all = mne_proj_op_combine(all,one);
+//    mne_free_proj_op(one); one = NULL;
+//      }
+//    }
+//  }
+//  if (all && mne_proj_op_affect_chs(all,chs,nch) == 0) {
+//    printf("Projection will not have any effect on selected channels. Projection omitted.\n");
+//    mne_free_proj_op(all);
+//    all = NULL;
+//  }
+//  *res = all;
   return OK;
 
   bad :
@@ -1629,7 +3654,7 @@ dipoleFitData setup_dipole_fit_data(char  *mriname,		 /* This gives the MRI/head
       goto bad;
   }
   else if (bemname) {
-    err_set_error("Source of MRI / head transform required for the BEM model is missing");
+    qCritical("Source of MRI / head transform required for the BEM model is missing");
     goto bad;
   }
   else {
@@ -1640,10 +3665,10 @@ dipoleFitData setup_dipole_fit_data(char  *mriname,		 /* This gives the MRI/head
     res->mri_head_t = fiff_make_transform(FIFFV_COORD_MRI,FIFFV_COORD_HEAD,rot,move);
   }
 
-  mne_print_coord_transform(stderr,res->mri_head_t);
+//ToDo    //mne_print_coord_transform(stderr,res->mri_head_t);
   if ((res->meg_head_t = mne_read_meas_transform(measname)) == NULL)
     goto bad;
-  mne_print_coord_transform(stderr,res->meg_head_t);
+//ToDo    //  mne_print_coord_transform(stderr,res->meg_head_t);
   /*
    * Read the bad channel lists
    */
@@ -1682,7 +3707,8 @@ dipoleFitData setup_dipole_fit_data(char  *mriname,		 /* This gives the MRI/head
 #ifdef USE_SHARE_PATH
     char *coilfile = mne_compose_mne_name("share/mne","coil_def.dat");
 #else
-    char *coilfile = mne_compose_mne_name("setup/mne","coil_def.dat");
+    char *coilfile;//= mne_compose_mne_name("setup/mne","coil_def.dat");
+    qDebug() << "ToDo: coilfile";
 #endif
 
     if (!coilfile)
@@ -1701,7 +3727,7 @@ dipoleFitData setup_dipole_fit_data(char  *mriname,		 /* This gives the MRI/head
     printf("Head coordinate coil definitions created.\n");
   }
   else {
-    err_printf_set_error("Cannot handle computations in %s coordinates",mne_coord_frame_name(coord_frame));
+    printf("Cannot handle computations in %s coordinates",mne_coord_frame_name(coord_frame));
     goto bad;
   }
   /*
@@ -1894,8 +3920,7 @@ static int scale_dipole_fit_noise_cov(dipoleFitData f,int nave)
   return FAIL;
 }
 
-int select_dipole_fit_noise_cov(dipoleFitData f,
-                mshMegEegData d)
+int select_dipole_fit_noise_cov(dipoleFitData f, mshMegEegData d)
 /*
  * Do the channel selection and scale with nave
  */
@@ -1941,11 +3966,11 @@ int select_dipole_fit_noise_cov(dipoleFitData f,
     }
     mne_free_cov(f->noise); f->noise = NULL;
     if (nmeg > 0 && nmeg-nomit_meg > 0 && nmeg-nomit_meg < min_nchan) {
-      err_set_error("Too few MEG channels remaining");
+      qCritical("Too few MEG channels remaining");
       return FAIL;
     }
     if (neeg > 0 && neeg-nomit_eeg > 0 && neeg-nomit_eeg < min_nchan) {
-      err_set_error("Too few EEG channels remaining");
+      qCritical("Too few EEG channels remaining");
       return FAIL;
     }
     f->noise = mne_dup_cov(f->noise_orig);
@@ -1984,11 +4009,11 @@ int compute_guess_fields(guessData guess,
   int k;
 
   if (!guess || !f) {
-    err_set_error("Data missing in compute_guess_fields");
+    qCritical("Data missing in compute_guess_fields");
     goto bad;
   }
   if (!f->noise) {
-    err_set_error("Noise covariance missing in compute_guess_fields");
+    qCritical("Noise covariance missing in compute_guess_fields");
     goto bad;
   }
   printf("Go through all guess source locations...");
@@ -2039,7 +4064,7 @@ guessData make_guess_data(char          *guessname,
     if (mne_read_source_spaces(guessname,&sp,&nsp) == FAIL)
       goto bad;
     if (nsp != 1) {
-      err_set_error("Incorrect number of source spaces in guess file");
+      qCritical("Incorrect number of source spaces in guess file");
       for (k = 0; k < nsp; k++)
     mne_free_source_space(sp[k]);
       FREE(sp);
@@ -2075,7 +4100,7 @@ guessData make_guess_data(char          *guessname,
    * Save the guesses for future use
    */
   if (guesses->nuse == 0) {
-    err_set_error("No active guess locations remaining.");
+    qCritical("No active guess locations remaining.");
     goto bad;
   }
   if (guess_save_name) {
@@ -3017,7 +5042,7 @@ int main(int argc, char *argv[])
     }
 
 //    mne_print_version_info(stderr,argv[0],PROGRAM_VERSION,__DATE__,__TIME__);
-    printf("%s version %s compiled at %s %s\n",argv[0],PROGRAM_VERSION,__DATE__,__TIME__);
+    printf("%s version %s\n",argv[0],PROGRAM_VERSION);//,__DATE__,__TIME__);
 
     if (bemname)
         printf("BEM              : %s\n",bemname);
