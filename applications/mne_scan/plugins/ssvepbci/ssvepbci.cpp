@@ -846,8 +846,6 @@ void ssvepBCI::ssvepBCIOnSensor()
 
     }
 
-
-
     // emit classifiaction results if any classifiaction has been done
     if(!m_lIndexOfClassResultSensor.isEmpty()){
 

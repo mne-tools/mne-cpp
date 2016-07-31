@@ -274,7 +274,6 @@ void ScreenKeyboard::updateCommand(double value){
     case 4:
         spellLetter(m_mapKeys.value(m_qCurCursorCoord));
         qDebug() << "chosen sign:"  << m_mapKeys.value(m_qCurCursorCoord);
-        m_qCurCursorCoord = QPair<int, int> (0,0);
         m_bUpdatePhraseDisplay = true;
         break;
     default:
@@ -284,16 +283,17 @@ void ScreenKeyboard::updateCommand(double value){
     // accuracy feature of the screen keyboard
     if(m_bUseSpellAccuracy && index >= 0){
 
-        // determine the next correct index-command
-
+        // giving audio feedback for every command
         m_qSound->play();
         cout << "\a";
 
+        // determine distance between selected and supposed coordinate
         int difXold = m_qNextCoord.first - m_qCurCursorCoord.first;
         int difYold = m_qNextCoord.second - m_qCurCursorCoord.second;
         int difXnew = m_qNextCoord.first - ( m_qCurCursorCoord.first + deltaX);
         int difYnew = m_qNextCoord.second - ( m_qCurCursorCoord.second + deltaY);
 
+        // evaluate classifiaction result
         if((m_mapKeys.contains(QPair<int, int> (m_qCurCursorCoord.first + deltaX, m_qCurCursorCoord.second + deltaY)))){
 
             if(qFabs( difXnew ) < qFabs(difXold) || qFabs( difYnew ) < qFabs(difYold)){
@@ -301,22 +301,18 @@ void ScreenKeyboard::updateCommand(double value){
                 emit isCorrectCommand(true);
                 qDebug() << "correct movement";
             }
-            else if((m_qOldCursorCoord == m_qNextCoord) && (index == 4)){
+            else if((m_qCurCursorCoord == m_qNextCoord) && (index == 4)){
 
-                qDebug() << "correct select";
                 emit isCorrectCommand(true);
+                qDebug() << "correct select";
 
                 if(m_qNextCoord == m_mapKeys.key("Del")){
+
                     m_qNextCoord = m_mapKeys.key(*m_qSpellIterator);
                     qDebug() << "correct delete! next coordinate:" << m_qNextCoord;
-                }
-                else if(m_qNextCoord == m_mapKeys.key("Clr")){
-                    m_qSpellIterator = m_sSettledPhrase.begin();
-                    m_qNextCoord = m_mapKeys.key(*m_qSpellIterator);
-                    qDebug() << "correct clear! next coordinate:" << m_qNextCoord;
-                }
+                } 
+                else if(m_qSpellIterator != m_sSettledPhrase.end()){
 
-                if(m_qSpellIterator != m_sSettledPhrase.end()){
                     ++m_qSpellIterator;
                     m_qNextCoord = m_mapKeys.key(*m_qSpellIterator);
                     qDebug() << "next sign:" << *m_qSpellIterator;
@@ -326,11 +322,17 @@ void ScreenKeyboard::updateCommand(double value){
                     stopSpellAccuracyFeature();
 
             }
+            else if(m_qCurCursorCoord == m_mapKeys.key("Clr") && (index == 4)){
+
+                m_qSpellIterator = m_sSettledPhrase.begin();
+                m_qNextCoord = m_mapKeys.key(*m_qSpellIterator);
+                qDebug() << "correct clear! next coordinate:" << m_qNextCoord;
+            }
             else if((m_qCurCursorCoord != m_qNextCoord) && (index == 4)){
 
                 m_qNextCoord = m_mapKeys.key("Del");
                 emit isCorrectCommand(false);
-                qDebug() << "false select! next coordinate is:" << m_qNextCoord;
+                qDebug() << "false select! next coordinate is:" << m_qNextCoord << "Del";
             }
             else{
                 emit isCorrectCommand(false);
@@ -350,6 +352,8 @@ void ScreenKeyboard::updateCommand(double value){
         m_qCurCursorCoord.first    += deltaX;
         m_qCurCursorCoord.second   += deltaY;
     }
+    else if(index == 4)
+        m_qCurCursorCoord = QPair<int, int> (0,0);
 
 }
 
@@ -406,6 +410,8 @@ void ScreenKeyboard::initSpellAccuracyFeature(){
     m_qNextCoord = m_mapKeys.key(*m_qSpellIterator);
     qDebug() << "next coordinate:" << m_qNextCoord;
 
+    m_qCurCursorCoord = QPair<int, int> (0,0);
+
     m_bUseSpellAccuracy = true;
     m_bUpdatePhraseDisplay = true;
 }
@@ -415,5 +421,6 @@ void ScreenKeyboard::initSpellAccuracyFeature(){
 
 void ScreenKeyboard::stopSpellAccuracyFeature(){
 
+    emit spellingFinished();
     m_bUseSpellAccuracy = false;
 }
