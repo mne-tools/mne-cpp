@@ -67,6 +67,8 @@ ssvepBCIConfigurationWidget::ssvepBCIConfigurationWidget(ssvepBCI* pssvepBCI, QW
 , m_bScreenKeyboardConnected(false)
 , m_iWrongCommands(0)
 , m_iCorrectCommands(0)
+, m_iElapsedSeconds(0)
+, m_qTimer(new QTimer)
 {
     ui->setupUi(this);
 
@@ -138,7 +140,8 @@ ssvepBCIConfigurationWidget::ssvepBCIConfigurationWidget(ssvepBCI* pssvepBCI, QW
     connect(ui->m_spinBox_ClassificationBreaks, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged), m_pSSVEPBCI, &ssvepBCI::setNumClassBreaks);
     connect(ui->m_spinBox_ClassificationListSize, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged), m_pSSVEPBCI, &ssvepBCI::setSizeClassList);
 
-
+    // connect timer to display elapsed time in widget
+    connect(m_qTimer, &QTimer::timeout, this, &ssvepBCIConfigurationWidget::showCurrentTime);
 
     // set palette for text color change
     m_palBlackFont.setColor(QPalette::WindowText, Qt::black);
@@ -444,12 +447,16 @@ void ssvepBCIPlugin::ssvepBCIConfigurationWidget::on_m_pushButton_StartMeasureme
 
             if(!m_bScreenKeyboardConnected){
                 connect(pScreenKeyboard.data(), &ScreenKeyboard::isCorrectCommand, this, &ssvepBCIConfigurationWidget::evaluateCommand);
+                connect(pScreenKeyboard.data(), &ScreenKeyboard::spellingFinished, this, &ssvepBCIConfigurationWidget::stopMeasurement);
 
                 m_bScreenKeyboardConnected = true;
             }
 
         }
     }
+
+    m_qTimer->start(1000);
+    m_iElapsedSeconds = 0;
 
     // reset counter for command evaluation
     m_iWrongCommands = 0;
@@ -468,8 +475,11 @@ void ssvepBCIPlugin::ssvepBCIConfigurationWidget::on_m_pushButton_StopMeasuremen
         QSharedPointer<ScreenKeyboard> pScreenKeyboard = m_pSSVEPBCI->m_pssvepBCISetupStimulusWidget->getScreenKeyboardSPtr();
         if(pScreenKeyboard != NULL)
             pScreenKeyboard->stopSpellAccuracyFeature();
+
     }
 
+
+    stopMeasurement();
 }
 
 
@@ -494,4 +504,17 @@ void ssvepBCIConfigurationWidget::evaluateCommand(bool isCorrectCommand){
 void ssvepBCIPlugin::ssvepBCIConfigurationWidget::on_m_spinBox_ClassificationListSize_valueChanged(int arg1)
 {
     ui->m_spinBox_ClassificationHits->setMaximum(arg1);
+}
+
+
+void ssvepBCIConfigurationWidget::showCurrentTime(){
+
+    m_iElapsedSeconds++;
+    QString time = QString::number(m_iElapsedSeconds);
+    ui->m_label_ElapsedTime->setText(time);
+}
+
+void ssvepBCIConfigurationWidget::stopMeasurement(){
+
+    m_qTimer->stop();
 }

@@ -169,6 +169,7 @@ public slots:
     void setSSVEPProbabilities(MyQList SSVEP);
     void setFrequencyLabels(MyQList frequencyList);
     void setClassResult(double classResult);
+    void stopMeasurement();
 
 private slots:
     void on_m_RadioButton_MEC_toggled(bool checked);
@@ -176,6 +177,7 @@ private slots:
     void numOfHarmonicsChanged(int harmonics);
     void channelSelectChanged(const QModelIndex &parent, int first, int last);
     void evaluateCommand(bool isCorrectCommand);
+    void showCurrentTime();
 
 
     void on_m_pushButton_StartMeasurement_clicked();
@@ -205,7 +207,8 @@ private:
     bool                                    m_bScreenKeyboardConnected;                 /**< flag for connected screen keaboard */
     int                                     m_iCorrectCommands;                         /**< counter for correct commands */
     int                                     m_iWrongCommands;                           /**< counter for wrong commands */
-
+    QTimer                                 *m_qTimer;                                   /**< timer for displaying accuracy every second */
+    int                                     m_iElapsedSeconds;                          /**< time, displayed on screen */
 
 };
 
