@@ -83,13 +83,13 @@ QuickControlWidget::QuickControlWidget(const QMap<qint32, float>& qMapChScaling,
     connect(ui->m_pushButton_close, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
             this, &QuickControlWidget::hide);
 
-    //Create trigger color map
-    m_qMapTriggerColor.clear();
+//    //Create trigger color map
+//    m_qMapTriggerColor.clear();
 
-    for(int i = 0; i<pFiffInfo->chs.size(); i++) {
-        if(pFiffInfo->chs[i].kind == FIFFV_STIM_CH)
-            m_qMapTriggerColor.insert(pFiffInfo->chs[i].ch_name, QColor(170,0,0));
-    }
+//    for(int i = 0; i<pFiffInfo->chs.size(); i++) {
+//        if(pFiffInfo->chs[i].kind == FIFFV_STIM_CH)
+//            m_qMapTriggerColor.insert(pFiffInfo->chs[i].ch_name, QColor(170,0,0));
+//    }
 
     //Connect screenshot button
     connect(ui->m_pushButton_makeScreenshot, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
@@ -299,10 +299,23 @@ void QuickControlWidget::setSignalBackgroundColors(const QColor& signalColor, co
 
 //*************************************************************************************************************
 
-void QuickControlWidget::setNumberDetectedTriggers(int numberDetections)
+void QuickControlWidget::setNumberDetectedTriggersAndTypes(int numberDetections, const QMap<int,QList<QPair<int,double> > >& mapDetectedTriggers)
 {
-    if(m_bTriggerDetection)
+    if(m_bTriggerDetection) {
         ui->m_label_numberDetectedTriggers->setText(QString("%1").arg(numberDetections));
+    }
+
+    //Set trigger types
+    QMapIterator<int,QList<QPair<int,double> > > i(mapDetectedTriggers);
+    while (i.hasNext()) {
+        i.next();
+
+        for(int j = 0; j < i.value().size(); ++j) {
+            if(ui->m_comboBox_triggerColorType->findText(QString::number(i.value().at(j).second)) == -1) {
+                ui->m_comboBox_triggerColorType->addItem(QString::number(i.value().at(j).second));
+            }
+        }
+    }
 }
 
 
@@ -558,7 +571,7 @@ void QuickControlWidget::onRealTimeTriggerColorChanged(bool state)
 {
     Q_UNUSED(state);
 
-    QColor color = QColorDialog::getColor(m_qMapTriggerColor[ui->m_comboBox_triggerChannels->currentText()], this, "Set trigger color");
+    QColor color = QColorDialog::getColor(m_qMapTriggerColor[ui->m_comboBox_triggerColorType->currentText().toDouble()], this, "Set trigger color");
 
     //Change color of pushbutton
     QPalette* palette1 = new QPalette();
@@ -566,7 +579,7 @@ void QuickControlWidget::onRealTimeTriggerColorChanged(bool state)
     ui->m_pushButton_triggerColor->setPalette(*palette1);
     ui->m_pushButton_triggerColor->update();
 
-    m_qMapTriggerColor[ui->m_comboBox_triggerChannels->currentText()] = color;
+    m_qMapTriggerColor[ui->m_comboBox_triggerColorType->currentText().toDouble()] = color;
 
     emit triggerInfoChanged(m_qMapTriggerColor, ui->m_checkBox_activateTriggerDetection->isChecked(), ui->m_comboBox_triggerChannels->currentText(), ui->m_doubleSpinBox_detectionThresholdFirst->value()*pow(10, ui->m_spinBox_detectionThresholdSecond->value()));
 }
@@ -584,14 +597,20 @@ void QuickControlWidget::onRealTimeTriggerThresholdChanged(double value)
 
 //*************************************************************************************************************
 
-void QuickControlWidget::onRealTimeTriggerCurrentChChanged(const QString &value)
+void QuickControlWidget::onRealTimeTriggerColorTypeChanged(const QString &value)
 {
     //Change color of pushbutton
     QPalette* palette1 = new QPalette();
-    palette1->setColor(QPalette::Button,m_qMapTriggerColor[value]);
+    palette1->setColor(QPalette::Button,m_qMapTriggerColor[value.toDouble()]);
     ui->m_pushButton_triggerColor->setPalette(*palette1);
     ui->m_pushButton_triggerColor->update();
+}
 
+
+//*************************************************************************************************************
+
+void QuickControlWidget::onRealTimeTriggerCurrentChChanged(const QString &value)
+{
     emit triggerInfoChanged(m_qMapTriggerColor, ui->m_checkBox_activateTriggerDetection->isChecked(), ui->m_comboBox_triggerChannels->currentText(), ui->m_doubleSpinBox_detectionThresholdFirst->value()*pow(10, ui->m_spinBox_detectionThresholdSecond->value()));
 }
 
@@ -1157,13 +1176,17 @@ void QuickControlWidget::createTriggerDetectionGroup()
     connect(ui->m_checkBox_activateTriggerDetection, static_cast<void (QCheckBox::*)(int)>(&QCheckBox::stateChanged),
             this, &QuickControlWidget::onRealTimeTriggerActiveChanged);
 
-    QMapIterator<QString, QColor> i(m_qMapTriggerColor);
-    while(i.hasNext()) {
-        i.next();
-        ui->m_comboBox_triggerChannels->addItem(i.key());
+    for(int i = 0; i<m_pFiffInfo->chs.size(); i++) {
+        if(m_pFiffInfo->chs[i].kind == FIFFV_STIM_CH) {
+            ui->m_comboBox_triggerChannels->addItem(m_pFiffInfo->chs[i].ch_name);
+        }
     }
+
     connect(ui->m_comboBox_triggerChannels, static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentTextChanged),
             this, &QuickControlWidget::onRealTimeTriggerCurrentChChanged);
+
+    connect(ui->m_comboBox_triggerColorType, static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentTextChanged),
+            this, &QuickControlWidget::onRealTimeTriggerColorTypeChanged);
 
     connect(ui->m_pushButton_triggerColor, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
             this, &QuickControlWidget::onRealTimeTriggerColorChanged);

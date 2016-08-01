@@ -194,11 +194,20 @@ public:
 
     //=========================================================================================================
     /**
+    * Set total number of detected triggers and trigger types.
+    *
+    * @param [in] totalNumberDetections     The numger of detected triggers
+    * @param [in] mapDetectedTriggers       The currently detected triggers
+    */
+    void setNumberDetectedTriggersAndTypes(int totalNumberDetections, const QMap<int,QList<QPair<int,double> > >& mapDetectedTriggers);
+
+    //=========================================================================================================
+    /**
     * Set number of detected triggers.
     *
-    * @param [in] numberDetections     the numger of detected triggers
+    * @param [in] lTriggerTypes     the trigger types.
     */
-    void setNumberDetectedTriggers(int numberDetections);
+    void setTriggerTypes(const QList<double>& lTriggerTypes);
 
     //=========================================================================================================
     /**
@@ -273,15 +282,21 @@ protected slots:
 
     //=========================================================================================================
     /**
-    * Slot called when trigger detection color button was clicked
+    * Slot called when trigger detection threshold was changed
     */
     void onRealTimeTriggerThresholdChanged(double value);
 
     //=========================================================================================================
     /**
-    * Slot called when trigger detection color button was clicked
+    * Slot called when trigger type changed
     */
-    void onRealTimeTriggerCurrentChChanged(const QString& value);
+    void onRealTimeTriggerColorTypeChanged(const QString& value);
+
+    //=========================================================================================================
+    /**
+    * Slot called when trigger channel selection changed
+    */
+    void onRealTimeTriggerCurrentChChanged(const QString &value);
 
     //=========================================================================================================
     /**
@@ -432,7 +447,7 @@ private:
     QMap<qint32,float>              m_qMapChScaling;                /**< Channel scaling values. */
     QMap<qint32, QDoubleSpinBox*>   m_qMapScalingDoubleSpinBox;     /**< Map of types and channel scaling line edits. */
     QMap<qint32, QSlider*>          m_qMapScalingSlider;            /**< Map of types and channel scaling line edits. */
-    QMap<QString, QColor>           m_qMapTriggerColor;             /**< Trigger channel colors. */
+    QMap<double, QColor>            m_qMapTriggerColor;             /**< Trigger colors per detected type. */
 
     QColor                          m_colCurrentSignalColor;        /**< Current color of the scene in all View3D's. */
     QColor                          m_colCurrentBackgroundColor;    /**< Current color of the scene in all View3D's. */
@@ -499,7 +514,7 @@ signals:
     /**
     * Emit this signal whenever the trigger infomration changed.
     */
-    void triggerInfoChanged(const QMap<QString, QColor>& value, bool active, const QString& triggerCh, double threshold);
+    void triggerInfoChanged(const QMap<double, QColor>& value, bool active, const QString& triggerCh, double threshold);
 
     //=========================================================================================================
     /**
