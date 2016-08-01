@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>303</width>
+    <width>314</width>
     <height>503</height>
    </rect>
   </property>
@@ -185,7 +185,7 @@
         <item row="0" column="0" colspan="2">
          <widget class="QTabWidget" name="m_tabWidget_viewOptions">
           <property name="currentIndex">
-           <number>0</number>
+           <number>1</number>
           </property>
           <widget class="QWidget" name="View">
            <attribute name="title">
@@ -308,10 +308,20 @@
             <string>Trigger detection</string>
            </attribute>
            <layout class="QGridLayout" name="gridLayout_2">
-            <item row="1" column="1" colspan="3">
-             <widget class="QComboBox" name="m_comboBox_triggerChannels"/>
+            <item row="3" column="4">
+             <widget class="QSpinBox" name="m_spinBox_detectionThresholdSecond">
+              <property name="minimum">
+               <number>-100</number>
+              </property>
+              <property name="maximum">
+               <number>100</number>
+              </property>
+              <property name="value">
+               <number>-1</number>
+              </property>
+             </widget>
             </item>
-            <item row="3" column="1">
+            <item row="3" column="2">
              <widget class="QDoubleSpinBox" name="m_doubleSpinBox_detectionThresholdFirst">
               <property name="minimum">
                <double>-1000.000000000000000</double>
@@ -327,7 +337,7 @@
               </property>
              </widget>
             </item>
-            <item row="3" column="2">
+            <item row="3" column="3">
              <widget class="QLabel" name="label_6">
               <property name="maximumSize">
                <size>
@@ -340,30 +350,10 @@
               </property>
              </widget>
             </item>
-            <item row="3" column="3">
-             <widget class="QSpinBox" name="m_spinBox_detectionThresholdSecond">
-              <property name="minimum">
-               <number>-100</number>
-              </property>
-              <property name="maximum">
-               <number>100</number>
-              </property>
-              <property name="value">
-               <number>-1</number>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="1" colspan="3">
-             <widget class="QPushButton" name="m_pushButton_triggerColor">
+            <item row="2" column="0">
+             <widget class="QLabel" name="label">
               <property name="text">
-               <string>Click to change</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="0" colspan="4">
-             <widget class="QCheckBox" name="m_checkBox_activateTriggerDetection">
-              <property name="text">
-               <string>Activate trigger detection</string>
+               <string>Type color:</string>
               </property>
              </widget>
             </item>
@@ -374,10 +364,10 @@
               </property>
              </widget>
             </item>
-            <item row="2" column="0">
-             <widget class="QLabel" name="label">
+            <item row="0" column="0" colspan="5">
+             <widget class="QCheckBox" name="m_checkBox_activateTriggerDetection">
               <property name="text">
-               <string>Trigger color:</string>
+               <string>Activate trigger detection</string>
               </property>
              </widget>
             </item>
@@ -388,6 +378,13 @@
               </property>
              </widget>
             </item>
+            <item row="4" column="3" colspan="2">
+             <widget class="QPushButton" name="m_pushButton_resetNumberTriggers">
+              <property name="text">
+               <string>Reset</string>
+              </property>
+             </widget>
+            </item>
             <item row="4" column="0">
              <widget class="QLabel" name="label_9">
               <property name="text">
@@ -395,7 +392,7 @@
               </property>
              </widget>
             </item>
-            <item row="4" column="1">
+            <item row="4" column="2">
              <widget class="QLabel" name="m_label_numberDetectedTriggers">
               <property name="text">
                <string>0</string>
@@ -405,12 +402,18 @@
               </property>
              </widget>
             </item>
-            <item row="4" column="2" colspan="2">
-             <widget class="QPushButton" name="m_pushButton_resetNumberTriggers">
+            <item row="1" column="2" colspan="3">
+             <widget class="QComboBox" name="m_comboBox_triggerChannels"/>
+            </item>
+            <item row="2" column="3" colspan="2">
+             <widget class="QPushButton" name="m_pushButton_triggerColor">
               <property name="text">
-               <string>Reset</string>
+               <string>Click to change</string>
               </property>
              </widget>
+            </item>
+            <item row="2" column="2">
+             <widget class="QComboBox" name="m_comboBox_triggerColorType"/>
             </item>
            </layout>
           </widget>

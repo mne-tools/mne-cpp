@@ -325,11 +325,8 @@ void RealTimeMultiSampleArrayDelegate::paint(QPainter *painter, const QStyleOpti
 
                 //Plot detected triggers
                 path = QPainterPath(QPointF(option.rect.x(),option.rect.y()));//QPointF(option.rect.x()+t_rtmsaModel->relFiffCursor(),option.rect.y()));
-                createTriggerPath(index, option, path, data);
-
                 painter->save();
-                painter->setPen(QPen(t_pModel->getTriggerColor(), 1.5, Qt::SolidLine));
-                painter->drawPath(path);
+                createTriggerPath(painter, index, option, path, data);
                 painter->restore();
 
                 //Plot trigger threshold
@@ -658,7 +655,7 @@ void RealTimeMultiSampleArrayDelegate::createTimeSpacersPath(const QModelIndex &
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayDelegate::createTriggerPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, RowVectorPair &data) const
+void RealTimeMultiSampleArrayDelegate::createTriggerPath(QPainter *painter, const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, RowVectorPair &data) const
 {
     Q_UNUSED(data)
 
@@ -666,6 +663,7 @@ void RealTimeMultiSampleArrayDelegate::createTriggerPath(const QModelIndex &inde
 
     QList<QPair<int,double> > detectedTriggers = t_pModel->getDetectedTriggers();
     QList<QPair<int,double> > detectedTriggersOld = t_pModel->getDetectedTriggersOld();
+    QMap<double, QColor> mapTriggerTypeColors = t_pModel->getTriggerColor();
 
     float yStart = option.rect.topLeft().y();
     float yEnd = option.rect.bottomRight().y();
@@ -673,14 +671,25 @@ void RealTimeMultiSampleArrayDelegate::createTriggerPath(const QModelIndex &inde
 
     int currentSampleIndex = t_pModel->getCurrentSampleIndex();
 
+
     //Newly detected triggers
     for(int u = 0; u<detectedTriggers.size(); u++) {
+        QPainterPath path;
+
         int triggerPos = detectedTriggers[u].first;
 
-        if(triggerPos<=currentSampleIndex+t_pModel->getCurrentOverlapAddDelay()) {
+        painter->save();
+        if(mapTriggerTypeColors.contains(detectedTriggers[u].second)) {
+            painter->setPen(QPen(mapTriggerTypeColors[detectedTriggers[u].second], 1.5, Qt::SolidLine));
+        }
+
+        if(triggerPos <= currentSampleIndex+t_pModel->getCurrentOverlapAddDelay()) {
             path.moveTo(triggerPos*fDx,yStart);
             path.lineTo(triggerPos*fDx,yEnd);
         }
+
+        painter->drawPath(path);
+        painter->restore();
     }
 
     //Old detected triggers
