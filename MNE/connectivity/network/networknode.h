@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     connectivitymeasures.h
+* @file     networknode.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     ConnectivityMeasures class declaration.
+* @brief     NetworkNode class declaration.
 *
 */
 
-#ifndef CONNECTLIB_CONNECTIVITYMEASURES_H
-#define CONNECTLIB_CONNECTIVITYMEASURES_H
+#ifndef CONNECTIVITYLIB_NETWORKNODE_H
+#define CONNECTIVITYLIB_NETWORKNODE_H
 
 
 //*************************************************************************************************************
@@ -42,25 +42,20 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "connectivity_global.h"
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QObject>
 #include <QSharedPointer>
-#include <QPair>
-#include <QString>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
 // Eigen INCLUDES
 //=============================================================================================================
-
-#include <Eigen/Core>
 
 
 //*************************************************************************************************************
@@ -79,45 +74,36 @@ namespace CONNECTIVITYLIB {
 
 //*************************************************************************************************************
 //=============================================================================================================
-// CONNECTLIB FORWARD DECLARATIONS
+// CONNECTIVITYLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
 
 //=============================================================================================================
 /**
-* This class computes basic (functional) connectivity measures.
+* This class holds an object to describe the node of a network.
 *
-* @brief This class computes basic (functional) connectivity measures.
+* @brief This class holds an object to describe the node of a network.
 */
-class CONNECTIVITYSHARED_EXPORT ConnectivityMeasures
-{    
+
+class NetworkNode : public QObject
+{
+    Q_OBJECT
 
 public:
-    typedef QSharedPointer<ConnectivityMeasures> SPtr;            /**< Shared pointer type for ConnectivityMeasures. */
-    typedef QSharedPointer<const ConnectivityMeasures> ConstSPtr; /**< Const shared pointer type for ConnectivityMeasures. */
+    typedef QSharedPointer<NetworkNode> SPtr;            /**< Shared pointer type for NetworkNode. */
+    typedef QSharedPointer<const NetworkNode> ConstSPtr; /**< Const shared pointer type for NetworkNode. */
 
     //=========================================================================================================
     /**
-    * Constructs a ConnectivityMeasures object.
+    * Constructs a NetworkNode object.
     */
-    explicit ConnectivityMeasures();
-
-    //=========================================================================================================
-    /**
-    * Calculates the cross correlation between the rows of the data matrix.
-    *
-    * @param[in] matDataIn  The input data for whicht the cross correlation is to be calcualted.
-    *
-    * @return               The connectivity matrix.
-    */
-    static Eigen::MatrixXd crossCorrelation(const Eigen::MatrixXd& matDataIn);
+    explicit NetworkNode(QObject *parent = 0);
 
 protected:
-    static QPair<int,double> eigenCrossCorrelation(const Eigen::RowVectorXd &xCorrInputVecFirst, const Eigen::RowVectorXd &xCorrInputVecSecond);
-    //std::pair<double, double> eigenCrossCorrelation(std::vector<double>& xCorrInputVecFirs, std::vector<double>& xCorrInputVecSecond);
 
-     QString m_sDeepThroat;
 private:
+
+signals:
 
 };
 
@@ -130,4 +116,4 @@ private:
 
 } // namespace CONNECTIVITYLIB
 
-#endif // CONNECTLIB_CONNECTIVITYMEASURES_H
+#endif // CONNECTIVITYLIB_NETWORKNODE_H
