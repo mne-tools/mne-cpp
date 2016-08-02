@@ -44,16 +44,12 @@ SUBDIRS += \
     SUBDIRS += \
         mne_scan \
         mne_browse
+        mne_matching_pursuit \
 
-    !contains(MNECPP_CONFIG, coverity) {
+        qtHaveModule(charts) {
         SUBDIRS += \
-            mne_matching_pursuit \
-
-            qtHaveModule(charts) {
-            SUBDIRS += \
-                    mne_analyze \
-            }
-    }
+                mne_analyze \
+        }
 }
 
 CONFIG += ordered
