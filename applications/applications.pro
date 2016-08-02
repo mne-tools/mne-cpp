@@ -43,18 +43,14 @@ SUBDIRS += \
 !contains(MNECPP_CONFIG, minimalVersion) {
     SUBDIRS += \
         mne_scan \
-        mne_browse
+        mne_browse \
+        mne_dipole_fit \
+        mne_matching_pursuit
 
-    !contains(MNECPP_CONFIG, coverity) {
-        SUBDIRS += \
-            mne_dipole_fit \
-            mne_matching_pursuit \
-
-            qtHaveModule(charts) {
+        qtHaveModule(charts) {
             SUBDIRS += \
-                    mne_analyze \
-            }
-    }
+                mne_analyze
+        }
 }
 
 CONFIG += ordered
