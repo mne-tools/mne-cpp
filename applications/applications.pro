@@ -43,8 +43,8 @@ SUBDIRS += \
 !contains(MNECPP_CONFIG, minimalVersion) {
     SUBDIRS += \
         mne_scan \
-        mne_browse
-        mne_matching_pursuit \
+        mne_browse \
+        mne_matching_pursuit
 
         qtHaveModule(charts) {
         SUBDIRS += \
