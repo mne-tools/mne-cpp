@@ -44,7 +44,7 @@
 
 #include "rtprocessing_global.h"
 
-#include <fiff/fiff_evoked.h>
+#include <fiff/fiff_evoked_set.h>
 #include <fiff/fiff_info.h>
 
 #include <generics/circularmatrixbuffer.h>
@@ -89,7 +89,6 @@ namespace RTPROCESSINGLIB
 //=============================================================================================================
 
 using namespace IOBuffer;
-using namespace FIFFLIB;
 
 
 //=============================================================================================================
@@ -124,7 +123,7 @@ public:
                    quint32 p_iBaselineFromSecs,
                    quint32 p_iBaselineToSecs,
                    quint32 p_iTriggerIndex,
-                   FiffInfo::SPtr p_pFiffInfo,
+                   FIFFLIB::FiffInfo::SPtr p_pFiffInfo,
                    QObject *parent = 0);
 
     //=========================================================================================================
@@ -258,33 +257,33 @@ protected:
 private:
     //=========================================================================================================
     /**
-    * Clears already detected trigger.
+    * do the actual averaging here.
     */
-    void clearDetectedTriggers();
+    void doAveraging(const Eigen::MatrixXd& rawSegment);
 
     //=========================================================================================================
     /**
     * Prepends incoming data to front/pre stim buffer.
     */
-    void fillFrontBuffer(Eigen::MatrixXd& data);
+    void fillFrontBuffer(const Eigen::MatrixXd& data, double dTriggerType);
 
     //=========================================================================================================
     /**
     * Prepends incoming data to back/post stim buffer.
     */
-    void fillBackBuffer(Eigen::MatrixXd& data);
+    void fillBackBuffer(const Eigen::MatrixXd& data, double dTriggerType);
 
     //=========================================================================================================
     /**
     * Packs the buffers togehter as one and calcualtes the current running average and emits the result if number of averages has been reached.
     */
-    void mergeData();
+    void mergeData(double dTriggerType);
 
     //=========================================================================================================
     /**
     * Generates the final evoke variable.
     */
-    void generateEvoked();
+    void generateEvoked(double dTriggerType);
 
     //=========================================================================================================
     /**
@@ -314,10 +313,8 @@ private:
     qint32  m_iNewPostStimSamples;      /**< New amount of samples averaged after the stimulus, including the stimulus sample.*/
     qint32  m_iPreStimSeconds;          /**< Amount of seconds averaged before the stimulus. */
     qint32  m_iPostStimSeconds;         /**< Amount of seconds averaged after the stimulus, including the stimulus sample.*/
-    qint32  m_iMatDataPostIdx;          /**< Current index inside of the matrix m_matDataPost */
-    qint32  m_iTriggerIndex;            /**< Current row index of the data matrix which is to be scanned for triggers */
+    qint32  m_iTriggerChIndex;          /**< Current row index of the data matrix which is to be scanned for triggers */
     qint32  m_iNewTriggerIndex;         /**< Old row index of the data matrix which is to be scanned for triggers */
-    qint32  m_iTriggerPos;              /**< Last found trigger postion */
     qint32  m_iNewAverageMode;          /**< The new averaging mode 0-running 1-cumulative. */
     qint32  m_iAverageMode;             /**< The averaging mode 0-running 1-cumulative. */
     qint32  m_iNumberCalcAverages;      /**< The number of currently calculated averages. */
@@ -329,38 +326,33 @@ private:
     bool    m_bDoArtifactReduction;     /**< Whether to do artifact reduction or not. */
     bool    m_bIsRunning;               /**< Holds if real-time Covariance estimation is running.*/
     bool    m_bAutoAspect;              /**< Auto aspect detection on or off. */
-    bool    m_bFillingBackBuffer;       /**< Whether the back buffer is currently getting filled. */
     bool    m_bDoBaselineCorrection;    /**< Whether to perform baseline correction. */
 
     QPair<QVariant,QVariant>                m_pairBaselineSec;              /**< Baseline information in seconds form where the seconds are seen relative to the trigger, meaning they can also be negative [from to]*/
     QPair<QVariant,QVariant>                m_pairBaselineSamp;             /**< Baseline information in samples form where the seconds are seen relative to the trigger, meaning they can also be negative [from to]*/
 
-    FiffInfo::SPtr                          m_pFiffInfo;                    /**< Holds the fiff measurement information. */
-    FiffEvoked::SPtr                        m_pStimEvoked;                  /**< Holds the evoked information. */
+    FIFFLIB::FiffInfo::SPtr                 m_pFiffInfo;                    /**< Holds the fiff measurement information. */
 
     CircularMatrixBuffer<double>::SPtr      m_pRawMatrixBuffer;             /**< The Circular Raw Matrix Buffer. */
 
     QMap<int,QList<int> >                   m_qMapDetectedTrigger;          /**< Detected trigger for each trigger channel. */
 
-    Eigen::MatrixXd                         m_matDataPre;                   /**< The matrix holding the pre stim data. */
-    Eigen::MatrixXd                         m_matDataPost;                  /**< The matrix holding the post stim data. */
+    FIFFLIB::FiffEvokedSet::SPtr            m_pStimEvokedSet;               /**< Holds the evoked information. */
 
-    QList<Eigen::MatrixXd>                  m_qListStimAve;                 /**< the current stimulus average buffer. Holds m_iNumAverages vectors */
+    QMap<double,QList<Eigen::MatrixXd> >    m_mapStimAve;                   /**< the current stimulus average buffer. Holds m_iNumAverages vectors */
+    QMap<double,Eigen::MatrixXd>            m_mapDataPre;                   /**< The matrix holding the pre stim data. */
+    QMap<double,Eigen::MatrixXd>            m_mapDataPost;                  /**< The matrix holding the post stim data. */
+    QMap<double,qint32>                     m_mapMatDataPostIdx;            /**< Current index inside of the matrix m_matDataPost */
+    QMap<double,bool>                       m_mapFillingBackBuffer;         /**< Whether the back buffer is currently getting filled. */
 
 signals:
     //=========================================================================================================
     /**
     * Signal which is emitted when new evoked stimulus data are available.
     *
-    * @param[out] p_pEvokedStim     The evoked stimulus data
+    * @param[out] p_pEvokedStimSet     The evoked stimulus data set
     */
-    void evokedStim(FIFFLIB::FiffEvoked::SPtr p_pEvokedStim);
-
-    //=========================================================================================================
-    /**
-    * Emitted when number of averages changed
-    */
-    void numAveragesChanged();
+    void evokedStim(FIFFLIB::FiffEvokedSet::SPtr p_pEvokedStimSet);
 };
 
 //*************************************************************************************************************

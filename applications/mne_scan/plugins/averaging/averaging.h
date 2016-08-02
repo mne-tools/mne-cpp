@@ -54,7 +54,7 @@
 // FIFF INCLUDES
 //=============================================================================================================
 
-#include <fiff/fiff_evoked.h>
+#include <fiff/fiff_evoked_set.h>
 
 
 //*************************************************************************************************************
@@ -176,7 +176,7 @@ public:
 
     void changeBaselineActive(bool state);
 
-    void appendEvoked(FIFFLIB::FiffEvoked::SPtr p_pEvoked);
+    void appendEvoked(FIFFLIB::FiffEvokedSet::SPtr p_pEvokedSet);
 
     void showAveragingWidget();
 
