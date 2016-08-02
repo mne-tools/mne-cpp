@@ -161,7 +161,13 @@ using namespace UTILSLIB;
 #define ALLOC_CMATRIX(x,y) mne_cmatrix((x),(y))
 #define FREE_CMATRIX(m) mne_free_cmatrix((m))
 #define CMATRIX ALLOC_CMATRIX
-
+/*
+ * double matrices
+ */
+#define ALLOC_DCMATRIX(x,y) mne_dmatrix((x),(y))
+#define ALLOC_COMPLEX_DCMATRIX(x,y) mne_complex_dmatrix((x),(y))
+#define FREE_DCMATRIX(m) mne_free_dcmatrix((m))
+#define FREE_COMPLEX_DCMATRIX(m) mne_free_dcmatrix((m))
 
 //============================= mne_allocs.c =============================
 
@@ -198,6 +204,27 @@ float **mne_cmatrix(int nr,int nc)
     m[i] = whole + i*nc;
   return m;
 }
+
+
+
+double **mne_dmatrix(int nr, int nc)
+
+{
+  int i;
+  double **m;
+  double *whole;
+
+  m = MALLOC(nr,double *);
+  if (!m) matrix_error(1,nr,nc);
+  whole = MALLOC(nr*nc,double);
+  if (!whole) matrix_error(2,nr,nc);
+
+  for(i=0;i<nr;i++)
+    m[i] = whole + i*nc;
+  return m;
+}
+
+
 
 void mne_free_cmatrix (float **m)
 {
@@ -3465,6 +3492,27 @@ mneNamedMatrix mne_build_named_matrix(int  nrow,        /* Number of rows */
 
 
 
+int mne_name_list_match(char **list1, int nlist1,
+            char **list2, int nlist2)
+/*
+ * Check whether two name lists are identical
+ */
+{
+  int k;
+  if (list1 == NULL && list2 == NULL)
+    return 0;
+  if (list1 == NULL || list2 == NULL)
+    return 1;
+  if (nlist1 != nlist2)
+    return 1;
+  for (k = 0; k < nlist1; k++)
+    if (strcmp(list1[k],list2[k]) != 0)
+      return 1;
+  return 0;
+}
+
+
+
 
 void mne_free_name_list(char **list, int nlist)
      /*
@@ -3953,7 +4001,6 @@ void mne_free_proj_op(mneProjOp op)
 
 
 
-
 void mne_proj_op_add_item_act(mneProjOp op, mneNamedMatrix vecs, int kind, const char *desc, int is_active)
      /*
       * Add a new item to an existing projection operator
@@ -4008,6 +4055,28 @@ void mne_proj_op_add_item(mneProjOp op, mneNamedMatrix vecs, int kind, const cha
   mne_proj_op_add_item_act(op, vecs, kind, desc, TRUE);
 }
 
+
+
+
+mneProjOp mne_dup_proj_op(mneProjOp op)
+     /*
+      * Provide a duplicate (item data only)
+      */
+{
+  mneProjOp dup = mne_new_proj_op();
+  mneProjItem it;
+  int k;
+
+  if (!op)
+    return NULL;
+
+  for (k = 0; k < op->nitems; k++) {
+    it = op->items[k];
+    mne_proj_op_add_item_act(dup,it->vecs,it->kind,it->desc,it->active);
+    dup->items[k]->active_file = it->active_file;
+  }
+  return dup;
+}
 
 
 
@@ -4178,6 +4247,124 @@ int mne_proj_op_affect_chs(mneProjOp op, fiffChInfo chs, int nch)
   res = mne_proj_op_affect(op,list,nlist);
   mne_free_name_list(list,nlist);
   return res;
+}
+
+
+
+
+int mne_proj_op_proj_dvector(mneProjOp op, double *vec, int nch, int do_complement)
+     /*
+      * Apply projection operator to a vector (doubles)
+      * Assume that all dimension checking etc. has been done before
+      */
+{
+  static double *res = NULL;
+  static int   res_size = 0;
+  float *pvec;
+  double w;
+  int k,p;
+
+  if (op->nvec <= 0)
+    return OK;
+
+  if (op->nch != nch) {
+    qCritical("Data vector size does not match projection operator");
+    return FAIL;
+  }
+
+  if (op->nch > res_size) {
+    res = REALLOC(res,op->nch,double);
+    res_size = op->nch;
+  }
+
+  for (k = 0; k < op->nch; k++)
+    res[k] = 0.0;
+
+  for (p = 0; p < op->nvec; p++) {
+    pvec = op->proj_data[p];
+    for (k = 0, w = 0.0; k < op->nch; k++)
+      w += vec[k]*pvec[k];
+    for (k = 0; k < op->nch; k++)
+      res[k] = res[k] + w*pvec[k];
+  }
+  if (do_complement) {
+    for (k = 0; k < op->nch; k++)
+      vec[k] = vec[k] - res[k];
+  }
+  else {
+    for (k = 0; k < op->nch; k++)
+      vec[k] = res[k];
+  }
+  return OK;
+}
+
+
+
+
+
+
+
+int mne_proj_op_apply_cov(mneProjOp op, mneCovMatrix c)
+     /*
+      * Apply the projection operator to a covariance matrix
+      */
+{
+  double **dcov = NULL;
+  int j,k,p;
+  int do_complement = TRUE;
+
+  if (op == NULL || op->nitems == 0)
+    return OK;
+
+  if (mne_name_list_match(op->names,op->nch,c->names,c->ncov) != OK) {
+    qCritical("Incompatible data in mne_proj_op_apply_cov");
+    return FAIL;
+  }
+
+  dcov = ALLOC_DCMATRIX(c->ncov,c->ncov);
+  /*
+   * Return the appropriate result
+   */
+  if (c->cov_diag) {		/* Pick the diagonals */
+    for (j = 0, p = 0; j < c->ncov; j++)
+      for (k = 0; k < c->ncov; k++)
+    dcov[j][k] = (j == k) ? c->cov_diag[j] : 0;
+  }
+  else {			/* Return full matrix */
+    for (j = 0, p = 0; j < c->ncov; j++)
+      for (k = 0; k <= j; k++)
+    dcov[j][k] = c->cov[p++];
+    for (j = 0; j < c->ncov; j++)
+      for (k = j+1; k < c->ncov; k++)
+    dcov[j][k] = dcov[k][j];
+  }
+  /*
+   * Project from front and behind
+   */
+  for (k = 0; k < c->ncov; k++)
+    if (mne_proj_op_proj_dvector(op,dcov[k],c->ncov,do_complement) != OK)
+      return FAIL;
+  mne_transpose_dsquare(dcov,c->ncov);
+  for (k = 0; k < c->ncov; k++)
+    if (mne_proj_op_proj_dvector(op,dcov[k],c->ncov,do_complement) != OK)
+      return FAIL;
+  /*
+   * Return the result
+   */
+  if (c->cov_diag) {		/* Pick the diagonal elements */
+    for (j = 0; j < c->ncov; j++)
+      c->cov_diag[j] = dcov[j][j];
+    FREE(c->cov); c->cov = NULL;
+  }
+  else {			/* Put everything back */
+    for (j = 0, p = 0; j < c->ncov; j++)
+      for (k = 0; k <= j; k++)
+    c->cov[p++] = dcov[j][k];
+  }
+  FREE_DCMATRIX(dcov);
+
+  c->nproj = mne_proj_op_affect(op,c->names,c->ncov);
+  return OK;
 }
 
 
@@ -5029,6 +5216,26 @@ void mne_free_sss_data(mneSssData s)
 
 
 
+mneSssData mne_dup_sss_data(mneSssData s)
+
+{
+  mneSssData dup = mne_new_sss_data();
+  int        k;
+
+  if (!s)
+    return NULL;
+
+  *dup = *s;
+  dup->comp_info = MALLOC(dup->ncomp,int);
+
+  for (k = 0; k < dup->ncomp; k++)
+    dup->comp_info[k] = s->comp_info[k];
+
+  return dup;
+}
+
+
+
 mneSssData mne_read_sss_data_from_node(fiffFile in, fiffDirNode start)
 /*
  * Read the SSS data from the given node of an open file
@@ -5170,17 +5377,6 @@ mneCovMatrix mne_new_cov(int    kind,
 }
 
 
-
-mneCovMatrix mne_new_cov_sparse(int             kind,
-                int             ncov,
-                char            **names,
-                mneSparseMatrix cov_sparse)
-
-{
-  return new_cov(kind,ncov,names,NULL,NULL,cov_sparse);
-}
-
-
 mneCovMatrix mne_new_cov_dense(int    kind,
                    int    ncov,
                    char   **names,
@@ -5199,6 +5395,28 @@ mneCovMatrix mne_new_cov_diag(int    kind,
 {
   return new_cov(kind,ncov,names,NULL,cov_diag,NULL);
 }
+
+
+mneCovMatrix mne_new_cov_sparse(int             kind,
+                int             ncov,
+                char            **names,
+                mneSparseMatrix cov_sparse)
+
+{
+  return new_cov(kind,ncov,names,NULL,NULL,cov_sparse);
+}
+
+
+static int mne_lt_packed_index(int j, int k)
+
+{
+  if (j >= k)
+    return k + j*(j+1)/2;
+  else
+    return j + k*(k+1)/2;
+}
+
+
 
 
 void mne_free_cov(mneCovMatrix c)
@@ -5438,6 +5656,115 @@ mneCovMatrix mne_read_cov(char *name,int kind)
   }
 
 }
+
+
+
+
+
+mneCovMatrix mne_pick_chs_cov_omit(mneCovMatrix c, char **new_names, int ncov, int omit_meg_eeg, fiffChInfo chs)
+     /*
+      * Pick designated channels from a covariance matrix, optionally omit MEG/EEG correlations
+      */
+{
+  int j,k;
+  int *pick = NULL;
+  double *cov = NULL;
+  double *cov_diag = NULL;
+  char  **names = NULL;
+  int   *is_meg = NULL;
+  int   from,to;
+  mneCovMatrix res;
+
+  if (ncov == 0) {
+    qCritical("No channels specified for picking in mne_pick_chs_cov_omit");
+    return NULL;
+  }
+  if (c->names == NULL) {
+    qCritical("No names in covariance matrix. Cannot do picking.");
+    return NULL;
+  }
+  pick = MALLOC(ncov,int);
+  for (j = 0; j < ncov; j++)
+    pick[j] = -1;
+  for (j = 0; j < ncov; j++)
+    for (k = 0; k < c->ncov; k++)
+      if (strcmp(c->names[k],new_names[j]) == 0) {
+    pick[j] = k;
+    break;
+      }
+  for (j = 0; j < ncov; j++) {
+    if (pick[j] < 0) {
+      printf("All desired channels not found in the covariance matrix (at least missing %s).", new_names[j]);
+      FREE(pick);
+      return NULL;
+    }
+  }
+  if (omit_meg_eeg) {
+    is_meg = MALLOC(ncov,int);
+    if (chs) {
+      for (j = 0; j < ncov; j++)
+    if (chs[j].kind == FIFFV_MEG_CH)
+      is_meg[j] = TRUE;
+    else
+      is_meg[j] = FALSE;
+    }
+    else {
+      for (j = 0; j < ncov; j++)
+    if (strncmp(new_names[j],"MEG",3) == 0)
+      is_meg[j] = TRUE;
+    else
+      is_meg[j] = FALSE;
+    }
+  }
+  names = MALLOC(ncov,char *);
+  if (c->cov_diag) {
+    cov_diag = MALLOC(ncov,double);
+    for (j = 0; j < ncov; j++) {
+      cov_diag[j] = c->cov_diag[pick[j]];
+      names[j] = mne_strdup(c->names[pick[j]]);
+    }
+  }
+  else {
+    cov = MALLOC(ncov*(ncov+1)/2,double);
+    for (j = 0; j < ncov; j++) {
+      names[j] = mne_strdup(c->names[pick[j]]);
+      for (k = 0; k <= j; k++) {
+    from = mne_lt_packed_index(pick[j],pick[k]);
+    to   = mne_lt_packed_index(j,k);
+    if (to < 0 || to > ncov*(ncov+1)/2-1) {
+      printf("Wrong destination index in mne_pick_chs_cov : %d %d %d\n",j,k,to);
+      exit(1);
+    }
+    if (from < 0 || from > c->ncov*(c->ncov+1)/2-1) {
+      printf("Wrong source index in mne_pick_chs_cov : %d %d %d\n",pick[j],pick[k],from);
+      exit(1);
+    }
+    cov[to] = c->cov[from];
+    if (omit_meg_eeg)
+      if (is_meg[j] != is_meg[k])
+        cov[to] = 0.0;
+      }
+    }
+  }
+  res = mne_new_cov(c->kind,ncov,names,cov,cov_diag);
+
+  res->bads = mne_dup_name_list(c->bads,c->nbad);
+  res->nbad = c->nbad;
+  res->proj = mne_dup_proj_op(c->proj);
+  res->sss  = mne_dup_sss_data(c->sss);
+
+  if (c->ch_class) {
+    res->ch_class = MALLOC(res->ncov,int);
+    for (k = 0; k < res->ncov; k++)
+      res->ch_class[k] = c->ch_class[pick[k]];
+  }
+  FREE(pick);
+  FREE(is_meg);
+  return res;
+}
+
+
+
 
 
 
@@ -5903,16 +6230,6 @@ fwdEegSphereModel setup_eeg_sphere_model(char  *eeg_model_file,   /* Contains th
     FREE(eeg_model_name);
     return NULL;
   }
-}
-
-
-static int mne_lt_packed_index(int j, int k)
-
-{
-  if (j >= k)
-    return k + j*(j+1)/2;
-  else
-    return j + k*(k+1)/2;
 }
 
 
@@ -6504,120 +6821,6 @@ guessData make_guess_data(char          *guessname,
     return NULL;
   }
 }
-
-
-
-//============================= setup.c =============================
-
-
-guessData new_guess_data()
-{
-    guessData res = MALLOC(1,guessDataRec);
-
-    res->rr        = NULL;
-    res->guess_fwd = NULL;
-    res->nguess    = 0;
-    return res;
-}
-
-static void free_guess_data(guessData g)
-
-{
-    int k;
-    if (!g)
-        return;
-
-    FREE_CMATRIX(g->rr);
-    if (g->guess_fwd) {
-    for (k = 0; k < g->nguess; k++)
-        free_dipole_forward(g->guess_fwd[k]);
-    FREE(g->guess_fwd);
-    }
-    FREE(g);
-    return;
-}
-
-static dipoleFitFuncs new_dipole_fit_funcs()
-{
-    dipoleFitFuncs f = MALLOC(1,dipoleFitFuncsRec);
-
-    f->meg_field     = NULL;
-    f->eeg_pot       = NULL;
-    f->meg_vec_field = NULL;
-    f->eeg_vec_pot   = NULL;
-    f->meg_client      = NULL;
-    f->meg_client_free = NULL;
-    f->eeg_client      = NULL;
-    f->eeg_client_free = NULL;
-
-    return f;
-}
-
-
-static void free_dipole_fit_funcs(dipoleFitFuncs f)
-{
-    if (!f)
-        return;
-
-    if (f->meg_client_free && f->meg_client)
-        f->meg_client_free(f->meg_client);
-    if (f->eeg_client_free && f->eeg_client)
-        f->eeg_client_free(f->eeg_client);
-
-    FREE(f);
-    return;
-}
-
-
-dipoleFitData new_dipole_fit_data()
-{
-  dipoleFitData res = new dipoleFitDataRec();//MALLOC(1,dipoleFitDataRec);
-
-//  res->mri_head_t    = NULL;
-//  res->meg_head_t    = NULL;
-//  res->chs           = NULL;
-    res->meg_coils     = NULL;
-    res->eeg_els       = NULL;
-    res->nmeg          = 0;
-    res->neeg          = 0;
-    res->r0[0]         = 0.0;
-    res->r0[1]         = 0.0;
-    res->r0[2]         = 0.0;
-    res->bemname       = NULL;
-    res->bem_model     = NULL;
-    res->eeg_model     = NULL;
-//  res->noise         = NULL;
-    res->nave          = 1;
-    res->user          = NULL;
-    res->user_free     = NULL;
-    res->proj          = NULL;
-
-    res->sphere_funcs     = NULL;
-    res->bem_funcs        = NULL;
-    res->mag_dipole_funcs = NULL;
-    res->funcs            = NULL;
-    res->column_norm      = COLUMN_NORM_NONE;
-    res->fit_mag_dipoles  = FALSE;
-
-    return res;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
