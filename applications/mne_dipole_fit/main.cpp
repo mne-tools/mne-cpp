@@ -888,6 +888,9 @@ void fiff_convert_tag_data(fiffTag tag, int from_endian, int to_endian)
 
 
 
+
+
+
 //============================= fiff_ext_data.c =============================
 
 
@@ -3308,6 +3311,89 @@ float **fiff_get_float_matrix(fiffTag tag)
 
 
 
+
+//============================= fiff_sparse.c =============================
+
+
+
+fiff_int_t *fiff_get_matrix_sparse_dims(fiffTag tag)
+  /*
+   * Interpret dimensions and nz from matrix data
+   */
+{
+  return fiff_get_matrix_dims(tag);
+}
+
+
+
+
+fiff_sparse_matrix_t *fiff_get_float_sparse_matrix(fiffTag tag)
+  /*
+   * Conversion into the standard representation
+   */
+{
+  int *dims;
+  fiff_sparse_matrix_t *res = NULL;
+  int   m,n,nz;
+  int   coding,correct_size;
+
+  if ( fiff_type_fundamental(tag->type)   != FIFFT_MATRIX ||
+       fiff_type_base(tag->type)          != FIFFT_FLOAT ||
+       (fiff_type_matrix_coding(tag->type) != FIFFTS_MC_CCS &&
+    fiff_type_matrix_coding(tag->type) != FIFFTS_MC_RCS) ) {
+    printf("fiff_get_float_ccs_matrix: wrong data type!");
+    return NULL;
+  }
+
+  if ((dims = fiff_get_matrix_sparse_dims(tag)) == NULL)
+    return NULL;
+
+  if (dims[0] != 2) {
+    printf("fiff_get_float_sparse_matrix: wrong # of dimensions!");
+    return NULL;
+  }
+
+  m   = dims[1];
+  n   = dims[2];
+  nz  = dims[3];
+
+  coding = fiff_type_matrix_coding(tag->type);
+  if (coding == FIFFTS_MC_CCS)
+    correct_size = nz*(sizeof(fiff_float_t) + sizeof(fiff_int_t)) +
+             (n+1+dims[0]+2)*(sizeof(fiff_int_t));
+  else if (coding == FIFFTS_MC_RCS)
+    correct_size = nz*(sizeof(fiff_float_t) + sizeof(fiff_int_t)) +
+             (m+1+dims[0]+2)*(sizeof(fiff_int_t));
+  else {
+    printf("fiff_get_float_sparse_matrix: Incomprehensible sparse matrix coding");
+    return NULL;
+  }
+  if (tag->size != correct_size) {
+    printf("fiff_get_float_sparse_matrix: wrong data size!");
+    FREE(dims);
+    return NULL;
+  }
+  /*
+   * Set up structure
+   */
+  res = MALLOC(1,fiff_sparse_matrix_t);
+  res->m      = m;
+  res->n      = n;
+  res->nz     = nz;
+  res->data   = (float *)(tag->data);  tag->data = NULL;
+  res->coding = coding;
+  res->inds   = (int *)(res->data + res->nz);
+  res->ptrs   = res->inds + res->nz;
+
+  FREE(dims);
+
+  return res;
+}
+
+
+
+
+
 //============================= mne_named_vector.c =============================
 
 
@@ -3431,6 +3517,22 @@ char **mne_dup_name_list(char **list, int nlist)
   return res;
 }
 
+
+mneNamedMatrix mne_dup_named_matrix(mneNamedMatrix mat)
+/*
+ * Duplicate a named matrix
+ */
+{
+  float **data = ALLOC_CMATRIX(mat->nrow,mat->ncol);
+  int   j,k;
+
+  for (j = 0; j < mat->nrow; j++)
+    for (k = 0; k < mat->ncol; k++)
+      data[j][k] = mat->data[j][k];
+  return mne_build_named_matrix(mat->nrow,mat->ncol,
+                mne_dup_name_list(mat->rowlist,mat->nrow),
+                mne_dup_name_list(mat->collist,mat->ncol),data);
+}
 
 
 void mne_string_to_name_list(char *s,char ***listp,int *nlistp)
@@ -3757,10 +3859,47 @@ int mne_read_bad_channel_list(char *name, char ***listp, int *nlistp)
 
 
 
-
-
-
 //============================= mne_lin_proj.c =============================
+
+/*
+* Handle the linear projection operators
+*/
+mneProjOp mne_new_proj_op()
+
+{
+ mneProjOp new_proj_op = MALLOC(1,mneProjOpRec);
+
+ new_proj_op->items     = NULL;
+ new_proj_op->nitems    = 0;
+ new_proj_op->names     = NULL;
+ new_proj_op->nch       = 0;
+ new_proj_op->nvec      = 0;
+ new_proj_op->proj_data = NULL;
+ return new_proj_op;
+}
+
+
+
+
+mneProjItem mne_new_proj_op_item()
+
+{
+  mneProjItem new_proj_item = MALLOC(1,mneProjItemRec);
+
+  new_proj_item->vecs        = NULL;
+  new_proj_item->kind        = FIFFV_PROJ_ITEM_NONE;
+  new_proj_item->desc        = NULL;
+  new_proj_item->nvec        = 0;
+  new_proj_item->active      = TRUE;
+  new_proj_item->active_file = FALSE;
+  new_proj_item->has_meg     = FALSE;
+  new_proj_item->has_eeg     = FALSE;
+  return new_proj_item;
+}
+
+
+
+
 
 void mne_free_proj_op_proj(mneProjOp op)
 
@@ -3811,6 +3950,63 @@ void mne_free_proj_op(mneProjOp op)
   return;
 }
 
+
+
+
+
+void mne_proj_op_add_item_act(mneProjOp op, mneNamedMatrix vecs, int kind, const char *desc, int is_active)
+     /*
+      * Add a new item to an existing projection operator
+      */
+{
+  mneProjItem new_item;
+  int         k;
+
+  op->items = REALLOC(op->items,op->nitems+1,mneProjItem);
+
+  op->items[op->nitems] = new_item = mne_new_proj_op_item();
+
+  new_item->active      = is_active;
+  new_item->vecs        = mne_dup_named_matrix(vecs);
+
+  if (kind == FIFFV_MNE_PROJ_ITEM_EEG_AVREF) {
+    new_item->has_meg = FALSE;
+    new_item->has_eeg = TRUE;
+  }
+  else {
+    for (k = 0; k < vecs->ncol; k++) {
+      if (strstr(vecs->collist[k],"EEG") == vecs->collist[k])
+    new_item->has_eeg = TRUE;
+      if (strstr(vecs->collist[k],"MEG") == vecs->collist[k])
+    new_item->has_meg = TRUE;
+    }
+    if (!new_item->has_meg && !new_item->has_eeg) {
+      new_item->has_meg = TRUE;
+      new_item->has_eeg = FALSE;
+    }
+    else if (new_item->has_meg && new_item->has_eeg) {
+      new_item->has_meg = TRUE;
+      new_item->has_eeg = FALSE;
+    }
+  }
+  if (desc != NULL)
+    new_item->desc = mne_strdup(desc);
+  new_item->kind = kind;
+  new_item->nvec = new_item->vecs->nrow;
+
+  op->nitems++;
+
+  mne_free_proj_op_proj(op);	/* These data are not valid any more */
+  return;
+}
+
+
+
+void mne_proj_op_add_item(mneProjOp op, mneNamedMatrix vecs, int kind, const char *desc)
+
+{
+  mne_proj_op_add_item_act(op, vecs, kind, desc, TRUE);
+}
 
 
 
@@ -3962,6 +4158,29 @@ static void clear_these(float *data, char **names, int nnames, const char *start
     if (strstr(names[k],start) == names[k])
       data[k] = 0.0;
 }
+
+
+
+int mne_proj_op_affect_chs(mneProjOp op, fiffChInfo chs, int nch)
+
+{
+  char *ch_string;
+  int  res;
+  char **list;
+  int  nlist;
+
+
+  if (nch == 0)
+    return FALSE;
+  ch_string = mne_channel_names_to_string(chs,nch);
+  mne_string_to_name_list(ch_string,&list,&nlist);
+  FREE(ch_string);
+  res = mne_proj_op_affect(op,list,nlist);
+  mne_free_name_list(list,nlist);
+  return res;
+}
+
+
 
 #define USE_LIMIT   1e-5
 #define SMALL_VALUE 1e-4
@@ -4208,6 +4427,252 @@ int mne_proj_op_make_proj(mneProjOp op)
       */
 {
   return mne_proj_op_make_proj_bad(op,NULL,0);
+}
+
+
+
+mneProjOp mne_proj_op_combine(mneProjOp to, mneProjOp from)
+     /*
+      * Copy items from 'from' operator to 'to' operator
+      */
+{
+  int k;
+  mneProjItem it;
+
+  if (to == NULL)
+    to = mne_new_proj_op();
+  if (from) {
+    for (k = 0; k < from->nitems; k++) {
+      it = from->items[k];
+      mne_proj_op_add_item(to,it->vecs,it->kind,it->desc);
+      to->items[to->nitems-1]->active_file = it->active_file;
+    }
+  }
+  return to;
+}
+
+
+mneProjOp mne_proj_op_average_eeg_ref(fiffChInfo chs,
+                      int nch)
+     /*
+      * Make the projection operator for average electrode reference
+      */
+{
+  int eegcount = 0;
+  int k;
+  float       **vec_data;
+  char        **names;
+  mneNamedMatrix vecs;
+  mneProjOp      op;
+
+  for (k = 0; k < nch; k++)
+    if (chs[k].kind == FIFFV_EEG_CH)
+      eegcount++;
+  if (eegcount == 0) {
+    qCritical("No EEG channels specified for average reference.");
+    return NULL;
+  }
+
+  vec_data = ALLOC_CMATRIX(1,eegcount);
+  names    = MALLOC(eegcount,char *);
+
+  for (k = 0, eegcount = 0; k < nch; k++)
+    if (chs[k].kind == FIFFV_EEG_CH)
+      names[eegcount++] = mne_strdup(chs[k].ch_name);
+
+  for (k = 0; k < eegcount; k++)
+    vec_data[0][k] = 1.0/sqrt((double)eegcount);
+
+  vecs = mne_build_named_matrix(1,eegcount,NULL,names,vec_data);
+
+  op = mne_new_proj_op();
+  mne_proj_op_add_item(op,vecs,FIFFV_MNE_PROJ_ITEM_EEG_AVREF,"Average EEG reference");
+
+  return op;
+}
+
+
+
+
+
+
+
+//============================= mne_lin_proj_io.c =============================
+
+
+
+
+
+mneProjOp mne_read_proj_op_from_node(fiffFile in, fiffDirNode start)
+     /*
+      * Load all the linear projection data
+      */
+{
+  mneProjOp   op     = NULL;
+  fiffDirNode *proj  = NULL;
+  fiffDirNode *items = NULL;
+  fiffDirNode node;
+  fiffTag     tag;
+  int         k;
+  char        *item_desc,*desc_tag,*lf;
+  int         global_nchan,item_nchan,nlist;
+  char        **item_names;
+  int         item_kind;
+  float       **item_vectors;
+  int         item_nvec;
+  int         item_active;
+  mneNamedMatrix item;
+
+  if (!in) {
+    qCritical("File not open mne_read_proj_op_from_node");
+    goto bad;
+  }
+  if (!start)
+    start = in->dirtree;
+
+  op = mne_new_proj_op();
+  proj = fiff_dir_tree_find(start,FIFFB_PROJ);
+  if (proj == NULL || proj[0] == NULL)   /* The caller must recognize an empty projection */
+    goto out;
+  /*
+   * Only the first projection block is recognized
+   */
+  items = fiff_dir_tree_find(proj[0],FIFFB_PROJ_ITEM);
+  if (items == NULL || items[0] == NULL)   /* The caller must recognize an empty projection */
+    goto out;
+  /*
+   * Get a common number of channels
+   */
+  node = proj[0];
+  if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_NCHAN)) == NULL)
+    global_nchan = 0;
+  else {
+    global_nchan = *(int *)tag->data;
+    TAG_FREE(tag);
+  }
+  /*
+   * Proceess each item
+   */
+  for (node = items[0],k = 0; node != NULL; k++, node = items[k]) {
+    /*
+     * Complicated procedure for getting the description
+     */
+    item_desc = NULL;
+    if ((tag = fiff_dir_tree_get_tag(in,node,
+                     FIFF_NAME)) != NULL) {
+      item_desc = add_string(item_desc,(char *)tag->data);
+    }
+    FREE(tag);
+    /*
+     * Take the first line of description if it exists
+     */
+    if ((tag = fiff_dir_tree_get_tag(in,node,
+                     FIFF_DESCRIPTION)) != NULL) {
+      desc_tag = (char *)tag->data;
+      if ((lf = strchr(desc_tag,'\n')) != NULL)
+    *lf = '\0';
+//      if (item_desc != NULL)
+//        item_desc = add_string(item_desc," ");
+      qDebug() << "ToDo: item_desc = add_string(item_desc," ");";
+      item_desc = add_string(item_desc,(char *)desc_tag);
+      FREE(desc_tag);
+    }
+    FREE(tag);
+    /*
+     * Possibility to override number of channels here
+     */
+    if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_NCHAN)) == NULL)
+      item_nchan = global_nchan;
+    else {
+      item_nchan = *(int *)tag->data;
+      TAG_FREE(tag); tag = NULL;
+    }
+    if (item_nchan <= 0) {
+      qCritical("Number of channels incorrectly specified for one of the projection items.");
+      goto bad;
+    }
+    /*
+     * Take care of the channel names
+     */
+    if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_PROJ_ITEM_CH_NAME_LIST)) == NULL)
+      goto bad;
+    mne_string_to_name_list((char *)(tag->data),&item_names,&nlist);
+    if (nlist != item_nchan) {
+      printf("Channel name list incorrectly specified for proj item # %d",k+1);
+      mne_free_name_list(item_names,nlist);
+      TAG_FREE(tag);
+      goto bad;
+    }
+    TAG_FREE(tag);
+    /*
+     * Kind of item
+     */
+    if ((tag = fiff_dir_tree_get_tag(in,node,
+                     FIFF_PROJ_ITEM_KIND)) == NULL)
+      goto bad;
+    item_kind = *(int *)tag->data;
+    TAG_FREE(tag);
+    /*
+     * How many vectors
+     */
+    if ((tag = fiff_dir_tree_get_tag(in,node,
+                     FIFF_PROJ_ITEM_NVEC)) == NULL)
+      goto bad;
+    item_nvec = *(int *)tag->data;
+    TAG_FREE(tag);
+    /*
+     * The projection data
+     */
+    if ((tag = fiff_dir_tree_get_tag(in,node,
+                     FIFF_PROJ_ITEM_VECTORS)) == NULL)
+      goto bad;
+    if ((item_vectors = fiff_get_float_matrix(tag)) == NULL) {
+      TAG_FREE(tag);
+      goto bad;
+    }
+    FREE(tag); tag = NULL;
+    /*
+     * Is this item active?
+     */
+    if ((tag = fiff_dir_tree_get_tag(in,node,
+                     FIFF_MNE_PROJ_ITEM_ACTIVE)) != NULL) {
+      item_active = *(int *)tag->data;
+      TAG_FREE(tag);
+    }
+    else
+      item_active = FALSE;
+    /*
+     * Ready to add
+     */
+    item = mne_build_named_matrix(item_nvec,item_nchan,NULL,item_names,item_vectors);
+    mne_proj_op_add_item_act(op,item,item_kind,item_desc,item_active);
+    mne_free_named_matrix(item);
+    op->items[op->nitems-1]->active_file = item_active;
+  }
+
+  out :
+    return op;
+
+  bad : {
+    mne_free_proj_op(op);
+    return NULL;
+  }
+}
+
+mneProjOp mne_read_proj_op(char *name)
+
+{
+  fiffFile    in  = fiff_open(name);
+  mneProjOp   res = NULL;
+
+  if (in == NULL)
+    return NULL;
+
+  res = mne_read_proj_op_from_node(in,NULL);
+
+  fiff_close(in);
+
+  return res;
 }
 
 
@@ -4535,6 +5000,22 @@ mneCTFcompDataSet mne_read_ctf_comp_data(char *name)
 //============================= mne_sss_data.c =============================
 
 
+static mneSssData mne_new_sss_data()
+
+{
+  mneSssData s   = MALLOC(1,mneSssDataRec);
+  s->job         = FIFFV_SSS_JOB_NOTHING;
+  s->coord_frame = FIFFV_COORD_UNKNOWN;
+  s->nchan       = 0;
+  s->in_order    = 0;
+  s->out_order   = 0;
+  s->in_nuse     = 0;
+  s->out_nuse    = 0;
+  s->comp_info   = NULL;
+  s->ncomp       = 0;
+  return s;
+}
+
 
 void mne_free_sss_data(mneSssData s)
 
@@ -4545,6 +5026,99 @@ void mne_free_sss_data(mneSssData s)
   FREE(s);
   return;
 }
+
+
+
+mneSssData mne_read_sss_data_from_node(fiffFile in, fiffDirNode start)
+/*
+ * Read the SSS data from the given node of an open file
+ */
+{
+  mneSssData s  = mne_new_sss_data();
+  fiffDirNode *sss = NULL;
+  fiffDirNode node;
+  fiffTag     tag;
+  float       *r0;
+  int j,p,q,n;
+  /*
+   * Locate the SSS information
+   */
+  sss = fiff_dir_tree_find(start,FIFFB_SSS_INFO);
+  if (sss && sss[0]) {
+    node = sss[0]; FREE(sss);
+    /*
+     * Read the SSS information, require all tags to be present
+     */
+    if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_SSS_JOB)) == NULL)
+    goto bad;
+    s->job = *(fiff_int_t *)tag->data;
+    TAG_FREE(tag);
+
+    if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_SSS_FRAME)) == NULL)
+      goto bad;
+    s->coord_frame = *(fiff_int_t *)tag->data;
+    TAG_FREE(tag);
+
+    if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_SSS_ORIGIN)) == NULL)
+      goto bad;
+    r0 = (float *)tag->data;
+    VEC_COPY(s->origin,r0);
+    TAG_FREE(tag);
+
+    if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_SSS_ORD_IN)) == NULL)
+      goto bad;
+    s->in_order = *(fiff_int_t *)tag->data;
+    TAG_FREE(tag);
+
+    if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_SSS_ORD_OUT)) == NULL)
+      goto bad;
+    s->out_order = *(fiff_int_t *)tag->data;
+    TAG_FREE(tag);
+
+    if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_SSS_NMAG)) == NULL)
+      goto bad;
+    s->nchan = *(fiff_int_t *)tag->data;
+    TAG_FREE(tag);
+
+    if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_SSS_COMPONENTS)) == NULL)
+      goto bad;
+    s->comp_info = (fiff_int_t *)tag->data; tag->data = NULL;
+    s->ncomp     = tag->size/sizeof(fiff_int_t);
+    TAG_FREE(tag);
+
+    if (s->ncomp != (s->in_order*(2+s->in_order) + s->out_order*(2+s->out_order))) {
+      printf("Number of SSS components does not match the expansion orders listed in the file");
+      goto bad;
+    }
+    /*
+     * Count the components in use
+     */
+    for (j = 0, n = 3, p = 0; j < s->in_order; j++, n = n + 2) {
+      for (q = 0; q < n; q++, p++)
+    if (s->comp_info[p])
+      s->in_nuse++;
+    }
+    for (j = 0, n = 3; j < s->out_order; j++, n = n + 2) {
+      for (q = 0; q < n; q++, p++)
+    s->out_nuse++;
+    }
+  }
+  /*
+   * There it is!
+   */
+  return s;
+
+ bad : {
+    /*
+     * Not entirely happy
+     */
+    mne_free_sss_data(s);
+    return NULL;
+  }
+}
+
+
+
 
 
 //============================= mne_cov_matrix.c =============================
@@ -4595,6 +5169,38 @@ mneCovMatrix mne_new_cov(int    kind,
   return new_cov(kind,ncov,names,cov,cov_diag,NULL);
 }
 
+
+
+mneCovMatrix mne_new_cov_sparse(int             kind,
+                int             ncov,
+                char            **names,
+                mneSparseMatrix cov_sparse)
+
+{
+  return new_cov(kind,ncov,names,NULL,NULL,cov_sparse);
+}
+
+
+mneCovMatrix mne_new_cov_dense(int    kind,
+                   int    ncov,
+                   char   **names,
+                   double *cov)
+
+{
+  return new_cov(kind,ncov,names,cov,NULL,NULL);
+}
+
+
+mneCovMatrix mne_new_cov_diag(int    kind,
+                  int    ncov,
+                  char   **names,
+                  double *cov_diag)
+
+{
+  return new_cov(kind,ncov,names,NULL,cov_diag,NULL);
+}
+
+
 void mne_free_cov(mneCovMatrix c)
      /*
       * Free a covariance matrix and all its data
@@ -4617,6 +5223,222 @@ void mne_free_cov(mneCovMatrix c)
   FREE(c);
   return;
 }
+
+
+
+static int check_cov_data(double *vals, int nval)
+
+{
+  int    k;
+  double sum;
+
+  for (k = 0, sum = 0.0; k < nval; k++)
+    sum += vals[k];
+  if (sum == 0.0) {
+    qCritical("Sum of covariance matrix elements is zero!");
+    return FAIL;
+  }
+  return OK;
+}
+
+
+
+mneCovMatrix mne_read_cov(char *name,int kind)
+     /*
+      * Read a covariance matrix from a fiff
+      */
+{
+  fiffFile       in = NULL;
+  fiffTag        tag;
+  fiffDirNode    *nodes = NULL;
+  fiffDirNode    covnode;
+
+  char            **names    = NULL;	/* Optional channel name list */
+  int             nnames     = 0;
+  double          *cov       = NULL;
+  double          *cov_diag  = NULL;
+  mneSparseMatrix cov_sparse = NULL;
+  double          *lambda    = NULL;
+  float           **eigen    = NULL;
+  char            **bads     = NULL;
+  int             nbad       = 0;
+  int             ncov       = 0;
+  int             nfree      = 1;
+  mneCovMatrix    res        = NULL;
+
+  int            k,p,nn;
+  float          *f;
+  mneProjOp      op = NULL;
+  mneSssData     sss = NULL;
+
+
+  if ((in = fiff_open(name)) == NULL)
+    goto out;
+  nodes = fiff_dir_tree_find(in->dirtree,FIFFB_MNE_COV);
+  if (nodes[0] == NULL) {
+    printf("No covariance matrix available in %s",name);
+    goto out;
+  }
+  /*
+   * Locate the desired matrix
+   */
+  for (covnode = NULL, k = 0 ; nodes[k] != NULL; k++) {
+    if ((tag = fiff_dir_tree_get_tag(in,nodes[k],FIFF_MNE_COV_KIND)) == NULL)
+      continue;
+    if (*(int *)tag->data == kind) {
+      covnode = nodes[k];
+      TAG_FREE(tag);
+      break;
+    }
+    TAG_FREE(tag);
+  }
+  if (covnode == NULL) {
+    printf("Desired covariance matrix not found from %s",name);
+    goto out;
+  }
+  /*
+   * Read the data
+   */
+  if ((tag = fiff_dir_tree_get_tag(in,nodes[k],FIFF_MNE_COV_DIM)) == NULL)
+    goto out;
+  ncov = *(int *)(tag->data);
+  TAG_FREE(tag);
+
+  if ((tag = fiff_dir_tree_get_tag(in,nodes[k],FIFF_MNE_COV_NFREE)) != NULL) {
+    nfree = *(int *)(tag->data);
+    TAG_FREE(tag);
+  }
+  if ((tag = fiff_dir_tree_get_tag(in,covnode,FIFF_MNE_ROW_NAMES)) != NULL) {
+    mne_string_to_name_list((char *)(tag->data),&names,&nnames);
+    TAG_FREE(tag);
+    if (nnames != ncov) {
+      qCritical("Incorrect number of channel names for a covariance matrix");
+      goto out;
+    }
+  }
+  if ((tag = fiff_dir_tree_get_tag(in,nodes[k],FIFF_MNE_COV)) == NULL) {
+    if ((tag = fiff_dir_tree_get_tag(in,nodes[k],FIFF_MNE_COV_DIAG)) == NULL)
+      goto out;
+    else {
+      if (tag->type == FIFFT_DOUBLE) {
+    cov_diag = (double *)(tag->data);
+    if (check_cov_data(cov_diag,ncov) != OK)
+      goto out;
+      }
+      else if (tag->type == FIFFT_FLOAT) {
+    cov_diag = MALLOC(ncov,double);
+    f = (float *)(tag->data);
+    for (p = 0; p < ncov; p++)
+      cov_diag[p] = f[p];
+    FREE(tag->data);
+      }
+      else {
+    printf("Illegal data type for covariance matrix");
+    goto out;
+      }
+      FREE(tag);
+    }
+  }
+  else {
+    nn = ncov*(ncov+1)/2;
+    if (tag->type == FIFFT_DOUBLE) {
+      cov = (double *)(tag->data);
+      if (check_cov_data(cov,nn) != OK)
+    goto out;
+    }
+    else if (tag->type == FIFFT_FLOAT) {
+      cov = MALLOC(nn,double);
+      f = (float *)(tag->data);
+      for (p = 0; p < nn; p++)
+    cov[p] = f[p];
+      FREE(tag->data);
+    }
+    else if ((cov_sparse = fiff_get_float_sparse_matrix(tag)) == NULL) {
+      TAG_FREE(tag);
+      goto out;
+    }
+    FREE(tag);
+    if ((tag = fiff_dir_tree_get_tag(in,nodes[k],FIFF_MNE_COV_EIGENVALUES)) != NULL) {
+      lambda = (double *)tag->data;
+      FREE(tag);
+      if ((tag = fiff_dir_tree_get_tag(in,nodes[k],FIFF_MNE_COV_EIGENVECTORS)) == NULL)
+    goto out;
+      if ((eigen = fiff_get_float_matrix(tag)) == NULL) {
+    TAG_FREE(tag);
+    goto out;
+      }
+    }
+    /*
+     * Read the optional projection operator
+     */
+    if ((op = mne_read_proj_op_from_node(in,nodes[k])) == NULL)
+      goto out;
+    /*
+     * Read the optional SSS data
+     */
+    if ((sss = mne_read_sss_data_from_node(in,nodes[k])) == NULL)
+      goto out;
+    /*
+     * Read the optional bad channel list
+     */
+    if (mne_read_bad_channel_list_from_node(in,nodes[k],&bads,&nbad) == FAIL)
+      goto out;
+  }
+  if (cov_sparse)
+    res = mne_new_cov_sparse(kind,ncov,names,cov_sparse);
+  else if (cov)
+    res = mne_new_cov_dense(kind,ncov,names,cov);
+  else if (cov_diag)
+    res = mne_new_cov_diag(kind,ncov,names,cov_diag);
+  else {
+   qCritical("mne_read_cov : covariance matrix data is not defined. How come?");
+    goto out;
+  }
+  cov         = NULL;
+  cov_diag    = NULL;
+  cov_sparse  = NULL;
+  res->eigen  = eigen;
+  res->lambda = lambda;
+  res->nfree  = nfree;
+  res->bads   = bads;
+  res->nbad   = nbad;
+  /*
+   * Count the non-zero eigenvalues
+   */
+  if (res->lambda) {
+    res->nzero = 0;
+    for (k = 0; k < res->ncov; k++, res->nzero++)
+      if (res->lambda[k] > 0)
+    break;
+  }
+
+  if (op && op->nitems > 0) {
+    res->proj = op;
+    op = NULL;
+  }
+  if (sss && sss->ncomp > 0 && sss->job != FIFFV_SSS_JOB_NOTHING) {
+    res->sss = sss;
+    sss = NULL;
+  }
+
+  out : {
+    fiff_close(in);
+    mne_free_proj_op(op);
+    mne_free_sss_data(sss);
+
+    if (!res) {
+      mne_free_name_list(names,nnames);
+      mne_free_name_list(bads,nbad);
+      FREE(cov);
+      FREE(cov_diag);
+      mne_free_sparse(cov_sparse);
+    }
+    FREE(nodes);
+    return res;
+  }
+
+}
+
 
 
 
@@ -5682,138 +6504,6 @@ guessData make_guess_data(char          *guessname,
     return NULL;
   }
 }
-
-
-
-mneNamedMatrix mne_read_named_matrix(fiffFile in,fiffDirNode node,int kind)
-     /*
-      * Read a named matrix from the specified node
-      */
-{
-  char **colnames = NULL;
-  char **rownames = NULL;
-  int  ncol = 0;
-  int  nrow = 0;
-  int  *dims = NULL;
-  float **data = NULL;
-  int  val;
-  char *s;
-  fiffTag tag;
-  int     k;
-  /*
-   * If the node is a named-matrix mode, use it.
-   * Otherwise, look in first-generation children
-   */
-  if (node->type == FIFFB_MNE_NAMED_MATRIX) {
-    if ((tag = fiff_dir_tree_get_tag(in,node,kind)) == NULL)
-      goto bad;
-    if ((dims = fiff_get_matrix_dims(tag)) == NULL)
-      goto bad;
-    if (dims[0] != 2) {
-      err_set_error("mne_read_named_matrix only works with two-dimensional matrices");
-      goto bad;
-    }
-    if ((data = fiff_get_float_matrix(tag)) == NULL) {
-      TAG_FREE(tag);
-      goto bad;
-    }
-  }
-  else {
-    for (k = 0; k < node->nchild; k++) {
-      if (node->children[k]->type == FIFFB_MNE_NAMED_MATRIX) {
-    if ((tag = fiff_dir_tree_get_tag(in,node->children[k],kind)) != NULL) {
-      if ((dims = fiff_get_matrix_dims(tag)) == NULL)
-        goto bad;
-      if (dims[0] != 2) {
-        err_set_error("mne_read_named_matrix only works with two-dimensional matrices");
-        goto bad;
-      }
-      if ((data = fiff_get_float_matrix(tag)) == NULL) {
-        TAG_FREE(tag);
-        goto bad;
-      }
-      FREE(tag);
-      node = node->children[k];
-      break;
-    }
-      }
-    }
-    if (!data)
-      goto bad;
-  }
-  /*
-   * Separate FIFF_MNE_NROW is now optional
-   */
-  if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_NROW)) == NULL)
-    nrow = dims[2];
-  else {
-    nrow = *(int *)(tag->data);
-    if (nrow != dims[2]) {
-      err_set_error("Number of rows in the FIFF_MNE_NROW tag and in the matrix data conflict.");
-      goto bad;
-    }
-  }
-  TAG_FREE(tag);
-  /*
-   * Separate FIFF_MNE_NCOL is now optional
-   */
-  if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_NCOL)) == NULL)
-    ncol = dims[1];
-  else {
-    ncol = *(int *)(tag->data);
-    if (ncol != dims[1]) {
-      err_set_error("Number of columns in the FIFF_MNE_NCOL tag and in the matrix data conflict.");
-      goto bad;
-    }
-  }
-  TAG_FREE(tag);
-
-  if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_ROW_NAMES)) != NULL) {
-    s = (char *)(tag->data);
-    mne_string_to_name_list(s,&rownames,&val);
-    TAG_FREE(tag);
-    if (val != nrow) {
-      err_set_error("Incorrect number of entries in the row name list");
-      nrow = val;
-      goto bad;
-    }
-  }
-  if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_COL_NAMES)) != NULL) {
-    s = (char *)(tag->data);
-    mne_string_to_name_list(s,&colnames,&val);
-    TAG_FREE(tag);
-    if (val != ncol) {
-      err_set_error("Incorrect number of entries in the column name list");
-      ncol = val;
-      goto bad;
-    }
-  }
-  FREE(dims);
-  return mne_build_named_matrix(nrow,ncol,rownames,colnames,data);
-
-  bad : {
-    mne_free_name_list(rownames,nrow);
-    mne_free_name_list(colnames,ncol);
-    FREE_CMATRIX(data);
-    FREE(dims);
-    return NULL;
-  }
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
