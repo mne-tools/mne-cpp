@@ -43,38 +43,21 @@
 //=============================================================================================================
 
 #include "rtprocessing_global.h"
-#include "utils/detecttrigger.h"
-#include "utils/mnemath.h"
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FIFF INCLUDES
-//=============================================================================================================
 
 #include <fiff/fiff_evoked.h>
 #include <fiff/fiff_info.h>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Generics INCLUDES
-//=============================================================================================================
 
 #include <generics/circularmatrixbuffer.h>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// Qt INCLUDES
 //=============================================================================================================
 
 #include <QThread>
 #include <QMutex>
 #include <QSharedPointer>
-#include <QSet>
-#include <QList>
-#include <QVariant>
 
 
 //*************************************************************************************************************
@@ -83,6 +66,12 @@
 //=============================================================================================================
 
 #include <Eigen/Core>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Forward Declarations
+//=============================================================================================================
 
 
 //*************************************************************************************************************
@@ -113,8 +102,8 @@ class RTPROCESSINGSHARED_EXPORT RtAve : public QThread
 {
     Q_OBJECT
 public:
-    typedef QSharedPointer<RtAve> SPtr;             /**< Shared pointer type for RtCov. */
-    typedef QSharedPointer<const RtAve> ConstSPtr;  /**< Const shared pointer type for RtCov. */
+    typedef QSharedPointer<RtAve> SPtr;             /**< Shared pointer type for RtAve. */
+    typedef QSharedPointer<const RtAve> ConstSPtr;  /**< Const shared pointer type for RtAve. */
 
     //=========================================================================================================
     /**
@@ -129,7 +118,14 @@ public:
     * @param[in] p_pFiffInfo            Associated Fiff Information
     * @param[in] parent     Parent QObject (optional)
     */
-    explicit RtAve(quint32 numAverages, quint32 p_iPreStimSamples, quint32 p_iPostStimSamples, quint32 p_iBaselineFromSecs, quint32 p_iBaselineToSecs, quint32 p_iTriggerIndex, FiffInfo::SPtr p_pFiffInfo, QObject *parent = 0);
+    explicit RtAve(quint32 numAverages,
+                   quint32 p_iPreStimSamples,
+                   quint32 p_iPostStimSamples,
+                   quint32 p_iBaselineFromSecs,
+                   quint32 p_iBaselineToSecs,
+                   quint32 p_iTriggerIndex,
+                   FiffInfo::SPtr p_pFiffInfo,
+                   QObject *parent = 0);
 
     //=========================================================================================================
     /**

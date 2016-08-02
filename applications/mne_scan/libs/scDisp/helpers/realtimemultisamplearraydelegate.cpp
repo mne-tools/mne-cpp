@@ -673,7 +673,7 @@ void RealTimeMultiSampleArrayDelegate::createTriggerPath(QPainter *painter, cons
 
 
     //Newly detected triggers
-    for(int u = 0; u<detectedTriggers.size(); u++) {
+    for(int u = 0; u < detectedTriggers.size(); ++u) {
         QPainterPath path;
 
         int triggerPos = detectedTriggers[u].first;
@@ -683,7 +683,7 @@ void RealTimeMultiSampleArrayDelegate::createTriggerPath(QPainter *painter, cons
             painter->setPen(QPen(mapTriggerTypeColors[detectedTriggers[u].second], 1.5, Qt::SolidLine));
         }
 
-        if(triggerPos <= currentSampleIndex+t_pModel->getCurrentOverlapAddDelay()) {
+        if(triggerPos <= currentSampleIndex + t_pModel->getCurrentOverlapAddDelay()) {
             path.moveTo(triggerPos*fDx,yStart);
             path.lineTo(triggerPos*fDx,yEnd);
         }
@@ -693,12 +693,23 @@ void RealTimeMultiSampleArrayDelegate::createTriggerPath(QPainter *painter, cons
     }
 
     //Old detected triggers
-    for(int u = 0; u<detectedTriggersOld.size(); u++) {
+    for(int u = 0; u < detectedTriggersOld.size(); ++u) {
+        QPainterPath path;
+
         int triggerPos = detectedTriggersOld[u].first;
 
-        if(triggerPos>currentSampleIndex+t_pModel->getCurrentOverlapAddDelay()) {
+        if(triggerPos >= currentSampleIndex + t_pModel->getCurrentOverlapAddDelay()) {
+            painter->save();
+
+            if(mapTriggerTypeColors.contains(detectedTriggersOld[u].second)) {
+                painter->setPen(QPen(mapTriggerTypeColors[detectedTriggersOld[u].second], 1.5, Qt::SolidLine));
+            }
+
             path.moveTo(triggerPos*fDx,yStart);
             path.lineTo(triggerPos*fDx,yEnd);
+
+            painter->drawPath(path);
+            painter->restore();
         }
     }
 }
