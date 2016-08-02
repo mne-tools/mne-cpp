@@ -133,6 +133,11 @@ using namespace UTILSLIB;
 }
 
 
+
+
+
+
+
 //============================= mne_allocs.h =============================
 
 /*
@@ -212,6 +217,135 @@ void mne_free_cmatrix (float **m)
 #include "fiff_types.h"
 #include "mne_types.h"
 #include "fit_types.h"
+
+
+
+
+
+
+
+
+
+
+//============================= mne_matop.c =============================
+
+#define MIN(a,b) ((a) < (b) ? (a) : (b))
+#define MAX(a,b) ((a) > (b) ? (a) : (b))
+
+float mne_dot_vectors (float *v1,
+               float *v2,
+               int   nn)
+
+{
+#ifdef BLAS
+  int one = 1;
+  float res = sdot(&nn,v1,&one,v2,&one);
+  return res;
+#else
+  float res = 0.0;
+  int   k;
+
+  for (k = 0; k < nn; k++)
+    res = res + v1[k]*v2[k];
+  return res;
+#endif
+}
+
+
+
+
+int mne_svd(float **mat,	/* The matrix */
+        int   m,int n,	/* m rows n columns */
+        float *sing,	/* Singular values (must have size
+                 * MIN(m,n)+1 */
+        float **uu,		/* Left eigenvectors */
+        float **vv)		/* Right eigenvectors */
+     /*
+      * Compute the SVD of mat.
+      * The singular vector calculations depend on whether
+      * or not u and v are given.
+      *
+      * The allocations should be done as follows
+      *
+      * mat = ALLOC_CMATRIX(m,n);
+      * vv  = ALLOC_CMATRIX(MIN(m,n),n);
+      * uu  = ALLOC_CMATRIX(MIN(m,n),m);
+      * sing = MALLOC(MIN(m,n),float);
+      *
+      * mat is modified by this operation
+      *
+      * This simply allocates the workspace and calls the
+      * LAPACK Fortran routine
+      */
+
+{
+  int    lwork;
+  float  *work;
+  float  **uutemp = NULL;
+  int    udim = MIN(m,n);
+  int    info;
+  const char   *jobu;
+  const char   *jobvt;
+  int    j,k;
+  float  dum[1];
+  float  *vvp,*uup;
+
+  lwork = MAX(3*MIN(m,n)+MAX(m,n),5*MIN(m,n)-4) + 100*MAX(m,n);
+  work  = (float *)MALLOC(lwork,float);
+  /*
+   * Do SVD
+   */
+  if (vv == NULL) {
+    jobu = "N";
+    vvp = dum;
+  }
+  else {
+    jobu = "S";
+    vvp  = vv[0];
+  }
+  if (uu == NULL) {
+    jobvt = "N";
+    uup   = dum;
+  }
+  else {
+    jobvt = "S";
+    uutemp = ALLOC_CMATRIX(m,udim);
+    uup = uutemp[0];
+  }
+
+  qDebug() << "ToDo: sgesvd(jobu,jobvt,&n,&m,mat[0],&n,sing,vvp,&n,uup,&udim,work,&lwork,&info); MISSING!!!!";
+//  sgesvd(jobu,jobvt,&n,&m,mat[0],&n,sing,
+//     vvp,&n,uup,&udim,work,&lwork,&info);
+  if (info == 0) {
+    if (uu != NULL) {
+      /*
+       * Transpose U to get rid of the
+       * LAPACK convention.
+       */
+      for (j = 0; j < udim; j++)
+    for (k = 0; k < m; k++)
+      uu[j][k] = uutemp[k][j];
+    }
+  }
+  else
+    printf("sgesvd returned error: %d",info);
+  FREE(work);
+  FREE_CMATRIX(uutemp);
+  return info;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -3173,6 +3307,45 @@ float **fiff_get_float_matrix(fiffTag tag)
 
 
 
+
+//============================= mne_named_vector.c =============================
+
+
+int mne_pick_from_named_vector(mneNamedVector vec, char **names, int nnames, int require_all, float *res)
+     /*
+      * Pick the desired elements from the named vector
+      */
+{
+  int found;
+  int k,p;
+
+  if (vec->names == 0) {
+    qCritical("No names present in vector. Cannot pick.");
+    return FAIL;
+  }
+
+  for (k = 0; k < nnames; k++)
+    res[k] = 0.0;
+
+  for (k = 0; k < nnames; k++) {
+    found = 0;
+    for (p = 0; p < vec->nvec; p++) {
+      if (strcmp(vec->names[p],names[k]) == 0) {
+    res[k] = vec->data[p];
+    found = TRUE;
+    break;
+      }
+    }
+    if (!found && require_all) {
+      qCritical("All required elements not found in named vector.");
+      return FAIL;
+    }
+  }
+  return OK;
+}
+
+
+
 //============================= mne_named_matrix.c =============================
 
 #define TAG_FREE(x) if (x) {\
@@ -3659,6 +3832,390 @@ static char *add_string(char *old,char *add)
 }
 
 
+
+
+int mne_proj_op_chs(mneProjOp op, char **list, int nlist)
+
+{
+  if (op == NULL)
+    return OK;
+
+  mne_free_proj_op_proj(op);	/* These data are not valid any more */
+
+  if (nlist == 0)
+    return OK;
+
+  op->names = mne_dup_name_list(list,nlist);
+  op->nch   = nlist;
+
+  return OK;
+}
+
+
+void mne_proj_op_report_data(FILE *out,const char *tag, mneProjOp op, int list_data,
+                 char **exclude, int nexclude)
+     /*
+      * Output info about the projection operator
+      */
+{
+  int j,k,p,q;
+  mneProjItem it;
+  mneNamedMatrix vecs;
+  int found;
+
+  if (out == NULL)
+    return;
+  if (op == NULL)
+    return;
+  if (op->nitems <= 0) {
+    fprintf(out,"Empty operator\n");
+    return;
+  }
+
+  for (k = 0; k < op->nitems; k++) {
+    it = op->items[k];
+    if (list_data && tag)
+      fprintf(out,"%s\n",tag);
+    if (tag)
+      fprintf(out,"%s",tag);
+    fprintf(out,"# %d : %s : %d vecs : %d chs %s %s\n",
+        k+1,it->desc,it->nvec,it->vecs->ncol,
+        it->has_meg ? "MEG" : "EEG",
+        it->active ? "active" : "idle");
+    if (list_data && tag)
+      fprintf(out,"%s\n",tag);
+    if (list_data) {
+      vecs = op->items[k]->vecs;
+
+      for (q = 0; q < vecs->ncol; q++) {
+    fprintf(out,"%-10s",vecs->collist[q]);
+    fprintf(out,q < vecs->ncol-1 ? " " : "\n");
+      }
+      for (p = 0; p < vecs->nrow; p++)
+    for (q = 0; q < vecs->ncol; q++) {
+      for (j = 0, found  = 0; j < nexclude; j++) {
+        if (strcmp(exclude[j],vecs->collist[q]) == 0) {
+          found = 1;
+          break;
+        }
+      }
+      fprintf(out,"%10.5g ",found ? 0.0 : vecs->data[p][q]);
+      fprintf(out,q < vecs->ncol-1 ? " " : "\n");
+    }
+    if (list_data && tag)
+      fprintf(out,"%s\n",tag);
+    }
+  }
+  return;
+}
+
+
+void mne_proj_op_report(FILE *out,const char *tag, mneProjOp op)
+
+{
+  mne_proj_op_report_data(out,tag,op, FALSE, NULL, 0);
+}
+
+
+int mne_proj_item_affect(mneProjItem it, char **list, int nlist)
+     /*
+      * Does this projection item affect this list of channels?
+      */
+{
+  int k,p,q;
+
+  if (it == NULL || it->vecs == NULL || it->nvec == 0)
+    return FALSE;
+
+  for (k = 0; k < nlist; k++)
+    for (p = 0; p < it->vecs->ncol; p++)
+      if (strcmp(it->vecs->collist[p],list[k]) == 0) {
+    for (q = 0; q < it->vecs->nrow; q++) {
+      if (it->vecs->data[q][p] != 0.0)
+        return TRUE;
+    }
+      }
+  return FALSE;
+}
+
+int mne_proj_op_affect(mneProjOp op, char **list, int nlist)
+
+{
+  int k;
+  int naff;
+
+  if (!op)
+    return 0;
+
+  for (k = 0, naff = 0; k < op->nitems; k++)
+    if (op->items[k]->active && mne_proj_item_affect(op->items[k],list,nlist))
+      naff += op->items[k]->nvec;
+
+  return naff;
+}
+
+static void clear_these(float *data, char **names, int nnames, const char *start)
+
+{
+  int k;
+  for (k = 0; k < nnames; k++)
+    if (strstr(names[k],start) == names[k])
+      data[k] = 0.0;
+}
+
+#define USE_LIMIT   1e-5
+#define SMALL_VALUE 1e-4
+
+int mne_proj_op_make_proj_bad(mneProjOp op, char **bad, int nbad)
+     /*
+      * Do the channel picking and SVD
+      * Include a bad list at this phase
+      * Input to the projection can include the bad channels
+      * but they are not affected
+      */
+{
+  int   k,p,q,r,nvec;
+  float **vv_meg  = NULL;
+  float *sing_meg = NULL;
+  float **vv_eeg  = NULL;
+  float *sing_eeg = NULL;
+  float **mat_meg = NULL;
+  float **mat_eeg = NULL;
+  int   nvec_meg;
+  int   nvec_eeg;
+  mneNamedVectorRec vec;
+  float size;
+  int   nzero;
+#ifdef DEBUG
+  char  name[20];
+#endif
+
+  FREE_CMATRIX(op->proj_data);
+  op->proj_data = NULL;
+  op->nvec      = 0;
+
+  if (op->nch <= 0)
+    return OK;
+  if (op->nitems <= 0)
+    return OK;
+
+  nvec = mne_proj_op_affect(op,op->names,op->nch);
+  if (nvec == 0)
+    return OK;
+
+  mat_meg = ALLOC_CMATRIX(nvec, op->nch);
+  mat_eeg = ALLOC_CMATRIX(nvec, op->nch);
+
+#ifdef DEBUG
+  fprintf(stdout,"mne_proj_op_make_proj_bad\n");
+#endif
+  for (k = 0, nvec_meg = nvec_eeg = 0; k < op->nitems; k++) {
+    if (op->items[k]->active && mne_proj_item_affect(op->items[k],op->names,op->nch)) {
+      vec.nvec  = op->items[k]->vecs->ncol;
+      vec.names = op->items[k]->vecs->collist;
+      if (op->items[k]->has_meg) {
+    for (p = 0; p < op->items[k]->nvec; p++, nvec_meg++) {
+      vec.data = op->items[k]->vecs->data[p];
+      if (mne_pick_from_named_vector(&vec,op->names,op->nch,FALSE,mat_meg[nvec_meg]) == FAIL)
+        goto bad;
+#ifdef DEBUG
+      fprintf(stdout,"Original MEG:\n");
+      mne_print_vector(stdout,op->items[k]->desc,mat_meg[nvec_meg],op->nch);
+      fflush(stdout);
+#endif
+    }
+      }
+      else if (op->items[k]->has_eeg) {
+    for (p = 0; p < op->items[k]->nvec; p++, nvec_eeg++) {
+      vec.data = op->items[k]->vecs->data[p];
+      if (mne_pick_from_named_vector(&vec,op->names,op->nch,FALSE,mat_eeg[nvec_eeg]) == FAIL)
+        goto bad;
+#ifdef DEBUG
+      fprintf (stdout,"Original EEG:\n");
+      mne_print_vector(stdout,op->items[k]->desc,mat_eeg[nvec_eeg],op->nch);
+      fflush(stdout);
+#endif
+    }
+      }
+    }
+  }
+  /*
+   * Replace bad channel entries with zeroes
+   */
+  for (q = 0; q < nbad; q++)
+    for (r = 0; r < op->nch; r++)
+      if (strcmp(op->names[r],bad[q]) == 0) {
+    for (p = 0; p < nvec_meg; p++)
+      mat_meg[p][r] = 0.0;
+    for (p = 0; p < nvec_eeg; p++)
+      mat_eeg[p][r] = 0.0;
+      }
+  /*
+   * Scale the rows so that detection of linear dependence becomes easy
+   */
+  for (p = 0, nzero = 0; p < nvec_meg; p++) {
+    size = sqrt(mne_dot_vectors(mat_meg[p],mat_meg[p],op->nch));
+    if (size > 0) {
+      for (k = 0; k < op->nch; k++)
+    mat_meg[p][k] = mat_meg[p][k]/size;
+    }
+    else
+      nzero++;
+  }
+  if (nzero == nvec_meg) {
+    FREE_CMATRIX(mat_meg); mat_meg = NULL; nvec_meg = 0;
+  }
+  for (p = 0, nzero = 0; p < nvec_eeg; p++) {
+    size = sqrt(mne_dot_vectors(mat_eeg[p],mat_eeg[p],op->nch));
+    if (size > 0) {
+      for (k = 0; k < op->nch; k++)
+    mat_eeg[p][k] = mat_eeg[p][k]/size;
+    }
+    else
+      nzero++;
+  }
+  if (nzero == nvec_eeg) {
+    FREE_CMATRIX(mat_eeg); mat_eeg = NULL; nvec_eeg = 0;
+  }
+  if (nvec_meg + nvec_eeg == 0) {
+    fprintf(stderr,"No projection remains after excluding bad channels. Omitting projection.\n");
+    return OK;
+  }
+  /*
+   * Proceed to SVD
+   */
+#ifdef DEBUG
+  fprintf(stdout,"Before SVD:\n");
+#endif
+  if (nvec_meg > 0) {
+#ifdef DEBUG
+    fprintf(stdout,"---->>\n");
+    for (p = 0; p < nvec_meg; p++) {
+      sprintf(name,"MEG %02d",p+1);
+      mne_print_vector(stdout,name,mat_meg[p],op->nch);
+    }
+    fprintf(stdout,"---->>\n");
+#endif
+    sing_meg = MALLOC(nvec_meg+1,float);
+    vv_meg   = ALLOC_CMATRIX(nvec_meg,op->nch);
+    if (mne_svd(mat_meg,nvec_meg,op->nch,sing_meg,NULL,vv_meg) != OK)
+      goto bad;
+  }
+  if (nvec_eeg > 0) {
+#ifdef DEBUG
+    fprintf(stdout,"---->>\n");
+    for (p = 0; p < nvec_eeg; p++) {
+      sprintf(name,"EEG %02d",p+1);
+      mne_print_vector(stdout,name,mat_eeg[p],op->nch);
+    }
+    fprintf(stdout,"---->>\n");
+#endif
+    sing_eeg = MALLOC(nvec_eeg+1,float);
+    vv_eeg   = ALLOC_CMATRIX(nvec_eeg,op->nch);
+    if (mne_svd(mat_eeg,nvec_eeg,op->nch,sing_eeg,NULL,vv_eeg) != OK)
+      goto bad;
+  }
+  /*
+   * Check for linearly dependent vectors
+   */
+  for (p = 0, op->nvec = 0; p < nvec_meg; p++, op->nvec++)
+    if (sing_meg[p]/sing_meg[0] < USE_LIMIT)
+      break;
+  for (p = 0; p < nvec_eeg; p++, op->nvec++)
+    if (sing_eeg[p]/sing_eeg[0] < USE_LIMIT)
+      break;
+#ifdef DEBUG
+  fprintf(stderr,"Number of linearly independent vectors = %d\n",op->nvec);
+#endif
+  op->proj_data = ALLOC_CMATRIX(op->nvec,op->nch);
+#ifdef DEBUG
+  fprintf(stdout,"Final projection data:\n");
+#endif
+  for (p = 0, op->nvec = 0; p < nvec_meg; p++, op->nvec++) {
+    if (sing_meg[p]/sing_meg[0] < USE_LIMIT)
+      break;
+    for (k = 0; k < op->nch; k++) {
+      /*
+       * Avoid crosstalk between MEG/EEG
+       */
+      if (fabs(vv_meg[p][k]) < SMALL_VALUE)
+    op->proj_data[op->nvec][k] = 0.0;
+      else
+    op->proj_data[op->nvec][k] = vv_meg[p][k];
+      /*
+       * If the above did not work, this will (provided that EEG channels are called EEG*)
+       */
+      clear_these(op->proj_data[op->nvec],op->names,op->nch,"EEG");
+    }
+#ifdef DEBUG
+    sprintf(name,"MEG %02d",p+1);
+    mne_print_vector(stdout,name,op->proj_data[op->nvec],op->nch);
+#endif
+  }
+  for (p = 0; p < nvec_eeg; p++, op->nvec++) {
+    if (sing_eeg[p]/sing_eeg[0] < USE_LIMIT)
+      break;
+    for (k = 0; k < op->nch; k++) {
+      /*
+       * Avoid crosstalk between MEG/EEG
+       */
+      if (fabs(vv_eeg[p][k]) < SMALL_VALUE)
+    op->proj_data[op->nvec][k] = 0.0;
+      else
+    op->proj_data[op->nvec][k] = vv_eeg[p][k];
+      /*
+       * If the above did not work, this will (provided that MEG channels are called MEG*)
+       */
+      clear_these(op->proj_data[op->nvec],op->names,op->nch,"MEG");
+    }
+#ifdef DEBUG
+    sprintf(name,"EEG %02d",p+1);
+    mne_print_vector(stdout,name,op->proj_data[op->nvec],op->nch);
+    fflush(stdout);
+#endif
+  }
+  FREE(sing_meg);
+  FREE_CMATRIX(vv_meg);
+  FREE_CMATRIX(mat_meg);
+  FREE(sing_eeg);
+  FREE_CMATRIX(vv_eeg);
+  FREE_CMATRIX(mat_eeg);
+  /*
+     * Make sure that the stimulus channels are not modified
+     */
+  for (k = 0; k < op->nch; k++)
+    if (strstr(op->names[k],"STI") == op->names[k]) {
+      for (p = 0; p < op->nvec; p++)
+    op->proj_data[p][k] = 0.0;
+    }
+  return OK;
+
+ bad : {
+    FREE(sing_meg);
+    FREE_CMATRIX(vv_meg);
+    FREE_CMATRIX(mat_meg);
+    FREE(sing_eeg);
+    FREE_CMATRIX(vv_eeg);
+    FREE_CMATRIX(mat_eeg);
+    return FAIL;
+  }
+}
+
+
+int mne_proj_op_make_proj(mneProjOp op)
+     /*
+      * Do the channel picking and SVD
+      */
+{
+  return mne_proj_op_make_proj_bad(op,NULL,0);
+}
+
+
+
+
+
+
+
 //============================= mne_sparse_matop.c =============================
 
 void mne_free_sparse(mneSparseMatrix mat)
@@ -3674,7 +4231,43 @@ void mne_free_sparse(mneSparseMatrix mat)
 
 //============================= mne_ctf_comp.c =============================
 
+#define MNE_CTFV_COMP_UNKNOWN -1
+#define MNE_CTFV_COMP_NONE    0
+#define MNE_CTFV_COMP_G1BR    0x47314252
+#define MNE_CTFV_COMP_G2BR    0x47324252
+#define MNE_CTFV_COMP_G3BR    0x47334252
+#define MNE_CTFV_COMP_G2OI    0x47324f49
+#define MNE_CTFV_COMP_G3OI    0x47334f49
 
+static struct {
+  int grad_comp;
+  int ctf_comp;
+} compMap[] = { { MNE_CTFV_NOGRAD,       MNE_CTFV_COMP_NONE },
+        { MNE_CTFV_GRAD1,        MNE_CTFV_COMP_G1BR },
+        { MNE_CTFV_GRAD2,        MNE_CTFV_COMP_G2BR },
+        { MNE_CTFV_GRAD3,        MNE_CTFV_COMP_G3BR },
+        { MNE_4DV_COMP1,         MNE_4DV_COMP1 },             /* One-to-one mapping for 4D data */
+        { MNE_CTFV_COMP_UNKNOWN, MNE_CTFV_COMP_UNKNOWN }};
+
+/*
+ * Allocation and freeing of the data structures
+ */
+mneCTFcompData mne_new_ctf_comp_data()
+
+{
+  mneCTFcompData res = MALLOC(1,mneCTFcompDataRec);
+  res->kind          = MNE_CTFV_COMP_UNKNOWN;
+  res->mne_kind      = MNE_CTFV_COMP_UNKNOWN;
+  res->calibrated    = FALSE;
+  res->data          = NULL;
+  res->presel        = NULL;
+  res->postsel       = NULL;
+  res->presel_data   = NULL;
+  res->comp_data     = NULL;
+  res->postsel_data  = NULL;
+
+  return res;
+}
 
 mneCTFcompDataSet mne_new_ctf_comp_data_set()
 
@@ -3727,6 +4320,84 @@ void mne_free_ctf_comp_data_set(mneCTFcompDataSet set)
   FREE(set);
   return;
 }
+
+
+
+int mne_unmap_ctf_comp_kind(int ctf_comp)
+
+{
+  int k;
+
+  for (k = 0; compMap[k].grad_comp >= 0; k++)
+    if (ctf_comp == compMap[k].ctf_comp)
+      return compMap[k].grad_comp;
+  return ctf_comp;
+}
+
+
+static int mne_calibrate_ctf_comp(mneCTFcompData one,
+                  fiffChInfo     chs,
+                  int            nch,
+                  int            do_it)
+/*
+ * Calibrate or decalibrate a compensation data set
+ */
+{
+  float *col_cals,*row_cals;
+  int   j,k,p,found;
+  char  *name;
+  float **data;
+
+  if (!one)
+    return OK;
+  if (one->calibrated)
+    return OK;
+
+  row_cals = MALLOC(one->data->nrow,float);
+  col_cals = MALLOC(one->data->ncol,float);
+
+  for (j = 0; j < one->data->nrow; j++) {
+    name = one->data->rowlist[j];
+    found = FALSE;
+    for (p = 0; p < nch; p++)
+      if (strcmp(name,chs[p].ch_name) == 0) {
+    row_cals[j] = chs[p].range*chs[p].cal;
+    found = TRUE;
+    break;
+      }
+    if (!found) {
+      printf("Channel %s not found. Cannot calibrate the compensation matrix.",name);
+      return FAIL;
+    }
+  }
+  for (k = 0; k < one->data->ncol; k++) {
+    name = one->data->collist[k];
+    found = FALSE;
+    for (p = 0; p < nch; p++)
+      if (strcmp(name,chs[p].ch_name) == 0) {
+    col_cals[k] = chs[p].range*chs[p].cal;
+    found = TRUE;
+    break;
+      }
+    if (!found) {
+      printf("Channel %s not found. Cannot calibrate the compensation matrix.",name);
+      return FAIL;
+    }
+  }
+  data = one->data->data;
+  if (do_it) {
+    for (j = 0; j < one->data->nrow; j++)
+      for (k = 0; k < one->data->ncol; k++)
+    data[j][k] = row_cals[j]*data[j][k]/col_cals[k];
+  }
+  else {
+    for (j = 0; j < one->data->nrow; j++)
+      for (k = 0; k < one->data->ncol; k++)
+    data[j][k] = col_cals[k]*data[j][k]/row_cals[j];
+  }
+  return OK;
+}
+
 
 
 
@@ -4324,53 +4995,51 @@ static int make_projection(char       **projnames,
   int       k,found;
   int       neeg;
 
-  qDebug() << "ToDo: static int make_projection(char       **projnames,";
+  for (k = 0, neeg = 0; k < nch; k++)
+    if (chs[k].kind == FIFFV_EEG_CH)
+      neeg++;
 
-//  for (k = 0, neeg = 0; k < nch; k++)
-//    if (chs[k].kind == FIFFV_EEG_CH)
-//      neeg++;
+  if (nproj == 0 && neeg == 0)
+    return OK;
 
-//  if (nproj == 0 && neeg == 0)
-//    return OK;
-
-//  for (k = 0; k < nproj; k++) {
-//    if ((one = mne_read_proj_op(projnames[k])) == NULL)
-//      goto bad;
-//    if (one->nitems == 0) {
-//      printf("No linear projection information in %s.\n",projnames[k]);
-//      mne_free_proj_op(one); one = NULL;
-//    }
-//    else {
-//      printf("Loaded projection from %s:\n",projnames[k]);
-//      mne_proj_op_report(stderr,"\t",one);
-//      all = mne_proj_op_combine(all,one);
-//      mne_free_proj_op(one); one = NULL;
-//    }
-//  }
-//  if (neeg > 0) {
-//    found = FALSE;
-//    if (all) {
-//      for (k = 0; k < all->nitems; k++)
-//      if (all->items[k]->kind == FIFFV_MNE_PROJ_ITEM_EEG_AVREF) {
-//        found = TRUE;
-//        break;
-//      }
-//    }
-//    if (!found) {
-//      if ((one = mne_proj_op_average_eeg_ref(chs,nch)) != NULL) {
-//    printf("Average EEG reference projection added:\n");
-//    mne_proj_op_report(stderr,"\t",one);
-//    all = mne_proj_op_combine(all,one);
-//    mne_free_proj_op(one); one = NULL;
-//      }
-//    }
-//  }
-//  if (all && mne_proj_op_affect_chs(all,chs,nch) == 0) {
-//    printf("Projection will not have any effect on selected channels. Projection omitted.\n");
-//    mne_free_proj_op(all);
-//    all = NULL;
-//  }
-//  *res = all;
+  for (k = 0; k < nproj; k++) {
+    if ((one = mne_read_proj_op(projnames[k])) == NULL)
+      goto bad;
+    if (one->nitems == 0) {
+      printf("No linear projection information in %s.\n",projnames[k]);
+      mne_free_proj_op(one); one = NULL;
+    }
+    else {
+      printf("Loaded projection from %s:\n",projnames[k]);
+      mne_proj_op_report(stderr,"\t",one);
+      all = mne_proj_op_combine(all,one);
+      mne_free_proj_op(one); one = NULL;
+    }
+  }
+  if (neeg > 0) {
+    found = FALSE;
+    if (all) {
+      for (k = 0; k < all->nitems; k++)
+      if (all->items[k]->kind == FIFFV_MNE_PROJ_ITEM_EEG_AVREF) {
+        found = TRUE;
+        break;
+      }
+    }
+    if (!found) {
+      if ((one = mne_proj_op_average_eeg_ref(chs,nch)) != NULL) {
+    printf("Average EEG reference projection added:\n");
+    mne_proj_op_report(stderr,"\t",one);
+    all = mne_proj_op_combine(all,one);
+    mne_free_proj_op(one); one = NULL;
+      }
+    }
+  }
+  if (all && mne_proj_op_affect_chs(all,chs,nch) == 0) {
+    printf("Projection will not have any effect on selected channels. Projection omitted.\n");
+    mne_free_proj_op(all);
+    all = NULL;
+  }
+  *res = all;
   return OK;
 
   bad :
