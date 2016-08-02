@@ -43,6 +43,8 @@
 #include "rtave.h"
 
 #include <utils/ioutils.h>
+#include <utils/detecttrigger.h>
+#include <utils/mnemath.h>
 
 #include <iostream>
 
@@ -54,6 +56,9 @@
 
 #include <QMutexLocker>
 #include <QDebug>
+#include <QSet>
+#include <QList>
+#include <QVariant>
 
 
 //*************************************************************************************************************
@@ -71,7 +76,14 @@ using namespace UTILSLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RtAve::RtAve(quint32 numAverages, quint32 p_iPreStimSamples, quint32 p_iPostStimSamples, quint32 p_iBaselineFromSecs, quint32 p_iBaselineToSecs, quint32 p_iTriggerIndex, FiffInfo::SPtr p_pFiffInfo, QObject *parent)
+RtAve::RtAve(quint32 numAverages,
+             quint32 p_iPreStimSamples,
+             quint32 p_iPostStimSamples,
+             quint32 p_iBaselineFromSecs,
+             quint32 p_iBaselineToSecs,
+             quint32 p_iTriggerIndex,
+             FiffInfo::SPtr p_pFiffInfo,
+             QObject *parent)
 : QThread(parent)
 , m_iNumAverages(numAverages)
 , m_iPreStimSamples(p_iPreStimSamples)
