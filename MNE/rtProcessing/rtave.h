@@ -85,10 +85,8 @@ namespace RTPROCESSINGLIB
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// Forward Declarations
 //=============================================================================================================
-
-using namespace IOBuffer;
 
 
 //=============================================================================================================
@@ -314,46 +312,46 @@ private:
     */
     inline bool controlValuesChanged();
 
-    QMutex  m_qMutex;                   /**< Provides access serialization between threads*/
+    QMutex                                          m_qMutex;                   /**< Provides access serialization between threads*/
 
-    qint32  m_iNumAverages;             /**< Number of averages */
-    qint32  m_iNewNumAverages;          /**< Number of averages */
-    qint32  m_iCurrentBlockSize;        /**< Current block size of the incoming data */
-    qint32  m_iPreStimSamples;          /**< Amount of samples averaged before the stimulus. */
-    qint32  m_iPostStimSamples;         /**< Amount of samples averaged after the stimulus, including the stimulus sample.*/
-    qint32  m_iNewPreStimSamples;       /**< New amount of samples averaged before the stimulus. */
-    qint32  m_iNewPostStimSamples;      /**< New amount of samples averaged after the stimulus, including the stimulus sample.*/
-    qint32  m_iPreStimSeconds;          /**< Amount of seconds averaged before the stimulus. */
-    qint32  m_iPostStimSeconds;         /**< Amount of seconds averaged after the stimulus, including the stimulus sample.*/
-    qint32  m_iTriggerChIndex;          /**< Current row index of the data matrix which is to be scanned for triggers */
-    qint32  m_iNewTriggerIndex;         /**< Old row index of the data matrix which is to be scanned for triggers */
-    qint32  m_iNewAverageMode;          /**< The new averaging mode 0-running 1-cumulative. */
-    qint32  m_iAverageMode;             /**< The averaging mode 0-running 1-cumulative. */
+    qint32                                          m_iNumAverages;             /**< Number of averages */
+    qint32                                          m_iNewNumAverages;          /**< Number of averages */
+    qint32                                          m_iCurrentBlockSize;        /**< Current block size of the incoming data */
+    qint32                                          m_iPreStimSamples;          /**< Amount of samples averaged before the stimulus. */
+    qint32                                          m_iPostStimSamples;         /**< Amount of samples averaged after the stimulus, including the stimulus sample.*/
+    qint32                                          m_iNewPreStimSamples;       /**< New amount of samples averaged before the stimulus. */
+    qint32                                          m_iNewPostStimSamples;      /**< New amount of samples averaged after the stimulus, including the stimulus sample.*/
+    qint32                                          m_iPreStimSeconds;          /**< Amount of seconds averaged before the stimulus. */
+    qint32                                          m_iPostStimSeconds;         /**< Amount of seconds averaged after the stimulus, including the stimulus sample.*/
+    qint32                                          m_iTriggerChIndex;          /**< Current row index of the data matrix which is to be scanned for triggers */
+    qint32                                          m_iNewTriggerIndex;         /**< Old row index of the data matrix which is to be scanned for triggers */
+    qint32                                          m_iNewAverageMode;          /**< The new averaging mode 0-running 1-cumulative. */
+    qint32                                          m_iAverageMode;             /**< The averaging mode 0-running 1-cumulative. */
 
-    float   m_fTriggerThreshold;        /**< Threshold to detect trigger */
+    float                                           m_fTriggerThreshold;        /**< Threshold to detect trigger */
 
-    double  m_dArtifactThreshold;       /**< Threshold to detect artifacts */
+    double                                          m_dArtifactThreshold;       /**< Threshold to detect artifacts */
 
-    bool    m_bDoArtifactReduction;     /**< Whether to do artifact reduction or not. */
-    bool    m_bIsRunning;               /**< Holds if real-time Covariance estimation is running.*/
-    bool    m_bAutoAspect;              /**< Auto aspect detection on or off. */
-    bool    m_bDoBaselineCorrection;    /**< Whether to perform baseline correction. */
+    bool                                            m_bDoArtifactReduction;     /**< Whether to do artifact reduction or not. */
+    bool                                            m_bIsRunning;               /**< Holds if real-time Covariance estimation is running.*/
+    bool                                            m_bAutoAspect;              /**< Auto aspect detection on or off. */
+    bool                                            m_bDoBaselineCorrection;    /**< Whether to perform baseline correction. */
 
-    QPair<QVariant,QVariant>                m_pairBaselineSec;              /**< Baseline information in seconds form where the seconds are seen relative to the trigger, meaning they can also be negative [from to]*/
-    QPair<QVariant,QVariant>                m_pairBaselineSamp;             /**< Baseline information in samples form where the seconds are seen relative to the trigger, meaning they can also be negative [from to]*/
+    QPair<QVariant,QVariant>                        m_pairBaselineSec;          /**< Baseline information in seconds form where the seconds are seen relative to the trigger, meaning they can also be negative [from to]*/
+    QPair<QVariant,QVariant>                        m_pairBaselineSamp;         /**< Baseline information in samples form where the seconds are seen relative to the trigger, meaning they can also be negative [from to]*/
 
-    FIFFLIB::FiffInfo::SPtr                 m_pFiffInfo;                    /**< Holds the fiff measurement information. */
-    FIFFLIB::FiffEvokedSet::SPtr            m_pStimEvokedSet;               /**< Holds the evoked information. */
+    FIFFLIB::FiffInfo::SPtr                         m_pFiffInfo;                /**< Holds the fiff measurement information. */
+    FIFFLIB::FiffEvokedSet::SPtr                    m_pStimEvokedSet;           /**< Holds the evoked information. */
 
-    CircularMatrixBuffer<double>::SPtr      m_pRawMatrixBuffer;             /**< The Circular Raw Matrix Buffer. */
+    QMap<int,QList<int> >                           m_qMapDetectedTrigger;      /**< Detected trigger for each trigger channel. */
+    QMap<double,QList<Eigen::MatrixXd> >            m_mapStimAve;               /**< the current stimulus average buffer. Holds m_iNumAverages vectors */
+    QMap<double,Eigen::MatrixXd>                    m_mapDataPre;               /**< The matrix holding the pre stim data. */
+    QMap<double,Eigen::MatrixXd>                    m_mapDataPost;              /**< The matrix holding the post stim data. */
+    QMap<double,qint32>                             m_mapMatDataPostIdx;        /**< Current index inside of the matrix m_matDataPost */
+    QMap<double,bool>                               m_mapFillingBackBuffer;     /**< Whether the back buffer is currently getting filled. */
+    QMap<double,qint32>                             m_mapNumberCalcAverages;    /**< The number of currently calculated averages for each trigger type. */
 
-    QMap<int,QList<int> >                   m_qMapDetectedTrigger;          /**< Detected trigger for each trigger channel. */
-    QMap<double,QList<Eigen::MatrixXd> >    m_mapStimAve;                   /**< the current stimulus average buffer. Holds m_iNumAverages vectors */
-    QMap<double,Eigen::MatrixXd>            m_mapDataPre;                   /**< The matrix holding the pre stim data. */
-    QMap<double,Eigen::MatrixXd>            m_mapDataPost;                  /**< The matrix holding the post stim data. */
-    QMap<double,qint32>                     m_mapMatDataPostIdx;            /**< Current index inside of the matrix m_matDataPost */
-    QMap<double,bool>                       m_mapFillingBackBuffer;         /**< Whether the back buffer is currently getting filled. */
-    QMap<double,qint32>                     m_mapNumberCalcAverages;        /**< The number of currently calculated averages for each trigger type. */
+    IOBuffer::CircularMatrixBuffer<double>::SPtr    m_pRawMatrixBuffer;         /**< The Circular Raw Matrix Buffer. */
 
 signals:
     //=========================================================================================================
