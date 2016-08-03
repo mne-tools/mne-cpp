@@ -525,7 +525,14 @@ void Averaging::changeBaselineActive(bool state)
 
 void Averaging::appendEvoked(FIFFLIB::FiffEvokedSet::SPtr p_pEvokedSet)
 {
-    qDebug() << "Averaging::appendEvoked - p_pEvokedSet->evoked.size():" << p_pEvokedSet->evoked.size();
+    qDebug() << "";
+    qDebug() << "Averaging::appendEvoked - p_pEvokedSet INFO:";
+    qDebug() << "p_pEvokedSet->evoked.size():" << p_pEvokedSet->evoked.size();
+    qDebug() << "";
+
+    for(int i = 0; i < p_pEvokedSet->evoked.size(); ++i) {
+        qDebug() << p_pEvokedSet->evoked.at(i).comment <<"rows x cols:" << p_pEvokedSet->evoked.at(i).data.rows() << "x" << p_pEvokedSet->evoked.at(i).data.cols() << "-" << p_pEvokedSet->evoked.at(i).nave << "averages";
+    }
 
     // << p_pEvoked->comment;
 //    qDebug() << p_pEvoked->comment;
@@ -535,7 +542,10 @@ void Averaging::appendEvoked(FIFFLIB::FiffEvokedSet::SPtr p_pEvokedSet)
 //    {
 //        qDebug()<< "append" << p_pEvoked->comment << "=" << t_sStimulusChannel;
 //        m_qMutex.lock();
-//        m_qVecEvokedData.push_back(p_pEvoked);
+//        if(!p_pEvokedSet->evoked.isEmpty()) {
+//            FIFFLIB::FiffEvoked::SPtr tempPoint = FIFFLIB::FiffEvoked::SPtr(&p_pEvokedSet->evoked[0]);
+//            m_qVecEvokedData.push_back(tempPoint);
+//        }
 //        m_qMutex.unlock();
 //        qDebug() << "append after" << m_qVecEvokedData.size();
 //    }

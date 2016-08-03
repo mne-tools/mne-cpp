@@ -302,6 +302,18 @@ private:
     */
     void init();
 
+    //=========================================================================================================
+    /**
+    * Check if data buffer has been initialized
+    */
+    inline bool isDataBufferInit();
+
+    //=========================================================================================================
+    /**
+    * Check if control values have been changed
+    */
+    inline bool controlValuesChanged();
+
     QMutex  m_qMutex;                   /**< Provides access serialization between threads*/
 
     qint32  m_iNumAverages;             /**< Number of averages */
@@ -317,7 +329,6 @@ private:
     qint32  m_iNewTriggerIndex;         /**< Old row index of the data matrix which is to be scanned for triggers */
     qint32  m_iNewAverageMode;          /**< The new averaging mode 0-running 1-cumulative. */
     qint32  m_iAverageMode;             /**< The averaging mode 0-running 1-cumulative. */
-    qint32  m_iNumberCalcAverages;      /**< The number of currently calculated averages. */
 
     float   m_fTriggerThreshold;        /**< Threshold to detect trigger */
 
@@ -332,18 +343,17 @@ private:
     QPair<QVariant,QVariant>                m_pairBaselineSamp;             /**< Baseline information in samples form where the seconds are seen relative to the trigger, meaning they can also be negative [from to]*/
 
     FIFFLIB::FiffInfo::SPtr                 m_pFiffInfo;                    /**< Holds the fiff measurement information. */
+    FIFFLIB::FiffEvokedSet::SPtr            m_pStimEvokedSet;               /**< Holds the evoked information. */
 
     CircularMatrixBuffer<double>::SPtr      m_pRawMatrixBuffer;             /**< The Circular Raw Matrix Buffer. */
 
     QMap<int,QList<int> >                   m_qMapDetectedTrigger;          /**< Detected trigger for each trigger channel. */
-
-    FIFFLIB::FiffEvokedSet::SPtr            m_pStimEvokedSet;               /**< Holds the evoked information. */
-
     QMap<double,QList<Eigen::MatrixXd> >    m_mapStimAve;                   /**< the current stimulus average buffer. Holds m_iNumAverages vectors */
     QMap<double,Eigen::MatrixXd>            m_mapDataPre;                   /**< The matrix holding the pre stim data. */
     QMap<double,Eigen::MatrixXd>            m_mapDataPost;                  /**< The matrix holding the post stim data. */
     QMap<double,qint32>                     m_mapMatDataPostIdx;            /**< Current index inside of the matrix m_matDataPost */
     QMap<double,bool>                       m_mapFillingBackBuffer;         /**< Whether the back buffer is currently getting filled. */
+    QMap<double,qint32>                     m_mapNumberCalcAverages;        /**< The number of currently calculated averages for each trigger type. */
 
 signals:
     //=========================================================================================================
@@ -363,6 +373,42 @@ signals:
 inline bool RtAve::isRunning()
 {
     return m_bIsRunning;
+}
+
+
+//*************************************************************************************************************
+
+inline bool RtAve::isDataBufferInit()
+{
+    QMutexLocker locker(&m_qMutex);
+
+    bool result = false;
+
+    if(m_pRawMatrixBuffer) {
+        result = true;
+    }
+
+    return result;
+}
+
+
+//*************************************************************************************************************
+
+inline bool RtAve::controlValuesChanged()
+{
+    QMutexLocker locker(&m_qMutex);
+
+    bool result = false;
+
+    if(m_iNewPreStimSamples != m_iPreStimSamples
+            || m_iNewPostStimSamples != m_iPostStimSamples
+            || m_iNewTriggerIndex != m_iTriggerChIndex
+            || m_iNewAverageMode != m_iAverageMode
+            || m_iNewNumAverages != m_iNumAverages) {
+        result = true;
+    }
+
+    return result;
 }
 
 } // NAMESPACE
