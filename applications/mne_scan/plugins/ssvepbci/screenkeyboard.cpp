@@ -318,7 +318,8 @@ void ScreenKeyboard::updateCommand(double value){
                     qDebug() << "next sign:" << *m_qSpellIterator;
                     qDebug() << "next coordinate:" << m_qNextCoord;
                 }
-                else
+
+                if(m_qSpellIterator == m_sSettledPhrase.end())
                     stopSpellAccuracyFeature();
 
             }
@@ -352,7 +353,8 @@ void ScreenKeyboard::updateCommand(double value){
         m_qCurCursorCoord.first    += deltaX;
         m_qCurCursorCoord.second   += deltaY;
     }
-    else if(index == 4)
+
+    if(index == 4)
         m_qCurCursorCoord = QPair<int, int> (0,0);
 
 }
