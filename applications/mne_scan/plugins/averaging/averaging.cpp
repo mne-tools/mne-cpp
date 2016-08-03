@@ -541,12 +541,12 @@ void Averaging::appendEvoked(FIFFLIB::FiffEvokedSet::SPtr p_pEvokedSet)
 //    if(p_pEvoked->comment == t_sStimulusChannel)
 //    {
 //        qDebug()<< "append" << p_pEvoked->comment << "=" << t_sStimulusChannel;
-//        m_qMutex.lock();
-//        if(!p_pEvokedSet->evoked.isEmpty()) {
-//            FIFFLIB::FiffEvoked::SPtr tempPoint = FIFFLIB::FiffEvoked::SPtr(&p_pEvokedSet->evoked[0]);
-//            m_qVecEvokedData.push_back(tempPoint);
-//        }
-//        m_qMutex.unlock();
+        m_qMutex.lock();
+        if(!p_pEvokedSet->evoked.isEmpty()) {
+            FIFFLIB::FiffEvoked::SPtr tempPoint = FIFFLIB::FiffEvoked::SPtr(&p_pEvokedSet->evoked[0]);
+            m_qVecEvokedData.push_back(tempPoint);
+        }
+        m_qMutex.unlock();
 //        qDebug() << "append after" << m_qVecEvokedData.size();
 //    }
 }

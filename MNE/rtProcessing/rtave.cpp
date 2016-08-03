@@ -56,9 +56,6 @@
 
 #include <QMutexLocker>
 #include <QDebug>
-#include <QSet>
-#include <QList>
-#include <QVariant>
 #include <QElapsedTimer>
 
 
