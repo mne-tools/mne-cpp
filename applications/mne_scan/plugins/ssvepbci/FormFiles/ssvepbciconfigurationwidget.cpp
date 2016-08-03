@@ -507,12 +507,17 @@ void ssvepBCIPlugin::ssvepBCIConfigurationWidget::on_m_spinBox_ClassificationLis
 }
 
 
+//*************************************************************************************************************
+
 void ssvepBCIConfigurationWidget::showCurrentTime(){
 
     m_iElapsedSeconds++;
     QString time = QString::number(m_iElapsedSeconds);
     ui->m_label_ElapsedTime->setText(time);
 }
+
+
+//*************************************************************************************************************
 
 void ssvepBCIConfigurationWidget::stopMeasurement(){
 
