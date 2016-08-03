@@ -234,6 +234,16 @@ void mne_free_cmatrix (float **m)
   }
 }
 
+
+void mne_free_dcmatrix (double **m)
+
+{
+  if (m) {
+    FREE(*m);
+    FREE(m);
+  }
+}
+
 /*
  * float matrices
  */
@@ -362,7 +372,22 @@ int mne_svd(float **mat,	/* The matrix */
 }
 
 
+void mne_transpose_dsquare(double **mat, int n)
+     /*
+      * In-place transpose of a square matrix
+      */
+{
+  int j,k;
+  double val;
 
+  for (j = 1; j < n; j++)
+    for (k = 0; k < j; k++) {
+      val = mat[j][k];
+      mat[j][k] = mat[k][j];
+      mat[k][j] = val;
+    }
+  return;
+}
 
 
 
@@ -5761,6 +5786,81 @@ mneCovMatrix mne_pick_chs_cov_omit(mneCovMatrix c, char **new_names, int ncov, i
   FREE(pick);
   FREE(is_meg);
   return res;
+}
+
+
+void mne_revert_to_diag_cov(mneCovMatrix c)
+     /*
+      * Pick the diagonal elements of the full covariance matrix
+      */
+{
+  int k,p;
+  if (c->cov == NULL)
+    return;
+#define REALLY_REVERT
+#ifdef REALLY_REVERT
+  c->cov_diag = REALLOC(c->cov_diag,c->ncov,double);
+
+  for (k = p = 0; k < c->ncov; k++) {
+    c->cov_diag[k] = c->cov[p];
+    p = p + k + 2;
+  }
+  FREE(c->cov);  c->cov = NULL;
+#else
+  for (j = 0, p = 0; j < c->ncov; j++)
+    for (k = 0; k <= j; k++, p++)
+      if (j != k)
+    c->cov[p] = 0.0;
+      else
+#endif
+  FREE(c->lambda); c->lambda = NULL;
+  FREE_CMATRIX(c->eigen); c->eigen = NULL;
+  return;
+
+}
+
+
+int mne_classify_channels_cov(mneCovMatrix cov, fiffChInfo chs, int nchan)
+/*
+ * Assign channel classes in a covariance matrix with help of channel infos
+ */
+{
+  int k,p;
+  fiffChInfo ch;
+
+  if (!chs) {
+    qCritical("Channel information not available in mne_classify_channels_cov");
+    goto bad;
+  }
+  cov->ch_class = REALLOC(cov->ch_class,cov->ncov,int);
+  for (k = 0; k < cov->ncov; k++) {
+    cov->ch_class[k] = MNE_COV_CH_UNKNOWN;
+    for (p = 0, ch = NULL; p < nchan; p++) {
+      if (strcmp(chs[p].ch_name,cov->names[k]) == 0) {
+    ch = chs+p;
+    if (ch->kind == FIFFV_MEG_CH) {
+      if (ch->unit == FIFF_UNIT_T)
+        cov->ch_class[k] = MNE_COV_CH_MEG_MAG;
+      else
+        cov->ch_class[k] = MNE_COV_CH_MEG_GRAD;
+    }
+    else if (ch->kind == FIFFV_EEG_CH)
+      cov->ch_class[k] = MNE_COV_CH_EEG;
+    break;
+      }
+    }
+    if (!ch) {
+      printf("Could not find channel info for channel %s in mne_classify_channels_cov",cov->names[k]);
+      goto bad;
+    }
+  }
+  return OK;
+
+ bad : {
+    FREE(cov->ch_class);
+    cov->ch_class = NULL;
+    return FAIL;
+  }
 }
 
 
