@@ -82,7 +82,7 @@ namespace RtSssPlugin
 using namespace SCSHAREDLIB;
 using namespace FIFFLIB;
 using namespace SCMEASLIB;
-using namespace IOBuffer;
+using namespace IOBUFFER;
 
 
 //*************************************************************************************************************

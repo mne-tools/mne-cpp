@@ -78,7 +78,7 @@
 using namespace AveragingPlugin;
 using namespace SCSHAREDLIB;
 using namespace SCMEASLIB;
-using namespace IOBuffer;
+using namespace IOBUFFER;
 using namespace FIFFLIB;
 using namespace RTPROCESSINGLIB;
 
@@ -542,10 +542,7 @@ void Averaging::appendEvoked(FIFFLIB::FiffEvokedSet::SPtr p_pEvokedSet)
 //    {
 //        qDebug()<< "append" << p_pEvoked->comment << "=" << t_sStimulusChannel;
         m_qMutex.lock();
-        if(!p_pEvokedSet->evoked.isEmpty()) {
-            FIFFLIB::FiffEvoked::SPtr tempPoint = FIFFLIB::FiffEvoked::SPtr(&p_pEvokedSet->evoked[0]);
-            m_qVecEvokedData.push_back(tempPoint);
-        }
+        m_qVecEvokedData.push_back(p_pEvokedSet);
         m_qMutex.unlock();
 //        qDebug() << "append after" << m_qVecEvokedData.size();
 //    }
@@ -643,12 +640,12 @@ void Averaging::run()
             m_qMutex.lock();
             if(m_qVecEvokedData.size() > 0)
             {
-                FiffEvoked t_fiffEvoked = *m_qVecEvokedData[0].data();
+                FiffEvokedSet t_fiffEvokedSet = *m_qVecEvokedData[0].data();
 
 #ifdef DEBUG_AVERAGING
                 std::cout << "EVK:" << t_fiffEvoked.data.row(0) << std::endl;
 #endif
-                m_pAveragingOutput->data()->setValue(t_fiffEvoked, m_pFiffInfo);
+                m_pAveragingOutput->data()->setValue(t_fiffEvokedSet, m_pFiffInfo);
 
                 m_qVecEvokedData.pop_front();
 

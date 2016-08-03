@@ -96,7 +96,7 @@ namespace RTPROCESSINGLIB
 //=============================================================================================================
 
 using namespace Eigen;
-using namespace IOBuffer;
+using namespace IOBUFFER;
 using namespace FIFFLIB;
 
 
