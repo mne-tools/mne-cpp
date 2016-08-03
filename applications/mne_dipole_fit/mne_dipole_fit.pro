@@ -78,7 +78,8 @@ HEADERS += \
     fwd.h \
     fwd_types.h \
     fiff_file.h \
-    fiff_explain.h
+    fiff_explain.h \
+    analyze_types.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

@@ -254,10 +254,36 @@ void mne_free_dcmatrix (double **m)
 #include "fiff_types.h"
 #include "mne_types.h"
 #include "fit_types.h"
+#include "analyze_types.h"
 
 
 
 
+
+//============================= data.c =============================
+
+#if defined(_WIN32) || defined(_WIN64)
+  #define snprintf _snprintf
+  #define vsnprintf _vsnprintf
+  #define strcasecmp _stricmp
+  #define strncasecmp _strnicmp
+#endif
+
+int is_selected_in_data(mshMegEegData d, char *ch_name)
+/*
+ * Is this channel selected in data
+ */
+{
+  int issel = FALSE;
+  int k;
+
+  for (k = 0; k < d->meas->nchan; k++)
+    if (strcasecmp(ch_name,d->meas->chs[k].ch_name) == 0) {
+      issel = d->sels[k];
+      break;
+    }
+  return issel;
+}
 
 
 
@@ -390,6 +416,37 @@ void mne_transpose_dsquare(double **mat, int n)
 }
 
 
+
+double **mne_dmatt_dmat_mult2 (double **m1,double **m2, int d1,int d2,int d3)
+     /* Matrix multiplication
+      * result(d1 x d3) = m1(d2 x d1)^T * m2(d2 x d3) */
+
+{
+  double **result = ALLOC_DCMATRIX(d1,d3);
+#ifdef BLAS
+  char  *transa = "N";
+  char  *transb = "T";
+  double zero = 0.0;
+  double one  = 1.0;
+
+  dgemm (transa,transb,&d3,&d1,&d2,
+     &one,m2[0],&d3,m1[0],&d1,&zero,result[0],&d3);
+
+  return result;
+#else
+  int j,k,p;
+  double sum;
+
+  for (j = 0; j < d1; j++)
+    for (k = 0; k < d3; k++) {
+      sum = 0.0;
+      for (p = 0; p < d2; p++)
+    sum = sum + m1[p][j]*m2[p][k];
+      result[j][k] = sum;
+    }
+  return result;
+#endif
+}
 
 
 
@@ -1814,6 +1871,78 @@ fiffFile fiff_open (const char *name)
 }
 
 
+//============================= mne_decompose.c =============================
+
+
+int mne_decompose_eigen (double *mat,
+             double *lambda,
+             float  **vectors, /* Eigenvectors fit into floats easily */
+             int    dim)
+     /*
+      * Compute the eigenvalue decomposition of
+      * a symmetric matrix using the LAPACK routines
+      *
+      * 'mat' contains the lower triangle of the matrix
+      */
+{
+  int    np  =   dim*(dim+1)/2;
+  double *w    = MALLOC(dim,double);
+  double *z    = MALLOC(dim*dim,double);
+  double *work = MALLOC(3*dim,double);
+  double *dmat = MALLOC(np,double);
+  float  *vecp = vectors[0];
+
+  const char   *uplo  = "U";
+  const char   *compz = "V";
+  int    info,k;
+  int    one = 1;
+  int    maxi;
+  double scale;
+
+  maxi = 0;//idamax(&np,mat,&one);
+  qDebug() << "ToDo: idamax(&np,mat,&one);";
+  scale = 1.0/mat[maxi-1];
+
+  for (k = 0; k < np; k++)
+    dmat[k] = mat[k]*scale;
+//  dspev(compz,uplo,&dim,dmat,w,z,&dim,work,&info);
+  qDebug() << "ToDo: dspev(compz,uplo,&dim,dmat,w,z,&dim,work,&info);";
+  FREE(work);
+  if (info != 0)
+    printf("Eigenvalue decomposition failed (LAPACK info = %d)",info);
+  else {
+    scale = 1.0/scale;
+    for (k = 0; k < dim; k++)
+      lambda[k] = scale*w[k];
+    for (k = 0; k < dim*dim; k++)
+      vecp[k] = z[k];
+  }
+  FREE(w);
+  FREE(z);
+  if (info == 0)
+    return 0;
+  else
+    return -1;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 //============================= mne_read_forward_solution.c =============================
 
 
@@ -2584,6 +2713,27 @@ fiffCoordTrans mne_read_meas_transform(char *name)
 
 //============================= dipole_forward.c =============================
 
+
+dipoleForward new_dipole_forward()
+
+{
+  dipoleForward res = MALLOC(1,dipoleForwardRec);
+
+  res->rd     = NULL;
+  res->fwd    = NULL;
+  res->scales = NULL;
+  res->uu     = NULL;
+  res->vv     = NULL;
+  res->sing   = NULL;
+  res->nch    = 0;
+  res->ndip   = 0;
+
+  return res;
+}
+
+
+
+
 void free_dipole_forward ( dipoleForward f )
 {
     if (!f)
@@ -2597,6 +2747,201 @@ void free_dipole_forward ( dipoleForward f )
     FREE(f);
     return;
 }
+
+
+
+
+
+int compute_dipole_field(dipoleFitData d, float *rd, int whiten, float **fwd)
+/*
+ * Compute the field and take whitening and projection into account
+ */
+{
+  float *eeg_fwd[3];
+  static float Qx[] = {1.0,0.0,0.0};
+  static float Qy[] = {0.0,1.0,0.0};
+  static float Qz[] = {0.0,0.0,1.0};
+  int k;
+  /*
+   * Compute the fields
+   */
+  if (d->nmeg > 0) {
+    if (d->funcs->meg_vec_field) {
+      if (d->funcs->meg_vec_field(rd,d->meg_coils,fwd,d->funcs->meg_client) != OK)
+    goto bad;
+    }
+    else {
+      if (d->funcs->meg_field(rd,Qx,d->meg_coils,fwd[0],d->funcs->meg_client) != OK)
+    goto bad;
+      if (d->funcs->meg_field(rd,Qy,d->meg_coils,fwd[1],d->funcs->meg_client) != OK)
+    goto bad;
+      if (d->funcs->meg_field(rd,Qz,d->meg_coils,fwd[2],d->funcs->meg_client) != OK)
+    goto bad;
+    }
+  }
+  if (d->neeg > 0) {
+    if (d->funcs->eeg_vec_pot) {
+      eeg_fwd[0] = fwd[0]+d->nmeg;
+      eeg_fwd[1] = fwd[1]+d->nmeg;
+      eeg_fwd[2] = fwd[2]+d->nmeg;
+      if (d->funcs->eeg_vec_pot(rd,d->eeg_els,eeg_fwd,d->funcs->eeg_client) != OK)
+    goto bad;
+    }
+    else {
+      if (d->funcs->eeg_pot(rd,Qx,d->eeg_els,fwd[0]+d->nmeg,d->funcs->eeg_client) != OK)
+    goto bad;
+      if (d->funcs->eeg_pot(rd,Qy,d->eeg_els,fwd[1]+d->nmeg,d->funcs->eeg_client) != OK)
+    goto bad;
+      if (d->funcs->eeg_pot(rd,Qz,d->eeg_els,fwd[2]+d->nmeg,d->funcs->eeg_client) != OK)
+    goto bad;
+    }
+  }
+  /*
+   * Apply projection
+   */
+#ifdef DEBUG
+  fprintf(stdout,"orig : ");
+  for (k = 0; k < 3; k++)
+    fprintf(stdout,"%g ",sqrt(mne_dot_vectors(fwd[k],fwd[k],d->nmeg+d->neeg)));
+  fprintf(stdout,"\n");
+#endif
+
+  for (k = 0; k < 3; k++)
+    if (mne_proj_op_proj_vector(d->proj,fwd[k],d->nmeg+d->neeg,TRUE) == FAIL)
+      goto bad;
+
+#ifdef DEBUG
+  fprintf(stdout,"proj : ");
+  for (k = 0; k < 3; k++)
+    fprintf(stdout,"%g ",sqrt(mne_dot_vectors(fwd[k],fwd[k],d->nmeg+d->neeg)));
+  fprintf(stdout,"\n");
+#endif
+
+  /*
+   * Whiten
+   */
+  if (d->noise && whiten) {
+    if (mne_whiten_data(fwd,fwd,3,d->nmeg+d->neeg,d->noise) == FAIL)
+      goto bad;
+  }
+
+#ifdef DEBUG
+  fprintf(stdout,"white : ");
+  for (k = 0; k < 3; k++)
+    fprintf(stdout,"%g ",sqrt(mne_dot_vectors(fwd[k],fwd[k],d->nmeg+d->neeg)));
+  fprintf(stdout,"\n");
+#endif
+
+  return OK;
+
+ bad :
+    return FAIL;
+}
+
+
+
+
+
+dipoleForward dipole_forward(dipoleFitData d,
+                 float         **rd,
+                 int           ndip,
+                 dipoleForward old)
+/*
+ * Compute the forward solution and do other nice stuff
+ */
+{
+  dipoleForward res;
+  float         **this_fwd;
+  float         S[3];
+  int           k,p;
+  /*
+   * Allocate data if necessary
+   */
+  if (old && old->ndip == ndip && old->nch == d->nmeg+d->neeg) {
+    res = old;
+  }
+  else {
+    free_dipole_forward(old); old = NULL;
+    res = new_dipole_forward();
+    res->fwd  = ALLOC_CMATRIX(3*ndip,d->nmeg+d->neeg);
+    res->uu   = ALLOC_CMATRIX(3*ndip,d->nmeg+d->neeg);
+    res->vv   = ALLOC_CMATRIX(3*ndip,3);
+    res->sing = MALLOC(3*ndip,float);
+    res->nch  = d->nmeg+d->neeg;
+    res->rd   = ALLOC_CMATRIX(ndip,3);
+    res->scales = MALLOC(3*ndip,float);
+    res->ndip = ndip;
+  }
+  for (k = 0; k < ndip; k++) {
+    VEC_COPY(res->rd[k],rd[k]);
+    this_fwd = res->fwd + 3*k;
+    /*
+     * Calculate the field of three orthogonal dipoles
+     */
+    if ((compute_dipole_field(d,rd[k],TRUE,this_fwd)) == FAIL)
+      goto bad;
+    /*
+     * Choice of column normalization
+     * (componentwise normalization is not recommended)
+     */
+    if (d->column_norm == COLUMN_NORM_LOC || d->column_norm == COLUMN_NORM_COMP) {
+      for (p = 0; p < 3; p++)
+    S[p] = mne_dot_vectors(res->fwd[3*k+p],res->fwd[3*k+p],res->nch);
+      if (d->column_norm == COLUMN_NORM_COMP) {
+    for (p = 0; p < 3; p++)
+      res->scales[3*k+p] = sqrt(S[p]);
+      }
+      else {
+    /*
+     * Divide by three or not?
+     */
+    res->scales[3*k+0] = res->scales[3*k+1] = res->scales[3*k+2] = sqrt(S[0]+S[1]+S[2])/3.0;
+      }
+      for (p = 0; p < 3; p++) {
+    if (res->scales[3*k+p] > 0.0) {
+      res->scales[3*k+p] = 1.0/res->scales[3*k+p];
+      mne_scale_vector(res->scales[3*k+p],res->fwd[3*k+p],res->nch);
+    }
+    else
+      res->scales[3*k+p] = 1.0;
+      }
+    }
+    else {
+      res->scales[3*k]   = 1.0;
+      res->scales[3*k+1] = 1.0;
+      res->scales[3*k+2] = 1.0;
+    }
+  }
+  /*
+   * SVD
+   */
+  if (mne_svd(res->fwd,3*ndip,d->nmeg+d->neeg,res->sing,res->vv,res->uu) != 0)
+    goto bad;
+  return res;
+
+ bad : {
+    if (!old)
+      free_dipole_forward(res);
+    return NULL;
+  }
+}
+
+dipoleForward dipole_forward_one(dipoleFitData d,
+                 float         *rd,
+                 dipoleForward old)
+/*
+ * Convenience function to compute the field of one dipole
+ */
+{
+  float *rds[1];
+  rds[0] = rd;
+  return dipole_forward(d,rds,1,old);
+}
+
+
+
+
+
 
 
 
@@ -5442,6 +5787,46 @@ static int mne_lt_packed_index(int j, int k)
 }
 
 
+mneCovMatrix mne_dup_cov(mneCovMatrix c)
+
+{
+  double       *vals;
+  int          nval;
+  int          k;
+  mneCovMatrix res;
+
+  if (c->cov_diag)
+    nval = c->ncov;
+  else
+    nval = (c->ncov*(c->ncov+1))/2;
+
+  vals = MALLOC(nval,double);
+  if (c->cov_diag) {
+    for (k = 0; k < nval; k++)
+      vals[k] = c->cov_diag[k];
+    res = mne_new_cov(c->kind,c->ncov,mne_dup_name_list(c->names,c->ncov),NULL,vals);
+  }
+  else {
+    for (k = 0; k < nval; k++)
+      vals[k] = c->cov[k];
+    res = mne_new_cov(c->kind,c->ncov,mne_dup_name_list(c->names,c->ncov),vals,NULL);
+  }
+  /*
+   * Duplicate additional items
+   */
+  if (c->ch_class) {
+    res->ch_class = MALLOC(c->ncov,int);
+    for (k = 0; k < c->ncov; k++)
+      res->ch_class[k] = c->ch_class[k];
+  }
+  res->bads = mne_dup_name_list(c->bads,c->nbad);
+  res->nbad = c->nbad;
+  res->proj = mne_dup_proj_op(c->proj);
+  res->sss  = mne_dup_sss_data(c->sss);
+
+  return res;
+}
+
 
 
 void mne_free_cov(mneCovMatrix c)
@@ -5865,6 +6250,265 @@ int mne_classify_channels_cov(mneCovMatrix cov, fiffChInfo chs, int nchan)
 
 
 
+int mne_add_inv_cov(mneCovMatrix c)
+     /*
+      * Calculate the inverse square roots for whitening
+      */
+{
+  double *src = c->lambda ? c->lambda : c->cov_diag;
+  int k;
+
+  if (src == NULL) {
+    qCritical("Covariance matrix is not diagonal or not decomposed.");
+    return FAIL;
+  }
+  c->inv_lambda = REALLOC(c->inv_lambda,c->ncov,double);
+  for (k = 0; k < c->ncov; k++) {
+    if (src[k] <= 0.0)
+      c->inv_lambda[k] = 0.0;
+    else
+      c->inv_lambda[k] = 1.0/sqrt(src[k]);
+  }
+  return OK;
+}
+
+
+
+
+#define SMALL      1e-29
+#define MEG_SMALL  1e-29
+#define EEG_SMALL  1e-18
+
+typedef struct {
+  double lambda;
+  int    no;
+} *covSort,covSortRec;
+
+static int comp_cov(const void *v1, const void *v2)
+
+{
+  covSort s1 = (covSort)v1;
+  covSort s2 = (covSort)v2;
+  if (s1->lambda < s2->lambda)
+    return -1;
+  if (s1->lambda > s2->lambda)
+    return 1;
+  return 0;
+}
+
+static int condition_cov(mneCovMatrix c, float rank_threshold, int use_rank)
+
+{
+  double *scale  = NULL;
+  double *cov    = NULL;
+  double *lambda = NULL;
+  float  **eigen = NULL;
+  double **data1 = NULL;
+  double **data2 = NULL;
+  double magscale,gradscale,eegscale;
+  int    nmag,ngrad,neeg,nok;
+  int    j,k;
+  int    res = FAIL;
+
+  if (c->cov_diag)
+    return OK;
+  if (!c->ch_class) {
+    qCritical("Channels not classified. Rank cannot be determined.");
+    return FAIL;
+  }
+  magscale = gradscale = eegscale = 0.0;
+  nmag = ngrad = neeg = 0;
+  for (k = 0; k < c->ncov; k++) {
+    if (c->ch_class[k] == MNE_COV_CH_MEG_MAG) {
+      magscale += c->cov[mne_lt_packed_index(k,k)]; nmag++;
+    }
+    else if (c->ch_class[k] == MNE_COV_CH_MEG_GRAD) {
+      gradscale += c->cov[mne_lt_packed_index(k,k)]; ngrad++;
+    }
+    else if (c->ch_class[k] == MNE_COV_CH_EEG) {
+      eegscale += c->cov[mne_lt_packed_index(k,k)]; neeg++;
+    }
+#ifdef DEBUG
+    fprintf(stdout,"%d ",c->ch_class[k]);
+#endif
+  }
+#ifdef DEBUG
+  fprintf(stdout,"\n");
+#endif
+  if (nmag > 0)
+    magscale = magscale > 0.0 ? sqrt(nmag/magscale) : 0.0;
+  if (ngrad > 0)
+    gradscale = gradscale > 0.0 ? sqrt(ngrad/gradscale) : 0.0;
+  if (neeg > 0)
+    eegscale = eegscale > 0.0 ? sqrt(neeg/eegscale) : 0.0;
+#ifdef DEBUG
+  fprintf(stdout,"%d %g\n",nmag,magscale);
+  fprintf(stdout,"%d %g\n",ngrad,gradscale);
+  fprintf(stdout,"%d %g\n",neeg,eegscale);
+#endif
+  scale = MALLOC(c->ncov,double);
+  for (k = 0; k < c->ncov; k++) {
+    if (c->ch_class[k] == MNE_COV_CH_MEG_MAG)
+      scale[k] = magscale;
+    else if (c->ch_class[k] == MNE_COV_CH_MEG_GRAD)
+      scale[k] = gradscale;
+    else if (c->ch_class[k] == MNE_COV_CH_EEG)
+      scale[k] = eegscale;
+    else
+      scale[k] = 1.0;
+  }
+  cov    = MALLOC(c->ncov*(c->ncov+1)/2.0,double);
+  lambda = MALLOC(c->ncov,double);
+  eigen  = ALLOC_CMATRIX(c->ncov,c->ncov);
+  for (j = 0; j < c->ncov; j++)
+    for (k = 0; k <= j; k++)
+      cov[mne_lt_packed_index(j,k)] = c->cov[mne_lt_packed_index(j,k)]*scale[j]*scale[k];
+  if (mne_decompose_eigen (cov,lambda,eigen,c->ncov) == 0) {
+ #ifdef DEBUG
+    for (k = 0; k < c->ncov; k++)
+      fprintf(stdout,"%g ",lambda[k]/lambda[c->ncov-1]);
+    fprintf(stdout,"\n");
+#endif
+    nok = 0;
+    for (k = c->ncov-1; k >= 0; k--) {
+      if (lambda[k] >= rank_threshold*lambda[c->ncov-1])
+    nok++;
+      else
+    break;
+    }
+    printf("\n\tEstimated covariance matrix rank = %d (%g)\n",nok,lambda[c->ncov-nok]/lambda[c->ncov-1]);
+    if (use_rank > 0 && use_rank < nok) {
+      nok = use_rank;
+      fprintf(stderr,"\tUser-selected covariance matrix rank = %d (%g)\n",nok,lambda[c->ncov-nok]/lambda[c->ncov-1]);
+    }
+    /*
+     * Put it back together
+     */
+    for (j = 0; j < c->ncov-nok; j++)
+      lambda[j] = 0.0;
+    data1 = ALLOC_DCMATRIX(c->ncov,c->ncov);
+    for (j = 0; j < c->ncov; j++) {
+#ifdef DEBUG
+      mne_print_vector(stdout,NULL,eigen[j],c->ncov);
+#endif
+      for (k = 0; k < c->ncov; k++)
+    data1[j][k] = sqrt(lambda[j])*eigen[j][k];
+    }
+    data2 = mne_dmatt_dmat_mult2 (data1,data1,c->ncov,c->ncov,c->ncov);
+#ifdef DEBUG
+    printf(">>>\n");
+    for (j = 0; j < c->ncov; j++)
+      mne_print_dvector(stdout,NULL,data2[j],c->ncov);
+    printf(">>>\n");
+#endif
+    /*
+     * Scale back
+     */
+    for (k = 0; k < c->ncov; k++)
+      if (scale[k] > 0.0)
+    scale[k] = 1.0/scale[k];
+    for (j = 0; j < c->ncov; j++)
+      for (k = 0; k <= j; k++)
+    if (c->cov[mne_lt_packed_index(j,k)] != 0.0)
+      c->cov[mne_lt_packed_index(j,k)] = scale[j]*scale[k]*data2[j][k];
+    res = nok;
+  }
+  FREE(cov);
+  FREE(lambda);
+  FREE_CMATRIX(eigen);
+  FREE_DCMATRIX(data1);
+  FREE_DCMATRIX(data2);
+  return res;
+}
+
+
+
+
+
+
+
+
+
+
+
+static int mne_decompose_eigen_cov_small(mneCovMatrix c,float small, int use_rank)
+     /*
+      * Do the eigenvalue decomposition
+      */
+{
+  int   np,k,p,rank;
+  float rank_threshold = 1e-6;
+
+  if (small < 0)
+    small = 1.0;
+
+  if (!c)
+    return OK;
+  if (c->cov_diag)
+    return mne_add_inv_cov(c);
+  if (c->lambda && c->eigen) {
+    fprintf(stderr,"\n\tEigenvalue decomposition had been precomputed.\n");
+    c->nzero = 0;
+    for (k = 0; k < c->ncov; k++, c->nzero++)
+      if (c->lambda[k] > 0)
+    break;
+  }
+  else {
+    FREE(c->lambda); c->lambda = NULL;
+    FREE_CMATRIX(c->eigen); c->eigen = NULL;
+
+    if ((rank = condition_cov(c,rank_threshold,use_rank)) < 0)
+      return FAIL;
+
+    np = c->ncov*(c->ncov+1)/2;
+    c->lambda = MALLOC(c->ncov,double);
+    c->eigen  = ALLOC_CMATRIX(c->ncov,c->ncov);
+    if (mne_decompose_eigen (c->cov,c->lambda,c->eigen,c->ncov) != 0)
+      goto bad;
+    c->nzero = c->ncov - rank;
+    for (k = 0; k < c->nzero; k++)
+      c->lambda[k] = 0.0;
+    /*
+     * Find which eigenvectors correspond to EEG/MEG
+     */
+    {
+      float meglike,eeglike;
+      int   nmeg,neeg;
+
+      nmeg = neeg = 0;
+      for (k = c->nzero; k < c->ncov; k++) {
+    meglike = eeglike = 0.0;
+    for (p = 0; p < c->ncov; p++)  {
+      if (c->ch_class[p] == MNE_COV_CH_EEG)
+        eeglike += fabs(c->eigen[k][p]);
+      else if (c->ch_class[p] == MNE_COV_CH_MEG_MAG || c->ch_class[p] == MNE_COV_CH_MEG_GRAD)
+        meglike += fabs(c->eigen[k][p]);
+    }
+    if (meglike > eeglike)
+      nmeg++;
+    else
+      neeg++;
+      }
+      printf("\t%d MEG and %d EEG-like channels remain in the whitened data\n",nmeg,neeg);
+    }
+  }
+  return mne_add_inv_cov(c);
+
+  bad : {
+    FREE(c->lambda); c->lambda = NULL;
+    FREE_CMATRIX(c->eigen); c->eigen = NULL;
+    return FAIL;
+  }
+}
+
+
+int mne_decompose_eigen_cov(mneCovMatrix c)
+
+{
+  return mne_decompose_eigen_cov_small(c,-1.0,-1);
+}
+
+
 
 
 
@@ -6171,10 +6815,6 @@ static int setup_forward_model(dipoleFitData d, mneCTFcompDataSet comp_data, fwd
 
 
 
-
-
-
-
 static mneCovMatrix ad_hoc_noise(fwdCoilSet meg,          /* Channel name lists to define which channels are gradiometers */
                  fwdCoilSet eeg,
                  float      grad_std,
@@ -6386,6 +7026,139 @@ static void regularize_cov(mneCovMatrix c,       /* The matrix to regularize */
   printf("Noise-covariance regularized as requested.\n");
   return;
 }
+
+
+
+static int scale_dipole_fit_noise_cov(dipoleFitData f,int nave)
+
+{
+  float nave_ratio = ((float)f->nave)/(float)nave;
+  int   k;
+
+  if (!f->noise)
+    return OK;
+  if (f->fixed_noise)
+    return OK;
+
+  if (f->noise->cov) {
+    /*
+     * Do the decomposition and check that the matrix is positive definite
+     */
+    fprintf(stderr,"Decomposing the noise covariance...");
+    if (f->noise->cov) {
+      if (mne_decompose_eigen_cov(f->noise) == FAIL)
+    goto bad;
+      for (k = 0; k < f->noise->ncov; k++) {
+    if (f->noise->lambda[k] < 0.0)
+      f->noise->lambda[k] = 0.0;
+      }
+    }
+    for (k = 0; k < f->noise->ncov*(f->noise->ncov+1)/2; k++)
+      f->noise->cov[k] = nave_ratio*f->noise->cov[k];
+    for (k = 0; k < f->noise->ncov; k++) {
+      f->noise->lambda[k] = nave_ratio*f->noise->lambda[k];
+      if (f->noise->lambda[k] < 0.0)
+    f->noise->lambda[k] = 0.0;
+    }
+    if (mne_add_inv_cov(f->noise) == FAIL)
+      goto bad;
+  }
+  else {
+    for (k = 0; k < f->noise->ncov; k++)
+      f->noise->cov_diag[k] = nave_ratio*f->noise->cov_diag[k];
+    fprintf(stderr,"Decomposition not needed for a diagonal noise covariance matrix.\n");
+    if (mne_add_inv_cov(f->noise) == FAIL)
+      goto bad;
+  }
+  fprintf(stderr,"Effective nave is now %d\n",nave);
+  f->nave = nave;
+  return OK;
+
+ bad :
+  return FAIL;
+}
+
+
+
+int select_dipole_fit_noise_cov(dipoleFitData f, mshMegEegData d)
+/*
+ * Do the channel selection and scale with nave
+ */
+{
+  int   nave,j,k;
+  float nonsel_w  = 30;
+  int   min_nchan = 20;
+
+  if (!f || !f->noise_orig)
+    return OK;
+  if (!d)
+    nave = 1;
+  else {
+    if (d->nave < 0)
+      nave = d->meas->current->nave;
+    else
+      nave = d->nave;
+  }
+  /*
+   * Channel selection
+   */
+  if (d) {
+    float  *w    = MALLOC(f->noise_orig->ncov,float);
+    int    nomit_meg,nomit_eeg,nmeg,neeg;
+    double *val;
+
+    nmeg = neeg = 0;
+    nomit_meg = nomit_eeg = 0;
+    for (k = 0; k < f->noise_orig->ncov; k++) {
+      if (f->noise_orig->ch_class[k] == MNE_COV_CH_EEG)
+    neeg++;
+      else
+    nmeg++;
+      if (is_selected_in_data(d,f->noise_orig->names[k]))
+    w[k] = 1.0;
+      else {
+    w[k] = nonsel_w;
+    if (f->noise_orig->ch_class[k] == MNE_COV_CH_EEG)
+      nomit_eeg++;
+    else
+      nomit_meg++;
+      }
+    }
+    mne_free_cov(f->noise); f->noise = NULL;
+    if (nmeg > 0 && nmeg-nomit_meg > 0 && nmeg-nomit_meg < min_nchan) {
+      qCritical("Too few MEG channels remaining");
+      return FAIL;
+    }
+    if (neeg > 0 && neeg-nomit_eeg > 0 && neeg-nomit_eeg < min_nchan) {
+      qCritical("Too few EEG channels remaining");
+      return FAIL;
+    }
+    f->noise = mne_dup_cov(f->noise_orig);
+    if (nomit_meg+nomit_eeg > 0) {
+      if (f->noise->cov) {
+    for (j = 0; j < f->noise->ncov; j++)
+      for (k = 0; k <= j; k++) {
+        val = f->noise->cov+mne_lt_packed_index(j,k);
+        *val = w[j]*w[k]*(*val);
+      }
+      }
+      else {
+    for (j = 0; j < f->noise->ncov; j++) {
+      val  = f->noise->cov_diag+j;
+      *val = w[j]*w[j]*(*val);
+    }
+      }
+    }
+    FREE(w);
+  }
+  else {
+    if (f->noise && f->nave == nave)
+      return OK;
+    f->noise = mne_dup_cov(f->noise_orig);
+  }
+  return scale_dipole_fit_noise_cov(f,nave);
+}
+
 
 
 dipoleFitData setup_dipole_fit_data(char  *mriname,		 /* This gives the MRI/head transform */
@@ -6650,133 +7423,7 @@ dipoleFitData setup_dipole_fit_data(char  *mriname,		 /* This gives the MRI/head
   }
 }
 
-static int scale_dipole_fit_noise_cov(dipoleFitData f,int nave)
 
-{
-  float nave_ratio = ((float)f->nave)/(float)nave;
-  int   k;
-
-  if (!f->noise)
-    return OK;
-  if (f->fixed_noise)
-    return OK;
-
-  if (f->noise->cov) {
-    /*
-     * Do the decomposition and check that the matrix is positive definite
-     */
-    printf("Decomposing the noise covariance...");
-    if (f->noise->cov) {
-      if (mne_decompose_eigen_cov(f->noise) == FAIL)
-    goto bad;
-      for (k = 0; k < f->noise->ncov; k++) {
-    if (f->noise->lambda[k] < 0.0)
-      f->noise->lambda[k] = 0.0;
-      }
-    }
-    for (k = 0; k < f->noise->ncov*(f->noise->ncov+1)/2; k++)
-      f->noise->cov[k] = nave_ratio*f->noise->cov[k];
-    for (k = 0; k < f->noise->ncov; k++) {
-      f->noise->lambda[k] = nave_ratio*f->noise->lambda[k];
-      if (f->noise->lambda[k] < 0.0)
-    f->noise->lambda[k] = 0.0;
-    }
-    if (mne_add_inv_cov(f->noise) == FAIL)
-      goto bad;
-  }
-  else {
-    for (k = 0; k < f->noise->ncov; k++)
-      f->noise->cov_diag[k] = nave_ratio*f->noise->cov_diag[k];
-    printf("Decomposition not needed for a diagonal noise covariance matrix.\n");
-    if (mne_add_inv_cov(f->noise) == FAIL)
-      goto bad;
-  }
-  printf("Effective nave is now %d\n",nave);
-  f->nave = nave;
-  return OK;
-
- bad :
-  return FAIL;
-}
-
-int select_dipole_fit_noise_cov(dipoleFitData f, mshMegEegData d)
-/*
- * Do the channel selection and scale with nave
- */
-{
-  int   nave,j,k;
-  float nonsel_w  = 30;
-  int   min_nchan = 20;
-
-  if (!f || !f->noise_orig)
-    return OK;
-  if (!d)
-    nave = 1;
-  else {
-    if (d->nave < 0)
-      nave = d->meas->current->nave;
-    else
-      nave = d->nave;
-  }
-  /*
-   * Channel selection
-   */
-  if (d) {
-    float  *w    = MALLOC(f->noise_orig->ncov,float);
-    int    nomit_meg,nomit_eeg,nmeg,neeg;
-    double *val;
-
-    nmeg = neeg = 0;
-    nomit_meg = nomit_eeg = 0;
-    for (k = 0; k < f->noise_orig->ncov; k++) {
-      if (f->noise_orig->ch_class[k] == MNE_COV_CH_EEG)
-    neeg++;
-      else
-    nmeg++;
-      if (is_selected_in_data(d,f->noise_orig->names[k]))
-    w[k] = 1.0;
-      else {
-    w[k] = nonsel_w;
-    if (f->noise_orig->ch_class[k] == MNE_COV_CH_EEG)
-      nomit_eeg++;
-    else
-      nomit_meg++;
-      }
-    }
-    mne_free_cov(f->noise); f->noise = NULL;
-    if (nmeg > 0 && nmeg-nomit_meg > 0 && nmeg-nomit_meg < min_nchan) {
-      qCritical("Too few MEG channels remaining");
-      return FAIL;
-    }
-    if (neeg > 0 && neeg-nomit_eeg > 0 && neeg-nomit_eeg < min_nchan) {
-      qCritical("Too few EEG channels remaining");
-      return FAIL;
-    }
-    f->noise = mne_dup_cov(f->noise_orig);
-    if (nomit_meg+nomit_eeg > 0) {
-      if (f->noise->cov) {
-    for (j = 0; j < f->noise->ncov; j++)
-      for (k = 0; k <= j; k++) {
-        val = f->noise->cov+mne_lt_packed_index(j,k);
-        *val = w[j]*w[k]*(*val);
-      }
-      }
-      else {
-    for (j = 0; j < f->noise->ncov; j++) {
-      val  = f->noise->cov_diag+j;
-      *val = w[j]*w[j]*(*val);
-    }
-      }
-    }
-    FREE(w);
-  }
-  else {
-    if (f->noise && f->nave == nave)
-      return OK;
-    f->noise = mne_dup_cov(f->noise_orig);
-  }
-  return scale_dipole_fit_noise_cov(f,nave);
-}
 
 int compute_guess_fields(guessData guess,
              dipoleFitData f)
