@@ -66,6 +66,7 @@
 
 using namespace RTPROCESSINGLIB;
 using namespace FIFFLIB;
+using namespace IOBUFFER;
 using namespace UTILSLIB;
 
 

@@ -195,11 +195,11 @@ private:
     SCSHAREDLIB::PluginInputData<SCMEASLIB::NewRealTimeMultiSampleArray>::SPtr  m_pAveragingInput;      /**< The RealTimeSampleArray of the Averaging input.*/
     SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeEvoked>::SPtr              m_pAveragingOutput;     /**< The RealTimeEvoked of the Averaging output.*/
 
-    IOBuffer::CircularMatrixBuffer<double>::SPtr    m_pAveragingBuffer;             /**< Holds incoming data.*/
+    IOBUFFER::CircularMatrixBuffer<double>::SPtr    m_pAveragingBuffer;             /**< Holds incoming data.*/
 
     QSharedPointer<AveragingSettingsWidget>         m_pAveragingWidget;
 
-    QVector<FIFFLIB::FiffEvoked::SPtr>              m_qVecEvokedData;               /**< Evoked data set */
+    QVector<FIFFLIB::FiffEvokedSet::SPtr>           m_qVecEvokedData;               /**< Evoked data set */
 
     QMutex                                          m_qMutex;                       /**< Provides access serialization between threads*/
 

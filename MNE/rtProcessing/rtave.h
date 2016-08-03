@@ -351,7 +351,7 @@ private:
     QMap<double,bool>                               m_mapFillingBackBuffer;     /**< Whether the back buffer is currently getting filled. */
     QMap<double,qint32>                             m_mapNumberCalcAverages;    /**< The number of currently calculated averages for each trigger type. */
 
-    IOBuffer::CircularMatrixBuffer<double>::SPtr    m_pRawMatrixBuffer;         /**< The Circular Raw Matrix Buffer. */
+    IOBUFFER::CircularMatrixBuffer<double>::SPtr    m_pRawMatrixBuffer;         /**< The Circular Raw Matrix Buffer. */
 
 signals:
     //=========================================================================================================
