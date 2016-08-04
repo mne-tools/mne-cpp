@@ -179,6 +179,7 @@ void RealTimeButterflyPlot::paintEvent(QPaintEvent* paintEvent)
 
         painter.translate(0,this->height()/2);
 
+        //Actual average data
         for(qint32 r = 0; r < m_iNumChannels; ++r) {
             if(m_lSelectedChannels.contains(r)) {
                 qint32 kind = m_pRealTimeEvokedModel->getKind(r);
@@ -233,10 +234,7 @@ void RealTimeButterflyPlot::paintEvent(QPaintEvent* paintEvent)
                 } else
                     painter.setPen(QPen(m_pRealTimeEvokedModel->getColor(r), 1));
 
-                QPainterPath path(QPointF(1,0));
-                createPlotPath(r,path);
-
-                painter.drawPath(path);
+                createPlotPath(r, painter);
 
                 painter.restore();
             }
@@ -249,7 +247,7 @@ void RealTimeButterflyPlot::paintEvent(QPaintEvent* paintEvent)
 
 //*************************************************************************************************************
 
-void RealTimeButterflyPlot::createPlotPath(qint32 row, QPainterPath& path) const
+void RealTimeButterflyPlot::createPlotPath(qint32 row, QPainter& painter) const
 {
     //get maximum range of respective channel type (range value in FiffChInfo does not seem to contain a reasonable value)
     qint32 kind = m_pRealTimeEvokedModel->getKind(row);
@@ -257,7 +255,7 @@ void RealTimeButterflyPlot::createPlotPath(qint32 row, QPainterPath& path) const
 
     switch(kind) {
         case FIFFV_MEG_CH: {
-            qint32 unit =m_pRealTimeEvokedModel->getUnit(row);
+            qint32 unit = m_pRealTimeEvokedModel->getUnit(row);
             if(unit == FIFF_UNIT_T_M) { //gradiometers
                 fMaxValue = 1e-10f;
                 if(m_pRealTimeEvokedModel->getScaling().contains(FIFF_UNIT_T_M))
@@ -317,67 +315,82 @@ void RealTimeButterflyPlot::createPlotPath(qint32 row, QPainterPath& path) const
     if(iDownSampling < 1)
         iDownSampling = 1;
 
-    float y_base = path.currentPosition().y();
     QPointF qSamplePosition;
 
     float fDx = (float)(this->width()-2) / ((float)m_pRealTimeEvokedModel->getNumSamples()-1.0f);//((float)option.rect.width()) / m_pRealTimeEvokedModel->getMaxSamples();
 //    fDx *= iDownSampling;
 
-    RowVectorXd rowVec = m_pRealTimeEvokedModel->data(row,1).value<RowVectorXd>();
-    //Move to initial starting point
-    if(rowVec.size() > 0)
-    {
-        float val = rowVec[0];
-        fValue = (val/*-rowVec[m_pRealTimeEvokedModel->getNumPreStimSamples()-1]*/)*fScaleY;//ToDo -> -2 PreStim is one too short
+    QList<Eigen::RowVectorXd> rowVec = m_pRealTimeEvokedModel->data(row,1).value<QList<Eigen::RowVectorXd> >();
 
-        float newY = y_base+fValue;
+    qDebug() << "";
+    qDebug() << "RealTimeButterflyPlot::createPlotPath - rowVec.size()" << rowVec.size();
 
-        qSamplePosition.setY(-newY);
-        qSamplePosition.setX(path.currentPosition().x());
+    //Do for all average types
+    for(int j = 0; j < rowVec.size(); ++j) {
+        qDebug() << "RealTimeButterflyPlot::createPlotPath - rowVec["<<j<<"].size()" << rowVec.at(j).cols();
 
-        path.moveTo(qSamplePosition);
-    }
+        QPainterPath path(QPointF(1,0));
+        float y_base = path.currentPosition().y();
 
-    //create lines from one to the next sample
-    qint32 i;
-    for(i = 1; i < rowVec.size(); ++i) {
-
-//        if(i != m_pRealTimeEvokedModel->getNumPreStimSamples() - 2)
-//        {
-            float val = /*rowVec[m_pRealTimeEvokedModel->getNumPreStimSamples()-1] - */rowVec[i]; //remove first sample data[0] as offset
-            fValue = val*fScaleY;
-
-            fValue = fValue > fWinMaxVal ? fWinMaxVal : fValue < -fWinMaxVal ? -fWinMaxVal : fValue;
+        //Move to initial starting point
+        if(rowVec.at(j).cols() > 0)
+        {
+            float val = rowVec.at(j)[0];
+            fValue = (val/*-rowVec.at(j)[m_pRealTimeEvokedModel->getNumPreStimSamples()-1]*/)*fScaleY;//ToDo -> -2 PreStim is one too short
 
             float newY = y_base+fValue;
 
             qSamplePosition.setY(-newY);
-//        }
-//        else
-//            qSamplePosition.setY(y_base);
+            qSamplePosition.setX(path.currentPosition().x());
+
+            path.moveTo(qSamplePosition);
+        }
+
+        //create lines from one to the next sample
+        qint32 i;
+        for(i = 1; i < rowVec.at(j).cols(); ++i) {
+
+    //        if(i != m_pRealTimeEvokedModel->getNumPreStimSamples() - 2)
+    //        {
+                float val = /*rowVec.at(j)[m_pRealTimeEvokedModel->getNumPreStimSamples()-1] - */rowVec.at(j)[i]; //remove first sample data[0] as offset
+                fValue = val*fScaleY;
+
+                fValue = fValue > fWinMaxVal ? fWinMaxVal : fValue < -fWinMaxVal ? -fWinMaxVal : fValue;
+
+                //qDebug()<<"fValue"<<fValue;
+
+                float newY = y_base+fValue;
+
+                qSamplePosition.setY(-newY);
+    //        }
+    //        else
+    //            qSamplePosition.setY(y_base);
 
 
-        qSamplePosition.setX(path.currentPosition().x()+fDx);
+            qSamplePosition.setX(path.currentPosition().x()+fDx);
 
-        path.lineTo(qSamplePosition);
+            path.lineTo(qSamplePosition);
+        }
+
+    //    //create lines from one to the next sample for last path
+    //    qint32 sample_offset = m_pRealTimeEvokedModel->numVLines() + 1;
+    //    qSamplePosition.setX(qSamplePosition.x() + fDx*sample_offset);
+    //    lastPath.moveTo(qSamplePosition);
+
+    //    for(i += sample_offset; i < lastData.size(); ++i) {
+    //        float val = lastData[i] - lastData[0]; //remove first sample lastData[0] as offset
+    //        fValue = val*fScaleY;
+
+    //        float newY = y_base+fValue;
+
+    //        qSamplePosition.setY(newY);
+    //        qSamplePosition.setX(lastPath.currentPosition().x()+fDx);
+
+    //        lastPath.lineTo(qSamplePosition);
+    //    }
+
+        painter.drawPath(path);
     }
-
-//    //create lines from one to the next sample for last path
-//    qint32 sample_offset = m_pRealTimeEvokedModel->numVLines() + 1;
-//    qSamplePosition.setX(qSamplePosition.x() + fDx*sample_offset);
-//    lastPath.moveTo(qSamplePosition);
-
-//    for(i += sample_offset; i < lastData.size(); ++i) {
-//        float val = lastData[i] - lastData[0]; //remove first sample lastData[0] as offset
-//        fValue = val*fScaleY;
-
-//        float newY = y_base+fValue;
-
-//        qSamplePosition.setY(newY);
-//        qSamplePosition.setX(lastPath.currentPosition().x()+fDx);
-
-//        lastPath.lineTo(qSamplePosition);
-//    }
 }
 
 

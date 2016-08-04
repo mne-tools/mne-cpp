@@ -45,7 +45,7 @@
 #include <iostream>
 #include <time.h>
 
-#include <scMeas/realtimeevoked.h>
+#include <scMeas/realtimeevokedset.h>
 #include <scMeas/newrealtimemultisamplearray.h>
 
 
@@ -353,7 +353,7 @@ void Averaging::init()
     m_inputConnectors.append(m_pAveragingInput);
 
     // Output
-    m_pAveragingOutput = PluginOutputData<RealTimeEvoked>::create(this, "AveragingOut", "Averaging Output Data");
+    m_pAveragingOutput = PluginOutputData<RealTimeEvokedSet>::create(this, "AveragingOut", "Averaging Output Data");
     m_pAveragingOutput->data()->setName(this->getName());//Provide name to auto store widget settings
     m_outputConnectors.append(m_pAveragingOutput);
 
@@ -532,6 +532,7 @@ void Averaging::appendEvoked(FIFFLIB::FiffEvokedSet::SPtr p_pEvokedSet)
 
     for(int i = 0; i < p_pEvokedSet->evoked.size(); ++i) {
         qDebug() << p_pEvokedSet->evoked.at(i).comment <<"rows x cols:" << p_pEvokedSet->evoked.at(i).data.rows() << "x" << p_pEvokedSet->evoked.at(i).data.cols() << "-" << p_pEvokedSet->evoked.at(i).nave << "averages";
+        std::cout << p_pEvokedSet->evoked.at(i).data.block(0,0,10,10);
     }
 
     // << p_pEvoked->comment;
@@ -541,9 +542,9 @@ void Averaging::appendEvoked(FIFFLIB::FiffEvokedSet::SPtr p_pEvokedSet)
 //    if(p_pEvoked->comment == t_sStimulusChannel)
 //    {
 //        qDebug()<< "append" << p_pEvoked->comment << "=" << t_sStimulusChannel;
-        m_qMutex.lock();
-        m_qVecEvokedData.push_back(p_pEvokedSet);
-        m_qMutex.unlock();
+//        m_qMutex.lock();
+//        m_qVecEvokedData.push_back(p_pEvokedSet);
+//        m_qMutex.unlock();
 //        qDebug() << "append after" << m_qVecEvokedData.size();
 //    }
 }

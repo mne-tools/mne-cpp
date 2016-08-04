@@ -8,7 +8,7 @@
 
 #include "../scdisp_global.h"
 
-#include "realtimeevokedmodel.h"
+#include "realtimeevokedsetmodel.h"
 
 
 //*************************************************************************************************************
@@ -43,7 +43,9 @@ public:
 
     explicit RealTimeButterflyPlot(QWidget *parent = 0);
 
-    inline void setModel(RealTimeEvokedModel* model);
+    //inline void setModel(RealTimeEvokedModel* model);
+
+    inline void setModel(RealTimeEvokedSetModel* model);
 
     void dataUpdate(const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles = QVector<int>());
 
@@ -73,9 +75,8 @@ private:
     * createPlotPath creates the QPointer path for the data plot.
     *
     * @param[in] index QModelIndex for accessing associated data and model object.
-    * @param[in,out] path The QPointerPath to create for the data plot.
     */
-    void createPlotPath(qint32 row, QPainterPath& path) const;
+    void createPlotPath(qint32 row, QPainter& painter) const;
 
     bool                    m_bShowMAG;                         /**< Show Magnetometers channels */
     bool                    m_bShowGRAD;                        /**< Show Gradiometers channels */
@@ -90,7 +91,7 @@ private:
     float                   m_fMaxEOG;                          /**< Scale for EEG channels */
     float                   m_fMaxMISC;                         /**< Scale for Miscellaneous channels */
 
-    RealTimeEvokedModel*    m_pRealTimeEvokedModel;
+    RealTimeEvokedSetModel* m_pRealTimeEvokedModel;
 
     qint32                  m_iNumChannels;
 
@@ -105,12 +106,24 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline void RealTimeButterflyPlot::setModel(RealTimeEvokedModel* model)
+//inline void RealTimeButterflyPlot::setModel(RealTimeEvokedModel* model)
+//{
+//    m_pRealTimeEvokedModel = model;
+
+//    connect(m_pRealTimeEvokedModel, &RealTimeEvokedModel::dataChanged, this, &RealTimeButterflyPlot::dataUpdate);
+//}
+
+
+//*************************************************************************************************************
+
+inline void RealTimeButterflyPlot::setModel(RealTimeEvokedSetModel* model)
 {
     m_pRealTimeEvokedModel = model;
 
-    connect(m_pRealTimeEvokedModel, &RealTimeEvokedModel::dataChanged, this, &RealTimeButterflyPlot::dataUpdate);
+    connect(m_pRealTimeEvokedModel, &RealTimeEvokedSetModel::dataChanged,
+            this, &RealTimeButterflyPlot::dataUpdate);
 }
+
 
 } // NAMESPACE
 

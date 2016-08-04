@@ -72,7 +72,7 @@
 
 namespace SCMEASLIB{
     class NewRealTimeMultiSampleArray;
-    class RealTimeEvoked;
+    class RealTimeEvokedSet;
 }
 
 namespace RTPROCESSINGLIB{
@@ -193,7 +193,7 @@ private:
     void initConnector();
 
     SCSHAREDLIB::PluginInputData<SCMEASLIB::NewRealTimeMultiSampleArray>::SPtr  m_pAveragingInput;      /**< The RealTimeSampleArray of the Averaging input.*/
-    SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeEvoked>::SPtr              m_pAveragingOutput;     /**< The RealTimeEvoked of the Averaging output.*/
+    SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeEvokedSet>::SPtr           m_pAveragingOutput;     /**< The RealTimeEvoked of the Averaging output.*/
 
     IOBUFFER::CircularMatrixBuffer<double>::SPtr    m_pAveragingBuffer;             /**< Holds incoming data.*/
 

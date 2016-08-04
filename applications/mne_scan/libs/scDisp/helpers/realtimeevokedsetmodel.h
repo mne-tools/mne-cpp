@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     realtimeevokedmodel.h
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     realtimeevokedsetmodel.h
+* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     May, 2014
+* @date     August, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Declaration of the RealTimeEvokedModel Class.
+* @brief    Declaration of the RealTimeEvokedSetModel Class.
 *
 */
 
-#ifndef REALTIMEEVOKEDMODEL_H
-#define REALTIMEEVOKEDMODEL_H
+#ifndef REALTIMEEVOKEDSETMODEL_H
+#define REALTIMEEVOKEDSETMODEL_H
 
 
 //*************************************************************************************************************
@@ -43,7 +43,7 @@
 //=============================================================================================================
 
 #include <scMeas/realtimesamplearraychinfo.h>
-#include <scMeas/realtimeevoked.h>
+#include <scMeas/realtimeevokedset.h>
 #include <fiff/fiff_types.h>
 #include <iostream>
 
@@ -77,7 +77,7 @@
 namespace SCDISPLIB
 {
 
-namespace RealTimeEvokedModelRoles
+namespace RealTimeEvokedSetModelRoles
 {
     enum ItemRole{GetAverageData = Qt::UserRole + 1020};
 }
@@ -106,17 +106,17 @@ typedef Matrix<double,Dynamic,Dynamic,RowMajor> MatrixXdR;
 
 //=============================================================================================================
 /**
-* DECLARE CLASS RealTimeEvokedModel
+* DECLARE CLASS RealTimeEvokedSetModel
 *
-* @brief The RealTimeEvokedModel class implements the data access model for a real-time multi sample array data stream
+* @brief The RealTimeEvokedSetModel class implements the data access model for a real-time multi sample array data stream
 */
-class RealTimeEvokedModel : public QAbstractTableModel
+class RealTimeEvokedSetModel : public QAbstractTableModel
 {
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<RealTimeEvokedModel> SPtr;              /**< Shared pointer type for RealTimeEvokedModel. */
-    typedef QSharedPointer<const RealTimeEvokedModel> ConstSPtr;   /**< Const shared pointer type for RealTimeEvokedModel. */
+    typedef QSharedPointer<RealTimeEvokedSetModel> SPtr;              /**< Shared pointer type for RealTimeEvokedSetModel. */
+    typedef QSharedPointer<const RealTimeEvokedSetModel> ConstSPtr;   /**< Const shared pointer type for RealTimeEvokedSetModel. */
 
     //=========================================================================================================
     /**
@@ -124,8 +124,8 @@ public:
     *
     * @param[in] parent     parent of the table model
     */
-    RealTimeEvokedModel(QObject *parent = 0);
-    ~RealTimeEvokedModel();
+    RealTimeEvokedSetModel(QObject *parent = 0);
+    ~RealTimeEvokedSetModel();
 
     inline bool isInit() const;
 
@@ -188,11 +188,11 @@ public:
 
     //=========================================================================================================
     /**
-    * Sets corresponding real-time evoked
+    * Sets corresponding real-time evoked set
     *
-    * @param [in] pRTE      The real-time evoked
+    * @param [in] pRTESet      The real-time evoked set
     */
-    void setRTE(QSharedPointer<RealTimeEvoked> &pRTE);
+    void setRTESet(QSharedPointer<RealTimeEvokedSet> &pRTESet);
 
     //=========================================================================================================
     /**
@@ -271,6 +271,14 @@ public:
     * @return the current baseline information as a from to QPair
     */
     inline QPair<QVariant,QVariant> getBaselineInfo() const;
+
+    //=========================================================================================================
+    /**
+    * Returns the current number of stored averages
+    *
+    * @return the current number of stored averages
+    */
+    inline int RealTimeEvokedSetModel::getNumAverages() const;
 
     //=========================================================================================================
     /**
@@ -370,15 +378,6 @@ public:
     */
     void createFilterChannelList(QStringList channelNames);
 
-signals:
-    //=========================================================================================================
-    /**
-    * Emmited when new selcetion was made
-    *
-    * @param [in] selection     list of all selected channels
-    */
-    void newSelection(QList<qint32> selection);
-
 private:
     //=========================================================================================================
     /**
@@ -386,20 +385,18 @@ private:
     */
     void filterChannelsConcurrently();
 
-    QSharedPointer<RealTimeEvoked>      m_pRTE;                         /**< The real-time evoked measurement. */
+    QSharedPointer<RealTimeEvokedSet>   m_pRTESet;                      /**< The real-time evoked set measurement. */
 
     QMap<qint32,qint32>                 m_qMapIdxRowSelection;          /**< Selection mapping.*/
     QMap<qint32,float>                  m_qMapChScaling;                /**< Channel scaling map. */
 
-    Eigen::MatrixXd                     m_matData;                      /**< List that holds the data*/
-    Eigen::MatrixXd                     m_matDataFreeze;                /**< List that holds the data when freezed*/
+    QList<Eigen::MatrixXd>              m_matData;                      /**< List that holds the data*/
+    QList<Eigen::MatrixXd>              m_matDataFreeze;                /**< List that holds the data when freezed*/
+    QList<Eigen::MatrixXd>              m_matDataFiltered;              /**< The filtered data */
+    QList<Eigen::MatrixXd>              m_matDataFilteredFreeze;        /**< The raw filtered data in freeze mode */
 
     Eigen::MatrixXd                     m_matProj;                      /**< SSP projector */
     Eigen::MatrixXd                     m_matComp;                      /**< Compensator */
-
-    Eigen::MatrixXd                     m_matDataFiltered;              /**< The filtered data */
-    Eigen::MatrixXd                     m_matDataFilteredFreeze;        /**< The raw filtered data in freeze mode */
-
     Eigen::SparseMatrix<double>         m_matSparseProjCompMult;        /**< The final sparse projection + compensator operator.*/
     Eigen::SparseMatrix<double>         m_matSparseProjMult;            /**< The final sparse SSP projector */
     Eigen::SparseMatrix<double>         m_matSparseCompMult;            /**< The final sparse compensator matrix */
@@ -419,6 +416,15 @@ private:
     QList<FilterData>                   m_filterData;                   /**< List of currently active filters. */
     QStringList                         m_filterChannelList;            /**< List of channels which are to be filtered.*/
     QStringList                         m_visibleChannelList;           /**< List of currently visible channels in the view.*/
+
+signals:
+    //=========================================================================================================
+    /**
+    * Emmited when new selcetion was made
+    *
+    * @param [in] selection     list of all selected channels
+    */
+    void newSelection(QList<qint32> selection);
 };
 
 
@@ -428,7 +434,7 @@ private:
 //=============================================================================================================
 
 
-inline bool RealTimeEvokedModel::isInit() const
+inline bool RealTimeEvokedSetModel::isInit() const
 {
     return m_bIsInit;
 }
@@ -436,15 +442,21 @@ inline bool RealTimeEvokedModel::isInit() const
 
 //*************************************************************************************************************
 
-inline qint32 RealTimeEvokedModel::getNumSamples() const
+inline qint32 RealTimeEvokedSetModel::getNumSamples() const
 {
-    return m_bIsInit ? m_matData.cols() : 0;
+    qint32 iNumSamples = 0;
+
+    if(!m_matData.isEmpty()) {
+        iNumSamples = m_matData.first().cols();
+    }
+
+    return m_bIsInit ? iNumSamples : 0;
 }
 
 
 //*************************************************************************************************************
 
-inline QVariant RealTimeEvokedModel::data(int row, int column, int role) const
+inline QVariant RealTimeEvokedSetModel::data(int row, int column, int role) const
 {
     return data(index(row, column), role);
 }
@@ -452,7 +464,7 @@ inline QVariant RealTimeEvokedModel::data(int row, int column, int role) const
 
 //*************************************************************************************************************
 
-inline const QMap<qint32,qint32>& RealTimeEvokedModel::getIdxSelMap() const
+inline const QMap<qint32,qint32>& RealTimeEvokedSetModel::getIdxSelMap() const
 {
     return m_qMapIdxRowSelection;
 }
@@ -460,23 +472,29 @@ inline const QMap<qint32,qint32>& RealTimeEvokedModel::getIdxSelMap() const
 
 //*************************************************************************************************************
 
-inline qint32 RealTimeEvokedModel::numVLines() const
+inline qint32 RealTimeEvokedSetModel::numVLines() const
 {
-    return (qint32)(m_matData.cols()/m_fSps) - 1;
+    qint32 iNumSamples = 0;
+
+    if(!m_matData.isEmpty()) {
+        iNumSamples = m_matData.first().cols();
+    }
+
+    return (qint32)(iNumSamples/m_fSps) - 1;
 }
 
 
 //*************************************************************************************************************
 
-inline qint32 RealTimeEvokedModel::getNumPreStimSamples() const
+inline qint32 RealTimeEvokedSetModel::getNumPreStimSamples() const
 {
-    return m_pRTE->getNumPreStimSamples();
+    return m_pRTESet->getNumPreStimSamples();
 }
 
 
 //*************************************************************************************************************
 
-inline float RealTimeEvokedModel::getSamplingFrequency() const
+inline float RealTimeEvokedSetModel::getSamplingFrequency() const
 {
     return m_fSps;
 }
@@ -484,7 +502,7 @@ inline float RealTimeEvokedModel::getSamplingFrequency() const
 
 //*************************************************************************************************************
 
-inline bool RealTimeEvokedModel::isFreezed() const
+inline bool RealTimeEvokedSetModel::isFreezed() const
 {
     return m_bIsFreezed;
 }
@@ -492,7 +510,7 @@ inline bool RealTimeEvokedModel::isFreezed() const
 
 //*************************************************************************************************************
 
-inline const QMap< qint32,float >& RealTimeEvokedModel::getScaling() const
+inline const QMap< qint32,float >& RealTimeEvokedSetModel::getScaling() const
 {
     return m_qMapChScaling;
 }
@@ -500,31 +518,45 @@ inline const QMap< qint32,float >& RealTimeEvokedModel::getScaling() const
 
 //*************************************************************************************************************
 
-inline int RealTimeEvokedModel::getNumberOfTimeSpacers() const
+inline int RealTimeEvokedSetModel::getNumberOfTimeSpacers() const
 {
     //std::cout<<floor((m_matData.cols()/m_fSps)*10)<<std::endl;
-    return floor((m_matData.cols()/m_fSps)*10);
+    qint32 iNumSamples = 0;
+
+    if(!m_matData.isEmpty()) {
+        iNumSamples = m_matData.first().cols();
+    }
+
+    return floor((iNumSamples/m_fSps)*10);
 }
 
 
 //*************************************************************************************************************
 
-inline QPair<QVariant,QVariant> RealTimeEvokedModel::getBaselineInfo() const
+inline QPair<QVariant,QVariant> RealTimeEvokedSetModel::getBaselineInfo() const
 {
     //std::cout<<floor((m_matData.cols()/m_fSps)*10)<<std::endl;
     return m_pairBaseline;
 }
 
+
+//*************************************************************************************************************
+
+inline int RealTimeEvokedSetModel::getNumAverages() const
+{
+    return m_matData.size();
+}
+
 } // NAMESPACE
 
-#ifndef metatype_rowvectorxd
-#define metatype_rowvectorxd
-Q_DECLARE_METATYPE(Eigen::RowVectorXd);    /**< Provides QT META type declaration of the Eigen::RowVectorXd type. For signal/slot usage.*/
+#ifndef metatype_listrowvectorxd
+#define metatype_listrowvectorxd
+Q_DECLARE_METATYPE(QList<Eigen::RowVectorXd>);    /**< Provides QT META type declaration of the Eigen::RowVectorXd type. For signal/slot usage.*/
 #endif
 
-#ifndef metatype_rowvectorpair
-#define metatype_rowvectorpair
-Q_DECLARE_METATYPE(SCDISPLIB::RowVectorPair);
+#ifndef metatype_listrowvectorpair
+#define metatype_listrowvectorpair
+Q_DECLARE_METATYPE(QList<SCDISPLIB::RowVectorPair>);
 #endif
 
-#endif // REALTIMEEVOKEDMODEL_H
+#endif // REALTIMEEVOKEDSETMODEL_H

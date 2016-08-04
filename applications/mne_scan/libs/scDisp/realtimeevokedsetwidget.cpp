@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     realtimeevokedwidget.cpp
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     realtimeevokedsetwidget.cpp
+* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     July, 2014
+* @date     August, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the RealTimeEvokedWidget Class.
+* @brief    Implementation of the RealTimeEvokedSetWidget Class.
 *
 */
 
@@ -40,10 +40,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "realtimeevokedwidget.h"
+#include "realtimeevokedsetwidget.h"
 //#include "annotationwindow.h"
-
-#include <scMeas/realtimeevoked.h>
 
 
 //*************************************************************************************************************
@@ -103,12 +101,12 @@ enum Tool
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RealTimeEvokedWidget::RealTimeEvokedWidget(QSharedPointer<RealTimeEvoked> pRTE, QSharedPointer<QTime> &pTime, QWidget* parent)
+RealTimeEvokedSetWidget::RealTimeEvokedSetWidget(QSharedPointer<RealTimeEvokedSet> pRTESet, QSharedPointer<QTime> &pTime, QWidget* parent)
 : NewMeasurementWidget(parent)
-, m_pRTEModel(Q_NULLPTR)
+, m_pRTESetModel(Q_NULLPTR)
 , m_pButterflyPlot(Q_NULLPTR)
 , m_pAverageScene(Q_NULLPTR)
-, m_pRTE(pRTE)
+, m_pRTESet(pRTESet)
 , m_pQuickControlWidget(Q_NULLPTR)
 , m_pSelectionManagerWindow(Q_NULLPTR)
 , m_pChInfoModel(Q_NULLPTR)
@@ -122,7 +120,7 @@ RealTimeEvokedWidget::RealTimeEvokedWidget(QSharedPointer<RealTimeEvoked> pRTE, 
     m_pActionSelectSensors->setShortcut(tr("F11"));
     m_pActionSelectSensors->setStatusTip(tr("Show the region selection widget (F11)"));
     connect(m_pActionSelectSensors, &QAction::triggered,
-            this, &RealTimeEvokedWidget::showSensorSelectionWidget);
+            this, &RealTimeEvokedSetWidget::showSensorSelectionWidget);
     addDisplayAction(m_pActionSelectSensors);
     m_pActionSelectSensors->setVisible(false);
 
@@ -130,12 +128,12 @@ RealTimeEvokedWidget::RealTimeEvokedWidget(QSharedPointer<RealTimeEvoked> pRTE, 
     m_pActionQuickControl->setShortcut(tr("F9"));
     m_pActionQuickControl->setStatusTip(tr("Show quick control widget (F9)"));
     connect(m_pActionQuickControl, &QAction::triggered,
-            this, &RealTimeEvokedWidget::showQuickControlWidget);
+            this, &RealTimeEvokedSetWidget::showQuickControlWidget);
     addDisplayAction(m_pActionQuickControl);
     m_pActionQuickControl->setVisible(false);
 
     //set vertical layout
-    m_pRteLayout = new QVBoxLayout(this);
+    m_pRTESetLayout = new QVBoxLayout(this);
 
     //Acquire label
     m_pLabelInit= new QLabel(this);
@@ -143,7 +141,7 @@ RealTimeEvokedWidget::RealTimeEvokedWidget(QSharedPointer<RealTimeEvoked> pRTE, 
     m_pLabelInit->setAlignment(Qt::AlignCenter);
     QFont font;font.setBold(true);font.setPointSize(20);
     m_pLabelInit->setFont(font);
-    m_pRteLayout->addWidget(m_pLabelInit);
+    m_pRTESetLayout->addWidget(m_pLabelInit);
 
     //Create toolboxes with butterfly and 2D layout plot
     m_pToolBox = new QToolBox(this);
@@ -161,10 +159,10 @@ RealTimeEvokedWidget::RealTimeEvokedWidget(QSharedPointer<RealTimeEvoked> pRTE, 
     //m_pAverageLayoutView->installEventFilter(this);
     m_pToolBox->insertItem(0, m_pAverageLayoutView, QIcon(), "2D Layout plot");
 
-    m_pRteLayout->addWidget(m_pToolBox);
+    m_pRTESetLayout->addWidget(m_pToolBox);
 
     //set layouts
-    this->setLayout(m_pRteLayout);
+    this->setLayout(m_pRTESetLayout);
 
     getData();
 }
@@ -172,14 +170,14 @@ RealTimeEvokedWidget::RealTimeEvokedWidget(QSharedPointer<RealTimeEvoked> pRTE, 
 
 //*************************************************************************************************************
 
-RealTimeEvokedWidget::~RealTimeEvokedWidget()
+RealTimeEvokedSetWidget::~RealTimeEvokedSetWidget()
 {
     //
     // Store Settings
     //
-    if(!m_pRTE->getName().isEmpty())
+    if(!m_pRTESet->getName().isEmpty())
     {
-        QString t_sRTEWName = m_pRTE->getName();
+        QString t_sRTEWName = m_pRTESet->getName();
 
         QSettings settings;
 
@@ -241,7 +239,7 @@ RealTimeEvokedWidget::~RealTimeEvokedWidget()
 
 //*************************************************************************************************************
 
-void RealTimeEvokedWidget::update(SCMEASLIB::NewMeasurement::SPtr)
+void RealTimeEvokedSetWidget::update(SCMEASLIB::NewMeasurement::SPtr)
 {
     getData();
 }
@@ -249,50 +247,55 @@ void RealTimeEvokedWidget::update(SCMEASLIB::NewMeasurement::SPtr)
 
 //*************************************************************************************************************
 
-void RealTimeEvokedWidget::getData()
+void RealTimeEvokedSetWidget::getData()
 {
     if(!m_bInitialized) {
-        if(m_pRTE->isInitialized()) {
-            m_qListChInfo = m_pRTE->chInfo();
-            m_pFiffInfo = m_pRTE->info();
+        if(m_pRTESet->isInitialized()) {
+            m_qListChInfo = m_pRTESet->chInfo();
+            m_pFiffInfo = m_pRTESet->info();
 
-            m_iMaxFilterTapSize = m_pRTE->getValue()->data.cols();
+            if(!m_pRTESet->getValue()->evoked.isEmpty()) {
+                m_iMaxFilterTapSize = m_pRTESet->getValue()->evoked.first().data.cols();
+            }
+
             init();
 
-            m_pRTEModel->updateData();
+            m_pRTESetModel->updateData();
         }
     }
     else {
         //Check if block size has changed, if yes update the filter
-        if(m_iMaxFilterTapSize != m_pRTE->getValue()->data.cols()) {
-            m_iMaxFilterTapSize = m_pRTE->getValue()->data.cols();
+        if(!m_pRTESet->getValue()->evoked.isEmpty()) {
+            if(m_iMaxFilterTapSize != m_pRTESet->getValue()->evoked.first().data.cols()) {
+                m_iMaxFilterTapSize = m_pRTESet->getValue()->evoked.first().data.cols();
 
-            m_pFilterWindow->setWindowSize(m_iMaxFilterTapSize);
-            m_pFilterWindow->setMaxFilterTaps(m_iMaxFilterTapSize);
+                m_pFilterWindow->setWindowSize(m_iMaxFilterTapSize);
+                m_pFilterWindow->setMaxFilterTaps(m_iMaxFilterTapSize);
+            }
         }
 
-        m_pRTEModel->updateData();
+        m_pRTESetModel->updateData();
     }
 }
 
 
 //*************************************************************************************************************
 
-void RealTimeEvokedWidget::init()
+void RealTimeEvokedSetWidget::init()
 {
     if(m_qListChInfo.size() > 0)
     {
-        qDebug()<<"RealTimeEvokedWidget::init() - "<<m_pRTE->getName();
-        QString t_sRTEWName = m_pRTE->getName();
-        m_pRteLayout->removeWidget(m_pLabelInit);
+        qDebug()<<"RealTimeEvokedSetWidget::init() - "<<m_pRTESet->getName();
+        QString t_sRTEWName = m_pRTESet->getName();
+        m_pRTESetLayout->removeWidget(m_pLabelInit);
         m_pLabelInit->hide();
 
         m_pToolBox->show();
 
-        m_pRTEModel = RealTimeEvokedModel::SPtr(new RealTimeEvokedModel(this));
-        m_pRTEModel->setRTE(m_pRTE);
+        m_pRTESetModel = RealTimeEvokedSetModel::SPtr(new RealTimeEvokedSetModel(this));
+        m_pRTESetModel->setRTESet(m_pRTESet);
 
-        //m_pButterflyPlot->setModel(m_pRTEModel.data());
+        m_pButterflyPlot->setModel(m_pRTESetModel.data());
 
         //
         //-------- Init modalities --------
@@ -368,7 +371,7 @@ void RealTimeEvokedWidget::init()
                 availabeChannelTypes.append(type);
         }
 
-        QString t_sRTEName = m_pRTE->getName();
+        QString t_sRTEName = m_pRTESet->getName();
 
         if(!t_sRTEName.isEmpty())
         {
@@ -407,7 +410,7 @@ void RealTimeEvokedWidget::init()
                 m_qMapChScaling.insert(FIFFV_MISC_CH, val);
             }
 
-            m_pRTEModel->setScaling(m_qMapChScaling);
+            m_pRTESetModel->setScaling(m_qMapChScaling);
         }
 
         //
@@ -421,10 +424,10 @@ void RealTimeEvokedWidget::init()
         m_pFilterWindow->setMaxFilterTaps(m_iMaxFilterTapSize);
 
         connect(m_pFilterWindow.data(), static_cast<void (FilterWindow::*)(QString)>(&FilterWindow::applyFilter),
-                m_pRTEModel.data(),static_cast<void (RealTimeEvokedModel::*)(QString)>(&RealTimeEvokedModel::setFilterChannelType));
+                m_pRTESetModel.data(),static_cast<void (RealTimeEvokedSetModel::*)(QString)>(&RealTimeEvokedSetModel::setFilterChannelType));
 
         connect(m_pFilterWindow.data(), &FilterWindow::filterChanged,
-                m_pRTEModel.data(), &RealTimeEvokedModel::filterChanged);
+                m_pRTESetModel.data(), &RealTimeEvokedSetModel::filterChanged);
 
         //Init downsampled sampling frequency
         m_pFilterWindow->setSamplingRate(m_pFiffInfo->sfreq);
@@ -446,7 +449,7 @@ void RealTimeEvokedWidget::init()
         m_pSelectionManagerWindow = QSharedPointer<SelectionManagerWindow>(new SelectionManagerWindow(this, m_pChInfoModel));
 
         connect(m_pSelectionManagerWindow.data(), &SelectionManagerWindow::showSelectedChannelsOnly,
-                this, &RealTimeEvokedWidget::showSelectedChannelsOnly);
+                this, &RealTimeEvokedSetWidget::showSelectedChannelsOnly);
 
         //Connect channel info model
         connect(m_pSelectionManagerWindow.data(), &SelectionManagerWindow::loadedLayoutMap,
@@ -474,44 +477,44 @@ void RealTimeEvokedWidget::init()
 
         //Handle scaling
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::scalingChanged,
-                this, &RealTimeEvokedWidget::broadcastScaling);
+                this, &RealTimeEvokedSetWidget::broadcastScaling);
 
         //Handle signal color changes
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::signalColorChanged,
-                this, &RealTimeEvokedWidget::onSignalColorChanged);
+                this, &RealTimeEvokedSetWidget::onSignalColorChanged);
 
         //Handle background color changes
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::backgroundColorChanged,
-                this, &RealTimeEvokedWidget::onTableViewBackgroundColorChanged);
+                this, &RealTimeEvokedSetWidget::onTableViewBackgroundColorChanged);
 
         //Handle screenshot signals
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::makeScreenshot,
-                this, &RealTimeEvokedWidget::onMakeScreenshot);
+                this, &RealTimeEvokedSetWidget::onMakeScreenshot);
 
         //Handle compensators
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::compSelectionChanged,
-                m_pRTEModel.data(), &RealTimeEvokedModel::updateCompensator);
+                m_pRTESetModel.data(), &RealTimeEvokedSetModel::updateCompensator);
 
         //Handle projections
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::projSelectionChanged,
-                m_pRTEModel.data(), &RealTimeEvokedModel::updateProjection);
+                m_pRTESetModel.data(), &RealTimeEvokedSetModel::updateProjection);
 
         //Handle modalities
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::settingsChanged,
-                this, &RealTimeEvokedWidget::broadcastSettings);
+                this, &RealTimeEvokedSetWidget::broadcastSettings);
 
         //Handle filtering
         connect(m_pFilterWindow.data(), &FilterWindow::activationCheckBoxListChanged,
                 m_pQuickControlWidget.data(), &QuickControlWidget::filterGroupChanged);
 
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::showFilterOptions,
-                this, &RealTimeEvokedWidget::showFilterWidget);
+                this, &RealTimeEvokedSetWidget::showFilterWidget);
 
         //Handle updating the butterfly and layout plot
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::updateConnectedView,
                 m_pButterflyPlot.data(), &RealTimeButterflyPlot::updateView);
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::updateConnectedView,
-                this, &RealTimeEvokedWidget::onSelectionChanged);
+                this, &RealTimeEvokedSetWidget::onSelectionChanged);
 
         m_pQuickControlWidget->setViewParameters(settings.value(QString("RTEW/%1/viewZoomFactor").arg(t_sRTEWName), 1.0).toFloat(),
                                                      settings.value(QString("RTEW/%1/viewWindowSize").arg(t_sRTEWName), 10).toInt(),
@@ -527,7 +530,7 @@ void RealTimeEvokedWidget::init()
         m_pActionQuickControl->setVisible(true);
 
         //Activate projections as default
-        m_pRTEModel->updateProjection();
+        m_pRTESetModel->updateProjection();
 
         //
         //-------- Init average scene --------
@@ -539,13 +542,13 @@ void RealTimeEvokedWidget::init()
 
         //Connect selection manager with average manager
         connect(m_pSelectionManagerWindow.data(), &SelectionManagerWindow::selectionChanged,
-                this, &RealTimeEvokedWidget::channelSelectionManagerChanged);
+                this, &RealTimeEvokedSetWidget::channelSelectionManagerChanged);
 
-        connect(m_pRTEModel.data(), &RealTimeEvokedModel::dataChanged,
-                this, &RealTimeEvokedWidget::onSelectionChanged);
+        connect(m_pRTESetModel.data(), &RealTimeEvokedSetModel::dataChanged,
+                this, &RealTimeEvokedSetWidget::onSelectionChanged);
 
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::scalingChanged,
-                this, &RealTimeEvokedWidget::scaleAveragedData);
+                this, &RealTimeEvokedSetWidget::scaleAveragedData);
 
         //
         //-------- Init signal and background colors --------
@@ -566,7 +569,7 @@ void RealTimeEvokedWidget::init()
 
 //*************************************************************************************************************
 
-void RealTimeEvokedWidget::channelSelectionManagerChanged(const QList<QGraphicsItem*> &selectedChannelItems)
+void RealTimeEvokedSetWidget::channelSelectionManagerChanged(const QList<QGraphicsItem*> &selectedChannelItems)
 {
     //Repaint the average items in the average scene based on the input parameter selectedChannelItems
     m_pAverageScene->repaintItems(selectedChannelItems);
@@ -582,7 +585,7 @@ void RealTimeEvokedWidget::channelSelectionManagerChanged(const QList<QGraphicsI
 
 //*************************************************************************************************************
 
-void RealTimeEvokedWidget::scaleAveragedData(const QMap<qint32, float> &scaleMap)
+void RealTimeEvokedSetWidget::scaleAveragedData(const QMap<qint32, float> &scaleMap)
 {
     //Set the scale map received from the scale window
     m_pAverageScene->setScaleMap(scaleMap);
@@ -591,7 +594,7 @@ void RealTimeEvokedWidget::scaleAveragedData(const QMap<qint32, float> &scaleMap
 
 //*************************************************************************************************************
 
-void RealTimeEvokedWidget::showSensorSelectionWidget()
+void RealTimeEvokedSetWidget::showSensorSelectionWidget()
 {
     if(!m_pSelectionManagerWindow)
         m_pSelectionManagerWindow = QSharedPointer<SelectionManagerWindow>(new SelectionManagerWindow);
@@ -602,7 +605,7 @@ void RealTimeEvokedWidget::showSensorSelectionWidget()
 
 //*************************************************************************************************************
 
-void RealTimeEvokedWidget::showSelectedChannelsOnly(QStringList selectedChannels)
+void RealTimeEvokedSetWidget::showSelectedChannelsOnly(QStringList selectedChannels)
 {
     QList<int> selectedChannelsIndexes;
 
@@ -615,15 +618,15 @@ void RealTimeEvokedWidget::showSelectedChannelsOnly(QStringList selectedChannels
 
 //*************************************************************************************************************
 
-void RealTimeEvokedWidget::broadcastScaling(QMap<qint32,float> scaleMap)
+void RealTimeEvokedSetWidget::broadcastScaling(QMap<qint32,float> scaleMap)
 {
-    m_pRTEModel->setScaling(scaleMap);
+    m_pRTESetModel->setScaling(scaleMap);
 }
 
 
 //*************************************************************************************************************
 
-void RealTimeEvokedWidget::broadcastSettings(QList<Modality> modalityList)
+void RealTimeEvokedSetWidget::broadcastSettings(QList<Modality> modalityList)
 {
     m_qListModalities = modalityList;
     m_pButterflyPlot->setSettings(modalityList);
@@ -632,7 +635,7 @@ void RealTimeEvokedWidget::broadcastSettings(QList<Modality> modalityList)
 
 //*************************************************************************************************************
 
-void RealTimeEvokedWidget::showQuickControlWidget()
+void RealTimeEvokedSetWidget::showQuickControlWidget()
 {
     m_pQuickControlWidget->show();
 }
@@ -640,7 +643,7 @@ void RealTimeEvokedWidget::showQuickControlWidget()
 
 //*************************************************************************************************************
 
-void RealTimeEvokedWidget::onSelectionChanged()
+void RealTimeEvokedSetWidget::onSelectionChanged()
 {
     //Get current items from the average scene
     QList<QGraphicsItem *> currentAverageSceneItems = m_pAverageScene->items();
@@ -652,7 +655,7 @@ void RealTimeEvokedWidget::onSelectionChanged()
         averageSceneItemTemp->m_lAverageData.clear();
 
         //Get only the necessary data from the average model (use column 2)
-        RowVectorPair averageData = m_pRTEModel->data(0, 2, RealTimeEvokedModelRoles::GetAverageData).value<RowVectorPair>();
+        QList<SCDISPLIB::RowVectorPair> averageData = m_pRTESetModel->data(0, 2, RealTimeEvokedSetModelRoles::GetAverageData).value<QList<SCDISPLIB::RowVectorPair> >();
 
         //Get the averageScenItem specific data row
         int channelNumber = m_pChInfoModel->getIndexFromMappedChName(averageSceneItemTemp->m_sChannelName);
@@ -660,11 +663,15 @@ void RealTimeEvokedWidget::onSelectionChanged()
         if(channelNumber != -1) {
             averageSceneItemTemp->m_iChannelKind = m_pFiffInfo->chs.at(channelNumber).kind;
             averageSceneItemTemp->m_iChannelUnit = m_pFiffInfo->chs.at(channelNumber).unit;
-            averageSceneItemTemp->m_firstLastSample.first = (-1)*m_pRTE->getNumPreStimSamples();
-            averageSceneItemTemp->m_firstLastSample.second = averageData.second-m_pRTE->getNumPreStimSamples();
+            averageSceneItemTemp->m_firstLastSample.first = (-1)*m_pRTESet->getNumPreStimSamples();
+
+            if(!averageData.isEmpty()) {
+                averageSceneItemTemp->m_firstLastSample.second = averageData.first().second - m_pRTESet->getNumPreStimSamples();
+            }
+
             averageSceneItemTemp->m_iChannelNumber = channelNumber;
             averageSceneItemTemp->m_iTotalNumberChannels = m_pFiffInfo->ch_names.size();
-            averageSceneItemTemp->m_lAverageData.append(averageData);
+            averageSceneItemTemp->m_lAverageData = averageData;
         }
     }
 
@@ -674,7 +681,7 @@ void RealTimeEvokedWidget::onSelectionChanged()
 
 //*************************************************************************************************************
 
-void RealTimeEvokedWidget::showFilterWidget(bool state)
+void RealTimeEvokedSetWidget::showFilterWidget(bool state)
 {
     if(state) {
         if(m_pFilterWindow->isActiveWindow())
@@ -691,7 +698,7 @@ void RealTimeEvokedWidget::showFilterWidget(bool state)
 
 //*************************************************************************************************************
 
-void RealTimeEvokedWidget::onSignalColorChanged(const QColor& signalColor)
+void RealTimeEvokedSetWidget::onSignalColorChanged(const QColor& signalColor)
 {
     //Only change the signal colors in the 2D layout plot
     if(m_pToolBox->itemText(m_pToolBox->currentIndex()) == "2D Layout plot") {
@@ -702,7 +709,7 @@ void RealTimeEvokedWidget::onSignalColorChanged(const QColor& signalColor)
 
 //*************************************************************************************************************
 
-void RealTimeEvokedWidget::onTableViewBackgroundColorChanged(const QColor& backgroundColor)
+void RealTimeEvokedSetWidget::onTableViewBackgroundColorChanged(const QColor& backgroundColor)
 {
     //Handle the butterfly plot and 2d layout plot differently
     if(m_pToolBox->itemText(m_pToolBox->currentIndex()) == "2D Layout plot") {
@@ -719,7 +726,7 @@ void RealTimeEvokedWidget::onTableViewBackgroundColorChanged(const QColor& backg
 
 //*************************************************************************************************************
 
-void RealTimeEvokedWidget::onMakeScreenshot(const QString& imageType)
+void RealTimeEvokedSetWidget::onMakeScreenshot(const QString& imageType)
 {
     // Create file name
     QString sDate = QDate::currentDate().toString("yyyy_MM_dd");
@@ -783,7 +790,7 @@ void RealTimeEvokedWidget::onMakeScreenshot(const QString& imageType)
 
 //*************************************************************************************************************
 
-void RealTimeEvokedWidget::wheelEvent(QWheelEvent * event)
+void RealTimeEvokedSetWidget::wheelEvent(QWheelEvent * event)
 {
     Q_UNUSED(event)
 }
@@ -791,10 +798,10 @@ void RealTimeEvokedWidget::wheelEvent(QWheelEvent * event)
 
 //*************************************************************************************************************
 
-bool RealTimeEvokedWidget::eventFilter(QObject *object, QEvent *event)
+bool RealTimeEvokedSetWidget::eventFilter(QObject *object, QEvent *event)
 {
     if ((object == m_pButterflyPlot || object == m_pAverageLayoutView) && event->type() == QEvent::MouseButtonDblClick) {
-        m_pRTEModel->toggleFreeze();
+        m_pRTESetModel->toggleFreeze();
     }
     return false;
 }
