@@ -76,6 +76,7 @@
 using namespace FSLIB;
 using namespace MNELIB;
 using namespace DISP3DLIB;
+using namespace CONNECTIVITYLIB;
 
 
 //*************************************************************************************************************
@@ -345,7 +346,7 @@ QList<BrainRTSourceLocDataTreeItem*> Data3DTreeModel::addData(const QString& sub
 
 //*************************************************************************************************************
 
-QList<BrainRTConnectivityDataTreeItem*> Data3DTreeModel::addData(const QString& subject, const QString& set, const Eigen::MatrixXd& matConnection, const MNEForwardSolution& tForwardSolution)
+QList<BrainRTConnectivityDataTreeItem*> Data3DTreeModel::addData(const QString& subject, const QString& set, Network::SPtr pNetworkData, const MNEForwardSolution& tForwardSolution)
 {
     QList<BrainRTConnectivityDataTreeItem*> returnList;
 
@@ -367,7 +368,7 @@ QList<BrainRTConnectivityDataTreeItem*> Data3DTreeModel::addData(const QString& 
                 for(int i = 0; i<itemList.size(); i++) {
                     if(itemList.at(i)->type() == Data3DTreeModelItemTypes::SurfaceSetItem) {
                         if(BrainSurfaceSetTreeItem* pSetItem = dynamic_cast<BrainSurfaceSetTreeItem*>(itemList.at(i))) {
-                            returnList.append(pSetItem->addData(matConnection, tForwardSolution, m_pParentEntity));
+                            returnList.append(pSetItem->addData(pNetworkData, tForwardSolution, m_pParentEntity));
                         }
                     }
                 }
