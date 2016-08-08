@@ -42,7 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "connectivity_global.h"
+#include "../connectivity_global.h"
 #include "networknode.h"
 #include "networkedge.h"
 
@@ -111,6 +111,18 @@ public:
     * @return    The connectivity matrix generated from the current network information.
     */
     Eigen::MatrixXd getConnectivityMatrix();
+
+    //=========================================================================================================
+    /**
+    * Returns the edges.
+    */
+    QList<NetworkEdge::SPtr> getEdges();
+
+    //=========================================================================================================
+    /**
+    * Returns the nodes.
+    */
+    QList<NetworkNode::SPtr> getNodes();
 
     //=========================================================================================================
     /**

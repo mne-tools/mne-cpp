@@ -42,8 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "connectivity_global.h"
-
+#include "../connectivity_global.h"
 #include "networkedge.h"
 
 
@@ -107,15 +106,21 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns the in going edges.
+    * Returns the ingoing edges.
     */
     QList<NetworkEdge::SPtr> getEdgesIn();
 
     //=========================================================================================================
     /**
-    * Returns the in outgoing edges.
+    * Returns the outgoing edges.
     */
     QList<NetworkEdge::SPtr> getEdgesOut();
+
+    //=========================================================================================================
+    /**
+    * Returns the vertex (position) of the node.
+    */
+    const Eigen::RowVectorXf& getVert();
 
     //=========================================================================================================
     /**

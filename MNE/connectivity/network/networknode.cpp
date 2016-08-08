@@ -106,6 +106,14 @@ QList<NetworkEdge::SPtr> NetworkNode::getEdgesOut()
 
 //*************************************************************************************************************
 
+const RowVectorXf& NetworkNode::getVert()
+{
+    return m_vecVert;
+}
+
+
+//*************************************************************************************************************
+
 qint16 NetworkNode::getNodeNumber()
 {
     return m_iNodeNumber;

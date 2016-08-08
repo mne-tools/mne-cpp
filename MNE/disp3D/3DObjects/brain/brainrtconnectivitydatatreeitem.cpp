@@ -183,7 +183,6 @@ bool BrainRTConnectivityDataTreeItem::init(const MNEForwardSolution& tForwardSol
 
 bool BrainRTConnectivityDataTreeItem::addData(Network::SPtr pNetworkData)
 {
-    Q_UNUSED(matNewConnection)
     if(!m_bIsInit) {
         qDebug() << "BrainRTConnectivityDataTreeItem::updateData - Rt Item has not been initialized yet!";
         return false;
@@ -195,7 +194,7 @@ bool BrainRTConnectivityDataTreeItem::addData(Network::SPtr pNetworkData)
     qDebug() << "BrainRTConnectivityDataTreeItem::addData - matSourceVert.rows()" << matSourceVert.rows();
     qDebug() << "BrainRTConnectivityDataTreeItem::addData - matSourceNorm.rows()" << matSourceNorm.rows();
 
-    if(matSourceVert.rows() != matNewConnection.rows())
+    if(matSourceVert.rows() != pNetworkData->getNodes().size())
     {
         qDebug() << "BrainRTConnectivityDataTreeItem::addData - Number of network nodes and sources do not match!";
         return false;
@@ -216,11 +215,13 @@ bool BrainRTConnectivityDataTreeItem::addData(Network::SPtr pNetworkData)
     Qt3DExtras::QPhongMaterial* material;
 
     //Draw network nodes and generate connection indices for Qt3D buffer
-    for(int i = 0; i < matSourceVert.rows(); ++i)
+    QList<NetworkNode::SPtr> lNetworkNodes = pNetworkData->getNodes();
+
+    for(int i = 0; i < lNetworkNodes.size(); ++i)
     {
-        pos.setX(matSourceVert(i,0));
-        pos.setY(matSourceVert(i,1));
-        pos.setZ(matSourceVert(i,2));
+        pos.setX(lNetworkNodes.at(i)->getVert()(0));
+        pos.setY(lNetworkNodes.at(i)->getVert()(1));
+        pos.setZ(lNetworkNodes.at(i)->getVert()(2));
 
         sourceSphereEntity = new Qt3DCore::QEntity(m_pRenderable3DEntity);
 
