@@ -66,6 +66,7 @@
 //=============================================================================================================
 
 using namespace CONNECTIVITYLIB;
+using namespace Eigen;
 
 
 //*************************************************************************************************************
@@ -79,10 +80,53 @@ using namespace CONNECTIVITYLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-NetworkNode::NetworkNode(QObject *parent)
-    : QObject(parent)
+NetworkNode::NetworkNode(qint16 iNodeNumber, const RowVectorXf& vecVert, QObject *parent)
+: QObject(parent)
+, m_iNodeNumber(iNodeNumber)
+, m_vecVert(vecVert)
 {
 }
 
 
 //*************************************************************************************************************
+
+QList<NetworkEdge::SPtr> NetworkNode::getEdgesIn()
+{
+    return m_lEdgesIn;
+}
+
+
+//*************************************************************************************************************
+
+QList<NetworkEdge::SPtr> NetworkNode::getEdgesOut()
+{
+    return m_lEdgesOut;
+}
+
+
+//*************************************************************************************************************
+
+qint16 NetworkNode::getNodeNumber()
+{
+    return m_iNodeNumber;
+}
+
+
+//*************************************************************************************************************
+
+NetworkNode& NetworkNode::operator<<(NetworkEdge::SPtr newEdge)
+{
+    if(newEdge->getEndNodeNumber() == m_iNodeNumber) {
+        m_lEdgesIn << newEdge;
+    }
+
+    if(newEdge->getStartNodeNumber() == m_iNodeNumber) {
+        m_lEdgesOut << newEdge;
+    }
+
+    return *this;
+}
+
+
+//*************************************************************************************************************
+

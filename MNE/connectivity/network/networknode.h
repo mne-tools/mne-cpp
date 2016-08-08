@@ -42,6 +42,10 @@
 // INCLUDES
 //=============================================================================================================
 
+#include "connectivity_global.h"
+
+#include "networkedge.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -56,6 +60,8 @@
 //=============================================================================================================
 // Eigen INCLUDES
 //=============================================================================================================
+
+#include <Eigen/Core>
 
 
 //*************************************************************************************************************
@@ -85,7 +91,7 @@ namespace CONNECTIVITYLIB {
 * @brief This class holds an object to describe the node of a network.
 */
 
-class NetworkNode : public QObject
+class CONNECTIVITYSHARED_EXPORT NetworkNode : public QObject
 {
     Q_OBJECT
 
@@ -97,11 +103,43 @@ public:
     /**
     * Constructs a NetworkNode object.
     */
-    explicit NetworkNode(QObject *parent = 0);
+    explicit NetworkNode(qint16 iNodeNumber, const Eigen::RowVectorXf& vecVert, QObject *parent = 0);
+
+    //=========================================================================================================
+    /**
+    * Returns the in going edges.
+    */
+    QList<NetworkEdge::SPtr> getEdgesIn();
+
+    //=========================================================================================================
+    /**
+    * Returns the in outgoing edges.
+    */
+    QList<NetworkEdge::SPtr> getEdgesOut();
+
+    //=========================================================================================================
+    /**
+    * Returns the node number.
+    */
+    qint16 getNodeNumber();
+
+    //=========================================================================================================
+    /**
+    * Overloaded stream operator to add a network edge to this network node.
+    *
+    * @param[in] newEdge    The new edge item as a reference.
+    */
+    NetworkNode &operator<<(NetworkEdge::SPtr newEdge);
 
 protected:
 
 private:
+    qint16                      m_iNodeNumber;
+
+    Eigen::RowVectorXf          m_vecVert;
+
+    QList<NetworkEdge::SPtr>    m_lEdgesIn;
+    QList<NetworkEdge::SPtr>    m_lEdgesOut;
 
 signals:
 

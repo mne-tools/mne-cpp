@@ -43,6 +43,7 @@
 //=============================================================================================================
 
 #include "connectivity_global.h"
+#include "network/network.h"
 
 
 //*************************************************************************************************************
@@ -79,7 +80,7 @@ namespace CONNECTIVITYLIB {
 
 //*************************************************************************************************************
 //=============================================================================================================
-// CONNECTLIB FORWARD DECLARATIONS
+// CONNECTIVITYLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
 
@@ -106,11 +107,22 @@ public:
     /**
     * Calculates the cross correlation between the rows of the data matrix.
     *
-    * @param[in] matDataIn  The input data for whicht the cross correlation is to be calcualted.
+    * @param[in] matData    The input data for whicht the cross correlation is to be calcualted.
+    * @param[in] matVert    The vertices of each network node.
+    *
+    * @return               The connectivity information in form of a network structure.
+    */
+    static Network::SPtr crossCorrelation(const Eigen::MatrixXd& matData, const Eigen::MatrixX3f& matVert = Eigen::MatrixX3f::Zero());
+
+    //=========================================================================================================
+    /**
+    * Calculates the cross correlation between the rows of the data matrix.
+    *
+    * @param[in] matData    The input data for whicht the cross correlation is to be calcualted.
     *
     * @return               The connectivity matrix.
     */
-    static Eigen::MatrixXd crossCorrelation(const Eigen::MatrixXd& matDataIn);
+    static Eigen::MatrixXd crossCorrelation(const Eigen::MatrixXd& matData);
 
 protected:
     static QPair<int,double> eigenCrossCorrelation(const Eigen::RowVectorXd &xCorrInputVecFirst, const Eigen::RowVectorXd &xCorrInputVecSecond);

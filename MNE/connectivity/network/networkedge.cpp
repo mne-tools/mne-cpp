@@ -79,10 +79,38 @@ using namespace CONNECTIVITYLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-NetworkEdge::NetworkEdge(QObject *parent)
-    : QObject(parent)
+NetworkEdge::NetworkEdge(qint16 iStart, qint16 iEnd, double dWeight, QObject *parent)
+: QObject(parent)
+, m_iStartNodeNumber(iStart)
+, m_iEndNodeNumber(iEnd)
+, m_dWeight(dWeight)
 {
 }
 
 
 //*************************************************************************************************************
+
+
+qint16 NetworkEdge::getStartNodeNumber()
+{
+    return m_iStartNodeNumber;
+}
+
+
+//*************************************************************************************************************
+
+qint16 NetworkEdge::getEndNodeNumber()
+{
+    return m_iEndNodeNumber;
+}
+
+
+//*************************************************************************************************************
+
+double NetworkEdge::getWeight()
+{
+    return m_dWeight;
+}
+
+
+

@@ -246,8 +246,38 @@ int main(int argc, char *argv[])
     //
     //########################################################################################
 
-    MatrixXd matConnect_LA = ConnectivityMeasures::crossCorrelation(sourceEstimate_LA.data);
-    std::cout << "\matConnect_LA:\n" << matConnect_LA.block(0,0,10,10) << std::endl;
+    //Generate node vertices
+    MatrixX3f matNodeVertLeft, matNodeVertRight, matNodeVertComb;
+
+    if(t_Fwd.isClustered()) {
+        matNodeVertLeft.resize(t_Fwd.src[0].cluster_info.centroidVertno.size(),3);
+
+        for(int j = 0; j < matNodeVertLeft.rows(); ++j) {
+            matNodeVertLeft.row(j) = tSurfSet[0].rr().row(t_Fwd.src[0].cluster_info.centroidVertno.at(j));
+        }
+
+        matNodeVertRight.resize(t_Fwd.src[1].cluster_info.centroidVertno.size(),3);
+        for(int j = 0; j < matNodeVertRight.rows(); ++j) {
+            matNodeVertRight.row(j) = tSurfSet[1].rr().row(t_Fwd.src[1].cluster_info.centroidVertno.at(j));
+        }
+    } else {
+        matNodeVertLeft.resize(t_Fwd.src[0].vertno.rows(),3);
+        for(int j = 0; j < matNodeVertLeft.rows(); ++j) {
+            matNodeVertLeft.row(j) = tSurfSet[0].rr().row(t_Fwd.src[0].vertno(j));
+        }
+
+        matNodeVertRight.resize(t_Fwd.src[1].vertno.rows(),3);
+        for(int j = 0; j < matNodeVertRight.rows(); ++j) {
+            matNodeVertRight.row(j) = tSurfSet[1].rr().row(t_Fwd.src[1].vertno(j));
+        }
+    }
+
+    matNodeVertComb.resize(matNodeVertLeft.rows()+matNodeVertRight.rows(),3);
+    matNodeVertComb << matNodeVertLeft, matNodeVertRight;
+
+    Network::SPtr pConnect_LA = ConnectivityMeasures::crossCorrelation(sourceEstimate_LA.data, matNodeVertComb);
+
+    MatrixXd matConnect_LA = pConnect_LA->getConnectivityMatrix();
 
     ImageSc* pPlot = new ImageSc(matConnect_LA);
     pPlot->show();
