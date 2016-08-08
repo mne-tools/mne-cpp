@@ -87,6 +87,7 @@
 using namespace FSLIB;
 using namespace MNELIB;
 using namespace DISP3DLIB;
+using namespace CONNECTIVITYLIB;
 
 
 //*************************************************************************************************************
@@ -386,7 +387,7 @@ bool BrainSurfaceSetTreeItem::addData(const FiffDigPointSet &tDigitizer, Qt3DCor
 
 //*************************************************************************************************************
 
-BrainRTConnectivityDataTreeItem* BrainSurfaceSetTreeItem::addData(const Eigen::MatrixXd& matConnection, const MNEForwardSolution& tForwardSolution, Qt3DCore::QEntity* p3DEntityParent)
+BrainRTConnectivityDataTreeItem* BrainSurfaceSetTreeItem::addData(Network::SPtr pNetworkData, const MNEForwardSolution& tForwardSolution, Qt3DCore::QEntity* p3DEntityParent)
 {
     if(matConnection.rows() != 0 || matConnection.cols() != 0) {
         //Add source estimation data as child
@@ -401,12 +402,12 @@ BrainRTConnectivityDataTreeItem* BrainSurfaceSetTreeItem::addData(const Eigen::M
                 this->appendRow(list);
 
                 m_pBrainRTConnectivityDataTreeItem->init(tForwardSolution, p3DEntityParent);
-                m_pBrainRTConnectivityDataTreeItem->addData(matConnection);
+                m_pBrainRTConnectivityDataTreeItem->addData(pNetworkData);
             } else {
                 qDebug() << "BrainSurfaceSetTreeItem::addData - Cannot add real time connectivity data since the forwad solution was not provided and therefore the rt connecntivity data item has not been initilaized yet. Returning...";
             }
         } else {
-            m_pBrainRTConnectivityDataTreeItem->addData(matConnection);
+            m_pBrainRTConnectivityDataTreeItem->addData(pNetworkData);
         }
 
         return m_pBrainRTConnectivityDataTreeItem;

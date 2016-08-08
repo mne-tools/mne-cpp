@@ -46,6 +46,8 @@
 #include "../../helpers/abstracttreeitem.h"
 #include "../../helpers/types.h"
 
+#include <connectivity/network/network.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -145,11 +147,11 @@ public:
     /**
     * Adds actual rt connectivity data which is streamed by this item's worker thread item. In order for this function to worker, you must call init(...) beforehand.
     *
-    * @param[in] matNewConnection    The new connectivity data.
+    * @param[in] pNetworkData       The new connectivity data.
     *
     * @return                       Returns true if successful.
     */
-    bool addData(const Eigen::MatrixXd& matNewConnection);
+    bool addData(CONNECTIVITYLIB::Network::SPtr pNetworkData);
 
     //=========================================================================================================
     /**

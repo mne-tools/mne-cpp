@@ -82,6 +82,7 @@
 using namespace Eigen;
 using namespace MNELIB;
 using namespace DISP3DLIB;
+using namespace CONNECTIVITYLIB;
 
 
 //*************************************************************************************************************
@@ -180,7 +181,7 @@ bool BrainRTConnectivityDataTreeItem::init(const MNEForwardSolution& tForwardSol
 
 //*************************************************************************************************************
 
-bool BrainRTConnectivityDataTreeItem::addData(const MatrixXd& matNewConnection)
+bool BrainRTConnectivityDataTreeItem::addData(Network::SPtr pNetworkData)
 {
     Q_UNUSED(matNewConnection)
     if(!m_bIsInit) {

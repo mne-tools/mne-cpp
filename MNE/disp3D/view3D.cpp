@@ -74,6 +74,7 @@
 using namespace MNELIB;
 using namespace DISP3DLIB;
 using namespace FSLIB;
+using namespace CONNECTIVITYLIB;
 
 
 //*************************************************************************************************************
@@ -217,9 +218,9 @@ QList<BrainRTSourceLocDataTreeItem*> View3D::addRtSourceData(const QString& subj
 
 //*************************************************************************************************************
 
-QList<BrainRTConnectivityDataTreeItem*> View3D::addRtConnectivityData(const QString& subject, const QString& set, const Eigen::MatrixXd& matConnection, const MNEForwardSolution& tForwardSolution)
+QList<BrainRTConnectivityDataTreeItem*> View3D::addRtConnectivityData(const QString& subject, const QString& set, Network::SPtr pNetworkData, const MNEForwardSolution& tForwardSolution)
 {
-    return m_pData3DTreeModel->addData(subject, set, matConnection, tForwardSolution);
+    return m_pData3DTreeModel->addData(subject, set, pNetworkData, tForwardSolution);
 }
 
 
