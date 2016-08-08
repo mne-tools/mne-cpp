@@ -537,9 +537,6 @@ FiffEvoked & FiffEvoked::operator+=(const MatrixXd &newData)
     //Init matrix if necessary
     if(nave == -1 || nave == 0) {
         data = MatrixXd::Zero(newData.rows(),newData.cols());
-
-        //Iterate nave here already since it is assigned -1 by default
-        nave++;
     }
 
     if(data.cols() == newData.cols() && data.rows() == newData.rows()) {
@@ -548,7 +545,12 @@ FiffEvoked & FiffEvoked::operator+=(const MatrixXd &newData)
 
         //Do new averaging
         data += newData;
-        nave++;
+        if(nave <= 0) {
+            nave = 1;
+        } else {
+            nave++;
+        }
+
         data /= nave;
     }
 

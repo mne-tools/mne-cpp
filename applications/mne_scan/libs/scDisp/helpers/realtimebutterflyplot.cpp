@@ -322,13 +322,8 @@ void RealTimeButterflyPlot::createPlotPath(qint32 row, QPainter& painter) const
 
     QList<Eigen::RowVectorXd> rowVec = m_pRealTimeEvokedModel->data(row,1).value<QList<Eigen::RowVectorXd> >();
 
-    qDebug() << "";
-    qDebug() << "RealTimeButterflyPlot::createPlotPath - rowVec.size()" << rowVec.size();
-
     //Do for all average types
     for(int j = 0; j < rowVec.size(); ++j) {
-        qDebug() << "RealTimeButterflyPlot::createPlotPath - rowVec["<<j<<"].size()" << rowVec.at(j).cols();
-
         QPainterPath path(QPointF(1,0));
         float y_base = path.currentPosition().y();
 
@@ -356,8 +351,6 @@ void RealTimeButterflyPlot::createPlotPath(qint32 row, QPainter& painter) const
                 fValue = val*fScaleY;
 
                 fValue = fValue > fWinMaxVal ? fWinMaxVal : fValue < -fWinMaxVal ? -fWinMaxVal : fValue;
-
-                //qDebug()<<"fValue"<<fValue;
 
                 float newY = y_base+fValue;
 
