@@ -66,6 +66,7 @@
 //=============================================================================================================
 
 using namespace CONNECTIVITYLIB;
+using namespace Eigen;
 
 
 //*************************************************************************************************************
@@ -79,10 +80,61 @@ using namespace CONNECTIVITYLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Network::Network(QObject *parent)
-: QObject(parent)
+Network::Network()
 {
 }
 
 
 //*************************************************************************************************************
+
+MatrixXd Network::getConnectivityMatrix()
+{
+    return generateConnectMat();
+}
+
+
+//*************************************************************************************************************
+
+Network& Network::operator<<(NetworkEdge::SPtr newEdge)
+{
+    m_lEdges << newEdge;
+
+    return *this;
+}
+
+
+//*************************************************************************************************************
+
+Network& Network::operator<<(NetworkNode::SPtr newNode)
+{
+    m_lNodes << newNode;
+
+    return *this;
+}
+
+
+//*************************************************************************************************************
+
+MatrixXd Network::generateConnectMat()
+{
+    MatrixXd matDist(m_lNodes.size(), m_lNodes.size());
+    matDist.setZero();
+
+    for(int i = 0; i < m_lEdges.size(); ++i)
+    {
+        int row = m_lEdges.at(i)->getStartNodeNumber();
+        int col = m_lEdges.at(i)->getEndNodeNumber();
+
+        if(row < matDist.rows() && col < matDist.cols())
+        {
+            matDist(row,col) = m_lEdges.at(i)->getWeight();
+        }
+    }
+
+    return matDist;
+}
+
+
+
+
+

@@ -40,6 +40,8 @@
 //=============================================================================================================
 
 #include "connectivitymeasures.h"
+#include "network/networknode.h"
+#include "network/networkedge.h"
 
 #include <iostream>
 
@@ -91,19 +93,59 @@ ConnectivityMeasures::ConnectivityMeasures()
 
 //*************************************************************************************************************
 
-Eigen::MatrixXd ConnectivityMeasures::crossCorrelation(const Eigen::MatrixXd& matDataIn)
+Network::SPtr ConnectivityMeasures::crossCorrelation(const MatrixXd& matData, const MatrixX3f& matVert)
 {
-    MatrixXd matDist = MatrixXd::Zero(matDataIn.rows(), matDataIn.rows());
+    Network::SPtr finalNetwork  = Network::SPtr(new Network());
+
+    for(int i = 0; i < matData.rows(); ++i)
+    {
+        QPair<int,double> crossCorrPair = eigenCrossCorrelation(matData.row(i), matData.row(i));
+
+        RowVectorXf rowVert = RowVectorXf::Zero(3);
+        if(matVert.rows() != 0) {
+            rowVert = matVert.row(i);
+        }
+
+        NetworkNode::SPtr node = NetworkNode::SPtr(new NetworkNode(i, rowVert));
+
+        double dScaling = crossCorrPair.second;
+        int start = i;
+
+        for(int j = i; j < matData.rows(); ++j)
+        {
+            int end = j;
+            QPair<int,double> crossCorrPair = eigenCrossCorrelation(matData.row(i), matData.row(j));
+
+            NetworkEdge::SPtr pEdge = NetworkEdge::SPtr(new NetworkEdge(start, end, crossCorrPair.second/* / dScaling*/));
+            *node << pEdge;
+            *finalNetwork << pEdge;
+        }
+
+        *finalNetwork << node;
+    }
+
+//    finalNetwork.scale();
+//    matDist /= matDist.maxCoeff();
+
+    return finalNetwork;
+}
+
+
+//*************************************************************************************************************
+
+Eigen::MatrixXd ConnectivityMeasures::crossCorrelation(const MatrixXd& matData)
+{
+    MatrixXd matDist = MatrixXd::Zero(matData.rows(), matData.rows());
 
     for(int i = 0; i < matDist.rows(); ++i)
     {
-        QPair<int,double> crossCorrPair = eigenCrossCorrelation(matDataIn.row(i), matDataIn.row(i));
+        QPair<int,double> crossCorrPair = eigenCrossCorrelation(matData.row(i), matData.row(i));
 
         double dScaling = crossCorrPair.second;
 
         for(int j = i; j < matDist.rows(); ++j)
         {
-            QPair<int,double> crossCorrPair = eigenCrossCorrelation(matDataIn.row(i), matDataIn.row(j));
+            QPair<int,double> crossCorrPair = eigenCrossCorrelation(matData.row(i), matData.row(j));
             matDist(i,j) = crossCorrPair.second/* / dScaling*/;
         }
     }

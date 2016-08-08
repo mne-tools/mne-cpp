@@ -42,6 +42,10 @@
 // INCLUDES
 //=============================================================================================================
 
+#include "connectivity_global.h"
+#include "networknode.h"
+#include "networkedge.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -56,6 +60,8 @@
 //=============================================================================================================
 // Eigen INCLUDES
 //=============================================================================================================
+
+#include <Eigen/Core>
 
 
 //*************************************************************************************************************
@@ -85,9 +91,8 @@ namespace CONNECTIVITYLIB {
 * @brief Brief description of this class.
 */
 
-class Network : public QObject
+class CONNECTIVITYSHARED_EXPORT Network
 {
-    Q_OBJECT
 
 public:
     typedef QSharedPointer<Network> SPtr;            /**< Shared pointer type for Network. */
@@ -97,13 +102,45 @@ public:
     /**
     * Constructs a Network object.
     */
-    explicit Network(QObject *parent = 0);
+    explicit Network();
+
+    //=========================================================================================================
+    /**
+    * Returns the connectivity matrix for this network structure.
+    *
+    * @return    The connectivity matrix generated from the current network information.
+    */
+    Eigen::MatrixXd getConnectivityMatrix();
+
+    //=========================================================================================================
+    /**
+    * Overloaded stream operator to add a network edge to this network.
+    *
+    * @param[in] newEdge    The new edge item as a reference.
+    */
+    Network &operator<<(NetworkEdge::SPtr newEdge);
+
+    //=========================================================================================================
+    /**
+    * Overloaded stream operator to add a network node to this network.
+    *
+    * @param[in] newNode    The new node item as a reference.
+    */
+    Network &operator<<(NetworkNode::SPtr newNode);
 
 protected:
 
 private:
+    QList<NetworkEdge::SPtr>    m_lEdges;
+    QList<NetworkNode::SPtr>    m_lNodes;
 
-signals:
+    //=========================================================================================================
+    /**
+    * Returns the connectivity matrix for this network structure.
+    *
+    * @return    The connectivity matrix generated from the current network information.
+    */
+    Eigen::MatrixXd generateConnectMat();
 
 };
 

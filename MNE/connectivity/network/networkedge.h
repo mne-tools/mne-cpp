@@ -42,6 +42,8 @@
 // INCLUDES
 //=============================================================================================================
 
+#include "connectivity_global.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -85,7 +87,7 @@ namespace CONNECTIVITYLIB {
 * @brief This class holds an object to describe the edge of a network.
 */
 
-class NetworkEdge : public QObject
+class CONNECTIVITYSHARED_EXPORT NetworkEdge : public QObject
 {
     Q_OBJECT
 
@@ -97,11 +99,33 @@ public:
     /**
     * Constructs a NetworkEdge object.
     */
-    explicit NetworkEdge(QObject *parent = 0);
+    explicit NetworkEdge(qint16 iStart, qint16 iEnd, double dWeight, QObject *parent = 0);
+
+    //=========================================================================================================
+    /**
+    * Returns the start node number of this edge.
+    */
+    qint16 getStartNodeNumber();
+
+    //=========================================================================================================
+    /**
+    * Returns the end node number of this edge.
+    */
+    qint16 getEndNodeNumber();
+
+    //=========================================================================================================
+    /**
+    * Returns the edge weight.
+    */
+    double getWeight();
+
 
 protected:
 
 private:
+    qint16      m_iStartNodeNumber;
+    qint16      m_iEndNodeNumber;
+    double      m_dWeight;
 
 signals:
 
@@ -112,6 +136,7 @@ signals:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
+
 
 
 } // namespace CONNECTIVITYLIB
