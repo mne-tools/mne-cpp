@@ -389,7 +389,7 @@ bool BrainSurfaceSetTreeItem::addData(const FiffDigPointSet &tDigitizer, Qt3DCor
 
 BrainRTConnectivityDataTreeItem* BrainSurfaceSetTreeItem::addData(Network::SPtr pNetworkData, const MNEForwardSolution& tForwardSolution, Qt3DCore::QEntity* p3DEntityParent)
 {
-    if(matConnection.rows() != 0 || matConnection.cols() != 0) {
+    if(!pNetworkData->getNodes().isEmpty()) {
         //Add source estimation data as child
         if(this->findChildren(Data3DTreeModelItemTypes::RTConnectivityDataItem).size() == 0) {
             //If rt data item does not exists yet, create it here!
@@ -412,7 +412,7 @@ BrainRTConnectivityDataTreeItem* BrainSurfaceSetTreeItem::addData(Network::SPtr 
 
         return m_pBrainRTConnectivityDataTreeItem;
     } else {
-        qDebug() << "BrainSurfaceSetTreeItem::addData - matConnection is empty";
+        qDebug() << "BrainSurfaceSetTreeItem::addData - network data is empty";
     }
 
     return new BrainRTConnectivityDataTreeItem();

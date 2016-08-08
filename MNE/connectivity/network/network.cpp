@@ -95,6 +95,22 @@ MatrixXd Network::getConnectivityMatrix()
 
 //*************************************************************************************************************
 
+QList<NetworkEdge::SPtr> Network::getEdges()
+{
+    return m_lEdges;
+}
+
+
+//*************************************************************************************************************
+
+QList<NetworkNode::SPtr> Network::getNodes()
+{
+    return m_lNodes;
+}
+
+
+//*************************************************************************************************************
+
 Network& Network::operator<<(NetworkEdge::SPtr newEdge)
 {
     m_lEdges << newEdge;
