@@ -56,6 +56,7 @@ SUBDIRS += \
     readBEM\
     patientManager \
     testWarp \
+    projection
 
 !contains(MNECPP_CONFIG, minimalVersion) {
     qtHaveModule(charts) {
