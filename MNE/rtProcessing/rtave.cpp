@@ -449,8 +449,9 @@ void RtAve::fillBackBuffer(const MatrixXd &data, double dTriggerType)
     if(m_mapMatDataPostIdx[dTriggerType] + data.cols() > m_iPostStimSamples) {
         iResidualCols = m_iPostStimSamples - m_mapMatDataPostIdx[dTriggerType];
         m_mapDataPost[dTriggerType].block(0,m_mapMatDataPostIdx[dTriggerType],m_mapDataPost[dTriggerType].rows(),iResidualCols) = data.block(0,0,data.rows(),iResidualCols);
-    } else
+    } else {
         m_mapDataPost[dTriggerType].block(0,m_mapMatDataPostIdx[dTriggerType],m_mapDataPost[dTriggerType].rows(),iResidualCols) = data;
+    }
 
     m_mapMatDataPostIdx[dTriggerType] += iResidualCols;
 }
@@ -562,17 +563,35 @@ bool RtAve::checkForArtifact(MatrixXd& data, double dThreshold)
 
 void RtAve::generateEvoked(double dTriggerType)
 {
-    if(m_mapStimAve[dTriggerType].isEmpty())
+    if(m_mapStimAve[dTriggerType].isEmpty()) {
         return;
+    }
 
     //Init evoked
-    FiffEvoked evoked;
+    FiffEvoked evoked;    
+    int iEvokedIdx = -1;
 
     for(int i = 0; i < m_pStimEvokedSet->evoked.size(); ++i) {
         if(m_pStimEvokedSet->evoked.at(i).comment == QString::number(dTriggerType)) {
             evoked = m_pStimEvokedSet->evoked.at(i);
+            iEvokedIdx = i;
             break;
         }
+    }
+
+    //If the evoked is not yet present add it here
+    if(iEvokedIdx == -1) {
+        float T = 1.0/m_pFiffInfo->sfreq;
+
+        evoked.setInfo(*m_pFiffInfo.data());
+        evoked.baseline = m_pairBaselineSec;
+        evoked.times.resize(m_iPreStimSamples + m_iPostStimSamples);
+        evoked.times[0] = -T*m_iPreStimSamples;
+        for(int i = 1; i < evoked.times.size(); ++i)
+            evoked.times[i] = evoked.times[i-1] + T;
+        evoked.first = evoked.times[0];
+        evoked.last = evoked.times[evoked.times.size()-1];
+        evoked.comment = QString::number(dTriggerType);
     }
 
     // Generate final evoked
@@ -582,7 +601,12 @@ void RtAve::generateEvoked(double dTriggerType)
         for(int i = 0; i < m_mapStimAve[dTriggerType].size(); ++i) {
             finalAverage += m_mapStimAve[dTriggerType].at(i);
         }
-        finalAverage = finalAverage/m_mapStimAve[dTriggerType].size();
+
+        if(m_mapStimAve[dTriggerType].isEmpty()) {
+            finalAverage = finalAverage/1;
+        } else {
+            finalAverage = finalAverage/m_mapStimAve[dTriggerType].size();
+        }
 
         if(m_bDoBaselineCorrection) {
             finalAverage = MNEMath::rescale(finalAverage, evoked.times, m_pairBaselineSec, QString("mean"));
@@ -607,32 +631,12 @@ void RtAve::generateEvoked(double dTriggerType)
         m_mapNumberCalcAverages[dTriggerType]++;
     }
 
-    //Add evoked to evoked set
-    bool bEvokedFound = false;
-
-    for(int i = 0; i < m_pStimEvokedSet->evoked.size(); ++i) {
-        if(m_pStimEvokedSet->evoked.at(i).comment == QString::number(dTriggerType)) {
-            m_pStimEvokedSet->evoked[i] = evoked;
-
-            bEvokedFound = true;
-            break;
-        }
-    }
-
-    //If the evoekd is not yet present add it here
-    if(!bEvokedFound) {
-        float T = 1.0/m_pFiffInfo->sfreq;
-
-        evoked.setInfo(*m_pFiffInfo.data());
-        evoked.baseline = m_pairBaselineSec;
-        evoked.times.resize(m_iPreStimSamples + m_iPostStimSamples);
-        evoked.times[0] = -T*m_iPreStimSamples;
-        for(int i = 1; i < evoked.times.size(); ++i)
-            evoked.times[i] = evoked.times[i-1] + T;
-        evoked.first = evoked.times[0];
-        evoked.last = evoked.times[evoked.times.size()-1];
-        evoked.comment = QString::number(dTriggerType);
-
+    //Add new data to evoked data set
+    if(iEvokedIdx != -1) {
+        //Evoked data is already present
+        m_pStimEvokedSet->evoked[iEvokedIdx] = evoked;
+    } else {
+        //Evoked data is not present yet
         m_pStimEvokedSet->evoked.append(evoked);
     }
 }
@@ -642,7 +646,7 @@ void RtAve::generateEvoked(double dTriggerType)
 
 void RtAve::reset()
 {
-    qDebug()<<"RtAve::reset()";
+//    qDebug()<<"RtAve::reset()";
     QMutexLocker locker(&m_qMutex);
 
     //Reset
@@ -695,7 +699,7 @@ void RtAve::reset()
 //        i3.value() = false;
 //    }
 
-    qDebug()<<"RtAve::reset() - END";
+//    qDebug()<<"RtAve::reset() - END";
 }
 
 

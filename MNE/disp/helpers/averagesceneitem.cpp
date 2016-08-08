@@ -157,8 +157,10 @@ void AverageSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 
 void AverageSceneItem::setSignalColorForAllChannels(const QColor& color)
 {
-    for(int i = 0; i<m_lAverageColors.size(); i++) {
-        m_lAverageColors[i] = color;
+    m_lAverageColors.clear();
+
+    for(int i = 0; i<m_lAverageData.size(); i++) {
+        m_lAverageColors.append(color);
     }
 
     update();
@@ -230,7 +232,7 @@ void AverageSceneItem::paintAveragePath(QPainter *painter)
     QPointF qSamplePosition;
 
     //do for all currently stored evoked set data
-    for(int dataIndex = 0; dataIndex<m_lAverageData.size(); dataIndex++) {
+    for(int dataIndex = 0; dataIndex < m_lAverageData.size(); ++dataIndex) {
         //plot data from averaged data m_lAverageData with the calculated downsample factor
         const double* averageData = m_lAverageData.at(dataIndex).first;
         int totalCols =  m_lAverageData.at(dataIndex).second;
@@ -250,11 +252,11 @@ void AverageSceneItem::paintAveragePath(QPainter *painter)
         QPainterPath path = QPainterPath(QPointF(boundingRect.x(), boundingRect.y() + boundingRect.height()/2));
         QPen pen;
         pen.setStyle(Qt::SolidLine);
-        if(!m_lAverageColors.isEmpty() && dataIndex<m_lAverageColors.size()) {
+        if(dataIndex < m_lAverageColors.size()) {
             pen.setColor(m_lAverageColors.at(dataIndex));
         }
 
-        pen.setWidthF(5);
+        pen.setWidthF(2);
         painter->setPen(pen);
 
         for(int i = 0; i < totalCols && path.elementCount() <= boundingRect.width(); i += dsFactor) {
