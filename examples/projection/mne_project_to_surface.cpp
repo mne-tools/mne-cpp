@@ -150,16 +150,117 @@ bool MNEProjectToSurface::mne_find_closest_on_surface(const MatrixX3f *r, Matrix
 
 //*************************************************************************************************************
 
-bool MNEProjectToSurface::nearest_triangle_point(Vector3f r, float p, float q, float dist)
+bool MNEProjectToSurface::nearest_triangle_point(Vector3f r, const int tri, float p, float q, float dist)
 {
+    //Calculate some helpers
+    Vector3f rr = r - this->r1.row(tri).transpose(); //Vector from triangle corner #1 to r
+    float v1 = this->r12.row(tri)*rr;
+    float v2 = this->r13.row(tri)*rr;
 
-    return false;
+    //Calculate the orthogonal projection of the point r on the plane
+    dist = this->nn.row(tri)*rr;
+    p = (this->b(tri)*v1 - this->c(tri)*v2)/det(tri);
+    q = (this->a(tri)*v2 - this->c(tri)*v1)/det(tri);
+
+    //If the point projects into the triangle we are done
+    if (p >= 0.0 && p <= 1.0 && q >= 0.0 && q <= 1.0 && (p+q) <= 1.0)
+         {
+        return true;
+    }
+
+    /*
+     * Tough: must investigate the sides
+     * We might do something intelligent here. However, for now it is ok
+     * to do it in the hard way
+     */
+    float p0, q0, t0, dist0, best;
+
+    /*
+     * Side 1 -> 2
+     */
+    p0 = p + (q * this->c(tri)) / this->a(tri);
+    // Place the point in the corner if it is not on the side
+    if (p0 < 0.0)
+    {
+        p0 = 0.0;
+    }
+    else if (p0 > 1.0)
+    {
+        p0 = 1.0;
+    }
+    // Distance
+    dist0 = sqrt((p-p0)*(p-p0)*this->a(tri) +
+                 (q-q0)*(q-q0)*this->b(tri) +
+                 2*(p-p0)*(q-q0)*this->c(tri) +
+                 dist*dist);
+
+    best = dist0;
+    p = p0;
+    q = q0;
+    dist = dist0;
+
+    /*
+    * Side 2 -> 3
+    */
+    t0 = ((a(tri)-c(tri))*(-p) + (b(tri)-c(tri))*q)/(a(tri)+b(tri)-2*c(tri));
+    // Place the point in the corner if it is not on the side
+    if (t0 < 0.0)
+    {
+        t0 = 0.0;
+    }
+    else if (t0 > 1.0)
+    {
+        t0 = 1.0;
+    }
+    p0 = 1.0 - t0;
+    q0 = t0;
+    // Distance
+    dist0 = sqrt((p-p0)*(p-p0)*this->a(tri) +
+                 (q-q0)*(q-q0)*this->b(tri) +
+                 2*(p-p0)*(q-q0)*this->c(tri) +
+                 dist*dist);
+    if (dist0 < best)
+    {
+        best = dist0;
+        p = p0;
+        q = q0;
+        dist = dist0;
+    }
+    /*
+    * Side 1 -> 3
+    */
+    p0 = 0.0;
+    q0 = q + (p * c(tri))/b(tri);
+    // Place the point in the corner if it is not on the side
+    if (q0 < 0.0)
+    {
+        q0 = 0.0;
+
+    }
+    else if (q0 > 1.0)
+    {
+        q0 = 1.0;
+    }
+    // Distance
+    dist0 = sqrt((p-p0)*(p-p0)*this->a(tri) +
+                 (q-q0)*(q-q0)*this->b(tri) +
+                 2*(p-p0)*(q-q0)*this->c(tri) +
+                 dist*dist);
+    if (dist0 < best)
+    {
+        best = dist0;
+        p = p0;
+        q = q0;
+        dist = dist0;
+    }
+    return true;
 }
 
 
 //*************************************************************************************************************
 
-bool MNEProjectToSurface::project_to_triangle(Vector3f rTri, float p, float q)
+void MNEProjectToSurface::project_to_triangle(Vector3f rTri, const float p, const float q, const int tri)
 {
-    return false;
+    rTri = this->r1.row(tri) + p*this->r12.row(tri) + q*this->r13.row(tri);
+    return;
 }
