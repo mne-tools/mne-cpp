@@ -124,11 +124,11 @@ qint16 NetworkNode::getNodeNumber()
 
 NetworkNode& NetworkNode::operator<<(NetworkEdge::SPtr newEdge)
 {
-    if(newEdge->getEndNodeNumber() == m_iNodeNumber) {
+    if(newEdge->getEndNode() == this) {
         m_lEdgesIn << newEdge;
     }
 
-    if(newEdge->getStartNodeNumber() == m_iNodeNumber) {
+    if(newEdge->getStartNode() == this) {
         m_lEdgesOut << newEdge;
     }
 
