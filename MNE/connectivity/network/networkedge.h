@@ -43,6 +43,7 @@
 //=============================================================================================================
 
 #include "../connectivity_global.h"
+#include "networknode.h"
 
 
 //*************************************************************************************************************
@@ -99,19 +100,19 @@ public:
     /**
     * Constructs a NetworkEdge object.
     */
-    explicit NetworkEdge(qint16 iStart, qint16 iEnd, double dWeight, QObject *parent = 0);
+    explicit NetworkEdge(NetworkNode::SPtr pStartNode, NetworkNode::SPtr pEndNode, double dWeight, QObject *parent = 0);
 
     //=========================================================================================================
     /**
-    * Returns the start node number of this edge.
+    * Returns the start node of this edge.
     */
-    qint16 getStartNodeNumber();
+    NetworkNode::SPtr getStartNode();
 
     //=========================================================================================================
     /**
-    * Returns the end node number of this edge.
+    * Returns the end node of this edge.
     */
-    qint16 getEndNodeNumber();
+    NetworkNode::SPtr getEndNode();
 
     //=========================================================================================================
     /**
@@ -123,9 +124,9 @@ public:
 protected:
 
 private:
-    qint16      m_iStartNodeNumber;
-    qint16      m_iEndNodeNumber;
-    double      m_dWeight;
+    NetworkNode::SPtr   m_pStartNode;
+    NetworkNode::SPtr   m_pEndNode;
+    double              m_dWeight;
 
 signals:
 
