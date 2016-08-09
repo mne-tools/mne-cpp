@@ -164,7 +164,7 @@ private:
      * @return
      */
 
-    bool nearest_triangle_point(Eigen::Vector3f r, float p, float q, float dist);
+    bool nearest_triangle_point(Eigen::Vector3f r, const int tri, float p, float q, float dist);
 
     //=========================================================================================================
     /**
@@ -172,9 +172,9 @@ private:
      * @param rTri
      * @param p
      * @param q
+     * @param tri
      */
-    bool project_to_triangle(Eigen::Vector3f rTri, float p, float q);
-
+    void project_to_triangle(Eigen::Vector3f rTri, const float p, const float q, const int tri);
 protected:
 
 private:
