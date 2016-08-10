@@ -47,7 +47,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <mne/mne_bem.h>
+#include <mne/mne_bem_surface.h>
 #include <mne/mne_surface.h>
 
 
@@ -61,6 +61,8 @@
 //=============================================================================================================
 // Eigen INCLUDES
 //=============================================================================================================
+
+#include <Eigen/Geometry>
 
 
 //*************************************************************************************************************
@@ -99,17 +101,66 @@ MNEProjectToSurface::MNEProjectToSurface()
 
 //*************************************************************************************************************
 
-MNEProjectToSurface::MNEProjectToSurface(const MNEBem &p_MNEBem)
+MNEProjectToSurface::MNEProjectToSurface(const MNEBemSurface &p_MNEBemSurf)
+    : r1(MatrixX3f::Zero(p_MNEBemSurf.ntri,3))
+    , r12(MatrixX3f::Zero(p_MNEBemSurf.ntri,3))
+    , r13(MatrixX3f::Zero(p_MNEBemSurf.ntri,3))
+    , nn(MatrixX3f::Zero(p_MNEBemSurf.ntri,3))
+    , a(Vector3f::Zero(p_MNEBemSurf.ntri))
+    , b(Vector3f::Zero(p_MNEBemSurf.ntri))
+    , c(Vector3f::Zero(p_MNEBemSurf.ntri))
+    , det(Vector3f::Zero(p_MNEBemSurf.ntri))
 {
+    for (int i = 0; i < p_MNEBemSurf.ntri; ++i)
+    {
+        r1.row(i) = p_MNEBemSurf.rr.row(p_MNEBemSurf.tris(i,0));
+        r12.row(i) = p_MNEBemSurf.rr.row(p_MNEBemSurf.tris(i,1)) - r1.row(i);
+        r13.row(i) = p_MNEBemSurf.rr.row(p_MNEBemSurf.tris(i,2)) - r1.row(i);
+        a(i) = r12.row(i) * r12.row(i).transpose();
+        b(i) = r13.row(i) * r13.row(i).transpose();
+        c(i) = r12.row(i) * r13.row(i).transpose();
 
+    }
+
+    if (!(p_MNEBemSurf.tri_nn.isZero(0)))
+    {
+        nn = p_MNEBemSurf.tri_nn.cast<float>();
+    }
+    else
+    {
+        for (int i = 0; i < p_MNEBemSurf.ntri; ++i)
+        {
+            nn.row(i) = r12.row(i).transpose().cross(r13.row(i).transpose()).transpose();
+        }
+    }
+    det = (a.array()*b.array() - c.array()*c.array()).matrix();
 }
 
 
 //*************************************************************************************************************
 
 MNEProjectToSurface::MNEProjectToSurface(const MNESurface &p_MNESurf)
+    : r1(MatrixX3f::Zero(p_MNESurf.ntri,3))
+    , r12(MatrixX3f::Zero(p_MNESurf.ntri,3))
+    , r13(MatrixX3f::Zero(p_MNESurf.ntri,3))
+    , nn(MatrixX3f::Zero(p_MNESurf.ntri,3))
+    , a(Vector3f::Zero(p_MNESurf.ntri))
+    , b(Vector3f::Zero(p_MNESurf.ntri))
+    , c(Vector3f::Zero(p_MNESurf.ntri))
+    , det(Vector3f::Zero(p_MNESurf.ntri))
 {
+    for (int i = 0; i < p_MNESurf.ntri; ++i)
+    {
+        r1.row(i) = p_MNESurf.rr.row(p_MNESurf.tris(i,0));
+        r12.row(i) = p_MNESurf.rr.row(p_MNESurf.tris(i,1)) - r1.row(i);
+        r13.row(i) = p_MNESurf.rr.row(p_MNESurf.tris(i,2)) - r1.row(i);
+        nn.row(i) = r12.row(i).transpose().cross(r13.row(i).transpose()).transpose();
+        a(i) = r12.row(i) * r12.row(i).transpose();
+        b(i) = r13.row(i) * r13.row(i).transpose();
+        c(i) = r12.row(i) * r13.row(i).transpose();
+    }
 
+    det = (a.array()*b.array() - c.array()*c.array()).matrix();
 }
 
 

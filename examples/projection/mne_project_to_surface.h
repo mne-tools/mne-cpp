@@ -78,7 +78,7 @@ namespace MNELIB {
 // MNELIB FORWARD DECLARATIONS
 //=============================================================================================================
 
-class MNEBem;
+class MNEBemSurface;
 class MNESurface;
 
 
@@ -106,7 +106,7 @@ public:
     /**
     * Constructs a MNEProjectToSurface object.
     */
-    MNEProjectToSurface(const MNELIB::MNEBem &p_MNEBem);
+    MNEProjectToSurface(const MNELIB::MNEBemSurface &p_MNEBemSurf);
 
     //=========================================================================================================
     /**
