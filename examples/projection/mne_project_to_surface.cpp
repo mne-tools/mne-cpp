@@ -168,7 +168,29 @@ MNEProjectToSurface::MNEProjectToSurface(const MNESurface &p_MNESurf)
 
 bool MNEProjectToSurface::mne_project_to_surface(const Vector3f r, Vector3f rTri, int bestTri)
 {
-    return false;
+    float p, q, dist , p0, q0, dist0 = 0;
+    for (int tri = 0; tri < a.size(); ++tri)
+    {
+        if (!this->nearest_triangle_point(r, tri, p, q, dist))
+        {
+            return false;
+        }
+
+        if ((dist0 == 0) || (dist < dist0))
+        {
+            dist0 = dist;
+            p0 = p;
+            q0 = q;
+            bestTri = tri;
+        }
+    }
+
+    if (!this->project_to_triangle(rTri, p, q, bestTri))
+    {
+        return false;
+    }
+
+    return true;
 }
 
 
@@ -310,8 +332,8 @@ bool MNEProjectToSurface::nearest_triangle_point(Vector3f r, const int tri, floa
 
 //*************************************************************************************************************
 
-void MNEProjectToSurface::project_to_triangle(Vector3f rTri, const float p, const float q, const int tri)
+bool MNEProjectToSurface::project_to_triangle(Vector3f rTri, const float p, const float q, const int tri)
 {
     rTri = this->r1.row(tri) + p*this->r12.row(tri) + q*this->r13.row(tri);
-    return;
+    return true;
 }
