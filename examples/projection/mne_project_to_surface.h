@@ -174,7 +174,7 @@ private:
      * @param q
      * @param tri
      */
-    void project_to_triangle(Eigen::Vector3f rTri, const float p, const float q, const int tri);
+    bool project_to_triangle(Eigen::Vector3f rTri, const float p, const float q, const int tri);
 protected:
 
 private:
