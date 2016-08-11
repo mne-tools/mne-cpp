@@ -387,25 +387,21 @@ bool BrainSurfaceSetTreeItem::addData(const FiffDigPointSet &tDigitizer, Qt3DCor
 
 //*************************************************************************************************************
 
-BrainRTConnectivityDataTreeItem* BrainSurfaceSetTreeItem::addData(Network::SPtr pNetworkData, const MNEForwardSolution& tForwardSolution, Qt3DCore::QEntity* p3DEntityParent)
+BrainRTConnectivityDataTreeItem* BrainSurfaceSetTreeItem::addData(Network::SPtr pNetworkData, Qt3DCore::QEntity* p3DEntityParent)
 {
     if(!pNetworkData->getNodes().isEmpty()) {
         //Add source estimation data as child
         if(this->findChildren(Data3DTreeModelItemTypes::RTConnectivityDataItem).size() == 0) {
             //If rt data item does not exists yet, create it here!
-            if(!tForwardSolution.isEmpty()) {
-                m_pBrainRTConnectivityDataTreeItem = new BrainRTConnectivityDataTreeItem();
+            m_pBrainRTConnectivityDataTreeItem = new BrainRTConnectivityDataTreeItem();
 
-                QList<QStandardItem*> list;
-                list << m_pBrainRTConnectivityDataTreeItem;
-                list << new QStandardItem(m_pBrainRTConnectivityDataTreeItem->toolTip());
-                this->appendRow(list);
+            QList<QStandardItem*> list;
+            list << m_pBrainRTConnectivityDataTreeItem;
+            list << new QStandardItem(m_pBrainRTConnectivityDataTreeItem->toolTip());
+            this->appendRow(list);
 
-                m_pBrainRTConnectivityDataTreeItem->init(tForwardSolution, p3DEntityParent);
-                m_pBrainRTConnectivityDataTreeItem->addData(pNetworkData);
-            } else {
-                qDebug() << "BrainSurfaceSetTreeItem::addData - Cannot add real time connectivity data since the forwad solution was not provided and therefore the rt connecntivity data item has not been initilaized yet. Returning...";
-            }
+            m_pBrainRTConnectivityDataTreeItem->init(p3DEntityParent);
+            m_pBrainRTConnectivityDataTreeItem->addData(pNetworkData);
         } else {
             m_pBrainRTConnectivityDataTreeItem->addData(pNetworkData);
         }

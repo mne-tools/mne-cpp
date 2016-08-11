@@ -201,11 +201,10 @@ public:
     * @param[in] subject                The name of the subject.
     * @param[in] set                    The name of the hemisphere surface set to which this data should be added.
     * @param[in] pNetworkData           The connectivity data.
-    * @param[in] tForwardSolution       The MNEForwardSolution data.
     *
     * @return                           Returns a list of the BrainRTSourceLocDataTreeItem where the data was appended to.
     */
-    QList<BrainRTConnectivityDataTreeItem*> addRtConnectivityData(const QString& subject, const QString& set, CONNECTIVITYLIB::Network::SPtr pNetworkData, const MNELIB::MNEForwardSolution& tForwardSolution = MNELIB::MNEForwardSolution());
+    QList<BrainRTConnectivityDataTreeItem*> addRtConnectivityData(const QString& subject, const QString& set, CONNECTIVITYLIB::Network::SPtr pNetworkData);
 
     //=========================================================================================================
     /**

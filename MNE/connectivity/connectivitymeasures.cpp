@@ -97,31 +97,29 @@ Network::SPtr ConnectivityMeasures::crossCorrelation(const MatrixXd& matData, co
 {
     Network::SPtr finalNetwork  = Network::SPtr(new Network());
 
+    //Create nodes
     for(int i = 0; i < matData.rows(); ++i)
     {
-        QPair<int,double> crossCorrPair = eigenCrossCorrelation(matData.row(i), matData.row(i));
-
         RowVectorXf rowVert = RowVectorXf::Zero(3);
         if(matVert.rows() != 0) {
             rowVert = matVert.row(i);
         }
 
-        NetworkNode::SPtr node = NetworkNode::SPtr(new NetworkNode(i, rowVert));
+        *finalNetwork << NetworkNode::SPtr(new NetworkNode(i, rowVert));
+    }
 
-        double dScaling = crossCorrPair.second;
-        int start = i;
-
+    //Create edges
+    for(int i = 0; i < matData.rows(); ++i)
+    {
         for(int j = i; j < matData.rows(); ++j)
         {
-            int end = j;
             QPair<int,double> crossCorrPair = eigenCrossCorrelation(matData.row(i), matData.row(j));
 
-            NetworkEdge::SPtr pEdge = NetworkEdge::SPtr(new NetworkEdge(start, end, crossCorrPair.second/* / dScaling*/));
-            *node << pEdge;
+            QSharedPointer<NetworkEdge> pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(finalNetwork->getNodes()[i], finalNetwork->getNodes()[j], crossCorrPair.second));
+
+            *finalNetwork->getNodes()[i] << pEdge;
             *finalNetwork << pEdge;
         }
-
-        *finalNetwork << node;
     }
 
 //    finalNetwork.scale();

@@ -80,6 +80,8 @@ namespace CONNECTIVITYLIB {
 // CONNECTIVITYLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
+class NetworkNode;
+
 
 //=============================================================================================================
 /**
@@ -100,19 +102,19 @@ public:
     /**
     * Constructs a NetworkEdge object.
     */
-    explicit NetworkEdge(NetworkNode::SPtr pStartNode, NetworkNode::SPtr pEndNode, double dWeight, QObject *parent = 0);
+    explicit NetworkEdge(QSharedPointer<NetworkNode> pStartNode, QSharedPointer<NetworkNode> pEndNode, double dWeight, QObject *parent = 0);
 
     //=========================================================================================================
     /**
     * Returns the start node of this edge.
     */
-    NetworkNode::SPtr getStartNode();
+    QSharedPointer<NetworkNode> getStartNode();
 
     //=========================================================================================================
     /**
     * Returns the end node of this edge.
     */
-    NetworkNode::SPtr getEndNode();
+    QSharedPointer<NetworkNode> getEndNode();
 
     //=========================================================================================================
     /**
@@ -120,13 +122,13 @@ public:
     */
     double getWeight();
 
-
 protected:
 
 private:
-    NetworkNode::SPtr   m_pStartNode;
-    NetworkNode::SPtr   m_pEndNode;
-    double              m_dWeight;
+    QSharedPointer<NetworkNode>     m_pStartNode;
+    QSharedPointer<NetworkNode>     m_pEndNode;
+
+    double                          m_dWeight;
 
 signals:
 

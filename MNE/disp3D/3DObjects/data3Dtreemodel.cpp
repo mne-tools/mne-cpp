@@ -346,7 +346,7 @@ QList<BrainRTSourceLocDataTreeItem*> Data3DTreeModel::addData(const QString& sub
 
 //*************************************************************************************************************
 
-QList<BrainRTConnectivityDataTreeItem*> Data3DTreeModel::addData(const QString& subject, const QString& set, Network::SPtr pNetworkData, const MNEForwardSolution& tForwardSolution)
+QList<BrainRTConnectivityDataTreeItem*> Data3DTreeModel::addData(const QString& subject, const QString& set, Network::SPtr pNetworkData)
 {
     QList<BrainRTConnectivityDataTreeItem*> returnList;
 
@@ -368,7 +368,7 @@ QList<BrainRTConnectivityDataTreeItem*> Data3DTreeModel::addData(const QString& 
                 for(int i = 0; i<itemList.size(); i++) {
                     if(itemList.at(i)->type() == Data3DTreeModelItemTypes::SurfaceSetItem) {
                         if(BrainSurfaceSetTreeItem* pSetItem = dynamic_cast<BrainSurfaceSetTreeItem*>(itemList.at(i))) {
-                            returnList.append(pSetItem->addData(pNetworkData, tForwardSolution, m_pParentEntity));
+                            returnList.append(pSetItem->addData(pNetworkData, m_pParentEntity));
                         }
                     }
                 }

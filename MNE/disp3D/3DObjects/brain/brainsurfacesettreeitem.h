@@ -202,11 +202,10 @@ public:
     * Adds connectivity estimation data.
     *
     * @param[in] pNetworkData       The connectivity data.
-    * @param[in] tForwardSolution   The MNEForwardSolution.
     *
     * @return                       Returns a list with the tree items which now hold the activation data. Use this list to update the data, i.e. during real time applications.
     */
-    BrainRTConnectivityDataTreeItem* addData(CONNECTIVITYLIB::Network::SPtr pNetworkData,  const MNELIB::MNEForwardSolution& tForwardSolution = MNELIB::MNEForwardSolution(), Qt3DCore::QEntity* p3DEntityParent = 0);
+    BrainRTConnectivityDataTreeItem* addData(CONNECTIVITYLIB::Network::SPtr pNetworkData, Qt3DCore::QEntity* p3DEntityParent = 0);
 
 private:
     //=========================================================================================================

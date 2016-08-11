@@ -79,7 +79,7 @@ using namespace CONNECTIVITYLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-NetworkEdge::NetworkEdge(NetworkNode::SPtr pStartNode, NetworkNode::SPtr pEndNode, double dWeight, QObject *parent)
+NetworkEdge::NetworkEdge(QSharedPointer<NetworkNode> pStartNode, QSharedPointer<NetworkNode> pEndNode, double dWeight, QObject *parent)
 : QObject(parent)
 , m_pStartNode(pStartNode)
 , m_pEndNode(pEndNode)
@@ -91,7 +91,7 @@ NetworkEdge::NetworkEdge(NetworkNode::SPtr pStartNode, NetworkNode::SPtr pEndNod
 //*************************************************************************************************************
 
 
-NetworkNode::SPtr NetworkEdge::getStartNode()
+QSharedPointer<NetworkNode> NetworkEdge::getStartNode()
 {
     return m_pStartNode;
 }
@@ -99,7 +99,7 @@ NetworkNode::SPtr NetworkEdge::getStartNode()
 
 //*************************************************************************************************************
 
-NetworkNode::SPtr NetworkEdge::getEndNode()
+QSharedPointer<NetworkNode> NetworkEdge::getEndNode()
 {
     return m_pEndNode;
 }

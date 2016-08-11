@@ -218,9 +218,9 @@ QList<BrainRTSourceLocDataTreeItem*> View3D::addRtSourceData(const QString& subj
 
 //*************************************************************************************************************
 
-QList<BrainRTConnectivityDataTreeItem*> View3D::addRtConnectivityData(const QString& subject, const QString& set, Network::SPtr pNetworkData, const MNEForwardSolution& tForwardSolution)
+QList<BrainRTConnectivityDataTreeItem*> View3D::addRtConnectivityData(const QString& subject, const QString& set, Network::SPtr pNetworkData)
 {
-    return m_pData3DTreeModel->addData(subject, set, pNetworkData, tForwardSolution);
+    return m_pData3DTreeModel->addData(subject, set, pNetworkData);
 }
 
 
