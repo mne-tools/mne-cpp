@@ -114,33 +114,15 @@ public:
     */
     MNEProjectToSurface(const MNELIB::MNESurface &p_MNESurf);
 
-    //=========================================================================================================
-    /**
-     * @brief mne_project_to_surface
-     * @param r
-     * @param rTri
-     */
-    bool mne_project_to_surface(const Eigen::Vector3f r, Eigen::Vector3f rTri, int bestTri);
-
-    //=========================================================================================================
-    /**
-     * @brief mne_triangle_coords
-     * @param r
-     * @param tri
-     * @param rTri
-     * @return
-     */
-    bool mne_triangle_coords(const Eigen::Vector3f *r, const int tri, Eigen::Vector3f *rTri);
-
-    //=========================================================================================================
-    /**
-     * @brief mne_nearest_triangle_point
-     * @param r
-     * @param tri
-     * @param rTri
-     * @return
-     */
-    bool mne_nearest_triangle_point(const Eigen::Vector3f *r, const int tri, Eigen::Vector3f *rTri);
+//    //=========================================================================================================
+//    /**
+//     * @brief mne_triangle_coords
+//     * @param r
+//     * @param tri
+//     * @param rTri
+//     * @return
+//     */
+//    bool mne_triangle_coords(const Eigen::Vector3f *r, const int tri, Eigen::Vector3f *rTri);
 
     //=========================================================================================================
     /**
@@ -151,9 +133,20 @@ public:
      * @param dist
      * @return
      */
-    bool mne_find_closest_on_surface(const Eigen::MatrixX3f *r, Eigen::MatrixX3f *rTri, int *nearest, Eigen::Vector3f *dist);
+    bool mne_find_closest_on_surface(const Eigen::MatrixX3f &r, const int ntri, Eigen::MatrixX3f &rTri,
+                                     Eigen::VectorXi &nearest, Eigen::Vector3f &dist);
+
+protected:
 
 private:
+    //=========================================================================================================
+    /**
+     * @brief mne_project_to_surface
+     * @param r
+     * @param rTri
+     */
+    bool mne_project_to_surface(const Eigen::Vector3f &r, Eigen::Vector3f &rTri, int bestTri);
+
     //=========================================================================================================
     /**
      * @brief nearest_triangle_point
@@ -164,7 +157,7 @@ private:
      * @return
      */
 
-    bool nearest_triangle_point(Eigen::Vector3f r, const int tri, float p, float q, float dist);
+    bool nearest_triangle_point(const Eigen::Vector3f &r, const int tri, float p, float q, float dist);
 
     //=========================================================================================================
     /**
@@ -174,10 +167,8 @@ private:
      * @param q
      * @param tri
      */
-    bool project_to_triangle(Eigen::Vector3f rTri, const float p, const float q, const int tri);
-protected:
+    bool project_to_triangle(Eigen::Vector3f &rTri, const float p, const float q, const int tri);
 
-private:
     Eigen::MatrixX3f r1;         /**< Cartesian Vector to the first triangel corner */
     Eigen::MatrixX3f r12;        /**< Cartesian Vector from the first to the second triangel corner */
     Eigen::MatrixX3f r13;        /**< Cartesian Vector from the first to the third triangel corner */

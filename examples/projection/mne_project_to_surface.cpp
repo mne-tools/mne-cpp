@@ -166,17 +166,43 @@ MNEProjectToSurface::MNEProjectToSurface(const MNESurface &p_MNESurf)
 
 //*************************************************************************************************************
 
-bool MNEProjectToSurface::mne_project_to_surface(const Vector3f r, Vector3f rTri, int bestTri)
+bool MNEProjectToSurface::mne_find_closest_on_surface(const MatrixX3f &r, const int ntri, MatrixX3f &rTri,
+                                                      VectorXi &nearest, Vector3f &dist)
 {
-    float p, q, dist , p0, q0, dist0 = 0;
-    for (int tri = 0; tri < a.size(); ++tri)
+    int bestTri;
+    Vector3f rTriK;
+    for (int  k = 0; k < ntri; ++k)
+    {
+        /*
+         * To do: decide_search_restriction for the use in an iterative closest point to plane algorithm
+         * For now it's OK to go through all triangles.
+         */
+        if (!this->mne_project_to_surface(r.row(k).transpose(), rTriK, bestTri))
+        {
+            return false;
+        }
+        rTri.row(k) = rTriK.transpose();
+        nearest[k] =  bestTri;
+    }
+    return true;
+}
+
+
+//*************************************************************************************************************
+
+bool MNEProjectToSurface::mne_project_to_surface(const Vector3f &r, Vector3f &rTri, int bestTri)
+{
+    float p, q, dist , p0, q0 = 0;
+    float  dist0 = -1;
+    bestTri = -1;
+    for (int tri = 0; tri < a .size(); ++tri)
     {
         if (!this->nearest_triangle_point(r, tri, p, q, dist))
         {
             return false;
         }
 
-        if ((dist0 == 0) || (dist < dist0))
+        if ((dist0 < 0) || (fabs(dist) < fabs(dist0)))
         {
             dist0 = dist;
             p0 = p;
@@ -185,45 +211,22 @@ bool MNEProjectToSurface::mne_project_to_surface(const Vector3f r, Vector3f rTri
         }
     }
 
-    if (!this->project_to_triangle(rTri, p, q, bestTri))
+    if (bestTri >= 0)
     {
-        return false;
+        if (!this->project_to_triangle(rTri, p, q, bestTri))
+        {
+            return false;
+        }
+        return true;
     }
 
-    return true;
-}
-
-
-//*************************************************************************************************************
-
-bool MNEProjectToSurface::mne_triangle_coords(const Vector3f *r, const int tri, Vector3f *rTri)
-{
-
     return false;
 }
 
 
 //*************************************************************************************************************
 
-bool MNEProjectToSurface::mne_nearest_triangle_point(const Vector3f *r, const int tri, Vector3f *rTri)
-{
-
-    return false;
-}
-
-
-//*************************************************************************************************************
-
-bool MNEProjectToSurface::mne_find_closest_on_surface(const MatrixX3f *r, MatrixX3f *rTri, int *nearest, Vector3f *dist)
-{
-
-    return false;
-}
-
-
-//*************************************************************************************************************
-
-bool MNEProjectToSurface::nearest_triangle_point(Vector3f r, const int tri, float p, float q, float dist)
+bool MNEProjectToSurface::nearest_triangle_point(const Vector3f &r, const int tri, float p, float q, float dist)
 {
     //Calculate some helpers
     Vector3f rr = r - this->r1.row(tri).transpose(); //Vector from triangle corner #1 to r
@@ -332,7 +335,7 @@ bool MNEProjectToSurface::nearest_triangle_point(Vector3f r, const int tri, floa
 
 //*************************************************************************************************************
 
-bool MNEProjectToSurface::project_to_triangle(Vector3f rTri, const float p, const float q, const int tri)
+bool MNEProjectToSurface::project_to_triangle(Vector3f &rTri, const float p, const float q, const int tri)
 {
     rTri = this->r1.row(tri) + p*this->r12.row(tri) + q*this->r13.row(tri);
     return true;
