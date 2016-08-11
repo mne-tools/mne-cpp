@@ -464,7 +464,7 @@ void BrainSurfaceSetTreeItem::onColorInfoOriginChanged()
         }
     }
 
-    if(pSurfaceTreeItemLeft && pSurfaceTreeItemRight) {
+    if(pSurfaceTreeItemLeft && pSurfaceTreeItemRight && !this->findChildren(Data3DTreeModelItemTypes::RTSourceLocDataItem).isEmpty()) {
         m_pBrainRTSourceLocDataTreeItem->onColorInfoOriginChanged(pSurfaceTreeItemLeft->data(Data3DTreeModelItemRoles::SurfaceCurrentColorVert).value<QByteArray>(),
                                             pSurfaceTreeItemRight->data(Data3DTreeModelItemRoles::SurfaceCurrentColorVert).value<QByteArray>());
     }

@@ -92,11 +92,12 @@ CustomMesh::CustomMesh()
 CustomMesh::CustomMesh(const MatrixX3f& tMatVert,
                        const MatrixX3f& tMatNorm,
                        const MatrixX3i& tMatTris,
-                       const QByteArray& tArrayColors)
+                       const QByteArray& tArrayColors,
+                       Qt3DRender::QGeometryRenderer::PrimitiveType primitiveType)
 : Qt3DRender::QGeometryRenderer()
 , m_iNumVert(tMatVert.rows())
 {
-    this->createCustomMesh(tMatVert, tMatNorm, tMatTris, tArrayColors, Qt3DRender::QGeometryRenderer::Triangles);
+    this->createCustomMesh(tMatVert, tMatNorm, tMatTris, tArrayColors, primitiveType);
 }
 
 

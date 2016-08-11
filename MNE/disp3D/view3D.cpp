@@ -162,7 +162,9 @@ void View3D::init()
     // Set root object of the scene
     this->setRootEntity(m_pRootEntity);
 
+    //Create coordinate system and hide as default
     createCoordSystem(m_pRootEntity);
+    toggleCoordAxis(false);
 }
 
 
@@ -292,6 +294,16 @@ void View3D::stopModelRotation()
     for(int i = 0; i < m_lPropertyAnimations.size(); ++i) {
         m_lPropertyAnimations.at(i)->stop();
     }
+}
+
+
+//*************************************************************************************************************
+
+void View3D::toggleCoordAxis(bool checked)
+{
+    m_XAxisEntity->setParent(checked ? m_pRootEntity : Q_NULLPTR);
+    m_YAxisEntity->setParent(checked ? m_pRootEntity : Q_NULLPTR);
+    m_ZAxisEntity->setParent(checked ? m_pRootEntity : Q_NULLPTR);
 }
 
 
