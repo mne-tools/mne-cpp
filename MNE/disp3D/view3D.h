@@ -264,7 +264,13 @@ public:
     /**
     * Stops to rotate all loaded 3D models.
     */
-    void stopModelRotation();
+    void stopModelRotation();    
+
+    //=========================================================================================================
+    /**
+    * Toggle the coord axis visibility.
+    */
+    void toggleCoordAxis(bool checked);
 
 protected:
     //=========================================================================================================

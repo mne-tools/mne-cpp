@@ -247,40 +247,40 @@ int main(int argc, char *argv[])
     //########################################################################################
 
     //Generate node vertices
-    MatrixX3f matNodeVertLeft, matNodeVertRight, matNodeVertComb;
+//    MatrixX3f matNodeVertLeft, matNodeVertRight, matNodeVertComb;
 
-    if(bDoClustering) {
-        matNodeVertLeft.resize(t_clusteredFwd.src[0].cluster_info.centroidVertno.size(),3);
+//    if(bDoClustering) {
+//        matNodeVertLeft.resize(t_clusteredFwd.src[0].cluster_info.centroidVertno.size(),3);
 
-        for(int j = 0; j < matNodeVertLeft.rows(); ++j) {
-            matNodeVertLeft.row(j) = tSurfSet[0].rr().row(t_clusteredFwd.src[0].cluster_info.centroidVertno.at(j));
-        }
+//        for(int j = 0; j < matNodeVertLeft.rows(); ++j) {
+//            matNodeVertLeft.row(j) = tSurfSet[0].rr().row(t_clusteredFwd.src[0].cluster_info.centroidVertno.at(j));
+//        }
 
-        matNodeVertRight.resize(t_clusteredFwd.src[1].cluster_info.centroidVertno.size(),3);
-        for(int j = 0; j < matNodeVertRight.rows(); ++j) {
-            matNodeVertRight.row(j) = tSurfSet[1].rr().row(t_clusteredFwd.src[1].cluster_info.centroidVertno.at(j));
-        }
-    } else {
-        matNodeVertLeft.resize(t_Fwd.src[0].vertno.rows(),3);
-        for(int j = 0; j < matNodeVertLeft.rows(); ++j) {
-            matNodeVertLeft.row(j) = tSurfSet[0].rr().row(t_Fwd.src[0].vertno(j));
-        }
+//        matNodeVertRight.resize(t_clusteredFwd.src[1].cluster_info.centroidVertno.size(),3);
+//        for(int j = 0; j < matNodeVertRight.rows(); ++j) {
+//            matNodeVertRight.row(j) = tSurfSet[1].rr().row(t_clusteredFwd.src[1].cluster_info.centroidVertno.at(j));
+//        }
+//    } else {
+//        matNodeVertLeft.resize(t_Fwd.src[0].vertno.rows(),3);
+//        for(int j = 0; j < matNodeVertLeft.rows(); ++j) {
+//            matNodeVertLeft.row(j) = tSurfSet[0].rr().row(t_Fwd.src[0].vertno(j));
+//        }
 
-        matNodeVertRight.resize(t_Fwd.src[1].vertno.rows(),3);
-        for(int j = 0; j < matNodeVertRight.rows(); ++j) {
-            matNodeVertRight.row(j) = tSurfSet[1].rr().row(t_Fwd.src[1].vertno(j));
-        }
-    }
+//        matNodeVertRight.resize(t_Fwd.src[1].vertno.rows(),3);
+//        for(int j = 0; j < matNodeVertRight.rows(); ++j) {
+//            matNodeVertRight.row(j) = tSurfSet[1].rr().row(t_Fwd.src[1].vertno(j));
+//        }
+//    }
 
-    matNodeVertComb.resize(matNodeVertLeft.rows()+matNodeVertRight.rows(),3);
-    matNodeVertComb << matNodeVertLeft, matNodeVertRight;
+//    matNodeVertComb.resize(matNodeVertLeft.rows()+matNodeVertRight.rows(),3);
+//    matNodeVertComb << matNodeVertLeft, matNodeVertRight;
 
-    Network::SPtr pConnect_LA = ConnectivityMeasures::crossCorrelation(sourceEstimate_LA.data, matNodeVertComb);
+//    Network::SPtr pConnect_LA = ConnectivityMeasures::crossCorrelation(sourceEstimate_LA.data, matNodeVertComb);
 
-    MatrixXd matConnect_LA = pConnect_LA->getConnectivityMatrix();
+//    MatrixXd matConnect_LA = pConnect_LA->getConnectivityMatrix();
 
-    ImageSc* pPlot = new ImageSc(matConnect_LA);
-    pPlot->show();
+//    ImageSc* pPlot = new ImageSc(matConnect_LA);
+//    pPlot->show();
 
     //########################################################################################
     //
@@ -299,7 +299,7 @@ int main(int argc, char *argv[])
     View3D::SPtr testWindow = View3D::SPtr(new View3D());
     testWindow->addBrainData("Subject01", "Left Auditory", tSurfSet, tAnnotSet);
 
-    QList<BrainRTConnectivityDataTreeItem*> rtItemList_LA = testWindow->addRtConnectivityData("Subject01", "Left Auditory", pConnect_LA);
+    //QList<BrainRTConnectivityDataTreeItem*> rtItemList_LA = testWindow->addRtConnectivityData("Subject01", "Left Auditory", pConnect_LA);
 
     testWindow->show();
 
