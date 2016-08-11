@@ -124,54 +124,11 @@ void  BrainRTConnectivityDataTreeItem::setData(const QVariant& value, int role)
 
 //*************************************************************************************************************
 
-bool BrainRTConnectivityDataTreeItem::init(const MNEForwardSolution& tForwardSolution, Qt3DCore::QEntity* parent)
+bool BrainRTConnectivityDataTreeItem::init(Qt3DCore::QEntity* parent)
 {
     //Create renderable 3D entity
     m_pParentEntity = parent;
     m_pRenderable3DEntity = new Renderable3DEntity(parent);
-
-    //Set data based on clusterd or full source space
-    bool isClustered = tForwardSolution.isClustered();
-
-    //Add source vertices to data
-    QVariant data;
-    if(isClustered)
-    {
-        MatrixX3f matSourceVert(tForwardSolution.src[0].cluster_info.centroidSource_rr.size() + tForwardSolution.src[1].cluster_info.centroidSource_rr.size(), 3);
-
-        int counter = 0;
-        for(int i = 0; i < tForwardSolution.src[0].cluster_info.centroidSource_rr.size(); ++i)
-        {
-            matSourceVert(counter,0) = tForwardSolution.src[0].cluster_info.centroidSource_rr.at(i)(0);
-            matSourceVert(counter,1) = tForwardSolution.src[0].cluster_info.centroidSource_rr.at(i)(1);
-            matSourceVert(counter,2) = tForwardSolution.src[0].cluster_info.centroidSource_rr.at(i)(2);
-            ++counter;
-        }
-
-        for(int i = 0; i < tForwardSolution.src[1].cluster_info.centroidSource_rr.size(); ++i)
-        {
-            matSourceVert(counter,0) = tForwardSolution.src[1].cluster_info.centroidSource_rr.at(i)(0);
-            matSourceVert(counter,1) = tForwardSolution.src[1].cluster_info.centroidSource_rr.at(i)(1);
-            matSourceVert(counter,2) = tForwardSolution.src[1].cluster_info.centroidSource_rr.at(i)(2);
-            ++counter;
-        }
-
-        data.setValue(matSourceVert);
-        this->setData(data, Data3DTreeModelItemRoles::SourceVertices);
-    }
-    else
-    {
-        data.setValue(tForwardSolution.source_rr);
-        this->setData(data, Data3DTreeModelItemRoles::SourceVertices);
-    }
-
-    //Add meta information as item children
-    QString sIsClustered = isClustered ? "Clustered" : "Full";
-    MetaTreeItem* pItemSourceSpaceType = new MetaTreeItem(MetaTreeItemTypes::RTDataSourceSpaceType, sIsClustered);
-    pItemSourceSpaceType->setEditable(false);
-    *this << pItemSourceSpaceType;
-    data.setValue(sIsClustered);
-    pItemSourceSpaceType->setData(data, MetaTreeItemRoles::RTDataSourceSpaceType);
 
     m_bIsInit = true;
 

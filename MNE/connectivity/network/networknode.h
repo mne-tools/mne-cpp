@@ -82,6 +82,8 @@ namespace CONNECTIVITYLIB {
 // CONNECTIVITYLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
+class NetworkEdge;
+
 
 //=============================================================================================================
 /**
@@ -108,13 +110,13 @@ public:
     /**
     * Returns the ingoing edges.
     */
-    QList<NetworkEdge::SPtr> getEdgesIn();
+    QList<QSharedPointer<NetworkEdge> > getEdgesIn();
 
     //=========================================================================================================
     /**
     * Returns the outgoing edges.
     */
-    QList<NetworkEdge::SPtr> getEdgesOut();
+    QList<QSharedPointer<NetworkEdge>> getEdgesOut();
 
     //=========================================================================================================
     /**
@@ -134,17 +136,17 @@ public:
     *
     * @param[in] newEdge    The new edge item as a reference.
     */
-    NetworkNode &operator<<(NetworkEdge::SPtr newEdge);
+    NetworkNode &operator<<(QSharedPointer<NetworkEdge> newEdge);
 
 protected:
 
 private:
-    qint16                      m_iNodeNumber;
+    qint16                                  m_iNodeNumber;
 
-    Eigen::RowVectorXf          m_vecVert;
+    Eigen::RowVectorXf                      m_vecVert;
 
-    QList<NetworkEdge::SPtr>    m_lEdgesIn;
-    QList<NetworkEdge::SPtr>    m_lEdgesOut;
+    QList<QSharedPointer<NetworkEdge> >     m_lEdgesIn;
+    QList<QSharedPointer<NetworkEdge> >     m_lEdgesOut;
 
 signals:
 

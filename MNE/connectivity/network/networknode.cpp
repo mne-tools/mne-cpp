@@ -40,6 +40,7 @@
 //=============================================================================================================
 
 #include "networknode.h"
+#include "networkedge.h"
 
 
 //*************************************************************************************************************
@@ -90,7 +91,7 @@ NetworkNode::NetworkNode(qint16 iNodeNumber, const RowVectorXf& vecVert, QObject
 
 //*************************************************************************************************************
 
-QList<NetworkEdge::SPtr> NetworkNode::getEdgesIn()
+QList<QSharedPointer<NetworkEdge> > NetworkNode::getEdgesIn()
 {
     return m_lEdgesIn;
 }
@@ -98,7 +99,7 @@ QList<NetworkEdge::SPtr> NetworkNode::getEdgesIn()
 
 //*************************************************************************************************************
 
-QList<NetworkEdge::SPtr> NetworkNode::getEdgesOut()
+QList<QSharedPointer<NetworkEdge> > NetworkNode::getEdgesOut()
 {
     return m_lEdgesOut;
 }
@@ -122,7 +123,7 @@ qint16 NetworkNode::getNodeNumber()
 
 //*************************************************************************************************************
 
-NetworkNode& NetworkNode::operator<<(NetworkEdge::SPtr newEdge)
+NetworkNode& NetworkNode::operator<<(QSharedPointer<NetworkEdge>  newEdge)
 {
     if(newEdge->getEndNode() == this) {
         m_lEdgesIn << newEdge;

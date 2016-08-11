@@ -136,12 +136,11 @@ public:
     /**
     * Initializes the rt connectivity data item with neccessary information for visualization computations.
     *
-    * @param[in] tForwardSolution       The MNEForwardSolution.
     * @param[in] parent                 The Qt3D entity parent of the new item.
     *
     * @return                           Returns true if successful.
     */
-    bool init(const MNELIB::MNEForwardSolution& tForwardSolution, Qt3DCore::QEntity *parent);
+    bool init(Qt3DCore::QEntity *parent);
 
     //=========================================================================================================
     /**
