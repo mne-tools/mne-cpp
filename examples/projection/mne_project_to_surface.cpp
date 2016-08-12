@@ -166,23 +166,29 @@ MNEProjectToSurface::MNEProjectToSurface(const MNESurface &p_MNESurf)
 
 //*************************************************************************************************************
 
-bool MNEProjectToSurface::mne_find_closest_on_surface(const MatrixX3f &r, const int ntri, MatrixX3f &rTri,
+bool MNEProjectToSurface::mne_find_closest_on_surface(const MatrixX3f &r, const int np, MatrixX3f &rTri,
                                                       VectorXi &nearest, Vector3f &dist)
 {
+    if (this->r1.isZero(0))
+    {
+        return false;
+    }
     int bestTri;
+    float bestDist;
     Vector3f rTriK;
-    for (int  k = 0; k < ntri; ++k)
+    for (int  k = 0; k < np; ++k)
     {
         /*
          * To do: decide_search_restriction for the use in an iterative closest point to plane algorithm
          * For now it's OK to go through all triangles.
          */
-        if (!this->mne_project_to_surface(r.row(k).transpose(), rTriK, bestTri))
+        if (!this->mne_project_to_surface(r.row(k).transpose(), rTriK, bestTri, bestDist))
         {
             return false;
         }
         rTri.row(k) = rTriK.transpose();
         nearest[k] =  bestTri;
+        dist[k] = bestDist;
     }
     return true;
 }
@@ -190,23 +196,23 @@ bool MNEProjectToSurface::mne_find_closest_on_surface(const MatrixX3f &r, const 
 
 //*************************************************************************************************************
 
-bool MNEProjectToSurface::mne_project_to_surface(const Vector3f &r, Vector3f &rTri, int bestTri)
+bool MNEProjectToSurface::mne_project_to_surface(const Vector3f &r, Vector3f &rTri, int bestTri, float &bestDist)
 {
-    float p, q, dist , p0, q0 = 0;
-    float  dist0 = -1;
+    float  p, q, p0, q0, dist0 = 0;
+    bestDist = 0;
     bestTri = -1;
     for (int tri = 0; tri < a .size(); ++tri)
     {
-        if (!this->nearest_triangle_point(r, tri, p, q, dist))
+        if (!this->nearest_triangle_point(r, tri, p0, q0, dist0))
         {
             return false;
         }
 
-        if ((dist0 < 0) || (fabs(dist) < fabs(dist0)))
+        if ((bestTri < 0) || (fabs(dist0) < fabs(bestDist)))
         {
-            dist0 = dist;
-            p0 = p;
-            q0 = q;
+            bestDist = dist0;
+            p = p0;
+            q = q0;
             bestTri = tri;
         }
     }
