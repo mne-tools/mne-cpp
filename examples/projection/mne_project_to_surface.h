@@ -104,14 +104,18 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a MNEProjectToSurface object.
-    */
+     * Constructs a MNEProjectToSurface with the data of a MNEBemSurface object.
+     * @brief MNEProjectToSurface
+     * @param[in] p_MNEBemSurf   The MNEBemSurface to which is to be projected
+     */
     MNEProjectToSurface(const MNELIB::MNEBemSurface &p_MNEBemSurf);
 
     //=========================================================================================================
     /**
-    * Constructs a MNEProjectToSurface object.
-    */
+     * Constructs a MNEProjectToSurface with the data of a MNESurf object.
+     * @brief MNEProjectToSurface
+     * @param[in] p_MNESurf      The MNESurface to which is to be projected
+     */
     MNEProjectToSurface(const MNELIB::MNESurface &p_MNESurf);
 
 //    //=========================================================================================================
@@ -126,14 +130,19 @@ public:
 
     //=========================================================================================================
     /**
+     * Projects a set of points r on the Surface
+     *
      * @brief mne_find_closest_on_surface
-     * @param r
-     * @param rTri
-     * @param nearest
-     * @param dist
-     * @return
+     *
+     * @param[in] r         Set of pionts, which are to be projectied.
+     * @param[in] np        number of points
+     * @param[out] rTri     set of points on the surface
+     * @param[out] nearest  Triangle of the new point
+     * @param[out] dist     Distance between r and rTri
+     *
+     * @return true if succeeded, false otherwise
      */
-    bool mne_find_closest_on_surface(const Eigen::MatrixX3f &r, const int ntri, Eigen::MatrixX3f &rTri,
+    bool mne_find_closest_on_surface(const Eigen::MatrixX3f &r, const int np, Eigen::MatrixX3f &rTri,
                                      Eigen::VectorXi &nearest, Eigen::Vector3f &dist);
 
 protected:
@@ -141,31 +150,48 @@ protected:
 private:
     //=========================================================================================================
     /**
+     * Projects a point r on the Surface
+     *
      * @brief mne_project_to_surface
-     * @param r
-     * @param rTri
+     *
+     * @param[in] r         Piont, which is to be projectied.
+     * @param[out] rTri     Point on the surface
+     * @param[out] bestTri  Triangle of the new point
+     * @param[out] bestDist Distance between r and rTri.
+     *
+     * @return true if succeeded, false otherwise
      */
-    bool mne_project_to_surface(const Eigen::Vector3f &r, Eigen::Vector3f &rTri, int bestTri);
+    bool mne_project_to_surface(const Eigen::Vector3f &r, Eigen::Vector3f &rTri, int bestTri, float &bestDist);
 
     //=========================================================================================================
     /**
+     * Finds the nearest point to a point r on a given triangle.
+     *
      * @brief nearest_triangle_point
-     * @param r
-     * @param p
-     * @param q
-     * @param dist
-     * @return
+     *
+     * @param[in] r     Point in space
+     * @param[in] tri   The Triangle of the surface
+     * @param[out] p    Coordiante in Triangel System (rTri = r1 + p*r12 +q*r13)
+     * @param[out] q    Coordiante in Triangel System (rTri = r1 + p*r12 +q*r13)
+     * @param[out] dist Distance between r and rTri
+     *
+     * @return true if succeeded, false otherwise
      */
 
     bool nearest_triangle_point(const Eigen::Vector3f &r, const int tri, float p, float q, float dist);
 
     //=========================================================================================================
     /**
+     * Converts a point given in triangel coordinates (p,q) to the kartesian system.
+     *
      * @brief project_to_triangle
-     * @param rTri
-     * @param p
-     * @param q
-     * @param tri
+     *
+     * @param[out] rTri Coordiante in kartesian System
+     * @param[in] p     Coordiante in Triangel System (r = r1 + p*r12 +q*r13)
+     * @param[in] q     Coordiante in Triangel System (r = r1 + p*r12 +q*r13)
+     * @param[in] tri   The Triangle of the surface
+     *
+     * @return true if succeeded, false otherwise
      */
     bool project_to_triangle(Eigen::Vector3f &rTri, const float p, const float q, const int tri);
 
