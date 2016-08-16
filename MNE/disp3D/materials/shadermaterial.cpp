@@ -123,6 +123,7 @@ void ShaderMaterial::init()
 
     m_vertexGL3Shader->setVertexShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/materials/shaders/gl3/pervertexphongalpha.vert"))));
     m_vertexGL3Shader->setFragmentShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/materials/shaders/gl3/pervertexphongalpha.frag"))));
+    //m_vertexGL3Shader->setGeometryShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/materials/shaders/gl3/pervertexphongalpha.geom"))));
 
     m_vertexGL3Technique->graphicsApiFilter()->setApi(QGraphicsApiFilter::OpenGL);
     m_vertexGL3Technique->graphicsApiFilter()->setMajorVersion(3);
