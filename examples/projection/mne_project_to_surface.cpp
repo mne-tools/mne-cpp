@@ -171,10 +171,11 @@ bool MNEProjectToSurface::mne_find_closest_on_surface(const MatrixX3f &r, const 
 {
     if (this->r1.isZero(0))
     {
+        qDebug() << "No surface loaded to make the projection./n";
         return false;
     }
-    int bestTri;
-    float bestDist;
+    int bestTri = -1;
+    float bestDist = -1;
     Vector3f rTriK;
     for (int  k = 0; k < np; ++k)
     {
@@ -184,6 +185,7 @@ bool MNEProjectToSurface::mne_find_closest_on_surface(const MatrixX3f &r, const 
          */
         if (!this->mne_project_to_surface(r.row(k).transpose(), rTriK, bestTri, bestDist))
         {
+            qDebug() << "The projection of point number " << k << " didn't work./n";
             return false;
         }
         rTri.row(k) = rTriK.transpose();
@@ -198,13 +200,14 @@ bool MNEProjectToSurface::mne_find_closest_on_surface(const MatrixX3f &r, const 
 
 bool MNEProjectToSurface::mne_project_to_surface(const Vector3f &r, Vector3f &rTri, int bestTri, float &bestDist)
 {
-    float  p, q, p0, q0, dist0 = 0;
+    float  p = 0, q = 0, p0 = 0, q0 = 0, dist0 = 0;
     bestDist = 0;
     bestTri = -1;
     for (int tri = 0; tri < a .size(); ++tri)
     {
         if (!this->nearest_triangle_point(r, tri, p0, q0, dist0))
         {
+            qDebug() << "The projection on triangle " << tri << " didn't work./n";
             return false;
         }
 
@@ -221,11 +224,13 @@ bool MNEProjectToSurface::mne_project_to_surface(const Vector3f &r, Vector3f &rT
     {
         if (!this->project_to_triangle(rTri, p, q, bestTri))
         {
+            qDebug() << "The coordinate transform to cartesian system didn't work./n";
             return false;
         }
         return true;
     }
 
+    qDebug() << "No best Triangle found./n";
     return false;
 }
 
@@ -270,6 +275,7 @@ bool MNEProjectToSurface::nearest_triangle_point(const Vector3f &r, const int tr
     {
         p0 = 1.0;
     }
+    q0 = 0;
     // Distance
     dist0 = sqrt((p-p0)*(p-p0)*this->a(tri) +
                  (q-q0)*(q-q0)*this->b(tri) +
