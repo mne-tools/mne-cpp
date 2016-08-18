@@ -37,12 +37,12 @@ TEMPLATE = app
 
 VERSION = $${MNE_CPP_VERSION}
 
-#QT += core
-QT -= gui
+QT += widgets 3dextras
+#QT -= gui
 
-#CONFIG += c++11
 CONFIG += console
 CONFIG -= app_bundle
+
 TARGET = projection
 
 CONFIG(debug, debug|release) {
@@ -55,14 +55,22 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Utilsd \
             -lMNE$${MNE_LIB_VERSION}Fsd \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
-            -lMNE$${MNE_LIB_VERSION}Mned
+            -lMNE$${MNE_LIB_VERSION}Mned \
+            -lMNE$${MNE_LIB_VERSION}Inversed \
+            -lMNE$${MNE_LIB_VERSION}Dispd \
+            -lMNE$${MNE_LIB_VERSION}DispChartsd \
+            -lMNE$${MNE_LIB_VERSION}Disp3Dd
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
             -lMNE$${MNE_LIB_VERSION}Utils \
             -lMNE$${MNE_LIB_VERSION}Fs \
             -lMNE$${MNE_LIB_VERSION}Fiff \
-            -lMNE$${MNE_LIB_VERSION}Mne
+            -lMNE$${MNE_LIB_VERSION}Mne \
+            -lMNE$${MNE_LIB_VERSION}Inverse \
+            -lMNE$${MNE_LIB_VERSION}Disp \
+            -lMNE$${MNE_LIB_VERSION}DispCharts \
+            -lMNE$${MNE_LIB_VERSION}Disp3D
 }
 
 DESTDIR =  $${MNE_BINARY_DIR}
