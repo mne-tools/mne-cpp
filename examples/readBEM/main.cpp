@@ -106,7 +106,7 @@ int main(int argc, char *argv[])
     }
 
     //Read and write Iso2Mesh Bem
-    QString folder = "C:/Users/Jana/Documents/MATLAB/AVG4-0Years_segmented_BEM3/";
+    QString folder = "./MNE-sample-data/warping/AVG4-0Years_segmented_BEM3/bem/";
 
     MatrixXd help;
 
@@ -114,10 +114,10 @@ int main(int argc, char *argv[])
     MNEBemSurface  p_Brain;
     p_Brain.id = FIFFV_BEM_SURF_ID_BRAIN;
     QString path=folder;
-    IOUtils::read_eigen_matrix(help, path.append("brain_vert.txt"));
+    IOUtils::read_eigen_matrix(help, path.append("inner_skull_vert.txt"));
     p_Brain.rr= help.cast<float>();
     path=folder;
-    IOUtils::read_eigen_matrix(help, path.append("brain_tri.txt"));
+    IOUtils::read_eigen_matrix(help, path.append("inner_skull_tri.txt"));
     p_Brain.tris = help.cast<int>();
     p_Brain.np = p_Brain.rr.rows();
     p_Brain.ntri = p_Brain.tris.rows();
@@ -128,10 +128,10 @@ int main(int argc, char *argv[])
     MNEBemSurface  p_Skull;
     p_Skull.id = FIFFV_BEM_SURF_ID_SKULL;
     path=folder;
-    IOUtils::read_eigen_matrix(help,path.append("skull_vert.txt"));
+    IOUtils::read_eigen_matrix(help,path.append("outer_skull_vert.txt"));
     p_Skull.rr =  help.cast<float>();
     path=folder;
-    IOUtils::read_eigen_matrix(help,path.append("skull_tri.txt"));
+    IOUtils::read_eigen_matrix(help,path.append("outer_skull_tri.txt"));
     p_Skull.tris =  help.cast<int>();
     p_Skull.np = p_Skull.rr.rows();
     p_Skull.ntri = p_Skull.tris.rows();
@@ -142,10 +142,10 @@ int main(int argc, char *argv[])
     MNEBemSurface  p_Head;
     p_Head.id = FIFFV_BEM_SURF_ID_HEAD;
     path=folder;
-    IOUtils::read_eigen_matrix(help,path.append("head_vert.txt"));
+    IOUtils::read_eigen_matrix(help,path.append("skin_vert.txt"));
     p_Head.rr =  help.cast<float>();
     path=folder;
-    IOUtils::read_eigen_matrix(help,path.append("head_tri.txt"));
+    IOUtils::read_eigen_matrix(help,path.append("skin_tri.txt"));
     p_Head.tris =  help.cast<int>();
     p_Head.np = p_Head.rr.rows();
     p_Head.ntri = p_Head.tris.rows();
