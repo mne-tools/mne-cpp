@@ -37,6 +37,10 @@
 //=============================================================================================================
 
 #include "mne_project_to_surface.h"
+#include <mne/mne.h>
+#include <disp3D/view3D.h>
+#include <disp3D/control/control3dwidget.h>
+#include <fiff/fiff_dig_point_set.h>
 
 
 //*************************************************************************************************************
@@ -44,13 +48,19 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtCore/QCoreApplication>
+#include <QApplication>
+#include <QMainWindow>
+#include <QCommandLineParser>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
+
+using namespace DISP3DLIB;
+using namespace MNELIB;
+using namespace FIFFLIB;
 
 
 //*************************************************************************************************************
@@ -70,7 +80,39 @@
 
 int main(int argc, char *argv[])
 {
-    QCoreApplication a(argc, argv);
+    QApplication app(argc, argv);
 
-    return a.exec();
+    // Command Line Parser
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Projection Example");
+    parser.addHelpOption();
+    QCommandLineOption sampleBEMFileOption("f", "Path to BEM <file>.", "file",
+                                           "./MNE-sample-data/warping/AVG4-0Years_segmented_BEM3/bem/AVG4-0Years_segmented_BEM3-2118-2188-3186-bem-sol.fif");
+
+    parser.addOption(sampleBEMFileOption);
+    parser.process(app);
+
+    //########################################################################################
+    // Read the BEM
+    QFile t_fileBem(parser.value(sampleBEMFileOption));
+    MNEBem t_Bem(t_fileBem);
+
+    // Read the Digitizer
+    QFile t_fileDig = "./MNE-sample-data/warping/AVG4-0Years_GSN128.fif";
+    FiffDigPointSet t_Dig(t_fileDig);
+
+    //Show
+    View3D::SPtr testWindow = View3D::SPtr(new View3D());
+    testWindow->addBemData("AVG4-0Years", "BEM", t_Bem);
+    testWindow->addDigitizerData("AVG4-0Years", "Orignal Dig", t_Dig);
+
+
+    testWindow->show();
+
+    Control3DWidget::SPtr control3DWidget = Control3DWidget::SPtr(new Control3DWidget());
+    control3DWidget->setView3D(testWindow);
+    control3DWidget->show();
+
+
+    return app.exec();
 }
