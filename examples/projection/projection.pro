@@ -76,10 +76,8 @@ else {
 DESTDIR =  $${MNE_BINARY_DIR}
 
 SOURCES += main.cpp \
-    mne_project_to_surface.cpp
 
 HEADERS += \
-    mne_project_to_surface.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

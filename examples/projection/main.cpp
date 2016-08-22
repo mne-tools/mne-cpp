@@ -36,7 +36,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "mne_project_to_surface.h"
+#include <mne/mne_project_to_surface.h>
 #include <mne/mne.h>
 #include <disp3D/view3D.h>
 #include <disp3D/control/control3dwidget.h>
