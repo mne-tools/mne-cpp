@@ -120,16 +120,6 @@ public:
      */
     MNEProjectToSurface(const MNELIB::MNESurface &p_MNESurf);
 
-//    //=========================================================================================================
-//    /**
-//     * @brief mne_triangle_coords
-//     * @param r
-//     * @param tri
-//     * @param rTri
-//     * @return
-//     */
-//    bool mne_triangle_coords(const Eigen::Vector3f *r, const int tri, Eigen::Vector3f *rTri);
-
     //=========================================================================================================
     /**
      * Projects a set of points r on the Surface
@@ -179,7 +169,6 @@ private:
      *
      * @return true if succeeded, false otherwise
      */
-
     bool nearest_triangle_point(const Eigen::Vector3f &r, const int tri, float &p, float &q, float &dist);
 
     //=========================================================================================================

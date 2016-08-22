@@ -119,7 +119,6 @@ MNEProjectToSurface::MNEProjectToSurface(const MNEBemSurface &p_MNEBemSurf)
         a(i) = r12.row(i) * r12.row(i).transpose();
         b(i) = r13.row(i) * r13.row(i).transpose();
         c(i) = r12.row(i) * r13.row(i).transpose();
-
     }
 
     if (!(p_MNEBemSurf.tri_nn.isZero(0)))
