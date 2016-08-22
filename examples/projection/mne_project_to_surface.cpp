@@ -90,10 +90,10 @@ MNEProjectToSurface::MNEProjectToSurface()
 , r12(MatrixX3f::Zero(1,3))
 , r13(MatrixX3f::Zero(1,3))
 , nn(MatrixX3f::Zero(1,3))
-, a(Vector3f::Zero(3))
-, b(Vector3f::Zero(3))
-, c(Vector3f::Zero(3))
-, det(Vector3f::Zero(3))
+, a(VectorXf::Zero(1))
+, b(VectorXf::Zero(1))
+, c(VectorXf::Zero(1))
+, det(VectorXf::Zero(1))
 {
 
 }
@@ -106,10 +106,10 @@ MNEProjectToSurface::MNEProjectToSurface(const MNEBemSurface &p_MNEBemSurf)
     , r12(MatrixX3f::Zero(p_MNEBemSurf.ntri,3))
     , r13(MatrixX3f::Zero(p_MNEBemSurf.ntri,3))
     , nn(MatrixX3f::Zero(p_MNEBemSurf.ntri,3))
-    , a(Vector3f::Zero(p_MNEBemSurf.ntri))
-    , b(Vector3f::Zero(p_MNEBemSurf.ntri))
-    , c(Vector3f::Zero(p_MNEBemSurf.ntri))
-    , det(Vector3f::Zero(p_MNEBemSurf.ntri))
+    , a(VectorXf::Zero(p_MNEBemSurf.ntri))
+    , b(VectorXf::Zero(p_MNEBemSurf.ntri))
+    , c(VectorXf::Zero(p_MNEBemSurf.ntri))
+    , det(VectorXf::Zero(p_MNEBemSurf.ntri))
 {
     for (int i = 0; i < p_MNEBemSurf.ntri; ++i)
     {
@@ -144,10 +144,10 @@ MNEProjectToSurface::MNEProjectToSurface(const MNESurface &p_MNESurf)
     , r12(MatrixX3f::Zero(p_MNESurf.ntri,3))
     , r13(MatrixX3f::Zero(p_MNESurf.ntri,3))
     , nn(MatrixX3f::Zero(p_MNESurf.ntri,3))
-    , a(Vector3f::Zero(p_MNESurf.ntri))
-    , b(Vector3f::Zero(p_MNESurf.ntri))
-    , c(Vector3f::Zero(p_MNESurf.ntri))
-    , det(Vector3f::Zero(p_MNESurf.ntri))
+    , a(VectorXf::Zero(p_MNESurf.ntri))
+    , b(VectorXf::Zero(p_MNESurf.ntri))
+    , c(VectorXf::Zero(p_MNESurf.ntri))
+    , det(VectorXf::Zero(p_MNESurf.ntri))
 {
     for (int i = 0; i < p_MNESurf.ntri; ++i)
     {
@@ -166,9 +166,11 @@ MNEProjectToSurface::MNEProjectToSurface(const MNESurface &p_MNESurf)
 
 //*************************************************************************************************************
 
-bool MNEProjectToSurface::mne_find_closest_on_surface(const MatrixX3f &r, const int np, MatrixX3f &rTri,
-                                                      VectorXi &nearest, Vector3f &dist)
+bool MNEProjectToSurface::mne_find_closest_on_surface(const MatrixXf &r, const int np, MatrixXf &rTri,
+                                                      VectorXi &nearest, VectorXf &dist)
 {
+    nearest.resize(np);
+    dist.resize(np);
     if (this->r1.isZero(0))
     {
         qDebug() << "No surface loaded to make the projection./n";
@@ -198,7 +200,7 @@ bool MNEProjectToSurface::mne_find_closest_on_surface(const MatrixX3f &r, const 
 
 //*************************************************************************************************************
 
-bool MNEProjectToSurface::mne_project_to_surface(const Vector3f &r, Vector3f &rTri, int bestTri, float &bestDist)
+bool MNEProjectToSurface::mne_project_to_surface(const Vector3f &r, Vector3f &rTri, int &bestTri, float &bestDist)
 {
     float  p = 0, q = 0, p0 = 0, q0 = 0, dist0 = 0;
     bestDist = 0;
@@ -237,7 +239,7 @@ bool MNEProjectToSurface::mne_project_to_surface(const Vector3f &r, Vector3f &rT
 
 //*************************************************************************************************************
 
-bool MNEProjectToSurface::nearest_triangle_point(const Vector3f &r, const int tri, float p, float q, float dist)
+bool MNEProjectToSurface::nearest_triangle_point(const Vector3f &r, const int tri, float &p, float &q, float &dist)
 {
     //Calculate some helpers
     Vector3f rr = r - this->r1.row(tri).transpose(); //Vector from triangle corner #1 to r
@@ -260,7 +262,7 @@ bool MNEProjectToSurface::nearest_triangle_point(const Vector3f &r, const int tr
      * We might do something intelligent here. However, for now it is ok
      * to do it in the hard way
      */
-    float p0, q0, t0, dist0, best;
+    float p0, q0, t0, dist0, best, bestp, bestq;
 
     /*
      * Side 1 -> 2
@@ -283,10 +285,8 @@ bool MNEProjectToSurface::nearest_triangle_point(const Vector3f &r, const int tr
                  dist*dist);
 
     best = dist0;
-    p = p0;
-    q = q0;
-    dist = dist0;
-
+    bestp = p0;
+    bestq = q0;
     /*
     * Side 2 -> 3
     */
@@ -310,9 +310,8 @@ bool MNEProjectToSurface::nearest_triangle_point(const Vector3f &r, const int tr
     if (dist0 < best)
     {
         best = dist0;
-        p = p0;
-        q = q0;
-        dist = dist0;
+        bestp = p0;
+        bestq = q0;
     }
     /*
     * Side 1 -> 3
@@ -337,10 +336,12 @@ bool MNEProjectToSurface::nearest_triangle_point(const Vector3f &r, const int tr
     if (dist0 < best)
     {
         best = dist0;
-        p = p0;
-        q = q0;
-        dist = dist0;
+        bestp = p0;
+        bestq = q0;
     }
+    dist = best;
+    p = bestp;
+    q = bestq;
     return true;
 }
 

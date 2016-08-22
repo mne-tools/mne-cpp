@@ -142,8 +142,8 @@ public:
      *
      * @return true if succeeded, false otherwise
      */
-    bool mne_find_closest_on_surface(const Eigen::MatrixX3f &r, const int np, Eigen::MatrixX3f &rTri,
-                                     Eigen::VectorXi &nearest, Eigen::Vector3f &dist);
+    bool mne_find_closest_on_surface(const Eigen::MatrixXf &r, const int np, Eigen::MatrixXf &rTri,
+                                     Eigen::VectorXi &nearest, Eigen::VectorXf &dist);
 
 protected:
 
@@ -161,7 +161,7 @@ private:
      *
      * @return true if succeeded, false otherwise
      */
-    bool mne_project_to_surface(const Eigen::Vector3f &r, Eigen::Vector3f &rTri, int bestTri, float &bestDist);
+    bool mne_project_to_surface(const Eigen::Vector3f &r, Eigen::Vector3f &rTri, int &bestTri, float &bestDist);
 
     //=========================================================================================================
     /**
@@ -178,7 +178,7 @@ private:
      * @return true if succeeded, false otherwise
      */
 
-    bool nearest_triangle_point(const Eigen::Vector3f &r, const int tri, float p, float q, float dist);
+    bool nearest_triangle_point(const Eigen::Vector3f &r, const int tri, float &p, float &q, float &dist);
 
     //=========================================================================================================
     /**
@@ -199,10 +199,10 @@ private:
     Eigen::MatrixX3f r12;        /**< Cartesian Vector from the first to the second triangel corner */
     Eigen::MatrixX3f r13;        /**< Cartesian Vector from the first to the third triangel corner */
     Eigen::MatrixX3f nn;         /**< Cartesian Vector of the triangle plane normal */
-    Eigen::Vector3f a;           /**< r12*r12 */
-    Eigen::Vector3f b;           /**< r13*r13 */
-    Eigen::Vector3f c;           /**< r12*r13 */
-    Eigen::Vector3f det;         /**< Determinant of the Matrix [a c, c b] */
+    Eigen::VectorXf a;           /**< r12*r12 */
+    Eigen::VectorXf b;           /**< r13*r13 */
+    Eigen::VectorXf c;           /**< r12*r13 */
+    Eigen::VectorXf det;         /**< Determinant of the Matrix [a c, c b] */
 };
 
 
