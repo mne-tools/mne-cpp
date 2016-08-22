@@ -196,7 +196,7 @@ bool DigitizerTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer, 
     QVariant data;
     QList<QStandardItem*> list;
 
-    MetaTreeItem* pItemSurfCol = new MetaTreeItem(MetaTreeItemTypes::SurfaceColor, "Point color");
+    MetaTreeItem* pItemSurfCol = new MetaTreeItem(MetaTreeItemTypes::PointColor, "Point color");
     connect(pItemSurfCol, &MetaTreeItem::surfaceColorChanged,
             this, &DigitizerTreeItem::onSurfaceColorChanged);
     list.clear();
@@ -204,7 +204,7 @@ bool DigitizerTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer, 
     list << new QStandardItem(pItemSurfCol->toolTip());
     this->appendRow(list);
     data.setValue(colDefault);
-    pItemSurfCol->setData(data, MetaTreeItemRoles::SurfaceColor);
+    pItemSurfCol->setData(data, MetaTreeItemRoles::PointColor);
     pItemSurfCol->setData(data, Qt::DecorationRole);
 
     return true;
@@ -225,7 +225,7 @@ void DigitizerTreeItem::setVisible(bool state)
 
 void DigitizerTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
 {
-    this->setVisible(checkState==Qt::Unchecked ? false : true);
+    this->setVisible(checkState == Qt::Unchecked ? false : true);
 }
 
 
