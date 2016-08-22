@@ -101,11 +101,50 @@ int main(int argc, char *argv[])
     QFile t_fileDig = "./MNE-sample-data/warping/AVG4-0Years_GSN128.fif";
     FiffDigPointSet t_Dig(t_fileDig);
 
+    MatrixXf ElecPos(t_Dig.size(), 3);
+    for (int i = 0; i < t_Dig.size(); ++i)
+    {
+        ElecPos(i,0) = t_Dig[i].r[0];
+        ElecPos(i,1) = t_Dig[i].r[1];
+        ElecPos(i,2) = t_Dig[i].r[2];
+    }
+
+    // Read and apply Transformation
+    QFile t_fileTrans("./MNE-sample-data/warping/AVG4-0Years_GSN128-trans.fif");
+    FiffCoordTrans t_Trans (t_fileTrans);
+    ElecPos=t_Trans.apply_trans(ElecPos);
+    FiffDigPointSet t_DigTrans(t_Dig);
+
+    for (int i = 0; i < t_DigTrans.size(); ++i)
+    {
+        t_DigTrans[i].r[0] = ElecPos(i,0);
+        t_DigTrans[i].r[1] = ElecPos(i,1);
+        t_DigTrans[i].r[2] = ElecPos(i,2);
+    }
+
+    //Projection
+    MatrixXf DigProject(t_DigTrans.size(), 3);
+    VectorXi nearest;
+    VectorXf dist;
+    MNEProjectToSurface t_Avg4 (t_Bem[0]);
+
+    t_Avg4.mne_find_closest_on_surface(ElecPos, t_DigTrans.size(), DigProject, nearest, dist);
+
+    FiffDigPointSet t_DigProject(t_Dig);
+
+    for (int i = 0; i < t_DigProject.size(); ++i)
+    {
+        t_DigProject[i].r[0] = DigProject(i,0);
+        t_DigProject[i].r[1] = DigProject(i,1);
+        t_DigProject[i].r[2] = DigProject(i,2);
+    }
+
     //Show
     View3D::SPtr testWindow = View3D::SPtr(new View3D());
     testWindow->addBemData("AVG4-0Years", "BEM", t_Bem);
     testWindow->addDigitizerData("AVG4-0Years", "Orignal Dig", t_Dig);
-
+    testWindow->addDigitizerData("AVG4-0Years", "Trans Dig", t_DigTrans);
+    testWindow->addDigitizerData("AVG4-0Years", "Project Dig", t_DigProject);
 
     testWindow->show();
 
