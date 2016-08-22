@@ -137,6 +137,7 @@ bool DigitizerTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer, 
     QVector3D pos;
     Qt3DExtras::QSphereMesh* sourceSphere;
     Qt3DExtras::QPhongMaterial* material;
+    QColor colDefault(100,100,100);
 
     for(int i = 0; i < tDigitizer.size(); ++i) {
         QSharedPointer<Qt3DCore::QEntity> pSourceSphereEntity = QSharedPointer<Qt3DCore::QEntity>(new Qt3DCore::QEntity());
@@ -163,19 +164,24 @@ bool DigitizerTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer, 
         material = new Qt3DExtras::QPhongMaterial();
         switch (tDigitizer[i].kind) {
         case FIFFV_POINT_CARDINAL:
-            material->setAmbient(Qt::yellow);
+            colDefault = Qt::yellow;
+            material->setAmbient(colDefault);
             break;
         case FIFFV_POINT_HPI:
-            material->setAmbient(Qt::red);
+            colDefault = Qt::red;
+            material->setAmbient(colDefault);
             break;
         case FIFFV_POINT_EEG:
-            material->setAmbient(Qt::green);
+            colDefault = Qt::green;
+            material->setAmbient(colDefault);
             break;
         case FIFFV_POINT_EXTRA:
-            material->setAmbient(Qt::blue);
+            colDefault = Qt::blue;
+            material->setAmbient(colDefault);
             break;
         default:
-            material->setAmbient(Qt::white);
+            colDefault = Qt::white;
+            material->setAmbient(colDefault);
             break;
         }
 
@@ -190,14 +196,14 @@ bool DigitizerTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer, 
     QVariant data;
     QList<QStandardItem*> list;
 
-    MetaTreeItem* pItemSurfCol = new MetaTreeItem(MetaTreeItemTypes::SurfaceColor, "Surface color");
+    MetaTreeItem* pItemSurfCol = new MetaTreeItem(MetaTreeItemTypes::SurfaceColor, "Point color");
     connect(pItemSurfCol, &MetaTreeItem::surfaceColorChanged,
             this, &DigitizerTreeItem::onSurfaceColorChanged);
     list.clear();
     list << pItemSurfCol;
     list << new QStandardItem(pItemSurfCol->toolTip());
     this->appendRow(list);
-    data.setValue(QColor(100,100,100));
+    data.setValue(colDefault);
     pItemSurfCol->setData(data, MetaTreeItemRoles::SurfaceColor);
     pItemSurfCol->setData(data, Qt::DecorationRole);
 
@@ -227,9 +233,13 @@ void DigitizerTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
 
 void DigitizerTreeItem::onSurfaceColorChanged(const QColor& color)
 {
-    //QVariant data;
-    //QByteArray arrayNewVertColor = createVertColor(this->data(Data3DTreeModelItemRoles::SurfaceVert).value<MatrixX3f>(), color);
+    for(int i = 0; i < m_lSpheres.size(); ++i) {
+        for(int j = 0; j < m_lSpheres.at(i)->components().size(); ++j) {
+            Qt3DCore::QComponent* pComponent = m_lSpheres.at(i)->components().at(j);
 
-    //data.setValue(arrayNewVertColor);
-    //this->setData(data, Data3DTreeModelItemRoles::SurfaceCurrentColorVert);
+            if(Qt3DExtras::QPhongMaterial* pMaterial = dynamic_cast<Qt3DExtras::QPhongMaterial*>(pComponent)) {
+                pMaterial->setAmbient(color);
+            }
+        }
+    }
 }
