@@ -1,10 +1,10 @@
 //=============================================================================================================
 /**
-* @file     digitizertreeitem.h
+* @file     mne_project_to_surface.h
 * @author   Jana Kiesel <jana.kiesel@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     July, 2016
+* @date     August, 2016
 *
 * @section  LICENSE
 *
@@ -29,26 +29,28 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     DigitizerTreeItem class declaration.
+* @brief     MNEProjectToSurface class declaration.
 *
 */
 
-#ifndef DIGITIZERTREEITEM_H
-#define DIGITIZERTREEITEM_H
+#ifndef MNELIB_MNEPROJECTTOSURFACE_H
+#define MNELIB_MNEPROJECTTOSURFACE_H
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../../disp3D_global.h"
-#include "../../helpers/abstracttreeitem.h"
+#include "mne_global.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// QT INCLUDES
 //=============================================================================================================
+
+#include <QSharedPointer>
 
 
 //*************************************************************************************************************
@@ -56,115 +58,151 @@
 // Eigen INCLUDES
 //=============================================================================================================
 
+#include <Eigen/Core>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB{
-    class FiffDigPoint;
-}
 
-namespace Qt3DCore {
-    class QEntity;
-}
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE MNELIB
+//=============================================================================================================
+
+namespace MNELIB {
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE DISP3DLIB
+// MNELIB FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace DISP3DLIB
-{
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-class Renderable3DEntity;
+class MNEBemSurface;
+class MNESurface;
 
 
 //=============================================================================================================
 /**
-* DigitizerTreeItem provides a generic tree item to hold digitizer data.
+* Description of what this class is intended to do (in detail).
 *
-* @brief Provides a generic digitizer tree item.
+* @brief Brief description of this class.
 */
-class DISP3DNEWSHARED_EXPORT DigitizerTreeItem : public AbstractTreeItem
+
+class MNESHARED_EXPORT MNEProjectToSurface
 {
-    Q_OBJECT
 
 public:
-    typedef QSharedPointer<DigitizerTreeItem> SPtr;             /**< Shared pointer type for DigitizerTreeItem class. */
-    typedef QSharedPointer<const DigitizerTreeItem> ConstSPtr;  /**< Const shared pointer type for DigitizerTreeItem class. */
+    typedef QSharedPointer<MNEProjectToSurface> SPtr;            /**< Shared pointer type for MNEProjectToSurface. */
+    typedef QSharedPointer<const MNEProjectToSurface> ConstSPtr; /**< Const shared pointer type for MNEProjectToSurface. */
 
     //=========================================================================================================
     /**
-    * Default constructor.
-    *
-    * @param[in] iType      The type of the item. See types.h for declaration and definition.
-    * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
+    * Constructs a MNEProjectToSurface object.
     */
-    explicit DigitizerTreeItem(int iType = Data3DTreeModelItemTypes::SourceSpaceItem, const QString& text = "Source space");
+    MNEProjectToSurface();
 
     //=========================================================================================================
     /**
-    * Default destructor
-    */
-    ~DigitizerTreeItem();
+     * Constructs a MNEProjectToSurface with the data of a MNEBemSurface object.
+     * @brief MNEProjectToSurface
+     * @param[in] p_MNEBemSurf   The MNEBemSurface to which is to be projected
+     */
+    MNEProjectToSurface(const MNELIB::MNEBemSurface &p_MNEBemSurf);
 
     //=========================================================================================================
     /**
-    * AbstractTreeItem functions
-    */
-    QVariant data(int role = Qt::UserRole + 1) const;
-    void setData(const QVariant& value, int role = Qt::UserRole + 1);
+     * Constructs a MNEProjectToSurface with the data of a MNESurf object.
+     * @brief MNEProjectToSurface
+     * @param[in] p_MNESurf      The MNESurface to which is to be projected
+     */
+    MNEProjectToSurface(const MNELIB::MNESurface &p_MNESurf);
 
     //=========================================================================================================
     /**
-    * Adds FreeSurfer data based on surface and annotation data to this item.
-    *
-    * @param[in] tDigitizer         The digitizer data.
-    * @param[in] parent             The Qt3D entity parent of the new item.
-    *
-    * @return                       Returns true if successful.
-    */
-    bool addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer, Qt3DCore::QEntity* parent);
+     * Projects a set of points r on the Surface
+     *
+     * @brief mne_find_closest_on_surface
+     *
+     * @param[in] r         Set of pionts, which are to be projectied.
+     * @param[in] np        number of points
+     * @param[out] rTri     set of points on the surface
+     * @param[out] nearest  Triangle of the new point
+     * @param[out] dist     Distance between r and rTri
+     *
+     * @return true if succeeded, false otherwise
+     */
+    bool mne_find_closest_on_surface(const Eigen::MatrixXf &r, const int np, Eigen::MatrixXf &rTri,
+                                     Eigen::VectorXi &nearest, Eigen::VectorXf &dist);
 
-    //=========================================================================================================
-    /**
-    * Call this function whenever you want to change the visibilty of the 3D rendered content.
-    *
-    * @param[in] state     The visiblity flag.
-    */
-    void setVisible(bool state);
+protected:
 
 private:
     //=========================================================================================================
     /**
-    * Call this function whenever the check box of this item was checked.
-    *
-    * @param[in] checkState        The current checkstate.
-    */
-    virtual void onCheckStateChanged(const Qt::CheckState& checkState);
+     * Projects a point r on the Surface
+     *
+     * @brief mne_project_to_surface
+     *
+     * @param[in] r         Piont, which is to be projectied.
+     * @param[out] rTri     Point on the surface
+     * @param[out] bestTri  Triangle of the new point
+     * @param[out] bestDist Distance between r and rTri.
+     *
+     * @return true if succeeded, false otherwise
+     */
+    bool mne_project_to_surface(const Eigen::Vector3f &r, Eigen::Vector3f &rTri, int &bestTri, float &bestDist);
 
     //=========================================================================================================
     /**
-    * Call this function whenever the surface color was changed.
-    *
-    * @param[in] color        The new surface color.
-    */
-    void onSurfaceColorChanged(const QColor &color);
+     * Finds the nearest point to a point r on a given triangle.
+     *
+     * @brief nearest_triangle_point
+     *
+     * @param[in] r     Point in space
+     * @param[in] tri   The Triangle of the surface
+     * @param[out] p    Coordiante in Triangel System (rTri = r1 + p*r12 +q*r13)
+     * @param[out] q    Coordiante in Triangel System (rTri = r1 + p*r12 +q*r13)
+     * @param[out] dist Distance between r and rTri
+     *
+     * @return true if succeeded, false otherwise
+     */
+    bool nearest_triangle_point(const Eigen::Vector3f &r, const int tri, float &p, float &q, float &dist);
 
-    Qt3DCore::QEntity*                          m_pParentEntity;            /**< The parent 3D entity. */
-    Renderable3DEntity*                         m_pRenderable3DEntity;      /**< The renderable 3D entity. */
+    //=========================================================================================================
+    /**
+     * Converts a point given in triangel coordinates (p,q) to the kartesian system.
+     *
+     * @brief project_to_triangle
+     *
+     * @param[out] rTri Coordiante in kartesian System
+     * @param[in] p     Coordiante in Triangel System (r = r1 + p*r12 +q*r13)
+     * @param[in] q     Coordiante in Triangel System (r = r1 + p*r12 +q*r13)
+     * @param[in] tri   The Triangle of the surface
+     *
+     * @return true if succeeded, false otherwise
+     */
+    bool project_to_triangle(Eigen::Vector3f &rTri, const float p, const float q, const int tri);
 
-    QList<QSharedPointer<Qt3DCore::QEntity> >   m_lSpheres;                 /**< The currently displayed digitizer points as 3D spheres. */
+    Eigen::MatrixX3f r1;         /**< Cartesian Vector to the first triangel corner */
+    Eigen::MatrixX3f r12;        /**< Cartesian Vector from the first to the second triangel corner */
+    Eigen::MatrixX3f r13;        /**< Cartesian Vector from the first to the third triangel corner */
+    Eigen::MatrixX3f nn;         /**< Cartesian Vector of the triangle plane normal */
+    Eigen::VectorXf a;           /**< r12*r12 */
+    Eigen::VectorXf b;           /**< r13*r13 */
+    Eigen::VectorXf c;           /**< r12*r13 */
+    Eigen::VectorXf det;         /**< Determinant of the Matrix [a c, c b] */
 };
 
-} //NAMESPACE DISP3DLIB
 
-#endif // DIGITIZERTREEITEM_H
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+
+} // namespace MNELIB
+
+#endif // MNELIB_MNEPROJECTTOSURFACE_H

@@ -1,14 +1,14 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     mne.pro
-# @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+# @file     projection.pro
+# @author   Jana Kiesel <jana.kiesel@tu-ilmenau.de>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
-# @date     July, 2012
+# @date     August, 2016
 #
 # @section  LICENSE
 #
-# Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+# Copyright (C) 2016, Jana Kiesel and Matti Hamalainen. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -18,7 +18,7 @@
 #       the following disclaimer in the documentation and/or other materials provided with the distribution.
 #     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 #       to endorse or promote products derived from this software without specific prior written permission.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 # WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
 # PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
@@ -29,21 +29,22 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file builds the mne library.
-#
+# @brief    Example to project points on a surface
 #--------------------------------------------------------------------------------------------------------------
-
 include(../../mne-cpp.pri)
 
-TEMPLATE = lib
+TEMPLATE = app
 
-QT += network concurrent
-QT -= gui
+VERSION = $${MNE_CPP_VERSION}
 
-DEFINES += MNE_LIBRARY
+QT += widgets 3dextras
+#QT -= gui
 
-TARGET = Mne
-TARGET = $$join(TARGET,,MNE$${MNE_LIB_VERSION},)
+CONFIG += console
+CONFIG -= app_bundle
+
+TARGET = projection
+
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
@@ -52,98 +53,33 @@ LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
             -lMNE$${MNE_LIB_VERSION}Utilsd \
+            -lMNE$${MNE_LIB_VERSION}Fsd \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
-            -lMNE$${MNE_LIB_VERSION}Fsd
+            -lMNE$${MNE_LIB_VERSION}Mned \
+            -lMNE$${MNE_LIB_VERSION}Inversed \
+            -lMNE$${MNE_LIB_VERSION}Dispd \
+            -lMNE$${MNE_LIB_VERSION}DispChartsd \
+            -lMNE$${MNE_LIB_VERSION}Disp3Dd
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
             -lMNE$${MNE_LIB_VERSION}Utils \
+            -lMNE$${MNE_LIB_VERSION}Fs \
             -lMNE$${MNE_LIB_VERSION}Fiff \
-            -lMNE$${MNE_LIB_VERSION}Fs
+            -lMNE$${MNE_LIB_VERSION}Mne \
+            -lMNE$${MNE_LIB_VERSION}Inverse \
+            -lMNE$${MNE_LIB_VERSION}Disp \
+            -lMNE$${MNE_LIB_VERSION}DispCharts \
+            -lMNE$${MNE_LIB_VERSION}Disp3D
 }
 
-DESTDIR = $${MNE_LIBRARY_DIR}
+DESTDIR =  $${MNE_BINARY_DIR}
 
-contains(MNECPP_CONFIG, build_MNECPP_Static_Lib) {
-    CONFIG += staticlib
-    DEFINES += BUILD_MNECPP_STATIC_LIB
-}
-else {
-    CONFIG += dll
-
-    #
-    # win32: copy dll's to bin dir
-    # unix: add lib folder to LD_LIBRARY_PATH
-    #
-    win32 {
-        FILE = $${DESTDIR}/$${TARGET}.dll
-        BINDIR = $${DESTDIR}/../bin
-        FILE ~= s,/,\\,g
-        BINDIR ~= s,/,\\,g
-        QMAKE_POST_LINK += $${QMAKE_COPY} $$quote($${FILE}) $$quote($${BINDIR}) $$escape_expand(\\n\\t)
-    }
-}
-
-SOURCES += \
-    mne.cpp \
-    mne_sourcespace.cpp \
-    mne_forwardsolution.cpp \
-    mne_sourceestimate.cpp \
-    mne_hemisphere.cpp \
-    mne_inverse_operator.cpp \
-    mne_epoch_data.cpp \
-    mne_epoch_data_list.cpp \
-    mne_cluster_info.cpp \
-    mne_surface.cpp \
-    mne_corsourceestimate.cpp\
-    mne_bem.cpp\
-    mne_bem_surface.cpp \
-    mne_project_to_surface.cpp
+SOURCES += main.cpp \
 
 HEADERS += \
-    mne.h \
-    mne_global.h \
-    mne_sourcespace.h \
-    mne_hemisphere.h \
-    mne_forwardsolution.h \
-    mne_sourceestimate.h \
-    mne_inverse_operator.h \
-    mne_epoch_data.h \
-    mne_epoch_data_list.h \
-    mne_cluster_info.h \
-    mne_surface.h \
-    mne_corsourceestimate.h\
-    mne_bem.h\
-    mne_bem_surface.h \
-    mne_project_to_surface.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
-# Install headers to include directory
-header_files.files = ./*.h
-header_files.path = $${MNE_INCLUDE_DIR}/mne
-
-INSTALLS += header_files
-
-OTHER_FILES += \
-    mne.pro
-
 unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
-
-# Deploy Qt Dependencies
-win32 {
-    isEmpty(TARGET_EXT) {
-        TARGET_CUSTOM_EXT = .dll
-    } else {
-        TARGET_CUSTOM_EXT = $${TARGET_EXT}
-    }
-
-    DEPLOY_COMMAND = windeployqt
-
-    DEPLOY_TARGET = $$shell_quote($$shell_path($${MNE_BINARY_DIR}/$${TARGET}$${TARGET_CUSTOM_EXT}))
-
-    #  # Uncomment the following line to help debug the deploy command when running qmake
-    #  warning($${DEPLOY_COMMAND} $${DEPLOY_TARGET})
-    QMAKE_POST_LINK += $${DEPLOY_COMMAND} $${DEPLOY_TARGET}
-}
