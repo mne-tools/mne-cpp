@@ -318,12 +318,18 @@ void RealTimeButterflyPlot::createPlotPath(qint32 row, QPainter& painter) const
     QPointF qSamplePosition;
 
     float fDx = (float)(this->width()-2) / ((float)m_pRealTimeEvokedModel->getNumSamples()-1.0f);//((float)option.rect.width()) / m_pRealTimeEvokedModel->getMaxSamples();
-//    fDx *= iDownSampling;
 
     QList<Eigen::RowVectorXd> rowVec = m_pRealTimeEvokedModel->data(row,1).value<QList<Eigen::RowVectorXd> >();
 
     //Do for all average types
     for(int j = 0; j < rowVec.size(); ++j) {
+        //Calculate downsampling factor of averaged data in respect to the items width
+        int dsFactor;
+        rowVec.at(j).cols() / this->width() < 1 ? dsFactor = 1 : dsFactor = rowVec.at(j).cols() / this->width();
+        if(dsFactor == 0) {
+            dsFactor = 1;
+        }
+
         QPainterPath path(QPointF(1,0));
         float y_base = path.currentPosition().y();
 
@@ -343,22 +349,16 @@ void RealTimeButterflyPlot::createPlotPath(qint32 row, QPainter& painter) const
 
         //create lines from one to the next sample
         qint32 i;
-        for(i = 1; i < rowVec.at(j).cols(); ++i) {
+        for(i = 1; i < rowVec.at(j).cols() && path.elementCount() <= this->width(); i += dsFactor) {
+            float val = /*rowVec.at(j)[m_pRealTimeEvokedModel->getNumPreStimSamples()-1] - */rowVec.at(j)[i]; //remove first sample data[0] as offset
+            fValue = val*fScaleY;
 
-    //        if(i != m_pRealTimeEvokedModel->getNumPreStimSamples() - 2)
-    //        {
-                float val = /*rowVec.at(j)[m_pRealTimeEvokedModel->getNumPreStimSamples()-1] - */rowVec.at(j)[i]; //remove first sample data[0] as offset
-                fValue = val*fScaleY;
+            //Cut plotting if out of widget area
+            fValue = fValue > fWinMaxVal ? fWinMaxVal : fValue < -fWinMaxVal ? -fWinMaxVal : fValue;
 
-                fValue = fValue > fWinMaxVal ? fWinMaxVal : fValue < -fWinMaxVal ? -fWinMaxVal : fValue;
+            float newY = y_base+fValue;
 
-                float newY = y_base+fValue;
-
-                qSamplePosition.setY(-newY);
-    //        }
-    //        else
-    //            qSamplePosition.setY(y_base);
-
+            qSamplePosition.setY(-newY);
 
             qSamplePosition.setX(path.currentPosition().x()+fDx);
 

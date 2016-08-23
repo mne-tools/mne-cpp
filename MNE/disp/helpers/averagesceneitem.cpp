@@ -244,8 +244,9 @@ void AverageSceneItem::paintAveragePath(QPainter *painter)
         //Calculate downsampling factor of averaged data in respect to the items width
         int dsFactor;
         totalCols / boundingRect.width()<1 ? dsFactor = 1 : dsFactor = totalCols / boundingRect.width();
-        if(dsFactor == 0)
+        if(dsFactor == 0) {
             dsFactor = 1;
+        }
 
         //Create path
         //float offset = (*(averageData+(abs(m_firstLastSample.first)*m_iTotalNumberChannels)+m_iChannelNumber)); //choose offset to be the signal value at time instance 0
