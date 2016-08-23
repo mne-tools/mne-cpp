@@ -1261,7 +1261,6 @@ void QuickControlWidget::createModalityGroup()
         connect(t_pCheckBoxModality,&QCheckBox::stateChanged,
                 this,&QuickControlWidget::onUpdateModalityCheckbox);
         t_pGridLayout->addWidget(t_pCheckBoxModality,i,1,1,1);
-
     }
 
     //Find Modalities tab and add current layout

@@ -680,7 +680,7 @@ void RealTimeEvokedSetModel::createFilterChannelList(QStringList channelNames)
 
 void doFilterPerChannelRTESet(QPair<QList<FilterData>,QPair<int,RowVectorXd> > &channelDataTime)
 {
-    for(int i=0; i<channelDataTime.first.size(); i++) {
+    for(int i=0; i < channelDataTime.first.size(); ++i) {
         //channelDataTime.second.second = channelDataTime.first.at(i).applyConvFilter(channelDataTime.second.second, true, FilterData::ZeroPad);
         channelDataTime.second.second = channelDataTime.first.at(i).applyFFTFilter(channelDataTime.second.second, true, FilterData::ZeroPad); //FFT Convolution for rt is not suitable. FFT make the signal filtering non causal.
     }
@@ -703,7 +703,7 @@ void RealTimeEvokedSetModel::filterChannelsConcurrently()
         QList<int> notFilterChannelIndex;
 
         //Also append mirrored data in front and back to get rid of edge effects
-        for(qint32 i=0; i<m_matData.at(j).rows(); ++i) {
+        for(qint32 i = 0; i < m_matData.at(j).rows(); ++i) {
             if(m_filterChannelList.contains(m_pRTESet->info()->chs.at(i).ch_name)) {
                 RowVectorXd datTemp(m_matData.at(j).row(i).cols() + 2 * m_iMaxFilterLength);
                 datTemp << m_matData.at(j).row(i).head(m_iMaxFilterLength).reverse(), m_matData.at(j).row(i), m_matData.at(j).row(i).tail(m_iMaxFilterLength).reverse();
@@ -720,9 +720,9 @@ void RealTimeEvokedSetModel::filterChannelsConcurrently()
 
             future.waitForFinished();
 
-            for(int r = 0; r<timeData.size(); r++) {
-                m_matDataFiltered[j].row(timeData.at(r).second.first) = timeData.at(r).second.second.segment(m_iMaxFilterLength+m_iMaxFilterLength/2, m_matData.at(j).cols());
-            }
+//            for(int r = 0; r < timeData.size(); ++r) {
+//                m_matDataFiltered[j].row(timeData.at(r).second.first) = timeData.at(r).second.second.segment(m_iMaxFilterLength+m_iMaxFilterLength/2, m_matData.at(j).cols());
+//            }
         }
 
         //Fill filtered data with raw data if the channel was not filtered
