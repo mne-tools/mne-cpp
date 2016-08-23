@@ -74,6 +74,7 @@ SUBDIRS += \
             roiClusteredInversePwlRapMusic \
             fsSurface \
             disp3DTutorial \
-            histogram
+            histogram \
+            projection
     }
 }
