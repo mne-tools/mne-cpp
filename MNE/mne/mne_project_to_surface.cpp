@@ -102,14 +102,14 @@ MNEProjectToSurface::MNEProjectToSurface()
 //*************************************************************************************************************
 
 MNEProjectToSurface::MNEProjectToSurface(const MNEBemSurface &p_MNEBemSurf)
-    : r1(MatrixX3f::Zero(p_MNEBemSurf.ntri,3))
-    , r12(MatrixX3f::Zero(p_MNEBemSurf.ntri,3))
-    , r13(MatrixX3f::Zero(p_MNEBemSurf.ntri,3))
-    , nn(MatrixX3f::Zero(p_MNEBemSurf.ntri,3))
-    , a(VectorXf::Zero(p_MNEBemSurf.ntri))
-    , b(VectorXf::Zero(p_MNEBemSurf.ntri))
-    , c(VectorXf::Zero(p_MNEBemSurf.ntri))
-    , det(VectorXf::Zero(p_MNEBemSurf.ntri))
+: r1(MatrixX3f::Zero(p_MNEBemSurf.ntri,3))
+, r12(MatrixX3f::Zero(p_MNEBemSurf.ntri,3))
+, r13(MatrixX3f::Zero(p_MNEBemSurf.ntri,3))
+, nn(MatrixX3f::Zero(p_MNEBemSurf.ntri,3))
+, a(VectorXf::Zero(p_MNEBemSurf.ntri))
+, b(VectorXf::Zero(p_MNEBemSurf.ntri))
+, c(VectorXf::Zero(p_MNEBemSurf.ntri))
+, det(VectorXf::Zero(p_MNEBemSurf.ntri))
 {
     for (int i = 0; i < p_MNEBemSurf.ntri; ++i)
     {
@@ -139,14 +139,14 @@ MNEProjectToSurface::MNEProjectToSurface(const MNEBemSurface &p_MNEBemSurf)
 //*************************************************************************************************************
 
 MNEProjectToSurface::MNEProjectToSurface(const MNESurface &p_MNESurf)
-    : r1(MatrixX3f::Zero(p_MNESurf.ntri,3))
-    , r12(MatrixX3f::Zero(p_MNESurf.ntri,3))
-    , r13(MatrixX3f::Zero(p_MNESurf.ntri,3))
-    , nn(MatrixX3f::Zero(p_MNESurf.ntri,3))
-    , a(VectorXf::Zero(p_MNESurf.ntri))
-    , b(VectorXf::Zero(p_MNESurf.ntri))
-    , c(VectorXf::Zero(p_MNESurf.ntri))
-    , det(VectorXf::Zero(p_MNESurf.ntri))
+: r1(MatrixX3f::Zero(p_MNESurf.ntri,3))
+, r12(MatrixX3f::Zero(p_MNESurf.ntri,3))
+, r13(MatrixX3f::Zero(p_MNESurf.ntri,3))
+, nn(MatrixX3f::Zero(p_MNESurf.ntri,3))
+, a(VectorXf::Zero(p_MNESurf.ntri))
+, b(VectorXf::Zero(p_MNESurf.ntri))
+, c(VectorXf::Zero(p_MNESurf.ntri))
+, det(VectorXf::Zero(p_MNESurf.ntri))
 {
     for (int i = 0; i < p_MNESurf.ntri; ++i)
     {
@@ -178,7 +178,7 @@ bool MNEProjectToSurface::mne_find_closest_on_surface(const MatrixXf &r, const i
     int bestTri = -1;
     float bestDist = -1;
     Vector3f rTriK;
-    for (int  k = 0; k < np; ++k)
+    for (int k = 0; k < np; ++k)
     {
         /*
          * To do: decide_search_restriction for the use in an iterative closest point to plane algorithm
@@ -190,7 +190,7 @@ bool MNEProjectToSurface::mne_find_closest_on_surface(const MatrixXf &r, const i
             return false;
         }
         rTri.row(k) = rTriK.transpose();
-        nearest[k] =  bestTri;
+        nearest[k] = bestTri;
         dist[k] = bestDist;
     }
     return true;
@@ -201,7 +201,7 @@ bool MNEProjectToSurface::mne_find_closest_on_surface(const MatrixXf &r, const i
 
 bool MNEProjectToSurface::mne_project_to_surface(const Vector3f &r, Vector3f &rTri, int &bestTri, float &bestDist)
 {
-    float  p = 0, q = 0, p0 = 0, q0 = 0, dist0 = 0;
+    float p = 0, q = 0, p0 = 0, q0 = 0, dist0 = 0;
     bestDist = 0;
     bestTri = -1;
     for (int tri = 0; tri < a .size(); ++tri)
