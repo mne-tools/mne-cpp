@@ -163,7 +163,7 @@ QuickControlWidget::QuickControlWidget(const QMap<qint32, float>& qMapChScaling,
         createModalityGroup();
         m_bModalitiy = true;
     } else {
-        ui->m_groupBox_modalities->hide();
+        ui->m_tabWidget_viewOptions->removeTab(ui->m_tabWidget_viewOptions->indexOf(this->findTabWidgetByText(ui->m_tabWidget_viewOptions, "Modalities")));
         m_bModalitiy = false;
     }
 
@@ -621,7 +621,6 @@ void QuickControlWidget::onToggleHideAll(bool state)
 {
     if(!state) {
         //ui->m_widget_master->hide();
-        ui->m_groupBox_modalities->hide();
         ui->m_groupBox_noise->hide();
         ui->m_groupBox_other->hide();
         ui->m_groupBox_scaling->hide();
@@ -637,10 +636,6 @@ void QuickControlWidget::onToggleHideAll(bool state)
 
         if(m_bView || m_bTriggerDetection) {
             ui->m_groupBox_other->show();
-        }
-
-        if(m_bModalitiy) {
-            ui->m_groupBox_modalities->show();
         }
 
         ui->m_pushButton_hideAll->setText(QString("Minimize - Quick Control - %1").arg(m_sName));
@@ -1269,7 +1264,8 @@ void QuickControlWidget::createModalityGroup()
 
     }
 
-    ui->m_groupBox_modalities->setLayout(t_pGridLayout);
+    //Find Modalities tab and add current layout
+    this->findTabWidgetByText(ui->m_tabWidget_viewOptions, "Modalities")->setLayout(t_pGridLayout);
 }
 
 

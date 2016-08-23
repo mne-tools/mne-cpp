@@ -38,13 +38,6 @@
        </property>
       </widget>
      </item>
-     <item row="3" column="0">
-      <widget class="QGroupBox" name="m_groupBox_modalities">
-       <property name="title">
-        <string>Modalities</string>
-       </property>
-      </widget>
-     </item>
      <item row="1" column="0">
       <widget class="QGroupBox" name="m_groupBox_noise">
        <property name="title">
@@ -185,7 +178,7 @@
         <item row="0" column="0" colspan="2">
          <widget class="QTabWidget" name="m_tabWidget_viewOptions">
           <property name="currentIndex">
-           <number>1</number>
+           <number>3</number>
           </property>
           <widget class="QWidget" name="View">
            <attribute name="title">
@@ -416,6 +409,11 @@
              <widget class="QComboBox" name="m_comboBox_triggerColorType"/>
             </item>
            </layout>
+          </widget>
+          <widget class="QWidget" name="Modalities">
+           <attribute name="title">
+            <string>Modalities</string>
+           </attribute>
           </widget>
           <widget class="QWidget" name="tab">
            <attribute name="title">
