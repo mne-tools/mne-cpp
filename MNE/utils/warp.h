@@ -122,11 +122,11 @@ public:
     *
     * @param[in]  sLm      3D Landmarks of the source geometry
     * @param[in]  dLm      3D Landmarks of the destination geometry
-    * @param[in]  p_MNEBem Bem containing the vertices of the source geometry
+    * @param[in]  sBem     source Bem containing the vertices of the source geometry
     *
-    * @return MNEBem   Bem containing the vertices of the warped destination geometry
+    * @return wBem   warped Bem containing the vertices of the warped destination geometry
     */
-    MNELIB::MNEBem calculate(const MatrixXd & sLm, const MatrixXd &dLm, const MNELIB::MNEBem &Bem);
+    MNELIB::MNEBem calculate(const MatrixXd & sLm, const MatrixXd &dLm, const MNELIB::MNEBem &sBem);
 
     //=========================================================================================================
     /**
