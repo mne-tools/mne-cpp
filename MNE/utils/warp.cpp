@@ -38,6 +38,7 @@
 
 #include "warp.h"
 #include <mne/mne_bem.h>
+#include <mne/mne_bem_surface.h>
 
 
 //*************************************************************************************************************
@@ -93,6 +94,12 @@ MNELIB::MNEBem Warp::calculate(const MatrixXd & sLm, const MatrixXd &dLm, const 
     MatrixXd warpWeight, polWeight;
     calcWeighting(sLm, dLm, warpWeight, polWeight);
 
+    MNELIB::MNEBemSurface head;
+    MNELIB::MNEBemSurface outer_skull;
+    MNELIB::MNEBemSurface inner_skull;
+    head = p_MNEBem[0];
+    outer_skull = p_MNEBem[1];
+    inner_skull = p_MNEBem[2];
     MatrixXd wVert = warpVertices(sVert, sLm, warpWeight, polWeight);
     return wVert;
 }
