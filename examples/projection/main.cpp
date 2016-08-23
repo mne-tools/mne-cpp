@@ -98,7 +98,7 @@ int main(int argc, char *argv[])
     MNEBem t_Bem(t_fileBem);
 
     // Read the Digitizer
-    QFile t_fileDig = "./MNE-sample-data/warping/AVG4-0Years_GSN128.fif";
+    QFile t_fileDig("./MNE-sample-data/warping/AVG4-0Years_GSN128.fif");
     FiffDigPointSet t_Dig(t_fileDig);
 
     MatrixXf ElecPos(t_Dig.size(), 3);
