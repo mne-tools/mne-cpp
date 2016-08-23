@@ -154,12 +154,15 @@ protected:
     */
     bool createCustomMesh(const Eigen::MatrixX3f& tMatVert, const Eigen::MatrixX3f& tMatNorm, const Eigen::MatrixX3i& tMatTris, const QByteArray& tArrayColors = QByteArray());
 
-    Qt3DRender::QBuffer*    m_pVertexDataBuffer;    /**< The vertex buffer. */
-    Qt3DRender::QBuffer*    m_pNormalDataBuffer;    /**< The normal buffer. */
-    Qt3DRender::QBuffer*    m_pColorDataBuffer;     /**< The color buffer. */
-    Qt3DRender::QBuffer*    m_pIndexDataBuffer;     /**< The index buffer. */
+//    Qt3DRender::QBuffer*    m_pVertexDataBuffer;    /**< The vertex buffer. */
+//    Qt3DRender::QBuffer*    m_pNormalDataBuffer;    /**< The normal buffer. */
+//    Qt3DRender::QBuffer*    m_pColorDataBuffer;     /**< The color buffer. */
+//    Qt3DRender::QBuffer*    m_pIndexDataBuffer;     /**< The index buffer. */
 
-    Qt3DRender::QAttribute* m_pColorAttribute;      /**< The color attribute. */
+    QSharedPointer<Qt3DRender::QBuffer>    m_pVertexDataBuffer;    /**< The vertex buffer. */
+    QSharedPointer<Qt3DRender::QBuffer>    m_pNormalDataBuffer;    /**< The normal buffer. */
+    QSharedPointer<Qt3DRender::QBuffer>    m_pColorDataBuffer;     /**< The color buffer. */
+    QSharedPointer<Qt3DRender::QBuffer>    m_pIndexDataBuffer;     /**< The index buffer. */
 
     int                     m_iNumVert;             /**< The total number of set vertices. */
 };
