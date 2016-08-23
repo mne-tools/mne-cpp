@@ -126,7 +126,7 @@ public:
     *
     * @return MNEBem   Bem containing the vertices of the warped destination geometry
     */
-    MNELIB::MNEBem calculate(const MatrixXd & sLm, const MatrixXd &dLm, const MNELIB::MNEBem &p_MNEBem);
+    MNELIB::MNEBem calculate(const MatrixXd & sLm, const MatrixXd &dLm, const MNELIB::MNEBem &Bem);
 
     //=========================================================================================================
     /**
