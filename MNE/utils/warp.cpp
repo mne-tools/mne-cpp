@@ -37,6 +37,7 @@
 //=============================================================================================================
 
 #include "warp.h"
+#include <mne/mne_bem.h>
 
 
 //*************************************************************************************************************
@@ -81,6 +82,17 @@ MatrixXd Warp::calculate(const MatrixXd &sLm, const MatrixXd &dLm, const MatrixX
 {
     MatrixXd warpWeight, polWeight;
     calcWeighting(sLm, dLm, warpWeight, polWeight);
+    MatrixXd wVert = warpVertices(sVert, sLm, warpWeight, polWeight);
+    return wVert;
+}
+
+//*************************************************************************************************************
+
+MNELIB::MNEBem Warp::calculate(const MatrixXd & sLm, const MatrixXd &dLm, const MNELIB::MNEBem &p_MNEBem)
+{
+    MatrixXd warpWeight, polWeight;
+    calcWeighting(sLm, dLm, warpWeight, polWeight);
+
     MatrixXd wVert = warpVertices(sVert, sLm, warpWeight, polWeight);
     return wVert;
 }

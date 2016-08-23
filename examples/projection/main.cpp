@@ -41,6 +41,7 @@
 #include <disp3D/view3D.h>
 #include <disp3D/control/control3dwidget.h>
 #include <fiff/fiff_dig_point_set.h>
+#include <utils/warp.h>
 
 
 //*************************************************************************************************************
@@ -138,6 +139,32 @@ int main(int argc, char *argv[])
         t_DigProject[i].r[1] = DigProject(i,1);
         t_DigProject[i].r[2] = DigProject(i,2);
     }
+
+    //
+    // calculate Warp
+    //
+    Warp  t_Avg4Warp;
+    MatrixXd wVert(sVert.rows(),3);
+    wVert = test.calculate(DigProject, ElecPos, t_Bem[0].rr);
+
+    //
+    // WRITE NEW VERTICES BACK TO BEM
+    //
+    skin.rr=wVert.cast<float>();
+    skin.addVertexNormals();
+
+    std::cout << "Here are the first row of the matrix skin.rr after warp:" << std::endl << skin.rr.topRows(9) << std::endl;
+//    std::cout << "Here is the first row of the final matrix skin.tris:" << std::endl << skin.tris.topRows(9) << std::endl;
+//    std::cout << "Here is the last row of the final matrix skin.tris:" << std::endl << skin.tris.bottomRows(1) << std::endl;
+
+    MNELIB::MNEBem t_BemWarpedA;
+    t_BemWarpedA<<skin;
+    QFile t_fileBemWarped("./MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem-warped.fif");
+    t_BemWarpedA.write(t_fileBemWarped);
+    t_fileBemWarped.close();
+
+    MNELIB::MNEBem t_BemWarpedB (t_fileBemWarped) ;
+    MNELIB::MNEBemSurface skinWarped=t_BemWarpedB[0];
 
     //Show
     View3D::SPtr testWindow = View3D::SPtr(new View3D());
