@@ -145,7 +145,7 @@ int main(int argc, char *argv[])
     //
     Warp  t_Avg4Warp;
     MatrixXd wVert(sVert.rows(),3);
-    wVert = test.calculate(DigProject, ElecPos, t_Bem[0].rr);
+    wVert = test.calculate(DigProject, ElecPos, t_Bem);
 
     //
     // WRITE NEW VERTICES BACK TO BEM
