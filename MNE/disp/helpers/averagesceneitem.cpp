@@ -263,8 +263,14 @@ void AverageSceneItem::paintAveragePath(QPainter *painter)
             //evoked matrix is stored in column major
             double val = ((*(averageData+(i*m_iTotalNumberChannels)+m_iChannelNumber))/*-offset*/) * dScaleY;
 
-            qSamplePosition.setY(-val);
-            qSamplePosition.setX(path.currentPosition().x()+1);
+            //Cut plotting if three times bigger than m_iMaxHeigth
+            if(abs(val) > 6*m_iMaxHeigth) {
+                qSamplePosition.setY(-(val/val) * m_iMaxHeigth); //(val/val) used to retrieve sign of val
+                qSamplePosition.setX(path.currentPosition().x()+1);
+            } else {
+                qSamplePosition.setY(-val);
+                qSamplePosition.setX(path.currentPosition().x()+1);
+            }
 
             path.lineTo(qSamplePosition);
         }
