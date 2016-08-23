@@ -89,7 +89,7 @@ MatrixXd Warp::calculate(const MatrixXd &sLm, const MatrixXd &dLm, const MatrixX
 
 //*************************************************************************************************************
 
-MNELIB::MNEBem Warp::calculate(const MatrixXd & sLm, const MatrixXd &dLm, const MNELIB::MNEBem &p_MNEBem)
+MNELIB::MNEBem Warp::calculate(const MatrixXd & sLm, const MatrixXd &dLm, const MNELIB::MNEBem &Bem)
 {
     MatrixXd warpWeight, polWeight;
     calcWeighting(sLm, dLm, warpWeight, polWeight);
@@ -97,11 +97,14 @@ MNELIB::MNEBem Warp::calculate(const MatrixXd & sLm, const MatrixXd &dLm, const 
     MNELIB::MNEBemSurface head;
     MNELIB::MNEBemSurface outer_skull;
     MNELIB::MNEBemSurface inner_skull;
-    head = p_MNEBem[0];
-    outer_skull = p_MNEBem[1];
-    inner_skull = p_MNEBem[2];
-    MatrixXd wVert = warpVertices(sVert, sLm, warpWeight, polWeight);
-    return wVert;
+    head = Bem[0];
+    outer_skull = Bem[1];
+    inner_skull = Bem[2];
+
+    MNELIB::MNEBem wBem(Bem);
+    MatrixXd wVert = warpVertices(head.rr, sLm, warpWeight, polWeight);
+
+    return wBem;
 }
 
 //*************************************************************************************************************
