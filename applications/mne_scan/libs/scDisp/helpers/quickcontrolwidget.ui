@@ -178,7 +178,7 @@
         <item row="0" column="0" colspan="2">
          <widget class="QTabWidget" name="m_tabWidget_viewOptions">
           <property name="currentIndex">
-           <number>3</number>
+           <number>4</number>
           </property>
           <widget class="QWidget" name="View">
            <attribute name="title">
@@ -449,6 +449,11 @@
              </widget>
             </item>
            </layout>
+          </widget>
+          <widget class="QWidget" name="Averages">
+           <attribute name="title">
+            <string>Averages</string>
+           </attribute>
           </widget>
          </widget>
         </item>
