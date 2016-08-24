@@ -283,7 +283,7 @@ void AverageWindow::onSelectionChanged(const QItemSelection &selected, const QIt
                 averageSceneItemTemp->m_iChannelUnit = fiffInfo->chs.at(channelNumber).unit;;
                 averageSceneItemTemp->m_iChannelNumber = channelNumber;
                 averageSceneItemTemp->m_iTotalNumberChannels = fiffInfo->ch_names.size();
-                averageSceneItemTemp->m_lAverageData.append(averageData);
+                averageSceneItemTemp->m_lAverageData.append(QPair<double, RowVectorPair>(0,averageData));
             }
         }
     }

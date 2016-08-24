@@ -84,12 +84,12 @@ QuickControlWidget::QuickControlWidget(const QMap<qint32, float>& qMapChScaling,
             this, &QuickControlWidget::hide);
 
 //    //Create trigger color map
-//    m_qMapTriggerColor.clear();
+//    m_qMapAverageColor.clear();
 
-//    for(int i = 0; i<pFiffInfo->chs.size(); i++) {
-//        if(pFiffInfo->chs[i].kind == FIFFV_STIM_CH)
-//            m_qMapTriggerColor.insert(pFiffInfo->chs[i].ch_name, QColor(170,0,0));
-//    }
+//    m_qMapAverageColor.insert(0, QPair<QColor,QString>(QColor(170,0,0),"Auditory"));
+//    m_qMapAverageColor.insert(1, QPair<QColor,QString>(QColor(170,5,0),"Vis"));
+//    m_qMapAverageColor.insert(4, QPair<QColor,QString>(QColor(170,63,11),"Senso"));
+//    m_qMapAverageColor.insert(5, QPair<QColor,QString>(QColor(170,88,22),"Auditory"));
 
     //Connect screenshot button
     connect(ui->m_pushButton_makeScreenshot, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
@@ -167,6 +167,14 @@ QuickControlWidget::QuickControlWidget(const QMap<qint32, float>& qMapChScaling,
         m_bModalitiy = false;
     }
 
+    if(m_slFlags.contains("averages", Qt::CaseInsensitive)) {
+        createAveragesGroup();
+        m_bAverages = true;
+    } else {
+        ui->m_tabWidget_viewOptions->removeTab(ui->m_tabWidget_viewOptions->indexOf(this->findTabWidgetByText(ui->m_tabWidget_viewOptions, "Averages")));
+        m_bAverages = false;
+    }
+
     //Decide whether to complete hide some groups
     if(!m_bFilter && !m_bProjections && !m_bCompensator && !m_bSphara) {
         ui->m_groupBox_noise->hide();
@@ -195,7 +203,7 @@ void QuickControlWidget::filterGroupChanged(QList<QCheckBox*> list)
     if(m_bFilter) {
         m_qFilterListCheckBox.clear();
 
-        for(int u = 0; u<list.size(); u++) {
+        for(int u = 0; u < list.size(); ++u) {
             QCheckBox* tempCheckBox = new QCheckBox(list[u]->text());
             tempCheckBox->setChecked(list[u]->isChecked());
 
@@ -214,8 +222,9 @@ void QuickControlWidget::filterGroupChanged(QList<QCheckBox*> list)
 
         //Delete all widgets in the filter layout
         QGridLayout* topLayout = static_cast<QGridLayout*>(this->findTabWidgetByText(ui->m_tabWidget_noiseReduction, "Filter")->layout());
-        if(!topLayout)
+        if(!topLayout) {
            topLayout = new QGridLayout();
+        }
 
         QLayoutItem *child;
         while ((child = topLayout->takeAt(0)) != 0) {
@@ -226,8 +235,9 @@ void QuickControlWidget::filterGroupChanged(QList<QCheckBox*> list)
         //Add filters
         int u = 0;
 
-        for(u; u<m_qFilterListCheckBox.size(); u++)
+        for(u; u < m_qFilterListCheckBox.size(); ++u) {
             topLayout->addWidget(m_qFilterListCheckBox[u], u, 0);
+        }
 
         //Add push button for filter options
         m_pShowFilterOptions = new QPushButton();
@@ -337,6 +347,28 @@ const QColor& QuickControlWidget::getBackgroundColor()
 
 //*************************************************************************************************************
 
+void QuickControlWidget::setAverageMap(const QMap<double, QPair<QColor, QPair<QString,bool> > >& qMapAverageColor)
+{
+    //Check if average type already exists in the map
+    QMapIterator<double, QPair<QColor, QPair<QString,bool> > > i(qMapAverageColor);
+
+    while (i.hasNext()) {
+        i.next();
+
+        if(!m_qMapAverageColor.contains(i.key())) {
+            m_qMapAverageColor.insert(i.key(), i.value());
+        }
+    }
+
+    //Recreate average group
+    if(m_bAverages) {
+        createAveragesGroup();
+    }
+}
+
+
+//*************************************************************************************************************
+
 void QuickControlWidget::onTimeWindowChanged(int value)
 {
     emit timeWindowChanged(value);
@@ -402,20 +434,23 @@ void QuickControlWidget::onEnableDisableAllProj(bool status)
 
 void QuickControlWidget::onCheckCompStatusChanged(const QString & compName)
 {
-    qDebug()<<compName;
+    //qDebug()<<compName;
 
     bool currentState = false;
 
-    for(int i = 0; i < m_qListCompCheckBox.size(); ++i)
-        if(m_qListCompCheckBox[i]->text() != compName)
+    for(int i = 0; i < m_qListCompCheckBox.size(); ++i) {
+        if(m_qListCompCheckBox[i]->text() != compName) {
             m_qListCompCheckBox[i]->setChecked(false);
-        else
+        } else {
             currentState = m_qListCompCheckBox[i]->isChecked();
+        }
+    }
 
-    if(currentState)
+    if(currentState) {
         emit compSelectionChanged(compName.toInt());
-    else //If none selected
+    } else { //If none selected
         emit compSelectionChanged(0);
+    }
 
     emit updateConnectedView();
 }
@@ -827,6 +862,39 @@ void QuickControlWidget::onMakeScreenshot()
 {
     qDebug()<<ui->m_comboBox_imageType->currentText();
     emit makeScreenshot(ui->m_comboBox_imageType->currentText());
+}
+
+
+//*************************************************************************************************************
+
+void QuickControlWidget::onAveragesChanged()
+{
+    //Change color for average
+    if(QPushButton* button = qobject_cast<QPushButton*>(sender()))
+    {
+        QColor color = QColorDialog::getColor(QColor(0,0,0), this, "Set average color");
+
+        //Change color of pushbutton
+        QPalette* palette1 = new QPalette();
+        palette1->setColor(QPalette::Button,color);
+        button->setPalette(*palette1);
+        button->update();
+
+        //Set color of button new new scene color
+        button->setStyleSheet(QString("background-color: rgb(%1, %2, %3);").arg(color.red()).arg(color.green()).arg(color.blue()));
+
+        m_qMapAverageColor[m_qMapButtonAverageType[button]].first = color;
+
+        emit averagesChanged(m_qMapAverageColor);
+    }
+
+    //Change color for average
+    if(QCheckBox* checkBox = qobject_cast<QCheckBox*>(sender()))
+    {
+        m_qMapAverageColor[m_qMapChkBoxAverageType[checkBox]].second.second = checkBox->isChecked();
+
+        emit averagesChanged(m_qMapAverageColor);
+    }
 }
 
 
@@ -1308,6 +1376,57 @@ void QuickControlWidget::createCompensatorGroup()
         //Find Comp tab and add current layout
         this->findTabWidgetByText(ui->m_tabWidget_noiseReduction, "Comp")->setLayout(topLayout);
     }
+}
+
+
+//*************************************************************************************************************
+
+void QuickControlWidget::createAveragesGroup()
+{
+    //Delete all widgets in the averages layout
+    QGridLayout* topLayout = static_cast<QGridLayout*>(this->findTabWidgetByText(ui->m_tabWidget_viewOptions, "Averages")->layout());
+    if(!topLayout) {
+       topLayout = new QGridLayout();
+    }
+
+    QLayoutItem *child;
+    while ((child = topLayout->takeAt(0)) != 0) {
+        delete child->widget();
+        delete child;
+    }
+
+    //Set trigger types
+    QMapIterator<double, QPair<QColor, QPair<QString,bool> > > i(m_qMapAverageColor);
+    int count = 0;
+    m_qMapButtonAverageType.clear();
+
+    while (i.hasNext()) {
+        i.next();
+
+        //Create average checkbox
+        QCheckBox* pCheckBox = new QCheckBox(i.value().second.first);
+        pCheckBox->setChecked(i.value().second.second);
+        topLayout->addWidget(pCheckBox, count, 0);
+        connect(pCheckBox, &QCheckBox::clicked,
+                this, &QuickControlWidget::onAveragesChanged);
+        m_qMapChkBoxAverageType.insert(pCheckBox, i.value().second.first.toDouble());
+
+        //Create average color pushbutton
+        QPushButton* pButton = new QPushButton();
+        QPalette* pPalette = new QPalette();
+        pPalette->setColor(QPalette::Button,i.value().first);
+        pButton->setPalette(*pPalette);
+        pButton->update();
+        topLayout->addWidget(pButton, count, 1);
+        connect(pButton, &QPushButton::clicked,
+                this, &QuickControlWidget::onAveragesChanged);
+        m_qMapButtonAverageType.insert(pButton, i.value().second.first.toDouble());
+
+        ++count;
+    }
+
+    //Find Filter tab and add current layout
+    this->findTabWidgetByText(ui->m_tabWidget_viewOptions, "Averages")->setLayout(topLayout);
 }
 
 

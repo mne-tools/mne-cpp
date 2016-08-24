@@ -476,10 +476,6 @@ void RealTimeEvokedWidget::init()
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::scalingChanged,
                 this, &RealTimeEvokedWidget::broadcastScaling);
 
-        //Handle signal color changes
-        connect(m_pQuickControlWidget.data(), &QuickControlWidget::signalColorChanged,
-                this, &RealTimeEvokedWidget::onSignalColorChanged);
-
         //Handle background color changes
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::backgroundColorChanged,
                 this, &RealTimeEvokedWidget::onTableViewBackgroundColorChanged);
@@ -510,6 +506,7 @@ void RealTimeEvokedWidget::init()
         //Handle updating the butterfly and layout plot
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::updateConnectedView,
                 m_pButterflyPlot.data(), &RealTimeButterflyPlot::updateView);
+
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::updateConnectedView,
                 this, &RealTimeEvokedWidget::onSelectionChanged);
 
@@ -555,8 +552,6 @@ void RealTimeEvokedWidget::init()
         m_pAverageScene->setBackgroundBrush(backgroundBrush);
 
         m_pButterflyPlot->setBackgroundColor(settings.value(QString("RTEW/%1/butterflyBackgroundColor").arg(t_sRTEWName), butterflyBackgroundDefault).value<QColor>());
-
-        m_pAverageScene->setSignalColorForAllItems(settings.value(QString("RTEW/%1/signalColor").arg(t_sRTEWName), signalDefault).value<QColor>());
 
         //Initialized
         m_bInitialized = true;
@@ -664,7 +659,7 @@ void RealTimeEvokedWidget::onSelectionChanged()
             averageSceneItemTemp->m_firstLastSample.second = averageData.second-m_pRTE->getNumPreStimSamples();
             averageSceneItemTemp->m_iChannelNumber = channelNumber;
             averageSceneItemTemp->m_iTotalNumberChannels = m_pFiffInfo->ch_names.size();
-            averageSceneItemTemp->m_lAverageData.append(averageData);
+            averageSceneItemTemp->m_lAverageData.append(QPair<double, RowVectorPair>(0,averageData));
         }
     }
 
@@ -685,17 +680,6 @@ void RealTimeEvokedWidget::showFilterWidget(bool state)
         }
     } else {
         m_pFilterWindow->hide();
-    }
-}
-
-
-//*************************************************************************************************************
-
-void RealTimeEvokedWidget::onSignalColorChanged(const QColor& signalColor)
-{
-    //Only change the signal colors in the 2D layout plot
-    if(m_pToolBox->itemText(m_pToolBox->currentIndex()) == "2D Layout plot") {
-        m_pAverageScene->setSignalColorForAllItems(signalColor);
     }
 }
 

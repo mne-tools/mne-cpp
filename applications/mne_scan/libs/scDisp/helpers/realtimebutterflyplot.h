@@ -59,6 +59,14 @@ public:
 
     const QColor& getBackgroundColor();
 
+    //=========================================================================================================
+    /**
+    * Set the average map information
+    *
+    * @param [in] mapAvr     The average data information including the color per average type.
+    */
+    void setAverageMap(const QMap<double, QPair<QColor, QPair<QString,bool> > >& mapAvr);
+
 protected:
     //=========================================================================================================
     /**
@@ -98,6 +106,9 @@ private:
     QColor                  m_colCurrentBackgroundColor;
 
     QList<int>              m_lSelectedChannels;
+
+    QMap<double, QPair<QColor, QPair<QString,bool> > >      m_qMapAverageColor;             /**< Average colors and names. */
+
 };
 
 

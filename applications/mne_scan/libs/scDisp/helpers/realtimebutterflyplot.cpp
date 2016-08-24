@@ -80,7 +80,7 @@ void RealTimeButterflyPlot::paintEvent(QPaintEvent* paintEvent)
     painter.drawRect(QRect(0,0,this->width()-1,this->height()-1));
     painter.restore();
 
-    painter.setRenderHint(QPainter::Antialiasing, true);
+    painter.setRenderHint(QPainter::Antialiasing, false);
 
     if(m_bIsInit)
     {
@@ -319,70 +319,72 @@ void RealTimeButterflyPlot::createPlotPath(qint32 row, QPainter& painter) const
 
     float fDx = (float)(this->width()-2) / ((float)m_pRealTimeEvokedModel->getNumSamples()-1.0f);//((float)option.rect.width()) / m_pRealTimeEvokedModel->getMaxSamples();
 
-    QList<Eigen::RowVectorXd> rowVec = m_pRealTimeEvokedModel->data(row,1).value<QList<Eigen::RowVectorXd> >();
+    QList<SCDISPLIB::AvrTypeRowVector> rowVec = m_pRealTimeEvokedModel->data(row,1).value<QList<SCDISPLIB::AvrTypeRowVector> >();
 
     //Do for all average types
     for(int j = 0; j < rowVec.size(); ++j) {
-        //Calculate downsampling factor of averaged data in respect to the items width
-        int dsFactor;
-        rowVec.at(j).cols() / this->width() < 1 ? dsFactor = 1 : dsFactor = rowVec.at(j).cols() / this->width();
-        if(dsFactor == 0) {
-            dsFactor = 1;
+        if(m_qMapAverageColor[rowVec.at(j).first].second.second) {
+            //Calculate downsampling factor of averaged data in respect to the items width
+            int dsFactor;
+            rowVec.at(j).second.cols() / this->width() < 1 ? dsFactor = 1 : dsFactor = rowVec.at(j).second.cols() / this->width();
+            if(dsFactor == 0) {
+                dsFactor = 1;
+            }
+
+            QPainterPath path(QPointF(1,0));
+            float y_base = path.currentPosition().y();
+
+            //Move to initial starting point
+            if(rowVec.at(j).second.cols() > 0)
+            {
+                float val = rowVec.at(j).second[0];
+                fValue = (val/*-rowVec.at(j)[m_pRealTimeEvokedModel->getNumPreStimSamples()-1]*/)*fScaleY;//ToDo -> -2 PreStim is one too short
+
+                float newY = y_base+fValue;
+
+                qSamplePosition.setY(-newY);
+                qSamplePosition.setX(path.currentPosition().x());
+
+                path.moveTo(qSamplePosition);
+            }
+
+            //create lines from one to the next sample
+            qint32 i;
+            for(i = 1; i < rowVec.at(j).second.cols() && path.elementCount() <= this->width(); i += dsFactor) {
+                float val = /*rowVec.at(j)[m_pRealTimeEvokedModel->getNumPreStimSamples()-1] - */rowVec.at(j).second[i]; //remove first sample data[0] as offset
+                fValue = val*fScaleY;
+
+                //Cut plotting if out of widget area
+                fValue = fValue > fWinMaxVal ? fWinMaxVal : fValue < -fWinMaxVal ? -fWinMaxVal : fValue;
+
+                float newY = y_base+fValue;
+
+                qSamplePosition.setY(-newY);
+
+                qSamplePosition.setX(path.currentPosition().x()+fDx);
+
+                path.lineTo(qSamplePosition);
+            }
+
+        //    //create lines from one to the next sample for last path
+        //    qint32 sample_offset = m_pRealTimeEvokedModel->numVLines() + 1;
+        //    qSamplePosition.setX(qSamplePosition.x() + fDx*sample_offset);
+        //    lastPath.moveTo(qSamplePosition);
+
+        //    for(i += sample_offset; i < lastData.size(); ++i) {
+        //        float val = lastData[i] - lastData[0]; //remove first sample lastData[0] as offset
+        //        fValue = val*fScaleY;
+
+        //        float newY = y_base+fValue;
+
+        //        qSamplePosition.setY(newY);
+        //        qSamplePosition.setX(lastPath.currentPosition().x()+fDx);
+
+        //        lastPath.lineTo(qSamplePosition);
+        //    }
+
+            painter.drawPath(path);
         }
-
-        QPainterPath path(QPointF(1,0));
-        float y_base = path.currentPosition().y();
-
-        //Move to initial starting point
-        if(rowVec.at(j).cols() > 0)
-        {
-            float val = rowVec.at(j)[0];
-            fValue = (val/*-rowVec.at(j)[m_pRealTimeEvokedModel->getNumPreStimSamples()-1]*/)*fScaleY;//ToDo -> -2 PreStim is one too short
-
-            float newY = y_base+fValue;
-
-            qSamplePosition.setY(-newY);
-            qSamplePosition.setX(path.currentPosition().x());
-
-            path.moveTo(qSamplePosition);
-        }
-
-        //create lines from one to the next sample
-        qint32 i;
-        for(i = 1; i < rowVec.at(j).cols() && path.elementCount() <= this->width(); i += dsFactor) {
-            float val = /*rowVec.at(j)[m_pRealTimeEvokedModel->getNumPreStimSamples()-1] - */rowVec.at(j)[i]; //remove first sample data[0] as offset
-            fValue = val*fScaleY;
-
-            //Cut plotting if out of widget area
-            fValue = fValue > fWinMaxVal ? fWinMaxVal : fValue < -fWinMaxVal ? -fWinMaxVal : fValue;
-
-            float newY = y_base+fValue;
-
-            qSamplePosition.setY(-newY);
-
-            qSamplePosition.setX(path.currentPosition().x()+fDx);
-
-            path.lineTo(qSamplePosition);
-        }
-
-    //    //create lines from one to the next sample for last path
-    //    qint32 sample_offset = m_pRealTimeEvokedModel->numVLines() + 1;
-    //    qSamplePosition.setX(qSamplePosition.x() + fDx*sample_offset);
-    //    lastPath.moveTo(qSamplePosition);
-
-    //    for(i += sample_offset; i < lastData.size(); ++i) {
-    //        float val = lastData[i] - lastData[0]; //remove first sample lastData[0] as offset
-    //        fValue = val*fScaleY;
-
-    //        float newY = y_base+fValue;
-
-    //        qSamplePosition.setY(newY);
-    //        qSamplePosition.setX(lastPath.currentPosition().x()+fDx);
-
-    //        lastPath.lineTo(qSamplePosition);
-    //    }
-
-        painter.drawPath(path);
     }
 }
 
@@ -461,3 +463,14 @@ const QColor& RealTimeButterflyPlot::getBackgroundColor()
 {
     return m_colCurrentBackgroundColor;
 }
+
+
+//*************************************************************************************************************
+
+void RealTimeButterflyPlot::setAverageMap(const QMap<double, QPair<QColor, QPair<QString,bool> > >& mapAvr)
+{
+    m_qMapAverageColor = mapAvr;
+
+    update();
+}
+

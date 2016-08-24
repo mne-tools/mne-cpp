@@ -83,6 +83,8 @@ namespace RealTimeEvokedSetModelRoles
 }
 
 typedef QPair<const double*,qint32> RowVectorPair;
+typedef QPair<double, Eigen::RowVectorXd> AvrTypeRowVector;
+typedef QPair<double, SCDISPLIB::RowVectorPair> AvrTypeRowVectorPair;
 
 
 //*************************************************************************************************************
@@ -389,11 +391,13 @@ private:
 
     QMap<qint32,qint32>                 m_qMapIdxRowSelection;          /**< Selection mapping.*/
     QMap<qint32,float>                  m_qMapChScaling;                /**< Channel scaling map. */
+    QMap<double, QPair<QColor, QPair<QString,bool> > >  m_qMapAverageColor;             /**< Average colors and names. */
 
     QList<Eigen::MatrixXd>              m_matData;                      /**< List that holds the data*/
     QList<Eigen::MatrixXd>              m_matDataFreeze;                /**< List that holds the data when freezed*/
     QList<Eigen::MatrixXd>              m_matDataFiltered;              /**< The filtered data */
     QList<Eigen::MatrixXd>              m_matDataFilteredFreeze;        /**< The raw filtered data in freeze mode */
+    QList<double>                       m_lAvrTypes;                    /**< The average types */
 
     Eigen::MatrixXd                     m_matProj;                      /**< SSP projector */
     Eigen::MatrixXd                     m_matComp;                      /**< Compensator */
@@ -425,6 +429,14 @@ signals:
     * @param [in] selection     list of all selected channels
     */
     void newSelection(QList<qint32> selection);
+
+    //=========================================================================================================
+    /**
+    * Emmited when new average type has been received
+    *
+    * @param [in] qMapAverageColor     the average information map
+    */
+    void newAverageTypeReceived(QMap<double, QPair<QColor, QPair<QString,bool> > > qMapAverageColor);
 };
 
 
@@ -551,12 +563,12 @@ inline int RealTimeEvokedSetModel::getNumAverages() const
 
 #ifndef metatype_listrowvectorxd
 #define metatype_listrowvectorxd
-Q_DECLARE_METATYPE(QList<Eigen::RowVectorXd>);    /**< Provides QT META type declaration of the Eigen::RowVectorXd type. For signal/slot usage.*/
+Q_DECLARE_METATYPE(SCDISPLIB::AvrTypeRowVector);    /**< Provides QT META type declaration of the Eigen::RowVectorXd type. For signal/slot usage.*/
 #endif
 
 #ifndef metatype_listrowvectorpair
 #define metatype_listrowvectorpair
-Q_DECLARE_METATYPE(QList<SCDISPLIB::RowVectorPair>);
+Q_DECLARE_METATYPE(SCDISPLIB::AvrTypeRowVectorPair);
 #endif
 
 #endif // REALTIMEEVOKEDSETMODEL_H
