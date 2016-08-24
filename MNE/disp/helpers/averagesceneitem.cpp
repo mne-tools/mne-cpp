@@ -111,7 +111,7 @@ void AverageSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     //set posistion
     this->setPos(75*m_qpChannelPosition.x(), -75*m_qpChannelPosition.y());
 
-    painter->setRenderHint(QPainter::Antialiasing, true);
+    painter->setRenderHint(QPainter::Antialiasing, false);
 
 //    //Plot bounding rect / drawing region of this item
 //    painter->drawRect(this->boundingRect());
