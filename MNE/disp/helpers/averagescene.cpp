@@ -111,7 +111,7 @@ void AverageScene::setAverageMap(const QMap<double, QPair<QColor, QPair<QString,
     QListIterator<QGraphicsItem*> i(items);
     while (i.hasNext()) {
         if(AverageSceneItem* averageSceneItemTemp = dynamic_cast<AverageSceneItem*>(i.next())) {
-            averageSceneItemTemp->setSignalColor(mapAvr);
+            averageSceneItemTemp->setSignalMap(mapAvr);
         }
     }
 }

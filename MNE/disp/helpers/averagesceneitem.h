@@ -119,11 +119,11 @@ public:
 
     //=========================================================================================================
     /**
-    * Set the color for each average type
+    * Set the average information for each average type
     *
     * @param [in] mapAvr     The new color for all channels.
     */
-    void setSignalColor(const QMap<double, QPair<QColor, QPair<QString,bool> > >& mapAvr);
+    void setSignalMap(const QMap<double, QPair<QColor, QPair<QString,bool> > >& mapAvr);
 
     QString                                         m_sChannelName;             /**< The channel name.*/
     int                                             m_iChannelNumber;           /**< The channel number.*/
