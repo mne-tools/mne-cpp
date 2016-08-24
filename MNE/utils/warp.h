@@ -104,7 +104,19 @@ public:
     *
     * @return wVert   Vertices of the warped destination geometry
     */
-    MatrixXd calculate(const MatrixXd & sLm, const MatrixXd &dLm, const MatrixXd & sVert);
+    MatrixXf calculate(const MatrixXf & sLm, const MatrixXf &dLm, const MatrixXf & sVert);
+
+    //=========================================================================================================
+    /**
+    * Calculates the TPS Warp of given setup for a Bem
+    *
+    * @param[in]  sLm       3D Landmarks of the source geometry
+    * @param[in]  dLm       3D Landmarks of the destination geometry
+    * @param[in/out] vertA  Vertices A of the source geometry that are warped to the destination
+    * @param[in/out] vertB  Vertices B of the source geometry that are warped to the destination
+    * @param[in/out] vertC  Vertices C of the source geometry that are warped to the destination
+    */
+    void calculate(const MatrixXf & sLm, const MatrixXf &dLm, MatrixXf & vertA, MatrixXf & vertB, MatrixXf & vertC);
 
     //=========================================================================================================
     /**
@@ -114,7 +126,7 @@ public:
     *
     * @return electrodes   Matrix with electrode positions
     */
-    MatrixXd readsLm(const QString &electrodeFileName);
+    MatrixXf readsLm(const QString &electrodeFileName);
 
 private:
 
@@ -127,7 +139,7 @@ private:
     * @param[out] warpWeight Weighting parameters of the tps warp
     * @param[out] polWeight  Weighting papameters of the polynomial warp
     */
-    bool calcWeighting(const MatrixXd& sLm, const MatrixXd &dLm, MatrixXd& warpWeight, MatrixXd& polWeight);
+    bool calcWeighting(const MatrixXf& sLm, const MatrixXf &dLm, MatrixXf& warpWeight, MatrixXf& polWeight);
 
     //=========================================================================================================
     /**
@@ -140,7 +152,7 @@ private:
     *
     * @return Warped Vertices
     */
-    MatrixXd warpVertices(const MatrixXd & sVert, const MatrixXd & sLm, const MatrixXd& warpWeight, const MatrixXd& polWeight);
+    MatrixXf warpVertices(const MatrixXf & sVert, const MatrixXf & sLm, const MatrixXf& warpWeight, const MatrixXf& polWeight);
 
 };
 
