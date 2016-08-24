@@ -37,8 +37,6 @@
 //=============================================================================================================
 
 #include "warp.h"
-#include <mne/mne_bem.h>
-#include <mne/mne_bem_surface.h>
 
 
 //*************************************************************************************************************
@@ -89,32 +87,16 @@ MatrixXd Warp::calculate(const MatrixXd &sLm, const MatrixXd &dLm, const MatrixX
 
 //*************************************************************************************************************
 
-MNELIB::MNEBem Warp::calculate(const MatrixXd & sLm, const MatrixXd &dLm, const MNELIB::MNEBem &sBem)
+void Warp::calculate(const MatrixXd & sLm, const MatrixXd &dLm, MatrixXd & vertA, MatrixXd & vertB, MatrixXd & vertC)
 {
     MatrixXd warpWeight, polWeight;
     calcWeighting(sLm, dLm, warpWeight, polWeight);
 
-    MNELIB::MNEBemSurface head;
-    MNELIB::MNEBemSurface outer_skull;
-    MNELIB::MNEBemSurface inner_skull;
-    head = sBem[0];
-    outer_skull = sBem[1];
-    inner_skull = sBem[2];
+    vertA = warpVertices(vertA, sLm, warpWeight, polWeight);
+    vertB = warpVertices(vertB, sLm, warpWeight, polWeight);
+    vertC = warpVertices(vertC, sLm, warpWeight, polWeight);
 
-    MNELIB::MNEBem wBem;
-    MatrixXd headVert = warpVertices(head.rr.cast<double>(), sLm, warpWeight, polWeight);
-    MatrixXd outer_skullVert = warpVertices(outer_skull.rr.cast<double>(), sLm, warpWeight, polWeight);
-    MatrixXd inner_skullVert = warpVertices(inner_skull.rr.cast<double>(), sLm, warpWeight, polWeight);
-
-    head.rr = headVert.cast<float>();
-    outer_skull.rr = outer_skullVert.cast<float>();
-    inner_skull.rr = inner_skullVert.cast<float>();
-
-    wBem << head;
-    wBem << outer_skull;
-    wBem << inner_skull;
-
-    return wBem;
+    return;
 }
 
 //*************************************************************************************************************
