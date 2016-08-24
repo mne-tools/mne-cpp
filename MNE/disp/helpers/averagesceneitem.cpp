@@ -56,7 +56,12 @@ using namespace std;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-AverageSceneItem::AverageSceneItem(const QString& channelName, int channelNumber, const QPointF &channelPosition, int channelKind, int channelUnit, const QColor &color)
+AverageSceneItem::AverageSceneItem(const QString& channelName,
+                                   int channelNumber,
+                                   const QPointF &channelPosition,
+                                   int channelKind,
+                                   int channelUnit,
+                                   const QColor &color)
 : m_sChannelName(channelName)
 , m_iChannelNumber(channelNumber)
 , m_qpChannelPosition(channelPosition)
@@ -70,6 +75,17 @@ AverageSceneItem::AverageSceneItem(const QString& channelName, int channelNumber
     m_lAverageColors.append(color);
 
     m_rectBoundingRect = QRectF(-m_iMaxWidth/2, -m_iMaxHeigth/2, m_iMaxWidth, m_iMaxHeigth);
+
+    //Init avr map
+    QPair<QColor, QPair<QString,bool> > pairFinal;
+    QPair<QString,bool> pair;
+
+    pair.first = "0";
+    pair.second = true;
+    pairFinal.first = QColor(0,0,0);
+    pairFinal.second = pair;
+
+    m_qMapAverageColor.insert(0,pairFinal);
 }
 
 
@@ -155,7 +171,7 @@ void AverageSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 
 //*************************************************************************************************************
 
-void AverageSceneItem::setSignalColor(const QMap<double, QPair<QColor, QPair<QString,bool> > >& mapAvr)
+void AverageSceneItem::setSignalMap(const QMap<double, QPair<QColor, QPair<QString,bool> > >& mapAvr)
 {
     m_qMapAverageColor = mapAvr;
 

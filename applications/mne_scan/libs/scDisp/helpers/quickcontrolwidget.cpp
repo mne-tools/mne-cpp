@@ -1408,10 +1408,7 @@ void QuickControlWidget::createAveragesGroup()
 
         //Create average color pushbutton
         QPushButton* pButton = new QPushButton();
-        QPalette* pPalette = new QPalette();
-        pPalette->setColor(QPalette::Button,i.value().first);
-        pButton->setPalette(*pPalette);
-        pButton->update();
+        pButton->setStyleSheet(QString("background-color: rgb(%1, %2, %3);").arg(i.value().first.red()).arg(i.value().first.green()).arg(i.value().first.blue()));
         topLayout->addWidget(pButton, count, 1);
         connect(pButton, &QPushButton::clicked,
                 this, &QuickControlWidget::onAveragesChanged);
