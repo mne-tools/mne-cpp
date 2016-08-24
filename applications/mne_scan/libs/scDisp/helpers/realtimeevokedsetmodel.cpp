@@ -114,7 +114,8 @@ QVariant RealTimeEvokedSetModel::data(const QModelIndex &index, int role) const
         if(index.column()==1) {
             QVariant v;
 
-            QList<Eigen::RowVectorXd> lRowDataPerTrigType;
+            QList<SCDISPLIB::AvrTypeRowVector> lRowDataPerTrigType;
+            SCDISPLIB::AvrTypeRowVector pairItem;
 
             switch(role) {
                 case Qt::DisplayRole: {
@@ -124,22 +125,30 @@ QVariant RealTimeEvokedSetModel::data(const QModelIndex &index, int role) const
                         // data freeze
                         if(m_filterData.isEmpty()) {
                             for(int i = 0; i < m_matDataFreeze.size(); ++i) {
-                                lRowDataPerTrigType.append(m_matDataFreeze.at(i).row(row));
+                                pairItem.first = m_lAvrTypes.at(i);
+                                pairItem.second = m_matDataFreeze.at(i).row(row);
+                                lRowDataPerTrigType.append(pairItem);
                             }
                         } else {
                             for(int i = 0; i < m_matDataFilteredFreeze.size(); ++i) {
-                                lRowDataPerTrigType.append(m_matDataFilteredFreeze.at(i).row(row));
+                                pairItem.first = m_lAvrTypes.at(i);
+                                pairItem.second = m_matDataFilteredFreeze.at(i).row(row);
+                                lRowDataPerTrigType.append(pairItem);
                             }
                         }
                     } else {
                         // data stream
                         if(m_filterData.isEmpty()) {
                             for(int i = 0; i < m_matData.size(); ++i) {
-                                lRowDataPerTrigType.append(m_matData.at(i).row(row));
+                                pairItem.first = m_lAvrTypes.at(i);
+                                pairItem.second = m_matData.at(i).row(row);
+                                lRowDataPerTrigType.append(pairItem);
                             }
                         } else {
                             for(int i = 0; i < m_matDataFiltered.size(); ++i) {
-                                lRowDataPerTrigType.append(m_matDataFiltered.at(i).row(row));
+                                pairItem.first = m_lAvrTypes.at(i);
+                                pairItem.second = m_matDataFiltered.at(i).row(row);
+                                lRowDataPerTrigType.append(pairItem);
                             }
                         }
                     }
@@ -168,8 +177,8 @@ QVariant RealTimeEvokedSetModel::data(const QModelIndex &index, int role) const
         //******** third column (2D layout data plot, this third column is needed because the te data needs to be in another structure for the 2D layout to work) ********
         if(index.column()==2) {
             QVariant v;
-            QList<SCDISPLIB::RowVectorPair> lRowDataPerTrigType;
-            RowVectorPair averagedData;
+            QList<SCDISPLIB::AvrTypeRowVectorPair> lRowDataPerTrigType;
+            SCDISPLIB::AvrTypeRowVectorPair averagedData;
 
             switch(role) {
                 case RealTimeEvokedSetModelRoles::GetAverageData: {
@@ -177,15 +186,17 @@ QVariant RealTimeEvokedSetModel::data(const QModelIndex &index, int role) const
                         // data freeze
                         if(m_filterData.isEmpty()) {
                             for(int i = 0; i < m_matDataFreeze.size(); ++i) {
-                                averagedData.first = m_matDataFreeze.at(i).data();
-                                averagedData.second = m_matDataFreeze.at(i).cols();
+                                averagedData.first = m_lAvrTypes.at(i);
+                                averagedData.second.first = m_matDataFreeze.at(i).data();
+                                averagedData.second.second = m_matDataFreeze.at(i).cols();
 
                                 lRowDataPerTrigType.append(averagedData);
                             }
                         } else {
                             for(int i = 0; i < m_matDataFilteredFreeze.size(); ++i) {
-                                averagedData.first = m_matDataFilteredFreeze.at(i).data();
-                                averagedData.second = m_matDataFilteredFreeze.at(i).cols();
+                                averagedData.first = m_lAvrTypes.at(i);
+                                averagedData.second.first = m_matDataFilteredFreeze.at(i).data();
+                                averagedData.second.second = m_matDataFilteredFreeze.at(i).cols();
 
                                 lRowDataPerTrigType.append(averagedData);
                             }
@@ -195,15 +206,17 @@ QVariant RealTimeEvokedSetModel::data(const QModelIndex &index, int role) const
                         // data
                         if(m_filterData.isEmpty()) {
                             for(int i = 0; i < m_matData.size(); ++i) {
-                                averagedData.first = m_matData.at(i).data();
-                                averagedData.second = m_matData.at(i).cols();
+                                averagedData.first = m_lAvrTypes.at(i);
+                                averagedData.second.first = m_matData.at(i).data();
+                                averagedData.second.second = m_matData.at(i).cols();
 
                                 lRowDataPerTrigType.append(averagedData);
                             }
                         } else {
                             for(int i = 0; i < m_matDataFiltered.size(); ++i) {
-                                averagedData.first = m_matDataFiltered.at(i).data();
-                                averagedData.second = m_matDataFiltered.at(i).cols();
+                                averagedData.first = m_lAvrTypes.at(i);
+                                averagedData.second.first = m_matDataFiltered.at(i).data();
+                                averagedData.second.second = m_matDataFiltered.at(i).cols();
 
                                 lRowDataPerTrigType.append(averagedData);
                             }
@@ -293,6 +306,7 @@ void RealTimeEvokedSetModel::setRTESet(QSharedPointer<RealTimeEvokedSet> &pRTESe
 void RealTimeEvokedSetModel::updateData()
 {
     m_matData.clear();
+    m_lAvrTypes.clear();
 
     for(int i = 0; i < m_pRTESet->getValue()->evoked.size(); ++i) {
         bool doProj = m_bProjActivated && m_pRTESet->getValue()->evoked.at(i).data.cols() > 0 && m_pRTESet->getValue()->evoked.at(i).data.rows() == m_matProj.cols() ? true : false;
@@ -318,6 +332,8 @@ void RealTimeEvokedSetModel::updateData()
         }
 
         m_pairBaseline = m_pRTESet->getValue()->evoked.at(i).baseline;
+
+        m_lAvrTypes.append(m_pRTESet->getValue()->evoked.at(i).comment.toDouble());
     }
 
     if(!m_filterData.isEmpty()) {
@@ -325,6 +341,31 @@ void RealTimeEvokedSetModel::updateData()
     }
 
     m_bIsInit = true;
+
+    //Update average information map
+    bool bFoundNewType = false;
+    for(int i = 0; i < m_pRTESet->getValue()->evoked.size(); ++i) {
+        //Check if average type already exists in the map
+        double avrType = m_pRTESet->getValue()->evoked.at(i).comment.toDouble();
+        if(!m_qMapAverageColor.contains(avrType)) {
+            QPair<QColor, QPair<QString,bool> > pairFinal;
+            QPair<QString,bool> pairTemp;
+
+            pairTemp.first = m_pRTESet->getValue()->evoked.at(i).comment;
+            pairTemp.second = true;
+
+            pairFinal.first = QColor(255,165,0);
+            pairFinal.second = pairTemp;
+
+            m_qMapAverageColor.insert(avrType, pairFinal);
+
+            bFoundNewType = true;
+        }
+    }
+
+    if(bFoundNewType) {
+        emit newAverageTypeReceived(m_qMapAverageColor);
+    }
 
     //Update data content
     QModelIndex topLeft = this->index(0,1);

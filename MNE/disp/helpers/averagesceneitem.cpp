@@ -155,13 +155,9 @@ void AverageSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 
 //*************************************************************************************************************
 
-void AverageSceneItem::setSignalColorForAllChannels(const QColor& color)
+void AverageSceneItem::setSignalColor(const QMap<double, QPair<QColor, QPair<QString,bool> > >& mapAvr)
 {
-    m_lAverageColors.clear();
-
-    for(int i = 0; i<m_lAverageData.size(); i++) {
-        m_lAverageColors.append(color);
-    }
+    m_qMapAverageColor = mapAvr;
 
     update();
 }
@@ -233,50 +229,54 @@ void AverageSceneItem::paintAveragePath(QPainter *painter)
 
     //do for all currently stored evoked set data
     for(int dataIndex = 0; dataIndex < m_lAverageData.size(); ++dataIndex) {
-        //plot data from averaged data m_lAverageData with the calculated downsample factor
-        const double* averageData = m_lAverageData.at(dataIndex).first;
-        int totalCols =  m_lAverageData.at(dataIndex).second;
+        if(m_qMapAverageColor[m_lAverageData.at(dataIndex).first].second.second) {
+            //plot data from averaged data m_lAverageData with the calculated downsample factor
+            const double* averageData = m_lAverageData.at(dataIndex).second.first;
+            int totalCols =  m_lAverageData.at(dataIndex).second.second;
 
-        if(totalCols < m_iMaxWidth) {
-            m_rectBoundingRect = QRectF(-totalCols/2, -m_iMaxHeigth/2, totalCols, m_iMaxHeigth);
-        }
-
-        //Calculate downsampling factor of averaged data in respect to the items width
-        int dsFactor;
-        totalCols / boundingRect.width()<1 ? dsFactor = 1 : dsFactor = totalCols / boundingRect.width();
-        if(dsFactor == 0) {
-            dsFactor = 1;
-        }
-
-        //Create path
-        //float offset = (*(averageData+(abs(m_firstLastSample.first)*m_iTotalNumberChannels)+m_iChannelNumber)); //choose offset to be the signal value at time instance 0
-        QPainterPath path = QPainterPath(QPointF(boundingRect.x(), boundingRect.y() + boundingRect.height()/2));
-        QPen pen;
-        pen.setStyle(Qt::SolidLine);
-        if(dataIndex < m_lAverageColors.size()) {
-            pen.setColor(m_lAverageColors.at(dataIndex));
-        }
-
-        pen.setWidthF(2);
-        painter->setPen(pen);
-
-        for(int i = 0; i < totalCols && path.elementCount() <= boundingRect.width(); i += dsFactor) {
-            //evoked matrix is stored in column major
-            double val = ((*(averageData+(i*m_iTotalNumberChannels)+m_iChannelNumber))/*-offset*/) * dScaleY;
-
-            //Cut plotting if three times bigger than m_iMaxHeigth
-            if(abs(val) > 6*m_iMaxHeigth) {
-                qSamplePosition.setY(-(val/val) * m_iMaxHeigth); //(val/val) used to retrieve sign of val
-                qSamplePosition.setX(path.currentPosition().x()+1);
-            } else {
-                qSamplePosition.setY(-val);
-                qSamplePosition.setX(path.currentPosition().x()+1);
+            if(totalCols < m_iMaxWidth) {
+                m_rectBoundingRect = QRectF(-totalCols/2, -m_iMaxHeigth/2, totalCols, m_iMaxHeigth);
             }
 
-            path.lineTo(qSamplePosition);
-        }
+            //Calculate downsampling factor of averaged data in respect to the items width
+            int dsFactor;
+            totalCols / boundingRect.width()<1 ? dsFactor = 1 : dsFactor = totalCols / boundingRect.width();
+            if(dsFactor == 0) {
+                dsFactor = 1;
+            }
 
-        painter->drawPath(path);
+            //Create path
+            //float offset = (*(averageData+(abs(m_firstLastSample.first)*m_iTotalNumberChannels)+m_iChannelNumber)); //choose offset to be the signal value at time instance 0
+            QPainterPath path = QPainterPath(QPointF(boundingRect.x(), boundingRect.y() + boundingRect.height()/2));
+            QPen pen;
+            pen.setStyle(Qt::SolidLine);
+            pen.setColor(Qt::yellow);
+
+            if(m_qMapAverageColor.contains(m_lAverageData.at(dataIndex).first)) {
+                pen.setColor(m_qMapAverageColor[m_lAverageData.at(dataIndex).first].first);
+            }
+
+            pen.setWidthF(2);
+            painter->setPen(pen);
+
+            for(int i = 0; i < totalCols && path.elementCount() <= boundingRect.width(); i += dsFactor) {
+                //evoked matrix is stored in column major
+                double val = ((*(averageData+(i*m_iTotalNumberChannels)+m_iChannelNumber))/*-offset*/) * dScaleY;
+
+                //Cut plotting if three times bigger than m_iMaxHeigth
+                if(abs(val) > 6*m_iMaxHeigth) {
+                    qSamplePosition.setY(-(val/val) * m_iMaxHeigth); //(val/val) used to retrieve sign of val
+                    qSamplePosition.setX(path.currentPosition().x()+1);
+                } else {
+                    qSamplePosition.setY(-val);
+                    qSamplePosition.setX(path.currentPosition().x()+1);
+                }
+
+                path.lineTo(qSamplePosition);
+            }
+
+            painter->drawPath(path);
+        }
     }
 }
 
@@ -293,7 +293,7 @@ void AverageSceneItem::paintStimLine(QPainter *painter)
     QPainterPath path = QPainterPath(QPointF(boundingRect.x(), boundingRect.y() + boundingRect.height()/2));
 
     int dsFactor = 1;
-    int totalCols =  m_lAverageData.first().second;
+    int totalCols =  m_lAverageData.first().second.second;
     totalCols / boundingRect.width()<1 ? dsFactor = 1 : dsFactor = totalCols / boundingRect.width();
 
     if(dsFactor == 0)
@@ -311,7 +311,7 @@ void AverageSceneItem::paintStimLine(QPainter *painter)
 
     //zero line
     path.moveTo(boundingRect.x(),boundingRect.y()+boundingRect.height()/2);
-    path.lineTo(boundingRect.x()+m_lAverageData.first().second/dsFactor, boundingRect.y()+boundingRect.height()/2);
+    path.lineTo(boundingRect.x()+m_lAverageData.first().second.second/dsFactor, boundingRect.y()+boundingRect.height()/2);
 
     painter->drawPath(path);
 }

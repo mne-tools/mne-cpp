@@ -105,15 +105,13 @@ void AverageScene::repaintItems(const QList<QGraphicsItem *> &selectedChannelIte
 
 //*************************************************************************************************************
 
-void AverageScene::setSignalColorForAllItems(const QColor& color)
+void AverageScene::setAverageMap(const QMap<double, QPair<QColor, QPair<QString,bool> > >& mapAvr)
 {
-    m_colGlobalItemSignalColor = color;
-
     QList<QGraphicsItem*> items = this->items();
     QListIterator<QGraphicsItem*> i(items);
     while (i.hasNext()) {
         if(AverageSceneItem* averageSceneItemTemp = dynamic_cast<AverageSceneItem*>(i.next())) {
-            averageSceneItemTemp->setSignalColorForAllChannels(color);
+            averageSceneItemTemp->setSignalColor(mapAvr);
         }
     }
 }

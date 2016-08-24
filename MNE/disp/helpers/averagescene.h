@@ -124,11 +124,11 @@ public:
 
     //=========================================================================================================
     /**
-    * Set the signal color for all items in the scene
+    * Set the average map information
     *
-    * @param [in] color     The new signal color for all items.
+    * @param [in] mapAvr     The average data information including the color per average type.
     */
-    void setSignalColorForAllItems(const QColor& color);
+    void setAverageMap(const QMap<double, QPair<QColor, QPair<QString,bool> > >& mapAvr);
 
     //=========================================================================================================
     /**

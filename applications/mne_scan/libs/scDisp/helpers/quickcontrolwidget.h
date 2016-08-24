@@ -225,6 +225,14 @@ public:
     */
     const QColor& getBackgroundColor();
 
+    //=========================================================================================================
+    /**
+    * Set the average map which holds the inforamtion about the currently calcuated averages.
+    *
+    * @param [in] qMapAverageColor     the average map.
+    */
+    void setAverageMap(const QMap<double, QPair<QColor, QPair<QString,bool> > >& qMapAverageColor);
+
 protected slots:
     //=========================================================================================================
     /**
@@ -372,6 +380,12 @@ protected slots:
     */
     void onMakeScreenshot();
 
+    //=========================================================================================================
+    /**
+    * Call this slot whenever the averages changed.
+    */
+    void onAveragesChanged();
+
 protected:
     //=========================================================================================================
     /**
@@ -423,6 +437,12 @@ protected:
 
     //=========================================================================================================
     /**
+    * Create the widgets used in the averages group
+    */
+    void createAveragesGroup();
+
+    //=========================================================================================================
+    /**
     * Slot called when the user designed filter was toggled
     *
     * @param [in] pTabWidget    pointer to the tab widget of interest
@@ -433,39 +453,43 @@ protected:
     QWidget* findTabWidgetByText(const QTabWidget *pTabWidget, const QString& sTabText);
 
 private:
-    QStringList                     m_slFlags;                      /**< The list holding the current flags. */
+    QStringList                                         m_slFlags;                      /**< The list holding the current flags. */
 
-    bool                            m_bScaling;                     /**< Flag for displaying the scaling group box. */
-    bool                            m_bProjections;                 /**< Flag for displaying the projection group box. */
-    bool                            m_bSphara;                      /**< Flag for displaying teh SPHARA group box. */
-    bool                            m_bView;                        /**< Flag for displaying the view group box. */
-    bool                            m_bFilter;                      /**< Flag for displaying the filter group box. */
-    bool                            m_bModalitiy;                   /**< Flag for displaying the modality group box. */
-    bool                            m_bCompensator;                 /**< Flag for displaying the compensator group box. */
-    bool                            m_bTriggerDetection;            /**< Flag for displaying the trigger detection tab in the view group box. */
+    bool                                                m_bScaling;                     /**< Flag for displaying the scaling group box. */
+    bool                                                m_bProjections;                 /**< Flag for displaying the projection group box. */
+    bool                                                m_bSphara;                      /**< Flag for displaying teh SPHARA group box. */
+    bool                                                m_bView;                        /**< Flag for displaying the view group box. */
+    bool                                                m_bFilter;                      /**< Flag for displaying the filter group box. */
+    bool                                                m_bModalitiy;                   /**< Flag for displaying the modality group box. */
+    bool                                                m_bCompensator;                 /**< Flag for displaying the compensator group box. */
+    bool                                                m_bTriggerDetection;            /**< Flag for displaying the trigger detection tab in the view group box. */
+    bool                                                m_bAverages;                    /**< Flag for displaying the averages group box. */
 
-    QMap<qint32,float>              m_qMapChScaling;                /**< Channel scaling values. */
-    QMap<qint32, QDoubleSpinBox*>   m_qMapScalingDoubleSpinBox;     /**< Map of types and channel scaling line edits. */
-    QMap<qint32, QSlider*>          m_qMapScalingSlider;            /**< Map of types and channel scaling line edits. */
-    QMap<double, QColor>            m_qMapTriggerColor;             /**< Trigger colors per detected type. */
+    QMap<qint32,float>                                  m_qMapChScaling;                /**< Channel scaling values. */
+    QMap<qint32, QDoubleSpinBox*>                       m_qMapScalingDoubleSpinBox;     /**< Map of types and channel scaling line edits. */
+    QMap<qint32, QSlider*>                              m_qMapScalingSlider;            /**< Map of types and channel scaling line edits. */
+    QMap<double, QColor>                                m_qMapTriggerColor;             /**< Trigger colors per detected type. */
+    QMap<double, QPair<QColor, QPair<QString,bool> > >  m_qMapAverageColor;             /**< Average colors and names. */
+    QMap<QCheckBox*, double>                            m_qMapChkBoxAverageType;        /**< Check box to average type map. */
+    QMap<QPushButton*, double>                          m_qMapButtonAverageType;        /**< Push button to average type map. */
 
-    QColor                          m_colCurrentSignalColor;        /**< Current color of the scene in all View3D's. */
-    QColor                          m_colCurrentBackgroundColor;    /**< Current color of the scene in all View3D's. */
+    QColor                                              m_colCurrentSignalColor;        /**< Current color of the scene in all View3D's. */
+    QColor                                              m_colCurrentBackgroundColor;    /**< Current color of the scene in all View3D's. */
 
-    QList<Modality>                 m_qListModalities;              /**< List of different modalities. */
-    QList<QCheckBox*>               m_qListProjCheckBox;            /**< List of projection CheckBox. */
-    QList<QCheckBox*>               m_qListCompCheckBox;            /**< List of compensator CheckBox. */
-    QList<QCheckBox*>               m_qFilterListCheckBox;          /**< List of filter CheckBox. */
-    QList<QCheckBox*>               m_qListModalityCheckBox;        /**< List of modality checkboxes. */
-    FiffInfo::SPtr                  m_pFiffInfo;                    /**< Connected fiff info. */
+    QList<Modality>                                     m_qListModalities;              /**< List of different modalities. */
+    QList<QCheckBox*>                                   m_qListProjCheckBox;            /**< List of projection CheckBox. */
+    QList<QCheckBox*>                                   m_qListCompCheckBox;            /**< List of compensator CheckBox. */
+    QList<QCheckBox*>                                   m_qFilterListCheckBox;          /**< List of filter CheckBox. */
+    QList<QCheckBox*>                                   m_qListModalityCheckBox;        /**< List of modality checkboxes. */
+    FiffInfo::SPtr                                      m_pFiffInfo;                    /**< Connected fiff info. */
 
-    QString                         m_sName;                        /**< Name of the widget which uses this quick control. */
-    QCheckBox*                      m_pEnableDisableProjectors;     /**< Holds the enable disable all check box. */
-    QPushButton*                    m_pShowFilterOptions;           /**< Holds the show filter options button. */
+    QString                                             m_sName;                        /**< Name of the widget which uses this quick control. */
+    QCheckBox*                                          m_pEnableDisableProjectors;     /**< Holds the enable disable all check box. */
+    QPushButton*                                        m_pShowFilterOptions;           /**< Holds the show filter options button. */
 
-    QSignalMapper*                  m_pCompSignalMapper;            /**< The signal mapper. */
+    QSignalMapper*                                      m_pCompSignalMapper;            /**< The signal mapper. */
 
-    Ui::QuickControlWidget *        ui;                             /**< The generated UI file. */
+    Ui::QuickControlWidget*                             ui;                             /**< The generated UI file. */
 
 signals:
     //=========================================================================================================
@@ -568,9 +592,17 @@ signals:
     /**
     * Emit this signal whenever the user wants to make a screenshot.
     *
-    * @param[out] imageType     The current iamge type: png, svg.
+    * @param[out] imageType     The current image type: png, svg.
     */
     void makeScreenshot(const QString& imageType);
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the user wants to make a screenshot.
+    *
+    * @param[out] map     The current average map.
+    */
+    void averagesChanged(const QMap<double, QPair<QColor, QPair<QString,bool> > >& map);
 };
 
 } // NAMESPACE SCDISPLIB

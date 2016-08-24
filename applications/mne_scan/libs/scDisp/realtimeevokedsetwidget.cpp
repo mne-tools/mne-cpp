@@ -468,7 +468,7 @@ void RealTimeEvokedSetWidget::init()
         //-------- Init quick control widget --------
         //
         QStringList slFlags;
-        slFlags <<  "projections" << "compensators" << "filter" << "scaling" << "modalities" << "colors";
+        slFlags <<  "projections" << "compensators" << "filter" << "scaling" << "modalities" << "colors" << "averages";
 
         m_pQuickControlWidget = QSharedPointer<QuickControlWidget>(new QuickControlWidget(m_qMapChScaling, m_pFiffInfo, "RT Averaging", slFlags));
 
@@ -478,10 +478,6 @@ void RealTimeEvokedSetWidget::init()
         //Handle scaling
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::scalingChanged,
                 this, &RealTimeEvokedSetWidget::broadcastScaling);
-
-        //Handle signal color changes
-        connect(m_pQuickControlWidget.data(), &QuickControlWidget::signalColorChanged,
-                this, &RealTimeEvokedSetWidget::onSignalColorChanged);
 
         //Handle background color changes
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::backgroundColorChanged,
@@ -550,6 +546,16 @@ void RealTimeEvokedSetWidget::init()
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::scalingChanged,
                 this, &RealTimeEvokedSetWidget::scaleAveragedData);
 
+        //Handle averages
+        connect(this->m_pRTESetModel.data(), &RealTimeEvokedSetModel::newAverageTypeReceived,
+                m_pQuickControlWidget.data(), &QuickControlWidget::setAverageMap);
+
+        connect(m_pQuickControlWidget.data(), &QuickControlWidget::averagesChanged,
+                m_pAverageScene.data(), &AverageScene::setAverageMap);
+
+        connect(m_pQuickControlWidget.data(), &QuickControlWidget::averagesChanged,
+                m_pButterflyPlot.data(), &RealTimeButterflyPlot::setAverageMap);
+
         //
         //-------- Init signal and background colors --------
         //
@@ -558,8 +564,6 @@ void RealTimeEvokedSetWidget::init()
         m_pAverageScene->setBackgroundBrush(backgroundBrush);
 
         m_pButterflyPlot->setBackgroundColor(settings.value(QString("RTEW/%1/butterflyBackgroundColor").arg(t_sRTEWName), butterflyBackgroundDefault).value<QColor>());
-
-        m_pAverageScene->setSignalColorForAllItems(settings.value(QString("RTEW/%1/signalColor").arg(t_sRTEWName), signalDefault).value<QColor>());
 
         //Initialized
         m_bInitialized = true;
@@ -655,7 +659,7 @@ void RealTimeEvokedSetWidget::onSelectionChanged()
         averageSceneItemTemp->m_lAverageData.clear();
 
         //Get only the necessary data from the average model (use column 2)
-        QList<SCDISPLIB::RowVectorPair> averageData = m_pRTESetModel->data(0, 2, RealTimeEvokedSetModelRoles::GetAverageData).value<QList<SCDISPLIB::RowVectorPair> >();
+        QList<QPair<double, SCDISPLIB::RowVectorPair> > averageData = m_pRTESetModel->data(0, 2, RealTimeEvokedSetModelRoles::GetAverageData).value<QList<QPair<double, SCDISPLIB::RowVectorPair> > >();
 
         //Get the averageScenItem specific data row
         int channelNumber = m_pChInfoModel->getIndexFromMappedChName(averageSceneItemTemp->m_sChannelName);
@@ -666,7 +670,7 @@ void RealTimeEvokedSetWidget::onSelectionChanged()
             averageSceneItemTemp->m_firstLastSample.first = (-1)*m_pRTESet->getNumPreStimSamples();
 
             if(!averageData.isEmpty()) {
-                averageSceneItemTemp->m_firstLastSample.second = averageData.first().second - m_pRTESet->getNumPreStimSamples();
+                averageSceneItemTemp->m_firstLastSample.second = averageData.first().second.second - m_pRTESet->getNumPreStimSamples();
             }
 
             averageSceneItemTemp->m_iChannelNumber = channelNumber;
@@ -692,17 +696,6 @@ void RealTimeEvokedSetWidget::showFilterWidget(bool state)
         }
     } else {
         m_pFilterWindow->hide();
-    }
-}
-
-
-//*************************************************************************************************************
-
-void RealTimeEvokedSetWidget::onSignalColorChanged(const QColor& signalColor)
-{
-    //Only change the signal colors in the 2D layout plot
-    if(m_pToolBox->itemText(m_pToolBox->currentIndex()) == "2D Layout plot") {
-        m_pAverageScene->setSignalColorForAllItems(signalColor);
     }
 }
 

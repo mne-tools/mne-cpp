@@ -238,14 +238,6 @@ private slots:
 
     //=========================================================================================================
     /**
-    * Broadcast the signal color changes made in the QuickControl widget
-    *
-    * @param [in] backgroundColor  The new signal color.
-    */
-    void onSignalColorChanged(const QColor& signalColor);
-
-    //=========================================================================================================
-    /**
     * Broadcast the background color changes made in the QuickControl widget
     *
     * @param [in] backgroundColor  The new background color.

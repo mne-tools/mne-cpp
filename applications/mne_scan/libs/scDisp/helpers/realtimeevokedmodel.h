@@ -83,6 +83,8 @@ namespace RealTimeEvokedModelRoles
 }
 
 typedef QPair<const double*,qint32> RowVectorPair;
+typedef QPair<double, Eigen::RowVectorXd> AvrTypeRowVector;
+typedef QPair<double, SCDISPLIB::RowVectorPair> AvrTypeRowVectorPair;
 
 
 //*************************************************************************************************************
