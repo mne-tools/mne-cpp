@@ -278,7 +278,7 @@ public:
     *
     * @return the current number of stored averages
     */
-    inline int RealTimeEvokedSetModel::getNumAverages() const;
+    inline int getNumAverages() const;
 
     //=========================================================================================================
     /**
