@@ -83,14 +83,6 @@ QuickControlWidget::QuickControlWidget(const QMap<qint32, float>& qMapChScaling,
     connect(ui->m_pushButton_close, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
             this, &QuickControlWidget::hide);
 
-//    //Create trigger color map
-//    m_qMapAverageColor.clear();
-
-//    m_qMapAverageColor.insert(0, QPair<QColor,QString>(QColor(170,0,0),"Auditory"));
-//    m_qMapAverageColor.insert(1, QPair<QColor,QString>(QColor(170,5,0),"Vis"));
-//    m_qMapAverageColor.insert(4, QPair<QColor,QString>(QColor(170,63,11),"Senso"));
-//    m_qMapAverageColor.insert(5, QPair<QColor,QString>(QColor(170,88,22),"Auditory"));
-
     //Connect screenshot button
     connect(ui->m_pushButton_makeScreenshot, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
             this, &QuickControlWidget::onMakeScreenshot);
@@ -363,6 +355,8 @@ void QuickControlWidget::setAverageMap(const QMap<double, QPair<QColor, QPair<QS
     //Recreate average group
     if(m_bAverages) {
         createAveragesGroup();
+
+        emit averagesChanged(m_qMapAverageColor);
     }
 }
 
@@ -1399,6 +1393,7 @@ void QuickControlWidget::createAveragesGroup()
     QMapIterator<double, QPair<QColor, QPair<QString,bool> > > i(m_qMapAverageColor);
     int count = 0;
     m_qMapButtonAverageType.clear();
+    m_qMapChkBoxAverageType.clear();
 
     while (i.hasNext()) {
         i.next();
