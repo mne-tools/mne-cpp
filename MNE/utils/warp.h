@@ -62,16 +62,6 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-namespace MNELIB {
-    class MNEBem;
-}
-
-
-//*************************************************************************************************************
-//=============================================================================================================
 // DEFINE NAMESPACE UTILSLIB
 //=============================================================================================================
 
@@ -120,13 +110,13 @@ public:
     /**
     * Calculates the TPS Warp of given setup for a Bem
     *
-    * @param[in]  sLm      3D Landmarks of the source geometry
-    * @param[in]  dLm      3D Landmarks of the destination geometry
-    * @param[in]  sBem     source Bem containing the vertices of the source geometry
-    *
-    * @return wBem   warped Bem containing the vertices of the warped destination geometry
+    * @param[in]  sLm       3D Landmarks of the source geometry
+    * @param[in]  dLm       3D Landmarks of the destination geometry
+    * @param[in/out] vertA  Vertices A of the source geometry that are warped to the destination
+    * @param[in/out] vertB  Vertices B of the source geometry that are warped to the destination
+    * @param[in/out] vertC  Vertices C of the source geometry that are warped to the destination
     */
-    MNELIB::MNEBem calculate(const MatrixXd & sLm, const MatrixXd &dLm, const MNELIB::MNEBem &sBem);
+    void calculate(const MatrixXd & sLm, const MatrixXd &dLm, MatrixXd & vertA, MatrixXd & vertB, MatrixXd & vertC);
 
     //=========================================================================================================
     /**
