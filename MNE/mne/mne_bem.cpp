@@ -42,6 +42,7 @@
 #include "mne_bem.h"
 
 #include <utils/mnemath.h>
+#include <utils/warp.h>
 #include <fs/label.h>
 
 
@@ -451,4 +452,22 @@ MNEBem &MNEBem::operator<<(const MNEBemSurface *surf)
 {
     this->m_qListBemSurface.append(*surf);
     return *this;
+}
+
+
+//*************************************************************************************************************
+
+void MNEBem::warp(const MatrixXf & sLm, const MatrixXf &dLm)
+{
+    Warp test;
+    MatrixXf vertA = this->m_qListBemSurface[0].rr;
+    MatrixXf vertB = this->m_qListBemSurface[1].rr;
+    MatrixXf vertC = this->m_qListBemSurface[2].rr;
+
+    test.calculate(sLm, dLm, vertA , vertB, vertC);
+
+    this->m_qListBemSurface[0].rr = vertA;
+    this->m_qListBemSurface[1].rr = vertB;
+    this->m_qListBemSurface[2].rr = vertC;
+    return;
 }
