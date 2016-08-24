@@ -140,35 +140,15 @@ int main(int argc, char *argv[])
         t_DigProject[i].r[2] = DigProject(i,2);
     }
 
-    //
-    // calculate Warp
-    //
-    Warp  t_Avg4Warp;
-    MatrixXd wVert(sVert.rows(),3);
-    wVert = test.calculate(DigProject, ElecPos, t_Bem);
+    // Warp
+    MNEBem t_BemWarped(t_Bem);
+    t_BemWarped.warp(DigProject, ElecPos);
 
-    //
-    // WRITE NEW VERTICES BACK TO BEM
-    //
-    skin.rr=wVert.cast<float>();
-    skin.addVertexNormals();
-
-    std::cout << "Here are the first row of the matrix skin.rr after warp:" << std::endl << skin.rr.topRows(9) << std::endl;
-//    std::cout << "Here is the first row of the final matrix skin.tris:" << std::endl << skin.tris.topRows(9) << std::endl;
-//    std::cout << "Here is the last row of the final matrix skin.tris:" << std::endl << skin.tris.bottomRows(1) << std::endl;
-
-    MNELIB::MNEBem t_BemWarpedA;
-    t_BemWarpedA<<skin;
-    QFile t_fileBemWarped("./MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem-warped.fif");
-    t_BemWarpedA.write(t_fileBemWarped);
-    t_fileBemWarped.close();
-
-    MNELIB::MNEBem t_BemWarpedB (t_fileBemWarped) ;
-    MNELIB::MNEBemSurface skinWarped=t_BemWarpedB[0];
 
     //Show
     View3D::SPtr testWindow = View3D::SPtr(new View3D());
     testWindow->addBemData("AVG4-0Years", "BEM", t_Bem);
+    testWindow->addBemData("AVG4-0Years", "warped BEM", t_BemWarped);
     testWindow->addDigitizerData("AVG4-0Years", "Orignal Dig", t_Dig);
     testWindow->addDigitizerData("AVG4-0Years", "Trans Dig", t_DigTrans);
     testWindow->addDigitizerData("AVG4-0Years", "Project Dig", t_DigProject);
