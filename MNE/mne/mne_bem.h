@@ -113,13 +113,13 @@ public:
 
     //=========================================================================================================
     /**
-    * Default constructor
+    * @brief Default constructor
     */
     MNEBem();
 
     //=========================================================================================================
     /**
-    * Copy constructor.
+    * @brief Copy constructor.
     *
     * @param[in] p_MNEBem   MNE BEM
     */
@@ -127,25 +127,25 @@ public:
 
     //=========================================================================================================
     /**
-    * Default constructor
+    * @brief Default constructor
     */
     MNEBem(QIODevice &p_IODevice);
 
     //=========================================================================================================
     /**
-    * Destroys the MNE Bem
+    * @brief Destroys the MNE Bem
     */
     ~MNEBem();
 
     //=========================================================================================================
     /**
-    * Initializes MNE Bem
+    * @brief Initializes MNE Bem
     */
     void clear();
 
     //=========================================================================================================
     /**
-    * True if MNE Bem is empty.
+    * @brief True if MNE Bem is empty.
     *
     * @return true if MNE Bem is empty
     */
@@ -155,7 +155,7 @@ public:
     /**
     * ### MNE toolbox root function ###: Implementation of the mne_read_bem_surface function
     *
-    * Reads Bem surface from a fif file
+    * @brief Reads Bem surface from a fif file
     *
     * @param [in,out] p_pStream     The opened fif file
     * @param [in] add_geom          Add geometry information to the Bem Surface
@@ -167,7 +167,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns the number of stored bem surfaces
+    * @brief Returns the number of stored bem surfaces
     *
     * @return number of stored bem surfaces
     */
@@ -177,7 +177,7 @@ public:
     /**
     * MNE Toolbox function mne_write_bem_surfaces_block
     *
-    * Write the Bem to a FIF file
+    * @brief Write the Bem to a FIF file
     *
     * @param [in] p_IODevice   IO device to write the bem to.
     */
@@ -187,7 +187,7 @@ public:
     /**
     * MNE Toolbox function mne_write_bem_surfaces_block
     *
-    * Write the Bem to a FIF stream
+    * @brief Write the Bem to a FIF stream
     *
     * @param[in] p_pStream  The stream to write to.
     */
@@ -195,7 +195,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Subscript operator [] to access bem_surface by index
+    * @brief Subscript operator [] to access bem_surface by index
     *
     * @param[in] idx    the surface index (0,1 or 2).
     *
@@ -205,7 +205,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Subscript operator [] to access bem_surface by index
+    * @brief Subscript operator [] to access bem_surface by index
     *
     * @param[in] idx    the surface index (0,1 or 2).
     *
@@ -215,7 +215,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Subscript operator << to add a new bem_surface
+    * @brief Subscript operator << to add a new bem_surface
     *
     * @param[in] surf   BemSurface to be added
     *
@@ -225,7 +225,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Subscript operator << to add a new bem_surface
+    * @brief Subscript operator << to add a new bem_surface
     *
     * @param[in] surf   BemSurface to be added
     *
@@ -233,11 +233,21 @@ public:
     */
     MNEBem& operator<< (const MNEBemSurface* surf);
 
+    //=========================================================================================================
+    /**
+    * @brief Warp the Bem
+    *
+    * @param[in]  sLm       3D Landmarks of the source geometry
+    * @param[in]  dLm       3D Landmarks of the destination geometry
+    */
+    void warp(const MatrixXf &sLm, const MatrixXf &dLm);
+
+
 protected:
     //=========================================================================================================
     /**
     * Implementation of the read_bem_surface function in e.g. mne_read_bem_surface.m
-    * Reads a single bem surface
+    * @brief Reads a single bem surface
     *
     * @param [in] p_pStream         The opened fif file
     * @param [in] p_Tree            Search for the bem surface here

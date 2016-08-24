@@ -41,6 +41,7 @@
 #include <disp3D/view3D.h>
 #include <disp3D/control/control3dwidget.h>
 #include <fiff/fiff_dig_point_set.h>
+#include <utils/warp.h>
 
 
 //*************************************************************************************************************
@@ -139,9 +140,15 @@ int main(int argc, char *argv[])
         t_DigProject[i].r[2] = DigProject(i,2);
     }
 
+    // Warp
+    MNEBem t_BemWarped(t_Bem);
+    t_BemWarped.warp(DigProject, ElecPos);
+
+
     //Show
     View3D::SPtr testWindow = View3D::SPtr(new View3D());
     testWindow->addBemData("AVG4-0Years", "BEM", t_Bem);
+    testWindow->addBemData("AVG4-0Years", "warped BEM", t_BemWarped);
     testWindow->addDigitizerData("AVG4-0Years", "Orignal Dig", t_Dig);
     testWindow->addDigitizerData("AVG4-0Years", "Trans Dig", t_DigTrans);
     testWindow->addDigitizerData("AVG4-0Years", "Project Dig", t_DigProject);
