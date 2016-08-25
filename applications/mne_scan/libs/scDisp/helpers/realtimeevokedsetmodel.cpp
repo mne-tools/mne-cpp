@@ -201,8 +201,7 @@ QVariant RealTimeEvokedSetModel::data(const QModelIndex &index, int role) const
                                 lRowDataPerTrigType.append(averagedData);
                             }
                         }
-                    }
-                    else {
+                    } else {
                         // data
                         if(m_filterData.isEmpty()) {
                             for(int i = 0; i < m_matData.size(); ++i) {
@@ -306,6 +305,7 @@ void RealTimeEvokedSetModel::setRTESet(QSharedPointer<RealTimeEvokedSet> &pRTESe
 void RealTimeEvokedSetModel::updateData()
 {
     m_matData.clear();
+    m_matDataFiltered.clear();
     m_lAvrTypes.clear();
 
     for(int i = 0; i < m_pRTESet->getValue()->evoked.size(); ++i) {
@@ -331,6 +331,8 @@ void RealTimeEvokedSetModel::updateData()
             }
         }
 
+        m_matDataFiltered.append(MatrixXd::Zero(m_pRTESet->getValue()->evoked.at(i).data.rows(), m_pRTESet->getValue()->evoked.at(i).data.cols()));
+
         m_pairBaseline = m_pRTESet->getValue()->evoked.at(i).baseline;
 
         m_lAvrTypes.append(m_pRTESet->getValue()->evoked.at(i).comment.toDouble());
@@ -354,7 +356,7 @@ void RealTimeEvokedSetModel::updateData()
             pairTemp.first = m_pRTESet->getValue()->evoked.at(i).comment;
             pairTemp.second = true;
 
-            pairFinal.first = QColor(255,165,0);
+            pairFinal.first = Qt::yellow;
             pairFinal.second = pairTemp;
 
             m_qMapAverageColor.insert(avrType, pairFinal);
@@ -735,6 +737,7 @@ void RealTimeEvokedSetModel::filterChannelsConcurrently()
     //std::cout<<"START RealTimeEvokedSetModel::filterChannelsConcurrently()"<<std::endl;
 
     if(m_filterData.isEmpty()) {
+        //qDebug()<<"data filter empty";
         return;
     }
 
@@ -761,9 +764,9 @@ void RealTimeEvokedSetModel::filterChannelsConcurrently()
 
             future.waitForFinished();
 
-//            for(int r = 0; r < timeData.size(); ++r) {
-//                m_matDataFiltered[j].row(timeData.at(r).second.first) = timeData.at(r).second.second.segment(m_iMaxFilterLength+m_iMaxFilterLength/2, m_matData.at(j).cols());
-//            }
+            for(int r = 0; r < timeData.size(); ++r) {
+                m_matDataFiltered[j].row(timeData.at(r).second.first) = timeData.at(r).second.second.segment(m_iMaxFilterLength+m_iMaxFilterLength/2, m_matData.at(j).cols());
+            }
         }
 
         //Fill filtered data with raw data if the channel was not filtered

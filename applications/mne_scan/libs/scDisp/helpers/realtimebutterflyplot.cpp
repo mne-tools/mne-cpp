@@ -231,8 +231,9 @@ void RealTimeButterflyPlot::paintEvent(QPaintEvent* paintEvent)
                     QColor freezeColor = m_pRealTimeEvokedModel->getColor(r);
                     freezeColor.setAlphaF(0.5);
                     painter.setPen(QPen(freezeColor, 1));
-                } else
+                } else {
                     painter.setPen(QPen(m_pRealTimeEvokedModel->getColor(r), 1));
+                }
 
                 createPlotPath(r, painter);
 
@@ -312,8 +313,9 @@ void RealTimeButterflyPlot::createPlotPath(qint32 row, QPainter& painter) const
     //restrictions for paint performance
     float fWinMaxVal = ((float)this->height()-2)/2.0f;
     qint32 iDownSampling = (m_pRealTimeEvokedModel->getNumSamples() * 4 / (this->width()-2));
-    if(iDownSampling < 1)
+    if(iDownSampling < 1) {
         iDownSampling = 1;
+    }
 
     QPointF qSamplePosition;
 
