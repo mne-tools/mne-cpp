@@ -115,6 +115,8 @@ RealTimeEvokedSetWidget::RealTimeEvokedSetWidget(QSharedPointer<RealTimeEvokedSe
 , m_bInitialized(false)
 {
     Q_UNUSED(pTime)
+    //qRegisterMetaType<SCDISPLIB::AverageInfoMap>("SCDISPLIB::AverageInfoMap");
+    qRegisterMetaTypeStreamOperators<SCDISPLIB::AverageInfoMap>("SCDISPLIB::AverageInfoMap");
 
     m_pActionSelectSensors = new QAction(QIcon(":/images/selectSensors.png"), tr("Show the region selection widget (F11)"),this);
     m_pActionSelectSensors->setShortcut(tr("F11"));
@@ -232,6 +234,14 @@ RealTimeEvokedSetWidget::~RealTimeEvokedSetWidget()
             settings.setValue(QString("RTESW/%1/selectedView").arg(t_sRTESWName), m_pToolBox->currentIndex());
         }
 
+        //Store average colors per type
+        if(m_pRTESetModel) {
+            QVariant data;
+            SCDISPLIB::AverageInfoMap avrMap = m_pQuickControlWidget->getAverageInformationMap();
+            data.setValue(avrMap);
+            settings.setValue(QString("RTESW/%1/averageInfoMap").arg(t_sRTESWName), data);
+        }
+
         //Store signal and background colors
         if(m_pQuickControlWidget != 0) {
             settings.setValue(QString("RTESW/%1/signalColor").arg(t_sRTESWName), m_pQuickControlWidget->getSignalColor());
@@ -290,7 +300,7 @@ void RealTimeEvokedSetWidget::init()
 {
     if(m_qListChInfo.size() > 0)
     {
-        //qDebug()<<"RealTimeEvokedSetWidget::init() - "<<m_pRTESet->getName();
+        qDebug()<<"RealTimeEvokedSetWidget::init() - "<<m_pRTESet->getName();
         QSettings settings;
         QString t_sRTESWName = m_pRTESet->getName();
         m_pRTESetLayout->removeWidget(m_pLabelInit);
@@ -556,13 +566,19 @@ void RealTimeEvokedSetWidget::init()
 
         //Handle averages
         connect(this->m_pRTESetModel.data(), &RealTimeEvokedSetModel::newAverageTypeReceived,
-                m_pQuickControlWidget.data(), &QuickControlWidget::setAverageMap);
+                m_pQuickControlWidget.data(), &QuickControlWidget::setAverageInformationMap);
 
-        connect(m_pQuickControlWidget.data(), &QuickControlWidget::averagesChanged,
-                m_pAverageScene.data(), &AverageScene::setAverageMap);
+        connect(m_pQuickControlWidget.data(), &QuickControlWidget::averageInformationChanged,
+                m_pAverageScene.data(), &AverageScene::setAverageInformationMap);
 
-        connect(m_pQuickControlWidget.data(), &QuickControlWidget::averagesChanged,
-                m_pButterflyPlot.data(), &RealTimeButterflyPlot::setAverageMap);
+        connect(m_pQuickControlWidget.data(), &QuickControlWidget::averageInformationChanged,
+                m_pButterflyPlot.data(), &RealTimeButterflyPlot::setAverageInformationMap);
+
+        QVariant data;
+        QMap<double, QPair<QColor, QPair<QString,bool> > > emptyMap;
+        data.setValue(emptyMap);
+        SCDISPLIB::AverageInfoMap map = settings.value(QString("RTESW/%1/averageInfoMap").arg(t_sRTESWName), data).value<SCDISPLIB::AverageInfoMap>();
+        m_pQuickControlWidget->setAverageInformationMapOld(map);
 
         m_pSelectionManagerWindow->updateDataView();
 

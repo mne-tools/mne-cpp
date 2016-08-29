@@ -339,16 +339,34 @@ const QColor& QuickControlWidget::getBackgroundColor()
 
 //*************************************************************************************************************
 
-void QuickControlWidget::setAverageMap(const QMap<double, QPair<QColor, QPair<QString,bool> > >& qMapAverageColor)
+void QuickControlWidget::setAverageInformationMapOld(const QMap<double, QPair<QColor, QPair<QString,bool> > >& qMapAverageColorOld)
+{
+    m_qMapAverageInfoOld = qMapAverageColorOld;
+}
+
+
+//*************************************************************************************************************
+
+void QuickControlWidget::setAverageInformationMap(const QMap<double, QPair<QColor, QPair<QString,bool> > >& qMapAverageColor)
 {
     //Check if average type already exists in the map
     QMapIterator<double, QPair<QColor, QPair<QString,bool> > > i(qMapAverageColor);
 
+    qDebug()<<"QuickControlWidget::setAverageMap - m_qMapAverageInfoOld.size()"<<m_qMapAverageInfoOld.size();
     while (i.hasNext()) {
         i.next();
 
-        if(!m_qMapAverageColor.contains(i.key())) {
-            m_qMapAverageColor.insert(i.key(), i.value());
+        if(!m_qMapAverageInfo.contains(i.key())) {
+            if(m_qMapAverageInfoOld.contains(i.key())) {
+                //Use old color
+                QPair<QColor, QPair<QString,bool> > tempPair = i.value();
+                tempPair.first = m_qMapAverageInfoOld[i.key()].first;
+
+                m_qMapAverageInfo.insert(i.key(), tempPair);
+            } else {
+                //Use default color
+                m_qMapAverageInfo.insert(i.key(), i.value());
+            }
         }
     }
 
@@ -356,8 +374,16 @@ void QuickControlWidget::setAverageMap(const QMap<double, QPair<QColor, QPair<QS
     if(m_bAverages) {
         createAveragesGroup();
 
-        emit averagesChanged(m_qMapAverageColor);
+        emit averageInformationChanged(m_qMapAverageInfo);
     }
+}
+
+
+//*************************************************************************************************************
+
+QMap<double, QPair<QColor, QPair<QString,bool> > > QuickControlWidget::getAverageInformationMap()
+{
+    return m_qMapAverageInfo;
 }
 
 
@@ -866,7 +892,7 @@ void QuickControlWidget::onAveragesChanged()
     //Change color for average
     if(QPushButton* button = qobject_cast<QPushButton*>(sender()))
     {
-        QColor color = QColorDialog::getColor(QColor(0,0,0), this, "Set average color");
+        QColor color = QColorDialog::getColor(m_qMapAverageInfo[m_qMapButtonAverageType[button]].first, this, "Set average color");
 
         //Change color of pushbutton
         QPalette* palette1 = new QPalette();
@@ -877,17 +903,17 @@ void QuickControlWidget::onAveragesChanged()
         //Set color of button new new scene color
         button->setStyleSheet(QString("background-color: rgb(%1, %2, %3);").arg(color.red()).arg(color.green()).arg(color.blue()));
 
-        m_qMapAverageColor[m_qMapButtonAverageType[button]].first = color;
+        m_qMapAverageInfo[m_qMapButtonAverageType[button]].first = color;
 
-        emit averagesChanged(m_qMapAverageColor);
+        emit averageInformationChanged(m_qMapAverageInfo);
     }
 
     //Change color for average
     if(QCheckBox* checkBox = qobject_cast<QCheckBox*>(sender()))
     {
-        m_qMapAverageColor[m_qMapChkBoxAverageType[checkBox]].second.second = checkBox->isChecked();
+        m_qMapAverageInfo[m_qMapChkBoxAverageType[checkBox]].second.second = checkBox->isChecked();
 
-        emit averagesChanged(m_qMapAverageColor);
+        emit averageInformationChanged(m_qMapAverageInfo);
     }
 }
 
@@ -1390,7 +1416,7 @@ void QuickControlWidget::createAveragesGroup()
     }
 
     //Set trigger types
-    QMapIterator<double, QPair<QColor, QPair<QString,bool> > > i(m_qMapAverageColor);
+    QMapIterator<double, QPair<QColor, QPair<QString,bool> > > i(m_qMapAverageInfo);
     int count = 0;
     m_qMapButtonAverageType.clear();
     m_qMapChkBoxAverageType.clear();

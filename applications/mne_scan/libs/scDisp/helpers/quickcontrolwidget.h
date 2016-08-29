@@ -227,11 +227,27 @@ public:
 
     //=========================================================================================================
     /**
+    * Set the old average map which holds the inforamtion about the calcuated averages.
+    *
+    * @param [in] qMapAverageColorOld     the old average map.
+    */
+    void setAverageInformationMapOld(const QMap<double, QPair<QColor, QPair<QString,bool> > >& qMapAverageColorOld);
+
+    //=========================================================================================================
+    /**
     * Set the average map which holds the inforamtion about the currently calcuated averages.
     *
     * @param [in] qMapAverageColor     the average map.
     */
-    void setAverageMap(const QMap<double, QPair<QColor, QPair<QString,bool> > >& qMapAverageColor);
+    void setAverageInformationMap(const QMap<double, QPair<QColor, QPair<QString,bool> > >& qMapAverageColor);
+
+    //=========================================================================================================
+    /**
+    * Create list of channels which are to be filtered based on channel names
+    *
+    * @return the average information map
+    */
+    QMap<double, QPair<QColor, QPair<QString,bool> > > getAverageInformationMap();
 
 protected slots:
     //=========================================================================================================
@@ -469,7 +485,8 @@ private:
     QMap<qint32, QDoubleSpinBox*>                       m_qMapScalingDoubleSpinBox;     /**< Map of types and channel scaling line edits. */
     QMap<qint32, QSlider*>                              m_qMapScalingSlider;            /**< Map of types and channel scaling line edits. */
     QMap<double, QColor>                                m_qMapTriggerColor;             /**< Trigger colors per detected type. */
-    QMap<double, QPair<QColor, QPair<QString,bool> > >  m_qMapAverageColor;             /**< Average colors and names. */
+    QMap<double, QPair<QColor, QPair<QString,bool> > >  m_qMapAverageInfo;              /**< Average colors and names. */
+    QMap<double, QPair<QColor, QPair<QString,bool> > >  m_qMapAverageInfoOld;           /**< Old average colors and names. */
     QMap<QCheckBox*, double>                            m_qMapChkBoxAverageType;        /**< Check box to average type map. */
     QMap<QPushButton*, double>                          m_qMapButtonAverageType;        /**< Push button to average type map. */
 
@@ -602,7 +619,7 @@ signals:
     *
     * @param[out] map     The current average map.
     */
-    void averagesChanged(const QMap<double, QPair<QColor, QPair<QString,bool> > >& map);
+    void averageInformationChanged(const QMap<double, QPair<QColor, QPair<QString,bool> > >& map);
 };
 
 } // NAMESPACE SCDISPLIB
