@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     realtimeevokedwidget.h
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     realtimeevokedsetwidget.h
+* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     August, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Declaration of the RealTimeEvokedWidget Class.
+* @brief    Declaration of the RealTimeEvokedSetWidget Class.
 *
 */
 
-#ifndef REALTIMEEVOKEDWIDGET_H
-#define REALTIMEEVOKEDWIDGET_H
+#ifndef REALTIMEEVOKEDSETWIDGET_H
+#define REALTIMEEVOKEDSETWIDGET_H
 
 
 //*************************************************************************************************************
@@ -44,7 +44,7 @@
 
 #include "scdisp_global.h"
 #include "newmeasurementwidget.h"
-#include "helpers/realtimeevokedmodel.h"
+#include "helpers/realtimeevokedsetmodel.h"
 #include "helpers/realtimebutterflyplot.h"
 #include "disp/selectionmanagerwindow.h"
 #include "disp/helpers/chinfomodel.h"
@@ -52,6 +52,7 @@
 #include "disp/helpers/averagescene.h"
 #include "disp/helpers/averagesceneitem.h"
 #include "disp/filterwindow.h"
+#include <scMeas/realtimeevokedset.h>
 
 
 //*************************************************************************************************************
@@ -74,13 +75,6 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class QTime;
-
-namespace SCMEASLIB
-{
-class RealTimeEvoked;
-}
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -96,6 +90,8 @@ namespace SCDISPLIB
 //=============================================================================================================
 
 struct Modality;
+
+typedef QMap<double, QPair<QColor, QPair<QString,bool> > > AverageInfoMap;
 
 
 //*************************************************************************************************************
@@ -129,29 +125,29 @@ using namespace DISPLIB;
 *
 * @brief The RealTimeMultiSampleArrayNewWidget class provides a real-time curve display.
 */
-class SCDISPSHARED_EXPORT RealTimeEvokedWidget : public NewMeasurementWidget
+class SCDISPSHARED_EXPORT RealTimeEvokedSetWidget : public NewMeasurementWidget
 {
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<RealTimeEvokedWidget> SPtr;              /**< Shared pointer type for RealTimeEvokedWidget. */
-    typedef QSharedPointer<const RealTimeEvokedWidget> ConstSPtr;   /**< Const shared pointer type for RealTimeEvokedWidget. */
+    typedef QSharedPointer<RealTimeEvokedSetWidget> SPtr;              /**< Shared pointer type for RealTimeEvokedSetWidget. */
+    typedef QSharedPointer<const RealTimeEvokedSetWidget> ConstSPtr;   /**< Const shared pointer type for RealTimeEvokedSetWidget. */
 
     //=========================================================================================================
     /**
-    * Constructs a RealTimeEvokedWidget which is a child of parent.
+    * Constructs a RealTimeEvokedSetWidget which is a child of parent.
     *
-    * @param [in] pRTE          pointer to real-time evoked measurement.
+    * @param [in] pRTESet       pointer to real-time evoked set measurement.
     * @param [in] pTime         pointer to application time.
     * @param [in] parent        pointer to parent widget; If parent is 0, the new NumericWidget becomes a window. If parent is another widget, NumericWidget becomes a child window inside parent. NumericWidget is deleted when its parent is deleted.
     */
-    RealTimeEvokedWidget(QSharedPointer<RealTimeEvoked> pRTE, QSharedPointer<QTime> &pTime, QWidget* parent = 0);
+    RealTimeEvokedSetWidget(QSharedPointer<RealTimeEvokedSet> pRTESet, QSharedPointer<QTime> &pTime, QWidget* parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the RealTimeEvokedWidget.
+    * Destroys the RealTimeEvokedSetWidget.
     */
-    ~RealTimeEvokedWidget();
+    ~RealTimeEvokedSetWidget();
 
     //=========================================================================================================
     /**
@@ -169,7 +165,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Initialise the RealTimeEvokedWidget.
+    * Initialise the RealTimeEvokedSetWidget.
     */
     virtual void init();
 
@@ -180,14 +176,6 @@ public:
     * * @param [in] selectedChannelItems list of selected graphic items
     */
     void channelSelectionManagerChanged(const QList<QGraphicsItem *> &selectedChannelItems);
-
-    //=========================================================================================================
-    /**
-    * Scales the averaged data according to scaleMap
-    *
-    * @param [in] scaleMap map with all channel types and their current scaling value
-    */
-    void scaleAveragedData(const QMap<qint32, float> &scaleMap);
 
 private slots:
     //=========================================================================================================
@@ -265,28 +253,28 @@ private:
     */
     bool virtual eventFilter(QObject *object, QEvent *event);
 
-    RealTimeEvokedModel::SPtr           m_pRTEModel;                /**< RTE data model */
+    RealTimeEvokedSetModel::SPtr        m_pRTESetModel;             /**< RTE data model */
     RealTimeButterflyPlot::SPtr         m_pButterflyPlot;           /**< Butterfly plot */
     AverageScene::SPtr                  m_pAverageScene;            /**< The pointer to the average scene. */
-    RealTimeEvoked::SPtr                m_pRTE;                     /**< The real-time evoked measurement. */
+    RealTimeEvokedSet::SPtr             m_pRTESet;                  /**< The real-time evoked measurement. */
     QuickControlWidget::SPtr            m_pQuickControlWidget;      /**< Quick control widget. */
     SelectionManagerWindow::SPtr        m_pSelectionManagerWindow;  /**< SelectionManagerWindow. */
     ChInfoModel::SPtr                   m_pChInfoModel;             /**< Channel info model. */
     FilterWindow::SPtr                  m_pFilterWindow;            /**< Filter window. */
 
-    bool            m_bInitialized;             /**< Is Initialized */
-    bool            m_bHideBadChannels;         /**< hide bad channels flag. */
-    qint32          m_iMaxFilterTapSize;        /**< maximum number of allowed filter taps. This number depends on the size of the receiving blocks. */
+    bool                                m_bInitialized;             /**< Is Initialized */
+    bool                                m_bHideBadChannels;         /**< hide bad channels flag. */
+    qint32                              m_iMaxFilterTapSize;        /**< maximum number of allowed filter taps. This number depends on the size of the receiving blocks. */
 
-    FiffInfo::SPtr  m_pFiffInfo;                /**< FiffInfo, which is used insteadd of ListChInfo*/
+    FiffInfo::SPtr                      m_pFiffInfo;                /**< FiffInfo, which is used insteadd of ListChInfo*/
 
-    QAction*        m_pActionSelectSensors;     /**< show roi select widget */
-    QAction*        m_pActionQuickControl;      /**< Show quick control widget. */
+    QAction*                            m_pActionSelectSensors;     /**< show roi select widget */
+    QAction*                            m_pActionQuickControl;      /**< Show quick control widget. */
 
-    QVBoxLayout*    m_pRteLayout;               /**< RTE Widget layout */
-    QLabel*         m_pLabelInit;               /**< Initialization Label */
-    QToolBox*       m_pToolBox;                 /**< The toolbox which holds the butterfly and 2D layout plot */
-    QGraphicsView*  m_pAverageLayoutView;       /**< View for 2D average layout scene */
+    QVBoxLayout*                        m_pRTESetLayout;            /**< RTE Widget layout */
+    QLabel*                             m_pLabelInit;               /**< Initialization Label */
+    QToolBox*                           m_pToolBox;                 /**< The toolbox which holds the butterfly and 2D layout plot */
+    QGraphicsView*                      m_pAverageLayoutView;       /**< View for 2D average layout scene */
 
     QList<Modality>                     m_qListModalities;
     QList<qint32>                       m_qListCurrentSelection;    /**< Current selection list -> hack around C++11 lambda  */
@@ -296,4 +284,4 @@ private:
 
 } // NAMESPACE SCDISPLIB
 
-#endif // REALTIMEEVOKEDWIDGET_H
+#endif // RealTimeEvokedSetWidget_H
