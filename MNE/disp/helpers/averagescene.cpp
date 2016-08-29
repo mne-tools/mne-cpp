@@ -114,6 +114,8 @@ void AverageScene::setAverageInformationMap(const QMap<double, QPair<QColor, QPa
             averageSceneItemTemp->setSignalMap(mapAvr);
         }
     }
+
+    updateScene();
 }
 
 

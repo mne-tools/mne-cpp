@@ -397,7 +397,7 @@ private:
 
     QMap<qint32,qint32>                 m_qMapIdxRowSelection;          /**< Selection mapping.*/
     QMap<qint32,float>                  m_qMapChScaling;                /**< Channel scaling map. */
-    QMap<double, QPair<QColor, QPair<QString,bool> > >  m_qMapAverageColor;             /**< Average colors and names. */
+    QMap<double, QPair<QColor, QPair<QString,bool> > >  m_qMapAverageInformation;             /**< Average colors and names. */
 
     QList<Eigen::MatrixXd>              m_matData;                      /**< List that holds the data*/
     QList<Eigen::MatrixXd>              m_matDataFreeze;                /**< List that holds the data when freezed*/
