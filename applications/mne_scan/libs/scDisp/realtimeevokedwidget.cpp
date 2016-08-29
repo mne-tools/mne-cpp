@@ -229,6 +229,11 @@ RealTimeEvokedWidget::~RealTimeEvokedWidget()
             settings.setValue(QString("RTEW/%1/selectedLayoutFile").arg(t_sRTEWName), m_pSelectionManagerWindow->getCurrentLayoutFile());
         }
 
+        //Store current view toolbox index - butterfly or 2D layout
+        if(m_pToolBox) {
+            settings.setValue(QString("RTEW/%1/selectedView").arg(t_sRTEWName), m_pToolBox->currentIndex());
+        }
+
         //Store signal and background colors
         if(m_pQuickControlWidget != 0) {
             settings.setValue(QString("RTEW/%1/signalColor").arg(t_sRTEWName), m_pQuickControlWidget->getSignalColor());
@@ -282,7 +287,8 @@ void RealTimeEvokedWidget::init()
 {
     if(m_qListChInfo.size() > 0)
     {
-        qDebug()<<"RealTimeEvokedWidget::init() - "<<m_pRTE->getName();
+        //qDebug()<<"RealTimeEvokedWidget::init() - "<<m_pRTE->getName();
+        QSettings settings;
         QString t_sRTEWName = m_pRTE->getName();
         m_pRteLayout->removeWidget(m_pLabelInit);
         m_pLabelInit->hide();
@@ -293,6 +299,9 @@ void RealTimeEvokedWidget::init()
         m_pRTEModel->setRTE(m_pRTE);
 
         //m_pButterflyPlot->setModel(m_pRTEModel.data());
+
+        //Choose current view toolbox index - butterfly or 2D layout
+        m_pToolBox->setCurrentIndex(settings.value(QString("RTEW/%1/selectedView").arg(t_sRTEWName), 0).toInt());
 
         //
         //-------- Init modalities --------
@@ -319,7 +328,6 @@ void RealTimeEvokedWidget::init()
             else if(!hasMISC && m_pFiffInfo->chs[i].kind == FIFFV_MISC_CH)
                 hasMISC = true;
         }
-        QSettings settings;
         bool sel = true;
         float val = 1e-11f;
         if(hasMag) {
