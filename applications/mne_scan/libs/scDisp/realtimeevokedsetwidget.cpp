@@ -556,6 +556,8 @@ void RealTimeEvokedSetWidget::init()
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::averagesChanged,
                 m_pButterflyPlot.data(), &RealTimeButterflyPlot::setAverageMap);
 
+        m_pSelectionManagerWindow->updateDataView();
+
         //
         //-------- Init signal and background colors --------
         //
@@ -575,6 +577,8 @@ void RealTimeEvokedSetWidget::init()
 
 void RealTimeEvokedSetWidget::channelSelectionManagerChanged(const QList<QGraphicsItem*> &selectedChannelItems)
 {
+    //qDebug()<<" RealTimeEvokedWidget::channelSelectionManagerChanged - selectedChannelItems.size()" << selectedChannelItems.size();
+
     //Repaint the average items in the average scene based on the input parameter selectedChannelItems
     m_pAverageScene->repaintItems(selectedChannelItems);
 
