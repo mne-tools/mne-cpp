@@ -525,15 +525,15 @@ void Averaging::changeBaselineActive(bool state)
 
 void Averaging::appendEvoked(FIFFLIB::FiffEvokedSet::SPtr p_pEvokedSet)
 {
-    qDebug() << "";
-    qDebug() << "Averaging::appendEvoked - p_pEvokedSet INFO:";
-    qDebug() << "p_pEvokedSet->evoked.size():" << p_pEvokedSet->evoked.size();
-    qDebug() << "";
+//    qDebug() << "";
+//    qDebug() << "Averaging::appendEvoked - p_pEvokedSet INFO:";
+//    qDebug() << "p_pEvokedSet->evoked.size():" << p_pEvokedSet->evoked.size();
+//    qDebug() << "";
 
-    for(int i = 0; i < p_pEvokedSet->evoked.size(); ++i) {
-        qDebug() << p_pEvokedSet->evoked.at(i).comment <<"rows x cols:" << p_pEvokedSet->evoked.at(i).data.rows() << "x" << p_pEvokedSet->evoked.at(i).data.cols() << "-" << p_pEvokedSet->evoked.at(i).nave << "averages";
-        //std::cout << p_pEvokedSet->evoked.at(i).data.block(0,0,10,10);
-    }
+//    for(int i = 0; i < p_pEvokedSet->evoked.size(); ++i) {
+//        qDebug() << p_pEvokedSet->evoked.at(i).comment <<"rows x cols:" << p_pEvokedSet->evoked.at(i).data.rows() << "x" << p_pEvokedSet->evoked.at(i).data.cols() << "-" << p_pEvokedSet->evoked.at(i).nave << "averages";
+//        //std::cout << p_pEvokedSet->evoked.at(i).data.block(0,0,10,10);
+//    }
 
     // << p_pEvoked->comment;
 //    qDebug() << p_pEvoked->comment;

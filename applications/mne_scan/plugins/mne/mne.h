@@ -59,7 +59,7 @@
 #include <scMeas/realtimesourceestimate.h>
 #include <scMeas/newrealtimemultisamplearray.h>
 #include <scMeas/realtimecov.h>
-#include <scMeas/realtimeevoked.h>
+#include <scMeas/realtimeevokedset.h>
 
 
 //*************************************************************************************************************
@@ -209,7 +209,7 @@ protected:
 
 private:
     PluginInputData<NewRealTimeMultiSampleArray>::SPtr      m_pRTMSAInput;          /**< The RealTimeMultiSampleArray input.*/
-    PluginInputData<RealTimeEvoked>::SPtr                   m_pRTEInput;            /**< The RealTimeEvoked input.*/
+    PluginInputData<RealTimeEvokedSet>::SPtr                m_pRTESInput;            /**< The RealTimeEvoked input.*/
     PluginInputData<RealTimeCov>::SPtr                      m_pRTCInput;            /**< The RealTimeCov input.*/
 
     PluginOutputData<RealTimeSourceEstimate>::SPtr          m_pRTSEOutput;          /**< The RealTimeSourceEstimate output.*/
@@ -251,6 +251,8 @@ private:
 
     MinimumNorm::SPtr           m_pMinimumNorm;     /**< Minimum Norm Estimation. */
     qint32                      m_iDownSample;      /**< Sampling rate */
+
+    QString                     m_sAvrType;         /**< The average type */
 
 //    RealTimeSourceEstimate::SPtr m_pRTSE_MNE; /**< Source Estimate output channel. */
 };
