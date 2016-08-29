@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     realtimeevoked.h
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     realtimeevokedset.h
+* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     August, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the RealTimeEvoked class.
+* @brief    Contains the declaration of the RealTimeEvokedSet class.
 *
 */
 
-#ifndef REALTIMEEVOKED_H
-#define REALTIMEEVOKED_H
+#ifndef REALTIMEEVOKEDSET_H
+#define REALTIMEEVOKEDSET_H
 
 
 //*************************************************************************************************************
@@ -46,7 +46,7 @@
 #include "newmeasurement.h"
 #include "realtimesamplearraychinfo.h"
 
-#include <fiff/fiff_evoked.h>
+#include <fiff/fiff_evoked_set.h>
 
 
 //*************************************************************************************************************
@@ -54,12 +54,24 @@
 // Qt INCLUDES
 //=============================================================================================================
 
+#include <QMutex>
+#include <QMutexLocker>
 #include <QSharedPointer>
 #include <QVector>
 #include <QList>
 #include <QColor>
-#include <QMutex>
-#include <QMutexLocker>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
 
 
 //*************************************************************************************************************
@@ -73,36 +85,34 @@ namespace SCMEASLIB
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// FORWARD DECLARATIONS
 //=============================================================================================================
-
-using namespace FIFFLIB;
 
 
 //=========================================================================================================
 /**
-* DECLARE CLASS RealTimeEvoked -> ToDo check feasibilty of QAbstractTableModel
+* DECLARE CLASS RealTimeEvokedSet -> ToDo check feasibilty of QAbstractTableModel
 *
-* @brief The RealTimeEvoked class provides a data stream which holds FiffEvoke data.
+* @brief The RealTimeEvokedSet class provides a data stream which holds FiffEvokedSet data.
 */
-class SCMEASSHARED_EXPORT RealTimeEvoked : public NewMeasurement
+class SCMEASSHARED_EXPORT RealTimeEvokedSet : public NewMeasurement
 {
     Q_OBJECT
 public:
-    typedef QSharedPointer<RealTimeEvoked> SPtr;               /**< Shared pointer type for RealTimeEvoked. */
-    typedef QSharedPointer<const RealTimeEvoked> ConstSPtr;    /**< Const shared pointer type for RealTimeEvoked. */
+    typedef QSharedPointer<RealTimeEvokedSet> SPtr;               /**< Shared pointer type for RealTimeEvokedSet. */
+    typedef QSharedPointer<const RealTimeEvokedSet> ConstSPtr;    /**< Const shared pointer type for RealTimeEvokedSet. */
 
     //=========================================================================================================
     /**
     * Constructs a RealTimeMultiSampleArrayNew.
     */
-    explicit RealTimeEvoked(QObject *parent = 0);
+    explicit RealTimeEvokedSet(QObject *parent = 0);
 
     //=========================================================================================================
     /**
     * Destroys the RealTimeMultiSampleArrayNew.
     */
-    virtual ~RealTimeEvoked();
+    virtual ~RealTimeEvokedSet();
 
     //=========================================================================================================
     /**
@@ -172,10 +182,10 @@ public:
     /**
     * New devoked to distribute
     *
-    * @param [in] v             the evoked which should be distributed.
+    * @param [in] v             the evoked set which should be distributed.
     * @param [in] p_fiffinfo    the evoked fiff info as shared pointer.
     */
-    virtual void setValue(FiffEvoked& v, FiffInfo::SPtr p_fiffinfo);
+    virtual void setValue(FiffEvokedSet &v, FiffInfo::SPtr p_fiffinfo);
 
     //=========================================================================================================
     /**
@@ -184,13 +194,13 @@ public:
     *
     * @return the last attached value.
     */
-    virtual FiffEvoked::SPtr& getValue();
+    virtual FiffEvokedSet::SPtr& getValue();
 
     //=========================================================================================================
     /**
-    * Returns whether RealTimeEvoked contains values
+    * Returns whether RealTimeEvokedSet contains values
     *
-    * @return whether RealTimeEvoked contains values.
+    * @return whether RealTimeEvokedSet contains values.
     */
     inline bool isInitialized() const;
 
@@ -219,23 +229,23 @@ private:
     */
     void init(FiffInfo::SPtr p_fiffInfo);
 
-    mutable QMutex              m_qMutex;           /**< Mutex to ensure thread safety */
+    mutable QMutex                      m_qMutex;           /**< Mutex to ensure thread safety */
 
-    FiffEvoked::SPtr            m_pFiffEvoked;      /**< Evoked data */
+    FIFFLIB::FiffEvokedSet::SPtr        m_pFiffEvokedSet;   /**< Evoked data set*/
 
-    FiffInfo::SPtr              m_pFiffInfo;        /**< Fiff info */
+    FIFFLIB::FiffInfo::SPtr             m_pFiffInfo;        /**< Fiff info */
 
-    QString                     m_sXMLLayoutFile;   /**< Layout file name. */
+    QString                             m_sXMLLayoutFile;   /**< Layout file name. */
 
-    qint32                      m_iPreStimSamples;  /**< Number of pre-stimulus samples */
+    qint32                              m_iPreStimSamples;  /**< Number of pre-stimulus samples */
 
-    QList<QColor>               m_qListChColors;    /**< Channel color for butterfly plot.*/
+    QList<QColor>                       m_qListChColors;    /**< Channel color for butterfly plot.*/
 
-    QList<RealTimeSampleArrayChInfo> m_qListChInfo; /**< Channel info list.*/
+    QList<RealTimeSampleArrayChInfo>    m_qListChInfo; /**< Channel info list.*/
 
-    bool                        m_bInitialized;     /**< If values are stored.*/
+    bool                                m_bInitialized;     /**< If values are stored.*/
 
-    QPair<qint32,qint32>        m_pairBaseline;     /**< Baseline information min max.*/
+    QPair<qint32,qint32>                m_pairBaseline;     /**< Baseline information min max.*/
 };
 
 
@@ -244,7 +254,7 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline const QString& RealTimeEvoked::getXMLLayoutFile() const
+inline const QString& RealTimeEvokedSet::getXMLLayoutFile() const
 {
     QMutexLocker locker(&m_qMutex);
     return m_sXMLLayoutFile;
@@ -253,7 +263,7 @@ inline const QString& RealTimeEvoked::getXMLLayoutFile() const
 
 //*************************************************************************************************************
 
-inline void RealTimeEvoked::setXMLLayoutFile(const QString& layout)
+inline void RealTimeEvokedSet::setXMLLayoutFile(const QString& layout)
 {
     QMutexLocker locker(&m_qMutex);
     m_sXMLLayoutFile = layout;
@@ -262,16 +272,16 @@ inline void RealTimeEvoked::setXMLLayoutFile(const QString& layout)
 
 //*************************************************************************************************************
 
-inline unsigned int RealTimeEvoked::getNumChannels() const
+inline unsigned int RealTimeEvokedSet::getNumChannels() const
 {
     QMutexLocker locker(&m_qMutex);
-    return m_pFiffEvoked->info.nchan;
+    return m_pFiffEvokedSet->info.nchan;
 }
 
 
 //*************************************************************************************************************
 
-inline qint32 RealTimeEvoked::getNumPreStimSamples() const
+inline qint32 RealTimeEvokedSet::getNumPreStimSamples() const
 {
     QMutexLocker locker(&m_qMutex);
     return m_iPreStimSamples;
@@ -280,7 +290,7 @@ inline qint32 RealTimeEvoked::getNumPreStimSamples() const
 
 //*************************************************************************************************************
 
-inline void RealTimeEvoked::setNumPreStimSamples(qint32 samples)
+inline void RealTimeEvokedSet::setNumPreStimSamples(qint32 samples)
 {
     QMutexLocker locker(&m_qMutex);
     m_iPreStimSamples = samples;
@@ -289,7 +299,7 @@ inline void RealTimeEvoked::setNumPreStimSamples(qint32 samples)
 
 //*************************************************************************************************************
 
-inline QList<QColor>& RealTimeEvoked::chColor()
+inline QList<QColor>& RealTimeEvokedSet::chColor()
 {
     QMutexLocker locker(&m_qMutex);
     return m_qListChColors;
@@ -298,7 +308,7 @@ inline QList<QColor>& RealTimeEvoked::chColor()
 
 //*************************************************************************************************************
 
-inline QList<RealTimeSampleArrayChInfo>& RealTimeEvoked::chInfo()
+inline QList<RealTimeSampleArrayChInfo>& RealTimeEvokedSet::chInfo()
 {
     QMutexLocker locker(&m_qMutex);
     return m_qListChInfo;
@@ -307,7 +317,7 @@ inline QList<RealTimeSampleArrayChInfo>& RealTimeEvoked::chInfo()
 
 //*************************************************************************************************************
 
-inline FiffInfo::SPtr RealTimeEvoked::info()
+inline FiffInfo::SPtr RealTimeEvokedSet::info()
 {
     QMutexLocker locker(&m_qMutex);
     return m_pFiffInfo;
@@ -316,7 +326,7 @@ inline FiffInfo::SPtr RealTimeEvoked::info()
 
 //*************************************************************************************************************
 
-inline bool RealTimeEvoked::isInitialized() const
+inline bool RealTimeEvokedSet::isInitialized() const
 {
     QMutexLocker locker(&m_qMutex);
     return m_bInitialized;
@@ -325,7 +335,7 @@ inline bool RealTimeEvoked::isInitialized() const
 
 //*************************************************************************************************************
 
-inline void RealTimeEvoked::setBaselineInfo(QPair<qint32,qint32> info)
+inline void RealTimeEvokedSet::setBaselineInfo(QPair<qint32,qint32> info)
 {
     m_pairBaseline = info;
 }
@@ -333,13 +343,13 @@ inline void RealTimeEvoked::setBaselineInfo(QPair<qint32,qint32> info)
 
 //*************************************************************************************************************
 
-inline QPair<qint32,qint32> RealTimeEvoked::getBaselineInfo()
+inline QPair<qint32,qint32> RealTimeEvokedSet::getBaselineInfo()
 {
     return m_pairBaseline;
 }
 
 } // NAMESPACE
 
-Q_DECLARE_METATYPE(SCMEASLIB::RealTimeEvoked::SPtr)
+Q_DECLARE_METATYPE(SCMEASLIB::RealTimeEvokedSet::SPtr)
 
-#endif // REALTIMEEVOKED_H
+#endif // RealTimeEvokedSet_H
