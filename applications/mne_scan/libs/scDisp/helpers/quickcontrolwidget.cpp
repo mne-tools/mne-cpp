@@ -339,9 +339,9 @@ const QColor& QuickControlWidget::getBackgroundColor()
 
 //*************************************************************************************************************
 
-void QuickControlWidget::setAverageInformationMapOld(const QMap<double, QPair<QColor, QPair<QString,bool> > >& qMapAverageColorOld)
+void QuickControlWidget::setAverageInformationMapOld(const QMap<double, QPair<QColor, QPair<QString,bool> > >& qMapAverageInfoOld)
 {
-    m_qMapAverageInfoOld = qMapAverageColorOld;
+    m_qMapAverageInfoOld = qMapAverageInfoOld;
 }
 
 

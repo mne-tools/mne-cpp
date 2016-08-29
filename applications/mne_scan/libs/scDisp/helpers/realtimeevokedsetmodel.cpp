@@ -349,7 +349,7 @@ void RealTimeEvokedSetModel::updateData()
     for(int i = 0; i < m_pRTESet->getValue()->evoked.size(); ++i) {
         //Check if average type already exists in the map
         double avrType = m_pRTESet->getValue()->evoked.at(i).comment.toDouble();
-        if(!m_qMapAverageColor.contains(avrType)) {
+        if(!m_qMapAverageInformation.contains(avrType)) {
             QPair<QColor, QPair<QString,bool> > pairFinal;
             QPair<QString,bool> pairTemp;
 
@@ -359,14 +359,14 @@ void RealTimeEvokedSetModel::updateData()
             pairFinal.first = Qt::yellow;
             pairFinal.second = pairTemp;
 
-            m_qMapAverageColor.insert(avrType, pairFinal);
+            m_qMapAverageInformation.insert(avrType, pairFinal);
 
             bFoundNewType = true;
         }
     }
 
     if(bFoundNewType) {
-        emit newAverageTypeReceived(m_qMapAverageColor);
+        emit newAverageTypeReceived(m_qMapAverageInformation);
     }
 
     //Update data content

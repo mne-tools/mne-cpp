@@ -229,9 +229,9 @@ public:
     /**
     * Set the old average map which holds the inforamtion about the calcuated averages.
     *
-    * @param [in] qMapAverageColorOld     the old average map.
+    * @param [in] qMapAverageInfoOld     the old average info map.
     */
-    void setAverageInformationMapOld(const QMap<double, QPair<QColor, QPair<QString,bool> > >& qMapAverageColorOld);
+    void setAverageInformationMapOld(const QMap<double, QPair<QColor, QPair<QString,bool> > >& qMapAverageInfoOld);
 
     //=========================================================================================================
     /**
