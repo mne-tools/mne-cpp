@@ -177,61 +177,66 @@ RealTimeEvokedSetWidget::~RealTimeEvokedSetWidget()
     //
     if(!m_pRTESet->getName().isEmpty())
     {
-        QString t_sRTEWName = m_pRTESet->getName();
+        QString t_sRTESWName = m_pRTESet->getName();
 
         QSettings settings;
 
         //Store modalities
         for(qint32 i = 0; i < m_qListModalities.size(); ++i) {
-            settings.setValue(QString("RTEW/%1/%2/active").arg(t_sRTEWName).arg(m_qListModalities[i].m_sName), m_qListModalities[i].m_bActive);
-            settings.setValue(QString("RTEW/%1/%2/norm").arg(t_sRTEWName).arg(m_qListModalities[i].m_sName), m_qListModalities[i].m_fNorm);
+            settings.setValue(QString("RTESW/%1/%2/active").arg(t_sRTESWName).arg(m_qListModalities[i].m_sName), m_qListModalities[i].m_bActive);
+            settings.setValue(QString("RTESW/%1/%2/norm").arg(t_sRTESWName).arg(m_qListModalities[i].m_sName), m_qListModalities[i].m_fNorm);
         }
 
         //Store filter
         if(m_pFilterWindow != 0) {
             FilterData filter = m_pFilterWindow->getUserDesignedFilter();
 
-            settings.setValue(QString("RTEW/%1/filterHP").arg(t_sRTEWName), filter.m_dHighpassFreq);
-            settings.setValue(QString("RTEW/%1/filterLP").arg(t_sRTEWName), filter.m_dLowpassFreq);
-            settings.setValue(QString("RTEW/%1/filterOrder").arg(t_sRTEWName), filter.m_iFilterOrder);
-            settings.setValue(QString("RTEW/%1/filterType").arg(t_sRTEWName), (int)filter.m_Type);
-            settings.setValue(QString("RTEW/%1/filterDesignMethod").arg(t_sRTEWName), (int)filter.m_designMethod);
-            settings.setValue(QString("RTEW/%1/filterTransition").arg(t_sRTEWName), filter.m_dParksWidth*(filter.m_sFreq/2));
-            settings.setValue(QString("RTEW/%1/filterUserDesignActive").arg(t_sRTEWName), m_pFilterWindow->userDesignedFiltersIsActive());
-            settings.setValue(QString("RTEW/%1/filterChannelType").arg(t_sRTEWName), m_pFilterWindow->getChannelType());
+            settings.setValue(QString("RTESW/%1/filterHP").arg(t_sRTESWName), filter.m_dHighpassFreq);
+            settings.setValue(QString("RTESW/%1/filterLP").arg(t_sRTESWName), filter.m_dLowpassFreq);
+            settings.setValue(QString("RTESW/%1/filterOrder").arg(t_sRTESWName), filter.m_iFilterOrder);
+            settings.setValue(QString("RTESW/%1/filterType").arg(t_sRTESWName), (int)filter.m_Type);
+            settings.setValue(QString("RTESW/%1/filterDesignMethod").arg(t_sRTESWName), (int)filter.m_designMethod);
+            settings.setValue(QString("RTESW/%1/filterTransition").arg(t_sRTESWName), filter.m_dParksWidth*(filter.m_sFreq/2));
+            settings.setValue(QString("RTESW/%1/filterUserDesignActive").arg(t_sRTESWName), m_pFilterWindow->userDesignedFiltersIsActive());
+            settings.setValue(QString("RTESW/%1/filterChannelType").arg(t_sRTESWName), m_pFilterWindow->getChannelType());
         }
 
         //Store scaling
         if(m_qMapChScaling.contains(FIFF_UNIT_T)) {
-            settings.setValue(QString("RTEW/%1/scaleMAG").arg(t_sRTEWName), m_qMapChScaling[FIFF_UNIT_T]);
+            settings.setValue(QString("RTESW/%1/scaleMAG").arg(t_sRTESWName), m_qMapChScaling[FIFF_UNIT_T]);
             qDebug()<<"m_qMapChScaling[FIFF_UNIT_T]: "<<m_qMapChScaling[FIFF_UNIT_T];
         }
 
         if(m_qMapChScaling.contains(FIFF_UNIT_T_M))
-            settings.setValue(QString("RTEW/%1/scaleGRAD").arg(t_sRTEWName), m_qMapChScaling[FIFF_UNIT_T_M]);
+            settings.setValue(QString("RTESW/%1/scaleGRAD").arg(t_sRTESWName), m_qMapChScaling[FIFF_UNIT_T_M]);
 
         if(m_qMapChScaling.contains(FIFFV_EEG_CH))
-            settings.setValue(QString("RTEW/%1/scaleEEG").arg(t_sRTEWName), m_qMapChScaling[FIFFV_EEG_CH]);
+            settings.setValue(QString("RTESW/%1/scaleEEG").arg(t_sRTESWName), m_qMapChScaling[FIFFV_EEG_CH]);
 
         if(m_qMapChScaling.contains(FIFFV_EOG_CH))
-            settings.setValue(QString("RTEW/%1/scaleEOG").arg(t_sRTEWName), m_qMapChScaling[FIFFV_EOG_CH]);
+            settings.setValue(QString("RTESW/%1/scaleEOG").arg(t_sRTESWName), m_qMapChScaling[FIFFV_EOG_CH]);
 
         if(m_qMapChScaling.contains(FIFFV_STIM_CH))
-            settings.setValue(QString("RTEW/%1/scaleSTIM").arg(t_sRTEWName), m_qMapChScaling[FIFFV_STIM_CH]);
+            settings.setValue(QString("RTESW/%1/scaleSTIM").arg(t_sRTESWName), m_qMapChScaling[FIFFV_STIM_CH]);
 
         if(m_qMapChScaling.contains(FIFFV_MISC_CH))
-            settings.setValue(QString("RTEW/%1/scaleMISC").arg(t_sRTEWName), m_qMapChScaling[FIFFV_MISC_CH]);
+            settings.setValue(QString("RTESW/%1/scaleMISC").arg(t_sRTESWName), m_qMapChScaling[FIFFV_MISC_CH]);
 
         //Store selected layout file
         if(!m_pSelectionManagerWindow == 0) {
-            settings.setValue(QString("RTEW/%1/selectedLayoutFile").arg(t_sRTEWName), m_pSelectionManagerWindow->getCurrentLayoutFile());
+            settings.setValue(QString("RTESW/%1/selectedLayoutFile").arg(t_sRTESWName), m_pSelectionManagerWindow->getCurrentLayoutFile());
+        }
+
+        //Store current view toolbox index - butterfly or 2D layout
+        if(m_pToolBox) {
+            settings.setValue(QString("RTESW/%1/selectedView").arg(t_sRTESWName), m_pToolBox->currentIndex());
         }
 
         //Store signal and background colors
         if(m_pQuickControlWidget != 0) {
-            settings.setValue(QString("RTEW/%1/signalColor").arg(t_sRTEWName), m_pQuickControlWidget->getSignalColor());
-            settings.setValue(QString("RTEW/%1/butterflyBackgroundColor").arg(t_sRTEWName), m_pButterflyPlot->getBackgroundColor());
-            settings.setValue(QString("RTEW/%1/layoutBackgroundColor").arg(t_sRTEWName), m_pAverageScene->backgroundBrush().color());
+            settings.setValue(QString("RTESW/%1/signalColor").arg(t_sRTESWName), m_pQuickControlWidget->getSignalColor());
+            settings.setValue(QString("RTESW/%1/butterflyBackgroundColor").arg(t_sRTESWName), m_pButterflyPlot->getBackgroundColor());
+            settings.setValue(QString("RTESW/%1/layoutBackgroundColor").arg(t_sRTESWName), m_pAverageScene->backgroundBrush().color());
         }
     }
 }
@@ -285,8 +290,9 @@ void RealTimeEvokedSetWidget::init()
 {
     if(m_qListChInfo.size() > 0)
     {
-        qDebug()<<"RealTimeEvokedSetWidget::init() - "<<m_pRTESet->getName();
-        QString t_sRTEWName = m_pRTESet->getName();
+        //qDebug()<<"RealTimeEvokedSetWidget::init() - "<<m_pRTESet->getName();
+        QSettings settings;
+        QString t_sRTESWName = m_pRTESet->getName();
         m_pRTESetLayout->removeWidget(m_pLabelInit);
         m_pLabelInit->hide();
 
@@ -296,6 +302,9 @@ void RealTimeEvokedSetWidget::init()
         m_pRTESetModel->setRTESet(m_pRTESet);
 
         m_pButterflyPlot->setModel(m_pRTESetModel.data());
+
+        //Choose current view toolbox index - butterfly or 2D layout
+        m_pToolBox->setCurrentIndex(settings.value(QString("RTESW/%1/selectedView").arg(t_sRTESWName), 0).toInt());
 
         //
         //-------- Init modalities --------
@@ -322,32 +331,31 @@ void RealTimeEvokedSetWidget::init()
             else if(!hasMISC && m_pFiffInfo->chs[i].kind == FIFFV_MISC_CH)
                 hasMISC = true;
         }
-        QSettings settings;
         bool sel = true;
         float val = 1e-11f;
         if(hasMag) {
-            sel = settings.value(QString("RTEW/%1/MAG/active").arg(t_sRTEWName), true).toBool();
-            val = settings.value(QString("RTEW/%1/MAG/norm").arg(t_sRTEWName), 1e-11f).toFloat();
+            sel = settings.value(QString("RTESW/%1/MAG/active").arg(t_sRTESWName), true).toBool();
+            val = settings.value(QString("RTESW/%1/MAG/norm").arg(t_sRTESWName), 1e-11f).toFloat();
             m_qListModalities.append(Modality("MAG",sel,val));
         }
         if(hasGrad) {
-            sel = settings.value(QString("RTEW/%1/GRAD/active").arg(t_sRTEWName), true).toBool();
-            val = settings.value(QString("RTEW/%1/GRAD/norm").arg(t_sRTEWName), 1e-10f).toFloat();
+            sel = settings.value(QString("RTESW/%1/GRAD/active").arg(t_sRTESWName), true).toBool();
+            val = settings.value(QString("RTESW/%1/GRAD/norm").arg(t_sRTESWName), 1e-10f).toFloat();
             m_qListModalities.append(Modality("GRAD",sel,val));
         }
         if(hasEEG) {
-            sel = settings.value(QString("RTEW/%1/EEG/active").arg(t_sRTEWName), true).toBool();
-            val = settings.value(QString("RTEW/%1/EEG/norm").arg(t_sRTEWName), 1e-4f).toFloat();
+            sel = settings.value(QString("RTESW/%1/EEG/active").arg(t_sRTESWName), true).toBool();
+            val = settings.value(QString("RTESW/%1/EEG/norm").arg(t_sRTESWName), 1e-4f).toFloat();
             m_qListModalities.append(Modality("EEG",sel,val));
         }
         if(hasEOG) {
-            sel = settings.value(QString("RTEW/%1/EOG/active").arg(t_sRTEWName), true).toBool();
-            val = settings.value(QString("RTEW/%1/EOG/norm").arg(t_sRTEWName), 1e-3f).toFloat();
+            sel = settings.value(QString("RTESW/%1/EOG/active").arg(t_sRTESWName), true).toBool();
+            val = settings.value(QString("RTESW/%1/EOG/norm").arg(t_sRTESWName), 1e-3f).toFloat();
             m_qListModalities.append(Modality("EOG",sel,val));
         }
         if(hasMISC) {
-            sel = settings.value(QString("RTEW/%1/MISC/active").arg(t_sRTEWName), true).toBool();
-            val = settings.value(QString("RTEW/%1/MISC/norm").arg(t_sRTEWName), 1e-3f).toFloat();
+            sel = settings.value(QString("RTESW/%1/MISC/active").arg(t_sRTESWName), true).toBool();
+            val = settings.value(QString("RTESW/%1/MISC/norm").arg(t_sRTESWName), 1e-3f).toFloat();
             m_qListModalities.append(Modality("MISC",sel,val));
         }
 
@@ -381,32 +389,32 @@ void RealTimeEvokedSetWidget::init()
             QSettings settings;
             float val = 0.0f;
             if(availabeChannelTypes.contains(FIFF_UNIT_T)) {
-                val = settings.value(QString("RTEW/%1/scaleMAG").arg(t_sRTEWName), 1e-11f).toFloat();
+                val = settings.value(QString("RTESW/%1/scaleMAG").arg(t_sRTESWName), 1e-11f).toFloat();
                 m_qMapChScaling.insert(FIFF_UNIT_T, val);
             }
 
             if(availabeChannelTypes.contains(FIFF_UNIT_T_M)) {
-                val = settings.value(QString("RTEW/%1/scaleGRAD").arg(t_sRTEWName), 1e-10f).toFloat();
+                val = settings.value(QString("RTESW/%1/scaleGRAD").arg(t_sRTESWName), 1e-10f).toFloat();
                 m_qMapChScaling.insert(FIFF_UNIT_T_M, val);
             }
 
             if(availabeChannelTypes.contains(FIFFV_EEG_CH)) {
-                val = settings.value(QString("RTEW/%1/scaleEEG").arg(t_sRTEWName), 1e-4f).toFloat();
+                val = settings.value(QString("RTESW/%1/scaleEEG").arg(t_sRTESWName), 1e-4f).toFloat();
                 m_qMapChScaling.insert(FIFFV_EEG_CH, val);
             }
 
             if(availabeChannelTypes.contains(FIFFV_EOG_CH)) {
-                val = settings.value(QString("RTEW/%1/scaleEOG").arg(t_sRTEWName), 1e-3f).toFloat();
+                val = settings.value(QString("RTESW/%1/scaleEOG").arg(t_sRTESWName), 1e-3f).toFloat();
                 m_qMapChScaling.insert(FIFFV_EOG_CH, val);
             }
 
             if(availabeChannelTypes.contains(FIFFV_STIM_CH)) {
-                val = settings.value(QString("RTEW/%1/scaleSTIM").arg(t_sRTEWName), 1e-3f).toFloat();
+                val = settings.value(QString("RTESW/%1/scaleSTIM").arg(t_sRTESWName), 1e-3f).toFloat();
                 m_qMapChScaling.insert(FIFFV_STIM_CH, val);
             }
 
             if(availabeChannelTypes.contains(FIFFV_MISC_CH)) {
-                val = settings.value(QString("RTEW/%1/scaleMISC").arg(t_sRTEWName), 1e-3f).toFloat();
+                val = settings.value(QString("RTESW/%1/scaleMISC").arg(t_sRTESWName), 1e-3f).toFloat();
                 m_qMapChScaling.insert(FIFFV_MISC_CH, val);
             }
 
@@ -433,14 +441,14 @@ void RealTimeEvokedSetWidget::init()
         m_pFilterWindow->setSamplingRate(m_pFiffInfo->sfreq);
 
         //Set stored filter settings from last session
-        m_pFilterWindow->setFilterParameters(settings.value(QString("RTEW/%1/filterHP").arg(t_sRTEWName), 5.0).toDouble(),
-                                                settings.value(QString("RTEW/%1/filterLP").arg(t_sRTEWName), 40.0).toDouble(),
-                                                settings.value(QString("RTEW/%1/filterOrder").arg(t_sRTEWName), 128).toInt(),
-                                                settings.value(QString("RTEW/%1/filterType").arg(t_sRTEWName), 2).toInt(),
-                                                settings.value(QString("RTEW/%1/filterDesignMethod").arg(t_sRTEWName), 0).toInt(),
-                                                settings.value(QString("RTEW/%1/filterTransition").arg(t_sRTEWName), 5.0).toDouble(),
-                                                settings.value(QString("RTEW/%1/filterUserDesignActive").arg(t_sRTEWName), false).toBool(),
-                                                settings.value(QString("RTEW/%1/filterChannelType").arg(t_sRTEWName), "MEG").toString());
+        m_pFilterWindow->setFilterParameters(settings.value(QString("RTESW/%1/filterHP").arg(t_sRTESWName), 5.0).toDouble(),
+                                                settings.value(QString("RTESW/%1/filterLP").arg(t_sRTESWName), 40.0).toDouble(),
+                                                settings.value(QString("RTESW/%1/filterOrder").arg(t_sRTESWName), 128).toInt(),
+                                                settings.value(QString("RTESW/%1/filterType").arg(t_sRTESWName), 2).toInt(),
+                                                settings.value(QString("RTESW/%1/filterDesignMethod").arg(t_sRTESWName), 0).toInt(),
+                                                settings.value(QString("RTESW/%1/filterTransition").arg(t_sRTESWName), 5.0).toDouble(),
+                                                settings.value(QString("RTESW/%1/filterUserDesignActive").arg(t_sRTESWName), false).toBool(),
+                                                settings.value(QString("RTESW/%1/filterChannelType").arg(t_sRTESWName), "MEG").toString());
 
         //
         //-------- Init channel selection manager --------
@@ -460,7 +468,7 @@ void RealTimeEvokedSetWidget::init()
 
         m_pChInfoModel->fiffInfoChanged(m_pFiffInfo);
 
-        m_pSelectionManagerWindow->setCurrentLayoutFile(settings.value(QString("RTEW/%1/selectedLayoutFile").arg(t_sRTEWName), "babymeg-mag-inner-layer.lout").toString());
+        m_pSelectionManagerWindow->setCurrentLayoutFile(settings.value(QString("RTESW/%1/selectedLayoutFile").arg(t_sRTESWName), "babymeg-mag-inner-layer.lout").toString());
 
         m_pActionSelectSensors->setVisible(true);
 
@@ -512,16 +520,16 @@ void RealTimeEvokedSetWidget::init()
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::updateConnectedView,
                 this, &RealTimeEvokedSetWidget::onSelectionChanged);
 
-        m_pQuickControlWidget->setViewParameters(settings.value(QString("RTEW/%1/viewZoomFactor").arg(t_sRTEWName), 1.0).toFloat(),
-                                                     settings.value(QString("RTEW/%1/viewWindowSize").arg(t_sRTEWName), 10).toInt(),
-                                                     settings.value(QString("RTEW/%1/viewOpacity").arg(t_sRTEWName), 95).toInt());
+        m_pQuickControlWidget->setViewParameters(settings.value(QString("RTESW/%1/viewZoomFactor").arg(t_sRTESWName), 1.0).toFloat(),
+                                                     settings.value(QString("RTESW/%1/viewWindowSize").arg(t_sRTESWName), 10).toInt(),
+                                                     settings.value(QString("RTESW/%1/viewOpacity").arg(t_sRTESWName), 95).toInt());
 
         m_pQuickControlWidget->filterGroupChanged(m_pFilterWindow->getActivationCheckBoxList());
 
         QColor signalDefault = Qt::darkBlue;
         QColor butterflyBackgroundDefault = Qt::white;
         QColor layoutBackgroundDefault = Qt::black;
-        m_pQuickControlWidget->setSignalBackgroundColors(settings.value(QString("RTEW/%1/signalColor").arg(t_sRTEWName), signalDefault).value<QColor>(), settings.value(QString("RTEW/%1/butterflyBackgroundColor").arg(t_sRTEWName), butterflyBackgroundDefault).value<QColor>());
+        m_pQuickControlWidget->setSignalBackgroundColors(settings.value(QString("RTESW/%1/signalColor").arg(t_sRTESWName), signalDefault).value<QColor>(), settings.value(QString("RTESW/%1/butterflyBackgroundColor").arg(t_sRTESWName), butterflyBackgroundDefault).value<QColor>());
 
         m_pActionQuickControl->setVisible(true);
 
@@ -562,10 +570,10 @@ void RealTimeEvokedSetWidget::init()
         //-------- Init signal and background colors --------
         //
         QBrush backgroundBrush = m_pAverageScene->backgroundBrush();
-        backgroundBrush.setColor(settings.value(QString("RTEW/%1/layoutBackgroundColor").arg(t_sRTEWName), layoutBackgroundDefault).value<QColor>());
+        backgroundBrush.setColor(settings.value(QString("RTESW/%1/layoutBackgroundColor").arg(t_sRTESWName), layoutBackgroundDefault).value<QColor>());
         m_pAverageScene->setBackgroundBrush(backgroundBrush);
 
-        m_pButterflyPlot->setBackgroundColor(settings.value(QString("RTEW/%1/butterflyBackgroundColor").arg(t_sRTEWName), butterflyBackgroundDefault).value<QColor>());
+        m_pButterflyPlot->setBackgroundColor(settings.value(QString("RTESW/%1/butterflyBackgroundColor").arg(t_sRTESWName), butterflyBackgroundDefault).value<QColor>());
 
         //Initialized
         m_bInitialized = true;
