@@ -83,14 +83,6 @@ QuickControlWidget::QuickControlWidget(const QMap<qint32, float>& qMapChScaling,
     connect(ui->m_pushButton_close, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
             this, &QuickControlWidget::hide);
 
-    //Create trigger color map
-    m_qMapTriggerColor.clear();
-
-    for(int i = 0; i<pFiffInfo->chs.size(); i++) {
-        if(pFiffInfo->chs[i].kind == FIFFV_STIM_CH)
-            m_qMapTriggerColor.insert(pFiffInfo->chs[i].ch_name, QColor(170,0,0));
-    }
-
     //Connect screenshot button
     connect(ui->m_pushButton_makeScreenshot, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
             this, &QuickControlWidget::onMakeScreenshot);
@@ -163,8 +155,16 @@ QuickControlWidget::QuickControlWidget(const QMap<qint32, float>& qMapChScaling,
         createModalityGroup();
         m_bModalitiy = true;
     } else {
-        ui->m_groupBox_modalities->hide();
+        ui->m_tabWidget_viewOptions->removeTab(ui->m_tabWidget_viewOptions->indexOf(this->findTabWidgetByText(ui->m_tabWidget_viewOptions, "Modalities")));
         m_bModalitiy = false;
+    }
+
+    if(m_slFlags.contains("averages", Qt::CaseInsensitive)) {
+        createAveragesGroup();
+        m_bAverages = true;
+    } else {
+        ui->m_tabWidget_viewOptions->removeTab(ui->m_tabWidget_viewOptions->indexOf(this->findTabWidgetByText(ui->m_tabWidget_viewOptions, "Averages")));
+        m_bAverages = false;
     }
 
     //Decide whether to complete hide some groups
@@ -195,7 +195,7 @@ void QuickControlWidget::filterGroupChanged(QList<QCheckBox*> list)
     if(m_bFilter) {
         m_qFilterListCheckBox.clear();
 
-        for(int u = 0; u<list.size(); u++) {
+        for(int u = 0; u < list.size(); ++u) {
             QCheckBox* tempCheckBox = new QCheckBox(list[u]->text());
             tempCheckBox->setChecked(list[u]->isChecked());
 
@@ -214,8 +214,9 @@ void QuickControlWidget::filterGroupChanged(QList<QCheckBox*> list)
 
         //Delete all widgets in the filter layout
         QGridLayout* topLayout = static_cast<QGridLayout*>(this->findTabWidgetByText(ui->m_tabWidget_noiseReduction, "Filter")->layout());
-        if(!topLayout)
+        if(!topLayout) {
            topLayout = new QGridLayout();
+        }
 
         QLayoutItem *child;
         while ((child = topLayout->takeAt(0)) != 0) {
@@ -226,8 +227,9 @@ void QuickControlWidget::filterGroupChanged(QList<QCheckBox*> list)
         //Add filters
         int u = 0;
 
-        for(u; u<m_qFilterListCheckBox.size(); u++)
+        for(u; u < m_qFilterListCheckBox.size(); ++u) {
             topLayout->addWidget(m_qFilterListCheckBox[u], u, 0);
+        }
 
         //Add push button for filter options
         m_pShowFilterOptions = new QPushButton();
@@ -299,10 +301,23 @@ void QuickControlWidget::setSignalBackgroundColors(const QColor& signalColor, co
 
 //*************************************************************************************************************
 
-void QuickControlWidget::setNumberDetectedTriggers(int numberDetections)
+void QuickControlWidget::setNumberDetectedTriggersAndTypes(int numberDetections, const QMap<int,QList<QPair<int,double> > >& mapDetectedTriggers)
 {
-    if(m_bTriggerDetection)
+    if(m_bTriggerDetection) {
         ui->m_label_numberDetectedTriggers->setText(QString("%1").arg(numberDetections));
+    }
+
+    //Set trigger types
+    QMapIterator<int,QList<QPair<int,double> > > i(mapDetectedTriggers);
+    while (i.hasNext()) {
+        i.next();
+
+        for(int j = 0; j < i.value().size(); ++j) {
+            if(ui->m_comboBox_triggerColorType->findText(QString::number(i.value().at(j).second)) == -1) {
+                ui->m_comboBox_triggerColorType->addItem(QString::number(i.value().at(j).second));
+            }
+        }
+    }
 }
 
 
@@ -319,6 +334,55 @@ const QColor& QuickControlWidget::getSignalColor()
 const QColor& QuickControlWidget::getBackgroundColor()
 {
     return m_colCurrentBackgroundColor;
+}
+
+
+//*************************************************************************************************************
+
+void QuickControlWidget::setAverageInformationMapOld(const QMap<double, QPair<QColor, QPair<QString,bool> > >& qMapAverageInfoOld)
+{
+    m_qMapAverageInfoOld = qMapAverageInfoOld;
+}
+
+
+//*************************************************************************************************************
+
+void QuickControlWidget::setAverageInformationMap(const QMap<double, QPair<QColor, QPair<QString,bool> > >& qMapAverageColor)
+{
+    //Check if average type already exists in the map
+    QMapIterator<double, QPair<QColor, QPair<QString,bool> > > i(qMapAverageColor);
+
+    while (i.hasNext()) {
+        i.next();
+
+        if(!m_qMapAverageInfo.contains(i.key())) {
+            if(m_qMapAverageInfoOld.contains(i.key())) {
+                //Use old color
+                QPair<QColor, QPair<QString,bool> > tempPair = i.value();
+                tempPair.first = m_qMapAverageInfoOld[i.key()].first;
+
+                m_qMapAverageInfo.insert(i.key(), tempPair);
+            } else {
+                //Use default color
+                m_qMapAverageInfo.insert(i.key(), i.value());
+            }
+        }
+    }
+
+    //Recreate average group
+    if(m_bAverages) {
+        createAveragesGroup();
+
+        emit averageInformationChanged(m_qMapAverageInfo);
+    }
+}
+
+
+//*************************************************************************************************************
+
+QMap<double, QPair<QColor, QPair<QString,bool> > > QuickControlWidget::getAverageInformationMap()
+{
+    return m_qMapAverageInfo;
 }
 
 
@@ -389,20 +453,23 @@ void QuickControlWidget::onEnableDisableAllProj(bool status)
 
 void QuickControlWidget::onCheckCompStatusChanged(const QString & compName)
 {
-    qDebug()<<compName;
+    //qDebug()<<compName;
 
     bool currentState = false;
 
-    for(int i = 0; i < m_qListCompCheckBox.size(); ++i)
-        if(m_qListCompCheckBox[i]->text() != compName)
+    for(int i = 0; i < m_qListCompCheckBox.size(); ++i) {
+        if(m_qListCompCheckBox[i]->text() != compName) {
             m_qListCompCheckBox[i]->setChecked(false);
-        else
+        } else {
             currentState = m_qListCompCheckBox[i]->isChecked();
+        }
+    }
 
-    if(currentState)
+    if(currentState) {
         emit compSelectionChanged(compName.toInt());
-    else //If none selected
+    } else { //If none selected
         emit compSelectionChanged(0);
+    }
 
     emit updateConnectedView();
 }
@@ -558,7 +625,7 @@ void QuickControlWidget::onRealTimeTriggerColorChanged(bool state)
 {
     Q_UNUSED(state);
 
-    QColor color = QColorDialog::getColor(m_qMapTriggerColor[ui->m_comboBox_triggerChannels->currentText()], this, "Set trigger color");
+    QColor color = QColorDialog::getColor(m_qMapTriggerColor[ui->m_comboBox_triggerColorType->currentText().toDouble()], this, "Set trigger color");
 
     //Change color of pushbutton
     QPalette* palette1 = new QPalette();
@@ -566,7 +633,7 @@ void QuickControlWidget::onRealTimeTriggerColorChanged(bool state)
     ui->m_pushButton_triggerColor->setPalette(*palette1);
     ui->m_pushButton_triggerColor->update();
 
-    m_qMapTriggerColor[ui->m_comboBox_triggerChannels->currentText()] = color;
+    m_qMapTriggerColor[ui->m_comboBox_triggerColorType->currentText().toDouble()] = color;
 
     emit triggerInfoChanged(m_qMapTriggerColor, ui->m_checkBox_activateTriggerDetection->isChecked(), ui->m_comboBox_triggerChannels->currentText(), ui->m_doubleSpinBox_detectionThresholdFirst->value()*pow(10, ui->m_spinBox_detectionThresholdSecond->value()));
 }
@@ -584,14 +651,20 @@ void QuickControlWidget::onRealTimeTriggerThresholdChanged(double value)
 
 //*************************************************************************************************************
 
-void QuickControlWidget::onRealTimeTriggerCurrentChChanged(const QString &value)
+void QuickControlWidget::onRealTimeTriggerColorTypeChanged(const QString &value)
 {
     //Change color of pushbutton
     QPalette* palette1 = new QPalette();
-    palette1->setColor(QPalette::Button,m_qMapTriggerColor[value]);
+    palette1->setColor(QPalette::Button,m_qMapTriggerColor[value.toDouble()]);
     ui->m_pushButton_triggerColor->setPalette(*palette1);
     ui->m_pushButton_triggerColor->update();
+}
 
+
+//*************************************************************************************************************
+
+void QuickControlWidget::onRealTimeTriggerCurrentChChanged(const QString &value)
+{
     emit triggerInfoChanged(m_qMapTriggerColor, ui->m_checkBox_activateTriggerDetection->isChecked(), ui->m_comboBox_triggerChannels->currentText(), ui->m_doubleSpinBox_detectionThresholdFirst->value()*pow(10, ui->m_spinBox_detectionThresholdSecond->value()));
 }
 
@@ -602,7 +675,6 @@ void QuickControlWidget::onToggleHideAll(bool state)
 {
     if(!state) {
         //ui->m_widget_master->hide();
-        ui->m_groupBox_modalities->hide();
         ui->m_groupBox_noise->hide();
         ui->m_groupBox_other->hide();
         ui->m_groupBox_scaling->hide();
@@ -618,10 +690,6 @@ void QuickControlWidget::onToggleHideAll(bool state)
 
         if(m_bView || m_bTriggerDetection) {
             ui->m_groupBox_other->show();
-        }
-
-        if(m_bModalitiy) {
-            ui->m_groupBox_modalities->show();
         }
 
         ui->m_pushButton_hideAll->setText(QString("Minimize - Quick Control - %1").arg(m_sName));
@@ -818,6 +886,39 @@ void QuickControlWidget::onMakeScreenshot()
 
 //*************************************************************************************************************
 
+void QuickControlWidget::onAveragesChanged()
+{
+    //Change color for average
+    if(QPushButton* button = qobject_cast<QPushButton*>(sender()))
+    {
+        QColor color = QColorDialog::getColor(m_qMapAverageInfo[m_qMapButtonAverageType[button]].first, this, "Set average color");
+
+        //Change color of pushbutton
+        QPalette* palette1 = new QPalette();
+        palette1->setColor(QPalette::Button,color);
+        button->setPalette(*palette1);
+        button->update();
+
+        //Set color of button new new scene color
+        button->setStyleSheet(QString("background-color: rgb(%1, %2, %3);").arg(color.red()).arg(color.green()).arg(color.blue()));
+
+        m_qMapAverageInfo[m_qMapButtonAverageType[button]].first = color;
+
+        emit averageInformationChanged(m_qMapAverageInfo);
+    }
+
+    //Change color for average
+    if(QCheckBox* checkBox = qobject_cast<QCheckBox*>(sender()))
+    {
+        m_qMapAverageInfo[m_qMapChkBoxAverageType[checkBox]].second.second = checkBox->isChecked();
+
+        emit averageInformationChanged(m_qMapAverageInfo);
+    }
+}
+
+
+//*************************************************************************************************************
+
 void QuickControlWidget::createScalingGroup()
 {
     QGridLayout* t_pGridLayout = new QGridLayout;
@@ -983,7 +1084,7 @@ void QuickControlWidget::createScalingGroup()
         t_pHorizontalSlider->setMaximum(1000);
         t_pHorizontalSlider->setSingleStep(1);
         t_pHorizontalSlider->setPageStep(1);
-        t_pHorizontalSlider->setValue(m_qMapChScaling.value(FIFFV_STIM_CH)/10);
+        t_pHorizontalSlider->setValue(m_qMapChScaling.value(FIFFV_STIM_CH)*10);
         m_qMapScalingSlider.insert(FIFFV_STIM_CH,t_pHorizontalSlider);
         connect(t_pHorizontalSlider,static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
                 this,&QuickControlWidget::onUpdateSliderScaling);
@@ -1157,13 +1258,17 @@ void QuickControlWidget::createTriggerDetectionGroup()
     connect(ui->m_checkBox_activateTriggerDetection, static_cast<void (QCheckBox::*)(int)>(&QCheckBox::stateChanged),
             this, &QuickControlWidget::onRealTimeTriggerActiveChanged);
 
-    QMapIterator<QString, QColor> i(m_qMapTriggerColor);
-    while(i.hasNext()) {
-        i.next();
-        ui->m_comboBox_triggerChannels->addItem(i.key());
+    for(int i = 0; i<m_pFiffInfo->chs.size(); i++) {
+        if(m_pFiffInfo->chs[i].kind == FIFFV_STIM_CH) {
+            ui->m_comboBox_triggerChannels->addItem(m_pFiffInfo->chs[i].ch_name);
+        }
     }
+
     connect(ui->m_comboBox_triggerChannels, static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentTextChanged),
             this, &QuickControlWidget::onRealTimeTriggerCurrentChChanged);
+
+    connect(ui->m_comboBox_triggerColorType, static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentTextChanged),
+            this, &QuickControlWidget::onRealTimeTriggerColorTypeChanged);
 
     connect(ui->m_pushButton_triggerColor, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
             this, &QuickControlWidget::onRealTimeTriggerColorChanged);
@@ -1243,10 +1348,10 @@ void QuickControlWidget::createModalityGroup()
         connect(t_pCheckBoxModality,&QCheckBox::stateChanged,
                 this,&QuickControlWidget::onUpdateModalityCheckbox);
         t_pGridLayout->addWidget(t_pCheckBoxModality,i,1,1,1);
-
     }
 
-    ui->m_groupBox_modalities->setLayout(t_pGridLayout);
+    //Find Modalities tab and add current layout
+    this->findTabWidgetByText(ui->m_tabWidget_viewOptions, "Modalities")->setLayout(t_pGridLayout);
 }
 
 
@@ -1290,6 +1395,55 @@ void QuickControlWidget::createCompensatorGroup()
         //Find Comp tab and add current layout
         this->findTabWidgetByText(ui->m_tabWidget_noiseReduction, "Comp")->setLayout(topLayout);
     }
+}
+
+
+//*************************************************************************************************************
+
+void QuickControlWidget::createAveragesGroup()
+{
+    //Delete all widgets in the averages layout
+    QGridLayout* topLayout = static_cast<QGridLayout*>(this->findTabWidgetByText(ui->m_tabWidget_viewOptions, "Averages")->layout());
+    if(!topLayout) {
+       topLayout = new QGridLayout();
+    }
+
+    QLayoutItem *child;
+    while ((child = topLayout->takeAt(0)) != 0) {
+        delete child->widget();
+        delete child;
+    }
+
+    //Set trigger types
+    QMapIterator<double, QPair<QColor, QPair<QString,bool> > > i(m_qMapAverageInfo);
+    int count = 0;
+    m_qMapButtonAverageType.clear();
+    m_qMapChkBoxAverageType.clear();
+
+    while (i.hasNext()) {
+        i.next();
+
+        //Create average checkbox
+        QCheckBox* pCheckBox = new QCheckBox(i.value().second.first);
+        pCheckBox->setChecked(i.value().second.second);
+        topLayout->addWidget(pCheckBox, count, 0);
+        connect(pCheckBox, &QCheckBox::clicked,
+                this, &QuickControlWidget::onAveragesChanged);
+        m_qMapChkBoxAverageType.insert(pCheckBox, i.value().second.first.toDouble());
+
+        //Create average color pushbutton
+        QPushButton* pButton = new QPushButton();
+        pButton->setStyleSheet(QString("background-color: rgb(%1, %2, %3);").arg(i.value().first.red()).arg(i.value().first.green()).arg(i.value().first.blue()));
+        topLayout->addWidget(pButton, count, 1);
+        connect(pButton, &QPushButton::clicked,
+                this, &QuickControlWidget::onAveragesChanged);
+        m_qMapButtonAverageType.insert(pButton, i.value().second.first.toDouble());
+
+        ++count;
+    }
+
+    //Find Filter tab and add current layout
+    this->findTabWidgetByText(ui->m_tabWidget_viewOptions, "Averages")->setLayout(topLayout);
 }
 
 

@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     realtimesourceestimate.cpp
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     realtimeevokedset.cpp
+* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     August, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the RealTimeSourceEstimate class.
+* @brief    Contains the implementation of the RealTimeEvokedSet class.
 *
 */
 
@@ -38,7 +38,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "realtimesourceestimate.h"
+#include "realtimeevokedset.h"
+
+#include <time.h>
 
 
 //*************************************************************************************************************
@@ -53,7 +55,7 @@
 //=============================================================================================================
 
 using namespace SCMEASLIB;
-//using namespace IOBUFFER;
+using namespace FIFFLIB;
 
 
 //*************************************************************************************************************
@@ -61,14 +63,11 @@ using namespace SCMEASLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RealTimeSourceEstimate::RealTimeSourceEstimate(QObject *parent)
-: NewMeasurement(QMetaType::type("RealTimeSourceEstimate::SPtr"), parent)
-, m_bStcSend(true)
-, m_pMNEStc(new MNESourceEstimate)
-, m_pAnnotSet(AnnotationSet::SPtr(new AnnotationSet))
-, m_pSurfSet(SurfaceSet::SPtr(new SurfaceSet))
-, m_pFwdSolution(MNEForwardSolution::SPtr(new MNEForwardSolution))
+RealTimeEvokedSet::RealTimeEvokedSet(QObject *parent)
+: NewMeasurement(QMetaType::type("RealTimeEvokedSet::SPtr"), parent)
+, m_pFiffEvokedSet(new FiffEvokedSet)
 , m_bInitialized(false)
+, m_iPreStimSamples(0)
 {
 
 }
@@ -76,7 +75,7 @@ RealTimeSourceEstimate::RealTimeSourceEstimate(QObject *parent)
 
 //*************************************************************************************************************
 
-RealTimeSourceEstimate::~RealTimeSourceEstimate()
+RealTimeEvokedSet::~RealTimeEvokedSet()
 {
 
 }
@@ -84,27 +83,87 @@ RealTimeSourceEstimate::~RealTimeSourceEstimate()
 
 //*************************************************************************************************************
 
-MNESourceEstimate::SPtr& RealTimeSourceEstimate::getValue()
+void RealTimeEvokedSet::init(FiffInfo::SPtr p_fiffInfo)
 {
     QMutexLocker locker(&m_qMutex);
-    return m_pMNEStc;
+    m_qListChInfo.clear();
+    m_qListChColors.clear();
+
+    m_pFiffInfo = p_fiffInfo;
+
+    qsrand(time(NULL));
+    for(qint32 i = 0; i < p_fiffInfo->nchan; ++i)
+    {
+         m_qListChColors.append(QColor(qrand() % 256, qrand() % 256, qrand() % 256));
+
+        RealTimeSampleArrayChInfo initChInfo;
+        initChInfo.setChannelName(p_fiffInfo->chs[i].ch_name);
+
+        // set channel Unit
+        initChInfo.setUnit(p_fiffInfo->chs[i].unit);
+
+        //Treat stimulus channels different
+        if(p_fiffInfo->chs[i].kind == FIFFV_STIM_CH)
+        {
+//            initChInfo.setUnit("");
+            initChInfo.setMinValue(0);
+            initChInfo.setMaxValue(1.0e6);
+        }
+
+        // set channel Kind
+        initChInfo.setKind(p_fiffInfo->chs[i].kind);
+
+        // set channel coil
+        initChInfo.setCoil(p_fiffInfo->chs[i].coil_type);
+
+        m_qListChInfo.append(initChInfo);
+    }
 }
 
 
 //*************************************************************************************************************
 
-void RealTimeSourceEstimate::setValue(MNESourceEstimate& v)
+FiffEvokedSet::SPtr& RealTimeEvokedSet::getValue()
 {
-    m_qMutex.lock();
-
-    //Store
-    *m_pMNEStc = v;
-
-    m_bInitialized = true;
-
-    m_qMutex.unlock();
-
-    emit notify();
-
+    QMutexLocker locker(&m_qMutex);
+    return m_pFiffEvokedSet;
 }
 
+
+//*************************************************************************************************************
+
+void RealTimeEvokedSet::setValue(FiffEvokedSet& v, FiffInfo::SPtr p_fiffinfo)
+{
+    //Store
+    m_qMutex.lock();
+    *m_pFiffEvokedSet = v;
+    m_qMutex.unlock();
+
+    if(!m_bInitialized)
+    {
+        init(p_fiffinfo);
+
+        m_qMutex.lock();
+        m_iPreStimSamples = 0;
+
+        //Take the first evoked iformation to calcualte the pre samples.
+        //They all have the same pre sample size as of right now.
+        if(!m_pFiffEvokedSet->evoked.isEmpty()) {
+            for(qint32 i = 0; i < m_pFiffEvokedSet->evoked.at(0).times.size(); ++i)
+            {
+                if(m_pFiffEvokedSet->evoked.at(0).times[i] >= 0)
+                    break;
+                else
+                    ++m_iPreStimSamples;
+            }
+        }
+
+        m_bInitialized = true;
+        m_qMutex.unlock();
+    }
+
+    emit notify();
+}
+
+
+//*************************************************************************************************************
