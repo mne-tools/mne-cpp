@@ -272,7 +272,7 @@ void AverageSceneItem::paintAveragePath(QPainter *painter)
                 pen.setColor(m_qMapAverageColor[m_lAverageData.at(dataIndex).first].first);
             }
 
-            pen.setWidthF(2);
+            pen.setWidthF(3);
             painter->setPen(pen);
 
             for(int i = 0; i < totalCols && path.elementCount() <= boundingRect.width(); i += dsFactor) {

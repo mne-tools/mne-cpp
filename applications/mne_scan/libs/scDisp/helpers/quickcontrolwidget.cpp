@@ -352,7 +352,6 @@ void QuickControlWidget::setAverageInformationMap(const QMap<double, QPair<QColo
     //Check if average type already exists in the map
     QMapIterator<double, QPair<QColor, QPair<QString,bool> > > i(qMapAverageColor);
 
-    qDebug()<<"QuickControlWidget::setAverageMap - m_qMapAverageInfoOld.size()"<<m_qMapAverageInfoOld.size();
     while (i.hasNext()) {
         i.next();
 
@@ -1085,7 +1084,7 @@ void QuickControlWidget::createScalingGroup()
         t_pHorizontalSlider->setMaximum(1000);
         t_pHorizontalSlider->setSingleStep(1);
         t_pHorizontalSlider->setPageStep(1);
-        t_pHorizontalSlider->setValue(m_qMapChScaling.value(FIFFV_STIM_CH)/10);
+        t_pHorizontalSlider->setValue(m_qMapChScaling.value(FIFFV_STIM_CH)*10);
         m_qMapScalingSlider.insert(FIFFV_STIM_CH,t_pHorizontalSlider);
         connect(t_pHorizontalSlider,static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
                 this,&QuickControlWidget::onUpdateSliderScaling);
