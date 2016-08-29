@@ -177,14 +177,6 @@ public:
     */
     void channelSelectionManagerChanged(const QList<QGraphicsItem *> &selectedChannelItems);
 
-    //=========================================================================================================
-    /**
-    * Scales the averaged data according to scaleMap
-    *
-    * @param [in] scaleMap map with all channel types and their current scaling value
-    */
-    void scaleAveragedData(const QMap<qint32, float> &scaleMap);
-
 private slots:
     //=========================================================================================================
     /**
@@ -291,10 +283,5 @@ private:
 };
 
 } // NAMESPACE SCDISPLIB
-
-#ifndef metatype_averageinformationmap
-#define metatype_averageinformationmap
-Q_DECLARE_METATYPE(SCDISPLIB::AverageInfoMap);
-#endif
 
 #endif // RealTimeEvokedSetWidget_H

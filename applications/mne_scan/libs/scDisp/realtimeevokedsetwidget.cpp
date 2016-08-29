@@ -562,7 +562,7 @@ void RealTimeEvokedSetWidget::init()
                 this, &RealTimeEvokedSetWidget::onSelectionChanged);
 
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::scalingChanged,
-                this, &RealTimeEvokedSetWidget::scaleAveragedData);
+                this, &RealTimeEvokedSetWidget::broadcastScaling);
 
         //Handle averages
         connect(this->m_pRTESetModel.data(), &RealTimeEvokedSetModel::newAverageTypeReceived,
@@ -581,6 +581,8 @@ void RealTimeEvokedSetWidget::init()
         m_pQuickControlWidget->setAverageInformationMapOld(map);
 
         m_pSelectionManagerWindow->updateDataView();
+
+        broadcastScaling(m_qMapChScaling);
 
         //
         //-------- Init signal and background colors --------
@@ -617,15 +619,6 @@ void RealTimeEvokedSetWidget::channelSelectionManagerChanged(const QList<QGraphi
 
 //*************************************************************************************************************
 
-void RealTimeEvokedSetWidget::scaleAveragedData(const QMap<qint32, float> &scaleMap)
-{
-    //Set the scale map received from the scale window
-    m_pAverageScene->setScaleMap(scaleMap);
-}
-
-
-//*************************************************************************************************************
-
 void RealTimeEvokedSetWidget::showSensorSelectionWidget()
 {
     if(!m_pSelectionManagerWindow)
@@ -652,6 +645,9 @@ void RealTimeEvokedSetWidget::showSelectedChannelsOnly(QStringList selectedChann
 
 void RealTimeEvokedSetWidget::broadcastScaling(QMap<qint32,float> scaleMap)
 {
+    //Set the scale map received from the scale window
+    m_pAverageScene->setScaleMap(scaleMap);
+    m_qMapChScaling = scaleMap;
     m_pRTESetModel->setScaling(scaleMap);
 }
 
