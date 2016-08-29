@@ -1,15 +1,14 @@
 //=============================================================================================================
 /**
-* @file     rtnoise.h
-* @author   Limin Sun <liminsun@nmr.mgh.harvard.edu>;
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     mne_project_to_surface.h
+* @author   Jana Kiesel <jana.kiesel@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     August, 2014
+* @date     August, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Limin Sun, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Jana Kiesel and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,36 +29,20 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     RtNoise class declaration.
+* @brief     MNEProjectToSurface class declaration.
 *
 */
 
-#ifndef RTNOISE_H
-#define RTNOISE_H
+#ifndef MNELIB_MNEPROJECTTOSURFACE_H
+#define MNELIB_MNEPROJECTTOSURFACE_H
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "rtprocessing_global.h"
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FIFF INCLUDES
-//=============================================================================================================
-
-#include <fiff/fiff_cov.h>
-#include <fiff/fiff_info.h>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Generics INCLUDES
-//=============================================================================================================
-
-#include <generics/circularmatrixbuffer.h>
+#include "mne_global.h"
 
 
 //*************************************************************************************************************
@@ -67,10 +50,7 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QThread>
-#include <QMutex>
 #include <QSharedPointer>
-#include <QVector>
 
 
 //*************************************************************************************************************
@@ -79,156 +59,150 @@
 //=============================================================================================================
 
 #include <Eigen/Core>
-#include <unsupported/Eigen/FFT>
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE RTPROCESSINGLIB
-//=============================================================================================================
-
-namespace RTPROCESSINGLIB
-{
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// FORWARD DECLARATIONS
 //=============================================================================================================
 
-using namespace Eigen;
-using namespace IOBUFFER;
-using namespace FIFFLIB;
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE MNELIB
+//=============================================================================================================
+
+namespace MNELIB {
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// MNELIB FORWARD DECLARATIONS
+//=============================================================================================================
+
+class MNEBemSurface;
+class MNESurface;
 
 
 //=============================================================================================================
 /**
-* Real-time noise Spectrum estimation
+* Description of what this class is intended to do (in detail).
 *
-* @brief Real-time Noise estimation
+* @brief Brief description of this class.
 */
-class RTPROCESSINGSHARED_EXPORT RtNoise : public QThread
+
+class MNESHARED_EXPORT MNEProjectToSurface
 {
-    Q_OBJECT
+
 public:
-    typedef QSharedPointer<RtNoise> SPtr;             /**< Shared pointer type for RtNoise. */
-    typedef QSharedPointer<const RtNoise> ConstSPtr;  /**< Const shared pointer type for RtNoise. */
+    typedef QSharedPointer<MNEProjectToSurface> SPtr;            /**< Shared pointer type for MNEProjectToSurface. */
+    typedef QSharedPointer<const MNEProjectToSurface> ConstSPtr; /**< Const shared pointer type for MNEProjectToSurface. */
 
     //=========================================================================================================
     /**
-    * Creates the real-time covariance estimation object.
-    *
-    * @param[in] p_iMaxSamples      Number of samples to use for each data chunk
-    * @param[in] p_pFiffInfo        Associated Fiff Information
-    * @param[in] parent     Parent QObject (optional)
+    * Constructs a MNEProjectToSurface object.
     */
-    explicit RtNoise(qint32 p_iMaxSamples, FiffInfo::SPtr p_pFiffInfo, qint32 p_dataLen, QObject *parent = 0);
+    MNEProjectToSurface();
 
     //=========================================================================================================
     /**
-    * Destroys the Real-time noise estimation object.
-    */
-    ~RtNoise();
+     * Constructs a MNEProjectToSurface with the data of a MNEBemSurface object.
+     * @brief MNEProjectToSurface
+     * @param[in] p_MNEBemSurf   The MNEBemSurface to which is to be projected
+     */
+    MNEProjectToSurface(const MNELIB::MNEBemSurface &p_MNEBemSurf);
 
     //=========================================================================================================
     /**
-    * Slot to receive incoming data.
-    *
-    * @param[in] p_DataSegment  Data to estimate the spectrum from -> ToDo Replace this by shared data pointer
-    */
-    void append(const MatrixXd &p_DataSegment);
+     * Constructs a MNEProjectToSurface with the data of a MNESurf object.
+     * @brief MNEProjectToSurface
+     * @param[in] p_MNESurf      The MNESurface to which is to be projected
+     */
+    MNEProjectToSurface(const MNELIB::MNESurface &p_MNESurf);
 
     //=========================================================================================================
     /**
-    * Returns true if is running, otherwise false.
-    *
-    * @return true if is running, false otherwise
-    */
-    inline bool isRunning();
-
-
-    //=========================================================================================================
-    /**
-    * Starts the RtNoise by starting the producer's thread.
-    *
-    * @return true if succeeded, false otherwise
-    */
-    virtual bool start();
-
-    //=========================================================================================================
-    /**
-    * Stops the RtNoise by stopping the producer's thread.
-    *
-    * @return true if succeeded, false otherwise
-    */
-    virtual bool stop();
-
-signals:
-    //=========================================================================================================
-    /**
-    * Signal which is emitted when a new data Matrix is estimated.
-    *
-    * @param[out]
-    */
-    void SpecCalculated(Eigen::MatrixXd);
+     * Projects a set of points r on the Surface
+     *
+     * @brief mne_find_closest_on_surface
+     *
+     * @param[in] r         Set of pionts, which are to be projectied.
+     * @param[in] np        number of points
+     * @param[out] rTri     set of points on the surface
+     * @param[out] nearest  Triangle of the new point
+     * @param[out] dist     Distance between r and rTri
+     *
+     * @return true if succeeded, false otherwise
+     */
+    bool mne_find_closest_on_surface(const Eigen::MatrixXf &r, const int np, Eigen::MatrixXf &rTri,
+                                     Eigen::VectorXi &nearest, Eigen::VectorXf &dist);
 
 protected:
-    //=========================================================================================================
-    /**
-    * The starting point for the thread. After calling start(), the newly created thread calls this function.
-    * Returning from this method will end the execution of the thread.
-    * Pure virtual method inherited by QThread.
-    */
-    virtual void run();
-
-    QVector <float> hanning(int N, short itype);
 
 private:
-    QMutex      mutex;                  /**< Provides access serialization between threads*/
+    //=========================================================================================================
+    /**
+     * Projects a point r on the Surface
+     *
+     * @brief mne_project_to_surface
+     *
+     * @param[in] r         Piont, which is to be projectied.
+     * @param[out] rTri     Point on the surface
+     * @param[out] bestTri  Triangle of the new point
+     * @param[out] bestDist Distance between r and rTri.
+     *
+     * @return true if succeeded, false otherwise
+     */
+    bool mne_project_to_surface(const Eigen::Vector3f &r, Eigen::Vector3f &rTri, int &bestTri, float &bestDist);
 
-    FiffInfo::SPtr  m_pFiffInfo;        /**< Holds the fiff measurement information. */
+    //=========================================================================================================
+    /**
+     * Finds the nearest point to a point r on a given triangle.
+     *
+     * @brief nearest_triangle_point
+     *
+     * @param[in] r     Point in space
+     * @param[in] tri   The Triangle of the surface
+     * @param[out] p    Coordiante in Triangel System (rTri = r1 + p*r12 +q*r13)
+     * @param[out] q    Coordiante in Triangel System (rTri = r1 + p*r12 +q*r13)
+     * @param[out] dist Distance between r and rTri
+     *
+     * @return true if succeeded, false otherwise
+     */
+    bool nearest_triangle_point(const Eigen::Vector3f &r, const int tri, float &p, float &q, float &dist);
 
-    bool        m_bIsRunning;           /**< Holds if real-time Covariance estimation is running.*/
+    //=========================================================================================================
+    /**
+     * Converts a point given in triangel coordinates (p,q) to the kartesian system.
+     *
+     * @brief project_to_triangle
+     *
+     * @param[out] rTri Coordiante in kartesian System
+     * @param[in] p     Coordiante in Triangel System (r = r1 + p*r12 +q*r13)
+     * @param[in] q     Coordiante in Triangel System (r = r1 + p*r12 +q*r13)
+     * @param[in] tri   The Triangle of the surface
+     *
+     * @return true if succeeded, false otherwise
+     */
+    bool project_to_triangle(Eigen::Vector3f &rTri, const float p, const float q, const int tri);
 
-    CircularMatrixBuffer<double>::SPtr m_pRawMatrixBuffer;   /**< The Circular Raw Matrix Buffer. */
-
-    QVector <float> m_fWin;
-
-    double m_Fs;
-
-    qint32 m_iFFTlength;
-    qint32 m_dataLength;
-
-protected:
-    int m_iNumOfBlocks;
-    int m_iBlockSize;
-    int m_iSensors;
-    int m_iBlockIndex;
-
-    MatrixXd m_matCircBuf;
-
-public:
-    MatrixXd m_matSpecData;
-    QMutex ReadMutex;
-
-    bool m_bSendDataToBuffer;
-
+    Eigen::MatrixX3f r1;         /**< Cartesian Vector to the first triangel corner */
+    Eigen::MatrixX3f r12;        /**< Cartesian Vector from the first to the second triangel corner */
+    Eigen::MatrixX3f r13;        /**< Cartesian Vector from the first to the third triangel corner */
+    Eigen::MatrixX3f nn;         /**< Cartesian Vector of the triangle plane normal */
+    Eigen::VectorXf a;           /**< r12*r12 */
+    Eigen::VectorXf b;           /**< r13*r13 */
+    Eigen::VectorXf c;           /**< r12*r13 */
+    Eigen::VectorXf det;         /**< Determinant of the Matrix [a c, c b] */
 };
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline bool RtNoise::isRunning()
-{
-    return m_bIsRunning;
-}
 
-} // NAMESPACE
+} // namespace MNELIB
 
-#ifndef metatype_matrix
-#define metatype_matrix
-Q_DECLARE_METATYPE(Eigen::MatrixXd); /**< Provides QT META type declaration of the MatrixXd type. For signal/slot usage.*/
-#endif
-
-#endif // RtNoise_H
+#endif // MNELIB_MNEPROJECTTOSURFACE_H
