@@ -65,7 +65,7 @@ public:
     *
     * @param [in] mapAvr     The average data information including the color per average type.
     */
-    void setAverageMap(const QMap<double, QPair<QColor, QPair<QString,bool> > >& mapAvr);
+    void setAverageInformationMap(const QMap<double, QPair<QColor, QPair<QString,bool> > >& mapAvr);
 
 protected:
     //=========================================================================================================

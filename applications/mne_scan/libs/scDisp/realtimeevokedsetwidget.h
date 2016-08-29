@@ -91,6 +91,8 @@ namespace SCDISPLIB
 
 struct Modality;
 
+typedef QMap<double, QPair<QColor, QPair<QString,bool> > > AverageInfoMap;
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -268,19 +270,19 @@ private:
     ChInfoModel::SPtr                   m_pChInfoModel;             /**< Channel info model. */
     FilterWindow::SPtr                  m_pFilterWindow;            /**< Filter window. */
 
-    bool            m_bInitialized;             /**< Is Initialized */
-    bool            m_bHideBadChannels;         /**< hide bad channels flag. */
-    qint32          m_iMaxFilterTapSize;        /**< maximum number of allowed filter taps. This number depends on the size of the receiving blocks. */
+    bool                                m_bInitialized;             /**< Is Initialized */
+    bool                                m_bHideBadChannels;         /**< hide bad channels flag. */
+    qint32                              m_iMaxFilterTapSize;        /**< maximum number of allowed filter taps. This number depends on the size of the receiving blocks. */
 
-    FiffInfo::SPtr  m_pFiffInfo;                /**< FiffInfo, which is used insteadd of ListChInfo*/
+    FiffInfo::SPtr                      m_pFiffInfo;                /**< FiffInfo, which is used insteadd of ListChInfo*/
 
-    QAction*        m_pActionSelectSensors;     /**< show roi select widget */
-    QAction*        m_pActionQuickControl;      /**< Show quick control widget. */
+    QAction*                            m_pActionSelectSensors;     /**< show roi select widget */
+    QAction*                            m_pActionQuickControl;      /**< Show quick control widget. */
 
-    QVBoxLayout*    m_pRTESetLayout;               /**< RTE Widget layout */
-    QLabel*         m_pLabelInit;               /**< Initialization Label */
-    QToolBox*       m_pToolBox;                 /**< The toolbox which holds the butterfly and 2D layout plot */
-    QGraphicsView*  m_pAverageLayoutView;       /**< View for 2D average layout scene */
+    QVBoxLayout*                        m_pRTESetLayout;            /**< RTE Widget layout */
+    QLabel*                             m_pLabelInit;               /**< Initialization Label */
+    QToolBox*                           m_pToolBox;                 /**< The toolbox which holds the butterfly and 2D layout plot */
+    QGraphicsView*                      m_pAverageLayoutView;       /**< View for 2D average layout scene */
 
     QList<Modality>                     m_qListModalities;
     QList<qint32>                       m_qListCurrentSelection;    /**< Current selection list -> hack around C++11 lambda  */
@@ -289,5 +291,10 @@ private:
 };
 
 } // NAMESPACE SCDISPLIB
+
+#ifndef metatype_averageinformationmap
+#define metatype_averageinformationmap
+Q_DECLARE_METATYPE(SCDISPLIB::AverageInfoMap);
+#endif
 
 #endif // RealTimeEvokedSetWidget_H

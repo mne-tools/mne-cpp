@@ -469,7 +469,7 @@ const QColor& RealTimeButterflyPlot::getBackgroundColor()
 
 //*************************************************************************************************************
 
-void RealTimeButterflyPlot::setAverageMap(const QMap<double, QPair<QColor, QPair<QString,bool> > >& mapAvr)
+void RealTimeButterflyPlot::setAverageInformationMap(const QMap<double, QPair<QColor, QPair<QString,bool> > >& mapAvr)
 {
     m_qMapAverageColor = mapAvr;
 
