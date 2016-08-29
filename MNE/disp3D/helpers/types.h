@@ -116,7 +116,8 @@ namespace MetaTreeItemTypes
                     UnknownItem = QStandardItem::UserType + 116,
                     SurfaceTranslateX = QStandardItem::UserType + 117,
                     SurfaceTranslateY = QStandardItem::UserType + 118,
-                    SurfaceTranslateZ = QStandardItem::UserType + 119};
+                    SurfaceTranslateZ = QStandardItem::UserType + 119,
+                    PointColor = QStandardItem::UserType + 120};
 }
 
 // Model item roles
@@ -176,7 +177,8 @@ namespace MetaTreeItemRoles
                     SurfaceColor = Qt::UserRole + 17,
                     SurfaceTranslateX = Qt::UserRole + 18,
                     SurfaceTranslateY = Qt::UserRole + 19,
-                    SurfaceTranslateZ = Qt::UserRole + 20};
+                    SurfaceTranslateZ = Qt::UserRole + 20,
+                    PointColor = Qt::UserRole + 21};
 }
 
 } //NAMESPACE DISP3DLIB

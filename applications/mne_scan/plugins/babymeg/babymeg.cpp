@@ -91,7 +91,7 @@ using namespace BABYMEGPLUGIN;
 using namespace UTILSLIB;
 using namespace RTPROCESSINGLIB;
 using namespace SCSHAREDLIB;
-using namespace IOBuffer;
+using namespace IOBUFFER;
 using namespace SCMEASLIB;
 
 
