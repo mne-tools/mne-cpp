@@ -80,7 +80,8 @@ MNE::MNE()
 //, m_sAtlasDir("D:/SoersStation/Dokumente/Karriere/TU Ilmenau/Promotion/Projekte/2016_LNT/Messdaten/subjects/lorenz/label")
 //, m_sSurfaceDir("D:/SoersStation/Dokumente/Karriere/TU Ilmenau/Promotion/Projekte/2016_LNT/Messdaten/subjects/lorenz/surf")
 , m_iNumAverages(1)
-, m_iDownSample(4)
+, m_iDownSample(6)
+, m_sAvrType("4")
 {
 
 }
@@ -121,9 +122,9 @@ void MNE::init()
     connect(m_pRTMSAInput.data(), &PluginInputConnector::notify, this, &MNE::updateRTMSA, Qt::DirectConnection);
     m_inputConnectors.append(m_pRTMSAInput);
 
-    m_pRTEInput = PluginInputData<RealTimeEvoked>::create(this, "MNE RTE In", "MNE real-time evoked input data");
-    connect(m_pRTEInput.data(), &PluginInputConnector::notify, this, &MNE::updateRTE, Qt::DirectConnection);
-    m_inputConnectors.append(m_pRTEInput);
+    m_pRTESInput = PluginInputData<RealTimeEvokedSet>::create(this, "MNE RTE In", "MNE real-time evoked input data");
+    connect(m_pRTESInput.data(), &PluginInputConnector::notify, this, &MNE::updateRTE, Qt::DirectConnection);
+    m_inputConnectors.append(m_pRTESInput);
 
     m_pRTCInput = PluginInputData<RealTimeCov>::create(this, "MNE RTC In", "MNE real-time covariance input data");
     connect(m_pRTCInput.data(), &PluginInputConnector::notify, this, &MNE::updateRTC, Qt::DirectConnection);
@@ -238,11 +239,11 @@ void MNE::calcFiffInfo()
         }
         RowVectorXi sel = m_pFiffInfoInput->pick_channels(m_qListPickChannels);
 
-        //qDebug() << "m_qListPickChannels" << m_qListPickChannels;
+        qDebug() << "m_qListPickChannels" << m_qListPickChannels;
 
         m_pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo(m_pFiffInfoInput->pick_info(sel)));
 
-        //qDebug() << "m_pFiffInfo" << m_pFiffInfo->ch_names;
+        qDebug() << "m_pFiffInfo" << m_pFiffInfo->ch_names;
     }
 }
 
@@ -413,18 +414,31 @@ void MNE::updateRTC(SCMEASLIB::NewMeasurement::SPtr pMeasurement)
 
 void MNE::updateRTE(SCMEASLIB::NewMeasurement::SPtr pMeasurement)
 {
-    QSharedPointer<RealTimeEvoked> pRTE = pMeasurement.dynamicCast<RealTimeEvoked>();
+    QSharedPointer<RealTimeEvokedSet> pRTES = pMeasurement.dynamicCast<RealTimeEvokedSet>();
 
     QMutexLocker locker(&m_qMutex);
     //MEG
-    if(pRTE && m_bReceiveData)
+    if(pRTES && m_bReceiveData)
     {
         //Fiff Information of the evoked
-        if(!m_pFiffInfoInput)
-            m_pFiffInfoInput = QSharedPointer<FiffInfo>(new FiffInfo(pRTE->getValue()->info));
+        if(!m_pFiffInfoInput && pRTES->getValue()->evoked.size() > 0) {
+            for(int i = 0; i < pRTES->getValue()->evoked.size(); ++i) {
+                if(pRTES->getValue()->evoked.at(i).comment == m_sAvrType) {
+                    m_pFiffInfoInput = QSharedPointer<FiffInfo>(new FiffInfo(pRTES->getValue()->evoked.at(i).info));
+                }
+            }
+        }
 
-        if(m_bProcessData)
-            m_qVecFiffEvoked.push_back(pRTE->getValue()->pick_channels(m_qListPickChannels));
+        if(m_bProcessData) {
+            FiffEvokedSet::SPtr pFiffEvokedSet = pRTES->getValue();
+
+            for(int i = 0; i < pFiffEvokedSet->evoked.size(); ++i) {
+                if(pFiffEvokedSet->evoked.at(i).comment == m_sAvrType) {
+                    qDebug()<<"MNE::updateRTE - avrage found type - " << m_sAvrType;
+                    m_qVecFiffEvoked.push_back(pFiffEvokedSet->evoked.at(i).pick_channels(m_qListPickChannels));
+                }
+            }
+        }
     }
 }
 
@@ -433,6 +447,7 @@ void MNE::updateRTE(SCMEASLIB::NewMeasurement::SPtr pMeasurement)
 
 void MNE::updateInvOp(MNEInverseOperator::SPtr p_pInvOp)
 {
+    qDebug() << "MNE::updateInvOp - START";
     m_pInvOp = p_pInvOp;
 
     double snr = 3.0;
@@ -484,7 +499,8 @@ void MNE::run()
     // Init Real-Time inverse estimator
     //
     m_pRtInvOp = RtInvOp::SPtr(new RtInvOp(m_pFiffInfo, m_pClusteredFwd));
-    connect(m_pRtInvOp.data(), &RtInvOp::invOperatorCalculated, this, &MNE::updateInvOp);
+    connect(m_pRtInvOp.data(), &RtInvOp::invOperatorCalculated,
+            this, &MNE::updateInvOp);
     m_pMinimumNorm.reset();
 
     //
@@ -573,11 +589,12 @@ void MNE::run()
 
         if(t_evokedSize > 0)
         {
-            //qDebug()<<"MNE::run - Processing RTE data";
+            qDebug() << "MNE::run - Processing RTE data - t_evokedSize" << t_evokedSize;
             if(m_pMinimumNorm && ((skip_count % m_iDownSample) == 0))
             {
                 m_qMutex.lock();
                 FiffEvoked t_fiffEvoked = m_qVecFiffEvoked[0];
+                qDebug()<<"MNE::run - t_fiffEvoked.data.rows()"<<t_fiffEvoked.data.rows();
                 m_qVecFiffEvoked.pop_front();
                 m_qMutex.unlock();
 
