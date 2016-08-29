@@ -544,6 +544,8 @@ void RealTimeEvokedWidget::init()
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::scalingChanged,
                 this, &RealTimeEvokedWidget::scaleAveragedData);
 
+        m_pSelectionManagerWindow->updateDataView();
+
         //
         //-------- Init signal and background colors --------
         //
