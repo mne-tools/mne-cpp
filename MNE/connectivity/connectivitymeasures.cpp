@@ -102,7 +102,9 @@ Network::SPtr ConnectivityMeasures::crossCorrelation(const MatrixXd& matData, co
     {
         RowVectorXf rowVert = RowVectorXf::Zero(3);
         if(matVert.rows() != 0) {
-            rowVert = matVert.row(i);
+            rowVert(0) = matVert.row(i)(0);
+            rowVert(1) = matVert.row(i)(1);
+            rowVert(2) = matVert.row(i)(2);
         }
 
         *finalNetwork << NetworkNode::SPtr(new NetworkNode(i, rowVert));
