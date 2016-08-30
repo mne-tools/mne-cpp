@@ -161,15 +161,54 @@ public:
     inline bool isInit() const;
 
 private:
-    bool                        m_bIsInit;                      /**< The init flag. */
+    //=========================================================================================================
+    /**
+    * Call this function whenever the check box of this item was checked.
+    *
+    * @param[in] checkState        The current checkstate.
+    */
+    virtual void onCheckStateChanged(const Qt::CheckState& checkState);
 
-    Qt3DCore::QEntity*          m_pParentEntity;                /**< The parent 3D entity. */
+    //=========================================================================================================
+    /**
+    * Call this function whenever you want to change the visibilty of the 3D rendered content.
+    *
+    * @param[in] state     The visiblity flag.
+    */
+    void setVisible(bool state);
 
-    Renderable3DEntity*         m_pRenderable3DEntity;          /**< The renderable 3D entity. */
+    //=========================================================================================================
+    /**
+    * This function gets called whenever the network threshold changes.
+    *
+    * @param[in] vecThresholds     The new threshold values used for threshold the network.
+    */
+    void onNetworkThresholdChanged(const QVector3D& vecThresholds);
+
+    //=========================================================================================================
+    /**
+    * Call this function whenever you want to calculate the indices/tris for a network.
+    *
+    * @param[in] pNetworkData     The network data.
+    * @param[in] vecThreshold     The threshold data.
+    */
+    void plotNetwork(QSharedPointer<CONNECTIVITYLIB::Network> pNetworkData, const QVector3D& vecThreshold);
+
+    bool                                        m_bIsInit;                      /**< The init flag. */
+
+    Qt3DCore::QEntity*                          m_pParentEntity;                /**< The parent 3D entity. */
+
+    Renderable3DEntity*                         m_pRenderable3DEntity;          /**< The renderable 3D entity. */
+    QList<QSharedPointer<Qt3DCore::QEntity> >   m_lNodes;                       /**< The currently displayed node points as 3D spheres. */
 
 signals:
 
 };
+
+#ifndef metatype_networksptr
+#define metatype_networksptr
+Q_DECLARE_METATYPE(CONNECTIVITYLIB::Network::SPtr);
+#endif
 
 //*************************************************************************************************************
 //=============================================================================================================

@@ -177,6 +177,7 @@ bool Renderable3DEntity::setMaterial(QSharedPointer<Qt3DRender::QMaterial> pMate
 bool Renderable3DEntity::setAlpha(float fAlpha)
 {
     m_fAlpha = fAlpha;
+    qDebug()<<"set alpha";
 
     for(int i = 0; i < m_pMaterial->effect()->parameters().size(); i++) {
         if(m_pMaterial->effect()->parameters().at(i)->name() == "alpha") {
