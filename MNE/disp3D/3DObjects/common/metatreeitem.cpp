@@ -142,6 +142,9 @@ MetaTreeItem::MetaTreeItem(int iType, const QString& text)
         case MetaTreeItemTypes::NetworkThreshold:
             sToolTip = "The threshold used to scale the network";
             break;
+        case MetaTreeItemTypes::NetworkMatrix:
+            sToolTip = "The network distance matrix";
+            break;
         default: // do nothing;
             break;
     }

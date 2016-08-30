@@ -280,20 +280,6 @@ int main(int argc, char *argv[])
     Network::SPtr pConnect_RA = ConnectivityMeasures::crossCorrelation(sourceEstimate_RA.data, matNodeVertComb);
     Network::SPtr pConnect_RV = ConnectivityMeasures::crossCorrelation(sourceEstimate_RV.data, matNodeVertComb);
 
-    MatrixXd matConnect_LA = pConnect_LA->getConnectivityMatrix();
-    MatrixXd matConnect_LV = pConnect_LV->getConnectivityMatrix();
-    MatrixXd matConnect_RA = pConnect_RA->getConnectivityMatrix();
-    MatrixXd matConnect_RV = pConnect_RV->getConnectivityMatrix();
-
-    ImageSc* pPlotLA = new ImageSc(matConnect_LA);
-    pPlotLA->show();
-    ImageSc* pPlotLV = new ImageSc(matConnect_LV);
-    pPlotLV->show();
-    ImageSc* pPlotRA = new ImageSc(matConnect_RA);
-    pPlotRA->show();
-    ImageSc* pPlotRV = new ImageSc(matConnect_RV);
-    pPlotRV->show();
-
     //########################################################################################
     //
     // Do connectivity analysis END

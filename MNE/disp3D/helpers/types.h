@@ -91,8 +91,8 @@ namespace Data3DTreeModelItemTypes
                     SubjectItem = QStandardItem::UserType + 8,
                     BemItem = QStandardItem::UserType + 9,
                     BemSurfaceItem = QStandardItem::UserType + 10,
-                    DigitizerSetItem = QStandardItem::UserType +11,
-                    DigitizerItem = QStandardItem::UserType +12};
+                    DigitizerSetItem = QStandardItem::UserType + 11,
+                    DigitizerItem = QStandardItem::UserType + 12};
 }
 
 namespace MetaTreeItemTypes
@@ -118,7 +118,8 @@ namespace MetaTreeItemTypes
                     SurfaceTranslateY = QStandardItem::UserType + 118,
                     SurfaceTranslateZ = QStandardItem::UserType + 119,
                     PointColor = QStandardItem::UserType + 120,
-                    NetworkThreshold = QStandardItem::UserType + 121};
+                    NetworkThreshold = QStandardItem::UserType + 121,
+                    NetworkMatrix = QStandardItem::UserType + 122};
 }
 
 // Model item roles
