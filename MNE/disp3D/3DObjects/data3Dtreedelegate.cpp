@@ -43,6 +43,8 @@
 #include "data3Dtreedelegate.h"
 #include "data3Dtreemodel.h"
 
+#include <disp/imagesc.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -70,6 +72,7 @@
 using namespace UTILSLIB;
 using namespace DISP3DLIB;
 using namespace DISPCHARTSLIB;
+using namespace DISPLIB;
 
 
 //*************************************************************************************************************
@@ -252,6 +255,16 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
             pSpline->setThreshold(vecThresholdValues);
 
             return pSpline;
+        }
+
+        case MetaTreeItemTypes::NetworkMatrix: {
+            QStandardItem* pParentItem = static_cast<QStandardItem*>(pAbstractItem->QStandardItem::parent());
+            QModelIndex indexParent = pData3DTreeModel->indexFromItem(pParentItem);
+            MatrixXd matRTData = index.model()->data(indexParent, Data3DTreeModelItemRoles::NetworkDataMatrix).value<MatrixXd>();
+
+            ImageSc* pPlotLA = new ImageSc(matRTData);
+            pPlotLA->show();
+            //return pPlotLA;
         }
 
         default: // do nothing;

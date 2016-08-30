@@ -172,6 +172,12 @@ bool BrainRTConnectivityDataTreeItem::addData(Network::SPtr pNetworkData)
     data.setValue(vecEdgeTrehshold);
     pItemNetworkThreshold->setData(data, MetaTreeItemRoles::NetworkThreshold);
 
+    list.clear();
+    MetaTreeItem* pItemNetworkMatrix = new MetaTreeItem(MetaTreeItemTypes::NetworkMatrix, "Show network matrix");
+    list << pItemNetworkMatrix;
+    list << new QStandardItem(pItemNetworkMatrix->toolTip());
+    this->appendRow(list);
+
     //Plot network
     plotNetwork(pNetworkData, vecEdgeTrehshold);
 
