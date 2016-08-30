@@ -133,7 +133,8 @@ Network::SPtr ConnectivityMeasures::crossCorrelation(const MatrixXd& matData, co
 
 Eigen::MatrixXd ConnectivityMeasures::crossCorrelation(const MatrixXd& matData)
 {
-    MatrixXd matDist = MatrixXd::Zero(matData.rows(), matData.rows());
+    MatrixXd matDist(matData.rows(), matData.rows());
+    matDist.setZero();
 
     for(int i = 0; i < matDist.rows(); ++i)
     {
@@ -232,10 +233,12 @@ QPair<int,double> ConnectivityMeasures::eigenCrossCorrelation(const RowVectorXd&
     int maxlag = N - 1;
 
     //Zero Padd
-    RowVectorXd xCorrInputVecFirst = RowVectorXd::Zero(fftsize);
+    RowVectorXd xCorrInputVecFirst(fftsize);
+    xCorrInputVecFirst.setZero();
     xCorrInputVecFirst.head(xCorrInputVecFirstIn.cols()) = xCorrInputVecFirstIn;
 
-    RowVectorXd xCorrInputVecSecond = RowVectorXd::Zero(fftsize);
+    RowVectorXd xCorrInputVecSecond(fftsize);
+    xCorrInputVecSecond.setZero();
     xCorrInputVecSecond.head(xCorrInputVecSecondIn.cols()) = xCorrInputVecSecondIn;
 
     //FFT for freq domain to both vectors
