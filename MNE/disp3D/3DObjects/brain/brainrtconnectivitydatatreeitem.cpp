@@ -93,8 +93,12 @@ using namespace CONNECTIVITYLIB;
 BrainRTConnectivityDataTreeItem::BrainRTConnectivityDataTreeItem(int iType, const QString &text)
 : AbstractTreeItem(iType, text)
 , m_bIsInit(false)
+, m_pParentEntity(new Qt3DCore::QEntity())
+, m_pRenderable3DEntity(new Renderable3DEntity())
 {
     this->setEditable(false);
+    this->setCheckable(true);
+    this->setCheckState(Qt::Checked);
     this->setToolTip("Real time connectivity data");
 }
 
@@ -141,24 +145,76 @@ bool BrainRTConnectivityDataTreeItem::init(Qt3DCore::QEntity* parent)
 bool BrainRTConnectivityDataTreeItem::addData(Network::SPtr pNetworkData)
 {
     if(!m_bIsInit) {
-        qDebug() << "BrainRTConnectivityDataTreeItem::updateData - Rt Item has not been initialized yet!";
+        qDebug() << "BrainRTConnectivityDataTreeItem::updateData - BrainRTConnectivityDataTreeItem has not been initialized yet!";
         return false;
     }
 
-    MatrixX3f matSourceVert = this->data(Data3DTreeModelItemRoles::SourceVertices).value<MatrixX3f>();
-    MatrixX3f matSourceNorm = MatrixX3f::Zero(matSourceVert.rows(),3);
+    //Add data which is held by this BrainRTConnectivityDataTreeItem
+    QVariant data;
 
-    qDebug() << "BrainRTConnectivityDataTreeItem::addData - matSourceVert.rows()" << matSourceVert.rows();
-    qDebug() << "BrainRTConnectivityDataTreeItem::addData - matSourceNorm.rows()" << matSourceNorm.rows();
+    data.setValue(pNetworkData);
+    this->setData(data, Data3DTreeModelItemRoles::NetworkData);
 
-    if(matSourceVert.rows() != pNetworkData->getNodes().size())
-    {
-        qDebug() << "BrainRTConnectivityDataTreeItem::addData - Number of network nodes and sources do not match!";
-        return false;
+    MatrixXd matDist = pNetworkData->getConnectivityMatrix();
+    data.setValue(matDist);
+    this->setData(data, Data3DTreeModelItemRoles::NetworkDataMatrix);
+
+    //Add surface meta information as item children
+    QList<QStandardItem*> list;
+
+    QVector3D vecEdgeTrehshold(0,0,0);
+    MetaTreeItem* pItemNetworkThreshold = new MetaTreeItem(MetaTreeItemTypes::NetworkThreshold, "0.0,0.0,0.0");
+    connect(pItemNetworkThreshold, &MetaTreeItem::networkThresholdChanged,
+            this, &BrainRTConnectivityDataTreeItem::onNetworkThresholdChanged);
+    list << pItemNetworkThreshold;
+    list << new QStandardItem(pItemNetworkThreshold->toolTip());
+    this->appendRow(list);
+    data.setValue(vecEdgeTrehshold);
+    pItemNetworkThreshold->setData(data, MetaTreeItemRoles::NetworkThreshold);
+
+    //Plot network
+    plotNetwork(pNetworkData, vecEdgeTrehshold);
+
+    return true;
+}
+
+
+//*************************************************************************************************************
+
+void BrainRTConnectivityDataTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
+{
+    this->setVisible(checkState == Qt::Unchecked ? false : true);
+}
+
+
+//*************************************************************************************************************
+
+void BrainRTConnectivityDataTreeItem::setVisible(bool state)
+{
+    for(int i = 0; i < m_lNodes.size(); ++i) {
+        m_lNodes.at(i)->setParent(state ? m_pRenderable3DEntity : Q_NULLPTR);
     }
 
-    //Visualize network
-    double dEdgeTrehshold = 500;
+    m_pRenderable3DEntity->setParent(state ? m_pParentEntity : Q_NULLPTR);
+}
+
+
+//*************************************************************************************************************
+
+void BrainRTConnectivityDataTreeItem::onNetworkThresholdChanged(const QVector3D& vecThresholds)
+{
+    qDebug()<<"";
+    Network::SPtr pNetwork = this->data(Data3DTreeModelItemRoles::NetworkData).value<Network::SPtr>();
+
+    plotNetwork(pNetwork, vecThresholds);
+}
+
+
+//*************************************************************************************************************
+
+void BrainRTConnectivityDataTreeItem::plotNetwork(QSharedPointer<CONNECTIVITYLIB::Network> pNetworkData, const QVector3D& vecThreshold)
+{
+    //Prepare network visualization
     QMatrix4x4 m;
     Qt3DCore::QTransform* transform =  new Qt3DCore::QTransform();
     m.rotate(180, QVector3D(0.0f, 1.0f, 0.0f));
@@ -167,20 +223,27 @@ bool BrainRTConnectivityDataTreeItem::addData(Network::SPtr pNetworkData)
     m_pRenderable3DEntity->addComponent(transform);
 
     QVector3D pos;
-    Qt3DCore::QEntity* sourceSphereEntity;
+    QSharedPointer<Qt3DCore::QEntity> sourceSphereEntity;
     Qt3DExtras::QSphereMesh* sourceSphere;
     Qt3DExtras::QPhongMaterial* material;
 
-    //Draw network nodes and generate connection indices for Qt3D buffer
+    //Draw network nodes
+    m_lNodes.clear();
+    MatrixX3f tMatVert(pNetworkData->getNodes().size(), 3);
+    MatrixX3f tMatNorm(pNetworkData->getNodes().size(), 3);
+    tMatNorm.setZero();
     QList<NetworkNode::SPtr> lNetworkNodes = pNetworkData->getNodes();
 
-    for(int i = 0; i < lNetworkNodes.size(); ++i)
-    {
+    for(int i = 0; i < lNetworkNodes.size(); ++i) {
         pos.setX(lNetworkNodes.at(i)->getVert()(0));
         pos.setY(lNetworkNodes.at(i)->getVert()(1));
         pos.setZ(lNetworkNodes.at(i)->getVert()(2));
 
-        sourceSphereEntity = new Qt3DCore::QEntity(m_pRenderable3DEntity);
+        tMatVert(i,0) = pos.x();
+        tMatVert(i,1) = pos.y();
+        tMatVert(i,2) = pos.z();
+
+        sourceSphereEntity = QSharedPointer<Qt3DCore::QEntity>(new Qt3DCore::QEntity(m_pRenderable3DEntity));
 
         sourceSphere = new Qt3DExtras::QSphereMesh();
         sourceSphere->setRadius(0.001f);
@@ -195,12 +258,39 @@ bool BrainRTConnectivityDataTreeItem::addData(Network::SPtr pNetworkData)
         material = new Qt3DExtras::QPhongMaterial();
         material->setAmbient(Qt::yellow);
         sourceSphereEntity->addComponent(material);
-    }    
+        m_lNodes << sourceSphereEntity;
+    }
 
-    //sourceSphereEntity->setParent(m_pRenderable3DEntity);
+    //Generate connection indices for Qt3D buffer
+    MatrixX3i tMatTris;
+    int count = 0;
 
-    //m_pRenderable3DEntity->setMeshData(matSourceVert, matSourceNorm, tSurface.tris(), arrayCurvatureColor, Qt3DRender::QGeometryRenderer::Lines);
+    for(int i = 0; i < lNetworkNodes.size(); ++i) {
+        //Plot in edges
+        for(int j = 0; j < lNetworkNodes.at(i)->getEdgesIn().size(); ++j) {
+            if(lNetworkNodes.at(i)->getEdgesIn().at(j)->getWeight() >= vecThreshold.x()) {
+                tMatTris.conservativeResize(count+1,3);
+                tMatTris(count,0) = lNetworkNodes.at(i)->getEdgesIn().at(j)->getStartNode()->getNodeNumber();
+                tMatTris(count,1) = lNetworkNodes.at(i)->getEdgesIn().at(j)->getEndNode()->getNodeNumber();
+                tMatTris(count,2) = lNetworkNodes.at(i)->getEdgesIn().at(j)->getStartNode()->getNodeNumber();
+                ++count;
+            }
+        }
 
-    return true;
+        //Plot out edges
+        for(int j = 0; j < lNetworkNodes.at(i)->getEdgesOut().size(); ++j) {
+            if(lNetworkNodes.at(i)->getEdgesOut().at(j)->getWeight() >= vecThreshold.x()) {
+                tMatTris.conservativeResize(count+1,3);
+                tMatTris(count,0) = lNetworkNodes.at(i)->getEdgesOut().at(j)->getStartNode()->getNodeNumber();
+                tMatTris(count,1) = lNetworkNodes.at(i)->getEdgesOut().at(j)->getEndNode()->getNodeNumber();
+                tMatTris(count,2) = lNetworkNodes.at(i)->getEdgesOut().at(j)->getStartNode()->getNodeNumber();
+                ++count;
+            }
+        }
+    }
+
+    //Generate line primitive based network
+    m_pRenderable3DEntity->setMeshData(tMatVert, tMatNorm, tMatTris, QByteArray(), Qt3DRender::QGeometryRenderer::Lines);
 }
+
 

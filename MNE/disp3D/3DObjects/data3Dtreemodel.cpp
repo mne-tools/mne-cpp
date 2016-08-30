@@ -363,16 +363,30 @@ QList<BrainRTConnectivityDataTreeItem*> Data3DTreeModel::addData(const QString& 
             //Find already existing surface items and add the new data to the first search result
             QList<QStandardItem*> itemList = pSubjectItem->findChildren(set);
 
-            //Find the "set" items and add the source estimates as items
-            if(!itemList.isEmpty()) {
-                for(int i = 0; i<itemList.size(); i++) {
-                    if(itemList.at(i)->type() == Data3DTreeModelItemTypes::SurfaceSetItem) {
-                        if(BrainSurfaceSetTreeItem* pSetItem = dynamic_cast<BrainSurfaceSetTreeItem*>(itemList.at(i))) {
-                            returnList.append(pSetItem->addData(pNetworkData, m_pParentEntity));
-                        }
-                    }
-                }
+            if(!itemList.isEmpty() && (itemList.at(0)->type() == Data3DTreeModelItemTypes::SurfaceSetItem)) {
+                BrainSurfaceSetTreeItem* pSurfaceSetItem = dynamic_cast<BrainSurfaceSetTreeItem*>(itemList.at(0));
+                returnList.append(pSurfaceSetItem->addData(pNetworkData, m_pParentEntity));
+            } else {
+                BrainSurfaceSetTreeItem* pSurfaceSetItem = new BrainSurfaceSetTreeItem(Data3DTreeModelItemTypes::SurfaceSetItem, set);
+
+                QList<QStandardItem*> list;
+                list << pSurfaceSetItem;
+                list << new QStandardItem(pSurfaceSetItem->toolTip());
+                pSubjectItem->appendRow(list);
+
+                returnList.append(pSurfaceSetItem->addData(pNetworkData, m_pParentEntity));
             }
+
+//            //Find the "set" items and add the source estimates as items
+//            if(!itemList.isEmpty()) {
+//                for(int i = 0; i<itemList.size(); i++) {
+//                    if(itemList.at(i)->type() == Data3DTreeModelItemTypes::SurfaceSetItem) {
+//                        if(BrainSurfaceSetTreeItem* pSetItem = dynamic_cast<BrainSurfaceSetTreeItem*>(itemList.at(i))) {
+//                            returnList.append(pSetItem->addData(pNetworkData, m_pParentEntity));
+//                        }
+//                    }
+//                }
+//            }
 
 //            //Find the all the hemispheres of the set "set" and add the source estimates as items
 //            if(!itemList.isEmpty()) {

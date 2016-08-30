@@ -254,6 +254,8 @@ public:
     */
     Qt3DCore::QEntity* get3DRootEntity();
 
+    void startModelRotationRecursive(QObject* pObject);
+
     //=========================================================================================================
     /**
     * Starts to rotate all loaded 3D models.

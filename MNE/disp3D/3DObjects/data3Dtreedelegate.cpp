@@ -236,6 +236,24 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
             return pDoubleSpinBox;
         }
 
+        case MetaTreeItemTypes::NetworkThreshold: {
+            Spline* pSpline = new Spline("Spline Histogram", 0);
+            connect(pSpline, static_cast<void (Spline::*)(double, double, double)>(&Spline::borderChanged),
+                this, &Data3DTreeDelegate::onEditorEdited);
+
+            QStandardItem* pParentItem = static_cast<QStandardItem*>(pAbstractItem->QStandardItem::parent());
+            QModelIndex indexParent = pData3DTreeModel->indexFromItem(pParentItem);
+            MatrixXd matRTData = index.model()->data(indexParent, Data3DTreeModelItemRoles::NetworkDataMatrix).value<MatrixXd>();
+            Eigen::VectorXd resultClassLimit;
+            Eigen::VectorXi resultFrequency;
+            MNEMath::histcounts(matRTData, false, 50, resultClassLimit, resultFrequency, 0.0, 0.0);
+            pSpline->setData(resultClassLimit, resultFrequency, 0);
+            QVector3D vecThresholdValues = index.model()->data(index, MetaTreeItemRoles::NetworkThreshold).value<QVector3D>();
+            pSpline->setThreshold(vecThresholdValues);
+
+            return pSpline;
+        }
+
         default: // do nothing;
             break;
     }
@@ -355,6 +373,23 @@ void Data3DTreeDelegate::setEditorData(QWidget* editor, const QModelIndex& index
             pDoubleSpinBox->setValue(value);
             break;
         }        
+
+        case MetaTreeItemTypes::NetworkThreshold: {
+            Spline* pSpline = static_cast<Spline*>(editor);
+            int width = pSpline->size().width();
+            int height = pSpline->size().height();
+            if (pSpline->size().width() < 200 && pSpline->size().height() < 200)   //pSpline initializes with size (137,15)
+            {
+                pSpline->resize(800,600);   //resize histogram to be readable with default size
+            }
+            else
+            {
+                width = pSpline->size().width();   //keeps the size of the histogram
+                height = pSpline->size().height();
+                pSpline->resize(width,height);
+            }
+            return;
+        }
 
         default: // do nothing;
             break;
@@ -512,6 +547,21 @@ void Data3DTreeDelegate::setModelData(QWidget* editor, QAbstractItemModel* model
             model->setData(index, data, MetaTreeItemRoles::SurfaceTranslateZ);
             model->setData(index, data, Qt::DisplayRole);
             break;
+        }
+
+        case MetaTreeItemTypes::NetworkThreshold: {
+            Spline* pSpline = static_cast<Spline*>(editor);
+            QVector3D returnVector;
+            returnVector = pSpline->getThreshold();
+
+            QString displayThreshold;
+            displayThreshold = QString("%1,%2,%3").arg(returnVector.x()).arg(returnVector.y()).arg(returnVector.z());
+            QVariant dataDisplay;
+            dataDisplay.setValue(displayThreshold);
+            model->setData(index, dataDisplay, Qt::DisplayRole);
+
+            model->setData(index, returnVector, MetaTreeItemRoles::NetworkThreshold);
+            return;
         }
 
         default: // do nothing;

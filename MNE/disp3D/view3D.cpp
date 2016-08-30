@@ -268,21 +268,33 @@ Qt3DCore::QEntity* View3D::get3DRootEntity()
 
 //*************************************************************************************************************
 
+void View3D::startModelRotationRecursive(QObject* pObject)
+{
+    //TODO this won't work with QEntities
+    if(Renderable3DEntity* pItem = dynamic_cast<Renderable3DEntity*>(pObject)) {
+        QPropertyAnimation *anim = new QPropertyAnimation(pItem, QByteArrayLiteral("rotZ"));
+        anim->setDuration(30000);
+        anim->setStartValue(QVariant::fromValue(pItem->rotZ()));
+        anim->setEndValue(QVariant::fromValue(pItem->rotZ() + 360.0f));
+        anim->setLoopCount(-1);
+        anim->start();
+        m_lPropertyAnimations << anim;
+    }
+
+    for(int i = 0; i < pObject->children().size(); ++i) {
+        startModelRotationRecursive(pObject->children().at(i));
+    }
+}
+
+//*************************************************************************************************************
+
 void View3D::startModelRotation()
 {
     //Start animation
     m_lPropertyAnimations.clear();
 
     for(int i = 0; i < m_pRootEntity->children().size(); ++i) {
-        if(Renderable3DEntity* pItem = dynamic_cast<Renderable3DEntity*>(m_pRootEntity->children().at(i))) {
-            QPropertyAnimation *anim = new QPropertyAnimation(pItem, QByteArrayLiteral("rotZ"));
-            anim->setDuration(30000);
-            anim->setStartValue(QVariant::fromValue(pItem->rotZ()));
-            anim->setEndValue(QVariant::fromValue(pItem->rotZ() + 360.0f));
-            anim->setLoopCount(-1);
-            anim->start();
-            m_lPropertyAnimations << anim;
-        }
+        startModelRotationRecursive(m_pRootEntity->children().at(i));
     }
 }
 

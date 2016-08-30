@@ -187,9 +187,12 @@ bool CustomMesh::createCustomMesh(const MatrixX3f& tMatVert,
 
         //Color (this is the default color and will be used until the updateVertColor function was called)
         if(tArrayColors.size() == 0 || tArrayColors.size() != colorBufferData.size()) {
-            rawColorArray[idxColor++] = 0.5f;
-            rawColorArray[idxColor++] = 0.2f;
-            rawColorArray[idxColor++] = 0.2f;
+//            rawColorArray[idxColor++] = 0.5f;
+//            rawColorArray[idxColor++] = 0.2f;
+//            rawColorArray[idxColor++] = 0.2f;
+            rawColorArray[idxColor++] = 1.0f;
+            rawColorArray[idxColor++] = 1.0f;
+            rawColorArray[idxColor++] = 1.0f;
         } else {
             rawColorArray[idxColor] = tArrayColors[idxColor];
             idxColor++;

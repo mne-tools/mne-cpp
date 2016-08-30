@@ -117,7 +117,7 @@ int main(int argc, char *argv[])
     QCommandLineOption sampleHemiOption("hemi", "Selected hemisphere <hemi>.", "hemi", "2");
     QCommandLineOption sampleSubjectOption("subject", "Selected subject <subject>.", "subject", "sample");
     QCommandLineOption sampleSubjectPathOption("subjectPath", "Selected subject path <subjectPath>.", "subjectPath", "./MNE-sample-data/subjects");
-    QCommandLineOption sampleSourceLocOption("doSourceLoc", "Do real time source localization <doSourceLoc>.", "doSourceLoc", "false");
+    QCommandLineOption sampleSourceLocOption("doSourceLoc", "Do real time source localization <doSourceLoc>.", "doSourceLoc", "true");
     QCommandLineOption sampleFwdOption("fwd", "Path to forwad solution <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
     QCommandLineOption sampleInvOpOption("invOp", "Path to inverse operator <file>.", "file", "");
     QCommandLineOption sampleClustOption("doClust", "Path to clustered inverse operator <doClust>.", "doClust", "true");
@@ -247,40 +247,52 @@ int main(int argc, char *argv[])
     //########################################################################################
 
     //Generate node vertices
-//    MatrixX3f matNodeVertLeft, matNodeVertRight, matNodeVertComb;
+    MatrixX3f matNodeVertLeft, matNodeVertRight, matNodeVertComb;
 
-//    if(bDoClustering) {
-//        matNodeVertLeft.resize(t_clusteredFwd.src[0].cluster_info.centroidVertno.size(),3);
+    if(bDoClustering) {
+        matNodeVertLeft.resize(t_clusteredFwd.src[0].cluster_info.centroidVertno.size(),3);
 
-//        for(int j = 0; j < matNodeVertLeft.rows(); ++j) {
-//            matNodeVertLeft.row(j) = tSurfSet[0].rr().row(t_clusteredFwd.src[0].cluster_info.centroidVertno.at(j));
-//        }
+        for(int j = 0; j < matNodeVertLeft.rows(); ++j) {
+            matNodeVertLeft.row(j) = tSurfSet[0].rr().row(t_clusteredFwd.src[0].cluster_info.centroidVertno.at(j)) - tSurfSet[0].offset().transpose();
+        }
 
-//        matNodeVertRight.resize(t_clusteredFwd.src[1].cluster_info.centroidVertno.size(),3);
-//        for(int j = 0; j < matNodeVertRight.rows(); ++j) {
-//            matNodeVertRight.row(j) = tSurfSet[1].rr().row(t_clusteredFwd.src[1].cluster_info.centroidVertno.at(j));
-//        }
-//    } else {
-//        matNodeVertLeft.resize(t_Fwd.src[0].vertno.rows(),3);
-//        for(int j = 0; j < matNodeVertLeft.rows(); ++j) {
-//            matNodeVertLeft.row(j) = tSurfSet[0].rr().row(t_Fwd.src[0].vertno(j));
-//        }
+        matNodeVertRight.resize(t_clusteredFwd.src[1].cluster_info.centroidVertno.size(),3);
+        for(int j = 0; j < matNodeVertRight.rows(); ++j) {
+            matNodeVertRight.row(j) = tSurfSet[1].rr().row(t_clusteredFwd.src[1].cluster_info.centroidVertno.at(j)) - tSurfSet[1].offset().transpose();
+        }
+    } else {
+        matNodeVertLeft.resize(t_Fwd.src[0].vertno.rows(),3);
+        for(int j = 0; j < matNodeVertLeft.rows(); ++j) {
+            matNodeVertLeft.row(j) = tSurfSet[0].rr().row(t_Fwd.src[0].vertno(j)) - tSurfSet[0].offset().transpose();
+        }
 
-//        matNodeVertRight.resize(t_Fwd.src[1].vertno.rows(),3);
-//        for(int j = 0; j < matNodeVertRight.rows(); ++j) {
-//            matNodeVertRight.row(j) = tSurfSet[1].rr().row(t_Fwd.src[1].vertno(j));
-//        }
-//    }
+        matNodeVertRight.resize(t_Fwd.src[1].vertno.rows(),3);
+        for(int j = 0; j < matNodeVertRight.rows(); ++j) {
+            matNodeVertRight.row(j) = tSurfSet[1].rr().row(t_Fwd.src[1].vertno(j)) - tSurfSet[1].offset().transpose();
+        }
+    }
 
-//    matNodeVertComb.resize(matNodeVertLeft.rows()+matNodeVertRight.rows(),3);
-//    matNodeVertComb << matNodeVertLeft, matNodeVertRight;
+    matNodeVertComb.resize(matNodeVertLeft.rows()+matNodeVertRight.rows(),3);
+    matNodeVertComb << matNodeVertLeft, matNodeVertRight;
 
-//    Network::SPtr pConnect_LA = ConnectivityMeasures::crossCorrelation(sourceEstimate_LA.data, matNodeVertComb);
+    Network::SPtr pConnect_LA = ConnectivityMeasures::crossCorrelation(sourceEstimate_LA.data, matNodeVertComb);
+    Network::SPtr pConnect_LV = ConnectivityMeasures::crossCorrelation(sourceEstimate_LV.data, matNodeVertComb);
+    Network::SPtr pConnect_RA = ConnectivityMeasures::crossCorrelation(sourceEstimate_RA.data, matNodeVertComb);
+    Network::SPtr pConnect_RV = ConnectivityMeasures::crossCorrelation(sourceEstimate_RV.data, matNodeVertComb);
 
-//    MatrixXd matConnect_LA = pConnect_LA->getConnectivityMatrix();
+    MatrixXd matConnect_LA = pConnect_LA->getConnectivityMatrix();
+    MatrixXd matConnect_LV = pConnect_LV->getConnectivityMatrix();
+    MatrixXd matConnect_RA = pConnect_RA->getConnectivityMatrix();
+    MatrixXd matConnect_RV = pConnect_RV->getConnectivityMatrix();
 
-//    ImageSc* pPlot = new ImageSc(matConnect_LA);
-//    pPlot->show();
+    ImageSc* pPlotLA = new ImageSc(matConnect_LA);
+    pPlotLA->show();
+    ImageSc* pPlotLV = new ImageSc(matConnect_LV);
+    pPlotLV->show();
+    ImageSc* pPlotRA = new ImageSc(matConnect_RA);
+    pPlotRA->show();
+    ImageSc* pPlotRV = new ImageSc(matConnect_RV);
+    pPlotRV->show();
 
     //########################################################################################
     //
@@ -297,9 +309,12 @@ int main(int argc, char *argv[])
     std::cout<<"Creating BrainView"<<std::endl;
 
     View3D::SPtr testWindow = View3D::SPtr(new View3D());
-    testWindow->addBrainData("Subject01", "Left Auditory", tSurfSet, tAnnotSet);
+    testWindow->addBrainData("Subject01", "Right Visual", tSurfSet, tAnnotSet);
 
-    //QList<BrainRTConnectivityDataTreeItem*> rtItemList_LA = testWindow->addRtConnectivityData("Subject01", "Left Auditory", pConnect_LA);
+    QList<BrainRTConnectivityDataTreeItem*> rtItemList_LA = testWindow->addRtConnectivityData("Subject01", "Left Auditory", pConnect_LA);
+    QList<BrainRTConnectivityDataTreeItem*> rtItemList_RA = testWindow->addRtConnectivityData("Subject01", "Right Auditory", pConnect_RA);
+    QList<BrainRTConnectivityDataTreeItem*> rtItemList_LV = testWindow->addRtConnectivityData("Subject01", "Left Visual", pConnect_LV);
+    QList<BrainRTConnectivityDataTreeItem*> rtItemList_RV = testWindow->addRtConnectivityData("Subject01", "Right Visual", pConnect_RV);
 
     testWindow->show();
 
