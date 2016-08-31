@@ -98,10 +98,11 @@ Network::SPtr ConnectivityMeasures::crossCorrelation(const MatrixXd& matData, co
     Network::SPtr finalNetwork  = Network::SPtr(new Network());
 
     //Create nodes
-    for(int i = 0; i < matData.rows(); ++i)
-    {
-        RowVectorXf rowVert = RowVectorXf::Zero(3);
-        if(matVert.rows() != 0) {
+    for(int i = 0; i < matData.rows(); ++i) {
+        RowVectorXf rowVert(3);
+        rowVert.setZero();
+
+        if(matVert.rows() != 0 && i < matVert.rows()) {
             rowVert(0) = matVert.row(i)(0);
             rowVert(1) = matVert.row(i)(1);
             rowVert(2) = matVert.row(i)(2);
@@ -111,10 +112,8 @@ Network::SPtr ConnectivityMeasures::crossCorrelation(const MatrixXd& matData, co
     }
 
     //Create edges
-    for(int i = 0; i < matData.rows(); ++i)
-    {
-        for(int j = i; j < matData.rows(); ++j)
-        {
+    for(int i = 0; i < matData.rows(); ++i) {
+        for(int j = i; j < matData.rows(); ++j) {
             QPair<int,double> crossCorrPair = eigenCrossCorrelation(matData.row(i), matData.row(j));
 
             QSharedPointer<NetworkEdge> pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(finalNetwork->getNodes()[i], finalNetwork->getNodes()[j], crossCorrPair.second));
@@ -138,14 +137,12 @@ Eigen::MatrixXd ConnectivityMeasures::crossCorrelation(const MatrixXd& matData)
     MatrixXd matDist(matData.rows(), matData.rows());
     matDist.setZero();
 
-    for(int i = 0; i < matDist.rows(); ++i)
-    {
+    for(int i = 0; i < matDist.rows(); ++i) {
         QPair<int,double> crossCorrPair = eigenCrossCorrelation(matData.row(i), matData.row(i));
 
         double dScaling = crossCorrPair.second;
 
-        for(int j = i; j < matDist.rows(); ++j)
-        {
+        for(int j = i; j < matDist.rows(); ++j) {
             QPair<int,double> crossCorrPair = eigenCrossCorrelation(matData.row(i), matData.row(j));
             matDist(i,j) = crossCorrPair.second/* / dScaling*/;
         }
@@ -254,8 +251,7 @@ QPair<int,double> ConnectivityMeasures::eigenCrossCorrelation(const RowVectorXd&
     freqvec2.conjugate();
 
     //Main step of cross corr
-    for (int i = 0; i < fftsize; i++)
-    {
+    for (int i = 0; i < fftsize; i++) {
         freqvec[i] = freqvec[i] * freqvec2[i];
     }
 
