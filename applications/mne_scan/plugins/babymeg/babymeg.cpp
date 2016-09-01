@@ -31,7 +31,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the BabyMEG class.
+* @brief    BabyMEG class definition.
 *
 */
 
@@ -41,13 +41,21 @@
 //=============================================================================================================
 
 #include "babymeg.h"
-
 #include "FormFiles/babymegsetupwidget.h"
 #include "FormFiles/babymegprojectdialog.h"
-
-#include <utils/ioutils.h>
+#include "FormFiles/babymegsquidcontroldgl.h"
+#include "FormFiles/babymeghpidgl.h"
+#include "babymegclient.h"
+#include "babymeginfo.h"
 
 #include <iostream>
+
+#include <utils/ioutils.h>
+#include <utils/detecttrigger.h>
+#include <fiff/fiff_types.h>
+#include <fiff/fiff_dir_tree.h>
+#include <rtClient/rtcmdclient.h>
+#include <scMeas/newrealtimemultisamplearray.h>
 
 
 //*************************************************************************************************************
@@ -67,11 +75,20 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
+
+//*************************************************************************************************************
+//=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace BabyMEGPlugin;
+using namespace BABYMEGPLUGIN;
 using namespace UTILSLIB;
+using namespace SCSHAREDLIB;
+using namespace IOBUFFER;
+using namespace SCMEASLIB;
 
 
 //*************************************************************************************************************
@@ -227,10 +244,14 @@ void BabyMEG::init()
 
     //BabyMEG Inits
     pInfo = QSharedPointer<BabyMEGInfo>(new BabyMEGInfo());
-    connect(pInfo.data(), &BabyMEGInfo::fiffInfoAvailable, this, &BabyMEG::setFiffInfo);
-    connect(pInfo.data(), &BabyMEGInfo::SendDataPackage, this, &BabyMEG::setFiffData);
-    connect(pInfo.data(), &BabyMEGInfo::SendCMDPackage, this, &BabyMEG::setCMDData);
-    connect(pInfo.data(), &BabyMEGInfo::GainInfoUpdate, this, &BabyMEG::setFiffGainInfo);
+    connect(pInfo.data(), &BabyMEGInfo::fiffInfoAvailable,
+            this, &BabyMEG::setFiffInfo);
+    connect(pInfo.data(), &BabyMEGInfo::SendDataPackage,
+            this, &BabyMEG::setFiffData);
+    connect(pInfo.data(), &BabyMEGInfo::SendCMDPackage,
+            this, &BabyMEG::setCMDData);
+    connect(pInfo.data(), &BabyMEGInfo::GainInfoUpdate,
+            this, &BabyMEG::setFiffGainInfo);
 
     m_pMyClient = QSharedPointer<BabyMEGClient>(new BabyMEGClient(6340,this));
     m_pMyClient->SetInfo(pInfo);
@@ -276,6 +297,16 @@ void BabyMEG::initConnector()
         m_pRTMSABabyMEG->data()->setVisibility(true);
 
         m_outputConnectors.append(m_pRTMSABabyMEG);
+
+        //Look for trigger channels and initialise detected trigger map
+        m_lTriggerChannelIndices.append(m_pFiffInfo->ch_names.indexOf("TRG001"));
+        m_lTriggerChannelIndices.append(m_pFiffInfo->ch_names.indexOf("TRG002"));
+        m_lTriggerChannelIndices.append(m_pFiffInfo->ch_names.indexOf("TRG003"));
+        m_lTriggerChannelIndices.append(m_pFiffInfo->ch_names.indexOf("TRG004"));
+        m_lTriggerChannelIndices.append(m_pFiffInfo->ch_names.indexOf("TRG005"));
+        m_lTriggerChannelIndices.append(m_pFiffInfo->ch_names.indexOf("TRG006"));
+        m_lTriggerChannelIndices.append(m_pFiffInfo->ch_names.indexOf("TRG007"));
+        m_lTriggerChannelIndices.append(m_pFiffInfo->ch_names.indexOf("TRG008"));
     }
 }
 
@@ -353,7 +384,7 @@ void BabyMEG::SetFiffInfoForHPI()
     {
         qDebug()<<" Start to load Polhemus File";
         if (HPIDlg == NULL)
-            HPIDlg = QSharedPointer<babymeghpidgl>(new babymeghpidgl(this));
+            HPIDlg = QSharedPointer<BabyMEGHPIDgl>(new BabyMEGHPIDgl(this));
 
         if (!HPIDlg->isVisible())
         {
@@ -697,6 +728,95 @@ QWidget* BabyMEG::setupWidget()
 
 //*************************************************************************************************************
 
+void BabyMEG::run()
+{
+    MatrixXf matValue;
+
+    qint32 size = 0;
+
+    while(m_bIsRunning)
+    {
+        if(m_pRawMatrixBuffer)
+        {
+            //pop matrix
+            matValue = m_pRawMatrixBuffer->pop();
+
+            //create digital trigger information
+            //QElapsedTimer time;
+            //time.start();
+            createDigTrig(matValue);
+            //qDebug()<<"BabyMEG::run - createDigTrig took: "<<time.elapsed();
+
+            //Write raw data to fif file
+            if(m_bWriteToFile)
+            {
+                size += matValue.rows()*matValue.cols() * 4;
+
+                if(size > MAX_DATA_LEN)
+                {
+                    size = 0;
+                    this->splitRecordingFile();
+                }
+
+                mutex.lock();
+                m_pOutfid->write_raw_buffer(matValue.cast<double>());
+                mutex.unlock();
+            }
+            else
+            {
+                size = 0;
+            }
+
+            if(m_pRTMSABabyMEG)
+            {
+                m_pRTMSABabyMEG->data()->setValue(this->calibrate(matValue));
+            }
+        }
+    }
+
+    //Close the fif output stream
+    if(m_bWriteToFile)
+    {
+        this->toggleRecordingFile();
+    }
+}
+
+
+//*************************************************************************************************************
+
+void BabyMEG::createDigTrig(MatrixXf& data)
+{
+    //Look for triggers in all trigger channels
+
+    //m_qMapDetectedTrigger = DetectTrigger::detectTriggerFlanksMax(data.at(b), m_lTriggerChannelIndices, m_iCurrentSample-nCol, m_dTriggerThreshold, true);
+    QMap<int,QList<QPair<int,double> > > qMapDetectedTrigger = DetectTrigger::detectTriggerFlanksGrad(data.cast<double>(), m_lTriggerChannelIndices, 0, 3.0, false, "Rising");
+
+    //Combine and write results into data block's digital trigger channel
+    QMapIterator<int,QList<QPair<int,double> >> i(qMapDetectedTrigger);
+    int counter = 0;
+    int idxDigTrig = m_pFiffInfo->ch_names.indexOf("DTRG01");
+
+    while (i.hasNext())
+    {
+        i.next();
+
+        QList<QPair<int,double> > lDetectedTriggers = i.value();
+
+        for(int k = 0; k < lDetectedTriggers.size(); ++k)
+        {
+            if(lDetectedTriggers.at(k).first < data.cols() && lDetectedTriggers.at(k).first >= 0)
+            {
+                data(idxDigTrig,lDetectedTriggers.at(k).first) = data(idxDigTrig,lDetectedTriggers.at(k).first) + pow(2,counter);
+            }
+        }
+
+        counter++;
+    }
+}
+
+
+//*************************************************************************************************************
+
 MatrixXd BabyMEG::calibrate(const MatrixXf& data)
 {
     MatrixXd one;
@@ -832,51 +952,6 @@ bool BabyMEG::readBadChannels()
     m_pFiffInfo->bads = t_sListbads;
 
     return true;
-}
-
-
-//*************************************************************************************************************
-
-void BabyMEG::run()
-{
-
-    MatrixXf matValue;
-
-    qint32 size = 0;
-
-    while(m_bIsRunning)
-    {
-        if(m_pRawMatrixBuffer)
-        {
-            //pop matrix
-            matValue = m_pRawMatrixBuffer->pop();
-
-            //Write raw data to fif file
-            if(m_bWriteToFile)
-            {
-                size += matValue.rows()*matValue.cols() * 4;
-
-                if(size > MAX_DATA_LEN)
-                {
-                    size = 0;
-                    this->splitRecordingFile();
-                }
-
-                mutex.lock();
-                m_pOutfid->write_raw_buffer(matValue.cast<double>());
-                mutex.unlock();
-            }
-            else
-                size = 0;
-
-            if(m_pRTMSABabyMEG)
-                m_pRTMSABabyMEG->data()->setValue(this->calibrate(matValue));
-        }
-    }
-
-    //Close the fif output stream
-    if(m_bWriteToFile)
-        this->toggleRecordingFile();
 }
 
 

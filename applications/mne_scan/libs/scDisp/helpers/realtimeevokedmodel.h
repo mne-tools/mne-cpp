@@ -83,6 +83,8 @@ namespace RealTimeEvokedModelRoles
 }
 
 typedef QPair<const double*,qint32> RowVectorPair;
+typedef QPair<double, Eigen::RowVectorXd> AvrTypeRowVector;
+typedef QPair<double, SCDISPLIB::RowVectorPair> AvrTypeRowVectorPair;
 
 
 //*************************************************************************************************************
@@ -92,7 +94,6 @@ typedef QPair<const double*,qint32> RowVectorPair;
 
 using namespace SCMEASLIB;
 using namespace FIFFLIB;
-using namespace Eigen;
 using namespace UTILSLIB;
 using namespace SCDISPLIB;
 
@@ -387,25 +388,25 @@ private:
     */
     void filterChannelsConcurrently();
 
-    QSharedPointer<RealTimeEvoked>      m_pRTE;          /**< The real-time evoked measurement. */
+    QSharedPointer<RealTimeEvoked>      m_pRTE;                         /**< The real-time evoked measurement. */
 
     QMap<qint32,qint32>                 m_qMapIdxRowSelection;          /**< Selection mapping.*/
     QMap<qint32,float>                  m_qMapChScaling;                /**< Channel scaling map. */
 
-    MatrixXd                            m_matData;                      /**< List that holds the data*/
-    MatrixXd                            m_matDataFreeze;                /**< List that holds the data when freezed*/
+    Eigen::MatrixXd                     m_matData;                      /**< List that holds the data*/
+    Eigen::MatrixXd                     m_matDataFreeze;                /**< List that holds the data when freezed*/
 
     Eigen::MatrixXd                     m_matProj;                      /**< SSP projector */
     Eigen::MatrixXd                     m_matComp;                      /**< Compensator */
 
-    MatrixXd                            m_matDataFiltered;              /**< The filtered data */
-    MatrixXd                            m_matDataFilteredFreeze;        /**< The raw filtered data in freeze mode */
+    Eigen::MatrixXd                     m_matDataFiltered;              /**< The filtered data */
+    Eigen::MatrixXd                     m_matDataFilteredFreeze;        /**< The raw filtered data in freeze mode */
 
     Eigen::SparseMatrix<double>         m_matSparseProjCompMult;        /**< The final sparse projection + compensator operator.*/
     Eigen::SparseMatrix<double>         m_matSparseProjMult;            /**< The final sparse SSP projector */
     Eigen::SparseMatrix<double>         m_matSparseCompMult;            /**< The final sparse compensator matrix */
 
-    RowVectorXi                         m_vecBadIdcs;                   /**< Idcs of bad channels */
+    Eigen::RowVectorXi                  m_vecBadIdcs;                   /**< Idcs of bad channels */
 
     QPair<QVariant,QVariant>            m_pairBaseline;                 /**< Baseline information */
 

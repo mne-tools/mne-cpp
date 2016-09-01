@@ -46,8 +46,6 @@
 
 #include <scShared/Interfaces/IAlgorithm.h>
 #include <generics/circularmatrixbuffer.h>
-#include <scMeas/newrealtimemultisamplearray.h>
-#include <scMeas/realtimeevoked.h>
 #include <rtProcessing/rtave.h>
 
 
@@ -56,8 +54,7 @@
 // FIFF INCLUDES
 //=============================================================================================================
 
-#include <fiff/fiff_info.h>
-#include <fiff/fiff_evoked.h>
+#include <fiff/fiff_evoked_set.h>
 
 
 //*************************************************************************************************************
@@ -65,10 +62,22 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtWidgets>
-#include <QSpinBox>
-
 //#define DEBUG_AVERAGING
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+namespace SCMEASLIB{
+    class NewRealTimeMultiSampleArray;
+    class RealTimeEvokedSet;
+}
+
+namespace RTPROCESSINGLIB{
+    class RtAve;
+}
 
 
 //*************************************************************************************************************
@@ -78,18 +87,6 @@
 
 namespace AveragingPlugin
 {
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace SCSHAREDLIB;
-using namespace SCMEASLIB;
-using namespace IOBuffer;
-using namespace FIFFLIB;
-using namespace RTPROCLIB;
 
 
 //*************************************************************************************************************
@@ -106,7 +103,7 @@ class AveragingSettingsWidget;
 *
 * @brief The Averaging class provides a Averaging algorithm structure.
 */
-class AVERAGINGSHARED_EXPORT Averaging : public IAlgorithm
+class AVERAGINGSHARED_EXPORT Averaging : public SCSHAREDLIB::IAlgorithm
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "averaging.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
@@ -133,10 +130,10 @@ public:
     * Reimplemented virtual functions
     */
     virtual void unload();
-    virtual QSharedPointer<IPlugin> clone() const;
+    virtual QSharedPointer<SCSHAREDLIB::IPlugin> clone() const;
     virtual bool start();
     virtual bool stop();
-    virtual IPlugin::PluginType getType() const;
+    virtual SCSHAREDLIB::IPlugin::PluginType getType() const;
     virtual QString getName() const;
     virtual QWidget* setupWidget();
     void update(SCMEASLIB::NewMeasurement::SPtr pMeasurement);
@@ -179,7 +176,7 @@ public:
 
     void changeBaselineActive(bool state);
 
-    void appendEvoked(FiffEvoked::SPtr p_pEvoked);
+    void appendEvoked(FIFFLIB::FiffEvokedSet::SPtr p_pEvokedSet);
 
     void showAveragingWidget();
 
@@ -195,43 +192,43 @@ private:
     */
     void initConnector();
 
-    PluginInputData<NewRealTimeMultiSampleArray>::SPtr  m_pAveragingInput;      /**< The RealTimeSampleArray of the Averaging input.*/
-    PluginOutputData<RealTimeEvoked>::SPtr              m_pAveragingOutput;     /**< The RealTimeEvoked of the Averaging output.*/
+    SCSHAREDLIB::PluginInputData<SCMEASLIB::NewRealTimeMultiSampleArray>::SPtr  m_pAveragingInput;      /**< The RealTimeSampleArray of the Averaging input.*/
+    SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeEvokedSet>::SPtr           m_pAveragingOutput;     /**< The RealTimeEvoked of the Averaging output.*/
 
-    CircularMatrixBuffer<double>::SPtr                  m_pAveragingBuffer;     /**< Holds incoming data.*/
+    IOBUFFER::CircularMatrixBuffer<double>::SPtr    m_pAveragingBuffer;             /**< Holds incoming data.*/
 
-    QSharedPointer<AveragingSettingsWidget>             m_pAveragingWidget;
+    QSharedPointer<AveragingSettingsWidget>         m_pAveragingWidget;
 
-    QVector<FiffEvoked::SPtr>   m_qVecEvokedData;               /**< Evoked data set */
+    QVector<FIFFLIB::FiffEvokedSet::SPtr>           m_qVecEvokedData;               /**< Evoked data set */
 
-    QMutex                      m_qMutex;                       /**< Provides access serialization between threads*/
+    QMutex                                          m_qMutex;                       /**< Provides access serialization between threads*/
 
-    FiffInfo::SPtr              m_pFiffInfo;                    /**< Fiff measurement info.*/
-    QList<qint32>               m_qListStimChs;                 /**< Stimulus channels.*/
+    FIFFLIB::FiffInfo::SPtr                         m_pFiffInfo;                    /**< Fiff measurement info.*/
+    QList<qint32>                                   m_qListStimChs;                 /**< Stimulus channels.*/
 
-    RtAve::SPtr                 m_pRtAve;                       /**< Real-time average. */
+    RTPROCESSINGLIB::RtAve::SPtr                    m_pRtAve;                       /**< Real-time average. */
 
-    bool                        m_bIsRunning;                   /**< If source lab is running */
-    bool                        m_bProcessData;                 /**< If data should be received for processing */
-    bool                        m_bDoArtifactReduction;
-    bool                        m_bDoBaselineCorrection;
+    bool                                            m_bIsRunning;                   /**< If source lab is running */
+    bool                                            m_bProcessData;                 /**< If data should be received for processing */
+    bool                                            m_bDoArtifactReduction;
+    bool                                            m_bDoBaselineCorrection;
 
-    qint32                      m_iPreStimSamples;
-    qint32                      m_iPostStimSamples;
-    qint32                      m_iPreStimSeconds;
-    qint32                      m_iPostStimSeconds;
-    qint32                      m_iBaselineFromSeconds;
-    qint32                      m_iBaselineFromSamples;
-    qint32                      m_iBaselineToSeconds;
-    qint32                      m_iBaselineToSamples;
-    qint32                      m_iStimChanIdx;
-    qint32                      m_iAverageMode;
-    qint32                      m_iNumAverages;
-    qint32                      m_iStimChan;
-    qint32                      m_iArtifactThresholdSecond;
-    double                      m_dArtifactThresholdFirst;
+    qint32                                          m_iPreStimSamples;
+    qint32                                          m_iPostStimSamples;
+    qint32                                          m_iPreStimSeconds;
+    qint32                                          m_iPostStimSeconds;
+    qint32                                          m_iBaselineFromSeconds;
+    qint32                                          m_iBaselineFromSamples;
+    qint32                                          m_iBaselineToSeconds;
+    qint32                                          m_iBaselineToSamples;
+    qint32                                          m_iStimChanIdx;
+    qint32                                          m_iAverageMode;
+    qint32                                          m_iNumAverages;
+    qint32                                          m_iStimChan;
+    qint32                                          m_iArtifactThresholdSecond;
+    double                                          m_dArtifactThresholdFirst;
 
-    QAction*                    m_pActionShowAdjustment;
+    QAction*                                        m_pActionShowAdjustment;
 
 #ifdef DEBUG_AVERAGING
     //

@@ -49,6 +49,7 @@
 
 #include <fiff/fiff_evoked.h>
 #include <fiff/fiff.h>
+#include <fiff/fiff_dig_point_set.h>
 #include <mne/mne.h>
 
 #include <mne/mne_epoch_data_list.h>
@@ -115,7 +116,7 @@ int main(int argc, char *argv[])
     QCommandLineOption sampleSourceLocOption("doSourceLoc", "Do real time source localization <doSourceLoc>.", "doSourceLoc", "false");
     QCommandLineOption sampleFwdOption("fwd", "Path to forwad solution <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
     QCommandLineOption sampleInvOpOption("invOp", "Path to inverse operator <file>.", "file", "");
-    QCommandLineOption sampleClustOption("doClust", "Path to clustered inverse operator <doClust>.", "doClust", "false");
+    QCommandLineOption sampleClustOption("doClust", "Path to clustered inverse operator <doClust>.", "doClust", "true");
 
     parser.addOption(sampleSurfOption);
     parser.addOption(sampleAnnotOption);
@@ -271,6 +272,14 @@ int main(int argc, char *argv[])
 //    testWindow->addBemData("Subject01", "BEM", t_Bem2);
 //    testWindow->addBemData("Sensors", "VectorView", t_sensorSurfaceVV);
 //    testWindow->addBemData("Sensors", "BabyMEG", t_sensorSurfaceBM);
+
+    //
+    // Read & show digitizer points
+    //
+
+    QFile t_fileDig("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    FiffDigPointSet t_Dig(t_fileDig);
+    testWindow->addDigitizerData("Subject01", "Left Auditory", t_Dig);
 
     if(bAddRtSourceLoc) {
         //testWindow->addBrainData("Subject01", "HemiLRSet", t_clusteredFwd);

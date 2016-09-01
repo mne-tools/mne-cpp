@@ -52,6 +52,7 @@
 #include <QColor>
 #include <QStandardItem>
 #include <QStandardItemModel>
+#include <QVector3D>
 
 
 //*************************************************************************************************************
@@ -122,6 +123,9 @@ MetaTreeItem::MetaTreeItem(int iType, const QString& text)
             break;
         case MetaTreeItemTypes::SurfaceColor:
             sToolTip = "Surface color item";
+            break;
+        case MetaTreeItemTypes::PointColor:
+            sToolTip = "Point color item";
             break;
         case MetaTreeItemTypes::SurfaceAlpha:
             sToolTip = "Surface alpha value";
@@ -197,6 +201,11 @@ void  MetaTreeItem::setData(const QVariant& value, int role)
         }
 
         case MetaTreeItemRoles::SurfaceColor: {
+            emit surfaceColorChanged(value.value<QColor>());
+            break;
+        }
+
+        case MetaTreeItemRoles::PointColor: {
             emit surfaceColorChanged(value.value<QColor>());
             break;
         }

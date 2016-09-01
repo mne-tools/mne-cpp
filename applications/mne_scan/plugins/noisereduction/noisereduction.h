@@ -297,13 +297,13 @@ private:
 
     FIFFLIB::FiffInfo::SPtr                         m_pFiffInfo;                /**< Fiff measurement info.*/
 
-    IOBuffer::CircularMatrixBuffer<double>::SPtr    m_pNoiseReductionBuffer;    /**< Holds incoming data.*/
+    IOBUFFER::CircularMatrixBuffer<double>::SPtr    m_pNoiseReductionBuffer;    /**< Holds incoming data.*/
 
     NoiseReductionOptionsWidget::SPtr               m_pOptionsWidget;           /**< The noise reduction option widget object.*/
     QAction*                                        m_pActionShowOptionsWidget; /**< The noise reduction option widget action.*/
 
     DISPLIB::FilterWindow::SPtr                     m_pFilterWindow;            /**< Filter window. */
-    RTPROCLIB::RtFilter::SPtr                       m_pRtFilter;                /**< Real time filter object. */
+    RTPROCESSINGLIB::RtFilter::SPtr                       m_pRtFilter;                /**< Real time filter object. */
 
     SCMEASLIB::NewRealTimeMultiSampleArray::SPtr     m_pRTMSA;                   /**< the real time multi sample array object. */
 
