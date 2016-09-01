@@ -126,6 +126,9 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Ne
     //set layouts
     this->setLayout(rtmsaLayout);
 
+
+    qRegisterMetaType<QMap<int,QList<QPair<int,double> > > >();
+
     init();
 }
 
@@ -499,7 +502,7 @@ void RealTimeMultiSampleArrayWidget::init()
                 this->m_pRTMSAModel.data(), &RealTimeMultiSampleArrayModel::resetTriggerCounter);
 
         connect(this->m_pRTMSAModel.data(), &RealTimeMultiSampleArrayModel::triggerDetected,
-                m_pQuickControlWidget.data(), &QuickControlWidget::setNumberDetectedTriggers);
+                m_pQuickControlWidget.data(), &QuickControlWidget::setNumberDetectedTriggersAndTypes);
 
         //Handle time spacer distance
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::distanceTimeSpacerChanged,
@@ -821,14 +824,6 @@ void RealTimeMultiSampleArrayWidget::hideBadChannels()
 
     //Update the visible channel list which are to be filtered
     //visibleRowsChanged(0);
-}
-
-
-//*************************************************************************************************************
-
-void RealTimeMultiSampleArrayWidget::onTriggerDetected(int numberDetectedTriggers)
-{
-    m_pQuickControlWidget->setNumberDetectedTriggers(numberDetectedTriggers);
 }
 
 

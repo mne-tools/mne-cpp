@@ -45,6 +45,15 @@
 #include <iostream>
 #include <time.h>
 
+#include <scMeas/realtimeevokedset.h>
+#include <scMeas/newrealtimemultisamplearray.h>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FIFF INCLUDES
+//=============================================================================================================
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -57,6 +66,9 @@
 
 #include <QDebug>
 
+#include <QtWidgets>
+#include <QSpinBox>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -66,6 +78,9 @@
 using namespace AveragingPlugin;
 using namespace SCSHAREDLIB;
 using namespace SCMEASLIB;
+using namespace IOBUFFER;
+using namespace FIFFLIB;
+using namespace RTPROCESSINGLIB;
 
 
 //*************************************************************************************************************
@@ -338,7 +353,7 @@ void Averaging::init()
     m_inputConnectors.append(m_pAveragingInput);
 
     // Output
-    m_pAveragingOutput = PluginOutputData<RealTimeEvoked>::create(this, "AveragingOut", "Averaging Output Data");
+    m_pAveragingOutput = PluginOutputData<RealTimeEvokedSet>::create(this, "AveragingOut", "Averaging Output Data");
     m_pAveragingOutput->data()->setName(this->getName());//Provide name to auto store widget settings
     m_outputConnectors.append(m_pAveragingOutput);
 
@@ -508,9 +523,19 @@ void Averaging::changeBaselineActive(bool state)
 
 //*************************************************************************************************************
 
-void Averaging::appendEvoked(FiffEvoked::SPtr p_pEvoked)
+void Averaging::appendEvoked(FIFFLIB::FiffEvokedSet::SPtr p_pEvokedSet)
 {
-//    qDebug() << "void Averaging::appendEvoked";// << p_pEvoked->comment;
+//    qDebug() << "";
+//    qDebug() << "Averaging::appendEvoked - p_pEvokedSet INFO:";
+//    qDebug() << "p_pEvokedSet->evoked.size():" << p_pEvokedSet->evoked.size();
+//    qDebug() << "";
+
+//    for(int i = 0; i < p_pEvokedSet->evoked.size(); ++i) {
+//        qDebug() << p_pEvokedSet->evoked.at(i).comment <<"rows x cols:" << p_pEvokedSet->evoked.at(i).data.rows() << "x" << p_pEvokedSet->evoked.at(i).data.cols() << "-" << p_pEvokedSet->evoked.at(i).nave << "averages";
+//        //std::cout << p_pEvokedSet->evoked.at(i).data.block(0,0,10,10);
+//    }
+
+    // << p_pEvoked->comment;
 //    qDebug() << p_pEvoked->comment;
 //    QString t_sStimulusChannel = m_pFiffInfo->chs[m_qListStimChs[m_iStimChan]].ch_name;
 
@@ -518,7 +543,7 @@ void Averaging::appendEvoked(FiffEvoked::SPtr p_pEvoked)
 //    {
 //        qDebug()<< "append" << p_pEvoked->comment << "=" << t_sStimulusChannel;
         m_qMutex.lock();
-        m_qVecEvokedData.push_back(p_pEvoked);
+        m_qVecEvokedData.push_back(p_pEvokedSet);
         m_qMutex.unlock();
 //        qDebug() << "append after" << m_qVecEvokedData.size();
 //    }
@@ -616,12 +641,12 @@ void Averaging::run()
             m_qMutex.lock();
             if(m_qVecEvokedData.size() > 0)
             {
-                FiffEvoked t_fiffEvoked = *m_qVecEvokedData[0].data();
+                FiffEvokedSet t_fiffEvokedSet = *m_qVecEvokedData[0].data();
 
 #ifdef DEBUG_AVERAGING
                 std::cout << "EVK:" << t_fiffEvoked.data.row(0) << std::endl;
 #endif
-                m_pAveragingOutput->data()->setValue(t_fiffEvoked, m_pFiffInfo);
+                m_pAveragingOutput->data()->setValue(t_fiffEvokedSet, m_pFiffInfo);
 
                 m_qVecEvokedData.pop_front();
 

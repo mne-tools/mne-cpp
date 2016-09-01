@@ -102,7 +102,8 @@ SOURCES += fiff.cpp \
     fiff_info_base.cpp \
     fiff_evoked.cpp \
     fiff_evoked_set.cpp \
-    fiff_io.cpp
+    fiff_io.cpp \
+    fiff_dig_point_set.cpp
 
 HEADERS += fiff.h \
     fiff_global.h \
@@ -127,7 +128,8 @@ HEADERS += fiff.h \
     fiff_info_base.h \
     fiff_evoked.h \
     fiff_evoked_set.h \ \
-    fiff_io.h
+    fiff_io.h \
+    fiff_dig_point_set.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

@@ -91,7 +91,7 @@ namespace MneRtClientPlugin
 //=============================================================================================================
 
 using namespace SCSHAREDLIB;
-using namespace IOBuffer;
+using namespace IOBUFFER;
 using namespace RTCLIENTLIB;
 using namespace FIFFLIB;
 using namespace SCMEASLIB;

@@ -40,8 +40,6 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "renderable3Dentity.h"
-
 #include "fs/label.h"
 
 
@@ -92,7 +90,9 @@ namespace Data3DTreeModelItemTypes
                     RTConnectivityDataItem = QStandardItem::UserType + 7,
                     SubjectItem = QStandardItem::UserType + 8,
                     BemItem = QStandardItem::UserType + 9,
-                    BemSurfaceItem = QStandardItem::UserType + 10};
+                    BemSurfaceItem = QStandardItem::UserType + 10,
+                    DigitizerSetItem = QStandardItem::UserType +11,
+                    DigitizerItem = QStandardItem::UserType +12};
 }
 
 namespace MetaTreeItemTypes
@@ -116,7 +116,8 @@ namespace MetaTreeItemTypes
                     UnknownItem = QStandardItem::UserType + 116,
                     SurfaceTranslateX = QStandardItem::UserType + 117,
                     SurfaceTranslateY = QStandardItem::UserType + 118,
-                    SurfaceTranslateZ = QStandardItem::UserType + 119};
+                    SurfaceTranslateZ = QStandardItem::UserType + 119,
+                    PointColor = QStandardItem::UserType + 120};
 }
 
 // Model item roles
@@ -176,18 +177,14 @@ namespace MetaTreeItemRoles
                     SurfaceColor = Qt::UserRole + 17,
                     SurfaceTranslateX = Qt::UserRole + 18,
                     SurfaceTranslateY = Qt::UserRole + 19,
-                    SurfaceTranslateZ = Qt::UserRole + 20};
+                    SurfaceTranslateZ = Qt::UserRole + 20,
+                    PointColor = Qt::UserRole + 21};
 }
 
 } //NAMESPACE DISP3DLIB
 
 // Metatype declaration for correct QVariant usage
 // DO NOT FORGET TO REGISTER THESE TYPES IF YOU WANT TO USE THEM IN SIGNAL SLOT/SLOT SYSTEM (SEE VIEW3D initMetatypes())
-#ifndef metatype_renderable3Dentity
-#define metatype_renderable3Dentity
-Q_DECLARE_METATYPE(DISP3DLIB::Renderable3DEntity*)
-#endif
-
 #ifndef metatype_matrixx3i
 #define metatype_matrixx3i
 Q_DECLARE_METATYPE(Eigen::MatrixX3i);

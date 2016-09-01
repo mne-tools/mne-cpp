@@ -42,10 +42,9 @@
 //=============================================================================================================
 
 #include "../../disp3D_global.h"
-
 #include "../../helpers/abstracttreeitem.h"
 
-#include "mne/mne_forwardsolution.h"
+#include <mne/mne_forwardsolution.h>
 
 
 //*************************************************************************************************************
@@ -75,6 +74,14 @@ namespace FSLIB {
 namespace MNELIB {
     class MNESourceSpace;
     class MNESourceEstimate;
+}
+
+namespace FIFFLIB{
+    class FiffDigPointSet;
+}
+
+namespace Qt3DCore {
+    class QEntity;
 }
 
 
@@ -175,6 +182,18 @@ public:
     * @return                       Returns a list with the tree items which now hold the activation data. Use this list to update the data, i.e. during real time applications.
     */
     BrainRTSourceLocDataTreeItem* addData(const MNELIB::MNESourceEstimate& tSourceEstimate, const MNELIB::MNEForwardSolution& tForwardSolution = MNELIB::MNEForwardSolution());
+
+    //=========================================================================================================
+    /**
+    * Adds digitizer data to this item.
+    *
+    * @param[in] digitizerkind      The kind of the digitizer data.
+    * @param[in] tDigitizer         The digitizer data.
+    * @param[in] p3DEntityParent    The Qt3D entity parent of the new item.
+    *
+    * @return                       Returns true if successful.
+    */
+    bool addData(const FIFFLIB::FiffDigPointSet& tDigitizer, Qt3DCore::QEntity* p3DEntityParent = 0);
 
 private:
     //=========================================================================================================

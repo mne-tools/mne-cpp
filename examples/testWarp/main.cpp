@@ -46,6 +46,7 @@
 
 #include <utils/warp.h>
 #include <fiff/fiff.h>
+#include <fiff/fiff_dig_point_set.h>
 #include <mne/mne_bem.h>
 
 #include <QFile>
@@ -87,6 +88,7 @@ using namespace std;
 
 #define MAXBUFSIZE  ((int) 1e6)
 
+
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
@@ -127,32 +129,64 @@ int main(int argc, char *argv[])
 //            4.0,1,1;;
 
     //
-    // Read Electrode Positions from fiff
+    // Read Electrode Positions from fiff raw
     //
-    QFile t_fileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
-    FiffRawData raw(t_fileRaw);
-    QList<FiffChInfo> ChannelInfo= raw.info.chs;
-    QList<QVector<double>> tempElecInfo;
-    QList<QString> ElecChanName;
-    for (int i=0; i<ChannelInfo.length();i++)
-    {
-        if (ChannelInfo[i].kind==2)
+//    QFile t_fileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
+//    FiffRawData raw(t_fileRaw);
+//    QList<FiffChInfo> ChannelInfo= raw.info.chs;
+
+//    QList<QVector<double>> tempElecInfo;
+//    QList<QString> ElecChanName;
+//    for (int i=0; i<ChannelInfo.length();i++)
+//    {
+//        if (ChannelInfo[i].kind==2)
+//        {
+//            QVector<double> temp;
+//            ElecChanName.append(ChannelInfo[i].ch_name);
+//            temp.append(ChannelInfo[i].loc(0,0));
+//            temp.append(ChannelInfo[i].loc(1,0));
+//            temp.append(ChannelInfo[i].loc(2,0));
+//            tempElecInfo.append(temp);
+//        }
+//    }
+//    MatrixXd ElecPos(tempElecInfo.length(),3);
+//    for (int i=0; i<tempElecInfo.length();i++)
+//    {
+//        ElecPos(i,0)=tempElecInfo[i][0];
+//        ElecPos(i,1)=tempElecInfo[i][1];
+//        ElecPos(i,2)=tempElecInfo[i][2];
+//    }
+
+    //
+    // Read Electrode Positions from fiff (digitizer points)
+    //
+
+    QFile t_fileElec("./MNE-sample-data/warping/AVG4-0Years_GSN128.fif");
+//    QList<FiffDigPoint> dig = FiffDigPoint::read(t_fileElec);
+    FiffDigPointSet digset(t_fileElec);
+
+
+        QList<QVector<float>> tempElecInfo;
+        QList<int> ElecChanName;
+        for (int i = 0; i < digset.size(); ++i)
         {
-            QVector<double> temp;
-            ElecChanName.append(ChannelInfo[i].ch_name);
-            temp.append(ChannelInfo[i].loc(0,0));
-            temp.append(ChannelInfo[i].loc(1,0));
-            temp.append(ChannelInfo[i].loc(2,0));
-            tempElecInfo.append(temp);
+            if (digset[i].kind == 3)
+            {
+                QVector<float> temp;
+                ElecChanName.append(digset[i].ident);
+                temp.append(digset[i].r[0]);
+                temp.append(digset[i].r[1]);
+                temp.append(digset[i].r[2]);
+                tempElecInfo.append(temp);
+            }
         }
-    }
-    MatrixXd ElecPos(tempElecInfo.length(),3);
-    for (int i=0; i<tempElecInfo.length();i++)
-    {
-        ElecPos(i,0)=tempElecInfo[i][0];
-        ElecPos(i,1)=tempElecInfo[i][1];
-        ElecPos(i,2)=tempElecInfo[i][2];
-    }
+        MatrixXf ElecPos(tempElecInfo.length(), 3);
+        for (int i = 0; i < tempElecInfo.length(); ++i)
+        {
+            ElecPos(i,0) = tempElecInfo[i][0];
+            ElecPos(i,1) = tempElecInfo[i][1];
+            ElecPos(i,2) = tempElecInfo[i][2];
+        }
 
 //    std::cout << "Here is the matrix ElecPos:" << std::endl << ElecPos << std::endl;
 
@@ -166,59 +200,69 @@ int main(int argc, char *argv[])
     //
     //Read BEM from fiff
     //
-    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif");
-    MNELIB::MNEBem t_Bem (t_fileBem) ;
+//    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif");
+//    MNELIB::MNEBem t_Bem (t_fileBem) ;
 
     //
-    // prepare warp
+    // Read Transformation
     //
-    MatrixXd sLm=ElecPos;
-    MatrixXd random(ElecPos.rows(),3);
-    srand(time(NULL));
-    for (int i=0;i<ElecPos.rows();i++)
-    {
 
-        for (int j=0; j<3;j++)
-        {
-            random(i,j)=rand();
-            random(i,j)/=RAND_MAX;
-            random(i,j)*=0.06;
-            random(i,j)-=0.03;
-            //            random(i,j)=0.005*(rand()/RAND_MAX);
-        }
-    }
-//    std::cout << "Here are the first row of the matrix random:" << std::endl << random.topRows(9) << std::endl;
-    MatrixXd dLm=sLm+random;
-    MNELIB::MNEBemSurface skin=t_Bem[0];
-    MatrixXd sVert=skin.rr.cast<double>();
+    QFile t_fileTrans("./MNE-sample-data/warping/AVG4-0Years_GSN128-trans.fif");
+    FiffCoordTrans t_Trans (t_fileTrans);
+    ElecPos=t_Trans.apply_trans(ElecPos);
 
-    std::cout << "Here are the first row of the matrix skin.rr bevor warp:" << std::endl << skin.rr.topRows(9) << std::endl;
+//    //
+//    // prepare warp
+//    //
+//    MatrixXd sLm=ElecPos;
+//    MatrixXd random(ElecPos.rows(),3);
+//    srand(time(NULL));
+//    for (int i=0;i<ElecPos.rows();i++)
+//    {
+
+//        for (int j=0; j<3;j++)
+//        {
+//            random(i,j)=rand();
+//            random(i,j)/=RAND_MAX;
+//            random(i,j)*=0.06;
+//            random(i,j)-=0.03;
+//            //            random(i,j)=0.005*(rand()/RAND_MAX);
+//        }
+//    }
+////    std::cout << "Here are the first row of the matrix random:" << std::endl << random.topRows(9) << std::endl;
+//    MatrixXd dLm=sLm+random;
+//    MNELIB::MNEBemSurface skin=t_Bem[0];
+//    MatrixXd sVert=skin.rr.cast<double>();
+
+//    std::cout << "Here are the first row of the matrix skin.rr bevor warp:" << std::endl << skin.rr.topRows(9) << std::endl;
 
 
-    //
-    // calculate Warp
-    //
-    Warp test;
-    MatrixXd wVert(sVert.rows(),3);
-    wVert = test.calculate(sLm, dLm, sVert);
+//    //
+//    // calculate Warp
+//    //
+//    Warp test;
+//    MatrixXd wVert(sVert.rows(),3);
+//    wVert = test.calculate(sLm, dLm, sVert);
 
-    //
-    // WRITE NEW VERTICES BACK TO BEM
-    //
-    skin.rr=wVert.cast<float>();
-    skin.addVertexNormals();
+//    //
+//    // WRITE NEW VERTICES BACK TO BEM
+//    //
+//    skin.rr=wVert.cast<float>();
+//    skin.addVertexNormals();
 
-    std::cout << "Here are the first row of the matrix skin.rr after warp:" << std::endl << skin.rr.topRows(9) << std::endl;
-//    std::cout << "Here is the first row of the final matrix skin.tris:" << std::endl << skin.tris.topRows(9) << std::endl;
-//    std::cout << "Here is the last row of the final matrix skin.tris:" << std::endl << skin.tris.bottomRows(1) << std::endl;
+//    std::cout << "Here are the first row of the matrix skin.rr after warp:" << std::endl << skin.rr.topRows(9) << std::endl;
+////    std::cout << "Here is the first row of the final matrix skin.tris:" << std::endl << skin.tris.topRows(9) << std::endl;
+////    std::cout << "Here is the last row of the final matrix skin.tris:" << std::endl << skin.tris.bottomRows(1) << std::endl;
 
-    MNELIB::MNEBem t_BemWarpedA;
-    t_BemWarpedA<<skin;
-    QFile t_fileBemWarped("./MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem-warped.fif");
-    t_BemWarpedA.write(t_fileBemWarped);
-    t_fileBemWarped.close();
+//    MNELIB::MNEBem t_BemWarpedA;
+//    t_BemWarpedA<<skin;
+//    QFile t_fileBemWarped("./MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem-warped.fif");
+//    t_BemWarpedA.write(t_fileBemWarped);
+//    t_fileBemWarped.close();
 
-    MNELIB::MNEBem t_BemWarpedB (t_fileBemWarped) ;
-    MNELIB::MNEBemSurface skinWarped=t_BemWarpedB[0];
+//    MNELIB::MNEBem t_BemWarpedB (t_fileBemWarped) ;
+//    MNELIB::MNEBemSurface skinWarped=t_BemWarpedB[0];
     return a.exec();
 }
+
+

@@ -50,10 +50,10 @@ using namespace NoiseReductionPlugin;
 using namespace SCSHAREDLIB;
 using namespace SCMEASLIB;
 using namespace UTILSLIB;
-using namespace IOBuffer;
+using namespace IOBUFFER;
 using namespace Eigen;
 using namespace DISPLIB;
-using namespace RTPROCLIB;
+using namespace RTPROCESSINGLIB;
 
 
 //*************************************************************************************************************

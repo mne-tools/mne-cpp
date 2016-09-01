@@ -39,12 +39,11 @@
 //=============================================================================================================
 
 #include "brainsurfacetreeitem.h"
-
 #include "../common/metatreeitem.h"
 #include "../../helpers/renderable3Dentity.h"
 
-#include "fs/label.h"
-#include "fs/surface.h"
+#include <fs/label.h>
+#include <fs/surface.h>
 
 
 //*************************************************************************************************************
