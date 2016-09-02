@@ -81,11 +81,19 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-NetworkNode::NetworkNode(qint16 iNodeNumber, const RowVectorXf& vecVert, QObject *parent)
+NetworkNode::NetworkNode(qint16 iId, const RowVectorXf& vecVert, QObject *parent)
 : QObject(parent)
-, m_iNodeNumber(iNodeNumber)
+, m_iId(iId)
 , m_vecVert(vecVert)
 {
+}
+
+
+//*************************************************************************************************************
+
+QList<QSharedPointer<NetworkEdge> > NetworkNode::getEdges()
+{
+    return m_lEdgesIn << m_lEdgesOut;
 }
 
 
@@ -115,9 +123,79 @@ const RowVectorXf& NetworkNode::getVert()
 
 //*************************************************************************************************************
 
-qint16 NetworkNode::getNodeNumber()
+qint16 NetworkNode::getId()
 {
-    return m_iNodeNumber;
+    return m_iId;
+}
+
+
+//*************************************************************************************************************
+
+qint16 NetworkNode::getDegree()
+{
+    return m_lEdgesIn.size() + m_lEdgesOut.size();
+}
+
+
+//*************************************************************************************************************
+
+qint16 NetworkNode::getIndegree()
+{
+    return m_lEdgesIn.size();
+}
+
+
+//*************************************************************************************************************
+
+qint16 NetworkNode::getOutdegree()
+{
+    return m_lEdgesOut.size();
+}
+
+
+//*************************************************************************************************************
+
+double NetworkNode::getStrength()
+{
+    double strength = 0;
+
+    for(NetworkEdge::SPtr node : m_lEdgesIn) {
+        strength += node->getWeight();
+    }
+
+    for(NetworkEdge::SPtr node : m_lEdgesOut) {
+        strength += node->getWeight();
+    }
+
+    return strength;
+}
+
+
+//*************************************************************************************************************
+
+double NetworkNode::getInstrength()
+{
+    double strength = 0;
+
+    for(NetworkEdge::SPtr node : m_lEdgesIn) {
+        strength += node->getWeight();
+    }
+
+    return strength;
+}
+
+
+//*************************************************************************************************************
+
+double NetworkNode::getOutstrength()
+{
+    double strength = 0;
+
+    for(NetworkEdge::SPtr node : m_lEdgesOut) {
+        strength += node->getWeight();
+    }
+
+    return strength;
 }
 
 

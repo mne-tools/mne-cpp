@@ -111,6 +111,20 @@ QList<NetworkNode::SPtr> Network::getNodes()
 
 //*************************************************************************************************************
 
+qint16 Network::getDistribution()
+{
+    qint16 distribution = 0;
+
+    for(NetworkNode::SPtr node : m_lNodes) {
+        distribution += node->getDegree();
+    }
+
+    return distribution;
+}
+
+
+//*************************************************************************************************************
+
 Network& Network::operator<<(NetworkEdge::SPtr newEdge)
 {
     m_lEdges << newEdge;
@@ -138,8 +152,8 @@ MatrixXd Network::generateConnectMat()
 
     for(int i = 0; i < m_lEdges.size(); ++i)
     {
-        int row = m_lEdges.at(i)->getStartNode()->getNodeNumber();
-        int col = m_lEdges.at(i)->getEndNode()->getNodeNumber();
+        int row = m_lEdges.at(i)->getStartNode()->getId();
+        int col = m_lEdges.at(i)->getEndNode()->getId();
 
         if(row < matDist.rows() && col < matDist.cols())
         {

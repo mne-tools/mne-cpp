@@ -125,10 +125,10 @@ public:
 protected:
 
 private:
-    QSharedPointer<NetworkNode>     m_pStartNode;
-    QSharedPointer<NetworkNode>     m_pEndNode;
+    QSharedPointer<NetworkNode>     m_pStartNode;       /**< The start node of the edge.*/
+    QSharedPointer<NetworkNode>     m_pEndNode;         /**< The end node of the edge.*/
 
-    double                          m_dWeight;
+    double                          m_dWeight;          /**< The weight of the edge.*/
 
 signals:
 

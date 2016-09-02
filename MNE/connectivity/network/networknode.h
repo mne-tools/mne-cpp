@@ -104,31 +104,95 @@ public:
     /**
     * Constructs a NetworkNode object.
     */
-    explicit NetworkNode(qint16 iNodeNumber, const Eigen::RowVectorXf& vecVert, QObject *parent = 0);
+    explicit NetworkNode(qint16 iId, const Eigen::RowVectorXf& vecVert, QObject *parent = 0);
+
+    //=========================================================================================================
+    /**
+    * Returns all edges(undirected gaph).
+    *
+    * @return   Returns the list with all edges beloning to the node.
+    */
+    QList<QSharedPointer<NetworkEdge> > getEdges();
 
     //=========================================================================================================
     /**
     * Returns the ingoing edges.
+    *
+    * @return   Returns the list with all ingoing edges.
     */
     QList<QSharedPointer<NetworkEdge> > getEdgesIn();
 
     //=========================================================================================================
     /**
     * Returns the outgoing edges.
+    *
+    * @return   Returns the list with all outgoing edges.
     */
     QList<QSharedPointer<NetworkEdge>> getEdgesOut();
 
     //=========================================================================================================
     /**
     * Returns the vertex (position) of the node.
+    *
+    * @return   Returns the 3D position of the node.
     */
     const Eigen::RowVectorXf& getVert();
 
     //=========================================================================================================
     /**
-    * Returns the node number.
+    * Returns the node id.
+    *
+    * @return   Returns the node id.
     */
-    qint16 getNodeNumber();
+    qint16 getId();
+
+    //=========================================================================================================
+    /**
+    * Returns node degree.
+    *
+    * @return   The node degree calculated as the number of edges connected to a node (undirected gaph).
+    */
+    qint16 getDegree();
+
+    //=========================================================================================================
+    /**
+    * Returns node indegree.
+    *
+    * @return   The node degree calculated as the number of incoming edges (only in directed graphs).
+    */
+    qint16 getIndegree();
+
+    //=========================================================================================================
+    /**
+    * Returns node outdegree.
+    *
+    * @return   The node degree calculated as the number of outgoing edges (only in directed graphs).
+    */
+    qint16 getOutdegree();
+
+    //=========================================================================================================
+    /**
+    * Returns node strength.
+    *
+    * @return   The node strength calculated as the sum of all weights of all edges of a node.
+    */
+    double getStrength();
+
+    //=========================================================================================================
+    /**
+    * Returns node strength of all ingoing edges.
+    *
+    * @return   The node strength calculated as the sum of all weights of all ingoing edges of a node.
+    */
+    double getInstrength();
+
+    //=========================================================================================================
+    /**
+    * Returns node strength of all outgoing edges.
+    *
+    * @return   The node strength calculated as the sum of all weights of all outgoing edges of a node.
+    */
+    double getOutstrength();
 
     //=========================================================================================================
     /**
@@ -141,7 +205,7 @@ public:
 protected:
 
 private:
-    qint16                                  m_iNodeNumber;
+    qint16                                  m_iId;
 
     Eigen::RowVectorXf                      m_vecVert;
 

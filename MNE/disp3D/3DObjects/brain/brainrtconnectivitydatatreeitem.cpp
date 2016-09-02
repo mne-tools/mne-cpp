@@ -276,9 +276,9 @@ void BrainRTConnectivityDataTreeItem::plotNetwork(QSharedPointer<CONNECTIVITYLIB
         for(int j = 0; j < lNetworkNodes.at(i)->getEdgesIn().size(); ++j) {
             if(lNetworkNodes.at(i)->getEdgesIn().at(j)->getWeight() >= vecThreshold.x()) {
                 tMatTris.conservativeResize(count+1,3);
-                tMatTris(count,0) = lNetworkNodes.at(i)->getEdgesIn().at(j)->getStartNode()->getNodeNumber();
-                tMatTris(count,1) = lNetworkNodes.at(i)->getEdgesIn().at(j)->getEndNode()->getNodeNumber();
-                tMatTris(count,2) = lNetworkNodes.at(i)->getEdgesIn().at(j)->getStartNode()->getNodeNumber();
+                tMatTris(count,0) = lNetworkNodes.at(i)->getEdgesIn().at(j)->getStartNode()->getId();
+                tMatTris(count,1) = lNetworkNodes.at(i)->getEdgesIn().at(j)->getEndNode()->getId();
+                tMatTris(count,2) = lNetworkNodes.at(i)->getEdgesIn().at(j)->getStartNode()->getId();
                 ++count;
             }
         }
@@ -287,9 +287,9 @@ void BrainRTConnectivityDataTreeItem::plotNetwork(QSharedPointer<CONNECTIVITYLIB
         for(int j = 0; j < lNetworkNodes.at(i)->getEdgesOut().size(); ++j) {
             if(lNetworkNodes.at(i)->getEdgesOut().at(j)->getWeight() >= vecThreshold.x()) {
                 tMatTris.conservativeResize(count+1,3);
-                tMatTris(count,0) = lNetworkNodes.at(i)->getEdgesOut().at(j)->getStartNode()->getNodeNumber();
-                tMatTris(count,1) = lNetworkNodes.at(i)->getEdgesOut().at(j)->getEndNode()->getNodeNumber();
-                tMatTris(count,2) = lNetworkNodes.at(i)->getEdgesOut().at(j)->getStartNode()->getNodeNumber();
+                tMatTris(count,0) = lNetworkNodes.at(i)->getEdgesOut().at(j)->getStartNode()->getId();
+                tMatTris(count,1) = lNetworkNodes.at(i)->getEdgesOut().at(j)->getEndNode()->getId();
+                tMatTris(count,2) = lNetworkNodes.at(i)->getEdgesOut().at(j)->getStartNode()->getId();
                 ++count;
             }
         }
