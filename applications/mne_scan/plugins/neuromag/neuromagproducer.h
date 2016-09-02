@@ -76,7 +76,7 @@ namespace MneRtClientPlugin
 // USED NAMESPACES
 //=============================================================================================================
 
-//using namespace IOBuffer;
+//using namespace IOBUFFER;
 using namespace RTCLIENTLIB;
 
 

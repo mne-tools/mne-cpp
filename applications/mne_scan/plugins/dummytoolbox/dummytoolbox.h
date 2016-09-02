@@ -147,7 +147,7 @@ private:
     QSharedPointer<DummyYourWidget>                 m_pYourWidget;          /**< flag whether thread is running.*/
     QAction*                                        m_pActionShowYourWidget;/**< flag whether thread is running.*/
 
-    IOBuffer::CircularMatrixBuffer<double>::SPtr    m_pDummyBuffer;         /**< Holds incoming data.*/
+    IOBUFFER::CircularMatrixBuffer<double>::SPtr    m_pDummyBuffer;         /**< Holds incoming data.*/
 
     PluginInputData<SCMEASLIB::NewRealTimeMultiSampleArray>::SPtr      m_pDummyInput;      /**< The NewRealTimeMultiSampleArray of the DummyToolbox input.*/
     PluginOutputData<SCMEASLIB::NewRealTimeMultiSampleArray>::SPtr     m_pDummyOutput;     /**< The NewRealTimeMultiSampleArray of the DummyToolbox output.*/

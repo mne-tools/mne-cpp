@@ -337,9 +337,9 @@ public:
     /**
     * Returns current trigger color
     *
-    * @return the current trigger color
+    * @return the current trigger color map fpr each detected type
     */
-    inline QColor getTriggerColor() const;
+    inline QMap<double, QColor> getTriggerColor() const;
 
     //=========================================================================================================
     /**
@@ -488,7 +488,7 @@ public:
     * @param triggerCh      current trigger channel to scan
     * @param threshold      threshold for the detection process
     */
-    void triggerInfoChanged(const QMap<QString, QColor>& colorMap, bool active, QString triggerCh, double threshold);
+    void triggerInfoChanged(const QMap<double, QColor>& colorMap, bool active, QString triggerCh, double threshold);
 
     //=========================================================================================================
     /**
@@ -593,7 +593,7 @@ private:
     Eigen::MatrixXd                     m_matSpharaBabyMEGOuterLoaded;              /**< The loaded babyMEG outer layer basis functions.*/
     Eigen::MatrixXd                     m_matSpharaEEGLoaded;                       /**< The loaded EEG basis functions.*/
 
-    QMap<QString, QColor>               m_qMapTriggerColor;                         /**< Current colors for all trigger channels. */
+    QMap<double, QColor>                m_qMapTriggerColor;                         /**< Current colors for all trigger channels. */
     QMap<int,QList<QPair<int,double> > >m_qMapDetectedTrigger;                      /**< Detected trigger for each trigger channel. */
     QList<int>                          m_lTriggerChannelIndices;                   /**< List of all trigger channel indices. */
     QMap<int,QList<QPair<int,double> > >m_qMapDetectedTriggerFreeze;                /**< Detected trigger for each trigger channel while display is freezed. */
@@ -627,7 +627,7 @@ signals:
     /**
     * Emmited when trigger detection was performed
     */
-    void triggerDetected(int numberDetectedTriggers);
+    void triggerDetected(int numberDetectedTriggers, const QMap<int,QList<QPair<int,double> > >& mapDetectedTriggers);
 };
 
 
@@ -708,13 +708,14 @@ inline const QMap< qint32,float >& RealTimeMultiSampleArrayModel::getScaling() c
 
 //*************************************************************************************************************
 
-inline QColor RealTimeMultiSampleArrayModel::getTriggerColor() const
+inline QMap<double, QColor> RealTimeMultiSampleArrayModel::getTriggerColor() const
 {
     if(m_bTriggerDetectionActive) {
-        return m_qMapTriggerColor[m_sCurrentTriggerCh];
+        return m_qMapTriggerColor;
     }
 
-    return QColor(170,0,0);
+    QMap<double, QColor> map;
+    return map;
 }
 
 
