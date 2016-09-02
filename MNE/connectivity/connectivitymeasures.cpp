@@ -99,8 +99,7 @@ Network::SPtr ConnectivityMeasures::crossCorrelation(const MatrixXd& matData, co
 
     //Create nodes
     for(int i = 0; i < matData.rows(); ++i) {
-        RowVectorXf rowVert(3);
-        rowVert.setZero();
+        RowVectorXf rowVert = RowVectorXf::Zero(3);
 
         if(matVert.rows() != 0 && i < matVert.rows()) {
             rowVert(0) = matVert.row(i)(0);
@@ -134,8 +133,7 @@ Network::SPtr ConnectivityMeasures::crossCorrelation(const MatrixXd& matData, co
 
 Eigen::MatrixXd ConnectivityMeasures::crossCorrelation(const MatrixXd& matData)
 {
-    MatrixXd matDist(matData.rows(), matData.rows());
-    matDist.setZero();
+    MatrixXd matDist = MatrixXd::Zero(matData.rows(), matData.rows());
 
     for(int i = 0; i < matDist.rows(); ++i) {
         QPair<int,double> crossCorrPair = eigenCrossCorrelation(matData.row(i), matData.row(i));
@@ -232,12 +230,10 @@ QPair<int,double> ConnectivityMeasures::eigenCrossCorrelation(const RowVectorXd&
     int maxlag = N - 1;
 
     //Zero Padd
-    RowVectorXd xCorrInputVecFirst(fftsize);
-    xCorrInputVecFirst.setZero();
+    RowVectorXd xCorrInputVecFirst = RowVectorXd::Zero(fftsize);
     xCorrInputVecFirst.head(xCorrInputVecFirstIn.cols()) = xCorrInputVecFirstIn;
 
-    RowVectorXd xCorrInputVecSecond(fftsize);
-    xCorrInputVecSecond.setZero();
+    RowVectorXd xCorrInputVecSecond = RowVectorXd::Zero(fftsize);
     xCorrInputVecSecond.head(xCorrInputVecSecondIn.cols()) = xCorrInputVecSecondIn;
 
     //FFT for freq domain to both vectors
