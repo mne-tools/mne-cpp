@@ -276,9 +276,9 @@ int main(int argc, char *argv[])
     matNodeVertComb << matNodeVertLeft, matNodeVertRight;
 
     Network::SPtr pConnect_LA = ConnectivityMeasures::crossCorrelation(sourceEstimate_LA.data, matNodeVertComb);
-    Network::SPtr pConnect_LV = ConnectivityMeasures::crossCorrelation(sourceEstimate_LV.data, matNodeVertComb);
-    Network::SPtr pConnect_RA = ConnectivityMeasures::crossCorrelation(sourceEstimate_RA.data, matNodeVertComb);
-    Network::SPtr pConnect_RV = ConnectivityMeasures::crossCorrelation(sourceEstimate_RV.data, matNodeVertComb);
+//    Network::SPtr pConnect_LV = ConnectivityMeasures::crossCorrelation(sourceEstimate_LV.data, matNodeVertComb);
+//    Network::SPtr pConnect_RA = ConnectivityMeasures::crossCorrelation(sourceEstimate_RA.data, matNodeVertComb);
+//    Network::SPtr pConnect_RV = ConnectivityMeasures::crossCorrelation(sourceEstimate_RV.data, matNodeVertComb);
 
     //########################################################################################
     //
@@ -298,9 +298,9 @@ int main(int argc, char *argv[])
     testWindow->addBrainData("Subject01", "Right Visual", tSurfSet, tAnnotSet);
 
     QList<BrainRTConnectivityDataTreeItem*> rtItemList_LA = testWindow->addRtConnectivityData("Subject01", "Left Auditory", pConnect_LA);
-    QList<BrainRTConnectivityDataTreeItem*> rtItemList_RA = testWindow->addRtConnectivityData("Subject01", "Right Auditory", pConnect_RA);
-    QList<BrainRTConnectivityDataTreeItem*> rtItemList_LV = testWindow->addRtConnectivityData("Subject01", "Left Visual", pConnect_LV);
-    QList<BrainRTConnectivityDataTreeItem*> rtItemList_RV = testWindow->addRtConnectivityData("Subject01", "Right Visual", pConnect_RV);
+//    QList<BrainRTConnectivityDataTreeItem*> rtItemList_RA = testWindow->addRtConnectivityData("Subject01", "Right Auditory", pConnect_RA);
+//    QList<BrainRTConnectivityDataTreeItem*> rtItemList_LV = testWindow->addRtConnectivityData("Subject01", "Left Visual", pConnect_LV);
+//    QList<BrainRTConnectivityDataTreeItem*> rtItemList_RV = testWindow->addRtConnectivityData("Subject01", "Right Visual", pConnect_RV);
 
     testWindow->show();
 
