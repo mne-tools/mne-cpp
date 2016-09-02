@@ -126,6 +126,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Returns network distribution, also known as network degree.
+    *
+    * @return   The network distribution calculated as degrees of all nodes together.
+    */
+    qint16 getDistribution();
+
+    //=========================================================================================================
+    /**
     * Overloaded stream operator to add a network edge to this network.
     *
     * @param[in] newEdge    The new edge item as a reference.
@@ -143,8 +151,8 @@ public:
 protected:
 
 private:
-    QList<NetworkEdge::SPtr>    m_lEdges;
-    QList<NetworkNode::SPtr>    m_lNodes;
+    QList<NetworkEdge::SPtr>    m_lEdges;       /**< List with all edges of the network.*/
+    QList<NetworkNode::SPtr>    m_lNodes;       /**< List with all nodes of the network.*/
 
     //=========================================================================================================
     /**

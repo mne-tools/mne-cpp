@@ -128,7 +128,6 @@ protected:
     static QPair<int,double> eigenCrossCorrelation(const Eigen::RowVectorXd &xCorrInputVecFirst, const Eigen::RowVectorXd &xCorrInputVecSecond);
     //std::pair<double, double> eigenCrossCorrelation(std::vector<double>& xCorrInputVecFirs, std::vector<double>& xCorrInputVecSecond);
 
-     QString m_sDeepThroat;
 private:
 
 };
