@@ -205,11 +205,6 @@ signals:
 
 };
 
-#ifndef metatype_networksptr
-#define metatype_networksptr
-Q_DECLARE_METATYPE(CONNECTIVITYLIB::Network::SPtr);
-#endif
-
 //*************************************************************************************************************
 //=============================================================================================================
 // INLINE DEFINITIONS
@@ -221,5 +216,10 @@ inline bool BrainRTConnectivityDataTreeItem::isInit() const
 }
 
 } //NAMESPACE DISP3DLIB
+
+#ifndef metatype_networksptr
+#define metatype_networksptr
+Q_DECLARE_METATYPE(CONNECTIVITYLIB::Network::SPtr);
+#endif
 
 #endif // BRAINRTCONNECTIVITYDATATREEITEM_H

@@ -132,14 +132,14 @@ void ShaderMaterial::init()
 
     m_vertexGL3RenderPass->setShaderProgram(m_vertexGL3Shader);
 
-    //Setup transparency
-    m_blendState->setSourceRgb(QBlendEquationArguments::SourceAlpha);
-    m_blendState->setDestinationRgb(QBlendEquationArguments::OneMinusSourceAlpha);
-    m_blendEquation->setBlendFunction(QBlendEquation::Add);
+//    //Setup transparency
+//    m_blendState->setSourceRgb(QBlendEquationArguments::SourceAlpha);
+//    m_blendState->setDestinationRgb(QBlendEquationArguments::OneMinusSourceAlpha);
+//    m_blendEquation->setBlendFunction(QBlendEquation::Add);
 
-    m_vertexGL3RenderPass->addRenderState(m_blendEquation);
-    m_vertexGL3RenderPass->addRenderState(m_noDepthMask);
-    m_vertexGL3RenderPass->addRenderState(m_blendState);
+//    m_vertexGL3RenderPass->addRenderState(m_blendEquation);
+//    m_vertexGL3RenderPass->addRenderState(m_noDepthMask);
+//    m_vertexGL3RenderPass->addRenderState(m_blendState);
 
     m_filterKey->setName(QStringLiteral("renderingStyle"));
     m_filterKey->setValue(QStringLiteral("forward"));
