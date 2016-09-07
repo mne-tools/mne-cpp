@@ -69,7 +69,7 @@ namespace EEGoSportsPlugin
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace IOBuffer;
+//using namespace IOBuffer;
 using namespace Eigen;
 
 
