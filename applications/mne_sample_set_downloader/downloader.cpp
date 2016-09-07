@@ -70,20 +70,25 @@ Downloader::Downloader(QWidget *parent)
     m_qCurrentPath = QDir::toNativeSeparators(QDir::currentPath());
     ui->m_toolButton->setVisible(false);
     ui->m_toolButton->setEnabled(false);
+    m_bDownloadStatus = false;
+    m_bExtractionDone = false;
     if (!QDir("MNE-sample-data").exists())
     {
         ui->m_downloadButton->setEnabled(false);
         ui->m_label->setText("Unknown error, please recompile");
+        m_bExtractionDone = true;
     }
     int numberOfFiles = QDir("MNE-sample-data/MEG/sample").count();
     if ((QDir("MNE-sample-data/MEG/sample").exists()) && (numberOfFiles > 60))
         ui->m_label->setText("Sample data seems to exist\nReplace data?");
-    m_bDownloadStatus = false;
-    m_bExtractionDone = false;
     connect(ui->m_downloadButton, &QPushButton::clicked, this, &Downloader::onDownloadButtonClicked);
     connect(ui->m_exitButton, &QPushButton::clicked, this, &Downloader::onExitButtonClicked);
+
+#ifdef _WIN32
     connect(ui->m_extractButton, &QPushButton::clicked, this, &Downloader::onExtractButtonClicked);
     connect(ui->m_toolButton, &QToolButton::clicked, this, &Downloader::onToolButtonClicked);
+#endif
+
 
 }
 
@@ -249,7 +254,7 @@ void Downloader::readyToExtract(bool stat)
 {
     if (stat == true)
     {
-        ui->label->setText("EXTRACTING...");
+        ui->m_label->setText("EXTRACTING...");
         m_extractor.beginExtraction();
     }
 }
@@ -261,7 +266,7 @@ void Downloader::downloadFinished()
     if (m_qReply != NULL)
         m_qFile.write(m_qReply->readAll());
     m_bDownloadStatus = true;
-    ui->progressBar->setEnabled(false);
+    ui->m_progressBar->setEnabled(false);
     readyToExtract(m_bDownloadStatus);
     return;
 }
