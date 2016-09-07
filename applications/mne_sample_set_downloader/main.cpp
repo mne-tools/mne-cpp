@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Main.cpp starts the program.
+* @brief    main.cpp starts the program.
 *
 */
 
@@ -39,8 +39,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "Downloader.h"
-#include "Extract.h"
+#include "downloader.h"
+#include "extract.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -63,8 +63,6 @@
 * @param [in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
 * @return the value that was set to exit() (which is 0 if exit() is called via quit()).
 */
-
-
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);

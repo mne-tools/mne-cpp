@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     mne_sample_set_downloader.h
+* @file     downloader.h
 * @author   Louis Eichhorst <louis.eichhorst@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     Downloader class declaration.
+* @brief     downloader class declaration.
 *
 */
 
@@ -42,7 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "Extract.h"
+#include "extract.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -74,11 +74,6 @@ class Downloader;
 }
 
 /**
-* This class builds a Downloader Object an GUI. It downloads the sample data set and stores it in a temporary file
-* for the Extract class to extract once it recieves the download_finished signal.
-* The temporary file is deleted on leaving the GUI. The class also handles error and finalisation signals
-* from the extract class and adjusts the GUI accordingly (i.e. displays "Done" on finalization and ask if/where 7zip is
-* installed if the Extract class can't find it).
 *
 * @brief Downloads the sample data set and manages the GUI
 */
@@ -96,42 +91,105 @@ public:
     * Constructs a Downloader object.
     */
     explicit Downloader(QWidget *parent = 0);
-    bool boolDownloadStatus = false;
     ~Downloader();
 
-public slots:
+    //=========================================================================================================
+    /**
+    * Called once the extraction is done. Changes GUI and sets m_bExtraction = true.
+    */
     void done();
 
-private slots:
-    void downloadFinished();
-    void on_downloadButton_clicked();
-    void on_exitButton_clicked();
-    void dataReady();
-    void downloadProgress(qint64,qint64);
-
 private:
-    Ui::Downloader *ui;
-    QSharedPointer<QNetworkReply> m_qReply;
-    QFile m_qFile;
-    Extract m_extractor;
-    QString m_qCurrentPath;
+    //=========================================================================================================
+    /**
+    * Starts the Download and changes GUI.
+    */
+    void onDownloadButtonClicked();
+
+    //=========================================================================================================
+    /**
+    * Checks if extraction is finished.
+    *
+    * Closes GUI and deletes temporary files if m_bExtraction = true, triggers warning if not.
+    */
+    void onExitButtonClicked();
+
+    //=========================================================================================================
+    /**
+    * Calls the extract class once the download is finished.
+    */
+    void downloadFinished();
+
+    //=========================================================================================================
+    /**
+    * Writes data onto harddrive once it arrives.
+    */
+    void dataReady();
+
+    //=========================================================================================================
+    /**
+    * Displays downloadprogress on the GUI.
+    *
+    * @param[in] recieved   Size of recieved data
+    *
+    * @param[in] total      Total size of the sample data set
+    */
+    void downloadProgress(qint64 recieved, qint64 total);
+
+    Ui::Downloader *ui;                                     /**< Sets up the GUI. */
+    QSharedPointer<QNetworkReply>   m_qReply;               /**< Networkreply */
+    QFile                           m_qFile;                /**< Temporary file for the dataset. */
+    Extract                         m_extractor;            /**< Extractor for the data set. */
+    QString                         m_qCurrentPath;         /**< Location of the temporary file. */
+    bool                            m_bDownloadStatus;      /**< True if download was completed. */
+    bool                            m_bExtractionDone;      /**< True if extraction was completed. */
+
 
 #ifdef _WIN32
-public slots:
+public:
+    //=========================================================================================================
+    /**
+    * Changes GUI for filepathinput if 7zip isn't found automatically.
+    */
     void checkZipperPath();
 
-private slots:
-    void on_extractButton_clicked();
-    void on_toolButton_clicked();
-
 private:
-    void readyToExtract(bool, QString, QString);
+    //=========================================================================================================
+    /**
+    * Tries to extract again using the new filepath if the extract button is pressed.
+    */
+    void onExtractButtonClicked();
+
+    //=========================================================================================================
+    /**
+    * Opens filepath GUI for easy input.
+    */
+    void onToolButtonClicked();
+
+    //=========================================================================================================
+    /**
+    * Starts Extraction if stat=true. Hands the extractor the path of the temporary file and of 7zip.
+    *
+    * @param[in] stat       Downloadstatus. stat = true if download has finished
+    *
+    * @param[in] zip        Path to 7z.exe
+    *
+    * @param[in] current    Path to the temporary .tar.gz file
+    */
+    void readyToExtract(bool stat, QString zip, QString current);
+
 
 #endif
 
 #ifdef __linux__
 private:
-    void readyToExtract(bool);
+    //=========================================================================================================
+    /**
+    * Starts Extraction if stat=true.
+    *
+    * @param[in] stat       Downloadstatus. stat = true if download has finished
+    */
+    void readyToExtract(bool stat);
 
 #endif
 

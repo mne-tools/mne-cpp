@@ -8,7 +8,7 @@
 #
 # @section  LICENSE
 #
-# Copyright (C) 2016, Christoph Dinh, Martin Luessi and Matti Hamalainen. All rights reserved.
+# Copyright (C) 2016, Louis Eichhorst and Matti Hamalainen. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -39,9 +39,7 @@ VERSION = $${MNE_CPP_VERSION}
 
 CONFIG   += qt
 
-QT       += core gui widgets
-
-QT       += network
+QT       += core gui widgets network
 
 DEFINES  += QT_NO_SSL
 
@@ -64,7 +62,7 @@ HEADERS  += \
     extract.h
 
 FORMS    += \
-    Downloader.ui
+    downloader.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

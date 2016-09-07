@@ -17,7 +17,7 @@
    <enum>QTabWidget::Rounded</enum>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <widget class="QPushButton" name="downloadButton">
+   <widget class="QPushButton" name="m_downloadButton">
     <property name="geometry">
      <rect>
       <x>40</x>
@@ -30,7 +30,7 @@
      <string>Download</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="exitButton">
+   <widget class="QPushButton" name="m_exitButton">
     <property name="geometry">
      <rect>
       <x>270</x>
@@ -43,7 +43,7 @@
      <string>Exit</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label">
+   <widget class="QLabel" name="m_label">
     <property name="geometry">
      <rect>
       <x>60</x>
@@ -70,7 +70,7 @@
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QProgressBar" name="progressBar">
+   <widget class="QProgressBar" name="m_progressBar">
     <property name="geometry">
      <rect>
       <x>50</x>
@@ -83,7 +83,7 @@
      <number>24</number>
     </property>
    </widget>
-   <widget class="QLineEdit" name="filePath">
+   <widget class="QLineEdit" name="m_filePath">
     <property name="geometry">
      <rect>
       <x>50</x>
@@ -96,7 +96,7 @@
      <string/>
     </property>
    </widget>
-   <widget class="QPushButton" name="extractButton">
+   <widget class="QPushButton" name="m_extractButton">
     <property name="geometry">
      <rect>
       <x>40</x>
@@ -109,7 +109,7 @@
      <string>Extract</string>
     </property>
    </widget>
-   <widget class="QToolButton" name="toolButton">
+   <widget class="QToolButton" name="m_toolButton">
     <property name="geometry">
      <rect>
       <x>330</x>
