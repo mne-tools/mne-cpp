@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     Downloader.cpp
+* @file     downloader.cpp
 * @author   Louis Eichhorst <louis.eichhorst@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Downloader class definition.
+* @brief    downloader class definition.
 *
 */
 
@@ -39,8 +39,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "Downloader.h"
-#include "Extract.h"
+#include "downloader.h"
+#include "extract.h"
 #include "ui_downloader.h"
 
 //*************************************************************************************************************
@@ -49,64 +49,200 @@
 //=============================================================================================================
 
 #include <QFileDialog>
+#include <QMessageBox>
 
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-#ifdef _WIN32
-
-void Downloader::on_extractButton_clicked()
+Downloader::Downloader(QWidget *parent)
+: QMainWindow(parent),
+    ui(new Ui::Downloader)
 {
-    QString zipPath = "\"" + QString(QDir::toNativeSeparators(ui->filePath->text())) + "\"";
-    readyToExtract(boolDownloadStatus, zipPath, m_qCurrentPath);
-    ui->extractButton->setEnabled(false);
-
-}
-
-void Downloader::checkZipperPath()
-{
-    ui->label->setText("7zip installed? Please check the path");
-    ui->extractButton->setVisible(true);
-    ui->extractButton->setEnabled(true);
-    ui->downloadButton->setVisible(false);
-    ui->downloadButton->setEnabled(false);
-    ui->progressBar->setVisible(false);
-    ui->filePath->setVisible(true);
-    ui->toolButton->setVisible(true);
-    ui->toolButton->setEnabled(true);
-}
-
-void Downloader::on_toolButton_clicked()
-{
-    QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"), "/home",QFileDialog::DontResolveSymlinks) + "\\7z.exe";
-    ui->filePath->setText(QDir::toNativeSeparators(dir));
-}
-
-void Downloader::readyToExtract(bool stat, QString zip, QString current)
-{
-    if (stat == true)
+    ui->setupUi(this);
+    ui->m_progressBar->hide();
+    ui->m_progressBar->setValue(0);
+    ui->m_filePath->setVisible(false);
+    ui->m_extractButton->setVisible(false);
+    ui->m_extractButton->setEnabled(false);
+    ui->m_filePath->setText(QDir::toNativeSeparators("C:/Program\ Files/7-Zip/7z.exe"));
+    m_qCurrentPath = QDir::toNativeSeparators(QDir::currentPath());
+    ui->m_toolButton->setVisible(false);
+    ui->m_toolButton->setEnabled(false);
+    if (!QDir("MNE-sample-data").exists())
     {
-        ui->label->setText("EXTRACTING...");
-        ui->progressBar->setVisible(false);
-        QObject::connect(&m_extractor, SIGNAL(zipperError()), this, SLOT(checkZipperPath()));
-        connect(&m_extractor, SIGNAL(extractionDone()), this, SLOT(done()));
-        m_extractor.beginExtraction(zip, current);
+        ui->m_downloadButton->setEnabled(false);
+        ui->m_label->setText("Unknown error, please recompile");
+    }
+    int numberOfFiles = QDir("MNE-sample-data/MEG/sample").count();
+    if ((QDir("MNE-sample-data/MEG/sample").exists()) && (numberOfFiles > 60))
+        ui->m_label->setText("Sample data seems to exist\nReplace data?");
+    m_bDownloadStatus = false;
+    m_bExtractionDone = false;
+    connect(ui->m_downloadButton, &QPushButton::clicked, this, &Downloader::onDownloadButtonClicked);
+    connect(ui->m_exitButton, &QPushButton::clicked, this, &Downloader::onExitButtonClicked);
+    connect(ui->m_extractButton, &QPushButton::clicked, this, &Downloader::onExtractButtonClicked);
+    connect(ui->m_toolButton, &QToolButton::clicked, this, &Downloader::onToolButtonClicked);
+
+}
+
+
+//*************************************************************************************************************
+
+Downloader::~Downloader()
+{
+    delete ui;
+    m_qFile.remove();
+}
+
+//*************************************************************************************************************
+
+void Downloader::done()
+{
+    m_bExtractionDone = true;
+    ui->m_label->setText("done");
+}
+
+
+//*************************************************************************************************************
+
+void Downloader::onDownloadButtonClicked()
+{
+    ui->m_downloadButton->setEnabled(false);
+    ui->m_progressBar->show();
+    ui->m_label->setText("DOWNLOADING FILES...");
+
+    QNetworkAccessManager *manager = new QNetworkAccessManager;
+    QString url = "ftp://surfer.nmr.mgh.harvard.edu/pub/data/MNE-sample-data-processed.tar.gz"; //"ftp://surfer.nmr.mgh.harvard.edu/pub/data/test_data.tar.gz";
+    m_qReply = QSharedPointer<QNetworkReply> (manager->get(QNetworkRequest(url)));
+
+    connect(m_qReply.data(), &QNetworkReply::readyRead, this, &Downloader::dataReady);
+    connect(m_qReply.data(), &QNetworkReply::finished, this, &Downloader::downloadFinished);
+
+    if (m_qFile.fileName() != "sample.tar.gz")
+        m_qFile.setFileName("sample.tar.gz");
+    m_qFile.open(QIODevice::Append);
+
+    connect(m_qReply.data(), &QNetworkReply::downloadProgress, this, &Downloader::downloadProgress);
+    QEventLoop loop;
+    connect(m_qReply.data(), &QNetworkReply::finished, &loop, &QEventLoop::quit);
+    loop.exec();
+    return;
+}
+
+//*************************************************************************************************************
+
+void Downloader::onExitButtonClicked()
+{
+    if (m_bExtractionDone == true)
+    {
+        this->close();
+        m_qFile.remove();
+        m_qFile.close();
+    }
+    if (m_bExtractionDone == false)
+    {
+        QMessageBox warning;
+        warning.setIcon(QMessageBox::Warning);
+        warning.setText("Extraction not finished. Do you really want to quit?");
+        warning.setStandardButtons(QMessageBox::No | QMessageBox::Yes);
+        int ret = warning.exec();
+        if (ret == QMessageBox::Yes)
+        {
+            this->close();
+            m_qFile.remove();
+            m_qFile.close();
+        }
+        warning.close();
     }
 }
+
+//*************************************************************************************************************
+
+void Downloader::dataReady()
+{
+    if (m_qReply != NULL)
+        m_qFile.write(m_qReply->readAll());
+    return;
+}
+
+void Downloader::downloadProgress(qint64 recieved, qint64 total)
+{
+    ui->m_progressBar->setMaximum(total);
+    ui->m_progressBar->setValue(recieved);
+}
+
+//*************************************************************************************************************
+
+#ifdef _WIN32
 
 void Downloader::downloadFinished()
 {
     if (m_qReply != NULL)
         m_qFile.write(m_qReply->readAll());
     m_qFile.close();
-    boolDownloadStatus = true;
-    QString zipPath ="\"" + QString (ui->filePath->text()) + "\"";
-    ui->progressBar->setEnabled(false);
-    readyToExtract(boolDownloadStatus, zipPath, m_qCurrentPath);
+    m_bDownloadStatus = true;
+    QString zipPath ="\"" + QString (ui->m_filePath->text()) + "\"";
+    ui->m_progressBar->setEnabled(false);
+    readyToExtract(m_bDownloadStatus, zipPath, m_qCurrentPath);
     return;
 }
+
+//*************************************************************************************************************
+
+void Downloader::checkZipperPath()
+{
+    ui->m_label->setText("7zip installed? Please check the path");
+    ui->m_extractButton->setVisible(true);
+    ui->m_extractButton->setEnabled(true);
+    ui->m_downloadButton->setVisible(false);
+    ui->m_downloadButton->setEnabled(false);
+    ui->m_progressBar->setVisible(false);
+    ui->m_filePath->setEnabled(true);
+    ui->m_filePath->setVisible(true);
+    ui->m_toolButton->setVisible(true);
+    ui->m_toolButton->setEnabled(true);
+}
+
+//*************************************************************************************************************
+
+void Downloader::onExtractButtonClicked()
+{
+    QString zipPath = "\"" + QString(QDir::toNativeSeparators(ui->m_filePath->text())) + "\"";
+    ui->m_extractButton->setEnabled(false);
+    ui->m_filePath->setEnabled(false);
+    ui->m_toolButton->setEnabled(false);
+    readyToExtract(m_bDownloadStatus, zipPath, m_qCurrentPath);
+
+}
+
+//*************************************************************************************************************
+
+void Downloader::onToolButtonClicked()
+{
+    QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"), "/home",QFileDialog::DontResolveSymlinks) + "\\7z.exe";
+    ui->m_filePath->setText(QDir::toNativeSeparators(dir));
+}
+
+
+//*************************************************************************************************************
+
+void Downloader::readyToExtract(bool stat, QString zip, QString current)
+{
+    if (stat == true)
+    {
+        ui->m_label->setText("EXTRACTING...");
+        ui->m_progressBar->setVisible(false);
+        QObject::connect(&m_extractor, &Extract::zipperError, this, &Downloader::checkZipperPath);
+        connect(&m_extractor, &Extract::extractionDone, this, &Downloader::done);
+        m_extractor.beginExtraction(zip, current);
+    }
+}
+
+//*************************************************************************************************************
+
+
 #elif __linux__
 
 void Downloader::readyToExtract(bool stat)
@@ -118,99 +254,18 @@ void Downloader::readyToExtract(bool stat)
     }
 }
 
+//*************************************************************************************************************
+
 void Downloader::downloadFinished()
 {
     if (m_qReply != NULL)
         m_qFile.write(m_qReply->readAll());
-    boolDownloadStatus = true;
+    m_bDownloadStatus = true;
     ui->progressBar->setEnabled(false);
-    readyToExtract(boolDownloadStatus);
+    readyToExtract(m_bDownloadStatus);
     return;
 }
 
 #endif
 
-void Downloader::done()
-{
-    ui->label->setText("done");
-}
-
-//placeholder downloadFinished OSX
-
-void Downloader::dataReady()
-{
-    if (m_qReply != NULL)
-        m_qFile.write(m_qReply->readAll());
-    return;
-}
-
-void Downloader::downloadProgress(qint64 recieved,qint64 total)
-{
-    ui->progressBar->setMaximum(total);
-    ui->progressBar->setValue(recieved);
-}
-
-
-void Downloader::on_downloadButton_clicked()
-{
-    ui->downloadButton->setEnabled(false);
-    ui->progressBar->show();
-    ui->label->setText("DOWNLOADING FILES...");
-
-    QNetworkAccessManager *manager = new QNetworkAccessManager;
-    QString url = "ftp://surfer.nmr.mgh.harvard.edu/pub/data/MNE-sample-data-processed.tar.gz"; //"ftp://surfer.nmr.mgh.harvard.edu/pub/data/test_data.tar.gz";
-    m_qReply = QSharedPointer<QNetworkReply> (manager->get(QNetworkRequest(url)));
-
-    connect(m_qReply.data(),SIGNAL(readyRead()),this,SLOT(dataReady()));
-    connect(m_qReply.data(),SIGNAL(finished()), this,SLOT(downloadFinished()));
-
-    if (m_qFile.fileName() != "sample.tar.gz")
-        m_qFile.setFileName("sample.tar.gz");
-    m_qFile.open(QIODevice::Append);
-
-    connect(m_qReply.data(), SIGNAL(downloadProgress(qint64,qint64)), this, SLOT(downloadProgress(qint64,qint64)));
-    QEventLoop loop;
-    connect(m_qReply.data(), SIGNAL(finished()), &loop, SLOT(quit()));
-    loop.exec();
-    return;
-}
-
-void Downloader::on_exitButton_clicked()
-{
-    this->close();
-    m_qFile.remove();
-    m_qFile.close();
-    return;
-}
-
-
-Downloader::Downloader(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::Downloader)
-{
-    ui->setupUi(this);
-    ui->progressBar->hide();
-    ui->progressBar->setValue(0);
-    ui->filePath->setVisible(false);
-    ui->extractButton->setVisible(false);
-    ui->extractButton->setEnabled(false);
-    ui->filePath->setText(QDir::toNativeSeparators("C:/Program\ Files/7-Zip/7z.exe"));
-    m_qCurrentPath = QDir::toNativeSeparators(QDir::currentPath());
-    ui->toolButton->setVisible(false);
-    ui->toolButton->setEnabled(false);
-    if (!QDir("MNE-sample-data").exists())
-    {
-        ui->downloadButton->setEnabled(false);
-        ui->label->setText("Unknown error, please recompile");
-    }
-    int numberOfFiles = QDir("MNE-sample-data/MEG/sample").count();
-    if ((QDir("MNE-sample-data/MEG/sample").exists()) && (numberOfFiles > 60))
-        ui->label->setText("Sample data seems to exist\nReplace data?");
-
-}
-
-Downloader::~Downloader()
-{
-    delete ui;
-    m_qFile.remove();
-}
+//TODO: Add OSX support

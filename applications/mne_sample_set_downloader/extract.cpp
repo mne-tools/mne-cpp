@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     Extract.cpp
+* @file     extract.cpp
 * @author   Louis Eichhorst <louis.eichhorst@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Extract class definition.
+* @brief    extract class definition.
 *
 */
 
@@ -39,65 +39,72 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "Extract.h"
+#include "extract.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Extract::Extract(QWidget *parent) :
-    QMainWindow(parent)
+Extract::Extract(QWidget *parent)
+: QMainWindow(parent)
 {
 
 }
 
-#ifdef _WIN32
 
+//*************************************************************************************************************
+
+#ifdef _WIN32
 
 void Extract::extractTar()
 {
 
     QProcess *m_qp7zipTar = new QProcess(this);
     m_qArguments.removeLast();
-    m_qArguments << (m_qCurrentPath + "\\MNE-Sample-Data.tar");
-    connect(m_qp7zipTar, SIGNAL(finished(int,QProcess::ExitStatus)), m_qp7zipTar, SLOT(deleteLater()));
+    m_qArguments << (m_qCurrentPath + "\\sample.tar");
+    connect(m_qp7zipTar, static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), m_qp7zipTar, &QProcess::deleteLater);
     m_qp7zipTar->start(m_q7zipPath, m_qArguments);
     m_qp7zipTar->waitForFinished(-1);
 
-    QFile tarFile("MNE-Sample-Data.tar");
+    QFile tarFile("sample.tar");
     tarFile.remove();
     tarFile.close();
 
     emit extractionDone();
-
 }
+
+
+//*************************************************************************************************************
 
 void Extract::extractGz(QString archivePath)
 {
     m_qArguments.clear();
-    QFile oldData("MNE-Sample-Data.tar");
+    QFile oldData("sample.tar");
     oldData.remove();
     oldData.close();
     m_qCurrentPath = archivePath;
-    m_qArguments << "x" << "-aoa" << (m_qCurrentPath + "\\sample.tar.gz");
+    m_qArguments << "x" << "-aoa" << "-y" << (m_qCurrentPath + "\\sample.tar.gz");
     QProcess *m_qp7zipGz = new QProcess(this);
-    connect(m_qp7zipGz, SIGNAL(finished(int,QProcess::ExitStatus)), m_qp7zipGz, SLOT(deleteLater()));
-    connect(m_qp7zipGz, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(extractTar()));
-    connect(m_qp7zipGz, SIGNAL(errorOccurred(QProcess::ProcessError)), this, SIGNAL(zipperError()));
+    connect(m_qp7zipGz, static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), m_qp7zipGz, &QProcess::deleteLater);
+    connect(m_qp7zipGz, static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), this, &Extract::extractTar);
+    connect(m_qp7zipGz, &QProcess::errorOccurred, this, &Extract::zipperError);
     m_qp7zipGz->start(m_q7zipPath, m_qArguments);
     qDebug() << m_qp7zipGz->error();
-
 }
+
+
+//*************************************************************************************************************
 
 void Extract::beginExtraction(QString zip, QString current)
 {
-    if (zip == NULL)
-        m_q7zipPath = QDir::toNativeSeparators("\"C:/Program\ Files/7-Zip/7z.exe\"");
-    else
-        m_q7zipPath = zip;
+    if (zip == NULL){m_q7zipPath = QDir::toNativeSeparators("\"C:/Program\ Files/7-Zip/7z.exe\"");}
+    else{m_q7zipPath = zip;}
     extractGz(current);
 }
+
+
+//*************************************************************************************************************
 
 #elif __linux__
 
@@ -106,6 +113,8 @@ void Extract::beginExtraction()
     system("tar -zxf sample.tar.gz");
     emit extractionDone();
 }
+
+//*************************************************************************************************************
 
 #else
 #   error "Unknown compiler"

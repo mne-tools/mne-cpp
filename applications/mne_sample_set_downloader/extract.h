@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     Extract.h
+* @file     extract.h
 * @author   Louis Eichhorst <louis.eichhorst@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,19 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     Extract class declaration.
+* @brief     extract class declaration.
 *
 */
 
 #ifndef EXTRACT_H
 #define EXTRACT_H
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// INCLUDES
-//=============================================================================================================
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -57,7 +50,6 @@
 #include <QDebug>
 #include <QIODevice>
 #include <QProcess>
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -75,16 +67,7 @@ class Extract;
 // Extract FORWARD DECLARATIONS
 //=============================================================================================================
 
-
-//=============================================================================================================
-
 /**
-* Extracts the sample data set from .tar.gz. On Windows it utilizes 7zip, as .tar.gz is not a supported format.
-* If the user hasn't installed 7zip or has installed it onto a different location then the standard path, it sends
-* an error signal which prompts the Downloader class to change it's GUI. On Linux, it uses a system call and thus
-* extracts the data set with the Linux native method for extraction of .tar.gz. No further software is needed.
-* Once the extraction is completed, it emits the extractionDone signal which prompts Downloader to display "Done".
-* OSX is currently unsupported.
 *
 * @brief Extracts the sample data set.
 */
@@ -94,43 +77,71 @@ class Extract : public QMainWindow
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<Extract> SPtr;            /**< Shared pointer type for mne_sample_set_downloader. */
-    typedef QSharedPointer<const Extract> ConstSPtr; /**< Const shared pointer type for mne_sample_set_downloader. */
+    typedef QSharedPointer<Extract> SPtr;              /**< Shared pointer type for Extract. */
+    typedef QSharedPointer<const Extract> ConstSPtr;   /**< Const shared pointer type for Extract. */
 
     //=========================================================================================================
     /**
-    * Constructs a Extract object.
+    * Constructs a extract object.
     */
     explicit Extract(QWidget *parent = 0);
     ~Extract();
 
-private:
-    Ui::Extract *ui;
-    QStringList m_qArguments;
-    QString m_qCurrentPath;
-    QString m_q7zipPath;
-
 signals:
+    //=========================================================================================================
+    /**
+    * Emitted if the extraction has finished.
+    */
     void extractionDone();
 
+private:
+    Ui::Extract     *ui;                                /**< Sets up the GUI. */
+    QStringList     m_qArguments;                       /**< List of extractionarguments for 7zip. */
+    QString         m_qCurrentPath;                     /**< Temporary filepath of the sample data set. */
+    QString         m_q7zipPath;                        /**< Location of 7z.exe, */
 
 #ifdef _WIN32
 public:
-    void beginExtraction(QString, QString);
+    //=========================================================================================================
+    /**
+    * Looks for 7zip at the given filepath and extracts the file at the other filepath.
+    *
+    * @param[in] zip            Path to 7z.exe
+    *
+    * @param[in] current        Path to the .tar.gz
+    */
+    void beginExtraction(QString zip, QString current);
 
 signals:
+    //=========================================================================================================
+    /**
+    * Emitted if 7zip cannot be opened.
+    */
     void zipperError();
 
 private:
-    void extractGz(QString);
+    //=========================================================================================================
+    /**
+    * Extracts from .tar.gz to .tar using 7zip
+    *
+    * @param[in] archivePath    Path to the .tar.gz
+    */
+    void extractGz(QString archivePath);
 
-private slots:
+    //=========================================================================================================
+    /**
+    * Extracts the sample set from .tar using 7zip
+    */
     void extractTar();
 
 #endif
 
 #ifdef __linux__
 public:
+    //=========================================================================================================
+    /**
+    * Extracts the .tar.gz using a systemcall.
+    */
     void beginExtraction();
 
 #endif
