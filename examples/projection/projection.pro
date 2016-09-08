@@ -1,14 +1,14 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     scMeas.pro
-# @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+# @file     projection.pro
+# @author   Jana Kiesel <jana.kiesel@tu-ilmenau.de>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
-# @date     July, 2012
+# @date     August, 2016
 #
 # @section  LICENSE
 #
-# Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+# Copyright (C) 2016, Jana Kiesel and Matti Hamalainen. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -29,19 +29,22 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file builds the scMeas library.
-#
+# @brief    Example to project points on a surface
 #--------------------------------------------------------------------------------------------------------------
+include(../../mne-cpp.pri)
 
-include(../../../../mne-cpp.pri)
+TEMPLATE = app
 
-TEMPLATE = lib
+VERSION = $${MNE_CPP_VERSION}
 
-QT += widgets
+QT += widgets 3dextras
+#QT -= gui
 
-DEFINES += SCMEAS_LIBRARY
+CONFIG += console
+CONFIG -= app_bundle
 
-TARGET = scMeas
+TARGET = projection
+
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
@@ -53,85 +56,30 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Fsd \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
             -lMNE$${MNE_LIB_VERSION}Mned \
+            -lMNE$${MNE_LIB_VERSION}Inversed \
+            -lMNE$${MNE_LIB_VERSION}Dispd \
+            -lMNE$${MNE_LIB_VERSION}DispChartsd \
+            -lMNE$${MNE_LIB_VERSION}Disp3Dd
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
             -lMNE$${MNE_LIB_VERSION}Utils \
             -lMNE$${MNE_LIB_VERSION}Fs \
             -lMNE$${MNE_LIB_VERSION}Fiff \
-            -lMNE$${MNE_LIB_VERSION}Mne
+            -lMNE$${MNE_LIB_VERSION}Mne \
+            -lMNE$${MNE_LIB_VERSION}Inverse \
+            -lMNE$${MNE_LIB_VERSION}Disp \
+            -lMNE$${MNE_LIB_VERSION}DispCharts \
+            -lMNE$${MNE_LIB_VERSION}Disp3D
 }
 
-DESTDIR = $${MNE_LIBRARY_DIR}
+DESTDIR =  $${MNE_BINARY_DIR}
 
-#
-# win32: copy dll's to bin dir
-# unix: add lib folder to LD_LIBRARY_PATH
-#
-win32 {
-    FILE = $${DESTDIR}/$${TARGET}.dll
-    BINDIR = $${DESTDIR}/../bin
-    FILE ~= s,/,\\,g
-    BINDIR ~= s,/,\\,g
-    QMAKE_POST_LINK += $${QMAKE_COPY} $$quote($${FILE}) $$quote($${BINDIR}) $$escape_expand(\\n\\t)
-}
-
-SOURCES += \
-    realtimesourceestimate.cpp \
-    newrealtimesamplearray.cpp \
-    newrealtimemultisamplearray.cpp \
-    realtimesamplearraychinfo.cpp \
-    newnumeric.cpp \
-    newmeasurement.cpp \
-    measurementtypes.cpp \
-    realtimeevoked.cpp \
-    realtimeevokedset.cpp \
-    realtimecov.cpp \
-    frequencyspectrum.cpp
-
+SOURCES += main.cpp \
 
 HEADERS += \
-    scmeas_global.h \
-    realtimesourceestimate.h \
-    newrealtimesamplearray.h \
-    newrealtimemultisamplearray.h \
-    realtimesamplearraychinfo.h \
-    newnumeric.h \
-    newmeasurement.h \
-    measurementtypes.h \
-    realtimeevoked.h \
-    realtimeevokedset.h \
-    realtimecov.h \
-    frequencyspectrum.h
-
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
-INCLUDEPATH += $${MNE_SCAN_INCLUDE_DIR}
 
-# Install headers to include directory
-header_files.files = ./*.h
-header_files.path = $${MNE_SCAN_INCLUDE_DIR}/scMeas
-
-header_files_measurement.files = ./Measurement/*.h
-header_files_measurement.path = $${MNE_SCAN_INCLUDE_DIR}/scMeas/Measurement
-
-INSTALLS += header_files
-INSTALLS += header_files_measurement
-
-# Deploy Qt Dependencies
-win32 {
-    isEmpty(TARGET_EXT) {
-        TARGET_CUSTOM_EXT = .dll
-    } else {
-        TARGET_CUSTOM_EXT = $${TARGET_EXT}
-    }
-
-    DEPLOY_COMMAND = windeployqt
-
-    DEPLOY_TARGET = $$shell_quote($$shell_path($${MNE_BINARY_DIR}/$${TARGET}$${TARGET_CUSTOM_EXT}))
-
-    #  # Uncomment the following line to help debug the deploy command when running qmake
-    #  warning($${DEPLOY_COMMAND} $${DEPLOY_TARGET})
-    QMAKE_POST_LINK += $${DEPLOY_COMMAND} $${DEPLOY_TARGET}
-}
+unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR

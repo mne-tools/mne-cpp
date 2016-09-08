@@ -340,6 +340,53 @@ void SelectionManagerWindow::updateBadChannels()
 
 //*************************************************************************************************************
 
+void SelectionManagerWindow::updateDataView()
+{
+    //if no channels have been selected by the user -> show selected group channels
+    QListWidget* targetListWidget;
+    if(ui->m_listWidget_userDefined->count()>0)
+        targetListWidget = ui->m_listWidget_userDefined;
+    else
+        targetListWidget = ui->m_listWidget_visibleChannels;
+
+    //Create list of channels which are to be visible in the view
+    QStringList selectedChannels;
+
+    for(int i = 0; i < targetListWidget->count(); i++) {
+        QListWidgetItem* item = targetListWidget->item(i);
+        int indexTemp = m_pChInfoModel->getIndexFromMappedChName(item->text());
+
+        if(indexTemp != -1) {
+            QModelIndex mappedNameIndex = m_pChInfoModel->index(indexTemp,1);
+            QString origChName = m_pChInfoModel->data(mappedNameIndex,ChInfoModelRoles::GetOrigChName).toString();
+
+            selectedChannels << origChName;
+        }
+        else
+            selectedChannels << item->text();
+    }
+
+    emit showSelectedChannelsOnly(selectedChannels);
+
+    //emit signal that selection was changed
+    if(!m_pSelectionScene->selectedItems().empty()) {
+        emit selectionChanged(m_pSelectionScene->selectedItems());
+    } else {
+        //only return visible items (EEG or MEG channels)
+        QList<QGraphicsItem*> visibleItemList =  m_pSelectionScene->items();
+        QMutableListIterator<QGraphicsItem*> i(visibleItemList);
+        while (i.hasNext()) {
+            if(!i.next()->isVisible())
+                i.remove();
+        }
+
+        emit selectionChanged(visibleItemList);
+    }
+}
+
+
+//*************************************************************************************************************
+
 bool SelectionManagerWindow::loadLayout(QString path)
 {
     bool state = LayoutLoader::readMNELoutFile(path, m_layoutMap);
@@ -563,54 +610,6 @@ void SelectionManagerWindow::updateUserDefinedChannelsList()
     ui->m_listWidget_userDefined->addItems(userDefinedChannels);
 
     updateDataView();
-}
-
-
-//*************************************************************************************************************
-
-void SelectionManagerWindow::updateDataView()
-{
-    //if no channels have been selected by the user -> show selected group channels
-    QListWidget* targetListWidget;
-    if(ui->m_listWidget_userDefined->count()>0)
-        targetListWidget = ui->m_listWidget_userDefined;
-    else
-        targetListWidget = ui->m_listWidget_visibleChannels;
-
-    //Create list of channels which are to be visible in the view
-    QStringList selectedChannels;
-
-    for(int i = 0; i < targetListWidget->count(); i++) {
-        QListWidgetItem* item = targetListWidget->item(i);
-        int indexTemp = m_pChInfoModel->getIndexFromMappedChName(item->text());
-
-        if(indexTemp != -1) {
-            QModelIndex mappedNameIndex = m_pChInfoModel->index(indexTemp,1);
-            QString origChName = m_pChInfoModel->data(mappedNameIndex,ChInfoModelRoles::GetOrigChName).toString();
-
-            selectedChannels << origChName;
-        }
-        else
-            selectedChannels << item->text();
-    }
-
-    emit showSelectedChannelsOnly(selectedChannels);
-
-    //emit signal that selection was changed
-    if(!m_pSelectionScene->selectedItems().empty())
-        emit selectionChanged(m_pSelectionScene->selectedItems());
-    else
-    {
-        //only return visible items (EEG or MEG channels)
-        QList<QGraphicsItem*> visibleItemList =  m_pSelectionScene->items();
-        QMutableListIterator<QGraphicsItem*> i(visibleItemList);
-        while (i.hasNext()) {
-            if(!i.next()->isVisible())
-                i.remove();
-        }
-
-        emit selectionChanged(visibleItemList);
-    }
 }
 
 

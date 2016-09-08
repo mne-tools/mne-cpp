@@ -46,4 +46,4 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace IOBuffer;
+using namespace IOBUFFER;

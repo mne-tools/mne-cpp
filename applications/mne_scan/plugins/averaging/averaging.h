@@ -54,7 +54,7 @@
 // FIFF INCLUDES
 //=============================================================================================================
 
-#include <fiff/fiff_evoked.h>
+#include <fiff/fiff_evoked_set.h>
 
 
 //*************************************************************************************************************
@@ -72,7 +72,7 @@
 
 namespace SCMEASLIB{
     class NewRealTimeMultiSampleArray;
-    class RealTimeEvoked;
+    class RealTimeEvokedSet;
 }
 
 namespace RTPROCESSINGLIB{
@@ -176,7 +176,7 @@ public:
 
     void changeBaselineActive(bool state);
 
-    void appendEvoked(FIFFLIB::FiffEvoked::SPtr p_pEvoked);
+    void appendEvoked(FIFFLIB::FiffEvokedSet::SPtr p_pEvokedSet);
 
     void showAveragingWidget();
 
@@ -193,13 +193,13 @@ private:
     void initConnector();
 
     SCSHAREDLIB::PluginInputData<SCMEASLIB::NewRealTimeMultiSampleArray>::SPtr  m_pAveragingInput;      /**< The RealTimeSampleArray of the Averaging input.*/
-    SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeEvoked>::SPtr              m_pAveragingOutput;     /**< The RealTimeEvoked of the Averaging output.*/
+    SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeEvokedSet>::SPtr           m_pAveragingOutput;     /**< The RealTimeEvoked of the Averaging output.*/
 
-    IOBuffer::CircularMatrixBuffer<double>::SPtr    m_pAveragingBuffer;             /**< Holds incoming data.*/
+    IOBUFFER::CircularMatrixBuffer<double>::SPtr    m_pAveragingBuffer;             /**< Holds incoming data.*/
 
     QSharedPointer<AveragingSettingsWidget>         m_pAveragingWidget;
 
-    QVector<FIFFLIB::FiffEvoked::SPtr>              m_qVecEvokedData;               /**< Evoked data set */
+    QVector<FIFFLIB::FiffEvokedSet::SPtr>           m_qVecEvokedData;               /**< Evoked data set */
 
     QMutex                                          m_qMutex;                       /**< Provides access serialization between threads*/
 

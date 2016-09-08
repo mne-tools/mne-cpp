@@ -98,7 +98,7 @@ namespace TMSIPlugin
 
 using namespace MNESCAN;
 using namespace SCMEASLIB;
-using namespace IOBuffer;
+using namespace IOBUFFER;
 using namespace FIFFLIB;
 using namespace std;
 using namespace UTILSLIB;
