@@ -2,14 +2,12 @@
 /**
 * @file     main.cpp
 * @author   Jana Kiesel <jana.kiesel@tu-ilmenau.de>
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     Mai, 2015
-*
+* @date     August, 2016
 * @section  LICENSE
 *
-* Copyright (C) 2015, Jana Kiesel, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Jana Kiesel and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,19 +28,19 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Example of reading BEM data
+* @brief    Example to project points on a surface
 *
 */
-
-
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include <iostream>
+#include <mne/mne_project_to_surface.h>
 #include <mne/mne.h>
-#include <utils/ioutils.h>
+#include <disp3D/view3D.h>
+#include <disp3D/control/control3dwidget.h>
+#include <fiff/fiff_dig_point_set.h>
 
 
 //*************************************************************************************************************
@@ -50,7 +48,8 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtCore/QCoreApplication>
+#include <QApplication>
+#include <QMainWindow>
 #include <QCommandLineParser>
 
 
@@ -59,7 +58,9 @@
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace DISP3DLIB;
 using namespace MNELIB;
+using namespace FIFFLIB;
 
 
 //*************************************************************************************************************
@@ -79,17 +80,15 @@ using namespace MNELIB;
 
 int main(int argc, char *argv[])
 {
-    QCoreApplication app(argc, argv);
+    QApplication app(argc, argv);
 
     // Command Line Parser
     QCommandLineParser parser;
-    parser.setApplicationDescription("Read BEM Example");
+    parser.setApplicationDescription("Projection Example");
     parser.addHelpOption();
-    QCommandLineOption sampleBEMFileOption("f", "Path to BEM <file>.", "file", "./MNE-sample-data/subjects/sample/bem/sample-head.fif");
-//    "./MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif"
-//    "./MNE-sample-data/subjects/sample/bem/sample-all-src.fif"
-//    "./MNE-sample-data/subjects/sample/bem/sample-5120-bem-sol.fif"
-//    "./MNE-sample-data/subjects/sample/bem/sample-5120-bem.fif"
+    QCommandLineOption sampleBEMFileOption("f", "Path to BEM <file>.", "file",
+                                           "./MNE-sample-data/warping/AVG4-0Years_segmented_BEM3/bem/AVG4-0Years_segmented_BEM3-2118-2188-3186-bem-sol.fif");
+
     parser.addOption(sampleBEMFileOption);
     parser.process(app);
 
@@ -98,79 +97,61 @@ int main(int argc, char *argv[])
     QFile t_fileBem(parser.value(sampleBEMFileOption));
     MNEBem t_Bem(t_fileBem);
 
-    if( t_Bem.size() > 0 )
+    // Read the Digitizer
+    QFile t_fileDig("./MNE-sample-data/warping/AVG4-0Years_GSN128.fif");
+    FiffDigPointSet t_Dig(t_fileDig);
+
+    MatrixXf ElecPos(t_Dig.size(), 3);
+    for (int i = 0; i < t_Dig.size(); ++i)
     {
-        qDebug() << "t_Bem[0].tri_nn:" << t_Bem[0].tri_nn(0,0) << t_Bem[0].tri_nn(0,1) << t_Bem[0].tri_nn(0,2);
-        qDebug() << "t_Bem[0].tri_nn:" << t_Bem[0].tri_nn(2,0) << t_Bem[0].tri_nn(2,1) << t_Bem[0].tri_nn(2,2);
-        qDebug() << "t_Bem[0].rr:" << t_Bem[0].rr(2,0) << t_Bem[0].rr(2,1) << t_Bem[0].rr(2,2);
+        ElecPos(i,0) = t_Dig[i].r[0];
+        ElecPos(i,1) = t_Dig[i].r[1];
+        ElecPos(i,2) = t_Dig[i].r[2];
     }
 
-    //Read and write Iso2Mesh Bem
-    QString folder = "./MNE-sample-data/warping/AVG4-0Years_segmented_BEM3/bem/";
+    // Read and apply Transformation
+    QFile t_fileTrans("./MNE-sample-data/warping/AVG4-0Years_GSN128-trans.fif");
+    FiffCoordTrans t_Trans (t_fileTrans);
+    ElecPos=t_Trans.apply_trans(ElecPos);
+    FiffDigPointSet t_DigTrans(t_Dig);
 
-    MatrixXd help;
-
-    MNEBem t_BemIso2Mesh;
-    MNEBemSurface  p_Brain;
-    p_Brain.id = FIFFV_BEM_SURF_ID_BRAIN;
-    QString path=folder;
-    IOUtils::read_eigen_matrix(help, path.append("inner_skull_vert.txt"));
-    p_Brain.rr= help.cast<float>();
-    path=folder;
-    IOUtils::read_eigen_matrix(help, path.append("inner_skull_tri.txt"));
-    p_Brain.tris = help.cast<int>();
-    p_Brain.np = p_Brain.rr.rows();
-    p_Brain.ntri = p_Brain.tris.rows();
-    p_Brain.addTriangleData();
-    p_Brain.addVertexNormals();
-    t_BemIso2Mesh<<p_Brain;
-
-    MNEBemSurface  p_Skull;
-    p_Skull.id = FIFFV_BEM_SURF_ID_SKULL;
-    path=folder;
-    IOUtils::read_eigen_matrix(help,path.append("outer_skull_vert.txt"));
-    p_Skull.rr =  help.cast<float>();
-    path=folder;
-    IOUtils::read_eigen_matrix(help,path.append("outer_skull_tri.txt"));
-    p_Skull.tris =  help.cast<int>();
-    p_Skull.np = p_Skull.rr.rows();
-    p_Skull.ntri = p_Skull.tris.rows();
-    p_Skull.addTriangleData();
-    p_Skull.addVertexNormals();
-    t_BemIso2Mesh<<p_Skull;
-
-    MNEBemSurface  p_Head;
-    p_Head.id = FIFFV_BEM_SURF_ID_HEAD;
-    path=folder;
-    IOUtils::read_eigen_matrix(help,path.append("skin_vert.txt"));
-    p_Head.rr =  help.cast<float>();
-    path=folder;
-    IOUtils::read_eigen_matrix(help,path.append("skin_tri.txt"));
-    p_Head.tris =  help.cast<int>();
-    p_Head.np = p_Head.rr.rows();
-    p_Head.ntri = p_Head.tris.rows();
-    p_Head.addTriangleData();
-    p_Head.addVertexNormals();
-    t_BemIso2Mesh<<p_Head;
-
-    QFile t_fileIso2MeshBem("./Iso2MeshBem/AVG4-0Years_segmented_BEM3.fiff");
-    t_BemIso2Mesh.write(t_fileIso2MeshBem);
-    t_fileIso2MeshBem.close();
-
-    // Write the BEM
-    QFile t_fileBemTest("./MNE-sample-data/subjects/sample/bem/sample-head-test.fif");
-    t_Bem.write(t_fileBemTest);
-    t_fileBemTest.close();
-
-    MNEBem t_BemTest (t_fileBemTest) ;
-
-    if( t_BemTest.size() > 0 )
+    for (int i = 0; i < t_DigTrans.size(); ++i)
     {
-        qDebug() << "t_BemTest[0].tri_nn:" << t_BemTest[0].tri_nn(0,0) << t_BemTest[0].tri_nn(0,1) << t_BemTest[0].tri_nn(0,2);
-        qDebug() << "t_BemTest[0].tri_nn:" << t_BemTest[0].tri_nn(2,0) << t_BemTest[0].tri_nn(2,1) << t_BemTest[0].tri_nn(2,2);
+        t_DigTrans[i].r[0] = ElecPos(i,0);
+        t_DigTrans[i].r[1] = ElecPos(i,1);
+        t_DigTrans[i].r[2] = ElecPos(i,2);
     }
 
-    qDebug() << "Put your stuff your interest in here";
+    //Projection
+    MatrixXf DigProject(t_DigTrans.size(), 3);
+    VectorXi nearest;
+    VectorXf dist;
+    MNEProjectToSurface t_Avg4 (t_Bem[0]);
+
+    t_Avg4.mne_find_closest_on_surface(ElecPos, t_DigTrans.size(), DigProject, nearest, dist);
+
+    FiffDigPointSet t_DigProject(t_Dig);
+
+    for (int i = 0; i < t_DigProject.size(); ++i)
+    {
+        t_DigProject[i].r[0] = DigProject(i,0);
+        t_DigProject[i].r[1] = DigProject(i,1);
+        t_DigProject[i].r[2] = DigProject(i,2);
+    }
+
+    //Show
+    View3D::SPtr testWindow = View3D::SPtr(new View3D());
+    testWindow->addBemData("AVG4-0Years", "BEM", t_Bem);
+    testWindow->addDigitizerData("AVG4-0Years", "Orignal Dig", t_Dig);
+    testWindow->addDigitizerData("AVG4-0Years", "Trans Dig", t_DigTrans);
+    testWindow->addDigitizerData("AVG4-0Years", "Project Dig", t_DigProject);
+
+    testWindow->show();
+
+    Control3DWidget::SPtr control3DWidget = Control3DWidget::SPtr(new Control3DWidget());
+    control3DWidget->setView3D(testWindow);
+    control3DWidget->show();
+
 
     return app.exec();
 }
