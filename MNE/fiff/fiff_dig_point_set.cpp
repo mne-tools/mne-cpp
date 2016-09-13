@@ -113,6 +113,10 @@ FiffDigPointSet::FiffDigPointSet(QIODevice &p_IODevice)   //const FiffDigPointSe
         t_pStream->device()->close();
         qDebug() << "Could not read the FiffDigPointSet\n"; // ToDo throw error
     }
+    if(this->size()==0)
+    {
+        qDebug() << "No digitizer Points found in file" ;
+    }
 }
 
 
