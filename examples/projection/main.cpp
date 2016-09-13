@@ -28,7 +28,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Example to project points on a surface
+* @brief    Example to project points on a surface and warp the surface
 *
 */
 //*************************************************************************************************************
@@ -88,7 +88,8 @@ int main(int argc, char *argv[])
     parser.setApplicationDescription("Projection Example");
     parser.addHelpOption();
     QCommandLineOption sampleBEMFileOption("f", "Path to BEM <file>.", "file",
-                                           "./MNE-sample-data/warping/AVG4-0Years_segmented_BEM3/bem/AVG4-0Years_segmented_BEM3-2118-2188-3186-bem-sol.fif");
+//                                           "./MNE-sample-data/warping/AVG4-0Years_segmented_BEM3/bem/AVG4-0Years_segmented_BEM3-2118-2188-3186-bem-sol.fif");
+                                           "./MNE-sample-data/warping/AVG3-0Years_segmented_BEM3-1824-1860-2530-bem.fif");
 
     parser.addOption(sampleBEMFileOption);
     parser.process(app);
@@ -98,38 +99,60 @@ int main(int argc, char *argv[])
     QFile t_fileBem(parser.value(sampleBEMFileOption));
     MNEBem t_Bem(t_fileBem);
 
+    // Read Patients Bem to compare
+    QFile t_fileBemPatient("D:/Studium/Master/Masterarbeit/Daten/4926787/ID_4926787_act/bem/FREESURFER-5120-5120-5120-bem.fif");
+    MNEBem t_BemPatient(t_fileBemPatient);
+
     // Read the Digitizer
-    QFile t_fileDig("./MNE-sample-data/warping/AVG4-0Years_GSN128.fif");
+//    QFile t_fileDig("./MNE-sample-data/warping/AVG4-0Years_GSN128.fif");
+    QFile t_fileDig("D:/Studium/Master/Masterarbeit/Daten/4926787/160130_151742_4926787_auditorytoneburst_raw.fif");
     FiffDigPointSet t_Dig(t_fileDig);
 
-    MatrixXf ElecPos(t_Dig.size(), 3);
+    MatrixXf Dig(t_Dig.size(), 3);
     for (int i = 0; i < t_Dig.size(); ++i)
     {
-        ElecPos(i,0) = t_Dig[i].r[0];
-        ElecPos(i,1) = t_Dig[i].r[1];
-        ElecPos(i,2) = t_Dig[i].r[2];
+        Dig(i,0) = t_Dig[i].r[0];
+        Dig(i,1) = t_Dig[i].r[1];
+        Dig(i,2) = t_Dig[i].r[2];
     }
 
-    // Read and apply Transformation
-    QFile t_fileTrans("./MNE-sample-data/warping/AVG4-0Years_GSN128-trans.fif");
+    // Read and apply Transformation on Average
+//    QFile t_fileTrans("./MNE-sample-data/warping/AVG4-0Years_GSN128-trans.fif");
+    QFile t_fileTrans("D:/Studium/Master/Masterarbeit/Daten/4926787/AnalysisJana/NSSP_SGM_160130_151742_4926787_auditorytoneburst_raw-ave-trans.fif");
+
     FiffCoordTrans t_Trans (t_fileTrans);
-    ElecPos=t_Trans.apply_trans(ElecPos);
+    MatrixXf DigTrans(t_Dig.size(), 3);
+    DigTrans=t_Trans.apply_trans(Dig);
     FiffDigPointSet t_DigTrans(t_Dig);
 
     for (int i = 0; i < t_DigTrans.size(); ++i)
     {
-        t_DigTrans[i].r[0] = ElecPos(i,0);
-        t_DigTrans[i].r[1] = ElecPos(i,1);
-        t_DigTrans[i].r[2] = ElecPos(i,2);
+        t_DigTrans[i].r[0] = DigTrans(i,0);
+        t_DigTrans[i].r[1] = DigTrans(i,1);
+        t_DigTrans[i].r[2] = DigTrans(i,2);
     }
 
+    // Read and apply Transformation on Patient
+    QFile t_fileTransP("D:/Studium/Master/Masterarbeit/Daten/4926787/AnalysisJana/patient-trans.fif");
+
+    FiffCoordTrans t_transPatient (t_fileTransP);
+    MatrixXf DigPatient(t_Dig.size(), 3);
+    DigPatient=t_transPatient.apply_trans(Dig);
+    FiffDigPointSet t_DigPatient(t_Dig);
+
+    for (int i = 0; i < t_DigPatient.size(); ++i)
+    {
+        t_DigPatient[i].r[0] = DigPatient(i,0);
+        t_DigPatient[i].r[1] = DigPatient(i,1);
+        t_DigPatient[i].r[2] = DigPatient(i,2);
+    }
     //Projection
     MatrixXf DigProject(t_DigTrans.size(), 3);
     VectorXi nearest;
     VectorXf dist;
     MNEProjectToSurface t_Avg4 (t_Bem[0]);
 
-    t_Avg4.mne_find_closest_on_surface(ElecPos, t_DigTrans.size(), DigProject, nearest, dist);
+    t_Avg4.mne_find_closest_on_surface(DigTrans, t_DigTrans.size(), DigProject, nearest, dist);
 
     FiffDigPointSet t_DigProject(t_Dig);
 
@@ -142,16 +165,18 @@ int main(int argc, char *argv[])
 
     // Warp
     MNEBem t_BemWarped(t_Bem);
-    t_BemWarped.warp(DigProject, ElecPos);
+    t_BemWarped.warp(DigProject, DigTrans);
 
 
     //Show
     View3D::SPtr testWindow = View3D::SPtr(new View3D());
-    testWindow->addBemData("AVG4-0Years", "BEM", t_Bem);
-    testWindow->addBemData("AVG4-0Years", "warped BEM", t_BemWarped);
-    testWindow->addDigitizerData("AVG4-0Years", "Orignal Dig", t_Dig);
-    testWindow->addDigitizerData("AVG4-0Years", "Trans Dig", t_DigTrans);
-    testWindow->addDigitizerData("AVG4-0Years", "Project Dig", t_DigProject);
+    testWindow->addBemData("AVG3-0Years", "BEM", t_Bem);
+    testWindow->addBemData("warped AVG3-0Years", "BEM", t_BemWarped);
+    testWindow->addBemData("4926787", "BEM", t_BemPatient);
+    testWindow->addDigitizerData("Original", "Dig", t_Dig);
+    testWindow->addDigitizerData("4926787", "Dig", t_DigPatient);
+    testWindow->addDigitizerData("warped AVG3-0Years", "Dig", t_DigTrans);
+    testWindow->addDigitizerData("AVG3-0Years", "Projected Dig", t_DigProject);
 
     testWindow->show();
 
