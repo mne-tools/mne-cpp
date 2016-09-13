@@ -45,6 +45,7 @@
 #include <scMeas/newrealtimesamplearray.h>
 #include <scMeas/newrealtimemultisamplearray.h>
 #include <scMeas/realtimeevoked.h>
+#include <scMeas/realtimeevokedset.h>
 #include <scMeas/realtimecov.h>
 #include <scMeas/realtimesourceestimate.h>
 
@@ -132,7 +133,7 @@ bool PluginConnectorConnection::createConnection()
                 break;
             }
 
-            //Cast to RealTimeSourceEstimate
+            //Cast to RealTimeEvoked
             QSharedPointer< PluginOutputData<RealTimeEvoked> > senderRTE = m_pSender->getOutputConnectors()[i].dynamicCast< PluginOutputData<RealTimeEvoked> >();
             QSharedPointer< PluginInputData<RealTimeEvoked> > receiverRTE = m_pReceiver->getInputConnectors()[j].dynamicCast< PluginInputData<RealTimeEvoked> >();
             if(senderRTE && receiverRTE)
@@ -143,7 +144,18 @@ bool PluginConnectorConnection::createConnection()
                 break;
             }
 
-            //Cast to RealTimeSourceEstimate
+            //Cast to RealTimeEvokedSet
+            QSharedPointer< PluginOutputData<RealTimeEvokedSet> > senderRTESet = m_pSender->getOutputConnectors()[i].dynamicCast< PluginOutputData<RealTimeEvokedSet> >();
+            QSharedPointer< PluginInputData<RealTimeEvokedSet> > receiverRTESet = m_pReceiver->getInputConnectors()[j].dynamicCast< PluginInputData<RealTimeEvokedSet> >();
+            if(senderRTESet && receiverRTESet)
+            {
+                m_qHashConnections.insert(QPair<QString,QString>(m_pSender->getOutputConnectors()[i]->getName(), m_pReceiver->getInputConnectors()[j]->getName()), connect(m_pSender->getOutputConnectors()[i].data(), &PluginOutputConnector::notify,
+                        m_pReceiver->getInputConnectors()[j].data(), &PluginInputConnector::update, Qt::BlockingQueuedConnection));
+                bConnected = true;
+                break;
+            }
+
+            //Cast to RealTimeCov
             QSharedPointer< PluginOutputData<RealTimeCov> > senderRTC = m_pSender->getOutputConnectors()[i].dynamicCast< PluginOutputData<RealTimeCov> >();
             QSharedPointer< PluginInputData<RealTimeCov> > receiverRTC = m_pReceiver->getInputConnectors()[j].dynamicCast< PluginInputData<RealTimeCov> >();
             if(senderRTC && receiverRTC)

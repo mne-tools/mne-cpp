@@ -47,6 +47,7 @@
 #include <scDisp/realtimesourceestimatewidget.h>
 #endif
 #include <scDisp/realtimeevokedwidget.h>
+#include <scDisp/realtimeevokedsetwidget.h>
 #include <scDisp/realtimecovwidget.h>
 #include <scDisp/frequencyspectrumwidget.h>
 
@@ -54,6 +55,7 @@
 #include <scMeas/newrealtimemultisamplearray.h>
 #include <scMeas/realtimesourceestimate.h>
 #include <scMeas/realtimeevoked.h>
+#include <scMeas/realtimeevokedset.h>
 #include <scMeas/realtimecov.h>
 #include <scMeas/frequencyspectrum.h>
 
@@ -184,6 +186,21 @@ QWidget* DisplayManager::show(IPlugin::OutputConnectorList &outputConnectorList,
 
             vboxLayout->addWidget(rteWidget);
             rteWidget->init();
+        }
+        else if(pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeEvokedSet> >())
+        {
+            QSharedPointer<RealTimeEvokedSet>* pRealTimeEvokedSet = &pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeEvokedSet> >()->data();
+
+            RealTimeEvokedSetWidget* rtesWidget = new RealTimeEvokedSetWidget(*pRealTimeEvokedSet, pT, newDisp);
+
+            qListActions.append(rtesWidget->getDisplayActions());
+            qListWidgets.append(rtesWidget->getDisplayWidgets());
+
+            connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify,
+                    rtesWidget, &RealTimeEvokedSetWidget::update, Qt::BlockingQueuedConnection);
+
+            vboxLayout->addWidget(rtesWidget);
+            rtesWidget->init();
         }
         else if(pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeCov> >())
         {

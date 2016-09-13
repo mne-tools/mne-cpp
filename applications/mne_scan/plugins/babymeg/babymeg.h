@@ -383,7 +383,7 @@ private:
 
     SCSHAREDLIB::PluginOutputData<SCMEASLIB::NewRealTimeMultiSampleArray>::SPtr m_pRTMSABabyMEG;    /**< The NewRealTimeMultiSampleArray to provide the rt_server Channels.*/
 
-    QSharedPointer<IOBuffer::RawMatrixBuffer>                                   m_pRawMatrixBuffer; /**< Holds incoming raw data. */
+    QSharedPointer<IOBUFFER::RawMatrixBuffer>                                   m_pRawMatrixBuffer; /**< Holds incoming raw data. */
 
     QSharedPointer<BabyMEGClient>           m_pMyClient;                    /**< TCP/IP communication between Qt and Labview. */
     QSharedPointer<BabyMEGClient>           m_pMyClientComm;                /**< TCP/IP communication between Qt and Labview - communication. */
