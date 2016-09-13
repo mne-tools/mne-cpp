@@ -92,45 +92,11 @@ using namespace std;
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
-
-//    Matrix<double,6,3> sLm;
-//    sLm <<  1,1,1,
-//            2,1,1,
-//            3,1,1,
-//            1,2,1,
-//            2,2,1,
-//            3,2,1;
-//    std::cout << "Here is the matrix sLm:" << std::endl << sLm << std::endl;
-
-//    Matrix<double,6,3> dLm;
-//    dLm <<  1,1,2,
-//            2,1,3,
-//            3,1,2,
-//            1,2,2,
-//            2,2,3,
-//            3,2,2;
-
-//    Matrix<double,16,3> sVert;
-//    sVert <<1.0,0.5,1,
-//            1.5,0.5,1,
-//            2.0,0.5,1,
-//            2.3,0.5,1,
-//            2.7,0.5,1,
-//            3.0,0.5,1,
-//            3.5,0.5,1,
-//            4.0,0.5,1,
-//            1.0,1,1,
-//            1.5,1,1,
-//            2.0,1,1,
-//            2.3,1,1,
-//            2.7,1,1,
-//            3.0,1,1,
-//            3.5,1,1,
-//            4.0,1,1;;
-
     //
+    // Destination Landmarks:
+    //
+
     // Read Electrode Positions from fiff raw
-    //
 //    QFile t_fileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
 //    FiffRawData raw(t_fileRaw);
 //    QList<FiffChInfo> ChannelInfo= raw.info.chs;
@@ -157,12 +123,11 @@ int main(int argc, char *argv[])
 //        ElecPos(i,2)=tempElecInfo[i][2];
 //    }
 
-    //
-    // Read Electrode Positions from fiff (digitizer points)
-    //
+    //Read Electrode Positions from fiff (digitizer points)
+//    QFile t_fileElec("./MNE-sample-data/warping/AVG4-0Years_GSN128.fif");
+    QFile t_fileElec("D:/Studium/Master/Masterarbeit/Daten/4889503/ID_4889503_act/bem/4889503-5120-5120-5120-bem.fif");
 
-    QFile t_fileElec("./MNE-sample-data/warping/AVG4-0Years_GSN128.fif");
-//    QList<FiffDigPoint> dig = FiffDigPoint::read(t_fileElec);
+
     FiffDigPointSet digset(t_fileElec);
 
 
@@ -191,50 +156,29 @@ int main(int argc, char *argv[])
 //    std::cout << "Here is the matrix ElecPos:" << std::endl << ElecPos << std::endl;
 
     //
-    // read electrode positions from Database
+    // source Landmarks:
     //
-//    QString electrodeFileName= "./MNE-sample-data/MriDatabase/FirstYear/Sources/Electrodes/AVG3-0Months_10-5_Electrodes.txt";
+
+    // read average electrode positions from Database
+    //    QString electrodeFileName= "./MNE-sample-data/MriDatabase/FirstYear/Sources/Electrodes/AVG3-0Months_10-5_Electrodes.txt";
 //    Matrix<double, Dynamic ,3> ElecPos = test.readsLm(electrodeFileName);
 //    std::cout << "Here is the matrix ElecPos:" << std::endl << ElecPos << std::endl;
 
     //
-    //Read BEM from fiff
+    // Source Bem:
     //
+
+    // Read BEM from fiff
 //    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif");
 //    MNELIB::MNEBem t_Bem (t_fileBem) ;
 
     //
-    // Read Transformation
+    // Read and apply Transformation of source landmarks (source)
     //
 
     QFile t_fileTrans("./MNE-sample-data/warping/AVG4-0Years_GSN128-trans.fif");
     FiffCoordTrans t_Trans (t_fileTrans);
     ElecPos=t_Trans.apply_trans(ElecPos);
-
-//    //
-//    // prepare warp
-//    //
-//    MatrixXd sLm=ElecPos;
-//    MatrixXd random(ElecPos.rows(),3);
-//    srand(time(NULL));
-//    for (int i=0;i<ElecPos.rows();i++)
-//    {
-
-//        for (int j=0; j<3;j++)
-//        {
-//            random(i,j)=rand();
-//            random(i,j)/=RAND_MAX;
-//            random(i,j)*=0.06;
-//            random(i,j)-=0.03;
-//            //            random(i,j)=0.005*(rand()/RAND_MAX);
-//        }
-//    }
-////    std::cout << "Here are the first row of the matrix random:" << std::endl << random.topRows(9) << std::endl;
-//    MatrixXd dLm=sLm+random;
-//    MNELIB::MNEBemSurface skin=t_Bem[0];
-//    MatrixXd sVert=skin.rr.cast<double>();
-
-//    std::cout << "Here are the first row of the matrix skin.rr bevor warp:" << std::endl << skin.rr.topRows(9) << std::endl;
 
 
 //    //
@@ -264,5 +208,3 @@ int main(int argc, char *argv[])
 //    MNELIB::MNEBemSurface skinWarped=t_BemWarpedB[0];
     return a.exec();
 }
-
-
