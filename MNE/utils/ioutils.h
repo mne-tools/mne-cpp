@@ -208,6 +208,10 @@ public:
     */
     template<typename T>
     static bool write_eigen_matrix(const Matrix<T, Dynamic, Dynamic>& in, const QString& sPath, const QString& sDescription = QString());
+    template<typename T>
+    static bool write_eigen_matrix(const Matrix<T, 1, Dynamic>& in, const QString& sPath, const QString& sDescription = QString());
+    template<typename T>
+    static bool write_eigen_matrix(const Matrix<T, Dynamic, 1>& in, const QString& sPath, const QString& sDescription = QString());
 
     //=========================================================================================================
     /**
@@ -218,12 +222,38 @@ public:
     */
     template<typename T>
     static bool read_eigen_matrix(Matrix<T, Dynamic, Dynamic>& out, const QString& path);
+    template<typename T>
+    static bool read_eigen_matrix(Matrix<T, 1, Dynamic>& out, const QString& path);
+    template<typename T>
+    static bool read_eigen_matrix(Matrix<T, Dynamic, 1>& out, const QString& path);
 };
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
+//*************************************************************************************************************
+
+template<typename T>
+bool IOUtils::write_eigen_matrix(const Matrix<T, 1, Dynamic>& in, const QString& sPath, const QString& sDescription)
+{
+    Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrixName(1,in.cols());
+    matrixName.row(0)= in;
+    MNEMath::histcounts(matrixName, sPath, sDescription);
+}
+
+
+//*************************************************************************************************************
+
+template<typename T>
+bool IOUtils::write_eigen_matrix(const Matrix<T, Dynamic, 1>& in, const QString& sPath, const QString& sDescription)
+{
+    Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrixName(in.rows(),1);
+    matrixName.col(0)= in;
+    MNEMath::histcounts(matrixName, sPath, sDescription);
+}
+
+
 //*************************************************************************************************************
 
 template<typename T>
@@ -248,6 +278,28 @@ bool IOUtils::write_eigen_matrix(const Matrix<T, Dynamic, Dynamic>& in, const QS
     file.close();
 
     return true;
+}
+
+
+//*************************************************************************************************************
+
+template<typename T>
+bool IOUtils::read_eigen_matrix(Matrix<T, 1, Dynamic>& out, const QString& path)
+{
+    Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrixName(1,out.cols());
+    matrixName.row(0)= out;
+    MNEMath::histcounts(matrixName, path);
+}
+
+
+//*************************************************************************************************************
+
+template<typename T>
+bool IOUtils::read_eigen_matrix(Matrix<T, Dynamic, 1>& out, const QString& path)
+{
+    Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrixName(out.rows(),1);
+    matrixName.col(0)= out;
+    MNEMath::histcounts(matrixName, path);
 }
 
 
