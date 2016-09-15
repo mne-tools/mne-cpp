@@ -78,20 +78,6 @@ int main(int argc, char *argv[])
 {
     QCoreApplication app(argc, argv);
 
-//    Eigen::MatrixXd testMatrix(1,5);
-//    testMatrix(0) = 0.1;
-//    testMatrix(1) = 0.2;
-//    testMatrix(2) = 0.3;
-//    testMatrix(3) = 0.4;
-//    testMatrix(4) = 0.5;
-
-//    Eigen::VectorXd testVector(5);
-//    testVector(0) = 0.1;
-//    testVector(1) = 0.2;
-//    testVector(2) = 0.3;
-//    testVector(3) = 0.4;
-//    testVector(4) = 0.5;
-
     QFile t_fileForwardSolution("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
     MNEForwardSolution t_Fwd(t_fileForwardSolution);
 
