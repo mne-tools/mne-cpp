@@ -99,7 +99,7 @@ namespace EEGoSportsPlugin
 
 using namespace SCSHAREDLIB;
 using namespace SCMEASLIB;
-using namespace IOBuffer;
+using namespace IOBUFFER;
 using namespace FIFFLIB;
 using namespace std;
 using namespace UTILSLIB;

@@ -94,7 +94,7 @@ typedef  QList<double>  MyQList;
 
 using namespace SCSHAREDLIB;
 using namespace SCMEASLIB;
-using namespace IOBuffer;
+using namespace IOBUFFER;
 using namespace UTILSLIB;
 using namespace FSLIB;
 using namespace std;
