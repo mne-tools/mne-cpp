@@ -309,7 +309,7 @@ int main(int argc, char *argv[])
             rtItemList_RV.at(i)->setLoopState(true);
             rtItemList_RV.at(i)->setTimeInterval(50);
             rtItemList_RV.at(i)->setNumberAverages(1);
-            rtItemList_RV.at(i)->setStreamingActive(false);
+            rtItemList_RV.at(i)->setStreamingActive(true);
             rtItemList_RV.at(i)->setNormalization(QVector3D(5.0,5.5,15));
             rtItemList_RV.at(i)->setVisualizationType("Vertex based");
             rtItemList_RV.at(i)->setColortable("Hot Negative 1");

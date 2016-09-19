@@ -286,9 +286,12 @@ bool IOUtils::write_eigen_matrix(const Matrix<T, Dynamic, Dynamic>& in, const QS
 template<typename T>
 bool IOUtils::read_eigen_matrix(Matrix<T, 1, Dynamic>& out, const QString& path)
 {
-    Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrixName(1,out.cols());
-    matrixName.row(0)= out;
+    Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrixName;
     IOUtils::read_eigen_matrix(matrixName, path);
+    if(matrixName.rows() > 0)
+    {
+        out = matrixName.row(0);
+    }
 }
 
 
@@ -297,9 +300,12 @@ bool IOUtils::read_eigen_matrix(Matrix<T, 1, Dynamic>& out, const QString& path)
 template<typename T>
 bool IOUtils::read_eigen_matrix(Matrix<T, Dynamic, 1>& out, const QString& path)
 {
-    Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrixName(out.rows(),1);
-    matrixName.col(0)= out;
+    Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrixName;
     IOUtils::read_eigen_matrix(matrixName, path);
+    if(matrixName.rows() > 0)
+    {
+        out = matrixName.row(0);
+    }
 }
 
 
