@@ -93,8 +93,6 @@ RtAve::RtAve(quint32 numAverages,
 , m_iNumAverages(numAverages)
 , m_iPreStimSamples(p_iPreStimSamples)
 , m_iPostStimSamples(p_iPostStimSamples)
-, m_iPreStimSeconds(p_iPreStimSamples/p_pFiffInfo->sfreq)
-, m_iPostStimSeconds(p_iPostStimSamples/p_pFiffInfo->sfreq)
 , m_pFiffInfo(p_pFiffInfo)
 , m_bIsRunning(false)
 , m_bAutoAspect(true)
@@ -106,7 +104,6 @@ RtAve::RtAve(quint32 numAverages,
 , m_bDoBaselineCorrection(false)
 , m_pairBaselineSec(qMakePair(QVariant(QString::number(p_iBaselineFromSecs)),QVariant(QString::number(p_iBaselineToSecs))))
 , m_pStimEvokedSet(FiffEvokedSet::SPtr(new FiffEvokedSet))
-, m_iCurrentBlockSize(0)
 , m_dArtifactThreshold(300e-6)
 , m_bDoArtifactReduction(false)
 {
@@ -163,7 +160,6 @@ void RtAve::setPreStim(qint32 samples, qint32 secs)
 {
     QMutexLocker locker(&m_qMutex);
     m_iNewPreStimSamples = samples;
-    m_iPreStimSeconds = secs;
 }
 
 
@@ -173,7 +169,6 @@ void RtAve::setPostStim(qint32 samples, qint32 secs)
 {
     QMutexLocker locker(&m_qMutex);
     m_iNewPostStimSamples = samples;
-    m_iPostStimSeconds = secs;
 }
 
 
@@ -299,7 +294,7 @@ void RtAve::run()
             //Acquire Data m_pRawMatrixBuffer is thread safe
             MatrixXd rawSegment = m_pRawMatrixBuffer->pop();
 
-            QMutexLocker locker(&m_qMutex);
+            //QMutexLocker locker(&m_qMutex);
             doAveraging(rawSegment);
 
             //qDebug()<<"RtAve::run() - time.elapsed()"<<time.elapsed();
@@ -311,7 +306,7 @@ void RtAve::run()
 //*************************************************************************************************************
 
 void RtAve::doAveraging(const MatrixXd& rawSegment)
-{    
+{
     //qDebug()<<"";
     //qDebug()<<"";
     //qDebug()<<"";
@@ -445,6 +440,8 @@ void RtAve::doAveraging(const MatrixXd& rawSegment)
 
 void RtAve::fillBackBuffer(const MatrixXd &data, double dTriggerType)
 {
+    QMutexLocker locker(&m_qMutex);
+
     int iResidualCols = data.cols();
     if(m_mapMatDataPostIdx[dTriggerType] + data.cols() > m_iPostStimSamples) {
         iResidualCols = m_iPostStimSamples - m_mapMatDataPostIdx[dTriggerType];
@@ -461,6 +458,8 @@ void RtAve::fillBackBuffer(const MatrixXd &data, double dTriggerType)
 
 void RtAve::fillFrontBuffer(const MatrixXd &data, double dTriggerType)
 {
+    QMutexLocker locker(&m_qMutex);
+
     //Init m_mapDataPre
     if(!m_mapDataPre.contains(dTriggerType)) {
         if(dTriggerType != -1.0) {
@@ -489,6 +488,8 @@ void RtAve::fillFrontBuffer(const MatrixXd &data, double dTriggerType)
 
 void RtAve::mergeData(double dTriggerType)
 {
+    QMutexLocker locker(&m_qMutex);
+
     MatrixXd mergedData(m_mapDataPre[dTriggerType].rows(), m_mapDataPre[dTriggerType].cols() + m_mapDataPost[dTriggerType].cols());
 
     mergedData << m_mapDataPre[dTriggerType], m_mapDataPost[dTriggerType];
@@ -563,6 +564,8 @@ bool RtAve::checkForArtifact(MatrixXd& data, double dThreshold)
 
 void RtAve::generateEvoked(double dTriggerType)
 {
+    QMutexLocker locker(&m_qMutex);
+
     if(m_mapStimAve[dTriggerType].isEmpty()) {
         return;
     }
@@ -649,6 +652,8 @@ void RtAve::reset()
 //    qDebug()<<"RtAve::reset()";
     QMutexLocker locker(&m_qMutex);
 
+    qDebug()<<"RtAve::reset() - 1";
+
     //Reset
     m_iPreStimSamples = m_iNewPreStimSamples;
     m_iPostStimSamples = m_iNewPostStimSamples;
@@ -656,16 +661,29 @@ void RtAve::reset()
     m_iAverageMode = m_iNewAverageMode;
     m_iNumAverages = m_iNewNumAverages;
 
+    qDebug()<<"RtAve::reset() - 2";
 
     //Clear all evoked data information
     m_pStimEvokedSet->evoked.clear();
 
+    qDebug()<<"RtAve::reset() - 3";
+
     //Clear all maps
+//    m_mapDataPre.clear();
+//    m_mapDataPost.clear();
+//    m_mapFillingBackBuffer.clear();
+//    m_mapStimAve.clear();
+//    m_mapNumberCalcAverages.clear();
+
+    m_qMapDetectedTrigger.clear();
+    m_mapStimAve.clear();
     m_mapDataPre.clear();
     m_mapDataPost.clear();
+    m_mapMatDataPostIdx.clear();
     m_mapFillingBackBuffer.clear();
-    m_mapStimAve.clear();
     m_mapNumberCalcAverages.clear();
+
+    qDebug()<<"RtAve::reset() - 4";
 
 //    QMutableMapIterator<double,Eigen::MatrixXd> i0(m_mapDataPre);
 //    while (i0.hasNext()) {
