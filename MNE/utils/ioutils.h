@@ -302,9 +302,9 @@ bool IOUtils::read_eigen_matrix(Matrix<T, Dynamic, 1>& out, const QString& path)
 {
     Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrixName;
     IOUtils::read_eigen_matrix(matrixName, path);
-    if(matrixName.rows() > 0)
+    if(matrixName.cols() > 0)
     {
-        out = matrixName.row(0);
+        out = matrixName.col(0);
     }
 }
 
