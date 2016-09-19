@@ -58,7 +58,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ssvepBCIPlugin;
+using namespace SSVEPBCIPLUGIN;
 using namespace Eigen;
 
 
@@ -67,7 +67,7 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ssvepBCIWidget::ssvepBCIWidget(ssvepBCI* pBCI, QWidget* parent)
+SsvepBciWidget::SsvepBciWidget(SsvepBci* pBCI, QWidget* parent)
 : QWidget(parent)
 , m_pBCI(pBCI)
 {
@@ -137,7 +137,7 @@ ssvepBCIWidget::ssvepBCIWidget(ssvepBCI* pBCI, QWidget* parent)
 //            this, &BCISetupWidget::setFilterOptions);
 
     //Connect about button
-    connect(ui.m_qPushButton_About, &QPushButton::released, this, &ssvepBCIWidget::showAboutDialog);
+    connect(ui.m_qPushButton_About, &QPushButton::released, this, &SsvepBciWidget::showAboutDialog);
 
     //Fill info box
     QFile file(m_pBCI->m_qStringResourcePath+"readme.txt");
@@ -156,14 +156,14 @@ ssvepBCIWidget::ssvepBCIWidget(ssvepBCI* pBCI, QWidget* parent)
 
 //*************************************************************************************************************
 
-ssvepBCIWidget::~ssvepBCIWidget()
+SsvepBciWidget::~SsvepBciWidget()
 {
 }
 
 
 //*************************************************************************************************************
 
-void ssvepBCIWidget::initGui()
+void SsvepBciWidget::initGui()
 {
 //    // General options
 //    ui.m_checkBox_UseSensorData->setChecked(m_pBCI->m_bUseSensorData);
@@ -215,7 +215,7 @@ void ssvepBCIWidget::initGui()
 
 //*************************************************************************************************************
 
-void ssvepBCIWidget::setGeneralOptions()
+void SsvepBciWidget::setGeneralOptions()
 {
 //    m_pBCI->m_bUseSensorData = ui.m_checkBox_UseSensorData->isChecked();
 //    m_pBCI->m_bUseSourceData = ui.m_checkBox_UseSourceData->isChecked();
@@ -230,7 +230,7 @@ void ssvepBCIWidget::setGeneralOptions()
 
 //*************************************************************************************************************
 
-void ssvepBCIWidget::setProcessingOptions()
+void SsvepBciWidget::setProcessingOptions()
 {
 //    m_pBCI->m_bSubtractMean = ui.m_checkBox_SubtractMean->isChecked();
 //    m_pBCI->m_dSlidingWindowSize = ui.m_doubleSpinBox_SlidingWindowSize->value();
@@ -251,7 +251,7 @@ void ssvepBCIWidget::setProcessingOptions()
 
 //*************************************************************************************************************
 
-void ssvepBCIWidget::changeLoadSensorBoundary()
+void SsvepBciWidget::changeLoadSensorBoundary()
 {
 //    QString path = QFileDialog::getOpenFileName(
 //                this,
@@ -270,7 +270,7 @@ void ssvepBCIWidget::changeLoadSensorBoundary()
 
 //*************************************************************************************************************
 
-void ssvepBCIWidget::changeLoadSourceBoundary()
+void SsvepBciWidget::changeLoadSourceBoundary()
 {
 //    QString path = QFileDialog::getOpenFileName(
 //                this,
@@ -358,7 +358,7 @@ void ssvepBCIWidget::changeLoadSourceBoundary()
 
 //*************************************************************************************************************
 
-void ssvepBCIWidget::setFeatureSelection()
+void SsvepBciWidget::setFeatureSelection()
 {
 //    QStringList ChosenFeaturesOnSensorLevel;
 //    for(int i=0; i< ui.m_listWidget_ChosenFeaturesOnSensorLevel->count(); i++)
@@ -375,7 +375,7 @@ void ssvepBCIWidget::setFeatureSelection()
 
 //*************************************************************************************************************
 
-void ssvepBCIWidget::setFilterOptions()
+void SsvepBciWidget::setFilterOptions()
 {
 //    m_pBCI->m_bUseFilter = ui.m_checkBox_UseFilter->isChecked();
 //    m_pBCI->m_dFilterLowerBound = ui.m_doubleSpinBox_FilterLowerBound->value();
@@ -387,7 +387,7 @@ void ssvepBCIWidget::setFilterOptions()
 
 //*************************************************************************************************************
 
-void ssvepBCIWidget::setClassificationOptions()
+void SsvepBciWidget::setClassificationOptions()
 {
 //    m_pBCI->m_iFeatureCalculationType = ui.m_comboBox_featureCalculationType->currentIndex();
 }
@@ -395,16 +395,16 @@ void ssvepBCIWidget::setClassificationOptions()
 
 //*************************************************************************************************************
 
-void ssvepBCIWidget::showAboutDialog()
+void SsvepBciWidget::showAboutDialog()
 {
-    ssvepBCIAboutWidget aboutDialog(this);
+    SsvepBciAboutWidget aboutDialog(this);
     aboutDialog.exec();
 }
 
 
 //*************************************************************************************************************
 
-bool ssvepBCIWidget::eventFilter(QObject *object, QEvent *event)
+bool SsvepBciWidget::eventFilter(QObject *object, QEvent *event)
 {
     Q_UNUSED(object)
     Q_UNUSED(event)

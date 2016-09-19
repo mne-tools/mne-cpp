@@ -62,7 +62,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ssvepBCIPlugin;
+using namespace SSVEPBCIPLUGIN;
 using namespace std;
 using namespace UTILSLIB;
 using namespace FSLIB;
@@ -72,7 +72,7 @@ using namespace FSLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ssvepBCI::ssvepBCI()
+SsvepBci::SsvepBci()
 : m_qStringResourcePath(qApp->applicationDirPath()+"/mne_scan_plugins/resources/ssvepbci/")
 , m_bProcessData(false)
 , m_dAlpha(0.25)
@@ -89,13 +89,13 @@ ssvepBCI::ssvepBCI()
     // Create configuration action bar item/button
     m_pActionBCIConfiguration = new QAction(QIcon(":/images/configuration.png"),tr("BCI configuration feature"),this);
     m_pActionBCIConfiguration->setStatusTip(tr("BCI configuration feature"));
-    connect(m_pActionBCIConfiguration, &QAction::triggered, this, &ssvepBCI::showBCIConfiguration);
+    connect(m_pActionBCIConfiguration, &QAction::triggered, this, &SsvepBci::showBCIConfiguration);
     addPluginAction(m_pActionBCIConfiguration);
 
     // Create start Stimuli action bar item/button
     m_pActionSetupStimulus = new QAction(QIcon(":/images/stimulus.png"),tr("setup stimulus feature"),this);
     m_pActionSetupStimulus->setStatusTip(tr("Setup stimulus feature"));
-    connect(m_pActionSetupStimulus, &QAction::triggered, this, &ssvepBCI::showSetupStimulus);
+    connect(m_pActionSetupStimulus, &QAction::triggered, this, &SsvepBci::showSetupStimulus);
     addPluginAction(m_pActionSetupStimulus);
 
 
@@ -111,7 +111,7 @@ ssvepBCI::ssvepBCI()
 
 //*************************************************************************************************************
 
-ssvepBCI::~ssvepBCI()
+SsvepBci::~SsvepBci()
 {
     //std::cout << "BCI::~BCI() " << std::endl;
 
@@ -123,26 +123,26 @@ ssvepBCI::~ssvepBCI()
 
 //*************************************************************************************************************
 
-QSharedPointer<IPlugin> ssvepBCI::clone() const
+QSharedPointer<IPlugin> SsvepBci::clone() const
 {
-    QSharedPointer<ssvepBCI> pSSVEPClone(new ssvepBCI());
+    QSharedPointer<SsvepBci> pSSVEPClone(new SsvepBci());
     return pSSVEPClone;
 }
 
 
 //*************************************************************************************************************
 
-void ssvepBCI::init()
+void SsvepBci::init()
 {
     m_bIsRunning = false;
 
     // Inputs - Source estimates and sensor level
     m_pRTSEInput = PluginInputData<RealTimeSourceEstimate>::create(this, "BCIInSource", "BCI source input data");
-    connect(m_pRTSEInput.data(), &PluginInputConnector::notify, this, &ssvepBCI::updateSource, Qt::DirectConnection);
+    connect(m_pRTSEInput.data(), &PluginInputConnector::notify, this, &SsvepBci::updateSource, Qt::DirectConnection);
     m_inputConnectors.append(m_pRTSEInput);
 
     m_pRTMSAInput = PluginInputData<NewRealTimeMultiSampleArray>::create(this, "BCIInSensor", "SourceLab sensor input data");
-    connect(m_pRTMSAInput.data(), &PluginInputConnector::notify, this, &ssvepBCI::updateSensor, Qt::DirectConnection);
+    connect(m_pRTMSAInput.data(), &PluginInputConnector::notify, this, &SsvepBci::updateSensor, Qt::DirectConnection);
     m_inputConnectors.append(m_pRTMSAInput);
 
 //    // Output streams
@@ -188,7 +188,7 @@ void ssvepBCI::init()
 
 //*************************************************************************************************************
 
-void ssvepBCI::unload()
+void SsvepBci::unload()
 {
 
 }
@@ -196,7 +196,7 @@ void ssvepBCI::unload()
 
 //*************************************************************************************************************
 
-bool ssvepBCI::start()
+bool SsvepBci::start()
 {
 
     // Init debug output stream
@@ -224,7 +224,7 @@ bool ssvepBCI::start()
 
 //*************************************************************************************************************
 
-bool ssvepBCI::stop()
+bool SsvepBci::stop()
 {
     m_bIsRunning = false;
 
@@ -253,7 +253,7 @@ bool ssvepBCI::stop()
 
 //*************************************************************************************************************
 
-IPlugin::PluginType ssvepBCI::getType() const
+IPlugin::PluginType SsvepBci::getType() const
 {
     return _IAlgorithm;
 }
@@ -261,7 +261,7 @@ IPlugin::PluginType ssvepBCI::getType() const
 
 //*************************************************************************************************************
 
-QString ssvepBCI::getName() const
+QString SsvepBci::getName() const
 {
     return "SSVEP BCI EEG";
 }
@@ -269,9 +269,9 @@ QString ssvepBCI::getName() const
 
 //*************************************************************************************************************
 
-QWidget* ssvepBCI::setupWidget()
+QWidget* SsvepBci::setupWidget()
 {
-    ssvepBCIWidget* setupWidget = new ssvepBCIWidget(this);//widget is later destroyed by CentralWidget - so it has to be created everytime new
+    SsvepBciWidget* setupWidget = new SsvepBciWidget(this);//widget is later destroyed by CentralWidget - so it has to be created everytime new
 
     //init properties dialog
     setupWidget->initGui();
@@ -282,7 +282,7 @@ QWidget* ssvepBCI::setupWidget()
 
 //*************************************************************************************************************
 
-void ssvepBCI::updateSensor(SCMEASLIB::NewMeasurement::SPtr pMeasurement)
+void SsvepBci::updateSensor(SCMEASLIB::NewMeasurement::SPtr pMeasurement)
 {
     // initialize the sample array which will be filled with raw data
     QSharedPointer<NewRealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<NewRealTimeMultiSampleArray>();
@@ -333,7 +333,7 @@ void ssvepBCI::updateSensor(SCMEASLIB::NewMeasurement::SPtr pMeasurement)
 
 //*************************************************************************************************************
 
-void ssvepBCI::updateSource(SCMEASLIB::NewMeasurement::SPtr pMeasurement)
+void SsvepBci::updateSource(SCMEASLIB::NewMeasurement::SPtr pMeasurement)
 {
 
     QSharedPointer<RealTimeSourceEstimate> pRTSE = pMeasurement.dynamicCast<RealTimeSourceEstimate>();
@@ -390,7 +390,7 @@ void ssvepBCI::updateSource(SCMEASLIB::NewMeasurement::SPtr pMeasurement)
 
 //*************************************************************************************************************
 
-void ssvepBCI::clearClassifications()
+void SsvepBci::clearClassifications()
 {
     m_qMutex.lock();
         m_lIndexOfClassResultSensor.clear();
@@ -400,39 +400,39 @@ void ssvepBCI::clearClassifications()
 
 //*************************************************************************************************************
 
-void ssvepBCI::setNumClassHits(int numClassHits){
+void SsvepBci::setNumClassHits(int numClassHits){
     m_iNumberOfClassHits = numClassHits;
 }
 
 
 //*************************************************************************************************************
 
-void ssvepBCI::setNumClassBreaks(int numClassBreaks){
+void SsvepBci::setNumClassBreaks(int numClassBreaks){
     m_iNumberOfClassBreaks = numClassBreaks;
 }
 
 //*************************************************************************************************************
 
-void  ssvepBCI::setChangeSSVEPParameterFlag(){
+void  SsvepBci::setChangeSSVEPParameterFlag(){
     m_bChangeSSVEPParameterFlag = true;
 }
 
 
 //*************************************************************************************************************
 
-void ssvepBCI::setSizeClassList(int classListSize){
+void SsvepBci::setSizeClassList(int classListSize){
     m_iClassListSize = classListSize;
 }
 
 //*************************************************************************************************************
 
-QString ssvepBCI::getSSVEPBCIResourcePath(){
+QString SsvepBci::getSsvepBciResourcePath(){
     return m_qStringResourcePath;
 }
 
 //*************************************************************************************************************
 
-bool ssvepBCI::lookForTrigger(const MatrixXd &data)
+bool SsvepBci::lookForTrigger(const MatrixXd &data)
 {
     // Check if capacitive touch trigger signal was received - Note that there can also be "beep" triggers in the received data, which are only 1 sample wide -> therefore look for 2 samples with a value of 254 each
     for(int i = 0; i<data.cols()-1; i++)
@@ -447,25 +447,25 @@ bool ssvepBCI::lookForTrigger(const MatrixXd &data)
 
 //*************************************************************************************************************
 
-void ssvepBCI::showSetupStimulus()
+void SsvepBci::showSetupStimulus()
 {
     QDesktopWidget Desktop; // Desktop Widget for getting the number of accessible screens
 
     if(Desktop.numScreens()> 1){
         // Open setup stimulus widget
-        if(m_pssvepBCISetupStimulusWidget == NULL)
-            m_pssvepBCISetupStimulusWidget = QSharedPointer<ssvepBCISetupStimulusWidget>(new ssvepBCISetupStimulusWidget(this));
+        if(m_pSsvepBciSetupStimulusWidget == NULL)
+            m_pSsvepBciSetupStimulusWidget = QSharedPointer<SsvepBciSetupStimulusWidget>(new SsvepBciSetupStimulusWidget(this));
 
-        if(!m_pssvepBCISetupStimulusWidget->isVisible()){
+        if(!m_pSsvepBciSetupStimulusWidget->isVisible()){
 
-            m_pssvepBCISetupStimulusWidget->setWindowTitle("ssvepBCI - Setup Stimulus");
-            //m_pssvepBCISetupStimulusWidget->initGui();
-            m_pssvepBCISetupStimulusWidget->show();
-            m_pssvepBCISetupStimulusWidget->raise();
+            m_pSsvepBciSetupStimulusWidget->setWindowTitle("ssvepBCI - Setup Stimulus");
+            //m_pSsvepBciSetupStimulusWidget->initGui();
+            m_pSsvepBciSetupStimulusWidget->show();
+            m_pSsvepBciSetupStimulusWidget->raise();
         }
 
         //sets Window to the foreground and activates it for editing
-        m_pssvepBCISetupStimulusWidget->activateWindow();
+        m_pSsvepBciSetupStimulusWidget->activateWindow();
     }
     else{
         QMessageBox msgBox;
@@ -479,27 +479,27 @@ void ssvepBCI::showSetupStimulus()
 
 //*************************************************************************************************************
 
-void ssvepBCI::showBCIConfiguration()
+void SsvepBci::showBCIConfiguration()
 {
     // Open setup stimulus widget
-    if(m_pssvepBCIConfigurationWidget == NULL)
-        m_pssvepBCIConfigurationWidget = QSharedPointer<ssvepBCIConfigurationWidget>(new ssvepBCIConfigurationWidget(this));
+    if(m_pSsvepBciConfigurationWidget == NULL)
+        m_pSsvepBciConfigurationWidget = QSharedPointer<SsvepBciConfigurationWidget>(new SsvepBciConfigurationWidget(this));
 
-    if(!m_pssvepBCIConfigurationWidget->isVisible()){
+    if(!m_pSsvepBciConfigurationWidget->isVisible()){
 
-        m_pssvepBCIConfigurationWidget->setWindowTitle("ssvepBCI - Configuration");
-        m_pssvepBCIConfigurationWidget->show();
-        m_pssvepBCIConfigurationWidget->raise();
+        m_pSsvepBciConfigurationWidget->setWindowTitle("ssvepBCI - Configuration");
+        m_pSsvepBciConfigurationWidget->show();
+        m_pSsvepBciConfigurationWidget->raise();
     }
 
     //sets Window to the foreground and activates it for editing
-    m_pssvepBCIConfigurationWidget->activateWindow();
+    m_pSsvepBciConfigurationWidget->activateWindow();
 }
 
 
 //*************************************************************************************************************
 
-void ssvepBCI::removePowerLine(bool removePowerLine){
+void SsvepBci::removePowerLine(bool removePowerLine){
     m_qMutex.lock();
     m_bRemovePowerLine = removePowerLine;
     m_qMutex.unlock();
@@ -508,7 +508,7 @@ void ssvepBCI::removePowerLine(bool removePowerLine){
 
 //*************************************************************************************************************
 
-void ssvepBCI::setPowerLine(int powerLine){
+void SsvepBci::setPowerLine(int powerLine){
     m_qMutex.lock();
     m_iPowerLine = powerLine;
     m_qMutex.unlock();
@@ -517,7 +517,7 @@ void ssvepBCI::setPowerLine(int powerLine){
 
 //*************************************************************************************************************
 
-void ssvepBCI::setFeatureExtractionMethod(bool useMEC){
+void SsvepBci::setFeatureExtractionMethod(bool useMEC){
     m_qMutex.lock();
     m_bUseMEC = useMEC;
     m_qMutex.unlock();
@@ -526,19 +526,19 @@ void ssvepBCI::setFeatureExtractionMethod(bool useMEC){
 
 //*************************************************************************************************************
 
-void ssvepBCI::changeSSVEPParameter(){
+void SsvepBci::changeSSVEPParameter(){
 
     // update frequency list from setup stimulus widget if activated
-    if(m_pssvepBCISetupStimulusWidget)
-        setFrequencyList(m_pssvepBCISetupStimulusWidget->getFrequencies());
+    if(m_pSsvepBciSetupStimulusWidget)
+        setFrequencyList(m_pSsvepBciSetupStimulusWidget->getFrequencies());
 
-    if(m_pssvepBCIConfigurationWidget){
+    if(m_pSsvepBciConfigurationWidget){
 
         // update number of harmonics of reference signal
-        m_iNumberOfHarmonics = 1 + m_pssvepBCIConfigurationWidget->getNumOfHarmonics();
+        m_iNumberOfHarmonics = 1 + m_pSsvepBciConfigurationWidget->getNumOfHarmonics();
 
         // update channel select
-        QStringList channelSelectSensor =  m_pssvepBCIConfigurationWidget->getSensorChannelSelection();
+        QStringList channelSelectSensor =  m_pSsvepBciConfigurationWidget->getSensorChannelSelection();
         if(channelSelectSensor.size() > 0){
 
             // update the list of selected channels
@@ -569,26 +569,26 @@ void ssvepBCI::changeSSVEPParameter(){
 
 //*************************************************************************************************************
 
-void ssvepBCI::setThresholdValues(MyQList thresholds){
+void SsvepBci::setThresholdValues(MyQList thresholds){
     m_lThresholdValues = thresholds;
 }
 
 
 //*************************************************************************************************************
 
-void ssvepBCI::run(){
+void SsvepBci::run(){
     while(m_bIsRunning){
 
         if(m_bUseSensorData)
         {
 //            QElapsedTimer timer;
 //            timer.start();
-            ssvepBCIOnSensor();
+            ssvepBciOnSensor();
 //            qDebug() << "ssvepBCI::run - ssvepBCIOnSensor() took" << timer.elapsed();
         }
         else
         {
-            ssvepBCIOnSource();
+            ssvepBciOnSource();
         }
     }
 }
@@ -596,7 +596,7 @@ void ssvepBCI::run(){
 
 //*************************************************************************************************************
 
-void ssvepBCI::setFrequencyList(QList<double> frequencyList)
+void SsvepBci::setFrequencyList(QList<double> frequencyList)
 {
     if(!frequencyList.isEmpty()){
 
@@ -618,14 +618,14 @@ void ssvepBCI::setFrequencyList(QList<double> frequencyList)
 
 //*************************************************************************************************************
 
-QList<double> ssvepBCI::getCurrentListOfFrequencies(){
+QList<double> SsvepBci::getCurrentListOfFrequencies(){
     return m_lDesFrequencies;
 }
 
 
 //*************************************************************************************************************
 
-double ssvepBCI::MEC(MatrixXd &Y, MatrixXd &X)
+double SsvepBci::MEC(MatrixXd &Y, MatrixXd &X)
 {
 
     // Remove SSVEP harmonic frequencies
@@ -668,7 +668,7 @@ double ssvepBCI::MEC(MatrixXd &Y, MatrixXd &X)
 
 //*************************************************************************************************************
 
-double ssvepBCI::CCA(MatrixXd &Y, MatrixXd &X)
+double SsvepBci::CCA(MatrixXd &Y, MatrixXd &X)
 {
     // CCA parameter
     int n  = X.rows();
@@ -698,7 +698,7 @@ double ssvepBCI::CCA(MatrixXd &Y, MatrixXd &X)
 
 //*************************************************************************************************************
 
-void ssvepBCI::readFromSlidingTimeWindow(MatrixXd &data)
+void SsvepBci::readFromSlidingTimeWindow(MatrixXd &data)
 {
     data.resize(m_matSlidingTimeWindow.rows(), m_iWindowSize*m_iReadSampleSize);
     // consider matrix overflow case
@@ -718,7 +718,7 @@ void ssvepBCI::readFromSlidingTimeWindow(MatrixXd &data)
 
 //*************************************************************************************************************
 
-void ssvepBCI::ssvepBCIOnSensor()
+void SsvepBci::ssvepBciOnSensor()
 {
 
     // Wait for fiff Info if not yet received - this is needed because we have to wait until the buffers are firstly initiated in the update functions
@@ -882,7 +882,7 @@ void ssvepBCI::ssvepBCIOnSensor()
 
 //*************************************************************************************************************
 
-void ssvepBCI::ssvepBCIOnSource(){
+void SsvepBci::ssvepBciOnSource(){
 
 
 }

@@ -59,7 +59,7 @@
 // DEFINE NAMESPACE ssvepBCIScreen
 //=============================================================================================================
 
-namespace ssvepBCIPlugin
+namespace SSVEPBCIPLUGIN
 {
 
 //*************************************************************************************************************
@@ -74,9 +74,9 @@ typedef  QList<double>  MyQList;
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class ssvepBCI;
-class ssvepBCISetupStimulusWidget;
-class ssvepBCIScreen;
+class SsvepBci;
+class SsvepBciSetupStimulusWidget;
+class SsvepBciScreen;
 
 //=============================================================================================================
 
@@ -89,7 +89,7 @@ class ScreenKeyboard : public QObject
     Q_OBJECT
 
 public:
-    ScreenKeyboard(QSharedPointer<ssvepBCI> pSSVEPBCI, QSharedPointer<ssvepBCISetupStimulusWidget> pSSVEPBCISetupStimulusWidget, QSharedPointer<ssvepBCIScreen> pSSVEPBCIScreen);
+    ScreenKeyboard(QSharedPointer<SsvepBci> pSsvepBci, QSharedPointer<SsvepBciSetupStimulusWidget> pSsvepBciSetupStimulusWidget, QSharedPointer<SsvepBciScreen> pSsvepBciScreen);
 
     ~ScreenKeyboard();
 
@@ -114,12 +114,12 @@ public slots:
     void stopSpellAccuracyFeature();
 
 private:
-    QSharedPointer<ssvepBCI>                        m_pSSVEPBCI;                        /**< pointer to the ssvepBCI class */
-    QSharedPointer<ssvepBCISetupStimulusWidget>     m_pSSVEPBCISetupStimulusWidget;     /**< pointer to ssvepBCISetupStimulusWidget class */
-    QSharedPointer<ssvepBCIScreen>                  m_pSSVEPBCIScreen;                  /**< holds the pointer to the ssvepBCIScreen class */
+    QSharedPointer<SsvepBci>                        m_pSsvepBci;                        /**< pointer to the SsvepBci class */
+    QSharedPointer<SsvepBciSetupStimulusWidget>     m_pSsvepBciSetupStimulusWidget;     /**< pointer to SsvepBciSetupStimulusWidget class */
+    QSharedPointer<SsvepBciScreen>                  m_pSsvepBciScreen;                  /**< holds the pointer to the SsvepBciScreen class */
 
     // displaying
-    QPainter                                m_qPainter;             /**< Painter, holding paint device of ssvepBCIScreen class */
+    QPainter                                m_qPainter;             /**< Painter, holding paint device of SsvepBciScreen class */
     QMap<QPair<int, int>, QString>          m_mapKeys;              /**< QMap, holding the key-values and according coordinates */
     QPair<int, int>                         m_qCurCursorCoord;      /**< current cursor coordinates */
     QPair<int, int>                         m_qOldCursorCoord;      /**< old cursor coordinates */
@@ -132,7 +132,7 @@ private:
     bool                                    m_bDisplaySpeller;      /**< flag for displaying speller panel */
     bool                                    m_bUseSpellAccuracy;    /**< flag for determine the spell accuracy */
     QString                                 m_sSettledPhrase;       /**< phrase established by the UI */
-    QString                                 m_sSpelledPhrase;       /**< phrase spelled by the user with the SSVEPBCI */
+    QString                                 m_sSpelledPhrase;       /**< phrase spelled by the user with the SsvepBci */
     QString::Iterator                       m_qSpellIterator;       /**< iterator for spelling */
     QMediaPlayer                           *m_qSound;               /**< sound-object for emiting audio feedback */
 

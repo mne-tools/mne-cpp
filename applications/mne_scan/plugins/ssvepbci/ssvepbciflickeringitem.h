@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     ssvepBCIFlickeringItem.h
+* @file     ssvepbciflickeringitem.h
 * @author   Viktor Klüber <viktor.klueber@tu-ilmenau.de>;
 *           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
@@ -31,12 +31,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the ssvepBCIFlickeringItem class.
+* @brief    Contains the declaration of the SsvepBciFlickeringItem class.
 *
 */
 
-#ifndef SSVEPBCIFLICKERINGITEM_H
-#define SSVEPBCIFLICKERINGITEM_H
+#ifndef SsvepBciFLICKERINGITEM_H
+#define SsvepBciFLICKERINGITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -51,36 +51,36 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE ssvepBCIScreen
+// DEFINE NAMESPACE SsvepBciScreen
 //=============================================================================================================
 
-namespace ssvepBCIPlugin
+namespace SSVEPBCIPLUGIN
 {
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS ssvepBCIFlickeringItem
+* DECLARE CLASS SsvepBciFlickeringItem
 *
-* @brief ssvepBCIFlickeringItem provices declaration and definition of flickering items which can be attached
-* to ssvepbciscreen
+* @brief SsvepBciFlickeringItem provices declaration and definition of flickering items which can be attached
+* to SsvepBciscreen
 */
-class ssvepBCIFlickeringItem
+class SsvepBciFlickeringItem
 {
 public:   
     int                 m_iFreqKey;     /**< getting the adjusted key of the frquency */
 
     //=========================================================================================================
     /**
-    * constructs a ssvepBCIFlickeringItem object
+    * constructs a SsvepBciFlickeringItem object
     */
-    ssvepBCIFlickeringItem();
+    SsvepBciFlickeringItem();
 
     //=========================================================================================================
     /**
-    * destroys the ssvepBCIFlickeringItem object
+    * destroys the SsvepBciFlickeringItem object
     */
-    ~ssvepBCIFlickeringItem();
+    ~SsvepBciFlickeringItem();
 
     //=========================================================================================================
     /**

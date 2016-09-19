@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>ssvepBCISetupClass</class>
- <widget class="QWidget" name="ssvepBCISetupClass">
+ <class>SsvepBciSetupClass</class>
+ <widget class="QWidget" name="SsvepBciSetupClass">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -68,7 +68,7 @@
          <string/>
         </property>
         <property name="pixmap">
-         <pixmap resource="../ssvepbci.qrc">:/logos/logos.png</pixmap>
+         <pixmap resource="../../eegosports/eegosports.qrc">:/logos/logos.png</pixmap>
         </property>
        </widget>
       </item>
@@ -142,7 +142,7 @@
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>
-  <include location="../ssvepbci.qrc"/>
+  <include location="../../eegosports/eegosports.qrc"/>
  </resources>
  <connections/>
 </ui>

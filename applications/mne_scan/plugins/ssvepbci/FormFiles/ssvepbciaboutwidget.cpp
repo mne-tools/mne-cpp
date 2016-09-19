@@ -54,7 +54,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ssvepBCIPlugin;
+using namespace SSVEPBCIPLUGIN;
 
 
 //*************************************************************************************************************
@@ -62,7 +62,7 @@ using namespace ssvepBCIPlugin;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ssvepBCIAboutWidget::ssvepBCIAboutWidget(QWidget *parent)
+SsvepBciAboutWidget::SsvepBciAboutWidget(QWidget *parent)
 : QDialog(parent)
 {
     ui.setupUi(this);
@@ -71,7 +71,7 @@ ssvepBCIAboutWidget::ssvepBCIAboutWidget(QWidget *parent)
 
 //*************************************************************************************************************
 
-ssvepBCIAboutWidget::~ssvepBCIAboutWidget()
+SsvepBciAboutWidget::~SsvepBciAboutWidget()
 {
 
 }

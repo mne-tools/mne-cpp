@@ -77,7 +77,7 @@
 // DEFINE NAMESPACE TMSIPlugin
 //=============================================================================================================
 
-namespace ssvepBCIPlugin
+namespace SSVEPBCIPLUGIN
 {
 
 //*************************************************************************************************************
@@ -106,7 +106,7 @@ using namespace std;
 *
 * @brief The BCI class provides an EEG BCI.
 */
-class SSVEPBCISHARED_EXPORT ssvepBCI : public IAlgorithm
+class SSVEPBCISHARED_EXPORT SsvepBci : public IAlgorithm
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "mne_scan/1.0" FILE "ssvepbci.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
@@ -115,22 +115,22 @@ class SSVEPBCISHARED_EXPORT ssvepBCI : public IAlgorithm
 
     friend class BCISetupWidget;
     friend class BCIFeatureWindow;
-    friend class ssvepBCISetupStimulusWidget;
-    friend class ssvepBCIConfigurationWidget;
-    friend class ssvepBCIWidget;
+    friend class SsvepBciSetupStimulusWidget;
+    friend class SsvepBciConfigurationWidget;
+    friend class SsvepBciWidget;
 
 public:
     //=========================================================================================================
     /**
     * Constructs a BCI.
     */
-    ssvepBCI();
+    SsvepBci();
 
     //=========================================================================================================
     /**
     * Destroys the BCI.
     */
-    virtual ~ssvepBCI();
+    virtual ~SsvepBci();
 
     //=========================================================================================================
     /**
@@ -191,7 +191,7 @@ public:
     * retruns the ssvep BCI resource path
     *
     */
-    QString getSSVEPBCIResourcePath();
+    QString getSsvepBciResourcePath();
 
 
 protected:
@@ -265,14 +265,14 @@ protected:
     * executing the ssvep BCI algorithm on sensor level
     *
     */
-    void ssvepBCIOnSensor();
+    void ssvepBciOnSensor();
 
     //=========================================================================================================
     /**
     * executing the ssvep BCI algorithm on source level
     *
     */
-    void ssvepBCIOnSource();
+    void ssvepBciOnSource();
 
 public slots:
     void removePowerLine(bool removePowerLine);
@@ -293,8 +293,8 @@ private:
     QAction*                                            m_pActionBCIConfiguration;          /**< start configuration feature */
     QAction*                                            m_pActionSetupStimulus;             /**< starts stimulus feature */
 
-    QSharedPointer<ssvepBCIConfigurationWidget>         m_pssvepBCIConfigurationWidget;     /**< hold pointer to Widget for BCI configuration */
-    QSharedPointer<ssvepBCISetupStimulusWidget>         m_pssvepBCISetupStimulusWidget;     /**< Widget for stimulus setup */
+    QSharedPointer<SsvepBciConfigurationWidget>         m_pSsvepBciConfigurationWidget;     /**< hold pointer to Widget for BCI configuration */
+    QSharedPointer<SsvepBciSetupStimulusWidget>         m_pSsvepBciSetupStimulusWidget;     /**< Widget for stimulus setup */
 
     PluginInputData<NewRealTimeMultiSampleArray>::SPtr  m_pRTMSAInput;          /**< The RealTimeMultiSampleArray input.*/
     PluginInputData<RealTimeSourceEstimate>::SPtr       m_pRTSEInput;           /**< The RealTimeSourceEstimate input.*/

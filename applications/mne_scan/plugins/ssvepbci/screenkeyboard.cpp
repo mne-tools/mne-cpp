@@ -55,18 +55,18 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ssvepBCIPlugin;
+using namespace SSVEPBCIPLUGIN;
 
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ScreenKeyboard::ScreenKeyboard(QSharedPointer<ssvepBCI> pSSVEPBCI, QSharedPointer<ssvepBCISetupStimulusWidget> pSSVEPBCISetupStimulusWidget, QSharedPointer<ssvepBCIScreen> pSSVEPBCIScreen)
-: m_pSSVEPBCI(pSSVEPBCI)
-, m_pSSVEPBCISetupStimulusWidget(pSSVEPBCISetupStimulusWidget)
-, m_pSSVEPBCIScreen(pSSVEPBCIScreen)
-, m_qPainter(m_pSSVEPBCIScreen.data())
+ScreenKeyboard::ScreenKeyboard(QSharedPointer<SsvepBci> pSsvepBci, QSharedPointer<SsvepBciSetupStimulusWidget> pSsvepBciSetupStimulusWidget, QSharedPointer<SsvepBciScreen> pSsvepBciScreen)
+: m_pSsvepBci(pSsvepBci)
+, m_pSsvepBciSetupStimulusWidget(pSsvepBciSetupStimulusWidget)
+, m_pSsvepBciScreen(pSsvepBciScreen)
+, m_qPainter(m_pSsvepBciScreen.data())
 , m_qCurCursorCoord(QPair<int, int> (0,0))
 , m_qOldCursorCoord(QPair<int, int> (1,0))
 , m_bDisplaySpeller(false)
@@ -111,14 +111,14 @@ ScreenKeyboard::ScreenKeyboard(QSharedPointer<ssvepBCI> pSSVEPBCI, QSharedPointe
 
     m_lClassList << 6.66 << 7.5 << 8.57 << 10 << 12;
 
-    m_pSSVEPBCIScreen->update();
+    m_pSsvepBciScreen->update();
 
     // connect ssvepBCI signals to the screen keyboard
-    connect(m_pSSVEPBCI.data(), &ssvepBCI::getFrequencyLabels, this, &ScreenKeyboard::updateClassList);
-    connect(m_pSSVEPBCI.data(), &ssvepBCI::classificationResult, this, &ScreenKeyboard::updateCommand);
+    connect(m_pSsvepBci.data(), &SsvepBci::getFrequencyLabels, this, &ScreenKeyboard::updateClassList);
+    connect(m_pSsvepBci.data(), &SsvepBci::classificationResult, this, &ScreenKeyboard::updateCommand);
 
     // connect SSVEPBCI speller
-    connect(m_pSSVEPBCISetupStimulusWidget.data(), &ssvepBCISetupStimulusWidget::settledPhrase, this, &ScreenKeyboard::setPhrase);
+    connect(m_pSsvepBciSetupStimulusWidget.data(), &SsvepBciSetupStimulusWidget::settledPhrase, this, &ScreenKeyboard::setPhrase);
 
     m_qSound->setMedia(QUrl("qrc:/sounds/beep.mp3"));
 }
@@ -138,9 +138,9 @@ void ScreenKeyboard::paint(QPaintDevice *device){
     QPainter painter(device);
 
     // declare center of screen and width of letter boxes
-    int width = int(0.08*m_pSSVEPBCIScreen.data()->height());
-    int x = int(0.5*m_pSSVEPBCIScreen.data()->width() - 0.5*width);
-    int y = int(0.5*m_pSSVEPBCIScreen.data()->height() - 0.5*width);
+    int width = int(0.08*m_pSsvepBciScreen.data()->height());
+    int x = int(0.5*m_pSsvepBciScreen.data()->width() - 0.5*width);
+    int y = int(0.5*m_pSsvepBciScreen.data()->height() - 0.5*width);
 
     // draw screen keyboard
     if(m_bInitializeKeyboard){
@@ -223,9 +223,9 @@ void ScreenKeyboard::paint(QPaintDevice *device){
         }
 
         // setting speller box parameter
-        int heightSpBox = 0.1* m_pSSVEPBCIScreen.data()->height() ;
-        int widthSpBox = 0.3* m_pSSVEPBCIScreen.data()->width() ;
-        QRect rectSpBox = QRect(0,m_pSSVEPBCIScreen.data()->height() - heightSpBox, widthSpBox, heightSpBox);
+        int heightSpBox = 0.1* m_pSsvepBciScreen.data()->height() ;
+        int widthSpBox = 0.3* m_pSsvepBciScreen.data()->width() ;
+        QRect rectSpBox = QRect(0,m_pSsvepBciScreen.data()->height() - heightSpBox, widthSpBox, heightSpBox);
 
         // drawing speller box
         painter.setBrush(Qt::white);

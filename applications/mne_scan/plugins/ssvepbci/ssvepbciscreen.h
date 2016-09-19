@@ -61,7 +61,7 @@
 // DEFINE NAMESPACE ssvepBCIScreen
 //=============================================================================================================
 
-namespace ssvepBCIPlugin
+namespace SSVEPBCIPLUGIN
 {
 
 //*************************************************************************************************************
@@ -76,36 +76,36 @@ typedef  QList<double>  MyQList;
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class ssvepBCI;
-class ssvepBCISetupStimulusWidget;
+class SsvepBci;
+class SsvepBciSetupStimulusWidget;
 
 //=============================================================================================================
 /**
-* DECLARE CLASS ssvepBCIScreen
+* DECLARE CLASS SsvepBciScreen
 *
-* @brief The ssvepBCIScreen class provides the subject screen. Contains the list of items which will be painted
+* @brief The SsvepBciScreen class provides the subject screen. Contains the list of items which will be painted
 * to screen automatically
 */
-class ssvepBCIScreen : public QOpenGLWidget
+class SsvepBciScreen : public QOpenGLWidget
 {
     Q_OBJECT
 
-    friend class ssvepBCISetupStimulusWidget;           /**< permit ssvepBCISetupStimulusWidget getting full access */
+    friend class SsvepBciSetupStimulusWidget;           /**< permit SsvepBciSetupStimulusWidget getting full access */
 
 public:
     //=========================================================================================================
     /**
-     * constructs the ssvepBCIScreen object
+     * constructs the SsvepBciScreen object
      *
      */
-    ssvepBCIScreen(QSharedPointer<ssvepBCI> pSSVEPBCI, QSharedPointer<ssvepBCISetupStimulusWidget> pSSVEPBCISetupStimulusWidget, QOpenGLWidget *parent = 0 );
+    SsvepBciScreen(QSharedPointer<SsvepBci> pSsvepBci, QSharedPointer<SsvepBciSetupStimulusWidget> pSsvepBciSetupStimulusWidget, QOpenGLWidget *parent = 0 );
 
     //=========================================================================================================
     /**
-     * deconstructs the ssvepBCIScreen object
+     * deconstructs the SsvepBciScreen object
      *
      */
-    ~ssvepBCIScreen();
+    ~SsvepBciScreen();
 
 public slots:
     void setClassResults(double classResult);
@@ -115,11 +115,11 @@ public slots:
 
 
 private:
-    QSharedPointer<ssvepBCI>                        m_pSSVEPBCI;                        /**< pointer to referring SSVEPBCI class */
-    QSharedPointer<ssvepBCISetupStimulusWidget>     m_pSSVEPBCISetupStimulusWidget;     /**< pointer to referring SSVEPBCISetupStimulusWidget class */
+    QSharedPointer<SsvepBci>                        m_pSsvepBci;                        /**< pointer to referring SsvepBci class */
+    QSharedPointer<SsvepBciSetupStimulusWidget>     m_pSsvepBciSetupStimulusWidget;     /**< pointer to referring SsvepBciSetupStimulusWidget class */
 
     // draw items
-    QList<ssvepBCIFlickeringItem>   m_Items;            /**< QList containing all flickering Items to be painted */
+    QList<SsvepBciFlickeringItem>   m_Items;            /**< QList containing all flickering Items to be painted */
     QSharedPointer<ScreenKeyboard>  m_pScreenKeyboard;   /**< pointer that holds the Screen-keyboard */
 
 

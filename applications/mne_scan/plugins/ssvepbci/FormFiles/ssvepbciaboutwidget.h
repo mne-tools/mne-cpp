@@ -57,10 +57,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE SSVEPBCIPlugin
+// DEFINE NAMESPACE SSVEPBCIPLUGIN
 //=============================================================================================================
 
-namespace ssvepBCIPlugin
+namespace SSVEPBCIPLUGIN
 {
 
 
@@ -78,11 +78,11 @@ namespace ssvepBCIPlugin
 
 //=============================================================================================================
 /**
-* DECLARE CLASS ssvepBCIAboutWidget
+* DECLARE CLASS SsvepBciAboutWidget
 *
 * @brief The BCIAboutWidget class provides the about dialog for the BCI.
 */
-class ssvepBCIAboutWidget : public QDialog
+class SsvepBciAboutWidget : public QDialog
 {
     Q_OBJECT
 
@@ -94,14 +94,14 @@ public:
     *
     * @param [in] parent pointer to parent widget; If parent is 0, the new BCIAboutWidget becomes a window. If parent is another widget, BCIAboutWidget becomes a child window inside parent. TMSIAboutWidget is deleted when its parent is deleted.
     */
-    ssvepBCIAboutWidget(QWidget *parent = 0);
+    SsvepBciAboutWidget(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
     * Destroys the BCIAboutWidget.
     * All BCIAboutWidget's children are deleted first. The application exits if BCIAboutWidget is the main widget.
     */
-    ~ssvepBCIAboutWidget();
+    ~SsvepBciAboutWidget();
 
 private:
     Ui::BCIAboutWidgetClass ui;    /**< Holds the user interface for the BCIAboutWidgetClass.*/
