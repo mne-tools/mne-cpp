@@ -231,7 +231,7 @@ int main(int argc, char *argv[])
 
     bool bMakeSymmetrical;
     bMakeSymmetrical = false;       //bMakeSymmetrical option: false means data is unchanged, true means histogram x axis is symmetrical to the right and left
-    int classAmount = 50;           //initialize the amount of classes and class frequencies
+    int classAmount = 10;           //initialize the amount of classes and class frequencies
     double inputGlobalMin = 0.0,
            inputGlobalMax = 0.0;
     Eigen::VectorXd resultClassLimit;
@@ -257,14 +257,10 @@ int main(int argc, char *argv[])
 
     QTime myTimerHistogram;
     myTimerHistogram.start();
-//    displayObj->setData(resultClassLimit, resultFrequency, precision);
-//    QVector3D thresholdLines1(9.0e-21, 19.0e-21, 20.0e-21);
-//    displayObj->setThreshold(thresholdLines1);
-//    qDebug() << "debug before new setdata";
-
     displayObj->setData(resultClassLimit, resultFrequency, precision);
-    //QVector3D thresholdLines2(-0.51e-6, 0.5e-6, 0.9e-6);
-    //displayObj->setThreshold(thresholdLines2);
+    QVector3D thresholdLines1(2.1e-10, 5.0e-8, 6.0e-7);
+    displayObj->setThreshold(thresholdLines1);
+
     qDebug()<<"Histogram timer:"<<myTimerHistogram.elapsed();
 
     displayObj->resize(800,600);
