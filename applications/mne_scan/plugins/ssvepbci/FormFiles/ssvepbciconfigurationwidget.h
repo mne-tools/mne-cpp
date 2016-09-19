@@ -64,10 +64,10 @@
 //=============================================================================================================
 
 namespace Ui {
-class ssvepBCIConfigurationWidget;
+class SsvepBciConfigurationWidget;
 }
 
-namespace ssvepBCIPlugin
+namespace SSVEPBCIPLUGIN
 {
 
 //*************************************************************************************************************
@@ -82,7 +82,7 @@ typedef  QList<double>  MyQList;
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class ssvepBCI;
+class SsvepBci;
 
 
 //=============================================================================================================
@@ -91,7 +91,7 @@ class ssvepBCI;
 *
 * @brief The EEGoSportsSetupStimulusWidget class provides the EEGoSportsSetupStimulusWidget configuration window.
 */
-class ssvepBCIConfigurationWidget : public QDialog
+class SsvepBciConfigurationWidget : public QDialog
 {
     Q_OBJECT
 
@@ -103,14 +103,14 @@ public:
     * @param [in] parent pointer to parent widget; If parent is 0, the new EEGoSportsSetupStimulusWidget becomes a window. If parent is another widget, EEGoSportsSetupStimulusWidget becomes a child window inside parent. EEGoSportsSetupStimulusWidget is deleted when its parent is deleted.
     * @param [in] pEEGoSports a pointer to the corresponding ECGSimulator.
     */
-    explicit ssvepBCIConfigurationWidget(ssvepBCI* pssvepBCI, QWidget *parent = 0);
+    explicit SsvepBciConfigurationWidget(SsvepBci* pSsvepBci, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
     * Destructs a EEGoSportsSetupStimulusWidget which is a child of parent.
     *
     */
-    ~ssvepBCIConfigurationWidget();
+    ~SsvepBciConfigurationWidget();
 
     //=========================================================================================================
     /**
@@ -191,13 +191,13 @@ signals:
     void changeSSVEPParameter();
 
 private:
-    Ui::ssvepBCIConfigurationWidget        *ui;                     /**< pointer to corresponding user interface */
-    ssvepBCI                               *m_pSSVEPBCI;            /**< a pointer to corresponding ssvepBCI class */
+    Ui::SsvepBciConfigurationWidget        *ui;                     /**< pointer to corresponding user interface */
+    SsvepBci                               *m_pSsvepBci;            /**< a pointer to corresponding SsvepBci class */
 
     QStringList                             m_vAvailableChannelsSensor;                 /**< QStringList holding available features to select on sensor level (electrodes).*/
     double                                  m_dMinProbValue;                            /**< minimum border for SSVEP visualization with a status bar */
     double                                  m_dMaxProbValue;                            /**< maximum border for SSVEP visualization with a status bar */
-    bool                                    m_bInitThresholdDisplay;                    /**< flag for first run and so initializing ssvepBCIConfigurationWidget-Class */
+    bool                                    m_bInitThresholdDisplay;                    /**< flag for first run and so initializing SsvepBciConfigurationWidget-Class */
     QList<double>                           m_lSSVEPThresholdValues;                    /**< contains the threshold values for SSVEP classifiaction */
     QList<double>                           m_lFrequencyList;                           /**< list of desired frequencies */
     QPalette                                m_palBlackFont;                             /**< setting black font for group box */

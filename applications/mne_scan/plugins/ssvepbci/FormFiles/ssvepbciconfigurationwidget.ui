@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>ssvepBCIConfigurationWidget</class>
- <widget class="QDialog" name="ssvepBCIConfigurationWidget">
+ <class>SsvepBciConfigurationWidget</class>
+ <widget class="QDialog" name="SsvepBciConfigurationWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>1165</width>
-    <height>653</height>
+    <height>672</height>
    </rect>
   </property>
   <property name="windowTitle">

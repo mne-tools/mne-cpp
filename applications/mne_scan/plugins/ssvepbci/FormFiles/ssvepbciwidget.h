@@ -60,7 +60,7 @@
 // DEFINE NAMESPACE TMSIPlugin
 //=============================================================================================================
 
-namespace ssvepBCIPlugin
+namespace SSVEPBCIPLUGIN
 {
 
 
@@ -69,7 +69,7 @@ namespace ssvepBCIPlugin
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class ssvepBCI;
+class SsvepBci;
 
 
 //=============================================================================================================
@@ -78,7 +78,7 @@ class ssvepBCI;
 *
 * @brief The TMSISetupWidget class provides the TMSI configuration window.
 */
-class ssvepBCIWidget : public QWidget
+class SsvepBciWidget : public QWidget
 {
     Q_OBJECT
 public:
@@ -90,14 +90,14 @@ public:
     * @param [in] parent pointer to parent widget; If parent is 0, the new BCISetupWidget becomes a window. If parent is another widget, BCISetupWidget becomes a child window inside parent. BCISetupWidget is deleted when its parent is deleted.
     * @param [in] pBCI a pointer to the corresponding BCI.
     */
-    ssvepBCIWidget(ssvepBCI* pBCI, QWidget *parent = 0);
+    SsvepBciWidget(SsvepBci* pBCI, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
     * Destroys the BCISetupWidget.
     * All BCISetupWidget's children are deleted first. The application exits if BCISetupWidget is the main widget.
     */
-    ~ssvepBCIWidget();
+    ~SsvepBciWidget();
 
     //=========================================================================================================
     /**
@@ -181,8 +181,8 @@ private:
     void setClassificationOptions();
 
 
-    ssvepBCI* m_pBCI;                                       /**< a pointer to corresponding BCI.*/
-    Ui::ssvepBCISetupClass ui;                              /**< the user interface for the ssvepBCIWidget.*/
+    SsvepBci* m_pBCI;                                       /**< a pointer to corresponding BCI.*/
+    Ui::SsvepBciSetupClass ui;                              /**< the user interface for the SsvepBciWidget.*/
 };
 
 } // NAMESPACE

@@ -49,7 +49,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ssvepBCIPlugin;
+using namespace SSVEPBCIPLUGIN;
 
 
 //*************************************************************************************************************
@@ -58,10 +58,10 @@ using namespace ssvepBCIPlugin;
 //=============================================================================================================
 
 
-ssvepBCIScreen::ssvepBCIScreen(QSharedPointer<ssvepBCI> pSSVEPBCI, QSharedPointer<ssvepBCISetupStimulusWidget> pSSVEPBCISetupStimulusWidget, QOpenGLWidget *parent)
-: m_pSSVEPBCI(pSSVEPBCI)
-, m_pSSVEPBCISetupStimulusWidget(pSSVEPBCISetupStimulusWidget)
-, m_pScreenKeyboard(QSharedPointer<ScreenKeyboard>(new ScreenKeyboard(m_pSSVEPBCI, m_pSSVEPBCISetupStimulusWidget, QSharedPointer<ssvepBCIScreen>(this))))
+SsvepBciScreen::SsvepBciScreen(QSharedPointer<SsvepBci> pSsvepBci, QSharedPointer<SsvepBciSetupStimulusWidget> pSsvepBciSetupStimulusWidget, QOpenGLWidget *parent)
+: m_pSsvepBci(pSsvepBci)
+, m_pSsvepBciSetupStimulusWidget(pSsvepBciSetupStimulusWidget)
+, m_pScreenKeyboard(QSharedPointer<ScreenKeyboard>(new ScreenKeyboard(m_pSsvepBci, m_pSsvepBciSetupStimulusWidget, QSharedPointer<SsvepBciScreen>(this))))
 , m_dXPosCross(0.5)
 , m_dYPosCross(0.5)
 , m_dStep(0.01)
@@ -69,7 +69,7 @@ ssvepBCIScreen::ssvepBCIScreen(QSharedPointer<ssvepBCI> pSSVEPBCI, QSharedPointe
 , m_qPainter(this)
 , m_qCrossColor(Qt::red)
 , m_bClearScreen(true)
-//, m_qSoundPath(m_pSSVEPBCI->getSSVEPBCIResourcePath() + "beep.mp3")
+//, m_qSoundPath(m_pSsvepBci->getSsvepBciResourcePath() + "beep.mp3")
 {
 //      // implementing the sound file
 //    qDebug() << "copying successfull:" << QFile::copy(":/sounds/beep.mp3", m_qSoundPath);
@@ -89,9 +89,9 @@ ssvepBCIScreen::ssvepBCIScreen(QSharedPointer<ssvepBCI> pSSVEPBCI, QSharedPointe
     // set update behaviour to preserved-swap-buffer
     setUpdateBehavior(UpdateBehavior::PartialUpdate);
 
-    // connect classResult and frequency list signal of SSVEPBCI class to setClassResult slot
-    connect(m_pSSVEPBCI.data(), &ssvepBCI::classificationResult, this, &ssvepBCIScreen::setClassResults);
-    connect(m_pSSVEPBCI.data(), &ssvepBCI::getFrequencyLabels, this, &ssvepBCIScreen::updateFrequencyList);
+    // connect classResult and frequency list signal of SsvepBci class to setClassResult slot
+    connect(m_pSsvepBci.data(), &SsvepBci::classificationResult, this, &SsvepBciScreen::setClassResults);
+    connect(m_pSsvepBci.data(), &SsvepBci::getFrequencyLabels, this, &SsvepBciScreen::updateFrequencyList);
 
     // initialize freqList
     m_lFreqList << 6.66 << 7.5 << 8.57 << 10 << 12;
@@ -101,13 +101,13 @@ ssvepBCIScreen::ssvepBCIScreen(QSharedPointer<ssvepBCI> pSSVEPBCI, QSharedPointe
 
 //*************************************************************************************************************
 
-ssvepBCIScreen::~ssvepBCIScreen(){
+SsvepBciScreen::~SsvepBciScreen(){
 
 }
 
 //*************************************************************************************************************
 
-void ssvepBCIScreen::resizeGL(int w, int h) {
+void SsvepBciScreen::resizeGL(int w, int h) {
     Q_UNUSED(w)
     Q_UNUSED(h)
 
@@ -117,13 +117,13 @@ void ssvepBCIScreen::resizeGL(int w, int h) {
 
 //*************************************************************************************************************
 
-void ssvepBCIScreen::initializeGL(){
+void SsvepBciScreen::initializeGL(){
 }
 
 
 //*************************************************************************************************************
 
-void ssvepBCIScreen::paintGL() {
+void SsvepBciScreen::paintGL() {
 
     // clear Screen by drawing a black filled rectangle
     if(m_bClearScreen){
@@ -151,7 +151,7 @@ void ssvepBCIScreen::paintGL() {
 
 //*************************************************************************************************************
 
-void ssvepBCIScreen::setClassResults(double classResult){
+void SsvepBciScreen::setClassResults(double classResult){
 
     m_qCrossColor = Qt::red;
 
@@ -181,7 +181,7 @@ void ssvepBCIScreen::setClassResults(double classResult){
 
 //*************************************************************************************************************
 
-void ssvepBCIScreen::updateFrequencyList(MyQList freqList){
+void SsvepBciScreen::updateFrequencyList(MyQList freqList){
     m_lFreqList.clear();
     m_lFreqList = freqList;
     qDebug() <<"update freqList:" <<freqList;
@@ -190,10 +190,10 @@ void ssvepBCIScreen::updateFrequencyList(MyQList freqList){
 
 //*************************************************************************************************************
 
-void ssvepBCIScreen::useScreenKeyboard(bool useKeyboard){
+void SsvepBciScreen::useScreenKeyboard(bool useKeyboard){
 
     if(m_pScreenKeyboard == NULL)
-        m_pScreenKeyboard = QSharedPointer<ScreenKeyboard>(new ScreenKeyboard(m_pSSVEPBCI, m_pSSVEPBCISetupStimulusWidget, QSharedPointer<ssvepBCIScreen>(this)));
+        m_pScreenKeyboard = QSharedPointer<ScreenKeyboard>(new ScreenKeyboard(m_pSsvepBci, m_pSsvepBciSetupStimulusWidget, QSharedPointer<SsvepBciScreen>(this)));
 
     m_bUseScreenKeyboard = useKeyboard;
     m_pScreenKeyboard->initScreenKeyboard();
@@ -202,7 +202,7 @@ void ssvepBCIScreen::useScreenKeyboard(bool useKeyboard){
 
 //*************************************************************************************************************
 
-void ssvepBCIScreen::clearScreen(){
+void SsvepBciScreen::clearScreen(){
     m_bClearScreen = true;
     m_bUseScreenKeyboard = false;
 }

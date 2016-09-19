@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     ssvepBCIFlickeringItem.cpp
+* @file     ssvepbciflickeringitem.cpp
 * @author   Viktor Klüber <viktor.klueber@tu-ilmenauz.de>;
 *           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
@@ -31,7 +31,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the ssvepBCIFlickeringItem class.
+* @brief    Contains the implementation of the SsvepBciFlickeringItem class.
 *
 */
 
@@ -47,7 +47,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ssvepBCIPlugin;
+using namespace SSVEPBCIPLUGIN;
 
 
 //*************************************************************************************************************
@@ -55,7 +55,7 @@ using namespace ssvepBCIPlugin;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ssvepBCIFlickeringItem::ssvepBCIFlickeringItem()
+SsvepBciFlickeringItem::SsvepBciFlickeringItem()
     : m_dPosX(0)
     , m_dPosY(0)
     , m_dWidth(0.4)
@@ -70,26 +70,26 @@ ssvepBCIFlickeringItem::ssvepBCIFlickeringItem()
 
 //*************************************************************************************************************
 
-ssvepBCIFlickeringItem::~ssvepBCIFlickeringItem(){
+SsvepBciFlickeringItem::~SsvepBciFlickeringItem(){
 }
 
 //*************************************************************************************************************
 
-void ssvepBCIFlickeringItem::setPos(double x, double y){
+void SsvepBciFlickeringItem::setPos(double x, double y){
         m_dPosX = x;
         m_dPosY = y;
 }
 
 //*************************************************************************************************************
 
-void ssvepBCIFlickeringItem::setDim(double w, double h){
+void SsvepBciFlickeringItem::setDim(double w, double h){
     m_dWidth    = w;
     m_dHeight   = h;
 }
 
 //*************************************************************************************************************
 
-void ssvepBCIFlickeringItem::setRenderOrder(QList<bool> renderOrder, int freqKey){
+void SsvepBciFlickeringItem::setRenderOrder(QList<bool> renderOrder, int freqKey){
 
     //clear the old rendering order list
     m_bRenderOrder.clear();
@@ -102,7 +102,7 @@ void ssvepBCIFlickeringItem::setRenderOrder(QList<bool> renderOrder, int freqKey
 
 //*************************************************************************************************************
 
-void ssvepBCIFlickeringItem::paint(QPaintDevice *paintDevice)
+void SsvepBciFlickeringItem::paint(QPaintDevice *paintDevice)
 {
     //setting the nex flicker state (moving iterater to front if necessary)
     if(!m_bIter.hasNext())
@@ -149,13 +149,13 @@ void ssvepBCIFlickeringItem::paint(QPaintDevice *paintDevice)
 
 //*************************************************************************************************************
 
-int ssvepBCIFlickeringItem::getFreqKey()
+int SsvepBciFlickeringItem::getFreqKey()
 {
     return m_iFreqKey;
 }
 
 
-void ssvepBCIFlickeringItem::addSign(QString sign){
+void SsvepBciFlickeringItem::addSign(QString sign){
 
     m_bSignFlag = true;
     m_sSign = sign;

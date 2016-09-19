@@ -49,7 +49,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ssvepBCIPlugin;
+using namespace SSVEPBCIPLUGIN;
 
 
 //*************************************************************************************************************
@@ -57,10 +57,10 @@ using namespace ssvepBCIPlugin;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ssvepBCIConfigurationWidget::ssvepBCIConfigurationWidget(ssvepBCI* pssvepBCI, QWidget *parent)
+SsvepBciConfigurationWidget::SsvepBciConfigurationWidget(SsvepBci* pSsvepBci, QWidget *parent)
 : QDialog(parent)
-, m_pSSVEPBCI(pssvepBCI)
-, ui(new Ui::ssvepBCIConfigurationWidget)
+, m_pSsvepBci(pSsvepBci)
+, ui(new Ui::SsvepBciConfigurationWidget)
 , m_bInitThresholdDisplay(true)
 , m_dMaxProbValue(1)
 , m_dMinProbValue(0)
@@ -100,55 +100,55 @@ ssvepBCIConfigurationWidget::ssvepBCIConfigurationWidget(ssvepBCI* pssvepBCI, QW
     ui->m_VerticalSlider_Threshold5->setStyleSheet("QSlider::handle {image: url(:/images/slider_handle.png);}");
 
     // Connect channel selection
-    connect(ui->m_listWidget_ChosenChannelsOnSensorLevel->model(), &QAbstractItemModel::rowsInserted, this, &ssvepBCIConfigurationWidget::channelSelectChanged);
-    connect(ui->m_listWidget_ChosenChannelsOnSensorLevel->model(), &QAbstractItemModel::rowsRemoved, this, &ssvepBCIConfigurationWidget::channelSelectChanged);
+    connect(ui->m_listWidget_ChosenChannelsOnSensorLevel->model(), &QAbstractItemModel::rowsInserted, this, &SsvepBciConfigurationWidget::channelSelectChanged);
+    connect(ui->m_listWidget_ChosenChannelsOnSensorLevel->model(), &QAbstractItemModel::rowsRemoved, this, &SsvepBciConfigurationWidget::channelSelectChanged);
 
     // connect signals for power line elimination
-    connect(ui->m_GroupBox_RemovePowerLine, &QGroupBox::toggled, m_pSSVEPBCI, &ssvepBCI::removePowerLine);
-    connect(ui->m_SpinBox_PowerLineFrequency, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged) , m_pSSVEPBCI, &ssvepBCI::setPowerLine);
+    connect(ui->m_GroupBox_RemovePowerLine, &QGroupBox::toggled, m_pSsvepBci, &SsvepBci::removePowerLine);
+    connect(ui->m_SpinBox_PowerLineFrequency, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged) , m_pSsvepBci, &SsvepBci::setPowerLine);
 
     // connect feature extraction behaviour signal
-    connect(ui->m_RadioButton_MEC, &QRadioButton::toggled, m_pSSVEPBCI, &ssvepBCI::setFeatureExtractionMethod);
+    connect(ui->m_RadioButton_MEC, &QRadioButton::toggled, m_pSsvepBci, &SsvepBci::setFeatureExtractionMethod);
 
     // connect number of harmonicssignal
-    connect(ui->m_SpinBox_NumOfHarmonics, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, &ssvepBCIConfigurationWidget::numOfHarmonicsChanged);
-    connect(this, &ssvepBCIConfigurationWidget::changeSSVEPParameter, m_pSSVEPBCI, &ssvepBCI::setChangeSSVEPParameterFlag);
+    connect(ui->m_SpinBox_NumOfHarmonics, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, &SsvepBciConfigurationWidget::numOfHarmonicsChanged);
+    connect(this, &SsvepBciConfigurationWidget::changeSSVEPParameter, m_pSsvepBci, &SsvepBci::setChangeSSVEPParameterFlag);
 
     // connect SSVEP frequency List signal
-    connect(m_pSSVEPBCI, &ssvepBCI::getFrequencyLabels, this, &ssvepBCIConfigurationWidget::setFrequencyLabels);
+    connect(m_pSsvepBci, &SsvepBci::getFrequencyLabels, this, &SsvepBciConfigurationWidget::setFrequencyLabels);
 
     // connect SSVEP values signal to refresh SSVEPProbabilities
-    connect(m_pSSVEPBCI, &ssvepBCI::SSVEPprob, this, &ssvepBCIConfigurationWidget::setSSVEPProbabilities);
+    connect(m_pSsvepBci, &SsvepBci::SSVEPprob, this, &SsvepBciConfigurationWidget::setSSVEPProbabilities);
     qRegisterMetaType<MyQList>("MyQList");
 
     // connect changed threshold values
-    connect(ui->m_DoubleSpinBox_Threshold1, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &ssvepBCIConfigurationWidget::thresholdChanged);
-    connect(ui->m_DoubleSpinBox_Threshold2, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &ssvepBCIConfigurationWidget::thresholdChanged);
-    connect(ui->m_DoubleSpinBox_Threshold3, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &ssvepBCIConfigurationWidget::thresholdChanged);
-    connect(ui->m_DoubleSpinBox_Threshold4, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &ssvepBCIConfigurationWidget::thresholdChanged);
-    connect(ui->m_DoubleSpinBox_Threshold5, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &ssvepBCIConfigurationWidget::thresholdChanged);
+    connect(ui->m_DoubleSpinBox_Threshold1, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &SsvepBciConfigurationWidget::thresholdChanged);
+    connect(ui->m_DoubleSpinBox_Threshold2, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &SsvepBciConfigurationWidget::thresholdChanged);
+    connect(ui->m_DoubleSpinBox_Threshold3, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &SsvepBciConfigurationWidget::thresholdChanged);
+    connect(ui->m_DoubleSpinBox_Threshold4, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &SsvepBciConfigurationWidget::thresholdChanged);
+    connect(ui->m_DoubleSpinBox_Threshold5, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &SsvepBciConfigurationWidget::thresholdChanged);
 
     // connect threshold values to BCI plugin
-    connect(this, &ssvepBCIConfigurationWidget::getThresholdValues, m_pSSVEPBCI, &ssvepBCI::setThresholdValues);
+    connect(this, &SsvepBciConfigurationWidget::getThresholdValues, m_pSsvepBci, &SsvepBci::setThresholdValues);
 
     // connect classifiaction result to LCD-Display and colour change for labels
-    connect(m_pSSVEPBCI, &ssvepBCI::classificationResult, ui->m_LcdNumber_ClasResult, static_cast<void(QLCDNumber::*)(double)>(&QLCDNumber::display));
-    connect(m_pSSVEPBCI, &ssvepBCI::classificationResult, this, &ssvepBCIConfigurationWidget::setClassResult);
+    connect(m_pSsvepBci, &SsvepBci::classificationResult, ui->m_LcdNumber_ClasResult, static_cast<void(QLCDNumber::*)(double)>(&QLCDNumber::display));
+    connect(m_pSsvepBci, &SsvepBci::classificationResult, this, &SsvepBciConfigurationWidget::setClassResult);
 
     // connect classifiaction hits-spinbox and classification breaks-spinbox
-    connect(ui->m_spinBox_ClassificationHits, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged), m_pSSVEPBCI, &ssvepBCI::setNumClassHits);
-    connect(ui->m_spinBox_ClassificationBreaks, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged), m_pSSVEPBCI, &ssvepBCI::setNumClassBreaks);
-    connect(ui->m_spinBox_ClassificationListSize, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged), m_pSSVEPBCI, &ssvepBCI::setSizeClassList);
+    connect(ui->m_spinBox_ClassificationHits, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged), m_pSsvepBci, &SsvepBci::setNumClassHits);
+    connect(ui->m_spinBox_ClassificationBreaks, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged), m_pSsvepBci, &SsvepBci::setNumClassBreaks);
+    connect(ui->m_spinBox_ClassificationListSize, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged), m_pSsvepBci, &SsvepBci::setSizeClassList);
 
     // connect timer to display elapsed time in widget
-    connect(m_qTimer, &QTimer::timeout, this, &ssvepBCIConfigurationWidget::showCurrentTime);
+    connect(m_qTimer, &QTimer::timeout, this, &SsvepBciConfigurationWidget::showCurrentTime);
 
     // set palette for text color change
     m_palBlackFont.setColor(QPalette::WindowText, Qt::black);
     m_palRedFont.setColor(QPalette::WindowText, Qt::red);
 
     // initialize values to GUI-surface
-    setFrequencyLabels(m_pSSVEPBCI->getCurrentListOfFrequencies());
+    setFrequencyLabels(m_pSsvepBci->getCurrentListOfFrequencies());
     thresholdChanged(0);
     initSelectedChannelsSensor();
 }
@@ -156,7 +156,7 @@ ssvepBCIConfigurationWidget::ssvepBCIConfigurationWidget(ssvepBCI* pssvepBCI, QW
 
 //*************************************************************************************************************
 
-ssvepBCIConfigurationWidget::~ssvepBCIConfigurationWidget()
+SsvepBciConfigurationWidget::~SsvepBciConfigurationWidget()
 {
     delete ui;
 }
@@ -164,7 +164,7 @@ ssvepBCIConfigurationWidget::~ssvepBCIConfigurationWidget()
 
 //*************************************************************************************************************
 
-void ssvepBCIConfigurationWidget::setSSVEPProbabilities(MyQList SSVEP){
+void SsvepBciConfigurationWidget::setSSVEPProbabilities(MyQList SSVEP){
 
     // determine scale for threshold status bar
     if(m_bInitThresholdDisplay){
@@ -215,7 +215,7 @@ void ssvepBCIConfigurationWidget::setSSVEPProbabilities(MyQList SSVEP){
 
 //*************************************************************************************************************
 
-void ssvepBCIConfigurationWidget::closeEvent(QCloseEvent *event)
+void SsvepBciConfigurationWidget::closeEvent(QCloseEvent *event)
 {
     Q_UNUSED(event)
 }
@@ -223,11 +223,11 @@ void ssvepBCIConfigurationWidget::closeEvent(QCloseEvent *event)
 
 //*************************************************************************************************************
 
-void ssvepBCIConfigurationWidget::initSelectedChannelsSensor()
+void SsvepBciConfigurationWidget::initSelectedChannelsSensor()
 {
     // Read electrode pinnig scheme from file and initialise List and store in QMap in BCI object
     QString path;
-    path.prepend(m_pSSVEPBCI->m_qStringResourcePath);
+    path.prepend(m_pSsvepBci->m_qStringResourcePath);
     path.append("Pinning_Scheme_Duke_Dry_64.txt");
     QFile file(path);
     if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
@@ -248,20 +248,20 @@ void ssvepBCIConfigurationWidget::initSelectedChannelsSensor()
         m_vAvailableChannelsSensor.append(list_temp.at(1));
     }
     file.close();
-    m_pSSVEPBCI->m_mapElectrodePinningScheme = mapElectrodePinningScheme;
+    m_pSsvepBci->m_mapElectrodePinningScheme = mapElectrodePinningScheme;
 
     // Remove default items from list
-    for(int i=0; i<m_pSSVEPBCI->m_slChosenChannelsSensor.size(); i++)
-        m_vAvailableChannelsSensor.removeAt(m_vAvailableChannelsSensor.indexOf(m_pSSVEPBCI->m_slChosenChannelsSensor.at(i)));
+    for(int i=0; i<m_pSsvepBci->m_slChosenChannelsSensor.size(); i++)
+        m_vAvailableChannelsSensor.removeAt(m_vAvailableChannelsSensor.indexOf(m_pSsvepBci->m_slChosenChannelsSensor.at(i)));
 
     ui->m_listWidget_AvailableChannelsOnSensorLevel->addItems(m_vAvailableChannelsSensor);
-    ui->m_listWidget_ChosenChannelsOnSensorLevel->addItems(m_pSSVEPBCI->m_slChosenChannelsSensor);
+    ui->m_listWidget_ChosenChannelsOnSensorLevel->addItems(m_pSsvepBci->m_slChosenChannelsSensor);
 }
 
 
 //*************************************************************************************************************
 
-void ssvepBCIPlugin::ssvepBCIConfigurationWidget::on_m_RadioButton_MEC_toggled(bool checked)
+void SSVEPBCIPLUGIN::SsvepBciConfigurationWidget::on_m_RadioButton_MEC_toggled(bool checked)
 {
     Q_UNUSED(checked);
     m_bInitThresholdDisplay = true;
@@ -270,7 +270,7 @@ void ssvepBCIPlugin::ssvepBCIConfigurationWidget::on_m_RadioButton_MEC_toggled(b
 
 //*************************************************************************************************************
 
-void ssvepBCIConfigurationWidget::thresholdChanged(double threshold)
+void SsvepBciConfigurationWidget::thresholdChanged(double threshold)
 {
     Q_UNUSED(threshold);
 
@@ -290,7 +290,7 @@ void ssvepBCIConfigurationWidget::thresholdChanged(double threshold)
 
 //*************************************************************************************************************
 
-void ssvepBCIConfigurationWidget::updateThresholdsToScreen(){
+void SsvepBciConfigurationWidget::updateThresholdsToScreen(){
 
     // scale threshold values for slider
     QList<int> thresholds;
@@ -308,7 +308,7 @@ void ssvepBCIConfigurationWidget::updateThresholdsToScreen(){
 
 //*************************************************************************************************************
 
-void ssvepBCIConfigurationWidget::setFrequencyLabels(MyQList frequencyList){
+void SsvepBciConfigurationWidget::setFrequencyLabels(MyQList frequencyList){
 
     // filling the list with missing zeros
     for(int i = frequencyList.size(); i < 6; i++)
@@ -332,7 +332,7 @@ void ssvepBCIConfigurationWidget::setFrequencyLabels(MyQList frequencyList){
 
 //*************************************************************************************************************
 
-void ssvepBCIConfigurationWidget::setClassResult(double classResult){
+void SsvepBciConfigurationWidget::setClassResult(double classResult){
 
     // set all labels to black again
     ui->m_Label_Frequency1->setPalette(m_palBlackFont);
@@ -364,14 +364,14 @@ void ssvepBCIConfigurationWidget::setClassResult(double classResult){
 
 //*************************************************************************************************************
 
-int ssvepBCIConfigurationWidget::getNumOfHarmonics(){
+int SsvepBciConfigurationWidget::getNumOfHarmonics(){
     return ui->m_SpinBox_NumOfHarmonics->value();
 }
 
 
 //*************************************************************************************************************
 
-void ssvepBCIConfigurationWidget::numOfHarmonicsChanged(int harmonics){
+void SsvepBciConfigurationWidget::numOfHarmonicsChanged(int harmonics){
 
     Q_UNUSED(harmonics);
 
@@ -385,7 +385,7 @@ void ssvepBCIConfigurationWidget::numOfHarmonicsChanged(int harmonics){
 
 //*************************************************************************************************************
 
-QStringList ssvepBCIConfigurationWidget::getSensorChannelSelection(){
+QStringList SsvepBciConfigurationWidget::getSensorChannelSelection(){
 
     QStringList ChosenSensorChannelSelect;
     for(int i=0; i< ui->m_listWidget_ChosenChannelsOnSensorLevel->count(); i++)
@@ -397,7 +397,7 @@ QStringList ssvepBCIConfigurationWidget::getSensorChannelSelection(){
 
 //*************************************************************************************************************
 
-QStringList ssvepBCIConfigurationWidget::getSourceChannelSelection(){
+QStringList SsvepBciConfigurationWidget::getSourceChannelSelection(){
 
     QStringList ChosenSourceChannelSelect;
     for(int i=0; i< ui->m_listWidget_ChosenChannelsOnSourceLevel->count(); i++)
@@ -409,7 +409,7 @@ QStringList ssvepBCIConfigurationWidget::getSourceChannelSelection(){
 
 //*************************************************************************************************************
 
-void ssvepBCIConfigurationWidget::channelSelectChanged(const QModelIndex &parent, int first, int last){
+void SsvepBciConfigurationWidget::channelSelectChanged(const QModelIndex &parent, int first, int last){
 
     Q_UNUSED(parent)
     Q_UNUSED(first)
@@ -425,7 +425,7 @@ void ssvepBCIConfigurationWidget::channelSelectChanged(const QModelIndex &parent
 
 //*************************************************************************************************************
 
-void ssvepBCIConfigurationWidget::resetThresholdValues(){
+void SsvepBciConfigurationWidget::resetThresholdValues(){
 
     // assign SSVEP thresholds to sliders
     ui->m_DoubleSpinBox_Threshold1->setValue(m_dMaxProbValue);
@@ -438,16 +438,16 @@ void ssvepBCIConfigurationWidget::resetThresholdValues(){
 
 //*************************************************************************************************************
 
-void ssvepBCIPlugin::ssvepBCIConfigurationWidget::on_m_pushButton_StartMeasurement_clicked()
+void SSVEPBCIPLUGIN::SsvepBciConfigurationWidget::on_m_pushButton_StartMeasurement_clicked()
 {
-    if(m_pSSVEPBCI->m_pssvepBCISetupStimulusWidget != NULL){
-        QSharedPointer<ScreenKeyboard> pScreenKeyboard = m_pSSVEPBCI->m_pssvepBCISetupStimulusWidget->getScreenKeyboardSPtr();
+    if(m_pSsvepBci->m_pSsvepBciSetupStimulusWidget != NULL){
+        QSharedPointer<ScreenKeyboard> pScreenKeyboard = m_pSsvepBci->m_pSsvepBciSetupStimulusWidget->getScreenKeyboardSPtr();
         if(pScreenKeyboard != NULL){
             pScreenKeyboard->initSpellAccuracyFeature();
 
             if(!m_bScreenKeyboardConnected){
-                connect(pScreenKeyboard.data(), &ScreenKeyboard::isCorrectCommand, this, &ssvepBCIConfigurationWidget::evaluateCommand);
-                connect(pScreenKeyboard.data(), &ScreenKeyboard::spellingFinished, this, &ssvepBCIConfigurationWidget::stopMeasurement);
+                connect(pScreenKeyboard.data(), &ScreenKeyboard::isCorrectCommand, this, &SsvepBciConfigurationWidget::evaluateCommand);
+                connect(pScreenKeyboard.data(), &ScreenKeyboard::spellingFinished, this, &SsvepBciConfigurationWidget::stopMeasurement);
 
                 m_bScreenKeyboardConnected = true;
             }
@@ -469,10 +469,10 @@ void ssvepBCIPlugin::ssvepBCIConfigurationWidget::on_m_pushButton_StartMeasureme
 
 //*************************************************************************************************************
 
-void ssvepBCIPlugin::ssvepBCIConfigurationWidget::on_m_pushButton_StopMeasurement_clicked()
+void SSVEPBCIPLUGIN::SsvepBciConfigurationWidget::on_m_pushButton_StopMeasurement_clicked()
 {
-    if(m_pSSVEPBCI->m_pssvepBCISetupStimulusWidget != NULL){
-        QSharedPointer<ScreenKeyboard> pScreenKeyboard = m_pSSVEPBCI->m_pssvepBCISetupStimulusWidget->getScreenKeyboardSPtr();
+    if(m_pSsvepBci->m_pSsvepBciSetupStimulusWidget != NULL){
+        QSharedPointer<ScreenKeyboard> pScreenKeyboard = m_pSsvepBci->m_pSsvepBciSetupStimulusWidget->getScreenKeyboardSPtr();
         if(pScreenKeyboard != NULL)
             pScreenKeyboard->stopSpellAccuracyFeature();
 
@@ -485,7 +485,7 @@ void ssvepBCIPlugin::ssvepBCIConfigurationWidget::on_m_pushButton_StopMeasuremen
 
 //*************************************************************************************************************
 
-void ssvepBCIConfigurationWidget::evaluateCommand(bool isCorrectCommand){
+void SsvepBciConfigurationWidget::evaluateCommand(bool isCorrectCommand){
 
     if(isCorrectCommand){
         m_iCorrectCommands += 1;
@@ -501,7 +501,7 @@ void ssvepBCIConfigurationWidget::evaluateCommand(bool isCorrectCommand){
 
 //*************************************************************************************************************
 
-void ssvepBCIPlugin::ssvepBCIConfigurationWidget::on_m_spinBox_ClassificationListSize_valueChanged(int arg1)
+void SSVEPBCIPLUGIN::SsvepBciConfigurationWidget::on_m_spinBox_ClassificationListSize_valueChanged(int arg1)
 {
     ui->m_spinBox_ClassificationHits->setMaximum(arg1);
 }
@@ -509,7 +509,7 @@ void ssvepBCIPlugin::ssvepBCIConfigurationWidget::on_m_spinBox_ClassificationLis
 
 //*************************************************************************************************************
 
-void ssvepBCIConfigurationWidget::showCurrentTime(){
+void SsvepBciConfigurationWidget::showCurrentTime(){
 
     m_iElapsedSeconds++;
     QString time = QString::number(m_iElapsedSeconds);
@@ -519,7 +519,7 @@ void ssvepBCIConfigurationWidget::showCurrentTime(){
 
 //*************************************************************************************************************
 
-void ssvepBCIConfigurationWidget::stopMeasurement(){
+void SsvepBciConfigurationWidget::stopMeasurement(){
 
     m_qTimer->stop();
 }

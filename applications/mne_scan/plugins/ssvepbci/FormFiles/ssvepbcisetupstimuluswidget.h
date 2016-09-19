@@ -65,10 +65,10 @@
 //=============================================================================================================
 
 namespace Ui {
-class ssvepBCISetupStimulusWidget;
+class SsvepBciSetupStimulusWidget;
 }
 
-namespace ssvepBCIPlugin
+namespace SSVEPBCIPLUGIN
 {
 
 
@@ -77,9 +77,9 @@ namespace ssvepBCIPlugin
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class ssvepBCI;
-class ssvepBCIScreen;
-class ssvepBCIFlickeringItem;
+class SsvepBci;
+class SsvepBciScreen;
+class SsvepBciFlickeringItem;
 class ScreenKeyboard;
 
 
@@ -89,7 +89,7 @@ class ScreenKeyboard;
 *
 * @brief The EEGoSportsSetupStimulusWidget class provides the EEGoSportsSetupStimulusWidget configuration window.
 */
-class ssvepBCISetupStimulusWidget : public QDialog
+class SsvepBciSetupStimulusWidget : public QDialog
 {
     Q_OBJECT
 
@@ -99,16 +99,16 @@ public:
     * Constructs a c which is a child of parent.
     *
     * @param [in] parent        a pointer to parent widget; If parent is 0, the new EEGoSportsSetupStimulusWidget becomes a window. If parent is another widget, EEGoSportsSetupStimulusWidget becomes a child window inside parent. EEGoSportsSetupStimulusWidget is deleted when its parent is deleted.
-    * @param [in] pssvepBCI     a pointer to the corresponding ECGSimulator.
+    * @param [in] pSsvepBci     a pointer to the corresponding ECGSimulator.
     */
-    explicit ssvepBCISetupStimulusWidget(ssvepBCI *pssvepBCI, QWidget *parent = 0);
+    explicit SsvepBciSetupStimulusWidget(SsvepBci *pSsvepBci, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
     * Destructs a EEGoSportsSetupStimulusWidget which is a child of parent.
     *
     */
-    ~ssvepBCISetupStimulusWidget();
+    ~SsvepBciSetupStimulusWidget();
 
     //=========================================================================================================
     /**
@@ -190,16 +190,16 @@ private slots:
 
     void on_comboBox_2_currentIndexChanged(int index);
 
-    void setFreq(ssvepBCIFlickeringItem &item, int freqKey);
+    void setFreq(SsvepBciFlickeringItem &item, int freqKey);
 
     void on_pushButton_7_clicked();
 
     void on_m_lineEdit_BCISpeller_textChanged(const QString &arg1);
 
 private:
-    Ui::ssvepBCISetupStimulusWidget        *ui;
-    QSharedPointer<ssvepBCI>                m_pssvepBCI;            /**< a pointer to corresponding EEGoSports */
-    QSharedPointer<ssvepBCIScreen>          m_pssvepBCIScreen;      /**< pointer to the ssvepBCIscreen class of the subject (friend class) */
+    Ui::SsvepBciSetupStimulusWidget        *ui;
+    QSharedPointer<SsvepBci>                m_pSsvepBci;            /**< a pointer to corresponding EEGoSports */
+    QSharedPointer<SsvepBciScreen>          m_pSsvepBciScreen;      /**< pointer to the SsvepBciscreen class of the subject (friend class) */
     QSharedPointer<ScreenKeyboard>          m_pScreenKeyboard;      /**< pointer to the Screenkeyboard class */
     QSharedPointer<QScreen>                 m_pScreen;              /**< pointer to the QScreen class; */
     bool                                    m_bIsRunning;           /**< Flag for running test */
