@@ -160,7 +160,6 @@ void View3D::init()
 
     // Set root object of the scene
     this->setRootEntity(m_pRootEntity);
-
     createCoordSystem(m_pRootEntity);
 }
 
