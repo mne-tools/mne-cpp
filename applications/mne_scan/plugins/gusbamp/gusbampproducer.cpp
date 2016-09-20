@@ -51,7 +51,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace GUSBAmpPlugin;
+using namespace GUSBAMPPLUGIN;
 
 
 //*************************************************************************************************************
@@ -66,7 +66,6 @@ GUSBAmpProducer::GUSBAmpProducer(GUSBAmp* pGUSBAmp)
 , m_iSampRate(1200)
 , m_sFilePath("data")
 {
-
     m_viSizeOfSampleMatrix.resize(2,0);
 
     m_vSerials.resize(1);
@@ -136,10 +135,7 @@ void GUSBAmpProducer::run()
             //Get the GUSBAmp EEG data out of the device buffer and write received data to circular buffer
             if(m_pGUSBAmpDriver->getSampleMatrixValue(matRawBuffer))
                 m_pGUSBAmp->m_pRawMatrixBuffer_In->push(&matRawBuffer);
-
-
         }
-
     //std::qDebug()<<"EXITING - GUSBAmpProducer::run()"<<std::endl;
 }
 

@@ -55,7 +55,7 @@ contains(MNECPP_CONFIG, BuildBasicMNESCANVersion) {
         neuromag \
         babymeg \
         triggercontrol \
-        #gusbamp \
+        gusbamp \
         eegosports
 
 

@@ -10,7 +10,7 @@
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Viktor Klüber, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -43,7 +43,6 @@
 // INCLUDES
 //=============================================================================================================
 
-
 #include "ssvepbciscreen.h"
 
 
@@ -58,9 +57,10 @@
 #include <QOpenGLWidget>
 #include <QListWidgetItem>
 
+
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE EEGoSportsPlugin
+// DEFINE NAMESPACE SSVEPBCIPLUGIN
 //=============================================================================================================
 
 namespace Ui {
@@ -70,12 +70,14 @@ class SsvepBciConfigurationWidget;
 namespace SSVEPBCIPLUGIN
 {
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // TypeDefs
 //=============================================================================================================
 
 typedef  QList<double>  MyQList;
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -87,9 +89,9 @@ class SsvepBci;
 
 //=============================================================================================================
 /**
-* DECLARE CLASS EEGoSportsSetupStimulusWidget
+* DECLARE CLASS SsvepBciConfigurationWidget
 *
-* @brief The EEGoSportsSetupStimulusWidget class provides the EEGoSportsSetupStimulusWidget configuration window.
+* @brief The SsvepBciConfigurationWidget class provides the EEGoSportsSetupStimulusWidget configuration window.
 */
 class SsvepBciConfigurationWidget : public QDialog
 {
@@ -164,7 +166,6 @@ public:
     */
     void resetThresholdValues();
 
-
 public slots:
     void setSSVEPProbabilities(MyQList SSVEP);
     void setFrequencyLabels(MyQList frequencyList);
@@ -178,12 +179,8 @@ private slots:
     void channelSelectChanged(const QModelIndex &parent, int first, int last);
     void evaluateCommand(bool isCorrectCommand);
     void showCurrentTime();
-
-
     void on_m_pushButton_StartMeasurement_clicked();
-
     void on_m_pushButton_StopMeasurement_clicked();
-
     void on_m_spinBox_ClassificationListSize_valueChanged(int arg1);
 
 signals:
@@ -191,24 +188,25 @@ signals:
     void changeSSVEPParameter();
 
 private:
-    Ui::SsvepBciConfigurationWidget        *ui;                     /**< pointer to corresponding user interface */
-    SsvepBci                               *m_pSsvepBci;            /**< a pointer to corresponding SsvepBci class */
+    Ui::SsvepBciConfigurationWidget        *ui;                     /**< Pointer to corresponding user interface. */
+    SsvepBci                               *m_pSsvepBci;            /**< A pointer to corresponding SsvepBci class. */
 
+    // configuration parameter
     QStringList                             m_vAvailableChannelsSensor;                 /**< QStringList holding available features to select on sensor level (electrodes).*/
-    double                                  m_dMinProbValue;                            /**< minimum border for SSVEP visualization with a status bar */
-    double                                  m_dMaxProbValue;                            /**< maximum border for SSVEP visualization with a status bar */
-    bool                                    m_bInitThresholdDisplay;                    /**< flag for first run and so initializing SsvepBciConfigurationWidget-Class */
-    QList<double>                           m_lSSVEPThresholdValues;                    /**< contains the threshold values for SSVEP classifiaction */
-    QList<double>                           m_lFrequencyList;                           /**< list of desired frequencies */
-    QPalette                                m_palBlackFont;                             /**< setting black font for group box */
-    QPalette                                m_palRedFont;                               /**< setting red font for highlightning label */
+    double                                  m_dMinProbValue;                            /**< Minimum border for SSVEP visualization with a status bar. */
+    double                                  m_dMaxProbValue;                            /**< Maximum border for SSVEP visualization with a status bar. */
+    bool                                    m_bInitThresholdDisplay;                    /**< Flag for first run and so initializing SsvepBciConfigurationWidget-Class. */
+    QList<double>                           m_lSSVEPThresholdValues;                    /**< Contains the threshold values for SSVEP classifiaction. */
+    QList<double>                           m_lFrequencyList;                           /**< List of desired frequencies. */
+    QPalette                                m_palBlackFont;                             /**< Setting black font for group box. */
+    QPalette                                m_palRedFont;                               /**< Setting red font for highlightning label. */
 
     // accuracy feature
-    bool                                    m_bScreenKeyboardConnected;                 /**< flag for connected screen keaboard */
-    int                                     m_iCorrectCommands;                         /**< counter for correct commands */
-    int                                     m_iWrongCommands;                           /**< counter for wrong commands */
-    QTimer                                 *m_qTimer;                                   /**< timer for displaying accuracy every second */
-    int                                     m_iElapsedSeconds;                          /**< time, displayed on screen */
+    bool                                    m_bScreenKeyboardConnected;                 /**< Flag for connected screen keaboard. */
+    int                                     m_iCorrectCommands;                         /**< Counter for correct commands. */
+    int                                     m_iWrongCommands;                           /**< Counter for wrong commands. */
+    QTimer                                 *m_qTimer;                                   /**< Timer for displaying accuracy every second. */
+    int                                     m_iElapsedSeconds;                          /**< Time, displayed on screen. */
 
 };
 

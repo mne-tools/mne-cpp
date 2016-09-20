@@ -10,7 +10,7 @@
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -41,6 +41,7 @@
 //=============================================================================================================
 
 #include "ssvepbci.h"
+
 #include <iostream>
 #include <Eigen/Dense>
 #include <utils/ioutils.h>
@@ -54,7 +55,6 @@
 #include <QtCore/QtPlugin>
 #include <QtCore/QTextStream>
 #include <QDebug>
-#include <QElapsedTimer>
 
 
 //*************************************************************************************************************
@@ -63,9 +63,12 @@
 //=============================================================================================================
 
 using namespace SSVEPBCIPLUGIN;
-using namespace std;
-using namespace UTILSLIB;
+using namespace SCSHAREDLIB;
+using namespace SCMEASLIB;
+using namespace IOBUFFER;
 using namespace FSLIB;
+using namespace std;
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -104,7 +107,6 @@ SsvepBci::SsvepBci()
     m_lElectrodeNumbers << 33 << 34 << 35 << 36 << 40 << 41 << 42 << 43;
     m_lDesFrequencies << 6.66 << 7.5 <<8.57 << 10 << 12;
     m_lThresholdValues << 0.12 << 0.12 << 0.12 << 0.12 << 0.12;
-
     setFrequencyList(m_lDesFrequencies);
 }
 
@@ -113,8 +115,6 @@ SsvepBci::SsvepBci()
 
 SsvepBci::~SsvepBci()
 {
-    //std::cout << "BCI::~BCI() " << std::endl;
-
     //If the program is closed while the sampling is in process
     if(this->isRunning())
         this->stop();
@@ -206,6 +206,7 @@ bool SsvepBci::start()
 
     m_pFiffInfo_Sensor = FiffInfo::SPtr();
 
+    // initialize time window parameters
     m_iWriteIndex   = 0;
     m_iReadIndex    = 0;
     m_iCounter      = 0;
@@ -375,13 +376,6 @@ void SsvepBci::updateSource(SCMEASLIB::NewMeasurement::SPtr pMeasurement)
     foreach(Label label, labels)
         qDebug() << "label IDs: " << label.label_id << "\v" << "label name: " << label.name;
 
-
-
-
-
-
-
-
     QList<VectorXi> vertNo = pRTSE->getFwdSolution()->src.get_vertno();
     foreach(VectorXi vector, vertNo)
         cout << "vertNo:" << vector << endl;
@@ -411,6 +405,7 @@ void SsvepBci::setNumClassBreaks(int numClassBreaks){
     m_iNumberOfClassBreaks = numClassBreaks;
 }
 
+
 //*************************************************************************************************************
 
 void  SsvepBci::setChangeSSVEPParameterFlag(){
@@ -424,25 +419,27 @@ void SsvepBci::setSizeClassList(int classListSize){
     m_iClassListSize = classListSize;
 }
 
+
 //*************************************************************************************************************
 
 QString SsvepBci::getSsvepBciResourcePath(){
     return m_qStringResourcePath;
 }
 
+
 //*************************************************************************************************************
 
-bool SsvepBci::lookForTrigger(const MatrixXd &data)
-{
-    // Check if capacitive touch trigger signal was received - Note that there can also be "beep" triggers in the received data, which are only 1 sample wide -> therefore look for 2 samples with a value of 254 each
-    for(int i = 0; i<data.cols()-1; i++)
-    {
-        if(data(0,i) == 254 && data(0,i+1) == 254) // data - corresponds with channel 136 which is the trigger channel
-            return true;
-    }
+//bool SsvepBci::lookForTrigger(const MatrixXd &data)
+//{
+//    // Check if capacitive touch trigger signal was received - Note that there can also be "beep" triggers in the received data, which are only 1 sample wide -> therefore look for 2 samples with a value of 254 each
+//    for(int i = 0; i<data.cols()-1; i++)
+//    {
+//        if(data(0,i) == 254 && data(0,i+1) == 254) // data - corresponds with channel 136 which is the trigger channel
+//            return true;
+//    }
 
-    return false;
-}
+//    return false;
+//}
 
 
 //*************************************************************************************************************
@@ -486,7 +483,6 @@ void SsvepBci::showBCIConfiguration()
         m_pSsvepBciConfigurationWidget = QSharedPointer<SsvepBciConfigurationWidget>(new SsvepBciConfigurationWidget(this));
 
     if(!m_pSsvepBciConfigurationWidget->isVisible()){
-
         m_pSsvepBciConfigurationWidget->setWindowTitle("ssvepBCI - Configuration");
         m_pSsvepBciConfigurationWidget->show();
         m_pSsvepBciConfigurationWidget->raise();
@@ -580,16 +576,9 @@ void SsvepBci::run(){
     while(m_bIsRunning){
 
         if(m_bUseSensorData)
-        {
-//            QElapsedTimer timer;
-//            timer.start();
             ssvepBciOnSensor();
-//            qDebug() << "ssvepBCI::run - ssvepBCIOnSensor() took" << timer.elapsed();
-        }
         else
-        {
             ssvepBciOnSource();
-        }
     }
 }
 
@@ -649,6 +638,7 @@ double SsvepBci::MEC(MatrixXd &Y, MatrixXd &X)
     MatrixXd W = eigensolver.eigenvectors().block(0, 0, eigensolver.eigenvectors().rows(), Ns);   
     for(int k = 0; k < Ns; k++)
         W.col(k) = W.col(k)*(1/sqrt(eigensolver.eigenvalues()(k)));
+
     // Calcuclate channel signals
     MatrixXd S = Y*W;
 
@@ -661,7 +651,6 @@ double SsvepBci::MEC(MatrixXd &Y, MatrixXd &X)
         power += 1 / double(m_iNumberOfHarmonics*Ns) * P.sum();
     }
 
-    //cout << "power" << endl << power << endl<< endl;
     return power;
 }
 
@@ -678,10 +667,13 @@ double SsvepBci::CCA(MatrixXd &Y, MatrixXd &X)
     // center data sets
     MatrixXd X_center(n, p1);
     MatrixXd Y_center(n, p2);
-    for(int i = 0; i < p1; i++)
+    for(int i = 0; i < p1; i++){
         X_center.col(i) = X.col(i).array() - X.col(i).mean();
-    for(int i = 0; i < p2; i++)
+    }
+
+    for(int i = 0; i < p2; i++){
         Y_center.col(i) = Y.col(i).array() - Y.col(i).mean();
+    }
 
     // QR decomposition
     MatrixXd Q1, Q2;
@@ -701,9 +693,9 @@ double SsvepBci::CCA(MatrixXd &Y, MatrixXd &X)
 void SsvepBci::readFromSlidingTimeWindow(MatrixXd &data)
 {
     data.resize(m_matSlidingTimeWindow.rows(), m_iWindowSize*m_iReadSampleSize);
+
     // consider matrix overflow case
     if(data.cols() > m_iReadIndex + 1){
-        //cout << "do splitting" << endl;
         int width = data.cols() - (m_iReadIndex + 1);
         data.block(0, 0, data.rows(), width) = m_matSlidingTimeWindow.block(0, m_matSlidingTimeWindow.cols() - width , data.rows(), width );
         data.block(0, width, data.rows(), m_iReadIndex + 1) = m_matSlidingTimeWindow.block(0, 0, data.rows(), m_iReadIndex + 1);
@@ -726,7 +718,6 @@ void SsvepBci::ssvepBciOnSensor()
         msleep(10);
 
     // reset list of classifiaction results
-//    m_lIndexOfClassResultSensor.clear();
     MatrixXd m_matSSVEPProbabilities(m_lDesFrequencies.size(), 0);
 
     // Start filling buffers with data from the inputs
@@ -764,18 +755,15 @@ void SsvepBci::ssvepBciOnSensor()
                 m_iWindowSize = 20;
             if(m_iCounter > 50)
                 m_iWindowSize = 40;
-            //cout << "Counter:" << m_iCounter << endl;
 
             // create current data matrix Y
             MatrixXd Y;
             readFromSlidingTimeWindow(Y);
-            //cout << "Y:" << Y <<  endl;
 
             // create realtive timeline according to Y
             int samples = Y.rows();
             ArrayXd t = 2*M_PI/m_dSampleFrequency * ArrayXd::LinSpaced(samples, 1, samples);
-            
-            //IOUtils::write_eigen_matrix(Y, "Y_before.txt");
+
             // Remove 50 Hz Power line signal
             if(m_bRemovePowerLine){
                 MatrixXd Zp(samples,2);
@@ -813,8 +801,6 @@ void SsvepBci::ssvepBciOnSensor()
             // classify probabilites
             int index = 0;
             double maxProbability = ssvepProbabilities.maxCoeff(&index);
-//            cout << "index:" << index << endl;
-//            qDebug() << "Thresholds: " << m_lThresholdValues;
             if(index < m_lDesFrequencies.size()){
                 //qDebug()<< "index:" << index;
                 if(m_lThresholdValues[index] < maxProbability){
@@ -842,13 +828,10 @@ void SsvepBci::ssvepBciOnSensor()
         m_iReadToWriteBuffer = m_iReadToWriteBuffer - m_iReadSampleSize;
         m_iReadIndex = (m_iReadIndex + m_iReadSampleSize) % (m_iTimeWindowLength);
 
-        //qDebug() << "Index-List: " << m_lIndexOfClassResultSensor;
-
     }
 
     // emit classifiaction results if any classifiaction has been done
     if(!m_lIndexOfClassResultSensor.isEmpty()){
-
         // finding a classifiaction result that satisfies the number of classifiaction hits
         for(int i = 1; (i <= m_lDesFrequencies.size()) && (!m_lIndexOfClassResultSensor.isEmpty() ); i++){
             if(m_lIndexOfClassResultSensor.count(i) >= m_iNumberOfClassHits){
@@ -860,8 +843,6 @@ void SsvepBci::ssvepBciOnSensor()
             else
               emit classificationResult(0);
         }
-
-
     }
 
     // calculate and emit signal of mean probabilities
@@ -882,7 +863,6 @@ void SsvepBci::ssvepBciOnSensor()
 
 //*************************************************************************************************************
 
-void SsvepBci::ssvepBciOnSource(){
-
-
+void SsvepBci::ssvepBciOnSource()
+{
 }

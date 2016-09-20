@@ -74,18 +74,18 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Utilsd \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
             -lMNE$${MNE_LIB_VERSION}Dispd \
-            -lxMeasd \
-            -lxDispd \
-            -lmne_xd
+            -lscMeasd \
+            -lscDispd \
+            -lscSharedd
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
             -lMNE$${MNE_LIB_VERSION}Utils \
             -lMNE$${MNE_LIB_VERSION}Fiff \
             -lMNE$${MNE_LIB_VERSION}Disp \
-            -lxMeas \
-            -lxDisp \
-            -lmne_x
+            -lscMeas \
+            -lscDisp \
+            -lscShared
 }
 
 DESTDIR = $${MNE_BINARY_DIR}/mne_x_plugins
@@ -115,7 +115,7 @@ FORMS += \
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
-INCLUDEPATH += $${MNE_X_INCLUDE_DIR}
+INCLUDEPATH += $${MNE_SCAN_INCLUDE_DIR}
 
 OTHER_FILES += gusbamp.json
 

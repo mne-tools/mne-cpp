@@ -10,7 +10,7 @@
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Viktor Klüber, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -49,48 +49,53 @@
 
 using namespace SSVEPBCIPLUGIN;
 
-
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
 SsvepBciFlickeringItem::SsvepBciFlickeringItem()
-    : m_dPosX(0)
-    , m_dPosY(0)
-    , m_dWidth(0.4)
-    , m_dHeight(0.4)
-    , m_bFlickerState(true)
-    , m_bSignFlag(false)
-    , m_bIter(m_bRenderOrder)
-
+: m_dPosX(0)
+, m_dPosY(0)
+, m_dWidth(0.4)
+, m_dHeight(0.4)
+, m_bFlickerState(true)
+, m_bSignFlag(false)
+, m_bIter(m_bRenderOrder)
 {
     m_bRenderOrder << 0 << 0 << 1 << 1; //default
 }
 
+
 //*************************************************************************************************************
 
-SsvepBciFlickeringItem::~SsvepBciFlickeringItem(){
+SsvepBciFlickeringItem::~SsvepBciFlickeringItem()
+{
 }
 
+
 //*************************************************************************************************************
 
-void SsvepBciFlickeringItem::setPos(double x, double y){
+void SsvepBciFlickeringItem::setPos(double x, double y)
+{
         m_dPosX = x;
         m_dPosY = y;
 }
 
+
 //*************************************************************************************************************
 
-void SsvepBciFlickeringItem::setDim(double w, double h){
+void SsvepBciFlickeringItem::setDim(double w, double h)
+{
     m_dWidth    = w;
     m_dHeight   = h;
 }
 
+
 //*************************************************************************************************************
 
-void SsvepBciFlickeringItem::setRenderOrder(QList<bool> renderOrder, int freqKey){
-
+void SsvepBciFlickeringItem::setRenderOrder(QList<bool> renderOrder, int freqKey)
+{
     //clear the old rendering order list
     m_bRenderOrder.clear();
 
@@ -100,6 +105,7 @@ void SsvepBciFlickeringItem::setRenderOrder(QList<bool> renderOrder, int freqKey
     m_iFreqKey      = freqKey;
 }
 
+
 //*************************************************************************************************************
 
 void SsvepBciFlickeringItem::paint(QPaintDevice *paintDevice)
@@ -108,24 +114,11 @@ void SsvepBciFlickeringItem::paint(QPaintDevice *paintDevice)
     if(!m_bIter.hasNext())
         m_bIter.toFront();
 
-
     if( m_bIter.peekNext() != m_bFlickerState){
-
         //painting the itme's shape
         QPainter p(paintDevice);
 
-
         if(m_bSignFlag){
-            //        // scaling the letter size to the biggest sign "DEL"
-            //        float factor =0.2* m_dWidth*paintDevice->width() / p.fontMetrics().width(m_sSign);
-            //        if ((factor < 1) || (factor > 1.25))
-            //        {
-            //            QFont f = p.font();
-            //            f.setBold(true);
-            //            f.setPointSizeF(f.pointSizeF()*factor);
-            //            p.setFont(f);
-            //        }
-
             QFont f = p.font();
             f.setBold(true);
             f.setPointSize(30);
@@ -138,14 +131,13 @@ void SsvepBciFlickeringItem::paint(QPaintDevice *paintDevice)
             p.fillRect(rectangle,Qt::white);
             p.drawText(rectangle, Qt::AlignCenter, m_sSign);
         }
-        else
+        else{
             p.fillRect(m_dPosX*paintDevice->width(),m_dPosY*paintDevice->height(),m_dWidth*paintDevice->width(),m_dHeight*paintDevice->height(),Qt::black);
-
+        }
     }
-
     m_bFlickerState = m_bIter.next();
-
 }
+
 
 //*************************************************************************************************************
 
@@ -155,8 +147,10 @@ int SsvepBciFlickeringItem::getFreqKey()
 }
 
 
-void SsvepBciFlickeringItem::addSign(QString sign){
+//*************************************************************************************************************
 
+void SsvepBciFlickeringItem::addSign(QString sign)
+{
     m_bSignFlag = true;
     m_sSign = sign;
 }

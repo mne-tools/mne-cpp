@@ -10,7 +10,7 @@
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Viktor Klüber Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -44,6 +44,7 @@
 #include "ui_ssvepbcisetupstimuluswidget.h"
 #include "../ssvepbci.h"
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
@@ -57,12 +58,12 @@ using namespace SSVEPBCIPLUGIN;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-SsvepBciSetupStimulusWidget::SsvepBciSetupStimulusWidget(SsvepBci *pSsvepBci, QWidget *parent) :
-    QDialog(parent),
-    ui(new Ui::SsvepBciSetupStimulusWidget),
-     m_pSsvepBci(QSharedPointer<SsvepBci>(pSsvepBci)),
-     m_bIsRunning(false),
-     m_bReadFreq(false)
+SsvepBciSetupStimulusWidget::SsvepBciSetupStimulusWidget(SsvepBci *pSsvepBci, QWidget *parent)
+: QDialog(parent)
+, ui(new Ui::SsvepBciSetupStimulusWidget)
+, m_pSsvepBci(QSharedPointer<SsvepBci>(pSsvepBci))
+, m_bIsRunning(false)
+, m_bReadFreq(false)
 {
     ui->setupUi(this);
 
@@ -94,8 +95,9 @@ SsvepBciSetupStimulusWidget::SsvepBciSetupStimulusWidget(SsvepBci *pSsvepBci, QW
     m_idFreqMap.insert( 0, 30   );
 
     //initialize combobox for frequencies
-    foreach(int i, m_idFreqMap.keys())
+    foreach(int i, m_idFreqMap.keys()){
         ui->comboBox_2->addItem(QString().number(m_idFreqMap[i]));
+    }
 
     //getting refreshrate of the subject's screen and add it to the setupWidget
     ui->label_6->setText(QString().number(m_pScreen->refreshRate()));
@@ -137,8 +139,9 @@ void SsvepBciSetupStimulusWidget::changeComboBox()
     ui->comboBox->clear();
 
     //create new comobBox list
-    for(int i = 1; i <= m_pSsvepBciScreen->m_Items.size(); i++ )
+    for(int i = 1; i <= m_pSsvepBciScreen->m_Items.size(); i++ ){
         ui->comboBox->addItem(QString().number(i));
+    }
 
     m_bIsRunning = true;
     on_comboBox_currentIndexChanged(0);
@@ -188,6 +191,7 @@ void SsvepBciSetupStimulusWidget::on_pushButton_4_clicked()
     setFreq(item2,12);
     setFreq(item3,8);
     setFreq(item4,4);
+
     //set dimensions and positions
     item1.setDim(0.2,0.2);
     item2.setDim(0.2,0.2);
@@ -200,7 +204,6 @@ void SsvepBciSetupStimulusWidget::on_pushButton_4_clicked()
 
     m_pSsvepBciScreen->m_Items <<item1<<item2<<item3<<item4 ;
     changeComboBox();
-
 }
 
 
@@ -214,6 +217,7 @@ void SsvepBciSetupStimulusWidget::on_pushButton_5_clicked()
     m_pSsvepBciScreen->useScreenKeyboard(false);
 
     SsvepBciFlickeringItem item1;
+
     //whole screen with 15 Hz
     setFreq(item1,11);
     item1.setDim(1,1);
@@ -244,6 +248,7 @@ void SsvepBciSetupStimulusWidget::on_pushButton_6_clicked()
     setFreq(item3,10);
     setFreq(item4, 8);
     setFreq(item5, 6);
+
     //set dimensions and positions
     item1.setDim(0.2,0.2);
     item2.setDim(0.2,0.2);
@@ -259,10 +264,6 @@ void SsvepBciSetupStimulusWidget::on_pushButton_6_clicked()
     m_pSsvepBciScreen->m_Items <<item1<<item2<<item3<<item4<<item5 ;
 
     changeComboBox();
-
-
-
-
 }
 
 
@@ -306,13 +307,11 @@ void SSVEPBCIPLUGIN::SsvepBciSetupStimulusWidget::on_pushButton_7_clicked()
     item5.addSign("Select");
 
     //add items to List
-    m_pSsvepBciScreen->m_Items <<item1<<item2<<item3<<item4<<item5 ;
+    m_pSsvepBciScreen->m_Items <<item1<<item2<<item3<<item4<<item5;
 
     changeComboBox();
 
     m_pSsvepBciScreen->useScreenKeyboard(true);
-
-
 }
 
 
@@ -333,19 +332,16 @@ void SsvepBciSetupStimulusWidget::on_comboBox_currentIndexChanged(int index)
 void SSVEPBCIPLUGIN::SsvepBciSetupStimulusWidget::on_comboBox_2_currentIndexChanged(int index)
 {
     if(m_bIsRunning){
-        if(m_bReadFreq)
+        if(m_bReadFreq){
             m_bReadFreq=false;
+        }
         else{
-
             //get selected Item from comboBox
             int ItemSelect = ui->comboBox->currentIndex();
             //adjust the rendering order of the selected Plugin
             setFreq(m_pSsvepBciScreen->m_Items[ItemSelect],index);
-
         }
-
     }
-
 }
 
 
@@ -353,7 +349,6 @@ void SSVEPBCIPLUGIN::SsvepBciSetupStimulusWidget::on_comboBox_2_currentIndexChan
 
 void SsvepBciSetupStimulusWidget::setFreq(SsvepBciFlickeringItem &item, int freqKey)
 {
-
     QList<bool> renderOrder;
 
     //choose the rendereing orders according to evoked flickerfrequency (being valid for a 60 Hz monitor)
@@ -399,32 +394,33 @@ void SsvepBciSetupStimulusWidget::setFreq(SsvepBciFlickeringItem &item, int freq
 
     // signal for changing frequency list of ssvepBCI class
     emit frequencyChanged();
-
 }
 
 
 //*************************************************************************************************************
 
-QList<double> SsvepBciSetupStimulusWidget::getFrequencies(){
-
+QList<double> SsvepBciSetupStimulusWidget::getFrequencies()
+{
     // get list of frequencies from the item-list beholding the ssvepBCIScreen class
     QList<double> freqList;
-    foreach(SsvepBciFlickeringItem item, m_pSsvepBciScreen->m_Items)
+    foreach(SsvepBciFlickeringItem item, m_pSsvepBciScreen->m_Items){
         freqList << m_idFreqMap.value(item.getFreqKey());
-
+    }
     return freqList;
 }
 
 
 //*************************************************************************************************************
 
-void SSVEPBCIPLUGIN::SsvepBciSetupStimulusWidget::on_m_lineEdit_BCISpeller_textChanged(const QString &arg1){
+void SSVEPBCIPLUGIN::SsvepBciSetupStimulusWidget::on_m_lineEdit_BCISpeller_textChanged(const QString &arg1)
+{
     emit settledPhrase(arg1);
 }
 
 
 //*************************************************************************************************************
 
-QSharedPointer<ScreenKeyboard> SsvepBciSetupStimulusWidget::getScreenKeyboardSPtr(){
+QSharedPointer<ScreenKeyboard> SsvepBciSetupStimulusWidget::getScreenKeyboardSPtr()
+{
     return m_pSsvepBciScreen->m_pScreenKeyboard;
 }
