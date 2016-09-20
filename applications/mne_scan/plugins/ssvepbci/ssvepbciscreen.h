@@ -10,7 +10,7 @@
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Viktor Klüber, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -48,6 +48,7 @@
 #include "screenkeyboard.h"
 #include "ssvepbci.h"
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
@@ -55,6 +56,7 @@
 
 #include <QOpenGLWidget>
 #include <QMediaPlayer>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -64,6 +66,7 @@
 namespace SSVEPBCIPLUGIN
 {
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // TypeDefs
@@ -71,13 +74,6 @@ namespace SSVEPBCIPLUGIN
 
 typedef  QList<double>  MyQList;
 
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-class SsvepBci;
-class SsvepBciSetupStimulusWidget;
 
 //=============================================================================================================
 /**
@@ -113,14 +109,13 @@ public slots:
     void useScreenKeyboard(bool useKeyboard);
     void clearScreen();
 
-
 private:
     QSharedPointer<SsvepBci>                        m_pSsvepBci;                        /**< pointer to referring SsvepBci class */
     QSharedPointer<SsvepBciSetupStimulusWidget>     m_pSsvepBciSetupStimulusWidget;     /**< pointer to referring SsvepBciSetupStimulusWidget class */
 
     // draw items
     QList<SsvepBciFlickeringItem>   m_Items;            /**< QList containing all flickering Items to be painted */
-    QSharedPointer<ScreenKeyboard>  m_pScreenKeyboard;   /**< pointer that holds the Screen-keyboard */
+    QSharedPointer<ScreenKeyboard>  m_pScreenKeyboard;  /**< pointer that holds the Screen-keyboard */
 
 
     // classifiaction updates
@@ -129,27 +124,18 @@ private:
     double                          m_dStep;            /**< moving step increment for reference cross */
     QList<double>                   m_lFreqList;        /**< list of current flickering frequencies */
     QColor                          m_qCrossColor;      /**< color of the reference cross */
-//    QMediaPlayer                    m_qBeep;            /**< beep sound for successful classifiaction */
     QPainter                        m_qPainter;         /**< painter for drawing items to the widget scene */
 //    QString                         m_qSoundPath;       /**< path to sound file for recognition sound */
+//    QMediaPlayer                    m_qBeep;            /**< beep sound for successful classifiaction */
 
     bool                            m_bUseScreenKeyboard;    /**< flag for updating screen keayboard */
     bool                            m_bClearScreen;          /**< flag for clearing swap buffer */
 
-
-
 protected:
-    //=========================================================================================================
-    /**
-     * overwritten functions from the QOpenGLWidget class which will be called automatically
-     *
-     */
     void resizeGL(int w, int h);
     void paintGL();
     void initializeGL();
-
 };
-
 
 }//Namescpace
 

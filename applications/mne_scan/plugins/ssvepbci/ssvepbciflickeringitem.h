@@ -10,7 +10,7 @@
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Viktor Klüber, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -49,9 +49,10 @@
 #include <QtCore>
 #include <QPainter>
 
+
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE SsvepBciScreen
+// DEFINE NAMESPACE SSVEPBCIPLUGIN
 //=============================================================================================================
 
 namespace SSVEPBCIPLUGIN
@@ -67,9 +68,8 @@ namespace SSVEPBCIPLUGIN
 */
 class SsvepBciFlickeringItem
 {
-public:   
-    int                 m_iFreqKey;     /**< getting the adjusted key of the frquency */
 
+public:   
     //=========================================================================================================
     /**
     * constructs a SsvepBciFlickeringItem object
@@ -90,7 +90,7 @@ public:
     * @param[in]  y  relative horizontal position. y is element from [0..1]
     *
     */
-    void            setPos(double x, double y);
+    void setPos(double x, double y);
 
     //=========================================================================================================
     /**
@@ -100,7 +100,7 @@ public:
     * @param[in]  h  relative height. h is element from [0..1]
     *
     */
-    void            setDim(double w, double h);
+    void setDim(double w, double h);
 
     //=========================================================================================================
     /**
@@ -139,21 +139,22 @@ public:
     */
     void addSign(QString sign);
 
+    int                 m_iFreqKey;     /**< getting the adjusted key of the frquency */
+
 private:
-    double m_dPosX;                         /**< realtive vertical position according to screen size; [0..1] */
-    double m_dPosY;                         /**< realtive horizontal position according to screen size; [0..1] */
-    double m_dWidth;                        /**< realtive width according to screen size; [0..1] */
-    double m_dHeight;                       /**< realtive height according to screen size; [0..1] */
+    double              m_dPosX;            /**< realtive vertical position according to screen size; [0..1] */
+    double              m_dPosY;            /**< realtive horizontal position according to screen size; [0..1] */
+    double              m_dWidth;           /**< realtive width according to screen size; [0..1] */
+    double              m_dHeight;          /**< realtive height according to screen size; [0..1] */
 
     QList<bool>         m_bRenderOrder;     /**< render order of the Item */
     QListIterator<bool> m_bIter;            /**< Iterator of the m_bRenderOrder list */
     bool                m_bFlickerState;    /**< actual Flickerstate [0] paint black [1] paint white */
     bool                m_bSignFlag;        /**< flag for an item attached sign */
     QString             m_sSign;            /**< item attached sign */
-    QFont               m_qFont;
-
-
+    QFont               m_qFont;            /**< font property, which is displayed on the subject's screen */
 };
 
 }       // NAMESPACE
+
 #endif  // SSVEPBCIFLICKERINGITEM_H

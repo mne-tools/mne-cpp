@@ -10,7 +10,7 @@
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Viktor Klüber Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -38,6 +38,7 @@
 #ifndef SCREENKEYBOARD_H
 #define SCREENKEYBOARD_H
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
@@ -47,6 +48,7 @@
 #include "FormFiles/ssvepbcisetupStimuluswidget.h"
 #include "ssvepbci.h"
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
@@ -54,13 +56,15 @@
 
 #include <QMediaPlayer>
 
+
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE ssvepBCIScreen
+// DEFINE NAMESPACE SSVEPBCIPLUGIN
 //=============================================================================================================
 
 namespace SSVEPBCIPLUGIN
 {
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -68,6 +72,7 @@ namespace SSVEPBCIPLUGIN
 //=============================================================================================================
 
 typedef  QList<double>  MyQList;
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -78,25 +83,35 @@ class SsvepBci;
 class SsvepBciSetupStimulusWidget;
 class SsvepBciScreen;
 
+
 //=============================================================================================================
-
-
-
-
-
+/**
+* DECLARE CLASS ScreenKeyboard
+*
+* @brief The ScreenKeyboard class provides the screen keyboard device for the ssvep BCI plug-in.
+*/
 class ScreenKeyboard : public QObject
 {
     Q_OBJECT
 
 public:
+    //=========================================================================================================
+    /**
+    * Constructrs the ScreenKeyboard class.
+    */
     ScreenKeyboard(QSharedPointer<SsvepBci> pSsvepBci, QSharedPointer<SsvepBciSetupStimulusWidget> pSsvepBciSetupStimulusWidget, QSharedPointer<SsvepBciScreen> pSsvepBciScreen);
 
+    //=========================================================================================================
+    /**
+    * Destroys the ScreenKeyboard class.
+    */
     ~ScreenKeyboard();
 
     //=========================================================================================================
     /**
-    * painting keyboard update to the screen
+    * Painting keyboard update to the screen
     *
+    * @param[in]    paint device which links to to the corresponding widget.
     */
     void paint(QPaintDevice *device);
 
@@ -114,6 +129,16 @@ public slots:
     void stopSpellAccuracyFeature();
 
 private:
+    //=========================================================================================================
+    /**
+    * process the spelled letter and emit the classifiaction signal
+    *
+    * @param [in] letter    sign which will be classified
+    *
+    */
+    void spellLetter(QString letter);
+
+    // Pointer to other classes
     QSharedPointer<SsvepBci>                        m_pSsvepBci;                        /**< pointer to the SsvepBci class */
     QSharedPointer<SsvepBciSetupStimulusWidget>     m_pSsvepBciSetupStimulusWidget;     /**< pointer to SsvepBciSetupStimulusWidget class */
     QSharedPointer<SsvepBciScreen>                  m_pSsvepBciScreen;                  /**< holds the pointer to the SsvepBciScreen class */
@@ -135,16 +160,6 @@ private:
     QString                                 m_sSpelledPhrase;       /**< phrase spelled by the user with the SsvepBci */
     QString::Iterator                       m_qSpellIterator;       /**< iterator for spelling */
     QMediaPlayer                           *m_qSound;               /**< sound-object for emiting audio feedback */
-
-    //=========================================================================================================
-    /**
-    * process the spelled letter and emit the classifiaction signal
-    *
-    * @param [in] letter    sign which will be classified
-    *
-    */
-    void spellLetter(QString letter);
-
 };
 
 } // namespace

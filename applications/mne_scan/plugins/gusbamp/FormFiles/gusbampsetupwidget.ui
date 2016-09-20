@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>784</width>
-    <height>495</height>
+    <width>914</width>
+    <height>409</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -25,29 +25,17 @@
      <layout class="QGridLayout" name="gridLayout_9">
       <item row="0" column="0">
        <widget class="QLabel" name="label_6">
-        <property name="text">
-         <string/>
+        <property name="font">
+         <font>
+          <pointsize>25</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
         </property>
-        <property name="pixmap">
-         <pixmap resource="../gusbamp.qrc">:/images/images/logos/title.png</pixmap>
+        <property name="text">
+         <string>gUSBamp Driver</string>
         </property>
        </widget>
-      </item>
-      <item row="0" column="1">
-       <spacer name="horizontalSpacer_4">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeType">
-         <enum>QSizePolicy::Expanding</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
       </item>
       <item row="0" column="2">
        <widget class="QLabel" name="label_7">
@@ -59,10 +47,23 @@
         </property>
        </widget>
       </item>
+      <item row="0" column="1">
+       <spacer name="horizontalSpacer_3">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
      </layout>
      <zorder>label_7</zorder>
-     <zorder>horizontalSpacer_4</zorder>
      <zorder>label_6</zorder>
+     <zorder>horizontalSpacer_3</zorder>
     </widget>
    </item>
    <item row="1" column="0">

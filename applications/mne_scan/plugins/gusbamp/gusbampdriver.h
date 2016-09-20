@@ -34,10 +34,6 @@
 *
 */
 
-
-
-
-
 #ifndef GUSBAMPDRIVER_H
 #define GUSBAMPDRIVER_H
 
@@ -51,6 +47,7 @@
 #include <deque>
 #include <stdarg.h>
 #include "gtec_gUSBamp.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -74,10 +71,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE GUSBAmpPlugin
+// DEFINE NAMESPACE GUSBAMPPLUGIN
 //=============================================================================================================
 
-namespace GUSBAmpPlugin
+namespace GUSBAMPPLUGIN
 {
 
 
@@ -113,8 +110,13 @@ class GUSBAmpProducer;
 class GUSBAmpDriver
 {
 private:
+    //=========================================================================================================
+    /**
+    * Refreshes the size-values of the ouput Matrix
+    */
+    void refreshSizeOutputMatrix(void);
 
-//device parameters
+    //device parameters
     vector<QString>     m_vsSerials;                /**< vector of serial number as String vector (first one is master) */
     vector<QByteArray>  m_vbSerials;                /**< vector of serial number as ByteArray vector (first one is master) */
     vector<LPSTR>       m_vpSerials;                /**< pointer to the serial numbers  */
@@ -134,19 +136,14 @@ private:
     GND                 m_commonGround;             /**< don't connect groups to common ground */
     const int           m_QUEUE_SIZE;               /**< the number of GT_GetData calls that will be queued during acquisition to avoid loss of data */
     bool                m_isRunning;                /**< flag for data acquisition */
-//buffer
+
+    //buffer
     int                 m_nPoints;                  /**< number of points which are received from one channel simultaneously */
     DWORD               m_bufferSizeBytes;          /**< Size of buffer in Bytes */
     DWORD               m_numBytesReceived;         /**< num of Bytes whicht are received during one measuring procedure */
     BYTE***             m_buffers;                  /**< pointer to the buffer */
     OVERLAPPED**        m_overlapped;               /**< storage in case of overlapping */
     vector<int>         m_sizeOfMatrix;             /**< number of rows and column of output matrix [rows columns] */
-
-    //=========================================================================================================
-    /**
-    * Refreshes the size-values of the ouput Matrix
-    */
-    void refreshSizeOutputMatrix(void);
 
 public:
     //=========================================================================================================
@@ -251,7 +248,6 @@ public:
     * Getting the size of the Sample Matrix
     *
     * @return                       vector which beholds the size of the matrix. first value refers to columns.
-    *                               second value refers to rows.
     *
     */
     vector<int> getSizeOfSampleMatrix(void);

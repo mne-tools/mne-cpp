@@ -10,7 +10,7 @@
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Viktor Klüber, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -45,17 +45,12 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-
-
-//*************************************************************************************************************
-//=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace SSVEPBCIPLUGIN;
+using namespace std;
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -126,14 +121,15 @@ ScreenKeyboard::ScreenKeyboard(QSharedPointer<SsvepBci> pSsvepBci, QSharedPointe
 
 //*************************************************************************************************************
 
-ScreenKeyboard::~ScreenKeyboard(){
-
+ScreenKeyboard::~ScreenKeyboard()
+{
 }
 
 
 //*************************************************************************************************************
 
-void ScreenKeyboard::paint(QPaintDevice *device){
+void ScreenKeyboard::paint(QPaintDevice *device)
+{
 
     QPainter painter(device);
 
@@ -247,7 +243,8 @@ void ScreenKeyboard::paint(QPaintDevice *device){
 
 //*************************************************************************************************************
 
-void ScreenKeyboard::updateClassList(MyQList classList){
+void ScreenKeyboard::updateClassList(MyQList classList)
+{
     m_lClassList = classList;
 }
 
@@ -307,7 +304,6 @@ void ScreenKeyboard::updateCommand(double value){
                 qDebug() << "correct select";
 
                 if(m_qNextCoord == m_mapKeys.key("Del")){
-
                     m_qNextCoord = m_mapKeys.key(*m_qSpellIterator);
                     qDebug() << "correct delete! next coordinate:" << m_qNextCoord;
                 } 
@@ -321,7 +317,6 @@ void ScreenKeyboard::updateCommand(double value){
 
                 if(m_qSpellIterator == m_sSettledPhrase.end())
                     stopSpellAccuracyFeature();
-
             }
             else if(m_qCurCursorCoord == m_mapKeys.key("Clr") && (index == 4)){
 
@@ -345,7 +340,6 @@ void ScreenKeyboard::updateCommand(double value){
             emit isCorrectCommand(false);
             qDebug() << "wrong command";
         }
-
     }
 
     // check existence of new cursor position -> then update
@@ -356,14 +350,13 @@ void ScreenKeyboard::updateCommand(double value){
 
     if(index == 4)
         m_qCurCursorCoord = QPair<int, int> (0,0);
-
 }
 
 
 //*************************************************************************************************************
 
-void ScreenKeyboard::setPhrase(QString phrase){
-
+void ScreenKeyboard::setPhrase(QString phrase)
+{
     // capitalizing the phrase and assign it
     m_sSettledPhrase = phrase.toUpper();
 
@@ -371,20 +364,23 @@ void ScreenKeyboard::setPhrase(QString phrase){
     m_bDisplaySpeller = true;
     m_bUpdatePhraseDisplay = true;
 
-    if(m_bUseSpellAccuracy)
+    if(m_bUseSpellAccuracy){
         initSpellAccuracyFeature();
+    }
 }
 
 
 //*************************************************************************************************************
 
-void ScreenKeyboard::spellLetter(QString letter){
-
+void ScreenKeyboard::spellLetter(QString letter)
+{
     // classify the subject's selection
-    if(letter == "Clr")
+    if(letter == "Clr"){
         m_sSpelledPhrase.clear();
-    else if(letter == "Del")
+    }
+    else if(letter == "Del"){
         m_sSpelledPhrase.resize(m_sSpelledPhrase.size() - 1);
+    }
     else{
         m_sSpelledPhrase.append(letter);
         m_bUpdatePhraseDisplay = true;
@@ -395,7 +391,8 @@ void ScreenKeyboard::spellLetter(QString letter){
 
 //*************************************************************************************************************
 
-void ScreenKeyboard::initScreenKeyboard(){
+void ScreenKeyboard::initScreenKeyboard()
+{
     m_bInitializeKeyboard = true;
     m_qOldCursorCoord = QPair<int, int>(100,100);
 }
@@ -403,7 +400,8 @@ void ScreenKeyboard::initScreenKeyboard(){
 
 //*************************************************************************************************************
 
-void ScreenKeyboard::initSpellAccuracyFeature(){
+void ScreenKeyboard::initSpellAccuracyFeature()
+{
 
     m_sSpelledPhrase.clear();
 
@@ -421,8 +419,8 @@ void ScreenKeyboard::initSpellAccuracyFeature(){
 
 //*************************************************************************************************************
 
-void ScreenKeyboard::stopSpellAccuracyFeature(){
-
+void ScreenKeyboard::stopSpellAccuracyFeature()
+{
     emit spellingFinished();
     m_bUseSpellAccuracy = false;
 }

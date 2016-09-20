@@ -10,7 +10,7 @@
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Viktor Klüber, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -43,6 +43,7 @@
 #include "ssvepbciconfigurationwidget.h"
 #include "ui_ssvepbciconfigurationwidget.h"
 #include "../ssvepbci.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -183,13 +184,15 @@ void SsvepBciConfigurationWidget::setSSVEPProbabilities(MyQList SSVEP){
     }
 
     // filling rest of SSVEP with zeros if size of SSVEP < 5
-    for(int i = SSVEP.size(); i < 5; i++)
+    for(int i = SSVEP.size(); i < 5; i++){
         SSVEP << m_dMinProbValue;
+    }
 
     // scale SSVEP values for status bar
     QList<int> values;
-    for(int i = 0; i < SSVEP.size(); i++)
+    for(int i = 0; i < SSVEP.size(); i++){
         values << int((SSVEP.at(i) - m_dMinProbValue) / ( m_dMaxProbValue - m_dMinProbValue ) * 100);
+    }
 
     // assign SSVEP values to the status bar
     ui->m_ProgressBar_Threshold1->setValue(values[0]);
@@ -227,11 +230,12 @@ void SsvepBciConfigurationWidget::initSelectedChannelsSensor()
 {
     // Read electrode pinnig scheme from file and initialise List and store in QMap in BCI object
     QString path;
-    path.prepend(m_pSsvepBci->m_qStringResourcePath);
+    path.prepend(m_pSsvepBci->getSsvepBciResourcePath());
     path.append("Pinning_Scheme_Duke_Dry_64.txt");
     QFile file(path);
-    if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
+    if(!file.open(QIODevice::ReadOnly | QIODevice::Text)){
         return;
+    }
 
     //Start reading from file
     m_vAvailableChannelsSensor.clear();
@@ -251,8 +255,9 @@ void SsvepBciConfigurationWidget::initSelectedChannelsSensor()
     m_pSsvepBci->m_mapElectrodePinningScheme = mapElectrodePinningScheme;
 
     // Remove default items from list
-    for(int i=0; i<m_pSsvepBci->m_slChosenChannelsSensor.size(); i++)
+    for(int i=0; i<m_pSsvepBci->m_slChosenChannelsSensor.size(); i++){
         m_vAvailableChannelsSensor.removeAt(m_vAvailableChannelsSensor.indexOf(m_pSsvepBci->m_slChosenChannelsSensor.at(i)));
+    }
 
     ui->m_listWidget_AvailableChannelsOnSensorLevel->addItems(m_vAvailableChannelsSensor);
     ui->m_listWidget_ChosenChannelsOnSensorLevel->addItems(m_pSsvepBci->m_slChosenChannelsSensor);
@@ -280,7 +285,6 @@ void SsvepBciConfigurationWidget::thresholdChanged(double threshold)
     m_lSSVEPThresholdValues[2] = ui->m_DoubleSpinBox_Threshold3->value();
     m_lSSVEPThresholdValues[3] = ui->m_DoubleSpinBox_Threshold4->value();
     m_lSSVEPThresholdValues[4] = ui->m_DoubleSpinBox_Threshold5->value();
-
     updateThresholdsToScreen();
 
     // emit thresholdValueChanged signal
@@ -290,12 +294,14 @@ void SsvepBciConfigurationWidget::thresholdChanged(double threshold)
 
 //*************************************************************************************************************
 
-void SsvepBciConfigurationWidget::updateThresholdsToScreen(){
+void SsvepBciConfigurationWidget::updateThresholdsToScreen()
+{
 
     // scale threshold values for slider
     QList<int> thresholds;
-    for(int i = 0; i < m_lSSVEPThresholdValues.size(); i++)
+    for(int i = 0; i < m_lSSVEPThresholdValues.size(); i++){
         thresholds << int((m_lSSVEPThresholdValues.at(i) - m_dMinProbValue) / ( m_dMaxProbValue - m_dMinProbValue ) * 100);
+    }
 
     // assign SSVEP thresholds to sliders
     ui->m_VerticalSlider_Threshold1->setValue(thresholds[0]);
@@ -308,11 +314,13 @@ void SsvepBciConfigurationWidget::updateThresholdsToScreen(){
 
 //*************************************************************************************************************
 
-void SsvepBciConfigurationWidget::setFrequencyLabels(MyQList frequencyList){
+void SsvepBciConfigurationWidget::setFrequencyLabels(MyQList frequencyList)
+{
 
     // filling the list with missing zeros
-    for(int i = frequencyList.size(); i < 6; i++)
+    for(int i = frequencyList.size(); i < 6; i++){
         frequencyList << 0;
+    }
 
     // update frequency list
     m_lFrequencyList = frequencyList;
@@ -326,14 +334,13 @@ void SsvepBciConfigurationWidget::setFrequencyLabels(MyQList frequencyList){
 
     // reset borders of status bar
     m_bInitThresholdDisplay = true;
-
 }
 
 
 //*************************************************************************************************************
 
-void SsvepBciConfigurationWidget::setClassResult(double classResult){
-
+void SsvepBciConfigurationWidget::setClassResult(double classResult)
+{
     // set all labels to black again
     ui->m_Label_Frequency1->setPalette(m_palBlackFont);
     ui->m_Label_Frequency2->setPalette(m_palBlackFont);
@@ -388,9 +395,9 @@ void SsvepBciConfigurationWidget::numOfHarmonicsChanged(int harmonics){
 QStringList SsvepBciConfigurationWidget::getSensorChannelSelection(){
 
     QStringList ChosenSensorChannelSelect;
-    for(int i=0; i< ui->m_listWidget_ChosenChannelsOnSensorLevel->count(); i++)
+    for(int i=0; i< ui->m_listWidget_ChosenChannelsOnSensorLevel->count(); i++){
         ChosenSensorChannelSelect << ui->m_listWidget_ChosenChannelsOnSensorLevel->item(i)->text();
-
+    }
     return ChosenSensorChannelSelect;
 }
 
@@ -400,9 +407,9 @@ QStringList SsvepBciConfigurationWidget::getSensorChannelSelection(){
 QStringList SsvepBciConfigurationWidget::getSourceChannelSelection(){
 
     QStringList ChosenSourceChannelSelect;
-    for(int i=0; i< ui->m_listWidget_ChosenChannelsOnSourceLevel->count(); i++)
+    for(int i=0; i< ui->m_listWidget_ChosenChannelsOnSourceLevel->count(); i++){
         ChosenSourceChannelSelect << ui->m_listWidget_ChosenChannelsOnSourceLevel->item(i)->text();
-
+    }
     return ChosenSourceChannelSelect;
 }
 
@@ -451,10 +458,8 @@ void SSVEPBCIPLUGIN::SsvepBciConfigurationWidget::on_m_pushButton_StartMeasureme
 
                 m_bScreenKeyboardConnected = true;
             }
-
         }
     }
-
     m_qTimer->start(1000);
     m_iElapsedSeconds = 0;
 
@@ -473,12 +478,11 @@ void SSVEPBCIPLUGIN::SsvepBciConfigurationWidget::on_m_pushButton_StopMeasuremen
 {
     if(m_pSsvepBci->m_pSsvepBciSetupStimulusWidget != NULL){
         QSharedPointer<ScreenKeyboard> pScreenKeyboard = m_pSsvepBci->m_pSsvepBciSetupStimulusWidget->getScreenKeyboardSPtr();
-        if(pScreenKeyboard != NULL)
+        if(pScreenKeyboard != NULL){
             pScreenKeyboard->stopSpellAccuracyFeature();
+        }
 
     }
-
-
     stopMeasurement();
 }
 
@@ -495,7 +499,6 @@ void SsvepBciConfigurationWidget::evaluateCommand(bool isCorrectCommand){
         m_iWrongCommands +=1;
         ui->m_label_WrongCommands->setText(QString::number(m_iWrongCommands));
     }
-
 }
 
 
@@ -520,6 +523,5 @@ void SsvepBciConfigurationWidget::showCurrentTime(){
 //*************************************************************************************************************
 
 void SsvepBciConfigurationWidget::stopMeasurement(){
-
     m_qTimer->stop();
 }

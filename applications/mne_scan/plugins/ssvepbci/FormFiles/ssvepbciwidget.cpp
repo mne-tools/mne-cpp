@@ -5,11 +5,11 @@
 *			Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     December, 2013
+* @date     April, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Viktor Klüber, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -140,7 +140,7 @@ SsvepBciWidget::SsvepBciWidget(SsvepBci* pBCI, QWidget* parent)
     connect(ui.m_qPushButton_About, &QPushButton::released, this, &SsvepBciWidget::showAboutDialog);
 
     //Fill info box
-    QFile file(m_pBCI->m_qStringResourcePath+"readme.txt");
+    QFile file(m_pBCI->getSsvepBciResourcePath()+"readme.txt");
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
         return;
 

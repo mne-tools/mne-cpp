@@ -49,13 +49,15 @@
 #include <deque>
 #include <stdarg.h>
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace GUSBAmpPlugin;
+using namespace GUSBAMPPLUGIN;
 using namespace std;
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -75,7 +77,6 @@ GUSBAmpDriver::GUSBAmpDriver(GUSBAmpProducer* pGUSBAmpProducer)
 , m_numBytesReceived(0)
 , m_isRunning(false)
 {
-
     //Linking the specific API-library to the project
     #ifdef _WIN64
         #pragma comment(lib, __FILE__"\\..\\gUSBamp_x64.lib")
@@ -107,7 +108,6 @@ GUSBAmpDriver::GUSBAmpDriver(GUSBAmpProducer* pGUSBAmpProducer)
 
 GUSBAmpDriver::~GUSBAmpDriver()
 {
-
     //qDebug() << "GUSBAmpDriver::~GUSBAmpDriver()" << endl;
 }
 
@@ -116,7 +116,6 @@ GUSBAmpDriver::~GUSBAmpDriver()
 
 bool GUSBAmpDriver::initDevice()
 {
-
     m_isRunning =true;
 
     //after start is initialized, buffer parameters can be calculated:
@@ -127,8 +126,9 @@ bool GUSBAmpDriver::initDevice()
     qDebug() << "\nFollowing parameters were adjusted:\n";
     qDebug() << "sample rate:\n" <<m_SAMPLE_RATE_HZ << "Hz" ;
     qDebug() << "called device(s):";
-    for(deque<LPSTR>::iterator serialNumber = m_callSequenceSerials.begin(); serialNumber != m_callSequenceSerials.end(); serialNumber++)
+    for(deque<LPSTR>::iterator serialNumber = m_callSequenceSerials.begin(); serialNumber != m_callSequenceSerials.end(); serialNumber++){
         qDebug() <<QString(*serialNumber);
+    }
     qDebug()<<"size of output Matrix:\n" << m_sizeOfMatrix[0]<<" rows (channels) and "<< m_sizeOfMatrix[1] <<"columns (samples)";
 
     //load parameters on the device(s)
@@ -226,7 +226,6 @@ bool GUSBAmpDriver::initDevice()
             }
 
             printf("\tg.USBamp %s initialized as %s (#%d in the call sequence)!\n", *serialNumber, (isSlave) ? "slave" : "master", m_openedDevicesHandles.size());
-
         }
 
         //define the buffer variables and start the device:
@@ -253,9 +252,6 @@ bool GUSBAmpDriver::initDevice()
                 m_overlapped[deviceIndex][queueIndex].hEvent = CreateEvent(NULL, false, false, NULL);
             }
         }
-
-
-
         //start the devices (master device must be started at last)
         for (int deviceIndex=0; deviceIndex<m_numDevices; deviceIndex++)
         {
@@ -280,13 +276,10 @@ bool GUSBAmpDriver::initDevice()
         }
 
         qDebug() << "Plugin GUSBAmp - INFO - initDevice() - The device has been connected and initialised successfully" << endl;
-
         return true;
-
     }
     catch (string& exception)
     {
-
         //in case an exception occurred, close all opened devices...
         while(!m_openedDevicesHandles.empty())
         {
@@ -294,15 +287,11 @@ bool GUSBAmpDriver::initDevice()
             qDebug() << "error occurred - Device " << &m_openedDevicesHandles.front()  << "was closed" << endl;
             m_openedDevicesHandles.pop_front();
         }
-
         delete [] m_channelsToAcquire;
 
         m_isRunning = false;
-
         cout << exception << '\n';
-
         return false;
-
     }
 }
 
@@ -311,9 +300,7 @@ bool GUSBAmpDriver::initDevice()
 
 bool GUSBAmpDriver::uninitDevice()
 {
-
     cout << "Stopping devices and cleaning up..." << "\n";
-
     //clean up allocated resources for each device
     for (int i=0; i<m_numDevices; i++)
     {
@@ -359,26 +346,20 @@ bool GUSBAmpDriver::uninitDevice()
         m_openedDevicesHandles.pop_front();
     }
 
-
     m_isRunning = false;
-
     qDebug() << "Plugin GUSBAmp - INFO - uninitDevice() - Successfully uninitialised the device" << endl;
-
     return true;
 }
 
 
 //*************************************************************************************************************
 
-
 bool GUSBAmpDriver::getSampleMatrixValue(MatrixXf& sampleMatrix)
 {
-
     sampleMatrix.setZero(); // Clear matrix - set all elements to zero
 
     for(int queueIndex=0; queueIndex<m_QUEUE_SIZE; queueIndex++)
     {
-
         //receive data from each device
         for (int deviceIndex = 0; deviceIndex < m_numDevices; deviceIndex++)
         {
@@ -437,18 +418,14 @@ bool GUSBAmpDriver::getSampleMatrixValue(MatrixXf& sampleMatrix)
                 return 0;
             }
     }
-
-
     return true;
 }
 
 
 //*************************************************************************************************************
 
-
 bool GUSBAmpDriver::setSerials(vector<QString> &list)
 {
-
     int size = list.size();
 
     if(m_isRunning)
@@ -456,13 +433,11 @@ bool GUSBAmpDriver::setSerials(vector<QString> &list)
         cout << "Do not change device-parameters while running the device!\n";
         return false;
     }
-
     if(size>4)
     {
         cout << "ERROR serSerials: max. for serial numbers can be setted!";
         return false;
     }
-
     //resize the vectordimensions of the string and byte vectors and convert it to LPSTR(LongPointertoSTRing)
     m_vbSerials.resize(size);
     m_vpSerials.resize(size);
@@ -471,7 +446,6 @@ bool GUSBAmpDriver::setSerials(vector<QString> &list)
         m_vbSerials[i] = list.at(i).toLocal8Bit();  //changing into QByteArray
         m_vpSerials[i] = m_vbSerials.at(i).data();  //creating a pointer on the QByteArray
     }
-
     m_SLAVE_SERIALS_SIZE = size - 1;
 
     //closes the former call-sequence-list
@@ -479,7 +453,6 @@ bool GUSBAmpDriver::setSerials(vector<QString> &list)
     {
         m_callSequenceSerials.pop_front();
     }
-
     //defining the new deque-list for data acquisition
     for (int i=1; i<=m_SLAVE_SERIALS_SIZE; i++)
         m_callSequenceSerials.push_back(m_vpSerials[i]);
@@ -489,8 +462,8 @@ bool GUSBAmpDriver::setSerials(vector<QString> &list)
     refreshSizeOutputMatrix();
 
     return true;
-
 }
+
 
 //*************************************************************************************************************
 
@@ -527,7 +500,6 @@ bool GUSBAmpDriver::setSampleRate(int sampleRate)
         cout << exception << '\n';
         return false;
     }
-
     refreshSizeOutputMatrix();
 
     //cout <<"sample rate [HZ]: \t" <<  m_SAMPLE_RATE_HZ << "\n" << "number of scans [/]:\t" << m_NUMBER_OF_SCANS << "\n";
@@ -545,7 +517,6 @@ bool GUSBAmpDriver::setChannels(vector<int> &list)
         cout << "Do not change device-parameters while running the device!\n";
         return false;
     }
-
     int size = list.size();
     if (size > 16)
     {
@@ -575,11 +546,9 @@ bool GUSBAmpDriver::setChannels(vector<int> &list)
         m_channelsToAcquire[i] = UCHAR(list[i]);
         //cout<< "channel " << int( m_channelsToAcquire[i]) << " setted \n";
     }
-
     refreshSizeOutputMatrix();
 
     return true;
-
 }
 
 

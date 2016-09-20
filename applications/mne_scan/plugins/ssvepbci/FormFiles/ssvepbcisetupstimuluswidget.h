@@ -10,7 +10,7 @@
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Viktor Klüber Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -58,6 +58,7 @@
 #include <QScreen>
 #include <QWidget>
 #include <QOpenGLWidget>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -119,7 +120,7 @@ public:
 
     //=========================================================================================================
     /**
-    * close event, when setup-stimulus window is closed.
+    * Close event, when setup-stimulus window is closed.
     *
     * @param [in] QClosEvent for clsoing the window
     *
@@ -128,7 +129,7 @@ public:
 
     //=========================================================================================================
     /**
-    * gets the list of all displayed freuqnecies
+    * Gets the list of all displayed freuqnecies
     *
     * @return  list of all displayed frequencies
     *
@@ -149,32 +150,40 @@ signals:
     void settledPhrase(QString phrase);
 
 private slots:
-
-
+    //=========================================================================================================
+    /**
+    * Shows the widget on Fullscreen.
+    */
     void on_pushButton_clicked();
-
-    void on_pushButton_2_clicked();
-
-    void on_pushButton_3_clicked();
-
 
     //=========================================================================================================
     /**
-    * start a test
-    *
+    * Clears the Widget from screen.
+    */
+    void on_pushButton_2_clicked();
+
+    //=========================================================================================================
+    /**
+    * Sets the state of the window to minimized.
+    */
+    void on_pushButton_3_clicked();
+
+    //=========================================================================================================
+    /**
+    * Starts a test.
     */
     void on_pushButton_4_clicked();
 
     //=========================================================================================================
     /**
-    * start a test
+    * Starts a test.
     *
     */
     void on_pushButton_5_clicked();
 
     //=========================================================================================================
     /**
-    * start a test
+    * Starts a test.
     *
     */
     void on_pushButton_6_clicked();
@@ -188,25 +197,41 @@ private slots:
     */
     void on_comboBox_currentIndexChanged(int index);
 
+    //=========================================================================================================
+    /**
+    * choose Item for frequency reaading and writing
+    *
+    * @param [in] index Get the frequencie's index of of the selected item.
+    *
+    */
     void on_comboBox_2_currentIndexChanged(int index);
 
+    //=========================================================================================================
+    /**
+    * Changes the render order (frequency) of the selected item.
+    *
+    * @param [in]   item        Selected Item.
+    * @param [in]   freqKey     Frequency key of the Item.
+    *
+    */
     void setFreq(SsvepBciFlickeringItem &item, int freqKey);
 
+    //=========================================================================================================
+    /**
+    * Starts the Screen Keyboard device.
+    */
     void on_pushButton_7_clicked();
 
+    //=========================================================================================================
+    /**
+    * Changes the render order (frequency) of the selected item.
+    *
+    * @param [in]   arg1        Edit the spell text.
+    *
+    */
     void on_m_lineEdit_BCISpeller_textChanged(const QString &arg1);
 
 private:
-    Ui::SsvepBciSetupStimulusWidget        *ui;
-    QSharedPointer<SsvepBci>                m_pSsvepBci;            /**< a pointer to corresponding EEGoSports */
-    QSharedPointer<SsvepBciScreen>          m_pSsvepBciScreen;      /**< pointer to the SsvepBciscreen class of the subject (friend class) */
-    QSharedPointer<ScreenKeyboard>          m_pScreenKeyboard;      /**< pointer to the Screenkeyboard class */
-    QSharedPointer<QScreen>                 m_pScreen;              /**< pointer to the QScreen class; */
-    bool                                    m_bIsRunning;           /**< Flag for running test */
-    bool                                    m_bReadFreq;            /**< Flag for reading the adjusted frequency */
-    QMap<int, double>                       m_idFreqMap;            /**< containing frequencies and their corresponding key */
-
-
     //=========================================================================================================
     /**
     * adapts the Item list of the combox box automatically
@@ -215,6 +240,15 @@ private:
     *
     */
     void changeComboBox();
+
+    Ui::SsvepBciSetupStimulusWidget        *ui;                     /**< Pointer to the graphical user interface. */
+    QSharedPointer<SsvepBci>                m_pSsvepBci;            /**< a pointer to corresponding EEGoSports */
+    QSharedPointer<SsvepBciScreen>          m_pSsvepBciScreen;      /**< pointer to the SsvepBciscreen class of the subject (friend class) */
+    QSharedPointer<ScreenKeyboard>          m_pScreenKeyboard;      /**< pointer to the Screenkeyboard class */
+    QSharedPointer<QScreen>                 m_pScreen;              /**< pointer to the QScreen class; */
+    bool                                    m_bIsRunning;           /**< Flag for running test */
+    bool                                    m_bReadFreq;            /**< Flag for reading the adjusted frequency */
+    QMap<int, double>                       m_idFreqMap;            /**< containing frequencies and their corresponding key */
 };
 
 } //NAMESPACE

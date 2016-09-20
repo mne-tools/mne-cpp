@@ -10,7 +10,7 @@
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Viktor Klüber, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -41,18 +41,11 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// INCLUDES
-//=============================================================================================================
-//#include <utils/filterdata.h>
-
-//*************************************************************************************************************
-//=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QtWidgets>
 #include "../ui_ssvepbciwidget.h"
-
 
 
 //*************************************************************************************************************
@@ -81,8 +74,8 @@ class SsvepBci;
 class SsvepBciWidget : public QWidget
 {
     Q_OBJECT
-public:
 
+public:
     //=========================================================================================================
     /**
     * Constructs a BCISetupWidget which is a child of parent.
@@ -115,7 +108,6 @@ protected:
     bool eventFilter(QObject *object, QEvent *event);
 
 private:
-
     //=========================================================================================================
     /**
     * Shows the About Dialog

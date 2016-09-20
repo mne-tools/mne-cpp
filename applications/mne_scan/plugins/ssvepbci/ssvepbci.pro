@@ -84,7 +84,8 @@ SOURCES += \
         ssvepbciscreen.cpp \
         ssvepbciflickeringitem.cpp \
         FormFiles/ssvepbciconfigurationwidget.cpp \
-        screenkeyboard.cpp
+        screenkeyboard.cpp \
+
 
 
 HEADERS += \
@@ -96,7 +97,8 @@ HEADERS += \
         ssvepbciscreen.h \
         ssvepbciflickeringitem.h \
         FormFiles/ssvepbciconfigurationwidget.h \
-        screenkeyboard.h
+        screenkeyboard.h \
+
 
 FORMS += \
         FormFiles/ssvepbciwidget.ui \
@@ -128,3 +130,7 @@ UI_DIR = $${PWD}
 
 RESOURCES += \
         ssvepbci.qrc
+
+DISTFILES += \
+    Bla \
+    Bla

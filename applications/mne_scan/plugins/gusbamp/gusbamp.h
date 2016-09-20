@@ -46,9 +46,9 @@
 // INCLUDES
 //=============================================================================================================
 #include "gusbamp_global.h"
-#include <mne_x/Interfaces/ISensor.h>
+#include <scShared/Interfaces/ISensor.h>
 #include <generics/circularmatrixbuffer.h>
-#include <xMeas/newrealtimemultisamplearray.h>
+#include <scMeas/newrealtimemultisamplearray.h>
 
 
 
@@ -76,10 +76,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE GUSBAmpPlugin
+// DEFINE NAMESPACE GUSBAMPPLUGIN
 //=============================================================================================================
 
-namespace GUSBAmpPlugin
+namespace GUSBAMPPLUGIN
 {
 
 
@@ -88,9 +88,9 @@ namespace GUSBAmpPlugin
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNEX;
-using namespace XMEASLIB;
-using namespace IOBuffer;
+using namespace SCSHAREDLIB;
+using namespace SCMEASLIB;
+using namespace IOBUFFER;
 using namespace FIFFLIB;
 using namespace std;
 using namespace Eigen;
@@ -113,9 +113,9 @@ class GUSBAmpProducer;
 class GUSBAMPSHARED_EXPORT GUSBAmp : public ISensor
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "mne_x/1.0" FILE "gusbamp.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    Q_PLUGIN_METADATA(IID "mne_scan/1.0" FILE "gusbamp.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(MNEX::ISensor)
+    Q_INTERFACES(SCSHAREDLIB::ISensor)
 
     friend class GUSBAmpProducer;
     friend class GUSBAmpSetupWidget;

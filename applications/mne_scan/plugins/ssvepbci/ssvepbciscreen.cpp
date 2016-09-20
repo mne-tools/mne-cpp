@@ -10,7 +10,7 @@
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Viktor Klüber, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -44,6 +44,7 @@
 #include <QDebug>
 #include <QPainter>
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
@@ -56,7 +57,6 @@ using namespace SSVEPBCIPLUGIN;
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
-
 
 SsvepBciScreen::SsvepBciScreen(QSharedPointer<SsvepBci> pSsvepBci, QSharedPointer<SsvepBciSetupStimulusWidget> pSsvepBciSetupStimulusWidget, QOpenGLWidget *parent)
 : m_pSsvepBci(pSsvepBci)
@@ -71,6 +71,7 @@ SsvepBciScreen::SsvepBciScreen(QSharedPointer<SsvepBci> pSsvepBci, QSharedPointe
 , m_bClearScreen(true)
 //, m_qSoundPath(m_pSsvepBci->getSsvepBciResourcePath() + "beep.mp3")
 {
+    Q_UNUSED(parent);
 //      // implementing the sound file
 //    qDebug() << "copying successfull:" << QFile::copy(":/sounds/beep.mp3", m_qSoundPath);
 //    m_qBeep.setMedia(QUrl(m_qSoundPath));
@@ -95,19 +96,20 @@ SsvepBciScreen::SsvepBciScreen(QSharedPointer<SsvepBci> pSsvepBci, QSharedPointe
 
     // initialize freqList
     m_lFreqList << 6.66 << 7.5 << 8.57 << 10 << 12;
-
 }
 
 
 //*************************************************************************************************************
 
-SsvepBciScreen::~SsvepBciScreen(){
-
+SsvepBciScreen::~SsvepBciScreen()
+{
 }
+
 
 //*************************************************************************************************************
 
-void SsvepBciScreen::resizeGL(int w, int h) {
+void SsvepBciScreen::resizeGL(int w, int h)
+{
     Q_UNUSED(w)
     Q_UNUSED(h)
 
@@ -117,14 +119,15 @@ void SsvepBciScreen::resizeGL(int w, int h) {
 
 //*************************************************************************************************************
 
-void SsvepBciScreen::initializeGL(){
+void SsvepBciScreen::initializeGL()
+{
 }
 
 
 //*************************************************************************************************************
 
-void SsvepBciScreen::paintGL() {
-
+void SsvepBciScreen::paintGL()
+{
     // clear Screen by drawing a black filled rectangle
     if(m_bClearScreen){
         QPainter p(this);
@@ -134,16 +137,13 @@ void SsvepBciScreen::paintGL() {
 
 
     //paint all items to the screen
-    for(int i = 0; i < m_Items.size(); i++)
+    for(int i = 0; i < m_Items.size(); i++){
         m_Items[i].paint(this);
+    }
 
-//    m_qPainter.begin(this);
-    //painting red cross as a point of reference for the subject
-//    m_qPainter.fillRect((m_dXPosCross-0.01/2)*this->width(),(m_dYPosCross-0.05/2)*this->height(),0.01*this->width(),0.05*this->height(), m_qCrossColor);
-//    m_qPainter.fillRect(m_dXPosCross*this->width()-0.05*this->height()/2,m_dYPosCross*this->height()-0.01*this->width()/2,0.05*this->height(),0.01*this->width(),m_qCrossColor);
-
-    if(m_bUseScreenKeyboard)
+    if(m_bUseScreenKeyboard){
         m_pScreenKeyboard->paint(this);
+    }
 
     update(); //schedules next update directly, without going through signal dispatching
 }
@@ -151,8 +151,8 @@ void SsvepBciScreen::paintGL() {
 
 //*************************************************************************************************************
 
-void SsvepBciScreen::setClassResults(double classResult){
-
+void SsvepBciScreen::setClassResults(double classResult)
+{
     m_qCrossColor = Qt::red;
 
     if(classResult != 0){
@@ -172,7 +172,6 @@ void SsvepBciScreen::setClassResults(double classResult){
         default:
             qDebug() << "WARNING: no classifiaction could be made!"; break;
         }
-
 //        //generate beep sound
 //        m_qBeep.play();  // doesn't work on Windows 10
     }
@@ -181,7 +180,8 @@ void SsvepBciScreen::setClassResults(double classResult){
 
 //*************************************************************************************************************
 
-void SsvepBciScreen::updateFrequencyList(MyQList freqList){
+void SsvepBciScreen::updateFrequencyList(MyQList freqList)
+{
     m_lFreqList.clear();
     m_lFreqList = freqList;
     qDebug() <<"update freqList:" <<freqList;
@@ -190,10 +190,11 @@ void SsvepBciScreen::updateFrequencyList(MyQList freqList){
 
 //*************************************************************************************************************
 
-void SsvepBciScreen::useScreenKeyboard(bool useKeyboard){
-
-    if(m_pScreenKeyboard == NULL)
+void SsvepBciScreen::useScreenKeyboard(bool useKeyboard)
+{
+    if(m_pScreenKeyboard == NULL){
         m_pScreenKeyboard = QSharedPointer<ScreenKeyboard>(new ScreenKeyboard(m_pSsvepBci, m_pSsvepBciSetupStimulusWidget, QSharedPointer<SsvepBciScreen>(this)));
+    }
 
     m_bUseScreenKeyboard = useKeyboard;
     m_pScreenKeyboard->initScreenKeyboard();
@@ -202,7 +203,8 @@ void SsvepBciScreen::useScreenKeyboard(bool useKeyboard){
 
 //*************************************************************************************************************
 
-void SsvepBciScreen::clearScreen(){
+void SsvepBciScreen::clearScreen()
+{
     m_bClearScreen = true;
     m_bUseScreenKeyboard = false;
 }
