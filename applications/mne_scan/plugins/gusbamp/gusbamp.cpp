@@ -359,9 +359,7 @@ void GUSBAmp::run()
             else
                 size = 0;
         }
-
     }
-
 }
 
 //*************************************************************************************************************
@@ -456,7 +454,6 @@ void GUSBAmp::showStartRecording()
             if(ret == QMessageBox::No)
                 return;
         }
-
         // Check if path exists -> otherwise create it
         QStringList list = m_sOutputFilePath.split("/");
         list.removeLast(); // remove file name
