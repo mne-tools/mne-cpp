@@ -189,7 +189,7 @@ MatrixX3f FiffCoordTrans::apply_trans (const MatrixX3f& rr) const
 
 //*************************************************************************************************************
 
-MatrixX3f FiffCoordTrans::apply_invtrans (const MatrixX3f& rr) const
+MatrixX3f FiffCoordTrans::apply_invers_trans (const MatrixX3f& rr) const
 {
     MatrixX4f rr_ones = MatrixX4f::Ones(rr.rows(),4);
     rr_ones.block(0,0,rr.rows(),3) = rr;

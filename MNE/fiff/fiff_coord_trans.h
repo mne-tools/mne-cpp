@@ -175,15 +175,13 @@ public:
 
     //=========================================================================================================
     /**
-    *
-    *
-    * Applies the coordinate transform to given coordinates and returns the transformed coordinates
+    * Applies the inverse coordinate transform to given coordinates and returns the transformed coordinates
     *
     * @param[in] rr     The coordinates
     *
     * @return Transformed coordinates
     */
-    MatrixX3f apply_invtrans (const MatrixX3f& rr) const;
+    MatrixX3f apply_invers_trans (const MatrixX3f& rr) const;
 
     //=========================================================================================================
     /**
