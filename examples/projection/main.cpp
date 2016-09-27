@@ -88,14 +88,13 @@ int main(int argc, char *argv[])
     parser.setApplicationDescription("Projection Example");
     parser.addHelpOption();
     QCommandLineOption sampleBEMFileOption("f", "Path to BEM <file>.", "file",
-//                                           "./MNE-sample-data/warping/AVG4-0Years_segmented_BEM3/bem/AVG4-0Years_segmented_BEM3-2118-2188-3186-bem-sol.fif");
                                            "D:/Studium/Master/Masterarbeit/Daten/warping/AVG3-0Years_segmented_BEM3-1824-1860-2530-bem.fif");
 
     parser.addOption(sampleBEMFileOption);
     parser.process(app);
 
     //########################################################################################
-    // Read the BEM
+    // Read the average BEM
     QFile t_fileBem(parser.value(sampleBEMFileOption));
     MNEBem t_Bem(t_fileBem);
 
@@ -104,7 +103,6 @@ int main(int argc, char *argv[])
     MNEBem t_BemPatient(t_fileBemPatient);
 
     // Read the Digitizer
-//    QFile t_fileDig("./MNE-sample-data/warping/AVG4-0Years_GSN128.fif");
     QFile t_fileDig("D:/Studium/Master/Masterarbeit/Daten/4926787/160130_151742_4926787_auditorytoneburst_raw.fif");
     FiffDigPointSet t_Dig(t_fileDig);
 
@@ -116,26 +114,17 @@ int main(int argc, char *argv[])
         Dig(i,2) = t_Dig[i].r[2];
     }
 
-    // Read and apply Transformation on Average
-//    QFile t_fileTrans("./MNE-sample-data/warping/AVG4-0Years_GSN128-trans.fif");
+    // Read and apply Transformation on Average Bem (average to head)
     QFile t_fileTrans("D:/Studium/Master/Masterarbeit/Daten/4926787/AnalysisJana/NSSP_SGM_160130_151742_4926787_auditorytoneburst_raw-ave-trans.fif");
-
     FiffCoordTrans t_Trans (t_fileTrans);
-    MatrixXf DigTrans(t_Dig.size(), 3);
-    DigTrans=t_Trans.apply_trans(Dig);
-    FiffDigPointSet t_DigTrans(t_Dig);
+    t_Bem.invtransform(t_Trans);
 
-    for (int i = 0; i < t_DigTrans.size(); ++i)
-    {
-        t_DigTrans[i].r[0] = DigTrans(i,0);
-        t_DigTrans[i].r[1] = DigTrans(i,1);
-        t_DigTrans[i].r[2] = DigTrans(i,2);
-    }
 
-    // Read and apply Transformation on Patient
+    // Read and apply Transformation on Digitizer and Average Bem (head to MRI)
     QFile t_fileTransP("D:/Studium/Master/Masterarbeit/Daten/4926787/AnalysisJana/patient-trans.fif");
-
     FiffCoordTrans t_transPatient (t_fileTransP);
+    t_Bem.transform(t_transPatient);
+
     MatrixXf DigPatient(t_Dig.size(), 3);
     DigPatient=t_transPatient.apply_trans(Dig);
     FiffDigPointSet t_DigPatient(t_Dig);
@@ -147,12 +136,12 @@ int main(int argc, char *argv[])
         t_DigPatient[i].r[2] = DigPatient(i,2);
     }
     //Projection
-    MatrixXf DigProject(t_DigTrans.size(), 3);
+    MatrixXf DigProject(t_DigPatient.size(), 3);
     VectorXi nearest;
     VectorXf dist;
     MNEProjectToSurface t_Avg4 (t_Bem[0]);
 
-    t_Avg4.mne_find_closest_on_surface(DigTrans, t_DigTrans.size(), DigProject, nearest, dist);
+    t_Avg4.mne_find_closest_on_surface(DigPatient, t_DigPatient.size(), DigProject, nearest, dist);
 
     FiffDigPointSet t_DigProject(t_Dig);
 
@@ -165,11 +154,12 @@ int main(int argc, char *argv[])
 
     // Warp
     MNEBem t_BemWarped(t_Bem);
-    t_BemWarped.warp(DigProject, DigTrans);
+    t_BemWarped.warp(DigProject, DigPatient);
 
-    //Transform warped Bem to Patient Bem
-    t_BemWarped.invtransform(t_Trans);
-    t_BemWarped.transform(t_transPatient);
+    //Write warped file
+    QFile t_fileBemWarped("D:/Studium/Master/Masterarbeit/Daten/4926787/AnalysisJana/warped_AVG3-0Years_segmented_BEM3-1824-1860-2530-bem.fif");
+    t_BemWarped.write(t_fileBemWarped);
+    t_fileBemWarped.close();
 
     //Show
     View3D::SPtr testWindow = View3D::SPtr(new View3D());
@@ -177,8 +167,7 @@ int main(int argc, char *argv[])
     testWindow->addBemData("warped AVG3-0Years", "BEM", t_BemWarped);
     testWindow->addBemData("4926787", "BEM", t_BemPatient);
     testWindow->addDigitizerData("Original", "Dig", t_Dig);
-    testWindow->addDigitizerData("4926787", "Dig", t_DigPatient);
-    testWindow->addDigitizerData("warped AVG3-0Years", "Dig", t_DigTrans);
+    testWindow->addDigitizerData("warped AVG3-0Years", "Dig", t_DigPatient);
     testWindow->addDigitizerData("AVG3-0Years", "Projected Dig", t_DigProject);
 
     testWindow->show();
@@ -186,7 +175,6 @@ int main(int argc, char *argv[])
     Control3DWidget::SPtr control3DWidget = Control3DWidget::SPtr(new Control3DWidget());
     control3DWidget->setView3D(testWindow);
     control3DWidget->show();
-
 
     return app.exec();
 }
