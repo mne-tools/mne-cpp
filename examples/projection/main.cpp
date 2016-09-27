@@ -89,7 +89,7 @@ int main(int argc, char *argv[])
     parser.addHelpOption();
     QCommandLineOption sampleBEMFileOption("f", "Path to BEM <file>.", "file",
 //                                           "./MNE-sample-data/warping/AVG4-0Years_segmented_BEM3/bem/AVG4-0Years_segmented_BEM3-2118-2188-3186-bem-sol.fif");
-                                           "./MNE-sample-data/warping/AVG3-0Years_segmented_BEM3-1824-1860-2530-bem.fif");
+                                           "D:/Studium/Master/Masterarbeit/Daten/warping/AVG3-0Years_segmented_BEM3-1824-1860-2530-bem.fif");
 
     parser.addOption(sampleBEMFileOption);
     parser.process(app);
@@ -167,6 +167,9 @@ int main(int argc, char *argv[])
     MNEBem t_BemWarped(t_Bem);
     t_BemWarped.warp(DigProject, DigTrans);
 
+    //Transform warped Bem to Patient Bem
+    t_BemWarped.invtransform(t_Trans);
+    t_BemWarped.transform(t_transPatient);
 
     //Show
     View3D::SPtr testWindow = View3D::SPtr(new View3D());
