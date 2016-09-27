@@ -500,9 +500,9 @@ void MNEBem::invtransform(const FiffCoordTrans trans)
     MatrixX3f vertB = this->m_qListBemSurface[1].rr;
     MatrixX3f vertC = this->m_qListBemSurface[2].rr;
 
-    vertA = trans.apply_invtrans(vertA );
-    vertB = trans.apply_invtrans(vertB);
-    vertC = trans.apply_invtrans(vertC);
+    vertA = trans.apply_inverse_trans(vertA );
+    vertB = trans.apply_inverse_trans(vertB);
+    vertC = trans.apply_inverse_trans(vertC);
 
     this->m_qListBemSurface[0].rr = vertA;
     this->m_qListBemSurface[1].rr = vertB;
