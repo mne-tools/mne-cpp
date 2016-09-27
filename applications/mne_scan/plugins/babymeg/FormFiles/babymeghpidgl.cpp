@@ -161,8 +161,10 @@ void BabyMEGHPIDgl::closeEvent(QCloseEvent *event)
 void BabyMEGHPIDgl::bnLoadPolhemusFile()
 {
     qDebug()<<" Start to load Polhemus File";
+   // FileName_HPI = QFileDialog::getOpenFileName(this,
+   //      tr("Open Polhemus File"), "C:/Users/babyMEG/Desktop", tr("Fiff file (*.fif)"));
     FileName_HPI = QFileDialog::getOpenFileName(this,
-         tr("Open Polhemus File"), "C:/Users/babyMEG/Desktop", tr("Fiff file (*.fif)"));
+            tr("Open Polhemus File"), "", tr("Fiff file (*.fif)"));
     //display the text on the text control
     ui->ed_PolFileName->setText(FileName_HPI);
 }
