@@ -108,12 +108,12 @@ int main(int argc, char *argv[])
     QCommandLineParser parser;
     parser.setApplicationDescription("Start disp3D tutorial");
     parser.addHelpOption();
-    QCommandLineOption sampleSurfOption("surfType", "Surface type <type>.", "type", "inflated");
+    QCommandLineOption sampleSurfOption("surfType", "Surface type <type>.", "type", "pial");
     QCommandLineOption sampleAnnotOption("annotType", "Annotation type <type>.", "type", "aparc.a2009s");
     QCommandLineOption sampleHemiOption("hemi", "Selected hemisphere <hemi>.", "hemi", "2");
     QCommandLineOption sampleSubjectOption("subject", "Selected subject <subject>.", "subject", "sample");
     QCommandLineOption sampleSubjectPathOption("subjectPath", "Selected subject path <subjectPath>.", "subjectPath", "./MNE-sample-data/subjects");
-    QCommandLineOption sampleSourceLocOption("doSourceLoc", "Do real time source localization <doSourceLoc>.", "doSourceLoc", "false");
+    QCommandLineOption sampleSourceLocOption("doSourceLoc", "Do real time source localization <doSourceLoc>.", "doSourceLoc", "true");
     QCommandLineOption sampleFwdOption("fwd", "Path to forwad solution <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
     QCommandLineOption sampleInvOpOption("invOp", "Path to inverse operator <file>.", "file", "");
     QCommandLineOption sampleClustOption("doClust", "Path to clustered inverse operator <doClust>.", "doClust", "true");
@@ -258,18 +258,18 @@ int main(int argc, char *argv[])
     testWindow->addBrainData("Subject01", "Left Auditory", tSurfSet, tAnnotSet);
     testWindow->addBrainData("Subject01", "Left Visual", tSurfSet, tAnnotSet);
 
-    //Read & show BEM and sensor surfaces
-//    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif");
-//    MNEBem t_Bem(t_fileBem);
-//    QFile t_fileBem2("./MNE-sample-data/subjects/sample/bem/sample-head.fif");
-//    MNEBem t_Bem2(t_fileBem2);
+//    Read & show BEM and sensor surfaces
+    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif");
+    MNEBem t_Bem(t_fileBem);
+    QFile t_fileBem2("./MNE-sample-data/subjects/sample/bem/sample-head.fif");
+    MNEBem t_Bem2(t_fileBem2);
 //    QFile t_filesensorSurfaceVV("./resources/sensorSurfaces/306m_rt.fif");
 //    MNEBem t_sensorSurfaceVV(t_filesensorSurfaceVV);
 //    QFile t_filesensorSurfaceBM("./resources/sensorSurfaces/BabyMEG.fif");
 //    MNEBem t_sensorSurfaceBM(t_filesensorSurfaceBM);
 
-//    testWindow->addBemData("Subject01", "BEM", t_Bem);
-//    testWindow->addBemData("Subject01", "BEM", t_Bem2);
+    testWindow->addBemData("Subject01", "BEM", t_Bem);
+    testWindow->addBemData("Subject01", "BEM", t_Bem2);
 //    testWindow->addBemData("Sensors", "VectorView", t_sensorSurfaceVV);
 //    testWindow->addBemData("Sensors", "BabyMEG", t_sensorSurfaceBM);
 
