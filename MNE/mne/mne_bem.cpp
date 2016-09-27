@@ -471,3 +471,41 @@ void MNEBem::warp(const MatrixXf & sLm, const MatrixXf &dLm)
     this->m_qListBemSurface[2].rr = vertC;
     return;
 }
+
+
+//*************************************************************************************************************
+
+void MNEBem::transform(const FiffCoordTrans trans)
+{
+    MatrixX3f vertA = this->m_qListBemSurface[0].rr;
+    MatrixX3f vertB = this->m_qListBemSurface[1].rr;
+    MatrixX3f vertC = this->m_qListBemSurface[2].rr;
+
+    vertA = trans.apply_trans(vertA );
+    vertB = trans.apply_trans(vertB);
+    vertC = trans.apply_trans(vertC);
+
+    this->m_qListBemSurface[0].rr = vertA;
+    this->m_qListBemSurface[1].rr = vertB;
+    this->m_qListBemSurface[2].rr = vertC;
+    return;
+}
+
+
+//*************************************************************************************************************
+
+void MNEBem::invtransform(const FiffCoordTrans trans)
+{
+    MatrixX3f vertA = this->m_qListBemSurface[0].rr;
+    MatrixX3f vertB = this->m_qListBemSurface[1].rr;
+    MatrixX3f vertC = this->m_qListBemSurface[2].rr;
+
+    vertA = trans.apply_invtrans(vertA );
+    vertB = trans.apply_invtrans(vertB);
+    vertC = trans.apply_invtrans(vertC);
+
+    this->m_qListBemSurface[0].rr = vertA;
+    this->m_qListBemSurface[1].rr = vertB;
+    this->m_qListBemSurface[2].rr = vertC;
+    return;
+}

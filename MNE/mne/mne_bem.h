@@ -243,6 +243,24 @@ public:
     void warp(const MatrixXf &sLm, const MatrixXf &dLm);
 
 
+    //=========================================================================================================
+    /**
+    * @brief Transform the Bem
+    *
+    * @param[in]  trans     The Transformation Matrix
+    */
+    void transform(const FiffCoordTrans trans);
+
+
+    //=========================================================================================================
+    /**
+    * @brief Transform the Bem using the inverse
+    *
+    * @param[in]  trans     The Transformation Matrix
+    */
+    void invtransform(const FiffCoordTrans trans);
+
+
 protected:
     //=========================================================================================================
     /**
