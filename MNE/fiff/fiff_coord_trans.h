@@ -181,7 +181,7 @@ public:
     *
     * @return Transformed coordinates
     */
-    MatrixX3f apply_invers_trans (const MatrixX3f& rr) const;
+    MatrixX3f apply_inverse_trans (const MatrixX3f& rr) const;
 
     //=========================================================================================================
     /**
