@@ -88,7 +88,7 @@ int main(int argc, char *argv[])
     parser.setApplicationDescription("Projection Example");
     parser.addHelpOption();
     QCommandLineOption sampleBEMFileOption("f", "Path to BEM <file>.", "file",
-                                           "D:/Studium/Master/Masterarbeit/Daten/warping/AVG3-0Years_segmented_BEM3-1824-1860-2530-bem.fif");
+                                           "D:/Studium/Master/Masterarbeit/Daten/AVG/AVG3-0Years_segmented_BEM3-1824-1860-2530-bem.fif");
 
     parser.addOption(sampleBEMFileOption);
     parser.process(app);
@@ -156,10 +156,15 @@ int main(int argc, char *argv[])
     MNEBem t_BemWarped(t_Bem);
     t_BemWarped.warp(DigProject, DigPatient);
 
-    //Write warped file
+    //Write warped and translated Bem
     QFile t_fileBemWarped("D:/Studium/Master/Masterarbeit/Daten/4926787/AnalysisJana/warped_AVG3-0Years_segmented_BEM3-1824-1860-2530-bem.fif");
     t_BemWarped.write(t_fileBemWarped);
     t_fileBemWarped.close();
+
+    //Write translated Bem
+    QFile t_fileBemTrans("D:/Studium/Master/Masterarbeit/Daten/4926787/AnalysisJana/trans_AVG3-0Years_segmented_BEM3-1824-1860-2530-bem.fif");
+    t_Bem.write(t_fileBemTrans);
+    t_fileBemTrans.close();
 
     //Show
     View3D::SPtr testWindow = View3D::SPtr(new View3D());
