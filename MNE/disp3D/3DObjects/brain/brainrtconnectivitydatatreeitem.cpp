@@ -262,7 +262,7 @@ void BrainRTConnectivityDataTreeItem::plotNetwork(QSharedPointer<CONNECTIVITYLIB
         sourceSphereEntity->addComponent(transform);
 
         material = new Qt3DExtras::QPhongMaterial();
-        material->setAmbient(Qt::yellow);
+        material->setAmbient(Qt::blue);
         sourceSphereEntity->addComponent(material);
         m_lNodes << sourceSphereEntity;
     }
@@ -295,8 +295,23 @@ void BrainRTConnectivityDataTreeItem::plotNetwork(QSharedPointer<CONNECTIVITYLIB
         }
     }
 
+    //Generate connection indices and colors for Qt3D buffer
+    QByteArray arrayCurvatureColor;
+    arrayCurvatureColor.resize(tMatVert.rows() * 3 * (int)sizeof(float));
+    float *rawColorArray = reinterpret_cast<float *>(arrayCurvatureColor.data());
+    int idxColor = 0;
+
+    for(int i = 0; i < tMatVert.rows(); ++i) {
+        rawColorArray[idxColor] = 0;
+        idxColor++;
+        rawColorArray[idxColor] = 0;
+        idxColor++;
+        rawColorArray[idxColor] = 1;
+        idxColor++;
+    }
+
     //Generate line primitive based network
-    m_pRenderable3DEntity->setMeshData(tMatVert, tMatNorm, tMatTris, QByteArray(), Qt3DRender::QGeometryRenderer::Lines);
+    m_pRenderable3DEntity->setMeshData(tMatVert, tMatNorm, tMatTris, arrayCurvatureColor, Qt3DRender::QGeometryRenderer::Lines);
 }
 
 
