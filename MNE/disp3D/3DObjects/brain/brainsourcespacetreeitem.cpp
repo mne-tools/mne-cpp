@@ -136,7 +136,7 @@ bool BrainSourceSpaceTreeItem::addData(const MNEHemisphere& tHemisphere, Qt3DCor
 {
     //Create renderable 3D entity
     m_pParentEntity = parent;
-    m_pRenderable3DEntity = new Renderable3DEntity(parent);
+    m_pRenderable3DEntity = new Renderable3DEntity(m_pParentEntity);
 
     QMatrix4x4 m;
     Qt3DCore::QTransform* transform =  new Qt3DCore::QTransform();
@@ -145,66 +145,67 @@ bool BrainSourceSpaceTreeItem::addData(const MNEHemisphere& tHemisphere, Qt3DCor
     transform->setMatrix(m);
     m_pRenderable3DEntity->addComponent(transform);
 
-//    //Create sources as small 3D spheres
-//    RowVector3f sourcePos;
-//    QVector3D pos;
-//    Qt3DCore::QEntity* sourceSphereEntity;
-//    Qt3DExtras::QSphereMesh* sourceSphere;
-//    Qt3DExtras::QPhongMaterial* material;
+    //Create sources as small 3D spheres
+    RowVector3f sourcePos;
+    QVector3D pos;
+    Qt3DExtras::QSphereMesh* sourceSphere;
+    Qt3DExtras::QPhongMaterial* material;
 
-//    if(tHemisphere.isClustered()) {
-//        for(int i = 0; i < tHemisphere.cluster_info.centroidVertno.size(); i++) {
-//            sourcePos = tHemisphere.rr.row(tHemisphere.cluster_info.centroidVertno.at(i));
-//            pos.setX(sourcePos(0));
-//            pos.setY(sourcePos(1));
-//            pos.setZ(sourcePos(2));
+    if(tHemisphere.isClustered()) {
+        for(int i = 0; i < tHemisphere.cluster_info.centroidVertno.size(); i++) {
+            QSharedPointer<Qt3DCore::QEntity> pSourceSphereEntity = QSharedPointer<Qt3DCore::QEntity>(new Qt3DCore::QEntity());
 
-//            sourceSphereEntity = new Qt3DCore::QEntity();
+            sourcePos = tHemisphere.rr.row(tHemisphere.cluster_info.centroidVertno.at(i));
+            pos.setX(sourcePos(0));
+            pos.setY(sourcePos(1));
+            pos.setZ(sourcePos(2));
 
-//            sourceSphere = new Qt3DExtras::QSphereMesh();
-//            sourceSphere->setRadius(0.001f);
-//            sourceSphereEntity->addComponent(sourceSphere);
+            sourceSphere = new Qt3DExtras::QSphereMesh();
+            sourceSphere->setRadius(0.001f);
+            pSourceSphereEntity->addComponent(sourceSphere);
 
-//            transform = new Qt3DCore::QTransform();
-//            QMatrix4x4 m;
-//            m.translate(pos);
-//            transform->setMatrix(m);
-//            sourceSphereEntity->addComponent(transform);
+            transform = new Qt3DCore::QTransform();
+            QMatrix4x4 m;
+            m.translate(pos);
+            transform->setMatrix(m);
+            pSourceSphereEntity->addComponent(transform);
 
-//            material = new Qt3DExtras::QPhongMaterial();
-//            material->setAmbient(Qt::yellow);
-//            sourceSphereEntity->addComponent(material);
+            material = new Qt3DExtras::QPhongMaterial();
+            material->setAmbient(Qt::yellow);
+            pSourceSphereEntity->addComponent(material);
 
-//            sourceSphereEntity->setParent(m_pRenderable3DEntity);
-//        }
-//    } else {
-//        for(int i = 0; i < tHemisphere.vertno.rows(); i++) {
-//            sourcePos = tHemisphere.rr.row(tHemisphere.vertno(i));
-//            pos.setX(sourcePos(0));
-//            pos.setY(sourcePos(1));
-//            pos.setZ(sourcePos(2));
+            pSourceSphereEntity->setParent(m_pRenderable3DEntity);
 
-//            sourceSphereEntity = new Qt3DCore::QEntity();
+            m_lSpheres.append(pSourceSphereEntity);
+        }
+    } else {
+        for(int i = 0; i < tHemisphere.vertno.rows(); i++) {
+            QSharedPointer<Qt3DCore::QEntity> pSourceSphereEntity = QSharedPointer<Qt3DCore::QEntity>(new Qt3DCore::QEntity());
 
-//            sourceSphere = new Qt3DExtras::QSphereMesh();
-//            sourceSphere->setRadius(0.001f);
-//            sourceSphereEntity->addComponent(sourceSphere);
+            sourcePos = tHemisphere.rr.row(tHemisphere.vertno(i));
+            pos.setX(sourcePos(0));
+            pos.setY(sourcePos(1));
+            pos.setZ(sourcePos(2));
 
-//            transform = new Qt3DCore::QTransform();
-//            QMatrix4x4 m;
-//            m.translate(pos);
-//            transform->setMatrix(m);
-//            sourceSphereEntity->addComponent(transform);
+            sourceSphere = new Qt3DExtras::QSphereMesh();
+            sourceSphere->setRadius(0.001f);
+            pSourceSphereEntity->addComponent(sourceSphere);
 
-//            material = new Qt3DExtras::QPhongMaterial();
-//            material->setAmbient(Qt::yellow);
-//            sourceSphereEntity->addComponent(material);
+            transform = new Qt3DCore::QTransform();
+            QMatrix4x4 m;
+            m.translate(pos);
+            transform->setMatrix(m);
+            pSourceSphereEntity->addComponent(transform);
 
-//            sourceSphereEntity->setParent(m_pRenderable3DEntity);
-//        }
-//    }
+            material = new Qt3DExtras::QPhongMaterial();
+            material->setAmbient(Qt::yellow);
+            pSourceSphereEntity->addComponent(material);
 
-//    m_lChildren = m_pRenderable3DEntity->children();
+            pSourceSphereEntity->setParent(m_pRenderable3DEntity);
+
+            m_lSpheres.append(pSourceSphereEntity);
+        }
+    }
 
     //Create color from curvature information with default gyri and sulcus colors
     QByteArray arrayVertColor = createVertColor(tHemisphere.rr);
@@ -251,10 +252,10 @@ bool BrainSourceSpaceTreeItem::addData(const MNEHemisphere& tHemisphere, Qt3DCor
 
 void BrainSourceSpaceTreeItem::setVisible(bool state)
 {
-    m_pRenderable3DEntity->setParent(state ? m_pParentEntity : Q_NULLPTR);
+//    m_pRenderable3DEntity->setParent(state ? m_pParentEntity : Q_NULLPTR);
 
-//    for(int i = 0; i<m_lChildren.size(); i++) {
-//        m_lChildren.at(i)->setParent(state ? m_pRenderable3DEntity : Q_NULLPTR);
+//    for(int i = 0; i < m_lSpheres.size(); ++i) {
+//        m_lSpheres.at(i)->setParent(state ? m_pRenderable3DEntity : Q_NULLPTR);
 //    }
 }
 

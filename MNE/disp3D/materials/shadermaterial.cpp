@@ -132,7 +132,7 @@ void ShaderMaterial::init()
 
     m_vertexGL3RenderPass->setShaderProgram(m_vertexGL3Shader);
 
-//    //Setup transparency
+    //Setup transparency
 //    m_blendState->setSourceRgb(QBlendEquationArguments::SourceAlpha);
 //    m_blendState->setDestinationRgb(QBlendEquationArguments::OneMinusSourceAlpha);
 //    m_blendEquation->setBlendFunction(QBlendEquation::Add);
