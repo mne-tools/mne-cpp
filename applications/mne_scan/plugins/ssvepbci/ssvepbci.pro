@@ -47,7 +47,7 @@ QT += core widgets concurrent gui \
        multimedia
 
 
-TARGET = bci
+TARGET = SSVEPBCI
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
@@ -131,6 +131,4 @@ UI_DIR = $${PWD}
 RESOURCES += \
         ssvepbci.qrc
 
-DISTFILES += \
-    Bla \
-    Bla
+DISTFILES +=

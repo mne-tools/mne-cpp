@@ -264,7 +264,7 @@ IPlugin::PluginType SsvepBci::getType() const
 
 QString SsvepBci::getName() const
 {
-    return "SSVEP BCI EEG";
+    return "SSVEP-BCI-EEG";
 }
 
 
