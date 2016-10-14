@@ -180,7 +180,7 @@ void View3D::initTransformations()
 
 //*************************************************************************************************************
 
-bool View3D::addBrainData(const QString& subject, const QString& set, const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet)
+bool View3D::addSurfaceSet(const QString& subject, const QString& set, const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet)
 {
     return m_pData3DTreeModel->addData(subject, set, tSurfaceSet, tAnnotationSet);
 }
@@ -188,7 +188,7 @@ bool View3D::addBrainData(const QString& subject, const QString& set, const Surf
 
 //*************************************************************************************************************
 
-bool View3D::addBrainData(const QString& subject, const QString& set, const Surface& tSurface, const Annotation& tAnnotation)
+bool View3D::addSurface(const QString& subject, const QString& set, const Surface& tSurface, const Annotation& tAnnotation)
 {
     return m_pData3DTreeModel->addData(subject, set, tSurface, tAnnotation);
 }
@@ -196,7 +196,7 @@ bool View3D::addBrainData(const QString& subject, const QString& set, const Surf
 
 //*************************************************************************************************************
 
-bool View3D::addBrainData(const QString& subject, const QString& set, const MNESourceSpace& tSourceSpace)
+bool View3D::addSourceSpace(const QString& subject, const QString& set, const MNESourceSpace& tSourceSpace)
 {
     return m_pData3DTreeModel->addData(subject, set, tSourceSpace);
 }
@@ -204,7 +204,7 @@ bool View3D::addBrainData(const QString& subject, const QString& set, const MNES
 
 //*************************************************************************************************************
 
-bool View3D::addBrainData(const QString& subject, const QString& set, const MNEForwardSolution& tForwardSolution)
+bool View3D::addForwardSolution(const QString& subject, const QString& set, const MNEForwardSolution& tForwardSolution)
 {
     return m_pData3DTreeModel->addData(subject, set, tForwardSolution.src);
 }
@@ -212,7 +212,7 @@ bool View3D::addBrainData(const QString& subject, const QString& set, const MNEF
 
 //*************************************************************************************************************
 
-QList<BrainRTSourceLocDataTreeItem*> View3D::addRtSourceData(const QString& subject, const QString& set, const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution)
+QList<BrainRTSourceLocDataTreeItem*> View3D::addSourceData(const QString& subject, const QString& set, const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution)
 {
     return m_pData3DTreeModel->addData(subject, set, tSourceEstimate, tForwardSolution);
 }
@@ -220,7 +220,7 @@ QList<BrainRTSourceLocDataTreeItem*> View3D::addRtSourceData(const QString& subj
 
 //*************************************************************************************************************
 
-QList<BrainRTConnectivityDataTreeItem*> View3D::addRtConnectivityData(const QString& subject, const QString& set, Network::SPtr pNetworkData)
+QList<BrainRTConnectivityDataTreeItem*> View3D::addConnectivityData(const QString& subject, const QString& set, Network::SPtr pNetworkData)
 {
     return m_pData3DTreeModel->addData(subject, set, pNetworkData);
 }
