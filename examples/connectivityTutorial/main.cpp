@@ -295,12 +295,12 @@ int main(int argc, char *argv[])
     std::cout<<"Creating BrainView"<<std::endl;
 
     View3D::SPtr testWindow = View3D::SPtr(new View3D());
-    testWindow->addBrainData("Subject01", "Right Visual", tSurfSet, tAnnotSet);
+    testWindow->addSurfaceSet("Subject01", "Right Visual", tSurfSet, tAnnotSet);
 
-    QList<BrainRTConnectivityDataTreeItem*> rtItemList_LA = testWindow->addRtConnectivityData("Subject01", "Left Auditory", pConnect_LA);
-//    QList<BrainRTConnectivityDataTreeItem*> rtItemList_RA = testWindow->addRtConnectivityData("Subject01", "Right Auditory", pConnect_RA);
-//    QList<BrainRTConnectivityDataTreeItem*> rtItemList_LV = testWindow->addRtConnectivityData("Subject01", "Left Visual", pConnect_LV);
-//    QList<BrainRTConnectivityDataTreeItem*> rtItemList_RV = testWindow->addRtConnectivityData("Subject01", "Right Visual", pConnect_RV);
+    QList<BrainRTConnectivityDataTreeItem*> rtItemList_LA = testWindow->addConnectivityData("Subject01", "Left Auditory", pConnect_LA);
+//    QList<BrainRTConnectivityDataTreeItem*> rtItemList_RA = testWindow->addConnectivityData("Subject01", "Right Auditory", pConnect_RA);
+//    QList<BrainRTConnectivityDataTreeItem*> rtItemList_LV = testWindow->addConnectivityData("Subject01", "Left Visual", pConnect_LV);
+//    QList<BrainRTConnectivityDataTreeItem*> rtItemList_RV = testWindow->addConnectivityData("Subject01", "Right Visual", pConnect_RV);
 
     testWindow->show();
 

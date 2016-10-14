@@ -142,7 +142,7 @@ public:
     *
     * @return                       Returns true if successful.
     */
-    bool addBrainData(const QString& subject, const QString& set, const FSLIB::SurfaceSet& tSurfaceSet, const FSLIB::AnnotationSet& tAnnotationSet = FSLIB::AnnotationSet());
+    bool addSurfaceSet(const QString& subject, const QString& set, const FSLIB::SurfaceSet& tSurfaceSet, const FSLIB::AnnotationSet& tAnnotationSet = FSLIB::AnnotationSet());
 
     //=========================================================================================================
     /**
@@ -155,7 +155,7 @@ public:
     *
     * @return                       Returns true if successful.
     */
-    bool addBrainData(const QString& subject, const QString& set, const FSLIB::Surface& tSurface, const FSLIB::Annotation& tAnnotation = FSLIB::Annotation());
+    bool addSurface(const QString& subject, const QString& set, const FSLIB::Surface& tSurface, const FSLIB::Annotation& tAnnotation = FSLIB::Annotation());
 
     //=========================================================================================================
     /**
@@ -167,7 +167,7 @@ public:
     *
     * @return                       Returns true if successful.
     */
-    bool addBrainData(const QString& subject, const QString& set, const MNELIB::MNESourceSpace& tSourceSpace);
+    bool addSourceSpace(const QString& subject, const QString& set, const MNELIB::MNESourceSpace& tSourceSpace);
 
     //=========================================================================================================
     /**
@@ -179,7 +179,7 @@ public:
     *
     * @return                       Returns true if successful.
     */
-    bool addBrainData(const QString& subject, const QString& set, const MNELIB::MNEForwardSolution& tForwardSolution);
+    bool addForwardSolution(const QString& subject, const QString& set, const MNELIB::MNEForwardSolution& tForwardSolution);
 
     //=========================================================================================================
     /**
@@ -192,7 +192,7 @@ public:
     *
     * @return                           Returns a list of the BrainRTSourceLocDataTreeItem where the data was appended to.
     */
-    QList<BrainRTSourceLocDataTreeItem*> addRtSourceData(const QString& subject, const QString& set, const MNELIB::MNESourceEstimate& tSourceEstimate, const MNELIB::MNEForwardSolution& tForwardSolution = MNELIB::MNEForwardSolution());
+    QList<BrainRTSourceLocDataTreeItem*> addSourceData(const QString& subject, const QString& set, const MNELIB::MNESourceEstimate& tSourceEstimate, const MNELIB::MNEForwardSolution& tForwardSolution = MNELIB::MNEForwardSolution());
 
     //=========================================================================================================
     /**
@@ -204,7 +204,7 @@ public:
     *
     * @return                           Returns a list of the BrainRTSourceLocDataTreeItem where the data was appended to.
     */
-    QList<BrainRTConnectivityDataTreeItem*> addRtConnectivityData(const QString& subject, const QString& set, CONNECTIVITYLIB::Network::SPtr pNetworkData);
+    QList<BrainRTConnectivityDataTreeItem*> addConnectivityData(const QString& subject, const QString& set, CONNECTIVITYLIB::Network::SPtr pNetworkData);
 
     //=========================================================================================================
     /**
