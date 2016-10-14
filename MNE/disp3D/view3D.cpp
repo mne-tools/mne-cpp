@@ -139,7 +139,7 @@ void View3D::initMetatypes()
 
 void View3D::init()
 {
-    //Light source
+//    //Light source
 //    Qt3DRender::QPointLight *light1 = new Qt3DRender::QPointLight();
 //    light1->setColor(Qt::white);
 //    light1->setIntensity(0.1f);
@@ -451,7 +451,7 @@ void View3D::createCoordSystem(Qt3DCore::QEntity* parent)
     YAxis->setSlices(20);
 
     m_YAxisEntity = QSharedPointer<Qt3DCore::QEntity>(new Qt3DCore::QEntity(parent));
-    m_YAxisEntity->addComponent(YAxis);
+    m_YAxisEntity->addComponent(YAxis); //will take ownership of YAxis if no parent was declared!
 
     Qt3DExtras::QPhongMaterial *phongMaterialY = new Qt3DExtras::QPhongMaterial();
     phongMaterialY->setDiffuse(QColor(255, 0, 0));
