@@ -107,25 +107,25 @@ int main(int argc, char *argv[])
     SurfaceSet tSurfSetPial ("sample", 2, "pial", "./MNE-sample-data/subjects");
 
     View3D::SPtr t_BrainView = View3D::SPtr(new View3D());
-    t_BrainView->addBrainData("Subject01", "pial", tSurfSetPial);
+    t_BrainView->addSurfaceSet("Subject01", "pial", tSurfSetPial);
 
     //
     // inflated
     //
     SurfaceSet tSurfSetInflated ("sample", 2, "inflated", "./MNE-sample-data/subjects");  
-    t_BrainView->addBrainData("Subject01", "inflated", tSurfSetInflated);
+    t_BrainView->addSurfaceSet("Subject01", "inflated", tSurfSetInflated);
 
     //
     // orig
     //
     SurfaceSet tSurfSetOrig ("sample", 2, "orig", "./MNE-sample-data/subjects");
-    t_BrainView->addBrainData("Subject01", "orig", tSurfSetOrig);
+    t_BrainView->addSurfaceSet("Subject01", "orig", tSurfSetOrig);
 
     //
     // white
     //
     SurfaceSet tSurfSetWhite ("sample", 2, "white", "./MNE-sample-data/subjects");
-    t_BrainView->addBrainData("Subject01", "white", tSurfSetWhite);
+    t_BrainView->addSurfaceSet("Subject01", "white", tSurfSetWhite);
 
     t_BrainView->show();
 

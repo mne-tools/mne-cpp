@@ -43,6 +43,7 @@ SUBDIRS += \
     fs \
     fiff \
     mne \
+    connectivity \
     inverse \
     rtCommand \
     rtClient \

@@ -181,6 +181,12 @@ protected:
     */
     void onRotationClicked(bool checked);
 
+    //=========================================================================================================
+    /**
+    * Slot called when the user wants to toggle the coord axis.
+    */
+    void onCoordAxisClicked(bool checked);
+
     Ui::Control3DWidget*    ui;                         /**< The pointer to the QtDesigner ui class. */
 
     QList<View3D::SPtr>     m_lView3D;                  /**< List of all connected view3D's. */
