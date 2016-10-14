@@ -229,9 +229,9 @@ void BrainRTConnectivityDataTreeItem::plotNetwork(QSharedPointer<CONNECTIVITYLIB
     m_pRenderable3DEntity->addComponent(transform);
 
     QVector3D pos;
-    QSharedPointer<Qt3DCore::QEntity> sourceSphereEntity;
-    Qt3DExtras::QSphereMesh* sourceSphere;
-    Qt3DExtras::QPhongMaterial* material;
+    QSharedPointer<Qt3DCore::QEntity> sourceSphereEntity; //set to NULL is automatically done by QSharedPointer
+    Qt3DExtras::QSphereMesh* sourceSphere = Q_NULLPTR;
+    Qt3DExtras::QPhongMaterial* material = Q_NULLPTR;
 
     //Draw network nodes
     m_lNodes.clear();
