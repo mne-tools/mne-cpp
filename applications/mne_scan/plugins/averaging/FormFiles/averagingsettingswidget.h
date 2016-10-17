@@ -108,6 +108,7 @@ private:
     void changeBaselineFrom();
     void changeBaselineTo();
     void changeArtifactThreshold();
+    void changeNumAverages();
 
     Ui::AverageSettingsWidgetClass ui;		/**< Holds the user interface for the AverageSettingsWidgetClass.*/
 

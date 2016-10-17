@@ -74,6 +74,7 @@
 using namespace MNELIB;
 using namespace DISP3DLIB;
 using namespace FSLIB;
+using namespace CONNECTIVITYLIB;
 
 
 //*************************************************************************************************************
@@ -138,7 +139,7 @@ void View3D::initMetatypes()
 
 void View3D::init()
 {
-    //Light source
+//    //Light source
 //    Qt3DRender::QPointLight *light1 = new Qt3DRender::QPointLight();
 //    light1->setColor(Qt::white);
 //    light1->setIntensity(0.1f);
@@ -160,7 +161,10 @@ void View3D::init()
 
     // Set root object of the scene
     this->setRootEntity(m_pRootEntity);
+
+    //Create coordinate system and hide as default
     createCoordSystem(m_pRootEntity);
+    toggleCoordAxis(false);
 }
 
 
@@ -176,7 +180,7 @@ void View3D::initTransformations()
 
 //*************************************************************************************************************
 
-bool View3D::addBrainData(const QString& subject, const QString& set, const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet)
+bool View3D::addSurfaceSet(const QString& subject, const QString& set, const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet)
 {
     return m_pData3DTreeModel->addData(subject, set, tSurfaceSet, tAnnotationSet);
 }
@@ -184,7 +188,7 @@ bool View3D::addBrainData(const QString& subject, const QString& set, const Surf
 
 //*************************************************************************************************************
 
-bool View3D::addBrainData(const QString& subject, const QString& set, const Surface& tSurface, const Annotation& tAnnotation)
+bool View3D::addSurface(const QString& subject, const QString& set, const Surface& tSurface, const Annotation& tAnnotation)
 {
     return m_pData3DTreeModel->addData(subject, set, tSurface, tAnnotation);
 }
@@ -192,7 +196,7 @@ bool View3D::addBrainData(const QString& subject, const QString& set, const Surf
 
 //*************************************************************************************************************
 
-bool View3D::addBrainData(const QString& subject, const QString& set, const MNESourceSpace& tSourceSpace)
+bool View3D::addSourceSpace(const QString& subject, const QString& set, const MNESourceSpace& tSourceSpace)
 {
     return m_pData3DTreeModel->addData(subject, set, tSourceSpace);
 }
@@ -200,7 +204,7 @@ bool View3D::addBrainData(const QString& subject, const QString& set, const MNES
 
 //*************************************************************************************************************
 
-bool View3D::addBrainData(const QString& subject, const QString& set, const MNEForwardSolution& tForwardSolution)
+bool View3D::addForwardSolution(const QString& subject, const QString& set, const MNEForwardSolution& tForwardSolution)
 {
     return m_pData3DTreeModel->addData(subject, set, tForwardSolution.src);
 }
@@ -208,9 +212,17 @@ bool View3D::addBrainData(const QString& subject, const QString& set, const MNEF
 
 //*************************************************************************************************************
 
-QList<BrainRTSourceLocDataTreeItem*> View3D::addRtBrainData(const QString& subject, const QString& set, const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution)
+QList<BrainRTSourceLocDataTreeItem*> View3D::addSourceData(const QString& subject, const QString& set, const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution)
 {
     return m_pData3DTreeModel->addData(subject, set, tSourceEstimate, tForwardSolution);
+}
+
+
+//*************************************************************************************************************
+
+QList<BrainRTConnectivityDataTreeItem*> View3D::addConnectivityData(const QString& subject, const QString& set, Network::SPtr pNetworkData)
+{
+    return m_pData3DTreeModel->addData(subject, set, pNetworkData);
 }
 
 
@@ -256,21 +268,33 @@ Qt3DCore::QEntity* View3D::get3DRootEntity()
 
 //*************************************************************************************************************
 
+void View3D::startModelRotationRecursive(QObject* pObject)
+{
+    //TODO this won't work with QEntities
+    if(Renderable3DEntity* pItem = dynamic_cast<Renderable3DEntity*>(pObject)) {
+        QPropertyAnimation *anim = new QPropertyAnimation(pItem, QByteArrayLiteral("rotZ"));
+        anim->setDuration(30000);
+        anim->setStartValue(QVariant::fromValue(pItem->rotZ()));
+        anim->setEndValue(QVariant::fromValue(pItem->rotZ() + 360.0f));
+        anim->setLoopCount(-1);
+        anim->start();
+        m_lPropertyAnimations << anim;
+    }
+
+    for(int i = 0; i < pObject->children().size(); ++i) {
+        startModelRotationRecursive(pObject->children().at(i));
+    }
+}
+
+//*************************************************************************************************************
+
 void View3D::startModelRotation()
 {
     //Start animation
     m_lPropertyAnimations.clear();
 
     for(int i = 0; i < m_pRootEntity->children().size(); ++i) {
-        if(Renderable3DEntity* pItem = dynamic_cast<Renderable3DEntity*>(m_pRootEntity->children().at(i))) {
-            QPropertyAnimation *anim = new QPropertyAnimation(pItem, QByteArrayLiteral("rotZ"));
-            anim->setDuration(30000);
-            anim->setStartValue(QVariant::fromValue(pItem->rotZ()));
-            anim->setEndValue(QVariant::fromValue(pItem->rotZ() + 360.0f));
-            anim->setLoopCount(-1);
-            anim->start();
-            m_lPropertyAnimations << anim;
-        }
+        startModelRotationRecursive(m_pRootEntity->children().at(i));
     }
 }
 
@@ -282,6 +306,16 @@ void View3D::stopModelRotation()
     for(int i = 0; i < m_lPropertyAnimations.size(); ++i) {
         m_lPropertyAnimations.at(i)->stop();
     }
+}
+
+
+//*************************************************************************************************************
+
+void View3D::toggleCoordAxis(bool checked)
+{
+    m_XAxisEntity->setParent(checked ? m_pRootEntity : Q_NULLPTR);
+    m_YAxisEntity->setParent(checked ? m_pRootEntity : Q_NULLPTR);
+    m_ZAxisEntity->setParent(checked ? m_pRootEntity : Q_NULLPTR);
 }
 
 
@@ -417,7 +451,7 @@ void View3D::createCoordSystem(Qt3DCore::QEntity* parent)
     YAxis->setSlices(20);
 
     m_YAxisEntity = QSharedPointer<Qt3DCore::QEntity>(new Qt3DCore::QEntity(parent));
-    m_YAxisEntity->addComponent(YAxis);
+    m_YAxisEntity->addComponent(YAxis); //will take ownership of YAxis if no parent was declared!
 
     Qt3DExtras::QPhongMaterial *phongMaterialY = new Qt3DExtras::QPhongMaterial();
     phongMaterialY->setDiffuse(QColor(255, 0, 0));
