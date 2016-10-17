@@ -42,9 +42,9 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <gusbamp_global.h>
 #include <generics/circularbuffer.h>
 #include <vector>
-
 #include <Windows.h>
 
 
@@ -65,16 +65,6 @@
 namespace GUSBAMPPLUGIN
 {
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace IOBUFFER;
-using namespace std;
-
-
 //*************************************************************************************************************
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -90,7 +80,7 @@ class GUSBAmpDriver;
 *
 * @brief The EEGProducer class provides a EEG data producer for a given sampling rate.
 */
-class GUSBAmpProducer : public QThread
+class GUSBAMPSHARED_EXPORT GUSBAmpProducer : public QThread
 {
 public:
     //=========================================================================================================
@@ -117,7 +107,7 @@ public:
     * @param [in] filePath      string of the filepath where data will be stored
     *
     */
-    virtual void start(vector<QString> &serials, vector<int> channels, int sampleRate);
+    virtual void start(std::vector<QString> &serials, std::vector<int> channels, int sampleRate);
 
     //=========================================================================================================
     /**
@@ -129,7 +119,7 @@ public:
     /**
     * @return           returns the size of the sample Matrix
     */
-    vector<int> getSizeOfSampleMatrix(void);
+    std::vector<int> getSizeOfSampleMatrix(void);
 
 protected:
     //=========================================================================================================
@@ -147,8 +137,8 @@ private:
 
     int                 m_iSampRate;            /**< sample rate of the device */
     QString             m_sFilePath;            /**< path of the file of written data */
-    vector<QString>     m_vSerials;             /**< vector with the serial numbers of the devices*/
-    vector<int>         m_viSizeOfSampleMatrix; /**< size of the sample matrix [rows columns] */
+    std::vector<QString>     m_vSerials;             /**< vector with the serial numbers of the devices*/
+    std::vector<int>         m_viSizeOfSampleMatrix; /**< size of the sample matrix [rows columns] */
 
 };
 

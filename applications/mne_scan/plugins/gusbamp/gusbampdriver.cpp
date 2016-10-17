@@ -56,6 +56,7 @@
 //=============================================================================================================
 
 using namespace GUSBAMPPLUGIN;
+using namespace Eigen;
 using namespace std;
 
 
@@ -507,6 +508,7 @@ bool GUSBAmpDriver::setSampleRate(int sampleRate)
     return true;
 
 }
+
 
 //*************************************************************************************************************
 

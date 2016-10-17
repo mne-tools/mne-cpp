@@ -44,6 +44,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <ssvepbci_global.h>
 #include "ssvepbciscreen.h"
 #include "FormFiles/ssvepbcisetupStimuluswidget.h"
 #include "ssvepbci.h"
@@ -90,7 +91,7 @@ class SsvepBciScreen;
 *
 * @brief The ScreenKeyboard class provides the screen keyboard device for the ssvep BCI plug-in.
 */
-class ScreenKeyboard : public QObject
+class SSVEPBCISHARED_EXPORT ScreenKeyboard : public QObject
 {
     Q_OBJECT
 

@@ -43,6 +43,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <ssvepbci_global.h>
 #include "FormFiles/ssvepbcisetupstimuluswidget.h"
 #include "ssvepbciflickeringitem.h"
 #include "screenkeyboard.h"
@@ -82,7 +83,7 @@ typedef  QList<double>  MyQList;
 * @brief The SsvepBciScreen class provides the subject screen. Contains the list of items which will be painted
 * to screen automatically
 */
-class SsvepBciScreen : public QOpenGLWidget
+class SSVEPBCISHARED_EXPORT SsvepBciScreen : public QOpenGLWidget
 {
     Q_OBJECT
 

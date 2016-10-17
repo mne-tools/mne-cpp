@@ -34,9 +34,6 @@
 *
 */
 
-
-
-
 #ifndef GUSBAMP_H
 #define GUSBAMP_H
 
@@ -45,33 +42,23 @@
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
+
 #include "gusbamp_global.h"
 #include <scShared/Interfaces/ISensor.h>
 #include <generics/circularmatrixbuffer.h>
 #include <scMeas/newrealtimemultisamplearray.h>
-
-
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// QT STL INCLUDES
-//=============================================================================================================
-
-#include <QtWidgets>
+#include <fiff/fiff.h>
 
 #include "FormFiles/gusbampsetupwidget.h"
 #include "FormFiles/gusbampsetupprojectwidget.h"
 
 
-
-
 //*************************************************************************************************************
 //=============================================================================================================
-// FIFF INCLUDES
+// QT INCLUDES
 //=============================================================================================================
 
-#include <fiff/fiff.h>
+#include <QtWidgets>
 
 
 //*************************************************************************************************************
@@ -81,20 +68,6 @@
 
 namespace GUSBAMPPLUGIN
 {
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace SCSHAREDLIB;
-using namespace SCMEASLIB;
-using namespace IOBUFFER;
-using namespace FIFFLIB;
-using namespace std;
-using namespace Eigen;
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -110,10 +83,10 @@ class GUSBAmpProducer;
 *
 * @brief The GUSBAmp class provides an EEG connector for the gTec USBAmp device.
 */
-class GUSBAMPSHARED_EXPORT GUSBAmp : public ISensor
+class GUSBAMPSHARED_EXPORT GUSBAmp : public SCSHAREDLIB::ISensor
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "mne_scan/1.0" FILE "gusbamp.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "gusbamp.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
     Q_INTERFACES(SCSHAREDLIB::ISensor)
 
@@ -144,7 +117,7 @@ public:
     /**
     * Clone the plugin
     */
-    virtual QSharedPointer<IPlugin> clone() const;
+    virtual QSharedPointer<SCSHAREDLIB::IPlugin> clone() const;
 
     //=========================================================================================================
     /**
@@ -194,7 +167,7 @@ public:
     */
     bool dirExists(const std::string& dirName_in);
 
-    virtual IPlugin::PluginType getType() const;
+    virtual SCSHAREDLIB::IPlugin::PluginType getType() const;
     virtual QString getName() const;
 
     virtual QWidget* setupWidget();
@@ -211,34 +184,32 @@ protected:
     virtual void run();
 
 private:
-    PluginOutputData<NewRealTimeMultiSampleArray>::SPtr m_pRTMSA_GUSBAmp;               /**< The RealTimeSampleArray to provide the EEG data.*/
-    QSharedPointer<GUSBAmpSetupProjectWidget>           m_pGUSBampSetupProjectWidget;   /**< Widget for setup the project file*/
+    SCSHAREDLIB::PluginOutputData<SCMEASLIB::NewRealTimeMultiSampleArray>::SPtr m_pRTMSA_GUSBAmp;               /**< The RealTimeSampleArray to provide the EEG data.*/
+    QSharedPointer<GUSBAmpSetupProjectWidget>                                   m_pGUSBampSetupProjectWidget;   /**< Widget for setup the project file*/
 
     QString                             m_qStringResourcePath;              /**< The path to the EEG resource directory.*/
-
     bool                                m_bIsRunning;                       /**< Whether GUSBAmp is running.*/
 
-    QSharedPointer<RawMatrixBuffer>     m_pRawMatrixBuffer_In;              /**< Holds incoming raw data.*/
+    QSharedPointer<IOBUFFER::RawMatrixBuffer>     m_pRawMatrixBuffer_In;              /**< Holds incoming raw data.*/
 
     QSharedPointer<GUSBAmpProducer>     m_pGUSBAmpProducer;                 /**< the GUSBAmpProducer.*/
 
-    QSharedPointer<FiffInfo>            m_pFiffInfo;                        /**< Fiff measurement info.*/
+    QSharedPointer<FIFFLIB::FiffInfo>            m_pFiffInfo;                        /**< Fiff measurement info.*/
 
-    vector<QString>     m_vSerials;                 /**< vector of all Serials (the first one is the master) */
-    int                 m_iSampleRate;              /**< the sample rate in Hz (see documentation of the g.USBamp API for details on this value and the NUMBER_OF_SCANS!)*/
-    int                 m_iSamplesPerBlock;         /**< The samples per block defined by the user via the GUI. */
-    UCHAR               m_iNumberOfChannels;        /**< the channels that should be acquired from each device */
-    vector<int>         m_viSizeOfSampleMatrix;     /**< vector including the size of the two dimensional sample Matrix */
-    vector<int>         m_viChannelsToAcquire;      /**< vector of the calling numbers of the channels to be acquired */
-    bool                m_bWriteToFile;             /**< Flag for File writing*/
-//write data to fiff-file
-    FiffStream::SPtr    m_pOutfid;                  /**< QFile for writing to fif file.*/
-    RowVectorXd         m_cals;
-    bool                m_bSplitFile;               /**< Flag for splitting the recorded file.*/
-    int                 m_iSplitFileSizeMs;         /**< Holds the size of the splitted files in ms.*/
-    int                 m_iSplitCount;              /**< File split count */
-    QString             m_sOutputFilePath;          /**< Holds the path for the sample output file. Defined by the user via the GUI.*/
-    QFile               m_fileOut;                  /**< QFile for writing to fiff file.*/
+    std::vector<QString>        m_vSerials;                 /**< vector of all Serials (the first one is the master) */
+    int                         m_iSampleRate;              /**< the sample rate in Hz (see documentation of the g.USBamp API for details on this value and the NUMBER_OF_SCANS!)*/
+    int                         m_iSamplesPerBlock;         /**< The samples per block defined by the user via the GUI. */
+    UCHAR                       m_iNumberOfChannels;        /**< the channels that should be acquired from each device */
+    std::vector<int>            m_viSizeOfSampleMatrix;     /**< vector including the size of the two dimensional sample Matrix */
+    std::vector<int>            m_viChannelsToAcquire;      /**< vector of the calling numbers of the channels to be acquired */
+    bool                        m_bWriteToFile;             /**< Flag for File writing*/
+    FIFFLIB::FiffStream::SPtr   m_pOutfid;                  /**< QFile for writing to fif file.*/
+    Eigen::RowVectorXd          m_cals;
+    bool                        m_bSplitFile;               /**< Flag for splitting the recorded file.*/
+    int                         m_iSplitFileSizeMs;         /**< Holds the size of the splitted files in ms.*/
+    int                         m_iSplitCount;              /**< File split count */
+    QString                     m_sOutputFilePath;          /**< Holds the path for the sample output file. Defined by the user via the GUI.*/
+    QFile                       m_fileOut;                  /**< QFile for writing to fiff file.*/
 
     QSharedPointer<QTimer>  m_pTimerRecordingChange;    /**< timer to control blinking of the recording icon */
     qint16                  m_iBlinkStatus;             /**< flag for recording icon blinking */

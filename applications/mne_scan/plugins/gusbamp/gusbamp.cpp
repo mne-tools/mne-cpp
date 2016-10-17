@@ -57,7 +57,10 @@
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace SCSHAREDLIB;
+using namespace SCMEASLIB;
 using namespace GUSBAMPPLUGIN;
+using namespace IOBUFFER;
 using namespace std;
 
 
@@ -110,6 +113,7 @@ GUSBAmp::~GUSBAmp()
         this->stop();
 
 }
+
 
 //*************************************************************************************************************
 
@@ -193,6 +197,7 @@ void GUSBAmp::setUpFiffInfo()
     m_pFiffInfo->ctf_head_t.to = FIFFV_COORD_HEAD;
 }
 
+
 //*************************************************************************************************************
 
 QSharedPointer<IPlugin> GUSBAmp::clone() const
@@ -200,6 +205,7 @@ QSharedPointer<IPlugin> GUSBAmp::clone() const
     QSharedPointer<GUSBAmp> pGUSBAmpClone(new GUSBAmp());
     return pGUSBAmpClone;
 }
+
 
 //*************************************************************************************************************
 
@@ -221,12 +227,14 @@ void GUSBAmp::init()
     m_bIsRunning = false;
 }
 
+
 //*************************************************************************************************************
 
 void GUSBAmp::unload()
 {
 
 }
+
 
 //*************************************************************************************************************
 
@@ -293,6 +301,7 @@ bool GUSBAmp::stop()
     return true;
 }
 
+
 //*************************************************************************************************************
 
 IPlugin::PluginType GUSBAmp::getType() const
@@ -300,12 +309,14 @@ IPlugin::PluginType GUSBAmp::getType() const
     return _ISensor;
 }
 
+
 //*************************************************************************************************************
 
 QString GUSBAmp::getName() const
 {
     return "GUSBAmp EEG";
 }
+
 
 //*************************************************************************************************************
 
@@ -318,6 +329,7 @@ QWidget* GUSBAmp::setupWidget()
 
     return pWidget;
 }
+
 
 //*************************************************************************************************************
 
@@ -362,6 +374,7 @@ void GUSBAmp::run()
     }
 }
 
+
 //*************************************************************************************************************
 
 void GUSBAmp::splitRecordingFile()
@@ -393,6 +406,8 @@ void GUSBAmp::splitRecordingFile()
     fiff_int_t first = 0;
     m_pOutfid->write_int(FIFF_FIRST_SAMPLE, &first);
 }
+
+
 //*************************************************************************************************************
 
 void GUSBAmp::showSetupProjectDialog()
@@ -409,6 +424,7 @@ void GUSBAmp::showSetupProjectDialog()
         m_pGUSBampSetupProjectWidget->raise();
     }
 }
+
 
 //*************************************************************************************************************
 
@@ -493,6 +509,7 @@ void GUSBAmp::changeRecordingButton()
         m_iBlinkStatus = 0;
     }
 }
+
 
 //*************************************************************************************************************
 
