@@ -3,7 +3,6 @@
 * @file     ssvepbciconfigurationwidget.h
 * @author   Viktor Klüber <viktor.klueber@tu-ilmenau.de>;
 *           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     June 2016
@@ -70,7 +69,6 @@ class SsvepBciConfigurationWidget;
 namespace SSVEPBCIPLUGIN
 {
 
-
 //*************************************************************************************************************
 //=============================================================================================================
 // TypeDefs
@@ -126,8 +124,6 @@ public:
     //=========================================================================================================
     /**
     * initialize selected channels-list on sensor level
-    *
-    *
     */
     void initSelectedChannelsSensor();
 
@@ -148,48 +144,137 @@ public:
     //=========================================================================================================
     /**
     * getting the string lists for senesor channel selection
-    *
     */
     QStringList getSensorChannelSelection();
 
     //=========================================================================================================
     /**
     * getting the string lists for source channel selection
-    *
     */
     QStringList getSourceChannelSelection();
 
     //=========================================================================================================
     /**
     * resetting thresholdbars values to maximal statusbar borders
-    *
     */
     void resetThresholdValues();
 
 public slots:
+    //=========================================================================================================
+    /**
+    * sets the SSVEP probabilities and puts them to the GUI of the SsvepBciConfigurationWidget
+    *
+    * @param[in]    SSVEP   QList of all five SSVEP values
+    */
     void setSSVEPProbabilities(MyQList SSVEP);
+
+    //=========================================================================================================
+    /**
+    * sets the labels when the frequencies are changed
+    *
+    * @param[in]    frequencyList   frequencies which are looked for
+    */
     void setFrequencyLabels(MyQList frequencyList);
+
+    //=========================================================================================================
+    /**
+    * signalizes the classification result and marks it red to the screen
+    *
+    * @param[in]    classResult     classification result
+    */
     void setClassResult(double classResult);
+
+    //=========================================================================================================
+    /**
+    * slot for stopping the measurement of the accuracy
+    */
     void stopMeasurement();
 
 private slots:
-    void on_m_RadioButton_MEC_toggled(bool checked);
+    //=========================================================================================================
+    /**
+    * slot for adjusting MEC or CCA as extraction method which is connected to the MEC qRadioButton
+    *
+    * @param [in]   checked     unused paramater
+    */
+    void onRadioButtonMECtoggled(bool checked);
+
+    //=========================================================================================================
+    /**
+    * slot for changing the thresholds
+    *
+    * @param [in]   threshodld     unused paramater
+    */
     void thresholdChanged(double threshold);
+
+    //=========================================================================================================
+    /**
+    * slot for changing the number of harmonics
+    *
+    * @param [in]   harmonics     number of harmonics
+    */
     void numOfHarmonicsChanged(int harmonics);
+
+    //=========================================================================================================
+    /**
+    * slot for changing the selected channels
+    *
+    * @param [in]   parent      unused parameter
+    * @param [in]   first       unused parameter
+    * @param [in]   last        unused parameter
+    */
     void channelSelectChanged(const QModelIndex &parent, int first, int last);
+
+    //=========================================================================================================
+    /**
+    * evaluates the classification result
+    *
+    * @param [in]   isCorrectCommand     flag when there was a classification
+    */
     void evaluateCommand(bool isCorrectCommand);
+
+    //=========================================================================================================
+    /**
+    * Slot for elapsed time. Triggered by a qTimer
+    */
     void showCurrentTime();
-    void on_m_pushButton_StartMeasurement_clicked();
-    void on_m_pushButton_StopMeasurement_clicked();
-    void on_m_spinBox_ClassificationListSize_valueChanged(int arg1);
+
+    //=========================================================================================================
+    /**
+    * starts the accuracy measurement
+    */
+    void onStartMeasurementClicked();
+
+    //=========================================================================================================
+    /**
+    * stops the accuracy measurement
+    */
+    void onStopMeasurementClicked();
+
+    //=========================================================================================================
+    /**
+    * slot for changing the size of the classification list
+    */
+    void classificationListSizeChanged(int arg1);
 
 signals:
-    void getThresholdValues(MyQList Thresholds);
+    //=========================================================================================================
+    /**
+    * emit newly adjusted threshold values
+    *
+    * @param[out]    thresholds     classification result
+    */
+    void getThresholdValues(MyQList thresholds);
+
+    //=========================================================================================================
+    /**
+    * signal for indicating a signal parameter change
+    */
     void changeSSVEPParameter();
 
 private:
-    Ui::SsvepBciConfigurationWidget        *ui;                     /**< Pointer to corresponding user interface. */
-    SsvepBci                               *m_pSsvepBci;            /**< A pointer to corresponding SsvepBci class. */
+    Ui::SsvepBciConfigurationWidget*        ui;                     /**< Pointer to corresponding user interface. */
+    SsvepBci*                               m_pSsvepBci;            /**< A pointer to corresponding SsvepBci class. */
 
     // configuration parameter
     QStringList                             m_vAvailableChannelsSensor;                 /**< QStringList holding available features to select on sensor level (electrodes).*/
@@ -200,14 +285,12 @@ private:
     QList<double>                           m_lFrequencyList;                           /**< List of desired frequencies. */
     QPalette                                m_palBlackFont;                             /**< Setting black font for group box. */
     QPalette                                m_palRedFont;                               /**< Setting red font for highlightning label. */
-
     // accuracy feature
     bool                                    m_bScreenKeyboardConnected;                 /**< Flag for connected screen keaboard. */
     int                                     m_iCorrectCommands;                         /**< Counter for correct commands. */
     int                                     m_iWrongCommands;                           /**< Counter for wrong commands. */
-    QTimer                                 *m_qTimer;                                   /**< Timer for displaying accuracy every second. */
+    QTimer*                                 m_qTimer;                                   /**< Timer for displaying accuracy every second. */
     int                                     m_iElapsedSeconds;                          /**< Time, displayed on screen. */
-
 };
 
 } //NAMESPACE

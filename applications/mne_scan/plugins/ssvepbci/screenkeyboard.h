@@ -160,7 +160,8 @@ private:
     QString                                 m_sSettledPhrase;       /**< phrase established by the UI */
     QString                                 m_sSpelledPhrase;       /**< phrase spelled by the user with the SsvepBci */
     QString::Iterator                       m_qSpellIterator;       /**< iterator for spelling */
-    QMediaPlayer                           *m_qSound;               /**< sound-object for emiting audio feedback */
+
+    //QMediaPlayer                           *m_qSound;               /**< sound-object for emiting audio feedback */
 };
 
 } // namespace

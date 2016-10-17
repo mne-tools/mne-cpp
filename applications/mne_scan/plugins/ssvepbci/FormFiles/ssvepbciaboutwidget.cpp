@@ -1,8 +1,8 @@
 //=============================================================================================================
 /**
 * @file     bciaboutwidget.cpp
-* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
-*			Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @author   Viktor Klüber <viktor.klueber@tu-ilmenau.de>;
+*           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     May, 2016
