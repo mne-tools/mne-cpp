@@ -74,6 +74,6 @@ SUBDIRS += \
             fsSurface \
             disp3DTutorial \
             histogram \
-            projection
+            connectivityTutorial
     }
 }
