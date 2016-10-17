@@ -123,7 +123,7 @@ class EEGoSportsProducer;
 class EEGOSPORTSSHARED_EXPORT EEGoSports : public ISensor
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "mne_scan/1.0" FILE "eegosports.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "eegosports.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
     Q_INTERFACES(SCSHAREDLIB::ISensor)
 

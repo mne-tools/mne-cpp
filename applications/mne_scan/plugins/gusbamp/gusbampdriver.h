@@ -43,9 +43,11 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <gusbamp_global.h>
 #include <Windows.h>        //windows.h-library for LPSTR-,UCHAR-, and HANDLE-files
 #include <deque>
 #include <stdarg.h>
+#include <Eigen/Core>
 #include "gtec_gUSBamp.h"
 
 
@@ -62,30 +64,11 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// EIGEN INCLUDES
-//=============================================================================================================
-
-#include <Eigen/Core>
-
-
-
-//*************************************************************************************************************
-//=============================================================================================================
 // DEFINE NAMESPACE GUSBAMPPLUGIN
 //=============================================================================================================
 
 namespace GUSBAMPPLUGIN
 {
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace std;
-using namespace Eigen;
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -95,19 +78,13 @@ using namespace Eigen;
 class GUSBAmpProducer;
 
 
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINES
-//=============================================================================================================
-
-
 //=============================================================================================================
 /**
 * GUSBAmpDriver
 *
 * @brief The GUSBAmpDriver class provides real time data acquisition of EEG data with a GUSBAmp device.
 */
-class GUSBAmpDriver
+class GUSBAMPSHARED_EXPORT GUSBAmpDriver
 {
 private:
     //=========================================================================================================
@@ -117,13 +94,14 @@ private:
     void refreshSizeOutputMatrix(void);
 
     //device parameters
-    vector<QString>     m_vsSerials;                /**< vector of serial number as String vector (first one is master) */
-    vector<QByteArray>  m_vbSerials;                /**< vector of serial number as ByteArray vector (first one is master) */
-    vector<LPSTR>       m_vpSerials;                /**< pointer to the serial numbers  */
-    int                 m_numDevices;               /**< number of connected devices (master and slaves) */
-    deque<LPSTR>        m_callSequenceSerials;      /**< list of the call sequence (master must be the last device in the call sequence) */
-    deque<HANDLE>       m_openedDevicesHandles;     /**< list of handles in the order of the opened devices */
-    deque<HANDLE>       m_callSequenceHandles;      /**< list of handles in the order of the opened devices */
+    std::vector<QString>    m_vsSerials;                /**< vector of serial number as String vector (first one is master) */
+    std::vector<QByteArray> m_vbSerials;                /**< vector of serial number as ByteArray vector (first one is master) */
+    std::vector<LPSTR>      m_vpSerials;                /**< pointer to the serial numbers  */
+    int                     m_numDevices;               /**< number of connected devices (master and slaves) */
+    std::deque<LPSTR>       m_callSequenceSerials;      /**< list of the call sequence (master must be the last device in the call sequence) */
+    std::deque<HANDLE>      m_openedDevicesHandles;     /**< list of handles in the order of the opened devices */
+    std::deque<HANDLE>      m_callSequenceHandles;      /**< list of handles in the order of the opened devices */
+
     int                 m_SLAVE_SERIALS_SIZE;       /**< the number of slave serials specified in slaveSerials */
     int                 m_SAMPLE_RATE_HZ;           /**< the sample rate in Hz (see documentation of the g.USBamp API for details on this value and the NUMBER_OF_SCANS!) */
     int                 m_NUMBER_OF_SCANS;          /**< the number of scans that should be received simultaneously (depending on the _sampleRate; see C-API documentation for this value!) */
@@ -143,7 +121,7 @@ private:
     DWORD               m_numBytesReceived;         /**< num of Bytes whicht are received during one measuring procedure */
     BYTE***             m_buffers;                  /**< pointer to the buffer */
     OVERLAPPED**        m_overlapped;               /**< storage in case of overlapping */
-    vector<int>         m_sizeOfMatrix;             /**< number of rows and column of output matrix [rows columns] */
+    std::vector<int>    m_sizeOfMatrix;             /**< number of rows and column of output matrix [rows columns] */
 
 public:
     //=========================================================================================================
@@ -167,7 +145,7 @@ public:
     *
     * @return                   returns true if sample was successfully written to the input variable, false otherwise.
     */
-    bool getSampleMatrixValue(MatrixXf& sampleMatrix);
+    bool getSampleMatrixValue(Eigen::MatrixXf& sampleMatrix);
 
     //=========================================================================================================
     /**
@@ -195,7 +173,7 @@ public:
     * @return                   true if executed successfully, false otherwise
     *
     */
-    bool setSerials(vector<QString> &list);
+    bool setSerials(std::vector<QString> &list);
 
     //=========================================================================================================
     /**
@@ -219,7 +197,7 @@ public:
     * @return                       true if executed successfully, false otherwise
     *
     */
-    bool setChannels(vector<int> &channels);
+    bool setChannels(std::vector<int> &channels);
 
     //=========================================================================================================
     /**
@@ -250,7 +228,7 @@ public:
     * @return                       vector which beholds the size of the matrix. first value refers to columns.
     *
     */
-    vector<int> getSizeOfSampleMatrix(void);
+    std::vector<int> getSizeOfSampleMatrix(void);
 
 
 protected:

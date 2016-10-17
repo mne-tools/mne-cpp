@@ -35,8 +35,16 @@
 *
 */
 
-#ifndef SsvepBciFLICKERINGITEM_H
-#define SsvepBciFLICKERINGITEM_H
+#ifndef SSVEPBCIFLICKERINGITEM_H
+#define SSVEPBCIFLICKERINGITEM_H
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include <ssvepbci_global.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -58,7 +66,6 @@
 namespace SSVEPBCIPLUGIN
 {
 
-
 //=============================================================================================================
 /**
 * DECLARE CLASS SsvepBciFlickeringItem
@@ -66,7 +73,7 @@ namespace SSVEPBCIPLUGIN
 * @brief SsvepBciFlickeringItem provices declaration and definition of flickering items which can be attached
 * to SsvepBciscreen
 */
-class SsvepBciFlickeringItem
+class SSVEPBCISHARED_EXPORT SsvepBciFlickeringItem
 {
 
 public:   
