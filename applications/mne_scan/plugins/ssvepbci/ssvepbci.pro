@@ -3,14 +3,13 @@
 # @file     ssvepbci.pro
 # @author   Viktor Klüber <viktor.klueber@tu-ilmenau.de>
 #           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
-#           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
 # @date     May, 2016
 #
 # @section  LICENSE
 #
-# Copyright (C) 2013, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+# Copyright (C) 2016, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -45,7 +44,6 @@ DEFINES += SSVEPBCI_LIBRARY
 
 QT += core widgets concurrent gui \
        multimedia
-
 
 TARGET = SSVEPBCI
 CONFIG(debug, debug|release) {
@@ -86,8 +84,6 @@ SOURCES += \
         FormFiles/ssvepbciconfigurationwidget.cpp \
         screenkeyboard.cpp \
 
-
-
 HEADERS += \
         ssvepbci.h\
         ssvepbci_global.h \
@@ -126,7 +122,6 @@ OTHER_FILES += ssvepbci.json
 
 # Put generated form headers into the origin --> cause other src is pointing at them
 UI_DIR = $${PWD}
-
 
 RESOURCES += \
         ssvepbci.qrc

@@ -1,9 +1,8 @@
 //=============================================================================================================
 /**
-* @file     ssvepbcisetupstimulus.h
+* @file     ssvepbcisetupstimuluswidget.h
 * @author   Viktor Klüber <viktor.klueber@tu-ilmenau.de>;
 *           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     April 2016
@@ -62,7 +61,7 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE EEGoSportsPlugin
+// DEFINE NAMESPACE SSVEPBCIPLUGIN
 //=============================================================================================================
 
 namespace Ui {
