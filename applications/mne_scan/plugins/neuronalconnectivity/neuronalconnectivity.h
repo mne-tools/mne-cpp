@@ -45,10 +45,9 @@
 #include "neuronalconnectivity_global.h"
 
 #include <scShared/Interfaces/IAlgorithm.h>
+
 #include <generics/circularmatrixbuffer.h>
-#include <scMeas/realtimesourceestimate.h>
-#include <scMeas/newrealtimemultisamplearray.h>
-#include "FormFiles/neuronalconnectivitysetupwidget.h"
+
 #include "FormFiles/neuronalconnectivityyourwidget.h"
 
 
@@ -72,19 +71,26 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+namespace FIFFLIB {
+    class FiffInfo;
+}
+
+namespace SCMEASLIB {
+    class RealTimeSourceEstimate;
+    class RealTimeConnectivityEstimate;
+}
+
+
+//*************************************************************************************************************
+//=============================================================================================================
 // DEFINE NAMESPACE NEURONALCONNECTIVITYPLUGIN
 //=============================================================================================================
 
 namespace NEURONALCONNECTIVITYPLUGIN
 {
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace SCSHAREDLIB;
 
 
 //*************************************************************************************************************
@@ -99,7 +105,7 @@ using namespace SCSHAREDLIB;
 *
 * @brief The NeuronalConnectivity class provides a NeuronalConnectivity plugin for online processing.
 */
-class NEURONALCONNECTIVITYSHARED_EXPORT NeuronalConnectivity : public IAlgorithm
+class NEURONALCONNECTIVITYSHARED_EXPORT NeuronalConnectivity : public SCSHAREDLIB::IAlgorithm
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "neuronalconnectivity.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
@@ -123,12 +129,12 @@ public:
     /**
     * IAlgorithm functions
     */
-    virtual QSharedPointer<IPlugin> clone() const;
+    virtual QSharedPointer<SCSHAREDLIB::IPlugin> clone() const;
     virtual void init();
     virtual void unload();
     virtual bool start();
     virtual bool stop();
-    virtual IPlugin::PluginType getType() const;
+    virtual SCSHAREDLIB::IPlugin::PluginType getType() const;
     virtual QString getName() const;
     virtual QWidget* setupWidget();
 
@@ -150,17 +156,17 @@ protected:
     void showYourWidget();
 
 private:
-    bool                                                        m_bIsRunning;                   /**< Flag whether thread is running.*/ 
-    qint32                                                      m_iDownSample;                  /**< Sampling rate */
+    bool                                                                            m_bIsRunning;                   /**< Flag whether thread is running.*/
+    qint32                                                                          m_iDownSample;                  /**< Sampling rate */
 
-    FIFFLIB::FiffInfo::SPtr                                     m_pFiffInfo;                    /**< Fiff measurement info.*/
-    QSharedPointer<NeuronalConnectivityYourWidget>              m_pYourWidget;                  /**< flag whether thread is running.*/
-    QAction*                                                    m_pActionShowYourWidget;        /**< flag whether thread is running.*/
+    QSharedPointer<FIFFLIB::FiffInfo>                                               m_pFiffInfo;                    /**< Fiff measurement info.*/
+    QSharedPointer<NeuronalConnectivityYourWidget>                                  m_pYourWidget;                  /**< flag whether thread is running.*/
+    QAction*                                                                        m_pActionShowYourWidget;        /**< flag whether thread is running.*/
 
-    IOBUFFER::CircularMatrixBuffer<double>::SPtr                m_pNeuronalConnectivityBuffer;  /**< Holds incoming data.*/
+    QSharedPointer<IOBUFFER::CircularMatrixBuffer<double> >                         m_pNeuronalConnectivityBuffer;  /**< Holds incoming data.*/
 
-    PluginInputData<SCMEASLIB::RealTimeSourceEstimate>::SPtr    m_pRTSEInput;                   /**< The RealTimeSourceEstimate input.*/
-    PluginOutputData<SCMEASLIB::RealTimeSourceEstimate>::SPtr   m_pRTSEOutput;                  /**< The RealTimeSourceEstimate output.*/
+    SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeSourceEstimate>::SPtr           m_pRTSEInput;                   /**< The RealTimeSourceEstimate input.*/
+    SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeConnectivityEstimate>::SPtr    m_pRTSEOutput;                  /**< The RealTimeSourceEstimate output.*/
 
     Eigen::MatrixX3f        m_matNodeVertLeft;          /**< Holds the left hemi vertex postions of the network nodes. Corresponding to the neuronal sources.*/
     Eigen::MatrixX3f        m_matNodeVertRight;         /**< Holds the right hemi vertex postions of the network nodes. Corresponding to the neuronal sources.*/
