@@ -86,7 +86,7 @@ public:
     /**
     * Constructs a NeuronalConnectivityToolbox.
     */
-    explicit NeuronalConnectivityYourWidget(QWidget *parent = 0);
+    NeuronalConnectivityYourWidget(QWidget *parent = 0);
 
     //=========================================================================================================
     /**

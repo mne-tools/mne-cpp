@@ -42,6 +42,11 @@
 
 #include <connectivity/connectivitymeasures.h>
 
+#include <scMeas/realtimesourceestimate.h>
+#include <scMeas/realtimeconnectivityestimate.h>
+
+#include "FormFiles/neuronalconnectivitysetupwidget.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -107,7 +112,7 @@ void NeuronalConnectivity::init()
 
     // Output - Uncomment this if you don't want to send processed data (in form of a matrix) to other plugins.
     // Also, this output stream will generate an online display in your plugin
-    m_pRTSEOutput = PluginOutputData<RealTimeSourceEstimate>::create(this, "NeuronalConnectivityOut", "NeuronalConnectivity output data");
+    m_pRTSEOutput = PluginOutputData<RealTimeConnectivityEstimate>::create(this, "NeuronalConnectivityOut", "NeuronalConnectivity output data");
     m_outputConnectors.append(m_pRTSEOutput);
     m_pRTSEOutput->data()->setName(this->getName());//Provide name to auto store widget settings
 
