@@ -75,6 +75,17 @@ SsvepBciSetupStimulusWidget::SsvepBciSetupStimulusWidget(SsvepBci *pSsvepBci, QW
     // connect signal for frequency change
     connect(this, &SsvepBciSetupStimulusWidget::frequencyChanged, m_pSsvepBci.data(), &SsvepBci::setChangeSSVEPParameterFlag);
 
+    // connect screen buttons
+    connect(ui->m_pushButton_clearScreen, &QPushButton::clicked, this, &SsvepBciSetupStimulusWidget::clearItems);
+    connect(ui->m_pushButton_closeScreen, &QPushButton::clicked, this, &SsvepBciSetupStimulusWidget::minimizeScreen);
+    connect(ui->m_pushButton_showScreen, &QPushButton::clicked, this, &SsvepBciSetupStimulusWidget::showTestScreen);
+
+    // connect stimulation buttons
+    connect(ui->m_pushButton_test1, &QPushButton::clicked, this, &SsvepBciSetupStimulusWidget::test1);
+    connect(ui->m_pushButton_test2, &QPushButton::clicked, this, &SsvepBciSetupStimulusWidget::test2);
+    connect(ui->m_pushButton_test3, &QPushButton::clicked, this, &SsvepBciSetupStimulusWidget::test3);
+    connect(ui->m_pushButton_screenKeyboard, &QPushButton::clicked, this, &SsvepBciSetupStimulusWidget::screenKeyboard);
+
     //Map for all frequencies according to their key
     m_idFreqMap.insert(15,  6   );
     m_idFreqMap.insert(14,  6.66);
@@ -149,7 +160,7 @@ void SsvepBciSetupStimulusWidget::changeComboBox()
 
 //*************************************************************************************************************
 
-void SsvepBciSetupStimulusWidget::on_pushButton_clicked()
+void SsvepBciSetupStimulusWidget::showTestScreen()
 {
     m_pSsvepBciScreen->showFullScreen();
 }
@@ -157,7 +168,7 @@ void SsvepBciSetupStimulusWidget::on_pushButton_clicked()
 
 //*************************************************************************************************************
 
-void SsvepBciSetupStimulusWidget::on_pushButton_2_clicked()
+void SsvepBciSetupStimulusWidget::clearItems()
 {
     clear();
 }
@@ -165,7 +176,7 @@ void SsvepBciSetupStimulusWidget::on_pushButton_2_clicked()
 
 //*************************************************************************************************************
 
-void SsvepBciSetupStimulusWidget::on_pushButton_3_clicked()
+void SsvepBciSetupStimulusWidget::minimizeScreen()
 {
     m_pSsvepBciScreen->setWindowState(Qt::WindowMinimized);
 }
@@ -173,7 +184,7 @@ void SsvepBciSetupStimulusWidget::on_pushButton_3_clicked()
 
 //*************************************************************************************************************
 
-void SsvepBciSetupStimulusWidget::on_pushButton_4_clicked()
+void SsvepBciSetupStimulusWidget::test3()
 {
     // TEST 3
     //clear  Items from screen
@@ -208,7 +219,7 @@ void SsvepBciSetupStimulusWidget::on_pushButton_4_clicked()
 
 //*************************************************************************************************************
 
-void SsvepBciSetupStimulusWidget::on_pushButton_5_clicked()
+void SsvepBciSetupStimulusWidget::test1()
 {
     // TEST 1
     //clear  Items from screen
@@ -227,7 +238,7 @@ void SsvepBciSetupStimulusWidget::on_pushButton_5_clicked()
 
 //*************************************************************************************************************
 
-void SsvepBciSetupStimulusWidget::on_pushButton_6_clicked()
+void SsvepBciSetupStimulusWidget::test2()
 {
     // TEST 2
 
@@ -268,7 +279,7 @@ void SsvepBciSetupStimulusWidget::on_pushButton_6_clicked()
 
 //*************************************************************************************************************
 
-void SSVEPBCIPLUGIN::SsvepBciSetupStimulusWidget::on_pushButton_7_clicked()
+void SsvepBciSetupStimulusWidget::screenKeyboard()
 {
     // Screen Keyboard
     //clear  Items from screen
@@ -328,7 +339,7 @@ void SsvepBciSetupStimulusWidget::on_comboBox_currentIndexChanged(int index)
 
 //*************************************************************************************************************
 
-void SSVEPBCIPLUGIN::SsvepBciSetupStimulusWidget::on_comboBox_2_currentIndexChanged(int index)
+void SsvepBciSetupStimulusWidget::on_comboBox_2_currentIndexChanged(int index)
 {
     if(m_bIsRunning){
         if(m_bReadFreq){
@@ -353,41 +364,57 @@ void SsvepBciSetupStimulusWidget::setFreq(SsvepBciFlickeringItem &item, int freq
     //choose the rendereing orders according to evoked flickerfrequency (being valid for a 60 Hz monitor)
     switch(freqKey){
     case 0:
-        renderOrder<< 0 << 1;                                                                                break;  // 30 Hz
+        renderOrder<< 0 << 1;
+        break;  // 30 Hz
     case 1:
-        renderOrder<< 0 << 1 << 0 << 1 << 1;                                                                 break;  // 24 Hz
+        renderOrder<< 0 << 1 << 0 << 1 << 1;
+        break;  // 24 Hz
     case 2:
-        renderOrder<< 0 << 1 << 1;                                                                           break;  // 20 Hz
+        renderOrder<< 0 << 1 << 1;
+        break;  // 20 Hz
     case 3:
-        renderOrder<< 0 << 0 << 1 << 1 << 0 << 1 << 1;                                                       break;  // 17.14 Hz
+        renderOrder<< 0 << 0 << 1 << 1 << 0 << 1 << 1;
+        break;  // 17.14 Hz
     case 4:
-        renderOrder<< 0 << 0 << 1 << 1;                                                                      break;  // 15 Hz
+        renderOrder<< 0 << 0 << 1 << 1;
+        break;  // 15 Hz
     case 5:
-        renderOrder<< 0 << 0 << 1 << 1 << 0 << 0 << 1 << 1 << 1;                                             break;  // 13.33 Hz
+        renderOrder<< 0 << 0 << 1 << 1 << 0 << 0 << 1 << 1 << 1;
+        break;  // 13.33 Hz
     case 6:
-        renderOrder<< 0 << 0 << 1 << 1 << 1;                                                                 break;  // 12 Hz
+        renderOrder<< 0 << 0 << 1 << 1 << 1;
+        break;  // 12 Hz
     case 7:
-        renderOrder<< 0 << 0 << 1 << 1 << 1 << 0 << 0 << 0 << 1 << 1 << 1;                                   break;  // 10.91 Hz
+        renderOrder<< 0 << 0 << 1 << 1 << 1 << 0 << 0 << 0 << 1 << 1 << 1;
+        break;  // 10.91 Hz
     case 8:
-        renderOrder<< 0 << 0 << 0 << 1 << 1 << 1;                                                            break;  // 10 Hz
+        renderOrder<< 0 << 0 << 0 << 1 << 1 << 1;
+        break;  // 10 Hz
     case 9:
-        renderOrder<< 0 << 0 << 0 << 1 << 1 << 1 << 0 << 0 << 0 << 1 << 1 << 1 << 1;                         break;  // 9.23 Hz
+        renderOrder<< 0 << 0 << 0 << 1 << 1 << 1 << 0 << 0 << 0 << 1 << 1 << 1 << 1;
+        break;  // 9.23 Hz
     case 10:
-        renderOrder<< 0 << 0 << 0 << 1 << 1 << 1 << 1;                                                       break;  // 8.57 Hz
+        renderOrder<< 0 << 0 << 0 << 1 << 1 << 1 << 1;
+        break;  // 8.57 Hz
     case 11:
-        renderOrder<< 0 << 0 << 0 << 1 << 1 << 1 << 1 << 0 << 0 << 0 << 0 << 1 << 1 << 1 << 1;               break;  // 8 Hz
+        renderOrder<< 0 << 0 << 0 << 1 << 1 << 1 << 1 << 0 << 0 << 0 << 0 << 1 << 1 << 1 << 1;
+        break;  // 8 Hz
     case 12:
-        renderOrder<< 0 << 0 << 0 << 0 << 1 << 1 << 1 << 1;                                                  break;  // 7.5 Hz
+        renderOrder<< 0 << 0 << 0 << 0 << 1 << 1 << 1 << 1;
+        break;  // 7.5 Hz
     case 13:
-        renderOrder<< 0 << 0 << 0 << 0 << 1 << 1 << 1 << 1 << 0 << 0 << 0 << 0 << 1 << 1 << 1 << 1 << 1;     break;  // 7.05 Hz
+        renderOrder<< 0 << 0 << 0 << 0 << 1 << 1 << 1 << 1 << 0 << 0 << 0 << 0 << 1 << 1 << 1 << 1 << 1;
+        break;  // 7.05 Hz
     case 14:
-        renderOrder<< 0 << 0 << 0 << 0 << 1 << 1 << 1 << 1 << 1;                                             break;  // 6.66 Hz
+        renderOrder<< 0 << 0 << 0 << 0 << 1 << 1 << 1 << 1 << 1;
+        break;  // 6.66 Hz
     case 15:
-        renderOrder<< 0 << 0 << 0 << 0 << 0 << 1 << 1 << 1 << 1 << 1;                                        break;  // 6 Hz
-    default:{
+        renderOrder<< 0 << 0 << 0 << 0 << 0 << 1 << 1 << 1 << 1 << 1;
+        break;  // 6 Hz
+    default:
         renderOrder<< 0 << 1 ;
-        qDebug()<< "SSVEPBCI-SETUP: Could not set up rendering order. 30 Hz have been chosen instead for flicker frequency!";break;
-    }
+        qDebug()<< "SSVEPBCI-SETUP: Could not set up rendering order. 30 Hz have been chosen instead for flicker frequency!";
+        break;
     }
     item.setRenderOrder(renderOrder, freqKey);
 
@@ -411,7 +438,7 @@ QList<double> SsvepBciSetupStimulusWidget::getFrequencies()
 
 //*************************************************************************************************************
 
-void SSVEPBCIPLUGIN::SsvepBciSetupStimulusWidget::on_m_lineEdit_BCISpeller_textChanged(const QString &arg1)
+void SsvepBciSetupStimulusWidget::on_m_lineEdit_BCISpeller_textChanged(const QString &arg1)
 {
     emit settledPhrase(arg1);
 }

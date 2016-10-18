@@ -72,8 +72,10 @@ GUSBAmpSetupWidget::GUSBAmpSetupWidget(GUSBAmp* pGUSBAmp, QWidget* parent)
 {
     ui.setupUi(this);
 
-    //Connect about button
+    //Connections
     connect(ui.m_qPushButton_About, &QPushButton::released, this, &GUSBAmpSetupWidget::showAboutDialog);
+    connect(ui.m_pushButton_setSerials, &QPushButton::clicked, this, &GUSBAmpSetupWidget::setSerialAdresses);
+    connect(ui.ChannelSelect, &QGroupBox::clicked, this, &GUSBAmpSetupWidget::activateChannelSelect);
 
     ui.comboBox->setCurrentIndex(2);
 }
@@ -104,7 +106,7 @@ void GUSBAmpSetupWidget::showAboutDialog()
 
 //*************************************************************************************************************
 
-void GUSBAMPPLUGIN::GUSBAmpSetupWidget::on_comboBox_currentIndexChanged(const QString &arg1)
+void GUSBAmpSetupWidget::on_comboBox_currentIndexChanged(const QString &arg1)
 {
     bool ok;
     QString sampleRate = arg1;
@@ -113,7 +115,7 @@ void GUSBAMPPLUGIN::GUSBAmpSetupWidget::on_comboBox_currentIndexChanged(const QS
 
 //*************************************************************************************************************
 
-void GUSBAmpSetupWidget::on_pushButton_clicked()
+void GUSBAmpSetupWidget::setSerialAdresses()
 {
     vector<QString> serials;
 
@@ -222,7 +224,9 @@ void GUSBAmpSetupWidget::checkBoxes()
 }
 
 
-void GUSBAmpSetupWidget::on_ChannelSelect_clicked(bool checked)
+//*************************************************************************************************************
+
+void GUSBAmpSetupWidget::activateChannelSelect(bool checked)
 {
     if(!checked)
     {
@@ -269,82 +273,130 @@ void GUSBAmpSetupWidget::on_ChannelSelect_clicked(bool checked)
     }
 }
 
-void GUSBAMPPLUGIN::GUSBAmpSetupWidget::on_checkBox_clicked()
+
+//*************************************************************************************************************
+
+void GUSBAmpSetupWidget::on_checkBox_clicked()
 {
     checkBoxes();
 }
 
-void GUSBAMPPLUGIN::GUSBAmpSetupWidget::on_checkBox_2_clicked()
+
+//*************************************************************************************************************
+
+void GUSBAmpSetupWidget::on_checkBox_2_clicked()
 {
     checkBoxes();
 }
 
-void GUSBAMPPLUGIN::GUSBAmpSetupWidget::on_checkBox_3_clicked()
+
+//*************************************************************************************************************
+
+void GUSBAmpSetupWidget::on_checkBox_3_clicked()
 {
     checkBoxes();
 }
 
-void GUSBAMPPLUGIN::GUSBAmpSetupWidget::on_checkBox_4_clicked()
+
+//*************************************************************************************************************
+
+void GUSBAmpSetupWidget::on_checkBox_4_clicked()
 {
     checkBoxes();
 }
 
-void GUSBAMPPLUGIN::GUSBAmpSetupWidget::on_checkBox_5_clicked()
+
+//*************************************************************************************************************
+
+void GUSBAmpSetupWidget::on_checkBox_5_clicked()
 {
     checkBoxes();
 }
 
-void GUSBAMPPLUGIN::GUSBAmpSetupWidget::on_checkBox_6_clicked()
+
+//*************************************************************************************************************
+
+void GUSBAmpSetupWidget::on_checkBox_6_clicked()
 {
     checkBoxes();
 }
 
-void GUSBAMPPLUGIN::GUSBAmpSetupWidget::on_checkBox_7_clicked()
+
+//*************************************************************************************************************
+
+void GUSBAmpSetupWidget::on_checkBox_7_clicked()
 {
     checkBoxes();
 }
 
-void GUSBAMPPLUGIN::GUSBAmpSetupWidget::on_checkBox_8_clicked()
+
+//*************************************************************************************************************
+
+void GUSBAmpSetupWidget::on_checkBox_8_clicked()
 {
     checkBoxes();
 }
 
-void GUSBAMPPLUGIN::GUSBAmpSetupWidget::on_checkBox_9_clicked()
+
+//*************************************************************************************************************
+
+void GUSBAmpSetupWidget::on_checkBox_9_clicked()
 {
     checkBoxes();
 }
 
-void GUSBAMPPLUGIN::GUSBAmpSetupWidget::on_checkBox_10_clicked()
+
+//*************************************************************************************************************
+
+void GUSBAmpSetupWidget::on_checkBox_10_clicked()
 {
     checkBoxes();
 }
 
-void GUSBAMPPLUGIN::GUSBAmpSetupWidget::on_checkBox_11_clicked()
+
+//*************************************************************************************************************
+
+void GUSBAmpSetupWidget::on_checkBox_11_clicked()
 {
     checkBoxes();
 }
 
-void GUSBAMPPLUGIN::GUSBAmpSetupWidget::on_checkBox_12_clicked()
+
+//*************************************************************************************************************
+
+void GUSBAmpSetupWidget::on_checkBox_12_clicked()
 {
     checkBoxes();
 }
 
-void GUSBAMPPLUGIN::GUSBAmpSetupWidget::on_checkBox_13_clicked()
+
+//*************************************************************************************************************
+
+void GUSBAmpSetupWidget::on_checkBox_13_clicked()
 {
     checkBoxes();
 }
 
-void GUSBAMPPLUGIN::GUSBAmpSetupWidget::on_checkBox_14_clicked()
+
+//*************************************************************************************************************
+
+void GUSBAmpSetupWidget::on_checkBox_14_clicked()
 {
     checkBoxes();
 }
 
-void GUSBAMPPLUGIN::GUSBAmpSetupWidget::on_checkBox_15_clicked()
+
+//*************************************************************************************************************
+
+void GUSBAmpSetupWidget::on_checkBox_15_clicked()
 {
     checkBoxes();
 }
 
-void GUSBAMPPLUGIN::GUSBAmpSetupWidget::on_checkBox_16_clicked()
+
+//*************************************************************************************************************
+
+void GUSBAmpSetupWidget::on_checkBox_16_clicked()
 {
     checkBoxes();
 }

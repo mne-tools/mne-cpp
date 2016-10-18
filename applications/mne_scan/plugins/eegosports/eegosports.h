@@ -71,8 +71,6 @@
 
 #include "FormFiles/eegosportssetupwidget.h"
 #include "FormFiles/eegosportssetupprojectwidget.h"
-#include "FormFiles/eegosportssetupstimuluswidget.h"
-#include "FormFiles/ssvepbcisetupstimuluswidget.h"
 
 
 //*************************************************************************************************************
@@ -85,10 +83,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE EEGoSportsPlugin
+// DEFINE NAMESPACE EEGOSPORTSPLUGIN
 //=============================================================================================================
 
-namespace EEGoSportsPlugin
+namespace EEGOSPORTSPLUGIN
 {
 
 
@@ -228,18 +226,6 @@ protected:
     * Starts data recording
     */
     void showStartRecording();
-
-    //=========================================================================================================
-    /**
-    * Starts time stimulus setup
-    */
-    void showSetupTimeStimulus();
-
-    //=========================================================================================================
-    /**
-    * Starts frame stimulus
-    */
-    void showSetupFrameStimulus();
 
     //=========================================================================================================
     /**

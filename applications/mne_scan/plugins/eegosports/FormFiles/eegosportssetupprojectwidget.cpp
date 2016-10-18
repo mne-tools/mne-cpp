@@ -48,7 +48,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace EEGoSportsPlugin;
+using namespace EEGOSPORTSPLUGIN;
 
 
 //*************************************************************************************************************
@@ -62,7 +62,6 @@ EEGoSportsSetupProjectWidget::EEGoSportsSetupProjectWidget(EEGoSports* pEEGoSpor
 , m_pEEGoSports(pEEGoSports)
 {
     ui->setupUi(this);
-
 
     // Connect write to file options
     connect(ui->m_qPushButton_NewProject, &QPushButton::released, this, &EEGoSportsSetupProjectWidget::addProject);
@@ -280,8 +279,9 @@ void EEGoSportsSetupProjectWidget::changeOutputFile()
                 "mne_x_plugins/resources/eegosports/EEG_data_001_raw.fif",
                  tr("Fif files (*.fif)"));
 
-    if(path==NULL)
+    if(path==NULL){
         path = ui->m_qLineEdit_FiffRecordFile->text();
+    }
 
     ui->m_qLineEdit_FiffRecordFile->setText(path);
     m_pEEGoSports->m_sOutputFilePath = ui->m_qLineEdit_FiffRecordFile->text();
@@ -297,8 +297,9 @@ void EEGoSportsSetupProjectWidget::changeCap()
                                                 "mne_x_plugins/resources/tmsi/loc_files",
                                                  tr("Electrode location files (*.elc)"));
 
-    if(path==NULL)
+    if(path==NULL){
         path = ui->m_qLineEdit_EEGCap->text();
+    }
 
     ui->m_qLineEdit_EEGCap->setText(path);
     m_pEEGoSports->m_sElcFilePath = ui->m_qLineEdit_EEGCap->text();

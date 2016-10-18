@@ -140,51 +140,52 @@ bool GUSBAmpDriver::initDevice()
             //open the device
             HANDLE hDevice = GT_OpenDeviceEx(*serialNumber);
 
-            if (hDevice == NULL)
+            if (hDevice == NULL){
                 throw string("Error on GT_OpenDeviceEx: Couldn't open device ").append(*serialNumber);
-
+            }
             //add the device handle to the list of opened devices
             m_openedDevicesHandles.push_back(hDevice);
 
             //set the channels from that data should be acquired
-            if (!GT_SetChannels(hDevice, m_channelsToAcquire, m_NUMBER_OF_CHANNELS))
+            if (!GT_SetChannels(hDevice, m_channelsToAcquire, m_NUMBER_OF_CHANNELS)){
                 throw string("Error on GT_SetChannels: Couldn't set channels to acquire for device ").append(*serialNumber);
-
+            }
             //set the sample rate
-            if (!GT_SetSampleRate(hDevice, m_SAMPLE_RATE_HZ))
+            if (!GT_SetSampleRate(hDevice, m_SAMPLE_RATE_HZ)){
                 throw string("Error on GT_SetSampleRate: Couldn't set sample rate for device ").append(*serialNumber);
-
+            }
             //disable the trigger line
-            if (!GT_EnableTriggerLine(hDevice, m_TRIGGER))
+            if (!GT_EnableTriggerLine(hDevice, m_TRIGGER)){
                 throw string("Error on GT_EnableTriggerLine: Couldn't enable/disable trigger line for device ").append(*serialNumber);
-
+            }
             //set the number of scans that should be received simultaneously
-            if (!GT_SetBufferSize(hDevice, m_NUMBER_OF_SCANS))
+            if (!GT_SetBufferSize(hDevice, m_NUMBER_OF_SCANS)){
                 throw string("Error on GT_SetBufferSize: Couldn't set the buffer size for device ").append(*serialNumber);
-
+            }
             //don't use bandpass and notch for each channel
             for (int i=0; i<m_NUMBER_OF_CHANNELS; i++)
             {
                 //don't use a bandpass filter for any channel
-                if (!GT_SetBandPass(hDevice, m_channelsToAcquire[i], -1))
+                if (!GT_SetBandPass(hDevice, m_channelsToAcquire[i], -1)){
                     throw string("Error on GT_SetBandPass: Couldn't set no bandpass filter for device ").append(*serialNumber);
-
+                }
                 //don't use a notch filter for any channel
-                if (!GT_SetNotch(hDevice, m_channelsToAcquire[i], -1))
+                if (!GT_SetNotch(hDevice, m_channelsToAcquire[i], -1)){
                     throw string("Error on GT_SetNotch: Couldn't set no notch filter for device ").append(*serialNumber);
+                }
             }
 
             //determine master device as the last device in the list
             bool isSlave = (*serialNumber != m_callSequenceSerials.back());
 
             //set slave/master mode of the device
-            if (!GT_SetSlave(hDevice, isSlave))
+            if (!GT_SetSlave(hDevice, isSlave)){
                 throw string("Error on GT_SetSlave: Couldn't set slave/master mode for device ").append(*serialNumber);
-
+            }
             //disable shortcut function
-            if (!GT_EnableSC(hDevice, false))
+            if (!GT_EnableSC(hDevice, false)){
                 throw string("Error on GT_EnableSC: Couldn't disable shortcut function for device ").append(*serialNumber);
-
+            }
             //set unipolar derivation
             m_bipolarSettings.Channel1 = 0;
             m_bipolarSettings.Channel2 = 0;
@@ -206,26 +207,27 @@ bool GUSBAmpDriver::initDevice()
             if (!GT_SetBipolar(hDevice, m_bipolarSettings))
                 throw string("Error on GT_SetBipolar: Couldn't set unipolar derivation for device ").append(*serialNumber);
 
-            if (m_mode == M_COUNTER)
-                if (!GT_SetMode(hDevice, M_NORMAL))
+            if (m_mode == M_COUNTER){
+                if (!GT_SetMode(hDevice, M_NORMAL)){
                     throw string("Error on GT_SetMode: Couldn't set mode M_NORMAL (before mode M_COUNTER) for device ").append(*serialNumber);
-
+                }
+            }
             //set acquisition mode
-            if (!GT_SetMode(hDevice, m_mode))
+            if (!GT_SetMode(hDevice, m_mode)){
                 throw string("Error on GT_SetMode: Couldn't set mode for device ").append(*serialNumber);
-
+            }
             //for g.USBamp devices set common ground and common reference
             if (strncmp(*serialNumber, "U", 1) == 0 && (m_mode == M_NORMAL || m_mode == M_COUNTER))
             {
                 //don't connect the 4 groups to common reference
-                if (!GT_SetReference(hDevice, m_commonReference))
+                if (!GT_SetReference(hDevice, m_commonReference)){
                     throw string("Error on GT_SetReference: Couldn't set common reference for device ").append(*serialNumber);
-
+                }
                 //don't connect the 4 groups to common ground
-                if (!GT_SetGround(hDevice, m_commonGround))
-                    throw string("Error on GT_SetGround: Couldn't set common ground for device ").append(*serialNumber);
+                if (!GT_SetGround(hDevice, m_commonGround)){
+                    throw string("Error on GT_SetGround: Couldn't set common ground for device ").append(*serialNumber);  
+                }
             }
-
             printf("\tg.USBamp %s initialized as %s (#%d in the call sequence)!\n", *serialNumber, (isSlave) ? "slave" : "master", m_openedDevicesHandles.size());
         }
 
@@ -455,8 +457,9 @@ bool GUSBAmpDriver::setSerials(vector<QString> &list)
         m_callSequenceSerials.pop_front();
     }
     //defining the new deque-list for data acquisition
-    for (int i=1; i<=m_SLAVE_SERIALS_SIZE; i++)
+    for (int i=1; i<=m_SLAVE_SERIALS_SIZE; i++){
         m_callSequenceSerials.push_back(m_vpSerials[i]);
+    }
     //add the master device at the end of the list!
     m_callSequenceSerials.push_back(m_vpSerials[0]);
 
@@ -472,8 +475,9 @@ bool GUSBAmpDriver::setSampleRate(int sampleRate)
 {
     try
     {
-        if(m_isRunning)
+        if(m_isRunning){
             throw string("Do not change device-parameters while running the device!\n");
+        }
 
         //choose the number of scans according to the sample rate (see documentation for further hints)
         switch(sampleRate)
@@ -528,8 +532,9 @@ bool GUSBAmpDriver::setChannels(vector<int> &list)
 
     //checking if values of vector are ascending and smalller then 17
     int i = 0;
-    do
+    do{
         i++;
+    }
     while ((i < size) && (list[i] > list[i - 1]) && (list[i] < 17));
 
     if (i != size)

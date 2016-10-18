@@ -3,7 +3,6 @@
 * @file     ssvepbci.cpp
 * @author   Viktor Klüber <viktor.klueber@tu-ilmenau.de>;
 *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     May, 2016
@@ -41,7 +40,6 @@
 //=============================================================================================================
 
 #include "ssvepbci.h"
-
 #include <iostream>
 #include <Eigen/Dense>
 #include <utils/ioutils.h>
@@ -116,8 +114,9 @@ SsvepBci::SsvepBci()
 SsvepBci::~SsvepBci()
 {
     //If the program is closed while the sampling is in process
-    if(this->isRunning())
+    if(this->isRunning()){
         this->stop();
+    }
 }
 
 
@@ -190,7 +189,6 @@ void SsvepBci::init()
 
 void SsvepBci::unload()
 {
-
 }
 
 
@@ -341,8 +339,9 @@ void SsvepBci::updateSource(SCMEASLIB::NewMeasurement::SPtr pMeasurement)
     if(pRTSE)
     {
         //Check if buffer initialized
-        if(!m_pBCIBuffer_Source)
+        if(!m_pBCIBuffer_Source){
             m_pBCIBuffer_Source = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64,  pRTSE->getValue()->data.rows(), pRTSE->getValue()->data.cols()));
+        }
 
         if(m_bProcessData)
         {
@@ -357,14 +356,11 @@ void SsvepBci::updateSource(SCMEASLIB::NewMeasurement::SPtr pMeasurement)
 
     // Initalize parameter for processing BCI on source level
     if(m_bInitializeSource){
-
-
         m_bInitializeSource = false;
     }
 
     QList<Label> labels;
     QList<RowVector4i> labelRGBAs;
-
 
     QSharedPointer<SurfaceSet> SPtrSurfSet = pRTSE->getSurfSet();
 
@@ -373,12 +369,14 @@ void SsvepBci::updateSource(SCMEASLIB::NewMeasurement::SPtr pMeasurement)
 
     qDebug() << "label acquisation successful:" << pRTSE->getAnnotSet()->toLabels(surf, labels, labelRGBAs);
 
-    foreach(Label label, labels)
+    foreach(Label label, labels){
         qDebug() << "label IDs: " << label.label_id << "\v" << "label name: " << label.name;
+    }
 
     QList<VectorXi> vertNo = pRTSE->getFwdSolution()->src.get_vertno();
-    foreach(VectorXi vector, vertNo)
+    foreach(VectorXi vector, vertNo){
         cout << "vertNo:" << vector << endl;
+    }
 }
 
 
@@ -387,7 +385,7 @@ void SsvepBci::updateSource(SCMEASLIB::NewMeasurement::SPtr pMeasurement)
 void SsvepBci::clearClassifications()
 {
     m_qMutex.lock();
-        m_lIndexOfClassResultSensor.clear();
+    m_lIndexOfClassResultSensor.clear();
     m_qMutex.unlock();
 }
 
@@ -429,21 +427,6 @@ QString SsvepBci::getSsvepBciResourcePath(){
 
 //*************************************************************************************************************
 
-//bool SsvepBci::lookForTrigger(const MatrixXd &data)
-//{
-//    // Check if capacitive touch trigger signal was received - Note that there can also be "beep" triggers in the received data, which are only 1 sample wide -> therefore look for 2 samples with a value of 254 each
-//    for(int i = 0; i<data.cols()-1; i++)
-//    {
-//        if(data(0,i) == 254 && data(0,i+1) == 254) // data - corresponds with channel 136 which is the trigger channel
-//            return true;
-//    }
-
-//    return false;
-//}
-
-
-//*************************************************************************************************************
-
 void SsvepBci::showSetupStimulus()
 {
     QDesktopWidget Desktop; // Desktop Widget for getting the number of accessible screens
@@ -460,7 +443,6 @@ void SsvepBci::showSetupStimulus()
             m_pSsvepBciSetupStimulusWidget->show();
             m_pSsvepBciSetupStimulusWidget->raise();
         }
-
         //sets Window to the foreground and activates it for editing
         m_pSsvepBciSetupStimulusWidget->activateWindow();
     }
@@ -495,7 +477,8 @@ void SsvepBci::showBCIConfiguration()
 
 //*************************************************************************************************************
 
-void SsvepBci::removePowerLine(bool removePowerLine){
+void SsvepBci::removePowerLine(bool removePowerLine)
+{
     m_qMutex.lock();
     m_bRemovePowerLine = removePowerLine;
     m_qMutex.unlock();
@@ -504,7 +487,8 @@ void SsvepBci::removePowerLine(bool removePowerLine){
 
 //*************************************************************************************************************
 
-void SsvepBci::setPowerLine(int powerLine){
+void SsvepBci::setPowerLine(int powerLine)
+{
     m_qMutex.lock();
     m_iPowerLine = powerLine;
     m_qMutex.unlock();
@@ -513,7 +497,8 @@ void SsvepBci::setPowerLine(int powerLine){
 
 //*************************************************************************************************************
 
-void SsvepBci::setFeatureExtractionMethod(bool useMEC){
+void SsvepBci::setFeatureExtractionMethod(bool useMEC)
+{
     m_qMutex.lock();
     m_bUseMEC = useMEC;
     m_qMutex.unlock();
@@ -525,8 +510,9 @@ void SsvepBci::setFeatureExtractionMethod(bool useMEC){
 void SsvepBci::changeSSVEPParameter(){
 
     // update frequency list from setup stimulus widget if activated
-    if(m_pSsvepBciSetupStimulusWidget)
+    if(m_pSsvepBciSetupStimulusWidget){
         setFrequencyList(m_pSsvepBciSetupStimulusWidget->getFrequencies());
+    }
 
     if(m_pSsvepBciConfigurationWidget){
 
@@ -542,8 +528,9 @@ void SsvepBci::changeSSVEPParameter(){
 
             // get new list of electrode numbers
             m_lElectrodeNumbers.clear();
-            foreach(const QString &str, m_slChosenChannelsSensor)
+            foreach(const QString &str, m_slChosenChannelsSensor){
                 m_lElectrodeNumbers << m_mapElectrodePinningScheme.value(str);
+            }
 
             // reset sliding time window parameter
             m_iWriteIndex   = 0;
@@ -575,10 +562,12 @@ void SsvepBci::setThresholdValues(MyQList thresholds){
 void SsvepBci::run(){
     while(m_bIsRunning){
 
-        if(m_bUseSensorData)
+        if(m_bUseSensorData){
             ssvepBciOnSensor();
-        else
+        }
+        else{
             ssvepBciOnSource();
+        }
     }
 }
 
@@ -596,8 +585,9 @@ void SsvepBci::setFrequencyList(QList<double> frequencyList)
         // update the list of all frequencies
         m_lAllFrequencies.clear();
         m_lAllFrequencies = m_lDesFrequencies;
-        for(int i = 0; i < m_lDesFrequencies.size() - 1; i++)
+        for(int i = 0; i < m_lDesFrequencies.size() - 1; i++){
             m_lAllFrequencies.append((m_lDesFrequencies.at(i) + m_lDesFrequencies.at(i + 1) ) / 2);
+        }
 
         // emit novel frequency list
         emit getFrequencyLabels(m_lDesFrequencies);
@@ -627,17 +617,21 @@ double SsvepBci::MEC(MatrixXd &Y, MatrixXd &X)
     // Determine number of channels Ns
     int Ns;
     VectorXd cumsum = eigensolver.eigenvalues();
-    for(int j = 1; j < eigensolver.eigenvalues().size(); j++)
+    for(int j = 1; j < eigensolver.eigenvalues().size(); j++){
         cumsum(j) += cumsum(j - 1);
-    for(Ns = 0; Ns < eigensolver.eigenvalues().size() ; Ns++)
-        if(cumsum(Ns)/eigensolver.eigenvalues().sum() > 0.1)
+    }
+    for(Ns = 0; Ns < eigensolver.eigenvalues().size() ; Ns++){
+        if(cumsum(Ns)/eigensolver.eigenvalues().sum() > 0.1){
             break;
+        }
+    }
     Ns += 1;
 
     // Determine spatial filter matrix W
     MatrixXd W = eigensolver.eigenvectors().block(0, 0, eigensolver.eigenvectors().rows(), Ns);   
-    for(int k = 0; k < Ns; k++)
+    for(int k = 0; k < Ns; k++){
         W.col(k) = W.col(k)*(1/sqrt(eigensolver.eigenvalues()(k)));
+    }
 
     // Calcuclate channel signals
     MatrixXd S = Y*W;
@@ -700,9 +694,9 @@ void SsvepBci::readFromSlidingTimeWindow(MatrixXd &data)
         data.block(0, 0, data.rows(), width) = m_matSlidingTimeWindow.block(0, m_matSlidingTimeWindow.cols() - width , data.rows(), width );
         data.block(0, width, data.rows(), m_iReadIndex + 1) = m_matSlidingTimeWindow.block(0, 0, data.rows(), m_iReadIndex + 1);
     }
-    else
+    else{
         data = m_matSlidingTimeWindow.block(0, m_iReadIndex - (data.cols() - 1), data.rows(), data.cols());  // consider case without matrix overflow
-
+    }
     // transpose in the same data space and avoiding aliasing
     data.transposeInPlace();
 }
@@ -714,9 +708,9 @@ void SsvepBci::ssvepBciOnSensor()
 {
 
     // Wait for fiff Info if not yet received - this is needed because we have to wait until the buffers are firstly initiated in the update functions
-    while(!m_pFiffInfo_Sensor)
+    while(!m_pFiffInfo_Sensor){
         msleep(10);
-
+    }
     // reset list of classifiaction results
     MatrixXd m_matSSVEPProbabilities(m_lDesFrequencies.size(), 0);
 
@@ -730,8 +724,9 @@ void SsvepBci::ssvepBciOnSensor()
 
         // write from t_mat to the sliding time window while doing channel select and downsampling
         m_iFormerDownSampleIndex = m_iDownSampleIndex;
-        for(int i = 0; i < m_lElectrodeNumbers.size(); i++)
+        for(int i = 0; i < m_lElectrodeNumbers.size(); i++){
             m_matSlidingTimeWindow(i, m_iWriteIndex) = t_mat(m_lElectrodeNumbers.at(i), m_iDownSampleIndex);
+        }
         writtenSamples++;
 
         // update counter variables
@@ -751,10 +746,12 @@ void SsvepBci::ssvepBciOnSensor()
         {
             // determine window size according to former counted miss classifications
             m_iWindowSize = 10;
-            if(m_iCounter <= 50 && m_iCounter > 40)
+            if(m_iCounter <= 50 && m_iCounter > 40){
                 m_iWindowSize = 20;
-            if(m_iCounter > 50)
+            }
+            if(m_iCounter > 50){
                 m_iWindowSize = 40;
+            }
 
             // create current data matrix Y
             MatrixXd Y;
@@ -787,10 +784,12 @@ void SsvepBci::ssvepBciOnSensor()
                 }
 
                 // extracting the features from the data Y with the reference signal X
-                if(m_bUseMEC)
+                if(m_bUseMEC){
                     ssvepProbabilities(i) = MEC(Y, X); // using Minimum Energy Combination as feature-extraction tool
-                else
+                }
+                else{
                     ssvepProbabilities(i) = CCA(Y, X); // using Canonical Correlation Analysis as feature-extraction tool
+                }
             }
 
             // normalize features to probabilities and transfering it into a softmax function
@@ -807,15 +806,18 @@ void SsvepBci::ssvepBciOnSensor()
                     //qDebug() << "comparison: "<<  m_lThresholdValues[index] << "and" << maxProbability;
                     m_lIndexOfClassResultSensor.append(index+1);
                 }
-                else
+                else{
                     m_lIndexOfClassResultSensor.append(0);
+                }
             }
-            else
+            else{
                 m_lIndexOfClassResultSensor.append(0);
+            }
 
             // clear classifiaction if it hits its threshold
-            if(m_lIndexOfClassResultSensor.size() > m_iClassListSize)
+            if(m_lIndexOfClassResultSensor.size() > m_iClassListSize){
                 m_lIndexOfClassResultSensor.pop_front();
+            }
 
             // transfer values to matrix containing all SSVEPProabibilities of desired frequencies of one calculationstep
             m_matSSVEPProbabilities.conservativeResize(m_lDesFrequencies.size(), m_matSSVEPProbabilities.cols() + 1);
@@ -840,24 +842,26 @@ void SsvepBci::ssvepBciOnSensor()
                 m_iCounter = 0;
                 break;
             }
-            else
+            else{
               emit classificationResult(0);
+            }
         }
     }
 
     // calculate and emit signal of mean probabilities
     if(m_matSSVEPProbabilities.cols() != 0){
         QList<double> meanSSVEPProbabilities;
-        for(int i = 0; i < m_lDesFrequencies.size(); i++)
+        for(int i = 0; i < m_lDesFrequencies.size(); i++){
             meanSSVEPProbabilities << m_matSSVEPProbabilities.row(i).mean();
+        }
         emit SSVEPprob(meanSSVEPProbabilities);
         //qDebug() << "emit ssvep:" << meanSSVEPProbabilities;
     }
 
     // change parameter and reset the time window if the change flag has been set
-    if(m_bChangeSSVEPParameterFlag)
+    if(m_bChangeSSVEPParameterFlag){
         changeSSVEPParameter();
-
+    }
 }
 
 

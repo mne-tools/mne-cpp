@@ -86,7 +86,6 @@ GUSBAmp::GUSBAmp()
     m_vSerials.resize(1);
     m_vSerials[0]= "UB-2015.05.16";
 
-
     // Create record file option action bar item/button
     m_pActionSetupProject = new QAction(QIcon(":/images/database.png"), tr("Setup project"), this);
     m_pActionSetupProject->setStatusTip(tr("Setup project"));
@@ -109,9 +108,9 @@ GUSBAmp::~GUSBAmp()
     //std::cout << "GUSBAmp::~GUSBAmp() " << std::endl;
 
     //If the program is closed while the sampling is in process
-    if(this->isRunning())
+    if(this->isRunning()){
         this->stop();
-
+    }
 }
 
 
@@ -153,11 +152,13 @@ void GUSBAmp::setUpFiffInfo()
             //Set channel name
             //fChInfo.ch_name = elcChannelNames.at(i);
             sChType = QString("EEG ");
-            if(i<10)
+            if(i<10){
                 sChType.append("00");
+            }
 
-            if(i>=10 && i<100)
+            if(i>=10 && i<100){
                 sChType.append("0");
+            }
 
             fChInfo.ch_name = sChType.append(sChType.number(i));
 
@@ -241,8 +242,9 @@ void GUSBAmp::unload()
 bool GUSBAmp::start()
 {
     //Check if the thread is already or still running. This can happen if the start button is pressed immediately after the stop button was pressed. In this case the stopping process is not finished yet but the start process is initiated.
-    if(this->isRunning())
+    if(this->isRunning()){
         QThread::wait();
+    }
 
     //get the values from the GUI and start GUSBAmpProducer
     m_pGUSBAmpProducer->start(m_vSerials, m_viChannelsToAcquire, m_iSampleRate);
@@ -276,8 +278,6 @@ bool GUSBAmp::start()
         qWarning() << "Plugin GUSBAmp - ERROR - GUSBAmpProducer thread could not be started - Either the device is turned off (check your OS device manager) or the driver DLL (GUSBAmpSDK.dll / GUSBAmpSDK32bit.dll) is not installed in the system32 / SysWOW64 directory" << endl;
         return false;
     }
-
-
 }
 
 
@@ -347,8 +347,9 @@ void GUSBAmp::run()
             MatrixXf matValue = m_pRawMatrixBuffer_In->pop();
             MatrixXf matValue_show = matValue/1000000; //matvalue for showing
 
-            for(int i = 0; i < matValue.cols(); i++)
+            for(int i = 0; i < matValue.cols(); i++){
                 qDebug() << matValue(0,i);
+            }
 
             //emit values to real time multi sample array
             m_pRTMSA_GUSBAmp->data()->setValue(matValue_show.cast<double>());
@@ -413,9 +414,9 @@ void GUSBAmp::splitRecordingFile()
 void GUSBAmp::showSetupProjectDialog()
 {
     // Open setup project widget
-    if(m_pGUSBampSetupProjectWidget == NULL)
+    if(m_pGUSBampSetupProjectWidget == NULL){
         m_pGUSBampSetupProjectWidget = QSharedPointer<GUSBAmpSetupProjectWidget>(new GUSBAmpSetupProjectWidget(this));
-
+    }
     if(!m_pGUSBampSetupProjectWidget->isVisible())
     {
         m_pGUSBampSetupProjectWidget->setWindowTitle("GUSBAmp EEG Connector - Setup project");
@@ -467,8 +468,9 @@ void GUSBAmp::showStartRecording()
             msgBox.setInformativeText("Do you want to overwrite this file?");
             msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
             int ret = msgBox.exec();
-            if(ret == QMessageBox::No)
+            if(ret == QMessageBox::No){
                 return;
+            }
         }
         // Check if path exists -> otherwise create it
         QStringList list = m_sOutputFilePath.split("/");
@@ -516,11 +518,11 @@ void GUSBAmp::changeRecordingButton()
 bool GUSBAmp::dirExists(const std::string& dirName_in)
 {
     DWORD ftyp = GetFileAttributesA(dirName_in.c_str());
-    if (ftyp == INVALID_FILE_ATTRIBUTES)
+    if (ftyp == INVALID_FILE_ATTRIBUTES){
         return false;  //something is wrong with your path!
-
-    if (ftyp & FILE_ATTRIBUTE_DIRECTORY)
+    }
+    if (ftyp & FILE_ATTRIBUTE_DIRECTORY){
         return true;   // this is a directory!
-
+    }
     return false;    // this is not a directory!
 }

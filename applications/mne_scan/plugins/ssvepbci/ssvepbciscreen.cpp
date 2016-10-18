@@ -3,7 +3,6 @@
 * @file     ssvepbciscreen.cpp
 * @author   Viktor Klüber <viktor.klueber@tu-ilmenauz.de>;
 *           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     May 2016
@@ -41,6 +40,13 @@
 //=============================================================================================================
 
 #include "ssvepbciscreen.h"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
 #include <QDebug>
 #include <QPainter>
 
@@ -160,15 +166,20 @@ void SsvepBciScreen::setClassResults(double classResult)
         // assign classifaiction result to an action
         switch(index){
         case 0:
-            m_dYPosCross -= m_dStep; break;
+            m_dYPosCross -= m_dStep;
+            break;
         case 1:
-            m_dXPosCross += m_dStep; break;
+            m_dXPosCross += m_dStep;
+            break;
         case 2:
-            m_dYPosCross += m_dStep; break;
+            m_dYPosCross += m_dStep;
+            break;
         case 3:
-            m_dXPosCross -= m_dStep; break;
+            m_dXPosCross -= m_dStep;
+            break;
         case 4:
-            m_qCrossColor = Qt::blue; break;
+            m_qCrossColor = Qt::blue;
+            break;
         default:
             qDebug() << "WARNING: no classifiaction could be made!"; break;
         }

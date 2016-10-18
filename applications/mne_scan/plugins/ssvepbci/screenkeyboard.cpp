@@ -3,7 +3,6 @@
 * @file     screenkeyboard.cpp
 * @author   Viktor Klüber <viktor.klueber@tu-ilmenau.de>
 *           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>
-*			Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     July, 2016
@@ -31,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the ScreenKeaboard class.
+* @brief    Contains the implementation of the ScreenKeyboard class.
 *
 */
 
@@ -130,7 +129,6 @@ ScreenKeyboard::~ScreenKeyboard()
 
 void ScreenKeyboard::paint(QPaintDevice *device)
 {
-
     QPainter painter(device);
 
     // declare center of screen and width of letter boxes
@@ -237,7 +235,6 @@ void ScreenKeyboard::paint(QPaintDevice *device)
 
         m_bUpdatePhraseDisplay = false;
     }
-
 }
 
 
@@ -315,8 +312,9 @@ void ScreenKeyboard::updateCommand(double value){
                     qDebug() << "next coordinate:" << m_qNextCoord;
                 }
 
-                if(m_qSpellIterator == m_sSettledPhrase.end())
+                if(m_qSpellIterator == m_sSettledPhrase.end()){
                     stopSpellAccuracyFeature();
+                }
             }
             else if(m_qCurCursorCoord == m_mapKeys.key("Clr") && (index == 4)){
 
@@ -348,8 +346,9 @@ void ScreenKeyboard::updateCommand(double value){
         m_qCurCursorCoord.second   += deltaY;
     }
 
-    if(index == 4)
+    if(index == 4){
         m_qCurCursorCoord = QPair<int, int> (0,0);
+    }
 }
 
 
