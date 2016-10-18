@@ -69,7 +69,7 @@ NeuronalConnectivity::NeuronalConnectivity()
 : m_bIsRunning(false)
 , m_iDownSample(4)
 , m_pRTSEInput(Q_NULLPTR)
-, m_pRTSEOutput(Q_NULLPTR)
+, m_pRTCEOutput(Q_NULLPTR)
 , m_pNeuronalConnectivityBuffer(CircularMatrixBuffer<double>::SPtr())
 {
     //Add action which will be visible in the plugin's toolbar
@@ -112,9 +112,9 @@ void NeuronalConnectivity::init()
 
     // Output - Uncomment this if you don't want to send processed data (in form of a matrix) to other plugins.
     // Also, this output stream will generate an online display in your plugin
-    m_pRTSEOutput = PluginOutputData<RealTimeConnectivityEstimate>::create(this, "NeuronalConnectivityOut", "NeuronalConnectivity output data");
-    m_outputConnectors.append(m_pRTSEOutput);
-    m_pRTSEOutput->data()->setName(this->getName());//Provide name to auto store widget settings
+    m_pRTCEOutput = PluginOutputData<RealTimeConnectivityEstimate>::create(this, "NeuronalConnectivityOut", "NeuronalConnectivity output data");
+    m_outputConnectors.append(m_pRTCEOutput);
+    m_pRTCEOutput->data()->setName(this->getName());//Provide name to auto store widget settings
 
     //Delete Buffer - will be initialized with first incoming data
     if(!m_pNeuronalConnectivityBuffer.isNull()) {
@@ -205,11 +205,11 @@ void NeuronalConnectivity::updateSource(SCMEASLIB::NewMeasurement::SPtr pMeasure
         if(!m_pFiffInfo) {
             m_pFiffInfo = pRTSE->getFiffInfo();
 
-            //Init output - Unocmment this if you also uncommented the m_pRTSEOutput in the constructor above
-            m_pRTSEOutput->data()->setAnnotSet(pRTSE->getAnnotSet());
-            m_pRTSEOutput->data()->setSurfSet(pRTSE->getSurfSet());
-            m_pRTSEOutput->data()->setFwdSolution(pRTSE->getFwdSolution());
-            m_pRTSEOutput->data()->setFiffInfo(m_pFiffInfo);
+            //Init output - Unocmment this if you also uncommented the m_pRTCEOutput in the constructor above
+            m_pRTCEOutput->data()->setAnnotSet(pRTSE->getAnnotSet());
+            m_pRTCEOutput->data()->setSurfSet(pRTSE->getSurfSet());
+            m_pRTCEOutput->data()->setFwdSolution(pRTSE->getFwdSolution());
+            m_pRTCEOutput->data()->setFiffInfo(m_pFiffInfo);
 
             //Prepare network creation
             //Generate node vertices
@@ -271,7 +271,7 @@ void NeuronalConnectivity::run()
             QElapsedTimer time;
             time.start();
 
-            Network::SPtr pConnect_LA = ConnectivityMeasures::crossCorrelation(t_mat, m_matNodeVertComb);
+            Network::SPtr pNetwork = ConnectivityMeasures::crossCorrelation(t_mat, m_matNodeVertComb);
 
             qDebug()<<"----------------------------------------";
             qDebug()<<"----------------------------------------";
@@ -280,8 +280,8 @@ void NeuronalConnectivity::run()
             qDebug()<<"----------------------------------------";
 
             //Send the data to the connected plugins and the online display
-            //Unocmment this if you also uncommented the m_pRTSEOutput in the constructor above
-            //m_pRTSEOutput->data()->setValue(t_mat);
+            //Unocmment this if you also uncommented the m_pRTCEOutput in the constructor above
+            m_pRTCEOutput->data()->setValue(*pNetwork.data());
         }
 
         ++skip_count;
