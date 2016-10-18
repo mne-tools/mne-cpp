@@ -114,16 +114,6 @@ public:
     */
     static Network::SPtr crossCorrelation(const Eigen::MatrixXd& matData, const Eigen::MatrixX3f& matVert);
 
-    //=========================================================================================================
-    /**
-    * Calculates the cross correlation between the rows of the data matrix.
-    *
-    * @param[in] matData    The input data for whicht the cross correlation is to be calcualted.
-    *
-    * @return               The connectivity matrix.
-    */
-    static Eigen::MatrixXd crossCorrelation(const Eigen::MatrixXd& matData);
-
 protected:
     static QPair<int,double> eigenCrossCorrelation(const Eigen::RowVectorXd &xCorrInputVecFirst, const Eigen::RowVectorXd &xCorrInputVecSecond);
     //std::pair<double, double> eigenCrossCorrelation(std::vector<double>& xCorrInputVecFirs, std::vector<double>& xCorrInputVecSecond);
