@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     realtimesourceestimate.cpp
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     realtimeconnectivityestimate.cpp
+* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     October, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the RealTimeSourceEstimate class.
+* @brief    Contains the implementation of the RealTimeConnectivityEstimate class.
 *
 */
 
@@ -38,7 +38,16 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "realtimesourceestimate.h"
+#include "realtimeconnectivityestimate.h"
+
+#include <connectivity/network/network.h>
+
+#include <mne/mne_forwardsolution.h>
+
+#include <fs/surfaceset.h>
+#include <fs/annotationset.h>
+
+#include <fiff/fiff_info.h>
 
 
 //*************************************************************************************************************
@@ -53,7 +62,8 @@
 //=============================================================================================================
 
 using namespace SCMEASLIB;
-//using namespace IOBUFFER;
+using namespace CONNECTIVITYLIB;
+using namespace MNELIB;
 
 
 //*************************************************************************************************************
@@ -61,10 +71,10 @@ using namespace SCMEASLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RealTimeSourceEstimate::RealTimeSourceEstimate(QObject *parent)
-: NewMeasurement(QMetaType::type("RealTimeSourceEstimate::SPtr"), parent)
-, m_bStcSend(true)
-, m_pMNEStc(new MNESourceEstimate)
+RealTimeConnectivityEstimate::RealTimeConnectivityEstimate(QObject *parent)
+: NewMeasurement(QMetaType::type("RealTimeConnectivityEstimate::SPtr"), parent)
+, m_bConnectivitySend(true)
+, m_pNetwork(Network::SPtr(new Network))
 , m_pAnnotSet(AnnotationSet::SPtr(new AnnotationSet))
 , m_pSurfSet(SurfaceSet::SPtr(new SurfaceSet))
 , m_pFwdSolution(MNEForwardSolution::SPtr(new MNEForwardSolution))
@@ -76,7 +86,7 @@ RealTimeSourceEstimate::RealTimeSourceEstimate(QObject *parent)
 
 //*************************************************************************************************************
 
-RealTimeSourceEstimate::~RealTimeSourceEstimate()
+RealTimeConnectivityEstimate::~RealTimeConnectivityEstimate()
 {
 
 }
@@ -84,26 +94,27 @@ RealTimeSourceEstimate::~RealTimeSourceEstimate()
 
 //*************************************************************************************************************
 
-MNESourceEstimate::SPtr& RealTimeSourceEstimate::getValue()
+QSharedPointer<Network> &RealTimeConnectivityEstimate::getValue()
 {
     QMutexLocker locker(&m_qMutex);
-    return m_pMNEStc;
+    return m_pNetwork;
 }
 
 
 //*************************************************************************************************************
 
-void RealTimeSourceEstimate::setValue(MNESourceEstimate& v)
+void RealTimeConnectivityEstimate::setValue(Network& v)
 {
     m_qMutex.lock();
 
     //Store
-    *m_pMNEStc = v;
+    *m_pNetwork = v;
 
     m_bInitialized = true;
 
     m_qMutex.unlock();
 
     emit notify();
+
 }
 
