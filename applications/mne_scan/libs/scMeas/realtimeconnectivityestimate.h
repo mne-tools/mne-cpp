@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     realtimesourceestimate.h
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     realtimeconnectivityestimate.h
+* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     October, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the RealTimeSourceEstimate class.
+* @brief    Contains the declaration of the RealTimeConnectivityEstimate class.
 *
 */
 
-#ifndef REALTIMESOURCEESTIMATE_H
-#define REALTIMESOURCEESTIMATE_H
+#ifndef REALTIMECONNECTIVITYESTIMATE_H
+#define REALTIMECONNECTIVITYESTIMATE_H
 
 
 //*************************************************************************************************************
@@ -45,25 +45,40 @@
 #include "scmeas_global.h"
 #include "newmeasurement.h"
 
-#include <fs/label.h>
-#include <fs/surfaceset.h>
-#include <fs/annotationset.h>
-#include <fiff/fiff_info.h>
-#include <mne/mne_sourcespace.h>
-#include <mne/mne_sourceestimate.h>
-#include <mne/mne_forwardsolution.h>
+
+//*************************************************************************************************************
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// EIGEN INCLUDES
 //=============================================================================================================
 
-#include <QSharedPointer>
-#include <QVector>
-#include <QList>
-#include <QMutex>
-#include <QMutexLocker>
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+namespace CONNECTIVITYLIB {
+    class Network;
+}
+
+namespace FIFFLIB {
+    class FiffInfo;
+}
+
+namespace MNELIB {
+    class MNEForwardSolution;
+}
+
+namespace FSLIB {
+    class SurfaceSet;
+    class AnnotationSet;
+}
 
 
 //*************************************************************************************************************
@@ -75,41 +90,31 @@ namespace SCMEASLIB
 {
 
 
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace FIFFLIB;
-using namespace MNELIB;
-using namespace FSLIB;
-
-
 //=========================================================================================================
 /**
-* RealTimeSourceEstimate
+* RealTimeConnectivityEstimate
 *
 * @brief Real-time source estimate measurement.
 */
-class SCMEASSHARED_EXPORT RealTimeSourceEstimate : public NewMeasurement
+class SCMEASSHARED_EXPORT RealTimeConnectivityEstimate : public NewMeasurement
 {
 public:
-    typedef QSharedPointer<RealTimeSourceEstimate> SPtr;               /**< Shared pointer type for RealTimeSourceEstimate. */
-    typedef QSharedPointer<const RealTimeSourceEstimate> ConstSPtr;    /**< Const shared pointer type for RealTimeSourceEstimate. */
+    typedef QSharedPointer<RealTimeConnectivityEstimate> SPtr;               /**< Shared pointer type for RealTimeConnectivityEstimate. */
+    typedef QSharedPointer<const RealTimeConnectivityEstimate> ConstSPtr;    /**< Const shared pointer type for RealTimeConnectivityEstimate. */
 
     //=========================================================================================================
     /**
-    * Constructs a RealTimeSourceEstimate.
+    * Constructs a RealTimeConnectivityEstimate.
     *
     * @param[in] parent     the QObject parent of this measurement
     */
-    RealTimeSourceEstimate(QObject *parent = 0);
+    RealTimeConnectivityEstimate(QObject *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the RealTimeSourceEstimate.
+    * Destroys the RealTimeConnectivityEstimate.
     */
-    virtual ~RealTimeSourceEstimate();
+    virtual ~RealTimeConnectivityEstimate();
 
     //=========================================================================================================
     /**
@@ -117,7 +122,7 @@ public:
     *
     * @param[in] annotSet   the annotation set to set
     */
-    inline void setAnnotSet(AnnotationSet::SPtr& annotSet);
+    inline void setAnnotSet(QSharedPointer<FSLIB::AnnotationSet>& annotSet);
 
     //=========================================================================================================
     /**
@@ -125,7 +130,7 @@ public:
     *
     * @return the annotation set
     */
-    inline AnnotationSet::SPtr& getAnnotSet();
+    inline QSharedPointer<FSLIB::AnnotationSet>& getAnnotSet();
 
     //=========================================================================================================
     /**
@@ -133,7 +138,7 @@ public:
     *
     * @param[in] surfSet   the surface set to set
     */
-    inline void setSurfSet(SurfaceSet::SPtr& surfSet);
+    inline void setSurfSet(QSharedPointer<FSLIB::SurfaceSet>& surfSet);
 
     //=========================================================================================================
     /**
@@ -141,7 +146,7 @@ public:
     *
     * @return the surface set
     */
-    inline SurfaceSet::SPtr& getSurfSet();
+    inline QSharedPointer<FSLIB::SurfaceSet> &getSurfSet();
 
     //=========================================================================================================
     /**
@@ -149,7 +154,7 @@ public:
     *
     * @param[in] fwdSolution   the forward solution to set
     */
-    inline void setFwdSolution(MNEForwardSolution::SPtr& fwdSolution);
+    inline void setFwdSolution(QSharedPointer<MNELIB::MNEForwardSolution>& fwdSolution);
 
     //=========================================================================================================
     /**
@@ -157,7 +162,7 @@ public:
     *
     * @return the forward solution
     */
-    inline MNEForwardSolution::SPtr& getFwdSolution();
+    inline QSharedPointer<MNELIB::MNEForwardSolution>& getFwdSolution();
 
     //=========================================================================================================
     /**
@@ -166,7 +171,7 @@ public:
     *
     * @param [in] v the value which is attached to the sample array vector.
     */
-    virtual void setValue(MNESourceEstimate &v);
+    virtual void setValue(CONNECTIVITYLIB::Network &v);
 
     //=========================================================================================================
     /**
@@ -175,13 +180,13 @@ public:
     *
     * @return the last attached value.
     */
-    virtual MNESourceEstimate::SPtr& getValue();
+    virtual QSharedPointer<CONNECTIVITYLIB::Network>& getValue();
 
     //=========================================================================================================
     /**
-    * Returns whether RealTimeSourceEstimate contains values
+    * Returns whether RealTimeConnectivityEstimate contains values
     *
-    * @return whether RealTimeSourceEstimate contains values.
+    * @return whether RealTimeConnectivityEstimate contains values.
     */
     inline bool isInitialized() const;
 
@@ -191,7 +196,7 @@ public:
     *
     * @param [in] p_fiffInfo the new FiffInfo..
     */
-    void setFiffInfo(FiffInfo::SPtr p_fiffInfo);
+    void setFiffInfo(QSharedPointer<FIFFLIB::FiffInfo> p_fiffInfo);
 
     //=========================================================================================================
     /**
@@ -199,21 +204,21 @@ public:
     *
     * @return the current FiffInfo.
     */
-    FiffInfo::SPtr getFiffInfo();
+    QSharedPointer<FIFFLIB::FiffInfo> getFiffInfo();
 
-    bool m_bStcSend; /**< dirty hack */
+    bool m_bConnectivitySend; /**< dirty hack */
 
 private:
-    mutable QMutex              m_qMutex;       /**< Mutex to ensure thread safety */
+    mutable QMutex                              m_qMutex;       /**< Mutex to ensure thread safety */
 
-    FiffInfo::SPtr              m_pFiffInfo;    /**< The Fiff info. */
+    QSharedPointer<FIFFLIB::FiffInfo>           m_pFiffInfo;    /**< The Fiff info. */
 
-    AnnotationSet::SPtr         m_pAnnotSet;    /**< Annotation set. */
-    SurfaceSet::SPtr            m_pSurfSet;     /**< Surface set. */
-    MNEForwardSolution::SPtr    m_pFwdSolution; /**< Forward solution. */
+    QSharedPointer<FSLIB::AnnotationSet>        m_pAnnotSet;    /**< Annotation set. */
+    QSharedPointer<FSLIB::SurfaceSet>           m_pSurfSet;     /**< Surface set. */
+    QSharedPointer<MNELIB::MNEForwardSolution>  m_pFwdSolution; /**< Forward solution. */
 
-    MNESourceEstimate::SPtr     m_pMNEStc;      /**< The source estimate. */
-    bool                        m_bInitialized; /**< Is initialized */
+    QSharedPointer<CONNECTIVITYLIB::Network>    m_pNetwork;     /**< The network/connectivity estimate. */
+    bool                                        m_bInitialized; /**< Is initialized */
 };
 
 
@@ -222,7 +227,7 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline void RealTimeSourceEstimate::setAnnotSet(AnnotationSet::SPtr& annotSet)
+inline void RealTimeConnectivityEstimate::setAnnotSet(QSharedPointer<FSLIB::AnnotationSet> &annotSet)
 {
     QMutexLocker locker(&m_qMutex);
     m_pAnnotSet = annotSet;
@@ -231,7 +236,7 @@ inline void RealTimeSourceEstimate::setAnnotSet(AnnotationSet::SPtr& annotSet)
 
 //*************************************************************************************************************
 
-inline AnnotationSet::SPtr& RealTimeSourceEstimate::getAnnotSet()
+inline QSharedPointer<FSLIB::AnnotationSet>& RealTimeConnectivityEstimate::getAnnotSet()
 {
     QMutexLocker locker(&m_qMutex);
     return m_pAnnotSet;
@@ -240,7 +245,7 @@ inline AnnotationSet::SPtr& RealTimeSourceEstimate::getAnnotSet()
 
 //*************************************************************************************************************
 
-inline void RealTimeSourceEstimate::setSurfSet(SurfaceSet::SPtr& surfSet)
+inline void RealTimeConnectivityEstimate::setSurfSet(QSharedPointer<FSLIB::SurfaceSet> &surfSet)
 {
     QMutexLocker locker(&m_qMutex);
     m_pSurfSet = surfSet;
@@ -249,7 +254,7 @@ inline void RealTimeSourceEstimate::setSurfSet(SurfaceSet::SPtr& surfSet)
 
 //*************************************************************************************************************
 
-inline SurfaceSet::SPtr& RealTimeSourceEstimate::getSurfSet()
+inline QSharedPointer<FSLIB::SurfaceSet>& RealTimeConnectivityEstimate::getSurfSet()
 {
     QMutexLocker locker(&m_qMutex);
     return m_pSurfSet;
@@ -258,7 +263,7 @@ inline SurfaceSet::SPtr& RealTimeSourceEstimate::getSurfSet()
 
 //*************************************************************************************************************
 
-inline void RealTimeSourceEstimate::setFwdSolution(MNEForwardSolution::SPtr& fwdSolution)
+inline void RealTimeConnectivityEstimate::setFwdSolution(QSharedPointer<MNELIB::MNEForwardSolution> &fwdSolution)
 {
     QMutexLocker locker(&m_qMutex);
     m_pFwdSolution = fwdSolution;
@@ -267,7 +272,7 @@ inline void RealTimeSourceEstimate::setFwdSolution(MNEForwardSolution::SPtr& fwd
 
 //*************************************************************************************************************
 
-inline MNEForwardSolution::SPtr& RealTimeSourceEstimate::getFwdSolution()
+inline QSharedPointer<MNELIB::MNEForwardSolution>& RealTimeConnectivityEstimate::getFwdSolution()
 {
     QMutexLocker locker(&m_qMutex);
     return m_pFwdSolution;
@@ -276,7 +281,7 @@ inline MNEForwardSolution::SPtr& RealTimeSourceEstimate::getFwdSolution()
 
 //*************************************************************************************************************
 
-inline bool RealTimeSourceEstimate::isInitialized() const
+inline bool RealTimeConnectivityEstimate::isInitialized() const
 {
     QMutexLocker locker(&m_qMutex);
     return m_bInitialized;
@@ -285,7 +290,7 @@ inline bool RealTimeSourceEstimate::isInitialized() const
 
 //*************************************************************************************************************
 
-inline void RealTimeSourceEstimate::setFiffInfo(FiffInfo::SPtr p_fiffInfo)
+inline void RealTimeConnectivityEstimate::setFiffInfo(QSharedPointer<FIFFLIB::FiffInfo> p_fiffInfo)
 {
     QMutexLocker locker(&m_qMutex);
     m_pFiffInfo = p_fiffInfo;
@@ -294,7 +299,7 @@ inline void RealTimeSourceEstimate::setFiffInfo(FiffInfo::SPtr p_fiffInfo)
 
 //*************************************************************************************************************
 
-inline FiffInfo::SPtr RealTimeSourceEstimate::getFiffInfo()
+inline QSharedPointer<FIFFLIB::FiffInfo> RealTimeConnectivityEstimate::getFiffInfo()
 {
     QMutexLocker locker(&m_qMutex);
     return m_pFiffInfo;
@@ -303,6 +308,6 @@ inline FiffInfo::SPtr RealTimeSourceEstimate::getFiffInfo()
 
 } // NAMESPACE
 
-Q_DECLARE_METATYPE(SCMEASLIB::RealTimeSourceEstimate::SPtr)
+Q_DECLARE_METATYPE(SCMEASLIB::RealTimeConnectivityEstimate::SPtr)
 
-#endif // REALTIMESOURCEESTIMATE_H
+#endif // REALTIMECONNECTIVITYESTIMATE_H
