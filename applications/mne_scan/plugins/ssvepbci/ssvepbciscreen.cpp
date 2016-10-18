@@ -75,13 +75,9 @@ SsvepBciScreen::SsvepBciScreen(QSharedPointer<SsvepBci> pSsvepBci, QSharedPointe
 , m_qPainter(this)
 , m_qCrossColor(Qt::red)
 , m_bClearScreen(true)
-//, m_qSoundPath(m_pSsvepBci->getSsvepBciResourcePath() + "beep.mp3")
 {
     Q_UNUSED(parent);
-//      // implementing the sound file
-//    qDebug() << "copying successfull:" << QFile::copy(":/sounds/beep.mp3", m_qSoundPath);
-//    m_qBeep.setMedia(QUrl(m_qSoundPath));
-//    m_qBeep.setVolume(100);
+
 
     // register Meta Type
     qRegisterMetaType<MyQList>("MyQList");
@@ -184,7 +180,6 @@ void SsvepBciScreen::setClassResults(double classResult)
             qDebug() << "WARNING: no classifiaction could be made!"; break;
         }
 //        //generate beep sound
-//        m_qBeep.play();  // doesn't work on Windows 10
     }
 }
 
