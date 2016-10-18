@@ -150,7 +150,8 @@ protected:
     void showYourWidget();
 
 private:
-    bool                                                        m_bIsRunning;                   /**< Flag whether thread is running.*/
+    bool                                                        m_bIsRunning;                   /**< Flag whether thread is running.*/ 
+    qint32                                                      m_iDownSample;                  /**< Sampling rate */
 
     FIFFLIB::FiffInfo::SPtr                                     m_pFiffInfo;                    /**< Fiff measurement info.*/
     QSharedPointer<NeuronalConnectivityYourWidget>              m_pYourWidget;                  /**< flag whether thread is running.*/
