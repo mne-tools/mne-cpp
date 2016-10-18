@@ -62,6 +62,7 @@ using namespace CONNECTIVITYLIB;
 
 NeuronalConnectivity::NeuronalConnectivity()
 : m_bIsRunning(false)
+, m_iDownSample(4)
 , m_pRTSEInput(Q_NULLPTR)
 , m_pRTSEOutput(Q_NULLPTR)
 , m_pNeuronalConnectivityBuffer(CircularMatrixBuffer<double>::SPtr())
@@ -251,20 +252,34 @@ void NeuronalConnectivity::run()
         msleep(10);// Wait for fiff Info
     }
 
+    int skip_count = 0;
+
     while(m_bIsRunning)
     {
         //Dispatch the inputs
         MatrixXd t_mat = m_pNeuronalConnectivityBuffer->pop();
 
-        //ToDo: Implement your algorithm here
+        //Do processing after skip count has reached limit
+        if((skip_count % m_iDownSample) == 0)
+        {
+            //ToDo: Implement your algorithm here
+            QElapsedTimer time;
+            time.start();
 
-        //Network::SPtr pConnect_LA = NeuronalConnectivityMeasures::crossCorrelation(t_mat, m_matNodeVertComb);
+            Network::SPtr pConnect_LA = ConnectivityMeasures::crossCorrelation(t_mat, m_matNodeVertComb);
 
-        qDebug() << "NeuronalConnectivity::run - t_mat.rows()" << t_mat.rows();
+            qDebug()<<"----------------------------------------";
+            qDebug()<<"----------------------------------------";
+            qDebug()<<"NeuronalConnectivity::run() - time.elapsed()" << time.elapsed();
+            qDebug()<<"----------------------------------------";
+            qDebug()<<"----------------------------------------";
 
-        //Send the data to the connected plugins and the online display
-        //Unocmment this if you also uncommented the m_pRTSEOutput in the constructor above
-        //m_pRTSEOutput->data()->setValue(t_mat);
+            //Send the data to the connected plugins and the online display
+            //Unocmment this if you also uncommented the m_pRTSEOutput in the constructor above
+            //m_pRTSEOutput->data()->setValue(t_mat);
+        }
+
+        ++skip_count;
     }
 }
 
