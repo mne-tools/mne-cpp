@@ -67,7 +67,6 @@ ScreenKeyboard::ScreenKeyboard(QSharedPointer<SsvepBci> pSsvepBci, QSharedPointe
 , m_bInitializeKeyboard(true)
 , m_bUpdatePhraseDisplay(true)
 , m_bUseSpellAccuracy(false)
-//, m_qSound(new QMediaPlayer())
 {
     // initialize map for keyboard values and their relative coordinates to each other
     m_mapKeys[QPair<int, int>( 0, 0)] = "E";
@@ -113,8 +112,6 @@ ScreenKeyboard::ScreenKeyboard(QSharedPointer<SsvepBci> pSsvepBci, QSharedPointe
 
     // connect SSVEPBCI speller
     connect(m_pSsvepBciSetupStimulusWidget.data(), &SsvepBciSetupStimulusWidget::settledPhrase, this, &ScreenKeyboard::setPhrase);
-
-    //m_qSound->setMedia(QUrl("qrc:/sounds/beep.mp3"));
 }
 
 
@@ -279,7 +276,7 @@ void ScreenKeyboard::updateCommand(double value){
 
         // giving audio feedback for every command
         //m_qSound->play();
-        cout << "\a";
+        //cout << "\a";
 
         // determine distance between selected and supposed coordinate
         int difXold = m_qNextCoord.first - m_qCurCursorCoord.first;
