@@ -125,29 +125,6 @@ Network::SPtr ConnectivityMeasures::crossCorrelation(const MatrixXd& matData, co
 
 //*************************************************************************************************************
 
-Eigen::MatrixXd ConnectivityMeasures::crossCorrelation(const MatrixXd& matData)
-{
-    MatrixXd matDist = MatrixXd::Zero(matData.rows(), matData.rows());
-
-    for(int i = 0; i < matDist.rows(); ++i) {
-        QPair<int,double> crossCorrPair = eigenCrossCorrelation(matData.row(i), matData.row(i));
-
-        double dScaling = crossCorrPair.second;
-
-        for(int j = i; j < matDist.rows(); ++j) {
-            QPair<int,double> crossCorrPair = eigenCrossCorrelation(matData.row(i), matData.row(j));
-            matDist(i,j) = crossCorrPair.second/* / dScaling*/;
-        }
-    }
-
-    matDist /= matDist.maxCoeff();
-
-    return matDist;
-}
-
-
-//*************************************************************************************************************
-
 QPair<int,double> ConnectivityMeasures::eigenCrossCorrelation(const RowVectorXd& xCorrInputVecFirstIn, const RowVectorXd& xCorrInputVecSecondIn)
 {
     Eigen::FFT<double> fft;
