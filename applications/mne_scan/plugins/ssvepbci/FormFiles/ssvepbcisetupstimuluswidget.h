@@ -85,9 +85,9 @@ class ScreenKeyboard;
 
 //=============================================================================================================
 /**
-* DECLARE CLASS EEGoSportsSetupStimulusWidget
+* DECLARE CLASS SsvepBciSetupStimulusWidget
 *
-* @brief The EEGoSportsSetupStimulusWidget class provides the EEGoSportsSetupStimulusWidget configuration window.
+* @brief The SsvepBciSetupStimulusWidget class provides the SsvepBciSetupStimulusWidget configuration window.
 */
 class SsvepBciSetupStimulusWidget : public QDialog
 {
@@ -145,7 +145,16 @@ public:
     QSharedPointer<ScreenKeyboard> getScreenKeyboardSPtr();
 
 signals:
+    //=========================================================================================================
+    /**
+    * signal for indicating a signal change
+    */
     void frequencyChanged();
+
+    //=========================================================================================================
+    /**
+    * signal for indicating a text change
+    */
     void settledPhrase(QString phrase);
 
 private slots:
@@ -153,39 +162,39 @@ private slots:
     /**
     * Shows the widget on Fullscreen.
     */
-    void on_pushButton_clicked();
+    void showTestScreen();
 
     //=========================================================================================================
     /**
-    * Clears the Widget from screen.
+    * Clears the blinking items from screen.
     */
-    void on_pushButton_2_clicked();
+    void clearItems();
 
     //=========================================================================================================
     /**
     * Sets the state of the window to minimized.
     */
-    void on_pushButton_3_clicked();
+    void minimizeScreen();
 
     //=========================================================================================================
     /**
-    * Starts a test.
+    * starts test 3
     */
-    void on_pushButton_4_clicked();
+    void test3();
 
     //=========================================================================================================
     /**
-    * Starts a test.
+    * starts test 1
     *
     */
-    void on_pushButton_5_clicked();
+    void test1();
 
     //=========================================================================================================
     /**
-    * Starts a test.
+    * starts test 2
     *
     */
-    void on_pushButton_6_clicked();
+    void test2();
 
     //=========================================================================================================
     /**
@@ -219,7 +228,7 @@ private slots:
     /**
     * Starts the Screen Keyboard device.
     */
-    void on_pushButton_7_clicked();
+    void screenKeyboard();
 
     //=========================================================================================================
     /**
@@ -240,7 +249,7 @@ private:
     */
     void changeComboBox();
 
-    Ui::SsvepBciSetupStimulusWidget        *ui;                     /**< Pointer to the graphical user interface. */
+    Ui::SsvepBciSetupStimulusWidget*        ui;                     /**< Pointer to the graphical user interface. */
     QSharedPointer<SsvepBci>                m_pSsvepBci;            /**< a pointer to corresponding EEGoSports */
     QSharedPointer<SsvepBciScreen>          m_pSsvepBciScreen;      /**< pointer to the SsvepBciscreen class of the subject (friend class) */
     QSharedPointer<ScreenKeyboard>          m_pScreenKeyboard;      /**< pointer to the Screenkeyboard class */

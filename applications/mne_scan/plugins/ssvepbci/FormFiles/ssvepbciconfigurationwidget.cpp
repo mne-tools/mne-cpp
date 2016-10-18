@@ -462,7 +462,7 @@ void SsvepBciConfigurationWidget::resetThresholdValues()
 
 //*************************************************************************************************************
 
-void SSVEPBCIPLUGIN::SsvepBciConfigurationWidget::onStartMeasurementClicked()
+void SsvepBciConfigurationWidget::onStartMeasurementClicked()
 {
     if(m_pSsvepBci->m_pSsvepBciSetupStimulusWidget != NULL){
         QSharedPointer<ScreenKeyboard> pScreenKeyboard = m_pSsvepBci->m_pSsvepBciSetupStimulusWidget->getScreenKeyboardSPtr();
@@ -491,7 +491,7 @@ void SSVEPBCIPLUGIN::SsvepBciConfigurationWidget::onStartMeasurementClicked()
 
 //*************************************************************************************************************
 
-void SSVEPBCIPLUGIN::SsvepBciConfigurationWidget::onStopMeasurementClicked()
+void SsvepBciConfigurationWidget::onStopMeasurementClicked()
 {
     if(m_pSsvepBci->m_pSsvepBciSetupStimulusWidget != NULL){
         QSharedPointer<ScreenKeyboard> pScreenKeyboard = m_pSsvepBci->m_pSsvepBciSetupStimulusWidget->getScreenKeyboardSPtr();
@@ -522,7 +522,7 @@ void SsvepBciConfigurationWidget::evaluateCommand(bool isCorrectCommand)
 
 //*************************************************************************************************************
 
-void SSVEPBCIPLUGIN::SsvepBciConfigurationWidget::classificationListSizeChanged(int arg1)
+void SsvepBciConfigurationWidget::classificationListSizeChanged(int arg1)
 {
     ui->m_spinBox_ClassificationHits->setMaximum(arg1);
 }

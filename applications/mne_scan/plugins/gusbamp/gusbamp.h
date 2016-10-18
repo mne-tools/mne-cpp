@@ -167,11 +167,28 @@ public:
     */
     bool dirExists(const std::string& dirName_in);
 
+    //=========================================================================================================
+    /**
+    * returns the type of the plug in
+    */
     virtual SCSHAREDLIB::IPlugin::PluginType getType() const;
+
+    //=========================================================================================================
+    /**
+    * returns the name of the plugin
+    */
     virtual QString getName() const;
 
+    //=========================================================================================================
+    /**
+    * setups the widget
+    */
     virtual QWidget* setupWidget();
 
+    //=========================================================================================================
+    /**
+    * splits the recorded FIFF file
+    */
     void splitRecordingFile();
 
 protected:
@@ -187,14 +204,12 @@ private:
     SCSHAREDLIB::PluginOutputData<SCMEASLIB::NewRealTimeMultiSampleArray>::SPtr m_pRTMSA_GUSBAmp;               /**< The RealTimeSampleArray to provide the EEG data.*/
     QSharedPointer<GUSBAmpSetupProjectWidget>                                   m_pGUSBampSetupProjectWidget;   /**< Widget for setup the project file*/
 
+    QSharedPointer<IOBUFFER::RawMatrixBuffer>     m_pRawMatrixBuffer_In;    /**< Holds incoming raw data.*/
+
     QString                             m_qStringResourcePath;              /**< The path to the EEG resource directory.*/
     bool                                m_bIsRunning;                       /**< Whether GUSBAmp is running.*/
-
-    QSharedPointer<IOBUFFER::RawMatrixBuffer>     m_pRawMatrixBuffer_In;              /**< Holds incoming raw data.*/
-
     QSharedPointer<GUSBAmpProducer>     m_pGUSBAmpProducer;                 /**< the GUSBAmpProducer.*/
-
-    QSharedPointer<FIFFLIB::FiffInfo>            m_pFiffInfo;                        /**< Fiff measurement info.*/
+    QSharedPointer<FIFFLIB::FiffInfo>   m_pFiffInfo;                        /**< Fiff measurement info.*/
 
     std::vector<QString>        m_vSerials;                 /**< vector of all Serials (the first one is the master) */
     int                         m_iSampleRate;              /**< the sample rate in Hz (see documentation of the g.USBamp API for details on this value and the NUMBER_OF_SCANS!)*/

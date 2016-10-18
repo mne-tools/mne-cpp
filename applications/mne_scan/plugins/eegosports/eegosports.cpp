@@ -59,7 +59,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace EEGoSportsPlugin;
+using namespace EEGOSPORTSPLUGIN;
 
 
 //*************************************************************************************************************
@@ -92,18 +92,6 @@ EEGoSports::EEGoSports()
     m_pActionStartRecording->setStatusTip(tr("Start recording data to fif file"));
     connect(m_pActionStartRecording, &QAction::triggered, this, &EEGoSports::showStartRecording);
     addPluginAction(m_pActionStartRecording);
-
-    // Create start time Stimuli action bar item/button
-    m_pActionSetupStimulus = new QAction(QIcon(":/images/stimulus_t.png"),tr("Setup time based stimulus feature"),this);
-    m_pActionSetupStimulus->setStatusTip(tr("Setup time based stimulus feature"));
-    connect(m_pActionSetupStimulus, &QAction::triggered, this, &EEGoSports::showSetupTimeStimulus);
-    addPluginAction(m_pActionSetupStimulus);
-
-    // Create start frame Stimuli action bar item/button
-    m_pActionSetupStimulus = new QAction(QIcon(":/images/stimulus_f.png"),tr("Setup frame based stimulus feature"),this);
-    m_pActionSetupStimulus->setStatusTip(tr("Setup frame based stimulus feature"));
-    connect(m_pActionSetupStimulus, &QAction::triggered, this, &EEGoSports::showSetupFrameStimulus);
-    addPluginAction(m_pActionSetupStimulus);
 }
 
 
@@ -703,59 +691,6 @@ void EEGoSports::showSetupProjectDialog()
     }
 }
 
-//*************************************************************************************************************
-
-void EEGoSports::showSetupTimeStimulus()
-{
-    QDesktopWidget Desktop; // Desktop Widget for getting the number of accessible screens
-
-    if(Desktop.numScreens()> 1){
-        // Open setup stimulus widget
-        if(m_pEEGoSportsSetupTimeStimulusWidget == NULL)
-            m_pEEGoSportsSetupTimeStimulusWidget = QSharedPointer<EEGoSportsSetupStimulusWidget>(new EEGoSportsSetupStimulusWidget(this));
-
-        if(!m_pEEGoSportsSetupTimeStimulusWidget->isVisible()){
-            m_pEEGoSportsSetupTimeStimulusWidget->setWindowTitle("EEGoSports EEG Connector - Setup Stimulus");
-            //m_pEEGoSportsSetupStimulusWidget->initGui();
-            m_pEEGoSportsSetupTimeStimulusWidget->show();
-            m_pEEGoSportsSetupTimeStimulusWidget->raise();
-        }
-    }
-    else{
-        QMessageBox msgBox;
-        msgBox.setText("Only one screen detected! For stimulus visualization attach one more.");
-        msgBox.exec();
-        return;
-    }
-}
-
-//*************************************************************************************************************
-
-void EEGoSports::showSetupFrameStimulus()
-{
-    QDesktopWidget Desktop; // Desktop Widget for getting the number of accessible screens
-
-    if(Desktop.numScreens()> 1){
-        // Open setup stimulus widget
-        if(m_pEEGoSportsSetupFrameStimulusWidget == NULL)
-            m_pEEGoSportsSetupFrameStimulusWidget = QSharedPointer<ssvepBCISetupStimulusWidget>(new ssvepBCISetupStimulusWidget(this));
-
-        if(!m_pEEGoSportsSetupFrameStimulusWidget->isVisible()){
-
-            m_pEEGoSportsSetupFrameStimulusWidget->setWindowTitle("ssvepBCI - Setup Stimulus");
-            //m_pEEGoSportsSetupStimulusWidget->initGui();
-            m_pEEGoSportsSetupFrameStimulusWidget->show();
-            m_pEEGoSportsSetupFrameStimulusWidget->raise();
-
-        }
-    }
-    else{
-        QMessageBox msgBox;
-        msgBox.setText("Only one screen detected! For stimulus visualization attach one more.");
-        msgBox.exec();
-        return;
-    }
-}
 
 //*************************************************************************************************************
 

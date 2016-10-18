@@ -3,7 +3,6 @@
 * @file     ssvepbci.h
 * @author   Viktor Klüber <viktor.klueber@tu-ilmenau.de>;
 *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
 * @date     May, 2016
@@ -61,7 +60,7 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT STL INCLUDES
+// QT INCLUDES
 //=============================================================================================================
 
 #include <QtWidgets>
@@ -74,7 +73,7 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE TMSIPlugin
+// DEFINE NAMESPACE SSVEPBCIPLUGIN
 //=============================================================================================================
 
 namespace SSVEPBCIPLUGIN
@@ -228,11 +227,6 @@ protected:
     */
     void clearClassifications();
 
-//    //=========================================================================================================
-//    /**
-//    * Look for trigger in stim channel
-//    */
-//    bool lookForTrigger(const MatrixXd &data);
 
     //=========================================================================================================
     /**
@@ -281,18 +275,91 @@ protected:
     void ssvepBciOnSource();
 
 public slots:
+    //=========================================================================================================
+    /**
+    * setting the flag for removing the power line
+    *
+    * @param [in]   removePowerline     Flag for power line
+    */
     void removePowerLine(bool removePowerLine);
+
+    //=========================================================================================================
+    /**
+    * adjusting the powerline frequency
+    *
+    * @param [in]   powerLine     frequency of the power line
+    */
     void setPowerLine(int powerLine);
+
+    //=========================================================================================================
+    /**
+    * slot adjusting the kind of feature extraction
+    *
+    * @param [in]   useMEC     flag for using MEC
+    */
     void setFeatureExtractionMethod(bool useMEC);
+
+    //=========================================================================================================
+    /**
+    * slot for adjusting the kind of feature extraction
+    *
+    * @param [in]   useMEC     flag for using MEC
+    */
     void setThresholdValues(MyQList thresholds);
+
+    //=========================================================================================================
+    /**
+    * slot for changing the SSVEP parameter
+    */
     void setChangeSSVEPParameterFlag();
+
+    //=========================================================================================================
+    /**
+    * slot for adjusting the number of classification hits
+    *
+    * @param [in]   numClassHits     number of classification hits
+    */
     void setNumClassHits(int numClassHits);
+
+    //=========================================================================================================
+    /**
+    * slot for setting the number of classfication breaks to the next classification process
+    *
+    * @param [in]   numClassBreaks     number of classification breaks
+    */
     void setNumClassBreaks(int numClassBreaks);
+
+    //=========================================================================================================
+    /**
+    * slot for setting the size of the classification list
+    *
+    * @param [in]   classListSize     size of the classification list
+    */
     void setSizeClassList(int classListSize);
 
 signals:
+    //=========================================================================================================
+    /**
+    * emits the values of SSVEP probabilities
+    *
+    * @param [in]   ssvepProb     list of SSVEP frequencies
+    */
     void SSVEPprob(MyQList ssvepProb);
+
+    //=========================================================================================================
+    /**
+    * emits the classification result
+    *
+    * @param [in]   classResult     classification result
+    */
     void classificationResult(double classResult);
+
+    //=========================================================================================================
+    /**
+    * emits the the values of detectable frequencies
+    *
+    * @param [in]   frequencyList     list of SSVEP frequencies
+    */
     void getFrequencyLabels(MyQList frequencyList);
 
 private:    
@@ -322,7 +389,6 @@ private:
 
     QAction*                                            m_pActionBCIConfiguration;          /**< Start configuration feature. */
     QAction*                                            m_pActionSetupStimulus;             /**< Starts stimulus feature. */
-
     QSharedPointer<SsvepBciConfigurationWidget>         m_pSsvepBciConfigurationWidget;     /**< Holds pointer to Widget for BCI configuration. */
     QSharedPointer<SsvepBciSetupStimulusWidget>         m_pSsvepBciSetupStimulusWidget;     /**< Widget for stimulus setup */
 
@@ -356,7 +422,6 @@ private:
     int                     m_iReadToWriteBuffer;               /**< number of samples from the current readindex to current write index */
     int                     m_iNumberOfClassBreaks;             /**< number of classifiactions whicht will be skipped if a classifiaction was made */
     int                     m_iWindowSize;                      /**< size of current time window */
-
     // SSVEP parameter
     QList<int>              m_lElectrodeNumbers;                /**< Sensor level: numbers of chosen electrode channels. */
     QList<double>           m_lDesFrequencies;                  /**< Contains desired frequencies. */

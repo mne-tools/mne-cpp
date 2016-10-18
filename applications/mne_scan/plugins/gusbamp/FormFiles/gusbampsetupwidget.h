@@ -112,30 +112,115 @@ private slots:
     * push-button-click for setting the serial adresses for master and slaves
     *
     */
-    void on_pushButton_clicked();
+    void setSerialAdresses();
 
     //=========================================================================================================
     /**
     * activate or deactivate groupbox for singel-channel-select
     *
     */
-    void on_ChannelSelect_clicked(bool checked);
+    void activateChannelSelect(bool checked);
+
+    //=========================================================================================================
+    /**
+    * grid of checkboxes for the channel select
+    */
     void on_checkBox_clicked();
+
+    //=========================================================================================================
+    /**
+    * grid of checkboxes for the channel select
+    */
     void on_checkBox_2_clicked();
+
+    //=========================================================================================================
+    /**
+    * grid of checkboxes for the channel select
+    */
     void on_checkBox_3_clicked();
+
+    //=========================================================================================================
+    /**
+    * grid of checkboxes for the channel select
+    */
     void on_checkBox_4_clicked();
+
+    //=========================================================================================================
+    /**
+    * grid of checkboxes for the channel select
+    */
     void on_checkBox_5_clicked();
+
+    //=========================================================================================================
+    /**
+    * grid of checkboxes for the channel select
+    */
     void on_checkBox_6_clicked();
+
+    //=========================================================================================================
+    /**
+    * grid of checkboxes for the channel select
+    */
     void on_checkBox_7_clicked();
+
+    //=========================================================================================================
+    /**
+    * grid of checkboxes for the channel select
+    */
     void on_checkBox_8_clicked();
+
+    //=========================================================================================================
+    /**
+    * grid of checkboxes for the channel select
+    */
     void on_checkBox_9_clicked();
+
+    //=========================================================================================================
+    /**
+    * grid of checkboxes for the channel select
+    */
     void on_checkBox_10_clicked();
+
+    //=========================================================================================================
+    /**
+    * grid of checkboxes for the channel select
+    */
     void on_checkBox_11_clicked();
+
+    //=========================================================================================================
+    /**
+    * grid of checkboxes for the channel select
+    */
     void on_checkBox_12_clicked();
+
+    //=========================================================================================================
+    /**
+    * grid of checkboxes for the channel select
+    */
     void on_checkBox_13_clicked();
+
+    //=========================================================================================================
+    /**
+    * grid of checkboxes for the channel select
+    */
     void on_checkBox_14_clicked();
+
+    //=========================================================================================================
+    /**
+    * grid of checkboxes for the channel select
+    */
     void on_checkBox_15_clicked();
+
+    //=========================================================================================================
+    /**
+    * grid of checkboxes for the channel select
+    */
     void on_checkBox_16_clicked();
+
+    //=========================================================================================================
+    /**
+    * combo box for adjusting the sample rate
+    */
     void on_comboBox_currentIndexChanged(const QString &arg1);
 
 private:

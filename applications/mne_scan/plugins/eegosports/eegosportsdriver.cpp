@@ -50,7 +50,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace EEGoSportsPlugin;
+using namespace EEGOSPORTSPLUGIN;
 using namespace eemagine::sdk;
 
 
@@ -126,7 +126,7 @@ bool EEGoSportsDriver::initDevice(int iNumberOfChannels,
             m_pDataStream = m_pAmplifier->OpenEegStream(m_uiSamplingFrequency, reference_range, bipolar_range);
         }
 
-        Sleep(1000);
+        Sleep(100);
     } catch (std::runtime_error& e) {
         std::cout <<"EEGoSportsDriver::initDevice - error " << e.what() << std::endl;
         return false;

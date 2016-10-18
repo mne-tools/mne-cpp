@@ -3,14 +3,13 @@
 * @file     gusbampsetupprojectwidget.cpp
 * @author   Viktor Klüber <viktor.klueber@tu-ilmenau.de>;
 *           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     March 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2016, Viktor Klüber, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2015, Viktor Klüber, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -159,8 +158,9 @@ void GUSBAmpSetupProjectWidget::changeOutputFile()
                 "mne_x_plugins/resources/gusbamp/EEG_data_001_raw.fif",
                  tr("Fif files (*.fif)"));
 
-    if(path==NULL)
+    if(path==NULL){
         path = ui->m_qLineEdit_FiffRecordFile->text();
+    }
 
     ui->m_qLineEdit_FiffRecordFile->setText(path);
     m_pGUSBAmp->m_sOutputFilePath = ui->m_qLineEdit_FiffRecordFile->text();
@@ -176,8 +176,9 @@ void GUSBAmpSetupProjectWidget::changeCap()
                                                 "mne_x_plugins/resources/gusbamp/loc_files",
                                                  tr("Electrode location files (*.elc)"));
 
-    if(path==NULL)
+    if(path==NULL){
         path = ui->m_qLineEdit_EEGCap->text();
+    }
 
     ui->m_qLineEdit_EEGCap->setText(path);
     //m_pGUSBAmp->m_sElcFilePath = ui->m_qLineEdit_EEGCap->text();

@@ -3,7 +3,6 @@
 * @file     ssvepBCIScreen.h
 * @author   Viktor Klüber <viktor.klueber@tu-ilmenau.de>;
 *           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     May 2016
@@ -61,7 +60,7 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE ssvepBCIScreen
+// DEFINE NAMESPACE SSVEPBCIPLUGIN
 //=============================================================================================================
 
 namespace SSVEPBCIPLUGIN
@@ -105,20 +104,42 @@ public:
     ~SsvepBciScreen();
 
 public slots:
+    //=========================================================================================================
+    /**
+     * slot for setting the classification result
+     *
+     * @param [in]  classResult     detected frequency
+     */
     void setClassResults(double classResult);
+
+    //=========================================================================================================
+    /**
+     * adjusting the list of detectable frequencies
+     *
+     * @param [in]  freqList     list of detectable frequencies
+     */
     void updateFrequencyList(MyQList freqList);
+
+    //=========================================================================================================
+    /**
+     * slot for using the screenkeyboard
+     *
+     * @param [in]  useKeyboard     useKeyboard
+     */
     void useScreenKeyboard(bool useKeyboard);
+
+    //=========================================================================================================
+    /**
+     * clears the screenkeyboard from the screen
+     */
     void clearScreen();
 
 private:
     QSharedPointer<SsvepBci>                        m_pSsvepBci;                        /**< pointer to referring SsvepBci class */
     QSharedPointer<SsvepBciSetupStimulusWidget>     m_pSsvepBciSetupStimulusWidget;     /**< pointer to referring SsvepBciSetupStimulusWidget class */
-
     // draw items
     QList<SsvepBciFlickeringItem>   m_Items;            /**< QList containing all flickering Items to be painted */
     QSharedPointer<ScreenKeyboard>  m_pScreenKeyboard;  /**< pointer that holds the Screen-keyboard */
-
-
     // classifiaction updates
     double                          m_dXPosCross;       /**< X position of reference cross */
     double                          m_dYPosCross;       /**< Y position of reference cross */
@@ -128,7 +149,6 @@ private:
     QPainter                        m_qPainter;         /**< painter for drawing items to the widget scene */
 //    QString                         m_qSoundPath;       /**< path to sound file for recognition sound */
 //    QMediaPlayer                    m_qBeep;            /**< beep sound for successful classifiaction */
-
     bool                            m_bUseScreenKeyboard;    /**< flag for updating screen keayboard */
     bool                            m_bClearScreen;          /**< flag for clearing swap buffer */
 

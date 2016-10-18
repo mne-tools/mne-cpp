@@ -3,7 +3,6 @@
 * @file     screenkeyboard.h
 * @author   Viktor Klüber <viktor.klueber@tu-ilmenau.de>;
 *           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     July 2016
@@ -117,16 +116,67 @@ public:
     void paint(QPaintDevice *device);
 
 signals:
+    //=========================================================================================================
+    /**
+    * emits the spelled letter
+    */
     void getLetter(QString letter);
+
+    //=========================================================================================================
+    /**
+    * emits a flag if the letter was spelled correctly or not.
+    *
+    * @param [out]  correctCommand      Flag for correct or wrong spelled letter
+    */
     void isCorrectCommand(bool correctCommand);
+
+    //=========================================================================================================
+    /**
+    * emits trigger signal for a finished spelling sequence
+    */
     void spellingFinished();
 
 public slots:
+    //=========================================================================================================
+    /**
+    * slot when frequency list is changed.
+    *
+    * @param [in]  classList      List of new frequencies
+    */
     void updateClassList(MyQList classList);
+
+    //=========================================================================================================
+    /**
+    * managing and interpreting a new detected frequency from the SsvepBci class
+    *
+    * @param [in]  value      detected frequency. Is supposed to be one of the values of the classification list
+    */
     void updateCommand(double value);
+
+    //=========================================================================================================
+    /**
+    * sets a new phrase which has to be spelt
+    *
+    * @param [out]  phrase      newly adjusted phrase
+    */
     void setPhrase(QString phrase);
+
+    //=========================================================================================================
+    /**
+    * initializes the screen keyboard
+    */
     void initScreenKeyboard();
+
+    //=========================================================================================================
+    /**
+    * initializes the accuracy feature of the screen keyboard device
+    */
     void initSpellAccuracyFeature();
+
+    //=========================================================================================================
+    /**
+    * stops the accuracy feature
+    */
     void stopSpellAccuracyFeature();
 
 private:
@@ -152,7 +202,6 @@ private:
     QList<double>                           m_lClassList;           /**< list containing all displayed frequencies [Hz] */
     bool                                    m_bInitializeKeyboard;  /**< initalizes the painting of the screen keyboard */
     bool                                    m_bUpdatePhraseDisplay; /**< updates the phrases's display */
-
     // speller
     QPair<int, int>                         m_qNextCoord;           /**< coordinate of the next sign which has to be picked */
     bool                                    m_bDisplaySpeller;      /**< flag for displaying speller panel */
@@ -160,7 +209,6 @@ private:
     QString                                 m_sSettledPhrase;       /**< phrase established by the UI */
     QString                                 m_sSpelledPhrase;       /**< phrase spelled by the user with the SsvepBci */
     QString::Iterator                       m_qSpellIterator;       /**< iterator for spelling */
-
     //QMediaPlayer                           *m_qSound;               /**< sound-object for emiting audio feedback */
 };
 

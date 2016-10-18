@@ -78,11 +78,6 @@ SOURCES += \
         FormFiles/eegosportsaboutwidget.cpp \
         eegosportsdriver.cpp \
         FormFiles/eegosportssetupprojectwidget.cpp \
-        FormFiles/eegosportssetupstimuluswidget.cpp \
-        flashobject.cpp \
-    FormFiles/ssvepbciflickeringitem.cpp \
-    FormFiles/ssvepbciscreen.cpp \
-    FormFiles/ssvepbcisetupstimuluswidget.cpp
 
 HEADERS += \
         eegosports.h\
@@ -92,18 +87,11 @@ HEADERS += \
         FormFiles/eegosportsaboutwidget.h \
         eegosportsdriver.h \
         FormFiles/eegosportssetupprojectwidget.h \
-        FormFiles/eegosportssetupstimuluswidget.h \
-        flashobject.h \
-    FormFiles/ssvepbciflickeringitem.h \
-    FormFiles/ssvepbciscreen.h \
-    FormFiles/ssvepbcisetupstimuluswidget.h
 
 FORMS += \
         FormFiles/eegosportssetup.ui \
         FormFiles/eegosportsabout.ui \
         FormFiles/eegosportssetupprojectwidget.ui \
-        FormFiles/eegosportssetupstimuluswidget.ui \
-    FormFiles/ssvepbcisetupstimuluswidget.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

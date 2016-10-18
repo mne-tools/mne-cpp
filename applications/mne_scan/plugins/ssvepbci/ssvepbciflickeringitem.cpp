@@ -3,7 +3,6 @@
 * @file     ssvepbciflickeringitem.cpp
 * @author   Viktor Klüber <viktor.klueber@tu-ilmenauz.de>;
 *           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     May 2016
@@ -111,8 +110,9 @@ void SsvepBciFlickeringItem::setRenderOrder(QList<bool> renderOrder, int freqKey
 void SsvepBciFlickeringItem::paint(QPaintDevice *paintDevice)
 {
     //setting the nex flicker state (moving iterater to front if necessary)
-    if(!m_bIter.hasNext())
+    if(!m_bIter.hasNext()){
         m_bIter.toFront();
+    }
 
     if( m_bIter.peekNext() != m_bFlickerState){
         //painting the itme's shape

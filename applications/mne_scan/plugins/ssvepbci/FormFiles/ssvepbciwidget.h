@@ -3,7 +3,6 @@
 * @file     ssvepbciwidget.h
 * @author   Viktor Klüber <viktor.klueber@tu-ilmenau.de>;
 *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
 * @date     May, 2016
@@ -50,7 +49,7 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE TMSIPlugin
+// DEFINE NAMESPACE SSVEPBCIPLUGIN
 //=============================================================================================================
 
 namespace SSVEPBCIPLUGIN
@@ -67,9 +66,9 @@ class SsvepBci;
 
 //=============================================================================================================
 /**
-* DECLARE CLASS TMSISetupWidget
+* DECLARE CLASS SsvepBciWidget
 *
-* @brief The TMSISetupWidget class provides the TMSI configuration window.
+* @brief The SsvepBciWidget class provides the SSVEPBCI configuration window.
 */
 class SsvepBciWidget : public QWidget
 {
@@ -80,7 +79,7 @@ public:
     /**
     * Constructs a BCISetupWidget which is a child of parent.
     *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new BCISetupWidget becomes a window. If parent is another widget, BCISetupWidget becomes a child window inside parent. BCISetupWidget is deleted when its parent is deleted.
+    * @param [in] parent pointer to parent widget; If parent is 0, the new SsvepBciWidget becomes a window. If parent is another widget, BCISetupWidget becomes a child window inside parent. BCISetupWidget is deleted when its parent is deleted.
     * @param [in] pBCI a pointer to the corresponding BCI.
     */
     SsvepBciWidget(SsvepBci* pBCI, QWidget *parent = 0);
@@ -88,7 +87,7 @@ public:
     //=========================================================================================================
     /**
     * Destroys the BCISetupWidget.
-    * All BCISetupWidget's children are deleted first. The application exits if BCISetupWidget is the main widget.
+    * All SsvepBciWidget's children are deleted first. The application exits if SsvepBciWidget is the main widget.
     */
     ~SsvepBciWidget();
 
@@ -99,14 +98,6 @@ public:
     */
     void initGui();
 
-protected:
-    //=========================================================================================================
-    /**
-    * Filters specified objects for wanted events -> intercepts events
-    *
-    */
-    bool eventFilter(QObject *object, QEvent *event);
-
 private:
     //=========================================================================================================
     /**
@@ -115,66 +106,8 @@ private:
     */
     void showAboutDialog();
 
-    //=========================================================================================================
-    /**
-    * Sets general options made by the user
-    *
-    */
-    void setGeneralOptions();
-
-    //=========================================================================================================
-    /**
-    * Sets processing options made by the user
-    *
-    */
-    void setProcessingOptions();
-
-    //=========================================================================================================
-    /**
-    * Loads classification boundary for source level
-    *
-    */
-    void changeLoadSourceBoundary();
-
-    //=========================================================================================================
-    /**
-    * Loads classification boundary for sensor level
-    *
-    */
-    void changeLoadSensorBoundary();
-
-//    //=========================================================================================================
-//    /**
-//    * Loads classification boundary for sensor level
-//    * [in] path location of the boundary file
-//    * [out] QVector<VectorXd> boundary coeff
-//    */
-//    QVector<VectorXd> readBoundaryInformation(QString path);
-
-    //=========================================================================================================
-    /**
-    * Sets feature selections made by the user on source and sensor level
-    *
-    */
-    void setFeatureSelection();
-
-    //=========================================================================================================
-    /**
-    * Sets filter options
-    *
-    */
-    void setFilterOptions();
-
-    //=========================================================================================================
-    /**
-    * Sets classification options
-    *
-    */
-    void setClassificationOptions();
-
-
-    SsvepBci* m_pBCI;                                       /**< a pointer to corresponding BCI.*/
-    Ui::SsvepBciSetupClass ui;                              /**< the user interface for the SsvepBciWidget.*/
+    SsvepBci*               m_pSsvepBCI;    /**< a pointer to corresponding BCI.*/
+    Ui::SsvepBciSetupClass  ui;             /**< the user interface for the SsvepBciWidget.*/
 };
 
 } // NAMESPACE
