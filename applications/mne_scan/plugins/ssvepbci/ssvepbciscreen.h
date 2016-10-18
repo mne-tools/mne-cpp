@@ -55,7 +55,6 @@
 //=============================================================================================================
 
 #include <QOpenGLWidget>
-#include <QMediaPlayer>
 
 
 //*************************************************************************************************************
@@ -147,8 +146,7 @@ private:
     QList<double>                   m_lFreqList;        /**< list of current flickering frequencies */
     QColor                          m_qCrossColor;      /**< color of the reference cross */
     QPainter                        m_qPainter;         /**< painter for drawing items to the widget scene */
-//    QString                         m_qSoundPath;       /**< path to sound file for recognition sound */
-//    QMediaPlayer                    m_qBeep;            /**< beep sound for successful classifiaction */
+
     bool                            m_bUseScreenKeyboard;    /**< flag for updating screen keayboard */
     bool                            m_bClearScreen;          /**< flag for clearing swap buffer */
 
