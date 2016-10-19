@@ -2,7 +2,7 @@
 /**
 * @file     brainampdriver.h
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
-*           Viktor Klüber <Viktor.Klüber@tu-ilmenau.de>;
+*           Viktor Klüber <viktor.klueber@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     October, 2016
@@ -197,4 +197,4 @@ private:
 
 } // NAMESPACE
 
-#endif // BrainAmpDriver_H
+#endif // BRAINAMPDRIVER_H

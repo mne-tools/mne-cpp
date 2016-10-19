@@ -42,9 +42,9 @@ CONFIG += plugin
 
 DEFINES += BRAINAMP_LIBRARY
 
-QT += core widgets svg
+QT += core widgets
 
-TARGET = BrainAMP
+TARGET = brainamp
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
