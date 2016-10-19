@@ -1,15 +1,15 @@
 //=============================================================================================================
 /**
-* @file     eegosportsdriver.cpp
+* @file     brainampdriver.cpp
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Viktor Klüber <viktor.klueber@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     July, 2014
+* @date     October, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Lorenz Esch, Viktor Klüber and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the EEGoSportsDriver class.
+* @brief    Contains the implementation of the BrainAMPDriver class.
 *
 */
 
@@ -39,10 +39,10 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "eegosportsdriver.h"
-#include "eegosportsproducer.h"
+#include "brainampdriver.h"
+#include "brainampproducer.h"
 
-#include <eemagine/sdk/wrapper.cc> // Wrapper code to be compiled.
+//#include <eemagine/sdk/wrapper.cc> // Wrapper code to be compiled.
 
 
 //*************************************************************************************************************
@@ -50,8 +50,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace EEGOSPORTSPLUGIN;
-using namespace eemagine::sdk;
+using namespace BRAINAMPPLUGIN;
+//using namespace eemagine::sdk;
 
 
 //*************************************************************************************************************
@@ -59,15 +59,15 @@ using namespace eemagine::sdk;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-EEGoSportsDriver::EEGoSportsDriver(EEGoSportsProducer* pEEGoSportsProducer)
-: m_pEEGoSportsProducer(pEEGoSportsProducer)
+BrainAMPDriver::BrainAMPDriver(BrainAMPProducer* pBrainAMPProducer)
+: m_pBrainAMPProducer(pBrainAMPProducer)
 , m_bDllLoaded(true)
 , m_bInitDeviceSuccess(false)
 , m_uiNumberOfChannels(64)
 , m_uiSamplingFrequency(512)
 , m_uiSamplesPerBlock(100)
 , m_bWriteDriverDebugToFile(false)
-, m_sOutputFilePath("/mne_x_plugins/resources/eegosports")
+, m_sOutputFilePath("/mne_scan_plugins/resources/brainamp")
 , m_bMeasureImpedances(false)
 {
     m_bDllLoaded = true;
@@ -76,15 +76,15 @@ EEGoSportsDriver::EEGoSportsDriver(EEGoSportsProducer* pEEGoSportsProducer)
 
 //*************************************************************************************************************
 
-EEGoSportsDriver::~EEGoSportsDriver()
+BrainAMPDriver::~BrainAMPDriver()
 {
-    //cout << "EEGoSportsDriver::~EEGoSportsDriver()" << endl;
+    //cout << "BrainAMPDriver::~BrainAMPDriver()" << endl;
 }
 
 
 //*************************************************************************************************************
 
-bool EEGoSportsDriver::initDevice(int iNumberOfChannels,
+bool BrainAMPDriver::initDevice(int iNumberOfChannels,
                             int iSamplesPerBlock,
                             int iSamplingFrequency,
                             bool bWriteDriverDebugToFile,
@@ -105,14 +105,14 @@ bool EEGoSportsDriver::initDevice(int iNumberOfChannels,
 
     //Open debug file to write to
     if(m_bWriteDriverDebugToFile)
-        m_outputFileStream.open("mne_x_plugins/resources/eegosports/EEGoSports_Driver_Debug.txt", std::ios::trunc); //ios::trunc deletes old file data
+        m_outputFileStream.open("mne_scan_plugins/resources/brainamp/brainamp_Driver_Debug.txt", std::ios::trunc); //ios::trunc deletes old file data
 
     try {
         // Get device handler
         factory factoryObj ("eego-SDK.dll"); // Make sure that eego-SDK.dll resides in the working directory
         m_pAmplifier = factoryObj.getAmplifier(); // Get an amplifier
 
-        //std::cout<<"EEGoSportsDriver::initDevice - Serial number of connected eegosports device: "<<m_pAmplifier->getSerialNumber()<<std::endl;
+        //std::cout<<"BrainAMPDriver::initDevice - Serial number of connected brainamp device: "<<m_pAmplifier->getSerialNumber()<<std::endl;
 
         //Start the stream
         if(bMeasureImpedance) {
@@ -128,11 +128,11 @@ bool EEGoSportsDriver::initDevice(int iNumberOfChannels,
 
         Sleep(100);
     } catch (std::runtime_error& e) {
-        std::cout <<"EEGoSportsDriver::initDevice - error " << e.what() << std::endl;
+        std::cout <<"BrainAMPDriver::initDevice - error " << e.what() << std::endl;
         return false;
     }
 
-    std::cout << "EEGoSportsDriver::initDevice - Successfully initialised the device." << std::endl;
+    std::cout << "BrainAMPDriver::initDevice - Successfully initialised the device." << std::endl;
 
     // Set flag for successfull initialisation true
     m_bInitDeviceSuccess = true;
@@ -143,19 +143,19 @@ bool EEGoSportsDriver::initDevice(int iNumberOfChannels,
 
 //*************************************************************************************************************
 
-bool EEGoSportsDriver::uninitDevice()
+bool BrainAMPDriver::uninitDevice()
 {
     //Check if the device was initialised
     if(!m_bInitDeviceSuccess)
     {
-        std::cout << "Plugin EEGoSports - ERROR - uninitDevice() - Device was not initialised - therefore can not be uninitialised" << std::endl;
+        std::cout << "Plugin BrainAMP - ERROR - uninitDevice() - Device was not initialised - therefore can not be uninitialised" << std::endl;
         return false;
     }
 
     //Check if the driver DLL was loaded
     if(!m_bDllLoaded)
     {
-        std::cout << "Plugin EEGoSports - ERROR - uninitDevice() - Driver DLL was not loaded" << std::endl;
+        std::cout << "Plugin BrainAMP - ERROR - uninitDevice() - Driver DLL was not loaded" << std::endl;
         return false;
     }
 
@@ -169,19 +169,19 @@ bool EEGoSportsDriver::uninitDevice()
     delete m_pDataStream;
     delete m_pAmplifier;
 
-    std::cout << "Plugin EEGoSports - INFO - uninitDevice() - Successfully uninitialised the device" << std::endl;
+    std::cout << "Plugin BrainAMP - INFO - uninitDevice() - Successfully uninitialised the device" << std::endl;
     return true;
 }
 
 
 //*************************************************************************************************************
 
-bool EEGoSportsDriver::getSampleMatrixValue(Eigen::MatrixXd &sampleMatrix)
+bool BrainAMPDriver::getSampleMatrixValue(Eigen::MatrixXd &sampleMatrix)
 {
     //Check if device was initialised and connected correctly
     if(!m_bInitDeviceSuccess)
     {
-        std::cout << "Plugin EEGoSports - ERROR - getSampleMatrixValue() - Cannot start to get samples from device because device was not initialised correctly" << std::endl;
+        std::cout << "Plugin BrainAMP - ERROR - getSampleMatrixValue() - Cannot start to get samples from device because device was not initialised correctly" << std::endl;
         return false;
     }
 

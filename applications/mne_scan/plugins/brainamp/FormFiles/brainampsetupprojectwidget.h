@@ -1,15 +1,15 @@
 //=============================================================================================================
 /**
-* @file     eegosportssetupprojectwidget.h
+* @file     brainampsetupprojectwidget.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Viktor Klüber <viktor.klueber@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     July 2014
+* @date     October, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Lorenz Esch, Viktor Klüber and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,12 +30,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the EEGoSportsSetupProjectWidget class.
+* @brief    Contains the declaration of the BrainAMPSetupProjectWidget class.
 *
 */
 
-#ifndef EEGOSPORTSSETUPPROJECTWIDGET_H
-#define EEGOSPORTSSETUPPROJECTWIDGET_H
+#ifndef BRAINAMPSETUPPROJECTWIDGET_H
+#define BRAINAMPSETUPPROJECTWIDGET_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -51,15 +51,15 @@
 #include <QWidget>
 
 namespace Ui {
-class EEGoSportsSetupProjectWidget;
+class BrainAMPSetupProjectWidget;
 }
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE EEGOSPORTSPLUGIN
+// DEFINE NAMESPACE BRAINAMPPLUGIN
 //=============================================================================================================
 
-namespace EEGOSPORTSPLUGIN
+namespace BRAINAMPPLUGIN
 {
 
 
@@ -68,35 +68,35 @@ namespace EEGOSPORTSPLUGIN
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class EEGoSports;
+class BrainAMP;
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS EEGoSportsSetupProjectWidget
+* DECLARE CLASS BrainAMPSetupProjectWidget
 *
-* @brief The EEGoSportsSetupProjectWidget class provides the EEGoSportsSetupProjectWidget configuration window.
+* @brief The BrainAMPSetupProjectWidget class provides the BrainAMPSetupProjectWidget configuration window.
 */
-class EEGoSportsSetupProjectWidget : public QWidget
+class BrainAMPSetupProjectWidget : public QWidget
 {
     Q_OBJECT
 
 public:
     //=========================================================================================================
     /**
-    * Constructs a EEGoSportsSetupProjectWidget which is a child of parent.
+    * Constructs a BrainAMPSetupProjectWidget which is a child of parent.
     *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new EEGoSportsSetupProjectWidget becomes a window. If parent is another widget, EEGoSportsSetupWidget becomes a child window inside parent. EEGoSportsSetupWidget is deleted when its parent is deleted.
-    * @param [in] pEEGoSports a pointer to the corresponding ECGSimulator.
+    * @param [in] parent pointer to parent widget; If parent is 0, the new BrainAMPSetupProjectWidget becomes a window. If parent is another widget, BrainAMPSetupWidget becomes a child window inside parent. BrainAMPSetupWidget is deleted when its parent is deleted.
+    * @param [in] pBrainAMP a pointer to the corresponding ECGSimulator.
     */
-    explicit EEGoSportsSetupProjectWidget(EEGoSports* pEEGoSports, QWidget *parent = 0);
+    explicit BrainAMPSetupProjectWidget(BrainAMP* pBrainAMP, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destructs a EEGoSportsSetupProjectWidget which is a child of parent.
+    * Destructs a BrainAMPSetupProjectWidget which is a child of parent.
     *
     */
-    ~EEGoSportsSetupProjectWidget();
+    ~BrainAMPSetupProjectWidget();
 
     //=========================================================================================================
     /**
@@ -106,9 +106,8 @@ public:
     void initGui();
 
 private:
-    EEGoSports*                           m_pEEGoSports;        /**< a pointer to corresponding EEGoSports.*/
-
-    Ui::EEGoSportsSetupProjectWidget*     ui;                   /**< the user interface for the EEGoSportsSetupWidget.*/
+    BrainAMP*                           m_pBrainAMP;        /**< a pointer to corresponding BrainAMP.*/
+    Ui::BrainAMPSetupProjectWidget*     ui;                 /**< the user interface for the BrainAMPSetupWidget.*/
 
     //=========================================================================================================
     /**
@@ -168,7 +167,7 @@ private:
 
     //=========================================================================================================
     /**
-    * Changes the EEG cap and file path variables in the EEGoSports class
+    * Changes the EEG cap and file path variables in the BrainAMP class
     */
     void changeQLineEdits();
 
@@ -189,4 +188,4 @@ signals:
 
 } // NAMESPACE
 
-#endif // EEGOSPORTSSETUPPROJECTWIDGET_H
+#endif // BRAINAMPSETUPPROJECTWIDGET_H
