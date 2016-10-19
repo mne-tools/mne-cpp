@@ -1,15 +1,15 @@
 //=============================================================================================================
 /**
-* @file     eegosportsdriver.h
+* @file     brainampdriver.h
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Viktor Klüber <viktor.klueber@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
-* @date     July, 2014
+* @date     October, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Lorenz Esch, Viktor Klüber and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,12 +30,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the EEGoSportsDriver class. This class implements the basic communication between MNE-X and a ANT EEGoSports device
+* @brief    Contains the declaration of the BrainAMPDriver class. This class implements the basic communication between MNE-X and a ANT BrainAMP device
 *
 */
 
-#ifndef EEGOSPORTSDRIVER_H
-#define EEGOSPORTSDRIVER_H
+#ifndef BRAINAMPDRIVER_H
+#define BRAINAMPDRIVER_H
 
 
 //*************************************************************************************************************
@@ -79,7 +79,7 @@
 // DEFINE NAMESPACE TMSIPlugin
 //=============================================================================================================
 
-namespace EEGOSPORTSPLUGIN
+namespace BRAINAMPPLUGIN
 {
 
 
@@ -94,7 +94,7 @@ namespace EEGOSPORTSPLUGIN
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class EEGoSportsProducer;
+class BrainAMPProducer;
 
 
 //*************************************************************************************************************
@@ -107,26 +107,26 @@ class EEGoSportsProducer;
 
 //=============================================================================================================
 /**
-* EEGoSportsDriver
+* BrainAMPDriver
 *
-* @brief The EEGoSportsDriver class provides real time data acquisition of EEG data with a TMSi Refa device.
+* @brief The BrainAMPDriver class provides real time data acquisition of EEG data with a TMSi Refa device.
 */
-class EEGoSportsDriver
+class BrainAMPDriver
 {
 public:
     //=========================================================================================================
     /**
-    * Constructs a EEGoSportsDriver.
+    * Constructs a BrainAMPDriver.
     *
-    * @param [in] pEEGoSportsProducer a pointer to the corresponding EEGoSports Producer class.
+    * @param [in] pBrainAMPProducer a pointer to the corresponding BrainAMP Producer class.
     */
-    EEGoSportsDriver(EEGoSportsProducer* pEEGoSportsProducer);
+    BrainAMPDriver(BrainAMPProducer* pBrainAMPProducer);
 
     //=========================================================================================================
     /**
-    * Destroys the EEGoSportsDriver.
+    * Destroys the BrainAMPDriver.
     */
-    ~EEGoSportsDriver();
+    ~BrainAMPDriver();
 
     //=========================================================================================================
     /**
@@ -161,7 +161,7 @@ public:
     bool uninitDevice();
 
 private:
-    EEGoSportsProducer*         m_pEEGoSportsProducer;          /**< A pointer to the corresponding EEGoSportsProducer class.*/
+    BrainAMPProducer*           m_pBrainAMPProducer;          /**< A pointer to the corresponding BrainAMPProducer class.*/
 
     bool                        m_bInitDeviceSuccess;           /**< Flag which defines if the device initialisation was successfull.*/
     bool                        m_bDllLoaded;                   /**< Flag which defines if the driver DLL was loaded successfully.*/
@@ -183,4 +183,4 @@ private:
 
 } // NAMESPACE
 
-#endif // EEGOSPORTSDRIVER_H
+#endif // BRAINAMPDRIVER_H

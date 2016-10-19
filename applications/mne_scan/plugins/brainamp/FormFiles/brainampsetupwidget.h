@@ -1,15 +1,15 @@
 //=============================================================================================================
 /**
-* @file     eegosportssetupwidget.h
+* @file     brainampsetupwidget.h
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Viktor Klüber <viktor.klueber@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
-* @date     July, 2014
+* @date     October, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Lorenz Esch, Viktor Klüber and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,12 +30,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the EEGoSportsSetupWidget class.
+* @brief    Contains the declaration of the BrainAMPSetupWidget class.
 *
 */
 
-#ifndef EEGOSPORTSSETUPWIDGET_H
-#define EEGOSPORTSSETUPWIDGET_H
+#ifndef BRAINAMPSETUPWIDGET_H
+#define BRAINAMPSETUPWIDGET_H
 
 
 //*************************************************************************************************************
@@ -50,15 +50,15 @@
 //=============================================================================================================
 
 #include <QtWidgets>
-#include "../ui_eegosportssetup.h"
+#include "../ui_brainampsetup.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE EEGOSPORTSPLUGIN
+// DEFINE NAMESPACE BRAINAMPPLUGIN
 //=============================================================================================================
 
-namespace EEGOSPORTSPLUGIN
+namespace BRAINAMPPLUGIN
 {
 
 
@@ -67,35 +67,35 @@ namespace EEGOSPORTSPLUGIN
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class EEGoSports;
+class BrainAMP;
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS EEGoSportsSetupWidget
+* DECLARE CLASS BrainAMPSetupWidget
 *
-* @brief The EEGoSportsSetupWidget class provides the EEGoSports configuration window.
+* @brief The BrainAMPSetupWidget class provides the BrainAMP configuration window.
 */
-class EEGoSportsSetupWidget : public QWidget
+class BrainAMPSetupWidget : public QWidget
 {
     Q_OBJECT
 public:
 
     //=========================================================================================================
     /**
-    * Constructs a EEGoSportsSetupWidget which is a child of parent.
+    * Constructs a BrainAMPSetupWidget which is a child of parent.
     *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new EEGoSportsSetupWidget becomes a window. If parent is another widget, EEGoSportsSetupWidget becomes a child window inside parent. EEGoSportsSetupWidget is deleted when its parent is deleted.
-    * @param [in] pEEGoSports a pointer to the corresponding ECGSimulator.
+    * @param [in] parent pointer to parent widget; If parent is 0, the new BrainAMPSetupWidget becomes a window. If parent is another widget, BrainAMPSetupWidget becomes a child window inside parent. BrainAMPSetupWidget is deleted when its parent is deleted.
+    * @param [in] pBrainAMP a pointer to the corresponding ECGSimulator.
     */
-    EEGoSportsSetupWidget(EEGoSports* pEEGoSports, QWidget *parent = 0);
+    BrainAMPSetupWidget(BrainAMP* pBrainAMP, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the EEGoSportsSetupWidget.
-    * All EEGoSportsSetupWidget's children are deleted first. The application exits if EEGoSportsSetupWidget is the main widget.
+    * Destroys the BrainAMPSetupWidget.
+    * All BrainAMPSetupWidget's children are deleted first. The application exits if BrainAMPSetupWidget is the main widget.
     */
-    ~EEGoSportsSetupWidget();
+    ~BrainAMPSetupWidget();
 
     //=========================================================================================================
     /**
@@ -127,11 +127,10 @@ private:
     */
     void showAboutDialog();
 
-    EEGoSports*               m_pEEGoSports;           /**< a pointer to corresponding EEGoSports.*/
-
-    Ui::EEGoSportsSetupClass  ui;                      /**< the user interface for the EEGoSportsSetupWidget.*/
+    BrainAMP*               m_pBrainAMP;            /**< a pointer to corresponding BrainAMP.*/
+    Ui::BrainAMPSetupClass  ui;                     /**< the user interface for the BrainAMPSetupWidget.*/
 };
 
 } // NAMESPACE
 
-#endif // EEGOSPORTSSETUPWIDGET_H
+#endif // BRAINAMPSETUPWIDGET_H
