@@ -5,11 +5,11 @@
 *           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     April 2016
+* @date     April, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2016, Viktor Klüber Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Viktor Klüber Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -61,12 +61,18 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE SSVEPBCIPLUGIN
+// FORWARD DECLARATIONS
 //=============================================================================================================
 
 namespace Ui {
 class SsvepBciSetupStimulusWidget;
 }
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE SSVEPBCIPLUGIN
+//=============================================================================================================
 
 namespace SSVEPBCIPLUGIN
 {
@@ -203,7 +209,7 @@ private slots:
     * @param [in] index value of the Item List
     *
     */
-    void on_comboBox_currentIndexChanged(int index);
+    void panelSelect(int index);
 
     //=========================================================================================================
     /**
@@ -212,7 +218,7 @@ private slots:
     * @param [in] index Get the frequencie's index of of the selected item.
     *
     */
-    void on_comboBox_2_currentIndexChanged(int index);
+    void frequencySelect(int index);
 
     //=========================================================================================================
     /**

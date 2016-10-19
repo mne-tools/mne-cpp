@@ -125,97 +125,97 @@ private slots:
     /**
     * grid of checkboxes for the channel select
     */
-    void on_checkBox_clicked();
+    void activateChannel1();
 
     //=========================================================================================================
     /**
     * grid of checkboxes for the channel select
     */
-    void on_checkBox_2_clicked();
+    void activateChannel2();
 
     //=========================================================================================================
     /**
     * grid of checkboxes for the channel select
     */
-    void on_checkBox_3_clicked();
+    void activateChannel3();
 
     //=========================================================================================================
     /**
     * grid of checkboxes for the channel select
     */
-    void on_checkBox_4_clicked();
+    void activateChannel4();
 
     //=========================================================================================================
     /**
     * grid of checkboxes for the channel select
     */
-    void on_checkBox_5_clicked();
+    void activateChannel5();
 
     //=========================================================================================================
     /**
     * grid of checkboxes for the channel select
     */
-    void on_checkBox_6_clicked();
+    void activateChannel6();
 
     //=========================================================================================================
     /**
     * grid of checkboxes for the channel select
     */
-    void on_checkBox_7_clicked();
+    void activateChannel7();
 
     //=========================================================================================================
     /**
     * grid of checkboxes for the channel select
     */
-    void on_checkBox_8_clicked();
+    void activateChannel8();
 
     //=========================================================================================================
     /**
     * grid of checkboxes for the channel select
     */
-    void on_checkBox_9_clicked();
+    void activateChannel9();
 
     //=========================================================================================================
     /**
     * grid of checkboxes for the channel select
     */
-    void on_checkBox_10_clicked();
+    void activateChannel10();
 
     //=========================================================================================================
     /**
     * grid of checkboxes for the channel select
     */
-    void on_checkBox_11_clicked();
+    void activateChannel11();
 
     //=========================================================================================================
     /**
     * grid of checkboxes for the channel select
     */
-    void on_checkBox_12_clicked();
+    void activateChannel12();
 
     //=========================================================================================================
     /**
     * grid of checkboxes for the channel select
     */
-    void on_checkBox_13_clicked();
+    void activateChannel13();
 
     //=========================================================================================================
     /**
     * grid of checkboxes for the channel select
     */
-    void on_checkBox_14_clicked();
+    void activateChannel14();
 
     //=========================================================================================================
     /**
     * grid of checkboxes for the channel select
     */
-    void on_checkBox_15_clicked();
+    void activateChannel15();
 
     //=========================================================================================================
     /**
     * grid of checkboxes for the channel select
     */
-    void on_checkBox_16_clicked();
+    void activateChannel16();
 
     //=========================================================================================================
     /**

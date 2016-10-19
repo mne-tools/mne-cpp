@@ -9,7 +9,7 @@
 *
 * @section  LICENSE
 *
-* Copyright (C) 2015, Viktor Klüber, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Viktor Klüber, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -42,6 +42,7 @@
 #include "gusbampsetupprojectwidget.h"
 #include "ui_gusbampsetupprojectwidget.h"
 #include "../gusbamp.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -90,6 +91,7 @@ GUSBAmpSetupProjectWidget::~GUSBAmpSetupProjectWidget()
 {
     delete ui;
 }
+
 
 //*************************************************************************************************************
 
