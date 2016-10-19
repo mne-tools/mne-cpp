@@ -1,15 +1,15 @@
 //=============================================================================================================
 /**
-* @file     eegosports.cpp
+* @file     brainamp.cpp
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Viktor Klüber <viktor.klueber@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     July, 2014
+* @date     October, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Lorenz Esch, Viktor Klüber and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the EEGoSports class.
+* @brief    Contains the implementation of the BrainAMP class.
 *
 */
 
@@ -39,8 +39,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "eegosports.h"
-#include "eegosportsproducer.h"
+#include "brainamp.h"
+#include "brainampproducer.h"
 
 
 //*************************************************************************************************************
@@ -59,7 +59,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace EEGOSPORTSPLUGIN;
+using namespace BRAINAMPPLUGIN;
+using namespace IPlugin;
 
 
 //*************************************************************************************************************
@@ -67,11 +68,11 @@ using namespace EEGOSPORTSPLUGIN;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-EEGoSports::EEGoSports()
-: m_pRMTSA_EEGoSports(0)
-, m_qStringResourcePath(qApp->applicationDirPath()+"/mne_x_plugins/resources/eegosports/")
+BrainAMP::BrainAMP()
+: m_pRMTSA_BrainAMP(0)
+, m_qStringResourcePath(qApp->applicationDirPath()+"/mne_scan_plugins/resources/brainamp/")
 , m_pRawMatrixBuffer_In(0)
-, m_pEEGoSportsProducer(new EEGoSportsProducer(this))
+, m_pBrainAMPProducer(new BrainAMPProducer(this))
 , m_dLPAShift(0.01)
 , m_dRPAShift(0.01)
 , m_dNasionShift(0.06)
@@ -84,22 +85,22 @@ EEGoSports::EEGoSports()
     // Create record file option action bar item/button
     m_pActionSetupProject = new QAction(QIcon(":/images/database.png"), tr("Setup project"), this);
     m_pActionSetupProject->setStatusTip(tr("Setup project"));
-    connect(m_pActionSetupProject, &QAction::triggered, this, &EEGoSports::showSetupProjectDialog);
+    connect(m_pActionSetupProject, &QAction::triggered, this, &BrainAMP::showSetupProjectDialog);
     addPluginAction(m_pActionSetupProject);
 
     // Create start recordin action bar item/button
     m_pActionStartRecording = new QAction(QIcon(":/images/record.png"), tr("Start recording data to fif file"), this);
     m_pActionStartRecording->setStatusTip(tr("Start recording data to fif file"));
-    connect(m_pActionStartRecording, &QAction::triggered, this, &EEGoSports::showStartRecording);
+    connect(m_pActionStartRecording, &QAction::triggered, this, &BrainAMP::showStartRecording);
     addPluginAction(m_pActionStartRecording);
 }
 
 
 //*************************************************************************************************************
 
-EEGoSports::~EEGoSports()
+BrainAMP::~BrainAMP()
 {
-    //std::cout << "EEGoSports::~EEGoSports() " << std::endl;
+    //std::cout << "BrainAMP::~BrainAMP() " << std::endl;
 
     //If the program is closed while the sampling is in process
     if(this->isRunning())
@@ -107,65 +108,65 @@ EEGoSports::~EEGoSports()
 
     //Store settings for next use
     QSettings settings;
-    settings.setValue(QString("EEGOSPORTS/sFreq"), m_iSamplingFreq);
-    settings.setValue(QString("EEGOSPORTS/samplesPerBlock"), m_iSamplesPerBlock);
-    settings.setValue(QString("EEGOSPORTS/LPAShift"), m_dLPAShift);
-    settings.setValue(QString("EEGOSPORTS/RPAShift"), m_dRPAShift);
-    settings.setValue(QString("EEGOSPORTS/NasionShift"), m_dNasionShift);
-    settings.setValue(QString("EEGOSPORTS/LPAElectrode"), m_sLPA);
-    settings.setValue(QString("EEGOSPORTS/RPAElectrode"), m_sRPA);
-    settings.setValue(QString("EEGOSPORTS/NasionElectrode"), m_sNasion);
-    settings.setValue(QString("EEGOSPORTS/outputFilePath"), m_sOutputFilePath);
-    settings.setValue(QString("EEGOSPORTS/elcFilePath"), m_sElcFilePath);
-    settings.setValue(QString("EEGOSPORTS/cardinalFilePath"), m_sCardinalFilePath);
-    settings.setValue(QString("EEGOSPORTS/useTrackedCardinalsMode"), m_bUseTrackedCardinalMode);
-    settings.setValue(QString("EEGOSPORTS/useElectrodeshiftMode"), m_bUseElectrodeShiftMode);
+    settings.setValue(QString("BRAINAMP/sFreq"), m_iSamplingFreq);
+    settings.setValue(QString("BRAINAMP/samplesPerBlock"), m_iSamplesPerBlock);
+    settings.setValue(QString("BRAINAMP/LPAShift"), m_dLPAShift);
+    settings.setValue(QString("BRAINAMP/RPAShift"), m_dRPAShift);
+    settings.setValue(QString("BRAINAMP/NasionShift"), m_dNasionShift);
+    settings.setValue(QString("BRAINAMP/LPAElectrode"), m_sLPA);
+    settings.setValue(QString("BRAINAMP/RPAElectrode"), m_sRPA);
+    settings.setValue(QString("BRAINAMP/NasionElectrode"), m_sNasion);
+    settings.setValue(QString("BRAINAMP/outputFilePath"), m_sOutputFilePath);
+    settings.setValue(QString("BRAINAMP/elcFilePath"), m_sElcFilePath);
+    settings.setValue(QString("BRAINAMP/cardinalFilePath"), m_sCardinalFilePath);
+    settings.setValue(QString("BRAINAMP/useTrackedCardinalsMode"), m_bUseTrackedCardinalMode);
+    settings.setValue(QString("BRAINAMP/useElectrodeshiftMode"), m_bUseElectrodeShiftMode);
 }
 
 
 //*************************************************************************************************************
 
-QSharedPointer<IPlugin> EEGoSports::clone() const
+QSharedPointer<IPlugin> BrainAMP::clone() const
 {
-    QSharedPointer<EEGoSports> pEEGoSportsClone(new EEGoSports());
-    return pEEGoSportsClone;
+    QSharedPointer<BrainAMP> pBrainAMPClone(new BrainAMP());
+    return pBrainAMPClone;
 }
 
 
 //*************************************************************************************************************
 
-void EEGoSports::init()
+void BrainAMP::init()
 {
-    m_pRMTSA_EEGoSports = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "EEGoSports", "EEG output data");
+    m_pRMTSA_BrainAMP = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "BrainAMP", "EEG output data");
 
-    m_outputConnectors.append(m_pRMTSA_EEGoSports);
+    m_outputConnectors.append(m_pRMTSA_BrainAMP);
 
     //default values used by the setupGUI class must be set here
 
     QSettings settings;
-    m_iSamplingFreq = settings.value(QString("EEGOSPORTS/sFreq"), 512).toInt();
+    m_iSamplingFreq = settings.value(QString("BRAINAMP/sFreq"), 512).toInt();
     m_iNumberOfChannels = 90;
-    m_iSamplesPerBlock = settings.value(QString("EEGOSPORTS/samplesPerBlock"), 512).toInt();
+    m_iSamplesPerBlock = settings.value(QString("BRAINAMP/samplesPerBlock"), 512).toInt();
     m_bWriteToFile = false;
     m_bWriteDriverDebugToFile = false;
     m_bIsRunning = false;
     m_bCheckImpedances = false;
 
     QDate date;
-    m_sOutputFilePath = settings.value(QString("EEGOSPORTS/outputFilePath"), QString("%1Sequence_01/Subject_01/%2_%3_%4_EEG_001_raw.fif").arg(m_qStringResourcePath).arg(date.currentDate().year()).arg(date.currentDate().month()).arg(date.currentDate().day())).toString();
+    m_sOutputFilePath = settings.value(QString("BRAINAMP/outputFilePath"), QString("%1Sequence_01/Subject_01/%2_%3_%4_EEG_001_raw.fif").arg(m_qStringResourcePath).arg(date.currentDate().year()).arg(date.currentDate().month()).arg(date.currentDate().day())).toString();
 
-    m_sElcFilePath = settings.value(QString("EEGOSPORTS/elcFilePath"), QString("./Resources/3DLayouts/standard_waveguard64_duke.elc")).toString();
+    m_sElcFilePath = settings.value(QString("BRAINAMP/elcFilePath"), QString("./Resources/3DLayouts/standard_waveguard64_duke.elc")).toString();
 
-    m_sCardinalFilePath = settings.value(QString("EEGOSPORTS/cardinalFilePath"), QString("")).toString();
+    m_sCardinalFilePath = settings.value(QString("BRAINAMP/cardinalFilePath"), QString("")).toString();
 
-    m_dLPAShift = settings.value(QString("EEGOSPORTS/LPAShift"), 0.0).toFloat();
-    m_dRPAShift = settings.value(QString("EEGOSPORTS/RPAShift"), 0.0).toFloat();
-    m_dNasionShift = settings.value(QString("EEGOSPORTS/NasionShift"), 0.0).toFloat();
-    m_sLPA = settings.value(QString("EEGOSPORTS/LPAElectrode"), QString("")).toString();
-    m_sRPA = settings.value(QString("EEGOSPORTS/RPAElectrode"), QString("")).toString();
-    m_sNasion = settings.value(QString("EEGOSPORTS/NasionElectrode"), QString("")).toString();
-    m_bUseTrackedCardinalMode = settings.value(QString("EEGOSPORTS/useTrackedCardinalsMode"), true).toBool();
-    m_bUseElectrodeShiftMode = settings.value(QString("EEGOSPORTS/useElectrodeshiftMode"), false).toBool();
+    m_dLPAShift = settings.value(QString("BRAINAMP/LPAShift"), 0.0).toFloat();
+    m_dRPAShift = settings.value(QString("BRAINAMP/RPAShift"), 0.0).toFloat();
+    m_dNasionShift = settings.value(QString("BRAINAMP/NasionShift"), 0.0).toFloat();
+    m_sLPA = settings.value(QString("BRAINAMP/LPAElectrode"), QString("")).toString();
+    m_sRPA = settings.value(QString("BRAINAMP/RPAElectrode"), QString("")).toString();
+    m_sNasion = settings.value(QString("BRAINAMP/NasionElectrode"), QString("")).toString();
+    m_bUseTrackedCardinalMode = settings.value(QString("BRAINAMP/useTrackedCardinalsMode"), true).toBool();
+    m_bUseElectrodeShiftMode = settings.value(QString("BRAINAMP/useElectrodeshiftMode"), false).toBool();
 
     m_pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo());
 }
@@ -173,7 +174,7 @@ void EEGoSports::init()
 
 //*************************************************************************************************************
 
-void EEGoSports::unload()
+void BrainAMP::unload()
 {
 
 }
@@ -181,7 +182,7 @@ void EEGoSports::unload()
 
 //*************************************************************************************************************
 
-void EEGoSports::setUpFiffInfo()
+void BrainAMP::setUpFiffInfo()
 {
     //
     //Clear old fiff info data
@@ -313,7 +314,7 @@ void EEGoSports::setUpFiffInfo()
             digitizerInfo.push_back(digPoint);
         }
         else {
-            qDebug() << "Plugin EEGOSPORTS - ERROR creating LPA - " << m_sLPA << " not found. Check loaded layout.";
+            qDebug() << "Plugin BRAINAMP - ERROR creating LPA - " << m_sLPA << " not found. Check loaded layout.";
         }
     }
 
@@ -339,7 +340,7 @@ void EEGoSports::setUpFiffInfo()
             digitizerInfo.push_back(digPoint);
         }
         else {
-            qDebug() << "Plugin EEGOSPORTS - ERROR creating Nasion - " << m_sNasion << " not found. Check loaded layout.";
+            qDebug() << "Plugin BRAINAMP - ERROR creating Nasion - " << m_sNasion << " not found. Check loaded layout.";
         }
     }
 
@@ -365,7 +366,7 @@ void EEGoSports::setUpFiffInfo()
             digitizerInfo.push_back(digPoint);
         }
         else {
-            qDebug() << "Plugin EEGOSPORTS - ERROR creating RPA - " << m_sRPA << " not found. Check loaded layout.";
+            qDebug() << "Plugin BRAINAMP - ERROR creating RPA - " << m_sRPA << " not found. Check loaded layout.";
         }
     }
 
@@ -513,7 +514,7 @@ void EEGoSports::setUpFiffInfo()
 
 //*************************************************************************************************************
 
-bool EEGoSports::start()
+bool BrainAMP::start()
 {
     //Check if the thread is already or still running. This can happen if the start button is pressed immediately after the stop button was pressed. In this case the stopping process is not finished yet but the start process is initiated.
     if(this->isRunning())
@@ -523,22 +524,22 @@ bool EEGoSports::start()
     setUpFiffInfo();
 
     //Set the channel size of the RMTSA - this needs to be done here and NOT in the init() function because the user can change the number of channels during runtime
-    m_pRMTSA_EEGoSports->data()->initFromFiffInfo(m_pFiffInfo);
-    m_pRMTSA_EEGoSports->data()->setMultiArraySize(1);//m_iSamplesPerBlock);
-    m_pRMTSA_EEGoSports->data()->setSamplingRate(m_iSamplingFreq);
+    m_pRMTSA_BrainAMP->data()->initFromFiffInfo(m_pFiffInfo);
+    m_pRMTSA_BrainAMP->data()->setMultiArraySize(1);//m_iSamplesPerBlock);
+    m_pRMTSA_BrainAMP->data()->setSamplingRate(m_iSamplingFreq);
 
     //Buffer
     m_pRawMatrixBuffer_In = QSharedPointer<RawMatrixBuffer>(new RawMatrixBuffer(8, m_iNumberOfChannels, m_iSamplesPerBlock));
     m_qListReceivedSamples.clear();
 
-    m_pEEGoSportsProducer->start(m_iNumberOfChannels,
+    m_pBrainAMPProducer->start(m_iNumberOfChannels,
                        m_iSamplesPerBlock,
                        m_iSamplingFreq,
                        m_bWriteDriverDebugToFile,
                        m_sOutputFilePath,
                        m_bCheckImpedances);
 
-    if(m_pEEGoSportsProducer->isRunning())
+    if(m_pBrainAMPProducer->isRunning())
     {
         m_bIsRunning = true;
         QThread::start();
@@ -546,7 +547,7 @@ bool EEGoSports::start()
     }
     else
     {
-        qWarning() << "Plugin EEGoSports - ERROR - EEGoSportsProducer thread could not be started - Either the device is turned off (check your OS device manager) or the driver DLL (EEGO-SDK.dll) is not installed in one of the monitored dll path." << endl;
+        qWarning() << "Plugin BrainAMP - ERROR - BrainAMPProducer thread could not be started - Either the device is turned off (check your OS device manager) or the driver DLL (EEGO-SDK.dll) is not installed in one of the monitored dll path." << endl;
         return false;
     }
 }
@@ -554,12 +555,12 @@ bool EEGoSports::start()
 
 //*************************************************************************************************************
 
-bool EEGoSports::stop()
+bool BrainAMP::stop()
 {
     //Stop the producer thread first
-    m_pEEGoSportsProducer->stop();
+    m_pBrainAMPProducer->stop();
 
-    //Wait until this thread (EEGoSports) is stopped
+    //Wait until this thread (BrainAMP) is stopped
     m_bIsRunning = false;
 
     //In case the semaphore blocks the thread -> Release the QSemaphore and let it exit from the pop function (acquire statement)
@@ -567,7 +568,7 @@ bool EEGoSports::stop()
 
     m_pRawMatrixBuffer_In->clear();
 
-    m_pRMTSA_EEGoSports->data()->clear();
+    m_pRMTSA_BrainAMP->data()->clear();
 
     m_qListReceivedSamples.clear();
 
@@ -577,7 +578,7 @@ bool EEGoSports::stop()
 
 //*************************************************************************************************************
 
-void EEGoSports::setSampleData(MatrixXd &matRawBuffer)
+void BrainAMP::setSampleData(MatrixXd &matRawBuffer)
 {
     m_mutex.lock();
         m_qListReceivedSamples.append(matRawBuffer);
@@ -587,7 +588,7 @@ void EEGoSports::setSampleData(MatrixXd &matRawBuffer)
 
 //*************************************************************************************************************
 
-IPlugin::PluginType EEGoSports::getType() const
+PluginType BrainAMP::getType() const
 {
     return _ISensor;
 }
@@ -595,17 +596,17 @@ IPlugin::PluginType EEGoSports::getType() const
 
 //*************************************************************************************************************
 
-QString EEGoSports::getName() const
+QString BrainAMP::getName() const
 {
-    return "EEGoSports EEG";
+    return "BrainAMP EEG";
 }
 
 
 //*************************************************************************************************************
 
-QWidget* EEGoSports::setupWidget()
+QWidget* BrainAMP::setupWidget()
 {
-    EEGoSportsSetupWidget* widget = new EEGoSportsSetupWidget(this);//widget is later destroyed by CentralWidget - so it has to be created everytime new
+    BrainAMPSetupWidget* widget = new BrainAMPSetupWidget(this);//widget is later destroyed by CentralWidget - so it has to be created everytime new
 
     //init properties dialog
     widget->initGui();
@@ -616,7 +617,7 @@ QWidget* EEGoSports::setupWidget()
 
 //*************************************************************************************************************
 
-void EEGoSports::onUpdateCardinalPoints(const QString& sLPA, double dLPA, const QString& sRPA, double dRPA, const QString& sNasion, double dNasion)
+void BrainAMP::onUpdateCardinalPoints(const QString& sLPA, double dLPA, const QString& sRPA, double dRPA, const QString& sNasion, double dNasion)
 {
     m_dLPAShift = dLPA;
     m_dRPAShift = dRPA;
@@ -630,11 +631,11 @@ void EEGoSports::onUpdateCardinalPoints(const QString& sLPA, double dLPA, const 
 
 //*************************************************************************************************************
 
-void EEGoSports::run()
+void BrainAMP::run()
 {
     while(m_bIsRunning)
     {
-        if(m_pEEGoSportsProducer->isRunning())
+        if(m_pBrainAMPProducer->isRunning())
         {
             m_mutex.lock();
 
@@ -650,8 +651,8 @@ void EEGoSports::run()
                 }
 
                 //emit values to real time multi sample array
-                //qDebug()<<"EEGoSports::run() - mat size"<<matValue.rows()<<"x"<<matValue.cols();
-                m_pRMTSA_EEGoSports->data()->setValue(matValue);
+                //qDebug()<<"BrainAMP::run() - mat size"<<matValue.rows()<<"x"<<matValue.cols();
+                m_pRMTSA_BrainAMP->data()->setValue(matValue);
             }
 
             m_mutex.unlock();            
@@ -667,34 +668,34 @@ void EEGoSports::run()
         m_pActionStartRecording->setIcon(QIcon(":/images/record.png"));
     }
 
-    //std::cout<<"EXITING - EEGoSports::run()"<<std::endl;
+    //std::cout<<"EXITING - BrainAMP::run()"<<std::endl;
 }
 
 
 //*************************************************************************************************************
 
-void EEGoSports::showSetupProjectDialog()
+void BrainAMP::showSetupProjectDialog()
 {
     // Open setup project widget
-    if(m_pEEGoSportsSetupProjectWidget == Q_NULLPTR) {
-        m_pEEGoSportsSetupProjectWidget = QSharedPointer<EEGoSportsSetupProjectWidget>(new EEGoSportsSetupProjectWidget(this));
+    if(m_pBrainAMPSetupProjectWidget == Q_NULLPTR) {
+        m_pBrainAMPSetupProjectWidget = QSharedPointer<BrainAMPSetupProjectWidget>(new BrainAMPSetupProjectWidget(this));
 
-        connect(m_pEEGoSportsSetupProjectWidget.data(), &EEGoSportsSetupProjectWidget::cardinalPointsChanged,
-                this, &EEGoSports::onUpdateCardinalPoints);
+        connect(m_pBrainAMPSetupProjectWidget.data(), &BrainAMPSetupProjectWidget::cardinalPointsChanged,
+                this, &BrainAMP::onUpdateCardinalPoints);
     }
 
-    if(!m_pEEGoSportsSetupProjectWidget->isVisible())
+    if(!m_pBrainAMPSetupProjectWidget->isVisible())
     {
-        m_pEEGoSportsSetupProjectWidget->setWindowTitle("EEGoSports EEG Connector - Setup project");        
-        m_pEEGoSportsSetupProjectWidget->show();
-        m_pEEGoSportsSetupProjectWidget->raise();
+        m_pBrainAMPSetupProjectWidget->setWindowTitle("BrainAMP EEG Connector - Setup project");
+        m_pBrainAMPSetupProjectWidget->show();
+        m_pBrainAMPSetupProjectWidget->raise();
     }
 }
 
 
 //*************************************************************************************************************
 
-void EEGoSports::showStartRecording()
+void BrainAMP::showStartRecording()
 {
     //Setup writing to file
     if(m_bWriteToFile)
@@ -753,7 +754,7 @@ void EEGoSports::showStartRecording()
         m_bWriteToFile = true;
 
         m_pTimerRecordingChange = QSharedPointer<QTimer>(new QTimer);
-        connect(m_pTimerRecordingChange.data(), &QTimer::timeout, this, &EEGoSports::changeRecordingButton);
+        connect(m_pTimerRecordingChange.data(), &QTimer::timeout, this, &BrainAMP::changeRecordingButton);
         m_pTimerRecordingChange->start(500);
     }
 }
@@ -761,7 +762,7 @@ void EEGoSports::showStartRecording()
 
 //*************************************************************************************************************
 
-void EEGoSports::changeRecordingButton()
+void BrainAMP::changeRecordingButton()
 {
     if(m_iBlinkStatus == 0)
     {
@@ -778,7 +779,7 @@ void EEGoSports::changeRecordingButton()
 
 //*************************************************************************************************************
 
-bool EEGoSports::dirExists(const std::string& dirName_in)
+bool BrainAMP::dirExists(const std::string& dirName_in)
 {
     DWORD ftyp = GetFileAttributesA(dirName_in.c_str());
     if (ftyp == INVALID_FILE_ATTRIBUTES)

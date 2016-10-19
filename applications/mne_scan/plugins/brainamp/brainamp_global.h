@@ -1,15 +1,15 @@
 //=============================================================================================================
 /**
-* @file     eegosports_global.h
+* @file     brainamp_global.h
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Viktor Klüber <viktor.klueber@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
-* @date     July, 2014
+* @date     October, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Lorenz Esch, Viktor Klüber and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,12 +30,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the EEGoSports library export/import macros.
+* @brief    Contains the BrainAMP library export/import macros.
 *
 */
 
-#ifndef EEGOSPORTS_GLOBAL_H
-#define EEGOSPORTS_GLOBAL_H
+#ifndef BRAINAMP_GLOBAL_H
+#define BRAINAMP_GLOBAL_H
 
 
 //*************************************************************************************************************
@@ -51,10 +51,10 @@
 // PREPROCESSOR DEFINES
 //=============================================================================================================
 
-#if defined(EEGOSPORTS_LIBRARY)
-#  define EEGOSPORTSSHARED_EXPORT Q_DECL_EXPORT   /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+#if defined(BRAINAMP_LIBRARY)
+#  define BRAINAMPSHARED_EXPORT Q_DECL_EXPORT   /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
 #else
-#  define EEGOSPORTSSHARED_EXPORT Q_DECL_IMPORT   /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+#  define BRAINAMPSHARED_EXPORT Q_DECL_IMPORT   /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
 
-#endif // EEGOSPORTS_GLOBAL_H
+#endif // BRAINAMP_GLOBAL_H

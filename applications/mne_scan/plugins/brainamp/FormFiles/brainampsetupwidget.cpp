@@ -1,15 +1,15 @@
 //=============================================================================================================
 /**
-* @file     eegosportssetupwidget.cpp
+* @file     brainampsetupwidget.cpp
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Viktor Klüber <viktor.klueber@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     July 2014
+* @date     October, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Lorenz Esch, Viktor Klüber and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the EEGoSportsSetupWidget class.
+* @brief    Contains the implementation of the BrainAMPSetupWidget class.
 *
 */
 
@@ -39,9 +39,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "eegosportssetupwidget.h"
-#include "eegosportsaboutwidget.h"
-#include "../eegosports.h"
+#include "brainampsetupwidget.h"
+#include "brainampaboutwidget.h"
+#include "../brainamp.h"
 
 
 //*************************************************************************************************************
@@ -57,7 +57,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace EEGOSPORTSPLUGIN;
+using namespace BRAINAMPPLUGIN;
 
 
 //*************************************************************************************************************
@@ -65,27 +65,27 @@ using namespace EEGOSPORTSPLUGIN;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-EEGoSportsSetupWidget::EEGoSportsSetupWidget(EEGoSports* pEEGoSports, QWidget* parent)
+BrainAMPSetupWidget::BrainAMPSetupWidget(BrainAMP* pBrainAMP, QWidget* parent)
 : QWidget(parent)
-, m_pEEGoSports(pEEGoSports)
+, m_pBrainAMP(pBrainAMP)
 {
     ui.setupUi(this);
 
     //Connect device sampling properties
     connect(ui.m_comboBox_SamplingFreq, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-            this, &EEGoSportsSetupWidget::setDeviceSamplingProperties);
+            this, &BrainAMPSetupWidget::setDeviceSamplingProperties);
     connect(ui.m_spinBox_BlockSize, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-            this, &EEGoSportsSetupWidget::setDeviceSamplingProperties);
+            this, &BrainAMPSetupWidget::setDeviceSamplingProperties);
 
     //Connect debug file
     connect(ui.m_checkBox_WriteDriverDebugToFile, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
-            this, &EEGoSportsSetupWidget::setWriteToFile);
+            this, &BrainAMPSetupWidget::setWriteToFile);
 
     //Connect about button
-    connect(ui.m_qPushButton_About, &QPushButton::released, this, &EEGoSportsSetupWidget::showAboutDialog);
+    connect(ui.m_qPushButton_About, &QPushButton::released, this, &BrainAMPSetupWidget::showAboutDialog);
 
     //Fill info box
-    QFile file(m_pEEGoSports->m_qStringResourcePath+"readme.txt");
+    QFile file(m_pBrainAMP->m_qStringResourcePath+"readme.txt");
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
         return;
 
@@ -101,7 +101,7 @@ EEGoSportsSetupWidget::EEGoSportsSetupWidget(EEGoSports* pEEGoSports, QWidget* p
 
 //*************************************************************************************************************
 
-EEGoSportsSetupWidget::~EEGoSportsSetupWidget()
+BrainAMPSetupWidget::~BrainAMPSetupWidget()
 {
 
 }
@@ -109,38 +109,38 @@ EEGoSportsSetupWidget::~EEGoSportsSetupWidget()
 
 //*************************************************************************************************************
 
-void EEGoSportsSetupWidget::initGui()
+void BrainAMPSetupWidget::initGui()
 {
     //Init device sampling properties
-    ui.m_comboBox_SamplingFreq->setCurrentText(QString::number(m_pEEGoSports->m_iSamplingFreq));
-    ui.m_spinBox_BlockSize->setValue(m_pEEGoSports->m_iSamplesPerBlock);
+    ui.m_comboBox_SamplingFreq->setCurrentText(QString::number(m_pBrainAMP->m_iSamplingFreq));
+    ui.m_spinBox_BlockSize->setValue(m_pBrainAMP->m_iSamplesPerBlock);
 
     //Init write to file
-    ui.m_checkBox_WriteDriverDebugToFile->setChecked(m_pEEGoSports->m_bWriteDriverDebugToFile);
+    ui.m_checkBox_WriteDriverDebugToFile->setChecked(m_pBrainAMP->m_bWriteDriverDebugToFile);
 }
 
 
 //*************************************************************************************************************
 
-void EEGoSportsSetupWidget::setDeviceSamplingProperties()
+void BrainAMPSetupWidget::setDeviceSamplingProperties()
 {
-    m_pEEGoSports->m_iSamplingFreq = ui.m_comboBox_SamplingFreq->currentText().toInt();
-    m_pEEGoSports->m_iSamplesPerBlock = ui.m_spinBox_BlockSize->value();
+    m_pBrainAMP->m_iSamplingFreq = ui.m_comboBox_SamplingFreq->currentText().toInt();
+    m_pBrainAMP->m_iSamplesPerBlock = ui.m_spinBox_BlockSize->value();
 }
 
 
 //*************************************************************************************************************
 
-void EEGoSportsSetupWidget::setWriteToFile()
+void BrainAMPSetupWidget::setWriteToFile()
 {
-    m_pEEGoSports->m_bWriteDriverDebugToFile = ui.m_checkBox_WriteDriverDebugToFile->isChecked();
+    m_pBrainAMP->m_bWriteDriverDebugToFile = ui.m_checkBox_WriteDriverDebugToFile->isChecked();
 }
 
 
 //*************************************************************************************************************
 
-void EEGoSportsSetupWidget::showAboutDialog()
+void BrainAMPSetupWidget::showAboutDialog()
 {
-    EEGoSportsAboutWidget aboutDialog(this);
+    BrainAMPAboutWidget aboutDialog(this);
     aboutDialog.exec();
 }

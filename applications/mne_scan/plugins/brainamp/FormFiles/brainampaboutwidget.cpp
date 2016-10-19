@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the EEGoSportsAboutWidget class.
+* @brief    Contains the implementation of the BrainAMPsAboutWidget class.
 *
 */
 
@@ -39,7 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "eegosportsaboutwidget.h"
+#include "brainampaboutwidget.h"
 
 
 //*************************************************************************************************************
@@ -54,7 +54,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace EEGOSPORTSPLUGIN;
+using namespace BRAINAMPPLUGIN;
 
 
 //*************************************************************************************************************
@@ -62,7 +62,7 @@ using namespace EEGOSPORTSPLUGIN;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-EEGoSportsAboutWidget::EEGoSportsAboutWidget(QWidget *parent)
+BrainAMPAboutWidget::BrainAMPAboutWidget(QWidget *parent)
 : QDialog(parent)
 {
     ui.setupUi(this);
@@ -71,7 +71,7 @@ EEGoSportsAboutWidget::EEGoSportsAboutWidget(QWidget *parent)
 
 //*************************************************************************************************************
 
-EEGoSportsAboutWidget::~EEGoSportsAboutWidget()
+BrainAMPAboutWidget::~BrainAMPAboutWidget()
 {
 
 }

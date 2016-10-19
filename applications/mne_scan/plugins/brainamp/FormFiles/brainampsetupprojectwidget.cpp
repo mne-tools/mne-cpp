@@ -1,15 +1,15 @@
 //=============================================================================================================
 /**
-* @file     eegosportssetupprojectwidget.cpp
+* @file     brainampsetupprojectwidget.cpp
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Viktor Klüber <viktor.klueber@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     July 2014
+* @date     October, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Lorenz Esch, Viktor Klüber and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the EEGoSportsSetupProjectWidget class.
+* @brief    Contains the implementation of the BrainAMPSetupProjectWidget class.
 *
 */
 
@@ -39,16 +39,16 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "eegosportssetupprojectwidget.h"
-#include "ui_eegosportssetupprojectwidget.h"
-#include "../eegosports.h"
+#include "brainampsetupprojectwidget.h"
+#include "ui_brainampsetupprojectwidget.h"
+#include "../brainamp.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace EEGOSPORTSPLUGIN;
+using namespace BRAINAMPPLUGIN;
 
 
 //*************************************************************************************************************
@@ -56,45 +56,45 @@ using namespace EEGOSPORTSPLUGIN;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-EEGoSportsSetupProjectWidget::EEGoSportsSetupProjectWidget(EEGoSports* pEEGoSports, QWidget *parent)
+BrainAMPSetupProjectWidget::BrainAMPSetupProjectWidget(BrainAMP* pBrainAMP, QWidget *parent)
 : QWidget(parent)
-, ui(new Ui::EEGoSportsSetupProjectWidget)
-, m_pEEGoSports(pEEGoSports)
+, ui(new Ui::BrainAMPSetupProjectWidget)
+, m_pBrainAMP(pBrainAMP)
 {
     ui->setupUi(this);
 
     // Connect write to file options
-    connect(ui->m_qPushButton_NewProject, &QPushButton::released, this, &EEGoSportsSetupProjectWidget::addProject);
-    connect(ui->m_qPushButton_NewSubject, &QPushButton::released, this, &EEGoSportsSetupProjectWidget::addSubject);
-    connect(ui->m_qPushButton_FiffRecordFile, &QPushButton::released, this, &EEGoSportsSetupProjectWidget::changeOutputFile);
+    connect(ui->m_qPushButton_NewProject, &QPushButton::released, this, &BrainAMPSetupProjectWidget::addProject);
+    connect(ui->m_qPushButton_NewSubject, &QPushButton::released, this, &BrainAMPSetupProjectWidget::addSubject);
+    connect(ui->m_qPushButton_FiffRecordFile, &QPushButton::released, this, &BrainAMPSetupProjectWidget::changeOutputFile);
 
     // Connect drop down menus
     connect(ui->m_qComboBox_SubjectSelection, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-            this, &EEGoSportsSetupProjectWidget::generateFilePath);
+            this, &BrainAMPSetupProjectWidget::generateFilePath);
     connect(ui->m_qComboBox_ProjectSelection, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-            this, &EEGoSportsSetupProjectWidget::generateFilePath);
+            this, &BrainAMPSetupProjectWidget::generateFilePath);
 
     // Connect EEG hat
-    connect(ui->m_qPushButton_EEGCap, &QPushButton::released, this, &EEGoSportsSetupProjectWidget::changeCap);
-    connect(ui->m_qLineEdit_EEGCap, &QLineEdit::textChanged, this, &EEGoSportsSetupProjectWidget::updateCardinalComboBoxes);
+    connect(ui->m_qPushButton_EEGCap, &QPushButton::released, this, &BrainAMPSetupProjectWidget::changeCap);
+    connect(ui->m_qLineEdit_EEGCap, &QLineEdit::textChanged, this, &BrainAMPSetupProjectWidget::updateCardinalComboBoxes);
 
     // Connect cardinal combo boxes and shift spin boxes
-    connect(ui->m_comboBox_cardinalMode, &QComboBox::currentTextChanged, this, &EEGoSportsSetupProjectWidget::changeCardinalMode);
+    connect(ui->m_comboBox_cardinalMode, &QComboBox::currentTextChanged, this, &BrainAMPSetupProjectWidget::changeCardinalMode);
 
-    connect(ui->m_comboBox_LPA, &QComboBox::currentTextChanged, this, &EEGoSportsSetupProjectWidget::onCardinalComboBoxChanged);
-    connect(ui->m_comboBox_RPA, &QComboBox::currentTextChanged, this, &EEGoSportsSetupProjectWidget::onCardinalComboBoxChanged);
-    connect(ui->m_comboBox_Nasion, &QComboBox::currentTextChanged, this, &EEGoSportsSetupProjectWidget::onCardinalComboBoxChanged);
-    connect(ui->m_doubleSpinBox_LPA, &QDoubleSpinBox::editingFinished, this, &EEGoSportsSetupProjectWidget::onCardinalComboBoxChanged);
-    connect(ui->m_doubleSpinBox_RPA, &QDoubleSpinBox::editingFinished, this, &EEGoSportsSetupProjectWidget::onCardinalComboBoxChanged);
-    connect(ui->m_doubleSpinBox_Nasion, &QDoubleSpinBox::editingFinished, this, &EEGoSportsSetupProjectWidget::onCardinalComboBoxChanged);    
+    connect(ui->m_comboBox_LPA, &QComboBox::currentTextChanged, this, &BrainAMPSetupProjectWidget::onCardinalComboBoxChanged);
+    connect(ui->m_comboBox_RPA, &QComboBox::currentTextChanged, this, &BrainAMPSetupProjectWidget::onCardinalComboBoxChanged);
+    connect(ui->m_comboBox_Nasion, &QComboBox::currentTextChanged, this, &BrainAMPSetupProjectWidget::onCardinalComboBoxChanged);
+    connect(ui->m_doubleSpinBox_LPA, &QDoubleSpinBox::editingFinished, this, &BrainAMPSetupProjectWidget::onCardinalComboBoxChanged);
+    connect(ui->m_doubleSpinBox_RPA, &QDoubleSpinBox::editingFinished, this, &BrainAMPSetupProjectWidget::onCardinalComboBoxChanged);
+    connect(ui->m_doubleSpinBox_Nasion, &QDoubleSpinBox::editingFinished, this, &BrainAMPSetupProjectWidget::onCardinalComboBoxChanged);
 
-    connect(ui->m_pushButton_cardinalFile, &QPushButton::released, this, &EEGoSportsSetupProjectWidget::changeCardinalFile);
+    connect(ui->m_pushButton_cardinalFile, &QPushButton::released, this, &BrainAMPSetupProjectWidget::changeCardinalFile);
 
     // Connect QLineEdit's
     connect(ui->m_qLineEdit_EEGCap, static_cast<void (QLineEdit::*)(const QString &)>(&QLineEdit::textEdited),
-            this, &EEGoSportsSetupProjectWidget::changeQLineEdits);
+            this, &BrainAMPSetupProjectWidget::changeQLineEdits);
     connect(ui->m_qLineEdit_FiffRecordFile, static_cast<void (QLineEdit::*)(const QString &)>(&QLineEdit::textEdited),
-            this, &EEGoSportsSetupProjectWidget::changeQLineEdits);
+            this, &BrainAMPSetupProjectWidget::changeQLineEdits);
 
     initGui();
 }
@@ -102,7 +102,7 @@ EEGoSportsSetupProjectWidget::EEGoSportsSetupProjectWidget(EEGoSports* pEEGoSpor
 
 //*************************************************************************************************************
 
-EEGoSportsSetupProjectWidget::~EEGoSportsSetupProjectWidget()
+BrainAMPSetupProjectWidget::~BrainAMPSetupProjectWidget()
 {
     delete ui;
 }
@@ -110,25 +110,25 @@ EEGoSportsSetupProjectWidget::~EEGoSportsSetupProjectWidget()
 
 //*************************************************************************************************************
 
-void EEGoSportsSetupProjectWidget::initGui()
+void BrainAMPSetupProjectWidget::initGui()
 {
     // Init output file path
-    ui->m_qLineEdit_FiffRecordFile->setText(m_pEEGoSports->m_sOutputFilePath);
+    ui->m_qLineEdit_FiffRecordFile->setText(m_pBrainAMP->m_sOutputFilePath);
 
     // Init location of layout file
-    ui->m_qLineEdit_EEGCap->setText(m_pEEGoSports->m_sElcFilePath);
+    ui->m_qLineEdit_EEGCap->setText(m_pBrainAMP->m_sElcFilePath);
 
-    updateCardinalComboBoxes(m_pEEGoSports->m_sElcFilePath);
+    updateCardinalComboBoxes(m_pBrainAMP->m_sElcFilePath);
 
-    ui->m_doubleSpinBox_LPA->setValue(1e2*m_pEEGoSports->m_dLPAShift);
-    ui->m_doubleSpinBox_RPA->setValue(1e2*m_pEEGoSports->m_dRPAShift);
-    ui->m_doubleSpinBox_Nasion->setValue(1e2*m_pEEGoSports->m_dNasionShift);
+    ui->m_doubleSpinBox_LPA->setValue(1e2*m_pBrainAMP->m_dLPAShift);
+    ui->m_doubleSpinBox_RPA->setValue(1e2*m_pBrainAMP->m_dRPAShift);
+    ui->m_doubleSpinBox_Nasion->setValue(1e2*m_pBrainAMP->m_dNasionShift);
 
-    ui->m_comboBox_LPA->setCurrentText(m_pEEGoSports->m_sLPA);
-    ui->m_comboBox_RPA->setCurrentText(m_pEEGoSports->m_sRPA);
-    ui->m_comboBox_Nasion->setCurrentText(m_pEEGoSports->m_sNasion);
+    ui->m_comboBox_LPA->setCurrentText(m_pBrainAMP->m_sLPA);
+    ui->m_comboBox_RPA->setCurrentText(m_pBrainAMP->m_sRPA);
+    ui->m_comboBox_Nasion->setCurrentText(m_pBrainAMP->m_sNasion);
 
-    ui->m_lineEdit_cardinalFile->setText(m_pEEGoSports->m_sCardinalFilePath);
+    ui->m_lineEdit_cardinalFile->setText(m_pBrainAMP->m_sCardinalFilePath);
 
     // Init project and subject menus
     ui->m_qComboBox_ProjectSelection->addItem("Sequence_01");
@@ -140,10 +140,10 @@ void EEGoSportsSetupProjectWidget::initGui()
     generateFilePath();
 
     //Init cardinal support
-    if(m_pEEGoSports->m_bUseTrackedCardinalMode) {
+    if(m_pBrainAMP->m_bUseTrackedCardinalMode) {
         ui->m_comboBox_cardinalMode->setCurrentText("Use tracked cardinals");
         changeCardinalMode("Use tracked cardinals");
-    } else if (m_pEEGoSports->m_bUseElectrodeShiftMode) {
+    } else if (m_pBrainAMP->m_bUseElectrodeShiftMode) {
         ui->m_comboBox_cardinalMode->setCurrentText("Use electrode shift");
         changeCardinalMode("Use electrode shift");
     }
@@ -152,7 +152,7 @@ void EEGoSportsSetupProjectWidget::initGui()
 
 //*************************************************************************************************************
 
-void EEGoSportsSetupProjectWidget::changeCardinalMode(const QString& text)
+void BrainAMPSetupProjectWidget::changeCardinalMode(const QString& text)
 {
     if(text == "Use tracked cardinals") {
         ui->m_label_cardinal->show();
@@ -169,8 +169,8 @@ void EEGoSportsSetupProjectWidget::changeCardinalMode(const QString& text)
         ui->m_doubleSpinBox_Nasion->hide();
         ui->m_comboBox_Nasion->hide();
 
-        m_pEEGoSports->m_bUseTrackedCardinalMode = true;
-        m_pEEGoSports->m_bUseElectrodeShiftMode = false;
+        m_pBrainAMP->m_bUseTrackedCardinalMode = true;
+        m_pBrainAMP->m_bUseElectrodeShiftMode = false;
     } else if(text == "Use electrode shift") {
         ui->m_label_cardinal->hide();
         ui->m_lineEdit_cardinalFile->hide();
@@ -186,8 +186,8 @@ void EEGoSportsSetupProjectWidget::changeCardinalMode(const QString& text)
         ui->m_doubleSpinBox_Nasion->show();
         ui->m_comboBox_Nasion->show();
 
-        m_pEEGoSports->m_bUseTrackedCardinalMode = false;
-        m_pEEGoSports->m_bUseElectrodeShiftMode = true;
+        m_pBrainAMP->m_bUseTrackedCardinalMode = false;
+        m_pBrainAMP->m_bUseElectrodeShiftMode = true;
     }
 
     this->adjustSize();
@@ -196,7 +196,7 @@ void EEGoSportsSetupProjectWidget::changeCardinalMode(const QString& text)
 
 //*************************************************************************************************************
 
-void EEGoSportsSetupProjectWidget::onCardinalComboBoxChanged()
+void BrainAMPSetupProjectWidget::onCardinalComboBoxChanged()
 {
     QString sLPA = ui->m_comboBox_LPA->currentText();
     double dLPAShift = ui->m_doubleSpinBox_LPA->value()*1e-2;
@@ -211,7 +211,7 @@ void EEGoSportsSetupProjectWidget::onCardinalComboBoxChanged()
 
 //*************************************************************************************************************
 
-void EEGoSportsSetupProjectWidget::updateCardinalComboBoxes(const QString& sPath)
+void BrainAMPSetupProjectWidget::updateCardinalComboBoxes(const QString& sPath)
 {
     QList<QVector<double> > elcLocation3D;
     QList<QVector<double> > elcLocation2D;
@@ -235,10 +235,10 @@ void EEGoSportsSetupProjectWidget::updateCardinalComboBoxes(const QString& sPath
 
 //*************************************************************************************************************
 
-void EEGoSportsSetupProjectWidget::addProject()
+void BrainAMPSetupProjectWidget::addProject()
 {
     QString path = QFileDialog::getExistingDirectory(this, tr("Open Project Directory"),
-                                                     m_pEEGoSports->m_qStringResourcePath,
+                                                     m_pBrainAMP->m_qStringResourcePath,
                                                      QFileDialog::ShowDirsOnly
                                                      | QFileDialog::DontResolveSymlinks);
 
@@ -253,10 +253,10 @@ void EEGoSportsSetupProjectWidget::addProject()
 
 //*************************************************************************************************************
 
-void EEGoSportsSetupProjectWidget::addSubject()
+void BrainAMPSetupProjectWidget::addSubject()
 {
     QString path = QFileDialog::getExistingDirectory(this, tr("Open Subject Directory"),
-                                                     m_pEEGoSports->m_qStringResourcePath,
+                                                     m_pBrainAMP->m_qStringResourcePath,
                                                      QFileDialog::ShowDirsOnly
                                                      | QFileDialog::DontResolveSymlinks);
 
@@ -271,12 +271,12 @@ void EEGoSportsSetupProjectWidget::addSubject()
 
 //*************************************************************************************************************
 
-void EEGoSportsSetupProjectWidget::changeOutputFile()
+void BrainAMPSetupProjectWidget::changeOutputFile()
 {
     QString path = QFileDialog::getSaveFileName(
                 this,
                 "Save to fif file",
-                "mne_x_plugins/resources/eegosports/EEG_data_001_raw.fif",
+                "mne_scan_plugins/resources/brainamp/EEG_data_001_raw.fif",
                  tr("Fif files (*.fif)"));
 
     if(path==NULL){
@@ -284,13 +284,13 @@ void EEGoSportsSetupProjectWidget::changeOutputFile()
     }
 
     ui->m_qLineEdit_FiffRecordFile->setText(path);
-    m_pEEGoSports->m_sOutputFilePath = ui->m_qLineEdit_FiffRecordFile->text();
+    m_pBrainAMP->m_sOutputFilePath = ui->m_qLineEdit_FiffRecordFile->text();
 }
 
 
 //*************************************************************************************************************
 
-void EEGoSportsSetupProjectWidget::changeCap()
+void BrainAMPSetupProjectWidget::changeCap()
 {
     QString path = QFileDialog::getOpenFileName(this,
                                                 "Change EEG cap layout",
@@ -302,13 +302,13 @@ void EEGoSportsSetupProjectWidget::changeCap()
     }
 
     ui->m_qLineEdit_EEGCap->setText(path);
-    m_pEEGoSports->m_sElcFilePath = ui->m_qLineEdit_EEGCap->text();
+    m_pBrainAMP->m_sElcFilePath = ui->m_qLineEdit_EEGCap->text();
 }
 
 
 //*************************************************************************************************************
 
-void EEGoSportsSetupProjectWidget::changeCardinalFile()
+void BrainAMPSetupProjectWidget::changeCardinalFile()
 {
     QString path = QFileDialog::getOpenFileName(this,
                                                 "Change cardinal file",
@@ -319,13 +319,13 @@ void EEGoSportsSetupProjectWidget::changeCardinalFile()
         path = ui->m_lineEdit_cardinalFile->text();
 
     ui->m_lineEdit_cardinalFile->setText(path);
-    m_pEEGoSports->m_sCardinalFilePath = ui->m_lineEdit_cardinalFile->text();
+    m_pBrainAMP->m_sCardinalFilePath = ui->m_lineEdit_cardinalFile->text();
 }
 
 
 //*************************************************************************************************************
 
-void EEGoSportsSetupProjectWidget::generateFilePath(int index)
+void BrainAMPSetupProjectWidget::generateFilePath(int index)
 {
     Q_UNUSED(index);
 
@@ -334,7 +334,7 @@ void EEGoSportsSetupProjectWidget::generateFilePath(int index)
     QString fileName = QString ("%1_%2_%3_EEG_001_raw.fif").arg(date.currentDate().year()).arg(date.currentDate().month()).arg(date.currentDate().day());
 
     // Append new file name, subject and project
-    QString resourcePath = m_pEEGoSports->m_qStringResourcePath;
+    QString resourcePath = m_pBrainAMP->m_qStringResourcePath;
     resourcePath.append(ui->m_qComboBox_ProjectSelection->currentText());
     resourcePath.append("/");
     resourcePath.append(ui->m_qComboBox_SubjectSelection->currentText());
@@ -342,14 +342,14 @@ void EEGoSportsSetupProjectWidget::generateFilePath(int index)
     resourcePath.append(fileName);
 
     ui->m_qLineEdit_FiffRecordFile->setText(resourcePath);
-    m_pEEGoSports->m_sOutputFilePath = resourcePath;
+    m_pBrainAMP->m_sOutputFilePath = resourcePath;
 }
 
 
 //*************************************************************************************************************
 
-void EEGoSportsSetupProjectWidget::changeQLineEdits()
+void BrainAMPSetupProjectWidget::changeQLineEdits()
 {
-    m_pEEGoSports->m_sElcFilePath = ui->m_qLineEdit_EEGCap->text();
-    m_pEEGoSports->m_sOutputFilePath = ui->m_qLineEdit_FiffRecordFile->text();
+    m_pBrainAMP->m_sElcFilePath = ui->m_qLineEdit_EEGCap->text();
+    m_pBrainAMP->m_sOutputFilePath = ui->m_qLineEdit_FiffRecordFile->text();
 }
