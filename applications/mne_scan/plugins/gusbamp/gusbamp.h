@@ -225,12 +225,10 @@ private:
     int                         m_iSplitCount;              /**< File split count */
     QString                     m_sOutputFilePath;          /**< Holds the path for the sample output file. Defined by the user via the GUI.*/
     QFile                       m_fileOut;                  /**< QFile for writing to fiff file.*/
-
-    QSharedPointer<QTimer>  m_pTimerRecordingChange;    /**< timer to control blinking of the recording icon */
-    qint16                  m_iBlinkStatus;             /**< flag for recording icon blinking */
-
-    QAction*            m_pActionStartRecording;    /**< starts to record data */
-    QAction*            m_pActionSetupProject;      /**< shows setup project dialog */
+    QSharedPointer<QTimer>      m_pTimerRecordingChange;    /**< timer to control blinking of the recording icon */
+    qint16                      m_iBlinkStatus;             /**< flag for recording icon blinking */
+    QAction*                    m_pActionStartRecording;    /**< starts to record data */
+    QAction*                    m_pActionSetupProject;      /**< shows setup project dialog */
 
 };
 

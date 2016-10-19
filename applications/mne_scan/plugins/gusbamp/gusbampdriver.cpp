@@ -67,11 +67,11 @@ using namespace std;
 
 GUSBAmpDriver::GUSBAmpDriver(GUSBAmpProducer* pGUSBAmpProducer)
 : m_pGUSBAmpProducer(pGUSBAmpProducer)
-, m_NUMBER_OF_CHANNELS(0)
-, m_NUMBER_OF_SCANS(0)
-, m_SLAVE_SERIALS_SIZE(0)
+, m_chNumberOfChannels(0)
+, m_iNumberOfScans(0)
+, m_iSlaveSerialsSize(0)
 , m_QUEUE_SIZE(4)
-, m_TRIGGER(FALSE)
+, m_bTrigger(FALSE)
 , m_mode(M_NORMAL)
 , m_commonReference({ FALSE, FALSE, FALSE, FALSE })
 , m_commonGround({ FALSE, FALSE, FALSE, FALSE })
@@ -120,12 +120,12 @@ bool GUSBAmpDriver::initDevice()
     m_isRunning =true;
 
     //after start is initialized, buffer parameters can be calculated:
-    m_nPoints           = m_NUMBER_OF_SCANS * (m_NUMBER_OF_CHANNELS + m_TRIGGER);
+    m_nPoints           = m_iNumberOfScans * (m_chNumberOfChannels + m_bTrigger);
     m_bufferSizeBytes   = HEADER_SIZE + m_nPoints * sizeof(float);
 
     //output of the adjusted parameters:
     qDebug() << "\nFollowing parameters were adjusted:\n";
-    qDebug() << "sample rate:\n" <<m_SAMPLE_RATE_HZ << "Hz" ;
+    qDebug() << "sample rate:\n" <<m_iSampleRateHz << "Hz" ;
     qDebug() << "called device(s):";
     for(deque<LPSTR>::iterator serialNumber = m_callSequenceSerials.begin(); serialNumber != m_callSequenceSerials.end(); serialNumber++){
         qDebug() <<QString(*serialNumber);
@@ -147,23 +147,23 @@ bool GUSBAmpDriver::initDevice()
             m_openedDevicesHandles.push_back(hDevice);
 
             //set the channels from that data should be acquired
-            if (!GT_SetChannels(hDevice, m_channelsToAcquire, m_NUMBER_OF_CHANNELS)){
+            if (!GT_SetChannels(hDevice, m_channelsToAcquire, m_chNumberOfChannels)){
                 throw string("Error on GT_SetChannels: Couldn't set channels to acquire for device ").append(*serialNumber);
             }
             //set the sample rate
-            if (!GT_SetSampleRate(hDevice, m_SAMPLE_RATE_HZ)){
+            if (!GT_SetSampleRate(hDevice, m_iSampleRateHz)){
                 throw string("Error on GT_SetSampleRate: Couldn't set sample rate for device ").append(*serialNumber);
             }
             //disable the trigger line
-            if (!GT_EnableTriggerLine(hDevice, m_TRIGGER)){
+            if (!GT_EnableTriggerLine(hDevice, m_bTrigger)){
                 throw string("Error on GT_EnableTriggerLine: Couldn't enable/disable trigger line for device ").append(*serialNumber);
             }
             //set the number of scans that should be received simultaneously
-            if (!GT_SetBufferSize(hDevice, m_NUMBER_OF_SCANS)){
+            if (!GT_SetBufferSize(hDevice, m_iNumberOfScans)){
                 throw string("Error on GT_SetBufferSize: Couldn't set the buffer size for device ").append(*serialNumber);
             }
             //don't use bandpass and notch for each channel
-            for (int i=0; i<m_NUMBER_OF_CHANNELS; i++)
+            for (int i=0; i<m_chNumberOfChannels; i++)
             {
                 //don't use a bandpass filter for any channel
                 if (!GT_SetBandPass(hDevice, m_channelsToAcquire[i], -1)){
@@ -389,26 +389,26 @@ bool GUSBAmpDriver::getSampleMatrixValue(MatrixXf& sampleMatrix)
         }
 
         //store received data from each device in the correct order (that is scan-wise, where one scan includes all channels of all devices) ignoring the header
-        //Data is aligned as follows: element at position destBuffer(scanIndex * (m_NUMBER_OF_CHANNELS + m_TRIGGER) + channelIndex) * sizeof(float) + HEADER_SIZE is sample of channel channelIndex (zero-based) of the scan with zero-based scanIndex.
+        //Data is aligned as follows: element at position destBuffer(scanIndex * (m_chNumberOfChannels + m_bTrigger) + channelIndex) * sizeof(float) + HEADER_SIZE is sample of channel channelIndex (zero-based) of the scan with zero-based scanIndex.
         //channelIndex ranges from 0..numDevices*numChannelsPerDevices where numDevices equals the number of recorded devices and numChannelsPerDevice the number of channels from each of those devices.
         //It is assumed that all devices provide the same number of channels.
-        for (int scanIndex = 0; scanIndex < m_NUMBER_OF_SCANS; scanIndex++)
+        for (int scanIndex = 0; scanIndex < m_iNumberOfScans; scanIndex++)
         {
             for (int deviceIndex = 0; deviceIndex < m_numDevices; deviceIndex++)
             {
-                for(int channelIndex = 0; channelIndex<m_NUMBER_OF_CHANNELS; channelIndex++)
+                for(int channelIndex = 0; channelIndex<m_chNumberOfChannels; channelIndex++)
                 {
                     BYTE ByteValue[sizeof(float)];
                     float   FloatValue;
 
                     for(int i=0;i<sizeof(float);i++)
                     {
-                        ByteValue[i] = m_buffers[deviceIndex][queueIndex][(scanIndex * (m_NUMBER_OF_CHANNELS + m_TRIGGER) + channelIndex) * sizeof(float) + HEADER_SIZE + i];
+                        ByteValue[i] = m_buffers[deviceIndex][queueIndex][(scanIndex * (m_chNumberOfChannels + m_bTrigger) + channelIndex) * sizeof(float) + HEADER_SIZE + i];
                     }
                     memcpy(&FloatValue, &ByteValue, sizeof(float));
 
                     //store float-value to Matrix
-                    sampleMatrix(channelIndex + deviceIndex*int(m_NUMBER_OF_CHANNELS), scanIndex + queueIndex * m_NUMBER_OF_SCANS) = FloatValue;
+                    sampleMatrix(channelIndex + deviceIndex*int(m_chNumberOfChannels), scanIndex + queueIndex * m_iNumberOfScans) = FloatValue;
                 }
             }
         }
@@ -449,7 +449,7 @@ bool GUSBAmpDriver::setSerials(vector<QString> &list)
         m_vbSerials[i] = list.at(i).toLocal8Bit();  //changing into QByteArray
         m_vpSerials[i] = m_vbSerials.at(i).data();  //creating a pointer on the QByteArray
     }
-    m_SLAVE_SERIALS_SIZE = size - 1;
+    m_iSlaveSerialsSize = size - 1;
 
     //closes the former call-sequence-list
     while (!m_callSequenceSerials.empty())
@@ -457,7 +457,7 @@ bool GUSBAmpDriver::setSerials(vector<QString> &list)
         m_callSequenceSerials.pop_front();
     }
     //defining the new deque-list for data acquisition
-    for (int i=1; i<=m_SLAVE_SERIALS_SIZE; i++){
+    for (int i=1; i<=m_iSlaveSerialsSize; i++){
         m_callSequenceSerials.push_back(m_vpSerials[i]);
     }
     //add the master device at the end of the list!
@@ -482,22 +482,47 @@ bool GUSBAmpDriver::setSampleRate(int sampleRate)
         //choose the number of scans according to the sample rate (see documentation for further hints)
         switch(sampleRate)
         {
-        case 32:    m_NUMBER_OF_SCANS = 1;      break;
-        case 64:    m_NUMBER_OF_SCANS = 2;      break;
-        case 128:   m_NUMBER_OF_SCANS = 8;      break;
-        case 256:   m_NUMBER_OF_SCANS = 16;     break;
-        case 512:   m_NUMBER_OF_SCANS = 32;     break;
-        case 600:   m_NUMBER_OF_SCANS = 64;     break;
-        case 1200:  m_NUMBER_OF_SCANS = 128;    break;
-        case 2400:  m_NUMBER_OF_SCANS = 128;    break;
-        case 4800:  m_NUMBER_OF_SCANS = 256;    break;
-        case 9600:  m_NUMBER_OF_SCANS = 512;    break;
-        case 19200: m_NUMBER_OF_SCANS = 512;    break;
-        case 38400: m_NUMBER_OF_SCANS = 512;    break;
-        default: throw string("Error on setSampleRate(choosed default sample rate of 1200 Hz): please choose between following options:\n"
+        case 32:
+            m_iNumberOfScans = 1;
+            break;
+        case 64:
+            m_iNumberOfScans = 2;
+            break;
+        case 128:
+            m_iNumberOfScans = 8;
+            break;
+        case 256:
+            m_iNumberOfScans = 16;
+            break;
+        case 512:
+            m_iNumberOfScans = 32;
+            break;
+        case 600:
+            m_iNumberOfScans = 64;
+            break;
+        case 1200:
+            m_iNumberOfScans = 128;
+            break;
+        case 2400:
+            m_iNumberOfScans = 128;
+            break;
+        case 4800:
+            m_iNumberOfScans = 256;
+            break;
+        case 9600:
+            m_iNumberOfScans = 512;
+            break;
+        case 19200:
+            m_iNumberOfScans = 512;
+            break;
+        case 38400:
+            m_iNumberOfScans = 512;
+            break;
+        default:
+            throw string("Error on setSampleRate(choosed default sample rate of 1200 Hz): please choose between following options:\n"
                               "32, 64, 128, 256, 512, 600, 1200, 2400, 4800, 9600, 19200 and 38400:\n"); break;
         }
-        m_SAMPLE_RATE_HZ = sampleRate;
+        m_iSampleRateHz = sampleRate;
         //qDebug()<<"Sample Rate is setted"<<endl;
     }
     catch(string& exception)
@@ -506,9 +531,7 @@ bool GUSBAmpDriver::setSampleRate(int sampleRate)
         return false;
     }
     refreshSizeOutputMatrix();
-
-    //cout <<"sample rate [HZ]: \t" <<  m_SAMPLE_RATE_HZ << "\n" << "number of scans [/]:\t" << m_NUMBER_OF_SCANS << "\n";
-
+    //cout <<"sample rate [HZ]: \t" <<  m_iSampleRateHz << "\n" << "number of scans [/]:\t" << m_iNumberOfScans << "\n";
     return true;
 
 }
@@ -543,12 +566,12 @@ bool GUSBAmpDriver::setChannels(vector<int> &list)
         return false;
     }
 
-    m_NUMBER_OF_CHANNELS    = UCHAR(size);
+    m_chNumberOfChannels    = UCHAR(size);
 
     //refilling of the pointer to the channelsToAcquire array
     m_channelsToAcquire = new UCHAR[size];
     //filling the UCHAR array with the values from the list
-    for(int i = 0; i < m_NUMBER_OF_CHANNELS; i++)
+    for(int i = 0; i < m_chNumberOfChannels; i++)
     {
         m_channelsToAcquire[i] = UCHAR(list[i]);
         //cout<< "channel " << int( m_channelsToAcquire[i]) << " setted \n";
@@ -572,7 +595,7 @@ vector<int> GUSBAmpDriver::getSizeOfSampleMatrix(void)
 void GUSBAmpDriver::refreshSizeOutputMatrix(void)
 {
     //refresh size of output matrix
-    m_sizeOfMatrix[0] = (int(m_NUMBER_OF_CHANNELS)*int(1 + m_SLAVE_SERIALS_SIZE));    //number of channels * number of devices (number of channels)
-    m_sizeOfMatrix[1] = (int(m_NUMBER_OF_SCANS)*int(m_QUEUE_SIZE));                   //number of the scanned samples * number of the queues (number of samples)
+    m_sizeOfMatrix[0] = (int(m_chNumberOfChannels)*int(1 + m_iSlaveSerialsSize));    //number of channels * number of devices (number of channels)
+    m_sizeOfMatrix[1] = (int(m_iNumberOfScans)*int(m_QUEUE_SIZE));                   //number of the scanned samples * number of the queues (number of samples)
 }
 

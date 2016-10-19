@@ -5,11 +5,11 @@
 *           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     April 2016
+* @date     April, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2016, Viktor Klüber Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Viktor Klüber Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -86,6 +86,10 @@ SsvepBciSetupStimulusWidget::SsvepBciSetupStimulusWidget(SsvepBci *pSsvepBci, QW
     connect(ui->m_pushButton_test3, &QPushButton::clicked, this, &SsvepBciSetupStimulusWidget::test3);
     connect(ui->m_pushButton_screenKeyboard, &QPushButton::clicked, this, &SsvepBciSetupStimulusWidget::screenKeyboard);
 
+    // connect panel buttons
+    connect(ui->m_comboBox_panelSelection, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &SsvepBciSetupStimulusWidget::panelSelect);
+    connect(ui->m_comboBox_frequencySelect, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &SsvepBciSetupStimulusWidget::frequencySelect);
+
     //Map for all frequencies according to their key
     m_idFreqMap.insert(15,  6   );
     m_idFreqMap.insert(14,  6.66);
@@ -106,12 +110,13 @@ SsvepBciSetupStimulusWidget::SsvepBciSetupStimulusWidget(SsvepBci *pSsvepBci, QW
 
     //initialize combobox for frequencies
     foreach(int i, m_idFreqMap.keys()){
-        ui->comboBox_2->addItem(QString().number(m_idFreqMap[i]));
+        ui->m_comboBox_frequencySelect->addItem(QString().number(m_idFreqMap[i]));
     }
 
     //getting refreshrate of the subject's screen and add it to the setupWidget
     ui->label_6->setText(QString().number(m_pScreen->refreshRate()));
 }
+
 
 //*************************************************************************************************************
 
@@ -146,15 +151,15 @@ void SsvepBciSetupStimulusWidget::changeComboBox()
 {
 
     //clear ComboBox
-    ui->comboBox->clear();
+    ui->m_comboBox_panelSelection->clear();
 
     //create new comobBox list
     for(int i = 1; i <= m_pSsvepBciScreen->m_Items.size(); i++ ){
-        ui->comboBox->addItem(QString().number(i));
+        ui->m_comboBox_panelSelection->addItem(QString().number(i));
     }
 
     m_bIsRunning = true;
-    on_comboBox_currentIndexChanged(0);
+    panelSelect(0);
 }
 
 
@@ -235,6 +240,7 @@ void SsvepBciSetupStimulusWidget::test1()
 
     changeComboBox();
 }
+
 
 //*************************************************************************************************************
 
@@ -327,19 +333,18 @@ void SsvepBciSetupStimulusWidget::screenKeyboard()
 
 //*************************************************************************************************************
 
-void SsvepBciSetupStimulusWidget::on_comboBox_currentIndexChanged(int index)
+void SsvepBciSetupStimulusWidget::panelSelect(int index)
 {
-
     if(m_bIsRunning){
         m_bReadFreq = true;
-        ui->comboBox_2->setCurrentIndex(m_pSsvepBciScreen->m_Items.at(index).m_iFreqKey);//get key of frequency
+        ui->m_comboBox_frequencySelect->setCurrentIndex(m_pSsvepBciScreen->m_Items.at(index).m_iFreqKey);//get key of frequency
     }
 }
 
 
 //*************************************************************************************************************
 
-void SsvepBciSetupStimulusWidget::on_comboBox_2_currentIndexChanged(int index)
+void SsvepBciSetupStimulusWidget::frequencySelect(int index)
 {
     if(m_bIsRunning){
         if(m_bReadFreq){
@@ -347,7 +352,7 @@ void SsvepBciSetupStimulusWidget::on_comboBox_2_currentIndexChanged(int index)
         }
         else{
             //get selected Item from comboBox
-            int ItemSelect = ui->comboBox->currentIndex();
+            int ItemSelect = ui->m_comboBox_panelSelection->currentIndex();
             //adjust the rendering order of the selected Plugin
             setFreq(m_pSsvepBciScreen->m_Items[ItemSelect],index);
         }

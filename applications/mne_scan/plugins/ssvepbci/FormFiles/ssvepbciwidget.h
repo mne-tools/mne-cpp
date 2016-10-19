@@ -9,7 +9,7 @@
 *
 * @section  LICENSE
 *
-* Copyright (C) 2016, Viktor Klüber, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Viktor Klüber, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the ssvepBCIWidget class.
+* @brief    Contains the declaration of the SsvepBciWidget class.
 *
 */
 

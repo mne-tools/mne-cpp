@@ -1,15 +1,15 @@
 #--------------------------------------------------------------------------------------------------------------
 #
 # @file     GUSBAmp.pro
-# @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
-#           Viktor Klüber <viktor.klueber@tu-ilmenau.de>;
+# @author   Viktor Klüber <viktor.klueber@tu-ilmenau.de>;
+#           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
-# @date     Oktober 2016
+# @date     Oktober, 2016
 #
 # @section  LICENSE
 #
-# Copyright (C) 2016, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+# Copyright (C) 2016, Viktor Klüber, Lorenz Esch and Matti Hamalainen. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:

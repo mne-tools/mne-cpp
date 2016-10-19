@@ -161,6 +161,7 @@ void GUSBAmpSetupWidget::setSerialAdresses()
     m_pGUSBAmp->m_vSerials = serials;
 }
 
+
 //*************************************************************************************************************
 
 void GUSBAmpSetupWidget::checkBoxes()
@@ -276,7 +277,7 @@ void GUSBAmpSetupWidget::activateChannelSelect(bool checked)
 
 //*************************************************************************************************************
 
-void GUSBAmpSetupWidget::on_checkBox_clicked()
+void GUSBAmpSetupWidget::activateChannel1()
 {
     checkBoxes();
 }
@@ -284,7 +285,7 @@ void GUSBAmpSetupWidget::on_checkBox_clicked()
 
 //*************************************************************************************************************
 
-void GUSBAmpSetupWidget::on_checkBox_2_clicked()
+void GUSBAmpSetupWidget::activateChannel2()
 {
     checkBoxes();
 }
@@ -292,7 +293,7 @@ void GUSBAmpSetupWidget::on_checkBox_2_clicked()
 
 //*************************************************************************************************************
 
-void GUSBAmpSetupWidget::on_checkBox_3_clicked()
+void GUSBAmpSetupWidget::activateChannel3()
 {
     checkBoxes();
 }
@@ -300,7 +301,7 @@ void GUSBAmpSetupWidget::on_checkBox_3_clicked()
 
 //*************************************************************************************************************
 
-void GUSBAmpSetupWidget::on_checkBox_4_clicked()
+void GUSBAmpSetupWidget::activateChannel4()
 {
     checkBoxes();
 }
@@ -308,7 +309,7 @@ void GUSBAmpSetupWidget::on_checkBox_4_clicked()
 
 //*************************************************************************************************************
 
-void GUSBAmpSetupWidget::on_checkBox_5_clicked()
+void GUSBAmpSetupWidget::activateChannel5()
 {
     checkBoxes();
 }
@@ -316,7 +317,7 @@ void GUSBAmpSetupWidget::on_checkBox_5_clicked()
 
 //*************************************************************************************************************
 
-void GUSBAmpSetupWidget::on_checkBox_6_clicked()
+void GUSBAmpSetupWidget::activateChannel6()
 {
     checkBoxes();
 }
@@ -324,7 +325,7 @@ void GUSBAmpSetupWidget::on_checkBox_6_clicked()
 
 //*************************************************************************************************************
 
-void GUSBAmpSetupWidget::on_checkBox_7_clicked()
+void GUSBAmpSetupWidget::activateChannel7()
 {
     checkBoxes();
 }
@@ -332,7 +333,7 @@ void GUSBAmpSetupWidget::on_checkBox_7_clicked()
 
 //*************************************************************************************************************
 
-void GUSBAmpSetupWidget::on_checkBox_8_clicked()
+void GUSBAmpSetupWidget::activateChannel8()
 {
     checkBoxes();
 }
@@ -340,7 +341,7 @@ void GUSBAmpSetupWidget::on_checkBox_8_clicked()
 
 //*************************************************************************************************************
 
-void GUSBAmpSetupWidget::on_checkBox_9_clicked()
+void GUSBAmpSetupWidget::activateChannel9()
 {
     checkBoxes();
 }
@@ -348,7 +349,7 @@ void GUSBAmpSetupWidget::on_checkBox_9_clicked()
 
 //*************************************************************************************************************
 
-void GUSBAmpSetupWidget::on_checkBox_10_clicked()
+void GUSBAmpSetupWidget::activateChannel10()
 {
     checkBoxes();
 }
@@ -356,7 +357,7 @@ void GUSBAmpSetupWidget::on_checkBox_10_clicked()
 
 //*************************************************************************************************************
 
-void GUSBAmpSetupWidget::on_checkBox_11_clicked()
+void GUSBAmpSetupWidget::activateChannel11()
 {
     checkBoxes();
 }
@@ -364,7 +365,7 @@ void GUSBAmpSetupWidget::on_checkBox_11_clicked()
 
 //*************************************************************************************************************
 
-void GUSBAmpSetupWidget::on_checkBox_12_clicked()
+void GUSBAmpSetupWidget::activateChannel12()
 {
     checkBoxes();
 }
@@ -372,7 +373,7 @@ void GUSBAmpSetupWidget::on_checkBox_12_clicked()
 
 //*************************************************************************************************************
 
-void GUSBAmpSetupWidget::on_checkBox_13_clicked()
+void GUSBAmpSetupWidget::activateChannel13()
 {
     checkBoxes();
 }
@@ -380,7 +381,7 @@ void GUSBAmpSetupWidget::on_checkBox_13_clicked()
 
 //*************************************************************************************************************
 
-void GUSBAmpSetupWidget::on_checkBox_14_clicked()
+void GUSBAmpSetupWidget::activateChannel14()
 {
     checkBoxes();
 }
@@ -388,7 +389,7 @@ void GUSBAmpSetupWidget::on_checkBox_14_clicked()
 
 //*************************************************************************************************************
 
-void GUSBAmpSetupWidget::on_checkBox_15_clicked()
+void GUSBAmpSetupWidget::activateChannel15()
 {
     checkBoxes();
 }
@@ -396,7 +397,7 @@ void GUSBAmpSetupWidget::on_checkBox_15_clicked()
 
 //*************************************************************************************************************
 
-void GUSBAmpSetupWidget::on_checkBox_16_clicked()
+void GUSBAmpSetupWidget::activateChannel16()
 {
     checkBoxes();
 }

@@ -9,7 +9,7 @@
 *
 * @section  LICENSE
 *
-* Copyright (C) 2016, Viktor Klüber, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Viktor Klüber, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -59,12 +59,18 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE SSVEPBCIPLUGIN
+// FORWARD DECLARATIONS
 //=============================================================================================================
 
 namespace Ui {
 class SsvepBciConfigurationWidget;
 }
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE SSVEPBCIPLUGIN
+//=============================================================================================================
 
 namespace SSVEPBCIPLUGIN
 {
@@ -273,9 +279,9 @@ signals:
     void changeSSVEPParameter();
 
 private:
+    // main links
     Ui::SsvepBciConfigurationWidget*        ui;                     /**< Pointer to corresponding user interface. */
     SsvepBci*                               m_pSsvepBci;            /**< A pointer to corresponding SsvepBci class. */
-
     // configuration parameter
     QStringList                             m_vAvailableChannelsSensor;                 /**< QStringList holding available features to select on sensor level (electrodes).*/
     double                                  m_dMinProbValue;                            /**< Minimum border for SSVEP visualization with a status bar. */
