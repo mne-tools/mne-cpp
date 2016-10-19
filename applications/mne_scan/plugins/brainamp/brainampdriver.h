@@ -1,15 +1,15 @@
 //=============================================================================================================
 /**
-* @file     eegosportsdriver.h
+* @file     brainampdriver.h
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+*           Viktor Klüber <Viktor.Klüber@tu-ilmenau.de>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     July, 2014
+* @date     October, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2106, Lorenz Esch, Viktor Klüber and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,12 +30,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the EEGoSportsDriver class. This class implements the basic communication between MNE-X and a ANT EEGoSports device
+* @brief    Contains the declaration of the BrainAmpDriver class.
 *
 */
 
-#ifndef EEGOSPORTSDRIVER_H
-#define EEGOSPORTSDRIVER_H
+#ifndef BRAINAMPDRIVER_H
+#define BRAINAMPDRIVER_H
 
 
 //*************************************************************************************************************
@@ -43,21 +43,13 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <iostream>
-#include <fstream>
-#include <cmath>
-#include <cstring>
-#include <vector>
-#include <map>
-#include <tchar.h>
-#include <string.h>
+#include "BrainAmpIoCtl.h"
 #include <windows.h>
-#include <eemagine/sdk/factory.h> // SDK header
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Eigen INCLUDES
+// EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
@@ -76,17 +68,11 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE TMSIPlugin
+// DEFINE NAMESPACE BRAINAMPPLUGIN
 //=============================================================================================================
 
-namespace EEGOSPORTSPLUGIN
+namespace BRAINAMPPLUGIN
 {
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
 
 
 //*************************************************************************************************************
@@ -94,7 +80,7 @@ namespace EEGOSPORTSPLUGIN
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class EEGoSportsProducer;
+class BrainAmpProducer;
 
 
 //*************************************************************************************************************
@@ -102,31 +88,46 @@ class EEGoSportsProducer;
 // DEFINES
 //=============================================================================================================
 
-#define EEGO_SDK_BIND_DYNAMIC // How to bind
+// Number of ELements
+#define NEL(x)  (sizeof(x) / sizeof(x[0]))
+
+// Device names, in case that more than one device is used
+//    (PCI systems with more than 128 channels),
+//    the second device is named "\\\\.\\BrainAmp2".
+// #define DEVICE_PCI		"\\\\.\\BrainAmp1"		// ISA/PCI device
+#define DEVICE_PCI		"\\\\.\\BrainAmp"			// ISA/PCI device
+#define DEVICE_USB		"\\\\.\\BrainAmpUSB1"		// USB device
+
+// Different amplifier types
+enum AmpTypes
+{
+    None = 0, Standard = 1, MR = 2, DCMRplus = 3, ExG_8 = 4, ExG_16 = 5
+};
 
 
 //=============================================================================================================
 /**
-* EEGoSportsDriver
+* BrainAmpDriver
 *
-* @brief The EEGoSportsDriver class provides real time data acquisition of EEG data with a TMSi Refa device.
+* @brief The BrainAmpDriver class provides real time data acquisition of EEG data with a Brain Amp device.
 */
-class EEGoSportsDriver
+class BrainAmpDriver
 {
+
 public:
     //=========================================================================================================
     /**
-    * Constructs a EEGoSportsDriver.
+    * Constructs a BrainAmpDriver.
     *
     * @param [in] pEEGoSportsProducer a pointer to the corresponding EEGoSports Producer class.
     */
-    EEGoSportsDriver(EEGoSportsProducer* pEEGoSportsProducer);
+    BrainAmpDriver(BrainAmpProducer* pBrainAmpProducer);
 
     //=========================================================================================================
     /**
-    * Destroys the EEGoSportsDriver.
+    * Destroys the BrainAmpDriver.
     */
-    ~EEGoSportsDriver();
+    ~BrainAmpDriver();
 
     //=========================================================================================================
     /**
@@ -155,32 +156,45 @@ public:
 
     //=========================================================================================================
     /**
+    * Opens the device.
+    */
+    void openDevice();
+
+    //=========================================================================================================
+    /**
     * Uninitialise device.
-    * @param [out] bool returns true if device was successfully uninitialised, false otherwise.
+    *
+    * @return returns true if device was successfully uninitialised, false otherwise.
     */
     bool uninitDevice();
 
 private:
-    EEGoSportsProducer*         m_pEEGoSportsProducer;          /**< A pointer to the corresponding EEGoSportsProducer class.*/
+    BrainAmpProducer*           m_pBrainAmpProducer;                /**< A pointer to the corresponding BrainAmpProducer class.*/
 
-    bool                        m_bInitDeviceSuccess;           /**< Flag which defines if the device initialisation was successfull.*/
-    bool                        m_bDllLoaded;                   /**< Flag which defines if the driver DLL was loaded successfully.*/
+    bool                        m_bInitDeviceSuccess;               /**< Flag which defines if the device initialisation was successfull.*/
+    bool                        m_bDllLoaded;                       /**< Flag which defines if the driver DLL was loaded successfully.*/
 
-    uint                        m_uiNumberOfChannels;           /**< The number of channels defined by the user via the GUI.*/
-    uint                        m_uiSamplingFrequency;          /**< The sampling frequency defined by the user via the GUI (in Hertz).*/
-    uint                        m_uiSamplesPerBlock;            /**< The samples per block defined by the user via the GUI.*/
-    bool                        m_bWriteDriverDebugToFile;      /**< Flag for for writing driver debug informstions to a file. Defined by the user via the GUI.*/
-    QString                     m_sOutputFilePath;              /**< Holds the path for the output file. Defined by the user via the GUI.*/
-    bool                        m_bMeasureImpedances;           /**< Flag for impedance measuring mode.*/
+    uint                        m_uiNumberOfChannels;               /**< The number of channels defined by the user via the GUI.*/
+    uint                        m_uiSamplingFrequency;              /**< The sampling frequency defined by the user via the GUI (in Hertz).*/
+    uint                        m_uiSamplesPerBlock;                /**< The samples per block defined by the user via the GUI.*/
+    bool                        m_bWriteDriverDebugToFile;          /**< Flag for for writing driver debug informstions to a file. Defined by the user via the GUI.*/
+    QString                     m_sOutputFilePath;                  /**< Holds the path for the output file. Defined by the user via the GUI.*/
+    bool                        m_bMeasureImpedances;               /**< Flag for impedance measuring mode.*/
 
-    QVector<Eigen::VectorXd>    m_vecSampleBlockBuffer;         /**< Buffer to store all the incoming smaples. This is the buffer which is getting read from.*/
+    std::ofstream               m_outputFileStream;                 /**< fstream for writing the driver debug informations to a txt file.*/
 
-    eemagine::sdk::stream*      m_pDataStream;                  /**< The EEG/Impedance data stream.*/
-    eemagine::sdk::amplifier*   m_pAmplifier;                   /**< Interface to the amplifier.*/
+    HANDLE                      DeviceAmp = INVALID_HANDLE_VALUE;   /**< Amplifier device.*/
 
-    std::ofstream               m_outputFileStream;             /**< fstream for writing the driver debug informations to a txt file.*/
+    bool                        UsbDevice = false;                  /**< If true, the connected device is an USB box, otherwise a PCI/ISA host adapter.*/
+
+    int                         DriverVersion = 0;                  /**< Driver version.*/
+
+    AmpTypes amplifiers[4] = { None, None, None, None };            /**< Connected amplifiers.*/
+
+    BA_SETUP                    Setup;                              /**< Setup structure.*/
+
 };
 
 } // NAMESPACE
 
-#endif // EEGOSPORTSDRIVER_H
+#endif // BrainAmpDriver_H

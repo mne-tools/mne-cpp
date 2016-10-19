@@ -1,15 +1,15 @@
 //=============================================================================================================
 /**
-* @file     eegosportsdriver.cpp
+* @file     brainampdriver.cpp
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Viktor Klüber <Viktor.Klüber@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     July, 2014
+* @date     July, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2106, Lorenz Esch, Viktor Klüber and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the EEGoSportsDriver class.
+* @brief    Contains the implementation of the BrainAmpDriver class.
 *
 */
 
@@ -39,10 +39,13 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "eegosportsdriver.h"
-#include "eegosportsproducer.h"
+#include "brainampdriver.h"
+#include "brainampproducer.h"
 
-#include <eemagine/sdk/wrapper.cc> // Wrapper code to be compiled.
+#include <conio.h>
+#include <stdio.h>
+#include <io.h>
+#include <vector>
 
 
 //*************************************************************************************************************
@@ -50,8 +53,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace EEGOSPORTSPLUGIN;
-using namespace eemagine::sdk;
+using namespace BRAINAMPPLUGIN;
+using namespace std;
 
 
 //*************************************************************************************************************
@@ -59,80 +62,108 @@ using namespace eemagine::sdk;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-EEGoSportsDriver::EEGoSportsDriver(EEGoSportsProducer* pEEGoSportsProducer)
-: m_pEEGoSportsProducer(pEEGoSportsProducer)
-, m_bDllLoaded(true)
+BrainAmpDriver::BrainAmpDriver(BrainAmpProducer* pBrainAmpProducer)
+: m_pBrainAmpProducer(pBrainAmpProducer)
 , m_bInitDeviceSuccess(false)
-, m_uiNumberOfChannels(64)
-, m_uiSamplingFrequency(512)
-, m_uiSamplesPerBlock(100)
+, m_uiNumberOfChannels(32)
+, m_uiSamplingFrequency(1000)
+, m_uiSamplesPerBlock(200)
 , m_bWriteDriverDebugToFile(false)
-, m_sOutputFilePath("/mne_x_plugins/resources/eegosports")
+, m_sOutputFilePath("/mne_scan_plugins/resources/brainamp")
 , m_bMeasureImpedances(false)
 {
-    m_bDllLoaded = true;
 }
 
 
 //*************************************************************************************************************
 
-EEGoSportsDriver::~EEGoSportsDriver()
+BrainAmpDriver::~BrainAmpDriver()
 {
-    //cout << "EEGoSportsDriver::~EEGoSportsDriver()" << endl;
 }
 
 
 //*************************************************************************************************************
 
-bool EEGoSportsDriver::initDevice(int iNumberOfChannels,
+bool BrainAmpDriver::initDevice(int iNumberOfChannels,
                             int iSamplesPerBlock,
                             int iSamplingFrequency,
                             bool bWriteDriverDebugToFile,
                             QString sOutpuFilePath,
                             bool bMeasureImpedance)
 {
-    //Check if the driver DLL was loaded
-    if(!m_bDllLoaded)
-        return false;
+    Q_UNUSED(iNumberOfChannels);
+    Q_UNUSED(iSamplesPerBlock);
+    Q_UNUSED(iSamplingFrequency);
+    Q_UNUSED(bWriteDriverDebugToFile);
+    Q_UNUSED(sOutpuFilePath);
+    Q_UNUSED(bMeasureImpedance);
 
-    //Set global variables
-    m_uiNumberOfChannels = iNumberOfChannels;
-    m_uiSamplesPerBlock = iSamplesPerBlock;
-    m_uiSamplingFrequency = iSamplingFrequency;
-    m_bWriteDriverDebugToFile = bWriteDriverDebugToFile;
-    m_sOutputFilePath = sOutpuFilePath;
-    m_bMeasureImpedances = bMeasureImpedance;
+    printf("*** BrainAmp Control Example Program ***\n\n");
 
-    //Open debug file to write to
-    if(m_bWriteDriverDebugToFile)
-        m_outputFileStream.open("mne_x_plugins/resources/eegosports/EEGoSports_Driver_Debug.txt", std::ios::trunc); //ios::trunc deletes old file data
-
-    try {
-        // Get device handler
-        factory factoryObj ("eego-SDK.dll"); // Make sure that eego-SDK.dll resides in the working directory
-        m_pAmplifier = factoryObj.getAmplifier(); // Get an amplifier
-
-        //std::cout<<"EEGoSportsDriver::initDevice - Serial number of connected eegosports device: "<<m_pAmplifier->getSerialNumber()<<std::endl;
-
-        //Start the stream
-        if(bMeasureImpedance) {
-            m_pDataStream = m_pAmplifier->OpenImpedanceStream(m_uiSamplingFrequency);
-        } else {            
-            //reference_range the range, in volt, for the referential channels. Valid values are: 1, 0.75, 0.15
-            //bipolar_range the range, in volt, for the bipolar channels. Valid values are: 4, 1.5, 0.7, 0.35
-            double reference_range = 1; //0.15;
-            double bipolar_range = 4;
-
-            m_pDataStream = m_pAmplifier->OpenEegStream(m_uiSamplingFrequency, reference_range, bipolar_range);
-        }
-
-        Sleep(100);
-    } catch (std::runtime_error& e) {
-        std::cout <<"EEGoSportsDriver::initDevice - error " << e.what() << std::endl;
-        return false;
+    // Open device
+    if (!OpenDevice())
+    {
+        printf("No BrainAmp USB adapter and no ISA/PCI adapter found!\n");
+        return -1;
     }
 
-    std::cout << "EEGoSportsDriver::initDevice - Successfully initialised the device." << std::endl;
+    // Show version
+    unsigned nModule = DriverVersion % 10000,
+             nMinor = (DriverVersion % 1000000) / 10000,
+             nMajor = DriverVersion / 1000000;
+
+    printf("%s Driver Found, Version %u.%02u.%04u\n",
+            UsbDevice ? "USB" : "ISA/PCI", nMajor, nMinor, nModule);
+
+    // Send simplest setup, 32 channels, one amp. AC, 1000Hz, 100nV
+    Setup.nChannels = 32;
+    Setup.nHoldValue = 0x0;		// Value without trigger
+    Setup.nPoints = 40 * 5;		// 5 kHz = 5 points per ms -> 40 ms data block
+
+    for (int i = 0; i < Setup.nChannels; i++) {
+        Setup.nChannelList[i] = i;
+    }
+
+    DWORD dwBytesReturned = 0;
+    if (!DeviceIoControl(DeviceAmp, IOCTL_BA_SETUP, &Setup,
+        sizeof(Setup), NULL, 0, &dwBytesReturned, NULL))
+    {
+        printf("Setup failed, error code: %u\n", ::GetLastError());
+    }
+
+//    //Start acqusition process
+//    // Pulldown input resistors for trigger input, (active high)
+//    unsigned short pullup = 0;
+//    DWORD dwBytesReturned = 0;
+//    if (!DeviceIoControl(DeviceAmp, IOCTL_BA_DIGITALINPUT_PULL_UP, &pullup,
+//        sizeof(pullup), NULL, 0, &dwBytesReturned, NULL))
+//    {
+//        printf("Can't set pull up/down resistors, error code: %u\n",
+//            ::GetLastError());
+//    }
+
+//    // Make sure that amps exist, otherwise a long timeout will occur.
+//    int nHighestChannel = 0;
+//    for (int i = 0; i < Setup.nChannels; i++)
+//    {
+//        nHighestChannel = max(Setup.nChannelList[i], nHighestChannel);
+//    }
+//    int nRequiredAmps = (nHighestChannel + 1) / 32;
+//    int nAmps = FindAmplifiers();
+//    if (nAmps < nRequiredAmps)
+//    {
+//        printf("Required Amplifiers: %d, Connected Amplifiers: %d\n",
+//            nRequiredAmps, nAmps);
+//        return;
+//    }
+
+//    // Start acquisition
+//    long acquisitionType = 1;
+//    if (!DeviceIoControl(DeviceAmp, IOCTL_BA_START, &acquisitionType,
+//        sizeof(acquisitionType), NULL, 0, &dwBytesReturned, NULL))
+//    {
+//        printf("Start failed, error code: %u\n", ::GetLastError());
+//    }
 
     // Set flag for successfull initialisation true
     m_bInitDeviceSuccess = true;
@@ -143,7 +174,40 @@ bool EEGoSportsDriver::initDevice(int iNumberOfChannels,
 
 //*************************************************************************************************************
 
-bool EEGoSportsDriver::uninitDevice()
+bool BrainAmpDriver::openDevice()
+{
+    DWORD dwFlags = FILE_ATTRIBUTE_NORMAL | FILE_FLAG_WRITE_THROUGH;
+    // First try USB box
+    DeviceAmp = CreateFile(DEVICE_USB, GENERIC_READ | GENERIC_WRITE, 0, NULL,
+                                OPEN_EXISTING, dwFlags, NULL);
+    if (DeviceAmp != INVALID_HANDLE_VALUE)
+    {
+        UsbDevice = true;
+    }
+    else
+    {
+        // USB box not found, try PCI host adapter
+        UsbDevice = false;;
+        DeviceAmp = CreateFile(DEVICE_PCI, GENERIC_READ | GENERIC_WRITE, 0, NULL,
+                                OPEN_EXISTING, dwFlags, NULL);
+    }
+
+    // Retrieve driver version
+    if (DeviceAmp != INVALID_HANDLE_VALUE)
+    {
+        DriverVersion = 0;
+        DWORD dwBytesReturned;
+        DeviceIoControl(DeviceAmp, IOCTL_BA_DRIVERVERSION, NULL, 0, &DriverVersion,
+                        sizeof(DriverVersion), &dwBytesReturned, NULL);
+    }
+
+    return DeviceAmp != INVALID_HANDLE_VALUE;
+}
+
+
+//*************************************************************************************************************
+
+bool BrainAmpDriver::uninitDevice()
 {
     //Check if the device was initialised
     if(!m_bInitDeviceSuccess)
@@ -152,115 +216,75 @@ bool EEGoSportsDriver::uninitDevice()
         return false;
     }
 
-    //Check if the driver DLL was loaded
-    if(!m_bDllLoaded)
+    // Stop acquisition
+    if (!DeviceIoControl(DeviceAmp, IOCTL_BA_STOP, NULL, 0, NULL, 0,
+        &dwBytesReturned, NULL))
     {
-        std::cout << "Plugin EEGoSports - ERROR - uninitDevice() - Driver DLL was not loaded" << std::endl;
-        return false;
+        printf("Stop failed, error code: %u\n", ::GetLastError());
     }
 
-    //Close the output stream/file
-    if(m_outputFileStream.is_open() && m_bWriteDriverDebugToFile)
-    {
-        m_outputFileStream.close();
-        m_outputFileStream.clear();
-    }
-
-    delete m_pDataStream;
-    delete m_pAmplifier;
-
-    std::cout << "Plugin EEGoSports - INFO - uninitDevice() - Successfully uninitialised the device" << std::endl;
     return true;
 }
 
 
 //*************************************************************************************************************
 
-bool EEGoSportsDriver::getSampleMatrixValue(Eigen::MatrixXd &sampleMatrix)
+bool BrainAmpDriver::getSampleMatrixValue(Eigen::MatrixXd &sampleMatrix)
 {
-    //Check if device was initialised and connected correctly
-    if(!m_bInitDeviceSuccess)
-    {
-        std::cout << "Plugin EEGoSports - ERROR - getSampleMatrixValue() - Cannot start to get samples from device because device was not initialised correctly" << std::endl;
-        return false;
-    }
+//    //Check if device was initialised and connected correctly
+//    if(!m_bInitDeviceSuccess)
+//    {
+//        std::cout << "Plugin EEGoSports - ERROR - getSampleMatrixValue() - Cannot start to get samples from device because device was not initialised correctly" << std::endl;
+//        return false;
+//    }
 
-    sampleMatrix = MatrixXd(90, m_uiSamplesPerBlock);
-    sampleMatrix.setZero(); // Clear matrix - set all elements to zero
+//    sampleMatrix = MatrixXd(Setup.nChannels + 1, Setup.nPoints);
+//    sampleMatrix.setZero(); // Clear matrix - set all elements to zero
 
-    uint iSamplesWrittenToMatrix = 0;
-    int sampleMax = 0;
-    int sampleIterator = 0;
+//    // Get the data
+//    // Data including marker channel
+//    vector<short>pnData((Setup.nChannels + 1) * Setup.nPoints);
 
-    //get samples from device until the complete matrix is filled, i.e. the samples per block size is met
-    while(iSamplesWrittenToMatrix < m_uiSamplesPerBlock)
-    {
-        //Get sample block from device
-        buffer buf = m_pDataStream->getData();
+//    // Pure data
+//    vector<short>pnPureData(Setup.nChannels * Setup.nPoints);
 
-        int iReceivedSamples = buf.getSampleCount();
-        int iChannelCount = buf.getChannelCount();
+//    unsigned short nLastMarkerValue = 0;
+//    unsigned nDataOffset = 0;
+//    unsigned int nMarkerNumber = 0;
 
-        //Only do the next steps if there was at least one sample received, otherwise skip and wait until at least one sample was received
-        if(iReceivedSamples > 0)
-        {
-            int actualSamplesWritten = 0; //Holds the number of samples which are actually written to the matrix in this while procedure
+//    printf("Press any key to stop the recording...\n");
 
-            //Write the received samples to an extra buffer, so that they are not getting lost if too many samples were received. These are then written to the next matrix (block)
-            for(int i=0; i<iReceivedSamples; i++) {
-                VectorXd vec(iChannelCount);
+//    // Check for error
+//    int nTemp = 0;
+//    DWORD dwBytesReturned;
+//    if (!DeviceIoControl(DeviceAmp, IOCTL_BA_ERROR_STATE, NULL, 0,
+//            &nTemp, sizeof(nTemp), &dwBytesReturned, NULL))
+//    {
+//        printf("Acquisition Error, GetLastError(): %d\n", ::GetLastError());
+//        return false;
+//    }
+//    if (nTemp != 0)
+//    {
+//        printf("Acquisition Error %d\n", nTemp);
+//        return false;
+//    }
 
-                for(uint j=0; j<iChannelCount; j++) {
-                    vec(j) = buf.getSample(j,i);
-                    //std::cout<<vec(j)<<std::endl;
-                }
+//    // Receive data
+//    int nTransferSize = (int)pnData.size() * sizeof(short);
+//    if (!ReadFile(DeviceAmp, &pnData[0], nTransferSize, &dwBytesReturned, NULL))
+//    {
+//        printf("Acquisition Error, GetLastError(): %d\n", ::GetLastError());
+//        return false;
+//    }
 
-                m_vecSampleBlockBuffer.push_back(vec);
-            }
+//    //Transform into matrix structure
+//    for (int i = 0; i < Setup.nPoints; ++i) {
+//        for (int n = 0; n < Setup.nChannels; ++n) {
+//            sampleMatrix(n,i) = *(pSrc++);
+//        }
+//    }
 
-            //If the number of the samples which were already written to the matrix plus the last received number of samples is larger then the defined block size
-            //-> only fill until the matrix is completeley filled with samples. The other (unused) samples are still stored in the vector buffer m_vSampleBlockBuffer and will be used in the next matrix which is to be sent to the circular buffer
-            if(iSamplesWrittenToMatrix + iReceivedSamples > m_uiSamplesPerBlock)
-                sampleMax = m_uiSamplesPerBlock - iSamplesWrittenToMatrix + sampleIterator;
-            else
-                sampleMax = iReceivedSamples + sampleIterator;
-
-            //Read the needed number of samples from the vector buffer to store them in the matrix
-            for(; sampleIterator < sampleMax; sampleIterator++)
-            {
-                sampleMatrix.col(sampleIterator) = m_vecSampleBlockBuffer.first();
-                m_vecSampleBlockBuffer.pop_front();
-
-                actualSamplesWritten ++;
-            }
-
-            iSamplesWrittenToMatrix = iSamplesWrittenToMatrix + actualSamplesWritten;
-        }
-
-//        std::cout << "buf.getSampleCount(): " << buf.getSampleCount() << std::endl;
-//        std::cout << "buf.getChannelCount(): " << buf.getChannelCount() << std::endl;
-//        std::cout << "buf.size(): " << buf.size() << std::endl;
-//        std::cout << "iReceivedSamples: " << iReceivedSamples << std::endl;
-//        std::cout << "sampleMax: " << sampleMax << std::endl;
-//        std::cout << "sampleIterator: " << sampleIterator << std::endl;
-//        std::cout << "iSamplesWrittenToMatrix: " << iSamplesWrittenToMatrix << std::endl;
-//        std::cout << "m_uiSamplesPerBlock: " << m_uiSamplesPerBlock << std::endl;
-//        std::cout << "m_uiSamplesPerBlock: " << m_uiSamplesPerBlock << std::endl << std::endl;
-
-        if(m_outputFileStream.is_open() && m_bWriteDriverDebugToFile)
-        {
-            m_outputFileStream << "buf.getSampleCount(): " << buf.getSampleCount() << std::endl;
-            m_outputFileStream << "buf.getChannelCount(): " << buf.getChannelCount() << std::endl;
-            m_outputFileStream << "buf.size(): " << buf.size() << std::endl;
-            m_outputFileStream << "iReceivedSamples: " << iReceivedSamples << std::endl;
-            m_outputFileStream << "sampleMax: " << sampleMax << std::endl;
-            m_outputFileStream << "sampleIterator: " << sampleIterator << std::endl;
-            m_outputFileStream << "iSamplesWrittenToMatrix: " << iSamplesWrittenToMatrix << std::endl << std::endl;
-            m_outputFileStream << "m_vecSampleBlockBuffer.size(): " << m_vecSampleBlockBuffer.size() << std::endl;
-        }
-    }
-
-    Sleep(100);
+//    Sleep(100);
 
     return true;
 }
