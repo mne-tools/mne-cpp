@@ -72,10 +72,28 @@ GUSBAmpSetupWidget::GUSBAmpSetupWidget(GUSBAmp* pGUSBAmp, QWidget* parent)
 {
     ui.setupUi(this);
 
-    //Connections
+    // connect push buttones and group boxes
     connect(ui.m_qPushButton_About, &QPushButton::released, this, &GUSBAmpSetupWidget::showAboutDialog);
     connect(ui.m_pushButton_setSerials, &QPushButton::clicked, this, &GUSBAmpSetupWidget::setSerialAdresses);
     connect(ui.ChannelSelect, &QGroupBox::clicked, this, &GUSBAmpSetupWidget::activateChannelSelect);
+
+    // connect check boxes
+    connect(ui.m_checkBox_channel1, &QCheckBox::clicked, this, &GUSBAmpSetupWidget::activateChannel1);
+    connect(ui.m_checkBox_channel2, &QCheckBox::clicked, this, &GUSBAmpSetupWidget::activateChannel2);
+    connect(ui.m_checkBox_channel3, &QCheckBox::clicked, this, &GUSBAmpSetupWidget::activateChannel3);
+    connect(ui.m_checkBox_channel4, &QCheckBox::clicked, this, &GUSBAmpSetupWidget::activateChannel4);
+    connect(ui.m_checkBox_channel5, &QCheckBox::clicked, this, &GUSBAmpSetupWidget::activateChannel5);
+    connect(ui.m_checkBox_channel6, &QCheckBox::clicked, this, &GUSBAmpSetupWidget::activateChannel6);
+    connect(ui.m_checkBox_channel7, &QCheckBox::clicked, this, &GUSBAmpSetupWidget::activateChannel7);
+    connect(ui.m_checkBox_channel8, &QCheckBox::clicked, this, &GUSBAmpSetupWidget::activateChannel8);
+    connect(ui.m_checkBox_channel9, &QCheckBox::clicked, this, &GUSBAmpSetupWidget::activateChannel9);
+    connect(ui.m_checkBox_channel10, &QCheckBox::clicked, this, &GUSBAmpSetupWidget::activateChannel10);
+    connect(ui.m_checkBox_channel11, &QCheckBox::clicked, this, &GUSBAmpSetupWidget::activateChannel11);
+    connect(ui.m_checkBox_channel12, &QCheckBox::clicked, this, &GUSBAmpSetupWidget::activateChannel12);
+    connect(ui.m_checkBox_channel13, &QCheckBox::clicked, this, &GUSBAmpSetupWidget::activateChannel13);
+    connect(ui.m_checkBox_channel14, &QCheckBox::clicked, this, &GUSBAmpSetupWidget::activateChannel14);
+    connect(ui.m_checkBox_channel15, &QCheckBox::clicked, this, &GUSBAmpSetupWidget::activateChannel15);
+    connect(ui.m_checkBox_channel16, &QCheckBox::clicked, this, &GUSBAmpSetupWidget::activateChannel16);
 
     ui.comboBox->setCurrentIndex(2);
 }
@@ -168,52 +186,52 @@ void GUSBAmpSetupWidget::checkBoxes()
 {
     vector<int> list;
 
-    if(ui.checkBox->isChecked())
+    if(ui.m_checkBox_channel1->isChecked())
         list.push_back(1);
 
-    if(ui.checkBox_2->isChecked())
+    if(ui.m_checkBox_channel2->isChecked())
         list.push_back(2);
 
-    if(ui.checkBox_3->isChecked())
+    if(ui.m_checkBox_channel3->isChecked())
         list.push_back(3);
 
-    if(ui.checkBox_4->isChecked())
+    if(ui.m_checkBox_channel4->isChecked())
         list.push_back(4);
 
-    if(ui.checkBox_5->isChecked())
+    if(ui.m_checkBox_channel5->isChecked())
         list.push_back(5);
 
-    if(ui.checkBox_6->isChecked())
+    if(ui.m_checkBox_channel6->isChecked())
         list.push_back(6);
 
-    if(ui.checkBox_7->isChecked())
+    if(ui.m_checkBox_channel7->isChecked())
         list.push_back(7);
 
-    if(ui.checkBox_8->isChecked())
+    if(ui.m_checkBox_channel8->isChecked())
         list.push_back(8);
 
-    if(ui.checkBox_9->isChecked())
+    if(ui.m_checkBox_channel9->isChecked())
         list.push_back(9);
 
-    if(ui.checkBox_10->isChecked())
+    if(ui.m_checkBox_channel10->isChecked())
         list.push_back(10);
 
-    if(ui.checkBox_11->isChecked())
+    if(ui.m_checkBox_channel11->isChecked())
         list.push_back(11);
 
-    if(ui.checkBox_12->isChecked())
+    if(ui.m_checkBox_channel12->isChecked())
         list.push_back(12);
 
-    if(ui.checkBox_13->isChecked())
+    if(ui.m_checkBox_channel13->isChecked())
         list.push_back(13);
 
-    if(ui.checkBox_14->isChecked())
+    if(ui.m_checkBox_channel14->isChecked())
         list.push_back(14);
 
-    if(ui.checkBox_15->isChecked())
+    if(ui.m_checkBox_channel15->isChecked())
         list.push_back(15);
 
-    if(ui.checkBox_16->isChecked())
+    if(ui.m_checkBox_channel16->isChecked())
         list.push_back(16);
 
     if(!list.empty())
@@ -231,44 +249,44 @@ void GUSBAmpSetupWidget::activateChannelSelect(bool checked)
 {
     if(!checked)
     {
-        ui.checkBox->setChecked(true);
-        ui.checkBox_2->setChecked(true);
-        ui.checkBox_3->setChecked(true);
-        ui.checkBox_4->setChecked(true);
-        ui.checkBox_5->setChecked(true);
-        ui.checkBox_6->setChecked(true);
-        ui.checkBox_7->setChecked(true);
-        ui.checkBox_8->setChecked(true);
-        ui.checkBox_9->setChecked(true);
-        ui.checkBox_10->setChecked(true);
-        ui.checkBox_11->setChecked(true);
-        ui.checkBox_12->setChecked(true);
-        ui.checkBox_13->setChecked(true);
-        ui.checkBox_14->setChecked(true);
-        ui.checkBox_15->setChecked(true);
-        ui.checkBox_16->setChecked(true);
+        ui.m_checkBox_channel1->setChecked(true);
+        ui.m_checkBox_channel2->setChecked(true);
+        ui.m_checkBox_channel3->setChecked(true);
+        ui.m_checkBox_channel4->setChecked(true);
+        ui.m_checkBox_channel5->setChecked(true);
+        ui.m_checkBox_channel6->setChecked(true);
+        ui.m_checkBox_channel7->setChecked(true);
+        ui.m_checkBox_channel8->setChecked(true);
+        ui.m_checkBox_channel9->setChecked(true);
+        ui.m_checkBox_channel10->setChecked(true);
+        ui.m_checkBox_channel11->setChecked(true);
+        ui.m_checkBox_channel12->setChecked(true);
+        ui.m_checkBox_channel13->setChecked(true);
+        ui.m_checkBox_channel14->setChecked(true);
+        ui.m_checkBox_channel15->setChecked(true);
+        ui.m_checkBox_channel16->setChecked(true);
 
         checkBoxes();
     }
 
     if(checked)
     {
-        ui.checkBox->setChecked(false);
-        ui.checkBox_2->setChecked(false);
-        ui.checkBox_3->setChecked(false);
-        ui.checkBox_4->setChecked(false);
-        ui.checkBox_5->setChecked(false);
-        ui.checkBox_6->setChecked(false);
-        ui.checkBox_7->setChecked(false);
-        ui.checkBox_8->setChecked(false);
-        ui.checkBox_9->setChecked(false);
-        ui.checkBox_10->setChecked(false);
-        ui.checkBox_11->setChecked(false);
-        ui.checkBox_12->setChecked(false);
-        ui.checkBox_13->setChecked(false);
-        ui.checkBox_14->setChecked(false);
-        ui.checkBox_15->setChecked(false);
-        ui.checkBox_16->setChecked(false);
+        ui.m_checkBox_channel1->setChecked(false);
+        ui.m_checkBox_channel2->setChecked(false);
+        ui.m_checkBox_channel3->setChecked(false);
+        ui.m_checkBox_channel4->setChecked(false);
+        ui.m_checkBox_channel5->setChecked(false);
+        ui.m_checkBox_channel6->setChecked(false);
+        ui.m_checkBox_channel7->setChecked(false);
+        ui.m_checkBox_channel8->setChecked(false);
+        ui.m_checkBox_channel9->setChecked(false);
+        ui.m_checkBox_channel10->setChecked(false);
+        ui.m_checkBox_channel11->setChecked(false);
+        ui.m_checkBox_channel12->setChecked(false);
+        ui.m_checkBox_channel13->setChecked(false);
+        ui.m_checkBox_channel14->setChecked(false);
+        ui.m_checkBox_channel15->setChecked(false);
+        ui.m_checkBox_channel16->setChecked(false);
 
         checkBoxes();
     }
