@@ -50,7 +50,7 @@
 #include <scMeas/newrealtimesamplearray.h>
 #include <scMeas/newrealtimemultisamplearray.h>
 #include <scMeas/realtimesourceestimate.h>
-#include <utils/filtertools/filterdata.h>
+#include <utils/filterTools/filterdata.h>
 
 #include <fstream>
 #include <iostream>
