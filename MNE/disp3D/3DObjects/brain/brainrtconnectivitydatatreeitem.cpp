@@ -94,6 +94,7 @@ BrainRTConnectivityDataTreeItem::BrainRTConnectivityDataTreeItem(int iType, cons
 : AbstractTreeItem(iType, text)
 , m_bIsInit(false)
 , m_bNodesPlotted(false)
+, m_pItemNetworkThreshold(new MetaTreeItem())
 , m_pParentEntity(new Qt3DCore::QEntity())
 , m_pRenderable3DEntity(new Renderable3DEntity())
 {
@@ -135,6 +136,27 @@ bool BrainRTConnectivityDataTreeItem::init(Qt3DCore::QEntity* parent)
     m_pParentEntity = parent;
     m_pRenderable3DEntity = new Renderable3DEntity(parent);
 
+    //Add meta information as item children
+    QList<QStandardItem*> list;
+
+    QVariant data;
+
+    QVector3D vecEdgeTrehshold(0,5,10);
+    m_pItemNetworkThreshold = new MetaTreeItem(MetaTreeItemTypes::NetworkThreshold, "0.0,5.0,10.0");
+    list << m_pItemNetworkThreshold;
+    list << new QStandardItem(m_pItemNetworkThreshold->toolTip());
+    this->appendRow(list);
+    data.setValue(vecEdgeTrehshold);
+    m_pItemNetworkThreshold->setData(data, MetaTreeItemRoles::NetworkThreshold);
+    connect(m_pItemNetworkThreshold, &MetaTreeItem::networkThresholdChanged,
+            this, &BrainRTConnectivityDataTreeItem::onNetworkThresholdChanged);
+
+    list.clear();
+    MetaTreeItem* pItemNetworkMatrix = new MetaTreeItem(MetaTreeItemTypes::NetworkMatrix, "Show network matrix");
+    list << pItemNetworkMatrix;
+    list << new QStandardItem(pItemNetworkMatrix->toolTip());
+    this->appendRow(list);
+
     m_bIsInit = true;
 
     return true;
@@ -160,27 +182,9 @@ bool BrainRTConnectivityDataTreeItem::addData(Network::SPtr pNetworkData)
     data.setValue(matDist);
     this->setData(data, Data3DTreeModelItemRoles::NetworkDataMatrix);
 
-    //Add surface meta information as item children
-    QList<QStandardItem*> list;
-
-    QVector3D vecEdgeTrehshold(0,0,0);
-    MetaTreeItem* pItemNetworkThreshold = new MetaTreeItem(MetaTreeItemTypes::NetworkThreshold, "0.0,0.0,0.0");
-    connect(pItemNetworkThreshold, &MetaTreeItem::networkThresholdChanged,
-            this, &BrainRTConnectivityDataTreeItem::onNetworkThresholdChanged);
-    list << pItemNetworkThreshold;
-    list << new QStandardItem(pItemNetworkThreshold->toolTip());
-    this->appendRow(list);
-    data.setValue(vecEdgeTrehshold);
-    pItemNetworkThreshold->setData(data, MetaTreeItemRoles::NetworkThreshold);
-
-    list.clear();
-    MetaTreeItem* pItemNetworkMatrix = new MetaTreeItem(MetaTreeItemTypes::NetworkMatrix, "Show network matrix");
-    list << pItemNetworkMatrix;
-    list << new QStandardItem(pItemNetworkMatrix->toolTip());
-    this->appendRow(list);
-
     //Plot network
-    plotNetwork(pNetworkData, vecEdgeTrehshold);
+    QVector3D vecThreshold = m_pItemNetworkThreshold->data(MetaTreeItemRoles::NetworkThreshold).value<QVector3D>();
+    plotNetwork(pNetworkData, vecThreshold);
 
     return true;
 }
@@ -210,7 +214,6 @@ void BrainRTConnectivityDataTreeItem::setVisible(bool state)
 
 void BrainRTConnectivityDataTreeItem::onNetworkThresholdChanged(const QVector3D& vecThresholds)
 {
-    qDebug()<<"";
     Network::SPtr pNetwork = this->data(Data3DTreeModelItemRoles::NetworkData).value<Network::SPtr>();
 
     plotNetwork(pNetwork, vecThresholds);
@@ -278,7 +281,7 @@ void BrainRTConnectivityDataTreeItem::plotNetwork(QSharedPointer<CONNECTIVITYLIB
             pos.setY(lNetworkNodes.at(i)->getVert()(1));
             pos.setZ(lNetworkNodes.at(i)->getVert()(2));
 
-            Renderable3DEntity* sourceSphereEntity = new Renderable3DEntity();
+            Renderable3DEntity* sourceSphereEntity = new Renderable3DEntity(m_pRenderable3DEntity);
 
             sourceSphereEntity->setRotX(90);
             sourceSphereEntity->setRotY(180);
@@ -296,8 +299,6 @@ void BrainRTConnectivityDataTreeItem::plotNetwork(QSharedPointer<CONNECTIVITYLIB
             Qt3DExtras::QPhongMaterial* material = new Qt3DExtras::QPhongMaterial();
             material->setAmbient(Qt::blue);
             sourceSphereEntity->addComponent(material);
-
-            sourceSphereEntity->setParent(m_pRenderable3DEntity);
 
             m_lNodes.append(sourceSphereEntity);
         }
