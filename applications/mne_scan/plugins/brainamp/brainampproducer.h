@@ -1,15 +1,15 @@
 //=============================================================================================================
 /**
-* @file     eegosportsproducer.h
+* @file     brainampproducer.h
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+*           Viktor Klüber <viktor.klueber@tu-ilmenau.de>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     July, 2014
+* @date     October, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Lorenz Esch, Viktor Klüber and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,12 +30,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the EEGoSportsProducer class.
+* @brief    Contains the declaration of the BrainAmpProducer class.
 *
 */
 
-#ifndef EEGOSPORTSPRODUCER_H
-#define EEGOSPORTSPRODUCER_H
+#ifndef BRAINAMPPRODUCER_H
+#define BRAINAMPPRODUCER_H
 
 
 //*************************************************************************************************************
@@ -44,6 +44,13 @@
 //=============================================================================================================
 
 #include <generics/circularbuffer.h>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
 #include <Eigen/Eigen>
 
 
@@ -57,20 +64,11 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE EEGOSPORTSPLUGIN
+// DEFINE NAMESPACE BRAINAMPPLUGIN
 //=============================================================================================================
 
-namespace EEGOSPORTSPLUGIN
+namespace BRAINAMPPLUGIN
 {
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-//using namespace IOBuffer;
-using namespace Eigen;
 
 
 //*************************************************************************************************************
@@ -78,36 +76,36 @@ using namespace Eigen;
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class EEGoSports;
-class EEGoSportsDriver;
+class BrainAmp;
+class BrainAmpDriver;
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS EEGProducer
+* DECLARE CLASS BrainAmpProducer
 *
-* @brief The EEGProducer class provides a EEG data producer for a given sampling rate.
+* @brief The BrainAmpProducer class provides a EEG data producer for a given sampling rate.
 */
-class EEGoSportsProducer : public QThread
+class BrainAmpProducer : public QThread
 {
 public:
     //=========================================================================================================
     /**
-    * Constructs a EEGoSportsProducer.
+    * Constructs a BrainAmpProducer.
     *
-    * @param [in] pEEGoSports a pointer to the corresponding EEGoSports class.
+    * @param [in] pBrainAmp a pointer to the corresponding BrainAmp class.
     */
-    EEGoSportsProducer(EEGoSports* pEEGoSports);
+    BrainAmpProducer(BrainAmp* pBrainAmp);
 
     //=========================================================================================================
     /**
-    * Destroys the EEGoSportsProducer.
+    * Destroys the BrainAmpProducer.
     */
-    ~EEGoSportsProducer();
+    ~BrainAmpProducer();
 
     //=========================================================================================================
     /**
-    * Starts the EEGoSportsProducer by starting the producer's thread and initialising the device.
+    * Starts the BrainAmpProducer by starting the producer's thread and initialising the device.
     * @param [in] iNumberOfChannels The number of channels defined by the user via the GUI.
     * @param [in] iSamplesPerBlock The samples per block defined by the user via the GUI.
     * @param [in] iSamplingFrequency The sampling frequency defined by the user via the GUI (in Hertz).
@@ -124,7 +122,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Stops the EEGoSportsProducer by stopping the producer's thread.
+    * Stops the BrainAmpProducer by stopping the producer's thread.
     */
     void stop();
 
@@ -138,12 +136,12 @@ protected:
     virtual void run();
 
 private:
-    EEGoSports*                         m_pEEGoSports;              /**< A pointer to the corresponding EEGoSports class.*/
-    QSharedPointer<EEGoSportsDriver>    m_pEEGoSportsDriver;        /**< A pointer to the corresponding EEGoSports driver class.*/
+    BrainAmp*                           m_pBrainAmp;            /**< A pointer to the corresponding BrainAmp class.*/
+    QSharedPointer<BrainAmpDriver>      m_pBrainAmpDriver;      /**< A pointer to the corresponding BrainAmp driver class.*/
 
-    bool                                m_bIsRunning;               /**< Whether EEGoSportsProducer is running.*/
+    bool                                m_bIsRunning;           /**< Whether BrainAmpProducer is running.*/
 };
 
 } // NAMESPACE
 
-#endif // EEGOSPORTSPRODUCER_H
+#endif // BRAINAMPPRODUCER_H

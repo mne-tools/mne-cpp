@@ -1,15 +1,15 @@
 //=============================================================================================================
 /**
-* @file     eegosportsproducer.cpp
+* @file     brainampproducer.cpp
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Viktor Klüber <viktor.klueber@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     July, 2014
+* @date     October, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Lorenz Esch, Viktor Klüber and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the EEGoSportsProducer class.
+* @brief    Contains the implementation of the BrainAmpProducer class.
 *
 */
 
@@ -39,9 +39,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "eegosportsproducer.h"
-#include "eegosports.h"
-#include "eegosportsdriver.h"
+#include "brainampproducer.h"
+#include "brainamp.h"
+#include "brainampdriver.h"
 
 #include <QDebug>
 
@@ -51,7 +51,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace EEGOSPORTSPLUGIN;
+using namespace BRAINAMPPLUGIN;
+using namespace Eigen;
 
 
 //*************************************************************************************************************
@@ -59,9 +60,9 @@ using namespace EEGOSPORTSPLUGIN;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-EEGoSportsProducer::EEGoSportsProducer(EEGoSports* pEEGoSports)
-: m_pEEGoSports(pEEGoSports)
-, m_pEEGoSportsDriver(new EEGoSportsDriver(this))
+BrainAmpProducer::BrainAmpProducer(BrainAmp* pBrainAmp)
+: m_pBrainAmp(pBrainAmp)
+, m_pBrainAmpDriver(new BrainAmpDriver(this))
 , m_bIsRunning(true)
 {
 }
@@ -69,15 +70,15 @@ EEGoSportsProducer::EEGoSportsProducer(EEGoSports* pEEGoSports)
 
 //*************************************************************************************************************
 
-EEGoSportsProducer::~EEGoSportsProducer()
+BrainAmpProducer::~BrainAmpProducer()
 {
-    //cout << "EEGoSportsProducer::~EEGoSportsProducer()" << endl;
+    //cout << "BrainAmpProducer::~BrainAmpProducer()" << endl;
 }
 
 
 //*************************************************************************************************************
 
-void EEGoSportsProducer::start(int iNumberOfChannels,
+void BrainAmpProducer::start(int iNumberOfChannels,
                         int iSamplesPerBlock,
                         int iSamplingFrequency,
                         bool bWriteDriverDebugToFile,
@@ -85,7 +86,7 @@ void EEGoSportsProducer::start(int iNumberOfChannels,
                         bool bMeasureImpedance)
 {
     //Initialise device
-    if(m_pEEGoSportsDriver->initDevice(iNumberOfChannels,
+    if(m_pBrainAmpDriver->initDevice(iNumberOfChannels,
                                 iSamplesPerBlock,
                                 iSamplingFrequency,
                                 bWriteDriverDebugToFile,
@@ -102,37 +103,38 @@ void EEGoSportsProducer::start(int iNumberOfChannels,
 
 //*************************************************************************************************************
 
-void EEGoSportsProducer::stop()
+void BrainAmpProducer::stop()
 {
-    //Wait until this thread (EEGoSportsProducer) is stopped
+    //Wait until this thread (BrainAmpProducer) is stopped
     m_bIsRunning = false;
 
     //In case the semaphore blocks the thread -> Release the QSemaphore and let it exit from the push function (acquire statement)
-    m_pEEGoSports->m_pRawMatrixBuffer_In->releaseFromPush();
+    m_pBrainAmpDriver->m_pRawMatrixBuffer_In->releaseFromPush();
 
     while(this->isRunning())
         m_bIsRunning = false;
 
     //Unitialise device only after the thread stopped
-    m_pEEGoSportsDriver->uninitDevice();
+    m_pBrainAmpDriver->uninitDevice();
 }
 
 
 //*************************************************************************************************************
 
-void EEGoSportsProducer::run()
+void BrainAmpProducer::run()
 {
     while(m_bIsRunning)
     {
-        //std::cout<<"EEGoSportsProducer::run()"<<std::endl;
+        //std::cout<<"BrainAmpProducer::run()"<<std::endl;
         //Get the TMSi EEG data out of the device buffer and write received data to a QList
         MatrixXd matRawBuffer;
 
-        if(m_pEEGoSportsDriver->getSampleMatrixValue(matRawBuffer))
-            m_pEEGoSports->setSampleData(matRawBuffer);
+        if(m_pBrainAmpDriver->getSampleMatrixValue(matRawBuffer)) {
+            m_pBrainAmpDriver->setSampleData(matRawBuffer);
+        }
     }
 
-    std::cout<<"EXITING - EEGoSportsProducer::run()"<<std::endl;
+    std::cout<<"EXITING - BrainAmpProducer::run()"<<std::endl;
 }
 
 
