@@ -236,7 +236,7 @@ void NeuronalConnectivity::updateSource(SCMEASLIB::NewMeasurement::SPtr pMeasure
                 }
             }
 
-            m_matNodeVertComb.resize(m_matNodeVertLeft.rows()+m_matNodeVertRight.rows(),3);
+            m_matNodeVertComb.resize(m_matNodeVertLeft.rows() + m_matNodeVertRight.rows(),3);
             m_matNodeVertComb << m_matNodeVertLeft, m_matNodeVertRight;
         }
 
@@ -272,7 +272,7 @@ void NeuronalConnectivity::run()
             time.start();
 
             Network::SPtr pNetwork = ConnectivityMeasures::crossCorrelation(t_mat, m_matNodeVertComb);
-
+            Network finalNetowrk = *pNetwork.data();
             qDebug()<<"----------------------------------------";
             qDebug()<<"----------------------------------------";
             qDebug()<<"NeuronalConnectivity::run() - time.elapsed()" << time.elapsed();
@@ -281,7 +281,7 @@ void NeuronalConnectivity::run()
 
             //Send the data to the connected plugins and the online display
             //Unocmment this if you also uncommented the m_pRTCEOutput in the constructor above
-            m_pRTCEOutput->data()->setValue(*pNetwork.data());
+            m_pRTCEOutput->data()->setValue(finalNetowrk);
         }
 
         ++skip_count;
