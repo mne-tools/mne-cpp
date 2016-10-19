@@ -1,15 +1,15 @@
 //=============================================================================================================
 /**
-* @file     eegosports.h
+* @file     brainamp.h
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Viktor Klüber <viktor.klueber@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
-* @date     July, 2014
+* @date     October, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Lorenz Esch, Viktor Klüber and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,12 +30,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the EEGoSports class.
+* @brief    Contains the declaration of the BrainAMP class.
 *
 */
 
-#ifndef EEGOSPORTS_H
-#define EEGOSPORTS_H
+#ifndef BRAINAMP_H
+#define BRAINAMP_H
 
 
 //*************************************************************************************************************
@@ -46,7 +46,7 @@
 #include <fstream>
 #include <direct.h>
 
-#include "eegosports_global.h"
+#include "brainamp_global.h"
 
 #include <scShared/Interfaces/ISensor.h>
 #include <generics/circularmatrixbuffer.h>
@@ -55,13 +55,24 @@
 #include <utils/layoutloader.h>
 #include <utils/layoutmaker.h>
 
+#include "FormFiles/brainampsetupwidget.h"
+#include "FormFiles/brainampsetupprojectwidget.h"
+
+#include <fiff/fiff.h>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
+
 #include <unsupported/Eigen/FFT>
 #include <Eigen/Geometry>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT STL INCLUDES
+// QT INCLUDES
 //=============================================================================================================
 
 #include <QtWidgets>
@@ -69,24 +80,13 @@
 #include <QTime>
 #include <QtConcurrent/QtConcurrent>
 
-#include "FormFiles/eegosportssetupwidget.h"
-#include "FormFiles/eegosportssetupprojectwidget.h"
-
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FIFF INCLUDES
+// DEFINE NAMESPACE BRAINAMPPLUGIN
 //=============================================================================================================
 
-#include <fiff/fiff.h>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE EEGOSPORTSPLUGIN
-//=============================================================================================================
-
-namespace EEGOSPORTSPLUGIN
+namespace BRAINAMPPLUGIN
 {
 
 
@@ -109,41 +109,40 @@ using namespace Eigen;
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class EEGoSportsProducer;
+class BrainAMPProducer;
 
 
 //=============================================================================================================
 /**
-* EEGoSports...
+* BrainAMP...
 *
-* @brief The EEGoSports class provides a EEG connector. In order for this plugin to work properly the driver dll "RTINST.dll" must be installed in the system directory. This dll is automatically copied in the system directory during the driver installtion of the TMSi Refa device.
+* @brief The BrainAMP class provides a EEG connector. In order for this plugin to work properly the driver dll "RTINST.dll" must be installed in the system directory. This dll is automatically copied in the system directory during the driver installtion of the TMSi Refa device.
 */
-class EEGOSPORTSSHARED_EXPORT EEGoSports : public ISensor
+class BRAINAMPSHARED_EXPORT BrainAMP : public ISensor
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "eegosports.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "brainamp.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
     Q_INTERFACES(SCSHAREDLIB::ISensor)
 
-    friend class EEGoSportsProducer;
-    friend class EEGoSportsSetupWidget;
-    friend class EEGoSportsImpedanceWidget;
-    friend class EEGoSportsSetupProjectWidget;
-    friend class EEGoSportsSetupStimulusWidget;
-    friend class ssvepBCISetupStimulusWidget;
+    friend class BrainAMPProducer;
+    friend class BrainAMPSetupWidget;
+    friend class BrainAMPImpedanceWidget;
+    friend class BrainAMPSetupProjectWidget;
+
 
 public:
     //=========================================================================================================
     /**
-    * Constructs a EEGoSports.
+    * Constructs a BrainAMP.
     */
-    EEGoSports();
+    BrainAMP();
 
     //=========================================================================================================
     /**
-    * Destroys the EEGoSports.
+    * Destroys the BrainAMP.
     */
-    virtual ~EEGoSports();
+    virtual ~BrainAMP();
 
     //=========================================================================================================
     /**
@@ -171,13 +170,13 @@ public:
 
     //=========================================================================================================
     /**
-    * Starts the EEGoSports by starting the tmsi's thread.
+    * Starts the BrainAMP by starting the tmsi's thread.
     */
     virtual bool start();
 
     //=========================================================================================================
     /**
-    * Stops the EEGoSports by stopping the tmsi's thread.
+    * Stops the BrainAMP by stopping the tmsi's thread.
     */
     virtual bool stop();
 
@@ -240,10 +239,8 @@ protected:
     bool dirExists(const std::string& dirName_in);
 
 private:
-    PluginOutputData<NewRealTimeMultiSampleArray>::SPtr m_pRMTSA_EEGoSports;      /**< The RealTimeSampleArray to provide the EEG data.*/
-    QSharedPointer<EEGoSportsSetupProjectWidget> m_pEEGoSportsSetupProjectWidget; /**< Widget for checking the impedances*/
-    QSharedPointer<EEGoSportsSetupStimulusWidget> m_pEEGoSportsSetupTimeStimulusWidget;     /**< Widget for time stimulus setup */
-    QSharedPointer<ssvepBCISetupStimulusWidget> m_pEEGoSportsSetupFrameStimulusWidget;    /**< Widget for frame stimulus setup */
+    PluginOutputData<NewRealTimeMultiSampleArray>::SPtr m_pRMTSA_BrainAMP;              /**< The RealTimeSampleArray to provide the EEG data.*/
+    QSharedPointer<BrainAMPSetupProjectWidget> m_pBrainAMPSetupProjectWidget;           /**< Widget for checking the impedances*/
 
     QString                             m_qStringResourcePath;              /**< The path to the EEG resource directory.*/
 
@@ -257,7 +254,7 @@ private:
 
     bool                                m_bWriteToFile;                     /**< Flag for for writing the received samples to a file. Defined by the user via the GUI.*/
     bool                                m_bWriteDriverDebugToFile;          /**< Flag for for writing driver debug informstions to a file. Defined by the user via the GUI.*/
-    bool                                m_bIsRunning;                       /**< Whether EEGoSports is running.*/
+    bool                                m_bIsRunning;                       /**< Whether BrainAMP is running.*/
     bool                                m_bCheckImpedances;                 /**< Flag for checking the impedances of the EEG amplifier.*/
     bool                                m_bUseTrackedCardinalMode;          /**< Flag for using the tracked cardinal mode.*/
     bool                                m_bUseElectrodeShiftMode;           /**< Flag for using the electrode shift mode.*/
@@ -278,7 +275,7 @@ private:
 
     QSharedPointer<RawMatrixBuffer>     m_pRawMatrixBuffer_In;              /**< Holds incoming raw data.*/
 
-    QSharedPointer<EEGoSportsProducer>  m_pEEGoSportsProducer;              /**< the EEGoSportsProducer.*/
+    QSharedPointer<BrainAMPProducer>    m_pBrainAMPProducer;                /**< the BrainAMPProducer.*/
 
     QMutex                              m_qMutex;                           /**< Holds the threads mutex.*/
 
@@ -297,4 +294,4 @@ private:
 
 } // NAMESPACE
 
-#endif // EEGOSPORTS_H
+#endif // BRAINAMP_H
