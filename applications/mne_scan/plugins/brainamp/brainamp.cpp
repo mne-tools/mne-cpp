@@ -304,11 +304,6 @@ bool BrainAMP::start()
         QThread::wait();
     }
 
-    //Temporaray hack
-    m_iSamplesPerBlock = 1000;
-    m_iNumberOfChannels = 33;
-    m_iSamplingFreq = 5000;
-
     //Setup fiff info
     setUpFiffInfo();
 

@@ -97,12 +97,18 @@ bool BrainAMPDriver::initDevice(int iNumberOfChannels,
                             bool bMeasureImpedance)
 {
     Q_UNUSED(iNumberOfChannels);
-    Q_UNUSED(iSamplingFrequency);
     Q_UNUSED(bWriteDriverDebugToFile);
     Q_UNUSED(sOutpuFilePath);
     Q_UNUSED(bMeasureImpedance);
 
     m_uiSamplesPerBlock = iSamplesPerBlock;
+    m_uiSamplingFrequency = iSamplingFrequency;
+    m_uiDownsample = 1; //no downsample
+
+    //fs is always 5000Hz
+    if(5000 % m_uiSamplingFrequency == 0) {
+        m_uiDownsample = 5000/m_uiSamplingFrequency;
+    }
 
     // Open device
     if (!openDevice())
@@ -120,8 +126,8 @@ bool BrainAMPDriver::initDevice(int iNumberOfChannels,
 
     // Send simplest setup, 32 channels, one amp. AC, 1000Hz, 100nV
     Setup.nChannels = 32;
-    Setup.nHoldValue = 0x0;                     // Value without trigger
-    Setup.nPoints = m_uiSamplesPerBlock;        //40 * 5;		// 5 kHz = 5 points per ms -> 40 ms data block
+    Setup.nHoldValue = 0x0;                                     // Value without trigger
+    Setup.nPoints = m_uiSamplesPerBlock * m_uiDownsample;       //40 * 5;		// 5 kHz = 5 points per ms -> 40 ms data block
 
     for (int i = 0; i < Setup.nChannels; i++) {
         Setup.nChannelList[i] = i;
@@ -259,8 +265,9 @@ bool BrainAMPDriver::getSampleMatrixValue(Eigen::MatrixXd &sampleMatrix)
         return false;
     }
 
-    int iDownsample = 5;
-    sampleMatrix = Eigen::MatrixXd(Setup.nChannels + 1, Setup.nPoints);
+    //printf("BrainAMPDriver::getSampleMatrixValue iDownsample: %d\n", m_uiDownsample);
+
+    sampleMatrix = Eigen::MatrixXd(Setup.nChannels + 1, m_uiSamplesPerBlock);
     sampleMatrix.setZero(); // Clear matrix - set all elements to zero
 
     // Get the data
@@ -293,22 +300,26 @@ bool BrainAMPDriver::getSampleMatrixValue(Eigen::MatrixXd &sampleMatrix)
             return false;
         }
 
+        //printf("BrainAMPDriver::getSampleMatrixValue - nTransferSize %u\n", nTransferSize);
+        //printf("BrainAMPDriver::getSampleMatrixValue - dwBytesReturned %u \n", dwBytesReturned);
+
         if (!dwBytesReturned)
         {
-            Sleep(1);
+            //Sleep(1);
             continue; //jumps to end of while statement
         }
 
-        short *pSrc = &pnData[0];
-
-        printf("BrainAMPDriver::getSampleMatrixValue - nTransferSize %u\n", nTransferSize);
-        printf("BrainAMPDriver::getSampleMatrixValue - dwBytesReturned %u \n", dwBytesReturned);
-        printf("BrainAMPDriver::getSampleMatrixValue - dwBytesReturned %u \n", dwBytesReturned);
 
         //Transform into matrix structure
-        for (int i = 0; i < Setup.nPoints; ++i) {
-            for (int n = 0; n < Setup.nChannels; ++n) {
-                sampleMatrix(n,i) = *(pSrc++) * 100e-09;
+        int counter = 0;
+        for (int i = 0; i < m_uiSamplesPerBlock; ++i) {
+            for (int n = 0; n < Setup.nChannels + 1; ++n) {
+                sampleMatrix(n,i) = pnData[counter] * 100e-09;
+                counter++;
+            }
+
+            if(counter + ((m_uiDownsample - 1) * (Setup.nChannels + 1)) < pnData.size()) {
+                counter += ((m_uiDownsample - 1) * (Setup.nChannels + 1));
             }
         }
 
