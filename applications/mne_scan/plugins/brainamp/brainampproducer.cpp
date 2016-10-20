@@ -77,18 +77,14 @@ BrainAMPProducer::~BrainAMPProducer()
 
 //*************************************************************************************************************
 
-void BrainAMPProducer::start(int iNumberOfChannels,
-                        int iSamplesPerBlock,
+void BrainAMPProducer::start(int iSamplesPerBlock,
                         int iSamplingFrequency,
-                        bool bWriteDriverDebugToFile,
                         QString sOutputFilePath,
                         bool bMeasureImpedance)
 {
     //Initialise device
-    if(m_pBrainAmpDriver->initDevice(iNumberOfChannels,
-                                iSamplesPerBlock,
+    if(m_pBrainAmpDriver->initDevice(iSamplesPerBlock,
                                 iSamplingFrequency,
-                                bWriteDriverDebugToFile,
                                 sOutputFilePath,
                                 bMeasureImpedance))
     {

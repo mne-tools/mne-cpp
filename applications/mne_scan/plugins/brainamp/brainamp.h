@@ -246,7 +246,6 @@ private:
     QString                             m_qStringResourcePath;              /**< The path to the EEG resource directory.*/
 
     int                                 m_iSamplingFreq;                    /**< The sampling frequency defined by the user via the GUI (in Hertz).*/
-    int                                 m_iNumberOfChannels;                /**< The samples per block defined by the user via the GUI.*/
     int                                 m_iSamplesPerBlock;                 /**< The number of channels defined by the user via the GUI.*/
 
     double                              m_dLPAShift;                        /**< The shift in m in to generate the LPA.*/
@@ -254,7 +253,6 @@ private:
     double                              m_dNasionShift;                     /**< The shift in m in to generate the Nasion.*/
 
     bool                                m_bWriteToFile;                     /**< Flag for for writing the received samples to a file. Defined by the user via the GUI.*/
-    bool                                m_bWriteDriverDebugToFile;          /**< Flag for for writing driver debug informstions to a file. Defined by the user via the GUI.*/
     bool                                m_bIsRunning;                       /**< Whether BrainAMP is running.*/
     bool                                m_bCheckImpedances;                 /**< Flag for checking the impedances of the EEG amplifier.*/
     bool                                m_bUseTrackedCardinalMode;          /**< Flag for using the tracked cardinal mode.*/

@@ -67,12 +67,9 @@ AmpTypes amplifiers[4] = { None, None, None, None };            /**< Connected a
 BrainAMPDriver::BrainAMPDriver(BrainAMPProducer* pBrainAmpProducer)
 : m_pBrainAmpProducer(pBrainAmpProducer)
 , m_bInitDeviceSuccess(false)
-, m_uiNumberOfChannels(32)
 , m_uiSamplingFrequency(1000)
 , m_uiSamplesPerBlock(200)
-, m_bWriteDriverDebugToFile(false)
 , m_sOutputFilePath("/mne_scan_plugins/resources/brainamp")
-, m_bMeasureImpedances(false)
 , DeviceAmp(INVALID_HANDLE_VALUE)
 , UsbDevice(false)
 , DriverVersion(0)
@@ -89,15 +86,11 @@ BrainAMPDriver::~BrainAMPDriver()
 
 //*************************************************************************************************************
 
-bool BrainAMPDriver::initDevice(int iNumberOfChannels,
-                            int iSamplesPerBlock,
+bool BrainAMPDriver::initDevice(int iSamplesPerBlock,
                             int iSamplingFrequency,
-                            bool bWriteDriverDebugToFile,
                             QString sOutpuFilePath,
                             bool bMeasureImpedance)
 {
-    Q_UNUSED(iNumberOfChannels);
-    Q_UNUSED(bWriteDriverDebugToFile);
     Q_UNUSED(sOutpuFilePath);
     Q_UNUSED(bMeasureImpedance);
 
