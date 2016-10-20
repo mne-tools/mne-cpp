@@ -3,13 +3,13 @@
 * @file     ssvepbci.cpp
 * @author   Viktor Klüber <viktor.klueber@tu-ilmenau.de>;
 *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
 * @date     May, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Viktor Klüber, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -102,6 +102,7 @@ SsvepBci::SsvepBci()
 
     // Intitalise BCI data
     m_slChosenChannelsSensor << "9Z" << "8Z" << "7Z" << "6Z" << "9L" << "8L" << "9R" << "8R"; //<< "TEST";
+    //m_slChosenChannelsSensor << "24" << "25" << "26" << "28" << "29" << "30" << "31" << "32";
     m_lElectrodeNumbers << 33 << 34 << 35 << 36 << 40 << 41 << 42 << 43;
     m_lDesFrequencies << 6.66 << 7.5 <<8.57 << 10 << 12;
     m_lThresholdValues << 0.12 << 0.12 << 0.12 << 0.12 << 0.12;
