@@ -160,16 +160,21 @@
         <item row="0" column="1">
          <widget class="QComboBox" name="m_comboBox_SamplingFreq">
           <property name="currentText">
-           <string>500</string>
+           <string>100</string>
           </property>
           <item>
            <property name="text">
-            <string>500</string>
+            <string>100</string>
            </property>
           </item>
           <item>
            <property name="text">
-            <string>512</string>
+            <string>250</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>500</string>
            </property>
           </item>
           <item>
@@ -179,17 +184,12 @@
           </item>
           <item>
            <property name="text">
-            <string>1024</string>
+            <string>2500</string>
            </property>
           </item>
           <item>
            <property name="text">
-            <string>2000</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>2048</string>
+            <string>5000</string>
            </property>
           </item>
          </widget>
@@ -224,10 +224,10 @@
         <item row="3" column="1">
          <widget class="QSpinBox" name="m_spinBox_BlockSize">
           <property name="minimum">
-           <number>100</number>
+           <number>10</number>
           </property>
           <property name="maximum">
-           <number>1024</number>
+           <number>10000</number>
           </property>
           <property name="value">
            <number>512</number>

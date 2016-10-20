@@ -43,13 +43,6 @@
 // INCLUDES
 //=============================================================================================================
 
-//#include <windows.h>
-//#include <stdio.h>
-//#include <io.h>
-//#include <conio.h>
-//#include <vector>
-//#include "BrainAmpIoCtl.h"
-
 #include <windows.h>
 #include "BrainAmpIoCtl.h"
 
@@ -193,6 +186,7 @@ private:
     bool                        m_bInitDeviceSuccess;               /**< Flag which defines if the device initialisation was successfull.*/
     bool                        m_bDllLoaded;                       /**< Flag which defines if the driver DLL was loaded successfully.*/
 
+    uint                        m_uiDownsample;                     /**< The number of channels defined by the user via the GUI.*/
     uint                        m_uiNumberOfChannels;               /**< The number of channels defined by the user via the GUI.*/
     uint                        m_uiSamplingFrequency;              /**< The sampling frequency defined by the user via the GUI (in Hertz).*/
     uint                        m_uiSamplesPerBlock;                /**< The samples per block defined by the user via the GUI.*/
