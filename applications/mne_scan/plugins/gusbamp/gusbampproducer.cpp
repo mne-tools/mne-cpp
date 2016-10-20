@@ -43,15 +43,15 @@
 #include "gusbamp.h"
 #include "gusbampdriver.h"
 
-#include <QDebug>
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace GUSBAmpPlugin;
+using namespace GUSBAMPPLUGIN;
+using namespace IOBUFFER;
+using namespace std;
 
 
 //*************************************************************************************************************
@@ -63,7 +63,13 @@ GUSBAmpProducer::GUSBAmpProducer(GUSBAmp* pGUSBAmp)
 : m_pGUSBAmp(pGUSBAmp)
 , m_pGUSBAmpDriver(new GUSBAmpDriver(this))
 , m_bIsRunning(true)
+, m_iSampRate(1200)
+, m_sFilePath("data")
 {
+    m_viSizeOfSampleMatrix.resize(2,0);
+
+    m_vSerials.resize(1);
+    m_vSerials[0]= "UB-2015.05.16";
 }
 
 
@@ -77,9 +83,17 @@ GUSBAmpProducer::~GUSBAmpProducer()
 
 //*************************************************************************************************************
 
-void GUSBAmpProducer::start()
+void GUSBAmpProducer::start(vector<QString> &serials, vector<int> channels, int sampleRate)
 {
-    //Initialise device
+    //setting the new parameters of the gUSBamp device
+    m_pGUSBAmpDriver->setSerials(serials);
+    m_pGUSBAmpDriver->setSampleRate(sampleRate);
+    m_pGUSBAmpDriver->setChannels(channels);
+
+    //asking for the size of the sample Matrix which will be acquired
+    m_viSizeOfSampleMatrix = m_pGUSBAmpDriver->getSizeOfSampleMatrix();
+
+    //Initialise and starting the device
     if(m_pGUSBAmpDriver->initDevice())
     {
         m_bIsRunning = true;
@@ -100,11 +114,13 @@ void GUSBAmpProducer::stop()
     //In case the semaphore blocks the thread -> Release the QSemaphore and let it exit from the push function (acquire statement)
     m_pGUSBAmp->m_pRawMatrixBuffer_In->releaseFromPush();
 
-    while(this->isRunning())
+    while(this->isRunning()){
         m_bIsRunning = false;
+    }
 
     //Unitialise device only after the thread stopped
     m_pGUSBAmpDriver->uninitDevice();
+
 }
 
 
@@ -112,16 +128,21 @@ void GUSBAmpProducer::stop()
 
 void GUSBAmpProducer::run()
 {
-    MatrixXf matRawBuffer(128,100);
+    MatrixXf matRawBuffer(m_viSizeOfSampleMatrix[0],m_viSizeOfSampleMatrix[1]);
 
-    while(m_bIsRunning) {
-        //std::qDebug()<<"GUSBAmpProducer::run()"<<std::endl;
+    while(m_bIsRunning)
+    {
+        //qDebug()<<"GUSBAmpProducer::run()"<<endl;
         //Get the GUSBAmp EEG data out of the device buffer and write received data to circular buffer
         if(m_pGUSBAmpDriver->getSampleMatrixValue(matRawBuffer))
             m_pGUSBAmp->m_pRawMatrixBuffer_In->push(&matRawBuffer);
     }
-
-    //std::qDebug()<<"EXITING - GUSBAmpProducer::run()"<<std::endl;
 }
 
 
+//*************************************************************************************************************
+
+vector<int> GUSBAmpProducer::getSizeOfSampleMatrix(void)
+{
+    return m_viSizeOfSampleMatrix;
+}
