@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>EEGoSportsSetupClass</class>
- <widget class="QWidget" name="EEGoSportsSetupClass">
+ <class>BrainAMPSetupClass</class>
+ <widget class="QWidget" name="BrainAMPSetupClass">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -23,7 +23,7 @@
       </font>
      </property>
      <property name="text">
-      <string>EEGoSports Connector</string>
+      <string>BrainAmp Connector</string>
      </property>
     </widget>
    </item>

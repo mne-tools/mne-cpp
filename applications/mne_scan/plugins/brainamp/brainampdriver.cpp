@@ -5,7 +5,7 @@
 *           Viktor Klüber <Viktor.Klueber@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     July, 2016
+* @date     October, 2016
 *
 * @section  LICENSE
 *
@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the BrainAmpDriver class.
+* @brief    Contains the implementation of the BrainAMPDriver class.
 *
 */
 
@@ -62,7 +62,9 @@ using namespace std;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-BrainAmpDriver::BrainAmpDriver(BrainAmpProducer* pBrainAmpProducer)
+AmpTypes amplifiers[4] = { None, None, None, None };            /**< Connected amplifiers.*/
+
+BrainAMPDriver::BrainAMPDriver(BrainAMPProducer* pBrainAmpProducer)
 : m_pBrainAmpProducer(pBrainAmpProducer)
 , m_bInitDeviceSuccess(false)
 , m_uiNumberOfChannels(32)
@@ -71,20 +73,23 @@ BrainAmpDriver::BrainAmpDriver(BrainAmpProducer* pBrainAmpProducer)
 , m_bWriteDriverDebugToFile(false)
 , m_sOutputFilePath("/mne_scan_plugins/resources/brainamp")
 , m_bMeasureImpedances(false)
+, DeviceAmp(INVALID_HANDLE_VALUE)
+, UsbDevice(false)
+, DriverVersion(0)
 {
 }
 
 
 //*************************************************************************************************************
 
-BrainAmpDriver::~BrainAmpDriver()
+BrainAMPDriver::~BrainAMPDriver()
 {
 }
 
 
 //*************************************************************************************************************
 
-bool BrainAmpDriver::initDevice(int iNumberOfChannels,
+bool BrainAMPDriver::initDevice(int iNumberOfChannels,
                             int iSamplesPerBlock,
                             int iSamplingFrequency,
                             bool bWriteDriverDebugToFile,
@@ -92,19 +97,18 @@ bool BrainAmpDriver::initDevice(int iNumberOfChannels,
                             bool bMeasureImpedance)
 {
     Q_UNUSED(iNumberOfChannels);
-    Q_UNUSED(iSamplesPerBlock);
     Q_UNUSED(iSamplingFrequency);
     Q_UNUSED(bWriteDriverDebugToFile);
     Q_UNUSED(sOutpuFilePath);
     Q_UNUSED(bMeasureImpedance);
 
-    printf("*** BrainAmp Control Example Program ***\n\n");
+    m_uiSamplesPerBlock = iSamplesPerBlock;
 
     // Open device
-    if (!OpenDevice())
+    if (!openDevice())
     {
         printf("No BrainAmp USB adapter and no ISA/PCI adapter found!\n");
-        return -1;
+        return false;
     }
 
     // Show version
@@ -112,58 +116,56 @@ bool BrainAmpDriver::initDevice(int iNumberOfChannels,
              nMinor = (DriverVersion % 1000000) / 10000,
              nMajor = DriverVersion / 1000000;
 
-    printf("%s Driver Found, Version %u.%02u.%04u\n",
-            UsbDevice ? "USB" : "ISA/PCI", nMajor, nMinor, nModule);
+    printf("BrainAMPDriver::initDevice - %s Driver Found, Version %u.%02u.%04u\n", UsbDevice ? "USB" : "ISA/PCI", nMajor, nMinor, nModule);
 
     // Send simplest setup, 32 channels, one amp. AC, 1000Hz, 100nV
     Setup.nChannels = 32;
-    Setup.nHoldValue = 0x0;		// Value without trigger
-    Setup.nPoints = 40 * 5;		// 5 kHz = 5 points per ms -> 40 ms data block
+    Setup.nHoldValue = 0x0;                     // Value without trigger
+    Setup.nPoints = m_uiSamplesPerBlock;        //40 * 5;		// 5 kHz = 5 points per ms -> 40 ms data block
 
     for (int i = 0; i < Setup.nChannels; i++) {
         Setup.nChannelList[i] = i;
+        //Setup.n250Hertz[i] = 0;                 // Low pass 1000Hz
     }
 
     DWORD dwBytesReturned = 0;
-    if (!DeviceIoControl(DeviceAmp, IOCTL_BA_SETUP, &Setup,
-        sizeof(Setup), NULL, 0, &dwBytesReturned, NULL))
+    if (!DeviceIoControl(DeviceAmp, IOCTL_BA_SETUP, &Setup, sizeof(Setup), NULL, 0, &dwBytesReturned, NULL))
     {
-        printf("Setup failed, error code: %u\n", ::GetLastError());
+        printf("BrainAMPDriver::initDevice - Setup failed, error code: %u\n", ::GetLastError());
     }
 
-//    //Start acqusition process
-//    // Pulldown input resistors for trigger input, (active high)
-//    unsigned short pullup = 0;
-//    DWORD dwBytesReturned = 0;
-//    if (!DeviceIoControl(DeviceAmp, IOCTL_BA_DIGITALINPUT_PULL_UP, &pullup,
-//        sizeof(pullup), NULL, 0, &dwBytesReturned, NULL))
-//    {
-//        printf("Can't set pull up/down resistors, error code: %u\n",
-//            ::GetLastError());
-//    }
+    // Start acqusition process
+    // Pulldown input resistors for trigger input, (active high)
+    unsigned short pullup = 0;
 
-//    // Make sure that amps exist, otherwise a long timeout will occur.
-//    int nHighestChannel = 0;
-//    for (int i = 0; i < Setup.nChannels; i++)
-//    {
-//        nHighestChannel = max(Setup.nChannelList[i], nHighestChannel);
-//    }
-//    int nRequiredAmps = (nHighestChannel + 1) / 32;
-//    int nAmps = FindAmplifiers();
-//    if (nAmps < nRequiredAmps)
-//    {
-//        printf("Required Amplifiers: %d, Connected Amplifiers: %d\n",
-//            nRequiredAmps, nAmps);
-//        return;
-//    }
+    if (!DeviceIoControl(DeviceAmp, IOCTL_BA_DIGITALINPUT_PULL_UP, &pullup, sizeof(pullup), NULL, 0, &dwBytesReturned, NULL))
+    {
+        printf("BrainAMPDriver::initDevice - Can't set pull up/down resistors, error code: %u\n", ::GetLastError());
+    }
 
-//    // Start acquisition
-//    long acquisitionType = 1;
-//    if (!DeviceIoControl(DeviceAmp, IOCTL_BA_START, &acquisitionType,
-//        sizeof(acquisitionType), NULL, 0, &dwBytesReturned, NULL))
-//    {
-//        printf("Start failed, error code: %u\n", ::GetLastError());
-//    }
+    // Make sure that amps exist, otherwise a long timeout will occur.
+    int nHighestChannel = 0;
+    for (int i = 0; i < Setup.nChannels; i++)
+    {
+        nHighestChannel = max(Setup.nChannelList[i], nHighestChannel);
+    }
+
+    int nRequiredAmps = (nHighestChannel + 1) / 32;
+    int nAmps = findAmplifiers();
+
+    if (nAmps < nRequiredAmps)
+    {
+        printf("BrainAMPDriver::initDevice - Required Amplifiers: %d, Connected Amplifiers: %d\n", nRequiredAmps, nAmps);
+        return false;
+    }
+
+    // Start acquisition
+    long acquisitionType = 1;
+
+    if (!DeviceIoControl(DeviceAmp, IOCTL_BA_START, &acquisitionType, sizeof(acquisitionType), NULL, 0, &dwBytesReturned, NULL))
+    {
+        printf("BrainAMPDriver::initDevice - Start failed, error code: %u\n", ::GetLastError());
+    }
 
     // Set flag for successfull initialisation true
     m_bInitDeviceSuccess = true;
@@ -174,12 +176,12 @@ bool BrainAmpDriver::initDevice(int iNumberOfChannels,
 
 //*************************************************************************************************************
 
-bool BrainAmpDriver::openDevice()
+bool BrainAMPDriver::openDevice()
 {
     DWORD dwFlags = FILE_ATTRIBUTE_NORMAL | FILE_FLAG_WRITE_THROUGH;
     // First try USB box
-    DeviceAmp = CreateFile(DEVICE_USB, GENERIC_READ | GENERIC_WRITE, 0, NULL,
-                                OPEN_EXISTING, dwFlags, NULL);
+    DeviceAmp = CreateFileA(DEVICE_USB, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, dwFlags, NULL);
+
     if (DeviceAmp != INVALID_HANDLE_VALUE)
     {
         UsbDevice = true;
@@ -187,9 +189,8 @@ bool BrainAmpDriver::openDevice()
     else
     {
         // USB box not found, try PCI host adapter
-        UsbDevice = false;;
-        DeviceAmp = CreateFile(DEVICE_PCI, GENERIC_READ | GENERIC_WRITE, 0, NULL,
-                                OPEN_EXISTING, dwFlags, NULL);
+        UsbDevice = false;
+        DeviceAmp = CreateFileA(DEVICE_PCI, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, dwFlags, NULL);
     }
 
     // Retrieve driver version
@@ -197,28 +198,48 @@ bool BrainAmpDriver::openDevice()
     {
         DriverVersion = 0;
         DWORD dwBytesReturned;
-        DeviceIoControl(DeviceAmp, IOCTL_BA_DRIVERVERSION, NULL, 0, &DriverVersion,
-                        sizeof(DriverVersion), &dwBytesReturned, NULL);
+        DeviceIoControl(DeviceAmp, IOCTL_BA_DRIVERVERSION, NULL, 0, &DriverVersion, sizeof(DriverVersion), &dwBytesReturned, NULL);
     }
 
-    return DeviceAmp != INVALID_HANDLE_VALUE;
+    return (DeviceAmp != INVALID_HANDLE_VALUE);
+}
+
+//*************************************************************************************************************
+
+int BrainAMPDriver::findAmplifiers()
+{
+    USHORT amps[4];
+    DWORD dwBytesReturned;
+
+    DeviceIoControl(DeviceAmp, IOCTL_BA_AMPLIFIER_TYPE, NULL, 0, amps, sizeof(amps), &dwBytesReturned, NULL);
+
+    int nAmps = 4;
+    for (int i = 0; i < 4; i++)
+    {
+        amplifiers[i] = (AmpTypes)amps[i];
+        if (amplifiers[i] == None && i < nAmps)
+        {
+            nAmps = i;
+        }
+    }
+    return nAmps;
 }
 
 
 //*************************************************************************************************************
 
-bool BrainAmpDriver::uninitDevice()
+bool BrainAMPDriver::uninitDevice()
 {
     //Check if the device was initialised
     if(!m_bInitDeviceSuccess)
     {
-        std::cout << "Plugin EEGoSports - ERROR - uninitDevice() - Device was not initialised - therefore can not be uninitialised" << std::endl;
+        printf("Plugin BrainAmp - ERROR - uninitDevice() - Device was not initialised - therefore can not be uninitialised\n");
         return false;
     }
 
     // Stop acquisition
-    if (!DeviceIoControl(DeviceAmp, IOCTL_BA_STOP, NULL, 0, NULL, 0,
-        &dwBytesReturned, NULL))
+    DWORD dwBytesReturned;
+    if (!DeviceIoControl(DeviceAmp, IOCTL_BA_STOP, NULL, 0, NULL, 0, &dwBytesReturned, NULL))
     {
         printf("Stop failed, error code: %u\n", ::GetLastError());
     }
@@ -229,62 +250,82 @@ bool BrainAmpDriver::uninitDevice()
 
 //*************************************************************************************************************
 
-bool BrainAmpDriver::getSampleMatrixValue(Eigen::MatrixXd &sampleMatrix)
+bool BrainAMPDriver::getSampleMatrixValue(Eigen::MatrixXd &sampleMatrix)
 {
-//    //Check if device was initialised and connected correctly
-//    if(!m_bInitDeviceSuccess)
-//    {
-//        std::cout << "Plugin EEGoSports - ERROR - getSampleMatrixValue() - Cannot start to get samples from device because device was not initialised correctly" << std::endl;
-//        return false;
-//    }
+    //Check if device was initialised and connected correctly
+    if(!m_bInitDeviceSuccess)
+    {
+        printf("BrainAMPDriver::getSampleMatrixValue - getSampleMatrixValue() - Cannot start to get samples from device because device was not initialised correctly");
+        return false;
+    }
 
-//    sampleMatrix = MatrixXd(Setup.nChannels + 1, Setup.nPoints);
-//    sampleMatrix.setZero(); // Clear matrix - set all elements to zero
+    int iDownsample = 5;
+    sampleMatrix = Eigen::MatrixXd(Setup.nChannels + 1, Setup.nPoints);
+    sampleMatrix.setZero(); // Clear matrix - set all elements to zero
 
-//    // Get the data
-//    // Data including marker channel
-//    vector<short>pnData((Setup.nChannels + 1) * Setup.nPoints);
+    // Get the data
+    // Data including marker channel
+    vector<short>pnData((Setup.nChannels + 1) * Setup.nPoints);
 
-//    // Pure data
-//    vector<short>pnPureData(Setup.nChannels * Setup.nPoints);
+    // Pure data
+    // Check for error
+    int nTemp = 0;
+    DWORD dwBytesReturned;
+    if (!DeviceIoControl(DeviceAmp, IOCTL_BA_ERROR_STATE, NULL, 0, &nTemp, sizeof(nTemp), &dwBytesReturned, NULL))
+    {
+        printf("Acquisition Error, GetLastError(): %d\n", ::GetLastError());
+        return false;
+    }
+    if (nTemp != 0)
+    {
+        printf("Acquisition Error %d\n", nTemp);
+        return false;
+    }
 
-//    unsigned short nLastMarkerValue = 0;
-//    unsigned nDataOffset = 0;
-//    unsigned int nMarkerNumber = 0;
+    // Receive data
+    bool bBlockReceived = false;
+    int nTransferSize = (int)pnData.size() * sizeof(short);
 
-//    printf("Press any key to stop the recording...\n");
+    while(!bBlockReceived) {
+        if (!ReadFile(DeviceAmp, &pnData[0], nTransferSize, &dwBytesReturned, NULL))
+        {
+            printf("Acquisition Error, GetLastError(): %d\n", ::GetLastError());
+            return false;
+        }
 
-//    // Check for error
-//    int nTemp = 0;
-//    DWORD dwBytesReturned;
-//    if (!DeviceIoControl(DeviceAmp, IOCTL_BA_ERROR_STATE, NULL, 0,
-//            &nTemp, sizeof(nTemp), &dwBytesReturned, NULL))
-//    {
-//        printf("Acquisition Error, GetLastError(): %d\n", ::GetLastError());
-//        return false;
-//    }
-//    if (nTemp != 0)
-//    {
-//        printf("Acquisition Error %d\n", nTemp);
-//        return false;
-//    }
+        if (!dwBytesReturned)
+        {
+            Sleep(1);
+            continue; //jumps to end of while statement
+        }
 
-//    // Receive data
-//    int nTransferSize = (int)pnData.size() * sizeof(short);
-//    if (!ReadFile(DeviceAmp, &pnData[0], nTransferSize, &dwBytesReturned, NULL))
-//    {
-//        printf("Acquisition Error, GetLastError(): %d\n", ::GetLastError());
-//        return false;
-//    }
+        short *pSrc = &pnData[0];
 
-//    //Transform into matrix structure
-//    for (int i = 0; i < Setup.nPoints; ++i) {
-//        for (int n = 0; n < Setup.nChannels; ++n) {
-//            sampleMatrix(n,i) = *(pSrc++);
-//        }
-//    }
+        printf("BrainAMPDriver::getSampleMatrixValue - nTransferSize %u\n", nTransferSize);
+        printf("BrainAMPDriver::getSampleMatrixValue - dwBytesReturned %u \n", dwBytesReturned);
+        printf("BrainAMPDriver::getSampleMatrixValue - dwBytesReturned %u \n", dwBytesReturned);
 
-//    Sleep(100);
+        //Transform into matrix structure
+        for (int i = 0; i < Setup.nPoints; ++i) {
+            for (int n = 0; n < Setup.nChannels; ++n) {
+                sampleMatrix(n,i) = *(pSrc++) * 100e-09;
+            }
+        }
+
+        bBlockReceived = true;
+    }
+
+    //Receive info about buffer status
+    long nState = 0;
+
+    if (!DeviceIoControl(DeviceAmp, IOCTL_BA_BUFFERFILLING_STATE, NULL, 0, &nState, sizeof(nState), &dwBytesReturned, NULL))
+    {
+        printf("BrainAMPDriver::initDevice - Buffer state failed, error code: %u\n", ::GetLastError());
+    }
+
+    printf("BrainAMPDriver::initDevice - Buffer state: %u\n", nState);
+
+    //Sleep(10);
 
     return true;
 }

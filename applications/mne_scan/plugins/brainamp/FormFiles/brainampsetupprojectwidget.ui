@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>EEGoSportsSetupProjectWidget</class>
- <widget class="QWidget" name="EEGoSportsSetupProjectWidget">
+ <class>BrainAMPSetupProjectWidget</class>
+ <widget class="QWidget" name="BrainAMPSetupProjectWidget">
   <property name="geometry">
    <rect>
     <x>0</x>

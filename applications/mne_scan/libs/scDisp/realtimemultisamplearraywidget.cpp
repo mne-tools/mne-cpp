@@ -217,9 +217,6 @@ void RealTimeMultiSampleArrayWidget::broadcastScaling(QMap<qint32,float> scaleMa
 
 void RealTimeMultiSampleArrayWidget::update(SCMEASLIB::NewMeasurement::SPtr)
 {
-    qDebug()<<"RealTimeMultiSampleArrayWidget::update";
-
-
     if(!m_bInitialized)
     {
         if(m_pRTMSA->isChInit())
