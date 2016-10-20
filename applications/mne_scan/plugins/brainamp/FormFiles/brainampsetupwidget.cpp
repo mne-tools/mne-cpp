@@ -77,10 +77,6 @@ BrainAMPSetupWidget::BrainAMPSetupWidget(BrainAMP* pBrainAMP, QWidget* parent)
     connect(ui.m_spinBox_BlockSize, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             this, &BrainAMPSetupWidget::setDeviceSamplingProperties);
 
-    //Connect debug file
-    connect(ui.m_checkBox_WriteDriverDebugToFile, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
-            this, &BrainAMPSetupWidget::setWriteToFile);
-
     //Connect about button
     connect(ui.m_qPushButton_About, &QPushButton::released, this, &BrainAMPSetupWidget::showAboutDialog);
 
@@ -114,9 +110,6 @@ void BrainAMPSetupWidget::initGui()
     //Init device sampling properties
     ui.m_comboBox_SamplingFreq->setCurrentText(QString::number(m_pBrainAMP->m_iSamplingFreq));
     ui.m_spinBox_BlockSize->setValue(m_pBrainAMP->m_iSamplesPerBlock);
-
-    //Init write to file
-    ui.m_checkBox_WriteDriverDebugToFile->setChecked(m_pBrainAMP->m_bWriteDriverDebugToFile);
 }
 
 
@@ -126,14 +119,6 @@ void BrainAMPSetupWidget::setDeviceSamplingProperties()
 {
     m_pBrainAMP->m_iSamplingFreq = ui.m_comboBox_SamplingFreq->currentText().toInt();
     m_pBrainAMP->m_iSamplesPerBlock = ui.m_spinBox_BlockSize->value();
-}
-
-
-//*************************************************************************************************************
-
-void BrainAMPSetupWidget::setWriteToFile()
-{
-    m_pBrainAMP->m_bWriteDriverDebugToFile = ui.m_checkBox_WriteDriverDebugToFile->isChecked();
 }
 
 
