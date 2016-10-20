@@ -144,10 +144,8 @@ void BrainAMP::init()
 
     QSettings settings;
     m_iSamplingFreq = settings.value(QString("BRAINAMP/sFreq"), 1000).toInt();
-    m_iNumberOfChannels = 33;
     m_iSamplesPerBlock = settings.value(QString("BRAINAMP/samplesPerBlock"), 1000).toInt();
     m_bWriteToFile = false;
-    m_bWriteDriverDebugToFile = false;
     m_bIsRunning = false;
     m_bCheckImpedances = false;
 
@@ -191,7 +189,7 @@ void BrainAMP::setUpFiffInfo()
     //
     //Set number of channels, sampling frequency and high/-lowpass
     //
-    m_pFiffInfo->nchan = m_iNumberOfChannels;
+    m_pFiffInfo->nchan = 33;
     m_pFiffInfo->sfreq = m_iSamplingFreq;
     m_pFiffInfo->highpass = (float)0.001;
     m_pFiffInfo->lowpass = m_iSamplingFreq/2;
@@ -202,14 +200,14 @@ void BrainAMP::setUpFiffInfo()
     QStringList QSLChNames;
     m_pFiffInfo->chs.clear();
 
-    for(int i = 0; i < m_iNumberOfChannels; ++i)
+    for(int i = 0; i < m_pFiffInfo->nchan; ++i)
     {
         //Create information for each channel
         QString sChType;
         FiffChInfo fChInfo;
 
         //EEG Channels
-        if(i <= m_iNumberOfChannels-2)
+        if(i <= m_pFiffInfo->nchan-2)
         {
             //Set channel name
             sChType = QString("EEG ");
@@ -268,7 +266,7 @@ void BrainAMP::setUpFiffInfo()
         }
 
         //Digital input channel
-        if(i == m_iNumberOfChannels-1)
+        if(i == m_pFiffInfo->nchan-1)
         {
             //Set channel type
             fChInfo.kind = FIFFV_STIM_CH;
@@ -313,13 +311,11 @@ bool BrainAMP::start()
     m_pRMTSA_BrainAMP->data()->setSamplingRate(m_iSamplingFreq);
 
     //Buffer
-    m_pRawMatrixBuffer_In = QSharedPointer<RawMatrixBuffer>(new RawMatrixBuffer(8, m_iNumberOfChannels, m_iSamplesPerBlock));
+    m_pRawMatrixBuffer_In = QSharedPointer<RawMatrixBuffer>(new RawMatrixBuffer(8, m_pFiffInfo->nchan, m_iSamplesPerBlock));
     m_qListReceivedSamples.clear();
 
-    m_pBrainAMPProducer->start(m_iNumberOfChannels,
-                       m_iSamplesPerBlock,
+    m_pBrainAMPProducer->start(m_iSamplesPerBlock,
                        m_iSamplingFreq,
-                       m_bWriteDriverDebugToFile,
                        m_sOutputFilePath,
                        m_bCheckImpedances);
 

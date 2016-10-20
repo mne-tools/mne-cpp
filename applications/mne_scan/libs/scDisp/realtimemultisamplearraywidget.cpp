@@ -224,7 +224,6 @@ void RealTimeMultiSampleArrayWidget::update(SCMEASLIB::NewMeasurement::SPtr)
             m_qListChInfo = m_pRTMSA->chInfo(); //ToDo Obsolete -> use fiffInfo instead
             m_pFiffInfo = m_pRTMSA->info();
 
-            qDebug()<<"RealTimeMultiSampleArrayWidget::update - m_pFiffInfo->chs.size()"<<m_pFiffInfo->chs.size();
             emit fiffFileUpdated(*m_pFiffInfo.data());
 
             m_fSamplingRate = m_pRTMSA->getSamplingRate();
