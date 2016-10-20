@@ -60,7 +60,6 @@
 //=============================================================================================================
 
 using namespace BRAINAMPPLUGIN;
-using namespace IPlugin;
 
 
 //*************************************************************************************************************
@@ -144,9 +143,9 @@ void BrainAMP::init()
     //default values used by the setupGUI class must be set here
 
     QSettings settings;
-    m_iSamplingFreq = settings.value(QString("BRAINAMP/sFreq"), 512).toInt();
-    m_iNumberOfChannels = 90;
-    m_iSamplesPerBlock = settings.value(QString("BRAINAMP/samplesPerBlock"), 512).toInt();
+    m_iSamplingFreq = settings.value(QString("BRAINAMP/sFreq"), 1000).toInt();
+    m_iNumberOfChannels = 33;
+    m_iSamplesPerBlock = settings.value(QString("BRAINAMP/samplesPerBlock"), 1000).toInt();
     m_bWriteToFile = false;
     m_bWriteDriverDebugToFile = false;
     m_bIsRunning = false;
@@ -198,225 +197,31 @@ void BrainAMP::setUpFiffInfo()
     m_pFiffInfo->lowpass = m_iSamplingFreq/2;
 
     //
-    //Read electrode positions from .elc file
-    //
-    QList<QVector<double> > elcLocation3D;
-    QList<QVector<double> > elcLocation2D;
-    QString unit;
-    QStringList elcChannelNames;
-
-    if(!LayoutLoader::readAsaElcFile(m_sElcFilePath, elcChannelNames, elcLocation3D, elcLocation2D, unit)) {
-        qDebug() << "Error: Reading elc file.";
-    }
-
-    //qDebug() << elcLocation3D;
-    //qDebug() << elcLocation2D;
-    //qDebug() << elcChannelNames;
-
-    //The positions read from the asa elc file do not correspond to a RAS coordinate system - use a simple 90° z transformation to fix this
-    Matrix3f rotation_z;
-    rotation_z = AngleAxisf((float)M_PI/2, Vector3f::UnitZ()); //M_PI/2 = 90°
-    QVector3D center_pos;
-
-    for(int i = 0; i<elcLocation3D.size(); i++)
-    {
-        Vector3f point;
-        point << elcLocation3D[i][0], elcLocation3D[i][1] , elcLocation3D[i][2];
-        Vector3f point_rot = rotation_z * point;
-//        cout<<"point: "<<endl<<point<<endl<<endl;
-//        cout<<"matrix: "<<endl<<rotation_z<<endl<<endl;
-//        cout<<"point_rot: "<<endl<<point_rot<<endl<<endl;
-//        cout<<"-----------------------------"<<endl;
-        elcLocation3D[i][0] = point_rot[0];
-        elcLocation3D[i][1] = point_rot[1];
-        elcLocation3D[i][2] = point_rot[2];
-
-        //Also calculate the center position of the electrode positions in this for routine
-        center_pos.setX(center_pos.x() + elcLocation3D[i][0]);
-        center_pos.setY(center_pos.y() + elcLocation3D[i][1]);
-        center_pos.setZ(center_pos.z() + elcLocation3D[i][2]);
-    }
-
-    center_pos.setX(center_pos.x()/elcLocation3D.size());
-    center_pos.setY(center_pos.y()/elcLocation3D.size());
-    center_pos.setZ(center_pos.z()/elcLocation3D.size());
-
-    //
-    //Write electrode positions to the digitizer info in the fiffinfo
-    //
-    QList<FiffDigPoint> digitizerInfo;
-
-    //Only write the EEG channel positions to the fiff info. The Refa devices have next to the EEG input channels 10 other input channels (Bipolar, Auxilary, Digital, Test)
-    int numberEEGCh = 64;
-
-    //Check if channel size by user corresponds with read channel informations from the elc file. If not append zeros and string 'unknown' until the size matches.
-    if(numberEEGCh > elcLocation3D.size())
-    {
-        qDebug()<<"Warning: setUpFiffInfo() - Not enough positions read from the elc file. Filling missing channel names and positions with zeroes and 'unknown' strings.";
-        QVector<double> tempA(3, 0.0);
-        QVector<double> tempB(2, 0.0);
-        int size = numberEEGCh-elcLocation3D.size();
-        for(int i = 0; i<size; i++)
-        {
-            elcLocation3D.push_back(tempA);
-            elcLocation2D.push_back(tempB);
-            elcChannelNames.append(QString("Unknown"));
-        }
-    }
-
-    //
-    //Append cardinal points LPA RPA Nasion
-    //
-    QList<QVector<double> > cardinals3D;
-    QList<QVector<double> > cardinals2D;
-    QStringList cardinalNames;
-
-    if(!LayoutLoader::readAsaElcFile(m_sCardinalFilePath, cardinalNames, cardinals3D, cardinals2D, unit)) {
-        qDebug() << "Error: Reading elc cardinal file.";
-    }
-
-    //Rotate cardinal points
-    for(int i = 0; i < cardinals3D.size(); i++)
-    {
-        Vector3f point;
-        point << cardinals3D[i][0], cardinals3D[i][1] , cardinals3D[i][2];
-        Vector3f point_rot = rotation_z * point;
-
-        cardinals3D[i][0] = point_rot[0];
-        cardinals3D[i][1] = point_rot[1];
-        cardinals3D[i][2] = point_rot[2];
-    }
-
-    qDebug()<<"cardinals3D"<<cardinals3D;
-    qDebug()<<"cardinals2D"<<cardinals2D;
-    qDebug()<<"cardinalNames"<<cardinalNames;
-
-    //Append LAP value to digitizer data.
-    FiffDigPoint digPoint;
-    int indexLPA = elcChannelNames.indexOf(m_sLPA);
-    digPoint.kind = FIFFV_POINT_CARDINAL;
-    digPoint.ident = FIFFV_POINT_LPA;//digitizerInfo.size();
-
-    //Set EEG electrode location - Convert from mm to m
-    if(m_bUseTrackedCardinalMode && !m_sCardinalFilePath.isEmpty() && cardinals3D.size() == 3 && cardinalNames.contains("LPA")) {
-        indexLPA = cardinalNames.indexOf("LPA");
-
-        digPoint.r[0] = cardinals3D[indexLPA][0]*0.001;
-        digPoint.r[1] = cardinals3D[indexLPA][1]*0.001;
-        digPoint.r[2] = cardinals3D[indexLPA][2]*0.001;
-        digitizerInfo.push_back(digPoint);
-    } else if(m_bUseElectrodeShiftMode) {
-        if(indexLPA != -1)
-        {
-            digPoint.r[0] = elcLocation3D[indexLPA][0]*0.001;
-            digPoint.r[1] = elcLocation3D[indexLPA][1]*0.001;
-            digPoint.r[2] = (elcLocation3D[indexLPA][2]-m_dLPAShift*10)*0.001;
-            digitizerInfo.push_back(digPoint);
-        }
-        else {
-            qDebug() << "Plugin BRAINAMP - ERROR creating LPA - " << m_sLPA << " not found. Check loaded layout.";
-        }
-    }
-
-    //Append nasion value to digitizer data.
-    int indexNasion = elcChannelNames.indexOf(m_sNasion);
-    digPoint.kind = FIFFV_POINT_CARDINAL;//FIFFV_POINT_NASION;
-    digPoint.ident = FIFFV_POINT_NASION;//digitizerInfo.size();
-
-    //Set EEG electrode location - Convert from mm to m
-    if(m_bUseTrackedCardinalMode && !m_sCardinalFilePath.isEmpty() && cardinals3D.size() == 3 && cardinalNames.contains("Nasion")) {
-        indexNasion = cardinalNames.indexOf("Nasion");
-
-        digPoint.r[0] = cardinals3D[indexNasion][0]*0.001;
-        digPoint.r[1] = cardinals3D[indexNasion][1]*0.001;
-        digPoint.r[2] = cardinals3D[indexNasion][2]*0.001;
-        digitizerInfo.push_back(digPoint);
-    } else if(m_bUseElectrodeShiftMode) {
-        if(indexNasion != -1)
-        {
-            digPoint.r[0] = elcLocation3D[indexNasion][0]*0.001;
-            digPoint.r[1] = elcLocation3D[indexNasion][1]*0.001;
-            digPoint.r[2] = (elcLocation3D[indexNasion][2]-m_dNasionShift*10)*0.001;
-            digitizerInfo.push_back(digPoint);
-        }
-        else {
-            qDebug() << "Plugin BRAINAMP - ERROR creating Nasion - " << m_sNasion << " not found. Check loaded layout.";
-        }
-    }
-
-    //Append RAP value to digitizer data.
-    int indexRPA = elcChannelNames.indexOf(m_sRPA);
-    digPoint.kind = FIFFV_POINT_CARDINAL;
-    digPoint.ident = FIFFV_POINT_RPA;//digitizerInfo.size();
-
-    //Set EEG electrode location - Convert from mm to m
-    if(m_bUseTrackedCardinalMode && !m_sCardinalFilePath.isEmpty() && cardinals3D.size() == 3 && cardinalNames.contains("RPA")) {
-        indexRPA = cardinalNames.indexOf("RPA");
-
-        digPoint.r[0] = cardinals3D[indexRPA][0]*0.001;
-        digPoint.r[1] = cardinals3D[indexRPA][1]*0.001;
-        digPoint.r[2] = cardinals3D[indexRPA][2]*0.001;
-        digitizerInfo.push_back(digPoint);
-    } else if(m_bUseElectrodeShiftMode) {
-        if(indexRPA != -1)
-        {
-            digPoint.r[0] = elcLocation3D[indexRPA][0]*0.001;
-            digPoint.r[1] = elcLocation3D[indexRPA][1]*0.001;
-            digPoint.r[2] = (elcLocation3D[indexRPA][2]-m_dRPAShift*10)*0.001;
-            digitizerInfo.push_back(digPoint);
-        }
-        else {
-            qDebug() << "Plugin BRAINAMP - ERROR creating RPA - " << m_sRPA << " not found. Check loaded layout.";
-        }
-    }
-
-    //Add EEG electrode positions as digitizers
-    for(int i=0; i<numberEEGCh; i++)
-    {
-        FiffDigPoint digPoint;
-        digPoint.kind = FIFFV_POINT_EEG;
-        digPoint.ident = i;
-
-        //Set EEG electrode location - Convert from mm to m
-        digPoint.r[0] = elcLocation3D[i][0]*0.001;
-        digPoint.r[1] = elcLocation3D[i][1]*0.001;
-        digPoint.r[2] = elcLocation3D[i][2]*0.001;
-        digitizerInfo.push_back(digPoint);
-    }
-
-    //Set the final digitizer values to the fiff info
-    m_pFiffInfo->dig = digitizerInfo;
-
-    //
     //Set up the channel info
     //
     QStringList QSLChNames;
     m_pFiffInfo->chs.clear();
 
-    for(int i=0; i<m_iNumberOfChannels; i++)
+    for(int i = 0; i < m_iNumberOfChannels; ++i)
     {
         //Create information for each channel
         QString sChType;
         FiffChInfo fChInfo;
 
         //EEG Channels
-        if(i<=numberEEGCh-1)
+        if(i <= m_iNumberOfChannels-2)
         {
             //Set channel name
-            if(!elcChannelNames.empty() && i<elcChannelNames.size()) {
-                sChType = QString("EEG ");
-                sChType.append(elcChannelNames.at(i));
-                fChInfo.ch_name = sChType;
-            } else {
-                sChType = QString("EEG ");
-                if(i<10)
-                    sChType.append("00");
-
-                if(i>=10 && i<100)
-                    sChType.append("0");
-
-                fChInfo.ch_name = sChType.append(sChType.number(i));
+            sChType = QString("EEG ");
+            if(i<10) {
+                sChType.append("00");
             }
+
+            if(i>=10 && i<100) {
+                sChType.append("0");
+            }
+
+            fChInfo.ch_name = sChType.append(sChType.number(i));
 
             //Set channel type
             fChInfo.kind = FIFFV_EEG_CH;
@@ -435,23 +240,23 @@ void BrainAMP::setUpFiffInfo()
             fChInfo.unit_mul = 0;
 
             //Set EEG electrode location - Convert from mm to m
-            fChInfo.eeg_loc(0,0) = elcLocation3D[i][0]*0.001;
-            fChInfo.eeg_loc(1,0) = elcLocation3D[i][1]*0.001;
-            fChInfo.eeg_loc(2,0) = elcLocation3D[i][2]*0.001;
+            fChInfo.eeg_loc(0,0) = 0;
+            fChInfo.eeg_loc(1,0) = 0;
+            fChInfo.eeg_loc(2,0) = 0;
 
             //Set EEG electrode direction - Convert from mm to m
-            fChInfo.eeg_loc(0,1) = center_pos.x()*0.001;
-            fChInfo.eeg_loc(1,1) = center_pos.y()*0.001;
-            fChInfo.eeg_loc(2,1) = center_pos.z()*0.001;
+            fChInfo.eeg_loc(0,1) = 0;
+            fChInfo.eeg_loc(1,1) = 0;
+            fChInfo.eeg_loc(2,1) = 0;
 
             //Also write the eeg electrode locations into the meg loc variable (mne_ex_read_raw() matlab function wants this)
-            fChInfo.loc(0,0) = elcLocation3D[i][0]*0.001;
-            fChInfo.loc(1,0) = elcLocation3D[i][1]*0.001;
-            fChInfo.loc(2,0) = elcLocation3D[i][2]*0.001;
+            fChInfo.loc(0,0) = 0;
+            fChInfo.loc(1,0) = 0;
+            fChInfo.loc(2,0) = 0;
 
-            fChInfo.loc(3,0) = center_pos.x()*0.001;
-            fChInfo.loc(4,0) = center_pos.y()*0.001;
-            fChInfo.loc(5,0) = center_pos.z()*0.001;
+            fChInfo.loc(3,0) = 0;
+            fChInfo.loc(4,0) = 0;
+            fChInfo.loc(5,0) = 0;
 
             fChInfo.loc(6,0) = 0;
             fChInfo.loc(7,0) = 1;
@@ -460,37 +265,15 @@ void BrainAMP::setUpFiffInfo()
             fChInfo.loc(9,0) = 0;
             fChInfo.loc(10,0) = 0;
             fChInfo.loc(11,0) = 1;
-
-            //cout<<i<<endl<<fChInfo.eeg_loc<<endl;
-        }
-
-        //Bipolar channels
-        if(i>=64 && i<=87)
-        {
-            //Set channel type
-            fChInfo.kind = FIFFV_MISC_CH;
-
-            sChType = QString("BIPO ");
-            fChInfo.ch_name = sChType.append(sChType.number(i-64));
         }
 
         //Digital input channel
-        if(i==88)
+        if(i == m_iNumberOfChannels-1)
         {
             //Set channel type
             fChInfo.kind = FIFFV_STIM_CH;
 
             sChType = QString("STIM");
-            fChInfo.ch_name = sChType;
-        }
-
-        //Internally generated test signal - ramp signal
-        if(i==89)
-        {
-            //Set channel type
-            fChInfo.kind = FIFFV_MISC_CH;
-
-            sChType = QString("TEST");
             fChInfo.ch_name = sChType;
         }
 
@@ -517,15 +300,21 @@ void BrainAMP::setUpFiffInfo()
 bool BrainAMP::start()
 {
     //Check if the thread is already or still running. This can happen if the start button is pressed immediately after the stop button was pressed. In this case the stopping process is not finished yet but the start process is initiated.
-    if(this->isRunning())
+    if(this->isRunning()) {
         QThread::wait();
+    }
+
+    //Temporaray hack
+    m_iSamplesPerBlock = 1000;
+    m_iNumberOfChannels = 33;
+    m_iSamplingFreq = 5000;
 
     //Setup fiff info
     setUpFiffInfo();
 
     //Set the channel size of the RMTSA - this needs to be done here and NOT in the init() function because the user can change the number of channels during runtime
     m_pRMTSA_BrainAMP->data()->initFromFiffInfo(m_pFiffInfo);
-    m_pRMTSA_BrainAMP->data()->setMultiArraySize(1);//m_iSamplesPerBlock);
+    m_pRMTSA_BrainAMP->data()->setMultiArraySize(1);
     m_pRMTSA_BrainAMP->data()->setSamplingRate(m_iSamplingFreq);
 
     //Buffer
@@ -547,7 +336,7 @@ bool BrainAMP::start()
     }
     else
     {
-        qWarning() << "Plugin BrainAMP - ERROR - BrainAMPProducer thread could not be started - Either the device is turned off (check your OS device manager) or the driver DLL (EEGO-SDK.dll) is not installed in one of the monitored dll path." << endl;
+        qWarning() << "BrainAMP::start() - BrainAMPProducer thread could not be started." << endl;
         return false;
     }
 }
@@ -581,14 +370,14 @@ bool BrainAMP::stop()
 void BrainAMP::setSampleData(MatrixXd &matRawBuffer)
 {
     m_mutex.lock();
-        m_qListReceivedSamples.append(matRawBuffer);
+    m_qListReceivedSamples.append(matRawBuffer);
     m_mutex.unlock();
 }
 
 
 //*************************************************************************************************************
 
-PluginType BrainAMP::getType() const
+IPlugin::PluginType BrainAMP::getType() const
 {
     return _ISensor;
 }
@@ -652,6 +441,7 @@ void BrainAMP::run()
 
                 //emit values to real time multi sample array
                 //qDebug()<<"BrainAMP::run() - mat size"<<matValue.rows()<<"x"<<matValue.cols();
+                //std::cout << "BrainAMP::run() - matValue.block(10,10)" << matValue.block(0,0,10,10) << std::endl;
                 m_pRMTSA_BrainAMP->data()->setValue(matValue);
             }
 

@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     brainampproducer.h
+* @file     BrainAMPProducer.h
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Viktor Klüber <viktor.klueber@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the BrainAmpProducer class.
+* @brief    Contains the declaration of the BrainAMPProducer class.
 *
 */
 
@@ -44,6 +44,7 @@
 //=============================================================================================================
 
 #include <generics/circularbuffer.h>
+#include "brainamp_global.h"
 
 
 //*************************************************************************************************************
@@ -76,36 +77,36 @@ namespace BRAINAMPPLUGIN
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class BrainAmp;
-class BrainAmpDriver;
+class BrainAMP;
+class BrainAMPDriver;
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS BrainAmpProducer
+* DECLARE CLASS BrainAMPProducer
 *
-* @brief The BrainAmpProducer class provides a EEG data producer for a given sampling rate.
+* @brief The BrainAMPProducer class provides a EEG data producer for a given sampling rate.
 */
-class BrainAmpProducer : public QThread
+class BRAINAMPSHARED_EXPORT BrainAMPProducer : public QThread
 {
 public:
     //=========================================================================================================
     /**
-    * Constructs a BrainAmpProducer.
+    * Constructs a BrainAMPProducer.
     *
     * @param [in] pBrainAmp a pointer to the corresponding BrainAmp class.
     */
-    BrainAmpProducer(BrainAmp* pBrainAmp);
+    BrainAMPProducer(BrainAMP* pBrainAmp);
 
     //=========================================================================================================
     /**
-    * Destroys the BrainAmpProducer.
+    * Destroys the BrainAMPProducer.
     */
-    ~BrainAmpProducer();
+    ~BrainAMPProducer();
 
     //=========================================================================================================
     /**
-    * Starts the BrainAmpProducer by starting the producer's thread and initialising the device.
+    * Starts the BrainAMPProducer by starting the producer's thread and initialising the device.
     * @param [in] iNumberOfChannels The number of channels defined by the user via the GUI.
     * @param [in] iSamplesPerBlock The samples per block defined by the user via the GUI.
     * @param [in] iSamplingFrequency The sampling frequency defined by the user via the GUI (in Hertz).
@@ -122,7 +123,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Stops the BrainAmpProducer by stopping the producer's thread.
+    * Stops the BrainAMPProducer by stopping the producer's thread.
     */
     void stop();
 
@@ -136,10 +137,10 @@ protected:
     virtual void run();
 
 private:
-    BrainAmp*                           m_pBrainAmp;            /**< A pointer to the corresponding BrainAmp class.*/
-    QSharedPointer<BrainAmpDriver>      m_pBrainAmpDriver;      /**< A pointer to the corresponding BrainAmp driver class.*/
+    BrainAMP*                           m_pBrainAmp;            /**< A pointer to the corresponding BrainAmp class.*/
+    QSharedPointer<BrainAMPDriver>      m_pBrainAmpDriver;      /**< A pointer to the corresponding BrainAmp driver class.*/
 
-    bool                                m_bIsRunning;           /**< Whether BrainAmpProducer is running.*/
+    bool                                m_bIsRunning;           /**< Whether BrainAMPProducer is running.*/
 };
 
 } // NAMESPACE

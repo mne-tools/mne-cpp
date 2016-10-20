@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the BrainAmpDriver class.
+* @brief    Contains the declaration of the BrainAMPDriver class.
 *
 */
 
@@ -43,8 +43,17 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "BrainAmpIoCtl.h"
+//#include <windows.h>
+//#include <stdio.h>
+//#include <io.h>
+//#include <conio.h>
+//#include <vector>
+//#include "BrainAmpIoCtl.h"
+
 #include <windows.h>
+#include "BrainAmpIoCtl.h"
+
+#include "brainamp_global.h"
 
 
 //*************************************************************************************************************
@@ -80,7 +89,7 @@ namespace BRAINAMPPLUGIN
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class BrainAmpProducer;
+class BrainAMPProducer;
 
 
 //*************************************************************************************************************
@@ -107,27 +116,27 @@ enum AmpTypes
 
 //=============================================================================================================
 /**
-* BrainAmpDriver
+* BrainAMPDriver
 *
-* @brief The BrainAmpDriver class provides real time data acquisition of EEG data with a Brain Amp device.
+* @brief The BrainAMPDriver class provides real time data acquisition of EEG data with a Brain Amp device.
 */
-class BrainAmpDriver
+class BRAINAMPSHARED_EXPORT BrainAMPDriver
 {
 
 public:
     //=========================================================================================================
     /**
-    * Constructs a BrainAmpDriver.
+    * Constructs a BrainAMPDriver.
     *
     * @param [in] pEEGoSportsProducer a pointer to the corresponding EEGoSports Producer class.
     */
-    BrainAmpDriver(BrainAmpProducer* pBrainAmpProducer);
+    BrainAMPDriver(BrainAMPProducer* pBrainAmpProducer);
 
     //=========================================================================================================
     /**
-    * Destroys the BrainAmpDriver.
+    * Destroys the BrainAMPDriver.
     */
-    ~BrainAmpDriver();
+    ~BrainAMPDriver();
 
     //=========================================================================================================
     /**
@@ -157,8 +166,18 @@ public:
     //=========================================================================================================
     /**
     * Opens the device.
+    *
+    * @return returns true if device was successfully opened, false otherwise.
     */
-    void openDevice();
+    bool openDevice();
+
+    //=========================================================================================================
+    /**
+    * Finds amplifiers.
+    *
+    * @return returns number of successive amplifiers starting from the first position.
+    */
+    int findAmplifiers();
 
     //=========================================================================================================
     /**
@@ -169,7 +188,7 @@ public:
     bool uninitDevice();
 
 private:
-    BrainAmpProducer*           m_pBrainAmpProducer;                /**< A pointer to the corresponding BrainAmpProducer class.*/
+    BrainAMPProducer*           m_pBrainAmpProducer;                /**< A pointer to the corresponding BrainAmpProducer class.*/
 
     bool                        m_bInitDeviceSuccess;               /**< Flag which defines if the device initialisation was successfull.*/
     bool                        m_bDllLoaded;                       /**< Flag which defines if the driver DLL was loaded successfully.*/
@@ -181,15 +200,11 @@ private:
     QString                     m_sOutputFilePath;                  /**< Holds the path for the output file. Defined by the user via the GUI.*/
     bool                        m_bMeasureImpedances;               /**< Flag for impedance measuring mode.*/
 
-    std::ofstream               m_outputFileStream;                 /**< fstream for writing the driver debug informations to a txt file.*/
+    HANDLE                      DeviceAmp;                          /**< Amplifier device.*/
 
-    HANDLE                      DeviceAmp = INVALID_HANDLE_VALUE;   /**< Amplifier device.*/
+    bool                        UsbDevice;                          /**< If true, the connected device is an USB box, otherwise a PCI/ISA host adapter.*/
 
-    bool                        UsbDevice = false;                  /**< If true, the connected device is an USB box, otherwise a PCI/ISA host adapter.*/
-
-    int                         DriverVersion = 0;                  /**< Driver version.*/
-
-    AmpTypes amplifiers[4] = { None, None, None, None };            /**< Connected amplifiers.*/
+    int                         DriverVersion;                      /**< Driver version.*/
 
     BA_SETUP                    Setup;                              /**< Setup structure.*/
 

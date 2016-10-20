@@ -423,26 +423,26 @@ bool SelectionManagerWindow::loadLayout(QString path)
     float height = 4.0;
     int numberTries = 0;
 
-    if(inputPoints.size()>0) {
-        while(numberTries<10) {
-            if(!LayoutMaker::makeLayout(inputPoints,
-                                       outputPoints,
-                                       names,
-                                       out,
-                                       true,
-                                       prad,
-                                       width,
-                                       height,
-                                       false,
-                                       true,
-                                       false)) {
-                numberTries++;
-            }
-            else {
-                numberTries = 11;
-            }
-        }
-    }
+//    if(inputPoints.size()>0) {
+//        while(numberTries<10) {
+//            if(!LayoutMaker::makeLayout(inputPoints,
+//                                       outputPoints,
+//                                       names,
+//                                       out,
+//                                       true,
+//                                       prad,
+//                                       width,
+//                                       height,
+//                                       false,
+//                                       true,
+//                                       false)) {
+//                numberTries++;
+//            }
+//            else {
+//                numberTries = 11;
+//            }
+//        }
+//    }
 
     //Add new EEG points to Layout Map
     for(int i = 0;  i < outputPoints.size(); i++) {

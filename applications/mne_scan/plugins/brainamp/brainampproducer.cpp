@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     brainampproducer.cpp
+* @file     brainamppoducer.cpp
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Viktor Klüber <viktor.klueber@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the BrainAmpProducer class.
+* @brief    Contains the implementation of the BrainAMPProducer class.
 *
 */
 
@@ -60,9 +60,9 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-BrainAmpProducer::BrainAmpProducer(BrainAmp* pBrainAmp)
+BrainAMPProducer::BrainAMPProducer(BrainAMP* pBrainAmp)
 : m_pBrainAmp(pBrainAmp)
-, m_pBrainAmpDriver(new BrainAmpDriver(this))
+, m_pBrainAmpDriver(new BrainAMPDriver(this))
 , m_bIsRunning(true)
 {
 }
@@ -70,15 +70,14 @@ BrainAmpProducer::BrainAmpProducer(BrainAmp* pBrainAmp)
 
 //*************************************************************************************************************
 
-BrainAmpProducer::~BrainAmpProducer()
+BrainAMPProducer::~BrainAMPProducer()
 {
-    //cout << "BrainAmpProducer::~BrainAmpProducer()" << endl;
 }
 
 
 //*************************************************************************************************************
 
-void BrainAmpProducer::start(int iNumberOfChannels,
+void BrainAMPProducer::start(int iNumberOfChannels,
                         int iSamplesPerBlock,
                         int iSamplingFrequency,
                         bool bWriteDriverDebugToFile,
@@ -103,13 +102,10 @@ void BrainAmpProducer::start(int iNumberOfChannels,
 
 //*************************************************************************************************************
 
-void BrainAmpProducer::stop()
+void BrainAMPProducer::stop()
 {
-    //Wait until this thread (BrainAmpProducer) is stopped
+    //Wait until this thread (BrainAMPProducer) is stopped
     m_bIsRunning = false;
-
-    //In case the semaphore blocks the thread -> Release the QSemaphore and let it exit from the push function (acquire statement)
-    m_pBrainAmpDriver->m_pRawMatrixBuffer_In->releaseFromPush();
 
     while(this->isRunning())
         m_bIsRunning = false;
@@ -121,20 +117,20 @@ void BrainAmpProducer::stop()
 
 //*************************************************************************************************************
 
-void BrainAmpProducer::run()
+void BrainAMPProducer::run()
 {
     while(m_bIsRunning)
     {
-        //std::cout<<"BrainAmpProducer::run()"<<std::endl;
+        //std::cout<<"BrainAMPProducer::run()"<<std::endl;
         //Get the TMSi EEG data out of the device buffer and write received data to a QList
         MatrixXd matRawBuffer;
 
         if(m_pBrainAmpDriver->getSampleMatrixValue(matRawBuffer)) {
-            m_pBrainAmpDriver->setSampleData(matRawBuffer);
+            m_pBrainAmp->setSampleData(matRawBuffer);
         }
     }
 
-    std::cout<<"EXITING - BrainAmpProducer::run()"<<std::endl;
+    std::cout<<"EXITING - BrainAMPProducer::run()"<<std::endl;
 }
 
 
