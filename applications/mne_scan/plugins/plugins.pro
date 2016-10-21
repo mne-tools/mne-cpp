@@ -71,7 +71,7 @@ contains(MNECPP_CONFIG, BuildBasicMNESCANVersion) {
         rtsss \
         rthpi \
         noisereduction \
-		ssvepbci \
+        ssvepbci \
         neuronalconnectivity \
 
     win32 { #Only compile the TMSI plugin if a windows system is used - TMSi driver is not available for linux yet
