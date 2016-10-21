@@ -67,6 +67,7 @@ ScreenKeyboard::ScreenKeyboard(QSharedPointer<SsvepBci> pSsvepBci, QSharedPointe
 , m_bInitializeKeyboard(true)
 , m_bUpdatePhraseDisplay(true)
 , m_bUseSpellAccuracy(false)
+, m_qSpellIterator(0)
 {
     // initialize map for keyboard values and their relative coordinates to each other
     m_mapKeys[QPair<int, int>( 0, 0)] = "E";
@@ -170,7 +171,7 @@ void ScreenKeyboard::paint(QPaintDevice *device)
     if( (m_qCurCursorCoord != m_qOldCursorCoord) ){
 
         // scaling the letter size to the biggest sign "DEL"
-        float factor = width / painter.fontMetrics().width("DEL");
+        float factor = ((float)(width)) / painter.fontMetrics().width("DEL");
         if ((factor < 1) || (factor > 1.25))
         {
             QFont f = painter.font();

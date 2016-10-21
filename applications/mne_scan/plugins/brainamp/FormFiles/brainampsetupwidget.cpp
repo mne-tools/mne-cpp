@@ -1,15 +1,15 @@
 //=============================================================================================================
 /**
-* @file     ssvepbciflickeringitem.cpp
-* @author   Viktor Klüber <viktor.klueber@tu-ilmenauz.de>;
-*           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+* @file     brainampsetupwidget.cpp
+* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+*           Viktor Klüber <viktor.klueber@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     May 2016
+* @date     October, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2016, Viktor Klüber, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Lorenz Esch, Viktor Klüber and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the SsvepBciFlickeringItem class.
+* @brief    Contains the implementation of the BrainAMPSetupWidget class.
 *
 */
 
@@ -39,119 +39,94 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "ssvepbciflickeringitem.h"
+#include "brainampsetupwidget.h"
+#include "brainampaboutwidget.h"
+#include "../brainamp.h"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QDebug>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace SSVEPBCIPLUGIN;
+using namespace BRAINAMPPLUGIN;
+
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-SsvepBciFlickeringItem::SsvepBciFlickeringItem()
-: m_dPosX(0)
-, m_dPosY(0)
-, m_dWidth(0.4)
-, m_dHeight(0.4)
-, m_bFlickerState(true)
-, m_bSignFlag(false)
-, m_bIter(m_bRenderOrder)
-, m_iFreqKey(0)
+BrainAMPSetupWidget::BrainAMPSetupWidget(BrainAMP* pBrainAMP, QWidget* parent)
+: QWidget(parent)
+, m_pBrainAMP(pBrainAMP)
 {
-    m_bRenderOrder << 0 << 0 << 1 << 1; //default
-}
+    ui.setupUi(this);
 
+    //Connect device sampling properties
+    connect(ui.m_comboBox_SamplingFreq, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+            this, &BrainAMPSetupWidget::setDeviceSamplingProperties);
+    connect(ui.m_spinBox_BlockSize, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+            this, &BrainAMPSetupWidget::setDeviceSamplingProperties);
 
-//*************************************************************************************************************
+    //Connect about button
+    connect(ui.m_qPushButton_About, &QPushButton::released, this, &BrainAMPSetupWidget::showAboutDialog);
 
-SsvepBciFlickeringItem::~SsvepBciFlickeringItem()
-{
-}
+    //Fill info box
+    QFile file(m_pBrainAMP->m_qStringResourcePath+"readme.txt");
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+        return;
 
-
-//*************************************************************************************************************
-
-void SsvepBciFlickeringItem::setPos(double x, double y)
-{
-        m_dPosX = x;
-        m_dPosY = y;
-}
-
-
-//*************************************************************************************************************
-
-void SsvepBciFlickeringItem::setDim(double w, double h)
-{
-    m_dWidth    = w;
-    m_dHeight   = h;
-}
-
-
-//*************************************************************************************************************
-
-void SsvepBciFlickeringItem::setRenderOrder(QList<bool> renderOrder, int freqKey)
-{
-    //clear the old rendering order list
-    m_bRenderOrder.clear();
-
-    //setup the iterator and assign it to the new list
-    m_bRenderOrder  = renderOrder;
-    m_bIter         = m_bRenderOrder;
-    m_iFreqKey      = freqKey;
-}
-
-
-//*************************************************************************************************************
-
-void SsvepBciFlickeringItem::paint(QPaintDevice *paintDevice)
-{
-    //setting the nex flicker state (moving iterater to front if necessary)
-    if(!m_bIter.hasNext()){
-        m_bIter.toFront();
+    QTextStream in(&file);
+    while (!in.atEnd())
+    {
+        QString line = in.readLine();
+        ui.m_qTextBrowser_Information->insertHtml(line);
+        ui.m_qTextBrowser_Information->insertHtml("<br>");
     }
-
-    if( m_bIter.peekNext() != m_bFlickerState){
-        //painting the itme's shape
-        QPainter p(paintDevice);
-
-        if(m_bSignFlag){
-            QFont f = p.font();
-            f.setBold(true);
-            f.setPointSize(30);
-            p.setFont(f);
-        }
-
-        QRect rectangle(m_dPosX*paintDevice->width(),m_dPosY*paintDevice->height(),m_dWidth*paintDevice->width(),m_dHeight*paintDevice->height());
-
-        if(m_bFlickerState){ //
-            p.fillRect(rectangle,Qt::white);
-            p.drawText(rectangle, Qt::AlignCenter, m_sSign);
-        }
-        else{
-            p.fillRect(m_dPosX*paintDevice->width(),m_dPosY*paintDevice->height(),m_dWidth*paintDevice->width(),m_dHeight*paintDevice->height(),Qt::black);
-        }
-    }
-    m_bFlickerState = m_bIter.next();
 }
 
 
 //*************************************************************************************************************
 
-int SsvepBciFlickeringItem::getFreqKey()
+BrainAMPSetupWidget::~BrainAMPSetupWidget()
 {
-    return m_iFreqKey;
+
 }
 
 
 //*************************************************************************************************************
 
-void SsvepBciFlickeringItem::addSign(QString sign)
+void BrainAMPSetupWidget::initGui()
 {
-    m_bSignFlag = true;
-    m_sSign = sign;
+    //Init device sampling properties
+    ui.m_comboBox_SamplingFreq->setCurrentText(QString::number(m_pBrainAMP->m_iSamplingFreq));
+    ui.m_spinBox_BlockSize->setValue(m_pBrainAMP->m_iSamplesPerBlock);
+}
+
+
+//*************************************************************************************************************
+
+void BrainAMPSetupWidget::setDeviceSamplingProperties()
+{
+    m_pBrainAMP->m_iSamplingFreq = ui.m_comboBox_SamplingFreq->currentText().toInt();
+    m_pBrainAMP->m_iSamplesPerBlock = ui.m_spinBox_BlockSize->value();
+}
+
+
+//*************************************************************************************************************
+
+void BrainAMPSetupWidget::showAboutDialog()
+{
+    BrainAMPAboutWidget aboutDialog(this);
+    aboutDialog.exec();
 }
