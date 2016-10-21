@@ -43,23 +43,20 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <iostream>
-#include <fstream>
-#include <direct.h>
-
 #include "brainamp_global.h"
+
+#include <fstream>
 
 #include <scShared/Interfaces/ISensor.h>
 #include <generics/circularmatrixbuffer.h>
-#include <scMeas/newrealtimemultisamplearray.h>
 
-#include <utils/layoutloader.h>
-#include <utils/layoutmaker.h>
 
-#include "FormFiles/brainampsetupwidget.h"
-#include "FormFiles/brainampsetupprojectwidget.h"
+//*************************************************************************************************************
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
 
-#include <fiff/fiff.h>
+#include <QFile>
 
 
 //*************************************************************************************************************
@@ -73,13 +70,17 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// FORWARD DECLARATIONS
 //=============================================================================================================
 
-#include <QtWidgets>
-#include <QVector>
-#include <QTime>
-#include <QtConcurrent/QtConcurrent>
+namespace SCMEASLIB {
+    class NewRealTimeMultiSampleArray;
+}
+
+namespace FIFFLIB {
+    class FiffStream;
+    class FiffInfo;
+}
 
 
 //*************************************************************************************************************
@@ -93,24 +94,12 @@ namespace BRAINAMPPLUGIN
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace SCSHAREDLIB;
-using namespace SCMEASLIB;
-using namespace IOBUFFER;
-using namespace FIFFLIB;
-using namespace std;
-using namespace UTILSLIB;
-using namespace Eigen;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
 class BrainAMPProducer;
+class BrainAMPSetupWidget;
+class BrainAMPSetupProjectWidget;
 
 
 //=============================================================================================================
@@ -119,10 +108,10 @@ class BrainAMPProducer;
 *
 * @brief The BrainAMP class provides a EEG connector. In order for this plugin to work properly the driver dll "RTINST.dll" must be installed in the system directory. This dll is automatically copied in the system directory during the driver installtion of the TMSi Refa device.
 */
-class BRAINAMPSHARED_EXPORT BrainAMP : public ISensor
+class BRAINAMPSHARED_EXPORT BrainAMP : public SCSHAREDLIB::ISensor
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "brainamp.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "brainamp.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
     Q_INTERFACES(SCSHAREDLIB::ISensor)
 
@@ -149,7 +138,7 @@ public:
     /**
     * Clone the plugin
     */
-    virtual QSharedPointer<IPlugin> clone() const;
+    virtual QSharedPointer<SCSHAREDLIB::IPlugin> clone() const;
 
     //=========================================================================================================
     /**
@@ -185,7 +174,7 @@ public:
     /**
     * Set/Add received samples to a QList.
     */
-    void setSampleData(MatrixXd &matRawBuffer);
+    void setSampleData(Eigen::MatrixXd &matRawBuffer);
 
     virtual IPlugin::PluginType getType() const;
     virtual QString getName() const;
@@ -240,8 +229,10 @@ protected:
     bool dirExists(const std::string& dirName_in);
 
 private:
-    PluginOutputData<NewRealTimeMultiSampleArray>::SPtr m_pRMTSA_BrainAMP;              /**< The RealTimeSampleArray to provide the EEG data.*/
-    QSharedPointer<BrainAMPSetupProjectWidget> m_pBrainAMPSetupProjectWidget;           /**< Widget for checking the impedances*/
+    QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::NewRealTimeMultiSampleArray> >  m_pRMTSA_BrainAMP;              /**< The RealTimeSampleArray to provide the EEG data.*/
+    QSharedPointer<BrainAMPSetupProjectWidget>                                              m_pBrainAMPSetupProjectWidget;  /**< Widget for checking the impedances*/
+
+    QSharedPointer<IOBUFFER::RawMatrixBuffer>     m_pRawMatrixBuffer_In;              /**< Holds incoming raw data.*/
 
     QString                             m_qStringResourcePath;              /**< The path to the EEG resource directory.*/
 
@@ -258,7 +249,7 @@ private:
     bool                                m_bUseTrackedCardinalMode;          /**< Flag for using the tracked cardinal mode.*/
     bool                                m_bUseElectrodeShiftMode;           /**< Flag for using the electrode shift mode.*/
 
-    ofstream                            m_outputFileStream;                 /**< fstream for writing the samples values to txt file.*/
+    std::ofstream                       m_outputFileStream;                 /**< fstream for writing the samples values to txt file.*/
 
     QString                             m_sOutputFilePath;                  /**< Holds the path for the sample output file. Defined by the user via the GUI.*/
     QString                             m_sElcFilePath;                     /**< Holds the path for the .elc file (electrode positions). Defined by the user via the GUI.*/
@@ -268,11 +259,9 @@ private:
     QString                             m_sNasion;                          /**< The electrode to take to function as the Nasion.*/
 
     QFile                               m_fileOut;                          /**< QFile for writing to fif file.*/
-    FiffStream::SPtr                    m_pOutfid;                          /**< QFile for writing to fif file.*/
-    QSharedPointer<FiffInfo>            m_pFiffInfo;                        /**< Fiff measurement info.*/
-    RowVectorXd                         m_cals;
-
-    QSharedPointer<RawMatrixBuffer>     m_pRawMatrixBuffer_In;              /**< Holds incoming raw data.*/
+    QSharedPointer<FIFFLIB::FiffStream> m_pOutfid;                          /**< QFile for writing to fif file.*/
+    QSharedPointer<FIFFLIB::FiffInfo>   m_pFiffInfo;                        /**< Fiff measurement info.*/
+    Eigen::RowVectorXd                  m_cals;
 
     QSharedPointer<BrainAMPProducer>    m_pBrainAMPProducer;                /**< the BrainAMPProducer.*/
 
@@ -285,7 +274,7 @@ private:
     QSharedPointer<QTimer>              m_pTimerRecordingChange;            /**< timer to control blinking of the recording icon */
     qint16                              m_iBlinkStatus;                     /**< flag for recording icon blinking */
 
-    QList<MatrixXd>                     m_qListReceivedSamples;             /**< list with alle the received samples in form of differentley sized matrices. */
+    QList<Eigen::MatrixXd>              m_qListReceivedSamples;             /**< list with alle the received samples in form of differentley sized matrices. */
 
     QMutex                              m_mutex;
 

@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     BrainAMPProducer.h
+* @file     brainampproducer.h
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Viktor Klüber <viktor.klueber@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
@@ -43,8 +43,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <generics/circularbuffer.h>
 #include "brainamp_global.h"
+
+#include <generics/circularbuffer.h>
 
 
 //*************************************************************************************************************
