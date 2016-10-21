@@ -65,12 +65,6 @@ namespace BRAINAMPPLUGIN
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-
-//*************************************************************************************************************
-//=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
@@ -89,7 +83,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a ECGAboutWidget dialog which is a child of parent.
+    * Constructs a BrainAMPAboutWidget dialog which is a child of parent.
     *
     * @param [in] parent pointer to parent widget; If parent is 0, the new BrainAMPAboutWidget becomes a window. If parent is another widget, BrainAMPAboutWidget becomes a child window inside parent. BrainAMPAboutWidget is deleted when its parent is deleted.
     */
