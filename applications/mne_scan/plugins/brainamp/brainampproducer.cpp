@@ -1,15 +1,15 @@
 //=============================================================================================================
 /**
-* @file     ssvepbciflickeringitem.cpp
-* @author   Viktor Klüber <viktor.klueber@tu-ilmenauz.de>;
-*           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+* @file     brainamppoducer.cpp
+* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+*           Viktor Klüber <viktor.klueber@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     May 2016
+* @date     October, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2016, Viktor Klüber, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Lorenz Esch, Viktor Klüber and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the SsvepBciFlickeringItem class.
+* @brief    Contains the implementation of the BrainAMPProducer class.
 *
 */
 
@@ -39,119 +39,108 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "ssvepbciflickeringitem.h"
+#include "brainampproducer.h"
+#include "brainamp.h"
+#include "brainampdriver.h"
+
+#include <iostream>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QDebug>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace SSVEPBCIPLUGIN;
+using namespace BRAINAMPPLUGIN;
+using namespace Eigen;
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-SsvepBciFlickeringItem::SsvepBciFlickeringItem()
-: m_dPosX(0)
-, m_dPosY(0)
-, m_dWidth(0.4)
-, m_dHeight(0.4)
-, m_bFlickerState(true)
-, m_bSignFlag(false)
-, m_bIter(m_bRenderOrder)
-, m_iFreqKey(0)
-{
-    m_bRenderOrder << 0 << 0 << 1 << 1; //default
-}
-
-
-//*************************************************************************************************************
-
-SsvepBciFlickeringItem::~SsvepBciFlickeringItem()
+BrainAMPProducer::BrainAMPProducer(BrainAMP* pBrainAmp)
+: m_pBrainAmp(pBrainAmp)
+, m_pBrainAmpDriver(new BrainAMPDriver(this))
+, m_bIsRunning(true)
 {
 }
 
 
 //*************************************************************************************************************
 
-void SsvepBciFlickeringItem::setPos(double x, double y)
+BrainAMPProducer::~BrainAMPProducer()
 {
-        m_dPosX = x;
-        m_dPosY = y;
 }
 
 
 //*************************************************************************************************************
 
-void SsvepBciFlickeringItem::setDim(double w, double h)
+void BrainAMPProducer::start(int iSamplesPerBlock,
+                        int iSamplingFrequency,
+                        QString sOutputFilePath,
+                        bool bMeasureImpedance)
 {
-    m_dWidth    = w;
-    m_dHeight   = h;
+    //Initialise device
+    if(m_pBrainAmpDriver->initDevice(iSamplesPerBlock,
+                                iSamplingFrequency,
+                                sOutputFilePath,
+                                bMeasureImpedance))
+    {
+        m_bIsRunning = true;
+        QThread::start();
+    }
+    else
+        m_bIsRunning = false;
 }
 
 
 //*************************************************************************************************************
 
-void SsvepBciFlickeringItem::setRenderOrder(QList<bool> renderOrder, int freqKey)
+void BrainAMPProducer::stop()
 {
-    //clear the old rendering order list
-    m_bRenderOrder.clear();
+    //Wait until this thread (BrainAMPProducer) is stopped
+    m_bIsRunning = false;
 
-    //setup the iterator and assign it to the new list
-    m_bRenderOrder  = renderOrder;
-    m_bIter         = m_bRenderOrder;
-    m_iFreqKey      = freqKey;
+    while(this->isRunning())
+        m_bIsRunning = false;
+
+    //Unitialise device only after the thread stopped
+    m_pBrainAmpDriver->uninitDevice();
 }
 
 
 //*************************************************************************************************************
 
-void SsvepBciFlickeringItem::paint(QPaintDevice *paintDevice)
+void BrainAMPProducer::run()
 {
-    //setting the nex flicker state (moving iterater to front if necessary)
-    if(!m_bIter.hasNext()){
-        m_bIter.toFront();
+    while(m_bIsRunning)
+    {
+        //std::cout<<"BrainAMPProducer::run()"<<std::endl;
+        //Get the TMSi EEG data out of the device buffer and write received data to a QList
+        MatrixXd matRawBuffer;
+
+        if(m_pBrainAmpDriver->getSampleMatrixValue(matRawBuffer)) {
+            m_pBrainAmp->setSampleData(matRawBuffer);
+        }
     }
 
-    if( m_bIter.peekNext() != m_bFlickerState){
-        //painting the itme's shape
-        QPainter p(paintDevice);
-
-        if(m_bSignFlag){
-            QFont f = p.font();
-            f.setBold(true);
-            f.setPointSize(30);
-            p.setFont(f);
-        }
-
-        QRect rectangle(m_dPosX*paintDevice->width(),m_dPosY*paintDevice->height(),m_dWidth*paintDevice->width(),m_dHeight*paintDevice->height());
-
-        if(m_bFlickerState){ //
-            p.fillRect(rectangle,Qt::white);
-            p.drawText(rectangle, Qt::AlignCenter, m_sSign);
-        }
-        else{
-            p.fillRect(m_dPosX*paintDevice->width(),m_dPosY*paintDevice->height(),m_dWidth*paintDevice->width(),m_dHeight*paintDevice->height(),Qt::black);
-        }
-    }
-    m_bFlickerState = m_bIter.next();
+    std::cout<<"EXITING - BrainAMPProducer::run()"<<std::endl;
 }
 
 
-//*************************************************************************************************************
-
-int SsvepBciFlickeringItem::getFreqKey()
-{
-    return m_iFreqKey;
-}
-
-
-//*************************************************************************************************************
-
-void SsvepBciFlickeringItem::addSign(QString sign)
-{
-    m_bSignFlag = true;
-    m_sSign = sign;
-}
