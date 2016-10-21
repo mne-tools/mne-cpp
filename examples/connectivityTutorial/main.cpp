@@ -41,7 +41,7 @@
 
 #include <disp3D/view3D.h>
 #include <disp3D/control/control3dwidget.h>
-
+#include <disp3D/3DObjects/brain/brainrtsourcelocdatatreeitem.h>
 #include <disp/imagesc.h>
 
 #include <fs/label.h>
@@ -295,12 +295,21 @@ int main(int argc, char *argv[])
     std::cout<<"Creating BrainView"<<std::endl;
 
     View3D::SPtr testWindow = View3D::SPtr(new View3D());
-    testWindow->addSurfaceSet("Subject01", "Right Visual", tSurfSet, tAnnotSet);
+    testWindow->addSurfaceSet("Subject01", "Left Auditory", tSurfSet, tAnnotSet);
 
-    QList<BrainRTConnectivityDataTreeItem*> rtItemList_LA = testWindow->addConnectivityData("Subject01", "Left Auditory", pConnect_LA);
-//    QList<BrainRTConnectivityDataTreeItem*> rtItemList_RA = testWindow->addConnectivityData("Subject01", "Right Auditory", pConnect_RA);
-//    QList<BrainRTConnectivityDataTreeItem*> rtItemList_LV = testWindow->addConnectivityData("Subject01", "Left Visual", pConnect_LV);
-//    QList<BrainRTConnectivityDataTreeItem*> rtItemList_RV = testWindow->addConnectivityData("Subject01", "Right Visual", pConnect_RV);
+    QList<BrainRTConnectivityDataTreeItem*> rtItemListConnect= testWindow->addConnectivityData("Subject01", "Left Auditory", pConnect_LA);
+
+    QList<BrainRTSourceLocDataTreeItem*> rtItemListSourceLoc = testWindow->addSourceData("Subject01", "Left Auditory", sourceEstimate_LA, t_clusteredFwd);
+    //Init some rt related values for right visual data
+    for(int i = 0; i < rtItemListSourceLoc.size(); ++i) {
+        rtItemListSourceLoc.at(i)->setLoopState(true);
+        rtItemListSourceLoc.at(i)->setTimeInterval(17);
+        rtItemListSourceLoc.at(i)->setNumberAverages(1);
+        rtItemListSourceLoc.at(i)->setStreamingActive(true);
+        rtItemListSourceLoc.at(i)->setNormalization(QVector3D(0.0,5.5,10));
+        rtItemListSourceLoc.at(i)->setVisualizationType("Annotation based");
+        rtItemListSourceLoc.at(i)->setColortable("Hot");
+    }
 
     testWindow->show();
 
