@@ -10,6 +10,7 @@
 * @section  LICENSE
 *
 * Copyright (C) 2015, Viktor Klüber, Lorenz Esch and Matti Hamalainen. All rights reserved.
+*
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
 *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
@@ -42,7 +43,10 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <gusbamp_global.h>
 #include <generics/circularbuffer.h>
+#include <vector>
+#include <Windows.h>
 
 
 //*************************************************************************************************************
@@ -56,19 +60,11 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE GUSBAmpPlugin
+// DEFINE NAMESPACE GUSBAMPPLUGIN
 //=============================================================================================================
 
-namespace GUSBAmpPlugin
+namespace GUSBAMPPLUGIN
 {
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace IOBuffer;
 
 
 //*************************************************************************************************************
@@ -86,7 +82,7 @@ class GUSBAmpDriver;
 *
 * @brief The EEGProducer class provides a EEG data producer for a given sampling rate.
 */
-class GUSBAmpProducer : public QThread
+class GUSBAMPSHARED_EXPORT GUSBAmpProducer : public QThread
 {
 public:
     //=========================================================================================================
@@ -107,14 +103,25 @@ public:
     /**
     * Starts the GUSBAmpProducer by starting the producer's thread and initialising the device.
     *
+    * @param [in] serials       string array of all Serial names
+    * @param [in] channels      int field of calling number of the channels to be acquired
+    * @param [in] sampleRate    sample Rate as an integer
+    * @param [in] filePath      string of the filepath where data will be stored
+    *
     */
-    virtual void start();
+    virtual void start(std::vector<QString> &serials, std::vector<int> channels, int sampleRate);
 
     //=========================================================================================================
     /**
     * Stops the GUSBAmpProducer by stopping the producer's thread.
     */
     void stop();
+
+    //=========================================================================================================
+    /**
+    * @return           returns the size of the sample Matrix
+    */
+    std::vector<int> getSizeOfSampleMatrix(void);
 
 protected:
     //=========================================================================================================
@@ -126,10 +133,14 @@ protected:
     virtual void run();
 
 private:
-    GUSBAmp*                       m_pGUSBAmp;            /**< A pointer to the corresponding GUSBAmp class.*/
-    QSharedPointer<GUSBAmpDriver>  m_pGUSBAmpDriver;      /**< A pointer to the corresponding GUSBAmp driver class.*/
+    GUSBAmp*                        m_pGUSBAmp;            /**< A pointer to the corresponding GUSBAmp class.*/
+    QSharedPointer<GUSBAmpDriver>   m_pGUSBAmpDriver;      /**< A pointer to the corresponding GUSBAmp driver class.*/
+    bool                            m_bIsRunning;          /**< Whether GUSBAmpProducer is running.*/
 
-    bool                        m_bIsRunning;       /**< Whether GUSBAmpProducer is running.*/
+    int                 m_iSampRate;            /**< sample rate of the device */
+    QString             m_sFilePath;            /**< path of the file of written data */
+    std::vector<QString>     m_vSerials;             /**< vector with the serial numbers of the devices*/
+    std::vector<int>         m_viSizeOfSampleMatrix; /**< size of the sample matrix [rows columns] */
 
 };
 
