@@ -246,8 +246,6 @@ bool SsvepBci::stop()
     // Delete all features and classification results
     clearClassifications();
 
-    m_pFiffInfo_Sensor.isNull();
-
     return true;
 }
 
