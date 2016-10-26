@@ -50,22 +50,10 @@
 #include <generics/circularmatrixbuffer.h>
 #include <scMeas/newrealtimemultisamplearray.h>
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FIFF INCLUDES
-//=============================================================================================================
+#include <rtClient/rtcmdclient.h>
 
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_stream.h>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// MNE INCLUDES
-//=============================================================================================================
-
-#include <rtClient/rtcmdclient.h>
 
 
 //*************************************************************************************************************
@@ -80,7 +68,7 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Eigen INCLUDES
+// EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/SparseCore>
@@ -106,24 +94,11 @@ namespace NEUROMAGPLUGIN
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace SCSHAREDLIB;
-using namespace IOBUFFER;
-using namespace RTCLIENTLIB;
-using namespace FIFFLIB;
-using namespace SCMEASLIB;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
 class NeuromagProducer;
 class NeuromagProjectDialog;
-//class ECGChannel;
 
 
 //=============================================================================================================
@@ -132,10 +107,10 @@ class NeuromagProjectDialog;
 *
 * @brief The Neuromag class provides a RT server connection.
 */
-class NEUROMAGSHARED_EXPORT Neuromag : public ISensor
+class NEUROMAGSHARED_EXPORT Neuromag : public SCSHAREDLIB::ISensor
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "neuromag.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "neuromag.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
     Q_INTERFACES(SCSHAREDLIB::ISensor)
 
@@ -167,7 +142,7 @@ public:
     /**
     * Clone the plugin
     */
-    virtual QSharedPointer<IPlugin> clone() const;
+    virtual QSharedPointer<SCSHAREDLIB::IPlugin> clone() const;
 
     //=========================================================================================================
     /**
@@ -241,7 +216,6 @@ public:
 
     virtual QWidget* setupWidget();
 
-//slots:
     //=========================================================================================================
     /**
     * Change connector
@@ -268,21 +242,6 @@ public:
     */
     void requestInfo();
 
-signals:
-    //=========================================================================================================
-    /**
-    * Emitted when command clients connection status changed
-    *
-    * @param[in] p_bStatus  connection status
-    */
-    void cmdConnectionChanged(bool p_bStatus);
-
-    //=========================================================================================================
-    /**
-    * Emitted when fiffInfo is available
-    */
-    void fiffInfoAvailable();
-
 protected:
     virtual void run();
 
@@ -307,16 +266,15 @@ private:
 
     bool readHeader();
 
-
 //    float           m_fSamplingRate;                /**< The sampling rate.*/
 //    int             m_iDownsamplingFactor;          /**< The down sampling factor.*/
 
-    PluginOutputData<NewRealTimeMultiSampleArray>::SPtr m_pRTMSA_Neuromag;          /**< The NewRealTimeMultiSampleArray to provide the rt_server Channels.*/
+    SCSHAREDLIB::PluginOutputData<SCMEASLIB::NewRealTimeMultiSampleArray>::SPtr m_pRTMSA_Neuromag;          /**< The NewRealTimeMultiSampleArray to provide the rt_server Channels.*/
 
     QMutex                                  m_mutex;
     QString                                 m_sNeuromagClientAlias;         /**< The rt server client alias.*/
 
-    QSharedPointer<RtCmdClient>             m_pRtCmdClient;                 /**< The command client.*/
+    QSharedPointer<RTCLIENTLIB::RtCmdClient>m_pRtCmdClient;                 /**< The command client.*/
     bool                                    m_bCmdClientIsConnected;        /**< If the command client is connected.*/
 
     QString                                 m_sNeuromagIP;                  /**< The IP Adress of mne_rt_server.*/
@@ -327,12 +285,12 @@ private:
     QMap<qint32, QString>                   m_qMapConnectors;               /**< Connector map.*/
     qint32                                  m_iActiveConnectorId;           /**< The active connector.*/
 
-    FiffInfo::SPtr                          m_pFiffInfo;                    /**< Fiff measurement info.*/
+    FIFFLIB::FiffInfo::SPtr                 m_pFiffInfo;                    /**< Fiff measurement info.*/
     qint32                                  m_iBufferSize;                  /**< The raw data buffer size.*/
 
     QTimer                                  m_cmdConnectionTimer;           /**< Timer for convinient command client connection. When timer times out a connection is tried to be established. */
 
-    QSharedPointer<RawMatrixBuffer>         m_pRawMatrixBuffer_In;          /**< Holds incoming raw data. */
+    QSharedPointer<IOBUFFER::RawMatrixBuffer>   m_pRawMatrixBuffer_In;      /**< Holds incoming raw data. */
 
     bool                                    m_bIsRunning;                   /**< Whether FiffSimulator is running.*/
 
@@ -357,6 +315,21 @@ private:
     Eigen::SparseMatrix<double>             m_sparseMatCals;                /**< Sparse calibration matrix.*/
     QAction*                                m_pActionSetupProject;          /**< shows setup project dialog */
     QAction*                                m_pActionRecordFile;            /**< start recording action */
+
+signals:
+    //=========================================================================================================
+    /**
+    * Emitted when command clients connection status changed
+    *
+    * @param[in] p_bStatus  connection status
+    */
+    void cmdConnectionChanged(bool p_bStatus);
+
+    //=========================================================================================================
+    /**
+    * Emitted when fiffInfo is available
+    */
+    void fiffInfoAvailable();
 
 };
 

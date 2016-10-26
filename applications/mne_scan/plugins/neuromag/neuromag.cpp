@@ -69,6 +69,10 @@
 
 using namespace NEUROMAGPLUGIN;
 using namespace UTILSLIB;
+using namespace SCSHAREDLIB;
+using namespace IOBUFFER;
+using namespace SCMEASLIB;
+using namespace FIFFLIB;
 
 
 //*************************************************************************************************************
@@ -119,7 +123,6 @@ Neuromag::Neuromag()
         connect(m_pUpdateTimeInfoTimer.data(), &QTimer::timeout,
                 this, &Neuromag::onRecordingRemainingTimeChange);
     }
-
 }
 
 
@@ -134,7 +137,7 @@ Neuromag::~Neuromag()
 
 //*************************************************************************************************************
 
-QSharedPointer<IPlugin> Neuromag::clone() const
+QSharedPointer<SCSHAREDLIB::IPlugin> Neuromag::clone() const
 {
     QSharedPointer<Neuromag> pNeuromagClone(new Neuromag());
     return pNeuromagClone;
