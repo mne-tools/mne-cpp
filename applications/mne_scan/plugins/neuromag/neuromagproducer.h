@@ -64,10 +64,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MneRtClientPlugin
+// DEFINE NAMESPACE NEUROMAGPLUGIN
 //=============================================================================================================
 
-namespace MneRtClientPlugin
+namespace NEUROMAGPLUGIN
 {
 
 
@@ -155,7 +155,7 @@ protected:
 
 private:
 
-    QMutex producerMutex;
+    QMutex m_mutex;
 
     Neuromag* m_pNeuromag;    /**< Holds a pointer to corresponding Neuromag.*/
     bool        m_bIsRunning;       /**< Whether NeuromagProducer is running.*/

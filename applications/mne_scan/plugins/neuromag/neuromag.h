@@ -2,13 +2,14 @@
 /**
 * @file     neuromag.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     October, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Christoph Dinh, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -56,6 +57,7 @@
 //=============================================================================================================
 
 #include <fiff/fiff_info.h>
+#include <fiff/fiff_stream.h>
 
 
 //*************************************************************************************************************
@@ -78,10 +80,27 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MneRtClientPlugin
+// Eigen INCLUDES
 //=============================================================================================================
 
-namespace MneRtClientPlugin
+#include <Eigen/SparseCore>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINES
+//=============================================================================================================
+
+#define MAX_DATA_LEN    2000000000L
+#define MAX_POS         2000000000L
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE NEUROMAGPLUGIN
+//=============================================================================================================
+
+namespace NEUROMAGPLUGIN
 {
 
 
@@ -103,6 +122,7 @@ using namespace SCMEASLIB;
 //=============================================================================================================
 
 class NeuromagProducer;
+class NeuromagProjectDialog;
 //class ECGChannel;
 
 
@@ -121,6 +141,7 @@ class NEUROMAGSHARED_EXPORT Neuromag : public ISensor
 
     friend class NeuromagProducer;
     friend class NeuromagSetupWidget;
+    friend class NeuromagProjectDialog;
 
 public:
 
@@ -158,7 +179,59 @@ public:
     /**
     * Is called when plugin is detached of the stage. Can be used to safe settings.
     */
-    virtual void unload();
+    virtual void unload();    
+
+    //=========================================================================================================
+    /**
+    * Returns the Neuromag file path which is to be written to.
+    *
+    * @param[in] currentTime    insert current time stamp.
+    *
+    * @return the storage filepath
+    */
+    QString getFilePath(bool currentTime = false) const;
+
+    //=========================================================================================================
+    /**
+    * Returns the path where the subjects folders are stored.
+    *
+    * @return the data path
+    */
+    QString getDataPath() const;
+
+    //=========================================================================================================
+    /**
+    * Shows the project dialog/window.
+    */
+    void showProjectDialog();
+
+    //=========================================================================================================
+    /**
+    * Determines current file. And starts a new one.
+    */
+    void splitRecordingFile();
+
+    //=========================================================================================================
+    /**
+    * Starts or stops a file recording depending on the current recording state.
+    */
+    void toggleRecordingFile();
+
+    //=========================================================================================================
+    /**
+    * Set the recording time in seconds.
+    *
+    * @param[in] time   the new recording time.
+    */
+    void setRecordingTimerChanged(int timeMSecs);
+
+    //=========================================================================================================
+    /**
+    * Set the recording time active flag.
+    *
+    * @param[in] state   whether the recording should be used or not.
+    */
+    void setRecordingTimerStateChanged(bool state);
 
     virtual bool start();
     virtual bool stop();
@@ -213,6 +286,18 @@ signals:
 protected:
     virtual void run();
 
+    //=========================================================================================================
+    /**
+    * change recording button.
+    */
+    void changeRecordingButton();
+
+    //=========================================================================================================
+    /**
+    * This function sends the current remaining recording time to the project window.
+    */
+    void onRecordingRemainingTimeChange();
+
 private:
     //=========================================================================================================
     /**
@@ -222,35 +307,56 @@ private:
 
     bool readHeader();
 
-    QMutex rtServerMutex;
-
-
-    QString m_sNeuromagClientAlias;     /**< The rt server client alias.*/
 
 //    float           m_fSamplingRate;                /**< The sampling rate.*/
 //    int             m_iDownsamplingFactor;          /**< The down sampling factor.*/
 
-    PluginOutputData<NewRealTimeMultiSampleArray>::SPtr m_pRTMSA_Neuromag;   /**< The NewRealTimeMultiSampleArray to provide the rt_server Channels.*/
+    PluginOutputData<NewRealTimeMultiSampleArray>::SPtr m_pRTMSA_Neuromag;          /**< The NewRealTimeMultiSampleArray to provide the rt_server Channels.*/
 
-    QSharedPointer<RtCmdClient> m_pRtCmdClient; /**< The command client.*/
-    bool m_bCmdClientIsConnected;               /**< If the command client is connected.*/
+    QMutex                                  m_mutex;
+    QString                                 m_sNeuromagClientAlias;         /**< The rt server client alias.*/
 
-    QString     m_sNeuromagIP;               /**< The IP Adress of mne_rt_server.*/
-    QString     m_sFiffHeader;  /**< Fiff header information */
+    QSharedPointer<RtCmdClient>             m_pRtCmdClient;                 /**< The command client.*/
+    bool                                    m_bCmdClientIsConnected;        /**< If the command client is connected.*/
 
-    QSharedPointer<NeuromagProducer> m_pNeuromagProducer;     /**< Holds the NeuromagnProducer.*/
+    QString                                 m_sNeuromagIP;                  /**< The IP Adress of mne_rt_server.*/
+    QString                                 m_sFiffHeader;                  /**< Fiff header information */
 
-    QMap<qint32, QString> m_qMapConnectors;                 /**< Connector map.*/
-    qint32 m_iActiveConnectorId;                            /**< The active connector.*/
+    QSharedPointer<NeuromagProducer>        m_pNeuromagProducer;            /**< Holds the NeuromagnProducer.*/
 
-    FiffInfo::SPtr m_pFiffInfo;                             /**< Fiff measurement info.*/
-    qint32 m_iBufferSize;                                   /**< The raw data buffer size.*/
+    QMap<qint32, QString>                   m_qMapConnectors;               /**< Connector map.*/
+    qint32                                  m_iActiveConnectorId;           /**< The active connector.*/
 
-    QTimer m_cmdConnectionTimer;                            /**< Timer for convinient command client connection. When timer times out a connection is tried to be established. */
+    FiffInfo::SPtr                          m_pFiffInfo;                    /**< Fiff measurement info.*/
+    qint32                                  m_iBufferSize;                  /**< The raw data buffer size.*/
 
-    QSharedPointer<RawMatrixBuffer> m_pRawMatrixBuffer_In;  /**< Holds incoming raw data. */
+    QTimer                                  m_cmdConnectionTimer;           /**< Timer for convinient command client connection. When timer times out a connection is tried to be established. */
 
-    bool                            m_bIsRunning;           /**< Whether FiffSimulator is running.*/
+    QSharedPointer<RawMatrixBuffer>         m_pRawMatrixBuffer_In;          /**< Holds incoming raw data. */
+
+    bool                                    m_bIsRunning;                   /**< Whether FiffSimulator is running.*/
+
+    QSharedPointer<QTimer>                  m_pUpdateTimeInfoTimer;         /**< timer to control remaining time. */
+    QSharedPointer<QTimer>                  m_pBlinkingRecordButtonTimer;   /**< timer to control blinking recording button. */
+    QSharedPointer<QTimer>                  m_pRecordTimer;                 /**< timer to control recording time. */
+    QSharedPointer<NeuromagProjectDialog>   m_pNeuromagProjectDialog;       /**< Window to setup the recording tiem and fiel name. */
+    FIFFLIB::FiffStream::SPtr               m_pOutfid;                      /**< FiffStream to write to.*/
+    qint16                                  m_iBlinkStatus;                 /**< The blink status of the recording button.*/
+    qint32                                  m_iSplitCount;                  /**< File split count */
+    int                                     m_iRecordingMSeconds;           /**< Recording length in mseconds.*/
+    bool                                    m_bWriteToFile;                 /**< Flag for for writing the received samples to a file. Defined by the user via the GUI.*/
+    bool                                    m_bUseRecordTimer;              /**< Flag whether to use data recording timer.*/
+    QString                                 m_sNeuromagDataPath;            /**< The data storage path.*/
+    QString                                 m_sCurrentProject;              /**< The current project which is part of the filename to be recorded.*/
+    QString                                 m_sCurrentSubject;              /**< The current subject which is part of the filename to be recorded.*/
+    QString                                 m_sCurrentParadigm;             /**< The current paradigm which is part of the filename to be recorded.*/
+    QString                                 m_sRecordFile;                  /**< Current record file. */
+    QFile                                   m_qFileOut;                     /**< QFile for writing to fif file.*/
+    QTime                                   m_recordingStartedTime;         /**< The time when the recording started.*/
+    Eigen::RowVectorXd                      m_cals;                         /**< Calibration vector.*/
+    Eigen::SparseMatrix<double>             m_sparseMatCals;                /**< Sparse calibration matrix.*/
+    QAction*                                m_pActionSetupProject;          /**< shows setup project dialog */
+    QAction*                                m_pActionRecordFile;            /**< start recording action */
 
 };
 

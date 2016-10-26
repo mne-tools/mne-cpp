@@ -1,14 +1,16 @@
 //=============================================================================================================
 /**
-* @file     neuromagsetupwidget.h
+* @file     neuromagprojectdialog.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+*           Limin Sun <liminsun@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     October, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Christoph Dinh, Lorenz Esch, Limin Sun and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,20 +31,19 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the NeuromagSetupWidget class.
+* @brief    NeuromagProjectDialog class declaration.
 *
 */
 
-#ifndef NEUROMAGSETUPWIDGET_H
-#define NEUROMAGSETUPWIDGET_H
-
+#ifndef NEUROMAGPROJECTDIALOG_H
+#define NEUROMAGPROJECTDIALOG_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_neuromagsetup.h"
+#include "neuromag_global.h"
 
 
 //*************************************************************************************************************
@@ -50,7 +51,24 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QWidget>
+#include <QDialog>
+#include <QStringList>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+namespace Ui {
+    class NeuromagProjectDialog;
+}
 
 
 //*************************************************************************************************************
@@ -72,84 +90,54 @@ class Neuromag;
 
 //=============================================================================================================
 /**
-* DECLARE CLASS NeuromagSetupWidget
+* The NeuromagProjectDialog class provides a dialog to setup the project.
 *
-* @brief The NeuromagSetupWidget class provides the ECG configuration window.
+* @brief The NeuromagProjectDialog class provides a dialog to setup the project.
 */
-class NeuromagSetupWidget : public QWidget
+class NEUROMAGSHARED_EXPORT NeuromagProjectDialog : public QDialog
 {
     Q_OBJECT
 
 public:
+    explicit NeuromagProjectDialog(Neuromag* p_pNeuromag, QWidget *parent = 0);
+    ~NeuromagProjectDialog();
 
-    //=========================================================================================================
-    /**
-    * Constructs a NeuromagSetupWidget which is a child of parent.
-    *
-    * @param [in] p_pNeuromag   a pointer to the corresponding Neuromag.
-    * @param [in] parent        pointer to parent widget; If parent is 0, the new NeuromagSetupWidget becomes a window. If parent is another widget, NeuromagSetupWidget becomes a child window inside parent. NeuromagSetupWidget is deleted when its parent is deleted.
-    */
-    NeuromagSetupWidget(Neuromag* p_pNeuromag, QWidget *parent = 0);
-
-    //=========================================================================================================
-    /**
-    * Destroys the NeuromagSetupWidget.
-    * All NeuromagSetupWidget's children are deleted first. The application exits if NeuromagSetupWidget is the main widget.
-    */
-    ~NeuromagSetupWidget();
-
-    //=========================================================================================================
-    /**
-    * Inits the setup widget
-    */
-    void init();
-
-//slots
-    void bufferSizeEdited();        /**< Buffer size edited and set new buffer size.*/
-
-    void checkedRecordDataChanged();    /**< Record Data checkbox changed. */
-
-    void printToLog(QString message);   /**< Implements printing messages to rtproc log.*/
-
-    void pressedFiffRecordFile();   /**< Triggers file dialog to select record file.*/
-
-    void pressedConnect();          /**< Triggers a connection trial to rt_server.*/
-
-    void pressedSendCLI();          /**< Triggers a send request of a cli command.*/
-
-    void fiffInfoReceived();        /**< Triggered when new fiff info is recieved by producer and stored intor rt_server */
-
+    void setRecordingElapsedTime(int mSecsElapsed);
 
 private:
-    //=========================================================================================================
-    /**
-    * Set command connection status
-    *
-    * @param[in] p_bConnectionStatus    the connection status
-    */
-    void cmdConnectionChanged(bool p_bConnectionStatus);
+    void addProject();
+    void addSubject();
 
-    //=========================================================================================================
-    /**
-    * Shows the About Dialog
-    *
-    */
-    void showAboutDialog();
+    void deleteProject();
+    void deleteSubject();
 
-//    //=========================================================================================================
-//    /**
-//    * Shows the SQUID Control Dialog
-//    *
-//    */
-//    void SQUIDControlDialog();
+    void paradigmChanged(const QString &newParadigm);
 
-    Neuromag*   m_pNeuromag;      /**< a pointer to corresponding mne rt client.*/
+    void scanForProjects();
+    void scanForSubjects();
 
-    Ui::NeuromagSetupWidgetClass ui; /**< the user interface for the NeuromagSetupWidget.*/
+    void selectNewProject(const QString &newProject);
+    void selectNewSubject(const QString &newSubject);
 
-    bool m_bIsInit;                     /**< false when gui is not initialized jet. Prevents gui from already interacting when not initialized */
+    void updateFileName();
+
+    void onTimeChanged();
+    void onRecordingTimerStateChanged(bool state);
+
+    Neuromag*                       m_pNeuromag;
+
+    Ui::NeuromagProjectDialog*      ui;
+
+    QStringList                     m_sListProjects;
+    QStringList                     m_sListSubjects;
+
+    int                             m_iRecordingTime;       /**< recording time in ms.*/
+
+signals:
+    void timerChanged(int secs);
+    void recordingTimerStateChanged(bool state);
 };
 
 } // NAMESPACE
 
-#endif // NEUROMAGSETUPWIDGET_H
+#endif // NEUROMAGPROJECTDIALOG_H
