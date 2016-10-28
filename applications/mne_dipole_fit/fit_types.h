@@ -91,6 +91,26 @@ typedef struct {
 } *ECD,ECDRec;			/* One ECD */
 
 
+
+
+typedef struct {
+  int   valid;			/* Is this dipole valid */
+  float time;			/* Time point */
+  float rd[3];			/* Dipole location */
+  float Q[3];			/* Dipole moment */
+  float good;			/* Goodness of fit */
+  float khi2;			/* khi^2 value */
+  int   nfree;			/* Degrees of freedom for the above */
+  int   neval;			/* Number of function evaluations required for this fit */
+} *ecd,ecdRec;			/* One ECD */
+
+typedef struct {
+  char *dataname;		/* The associated data file */
+  int  ndip;			/* How many dipoles */
+  ecd  *dips;			/* The dipoles themselves */
+} *ecdSet,ecdSetRec;		/* A set of ECDs */
+
+
 #define DIPOLE_MODEL_UNKNOWN    -1
 #define DIPOLE_MODEL_SINGLE      1
 #define DIPOLE_MODEL_SEQUENTIAL  2   /* AKA moving dipole fit */

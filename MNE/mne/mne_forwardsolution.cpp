@@ -267,7 +267,7 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(const Annotation
             if (label_ids[i] != 0)
             {
                 QString curr_name = t_CurrentColorTable.struct_names[i];//obj.label2AtlasName(label(i));
-                printf("\tCluster %d / %d %s...", i+1, label_ids.rows(), curr_name.toUtf8().constData());
+                printf("\tCluster %d / %ld %s...", i+1, label_ids.rows(), curr_name.toUtf8().constData());
 
                 //
                 // Get source space indeces
@@ -890,7 +890,7 @@ FiffCov MNEForwardSolution::compute_depth_prior(const MatrixXd &Gain, const Fiff
         }
     }
 
-    printf("\tlimit = %d/%lld = %f", n_limit + 1, d.size(), sqrt(limit / ws[0]));
+    printf("\tlimit = %d/%ld = %f", n_limit + 1, d.size(), sqrt(limit / ws[0]));
     double scale = 1.0 / limit;
     printf("\tscale = %g exp = %g", scale, exp);
 
@@ -1781,7 +1781,7 @@ void MNEForwardSolution::restrict_gain_matrix(MatrixXd &G, const FiffInfo &info)
     // Figure out which ones have been used
     if(info.chs.size() != G.rows())
     {
-        printf("Error G.rows() and length of info.chs do not match: %lld != %i", G.rows(), info.chs.size()); //ToDo throw
+        printf("Error G.rows() and length of info.chs do not match: %ld != %i", G.rows(), info.chs.size()); //ToDo throw
         return;
     }
 
@@ -1791,7 +1791,7 @@ void MNEForwardSolution::restrict_gain_matrix(MatrixXd &G, const FiffInfo &info)
         for(qint32 i = 0; i < sel.size(); ++i)
             G.row(i) = G.row(sel[i]);
         G.conservativeResize(sel.size(), G.cols());
-        printf("\t%lld planar channels", sel.size());
+        printf("\t%ld planar channels", sel.size());
     }
     else
     {
@@ -1801,7 +1801,7 @@ void MNEForwardSolution::restrict_gain_matrix(MatrixXd &G, const FiffInfo &info)
             for(qint32 i = 0; i < sel.size(); ++i)
                 G.row(i) = G.row(sel[i]);
             G.conservativeResize(sel.size(), G.cols());
-            printf("\t%lld magnetometer or axial gradiometer channels", sel.size());
+            printf("\t%ld magnetometer or axial gradiometer channels", sel.size());
         }
         else
         {
@@ -1811,7 +1811,7 @@ void MNEForwardSolution::restrict_gain_matrix(MatrixXd &G, const FiffInfo &info)
                 for(qint32 i = 0; i < sel.size(); ++i)
                     G.row(i) = G.row(sel[i]);
                 G.conservativeResize(sel.size(), G.cols());
-                printf("\t%lld EEG channels\n", sel.size());
+                printf("\t%ld EEG channels\n", sel.size());
             }
             else
                 printf("Could not find MEG or EEG channels\n");
