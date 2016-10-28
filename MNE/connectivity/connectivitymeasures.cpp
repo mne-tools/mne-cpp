@@ -91,7 +91,7 @@ ConnectivityMeasures::ConnectivityMeasures()
 
 Network::SPtr ConnectivityMeasures::pearsonsCorrelationCoeff(const MatrixXd& matData, const MatrixX3f& matVert)
 {
-    Network::SPtr finalNetwork  = Network::SPtr(new Network());
+    Network::SPtr finalNetwork  = Network::SPtr(new Network("Pearson's Correlation Coefficient"));
 
     //Create nodes
     for(int i = 0; i < matData.rows(); ++i) {
@@ -126,7 +126,7 @@ Network::SPtr ConnectivityMeasures::pearsonsCorrelationCoeff(const MatrixXd& mat
 
 Network::SPtr ConnectivityMeasures::crossCorrelation(const MatrixXd& matData, const MatrixX3f& matVert)
 {
-    Network::SPtr finalNetwork  = Network::SPtr(new Network());
+    Network::SPtr finalNetwork  = Network::SPtr(new Network("Cross Correlation"));
 
     //Create nodes
     for(int i = 0; i < matData.rows(); ++i) {
@@ -167,8 +167,10 @@ double ConnectivityMeasures::calcPearsonsCorrelationCoeff(const Eigen::RowVector
     if(vecFirst.cols() != vecSecond.cols()) {
         qDebug() << "ConnectivityMeasures::calcPearsonsCorrelationCoeff - Vectors length do not match!";
     }
-
-    return (vecFirst.dot(vecSecond))/vecFirst.cols();
+    qDebug() << "ConnectivityMeasures::calcPearsonsCorrelationCoeff";
+    double pearsonsCoeff = (vecFirst.dot(vecSecond))/vecFirst.cols();
+    qDebug() << "ConnectivityMeasures::calcPearsonsCorrelationCoeff - pearsonsCoeff" << pearsonsCoeff;
+    return pearsonsCoeff;
 }
 
 
