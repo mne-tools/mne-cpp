@@ -535,16 +535,22 @@ void FiffEvoked::setInfo(FiffInfo &p_info, bool proj)
 FiffEvoked & FiffEvoked::operator+=(const MatrixXd &newData)
 {
     //Init matrix if necessary
-    if(nave == -1 || nave == 0)
+    if(nave == -1 || nave == 0) {
         data = MatrixXd::Zero(newData.rows(),newData.cols());
+    }
 
-    if(data.cols() == newData.cols() && data.rows() ==  newData.rows()) {
+    if(data.cols() == newData.cols() && data.rows() == newData.rows()) {
         //Revert old averaging
         data = data*nave;
 
         //Do new averaging
         data += newData;
-        nave++;
+        if(nave <= 0) {
+            nave = 1;
+        } else {
+            nave++;
+        }
+
         data /= nave;
     }
 

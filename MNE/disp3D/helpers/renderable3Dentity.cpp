@@ -142,9 +142,13 @@ bool Renderable3DEntity::setVertColor(const QByteArray& tArrayColors)
 
 //*************************************************************************************************************
 
-bool Renderable3DEntity::setMeshData(const MatrixX3f& tMatVert, const MatrixX3f& tMatNorm, const MatrixX3i& tMatTris, const QByteArray& tArrayColors)
+bool Renderable3DEntity::setMeshData(const MatrixX3f& tMatVert,
+                                     const MatrixX3f& tMatNorm,
+                                     const MatrixX3i& tMatTris,
+                                     const QByteArray& tArrayColors,
+                                     Qt3DRender::QGeometryRenderer::PrimitiveType primitiveType)
 {
-    return m_pCustomMesh->setMeshData(tMatVert, tMatNorm, tMatTris, tArrayColors);
+    return m_pCustomMesh->setMeshData(tMatVert, tMatNorm, tMatTris, tArrayColors, primitiveType);
 }
 
 
@@ -173,6 +177,7 @@ bool Renderable3DEntity::setMaterial(QSharedPointer<Qt3DRender::QMaterial> pMate
 bool Renderable3DEntity::setAlpha(float fAlpha)
 {
     m_fAlpha = fAlpha;
+    qDebug()<<"set alpha";
 
     for(int i = 0; i < m_pMaterial->effect()->parameters().size(); i++) {
         if(m_pMaterial->effect()->parameters().at(i)->name() == "alpha") {

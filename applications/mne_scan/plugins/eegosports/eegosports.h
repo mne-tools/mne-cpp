@@ -83,10 +83,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE EEGoSportsPlugin
+// DEFINE NAMESPACE EEGOSPORTSPLUGIN
 //=============================================================================================================
 
-namespace EEGoSportsPlugin
+namespace EEGOSPORTSPLUGIN
 {
 
 
@@ -97,7 +97,7 @@ namespace EEGoSportsPlugin
 
 using namespace SCSHAREDLIB;
 using namespace SCMEASLIB;
-using namespace IOBuffer;
+using namespace IOBUFFER;
 using namespace FIFFLIB;
 using namespace std;
 using namespace UTILSLIB;
@@ -121,7 +121,7 @@ class EEGoSportsProducer;
 class EEGOSPORTSSHARED_EXPORT EEGoSports : public ISensor
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "mne_scan/1.0" FILE "eegosports.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "eegosports.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
     Q_INTERFACES(SCSHAREDLIB::ISensor)
 
@@ -129,6 +129,8 @@ class EEGOSPORTSSHARED_EXPORT EEGoSports : public ISensor
     friend class EEGoSportsSetupWidget;
     friend class EEGoSportsImpedanceWidget;
     friend class EEGoSportsSetupProjectWidget;
+    friend class EEGoSportsSetupStimulusWidget;
+    friend class ssvepBCISetupStimulusWidget;
 
 public:
     //=========================================================================================================
@@ -240,6 +242,8 @@ protected:
 private:
     PluginOutputData<NewRealTimeMultiSampleArray>::SPtr m_pRMTSA_EEGoSports;      /**< The RealTimeSampleArray to provide the EEG data.*/
     QSharedPointer<EEGoSportsSetupProjectWidget> m_pEEGoSportsSetupProjectWidget; /**< Widget for checking the impedances*/
+    QSharedPointer<EEGoSportsSetupStimulusWidget> m_pEEGoSportsSetupTimeStimulusWidget;     /**< Widget for time stimulus setup */
+    QSharedPointer<ssvepBCISetupStimulusWidget> m_pEEGoSportsSetupFrameStimulusWidget;    /**< Widget for frame stimulus setup */
 
     QString                             m_qStringResourcePath;              /**< The path to the EEG resource directory.*/
 
@@ -280,6 +284,7 @@ private:
 
     QAction*                            m_pActionSetupProject;              /**< shows setup project dialog */
     QAction*                            m_pActionStartRecording;            /**< starts to record data */
+    QAction*                            m_pActionSetupStimulus;             /**< starts stimulus feature */
 
     QSharedPointer<QTimer>              m_pTimerRecordingChange;            /**< timer to control blinking of the recording icon */
     qint16                              m_iBlinkStatus;                     /**< flag for recording icon blinking */

@@ -83,7 +83,7 @@ using namespace FIFFLIB;
 /**
 * DECLARE CLASS RealTimeEvoked -> ToDo check feasibilty of QAbstractTableModel
 *
-* @brief The RealTimeMultiSampleArrayNew class is the base class of every RealTimeMultiSampleArrayNew Measurement.
+* @brief The RealTimeEvoked class provides a data stream which holds FiffEvoke data.
 */
 class SCMEASSHARED_EXPORT RealTimeEvoked : public NewMeasurement
 {
@@ -221,7 +221,7 @@ private:
 
     mutable QMutex              m_qMutex;           /**< Mutex to ensure thread safety */
 
-    FiffEvoked::SPtr            m_pFiffEvoked;      /**< Evoked data set */
+    FiffEvoked::SPtr            m_pFiffEvoked;      /**< Evoked data */
 
     FiffInfo::SPtr              m_pFiffInfo;        /**< Fiff info */
 

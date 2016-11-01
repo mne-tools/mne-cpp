@@ -159,7 +159,6 @@ public:
     */
     bool compensate_to(FiffEvokedSet &p_FiffEvokedSet, fiff_int_t to) const;
 
-
     //=========================================================================================================
     /**
     * fiff_find_evoked
