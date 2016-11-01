@@ -77,7 +77,7 @@ SOURCES += \
         FormFiles/eegosportssetupwidget.cpp \
         FormFiles/eegosportsaboutwidget.cpp \
         eegosportsdriver.cpp \
-        FormFiles/eegosportssetupprojectwidget.cpp
+        FormFiles/eegosportssetupprojectwidget.cpp \
 
 HEADERS += \
         eegosports.h\
@@ -86,12 +86,12 @@ HEADERS += \
         FormFiles/eegosportssetupwidget.h \
         FormFiles/eegosportsaboutwidget.h \
         eegosportsdriver.h \
-        FormFiles/eegosportssetupprojectwidget.h
+        FormFiles/eegosportssetupprojectwidget.h \
 
 FORMS += \
         FormFiles/eegosportssetup.ui \
+        FormFiles/eegosportsabout.ui \
         FormFiles/eegosportssetupprojectwidget.ui \
-        FormFiles/eegosportsabout.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
@@ -109,3 +109,5 @@ unix: QMAKE_CXXFLAGS += -Wno-attributes
 
 RESOURCES += \
     eegosports.qrc
+
+DISTFILES +=

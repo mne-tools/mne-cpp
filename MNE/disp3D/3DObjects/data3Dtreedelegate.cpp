@@ -43,6 +43,8 @@
 #include "data3Dtreedelegate.h"
 #include "data3Dtreemodel.h"
 
+#include <disp/imagesc.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -52,7 +54,6 @@
 #include <QSpinBox>
 #include <QDoubleSpinBox>
 #include <QComboBox>
-#include <QDebug>
 #include <QPushButton>
 
 
@@ -70,6 +71,7 @@
 using namespace UTILSLIB;
 using namespace DISP3DLIB;
 using namespace DISPCHARTSLIB;
+using namespace DISPLIB;
 
 
 //*************************************************************************************************************
@@ -172,6 +174,15 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
             return pColorDialog;
         }
 
+        case MetaTreeItemTypes::PointColor: {
+            QColorDialog *pColorDialog = new QColorDialog();
+            connect(pColorDialog, &QColorDialog::currentColorChanged,
+                    this, &Data3DTreeDelegate::onEditorEdited);
+            pColorDialog->setWindowTitle("Select Point Color");
+            pColorDialog->show();
+            return pColorDialog;
+        }
+
         case MetaTreeItemTypes::RTDataNumberAverages: {
             QSpinBox* pSpinBox = new QSpinBox(parent);
             connect(pSpinBox, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
@@ -227,6 +238,34 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
             return pDoubleSpinBox;
         }
 
+        case MetaTreeItemTypes::NetworkThreshold: {
+            Spline* pSpline = new Spline("Spline Histogram", 0);
+            connect(pSpline, static_cast<void (Spline::*)(double, double, double)>(&Spline::borderChanged),
+                this, &Data3DTreeDelegate::onEditorEdited);
+
+            QStandardItem* pParentItem = static_cast<QStandardItem*>(pAbstractItem->QStandardItem::parent());
+            QModelIndex indexParent = pData3DTreeModel->indexFromItem(pParentItem);
+            MatrixXd matRTData = index.model()->data(indexParent, Data3DTreeModelItemRoles::NetworkDataMatrix).value<MatrixXd>();
+            Eigen::VectorXd resultClassLimit;
+            Eigen::VectorXi resultFrequency;
+            MNEMath::histcounts(matRTData, false, 50, resultClassLimit, resultFrequency, 0.0, 0.0);
+            pSpline->setData(resultClassLimit, resultFrequency, 0);
+            QVector3D vecThresholdValues = index.model()->data(index, MetaTreeItemRoles::NetworkThreshold).value<QVector3D>();
+            pSpline->setThreshold(vecThresholdValues);
+
+            return pSpline;
+        }
+
+        case MetaTreeItemTypes::NetworkMatrix: {
+            QStandardItem* pParentItem = static_cast<QStandardItem*>(pAbstractItem->QStandardItem::parent());
+            QModelIndex indexParent = pData3DTreeModel->indexFromItem(pParentItem);
+            MatrixXd matRTData = index.model()->data(indexParent, Data3DTreeModelItemRoles::NetworkDataMatrix).value<MatrixXd>();
+
+            ImageSc* pPlotLA = new ImageSc(matRTData);
+            pPlotLA->show();
+            //return pPlotLA;
+        }
+
         default: // do nothing;
             break;
     }
@@ -269,11 +308,9 @@ void Data3DTreeDelegate::setEditorData(QWidget* editor, const QModelIndex& index
             Spline* pSpline = static_cast<Spline*>(editor);
             int width = pSpline->size().width();
             int height = pSpline->size().height();
-            qDebug()<< "width = " << width;
-            qDebug()<< "height = " << height;
-            if (pSpline->size().width() < 200 && pSpline->size().height() < 200)   //pSpline initializes with size (137,15)
+            if (pSpline->size().width() < 200 && pSpline->size().height() < 200)
             {
-                pSpline->resize(800,600);   //resize histogram to be readable with default size
+                pSpline->resize(600,400);   //resize histogram to be readable with default size
             }
             else
             {
@@ -300,6 +337,13 @@ void Data3DTreeDelegate::setEditorData(QWidget* editor, const QModelIndex& index
 
         case MetaTreeItemTypes::SurfaceColor: {
             QColor color = index.model()->data(index, MetaTreeItemRoles::SurfaceColor).value<QColor>();
+            QColorDialog* pColorDialog = static_cast<QColorDialog*>(editor);
+            pColorDialog->setCurrentColor(color);
+            break;
+        }
+
+        case MetaTreeItemTypes::PointColor: {
+            QColor color = index.model()->data(index, MetaTreeItemRoles::PointColor).value<QColor>();
             QColorDialog* pColorDialog = static_cast<QColorDialog*>(editor);
             pColorDialog->setCurrentColor(color);
             break;
@@ -339,6 +383,23 @@ void Data3DTreeDelegate::setEditorData(QWidget* editor, const QModelIndex& index
             pDoubleSpinBox->setValue(value);
             break;
         }        
+
+        case MetaTreeItemTypes::NetworkThreshold: {
+            Spline* pSpline = static_cast<Spline*>(editor);
+            int width = pSpline->size().width();
+            int height = pSpline->size().height();
+            if (pSpline->size().width() < 200 && pSpline->size().height() < 200)   //pSpline initializes with size (137,15)
+            {
+                pSpline->resize(800,600);   //resize histogram to be readable with default size
+            }
+            else
+            {
+                width = pSpline->size().width();   //keeps the size of the histogram
+                height = pSpline->size().height();
+                pSpline->resize(width,height);
+            }
+            return;
+        }
 
         default: // do nothing;
             break;
@@ -389,7 +450,6 @@ void Data3DTreeDelegate::setModelData(QWidget* editor, QAbstractItemModel* model
         }
 
         case MetaTreeItemTypes::RTDataNormalizationValue: {
-            //qDebug() << "MetaTreeItemTypes::RTDataNormalizationValue starts!";
             Spline* pSpline = static_cast<Spline*>(editor);
             QVector3D returnVector;
             returnVector = pSpline->getThreshold();
@@ -432,6 +492,17 @@ void Data3DTreeDelegate::setModelData(QWidget* editor, QAbstractItemModel* model
             data.setValue(color);
 
             model->setData(index, data, MetaTreeItemRoles::SurfaceColor);
+            model->setData(index, data, Qt::DecorationRole);
+            return;
+        }
+
+        case MetaTreeItemTypes::PointColor: {
+            QColorDialog* pColorDialog = static_cast<QColorDialog*>(editor);
+            QColor color = pColorDialog->currentColor();
+            QVariant data;
+            data.setValue(color);
+
+            model->setData(index, data, MetaTreeItemRoles::PointColor);
             model->setData(index, data, Qt::DecorationRole);
             return;
         }
@@ -485,6 +556,21 @@ void Data3DTreeDelegate::setModelData(QWidget* editor, QAbstractItemModel* model
             model->setData(index, data, MetaTreeItemRoles::SurfaceTranslateZ);
             model->setData(index, data, Qt::DisplayRole);
             break;
+        }
+
+        case MetaTreeItemTypes::NetworkThreshold: {
+            Spline* pSpline = static_cast<Spline*>(editor);
+            QVector3D returnVector;
+            returnVector = pSpline->getThreshold();
+
+            QString displayThreshold;
+            displayThreshold = QString("%1,%2,%3").arg(returnVector.x()).arg(returnVector.y()).arg(returnVector.z());
+            QVariant dataDisplay;
+            dataDisplay.setValue(displayThreshold);
+            model->setData(index, dataDisplay, Qt::DisplayRole);
+
+            model->setData(index, returnVector, MetaTreeItemRoles::NetworkThreshold);
+            return;
         }
 
         default: // do nothing;

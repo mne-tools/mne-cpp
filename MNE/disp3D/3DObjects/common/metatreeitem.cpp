@@ -124,6 +124,9 @@ MetaTreeItem::MetaTreeItem(int iType, const QString& text)
         case MetaTreeItemTypes::SurfaceColor:
             sToolTip = "Surface color item";
             break;
+        case MetaTreeItemTypes::PointColor:
+            sToolTip = "Point color item";
+            break;
         case MetaTreeItemTypes::SurfaceAlpha:
             sToolTip = "Surface alpha value";
             break;
@@ -135,6 +138,12 @@ MetaTreeItem::MetaTreeItem(int iType, const QString& text)
             break;
         case MetaTreeItemTypes::SurfaceTranslateZ:
             sToolTip = "Surface z translation value";
+            break;
+        case MetaTreeItemTypes::NetworkThreshold:
+            sToolTip = "The threshold used to scale the network";
+            break;
+        case MetaTreeItemTypes::NetworkMatrix:
+            sToolTip = "The network distance matrix";
             break;
         default: // do nothing;
             break;
@@ -202,6 +211,11 @@ void  MetaTreeItem::setData(const QVariant& value, int role)
             break;
         }
 
+        case MetaTreeItemRoles::PointColor: {
+            emit surfaceColorChanged(value.value<QColor>());
+            break;
+        }
+
         case MetaTreeItemRoles::RTDataNumberAverages: {
             emit rtDataNumberAveragesChanged(value.toInt());
             break;
@@ -224,6 +238,12 @@ void  MetaTreeItem::setData(const QVariant& value, int role)
 
         case MetaTreeItemRoles::SurfaceTranslateZ: {
             emit surfaceTranslationZChanged(value.toFloat());
+            break;
+        }
+
+        case MetaTreeItemRoles::NetworkThreshold: {
+            QVector3D vecTemp = value.value<QVector3D>();
+            emit networkThresholdChanged(vecTemp);
             break;
         }
 

@@ -151,10 +151,18 @@ private:
     */
     virtual void onCheckStateChanged(const Qt::CheckState& checkState);
 
-    Qt3DCore::QEntity*      m_pParentEntity;                            /**< The parent 3D entity. */
-    Renderable3DEntity*     m_pRenderable3DEntity;                      /**< The renderable 3D entity. */
+    //=========================================================================================================
+    /**
+    * Call this function whenever the surface color was changed.
+    *
+    * @param[in] color        The new surface color.
+    */
+    void onSurfaceColorChanged(const QColor &color);
 
-    QObjectList             m_lChildren;
+    Qt3DCore::QEntity*                          m_pParentEntity;            /**< The parent 3D entity. */
+    Renderable3DEntity*                         m_pRenderable3DEntity;      /**< The renderable 3D entity. */
+
+    QList<Renderable3DEntity*>                  m_lSpheres;                 /**< The currently displayed digitizer points as 3D spheres. */
 };
 
 } //NAMESPACE DISP3DLIB

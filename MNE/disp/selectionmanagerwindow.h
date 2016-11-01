@@ -193,30 +193,12 @@ public:
     */
     void updateBadChannels();
 
-signals:
     //=========================================================================================================
     /**
-    * emit this signal whenever the user or group selection has changed
+    * Updates data view.
     *
-    * @param [in] selectedChannels currently user selected channels or items which are in the visible list widget
     */
-    void showSelectedChannelsOnly(QStringList selectedChannels);
-
-    //=========================================================================================================
-    /**
-    * emit this signal whenever the selection in the scene has changed
-    *
-    * @param [in] selectedChannelItems currently user selected channels
-    */
-    void selectionChanged(const QList<QGraphicsItem*> &selectedChannelItems);
-
-    //=========================================================================================================
-    /**
-    * emit this signal whenever a new layout was loaded
-    *
-    * @param [in] layoutMap currently loaded layout
-    */
-    void loadedLayoutMap(const QMap<QString,QPointF> &layoutMap);
+    void updateDataView();
 
 private:
     //=========================================================================================================
@@ -302,13 +284,6 @@ private:
 
     //=========================================================================================================
     /**
-    * Updates data view.
-    *
-    */
-    void updateDataView();
-
-    //=========================================================================================================
-    /**
     * loads a user selection file.
     *
     */
@@ -359,6 +334,31 @@ private:
     SelectionScene*                 m_pSelectionScene;                  /**< Pointer to the selection scene class. */
 
     QStringList                     m_currentlyLoadedFiffChannels;      /**< List of currently loaded fiff data channels.*/
+
+signals:
+    //=========================================================================================================
+    /**
+    * emit this signal whenever the user or group selection has changed
+    *
+    * @param [in] selectedChannels currently user selected channels or items which are in the visible list widget
+    */
+    void showSelectedChannelsOnly(QStringList selectedChannels);
+
+    //=========================================================================================================
+    /**
+    * emit this signal whenever the selection in the scene has changed
+    *
+    * @param [in] selectedChannelItems currently user selected channels
+    */
+    void selectionChanged(const QList<QGraphicsItem*> &selectedChannelItems);
+
+    //=========================================================================================================
+    /**
+    * emit this signal whenever a new layout was loaded
+    *
+    * @param [in] layoutMap currently loaded layout
+    */
+    void loadedLayoutMap(const QMap<QString,QPointF> &layoutMap);
 };
 
 } // NAMESPACE DISPLIB
