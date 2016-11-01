@@ -75,7 +75,6 @@ HEADERS += \
     fiff_types.h \
     mne_types.h \
     fit_types.h \
-    fwd.h \
     fwd_types.h \
     fiff_file.h \
     fiff_explain.h \
