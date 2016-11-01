@@ -231,14 +231,14 @@ bool BrainRTSourceLocDataTreeItem::init(const MNEForwardSolution& tForwardSoluti
     data.setValue(QVector3D(5.0,5.5,15));
     pItemSourceLocNormValue->setData(data, MetaTreeItemRoles::RTDataNormalizationValue);
 
-    MetaTreeItem *pItemStreamingInterval = new MetaTreeItem(MetaTreeItemTypes::RTDataTimeInterval, "1000");
+    MetaTreeItem *pItemStreamingInterval = new MetaTreeItem(MetaTreeItemTypes::RTDataTimeInterval, "50");
     connect(pItemStreamingInterval, &MetaTreeItem::rtDataTimeIntervalChanged,
             this, &BrainRTSourceLocDataTreeItem::onTimeIntervalChanged);
     list.clear();
     list << pItemStreamingInterval;
     list << new QStandardItem(pItemStreamingInterval->toolTip());
     this->appendRow(list);
-    data.setValue(1000);
+    data.setValue(50);
     pItemStreamingInterval->setData(data, MetaTreeItemRoles::RTDataTimeInterval);
 
     MetaTreeItem *pItemLoopedStreaming = new MetaTreeItem(MetaTreeItemTypes::RTDataLoopedStreaming, "Looping on/off");
@@ -283,7 +283,7 @@ bool BrainRTSourceLocDataTreeItem::init(const MNEForwardSolution& tForwardSoluti
 bool BrainRTSourceLocDataTreeItem::addData(const MNESourceEstimate& tSourceEstimate)
 {
     if(!m_bIsInit) {
-        qDebug() << "BrainRTSourceLocDataTreeItem::updateData - Rt Item has not been initialized yet!";
+        qDebug() << "BrainRTSourceLocDataTreeItem::addData - Rt source loc item has not been initialized yet!";
         return false;
     }
 

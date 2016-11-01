@@ -40,6 +40,7 @@
 
 #include "digitizertreeitem.h"
 #include "../../helpers/renderable3Dentity.h"
+#include "../common/metatreeitem.h"
 
 #include <fiff/fiff_constants.h>
 #include <fiff/fiff_dig_point.h>
@@ -123,66 +124,80 @@ bool DigitizerTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer, 
 {
     //Create renderable 3D entity
     m_pParentEntity = parent;
-    m_pRenderable3DEntity = new Renderable3DEntity(parent);
+    m_pRenderable3DEntity = new Renderable3DEntity(m_pParentEntity);
 
-    QMatrix4x4 m;
-    Qt3DCore::QTransform* transform =  new Qt3DCore::QTransform();
-    m.rotate(180, QVector3D(0.0f, 1.0f, 0.0f));
-    m.rotate(-90, QVector3D(1.0f, 0.0f, 0.0f));
-    transform->setMatrix(m);
-    m_pRenderable3DEntity->addComponent(transform);
+    //Initial transformation also regarding the surface offset
+    m_pRenderable3DEntity->setRotX(90);
+    m_pRenderable3DEntity->setRotY(180);
 
     //Create sources as small 3D spheres
     QVector3D pos;
-    Qt3DCore::QEntity* sourceSphereEntity;
-    Qt3DExtras::QSphereMesh* sourceSphere;
-    Qt3DExtras::QPhongMaterial* material;
+    QColor colDefault(100,100,100);
 
     for(int i = 0; i < tDigitizer.size(); ++i) {
+        Renderable3DEntity* pSourceSphereEntity = new Renderable3DEntity(m_pRenderable3DEntity);
 
         pos.setX(tDigitizer[i].r[0]);
         pos.setY(tDigitizer[i].r[1]);
         pos.setZ(tDigitizer[i].r[2]);
 
-        sourceSphereEntity = new Qt3DCore::QEntity();
+        Qt3DExtras::QSphereMesh* sourceSphere = new Qt3DExtras::QSphereMesh();
 
-        sourceSphere = new Qt3DExtras::QSphereMesh();
-        if (tDigitizer[i].kind==FIFFV_POINT_CARDINAL){
+        if (tDigitizer[i].kind == FIFFV_POINT_CARDINAL) {
             sourceSphere->setRadius(0.002f);
-        }
-        else{
+        } else {
             sourceSphere->setRadius(0.001f);
         }
-        sourceSphereEntity->addComponent(sourceSphere);
+        pSourceSphereEntity->addComponent(sourceSphere);
+        pSourceSphereEntity->setPosition(pos);
 
-        transform = new Qt3DCore::QTransform();
-        QMatrix4x4 m;
-        m.translate(pos);
-        transform->setMatrix(m);
-        sourceSphereEntity->addComponent(transform);
+        Qt3DExtras::QPhongMaterial* material = new Qt3DExtras::QPhongMaterial();
 
-        material = new Qt3DExtras::QPhongMaterial();
         switch (tDigitizer[i].kind) {
         case FIFFV_POINT_CARDINAL:
-            material->setAmbient(Qt::yellow);
+            colDefault = Qt::yellow;
+            material->setAmbient(colDefault);
             break;
         case FIFFV_POINT_HPI:
-            material->setAmbient(Qt::red);
+            colDefault = Qt::red;
+            material->setAmbient(colDefault);
             break;
         case FIFFV_POINT_EEG:
-            material->setAmbient(Qt::green);
+            colDefault = Qt::green;
+            material->setAmbient(colDefault);
             break;
         case FIFFV_POINT_EXTRA:
-            material->setAmbient(Qt::blue);
+            colDefault = Qt::blue;
+            material->setAmbient(colDefault);
             break;
         default:
-            material->setAmbient(Qt::white);
+            colDefault = Qt::white;
+            material->setAmbient(colDefault);
             break;
         }
-        sourceSphereEntity->addComponent(material);
 
-        sourceSphereEntity->setParent(m_pRenderable3DEntity);
+        pSourceSphereEntity->addComponent(material);
+
+        pSourceSphereEntity->setParent(m_pRenderable3DEntity);
+
+        m_lSpheres.append(pSourceSphereEntity);
     }
+
+    //Add surface meta information as item children
+    QVariant data;
+    QList<QStandardItem*> list;
+
+    MetaTreeItem* pItemSurfCol = new MetaTreeItem(MetaTreeItemTypes::PointColor, "Point color");
+    connect(pItemSurfCol, &MetaTreeItem::surfaceColorChanged,
+            this, &DigitizerTreeItem::onSurfaceColorChanged);
+    list.clear();
+    list << pItemSurfCol;
+    list << new QStandardItem(pItemSurfCol->toolTip());
+    this->appendRow(list);
+    data.setValue(colDefault);
+    pItemSurfCol->setData(data, MetaTreeItemRoles::PointColor);
+    pItemSurfCol->setData(data, Qt::DecorationRole);
+
     return true;
 }
 
@@ -191,7 +206,9 @@ bool DigitizerTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer, 
 
 void DigitizerTreeItem::setVisible(bool state)
 {
-    m_pRenderable3DEntity->setParent(state ? m_pParentEntity : Q_NULLPTR);
+    for(int i = 0; i < m_lSpheres.size(); ++i) {
+        m_lSpheres.at(i)->setParent(state ? m_pRenderable3DEntity : Q_NULLPTR);
+    }
 }
 
 
@@ -199,5 +216,21 @@ void DigitizerTreeItem::setVisible(bool state)
 
 void DigitizerTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
 {
-    this->setVisible(checkState==Qt::Unchecked ? false : true);
+    this->setVisible(checkState == Qt::Unchecked ? false : true);
+}
+
+
+//*************************************************************************************************************
+
+void DigitizerTreeItem::onSurfaceColorChanged(const QColor& color)
+{
+    for(int i = 0; i < m_lSpheres.size(); ++i) {
+        for(int j = 0; j < m_lSpheres.at(i)->components().size(); ++j) {
+            Qt3DCore::QComponent* pComponent = m_lSpheres.at(i)->components().at(j);
+
+            if(Qt3DExtras::QPhongMaterial* pMaterial = dynamic_cast<Qt3DExtras::QPhongMaterial*>(pComponent)) {
+                pMaterial->setAmbient(color);
+            }
+        }
+    }
 }
