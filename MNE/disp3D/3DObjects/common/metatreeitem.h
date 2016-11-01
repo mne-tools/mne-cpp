@@ -194,6 +194,14 @@ signals:
     * @param[in] zTrans     The new translation z value.
     */
     void surfaceTranslationZChanged(float zTrans);
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the network threshold changed.
+    *
+    * @param[in] vecThresholds     The new threshold values used for thresholding the data.
+    */
+    void networkThresholdChanged(const QVector3D& vecThresholds);
 };
 
 } //NAMESPACE DISP3DLIB

@@ -451,7 +451,7 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(const Annotation
                     qint32 sel_idx = itIn->idcs[j_min];
 
                     p_fwdOut.src[h].cluster_info.centroidVertno.append(this->src[h].vertno[sel_idx]);
-                    p_fwdOut.src[h].cluster_info.centroidSource_rr.append(this->src[h].rr.row(sel_idx));
+                    p_fwdOut.src[h].cluster_info.centroidSource_rr.append(this->src[h].rr.row(this->src[h].vertno[sel_idx]));
 //                    p_fwdOut.src[h].nn.row(count) = MatrixXd::Zero(1,3);
 
 //                    // Option 1 closest vertno

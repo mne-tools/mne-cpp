@@ -364,14 +364,6 @@ private slots:
 
     //=========================================================================================================
     /**
-    * Updates the number of detected trigger in quick control widget
-    *
-    * @param [in] numberDetectedTriggers number of detected triggers.
-    */
-    void onTriggerDetected(int numberDetectedTriggers);
-
-    //=========================================================================================================
-    /**
     * Shows the filter widget
     */
     void showFilterWidget(bool state = true);

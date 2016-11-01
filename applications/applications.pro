@@ -44,10 +44,11 @@ SUBDIRS += \
     SUBDIRS += \
         mne_scan \
         mne_browse \
+        mne_matching_pursuit\
         mne_dipole_fit \
-        mne_matching_pursuit
-
-        qtHaveModule(charts) {
+        mne_sample_set_downloader \        
+		
+		qtHaveModule(charts) {
             SUBDIRS += \
                 mne_analyze
         }
