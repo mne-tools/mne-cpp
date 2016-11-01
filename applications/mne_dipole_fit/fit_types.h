@@ -1,7 +1,8 @@
 #ifndef _fit_types_h
 #define _fit_types_h
 
-#include "fwd.h"
+#include "fwd_types.h"
+
 /*
  * These are the type definitions for dipole fitting
  */

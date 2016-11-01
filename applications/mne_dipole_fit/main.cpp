@@ -56,6 +56,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <strings.h>
 
 
 
@@ -2739,6 +2740,17 @@ void fiff_coord_trans_inv (float r[3],fiffCoordTrans t,int do_move)
 }
 
 
+fiffCoordTrans fiff_dup_transform (fiffCoordTrans t)
+     /*
+      * Simply duplicate
+      */
+{
+  fiffCoordTrans tdup = (fiffCoordTrans)malloc(sizeof(fiffCoordTransRec));
+
+  memcpy (tdup,t,sizeof(fiffCoordTransRec));
+  return (tdup);
+}
+
 
 
 
@@ -3520,6 +3532,98 @@ fwdCoilSet fwd_create_eeg_els(fiffChInfo      chs,      /* Channel information t
 
 
 
+fwdCoil fwd_dup_coil(fwdCoil c)
+/*
+ * Make a carbon copy
+ */
+{
+  fwdCoil res;
+  int p;
+  /*
+   * Create the result
+   */
+  res = fwd_new_coil(c->np);
+
+  if (c->chname)
+    res->chname   = mne_strdup(c->chname);
+  if (c->desc)
+    res->desc   = mne_strdup(c->desc);
+  res->coil_class = c->coil_class;
+  res->accuracy   = c->accuracy;
+  res->base       = c->base;
+  res->size       = c->size;
+  res->type       = c->type;
+
+  VEC_COPY(res->r0,c->r0);
+  VEC_COPY(res->ex,c->ex);
+  VEC_COPY(res->ey,c->ey);
+  VEC_COPY(res->ez,c->ez);
+
+  for (p = 0; p < c->np; p++) {
+    res->w[p] = c->w[p];
+    VEC_COPY(res->rmag[p],c->rmag[p]);
+    VEC_COPY(res->cosmag[p],c->cosmag[p]);
+  }
+  res->coord_frame = c->coord_frame;
+
+  return res;
+}
+
+
+
+fwdCoilSet fwd_dup_coil_set(fwdCoilSet s,
+                            fiffCoordTrans t)
+/*
+ * Make a duplicate
+ */
+{
+  fwdCoilSet res;
+  fwdCoil    coil;
+  int k,p;
+
+  if (!s) {
+    printf("No coils to duplicate");
+    return NULL;
+  }
+  if (t) {
+    if (s->coord_frame != t->from) {
+      printf("Coordinate frame of the transformation does not match the coil set in fwd_dup_coil_set");
+      return NULL;
+    }
+  }
+  res = fwd_new_coil_set();
+  if (t)
+    res->coord_frame = t->to;
+  else
+    res->coord_frame = s->coord_frame;
+
+  res->coils = MALLOC(s->ncoil,fwdCoil);
+  res->ncoil = s->ncoil;
+
+  for (k = 0; k < s->ncoil; k++) {
+    coil = res->coils[k] = fwd_dup_coil(s->coils[k]);
+    /*
+     * Optional coordinate transformation
+     */
+    if (t) {
+      fiff_coord_trans(coil->r0,t,FIFFV_MOVE);
+      fiff_coord_trans(coil->ex,t,FIFFV_NO_MOVE);
+      fiff_coord_trans(coil->ey,t,FIFFV_NO_MOVE);
+      fiff_coord_trans(coil->ez,t,FIFFV_NO_MOVE);
+
+      for (p = 0; p < coil->np; p++) {
+        fiff_coord_trans(coil->rmag[p],t,FIFFV_MOVE);
+        fiff_coord_trans(coil->cosmag[p],t,FIFFV_NO_MOVE);
+      }
+      coil->coord_frame = t->to;
+    }
+  }
+  return res;
+}
+
+
+
+
 
 //============================= fiff_matrix.c =============================
 
@@ -3821,6 +3925,46 @@ void mne_free_sparse(mneSparseMatrix mat)
     FREE(mat);
   }
 }
+
+
+
+
+mneSparseMatrix mne_dup_sparse_matrix(mneSparseMatrix mat)
+
+{
+  mneSparseMatrix res;
+  int             size;
+
+  if (!mat)
+    return NULL;
+
+  res = MALLOC(1,mneSparseMatrixRec);
+  res->coding = mat->coding;
+  res->m      = mat->m;
+  res->n      = mat->n;
+  res->nz     = mat->nz;
+
+  if (mat->coding == FIFFTS_MC_CCS) {
+    size = mat->nz*(sizeof(fiff_float_t) + sizeof(fiff_int_t)) +
+      (mat->n+1)*(sizeof(fiff_int_t));
+  }
+  if (mat->coding == FIFFTS_MC_RCS) {
+    size = mat->nz*(sizeof(fiff_float_t) + sizeof(fiff_int_t)) +
+      (mat->m+1)*(sizeof(fiff_int_t));
+  }
+  else {
+    printf("Illegal sparse matrix storage type: %d",mat->coding);
+    FREE(res);
+    return NULL;
+  }
+  res->data   = (float *)malloc(size);
+  res->inds   = (int *)(res->data+res->nz);
+  res->ptrs   = res->inds+res->nz;
+  memcpy(res->data,mat->data,size);
+
+  return res;
+}
+
 
 
 mneSparseMatrix mne_convert_to_sparse(float **dense,        /* The dense matrix to be converted */
@@ -6698,6 +6842,56 @@ void mne_free_ctf_comp_data_set(mneCTFcompDataSet set)
 
 
 
+mneCTFcompData mne_dup_ctf_comp_data(mneCTFcompData data)
+
+{
+  mneCTFcompData res;
+
+  if (!data)
+    return NULL;
+
+  res = mne_new_ctf_comp_data();
+
+  res->kind       = data->kind;
+  res->mne_kind   = data->mne_kind;
+  res->calibrated = data->calibrated;
+  res->data       = mne_dup_named_matrix(data->data);
+
+  res->presel     = mne_dup_sparse_matrix(data->presel);
+  res->postsel    = mne_dup_sparse_matrix(data->postsel);
+
+
+  return res;
+}
+
+
+mneCTFcompDataSet mne_dup_ctf_comp_data_set(mneCTFcompDataSet set)
+     /*
+      * Make a verbatim copy of a data set
+      */
+{
+  mneCTFcompDataSet res;
+  int  k;
+
+  if (!set)
+    return NULL;
+
+  res = mne_new_ctf_comp_data_set();
+
+  if (set->ncomp > 0) {
+    res->comps = MALLOC(set->ncomp,mneCTFcompData);
+    res->ncomp = set->ncomp;
+    for (k = 0; k < res->ncomp; k++)
+      res->comps[k] = mne_dup_ctf_comp_data(set->comps[k]);
+  }
+  res->current = mne_dup_ctf_comp_data(set->current);
+
+  return res;
+}
+
+
+
+
 int mne_apply_ctf_comp(mneCTFcompDataSet set,		  /* The compensation data */
                        int               do_it,
                        float             *data,           /* The data to process */
@@ -9343,243 +9537,6 @@ int mne_transform_source_spaces_to(int            coord_frame,   /* Which coord 
 }
 
 
-//int mne_write_one_source_space(FILE *out,mneSourceSpace ss,int selected_only)
-
-//{
-//  float **sel = NULL;
-//  int   **tris = NULL;
-//  int   *nearest = NULL;
-//  float *nearest_dist = NULL;
-//  int   p,pp;
-
-//  if (ss->np <= 0) {
-//    printf("No points in the source space being saved");
-//    goto bad;
-//  }
-
-//  if (fiff_start_block (out,FIFFB_MNE_SOURCE_SPACE) == FIFF_FAIL)
-//    goto bad;
-//  /*
-//   * General information
-//   */
-//  if (ss->type != FIFFV_MNE_SPACE_UNKNOWN)
-//    if (fiff_write_int_tag (out,FIFF_MNE_SOURCE_SPACE_TYPE,ss->type) == FIFF_FAIL)
-//      goto bad;
-//  if (ss->id != FIFFV_MNE_SURF_UNKNOWN)
-//    if (fiff_write_int_tag (out,FIFF_MNE_SOURCE_SPACE_ID,ss->id) == FIFF_FAIL)
-//      goto bad;
-//  if (ss->subject && strlen(ss->subject) > 0)
-//    if (fiff_write_string_tag (out,FIFF_SUBJ_HIS_ID,ss->subject) == FIFF_FAIL)
-//      goto bad;
-//  if (fiff_write_int_tag (out,FIFF_MNE_COORD_FRAME,ss->coord_frame) == FIFF_FAIL)
-//    goto bad;
-
-//  if (selected_only) {
-//    if (ss->nuse == 0) {
-//      printf("No vertices in use. Cannot write active-only vertices from this source space");
-//      goto bad;
-//    }
-//    sel = ALLOC_CMATRIX(ss->nuse,3);
-//    if (fiff_write_int_tag (out,FIFF_MNE_SOURCE_SPACE_NPOINTS,ss->nuse) == FIFF_FAIL)
-//      goto bad;
-//    for (p = 0, pp = 0; p < ss->np; p++)
-//      if (ss->inuse[p]) {
-//        sel[pp][X] = ss->rr[p][X];
-//        sel[pp][Y] = ss->rr[p][Y];
-//        sel[pp][Z] = ss->rr[p][Z];
-//        pp++;
-//      }
-//    if (fiff_write_float_matrix (out, FIFF_MNE_SOURCE_SPACE_POINTS,sel,ss->nuse,3) == FIFF_FAIL)
-//      goto bad;
-//    for (p = 0, pp = 0; p < ss->np; p++)
-//      if (ss->inuse[p]) {
-//        sel[pp][X] = ss->nn[p][X];
-//        sel[pp][Y] = ss->nn[p][Y];
-//        sel[pp][Z] = ss->nn[p][Z];
-//        pp++;
-//      }
-//    if (fiff_write_float_matrix (out, FIFF_MNE_SOURCE_SPACE_NORMALS,sel, ss->nuse, 3) == FIFF_FAIL)
-//      goto bad;
-//    FREE_CMATRIX(sel); sel = NULL;
-//#ifdef WRONG
-//    /*
-//     * This code is incorrect because the numbering in the nuse triangulation refers to the complete source space
-//     */
-//    if (ss->nuse_tri > 0) {		/* Write the triangulation information */
-//      /*
-//       * The 'use' triangulation is identical to the complete one
-//       */
-//      if (fiff_write_int_tag(out,FIFF_MNE_SOURCE_SPACE_NTRI,ss->nuse_tri) == FIFF_FAIL)
-//        goto bad;
-//      tris = make_file_triangle_list(ss->use_itris,ss->nuse_tri);
-//      if (fiff_write_int_matrix(out,FIFF_MNE_SOURCE_SPACE_TRIANGLES,tris,
-//                                ss->nuse_tri,3) == FIFF_FAIL)
-//        goto bad;
-
-//      if (fiff_write_int_tag(out,FIFF_MNE_SOURCE_SPACE_NUSE_TRI,ss->nuse_tri) == FIFF_FAIL)
-//        goto bad;
-//      if (fiff_write_int_matrix(out,FIFF_MNE_SOURCE_SPACE_USE_TRIANGLES,tris,
-//                                ss->nuse_tri,3) == FIFF_FAIL)
-//        goto bad;
-//      FREE_ICMATRIX(tris); tris = NULL;
-//    }
-//#endif
-//  }
-//  else {
-//    fiffTagRec tag;
-//    if (fiff_write_int_tag (out,FIFF_MNE_SOURCE_SPACE_NPOINTS,ss->np) == FIFF_FAIL)
-//      goto bad;
-//    if (fiff_write_float_matrix (out, FIFF_MNE_SOURCE_SPACE_POINTS,ss->rr, ss->np, 3) == FIFF_FAIL)
-//      goto bad;
-//    if (fiff_write_float_matrix (out, FIFF_MNE_SOURCE_SPACE_NORMALS,ss->nn, ss->np, 3) == FIFF_FAIL)
-//      goto bad;
-
-//    if (ss->nuse > 0 && ss->inuse) {
-//      tag.next = 0;
-//      tag.kind = FIFF_MNE_SOURCE_SPACE_SELECTION;
-//      tag.type = FIFFT_INT;
-//      tag.size = (ss->np)*sizeof(fiff_int_t);
-//      tag.data = (fiff_byte_t *)(ss->inuse);
-//      if (fiff_write_tag(out,&tag) == FIFF_FAIL)
-//        goto bad;
-
-//      if (fiff_write_int_tag (out, FIFF_MNE_SOURCE_SPACE_NUSE,ss->nuse) == FIFF_FAIL)
-//        goto bad;
-//    }
-//    if (ss->ntri > 0) {		/* Write the triangulation information */
-//      if (fiff_write_int_tag(out,FIFF_MNE_SOURCE_SPACE_NTRI,ss->ntri) == FIFF_FAIL)
-//        goto bad;
-//      tris = make_file_triangle_list(ss->itris,ss->ntri);
-//      if (fiff_write_int_matrix(out,FIFF_MNE_SOURCE_SPACE_TRIANGLES,tris,
-//                                ss->ntri,3) == FIFF_FAIL)
-//        goto bad;
-//      FREE_ICMATRIX(tris); tris = NULL;
-//    }
-//    if (ss->nuse_tri > 0) {		/* Write the triangulation information for the vertices in use */
-//      if (fiff_write_int_tag(out,FIFF_MNE_SOURCE_SPACE_NUSE_TRI,ss->nuse_tri) == FIFF_FAIL)
-//        goto bad;
-//      tris = make_file_triangle_list(ss->use_itris,ss->nuse_tri);
-//      if (fiff_write_int_matrix(out,FIFF_MNE_SOURCE_SPACE_USE_TRIANGLES,tris,
-//                                ss->nuse_tri,3) == FIFF_FAIL)
-//        goto bad;
-//      FREE_ICMATRIX(tris); tris = NULL;
-//    }
-//    if (ss->nearest) {		/* Write the patch information */
-//      nearest = MALLOC(ss->np,int);
-//      nearest_dist = MALLOC(ss->np,float);
-
-//      mne_sort_nearest_by_vertex(ss->nearest,ss->np);
-//      for (p = 0; p < ss->np; p++) {
-//        nearest[p] = ss->nearest[p].nearest;
-//        nearest_dist[p] = ss->nearest[p].dist;
-//      }
-
-//      tag.next = FIFFV_NEXT_SEQ;
-//      tag.kind = FIFF_MNE_SOURCE_SPACE_NEAREST;
-//      tag.type = FIFFT_INT;
-//      tag.size = (ss->np)*sizeof(fiff_int_t);
-//      tag.data = (fiff_byte_t *)(nearest);
-//      if (fiff_write_tag(out,&tag) == FIFF_FAIL)
-//        goto bad;
-
-//      tag.next = FIFFV_NEXT_SEQ;
-//      tag.kind = FIFF_MNE_SOURCE_SPACE_NEAREST_DIST;
-//      tag.type = FIFFT_FLOAT;
-//      tag.size = (ss->np)*sizeof(fiff_float_t);
-//      tag.data = (fiff_byte_t *)(nearest_dist);
-//      if (fiff_write_tag(out,&tag) == FIFF_FAIL)
-//        goto bad;
-
-//      FREE(nearest); nearest = NULL;
-//      FREE(nearest_dist); nearest_dist = NULL;
-//    }
-//    if (ss->dist) {		/* Distance information */
-//      mneSparseMatrix m = mne_pick_lower_triangle_rcs(ss->dist);
-//      if (!m)
-//        goto bad;
-//      if (fiff_write_float_sparse_matrix(out,FIFF_MNE_SOURCE_SPACE_DIST,m) == FIFF_FAIL) {
-//        mne_free_sparse(m);
-//        goto bad;
-//      }
-//      mne_free_sparse(m);
-//      if (fiff_write_float_tag(out,FIFF_MNE_SOURCE_SPACE_DIST_LIMIT,ss->dist_limit) == FIFF_FAIL)
-//        goto bad;
-//    }
-//  }
-//  /*
-//   * Volume source spaces have additional information
-//   */
-//  if (write_volume_space_info(out,ss,selected_only) == FIFF_FAIL)
-//    goto bad;
-//  if (fiff_end_block (out,FIFFB_MNE_SOURCE_SPACE) == FIFF_FAIL)
-//    goto bad;
-//  return FIFF_OK;
-
-//  bad : {
-//    FREE_ICMATRIX(tris);
-//    FREE_CMATRIX(sel);
-//    FREE(nearest);
-//    FREE(nearest_dist);
-//    return FIFF_FAIL;
-//  }
-//}
-
-
-
-//int mne_write_source_spaces(char           *name,
-//                            mneSourceSpace *spaces,
-//                            int            nspace,
-//                            int            selected_only)
-//     /*
-//      * Write several source spaces into a fiff file
-//      */
-//{
-//  FILE *out = NULL;
-//  int  k;
-//  fiffFile in = NULL;
-
-//  if ((out = fopen(name,"w+")) == NULL) {
-//    printf (name);
-//    return FIFF_FAIL;
-//  }
-//  if (fiff_start_file (out) == FIFF_FAIL)
-//    goto bad;
-
-//  if (fiff_start_block (out,FIFFB_MNE) == FIFF_FAIL)
-//    goto bad;
-//  for (k = 0; k < nspace; k++)
-//    if (mne_write_one_source_space(out,spaces[k],selected_only) == FIFF_FAIL)
-//      goto bad;
-//  if (fiff_end_block (out,FIFFB_MNE) == FIFF_FAIL)
-//    goto bad;
-//  if (fiff_end_file (out) == FIFF_FAIL)
-//    goto bad;
-//  (void)fclose(out); out = NULL;
-
-//  /*
-//   * Add directory
-//   */
-//  if ((in = fiff_open_update(name)) == NULL)
-//    goto bad;
-//  if (fiff_put_dir(in->fd,in->dir) == FIFF_FAIL)
-//    goto bad;
-//  fiff_close(in); in = NULL;
-
-//  return FIFF_OK;
-
-//  bad : {
-//    if (out != NULL)
-//      fclose(out);
-//    fiff_close(in);
-//    unlink(name);
-
-//    return FIFF_FAIL;
-//  }
-
-//}
-
-
-
 
 //============================= dipole_forward.c =============================
 
@@ -10886,6 +10843,1546 @@ mneSourceSpace make_volume_source_space(mneSurface surf,
 }
 
 
+//============================= fwd_bem_model.c =============================
+
+
+static struct {
+  int  kind;
+  char *name;
+} surf_expl[] = { { FIFFV_BEM_SURF_ID_BRAIN , "inner skull" },
+                  { FIFFV_BEM_SURF_ID_SKULL , "outer skull" },
+                  { FIFFV_BEM_SURF_ID_HEAD  , "scalp" },
+                  { -1                      , "unknown" } };
+
+static struct {
+  int  method;
+  char *name;
+} method_expl[] = { { FWD_BEM_CONSTANT_COLL , "constant collocation" },
+                    { FWD_BEM_LINEAR_COLL   , "linear collocation" },
+                    { -1                    , "unknown" } };
+
+
+fwdBemModel fwd_bem_new_model()
+
+{
+  fwdBemModel m = MALLOC(1,fwdBemModelRec);
+
+  m->surf_name   = NULL;
+  m->surfs       = NULL;
+  m->nsurf       = 0;
+  m->ntri        = NULL;
+  m->np          = NULL;
+  m->sigma       = NULL;
+  m->gamma       = NULL;
+  m->source_mult = NULL;
+  m->field_mult  = NULL;
+  m->bem_method  = FWD_BEM_UNKNOWN;
+  m->head_mri_t  = NULL;
+  m->sol_name    = NULL;
+  m->solution    = NULL;
+  m->nsol        = 0;
+  m->v0          = NULL;
+  m->use_ip_approach = FALSE;
+  m->ip_approach_limit = FWD_BEM_IP_APPROACH_LIMIT;
+  return m;
+}
+
+void fwd_bem_free_solution(fwdBemModel m)
+
+{
+  if (!m)
+    return;
+  FREE_CMATRIX(m->solution); m->solution = NULL;
+  FREE(m->sol_name); m->sol_name = NULL;
+  FREE(m->v0); m->v0 = NULL;
+  m->bem_method = FWD_BEM_UNKNOWN;
+  m->nsol       = 0;
+
+  return;
+}
+
+void fwd_bem_free_coil_solution(void *user)
+
+{
+  fwdBemSolution sol = (fwdBemSolution)user;
+
+  if (!sol)
+    return;
+  FREE_CMATRIX(sol->solution);
+  FREE(sol);
+  return;
+}
+
+fwdBemSolution fwd_bem_new_coil_solution()
+
+{
+  fwdBemSolution sol = MALLOC(1,fwdBemSolutionRec);
+
+  sol->solution = NULL;
+  sol->ncoil    = 0;
+  sol->np       = 0;
+
+  return sol;
+}
+
+void fwd_bem_free_model(fwdBemModel m)
+
+{
+  int k;
+
+  if (!m)
+    return;
+
+  FREE(m->surf_name);
+  for (k = 0; k < m->nsurf; k++)
+    mne_free_source_space(m->surfs[k]);
+  FREE(m->surfs);
+  FREE(m->ntri);
+  FREE(m->np);
+  FREE(m->sigma);
+  FREE(m->source_mult);
+  FREE(m->field_mult);
+  FREE_CMATRIX(m->gamma);
+  FREE(m->head_mri_t);
+  fwd_bem_free_solution(m);
+
+  FREE(m);
+  return;
+}
+
+char *fwd_bem_explain_surface(int kind)
+
+{
+  int k;
+
+  for (k = 0; surf_expl[k].kind >= 0; k++)
+    if (surf_expl[k].kind == kind)
+      return surf_expl[k].name;
+
+  return surf_expl[k].name;
+}
+
+char *fwd_bem_explain_method(int method)
+
+{
+  int k;
+
+  for (k = 0; method_expl[k].method >= 0; k++)
+    if (method_expl[k].method == method)
+      return method_expl[k].name;
+
+  return method_expl[k].name;
+}
+
+mneSurface fwd_bem_find_surface(fwdBemModel model, int kind)
+/*
+ * Return a pointer to a specific surface in a BEM
+ */
+{
+  int k;
+  if (!model) {
+    printf("No model specified for fwd_bem_find_surface");
+    return NULL;
+  }
+  for (k = 0; k < model->nsurf; k++)
+    if (model->surfs[k]->id == kind)
+      return model->surfs[k];
+  printf("Desired surface (%d = %s) not found.",
+                       kind,fwd_bem_explain_surface(kind));
+  return NULL;
+}
+
+fwdBemModel fwd_bem_load_surfaces(char *name,
+                                  int  *kinds,
+                                  int  nkind)
+/*
+ * Load a set of surfaces
+ */
+{
+  mneSurface *surfs = NULL;
+  float      *sigma = NULL;
+  float      *sigma1;
+  fwdBemModel m = NULL;
+  int         j,k;
+
+  if (nkind <= 0) {
+    printf("No surfaces specified to fwd_bem_load_surfaces");
+    return NULL;
+  }
+
+  surfs = MALLOC(nkind,mneSurface);
+  sigma = MALLOC(nkind,float);
+  for (k = 0; k < nkind; k++)
+    surfs[k] = NULL;
+
+  for (k = 0; k < nkind; k++) {
+    if ((surfs[k] = mne_read_bem_surface(name,kinds[k],TRUE,sigma+k)) == NULL)
+      goto bad;
+    if (sigma[k] < 0.0) {
+      printf("No conductivity available for surface %s",fwd_bem_explain_surface(kinds[k]));
+      goto bad;
+    }
+    if (surfs[k]->coord_frame != FIFFV_COORD_MRI) { /* We make our life much easier with this */
+      printf("Surface %s not specified in MRI coordinates.",fwd_bem_explain_surface(kinds[k]));
+      goto bad;
+    }
+  }
+  m = fwd_bem_new_model();
+
+  m->surf_name = mne_strdup(name);
+  m->nsurf     = nkind;
+  m->surfs     = surfs;
+  m->sigma     = sigma;
+  m->ntri      = MALLOC(nkind,int);
+  m->np        = MALLOC(nkind,int);
+  m->gamma = ALLOC_CMATRIX(nkind,nkind);
+  m->source_mult = MALLOC(nkind,float);
+  m->field_mult  = MALLOC(nkind,float);
+  /*
+   * Dirty trick for the zero conductivity outside
+   */
+  sigma1 = MALLOC(nkind+1,float);
+  sigma1[0] = 0.0;
+  sigma  = sigma1+1;
+  for (k = 0; k < m->nsurf; k++)
+    sigma[k] = m->sigma[k];
+  /*
+   * Gamma factors and multipliers
+   */
+  for (j = 0; j < m->nsurf; j++) {
+    m->ntri[j] = m->surfs[j]->ntri;
+    m->np[j]   = m->surfs[j]->np;
+    m->source_mult[j] = 2.0/(sigma[j]+sigma[j-1]);
+    m->field_mult[j] = sigma[j]-sigma[j-1];
+    for (k = 0; k < m->nsurf; k++)
+      m->gamma[j][k] = (sigma[k]-sigma[k-1])/(sigma[j]+sigma[j-1]);
+  }
+  FREE(sigma1);
+
+  return m;
+
+ bad : {
+    FREE(sigma);
+    for (k = 0; k < nkind; k++)
+      mne_free_source_space(surfs[k]);
+    FREE(surfs);
+    return NULL;
+  }
+}
+
+fwdBemModel fwd_bem_load_homog_surface(char *name)
+/*
+ * Load surfaces for the homogeneous model
+ */
+{
+  int kinds[] = { FIFFV_BEM_SURF_ID_BRAIN };
+  int nkind   = 1;
+
+  return fwd_bem_load_surfaces(name,kinds,nkind);
+}
+
+fwdBemModel fwd_bem_load_three_layer_surfaces(char *name)
+/*
+ * Load surfaces for three-layer model
+ */
+{
+  int kinds[] = { FIFFV_BEM_SURF_ID_HEAD, FIFFV_BEM_SURF_ID_SKULL, FIFFV_BEM_SURF_ID_BRAIN };
+  int nkind   = 3;
+
+  return fwd_bem_load_surfaces(name,kinds,nkind);
+}
+
+static int get_int(fiffFile in,fiffDirNode node,int what,int *res)
+     /*
+      * Wrapper to get int's
+      */
+{
+  fiffTag tag;
+  if ((tag = fiff_dir_tree_get_tag(in,node,what)) != NULL) {
+    if (tag->type != FIFFT_INT) {
+      printf("Expected an integer tag : %d (found data type %d instead)\n",what,tag->type);
+      FREE(tag->data);
+      FREE(tag);
+      return FAIL;
+    }
+    *res = *(int *)tag->data;
+    FREE(tag->data);
+    FREE(tag);
+    return OK;
+  }
+  return FAIL;
+}
+
+
+int fwd_bem_load_solution(char *name, int bem_method, fwdBemModel m)
+/*
+ * Load the potential solution matrix and attach it to the model:
+ *
+ * return values:
+ *
+ *       TRUE   found a suitable solution
+ *       FALSE  did not find a suitable solution
+ *       FAIL   error in reading the solution
+ *
+ */
+{
+  fiffFile    in = fiff_open(name);
+  float       **sol = NULL;
+  fiffDirNode bem_node;
+  int         method;
+  fiffTag     tag = NULL;
+  int         nsol;
+
+  if (!in)
+    goto not_found;
+
+  /*
+   * Find the BEM data
+   */
+  {
+    fiffDirNode *nodes = fiff_dir_tree_find(in->dirtree,FIFFB_BEM);
+
+    if (nodes == NULL || nodes[0] == NULL) {
+      printf ("No BEM data in %s",name);
+      FREE(nodes);
+      goto not_found;
+    }
+    bem_node = nodes[0]; FREE(nodes);
+  }
+  /*
+   * Approximation method
+   */
+  if (get_int(in,bem_node,FIFF_BEM_APPROX,&method) != OK)
+    goto not_found;
+  if (method == FIFFV_BEM_APPROX_CONST)
+    method = FWD_BEM_CONSTANT_COLL;
+  else if (method == FIFFV_BEM_APPROX_LINEAR)
+    method = FWD_BEM_LINEAR_COLL;
+  else {
+    printf ("Cannot handle BEM approximation method : %d",method);
+    goto bad;
+  }
+  if (bem_method != FWD_BEM_UNKNOWN && method != bem_method) {
+    printf("Approximation method in file : %d desired : %d",method,bem_method);
+    goto not_found;
+  }
+  {
+    int         *dims;
+    int         dim,k;
+
+    if ((tag = fiff_dir_tree_get_tag(in,bem_node,
+                                     FIFF_BEM_POT_SOLUTION)) == NULL)
+      goto bad;
+    if ((dims = fiff_get_matrix_dims(tag)) == NULL)
+      goto bad;
+    if (dims[0] != 2) {
+      printf("Expected a two-dimensional solution matrix instead of a %d dimensional one",dims[0]);
+      goto bad;
+    }
+    for (k = 0, dim = 0; k < m->nsurf; k++)
+      dim = dim + ((method == FWD_BEM_LINEAR_COLL) ? m->surfs[k]->np : m->surfs[k]->ntri);
+    if (dims[1] != dim || dims[2] != dim) {
+      printf("Expected a %d x %d solution matrix instead of a %d x %d  one",dim,dim,dims[2],dims[1]);
+      goto not_found;
+    }
+    if ((sol = fiff_get_float_matrix(tag)) == NULL) {
+      printf("Could not read potential solution.");
+      goto bad;
+    }
+    nsol = dims[1];
+    FREE(tag); tag = NULL;
+    FREE(dims);
+  }
+  fwd_bem_free_solution(m);
+  m->sol_name = mne_strdup(name);
+  m->solution = sol;
+  m->nsol     = nsol;
+  m->bem_method = method;
+  fiff_close(in);
+
+  return TRUE;
+
+ bad : {
+    fiff_close(in);
+    if (tag) {
+      FREE(tag->data);
+      FREE(tag);
+    }
+    FREE_CMATRIX(sol);
+    return FAIL;
+  }
+
+ not_found : {
+    fiff_close(in);
+    if (tag) {
+      FREE(tag->data);
+      FREE(tag);
+    }
+    FREE_CMATRIX(sol);
+    return FALSE;
+  }
+}
+
+extern int fwd_bem_linear_collocation_solution(fwdBemModel m);
+extern int fwd_bem_constant_collocation_solution(fwdBemModel m);
+
+int fwd_bem_compute_solution(fwdBemModel m,
+                             int         bem_method)
+/*
+ * Compute the solution
+ */
+{
+  /*
+   * Compute the solution
+   */
+  if (bem_method == FWD_BEM_LINEAR_COLL)
+    return fwd_bem_linear_collocation_solution(m);
+  else if (bem_method == FWD_BEM_CONSTANT_COLL)
+    return fwd_bem_constant_collocation_solution(m);
+
+  fwd_bem_free_solution(m);
+  printf ("Unknown BEM method: %d\n",bem_method);
+  return FAIL;
+}
+
+int fwd_bem_load_recompute_solution(char        *name,
+                                    int         bem_method,
+                                    int         force_recompute,
+                                    fwdBemModel m)
+/*
+ * Load or recompute the potential solution matrix
+ */
+{
+  int solres;
+
+  if (!m) {
+    printf ("No model specified for fwd_bem_load_recompute_solution");
+    return FAIL;
+  }
+
+  if (!force_recompute) {
+    fwd_bem_free_solution(m);
+    solres = fwd_bem_load_solution(name,bem_method,m);
+    if (solres == TRUE) {
+      fprintf(stderr,"\nLoaded %s BEM solution from %s\n",fwd_bem_explain_method(m->bem_method),name);
+      return OK;
+    }
+    else if (solres == FAIL)
+      return FAIL;
+#ifdef DEBUG
+    else
+      fprintf(stderr,"Desired BEM  solution not available in %s (%s)\n",name,err_get_error());
+#endif
+  }
+  if (bem_method == FWD_BEM_UNKNOWN)
+    bem_method = FWD_BEM_LINEAR_COLL;
+  return fwd_bem_compute_solution(m,bem_method);
+}
+
+int fwd_bem_set_head_mri_t(fwdBemModel m, fiffCoordTrans t)
+/*
+ * Set the coordinate transformation
+ */
+{
+  if (t->from == FIFFV_COORD_HEAD && t->to == FIFFV_COORD_MRI) {
+    FREE(m->head_mri_t);
+    m->head_mri_t = fiff_dup_transform(t);
+    return OK;
+  }
+  else if (t->from == FIFFV_COORD_MRI && t->to == FIFFV_COORD_HEAD) {
+    FREE(m->head_mri_t);
+    m->head_mri_t = fiff_invert_transform(t);
+    return OK;
+  }
+  else {
+    printf ("Improper coordinate transform delivered to fwd_bem_set_head_mri_t");
+    return FAIL;
+  }
+}
+
+/*
+ * Some filename utilities follow
+ */
+static char *ends_with(char *s, char *suffix)
+     /*
+      * Does a string end with the given suffix?
+      */
+{
+  char *p;
+
+  if (!s)
+    return NULL;
+
+  for (p = strstr(s,suffix); p ; s = p + strlen(suffix), p = strstr(s,suffix))
+    if (p == s + strlen(s) - strlen(suffix))
+      return p;
+  return NULL;
+}
+
+static char *strip_from(char *s, char *suffix)
+
+{
+  char *p = ends_with(s,suffix);
+  char c;
+  char *res;
+
+  if (p) {
+    c = *p;
+    *p = '\0';
+    res = mne_strdup(s);
+    *p = c;
+  }
+  else
+    res = mne_strdup(s);
+  return res;
+}
+
+#define BEM_SUFFIX     "-bem.fif"
+#define BEM_SOL_SUFFIX "-bem-sol.fif"
+
+char *fwd_bem_make_bem_name(char *name)
+/*
+ * Make a standard BEM file name
+ */
+{
+  char *s1,*s2;
+
+  s1 = strip_from(name,".fif");
+  s2 = strip_from(s1,"-sol");
+  FREE(s1);
+  s1 = strip_from(s2,"-bem");
+  FREE(s2);
+  s2 = MALLOC(strlen(s1)+strlen(BEM_SUFFIX)+1,char);
+  sprintf(s2,"%s%s",s1,BEM_SUFFIX);
+  FREE(s1);
+  return s2;
+}
+
+char *fwd_bem_make_bem_sol_name(char *name)
+/*
+ * Make a standard BEM solution file name
+ */
+{
+  char *s1,*s2;
+
+  s1 = strip_from(name,".fif");
+  s2 = strip_from(s1,"-sol");
+  FREE(s1);
+  s1 = strip_from(s2,"-bem");
+  FREE(s2);
+  s2 = MALLOC(strlen(s1)+strlen(BEM_SOL_SUFFIX)+1,char);
+  sprintf(s2,"%s%s",s1,BEM_SOL_SUFFIX);
+  FREE(s1);
+  return s2;
+}
+
+
+//============================= simplex_minimize.c =============================
+
+
+/*
+ * This routine comes from Numerical recipes
+ */
+
+#define ALPHA 1.0
+#define BETA 0.5
+#define GAMMA 2.0
+#define MIN_STOL_LOOP 5
+
+static float tryf (float **p,
+                  float *y,
+                  float *psum,
+                  int   ndim,
+                  float (*func)(float *x,int npar,void *user_data),	  /* The function to be evaluated */
+                  void  *user_data,				          /* Data to be passed to the above function in each evaluation */
+                  int   ihi,
+                  int   *neval,
+                  float fac)
+
+{
+  int j;
+  float fac1,fac2,ytry,*ptry;
+
+  ptry = ALLOC_FLOAT(ndim);
+  fac1 = (1.0-fac)/ndim;
+  fac2 = fac1-fac;
+  for (j = 0; j < ndim; j++)
+    ptry[j] = psum[j]*fac1-p[ihi][j]*fac2;
+  ytry = (*func)(ptry,ndim,user_data);
+  ++(*neval);
+  if (ytry < y[ihi]) {
+    y[ihi] = ytry;
+    for (j = 0; j < ndim; j++) {
+      psum[j] +=  ptry[j]-p[ihi][j];
+      p[ihi][j] = ptry[j];
+    }
+  }
+  FREE(ptry);
+  return ytry;
+}
+
+
+int simplex_minimize(float **p,		                              /* The initial simplex */
+                     float *y,		                              /* Function values at the vertices */
+                     int   ndim,	                              /* Number of variables */
+                     float ftol,	                              /* Relative convergence tolerance */
+                     float stol,
+                     float (*func)(float *x,int npar,void *user_data),/* The function to be evaluated */
+                     void  *user_data,				      /* Data to be passed to the above function in each evaluation */
+                     int   max_eval,	                              /* Maximum number of function evaluations */
+                     int   *neval,	                              /* Number of function evaluations */
+                     int   report,                                    /* How often to report (-1 = no_reporting) */
+                     int   (*report_func)(int loop,
+                                          float *fitpar, int npar,
+                                          double fval_lo,
+                                          double fval_hi,
+                                          double par_diff))            /* The function to be called when reporting */
+     /*
+      * Minimization with the simplex algorithm
+      * Modified from Numerical recipes
+      */
+
+{
+  int   i,j,ilo,ihi,inhi;
+  int   mpts = ndim+1;
+  float ytry,ysave,sum,rtol,*psum;
+  double dsum,diff;
+  int   result = 0;
+  int   count = 0;
+  int   loop  = 1;
+
+  psum = ALLOC_FLOAT(ndim);
+  *neval = 0;
+  for (j = 0; j < ndim; j++) {
+    for (i = 0,sum = 0.0; i<mpts; i++)
+      sum +=  p[i][j];
+    psum[j] = sum;
+  }
+  if (report_func != NULL && report > 0)
+    (void)report_func (0,p[0],ndim,-1.0,-1.0,0.0);
+
+  dsum = 0.0;
+  for (;;count++,loop++) {
+    ilo = 1;
+    ihi  =  y[1]>y[2] ? (inhi = 2,1) : (inhi = 1,2);
+    for (i = 0; i < mpts; i++) {
+      if (y[i]  <  y[ilo]) ilo = i;
+      if (y[i] > y[ihi]) {
+        inhi = ihi;
+        ihi = i;
+      } else if (y[i] > y[inhi])
+        if (i !=  ihi) inhi = i;
+    }
+    rtol = 2.0*fabs(y[ihi]-y[ilo])/(fabs(y[ihi])+fabs(y[ilo]));
+    /*
+     * Report that we are proceeding...
+     */
+    if (count == report && report_func != NULL) {
+      if (report_func (loop,p[ilo],ndim,y[ilo],y[ihi],sqrt(dsum))) {
+        printf("Interation interrupted.");
+        result = -1;
+        break;
+      }
+      count = 0;
+    }
+    if (rtol < ftol) break;
+    if (*neval >=  max_eval) {
+      printf("Maximum number of evaluations exceeded.");
+      result  =  -1;
+      break;
+    }
+    if (stol > 0) {		/* Has the simplex collapsed? */
+      for (dsum = 0.0, j = 0; j < ndim; j++) {
+        diff = p[ilo][j] - p[ihi][j];
+        dsum += diff*diff;
+      }
+      if (loop > MIN_STOL_LOOP && sqrt(dsum) < stol)
+        break;
+    }
+    ytry = tryf(p,y,psum,ndim,func,user_data,ihi,neval,-ALPHA);
+    if (ytry <= y[ilo])
+      ytry = tryf(p,y,psum,ndim,func,user_data,ihi,neval,GAMMA);
+    else if (ytry >= y[inhi]) {
+      ysave = y[ihi];
+      ytry = tryf(p,y,psum,ndim,func,user_data,ihi,neval,BETA);
+      if (ytry >= ysave) {
+        for (i = 0; i < mpts; i++) {
+          if (i !=  ilo) {
+            for (j = 0; j < ndim; j++) {
+              psum[j] = 0.5*(p[i][j]+p[ilo][j]);
+              p[i][j] = psum[j];
+            }
+            y[i] = (*func)(psum,ndim,user_data);
+          }
+        }
+        *neval +=  ndim;
+        for (j = 0; j < ndim; j++) {
+          for (i = 0,sum = 0.0; i < mpts; i++)
+            sum +=  p[i][j];
+          psum[j] = sum;
+        }
+      }
+    }
+  }
+  FREE (psum);
+  return (result);
+}
+
+
+
+
+//============================= fwd_fit_berg_scherg.c =============================
+
+
+static double dot_dvectors (double *v1,
+                            double *v2,
+                            int   nn)
+{
+  double result = 0.0;
+  int   k;
+
+  for (k = 0; k < nn; k++)
+    result = result + v1[k]*v2[k];
+  return (result);
+}
+
+static int c_dsvd(double **mat,		/* The matrix */
+                  int   m,int n,	/* m rows n columns */
+                  double *sing,	        /* Singular values (must have size
+                                         * MIN(m,n)+1 */
+                  double **uu,		/* Left eigenvectors */
+                  double **vv)		/* Right eigenvectors */
+     /*
+      * Compute the SVD of mat.
+      * The singular vector calculations depend on whether
+      * or not u and v are given.
+      * The allocations should be done as follows
+      *
+      * mat = ALLOC_DCMATRIX(m,n);
+      * vv  = ALLOC_DCMATRIX(MIN(m,n),n);
+      * uu  = ALLOC_DCMATRIX(MIN(m,n),m);
+      * sing = MALLOC(MIN(m,n),double);
+      *
+      * mat is modified by this operation
+      *
+      * This simply allocates the workspace and calls the
+      * LAPACK Fortran routine
+      */
+{
+  static int lwork = 0;
+  static double *work = NULL;
+  int    nlwork;
+  double **uutemp = NULL;
+  int    udim = MIN(m,n);
+  int    info;
+  char   *jobu;
+  char   *jobvt;
+  int    j,k;
+  double dum[1];
+  double *vvp,*uup;
+
+  nlwork = MAX(3*MIN(m,n)+MAX(m,n),5*MIN(m,n)-4);
+  if (nlwork > lwork) {
+    lwork = nlwork;
+    work = REALLOC(work,lwork,double);
+  }
+  /*
+   * Do SVD
+   */
+  if (vv == NULL) {
+    jobu = "N";
+    vvp  = dum;
+  }
+  else {
+    jobu = "S";
+    vvp  = vv[0];
+  }
+  if (uu == NULL) {
+    jobvt = "N";
+    uup   = dum;
+  }
+  else {
+    jobvt = "S";
+    uutemp = ALLOC_DCMATRIX(m,udim);
+    uup = uutemp[0];
+  }
+  dgesvd(jobu,jobvt,&n,&m,mat[0],&n,sing,
+         vvp,&n,uup,&udim,
+         work,&lwork,&info);
+  if (info == 0 && uu != NULL) {
+    /*
+     * Transpose U to get rid of the
+     * LAPACK convention.
+     */
+    for (j = 0; j < udim; j++)
+      for (k = 0; k < m; k++)
+        uu[j][k] = uutemp[k][j];
+  }
+  FREE_DCMATRIX(uutemp);
+  return info;
+}
+
+/*
+ * Include the simplex and SVD code here.
+ * It is not too much of a problem
+ */
+#define ALPHA 1.0
+#define BETA 0.5
+#define GAMMA 2.0
+
+static double tryit (double **p,
+                     double *y,
+                     double *psum,
+                     int ndim,
+                     double (*func)(double *,int,void *),
+                     void   *user_data,
+                     int ihi,
+                     int *neval,
+                     double fac)
+
+{
+  int j;
+  double fac1,fac2,ytry,*ptry;
+
+  ptry = MALLOC(ndim,double);
+  fac1 = (1.0-fac)/ndim;
+  fac2 = fac1-fac;
+  for (j = 0; j < ndim; j++)
+    ptry[j] = psum[j]*fac1-p[ihi][j]*fac2;
+  ytry = (*func)(ptry,ndim,user_data);
+  ++(*neval);
+  if (ytry < y[ihi]) {
+    y[ihi] = ytry;
+    for (j = 0; j < ndim; j++) {
+      psum[j] +=  ptry[j]-p[ihi][j];
+      p[ihi][j] = ptry[j];
+    }
+  }
+  FREE(ptry);
+  return ytry;
+}
+
+
+/*
+ * This is the beginning of the specific code
+ */
+typedef struct {
+  double *y;
+  double *resi;
+  double **M;
+  double **uu;
+  double **vv;
+  double *sing;
+  double *fn;
+  double *w;
+  int    nfit;
+  int    nterms;
+} *fitUser,fitUserRec;
+
+
+typedef struct {
+  double lambda;		/* Magnitude for the apparent dipole */
+  double mu;			/* Distance multiplier for the apparent dipole */
+} *bergSchergPar,bergSchergParRec;
+
+
+static int comp_pars(const void *p1,const void *p2)
+     /*
+      * Comparison function for sorting layers
+      */
+{
+  bergSchergPar v1 = (bergSchergPar)p1;
+  bergSchergPar v2 = (bergSchergPar)p2;
+
+  if (v1->mu > v2->mu)
+    return -1;
+  else if (v1->mu < v2->mu)
+    return 1;
+  else
+    return 0;
+}
+
+static void sort_parameters(double *mu,double *lambda,int nfit)
+     /*
+      * Sort the parameters so that largest mu comes first
+      */
+{
+  int k;
+  bergSchergPar pars = MALLOC(nfit,bergSchergParRec);
+
+  for (k = 0; k < nfit; k++) {
+    pars[k].mu = mu[k];
+    pars[k].lambda = lambda[k];
+  }
+  qsort (pars, nfit, sizeof(bergSchergParRec), comp_pars);
+  for (k = 0; k < nfit; k++) {
+    mu[k]     = pars[k].mu;
+    lambda[k] = pars[k].lambda;
+  }
+  return;
+}
+
+
+
+static int report_fit(int    loop,
+                      double  *mu,
+                      int    nfit,
+                      double Smin)
+     /*
+      * Report our progress
+      */
+{
+#ifdef LOG_FIT
+  int k;
+  for (k = 0; k < nfit; k++)
+    fprintf(stderr,"%g ",mu[k]);
+  fprintf(stderr,"%g\n",Smin);
+#endif
+  return 0;
+}
+
+
+static double **get_initial_simplex(double  *pars,
+                                    int    npar,
+                                    double simplex_size)
+
+{
+  double **simplex = ALLOC_DCMATRIX(npar+1,npar);
+  int k;
+
+  for (k = 0; k < npar+1; k++)
+    memcpy (simplex[k],pars,npar*sizeof(double));
+  for (k = 1; k < npar+1; k++)
+    simplex[k][k-1] = simplex[k][k-1] + simplex_size;
+  return (simplex);
+}
+
+
+static fitUser new_fit_user(int nfit, int nterms)
+
+{
+  fitUser u = MALLOC(1,fitUserRec);
+  u->y      = MALLOC(nterms-1,double);
+  u->resi   = MALLOC(nterms-1,double);
+  u->M      = ALLOC_DCMATRIX(nterms-1,nfit-1);
+  u->uu     = ALLOC_DCMATRIX(nfit-1,nterms-1);
+  u->vv     = ALLOC_DCMATRIX(nfit-1,nfit-1);
+  u->sing   = MALLOC(nfit,double);
+  u->fn     = MALLOC(nterms,double);
+  u->w      = MALLOC(nterms,double);
+  u->nfit   = nfit;
+  u->nterms = nterms;
+  return u;
+}
+
+static void compose_linear_fitting_data(double *mu,fitUser u)
+
+{
+  double mu1n,k1;
+  int k,p;
+  /*
+   * y is the data to be fitted (nterms-1 x 1)
+   * M is the model matrix      (nterms-1 x nfit-1)
+   */
+  for (k = 0; k < u->nterms-1; k++) {
+    k1 = k + 1;
+    mu1n = pow(mu[0],k1);
+    u->y[k] = u->w[k]*(u->fn[k+1] - mu1n*u->fn[0]);
+    for (p = 0; p < u->nfit-1; p++)
+      u->M[k][p] = u->w[k]*(pow(mu[p+1],k1)-mu1n);
+  }
+}
+
+static double compute_linear_parameters(double *mu,
+                                        double *lambda,
+                                        fitUser u)
+     /*
+      * Compute the best-fitting linear parameters
+      * Return the corresponding RV
+      */
+{
+  int k,p,q;
+  double *vec = MALLOC(u->nfit-1,double);
+  double sum;
+
+  compose_linear_fitting_data(mu,u);
+  c_dsvd(u->M,u->nterms-1,u->nfit-1,u->sing,u->uu,u->vv);
+  /*
+   * Compute the residuals
+   */
+  for (k = 0; k < u->nterms-1; k++)
+    u->resi[k] = u->y[k];
+
+  for (p = 0; p < u->nfit-1; p++) {
+    vec[p] = dot_dvectors(u->uu[p],u->y,u->nterms-1);
+    for (k = 0; k < u->nterms-1; k++)
+      u->resi[k] = u->resi[k] - u->uu[p][k]*vec[p];
+    vec[p] = vec[p]/u->sing[p];
+  }
+
+  for (p = 0; p < u->nfit-1; p++) {
+    for (q = 0, sum = 0.0; q < u->nfit-1; q++)
+      sum += u->vv[q][p]*vec[q];
+    lambda[p+1] = sum;
+  }
+  for (p = 1, sum = 0.0; p < u->nfit; p++)
+    sum += lambda[p];
+  lambda[0] = u->fn[0] - sum;
+  FREE(vec);
+  return dot_dvectors(u->resi,u->resi,u->nterms-1)/dot_dvectors(u->y,u->y,u->nterms-1);
+}
+
+static double one_step (double *mu, int nfit, void *user_data)
+     /*
+      * Evaluate the residual sum of squares fit for one set of
+      * mu values
+      */
+{
+  int k,p;
+  double  dot;
+  fitUser u = (fitUser)user_data;
+
+  for (k = 0; k < u->nfit; k++) {
+    if (fabs(mu[k]) > 1.0)
+      return 1.0;
+  }
+  /*
+   * Compose the data for the linear fitting
+   */
+  compose_linear_fitting_data(mu,u);
+  /*
+   * Compute SVD
+   */
+  c_dsvd(u->M,u->nterms-1,u->nfit-1,u->sing,u->uu,NULL);
+  /*
+   * Compute the residuals
+   */
+  for (k = 0; k < u->nterms-1; k++)
+    u->resi[k] = u->y[k];
+  for (p = 0; p < u->nfit-1; p++) {
+    dot = dot_dvectors(u->uu[p],u->y,u->nterms-1);
+    for (k = 0; k < u->nterms-1; k++)
+      u->resi[k] = u->resi[k] - u->uu[p][k]*dot;
+  }
+  /*
+   * Return their sum of squares
+   */
+  return dot_dvectors(u->resi,u->resi,u->nterms-1);
+}
+
+
+int fwd_eeg_fit_berg_scherg(fwdEegSphereModel m,       /* Conductor model definition */
+                            int   nterms,              /* Number of terms to use in the series expansion
+                                                        * when fitting the parameters */
+                            int   nfit,	               /* Number of equivalent dipoles to fit */
+                            float *rv)
+     /*
+      * This routine fits the Berg-Scherg equivalent spherical model
+      * dipole parameters by minimizing the difference between the
+      * actual and approximative series expansions
+      */
+{
+  int   res = FAIL;
+  int   k;
+  double rd,R,f;
+  double simplex_size = 0.01;
+  double **simplex = NULL;
+  double *func_val = NULL;
+  double ftol = 1e-9;
+  double *lambda = NULL;
+  double *mu     = NULL;
+  int   neval;
+  int   max_eval = 1000;
+  int   report   = 1;
+  fitUser u = new_fit_user(nfit,nterms);
+
+  if (nfit < 2) {
+    printf("fwd_fit_berg_scherg does not work with less than two equivalent sources.");
+    return FAIL;
+  }
+  /*
+   * (1) Calculate the coefficients of the true expansion
+   */
+  for (k = 0; k < nterms; k++)
+    u->fn[k] = fwd_eeg_get_multi_sphere_model_coeff(m,k+1);
+  /*
+   * (2) Calculate the weighting
+   */
+  rd = R = m->layers[0].rad;
+  for (k = 1; k < m->nlayer; k++) {
+    if (m->layers[k].rad > R)
+      R = m->layers[k].rad;
+    if (m->layers[k].rad < rd)
+      rd = m->layers[k].rad;
+  }
+  f = rd/R;
+#ifdef ZHANG
+  /*
+   * This is the Zhang weighting
+   */
+  for (k = 1; k < nterms; k++)
+    u->w[k-1] = pow(f,k);
+#else
+  /*
+   * This is the correct weighting
+   */
+  for (k = 1; k < nterms; k++)
+    u->w[k-1] = sqrt((2.0*k+1)*(3.0*k+1.0)/k)*pow(f,(k-1.0));
+#endif
+  /*
+   * (3) Prepare for simplex minimization
+   */
+  func_val = MALLOC(nfit+1,double);
+  lambda   = MALLOC(nfit,double);
+  mu       = MALLOC(nfit,double);
+  /*
+   * (4) Rather arbitrary initial guess
+   */
+  for (k = 0; k < nfit; k++) {
+    /*
+    mu[k] = (k+1)*0.1*f;
+    */
+    mu[k] = drand48()*f;
+  }
+
+  simplex = get_initial_simplex(mu,nfit,simplex_size);
+  for (k = 0; k < nfit+1; k++)
+    func_val[k] = one_step(simplex[k],u->nfit,u);
+  /*
+   * (5) Do the nonlinear minimization
+   */
+  if ((res = simplex_minimize(simplex,func_val,nfit,
+                              ftol,one_step,
+                              u,
+                              max_eval,&neval,
+                              report,report_fit)) != OK)
+    goto out;
+  for (k = 0; k < nfit; k++)
+    mu[k] = simplex[0][k];
+  /*
+   * (6) Do the final step: calculation of the linear parameters
+   */
+  *rv = compute_linear_parameters(mu,lambda,u);
+  sort_parameters(mu,lambda,nfit);
+#ifdef LOG_FIT
+  fprintf(stderr,"RV = %g %%\n",100*(*rv));
+#endif
+  m->mu     = REALLOC(m->mu,nfit,float);
+  m->lambda = REALLOC(m->lambda,nfit,float);
+  m->nfit   = nfit;
+  for (k = 0; k < nfit; k++) {
+    m->mu[k] = mu[k];
+    /*
+     * This division takes into account the actual conductivities
+     */
+    m->lambda[k] = lambda[k]/m->layers[m->nlayer-1].sigma;
+#ifdef LOG_FIT
+    fprintf(stderr,"lambda%d = %g\tmu%d = %g\n",k+1,lambda[k],k+1,mu[k]);
+#endif
+  }
+  /*
+   * This is the cleanup code
+   */
+ out : {
+    FREE_DCMATRIX(simplex);
+    if (u) {
+      FREE(u->fn);
+      FREE_DCMATRIX(u->M);
+      FREE_DCMATRIX(u->uu);
+      FREE_DCMATRIX(u->vv);
+      FREE(u->y);
+      FREE(u->w);
+      FREE(u->resi);
+      FREE(u->sing);
+    }
+    FREE(func_val);
+    FREE(lambda);
+    FREE(mu);
+    return res;
+  }
+}
+
+
+
+
+
+//============================= fwd_eeg_sphere_models.c =============================
+
+/*
+ * Basic routines for EEG sphere model bookkeeping
+ */
+static fwdEegSphereModel fwd_new_eeg_sphere_model()
+
+{
+  fwdEegSphereModel m = MALLOC(1,fwdEegSphereModelRec);
+
+  m->name    = NULL;
+  m->nlayer  = 0;
+  m->layers  = NULL;
+  m->fn      = NULL;
+  m->nterms  = 0;
+  m->r0[0]   = 0.0;
+  m->r0[1]   = 0.0;
+  m->r0[2]   = 0.0;
+  m->lambda  = NULL;
+  m->mu      = NULL;
+  m->nfit    = 0;
+  m->scale_pos = 0;
+  return m;
+}
+
+
+void fwd_free_eeg_sphere_model(fwdEegSphereModel m)
+
+{
+  if (!m)
+    return;
+  FREE(m->name);
+  FREE(m->layers);
+  FREE(m->fn);
+  FREE(m->mu);
+  FREE(m->lambda);
+  FREE(m);
+  return;
+}
+
+
+
+
+fwdEegSphereModel fwd_dup_eeg_sphere_model(fwdEegSphereModel m)
+
+{
+  fwdEegSphereModel dup;
+  int k;
+
+  if (!m)
+    return NULL;
+
+  dup = fwd_new_eeg_sphere_model();
+
+  if (m->name)
+    dup->name = mne_strdup(m->name);
+  if (m->nlayer > 0) {
+    dup->layers = MALLOC(m->nlayer,fwdEegSphereLayerRec);
+    dup->nlayer = m->nlayer;
+    for (k = 0; k < m->nlayer; k++)
+      dup->layers[k] = m->layers[k];
+  }
+  VEC_COPY(dup->r0,m->r0);
+  if (m->nterms > 0) {
+    dup->fn = MALLOC(m->nterms,double);
+    dup->nterms = m->nterms;
+    for (k = 0; k < m->nterms; k++)
+      dup->fn[k] = m->fn[k];
+  }
+  if (m->nfit > 0) {
+    dup->mu     = MALLOC(m->nfit,float);
+    dup->lambda = MALLOC(m->nfit,float);
+    dup->nfit   = m->nfit;
+    for (k = 0; k < m->nfit; k++) {
+      dup->mu[k] = m->mu[k];
+      dup->lambda[k] = m->lambda[k];
+    }
+  }
+  dup->scale_pos = m->scale_pos;
+  return dup;
+}
+
+
+
+static int comp_layers(const void *p1,const void *p2)
+     /*
+      * Comparison function for sorting layers
+      */
+{
+  fwdEegSphereLayer v1 = (fwdEegSphereLayer)p1;
+  fwdEegSphereLayer v2 = (fwdEegSphereLayer)p2;
+
+  if (v1->rad > v2->rad)
+    return 1;
+  else if (v1->rad < v2->rad)
+    return -1;
+  else
+    return 0;
+}
+
+
+
+static fwdEegSphereModel fwd_create_eeg_sphere_model(char *name,
+                                                     int nlayer,
+                                                     const float *rads,
+                                                     const float *sigmas)
+     /*
+      * Produce a new sphere model structure
+      */
+{
+  fwdEegSphereModel new_model = fwd_new_eeg_sphere_model();
+  int            k;
+  fwdEegSphereLayer layers;
+  float          R,rR;
+
+  new_model->name   = mne_strdup(name);
+  new_model->nlayer = nlayer;
+  new_model->layers = layers = MALLOC(nlayer,fwdEegSphereLayerRec);
+
+  for (k = 0; k < nlayer; k++) {
+    layers[k].rad    = layers[k].rel_rad = rads[k];
+    layers[k].sigma  = sigmas[k];
+  }
+  /*
+   * Sort...
+   */
+  qsort (layers, nlayer, sizeof(fwdEegSphereLayerRec), comp_layers);
+  /*
+   * Scale the radiuses
+   */
+  R  = layers[nlayer-1].rad;
+  rR = layers[nlayer-1].rel_rad;
+  for (k = 0; k < nlayer; k++) {
+    layers[k].rad     = layers[k].rad/R;
+    layers[k].rel_rad = layers[k].rel_rad/rR;
+  }
+  return new_model;
+}
+
+
+
+static fwdEegSphereModelSet fwd_new_eeg_sphere_model_set()
+
+{
+  fwdEegSphereModelSet s = MALLOC(1,fwdEegSphereModelSetRec);
+
+  s->models  = NULL;
+  s->nmodel  = 0;
+  return s;
+}
+
+void fwd_free_eeg_sphere_model_set(fwdEegSphereModelSet s)
+
+{
+  int k;
+  if (!s)
+    return;
+  for (k = 0; k < s->nmodel; k++)
+    fwd_free_eeg_sphere_model(s->models[k]);
+  FREE(s->models);
+  FREE(s);
+
+  return;
+}
+
+
+
+static fwdEegSphereModelSet fwd_add_to_eeg_sphere_model_set(fwdEegSphereModelSet s,
+                                                            fwdEegSphereModel m)
+/*
+ * Add a new model to a set.
+ * The model should not be deallocated after this since it is attached to the set
+ */
+{
+  if (!s)
+    s = fwd_new_eeg_sphere_model_set();
+
+  s->models = REALLOC(s->models,s->nmodel+1,fwdEegSphereModel);
+  s->models[s->nmodel++] = m;
+  return s;
+}
+
+
+
+static fwdEegSphereModelSet fwd_add_default_eeg_sphere_model(fwdEegSphereModelSet s)
+     /*
+      * Choose and setup the default EEG sphere model
+      */
+{
+  static const int   def_nlayer        = 4;
+  static const float def_unit_rads[]   = {0.90,0.92,0.97,1.0};
+  static const float def_sigmas[]      = {0.33,1.0,0.4e-2,0.33};
+
+  return fwd_add_to_eeg_sphere_model_set(s,fwd_create_eeg_sphere_model("Default",
+                                                                       def_nlayer,def_unit_rads,def_sigmas));
+}
+
+
+
+#define SEP ":\n\r"
+
+
+fwdEegSphereModelSet fwd_load_eeg_sphere_models(char *filename, fwdEegSphereModelSet now)
+     /*
+      * Load all models available in the specified file
+      */
+{
+  char line[MAXLINE];
+  FILE *fp = NULL;
+  char  *name   = NULL;
+  float *rads   = NULL;
+  float *sigmas = NULL;
+  int   nlayer  = 0;
+  char  *one,*two;
+  char  *tag = NULL;
+
+  if (!now)
+    now = fwd_add_default_eeg_sphere_model(now);
+
+  if (!filename)
+    return now;
+
+  if (access(filename,R_OK) != OK)	/* Never mind about an unaccesible file */
+    return now;
+
+  if ((fp = fopen(filename,"r")) == NULL) {
+    printf(filename);
+    goto bad;
+  }
+  while (fgets(line,MAXLINE,fp) != NULL) {
+    if (line[0] == '#')
+      continue;
+    one = strtok(line,SEP);
+    if (one != NULL) {
+      if (!tag || strlen(tag) == 0)
+        name = mne_strdup(one);
+      else {
+        name = MALLOC(strlen(one)+strlen(tag)+10,char);
+        sprintf(name,"%s %s",one,tag);
+      }
+      while (1) {
+        one = strtok(NULL,SEP);
+        if (one == NULL)
+          break;
+        two = strtok(NULL,SEP);
+        if (two == NULL)
+          break;
+        rads   = REALLOC(rads,nlayer+1,float);
+        sigmas = REALLOC(sigmas,nlayer+1,float);
+        if (sscanf(one,"%g",rads+nlayer) != 1) {
+          nlayer = 0;
+          break;
+        }
+        if (sscanf(two,"%g",sigmas+nlayer) != 1) {
+          nlayer = 0;
+          break;
+        }
+        nlayer++;
+      }
+      if (nlayer > 0)
+        now = fwd_add_to_eeg_sphere_model_set(now,fwd_create_eeg_sphere_model(name,nlayer,rads,sigmas));
+      nlayer = 0;
+    }
+  }
+  if (ferror(fp)) {
+    printf(filename);
+    goto bad;
+  }
+  fclose(fp);
+  return now;
+
+ bad : {
+    if (fp)
+      fclose(fp);
+    fwd_free_eeg_sphere_model_set(now);
+    return NULL;
+  }
+}
+
+
+
+
+
+void fwd_list_eeg_sphere_models(FILE *f, fwdEegSphereModelSet s)
+/*
+ * List the properties of available models
+ */
+{
+  int k,p;
+  fwdEegSphereModel this_model;
+
+  if (!s || s->nmodel < 0)
+    return;
+  fprintf(f,"Available EEG sphere models:\n");
+  for (k = 0; k < s->nmodel; k++) {
+    this_model = s->models[k];
+    fprintf(f,"\t%s : %d",this_model->name,this_model->nlayer);
+    for (p = 0; p < this_model->nlayer; p++)
+      fprintf(f," : %7.3f : %7.3f",this_model->layers[p].rel_rad,this_model->layers[p].sigma);
+    fprintf(f,"\n");
+  }
+}
+
+
+
+fwdEegSphereModel fwd_select_eeg_sphere_model(char *name,fwdEegSphereModelSet s)
+/*
+ * Find a model with a given name and return a duplicate
+ */
+{
+  int k;
+
+  if (name == NULL)
+    name = "Default";
+
+  if (!s || s->nmodel == 0) {
+    printf("No EEG sphere model definitions available");
+    return NULL;
+  }
+
+  for (k = 0; k < s->nmodel; k++) {
+    if (strcasecmp(s->models[k]->name,name) == 0) {
+      fprintf(stderr,"Selected model: %s\n",s->models[k]->name);
+      return fwd_dup_eeg_sphere_model(s->models[k]);
+    }
+  }
+  printf("EEG sphere model %s not found.",name);
+  return NULL;
+}
+
+
+int fwd_setup_eeg_sphere_model(fwdEegSphereModel m,
+                               float rad,
+                               int   fit_berg_scherg,
+                               int   nfit)
+/*
+ * Setup the EEG sphere model calculations
+ */
+{
+  static const int nterms = 200;
+  float  rv;
+  int    k;
+
+  if (!m) {
+    printf("No EEG model specified");
+    return FAIL;
+  }
+  /*
+   * Scale the relative radiuses
+   */
+  for (k = 0; k < m->nlayer; k++)
+    m->layers[k].rad = rad*m->layers[k].rel_rad;
+
+  if (fit_berg_scherg) {
+    if (fwd_eeg_fit_berg_scherg(m,nterms,nfit,&rv) == OK) {
+      fprintf(stderr,"Equiv. model fitting -> ");
+      fprintf(stderr,"RV = %g %%\n",100*rv);
+      for (k = 0; k < nfit; k++)
+        fprintf(stderr,"mu%d = %g\tlambda%d = %g\n",
+                k+1,m->mu[k],k+1,m->layers[m->nlayer-1].sigma*m->lambda[k]);
+    }
+    else
+      goto bad;
+  }
+  fprintf(stderr,"Defined EEG sphere model with rad = %7.2f mm\n",
+          1000.0*rad);
+  return OK;
+
+ bad :
+  return FAIL;
+}
+
+
+
+
+
+
 //============================= dipole_fit_guesses.c =============================
 
 mneSurface make_guesses(mneSurface guess_surf,     /* Predefined boundary for the guesses */
@@ -10949,6 +12446,2219 @@ mneSurface make_guesses(mneSurface guess_surf,     /* Predefined boundary for th
   }
 }
 
+
+
+//============================= mne_project_to_surface.c =============================
+
+
+typedef struct {
+  float *a;
+  float *b;
+  float *c;
+  int   *act;
+  int   nactive;
+} *projData,projDataRec;
+
+
+
+
+void mne_triangle_coords(float       *r,       /* Location of a point */
+                         mneSurface  s,	       /* The surface */
+                         int         tri,      /* Which triangle */
+                         float       *x,       /* Coordinates of the point on the triangle */
+                         float       *y,
+                         float       *z)
+     /*
+      * Compute the coordinates of a point within a triangle
+      */
+{
+  double rr[3];			/* Vector from triangle corner #1 to r */
+  double a,b,c,v1,v2,det;
+  mneTriangle this_tri;
+
+  this_tri = s->tris+tri;
+
+  VEC_DIFF(this_tri->r1,r,rr);
+  *z = VEC_DOT(rr,this_tri->nn);
+
+  a =  VEC_DOT(this_tri->r12,this_tri->r12);
+  b =  VEC_DOT(this_tri->r13,this_tri->r13);
+  c =  VEC_DOT(this_tri->r12,this_tri->r13);
+
+  v1 = VEC_DOT(rr,this_tri->r12);
+  v2 = VEC_DOT(rr,this_tri->r13);
+
+  det = a*b - c*c;
+
+  *x = (b*v1 - c*v2)/det;
+  *y = (a*v2 - c*v1)/det;
+
+  return;
+}
+
+
+static int nearest_triangle_point(float       *r,    /* Location of a point */
+                                  mneSurface  s,     /* The surface */
+                                  void        *user, /* Something precomputed */
+                                  int         tri,   /* Which triangle */
+                                  float       *x,    /* Coordinates of the point on the triangle */
+                                  float       *y,
+                                  float       *z)
+     /*
+      * Find the nearest point from a triangle
+      */
+{
+
+  double p,q,p0,q0,t0;
+  double rr[3];			/* Vector from triangle corner #1 to r */
+  double a,b,c,v1,v2,det;
+  double best,dist,dist0;
+  projData    pd = (projData)user;
+  mneTriangle this_tri;
+
+  this_tri = s->tris+tri;
+  VEC_DIFF(this_tri->r1,r,rr);
+  dist  = VEC_DOT(rr,this_tri->nn);
+
+  if (pd) {
+    if (!pd->act[tri])
+      return FALSE;
+    a = pd->a[tri];
+    b = pd->b[tri];
+    c = pd->c[tri];
+  }
+  else {
+    a =  VEC_DOT(this_tri->r12,this_tri->r12);
+    b =  VEC_DOT(this_tri->r13,this_tri->r13);
+    c =  VEC_DOT(this_tri->r12,this_tri->r13);
+  }
+
+  v1 = VEC_DOT(rr,this_tri->r12);
+  v2 = VEC_DOT(rr,this_tri->r13);
+
+  det = a*b - c*c;
+
+  p = (b*v1 - c*v2)/det;
+  q = (a*v2 - c*v1)/det;
+  /*
+   * If the point projects into the triangle we are done
+   */
+  if (p >= 0.0 && p <= 1.0 &&
+      q >= 0.0 && q <= 1.0 &&
+      q <= 1.0 - p) {
+    *x = p;
+    *y = q;
+    *z = dist;
+    return TRUE;
+  }
+  /*
+   * Tough: must investigate the sides
+   * We might do something intelligent here. However, for now it is ok
+   * to do it in the hard way
+   */
+  /*
+   * Side 1 -> 2
+   */
+  p0 = p + 0.5*(q * c)/a;
+  if (p0 < 0.0)
+    p0 = 0.0;
+  else if (p0 > 1.0)
+    p0 = 1.0;
+  q0 = 0.0;
+   dist0 = sqrt((p-p0)*(p-p0)*a +
+               (q-q0)*(q-q0)*b +
+               (p-p0)*(q-q0)*c +
+               dist*dist);
+  best = dist0;
+  *x = p0;
+  *y = q0;
+  *z = dist0;
+  /*
+   * Side 2 -> 3
+   */
+  t0 = 0.5*((2.0*a-c)*(1.0-p) + (2.0*b-c)*q)/(a+b-c);
+  if (t0 < 0.0)
+    t0 = 0.0;
+  else if (t0 > 1.0)
+    t0 = 1.0;
+  p0 = 1.0 - t0;
+  q0 = t0;
+  dist0 = sqrt((p-p0)*(p-p0)*a +
+               (q-q0)*(q-q0)*b +
+               (p-p0)*(q-q0)*c +
+               dist*dist);
+  if (dist0 < best) {
+    best = dist0;
+    *x = p0;
+    *y = q0;
+    *z = dist0;
+  }
+  /*
+   * Side 1 -> 3
+   */
+  p0 = 0.0;
+  q0 = q + 0.5*(p * c)/b;
+  if (q0 < 0.0)
+    q0 = 0.0;
+  else if (q0 > 1.0)
+    q0 = 1.0;
+  dist0 = sqrt((p-p0)*(p-p0)*a +
+               (q-q0)*(q-q0)*b +
+               (p-p0)*(q-q0)*c +
+               dist*dist);
+  if (dist0 < best) {
+    best = dist0;
+    *x = p0;
+    *y = q0;
+    *z = dist0;
+  }
+  return TRUE;
+}
+
+static void project_to_triangle(mneSurface s,
+                                int        tri,
+                                float      p,
+                                float      q,
+                                float      *r)
+
+{
+  int   k;
+  mneTriangle this_tri;
+
+  this_tri = s->tris+tri;
+
+  for (k = 0; k < 3; k++)
+    r[k] = this_tri->r1[k] + p*this_tri->r12[k] + q*this_tri->r13[k];
+
+  return;
+}
+
+int mne_nearest_triangle_point(float       *r,    /* Location of a point */
+                               mneSurface  s,     /* The surface */
+                               int         tri,   /* Which triangle */
+                               float       *x,    /* Coordinates of the point on the triangle */
+                               float       *y,
+                               float       *z)
+/*
+ * This is for external use
+ */
+{
+  return nearest_triangle_point(r,s,NULL,tri,x,y,z);
+}
+
+
+
+int mne_project_to_surface(mneSurface s, void *proj_data, float *r, int project_it, float *distp)
+     /*
+      * Project the point onto the closest point on the surface
+      */
+{
+  float dist;			/* Distance to the triangle */
+  float p,q;			/* Coordinates on the triangle */
+  float p0,q0,dist0;
+  int   best;
+  int   k;
+
+  p0 = q0 = 0.0;
+  dist0 = 0.0;
+  for (best = -1, k = 0; k < s->ntri; k++) {
+    if (nearest_triangle_point(r,s,proj_data,k,&p,&q,&dist)) {
+      if (best < 0 || fabs(dist) < fabs(dist0)) {
+        dist0 = dist;
+        best = k;
+        p0 = p;
+        q0 = q;
+      }
+    }
+  }
+  if (best >= 0 && project_it)
+    project_to_triangle(s,best,p0,q0,r);
+  if (distp)
+    *distp = dist0;
+  return best;
+}
+
+
+
+
+
+
+
+
+//============================= fwd_bem_pot.c =============================
+
+static float fwd_bem_inf_field(float *rd,      /* Dipole position */
+                               float *Q,       /* Dipole moment */
+                               float *rp,      /* Field point */
+                               float *dir)     /* Which field component */
+/*
+ * Infinite-medium magnetic field
+ * (without \mu_0/4\pi)
+ */
+{
+  float diff[3],diff2,cross[3];
+
+  VEC_DIFF (rd,rp,diff);
+  diff2 = VEC_DOT(diff,diff);
+  CROSS_PRODUCT (Q,diff,cross);
+
+  return (VEC_DOT(cross,dir)/(diff2*sqrt(diff2)));
+}
+
+
+float fwd_bem_inf_pot (float *rd,	/* Dipole position */
+                       float *Q,	/* Dipole moment */
+                       float *rp)	/* Potential point */
+/*
+ * The infinite medium potential
+ */
+{
+  float diff[3];
+  float diff2;
+  VEC_DIFF(rd,rp,diff);
+  diff2 = VEC_DOT(diff,diff);
+  return (VEC_DOT(Q,diff)/(4.0*M_PI*diff2*sqrt(diff2)));
+}
+
+
+
+
+int fwd_bem_specify_els(fwdBemModel m,
+                        fwdCoilSet  els)
+/*
+ * Set up for computing the solution at a set of electrodes
+ */
+{
+  fwdCoil     el;
+  mneSurface  scalp;
+  int         k,p,q,v;
+  float       *one_sol,*pick_sol;
+  float       r[3],w[3],dist;
+  int         best;
+  mneTriangle tri;
+  float       x,y,z;
+  fwdBemSolution sol;
+
+  extern fwdBemSolution fwd_bem_new_coil_solution();
+  extern void fwd_bem_free_coil_solution(void *user);
+  extern void fwd_free_coil_set_user_data(fwdCoilSet set);
+
+  if (!m) {
+    printf("Model missing in fwd_bem_specify_els");
+    goto bad;
+  }
+  if (!m->solution) {
+    printf("Solution not computed in fwd_bem_specify_els");
+    goto bad;
+  }
+  if (!els || els->ncoil == 0)
+    return OK;
+  fwd_free_coil_set_user_data(els);
+  /*
+   * Hard work follows
+   */
+  els->user_data = sol = fwd_bem_new_coil_solution();
+  els->user_data_free = fwd_bem_free_coil_solution;
+
+  sol->ncoil = els->ncoil;
+  sol->np    = m->nsol;
+  sol->solution  = ALLOC_CMATRIX(sol->ncoil,sol->np);
+  /*
+   * Go through all coils
+   */
+  for (k = 0; k < els->ncoil; k++) {
+    el = els->coils[k];
+    one_sol = sol->solution[k];
+    for (q = 0; q < m->nsol; q++)
+      one_sol[q] = 0.0;
+    scalp = m->surfs[0];
+    /*
+     * Go through all 'integration points'
+     */
+    for (p = 0; p < el->np; p++) {
+      VEC_COPY(r,el->rmag[p]);
+      if (m->head_mri_t != NULL)
+        fiff_coord_trans(r,m->head_mri_t,FIFFV_MOVE);
+      best = mne_project_to_surface(scalp,NULL,r,FALSE,&dist);
+      if (best < 0) {
+        printf("One of the electrodes could not be projected onto the scalp surface. How come?");
+        goto bad;
+      }
+      if (m->bem_method == FWD_BEM_CONSTANT_COLL) {
+        /*
+         * Simply pick the value at the triangle
+         */
+        pick_sol = m->solution[best];
+        for (q = 0; q < m->nsol; q++)
+          one_sol[q] += el->w[p]*pick_sol[q];
+      }
+      else if (m->bem_method == FWD_BEM_LINEAR_COLL) {
+        /*
+         * Calculate a linear interpolation between the vertex values
+         */
+        tri = scalp->tris+best;
+        mne_triangle_coords(r,scalp,best,&x,&y,&z);
+
+        w[X] = el->w[p]*(1.0 - x - y);
+        w[Y] = el->w[p]*x;
+        w[Z] = el->w[p]*y;
+        for (v = 0; v < 3; v++) {
+          pick_sol = m->solution[tri->vert[v]];
+          for (q = 0; q < m->nsol; q++)
+            one_sol[q] += w[v]*pick_sol[q];
+        }
+      }
+      else {
+        printf("Unknown BEM approximation method : %d\n",m->bem_method);
+        goto bad;
+      }
+    }
+  }
+  return OK;
+
+ bad : {
+   fwd_free_coil_set_user_data(els);
+   return FAIL;
+ }
+}
+
+
+
+
+static void fwd_bem_lin_pot_calc (float       *rd,		/* Dipole position */
+                                  float       *Q,		/* Dipole orientation */
+                                  fwdBemModel m,		/* The model */
+                                  fwdCoilSet  els,              /* Use this electrode set if available */
+                                  int         all_surfs,	/* Compute on all surfaces? */
+                                  float      *pot)              /* Put the result here */
+     /*
+      * Compute the potentials due to a current dipole
+      * using the linear potential approximation
+      */
+{
+  float **rr;
+  int   np;
+  int   s,k,p,nsol;
+  float mult,mri_rd[3],mri_Q[3];
+
+  float *v0;
+  float **solution;
+
+  if (!m->v0)
+    m->v0 = MALLOC(m->nsol,float);
+  v0 = m->v0;
+
+  VEC_COPY(mri_rd,rd);
+  VEC_COPY(mri_Q,Q);
+  if (m->head_mri_t) {
+    fiff_coord_trans(mri_rd,m->head_mri_t,FIFFV_MOVE);
+    fiff_coord_trans(mri_Q,m->head_mri_t,FIFFV_NO_MOVE);
+  }
+  for (s = 0, p = 0; s < m->nsurf; s++) {
+    np     = m->surfs[s]->np;
+    rr     = m->surfs[s]->rr;
+    mult   = m->source_mult[s];
+    for (k = 0; k < np; k++)
+      v0[p++] = mult*fwd_bem_inf_pot(mri_rd,mri_Q,rr[k]);
+  }
+  if (els) {
+    fwdBemSolution sol = (fwdBemSolution)els->user_data;
+    solution = sol->solution;
+    nsol     = sol->ncoil;
+  }
+  else {
+    solution = m->solution;
+    nsol     = all_surfs ? m->nsol : m->surfs[0]->np;
+  }
+  for (k = 0; k < nsol; k++)
+    pot[k] = mne_dot_vectors(solution[k],v0,m->nsol);
+  return;
+}
+
+
+
+static void fwd_bem_pot_calc (float       *rd,	     /* Dipole position */
+                              float       *Q,        /* Dipole orientation */
+                              fwdBemModel m,	     /* The model */
+                              fwdCoilSet  els,       /* Use this electrode set if available */
+                              int         all_surfs, /* Compute solution on all surfaces? */
+                              float       *pot)
+     /*
+      * Compute the potentials due to a current dipole
+      */
+{
+  mneTriangle tri;
+  int         ntri;
+  int         s,k,p,nsol;
+  float       mult;
+  float       *v0;
+  float       **solution;
+  float       mri_rd[3],mri_Q[3];
+
+  if (!m->v0)
+    m->v0 = MALLOC(m->nsol,float);
+  v0 = m->v0;
+
+  VEC_COPY(mri_rd,rd);
+  VEC_COPY(mri_Q,Q);
+  if (m->head_mri_t) {
+    fiff_coord_trans(mri_rd,m->head_mri_t,FIFFV_MOVE);
+    fiff_coord_trans(mri_Q,m->head_mri_t,FIFFV_NO_MOVE);
+  }
+  for (s = 0, p = 0; s < m->nsurf; s++) {
+    ntri = m->surfs[s]->ntri;
+    tri  = m->surfs[s]->tris;
+    mult = m->source_mult[s];
+    for (k = 0; k < ntri; k++, tri++)
+      v0[p++] = mult*fwd_bem_inf_pot(mri_rd,mri_Q,tri->cent);
+  }
+  if (els) {
+    fwdBemSolution sol = (fwdBemSolution)els->user_data;
+    solution = sol->solution;
+    nsol     = sol->ncoil;
+  }
+  else {
+    solution = m->solution;
+    nsol     = all_surfs ? m->nsol : m->surfs[0]->ntri;
+  }
+  for (k = 0; k < nsol; k++)
+    pot[k] = mne_dot_vectors(solution[k],v0,m->nsol);
+  return;
+}
+
+
+int fwd_bem_pot_els (float       *rd,	  /* Dipole position */
+                     float       *Q,	  /* Dipole orientation */
+                     fwdCoilSet  els,     /* Electrode descriptors */
+                     float       *pot,    /* Result */
+                     void        *client) /* The model */
+/*
+ * This version calculates the potential on all surfaces
+ */
+{
+  fwdBemModel    m = (fwdBemModel)client;
+  fwdBemSolution sol = (fwdBemSolution)els->user_data;
+
+  if (!m) {
+    printf("No BEM model specified to fwd_bem_pot_els");
+    return FAIL;
+  }
+  if (!m->solution) {
+    printf("No solution available for fwd_bem_pot_els");
+    return FAIL;
+  }
+  if (!sol || sol->ncoil != els->ncoil) {
+    printf("No appropriate electrode-specific data available in fwd_bem_pot_coils");
+    return FAIL;
+  }
+  if (m->bem_method == FWD_BEM_CONSTANT_COLL)
+    fwd_bem_pot_calc(rd,Q,m,els,FALSE,pot);
+  else if (m->bem_method == FWD_BEM_LINEAR_COLL)
+    fwd_bem_lin_pot_calc(rd,Q,m,els,FALSE,pot);
+  else {
+    printf("Unknown BEM method : %d",m->bem_method);
+    return FAIL;
+  }
+  return OK;
+}
+
+
+
+
+
+
+//============================= fwd_bem_field.c =============================
+
+
+/*
+ * These are some of the integration formulas listed in
+ *
+ * L. Urankar, Common compact analytical formulas for computation of
+ * geometry integrals on a basic Cartesian sub-domain in boundary and
+ * volume integral methods, Engineering Analysis with Boundary Elements,
+ * 7 (3), 1990, 124 - 129.
+ *
+ */
+#define ARSINH(x) log((x) + sqrt(1.0+(x)*(x)))
+
+
+static void calc_f (double *xx,
+                    double *yy,		/* Corner coordinates */
+                    double *f0,
+                    double *fx,
+                    double *fy)	        /* The weights in the linear approximation */
+
+{
+  double det = -xx[Y]*yy[X] + xx[Z]*yy[X] +
+    xx[X]*yy[Y] - xx[Z]*yy[Y] - xx[X]*yy[Z] + xx[Y]*yy[Z];
+  int k;
+
+  f0[X] = -xx[Z]*yy[Y] + xx[Y]*yy[Z];
+  f0[Y] = xx[Z]*yy[X] - xx[X]*yy[Z];
+  f0[Z] = -xx[Y]*yy[X] + xx[X]*yy[Y];
+
+  fx[X] =  yy[Y] - yy[Z];
+  fx[Y] = -yy[X] + yy[Z];
+  fx[Z] = yy[X] - yy[Y];
+
+  fy[X] = -xx[Y] + xx[Z];
+  fy[Y] = xx[X] - xx[Z];
+  fy[Z] = -xx[X] + xx[Y];
+
+  for (k = 0; k < 3; k++) {
+    f0[k] = f0[k]/det;
+    fx[k] = fx[k]/det;
+    fy[k] = fy[k]/det;
+  }
+}
+
+
+
+static void calc_magic (double u,double z,
+                        double A,
+                        double B,
+                        double *beta,
+                        double *D)
+     /*
+      * Calculate Urankar's magic numbers
+      */
+{
+  double B2 = 1.0 + B*B;
+  double ABu = A + B*u;
+  *D = sqrt(u*u + z*z + ABu*ABu);
+  beta[0] = ABu/sqrt(u*u + z*z);
+  beta[1] = (A*B + B2*u)/sqrt(A*A + B2*z*z);
+  beta[2] = (B*z*z - A*u)/(z*(*D));
+}
+
+
+static void field_integrals (float *from,
+                             mneTriangle to,
+                             double *I1p,
+                             double *T,double *S1,double *S2,
+                             double *f0,double *fx,double *fy)
+
+{
+  double y1[3],y2[3],y3[3];
+  double xx[4],yy[4];
+  double A,B,z,dx;
+  double beta[3],I1,Tx,Ty,Txx,Tyy,Sxx,mult;
+  double S1x,S1y,S2x,S2y;
+  double D1,B2;
+  int k;
+  /*
+   * Preliminaries...
+   *
+   * 1. Move origin to viewpoint...
+   *
+   */
+  VEC_DIFF (from,to->r1,y1);
+  VEC_DIFF (from,to->r2,y2);
+  VEC_DIFF (from,to->r3,y3);
+  /*
+   * 2. Calculate local xy coordinates...
+   */
+  xx[0] = VEC_DOT(y1,to->ex);
+  xx[1] = VEC_DOT(y2,to->ex);
+  xx[2] = VEC_DOT(y3,to->ex);
+  xx[3] = xx[0];
+
+  yy[0] = VEC_DOT(y1,to->ey);
+  yy[1] = VEC_DOT(y2,to->ey);
+  yy[2] = VEC_DOT(y3,to->ey);
+  yy[3] = yy[0];
+
+  calc_f (xx,yy,f0,fx,fy);
+  /*
+   * 3. Distance of the plane from origin...
+   */
+  z = VEC_DOT(y1,to->nn);
+  /*
+   * Put together the line integral...
+   * We use the convention where the local y-axis
+   * is parallel to the last side and, therefore, dx = 0
+   * on that side. We can thus omit the last side from this
+   * computation in some cases.
+   */
+  I1 = 0.0;
+  Tx = 0.0;
+  Ty = 0.0;
+  S1x = 0.0;
+  S1y = 0.0;
+  S2x = 0.0;
+  S2y = 0.0;
+  for (k = 0; k < 2; k++) {
+    dx = xx[k+1] - xx[k];
+    A = (yy[k]*xx[k+1] - yy[k+1]*xx[k])/dx;
+    B = (yy[k+1]-yy[k])/dx;
+    B2 = (1.0 + B*B);
+    /*
+     * Upper limit
+     */
+    calc_magic (xx[k+1],z,A,B,beta,&D1);
+    I1 = I1 - xx[k+1]*ARSINH(beta[0]) - (A/sqrt(1.0+B*B))*ARSINH(beta[1])
+      - z*atan(beta[2]);
+    Txx = ARSINH(beta[1])/sqrt(B2);
+    Tx = Tx + Txx;
+    Ty = Ty + B*Txx;
+    Sxx = (D1 - A*B*Txx)/B2;
+    S1x = S1x + Sxx;
+    S1y = S1y + B*Sxx;
+    Sxx = (B*D1 + A*Txx)/B2;
+    S2x = S2x + Sxx;
+    /*
+     * Lower limit
+     */
+    calc_magic (xx[k],z,A,B,beta,&D1);
+    I1 = I1 + xx[k]*ARSINH(beta[0]) + (A/sqrt(1.0+B*B))*ARSINH(beta[1])
+      + z*atan(beta[2]);
+    Txx = ARSINH(beta[1])/sqrt(B2);
+    Tx = Tx - Txx;
+    Ty = Ty - B*Txx;
+    Sxx = (D1 - A*B*Txx)/B2;
+    S1x = S1x - Sxx;
+    S1y = S1y - B*Sxx;
+    Sxx = (B*D1 + A*Txx)/B2;
+    S2x = S2x - Sxx;
+  }
+  /*
+   * Handle last side (dx = 0) in a special way;
+   */
+  mult = 1.0/sqrt(xx[k]*xx[k]+z*z);
+  /*
+   * Upper...
+   */
+  Tyy = ARSINH(mult*yy[k+1]);
+  Ty = Ty + Tyy;
+  S1y = S1y + xx[k]*Tyy;
+  /*
+   * Lower...
+   */
+  Tyy = ARSINH(mult*yy[k]);
+  Ty = Ty - Tyy;
+  S1y = S1y - xx[k]*Tyy;
+  /*
+   * Set return values
+   */
+  *I1p = I1;
+  T[X] = Tx;
+  T[Y] = Ty;
+  S1[X] = S1x;
+  S1[Y] = S1y;
+  S2[X] = S2x;
+  S2[Y] = -S1x;
+  return;
+}
+
+
+
+static double calc_beta (double *rk,double *rk1)
+
+{
+  double rkk1[3];
+  double size;
+  double res;
+
+  VEC_DIFF (rk,rk1,rkk1);
+  size = VEC_LEN(rkk1);
+
+  res = log((VEC_LEN(rk)*size + VEC_DOT(rk,rkk1))/
+            (VEC_LEN(rk1)*size + VEC_DOT(rk1,rkk1)))/size;
+  return (res);
+}
+
+
+static double one_field_coeff (float       *dest,	/* The destination field point */
+                               float       *normal,	/* The field direction we are interested in */
+                               mneTriangle tri)
+/*
+ * Compute the integral over one triangle.
+ * This looks magical but it is not.
+ */
+{
+  double *yy[4];
+  double y1[3],y2[3],y3[3];
+  double beta[3];
+  double bbeta[3];
+  double coeff[3];
+  int   j,k;
+
+  yy[0] = y1;
+  yy[1] = y2;
+  yy[2] = y3;
+  yy[3] = y1;
+  VEC_DIFF (dest,tri->r1,y1);
+  VEC_DIFF (dest,tri->r2,y2);
+  VEC_DIFF (dest,tri->r3,y3);
+  for (j = 0; j < 3; j++)
+    beta[j] = calc_beta(yy[j],yy[j+1]);
+  bbeta[0] = beta[2] - beta[0];
+  bbeta[1] = beta[0] - beta[1];
+  bbeta[2] = beta[1] - beta[2];
+
+  for (j = 0; j < 3; j++)
+    coeff[j] = 0.0;
+  for (j = 0; j < 3; j++)
+    for (k = 0; k < 3; k++)
+      coeff[k] = coeff[k] + yy[j][k]*bbeta[j];
+  return (VEC_DOT(coeff,normal));
+}
+
+
+
+float **fwd_bem_field_coeff(fwdBemModel m,	/* The model */
+                            fwdCoilSet  coils)	/* Gradiometer coil positions */
+/*
+ * Compute the weighting factors to obtain the magnetic field
+ */
+{
+  mneSurface     surf;
+  mneTriangle    tri;
+  fwdCoil        coil;
+  fwdCoilSet     tcoils = NULL;
+  int            ntri;
+  float          **coeff = NULL;
+  int            j,k,p,s,off;
+  double         res;
+  double         mult;
+
+  if (m->solution == NULL) {
+    printf("Solution matrix missing in fwd_bem_field_coeff");
+    return NULL;
+  }
+  if (m->bem_method != FWD_BEM_CONSTANT_COLL) {
+    printf("BEM method should be constant collocation for fwd_bem_field_coeff");
+    return NULL;
+  }
+  if (coils->coord_frame != FIFFV_COORD_MRI) {
+    if (coils->coord_frame == FIFFV_COORD_HEAD) {
+      if (!m->head_mri_t) {
+        printf("head -> mri coordinate transform missing in fwd_bem_field_coeff");
+        return NULL;
+      }
+      else {
+        /*
+         * Make a transformed duplicate
+         */
+        if ((tcoils = fwd_dup_coil_set(coils,m->head_mri_t)) == NULL)
+          return NULL;
+        coils = tcoils;
+      }
+    }
+    else {
+      printf("Incompatible coil coordinate frame %d for fwd_bem_field_coeff",coils->coord_frame);
+      return NULL;
+    }
+  }
+  ntri  = m->nsol;
+  coeff = ALLOC_CMATRIX(coils->ncoil,ntri);
+
+  for (s = 0, off = 0; s < m->nsurf; s++) {
+    surf = m->surfs[s];
+    ntri = surf->ntri;
+    tri  = surf->tris;
+    mult = m->field_mult[s];
+
+    for (k = 0; k < ntri; k++,tri++) {
+      for (j = 0; j < coils->ncoil; j++) {
+        coil = coils->coils[j];
+        res = 0.0;
+        for (p = 0; p < coil->np; p++)
+          res = res + coil->w[p]*one_field_coeff(coil->rmag[p],coil->cosmag[p],tri);
+        coeff[j][k+off] = mult*res;
+      }
+    }
+    off = off + ntri;
+  }
+  fwd_free_coil_set(tcoils);
+  return coeff;
+}
+
+
+
+/*
+ * These are the formulas from Ferguson et al
+ * A Complete Linear Discretization for Calculating the Magnetic Field
+ * Using the Boundary-Element Method, IEEE Trans. Biomed. Eng., submitted
+ */
+
+static double calc_gamma (double *rk,double *rk1)
+
+{
+  double rkk1[3];
+  double size;
+  double res;
+
+  VEC_DIFF (rk,rk1,rkk1);
+  size = VEC_LEN(rkk1);
+
+  res = log((VEC_LEN(rk1)*size + VEC_DOT(rk1,rkk1))/
+            (VEC_LEN(rk)*size + VEC_DOT(rk,rkk1)))/size;
+  return (res);
+}
+
+
+
+
+void fwd_bem_one_lin_field_coeff_ferg (float *dest,	/* The field point */
+                                       float *dir,	/* The interesting direction */
+                                       mneTriangle tri,	/* The destination triangle */
+                                       double *res)	/* The results */
+
+{
+  double c[3];			/* Component of dest vector normal to
+                                 * the triangle plane */
+  double A[3];			/* Projection of dest onto the triangle */
+  double c1[3],c2[3],c3[3];
+  double y1[3],y2[3],y3[3];
+  double *yy[4],*cc[4];
+  double rjk[3][3];
+  double cross[3],triple,l1,l2,l3,solid,clen;
+  double common,sum,beta,gamma;
+  int    k;
+
+  yy[0] = y1;   cc[0] = c1;
+  yy[1] = y2;   cc[1] = c2;
+  yy[2] = y3;   cc[2] = c3;
+  yy[3] = y1;   cc[3] = c1;
+
+  VEC_DIFF(tri->r2,tri->r3,rjk[0]);
+  VEC_DIFF(tri->r3,tri->r1,rjk[1]);
+  VEC_DIFF(tri->r1,tri->r2,rjk[2]);
+
+  for (k = 0; k < 3; k++) {
+    y1[k] = tri->r1[k] - dest[k];
+    y2[k] = tri->r2[k] - dest[k];
+    y3[k] = tri->r3[k] - dest[k];
+  }
+  clen  = VEC_DOT(y1,tri->nn);
+  for (k = 0; k < 3; k++) {
+    c[k]  = clen*tri->nn[k];
+    A[k]  = dest[k] + c[k];
+    c1[k] = tri->r1[k] - A[k];
+    c2[k] = tri->r2[k] - A[k];
+    c3[k] = tri->r3[k] - A[k];
+  }
+  /*
+   * beta and gamma...
+   */
+  for (sum = 0.0, k = 0; k < 3; k++) {
+    CROSS_PRODUCT(cc[k],cc[k+1],cross);
+    beta  = VEC_DOT(cross,tri->nn);
+    gamma = calc_gamma (yy[k],yy[k+1]);
+    sum = sum + beta*gamma;
+  }
+  /*
+   * Solid angle...
+   */
+  CROSS_PRODUCT(y1,y2,cross);
+  triple = VEC_DOT(cross,y3);
+
+  l1 = VEC_LEN(y1);
+  l2 = VEC_LEN(y2);
+  l3 = VEC_LEN(y3);
+  solid = 2.0*atan2(triple,
+                    (l1*l2*l3+
+                     VEC_DOT(y1,y2)*l3+
+                     VEC_DOT(y1,y3)*l2+
+                     VEC_DOT(y2,y3)*l1));
+  /*
+   * Now we are ready to assemble it all together
+   */
+  common = (sum-clen*solid)/(2.0*tri->area);
+  for (k = 0; k < 3; k++)
+    res[k] = -VEC_DOT(rjk[k],dir)*common;
+  return;
+}
+
+
+
+
+
+void fwd_bem_one_lin_field_coeff_uran(float *dest,	/* The field point */
+                                      float *dir,	/* The interesting direction */
+                                      mneTriangle tri,	/* The destination triangle */
+                                      double *res)	/* The results */
+
+{
+  double      I1,T[2],S1[2],S2[2];
+  double      f0[3],fx[3],fy[3];
+  double      res_x,res_y;
+  double      x_fac,y_fac;
+  int         k;
+  double      len;
+  /*
+   * Compute the component integrals
+   */
+  field_integrals (dest,tri,&I1,T,S1,S2,f0,fx,fy);
+  /*
+   * Compute the coefficient for each node...
+   */
+  len = VEC_LEN(dir);
+  dir[X] = dir[X]/len;
+  dir[Y] = dir[Y]/len;
+  dir[Z] = dir[Z]/len;
+
+  x_fac = -VEC_DOT(dir,tri->ex);
+  y_fac = -VEC_DOT(dir,tri->ey);
+  for (k = 0; k < 3; k++) {
+    res_x = f0[k]*T[X] + fx[k]*S1[X] + fy[k]*S2[X] + fy[k]*I1;
+    res_y = f0[k]*T[Y] + fx[k]*S1[Y] + fy[k]*S2[Y] - fx[k]*I1;
+    res[k] = x_fac*res_x + y_fac*res_y;
+  }
+  return;
+}
+
+
+void fwd_bem_one_lin_field_coeff_simple (float       *dest,    /* The destination field point */
+                                         float       *normal,  /* The field direction we are interested in */
+                                         mneTriangle source,   /* The source triangle */
+                                         double      *res)     /* The result for each triangle node */
+     /*
+      * Simple version...
+      */
+{
+  float diff[3];
+  float vec_result[3];
+  float dl;
+  int   k;
+  float *rr[3];
+
+
+  rr[0] = source->r1;
+  rr[1] = source->r2;
+  rr[2] = source->r3;
+
+  for (k = 0; k < 3; k++) {
+    VEC_DIFF (rr[k],dest,diff);
+    dl = VEC_DOT(diff,diff);
+    CROSS_PRODUCT (diff,source->nn,vec_result);
+    res[k] = source->area*VEC_DOT(vec_result,normal)/(3.0*dl*sqrt(dl));
+  }
+  return;
+}
+
+typedef void (* linFieldIntFunc)(float *dest,float *dir,mneTriangle tri, double *res);
+
+float **fwd_bem_lin_field_coeff (fwdBemModel m,	        /* The model */
+                                 fwdCoilSet  coils,	/* Coil information */
+                                 int         method)	/* Which integration formula to use */
+     /*
+      * Compute the weighting factors to obtain the magnetic field
+      * in the linear potential approximation
+      */
+{
+  mneSurface  surf;
+  mneTriangle tri;
+  fwdCoil     coil;
+  fwdCoilSet  tcoils = NULL;
+  int         ntri;
+  float       **coeff  = NULL;
+  int         j,k,p,pp,off,s;
+  double      res[3],one[3];
+  float       mult;
+  linFieldIntFunc func;
+
+  if (m->solution == NULL) {
+    printf("Solution matrix missing in fwd_bem_lin_field_coeff");
+    return NULL;
+  }
+  if (m->bem_method != FWD_BEM_LINEAR_COLL) {
+    printf("BEM method should be linear collocation for fwd_bem_lin_field_coeff");
+    return NULL;
+  }
+  if (coils->coord_frame != FIFFV_COORD_MRI) {
+    if (coils->coord_frame == FIFFV_COORD_HEAD) {
+      if (!m->head_mri_t) {
+        printf("head -> mri coordinate transform missing in fwd_bem_lin_field_coeff");
+        return NULL;
+      }
+      else {
+        /*
+         * Make a transformed duplicate
+         */
+        if ((tcoils = fwd_dup_coil_set(coils,m->head_mri_t)) == NULL)
+          return NULL;
+        coils = tcoils;
+      }
+    }
+    else {
+      printf("Incompatible coil coordinate frame %d for fwd_bem_field_coeff",coils->coord_frame);
+      return NULL;
+    }
+  }
+  if (method == FWD_BEM_LIN_FIELD_FERGUSON)
+    func = fwd_bem_one_lin_field_coeff_ferg;
+  else if (method == FWD_BEM_LIN_FIELD_URANKAR)
+    func = fwd_bem_one_lin_field_coeff_uran;
+  else
+    func = fwd_bem_one_lin_field_coeff_simple;
+
+  coeff = ALLOC_CMATRIX(coils->ncoil,m->nsol);
+  for (k = 0; k < m->nsol; k++)
+    for (j = 0; j < coils->ncoil; j++)
+      coeff[j][k] = 0.0;
+  /*
+   * Process each of the surfaces
+   */
+  for (s = 0, off = 0; s < m->nsurf; s++) {
+    surf = m->surfs[s];
+    ntri = surf->ntri;
+    tri  = surf->tris;
+    mult = m->field_mult[s];
+
+    for (k = 0; k < ntri; k++,tri++) {
+      for (j = 0; j < coils->ncoil; j++) {
+        coil = coils->coils[j];
+        for (pp = 0; pp < 3; pp++)
+          res[pp] = 0;
+        /*
+         * Accumulate the coefficients for each triangle node...
+         */
+        for (p = 0; p < coil->np; p++) {
+          func(coil->rmag[p],coil->cosmag[p],tri,one);
+          for (pp = 0; pp < 3; pp++)
+            res[pp] = res[pp] + coil->w[p]*one[pp];
+        }
+        /*
+         * Add these to the corresponding coefficient matrix
+         * elements...
+         */
+        for (pp = 0; pp < 3; pp++)
+          coeff[j][tri->vert[pp]+off] = coeff[j][tri->vert[pp]+off] + mult*res[pp];
+      }
+    }
+    off = off + surf->np;
+  }
+  /*
+   * Discard the duplicate
+   */
+  fwd_free_coil_set(tcoils);
+  return (coeff);
+}
+
+
+
+int fwd_bem_specify_coils(fwdBemModel m,
+                          fwdCoilSet  coils)
+/*
+ * Set up for computing the solution at a set of coils
+  */
+{
+  float **sol = NULL;
+  fwdBemSolution csol;
+
+  if (!m) {
+    printf("Model missing in fwd_bem_specify_coils");
+    goto bad;
+  }
+  if (!m->solution) {
+    printf("Solution not computed in fwd_bem_specify_coils");
+    goto bad;
+  }
+  fwd_free_coil_set_user_data(coils);
+  if (!coils || coils->ncoil == 0)
+    return OK;
+  if (m->bem_method == FWD_BEM_CONSTANT_COLL)
+    sol = fwd_bem_field_coeff(m,coils);
+  else if (m->bem_method == FWD_BEM_LINEAR_COLL)
+    sol = fwd_bem_lin_field_coeff(m,coils,FWD_BEM_LIN_FIELD_SIMPLE);
+  else {
+    printf("Unknown BEM method in fwd_bem_specify_coils : %d",m->bem_method);
+    goto bad;
+  }
+  coils->user_data = csol = fwd_bem_new_coil_solution();
+  coils->user_data_free   = fwd_bem_free_coil_solution;
+
+  csol->ncoil     = coils->ncoil;
+  csol->np        = m->nsol;
+  csol->solution  = mne_mat_mat_mult(sol,m->solution,coils->ncoil,m->nsol,m->nsol);
+
+  FREE_CMATRIX(sol);
+  return OK;
+
+ bad : {
+    FREE_CMATRIX(sol);
+    return FAIL;
+
+  }
+}
+
+
+
+
+#define MAG_FACTOR 1e-7		/* \mu_0/4\pi */
+
+
+
+
+static void fwd_bem_lin_field_calc(float       *rd,
+                                   float       *Q,
+                                   fwdCoilSet  coils,
+                                   fwdBemModel m,
+                                   float       *B)
+/*
+ * Calculate the magnetic field in a set of coils
+ */
+{
+  float *v0;
+  int   s,k,p,np;
+  fwdCoil coil;
+  float  mult;
+  float  **rr;
+  float  my_rd[3],my_Q[3];
+  fwdBemSolution sol = (fwdBemSolution)coils->user_data;
+  /*
+   * Infinite-medium potentials
+   */
+  if (!m->v0)
+    m->v0 = MALLOC(m->nsol,float);
+  v0 = m->v0;
+  /*
+   * The dipole location and orientation must be transformed
+   */
+  VEC_COPY(my_rd,rd);
+  VEC_COPY(my_Q,Q);
+  if (m->head_mri_t) {
+    fiff_coord_trans(my_rd,m->head_mri_t,FIFFV_MOVE);
+    fiff_coord_trans(my_Q,m->head_mri_t,FIFFV_NO_MOVE);
+  }
+  /*
+   * Compute the inifinite-medium potentials at the vertices
+   */
+  for (s = 0, p = 0; s < m->nsurf; s++) {
+    np     = m->surfs[s]->np;
+    rr     = m->surfs[s]->rr;
+    mult   = m->source_mult[s];
+    for (k = 0; k < np; k++)
+      v0[p++] = mult*fwd_bem_inf_pot(my_rd,my_Q,rr[k]);
+  }
+  /*
+   * Primary current contribution
+   * (can be calculated in the coil/dipole coordinates)
+   */
+  for (k = 0; k < coils->ncoil; k++) {
+    coil = coils->coils[k];
+    B[k] = 0.0;
+    for (p = 0; p < coil->np; p++)
+      B[k] = B[k] + coil->w[p]*fwd_bem_inf_field(rd,Q,coil->rmag[p],coil->cosmag[p]);
+  }
+  /*
+   * Volume current contribution
+   */
+  for (k = 0; k < coils->ncoil; k++)
+    B[k] = B[k] + mne_dot_vectors(sol->solution[k],v0,m->nsol);
+  /*
+   * Scale correctly
+   */
+  for (k = 0; k < coils->ncoil; k++)
+    B[k] = MAG_FACTOR*B[k];
+  return;
+}
+
+
+static void fwd_bem_field_calc(float       *rd,
+                               float       *Q,
+                               fwdCoilSet  coils,
+                               fwdBemModel m,
+                               float       *B)
+/*
+ * Calculate the magnetic field in a set of coils
+ */
+{
+  float *v0;
+  int   s,k,p,ntri;
+  fwdCoil coil;
+  mneTriangle tri;
+  float   mult;
+  float  my_rd[3],my_Q[3];
+  fwdBemSolution sol = (fwdBemSolution)coils->user_data;
+  /*
+   * Infinite-medium potentials
+   */
+  if (!m->v0)
+    m->v0 = MALLOC(m->nsol,float);
+  v0 = m->v0;
+  /*
+   * The dipole location and orientation must be transformed
+   */
+  VEC_COPY(my_rd,rd);
+  VEC_COPY(my_Q,Q);
+  if (m->head_mri_t) {
+    fiff_coord_trans(my_rd,m->head_mri_t,FIFFV_MOVE);
+    fiff_coord_trans(my_Q,m->head_mri_t,FIFFV_NO_MOVE);
+  }
+  /*
+   * Compute the inifinite-medium potentials at the centers of the triangles
+   */
+  for (s = 0, p = 0; s < m->nsurf; s++) {
+    ntri = m->surfs[s]->ntri;
+    tri  = m->surfs[s]->tris;
+    mult = m->source_mult[s];
+    for (k = 0; k < ntri; k++, tri++)
+      v0[p++] = mult*fwd_bem_inf_pot(my_rd,my_Q,tri->cent);
+  }
+  /*
+   * Primary current contribution
+   * (can be calculated in the coil/dipole coordinates)
+   */
+  for (k = 0; k < coils->ncoil; k++) {
+    coil = coils->coils[k];
+    B[k] = 0.0;
+    for (p = 0; p < coil->np; p++)
+      B[k] = B[k] + coil->w[p]*fwd_bem_inf_field(rd,Q,coil->rmag[p],coil->cosmag[p]);
+  }
+  /*
+   * Volume current contribution
+   */
+  for (k = 0; k < coils->ncoil; k++)
+    B[k] = B[k] + mne_dot_vectors(sol->solution[k],v0,m->nsol);
+  /*
+   * Scale correctly
+   */
+  for (k = 0; k < coils->ncoil; k++)
+    B[k] = MAG_FACTOR*B[k];
+  return;
+}
+
+
+
+
+int fwd_bem_field(float       *rd,	/* Dipole position */
+                  float       *Q,	/* Dipole orientation */
+                  fwdCoilSet  coils,    /* Coil descriptors */
+                  float       *B,       /* Result */
+                  void        *client)  /* The model */
+/*
+ * This version calculates the magnetic field in a set of coils
+ * Call fwd_bem_specify_coils first to establish the coil-specific
+ * solution matrix
+ */
+{
+  fwdBemModel m = (fwdBemModel)client;
+  fwdBemSolution sol = (fwdBemSolution)coils->user_data;
+
+  if (!m) {
+    printf("No BEM model specified to fwd_bem_field");
+    return FAIL;
+  }
+  if (!sol || !sol->solution || sol->ncoil != coils->ncoil) {
+    printf("No appropriate coil-specific data available in fwd_bem_field");
+    return FAIL;
+  }
+  if (m->bem_method == FWD_BEM_CONSTANT_COLL)
+    fwd_bem_field_calc(rd,Q,coils,m,B);
+  else if (m->bem_method == FWD_BEM_LINEAR_COLL)
+    fwd_bem_lin_field_calc(rd,Q,coils,m,B);
+  else {
+    printf("Unknown BEM method : %d",m->bem_method);
+    return FAIL;
+  }
+  return OK;
+}
+
+\
+//============================= fwd_comp.c =============================
+
+
+
+
+int fwd_comp_field(float *rd,float *Q, fwdCoilSet coils, float *res, void *client)
+     /*
+      * Calculate the compensated field (one dipole component)
+      */
+{
+  fwdCompData comp = (fwdCompData)client;
+
+  if (!comp->field) {
+    printf("Field computation function is missing in fwd_comp_field_vec");
+    return FAIL;
+  }
+  /*
+   * First compute the field in the primary set of coils
+   */
+  if (comp->field(rd,Q,coils,res,comp->client) == FAIL)
+    return FAIL;
+  /*
+   * Compensation needed?
+   */
+  if (!comp->comp_coils || comp->comp_coils->ncoil <= 0 || !comp->set || !comp->set->current)
+    return OK;
+  /*
+   * Workspace needed?
+   */
+  if (!comp->work)
+    comp->work = MALLOC(comp->comp_coils->ncoil,float);
+  /*
+   * Compute the field in the compensation coils
+   */
+  if (comp->field(rd,Q,comp->comp_coils,comp->work,comp->client) == FAIL)
+    return FAIL;
+  /*
+   * Compute the compensated field
+   */
+  return mne_apply_ctf_comp(comp->set,TRUE,res,coils->ncoil,comp->work,comp->comp_coils->ncoil);
+}
+
+
+
+/*
+ * Routines to implement the reference channel compensation in field computations
+ */
+
+void fwd_free_comp_data(void *d)
+
+{
+  fwdCompData comp = (fwdCompData)d;
+
+  if (!comp)
+    return;
+  fwd_free_coil_set(comp->comp_coils);
+  mne_free_ctf_comp_data_set(comp->set);
+  FREE(comp->work);
+  FREE_CMATRIX(comp->vec_work);
+
+  if (comp->client_free && comp->client)
+    comp->client_free(comp->client);
+
+  FREE(comp);
+  return;
+}
+
+
+
+
+fwdCompData fwd_new_comp_data()
+
+{
+  fwdCompData comp = MALLOC(1,fwdCompDataRec);
+
+  comp->comp_coils  = NULL;
+  comp->field       = NULL;
+  comp->vec_field   = NULL;
+  comp->field_grad  = NULL;
+  comp->client      = NULL;
+  comp->client_free = NULL;
+  comp->set         = NULL;
+  comp->work        = NULL;
+  comp->vec_work    = NULL;
+  return comp;
+}
+
+
+
+
+static int fwd_make_ctf_comp_coils(mneCTFcompDataSet set,          /* The available compensation data */
+                                   fwdCoilSet        coils,        /* The main coil set */
+                                   fwdCoilSet        comp_coils)   /* The compensation coil set */
+     /*
+      * Call mne_make_ctf_comp using the information in the coil sets
+      */
+{
+  fiffChInfo chs     = NULL;
+  fiffChInfo compchs = NULL;
+  int        nchan   = 0;
+  int        ncomp   = 0;
+  fwdCoil coil;
+  int k,res;
+
+  if (!coils || coils->ncoil <= 0) {
+    printf("Coil data missing in fwd_make_ctf_comp_coils");
+    return FAIL;
+  }
+  /*
+   * Create the fake channel info which contain just enough information
+   * for mne_make_ctf_comp
+   */
+  chs = MALLOC(coils->ncoil,fiffChInfoRec);
+  for (k = 0; k < coils->ncoil; k++) {
+    coil = coils->coils[k];
+    strcpy(chs[k].ch_name,coil->chname);
+    chs[k].chpos.coil_type = coil->type;
+    chs[k].kind = (coil->coil_class == FWD_COILC_EEG) ? FIFFV_EEG_CH : FIFFV_MEG_CH;
+  }
+  nchan = coils->ncoil;
+  if (comp_coils && comp_coils->ncoil > 0) {
+    compchs = MALLOC(comp_coils->ncoil,fiffChInfoRec);
+    for (k = 0; k < comp_coils->ncoil; k++) {
+      coil = comp_coils->coils[k];
+      strcpy(compchs[k].ch_name,coil->chname);
+      compchs[k].chpos.coil_type = coil->type;
+      compchs[k].kind = (coil->coil_class == FWD_COILC_EEG) ? FIFFV_EEG_CH : FIFFV_MEG_CH;
+    }
+    ncomp = comp_coils->ncoil;
+  }
+  res = mne_make_ctf_comp(set,chs,nchan,compchs,ncomp);
+
+  FREE(chs);
+  FREE(compchs);
+
+  return res;
+}
+
+
+
+fwdCompData fwd_make_comp_data(mneCTFcompDataSet set,           /* The CTF compensation data read from the file */
+                               fwdCoilSet        coils,         /* The principal set of coils */
+                               fwdCoilSet        comp_coils,    /* The compensation coils */
+                               fwdFieldFunc      field,	        /* The field computation functions */
+                               fwdVecFieldFunc   vec_field,
+                               fwdFieldGradFunc  field_grad,    /* The field and gradient computation function */
+                               void              *client,       /* Client data to be passed to the above */
+                               fwdUserFreeFunc   client_free)
+     /*
+      * Compose a compensation data set
+      */
+{
+  fwdCompData comp = fwd_new_comp_data();
+
+  comp->set         = mne_dup_ctf_comp_data_set(set);
+  comp->comp_coils  = fwd_dup_coil_set(comp_coils,NULL);
+  comp->field       = field;
+  comp->vec_field   = vec_field;
+  comp->field_grad  = field_grad;
+  comp->client      = client;
+  comp->client_free = client_free;
+
+  if (fwd_make_ctf_comp_coils(comp->set,
+                              coils,
+                              comp->comp_coils) != OK) {
+    fwd_free_comp_data(comp);
+    return NULL;
+  }
+  else
+    return comp;
+}
+
+
+
+int fwd_comp_field_vec(float *rd, fwdCoilSet coils, float **res, void *client)
+     /*
+      * Calculate the compensated field (all dipole components)
+      */
+{
+  fwdCompData comp = (fwdCompData)client;
+  int k;
+
+  if (!comp->vec_field) {
+    printf("Field computation function is missing in fwd_comp_field_vec");
+    return FAIL;
+  }
+  /*
+   * First compute the field in the primary set of coils
+   */
+  if (comp->vec_field(rd,coils,res,comp->client) == FAIL)
+    return FAIL;
+  /*
+   * Compensation needed?
+   */
+  if (!comp->comp_coils || comp->comp_coils->ncoil <= 0 || !comp->set || !comp->set->current)
+    return OK;
+  /*
+   * Need workspace?
+   */
+  if (!comp->vec_work)
+    comp->vec_work = ALLOC_CMATRIX(3,comp->comp_coils->ncoil);
+  /*
+   * Compute the field at the compensation sensors
+   */
+  if (comp->vec_field(rd,comp->comp_coils,comp->vec_work,comp->client) == FAIL)
+    return FAIL;
+  /*
+   * Compute the compensated field of three orthogonal dipoles
+   */
+  for (k = 0; k < 3; k++) {
+    if (mne_apply_ctf_comp(comp->set,TRUE,res[k],coils->ncoil,comp->vec_work[k],comp->comp_coils->ncoil) == FAIL)
+      return FAIL;
+  }
+  return OK;
+}
+
+
+
+
+//============================= fwd_multi_spherepot.c =============================
+
+
+
+
+double fwd_eeg_get_multi_sphere_model_coeff(fwdEegSphereModel m, int n)
+     /*
+      * Get the model depended weighting factor for n
+      */
+{
+  double **M,**Mn,**help,**Mm;
+  static double **mat1 = NULL;
+  static double **mat2 = NULL;
+  static double **mat3 = NULL;
+  static double *c1 = NULL;
+  static double *c2 = NULL;
+  static double *cr = NULL;
+  static double *cr_mult = NULL;
+  double div,div_mult;
+  double n1;
+#ifdef TEST
+  double rel1,rel2;
+  double b,c;
+#endif
+  int    k;
+
+  if (m->nlayer == 0 || m->nlayer == 1)
+    return 1.0;
+  /*
+   * Now follows the tricky case
+   */
+#ifdef TEST
+  if (m->nlayer == 2) {
+    rel1 = layers[0].sigma/layers[1].sigma;
+    n1 = n + 1.0;
+    div_mult = 2.0*n + 1;
+    b = pow(m->layers[0].rel_rad,div_mult);
+    return div_mult/((n1 + n*rel1) + b*n1*(rel1-1.0));
+  }
+  else if (m->nlayer == 3) {
+    rel1 = m->layers[0].sigma/m->layers[1].sigma;
+    rel2 = m->layers[1].sigma/m->layers[2].sigma;
+    n1 = n + 1.0;
+    div_mult = 2.0*n + 1.0;
+    b = pow(m->layers[0].rel_rad,div_mult);
+    c = pow(m->layers[1].rel_rad,div_mult);
+    div_mult = div_mult*div_mult;
+    div = (b*n*n1*(rel1-1.0)*(rel2-1.0) + c*(rel1*n + n1)*(rel2*n + n1))/c +
+      n1*(b*(rel1-1.0)*(rel2*n1 + n) + c*(rel1*n + n1)*(rel2-1.0));
+    return div_mult/div;
+  }
+#endif
+  if (n == 1) {
+    /*
+     * Initialize the arrays
+     */
+    c1 = REALLOC(c1,m->nlayer-1,double);
+    c2 = REALLOC(c2,m->nlayer-1,double);
+    cr = REALLOC(cr,m->nlayer-1,double);
+    cr_mult = REALLOC(cr_mult,m->nlayer-1,double);
+    for (k = 0; k < m->nlayer-1; k++) {
+      c1[k] = m->layers[k].sigma/m->layers[k+1].sigma;
+      c2[k] = c1[k] - 1.0;
+      cr_mult[k] = m->layers[k].rel_rad;
+      cr[k] = cr_mult[k];
+      cr_mult[k] = cr_mult[k]*cr_mult[k];
+    }
+    if (mat1 == NULL)
+      mat1 = ALLOC_DCMATRIX(2,2);
+    if (mat2 == NULL)
+      mat2 = ALLOC_DCMATRIX(2,2);
+    if (mat3 == NULL)
+      mat3 = ALLOC_DCMATRIX(2,2);
+  }
+  /*
+   * Increment the radius coefficients
+   */
+  for (k = 0; k < m->nlayer-1; k++)
+    cr[k] = cr[k]*cr_mult[k];
+  /*
+   * Multiply the matrices
+   */
+  M  = mat1;
+  Mn = mat2;
+  Mm = mat3;
+  M[0][0] = M[1][1] = 1.0;
+  M[0][1] = M[1][0] = 0.0;
+  div      = 1.0;
+  div_mult = 2.0*n + 1.0;
+  n1       = n + 1.0;
+
+  for (k = m->nlayer-2; k >= 0; k--) {
+
+    Mm[0][0] = (n + n1*c1[k]);
+    Mm[0][1] = n1*c2[k]/cr[k];
+    Mm[1][0] = n*c2[k]*cr[k];
+    Mm[1][1] = n1 + n*c1[k];
+
+    Mn[0][0] = Mm[0][0]*M[0][0] + Mm[0][1]*M[1][0];
+    Mn[0][1] = Mm[0][0]*M[0][1] + Mm[0][1]*M[1][1];
+    Mn[1][0] = Mm[1][0]*M[0][0] + Mm[1][1]*M[1][0];
+    Mn[1][1] = Mm[1][0]*M[0][1] + Mm[1][1]*M[1][1];
+    help = M;
+    M = Mn;
+    Mn = help;
+    div = div*div_mult;
+
+  }
+  return n*div/(n*M[1][1] + n1*M[1][0]);
+}
+
+
+
+int fwd_eeg_spherepot_vec(float   *rd,          /* Dipole position */
+                          float   **el,         /* Electrode positions */
+                          int     neeg,	        /* Number of electrodes */
+                          float   **Vval_vec,	/* The potential values
+                                                 * Vval_vec[0][k] potentials given by Q = (1.0,0.0,0.0) at electrode k
+                                                 * Vval_vec[1][k] potentials given by Q = (0.0,1.0,0.0) at electrode k
+                                                 * Vval_vec[2][k] potentials given by Q = (0.0,0.0,1.0) at electrode k
+                                                 */
+                          void    *client)
+     /*
+      * Compute the electric potentials in a set of electrodes in spherically
+      * Symmetric head model. This routine calculates the fields for all
+      * dipole directions.
+      *
+      * The code is based on the formulas presented in
+      *
+      * J.C. Moscher, R.M. Leahy, and P.S. Lewis, Matrix Kernels for
+      * Modeling of EEG and MEG Data, Los Alamos Technical Report,
+      * LA-UR-96-1993, 1996.
+      *
+      * This routine uses the acceleration with help of equivalent sources
+      * in the homogeneous sphere.
+      *
+      */
+{
+  fwdEegSphereModel m = (fwdEegSphereModel)client;
+  float fact = 0.25/M_PI;
+  float a_vec[3];
+  float a,a2,a3;
+  float rrd,rd2,rd2_inv,r,r2,ra,rda;
+  float F;
+  float c1,c2,m1,m2;
+  int   k,p,eq;
+  float *this_pos;
+  float orig_rd[3],scaled_rd[3];
+  float pos[3],pos_len;
+  /*
+   * Shift to the sphere model coordinates
+   */
+  for (p = 0; p < 3; p++)
+    orig_rd[p] = rd[p] - m->r0[p];
+  rd = scaled_rd;
+  /*
+   * Initialize the arrays
+   */
+  for (k = 0 ; k < neeg ; k++) {
+    Vval_vec[X][k] = 0.0;
+    Vval_vec[Y][k] = 0.0;
+    Vval_vec[Z][k] = 0.0;
+  }
+  /*
+   * Ignore dipoles outside the innermost sphere
+   */
+  if (VEC_LEN(orig_rd) >= m->layers[0].rad)
+    return OK;
+  /*
+   * Default to homogeneous model if no model was previously set
+   */
+#ifdef FOO
+  if (nequiv == 0) /* what to do */
+    eeg_set_homog_sphere_model();
+#endif
+  /*
+   * Make a weighted sum over the equivalence parameters
+   */
+  for (eq = 0; eq < m->nfit; eq++) {
+    /*
+     * Scale the dipole position
+     */
+    for (p = 0; p < 3; p++)
+      rd[p] = m->mu[eq]*orig_rd[p];
+
+    rd2     = VEC_DOT(rd,rd);
+    rd2_inv = 1.0/rd2;
+
+    /*
+     * Go over all electrodes
+     */
+    for (k = 0; k < neeg ; k++) {
+      this_pos = el[k];
+
+      for (p = 0; p < 3; p++)
+        pos[p] = this_pos[p] - m->r0[p];
+      /*
+       * Scale location onto the surface of the sphere
+       */
+      if (m->scale_pos) {
+        pos_len = m->layers[m->nlayer-1].rad/VEC_LEN(pos);
+        for (p = 0; p < 3; p++)
+          pos[p] = pos_len*pos[p];
+      }
+      this_pos = pos;
+
+      /* Vector from dipole to the field point */
+
+      VEC_DIFF (rd,this_pos,a_vec);
+
+      /* Compute the dot products needed */
+
+      a2  = VEC_DOT(a_vec,a_vec);       a = sqrt(a2);
+      a3  = 2.0/(a2*a);
+      r2  = VEC_DOT(this_pos,this_pos); r = sqrt(r2);
+      rrd = VEC_DOT(this_pos,rd);
+      ra  = r2 - rrd;
+      rda = rrd - rd2;
+
+      /* The main ingredients */
+
+      F  = a*(r*a + ra);
+      c1 = a3*rda + 1.0/a - 1.0/r;
+      c2 = a3 + (a+r)/(r*F);
+
+      /* Mix them together and scale by lambda/(rd*rd) */
+
+      m1 = (c1 - c2*rrd);
+      m2 = c2*rd2;
+
+      Vval_vec[X][k] = Vval_vec[X][k] + m->lambda[eq]*rd2_inv*(m1*rd[X] + m2*this_pos[X]);
+      Vval_vec[Y][k] = Vval_vec[Y][k] + m->lambda[eq]*rd2_inv*(m1*rd[Y] + m2*this_pos[Y]);
+      Vval_vec[Z][k] = Vval_vec[Z][k] + m->lambda[eq]*rd2_inv*(m1*rd[Z] + m2*this_pos[Z]);
+    }             /* All electrodes done */
+  }               /* All equivalent dipoles done */
+  /*
+   * Finish by scaling by 1/(4*M_PI);
+   */
+  for (k = 0; k  < neeg; k++) {
+    Vval_vec[X][k] = fact*Vval_vec[X][k];
+    Vval_vec[Y][k] = fact*Vval_vec[Y][k];
+    Vval_vec[Z][k] = fact*Vval_vec[Z][k];
+  }
+  return OK;
+}
+
+
+
+
+
+int fwd_eeg_spherepot(float   *rd,       /* Dipole position */
+                      float   *Q,	 /* Dipole moment */
+                      float   **el,	 /* Electrode positions */
+                      int     neeg,	 /* Number of electrodes */
+                      float   *Vval,	 /* The potential values */
+                      void    *client)
+     /*
+      * This routine calculates the potentials for a specific dipole direction
+      *
+      * This routine uses the acceleration with help of equivalent sources
+      * in the homogeneous sphere.
+      */
+{
+  fwdEegSphereModel m = (fwdEegSphereModel)client;
+  float fact = 0.25/M_PI;
+  float a_vec[3];
+  float a,a2,a3;
+  float rrd,rd2,rd2_inv,r,r2,ra,rda;
+  float F;
+  float c1,c2,m1,m2,f1,f2;
+  int   k,p,eq;
+  float *this_pos;
+  float orig_rd[3],scaled_rd[3];
+  float pos[3],pos_len;
+  /*
+   * Shift to the sphere model coordinates
+   */
+  for (p = 0; p < 3; p++)
+    orig_rd[p] = rd[p] - m->r0[p];
+  rd = scaled_rd;
+  /*
+   * Initialize the arrays
+   */
+  for (k = 0 ; k < neeg ; k++)
+    Vval[k] = 0.0;
+  /*
+   * Ignore dipoles outside the innermost sphere
+   */
+  if (VEC_LEN(orig_rd) >= m->layers[0].rad)
+    return OK;
+  /*
+   * Default to homogeneous model if no model was previously set
+   */
+#ifdef FOO
+  if (nequiv == 0) /* what to do */
+    eeg_set_homog_sphere_model();
+#endif
+  /*
+   * Make a weighted sum over the equivalence parameters
+   */
+  for (eq = 0; eq < m->nfit; eq++) {
+    /*
+     * Scale the dipole position
+     */
+    for (p = 0; p < 3; p++)
+      rd[p] = m->mu[eq]*orig_rd[p];
+
+    rd2     = VEC_DOT(rd,rd);
+    rd2_inv = 1.0/rd2;
+
+    f1 = VEC_DOT(rd,Q);
+    /*
+     * Go over all electrodes
+     */
+    for (k = 0; k < neeg ; k++) {
+      this_pos = el[k];
+
+      for (p = 0; p < 3; p++)
+        pos[p] = this_pos[p] - m->r0[p];
+      /*
+       * Scale location onto the surface of the sphere
+       */
+      if (m->scale_pos) {
+        pos_len = m->layers[m->nlayer-1].rad/VEC_LEN(pos);
+        for (p = 0; p < 3; p++)
+          pos[p] = pos_len*pos[p];
+      }
+      this_pos = pos;
+
+      /* Vector from dipole to the field point */
+
+      VEC_DIFF (rd,this_pos,a_vec);
+
+      /* Compute the dot products needed */
+
+      a2  = VEC_DOT(a_vec,a_vec);       a = sqrt(a2);
+      a3  = 2.0/(a2*a);
+      r2  = VEC_DOT(this_pos,this_pos); r = sqrt(r2);
+      rrd = VEC_DOT(this_pos,rd);
+      ra  = r2 - rrd;
+      rda = rrd - rd2;
+
+      /* The main ingredients */
+
+      F  = a*(r*a + ra);
+      c1 = a3*rda + 1.0/a - 1.0/r;
+      c2 = a3 + (a+r)/(r*F);
+
+      /* Mix them together and scale by lambda/(rd*rd) */
+
+      m1 = (c1 - c2*rrd);
+      m2 = c2*rd2;
+
+      f2 = VEC_DOT(this_pos,Q);
+      Vval[k] = Vval[k] + m->lambda[eq]*rd2_inv*(m1*f1 + m2*f2);
+    }             /* All electrodes done */
+  }               /* All equivalent dipoles done */
+  /*
+   * Finish by scaling by 1/(4*M_PI);
+   */
+  for (k = 0; k  < neeg; k++)
+    Vval[k] = fact*Vval[k];
+  return OK;
+}
+
+
+
+
+int fwd_eeg_spherepot_coil(float      *rd,     /* Dipole position */
+                           float      *Q,      /* Dipole moment */
+                           fwdCoilSet els,     /* Electrode positions */
+                           float      *Vval,   /* The potential values */
+                           void       *client)
+     /*
+      * Calculate the EEG in the sphere model using the megCoil structure
+      * MEG channels are skipped
+      */
+{
+  float *vval_one = NULL,val;
+  int   nvval = 0;
+  int   k,c;
+  fwdCoil el;
+
+  for (k = 0; k < els->ncoil; k++, el++) {
+    el = els->coils[k];
+    if (el->coil_class == FWD_COILC_EEG) {
+      if (el->np > nvval) {
+        vval_one = REALLOC(vval_one,el->np,float);
+        nvval = el->np;
+      }
+      if (fwd_eeg_spherepot(rd,Q,el->rmag,el->np,vval_one,client) != OK) {
+        FREE(vval_one);
+        return FAIL;
+      }
+      for (c = 0, val = 0.0; c < el->np; c++)
+        val += el->w[c]*vval_one[c];
+      *Vval = val;
+    }
+    Vval++;
+  }
+  FREE(vval_one);
+  return OK;
+}
+
+
+
+int fwd_eeg_spherepot_coil_vec(float      *rd,        /* Dipole position */
+                               fwdCoilSet els,        /* Electrode positions */
+                               float      **Vval_vec, /* The potential values
+                                                       * Vval_vec[0][k] potentials given by Q = (1.0,0.0,0.0) at electrode k
+                                                       * Vval_vec[1][k] potentials given by Q = (0.0,1.0,0.0) at electrode k
+                                                       * Vval_vec[2][k] potentials given by Q = (0.0,0.0,1.0) at electrode k
+                                                       */
+                                void       *client)
+     /*
+      * Calculate the EEG in the sphere model using the fwdCoilSet structure
+      * MEG channels are skipped
+      *
+      * This routine uses the acceleration with help of equivalent sources
+      * in the homogeneous sphere.
+      */
+{
+  float **vval_one = NULL;
+  float val;
+  int   nvval = 0;
+  int   k,c,p;
+  fwdCoil el;
+
+  for (k = 0; k < els->ncoil; k++, el++) {
+    el = els->coils[k];
+    if (el->coil_class == FWD_COILC_EEG) {
+      if (el->np > nvval) {
+        FREE_CMATRIX(vval_one);
+        vval_one = ALLOC_CMATRIX(3,el->np);
+        nvval = el->np;
+      }
+      if (fwd_eeg_spherepot_vec(rd,el->rmag,el->np,vval_one,client) != OK) {
+        FREE_CMATRIX(vval_one);
+        return FAIL;
+      }
+      for (p = 0; p < 3; p++) {
+        for (c = 0, val = 0.0; c < el->np; c++)
+          val += el->w[c]*vval_one[p][c];
+        Vval_vec[p][k] = val;
+      }
+    }
+  }
+  FREE_CMATRIX(vval_one);
+  return OK;
+}
+
+
+
+//============================= fwd_spherefield.c =============================
+
+#define EPS   1e-5		/* Points closer to origin than this many
+                                   meters are considered to be at the
+                                   origin */
+#define CEPS       1e-5
+
+
+
+
+int fwd_sphere_field(float        *rd,	        /* The dipole location */
+                      float        Q[],	        /* The dipole components (xyz) */
+                      fwdCoilSet   coils,	/* The coil definitions */
+                      float        Bval[],	/* Results */
+                      void         *client)	/* Client data will be the sphere model origin */
+
+{
+  /* This version uses Jukka Sarvas' field computation
+     for details, see
+
+     Jukka Sarvas:
+
+     Basic mathematical and electromagnetic concepts
+     of the biomagnetic inverse problem,
+
+     Phys. Med. Biol. 1987, Vol. 32, 1, 11-22
+
+     The formulas have been manipulated for efficient computation
+     by Matti Hamalainen, February 1990
+
+  */
+  float *r0 = (float *)client;      /* The sphere model origin */
+  float v[3],a_vec[3];
+  float a,a2,r,r2;
+  float ar,ar0,rr0;
+  float vr,ve,re,r0e;
+  float F,g0,gr,result,sum;
+  int   j,k,p;
+  fwdCoil this_coil;
+  float *this_pos,*this_dir;	/* These point to the coil structure! */
+  int   np;
+  float myrd[3];
+  float pos[3];
+  /*
+   * Shift to the sphere model coordinates
+   */
+  for (p = 0; p < 3; p++)
+    myrd[p] = rd[p] - r0[p];
+  rd = myrd;
+  /*
+   * Check for a dipole at the origin
+   */
+  for (k = 0 ; k < coils->ncoil ; k++)
+    if (FWD_IS_MEG_COIL(coils->coils[k]->coil_class))
+      Bval[k] = 0.0;
+  r = VEC_LEN(rd);
+  if (r > EPS)	{		/* The hard job */
+
+    CROSS_PRODUCT(Q,rd,v);
+
+    for (k = 0; k < coils->ncoil; k++) {
+      this_coil = coils->coils[k];
+      if (FWD_IS_MEG_COIL(this_coil->type)) {
+
+        np = this_coil->np;
+
+        for (j = 0, sum = 0.0; j < np; j++) {
+
+          this_pos = this_coil->rmag[j];
+          this_dir = this_coil->cosmag[j];
+
+          for (p = 0; p < 3; p++)
+            pos[p] = this_pos[p] - r0[p];
+          this_pos = pos;
+          result = 0.0;
+
+          /* Vector from dipole to the field point */
+
+          VEC_DIFF (rd,this_pos,a_vec);
+
+          /* Compute the dot products needed */
+
+          a2  = VEC_DOT(a_vec,a_vec);       a = sqrt(a2);
+
+          if (a > 0.0) {
+            r2  = VEC_DOT(this_pos,this_pos); r = sqrt(r2);
+            if (r > 0.0) {
+              rr0 = VEC_DOT(this_pos,rd);
+              ar = (r2-rr0);
+              if (fabs(ar/(a*r)+1.0) > CEPS) { /* There is a problem on the negative 'z' axis if the dipole location
+                                                * and the field point are on the same line */
+                ar0  = ar/a;
+
+                ve = VEC_DOT(v,this_dir); vr = VEC_DOT(v,this_pos);
+                re = VEC_DOT(this_pos,this_dir); r0e = VEC_DOT(rd,this_dir);
+
+                /* The main ingredients */
+
+                F  = a*(r*a + ar);
+                gr = a2/r + ar0 + 2.0*(a+r);
+                g0 = a + 2*r + ar0;
+
+                /* Mix them together... */
+
+                sum = sum + this_coil->w[j]*(ve*F + vr*(g0*r0e - gr*re))/(F*F);
+              }
+            }
+          }
+        }				/* All points done */
+        Bval[k] = MAG_FACTOR*sum;
+      }
+    }
+  }
+  return OK;			/* Happy conclusion: this works always */
+}
+
+
+int fwd_sphere_field_vec(float        *rd,	/* The dipole location */
+                          fwdCoilSet   coils,	/* The coil definitions */
+                          float        **Bval,  /* Results: rows are the fields of the x,y, and z direction dipoles */
+                          void         *client)	/* Client data will be the sphere model origin */
+
+{
+  /* This version uses Jukka Sarvas' field computation
+     for details, see
+
+     Jukka Sarvas:
+
+     Basic mathematical and electromagnetic concepts
+     of the biomagnetic inverse problem,
+
+     Phys. Med. Biol. 1987, Vol. 32, 1, 11-22
+
+     The formulas have been manipulated for efficient computation
+     by Matti Hamalainen, February 1990
+
+     The idea of matrix kernels is from
+
+     Mosher, Leahy, and Lewis: EEG and MEG: Forward Solutions for Inverse Methods
+
+     which has been simplified here using standard vector notation
+
+  */
+  float *r0 = (float *)client;      /* The sphere model origin */
+  float a_vec[3],v1[3],v2[3];
+  float a,a2,r,r2;
+  float ar,ar0,rr0;
+  float re,r0e;
+  float F,g0,gr,g,sum[3];
+  int   j,k,p;
+  fwdCoil this_coil;
+  float *this_pos,*this_dir;	/* These point to the coil structure! */
+  int   np;
+  float myrd[3];
+  float pos[3];
+  /*
+   * Shift to the sphere model coordinates
+   */
+  for (p = 0; p < 3; p++)
+    myrd[p] = rd[p] - r0[p];
+  rd = myrd;
+  /*
+   * Check for a dipole at the origin
+   */
+  r = VEC_LEN(rd);
+  for (k = 0; k < coils->ncoil; k++) {
+    this_coil = coils->coils[k];
+    if (FWD_IS_MEG_COIL(this_coil->coil_class)) {
+      if (r < EPS) {
+        Bval[0][k] = Bval[1][k] = Bval[2][k] = 0.0;
+      }
+      else { 	/* The hard job */
+
+        np = this_coil->np;
+        sum[0] = sum[1] = sum[2] = 0.0;
+
+        for (j = 0; j < np; j++) {
+
+          this_pos = this_coil->rmag[j];
+          this_dir = this_coil->cosmag[j];
+
+          for (p = 0; p < 3; p++)
+            pos[p] = this_pos[p] - r0[p];
+          this_pos = pos;
+
+          /* Vector from dipole to the field point */
+
+          VEC_DIFF (rd,this_pos,a_vec);
+
+          /* Compute the dot products needed */
+
+          a2  = VEC_DOT(a_vec,a_vec);       a = sqrt(a2);
+
+          if (a > 0.0) {
+            r2  = VEC_DOT(this_pos,this_pos); r = sqrt(r2);
+            if (r > 0.0) {
+              rr0 = VEC_DOT(this_pos,rd);
+              ar = (r2-rr0);
+              if (fabs(ar/(a*r)+1.0) > CEPS) { /* There is a problem on the negative 'z' axis if the dipole location
+                                                * and the field point are on the same line */
+
+                /* The main ingredients */
+
+                ar0  = ar/a;
+                F  = a*(r*a + ar);
+                gr = a2/r + ar0 + 2.0*(a+r);
+                g0 = a + 2*r + ar0;
+
+                re = VEC_DOT(this_pos,this_dir); r0e = VEC_DOT(rd,this_dir);
+                CROSS_PRODUCT(rd,this_dir,v1);
+                CROSS_PRODUCT(rd,this_pos,v2);
+
+                g = (g0*r0e - gr*re)/(F*F);
+                /*
+                 * Mix them together...
+                 */
+                for (p = 0; p < 3; p++)
+                  sum[p] = sum[p] + this_coil->w[j]*(v1[p]/F + v2[p]*g);
+              }
+            }
+          }
+        }				/* All points done */
+        for (p = 0; p < 3; p++)
+          Bval[p][k] = MAG_FACTOR*sum[p];
+      }
+    }
+  }
+  return OK;			/* Happy conclusion: this works always */
+}
 
 
 
@@ -15179,6 +18889,7 @@ guessData get_dipole_fit_guess_data(mshMegEegData d)
 }
 
 
+
 //============================= fit_dipoles.c =============================
 
 static ecd new_ecd()
@@ -15762,7 +19473,149 @@ int    fit_dipoles(char          *dataname,
 }
 
 
+//============================= save_dipoles.c =============================
 
+int save_dipoles_dip(char   *name,
+                     ecdSet set)
+  /*
+   * Save dipoles in the dip format suitable for mrilab
+   */
+
+{
+  FILE *out = NULL;
+  int  k,nsave;
+  ecd  one;
+
+  if (!name || strlen(name) == 0 || !set || set->ndip == 0)
+    return OK;
+  if ((out = fopen(name,"w")) == NULL) {
+    printf(name);
+    return FAIL;
+  }
+  fprintf(out,"# CoordinateSystem \"Head\"\n");
+  fprintf (out,"# %7s %7s %8s %8s %8s %8s %8s %8s %8s %6s\n",
+           "begin","end","X (mm)","Y (mm)","Z (mm)","Q(nAm)","Qx(nAm)","Qy(nAm)","Qz(nAm)","g/%");
+  for (k = 0, nsave = 0; k < set->ndip; k++) {
+    one = set->dips[k];
+    if (one->valid) {
+      fprintf(out,"  %7.1f %7.1f %8.2f %8.2f %8.2f %8.3f %8.3f %8.3f %8.3f %6.1f\n",
+              1000*one->time,1000*one->time,
+              1000*one->rd[X],1000*one->rd[Y],1000*one->rd[2],
+              1e9*VEC_LEN(one->Q),1e9*one->Q[X],1e9*one->Q[Y],1e9*one->Q[Z],100.0*one->good);
+      nsave++;
+    }
+  }
+  fprintf(out,"## Name \"%s dipoles\" Style \"Dipoles\"\n","ALL");
+  if (fclose(out) != 0) {
+    out = NULL;
+    printf(name);
+    goto bad;
+  }
+  fprintf(stderr,"Save %d dipoles in dip format to %s\n",nsave,name);
+  return OK;
+
+ bad : {
+    if (out) {
+      fclose(out);
+      unlink(name);
+    }
+    return FAIL;
+  }
+
+}
+
+
+
+static float swap_float (float source)
+
+{
+  unsigned char *csource =  (unsigned char *)(&source);
+  float result;
+  unsigned char *cresult =  (unsigned char *)(&result);
+
+  cresult[0] = csource[3];
+  cresult[1] = csource[2];
+  cresult[2] = csource[1];
+  cresult[3] = csource[0];
+  return result;
+}
+
+
+typedef struct {
+  int   dipole;			/* Which dipole in a multi-dipole set */
+  float begin,end;		/* Fitting time range */
+  float r0[3];                  /* Sphere model origin */
+  float rd[3];			/* Dipole location */
+  float Q[3];			/* Dipole amplitude */
+  float goodness;		/* Goodness-of-fit */
+  int   errors_computed;	/* Have we computed the errors */
+  float noise_level;		/* Noise level used for error computations */
+  float single_errors[5];	/* Single parameter error limits */
+  float error_matrix[5][5];	/* This fully describes the conf. ellipsoid */
+  float conf_vol;		/* The xyz confidence volume */
+  float khi2;			/* The khi^2 value */
+  float prob;			/* Probability to exceed khi^2 by chance */
+  float noise_est;		/* Total noise estimate */
+} *bdipEcd,bdipEcdRec;
+
+
+int save_dipoles_bdip(char   *name,
+                      ecdSet set)
+  /*
+   * Save dipoles in the bdip format employed by xfit
+   */
+{
+  FILE        *out = NULL;
+  bdipEcdRec  one_out;
+  ecd         one;
+  int         k,p;
+  int         nsave;
+
+  if (!name || strlen(name) == 0 || !set || set->ndip == 0)
+    return OK;
+
+  if ((out = fopen(name,"w")) == NULL) {
+    printf(name);
+    return FAIL;
+  }
+
+  for (k = 0, nsave = 0; k < set->ndip; k++) {
+    one = set->dips[k];
+    if (one->valid) {
+      one_out.dipole = swap_int(1);
+      one_out.begin  = swap_float(one->time);
+      for (p = 0; p < 3; p++) {
+        one_out.r0[p] = swap_float(0.0);
+        one_out.rd[p] = swap_float(one->rd[p]);
+        one_out.Q[p]  = swap_float(one->Q[p]);
+      }
+      one_out.goodness = swap_float(one->good);
+      one_out.errors_computed = swap_int(0);
+      one_out.khi2            = swap_float(one->khi2);
+      if (fwrite(&one_out,sizeof(bdipEcdRec),1,out) != 1) {
+        printf("Failed to write a dipole");
+        goto bad;
+      }
+      nsave++;
+    }
+  }
+  if (fclose(out) != 0) {
+    out = NULL;
+    printf(name);
+    goto bad;
+  }
+  fprintf(stderr,"Save %d dipoles in bdip format to %s\n",nsave,name);
+  return OK;
+
+
+ bad : {
+    if (out) {
+      fclose(out);
+      unlink(name);
+    }
+    return FAIL;
+  }
+}
 
 
 //*************************************************************************************************************
