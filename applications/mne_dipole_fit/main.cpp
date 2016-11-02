@@ -58,6 +58,14 @@
 #include <string.h>
 #include <strings.h>
 
+#include <math.h>
+#include <stdlib.h>
+#include <cblas.h>
+
+
+#include <Eigen/Dense>
+#include <unsupported/Eigen/FFT>
+
 
 
 //*************************************************************************************************************
@@ -344,6 +352,82 @@ int is_selected_in_data(mshMegEegData d, char *ch_name)
 #define MIN(a,b) ((a) < (b) ? (a) : (b))
 #define MAX(a,b) ((a) > (b) ? (a) : (b))
 
+#define LU_INVERT_REPORT_DIM 100
+
+
+float **mne_lu_invert(float **mat,int dim)
+     /*
+      * Invert a matrix using the LU decomposition from
+      * LAPACK
+      */
+{
+    Eigen::MatrixXf eigen_mat(dim,dim);
+
+    for ( int i = 0; i < dim; ++i)
+    {
+        for ( int j = 0; j < dim; ++j)
+        {
+            eigen_mat(i,j) = mat[i][j];
+        }
+    }
+
+    Eigen::MatrixXf eigen_mat_inv = eigen_mat.inverse();
+
+    for ( int i = 0; i < dim; ++i)
+    {
+        for ( int j = 0; j < dim; ++j)
+        {
+            mat[i][j] = eigen_mat_inv(i,j);
+        }
+    }
+
+//  int info;
+//  int *ipiv = MALLOC(dim,int);
+//  float *work;
+//  int   lwork;
+
+//  if (dim > LU_INVERT_REPORT_DIM)
+//    fprintf(stderr,"\t\tLU factorization...\n");
+//  sgetrf(&dim,&dim,mat[0],&dim,ipiv,&info);
+
+//  if (info != 0) {
+//    printf("dgetrf failed in lu_invert");
+//    FREE(ipiv);
+//    return NULL;
+//  }
+//  lwork = 64*dim;
+//  work  = MALLOC(lwork,float);
+//  if (dim > LU_INVERT_REPORT_DIM)
+//    fprintf(stderr,"\t\tCompute inverse...\n");
+//  sgetri(&dim,mat[0],&dim,ipiv,work,&lwork,&info);
+//  if (info != 0) {
+//    FREE(ipiv);
+//    FREE(work);
+//    printf("dgetri failed in lu_invert");
+//    return NULL;
+//  }
+//  FREE(ipiv);
+//  FREE(work);
+  return mat;
+}
+
+
+void mne_transpose_square(float **mat, int n)
+     /*
+      * In-place transpose of a square matrix
+      */
+{
+  int j,k;
+  float val;
+
+  for (j = 1; j < n; j++)
+    for (k = 0; k < j; k++) {
+      val = mat[j][k];
+      mat[j][k] = mat[k][j];
+      mat[k][j] = val;
+    }
+  return;
+}
 
 
 void mne_scale_vector (double scale,float *v,int   nn)
@@ -10843,8 +10927,22 @@ mneSourceSpace make_volume_source_space(mneSurface surf,
 }
 
 
-//============================= fwd_bem_model.c =============================
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//============================= fwd_bem_model.c =============================
 
 static struct {
   int  kind;
@@ -10961,6 +11059,648 @@ char *fwd_bem_explain_surface(int kind)
 
   return surf_expl[k].name;
 }
+
+
+
+
+
+
+
+//============================= fwd_bem_solution.c =============================
+
+float **fwd_bem_multi_solution (float **solids,    /* The solid-angle matrix */
+                                float **gamma,     /* The conductivity multipliers */
+                                int   nsurf,       /* Number of surfaces */
+                                int   *ntri)       /* Number of triangles or nodes on each surface */
+     /*
+      * Invert I - solids/(2*M_PI)
+      * Take deflation into account
+      * The matrix is destroyed after inversion
+      * This is the general multilayer case
+      */
+{
+  int j,k,p,q;
+  float defl;
+  float pi2 = 1.0/(2*M_PI);
+  float mult;
+  int   joff,koff,jup,kup,ntot;
+
+  for (j = 0,ntot = 0; j < nsurf; j++)
+    ntot += ntri[j];
+  defl = 1.0/ntot;
+  /*
+   * Modify the matrix
+   */
+  for (p = 0, joff = 0; p < nsurf; p++) {
+    jup = ntri[p] + joff;
+    for (q = 0, koff = 0; q < nsurf; q++) {
+      kup = ntri[q] + koff;
+      mult = (gamma == NULL) ? pi2 : pi2*gamma[p][q];
+      for (j = joff; j < jup; j++)
+        for (k = koff; k < kup; k++)
+          solids[j][k] = defl - solids[j][k]*mult;
+      koff = kup;
+    }
+    joff = jup;
+  }
+  for (k = 0; k < ntot; k++)
+    solids[k][k] = solids[k][k] + 1.0;
+
+  return (mne_lu_invert(solids,ntot));
+}
+
+
+
+float **fwd_bem_homog_solution (float **solids,int ntri)
+     /*
+      * Invert I - solids/(2*M_PI)
+      * Take deflation into account
+      * The matrix is destroyed after inversion
+      * This is the homogeneous model case
+      */
+{
+  return fwd_bem_multi_solution (solids,NULL,1,&ntri);
+}
+
+
+void fwd_bem_ip_modify_solution(float **solution,           /* The original solution */
+                                float **ip_solution,	    /* The isolated problem solution */
+                                float ip_mult,		    /* Conductivity ratio */
+                                int nsurf,		    /* Number of surfaces */
+                                int *ntri)		    /* Number of triangles (nodes) on each surface */
+     /*
+      * Modify the solution according to the IP approach
+      */
+{
+  int s;
+  int j,k,joff,koff,ntot,nlast;
+  float mult;
+  float *row = NULL;
+  float **sub = NULL;
+
+  for (s = 0, koff = 0; s < nsurf-1; s++)
+    koff = koff + ntri[s];
+  nlast = ntri[nsurf-1];
+  ntot  = koff + nlast;
+
+  row = MALLOC(nlast,float);
+  sub = MALLOC(ntot,float *);
+  mult = (1.0 + ip_mult)/ip_mult;
+
+  fprintf(stderr,"\t\tCombining...");
+#ifndef OLD
+  fprintf(stderr,"t ");
+  mne_transpose_square(ip_solution,nlast);
+#endif
+  for (s = 0, joff = 0; s < nsurf; s++) {
+    fprintf(stderr,"%d3 ",s+1);
+    /*
+     * Pick the correct submatrix
+     */
+    for (j = 0; j < ntri[s]; j++)
+      sub[j] = solution[j+joff]+koff;
+    /*
+     * Multiply
+     */
+#ifdef OLD
+    for (j = 0; j < ntri[s]; j++) {
+      for (k = 0; k < nlast; k++) {
+        res = mne_dot_vectors_skip_skip(sub[j],1,ip_solution[0]+k,nlast,nlast);
+        row[k] = sub[j][k] - 2.0*res;
+      }
+      for (k = 0; k < nlast; k++)
+        sub[j][k] = row[k];
+    }
+#else
+    for (j = 0; j < ntri[s]; j++) {
+      for (k = 0; k < nlast; k++)
+        row[k] = mne_dot_vectors(sub[j],ip_solution[k],nlast);
+      mne_add_scaled_vector_to(row,-2.0,sub[j],nlast);
+    }
+#endif
+    joff = joff+ntri[s];
+  }
+#ifndef OLD
+  fprintf(stderr,"t ");
+  mne_transpose_square(ip_solution,nlast);
+#endif
+  fprintf(stderr,"33 ");
+  /*
+   * The lower right corner is a special case
+   */
+  for (j = 0; j < nlast; j++)
+    for (k = 0; k < nlast; k++)
+      sub[j][k] = sub[j][k] + mult*ip_solution[j][k];
+  /*
+   * Final scaling
+   */
+  fprintf(stderr,"done.\n\t\tScaling...");
+  mne_scale_vector(ip_mult,solution[0],ntot*ntot);
+  fprintf(stderr,"done.\n");
+  FREE(row); FREE(sub);
+  return;
+}
+
+
+
+//============================= fwd_bem_linear_collocation.c =============================
+
+
+
+/*
+ * The following approach is based on:
+ *
+ * de Munck JC: "A linear discretization of the volume conductor boundary integral equation using analytically integrated elements",
+ * IEEE Trans Biomed Eng. 1992 39(9) : 986 - 990
+ *
+ */
+
+static double calc_beta (double *rk,double *rk1)
+
+{
+  double rkk1[3];
+  double size;
+  double res;
+
+  VEC_DIFF (rk,rk1,rkk1);
+  size = VEC_LEN(rkk1);
+
+  res = log((VEC_LEN(rk)*size + VEC_DOT(rk,rkk1))/
+            (VEC_LEN(rk1)*size + VEC_DOT(rk1,rkk1)))/size;
+  return (res);
+}
+
+static void lin_pot_coeff (float  *from,	/* Origin */
+                           mneTriangle to,	/* The destination triangle */
+                           double omega[3])	/* The final result */
+     /*
+      * The linear potential matrix element computations
+      */
+{
+  double y1[3],y2[3],y3[3];	/* Corners with origin at from */
+  double *y[5];
+  double **yy;
+  double l1,l2,l3;		/* Lengths of y1, y2, and y3 */
+  double solid;			/* The standard solid angle */
+  double vec_omega[3];		/* The cross-product integral */
+  double cross[3];		/* y1 x y2 */
+  double triple;		/* VEC_DOT(y1 x y2,y3) */
+  double ss;
+  double beta[3],bbeta[3];
+  int   j,k;
+  double z[3];
+  double n2,area2;
+  double diff[3];
+  static const double solid_eps = 4.0*M_PI/1.0E6;
+  /*
+   * This circularity makes things easy for us...
+   */
+  y[0] = y3;
+  y[1] = y1;
+  y[2] = y2;
+  y[3] = y3;
+  y[4] = y1;
+  yy = y + 1;			/* yy can have index -1! */
+  /*
+   * The standard solid angle computation
+   */
+  VEC_DIFF (from,to->r1,y1);
+  VEC_DIFF (from,to->r2,y2);
+  VEC_DIFF (from,to->r3,y3);
+
+  CROSS_PRODUCT(y1,y2,cross);
+  triple = VEC_DOT(cross,y3);
+
+  l1 = VEC_LEN(y1);
+  l2 = VEC_LEN(y2);
+  l3 = VEC_LEN(y3);
+  ss = (l1*l2*l3+VEC_DOT(y1,y2)*l3+VEC_DOT(y1,y3)*l2+VEC_DOT(y2,y3)*l1);
+  solid  = 2.0*atan2(triple,ss);
+  if (fabs(solid) < solid_eps) {
+    for (k = 0; k < 3; k++)
+      omega[k] = 0.0;
+  }
+  else {
+    /*
+     * Calculate the magic vector vec_omega
+     */
+    for (j = 0; j < 3; j++)
+      beta[j] = calc_beta(yy[j],yy[j+1]);
+    bbeta[0] = beta[2] - beta[0];
+    bbeta[1] = beta[0] - beta[1];
+    bbeta[2] = beta[1] - beta[2];
+
+    for (j = 0; j < 3; j++)
+      vec_omega[j] = 0.0;
+    for (j = 0; j < 3; j++)
+      for (k = 0; k < 3; k++)
+        vec_omega[k] = vec_omega[k] + bbeta[j]*yy[j][k];
+    /*
+     * Put it all together...
+     */
+    area2 = 2.0*to->area;
+    n2 = 1.0/(area2*area2);
+    for (k = 0; k < 3; k++) {
+      CROSS_PRODUCT (yy[k+1],yy[k-1],z);
+      VEC_DIFF (yy[k+1],yy[k-1],diff);
+      omega[k] = n2*(-area2*VEC_DOT(z,to->nn)*solid +
+                     triple*VEC_DOT(diff,vec_omega));
+    }
+  }
+#ifdef CHECK
+  /*
+   * Check it out!
+   *
+   * omega1 + omega2 + omega3 = solid
+   */
+  rel1 = (solid + omega[X]+omega[Y]+omega[Z])/solid;
+  /*
+   * The other way of evaluating...
+   */
+  for (j = 0; j < 3; j++)
+    check[j] = 0;
+  for (k = 0; k < 3; k++) {
+    CROSS_PRODUCT (to->nn[to],yy[k],z);
+    for (j = 0; j < 3; j++)
+      check[j] = check[j] + omega[k]*z[j];
+  }
+  for (j = 0; j < 3; j++)
+    check[j] = -area2*check[j]/triple;
+  fprintf (stderr,"(%g,%g,%g) =? (%g,%g,%g)\n",
+           check[X],check[Y],check[Z],
+           vec_omega[X],vec_omega[Y],vec_omega[Z]);
+  for (j = 0; j < 3; j++)
+    check[j] = check[j] - vec_omega[j];
+  rel2 = sqrt(VEC_DOT(check,check)/VEC_DOT(vec_omega,vec_omega));
+  fprintf (stderr,"err1 = %g, err2 = %g\n",100*rel1,100*rel2);
+#endif
+  return;
+}
+
+
+
+static void correct_auto_elements (mneSurface surf,
+                                   float      **mat)
+     /*
+      * Improve auto-element approximation...
+      */
+{
+  float *row;
+  float sum,miss;
+  int   nnode = surf->np;
+  int   ntri  = surf->ntri;
+  int   nmemb;
+  int   j,k;
+  float pi2 = 2.0*M_PI;
+  mneTriangle   tri;
+
+#ifdef SIMPLE
+  for (j = 0; j < nnode; j++) {
+    row = mat[j];
+    sum = 0.0;
+    for (k = 0; k < nnode; k++)
+      sum = sum + row[k];
+    fprintf (stderr,"row %d sum = %g missing = %g\n",j+1,sum/pi2,
+             1.0-sum/pi2);
+    row[j] = pi2 - sum;
+  }
+#else
+  for (j = 0; j < nnode; j++) {
+    /*
+     * How much is missing?
+     */
+    row = mat[j];
+    sum = 0.0;
+    for (k = 0; k < nnode; k++)
+      sum = sum + row[k];
+    miss  = pi2-sum;
+    nmemb = surf->nneighbor_tri[j];
+    /*
+     * The node itself receives one half
+     */
+    row[j] = miss/2.0;
+    /*
+     * The rest is divided evenly among the member nodes...
+     */
+    miss = miss/(4.0*nmemb);
+    for (k = 0,tri = surf->tris; k < ntri; k++,tri++) {
+      if (tri->vert[0] == j) {
+        row[tri->vert[1]] = row[tri->vert[1]] + miss;
+        row[tri->vert[2]] = row[tri->vert[2]] + miss;
+      }
+      else if (tri->vert[1] == j) {
+        row[tri->vert[0]] = row[tri->vert[0]] + miss;
+        row[tri->vert[2]] = row[tri->vert[2]] + miss;
+      }
+      else if (tri->vert[2] == j) {
+        row[tri->vert[0]] = row[tri->vert[0]] + miss;
+        row[tri->vert[1]] = row[tri->vert[1]] + miss;
+      }
+    }
+    /*
+     * Just check it it out...
+     *
+    for (k = 0, sum = 0; k < nnode; k++)
+      sum = sum + row[k];
+    fprintf (stderr,"row %d sum = %g\n",j+1,sum/pi2);
+    */
+  }
+#endif
+  return;
+}
+
+
+static float **fwd_bem_lin_pot_coeff (mneSurface *surfs,int nsurf)
+     /*
+      * Calculate the coefficients for linear collocation approach
+      */
+{
+  float **mat = NULL;
+  float **sub_mat = NULL;
+  int   np1,np2,ntri,np_tot,np_max;
+  float **nodes;
+  mneTriangle   tri;
+  double omega[3];
+  double *row = NULL;
+  int    j,k,p,q,c;
+  int    joff,koff;
+  mneSurface surf1,surf2;
+
+  for (p = 0, np_tot = np_max = 0; p < nsurf; p++) {
+    np_tot += surfs[p]->np;
+    if (surfs[p]->np > np_max)
+      np_max = surfs[p]->np;
+  }
+
+  mat = ALLOC_CMATRIX(np_tot,np_tot);
+  for (j = 0; j < np_tot; j++)
+    for (k = 0; k < np_tot; k++)
+      mat[j][k] = 0.0;
+  row        = MALLOC(np_max,double);
+  sub_mat = MALLOC(np_max,float *);
+  for (p = 0, joff = 0; p < nsurf; p++, joff = joff + np1) {
+    surf1 = surfs[p];
+    np1   = surf1->np;
+    nodes = surf1->rr;
+    for (q = 0, koff = 0; q < nsurf; q++, koff = koff + np2) {
+      surf2 = surfs[q];
+      np2   = surf2->np;
+      ntri  = surf2->ntri;
+
+      fprintf(stderr,"\t\t%s (%d) -> %s (%d) ... ",
+              fwd_bem_explain_surface(surf1->id),np1,
+              fwd_bem_explain_surface(surf2->id),np2);
+
+      for (j = 0; j < np1; j++) {
+        for (k = 0; k < np2; k++)
+          row[k] = 0.0;
+        for (k = 0, tri = surf2->tris; k < ntri; k++,tri++) {
+          /*
+           * No contribution from a triangle that
+           * this vertex belongs to
+           */
+          if (p == q && (tri->vert[0] == j || tri->vert[1] == j || tri->vert[2] == j))
+            continue;
+          /*
+           * Otherwise do the hard job
+           */
+          lin_pot_coeff (nodes[j],tri,omega);
+          for (c = 0; c < 3; c++)
+            row[tri->vert[c]] = row[tri->vert[c]] - omega[c];
+        }
+        for (k = 0; k < np2; k++)
+          mat[j+joff][k+koff] = row[k];
+      }
+      if (p == q) {
+        for (j = 0; j < np1; j++)
+          sub_mat[j] = mat[j+joff]+koff;
+        correct_auto_elements (surf1,sub_mat);
+      }
+      fprintf(stderr,"[done]\n");
+    }
+  }
+  FREE(row);
+  FREE(sub_mat);
+  return(mat);
+}
+
+
+int fwd_bem_linear_collocation_solution(fwdBemModel m)
+/*
+ * Compute the linear collocation potential solution
+ */
+{
+  float **coeff = NULL;
+  float ip_mult;
+  int k;
+
+  fwd_bem_free_solution(m);
+
+  fprintf(stderr,"\nComputing the linear collocation solution...\n");
+  fprintf (stderr,"\tMatrix coefficients...\n");
+  if ((coeff = fwd_bem_lin_pot_coeff (m->surfs,m->nsurf)) == NULL)
+    goto bad;
+
+  for (k = 0, m->nsol = 0; k < m->nsurf; k++)
+    m->nsol += m->surfs[k]->np;
+
+  fprintf (stderr,"\tInverting the coefficient matrix...\n");
+  if ((m->solution = fwd_bem_multi_solution (coeff,m->gamma,m->nsurf,m->np)) == NULL)
+    goto bad;
+
+  /*
+   * IP approach?
+   */
+  if ((m->nsurf == 3) &&
+      (ip_mult = m->sigma[m->nsurf-2]/m->sigma[m->nsurf-1]) <= m->ip_approach_limit) {
+    float **ip_solution = NULL;
+
+    fprintf (stderr,"IP approach required...\n");
+
+    fprintf (stderr,"\tMatrix coefficients (homog)...\n");
+    if ((coeff = fwd_bem_lin_pot_coeff (m->surfs+m->nsurf-1,1)) == NULL)
+      goto bad;
+
+    fprintf (stderr,"\tInverting the coefficient matrix (homog)...\n");
+    if ((ip_solution = fwd_bem_homog_solution (coeff,m->surfs[m->nsurf-1]->np)) == NULL)
+      goto bad;
+
+    fprintf (stderr,"\tModify the original solution to incorporate IP approach...\n");
+
+    fwd_bem_ip_modify_solution(m->solution,ip_solution,ip_mult,m->nsurf,m->np);
+    FREE_CMATRIX(ip_solution);
+
+  }
+  m->bem_method = FWD_BEM_LINEAR_COLL;
+  fprintf(stderr,"Solution ready.\n");
+  return OK;
+
+ bad : {
+    fwd_bem_free_solution(m);
+    FREE_CMATRIX(coeff);
+    return FAIL;
+  }
+}
+
+
+
+
+//============================= fwd_bem_constant_collocation.c =============================
+
+
+static int fwd_bem_check_solids (float **angles,int ntri1,int ntri2, float desired)
+/*
+ * Check the angle computations
+ */
+{
+  float *sums = MALLOC(ntri1,float);
+  float sum;
+  int j,k;
+  int res = 0;
+
+  for (j = 0; j < ntri1; j++) {
+    sum = 0;
+    for (k = 0; k < ntri2; k++)
+      sum = sum + angles[j][k];
+    sums[j] = sum/(2*M_PI);
+  }
+  for (j = 0; j < ntri1; j++)
+    /*
+     * Three cases:
+     * same surface: sum = 2*pi
+     * to outer:     sum = 4*pi
+     * to inner:     sum = 0*pi;
+     */
+    if (fabs(sums[j]-desired) > 1e-4) {
+      printf("solid angle matrix: rowsum[%d] = 2PI*%g",
+                           j+1,sums[j]);
+      res = -1;
+      break;
+    }
+  FREE(sums);
+  return res;
+}
+
+
+static float **fwd_bem_solid_angles (mneSurface *surfs, int nsurf)
+     /*
+      * Compute the solid angle matrix
+      */
+{
+  mneSurface surf1,surf2;
+  mneTriangle tri;
+  int ntri1,ntri2,ntri_tot;
+  int j,k,p,q;
+  int joff,koff;
+  float **solids;
+  float result;
+  float **sub_solids = NULL;
+  float desired;
+
+  for (p = 0,ntri_tot = 0; p < nsurf; p++)
+    ntri_tot += surfs[p]->ntri;
+
+  sub_solids = MALLOC(ntri_tot,float *);
+  solids = ALLOC_CMATRIX(ntri_tot,ntri_tot);
+  for (p = 0, joff = 0; p < nsurf; p++, joff = joff + ntri1) {
+    surf1 = surfs[p];
+    ntri1 = surf1->ntri;
+    for (q = 0, koff = 0; q < nsurf; q++, koff = koff + ntri2) {
+      surf2 = surfs[q];
+      ntri2 = surf2->ntri;
+      fprintf(stderr,"\t\t%s (%d) -> %s (%d) ... ",fwd_bem_explain_surface(surf1->id),ntri1,fwd_bem_explain_surface(surf2->id),ntri2);
+      for (j = 0; j < ntri1; j++)
+        for (k = 0, tri = surf2->tris; k < ntri2; k++, tri++) {
+          if (p == q && j == k)
+            result = 0.0;
+          else
+            result = solid_angle (surf1->tris[j].cent,tri);
+          solids[j+joff][k+koff] = result;
+        }
+      for (j = 0; j < ntri1; j++)
+        sub_solids[j] = solids[j+joff]+koff;
+      fprintf(stderr,"[done]\n");
+      if (p == q)
+        desired = 1;
+      else if (p < q)
+        desired = 0;
+      else
+        desired = 2;
+      if (fwd_bem_check_solids(sub_solids,ntri1,ntri2,desired) == FAIL) {
+        FREE_CMATRIX(solids);
+        FREE(sub_solids);
+        return NULL;
+      }
+    }
+  }
+  FREE(sub_solids);
+  return (solids);
+}
+
+
+
+int fwd_bem_constant_collocation_solution(fwdBemModel m)
+/*
+ * Compute the solution for the constant collocation approach
+ */
+{
+  float  **solids = NULL;
+  int    k;
+  float  ip_mult;
+
+  fwd_bem_free_solution(m);
+
+  fprintf(stderr,"\nComputing the constant collocation solution...\n");
+  fprintf(stderr,"\tSolid angles...\n");
+  if ((solids = fwd_bem_solid_angles(m->surfs,m->nsurf)) == NULL)
+    goto bad;
+
+  for (k = 0, m->nsol = 0; k < m->nsurf; k++)
+    m->nsol += m->surfs[k]->ntri;
+
+  fprintf (stderr,"\tInverting the coefficient matrix...\n");
+  if ((m->solution = fwd_bem_multi_solution (solids,m->gamma,m->nsurf,m->ntri)) == NULL)
+    goto bad;
+  /*
+   * IP approach?
+   */
+  if ((m->nsurf == 3) &&
+      (ip_mult = m->sigma[m->nsurf-2]/m->sigma[m->nsurf-1]) <= m->ip_approach_limit) {
+    float **ip_solution = NULL;
+
+    fprintf (stderr,"IP approach required...\n");
+
+    fprintf (stderr,"\tSolid angles (homog)...\n");
+    if ((solids = fwd_bem_solid_angles (m->surfs+m->nsurf-1,1)) == NULL)
+      goto bad;
+
+    fprintf (stderr,"\tInverting the coefficient matrix (homog)...\n");
+    if ((ip_solution = fwd_bem_homog_solution (solids,m->surfs[m->nsurf-1]->ntri)) == NULL)
+      goto bad;
+
+    fprintf (stderr,"\tModify the original solution to incorporate IP approach...\n");
+    fwd_bem_ip_modify_solution(m->solution,ip_solution,ip_mult,m->nsurf,m->ntri);
+    FREE_CMATRIX(ip_solution);
+  }
+  m->bem_method = FWD_BEM_CONSTANT_COLL;
+  fprintf (stderr,"Solution ready.\n");
+
+  return OK;
+
+ bad : {
+    fwd_bem_free_solution(m);
+    FREE_CMATRIX(solids);
+    return FAIL;
+  }
+}
+
+
+
+
+
+
+//============================= fwd_bem_model.c =============================
+
 
 char *fwd_bem_explain_method(int method)
 
@@ -11223,8 +11963,6 @@ int fwd_bem_load_solution(char *name, int bem_method, fwdBemModel m)
   }
 }
 
-extern int fwd_bem_linear_collocation_solution(fwdBemModel m);
-extern int fwd_bem_constant_collocation_solution(fwdBemModel m);
 
 int fwd_bem_compute_solution(fwdBemModel m,
                              int         bem_method)
@@ -11375,6 +12113,9 @@ char *fwd_bem_make_bem_sol_name(char *name)
   FREE(s1);
   return s2;
 }
+
+
+
 
 
 //============================= simplex_minimize.c =============================
@@ -11531,852 +12272,6 @@ int simplex_minimize(float **p,		                              /* The initial si
 
 
 
-//============================= fwd_fit_berg_scherg.c =============================
-
-
-static double dot_dvectors (double *v1,
-                            double *v2,
-                            int   nn)
-{
-  double result = 0.0;
-  int   k;
-
-  for (k = 0; k < nn; k++)
-    result = result + v1[k]*v2[k];
-  return (result);
-}
-
-static int c_dsvd(double **mat,		/* The matrix */
-                  int   m,int n,	/* m rows n columns */
-                  double *sing,	        /* Singular values (must have size
-                                         * MIN(m,n)+1 */
-                  double **uu,		/* Left eigenvectors */
-                  double **vv)		/* Right eigenvectors */
-     /*
-      * Compute the SVD of mat.
-      * The singular vector calculations depend on whether
-      * or not u and v are given.
-      * The allocations should be done as follows
-      *
-      * mat = ALLOC_DCMATRIX(m,n);
-      * vv  = ALLOC_DCMATRIX(MIN(m,n),n);
-      * uu  = ALLOC_DCMATRIX(MIN(m,n),m);
-      * sing = MALLOC(MIN(m,n),double);
-      *
-      * mat is modified by this operation
-      *
-      * This simply allocates the workspace and calls the
-      * LAPACK Fortran routine
-      */
-{
-  static int lwork = 0;
-  static double *work = NULL;
-  int    nlwork;
-  double **uutemp = NULL;
-  int    udim = MIN(m,n);
-  int    info;
-  char   *jobu;
-  char   *jobvt;
-  int    j,k;
-  double dum[1];
-  double *vvp,*uup;
-
-  nlwork = MAX(3*MIN(m,n)+MAX(m,n),5*MIN(m,n)-4);
-  if (nlwork > lwork) {
-    lwork = nlwork;
-    work = REALLOC(work,lwork,double);
-  }
-  /*
-   * Do SVD
-   */
-  if (vv == NULL) {
-    jobu = "N";
-    vvp  = dum;
-  }
-  else {
-    jobu = "S";
-    vvp  = vv[0];
-  }
-  if (uu == NULL) {
-    jobvt = "N";
-    uup   = dum;
-  }
-  else {
-    jobvt = "S";
-    uutemp = ALLOC_DCMATRIX(m,udim);
-    uup = uutemp[0];
-  }
-  dgesvd(jobu,jobvt,&n,&m,mat[0],&n,sing,
-         vvp,&n,uup,&udim,
-         work,&lwork,&info);
-  if (info == 0 && uu != NULL) {
-    /*
-     * Transpose U to get rid of the
-     * LAPACK convention.
-     */
-    for (j = 0; j < udim; j++)
-      for (k = 0; k < m; k++)
-        uu[j][k] = uutemp[k][j];
-  }
-  FREE_DCMATRIX(uutemp);
-  return info;
-}
-
-/*
- * Include the simplex and SVD code here.
- * It is not too much of a problem
- */
-#define ALPHA 1.0
-#define BETA 0.5
-#define GAMMA 2.0
-
-static double tryit (double **p,
-                     double *y,
-                     double *psum,
-                     int ndim,
-                     double (*func)(double *,int,void *),
-                     void   *user_data,
-                     int ihi,
-                     int *neval,
-                     double fac)
-
-{
-  int j;
-  double fac1,fac2,ytry,*ptry;
-
-  ptry = MALLOC(ndim,double);
-  fac1 = (1.0-fac)/ndim;
-  fac2 = fac1-fac;
-  for (j = 0; j < ndim; j++)
-    ptry[j] = psum[j]*fac1-p[ihi][j]*fac2;
-  ytry = (*func)(ptry,ndim,user_data);
-  ++(*neval);
-  if (ytry < y[ihi]) {
-    y[ihi] = ytry;
-    for (j = 0; j < ndim; j++) {
-      psum[j] +=  ptry[j]-p[ihi][j];
-      p[ihi][j] = ptry[j];
-    }
-  }
-  FREE(ptry);
-  return ytry;
-}
-
-
-/*
- * This is the beginning of the specific code
- */
-typedef struct {
-  double *y;
-  double *resi;
-  double **M;
-  double **uu;
-  double **vv;
-  double *sing;
-  double *fn;
-  double *w;
-  int    nfit;
-  int    nterms;
-} *fitUser,fitUserRec;
-
-
-typedef struct {
-  double lambda;		/* Magnitude for the apparent dipole */
-  double mu;			/* Distance multiplier for the apparent dipole */
-} *bergSchergPar,bergSchergParRec;
-
-
-static int comp_pars(const void *p1,const void *p2)
-     /*
-      * Comparison function for sorting layers
-      */
-{
-  bergSchergPar v1 = (bergSchergPar)p1;
-  bergSchergPar v2 = (bergSchergPar)p2;
-
-  if (v1->mu > v2->mu)
-    return -1;
-  else if (v1->mu < v2->mu)
-    return 1;
-  else
-    return 0;
-}
-
-static void sort_parameters(double *mu,double *lambda,int nfit)
-     /*
-      * Sort the parameters so that largest mu comes first
-      */
-{
-  int k;
-  bergSchergPar pars = MALLOC(nfit,bergSchergParRec);
-
-  for (k = 0; k < nfit; k++) {
-    pars[k].mu = mu[k];
-    pars[k].lambda = lambda[k];
-  }
-  qsort (pars, nfit, sizeof(bergSchergParRec), comp_pars);
-  for (k = 0; k < nfit; k++) {
-    mu[k]     = pars[k].mu;
-    lambda[k] = pars[k].lambda;
-  }
-  return;
-}
-
-
-
-static int report_fit(int    loop,
-                      double  *mu,
-                      int    nfit,
-                      double Smin)
-     /*
-      * Report our progress
-      */
-{
-#ifdef LOG_FIT
-  int k;
-  for (k = 0; k < nfit; k++)
-    fprintf(stderr,"%g ",mu[k]);
-  fprintf(stderr,"%g\n",Smin);
-#endif
-  return 0;
-}
-
-
-static double **get_initial_simplex(double  *pars,
-                                    int    npar,
-                                    double simplex_size)
-
-{
-  double **simplex = ALLOC_DCMATRIX(npar+1,npar);
-  int k;
-
-  for (k = 0; k < npar+1; k++)
-    memcpy (simplex[k],pars,npar*sizeof(double));
-  for (k = 1; k < npar+1; k++)
-    simplex[k][k-1] = simplex[k][k-1] + simplex_size;
-  return (simplex);
-}
-
-
-static fitUser new_fit_user(int nfit, int nterms)
-
-{
-  fitUser u = MALLOC(1,fitUserRec);
-  u->y      = MALLOC(nterms-1,double);
-  u->resi   = MALLOC(nterms-1,double);
-  u->M      = ALLOC_DCMATRIX(nterms-1,nfit-1);
-  u->uu     = ALLOC_DCMATRIX(nfit-1,nterms-1);
-  u->vv     = ALLOC_DCMATRIX(nfit-1,nfit-1);
-  u->sing   = MALLOC(nfit,double);
-  u->fn     = MALLOC(nterms,double);
-  u->w      = MALLOC(nterms,double);
-  u->nfit   = nfit;
-  u->nterms = nterms;
-  return u;
-}
-
-static void compose_linear_fitting_data(double *mu,fitUser u)
-
-{
-  double mu1n,k1;
-  int k,p;
-  /*
-   * y is the data to be fitted (nterms-1 x 1)
-   * M is the model matrix      (nterms-1 x nfit-1)
-   */
-  for (k = 0; k < u->nterms-1; k++) {
-    k1 = k + 1;
-    mu1n = pow(mu[0],k1);
-    u->y[k] = u->w[k]*(u->fn[k+1] - mu1n*u->fn[0]);
-    for (p = 0; p < u->nfit-1; p++)
-      u->M[k][p] = u->w[k]*(pow(mu[p+1],k1)-mu1n);
-  }
-}
-
-static double compute_linear_parameters(double *mu,
-                                        double *lambda,
-                                        fitUser u)
-     /*
-      * Compute the best-fitting linear parameters
-      * Return the corresponding RV
-      */
-{
-  int k,p,q;
-  double *vec = MALLOC(u->nfit-1,double);
-  double sum;
-
-  compose_linear_fitting_data(mu,u);
-  c_dsvd(u->M,u->nterms-1,u->nfit-1,u->sing,u->uu,u->vv);
-  /*
-   * Compute the residuals
-   */
-  for (k = 0; k < u->nterms-1; k++)
-    u->resi[k] = u->y[k];
-
-  for (p = 0; p < u->nfit-1; p++) {
-    vec[p] = dot_dvectors(u->uu[p],u->y,u->nterms-1);
-    for (k = 0; k < u->nterms-1; k++)
-      u->resi[k] = u->resi[k] - u->uu[p][k]*vec[p];
-    vec[p] = vec[p]/u->sing[p];
-  }
-
-  for (p = 0; p < u->nfit-1; p++) {
-    for (q = 0, sum = 0.0; q < u->nfit-1; q++)
-      sum += u->vv[q][p]*vec[q];
-    lambda[p+1] = sum;
-  }
-  for (p = 1, sum = 0.0; p < u->nfit; p++)
-    sum += lambda[p];
-  lambda[0] = u->fn[0] - sum;
-  FREE(vec);
-  return dot_dvectors(u->resi,u->resi,u->nterms-1)/dot_dvectors(u->y,u->y,u->nterms-1);
-}
-
-static double one_step (double *mu, int nfit, void *user_data)
-     /*
-      * Evaluate the residual sum of squares fit for one set of
-      * mu values
-      */
-{
-  int k,p;
-  double  dot;
-  fitUser u = (fitUser)user_data;
-
-  for (k = 0; k < u->nfit; k++) {
-    if (fabs(mu[k]) > 1.0)
-      return 1.0;
-  }
-  /*
-   * Compose the data for the linear fitting
-   */
-  compose_linear_fitting_data(mu,u);
-  /*
-   * Compute SVD
-   */
-  c_dsvd(u->M,u->nterms-1,u->nfit-1,u->sing,u->uu,NULL);
-  /*
-   * Compute the residuals
-   */
-  for (k = 0; k < u->nterms-1; k++)
-    u->resi[k] = u->y[k];
-  for (p = 0; p < u->nfit-1; p++) {
-    dot = dot_dvectors(u->uu[p],u->y,u->nterms-1);
-    for (k = 0; k < u->nterms-1; k++)
-      u->resi[k] = u->resi[k] - u->uu[p][k]*dot;
-  }
-  /*
-   * Return their sum of squares
-   */
-  return dot_dvectors(u->resi,u->resi,u->nterms-1);
-}
-
-
-int fwd_eeg_fit_berg_scherg(fwdEegSphereModel m,       /* Conductor model definition */
-                            int   nterms,              /* Number of terms to use in the series expansion
-                                                        * when fitting the parameters */
-                            int   nfit,	               /* Number of equivalent dipoles to fit */
-                            float *rv)
-     /*
-      * This routine fits the Berg-Scherg equivalent spherical model
-      * dipole parameters by minimizing the difference between the
-      * actual and approximative series expansions
-      */
-{
-  int   res = FAIL;
-  int   k;
-  double rd,R,f;
-  double simplex_size = 0.01;
-  double **simplex = NULL;
-  double *func_val = NULL;
-  double ftol = 1e-9;
-  double *lambda = NULL;
-  double *mu     = NULL;
-  int   neval;
-  int   max_eval = 1000;
-  int   report   = 1;
-  fitUser u = new_fit_user(nfit,nterms);
-
-  if (nfit < 2) {
-    printf("fwd_fit_berg_scherg does not work with less than two equivalent sources.");
-    return FAIL;
-  }
-  /*
-   * (1) Calculate the coefficients of the true expansion
-   */
-  for (k = 0; k < nterms; k++)
-    u->fn[k] = fwd_eeg_get_multi_sphere_model_coeff(m,k+1);
-  /*
-   * (2) Calculate the weighting
-   */
-  rd = R = m->layers[0].rad;
-  for (k = 1; k < m->nlayer; k++) {
-    if (m->layers[k].rad > R)
-      R = m->layers[k].rad;
-    if (m->layers[k].rad < rd)
-      rd = m->layers[k].rad;
-  }
-  f = rd/R;
-#ifdef ZHANG
-  /*
-   * This is the Zhang weighting
-   */
-  for (k = 1; k < nterms; k++)
-    u->w[k-1] = pow(f,k);
-#else
-  /*
-   * This is the correct weighting
-   */
-  for (k = 1; k < nterms; k++)
-    u->w[k-1] = sqrt((2.0*k+1)*(3.0*k+1.0)/k)*pow(f,(k-1.0));
-#endif
-  /*
-   * (3) Prepare for simplex minimization
-   */
-  func_val = MALLOC(nfit+1,double);
-  lambda   = MALLOC(nfit,double);
-  mu       = MALLOC(nfit,double);
-  /*
-   * (4) Rather arbitrary initial guess
-   */
-  for (k = 0; k < nfit; k++) {
-    /*
-    mu[k] = (k+1)*0.1*f;
-    */
-    mu[k] = drand48()*f;
-  }
-
-  simplex = get_initial_simplex(mu,nfit,simplex_size);
-  for (k = 0; k < nfit+1; k++)
-    func_val[k] = one_step(simplex[k],u->nfit,u);
-  /*
-   * (5) Do the nonlinear minimization
-   */
-  if ((res = simplex_minimize(simplex,func_val,nfit,
-                              ftol,one_step,
-                              u,
-                              max_eval,&neval,
-                              report,report_fit)) != OK)
-    goto out;
-  for (k = 0; k < nfit; k++)
-    mu[k] = simplex[0][k];
-  /*
-   * (6) Do the final step: calculation of the linear parameters
-   */
-  *rv = compute_linear_parameters(mu,lambda,u);
-  sort_parameters(mu,lambda,nfit);
-#ifdef LOG_FIT
-  fprintf(stderr,"RV = %g %%\n",100*(*rv));
-#endif
-  m->mu     = REALLOC(m->mu,nfit,float);
-  m->lambda = REALLOC(m->lambda,nfit,float);
-  m->nfit   = nfit;
-  for (k = 0; k < nfit; k++) {
-    m->mu[k] = mu[k];
-    /*
-     * This division takes into account the actual conductivities
-     */
-    m->lambda[k] = lambda[k]/m->layers[m->nlayer-1].sigma;
-#ifdef LOG_FIT
-    fprintf(stderr,"lambda%d = %g\tmu%d = %g\n",k+1,lambda[k],k+1,mu[k]);
-#endif
-  }
-  /*
-   * This is the cleanup code
-   */
- out : {
-    FREE_DCMATRIX(simplex);
-    if (u) {
-      FREE(u->fn);
-      FREE_DCMATRIX(u->M);
-      FREE_DCMATRIX(u->uu);
-      FREE_DCMATRIX(u->vv);
-      FREE(u->y);
-      FREE(u->w);
-      FREE(u->resi);
-      FREE(u->sing);
-    }
-    FREE(func_val);
-    FREE(lambda);
-    FREE(mu);
-    return res;
-  }
-}
-
-
-
-
-
-//============================= fwd_eeg_sphere_models.c =============================
-
-/*
- * Basic routines for EEG sphere model bookkeeping
- */
-static fwdEegSphereModel fwd_new_eeg_sphere_model()
-
-{
-  fwdEegSphereModel m = MALLOC(1,fwdEegSphereModelRec);
-
-  m->name    = NULL;
-  m->nlayer  = 0;
-  m->layers  = NULL;
-  m->fn      = NULL;
-  m->nterms  = 0;
-  m->r0[0]   = 0.0;
-  m->r0[1]   = 0.0;
-  m->r0[2]   = 0.0;
-  m->lambda  = NULL;
-  m->mu      = NULL;
-  m->nfit    = 0;
-  m->scale_pos = 0;
-  return m;
-}
-
-
-void fwd_free_eeg_sphere_model(fwdEegSphereModel m)
-
-{
-  if (!m)
-    return;
-  FREE(m->name);
-  FREE(m->layers);
-  FREE(m->fn);
-  FREE(m->mu);
-  FREE(m->lambda);
-  FREE(m);
-  return;
-}
-
-
-
-
-fwdEegSphereModel fwd_dup_eeg_sphere_model(fwdEegSphereModel m)
-
-{
-  fwdEegSphereModel dup;
-  int k;
-
-  if (!m)
-    return NULL;
-
-  dup = fwd_new_eeg_sphere_model();
-
-  if (m->name)
-    dup->name = mne_strdup(m->name);
-  if (m->nlayer > 0) {
-    dup->layers = MALLOC(m->nlayer,fwdEegSphereLayerRec);
-    dup->nlayer = m->nlayer;
-    for (k = 0; k < m->nlayer; k++)
-      dup->layers[k] = m->layers[k];
-  }
-  VEC_COPY(dup->r0,m->r0);
-  if (m->nterms > 0) {
-    dup->fn = MALLOC(m->nterms,double);
-    dup->nterms = m->nterms;
-    for (k = 0; k < m->nterms; k++)
-      dup->fn[k] = m->fn[k];
-  }
-  if (m->nfit > 0) {
-    dup->mu     = MALLOC(m->nfit,float);
-    dup->lambda = MALLOC(m->nfit,float);
-    dup->nfit   = m->nfit;
-    for (k = 0; k < m->nfit; k++) {
-      dup->mu[k] = m->mu[k];
-      dup->lambda[k] = m->lambda[k];
-    }
-  }
-  dup->scale_pos = m->scale_pos;
-  return dup;
-}
-
-
-
-static int comp_layers(const void *p1,const void *p2)
-     /*
-      * Comparison function for sorting layers
-      */
-{
-  fwdEegSphereLayer v1 = (fwdEegSphereLayer)p1;
-  fwdEegSphereLayer v2 = (fwdEegSphereLayer)p2;
-
-  if (v1->rad > v2->rad)
-    return 1;
-  else if (v1->rad < v2->rad)
-    return -1;
-  else
-    return 0;
-}
-
-
-
-static fwdEegSphereModel fwd_create_eeg_sphere_model(char *name,
-                                                     int nlayer,
-                                                     const float *rads,
-                                                     const float *sigmas)
-     /*
-      * Produce a new sphere model structure
-      */
-{
-  fwdEegSphereModel new_model = fwd_new_eeg_sphere_model();
-  int            k;
-  fwdEegSphereLayer layers;
-  float          R,rR;
-
-  new_model->name   = mne_strdup(name);
-  new_model->nlayer = nlayer;
-  new_model->layers = layers = MALLOC(nlayer,fwdEegSphereLayerRec);
-
-  for (k = 0; k < nlayer; k++) {
-    layers[k].rad    = layers[k].rel_rad = rads[k];
-    layers[k].sigma  = sigmas[k];
-  }
-  /*
-   * Sort...
-   */
-  qsort (layers, nlayer, sizeof(fwdEegSphereLayerRec), comp_layers);
-  /*
-   * Scale the radiuses
-   */
-  R  = layers[nlayer-1].rad;
-  rR = layers[nlayer-1].rel_rad;
-  for (k = 0; k < nlayer; k++) {
-    layers[k].rad     = layers[k].rad/R;
-    layers[k].rel_rad = layers[k].rel_rad/rR;
-  }
-  return new_model;
-}
-
-
-
-static fwdEegSphereModelSet fwd_new_eeg_sphere_model_set()
-
-{
-  fwdEegSphereModelSet s = MALLOC(1,fwdEegSphereModelSetRec);
-
-  s->models  = NULL;
-  s->nmodel  = 0;
-  return s;
-}
-
-void fwd_free_eeg_sphere_model_set(fwdEegSphereModelSet s)
-
-{
-  int k;
-  if (!s)
-    return;
-  for (k = 0; k < s->nmodel; k++)
-    fwd_free_eeg_sphere_model(s->models[k]);
-  FREE(s->models);
-  FREE(s);
-
-  return;
-}
-
-
-
-static fwdEegSphereModelSet fwd_add_to_eeg_sphere_model_set(fwdEegSphereModelSet s,
-                                                            fwdEegSphereModel m)
-/*
- * Add a new model to a set.
- * The model should not be deallocated after this since it is attached to the set
- */
-{
-  if (!s)
-    s = fwd_new_eeg_sphere_model_set();
-
-  s->models = REALLOC(s->models,s->nmodel+1,fwdEegSphereModel);
-  s->models[s->nmodel++] = m;
-  return s;
-}
-
-
-
-static fwdEegSphereModelSet fwd_add_default_eeg_sphere_model(fwdEegSphereModelSet s)
-     /*
-      * Choose and setup the default EEG sphere model
-      */
-{
-  static const int   def_nlayer        = 4;
-  static const float def_unit_rads[]   = {0.90,0.92,0.97,1.0};
-  static const float def_sigmas[]      = {0.33,1.0,0.4e-2,0.33};
-
-  return fwd_add_to_eeg_sphere_model_set(s,fwd_create_eeg_sphere_model("Default",
-                                                                       def_nlayer,def_unit_rads,def_sigmas));
-}
-
-
-
-#define SEP ":\n\r"
-
-
-fwdEegSphereModelSet fwd_load_eeg_sphere_models(char *filename, fwdEegSphereModelSet now)
-     /*
-      * Load all models available in the specified file
-      */
-{
-  char line[MAXLINE];
-  FILE *fp = NULL;
-  char  *name   = NULL;
-  float *rads   = NULL;
-  float *sigmas = NULL;
-  int   nlayer  = 0;
-  char  *one,*two;
-  char  *tag = NULL;
-
-  if (!now)
-    now = fwd_add_default_eeg_sphere_model(now);
-
-  if (!filename)
-    return now;
-
-  if (access(filename,R_OK) != OK)	/* Never mind about an unaccesible file */
-    return now;
-
-  if ((fp = fopen(filename,"r")) == NULL) {
-    printf(filename);
-    goto bad;
-  }
-  while (fgets(line,MAXLINE,fp) != NULL) {
-    if (line[0] == '#')
-      continue;
-    one = strtok(line,SEP);
-    if (one != NULL) {
-      if (!tag || strlen(tag) == 0)
-        name = mne_strdup(one);
-      else {
-        name = MALLOC(strlen(one)+strlen(tag)+10,char);
-        sprintf(name,"%s %s",one,tag);
-      }
-      while (1) {
-        one = strtok(NULL,SEP);
-        if (one == NULL)
-          break;
-        two = strtok(NULL,SEP);
-        if (two == NULL)
-          break;
-        rads   = REALLOC(rads,nlayer+1,float);
-        sigmas = REALLOC(sigmas,nlayer+1,float);
-        if (sscanf(one,"%g",rads+nlayer) != 1) {
-          nlayer = 0;
-          break;
-        }
-        if (sscanf(two,"%g",sigmas+nlayer) != 1) {
-          nlayer = 0;
-          break;
-        }
-        nlayer++;
-      }
-      if (nlayer > 0)
-        now = fwd_add_to_eeg_sphere_model_set(now,fwd_create_eeg_sphere_model(name,nlayer,rads,sigmas));
-      nlayer = 0;
-    }
-  }
-  if (ferror(fp)) {
-    printf(filename);
-    goto bad;
-  }
-  fclose(fp);
-  return now;
-
- bad : {
-    if (fp)
-      fclose(fp);
-    fwd_free_eeg_sphere_model_set(now);
-    return NULL;
-  }
-}
-
-
-
-
-
-void fwd_list_eeg_sphere_models(FILE *f, fwdEegSphereModelSet s)
-/*
- * List the properties of available models
- */
-{
-  int k,p;
-  fwdEegSphereModel this_model;
-
-  if (!s || s->nmodel < 0)
-    return;
-  fprintf(f,"Available EEG sphere models:\n");
-  for (k = 0; k < s->nmodel; k++) {
-    this_model = s->models[k];
-    fprintf(f,"\t%s : %d",this_model->name,this_model->nlayer);
-    for (p = 0; p < this_model->nlayer; p++)
-      fprintf(f," : %7.3f : %7.3f",this_model->layers[p].rel_rad,this_model->layers[p].sigma);
-    fprintf(f,"\n");
-  }
-}
-
-
-
-fwdEegSphereModel fwd_select_eeg_sphere_model(char *name,fwdEegSphereModelSet s)
-/*
- * Find a model with a given name and return a duplicate
- */
-{
-  int k;
-
-  if (name == NULL)
-    name = "Default";
-
-  if (!s || s->nmodel == 0) {
-    printf("No EEG sphere model definitions available");
-    return NULL;
-  }
-
-  for (k = 0; k < s->nmodel; k++) {
-    if (strcasecmp(s->models[k]->name,name) == 0) {
-      fprintf(stderr,"Selected model: %s\n",s->models[k]->name);
-      return fwd_dup_eeg_sphere_model(s->models[k]);
-    }
-  }
-  printf("EEG sphere model %s not found.",name);
-  return NULL;
-}
-
-
-int fwd_setup_eeg_sphere_model(fwdEegSphereModel m,
-                               float rad,
-                               int   fit_berg_scherg,
-                               int   nfit)
-/*
- * Setup the EEG sphere model calculations
- */
-{
-  static const int nterms = 200;
-  float  rv;
-  int    k;
-
-  if (!m) {
-    printf("No EEG model specified");
-    return FAIL;
-  }
-  /*
-   * Scale the relative radiuses
-   */
-  for (k = 0; k < m->nlayer; k++)
-    m->layers[k].rad = rad*m->layers[k].rel_rad;
-
-  if (fit_berg_scherg) {
-    if (fwd_eeg_fit_berg_scherg(m,nterms,nfit,&rv) == OK) {
-      fprintf(stderr,"Equiv. model fitting -> ");
-      fprintf(stderr,"RV = %g %%\n",100*rv);
-      for (k = 0; k < nfit; k++)
-        fprintf(stderr,"mu%d = %g\tlambda%d = %g\n",
-                k+1,m->mu[k],k+1,m->layers[m->nlayer-1].sigma*m->lambda[k]);
-    }
-    else
-      goto bad;
-  }
-  fprintf(stderr,"Defined EEG sphere model with rad = %7.2f mm\n",
-          1000.0*rad);
-  return OK;
-
- bad :
-  return FAIL;
-}
 
 
 
@@ -13148,23 +13043,6 @@ static void field_integrals (float *from,
   S2[X] = S2x;
   S2[Y] = -S1x;
   return;
-}
-
-
-
-static double calc_beta (double *rk,double *rk1)
-
-{
-  double rkk1[3];
-  double size;
-  double res;
-
-  VEC_DIFF (rk,rk1,rkk1);
-  size = VEC_LEN(rkk1);
-
-  res = log((VEC_LEN(rk)*size + VEC_DOT(rk,rkk1))/
-            (VEC_LEN(rk1)*size + VEC_DOT(rk1,rkk1)))/size;
-  return (res);
 }
 
 
@@ -14427,6 +14305,1015 @@ int fwd_eeg_spherepot_coil_vec(float      *rd,        /* Dipole position */
   FREE_CMATRIX(vval_one);
   return OK;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+//============================= fwd_fit_berg_scherg.c =============================
+
+static double dot_dvectors (double *v1,
+                            double *v2,
+                            int   nn)
+{
+  double result = 0.0;
+  int   k;
+
+  for (k = 0; k < nn; k++)
+    result = result + v1[k]*v2[k];
+  return (result);
+}
+
+static int c_dsvd(double **mat,		/* The matrix */
+                  int   m,int n,	/* m rows n columns */
+                  double *sing,	        /* Singular values (must have size
+                                         * MIN(m,n)+1 */
+                  double **uu,		/* Left eigenvectors */
+                  double **vv)		/* Right eigenvectors */
+     /*
+      * Compute the SVD of mat.
+      * The singular vector calculations depend on whether
+      * or not u and v are given.
+      * The allocations should be done as follows
+      *
+      * mat = ALLOC_DCMATRIX(m,n);
+      * vv  = ALLOC_DCMATRIX(MIN(m,n),n);
+      * uu  = ALLOC_DCMATRIX(MIN(m,n),m);
+      * sing = MALLOC(MIN(m,n),double);
+      *
+      * mat is modified by this operation
+      *
+      * This simply allocates the workspace and calls the
+      * LAPACK Fortran routine
+      */
+{
+
+    int    udim = MIN(m,n);
+    MatrixXd eigen_mat(m,n);
+
+    for( int i = 0; i < m; ++i )
+    {
+        for( int j = 0; j < n; ++j )
+        {
+            eigen_mat(i,j) = mat[i][j];
+        }
+    }
+
+    Eigen::JacobiSVD< Eigen::MatrixXd > svd(eigen_mat ,Eigen::ComputeFullU | Eigen::ComputeFullV);
+
+
+    for( int i = 0; i < udim; ++i )
+    {
+        sing[i] = svd.singularValues()[i];
+    }
+
+    if ( vv != NULL )
+    {
+        for( int i = 0; i < udim; ++i )
+        {
+            for( int j = 0; j < n; ++j )
+            {
+                vv[i][j] = svd.matrixV()(i,j);
+            }
+        }
+    }
+
+    if ( uu != NULL )
+    {
+        for( int i = 0; i < udim; ++i )
+        {
+            for( int j = 0; j < m; ++j )
+            {
+                uu[i][j] = svd.matrixU()(i,j);
+            }
+        }
+    }
+
+    return 0;
+
+
+//  static int lwork = 0;
+//  static double *work = NULL;
+//  int    nlwork;
+//  double **uutemp = NULL;
+//  int    udim = MIN(m,n);
+//  int    info;
+//  char   *jobu;
+//  char   *jobvt;
+//  int    j,k;
+//  double dum[1];
+//  double *vvp,*uup;
+
+//  nlwork = MAX(3*MIN(m,n)+MAX(m,n),5*MIN(m,n)-4);
+//  if (nlwork > lwork) {
+//    lwork = nlwork;
+//    work = REALLOC(work,lwork,double);
+//  }
+//  /*
+//   * Do SVD
+//   */
+//  if (vv == NULL) {
+//    jobu = "N";
+//    vvp  = dum;
+//  }
+//  else {
+//    jobu = "S";
+//    vvp  = vv[0];
+//  }
+//  if (uu == NULL) {
+//    jobvt = "N";
+//    uup   = dum;
+//  }
+//  else {
+//    jobvt = "S";
+//    uutemp = ALLOC_DCMATRIX(m,udim);
+//    uup = uutemp[0];
+//  }
+//  dgesvd(jobu,jobvt,&n,&m,mat[0],&n,sing,
+//         vvp,&n,uup,&udim,
+//         work,&lwork,&info);
+//  if (info == 0 && uu != NULL) {
+//    /*
+//     * Transpose U to get rid of the
+//     * LAPACK convention.
+//     */
+//    for (j = 0; j < udim; j++)
+//      for (k = 0; k < m; k++)
+//        uu[j][k] = uutemp[k][j];
+//  }
+//  FREE_DCMATRIX(uutemp);
+//  return info;
+}
+
+/*
+ * Include the simplex and SVD code here.
+ * It is not too much of a problem
+ */
+#define ALPHA 1.0
+#define BETA 0.5
+#define GAMMA 2.0
+
+static double tryit (double **p,
+                     double *y,
+                     double *psum,
+                     int ndim,
+                     double (*func)(double *,int,void *),
+                     void   *user_data,
+                     int ihi,
+                     int *neval,
+                     double fac)
+
+{
+  int j;
+  double fac1,fac2,ytry,*ptry;
+
+  ptry = MALLOC(ndim,double);
+  fac1 = (1.0-fac)/ndim;
+  fac2 = fac1-fac;
+  for (j = 0; j < ndim; j++)
+    ptry[j] = psum[j]*fac1-p[ihi][j]*fac2;
+  ytry = (*func)(ptry,ndim,user_data);
+  ++(*neval);
+  if (ytry < y[ihi]) {
+    y[ihi] = ytry;
+    for (j = 0; j < ndim; j++) {
+      psum[j] +=  ptry[j]-p[ihi][j];
+      p[ihi][j] = ptry[j];
+    }
+  }
+  FREE(ptry);
+  return ytry;
+}
+
+
+static int simplex_minimize(double **p,		     /* The initial simplex */
+                            double *y,		     /* Function values at the vertices */
+                            int   ndim,		     /* Number of variables */
+                            double ftol,	     /* Relative convergence tolerance */
+                            double (*func)(double *fitpar,int npar,void *user_data),
+                                                     /* The function to be evaluated */
+                            void  *user_data,	     /* Data to be passed to the above function in each evaluation */
+                            int   max_eval,	     /* Maximum number of function evaluations */
+                            int   *neval,	     /* Number of function evaluations */
+                            int   report,	     /* How often to report (-1 = no_reporting) */
+                            int   (*report_func)(int loop,
+                                                 double *fitpar, int npar,
+                                                 double fval)) /* The function to be called when reporting */
+
+     /*
+      * Minimization with the simplex algorithm
+      * Modified from Numerical recipes
+      */
+
+{
+  int   i,j,ilo,ihi,inhi;
+  int   mpts = ndim+1;
+  double ytry,ysave,sum,rtol,*psum;
+  int   result = 0;
+  int   count = 0;
+  int   loop  = 1;
+
+  psum   = MALLOC(ndim,double);
+  *neval = 0;
+  for (j = 0; j < ndim; j++) {
+    for (i = 0,sum = 0.0; i<mpts; i++)
+      sum +=  p[i][j];
+    psum[j] = sum;
+  }
+  if (report_func != NULL && report > 0)
+    (void)report_func (0,p[0],ndim,-1.0);
+
+  for (;;count++,loop++) {
+    ilo = 1;
+    ihi  =  y[1]>y[2] ? (inhi = 2,1) : (inhi = 1,2);
+    for (i = 0; i < mpts; i++) {
+      if (y[i]  <  y[ilo]) ilo = i;
+      if (y[i] > y[ihi]) {
+        inhi = ihi;
+        ihi = i;
+      } else if (y[i] > y[inhi])
+        if (i !=  ihi) inhi = i;
+    }
+    rtol = 2.0*fabs(y[ihi]-y[ilo])/(fabs(y[ihi])+fabs(y[ilo]));
+    /*
+     * Report that we are proceeding...
+     */
+    if (count == report && report_func != NULL) {
+      if (report_func (loop,p[ilo],ndim,y[ilo])) {
+        printf("Interation interrupted.");
+        result = -1;
+        break;
+      }
+      count = 0;
+    }
+    if (rtol < ftol) break;
+    if (*neval >=  max_eval) {
+      printf("Maximum number of evaluations exceeded.");
+      result  =  -1;
+      break;
+    }
+    ytry = tryit(p,y,psum,ndim,func,user_data,ihi,neval,-ALPHA);
+    if (ytry <= y[ilo])
+      ytry = tryit(p,y,psum,ndim,func,user_data,ihi,neval,GAMMA);
+    else if (ytry >= y[inhi]) {
+      ysave = y[ihi];
+      ytry = tryit(p,y,psum,ndim,func,user_data,ihi,neval,BETA);
+      if (ytry >= ysave) {
+        for (i = 0; i < mpts; i++) {
+          if (i !=  ilo) {
+            for (j = 0; j < ndim; j++) {
+              psum[j] = 0.5*(p[i][j]+p[ilo][j]);
+              p[i][j] = psum[j];
+            }
+            y[i] = (*func)(psum,ndim,user_data);
+          }
+        }
+        *neval +=  ndim;
+        for (j = 0; j < ndim; j++) {
+          for (i = 0,sum = 0.0; i < mpts; i++)
+            sum +=  p[i][j];
+          psum[j] = sum;
+        }
+      }
+    }
+  }
+  FREE (psum);
+  return (result);
+}
+
+#undef ALPHA
+#undef BETA
+#undef GAMMA
+
+/*
+ * This is the beginning of the specific code
+ */
+typedef struct {
+  double *y;
+  double *resi;
+  double **M;
+  double **uu;
+  double **vv;
+  double *sing;
+  double *fn;
+  double *w;
+  int    nfit;
+  int    nterms;
+} *fitUser,fitUserRec;
+
+
+typedef struct {
+  double lambda;		/* Magnitude for the apparent dipole */
+  double mu;			/* Distance multiplier for the apparent dipole */
+} *bergSchergPar,bergSchergParRec;
+
+
+static int comp_pars(const void *p1,const void *p2)
+     /*
+      * Comparison function for sorting layers
+      */
+{
+  bergSchergPar v1 = (bergSchergPar)p1;
+  bergSchergPar v2 = (bergSchergPar)p2;
+
+  if (v1->mu > v2->mu)
+    return -1;
+  else if (v1->mu < v2->mu)
+    return 1;
+  else
+    return 0;
+}
+
+static void sort_parameters(double *mu,double *lambda,int nfit)
+     /*
+      * Sort the parameters so that largest mu comes first
+      */
+{
+  int k;
+  bergSchergPar pars = MALLOC(nfit,bergSchergParRec);
+
+  for (k = 0; k < nfit; k++) {
+    pars[k].mu = mu[k];
+    pars[k].lambda = lambda[k];
+  }
+  qsort (pars, nfit, sizeof(bergSchergParRec), comp_pars);
+  for (k = 0; k < nfit; k++) {
+    mu[k]     = pars[k].mu;
+    lambda[k] = pars[k].lambda;
+  }
+  return;
+}
+
+
+
+static int report_fit(int    loop,
+                      double  *mu,
+                      int    nfit,
+                      double Smin)
+     /*
+      * Report our progress
+      */
+{
+#ifdef LOG_FIT
+  int k;
+  for (k = 0; k < nfit; k++)
+    fprintf(stderr,"%g ",mu[k]);
+  fprintf(stderr,"%g\n",Smin);
+#endif
+  return 0;
+}
+
+
+static double **get_initial_simplex(double  *pars,
+                                    int    npar,
+                                    double simplex_size)
+
+{
+  double **simplex = ALLOC_DCMATRIX(npar+1,npar);
+  int k;
+
+  for (k = 0; k < npar+1; k++)
+    memcpy (simplex[k],pars,npar*sizeof(double));
+  for (k = 1; k < npar+1; k++)
+    simplex[k][k-1] = simplex[k][k-1] + simplex_size;
+  return (simplex);
+}
+
+
+static fitUser new_fit_user(int nfit, int nterms)
+
+{
+  fitUser u = MALLOC(1,fitUserRec);
+  u->y      = MALLOC(nterms-1,double);
+  u->resi   = MALLOC(nterms-1,double);
+  u->M      = ALLOC_DCMATRIX(nterms-1,nfit-1);
+  u->uu     = ALLOC_DCMATRIX(nfit-1,nterms-1);
+  u->vv     = ALLOC_DCMATRIX(nfit-1,nfit-1);
+  u->sing   = MALLOC(nfit,double);
+  u->fn     = MALLOC(nterms,double);
+  u->w      = MALLOC(nterms,double);
+  u->nfit   = nfit;
+  u->nterms = nterms;
+  return u;
+}
+
+static void compose_linear_fitting_data(double *mu,fitUser u)
+
+{
+  double mu1n,k1;
+  int k,p;
+  /*
+   * y is the data to be fitted (nterms-1 x 1)
+   * M is the model matrix      (nterms-1 x nfit-1)
+   */
+  for (k = 0; k < u->nterms-1; k++) {
+    k1 = k + 1;
+    mu1n = pow(mu[0],k1);
+    u->y[k] = u->w[k]*(u->fn[k+1] - mu1n*u->fn[0]);
+    for (p = 0; p < u->nfit-1; p++)
+      u->M[k][p] = u->w[k]*(pow(mu[p+1],k1)-mu1n);
+  }
+}
+
+static double compute_linear_parameters(double *mu,
+                                        double *lambda,
+                                        fitUser u)
+     /*
+      * Compute the best-fitting linear parameters
+      * Return the corresponding RV
+      */
+{
+  int k,p,q;
+  double *vec = MALLOC(u->nfit-1,double);
+  double sum;
+
+  compose_linear_fitting_data(mu,u);
+  c_dsvd(u->M,u->nterms-1,u->nfit-1,u->sing,u->uu,u->vv);
+  /*
+   * Compute the residuals
+   */
+  for (k = 0; k < u->nterms-1; k++)
+    u->resi[k] = u->y[k];
+
+  for (p = 0; p < u->nfit-1; p++) {
+    vec[p] = dot_dvectors(u->uu[p],u->y,u->nterms-1);
+    for (k = 0; k < u->nterms-1; k++)
+      u->resi[k] = u->resi[k] - u->uu[p][k]*vec[p];
+    vec[p] = vec[p]/u->sing[p];
+  }
+
+  for (p = 0; p < u->nfit-1; p++) {
+    for (q = 0, sum = 0.0; q < u->nfit-1; q++)
+      sum += u->vv[q][p]*vec[q];
+    lambda[p+1] = sum;
+  }
+  for (p = 1, sum = 0.0; p < u->nfit; p++)
+    sum += lambda[p];
+  lambda[0] = u->fn[0] - sum;
+  FREE(vec);
+  return dot_dvectors(u->resi,u->resi,u->nterms-1)/dot_dvectors(u->y,u->y,u->nterms-1);
+}
+
+static double one_step (double *mu, int nfit, void *user_data)
+     /*
+      * Evaluate the residual sum of squares fit for one set of
+      * mu values
+      */
+{
+  int k,p;
+  double  dot;
+  fitUser u = (fitUser)user_data;
+
+  for (k = 0; k < u->nfit; k++) {
+    if (fabs(mu[k]) > 1.0)
+      return 1.0;
+  }
+  /*
+   * Compose the data for the linear fitting
+   */
+  compose_linear_fitting_data(mu,u);
+  /*
+   * Compute SVD
+   */
+  c_dsvd(u->M,u->nterms-1,u->nfit-1,u->sing,u->uu,NULL);
+  /*
+   * Compute the residuals
+   */
+  for (k = 0; k < u->nterms-1; k++)
+    u->resi[k] = u->y[k];
+  for (p = 0; p < u->nfit-1; p++) {
+    dot = dot_dvectors(u->uu[p],u->y,u->nterms-1);
+    for (k = 0; k < u->nterms-1; k++)
+      u->resi[k] = u->resi[k] - u->uu[p][k]*dot;
+  }
+  /*
+   * Return their sum of squares
+   */
+  return dot_dvectors(u->resi,u->resi,u->nterms-1);
+}
+
+
+int fwd_eeg_fit_berg_scherg(fwdEegSphereModel m,       /* Conductor model definition */
+                            int   nterms,              /* Number of terms to use in the series expansion
+                                                        * when fitting the parameters */
+                            int   nfit,	               /* Number of equivalent dipoles to fit */
+                            float *rv)
+     /*
+      * This routine fits the Berg-Scherg equivalent spherical model
+      * dipole parameters by minimizing the difference between the
+      * actual and approximative series expansions
+      */
+{
+  int   res = FAIL;
+  int   k;
+  double rd,R,f;
+  double simplex_size = 0.01;
+  double **simplex = NULL;
+  double *func_val = NULL;
+  double ftol = 1e-9;
+  double *lambda = NULL;
+  double *mu     = NULL;
+  int   neval;
+  int   max_eval = 1000;
+  int   report   = 1;
+  fitUser u = new_fit_user(nfit,nterms);
+
+  if (nfit < 2) {
+    printf("fwd_fit_berg_scherg does not work with less than two equivalent sources.");
+    return FAIL;
+  }
+  /*
+   * (1) Calculate the coefficients of the true expansion
+   */
+  for (k = 0; k < nterms; k++)
+    u->fn[k] = fwd_eeg_get_multi_sphere_model_coeff(m,k+1);
+  /*
+   * (2) Calculate the weighting
+   */
+  rd = R = m->layers[0].rad;
+  for (k = 1; k < m->nlayer; k++) {
+    if (m->layers[k].rad > R)
+      R = m->layers[k].rad;
+    if (m->layers[k].rad < rd)
+      rd = m->layers[k].rad;
+  }
+  f = rd/R;
+#ifdef ZHANG
+  /*
+   * This is the Zhang weighting
+   */
+  for (k = 1; k < nterms; k++)
+    u->w[k-1] = pow(f,k);
+#else
+  /*
+   * This is the correct weighting
+   */
+  for (k = 1; k < nterms; k++)
+    u->w[k-1] = sqrt((2.0*k+1)*(3.0*k+1.0)/k)*pow(f,(k-1.0));
+#endif
+  /*
+   * (3) Prepare for simplex minimization
+   */
+  func_val = MALLOC(nfit+1,double);
+  lambda   = MALLOC(nfit,double);
+  mu       = MALLOC(nfit,double);
+  /*
+   * (4) Rather arbitrary initial guess
+   */
+  for (k = 0; k < nfit; k++) {
+    /*
+    mu[k] = (k+1)*0.1*f;
+    */
+    mu[k] = drand48()*f;
+  }
+
+  simplex = get_initial_simplex(mu,nfit,simplex_size);
+  for (k = 0; k < nfit+1; k++)
+    func_val[k] = one_step(simplex[k],u->nfit,u);
+  /*
+   * (5) Do the nonlinear minimization
+   */
+  if ((res = simplex_minimize(simplex,func_val,nfit,
+                              ftol,one_step,
+                              u,
+                              max_eval,&neval,
+                              report,report_fit)) != OK)
+    goto out;
+  for (k = 0; k < nfit; k++)
+    mu[k] = simplex[0][k];
+  /*
+   * (6) Do the final step: calculation of the linear parameters
+   */
+  *rv = compute_linear_parameters(mu,lambda,u);
+  sort_parameters(mu,lambda,nfit);
+#ifdef LOG_FIT
+  fprintf(stderr,"RV = %g %%\n",100*(*rv));
+#endif
+  m->mu     = REALLOC(m->mu,nfit,float);
+  m->lambda = REALLOC(m->lambda,nfit,float);
+  m->nfit   = nfit;
+  for (k = 0; k < nfit; k++) {
+    m->mu[k] = mu[k];
+    /*
+     * This division takes into account the actual conductivities
+     */
+    m->lambda[k] = lambda[k]/m->layers[m->nlayer-1].sigma;
+#ifdef LOG_FIT
+    fprintf(stderr,"lambda%d = %g\tmu%d = %g\n",k+1,lambda[k],k+1,mu[k]);
+#endif
+  }
+  /*
+   * This is the cleanup code
+   */
+ out : {
+    FREE_DCMATRIX(simplex);
+    if (u) {
+      FREE(u->fn);
+      FREE_DCMATRIX(u->M);
+      FREE_DCMATRIX(u->uu);
+      FREE_DCMATRIX(u->vv);
+      FREE(u->y);
+      FREE(u->w);
+      FREE(u->resi);
+      FREE(u->sing);
+    }
+    FREE(func_val);
+    FREE(lambda);
+    FREE(mu);
+    return res;
+  }
+}
+
+
+
+
+
+
+
+//============================= fwd_eeg_sphere_models.c =============================
+
+/*
+ * Basic routines for EEG sphere model bookkeeping
+ */
+static fwdEegSphereModel fwd_new_eeg_sphere_model()
+
+{
+  fwdEegSphereModel m = MALLOC(1,fwdEegSphereModelRec);
+
+  m->name    = NULL;
+  m->nlayer  = 0;
+  m->layers  = NULL;
+  m->fn      = NULL;
+  m->nterms  = 0;
+  m->r0[0]   = 0.0;
+  m->r0[1]   = 0.0;
+  m->r0[2]   = 0.0;
+  m->lambda  = NULL;
+  m->mu      = NULL;
+  m->nfit    = 0;
+  m->scale_pos = 0;
+  return m;
+}
+
+
+void fwd_free_eeg_sphere_model(fwdEegSphereModel m)
+
+{
+  if (!m)
+    return;
+  FREE(m->name);
+  FREE(m->layers);
+  FREE(m->fn);
+  FREE(m->mu);
+  FREE(m->lambda);
+  FREE(m);
+  return;
+}
+
+
+
+
+fwdEegSphereModel fwd_dup_eeg_sphere_model(fwdEegSphereModel m)
+
+{
+  fwdEegSphereModel dup;
+  int k;
+
+  if (!m)
+    return NULL;
+
+  dup = fwd_new_eeg_sphere_model();
+
+  if (m->name)
+    dup->name = mne_strdup(m->name);
+  if (m->nlayer > 0) {
+    dup->layers = MALLOC(m->nlayer,fwdEegSphereLayerRec);
+    dup->nlayer = m->nlayer;
+    for (k = 0; k < m->nlayer; k++)
+      dup->layers[k] = m->layers[k];
+  }
+  VEC_COPY(dup->r0,m->r0);
+  if (m->nterms > 0) {
+    dup->fn = MALLOC(m->nterms,double);
+    dup->nterms = m->nterms;
+    for (k = 0; k < m->nterms; k++)
+      dup->fn[k] = m->fn[k];
+  }
+  if (m->nfit > 0) {
+    dup->mu     = MALLOC(m->nfit,float);
+    dup->lambda = MALLOC(m->nfit,float);
+    dup->nfit   = m->nfit;
+    for (k = 0; k < m->nfit; k++) {
+      dup->mu[k] = m->mu[k];
+      dup->lambda[k] = m->lambda[k];
+    }
+  }
+  dup->scale_pos = m->scale_pos;
+  return dup;
+}
+
+
+
+static int comp_layers(const void *p1,const void *p2)
+     /*
+      * Comparison function for sorting layers
+      */
+{
+  fwdEegSphereLayer v1 = (fwdEegSphereLayer)p1;
+  fwdEegSphereLayer v2 = (fwdEegSphereLayer)p2;
+
+  if (v1->rad > v2->rad)
+    return 1;
+  else if (v1->rad < v2->rad)
+    return -1;
+  else
+    return 0;
+}
+
+
+
+static fwdEegSphereModel fwd_create_eeg_sphere_model(char *name,
+                                                     int nlayer,
+                                                     const float *rads,
+                                                     const float *sigmas)
+     /*
+      * Produce a new sphere model structure
+      */
+{
+  fwdEegSphereModel new_model = fwd_new_eeg_sphere_model();
+  int            k;
+  fwdEegSphereLayer layers;
+  float          R,rR;
+
+  new_model->name   = mne_strdup(name);
+  new_model->nlayer = nlayer;
+  new_model->layers = layers = MALLOC(nlayer,fwdEegSphereLayerRec);
+
+  for (k = 0; k < nlayer; k++) {
+    layers[k].rad    = layers[k].rel_rad = rads[k];
+    layers[k].sigma  = sigmas[k];
+  }
+  /*
+   * Sort...
+   */
+  qsort (layers, nlayer, sizeof(fwdEegSphereLayerRec), comp_layers);
+  /*
+   * Scale the radiuses
+   */
+  R  = layers[nlayer-1].rad;
+  rR = layers[nlayer-1].rel_rad;
+  for (k = 0; k < nlayer; k++) {
+    layers[k].rad     = layers[k].rad/R;
+    layers[k].rel_rad = layers[k].rel_rad/rR;
+  }
+  return new_model;
+}
+
+
+
+static fwdEegSphereModelSet fwd_new_eeg_sphere_model_set()
+
+{
+  fwdEegSphereModelSet s = MALLOC(1,fwdEegSphereModelSetRec);
+
+  s->models  = NULL;
+  s->nmodel  = 0;
+  return s;
+}
+
+void fwd_free_eeg_sphere_model_set(fwdEegSphereModelSet s)
+
+{
+  int k;
+  if (!s)
+    return;
+  for (k = 0; k < s->nmodel; k++)
+    fwd_free_eeg_sphere_model(s->models[k]);
+  FREE(s->models);
+  FREE(s);
+
+  return;
+}
+
+
+
+static fwdEegSphereModelSet fwd_add_to_eeg_sphere_model_set(fwdEegSphereModelSet s,
+                                                            fwdEegSphereModel m)
+/*
+ * Add a new model to a set.
+ * The model should not be deallocated after this since it is attached to the set
+ */
+{
+  if (!s)
+    s = fwd_new_eeg_sphere_model_set();
+
+  s->models = REALLOC(s->models,s->nmodel+1,fwdEegSphereModel);
+  s->models[s->nmodel++] = m;
+  return s;
+}
+
+
+
+static fwdEegSphereModelSet fwd_add_default_eeg_sphere_model(fwdEegSphereModelSet s)
+     /*
+      * Choose and setup the default EEG sphere model
+      */
+{
+  static const int   def_nlayer        = 4;
+  static const float def_unit_rads[]   = {0.90,0.92,0.97,1.0};
+  static const float def_sigmas[]      = {0.33,1.0,0.4e-2,0.33};
+
+  return fwd_add_to_eeg_sphere_model_set(s,fwd_create_eeg_sphere_model("Default",
+                                                                       def_nlayer,def_unit_rads,def_sigmas));
+}
+
+
+
+#define SEP ":\n\r"
+
+
+fwdEegSphereModelSet fwd_load_eeg_sphere_models(char *filename, fwdEegSphereModelSet now)
+     /*
+      * Load all models available in the specified file
+      */
+{
+  char line[MAXLINE];
+  FILE *fp = NULL;
+  char  *name   = NULL;
+  float *rads   = NULL;
+  float *sigmas = NULL;
+  int   nlayer  = 0;
+  char  *one,*two;
+  char  *tag = NULL;
+
+  if (!now)
+    now = fwd_add_default_eeg_sphere_model(now);
+
+  if (!filename)
+    return now;
+
+  if (access(filename,R_OK) != OK)	/* Never mind about an unaccesible file */
+    return now;
+
+  if ((fp = fopen(filename,"r")) == NULL) {
+    printf(filename);
+    goto bad;
+  }
+  while (fgets(line,MAXLINE,fp) != NULL) {
+    if (line[0] == '#')
+      continue;
+    one = strtok(line,SEP);
+    if (one != NULL) {
+      if (!tag || strlen(tag) == 0)
+        name = mne_strdup(one);
+      else {
+        name = MALLOC(strlen(one)+strlen(tag)+10,char);
+        sprintf(name,"%s %s",one,tag);
+      }
+      while (1) {
+        one = strtok(NULL,SEP);
+        if (one == NULL)
+          break;
+        two = strtok(NULL,SEP);
+        if (two == NULL)
+          break;
+        rads   = REALLOC(rads,nlayer+1,float);
+        sigmas = REALLOC(sigmas,nlayer+1,float);
+        if (sscanf(one,"%g",rads+nlayer) != 1) {
+          nlayer = 0;
+          break;
+        }
+        if (sscanf(two,"%g",sigmas+nlayer) != 1) {
+          nlayer = 0;
+          break;
+        }
+        nlayer++;
+      }
+      if (nlayer > 0)
+        now = fwd_add_to_eeg_sphere_model_set(now,fwd_create_eeg_sphere_model(name,nlayer,rads,sigmas));
+      nlayer = 0;
+    }
+  }
+  if (ferror(fp)) {
+    printf(filename);
+    goto bad;
+  }
+  fclose(fp);
+  return now;
+
+ bad : {
+    if (fp)
+      fclose(fp);
+    fwd_free_eeg_sphere_model_set(now);
+    return NULL;
+  }
+}
+
+
+
+
+
+void fwd_list_eeg_sphere_models(FILE *f, fwdEegSphereModelSet s)
+/*
+ * List the properties of available models
+ */
+{
+  int k,p;
+  fwdEegSphereModel this_model;
+
+  if (!s || s->nmodel < 0)
+    return;
+  fprintf(f,"Available EEG sphere models:\n");
+  for (k = 0; k < s->nmodel; k++) {
+    this_model = s->models[k];
+    fprintf(f,"\t%s : %d",this_model->name,this_model->nlayer);
+    for (p = 0; p < this_model->nlayer; p++)
+      fprintf(f," : %7.3f : %7.3f",this_model->layers[p].rel_rad,this_model->layers[p].sigma);
+    fprintf(f,"\n");
+  }
+}
+
+
+
+fwdEegSphereModel fwd_select_eeg_sphere_model(char *name,fwdEegSphereModelSet s)
+/*
+ * Find a model with a given name and return a duplicate
+ */
+{
+  int k;
+
+  if (name == NULL)
+    name = "Default";
+
+  if (!s || s->nmodel == 0) {
+    printf("No EEG sphere model definitions available");
+    return NULL;
+  }
+
+  for (k = 0; k < s->nmodel; k++) {
+    if (strcasecmp(s->models[k]->name,name) == 0) {
+      fprintf(stderr,"Selected model: %s\n",s->models[k]->name);
+      return fwd_dup_eeg_sphere_model(s->models[k]);
+    }
+  }
+  printf("EEG sphere model %s not found.",name);
+  return NULL;
+}
+
+
+int fwd_setup_eeg_sphere_model(fwdEegSphereModel m,
+                               float rad,
+                               int   fit_berg_scherg,
+                               int   nfit)
+/*
+ * Setup the EEG sphere model calculations
+ */
+{
+  static const int nterms = 200;
+  float  rv;
+  int    k;
+
+  if (!m) {
+    printf("No EEG model specified");
+    return FAIL;
+  }
+  /*
+   * Scale the relative radiuses
+   */
+  for (k = 0; k < m->nlayer; k++)
+    m->layers[k].rad = rad*m->layers[k].rel_rad;
+
+  if (fit_berg_scherg) {
+    if (fwd_eeg_fit_berg_scherg(m,nterms,nfit,&rv) == OK) {
+      fprintf(stderr,"Equiv. model fitting -> ");
+      fprintf(stderr,"RV = %g %%\n",100*rv);
+      for (k = 0; k < nfit; k++)
+        fprintf(stderr,"mu%d = %g\tlambda%d = %g\n",
+                k+1,m->mu[k],k+1,m->layers[m->nlayer-1].sigma*m->lambda[k]);
+    }
+    else
+      goto bad;
+  }
+  fprintf(stderr,"Defined EEG sphere model with rad = %7.2f mm\n",
+          1000.0*rad);
+  return OK;
+
+ bad :
+  return FAIL;
+}
+
+
+
+
+
+
 
 
 
@@ -16126,6 +17013,65 @@ int mne_read_raw_buffer_t(fiffFile     in,	    /* Input file */
 }
 
 
+
+//============================= mne_fft.c =============================
+
+
+void mne_fft_ana(float *data,int np, float **precalcp)
+     /*
+      * FFT analysis for real data
+      */
+{
+  float *precalc;
+
+  qDebug() << "Error: FFT analysis needs to be implemented";
+
+//  if (precalcp && *precalcp)
+//    precalc = *precalcp;
+//  else {
+//    precalc = MALLOC(2*np+15,float);
+//    rffti(&np,precalc);
+//    if (precalcp)
+//      *precalcp = precalc;
+//  }
+//  rfftf(&np,data,precalc);
+  if (!precalcp)
+    FREE(precalc);
+  return;
+}
+
+
+void mne_fft_syn(float *data,int np, float **precalcp)
+     /*
+      * FFT synthesis for real data
+      */
+{
+  float *precalc;
+  float mult;
+
+  qDebug() << "Error: FFT synthesis needs to be implemented";
+
+//  if (precalcp && *precalcp)
+//    precalc = *precalcp;
+//  else {
+//    precalc = MALLOC(2*np+15,float);
+//    rffti(&np,precalc);
+//    if (precalcp)
+//      *precalcp = precalc;
+//  }
+//  rfftb(&np,data,precalc);
+//  /*
+//   * Normalization
+//   */
+//  mult = 1.0/np;
+//  mne_scale_vector(mult,data,np);
+
+  if (!precalcp)
+    FREE(precalc);
+  return;
+}
+
+
 //============================= mne_apply_filter.c =============================
 
 
@@ -16182,8 +17128,6 @@ int mne_compare_filters(mneFilterDef f1,
       return 0;
 }
 
-extern void mne_fft_ana(float *data, int np, float **precalc);
-extern void mne_fft_syn(float *data, int np, float **precalc);
 
 void mne_create_filter_response(mneFilterDef    filter,
                                 float           sfreq,
@@ -18971,7 +19915,7 @@ typedef struct {
   float          *B;
   double         B2;
   dipoleForward  fwd;
-} *fitUser,fitUserRec;
+} *fitDipUser,fitDipUserRec;
 
 static int find_best_guess(float     *B,         /* The whitened data */
                            int       nch,
@@ -19113,7 +20057,7 @@ static float fit_eval(float *rd,int npar,void *user)
 {
   dipoleFitData fit   = (dipoleFitData)user;
   dipoleForward fwd;
-  fitUser       fuser = (fitUser)fit->user;
+  fitDipUser       fuser = (fitDipUser)fit->user;
   double        Bm2,one;
   int           ncomp,c;
 
@@ -19168,7 +20112,7 @@ static ecd fit_one(dipoleFitData fit,	            /* Precomputed fitting data */
 
   int        best;
   float      good,rd_guess[3],rd_final[3],Q[3],final_val;
-  fitUserRec user;
+  fitDipUserRec user;
   int        k,p,neval,neval_tot,nchan,ncomp;
   int        fit_fail;
   ecd        res = NULL;
