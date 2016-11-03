@@ -45,13 +45,9 @@
 
 
 #include <fiff/fiff.h>
-//#include <mne/mne.h>
 #include <utils/sphere.h>
 
 #include "fiff_file.h"
-
-
-
 
 
 #include <stdio.h>
