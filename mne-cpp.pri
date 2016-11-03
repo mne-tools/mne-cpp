@@ -79,3 +79,7 @@ isEmpty( MNE_BINARY_DIR ) {
     message("Building minimal version due to Qt version $${QT_VERSION}.")
     MNECPP_CONFIG += minimalVersion
 }
+
+HEADERS +=
+
+SOURCES +=

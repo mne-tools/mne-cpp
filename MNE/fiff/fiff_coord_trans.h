@@ -175,6 +175,16 @@ public:
 
     //=========================================================================================================
     /**
+    * Applies the inverse coordinate transform to given coordinates and returns the transformed coordinates
+    *
+    * @param[in] rr     The coordinates
+    *
+    * @return Transformed coordinates
+    */
+    MatrixX3f apply_inverse_trans (const MatrixX3f& rr) const;
+
+    //=========================================================================================================
+    /**
     * ### MNE C root function ###: Implementation of the mne_coord_frame_name function
     *
     * Map coordinate frame integers to human-readable names

@@ -44,7 +44,8 @@ SUBDIRS += \
     SUBDIRS += \
         mne_scan \
         mne_browse \
-        mne_matching_pursuit
+        mne_matching_pursuit \
+        mne_sample_set_downloader \
 
         qtHaveModule(charts) {
         SUBDIRS += \
