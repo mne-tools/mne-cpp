@@ -49,12 +49,13 @@
 
 #include "fiff_file.h"
 
-
+#include <io.h>
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <strings.h>
 
 #include <math.h>
+#include <time.h>
 
 
 #include <Eigen/Dense>
@@ -4862,7 +4863,7 @@ static void get_aspect_name_type(fiffFile file,fiffDirNode start, char **namep, 
   int k;
   fiffTagRec tag;
   fiffDirEntry ent;
-  char *res = "unknown";
+  const char *res = "unknown";
   int  type = -1;
 
   tag.data = NULL;
@@ -7065,12 +7066,12 @@ int mne_apply_ctf_comp(mneCTFcompDataSet set,		  /* The compensation data */
 
 
 
-char *mne_explain_ctf_comp(int kind)
+const char *mne_explain_ctf_comp(int kind)
 
 {
   static struct {
     int kind;
-    char *expl;
+    const char *expl;
   } explain[] = { { MNE_CTFV_COMP_NONE,    "uncompensated" },
                   { MNE_CTFV_COMP_G1BR,    "first order gradiometer" },
                   { MNE_CTFV_COMP_G2BR,    "second order gradiometer" },
@@ -10940,7 +10941,7 @@ mneSourceSpace make_volume_source_space(mneSurface surf,
 
 static struct {
   int  kind;
-  char *name;
+  const char *name;
 } surf_expl[] = { { FIFFV_BEM_SURF_ID_BRAIN , "inner skull" },
                   { FIFFV_BEM_SURF_ID_SKULL , "outer skull" },
                   { FIFFV_BEM_SURF_ID_HEAD  , "scalp" },
@@ -10948,7 +10949,7 @@ static struct {
 
 static struct {
   int  method;
-  char *name;
+  const char *name;
 } method_expl[] = { { FWD_BEM_CONSTANT_COLL , "constant collocation" },
                     { FWD_BEM_LINEAR_COLL   , "linear collocation" },
                     { -1                    , "unknown" } };
@@ -11042,7 +11043,7 @@ void fwd_bem_free_model(fwdBemModel m)
   return;
 }
 
-char *fwd_bem_explain_surface(int kind)
+const char *fwd_bem_explain_surface(int kind)
 
 {
   int k;
@@ -11696,7 +11697,7 @@ int fwd_bem_constant_collocation_solution(fwdBemModel m)
 //============================= fwd_bem_model.c =============================
 
 
-char *fwd_bem_explain_method(int method)
+const char *fwd_bem_explain_method(int method)
 
 {
   int k;
@@ -12079,10 +12080,10 @@ char *fwd_bem_make_bem_name(char *name)
 {
   char *s1,*s2;
 
-  s1 = strip_from(name,".fif");
-  s2 = strip_from(s1,"-sol");
+  s1 = strip_from(name,(char*)(".fif"));
+  s2 = strip_from(s1,(char*)("-sol"));
   FREE(s1);
-  s1 = strip_from(s2,"-bem");
+  s1 = strip_from(s2,(char*)("-bem"));
   FREE(s2);
   s2 = MALLOC(strlen(s1)+strlen(BEM_SUFFIX)+1,char);
   sprintf(s2,"%s%s",s1,BEM_SUFFIX);
@@ -12097,10 +12098,10 @@ char *fwd_bem_make_bem_sol_name(char *name)
 {
   char *s1,*s2;
 
-  s1 = strip_from(name,".fif");
-  s2 = strip_from(s1,"-sol");
+  s1 = strip_from(name,(char*)(".fif"));
+  s2 = strip_from(s1,(char*)("-sol"));
   FREE(s1);
-  s1 = strip_from(s2,"-bem");
+  s1 = strip_from(s2,(char*)("-bem"));
   FREE(s2);
   s2 = MALLOC(strlen(s1)+strlen(BEM_SOL_SUFFIX)+1,char);
   sprintf(s2,"%s%s",s1,BEM_SOL_SUFFIX);
@@ -14865,7 +14866,8 @@ int fwd_eeg_fit_berg_scherg(fwdEegSphereModel m,       /* Conductor model defini
     /*
     mu[k] = (k+1)*0.1*f;
     */
-    mu[k] = drand48()*f;
+//    mu[k] = drand48()*f;
+    mu[k] = (rand() / (RAND_MAX + 1.0))*f;
   }
 
   simplex = get_initial_simplex(mu,nfit,simplex_size);
@@ -15033,7 +15035,7 @@ static int comp_layers(const void *p1,const void *p2)
 
 
 
-static fwdEegSphereModel fwd_create_eeg_sphere_model(char *name,
+static fwdEegSphereModel fwd_create_eeg_sphere_model(const char *name,
                                                      int nlayer,
                                                      const float *rads,
                                                      const float *sigmas)
@@ -15132,6 +15134,18 @@ static fwdEegSphereModelSet fwd_add_default_eeg_sphere_model(fwdEegSphereModelSe
 
 #define SEP ":\n\r"
 
+#ifndef R_OK
+#define R_OK    4       /* Test for read permission.  */
+#endif
+
+#ifndef W_OK
+#define W_OK    2       /* Test for write permission.  */
+#endif
+//#define   X_OK    1       /* execute permission - unsupported in windows*/
+#ifndef F_OK
+#define F_OK    0       /* Test for existence.  */
+#endif
+
 
 fwdEegSphereModelSet fwd_load_eeg_sphere_models(char *filename, fwdEegSphereModelSet now)
      /*
@@ -15153,8 +15167,13 @@ fwdEegSphereModelSet fwd_load_eeg_sphere_models(char *filename, fwdEegSphereMode
   if (!filename)
     return now;
 
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
+  if (_access(filename,R_OK) != OK)	/* Never mind about an unaccesible file */
+    return now;
+#else
   if (access(filename,R_OK) != OK)	/* Never mind about an unaccesible file */
     return now;
+#endif
 
   if ((fp = fopen(filename,"r")) == NULL) {
     printf(filename);
@@ -15236,7 +15255,7 @@ void fwd_list_eeg_sphere_models(FILE *f, fwdEegSphereModelSet s)
 
 
 
-fwdEegSphereModel fwd_select_eeg_sphere_model(char *name,fwdEegSphereModelSet s)
+fwdEegSphereModel fwd_select_eeg_sphere_model(const char *name,fwdEegSphereModelSet s)
 /*
  * Find a model with a given name and return a duplicate
  */
@@ -18887,7 +18906,7 @@ void mne_ch_selection_free(mneChSelection s)
 }
 
 
-mneChSelection mne_ch_selection_these(char *selname, char **names, int nch)
+mneChSelection mne_ch_selection_these(const char *selname, char **names, int nch)
 /*
  * Give an explicit list of interesting channels
  */
@@ -19231,7 +19250,7 @@ mneMeasData mne_read_meas_data_add(char               *name,       /* Name of th
   fiffId         id = NULL;
   fiffCoordTrans t = NULL;
   fiffTime       meas_date = NULL;
-  char           *stim14_name;
+  const char    *stim14_name;
   /*
    * Desired channels
    */
