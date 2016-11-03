@@ -59,8 +59,6 @@
 #include <strings.h>
 
 #include <math.h>
-#include <stdlib.h>
-#include <cblas.h>
 
 
 #include <Eigen/Dense>
