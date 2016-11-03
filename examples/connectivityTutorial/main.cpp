@@ -277,7 +277,7 @@ int main(int argc, char *argv[])
 
     Network::SPtr pConnect_LA = ConnectivityMeasures::pearsonsCorrelationCoeff(sourceEstimate_LA.data, matNodeVertComb);
 
-    //    Network::SPtr pConnect_LA = ConnectivityMeasures::crossCorrelation(sourceEstimate_LA.data, matNodeVertComb);
+//    Network::SPtr pConnect_LA = ConnectivityMeasures::crossCorrelation(sourceEstimate_LA.data, matNodeVertComb);
 //    Network::SPtr pConnect_LV = ConnectivityMeasures::crossCorrelation(sourceEstimate_LV.data, matNodeVertComb);
 //    Network::SPtr pConnect_RA = ConnectivityMeasures::crossCorrelation(sourceEstimate_RA.data, matNodeVertComb);
 //    Network::SPtr pConnect_RV = ConnectivityMeasures::crossCorrelation(sourceEstimate_RV.data, matNodeVertComb);

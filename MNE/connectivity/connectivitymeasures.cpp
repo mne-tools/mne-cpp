@@ -103,19 +103,19 @@ Network::SPtr ConnectivityMeasures::pearsonsCorrelationCoeff(const MatrixXd& mat
             rowVert(2) = matVert.row(i)(2);
         }
 
-        //Create edges
-        for(int i = 0; i < matData.rows(); ++i) {
-            for(int j = i; j < matData.rows(); ++j) {
-                double pearsonsCoeff = calcPearsonsCorrelationCoeff(matData.row(i), matData.row(j));
-
-                QSharedPointer<NetworkEdge> pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(finalNetwork->getNodes()[i], finalNetwork->getNodes()[j], pearsonsCoeff));
-
-                *finalNetwork->getNodes()[i] << pEdge;
-                *finalNetwork << pEdge;
-            }
-        }
-
         *finalNetwork << NetworkNode::SPtr(new NetworkNode(i, rowVert));
+    }
+
+    //Create edges
+    for(int i = 0; i < matData.rows(); ++i) {
+        for(int j = i; j < matData.rows(); ++j) {
+            double pearsonsCoeff = calcPearsonsCorrelationCoeff(matData.row(i), matData.row(j));
+
+            QSharedPointer<NetworkEdge> pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(finalNetwork->getNodes()[i], finalNetwork->getNodes()[j], pearsonsCoeff));
+
+            *finalNetwork->getNodes()[i] << pEdge;
+            *finalNetwork << pEdge;
+        }
     }
 
     return finalNetwork;
@@ -167,10 +167,8 @@ double ConnectivityMeasures::calcPearsonsCorrelationCoeff(const Eigen::RowVector
     if(vecFirst.cols() != vecSecond.cols()) {
         qDebug() << "ConnectivityMeasures::calcPearsonsCorrelationCoeff - Vectors length do not match!";
     }
-    qDebug() << "ConnectivityMeasures::calcPearsonsCorrelationCoeff";
-    double pearsonsCoeff = (vecFirst.dot(vecSecond))/vecFirst.cols();
-    qDebug() << "ConnectivityMeasures::calcPearsonsCorrelationCoeff - pearsonsCoeff" << pearsonsCoeff;
-    return pearsonsCoeff;
+
+    return (vecFirst.dot(vecSecond))/vecFirst.cols();
 }
 
 
