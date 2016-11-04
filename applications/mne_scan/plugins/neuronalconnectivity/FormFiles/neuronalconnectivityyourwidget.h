@@ -73,7 +73,6 @@ namespace NEURONALCONNECTIVITYPLUGIN
 *
 * @brief The NeuronalConnectivityToolbox class provides a NeuronalConnectivity plugin widget structure.
 */
-}
 class NeuronalConnectivityYourWidget : public QWidget
 {
     Q_OBJECT
@@ -96,6 +95,7 @@ public:
 
 private:
     Ui::NeuronalConnectivityYourToolbarWidget* ui;        /**< The UI class specified in the designer. */
-};
 
+};
+}
 #endif // NEURONALCONNECTIVITYYOURWIDGET_H

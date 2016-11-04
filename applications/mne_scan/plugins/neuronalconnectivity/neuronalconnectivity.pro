@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     connectivity.pro
+# @file     neuronalconnectivity.pro
 # @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
@@ -29,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file generates the makefile for the connectivity plugin.
+# @brief    This project file generates the makefile for the Neuronal Connectivity plugin.
 #
 #--------------------------------------------------------------------------------------------------------------
 
