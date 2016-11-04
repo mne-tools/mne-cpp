@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     realtimesourceestimate.cpp
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     neuronalconnectivityyourwidget.cpp
+* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     October, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the RealTimeSourceEstimate class.
+* @brief    Contains the implementation of the NeuronalConnectivityYourWidget class.
 *
 */
 
@@ -38,13 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "realtimesourceestimate.h"
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
+#include "neuronalconnectivityyourwidget.h"
 
 
 //*************************************************************************************************************
@@ -52,8 +46,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace SCMEASLIB;
-//using namespace IOBUFFER;
+using namespace NEURONALCONNECTIVITYPLUGIN;
 
 
 //*************************************************************************************************************
@@ -61,49 +54,17 @@ using namespace SCMEASLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RealTimeSourceEstimate::RealTimeSourceEstimate(QObject *parent)
-: NewMeasurement(QMetaType::type("RealTimeSourceEstimate::SPtr"), parent)
-, m_bStcSend(true)
-, m_pMNEStc(new MNESourceEstimate)
-, m_pAnnotSet(AnnotationSet::SPtr(new AnnotationSet))
-, m_pSurfSet(SurfaceSet::SPtr(new SurfaceSet))
-, m_pFwdSolution(MNEForwardSolution::SPtr(new MNEForwardSolution))
-, m_bInitialized(false)
+NeuronalConnectivityYourWidget::NeuronalConnectivityYourWidget(QWidget *parent)
+: QWidget(parent)
+, ui(new Ui::NeuronalConnectivityYourToolbarWidget)
 {
-
+    ui->setupUi(this);
 }
 
 
 //*************************************************************************************************************
 
-RealTimeSourceEstimate::~RealTimeSourceEstimate()
+NeuronalConnectivityYourWidget::~NeuronalConnectivityYourWidget()
 {
-
+    delete ui;
 }
-
-
-//*************************************************************************************************************
-
-MNESourceEstimate::SPtr& RealTimeSourceEstimate::getValue()
-{
-    QMutexLocker locker(&m_qMutex);
-    return m_pMNEStc;
-}
-
-
-//*************************************************************************************************************
-
-void RealTimeSourceEstimate::setValue(MNESourceEstimate& v)
-{
-    m_qMutex.lock();
-
-    //Store
-    *m_pMNEStc = v;
-
-    m_bInitialized = true;
-
-    m_qMutex.unlock();
-
-    emit notify();
-}
-
