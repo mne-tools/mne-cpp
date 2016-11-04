@@ -145,6 +145,8 @@ FORMS += \
 qtHaveModule(charts) {
     SOURCES += realtimesourceestimatewidget.cpp
     HEADERS += realtimesourceestimatewidget.h
+    SOURCES += realtimeconnectivityestimatewidget.cpp
+    HEADERS += realtimeconnectivityestimatewidget.h
 }
 
 RESOURCES += \

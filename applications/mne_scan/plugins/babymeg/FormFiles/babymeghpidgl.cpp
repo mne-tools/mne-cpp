@@ -113,6 +113,9 @@ BabyMEGHPIDgl::BabyMEGHPIDgl(BabyMEG* p_pBabyMEG,QWidget *parent)
     QFile t_fileSensorSurfaceBEM("./resources/sensorSurfaces/BabyMEG.fif");
     MNEBem t_sensorSurfaceBEM(t_fileSensorSurfaceBEM);
     m_pView3D->addBemData("Device", "BabyMEG", t_sensorSurfaceBEM);
+
+    //Always on top
+    this->setWindowFlags(this->windowFlags() | Qt::WindowStaysOnTopHint);
 }
 
 
@@ -267,9 +270,9 @@ void BabyMEGHPIDgl::setDigitizerDataToView3D(const FiffDigPointSet& digPointSet,
             }
         }
 
-        m_pView3D->addDigitizerData("Subject", "Digitizer", t_digSetWithoutAdditional);
+        m_pView3D->addDigitizerData("Head", "Digitizer", t_digSetWithoutAdditional);
     } else {
-        m_pView3D->addDigitizerData("Subject", "Digitizer", digPointSet);
+        m_pView3D->addDigitizerData("Head", "Digitizer", digPointSet);
     }
 }
 
