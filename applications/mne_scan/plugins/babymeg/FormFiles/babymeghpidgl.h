@@ -91,7 +91,7 @@ class BabyMEG;
 
 //=============================================================================================================
 /**
-* DECLARE CLASS BabyMEGHPIDgl
+* The BabyMEGHPIDgl class provides a QDialog for the HPI controls.
 *
 * @brief The BabyMEGHPIDgl class provides a QDialog for the HPI controls.
 */

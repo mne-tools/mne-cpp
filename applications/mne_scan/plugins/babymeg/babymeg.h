@@ -70,6 +70,7 @@
 
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
+#include <QQuaternion>
 
 
 //*************************************************************************************************************
@@ -322,7 +323,13 @@ public:
 protected:
     virtual void run();
 
-private:
+private:    
+    //=========================================================================================================
+    /**
+    * Update HPI.
+    */
+    void updateHPI();
+
     //=========================================================================================================
     /**
     * Combines all analog trigger signals to one single digital trigger line.
@@ -423,12 +430,13 @@ private:
 
     Eigen::RowVectorXd                      m_cals;                         /**< Calibration vector.*/
     Eigen::SparseMatrix<double>             m_sparseMatCals;                /**< Sparse calibration matrix.*/
+    Eigen::MatrixXf                         m_matValue;                     /**< The current data block.*/
 
-    QAction*                                m_pActionSetupProject;          /**< shows setup project dialog */
-    QAction*                                m_pActionRecordFile;            /**< start recording action */
-    QAction*                                m_pActionSqdCtrl;               /**< show squid control */
-    QAction*                                m_pActionUpdateFiffInfo;        /**< Update Fiff Info action */
-    QAction*                                m_pActionUpdateFiffInfoForHPI;  /**< Update HPI info into Fiff Info action */
+    QAction*                m_pActionSetupProject;          /**< shows setup project dialog */
+    QAction*                m_pActionRecordFile;            /**< start recording action */
+    QAction*                m_pActionSqdCtrl;               /**< show squid control */
+    QAction*                m_pActionUpdateFiffInfo;        /**< Update Fiff Info action */
+    QAction*                m_pActionUpdateFiffInfoForHPI;  /**< Update HPI info into Fiff Info action */
 
 signals:
     //=========================================================================================================

@@ -82,15 +82,17 @@ BabyMEGHPIDgl::BabyMEGHPIDgl(BabyMEG* p_pBabyMEG,QWidget *parent)
 {
     ui->setupUi(this);
 
-    connect(ui->bn_PolhemusFile, SIGNAL(released()),
-            this, SLOT(bnLoadPolhemusFile()));
+    connect(ui->bn_PolhemusFile, &QPushButton::released,
+            this, &BabyMEGHPIDgl::bnLoadPolhemusFile);
 
     connect(this, &BabyMEGHPIDgl::SendHPIFiffInfo,
             m_pBabyMEG, &BabyMEG::RecvHPIFiffInfo);
 
-    connect(ui->buttonBox,SIGNAL(clicked(QAbstractButton *)),
-            this, SLOT(OKProc(QAbstractButton *)));
-//    connect(ui->buttonBox,SIGNAL(rejected()),this,SLOT(CancelProc));
+    connect(ui->buttonBox, &QDialogButtonBox::clicked,
+            this, &BabyMEGHPIDgl::OKProc);
+
+//    connect(ui->buttonBox,&QDialogButtonBox::rejected,
+//              this, &BabyMEGHPIDgl::CancelProc);
 }
 
 
@@ -161,8 +163,12 @@ void BabyMEGHPIDgl::closeEvent(QCloseEvent *event)
 void BabyMEGHPIDgl::bnLoadPolhemusFile()
 {
     qDebug()<<" Start to load Polhemus File";
+
+
+//    FileName_HPI = QFileDialog::getOpenFileName(this,
+//         tr("Open Polhemus File"), "C:/Users/babyMEG/Desktop", tr("Fiff file (*.fif)"));
     FileName_HPI = QFileDialog::getOpenFileName(this,
-         tr("Open Polhemus File"), "C:/Users/babyMEG/Desktop", tr("Fiff file (*.fif)"));
+            tr("Open Polhemus File"), "", tr("Fiff file (*.fif)"));
     //display the text on the text control
     ui->ed_PolFileName->setText(FileName_HPI);
 }

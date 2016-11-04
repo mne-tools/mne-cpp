@@ -112,6 +112,7 @@ struct coilParam {
 struct dipError {
     double error;
     Eigen::MatrixXd moment;
+    int numIterations;
 };
 
 struct sens {
@@ -152,9 +153,17 @@ public:
 
     //=========================================================================================================
     /**
+    * Inits the rt HPI processing and performs one single fit.
+    *
+    * @param[in] t_mat  Data to estimate the HPI positions from
+    */
+    void singleHPIFit(const MatrixXd& t_mat);
+
+    //=========================================================================================================
+    /**
     * Slot to receive incoming data.
     *
-    * @param[in] p_DataSegment  Data to estimate the spectrum from -> ToDo Replace this by shared data pointer
+    * @param[in] p_DataSegment  Data to estimate the HPI positions from
     */
     void append(const MatrixXd &p_DataSegment);
 
@@ -165,7 +174,6 @@ public:
     * @return true if is running, false otherwise
     */
     inline bool isRunning();
-
 
     //=========================================================================================================
     /**
@@ -183,16 +191,19 @@ public:
     */
     virtual bool stop();
 
-    dipError dipfitError (Eigen::MatrixXd, Eigen::MatrixXd, struct sens);
-    Eigen::MatrixXd ft_compute_leadfield(Eigen::MatrixXd, struct sens);
-    Eigen::MatrixXd magnetic_dipole(Eigen::MatrixXd, Eigen::MatrixXd, Eigen::MatrixXd);
     coilParam dipfit(struct coilParam, struct sens, Eigen::MatrixXd, int numCoils);
-    Eigen::MatrixXd fminsearch(Eigen::MatrixXd,int, int, int, Eigen::MatrixXd, struct sens);
-    static bool compar (int, int);
-    Eigen::MatrixXd pinv(Eigen::MatrixXd);
     Eigen::Matrix4d computeTransformation(Eigen::MatrixXd, Eigen::MatrixXd);
+    Eigen::MatrixXd fminsearch(Eigen::MatrixXd,int, int, int, Eigen::MatrixXd, struct sens);
 
-    void test();
+    //void test();
+
+    QMutex m_mutex;
+
+    bool SendDataToBuffer;
+
+    int simplex_numitr;
+
+    //MatrixXd SpecData;
 
 signals:
     //=========================================================================================================
@@ -212,44 +223,33 @@ protected:
     */
     virtual void run();
 
-private:
-    QMutex      mutex;                  /**< Provides access serialization between threads*/
+    CircularMatrixBuffer<double>::SPtr m_pRawMatrixBuffer;      /**< The Circular Raw Matrix Buffer. */
 
-    quint32      m_iMaxSamples;         /**< Maximal amount of samples received, before covariance is estimated.*/
+    QMutex              mutex;                                  /**< Provides access serialization between threads*/
 
-    quint32      m_iNewMaxSamples;      /**< New maximal amount of samples received, before covariance is estimated.*/
+    quint32             m_iMaxSamples;                          /**< Maximal amount of samples received, before covariance is estimated.*/
+    quint32             m_iNewMaxSamples;                       /**< New maximal amount of samples received, before covariance is estimated.*/
 
-    FiffInfo::SPtr  m_pFiffInfo;        /**< Holds the fiff measurement information. */
+    FiffInfo::SPtr      m_pFiffInfo;                            /**< Holds the fiff measurement information. */
 
-    bool        m_bIsRunning;           /**< Holds if real-time Covariance estimation is running.*/
-
-    CircularMatrixBuffer<double>::SPtr m_pRawMatrixBuffer;   /**< The Circular Raw Matrix Buffer. */
-
-//    QVector <float> m_fWin;
-
-//    double m_Fs;
-
-//    qint32 m_iFFTlength;
-//    qint32 m_dataLength;
+    bool                m_bIsRunning;                           /**< Holds if real-time Covariance estimation is running.*/
 
     static std::vector <double>base_arr;
 
+    int                 m_iCounter;
+    //QVector <float> m_fWin;
 
-//protected:
-//    int NumOfBlocks;
-//    int BlockSize  ;
-//    int Sensors    ;
-//    int BlockIndex ;
+    //double m_Fs;
 
-//    MatrixXd CircBuf;
+    //qint32 m_iFFTlength;
+    //qint32 m_dataLength;
 
-public:
-    MatrixXd SpecData;
-    QMutex ReadMutex;
+    //int NumOfBlocks;
+    //int BlockSize  ;
+    //int Sensors    ;
+    //int BlockIndex ;
 
-    bool SendDataToBuffer;
-
-    int simplex_numitr;
+    //MatrixXd CircBuf;
 
 };
 
@@ -270,4 +270,4 @@ inline bool RtHPIS::isRunning()
 Q_DECLARE_METATYPE(Eigen::MatrixXd); /**< Provides QT META type declaration of the MatrixXd type. For signal/slot usage.*/
 #endif
 
-#endif // RtHPIS_H
+#endif // RTHPIS_H
