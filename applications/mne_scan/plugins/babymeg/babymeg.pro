@@ -2,13 +2,14 @@
 #
 # @file     babymeg.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+#           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
-# @date     July, 2012
+# @date     November, 2016
 #
 # @section  LICENSE
 #
-# Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+# Copyright (C) 2012, Christoph Dinh, Lorenz Esch and Matti Hamalainen. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -41,8 +42,7 @@ CONFIG += plugin
 
 DEFINES += BABYMEG_LIBRARY
 
-QT += widgets opengl
-QT += network
+QT += widgets 3dextras network
 
 TARGET = babymeg
 CONFIG(debug, debug|release) {
@@ -59,6 +59,8 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}RtProcessingd \
             -lMNE$${MNE_LIB_VERSION}RtCommandd \
             -lMNE$${MNE_LIB_VERSION}RtClientd \
+            -lMNE$${MNE_LIB_VERSION}DispChartsd \
+            -lMNE$${MNE_LIB_VERSION}Disp3Dd \
             -lscMeasd \
             -lscDispd \
             -lscSharedd
@@ -72,6 +74,8 @@ else {
             -lMNE$${MNE_LIB_VERSION}RtProcessing \
             -lMNE$${MNE_LIB_VERSION}RtCommand \
             -lMNE$${MNE_LIB_VERSION}RtClient \
+            -lMNE$${MNE_LIB_VERSION}DispCharts \
+            -lMNE$${MNE_LIB_VERSION}Disp3D \
             -lscMeas \
             -lscDisp \
             -lscShared
