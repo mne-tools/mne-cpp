@@ -454,6 +454,19 @@ void BabyMEG::splitRecordingFile()
 
 //*************************************************************************************************************
 
+void BabyMEG::performHPIFitting()
+{
+    //Generate/Update current dev/head transfomration. We do not need to make use of rtHPI plugin here since the fitting is only needed once here.
+    //rt head motion correction will be performed using the rtHPI plugin.
+    if(m_pFiffInfo) {
+        RtHPIS::SPtr pRtHpis = RtHPIS::SPtr(new RtHPIS(m_pFiffInfo));
+        pRtHpis->singleHPIFit(this->calibrate(m_matValue));
+    }
+}
+
+
+//*************************************************************************************************************
+
 void BabyMEG::toggleRecordingFile()
 {
     //Setup writing to file
@@ -502,15 +515,6 @@ void BabyMEG::toggleRecordingFile()
         //Set all projectors to zero before writing to file because we always write the raw data
         for(int i = 0; i<m_pFiffInfo->projs.size(); i++)
             m_pFiffInfo->projs[i].active = false;
-
-        //Generate/Update current dev/head transfomration. We do not need to make use of rtHPI plugin here since the fitting is only needed once here.
-        //rt head motion correction will be performed using the rtHPI plugin.
-        RtHPIS::SPtr pRtHpis = RtHPIS::SPtr(new RtHPIS(m_pFiffInfo));
-        pRtHpis->singleHPIFit(this->calibrate(m_matValue));
-        qDebug()<<"====================Limin Debug here";
-        qDebug()<< m_pFiffInfo->dev_head_t.trans(0,0);
-        qDebug()<<"====================Limin Debug here";
-
 
         //Start/Prepare writing process. Actual writing is done in run() method.
         mutex.lock();

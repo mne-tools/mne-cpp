@@ -202,6 +202,12 @@ public:
 
     //=========================================================================================================
     /**
+    * Perform a HPI fitting procedure.
+    */
+    void performHPIFitting();
+
+    //=========================================================================================================
+    /**
     * Starts or stops a file recording depending on the current recording state.
     */
     void toggleRecordingFile();
