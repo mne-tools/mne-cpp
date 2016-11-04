@@ -103,7 +103,7 @@ DigitizerSetTreeItem::DigitizerSetTreeItem(int iType, const QString& text)
 
 DigitizerSetTreeItem::~DigitizerSetTreeItem()
 {
-
+    delete m_pRenderable3DEntity;
 }
 
 
@@ -120,12 +120,6 @@ QVariant DigitizerSetTreeItem::data(int role) const
 void  DigitizerSetTreeItem::setData(const QVariant& value, int role)
 {
     AbstractTreeItem::setData(value, role);
-
-    switch(role) {
-    case Data3DTreeModelItemRoles::SurfaceCurrentColorVert:
-        m_pRenderable3DEntity->setVertColor(value.value<QByteArray>());
-        break;
-    }
 }
 
 
@@ -133,6 +127,12 @@ void  DigitizerSetTreeItem::setData(const QVariant& value, int role)
 
 bool DigitizerSetTreeItem::addData(const FIFFLIB::FiffDigPointSet& tDigitizer, Qt3DCore::QEntity* parent)
 {
+    //Delete all childs first
+    if(this->hasChildren()) {
+        this->removeRows(0, this->rowCount());
+    }
+
+    //Add data
     bool state = false;
 
     //parsing the digitizer List
@@ -200,16 +200,6 @@ bool DigitizerSetTreeItem::addData(const FIFFLIB::FiffDigPointSet& tDigitizer, Q
         itemList.clear();
     }
     return state;
-}
-
-
-//*************************************************************************************************************
-
-void DigitizerSetTreeItem::setVisible(bool state)
-{
-    for(int i = 0; i < m_lChildren.size(); ++i) {
-        m_lChildren.at(i)->setParent(state ? m_pRenderable3DEntity : Q_NULLPTR);
-    }
 }
 
 

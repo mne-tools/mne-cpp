@@ -101,7 +101,7 @@ BrainRTSourceLocDataTreeItem::~BrainRTSourceLocDataTreeItem()
 {
     if(m_pSourceLocRtDataWorker->isRunning()) {
         m_pSourceLocRtDataWorker->stop();
-        qDebug() << "m_pSourceLocRtDataWorker stopped";
+        delete m_pSourceLocRtDataWorker;
     }
 }
 
