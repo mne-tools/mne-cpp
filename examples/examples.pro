@@ -60,7 +60,6 @@ SUBDIRS += \
         SUBDIRS += \
             clusteredInverse \
             rawClusteredInverse \
-            rawClusteredInverseEEG \
             readFwdDisp3D \
             plotSurfaces \
             computeInverseRapMusic \
