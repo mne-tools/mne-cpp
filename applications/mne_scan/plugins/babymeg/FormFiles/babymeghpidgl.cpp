@@ -115,7 +115,7 @@ BabyMEGHPIDgl::BabyMEGHPIDgl(BabyMEG* p_pBabyMEG,QWidget *parent)
     m_pView3D->addBemData("Device", "BabyMEG", t_sensorSurfaceBEM);
 
     //Always on top
-    this->setWindowFlags(this->windowFlags() | Qt::WindowStaysOnTopHint);
+    //this->setWindowFlags(this->windowFlags() | Qt::WindowStaysOnTopHint);
 }
 
 
