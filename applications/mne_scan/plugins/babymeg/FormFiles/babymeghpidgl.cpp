@@ -247,9 +247,9 @@ QList<FiffDigPoint> BabyMEGHPIDgl::readPolhemusDig(QString fileName)
 
 void BabyMEGHPIDgl::setDigitizerDataToView3D(const FiffDigPointSet& digPointSet, bool bSortOutAdditionalDigitizer)
 {
-    FiffDigPointSet t_digSetWithoutAdditional = digPointSet;
-
     if(bSortOutAdditionalDigitizer) {
+        FiffDigPointSet t_digSetWithoutAdditional;
+
         for(int i = 0; i < digPointSet.size(); ++i) {
             switch(digPointSet[i].kind)
             {
@@ -266,8 +266,10 @@ void BabyMEGHPIDgl::setDigitizerDataToView3D(const FiffDigPointSet& digPointSet,
                     break;
             }
         }
-    }
 
-    m_pView3D->addDigitizerData("Subject", "Digitizer", t_digSetWithoutAdditional);
+        m_pView3D->addDigitizerData("Subject", "Digitizer", t_digSetWithoutAdditional);
+    } else {
+        m_pView3D->addDigitizerData("Subject", "Digitizer", digPointSet);
+    }
 }
 
