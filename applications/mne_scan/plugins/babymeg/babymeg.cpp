@@ -506,7 +506,11 @@ void BabyMEG::toggleRecordingFile()
         //Generate/Update current dev/head transfomration. We do not need to make use of rtHPI plugin here since the fitting is only needed once here.
         //rt head motion correction will be performed using the rtHPI plugin.
         RtHPIS::SPtr pRtHpis = RtHPIS::SPtr(new RtHPIS(m_pFiffInfo));
-        pRtHpis->singleHPIFit(m_matValue.cast<double>());
+        pRtHpis->singleHPIFit(this->calibrate(m_matValue));
+        qDebug()<<"====================Limin Debug here";
+        qDebug()<< m_pFiffInfo->dev_head_t.trans(0,0);
+        qDebug()<<"====================Limin Debug here";
+
 
         //Start/Prepare writing process. Actual writing is done in run() method.
         mutex.lock();
@@ -750,7 +754,7 @@ QWidget* BabyMEG::setupWidget()
 
 void BabyMEG::run()
 {
-    MatrixXf matValue;
+//    MatrixXf matValue;
 
     qint32 size = 0;
 
@@ -759,7 +763,7 @@ void BabyMEG::run()
         if(m_pRawMatrixBuffer)
         {
             //pop matrix
-            matValue = m_pRawMatrixBuffer->pop();
+            m_matValue = m_pRawMatrixBuffer->pop();
 
 //            //Update and write the HPI information to the current data block
 //            QTime timer;
@@ -770,13 +774,13 @@ void BabyMEG::run()
             //create digital trigger information
             //QElapsedTimer time;
             //time.start();
-            createDigTrig(matValue);
+            createDigTrig(m_matValue);
             //qDebug()<<"BabyMEG::run - createDigTrig took: "<<time.elapsed();
 
             //Write raw data to fif file
             if(m_bWriteToFile)
             {
-                size += matValue.rows()*matValue.cols() * 4;
+                size += m_matValue.rows()*m_matValue.cols() * 4;
 
                 if(size > MAX_DATA_LEN)
                 {
@@ -785,7 +789,7 @@ void BabyMEG::run()
                 }
 
                 mutex.lock();
-                m_pOutfid->write_raw_buffer(matValue.cast<double>());
+                m_pOutfid->write_raw_buffer(m_matValue.cast<double>());
                 mutex.unlock();
             }
             else
@@ -795,7 +799,7 @@ void BabyMEG::run()
 
             if(m_pRTMSABabyMEG)
             {
-                m_pRTMSABabyMEG->data()->setValue(this->calibrate(matValue));
+                m_pRTMSABabyMEG->data()->setValue(this->calibrate(m_matValue));
             }
         }
     }

@@ -236,6 +236,7 @@ protected:
 
     static std::vector <double>base_arr;
 
+    int                 m_iCounter;
     //QVector <float> m_fWin;
 
     //double m_Fs;
