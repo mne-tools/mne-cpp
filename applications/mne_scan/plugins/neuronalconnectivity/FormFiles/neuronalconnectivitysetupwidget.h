@@ -1,10 +1,10 @@
 //=============================================================================================================
 /**
-* @file     shadermaterial.h
+* @file     neuronalconnectivitysetupwidget.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2016
+* @date     October, 2016
 *
 * @section  LICENSE
 *
@@ -29,11 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    ShaderMaterial class declaration
+* @brief    Contains the declaration of the NeuronalConnectivitySetupWidget class.
+*
 */
 
-#ifndef SHADERMATERIAL_H
-#define SHADERMATERIAL_H
+#ifndef NEURONALCONNECTIVITYSETUPWIDGET_H
+#define NEURONALCONNECTIVITYSETUPWIDGET_H
 
 
 //*************************************************************************************************************
@@ -41,7 +42,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../disp3D_global.h"
+#include "../ui_neuronalconnectivitysetup.h"
+#include "neuronalconnectivityaboutwidget.h"
 
 
 //*************************************************************************************************************
@@ -49,42 +51,15 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <Qt3DRender/qmaterial.h>
+#include <QtWidgets>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Eigen INCLUDES
+// DEFINE NAMESPACE NEURONALCONNECTIVITYPLUGIN
 //=============================================================================================================
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-namespace Qt3DRender {
-    class QMaterial;
-    class QEffect;
-    class QParameter;
-    class QShaderProgram;
-    class QMaterial;
-    class QFilterKey;
-    class QTechnique;
-    class QRenderPass;
-    class QNoDepthMask;
-    class QBlendEquationArguments;
-    class QBlendEquation;
-    class QGraphicsApiFilter;
-}
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE DISP3DLIB
-//=============================================================================================================
-
-namespace DISP3DLIB
+namespace NEURONALCONNECTIVITYPLUGIN
 {
 
 
@@ -93,73 +68,50 @@ namespace DISP3DLIB
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+class NeuronalConnectivity;
+
 
 //=============================================================================================================
 /**
-* ShaderMaterial is provides a Qt3D material with own shader support.
+* DECLARE CLASS NeuronalConnectivitySetupWidget
 *
-* @brief ShaderMaterial is provides a Qt3D material with own shader support.
+* @brief The NeuronalConnectivitySetupWidget class provides the NeuronalConnectivity configuration window.
 */
-class DISP3DNEWSHARED_EXPORT ShaderMaterial : public Qt3DRender::QMaterial
+class NeuronalConnectivitySetupWidget : public QWidget
 {
     Q_OBJECT
 
 public:
     //=========================================================================================================
     /**
-    * Default constructor.
+    * Constructs a NeuronalConnectivitySetupWidget which is a child of parent.
     *
-    * @param[in] parent         The parent of this class.
+    * @param [in] toolbox a pointer to the corresponding NeuronalConnectivityToolbox.
+    * @param [in] parent pointer to parent widget; If parent is 0, the new NeuronalConnectivitySetupWidget becomes a window. If parent is another widget, NeuronalConnectivitySetupWidget becomes a child window inside parent. NeuronalConnectivitySetupWidget is deleted when its parent is deleted.
     */
-    explicit ShaderMaterial(Qt3DCore::QNode *parent = 0);
+    NeuronalConnectivitySetupWidget(NeuronalConnectivity* toolbox, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Default destructor.
+    * Destroys the NeuronalConnectivitySetupWidget.
+    * All NeuronalConnectivitySetupWidget's children are deleted first. The application exits if NeuronalConnectivitySetupWidget is the main widget.
     */
-    ~ShaderMaterial();
+    ~NeuronalConnectivitySetupWidget();
 
+private slots:
     //=========================================================================================================
     /**
-    * Get the current alpha value.
+    * Shows the About Dialog
     *
-    * @return The current alpha value.
     */
-    float alpha();
-
-    //=========================================================================================================
-    /**
-    * Set the current alpha value.
-    *
-    * @param[in] alpha  The new alpha value.
-    */
-    void setAlpha(float alpha);
+    void showAboutDialog();
 
 private:
-    //=========================================================================================================
-    /**
-    * Init the ShaderMaterial class.
-    */
-    void init();
+    NeuronalConnectivity*   m_pNeuronalConnectivity;	/**< Holds a pointer to corresponding NeuronalConnectivityToolbox.*/
 
-    Qt3DRender::QEffect*            m_pVertexEffect;
-
-    Qt3DRender::QParameter*         m_pAmbientParameter;
-    Qt3DRender::QParameter*         m_pDiffuseParameter;
-    Qt3DRender::QParameter*         m_pSpecularParameter;
-    Qt3DRender::QParameter*         m_pShininessParameter;
-    Qt3DRender::QParameter*         m_pAlphaParameter;
-    Qt3DRender::QFilterKey*         m_pFilterKey;
-
-    Qt3DRender::QTechnique*         m_pVertexGL3Technique;
-    Qt3DRender::QRenderPass*        m_pVertexGL3RenderPass;
-    Qt3DRender::QShaderProgram*     m_pVertexGL3Shader;
-
-    Qt3DRender::QNoDepthMask*                   m_pNoDepthMask;
-    Qt3DRender::QBlendEquationArguments*        m_pBlendState;
-    Qt3DRender::QBlendEquation*                 m_pBlendEquation;
+    Ui::NeuronalConnectivitySetupWidgetClass ui;        /**< Holds the user interface for the NeuronalConnectivitySetupWidget.*/
 };
 
-} // namespace DISP3DLIB
+} // NAMESPACE
 
-#endif // SHADERMATERIAL_H
+#endif // NEURONALCONNECTIVITYSETUPWIDGET_H

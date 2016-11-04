@@ -1,10 +1,10 @@
 //=============================================================================================================
 /**
-* @file     network.cpp
+* @file     realtimeconnectivityestimatewidget.cpp
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     July, 2016
+* @date     October, 2016
 *
 * @section  LICENSE
 *
@@ -29,23 +29,32 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Network class definition.
+* @brief    Implementation of the RealTimeConnectivityEstimateWidget Class.
 *
 */
 
+//ToDo Paint to render area
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "network.h"
+#include "realtimeconnectivityestimatewidget.h"
 
+#include <scMeas/realtimeconnectivityestimate.h>
 
-//*************************************************************************************************************
-//=============================================================================================================
-// INCLUDES
-//=============================================================================================================
+#include <disp3D/3DObjects/brain/brainrtconnectivitydatatreeitem.h>
+
+#include <mne/mne_forwardsolution.h>
+#include <mne/mne_inverse_operator.h>
+
+#include <fs/surfaceset.h>
+#include <fs/annotationset.h>
+
+#include <inverse/minimumNorm/minimumnorm.h>
+
+#include <math.h>
 
 
 //*************************************************************************************************************
@@ -53,11 +62,20 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QSlider>
+#include <QAction>
+#include <QLabel>
+#include <QGridLayout>
+#include <QSettings>
+#include <QDebug>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // Eigen INCLUDES
 //=============================================================================================================
+
+#include <Eigen/Core>
 
 
 //*************************************************************************************************************
@@ -65,14 +83,11 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace CONNECTIVITYLIB;
-using namespace Eigen;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE GLOBAL METHODS
-//=============================================================================================================
+using namespace SCDISPLIB;
+using namespace DISP3DLIB;
+using namespace MNELIB;
+using namespace SCMEASLIB;
+using namespace INVERSELIB;
 
 
 //*************************************************************************************************************
@@ -80,108 +95,114 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Network::Network(const QString& sConnectivityMethod)
-: m_sConnectivityMethod(sConnectivityMethod)
+RealTimeConnectivityEstimateWidget::RealTimeConnectivityEstimateWidget(QSharedPointer<SCMEASLIB::RealTimeConnectivityEstimate> &pRTCE, QWidget* parent)
+: NewMeasurementWidget(parent)
+, m_pRTCE(pRTCE)
+, m_bInitialized(false)
 {
+    m_pAction3DControl = new QAction(QIcon(":/images/3DControl.png"), tr("Shows the 3D control widget (F9)"),this);
+    m_pAction3DControl->setShortcut(tr("F9"));
+    m_pAction3DControl->setToolTip(tr("Shows the 3D control widget (F9)"));
+    connect(m_pAction3DControl, &QAction::triggered,
+            this, &RealTimeConnectivityEstimateWidget::show3DControlWidget);
+    addDisplayAction(m_pAction3DControl);
+    m_pAction3DControl->setVisible(true);
+
+    m_p3DView = View3D::SPtr(new View3D());
+
+    m_pControl3DView = Control3DWidget::SPtr(new Control3DWidget(this));
+    m_pControl3DView->setView3D(m_p3DView);
+
+    QGridLayout *mainLayoutView = new QGridLayout;
+    QWidget *pWidgetContainer = QWidget::createWindowContainer(m_p3DView.data());
+    mainLayoutView->addWidget(pWidgetContainer);
+
+    this->setLayout(mainLayoutView);
+
+    getData();
 }
 
 
 //*************************************************************************************************************
 
-MatrixXd Network::getConnectivityMatrix()
+RealTimeConnectivityEstimateWidget::~RealTimeConnectivityEstimateWidget()
 {
-    return generateConnectMat();
-}
-
-
-//*************************************************************************************************************
-
-QList<NetworkEdge::SPtr> Network::getEdges()
-{
-    return m_lEdges;
-}
-
-
-//*************************************************************************************************************
-
-QList<NetworkNode::SPtr> Network::getNodes()
-{
-    return m_lNodes;
-}
-
-
-//*************************************************************************************************************
-
-qint16 Network::getDistribution()
-{
-    qint16 distribution = 0;
-
-    for(NetworkNode::SPtr node : m_lNodes) {
-        distribution += node->getDegree();
-    }
-
-    return distribution;
-}
-
-
-//*************************************************************************************************************
-
-void Network::setConnectivityMethod(const QString& sConnectivityMethod)
-{
-    m_sConnectivityMethod = sConnectivityMethod;
-}
-
-
-//*************************************************************************************************************
-
-QString Network::getConnectivityMethod()
-{
-    return m_sConnectivityMethod;
-}
-
-
-//*************************************************************************************************************
-
-Network& Network::operator<<(NetworkEdge::SPtr newEdge)
-{
-    m_lEdges << newEdge;
-
-    return *this;
-}
-
-
-//*************************************************************************************************************
-
-Network& Network::operator<<(NetworkNode::SPtr newNode)
-{
-    m_lNodes << newNode;
-
-    return *this;
-}
-
-
-//*************************************************************************************************************
-
-MatrixXd Network::generateConnectMat()
-{
-    MatrixXd matDist(m_lNodes.size(), m_lNodes.size());
-    matDist.setZero();
-
-    for(int i = 0; i < m_lEdges.size(); ++i)
+    //
+    // Store Settings
+    //
+    if(!m_pRTCE->getName().isEmpty())
     {
-        int row = m_lEdges.at(i)->getStartNode()->getId();
-        int col = m_lEdges.at(i)->getEndNode()->getId();
+    }
+}
 
-        if(row < matDist.rows() && col < matDist.cols())
-        {
-            matDist(row,col) = m_lEdges.at(i)->getWeight();
+
+//*************************************************************************************************************
+
+void RealTimeConnectivityEstimateWidget::update(SCMEASLIB::NewMeasurement::SPtr)
+{
+    getData();
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeConnectivityEstimateWidget::getData()
+{
+    if(m_bInitialized)
+    {
+        //
+        // Add rt brain data
+        //
+        if(m_lRtItem.isEmpty()) {
+            qDebug()<<"RealTimeConnectivityEstimateWidget::getData - Creating m_lRtItem list";
+            m_lRtItem = m_p3DView->addConnectivityData("Subject01", "HemiLRSet", m_pRTCE->getValue());
+        } else {
+            qDebug()<<"RealTimeConnectivityEstimateWidget::getData - Working with m_lRtItem list";
+
+            for(int i = 0; i<m_lRtItem.size(); i++) {
+                m_lRtItem.at(i)->addData(m_pRTCE->getValue());
+            }
         }
     }
+    else
+    {
+        if(m_pRTCE->getAnnotSet() && m_pRTCE->getSurfSet())
+        {
+            m_pRTCE->m_bConnectivitySend = false;
+            init();
 
-    return matDist;
+            //
+            // Add brain data
+            //
+            m_p3DView->addSurfaceSet("Subject01", "HemiLRSet", *m_pRTCE->getSurfSet(), *m_pRTCE->getAnnotSet());
+        }
+    }
 }
 
 
+//*************************************************************************************************************
+
+void RealTimeConnectivityEstimateWidget::init()
+{
+    m_bInitialized = true;
+    m_pRTCE->m_bConnectivitySend = true;
+}
 
 
+//*************************************************************************************************************
 
+void RealTimeConnectivityEstimateWidget::show3DControlWidget()
+{
+    if(m_pControl3DView->isActiveWindow())
+        m_pControl3DView->hide();
+    else {
+        m_pControl3DView->activateWindow();
+        m_pControl3DView->show();
+    }
+}
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// STATIC DEFINITIONS
+//=============================================================================================================
