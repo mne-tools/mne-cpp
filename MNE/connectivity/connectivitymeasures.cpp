@@ -51,6 +51,8 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QDebug>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -87,9 +89,9 @@ ConnectivityMeasures::ConnectivityMeasures()
 
 //*************************************************************************************************************
 
-Network::SPtr ConnectivityMeasures::crossCorrelation(const MatrixXd& matData, const MatrixX3f& matVert)
+Network::SPtr ConnectivityMeasures::pearsonsCorrelationCoeff(const MatrixXd& matData, const MatrixX3f& matVert)
 {
-    Network::SPtr finalNetwork  = Network::SPtr(new Network());
+    Network::SPtr finalNetwork  = Network::SPtr(new Network("Pearson's Correlation Coefficient"));
 
     //Create nodes
     for(int i = 0; i < matData.rows(); ++i) {
@@ -107,7 +109,42 @@ Network::SPtr ConnectivityMeasures::crossCorrelation(const MatrixXd& matData, co
     //Create edges
     for(int i = 0; i < matData.rows(); ++i) {
         for(int j = i; j < matData.rows(); ++j) {
-            QPair<int,double> crossCorrPair = eigenCrossCorrelation(matData.row(i), matData.row(j));
+            double pearsonsCoeff = calcPearsonsCorrelationCoeff(matData.row(i), matData.row(j));
+
+            QSharedPointer<NetworkEdge> pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(finalNetwork->getNodes()[i], finalNetwork->getNodes()[j], pearsonsCoeff));
+
+            *finalNetwork->getNodes()[i] << pEdge;
+            *finalNetwork << pEdge;
+        }
+    }
+
+    return finalNetwork;
+}
+
+
+//*************************************************************************************************************
+
+Network::SPtr ConnectivityMeasures::crossCorrelation(const MatrixXd& matData, const MatrixX3f& matVert)
+{
+    Network::SPtr finalNetwork  = Network::SPtr(new Network("Cross Correlation"));
+
+    //Create nodes
+    for(int i = 0; i < matData.rows(); ++i) {
+        RowVectorXf rowVert = RowVectorXf::Zero(3);
+
+        if(matVert.rows() != 0 && i < matVert.rows()) {
+            rowVert(0) = matVert.row(i)(0);
+            rowVert(1) = matVert.row(i)(1);
+            rowVert(2) = matVert.row(i)(2);
+        }
+
+        *finalNetwork << NetworkNode::SPtr(new NetworkNode(i, rowVert));
+    }
+
+    //Create edges
+    for(int i = 0; i < matData.rows(); ++i) {
+        for(int j = i; j < matData.rows(); ++j) {
+            QPair<int,double> crossCorrPair = calcCrossCorrelation(matData.row(i), matData.row(j));
 
             QSharedPointer<NetworkEdge> pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(finalNetwork->getNodes()[i], finalNetwork->getNodes()[j], crossCorrPair.second));
 
@@ -125,34 +162,23 @@ Network::SPtr ConnectivityMeasures::crossCorrelation(const MatrixXd& matData, co
 
 //*************************************************************************************************************
 
-Eigen::MatrixXd ConnectivityMeasures::crossCorrelation(const MatrixXd& matData)
+double ConnectivityMeasures::calcPearsonsCorrelationCoeff(const Eigen::RowVectorXd &vecFirst, const Eigen::RowVectorXd &vecSecond)
 {
-    MatrixXd matDist = MatrixXd::Zero(matData.rows(), matData.rows());
-
-    for(int i = 0; i < matDist.rows(); ++i) {
-        QPair<int,double> crossCorrPair = eigenCrossCorrelation(matData.row(i), matData.row(i));
-
-        double dScaling = crossCorrPair.second;
-
-        for(int j = i; j < matDist.rows(); ++j) {
-            QPair<int,double> crossCorrPair = eigenCrossCorrelation(matData.row(i), matData.row(j));
-            matDist(i,j) = crossCorrPair.second/* / dScaling*/;
-        }
+    if(vecFirst.cols() != vecSecond.cols()) {
+        qDebug() << "ConnectivityMeasures::calcPearsonsCorrelationCoeff - Vectors length do not match!";
     }
 
-    matDist /= matDist.maxCoeff();
-
-    return matDist;
+    return (vecFirst.dot(vecSecond))/vecFirst.cols();
 }
 
 
 //*************************************************************************************************************
 
-QPair<int,double> ConnectivityMeasures::eigenCrossCorrelation(const RowVectorXd& xCorrInputVecFirstIn, const RowVectorXd& xCorrInputVecSecondIn)
+QPair<int,double> ConnectivityMeasures::calcCrossCorrelation(const RowVectorXd& vecFirst, const RowVectorXd& vecSecond)
 {
     Eigen::FFT<double> fft;
 
-    int N = std::max(xCorrInputVecFirstIn.cols(), xCorrInputVecSecondIn.cols());
+    int N = std::max(vecFirst.cols(), vecSecond.cols());
 
     //Compute the FFT size as the "next power of 2" of the input vector's length (max)
     int b = ceil(log2(2.0 * N - 1));
@@ -162,10 +188,10 @@ QPair<int,double> ConnectivityMeasures::eigenCrossCorrelation(const RowVectorXd&
 
     //Zero Padd
     RowVectorXd xCorrInputVecFirst = RowVectorXd::Zero(fftsize);
-    xCorrInputVecFirst.head(xCorrInputVecFirstIn.cols()) = xCorrInputVecFirstIn;
+    xCorrInputVecFirst.head(vecFirst.cols()) = vecFirst;
 
     RowVectorXd xCorrInputVecSecond = RowVectorXd::Zero(fftsize);
-    xCorrInputVecSecond.head(xCorrInputVecSecondIn.cols()) = xCorrInputVecSecondIn;
+    xCorrInputVecSecond.head(vecSecond.cols()) = vecSecond;
 
     //FFT for freq domain to both vectors
     RowVectorXcd freqvec;

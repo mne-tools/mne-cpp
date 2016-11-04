@@ -1,10 +1,10 @@
 //=============================================================================================================
 /**
-* @file     shadermaterial.h
+* @file     realtimeconnectivityestimatewidget.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2016
+* @date     October, 2016
 *
 * @section  LICENSE
 *
@@ -29,11 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    ShaderMaterial class declaration
+* @brief    Declaration of the RealTimeConnectivityEstimateWidget Class.
+*
 */
 
-#ifndef SHADERMATERIAL_H
-#define SHADERMATERIAL_H
+#ifndef REALTIMECONNECTIVITYESTIMATEWIDGET_H
+#define REALTIMECONNECTIVITYESTIMATEWIDGET_H
 
 
 //*************************************************************************************************************
@@ -41,15 +42,20 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../disp3D_global.h"
+#include "scdisp_global.h"
+
+#include "newmeasurementwidget.h"
+#include <disp3D/view3D.h>
+#include <disp3D/control/control3dwidget.h>
+
+#include "fs/annotationset.h"
+#include "fs/surfaceset.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
-
-#include <Qt3DRender/qmaterial.h>
 
 
 //*************************************************************************************************************
@@ -63,28 +69,23 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace Qt3DRender {
-    class QMaterial;
-    class QEffect;
-    class QParameter;
-    class QShaderProgram;
-    class QMaterial;
-    class QFilterKey;
-    class QTechnique;
-    class QRenderPass;
-    class QNoDepthMask;
-    class QBlendEquationArguments;
-    class QBlendEquation;
-    class QGraphicsApiFilter;
+class QTime;
+
+namespace DISP3DLIB {
+    class BrainRTConnectivityDataTreeItem;
+}
+
+namespace SCMEASLIB {
+    class RealTimeConnectivityEstimate;
 }
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE DISP3DLIB
+// DEFINE NAMESPACE SCDISPLIB
 //=============================================================================================================
 
-namespace DISP3DLIB
+namespace SCDISPLIB
 {
 
 
@@ -94,72 +95,95 @@ namespace DISP3DLIB
 //=============================================================================================================
 
 
+//*************************************************************************************************************
+//=============================================================================================================
+// ENUMERATIONS
+//=============================================================================================================
+
+////=============================================================================================================
+///**
+//* Tool enumeration.
+//*/
+//enum Tool
+//{
+//    Freeze     = 0,       /**< Freezing tool. */
+//    Annotation = 1        /**< Annotation tool. */
+//};
+
+
 //=============================================================================================================
 /**
-* ShaderMaterial is provides a Qt3D material with own shader support.
+* DECLARE CLASS RealTimeMultiSampleArrayNewWidget
 *
-* @brief ShaderMaterial is provides a Qt3D material with own shader support.
+* @brief The RealTimeMultiSampleArrayNewWidget class provides a real-time curve display.
 */
-class DISP3DNEWSHARED_EXPORT ShaderMaterial : public Qt3DRender::QMaterial
+
+class SCDISPSHARED_EXPORT RealTimeConnectivityEstimateWidget : public NewMeasurementWidget
 {
     Q_OBJECT
 
 public:
     //=========================================================================================================
     /**
-    * Default constructor.
+    * Constructs a RealTimeConnectivityEstimateWidget which is a child of parent.
     *
-    * @param[in] parent         The parent of this class.
+    * @param [in] pRTMSE        pointer to real-time multi sample array measurement.
+    * @param [in] pTime         pointer to application time.
+    * @param [in] parent        pointer to parent widget; If parent is 0, the new NumericWidget becomes a window. If parent is another widget, NumericWidget becomes a child window inside parent. NumericWidget is deleted when its parent is deleted.
     */
-    explicit ShaderMaterial(Qt3DCore::QNode *parent = 0);
+    RealTimeConnectivityEstimateWidget(QSharedPointer<SCMEASLIB::RealTimeConnectivityEstimate> &pRTCE, QWidget* parent = 0);
 
     //=========================================================================================================
     /**
-    * Default destructor.
+    * Destroys the RealTimeConnectivityEstimateWidget.
     */
-    ~ShaderMaterial();
+    ~RealTimeConnectivityEstimateWidget();
 
     //=========================================================================================================
     /**
-    * Get the current alpha value.
-    *
-    * @return The current alpha value.
+    * Is called when new data are available.
     */
-    float alpha();
+    virtual void getData();
 
     //=========================================================================================================
     /**
-    * Set the current alpha value.
+    * Is called when new data are available.
     *
-    * @param[in] alpha  The new alpha value.
+    * @param [in] pMeasurement  pointer to measurement -> not used because its direct attached to the measurement.
     */
-    void setAlpha(float alpha);
+    virtual void update(SCMEASLIB::NewMeasurement::SPtr pMeasurement);
+
+    //=========================================================================================================
+    /**
+    * Initialise the RealTimeConnectivityEstimateWidget.
+    */
+    virtual void init();
+
+protected slots:
+    //=========================================================================================================
+    /**
+    * Shows the 3D control widget
+    */
+    void show3DControlWidget();
 
 private:
-    //=========================================================================================================
-    /**
-    * Init the ShaderMaterial class.
-    */
-    void init();
+    QSharedPointer<SCMEASLIB::RealTimeConnectivityEstimate>     m_pRTCE;            /**< The real-time source estimate measurement. */
 
-    Qt3DRender::QEffect*            m_pVertexEffect;
+    bool                                                        m_bInitialized;     /**< Whether init was processed successfully. */
 
-    Qt3DRender::QParameter*         m_pAmbientParameter;
-    Qt3DRender::QParameter*         m_pDiffuseParameter;
-    Qt3DRender::QParameter*         m_pSpecularParameter;
-    Qt3DRender::QParameter*         m_pShininessParameter;
-    Qt3DRender::QParameter*         m_pAlphaParameter;
-    Qt3DRender::QFilterKey*         m_pFilterKey;
+    FSLIB::AnnotationSet                                        m_annotationSet;    /**< The current annotation set. */
+    FSLIB::SurfaceSet                                           m_surfSet;          /**< The current surface set. */
 
-    Qt3DRender::QTechnique*         m_pVertexGL3Technique;
-    Qt3DRender::QRenderPass*        m_pVertexGL3RenderPass;
-    Qt3DRender::QShaderProgram*     m_pVertexGL3Shader;
+    DISP3DLIB::View3D::SPtr                                     m_p3DView;          /**< The Disp3D view. */
+    DISP3DLIB::Control3DWidget::SPtr                            m_pControl3DView;   /**< The Disp3D control. */
+    QList<DISP3DLIB::BrainRTConnectivityDataTreeItem*>          m_lRtItem;          /**< The Disp3D real time items. */
 
-    Qt3DRender::QNoDepthMask*                   m_pNoDepthMask;
-    Qt3DRender::QBlendEquationArguments*        m_pBlendState;
-    Qt3DRender::QBlendEquation*                 m_pBlendEquation;
+    QAction*                                                    m_pAction3DControl; /**< Show 3D View control widget */
+
+signals:
+    void startInit();
 };
 
-} // namespace DISP3DLIB
+} // NAMESPACE
 
-#endif // SHADERMATERIAL_H
+#endif // REALTIMECONNECTIVITYESTIMATEWIDGET_H

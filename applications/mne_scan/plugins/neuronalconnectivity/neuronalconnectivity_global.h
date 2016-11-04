@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     realtimesourceestimate.cpp
+* @file     neuronalconnectivity_global.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,16 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the RealTimeSourceEstimate class.
+* @brief    Contains the NeuronalConnectivity library export/import macros.
 *
 */
 
-//*************************************************************************************************************
-//=============================================================================================================
-// INCLUDES
-//=============================================================================================================
-
-#include "realtimesourceestimate.h"
+#ifndef NEURONALCONNECTIVITY_GLOBAL_H
+#define NEURONALCONNECTIVITY_GLOBAL_H
 
 
 //*************************************************************************************************************
@@ -46,64 +42,18 @@
 // QT INCLUDES
 //=============================================================================================================
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace SCMEASLIB;
-//using namespace IOBUFFER;
+#include <QtCore/qglobal.h>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE MEMBER METHODS
+// PREPROCESSOR DEFINES
 //=============================================================================================================
 
-RealTimeSourceEstimate::RealTimeSourceEstimate(QObject *parent)
-: NewMeasurement(QMetaType::type("RealTimeSourceEstimate::SPtr"), parent)
-, m_bStcSend(true)
-, m_pMNEStc(new MNESourceEstimate)
-, m_pAnnotSet(AnnotationSet::SPtr(new AnnotationSet))
-, m_pSurfSet(SurfaceSet::SPtr(new SurfaceSet))
-, m_pFwdSolution(MNEForwardSolution::SPtr(new MNEForwardSolution))
-, m_bInitialized(false)
-{
+#if defined(NEURONALCONNECTIVITY_LIBRARY)
+#  define NEURONALCONNECTIVITYSHARED_EXPORT Q_DECL_EXPORT   /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+#else
+#  define NEURONALCONNECTIVITYSHARED_EXPORT Q_DECL_IMPORT   /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+#endif
 
-}
-
-
-//*************************************************************************************************************
-
-RealTimeSourceEstimate::~RealTimeSourceEstimate()
-{
-
-}
-
-
-//*************************************************************************************************************
-
-MNESourceEstimate::SPtr& RealTimeSourceEstimate::getValue()
-{
-    QMutexLocker locker(&m_qMutex);
-    return m_pMNEStc;
-}
-
-
-//*************************************************************************************************************
-
-void RealTimeSourceEstimate::setValue(MNESourceEstimate& v)
-{
-    m_qMutex.lock();
-
-    //Store
-    *m_pMNEStc = v;
-
-    m_bInitialized = true;
-
-    m_qMutex.unlock();
-
-    emit notify();
-}
-
+#endif // CONNECTIVITY_GLOBAL_H

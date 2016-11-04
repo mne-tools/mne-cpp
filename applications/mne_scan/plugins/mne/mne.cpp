@@ -243,6 +243,8 @@ void MNE::calcFiffInfo()
 
         m_pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo(m_pFiffInfoInput->pick_info(sel)));
 
+        m_pRTSEOutput->data()->setFiffInfo(m_pFiffInfo);
+
         qDebug() << "m_pFiffInfo" << m_pFiffInfo->ch_names;
     }
 }
