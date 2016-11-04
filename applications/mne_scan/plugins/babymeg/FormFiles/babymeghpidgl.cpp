@@ -89,12 +89,17 @@ BabyMEGHPIDgl::BabyMEGHPIDgl(BabyMEG* p_pBabyMEG,QWidget *parent)
 {
     ui->setupUi(this);
 
-    connect(ui->m_pushButton_loadDigitizers, &QPushButton::released,
-            this, &BabyMEGHPIDgl::bnLoadPolhemusFile);
+    //Do the connects
+    connect(ui->m_pushButton_doSingleFit, &QPushButton::released,
+            this, &BabyMEGHPIDgl::onBtnDoSingleFit);
 
     connect(this, &BabyMEGHPIDgl::SendHPIFiffInfo,
             m_pBabyMEG, &BabyMEG::RecvHPIFiffInfo);
 
+    connect(ui->m_pushButton_loadDigitizers, &QPushButton::released,
+            this, &BabyMEGHPIDgl::onBtnLoadPolhemusFile);
+
+    //Setup Vie3D
     QWidget *pWidgetContainer = QWidget::createWindowContainer(m_pView3D.data());
     ui->m_gridLayout_main->addWidget(pWidgetContainer,0,0,5,1);
 
@@ -129,7 +134,37 @@ void BabyMEGHPIDgl::closeEvent(QCloseEvent *event)
 
 //*************************************************************************************************************
 
-void BabyMEGHPIDgl::bnLoadPolhemusFile()
+void BabyMEGHPIDgl::onBtnDoSingleFit()
+{
+    m_pBabyMEG->performHPIFitting();
+
+    FiffCoordTrans devHeadTrans = m_pBabyMEG->m_pFiffInfo->dev_head_t;
+
+    ui->m_label_mat00->setNum(devHeadTrans.trans(0,0));
+    ui->m_label_mat01->setNum(devHeadTrans.trans(0,1));
+    ui->m_label_mat02->setNum(devHeadTrans.trans(0,2));
+    ui->m_label_mat03->setNum(devHeadTrans.trans(0,3));
+
+    ui->m_label_mat10->setNum(devHeadTrans.trans(1,0));
+    ui->m_label_mat11->setNum(devHeadTrans.trans(1,1));
+    ui->m_label_mat12->setNum(devHeadTrans.trans(1,2));
+    ui->m_label_mat13->setNum(devHeadTrans.trans(1,3));
+
+    ui->m_label_mat20->setNum(devHeadTrans.trans(2,0));
+    ui->m_label_mat21->setNum(devHeadTrans.trans(2,1));
+    ui->m_label_mat22->setNum(devHeadTrans.trans(2,2));
+    ui->m_label_mat23->setNum(devHeadTrans.trans(2,3));
+
+    ui->m_label_mat30->setNum(devHeadTrans.trans(3,0));
+    ui->m_label_mat31->setNum(devHeadTrans.trans(3,1));
+    ui->m_label_mat32->setNum(devHeadTrans.trans(3,2));
+    ui->m_label_mat33->setNum(devHeadTrans.trans(3,3));
+}
+
+
+//*************************************************************************************************************
+
+void BabyMEGHPIDgl::onBtnLoadPolhemusFile()
 {
     //Get file location
     QString fileName_HPI = QFileDialog::getOpenFileName(this,
@@ -164,7 +199,6 @@ QList<FiffDigPoint> BabyMEGHPIDgl::readPolhemusDig(QString fileName)
 {
     QFile t_fileDig(fileName);
     FiffDigPointSet t_digSet(t_fileDig);
-    FiffDigPointSet t_digSetWithoutAdditional;
 
     QList<FiffDigPoint> lDigPoints;
 
@@ -180,7 +214,6 @@ QList<FiffDigPoint> BabyMEGHPIDgl::readPolhemusDig(QString fileName)
         {
             case FIFFV_POINT_HPI:
                 numHPI++;
-                t_digSetWithoutAdditional << t_digSet[i];
                 break;
 
             case FIFFV_POINT_EXTRA:
@@ -189,19 +222,16 @@ QList<FiffDigPoint> BabyMEGHPIDgl::readPolhemusDig(QString fileName)
 
             case FIFFV_POINT_CARDINAL:
                 numFiducials++;
-                t_digSetWithoutAdditional << t_digSet[i];
                 break;
 
             case FIFFV_POINT_EEG:
                 numEEG++;
-                t_digSetWithoutAdditional << t_digSet[i];
                 break;
         }
     }
 
-
     //Add all digitizer but additional points to View3D
-    m_pView3D->addDigitizerData("Subject", "Digitizer", t_digSetWithoutAdditional);
+    this->setDigitizerDataToView3D(t_digSet);
 
     //Set loaded number of digitizers
     ui->m_label_numberLoadedCoils->setNum(numHPI);
@@ -212,4 +242,32 @@ QList<FiffDigPoint> BabyMEGHPIDgl::readPolhemusDig(QString fileName)
     return lDigPoints;
 }
 
+
+//*************************************************************************************************************
+
+void BabyMEGHPIDgl::setDigitizerDataToView3D(const FiffDigPointSet& digPointSet, bool bSortOutAdditionalDigitizer)
+{
+    FiffDigPointSet t_digSetWithoutAdditional = digPointSet;
+
+    if(bSortOutAdditionalDigitizer) {
+        for(int i = 0; i < digPointSet.size(); ++i) {
+            switch(digPointSet[i].kind)
+            {
+                case FIFFV_POINT_HPI:
+                    t_digSetWithoutAdditional << digPointSet[i];
+                    break;
+
+                case FIFFV_POINT_CARDINAL:
+                    t_digSetWithoutAdditional << digPointSet[i];
+                    break;
+
+                case FIFFV_POINT_EEG:
+                    t_digSetWithoutAdditional << digPointSet[i];
+                    break;
+            }
+        }
+    }
+
+    m_pView3D->addDigitizerData("Subject", "Digitizer", t_digSetWithoutAdditional);
+}
 

@@ -75,6 +75,10 @@ namespace DISP3DLIB {
     class View3D;
 }
 
+namespace FIFFLIB {
+    class FiffDigPointSet;
+}
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -109,17 +113,12 @@ public:
 
     //=========================================================================================================
     /**
-    * Read Polhemus data from fif file
+    * Set new digitizer data to View3D.
     *
+    * @param[in] digPointSet                    The new digitizer set.
+    * @param[in] bSortOutAdditionalDigitizer    Whether additional or extra digitized points dhould be sorted out. Too many points could lead to 3D performance issues.
     */
-    QList<FIFFLIB::FiffDigPoint> readPolhemusDig(QString fileName);
-
-    //=========================================================================================================
-    /**
-    * Load a Polhemus file name
-    *
-    */
-    void bnLoadPolhemusFile();
+    void setDigitizerDataToView3D(const FIFFLIB::FiffDigPointSet& digPointSet, bool bSortOutAdditionalDigitizer = true);
 
     BabyMEG*                m_pBabyMEG;
 
@@ -127,6 +126,28 @@ protected:
      virtual void closeEvent( QCloseEvent * event );
 
 private:
+
+    //=========================================================================================================
+    /**
+    * Read Polhemus data from fif file.
+    *
+    */
+    QList<FIFFLIB::FiffDigPoint> readPolhemusDig(QString fileName);
+
+    //=========================================================================================================
+    /**
+    * Perform a single HPI fit.
+    *
+    */
+    void onBtnDoSingleFit();
+
+    //=========================================================================================================
+    /**
+    * Load a Polhemus file name.
+    *
+    */
+    void onBtnLoadPolhemusFile();
+
     Ui::BabyMEGHPIDgl*                  ui;
 
     QSharedPointer<DISP3DLIB::View3D>   m_pView3D;
