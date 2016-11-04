@@ -104,33 +104,13 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-//    QFile t_fileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
-//    QString t_sEventName = "./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif";
-//    QFile t_fileFwd("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
-//    AnnotationSet t_annotationSet("sample", 2, "aparc.a2009s", "./MNE-sample-data/subjects");
-//    SurfaceSet t_surfSet("sample", 2, "white", "./MNE-sample-data/subjects");
+    QFile t_fileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
+    QString t_sEventName = "./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif";
+    QFile t_fileFwd("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
+    AnnotationSet t_annotationSet("sample", 2, "aparc.a2009s", "./MNE-sample-data/subjects");
+    SurfaceSet t_surfSet("sample", 2, "white", "./MNE-sample-data/subjects");
 
-
-//    QFile t_fileRaw("D:/Users/Christoph/SkyDrive/Thesis_Data/MIND/mind004_050924_median01_raw.fif");
-//    QString t_sEventName = "D:/Users/Christoph/SkyDrive/Thesis_Data/MIND/mind004_050924_median01_raw-eve.fif";
-//    QFile t_fileFwd("D:/Users/Christoph/SkyDrive/Thesis_Data/MIND/mind004_050924_median01_raw-oct-6-fwd.fif");
-//    AnnotationSet t_annotationSet("mind004", 2, "aparc.a2009s", "D:/Users/Christoph/SkyDrive/Thesis_Data/subjects");
-//    SurfaceSet t_surfSet("mind004", 2, "white", "D:/Users/Christoph/SkyDrive/Thesis_Data/subjects");
-
-
-    QFile t_fileRaw("D:/Users/Christoph/SkyDrive/Thesis_Data/MIND/mind006_051209_auditory01_raw.fif");
-    QString t_sEventName = "D:/Users/Christoph/SkyDrive/Thesis_Data/MIND/mind006_051209_auditory01_raw-eve.fif";
-    QFile t_fileFwd("D:/Users/Christoph/SkyDrive/Thesis_Data/MIND/mind006_051209_auditory01_raw-oct-6-fwd.fif");
-    AnnotationSet t_annotationSet("mind006", 2, "aparc.a2009s", "D:/Users/Christoph/SkyDrive/Thesis_Data/subjects");
-    SurfaceSet t_surfSet("mind006", 2, "white", "D:/Users/Christoph/SkyDrive/Thesis_Data/subjects");
-
-//    QFile t_fileRaw("D:/Users/Christoph/SkyDrive/Thesis_Data/MIND/mind006_051210_median02_raw.fif");
-//    QString t_sEventName = "D:/Users/Christoph/SkyDrive/Thesis_Data/MIND/mind006_051210_median02_raw-eve.fif";
-//    QFile t_fileFwd("D:/Users/Christoph/SkyDrive/Thesis_Data/MIND/mind006_051210_median02_raw-oct-6-fwd.fif");
-//    AnnotationSet t_annotationSet("mind006", 2, "aparc.a2009s", "D:/Users/Christoph/SkyDrive/Thesis_Data/subjects");
-//    SurfaceSet t_surfSet("mind006", 2, "white", "D:/Users/Christoph/SkyDrive/Thesis_Data/subjects");
-
-    QString t_sFileNameStc("");//("mind006_051209_auditory01.stc");
+    QString t_sFileNameStc("");
 
 
     bool doMovie = false;

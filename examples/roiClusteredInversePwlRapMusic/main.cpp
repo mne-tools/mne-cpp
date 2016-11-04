@@ -102,39 +102,7 @@ int main(int argc, char *argv[])
     AnnotationSet t_annotationSet("./MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot", "./MNE-sample-data/subjects/sample/label/rh.aparc.a2009s.annot");
     SurfaceSet t_surfSet("./MNE-sample-data/subjects/sample/surf/lh.white", "./MNE-sample-data/subjects/sample/surf/rh.white");
 
-//    QFile t_fileRaw("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw.fif");
-//    QFile t_fileFwd("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-oct-6p-fwd.fif");
-//    AnnotationSet t_annotationSet("E:/Data/sl_data/subjects/mind006/label/lh.aparc.a2009s.annot", "E:/Data/sl_data/subjects/mind006/label/rh.aparc.a2009s.annot");
-//    SurfaceSet t_surfSet("E:/Data/sl_data/subjects/mind006/surf/lh.white", "E:/Data/sl_data/subjects/mind006/surf/rh.white");
-
-//    QFile t_fileRaw("E:/Data/sl_data/MEG/mind006/mind006_051209_median01_raw.fif");
-//    QFile t_fileFwd("E:/Data/sl_data/MEG/mind006/mind006_051209_median01_raw-oct-6-fwd.fif");
-//    AnnotationSet t_annotationSet("E:/Data/sl_data/subjects/mind006/label/lh.aparc.a2009s.annot", "E:/Data/sl_data/subjects/mind006/label/rh.aparc.a2009s.annot");
-//    SurfaceSet t_surfSet("E:/Data/sl_data/subjects/mind006/surf/lh.white", "E:/Data/sl_data/subjects/mind006/surf/rh.white");
-
-//    QFile t_fileRaw("D:/Dropbox/Masterarbeit DB/Messdaten/mind006/mind006_051209_index01_raw.fif");
-//    QFile t_fileFwd("D:/Dropbox/Masterarbeit DB/Messdaten/mind006/mind006_051209_index01_raw-oct-6-fwd.fif");
-//    AnnotationSet t_annotationSet("D:/Dropbox/Masterarbeit DB/Messdaten/mind006/label/lh.aparc.a2009s.annot", "D:/Dropbox/Masterarbeit DB/Messdaten/mind006/label/rh.aparc.a2009s.annot");
-//    SurfaceSet t_surfSet("D:/Dropbox/Masterarbeit DB/Messdaten/mind006/surf/lh.white", "D:/Dropbox/Masterarbeit DB/Messdaten/mind006/surf/rh.white");
-//    QString t_sFileNameStc("D:/Dropbox/Masterarbeit DB/Messdaten/mind006/mind006_051209_index01_raw_RAP.stc");
-
-//    QFile t_fileRaw("D:/Dropbox/Masterarbeit DB/Messdaten/EEG/2014_03_17_Lorenz_Esch_010/Processed/averaged/EEG_data_001_voluntary_left_tapping_raw_Averaged_-1_1_108.fif");
-//    QFile t_fileFwd("D:/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/Lorenz-140128-Duke128-fwd.fif");
-//    AnnotationSet t_annotationSet("D:/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/atlas/lh.aparc.a2009s.annot", "D:/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/atlas/rh.aparc.a2009s.annot");
-//    SurfaceSet t_surfSet("D:/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/surface/lh.white", "D:/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/surface/rh.white");
-    QString t_sFileNameStc("D:/Dropbox/Masterarbeit DB/Messdaten/EEG/2014_03_17_Lorenz_Esch_010/Processed/stc/EEG_data_001_voluntary_left_tapping_raw_Averaged_-1_1_108_RAP.stc");
-
-//    QFile t_fileRaw("D:/Dropbox/Masterarbeit DB/Messdaten/EEG/2014_02_04_Lorenz_Esch_005/Processed/averaged/EEG_data_002_voluntary_right_tapping_filtered_07_40_Averaged_-1_1_184.fif");
-//    QFile t_fileFwd("D:/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/Lorenz-140128-Duke128-fwd.fif");
-//    AnnotationSet t_annotationSet("D:/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/atlas/lh.aparc.a2009s.annot", "D:/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/atlas/rh.aparc.a2009s.annot");
-//    SurfaceSet t_surfSet("D:/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/surface/lh.white", "D:/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/surface/rh.white");
-//    QString t_sFileNameStc("D:/Dropbox/Masterarbeit DB/Messdaten/EEG/2014_02_04_Lorenz_Esch_005/Processed/stc/EEG_data_002_voluntary_right_tapping_filtered_07_40_Averaged_-1_1_184_RAP.stc");
-
-//    QFile t_fileRaw("D:/Dropbox/Masterarbeit DB/Messdaten/EEG/2014_03_17_Lorenz_Esch_010/Processed/filtered/EEG_data_001_voluntary_left_right_tapping_filtered_07_40_raw.fif");
-//    QFile t_fileFwd("D:/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/Lorenz-140128-Duke128-fwd.fif");
-//    AnnotationSet t_annotationSet("D:/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/atlas/lh.aparc.a2009s.annot", "D:/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/atlas/rh.aparc.a2009s.annot");
-//    SurfaceSet t_surfSet("D:/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/surface/lh.white", "D:/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/surface/rh.white");
-//    QString t_sFileNameStc("D:/Dropbox/Masterarbeit DB/Messdaten/EEG/2014_03_17_Lorenz_Esch_010/Processed/stc/EEG_data_001_voluntary_left_right_tapping_filtered_07_40_raw_RAP.stc");
+    QString t_sFileNameStc("sample_audvis_raw_RAP_MUSIC.stc");
 
     qint32 numDipolePairs = 7;
 
