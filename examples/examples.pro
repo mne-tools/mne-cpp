@@ -54,7 +54,6 @@ SUBDIRS += \
     fiffIO \
     makeLayout\
     readBEM\
-    patientManager \
     testWarp \
 
 !contains(MNECPP_CONFIG, minimalVersion) {
