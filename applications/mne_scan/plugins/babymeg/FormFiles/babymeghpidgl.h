@@ -71,6 +71,10 @@ namespace Ui {
     class BabyMEGHPIDgl;
 }
 
+namespace DISP3DLIB {
+    class View3D;
+}
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -95,12 +99,12 @@ class BabyMEG;
 *
 * @brief The BabyMEGHPIDgl class provides a QDialog for the HPI controls.
 */
-class BABYMEGSHARED_EXPORT BabyMEGHPIDgl : public QDialog
+class BABYMEGSHARED_EXPORT BabyMEGHPIDgl : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit BabyMEGHPIDgl(BabyMEG* p_pBabyMEG,QWidget *parent = 0);
+    explicit BabyMEGHPIDgl(BabyMEG* p_pBabyMEG, QWidget *parent = 0);
     ~BabyMEGHPIDgl();
 
     //=========================================================================================================
@@ -108,7 +112,7 @@ public:
     * Read Polhemus data from fif file
     *
     */
-    void ReadPolhemusDig(QString fileName);
+    QList<FIFFLIB::FiffDigPoint> readPolhemusDig(QString fileName);
 
     //=========================================================================================================
     /**
@@ -116,18 +120,16 @@ public:
     *
     */
     void bnLoadPolhemusFile();
-    void OKProc(QAbstractButton *b);
-    void CancelProc();
 
     BabyMEG*                m_pBabyMEG;
-    FIFFLIB::FiffInfo       info;
-    QString                 FileName_HPI;
 
 protected:
      virtual void closeEvent( QCloseEvent * event );
 
 private:
-    Ui::BabyMEGHPIDgl*      ui;
+    Ui::BabyMEGHPIDgl*                  ui;
+
+    QSharedPointer<DISP3DLIB::View3D>   m_pView3D;
 
 signals:
     void SendHPIFiffInfo(FIFFLIB::FiffInfo);

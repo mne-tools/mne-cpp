@@ -377,25 +377,35 @@ void BabyMEG::UpdateFiffInfo()
 
 void BabyMEG::SetFiffInfoForHPI()
 {
-    if(!m_pFiffInfo)
-    {
-        QMessageBox msgBox;
-        msgBox.setText("FiffInfo missing!");
-        msgBox.exec();
-        return;
-    }
-    else
-    {
-        qDebug()<<" Start to load Polhemus File";
-        if (HPIDlg == NULL)
-            HPIDlg = QSharedPointer<BabyMEGHPIDgl>(new BabyMEGHPIDgl(this));
+    qDebug()<<" Start to load Polhemus File";
+    if (HPIDlg == NULL)
+        HPIDlg = QSharedPointer<BabyMEGHPIDgl>(new BabyMEGHPIDgl(this));
 
-        if (!HPIDlg->isVisible())
-        {
-            HPIDlg->show();
-            HPIDlg->raise();
-        }
+    if (!HPIDlg->isVisible())
+    {
+        HPIDlg->show();
+        HPIDlg->raise();
     }
+
+//    if(!m_pFiffInfo)
+//    {
+//        QMessageBox msgBox;
+//        msgBox.setText("FiffInfo missing!");
+//        msgBox.exec();
+//        return;
+//    }
+//    else
+//    {
+//        qDebug()<<" Start to load Polhemus File";
+//        if (HPIDlg == NULL)
+//            HPIDlg = QSharedPointer<BabyMEGHPIDgl>(new BabyMEGHPIDgl(this));
+
+//        if (!HPIDlg->isVisible())
+//        {
+//            HPIDlg->show();
+//            HPIDlg->raise();
+//        }
+//    }
 }
 
 

@@ -50,7 +50,6 @@
 #include <fiff/fiff_evoked.h>
 #include <fiff/fiff.h>
 #include <fiff/fiff_dig_point_set.h>
-#include <mne/mne.h>
 
 #include <mne/mne.h>
 #include <mne/mne_epoch_data_list.h>
