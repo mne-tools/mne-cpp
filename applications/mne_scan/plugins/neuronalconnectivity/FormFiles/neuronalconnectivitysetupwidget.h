@@ -82,7 +82,6 @@ class NeuronalConnectivitySetupWidget : public QWidget
     Q_OBJECT
 
 public:
-
     //=========================================================================================================
     /**
     * Constructs a NeuronalConnectivitySetupWidget which is a child of parent.
@@ -99,7 +98,6 @@ public:
     */
     ~NeuronalConnectivitySetupWidget();
 
-
 private slots:
     //=========================================================================================================
     /**
@@ -109,10 +107,9 @@ private slots:
     void showAboutDialog();
 
 private:
-
     NeuronalConnectivity*   m_pNeuronalConnectivity;	/**< Holds a pointer to corresponding NeuronalConnectivityToolbox.*/
 
-    Ui::NeuronalConnectivitySetupWidgetClass ui;	/**< Holds the user interface for the NeuronalConnectivitySetupWidget.*/
+    Ui::NeuronalConnectivitySetupWidgetClass ui;        /**< Holds the user interface for the NeuronalConnectivitySetupWidget.*/
 };
 
 } // NAMESPACE
