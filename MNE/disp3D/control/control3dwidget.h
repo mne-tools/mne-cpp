@@ -104,8 +104,10 @@ public:
     * Default constructor.
     *
     * @param[in] parent      The parent of the QObject.
+    * @param [in] slFlags    The flags indicating which tools to display. Scaling is displayed as default. Possible flags are: projections, compensators, view, filter, triggerdetection, modalities, scaling, sphara.
+    * @param [in] type
     */
-    explicit Control3DWidget(QWidget* parent = 0, Qt::WindowType type = Qt::Window);
+    explicit Control3DWidget(QWidget* parent = 0, const QStringList& slFlags = QStringList() << "Minimize" << "Data" << "Window" << "View", Qt::WindowType type = Qt::Window);
 
     //=========================================================================================================
     /**
