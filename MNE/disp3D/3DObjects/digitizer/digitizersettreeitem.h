@@ -136,14 +136,6 @@ public:
     */
     bool addData(const FIFFLIB::FiffDigPointSet& tDigitizer, Qt3DCore::QEntity* parent);
 
-    //=========================================================================================================
-    /**
-    * Call this function whenever you want to change the visibilty of the 3D rendered content.
-    *
-    * @param[in] state     The visiblity flag.
-    */
-    void setVisible(bool state);
-
 private:
     //=========================================================================================================
     /**
@@ -155,8 +147,6 @@ private:
 
     Qt3DCore::QEntity*      m_pParentEntity;                            /**< The parent 3D entity. */
     Renderable3DEntity*     m_pRenderable3DEntity;                      /**< The renderable 3D entity. */
-
-    QObjectList             m_lChildren;
 };
 
 } // NAMESPACE DISP3DLIB

@@ -102,6 +102,10 @@ BrainSurfaceTreeItem::BrainSurfaceTreeItem(int iType, const QString& text)
 
 BrainSurfaceTreeItem::~BrainSurfaceTreeItem()
 {
+    setVisible(false);
+
+    delete m_pRenderable3DEntity;
+    delete m_pRenderable3DEntityActivationOverlay;
 }
 
 
@@ -318,6 +322,7 @@ void BrainSurfaceTreeItem::onAnnotationVisibilityChanged(bool isVisible)
 void BrainSurfaceTreeItem::setVisible(bool state)
 {
     m_pRenderable3DEntity->setParent(state ? m_pParentEntity : Q_NULLPTR);
+    m_pRenderable3DEntityActivationOverlay->setParent(state ? m_pParentEntity : Q_NULLPTR);
 }
 
 
