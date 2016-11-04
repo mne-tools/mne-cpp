@@ -52,9 +52,8 @@ SUBDIRS += \
     cancelNoise \
 #    dipoleFit \
     fiffIO \
-    makeLayout\
-    readBEM\
-    testWarp \
+    makeLayout \
+    readBEM \
 
 !contains(MNECPP_CONFIG, minimalVersion) {
     qtHaveModule(charts) {
