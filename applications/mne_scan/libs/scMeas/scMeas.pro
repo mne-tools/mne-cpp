@@ -53,13 +53,15 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Fsd \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
             -lMNE$${MNE_LIB_VERSION}Mned \
+            -lMNE$${MNE_LIB_VERSION}Connectivityd \
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
             -lMNE$${MNE_LIB_VERSION}Utils \
             -lMNE$${MNE_LIB_VERSION}Fs \
             -lMNE$${MNE_LIB_VERSION}Fiff \
-            -lMNE$${MNE_LIB_VERSION}Mne
+            -lMNE$${MNE_LIB_VERSION}Mne \
+            -lMNE$${MNE_LIB_VERSION}Connectivity \
 }
 
 DESTDIR = $${MNE_LIBRARY_DIR}
@@ -78,6 +80,7 @@ win32 {
 
 SOURCES += \
     realtimesourceestimate.cpp \
+    realtimeconnectivityestimate.cpp \
     newrealtimesamplearray.cpp \
     newrealtimemultisamplearray.cpp \
     realtimesamplearraychinfo.cpp \
@@ -93,6 +96,7 @@ SOURCES += \
 HEADERS += \
     scmeas_global.h \
     realtimesourceestimate.h \
+    realtimeconnectivityestimate.h \
     newrealtimesamplearray.h \
     newrealtimemultisamplearray.h \
     realtimesamplearraychinfo.h \
