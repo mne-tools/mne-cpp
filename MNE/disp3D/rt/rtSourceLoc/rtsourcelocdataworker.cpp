@@ -423,7 +423,7 @@ QPair<QByteArray, QByteArray> RtSourceLocDataWorker::performVisualizationTypeCal
                 //Find out label for source
                 qint32 labelIdxLeftHemi = m_mapLabelIdSourcesLeftHemi[m_vecVertNoLeftHemi(i)];
 
-                if(abs(sourceColorSamplesLeftHemi(i)) > abs(vecLabelActivationLeftHemi[labelIdxLeftHemi]))
+                if(fabs(sourceColorSamplesLeftHemi(i)) > fabs(vecLabelActivationLeftHemi[labelIdxLeftHemi]))
                     vecLabelActivationLeftHemi.insert(labelIdxLeftHemi, sourceColorSamplesLeftHemi(i));
             }
 
@@ -432,7 +432,7 @@ QPair<QByteArray, QByteArray> RtSourceLocDataWorker::performVisualizationTypeCal
                 //Find out label for source
                 qint32 labelIdxRightHemi = m_mapLabelIdSourcesRightHemi[m_vecVertNoRightHemi(i)];
 
-                if(abs(sourceColorSamplesRightHemi(i)) > abs(vecLabelActivationRightHemi[labelIdxRightHemi]))
+                if(fabs(sourceColorSamplesRightHemi(i)) > fabs(vecLabelActivationRightHemi[labelIdxRightHemi]))
                     vecLabelActivationRightHemi.insert(labelIdxRightHemi, sourceColorSamplesRightHemi(i));
             }
 

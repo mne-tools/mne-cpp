@@ -233,7 +233,7 @@ void Bar::splitCoefficientAndExponent (const Eigen::Matrix<T, Eigen::Dynamic, Ei
         }
         else
         {
-            doubleExponentValue = log10(abs(originalValue));                    //return the exponent value in double
+            doubleExponentValue = log10(fabs(originalValue));                    //return the exponent value in double
         }
 
         limitExponentValue = round(doubleExponentValue);                        //round the exponent value to the nearest signed integer
