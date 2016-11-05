@@ -40,7 +40,7 @@
 
 #include "bemsurfacetreeitem.h"
 #include "../common/metatreeitem.h"
-#include "../../helpers/renderable3Dentity.h"
+#include "../common/renderable3Dentity.h"
 
 #include <mne/mne_bem.h>
 #include <fiff/fiff_constants.h>
