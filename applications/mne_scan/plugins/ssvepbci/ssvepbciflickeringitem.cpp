@@ -61,6 +61,7 @@ SsvepBciFlickeringItem::SsvepBciFlickeringItem()
 , m_bFlickerState(true)
 , m_bSignFlag(false)
 , m_bIter(m_bRenderOrder)
+, m_iFreqKey(0)
 {
     m_bRenderOrder << 0 << 0 << 1 << 1; //default
 }

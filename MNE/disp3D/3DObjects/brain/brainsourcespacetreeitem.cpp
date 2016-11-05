@@ -161,7 +161,7 @@ bool BrainSourceSpaceTreeItem::addData(const MNEHemisphere& tHemisphere, Qt3DCor
 
             pSourceSphereEntity->setPosition(pos);
 
-            Qt3DExtras::QPhongMaterial*material = new Qt3DExtras::QPhongMaterial();
+            Qt3DExtras::QPhongMaterial* material = new Qt3DExtras::QPhongMaterial();
             material->setAmbient(Qt::yellow);
             pSourceSphereEntity->addComponent(material);
 
