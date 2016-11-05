@@ -39,7 +39,7 @@
 //=============================================================================================================
 
 #include "digitizertreeitem.h"
-#include "../../helpers/renderable3Dentity.h"
+#include "../common/renderable3Dentity.h"
 #include "../common/metatreeitem.h"
 
 #include <fiff/fiff_constants.h>

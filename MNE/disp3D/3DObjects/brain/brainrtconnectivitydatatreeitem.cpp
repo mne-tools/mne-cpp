@@ -41,7 +41,7 @@
 #include "brainrtconnectivitydatatreeitem.h"
 #include "../../rt/rtSourceLoc/rtsourcelocdataworker.h"
 #include "../common/metatreeitem.h"
-#include "../../helpers/renderable3Dentity.h"
+#include "../common/renderable3Dentity.h"
 
 #include <fiff/fiff_types.h>
 

@@ -183,9 +183,11 @@ BabyMEG::~BabyMEG()
     if(this->isRunning())
         stop();
 
-    if(m_pMyClient && m_pMyClient->isConnected())
+    if(m_pMyClient) {
+        if(m_pMyClient->isConnected()) {
             m_pMyClient->DisConnectBabyMEG();
-
+        }
+    }
 }
 
 
