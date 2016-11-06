@@ -544,9 +544,11 @@ void SsvepBciConfigurationWidget::stopMeasurement()
 {
     m_qTimer->stop();
 
-    QFile file(m_pSsvepBci->getSsvepBciResourcePath()+"/result.txt");
+    QDateTime dateTime = QDateTime::currentDateTime();
+
+    QFile file(m_pSsvepBci->getSsvepBciResourcePath()+"/AccuracyResults.txt");
     file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append);
     QTextStream out(&file);   // we will serialize the data into the file
-    out << endl <<"victory"<< endl;   // serialize a string
+    out << endl << dateTime.toString(Qt::TextDate) << endl << "Wrong commands:" << m_iWrongCommands  << "\tCorrect commands:" << m_iCorrectCommands << endl;   // serialize a string
     file.close();
 }
