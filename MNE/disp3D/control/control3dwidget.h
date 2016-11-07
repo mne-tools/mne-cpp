@@ -42,7 +42,6 @@
 //=============================================================================================================
 
 #include "../disp3D_global.h"
-#include "../view3D.h"
 
 
 //*************************************************************************************************************
@@ -83,6 +82,7 @@ namespace DISP3DLIB
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+class View3D;
 
 
 //=============================================================================================================
@@ -121,7 +121,7 @@ public:
     *
     * @param[in] view3D         The view3D to bec connected to this widget.
     */
-    void setView3D(View3D::SPtr view3D);
+    void setView3D(QSharedPointer<View3D> view3D);
 
 protected:
     //=========================================================================================================
@@ -173,6 +173,12 @@ protected:
 
     //=========================================================================================================
     /**
+    * Slot called when the user wants change the color of the scene.
+    */
+    void onSceneColorChanged(QColor color);
+
+    //=========================================================================================================
+    /**
     * Slot called when the user wants to show the view in full screen.
     */
     void onShowFullScreen(bool checked);
@@ -191,8 +197,40 @@ protected:
 
     Ui::Control3DWidget*    ui;                         /**< The pointer to the QtDesigner ui class. */
 
-    QList<View3D::SPtr>     m_lView3D;                  /**< List of all connected view3D's. */
     QColor                  m_colCurrentSceneColor;     /**< Current color of the scene in all View3D's. */
+
+signals:
+    //=========================================================================================================
+    /**
+    * Use this signal whenever the scene color was changed by the user.
+    *
+    * @param[in] color      The newly picked color.
+    */
+    void sceneColorChanged(const QColor& color);
+
+    //=========================================================================================================
+    /**
+    * Use this signal whenever the user wants to use full screen mode.
+    *
+    * @param[in] bShowFullScreen      The full screen flag.
+    */
+    void showFullScreen(bool bShowFullScreen);
+
+    //=========================================================================================================
+    /**
+    * Use this signal whenever the user wants to rotate the 3D model.
+    *
+    * @param[in] bRotationChanged      The rotation flag.
+    */
+    void rotationChanged(bool bRotationChanged);
+
+    //=========================================================================================================
+    /**
+    * Use this signal whenever the user wants to show the coordinate axis.
+    *
+    * @param[in] bShowCoordAxis      The coordinate axis flag.
+    */
+    void showCoordAxis(bool bShowCoordAxis);
 };
 
 } // NAMESPACE DISP3DLIB
