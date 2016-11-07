@@ -155,9 +155,10 @@ public:
     /**
     * Inits the rt HPI processing and performs one single fit.
     *
-    * @param[in] t_mat  Data to estimate the HPI positions from
+    * @param[in] t_mat      Data to estimate the HPI positions from
+    * @param[in] vFreqs     The frequencies for each coil.
     */
-    void singleHPIFit(const MatrixXd& t_mat);
+    void singleHPIFit(const MatrixXd& t_mat, const QVector<int>& vFreqs);
 
     //=========================================================================================================
     /**

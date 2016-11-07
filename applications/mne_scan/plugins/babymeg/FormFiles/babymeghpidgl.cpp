@@ -99,6 +99,15 @@ BabyMEGHPIDgl::BabyMEGHPIDgl(BabyMEG* p_pBabyMEG,QWidget *parent)
     connect(ui->m_pushButton_loadDigitizers, &QPushButton::released,
             this, &BabyMEGHPIDgl::onBtnLoadPolhemusFile);
 
+    connect(ui->m_spinBox_freqCoil1, static_cast<void(QSpinBox::*)(const QString &)>(&QSpinBox::valueChanged),
+            this, &BabyMEGHPIDgl::onFreqsChanged);
+    connect(ui->m_spinBox_freqCoil2, static_cast<void(QSpinBox::*)(const QString &)>(&QSpinBox::valueChanged),
+            this, &BabyMEGHPIDgl::onFreqsChanged);
+    connect(ui->m_spinBox_freqCoil3, static_cast<void(QSpinBox::*)(const QString &)>(&QSpinBox::valueChanged),
+            this, &BabyMEGHPIDgl::onFreqsChanged);
+    connect(ui->m_spinBox_freqCoil4, static_cast<void(QSpinBox::*)(const QString &)>(&QSpinBox::valueChanged),
+            this, &BabyMEGHPIDgl::onFreqsChanged);
+
     //Setup Vie3D
     QWidget *pWidgetContainer = QWidget::createWindowContainer(m_pView3D.data());
     ui->m_gridLayout_main->addWidget(pWidgetContainer,0,0,5,1);
@@ -118,6 +127,9 @@ BabyMEGHPIDgl::BabyMEGHPIDgl(BabyMEG* p_pBabyMEG,QWidget *parent)
 
     //Always on top
     //this->setWindowFlags(this->windowFlags() | Qt::WindowStaysOnTopHint);
+
+    //Init coil freqs
+    m_vCoilFreqs << 155 << 165 << 190 << 200;
 }
 
 
@@ -141,29 +153,31 @@ void BabyMEGHPIDgl::closeEvent(QCloseEvent *event)
 
 void BabyMEGHPIDgl::onBtnDoSingleFit()
 {
-    m_pBabyMEG->performHPIFitting();
+    m_pBabyMEG->performHPIFitting(m_vCoilFreqs);
 
-    FiffCoordTrans devHeadTrans = m_pBabyMEG->m_pFiffInfo->dev_head_t;
+    if(m_pBabyMEG->m_pFiffInfo) {
+        FiffCoordTrans devHeadTrans = m_pBabyMEG->m_pFiffInfo->dev_head_t;
 
-    ui->m_label_mat00->setNum(devHeadTrans.trans(0,0));
-    ui->m_label_mat01->setNum(devHeadTrans.trans(0,1));
-    ui->m_label_mat02->setNum(devHeadTrans.trans(0,2));
-    ui->m_label_mat03->setNum(devHeadTrans.trans(0,3));
+        ui->m_label_mat00->setNum(devHeadTrans.trans(0,0));
+        ui->m_label_mat01->setNum(devHeadTrans.trans(0,1));
+        ui->m_label_mat02->setNum(devHeadTrans.trans(0,2));
+        ui->m_label_mat03->setNum(devHeadTrans.trans(0,3));
 
-    ui->m_label_mat10->setNum(devHeadTrans.trans(1,0));
-    ui->m_label_mat11->setNum(devHeadTrans.trans(1,1));
-    ui->m_label_mat12->setNum(devHeadTrans.trans(1,2));
-    ui->m_label_mat13->setNum(devHeadTrans.trans(1,3));
+        ui->m_label_mat10->setNum(devHeadTrans.trans(1,0));
+        ui->m_label_mat11->setNum(devHeadTrans.trans(1,1));
+        ui->m_label_mat12->setNum(devHeadTrans.trans(1,2));
+        ui->m_label_mat13->setNum(devHeadTrans.trans(1,3));
 
-    ui->m_label_mat20->setNum(devHeadTrans.trans(2,0));
-    ui->m_label_mat21->setNum(devHeadTrans.trans(2,1));
-    ui->m_label_mat22->setNum(devHeadTrans.trans(2,2));
-    ui->m_label_mat23->setNum(devHeadTrans.trans(2,3));
+        ui->m_label_mat20->setNum(devHeadTrans.trans(2,0));
+        ui->m_label_mat21->setNum(devHeadTrans.trans(2,1));
+        ui->m_label_mat22->setNum(devHeadTrans.trans(2,2));
+        ui->m_label_mat23->setNum(devHeadTrans.trans(2,3));
 
-    ui->m_label_mat30->setNum(devHeadTrans.trans(3,0));
-    ui->m_label_mat31->setNum(devHeadTrans.trans(3,1));
-    ui->m_label_mat32->setNum(devHeadTrans.trans(3,2));
-    ui->m_label_mat33->setNum(devHeadTrans.trans(3,3));
+        ui->m_label_mat30->setNum(devHeadTrans.trans(3,0));
+        ui->m_label_mat31->setNum(devHeadTrans.trans(3,1));
+        ui->m_label_mat32->setNum(devHeadTrans.trans(3,2));
+        ui->m_label_mat33->setNum(devHeadTrans.trans(3,3));
+    }
 }
 
 
@@ -278,3 +292,14 @@ void BabyMEGHPIDgl::setDigitizerDataToView3D(const FiffDigPointSet& digPointSet,
     }
 }
 
+
+//*************************************************************************************************************
+
+void BabyMEGHPIDgl::onFreqsChanged()
+{
+    m_vCoilFreqs.clear();
+    m_vCoilFreqs.append(ui->m_spinBox_freqCoil1->value());
+    m_vCoilFreqs.append(ui->m_spinBox_freqCoil2->value());
+    m_vCoilFreqs.append(ui->m_spinBox_freqCoil3->value());
+    m_vCoilFreqs.append(ui->m_spinBox_freqCoil4->value());
+}
