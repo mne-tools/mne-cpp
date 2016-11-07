@@ -203,8 +203,10 @@ public:
     //=========================================================================================================
     /**
     * Perform a HPI fitting procedure.
+    *
+    * @param[in] vFreqs    the frequencies for each coil.
     */
-    void performHPIFitting();
+    void performHPIFitting(const QVector<int>& vFreqs);
 
     //=========================================================================================================
     /**

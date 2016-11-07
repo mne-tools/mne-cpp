@@ -455,13 +455,13 @@ void BabyMEG::splitRecordingFile()
 
 //*************************************************************************************************************
 
-void BabyMEG::performHPIFitting()
+void BabyMEG::performHPIFitting(const QVector<int>& vFreqs)
 {
     //Generate/Update current dev/head transfomration. We do not need to make use of rtHPI plugin here since the fitting is only needed once here.
     //rt head motion correction will be performed using the rtHPI plugin.
     if(m_pFiffInfo) {
         RtHPIS::SPtr pRtHpis = RtHPIS::SPtr(new RtHPIS(m_pFiffInfo));
-        pRtHpis->singleHPIFit(this->calibrate(m_matValue));
+        pRtHpis->singleHPIFit(this->calibrate(m_matValue), vFreqs);
     }
 }
 
