@@ -97,6 +97,8 @@ BemSurfaceTreeItem::BemSurfaceTreeItem(int iType, const QString& text)
 
 BemSurfaceTreeItem::~BemSurfaceTreeItem()
 {
+    setVisible(false);
+    delete m_pRenderable3DEntity;
 }
 
 

@@ -79,35 +79,54 @@ using namespace DISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Control3DWidget::Control3DWidget(QWidget* parent, Qt::WindowType type)
+Control3DWidget::Control3DWidget(QWidget* parent, const QStringList& slFlags, Qt::WindowType type)
 : QWidget(parent, type)/*RoundedEdgesWidget(parent, type)*/
 , ui(new Ui::Control3DWidget)
 , m_colCurrentSceneColor(QColor(0,0,0))
 {
     ui->setupUi(this);
 
-    //Do connect for internal widget use (non dependent on a view3D)
-    connect(ui->m_pushButton_minimize, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
-            this, &Control3DWidget::onMinimizeWidget);
+    //Parse flags
+    if(slFlags.contains("Minimize")) {
+        ui->m_pushButton_minimize->show();
+        connect(ui->m_pushButton_minimize, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
+             this, &Control3DWidget::onMinimizeWidget);
+    } else {
+        ui->m_pushButton_minimize->hide();
+    }
 
-    connect(ui->m_horizontalSlider_opacity, &QSlider::valueChanged,
-            this, &Control3DWidget::onOpacityChange);
+    if(slFlags.contains("Data")) {
+        ui->m_treeView_loadedData->show();
+    } else {
+        ui->m_treeView_loadedData->hide();
+    }
 
-    connect(ui->m_pushButton_sceneColorPicker, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
-            this, &Control3DWidget::onSceneColorPicker);
+    if(slFlags.contains("Window")) {
+        ui->m_groupBox_windowOptions->show();
+        connect(ui->m_horizontalSlider_opacity, &QSlider::valueChanged,
+                this, &Control3DWidget::onOpacityChange);
+    } else {
+        ui->m_groupBox_windowOptions->hide();
+    }
 
-    connect(ui->m_checkBox_alwaysOnTop, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
-            this, &Control3DWidget::onAlwaysOnTop);
+    if(slFlags.contains("View")) {
+        ui->m_groupBox_viewOptions->show();
 
-    //Connect animation and fullscreen and coord axis
-    connect(ui->m_checkBox_showFullScreen, &QCheckBox::clicked,
-            this, &Control3DWidget::onShowFullScreen);
+        connect(ui->m_pushButton_sceneColorPicker, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
+                this, &Control3DWidget::onSceneColorPicker);
+        connect(ui->m_checkBox_alwaysOnTop, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
+                this, &Control3DWidget::onAlwaysOnTop);
+        connect(ui->m_checkBox_showFullScreen, &QCheckBox::clicked,
+                this, &Control3DWidget::onShowFullScreen);
 
-    connect(ui->m_checkBox_rotate, &QCheckBox::clicked,
-            this, &Control3DWidget::onRotationClicked);
+        connect(ui->m_checkBox_rotate, &QCheckBox::clicked,
+                this, &Control3DWidget::onRotationClicked);
 
-    connect(ui->m_checkBox_coordAxis, &QCheckBox::clicked,
-            this, &Control3DWidget::onCoordAxisClicked);
+        connect(ui->m_checkBox_coordAxis, &QCheckBox::clicked,
+                this, &Control3DWidget::onCoordAxisClicked);
+    } else {
+        ui->m_groupBox_viewOptions->hide();
+    }
 
     //Init's
     ui->m_pushButton_sceneColorPicker->setStyleSheet(QString("background-color: rgb(0, 0, 0);"));
