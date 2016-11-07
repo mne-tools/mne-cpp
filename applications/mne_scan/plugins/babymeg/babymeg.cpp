@@ -483,7 +483,6 @@ void BabyMEG::performHPIFitting(const QVector<int>& vFreqs)
                 digPoint.r[0] = matPos(0,0);
                 digPoint.r[1] = matPos(1,0);
                 digPoint.r[2] = matPos(2,0);
-                digPoint.r[3] = 1.0f;
 
                 t_digSet << digPoint;
             }
