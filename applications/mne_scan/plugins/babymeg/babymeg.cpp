@@ -55,6 +55,7 @@
 #include <utils/detecttrigger.h>
 #include <fiff/fiff_types.h>
 #include <fiff/fiff_dir_tree.h>
+#include <fiff/fiff_dig_point_set.h>
 #include <rtClient/rtcmdclient.h>
 #include <scMeas/newrealtimemultisamplearray.h>
 
@@ -381,13 +382,14 @@ void BabyMEG::UpdateFiffInfo()
 void BabyMEG::SetFiffInfoForHPI()
 {
     qDebug()<<" Start to load Polhemus File";
-    if (HPIDlg == NULL)
-        HPIDlg = QSharedPointer<BabyMEGHPIDgl>(new BabyMEGHPIDgl(this));
+    if (m_pHPIDlg == NULL) {
+        m_pHPIDlg = QSharedPointer<BabyMEGHPIDgl>(new BabyMEGHPIDgl(this));
+    }
 
-    if (!HPIDlg->isVisible())
+    if (!m_pHPIDlg->isVisible())
     {
-        HPIDlg->show();
-        HPIDlg->raise();
+        m_pHPIDlg->show();
+        m_pHPIDlg->raise();
     }
 
 //    if(!m_pFiffInfo)
@@ -400,13 +402,13 @@ void BabyMEG::SetFiffInfoForHPI()
 //    else
 //    {
 //        qDebug()<<" Start to load Polhemus File";
-//        if (HPIDlg == NULL)
-//            HPIDlg = QSharedPointer<BabyMEGHPIDgl>(new BabyMEGHPIDgl(this));
+//        if (m_pHPIDlg == NULL)
+//            m_pHPIDlg = QSharedPointer<BabyMEGHPIDgl>(new BabyMEGHPIDgl(this));
 
-//        if (!HPIDlg->isVisible())
+//        if (!m_pHPIDlg->isVisible())
 //        {
-//            HPIDlg->show();
-//            HPIDlg->raise();
+//            m_pHPIDlg->show();
+//            m_pHPIDlg->raise();
 //        }
 //    }
 }
@@ -457,13 +459,39 @@ void BabyMEG::splitRecordingFile()
 
 //*************************************************************************************************************
 
-void BabyMEG::performHPIFitting()
+void BabyMEG::performHPIFitting(const QVector<int>& vFreqs)
 {
     //Generate/Update current dev/head transfomration. We do not need to make use of rtHPI plugin here since the fitting is only needed once here.
     //rt head motion correction will be performed using the rtHPI plugin.
     if(m_pFiffInfo) {
         RtHPIS::SPtr pRtHpis = RtHPIS::SPtr(new RtHPIS(m_pFiffInfo));
-        pRtHpis->singleHPIFit(this->calibrate(m_matValue));
+        pRtHpis->singleHPIFit(this->calibrate(m_matValue), vFreqs);
+
+        //Apply new dev/head matrix to current digitizer and update in 3D view in HPI control widget
+        if(m_pHPIDlg) {
+            FiffDigPointSet t_digSet;
+
+            for(int i = 0; i < m_pFiffInfo->dig.size(); ++i) {
+                FiffDigPoint digPoint = m_pFiffInfo->dig.at(i);
+
+                MatrixX3f matPos(4,1);
+                matPos(0,0) = digPoint.r[0];
+                matPos(1,0) = digPoint.r[1];
+                matPos(2,0) = digPoint.r[2];
+                matPos(3,0) = 1.0f;
+
+                matPos = m_pFiffInfo->dev_head_t.apply_trans(matPos);
+
+                digPoint.r[0] = matPos(0,0);
+                digPoint.r[1] = matPos(1,0);
+                digPoint.r[2] = matPos(2,0);
+                digPoint.r[3] = 1.0f;
+
+                t_digSet << digPoint;
+            }
+
+            m_pHPIDlg->setDigitizerDataToView3D(t_digSet);
+        }
     }
 }
 

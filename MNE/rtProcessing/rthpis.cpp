@@ -471,7 +471,7 @@ RtHPIS::~RtHPIS()
 
 //*************************************************************************************************************
 
-void RtHPIS::singleHPIFit(const MatrixXd& t_mat)
+void RtHPIS::singleHPIFit(const MatrixXd& t_mat, const QVector<int>& vFreqs)
 {
     struct sens sensors;
     struct coilParam coil;
@@ -482,17 +482,17 @@ void RtHPIS::singleHPIFit(const MatrixXd& t_mat)
     samLoc = samF/numLoc; // minimum samples required to localize numLoc times in a second
     Eigen::VectorXd coilfreq(numCoils);
 
-
-    //Change coil frequencies (in Hz) here and recompile to take into effect
-    //These values should match the ones in LabView!
-    coilfreq[0] = 155;
-    coilfreq[1] = 165;
-    coilfreq[2] = 190;
-    coilfreq[3] = 200;
-
-
-//    coilfreq[0] = 154; coilfreq[1] = 158;coilfreq[2] = 162;coilfreq[3] = 166;
-//    coilfreq[0] = 270; coilfreq[1] = 290; coilfreq[2] = 330; coilfreq[3] = 310;
+    //Set coil frequencies
+    if(numCoils == vFreqs.size()) {
+        for(int i = 0; i < numCoils; ++i) {
+            coilfreq[i] = vFreqs.at(i);
+        }
+    } else {
+        coilfreq[0] = 155;
+        coilfreq[1] = 165;
+        coilfreq[2] = 190;
+        coilfreq[3] = 200;
+    }
 
     qDebug()<< "======= coil driving frequency (Hz)======== ";
     qDebug() << coilfreq[0] << ", " << coilfreq[1] << ", " << coilfreq[2] << ", " << coilfreq[3];

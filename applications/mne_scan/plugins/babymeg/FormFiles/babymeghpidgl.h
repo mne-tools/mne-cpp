@@ -148,7 +148,16 @@ private:
     */
     void onBtnLoadPolhemusFile();
 
+    //=========================================================================================================
+    /**
+    * Load a Polhemus file name.
+    *
+    */
+    void onFreqsChanged();
+
     Ui::BabyMEGHPIDgl*                  ui;
+
+    QVector<int>                        m_vCoilFreqs;
 
     QSharedPointer<DISP3DLIB::View3D>   m_pView3D;
 
