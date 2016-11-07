@@ -41,6 +41,7 @@
 #include "control3dwidget.h"
 #include "disp/helpers/roundededgeswidget.h"
 #include "../3DObjects/data3Dtreedelegate.h"
+#include "../view3D.h"
 
 
 //*************************************************************************************************************
@@ -163,13 +164,10 @@ Control3DWidget::~Control3DWidget()
 
 //*************************************************************************************************************
 
-void Control3DWidget::setView3D(View3D::SPtr view3D)
+void Control3DWidget::setView3D(QSharedPointer<View3D> view3D)
 {
     //Do the connects from this control widget to the View3D
-    ui->m_treeView_loadedData->setModel(view3D->getData3DTreeModel());
-
-    //Add the view3D to the list of connected view3D's
-    m_lView3D.append(view3D);
+    //ui->m_treeView_loadedData->setModel(view3D->getData3DTreeModel());
 
     //Set description hidden as default
     this->onTreeViewDescriptionHide();
@@ -214,10 +212,8 @@ void Control3DWidget::onSceneColorPicker()
     pDialog->setCurrentColor(m_colCurrentSceneColor);
 
     //Update all connected View3D's scene colors
-    for(int i = 0; i<m_lView3D.size(); i++) {
-        connect(pDialog, &QColorDialog::currentColorChanged,
-                m_lView3D.at(i).data(), &View3D::setSceneColor);
-    }
+    connect(pDialog, &QColorDialog::currentColorChanged,
+            this, &Control3DWidget::onSceneColorChanged);
 
     pDialog->exec();
     m_colCurrentSceneColor = pDialog->currentColor();
@@ -285,19 +281,19 @@ void Control3DWidget::onAlwaysOnTop(bool state)
     }
 }
 
+//*************************************************************************************************************
+
+void Control3DWidget::onSceneColorChanged(QColor color)
+{
+    emit sceneColorChanged(color);
+}
+
 
 //*************************************************************************************************************
 
 void Control3DWidget::onShowFullScreen(bool checked)
 {
-    //Update all connected View3D's scene colors
-    for(int i = 0; i < m_lView3D.size(); ++i) {
-        if(checked) {
-            m_lView3D.at(i)->showFullScreen();
-        } else {
-            m_lView3D.at(i)->showNormal();
-        }
-    }
+    emit showFullScreen(checked);
 }
 
 
@@ -305,14 +301,7 @@ void Control3DWidget::onShowFullScreen(bool checked)
 
 void Control3DWidget::onRotationClicked(bool checked)
 {
-    //Update all connected View3D's scene colors
-    for(int i = 0; i<m_lView3D.size(); i++) {
-        if(checked) {
-            m_lView3D.at(i)->startModelRotation();
-        } else {
-            m_lView3D.at(i)->stopModelRotation();
-        }
-    }
+    emit rotationChanged(checked);
 }
 
 
@@ -320,10 +309,7 @@ void Control3DWidget::onRotationClicked(bool checked)
 
 void Control3DWidget::onCoordAxisClicked(bool checked)
 {
-    //Update all connected View3D's scene colors
-    for(int i = 0; i<m_lView3D.size(); i++) {
-        m_lView3D.at(i)->toggleCoordAxis(checked);
-    }
+    emit showCoordAxis(checked);
 }
 
 
