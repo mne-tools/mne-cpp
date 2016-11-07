@@ -44,7 +44,7 @@
 #include "brain/brainsurfacetreeitem.h"
 #include "brain/brainsurfacesettreeitem.h"
 #include "digitizer/digitizertreeitem.h"
-#include "../helpers/renderable3Dentity.h"
+#include "common/renderable3Dentity.h"
 
 #include <mne/mne_bem.h>
 #include <fs/surfaceset.h>

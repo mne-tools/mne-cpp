@@ -39,8 +39,8 @@
 //=============================================================================================================
 
 #include "view3D.h"
-#include "helpers/renderable3Dentity.h"
-#include "helpers/types.h"
+#include "3DObjects/common/renderable3Dentity.h"
+#include "3DObjects/common/types.h"
 
 #include <mne/mne_sourceestimate.h>
 #include <fiff/fiff_dig_point_set.h>
