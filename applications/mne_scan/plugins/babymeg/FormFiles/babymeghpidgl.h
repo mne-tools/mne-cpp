@@ -120,6 +120,14 @@ public:
     */
     void setDigitizerDataToView3D(const FIFFLIB::FiffDigPointSet& digPointSet, bool bSortOutAdditionalDigitizer = true);
 
+    //=========================================================================================================
+    /**
+    * Returns true if any digitizers were loaded that correspond to HPI coils.
+    *
+    * @return true  If any digitizers were loaded that correspond to HPI coils, false otherwise.
+    */
+    bool hpiLoaded();
+
     BabyMEG*                m_pBabyMEG;
 
 protected:
