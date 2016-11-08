@@ -923,12 +923,14 @@ void RtHPIS::singleHPIFit(const MatrixXd& t_mat, const QVector<int>& vFreqs)
 
         UTILSLIB::IOUtils::write_eigen_matrix(diffPos, QString("C:/Users/MEG measurement/BabyMEGData/TestProject/TestSubject/%1_diffPos_mat").arg(sTimeStamp));
 
-
-//        qDebug()<<"Write to FiffInfo Start";
-
-        for(int ti =0; ti<4;ti++)
-            for(int tj=0;tj<4;tj++)
+        // Set final device/head matrix and its inverse to the fiff info
+        for(int ti =0; ti<4;ti++) {
+            for(int tj=0;tj<4;tj++) {
                 m_pFiffInfo->dev_head_t.trans(ti,tj) = trans(ti,tj);
+            }
+        }
+
+        m_pFiffInfo->dev_head_t.invtrans = m_pFiffInfo->dev_head_t.trans.inverse();
 
 //        qDebug()<<"====================rthpis====================";
 //        qDebug()<< m_pFiffInfo->dev_head_t.trans(0,0);

@@ -348,9 +348,7 @@ void BabyMEG::showProjectDialog()
 
 void BabyMEG::showSqdCtrlDialog()
 {
-    //BabyMEGSQUIDControlDgl SQUIDCtrlDlg(this);
-    //SQUIDCtrlDlg.exec();
-    // added by Limin for nonmodal dialog
+    // Start HPI control widget
     if (SQUIDCtrlDlg == NULL)
         SQUIDCtrlDlg = QSharedPointer<BabyMEGSQUIDControlDgl>(new BabyMEGSQUIDControlDgl(this));
 
@@ -450,8 +448,23 @@ void BabyMEG::performHPIFitting(const QVector<int>& vFreqs)
     //Generate/Update current dev/head transfomration. We do not need to make use of rtHPI plugin here since the fitting is only needed once here.
     //rt head motion correction will be performed using the rtHPI plugin.
     if(m_pFiffInfo) {
+        // Setup SSP
+        //If a minimum of one projector is active set m_bProjActivated to true so that this model applies the ssp to the incoming data
+        Eigen::MatrixXd matProj;
+        m_pFiffInfo->make_projector(matProj);
+
+        //set columns of matrix to zero depending on bad channels indexes
+        for(qint32 j = 0; j < m_pFiffInfo->bads.size(); ++j) {
+            matProj.col(m_pFiffInfo->ch_names.indexOf(m_pFiffInfo->bads.at(j))).setZero();
+        }
+
+        // Setup Comps
+        FiffCtfComp newComp;
+        m_pFiffInfo->make_compensator(0, 101, newComp);//Do this always from 0 since we always read new raw data, we never actually perform a multiplication on already existing data
+        Eigen::MatrixXd matComp = newComp.data->data;
+
         RtHPIS::SPtr pRtHpis = RtHPIS::SPtr(new RtHPIS(m_pFiffInfo));
-        pRtHpis->singleHPIFit(this->calibrate(m_matValue), vFreqs);
+        pRtHpis->singleHPIFit(matProj * matComp * this->calibrate(m_matValue), vFreqs);
 
         //Apply new dev/head matrix to current digitizer and update in 3D view in HPI control widget
         if(m_pHPIDlg) {
@@ -460,17 +473,16 @@ void BabyMEG::performHPIFitting(const QVector<int>& vFreqs)
             for(int i = 0; i < m_pFiffInfo->dig.size(); ++i) {
                 FiffDigPoint digPoint = m_pFiffInfo->dig.at(i);
 
-                MatrixX3f matPos(4,1);
+                MatrixX3f matPos(1,3);
                 matPos(0,0) = digPoint.r[0];
-                matPos(1,0) = digPoint.r[1];
-                matPos(2,0) = digPoint.r[2];
-                matPos(3,0) = 1.0f;
+                matPos(0,1) = digPoint.r[1];
+                matPos(0,2) = digPoint.r[2];
 
-                matPos = m_pFiffInfo->dev_head_t.apply_trans(matPos);
+                MatrixX3f matPosTrans = m_pFiffInfo->dev_head_t.apply_inverse_trans(matPos);
 
-                digPoint.r[0] = matPos(0,0);
-                digPoint.r[1] = matPos(1,0);
-                digPoint.r[2] = matPos(2,0);
+                digPoint.r[0] = matPosTrans(0,0);
+                digPoint.r[1] = matPosTrans(0,1);
+                digPoint.r[2] = matPosTrans(0,2);
 
                 t_digSet << digPoint;
             }
