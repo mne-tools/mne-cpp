@@ -306,9 +306,9 @@ int main(int argc, char *argv[])
 
     testWindow->show();
 
-//    Control3DWidget::SPtr control3DWidget = Control3DWidget::SPtr(new Control3DWidget());
-//    control3DWidget->setView3D(testWindow);
-//    control3DWidget->show();
+    Control3DWidget::SPtr control3DWidget = Control3DWidget::SPtr(new Control3DWidget());
+    control3DWidget->setView3D(testWindow);
+    control3DWidget->show();
 
     //########################################################################################
     //

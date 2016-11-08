@@ -288,23 +288,19 @@ void View3D::startModelRotationRecursive(QObject* pObject)
 
 //*************************************************************************************************************
 
-void View3D::startModelRotation()
+void View3D::startStopModelRotation(bool checked)
 {
-    //Start animation
-    m_lPropertyAnimations.clear();
+    if(checked) {
+        //Start animation
+        m_lPropertyAnimations.clear();
 
-    for(int i = 0; i < m_pRootEntity->children().size(); ++i) {
-        startModelRotationRecursive(m_pRootEntity->children().at(i));
-    }
-}
-
-
-//*************************************************************************************************************
-
-void View3D::stopModelRotation()
-{
-    for(int i = 0; i < m_lPropertyAnimations.size(); ++i) {
-        m_lPropertyAnimations.at(i)->stop();
+        for(int i = 0; i < m_pRootEntity->children().size(); ++i) {
+            startModelRotationRecursive(m_pRootEntity->children().at(i));
+        }
+    } else {
+        for(int i = 0; i < m_lPropertyAnimations.size(); ++i) {
+            m_lPropertyAnimations.at(i)->stop();
+        }
     }
 }
 
@@ -316,6 +312,18 @@ void View3D::toggleCoordAxis(bool checked)
     m_XAxisEntity->setParent(checked ? m_pRootEntity : Q_NULLPTR);
     m_YAxisEntity->setParent(checked ? m_pRootEntity : Q_NULLPTR);
     m_ZAxisEntity->setParent(checked ? m_pRootEntity : Q_NULLPTR);
+}
+
+
+//*************************************************************************************************************
+
+void View3D::showFullScreen(bool checked)
+{
+    if(checked) {
+        this->Qt3DWindow::showFullScreen();
+    } else {
+        this->showNormal();
+    }
 }
 
 

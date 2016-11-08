@@ -167,7 +167,20 @@ Control3DWidget::~Control3DWidget()
 void Control3DWidget::setView3D(QSharedPointer<View3D> view3D)
 {
     //Do the connects from this control widget to the View3D
-    //ui->m_treeView_loadedData->setModel(view3D->getData3DTreeModel());
+    ui->m_treeView_loadedData->setModel(view3D->getData3DTreeModel());
+
+    //Do the connects
+    connect(this, &Control3DWidget::sceneColorChanged,
+            view3D.data(), &View3D::setSceneColor);
+
+    connect(this, &Control3DWidget::rotationChanged,
+            view3D.data(), &View3D::startStopModelRotation);
+
+    connect(this, &Control3DWidget::showCoordAxis,
+            view3D.data(), &View3D::toggleCoordAxis);
+
+    connect(this, &Control3DWidget::showFullScreen,
+            view3D.data(), &View3D::showFullScreen);
 
     //Set description hidden as default
     this->onTreeViewDescriptionHide();
