@@ -189,6 +189,30 @@ void Control3DWidget::setView3D(QSharedPointer<View3D> view3D)
 
 //*************************************************************************************************************
 
+void Control3DWidget::onTreeViewHeaderHide()
+{
+    if(!ui->m_treeView_loadedData->isHeaderHidden()) {
+        ui->m_treeView_loadedData->setHeaderHidden(true);
+    } else {
+        ui->m_treeView_loadedData->setHeaderHidden(false);
+    }
+}
+
+
+//*************************************************************************************************************
+
+void Control3DWidget::onTreeViewDescriptionHide()
+{
+    if(ui->m_treeView_loadedData->isColumnHidden(1)) {
+        ui->m_treeView_loadedData->setColumnHidden(1, false);
+    } else {
+        ui->m_treeView_loadedData->setColumnHidden(1, true);
+    }
+}
+
+
+//*************************************************************************************************************
+
 void Control3DWidget::onMinimizeWidget(bool state)
 {
     if(!state) {
@@ -254,30 +278,6 @@ void Control3DWidget::onCustomContextMenuRequested(QPoint pos)
 
     //show context menu
     menu->popup(ui->m_treeView_loadedData->viewport()->mapToGlobal(pos));
-}
-
-
-//*************************************************************************************************************
-
-void Control3DWidget::onTreeViewHeaderHide()
-{
-    if(!ui->m_treeView_loadedData->isHeaderHidden()) {
-        ui->m_treeView_loadedData->setHeaderHidden(true);
-    } else {
-        ui->m_treeView_loadedData->setHeaderHidden(false);
-    }
-}
-
-
-//*************************************************************************************************************
-
-void Control3DWidget::onTreeViewDescriptionHide()
-{
-    if(ui->m_treeView_loadedData->isColumnHidden(1)) {
-        ui->m_treeView_loadedData->setColumnHidden(1, false);
-    } else {
-        ui->m_treeView_loadedData->setColumnHidden(1, true);
-    }
 }
 
 
