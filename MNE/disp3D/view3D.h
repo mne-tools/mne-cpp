@@ -258,21 +258,21 @@ public:
 
     //=========================================================================================================
     /**
-    * Starts to rotate all loaded 3D models.
+    * Starts or stops to rotate all loaded 3D models.
     */
-    void startModelRotation();
-
-    //=========================================================================================================
-    /**
-    * Stops to rotate all loaded 3D models.
-    */
-    void stopModelRotation();    
+    void startStopModelRotation(bool checked);
 
     //=========================================================================================================
     /**
     * Toggle the coord axis visibility.
     */
     void toggleCoordAxis(bool checked);
+
+    //=========================================================================================================
+    /**
+    * Show fullscreen.
+    */
+    void showFullScreen(bool checked);
 
 protected:
     //=========================================================================================================
