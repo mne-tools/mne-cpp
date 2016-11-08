@@ -447,27 +447,27 @@ void BabyMEG::performHPIFitting(const QVector<int>& vFreqs)
 {
     //Generate/Update current dev/head transfomration. We do not need to make use of rtHPI plugin here since the fitting is only needed once here.
     //rt head motion correction will be performed using the rtHPI plugin.
-    if(m_pFiffInfo) {
-        // Setup SSP
-        //If a minimum of one projector is active set m_bProjActivated to true so that this model applies the ssp to the incoming data
-        Eigen::MatrixXd matProj;
-        m_pFiffInfo->make_projector(matProj);
+    if(m_pFiffInfo && m_pHPIDlg) {
+        if(m_pHPIDlg->hpiLoaded()) {
+            // Setup SSP
+            //If a minimum of one projector is active set m_bProjActivated to true so that this model applies the ssp to the incoming data
+            Eigen::MatrixXd matProj;
+            m_pFiffInfo->make_projector(matProj);
 
-        //set columns of matrix to zero depending on bad channels indexes
-        for(qint32 j = 0; j < m_pFiffInfo->bads.size(); ++j) {
-            matProj.col(m_pFiffInfo->ch_names.indexOf(m_pFiffInfo->bads.at(j))).setZero();
-        }
+            //set columns of matrix to zero depending on bad channels indexes
+            for(qint32 j = 0; j < m_pFiffInfo->bads.size(); ++j) {
+                matProj.col(m_pFiffInfo->ch_names.indexOf(m_pFiffInfo->bads.at(j))).setZero();
+            }
 
-        // Setup Comps
-        FiffCtfComp newComp;
-        m_pFiffInfo->make_compensator(0, 101, newComp);//Do this always from 0 since we always read new raw data, we never actually perform a multiplication on already existing data
-        Eigen::MatrixXd matComp = newComp.data->data;
+            // Setup Comps
+            FiffCtfComp newComp;
+            m_pFiffInfo->make_compensator(0, 101, newComp);//Do this always from 0 since we always read new raw data, we never actually perform a multiplication on already existing data
+            Eigen::MatrixXd matComp = newComp.data->data;
 
-        RtHPIS::SPtr pRtHpis = RtHPIS::SPtr(new RtHPIS(m_pFiffInfo));
-        pRtHpis->singleHPIFit(matProj * matComp * this->calibrate(m_matValue), vFreqs);
+            RtHPIS::SPtr pRtHpis = RtHPIS::SPtr(new RtHPIS(m_pFiffInfo));
+            pRtHpis->singleHPIFit(matProj * matComp * this->calibrate(m_matValue), vFreqs);
 
-        //Apply new dev/head matrix to current digitizer and update in 3D view in HPI control widget
-        if(m_pHPIDlg) {
+            //Apply new dev/head matrix to current digitizer and update in 3D view in HPI control widget
             FiffDigPointSet t_digSet;
 
             for(int i = 0; i < m_pFiffInfo->dig.size(); ++i) {
@@ -488,6 +488,11 @@ void BabyMEG::performHPIFitting(const QVector<int>& vFreqs)
             }
 
             m_pHPIDlg->setDigitizerDataToView3D(t_digSet);
+        } else {
+            QMessageBox msgBox;
+            msgBox.setText("Please load a digitizer set with HPI coils first!");
+            msgBox.exec();
+            return;
         }
     }
 }

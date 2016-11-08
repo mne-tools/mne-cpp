@@ -296,6 +296,18 @@ void BabyMEGHPIDgl::setDigitizerDataToView3D(const FiffDigPointSet& digPointSet,
 
 //*************************************************************************************************************
 
+bool BabyMEGHPIDgl::hpiLoaded()
+{
+    if(ui->m_label_numberLoadedCoils->text().toInt() > 0) {
+        return true;
+    }
+
+    return false;
+}
+
+
+//*************************************************************************************************************
+
 void BabyMEGHPIDgl::onFreqsChanged()
 {
     m_vCoilFreqs.clear();
