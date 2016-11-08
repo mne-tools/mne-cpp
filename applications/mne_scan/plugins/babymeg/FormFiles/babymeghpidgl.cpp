@@ -116,6 +116,7 @@ BabyMEGHPIDgl::BabyMEGHPIDgl(BabyMEG* p_pBabyMEG,QWidget *parent)
 
     Control3DWidget* control3DWidget = new Control3DWidget(this, slFlag);
     control3DWidget->setView3D(m_pView3D);
+    control3DWidget->onTreeViewDescriptionHide();
     QGridLayout* gridLayout = new QGridLayout();
     gridLayout->addWidget(control3DWidget);
     ui->m_groupBox_3dControl->setLayout(gridLayout);

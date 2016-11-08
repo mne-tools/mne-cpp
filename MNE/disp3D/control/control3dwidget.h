@@ -123,6 +123,18 @@ public:
     */
     void setView3D(QSharedPointer<View3D> view3D);
 
+    //=========================================================================================================
+    /**
+    * Slot called when tree view header visibilty changed.
+    */
+    void onTreeViewHeaderHide();
+
+    //=========================================================================================================
+    /**
+    * Slot called when tree view description visibilty changed.
+    */
+    void onTreeViewDescriptionHide();
+
 protected:
     //=========================================================================================================
     /**
@@ -152,18 +164,6 @@ protected:
     * @param[in] pos    The position, where the right-click occurred
     */
     void onCustomContextMenuRequested(QPoint pos);
-
-    //=========================================================================================================
-    /**
-    * Slot called when tree view header visibilty changed.
-    */
-    void onTreeViewHeaderHide();
-
-    //=========================================================================================================
-    /**
-    * Slot called when tree view description visibilty changed.
-    */
-    void onTreeViewDescriptionHide();
 
     //=========================================================================================================
     /**
