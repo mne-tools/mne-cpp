@@ -184,7 +184,7 @@
 /bin/bearer/qnativewifibearer.dll
 /bin/connectivityTutorial
 /bin/histogram
-/bin/mne_dipole_fit
+/bin/mne_dipole_fit_new
 /bin/mne_sample_data_downloader
 /bin/test_codecov
 

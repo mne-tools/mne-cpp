@@ -44,7 +44,7 @@ QT -= gui
 CONFIG   += console
 CONFIG   -= app_bundle
 
-TARGET = mne_dipole_fit
+TARGET = mne_dipole_fit_new
 
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
