@@ -3328,7 +3328,7 @@ static int get_fval(FILE *in, float *fval)
 
 
 
-fwdCoilSet fwd_read_coil_defs(char *name)
+fwdCoilSet fwd_read_coil_defs(const char *name)
      /*
       * Read a coil definition file
       */
@@ -16351,9 +16351,12 @@ dipoleFitData setup_dipole_fit_data(char  *mriname,		 /* This gives the MRI/head
 #ifdef USE_SHARE_PATH
     char *coilfile = mne_compose_mne_name("share/mne","coil_def.dat");
 #else
-    const char *path = "setup/mne";
-    const char *filename = "coil_def.dat";
-    char *coilfile = mne_compose_mne_name(path,filename);
+//    const char *path = "setup/mne";
+//    const char *filename = "coil_def.dat";
+//    const char *coilfile = mne_compose_mne_name(path,filename);
+    QString qPath = QCoreApplication::applicationDirPath() + QString("/resources/coilDefinitions/coil_def.dat");
+    char *coilfile = MALLOC(strlen(qPath.toLatin1().data())+1,char);
+    strcpy(coilfile,qPath.toLatin1().data());
 #endif
 
     if (!coilfile)
