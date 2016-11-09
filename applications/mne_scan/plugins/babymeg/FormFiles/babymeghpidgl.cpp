@@ -112,7 +112,7 @@ BabyMEGHPIDgl::BabyMEGHPIDgl(BabyMEG* p_pBabyMEG,QWidget *parent)
     QWidget *pWidgetContainer = QWidget::createWindowContainer(m_pView3D.data());
     ui->m_gridLayout_main->addWidget(pWidgetContainer,0,0,5,1);
 
-    QStringList slFlag = QStringList() << "Data" << "View";
+    QStringList slFlag = QStringList() << "Data";
 
     Control3DWidget* control3DWidget = new Control3DWidget(this, slFlag);
     control3DWidget->setView3D(m_pView3D);

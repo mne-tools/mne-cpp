@@ -168,7 +168,11 @@ public:
 
     void changeArtifactThreshold(double thresholdFirst, int thresholdSecond);
 
-    void changeArtifactReductionActive(bool state);
+    void changeArtifactThresholdReductionActive(bool state);
+
+    void changeArtifactVariance(double dVariance);
+
+    void changeArtifactVarianceReductionActive(bool state);
 
     void changeBaselineFrom(qint32 fromMSeconds);
 
@@ -210,7 +214,8 @@ private:
 
     bool                                            m_bIsRunning;                   /**< If source lab is running */
     bool                                            m_bProcessData;                 /**< If data should be received for processing */
-    bool                                            m_bDoArtifactReduction;
+    bool                                            m_bDoArtifactThresholdReduction;
+    bool                                            m_bDoArtifactVarianceReduction;
     bool                                            m_bDoBaselineCorrection;
 
     qint32                                          m_iPreStimSamples;
@@ -226,6 +231,7 @@ private:
     qint32                                          m_iNumAverages;
     qint32                                          m_iStimChan;
     qint32                                          m_iArtifactThresholdSecond;
+    double                                          m_dArtifactVariance;
     double                                          m_dArtifactThresholdFirst;
 
     QAction*                                        m_pActionShowAdjustment;
