@@ -546,7 +546,6 @@ void checkChVariance(QPair<bool, RowVectorXd>& pairData)
     //If variance is 3 times bigger than median -> reject
     if(temp.norm() / temp.cols() > (m_dValueVariance * abs(dMedian))) {
         pairData.first = true;
-        qDebug() << "RtAve::checkChVariance - Reject trial";
     } else {
         pairData.first = false;
     }
@@ -572,7 +571,6 @@ void checkChThreshold(QPair<bool, RowVectorXd>& pairData)
     //If absolute vaue of min or max if bigger than threshold -> reject
     if((abs(min) > m_dValueThreshold) || (abs(max) > m_dValueThreshold)) {
         pairData.first = true;
-        qDebug() << "RtAve::checkChThreshold - Reject trial";
     } else {
         pairData.first = false;
     }
@@ -607,9 +605,10 @@ bool RtAve::checkForArtifact(MatrixXd& data)
             QFuture<void> future = QtConcurrent::map(lchData, checkChVariance);
             future.waitForFinished();
 
-            for(int i = 0; i > lchData.size(); ++i) {
+            for(int i = 0; i < lchData.size(); ++i) {
                 if(lchData.at(i).first) {
                     bReject = true;
+                    qDebug() << "RtAve::checkForArtifact - Reject trial";
                     break;
                 }
             }
@@ -620,9 +619,10 @@ bool RtAve::checkForArtifact(MatrixXd& data)
             QFuture<void> future = QtConcurrent::map(lchData, checkChThreshold);
             future.waitForFinished();
 
-            for(int i = 0; i > lchData.size(); ++i) {
+            for(int i = 0; i < lchData.size(); ++i) {
                 if(lchData.at(i).first) {
                     bReject = true;
+                    qDebug() << "RtAve::checkForArtifact - Reject trial";
                     break;
                 }
             }
