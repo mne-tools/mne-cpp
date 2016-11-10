@@ -464,8 +464,10 @@ void BabyMEG::performHPIFitting(const QVector<int>& vFreqs)
             m_pFiffInfo->make_compensator(0, 101, newComp);//Do this always from 0 since we always read new raw data, we never actually perform a multiplication on already existing data
             Eigen::MatrixXd matComp = newComp.data->data;
 
+            //Perform actual fitting
+            QVector<double> vGof;
             RtHPIS::SPtr pRtHpis = RtHPIS::SPtr(new RtHPIS(m_pFiffInfo));
-            pRtHpis->singleHPIFit(matProj * matComp * this->calibrate(m_matValue), vFreqs);
+            pRtHpis->singleHPIFit(matProj * matComp * this->calibrate(m_matValue), vFreqs, vGof);
 
             //Apply new dev/head matrix to current digitizer and update in 3D view in HPI control widget
             FiffDigPointSet t_digSet;
@@ -485,9 +487,19 @@ void BabyMEG::performHPIFitting(const QVector<int>& vFreqs)
                 digPoint.r[2] = matPosTrans(0,2);
 
                 t_digSet << digPoint;
+
+                // If digitizer is HPI also perform goodness of fit test
+                if(m_pFiffInfo->dig.at(i).kind == FIFFV_POINT_HPI) {
+                    Vector3f vDiff(3);
+                    vDiff(0) = digPoint.r[0] - m_pFiffInfo->dig.at(i).r[0];
+                    vDiff(1) = digPoint.r[1] - m_pFiffInfo->dig.at(i).r[1];
+                    vDiff(2) = digPoint.r[2] - m_pFiffInfo->dig.at(i).r[2];
+
+                    vGof.push_back(vDiff.norm());
+                }
             }
 
-            m_pHPIDlg->setDigitizerDataToView3D(t_digSet);
+            m_pHPIDlg->setDigitizerDataToView3D(t_digSet, vGof);
         } else {
             QMessageBox msgBox;
             msgBox.setText("Please load a digitizer set with HPI coils first!");
