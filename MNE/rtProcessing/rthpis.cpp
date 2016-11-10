@@ -476,26 +476,24 @@ void RtHPIS::singleHPIFit(const MatrixXd& t_mat, const QVector<int>& vFreqs, QVe
     vGof.clear();
     struct sens sensors;
     struct coilParam coil;
-    int numCoils = 4;
+    int numCoils = 3;
     int numCh = m_pFiffInfo->nchan;
     int samF = m_pFiffInfo->sfreq;
     int samLoc = t_mat.cols(); // minimum samples required to localize numLoc times in a second
     Eigen::VectorXd coilfreq(numCoils);
 
     //Set coil frequencies
-    if(numCoils == vFreqs.size()) {
+    qDebug()<< "RtHPIS::singleHPIFit - Coil frequencies:";
+
+    if(vFreqs.size() >= numCoils) {
         for(int i = 0; i < numCoils; ++i) {
             coilfreq[i] = vFreqs.at(i);
+            qDebug() << coilfreq[i] << "Hz";
         }
     } else {
-        coilfreq[0] = 155;
-        coilfreq[1] = 165;
-        coilfreq[2] = 190;
-        coilfreq[3] = 200;
+        qDebug()<< "RtHPIS::singleHPIFit - Not enough coil frequencies specified. Returning.";
+        return;
     }
-
-    qDebug()<< "======= coil driving frequency (Hz)======== ";
-    qDebug() << coilfreq[0] << ", " << coilfreq[1] << ", " << coilfreq[2] << ", " << coilfreq[3];
 
     // Initialize HPI coils location and moment
     coil.pos = Eigen::MatrixXd::Zero(numCoils,3);
@@ -682,14 +680,11 @@ void RtHPIS::singleHPIFit(const MatrixXd& t_mat, const QVector<int>& vFreqs, QVe
     MatrixXd temp = coil.pos;
     temp.conservativeResize(coil.pos.rows(),coil.pos.cols()+1);
 
-    temp(0,3) = 1;
-    temp(1,3) = 1;
-    temp(2,3) = 1;
-    temp(3,3) = 1;
+    temp.block(0,3,numCoils,0).setOnes();
     temp.transposeInPlace();
 
     MatrixXd testPos = trans * temp;
-    MatrixXd diffPos = testPos.block(0,0,3,4) - headHPI.transpose();
+    MatrixXd diffPos = testPos.block(0,0,3,numCoils) - headHPI.transpose();
 
     for(int i = 0; i < diffPos.cols(); ++i) {
         vGof.append(diffPos.col(i).norm());
