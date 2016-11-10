@@ -105,28 +105,48 @@ public:
 
     //=========================================================================================================
     /**
+    * Calculates the Pearson's correlation coefficient between the rows of the data matrix.
+    *
+    * @param[in] matData    The input data for whicht the cross correlation is to be calculated.
+    * @param[in] matVert    The vertices of each network node.
+    *
+    * @return               The connectivity information in form of a network structure.
+    */
+    static Network::SPtr pearsonsCorrelationCoeff(const Eigen::MatrixXd& matData, const Eigen::MatrixX3f& matVert);
+
+    //=========================================================================================================
+    /**
     * Calculates the cross correlation between the rows of the data matrix.
     *
-    * @param[in] matData    The input data for whicht the cross correlation is to be calcualted.
+    * @param[in] matData    The input data for which the cross correlation is to be calculated.
     * @param[in] matVert    The vertices of each network node.
     *
     * @return               The connectivity information in form of a network structure.
     */
     static Network::SPtr crossCorrelation(const Eigen::MatrixXd& matData, const Eigen::MatrixX3f& matVert);
 
+protected:
     //=========================================================================================================
     /**
-    * Calculates the cross correlation between the rows of the data matrix.
+    * Calculates the actual Pearson's correlation coefficient between two data vectors.
     *
-    * @param[in] matData    The input data for whicht the cross correlation is to be calcualted.
+    * @param[in] vecFirst    The first input data row.
+    * @param[in] vecSecond   The second input data row.
     *
-    * @return               The connectivity matrix.
+    * @return               The Pearson's correlation coefficient.
     */
-    static Eigen::MatrixXd crossCorrelation(const Eigen::MatrixXd& matData);
+    static double calcPearsonsCorrelationCoeff(const Eigen::RowVectorXd &vecFirst, const Eigen::RowVectorXd &vecSecond);
 
-protected:
-    static QPair<int,double> eigenCrossCorrelation(const Eigen::RowVectorXd &xCorrInputVecFirst, const Eigen::RowVectorXd &xCorrInputVecSecond);
-    //std::pair<double, double> eigenCrossCorrelation(std::vector<double>& xCorrInputVecFirs, std::vector<double>& xCorrInputVecSecond);
+    //=========================================================================================================
+    /**
+    * Calculates the actual cross correlation between two data vectors.
+    *
+    * @param[in] vecFirst    The first input data row.
+    * @param[in] vecSecond   The second input data row.
+    *
+    * @return               The result in form of a QPair. First element represents the index of the maximum. Second element represents the actual correlation value.
+    */
+    static QPair<int,double> calcCrossCorrelation(const Eigen::RowVectorXd &vecFirst, const Eigen::RowVectorXd &vecSecond);
 
 private:
 
