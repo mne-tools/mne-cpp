@@ -39,6 +39,7 @@
 //=============================================================================================================
 
 #include <iostream>
+#define _USE_MATH_DEFINES
 #include <math.h>
 #include <ctime>
 #include <cstdlib>
@@ -97,10 +98,6 @@ using namespace UTILSLIB;
 //=============================================================================================================
 // MAIN
 //=============================================================================================================
-
-#ifndef M_PI
-const double M_PI = 3.14159265358979323846; //Pi constant used in sineWaveGenerator function
-#endif
 
 //sineWaveGenerator function - used to create synthetic data to test histogram functionality
 Eigen::VectorXd sineWaveGenerator(double amplitude, double xStep, int xNow, int xEnd)

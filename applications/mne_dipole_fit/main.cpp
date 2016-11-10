@@ -41,8 +41,9 @@
 
 #include <iostream>
 #include <vector>
-#include <math.h>
 
+#define _USE_MATH_DEFINES
+#include <math.h>
 
 #include <fiff/fiff.h>
 #include <utils/sphere.h>
@@ -59,7 +60,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <math.h>
 #include <time.h>
 
 
