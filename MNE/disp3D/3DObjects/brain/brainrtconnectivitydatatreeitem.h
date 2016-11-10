@@ -46,6 +46,8 @@
 #include "../../helpers/abstracttreeitem.h"
 #include "../../helpers/types.h"
 
+#include <connectivity/network/network.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -68,6 +70,14 @@ namespace MNELIB {
     class MNEForwardSolution;
 }
 
+namespace FSLIB {
+    class Surface;
+}
+
+namespace Qt3DCore {
+    class QEntity;
+}
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -82,6 +92,9 @@ namespace DISP3DLIB
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
+
+class Renderable3DEntity;
+class MetaTreeItem;
 
 
 //=============================================================================================================
@@ -124,22 +137,21 @@ public:
     /**
     * Initializes the rt connectivity data item with neccessary information for visualization computations.
     *
-    * @param[in] tForwardSolution       The MNEForwardSolution.
-    * @param[in] hemi                   The hemispehre of this brain rt connectivity data item.
+    * @param[in] parent                 The Qt3D entity parent of the new item.
     *
     * @return                           Returns true if successful.
     */
-    bool init(const MNELIB::MNEForwardSolution& tForwardSolution, int iHemi);
+    bool init(Qt3DCore::QEntity *parent);
 
     //=========================================================================================================
     /**
     * Adds actual rt connectivity data which is streamed by this item's worker thread item. In order for this function to worker, you must call init(...) beforehand.
     *
-    * @param[in] matNewConnection    The new connectivity data.
+    * @param[in] pNetworkData       The new connectivity data.
     *
     * @return                       Returns true if successful.
     */
-    bool addData(const Eigen::MatrixXd& matNewConnection);
+    bool addData(CONNECTIVITYLIB::Network::SPtr pNetworkData);
 
     //=========================================================================================================
     /**
@@ -150,7 +162,48 @@ public:
     inline bool isInit() const;
 
 private:
-    bool                        m_bIsInit;                      /**< The init flag. */
+    //=========================================================================================================
+    /**
+    * Call this function whenever the check box of this item was checked.
+    *
+    * @param[in] checkState        The current checkstate.
+    */
+    virtual void onCheckStateChanged(const Qt::CheckState& checkState);
+
+    //=========================================================================================================
+    /**
+    * Call this function whenever you want to change the visibilty of the 3D rendered content.
+    *
+    * @param[in] state     The visiblity flag.
+    */
+    void setVisible(bool state);
+
+    //=========================================================================================================
+    /**
+    * This function gets called whenever the network threshold changes.
+    *
+    * @param[in] vecThresholds     The new threshold values used for threshold the network.
+    */
+    void onNetworkThresholdChanged(const QVector3D& vecThresholds);
+
+    //=========================================================================================================
+    /**
+    * Call this function whenever you want to calculate the indices/tris for a network.
+    *
+    * @param[in] pNetworkData     The network data.
+    * @param[in] vecThreshold     The threshold data.
+    */
+    void plotNetwork(QSharedPointer<CONNECTIVITYLIB::Network> pNetworkData, const QVector3D& vecThreshold);
+
+    bool                                        m_bIsInit;                      /**< The init flag. */
+    bool                                        m_bNodesPlotted;                /**< Flag whether nodes were plotted. */
+
+    Qt3DCore::QEntity*                          m_pParentEntity;                /**< The parent 3D entity. */
+
+    MetaTreeItem*                               m_pItemNetworkThreshold;        /**< The item to access the threshold values. */
+
+    Renderable3DEntity*                         m_pRenderable3DEntity;          /**< The renderable 3D entity. */
+    QList<Renderable3DEntity*>                  m_lNodes;                       /**< The currently displayed node points as 3D spheres. */
 
 signals:
 
@@ -167,5 +220,10 @@ inline bool BrainRTConnectivityDataTreeItem::isInit() const
 }
 
 } //NAMESPACE DISP3DLIB
+
+#ifndef metatype_networksptr
+#define metatype_networksptr
+Q_DECLARE_METATYPE(CONNECTIVITYLIB::Network::SPtr);
+#endif
 
 #endif // BRAINRTCONNECTIVITYDATATREEITEM_H

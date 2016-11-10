@@ -47,6 +47,7 @@
 #include <fs/annotationset.h>
 #include <fs/annotation.h>
 #include <mne/mne_forwardsolution.h>
+#include <connectivity/network/network.h>
 
 
 //*************************************************************************************************************
@@ -100,6 +101,7 @@ namespace DISP3DLIB
 //=============================================================================================================
 
 class BrainRTSourceLocDataTreeItem;
+class BrainRTConnectivityDataTreeItem;
 
 
 //=============================================================================================================
@@ -140,7 +142,7 @@ public:
     *
     * @return                       Returns true if successful.
     */
-    bool addBrainData(const QString& subject, const QString& set, const FSLIB::SurfaceSet& tSurfaceSet, const FSLIB::AnnotationSet& tAnnotationSet = FSLIB::AnnotationSet());
+    bool addSurfaceSet(const QString& subject, const QString& set, const FSLIB::SurfaceSet& tSurfaceSet, const FSLIB::AnnotationSet& tAnnotationSet = FSLIB::AnnotationSet());
 
     //=========================================================================================================
     /**
@@ -153,7 +155,7 @@ public:
     *
     * @return                       Returns true if successful.
     */
-    bool addBrainData(const QString& subject, const QString& set, const FSLIB::Surface& tSurface, const FSLIB::Annotation& tAnnotation = FSLIB::Annotation());
+    bool addSurface(const QString& subject, const QString& set, const FSLIB::Surface& tSurface, const FSLIB::Annotation& tAnnotation = FSLIB::Annotation());
 
     //=========================================================================================================
     /**
@@ -165,7 +167,7 @@ public:
     *
     * @return                       Returns true if successful.
     */
-    bool addBrainData(const QString& subject, const QString& set, const MNELIB::MNESourceSpace& tSourceSpace);
+    bool addSourceSpace(const QString& subject, const QString& set, const MNELIB::MNESourceSpace& tSourceSpace);
 
     //=========================================================================================================
     /**
@@ -177,7 +179,7 @@ public:
     *
     * @return                       Returns true if successful.
     */
-    bool addBrainData(const QString& subject, const QString& set, const MNELIB::MNEForwardSolution& tForwardSolution);
+    bool addForwardSolution(const QString& subject, const QString& set, const MNELIB::MNEForwardSolution& tForwardSolution);
 
     //=========================================================================================================
     /**
@@ -190,7 +192,19 @@ public:
     *
     * @return                           Returns a list of the BrainRTSourceLocDataTreeItem where the data was appended to.
     */
-    QList<BrainRTSourceLocDataTreeItem*> addRtBrainData(const QString& subject, const QString& set, const MNELIB::MNESourceEstimate& tSourceEstimate, const MNELIB::MNEForwardSolution& tForwardSolution = MNELIB::MNEForwardSolution());
+    QList<BrainRTSourceLocDataTreeItem*> addSourceData(const QString& subject, const QString& set, const MNELIB::MNESourceEstimate& tSourceEstimate, const MNELIB::MNEForwardSolution& tForwardSolution = MNELIB::MNEForwardSolution());
+
+    //=========================================================================================================
+    /**
+    * Adds connectivity data to the brain tree model.
+    *
+    * @param[in] subject                The name of the subject.
+    * @param[in] set                    The name of the hemisphere surface set to which this data should be added.
+    * @param[in] pNetworkData           The connectivity data.
+    *
+    * @return                           Returns a list of the BrainRTSourceLocDataTreeItem where the data was appended to.
+    */
+    QList<BrainRTConnectivityDataTreeItem*> addConnectivityData(const QString& subject, const QString& set, CONNECTIVITYLIB::Network::SPtr pNetworkData);
 
     //=========================================================================================================
     /**
@@ -240,6 +254,8 @@ public:
     */
     Qt3DCore::QEntity* get3DRootEntity();
 
+    void startModelRotationRecursive(QObject* pObject);
+
     //=========================================================================================================
     /**
     * Starts to rotate all loaded 3D models.
@@ -250,7 +266,13 @@ public:
     /**
     * Stops to rotate all loaded 3D models.
     */
-    void stopModelRotation();
+    void stopModelRotation();    
+
+    //=========================================================================================================
+    /**
+    * Toggle the coord axis visibility.
+    */
+    void toggleCoordAxis(bool checked);
 
 protected:
     //=========================================================================================================

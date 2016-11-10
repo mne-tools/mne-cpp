@@ -124,44 +124,35 @@ bool DigitizerTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer, 
 {
     //Create renderable 3D entity
     m_pParentEntity = parent;
-    m_pRenderable3DEntity = new Renderable3DEntity(parent);
+    m_pRenderable3DEntity = new Renderable3DEntity(m_pParentEntity);
 
-    QMatrix4x4 m;
-    Qt3DCore::QTransform* transform =  new Qt3DCore::QTransform();
-    m.rotate(180, QVector3D(0.0f, 1.0f, 0.0f));
-    m.rotate(-90, QVector3D(1.0f, 0.0f, 0.0f));
-    transform->setMatrix(m);
-    m_pRenderable3DEntity->addComponent(transform);
+    //Initial transformation also regarding the surface offset
+    m_pRenderable3DEntity->setRotX(90);
+    m_pRenderable3DEntity->setRotY(180);
 
     //Create sources as small 3D spheres
     QVector3D pos;
-    Qt3DExtras::QSphereMesh* sourceSphere;
-    Qt3DExtras::QPhongMaterial* material;
     QColor colDefault(100,100,100);
 
     for(int i = 0; i < tDigitizer.size(); ++i) {
-        QSharedPointer<Qt3DCore::QEntity> pSourceSphereEntity = QSharedPointer<Qt3DCore::QEntity>(new Qt3DCore::QEntity());
+        Renderable3DEntity* pSourceSphereEntity = new Renderable3DEntity(m_pRenderable3DEntity);
 
         pos.setX(tDigitizer[i].r[0]);
         pos.setY(tDigitizer[i].r[1]);
         pos.setZ(tDigitizer[i].r[2]);
 
-        sourceSphere = new Qt3DExtras::QSphereMesh();
-        if (tDigitizer[i].kind==FIFFV_POINT_CARDINAL){
+        Qt3DExtras::QSphereMesh* sourceSphere = new Qt3DExtras::QSphereMesh();
+
+        if (tDigitizer[i].kind == FIFFV_POINT_CARDINAL) {
             sourceSphere->setRadius(0.002f);
-        }
-        else{
+        } else {
             sourceSphere->setRadius(0.001f);
         }
         pSourceSphereEntity->addComponent(sourceSphere);
+        pSourceSphereEntity->setPosition(pos);
 
-        transform = new Qt3DCore::QTransform();
-        QMatrix4x4 m;
-        m.translate(pos);
-        transform->setMatrix(m);
-        pSourceSphereEntity->addComponent(transform);
+        Qt3DExtras::QPhongMaterial* material = new Qt3DExtras::QPhongMaterial();
 
-        material = new Qt3DExtras::QPhongMaterial();
         switch (tDigitizer[i].kind) {
         case FIFFV_POINT_CARDINAL:
             colDefault = Qt::yellow;

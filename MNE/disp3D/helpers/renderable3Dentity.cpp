@@ -78,6 +78,7 @@
 
 using namespace DISP3DLIB;
 using namespace Eigen;
+using namespace Qt3DCore;
 
 
 //*************************************************************************************************************
@@ -87,9 +88,9 @@ using namespace Eigen;
 
 Renderable3DEntity::Renderable3DEntity(Qt3DCore::QEntity* parent)
 : Qt3DCore::QEntity(parent)
-, m_pCustomMesh(CustomMesh::SPtr(new CustomMesh()))
-, m_pTransform(QSharedPointer<Qt3DCore::QTransform>(new Qt3DCore::QTransform()))
-, m_pMaterial(QSharedPointer<ShaderMaterial>(new ShaderMaterial(this)))
+, m_pCustomMesh(new CustomMesh())
+, m_pTransform(new Qt3DCore::QTransform())
+, m_pMaterial(new ShaderMaterial(this))
 //, m_pMaterial(QSharedPointer<Qt3DRender::QMaterial>(new Qt3DExtras::QPerVertexColorMaterial))
 //, m_pMaterial(QSharedPointer<Qt3DRender::QMaterial>(new Qt3DRender::QPhongMaterial(this)))
 , m_fAlpha(1.0f)
@@ -97,9 +98,9 @@ Renderable3DEntity::Renderable3DEntity(Qt3DCore::QEntity* parent)
 , m_fRotY(0.0f)
 , m_fRotZ(0.0f)
 {
-    this->addComponent(m_pCustomMesh.data());
-    this->addComponent(m_pTransform.data());
-    this->addComponent(m_pMaterial.data());
+    this->addComponent(m_pCustomMesh);
+    this->addComponent(m_pTransform);
+    this->addComponent(m_pMaterial);
 }
 
 
@@ -108,8 +109,8 @@ Renderable3DEntity::Renderable3DEntity(Qt3DCore::QEntity* parent)
 Renderable3DEntity::Renderable3DEntity(const MatrixX3f& tMatVert, const MatrixX3f& tMatNorm, const MatrixX3i& tMatTris, Qt3DCore::QEntity* parent)
 : Qt3DCore::QEntity(parent)
 , m_pCustomMesh(new CustomMesh(tMatVert, tMatNorm, tMatTris))
-, m_pTransform(QSharedPointer<Qt3DCore::QTransform>(new Qt3DCore::QTransform()))
-, m_pMaterial(QSharedPointer<ShaderMaterial>(new ShaderMaterial(this)))
+, m_pTransform(new Qt3DCore::QTransform())
+, m_pMaterial(new ShaderMaterial(this))
 //, m_pMaterial(QSharedPointer<Qt3DRender::QMaterial>(new Qt3DExtras::QPerVertexColorMaterial))
 //, m_pMaterial(QSharedPointer<Qt3DRender::QMaterial>(new Qt3DExtras::QPhongMaterial(this)))
 , m_fAlpha(1.0f)
@@ -117,9 +118,9 @@ Renderable3DEntity::Renderable3DEntity(const MatrixX3f& tMatVert, const MatrixX3
 , m_fRotY(0.0f)
 , m_fRotZ(0.0f)
 {
-    this->addComponent(m_pCustomMesh.data());
-    this->addComponent(m_pTransform.data());
-    this->addComponent(m_pMaterial.data());
+    this->addComponent(m_pCustomMesh);
+    this->addComponent(m_pTransform);
+    this->addComponent(m_pMaterial);
 }
 
 
@@ -127,8 +128,20 @@ Renderable3DEntity::Renderable3DEntity(const MatrixX3f& tMatVert, const MatrixX3
 
 Renderable3DEntity::~Renderable3DEntity()
 {
-    //TODO: Port to 5.7
-    //this->removeAllComponents();
+    QVector<QComponent*> list = this->components();
+
+    for(int i = 0; i < list.size() ; ++i) {
+        this->removeComponent(list[i]);
+        delete list[i];
+    }
+
+//    this->removeComponent(m_pCustomMesh);
+//    this->removeComponent(m_pTransform);
+//    this->removeComponent(m_pMaterial);
+
+//    delete m_pCustomMesh;
+//    delete m_pTransform;
+//    delete m_pMaterial;
 }
 
 
@@ -142,9 +155,13 @@ bool Renderable3DEntity::setVertColor(const QByteArray& tArrayColors)
 
 //*************************************************************************************************************
 
-bool Renderable3DEntity::setMeshData(const MatrixX3f& tMatVert, const MatrixX3f& tMatNorm, const MatrixX3i& tMatTris, const QByteArray& tArrayColors)
+bool Renderable3DEntity::setMeshData(const MatrixX3f& tMatVert,
+                                     const MatrixX3f& tMatNorm,
+                                     const MatrixX3i& tMatTris,
+                                     const QByteArray& tArrayColors,
+                                     Qt3DRender::QGeometryRenderer::PrimitiveType primitiveType)
 {
-    return m_pCustomMesh->setMeshData(tMatVert, tMatNorm, tMatTris, tArrayColors);
+    return m_pCustomMesh->setMeshData(tMatVert, tMatNorm, tMatTris, tArrayColors, primitiveType);
 }
 
 
@@ -152,7 +169,7 @@ bool Renderable3DEntity::setMeshData(const MatrixX3f& tMatVert, const MatrixX3f&
 
 bool Renderable3DEntity::setTransform(QSharedPointer<Qt3DCore::QTransform> pTransform)
 {
-    m_pTransform = pTransform;
+    m_pTransform = pTransform.data();
 
     return true;
 }
@@ -162,7 +179,7 @@ bool Renderable3DEntity::setTransform(QSharedPointer<Qt3DCore::QTransform> pTran
 
 bool Renderable3DEntity::setMaterial(QSharedPointer<Qt3DRender::QMaterial> pMaterial)
 {
-    m_pMaterial = pMaterial;
+    m_pMaterial = pMaterial.data();
 
     return true;
 }
@@ -173,6 +190,7 @@ bool Renderable3DEntity::setMaterial(QSharedPointer<Qt3DRender::QMaterial> pMate
 bool Renderable3DEntity::setAlpha(float fAlpha)
 {
     m_fAlpha = fAlpha;
+    qDebug()<<"set alpha";
 
     for(int i = 0; i < m_pMaterial->effect()->parameters().size(); i++) {
         if(m_pMaterial->effect()->parameters().at(i)->name() == "alpha") {
