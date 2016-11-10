@@ -251,7 +251,10 @@ QList<FiffDigPoint> BabyMEGHPIDgl::readPolhemusDig(QString fileName)
     }
 
     //Add all digitizer but additional points to View3D
-    this->setDigitizerDataToView3D(t_digSet);
+    QVector<double> vGof;
+    vGof << 0.0 << 0.0 << 0.0 << 0.0;
+
+    this->setDigitizerDataToView3D(t_digSet, vGof);
 
     //Set loaded number of digitizers
     ui->m_label_numberLoadedCoils->setNum(numHPI);
@@ -265,7 +268,7 @@ QList<FiffDigPoint> BabyMEGHPIDgl::readPolhemusDig(QString fileName)
 
 //*************************************************************************************************************
 
-void BabyMEGHPIDgl::setDigitizerDataToView3D(const FiffDigPointSet& digPointSet, bool bSortOutAdditionalDigitizer)
+void BabyMEGHPIDgl::setDigitizerDataToView3D(const FiffDigPointSet& digPointSet, const QVector<double>& vGof, bool bSortOutAdditionalDigitizer)
 {
     if(bSortOutAdditionalDigitizer) {
         FiffDigPointSet t_digSetWithoutAdditional;
@@ -288,6 +291,28 @@ void BabyMEGHPIDgl::setDigitizerDataToView3D(const FiffDigPointSet& digPointSet,
         }
 
         m_pView3D->addDigitizerData("Head", "Digitizer", t_digSetWithoutAdditional);
+
+        //Update gof labels and transform from m to mm
+        QString sGof("0mm");
+        if(vGof.size() > 0) {
+            sGof = QString("%1mm").arg(1000*vGof[0]);
+            ui->m_label_gofCoil1->setText(sGof);
+        }
+
+        if(vGof.size() > 1) {
+            sGof = QString("%1mm").arg(1000*vGof[1]);
+            ui->m_label_gofCoil2->setText(sGof);
+        }
+
+        if(vGof.size() > 2) {
+            sGof = QString("%1mm").arg(1000*vGof[2]);
+            ui->m_label_gofCoil3->setText(sGof);
+        }
+
+        if(vGof.size() > 3) {
+            sGof = QString("%1mm").arg(1000*vGof[3]);
+            ui->m_label_gofCoil4->setText(sGof);
+        }
     } else {
         m_pView3D->addDigitizerData("Head", "Digitizer", digPointSet);
     }

@@ -471,8 +471,9 @@ RtHPIS::~RtHPIS()
 
 //*************************************************************************************************************
 
-void RtHPIS::singleHPIFit(const MatrixXd& t_mat, const QVector<int>& vFreqs)
+void RtHPIS::singleHPIFit(const MatrixXd& t_mat, const QVector<int>& vFreqs, QVector<double>& vGof)
 {
+    vGof.clear();
     struct sens sensors;
     struct coilParam coil;
     int numCoils = 4;
@@ -667,7 +668,23 @@ void RtHPIS::singleHPIFit(const MatrixXd& t_mat, const QVector<int>& vFreqs)
 
     Eigen::Matrix4d trans = computeTransformation(headHPI,coil.pos);
 
-    // DEBUG HPI fitting and write debug results
+    // Store the final result to fiff info
+    // Set final device/head matrix and its inverse to the fiff info
+    for(int ti =0; ti<4;ti++) {
+        for(int tj=0;tj<4;tj++) {
+            m_pFiffInfo->dev_head_t.trans(ti,tj) = trans(ti,tj);
+        }
+    }
+
+    // Also store the inverse
+    m_pFiffInfo->dev_head_t.invtrans = m_pFiffInfo->dev_head_t.trans.inverse();
+
+    qDebug() << "";
+    qDebug() << "RtHPIS::run() - All" << timerAll.elapsed() << "milliseconds";
+    qDebug() << "";
+    qDebug() << "RtHPIS::run() - itimerDipFit" << itimerDipFit << "milliseconds";
+
+    //Calculate GOF
     MatrixXd temp = coil.pos;
     temp.conservativeResize(coil.pos.rows(),coil.pos.cols()+1);
 
@@ -678,9 +695,13 @@ void RtHPIS::singleHPIFit(const MatrixXd& t_mat, const QVector<int>& vFreqs)
     temp.transposeInPlace();
 
     MatrixXd testPos = trans * temp;
-
     MatrixXd diffPos = testPos.block(0,0,3,4) - headHPI.transpose();
 
+    for(int i = 0; i < diffPos.cols(); ++i) {
+        vGof.append(diffPos.col(i).norm());
+    }
+
+    // DEBUG HPI fitting and write debug results
     std::cout << std::endl << std::endl << "RtHPIS::singleHPIFit - temp" << std::endl << temp << std::endl;
 
     std::cout << std::endl << std::endl << "RtHPIS::singleHPIFit - testPos" << std::endl << testPos << std::endl;
@@ -708,21 +729,6 @@ void RtHPIS::singleHPIFit(const MatrixXd& t_mat, const QVector<int>& vFreqs)
 
     UTILSLIB::IOUtils::write_eigen_matrix(diffPos, QString("C:/Users/MEG measurement/BabyMEGData/TestProject/TestSubject/%1_diffPos_mat").arg(sTimeStamp));
 
-    // Store the final result to fiff info
-    // Set final device/head matrix and its inverse to the fiff info
-    for(int ti =0; ti<4;ti++) {
-        for(int tj=0;tj<4;tj++) {
-            m_pFiffInfo->dev_head_t.trans(ti,tj) = trans(ti,tj);
-        }
-    }
-
-    // Also store the inverse
-    m_pFiffInfo->dev_head_t.invtrans = m_pFiffInfo->dev_head_t.trans.inverse();
-
-    qDebug() << "";
-    qDebug() << "RtHPIS::run() - All" << timerAll.elapsed() << "milliseconds";
-    qDebug() << "";
-    qDebug() << "RtHPIS::run() - itimerDipFit" << itimerDipFit << "milliseconds";
 }
 
 
