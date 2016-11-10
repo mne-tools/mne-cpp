@@ -80,7 +80,8 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Network::Network()
+Network::Network(const QString& sConnectivityMethod)
+: m_sConnectivityMethod(sConnectivityMethod)
 {
 }
 
@@ -120,6 +121,22 @@ qint16 Network::getDistribution()
     }
 
     return distribution;
+}
+
+
+//*************************************************************************************************************
+
+void Network::setConnectivityMethod(const QString& sConnectivityMethod)
+{
+    m_sConnectivityMethod = sConnectivityMethod;
+}
+
+
+//*************************************************************************************************************
+
+QString Network::getConnectivityMethod()
+{
+    return m_sConnectivityMethod;
 }
 
 

@@ -179,16 +179,34 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns whether RealTimeEvoked contains values
+    * Returns whether RealTimeSourceEstimate contains values
     *
-    * @return whether RealTimeEvoked contains values.
+    * @return whether RealTimeSourceEstimate contains values.
     */
     inline bool isInitialized() const;
+
+    //=========================================================================================================
+    /**
+    * Sets the current FiffInfo.
+    *
+    * @param [in] p_fiffInfo the new FiffInfo..
+    */
+    void setFiffInfo(FiffInfo::SPtr p_fiffInfo);
+
+    //=========================================================================================================
+    /**
+    * Returns the current FiffInfo.
+    *
+    * @return the current FiffInfo.
+    */
+    FiffInfo::SPtr getFiffInfo();
 
     bool m_bStcSend; /**< dirty hack */
 
 private:
     mutable QMutex              m_qMutex;       /**< Mutex to ensure thread safety */
+
+    FiffInfo::SPtr              m_pFiffInfo;    /**< The Fiff info. */
 
     AnnotationSet::SPtr         m_pAnnotSet;    /**< Annotation set. */
     SurfaceSet::SPtr            m_pSurfSet;     /**< Surface set. */
@@ -263,6 +281,25 @@ inline bool RealTimeSourceEstimate::isInitialized() const
     QMutexLocker locker(&m_qMutex);
     return m_bInitialized;
 }
+
+
+//*************************************************************************************************************
+
+inline void RealTimeSourceEstimate::setFiffInfo(FiffInfo::SPtr p_fiffInfo)
+{
+    QMutexLocker locker(&m_qMutex);
+    m_pFiffInfo = p_fiffInfo;
+}
+
+
+//*************************************************************************************************************
+
+inline FiffInfo::SPtr RealTimeSourceEstimate::getFiffInfo()
+{
+    QMutexLocker locker(&m_qMutex);
+    return m_pFiffInfo;
+}
+
 
 } // NAMESPACE
 
