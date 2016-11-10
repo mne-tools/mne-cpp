@@ -487,16 +487,6 @@ void BabyMEG::performHPIFitting(const QVector<int>& vFreqs)
                 digPoint.r[2] = matPosTrans(0,2);
 
                 t_digSet << digPoint;
-
-                // If digitizer is HPI also perform goodness of fit test
-                if(m_pFiffInfo->dig.at(i).kind == FIFFV_POINT_HPI) {
-                    Vector3f vDiff(3);
-                    vDiff(0) = digPoint.r[0] - m_pFiffInfo->dig.at(i).r[0];
-                    vDiff(1) = digPoint.r[1] - m_pFiffInfo->dig.at(i).r[1];
-                    vDiff(2) = digPoint.r[2] - m_pFiffInfo->dig.at(i).r[2];
-
-                    vGof.push_back(vDiff.norm());
-                }
             }
 
             m_pHPIDlg->setDigitizerDataToView3D(t_digSet, vGof);
