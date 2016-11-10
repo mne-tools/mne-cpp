@@ -91,8 +91,8 @@ namespace Data3DTreeModelItemTypes
                     SubjectItem = QStandardItem::UserType + 8,
                     BemItem = QStandardItem::UserType + 9,
                     BemSurfaceItem = QStandardItem::UserType + 10,
-                    DigitizerSetItem = QStandardItem::UserType +11,
-                    DigitizerItem = QStandardItem::UserType +12};
+                    DigitizerSetItem = QStandardItem::UserType + 11,
+                    DigitizerItem = QStandardItem::UserType + 12};
 }
 
 namespace MetaTreeItemTypes
@@ -117,7 +117,9 @@ namespace MetaTreeItemTypes
                     SurfaceTranslateX = QStandardItem::UserType + 117,
                     SurfaceTranslateY = QStandardItem::UserType + 118,
                     SurfaceTranslateZ = QStandardItem::UserType + 119,
-                    PointColor = QStandardItem::UserType + 120};
+                    PointColor = QStandardItem::UserType + 120,
+                    NetworkThreshold = QStandardItem::UserType + 121,
+                    NetworkMatrix = QStandardItem::UserType + 122};
 }
 
 // Model item roles
@@ -153,7 +155,10 @@ namespace Data3DTreeModelItemRoles
                     BemName = Qt::UserRole + 127,
                     RTStartIdxRightHemi = Qt::UserRole + 128,
                     RTEndIdxRightHemi = Qt::UserRole + 129,
-                    RTVertNoRightHemi = Qt::UserRole + 130,};
+                    RTVertNoRightHemi = Qt::UserRole + 130,
+                    SourceVertices = Qt::UserRole + 131,
+                    NetworkData = Qt::UserRole + 132,
+                    NetworkDataMatrix = Qt::UserRole + 133};
 }
 
 namespace MetaTreeItemRoles
@@ -178,7 +183,8 @@ namespace MetaTreeItemRoles
                     SurfaceTranslateX = Qt::UserRole + 18,
                     SurfaceTranslateY = Qt::UserRole + 19,
                     SurfaceTranslateZ = Qt::UserRole + 20,
-                    PointColor = Qt::UserRole + 21};
+                    PointColor = Qt::UserRole + 21,
+                    NetworkThreshold = Qt::UserRole + 22};
 }
 
 } //NAMESPACE DISP3DLIB

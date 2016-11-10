@@ -52,7 +52,7 @@
 #include <xMeas/newrealtimemultisamplearray.h>
 #include <xMeas/realtimesourceestimate.h>
 
-#include <utils/filterdata.h>
+#include <utils/filterTools/filterdata.h>
 
 #include <fstream>
 

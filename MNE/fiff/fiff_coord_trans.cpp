@@ -135,8 +135,8 @@ bool FiffCoordTrans::invert_transform()
     fiff_int_t from_new = this->to;
     this->to    = this->from;
     this->from  = from_new;
-    this->trans = this->trans.inverse();
-    this->invtrans = this->invtrans.inverse();
+    this->trans = this->trans.inverse().eval();
+    this->invtrans = this->invtrans.inverse().eval();
 
     return true;
 }
@@ -184,6 +184,16 @@ MatrixX3f FiffCoordTrans::apply_trans (const MatrixX3f& rr) const
     MatrixX4f rr_ones = MatrixX4f::Ones(rr.rows(),4);
     rr_ones.block(0,0,rr.rows(),3) = rr;
     return rr_ones*trans.block<3,4>(0,0).transpose();
+}
+
+
+//*************************************************************************************************************
+
+MatrixX3f FiffCoordTrans::apply_inverse_trans (const MatrixX3f& rr) const
+{
+    MatrixX4f rr_ones = MatrixX4f::Ones(rr.rows(),4);
+    rr_ones.block(0,0,rr.rows(),3) = rr;
+    return rr_ones*invtrans.block<3,4>(0,0).transpose();
 }
 
 

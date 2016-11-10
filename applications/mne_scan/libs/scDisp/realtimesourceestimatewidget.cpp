@@ -155,13 +155,13 @@ void RealTimeSourceEstimateWidget::getData()
         //
         if(m_lRtItem.isEmpty()) {
             qDebug()<<"RealTimeSourceEstimateWidget::getData - Creating m_lRtItem list";
-            m_lRtItem = m_p3DView->addRtBrainData("Subject01", "HemiLRSet", *m_pRTSE->getValue(), *m_pRTSE->getFwdSolution());
+            m_lRtItem = m_p3DView->addSourceData("Subject01", "HemiLRSet", *m_pRTSE->getValue(), *m_pRTSE->getFwdSolution());
 
             for(int i = 0; i<m_lRtItem.size(); i++) {
                 m_lRtItem.at(i)->setLoopState(false);
-                m_lRtItem.at(i)->setTimeInterval(25);
-                m_lRtItem.at(i)->setNormalization(QVector3D(0.0,0.5,10000));
-                m_lRtItem.at(i)->setColortable("Hot Negative 2");
+                m_lRtItem.at(i)->setTimeInterval(17);
+                m_lRtItem.at(i)->setNormalization(QVector3D(0.0,5,10));
+                m_lRtItem.at(i)->setColortable("Hot");
                 m_lRtItem.at(i)->setVisualizationType("Annotation based");
                 //m_lRtItem.at(i)->onTimeIntervalChanged(m_pRTSE->getValue()->tstep*1000000);
                 m_lRtItem.at(i)->setNumberAverages(1);
@@ -185,7 +185,7 @@ void RealTimeSourceEstimateWidget::getData()
             //
             // Add brain data
             //
-            m_p3DView->addBrainData("Subject01", "HemiLRSet", *m_pRTSE->getSurfSet(), *m_pRTSE->getAnnotSet());
+            m_p3DView->addSurfaceSet("Subject01", "HemiLRSet", *m_pRTSE->getSurfSet(), *m_pRTSE->getAnnotSet());
         }
     }
 }

@@ -162,7 +162,7 @@ private:
     Qt3DCore::QEntity*                          m_pParentEntity;            /**< The parent 3D entity. */
     Renderable3DEntity*                         m_pRenderable3DEntity;      /**< The renderable 3D entity. */
 
-    QList<QSharedPointer<Qt3DCore::QEntity> >   m_lSpheres;                 /**< The currently displayed digitizer points as 3D spheres. */
+    QList<Renderable3DEntity*>                  m_lSpheres;                 /**< The currently displayed digitizer points as 3D spheres. */
 };
 
 } //NAMESPACE DISP3DLIB

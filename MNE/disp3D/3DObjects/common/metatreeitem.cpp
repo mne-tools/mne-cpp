@@ -139,6 +139,12 @@ MetaTreeItem::MetaTreeItem(int iType, const QString& text)
         case MetaTreeItemTypes::SurfaceTranslateZ:
             sToolTip = "Surface z translation value";
             break;
+        case MetaTreeItemTypes::NetworkThreshold:
+            sToolTip = "The threshold used to scale the network";
+            break;
+        case MetaTreeItemTypes::NetworkMatrix:
+            sToolTip = "The network distance matrix";
+            break;
         default: // do nothing;
             break;
     }
@@ -232,6 +238,12 @@ void  MetaTreeItem::setData(const QVariant& value, int role)
 
         case MetaTreeItemRoles::SurfaceTranslateZ: {
             emit surfaceTranslationZChanged(value.toFloat());
+            break;
+        }
+
+        case MetaTreeItemRoles::NetworkThreshold: {
+            QVector3D vecTemp = value.value<QVector3D>();
+            emit networkThresholdChanged(vecTemp);
             break;
         }
 

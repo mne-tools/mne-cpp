@@ -141,7 +141,7 @@ bool BrainSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* p
     //Create renderable 3D entity
     m_pParentEntity = parent;
     m_pRenderable3DEntity = new Renderable3DEntity(m_pParentEntity);
-    m_pRenderable3DEntityActivationOverlay = new Renderable3DEntity(parent);
+    m_pRenderable3DEntityActivationOverlay = new Renderable3DEntity(m_pParentEntity);
 
     //Initial transformation also regarding the surface offset
     m_pRenderable3DEntity->setPosition(QVector3D(tSurface.offset()(0), tSurface.offset()(1), tSurface.offset()(2)));
@@ -153,7 +153,7 @@ bool BrainSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* p
     QByteArray arrayCurvatureColor = createCurvatureVertColor(tSurface.curv());
 
     //Set renderable 3D entity mesh and color data
-    m_pRenderable3DEntity->setMeshData(tSurface.rr(), tSurface.nn(), tSurface.tris(), arrayCurvatureColor);
+    m_pRenderable3DEntity->setMeshData(tSurface.rr(), tSurface.nn(), tSurface.tris(), arrayCurvatureColor, Qt3DRender::QGeometryRenderer::Triangles);
 
     //Generate activation overlay surface
 //    MatrixX3f overlayAdds = tSurface.rr();

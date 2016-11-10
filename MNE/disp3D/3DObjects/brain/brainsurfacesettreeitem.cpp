@@ -41,6 +41,7 @@
 #include "brainsurfacesettreeitem.h"
 #include "brainhemispheretreeitem.h"
 #include "brainrtsourcelocdatatreeitem.h"
+#include "brainrtconnectivitydatatreeitem.h"
 #include "brainsurfacetreeitem.h"
 #include "brainannotationtreeitem.h"
 #include "../digitizer/digitizersettreeitem.h"
@@ -86,6 +87,7 @@
 using namespace FSLIB;
 using namespace MNELIB;
 using namespace DISP3DLIB;
+using namespace CONNECTIVITYLIB;
 
 
 //*************************************************************************************************************
@@ -96,6 +98,7 @@ using namespace DISP3DLIB;
 BrainSurfaceSetTreeItem::BrainSurfaceSetTreeItem(int iType, const QString& text)
 : AbstractTreeItem(iType, text)
 , m_pBrainRTSourceLocDataTreeItem(new BrainRTSourceLocDataTreeItem())
+, m_pBrainRTConnectivityDataTreeItem(new BrainRTConnectivityDataTreeItem())
 {
     this->setEditable(false);
     this->setCheckable(true);
@@ -384,6 +387,36 @@ bool BrainSurfaceSetTreeItem::addData(const FiffDigPointSet &tDigitizer, Qt3DCor
 
 //*************************************************************************************************************
 
+BrainRTConnectivityDataTreeItem* BrainSurfaceSetTreeItem::addData(Network::SPtr pNetworkData, Qt3DCore::QEntity* p3DEntityParent)
+{
+    if(!pNetworkData->getNodes().isEmpty()) {
+        //Add source estimation data as child
+        if(this->findChildren(Data3DTreeModelItemTypes::RTConnectivityDataItem).size() == 0) {
+            //If rt data item does not exists yet, create it here!
+            m_pBrainRTConnectivityDataTreeItem = new BrainRTConnectivityDataTreeItem();
+
+            QList<QStandardItem*> list;
+            list << m_pBrainRTConnectivityDataTreeItem;
+            list << new QStandardItem(m_pBrainRTConnectivityDataTreeItem->toolTip());
+            this->appendRow(list);
+
+            m_pBrainRTConnectivityDataTreeItem->init(p3DEntityParent);
+            m_pBrainRTConnectivityDataTreeItem->addData(pNetworkData);
+        } else {
+            m_pBrainRTConnectivityDataTreeItem->addData(pNetworkData);
+        }
+
+        return m_pBrainRTConnectivityDataTreeItem;
+    } else {
+        qDebug() << "BrainSurfaceSetTreeItem::addData - network data is empty";
+    }
+
+    return new BrainRTConnectivityDataTreeItem();
+}
+
+
+//*************************************************************************************************************
+
 void BrainSurfaceSetTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
 {
     for(int i = 0; i < this->rowCount(); ++i) {
@@ -431,9 +464,9 @@ void BrainSurfaceSetTreeItem::onColorInfoOriginChanged()
         }
     }
 
-    if(pSurfaceTreeItemLeft && pSurfaceTreeItemRight) {
+    if(pSurfaceTreeItemLeft && pSurfaceTreeItemRight && !this->findChildren(Data3DTreeModelItemTypes::RTSourceLocDataItem).isEmpty()) {
         m_pBrainRTSourceLocDataTreeItem->onColorInfoOriginChanged(pSurfaceTreeItemLeft->data(Data3DTreeModelItemRoles::SurfaceCurrentColorVert).value<QByteArray>(),
-                                            pSurfaceTreeItemRight->data(Data3DTreeModelItemRoles::SurfaceCurrentColorVert).value<QByteArray>());
+                                                                    pSurfaceTreeItemRight->data(Data3DTreeModelItemRoles::SurfaceCurrentColorVert).value<QByteArray>());
     }
 }
 

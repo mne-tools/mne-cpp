@@ -76,8 +76,8 @@ AveragingSettingsWidget::AveragingSettingsWidget(Averaging *toolbox, QWidget *pa
 
     if(m_pAveragingToolbox->m_pRtAve) {
         ui.m_pSpinBoxNumAverages->setValue(m_pAveragingToolbox->m_iNumAverages);
-        connect(ui.m_pSpinBoxNumAverages, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-                m_pAveragingToolbox, &Averaging::changeNumAverages);
+        connect(ui.m_pSpinBoxNumAverages, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
+                this, &AveragingSettingsWidget::changeNumAverages);
 
         ui.m_comboBox_runningAvr->setCurrentIndex(m_pAveragingToolbox->m_iAverageMode);
         connect(ui.m_comboBox_runningAvr, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
@@ -194,4 +194,10 @@ void AveragingSettingsWidget::changeArtifactThreshold()
 }
 
 
+//*************************************************************************************************************
+
+void AveragingSettingsWidget::changeNumAverages()
+{
+    m_pAveragingToolbox->changeNumAverages(ui.m_pSpinBoxNumAverages->value());
+}
 

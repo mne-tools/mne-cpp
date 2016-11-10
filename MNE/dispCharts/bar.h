@@ -139,15 +139,9 @@ public:
     * @param[out] vecExponentResults     vector filled with values of exponent only
     */
     template<typename T>
-    void splitCoefficientAndExponent (const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData, int iClassAmount, Eigen::VectorXd& vecCoefficientResults, Eigen::VectorXi& vecExponentValues);
+    void splitCoefficientAndExponent(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData, int iClassAmount, Eigen::VectorXd& vecCoefficientResults, Eigen::VectorXi& vecExponentValues);
 
 private:
-    //=============================================================================================================
-    /**
-    * @param[out]   m_pChart    m_pChart is the name of the Qobject that will be shown as a graphical widget for the histogram
-    * @param[out]   m_pAxis     customized x-axis to be used in m_pChart
-    */
-
     QtCharts::QChart*             m_pChart; /**< QChart object that will be shown in the widget */
     QtCharts::QBarCategoryAxis*   m_pAxis;  /**< Customized axis for bar histogram*/
 };
