@@ -196,6 +196,22 @@ public:
 
     //=========================================================================================================
     /**
+    * Sets the hub status of this node.
+    *
+    * @param bIsHub   New hub status for this node.
+    */
+    void setHubStatus(bool bIsHub);
+
+    //=========================================================================================================
+    /**
+    * Returns flag describing whether this node is a hub or not.
+    *
+    * @return   Whether this node is a hub or not.
+    */
+    bool getHubStatus();
+
+    //=========================================================================================================
+    /**
     * Overloaded stream operator to add a network edge to this network node.
     *
     * @param[in] newEdge    The new edge item as a reference.
@@ -205,6 +221,8 @@ public:
 protected:
 
 private:
+    bool                                    m_bIsHub;
+
     qint16                                  m_iId;
 
     Eigen::RowVectorXf                      m_vecVert;

@@ -93,6 +93,8 @@ using namespace CONNECTIVITYLIB;
 BrainRTConnectivityDataTreeItem::BrainRTConnectivityDataTreeItem(int iType, const QString &text)
 : AbstractTreeItem(iType, text)
 , m_bIsInit(false)
+, m_bNodesPlotted(false)
+, m_pItemNetworkThreshold(new MetaTreeItem())
 , m_pParentEntity(new Qt3DCore::QEntity())
 , m_pRenderable3DEntity(new Renderable3DEntity())
 {
@@ -134,6 +136,27 @@ bool BrainRTConnectivityDataTreeItem::init(Qt3DCore::QEntity* parent)
     m_pParentEntity = parent;
     m_pRenderable3DEntity = new Renderable3DEntity(parent);
 
+    //Add meta information as item children
+    QList<QStandardItem*> list;
+
+    QVariant data;
+
+    QVector3D vecEdgeTrehshold(0,5,10);
+    m_pItemNetworkThreshold = new MetaTreeItem(MetaTreeItemTypes::NetworkThreshold, "0.0,5.0,10.0");
+    list << m_pItemNetworkThreshold;
+    list << new QStandardItem(m_pItemNetworkThreshold->toolTip());
+    this->appendRow(list);
+    data.setValue(vecEdgeTrehshold);
+    m_pItemNetworkThreshold->setData(data, MetaTreeItemRoles::NetworkThreshold);
+    connect(m_pItemNetworkThreshold, &MetaTreeItem::networkThresholdChanged,
+            this, &BrainRTConnectivityDataTreeItem::onNetworkThresholdChanged);
+
+    list.clear();
+    MetaTreeItem* pItemNetworkMatrix = new MetaTreeItem(MetaTreeItemTypes::NetworkMatrix, "Show network matrix");
+    list << pItemNetworkMatrix;
+    list << new QStandardItem(pItemNetworkMatrix->toolTip());
+    this->appendRow(list);
+
     m_bIsInit = true;
 
     return true;
@@ -159,27 +182,9 @@ bool BrainRTConnectivityDataTreeItem::addData(Network::SPtr pNetworkData)
     data.setValue(matDist);
     this->setData(data, Data3DTreeModelItemRoles::NetworkDataMatrix);
 
-    //Add surface meta information as item children
-    QList<QStandardItem*> list;
-
-    QVector3D vecEdgeTrehshold(0,0,0);
-    MetaTreeItem* pItemNetworkThreshold = new MetaTreeItem(MetaTreeItemTypes::NetworkThreshold, "0.0,0.0,0.0");
-    connect(pItemNetworkThreshold, &MetaTreeItem::networkThresholdChanged,
-            this, &BrainRTConnectivityDataTreeItem::onNetworkThresholdChanged);
-    list << pItemNetworkThreshold;
-    list << new QStandardItem(pItemNetworkThreshold->toolTip());
-    this->appendRow(list);
-    data.setValue(vecEdgeTrehshold);
-    pItemNetworkThreshold->setData(data, MetaTreeItemRoles::NetworkThreshold);
-
-    list.clear();
-    MetaTreeItem* pItemNetworkMatrix = new MetaTreeItem(MetaTreeItemTypes::NetworkMatrix, "Show network matrix");
-    list << pItemNetworkMatrix;
-    list << new QStandardItem(pItemNetworkMatrix->toolTip());
-    this->appendRow(list);
-
     //Plot network
-    plotNetwork(pNetworkData, vecEdgeTrehshold);
+    QVector3D vecThreshold = m_pItemNetworkThreshold->data(MetaTreeItemRoles::NetworkThreshold).value<QVector3D>();
+    plotNetwork(pNetworkData, vecThreshold);
 
     return true;
 }
@@ -209,7 +214,6 @@ void BrainRTConnectivityDataTreeItem::setVisible(bool state)
 
 void BrainRTConnectivityDataTreeItem::onNetworkThresholdChanged(const QVector3D& vecThresholds)
 {
-    qDebug()<<"";
     Network::SPtr pNetwork = this->data(Data3DTreeModelItemRoles::NetworkData).value<Network::SPtr>();
 
     plotNetwork(pNetwork, vecThresholds);
@@ -220,51 +224,86 @@ void BrainRTConnectivityDataTreeItem::onNetworkThresholdChanged(const QVector3D&
 
 void BrainRTConnectivityDataTreeItem::plotNetwork(QSharedPointer<CONNECTIVITYLIB::Network> pNetworkData, const QVector3D& vecThreshold)
 {
-    //Prepare network visualization
-    QMatrix4x4 m;
-    Qt3DCore::QTransform* transform =  new Qt3DCore::QTransform();
-    m.rotate(180, QVector3D(0.0f, 1.0f, 0.0f));
-    m.rotate(-90, QVector3D(1.0f, 0.0f, 0.0f));
-    transform->setMatrix(m);
-    m_pRenderable3DEntity->addComponent(transform);
+//    // Delete all old renderable children
+//    Renderable3DEntity* pParentTemp = new Renderable3DEntity();
+//    QList<QObject*> list = m_pRenderable3DEntity->children();
+//    QMutableListIterator<QObject*> i(list);
+//    int counter = 0;
 
-    QVector3D pos;
-    QSharedPointer<Qt3DCore::QEntity> sourceSphereEntity; //set to NULL is automatically done by QSharedPointer
-    Qt3DExtras::QSphereMesh* sourceSphere = Q_NULLPTR;
-    Qt3DExtras::QPhongMaterial* material = Q_NULLPTR;
+//    while (i.hasNext()) {
+//        if(Renderable3DEntity* entity = dynamic_cast<Renderable3DEntity*>(i.next())) {
+//            entity->setParent(pParentTemp);
+//            delete entity;
+//            i.remove();
+//            counter++;
+//        }
+//    }
 
-    //Draw network nodes
-    m_lNodes.clear();
-    MatrixX3f tMatVert(pNetworkData->getNodes().size(), 3);
-    MatrixX3f tMatNorm(pNetworkData->getNodes().size(), 3);
-    tMatNorm.setZero();
+//    delete pParentTemp;
+
+//    qDebug() << "Deleted children from qt3d entity:" << counter;
+
+//    //Delete all nodes
+//    QMutableListIterator<Renderable3DEntity*> i(m_lNodes);
+
+//    while(i.hasNext()) {
+//        delete i.next();
+//        i.remove();
+//    }
+
+//    m_lNodes.clear();
+
+    //Initial transform
+    m_pRenderable3DEntity->setRotX(90);
+    m_pRenderable3DEntity->setRotY(180);
+
+    //Create network vertices and normals
     QList<NetworkNode::SPtr> lNetworkNodes = pNetworkData->getNodes();
 
+    MatrixX3f tMatVert(pNetworkData->getNodes().size(), 3);
+
     for(int i = 0; i < lNetworkNodes.size(); ++i) {
-        pos.setX(lNetworkNodes.at(i)->getVert()(0));
-        pos.setY(lNetworkNodes.at(i)->getVert()(1));
-        pos.setZ(lNetworkNodes.at(i)->getVert()(2));
+        tMatVert(i,0) = lNetworkNodes.at(i)->getVert()(0);
+        tMatVert(i,1) = lNetworkNodes.at(i)->getVert()(1);
+        tMatVert(i,2) = lNetworkNodes.at(i)->getVert()(2);
+    }
 
-        tMatVert(i,0) = pos.x();
-        tMatVert(i,1) = pos.y();
-        tMatVert(i,2) = pos.z();
+    MatrixX3f tMatNorm(pNetworkData->getNodes().size(), 3);
+    tMatNorm.setZero();
 
-        sourceSphereEntity = QSharedPointer<Qt3DCore::QEntity>(new Qt3DCore::QEntity(m_pRenderable3DEntity));
+    //Draw network nodes
+    //TODO: Dirty hack using m_bNodesPlotted flag to get rid of memory leakage problem when putting parent to the nodes entities. Internal Qt3D problem?
+    if(!m_bNodesPlotted) {
+        QVector3D pos;
 
-        sourceSphere = new Qt3DExtras::QSphereMesh();
-        sourceSphere->setRadius(0.001f);
-        sourceSphereEntity->addComponent(sourceSphere);
+        for(int i = 0; i < lNetworkNodes.size(); ++i) {
+            pos.setX(lNetworkNodes.at(i)->getVert()(0));
+            pos.setY(lNetworkNodes.at(i)->getVert()(1));
+            pos.setZ(lNetworkNodes.at(i)->getVert()(2));
 
-        Qt3DCore::QTransform* transform = new Qt3DCore::QTransform();
-        QMatrix4x4 m;
-        m.translate(pos);
-        transform->setMatrix(m);
-        sourceSphereEntity->addComponent(transform);
+            Renderable3DEntity* sourceSphereEntity = new Renderable3DEntity(m_pRenderable3DEntity);
 
-        material = new Qt3DExtras::QPhongMaterial();
-        material->setAmbient(Qt::blue);
-        sourceSphereEntity->addComponent(material);
-        m_lNodes << sourceSphereEntity;
+            sourceSphereEntity->setRotX(90);
+            sourceSphereEntity->setRotY(180);
+
+            Qt3DExtras::QSphereMesh* sourceSphere = new Qt3DExtras::QSphereMesh();
+            sourceSphere->setRadius(0.001f);
+            sourceSphereEntity->addComponent(sourceSphere);
+
+            Qt3DCore::QTransform* transform = new Qt3DCore::QTransform();
+            QMatrix4x4 m;
+            m.translate(pos);
+            transform->setMatrix(m);
+            sourceSphereEntity->addComponent(transform);
+
+            Qt3DExtras::QPhongMaterial* material = new Qt3DExtras::QPhongMaterial();
+            material->setAmbient(Qt::blue);
+            sourceSphereEntity->addComponent(material);
+
+            m_lNodes.append(sourceSphereEntity);
+        }
+
+        m_bNodesPlotted = true;
     }
 
     //Generate connection indices for Qt3D buffer
@@ -297,11 +336,11 @@ void BrainRTConnectivityDataTreeItem::plotNetwork(QSharedPointer<CONNECTIVITYLIB
 
     //Generate connection indices and colors for Qt3D buffer
     QByteArray arrayCurvatureColor;
-    arrayCurvatureColor.resize(tMatVert.rows() * 3 * (int)sizeof(float));
+    arrayCurvatureColor.resize(pNetworkData->getNodes().size() * 3 * (int)sizeof(float));
     float *rawColorArray = reinterpret_cast<float *>(arrayCurvatureColor.data());
     int idxColor = 0;
 
-    for(int i = 0; i < tMatVert.rows(); ++i) {
+    for(int i = 0; i < pNetworkData->getNodes().size(); ++i) {
         rawColorArray[idxColor] = 0;
         idxColor++;
         rawColorArray[idxColor] = 0;
