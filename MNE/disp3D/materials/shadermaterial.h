@@ -142,22 +142,22 @@ private:
     */
     void init();
 
-    Qt3DRender::QEffect*            m_vertexEffect;
+    Qt3DRender::QEffect*            m_pVertexEffect;
 
-    Qt3DRender::QParameter*         m_ambientParameter;
-    Qt3DRender::QParameter*         m_diffuseParameter;
-    Qt3DRender::QParameter*         m_specularParameter;
-    Qt3DRender::QParameter*         m_shininessParameter;
-    Qt3DRender::QParameter*         m_alphaParameter;
-    Qt3DRender::QFilterKey*         m_filterKey;
+    Qt3DRender::QParameter*         m_pAmbientParameter;
+    Qt3DRender::QParameter*         m_pDiffuseParameter;
+    Qt3DRender::QParameter*         m_pSpecularParameter;
+    Qt3DRender::QParameter*         m_pShininessParameter;
+    Qt3DRender::QParameter*         m_pAlphaParameter;
+    Qt3DRender::QFilterKey*         m_pFilterKey;
 
-    Qt3DRender::QTechnique*         m_vertexGL3Technique;
-    Qt3DRender::QRenderPass*        m_vertexGL3RenderPass;
-    Qt3DRender::QShaderProgram*     m_vertexGL3Shader;
+    Qt3DRender::QTechnique*         m_pVertexGL3Technique;
+    Qt3DRender::QRenderPass*        m_pVertexGL3RenderPass;
+    Qt3DRender::QShaderProgram*     m_pVertexGL3Shader;
 
-    Qt3DRender::QNoDepthMask*                   m_noDepthMask;
-    Qt3DRender::QBlendEquationArguments*        m_blendState;
-    Qt3DRender::QBlendEquation*                 m_blendEquation;
+    Qt3DRender::QNoDepthMask*                   m_pNoDepthMask;
+    Qt3DRender::QBlendEquationArguments*        m_pBlendState;
+    Qt3DRender::QBlendEquation*                 m_pBlendEquation;
 };
 
 } // namespace DISP3DLIB
