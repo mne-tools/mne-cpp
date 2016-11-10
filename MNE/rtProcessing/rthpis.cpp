@@ -672,9 +672,9 @@ void RtHPIS::singleHPIFit(const MatrixXd& t_mat, const QVector<int>& vFreqs, QVe
     m_pFiffInfo->dev_head_t.invtrans = m_pFiffInfo->dev_head_t.trans.inverse();
 
     qDebug() << "";
-    qDebug() << "RtHPIS::run() - All" << timerAll.elapsed() << "milliseconds";
+    qDebug() << "RtHPIS::singleHPIFit - Timing All" << timerAll.elapsed() << "milliseconds";
     qDebug() << "";
-    qDebug() << "RtHPIS::run() - itimerDipFit" << itimerDipFit << "milliseconds";
+    qDebug() << "RtHPIS::singleHPIFit - Timing itimerDipFit" << itimerDipFit << "milliseconds";
 
     //Calculate GOF
     MatrixXd temp = coil.pos;
@@ -1223,10 +1223,10 @@ coilParam RtHPIS::dipfit(struct coilParam coil, struct sens sensors, Eigen::Matr
 Eigen::Matrix4d RtHPIS::computeTransformation(Eigen::MatrixXd NH, Eigen::MatrixXd BT)
 {
     Eigen::MatrixXd xdiff, ydiff, zdiff, C, Q;
-    Eigen::Matrix4d trans = Eigen::Matrix4d::Identity(4,4), Rot = Eigen::Matrix4d::Zero(4,4), Trans = Eigen::Matrix4d::Identity(4,4);
+    Eigen::Matrix4d transFinal = Eigen::Matrix4d::Identity(4,4), Rot = Eigen::Matrix4d::Zero(4,4), Trans = Eigen::Matrix4d::Identity(4,4);
     double meanx,meany,meanz,normf;
 
-    for(int i = 0;i < 15;i++) {
+    for(int i = 0; i < 25; i++) {
         zdiff = NH.col(2) - BT.col(2);
         ydiff = NH.col(1) - BT.col(1);
         xdiff = NH.col(0) - BT.col(0);
@@ -1257,9 +1257,10 @@ Eigen::Matrix4d RtHPIS::computeTransformation(Eigen::MatrixXd NH, Eigen::MatrixX
 
         Rot(3,3) = 1;
         Trans(0,3) = meanx;Trans(1,3) = meany;Trans(2,3) = meanz;
-        trans = Rot * Trans * trans;
+        transFinal = Rot * Trans * transFinal;
     }
-    return trans;
+
+    return transFinal;
 }
 
 
