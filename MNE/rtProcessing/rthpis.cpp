@@ -507,12 +507,12 @@ void RtHPIS::singleHPIFit(const MatrixXd& t_mat, const QVector<int>& vFreqs, QVe
     Eigen::MatrixXd simsig(samLoc,numCoils*2);
     Eigen::VectorXd time(samLoc);
 
-    for (int i = 0;i < samLoc;i++) {
+    for (int i = 0; i < samLoc; ++i) {
         time[i] = i*1.0/samF;
     }
 
-    for(int i=0;i<numCoils;i++) {
-        for(int j=0;j<samLoc;j++) {
+    for(int i = 0; i < numCoils; ++i) {
+        for(int j = 0; j < samLoc; ++j) {
             simsig(j,i) = sin(2*M_PI*coilfreq[i]*time[j]);
             simsig(j,i+numCoils) = cos(2*M_PI*coilfreq[i]*time[j]);
         }
@@ -532,20 +532,20 @@ void RtHPIS::singleHPIFit(const MatrixXd& t_mat, const QVector<int>& vFreqs, QVe
         for (int i=0;i<numCoils;i++) {
             headHPI(i,0) = 0;headHPI(i,1) = 0;headHPI(i,2) = 0;
         }
+
         qDebug() << "\n \n \n";
         qDebug()<< "    **********************************************************";
         qDebug()<< "   *************************************************************";
         qDebug()<< "  ***************************************************************";
         qDebug()<< "******************************************************************";
         qDebug()<< "********    You forget to load polhemus HPI information!   *********";
-        qDebug()<< "***********  Please stop running and load it propoerly!  **********";
+        qDebug()<< "***********  Please stop running and load it properly!   **********";
         qDebug()<< "******************************************************************";
         qDebug()<< " ****************************************************************";
         qDebug()<< "  **************************************************************";
         qDebug()<< "   ************************************************************";
         qDebug()<< "    **********************************************************";
         qDebug() << "\n \n \n";
-
     }
 
     //Setup timers
@@ -557,7 +557,7 @@ void RtHPIS::singleHPIFit(const MatrixXd& t_mat, const QVector<int>& vFreqs, QVe
 
     // Get the indices of inner layer channels and exclude bad channels
     QVector<int> innerind(0);
-    for (int i = 0;i < numCh;i++) {
+    for (int i = 0; i < numCh; ++i) {
         if(m_pFiffInfo->chs[i].coil_type == 7002) {
             // Check if the sensor is bad, if not append to innerind
             if(!(m_pFiffInfo->bads.contains(m_pFiffInfo->ch_names.at(i)))) {
@@ -571,7 +571,7 @@ void RtHPIS::singleHPIFit(const MatrixXd& t_mat, const QVector<int>& vFreqs, QVe
     sensors.coilori = Eigen::MatrixXd::Zero(innerind.size(),3);
     sensors.tra = Eigen::MatrixXd::Identity(innerind.size(),innerind.size());
 
-    for(int i=0; i<innerind.size(); i++) {
+    for(int i = 0; i < innerind.size(); i++) {
         sensors.coilpos(i,0) = m_pFiffInfo->chs[innerind.at(i)].loc(0,0);
         sensors.coilpos(i,1) = m_pFiffInfo->chs[innerind.at(i)].loc(1,0);
         sensors.coilpos(i,2) = m_pFiffInfo->chs[innerind.at(i)].loc(2,0);
@@ -587,7 +587,7 @@ void RtHPIS::singleHPIFit(const MatrixXd& t_mat, const QVector<int>& vFreqs, QVe
     // Get the data from inner layer channels
     Eigen::MatrixXd innerdata(innerind.size(), t_mat.cols());
 
-    for(int j = 0;j < innerind.size();j++) {
+    for(int j = 0; j < innerind.size(); ++j) {
         innerdata.row(j) << t_mat.row(innerind[j]);
     }
 
@@ -598,7 +598,7 @@ void RtHPIS::singleHPIFit(const MatrixXd& t_mat, const QVector<int>& vFreqs, QVe
     amp  = topo.leftCols(numCoils); // amp: # of good inner channel x 4
     ampC = topo.rightCols(numCoils);
 
-    for (int j = 0; j < numCoils; j++) {
+    for (int j = 0; j < numCoils; ++j) {
        float nS = 0.0;
        float nC = 0.0;
        for (int i = 0; i < innerind.size(); i++) {
@@ -654,25 +654,19 @@ void RtHPIS::singleHPIFit(const MatrixXd& t_mat, const QVector<int>& vFreqs, QVe
 
     coil.pos = coilPos;
 
-    std::cout << std::endl << std::endl << "RtHPIS::singleHPIFit - Initial seed point for HPI coils" << std::endl << coil.pos << std::endl;
-
-    UTILSLIB::IOUtils::write_eigen_matrix(amp, QString("C:/Users/MEG measurement/BabyMEGData/TestProject/TestSubject/amp_mat"));
-
     timerDipFit.start();
 
     coil = dipfit(coil, sensors, amp, numCoils);
-    itimerDipFit = timerDipFit.elapsed();
 
-    std::cout << std::endl << std::endl << "RtHPIS::singleHPIFit - Fitted HPI coils" << std::endl << coil.pos << std::endl;
-    std::cout << std::endl << "RtHPIS::singleHPIFit - Tracked HPI coils" << std::endl << headHPI << std::endl;
+    itimerDipFit = timerDipFit.elapsed();
 
     Eigen::Matrix4d trans = computeTransformation(headHPI,coil.pos);
 
     // Store the final result to fiff info
     // Set final device/head matrix and its inverse to the fiff info
-    for(int ti =0; ti<4;ti++) {
-        for(int tj=0;tj<4;tj++) {
-            m_pFiffInfo->dev_head_t.trans(ti,tj) = trans(ti,tj);
+    for(int r = 0; r < 4; ++r) {
+        for(int c = 0; c < 4 ; ++c) {
+            m_pFiffInfo->dev_head_t.trans(r,c) = trans(r,c);
         }
     }
 
@@ -702,6 +696,8 @@ void RtHPIS::singleHPIFit(const MatrixXd& t_mat, const QVector<int>& vFreqs, QVe
     }
 
     // DEBUG HPI fitting and write debug results
+    std::cout << std::endl << std::endl << "RtHPIS::singleHPIFit - Initial seed point for HPI coils" << std::endl << coil.pos << std::endl;
+
     std::cout << std::endl << std::endl << "RtHPIS::singleHPIFit - temp" << std::endl << temp << std::endl;
 
     std::cout << std::endl << std::endl << "RtHPIS::singleHPIFit - testPos" << std::endl << testPos << std::endl;
@@ -711,6 +707,8 @@ void RtHPIS::singleHPIFit(const MatrixXd& t_mat, const QVector<int>& vFreqs, QVe
     std::cout << std::endl << std::endl << "RtHPIS::singleHPIFit - dev/head trans" << std::endl << trans << std::endl;
 
     QString sTimeStamp = QDateTime::currentDateTime().toString("yyMMdd_hhmmss");
+
+    UTILSLIB::IOUtils::write_eigen_matrix(amp, QString("C:/Users/MEG measurement/BabyMEGData/TestProject/TestSubject/amp_mat"));
 
     UTILSLIB::IOUtils::write_eigen_matrix(coil.pos, QString("C:/Users/MEG measurement/BabyMEGData/TestProject/TestSubject/%1_coilPos_mat").arg(sTimeStamp));
 
@@ -1225,6 +1223,7 @@ coilParam RtHPIS::dipfit(struct coilParam coil, struct sens sensors, Eigen::Matr
 
     return coil;
 }
+
 
 Eigen::Matrix4d RtHPIS::computeTransformation(Eigen::MatrixXd NH, Eigen::MatrixXd BT)
 {
