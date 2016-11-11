@@ -680,7 +680,7 @@ void RtHPIS::singleHPIFit(const MatrixXd& t_mat, const QVector<int>& vFreqs, QVe
     MatrixXd temp = coil.pos;
     temp.conservativeResize(coil.pos.rows(),coil.pos.cols()+1);
 
-    temp.block(0,3,numCoils,0).setOnes();
+    temp.block(0,3,numCoils,1).setOnes();
     temp.transposeInPlace();
 
     MatrixXd testPos = trans * temp;
@@ -1229,6 +1229,7 @@ Eigen::Matrix4d RtHPIS::computeTransformation(Eigen::MatrixXd NH, Eigen::MatrixX
     double meanx,meany,meanz,normf;
 
     for(int i = 0; i < 15; ++i) {
+        // Calcualte translation
         xdiff = NH.col(0) - BT.col(0);
         ydiff = NH.col(1) - BT.col(1);
         zdiff = NH.col(2) - BT.col(2);
@@ -1237,38 +1238,40 @@ Eigen::Matrix4d RtHPIS::computeTransformation(Eigen::MatrixXd NH, Eigen::MatrixX
         meany = ydiff.mean();
         meanz = zdiff.mean();
 
-        for (int j = 0; j < NH.rows(); ++j) {
+        // Apply translation
+        for (int j = 0; j < BT.rows(); ++j) {
             BT(j,0) = BT(j,0) + meanx;
             BT(j,1) = BT(j,1) + meany;
             BT(j,2) = BT(j,2) + meanz;
         }
 
+        // Estimate rotation component
         C = BT.transpose() * NH;
 
         Eigen::JacobiSVD< Eigen::MatrixXd > svd(C ,Eigen::ComputeThinU | Eigen::ComputeThinV);
 
         Q = svd.matrixU() * svd.matrixV().transpose();
 
+        // Apply rotation on translated points
         BT = BT * Q;
 
+        // Calculate GOF
         normf = (NH.transpose()-BT.transpose()).norm();
 
-        qDebug() << "RtHPIS::computeTransformation - meanx" << meanx;
-        qDebug() << "RtHPIS::computeTransformation - meany" << meany;
-        qDebug() << "RtHPIS::computeTransformation - meanz" << meanz;
-        qDebug() << "RtHPIS::computeTransformation - normf" << normf << "\n \n \n";
-
-        for(int j = 0 ; j < 3; ++j) {
+        // Store rotation part to transformation matrix
+        Rot(3,3) = 1;
+        for(int j = 0; j < 3; ++j) {
             for(int k = 0; k < 3; ++k) {
                 Rot(j,k) = Q(k,j);
             }
         }
 
-        Rot(3,3) = 1;
+        // Store translation part to transformation matrix
         Trans(0,3) = meanx;
         Trans(1,3) = meany;
         Trans(2,3) = meanz;
 
+        // Safe rotation and translation to final amtrix for next iteration step
         transFinal = Rot * Trans * transFinal;
     }
 
