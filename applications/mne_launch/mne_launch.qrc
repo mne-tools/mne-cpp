@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/resources">
+        <file alias="icon_mne-analyze">resources/icon_mne-analyze_256x256.png</file>
+        <file alias="icon_mne-browse">resources/icon_browse_256x256.png</file>
+        <file alias="icon_mne_scan">resources/icon_mne_scan_256x256.png</file>
+    </qresource>
+</RCC>
