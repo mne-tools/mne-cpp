@@ -4,8 +4,12 @@ import QtQuick.Layouts 1.0
 
 ApplicationWindow {
     visible: true
-    width: 640
-    height: 480
+    width: 960
+    height: 600
+    minimumWidth: width
+    minimumHeight: height
+    maximumWidth: width
+    maximumHeight: height
     title: qsTr("MNE Launch")
 
     MainPage {

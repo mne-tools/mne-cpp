@@ -3,5 +3,10 @@
         <file>main.qml</file>
         <file>MainPage.qml</file>
         <file>MainPageForm.ui.qml</file>
+        <file>resources/icon_browse_256x256.png</file>
+        <file>resources/icon_mne_scan_256x256.png</file>
+        <file>resources/icon_mne-analyze_256x256.png</file>
+        <file>resources/MNE-CPP_Logo.svg</file>
+        <file>resources/Electric_Art_Brain_sdw.jpg</file>
     </qresource>
 </RCC>
