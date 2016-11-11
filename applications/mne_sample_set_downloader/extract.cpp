@@ -106,7 +106,7 @@ void Extract::beginExtraction(QString zip, QString current)
 
 //*************************************************************************************************************
 
-#elif __linux__
+#else
 
 void Extract::beginExtraction()
 {
@@ -114,12 +114,11 @@ void Extract::beginExtraction()
     emit extractionDone();
 }
 
-//*************************************************************************************************************
-
-#else
-#   error "Unknown compiler"
+//#else
+//#   error "Unknown compiler" // we don't want to have a compilation error on an unknown os
 #endif
 
+//*************************************************************************************************************
 
 Extract::~Extract()
 {
