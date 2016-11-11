@@ -178,7 +178,7 @@
        </widget>
       </item>
       <item row="2" column="0" colspan="4">
-       <widget class="Line" name="line_2">
+       <widget class="Line" name="m_line_adrtifactRejection">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
@@ -192,7 +192,7 @@
        </widget>
       </item>
       <item row="4" column="0">
-       <widget class="QLabel" name="label_11">
+       <widget class="QLabel" name="m_label_varianceValue">
         <property name="text">
          <string>Variance:</string>
         </property>

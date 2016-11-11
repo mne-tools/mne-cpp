@@ -135,8 +135,14 @@ AveragingSettingsWidget::AveragingSettingsWidget(Averaging *toolbox, QWidget *pa
     connect(ui.m_pushButton_reset, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
             m_pAveragingToolbox, &Averaging::resetAverage);
 
-
     setWindowFlags(Qt::WindowStaysOnTopHint);
+
+    // Disable and hide variance rejection
+    ui.m_pcheckBox_varianceReduction->setChecked(false);
+    ui.m_line_adrtifactRejection->hide();
+    ui.m_pcheckBox_varianceReduction->hide();
+    ui.m_label_varianceValue->hide();
+    ui.m_spinBox_variance->hide();
 }
 
 
