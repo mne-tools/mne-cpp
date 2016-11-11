@@ -139,11 +139,8 @@ void View3D::initMetatypes()
 
 void View3D::init()
 {
-//    //Light source
-//    Qt3DRender::QPointLight *light1 = new Qt3DRender::QPointLight();
-//    light1->setColor(Qt::white);
-//    light1->setIntensity(0.1f);
-//    m_pRootEntity->addComponent(light1);
+    //Create the lights
+    initLight();
 
     // Camera
     m_pCameraEntity->lens()->setPerspectiveProjection(45.0f, 16.0f/9.0f, 0.0001f, 100000.0f);
@@ -165,6 +162,43 @@ void View3D::init()
     //Create coordinate system and hide as default
     createCoordSystem(m_pRootEntity);
     toggleCoordAxis(false);
+}
+
+
+//*************************************************************************************************************
+
+void View3D::initLight()
+{
+//    //Setup light positions, intensities and color
+//    QList<QVector3D> lLightPositions;
+//    QList<float> lLightIntensities;
+//    QList<QColor> lLightColor;
+
+//    QColor lightColor(100,0,0);
+//    float lightIntensity = 0.03f;
+
+//    lLightPositions << QVector3D(0,0,1) << QVector3D(0,0,-1) << QVector3D(1,0,0) << QVector3D(-1,0,0) << QVector3D(0,1,0) << QVector3D(0,-1,0);
+//    lLightIntensities << lightIntensity << lightIntensity << lightIntensity << lightIntensity << lightIntensity << lightIntensity;
+//    lLightColor << lightColor << lightColor << lightColor << lightColor << lightColor << lightColor;
+
+//    //Create all the lights - make it shine
+//    if(lLightPositions.size() == lLightIntensities.size() == lLightColor.size()) {
+//        for(int i = 0; i < lLightPositions.size(); ++i) {
+//            //Light source
+//            Qt3DCore::QEntity* enitityLight = new Qt3DCore::QEntity(m_pRootEntity);
+//            Qt3DCore::QTransform* transform = new Qt3DCore::QTransform();
+//            QMatrix4x4 m;
+//            m.translate(lLightPositions.at(i));
+//            transform->setMatrix(m);
+
+//            enitityLight->addComponent(transform);
+
+//            Qt3DRender::QPointLight *light1 = new Qt3DRender::QPointLight(enitityLight);
+//            light1->setColor(lLightColor.at(i));
+//            light1->setIntensity(lLightIntensities.at(i));
+//            enitityLight->addComponent(light1);
+//        }
+//    }
 }
 
 

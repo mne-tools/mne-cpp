@@ -84,7 +84,7 @@ ShaderMaterial::ShaderMaterial(QNode *parent)
 , m_pAmbientParameter(new QParameter(QStringLiteral("ka"), QColor::fromRgbF(0.05f, 0.05f, 0.05f, 1.0f)))
 , m_pDiffuseParameter(new QParameter(QStringLiteral("kd"), QColor::fromRgbF(0.7f, 0.7f, 0.7f, 1.0f)))
 , m_pSpecularParameter(new QParameter(QStringLiteral("ks"), QColor::fromRgbF(0.1f, 0.1f, 0.1f, 1.0f)))
-, m_pShininessParameter(new QParameter(QStringLiteral("shininess"), 1.0f))
+, m_pShininessParameter(new QParameter(QStringLiteral("shininess"), 10.0f))
 , m_pAlphaParameter(new QParameter("alpha", 0.5f))
 , m_pVertexGL3Technique(new QTechnique())
 , m_pVertexGL3RenderPass(new QRenderPass())
@@ -141,14 +141,14 @@ void ShaderMaterial::init()
 
     m_pVertexGL3RenderPass->setShaderProgram(m_pVertexGL3Shader);
 
-    //Setup transparency
-    m_pBlendState->setSourceRgb(QBlendEquationArguments::SourceAlpha);
-    m_pBlendState->setDestinationRgb(QBlendEquationArguments::OneMinusSourceAlpha);
-    m_pBlendEquation->setBlendFunction(QBlendEquation::Add);
+//    //Setup transparency
+//    m_pBlendState->setSourceRgb(QBlendEquationArguments::SourceAlpha);
+//    m_pBlendState->setDestinationRgb(QBlendEquationArguments::OneMinusSourceAlpha);
+//    m_pBlendEquation->setBlendFunction(QBlendEquation::Add);
 
-    m_pVertexGL3RenderPass->addRenderState(m_pBlendEquation);
-    m_pVertexGL3RenderPass->addRenderState(m_pNoDepthMask);
-    m_pVertexGL3RenderPass->addRenderState(m_pBlendState);
+//    m_pVertexGL3RenderPass->addRenderState(m_pBlendEquation);
+//    m_pVertexGL3RenderPass->addRenderState(m_pNoDepthMask);
+//    m_pVertexGL3RenderPass->addRenderState(m_pBlendState);
 
     m_pFilterKey->setName(QStringLiteral("renderingStyle"));
     m_pFilterKey->setValue(QStringLiteral("forward"));
