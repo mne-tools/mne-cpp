@@ -106,7 +106,7 @@ void Extract::beginExtraction(QString zip, QString current)
 
 //*************************************************************************************************************
 
-#else
+#else //Linux & OSX
 
 void Extract::beginExtraction()
 {
