@@ -1223,19 +1223,21 @@ coilParam RtHPIS::dipfit(struct coilParam coil, struct sens sensors, Eigen::Matr
 Eigen::Matrix4d RtHPIS::computeTransformation(Eigen::MatrixXd NH, Eigen::MatrixXd BT)
 {
     Eigen::MatrixXd xdiff, ydiff, zdiff, C, Q;
-    Eigen::Matrix4d transFinal = Eigen::Matrix4d::Identity(4,4), Rot = Eigen::Matrix4d::Zero(4,4), Trans = Eigen::Matrix4d::Identity(4,4);
+    Eigen::Matrix4d transFinal = Eigen::Matrix4d::Identity(4,4);
+    Eigen::Matrix4d Rot = Eigen::Matrix4d::Zero(4,4);
+    Eigen::Matrix4d Trans = Eigen::Matrix4d::Identity(4,4);
     double meanx,meany,meanz,normf;
 
-    for(int i = 0; i < 25; i++) {
-        zdiff = NH.col(2) - BT.col(2);
-        ydiff = NH.col(1) - BT.col(1);
+    for(int i = 0; i < 15; ++i) {
         xdiff = NH.col(0) - BT.col(0);
+        ydiff = NH.col(1) - BT.col(1);
+        zdiff = NH.col(2) - BT.col(2);
 
-        meanx=xdiff.mean();
-        meany=ydiff.mean();
-        meanz=zdiff.mean();
+        meanx = xdiff.mean();
+        meany = ydiff.mean();
+        meanz = zdiff.mean();
 
-        for (int j=0;j<NH.rows();j++) {
+        for (int j = 0; j < NH.rows(); ++j) {
             BT(j,0) = BT(j,0) + meanx;
             BT(j,1) = BT(j,1) + meany;
             BT(j,2) = BT(j,2) + meanz;
@@ -1251,12 +1253,22 @@ Eigen::Matrix4d RtHPIS::computeTransformation(Eigen::MatrixXd NH, Eigen::MatrixX
 
         normf = (NH.transpose()-BT.transpose()).norm();
 
-        for(int j=0;j<3;j++) {
-            for(int k=0;k<3;k++) Rot(j,k) = Q(k,j);
+        qDebug() << "RtHPIS::computeTransformation - meanx" << meanx;
+        qDebug() << "RtHPIS::computeTransformation - meany" << meany;
+        qDebug() << "RtHPIS::computeTransformation - meanz" << meanz;
+        qDebug() << "RtHPIS::computeTransformation - normf" << normf << "\n \n \n";
+
+        for(int j = 0 ; j < 3; ++j) {
+            for(int k = 0; k < 3; ++k) {
+                Rot(j,k) = Q(k,j);
+            }
         }
 
         Rot(3,3) = 1;
-        Trans(0,3) = meanx;Trans(1,3) = meany;Trans(2,3) = meanz;
+        Trans(0,3) = meanx;
+        Trans(1,3) = meany;
+        Trans(2,3) = meanz;
+
         transFinal = Rot * Trans * transFinal;
     }
 
