@@ -108,12 +108,12 @@ int main(int argc, char *argv[])
     QCommandLineParser parser;
     parser.setApplicationDescription("Start disp3D tutorial");
     parser.addHelpOption();
-    QCommandLineOption sampleSurfOption("surfType", "Surface type <type>.", "type", "orig");
+    QCommandLineOption sampleSurfOption("surfType", "Surface type <type>.", "type", "pial");
     QCommandLineOption sampleAnnotOption("annotType", "Annotation type <type>.", "type", "aparc.a2009s");
     QCommandLineOption sampleHemiOption("hemi", "Selected hemisphere <hemi>.", "hemi", "2");
     QCommandLineOption sampleSubjectOption("subject", "Selected subject <subject>.", "subject", "sample");
     QCommandLineOption sampleSubjectPathOption("subjectPath", "Selected subject path <subjectPath>.", "subjectPath", "./MNE-sample-data/subjects");
-    QCommandLineOption sampleSourceLocOption("doSourceLoc", "Do real time source localization <doSourceLoc>.", "doSourceLoc", "true");
+    QCommandLineOption sampleSourceLocOption("doSourceLoc", "Do real time source localization <doSourceLoc>.", "doSourceLoc", "false");
     QCommandLineOption sampleFwdOption("fwd", "Path to forwad solution <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
     QCommandLineOption sampleInvOpOption("invOp", "Path to inverse operator <file>.", "file", "");
     QCommandLineOption sampleClustOption("doClust", "Path to clustered inverse operator <doClust>.", "doClust", "true");
@@ -262,28 +262,28 @@ int main(int argc, char *argv[])
     //testWindow->addSurfaceSet("Subject01", "Left Auditory", tSurfSet, tAnnotSet);
     //testWindow->addSurfaceSet("Subject01", "Left Visual", tSurfSet, tAnnotSet);
 
-    //Read and show BEM
-    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif");
-    MNEBem t_Bem(t_fileBem);
-    testWindow->addBemData("Subject01", "BEM", t_Bem);
+//    //Read and show BEM
+//    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif");
+//    MNEBem t_Bem(t_fileBem);
+//    testWindow->addBemData("Subject01", "BEM", t_Bem);
 
 //    QFile t_fileBem2("./MNE-sample-data/subjects/sample/bem/sample-head.fif");
 //    MNEBem t_Bem2(t_fileBem2);
 //    testWindow->addBemData("Subject01", "BEM", t_Bem2);
 
-    //Read and show sensor helmets
-    QFile t_filesensorSurfaceVV("./resources/sensorSurfaces/306m_rt.fif");
-    MNEBem t_sensorSurfaceVV(t_filesensorSurfaceVV);
-    testWindow->addBemData("Sensors", "VectorView", t_sensorSurfaceVV);
+//    //Read and show sensor helmets
+//    QFile t_filesensorSurfaceVV("./resources/sensorSurfaces/306m_rt.fif");
+//    MNEBem t_sensorSurfaceVV(t_filesensorSurfaceVV);
+//    testWindow->addBemData("Sensors", "VectorView", t_sensorSurfaceVV);
 
 //    QFile t_filesensorSurfaceBM("./resources/sensorSurfaces/BabyMEG.fif");
 //    MNEBem t_sensorSurfaceBM(t_filesensorSurfaceBM);
 //    testWindow->addBemData("Sensors", "BabyMEG", t_sensorSurfaceBM);
 
-    // Read & show digitizer points
-    QFile t_fileDig("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
-    FiffDigPointSet t_Dig(t_fileDig);
-    testWindow->addDigitizerData("Subject01", "Left Auditory", t_Dig);
+//    // Read & show digitizer points
+//    QFile t_fileDig("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+//    FiffDigPointSet t_Dig(t_fileDig);
+//    testWindow->addDigitizerData("Subject01", "Left Auditory", t_Dig);
 
     if(bAddRtSourceLoc) {
         //Add rt source loc data
