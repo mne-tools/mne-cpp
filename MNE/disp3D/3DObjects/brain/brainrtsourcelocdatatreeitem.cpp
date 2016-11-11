@@ -221,14 +221,14 @@ bool BrainRTSourceLocDataTreeItem::init(const MNEForwardSolution& tForwardSoluti
     data.setValue(QString("Hot Negative 2"));
     pItemColormapType->setData(data, MetaTreeItemRoles::RTDataColormapType);
 
-    MetaTreeItem* pItemSourceLocNormValue = new MetaTreeItem(MetaTreeItemTypes::RTDataNormalizationValue, "5.0,5.5,15");
+    MetaTreeItem* pItemSourceLocNormValue = new MetaTreeItem(MetaTreeItemTypes::RTDataNormalizationValue, "0.0,5.5,15");
     connect(pItemSourceLocNormValue, &MetaTreeItem::rtDataNormalizationValueChanged,
             this, &BrainRTSourceLocDataTreeItem::onDataNormalizationValueChanged);
     list.clear();
     list << pItemSourceLocNormValue;
     list << new QStandardItem(pItemSourceLocNormValue->toolTip());
     this->appendRow(list);
-    data.setValue(QVector3D(5.0,5.5,15));
+    data.setValue(QVector3D(0.0,5.5,15));
     pItemSourceLocNormValue->setData(data, MetaTreeItemRoles::RTDataNormalizationValue);
 
     MetaTreeItem *pItemStreamingInterval = new MetaTreeItem(MetaTreeItemTypes::RTDataTimeInterval, "50");
