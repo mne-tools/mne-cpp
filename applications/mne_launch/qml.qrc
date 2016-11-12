@@ -1,12 +1,8 @@
 <RCC>
     <qresource prefix="/">
-        <file>main.qml</file>
-        <file>MainPage.qml</file>
-        <file>MainPageForm.ui.qml</file>
-        <file>resources/icon_browse_256x256.png</file>
-        <file>resources/icon_mne_scan_256x256.png</file>
-        <file>resources/icon_mne-analyze_256x256.png</file>
-        <file>resources/MNE-CPP_Logo.svg</file>
-        <file>resources/Electric_Art_Brain_sdw.jpg</file>
+        <file>qml/main.qml</file>
+        <file>qml/MainPage.qml</file>
+        <file>qml/MainPageForm.ui.qml</file>
+        <file>qml/MenuButton.qml</file>
     </qresource>
 </RCC>

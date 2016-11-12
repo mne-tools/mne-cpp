@@ -54,7 +54,8 @@ INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_SCAN_INCLUDE_DIR}
 
-RESOURCES += qml.qrc
+RESOURCES +=    qml.qrc \
+                images.qrc
 
 
 # Deploy Qt Dependencies
@@ -73,7 +74,7 @@ win32 {
     #  # Uncomment the following line to help debug the deploy command when running qmake
     #  warning($${DEPLOY_COMMAND} $${DEPLOY_TARGET})
     # remember to also deploy qml depnedencies with --qmldir $${PWD} $${DESTDIR}
-    QMAKE_POST_LINK += $${DEPLOY_COMMAND} $${DEPLOY_TARGET} --qmldir $${PWD} $${DESTDIR}
+    QMAKE_POST_LINK += $${DEPLOY_COMMAND} $${DEPLOY_TARGET} --qmldir $${PWD}/qml $${DESTDIR}
 }
 unix:!macx {
     # === Unix ===
