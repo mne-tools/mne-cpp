@@ -4,20 +4,23 @@ import QtQuick.Layouts 1.0
 
 Item {
     property alias button_close: button_close
+    property alias button_mne_scan: button_mne_scan
+    property alias button_mne_browse: button_mne_browse
+    property alias button_mne_analyze: button_mne_analyze
 
-    width: 960
-    height: 600
+    width: 1040
+    height: 650
 
     Image {
-        id: image5
-        x: 0
-        y: -100
-        width: 960
-        height: 800
+        id: image_background
+        anchors.rightMargin: 0
+        anchors.bottomMargin: 0
+        anchors.leftMargin: 0
+        anchors.topMargin: 0
+        anchors.fill: parent
         fillMode: Image.PreserveAspectFit
-        source: "../resources/Electric_Art_Brain_sdw.jpg"
+        source: "../resources/tmp_background.jpg"
     }
-
 
     // Close
     MenuButton{
@@ -30,43 +33,50 @@ Item {
         anchors.top: parent.top
         anchors.topMargin: 2
         anchors.right: parent.right
-        anchors.rightMargin: 2
+        anchors.rightMargin: 4
     }
 
-    Image {
-        id: image1
-        x: 692
-        y: 56
-        width: 100
-        height: 100
-        source: "../resources/icon_mne_scan_256x256.png"
+    // MNE Scan
+    ApplicationButton{
+        id: button_mne_scan
+        x: 697
+        y: 36
+        imgSrcNormal: "../resources/icon_mne_scan_white.png"
+        imgSrcHover:  "../resources/icon_mne_scan.png"
+        imgHeight: 100
+        imgWidth: 100
     }
 
-    Image {
-        id: image2
-        x: 759
-        y: 238
-        width: 100
-        height: 100
-        source: "../resources/icon_browse_256x256.png"
+    // MNE Browse
+    ApplicationButton{
+        id: button_mne_browse
+        x: 867
+        y: 216
+        imgSrcNormal: "../resources/icon_mne_browse_white.png"
+        imgSrcHover:  "../resources/icon_mne_browse.png"
+        imgHeight: 100
+        imgWidth: 100
     }
 
-    Image {
-        id: image3
-        x: 661
-        y: 416
-        width: 100
-        height: 100
-        source: "../resources/icon_mne-analyze_256x256.png"
+
+    // MNE Analyze
+    ApplicationButton{
+        id: button_mne_analyze
+        x: 749
+        y: 428
+        imgSrcNormal: "../resources/icon_mne_analyze_white.png"
+        imgSrcHover:  "../resources/icon_mne_analyze.png"
+        imgHeight: 100
+        imgWidth: 100
     }
 
     Image {
         id: image4
-        x: 21
-        y: 0
-        width: 166
-        height: 98
+        x: 25
+        y: 20
+        width: 175
+        height: 95
         fillMode: Image.PreserveAspectFit
-        source: "../resources/MNE-CPP_Logo.svg"
+        source: "../resources/MNE-CPP_Logo_color.png"
     }
 }

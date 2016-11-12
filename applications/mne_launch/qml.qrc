@@ -4,5 +4,6 @@
         <file>qml/MainPage.qml</file>
         <file>qml/MainPageForm.ui.qml</file>
         <file>qml/MenuButton.qml</file>
+        <file>qml/ApplicationButton.qml</file>
     </qresource>
 </RCC>

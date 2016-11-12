@@ -1,10 +1,13 @@
 <RCC>
     <qresource prefix="/">
-        <file>resources/icon_browse_256x256.png</file>
-        <file>resources/icon_mne_scan_256x256.png</file>
-        <file>resources/icon_mne-analyze_256x256.png</file>
-        <file>resources/MNE-CPP_Logo.svg</file>
-        <file>resources/Electric_Art_Brain_sdw.jpg</file>
         <file>resources/icon_close.svg</file>
+        <file>resources/tmp_background.jpg</file>
+        <file>resources/MNE-CPP_Logo_color.png</file>
+        <file>resources/icon_mne_analyze.png</file>
+        <file>resources/icon_mne_analyze_white.png</file>
+        <file>resources/icon_mne_scan.png</file>
+        <file>resources/icon_mne_scan_white.png</file>
+        <file>resources/icon_mne_browse.png</file>
+        <file>resources/icon_mne_browse_white.png</file>
     </qresource>
 </RCC>
