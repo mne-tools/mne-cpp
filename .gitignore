@@ -386,3 +386,12 @@ lib
 /tools/ifw_installer/windows/packages/org.mne_cpp.suite.mne_scan/data
 /tools/ifw_installer/windows/packages/org.mne_cpp.suite/data
 /bin/bearer
+/bin/Material
+/bin/QtGraphicalEffects
+/bin/QtQuick.2
+/bin/Universal
+/bin/private
+/bin/scenegraph
+/bin/QtQuick
+/bin/qmltooling
+/bin/platforminputcontexts

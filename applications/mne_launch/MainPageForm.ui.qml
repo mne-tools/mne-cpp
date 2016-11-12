@@ -3,40 +3,41 @@ import QtQuick.Controls 2.0
 import QtQuick.Layouts 1.0
 
 Item {
-    property alias button1: button1
-    property alias button2: button2
+    property alias button_close: but_close
 
+    width: 960
+    height: 600
 
     Image {
         id: image5
         x: 0
-        y: -42
+        y: -100
         width: 960
         height: 800
         fillMode: Image.PreserveAspectFit
         source: "resources/Electric_Art_Brain_sdw.jpg"
     }
 
-    RowLayout {
-        anchors.verticalCenterOffset: -39
-        anchors.horizontalCenterOffset: -157
-        anchors.centerIn: parent
-
-        Button {
-            id: button1
-            text: qsTr("Press Me 1")
+    Item {
+        x: 852
+        y: 0
+        width: 100
+        height: 100
+        Text {
+            anchors.centerIn: parent
+            text: qsTr("X")
+        }
+        MouseArea {
+            id: but_close
+            anchors.fill: parent
         }
 
-        Button {
-            id: button2
-            text: qsTr("Press Me 2")
-        }
     }
 
     Image {
         id: image1
-        x: 430
-        y: -10
+        x: 692
+        y: 56
         width: 100
         height: 100
         source: "resources/icon_mne_scan_256x256.png"
@@ -44,8 +45,8 @@ Item {
 
     Image {
         id: image2
-        x: 685
-        y: 67
+        x: 759
+        y: 238
         width: 100
         height: 100
         source: "resources/icon_browse_256x256.png"
@@ -53,8 +54,8 @@ Item {
 
     Image {
         id: image3
-        x: 797
-        y: 330
+        x: 661
+        y: 416
         width: 100
         height: 100
         source: "resources/icon_mne-analyze_256x256.png"
@@ -62,12 +63,11 @@ Item {
 
     Image {
         id: image4
-        x: 37
-        y: 507
+        x: 21
+        y: 0
         width: 166
         height: 98
         fillMode: Image.PreserveAspectFit
         source: "resources/MNE-CPP_Logo.svg"
     }
-
 }
