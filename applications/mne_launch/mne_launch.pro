@@ -36,9 +36,7 @@
 
 include(../../mne-cpp.pri)
 
-TEMPLATE = app
-
-QT += qml quick
+QT += qml quick quickcontrols2
 
 TARGET = mne_launch
 
@@ -57,3 +55,33 @@ INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_SCAN_INCLUDE_DIR}
 
 RESOURCES += qml.qrc
+
+
+# Deploy Qt Dependencies
+win32 {
+    isEmpty(TARGET_EXT) {
+        TARGET_CUSTOM_EXT = .exe
+    } else {
+        TARGET_CUSTOM_EXT = $${TARGET_EXT}
+    }
+
+    DEPLOY_COMMAND = windeployqt
+
+
+    DEPLOY_TARGET = $$shell_quote($$shell_path($${MNE_BINARY_DIR}/$${TARGET}$${TARGET_CUSTOM_EXT}))
+
+    #  # Uncomment the following line to help debug the deploy command when running qmake
+    #  warning($${DEPLOY_COMMAND} $${DEPLOY_TARGET})
+    # remember to also deploy qml depnedencies with --qmldir $${PWD} $${DESTDIR}
+    QMAKE_POST_LINK += $${DEPLOY_COMMAND} $${DEPLOY_TARGET} --qmldir $${PWD} $${DESTDIR}
+}
+unix:!macx {
+    # === Unix ===
+    QMAKE_RPATHDIR += $ORIGIN/../lib
+}
+macx {
+    # === Mac ===
+    QMAKE_RPATHDIR += @executable_path/../Frameworks
+
+    #ToDo copy dependcies to app bundle
+}

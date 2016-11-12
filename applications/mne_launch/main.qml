@@ -12,6 +12,8 @@ ApplicationWindow {
     maximumHeight: height
     title: qsTr("MNE Launch")
 
+    flags: Qt.FramelessWindowHint | Qt.Window
+
     MainPage {
         anchors.fill: parent
     }
