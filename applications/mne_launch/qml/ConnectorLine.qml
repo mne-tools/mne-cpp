@@ -5,24 +5,14 @@ import QtGraphicalEffects 1.0
 Item{
     id: container
 
-    property bool active: false
+    property int x_start: 0
+    property int y_start: 0
 
-    property int x_center: 0
-    property int y_center: 0
+    property int x_end: 100
+    property int y_end: 100
 
-    property int x_start: x_center
-    property int y_start: y_center
-
-    property int x_mid: x_start-100
+    property int x_mid: x_start + (x_end - x_start) / 2
     property int y_mid: y_start
-
-    property int x_end: x_mid-50
-    property int y_end: y_mid+70
-
-    Component.onCompleted: {
-        lines_mne_scan.visible = false;
-    }
-
 
     Canvas {
         id: lines_mne_scan
@@ -49,26 +39,4 @@ Item{
             ctx.stroke()
         }
     }
-
-
-    states: [
-        State {
-            name: "ACTIVE"
-            when: container.active === true
-
-            PropertyChanges {
-                target: lines_mne_scan
-                visible: true
-            }
-        }
-    ]
-
-//    transitions: [
-//        Transition {
-//            from: ""; to: "ACTIVE"
-//            ColorAnimation {
-//                duration: 200
-//            }
-//        }
-//    ]
 }
