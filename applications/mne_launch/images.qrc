@@ -9,5 +9,8 @@
         <file>resources/icon_mne_scan_white.png</file>
         <file>resources/icon_mne_browse.png</file>
         <file>resources/icon_mne_browse_white.png</file>
+        <file>resources/MNE-CPP_Logo_blue.png</file>
+        <file>resources/MNE-CPP_Logo_green.png</file>
+        <file>resources/MNE-CPP_Logo_red.png</file>
     </qresource>
 </RCC>
