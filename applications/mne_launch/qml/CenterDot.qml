@@ -23,6 +23,7 @@ Item{
         id: echo_circle
 
         property int val: 0
+        property int max_radius: 30
 
         anchors.centerIn: parent
 
@@ -33,14 +34,14 @@ Item{
 
         color: "transparent"
 
-        opacity: (30 - val)/30
+        opacity: (max_radius - val)/max_radius
 
         border.color: "white"
         border.width: 2
 
         NumberAnimation on val {
             from: 0
-            to: 30
+            to: echo_circle.max_radius
             loops: Animation.Infinite
             duration: 2000
             easing.type: Easing.OutQuad
