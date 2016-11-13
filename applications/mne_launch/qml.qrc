@@ -5,7 +5,8 @@
         <file>qml/MainPageForm.ui.qml</file>
         <file>qml/MenuButton.qml</file>
         <file>qml/ApplicationButton.qml</file>
-        <file>qml/ScanAnimation.qml</file>
         <file>qml/Logo.qml</file>
+        <file>qml/ConnectorLine.qml</file>
+        <file>qml/CenterDot.qml</file>
     </qresource>
 </RCC>

@@ -1,6 +1,7 @@
 import QtQuick 2.7
 
 MainPageForm {
+
     button_close.onClicked: {
         Qt.quit();
     }
@@ -11,14 +12,10 @@ MainPageForm {
     }
 
     button_mne_scan.onHoveredChanged: {
-        if ( button_mne_scan.hovered ) {
-            animation_mne_scan.active = true
-            logo.state = "SCAN"
-        }
-        else {
-            animation_mne_scan.active = false
-            logo.state = "DEFAULT"
-        }
+        if ( button_mne_scan.hovered )
+            state = "SCAN"
+        else
+            state = "DEFAULT"
     }
 
     // MNE Browse
@@ -27,14 +24,10 @@ MainPageForm {
     }
 
     button_mne_browse.onHoveredChanged: {
-        if ( button_mne_browse.hovered ) {
-//            animation_mne_browse.active = true
-            logo.state = "BROWSE"
-        }
-        else {
-//            animation_mne_browse.active = false
-            logo.state = "DEFAULT"
-        }
+        if ( button_mne_browse.hovered )
+            state = "BROWSE"
+        else
+            state = "DEFAULT"
     }
 
     // MNE Analyze
@@ -43,13 +36,24 @@ MainPageForm {
     }
 
     button_mne_analyze.onHoveredChanged: {
-        if ( button_mne_analyze.hovered ) {
-//            animation_mne_analyze.active = true
-            logo.state = "ANALYZE"
-        }
-        else {
-//            animation_mne_analyze.active = false
-            logo.state = "DEFAULT"
-        }
+        if ( button_mne_analyze.hovered )
+            state = "ANALYZE"
+        else
+            state = "DEFAULT"
     }
+
+    states: [
+        State {
+            name: "DEFAULT"
+        },
+        State {
+            name: "SCAN"
+        },
+        State {
+            name: "BROWSE"
+        },
+        State {
+            name: "ANALYZE"
+        }
+    ]
 }

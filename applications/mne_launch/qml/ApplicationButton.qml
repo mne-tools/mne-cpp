@@ -5,10 +5,10 @@ import QtGraphicalEffects 1.0
 Item{
     id: container
 
-    property alias imgSrcNormal: imageNormalItem.source
-    property alias imgSrcHover: imageHoverItem.source
-    property alias imgWidth: imageNormalItem.sourceSize.width
-    property alias imgHeight: imageNormalItem.sourceSize.height
+    property string imgSrcNormal: "../resources/icon_mne_scan_white.png"
+    property string imgSrcHover: "../resources/icon_mne_scan.png"
+    property int imgWidth: 100
+    property int imgHeight: 100
 
     property bool hovered: false
 
@@ -30,17 +30,19 @@ Item{
 
     Image {
         id: imageNormalItem
+        source: imgSrcNormal
         anchors.centerIn: parent
+        sourceSize.width: imgWidth
+        sourceSize.height: imgHeight
         visible: true
     }
 
     Image {
         id: imageHoverItem
+        source: imgSrcHover
         anchors.centerIn: parent
-
         sourceSize.width: imgWidth
         sourceSize.height: imgHeight
-
         visible: false
     }
 
@@ -55,19 +57,27 @@ Item{
 
     states: [
         State {
-            name: "stateHover"
-            when: mouseArea.containsMouse === true
-
-            PropertyChanges { target: buttonRect; border.color: "white" }
-            PropertyChanges { target: imageNormalItem; visible: false }
-            PropertyChanges { target: imageHoverItem; visible: true }
-            PropertyChanges { target: container; hovered: true }
+            name: "DEFAULT"
+            PropertyChanges { target: buttonRect; border.color: "transparent" }
+            PropertyChanges { target: container; hovered: false }
+            PropertyChanges { target: imageNormalItem; visible: true }
+            PropertyChanges { target: imageHoverItem; visible: false }
         },
         State {
-            name: "stateClicked"
+            name: "HOVERED"
+            when: mouseArea.containsMouse === true && mouseArea.pressed !== true
+
+            PropertyChanges { target: buttonRect; border.color: "white" }
+            PropertyChanges { target: container; hovered: true }
+            PropertyChanges { target: imageNormalItem; visible: false }
+            PropertyChanges { target: imageHoverItem; visible: true }
+        },
+        State {
+            name: "PRESSED"
             when: mouseArea.pressed === true
 
             PropertyChanges { target: buttonRect; border.color: "black" }
+            PropertyChanges { target: container; hovered: true }
             PropertyChanges { target: imageNormalItem; visible: true }
             PropertyChanges { target: imageHoverItem; visible: false }
         }
