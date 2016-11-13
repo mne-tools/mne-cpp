@@ -1,3 +1,42 @@
+//=============================================================================================================
+/**
+* @file     MainPageForm.ui.qml
+* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
+* @version  1.0
+* @date     November, 2016
+*
+* @section  LICENSE
+*
+* Copyright (C) 2016, Christoph Dinh. All rights reserved.
+*
+* Redistribution and use in source and binary forms, with or without modification, are permitted provided that
+* the following conditions are met:
+*     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
+*       following disclaimer.
+*     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
+*       the following disclaimer in the documentation and/or other materials provided with the distribution.
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
+*       to endorse or promote products derived from this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+* WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+* INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+* PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+* NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+* POSSIBILITY OF SUCH DAMAGE.
+*
+*
+* @brief    Implements the QML MainPage UI component.
+*
+*/
+
+//*************************************************************************************************************
+//=============================================================================================================
+// IMPORTS
+//=============================================================================================================
+
 import QtQuick 2.7
 import QtQuick.Controls 2.0
 import QtQuick.Layouts 1.0
@@ -37,18 +76,30 @@ Item {
     // MNE Scan
     ApplicationButton {
         id: button_mne_scan
-        x: 697
-        y: 36
+        x: 728
+        y: 34
         imgSrcNormal: "../resources/icon_mne_scan_white.png"
         imgSrcHover:  "../resources/icon_mne_scan.png"
         imgHeight: 100
         imgWidth: 100
     }
-
-    CenterDot{
+    Text {
+        id: text_mne_scan
+        color: "#ffffff"
+        anchors.right: button_mne_scan.left
+        anchors.rightMargin: 5
+        anchors.bottom: button_mne_scan.bottom
+        anchors.bottomMargin: button_mne_scan.height/2 + 5
+        text: qsTr("MNE Scan")
+        font.bold: true
+        font.family: "Arial"
+        opacity: 0.8
+        font.pixelSize: 22
+    }
+    CenterDot {
         id: center_dot_scan
-        x: 560
-        y: 200
+        x: 553
+        y: 207
     }
     ConnectorLine {
         id: connector_line_scan
@@ -70,10 +121,23 @@ Item {
         imgHeight: 100
         imgWidth: 100
     }
+    Text {
+        id: text_mne_browse
+        color: "#ffffff"
+        anchors.right: button_mne_browse.left
+        anchors.rightMargin: 5
+        anchors.bottom: button_mne_browse.bottom
+        anchors.bottomMargin: button_mne_browse.height/2 + 5
+        text: qsTr("MNE Browse")
+        font.bold: true
+        font.family: "Arial"
+        opacity: 0.8
+        font.pixelSize: 22
+    }
     CenterDot{
         id: center_dot_browse
         x: 604
-        y: 313
+        y: 307
     }
     ConnectorLine {
         id: connector_line_browse
@@ -83,25 +147,34 @@ Item {
         y_end: center_dot_browse.y_center
         anchors.fill: parent
     }
-
-
     // MNE Analyze
     ApplicationButton{
         id: button_mne_analyze
-        x: 749
-        y: 428
+        x: 828
+        y: 437
         imgSrcNormal: "../resources/icon_mne_analyze_white.png"
         imgSrcHover:  "../resources/icon_mne_analyze.png"
         imgHeight: 100
         imgWidth: 100
     }
-
+    Text {
+        id: text_mne_analyze
+        color: "#ffffff"
+        anchors.right: button_mne_analyze.left
+        anchors.rightMargin: 5
+        anchors.bottom: button_mne_analyze.bottom
+        anchors.bottomMargin: button_mne_analyze.height/2 + 5
+        text: qsTr("MNE Analyze")
+        font.bold: true
+        font.family: "Arial"
+        opacity: 0.8
+        font.pixelSize: 22
+    }
     CenterDot{
         id: center_dot_analyze
         x: 577
         y: 437
     }
-
     ConnectorLine {
         id: connector_line_analyze
         x_start: button_mne_analyze.x
@@ -111,11 +184,13 @@ Item {
         anchors.fill: parent
     }
 
+    // MNE-CPP
     Logo {
         id: logo
         x: 25
         y: 20
     }
+
 
 
     states: [
@@ -128,6 +203,9 @@ Item {
             PropertyChanges { target: connector_line_scan; visible: false }
             PropertyChanges { target: connector_line_browse; visible: false }
             PropertyChanges { target: connector_line_analyze; visible: false }
+            PropertyChanges { target: text_mne_scan; visible: false }
+            PropertyChanges { target: text_mne_browse; visible: false }
+            PropertyChanges { target: text_mne_analyze; visible: false }
         },
         State {
             name: "SCAN"
@@ -138,6 +216,9 @@ Item {
             PropertyChanges { target: connector_line_scan; visible: true }
             PropertyChanges { target: connector_line_browse; visible: false }
             PropertyChanges { target: connector_line_analyze; visible: false }
+            PropertyChanges { target: text_mne_scan; visible: true }
+            PropertyChanges { target: text_mne_browse; visible: false }
+            PropertyChanges { target: text_mne_analyze; visible: false }
         },
         State {
             name: "BROWSE"
@@ -148,6 +229,9 @@ Item {
             PropertyChanges { target: connector_line_scan; visible: false }
             PropertyChanges { target: connector_line_browse; visible: true }
             PropertyChanges { target: connector_line_analyze; visible: false }
+            PropertyChanges { target: text_mne_scan; visible: false }
+            PropertyChanges { target: text_mne_browse; visible: true }
+            PropertyChanges { target: text_mne_analyze; visible: false }
         },
         State {
             name: "ANALYZE"
@@ -158,6 +242,9 @@ Item {
             PropertyChanges { target: connector_line_scan; visible: false }
             PropertyChanges { target: connector_line_browse; visible: false }
             PropertyChanges { target: connector_line_analyze; visible: true }
+            PropertyChanges { target: text_mne_scan; visible: false }
+            PropertyChanges { target: text_mne_browse; visible: false }
+            PropertyChanges { target: text_mne_analyze; visible: true }
         }
     ]
 }
