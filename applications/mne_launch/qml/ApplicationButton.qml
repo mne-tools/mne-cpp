@@ -10,24 +10,21 @@ Item{
     property alias imgWidth: imageNormalItem.sourceSize.width
     property alias imgHeight: imageNormalItem.sourceSize.height
 
+    property bool hovered: false
+
     signal clicked
 
     width: imgWidth + 20
     height: imgHeight + 20
 
-
     Rectangle{
         id: buttonRect
-
         color: "transparent"
-
         anchors.fill: container
-
         border {
             width: 2
             color: "transparent"
         }
-
         radius: 4
     }
 
@@ -58,47 +55,30 @@ Item{
 
     states: [
         State {
-            name: "stateClicked"
-            when: mouseArea.pressed === true
-
-            PropertyChanges {
-                target: buttonRect
-                border.color: "black"
-            }
-            PropertyChanges {
-                target: imageNormalItem
-                visible: true
-            }
-            PropertyChanges {
-                target: imageHoverItem
-                visible: false
-            }
-        },
-        State {
             name: "stateHover"
             when: mouseArea.containsMouse === true
 
-            PropertyChanges {
-                target: buttonRect
-                border.color: "white"
-            }
-            PropertyChanges {
-                target: imageNormalItem
-                visible: false
-            }
-            PropertyChanges {
-                target: imageHoverItem
-                visible: true
-            }
+            PropertyChanges { target: buttonRect; border.color: "white" }
+            PropertyChanges { target: imageNormalItem; visible: false }
+            PropertyChanges { target: imageHoverItem; visible: true }
+            PropertyChanges { target: container; hovered: true }
+        },
+        State {
+            name: "stateClicked"
+            when: mouseArea.pressed === true
+
+            PropertyChanges { target: buttonRect; border.color: "black" }
+            PropertyChanges { target: imageNormalItem; visible: true }
+            PropertyChanges { target: imageHoverItem; visible: false }
         }
     ]
 
-    transitions: [
-        Transition {
-            from: ""; to: "stateHover"
-            ColorAnimation {
-                duration: 300
-            }
-        }
-    ]
+//    transitions: [
+//        Transition {
+//            from: ""; to: "stateHover"
+//            ColorAnimation {
+//                duration: 100
+//            }
+//        }
+//    ]
 }
