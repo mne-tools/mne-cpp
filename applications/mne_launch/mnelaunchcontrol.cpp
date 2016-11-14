@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     extract.cpp
-* @author   Louis Eichhorst <louis.eichhorst@tu-ilmenau.de>;
+* @file     mnelaunchcontrol.cpp
+* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     August, 2016
+* @date     November, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2016, Louis Eichhorst and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Christoph Dinh. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,98 +29,104 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    extract class definition.
+* @brief    MNELaunchControl class implementation
 *
 */
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "extract.h"
+#include "mnelaunchcontrol.h"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Qt INCLUDES
+//=============================================================================================================
+
+#include <QDebug>
+#include <QCoreApplication>
+#include <QFile>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Extract::Extract(QWidget *parent)
-: QMainWindow(parent)
+MNELaunchControl::MNELaunchControl(QObject *parent)
+: QObject(parent)
 {
-
+    m_requiredSampleFiles   <<  "/MNE-sample-data/MEG/sample/sample_audvis_raw.fif"
+                            <<  "/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif"
+                            <<  "/MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot"
+                            <<  "/MNE-sample-data/subjects/sample/label/rh.aparc.a2009s.annot";
 }
 
 
 //*************************************************************************************************************
 
-#ifdef _WIN32
-
-void Extract::extractTar()
+void MNELaunchControl::invokeScan()
 {
-
-    QProcess *m_qp7zipTar = new QProcess(this);
-    m_qArguments.removeLast();
-    m_qArguments << (m_qCurrentPath + "\\sample.tar");
-    connect(m_qp7zipTar, static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), m_qp7zipTar, &QProcess::deleteLater);
-    m_qp7zipTar->start(m_q7zipPath, m_qArguments);
-    m_qp7zipTar->waitForFinished(-1);
-
-    QFile tarFile("sample.tar");
-    tarFile.remove();
-    tarFile.close();
-
-    emit extractionDone();
+    invokeApplication("mne_scan",QStringList());
 }
 
 
 //*************************************************************************************************************
 
-void Extract::extractGz(QString archivePath)
+void MNELaunchControl::invokeBrowse()
 {
-    m_qArguments.clear();
-    QFile oldData("sample.tar");
-    oldData.remove();
-    oldData.close();
-    m_qCurrentPath = archivePath;
-    m_qArguments << "x" << "-aoa" << "-y" << (m_qCurrentPath + "\\sample.tar.gz");
-    QProcess *m_qp7zipGz = new QProcess(this);
-    connect(m_qp7zipGz, static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), m_qp7zipGz, &QProcess::deleteLater);
-    connect(m_qp7zipGz, static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), this, &Extract::extractTar);
-    connect(m_qp7zipGz, &QProcess::errorOccurred, this, &Extract::zipperError);
-    m_qp7zipGz->start(m_q7zipPath, m_qArguments);
-    qDebug() << m_qp7zipGz->error();
+    invokeApplication("mne_browse",QStringList());
 }
 
 
 //*************************************************************************************************************
 
-void Extract::beginExtraction(QString zip, QString current)
+void MNELaunchControl::invokeAnalyze()
 {
-    if (zip == NULL){m_q7zipPath = QDir::toNativeSeparators("\"C:/Program\ Files/7-Zip/7z.exe\"");}
-    else{m_q7zipPath = zip;}
-    extractGz(current);
+    invokeApplication("mne_analyze",QStringList());
 }
 
 
 //*************************************************************************************************************
 
-#else //Linux & OSX
-
-void Extract::beginExtraction()
+void MNELaunchControl::invokeApplication(const QString &application, const QStringList &arguments)
 {
-    system("tar -zxf sample.tar.gz");
-    emit extractionDone();
-}
-
-//#else
-//#   error "Unknown compiler" // we don't want to have a compilation error on an unknown os
+    QFile file(QCoreApplication::applicationDirPath()+ "/" + application);
+#if defined(_WIN32) || defined(_WIN32_WCE)
+    file.setFileName(file.fileName() + ".exe");
 #endif
 
+    if(file.exists()) {
+        try {
+            QPointer<QProcess> process( new QProcess );
+            process->start(file.fileName(), arguments);
+            m_ListProcesses.append(process);
+        } catch (int e) {
+            qWarning() << "Not able to start" << file.fileName() << ". Error:" << e;
+        }
+    }
+    else {
+        qWarning() << "Application" << file.fileName() << "does not exists.";
+    }
+}
+
+
 //*************************************************************************************************************
 
-Extract::~Extract()
+bool MNELaunchControl::getSampleDataAvailable() const
 {
+    bool sampleFilesExist = true;
 
+    for(QString fileName : m_requiredSampleFiles)
+    {
+        QFile file (QCoreApplication::applicationDirPath() + fileName);
+        if ( !file.exists() ) {
+            qWarning() << "Missing sample file" << file.fileName();
+            sampleFilesExist = false;
+        }
+    }
+    return sampleFilesExist;
 }

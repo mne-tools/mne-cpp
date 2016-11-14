@@ -1,14 +1,13 @@
 //=============================================================================================================
 /**
-* @file     extract.h
-* @author   Louis Eichhorst <louis.eichhorst@tu-ilmenau.de>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+* @file     mnelaunchcontrol.cpp
+* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     August, 2016
+* @date     November, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2016, Louis Eichhorst and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Christoph Dinh. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,121 +28,89 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     extract class declaration.
+* @brief    MNELaunchControl class declaration
 *
 */
 
-#ifndef EXTRACT_H
-#define EXTRACT_H
+#ifndef MNELAUNCHCONTROL_H
+#define MNELAUNCHCONTROL_H
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// Qt INCLUDES
 //=============================================================================================================
 
-#include <QSharedPointer>
-#include <QMainWindow>
-#include <QString>
-#include <QtCore>
-#include <QFile>
 #include <QObject>
-#include <QDebug>
-#include <QIODevice>
 #include <QProcess>
+#include <QPointer>
+#include <QList>
 
-//*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE EXTRACT
-//=============================================================================================================
-
-using namespace std;
-
-namespace Ui {
-class Extract;
-}
-
-//*************************************************************************************************************
-//=============================================================================================================
-// EXTRACT FORWARD DECLARATIONS
-//=============================================================================================================
-
 /**
+* DECLARE CLASS MNELaunchControl
 *
-* @brief Extracts the sample data set.
+* @brief The MNELaunchControl class is the MNE Launch ViewModel (Control).
 */
-
-class Extract : public QMainWindow
+class MNELaunchControl : public QObject
 {
     Q_OBJECT
 
+    Q_PROPERTY ( bool sampleDataAvailable READ getSampleDataAvailable NOTIFY sampleDataAvailableChanged_Signal )
+
 public:
-    typedef QSharedPointer<Extract> SPtr;              /**< Shared pointer type for Extract. */
-    typedef QSharedPointer<const Extract> ConstSPtr;   /**< Const shared pointer type for Extract. */
+    //=========================================================================================================
+    /**
+    * Constructs the MNE Launch Application.
+    *
+    * @param[in] parent     If parent is not NULL the QObject becomes a child of QObject inside parent.
+    */
+    MNELaunchControl(QObject *parent = nullptr);
 
     //=========================================================================================================
     /**
-    * Constructs a extract object.
+    * Launches MNE Scan
     */
-    explicit Extract(QWidget *parent = 0);
-    ~Extract();
+    Q_INVOKABLE void invokeScan();
+
+    //=========================================================================================================
+    /**
+    * Launches MNE Browse
+    */
+    Q_INVOKABLE void invokeBrowse();
+
+    //=========================================================================================================
+    /**
+    * Launches MNE Analyze
+    */
+    Q_INVOKABLE void invokeAnalyze();
+
+    //=========================================================================================================
+    /**
+    * Invokes an application with the given arguments
+    *
+    * @param[in] application    The MNE application name to start.
+    * @param[in] arguments      The arguments to start the MNE application with.
+    */
+    void invokeApplication(const QString& application, const QStringList& arguments);
+
+    //=========================================================================================================
+    /**
+    * Checks whether the SampleData are available.
+    *
+    * @return true if the SampleData are available.
+    */
+    bool getSampleDataAvailable() const;
 
 signals:
     //=========================================================================================================
     /**
-    * Emitted if the extraction has finished.
+    * Shall be emitted when the SampleData availability has changed.
     */
-    void extractionDone();
+    void sampleDataAvailableChanged_Signal();
 
 private:
-    Ui::Extract     *ui;                                /**< Sets up the GUI. */
-    QStringList     m_qArguments;                       /**< List of extractionarguments for 7zip. */
-    QString         m_qCurrentPath;                     /**< Temporary filepath of the sample data set. */
-    QString         m_q7zipPath;                        /**< Location of 7z.exe, */
-
-#ifdef _WIN32
-public:
-    //=========================================================================================================
-    /**
-    * Looks for 7zip at the given filepath and extracts the file at the other filepath.
-    *
-    * @param[in] zip            Path to 7z.exe
-    *
-    * @param[in] current        Path to the .tar.gz
-    */
-    void beginExtraction(QString zip, QString current);
-
-signals:
-    //=========================================================================================================
-    /**
-    * Emitted if 7zip cannot be opened.
-    */
-    void zipperError();
-
-private:
-    //=========================================================================================================
-    /**
-    * Extracts from .tar.gz to .tar using 7zip
-    *
-    * @param[in] archivePath    Path to the .tar.gz
-    */
-    void extractGz(QString archivePath);
-
-    //=========================================================================================================
-    /**
-    * Extracts the sample set from .tar using 7zip
-    */
-    void extractTar();
-
-#else //Linux & OSX
-public:
-    //=========================================================================================================
-    /**
-    * Extracts the .tar.gz using a systemcall.
-    */
-    void beginExtraction();
-
-#endif
-
+    QList<QPointer<QProcess>> m_ListProcesses;  /**< List of started processes. */
+    QStringList m_requiredSampleFiles;          /**< List of required sample data files. */
 };
 
-#endif // EXTRACT_H
+#endif // MNELAUNCHCONTROL_H
