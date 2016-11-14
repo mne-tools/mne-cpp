@@ -89,16 +89,6 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
-//  fname_data  - Name of the data file
-//  setno       - Data set number
-//  fname_inv   - Inverse operator file name
-//  nave        - Number of averages (scales the noise covariance)
-//             If negative, the number of averages in the data will be
-//             used
-//  lambda2     - The regularization factor
-//  dSPM        - do dSPM?
-//  sLORETA     - do sLORETA?
-
     // Command Line Parser
     QCommandLineParser parser;
     parser.setApplicationDescription("Compute Inverse Powell RAP-MUSIC Example");
