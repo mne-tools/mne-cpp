@@ -36,7 +36,7 @@
 
 include(../../mne-cpp.pri)
 
-QT += qml quick quickcontrols2
+QT += qml quick
 
 TARGET = mne_launch
 
