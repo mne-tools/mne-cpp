@@ -287,11 +287,11 @@ int main(int argc, char *argv[])
     //########################################################################################
 
     View3D::SPtr testWindow = View3D::SPtr(new View3D());
-    testWindow->addSurfaceSet("Subject01", evoked.comment, tSurfSet, tAnnotSet);
+    testWindow->addSurfaceSet(parser.value(subjectOption), evoked.comment, tSurfSet, tAnnotSet);
 
-    QList<BrainRTConnectivityDataTreeItem*> rtItemListConnect= testWindow->addConnectivityData("Subject01", evoked.comment, pConnect_LA);
+    QList<BrainRTConnectivityDataTreeItem*> rtItemListConnect= testWindow->addConnectivityData(parser.value(subjectOption), evoked.comment, pConnect_LA);
 
-    QList<BrainRTSourceLocDataTreeItem*> rtItemListSourceLoc = testWindow->addSourceData("Subject01", evoked.comment, sourceEstimate, t_clusteredFwd);
+    QList<BrainRTSourceLocDataTreeItem*> rtItemListSourceLoc = testWindow->addSourceData(parser.value(subjectOption), evoked.comment, sourceEstimate, t_clusteredFwd);
     //Init some rt related values for right visual data
     for(int i = 0; i < rtItemListSourceLoc.size(); ++i) {
         rtItemListSourceLoc.at(i)->setLoopState(true);

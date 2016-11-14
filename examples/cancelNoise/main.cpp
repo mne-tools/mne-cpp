@@ -89,12 +89,12 @@ int main(int argc, char *argv[])
     QCommandLineParser parser;
     parser.setApplicationDescription("Cancel Noise Example");
     parser.addHelpOption();
-    QCommandLineOption sampleFileOption("ave", "Path to the evoked/average <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
-    parser.addOption(sampleFileOption);
+    QCommandLineOption evokedFileOption("ave", "Path to the evoked/average <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    parser.addOption(evokedFileOption);
     parser.process(app);
 
     //generate FiffEvokedSet
-    QFile t_sampleFile(parser.value(sampleFileOption));
+    QFile t_sampleFile(parser.value(evokedFileOption));
     FiffEvokedSet p_FiffEvokedSet(t_sampleFile);
 
     //cancelNoise example

@@ -101,16 +101,16 @@ int main(int argc, char *argv[])
     QCommandLineParser parser;
     parser.setApplicationDescription("Clustered Inverse Example");
     parser.addHelpOption();
-    QCommandLineOption sampleFwdFileOption("fwd", "Path to the forward solution <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
-    QCommandLineOption sampleCovFileOption("cov", "Path to the covariance <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
-    QCommandLineOption sampleEvokedFileOption("ave", "Path to the evoked/average <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    QCommandLineOption fwdFileOption("fwd", "Path to the forward solution <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
+    QCommandLineOption covFileOption("cov", "Path to the covariance <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
+    QCommandLineOption evokedFileOption("ave", "Path to the evoked/average <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
     QCommandLineOption snrOption("snr", "The <snr> value used for computation.", "snr", "1.0");//3.0f;//0.1f;//3.0f;
     QCommandLineOption methodOption("method", "Inverse estimation <method>, i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM");//"MNE" | "dSPM" | "sLORETA"
     QCommandLineOption invFileOption("inv", "Path to inverse <file>, which is to be written.", "file", "");
     QCommandLineOption stcFileOption("stc", "Path to stc <file>, which is to be written.", "file", "");
-    parser.addOption(sampleFwdFileOption);
-    parser.addOption(sampleCovFileOption);
-    parser.addOption(sampleEvokedFileOption);
+    parser.addOption(fwdFileOption);
+    parser.addOption(covFileOption);
+    parser.addOption(evokedFileOption);
     parser.addOption(snrOption);
     parser.addOption(methodOption);
     parser.addOption(invFileOption);
@@ -118,9 +118,9 @@ int main(int argc, char *argv[])
     parser.process(app);
 
     //Parse inputs
-    QFile t_fileFwd(parser.value(sampleFwdFileOption));
-    QFile t_fileCov(parser.value(sampleCovFileOption));
-    QFile t_fileEvoked(parser.value(sampleEvokedFileOption));
+    QFile t_fileFwd(parser.value(fwdFileOption));
+    QFile t_fileCov(parser.value(covFileOption));
+    QFile t_fileEvoked(parser.value(evokedFileOption));
 
     double snr = parser.value(snrOption).toDouble();
     QString method = parser.value(methodOption);
