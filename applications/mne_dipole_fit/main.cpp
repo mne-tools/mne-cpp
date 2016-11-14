@@ -75,6 +75,7 @@
 
 #include <QtCore/QCoreApplication>
 #include <QCommandLineParser>
+#include <QFile>
 
 
 //*************************************************************************************************************
@@ -215,6 +216,85 @@ using namespace UTILSLIB;
 #define ALLOC_COMPLEX_DCMATRIX(x,y) mne_complex_dmatrix((x),(y))
 #define FREE_DCMATRIX(m) mne_free_dcmatrix((m))
 #define FREE_COMPLEX_DCMATRIX(m) mne_free_dcmatrix((m))
+
+
+//============================= Refactoring helpers =============================
+
+//float
+Eigen::MatrixXf toFloatEigenMatrix(float **mat, const int m, const int n)
+{
+    Eigen::MatrixXf eigen_mat(m,n);
+
+    for ( int i = 0; i < m; ++i)
+        for ( int j = 0; j < n; ++j)
+            eigen_mat(i,j) = mat[i][j];
+
+    return eigen_mat;
+}
+
+void fromFloatEigenMatrix(const Eigen::MatrixXf& from_mat, float **to_mat, const int m, const int n)
+{
+    for ( int i = 0; i < m; ++i)
+        for ( int j = 0; j < n; ++j)
+            to_mat[i][j] = from_mat(i,j);
+}
+
+void fromFloatEigenMatrix(const Eigen::MatrixXf& from_mat, float **to_mat)
+{
+    fromFloatEigenMatrix(from_mat, to_mat, from_mat.rows(), from_mat.cols());
+}
+
+
+void fromFloatEigenVector(const Eigen::VectorXf& from_vec, float *to_vec, const int n)
+{
+    for ( int i = 0; i < n; ++i)
+        to_vec[i] = from_vec[i];
+}
+
+void fromFloatEigenVector(const Eigen::VectorXf& from_vec, float *to_vec)
+{
+    fromFloatEigenVector(from_vec, to_vec, from_vec.size());
+}
+
+
+
+//double
+Eigen::MatrixXd toDoubleEigenMatrix(double **mat, const int m, const int n)
+{
+    Eigen::MatrixXd eigen_mat(m,n);
+
+    for ( int i = 0; i < m; ++i)
+        for ( int j = 0; j < n; ++j)
+            eigen_mat(i,j) = mat[i][j];
+
+    return eigen_mat;
+}
+
+void fromDoubleEigenMatrix(const Eigen::MatrixXd& from_mat, double **to_mat, const int m, const int n)
+{
+    for ( int i = 0; i < m; ++i)
+        for ( int j = 0; j < n; ++j)
+            to_mat[i][j] = from_mat(i,j);
+}
+
+void fromDoubleEigenMatrix(const Eigen::MatrixXd& from_mat, double **to_mat)
+{
+    fromDoubleEigenMatrix(from_mat, to_mat, from_mat.rows(), from_mat.cols());
+}
+
+void fromDoubleEigenVector(const Eigen::VectorXd& from_vec, double *to_vec, const int n)
+{
+    for ( int i = 0; i < n; ++i)
+        to_vec[i] = from_vec[i];
+}
+
+void fromDoubleEigenVector(const Eigen::VectorXd& from_vec, double *to_vec)
+{
+    fromDoubleEigenVector(from_vec, to_vec, from_vec.size());
+}
+
+
+
 
 //============================= mne_allocs.c =============================
 
@@ -361,25 +441,11 @@ float **mne_lu_invert(float **mat,int dim)
       * LAPACK
       */
 {
-    Eigen::MatrixXf eigen_mat(dim,dim);
-
-    for ( int i = 0; i < dim; ++i)
-    {
-        for ( int j = 0; j < dim; ++j)
-        {
-            eigen_mat(i,j) = mat[i][j];
-        }
-    }
+    Eigen::MatrixXf eigen_mat = toFloatEigenMatrix(mat, dim, dim);
 
     Eigen::MatrixXf eigen_mat_inv = eigen_mat.inverse();
 
-    for ( int i = 0; i < dim; ++i)
-    {
-        for ( int j = 0; j < dim; ++j)
-        {
-            mat[i][j] = eigen_mat_inv(i,j);
-        }
-    }
+    fromFloatEigenMatrix(eigen_mat_inv, mat);
 
 //  int info;
 //  int *ipiv = MALLOC(dim,int);
@@ -586,25 +652,39 @@ int mne_svd(float **mat,	/* The matrix */
     uup = uutemp[0];
   }
 
-  qDebug() << "ToDo: sgesvd(jobu,jobvt,&n,&m,mat[0],&n,sing,vvp,&n,uup,&udim,work,&lwork,&info); MISSING!!!!";
+
+  MatrixXf eigen_mat = toFloatEigenMatrix(mat, 1, m);
+
+  Eigen::JacobiSVD< Eigen::MatrixXf > svd(eigen_mat ,Eigen::ComputeFullU | Eigen::ComputeFullV);
+
+  fromFloatEigenVector(svd.singularValues(), sing, 1);
+
+  if (uu != NULL)
+    fromFloatEigenMatrix(svd.matrixV(), uu, udim, m);
+
+  if (vv != NULL)
+    fromFloatEigenMatrix(svd.matrixU(), vv);
+
+  return 0;
+
 //  sgesvd(jobu,jobvt,&n,&m,mat[0],&n,sing,
 //     vvp,&n,uup,&udim,work,&lwork,&info);
-  if (info == 0) {
-    if (uu != NULL) {
-      /*
-       * Transpose U to get rid of the
-       * LAPACK convention.
-       */
-      for (j = 0; j < udim; j++)
-    for (k = 0; k < m; k++)
-      uu[j][k] = uutemp[k][j];
-    }
-  }
-  else
-    printf("sgesvd returned error: %d",info);
-  FREE(work);
-  FREE_CMATRIX(uutemp);
-  return info;
+//  if (info == 0) {
+//    if (uu != NULL) {
+//      /*
+//       * Transpose U to get rid of the
+//       * LAPACK convention.
+//       */
+//      for (j = 0; j < udim; j++)
+//        for (k = 0; k < m; k++)
+//          uu[j][k] = uutemp[k][j];
+//    }
+//  }
+//  else
+//    printf("sgesvd returned error: %d",info);
+//  FREE(work);
+//  FREE_CMATRIX(uutemp);
+//  return info;
 }
 
 
@@ -1823,7 +1903,7 @@ fiffTag fiff_dir_tree_get_tag(fiffFile file,fiffDirNode node,int kind)
       else
     return (tag);
     }
-  printf("Desired tag (%s [%d]) not found",
+  qWarning("Desired tag (%s [%d]) not found",
             fiff_get_tag_explanation(kind),kind);
   return (NULL);
 }
@@ -2110,13 +2190,13 @@ int mne_decompose_eigen (double *mat,
   double scale;
 
   maxi = 0;//idamax(&np,mat,&one);
-  qDebug() << "ToDo: idamax(&np,mat,&one);";
+  qDebug() << "!!!!!!!!ToDo: idamax(&np,mat,&one);";
   scale = 1.0/mat[maxi-1];
 
   for (k = 0; k < np; k++)
     dmat[k] = mat[k]*scale;
 //  dspev(compz,uplo,&dim,dmat,w,z,&dim,work,&info);
-  qDebug() << "ToDo: dspev(compz,uplo,&dim,dmat,w,z,&dim,work,&info);";
+  qDebug() << "!!!!!!!ToDo: dspev(compz,uplo,&dim,dmat,w,z,&dim,work,&info);";
   FREE(work);
   if (info != 0)
     printf("Eigenvalue decomposition failed (LAPACK info = %d)",info);
@@ -2876,6 +2956,34 @@ const char *mne_coord_frame_name(int frame)
 }
 
 
+void mne_print_coord_transform_label(FILE *log,char *label, fiffCoordTrans t)
+
+{
+  int k,p;
+  int frame;
+  if (!label || strlen(label) == 0)
+    fprintf(log,"Coordinate transformation: ");
+  else
+    fprintf(log,"%s",label);
+  for (frame = t->from, k = 0; k < 2; k++) {
+    if (k == 0) {
+      fprintf(log,"%s -> ",mne_coord_frame_name(frame));
+      frame = t->to;
+    }
+    else {
+      fprintf(log,"%s\n",mne_coord_frame_name(frame));
+      for (p = 0; p < 3; p++)
+        fprintf(log,"\t% 8.6f % 8.6f % 8.6f\t% 7.2f mm\n",
+        t->rot[p][X],t->rot[p][Y],t->rot[p][Z],1000*t->move[p]);
+        fprintf(log,"\t% 8.6f % 8.6f % 8.6f  % 7.2f\n",0.0,0.0,0.0,1.0);
+    }
+  }
+}
+
+void mne_print_coord_transform(FILE *log, fiffCoordTrans t)
+{
+  mne_print_coord_transform_label(log,NULL,t);
+}
 
 
 fiffCoordTrans mne_read_transform_from_node(fiffFile in, fiffDirNode node,int from, int to)
@@ -3182,24 +3290,24 @@ static fwdCoil fwd_add_coil_to_set(fwdCoilSet set,
   fwdCoil def;
 
   if (set == NULL) {
-    qDebug() << "qCritical (No coil definition set to augment.)";
+    qWarning ("No coil definition set to augment.");
     return NULL;
   }
   if (np <= 0) {
-    qDebug() << "err_printf_set_error(Number of integration points should be positive (type = %d acc = %d),type,acc)";
+    qWarning("Number of integration points should be positive (type = %d acc = %d)",type,acc);
     return NULL;
   }
   if (! (acc == FWD_COIL_ACCURACY_POINT ||
         acc == FWD_COIL_ACCURACY_NORMAL ||
         acc == FWD_COIL_ACCURACY_ACCURATE) ) {
-    qDebug() << "err_printf_set_error(Illegal accuracy (type = %d acc = %d),type,acc)";
+    qWarning("Illegal accuracy (type = %d acc = %d)",type,acc);
     return NULL;
   }
   if (! (coil_class == FWD_COILC_MAG ||
         coil_class == FWD_COILC_AXIAL_GRAD ||
         coil_class == FWD_COILC_PLANAR_GRAD ||
         coil_class == FWD_COILC_AXIAL_GRAD2) ) {
-    qDebug() << "err_printf_set_error(Illegal coil class (type = %d acc = %d class = %d),type,acc,coil_class)";
+    qWarning("Illegal coil class (type = %d acc = %d class = %d)",type,acc,coil_class);
     return NULL;
   }
 
@@ -3296,11 +3404,11 @@ static int get_ival(FILE *in, int *ival)
 {
   char *next = next_word(in);
   if (next == NULL) {
-    qDebug() << "err_printf_set_error(missing integer)";
+    qWarning("missing integer");
     return FAIL;
   }
   else if (sscanf(next,"%d",ival) != 1) {
-    qDebug() << "err_printf_set_error(bad integer : %s,next)";
+    qWarning("bad integer : %s",next);
     FREE(next);
     return FAIL;
   }
@@ -3313,11 +3421,11 @@ static int get_fval(FILE *in, float *fval)
 {
   char *next = next_word(in);
   if (next == NULL) {
-    qDebug() << "qCritical (bad integer)";
+    qWarning("bad integer");
     return FAIL;
   }
   else if (sscanf(next,"%g",fval) != 1) {
-    qDebug() << "err_printf_set_error(bad floating point number : %s,next)";
+    qWarning("bad floating point number : %s",next);
     FREE(next);
     return FAIL;
   }
@@ -3344,7 +3452,7 @@ fwdCoilSet fwd_read_coil_defs(const char *name)
   fwdCoil def;
 
   if (in == NULL) {
-    qDebug() << "err_set_sys_error(name)";
+    qWarning(name);
     goto bad;
   }
 
@@ -3394,12 +3502,12 @@ fwdCoilSet fwd_read_coil_defs(const char *name)
     goto bad;
 
     if (VEC_LEN(def->rmag[p]) > BIG) {
-        qDebug() << "err_printf_set_error(Unreasonable integration point: %f %f %f mm (coil type = %d acc = %d), 1000*def->rmag[p][X],1000*def->rmag[p][Y],1000*def->rmag[p][Z], def->type,def->accuracy)";
+        qWarning("Unreasonable integration point: %f %f %f mm (coil type = %d acc = %d)", 1000*def->rmag[p][X],1000*def->rmag[p][Y],1000*def->rmag[p][Z], def->type,def->accuracy);
     goto bad;
       }
       size = VEC_LEN(def->cosmag[p]);
       if (size <= 0) {
-        qDebug() << "err_printf_set_error(Unreasonable normal: %f %f %f (coil type = %d acc = %d), def->cosmag[p][X],def->cosmag[p][Y],def->cosmag[p][Z], def->type,def->accuracy)";
+        qWarning("Unreasonable normal: %f %f %f (coil type = %d acc = %d)", def->cosmag[p][X],def->cosmag[p][Y],def->cosmag[p][Z], def->type,def->accuracy);
     goto bad;
       }
       normalize(def->cosmag[p]);
@@ -3666,12 +3774,12 @@ fwdCoilSet fwd_dup_coil_set(fwdCoilSet s,
   int k,p;
 
   if (!s) {
-    printf("No coils to duplicate");
+    qWarning("No coils to duplicate");
     return NULL;
   }
   if (t) {
     if (s->coord_frame != t->from) {
-      printf("Coordinate frame of the transformation does not match the coil set in fwd_dup_coil_set");
+      qWarning("Coordinate frame of the transformation does not match the coil set in fwd_dup_coil_set");
       return NULL;
     }
   }
@@ -6712,7 +6820,7 @@ mneProjOp mne_read_proj_op_from_node(fiffFile in, fiffDirNode start)
     *lf = '\0';
 //      if (item_desc != NULL)
 //        item_desc = add_string(item_desc," ");
-      qDebug() << "ToDo: item_desc = add_string(item_desc," ");";
+      qDebug() << "!!!!!!!!!!!!!!!!!ToDo: item_desc = add_string(item_desc," ");";
       item_desc = add_string(item_desc,(char *)desc_tag);
       FREE(desc_tag);
     }
@@ -12306,12 +12414,19 @@ mneSurface make_guesses(mneSurface guess_surf,     /* Predefined boundary for th
 
   if (!guess_surf) {
     fprintf(stderr,"Making a spherical guess space with radius %7.1f mm...\n",1000*guessrad);
-#ifdef USE_SHARE_PATH
-    if ((bemname = mne_compose_mne_name("share/mne","icos.fif")) == NULL)
-#else
-    if ((bemname = mne_compose_mne_name("setup/mne","icos.fif")) == NULL)
-#endif
-      goto out;
+//#ifdef USE_SHARE_PATH
+//    if ((bemname = mne_compose_mne_name("share/mne","icos.fif")) == NULL)
+//#else
+//    if ((bemname = mne_compose_mne_name("setup/mne","icos.fif")) == NULL)
+//#endif
+//      goto out;
+
+    QFile bemFile("/usr/pubsw/packages/mne/stable/share/mne/icos.fif");
+    if( !bemFile.exists () )
+        goto out;
+
+    bemname = MALLOC(strlen(bemFile.fileName().toLatin1().data())+1,char);
+    strcpy(bemname,bemFile.fileName().toLatin1().data());
 
     if ((sphere = mne_read_bem_surface(bemname,9003,FALSE,NULL)) == NULL)
       goto out;
@@ -13804,8 +13919,9 @@ fwdCompData fwd_make_comp_data(mneCTFcompDataSet set,           /* The CTF compe
     fwd_free_comp_data(comp);
     return NULL;
   }
-  else
+  else {
     return comp;
+  }
 }
 
 
@@ -14356,45 +14472,17 @@ static int c_dsvd(double **mat,		/* The matrix */
 {
 
     int    udim = MIN(m,n);
-    MatrixXd eigen_mat(m,n);
-
-    for( int i = 0; i < m; ++i )
-    {
-        for( int j = 0; j < n; ++j )
-        {
-            eigen_mat(i,j) = mat[i][j];
-        }
-    }
+    MatrixXd eigen_mat = toDoubleEigenMatrix(mat, m, n);
 
     Eigen::JacobiSVD< Eigen::MatrixXd > svd(eigen_mat ,Eigen::ComputeFullU | Eigen::ComputeFullV);
 
-
-    for( int i = 0; i < udim; ++i )
-    {
-        sing[i] = svd.singularValues()[i];
-    }
+    fromDoubleEigenVector(svd.singularValues(), sing, udim);
 
     if ( vv != NULL )
-    {
-        for( int i = 0; i < udim; ++i )
-        {
-            for( int j = 0; j < n; ++j )
-            {
-                vv[i][j] = svd.matrixV()(i,j);
-            }
-        }
-    }
+        fromDoubleEigenMatrix(svd.matrixV(), vv, udim, n);
 
     if ( uu != NULL )
-    {
-        for( int i = 0; i < udim; ++i )
-        {
-            for( int j = 0; j < m; ++j )
-            {
-                uu[i][j] = svd.matrixU()(i,j);
-            }
-        }
-    }
+        fromDoubleEigenMatrix(svd.matrixU(), uu, udim, m);
 
     return 0;
 
@@ -15777,14 +15865,14 @@ static int setup_forward_model(dipoleFitData d, mneCTFcompDataSet comp_data, fwd
       comp = fwd_make_comp_data(comp_data,d->meg_coils,comp_coils,
                 fwd_bem_field,NULL,NULL,d->bem_model,NULL);
       if (!comp)
-    goto out;
+        goto out;
       printf("Compensation setup done.\n");
 
       printf("MEG solution matrix...");
       if (fwd_bem_specify_coils(d->bem_model,d->meg_coils) == FAIL)
-    goto out;
+        goto out;
       if (fwd_bem_specify_coils(d->bem_model,comp->comp_coils) == FAIL)
-    goto out;
+        goto out;
       printf("[done]\n");
 
       f->meg_field       = fwd_comp_field;
@@ -16311,10 +16399,10 @@ dipoleFitData setup_dipole_fit_data(char  *mriname,		 /* This gives the MRI/head
     res->mri_head_t = fiff_make_transform(FIFFV_COORD_MRI,FIFFV_COORD_HEAD,rot,move);
   }
 
-//ToDo    //mne_print_coord_transform(stderr,res->mri_head_t);
+  mne_print_coord_transform(stderr,res->mri_head_t);
   if ((res->meg_head_t = mne_read_meas_transform(measname)) == NULL)
     goto bad;
-//ToDo    //  mne_print_coord_transform(stderr,res->meg_head_t);
+  mne_print_coord_transform(stderr,res->meg_head_t);
   /*
    * Read the bad channel lists
    */
@@ -16356,7 +16444,9 @@ dipoleFitData setup_dipole_fit_data(char  *mriname,		 /* This gives the MRI/head
 //    const char *path = "setup/mne";
 //    const char *filename = "coil_def.dat";
 //    const char *coilfile = mne_compose_mne_name(path,filename);
-    QString qPath = QCoreApplication::applicationDirPath() + QString("/resources/coilDefinitions/coil_def.dat");
+
+    QString qPath("/usr/pubsw/packages/mne/stable/share/mne/coil_def.dat");
+//    QString qPath = QCoreApplication::applicationDirPath() + QString("/resources/coilDefinitions/coil_def.dat");
     char *coilfile = MALLOC(strlen(qPath.toLatin1().data())+1,char);
     strcpy(coilfile,qPath.toLatin1().data());
 #endif
@@ -16405,8 +16495,8 @@ dipoleFitData setup_dipole_fit_data(char  *mriname,		 /* This gives the MRI/head
     if (ncomp > 0) {
       if ((comp_coils = fwd_create_meg_coils(templates,comp_chs,ncomp,
                          FWD_COIL_ACCURACY_NORMAL,res->meg_head_t)) == NULL) {
-    FREE(comp_chs);
-    goto bad;
+        FREE(comp_chs);
+        goto bad;
       }
       printf("%d compensation channels in %s\n",comp_coils->ncoil,measname);
     }

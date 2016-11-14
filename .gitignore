@@ -185,6 +185,7 @@
 /bin/connectivityTutorial
 /bin/histogram
 /bin/mne_dipole_fit_new
+/bin/mne_launch
 /bin/mne_sample_data_downloader
 /bin/test_codecov
 /bin/Material
@@ -197,6 +198,7 @@
 /bin/qmltooling
 /bin/platforminputcontexts
 /bin/QtQml
+/bin/MNE-sample-data/Result
 
 /applications/mne_scan/plugins/tmsi/*.dll
 
