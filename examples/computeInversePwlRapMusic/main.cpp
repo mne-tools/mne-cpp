@@ -123,7 +123,6 @@ int main(int argc, char *argv[])
     parser.addOption(surfOption);
     parser.process(app);
 
-
     // Parse command line parameters
     QFile t_fileFwd(parser.value(sampleFwdFileOption));
     QFile t_fileEvoked(parser.value(sampleEvokedFileOption));
