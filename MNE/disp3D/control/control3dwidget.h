@@ -107,7 +107,7 @@ public:
     * @param [in] slFlags    The flags indicating which tools to display. Scaling is displayed as default. Possible flags are: projections, compensators, view, filter, triggerdetection, modalities, scaling, sphara.
     * @param [in] type
     */
-    explicit Control3DWidget(QWidget* parent = 0, const QStringList& slFlags = QStringList() << "Minimize" << "Data" << "Window" << "View", Qt::WindowType type = Qt::Window);
+    explicit Control3DWidget(QWidget* parent = 0, const QStringList& slFlags = QStringList() << "Minimize" << "Data" << "Window" << "View" << "Light", Qt::WindowType type = Qt::Window);
 
     //=========================================================================================================
     /**
@@ -195,9 +195,28 @@ protected:
     */
     void onCoordAxisClicked(bool checked);
 
+    //=========================================================================================================
+    /**
+    * Slot called when the user wants change the color of the lights.
+    */
+    void onLightColorPicker();
+
+    //=========================================================================================================
+    /**
+    * Slot called when the user wants change the color of the lights.
+    */
+    void onLightColorChanged(QColor color);
+
+    //=========================================================================================================
+    /**
+    * Slot called when the user wants to change the light intensity.
+    */
+    void onLightIntensityChanged(double value);
+
     Ui::Control3DWidget*    ui;                         /**< The pointer to the QtDesigner ui class. */
 
     QColor                  m_colCurrentSceneColor;     /**< Current color of the scene in all View3D's. */
+    QColor                  m_colCurrentLightColor;     /**< Current color of the lights in all View3D's. */
 
 signals:
     //=========================================================================================================
@@ -231,6 +250,22 @@ signals:
     * @param[in] bShowCoordAxis      The coordinate axis flag.
     */
     void showCoordAxis(bool bShowCoordAxis);
+
+    //=========================================================================================================
+    /**
+    * Use this signal whenever the light color was changed by the user.
+    *
+    * @param[in] color      The newly picked color.
+    */
+    void lightColorChanged(const QColor& color);
+
+    //=========================================================================================================
+    /**
+    * Use this signal whenever the light intensity was changed by the user.
+    *
+    * @param[in] value      The newly picked intensity.
+    */
+    void lightIntensityChanged(double value);
 };
 
 } // NAMESPACE DISP3DLIB
