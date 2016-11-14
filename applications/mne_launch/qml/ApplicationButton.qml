@@ -115,13 +115,4 @@ Item{
             PropertyChanges { target: imageHoverItem; visible: false }
         }
     ]
-
-//    transitions: [
-//        Transition {
-//            from: ""; to: "HOVERED"
-//            ColorAnimation {
-//                duration: 100
-//            }
-//        }
-//    ]
 }

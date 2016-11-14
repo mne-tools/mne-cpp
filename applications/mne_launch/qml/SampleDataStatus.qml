@@ -90,13 +90,4 @@ Item{
             PropertyChanges { target: statusTxt; text: qsTr("SampleData set up") }
         }
     ]
-
-//    transitions: [
-//        Transition {
-//            from: ""; to: "AVAILABLE"
-//            ColorAnimation {
-//                duration: 200
-//            }
-//        }
-//    ]
 }
