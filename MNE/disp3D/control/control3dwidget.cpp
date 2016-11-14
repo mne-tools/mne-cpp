@@ -84,6 +84,7 @@ Control3DWidget::Control3DWidget(QWidget* parent, const QStringList& slFlags, Qt
 : QWidget(parent, type)/*RoundedEdgesWidget(parent, type)*/
 , ui(new Ui::Control3DWidget)
 , m_colCurrentSceneColor(QColor(0,0,0))
+, m_colCurrentLightColor(QColor(255,255,255))
 {
     ui->setupUi(this);
 
@@ -129,8 +130,21 @@ Control3DWidget::Control3DWidget(QWidget* parent, const QStringList& slFlags, Qt
         ui->m_groupBox_viewOptions->hide();
     }
 
+    if(slFlags.contains("Light")) {
+        ui->m_groupBox_lightOptions->show();
+
+        connect(ui->m_pushButton_lightColorPicker, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
+                this, &Control3DWidget::onLightColorPicker);
+        connect(ui->m_doubleSpinBox_colorIntensity, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+                this, &Control3DWidget::onLightIntensityChanged);
+    } else {
+        ui->m_groupBox_lightOptions->hide();
+    }
+
+
     //Init's
     ui->m_pushButton_sceneColorPicker->setStyleSheet(QString("background-color: rgb(0, 0, 0);"));
+    ui->m_pushButton_lightColorPicker->setStyleSheet(QString("background-color: rgb(255, 255, 255);"));
 
     this->adjustSize();
     this->setWindowOpacity(1/(100.0/90.0));
@@ -181,6 +195,12 @@ void Control3DWidget::setView3D(QSharedPointer<View3D> view3D)
 
     connect(this, &Control3DWidget::showFullScreen,
             view3D.data(), &View3D::showFullScreen);
+
+    connect(this, &Control3DWidget::lightColorChanged,
+            view3D.data(), &View3D::setLightColor);
+
+    connect(this, &Control3DWidget::lightIntensityChanged,
+            view3D.data(), &View3D::setLightIntensity);
 
     //Set description hidden as default
     this->onTreeViewDescriptionHide();
@@ -325,4 +345,38 @@ void Control3DWidget::onCoordAxisClicked(bool checked)
     emit showCoordAxis(checked);
 }
 
+
+//*************************************************************************************************************
+
+void Control3DWidget::onLightColorPicker()
+{
+    QColorDialog* pDialog = new QColorDialog(this);
+    pDialog->setCurrentColor(m_colCurrentLightColor);
+
+    //Update all connected View3D's scene colors
+    connect(pDialog, &QColorDialog::currentColorChanged,
+            this, &Control3DWidget::onLightColorChanged);
+
+    pDialog->exec();
+    m_colCurrentLightColor = pDialog->currentColor();
+
+    //Set color of button new new scene color
+    ui->m_pushButton_lightColorPicker->setStyleSheet(QString("background-color: rgb(%1, %2, %3);").arg(m_colCurrentLightColor.red()).arg(m_colCurrentLightColor.green()).arg(m_colCurrentLightColor.blue()));
+}
+
+
+//*************************************************************************************************************
+
+void Control3DWidget::onLightColorChanged(QColor color)
+{
+    emit lightColorChanged(color);
+}
+
+
+//*************************************************************************************************************
+
+void Control3DWidget::onLightIntensityChanged(double value)
+{
+    emit lightIntensityChanged(value);
+}
 
