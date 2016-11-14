@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     extract.cpp
-* @author   Louis Eichhorst <louis.eichhorst@tu-ilmenau.de>;
+* @file     application.cpp
+* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     August, 2016
+* @date     November, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2016, Louis Eichhorst and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Christoph Dinh. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,25 +29,28 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    extract class definition.
+* @brief    Application class implementation
 *
 */
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "extract.h"
+#include "application.h"
+#include "mnelaunchcontrol.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Extract::Extract(QWidget *parent)
-: QMainWindow(parent)
+Application::Application(QObject *parent)
+: QObject(parent)
+, m_pQMLEngine (new QQmlApplicationEngine)
+, m_pLaunchControl (new MNELaunchControl)
 {
 
 }
@@ -55,72 +58,31 @@ Extract::Extract(QWidget *parent)
 
 //*************************************************************************************************************
 
-#ifdef _WIN32
-
-void Extract::extractTar()
+int Application::init(int &argc, char **argv, QGuiApplication& app)
 {
+    Q_UNUSED(argc)
+    Q_UNUSED(argv)
+    Q_UNUSED(app)
 
-    QProcess *m_qp7zipTar = new QProcess(this);
-    m_qArguments.removeLast();
-    m_qArguments << (m_qCurrentPath + "\\sample.tar");
-    connect(m_qp7zipTar, static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), m_qp7zipTar, &QProcess::deleteLater);
-    m_qp7zipTar->start(m_q7zipPath, m_qArguments);
-    m_qp7zipTar->waitForFinished(-1);
+    registerTypes();
 
-    QFile tarFile("sample.tar");
-    tarFile.remove();
-    tarFile.close();
+    m_pQMLEngine->rootContext()->setContextProperty("launchControl", m_pLaunchControl);
+    m_pQMLEngine->load(QUrl(QLatin1String("qrc:/qml/main.qml")));
 
-    emit extractionDone();
+    return 0;
 }
 
 
 //*************************************************************************************************************
 
-void Extract::extractGz(QString archivePath)
+void Application::registerTypes()
 {
-    m_qArguments.clear();
-    QFile oldData("sample.tar");
-    oldData.remove();
-    oldData.close();
-    m_qCurrentPath = archivePath;
-    m_qArguments << "x" << "-aoa" << "-y" << (m_qCurrentPath + "\\sample.tar.gz");
-    QProcess *m_qp7zipGz = new QProcess(this);
-    connect(m_qp7zipGz, static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), m_qp7zipGz, &QProcess::deleteLater);
-    connect(m_qp7zipGz, static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), this, &Extract::extractTar);
-    connect(m_qp7zipGz, &QProcess::errorOccurred, this, &Extract::zipperError);
-    m_qp7zipGz->start(m_q7zipPath, m_qArguments);
-    qDebug() << m_qp7zipGz->error();
+    // Register QML types hier
 }
 
 
 //*************************************************************************************************************
 
-void Extract::beginExtraction(QString zip, QString current)
+void Application::start()
 {
-    if (zip == NULL){m_q7zipPath = QDir::toNativeSeparators("\"C:/Program\ Files/7-Zip/7z.exe\"");}
-    else{m_q7zipPath = zip;}
-    extractGz(current);
-}
-
-
-//*************************************************************************************************************
-
-#else //Linux & OSX
-
-void Extract::beginExtraction()
-{
-    system("tar -zxf sample.tar.gz");
-    emit extractionDone();
-}
-
-//#else
-//#   error "Unknown compiler" // we don't want to have a compilation error on an unknown os
-#endif
-
-//*************************************************************************************************************
-
-Extract::~Extract()
-{
-
 }
