@@ -98,11 +98,11 @@ int main(int argc, char *argv[])
     QCommandLineParser parser;
     parser.setApplicationDescription("Compute Inverse Example");
     parser.addHelpOption();
-    QCommandLineOption sampleEvokedFileOption("e", "Path to evoked <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
-    QCommandLineOption sampleInvFileOption("i", "Path to inverse operator <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-meg-eeg-inv.fif");
-    QCommandLineOption snrOption("s", "<snr> of the given evoked file.", "snr", "1.0");
-    QCommandLineOption methodOption("m", "Inverse estimation <method>, i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM");
-    QCommandLineOption stcFileOption("t", "Path to <target> where stc is stored to.", "target", "");
+    QCommandLineOption sampleEvokedFileOption("ave", "Path to evoked <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    QCommandLineOption sampleInvFileOption("inv", "Path to inverse operator <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-meg-eeg-inv.fif");
+    QCommandLineOption snrOption("snr", "The <snr> value used for computation.", "snr", "1.0");
+    QCommandLineOption methodOption("method", "Inverse estimation <method>, i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM");
+    QCommandLineOption stcFileOption("stc", "Path to <file> where stc is stored to.", "file", "");
     parser.addOption(sampleEvokedFileOption);
     parser.addOption(sampleInvFileOption);
     parser.addOption(snrOption);
@@ -122,28 +122,8 @@ int main(int argc, char *argv[])
     QFile t_fileInv(parser.value(sampleInvFileOption));
 
     float snr = parser.value(snrOption).toFloat();
-    QString method(parser.value(methodOption)); //"MNE" | "dSPM" | "sLORETA"
+    QString method(parser.value(methodOption));
     QString t_sFileNameStc(parser.value(stcFileOption));
-
-    // Parse command line parameters
-    for(qint32 i = 0; i < argc; ++i)
-    {
-        if(strcmp(argv[i], "-snr") == 0 || strcmp(argv[i], "--snr") == 0)
-        {
-            if(i + 1 < argc)
-                snr = atof(argv[i+1]);
-        }
-        else if(strcmp(argv[i], "-method") == 0 || strcmp(argv[i], "--method") == 0)
-        {
-            if(i + 1 < argc)
-                method = QString::fromUtf8(argv[i+1]);
-        }
-        else if(strcmp(argv[i], "-stc") == 0 || strcmp(argv[i], "--stc") == 0)
-        {
-            if(i + 1 < argc)
-                t_sFileNameStc = QString::fromUtf8(argv[i+1]);
-        }
-    }
 
     double lambda2 = 1.0 / pow(snr, 2);
     qDebug() << "Start calculation with: SNR" << snr << "; Lambda" << lambda2 << "; Method" << method << "; stc:" << t_sFileNameStc;

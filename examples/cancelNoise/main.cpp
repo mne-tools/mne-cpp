@@ -89,7 +89,7 @@ int main(int argc, char *argv[])
     QCommandLineParser parser;
     parser.setApplicationDescription("Cancel Noise Example");
     parser.addHelpOption();
-    QCommandLineOption sampleFileOption("e", "Path to the evoked/average <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    QCommandLineOption sampleFileOption("ave", "Path to the evoked/average <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
     parser.addOption(sampleFileOption);
     parser.process(app);
 
