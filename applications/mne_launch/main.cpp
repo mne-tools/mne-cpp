@@ -37,9 +37,15 @@
 // INCLUDES
 //=============================================================================================================
 
+#include "application.h"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Qt INCLUDES
+//=============================================================================================================
+
 #include <QGuiApplication>
-#include <QQmlApplicationEngine>
-#include <QQmlContext>
 
 
 //*************************************************************************************************************
@@ -61,8 +67,21 @@ int main(int argc, char *argv[])
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QGuiApplication app(argc, argv);
 
-    QQmlApplicationEngine engine;
-    engine.load(QUrl(QLatin1String("qrc:/qml/main.qml")));
+    Application mne_launch;
+    mne_launch.init(argc, argv, app);
+    mne_launch.start();
 
-    return app.exec();
+    int return_code = 0;
+
+    try {
+        return_code = app.exec();
+    } catch ( ... ) {
+        // Catch all exceptions – dangerous!!!
+        // Respond (perhaps only partially) to the exception, then
+        // re-throw to pass the exception to some other handler
+        // ...
+        throw;
+    }
+
+    return return_code;
 }

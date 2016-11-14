@@ -60,7 +60,7 @@ Item {
     }
 
     // Close
-    MenuButton{
+    MenuButton {
         id: button_close
 
         imgSrc: "../resources/icon_close.svg"
@@ -87,9 +87,9 @@ Item {
         id: text_mne_scan
         color: "#ffffff"
         anchors.right: button_mne_scan.left
-        anchors.rightMargin: 5
-        anchors.bottom: button_mne_scan.bottom
-        anchors.bottomMargin: button_mne_scan.height/2 + 5
+        anchors.rightMargin: 10
+        anchors.top: button_mne_scan.top
+        anchors.topMargin: button_mne_scan.height/6
         text: qsTr("MNE Scan")
         font.bold: true
         font.family: "Arial"
@@ -125,9 +125,9 @@ Item {
         id: text_mne_browse
         color: "#ffffff"
         anchors.right: button_mne_browse.left
-        anchors.rightMargin: 5
-        anchors.bottom: button_mne_browse.bottom
-        anchors.bottomMargin: button_mne_browse.height/2 + 5
+        anchors.rightMargin: 10
+        anchors.top: button_mne_browse.top
+        anchors.topMargin: button_mne_browse.height/6
         text: qsTr("MNE Browse")
         font.bold: true
         font.family: "Arial"
@@ -147,10 +147,11 @@ Item {
         y_end: center_dot_browse.y_center
         anchors.fill: parent
     }
+
     // MNE Analyze
     ApplicationButton{
         id: button_mne_analyze
-        x: 828
+        x: 844
         y: 437
         imgSrcNormal: "../resources/icon_mne_analyze_white.png"
         imgSrcHover:  "../resources/icon_mne_analyze.png"
@@ -161,9 +162,9 @@ Item {
         id: text_mne_analyze
         color: "#ffffff"
         anchors.right: button_mne_analyze.left
-        anchors.rightMargin: 5
-        anchors.bottom: button_mne_analyze.bottom
-        anchors.bottomMargin: button_mne_analyze.height/2 + 5
+        anchors.rightMargin: 10
+        anchors.top: button_mne_analyze.top
+        anchors.topMargin: button_mne_analyze.height/6
         text: qsTr("MNE Analyze")
         font.bold: true
         font.family: "Arial"
@@ -172,7 +173,7 @@ Item {
     }
     CenterDot{
         id: center_dot_analyze
-        x: 577
+        x: 584
         y: 437
     }
     ConnectorLine {
@@ -191,7 +192,14 @@ Item {
         y: 20
     }
 
-
+    //Sample Data
+    SampleDataStatus {
+        id: sampleDataStatusLine
+        anchors.right: parent.right
+        anchors.rightMargin: 10
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 10
+    }
 
     states: [
         State {
