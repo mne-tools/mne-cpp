@@ -110,14 +110,6 @@ int main(int argc, char *argv[])
     parser.addOption(stcFileOption);
     parser.process(app);
 
-//  setno       - Data set number
-//  nave        - Number of averages (scales the noise covariance)
-//             If negative, the number of averages in the data will be
-//             used
-//  lambda2     - The regularization factor
-//  dSPM        - do dSPM?
-//  sLORETA     - do sLORETA?
-
     QFile t_fileEvoked(parser.value(sampleEvokedFileOption));
     QFile t_fileInv(parser.value(sampleInvFileOption));
 
