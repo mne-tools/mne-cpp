@@ -187,6 +187,16 @@
 /bin/mne_dipole_fit_new
 /bin/mne_sample_data_downloader
 /bin/test_codecov
+/bin/Material
+/bin/QtGraphicalEffects
+/bin/QtQuick.2
+/bin/Universal
+/bin/private
+/bin/scenegraph
+/bin/QtQuick
+/bin/qmltooling
+/bin/platforminputcontexts
+/bin/QtQml
 
 /applications/mne_scan/plugins/tmsi/*.dll
 
