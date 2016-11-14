@@ -48,7 +48,9 @@ CONFIG(debug, debug|release) {
 
 DESTDIR = $${MNE_BINARY_DIR}
 
-SOURCES += main.cpp
+SOURCES += main.cpp \
+    application.cpp \
+    mnelaunchcontrol.cpp
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
@@ -86,3 +88,7 @@ macx {
 
     #ToDo copy dependcies to app bundle
 }
+
+HEADERS += \
+    application.h \
+    mnelaunchcontrol.h

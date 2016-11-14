@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     MainPage.qml
+* @file     SampleDataStatus.qml
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     November, 2016
@@ -28,7 +28,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implements the QML MainPage code behind component.
+* @brief    Implements QML SampleDataStatus component.
 *
 */
 
@@ -38,60 +38,65 @@
 //=============================================================================================================
 
 import QtQuick 2.7
+import QtQuick.Controls 2.0
+import QtGraphicalEffects 1.0
 
-MainPageForm {
-    button_close.onClicked: {
-        Qt.quit();
-    }
+Item{
+    id: container
 
-    // MNE Scan
-    button_mne_scan.onClicked: {
-        launchControl.invokeScan();
-    }
+    property bool sampleDataAvailable: launchControl.sampleDataAvailable
 
-    button_mne_scan.onHoveredChanged: {
-        if ( button_mne_scan.hovered )
-            state = "SCAN"
+    onSampleDataAvailableChanged: {
+        if ( sampleDataAvailable )
+            state = "AVAILABLE";
         else
-            state = "DEFAULT"
+            state = "NOTAVAILABLE";
     }
 
-    // MNE Browse
-    button_mne_browse.onClicked: {
-        launchControl.invokeBrowse();
+    state: "NOTAVAILABLE"
+
+    width: 270
+    height: 24
+
+    Image {
+        id: statusImg
+        anchors.right: parent.right
+        anchors.verticalCenter: parent.verticalCenter
+        width: parent.height
+        height: parent.height
+        source: "../resources/cross-flat.png"
     }
 
-    button_mne_browse.onHoveredChanged: {
-        if ( button_mne_browse.hovered )
-            state = "BROWSE"
-        else
-            state = "DEFAULT"
-    }
-
-    // MNE Analyze
-    button_mne_analyze.onClicked: {
-        launchControl.invokeAnalyze();
-    }
-
-    button_mne_analyze.onHoveredChanged: {
-        if ( button_mne_analyze.hovered )
-            state = "ANALYZE"
-        else
-            state = "DEFAULT"
+    Text {
+        id: statusTxt
+        color: "#e6ffffff"
+        anchors.right: statusImg.left
+        anchors.rightMargin: 10
+        anchors.verticalCenter: parent.verticalCenter
+        text: qsTr("SampleData not set up")
+        font.family: "Arial"
+        font.pointSize: 12
     }
 
     states: [
         State {
-            name: "DEFAULT"
+            name: "NOTAVAILABLE"
+            PropertyChanges { target: statusImg; source: "../resources/cross-flat.png" }
+            PropertyChanges { target: statusTxt; text: qsTr("SampleData not set up") }
         },
         State {
-            name: "SCAN"
-        },
-        State {
-            name: "BROWSE"
-        },
-        State {
-            name: "ANALYZE"
+            name: "AVAILABLE"
+            PropertyChanges { target: statusImg; source: "../resources/checkmark-flat.png" }
+            PropertyChanges { target: statusTxt; text: qsTr("SampleData set up") }
         }
     ]
+
+//    transitions: [
+//        Transition {
+//            from: ""; to: "AVAILABLE"
+//            ColorAnimation {
+//                duration: 200
+//            }
+//        }
+//    ]
 }
