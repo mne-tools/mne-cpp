@@ -74,13 +74,4 @@ Item{
             PropertyChanges { target: logo; source: "../resources/MNE-CPP_Logo_red.png" }
         }
     ]
-
-//    transitions: [
-//        Transition {
-//            from: ""; to: "ACTIVE"
-//            ColorAnimation {
-//                duration: 200
-//            }
-//        }
-//    ]
 }
