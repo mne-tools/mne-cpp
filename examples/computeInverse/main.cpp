@@ -98,20 +98,20 @@ int main(int argc, char *argv[])
     QCommandLineParser parser;
     parser.setApplicationDescription("Compute Inverse Example");
     parser.addHelpOption();
-    QCommandLineOption sampleEvokedFileOption("ave", "Path to evoked <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
-    QCommandLineOption sampleInvFileOption("inv", "Path to inverse operator <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-meg-eeg-inv.fif");
+    QCommandLineOption evokedFileOption("ave", "Path to evoked <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    QCommandLineOption invFileOption("inv", "Path to inverse operator <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-meg-eeg-inv.fif");
     QCommandLineOption snrOption("snr", "The <snr> value used for computation.", "snr", "1.0");
     QCommandLineOption methodOption("method", "Inverse estimation <method>, i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM");
     QCommandLineOption stcFileOption("stc", "Path to <file> where stc is stored to.", "file", "");
-    parser.addOption(sampleEvokedFileOption);
-    parser.addOption(sampleInvFileOption);
+    parser.addOption(evokedFileOption);
+    parser.addOption(invFileOption);
     parser.addOption(snrOption);
     parser.addOption(methodOption);
     parser.addOption(stcFileOption);
     parser.process(app);
 
-    QFile t_fileEvoked(parser.value(sampleEvokedFileOption));
-    QFile t_fileInv(parser.value(sampleInvFileOption));
+    QFile t_fileEvoked(parser.value(evokedFileOption));
+    QFile t_fileInv(parser.value(invFileOption));
 
     float snr = parser.value(snrOption).toFloat();
     QString method(parser.value(methodOption));

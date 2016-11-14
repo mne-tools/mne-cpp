@@ -102,20 +102,20 @@ int main(int argc, char *argv[])
     QCommandLineParser parser;
     parser.setApplicationDescription("Compute Inverse Powell RAP-MUSIC Example");
     parser.addHelpOption();
-    QCommandLineOption sampleFwdFileOption("fwd", "Path to forward solution <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
-    QCommandLineOption sampleEvokedFileOption("ave", "Path to evoked <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
-    QCommandLineOption sampleSubjectDirectoryOption("subjDir", "Path to subject <directory>.", "directory", "./MNE-sample-data/subjects");
-    QCommandLineOption sampleSubjectOption("subj", "Selected <subject>.", "subject", "sample");
+    QCommandLineOption fwdFileOption("fwd", "Path to forward solution <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
+    QCommandLineOption evokedFileOption("ave", "Path to evoked <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    QCommandLineOption subjectDirectoryOption("subjDir", "Path to subject <directory>.", "directory", "./MNE-sample-data/subjects");
+    QCommandLineOption subjectOption("subj", "Selected <subject>.", "subject", "sample");
     QCommandLineOption stcFileOption("stc", "Path to <file> where stc is stored to.", "file", "");//"RapMusic.stc");
     QCommandLineOption numDipolePairsOption("numDip", "<number> of dipole pairs to localize.", "number", "7");
     QCommandLineOption doMovieOption("movie", "Create overlapping movie.");
     QCommandLineOption annotOption("annotType", "Annotation type <type>.", "type", "aparc.a2009s");
     QCommandLineOption surfOption("surfType", "Surface type <type>.", "type", "orig");
 
-    parser.addOption(sampleFwdFileOption);
-    parser.addOption(sampleEvokedFileOption);
-    parser.addOption(sampleSubjectDirectoryOption);
-    parser.addOption(sampleSubjectOption);
+    parser.addOption(fwdFileOption);
+    parser.addOption(evokedFileOption);
+    parser.addOption(subjectDirectoryOption);
+    parser.addOption(subjectOption);
     parser.addOption(stcFileOption);
     parser.addOption(numDipolePairsOption);
     parser.addOption(doMovieOption);
@@ -124,10 +124,10 @@ int main(int argc, char *argv[])
     parser.process(app);
 
     // Parse command line parameters
-    QFile t_fileFwd(parser.value(sampleFwdFileOption));
-    QFile t_fileEvoked(parser.value(sampleEvokedFileOption));
-    QString subject(parser.value(sampleSubjectOption));
-    QString subjectDir(parser.value(sampleSubjectDirectoryOption));
+    QFile t_fileFwd(parser.value(fwdFileOption));
+    QFile t_fileEvoked(parser.value(evokedFileOption));
+    QString subject(parser.value(subjectOption));
+    QString subjectDir(parser.value(subjectDirectoryOption));
     AnnotationSet t_annotationSet(subject, 2, parser.value(annotOption), subjectDir);
     SurfaceSet t_surfSet(subject, 2, parser.value(surfOption), subjectDir);
 
