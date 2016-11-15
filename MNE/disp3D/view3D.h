@@ -365,7 +365,7 @@ protected:
     QVector3D                           m_vecCameraRotationOld;         /**< The camera old rotation vector. */
 
     QList<QPropertyAnimation*>          m_lPropertyAnimations;          /**< The animations for each 3D object. */
-    QList<QPair<Qt3DRender::QPointLight*, Qt3DExtras::QPhongMaterial*> >     m_lLightSources;                /**< The light sources. */
+    QList<QPair<Qt3DRender::QDirectionalLight*, Qt3DExtras::QPhongMaterial*> >     m_lLightSources;                /**< The light sources. */
 };
 
 } // NAMESPACE

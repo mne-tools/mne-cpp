@@ -144,7 +144,7 @@ void View3D::initMetatypes()
 void View3D::init()
 {
     //Create the lights
-    //initLight();
+    initLight();
 
     // Camera
     m_pCameraEntity->lens()->setPerspectiveProjection(45.0f, 16.0f/9.0f, 0.0001f, 100000.0f);
@@ -182,43 +182,41 @@ void View3D::initLight()
     QColor lightColor(255,255,255);
     float lightIntensity = 0.1f;
 
-    lLightPositions << QVector3D(0,0,0.5)/* << QVector3D(0,0,-0.5) << QVector3D(0.5,0,0) << QVector3D(-0.5,0,0) << QVector3D(0,0.5,0) << QVector3D(0,-0.5,0)*/;
-    lLightDirections << QVector3D(0,0,-1)/* << QVector3D(0,0,1) << QVector3D(-1,0,0) << QVector3D(1,0,0) << QVector3D(0,-1,0) << QVector3D(0,1,0)*/;
+    lLightPositions << QVector3D(0.5,0.25,0)/* << QVector3D(0,0,-0.5) << QVector3D(0.5,0,0) << QVector3D(-0.5,0,0) << QVector3D(0,0.5,0) << QVector3D(0,-0.5,0)*/;
+    lLightDirections << QVector3D(-0.5,-0.25,0)/* << QVector3D(0,0,1) << QVector3D(-1,0,0) << QVector3D(1,0,0) << QVector3D(0,-1,0) << QVector3D(0,1,0)*/;
     lLightIntensities << lightIntensity/* << lightIntensity << lightIntensity << lightIntensity << lightIntensity << lightIntensity*/;
     lLightColor << lightColor/* << lightColor << lightColor << lightColor << lightColor << lightColor*/;
 
     //Create all the lights - make it shine
-    //if(lLightPositions.size() == lLightIntensities.size() == lLightColor.size()) {
-        for(int i = 0; i < lLightPositions.size(); ++i) {
-            //Light source
-            Qt3DCore::QEntity* enitityLight = new Qt3DCore::QEntity(m_pLightEntity);
-            Qt3DCore::QTransform* transform = new Qt3DCore::QTransform();
-            QMatrix4x4 m;
-            m.translate(lLightPositions.at(i));
-            transform->setMatrix(m);
+    for(int i = 0; i < lLightPositions.size(); ++i) {
+        //Light source
+        Qt3DCore::QEntity* enitityLight = new Qt3DCore::QEntity(m_pLightEntity);
+        Qt3DCore::QTransform* transform = new Qt3DCore::QTransform();
+        QMatrix4x4 m;
+        m.translate(lLightPositions.at(i));
+        transform->setMatrix(m);
 
-            enitityLight->addComponent(transform);
+        enitityLight->addComponent(transform);
 
-            Qt3DRender::QPointLight *light1 = new Qt3DRender::QPointLight(enitityLight);
-            light1->setColor(lLightColor.at(i));
-            //light1->setWorldDirection(lLightDirections.at(i));
-            light1->setIntensity(lLightIntensities.at(i));
-            enitityLight->addComponent(light1);
+        Qt3DRender::QDirectionalLight *light1 = new Qt3DRender::QDirectionalLight(enitityLight);
+        light1->setColor(lLightColor.at(i));
+        light1->setWorldDirection(lLightDirections.at(i));
+        light1->setIntensity(lLightIntensities.at(i));
+        enitityLight->addComponent(light1);
 
-            Qt3DExtras::QSphereMesh* lightSphere = new Qt3DExtras::QSphereMesh(enitityLight);
-            lightSphere->setRadius(0.1f);
-            enitityLight->addComponent(lightSphere);
+        Qt3DExtras::QSphereMesh* lightSphere = new Qt3DExtras::QSphereMesh(enitityLight);
+        lightSphere->setRadius(0.1f);
+        enitityLight->addComponent(lightSphere);
 
-            Qt3DExtras::QPhongMaterial* material = new Qt3DExtras::QPhongMaterial(enitityLight);
-            material->setAmbient(lLightColor.at(i));
-            enitityLight->addComponent(material);
+        Qt3DExtras::QPhongMaterial* material = new Qt3DExtras::QPhongMaterial(enitityLight);
+        material->setAmbient(lLightColor.at(i));
+        enitityLight->addComponent(material);
 
-            QPair<Qt3DRender::QPointLight*, Qt3DExtras::QPhongMaterial*> pair;
-            pair.first = light1;
-            pair.second = material;
-            m_lLightSources.append(pair);
-        }
-    //}
+        QPair<Qt3DRender::QDirectionalLight*, Qt3DExtras::QPhongMaterial*> pair;
+        pair.first = light1;
+        pair.second = material;
+        m_lLightSources.append(pair);
+    }
 }
 
 
