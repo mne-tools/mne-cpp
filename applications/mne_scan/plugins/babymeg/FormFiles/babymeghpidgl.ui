@@ -185,7 +185,7 @@
        </property>
        <layout class="QGridLayout" name="gridLayout">
         <item row="13" column="1">
-         <widget class="QLabel" name="label_13">
+         <widget class="QLabel" name="m_label_gofCoil2Description">
           <property name="text">
            <string>Coil 2</string>
           </property>
@@ -195,7 +195,7 @@
          </widget>
         </item>
         <item row="13" column="0">
-         <widget class="QLabel" name="label_12">
+         <widget class="QLabel" name="m_label_gofCoil1Description">
           <property name="text">
            <string>Coil 1</string>
           </property>
@@ -205,7 +205,7 @@
          </widget>
         </item>
         <item row="13" column="3">
-         <widget class="QLabel" name="label_15">
+         <widget class="QLabel" name="m_label_gofCoil4Description">
           <property name="text">
            <string>Coil 4</string>
           </property>
@@ -215,7 +215,7 @@
          </widget>
         </item>
         <item row="13" column="2">
-         <widget class="QLabel" name="label_14">
+         <widget class="QLabel" name="m_label_gofCoil3Description">
           <property name="text">
            <string>Coil 3</string>
           </property>
@@ -248,14 +248,14 @@
          </widget>
         </item>
         <item row="1" column="0">
-         <widget class="QLabel" name="label">
+         <widget class="QLabel" name="m_label_freqCoil1">
           <property name="text">
            <string>Coil 1:</string>
           </property>
          </widget>
         </item>
         <item row="1" column="2">
-         <widget class="QLabel" name="label_3">
+         <widget class="QLabel" name="m_label_freqCoil2">
           <property name="text">
            <string>Coil 2:</string>
           </property>
@@ -434,7 +434,7 @@
          </widget>
         </item>
         <item row="2" column="2">
-         <widget class="QLabel" name="label_4">
+         <widget class="QLabel" name="m_label_freqCoil4">
           <property name="text">
            <string>Coil 4:</string>
           </property>
@@ -471,7 +471,7 @@
          </widget>
         </item>
         <item row="2" column="0">
-         <widget class="QLabel" name="label_2">
+         <widget class="QLabel" name="m_label_freqCoil3">
           <property name="text">
            <string>Coil 3:</string>
           </property>
