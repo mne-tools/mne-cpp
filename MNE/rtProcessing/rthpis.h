@@ -2,14 +2,16 @@
 /**
 * @file     rthpis.h
 * @author   Chiran Doshi <chiran.doshi@childrens.harvard.edu>;
+*           Lorenz Esch <Lorenz.Esch@ntu-ilmenau.de>;
 *           Limin Sun <liminsun@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+*
 * @version  1.0
-* @date     March, 2015
+* @date     November, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2015, Chiran Doshi, Limin Sun, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Chiran Doshi, Lorenz Esch, Limin Sun, and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
