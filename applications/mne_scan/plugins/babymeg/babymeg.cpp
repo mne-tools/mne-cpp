@@ -490,11 +490,6 @@ void BabyMEG::performHPIFitting(const QVector<int>& vFreqs)
             }
 
             m_pHPIDlg->setDigitizerDataToView3D(t_digSet, vGof);
-        } else {
-            QMessageBox msgBox;
-            msgBox.setText("Please load a digitizer set with HPI coils first!");
-            msgBox.exec();
-            return;
         }
     }
 }

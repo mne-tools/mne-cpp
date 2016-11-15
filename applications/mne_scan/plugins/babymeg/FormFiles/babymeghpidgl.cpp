@@ -153,7 +153,14 @@ void BabyMEGHPIDgl::closeEvent(QCloseEvent *event)
 //*************************************************************************************************************
 
 void BabyMEGHPIDgl::onBtnDoSingleFit()
-{
+{    
+    if(!this->hpiLoaded()) {
+       QMessageBox msgBox;
+       msgBox.setText("Please load a digitizer set with at lesat 3 HPI coils first!");
+       msgBox.exec();
+       return;
+    }
+
     m_pBabyMEG->performHPIFitting(m_vCoilFreqs);
 
     if(m_pBabyMEG->m_pFiffInfo) {
@@ -262,6 +269,19 @@ QList<FiffDigPoint> BabyMEGHPIDgl::readPolhemusDig(QString fileName)
     ui->m_label_numberLoadedFiducials->setNum(numFiducials);
     ui->m_label_numberLoadedEEG->setNum(numEEG);
 
+    //Hdie show frequencies and errors based on the number of coils
+    if(numHPI == 3) {
+        ui->m_label_gofCoil4->hide();
+        ui->m_spinBox_freqCoil4->hide();
+        ui->m_label_freqCoil4->hide();
+        ui->m_spinBox_freqCoil4->hide();
+    } else {
+        ui->m_label_gofCoil4->show();
+        ui->m_spinBox_freqCoil4->show();
+        ui->m_label_freqCoil4->show();
+        ui->m_spinBox_freqCoil4->show();
+    }
+
     return lDigPoints;
 }
 
@@ -323,7 +343,7 @@ void BabyMEGHPIDgl::setDigitizerDataToView3D(const FiffDigPointSet& digPointSet,
 
 bool BabyMEGHPIDgl::hpiLoaded()
 {
-    if(ui->m_label_numberLoadedCoils->text().toInt() > 0) {
+    if(ui->m_label_numberLoadedCoils->text().toInt() >= 3) {
         return true;
     }
 
