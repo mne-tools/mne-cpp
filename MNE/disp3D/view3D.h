@@ -82,9 +82,19 @@ namespace Qt3DCore {
     class QTransform;
 }
 
+namespace Qt3DRender {
+    class QPointLight;
+    class QDirectionalLight;
+}
+
+namespace Qt3DExtras {
+    class QPhongMaterial;
+}
+
 namespace FIFFLIB{
     class FiffDigPointSet;
 }
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -274,6 +284,18 @@ public:
     */
     void showFullScreen(bool checked);
 
+    //=========================================================================================================
+    /**
+    * Change light color.
+    */
+    void setLightColor(QColor color);
+
+    //=========================================================================================================
+    /**
+    * Set light intensity.
+    */
+    void setLightIntensity(double value);
+
 protected:
     //=========================================================================================================
     /**
@@ -319,6 +341,8 @@ protected:
     void createCoordSystem(Qt3DCore::QEntity *parent);
 
     Qt3DCore::QEntity*                  m_pRootEntity;                  /**< The root/most top level entity buffer. */
+    Qt3DCore::QEntity*                  m_p3DObjectsEntity;             /**< The root/most top level entity buffer. */
+    Qt3DCore::QEntity*                  m_pLightEntity;                 /**< The root/most top level entity buffer. */
     Qt3DRender::QCamera*                m_pCameraEntity;                /**< The camera entity. */
 
     QSharedPointer<Qt3DCore::QEntity>   m_XAxisEntity;                  /**< The entity representing a torus in x direction. */
@@ -341,6 +365,7 @@ protected:
     QVector3D                           m_vecCameraRotationOld;         /**< The camera old rotation vector. */
 
     QList<QPropertyAnimation*>          m_lPropertyAnimations;          /**< The animations for each 3D object. */
+    QList<QPair<Qt3DRender::QPointLight*, Qt3DExtras::QPhongMaterial*> >     m_lLightSources;                /**< The light sources. */
 };
 
 } // NAMESPACE
