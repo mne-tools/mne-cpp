@@ -88,6 +88,8 @@
 
 using namespace RTPROCESSINGLIB;
 using namespace FIFFLIB;
+using namespace Eigen;
+using namespace IOBUFFER;
 
 
 //*************************************************************************************************************
@@ -482,7 +484,7 @@ RtHPIS::~RtHPIS()
 
 //*************************************************************************************************************
 
-void RtHPIS::singleHPIFit(const MatrixXd& t_mat, const QVector<int>& vFreqs, QVector<double>& vGof)
+void RtHPIS::singleHPIFit(const MatrixXd& t_mat, FiffCoordTrans& transDevHead, const QVector<int>& vFreqs, QVector<double>& vGof)
 {
     vGof.clear();
 
@@ -497,7 +499,7 @@ void RtHPIS::singleHPIFit(const MatrixXd& t_mat, const QVector<int>& vFreqs, QVe
     QList<FiffDigPoint> lHPIPoints;
 
     for(int i = 0; i < m_pFiffInfo->dig.size(); ++i) {
-        if(m_pFiffInfo->dig[i].kind = FIFFV_POINT_HPI) {
+        if(m_pFiffInfo->dig[i].kind == FIFFV_POINT_HPI) {
             numCoils++;
             lHPIPoints.append(m_pFiffInfo->dig[i]);
         }
@@ -505,6 +507,7 @@ void RtHPIS::singleHPIFit(const MatrixXd& t_mat, const QVector<int>& vFreqs, QVe
 
     //Set coil frequencies
     Eigen::VectorXd coilfreq(numCoils);
+    qDebug()<< "RtHPIS::singleHPIFit - numCoils:" << numCoils;
     qDebug()<< "RtHPIS::singleHPIFit - Coil frequencies:";
 
     if(vFreqs.size() >= numCoils) {
@@ -686,14 +689,17 @@ void RtHPIS::singleHPIFit(const MatrixXd& t_mat, const QVector<int>& vFreqs, QVe
 
     // Store the final result to fiff info
     // Set final device/head matrix and its inverse to the fiff info
+    transDevHead.from = 1;
+    transDevHead.to = 4;
+
     for(int r = 0; r < 4; ++r) {
         for(int c = 0; c < 4 ; ++c) {
-            m_pFiffInfo->dev_head_t.trans(r,c) = trans(r,c);
+            transDevHead.trans(r,c) = trans(r,c);
         }
     }
 
     // Also store the inverse
-    m_pFiffInfo->dev_head_t.invtrans = m_pFiffInfo->dev_head_t.trans.inverse();
+    transDevHead.invtrans = transDevHead.trans.inverse();
 
     qDebug() << "";
     qDebug() << "RtHPIS::singleHPIFit - Timing All" << timerAll.elapsed() << "milliseconds";

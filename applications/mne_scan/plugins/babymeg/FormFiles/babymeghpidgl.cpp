@@ -272,14 +272,20 @@ QList<FiffDigPoint> BabyMEGHPIDgl::readPolhemusDig(QString fileName)
     //Hdie show frequencies and errors based on the number of coils
     if(numHPI == 3) {
         ui->m_label_gofCoil4->hide();
-        ui->m_spinBox_freqCoil4->hide();
+        ui->m_label_gofCoil4Description->hide();
         ui->m_label_freqCoil4->hide();
         ui->m_spinBox_freqCoil4->hide();
+
+        m_vCoilFreqs.clear();
+        m_vCoilFreqs << 155 << 165 << 190;
     } else {
-        ui->m_label_gofCoil4->show();
-        ui->m_spinBox_freqCoil4->show();
+        ui->m_label_gofCoil4->show();        
+        ui->m_label_gofCoil4Description->show();
         ui->m_label_freqCoil4->show();
         ui->m_spinBox_freqCoil4->show();
+
+        m_vCoilFreqs.clear();
+        m_vCoilFreqs << 155 << 165 << 190 << 200;
     }
 
     return lDigPoints;
