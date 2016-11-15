@@ -467,7 +467,16 @@ void BabyMEG::performHPIFitting(const QVector<int>& vFreqs)
             //Perform actual fitting
             QVector<double> vGof;
             RtHPIS::SPtr pRtHpis = RtHPIS::SPtr(new RtHPIS(m_pFiffInfo));
-            pRtHpis->singleHPIFit(matProj * matComp * this->calibrate(m_matValue), vFreqs, vGof);
+            FiffCoordTrans transDevHead;
+            transDevHead.from = 1;
+            transDevHead.to = 4;
+
+            pRtHpis->singleHPIFit(matProj * matComp * this->calibrate(m_matValue), transDevHead, vFreqs, vGof);
+
+            //Set newly calculated transforamtion amtrix to fiff info
+            mutex.lock();
+            m_pFiffInfo->dev_head_t = transDevHead;
+            mutex.unlock();
 
             //Apply new dev/head matrix to current digitizer and update in 3D view in HPI control widget
             FiffDigPointSet t_digSet;

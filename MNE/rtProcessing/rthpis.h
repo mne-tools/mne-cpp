@@ -46,21 +46,15 @@
 
 #include "rtprocessing_global.h"
 
-//*************************************************************************************************************
-//=============================================================================================================
-// FIFF INCLUDES
-//=============================================================================================================
-
-#include <fiff/fiff_cov.h>
-#include <fiff/fiff_info.h>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Generics INCLUDES
-//=============================================================================================================
-
 #include <generics/circularmatrixbuffer.h>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
 
 
 //*************************************************************************************************************
@@ -75,10 +69,13 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Eigen INCLUDES
+// FORWARD DECLARATIONS
 //=============================================================================================================
 
-#include <Eigen/Core>
+namespace FIFFLIB{
+    class FiffInfo;
+    class FiffCoordTrans;
+}
 
 
 //*************************************************************************************************************
@@ -89,15 +86,6 @@
 namespace RTPROCESSINGLIB
 {
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace Eigen;
-using namespace IOBUFFER;
-using namespace FIFFLIB;
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -133,6 +121,7 @@ struct sens {
 class RTPROCESSINGSHARED_EXPORT RtHPIS : public QThread
 {
     Q_OBJECT
+
 public:
     typedef QSharedPointer<RtHPIS> SPtr;             /**< Shared pointer type for RtHPIS. */
     typedef QSharedPointer<const RtHPIS> ConstSPtr;  /**< Const shared pointer type for RtHPIS. */
@@ -145,7 +134,7 @@ public:
     * @param[in] p_pFiffInfo        Associated Fiff Information
     * @param[in] parent     Parent QObject (optional)
     */
-    explicit RtHPIS(FiffInfo::SPtr p_pFiffInfo, QObject *parent = 0);
+    explicit RtHPIS(QSharedPointer<FIFFLIB::FiffInfo> p_pFiffInfo, QObject *parent = 0);
 
     //=========================================================================================================
     /**
@@ -157,11 +146,12 @@ public:
     /**
     * Inits the rt HPI processing and performs one single fit.
     *
-    * @param[in] t_mat      Data to estimate the HPI positions from
-    * @param[in] vGof       The goodness of fit in mm for each fitted HPI coil.
-    * @param[in] vFreqs     The frequencies for each coil.
+    * @param[in] t_mat          Data to estimate the HPI positions from
+    * @param[out] transDevHead  The final dev head transformation matrix
+    * @param[out] vGof           The goodness of fit in mm for each fitted HPI coil.
+    * @param[in] vFreqs         The frequencies for each coil.
     */
-    void singleHPIFit(const MatrixXd& t_mat, const QVector<int>& vFreqs, QVector<double> &vGof);
+    void singleHPIFit(const Eigen::MatrixXd& t_mat, FIFFLIB::FiffCoordTrans &transDevHead, const QVector<int>& vFreqs, QVector<double> &vGof);
 
     //=========================================================================================================
     /**
@@ -169,7 +159,7 @@ public:
     *
     * @param[in] p_DataSegment  Data to estimate the HPI positions from
     */
-    void append(const MatrixXd &p_DataSegment);
+    void append(const Eigen::MatrixXd &p_DataSegment);
 
     //=========================================================================================================
     /**
@@ -227,20 +217,19 @@ protected:
     */
     virtual void run();
 
-    CircularMatrixBuffer<double>::SPtr m_pRawMatrixBuffer;      /**< The Circular Raw Matrix Buffer. */
+    IOBUFFER::CircularMatrixBuffer<double>::SPtr m_pRawMatrixBuffer;    /**< The Circular Raw Matrix Buffer. */
 
-    QMutex              mutex;                                  /**< Provides access serialization between threads*/
+    QMutex              mutex;                                          /**< Provides access serialization between threads*/
 
-    quint32             m_iMaxSamples;                          /**< Maximal amount of samples received, before covariance is estimated.*/
-    quint32             m_iNewMaxSamples;                       /**< New maximal amount of samples received, before covariance is estimated.*/
-
-    FiffInfo::SPtr      m_pFiffInfo;                            /**< Holds the fiff measurement information. */
-
-    bool                m_bIsRunning;                           /**< Holds if real-time Covariance estimation is running.*/
-
-    static std::vector <double>base_arr;
-
+    int                 m_iMaxSamples;                                  /**< Maximal amount of samples received, before covariance is estimated.*/
+    int                 m_iNewMaxSamples;                               /**< New maximal amount of samples received, before covariance is estimated.*/
     int                 m_iCounter;
+
+    bool                m_bIsRunning;                                   /**< Holds if real-time Covariance estimation is running.*/
+
+    static std::vector <double>         base_arr;
+    QSharedPointer<FIFFLIB::FiffInfo>   m_pFiffInfo;                    /**< Holds the fiff measurement information. */
+
     //QVector <float> m_fWin;
 
     //double m_Fs;
