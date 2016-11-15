@@ -141,6 +141,28 @@ int main(int argc, char *argv[])
 //    Surface tSurfLeft ("sample", 0, "orig", "./MNE-sample-data/subjects");
 //    Annotation tAnnotLeft ("sample", 0, "aparc.a2009s", "./MNE-sample-data/subjects");
 
+    //Write obj file
+    QString filename = "brain.obj";
+    QFile file(filename);
+    if (file.open(QIODevice::ReadWrite)) {
+        QTextStream stream(&file);
+
+        for(int i = 0; i < tSurfSet[0].rr().rows(); ++i) {
+            stream << "v " << 100*tSurfSet[0].rr()(i,0)<< " " << 100*tSurfSet[0].rr()(i,1)<< " " << 100*tSurfSet[0].rr()(i,2) << endl;
+        }
+
+//        for(int i = 0; i < tSurfSet[0].nn().rows(); ++i) {
+//            stream << "vn " << tSurfSet[0].nn()(i,0)<< " " << tSurfSet[0].nn()(i,1)<< " " << tSurfSet[0].nn()(i,2) << endl;
+//        }
+
+        for(int i = 0; i < tSurfSet[0].tris().rows(); ++i) {
+            stream << "f " << tSurfSet[0].tris()(i,0)<< " " << tSurfSet[0].tris()(i,1)<< " "  << tSurfSet[0].tris()(i,2)<< endl;
+        }
+    }
+
+
+
+
     QFile t_fileFwd(parser.value(sampleFwdOption));
     MNEForwardSolution t_Fwd(t_fileFwd);
     MNEForwardSolution t_clusteredFwd;

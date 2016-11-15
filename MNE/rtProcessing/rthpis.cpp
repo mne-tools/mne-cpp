@@ -2,15 +2,16 @@
 /**
 * @file     rthpis.cpp
 * @author   Chiran Doshi <chiran.doshi@childrens.harvard.edu>;
+*           Lorenz Esch <Lorenz.Esch@ntu-ilmenau.de>;
 *           Limin Sun <liminsun@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 *
 * @version  1.0
-* @date     March, 2015
+* @date     November, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2015, Chiran Doshi, Limin Sun, and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Chiran Doshi, Lorenz Esch, Limin Sun, and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -484,15 +485,26 @@ RtHPIS::~RtHPIS()
 void RtHPIS::singleHPIFit(const MatrixXd& t_mat, const QVector<int>& vFreqs, QVector<double>& vGof)
 {
     vGof.clear();
+
     struct sens sensors;
     struct coilParam coil;
-    int numCoils = 3;
     int numCh = m_pFiffInfo->nchan;
     int samF = m_pFiffInfo->sfreq;
     int samLoc = t_mat.cols(); // minimum samples required to localize numLoc times in a second
-    Eigen::VectorXd coilfreq(numCoils);
+
+    //Get HPI coils from digitizers and set number of coils
+    int numCoils = 0;
+    QList<FiffDigPoint> lHPIPoints;
+
+    for(int i = 0; i < m_pFiffInfo->dig.size(); ++i) {
+        if(m_pFiffInfo->dig[i].kind = FIFFV_POINT_HPI) {
+            numCoils++;
+            lHPIPoints.append(m_pFiffInfo->dig[i]);
+        }
+    }
 
     //Set coil frequencies
+    Eigen::VectorXd coilfreq(numCoils);
     qDebug()<< "RtHPIS::singleHPIFit - Coil frequencies:";
 
     if(vFreqs.size() >= numCoils) {
@@ -530,15 +542,17 @@ void RtHPIS::singleHPIFit(const MatrixXd& t_mat, const QVector<int>& vFreqs, QVe
     Eigen::MatrixXd headHPI(numCoils,3);
 
     // check the m_pFiffInfo->dig information. If dig is empty, set the headHPI is 0;
-    if (m_pFiffInfo->dig.size() > 0) {
-        for (int i = 0; i < numCoils; i++) {
-            headHPI(i,0) = m_pFiffInfo->dig.at(i+3).r[0];
-            headHPI(i,1) = m_pFiffInfo->dig.at(i+3).r[1];
-            headHPI(i,2) = m_pFiffInfo->dig.at(i+3).r[2];
+    if (lHPIPoints.size() > 0) {
+        for (int i = 0; i < lHPIPoints.size(); ++i) {
+            headHPI(i,0) = lHPIPoints.at(i).r[0];
+            headHPI(i,1) = lHPIPoints.at(i).r[1];
+            headHPI(i,2) = lHPIPoints.at(i).r[2];
         }
     } else {
-        for (int i=0;i<numCoils;i++) {
-            headHPI(i,0) = 0;headHPI(i,1) = 0;headHPI(i,2) = 0;
+        for (int i = 0; i < numCoils; ++i) {
+            headHPI(i,0) = 0;
+            headHPI(i,1) = 0;
+            headHPI(i,2) = 0;
         }
 
         qDebug() << "\n \n \n";
