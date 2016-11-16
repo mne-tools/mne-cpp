@@ -106,7 +106,7 @@ int main(int argc, char *argv[])
     QCommandLineOption evokedFileOption("ave", "Path to evoked <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
     QCommandLineOption subjectDirectoryOption("subjDir", "Path to subject <directory>.", "directory", "./MNE-sample-data/subjects");
     QCommandLineOption subjectOption("subj", "Selected <subject>.", "subject", "sample");
-    QCommandLineOption stcFileOption("stc", "Path to <file> where stc is stored to.", "file", "");//"RapMusic.stc");
+    QCommandLineOption stcFileOption("stcOut", "Path to stc <file>, which is to be written.", "file", "");//"RapMusic.stc");
     QCommandLineOption numDipolePairsOption("numDip", "<number> of dipole pairs to localize.", "number", "7");
     QCommandLineOption doMovieOption("movie", "Create overlapping movie.");
     QCommandLineOption annotOption("annotType", "Annotation type <type>.", "type", "aparc.a2009s");

@@ -55,6 +55,7 @@
 //=============================================================================================================
 
 #include <QtCore/QCoreApplication>
+#include <QCommandLineParser>
 
 
 //*************************************************************************************************************
@@ -84,8 +85,18 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
+    // Command Line Parser
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Start findEvoked tutorial");
+    parser.addHelpOption();
+    QCommandLineOption evokedFileOption("ave", "Path to the evoked/average <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+
+    parser.addOption(evokedFileOption);
+
+    parser.process(a);
+
     //generate FiffEvokedSet
-    QFile t_sampleFile("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    QFile t_sampleFile(parser.value(evokedFileOption));
     FiffEvokedSet p_FiffEvokedSet(t_sampleFile);
 
     //run find_evoked function

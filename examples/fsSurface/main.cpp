@@ -51,6 +51,7 @@
 //=============================================================================================================
 
 #include <QApplication>
+#include <QCommandLineParser>
 
 
 //*************************************************************************************************************
@@ -80,52 +81,50 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    QStringList args = QCoreApplication::arguments();
-    int w_pos = args.indexOf("-width");
-    int h_pos = args.indexOf("-height");
-    int w, h;
-    if (w_pos >= 0 && h_pos >= 0)
-    {
-        bool ok = true;
-        w = args.at(w_pos + 1).toInt(&ok);
-        if (!ok)
-        {
-            qWarning() << "Could not parse width argument:" << args;
-            return 1;
-        }
-        h = args.at(h_pos + 1).toInt(&ok);
-        if (!ok)
-        {
-            qWarning() << "Could not parse height argument:" << args;
-            return 1;
-        }
-    }
+    // Command Line Parser
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Start fsSurface tutorial");
+    parser.addHelpOption();
+
+    QCommandLineOption hemiOption("hemi", "Selected hemisphere <hemi>.", "hemi", "2");
+    QCommandLineOption subjectOption("subject", "Selected subject <subject>.", "subject", "sample");
+    QCommandLineOption subjectPathOption("subjectPath", "Selected subject path <subjectPath>.", "subjectPath", "./MNE-sample-data/subjects");
+
+    parser.addOption(hemiOption);
+    parser.addOption(subjectOption);
+    parser.addOption(subjectPathOption);
+
+    parser.process(a);
+
+    int hemi = parser.value(hemiOption).toInt();
+    QString subject = parser.value(subjectOption);
+    QString subjectPath = parser.value(subjectPathOption);
 
     //
     // pial
     //
-    SurfaceSet tSurfSetPial ("sample", 2, "pial", "./MNE-sample-data/subjects");
+    SurfaceSet tSurfSetPial (subject, hemi, "pial", subjectPath);
 
     View3D::SPtr t_BrainView = View3D::SPtr(new View3D());
-    t_BrainView->addSurfaceSet("Subject01", "pial", tSurfSetPial);
+    t_BrainView->addSurfaceSet(subject, "pial", tSurfSetPial);
 
     //
     // inflated
     //
-    SurfaceSet tSurfSetInflated ("sample", 2, "inflated", "./MNE-sample-data/subjects");  
-    t_BrainView->addSurfaceSet("Subject01", "inflated", tSurfSetInflated);
+    SurfaceSet tSurfSetInflated (subject, hemi, "inflated", subjectPath);
+    t_BrainView->addSurfaceSet(subject, "inflated", tSurfSetInflated);
 
     //
     // orig
     //
-    SurfaceSet tSurfSetOrig ("sample", 2, "orig", "./MNE-sample-data/subjects");
-    t_BrainView->addSurfaceSet("Subject01", "orig", tSurfSetOrig);
+    SurfaceSet tSurfSetOrig (subject, hemi, "orig", subjectPath);
+    t_BrainView->addSurfaceSet(subject, "orig", tSurfSetOrig);
 
     //
     // white
     //
-    SurfaceSet tSurfSetWhite ("sample", 2, "white", "./MNE-sample-data/subjects");
-    t_BrainView->addSurfaceSet("Subject01", "white", tSurfSetWhite);
+    SurfaceSet tSurfSetWhite (subject, hemi, "white", subjectPath);
+    t_BrainView->addSurfaceSet(subject, "white", tSurfSetWhite);
 
     t_BrainView->show();
 

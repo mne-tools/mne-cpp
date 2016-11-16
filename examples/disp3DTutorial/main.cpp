@@ -116,7 +116,7 @@ int main(int argc, char *argv[])
     QCommandLineOption subjectPathOption("subjectPath", "Selected subject path <subjectPath>.", "subjectPath", "./MNE-sample-data/subjects");
     QCommandLineOption sourceLocOption("doSourceLoc", "Do real time source localization <doSourceLoc>.", "doSourceLoc", "true");
     QCommandLineOption fwdOption("fwd", "Path to forwad solution <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
-    QCommandLineOption invOpOption("invOp", "Path to inverse operator <file>.", "file", "");
+    QCommandLineOption invOpOption("inv", "Path to inverse operator <file>.", "file", "");
     QCommandLineOption clustOption("doClust", "Path to clustered inverse operator <doClust>.", "doClust", "true");
     QCommandLineOption covFileOption("cov", "Path to the covariance <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
     QCommandLineOption evokedFileOption("ave", "Path to the evoked/average <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");

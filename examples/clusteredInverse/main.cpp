@@ -106,8 +106,8 @@ int main(int argc, char *argv[])
     QCommandLineOption evokedFileOption("ave", "Path to the evoked/average <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
     QCommandLineOption snrOption("snr", "The <snr> value used for computation.", "snr", "1.0");//3.0f;//0.1f;//3.0f;
     QCommandLineOption methodOption("method", "Inverse estimation <method>, i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM");//"MNE" | "dSPM" | "sLORETA"
-    QCommandLineOption invFileOption("inv", "Path to inverse <file>, which is to be written.", "file", "");
-    QCommandLineOption stcFileOption("stc", "Path to stc <file>, which is to be written.", "file", "");
+    QCommandLineOption invFileOption("invOut", "Path to inverse <file>, which is to be written.", "file", "");
+    QCommandLineOption stcFileOption("stcOut", "Path to stc <file>, which is to be written.", "file", "");
     parser.addOption(fwdFileOption);
     parser.addOption(covFileOption);
     parser.addOption(evokedFileOption);
