@@ -6,5 +6,7 @@
         <file>materials/shaders/gl3/pervertexphongalpha.vert</file>
         <file>materials/shaders/gl3/light.inc.frag</file>
         <file>materials/shaders/gl3/pervertexphongalpha.geom</file>
+        <file>materials/shaders/gl3/triangles.tcs</file>
+        <file>materials/shaders/gl3/triangles.tes</file>
     </qresource>
 </RCC>
