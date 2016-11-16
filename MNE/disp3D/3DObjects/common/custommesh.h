@@ -50,6 +50,7 @@
 //=============================================================================================================
 
 #include <Qt3DRender/QGeometryRenderer>
+#include <QPointer>
 
 
 //*************************************************************************************************************
@@ -175,10 +176,10 @@ protected:
                           const QByteArray& tArrayColors,
                           Qt3DRender::QGeometryRenderer::PrimitiveType primitiveType);
 
-    Qt3DRender::QBuffer*    m_pVertexDataBuffer;    /**< The vertex buffer. */
-    Qt3DRender::QBuffer*    m_pNormalDataBuffer;    /**< The normal buffer. */
-    Qt3DRender::QBuffer*    m_pColorDataBuffer;     /**< The color buffer. */
-    Qt3DRender::QBuffer*    m_pIndexDataBuffer;     /**< The index buffer. */
+    QPointer<Qt3DRender::QBuffer>    m_pVertexDataBuffer;    /**< The vertex buffer. */
+    QPointer<Qt3DRender::QBuffer>    m_pNormalDataBuffer;    /**< The normal buffer. */
+    QPointer<Qt3DRender::QBuffer>    m_pColorDataBuffer;     /**< The color buffer. */
+    QPointer<Qt3DRender::QBuffer>    m_pIndexDataBuffer;     /**< The index buffer. */
 
 //    QSharedPointer<Qt3DRender::QBuffer>    m_pVertexDataBuffer;    /**< The vertex buffer. */
 //    QSharedPointer<Qt3DRender::QBuffer>    m_pNormalDataBuffer;    /**< The normal buffer. */
