@@ -598,7 +598,7 @@ bool RtAve::checkForArtifact(MatrixXd& data)
             }
         }
 
-        qDebug() << "RtAve::checkForArtifact - lchData.size()" << lchData.size();
+        //qDebug() << "RtAve::checkForArtifact - lchData.size()" << lchData.size();
 
         if(m_bActivateVariance) {
             //Start the concurrent processing
