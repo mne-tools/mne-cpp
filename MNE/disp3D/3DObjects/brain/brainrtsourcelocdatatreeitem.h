@@ -52,6 +52,8 @@
 // Qt INCLUDES
 //=============================================================================================================
 
+#include <QPointer>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -292,9 +294,9 @@ private:
     */
     void onNumberAveragesChanged(int iNumAvr);
 
-    bool                        m_bIsInit;                      /**< The init flag. */
+    bool                                m_bIsInit;                      /**< The init flag. */
 
-    RtSourceLocDataWorker*      m_pSourceLocRtDataWorker;       /**< The source data worker. This worker streams the rt data to this item.*/
+    QPointer<RtSourceLocDataWorker>     m_pSourceLocRtDataWorker;       /**< The source data worker. This worker streams the rt data to this item.*/
 
 signals:
     //=========================================================================================================

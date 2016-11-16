@@ -53,6 +53,7 @@
 //=============================================================================================================
 
 #include <QStandardItemModel>
+#include <QPointer>
 
 
 //*************************************************************************************************************
@@ -232,8 +233,8 @@ public:
     bool addData(const QString& subject, const QString& set, const FIFFLIB::FiffDigPointSet &tDigitizer);
 
 protected:
-    QStandardItem*          m_pRootItem;            /**< The root item of the tree model. */
-    Qt3DCore::QEntity*      m_pParentEntity;        /**< The parent 3D entity. */
+    QStandardItem*                   m_pRootItem;            /**< The root item of the tree model. */
+    QPointer<Qt3DCore::QEntity>      m_pParentEntity;        /**< The parent 3D entity. */
 };
 
 } // NAMESPACE

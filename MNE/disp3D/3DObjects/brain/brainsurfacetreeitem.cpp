@@ -102,10 +102,6 @@ BrainSurfaceTreeItem::BrainSurfaceTreeItem(int iType, const QString& text)
 
 BrainSurfaceTreeItem::~BrainSurfaceTreeItem()
 {
-    setVisible(false);
-
-    delete m_pRenderable3DEntity;
-    delete m_pRenderable3DEntityActivationOverlay;
 }
 
 

@@ -54,6 +54,8 @@
 // Qt INCLUDES
 //=============================================================================================================
 
+#include <QPointer>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -200,10 +202,10 @@ private:
 
     MetaTreeItem*                               m_pItemNetworkThreshold;        /**< The item to access the threshold values. */
 
-    Qt3DCore::QEntity*                          m_pParentEntity;                /**< The parent 3D entity. */
-    Renderable3DEntity*                         m_pRenderable3DEntity;          /**< The renderable 3D entity. */
+    QPointer<Qt3DCore::QEntity>                 m_pParentEntity;                /**< The parent 3D entity. */
+    QPointer<Renderable3DEntity>                m_pRenderable3DEntity;          /**< The renderable 3D entity. */
 
-    QList<Renderable3DEntity*>                  m_lNodes;                       /**< The currently displayed node points as 3D spheres. */
+    QList<QPointer<Renderable3DEntity> >        m_lNodes;                       /**< The currently displayed node points as 3D spheres. */
 
 signals:
 

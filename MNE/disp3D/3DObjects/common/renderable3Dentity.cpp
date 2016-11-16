@@ -128,13 +128,6 @@ Renderable3DEntity::Renderable3DEntity(const MatrixX3f& tMatVert, const MatrixX3
 
 Renderable3DEntity::~Renderable3DEntity()
 {
-    QVector<QComponent*> list = this->components();
-
-    for(int i = 0; i < list.size() ; ++i) {
-        this->removeComponent(list[i]);
-        delete list[i];
-    }
-
 //    this->removeComponent(m_pCustomMesh);
 //    this->removeComponent(m_pTransform);
 //    this->removeComponent(m_pMaterial);

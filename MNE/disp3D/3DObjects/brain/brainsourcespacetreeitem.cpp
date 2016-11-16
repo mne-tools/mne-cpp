@@ -105,14 +105,6 @@ BrainSourceSpaceTreeItem::BrainSourceSpaceTreeItem(int iType, const QString& tex
 
 BrainSourceSpaceTreeItem::~BrainSourceSpaceTreeItem()
 {
-    setVisible(false);
-    delete m_pRenderable3DEntity;
-
-    for(int i = 0; i < m_lSpheres.size(); ++i) {
-        delete m_lSpheres[i];
-    }
-
-    m_lSpheres.clear();
 }
 
 
