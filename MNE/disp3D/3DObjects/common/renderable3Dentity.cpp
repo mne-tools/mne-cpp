@@ -128,13 +128,6 @@ Renderable3DEntity::Renderable3DEntity(const MatrixX3f& tMatVert, const MatrixX3
 
 Renderable3DEntity::~Renderable3DEntity()
 {
-//    this->removeComponent(m_pCustomMesh);
-//    this->removeComponent(m_pTransform);
-//    this->removeComponent(m_pMaterial);
-
-//    delete m_pCustomMesh;
-//    delete m_pTransform;
-//    delete m_pMaterial;
 }
 
 

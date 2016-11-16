@@ -316,7 +316,7 @@ void Control3DWidget::onAlwaysOnTop(bool state)
 
 //*************************************************************************************************************
 
-void Control3DWidget::onSceneColorChanged(QColor color)
+void Control3DWidget::onSceneColorChanged(const QColor& color)
 {
     emit sceneColorChanged(color);
 }
@@ -367,7 +367,7 @@ void Control3DWidget::onLightColorPicker()
 
 //*************************************************************************************************************
 
-void Control3DWidget::onLightColorChanged(QColor color)
+void Control3DWidget::onLightColorChanged(const QColor &color)
 {
     emit lightColorChanged(color);
 }

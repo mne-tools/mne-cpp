@@ -161,6 +161,7 @@ protected:
     //=========================================================================================================
     /**
     * @brief customContextMenuRequested
+    *
     * @param[in] pos    The position, where the right-click occurred
     */
     void onCustomContextMenuRequested(QPoint pos);
@@ -168,24 +169,33 @@ protected:
     //=========================================================================================================
     /**
     * Slot called when the user wants to change the always on top window flag.
+    *
+    * @param[in] state      The newly picked on top state.
     */
     void onAlwaysOnTop(bool state);
 
     //=========================================================================================================
     /**
     * Slot called when the user wants change the color of the scene.
+    *
+    * @param[in] color      The newly picked scene color.
+    *
     */
-    void onSceneColorChanged(QColor color);
+    void onSceneColorChanged(const QColor& color);
 
     //=========================================================================================================
     /**
     * Slot called when the user wants to show the view in full screen.
+    *
+    * @param[in] checked      The newly picked full screen state.
     */
     void onShowFullScreen(bool checked);
 
     //=========================================================================================================
     /**
     * Slot called when the user wants to rotate the models.
+    *
+    * @param[in] checked      The newly picked rotation state.
     */
     void onRotationClicked(bool checked);
 
@@ -204,12 +214,16 @@ protected:
     //=========================================================================================================
     /**
     * Slot called when the user wants change the color of the lights.
+    *
+    * @param[in] color      The newly picked light color.
     */
-    void onLightColorChanged(QColor color);
+    void onLightColorChanged(const QColor& color);
 
     //=========================================================================================================
     /**
     * Slot called when the user wants to change the light intensity.
+    *
+    * @param[in] value      The newly picked light intensity value.
     */
     void onLightIntensityChanged(double value);
 
