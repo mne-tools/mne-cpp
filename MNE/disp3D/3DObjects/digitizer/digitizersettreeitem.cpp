@@ -103,7 +103,6 @@ DigitizerSetTreeItem::DigitizerSetTreeItem(int iType, const QString& text)
 
 DigitizerSetTreeItem::~DigitizerSetTreeItem()
 {
-    delete m_pRenderable3DEntity;
 }
 
 

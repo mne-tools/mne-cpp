@@ -50,6 +50,8 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QPointer>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -145,8 +147,8 @@ private:
     */
     virtual void onCheckStateChanged(const Qt::CheckState& checkState);
 
-    Qt3DCore::QEntity*      m_pParentEntity;                            /**< The parent 3D entity. */
-    Renderable3DEntity*     m_pRenderable3DEntity;                      /**< The renderable 3D entity. */
+    QPointer<Qt3DCore::QEntity>      m_pParentEntity;                            /**< The parent 3D entity. */
+    QPointer<Renderable3DEntity>     m_pRenderable3DEntity;                      /**< The renderable 3D entity. */
 };
 
 } // NAMESPACE DISP3DLIB

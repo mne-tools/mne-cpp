@@ -53,6 +53,7 @@
 
 #include <Qt3DCore/QEntity>
 #include <QVector3D>
+#include <QPointer>
 
 
 //*************************************************************************************************************
@@ -254,9 +255,9 @@ public:
     void setPosition(QVector3D position);
 
 protected: 
-    CustomMesh*                                 m_pCustomMesh;           /**< The actual mesh information (vertices, normals, colors). */
-    Qt3DCore::QTransform*                       m_pTransform;            /**< The main transformation. */
-    Qt3DRender::QMaterial*                      m_pMaterial;             /**< The material to be used for this entity. */
+    QPointer<CustomMesh>                        m_pCustomMesh;           /**< The actual mesh information (vertices, normals, colors). */
+    QPointer<Qt3DCore::QTransform>              m_pTransform;            /**< The main transformation. */
+    QPointer<Qt3DRender::QMaterial>             m_pMaterial;             /**< The material to be used for this entity. */
 
     float                                       m_fRotX;                 /**< The x axis rotation value. */
     float                                       m_fRotY;                 /**< The y axis rotation value. */

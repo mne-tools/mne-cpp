@@ -109,16 +109,6 @@ BrainRTConnectivityDataTreeItem::BrainRTConnectivityDataTreeItem(int iType, cons
 
 BrainRTConnectivityDataTreeItem::~BrainRTConnectivityDataTreeItem()
 {
-    setVisible(false);
-
-    delete m_pRenderable3DEntity;
-    delete m_pItemNetworkThreshold;
-
-    for(int i = 0; i < m_lNodes.size(); ++i) {
-        delete m_lNodes[i];
-    }
-
-    m_lNodes.clear();
 }
 
 
