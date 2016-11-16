@@ -102,7 +102,7 @@ int main(int argc, char *argv[])
     QCommandLineOption invFileOption("inv", "Path to inverse operator <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-meg-eeg-inv.fif");
     QCommandLineOption snrOption("snr", "The <snr> value used for computation.", "snr", "1.0");
     QCommandLineOption methodOption("method", "Inverse estimation <method>, i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM");
-    QCommandLineOption stcFileOption("stc", "Path to <file> where stc is stored to.", "file", "");
+    QCommandLineOption stcFileOption("stcOut", "Path to stc <file>, which is to be written.", "file", "");
     parser.addOption(evokedFileOption);
     parser.addOption(invFileOption);
     parser.addOption(snrOption);
