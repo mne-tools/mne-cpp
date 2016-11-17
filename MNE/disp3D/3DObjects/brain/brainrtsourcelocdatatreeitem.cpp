@@ -87,7 +87,10 @@ BrainRTSourceLocDataTreeItem::BrainRTSourceLocDataTreeItem(int iType, const QStr
 , m_bIsInit(false)
 , m_pSourceLocRtDataWorker(new RtSourceLocDataWorker(this))
 {
-    connect(m_pSourceLocRtDataWorker, &RtSourceLocDataWorker::newRtData,
+//    connect(m_pSourceLocRtDataWorker, &RtSourceLocDataWorker::newRtData,
+//            this, &BrainRTSourceLocDataTreeItem::onNewRtData);
+
+    connect(m_pSourceLocRtDataWorker, static_cast<void (RtSourceLocDataWorker::*)(const QPair<QByteArray, QByteArray>&)>(&RtSourceLocDataWorker::newRtData),
             this, &BrainRTSourceLocDataTreeItem::onNewRtData);
 
     this->setEditable(false);
