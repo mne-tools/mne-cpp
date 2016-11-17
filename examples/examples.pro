@@ -61,7 +61,6 @@ SUBDIRS += \
             clusteredInverse \
             rawClusteredInverse \
             readFwdDisp3D \
-            plotSurfaces \
             computeInverseRapMusic \
             rawClusteredInverseRapMusic \
             computeInversePwlRapMusic \
