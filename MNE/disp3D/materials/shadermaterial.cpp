@@ -127,28 +127,35 @@ ShaderMaterial::~ShaderMaterial()
 
 void ShaderMaterial::init()
 {
+    //Set shaders
     //m_pVertexGL3Shader->setVertexShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/materials/shaders/gl3/brain.vert"))));
     //m_pVertexGL3Shader->setFragmentShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/materials/shaders/gl3/brain.frag"))));
 
     m_pVertexGL3Shader->setVertexShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/materials/shaders/gl3/pervertexphongalpha.vert"))));
-    m_pVertexGL3Shader->setFragmentShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/materials/shaders/gl3/pervertexphongalpha.frag"))));
-    //m_pVertexGL3Shader->setGeometryShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/materials/shaders/gl3/pervertexphongalpha.geom"))));
 
+    m_pVertexGL3Shader->setTessellationControlShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/materials/shaders/gl3/triangles.tcs"))));
+    m_pVertexGL3Shader->setTessellationEvaluationShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/materials/shaders/gl3/triangles.tes"))));
+
+    m_pVertexGL3Shader->setGeometryShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/materials/shaders/gl3/pervertexphongalpha.geom"))));
+
+    m_pVertexGL3Shader->setFragmentShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/materials/shaders/gl3/pervertexphongalpha.frag"))));
+
+    //Set OpenGL version
     m_pVertexGL3Technique->graphicsApiFilter()->setApi(QGraphicsApiFilter::OpenGL);
-    m_pVertexGL3Technique->graphicsApiFilter()->setMajorVersion(3);
-    m_pVertexGL3Technique->graphicsApiFilter()->setMinorVersion(1);
+    m_pVertexGL3Technique->graphicsApiFilter()->setMajorVersion(4);
+    m_pVertexGL3Technique->graphicsApiFilter()->setMinorVersion(0);
     m_pVertexGL3Technique->graphicsApiFilter()->setProfile(QGraphicsApiFilter::CoreProfile);
 
     m_pVertexGL3RenderPass->setShaderProgram(m_pVertexGL3Shader);
 
-    //Setup transparency
-    m_pBlendState->setSourceRgb(QBlendEquationArguments::SourceAlpha);
-    m_pBlendState->setDestinationRgb(QBlendEquationArguments::OneMinusSourceAlpha);
-    m_pBlendEquation->setBlendFunction(QBlendEquation::Add);
+//    //Setup transparency
+//    m_pBlendState->setSourceRgb(QBlendEquationArguments::SourceAlpha);
+//    m_pBlendState->setDestinationRgb(QBlendEquationArguments::OneMinusSourceAlpha);
+//    m_pBlendEquation->setBlendFunction(QBlendEquation::Add);
 
-    m_pVertexGL3RenderPass->addRenderState(m_pBlendEquation);
-    m_pVertexGL3RenderPass->addRenderState(m_pNoDepthMask);
-    m_pVertexGL3RenderPass->addRenderState(m_pBlendState);
+//    m_pVertexGL3RenderPass->addRenderState(m_pBlendEquation);
+//    m_pVertexGL3RenderPass->addRenderState(m_pNoDepthMask);
+//    m_pVertexGL3RenderPass->addRenderState(m_pBlendState);
 
     m_pFilterKey->setName(QStringLiteral("renderingStyle"));
     m_pFilterKey->setValue(QStringLiteral("forward"));

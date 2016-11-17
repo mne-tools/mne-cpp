@@ -2,18 +2,21 @@
 
 layout( vertices = 3 ) out;
 
+in vec3 vPosition[];
+out vec3 tcPosition[];
+
 uniform float inner[2] = float[]( 1.0, 1.0 );
 uniform float outer[4] = float[]( 1.0, 1.0, 1.0, 1.0 );
 
 void main()
 {
 	// Pass along the vertex position unmodified
-    gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;
+    tcPosition[gl_InvocationID] = tcPosition[gl_InvocationID];
 
     // Set the tessellation levels from the uniforms
-    gl_TessLevelOuter[0] = outer[0];
+    gl_TessLevelInner[0] = inner[0];	
+	
+	gl_TessLevelOuter[0] = outer[0];
     gl_TessLevelOuter[1] = outer[1];
     gl_TessLevelOuter[2] = outer[2];
-
-    gl_TessLevelInner[0] = inner[0];
 }

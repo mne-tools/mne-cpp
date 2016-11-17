@@ -1,10 +1,9 @@
 #version 400 core
 
 in vec3 vertexPosition;
+out vec3 vPosition;
 
 void main()
 {
-	// We do the transformations later in the
-    // tessellation evaluation shader
-    gl_Position = vec4( vertexPosition, 1.0 );
+    vPosition = vertexPosition;
 }
