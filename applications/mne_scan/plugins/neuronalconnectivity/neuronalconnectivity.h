@@ -1,10 +1,10 @@
 //=============================================================================================================
 /**
-* @file     shadermaterial.h
+* @file     neuronalconnectivity.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2016
+* @date     October, 2016
 *
 * @section  LICENSE
 *
@@ -29,11 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    ShaderMaterial class declaration
+* @brief    Contains the declaration of the NeuronalConnectivity class.
+*
 */
 
-#ifndef SHADERMATERIAL_H
-#define SHADERMATERIAL_H
+#ifndef NEURONALCONNECTIVITY_H
+#define NEURONALCONNECTIVITY_H
 
 
 //*************************************************************************************************************
@@ -41,7 +42,13 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../disp3D_global.h"
+#include "neuronalconnectivity_global.h"
+
+#include <scShared/Interfaces/IAlgorithm.h>
+
+#include <generics/circularmatrixbuffer.h>
+
+#include "FormFiles/neuronalconnectivityyourwidget.h"
 
 
 //*************************************************************************************************************
@@ -49,13 +56,17 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <Qt3DRender/qmaterial.h>
+#include <QtWidgets>
+#include <QtCore/QtPlugin>
+#include <QDebug>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Eigen INCLUDES
+// EIGEN INCLUDES
 //=============================================================================================================
+
+#include <Eigen/Core>
 
 
 //*************************************************************************************************************
@@ -63,28 +74,22 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace Qt3DRender {
-    class QMaterial;
-    class QEffect;
-    class QParameter;
-    class QShaderProgram;
-    class QMaterial;
-    class QFilterKey;
-    class QTechnique;
-    class QRenderPass;
-    class QNoDepthMask;
-    class QBlendEquationArguments;
-    class QBlendEquation;
-    class QGraphicsApiFilter;
+namespace FIFFLIB {
+    class FiffInfo;
+}
+
+namespace SCMEASLIB {
+    class RealTimeSourceEstimate;
+    class RealTimeConnectivityEstimate;
 }
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE DISP3DLIB
+// DEFINE NAMESPACE NEURONALCONNECTIVITYPLUGIN
 //=============================================================================================================
 
-namespace DISP3DLIB
+namespace NEURONALCONNECTIVITYPLUGIN
 {
 
 
@@ -96,70 +101,85 @@ namespace DISP3DLIB
 
 //=============================================================================================================
 /**
-* ShaderMaterial is provides a Qt3D material with own shader support.
+* DECLARE CLASS NeuronalConnectivity
 *
-* @brief ShaderMaterial is provides a Qt3D material with own shader support.
+* @brief The NeuronalConnectivity class provides a NeuronalConnectivity plugin for online processing.
 */
-class DISP3DNEWSHARED_EXPORT ShaderMaterial : public Qt3DRender::QMaterial
+class NEURONALCONNECTIVITYSHARED_EXPORT NeuronalConnectivity : public SCSHAREDLIB::IAlgorithm
 {
     Q_OBJECT
+    Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "neuronalconnectivity.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
+    Q_INTERFACES(SCSHAREDLIB::IAlgorithm)
 
 public:
     //=========================================================================================================
     /**
-    * Default constructor.
-    *
-    * @param[in] parent         The parent of this class.
+    * Constructs a NeuronalConnectivity.
     */
-    explicit ShaderMaterial(Qt3DCore::QNode *parent = 0);
+    NeuronalConnectivity();
 
     //=========================================================================================================
     /**
-    * Default destructor.
+    * Destroys the NeuronalConnectivity.
     */
-    ~ShaderMaterial();
+    ~NeuronalConnectivity();
 
     //=========================================================================================================
     /**
-    * Get the current alpha value.
-    *
-    * @return The current alpha value.
+    * IAlgorithm functions
     */
-    float alpha();
+    virtual QSharedPointer<SCSHAREDLIB::IPlugin> clone() const;
+    virtual void init();
+    virtual void unload();
+    virtual bool start();
+    virtual bool stop();
+    virtual SCSHAREDLIB::IPlugin::PluginType getType() const;
+    virtual QString getName() const;
+    virtual QWidget* setupWidget();
 
     //=========================================================================================================
     /**
-    * Set the current alpha value.
+    * Udates the pugin with new (incoming) data.
     *
-    * @param[in] alpha  The new alpha value.
+    * @param[in] pMeasurement    The incoming data in form of a generalized NewMeasurement.
     */
-    void setAlpha(float alpha);
+    void updateSource(SCMEASLIB::NewMeasurement::SPtr pMeasurement);
+
+protected:
+    //=========================================================================================================
+    /**
+    * IAlgorithm function
+    */
+    virtual void run();
+
+    void showYourWidget();
 
 private:
+    bool                                                                            m_bIsRunning;                   /**< Flag whether thread is running.*/
+    qint32                                                                          m_iDownSample;                  /**< Sampling rate */
+
+    QSharedPointer<FIFFLIB::FiffInfo>                                               m_pFiffInfo;                    /**< Fiff measurement info.*/
+    QSharedPointer<NeuronalConnectivityYourWidget>                                  m_pYourWidget;                  /**< flag whether thread is running.*/
+    QAction*                                                                        m_pActionShowYourWidget;        /**< flag whether thread is running.*/
+
+    QSharedPointer<IOBUFFER::CircularMatrixBuffer<double> >                         m_pNeuronalConnectivityBuffer;  /**< Holds incoming data.*/
+
+    SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeSourceEstimate>::SPtr           m_pRTSEInput;                   /**< The RealTimeSourceEstimate input.*/
+    SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeConnectivityEstimate>::SPtr    m_pRTCEOutput;                  /**< The RealTimeSourceEstimate output.*/
+
+    Eigen::MatrixX3f        m_matNodeVertLeft;          /**< Holds the left hemi vertex postions of the network nodes. Corresponding to the neuronal sources.*/
+    Eigen::MatrixX3f        m_matNodeVertRight;         /**< Holds the right hemi vertex postions of the network nodes. Corresponding to the neuronal sources.*/
+    Eigen::MatrixX3f        m_matNodeVertComb;          /**< Holds both hemi vertex postions of the network nodes. Corresponding to the neuronal sources.*/
+
+signals:
     //=========================================================================================================
     /**
-    * Init the ShaderMaterial class.
+    * Emitted when fiffInfo is available
     */
-    void init();
-
-    Qt3DRender::QEffect*            m_pVertexEffect;
-
-    Qt3DRender::QParameter*         m_pAmbientParameter;
-    Qt3DRender::QParameter*         m_pDiffuseParameter;
-    Qt3DRender::QParameter*         m_pSpecularParameter;
-    Qt3DRender::QParameter*         m_pShininessParameter;
-    Qt3DRender::QParameter*         m_pAlphaParameter;
-    Qt3DRender::QFilterKey*         m_pFilterKey;
-
-    Qt3DRender::QTechnique*         m_pVertexGL3Technique;
-    Qt3DRender::QRenderPass*        m_pVertexGL3RenderPass;
-    Qt3DRender::QShaderProgram*     m_pVertexGL3Shader;
-
-    Qt3DRender::QNoDepthMask*                   m_pNoDepthMask;
-    Qt3DRender::QBlendEquationArguments*        m_pBlendState;
-    Qt3DRender::QBlendEquation*                 m_pBlendEquation;
+    void fiffInfoAvailable();
 };
 
-} // namespace DISP3DLIB
+} // NAMESPACE
 
-#endif // SHADERMATERIAL_H
+#endif // NEURONALCONNECTIVITY_H

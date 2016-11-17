@@ -1,10 +1,10 @@
 //=============================================================================================================
 /**
-* @file     shadermaterial.h
+* @file     realtimeconnectivityestimate.cpp
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2016
+* @date     October, 2016
 *
 * @section  LICENSE
 *
@@ -29,19 +29,25 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    ShaderMaterial class declaration
+* @brief    Contains the implementation of the RealTimeConnectivityEstimate class.
+*
 */
-
-#ifndef SHADERMATERIAL_H
-#define SHADERMATERIAL_H
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../disp3D_global.h"
+#include "realtimeconnectivityestimate.h"
+
+#include <connectivity/network/network.h>
+
+#include <mne/mne_forwardsolution.h>
+
+#include <fs/surfaceset.h>
+#include <fs/annotationset.h>
+
+#include <fiff/fiff_info.h>
 
 
 //*************************************************************************************************************
@@ -49,117 +55,66 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <Qt3DRender/qmaterial.h>
+
+//*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace SCMEASLIB;
+using namespace CONNECTIVITYLIB;
+using namespace MNELIB;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Eigen INCLUDES
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
+RealTimeConnectivityEstimate::RealTimeConnectivityEstimate(QObject *parent)
+: NewMeasurement(QMetaType::type("RealTimeConnectivityEstimate::SPtr"), parent)
+, m_bConnectivitySend(true)
+, m_pNetwork(Network::SPtr(new Network))
+, m_pAnnotSet(AnnotationSet::SPtr(new AnnotationSet))
+, m_pSurfSet(SurfaceSet::SPtr(new SurfaceSet))
+, m_pFwdSolution(MNEForwardSolution::SPtr(new MNEForwardSolution))
+, m_bInitialized(false)
+{
 
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-namespace Qt3DRender {
-    class QMaterial;
-    class QEffect;
-    class QParameter;
-    class QShaderProgram;
-    class QMaterial;
-    class QFilterKey;
-    class QTechnique;
-    class QRenderPass;
-    class QNoDepthMask;
-    class QBlendEquationArguments;
-    class QBlendEquation;
-    class QGraphicsApiFilter;
 }
 
 
 //*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE DISP3DLIB
-//=============================================================================================================
 
-namespace DISP3DLIB
+RealTimeConnectivityEstimate::~RealTimeConnectivityEstimate()
 {
+
+}
 
 
 //*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
 
-
-//=============================================================================================================
-/**
-* ShaderMaterial is provides a Qt3D material with own shader support.
-*
-* @brief ShaderMaterial is provides a Qt3D material with own shader support.
-*/
-class DISP3DNEWSHARED_EXPORT ShaderMaterial : public Qt3DRender::QMaterial
+QSharedPointer<Network> &RealTimeConnectivityEstimate::getValue()
 {
-    Q_OBJECT
+    QMutexLocker locker(&m_qMutex);
+    return m_pNetwork;
+}
 
-public:
-    //=========================================================================================================
-    /**
-    * Default constructor.
-    *
-    * @param[in] parent         The parent of this class.
-    */
-    explicit ShaderMaterial(Qt3DCore::QNode *parent = 0);
 
-    //=========================================================================================================
-    /**
-    * Default destructor.
-    */
-    ~ShaderMaterial();
+//*************************************************************************************************************
 
-    //=========================================================================================================
-    /**
-    * Get the current alpha value.
-    *
-    * @return The current alpha value.
-    */
-    float alpha();
+void RealTimeConnectivityEstimate::setValue(Network& v)
+{
+    m_qMutex.lock();
 
-    //=========================================================================================================
-    /**
-    * Set the current alpha value.
-    *
-    * @param[in] alpha  The new alpha value.
-    */
-    void setAlpha(float alpha);
+    //Store
+    *m_pNetwork = v;
 
-private:
-    //=========================================================================================================
-    /**
-    * Init the ShaderMaterial class.
-    */
-    void init();
+    m_bInitialized = true;
 
-    Qt3DRender::QEffect*            m_pVertexEffect;
+    m_qMutex.unlock();
 
-    Qt3DRender::QParameter*         m_pAmbientParameter;
-    Qt3DRender::QParameter*         m_pDiffuseParameter;
-    Qt3DRender::QParameter*         m_pSpecularParameter;
-    Qt3DRender::QParameter*         m_pShininessParameter;
-    Qt3DRender::QParameter*         m_pAlphaParameter;
-    Qt3DRender::QFilterKey*         m_pFilterKey;
+    emit notify();
 
-    Qt3DRender::QTechnique*         m_pVertexGL3Technique;
-    Qt3DRender::QRenderPass*        m_pVertexGL3RenderPass;
-    Qt3DRender::QShaderProgram*     m_pVertexGL3Shader;
+}
 
-    Qt3DRender::QNoDepthMask*                   m_pNoDepthMask;
-    Qt3DRender::QBlendEquationArguments*        m_pBlendState;
-    Qt3DRender::QBlendEquation*                 m_pBlendEquation;
-};
-
-} // namespace DISP3DLIB
-
-#endif // SHADERMATERIAL_H

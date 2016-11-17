@@ -81,8 +81,9 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-NetworkNode::NetworkNode(qint16 iId, const RowVectorXf& vecVert, QObject *parent)
+NetworkNode::NetworkNode(qint16 iId, const RowVectorXf& vecVert, QObject* parent)
 : QObject(parent)
+, m_bIsHub(false)
 , m_iId(iId)
 , m_vecVert(vecVert)
 {
@@ -201,7 +202,23 @@ double NetworkNode::getOutstrength()
 
 //*************************************************************************************************************
 
-NetworkNode& NetworkNode::operator<<(QSharedPointer<NetworkEdge>  newEdge)
+void NetworkNode::setHubStatus(bool bIsHub)
+{
+    m_bIsHub = bIsHub;
+}
+
+
+//*************************************************************************************************************
+
+bool NetworkNode::getHubStatus()
+{
+    return m_bIsHub;
+}
+
+
+//*************************************************************************************************************
+
+NetworkNode& NetworkNode::operator<<(QSharedPointer<NetworkEdge> newEdge)
 {
     if(newEdge->getEndNode() == this) {
         m_lEdgesIn << newEdge;
@@ -215,5 +232,4 @@ NetworkNode& NetworkNode::operator<<(QSharedPointer<NetworkEdge>  newEdge)
 }
 
 
-//*************************************************************************************************************
 

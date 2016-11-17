@@ -159,9 +159,9 @@ void RealTimeSourceEstimateWidget::getData()
 
             for(int i = 0; i<m_lRtItem.size(); i++) {
                 m_lRtItem.at(i)->setLoopState(false);
-                m_lRtItem.at(i)->setTimeInterval(25);
-                m_lRtItem.at(i)->setNormalization(QVector3D(0.0,0.5,10000));
-                m_lRtItem.at(i)->setColortable("Hot Negative 2");
+                m_lRtItem.at(i)->setTimeInterval(17);
+                m_lRtItem.at(i)->setNormalization(QVector3D(0.0,5,10));
+                m_lRtItem.at(i)->setColortable("Hot");
                 m_lRtItem.at(i)->setVisualizationType("Annotation based");
                 //m_lRtItem.at(i)->onTimeIntervalChanged(m_pRTSE->getValue()->tstep*1000000);
                 m_lRtItem.at(i)->setNumberAverages(1);
