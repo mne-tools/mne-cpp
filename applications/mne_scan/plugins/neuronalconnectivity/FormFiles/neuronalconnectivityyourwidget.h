@@ -1,10 +1,10 @@
 //=============================================================================================================
 /**
-* @file     shadermaterial.h
+* @file     neuronalconnectivitytoolbox.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2016
+* @date     October, 2016
 *
 * @section  LICENSE
 *
@@ -29,19 +29,19 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    ShaderMaterial class declaration
+* @brief    Contains the declaration of the NeuronalConnectivityYourWidget class.
+*
 */
 
-#ifndef SHADERMATERIAL_H
-#define SHADERMATERIAL_H
-
+#ifndef NEURONALCONNECTIVITYYOURWIDGET_H
+#define NEURONALCONNECTIVITYYOURWIDGET_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../disp3D_global.h"
+#include "../ui_neuronalconnectivityyourtoolbarwidget.h"
 
 
 //*************************************************************************************************************
@@ -49,42 +49,15 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <Qt3DRender/qmaterial.h>
+#include <QWidget>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Eigen INCLUDES
+// DEFINE NAMESPACE NEURONALCONNECTIVITYPLUGIN
 //=============================================================================================================
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-namespace Qt3DRender {
-    class QMaterial;
-    class QEffect;
-    class QParameter;
-    class QShaderProgram;
-    class QMaterial;
-    class QFilterKey;
-    class QTechnique;
-    class QRenderPass;
-    class QNoDepthMask;
-    class QBlendEquationArguments;
-    class QBlendEquation;
-    class QGraphicsApiFilter;
-}
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE DISP3DLIB
-//=============================================================================================================
-
-namespace DISP3DLIB
+namespace NEURONALCONNECTIVITYPLUGIN
 {
 
 
@@ -96,70 +69,33 @@ namespace DISP3DLIB
 
 //=============================================================================================================
 /**
-* ShaderMaterial is provides a Qt3D material with own shader support.
+* DECLARE CLASS NeuronalConnectivityYourWidget
 *
-* @brief ShaderMaterial is provides a Qt3D material with own shader support.
+* @brief The NeuronalConnectivityToolbox class provides a NeuronalConnectivity plugin widget structure.
 */
-class DISP3DNEWSHARED_EXPORT ShaderMaterial : public Qt3DRender::QMaterial
+class NeuronalConnectivityYourWidget : public QWidget
 {
     Q_OBJECT
 
 public:
-    //=========================================================================================================
-    /**
-    * Default constructor.
-    *
-    * @param[in] parent         The parent of this class.
-    */
-    explicit ShaderMaterial(Qt3DCore::QNode *parent = 0);
+    typedef QSharedPointer<NeuronalConnectivityYourWidget> SPtr;         /**< Shared pointer type for NeuronalConnectivityYourWidget. */
+    typedef QSharedPointer<NeuronalConnectivityYourWidget> ConstSPtr;    /**< Const shared pointer type for NeuronalConnectivityYourWidget. */
 
     //=========================================================================================================
     /**
-    * Default destructor.
+    * Constructs a NeuronalConnectivityToolbox.
     */
-    ~ShaderMaterial();
+    NeuronalConnectivityYourWidget(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Get the current alpha value.
-    *
-    * @return The current alpha value.
+    * Destroys the NeuronalConnectivityToolbox.
     */
-    float alpha();
-
-    //=========================================================================================================
-    /**
-    * Set the current alpha value.
-    *
-    * @param[in] alpha  The new alpha value.
-    */
-    void setAlpha(float alpha);
+    ~NeuronalConnectivityYourWidget();
 
 private:
-    //=========================================================================================================
-    /**
-    * Init the ShaderMaterial class.
-    */
-    void init();
+    Ui::NeuronalConnectivityYourToolbarWidget* ui;        /**< The UI class specified in the designer. */
 
-    Qt3DRender::QEffect*            m_pVertexEffect;
-
-    Qt3DRender::QParameter*         m_pAmbientParameter;
-    Qt3DRender::QParameter*         m_pDiffuseParameter;
-    Qt3DRender::QParameter*         m_pSpecularParameter;
-    Qt3DRender::QParameter*         m_pShininessParameter;
-    Qt3DRender::QParameter*         m_pAlphaParameter;
-    Qt3DRender::QFilterKey*         m_pFilterKey;
-
-    Qt3DRender::QTechnique*         m_pVertexGL3Technique;
-    Qt3DRender::QRenderPass*        m_pVertexGL3RenderPass;
-    Qt3DRender::QShaderProgram*     m_pVertexGL3Shader;
-
-    Qt3DRender::QNoDepthMask*                   m_pNoDepthMask;
-    Qt3DRender::QBlendEquationArguments*        m_pBlendState;
-    Qt3DRender::QBlendEquation*                 m_pBlendEquation;
 };
-
-} // namespace DISP3DLIB
-
-#endif // SHADERMATERIAL_H
+}
+#endif // NEURONALCONNECTIVITYYOURWIDGET_H

@@ -531,7 +531,6 @@ void SsvepBciConfigurationWidget::classificationListSizeChanged(int arg1)
 
 void SsvepBciConfigurationWidget::showCurrentTime()
 {
-
     m_iElapsedSeconds++;
     QString time = QString::number(m_iElapsedSeconds);
     ui->m_label_ElapsedTime->setText(time);
@@ -543,4 +542,12 @@ void SsvepBciConfigurationWidget::showCurrentTime()
 void SsvepBciConfigurationWidget::stopMeasurement()
 {
     m_qTimer->stop();
+
+    QDateTime dateTime = QDateTime::currentDateTime();
+
+    QFile file(m_pSsvepBci->getSsvepBciResourcePath()+"/AccuracyResults.txt");
+    file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append);
+    QTextStream out(&file);   // serialize the data into the file
+    out << endl << dateTime.toString(Qt::TextDate) + "\t" + ui->m_lineEdit_subjectName->text() + ":" << endl << "Wrong commands:" << m_iWrongCommands  << "\tCorrect commands:" << m_iCorrectCommands << endl;   // serialize a string
+    file.close();
 }

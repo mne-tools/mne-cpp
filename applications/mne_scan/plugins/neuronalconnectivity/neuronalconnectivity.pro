@@ -1,14 +1,14 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     scMeas.pro
-# @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+# @file     neuronalconnectivity.pro
+# @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
-# @date     July, 2012
+# @date     October, 2016
 #
 # @section  LICENSE
 #
-# Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+# Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -29,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file builds the scMeas library.
+# @brief    This project file generates the makefile for the Neuronal Connectivity plugin.
 #
 #--------------------------------------------------------------------------------------------------------------
 
@@ -37,11 +37,13 @@ include(../../../../mne-cpp.pri)
 
 TEMPLATE = lib
 
-QT += widgets
+CONFIG += plugin
 
-DEFINES += SCMEAS_LIBRARY
+DEFINES += NEURONALCONNECTIVITY_LIBRARY
 
-TARGET = scMeas
+QT += core widgets
+
+TARGET = neuronalconnectivity
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
@@ -54,6 +56,10 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Fiffd \
             -lMNE$${MNE_LIB_VERSION}Mned \
             -lMNE$${MNE_LIB_VERSION}Connectivityd \
+            -lMNE$${MNE_LIB_VERSION}Inversed \
+            -lscMeasd \
+            -lscDispd \
+            -lscSharedd
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
@@ -62,80 +68,42 @@ else {
             -lMNE$${MNE_LIB_VERSION}Fiff \
             -lMNE$${MNE_LIB_VERSION}Mne \
             -lMNE$${MNE_LIB_VERSION}Connectivity \
+            -lMNE$${MNE_LIB_VERSION}Inverse \
+            -lscMeas \
+            -lscDisp \
+            -lscShared
 }
 
-DESTDIR = $${MNE_LIBRARY_DIR}
-
-#
-# win32: copy dll's to bin dir
-# unix: add lib folder to LD_LIBRARY_PATH
-#
-win32 {
-    FILE = $${DESTDIR}/$${TARGET}.dll
-    BINDIR = $${DESTDIR}/../bin
-    FILE ~= s,/,\\,g
-    BINDIR ~= s,/,\\,g
-    QMAKE_POST_LINK += $${QMAKE_COPY} $$quote($${FILE}) $$quote($${BINDIR}) $$escape_expand(\\n\\t)
-}
+DESTDIR = $${MNE_BINARY_DIR}/mne_scan_plugins
 
 SOURCES += \
-    realtimesourceestimate.cpp \
-    realtimeconnectivityestimate.cpp \
-    newrealtimesamplearray.cpp \
-    newrealtimemultisamplearray.cpp \
-    realtimesamplearraychinfo.cpp \
-    newnumeric.cpp \
-    newmeasurement.cpp \
-    measurementtypes.cpp \
-    realtimeevoked.cpp \
-    realtimeevokedset.cpp \
-    realtimecov.cpp \
-    frequencyspectrum.cpp
-
+        neuronalconnectivity.cpp \
+        FormFiles/neuronalconnectivitysetupwidget.cpp \
+        FormFiles/neuronalconnectivityaboutwidget.cpp \
+        FormFiles/neuronalconnectivityyourwidget.cpp
 
 HEADERS += \
-    scmeas_global.h \
-    realtimesourceestimate.h \
-    realtimeconnectivityestimate.h \
-    newrealtimesamplearray.h \
-    newrealtimemultisamplearray.h \
-    realtimesamplearraychinfo.h \
-    newnumeric.h \
-    newmeasurement.h \
-    measurementtypes.h \
-    realtimeevoked.h \
-    realtimeevokedset.h \
-    realtimecov.h \
-    frequencyspectrum.h
+        neuronalconnectivity.h\
+        neuronalconnectivity_global.h \
+        FormFiles/neuronalconnectivitysetupwidget.h \
+        FormFiles/neuronalconnectivityaboutwidget.h \
+        FormFiles/neuronalconnectivityyourwidget.h
 
+FORMS += \
+        FormFiles/neuronalconnectivitysetup.ui \
+        FormFiles/neuronalconnectivityabout.ui \
+        FormFiles/neuronalconnectivityyourtoolbarwidget.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_SCAN_INCLUDE_DIR}
 
-# Install headers to include directory
-header_files.files = ./*.h
-header_files.path = $${MNE_SCAN_INCLUDE_DIR}/scMeas
+OTHER_FILES += connectivity.json
 
-header_files_measurement.files = ./Measurement/*.h
-header_files_measurement.path = $${MNE_SCAN_INCLUDE_DIR}/scMeas/Measurement
+# Put generated form headers into the origin --> cause other src is pointing at them
+UI_DIR = $$PWD
 
-INSTALLS += header_files
-INSTALLS += header_files_measurement
+unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
 
-# Deploy Qt Dependencies
-win32 {
-    isEmpty(TARGET_EXT) {
-        TARGET_CUSTOM_EXT = .dll
-    } else {
-        TARGET_CUSTOM_EXT = $${TARGET_EXT}
-    }
-
-    DEPLOY_COMMAND = windeployqt
-
-    DEPLOY_TARGET = $$shell_quote($$shell_path($${MNE_BINARY_DIR}/$${TARGET}$${TARGET_CUSTOM_EXT}))
-
-    #  # Uncomment the following line to help debug the deploy command when running qmake
-    #  warning($${DEPLOY_COMMAND} $${DEPLOY_TARGET})
-    QMAKE_POST_LINK += $${DEPLOY_COMMAND} $${DEPLOY_TARGET}
-}
+# suppress visibility warnings
+unix: QMAKE_CXXFLAGS += -Wno-attributes

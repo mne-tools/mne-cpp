@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     realtimesourceestimate.cpp
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     neuronalconnectivityaboutwidget.h
+* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     October, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,16 +29,20 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the RealTimeSourceEstimate class.
+* @brief    Contains the declaration of the NeuronalConnectivityAboutWidget class.
 *
 */
+
+#ifndef NEURONALCONNECTIVITYABOUTWIDGET_H
+#define NEURONALCONNECTIVITYABOUTWIDGET_H
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "realtimesourceestimate.h"
+#include "../ui_neuronalconnectivityabout.h"
 
 
 //*************************************************************************************************************
@@ -46,64 +50,51 @@
 // QT INCLUDES
 //=============================================================================================================
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace SCMEASLIB;
-//using namespace IOBUFFER;
+#include <QtWidgets>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE MEMBER METHODS
+// DEFINE NAMESPACE NEURONALCONNECTIVITYPLUGIN
 //=============================================================================================================
 
-RealTimeSourceEstimate::RealTimeSourceEstimate(QObject *parent)
-: NewMeasurement(QMetaType::type("RealTimeSourceEstimate::SPtr"), parent)
-, m_bStcSend(true)
-, m_pMNEStc(new MNESourceEstimate)
-, m_pAnnotSet(AnnotationSet::SPtr(new AnnotationSet))
-, m_pSurfSet(SurfaceSet::SPtr(new SurfaceSet))
-, m_pFwdSolution(MNEForwardSolution::SPtr(new MNEForwardSolution))
-, m_bInitialized(false)
+namespace NEURONALCONNECTIVITYPLUGIN
 {
 
-}
 
-
-//*************************************************************************************************************
-
-RealTimeSourceEstimate::~RealTimeSourceEstimate()
+//=============================================================================================================
+/**
+* DECLARE CLASS NeuronalConnectivityAboutWidget
+*
+* @brief The NeuronalConnectivityAboutWidget class provides the about dialog for the NeuronalConnectivity plugin.
+*/
+class NeuronalConnectivityAboutWidget : public QDialog
 {
+    Q_OBJECT
 
-}
+public:
 
+    //=========================================================================================================
+    /**
+    * Constructs a NeuronalConnectivityAboutWidget dialog which is a child of parent.
+    *
+    * @param [in] parent pointer to parent widget; If parent is 0, the new NeuronalConnectivityAboutWidget becomes a window. If parent is another widget, NeuronalConnectivityAboutWidget becomes a child window inside parent. NeuronalConnectivityAboutWidget is deleted when its parent is deleted.
+    */
+    NeuronalConnectivityAboutWidget(QWidget *parent = 0);
 
-//*************************************************************************************************************
+    //=========================================================================================================
+    /**
+    * Destroys the NeuronalConnectivityAboutWidget.
+    * All NeuronalConnectivityAboutWidget's children are deleted first. The application exits if NeuronalConnectivityAboutWidget is the main widget.
+    */
+    ~NeuronalConnectivityAboutWidget();
 
-MNESourceEstimate::SPtr& RealTimeSourceEstimate::getValue()
-{
-    QMutexLocker locker(&m_qMutex);
-    return m_pMNEStc;
-}
+private:
 
+    Ui::NeuronalConnectivityAboutWidgetClass ui;		/**< Holds the user interface for the NeuronalConnectivityAboutWidget.*/
 
-//*************************************************************************************************************
+};
 
-void RealTimeSourceEstimate::setValue(MNESourceEstimate& v)
-{
-    m_qMutex.lock();
+} // NAMESPACE
 
-    //Store
-    *m_pMNEStc = v;
-
-    m_bInitialized = true;
-
-    m_qMutex.unlock();
-
-    emit notify();
-}
-
+#endif // NEURONALCONNECTIVITYABOUTWIDGET_H

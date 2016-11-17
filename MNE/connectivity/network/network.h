@@ -101,8 +101,10 @@ public:
     //=========================================================================================================
     /**
     * Constructs a Network object.
+    *
+    * @param[in] sConnectivityMethod    The connectivity measure method used to create the data of this network structure.
     */
-    explicit Network();
+    explicit Network(const QString& sConnectivityMethod = "Unknown");
 
     //=========================================================================================================
     /**
@@ -134,6 +136,22 @@ public:
 
     //=========================================================================================================
     /**
+    * Sets the connectivity measure method used to create the data of this network structure.
+    *
+    * @param[in] sConnectivityMethod    The connectivity measure method used to create the data of this network structure.
+    */
+    void setConnectivityMethod(const QString& sConnectivityMethod);
+
+    //=========================================================================================================
+    /**
+    * Returns the connectivity measure method used to create the data of this network structure.
+    *
+    * @return   The connectivity measure method used to create the data of this network structure.
+    */
+    QString getConnectivityMethod();
+
+    //=========================================================================================================
+    /**
     * Overloaded stream operator to add a network edge to this network.
     *
     * @param[in] newEdge    The new edge item as a reference.
@@ -151,8 +169,10 @@ public:
 protected:
 
 private:
-    QList<NetworkEdge::SPtr>    m_lEdges;       /**< List with all edges of the network.*/
-    QList<NetworkNode::SPtr>    m_lNodes;       /**< List with all nodes of the network.*/
+    QList<NetworkEdge::SPtr>    m_lEdges;                   /**< List with all edges of the network.*/
+    QList<NetworkNode::SPtr>    m_lNodes;                   /**< List with all nodes of the network.*/
+
+    QString                     m_sConnectivityMethod;      /**< The connectivity measure method used to create the data of this network structure.*/
 
     //=========================================================================================================
     /**
