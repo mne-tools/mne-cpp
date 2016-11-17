@@ -238,7 +238,7 @@ void SsvepBciConfigurationWidget::initSelectedChannelsSensor()
     // Read electrode pinnig scheme from file and initialise List and store in QMap in BCI object
     QString path;
     path.prepend(m_pSsvepBci->getSsvepBciResourcePath());
-    path.append("Brain_Amp_presentation.txt"); //Pinning_Scheme_Duke_Dry_64.txt
+    path.append("Pinning_Scheme_Duke_Dry_64.txt"); //Brain_Amp_presentation.txt
     QFile file(path);
     if(!file.open(QIODevice::ReadOnly | QIODevice::Text)){
         return;
