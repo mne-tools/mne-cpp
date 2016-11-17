@@ -91,7 +91,9 @@ BrainRTSourceLocDataTreeItem::BrainRTSourceLocDataTreeItem(int iType, const QStr
 //            this, &BrainRTSourceLocDataTreeItem::onNewRtData);
 
     connect(m_pSourceLocRtDataWorker, static_cast<void (RtSourceLocDataWorker::*)(const QPair<QByteArray, QByteArray>&)>(&RtSourceLocDataWorker::newRtData),
-            this, &BrainRTSourceLocDataTreeItem::onNewRtData);
+            this, static_cast<void (BrainRTSourceLocDataTreeItem::*)(const QPair<QByteArray, QByteArray>&)>(&BrainRTSourceLocDataTreeItem::onNewRtData));
+
+            //&BrainRTSourceLocDataTreeItem::onNewRtData);
 
     this->setEditable(false);
     this->setToolTip("Real time source localization data");
