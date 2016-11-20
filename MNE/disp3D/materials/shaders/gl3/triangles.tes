@@ -3,13 +3,20 @@
 layout( triangles, equal_spacing, cw ) in;
 
 in vec3 tcPosition[];
+in vec3 tcColor[];
 
 out vec3 tePosition;
+out vec3 teColor;
 out vec3 tePatchDistance;
 
-uniform mat4 modelViewMatrix;
 uniform mat4 projectionMatrix;
+uniform mat4 modelViewMatrix;
 uniform mat4 mvp;
+
+in Tess
+{
+  vec3 color;
+} In[];
 
 void main()
 {
@@ -19,7 +26,9 @@ void main()
 
     tePatchDistance = gl_TessCoord;
 
-    tePosition = normalize(p0 + p1 + p2);
+    tePosition = p0 + p1 + p2;
+	
+	teColor = In[0].color;
 
-    gl_Position = projectionMatrix * modelViewMatrix * vec4(tePosition, 1);
+    gl_Position = mvp * vec4(tePosition, 1);
 }
