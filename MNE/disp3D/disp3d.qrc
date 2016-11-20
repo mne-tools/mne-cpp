@@ -8,5 +8,8 @@
         <file>materials/shaders/gl3/pervertexphongalpha.geom</file>
         <file>materials/shaders/gl3/triangles.tcs</file>
         <file>materials/shaders/gl3/triangles.tes</file>
+        <file>materials/shaders/gl3/pervertexphongalpha_old.frag</file>
+        <file>materials/shaders/gl3/pervertexphongalpha_old.geom</file>
+        <file>materials/shaders/gl3/pervertexphongalpha_old.vert</file>
     </qresource>
 </RCC>

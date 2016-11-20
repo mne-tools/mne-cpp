@@ -153,7 +153,7 @@ bool BrainSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* p
     QByteArray arrayCurvatureColor = createCurvatureVertColor(tSurface.curv());
 
     //Set renderable 3D entity mesh and color data
-    m_pRenderable3DEntity->setMeshData(tSurface.rr(), tSurface.nn(), tSurface.tris(), arrayCurvatureColor, Qt3DRender::QGeometryRenderer::Triangles);
+    m_pRenderable3DEntity->setMeshData(tSurface.rr(), tSurface.nn(), tSurface.tris(), arrayCurvatureColor, Qt3DRender::QGeometryRenderer::Patches);
 
     //Generate activation overlay surface
 //    MatrixX3f overlayAdds = tSurface.rr();

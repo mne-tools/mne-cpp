@@ -285,12 +285,17 @@ bool CustomMesh::createCustomMesh(const MatrixX3f& tMatVert,
     customGeometry->addAttribute(colorAttribute);
     customGeometry->addAttribute(indexAttribute);
 
-    this->setInstanceCount(1);
-    this->setIndexOffset(0);
-    //this->setFirstVertex(0);
-    this->setFirstInstance(0);
+    //Set the final geometry and primitive type
     this->setPrimitiveType(primitiveType);
+    this->setVerticesPerPatch(3);
     this->setGeometry(customGeometry);
+
+
+//    this->setInstanceCount(1);
+//    this->setIndexOffset(0);
+//    //this->setFirstVertex(0);
+//    this->setFirstInstance(0);
+
 
     this->setVertexCount(tMatTris.rows()*3);
 
