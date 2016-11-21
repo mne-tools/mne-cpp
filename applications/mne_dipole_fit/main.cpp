@@ -6319,11 +6319,14 @@ int mne_proj_op_proj_dvector(mneProjOp op, double *vec, int nch, int do_compleme
 
 
 
-int mne_proj_op_apply_cov(mneProjOp op, mneCovMatrix c)
+int mne_proj_op_apply_cov(mneProjOp op, mneCovMatrix& c)
      /*
       * Apply the projection operator to a covariance matrix
       */
 {
+
+  printf("############ BUGGY int mne_proj_op_apply_cov(mneProjOp op, mneCovMatrix c)\n");
+
   double **dcov = NULL;
   int j,k,p;
   int do_complement = TRUE;
@@ -8618,6 +8621,11 @@ mneCovMatrix mne_pick_chs_cov_omit(mneCovMatrix c, char **new_names, int ncov, i
   int   from,to;
   mneCovMatrix res;
 
+
+  printf("############ mneCovMatrix mne_pick_chs_cov_omit(mneCovMatrix c, char **new_names, int ncov, int omit_meg_eeg, fiffChInfo chs)\n");
+
+
+
   if (ncov == 0) {
     qCritical("No channels specified for picking in mne_pick_chs_cov_omit");
     return NULL;
@@ -8661,10 +8669,16 @@ mneCovMatrix mne_pick_chs_cov_omit(mneCovMatrix c, char **new_names, int ncov, i
   }
   names = MALLOC(ncov,char *);
   if (c->cov_diag) {
+    printf("############ Inside copy Cov Diag\n");
     cov_diag = MALLOC(ncov,double);
     for (j = 0; j < ncov; j++) {
       cov_diag[j] = c->cov_diag[pick[j]];
       names[j] = mne_strdup(c->names[pick[j]]);
+
+      printf("############ pick=%d\n",pick[j]);
+      printf("############ value=%f\n",c->cov_diag[pick[j]]);
+      printf("############ name=%s\n",names[j]);
+      printf("############ cov_diag[j]=%f\n",cov_diag[j]);
     }
   }
   else {
@@ -8689,7 +8703,12 @@ mneCovMatrix mne_pick_chs_cov_omit(mneCovMatrix c, char **new_names, int ncov, i
       }
     }
   }
+
+
+  printf("############ cov_diag[0]=%f\n",cov_diag[0]);
   res = mne_new_cov(c->kind,ncov,names,cov,cov_diag);
+  printf("############ res->cov_diag[0]=%f\n",res->cov_diag[0]);
+
 
   res->bads = mne_dup_name_list(c->bads,c->nbad);
   res->nbad = c->nbad;
@@ -8790,6 +8809,10 @@ int mne_add_inv_cov(mneCovMatrix c)
 {
   double *src = c->lambda ? c->lambda : c->cov_diag;
   int k;
+
+  printf("############ int mne_add_inv_cov(mneCovMatrix c)\n");
+  printf("############ c->cov_diag=[%f]\n",c->cov_diag[0]);
+  printf("############ src=[%f]\n",src[0]);
 
   if (src == NULL) {
     qCritical("Covariance matrix is not diagonal or not decomposed.");
@@ -8969,6 +8992,14 @@ static int mne_decompose_eigen_cov_small(mneCovMatrix c,float small, int use_ran
       * Do the eigenvalue decomposition
       */
 {
+
+    printf("############ static int mne_decompose_eigen_cov_small\n");
+
+//    printf("############ NOISE DEBUG ncov=%d\n", res->noise->ncov);
+//    printf("############ NOISE DEBUG nzero=%d\n", res->noise->nzero);
+//    printf("############ NOISE DEBUG inv_lambda=%f,%f,%f\n", res->noise->inv_lambda[0], res->noise->inv_lambda[1], res->noise->inv_lambda[2]);
+//    printf("############ NOISE DEBUG cov_diag=[%f,%f,%f]\n", res->noise->cov_diag[0], res->noise->cov_diag[1], res->noise->cov_diag[2]);
+
   int   np,k,p,rank;
   float rank_threshold = 1e-6;
 
@@ -8992,6 +9023,9 @@ static int mne_decompose_eigen_cov_small(mneCovMatrix c,float small, int use_ran
 
     if ((rank = condition_cov(c,rank_threshold,use_rank)) < 0)
       return FAIL;
+
+    printf("############ rank=%d\n", rank);
+
 
     np = c->ncov*(c->ncov+1)/2;
     c->lambda = MALLOC(c->ncov,double);
@@ -9042,6 +9076,67 @@ int mne_decompose_eigen_cov(mneCovMatrix c)
 }
 
 
+
+
+
+void mne_regularize_cov(mneCovMatrix c,       /* The matrix to regularize */
+            float        *regs)   /* Regularization values to apply (fractions of the
+                           * average diagonal values for each class */
+/*
+ * Regularize different parts of the noise covariance matrix differently
+ */
+{
+  int    j;
+  float  sums[3],nn[3];
+  int    nkind = 3;
+
+  printf("########DEBUG######## dmne_regularize_cov\n");
+
+  if (!c->cov || !c->ch_class)
+    return;
+
+  for (j = 0; j < nkind; j++) {
+    sums[j] = 0.0;
+    nn[j]   = 0;
+  }
+  /*
+   * Compute the averages over the diagonal elements for each class
+   */
+  for (j = 0; j < c->ncov; j++) {
+    if (c->ch_class[j] >= 0) {
+      sums[c->ch_class[j]] += c->cov[mne_lt_packed_index(j,j)];
+      nn[c->ch_class[j]]++;
+    }
+  }
+  fprintf(stderr,"Average noise-covariance matrix diagonals:\n");
+  for (j = 0; j < nkind; j++) {
+    if (nn[j] > 0) {
+      sums[j] = sums[j]/nn[j];
+      if (j == MNE_COV_CH_MEG_MAG)
+    fprintf(stderr,"\tMagnetometers       : %-7.2f fT    reg = %-6.2f\n",1e15*sqrt(sums[j]),regs[j]);
+      else if (j == MNE_COV_CH_MEG_GRAD)
+    fprintf(stderr,"\tPlanar gradiometers : %-7.2f fT/cm reg = %-6.2f\n",1e13*sqrt(sums[j]),regs[j]);
+      else
+    fprintf(stderr,"\tEEG                 : %-7.2f uV    reg = %-6.2f\n",1e6*sqrt(sums[j]),regs[j]);
+      sums[j] = regs[j]*sums[j];
+    }
+  }
+  /*
+   * Add thee proper amount to the diagonal
+   */
+  for (j = 0; j < c->ncov; j++)
+    if (c->ch_class[j] >= 0)
+      c->cov[mne_lt_packed_index(j,j)] += sums[c->ch_class[j]];
+
+  fprintf(stderr,"Noise-covariance regularized as requested.\n");
+  return;
+}
+
+
+
+
+
+
 //============================= mne_whiten.c =============================
 
 int mne_whiten_data(float **data, float **whitened_data, int np, int nchan, mneCovMatrix C)
@@ -9053,6 +9148,36 @@ int mne_whiten_data(float **data, float **whitened_data, int np, int nchan, mneC
   float  *one = NULL,*orig,*white;
   double *inv;
 
+  //DEBUG
+  printf("w0 [0] data=[%f,%f,%f]\n", data[0][0], data[0][1], data[0][2]);
+  printf("w0 [1] data=[%f,%f,%f]\n", data[1][0], data[1][1], data[1][2]);
+  printf("w0 ncov=%d\n", C->ncov);
+  printf("w0 nzero=%d\n", C->nzero);
+  printf("w0 inv_lambda=%f,%f,%f\n", C->inv_lambda[0], C->inv_lambda[1], C->inv_lambda[2]);
+  printf("w0 cov_diag=[%f,%f,%f]\n", C->cov_diag[0], C->cov_diag[1], C->cov_diag[2]);
+
+//  typedef struct {		/* Covariance matrix storage */
+//    int        kind;		/* Sensor or source covariance */
+//    int        ncov;		/* Dimension */
+//    int        nfree;		/* Number of degrees of freedom */
+//    int        nproj;		/* Number of dimensions projected out */
+//    int        nzero;		/* Number of zero or small eigenvalues */
+//    char       **names;		/* Names of the entries (optional) */
+//    double     *cov;		/* Covariance matrix in packed representation (lower triangle) */
+//    double     *cov_diag;		/* Diagonal covariance matrix */
+//    mneSparseMatrix cov_sparse;   /* A sparse covariance matrix
+//                   * (Note: data are floats in this which is an inconsistency) */
+//    double     *lambda;		/* Eigenvalues of cov */
+//    double     *inv_lambda;	/* Inverses of the square roots of the eigenvalues of cov */
+//    float      **eigen;		/* Eigenvectors of cov */
+//    double     *chol;		/* Cholesky decomposition */
+//    mneProjOp  proj;		/* The projection which was active when this matrix was computed */
+//    mneSssData sss;		/* The SSS data present in the associated raw data file */
+//    int        *ch_class;		/* This will allow grouping of channels for regularization (MEG [T/m], MEG [T], EEG [V] */
+//    char       **bads;		/* Which channels were designated bad when this noise covariance matrix was computed? */
+//    int        nbad;		/* How many of them */
+//  } *mneCovMatrix,mneCovMatrixRec;
+
   if (data == NULL || np <= 0)
     return OK;
 
@@ -9062,6 +9187,7 @@ int mne_whiten_data(float **data, float **whitened_data, int np, int nchan, mneC
   }
   inv = C->inv_lambda;
   if (mne_is_diag_cov(C)) {
+    printf("<DEBUG> Performing Diag\n");
     for (j = 0; j < np; j++) {
       orig = data[j];
       white = whitened_data[j];
@@ -9798,6 +9924,10 @@ int compute_dipole_field(dipoleFitData d, float *rd, int whiten, float **fwd)
     goto bad;
     }
   }
+
+  printf("0 [0] fwd=[%f,%f,%f]\n", fwd[0][0], fwd[0][1], fwd[0][2]);
+  printf("0 [1] fwd=[%f,%f,%f]\n", fwd[1][0], fwd[1][1], fwd[1][2]);
+
   if (d->neeg > 0) {
     if (d->funcs->eeg_vec_pot) {
       eeg_fwd[0] = fwd[0]+d->nmeg;
@@ -9815,6 +9945,10 @@ int compute_dipole_field(dipoleFitData d, float *rd, int whiten, float **fwd)
     goto bad;
     }
   }
+
+  printf("1 [0] fwd=[%f,%f,%f]\n", fwd[0][0], fwd[0][1], fwd[0][2]);
+  printf("1 [1] fwd=[%f,%f,%f]\n", fwd[1][0], fwd[1][1], fwd[1][2]);
+
   /*
    * Apply projection
    */
@@ -9825,9 +9959,14 @@ int compute_dipole_field(dipoleFitData d, float *rd, int whiten, float **fwd)
   fprintf(stdout,"\n");
 #endif
 
-  for (k = 0; k < 3; k++)
-    if (mne_proj_op_proj_vector(d->proj,fwd[k],d->nmeg+d->neeg,TRUE) == FAIL)
-      goto bad;
+  //Debug something suspecious here
+//  for (k = 0; k < 3; k++)
+//    if (mne_proj_op_proj_vector(d->proj,fwd[k],d->nmeg+d->neeg,TRUE) == FAIL)
+//      goto bad;
+  //Debug something suspecious here
+
+  printf("2 [0] fwd=[%f,%f,%f]\n", fwd[0][0], fwd[0][1], fwd[0][2]);
+  printf("2 [1] fwd=[%f,%f,%f]\n", fwd[1][0], fwd[1][1], fwd[1][2]);
 
 #ifdef DEBUG
   fprintf(stdout,"proj : ");
@@ -9843,6 +9982,9 @@ int compute_dipole_field(dipoleFitData d, float *rd, int whiten, float **fwd)
     if (mne_whiten_data(fwd,fwd,3,d->nmeg+d->neeg,d->noise) == FAIL)
       goto bad;
   }
+
+  printf("3 [0] fwd=[%f,%f,%f]\n", fwd[0][0], fwd[0][1], fwd[0][2]);
+  printf("3 [1] fwd=[%f,%f,%f]\n", fwd[1][0], fwd[1][1], fwd[1][2]);
 
 #ifdef DEBUG
   fprintf(stdout,"white : ");
@@ -9869,6 +10011,9 @@ dipoleForward dipole_forward(dipoleFitData d,
  * Compute the forward solution and do other nice stuff
  */
 {
+  printf("\n<<<< DEBUG >>>> [3.2] dipole_forward\n");
+  printf("rd=[%f,%f,%f]\n", rd[0][0], rd[0][1], rd[0][2]);
+
   dipoleForward res;
   float         **this_fwd;
   float         S[3];
@@ -9931,6 +10076,16 @@ dipoleForward dipole_forward(dipoleFitData d,
       res->scales[3*k+2] = 1.0;
     }
   }
+
+  printf("rd=[%f,%f,%f]\n", res->rd[0][0], res->rd[0][1], res->rd[0][2]);
+  printf("ndip=%d\n", res->ndip);
+  printf("fwd=[%f,%f,%f]\n", res->fwd[0][0], res->fwd[0][1], res->fwd[0][2]);
+  printf("scales=[%f,%f,%f]\n", res->scales[0], res->scales[1], res->scales[2]);
+  printf("uu=[%f,%f,%f]\n", res->uu[0][0], res->uu[0][1], res->uu[0][2]);
+  printf("vv=[%f,%f,%f]\n", res->vv[0][0], res->vv[0][1], res->vv[0][2]);
+  printf("sing=[%f,%f,%f]\n", res->sing[0], res->sing[1], res->sing[2]);
+  printf("nch=%d\n", res->nch);
+
   /*
    * SVD
    */
@@ -16272,6 +16427,8 @@ int select_dipole_fit_noise_cov(dipoleFitData f, mshMegEegData d)
   float nonsel_w  = 30;
   int   min_nchan = 20;
 
+  printf("########DEBUG######## select_dipole_fit_noise_cov\n");
+
   if (!f || !f->noise_orig)
     return OK;
   if (!d)
@@ -16339,6 +16496,16 @@ int select_dipole_fit_noise_cov(dipoleFitData f, mshMegEegData d)
       return OK;
     f->noise = mne_dup_cov(f->noise_orig);
   }
+
+
+  //DEBUG
+  printf("select_dipole_fit_noise_cov ncov=%d\n", f->noise->ncov);
+  printf("select_dipole_fit_noise_cov nzero=%d\n", f->noise->nzero);
+  printf("select_dipole_fit_noise_cov inv_lambda=%f,%f,%f\n", f->noise->inv_lambda[0], f->noise_orig->inv_lambda[1], f->noise_orig->inv_lambda[2]);
+  printf("select_dipole_fit_noise_cov cov_diag=[%f,%f,%f]\n", f->noise->cov_diag[0], f->noise_orig->cov_diag[1], f->noise_orig->cov_diag[2]);
+
+
+
   return scale_dipole_fit_noise_cov(f,nave);
 }
 
@@ -16368,18 +16535,20 @@ dipoleFitData setup_dipole_fit_data(char  *mriname,		 /* This gives the MRI/head
       * Background work for modelling
       */
 {
-  dipoleFitData     res = new_dipole_fit_data();
-  int               k;
-  char              **badlist = NULL;
-  int               nbad      = 0;
-  char              **file_bads;
-  int               file_nbad;
-  int               coord_frame = FIFFV_COORD_HEAD;
-  mneCovMatrix      cov;
-  fwdCoilSet        templates = NULL;
+  dipoleFitData  res = new_dipole_fit_data();
+  int            k;
+  char           **badlist = NULL;
+  int            nbad      = 0;
+  char           **file_bads;
+  int            file_nbad;
+  int            coord_frame = FIFFV_COORD_HEAD;
+  mneCovMatrix cov;
+  fwdCoilSet     templates = NULL;
   mneCTFcompDataSet comp_data  = NULL;
   fwdCoilSet        comp_coils = NULL;
-  int               dum;
+
+  printf("########DEBUG######## dipoleFitData setup_dipole_fit_data\n");
+
   /*
    * Read the coordinate transformations
    */
@@ -16388,7 +16557,7 @@ dipoleFitData setup_dipole_fit_data(char  *mriname,		 /* This gives the MRI/head
       goto bad;
   }
   else if (bemname) {
-    qCritical("Source of MRI / head transform required for the BEM model is missing");
+    qWarning("Source of MRI / head transform required for the BEM model is missing");
     goto bad;
   }
   else {
@@ -16432,7 +16601,11 @@ dipoleFitData setup_dipole_fit_data(char  *mriname,		 /* This gives the MRI/head
     printf("Will use %3d MEG channels from %s\n",res->nmeg,measname);
   if (res->neeg > 0)
     printf("Will use %3d EEG channels from %s\n",res->neeg,measname);
-  mne_channel_names_to_name_list(res->chs,res->nmeg+res->neeg,&res->ch_names,&dum);
+  {
+    char *s = mne_channel_names_to_string(res->chs,res->nmeg+res->neeg);
+    int  n;
+    mne_string_to_name_list(s,&res->ch_names,&n);
+  }
   /*
    * Make coil definitions
    */
@@ -16467,7 +16640,7 @@ dipoleFitData setup_dipole_fit_data(char  *mriname,		 /* This gives the MRI/head
     printf("Head coordinate coil definitions created.\n");
   }
   else {
-    printf("Cannot handle computations in %s coordinates",mne_coord_frame_name(coord_frame));
+    qWarning("Cannot handle computations in %s coordinates",mne_coord_frame_name(coord_frame));
     goto bad;
   }
   /*
@@ -16479,7 +16652,7 @@ dipoleFitData setup_dipole_fit_data(char  *mriname,		 /* This gives the MRI/head
     res->r0[1]     = r0[1];
     res->r0[2]     = r0[2];
   }
-  res->eeg_model = fwd_dup_eeg_sphere_model(eeg_model);
+  res->eeg_model = eeg_model;
   /*
    * Compensation data
    */
@@ -16495,8 +16668,8 @@ dipoleFitData setup_dipole_fit_data(char  *mriname,		 /* This gives the MRI/head
     if (ncomp > 0) {
       if ((comp_coils = fwd_create_meg_coils(templates,comp_chs,ncomp,
                          FWD_COIL_ACCURACY_NORMAL,res->meg_head_t)) == NULL) {
-        FREE(comp_chs);
-        goto bad;
+    FREE(comp_chs);
+    goto bad;
       }
       printf("%d compensation channels in %s\n",comp_coils->ncoil,measname);
     }
@@ -16518,7 +16691,7 @@ dipoleFitData setup_dipole_fit_data(char  *mriname,		 /* This gives the MRI/head
   if (make_projection(projnames,nproj,res->chs,res->nmeg+res->neeg,&res->proj) == FAIL)
     goto bad;
   if (res->proj && res->proj->nitems > 0) {
-    printf("Final projection operator is:\n");
+    fprintf(stderr,"Final projection operator is:\n");
     mne_proj_op_report(stderr,"\t",res->proj);
 
     if (mne_proj_op_chs(res->proj,res->ch_names,res->nmeg+res->neeg) == FAIL)
@@ -16526,6 +16699,8 @@ dipoleFitData setup_dipole_fit_data(char  *mriname,		 /* This gives the MRI/head
     if (mne_proj_op_make_proj(res->proj) == FAIL)
       goto bad;
   }
+  else
+    printf("No projection will be applied to the data.\n");
   /*
    * Noise covariance
    */
@@ -16536,40 +16711,49 @@ dipoleFitData setup_dipole_fit_data(char  *mriname,		 /* This gives the MRI/head
         cov->cov_diag ? "diagonal" : "full", noisename);
   }
   else {
+    printf("############ NOISE DEBUG res->noise\n");
     if ((cov = ad_hoc_noise(res->meg_coils,res->eeg_els,grad_std,mag_std,eeg_std)) == NULL)
       goto bad;
   }
-  res->noise_orig = mne_pick_chs_cov_omit(cov,res->ch_names,res->nmeg+res->neeg,TRUE,res->chs);
-  if (!res->noise_orig) {
+  res->noise = mne_pick_chs_cov_omit(cov,res->ch_names,res->nmeg+res->neeg,TRUE,res->chs);
+  if (res->noise == NULL) {
+    printf("############ Free NOISE\n");
     mne_free_cov(cov);
     goto bad;
   }
+
+  printf("############ 1 NOISE DEBUG DIAG HERE cov_diag=[%f,%f,%f]\n", res->noise->cov_diag[0], res->noise->cov_diag[1], res->noise->cov_diag[2]);
+
+
   printf("Picked appropriate channels from the noise-covariance matrix.\n");
   mne_free_cov(cov);
+  printf("############ 2 NOISE DEBUG DIAG HERE cov_diag=[%f,%f,%f]\n", res->noise->cov_diag[0], res->noise->cov_diag[1], res->noise->cov_diag[2]);
+
   /*
    * Apply the projection operator to the noise-covariance matrix
    */
   if (res->proj && res->proj->nitems > 0 && res->proj->nvec > 0) {
-    if (mne_proj_op_apply_cov(res->proj,res->noise_orig) == FAIL)
+    if (mne_proj_op_apply_cov(res->proj,res->noise) == FAIL)
       goto bad;
     printf("Projection applied to the covariance matrix.\n");
   }
+
+  printf("############ 3 NOISE DEBUG DIAG HERE cov_diag=[%f,%f,%f]\n", res->noise->cov_diag[0], res->noise->cov_diag[1], res->noise->cov_diag[2]);
+
   /*
    * Force diagonal noise covariance?
    */
   if (diagnoise) {
-    mne_revert_to_diag_cov(res->noise_orig);
-    printf("Using only the main diagonal of the noise-covariance matrix.\n");
+    mne_revert_to_diag_cov(res->noise);
+    fprintf(stderr,"Using only the main diagonal of the noise-covariance matrix.\n");
   }
-  /*
-   * Classify the channels in the noise covariance
-   */
-  if (mne_classify_channels_cov(res->noise_orig,res->chs,res->nmeg+res->neeg) == FAIL)
-    goto bad;
+
+  printf("############ 4 NOISE DEBUG DIAG HERE cov_diag=[%f,%f,%f]\n", res->noise->cov_diag[0], res->noise->cov_diag[1], res->noise->cov_diag[2]);
+
   /*
    * Regularize the possibly deficient noise-covariance matrix
    */
-  if (res->noise_orig->cov) {
+  if (res->noise->cov) {
     float regs[3];
     int   do_it;
 
@@ -16577,29 +16761,60 @@ dipoleFitData setup_dipole_fit_data(char  *mriname,		 /* This gives the MRI/head
     regs[MNE_COV_CH_MEG_GRAD] = grad_reg;
     regs[MNE_COV_CH_EEG]      = eeg_reg;
     /*
+     * Classify the channels
+     */
+    if (mne_classify_channels_cov(res->noise,res->chs,res->nmeg+res->neeg) == FAIL)
+      goto bad;
+    /*
      * Do we need to do anything?
      */
-    for (k = 0, do_it = 0; k < res->noise_orig->ncov; k++) {
-      if (res->noise_orig->ch_class[k] != MNE_COV_CH_UNKNOWN &&
-      regs[res->noise_orig->ch_class[k]] > 0.0)
+    for (k = 0, do_it = 0; k < res->noise->ncov; k++) {
+      if (res->noise->ch_class[k] != MNE_COV_CH_UNKNOWN &&
+      regs[res->noise->ch_class[k]] > 0.0)
     do_it++;
     }
     /*
      * Apply regularization if necessary
      */
     if (do_it > 0)
-      regularize_cov(res->noise_orig,regs,NULL);
+      mne_regularize_cov(res->noise,regs);
     else
       printf("No regularization applied to the noise-covariance matrix\n");
   }
-  if (select_dipole_fit_noise_cov(res,NULL) == FAIL)
-    goto bad;
+
+  printf("############ NOISE DEBUG Before the decomposition\n");
+  printf("############ NOISE DEBUG cov_diag=[%f,%f,%f]\n", res->noise->cov_diag[0], res->noise->cov_diag[1], res->noise->cov_diag[2]);
+
+  /*
+   * Do the decomposition and check that the matrix is positive definite
+   */
+  fprintf(stderr,"Decomposing the noise covariance...\n");
+  if (res->noise->cov) {
+    if (mne_decompose_eigen_cov(res->noise) == FAIL)
+      goto bad;
+    fprintf(stderr,"Eigenvalue decomposition done.\n");
+    for (k = 0; k < res->noise->ncov; k++) {
+      if (res->noise->lambda[k] < 0.0)
+    res->noise->lambda[k] = 0.0;
+    }
+  }
+  else {
+    printf("Decomposition not needed for a diagonal covariance matrix.\n");
+    if (mne_add_inv_cov(res->noise) == FAIL)
+      goto bad;
+  }
+
+  printf("############ NOISE DEBUG ncov=%d\n", res->noise->ncov);
+  printf("############ NOISE DEBUG nzero=%d\n", res->noise->nzero);
+  printf("############ NOISE DEBUG inv_lambda=%f,%f,%f\n", res->noise->inv_lambda[0], res->noise->inv_lambda[1], res->noise->inv_lambda[2]);
+  printf("############ NOISE DEBUG cov_diag=[%f,%f,%f]\n", res->noise->cov_diag[0], res->noise->cov_diag[1], res->noise->cov_diag[2]);
 
   mne_free_name_list(badlist,nbad);
   fwd_free_coil_set(templates);
   fwd_free_coil_set(comp_coils);
   mne_free_ctf_comp_data_set(comp_data);
   return res;
+
 
   bad : {
     mne_free_name_list(badlist,nbad);
@@ -16778,6 +16993,11 @@ guessData make_guess_data(char          *guessname,
   mneSourceSpace guesses = NULL;
   dipoleFitFuncs orig;
 
+
+  // DEBUG [3.1]
+  printf("<<<< DEBUG >>>> [3.1] guessname=%s\n", guessname);
+
+
   if (guessname) {
     /*
      * Read the guesses and transform to the appropriate coordinate frame
@@ -16841,9 +17061,15 @@ guessData make_guess_data(char          *guessname,
     f->funcs = f->mag_dipole_funcs;
   else
     f->funcs = f->sphere_funcs;
-  for (k = 0; k < res->nguess; k++) {
-    if ((res->guess_fwd[k] = dipole_forward_one(f,res->rr[k],NULL)) == NULL)
+
+//  for (k = 0; k < res->nguess; k++) {
+//    if ((res->guess_fwd[k] = dipole_forward_one(f,res->rr[k],NULL)) == NULL)
+//      goto bad;
+//DEBUG ToDo Remove
+  for (k = 0; k < 1/*res->nguess*/; k++) {
+    if ((res->guess_fwd[k] = dipole_forward_one(f,res->rr[k],NULL)) != NULL)
       goto bad;
+//DEBUG ToDo Remove
 #ifdef DEBUG
     sing = res->guess_fwd[k]->sing;
     printf("%f %f %f\n",sing[0],sing[1],sing[2]);
@@ -16852,6 +17078,32 @@ guessData make_guess_data(char          *guessname,
   f->funcs = orig;
 
   fprintf(stderr,"[done %d sources]\n",p);
+
+
+
+
+  // DEBUG [3.2]
+  printf("<<<< DEBUG >>>> [3.2] guess\n");
+  printf("rr=[%f,%f,%f]\n nguess=%d\n",
+            res->rr[0][0],res->rr[0][1],res->rr[0][2],
+            res->nguess);
+
+
+//  typedef struct {
+//    float          **rr;		    /* These are the guess dipole locations */
+//    dipoleForward  *guess_fwd;	    /* Forward solutions for the guesses */
+//    int            nguess;	    /* How many sources */
+//  } *guessData,guessDataRec;
+
+
+
+
+
+
+
+
+
+
   return res;
 
  bad : {
@@ -20231,6 +20483,21 @@ static ecd fit_one(dipoleFitData fit,	            /* Precomputed fitting data */
   nchan = fit->nmeg+fit->neeg;
   user.fwd = NULL;
 
+  // DEBUG [4.1.2.0]
+//  printf("<<<< DEBUG >>>> [4.1.2.0] time=%f; B=%f\n");
+//  printf("<<<< DEBUG >>>> [4.1.2.0] fit=\n");
+//  printf("<<<< DEBUG >>>> [4.1.2.0] guess \n\t rr=[%f,%f,%f];\n\t nguess=%d\n", *guess->rr[0], *guess->rr[1], *guess->rr[2] , guess->nguess);
+//  printf("<<<< DEBUG >>>> [4.1.2.0] guess dipForward \n\t rd=[%f,%f,%f];\n\t ndip=%d;\n\t fwd=[%f,%f,%f];\n\t scales=[%f,%f,%f];\n\t uu=[%f,%f,%f];\n\t vv=[%f,%f,%f];\n\t sing=[%f,%f,%f];\n\t nch=%d\n",
+//          (*guess->guess_fwd)->rd[0][0], (*guess->guess_fwd)->rd[0][1], (*guess->guess_fwd)->rd[0][2],
+//          (*guess->guess_fwd)->ndip,
+//          (*guess->guess_fwd)->fwd[0][0], (*guess->guess_fwd)->fwd[0][1], (*guess->guess_fwd)->fwd[0][2],
+//          (*guess->guess_fwd)->scales[0], (*guess->guess_fwd)->scales[1], (*guess->guess_fwd)->scales[2],
+//          (*guess->guess_fwd)->uu[0][0], (*guess->guess_fwd)->uu[0][1], (*guess->guess_fwd)->uu[0][2],
+//          (*guess->guess_fwd)->vv[0][0], (*guess->guess_fwd)->vv[0][1], (*guess->guess_fwd)->vv[0][2],
+//          (*guess->guess_fwd)->sing[0], (*guess->guess_fwd)->sing[1], (*guess->guess_fwd)->sing[2],
+//          (*guess->guess_fwd)->nch);
+
+
   if (mne_proj_op_proj_vector(fit->proj,B,nchan,TRUE) == FAIL)
     goto bad;
 
@@ -20497,8 +20764,15 @@ int    fit_dipoles(char          *dataname,
     set->dataname = mne_strdup(dataname);
   }
 
+//  // DEBUG [4.1.0]
+//  printf("<<<< DEBUG >>>> [4.1.0]\n");
+
   fprintf(stderr,"Fitting...%c",verbose ? '\n' : '\0');
   for (s = 0, time = tmin; time < tmax; s++, time = tmin  + s*tstep) {
+
+//      // DEBUG [4.1.1]
+//      printf("<<<< DEBUG >>>> [4.1.1]\n");
+
     /*
      * Pick the data point
      */
@@ -20507,17 +20781,28 @@ int    fit_dipoles(char          *dataname,
       fprintf(stderr,"Cannot pick time: %7.1f ms\n",1000*time);
       continue;
     }
+
+//    // DEBUG [4.1.2]
+//    printf("<<<< DEBUG >>>> [4.1.2]\n");
+
     if ((dip = fit_one(fit,guess,time,one,verbose)) == NULL)
       printf("t = %7.1f ms : %s\n",1000*time,"error (tbd: catch)");
     else {
       add_to_ecd_set(set,dip);
-      if (verbose)
-        print_ecd(stdout,dip);
-      else {
-        if (set->ndip % report_interval == 0)
-          fprintf(stderr,"%d..",set->ndip);
-      }
+//      if (verbose)
+
+//      // DEBUG [4.1.2]
+//        print_ecd(stdout,dip);
+
+//      else {
+//        if (set->ndip % report_interval == 0)
+//          fprintf(stderr,"%d..",set->ndip);
+//      }
     }
+
+//    // DEBUG [4.1.3]
+//    printf("<<<< DEBUG >>>> [4.1.3]\n");
+
   }
   if (!verbose)
     fprintf(stderr,"[done]\n");
@@ -21490,15 +21775,45 @@ int main(int argc, char *argv[])
     printf("\n");
     printf("---- Setting up...\n\n");
 
+
+    // DEBUG [0]
+    printf("<<<< DEBUG >>>> [0]: before include EEG.\n");
+
     if (include_eeg) {
         if ((eeg_model = setup_eeg_sphere_model(eeg_model_file,eeg_model_name,eeg_sphere_rad)) == NULL)
             goto out;
     }
+
+    // DEBUG [1]
+    printf("<<<< DEBUG >>>> [1]: setup_eeg_sphere_model.\n");
+    if( eeg_model ) {
+  //      typedef struct {
+  //        char  *name;			/* Textual identifier */
+  //        int   nlayer;			/* Number of layers */
+  //        fwdEegSphereLayer layers;	/* An array of layers */
+  //        float  r0[3];			/* The origin */
+
+  //        double *fn;		        /* Coefficients saved to speed up the computations */
+  //        int    nterms;		/* How many? */
+
+  //        float  *mu;			/* The Berg-Scherg equivalence parameters */
+  //        float  *lambda;
+  //        int    nfit;			/* How many? */
+  //        int    scale_pos;		/* Scale the positions to the surface of the sphere? */
+  //      } *fwdEegSphereModel,fwdEegSphereModelRec;
+        printf("<<<< DEBUG >>>> [1] eeg_model name: %s\n", eeg_model->name);
+        printf("<<<< DEBUG >>>> [1] eeg_model nlayer: %d\n", eeg_model->nlayer);
+    }
+
     if ((fit_data = setup_dipole_fit_data(mriname,measname,bemname,r0,eeg_model,accurate,
         badname,noisename,grad_std,mag_std,eeg_std,
         mag_reg,grad_reg,eeg_reg,
         diagnoise,projnames,nproj,include_meg,include_eeg)) == NULL)
         goto out;
+
+    // DEBUG [2]
+    printf("<<<< DEBUG >>>> [2]: setup_dipole_fit_data.\n");
+
     fit_data->fit_mag_dipoles = fit_mag_dipoles;
     if (is_raw) {
         int c;
@@ -21557,23 +21872,74 @@ int main(int argc, char *argv[])
                 goto out;
         }
     }
+
+    // DEBUG [3]
+    printf("<<<< DEBUG >>>> [3]\n");
+
     /*
     * Proceed to computing the fits
     */
     printf("\n---- Computing the forward solution for the guesses...\n\n");
     if ((guess = make_guess_data(guessname, guess_surfname, guess_mindist, guess_exclude, guess_grid, fit_data)) == NULL)
     goto out;
+
+    // DEBUG [4]
+    printf("<<<< DEBUG >>>> [4]: make_guess_data\n");
+
+    // DEBUG [4.0.1]
+    printf("<<<< DEBUG >>>> [4.0.1] guess\n");
+    printf("rr=[%f,%f,%f]\n", guess->rr[0][0],guess->rr[0][1],guess->rr[0][2]);
+    for (int i = 0; i < 2/*guess->nguess*/; ++i) {
+        printf("<<<Dipole %i>>>\n", i);
+        printf("dplFwd rd=[%f,%f,%f]\n", (guess->guess_fwd[i])->rd[0][0], (*(guess->guess_fwd))->rd[0][1], (*(guess->guess_fwd))->rd[0][2]);
+        printf("dplFwd ndip=%d\n",  (guess->guess_fwd[i])->ndip);
+        printf("dplFwd fwd=[%f,%f,%f]\n", (guess->guess_fwd[i])->fwd[0][0], (*(guess->guess_fwd))->fwd[0][1], (*(guess->guess_fwd))->fwd[0][2]);
+        printf("dplFwd scales=[%f,%f,%f]\n", (guess->guess_fwd[i])->scales[0], (*(guess->guess_fwd))->scales[1], (*(guess->guess_fwd))->scales[2]);
+        printf("dplFwd uu=[%f,%f,%f]\n", (guess->guess_fwd[i])->uu[0][0], (*(guess->guess_fwd))->uu[0][1], (*(guess->guess_fwd))->uu[0][2]);
+        printf("dplFwd vv=[%f,%f,%f]\n", (guess->guess_fwd[i])->vv[0][0], (*(guess->guess_fwd))->vv[0][1], (*(guess->guess_fwd))->vv[0][2]);
+        printf("dplFwd sing=[%f,%f,%f]\n", (guess->guess_fwd[i])->sing[0], (*(guess->guess_fwd))->sing[1], (*(guess->guess_fwd))->sing[2]);
+        printf("dplFwd nch=%d\n",  (guess->guess_fwd[i])->nch);
+    }
+    printf("nguess=%d\n", guess->nguess);
+
+//    typedef struct {
+//      float **rd;			    /* Dipole locations */
+//      int   ndip;			    /* How many dipoles */
+//      float **fwd;			    /* The forward solution (projected and whitened) */
+//      float *scales;		    /* Scales applied to the columns of fwd */
+//      float **uu;			    /* The left singular vectors of the forward matrix */
+//      float **vv;			    /* The right singular vectors of the forward matrix */
+//      float *sing;			    /* The singular values */
+//      int   nch;			    /* Number of channels */
+//    } *dipoleForward,dipoleForwardRec;
+
+
+
     fprintf (stderr,"\n---- Fitting : %7.1f ... %7.1f ms (step: %6.1f ms integ: %6.1f ms)\n\n",
     1000*tmin,1000*tmax,1000*tstep,1000*integ);
+
+
     if (raw) {
+
+        // DEBUG [4.1 raw]
+        printf("<<<< DEBUG >>>> [4.1 raw]\n");
+
         if (fit_dipoles_raw(measname,raw,sel,fit_data,guess,tmin,tmax,tstep,integ,verbose,NULL) == FAIL)
             goto out;
     }
     else {
+
+        // DEBUG [4.1 data]
+        printf("<<<< DEBUG >>>> [4.1 data]\n");
+
         if (fit_dipoles(measname,data,fit_data,guess,tmin,tmax,tstep,integ,verbose,&set) == FAIL)
             goto out;
     }
     printf("%d dipoles fitted\n",set->ndip);
+
+    // DEBUG [5]
+    printf("<<<< DEBUG >>>> [5]: fit_dipoles fitted\n");
+
     /*
     * Saving...
     */
