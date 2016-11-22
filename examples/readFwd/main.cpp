@@ -81,7 +81,7 @@ int main(int argc, char *argv[])
 
     // Command Line Parser
     QCommandLineParser parser;
-    parser.setApplicationDescription("Start rawClusteredInverseRapMusic tutorial");
+    parser.setApplicationDescription("Start readFwd tutorial");
     parser.addHelpOption();
 
     QCommandLineOption fwdFileOption("fwd", "Path to the forward solution <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");

@@ -86,16 +86,23 @@ int main(int argc, char *argv[])
 
     // Command Line Parser
     QCommandLineParser parser;
-    parser.setApplicationDescription("Read Raw Example");
+    parser.setApplicationDescription("Start readRaw tutorial");
     parser.addHelpOption();
-    QCommandLineOption sampleRawFileOption("f", "Path to raw <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
-    parser.addOption(sampleRawFileOption);
+
+    QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", "./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
+    QCommandLineOption fromOption("from", "Read data from <from> (in seconds).", "from", "42.956");
+    QCommandLineOption toOption("to", "Read data from <to> (in seconds).", "to", "320.670");
+
+    parser.addOption(inputOption);
+    parser.addOption(fromOption);
+    parser.addOption(toOption);
+
     parser.process(app);
 
-    QFile t_fileRaw(parser.value(sampleRawFileOption));
+    QFile t_fileRaw(parser.value(inputOption));
 
-    float from = 42.956f;
-    float to = 320.670f;
+    float from = parser.value(fromOption).toFloat();
+    float to = parser.value(toOption).toFloat();
 
     bool in_samples = false;
 

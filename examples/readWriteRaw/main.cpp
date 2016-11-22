@@ -81,9 +81,23 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
-    QFile t_fileIn("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
+    // Command Line Parser
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Start readWriteRaw tutorial");
+    parser.addHelpOption();
 
-    QFile t_fileOut("./MNE-sample-data/MEG/sample/test_output.fif");
+    QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", "./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
+    QCommandLineOption outputOption("fileOut", "The output file <out>.", "out", "./MNE-sample-data/MEG/sample/test_output.fif");
+
+    parser.addOption(inputOption);
+    parser.addOption(outputOption);
+
+    parser.process(a);
+
+    //Load data
+    QFile t_fileIn(parser.value(inputOption));
+
+    QFile t_fileOut(parser.value(outputOption));
 
     //
     //   Setup for reading the raw data
