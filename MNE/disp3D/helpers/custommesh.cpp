@@ -108,6 +108,10 @@ CustomMesh::CustomMesh(const MatrixX3f& tMatVert,
 
 CustomMesh::~CustomMesh()
 {
+    delete m_pVertexDataBuffer;
+    delete m_pNormalDataBuffer;
+    delete m_pColorDataBuffer;
+    delete m_pIndexDataBuffer;
 }
 
 
@@ -150,6 +154,12 @@ bool CustomMesh::createCustomMesh(const MatrixX3f& tMatVert,
                                   Qt3DRender::QGeometryRenderer::PrimitiveType primitiveType)
 {
     Qt3DRender::QGeometry* customGeometry = new Qt3DRender::QGeometry(this);
+
+    //Delete old buffers first
+    delete m_pVertexDataBuffer;
+    delete m_pNormalDataBuffer;
+    delete m_pColorDataBuffer;
+    delete m_pIndexDataBuffer;
 
     m_pVertexDataBuffer = new Qt3DRender::QBuffer(Qt3DRender::QBuffer::VertexBuffer, customGeometry);
     m_pNormalDataBuffer = new Qt3DRender::QBuffer(Qt3DRender::QBuffer::VertexBuffer, customGeometry);
