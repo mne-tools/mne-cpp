@@ -50,6 +50,7 @@
 //=============================================================================================================
 
 #include <QApplication>
+#include <QCommandLineParser>
 
 
 //*************************************************************************************************************
@@ -80,7 +81,29 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    QFile t_File("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
+    // Command Line Parser
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Start readFwd tutorial");
+    parser.addHelpOption();
+
+    QCommandLineOption fwdFileOption("fwd", "Path to the forward solution <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
+    QCommandLineOption surfOption("surfType", "Surface type <type>.", "type", "orig");
+    QCommandLineOption annotOption("annotType", "Annotation type <type>.", "type", "aparc.a2009s");
+    QCommandLineOption subjectOption("subject", "Selected subject <subject>.", "subject", "sample");
+    QCommandLineOption subjectPathOption("subjectPath", "Selected subject path <subjectPath>.", "subjectPath", "./MNE-sample-data/subjects");
+    QCommandLineOption hemiOption("hemi", "Selected hemisphere <hemi>.", "hemi", "2");
+
+    parser.addOption(fwdFileOption);
+    parser.addOption(surfOption);
+    parser.addOption(annotOption);
+    parser.addOption(subjectOption);
+    parser.addOption(subjectPathOption);
+    parser.addOption(hemiOption);
+
+    parser.process(a);
+
+    //Load data
+    QFile t_File(parser.value(fwdFileOption));
     MNEForwardSolution t_forwardSolution(t_File);
 
     View3D::SPtr testWindow = View3D::SPtr(new View3D());
@@ -89,9 +112,10 @@ int main(int argc, char *argv[])
 //    testWindow->addForwardSolution("Subject01", "ForwardSolution", t_forwardSolution);
 
     //Option 2 - Visualize clustered source space
-    AnnotationSet t_annotationSet ("sample", 2, "aparc.a2009s", "./MNE-sample-data/subjects");
+    AnnotationSet t_annotationSet (parser.value(subjectOption), parser.value(hemiOption).toInt(), parser.value(annotOption), parser.value(subjectPathOption));
+
     MNEForwardSolution t_clusteredFwd = t_forwardSolution.cluster_forward_solution(t_annotationSet, 40);
-    testWindow->addForwardSolution("Subject01", "ForwardSolution", t_clusteredFwd);
+    testWindow->addForwardSolution(parser.value(subjectOption), "ForwardSolution", t_clusteredFwd);
 
     testWindow->show();
     Control3DWidget::SPtr control3DWidget = Control3DWidget::SPtr(new Control3DWidget());
