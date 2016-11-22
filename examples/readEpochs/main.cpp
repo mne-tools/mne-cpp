@@ -103,6 +103,9 @@ int main(int argc, char *argv[])
     parser.addOption(eventsFileOption);
     parser.addOption(evokedIdxOption);
 
+    parser.process(a);
+
+    //Load data
     QFile t_fileRaw(parser.value(inputOption));
 
     qint32 event = parser.value(evokedIdxOption).toInt();

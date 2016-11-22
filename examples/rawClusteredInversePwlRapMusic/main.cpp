@@ -134,6 +134,8 @@ int main(int argc, char *argv[])
     parser.addOption(evokedIdxOption);
     parser.addOption(hemiOption);
 
+    parser.process(a);
+
     //Load data
     QFile t_fileRaw(parser.value(inputOption));
     QString t_sEventName = parser.value(eventsFileOption);
