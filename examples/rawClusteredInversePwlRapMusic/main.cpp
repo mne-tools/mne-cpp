@@ -69,6 +69,7 @@
 #include <QApplication>
 #include <QSet>
 #include <QElapsedTimer>
+#include <QCommandLineParser>
 
 //#define BENCHMARK
 
@@ -104,26 +105,49 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    QFile t_fileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
-    QString t_sEventName = "./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif";
-    QFile t_fileFwd("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
-    AnnotationSet t_annotationSet("sample", 2, "aparc.a2009s", "./MNE-sample-data/subjects");
-    SurfaceSet t_surfSet("sample", 2, "white", "./MNE-sample-data/subjects");
+    // Command Line Parser
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Start rawClusteredInversePwlRapMusic tutorial");
+    parser.addHelpOption();
 
-    QString t_sFileNameStc("");
+    QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", "./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
+    QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif");
+    QCommandLineOption fwdOption("fwd", "Path to forwad solution <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
+    QCommandLineOption surfOption("surfType", "Surface type <type>.", "type", "orig");
+    QCommandLineOption annotOption("annotType", "Annotation type <type>.", "type", "aparc.a2009s");
+    QCommandLineOption subjectOption("subject", "Selected subject <subject>.", "subject", "sample");
+    QCommandLineOption subjectPathOption("subjectPath", "Selected subject path <subjectPath>.", "subjectPath", "./MNE-sample-data/subjects");
+    QCommandLineOption stcFileOption("stcOut", "Path to stc <file>, which is to be written.", "file", "");
+    QCommandLineOption numDipolePairsOption("numDip", "<number> of dipole pairs to localize.", "number", "7");
+    QCommandLineOption evokedIdxOption("aveIdx", "The average <index> to choose from the average file.", "index", "0");
+    QCommandLineOption hemiOption("hemi", "Selected hemisphere <hemi>.", "hemi", "2");
 
 
-    bool doMovie = false;
+    parser.addOption(inputOption);
+    parser.addOption(eventsFileOption);
+    parser.addOption(fwdOption);
+    parser.addOption(surfOption);
+    parser.addOption(annotOption);
+    parser.addOption(subjectOption);
+    parser.addOption(subjectPathOption);
+    parser.addOption(stcFileOption);
+    parser.addOption(numDipolePairsOption);
+    parser.addOption(evokedIdxOption);
+    parser.addOption(hemiOption);
 
-    qint32 numDipolePairs = 1;//7;
+    QFile t_fileRaw(parser.value(inputOption));
+    QString t_sEventName = parser.value(eventsFileOption);
+    QFile t_fileFwd(parser.value(fwdOption));
 
-//    //Right Medianus MIND004
-//    qint32 event = 65;
-//    float tmin = 0.0f;
-//    float tmax = 0.1f;
+    SurfaceSet t_surfSet (parser.value(subjectOption), parser.value(hemiOption).toInt(), parser.value(surfOption), parser.value(subjectPathOption));
+    AnnotationSet t_annotationSet (parser.value(subjectOption), parser.value(hemiOption).toInt(), parser.value(annotOption), parser.value(subjectPathOption));
 
-    //Right500 Auditory MIND006
-    qint32 event = 2;
+    QString t_sFileNameStc(parser.value(stcFileOption));
+
+    qint32 numDipolePairs = parser.value(numDipolePairsOption).toInt();
+
+    //Choose average
+    qint32 event = parser.value(evokedIdxOption).toInt();
 
     float tmin = 0.1f;
     float tmax = 0.2f;
@@ -133,17 +157,6 @@ int main(int argc, char *argv[])
     bool pick_all  = true;
 
     qint32 k, p;
-
-
-    // Parse command line parameters
-    for(qint32 i = 0; i < argc; ++i)
-    {
-        if(strcmp(argv[i], "-stc") == 0 || strcmp(argv[i], "--stc") == 0)
-        {
-            if(i + 1 < argc)
-                t_sFileNameStc = QString::fromUtf8(argv[i+1]);
-        }
-    }
 
     //
     // Load data
@@ -471,10 +484,6 @@ int main(int argc, char *argv[])
     // Compute inverse solution
     //
     PwlRapMusic t_pwlRapMusic(t_clusteredFwd, false, numDipolePairs);
-
-    if(doMovie)
-        t_pwlRapMusic.setStcAttr(200,0.5);
-
 
 #ifdef BENCHMARK
     MNESourceEstimate sourceEstimate;
