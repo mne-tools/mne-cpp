@@ -254,15 +254,15 @@ public:
     void setPosition(QVector3D position);
 
 protected: 
-    CustomMesh::SPtr                                m_pCustomMesh;           /**< The actual mesh information (vertices, normals, colors). */
-    QSharedPointer<Qt3DCore::QTransform>            m_pTransform;            /**< The main transformation. */
-    QSharedPointer<Qt3DRender::QMaterial>           m_pMaterial;             /**< The material to be used for this entity. */
+    CustomMesh*                                 m_pCustomMesh;           /**< The actual mesh information (vertices, normals, colors). */
+    Qt3DCore::QTransform*                       m_pTransform;            /**< The main transformation. */
+    Qt3DRender::QMaterial*                      m_pMaterial;             /**< The material to be used for this entity. */
 
-    float                                           m_fRotX;                 /**< The x axis rotation value. */
-    float                                           m_fRotY;                 /**< The y axis rotation value. */
-    float                                           m_fRotZ;                 /**< The z axis rotation value. */
-    QVector3D                                       m_position;              /**< The position/translation value. */
-    float                                           m_fAlpha;                /**< The alpha value. */
+    float                                       m_fRotX;                 /**< The x axis rotation value. */
+    float                                       m_fRotY;                 /**< The y axis rotation value. */
+    float                                       m_fRotZ;                 /**< The z axis rotation value. */
+    QVector3D                                   m_position;              /**< The position/translation value. */
+    float                                       m_fAlpha;                /**< The alpha value. */
 
     //=========================================================================================================
     /**

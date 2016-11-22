@@ -105,6 +105,5 @@ void RealTimeSourceEstimate::setValue(MNESourceEstimate& v)
     m_qMutex.unlock();
 
     emit notify();
-
 }
 
