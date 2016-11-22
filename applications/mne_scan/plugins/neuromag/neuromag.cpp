@@ -305,12 +305,31 @@ void Neuromag::toggleRecordingFile()
                 return;
         }
 
+        //Add the calibration factors
+        m_cals = RowVectorXd(m_pFiffInfo->nchan);
+        m_cals.setZero();
+        for (qint32 k = 0; k < m_pFiffInfo->nchan; ++k) {
+            m_cals[k] = m_pFiffInfo->chs[k].range*m_pFiffInfo->chs[k].cal;
+        }
+
         //Set all projectors to zero before writing to file because we always write the raw data
-        for(int i = 0; i<m_pFiffInfo->projs.size(); i++)
+        for(int i = 0; i<m_pFiffInfo->projs.size(); i++) {
             m_pFiffInfo->projs[i].active = false;
+        }
+
+        //Initialize the data and calibration vector
+        typedef Eigen::Triplet<double> T;
+        std::vector<T> tripletList;
+        tripletList.reserve(m_pFiffInfo->nchan);
+        for(qint32 i = 0; i < m_pFiffInfo->nchan; ++i) {
+            tripletList.push_back(T(i, i, this->m_cals[i]));
+        }
+
+        m_sparseMatCals = SparseMatrix<double>(m_pFiffInfo->nchan, m_pFiffInfo->nchan);
+        m_sparseMatCals.setFromTriplets(tripletList.begin(), tripletList.end());
 
         m_mutex.lock();
-        m_pOutfid = FiffStream::start_writing_raw(m_qFileOut, *m_pFiffInfo, m_cals, defaultMatrixXi, false);
+        m_pOutfid = FiffStream::start_writing_raw(m_qFileOut, *m_pFiffInfo, m_cals, defaultMatrixXi, true);
         fiff_int_t first = 0;
         m_pOutfid->write_int(FIFF_FIRST_SAMPLE, &first);
         m_mutex.unlock();
