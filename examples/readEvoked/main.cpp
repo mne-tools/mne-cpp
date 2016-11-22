@@ -55,6 +55,7 @@
 //=============================================================================================================
 
 #include <QtCore/QCoreApplication>
+#include <QCommandLineParser>
 
 
 //*************************************************************************************************************
@@ -84,9 +85,22 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
+    // Command Line Parser
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Start readEvoked tutorial");
+    parser.addHelpOption();
+
+    QCommandLineOption evokedFileOption("ave", "Path to the evoked/average <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    QCommandLineOption evokedIdxOption("aveIdx", "The average <index> to choose from the average file.", "index", "2");
+
+    parser.addOption(evokedFileOption);
+    parser.addOption(evokedIdxOption);
+
+    parser.process(a);
+
     //generate FiffEvoked object
-    QFile t_sampleFile("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
-    FiffEvoked p_FiffEvoked(t_sampleFile,QVariant("2"));
+    QFile t_sampleFile(parser.value(evokedFileOption));
+    FiffEvoked p_FiffEvoked(t_sampleFile,QVariant(parser.value(evokedIdxOption)));
 
     //Select the head coordinate system
     bool use_ctf_head = 1;

@@ -50,6 +50,7 @@
 
 #include <QtCore/QCoreApplication>
 #include <QDebug>
+#include <QCommandLineParser>
 
 
 //*************************************************************************************************************
@@ -78,7 +79,29 @@ int main(int argc, char *argv[])
 {
     QCoreApplication app(argc, argv);
 
-    QFile t_fileForwardSolution("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
+    // Command Line Parser
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Start rawClusteredInverseRapMusic tutorial");
+    parser.addHelpOption();
+
+    QCommandLineOption fwdFileOption("fwd", "Path to the forward solution <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
+    QCommandLineOption surfOption("surfType", "Surface type <type>.", "type", "orig");
+    QCommandLineOption annotOption("annotType", "Annotation type <type>.", "type", "aparc.a2009s");
+    QCommandLineOption subjectOption("subject", "Selected subject <subject>.", "subject", "sample");
+    QCommandLineOption subjectPathOption("subjectPath", "Selected subject path <subjectPath>.", "subjectPath", "./MNE-sample-data/subjects");
+    QCommandLineOption hemiOption("hemi", "Selected hemisphere <hemi>.", "hemi", "2");
+
+    parser.addOption(fwdFileOption);
+    parser.addOption(surfOption);
+    parser.addOption(annotOption);
+    parser.addOption(subjectOption);
+    parser.addOption(subjectPathOption);
+    parser.addOption(hemiOption);
+
+    parser.process(app);
+
+    //Load data
+    QFile t_fileForwardSolution(parser.value(fwdFileOption));
     MNEForwardSolution t_Fwd(t_fileForwardSolution);
 
     if(t_Fwd.source_ori != -1)
@@ -88,10 +111,8 @@ int main(int argc, char *argv[])
         std::cout << "\nfirst 10 dipole normales:\n" << t_Fwd.source_nn.block(0,0,10,3) << std::endl ;
     }
 
-
     // === Option to cluster forward solution ===
-
-    AnnotationSet t_annotationSet("sample", 2, "aparc.a2009s", "./MNE-sample-data/subjects");
+    AnnotationSet t_annotationSet (parser.value(subjectOption), parser.value(hemiOption).toInt(), parser.value(annotOption), parser.value(subjectPathOption));
 
     //
     // Cluster forward solution;
