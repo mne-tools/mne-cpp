@@ -1,29 +1,38 @@
 #version 400 core
 
-uniform mat3 normalMatrix;
+uniform mat4 mvp;
+uniform mat4 projectionMatrix;
 
 layout(triangles) in;
-layout(triangle_strip, max_vertices = 3) out;
+layout(triangle_strip, max_vertices = 4) out;
 
-in vec3 teColor[3];
-in vec3 tePosition[3];
+in vec4 tePosition[];
+in vec3 teColor[];
+in vec3 teNormal[];
 
-out vec3 gFacetNormal;
+out vec3 gNormal;
 out vec3 gColor;
+out vec3 gPosition;
 
 void main()
 {
+	gl_Position = mvp * tePosition[0];
+	gNormal = teNormal[0];
 	gColor = teColor[0];
-	
-    vec3 A = tePosition[2] - tePosition[0];
-    vec3 B = tePosition[1] - tePosition[0];
-    gFacetNormal = normalMatrix * -1.0 * normalize(cross(A, B));
+	gPosition = gl_Position.xyz;
+	EmitVertex();
 
-    gl_Position = gl_in[0].gl_Position; EmitVertex();
+    gl_Position = mvp * tePosition[1];
+	gNormal = teNormal[1];
+	gColor = teColor[1];
+	gPosition = gl_Position.xyz;
+	EmitVertex();
 
-    gl_Position = gl_in[1].gl_Position; EmitVertex();
-
-    gl_Position = gl_in[2].gl_Position; EmitVertex();
+    gl_Position = mvp * tePosition[2];
+	gNormal = teNormal[2];
+	gColor = teColor[2];
+	gPosition = gl_Position.xyz;
+	EmitVertex();
 
     EndPrimitive();
 }

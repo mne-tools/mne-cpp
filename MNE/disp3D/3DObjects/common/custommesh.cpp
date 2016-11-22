@@ -223,7 +223,7 @@ bool CustomMesh::createCustomMesh(const MatrixX3f& tMatVert,
     uint *rawIndexArray = reinterpret_cast<uint *>(indexBufferData.data());
     int idxTris = 0;
 
-    for(int i = 0; i<tMatTris.rows(); i++) {
+    for(int i = 0; i < tMatTris.rows(); ++i) {
         //Faces/Tris
         rawIndexArray[idxTris++] = tMatTris(i,0);
         rawIndexArray[idxTris++] = tMatTris(i,1);
