@@ -6325,7 +6325,7 @@ int mne_proj_op_apply_cov(mneProjOp op, mneCovMatrix& c)
       */
 {
 
-  printf("############ BUGGY int mne_proj_op_apply_cov(mneProjOp op, mneCovMatrix c)\n");
+  printf("############ BUGGY -somhow the output gets deleted int mne_proj_op_apply_cov(mneProjOp op, mneCovMatrix c)\n");
 
   double **dcov = NULL;
   int j,k,p;
