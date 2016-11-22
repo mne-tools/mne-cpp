@@ -91,6 +91,7 @@ Neuromag::Neuromag()
 , m_bIsRunning(false)
 , m_sFiffHeader(QCoreApplication::applicationDirPath() + "/mne_scan_plugins/resources/neuromag/header.fif")
 , m_iActiveConnectorId(0)
+, m_bWriteToFile(false)
 {
     m_pActionSetupProject = new QAction(QIcon(":/images/database.png"), tr("Setup Project"),this);
     m_pActionSetupProject->setStatusTip(tr("Setup Project"));
@@ -105,24 +106,18 @@ Neuromag::Neuromag()
     addPluginAction(m_pActionRecordFile);
 
     //Init timers
-    if(!m_pRecordTimer) {
-        m_pRecordTimer = QSharedPointer<QTimer>(new QTimer(this));
-        m_pRecordTimer->setSingleShot(true);
-        connect(m_pRecordTimer.data(), &QTimer::timeout,
-                this, &Neuromag::toggleRecordingFile);
-    }
+    m_pRecordTimer = QSharedPointer<QTimer>(new QTimer(this));
+    m_pRecordTimer->setSingleShot(true);
+    connect(m_pRecordTimer.data(), &QTimer::timeout,
+            this, &Neuromag::toggleRecordingFile);
 
-    if(!m_pBlinkingRecordButtonTimer) {
-        m_pBlinkingRecordButtonTimer = QSharedPointer<QTimer>(new QTimer(this));
-        connect(m_pBlinkingRecordButtonTimer.data(), &QTimer::timeout,
-                this, &Neuromag::changeRecordingButton);
-    }
+    m_pBlinkingRecordButtonTimer = QSharedPointer<QTimer>(new QTimer(this));
+    connect(m_pBlinkingRecordButtonTimer.data(), &QTimer::timeout,
+            this, &Neuromag::changeRecordingButton);
 
-    if(!m_pUpdateTimeInfoTimer) {
-        m_pUpdateTimeInfoTimer = QSharedPointer<QTimer>(new QTimer(this));
-        connect(m_pUpdateTimeInfoTimer.data(), &QTimer::timeout,
-                this, &Neuromag::onRecordingRemainingTimeChange);
-    }
+    m_pUpdateTimeInfoTimer = QSharedPointer<QTimer>(new QTimer(this));
+    connect(m_pUpdateTimeInfoTimer.data(), &QTimer::timeout,
+            this, &Neuromag::onRecordingRemainingTimeChange);
 }
 
 
@@ -689,7 +684,10 @@ void Neuromag::run()
                 }
 
                 m_mutex.lock();
-                m_pOutfid->write_raw_buffer(matValue.cast<double>());
+                if(m_pOutfid)
+                {
+                    m_pOutfid->write_raw_buffer(matValue.cast<double>());
+                }
                 m_mutex.unlock();
             }
             else
