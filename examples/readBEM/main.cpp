@@ -83,19 +83,22 @@ int main(int argc, char *argv[])
 
     // Command Line Parser
     QCommandLineParser parser;
-    parser.setApplicationDescription("Read BEM Example");
+    parser.setApplicationDescription("Start readBEM Example");
     parser.addHelpOption();
-    QCommandLineOption sampleBEMFileOption("f", "Path to BEM <file>.", "file", "./MNE-sample-data/subjects/sample/bem/sample-head.fif");
+    QCommandLineOption bemFileInOption("bem", "Path to BEM <file>.", "file", "./MNE-sample-data/subjects/sample/bem/sample-head.fif");
+    QCommandLineOption bemFileOutOption("bemOut", "Path to BEM <file>, which is to be written.", "file", "./sample-head-test.fif");
+
 //    "./MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif"
 //    "./MNE-sample-data/subjects/sample/bem/sample-all-src.fif"
 //    "./MNE-sample-data/subjects/sample/bem/sample-5120-bem-sol.fif"
 //    "./MNE-sample-data/subjects/sample/bem/sample-5120-bem.fif"
 
-    parser.addOption(sampleBEMFileOption);
+    parser.addOption(bemFileInOption);
+    parser.addOption(bemFileOutOption);
     parser.process(app);
 
     // Read the BEM
-    QFile t_fileBem(parser.value(sampleBEMFileOption));
+    QFile t_fileBem(parser.value(bemFileInOption));
     MNEBem t_Bem(t_fileBem);
 
     if( t_Bem.size() > 0 )
@@ -107,7 +110,7 @@ int main(int argc, char *argv[])
     }
 
     // Write the BEM
-    QFile t_fileBemTest("sample-head-test.fif");
+    QFile t_fileBemTest(parser.value(bemFileOutOption));
     t_Bem.write(t_fileBemTest);
     t_fileBemTest.close();
 

@@ -122,7 +122,6 @@ int main(int argc, char *argv[])
     QCommandLineOption evokedIdxOption("aveIdx", "The average <index> to choose from the average file.", "index", "0");
     QCommandLineOption hemiOption("hemi", "Selected hemisphere <hemi>.", "hemi", "2");
 
-
     parser.addOption(inputOption);
     parser.addOption(eventsFileOption);
     parser.addOption(fwdOption);
@@ -135,6 +134,7 @@ int main(int argc, char *argv[])
     parser.addOption(evokedIdxOption);
     parser.addOption(hemiOption);
 
+    //Load data
     QFile t_fileRaw(parser.value(inputOption));
     QString t_sEventName = parser.value(eventsFileOption);
     QFile t_fileFwd(parser.value(fwdOption));
