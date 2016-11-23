@@ -6601,7 +6601,7 @@ int mne_proj_op_make_proj_bad(mneProjOp op, char **bad, int nbad)
       else
         op->proj_data[op->nvec][k] = vv_meg[p][k];
 
-      printf("#### MEG op->proj_data[%d][%d]=%f\n", op->nvec, k, op->proj_data[op->nvec][k]);
+//      printf("#### MEG op->proj_data[%d][%d]=%f\n", op->nvec, k, op->proj_data[op->nvec][k]);
 
       /*
        * If the above did not work, this will (provided that EEG channels are called EEG*)
@@ -6625,7 +6625,7 @@ int mne_proj_op_make_proj_bad(mneProjOp op, char **bad, int nbad)
       else
         op->proj_data[op->nvec][k] = vv_eeg[p][k];
 
-      printf("#### EEG op->proj_data[%d][%d]=%f\n", op->nvec, k, op->proj_data[op->nvec][k]);
+//      printf("#### EEG op->proj_data[%d][%d]=%f\n", op->nvec, k, op->proj_data[op->nvec][k]);
 
       /*
        * If the above did not work, this will (provided that MEG channels are called MEG*)
@@ -6660,15 +6660,15 @@ int mne_proj_op_make_proj_bad(mneProjOp op, char **bad, int nbad)
 
 
 
-  //DEBUG
-  printf("####mne_proj_op_make_proj_bad#### Result:\n");
-  for (int p = 0; p < op->nvec; p++) {
-    float* pvec = op->proj_data[p];
-    for (int k = 0; k < 10/*op->nch*/; k++) {
-      printf("####new 0 pvec#### pvec[%d][%d]=%f\n", p, k, pvec[k]);
-    }
-  }
-  //DEBUG
+//  //DEBUG
+//  printf("####mne_proj_op_make_proj_bad#### Result:\n");
+//  for (int p = 0; p < op->nvec; p++) {
+//    float* pvec = op->proj_data[p];
+//    for (int k = 0; k < 10/*op->nch*/; k++) {
+//      printf("####new 0 pvec#### pvec[%d][%d]=%f\n", p, k, pvec[k]);
+//    }
+//  }
+//  //DEBUG
 
 
 
@@ -9215,12 +9215,12 @@ int mne_whiten_data(float **data, float **whitened_data, int np, int nchan, mneC
   double *inv;
 
   //DEBUG
-  printf("w0 [0] data=[%f,%f,%f]\n", data[0][0], data[0][1], data[0][2]);
-  printf("w0 [1] data=[%f,%f,%f]\n", data[1][0], data[1][1], data[1][2]);
-  printf("w0 ncov=%d\n", C->ncov);
-  printf("w0 nzero=%d\n", C->nzero);
-  printf("w0 inv_lambda=%f,%f,%f\n", C->inv_lambda[0], C->inv_lambda[1], C->inv_lambda[2]);
-  printf("w0 cov_diag=[%f,%f,%f]\n", C->cov_diag[0], C->cov_diag[1], C->cov_diag[2]);
+//  printf("w0 [0] data=[%f,%f,%f]\n", data[0][0], data[0][1], data[0][2]);
+//  printf("w0 [1] data=[%f,%f,%f]\n", data[1][0], data[1][1], data[1][2]);
+//  printf("w0 ncov=%d\n", C->ncov);
+//  printf("w0 nzero=%d\n", C->nzero);
+//  printf("w0 inv_lambda=%f,%f,%f\n", C->inv_lambda[0], C->inv_lambda[1], C->inv_lambda[2]);
+//  printf("w0 cov_diag=[%f,%f,%f]\n", C->cov_diag[0], C->cov_diag[1], C->cov_diag[2]);
 
 //  typedef struct {		/* Covariance matrix storage */
 //    int        kind;		/* Sensor or source covariance */
@@ -9253,7 +9253,7 @@ int mne_whiten_data(float **data, float **whitened_data, int np, int nchan, mneC
   }
   inv = C->inv_lambda;
   if (mne_is_diag_cov(C)) {
-    printf("<DEBUG> Performing Diag\n");
+//    printf("<DEBUG> Performing Diag\n");
     for (j = 0; j < np; j++) {
       orig = data[j];
       white = whitened_data[j];
@@ -9991,8 +9991,8 @@ int compute_dipole_field(dipoleFitData d, float *rd, int whiten, float **fwd)
     }
   }
 
-  printf("0 [0] fwd=[%f,%f,%f]\n", fwd[0][0], fwd[0][1], fwd[0][2]);
-  printf("0 [1] fwd=[%f,%f,%f]\n", fwd[1][0], fwd[1][1], fwd[1][2]);
+//  printf("DEBUG 0 [0] fwd=[%f,%f,%f]\n", fwd[0][0], fwd[0][1], fwd[0][2]);
+//  printf("DEBUG 0 [1] fwd=[%f,%f,%f]\n", fwd[1][0], fwd[1][1], fwd[1][2]);
 
   if (d->neeg > 0) {
     if (d->funcs->eeg_vec_pot) {
@@ -10012,8 +10012,8 @@ int compute_dipole_field(dipoleFitData d, float *rd, int whiten, float **fwd)
     }
   }
 
-  printf("1 [0] fwd=[%f,%f,%f]\n", fwd[0][0], fwd[0][1], fwd[0][2]);
-  printf("1 [1] fwd=[%f,%f,%f]\n", fwd[1][0], fwd[1][1], fwd[1][2]);
+//  printf("DEBUG 1 [0] fwd=[%f,%f,%f]\n", fwd[0][0], fwd[0][1], fwd[0][2]);
+//  printf("DEBUG 1 [1] fwd=[%f,%f,%f]\n", fwd[1][0], fwd[1][1], fwd[1][2]);
 
   /*
    * Apply projection
@@ -10031,8 +10031,8 @@ int compute_dipole_field(dipoleFitData d, float *rd, int whiten, float **fwd)
 //      goto bad;
   //Debug something suspecious here
 
-  printf("2 [0] fwd=[%f,%f,%f]\n", fwd[0][0], fwd[0][1], fwd[0][2]);
-  printf("2 [1] fwd=[%f,%f,%f]\n", fwd[1][0], fwd[1][1], fwd[1][2]);
+//  printf("DEBUG 2 [0] fwd=[%f,%f,%f]\n", fwd[0][0], fwd[0][1], fwd[0][2]);
+//  printf("DEBUG 2 [1] fwd=[%f,%f,%f]\n", fwd[1][0], fwd[1][1], fwd[1][2]);
 
 #ifdef DEBUG
   fprintf(stdout,"proj : ");
@@ -10049,8 +10049,8 @@ int compute_dipole_field(dipoleFitData d, float *rd, int whiten, float **fwd)
       goto bad;
   }
 
-  printf("3 [0] fwd=[%f,%f,%f]\n", fwd[0][0], fwd[0][1], fwd[0][2]);
-  printf("3 [1] fwd=[%f,%f,%f]\n", fwd[1][0], fwd[1][1], fwd[1][2]);
+//  printf("DEBUG 3 [0] fwd=[%f,%f,%f]\n", fwd[0][0], fwd[0][1], fwd[0][2]);
+//  printf("DEBUG 3 [1] fwd=[%f,%f,%f]\n", fwd[1][0], fwd[1][1], fwd[1][2]);
 
 #ifdef DEBUG
   fprintf(stdout,"white : ");
@@ -10077,8 +10077,8 @@ dipoleForward dipole_forward(dipoleFitData d,
  * Compute the forward solution and do other nice stuff
  */
 {
-  printf("\n<<<< DEBUG >>>> [3.2] dipole_forward\n");
-  printf("rd=[%f,%f,%f]\n", rd[0][0], rd[0][1], rd[0][2]);
+//  printf("\n<<<< DEBUG >>>> [3.2] dipole_forward\n");
+//  printf("DEBUG rd=[%f,%f,%f]\n", rd[0][0], rd[0][1], rd[0][2]);
 
   dipoleForward res;
   float         **this_fwd;
@@ -10088,9 +10088,11 @@ dipoleForward dipole_forward(dipoleFitData d,
    * Allocate data if necessary
    */
   if (old && old->ndip == ndip && old->nch == d->nmeg+d->neeg) {
+//    printf("DEBUG 0 using old\n");
     res = old;
   }
   else {
+//    printf("DEBUG 0 using new\n");
     free_dipole_forward(old); old = NULL;
     res = new_dipole_forward();
     res->fwd  = ALLOC_CMATRIX(3*ndip,d->nmeg+d->neeg);
@@ -10102,6 +10104,7 @@ dipoleForward dipole_forward(dipoleFitData d,
     res->scales = MALLOC(3*ndip,float);
     res->ndip = ndip;
   }
+
   for (k = 0; k < ndip; k++) {
     VEC_COPY(res->rd[k],rd[k]);
     this_fwd = res->fwd + 3*k;
@@ -10143,20 +10146,21 @@ dipoleForward dipole_forward(dipoleFitData d,
     }
   }
 
-  printf("rd=[%f,%f,%f]\n", res->rd[0][0], res->rd[0][1], res->rd[0][2]);
-  printf("ndip=%d\n", res->ndip);
-  printf("fwd=[%f,%f,%f]\n", res->fwd[0][0], res->fwd[0][1], res->fwd[0][2]);
-  printf("scales=[%f,%f,%f]\n", res->scales[0], res->scales[1], res->scales[2]);
-  printf("uu=[%f,%f,%f]\n", res->uu[0][0], res->uu[0][1], res->uu[0][2]);
-  printf("vv=[%f,%f,%f]\n", res->vv[0][0], res->vv[0][1], res->vv[0][2]);
-  printf("sing=[%f,%f,%f]\n", res->sing[0], res->sing[1], res->sing[2]);
-  printf("nch=%d\n", res->nch);
-
   /*
    * SVD
    */
   if (mne_svd(res->fwd,3*ndip,d->nmeg+d->neeg,res->sing,res->vv,res->uu) != 0)
     goto bad;
+
+//  printf("DEBUG 1 rd=[%f,%f,%f]\n", res->rd[0][0], res->rd[0][1], res->rd[0][2]);
+//  printf("DEBUG 1 ndip=%d\n", res->ndip);
+//  printf("DEBUG 1 fwd=[%f,%f,%f]\n", res->fwd[0][0], res->fwd[0][1], res->fwd[0][2]);
+//  printf("DEBUG 1 scales=[%f,%f,%f]\n", res->scales[0], res->scales[1], res->scales[2]);
+//  printf("DEBUG 1 uu=[%f,%f,%f]\n", res->uu[0][0], res->uu[0][1], res->uu[0][2]);
+//  printf("DEBUG 1 vv=[%f,%f,%f]\n", res->vv[0][0], res->vv[0][1], res->vv[0][2]);
+//  printf("DEBUG 1 sing=[%f,%f,%f]\n", res->sing[0], res->sing[1], res->sing[2]);
+//  printf("DEBUG 1 nch=%d\n", res->nch);
+
   return res;
 
  bad : {
@@ -14691,19 +14695,90 @@ static int c_dsvd(double **mat,		/* The matrix */
       * LAPACK Fortran routine
       */
 {
+    ///////// ToDo: NONE - Already Debugged
+    printf("####### ToDo: Debug c_dsvd\n");
 
     int    udim = MIN(m,n);
     MatrixXd eigen_mat = toDoubleEigenMatrix(mat, m, n);
 
-    Eigen::JacobiSVD< Eigen::MatrixXd > svd(eigen_mat ,Eigen::ComputeFullU | Eigen::ComputeFullV);
+//    //DEBUG
+//    printf("#### mat (%dx%d)####:\n",m,n);
+//    for (int i = 0; i < 3; i++)
+//      for (int j = 0; j < 2; j++)
+//        printf("mat[%d][%d]=%f\n", i, j, mat[i][j]);
+//    //DEBUG
 
-    fromDoubleEigenVector(svd.singularValues(), sing, udim);
+    Eigen::JacobiSVD< Eigen::MatrixXd > svd(eigen_mat,Eigen::ComputeFullU | Eigen::ComputeFullV);
 
-    if ( vv != NULL )
-        fromDoubleEigenMatrix(svd.matrixV(), vv, udim, n);
+//    //DEBUG
+//    printf("#### sing (%d)####:\n",udim);
+//    for (int i = 0; i < udim; i++) {
+//      printf("sing[%d]=%f\n", i, sing[i]);
+//    }
+//    //DEBUG
+
+    fromDoubleEigenVector(svd.singularValues(), sing, svd.singularValues().size());
+
+
+    printf("#### uu before (%dx%d)####:\n",udim,m);
+    printf("#### UU (%dx%d)####:\n",svd.matrixU().rows(),svd.matrixU().cols());
 
     if ( uu != NULL )
         fromDoubleEigenMatrix(svd.matrixU(), uu, udim, m);
+
+//    if(uu != NULL)
+//    {
+//        //DEBUG
+//        printf("#### uu (%dx%d)####:\n",udim,m);
+//        for (int i = 0; i < udim; i++) {
+//            for (int j = 0; j < m; j++) {
+//                printf("uu[%d][%d]=%f\n", i, j, uu[i][j]);
+//            }
+//        }
+//        //DEBUG
+//    }
+
+    printf("#### vv before (%dx%d)####:\n",m,n);
+    printf("#### VV (%dx%d)####:\n",svd.matrixV().rows(),svd.matrixV().cols());
+
+    if ( vv != NULL )
+        fromDoubleEigenMatrix(svd.matrixV().transpose(), vv, udim, udim);
+
+//    if(vv != NULL)
+//    {
+//        //DEBUG
+//        printf("#### vv (%dx%d)####:\n",m,n);
+//        for (int i = 0; i < m; i++) {
+//          for (int j = 0; j < n; j++) {
+//            printf("vv[%d][%d]=%f\n", i, j, vv[i][j]);
+//          }
+//        }
+//        //DEBUG
+//    }
+
+//  if(uu != NULL)
+//  {
+//      //DEBUG
+//      printf("#### uu (%dx%d)####:\n",udim,m);
+//      for (int i = 0; i < udim; i++) {
+//        for (int j = 0; j < m; j++) {
+//          printf("uu[%d][%d]=%f\n", i, j, uu[i][j]);
+//        }
+//      }
+//      //DEBUG
+//  }
+
+//  //DEBUG
+//  printf("#### vv (%dx%d)####:\n",m,m);
+//  for (int i = 0; i < m; i++) {
+//    for (int j = 0; j < m; j++) {
+//      printf("vv[%d][%d]=%f\n", i, j, vv[i][j]);
+//    }
+//  }
+//  //DEBUG
+
+
+
 
     return 0;
 
@@ -17151,14 +17226,14 @@ guessData make_guess_data(char          *guessname,
   else
     f->funcs = f->sphere_funcs;
 
-//  for (k = 0; k < res->nguess; k++) {
-//    if ((res->guess_fwd[k] = dipole_forward_one(f,res->rr[k],NULL)) == NULL)
-//      goto bad;
-//DEBUG ToDo Remove
-  for (k = 0; k < 1/*res->nguess*/; k++) {
-    if ((res->guess_fwd[k] = dipole_forward_one(f,res->rr[k],NULL)) != NULL)
+  for (k = 0; k < res->nguess; k++) {
+    if ((res->guess_fwd[k] = dipole_forward_one(f,res->rr[k],NULL)) == NULL)
       goto bad;
-//DEBUG ToDo Remove
+////DEBUG ToDo Remove
+//  for (k = 0; k < 1/*res->nguess*/; k++) {
+//    if ((res->guess_fwd[k] = dipole_forward_one(f,res->rr[k],NULL)) != NULL)
+//      goto bad;
+////DEBUG ToDo Remove
 #ifdef DEBUG
     sing = res->guess_fwd[k]->sing;
     printf("%f %f %f\n",sing[0],sing[1],sing[2]);
