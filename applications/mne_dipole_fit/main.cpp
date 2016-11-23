@@ -653,19 +653,63 @@ int mne_svd(float **mat,	/* The matrix */
   }
 
 
-  MatrixXf eigen_mat = toFloatEigenMatrix(mat, 1, m);
+//  //DEBUG
+//  printf("#### mat (%dx%d)####:\n",m,n);
+//  for (int i = 0; i < m; i++) {
+//    for (int j = 0; j < 10; j++) {
+//      printf("mat[%d][%d]=%f\n", i, j, mat[i][j]);
+//    }
+//  }
+//  //DEBUG
+
+
+  MatrixXf eigen_mat = toFloatEigenMatrix(mat, m, n).transpose(); //ToDo: don't transpose here and the exchange is not necessary
 
   Eigen::JacobiSVD< Eigen::MatrixXf > svd(eigen_mat ,Eigen::ComputeFullU | Eigen::ComputeFullV);
 
-  fromFloatEigenVector(svd.singularValues(), sing, 1);
+  fromFloatEigenVector(svd.singularValues(), sing, svd.singularValues().size());
+
+//  //DEBUG
+//  printf("#### sing (%d)####:\n",udim);
+//  for (int i = 0; i < udim; i++) {
+//      printf("sing[%d]=%f\n", i, sing[i]);
+//  }
+//  //DEBUG
 
   if (uu != NULL)
     fromFloatEigenMatrix(svd.matrixV(), uu, udim, m);
 
   if (vv != NULL)
-    fromFloatEigenMatrix(svd.matrixU(), vv);
+    fromFloatEigenMatrix(svd.matrixU().transpose(), vv, m, n);
+
+  printf("#### svd.matrixV() (%dx%d)####:\n",svd.matrixV().rows(),svd.matrixV().cols());
+  printf("#### svd.matrixU() (%dx%d)####:\n",svd.matrixU().rows(),svd.matrixU().cols());
+
+//  if(uu != NULL)
+//  {
+//      //DEBUG
+//      printf("#### uu (%dx%d)####:\n",udim,m);
+//      for (int i = 0; i < udim; i++) {
+//        for (int j = 0; j < m; j++) {
+//          printf("uu[%d][%d]=%f\n", i, j, uu[i][j]);
+//        }
+//      }
+//      //DEBUG
+//  }
+
+  //DEBUG
+  printf("#### vv (%dx%d)####:\n",m,m);
+//  for (int i = 0; i < m; i++) {
+//    for (int j = 0; j < m; j++) {
+//      printf("vv[%d][%d]=%f\n", i, j, vv[i][j]);
+//    }
+//  }
+//  //DEBUG
+
 
   return 0;
+
+
 
 //  sgesvd(jobu,jobvt,&n,&m,mat[0],&n,sing,
 //     vvp,&n,uup,&udim,work,&lwork,&info);
@@ -6122,6 +6166,8 @@ int mne_proj_op_chs(mneProjOp op, char **list, int nlist)
 
   mne_free_proj_op_proj(op);	/* These data are not valid any more */
 
+  qDebug() << "!!!!!!!!!!!!!!!!!! int mne_proj_op_chs(mneProjOp op, char **list, int nlist) !!!!!!!!!!!!!!!!!!!!!!";
+
   if (nlist == 0)
     return OK;
 
@@ -6273,11 +6319,13 @@ int mne_proj_op_proj_dvector(mneProjOp op, double *vec, int nch, int do_compleme
       * Assume that all dimension checking etc. has been done before
       */
 {
-  static double *res = NULL;
-  static int   res_size = 0;
+//  static double *res = NULL;
+//  static int   res_size = 0;
   float *pvec;
   double w;
   int k,p;
+
+//  printf("###START### 0 mne_proj_op_proj_dvector vec=%f\n", vec[0]);
 
   if (op->nvec <= 0)
     return OK;
@@ -6287,21 +6335,49 @@ int mne_proj_op_proj_dvector(mneProjOp op, double *vec, int nch, int do_compleme
     return FAIL;
   }
 
-  if (op->nch > res_size) {
-    res = REALLOC(res,op->nch,double);
-    res_size = op->nch;
-  }
+//  if (op->nch > res_size) {
+//    res = REALLOC(res,op->nch,double);
+//    res_size = op->nch;
+//  }
 
-  for (k = 0; k < op->nch; k++)
-    res[k] = 0.0;
+//  for (k = 0; k < op->nch; k++)
+//    res[k] = 0.0;
+
+  VectorXd res = VectorXd::Zero(op->nch);
+
+//  printf("############ 1 mne_proj_op_proj_dvector res=%f\n", res[0]);
+
+
+  //DEBUG
+//  for (p = 0; p < op->nvec; p++) {
+//    pvec = op->proj_data[p];
+//    for (k = 0; k < op->nch; k++) {
+//      printf("############ pvec[%d][%d]=%f\n", p, k, pvec[k]);
+//    }
+//  }
+  //DEBUG
+
 
   for (p = 0; p < op->nvec; p++) {
     pvec = op->proj_data[p];
-    for (k = 0, w = 0.0; k < op->nch; k++)
+    w = 0.0;
+    for (k = 0; k < op->nch; k++) {
+//      printf("############ 2 mne_proj_op_proj_dvector vec[%d]=%f, pvec[%d]=%f\n",  k, vec[k], k, pvec[k]);
       w += vec[k]*pvec[k];
+    }
+
+//    printf("############ 3 mne_proj_op_proj_dvector w=%f\n", w);
     for (k = 0; k < op->nch; k++)
+    {
       res[k] = res[k] + w*pvec[k];
+//      printf("############ 4 mne_proj_op_proj_dvector res[%d]=%f, w=%f, pvec[%d]=%f\n", k, res[k], w, k, pvec[k]);
+//      printf("############ 5 mne_proj_op_proj_dvector w=%f\n", w);
+    }
   }
+
+//  printf("############ 6 mne_proj_op_proj_dvector vec=%f\n", vec[0]);
+//  printf("############ 7 mne_proj_op_proj_dvector res=%f\n", res[0]);
+
   if (do_complement) {
     for (k = 0; k < op->nch; k++)
       vec[k] = vec[k] - res[k];
@@ -6310,6 +6386,9 @@ int mne_proj_op_proj_dvector(mneProjOp op, double *vec, int nch, int do_compleme
     for (k = 0; k < op->nch; k++)
       vec[k] = res[k];
   }
+
+//  printf("############ 4 mne_proj_op_proj_dvector vec=%f\n", vec[0]);
+
   return OK;
 }
 
@@ -6346,7 +6425,7 @@ int mne_proj_op_apply_cov(mneProjOp op, mneCovMatrix& c)
   if (c->cov_diag) {		/* Pick the diagonals */
     for (j = 0, p = 0; j < c->ncov; j++)
       for (k = 0; k < c->ncov; k++)
-    dcov[j][k] = (j == k) ? c->cov_diag[j] : 0;
+        dcov[j][k] = (j == k) ? c->cov_diag[j] : 0;
   }
   else {			/* Return full matrix */
     for (j = 0, p = 0; j < c->ncov; j++)
@@ -6356,29 +6435,74 @@ int mne_proj_op_apply_cov(mneProjOp op, mneCovMatrix& c)
       for (k = j+1; k < c->ncov; k++)
     dcov[j][k] = dcov[k][j];
   }
+
+
+  printf("############ 0 dcov[0][0]=%f\n", dcov[0][0]);
+
+  printf("############ 0 mne_proj_op_apply_cov cov_diag=[%f,%f,%f]\n", c->cov_diag[0], c->cov_diag[1], c->cov_diag[2]);
+
+
+
+//  //DEBUG
+//  for (p = 0; p < op->nvec; p++) {
+//    float* pvec = op->proj_data[p];
+//    for (k = 0; k < op->nch; k++) {
+//      printf("####pvec#### pvec[%d][%d]=%f\n", p, k, pvec[k]);
+//    }
+//  }
+//  //DEBUG
+
+
+
   /*
    * Project from front and behind
    */
-  for (k = 0; k < c->ncov; k++)
+  for (k = 0; k < c->ncov; k++) {
+//    printf("############ 0.1 dcov[%d][0]=%f\n", k, dcov[k][0]);
     if (mne_proj_op_proj_dvector(op,dcov[k],c->ncov,do_complement) != OK)
       return FAIL;
+//    printf("############ 0.2 dcov[%d][0]=%f\n", k, dcov[k][0]);
+  }
+
+//  printf("############ 0.5 dcov[0][0]=%f\n", dcov[0][0]);
+
   mne_transpose_dsquare(dcov,c->ncov);
+
+//  printf("############ 1 dcov[0][0]=%f\n", dcov[0][0]);
+
+//  printf("############ 1 mne_proj_op_apply_cov cov_diag=[%f,%f,%f]\n", c->cov_diag[0], c->cov_diag[1], c->cov_diag[2]);
+
+
   for (k = 0; k < c->ncov; k++)
     if (mne_proj_op_proj_dvector(op,dcov[k],c->ncov,do_complement) != OK)
       return FAIL;
+
+//  printf("############ 2 dcov[0][0]=%f\n", dcov[0][0]);
+
+//  printf("############ 2 mne_proj_op_apply_cov cov_diag=[%f,%f,%f]\n", c->cov_diag[0], c->cov_diag[1], c->cov_diag[2]);
+
   /*
    * Return the result
    */
   if (c->cov_diag) {		/* Pick the diagonal elements */
-    for (j = 0; j < c->ncov; j++)
+    for (j = 0; j < c->ncov; j++) {
+//      printf("############ dcov[j][j]=%f\n", dcov[j][j]);
+
       c->cov_diag[j] = dcov[j][j];
+
+//      printf("############ c->cov_diag[j]=%f\n", c->cov_diag[j]);
+    }
     FREE(c->cov); c->cov = NULL;
   }
   else {			/* Put everything back */
     for (j = 0, p = 0; j < c->ncov; j++)
       for (k = 0; k <= j; k++)
-    c->cov[p++] = dcov[j][k];
+        c->cov[p++] = dcov[j][k];
   }
+
+
+//  printf("############ 3 mne_proj_op_apply_cov cov_diag=[%f,%f,%f]\n", c->cov_diag[0], c->cov_diag[1], c->cov_diag[2]);
+
   FREE_DCMATRIX(dcov);
 
   c->nproj = mne_proj_op_affect(op,c->names,c->ncov);
@@ -6417,6 +6541,10 @@ int mne_proj_op_make_proj_bad(mneProjOp op, char **bad, int nbad)
   FREE_CMATRIX(op->proj_data);
   op->proj_data = NULL;
   op->nvec      = 0;
+
+
+  printf("####mne_proj_op_make_proj_bad#### !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
+
 
   if (op->nch <= 0)
     return OK;
@@ -6563,9 +6691,12 @@ int mne_proj_op_make_proj_bad(mneProjOp op, char **bad, int nbad)
        * Avoid crosstalk between MEG/EEG
        */
       if (fabs(vv_meg[p][k]) < SMALL_VALUE)
-    op->proj_data[op->nvec][k] = 0.0;
+        op->proj_data[op->nvec][k] = 0.0;
       else
-    op->proj_data[op->nvec][k] = vv_meg[p][k];
+        op->proj_data[op->nvec][k] = vv_meg[p][k];
+
+      printf("#### MEG op->proj_data[%d][%d]=%f\n", op->nvec, k, op->proj_data[op->nvec][k]);
+
       /*
        * If the above did not work, this will (provided that EEG channels are called EEG*)
        */
@@ -6584,9 +6715,12 @@ int mne_proj_op_make_proj_bad(mneProjOp op, char **bad, int nbad)
        * Avoid crosstalk between MEG/EEG
        */
       if (fabs(vv_eeg[p][k]) < SMALL_VALUE)
-    op->proj_data[op->nvec][k] = 0.0;
+        op->proj_data[op->nvec][k] = 0.0;
       else
-    op->proj_data[op->nvec][k] = vv_eeg[p][k];
+        op->proj_data[op->nvec][k] = vv_eeg[p][k];
+
+      printf("#### EEG op->proj_data[%d][%d]=%f\n", op->nvec, k, op->proj_data[op->nvec][k]);
+
       /*
        * If the above did not work, this will (provided that MEG channels are called MEG*)
        */
@@ -6610,8 +6744,34 @@ int mne_proj_op_make_proj_bad(mneProjOp op, char **bad, int nbad)
   for (k = 0; k < op->nch; k++)
     if (strstr(op->names[k],"STI") == op->names[k]) {
       for (p = 0; p < op->nvec; p++)
-    op->proj_data[p][k] = 0.0;
+        op->proj_data[p][k] = 0.0;
     }
+
+
+
+
+
+
+
+
+  //DEBUG
+  printf("####mne_proj_op_make_proj_bad#### Result:\n");
+  for (int p = 0; p < op->nvec; p++) {
+    float* pvec = op->proj_data[p];
+    for (int k = 0; k < 10/*op->nch*/; k++) {
+      printf("####new 0 pvec#### pvec[%d][%d]=%f\n", p, k, pvec[k]);
+    }
+  }
+  //DEBUG
+
+
+
+
+
+
+
+
+
   return OK;
 
  bad : {
@@ -8675,10 +8835,10 @@ mneCovMatrix mne_pick_chs_cov_omit(mneCovMatrix c, char **new_names, int ncov, i
       cov_diag[j] = c->cov_diag[pick[j]];
       names[j] = mne_strdup(c->names[pick[j]]);
 
-      printf("############ pick=%d\n",pick[j]);
-      printf("############ value=%f\n",c->cov_diag[pick[j]]);
-      printf("############ name=%s\n",names[j]);
-      printf("############ cov_diag[j]=%f\n",cov_diag[j]);
+//      printf("############ pick=%d\n",pick[j]);
+//      printf("############ value=%f\n",c->cov_diag[pick[j]]);
+//      printf("############ name=%s\n",names[j]);
+//      printf("############ cov_diag[j]=%f\n",cov_diag[j]);
     }
   }
   else {
@@ -16690,6 +16850,18 @@ dipoleFitData setup_dipole_fit_data(char  *mriname,		 /* This gives the MRI/head
    */
   if (make_projection(projnames,nproj,res->chs,res->nmeg+res->neeg,&res->proj) == FAIL)
     goto bad;
+
+
+//  //DEBUG
+//  printf("####make_projection#### !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
+//  for (int p = 0; p < res->proj->nvec; p++) {
+//    float* pvec = res->proj->proj_data[p];
+//    for (int k = 0; k < res->proj->nch; k++) {
+//      printf("####new 0 pvec#### pvec[%d][%d]=%f\n", p, k, pvec[k]);
+//    }
+//  }
+//  //DEBUG
+
   if (res->proj && res->proj->nitems > 0) {
     fprintf(stderr,"Final projection operator is:\n");
     mne_proj_op_report(stderr,"\t",res->proj);
@@ -16701,6 +16873,17 @@ dipoleFitData setup_dipole_fit_data(char  *mriname,		 /* This gives the MRI/head
   }
   else
     printf("No projection will be applied to the data.\n");
+
+//  //DEBUG
+//  printf("####make_projection#### !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
+//  for (int p = 0; p < res->proj->nvec; p++) {
+//    float* pvec = res->proj->proj_data[p];
+//    for (int k = 0; k < res->proj->nch; k++) {
+//      printf("####new 1 pvec#### pvec[%d][%d]=%f\n", p, k, pvec[k]);
+//    }
+//  }
+//  //DEBUG
+
   /*
    * Noise covariance
    */
