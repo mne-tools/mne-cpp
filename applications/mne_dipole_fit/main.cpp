@@ -618,116 +618,22 @@ int mne_svd(float **mat,	/* The matrix */
       */
 
 {
-  int    lwork;
-  float  *work;
-  float  **uutemp = NULL;
+///////// ToDo: NONE - Already Debugged
+
   int    udim = MIN(m,n);
-  int    info;
-  const char   *jobu;
-  const char   *jobvt;
-  int    j,k;
-  float  dum[1];
-  float  *vvp,*uup;
 
-  lwork = MAX(3*MIN(m,n)+MAX(m,n),5*MIN(m,n)-4) + 100*MAX(m,n);
-  work  = (float *)MALLOC(lwork,float);
-  /*
-   * Do SVD
-   */
-  if (vv == NULL) {
-    jobu = "N";
-    vvp = dum;
-  }
-  else {
-    jobu = "S";
-    vvp  = vv[0];
-  }
-  if (uu == NULL) {
-    jobvt = "N";
-    uup   = dum;
-  }
-  else {
-    jobvt = "S";
-    uutemp = ALLOC_CMATRIX(m,udim);
-    uup = uutemp[0];
-  }
-
-
-//  //DEBUG
-//  printf("#### mat (%dx%d)####:\n",m,n);
-//  for (int i = 0; i < m; i++) {
-//    for (int j = 0; j < 10; j++) {
-//      printf("mat[%d][%d]=%f\n", i, j, mat[i][j]);
-//    }
-//  }
-//  //DEBUG
-
-
-  MatrixXf eigen_mat = toFloatEigenMatrix(mat, m, n).transpose(); //ToDo: don't transpose here and the exchange is not necessary
-
+  MatrixXf eigen_mat = toFloatEigenMatrix(mat, m, n);
   Eigen::JacobiSVD< Eigen::MatrixXf > svd(eigen_mat ,Eigen::ComputeFullU | Eigen::ComputeFullV);
 
   fromFloatEigenVector(svd.singularValues(), sing, svd.singularValues().size());
 
-//  //DEBUG
-//  printf("#### sing (%d)####:\n",udim);
-//  for (int i = 0; i < udim; i++) {
-//      printf("sing[%d]=%f\n", i, sing[i]);
-//  }
-//  //DEBUG
-
   if (uu != NULL)
-    fromFloatEigenMatrix(svd.matrixV(), uu, udim, m);
+    fromFloatEigenMatrix(svd.matrixU(), uu, udim, m);
 
   if (vv != NULL)
-    fromFloatEigenMatrix(svd.matrixU().transpose(), vv, m, n);
-
-  printf("#### svd.matrixV() (%dx%d)####:\n",svd.matrixV().rows(),svd.matrixV().cols());
-  printf("#### svd.matrixU() (%dx%d)####:\n",svd.matrixU().rows(),svd.matrixU().cols());
-
-//  if(uu != NULL)
-//  {
-//      //DEBUG
-//      printf("#### uu (%dx%d)####:\n",udim,m);
-//      for (int i = 0; i < udim; i++) {
-//        for (int j = 0; j < m; j++) {
-//          printf("uu[%d][%d]=%f\n", i, j, uu[i][j]);
-//        }
-//      }
-//      //DEBUG
-//  }
-
-  //DEBUG
-  printf("#### vv (%dx%d)####:\n",m,m);
-//  for (int i = 0; i < m; i++) {
-//    for (int j = 0; j < m; j++) {
-//      printf("vv[%d][%d]=%f\n", i, j, vv[i][j]);
-//    }
-//  }
-//  //DEBUG
-
+    fromFloatEigenMatrix(svd.matrixV().transpose(), vv, m, n);
 
   return 0;
-
-
-
-//  sgesvd(jobu,jobvt,&n,&m,mat[0],&n,sing,
-//     vvp,&n,uup,&udim,work,&lwork,&info);
-//  if (info == 0) {
-//    if (uu != NULL) {
-//      /*
-//       * Transpose U to get rid of the
-//       * LAPACK convention.
-//       */
-//      for (j = 0; j < udim; j++)
-//        for (k = 0; k < m; k++)
-//          uu[j][k] = uutemp[k][j];
-//    }
-//  }
-//  else
-//    printf("sgesvd returned error: %d",info);
-//  FREE(work);
-//  FREE_CMATRIX(uutemp);
 //  return info;
 }
 
