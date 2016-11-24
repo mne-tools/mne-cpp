@@ -56,6 +56,7 @@ SUBDIRS += \
     readBEM\
     patientManager \
 
+
 !contains(MNECPP_CONFIG, minimalVersion) {
     qtHaveModule(charts) {
         SUBDIRS += \
@@ -73,6 +74,7 @@ SUBDIRS += \
             fsSurface \
             disp3DTutorial \
             histogram \
-            projection
+            projection \
+            cleanDig
     }
 }
