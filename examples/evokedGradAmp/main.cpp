@@ -88,7 +88,7 @@ int main(int argc, char *argv[])
 
     // Command Line Parser
     QCommandLineParser parser;
-    parser.setApplicationDescription("Start evokedGradAmp tutorial");
+    parser.setApplicationDescription("Start evokedGradAmp example");
     parser.addHelpOption();
     QCommandLineOption evokedFileOption("ave", "Path to the evoked/average <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
 

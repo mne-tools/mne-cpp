@@ -105,11 +105,11 @@ int main(int argc, char *argv[])
 
     // Command Line Parser
     QCommandLineParser parser;
-    parser.setApplicationDescription("Start rawClusteredInverse tutorial");
+    parser.setApplicationDescription("Start rawClusteredInverse example");
     parser.addHelpOption();
 
     QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", "./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
-    QCommandLineOption surfOption("surfType", "Surface type <type>.", "type", "orig");
+    QCommandLineOption surfOption("surfType", "Surface type <type>.", "type", "inflated");
     QCommandLineOption annotOption("annotType", "Annotation type <type>.", "type", "aparc.a2009s");
     QCommandLineOption subjectOption("subject", "Selected subject <subject>.", "subject", "sample");
     QCommandLineOption subjectPathOption("subjectPath", "Selected subject path <subjectPath>.", "subjectPath", "./MNE-sample-data/subjects");
@@ -409,24 +409,28 @@ int main(int argc, char *argv[])
         qDebug() << times.rows() << " x " << times.cols();
     }
 
-    //
-    // calculate the average
-    //
-    //Option 1
-    qint32 numAverages = 99;
-    VectorXi vecSel(numAverages);
+    // Calculate the average
+    // Option 1 - Random selection
+    VectorXi vecSel(50);
 
     for(qint32 i = 0; i < vecSel.size(); ++i)
     {
-        qint32 val = rand() % data.size();
+        qint32 val = rand() % count;
         vecSel(i) = val;
     }
 
-//    //Option 2
+//    //Option 3 - Take all epochs
+//    VectorXi vecSel(data.size());
+
+//    for(qint32 i = 0; i < vecSel.size(); ++i)
+//    {
+//        vecSel(i) = i;
+//    }
+
+//    //Option 3 - Manual selection
 //    VectorXi vecSel(20);
 
 //    vecSel << 76, 74, 13, 61, 97, 94, 75, 71, 60, 56, 26, 57, 56, 0, 52, 72, 33, 86, 96, 67;
-
 
     std::cout << "Select following epochs to average:\n" << vecSel << std::endl;
 
@@ -454,7 +458,6 @@ int main(int argc, char *argv[])
     MNEForwardSolution t_Fwd(t_fileFwd);
     if(t_Fwd.isEmpty())
         return 1;
-
 
     FiffCov noise_cov(t_fileCov);
 
@@ -578,7 +581,6 @@ int main(int argc, char *argv[])
 
     double t_dConditionNumber = MNEMath::getConditionNumber(t_Fwd.sol->data, s);
     double t_dConditionNumberClustered = MNEMath::getConditionNumber(t_clusteredFwd.sol->data, s);
-
 
     std::cout << "Condition Number:\n" << t_dConditionNumber << std::endl;
     std::cout << "Clustered Condition Number:\n" << t_dConditionNumberClustered << std::endl;

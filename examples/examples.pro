@@ -54,11 +54,11 @@ SUBDIRS += \
     fiffIO \
     makeLayout \
     readBEM \
+    clusteredInverse \
 
 !contains(MNECPP_CONFIG, minimalVersion) {
     qtHaveModule(charts) {
         SUBDIRS += \
-            clusteredInverse \
             rawClusteredInverse \
             readFwdDisp3D \
             computeInverseRapMusic \

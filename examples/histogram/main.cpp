@@ -128,7 +128,7 @@ int main(int argc, char *argv[])
 
     // Command Line Parser
     QCommandLineParser parser;
-    parser.setApplicationDescription("Start histogram tutorial");
+    parser.setApplicationDescription("Start histogram example");
     parser.addHelpOption();
     QCommandLineOption sampleFwdFileOption("fwd", "Path to forward solution <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
     QCommandLineOption sampleCovFileOption("cov", "Path to covariance <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");

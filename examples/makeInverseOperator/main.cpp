@@ -91,7 +91,7 @@ int main(int argc, char *argv[])
 
     // Command Line Parser
     QCommandLineParser parser;
-    parser.setApplicationDescription("Start makeInverseOperator tutorial");
+    parser.setApplicationDescription("Start makeInverseOperator example");
     parser.addHelpOption();
     QCommandLineOption fwdMEGOption("fwdMEG", "Path to forwad solution <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
     QCommandLineOption fwdEEGOption("fwdEEG", "Path to forwad solution <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-eeg-oct-6-fwd.fif");

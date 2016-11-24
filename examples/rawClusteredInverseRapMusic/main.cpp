@@ -104,7 +104,7 @@ int main(int argc, char *argv[])
 
     // Command Line Parser
     QCommandLineParser parser;
-    parser.setApplicationDescription("Start rawClusteredInverseRapMusic tutorial");
+    parser.setApplicationDescription("Start rawClusteredInverseRapMusic example");
     parser.addHelpOption();
 
     QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", "./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
@@ -410,37 +410,29 @@ int main(int argc, char *argv[])
         qDebug() << times.rows() << " x " << times.cols();
     }
 
-    //
-    // calculate the average
-    //
-//    //Option 1
-//    qint32 numAverages = 99;
-//    VectorXi vecSel(numAverages);
-//    srand (time(NULL)); // initialize random seed
+
+    // Calculate the average
+    // Option 1 - Random selection
+    VectorXi vecSel(2);
+
+    for(qint32 i = 0; i < vecSel.size(); ++i)
+    {
+        qint32 val = rand() % count;
+        vecSel(i) = val;
+    }
+
+//    //Option 3 - Take all epochs
+//    VectorXi vecSel(data.size());
 
 //    for(qint32 i = 0; i < vecSel.size(); ++i)
 //    {
-//        qint32 val = rand() % data.size();
-//        vecSel(i) = val;
+//        vecSel(i) = i;
 //    }
 
-    //Option 2
+//    //Option 3 - Manual selection
 //    VectorXi vecSel(20);
 
-////    vecSel << 76, 74, 13, 61, 97, 94, 75, 71, 60, 56, 26, 57, 56, 0, 52, 72, 33, 86, 96, 67;
-
-//    vecSel << 65, 22, 47, 55, 16, 29, 14, 36, 57, 97, 89, 46, 9, 93, 83, 52, 71, 52, 3, 96;
-
-    //Option 3 Newest
-//    VectorXi vecSel(10);
-
-//    vecSel << 0, 96, 80, 55, 66, 25, 26, 2, 55, 58, 6, 88;
-
-
-    VectorXi vecSel(1);
-
-    vecSel << 0;
-
+//    vecSel << 76, 74, 13, 61, 97, 94, 75, 71, 60, 56, 26, 57, 56, 0, 52, 72, 33, 86, 96, 67;
 
     std::cout << "Select following epochs to average:\n" << vecSel << std::endl;
 
@@ -448,8 +440,6 @@ int main(int argc, char *argv[])
 
     QStringList ch_sel_names = t_Fwd.info.ch_names;
     FiffEvoked pickedEvoked = evoked.pick_channels(ch_sel_names);
-
-
 
     //########################################################################################
     // RAP MUSIC Source Estimate
