@@ -130,7 +130,7 @@ void  DigitizerSetTreeItem::setData(const QVariant& value, int role)
 
 bool DigitizerSetTreeItem::addData(const FIFFLIB::FiffDigPointSet& tDigitizer, Qt3DCore::QEntity* parent)
 {
-    //Delete all childs first
+    //Delete all childs first. We do this because we always want to start fresh with the newly added digitizer data.
     if(this->hasChildren()) {
         this->removeRows(0, this->rowCount());
     }
@@ -164,7 +164,7 @@ bool DigitizerSetTreeItem::addData(const FIFFLIB::FiffDigPointSet& tDigitizer, Q
     }
 
     // Find the Digitizer Items
-    QList<QStandardItem*> itemList = this->findChildren(Data3DTreeModelItemTypes::DigitizerItem);
+    QList<QStandardItem*> itemList;
 
     if (!tCardinal.empty()){
         //Create a cardinal digitizer item
