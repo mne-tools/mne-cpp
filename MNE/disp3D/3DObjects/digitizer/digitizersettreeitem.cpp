@@ -103,6 +103,10 @@ DigitizerSetTreeItem::DigitizerSetTreeItem(int iType, const QString& text)
 
 DigitizerSetTreeItem::~DigitizerSetTreeItem()
 {
+    //Delete entity so that the SceneGraph is NOT plotting it anymore.
+    //QPointer only deletes if the parent is destroyed. What happens if this item is destroyed before the parent is destroyed?
+    //Cannot delete m_pParentEntity since we do not know who else holds it.
+    delete m_pRenderable3DEntity;
 }
 
 
