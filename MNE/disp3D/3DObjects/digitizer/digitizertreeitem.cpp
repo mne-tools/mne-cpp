@@ -96,7 +96,17 @@ DigitizerTreeItem::~DigitizerTreeItem()
     //Delete entity so that the SceneGraph is NOT plotting it anymore.
     //QPointer only deletes if the parent is destroyed. What happens if this item is destroyed before the parent is destroyed?
     //Cannot delete m_pParentEntity since we do not know who else holds it.
-    delete m_pRenderable3DEntity;
+
+    //qDebug() << "         START                             DigitizerTreeItem::~DigitizerTreeItem()";
+
+    m_lSpheres.clear();
+
+    if(!m_pRenderable3DEntity.isNull()) {
+        delete m_pRenderable3DEntity;
+    }
+
+    //qDebug() << "         END                             DigitizerTreeItem::~DigitizerTreeItem()";
+
 }
 
 
@@ -126,8 +136,16 @@ void  DigitizerTreeItem::setData(const QVariant& value, int role)
 
 bool DigitizerTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer, Qt3DCore::QEntity* parent)
 {
+    //Clear all data
+    m_lSpheres.clear();
+
     //Create renderable 3D entity
     m_pParentEntity = parent;
+
+    if(!m_pRenderable3DEntity.isNull()) {
+        delete m_pRenderable3DEntity;
+    }
+
     m_pRenderable3DEntity = new Renderable3DEntity(m_pParentEntity);
 
     //Initial transformation also regarding the surface offset

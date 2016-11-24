@@ -474,9 +474,9 @@ void BabyMEG::performHPIFitting(const QVector<int>& vFreqs)
             pRtHpis->singleHPIFit(matProj * matComp * this->calibrate(m_matValue), transDevHead, vFreqs, vGof);
 
             //Set newly calculated transforamtion amtrix to fiff info
-            mutex.lock();
+            m_mutex.lock();
             m_pFiffInfo->dev_head_t = transDevHead;
-            mutex.unlock();
+            m_mutex.unlock();
 
             //Apply new dev/head matrix to current digitizer and update in 3D view in HPI control widget
             FiffDigPointSet t_digSet;
@@ -511,9 +511,9 @@ void BabyMEG::toggleRecordingFile()
     //Setup writing to file
     if(m_bWriteToFile)
     {
-        mutex.lock();
+        m_mutex.lock();
         m_pOutfid->finish_writing_raw();
-        mutex.unlock();
+        m_mutex.unlock();
 
         m_bWriteToFile = false;
         m_iSplitCount = 0;
@@ -556,11 +556,11 @@ void BabyMEG::toggleRecordingFile()
             m_pFiffInfo->projs[i].active = false;
 
         //Start/Prepare writing process. Actual writing is done in run() method.
-        mutex.lock();
+        m_mutex.lock();
         m_pOutfid = FiffStream::start_writing_raw(m_qFileOut, *m_pFiffInfo, m_cals, defaultMatrixXi, false);
         fiff_int_t first = 0;
         m_pOutfid->write_int(FIFF_FIRST_SAMPLE, &first);
-        mutex.unlock();
+        m_mutex.unlock();
 
         m_bWriteToFile = true;
 
@@ -831,9 +831,9 @@ void BabyMEG::run()
                     this->splitRecordingFile();
                 }
 
-                mutex.lock();
+                m_mutex.lock();
                 m_pOutfid->write_raw_buffer(m_matValue.cast<double>());
-                mutex.unlock();
+                m_mutex.unlock();
             }
             else
             {
