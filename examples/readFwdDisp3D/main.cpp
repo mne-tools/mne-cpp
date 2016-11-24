@@ -86,12 +86,12 @@ int main(int argc, char *argv[])
     View3D::SPtr testWindow = View3D::SPtr(new View3D());
 
     //Option 1 - Visualize full source space
-    testWindow->addBrainData("Subject01", "ForwardSolution", t_forwardSolution);
+//    testWindow->addForwardSolution("Subject01", "ForwardSolution", t_forwardSolution);
 
     //Option 2 - Visualize clustered source space
-//    AnnotationSet t_annotationSet ("sample", 2, "aparc.a2009s", "./MNE-sample-data/subjects");
-//    MNEForwardSolution t_clusteredFwd = t_forwardSolution.cluster_forward_solution(t_annotationSet, 40);
-//    testWindow->addBrainData("Subject01", "ForwardSolution", t_clusteredFwd);
+    AnnotationSet t_annotationSet ("sample", 2, "aparc.a2009s", "./MNE-sample-data/subjects");
+    MNEForwardSolution t_clusteredFwd = t_forwardSolution.cluster_forward_solution(t_annotationSet, 40);
+    testWindow->addForwardSolution("Subject01", "ForwardSolution", t_clusteredFwd);
 
     testWindow->show();
     Control3DWidget::SPtr control3DWidget = Control3DWidget::SPtr(new Control3DWidget());

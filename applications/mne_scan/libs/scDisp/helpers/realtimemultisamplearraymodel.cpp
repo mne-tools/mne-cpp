@@ -530,8 +530,8 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
         if(m_bTriggerDetectionActive) {
             int iOldDetectedTriggers = m_qMapDetectedTrigger[m_iCurrentTriggerChIndex].size();
 
-            //m_qMapDetectedTrigger = DetectTrigger::detectTriggerFlanksMax(data.at(b), m_lTriggerChannelIndices, m_iCurrentSample-nCol, m_dTriggerThreshold, true);
-            QList<QPair<int,double> > qMapDetectedTrigger = DetectTrigger::detectTriggerFlanksGrad(data.at(b), m_iCurrentTriggerChIndex, m_iCurrentSample-nCol, m_dTriggerThreshold, false, "Rising");
+            QList<QPair<int,double> > qMapDetectedTrigger = DetectTrigger::detectTriggerFlanksMax(data.at(b), m_iCurrentTriggerChIndex, m_iCurrentSample-nCol, m_dTriggerThreshold, true);
+            //QList<QPair<int,double> > qMapDetectedTrigger = DetectTrigger::detectTriggerFlanksGrad(data.at(b), m_iCurrentTriggerChIndex, m_iCurrentSample-nCol, m_dTriggerThreshold, false, "Rising");
 
             //Append results to already found triggers
             m_qMapDetectedTrigger[m_iCurrentTriggerChIndex].append(qMapDetectedTrigger);

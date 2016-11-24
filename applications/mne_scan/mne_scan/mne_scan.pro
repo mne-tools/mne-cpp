@@ -8,7 +8,7 @@
 #
 # @section  LICENSE
 #
-# Copyright (C) 2013, Christoph Dinh, Martin Luessi and Matti Hamalainen. All rights reserved.
+# Copyright (C) 2013, Christoph Dinh, Lorenz Esch and Matti Hamalainen. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -77,10 +77,12 @@ else {
 
 qtHaveModule(charts) {
     CONFIG(debug, debug|release) {
+        LIBS += -lMNE$${MNE_LIB_VERSION}Connectivityd
         LIBS += -lMNE$${MNE_LIB_VERSION}DispChartsd
         LIBS += -lMNE$${MNE_LIB_VERSION}Disp3Dd
     }
     else {
+        LIBS += -lMNE$${MNE_LIB_VERSION}Connectivity
         LIBS += -lMNE$${MNE_LIB_VERSION}DispCharts
         LIBS += -lMNE$${MNE_LIB_VERSION}Disp3D
     }

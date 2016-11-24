@@ -76,6 +76,7 @@
 using namespace FSLIB;
 using namespace MNELIB;
 using namespace DISP3DLIB;
+using namespace CONNECTIVITYLIB;
 
 
 //*************************************************************************************************************
@@ -314,7 +315,7 @@ QList<BrainRTSourceLocDataTreeItem*> Data3DTreeModel::addData(const QString& sub
             //Find already existing surface items and add the new data to the first search result
             QList<QStandardItem*> itemList = pSubjectItem->findChildren(set);
 
-            //Find the all the hemispheres of the set "set" and add the source estimates as items
+            //Find the "set" items and add the source estimates as items
             if(!itemList.isEmpty()) {
                 for(int i = 0; i < itemList.size(); ++i) {
                     if(itemList.at(i)->type() == Data3DTreeModelItemTypes::SurfaceSetItem) {
@@ -324,6 +325,68 @@ QList<BrainRTSourceLocDataTreeItem*> Data3DTreeModel::addData(const QString& sub
                     }
                 }
             }
+
+//            //Find the all the hemispheres of the set "set" and add the source estimates as items
+//            if(!itemList.isEmpty()) {
+//                for(int i = 0; i<itemList.size(); i++) {
+//                    for(int j = 0; j<itemList.at(i)->rowCount(); j++) {
+//                        if(itemList.at(i)->child(j,0)->type() == Data3DTreeModelItemTypes::HemisphereItem) {
+//                            BrainHemisphereTreeItem* pHemiItem = dynamic_cast<BrainHemisphereTreeItem*>(itemList.at(i)->child(j,0));
+//                            returnList.append(pHemiItem->addData(tSourceEstimate, tForwardSolution));
+//                        }
+//                    }
+//                }
+//            }
+        }
+    }
+
+    return returnList;
+}
+
+
+//*************************************************************************************************************
+
+QList<BrainRTConnectivityDataTreeItem*> Data3DTreeModel::addData(const QString& subject, const QString& set, Network::SPtr pNetworkData)
+{
+    QList<BrainRTConnectivityDataTreeItem*> returnList;
+
+    //Find the subject
+    QList<QStandardItem*> itemSubjectList = this->findItems(subject);
+
+    //Iterate through subject items and add new data respectivley
+
+    for(int i = 0; i < itemSubjectList.size(); ++i) {
+        //Check if it is really a subject tree item
+        if((itemSubjectList.at(i)->type() == Data3DTreeModelItemTypes::SubjectItem)) {
+            SubjectTreeItem* pSubjectItem = dynamic_cast<SubjectTreeItem*>(itemSubjectList.at(i));
+
+            //Find already existing surface items and add the new data to the first search result
+            QList<QStandardItem*> itemList = pSubjectItem->findChildren(set);
+
+            if(!itemList.isEmpty() && (itemList.at(0)->type() == Data3DTreeModelItemTypes::SurfaceSetItem)) {
+                BrainSurfaceSetTreeItem* pSurfaceSetItem = dynamic_cast<BrainSurfaceSetTreeItem*>(itemList.at(0));
+                returnList.append(pSurfaceSetItem->addData(pNetworkData, m_pParentEntity));
+            } else {
+                BrainSurfaceSetTreeItem* pSurfaceSetItem = new BrainSurfaceSetTreeItem(Data3DTreeModelItemTypes::SurfaceSetItem, set);
+
+                QList<QStandardItem*> list;
+                list << pSurfaceSetItem;
+                list << new QStandardItem(pSurfaceSetItem->toolTip());
+                pSubjectItem->appendRow(list);
+
+                returnList.append(pSurfaceSetItem->addData(pNetworkData, m_pParentEntity));
+            }
+
+//            //Find the "set" items and add the source estimates as items
+//            if(!itemList.isEmpty()) {
+//                for(int i = 0; i<itemList.size(); i++) {
+//                    if(itemList.at(i)->type() == Data3DTreeModelItemTypes::SurfaceSetItem) {
+//                        if(BrainSurfaceSetTreeItem* pSetItem = dynamic_cast<BrainSurfaceSetTreeItem*>(itemList.at(i))) {
+//                            returnList.append(pSetItem->addData(pNetworkData, m_pParentEntity));
+//                        }
+//                    }
+//                }
+//            }
 
 //            //Find the all the hemispheres of the set "set" and add the source estimates as items
 //            if(!itemList.isEmpty()) {
