@@ -85,6 +85,7 @@ using namespace FIFFLIB;
 //=============================================================================================================
 
 FiffDigPointSet::FiffDigPointSet()
+    :m_qListDigPoint()
 {
 }
 
@@ -210,6 +211,41 @@ bool FiffDigPointSet::readFromStream(FiffStream::SPtr &p_pStream, FiffDirTree &p
     return true;
 }
 
+
+//*************************************************************************************************************
+
+void FiffDigPointSet::write(QIODevice &p_IODevice)
+{
+    //
+    //   Open the file, create directory
+    //
+
+    // Create the file and save the essentials
+    FiffStream::SPtr t_pStream = FiffStream::start_file(p_IODevice);
+    printf("Write Digitizer Points in %s...\n", t_pStream->streamName().toUtf8().constData());
+    this->writeToStream(t_pStream.data());
+}
+
+
+//*************************************************************************************************************
+
+void FiffDigPointSet::writeToStream(FiffStream* p_pStream)
+{
+    p_pStream->start_block(FIFFB_MEAS);
+    p_pStream->start_block(FIFFB_MEAS_INFO);
+    p_pStream->start_block(FIFFB_ISOTRAK);
+
+    for(qint32 h = 0; h < m_qListDigPoint.size(); ++h)
+    {
+        p_pStream->write_dig_point(m_qListDigPoint[h]);
+    }
+
+    printf("\t%d digitizer points written\n", m_qListDigPoint.size());
+    p_pStream->end_block(FIFFB_ISOTRAK);
+    p_pStream->end_block(FIFFB_MEAS_INFO);
+    p_pStream->end_block(FIFFB_MEAS);
+    p_pStream->end_file();
+}
 
 //*************************************************************************************************************
 
