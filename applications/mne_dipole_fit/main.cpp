@@ -442,39 +442,9 @@ float **mne_lu_invert(float **mat,int dim)
       */
 {
     Eigen::MatrixXf eigen_mat = toFloatEigenMatrix(mat, dim, dim);
-
     Eigen::MatrixXf eigen_mat_inv = eigen_mat.inverse();
-
     fromFloatEigenMatrix(eigen_mat_inv, mat);
-
-//  int info;
-//  int *ipiv = MALLOC(dim,int);
-//  float *work;
-//  int   lwork;
-
-//  if (dim > LU_INVERT_REPORT_DIM)
-//    fprintf(stderr,"\t\tLU factorization...\n");
-//  sgetrf(&dim,&dim,mat[0],&dim,ipiv,&info);
-
-//  if (info != 0) {
-//    printf("dgetrf failed in lu_invert");
-//    FREE(ipiv);
-//    return NULL;
-//  }
-//  lwork = 64*dim;
-//  work  = MALLOC(lwork,float);
-//  if (dim > LU_INVERT_REPORT_DIM)
-//    fprintf(stderr,"\t\tCompute inverse...\n");
-//  sgetri(&dim,mat[0],&dim,ipiv,work,&lwork,&info);
-//  if (info != 0) {
-//    FREE(ipiv);
-//    FREE(work);
-//    printf("dgetri failed in lu_invert");
-//    return NULL;
-//  }
-//  FREE(ipiv);
-//  FREE(work);
-  return mat;
+    return mat;
 }
 
 
@@ -618,11 +588,11 @@ int mne_svd(float **mat,	/* The matrix */
       */
 
 {
-///////// ToDo: NONE - Already Debugged
-
   int    udim = MIN(m,n);
 
   MatrixXf eigen_mat = toFloatEigenMatrix(mat, m, n);
+
+  //ToDo Optimize computation depending of whether uu or vv are defined
   Eigen::JacobiSVD< Eigen::MatrixXf > svd(eigen_mat ,Eigen::ComputeFullU | Eigen::ComputeFullV);
 
   fromFloatEigenVector(svd.singularValues(), sing, svd.singularValues().size());
@@ -691,13 +661,6 @@ double **mne_dmatt_dmat_mult2 (double **m1,double **m2, int d1,int d2,int d3)
 
 
 
-
-
-
-
-
-
-
 //============================= fiff_type_spec.h =============================
 
 /*
@@ -720,17 +683,6 @@ fiff_int_t fiff_type_matrix_coding(fiff_int_t type)
 {
   return type & FIFFTS_MC_MASK;
 }
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -1704,8 +1656,6 @@ int fiff_dir_tree_create(fiffFile file)
 
 
 
-
-
 static void print_id (fiffId id)
 
 {
@@ -1789,13 +1739,6 @@ int fiff_dir_tree_count(fiffDirNode tree)
 
 
 
-
-
-
-
-
-
-
 static fiffDirNode *found = NULL;
 static int count = 0;
 
@@ -1857,11 +1800,6 @@ fiffTag fiff_dir_tree_get_tag(fiffFile file,fiffDirNode node,int kind)
             fiff_get_tag_explanation(kind),kind);
   return (NULL);
 }
-
-
-
-
-
 
 
 
@@ -2140,13 +2078,13 @@ int mne_decompose_eigen (double *mat,
   double scale;
 
   maxi = 0;//idamax(&np,mat,&one);
-  qDebug() << "!!!!!!!!ToDo: idamax(&np,mat,&one);";
+  printf("################### DEBUG ToDo: idamax(&np,mat,&one);");
   scale = 1.0/mat[maxi-1];
 
   for (k = 0; k < np; k++)
     dmat[k] = mat[k]*scale;
 //  dspev(compz,uplo,&dim,dmat,w,z,&dim,work,&info);
-  qDebug() << "!!!!!!!ToDo: dspev(compz,uplo,&dim,dmat,w,z,&dim,work,&info);";
+  printf("################### DEBUG ToDo: dspev(compz,uplo,&dim,dmat,w,z,&dim,work,&info);");
   FREE(work);
   if (info != 0)
     printf("Eigenvalue decomposition failed (LAPACK info = %d)",info);
@@ -2361,16 +2299,6 @@ int mne_read_meg_comp_eeg_ch_info(char           *name,
 
 
 
-
-
-
-
-
-
-
-
-
-
 //============================= mne_read_process_forward_solution.c =============================
 
 
@@ -2389,22 +2317,6 @@ void mne_merge_channels(fiffChInfo chs1, int nch1,
   *nresp = nch1+nch2;
   return;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -2741,32 +2653,42 @@ char *mne_strdup(const char *s)
 
 
 
+//============================= make_volume_source_space.c =============================
 
-
-
-//============================= fiff_trans.c =============================
-
-static void add_inverse(fiffCoordTrans t)
+static int add_inverse(fiffCoordTrans t)
      /*
       * Add inverse transform to an existing one
       */
 {
-  int j,k;
-  float res;
+  int   j,k;
+  float **m = ALLOC_CMATRIX(4,4);
 
-  for (j = 0; j < 3; j++)
-    for (k = 0; k < 3; k++)
-      t->invrot[j][k] = t->rot[k][j];
   for (j = 0; j < 3; j++) {
-    for (res = 0.0, k = 0; k < 3; k++)
-      res += t->invrot[j][k]*t->move[k];
-    t->invmove[j] = -res;
+    for (k = 0; k < 3; k++)
+      m[j][k] = t->rot[j][k];
+    m[j][3] = t->move[j];
   }
+  for (k = 0; k < 3; k++)
+    m[3][k] = 0.0;
+  m[3][3] = 1.0;
+  if (mne_lu_invert(m,4) == NULL) {
+    FREE_CMATRIX(m);
+    return FAIL;
+  }
+  for (j = 0; j < 3; j++) {
+    for (k = 0; k < 3; k++)
+      t->invrot[j][k] = m[j][k];
+    t->invmove[j] = m[j][3];
+  }
+  FREE_CMATRIX(m);
+  return OK;
 }
 
 
 
 
+
+//============================= fiff_trans.c =============================
 
 
 
@@ -6072,8 +5994,6 @@ int mne_proj_op_chs(mneProjOp op, char **list, int nlist)
 
   mne_free_proj_op_proj(op);	/* These data are not valid any more */
 
-  qDebug() << "!!!!!!!!!!!!!!!!!! int mne_proj_op_chs(mneProjOp op, char **list, int nlist) !!!!!!!!!!!!!!!!!!!!!!";
-
   if (nlist == 0)
     return OK;
 
@@ -6225,13 +6145,9 @@ int mne_proj_op_proj_dvector(mneProjOp op, double *vec, int nch, int do_compleme
       * Assume that all dimension checking etc. has been done before
       */
 {
-//  static double *res = NULL;
-//  static int   res_size = 0;
   float *pvec;
   double w;
   int k,p;
-
-//  printf("###START### 0 mne_proj_op_proj_dvector vec=%f\n", vec[0]);
 
   if (op->nvec <= 0)
     return OK;
@@ -6241,48 +6157,16 @@ int mne_proj_op_proj_dvector(mneProjOp op, double *vec, int nch, int do_compleme
     return FAIL;
   }
 
-//  if (op->nch > res_size) {
-//    res = REALLOC(res,op->nch,double);
-//    res_size = op->nch;
-//  }
-
-//  for (k = 0; k < op->nch; k++)
-//    res[k] = 0.0;
-
   VectorXd res = VectorXd::Zero(op->nch);
-
-//  printf("############ 1 mne_proj_op_proj_dvector res=%f\n", res[0]);
-
-
-  //DEBUG
-//  for (p = 0; p < op->nvec; p++) {
-//    pvec = op->proj_data[p];
-//    for (k = 0; k < op->nch; k++) {
-//      printf("############ pvec[%d][%d]=%f\n", p, k, pvec[k]);
-//    }
-//  }
-  //DEBUG
-
 
   for (p = 0; p < op->nvec; p++) {
     pvec = op->proj_data[p];
     w = 0.0;
-    for (k = 0; k < op->nch; k++) {
-//      printf("############ 2 mne_proj_op_proj_dvector vec[%d]=%f, pvec[%d]=%f\n",  k, vec[k], k, pvec[k]);
-      w += vec[k]*pvec[k];
-    }
-
-//    printf("############ 3 mne_proj_op_proj_dvector w=%f\n", w);
     for (k = 0; k < op->nch; k++)
-    {
+      w += vec[k]*pvec[k];
+    for (k = 0; k < op->nch; k++)
       res[k] = res[k] + w*pvec[k];
-//      printf("############ 4 mne_proj_op_proj_dvector res[%d]=%f, w=%f, pvec[%d]=%f\n", k, res[k], w, k, pvec[k]);
-//      printf("############ 5 mne_proj_op_proj_dvector w=%f\n", w);
-    }
   }
-
-//  printf("############ 6 mne_proj_op_proj_dvector vec=%f\n", vec[0]);
-//  printf("############ 7 mne_proj_op_proj_dvector res=%f\n", res[0]);
 
   if (do_complement) {
     for (k = 0; k < op->nch; k++)
@@ -6293,13 +6177,8 @@ int mne_proj_op_proj_dvector(mneProjOp op, double *vec, int nch, int do_compleme
       vec[k] = res[k];
   }
 
-//  printf("############ 4 mne_proj_op_proj_dvector vec=%f\n", vec[0]);
-
   return OK;
 }
-
-
-
 
 
 
@@ -6309,9 +6188,6 @@ int mne_proj_op_apply_cov(mneProjOp op, mneCovMatrix& c)
       * Apply the projection operator to a covariance matrix
       */
 {
-
-  printf("############ BUGGY - somhow the output gets deleted int mne_proj_op_apply_cov(mneProjOp op, mneCovMatrix c)\n");
-
   double **dcov = NULL;
   int j,k,p;
   int do_complement = TRUE;
@@ -6343,60 +6219,26 @@ int mne_proj_op_apply_cov(mneProjOp op, mneCovMatrix& c)
   }
 
 
-  printf("############ 0 dcov[0][0]=%f\n", dcov[0][0]);
-
-  printf("############ 0 mne_proj_op_apply_cov cov_diag=[%f,%f,%f]\n", c->cov_diag[0], c->cov_diag[1], c->cov_diag[2]);
-
-
-
-//  //DEBUG
-//  for (p = 0; p < op->nvec; p++) {
-//    float* pvec = op->proj_data[p];
-//    for (k = 0; k < op->nch; k++) {
-//      printf("####pvec#### pvec[%d][%d]=%f\n", p, k, pvec[k]);
-//    }
-//  }
-//  //DEBUG
-
-
-
   /*
    * Project from front and behind
    */
   for (k = 0; k < c->ncov; k++) {
-//    printf("############ 0.1 dcov[%d][0]=%f\n", k, dcov[k][0]);
     if (mne_proj_op_proj_dvector(op,dcov[k],c->ncov,do_complement) != OK)
       return FAIL;
-//    printf("############ 0.2 dcov[%d][0]=%f\n", k, dcov[k][0]);
   }
 
-//  printf("############ 0.5 dcov[0][0]=%f\n", dcov[0][0]);
-
   mne_transpose_dsquare(dcov,c->ncov);
-
-//  printf("############ 1 dcov[0][0]=%f\n", dcov[0][0]);
-
-//  printf("############ 1 mne_proj_op_apply_cov cov_diag=[%f,%f,%f]\n", c->cov_diag[0], c->cov_diag[1], c->cov_diag[2]);
-
 
   for (k = 0; k < c->ncov; k++)
     if (mne_proj_op_proj_dvector(op,dcov[k],c->ncov,do_complement) != OK)
       return FAIL;
-
-//  printf("############ 2 dcov[0][0]=%f\n", dcov[0][0]);
-
-//  printf("############ 2 mne_proj_op_apply_cov cov_diag=[%f,%f,%f]\n", c->cov_diag[0], c->cov_diag[1], c->cov_diag[2]);
 
   /*
    * Return the result
    */
   if (c->cov_diag) {		/* Pick the diagonal elements */
     for (j = 0; j < c->ncov; j++) {
-//      printf("############ dcov[j][j]=%f\n", dcov[j][j]);
-
       c->cov_diag[j] = dcov[j][j];
-
-//      printf("############ c->cov_diag[j]=%f\n", c->cov_diag[j]);
     }
     FREE(c->cov); c->cov = NULL;
   }
@@ -6405,9 +6247,6 @@ int mne_proj_op_apply_cov(mneProjOp op, mneCovMatrix& c)
       for (k = 0; k <= j; k++)
         c->cov[p++] = dcov[j][k];
   }
-
-
-//  printf("############ 3 mne_proj_op_apply_cov cov_diag=[%f,%f,%f]\n", c->cov_diag[0], c->cov_diag[1], c->cov_diag[2]);
 
   FREE_DCMATRIX(dcov);
 
@@ -6447,10 +6286,6 @@ int mne_proj_op_make_proj_bad(mneProjOp op, char **bad, int nbad)
   FREE_CMATRIX(op->proj_data);
   op->proj_data = NULL;
   op->nvec      = 0;
-
-
-  printf("####mne_proj_op_make_proj_bad#### !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
-
 
   if (op->nch <= 0)
     return OK;
@@ -6601,8 +6436,6 @@ int mne_proj_op_make_proj_bad(mneProjOp op, char **bad, int nbad)
       else
         op->proj_data[op->nvec][k] = vv_meg[p][k];
 
-//      printf("#### MEG op->proj_data[%d][%d]=%f\n", op->nvec, k, op->proj_data[op->nvec][k]);
-
       /*
        * If the above did not work, this will (provided that EEG channels are called EEG*)
        */
@@ -6624,9 +6457,6 @@ int mne_proj_op_make_proj_bad(mneProjOp op, char **bad, int nbad)
         op->proj_data[op->nvec][k] = 0.0;
       else
         op->proj_data[op->nvec][k] = vv_eeg[p][k];
-
-//      printf("#### EEG op->proj_data[%d][%d]=%f\n", op->nvec, k, op->proj_data[op->nvec][k]);
-
       /*
        * If the above did not work, this will (provided that MEG channels are called MEG*)
        */
@@ -6652,31 +6482,6 @@ int mne_proj_op_make_proj_bad(mneProjOp op, char **bad, int nbad)
       for (p = 0; p < op->nvec; p++)
         op->proj_data[p][k] = 0.0;
     }
-
-
-
-
-
-
-
-
-//  //DEBUG
-//  printf("####mne_proj_op_make_proj_bad#### Result:\n");
-//  for (int p = 0; p < op->nvec; p++) {
-//    float* pvec = op->proj_data[p];
-//    for (int k = 0; k < 10/*op->nch*/; k++) {
-//      printf("####new 0 pvec#### pvec[%d][%d]=%f\n", p, k, pvec[k]);
-//    }
-//  }
-//  //DEBUG
-
-
-
-
-
-
-
-
 
   return OK;
 
@@ -6811,12 +6616,7 @@ mneProjOp mne_proj_op_average_eeg_ref(fiffChInfo chs,
 
 
 
-
-
 //============================= mne_lin_proj_io.c =============================
-
-
-
 
 
 mneProjOp mne_read_proj_op_from_node(fiffFile in, fiffDirNode start)
@@ -6889,7 +6689,7 @@ mneProjOp mne_read_proj_op_from_node(fiffFile in, fiffDirNode start)
     *lf = '\0';
 //      if (item_desc != NULL)
 //        item_desc = add_string(item_desc," ");
-      qDebug() << "!!!!!!!!!!!!!!!!!ToDo: item_desc = add_string(item_desc," ");";
+      printf("###################DEBUG ToDo: item_desc = add_string(item_desc," ");");
       item_desc = add_string(item_desc,(char *)desc_tag);
       FREE(desc_tag);
     }
@@ -8687,11 +8487,6 @@ mneCovMatrix mne_pick_chs_cov_omit(mneCovMatrix c, char **new_names, int ncov, i
   int   from,to;
   mneCovMatrix res;
 
-
-  printf("############ mneCovMatrix mne_pick_chs_cov_omit(mneCovMatrix c, char **new_names, int ncov, int omit_meg_eeg, fiffChInfo chs)\n");
-
-
-
   if (ncov == 0) {
     qCritical("No channels specified for picking in mne_pick_chs_cov_omit");
     return NULL;
@@ -8735,16 +8530,10 @@ mneCovMatrix mne_pick_chs_cov_omit(mneCovMatrix c, char **new_names, int ncov, i
   }
   names = MALLOC(ncov,char *);
   if (c->cov_diag) {
-    printf("############ Inside copy Cov Diag\n");
     cov_diag = MALLOC(ncov,double);
     for (j = 0; j < ncov; j++) {
       cov_diag[j] = c->cov_diag[pick[j]];
       names[j] = mne_strdup(c->names[pick[j]]);
-
-//      printf("############ pick=%d\n",pick[j]);
-//      printf("############ value=%f\n",c->cov_diag[pick[j]]);
-//      printf("############ name=%s\n",names[j]);
-//      printf("############ cov_diag[j]=%f\n",cov_diag[j]);
     }
   }
   else {
@@ -8770,11 +8559,7 @@ mneCovMatrix mne_pick_chs_cov_omit(mneCovMatrix c, char **new_names, int ncov, i
     }
   }
 
-
-  printf("############ cov_diag[0]=%f\n",cov_diag[0]);
   res = mne_new_cov(c->kind,ncov,names,cov,cov_diag);
-  printf("############ res->cov_diag[0]=%f\n",res->cov_diag[0]);
-
 
   res->bads = mne_dup_name_list(c->bads,c->nbad);
   res->nbad = c->nbad;
@@ -8875,10 +8660,6 @@ int mne_add_inv_cov(mneCovMatrix c)
 {
   double *src = c->lambda ? c->lambda : c->cov_diag;
   int k;
-
-  printf("############ int mne_add_inv_cov(mneCovMatrix c)\n");
-  printf("############ c->cov_diag=[%f]\n",c->cov_diag[0]);
-  printf("############ src=[%f]\n",src[0]);
 
   if (src == NULL) {
     qCritical("Covariance matrix is not diagonal or not decomposed.");
@@ -9058,14 +8839,6 @@ static int mne_decompose_eigen_cov_small(mneCovMatrix c,float small, int use_ran
       * Do the eigenvalue decomposition
       */
 {
-
-    printf("############ static int mne_decompose_eigen_cov_small\n");
-
-//    printf("############ NOISE DEBUG ncov=%d\n", res->noise->ncov);
-//    printf("############ NOISE DEBUG nzero=%d\n", res->noise->nzero);
-//    printf("############ NOISE DEBUG inv_lambda=%f,%f,%f\n", res->noise->inv_lambda[0], res->noise->inv_lambda[1], res->noise->inv_lambda[2]);
-//    printf("############ NOISE DEBUG cov_diag=[%f,%f,%f]\n", res->noise->cov_diag[0], res->noise->cov_diag[1], res->noise->cov_diag[2]);
-
   int   np,k,p,rank;
   float rank_threshold = 1e-6;
 
@@ -9089,9 +8862,6 @@ static int mne_decompose_eigen_cov_small(mneCovMatrix c,float small, int use_ran
 
     if ((rank = condition_cov(c,rank_threshold,use_rank)) < 0)
       return FAIL;
-
-    printf("############ rank=%d\n", rank);
-
 
     np = c->ncov*(c->ncov+1)/2;
     c->lambda = MALLOC(c->ncov,double);
@@ -9156,8 +8926,6 @@ void mne_regularize_cov(mneCovMatrix c,       /* The matrix to regularize */
   float  sums[3],nn[3];
   int    nkind = 3;
 
-  printf("########DEBUG######## dmne_regularize_cov\n");
-
   if (!c->cov || !c->ch_class)
     return;
 
@@ -9213,36 +8981,6 @@ int mne_whiten_data(float **data, float **whitened_data, int np, int nchan, mneC
   int    j,k;
   float  *one = NULL,*orig,*white;
   double *inv;
-
-  //DEBUG
-//  printf("w0 [0] data=[%f,%f,%f]\n", data[0][0], data[0][1], data[0][2]);
-//  printf("w0 [1] data=[%f,%f,%f]\n", data[1][0], data[1][1], data[1][2]);
-//  printf("w0 ncov=%d\n", C->ncov);
-//  printf("w0 nzero=%d\n", C->nzero);
-//  printf("w0 inv_lambda=%f,%f,%f\n", C->inv_lambda[0], C->inv_lambda[1], C->inv_lambda[2]);
-//  printf("w0 cov_diag=[%f,%f,%f]\n", C->cov_diag[0], C->cov_diag[1], C->cov_diag[2]);
-
-//  typedef struct {		/* Covariance matrix storage */
-//    int        kind;		/* Sensor or source covariance */
-//    int        ncov;		/* Dimension */
-//    int        nfree;		/* Number of degrees of freedom */
-//    int        nproj;		/* Number of dimensions projected out */
-//    int        nzero;		/* Number of zero or small eigenvalues */
-//    char       **names;		/* Names of the entries (optional) */
-//    double     *cov;		/* Covariance matrix in packed representation (lower triangle) */
-//    double     *cov_diag;		/* Diagonal covariance matrix */
-//    mneSparseMatrix cov_sparse;   /* A sparse covariance matrix
-//                   * (Note: data are floats in this which is an inconsistency) */
-//    double     *lambda;		/* Eigenvalues of cov */
-//    double     *inv_lambda;	/* Inverses of the square roots of the eigenvalues of cov */
-//    float      **eigen;		/* Eigenvectors of cov */
-//    double     *chol;		/* Cholesky decomposition */
-//    mneProjOp  proj;		/* The projection which was active when this matrix was computed */
-//    mneSssData sss;		/* The SSS data present in the associated raw data file */
-//    int        *ch_class;		/* This will allow grouping of channels for regularization (MEG [T/m], MEG [T], EEG [V] */
-//    char       **bads;		/* Which channels were designated bad when this noise covariance matrix was computed? */
-//    int        nbad;		/* How many of them */
-//  } *mneCovMatrix,mneCovMatrixRec;
 
   if (data == NULL || np <= 0)
     return OK;
@@ -9991,9 +9729,6 @@ int compute_dipole_field(dipoleFitData d, float *rd, int whiten, float **fwd)
     }
   }
 
-//  printf("DEBUG 0 [0] fwd=[%f,%f,%f]\n", fwd[0][0], fwd[0][1], fwd[0][2]);
-//  printf("DEBUG 0 [1] fwd=[%f,%f,%f]\n", fwd[1][0], fwd[1][1], fwd[1][2]);
-
   if (d->neeg > 0) {
     if (d->funcs->eeg_vec_pot) {
       eeg_fwd[0] = fwd[0]+d->nmeg;
@@ -10012,9 +9747,6 @@ int compute_dipole_field(dipoleFitData d, float *rd, int whiten, float **fwd)
     }
   }
 
-//  printf("DEBUG 1 [0] fwd=[%f,%f,%f]\n", fwd[0][0], fwd[0][1], fwd[0][2]);
-//  printf("DEBUG 1 [1] fwd=[%f,%f,%f]\n", fwd[1][0], fwd[1][1], fwd[1][2]);
-
   /*
    * Apply projection
    */
@@ -10025,14 +9757,9 @@ int compute_dipole_field(dipoleFitData d, float *rd, int whiten, float **fwd)
   fprintf(stdout,"\n");
 #endif
 
-  //Debug something suspecious here
-//  for (k = 0; k < 3; k++)
-//    if (mne_proj_op_proj_vector(d->proj,fwd[k],d->nmeg+d->neeg,TRUE) == FAIL)
-//      goto bad;
-  //Debug something suspecious here
-
-//  printf("DEBUG 2 [0] fwd=[%f,%f,%f]\n", fwd[0][0], fwd[0][1], fwd[0][2]);
-//  printf("DEBUG 2 [1] fwd=[%f,%f,%f]\n", fwd[1][0], fwd[1][1], fwd[1][2]);
+  for (k = 0; k < 3; k++)
+    if (mne_proj_op_proj_vector(d->proj,fwd[k],d->nmeg+d->neeg,TRUE) == FAIL)
+      goto bad;
 
 #ifdef DEBUG
   fprintf(stdout,"proj : ");
@@ -10048,9 +9775,6 @@ int compute_dipole_field(dipoleFitData d, float *rd, int whiten, float **fwd)
     if (mne_whiten_data(fwd,fwd,3,d->nmeg+d->neeg,d->noise) == FAIL)
       goto bad;
   }
-
-//  printf("DEBUG 3 [0] fwd=[%f,%f,%f]\n", fwd[0][0], fwd[0][1], fwd[0][2]);
-//  printf("DEBUG 3 [1] fwd=[%f,%f,%f]\n", fwd[1][0], fwd[1][1], fwd[1][2]);
 
 #ifdef DEBUG
   fprintf(stdout,"white : ");
@@ -10077,9 +9801,6 @@ dipoleForward dipole_forward(dipoleFitData d,
  * Compute the forward solution and do other nice stuff
  */
 {
-//  printf("\n<<<< DEBUG >>>> [3.2] dipole_forward\n");
-//  printf("DEBUG rd=[%f,%f,%f]\n", rd[0][0], rd[0][1], rd[0][2]);
-
   dipoleForward res;
   float         **this_fwd;
   float         S[3];
@@ -10088,11 +9809,9 @@ dipoleForward dipole_forward(dipoleFitData d,
    * Allocate data if necessary
    */
   if (old && old->ndip == ndip && old->nch == d->nmeg+d->neeg) {
-//    printf("DEBUG 0 using old\n");
     res = old;
   }
   else {
-//    printf("DEBUG 0 using new\n");
     free_dipole_forward(old); old = NULL;
     res = new_dipole_forward();
     res->fwd  = ALLOC_CMATRIX(3*ndip,d->nmeg+d->neeg);
@@ -10151,15 +9870,6 @@ dipoleForward dipole_forward(dipoleFitData d,
    */
   if (mne_svd(res->fwd,3*ndip,d->nmeg+d->neeg,res->sing,res->vv,res->uu) != 0)
     goto bad;
-
-//  printf("DEBUG 1 rd=[%f,%f,%f]\n", res->rd[0][0], res->rd[0][1], res->rd[0][2]);
-//  printf("DEBUG 1 ndip=%d\n", res->ndip);
-//  printf("DEBUG 1 fwd=[%f,%f,%f]\n", res->fwd[0][0], res->fwd[0][1], res->fwd[0][2]);
-//  printf("DEBUG 1 scales=[%f,%f,%f]\n", res->scales[0], res->scales[1], res->scales[2]);
-//  printf("DEBUG 1 uu=[%f,%f,%f]\n", res->uu[0][0], res->uu[0][1], res->uu[0][2]);
-//  printf("DEBUG 1 vv=[%f,%f,%f]\n", res->vv[0][0], res->vv[0][1], res->vv[0][2]);
-//  printf("DEBUG 1 sing=[%f,%f,%f]\n", res->sing[0], res->sing[1], res->sing[2]);
-//  printf("DEBUG 1 nch=%d\n", res->nch);
 
   return res;
 
@@ -10964,12 +10674,11 @@ static fiffCoordTrans fiff_make_transform2 (int from,int to,float rot[3][3],floa
     for (k = 0; k < 3; k++)
       t->rot[j][k] = rot[j][k];
   }
-  add_inverse(t);
-//  if (add_inverse(t) == FAIL) {
-//    printf("Failed to add the inverse coordinate transformation");
-//    FREE(t);
-//    return NULL;
-//  }
+  if (add_inverse(t) == FAIL) {
+    printf("Failed to add the inverse coordinate transformation");
+    FREE(t);
+    return NULL;
+  }
   return (t);
 }
 
@@ -14695,144 +14404,21 @@ static int c_dsvd(double **mat,		/* The matrix */
       * LAPACK Fortran routine
       */
 {
-    ///////// ToDo: NONE - Already Debugged
-    printf("####### ToDo: Debug c_dsvd\n");
-
     int    udim = MIN(m,n);
     MatrixXd eigen_mat = toDoubleEigenMatrix(mat, m, n);
 
-//    //DEBUG
-//    printf("#### mat (%dx%d)####:\n",m,n);
-//    for (int i = 0; i < 3; i++)
-//      for (int j = 0; j < 2; j++)
-//        printf("mat[%d][%d]=%f\n", i, j, mat[i][j]);
-//    //DEBUG
-
+    //ToDo Optimize computation depending of whether uu or vv are defined
     Eigen::JacobiSVD< Eigen::MatrixXd > svd(eigen_mat,Eigen::ComputeFullU | Eigen::ComputeFullV);
 
-//    //DEBUG
-//    printf("#### sing (%d)####:\n",udim);
-//    for (int i = 0; i < udim; i++) {
-//      printf("sing[%d]=%f\n", i, sing[i]);
-//    }
-//    //DEBUG
-
     fromDoubleEigenVector(svd.singularValues(), sing, svd.singularValues().size());
-
-
-    printf("#### uu before (%dx%d)####:\n",udim,m);
-    printf("#### UU (%dx%d)####:\n",svd.matrixU().rows(),svd.matrixU().cols());
 
     if ( uu != NULL )
         fromDoubleEigenMatrix(svd.matrixU(), uu, udim, m);
 
-//    if(uu != NULL)
-//    {
-//        //DEBUG
-//        printf("#### uu (%dx%d)####:\n",udim,m);
-//        for (int i = 0; i < udim; i++) {
-//            for (int j = 0; j < m; j++) {
-//                printf("uu[%d][%d]=%f\n", i, j, uu[i][j]);
-//            }
-//        }
-//        //DEBUG
-//    }
-
-    printf("#### vv before (%dx%d)####:\n",m,n);
-    printf("#### VV (%dx%d)####:\n",svd.matrixV().rows(),svd.matrixV().cols());
-
     if ( vv != NULL )
         fromDoubleEigenMatrix(svd.matrixV().transpose(), vv, udim, udim);
 
-//    if(vv != NULL)
-//    {
-//        //DEBUG
-//        printf("#### vv (%dx%d)####:\n",m,n);
-//        for (int i = 0; i < m; i++) {
-//          for (int j = 0; j < n; j++) {
-//            printf("vv[%d][%d]=%f\n", i, j, vv[i][j]);
-//          }
-//        }
-//        //DEBUG
-//    }
-
-//  if(uu != NULL)
-//  {
-//      //DEBUG
-//      printf("#### uu (%dx%d)####:\n",udim,m);
-//      for (int i = 0; i < udim; i++) {
-//        for (int j = 0; j < m; j++) {
-//          printf("uu[%d][%d]=%f\n", i, j, uu[i][j]);
-//        }
-//      }
-//      //DEBUG
-//  }
-
-//  //DEBUG
-//  printf("#### vv (%dx%d)####:\n",m,m);
-//  for (int i = 0; i < m; i++) {
-//    for (int j = 0; j < m; j++) {
-//      printf("vv[%d][%d]=%f\n", i, j, vv[i][j]);
-//    }
-//  }
-//  //DEBUG
-
-
-
-
     return 0;
-
-
-//  static int lwork = 0;
-//  static double *work = NULL;
-//  int    nlwork;
-//  double **uutemp = NULL;
-//  int    udim = MIN(m,n);
-//  int    info;
-//  char   *jobu;
-//  char   *jobvt;
-//  int    j,k;
-//  double dum[1];
-//  double *vvp,*uup;
-
-//  nlwork = MAX(3*MIN(m,n)+MAX(m,n),5*MIN(m,n)-4);
-//  if (nlwork > lwork) {
-//    lwork = nlwork;
-//    work = REALLOC(work,lwork,double);
-//  }
-//  /*
-//   * Do SVD
-//   */
-//  if (vv == NULL) {
-//    jobu = "N";
-//    vvp  = dum;
-//  }
-//  else {
-//    jobu = "S";
-//    vvp  = vv[0];
-//  }
-//  if (uu == NULL) {
-//    jobvt = "N";
-//    uup   = dum;
-//  }
-//  else {
-//    jobvt = "S";
-//    uutemp = ALLOC_DCMATRIX(m,udim);
-//    uup = uutemp[0];
-//  }
-//  dgesvd(jobu,jobvt,&n,&m,mat[0],&n,sing,
-//         vvp,&n,uup,&udim,
-//         work,&lwork,&info);
-//  if (info == 0 && uu != NULL) {
-//    /*
-//     * Transpose U to get rid of the
-//     * LAPACK convention.
-//     */
-//    for (j = 0; j < udim; j++)
-//      for (k = 0; k < m; k++)
-//        uu[j][k] = uutemp[k][j];
-//  }
-//  FREE_DCMATRIX(uutemp);
 //  return info;
 }
 
@@ -15119,6 +14705,7 @@ static double compute_linear_parameters(double *mu,
   double sum;
 
   compose_linear_fitting_data(mu,u);
+  printf("############## DEBUG c_dsvd");
   c_dsvd(u->M,u->nterms-1,u->nfit-1,u->sing,u->uu,u->vv);
   /*
    * Compute the residuals
@@ -15166,6 +14753,7 @@ static double one_step (double *mu, int nfit, void *user_data)
   /*
    * Compute SVD
    */
+  printf("############## DEBUG c_dsvd");
   c_dsvd(u->M,u->nterms-1,u->nfit-1,u->sing,u->uu,NULL);
   /*
    * Compute the residuals
@@ -15950,6 +15538,437 @@ int fwd_sphere_field_vec(float        *rd,	/* The dipole location */
 }
 
 
+//============================= mne_simplex_fit.c =============================
+
+/*
+ * This routine comes from Numerical recipes
+ */
+
+#define ALPHA 1.0
+#define BETA 0.5
+#define GAMMA 2.0
+
+static float tryit (float **p,
+          float *y,
+          float *psum,
+          int   ndim,
+          float (*func)(float *x,int npar,void *user_data),	  /* The function to be evaluated */
+          void  *user_data,				          /* Data to be passed to the above function in each evaluation */
+          int   ihi,
+          int   *neval,
+          float fac)
+
+{
+  int j;
+  float fac1,fac2,ytry,*ptry;
+
+  ptry = ALLOC_FLOAT(ndim);
+  fac1 = (1.0-fac)/ndim;
+  fac2 = fac1-fac;
+  for (j = 0; j < ndim; j++)
+    ptry[j] = psum[j]*fac1-p[ihi][j]*fac2;
+  ytry = (*func)(ptry,ndim,user_data);
+  ++(*neval);
+  if (ytry < y[ihi]) {
+    y[ihi] = ytry;
+    for (j = 0; j < ndim; j++) {
+      psum[j] +=  ptry[j]-p[ihi][j];
+      p[ihi][j] = ptry[j];
+    }
+  }
+  FREE(ptry);
+  return ytry;
+}
+
+int mne_simplex_minimize(float **p,		                              /* The initial simplex */
+             float *y,		                              /* Function values at the vertices */
+             int   ndim,	                                      /* Number of variables */
+             float ftol,	                                      /* Relative convergence tolerance */
+             float (*func)(float *x,int npar,void *user_data),    /* The function to be evaluated */
+             void  *user_data,				      /* Data to be passed to the above function in each evaluation */
+             int   max_eval,	                              /* Maximum number of function evaluations */
+             int   *neval,	                                      /* Number of function evaluations */
+             int   report,                                        /* How often to report (-1 = no_reporting) */
+             int   (*report_func)(int loop,
+                          float *fitpar, int npar,
+                          double fval))                   /* The function to be called when reporting */
+
+     /*
+      * Minimization with the simplex algorithm
+      * Modified from Numerical recipes
+      */
+
+{
+  int   i,j,ilo,ihi,inhi;
+  int   mpts = ndim+1;
+  float ytry,ysave,sum,rtol,*psum;
+  int   result = 0;
+  int   count = 0;
+  int   loop  = 1;
+
+  psum = ALLOC_FLOAT(ndim);
+  *neval = 0;
+  for (j = 0; j < ndim; j++) {
+    for (i = 0,sum = 0.0; i<mpts; i++)
+      sum +=  p[i][j];
+    psum[j] = sum;
+  }
+  if (report_func != NULL && report > 0)
+    (void)report_func (0,p[0],ndim,-1.0);
+
+  for (;;count++,loop++) {
+    ilo = 1;
+    ihi  =  y[1]>y[2] ? (inhi = 2,1) : (inhi = 1,2);
+    for (i = 0; i < mpts; i++) {
+      if (y[i]  <  y[ilo]) ilo = i;
+      if (y[i] > y[ihi]) {
+    inhi = ihi;
+    ihi = i;
+      } else if (y[i] > y[inhi])
+    if (i !=  ihi) inhi = i;
+    }
+    rtol = 2.0*fabs(y[ihi]-y[ilo])/(fabs(y[ihi])+fabs(y[ilo]));
+    /*
+     * Report that we are proceeding...
+     */
+    if (count == report && report_func != NULL) {
+      if (report_func (loop,p[ilo],ndim,y[ilo])) {
+        qWarning("Interation interrupted.");
+    result = -1;
+    break;
+      }
+      count = 0;
+    }
+    if (rtol < ftol) break;
+    if (*neval >=  max_eval) {
+      qWarning("Maximum number of evaluations exceeded.");
+      result  =  -1;
+      break;
+    }
+    ytry = tryit(p,y,psum,ndim,func,user_data,ihi,neval,-ALPHA);
+    if (ytry <= y[ilo])
+      ytry = tryit(p,y,psum,ndim,func,user_data,ihi,neval,GAMMA);
+    else if (ytry >= y[inhi]) {
+      ysave = y[ihi];
+      ytry = tryit(p,y,psum,ndim,func,user_data,ihi,neval,BETA);
+      if (ytry >= ysave) {
+    for (i = 0; i < mpts; i++) {
+      if (i !=  ilo) {
+        for (j = 0; j < ndim; j++) {
+          psum[j] = 0.5*(p[i][j]+p[ilo][j]);
+          p[i][j] = psum[j];
+        }
+        y[i] = (*func)(psum,ndim,user_data);
+      }
+    }
+    *neval +=  ndim;
+    for (j = 0; j < ndim; j++) {
+      for (i = 0,sum = 0.0; i < mpts; i++)
+        sum +=  p[i][j];
+      psum[j] = sum;
+    }
+      }
+    }
+  }
+  FREE (psum);
+  return (result);
+}
+
+#undef ALPHA
+#undef BETA
+#undef GAMMA
+
+
+
+//============================= fit_sphere.c =============================
+
+
+typedef struct {
+  float **rr;
+  int   np;
+  int   report;
+} *fitSphereUser,fitSphereUserRec;
+
+static int report_func(int     loop,
+               float   *fitpar,
+               int     npar,
+               double  fval)
+     /*
+      * Report periodically
+      */
+{
+  float *r0 = fitpar;
+
+  fprintf(stderr,"loop %d r0 %7.1f %7.1f %7.1f fval %g\n",
+      loop,1000*r0[0],1000*r0[1],1000*r0[2],fval);
+
+  return OK;
+}
+
+static float fit_sphere_eval(float *fitpar,
+              int   npar,
+              void  *user_data)
+     /*
+      * Calculate the cost function value
+      * Optimize for the radius inside here
+      */
+{
+  fitSphereUser user = (fitSphereUser)user_data;
+  float *r0 = fitpar;
+  float diff[3];
+  int   k;
+  float sum,sum2,one,F;
+
+  for (k = 0, sum = sum2 = 0.0; k < user->np; k++) {
+    VEC_DIFF(r0,user->rr[k],diff);
+    one = VEC_LEN(diff);
+    sum  += one;
+    sum2 += one*one;
+  }
+  F = sum2 - sum*sum/user->np;
+
+  if (user->report)
+    fprintf(stderr,"r0 %7.1f %7.1f %7.1f R %7.1f fval %g\n",
+        1000*r0[0],1000*r0[1],1000*r0[2],1000*sum/user->np,F);
+
+  return F;
+}
+
+static float opt_rad(float *r0,fitSphereUser user)
+
+{
+  float sum, diff[3], one;
+  int   k;
+
+  for (k = 0, sum = 0.0; k < user->np; k++) {
+    VEC_DIFF(r0,user->rr[k],diff);
+    one = VEC_LEN(diff);
+    sum  += one;
+  }
+  return sum/user->np;
+}
+
+
+static void calculate_cm_ave_dist(float **rr, int np, float *cm, float *avep)
+
+{
+  int k,q;
+  float ave,diff[3];
+
+  for (q = 0; q < 3; q++)
+    cm[q] = 0.0;
+
+  for (k = 0; k < np; k++)
+    for (q = 0; q < 3; q++)
+      cm[q] += rr[k][q];
+
+  if (np > 0) {
+    for (q = 0; q < 3; q++)
+      cm[q] = cm[q]/np;
+
+    for (k = 0, ave = 0.0; k < np; k++) {
+      for (q = 0; q < 3; q++)
+    diff[q] = rr[k][q] - cm[q];
+      ave += VEC_LEN(diff);
+    }
+    *avep = ave/np;
+  }
+  return;
+}
+
+static float **make_initial_simplex(float  *pars,
+                    int    npar,
+                    float  size)
+     /*
+      * Make the initial tetrahedron
+      */
+{
+  float **simplex = ALLOC_CMATRIX(npar+1,npar);
+  int k;
+
+  for (k = 0; k < npar+1; k++)
+    memcpy (simplex[k],pars,npar*sizeof(float));
+
+  for (k = 1; k < npar+1; k++)
+    simplex[k][k-1] = simplex[k][k-1] + size;
+  return (simplex);
+}
+
+
+int fit_sphere_to_points(float **rr,
+             int   np,
+             float simplex_size,
+             float *r0,
+             float *R)
+     /*
+      * Find the optimal sphere origin
+      */
+{
+  fitSphereUserRec user;
+  float      ftol            = 1e-5;
+  int        max_eval        = 500;
+  int        report_interval = -1;
+  int        neval = 0;
+  float      **init_simplex  = NULL;
+  float      *init_vals      = NULL;
+
+  float      cm[3],R0;
+  int        k;
+
+  int        res = FAIL;
+
+  user.rr = rr;
+  user.np = np;
+
+  calculate_cm_ave_dist(rr,np,cm,&R0);
+
+#ifdef DEBUG
+  fprintf(stderr,"cm %7.1f %7.1f %7.1f R %7.1f\n",
+      1000*cm[0],1000*cm[1],1000*cm[2],1000*R0);
+#endif
+
+  init_simplex = make_initial_simplex(cm,3,simplex_size);
+
+  init_vals = MALLOC(4,float);
+
+#ifdef DEBUG
+  user.report = TRUE;
+#else
+  user.report = FALSE;
+#endif
+
+  for (k = 0; k < 4; k++)
+    init_vals[k] = fit_sphere_eval(init_simplex[k],3,&user);
+
+  if (mne_simplex_minimize(init_simplex,		                  /* The initial simplex */
+               init_vals,		                          /* Function values at the vertices */
+               3,    	                                  /* Number of variables */
+               ftol,	                                  /* Relative convergence tolerance */
+               fit_sphere_eval,                                      /* The function to be evaluated */
+               &user,	  			          /* Data to be passed to the above function in each evaluation */
+               max_eval,	                                  /* Maximum number of function evaluations */
+               &neval,	                                  /* Number of function evaluations */
+               report_interval,	                          /* How often to report (-1 = no_reporting) */
+               report_func) != OK)                            /* The function to be called when reporting */
+    goto out;
+
+  r0[X] = init_simplex[0][X];
+  r0[Y] = init_simplex[0][Y];
+  r0[Z] = init_simplex[0][Z];
+  *R    = opt_rad(r0,&user);
+
+  res = OK;
+  goto out;
+
+  out : {
+    FREE(init_vals);
+    FREE_CMATRIX(init_simplex);
+    return res;
+  }
+}
+
+
+
+
+//============================= fwd_mag_dipole_field.c =============================
+
+
+#define MAG_FACTOR 1e-7
+#define EPS 1e-5
+
+#ifndef OK
+#define OK 0
+#endif
+
+/*
+ * Compute the field of a magnetic dipole
+ */
+
+
+int fwd_mag_dipole_field(float        *rm,      /* The dipole location in the same coordinate system as the coils */
+             float        M[],	/* The dipole components (xyz) */
+             fwdCoilSet   coils,	/* The coil definitions */
+             float        Bval[],	/* Results */
+             void         *client)	/* Client data will be the sphere model origin */
+/*
+ * This is for a specific dipole component
+ */
+{
+  int     j,k,np;
+  fwdCoil this_coil;
+  float   sum,diff[3],dist,dist2,dist5,*dir;
+
+
+  for (k = 0; k < coils->ncoil; k++) {
+    this_coil = coils->coils[k];
+    if (FWD_IS_MEG_COIL(this_coil->type)) {
+      np = this_coil->np;
+      /*
+       * Go through all points
+       */
+      for (j = 0, sum = 0.0; j < np; j++) {
+    dir = this_coil->cosmag[j];
+    VEC_DIFF(rm,this_coil->rmag[j],diff);
+    dist = VEC_LEN(diff);
+    if (dist > EPS) {
+      dist2 = dist*dist;
+      dist5 = dist2*dist2*dist;
+      sum = sum + this_coil->w[j]*(3*VEC_DOT(M,diff)*VEC_DOT(diff,dir) - dist2*VEC_DOT(M,dir))/dist5;
+    }
+      }				/* All points done */
+      Bval[k] = MAG_FACTOR*sum;
+    }
+    else if (this_coil->type == FWD_COILC_EEG)
+      Bval[k] = 0.0;
+  }
+  return OK;
+}
+
+int fwd_mag_dipole_field_vec(float        *rm,	        /* The dipole location */
+                 fwdCoilSet   coils,	/* The coil definitions */
+                 float        **Bval,       /* Results: rows are the fields of the x,y, and z direction dipoles */
+                 void         *client)	/* Client data will be the sphere model origin */
+/*
+ * This is for all dipole components
+ * For EEG this produces a zero result
+ */
+{
+  int     j,k,p,np;
+  fwdCoil this_coil;
+  float   sum[3],diff[3],dist,dist2,dist5,*dir;
+
+
+  for (k = 0; k < coils->ncoil; k++) {
+    this_coil = coils->coils[k];
+    if (FWD_IS_MEG_COIL(this_coil->type)) {
+      np = this_coil->np;
+      sum[0] = sum[1] = sum[2] = 0.0;
+      /*
+       * Go through all points
+       */
+      for (j = 0; j < np; j++) {
+    dir = this_coil->cosmag[j];
+    VEC_DIFF(rm,this_coil->rmag[j],diff);
+    dist = VEC_LEN(diff);
+    if (dist > EPS) {
+      dist2 = dist*dist;
+      dist5 = dist2*dist2*dist;
+      for (p = 0; p < 3; p++)
+        sum[p] = sum[p] + this_coil->w[j]*(3*diff[p]*VEC_DOT(diff,dir) - dist2*dir[p])/dist5;
+    }
+      }				/* All points done */
+      for (p = 0; p < 3; p++)
+    Bval[p][k] = MAG_FACTOR*sum[p];
+    }
+    else if (this_coil->type == FWD_COILC_EEG) {
+      for (p = 0; p < 3; p++)
+    Bval[p][k] = 0.0;
+    }
+  }
+  return OK;
+}
+
+
 
 
 //============================= dipole_fit_setup.c =============================
@@ -16137,16 +16156,8 @@ static int setup_forward_model(dipoleFitData d, mneCTFcompDataSet comp_data, fwd
         if ((inner_skull = fwd_bem_find_surface(d->bem_model,FIFFV_BEM_SURF_ID_BRAIN)) == NULL)
             goto out;
 
-//        static Sphere fit_sphere_simplex(const Eigen::MatrixX3f& points, double simplex_size = 2e-2);
-        Eigen::MatrixX3f rr(inner_skull->np,3);
-        for (int i = 0; i < inner_skull->np; ++i) {
-            rr(i,0) = inner_skull->rr[i][0];
-            rr(i,1) = inner_skull->rr[i][1];
-            rr(i,2) = inner_skull->rr[i][2];
-        }
-        Sphere t_sphere = Sphere::fit_sphere_simplex(rr, simplex_size);
-//        if (fit_sphere_to_points(inner_skull->rr,inner_skull->np,simplex_size,d->r0,&R) == FAIL)
-//            goto out;
+        if (fit_sphere_to_points(inner_skull->rr,inner_skull->np,simplex_size,d->r0,&R) == FAIL)
+            goto out;
 
         fiff_coord_trans(d->r0,d->mri_head_t,TRUE);
         printf("Fitted sphere model origin : %6.1f %6.1f %6.1f mm rad = %6.1f mm.\n",
@@ -16216,7 +16227,6 @@ static int setup_forward_model(dipoleFitData d, mneCTFcompDataSet comp_data, fwd
   }
   printf("Sphere model origin : %6.1f %6.1f %6.1f mm.\n",
       1000*d->r0[X],1000*d->r0[Y],1000*d->r0[Z]);
-#ifdef MAG_DIPOLES
   /*
    * Finally add the magnetic dipole fitting functions (for special purposes)
    */
@@ -16229,6 +16239,7 @@ static int setup_forward_model(dipoleFitData d, mneCTFcompDataSet comp_data, fwd
     comp = fwd_make_comp_data(comp_data,d->meg_coils,comp_coils,
                   fwd_mag_dipole_field,
                   fwd_mag_dipole_field_vec,
+                  NULL,
                   NULL,NULL);
     if (!comp)
       goto out;
@@ -16239,7 +16250,6 @@ static int setup_forward_model(dipoleFitData d, mneCTFcompDataSet comp_data, fwd
   }
   f->eeg_pot     = fwd_mag_dipole_field;
   f->eeg_vec_pot = fwd_mag_dipole_field_vec;
-#endif
   /*
    * Select the appropriate fitting function
    */
@@ -16568,8 +16578,6 @@ int select_dipole_fit_noise_cov(dipoleFitData f, mshMegEegData d)
   float nonsel_w  = 30;
   int   min_nchan = 20;
 
-  printf("########DEBUG######## select_dipole_fit_noise_cov\n");
-
   if (!f || !f->noise_orig)
     return OK;
   if (!d)
@@ -16638,15 +16646,6 @@ int select_dipole_fit_noise_cov(dipoleFitData f, mshMegEegData d)
     f->noise = mne_dup_cov(f->noise_orig);
   }
 
-
-  //DEBUG
-  printf("select_dipole_fit_noise_cov ncov=%d\n", f->noise->ncov);
-  printf("select_dipole_fit_noise_cov nzero=%d\n", f->noise->nzero);
-  printf("select_dipole_fit_noise_cov inv_lambda=%f,%f,%f\n", f->noise->inv_lambda[0], f->noise_orig->inv_lambda[1], f->noise_orig->inv_lambda[2]);
-  printf("select_dipole_fit_noise_cov cov_diag=[%f,%f,%f]\n", f->noise->cov_diag[0], f->noise_orig->cov_diag[1], f->noise_orig->cov_diag[2]);
-
-
-
   return scale_dipole_fit_noise_cov(f,nave);
 }
 
@@ -16687,8 +16686,6 @@ dipoleFitData setup_dipole_fit_data(char  *mriname,		 /* This gives the MRI/head
   fwdCoilSet     templates = NULL;
   mneCTFcompDataSet comp_data  = NULL;
   fwdCoilSet        comp_coils = NULL;
-
-  printf("########DEBUG######## dipoleFitData setup_dipole_fit_data\n");
 
   /*
    * Read the coordinate transformations
@@ -16832,17 +16829,6 @@ dipoleFitData setup_dipole_fit_data(char  *mriname,		 /* This gives the MRI/head
   if (make_projection(projnames,nproj,res->chs,res->nmeg+res->neeg,&res->proj) == FAIL)
     goto bad;
 
-
-//  //DEBUG
-//  printf("####make_projection#### !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
-//  for (int p = 0; p < res->proj->nvec; p++) {
-//    float* pvec = res->proj->proj_data[p];
-//    for (int k = 0; k < res->proj->nch; k++) {
-//      printf("####new 0 pvec#### pvec[%d][%d]=%f\n", p, k, pvec[k]);
-//    }
-//  }
-//  //DEBUG
-
   if (res->proj && res->proj->nitems > 0) {
     fprintf(stderr,"Final projection operator is:\n");
     mne_proj_op_report(stderr,"\t",res->proj);
@@ -16855,16 +16841,6 @@ dipoleFitData setup_dipole_fit_data(char  *mriname,		 /* This gives the MRI/head
   else
     printf("No projection will be applied to the data.\n");
 
-//  //DEBUG
-//  printf("####make_projection#### !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
-//  for (int p = 0; p < res->proj->nvec; p++) {
-//    float* pvec = res->proj->proj_data[p];
-//    for (int k = 0; k < res->proj->nch; k++) {
-//      printf("####new 1 pvec#### pvec[%d][%d]=%f\n", p, k, pvec[k]);
-//    }
-//  }
-//  //DEBUG
-
   /*
    * Noise covariance
    */
@@ -16875,23 +16851,17 @@ dipoleFitData setup_dipole_fit_data(char  *mriname,		 /* This gives the MRI/head
         cov->cov_diag ? "diagonal" : "full", noisename);
   }
   else {
-    printf("############ NOISE DEBUG res->noise\n");
     if ((cov = ad_hoc_noise(res->meg_coils,res->eeg_els,grad_std,mag_std,eeg_std)) == NULL)
       goto bad;
   }
   res->noise = mne_pick_chs_cov_omit(cov,res->ch_names,res->nmeg+res->neeg,TRUE,res->chs);
   if (res->noise == NULL) {
-    printf("############ Free NOISE\n");
     mne_free_cov(cov);
     goto bad;
   }
 
-  printf("############ 1 NOISE DEBUG DIAG HERE cov_diag=[%f,%f,%f]\n", res->noise->cov_diag[0], res->noise->cov_diag[1], res->noise->cov_diag[2]);
-
-
   printf("Picked appropriate channels from the noise-covariance matrix.\n");
   mne_free_cov(cov);
-  printf("############ 2 NOISE DEBUG DIAG HERE cov_diag=[%f,%f,%f]\n", res->noise->cov_diag[0], res->noise->cov_diag[1], res->noise->cov_diag[2]);
 
   /*
    * Apply the projection operator to the noise-covariance matrix
@@ -16902,8 +16872,6 @@ dipoleFitData setup_dipole_fit_data(char  *mriname,		 /* This gives the MRI/head
     printf("Projection applied to the covariance matrix.\n");
   }
 
-  printf("############ 3 NOISE DEBUG DIAG HERE cov_diag=[%f,%f,%f]\n", res->noise->cov_diag[0], res->noise->cov_diag[1], res->noise->cov_diag[2]);
-
   /*
    * Force diagonal noise covariance?
    */
@@ -16911,8 +16879,6 @@ dipoleFitData setup_dipole_fit_data(char  *mriname,		 /* This gives the MRI/head
     mne_revert_to_diag_cov(res->noise);
     fprintf(stderr,"Using only the main diagonal of the noise-covariance matrix.\n");
   }
-
-  printf("############ 4 NOISE DEBUG DIAG HERE cov_diag=[%f,%f,%f]\n", res->noise->cov_diag[0], res->noise->cov_diag[1], res->noise->cov_diag[2]);
 
   /*
    * Regularize the possibly deficient noise-covariance matrix
@@ -16946,9 +16912,6 @@ dipoleFitData setup_dipole_fit_data(char  *mriname,		 /* This gives the MRI/head
       printf("No regularization applied to the noise-covariance matrix\n");
   }
 
-  printf("############ NOISE DEBUG Before the decomposition\n");
-  printf("############ NOISE DEBUG cov_diag=[%f,%f,%f]\n", res->noise->cov_diag[0], res->noise->cov_diag[1], res->noise->cov_diag[2]);
-
   /*
    * Do the decomposition and check that the matrix is positive definite
    */
@@ -16967,11 +16930,6 @@ dipoleFitData setup_dipole_fit_data(char  *mriname,		 /* This gives the MRI/head
     if (mne_add_inv_cov(res->noise) == FAIL)
       goto bad;
   }
-
-  printf("############ NOISE DEBUG ncov=%d\n", res->noise->ncov);
-  printf("############ NOISE DEBUG nzero=%d\n", res->noise->nzero);
-  printf("############ NOISE DEBUG inv_lambda=%f,%f,%f\n", res->noise->inv_lambda[0], res->noise->inv_lambda[1], res->noise->inv_lambda[2]);
-  printf("############ NOISE DEBUG cov_diag=[%f,%f,%f]\n", res->noise->cov_diag[0], res->noise->cov_diag[1], res->noise->cov_diag[2]);
 
   mne_free_name_list(badlist,nbad);
   fwd_free_coil_set(templates);
@@ -17097,7 +17055,7 @@ guessData make_guess_data(char          *guessname,
     goto bad;
   }
   if (guess_save_name) {
-      qDebug() << "writing source spaces not yet implemented.";
+      printf("###################DEBUG writing source spaces not yet implemented.");
 //    if (mne_write_source_spaces(guess_save_name,&guesses,1,FALSE) != OK)
 //      goto bad;
 //    printf("Wrote guess locations to %s\n",guess_save_name);
@@ -17156,11 +17114,6 @@ guessData make_guess_data(char          *guessname,
   float          guessrad = 0.080;
   mneSourceSpace guesses = NULL;
   dipoleFitFuncs orig;
-
-
-  // DEBUG [3.1]
-  printf("<<<< DEBUG >>>> [3.1] guessname=%s\n", guessname);
-
 
   if (guessname) {
     /*
@@ -17229,11 +17182,6 @@ guessData make_guess_data(char          *guessname,
   for (k = 0; k < res->nguess; k++) {
     if ((res->guess_fwd[k] = dipole_forward_one(f,res->rr[k],NULL)) == NULL)
       goto bad;
-////DEBUG ToDo Remove
-//  for (k = 0; k < 1/*res->nguess*/; k++) {
-//    if ((res->guess_fwd[k] = dipole_forward_one(f,res->rr[k],NULL)) != NULL)
-//      goto bad;
-////DEBUG ToDo Remove
 #ifdef DEBUG
     sing = res->guess_fwd[k]->sing;
     printf("%f %f %f\n",sing[0],sing[1],sing[2]);
@@ -17242,31 +17190,6 @@ guessData make_guess_data(char          *guessname,
   f->funcs = orig;
 
   fprintf(stderr,"[done %d sources]\n",p);
-
-
-
-
-  // DEBUG [3.2]
-  printf("<<<< DEBUG >>>> [3.2] guess\n");
-  printf("rr=[%f,%f,%f]\n nguess=%d\n",
-            res->rr[0][0],res->rr[0][1],res->rr[0][2],
-            res->nguess);
-
-
-//  typedef struct {
-//    float          **rr;		    /* These are the guess dipole locations */
-//    dipoleForward  *guess_fwd;	    /* Forward solutions for the guesses */
-//    int            nguess;	    /* How many sources */
-//  } *guessData,guessDataRec;
-
-
-
-
-
-
-
-
-
 
   return res;
 
@@ -17551,7 +17474,7 @@ void mne_fft_ana(float *data,int np, float **precalcp)
 {
   float *precalc;
 
-  qDebug() << "Error: FFT analysis needs to be implemented";
+  printf("##################### DEBUG Error: FFT analysis needs to be implemented");
 
 //  if (precalcp && *precalcp)
 //    precalc = *precalcp;
@@ -17576,7 +17499,7 @@ void mne_fft_syn(float *data,int np, float **precalcp)
   float *precalc;
   float mult;
 
-  qDebug() << "Error: FFT synthesis needs to be implemented";
+  printf("##################### DEBUG Error: FFT synthesis needs to be implemented");
 
 //  if (precalcp && *precalcp)
 //    precalc = *precalcp;
@@ -20647,21 +20570,6 @@ static ecd fit_one(dipoleFitData fit,	            /* Precomputed fitting data */
   nchan = fit->nmeg+fit->neeg;
   user.fwd = NULL;
 
-  // DEBUG [4.1.2.0]
-//  printf("<<<< DEBUG >>>> [4.1.2.0] time=%f; B=%f\n");
-//  printf("<<<< DEBUG >>>> [4.1.2.0] fit=\n");
-//  printf("<<<< DEBUG >>>> [4.1.2.0] guess \n\t rr=[%f,%f,%f];\n\t nguess=%d\n", *guess->rr[0], *guess->rr[1], *guess->rr[2] , guess->nguess);
-//  printf("<<<< DEBUG >>>> [4.1.2.0] guess dipForward \n\t rd=[%f,%f,%f];\n\t ndip=%d;\n\t fwd=[%f,%f,%f];\n\t scales=[%f,%f,%f];\n\t uu=[%f,%f,%f];\n\t vv=[%f,%f,%f];\n\t sing=[%f,%f,%f];\n\t nch=%d\n",
-//          (*guess->guess_fwd)->rd[0][0], (*guess->guess_fwd)->rd[0][1], (*guess->guess_fwd)->rd[0][2],
-//          (*guess->guess_fwd)->ndip,
-//          (*guess->guess_fwd)->fwd[0][0], (*guess->guess_fwd)->fwd[0][1], (*guess->guess_fwd)->fwd[0][2],
-//          (*guess->guess_fwd)->scales[0], (*guess->guess_fwd)->scales[1], (*guess->guess_fwd)->scales[2],
-//          (*guess->guess_fwd)->uu[0][0], (*guess->guess_fwd)->uu[0][1], (*guess->guess_fwd)->uu[0][2],
-//          (*guess->guess_fwd)->vv[0][0], (*guess->guess_fwd)->vv[0][1], (*guess->guess_fwd)->vv[0][2],
-//          (*guess->guess_fwd)->sing[0], (*guess->guess_fwd)->sing[1], (*guess->guess_fwd)->sing[2],
-//          (*guess->guess_fwd)->nch);
-
-
   if (mne_proj_op_proj_vector(fit->proj,B,nchan,TRUE) == FAIL)
     goto bad;
 
@@ -20928,15 +20836,8 @@ int    fit_dipoles(char          *dataname,
     set->dataname = mne_strdup(dataname);
   }
 
-//  // DEBUG [4.1.0]
-//  printf("<<<< DEBUG >>>> [4.1.0]\n");
-
   fprintf(stderr,"Fitting...%c",verbose ? '\n' : '\0');
   for (s = 0, time = tmin; time < tmax; s++, time = tmin  + s*tstep) {
-
-//      // DEBUG [4.1.1]
-//      printf("<<<< DEBUG >>>> [4.1.1]\n");
-
     /*
      * Pick the data point
      */
@@ -20946,27 +20847,17 @@ int    fit_dipoles(char          *dataname,
       continue;
     }
 
-//    // DEBUG [4.1.2]
-//    printf("<<<< DEBUG >>>> [4.1.2]\n");
-
     if ((dip = fit_one(fit,guess,time,one,verbose)) == NULL)
       printf("t = %7.1f ms : %s\n",1000*time,"error (tbd: catch)");
     else {
       add_to_ecd_set(set,dip);
-//      if (verbose)
-
-//      // DEBUG [4.1.2]
-//        print_ecd(stdout,dip);
-
-//      else {
-//        if (set->ndip % report_interval == 0)
-//          fprintf(stderr,"%d..",set->ndip);
-//      }
+      if (verbose)
+        print_ecd(stdout,dip);
+      else {
+        if (set->ndip % report_interval == 0)
+          fprintf(stderr,"%d..",set->ndip);
+      }
     }
-
-//    // DEBUG [4.1.3]
-//    printf("<<<< DEBUG >>>> [4.1.3]\n");
-
   }
   if (!verbose)
     fprintf(stderr,"[done]\n");
@@ -21939,34 +21830,9 @@ int main(int argc, char *argv[])
     printf("\n");
     printf("---- Setting up...\n\n");
 
-
-    // DEBUG [0]
-    printf("<<<< DEBUG >>>> [0]: before include EEG.\n");
-
     if (include_eeg) {
         if ((eeg_model = setup_eeg_sphere_model(eeg_model_file,eeg_model_name,eeg_sphere_rad)) == NULL)
             goto out;
-    }
-
-    // DEBUG [1]
-    printf("<<<< DEBUG >>>> [1]: setup_eeg_sphere_model.\n");
-    if( eeg_model ) {
-  //      typedef struct {
-  //        char  *name;			/* Textual identifier */
-  //        int   nlayer;			/* Number of layers */
-  //        fwdEegSphereLayer layers;	/* An array of layers */
-  //        float  r0[3];			/* The origin */
-
-  //        double *fn;		        /* Coefficients saved to speed up the computations */
-  //        int    nterms;		/* How many? */
-
-  //        float  *mu;			/* The Berg-Scherg equivalence parameters */
-  //        float  *lambda;
-  //        int    nfit;			/* How many? */
-  //        int    scale_pos;		/* Scale the positions to the surface of the sphere? */
-  //      } *fwdEegSphereModel,fwdEegSphereModelRec;
-        printf("<<<< DEBUG >>>> [1] eeg_model name: %s\n", eeg_model->name);
-        printf("<<<< DEBUG >>>> [1] eeg_model nlayer: %d\n", eeg_model->nlayer);
     }
 
     if ((fit_data = setup_dipole_fit_data(mriname,measname,bemname,r0,eeg_model,accurate,
@@ -21974,9 +21840,6 @@ int main(int argc, char *argv[])
         mag_reg,grad_reg,eeg_reg,
         diagnoise,projnames,nproj,include_meg,include_eeg)) == NULL)
         goto out;
-
-    // DEBUG [2]
-    printf("<<<< DEBUG >>>> [2]: setup_dipole_fit_data.\n");
 
     fit_data->fit_mag_dipoles = fit_mag_dipoles;
     if (is_raw) {
@@ -22037,9 +21900,6 @@ int main(int argc, char *argv[])
         }
     }
 
-    // DEBUG [3]
-    printf("<<<< DEBUG >>>> [3]\n");
-
     /*
     * Proceed to computing the fits
     */
@@ -22047,62 +21907,19 @@ int main(int argc, char *argv[])
     if ((guess = make_guess_data(guessname, guess_surfname, guess_mindist, guess_exclude, guess_grid, fit_data)) == NULL)
     goto out;
 
-    // DEBUG [4]
-    printf("<<<< DEBUG >>>> [4]: make_guess_data\n");
-
-    // DEBUG [4.0.1]
-    printf("<<<< DEBUG >>>> [4.0.1] guess\n");
-    printf("rr=[%f,%f,%f]\n", guess->rr[0][0],guess->rr[0][1],guess->rr[0][2]);
-    for (int i = 0; i < 2/*guess->nguess*/; ++i) {
-        printf("<<<Dipole %i>>>\n", i);
-        printf("dplFwd rd=[%f,%f,%f]\n", (guess->guess_fwd[i])->rd[0][0], (*(guess->guess_fwd))->rd[0][1], (*(guess->guess_fwd))->rd[0][2]);
-        printf("dplFwd ndip=%d\n",  (guess->guess_fwd[i])->ndip);
-        printf("dplFwd fwd=[%f,%f,%f]\n", (guess->guess_fwd[i])->fwd[0][0], (*(guess->guess_fwd))->fwd[0][1], (*(guess->guess_fwd))->fwd[0][2]);
-        printf("dplFwd scales=[%f,%f,%f]\n", (guess->guess_fwd[i])->scales[0], (*(guess->guess_fwd))->scales[1], (*(guess->guess_fwd))->scales[2]);
-        printf("dplFwd uu=[%f,%f,%f]\n", (guess->guess_fwd[i])->uu[0][0], (*(guess->guess_fwd))->uu[0][1], (*(guess->guess_fwd))->uu[0][2]);
-        printf("dplFwd vv=[%f,%f,%f]\n", (guess->guess_fwd[i])->vv[0][0], (*(guess->guess_fwd))->vv[0][1], (*(guess->guess_fwd))->vv[0][2]);
-        printf("dplFwd sing=[%f,%f,%f]\n", (guess->guess_fwd[i])->sing[0], (*(guess->guess_fwd))->sing[1], (*(guess->guess_fwd))->sing[2]);
-        printf("dplFwd nch=%d\n",  (guess->guess_fwd[i])->nch);
-    }
-    printf("nguess=%d\n", guess->nguess);
-
-//    typedef struct {
-//      float **rd;			    /* Dipole locations */
-//      int   ndip;			    /* How many dipoles */
-//      float **fwd;			    /* The forward solution (projected and whitened) */
-//      float *scales;		    /* Scales applied to the columns of fwd */
-//      float **uu;			    /* The left singular vectors of the forward matrix */
-//      float **vv;			    /* The right singular vectors of the forward matrix */
-//      float *sing;			    /* The singular values */
-//      int   nch;			    /* Number of channels */
-//    } *dipoleForward,dipoleForwardRec;
-
-
-
     fprintf (stderr,"\n---- Fitting : %7.1f ... %7.1f ms (step: %6.1f ms integ: %6.1f ms)\n\n",
     1000*tmin,1000*tmax,1000*tstep,1000*integ);
 
 
     if (raw) {
-
-        // DEBUG [4.1 raw]
-        printf("<<<< DEBUG >>>> [4.1 raw]\n");
-
         if (fit_dipoles_raw(measname,raw,sel,fit_data,guess,tmin,tmax,tstep,integ,verbose,NULL) == FAIL)
             goto out;
     }
     else {
-
-        // DEBUG [4.1 data]
-        printf("<<<< DEBUG >>>> [4.1 data]\n");
-
         if (fit_dipoles(measname,data,fit_data,guess,tmin,tmax,tstep,integ,verbose,&set) == FAIL)
             goto out;
     }
     printf("%d dipoles fitted\n",set->ndip);
-
-    // DEBUG [5]
-    printf("<<<< DEBUG >>>> [5]: fit_dipoles fitted\n");
 
     /*
     * Saving...
