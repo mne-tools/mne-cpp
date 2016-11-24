@@ -136,7 +136,9 @@ bool DigitizerSetTreeItem::addData(const FIFFLIB::FiffDigPointSet& tDigitizer, Q
     bool state = false;
 
     //parsing the digitizer List
-    QList<FIFFLIB::FiffDigPoint> tCardinal;
+    QList<FIFFLIB::FiffDigPoint> tNasion;
+    QList<FIFFLIB::FiffDigPoint> tLAP;
+    QList<FIFFLIB::FiffDigPoint> tRAP;
     QList<FIFFLIB::FiffDigPoint> tHpi;
     QList<FIFFLIB::FiffDigPoint> tEeg;
     QList<FIFFLIB::FiffDigPoint> tExtra;
@@ -144,7 +146,19 @@ bool DigitizerSetTreeItem::addData(const FIFFLIB::FiffDigPointSet& tDigitizer, Q
     for(int i = 0; i < tDigitizer.size(); ++i){
         switch (tDigitizer[i].kind) {
         case FIFFV_POINT_CARDINAL:
-            tCardinal.append(tDigitizer[i]);
+            switch (tDigitizer[i].ident) {
+            case FIFFV_POINT_LPA:
+                tLAP.append(tDigitizer[i]);
+            break;
+            case FIFFV_POINT_NASION:
+                tNasion.append(tDigitizer[i]);
+            break;
+            case FIFFV_POINT_RPA:
+                tRAP.append(tDigitizer[i]);
+            break;
+            default:
+            break;
+            }
             break;
         case FIFFV_POINT_HPI:
             tHpi.append(tDigitizer[i]);
@@ -163,10 +177,28 @@ bool DigitizerSetTreeItem::addData(const FIFFLIB::FiffDigPointSet& tDigitizer, Q
     // Find the Digitizer Items
     QList<QStandardItem*> itemList = this->findChildren(Data3DTreeModelItemTypes::DigitizerItem);
 
-    if (!tCardinal.empty()){
-        //Create a cardinal digitizer item
-        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(Data3DTreeModelItemTypes::DigitizerItem,"Cardinal");
-        state = digitizerItem->addData(tCardinal, parent);
+    if (!tLAP.empty()){
+        //Create a LAP digitizer item
+        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(Data3DTreeModelItemTypes::DigitizerItem,"LAP");
+        state = digitizerItem->addData(tLAP, parent);
+        itemList << digitizerItem;
+        itemList << new QStandardItem(digitizerItem->toolTip());
+        this->appendRow(itemList);
+        itemList.clear();
+    }
+    if (!tNasion.empty()){
+        //Create a Nasion digitizer item
+        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(Data3DTreeModelItemTypes::DigitizerItem,"Nasion");
+        state = digitizerItem->addData(tNasion, parent);
+        itemList << digitizerItem;
+        itemList << new QStandardItem(digitizerItem->toolTip());
+        this->appendRow(itemList);
+        itemList.clear();
+    }
+    if (!tRAP.empty()){
+        //Create a RAO digitizer item
+        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(Data3DTreeModelItemTypes::DigitizerItem,"RAP");
+        state = digitizerItem->addData(tRAP, parent);
         itemList << digitizerItem;
         itemList << new QStandardItem(digitizerItem->toolTip());
         this->appendRow(itemList);
