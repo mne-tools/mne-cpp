@@ -50,7 +50,6 @@ SUBDIRS += \
     findEvoked \
     evokedGradAmp \
     cancelNoise \
-#    dipoleFit \
     fiffIO \
     makeLayout\
     readBEM\
