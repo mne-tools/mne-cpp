@@ -161,6 +161,9 @@ bool DigitizerSetTreeItem::addData(const FIFFLIB::FiffDigPointSet& tDigitizer, Q
     // Find the Digitizer Items
     QList<QStandardItem*> itemList = this->findChildren(Data3DTreeModelItemTypes::DigitizerItem);
     bool bFoundCardinalItem = false;
+    bool bFoundHPIItem = false;
+    bool bFoundEEGItem = false;
+    bool bFoundExtraItem = false;
 
     for(int i = 0; i < itemList.size(); ++i) {
         DigitizerTreeItem* item = dynamic_cast<DigitizerTreeItem*>(itemList.at(i));
@@ -168,6 +171,21 @@ bool DigitizerSetTreeItem::addData(const FIFFLIB::FiffDigPointSet& tDigitizer, Q
         if(item->text() == "Cardinal" && !tCardinal.empty()) {
             item->addData(tCardinal, parent);
             bFoundCardinalItem = true;
+        }
+
+        if(item->text() == "HPI" && !tHpi.empty()) {
+            item->addData(tHpi, parent);
+            bFoundHPIItem = true;
+        }
+
+        if(item->text() == "EEG/ECG" && !tEeg.empty()) {
+            item->addData(tEeg, parent);
+            bFoundEEGItem = true;
+        }
+
+        if(item->text() == "Extra" && !tExtra.empty()) {
+            item->addData(tExtra, parent);
+            bFoundExtraItem = true;
         }
     }
 
@@ -179,6 +197,36 @@ bool DigitizerSetTreeItem::addData(const FIFFLIB::FiffDigPointSet& tDigitizer, Q
         itemListCardinal << digitizerItem;
         itemListCardinal << new QStandardItem(digitizerItem->toolTip());
         this->appendRow(itemListCardinal);
+    }
+
+    if (!bFoundHPIItem && !tHpi.empty()){
+        //Create a hpi digitizer item
+        QList<QStandardItem*> itemListHPI;
+        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(Data3DTreeModelItemTypes::DigitizerItem,"HPI");
+        state = digitizerItem->addData(tHpi, parent);
+        itemListHPI << digitizerItem;
+        itemListHPI << new QStandardItem(digitizerItem->toolTip());
+        this->appendRow(itemListHPI);
+    }
+
+    if (!bFoundEEGItem && !tEeg.empty()){
+        //Create a eeg ecg digitizer item
+        QList<QStandardItem*> itemListEEG;
+        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(Data3DTreeModelItemTypes::DigitizerItem,"EEG/ECG");
+        state = digitizerItem->addData(tEeg, parent);
+        itemListEEG << digitizerItem;
+        itemListEEG << new QStandardItem(digitizerItem->toolTip());
+        this->appendRow(itemListEEG);
+    }
+
+    if (!bFoundExtraItem && !tExtra.empty()){
+        //Create a extra digitizer item
+        QList<QStandardItem*> itemListExtra;
+        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(Data3DTreeModelItemTypes::DigitizerItem,"Extra");
+        state = digitizerItem->addData(tExtra, parent);
+        itemListExtra << digitizerItem;
+        itemListExtra << new QStandardItem(digitizerItem->toolTip());
+        this->appendRow(itemListExtra);
     }
 
 //    if (!tHpi.empty()){
