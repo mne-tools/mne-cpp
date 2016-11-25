@@ -130,11 +130,6 @@ void  DigitizerSetTreeItem::setData(const QVariant& value, int role)
 
 bool DigitizerSetTreeItem::addData(const FIFFLIB::FiffDigPointSet& tDigitizer, Qt3DCore::QEntity* parent)
 {
-    //Delete all childs first. We do this because we always want to start fresh with the newly added digitizer data.
-    if(this->hasChildren()) {
-        this->removeRows(0, this->rowCount());
-    }
-
     //Add data
     bool state = false;
 
@@ -164,44 +159,55 @@ bool DigitizerSetTreeItem::addData(const FIFFLIB::FiffDigPointSet& tDigitizer, Q
     }
 
     // Find the Digitizer Items
-    QList<QStandardItem*> itemList;
+    QList<QStandardItem*> itemList = this->findChildren(Data3DTreeModelItemTypes::DigitizerItem);
+    bool bFoundCardinalItem = false;
 
-    if (!tCardinal.empty()){
+    for(int i = 0; i < itemList.size(); ++i) {
+        DigitizerTreeItem* item = dynamic_cast<DigitizerTreeItem*>(itemList.at(i));
+
+        if(item->text() == "Cardinal" && !tCardinal.empty()) {
+            item->addData(tCardinal, parent);
+            bFoundCardinalItem = true;
+        }
+    }
+
+    if (!bFoundCardinalItem && !tCardinal.empty()){
         //Create a cardinal digitizer item
+        QList<QStandardItem*> itemListCardinal;
         DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(Data3DTreeModelItemTypes::DigitizerItem,"Cardinal");
         state = digitizerItem->addData(tCardinal, parent);
-        itemList << digitizerItem;
-        itemList << new QStandardItem(digitizerItem->toolTip());
-        this->appendRow(itemList);
-        itemList.clear();
+        itemListCardinal << digitizerItem;
+        itemListCardinal << new QStandardItem(digitizerItem->toolTip());
+        this->appendRow(itemListCardinal);
     }
-    if (!tHpi.empty()){
-        //Create a HPI digitizer item
-        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(Data3DTreeModelItemTypes::DigitizerItem,"HPI");
-        state = digitizerItem->addData(tHpi, parent);
-        itemList << digitizerItem;
-        itemList << new QStandardItem(digitizerItem->toolTip());
-        this->appendRow(itemList);
-        itemList.clear();
-    }
-    if (!tEeg.empty()){
-        //Create a EEG digitizer item
-        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(Data3DTreeModelItemTypes::DigitizerItem,"EEG/ECG");
-        state = digitizerItem->addData(tEeg, parent);
-        itemList << digitizerItem;
-        itemList << new QStandardItem(digitizerItem->toolTip());
-        this->appendRow(itemList);
-        itemList.clear();
-    }
-    if (!tExtra.empty()){
-        //Create a extra digitizer item
-        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(Data3DTreeModelItemTypes::DigitizerItem,"Extra");
-        state = digitizerItem->addData(tExtra, parent);
-        itemList << digitizerItem;
-        itemList << new QStandardItem(digitizerItem->toolTip());
-        this->appendRow(itemList);
-        itemList.clear();
-    }
+
+//    if (!tHpi.empty()){
+//        //Create a HPI digitizer item
+//        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(Data3DTreeModelItemTypes::DigitizerItem,"HPI");
+//        state = digitizerItem->addData(tHpi, parent);
+//        itemList << digitizerItem;
+//        itemList << new QStandardItem(digitizerItem->toolTip());
+//        this->appendRow(itemList);
+//        itemList.clear();
+//    }
+//    if (!tEeg.empty()){
+//        //Create a EEG digitizer item
+//        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(Data3DTreeModelItemTypes::DigitizerItem,"EEG/ECG");
+//        state = digitizerItem->addData(tEeg, parent);
+//        itemList << digitizerItem;
+//        itemList << new QStandardItem(digitizerItem->toolTip());
+//        this->appendRow(itemList);
+//        itemList.clear();
+//    }
+//    if (!tExtra.empty()){
+//        //Create a extra digitizer item
+//        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(Data3DTreeModelItemTypes::DigitizerItem,"Extra");
+//        state = digitizerItem->addData(tExtra, parent);
+//        itemList << digitizerItem;
+//        itemList << new QStandardItem(digitizerItem->toolTip());
+//        this->appendRow(itemList);
+//        itemList.clear();
+//    }
     return state;
 }
 

@@ -105,10 +105,11 @@ BrainSourceSpaceTreeItem::BrainSourceSpaceTreeItem(int iType, const QString& tex
 
 BrainSourceSpaceTreeItem::~BrainSourceSpaceTreeItem()
 {
-    //Delete entity so that the SceneGraph is NOT plotting it anymore.
-    //QPointer only deletes if the parent is destroyed. What happens if this item is destroyed before the parent is destroyed?
-    //Cannot delete m_pParentEntity since we do not know who else holds it.
-    delete m_pRenderable3DEntity;
+    //Schedule deletion/Decouple of all entities so that the SceneGraph is NOT plotting them anymore.
+    //Cannot delete m_pParentEntity since we do not know who else holds it, that is why we use a QPointer for m_pParentEntity.
+    if(!m_pRenderable3DEntity.isNull()) {
+        m_pRenderable3DEntity->deleteLater();
+    }
 }
 
 
