@@ -12355,9 +12355,13 @@ mneSurface make_guesses(mneSurface guess_surf,     /* Predefined boundary for th
 //#endif
 //      goto out;
 
-    QFile bemFile("/usr/pubsw/packages/mne/stable/share/mne/icos.fif");
-    if( !bemFile.exists () )
+//    QFile bemFile("/usr/pubsw/packages/mne/stable/share/mne/icos.fif");
+    QFile bemFile(QCoreApplication::applicationDirPath() + QString("/resources/surf2bem/icos.fif"));
+
+    if( !bemFile.exists () ){
+        qDebug() << bemFile.fileName() << "does not exists.";
         goto out;
+    }
 
     bemname = MALLOC(strlen(bemFile.fileName().toLatin1().data())+1,char);
     strcpy(bemname,bemFile.fileName().toLatin1().data());
@@ -16756,8 +16760,8 @@ dipoleFitData setup_dipole_fit_data(char  *mriname,		 /* This gives the MRI/head
 //    const char *filename = "coil_def.dat";
 //    const char *coilfile = mne_compose_mne_name(path,filename);
 
-    QString qPath("/usr/pubsw/packages/mne/stable/share/mne/coil_def.dat");
-//    QString qPath = QCoreApplication::applicationDirPath() + QString("/resources/coilDefinitions/coil_def.dat");
+//    QString qPath("/usr/pubsw/packages/mne/stable/share/mne/coil_def.dat");
+    QString qPath = QCoreApplication::applicationDirPath() + QString("/resources/coilDefinitions/coil_def.dat");
     char *coilfile = MALLOC(strlen(qPath.toLatin1().data())+1,char);
     strcpy(coilfile,qPath.toLatin1().data());
 #endif
