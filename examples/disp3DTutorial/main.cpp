@@ -174,8 +174,6 @@ int main(int argc, char *argv[])
         QString method(parser.value(methodOption));
 
         // Load data
-        QPair<QVariant, QVariant> baseline(QVariant(), 0);
-        FiffEvoked evoked(t_fileEvoked, 0, baseline);
         t_fileEvoked.close();
         if(evoked.isEmpty())
             return 1;
