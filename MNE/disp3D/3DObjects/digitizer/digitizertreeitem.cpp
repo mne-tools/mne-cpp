@@ -110,9 +110,9 @@ DigitizerTreeItem::~DigitizerTreeItem()
 {
     //Schedule deletion/Decouple of all entities so that the SceneGraph is NOT plotting them anymore.
     //Cannot delete m_pParentEntity since we do not know who else holds it, that is why we use a QPointer for m_pParentEntity.
-//    for(int i = 0; i < m_lSpheres.size(); ++i) {
-//        m_lSpheres.at(i)->deleteLater();
-//    }
+    for(int i = 0; i < m_lSpheres.size(); ++i) {
+        m_lSpheres.at(i)->deleteLater();
+    }
 
     if(!m_pRenderable3DEntity.isNull()) {
         m_pRenderable3DEntity->deleteLater();
@@ -154,9 +154,9 @@ bool DigitizerTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer, 
     //Create renderable 3D entity
     m_pParentEntity = parent;
 
-    if(!m_pRenderable3DEntity.isNull()) {
-        m_pRenderable3DEntity->deleteLater();
-    }
+//    if(!m_pRenderable3DEntity.isNull()) {
+//        m_pRenderable3DEntity->deleteLater();
+//    }
 
     m_pRenderable3DEntity = new Renderable3DEntity(m_pParentEntity);
 
