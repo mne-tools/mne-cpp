@@ -104,7 +104,7 @@ int main(int argc, char *argv[])
 
     // Command Line Parser
     QCommandLineParser parser;
-    parser.setApplicationDescription("Start roiClusteredInversePwlRapMusic example");
+    parser.setApplicationDescription("ROI Clustered Inverse Powell Rap Music Example");
     parser.addHelpOption();
 
     QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", "./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
