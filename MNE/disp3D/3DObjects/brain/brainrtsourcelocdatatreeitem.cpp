@@ -87,7 +87,7 @@ BrainRTSourceLocDataTreeItem::BrainRTSourceLocDataTreeItem(int iType, const QStr
 , m_bIsInit(false)
 , m_pSourceLocRtDataWorker(new RtSourceLocDataWorker(this))
 {
-    connect(m_pSourceLocRtDataWorker, &RtSourceLocDataWorker::newRtData,
+    connect(m_pSourceLocRtDataWorker.data(), &RtSourceLocDataWorker::newRtData,
             this, &BrainRTSourceLocDataTreeItem::onNewRtData);
 
     this->setEditable(false);

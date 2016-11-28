@@ -272,7 +272,7 @@ signals:
     *
     * @param[in] colorPair     The samples data in form of a QPair rgb colors as QByteArray.
     */
-    void newRtData(QPair<QByteArray, QByteArray> colorPair);
+    void newRtData(const QPair<QByteArray, QByteArray>& colorPair);
 };
 
 } // NAMESPACE

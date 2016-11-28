@@ -109,6 +109,11 @@ BrainRTConnectivityDataTreeItem::BrainRTConnectivityDataTreeItem(int iType, cons
 
 BrainRTConnectivityDataTreeItem::~BrainRTConnectivityDataTreeItem()
 {
+    //Schedule deletion/Decouple of all entities so that the SceneGraph is NOT plotting them anymore.
+    //Cannot delete m_pParentEntity since we do not know who else holds it, that is why we use a QPointer for m_pParentEntity.
+    if(!m_pRenderable3DEntity.isNull()) {
+        m_pRenderable3DEntity->deleteLater();
+    }
 }
 
 

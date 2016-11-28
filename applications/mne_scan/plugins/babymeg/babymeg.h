@@ -433,7 +433,7 @@ private:
     QString                                 m_sBadChannels;                 /**< Filename which contains a list of bad channels */
 
     QFile                                   m_qFileOut;                     /**< QFile for writing to fif file.*/
-    QMutex                                  mutex;                          /**< Mutex to guarantee thread safety.*/
+    QMutex                                  m_mutex;                        /**< Mutex to guarantee thread safety.*/
     QTime                                   m_recordingStartedTime;         /**< The time when the recording started.*/
 
     Eigen::RowVectorXd                      m_cals;                         /**< Calibration vector.*/
