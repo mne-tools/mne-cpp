@@ -1,7 +1,8 @@
 //=============================================================================================================
 /**
 * @file     main.cpp
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
+* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Lorenz Esch <lorenz.esch@tu-ilmenau.de>
 * @version  1.0
 * @date     March, 2014
 *

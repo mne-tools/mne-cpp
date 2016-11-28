@@ -2,6 +2,7 @@
 /**
 * @file     main.cpp
 * @author   Jana Kiesel <jana.kiesel@tu-ilmenau.de>
+*           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0

@@ -2,6 +2,7 @@
 /**
 * @file     histogram.cpp
 * @author   Ricky Tjen <ricky270@student.sgu.ac.id>;
+*           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
 * @date     March, 2016

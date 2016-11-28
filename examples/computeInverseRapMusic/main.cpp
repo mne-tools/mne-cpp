@@ -1,7 +1,8 @@
 //=============================================================================================================
 /**
 * @file     main.cpp
-* @author   Christoph Dinh <christoph.dinh@tu-ilmenau.de>
+* @author   Christoph Dinh <christoph.dinh@tu-ilmenau.de>;
+*           Lorenz Esch <lorenz.esch@tu-ilmenau.de>
 * @version  1.0
 * @date     July, 2013
 *
