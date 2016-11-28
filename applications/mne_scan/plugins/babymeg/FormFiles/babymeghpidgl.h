@@ -71,6 +71,14 @@ namespace Ui {
     class BabyMEGHPIDgl;
 }
 
+namespace DISP3DLIB {
+    class View3D;
+}
+
+namespace FIFFLIB {
+    class FiffDigPointSet;
+}
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -91,43 +99,76 @@ class BabyMEG;
 
 //=============================================================================================================
 /**
-* DECLARE CLASS BabyMEGHPIDgl
+* The BabyMEGHPIDgl class provides a QDialog for the HPI controls.
 *
 * @brief The BabyMEGHPIDgl class provides a QDialog for the HPI controls.
 */
-class BABYMEGSHARED_EXPORT BabyMEGHPIDgl : public QDialog
+class BABYMEGSHARED_EXPORT BabyMEGHPIDgl : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit BabyMEGHPIDgl(BabyMEG* p_pBabyMEG,QWidget *parent = 0);
+    explicit BabyMEGHPIDgl(BabyMEG* p_pBabyMEG, QWidget *parent = 0);
     ~BabyMEGHPIDgl();
 
     //=========================================================================================================
     /**
-    * Read Polhemus data from fif file
+    * Set new digitizer data to View3D.
     *
+    * @param[in] digPointSet                    The new digitizer set.
+    * @param[in] vGof                           The goodness of fit in mm for each fitted HPI coil.
+    * @param[in] bSortOutAdditionalDigitizer    Whether additional or extra digitized points dhould be sorted out. Too many points could lead to 3D performance issues.
     */
-    void ReadPolhemusDig(QString fileName);
+    void setDigitizerDataToView3D(const FIFFLIB::FiffDigPointSet& digPointSet, const QVector<double>& vGof, bool bSortOutAdditionalDigitizer = true);
 
     //=========================================================================================================
     /**
-    * Load a Polhemus file name
+    * Returns true if any digitizers were loaded that correspond to HPI coils.
     *
+    * @return true  If any digitizers were loaded that correspond to HPI coils, false otherwise.
     */
-    void bnLoadPolhemusFile();
-    void OKProc(QAbstractButton *b);
-    void CancelProc();
+    bool hpiLoaded();
 
     BabyMEG*                m_pBabyMEG;
-    FIFFLIB::FiffInfo       info;
-    QString                 FileName_HPI;
 
 protected:
      virtual void closeEvent( QCloseEvent * event );
 
 private:
-    Ui::BabyMEGHPIDgl*      ui;
+
+    //=========================================================================================================
+    /**
+    * Read Polhemus data from fif file.
+    *
+    */
+    QList<FIFFLIB::FiffDigPoint> readPolhemusDig(QString fileName);
+
+    //=========================================================================================================
+    /**
+    * Perform a single HPI fit.
+    *
+    */
+    void onBtnDoSingleFit();
+
+    //=========================================================================================================
+    /**
+    * Load a Polhemus file name.
+    *
+    */
+    void onBtnLoadPolhemusFile();
+
+    //=========================================================================================================
+    /**
+    * Load a Polhemus file name.
+    *
+    */
+    void onFreqsChanged();
+
+    Ui::BabyMEGHPIDgl*                  ui;
+
+    QVector<int>                        m_vCoilFreqs;
+
+    QSharedPointer<DISP3DLIB::View3D>   m_pView3D;
 
 signals:
     void SendHPIFiffInfo(FIFFLIB::FiffInfo);

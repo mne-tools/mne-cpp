@@ -42,14 +42,16 @@
 //=============================================================================================================
 
 #include "../../disp3D_global.h"
-#include "../../helpers/abstracttreeitem.h"
-#include "../../helpers/types.h"
+#include "../common/abstracttreeitem.h"
+#include "../common/types.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
 // Qt INCLUDES
 //=============================================================================================================
+
+#include <QPointer>
 
 
 //*************************************************************************************************************
@@ -169,10 +171,10 @@ private:
     */
     QByteArray createVertColor(const Eigen::MatrixXf& vertices, const QColor& color = QColor(100,100,100)) const;
 
-    Qt3DCore::QEntity*                          m_pParentEntity;            /**< The parent 3D entity. */
-    Renderable3DEntity*                         m_pRenderable3DEntity;      /**< The renderable 3D entity. */
+    QPointer<Qt3DCore::QEntity>                 m_pParentEntity;            /**< The parent 3D entity. */
+    QPointer<Renderable3DEntity>                m_pRenderable3DEntity;      /**< The renderable 3D entity. */
 
-    QList<Renderable3DEntity*>                  m_lSpheres;                 /**< The currently displayed source points as 3D spheres. */
+    QList<QPointer<Renderable3DEntity> >        m_lSpheres;                 /**< The currently displayed source points as 3D spheres. */
 
 signals:
     //=========================================================================================================
