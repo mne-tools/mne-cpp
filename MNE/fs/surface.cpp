@@ -200,8 +200,6 @@ bool Surface::read(const QString &subject_id, qint32 hemi, const QString &surf, 
 
     QString p_sFile = QString("%1/%2/surf/%3.%4").arg(subjects_dir).arg(subject_id).arg(hemi == 0 ? "lh" : "rh").arg(surf);
 
-    qDebug()<<p_sFile;
-
     return read(p_sFile, p_Surface, p_bLoadCurvature);
 }
 
