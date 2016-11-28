@@ -4,7 +4,7 @@ uniform mat4 mvp;
 uniform mat4 projectionMatrix;
 
 layout(triangles) in;
-layout(triangle_strip, max_vertices = 4) out;
+layout(triangle_strip, max_vertices = 3) out;
 
 in vec4 tePosition[];
 in vec3 teColor[];
