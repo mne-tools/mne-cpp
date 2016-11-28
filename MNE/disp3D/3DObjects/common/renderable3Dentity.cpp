@@ -39,7 +39,7 @@
 //=============================================================================================================
 
 #include "renderable3Dentity.h"
-#include "../materials/shadermaterial.h"
+#include "../../materials/shadermaterial.h"
 
 
 //*************************************************************************************************************
@@ -90,9 +90,9 @@ Renderable3DEntity::Renderable3DEntity(Qt3DCore::QEntity* parent)
 : Qt3DCore::QEntity(parent)
 , m_pCustomMesh(new CustomMesh())
 , m_pTransform(new Qt3DCore::QTransform())
-, m_pMaterial(new ShaderMaterial(this))
-//, m_pMaterial(QSharedPointer<Qt3DRender::QMaterial>(new Qt3DExtras::QPerVertexColorMaterial))
-//, m_pMaterial(QSharedPointer<Qt3DRender::QMaterial>(new Qt3DRender::QPhongMaterial(this)))
+, m_pMaterial(new ShaderMaterial())
+//, m_pMaterial(new Qt3DExtras::QPerVertexColorMaterial)
+//, m_pMaterial(new Qt3DExtras::QPhongMaterial(this))
 , m_fAlpha(1.0f)
 , m_fRotX(0.0f)
 , m_fRotY(0.0f)
@@ -110,9 +110,9 @@ Renderable3DEntity::Renderable3DEntity(const MatrixX3f& tMatVert, const MatrixX3
 : Qt3DCore::QEntity(parent)
 , m_pCustomMesh(new CustomMesh(tMatVert, tMatNorm, tMatTris))
 , m_pTransform(new Qt3DCore::QTransform())
-, m_pMaterial(new ShaderMaterial(this))
-//, m_pMaterial(QSharedPointer<Qt3DRender::QMaterial>(new Qt3DExtras::QPerVertexColorMaterial))
-//, m_pMaterial(QSharedPointer<Qt3DRender::QMaterial>(new Qt3DExtras::QPhongMaterial(this)))
+, m_pMaterial(new ShaderMaterial())
+//, m_pMaterial(new Qt3DExtras::QPerVertexColorMaterial)
+//, m_pMaterial(new Qt3DExtras::QPhongMaterial(this))
 , m_fAlpha(1.0f)
 , m_fRotX(0.0f)
 , m_fRotY(0.0f)
@@ -128,20 +128,6 @@ Renderable3DEntity::Renderable3DEntity(const MatrixX3f& tMatVert, const MatrixX3
 
 Renderable3DEntity::~Renderable3DEntity()
 {
-    QVector<QComponent*> list = this->components();
-
-    for(int i = 0; i < list.size() ; ++i) {
-        this->removeComponent(list[i]);
-        delete list[i];
-    }
-
-//    this->removeComponent(m_pCustomMesh);
-//    this->removeComponent(m_pTransform);
-//    this->removeComponent(m_pMaterial);
-
-//    delete m_pCustomMesh;
-//    delete m_pTransform;
-//    delete m_pMaterial;
 }
 
 
@@ -190,7 +176,6 @@ bool Renderable3DEntity::setMaterial(QSharedPointer<Qt3DRender::QMaterial> pMate
 bool Renderable3DEntity::setAlpha(float fAlpha)
 {
     m_fAlpha = fAlpha;
-    qDebug()<<"set alpha";
 
     for(int i = 0; i < m_pMaterial->effect()->parameters().size(); i++) {
         if(m_pMaterial->effect()->parameters().at(i)->name() == "alpha") {

@@ -47,7 +47,7 @@
 //=============================================================================================================
 
 #include "digitizertreeitem.h"
-#include "../../helpers/renderable3Dentity.h"
+#include "../common/renderable3Dentity.h"
 
 #include <fiff/fiff_constants.h>
 #include <fiff/fiff_dig_point.h>
@@ -103,7 +103,10 @@ DigitizerSetTreeItem::DigitizerSetTreeItem(int iType, const QString& text)
 
 DigitizerSetTreeItem::~DigitizerSetTreeItem()
 {
-
+    //Delete entity so that the SceneGraph is NOT plotting it anymore.
+    //QPointer only deletes if the parent is destroyed. What happens if this item is destroyed before the parent is destroyed?
+    //Cannot delete m_pParentEntity since we do not know who else holds it.
+    delete m_pRenderable3DEntity;
 }
 
 
@@ -120,12 +123,6 @@ QVariant DigitizerSetTreeItem::data(int role) const
 void  DigitizerSetTreeItem::setData(const QVariant& value, int role)
 {
     AbstractTreeItem::setData(value, role);
-
-    switch(role) {
-    case Data3DTreeModelItemRoles::SurfaceCurrentColorVert:
-        m_pRenderable3DEntity->setVertColor(value.value<QByteArray>());
-        break;
-    }
 }
 
 
@@ -133,6 +130,7 @@ void  DigitizerSetTreeItem::setData(const QVariant& value, int role)
 
 bool DigitizerSetTreeItem::addData(const FIFFLIB::FiffDigPointSet& tDigitizer, Qt3DCore::QEntity* parent)
 {
+    //Add data
     bool state = false;
 
     //parsing the digitizer List
@@ -160,8 +158,14 @@ bool DigitizerSetTreeItem::addData(const FIFFLIB::FiffDigPointSet& tDigitizer, Q
         }
     }
 
-    // Find the Digitizer Items
-    QList<QStandardItem*> itemList = this->findChildren(Data3DTreeModelItemTypes::DigitizerItem);
+    //Create items all new - A bit more inefficient but we do not run into the problem that the QEntity
+    //is delted with deleteLater() which could let to deletion after the new Qentity has been created
+    //Delete all childs first. We do this because we always want to start fresh with the newly added digitizer data.
+    if(this->hasChildren()) {
+        this->removeRows(0, this->rowCount());
+    }
+
+    QList<QStandardItem*> itemList;
 
     if (!tCardinal.empty()){
         //Create a cardinal digitizer item
@@ -199,17 +203,80 @@ bool DigitizerSetTreeItem::addData(const FIFFLIB::FiffDigPointSet& tDigitizer, Q
         this->appendRow(itemList);
         itemList.clear();
     }
+
+//    //Find exiting Digitizer Items and add data respectivley
+//    QList<QStandardItem*> itemList = this->findChildren(Data3DTreeModelItemTypes::DigitizerItem);
+//    bool bFoundCardinalItem = false;
+//    bool bFoundHPIItem = false;
+//    bool bFoundEEGItem = false;
+//    bool bFoundExtraItem = false;
+
+//    for(int i = 0; i < itemList.size(); ++i) {
+//        DigitizerTreeItem* item = dynamic_cast<DigitizerTreeItem*>(itemList.at(i));
+
+//        if(item->text() == "Cardinal" && !tCardinal.empty()) {
+//            item->addData(tCardinal, parent);
+//            bFoundCardinalItem = true;
+//        }
+
+//        if(item->text() == "HPI" && !tHpi.empty()) {
+//            item->addData(tHpi, parent);
+//            bFoundHPIItem = true;
+//        }
+
+//        if(item->text() == "EEG/ECG" && !tEeg.empty()) {
+//            item->addData(tEeg, parent);
+//            bFoundEEGItem = true;
+//        }
+
+//        if(item->text() == "Extra" && !tExtra.empty()) {
+//            item->addData(tExtra, parent);
+//            bFoundExtraItem = true;
+//        }
+//    }
+
+//    //If not existent yet create here
+//    if (!bFoundCardinalItem && !tCardinal.empty()){
+//        //Create a cardinal digitizer item
+//        QList<QStandardItem*> itemListCardinal;
+//        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(Data3DTreeModelItemTypes::DigitizerItem,"Cardinal");
+//        state = digitizerItem->addData(tCardinal, parent);
+//        itemListCardinal << digitizerItem;
+//        itemListCardinal << new QStandardItem(digitizerItem->toolTip());
+//        this->appendRow(itemListCardinal);
+//    }
+
+//    if (!bFoundHPIItem && !tHpi.empty()){
+//        //Create a hpi digitizer item
+//        QList<QStandardItem*> itemListHPI;
+//        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(Data3DTreeModelItemTypes::DigitizerItem,"HPI");
+//        state = digitizerItem->addData(tHpi, parent);
+//        itemListHPI << digitizerItem;
+//        itemListHPI << new QStandardItem(digitizerItem->toolTip());
+//        this->appendRow(itemListHPI);
+//    }
+
+//    if (!bFoundEEGItem && !tEeg.empty()){
+//        //Create a eeg ecg digitizer item
+//        QList<QStandardItem*> itemListEEG;
+//        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(Data3DTreeModelItemTypes::DigitizerItem,"EEG/ECG");
+//        state = digitizerItem->addData(tEeg, parent);
+//        itemListEEG << digitizerItem;
+//        itemListEEG << new QStandardItem(digitizerItem->toolTip());
+//        this->appendRow(itemListEEG);
+//    }
+
+//    if (!bFoundExtraItem && !tExtra.empty()){
+//        //Create a extra digitizer item
+//        QList<QStandardItem*> itemListExtra;
+//        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(Data3DTreeModelItemTypes::DigitizerItem,"Extra");
+//        state = digitizerItem->addData(tExtra, parent);
+//        itemListExtra << digitizerItem;
+//        itemListExtra << new QStandardItem(digitizerItem->toolTip());
+//        this->appendRow(itemListExtra);
+//    }
+
     return state;
-}
-
-
-//*************************************************************************************************************
-
-void DigitizerSetTreeItem::setVisible(bool state)
-{
-    for(int i = 0; i < m_lChildren.size(); ++i) {
-        m_lChildren.at(i)->setParent(state ? m_pRenderable3DEntity : Q_NULLPTR);
-    }
 }
 
 

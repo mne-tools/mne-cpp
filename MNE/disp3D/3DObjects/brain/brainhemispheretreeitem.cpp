@@ -105,9 +105,6 @@ BrainHemisphereTreeItem::BrainHemisphereTreeItem(int iType, const QString& text)
 
 BrainHemisphereTreeItem::~BrainHemisphereTreeItem()
 {
-//    delete m_pSurfaceItem;
-//    delete m_pAnnotItem;
-//    delete m_pBrainRTSourceLocDataTreeItem;
 }
 
 
