@@ -84,7 +84,7 @@ int main(int argc, char *argv[])
 
     // Command Line Parser
     QCommandLineParser parser;
-    parser.setApplicationDescription("Start readBEM Example");
+    parser.setApplicationDescription("Read BEM Example");
     parser.addHelpOption();
     QCommandLineOption bemFileInOption("bem", "Path to BEM <file>.", "file", "./MNE-sample-data/subjects/sample/bem/sample-head.fif");
     QCommandLineOption bemFileOutOption("bemOut", "Path to BEM <file>, which is to be written.", "file", "./sample-head-test.fif");

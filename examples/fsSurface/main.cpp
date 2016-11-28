@@ -84,7 +84,7 @@ int main(int argc, char *argv[])
 
     // Command Line Parser
     QCommandLineParser parser;
-    parser.setApplicationDescription("Start fsSurface example");
+    parser.setApplicationDescription("Fs Surface Example");
     parser.addHelpOption();
 
     QCommandLineOption hemiOption("hemi", "Selected hemisphere <hemi>.", "hemi", "2");

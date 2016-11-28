@@ -84,7 +84,7 @@ int main(int argc, char *argv[])
 
     // Command Line Parser
     QCommandLineParser parser;
-    parser.setApplicationDescription("Start readFwd example");
+    parser.setApplicationDescription("Read Forward and Visualize in 3D Example");
     parser.addHelpOption();
 
     QCommandLineOption fwdFileOption("fwd", "Path to the forward solution <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
