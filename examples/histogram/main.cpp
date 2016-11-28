@@ -2,6 +2,7 @@
 /**
 * @file     histogram.cpp
 * @author   Ricky Tjen <ricky270@student.sgu.ac.id>;
+*           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
 * @date     March, 2016
@@ -128,52 +129,36 @@ int main(int argc, char *argv[])
 
     // Command Line Parser
     QCommandLineParser parser;
-    parser.setApplicationDescription("Clustered Inverse Example");
+    parser.setApplicationDescription("Histogram Example");
     parser.addHelpOption();
-    QCommandLineOption sampleFwdFileOption("f", "Path to forward solution <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
-    QCommandLineOption sampleCovFileOption("c", "Path to covariance <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
-    QCommandLineOption sampleEvokedFileOption("e", "Path to evoked <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    QCommandLineOption sampleFwdFileOption("fwd", "Path to forward solution <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
+    QCommandLineOption sampleCovFileOption("cov", "Path to covariance <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
+    QCommandLineOption sampleEvokedFileOption("ave", "Path to evoked <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    QCommandLineOption methodOption("method", "Inverse estimation <method>, i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM");//"MNE" | "dSPM" | "sLORETA"
+    QCommandLineOption snrOption("snr", "The SNR value used for computation <snr>.", "snr", "1.0");//3.0f;//0.1f;//3.0f;
+    QCommandLineOption stcFileOption("stcOut", "Path to stc <file>, which is to be written.", "file", "");
+    QCommandLineOption invFileOption("invOut", "Path to inverse <file>, which is to be written.", "file", "");
+
     parser.addOption(sampleFwdFileOption);
     parser.addOption(sampleCovFileOption);
     parser.addOption(sampleEvokedFileOption);
+    parser.addOption(methodOption);
+    parser.addOption(snrOption);
+    parser.addOption(stcFileOption);
+    parser.addOption(invFileOption);
+
     parser.process(a);
 
-    //########################################################################################
     // Source Estimate
     QFile t_fileFwd(parser.value(sampleFwdFileOption));
     QFile t_fileCov(parser.value(sampleCovFileOption));
     QFile t_fileEvoked(parser.value(sampleEvokedFileOption));
 
-    double snr = 1.0f;//3.0f;//0.1f;//3.0f;
-    QString method("MNE"); //"MNE" | "dSPM" | "sLORETA"
+    double snr = parser.value(snrOption).toDouble();
+    QString method(parser.value(methodOption));
 
-    QString t_sFileNameClusteredInv("");
-    QString t_sFileNameStc("");
-
-    // Parse command line parameters
-    for(qint32 i = 0; i < argc; ++i)
-    {
-        if(strcmp(argv[i], "-snr") == 0 || strcmp(argv[i], "--snr") == 0)
-        {
-            if(i + 1 < argc)
-                snr = atof(argv[i+1]);
-        }
-        else if(strcmp(argv[i], "-method") == 0 || strcmp(argv[i], "--method") == 0)
-        {
-            if(i + 1 < argc)
-                method = QString::fromUtf8(argv[i+1]);
-        }
-        else if(strcmp(argv[i], "-inv") == 0 || strcmp(argv[i], "--inv") == 0)
-        {
-            if(i + 1 < argc)
-                t_sFileNameClusteredInv = QString::fromUtf8(argv[i+1]);
-        }
-        else if(strcmp(argv[i], "-stc") == 0 || strcmp(argv[i], "--stc") == 0)
-        {
-            if(i + 1 < argc)
-                t_sFileNameStc = QString::fromUtf8(argv[i+1]);
-        }
-    }
+    QString t_sFileNameClusteredInv(parser.value(invFileOption));
+    QString t_sFileNameStc(parser.value(stcFileOption));
 
     double lambda2 = 1.0 / pow(snr, 2);
     qDebug() << "Start calculation with: SNR" << snr << "; Lambda" << lambda2 << "; Method" << method << "; stc:" << t_sFileNameStc;
