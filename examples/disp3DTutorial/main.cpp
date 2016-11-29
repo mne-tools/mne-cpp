@@ -110,12 +110,12 @@ int main(int argc, char *argv[])
     QCommandLineParser parser;
     parser.setApplicationDescription("Disp3D Example");
     parser.addHelpOption();
-    QCommandLineOption surfOption("surfType", "Surface type <type>.", "type", "orig");
+    QCommandLineOption surfOption("surfType", "Surface type <type>.", "type", "inflated");
     QCommandLineOption annotOption("annotType", "Annotation type <type>.", "type", "aparc.a2009s");
     QCommandLineOption hemiOption("hemi", "Selected hemisphere <hemi>.", "hemi", "2");
     QCommandLineOption subjectOption("subject", "Selected subject <subject>.", "subject", "sample");
     QCommandLineOption subjectPathOption("subjectPath", "Selected subject path <subjectPath>.", "subjectPath", "./MNE-sample-data/subjects");
-    QCommandLineOption sourceLocOption("doSourceLoc", "Do real time source localization <doSourceLoc>.", "doSourceLoc", "true");
+    QCommandLineOption sourceLocOption("doSourceLoc", "Do real time source localization <doSourceLoc>.", "doSourceLoc", "false");
     QCommandLineOption fwdOption("fwd", "Path to forwad solution <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
     QCommandLineOption invOpOption("inv", "Path to inverse operator <file>.", "file", "");
     QCommandLineOption clustOption("doClust", "Path to clustered inverse operator <doClust>.", "doClust", "true");
@@ -248,20 +248,20 @@ int main(int argc, char *argv[])
     //Add fressurfer surface set including both hemispheres
     testWindow->addSurfaceSet(parser.value(subjectOption), evoked.comment, tSurfSet, tAnnotSet);
 
-    //Read and show BEM
-    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif");
-    MNEBem t_Bem(t_fileBem);
-    testWindow->addBemData(parser.value(subjectOption), "BEM", t_Bem);
+//    //Read and show BEM
+//    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif");
+//    MNEBem t_Bem(t_fileBem);
+//    testWindow->addBemData(parser.value(subjectOption), "BEM", t_Bem);
 
-    //Read and show sensor helmets
-    QFile t_filesensorSurfaceVV("./resources/sensorSurfaces/306m_rt.fif");
-    MNEBem t_sensorSurfaceVV(t_filesensorSurfaceVV);
-    testWindow->addBemData("Sensors", "VectorView", t_sensorSurfaceVV);
+//    //Read and show sensor helmets
+//    QFile t_filesensorSurfaceVV("./resources/sensorSurfaces/306m_rt.fif");
+//    MNEBem t_sensorSurfaceVV(t_filesensorSurfaceVV);
+//    testWindow->addBemData("Sensors", "VectorView", t_sensorSurfaceVV);
 
-    // Read & show digitizer points
-    QFile t_fileDig("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
-    FiffDigPointSet t_Dig(t_fileDig);
-    testWindow->addDigitizerData(parser.value(subjectOption), evoked.comment, t_Dig);
+//    // Read & show digitizer points
+//    QFile t_fileDig("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+//    FiffDigPointSet t_Dig(t_fileDig);
+//    testWindow->addDigitizerData(parser.value(subjectOption), evoked.comment, t_Dig);
 
     if(bAddRtSourceLoc) {
         //Add rt source loc data

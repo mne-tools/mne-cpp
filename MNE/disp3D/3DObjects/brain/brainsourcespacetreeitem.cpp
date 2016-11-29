@@ -143,10 +143,6 @@ bool BrainSourceSpaceTreeItem::addData(const MNEHemisphere& tHemisphere, Qt3DCor
     m_pParentEntity = parent;
     m_pRenderable3DEntity = new Renderable3DEntity(m_pParentEntity);
 
-    //Initial transformation also regarding the surface offset
-    m_pRenderable3DEntity->setRotX(90);
-    m_pRenderable3DEntity->setRotY(180);
-
     //Create sources as small 3D spheres
     RowVector3f sourcePos;
     QVector3D pos;
