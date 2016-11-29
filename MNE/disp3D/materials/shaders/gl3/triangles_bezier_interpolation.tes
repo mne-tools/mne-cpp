@@ -1,8 +1,10 @@
 #version 400 core
 
-layout( triangles, equal_spacing, ccw ) in;
+layout( triangles, fractional_odd_spacing, ccw ) in;
 
-uniform mat4 mvp;
+//fractional_odd_spacing, fractional_even_spacing, equal_spacing
+
+uniform mat4 modelViewNormal;
 
 in vec4 tcPosition[];
 in vec3 tcColor[];
@@ -59,9 +61,9 @@ void main()
 	float v23 = 2. * dot( p3-p2, n2+n3 ) / dot( p3-p2, p3-p2 );
 	float v31 = 2. * dot( p1-p3, n3+n1 ) / dot( p1-p3, p1-p3 );
 	
-	vec3 n200 = n1;
-	vec3 n020 = n2;
-	vec3 n002 = n3;
+	vec3 n200 = normalize( n1 );
+	vec3 n020 = normalize( n2 );
+	vec3 n002 = normalize( n3 );
 	
 	vec3 n110 = normalize( n1 + n2 - v12 * (p2-p1) );
 	vec3 n011 = normalize( n2 + n3 - v23 * (p3-p2) );
