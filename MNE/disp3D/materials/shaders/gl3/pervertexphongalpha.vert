@@ -16,7 +16,7 @@ out vec3 vNormal;
 void main()
 {
     vPosition = viewMatrix * modelMatrix * vec4(vertexPosition, 1.);
-	vNormal = vertexNormal;
+	vNormal = normalize( vertexNormal );
 	
 	vColor = vertexColor;
 }

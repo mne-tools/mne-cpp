@@ -6,7 +6,7 @@ uniform mat4 projectionMatrix;
 uniform mat4 modelViewProjection;
 
 layout(triangles) in;
-layout(triangle_strip, max_vertices = 3) out;
+layout(triangle_strip, max_vertices = 32) out;
 
 in vec4 tePosition[];
 in vec3 teColor[];
@@ -20,7 +20,7 @@ vec3 CG;
 
 void ProduceVertex(int v) 
 {
-	gl_Position = projectionMatrix * vec4( CG + 1.0 * ( tePosition[v].xyz - CG ), 1. );
+	gl_Position = projectionMatrix * vec4( CG + 0.95 * ( tePosition[v].xyz - CG ), 1. );
 	//gl_Position = projectionMatrix * tePosition[v];
 	gNormal = teNormal[v];
 	gColor = teColor[v];
@@ -35,5 +35,5 @@ void main()
 	ProduceVertex(0);  
 	ProduceVertex(1);
 	ProduceVertex(2);  
-	EndPrimitive();
+	//EndPrimitive();
 }

@@ -1,6 +1,6 @@
 #version 400 core
 
-layout( triangles, fractional_odd_spacing, ccw ) in;
+layout( triangles, equal_spacing, ccw ) in;
 
 //fractional_odd_spacing, fractional_even_spacing, equal_spacing
 
@@ -28,7 +28,7 @@ void main()
     float v = gl_TessCoord.y;
     float w = gl_TessCoord.z;
 	
-	teColor = tcColor[0] * u + tcColor[1] * v + tcColor[2] * w;
+	teColor = tcColor[0] * w + tcColor[1] * u + tcColor[2] * v;
 
 	vec3 b300 = p1;
     vec3 b030 = p2;
