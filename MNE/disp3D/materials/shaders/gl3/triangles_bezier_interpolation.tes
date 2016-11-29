@@ -17,8 +17,6 @@ void main()
 	vec3 p1 = tcPosition[0].xyz;
     vec3 p2 = tcPosition[1].xyz;
     vec3 p3 = tcPosition[2].xyz;
-		
-	teColor = tcColor[0];
 	
 	vec3 n1 = tcNormal[0];
     vec3 n2 = tcNormal[1];
@@ -27,6 +25,8 @@ void main()
 	float u = gl_TessCoord.x;
     float v = gl_TessCoord.y;
     float w = gl_TessCoord.z;
+	
+	teColor = tcColor[0] * u + tcColor[1] * v + tcColor[2] * w;
 
 	vec3 b300 = p1;
     vec3 b030 = p2;

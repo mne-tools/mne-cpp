@@ -96,8 +96,8 @@ View3D::View3D()
 , m_bModelRotationMode(false)
 , m_vecCameraTrans(QVector3D(0.0,0.0,-0.5))
 , m_vecCameraTransOld(QVector3D(0.0,0.0,-0.5))
-, m_vecCameraRotation(QVector3D(0.0,0.0,0.0))
-, m_vecCameraRotationOld(QVector3D(0.0,0.0,0.0))
+, m_vecCameraRotation(QVector3D(-90.0,130.0,0.0))
+, m_vecCameraRotationOld(QVector3D(-90.0,130.0,0.0))
 , m_pCameraTransform(new Qt3DCore::QTransform())
 {
     initMetatypes();
@@ -148,7 +148,6 @@ void View3D::init()
 
     // Camera
     m_pCameraEntity->lens()->setPerspectiveProjection(45.0f, 16.0f/9.0f, 0.0001f, 100000.0f);
-    m_pCameraEntity->setPosition(m_vecCameraTrans);
     m_pCameraEntity->setUpVector(QVector3D(0, 1, 0));
     m_pCameraEntity->setViewCenter(QVector3D(0, 0, 0));
 
@@ -182,8 +181,8 @@ void View3D::initLight()
     QColor lightColor(255,255,255);
     float lightIntensity = 0.8f;
 
-    lLightPositions << QVector3D(0.5,0.25,0)/* << QVector3D(0,0,-0.5) << QVector3D(0.5,0,0) << QVector3D(-0.5,0,0) << QVector3D(0,0.5,0) << QVector3D(0,-0.5,0)*/;
-    lLightDirections << QVector3D(-0.5,-0.25,0)/* << QVector3D(0,0,1) << QVector3D(-1,0,0) << QVector3D(1,0,0) << QVector3D(0,-1,0) << QVector3D(0,1,0)*/;
+    lLightPositions << QVector3D(-0.5,0,0)/* << QVector3D(0,0,-0.5) << QVector3D(0.5,0,0) << QVector3D(-0.5,0,0) << QVector3D(0,0.5,0) << QVector3D(0,-0.5,0)*/;
+    lLightDirections << QVector3D(1,0,0)/* << QVector3D(0,0,1) << QVector3D(-1,0,0) << QVector3D(1,0,0) << QVector3D(0,-1,0) << QVector3D(0,1,0)*/;
     lLightIntensities << lightIntensity/* << lightIntensity << lightIntensity << lightIntensity << lightIntensity << lightIntensity*/;
     lLightColor << lightColor/* << lightColor << lightColor << lightColor << lightColor << lightColor*/;
 
@@ -226,6 +225,10 @@ void View3D::initTransformations()
 {
     // Initialize camera transforms
     m_pCameraTransform->setTranslation(m_vecCameraTrans);
+    m_pCameraTransform->setRotationX(m_vecCameraRotation.x());
+    m_pCameraTransform->setRotationY(m_vecCameraRotation.y());
+    m_pCameraTransform->setRotationZ(m_vecCameraRotation.z());
+
     m_pCameraEntity->addComponent(m_pCameraTransform);
 }
 
@@ -490,7 +493,7 @@ void View3D::mouseReleaseEvent(QMouseEvent* e)
 void View3D::mouseMoveEvent(QMouseEvent* e)
 {
     if(m_bCameraRotationMode) {
-        m_vecCameraRotation.setX(((e->pos().y() - m_mousePressPositon.y()) * 0.1f) + m_vecCameraRotationOld.x());
+        m_vecCameraRotation.setX(((e->pos().y() - m_mousePressPositon.y()) * -0.1f) + m_vecCameraRotationOld.x());
         m_vecCameraRotation.setY(((e->pos().x() - m_mousePressPositon.x()) * 0.1f) + m_vecCameraRotationOld.y());
 
         //Rotate all surface objects
@@ -503,7 +506,7 @@ void View3D::mouseMoveEvent(QMouseEvent* e)
             for(int i = 0; i < m_p3DObjectsEntity->children().size(); ++i) {
                 if(Renderable3DEntity* pItem = dynamic_cast<Renderable3DEntity*>(m_p3DObjectsEntity->children().at(i))) {
                     pItem->setRotZ(m_vecCameraRotation.y());
-                    pItem->setRotX(90+m_vecCameraRotation.x());
+                    pItem->setRotX(m_vecCameraRotation.x());
                 }
             }
         }

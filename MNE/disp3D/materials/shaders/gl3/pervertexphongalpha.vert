@@ -1,7 +1,9 @@
 #version 400 core
 
-uniform mat4 mvp;
-uniform mat4 modelViewMatrix;
+uniform mat4 modelMatrix;
+uniform mat4 viewMatrix;
+uniform mat4 modelViewNormal;
+uniform mat4 modelNormalMatrix;
 
 in vec3 vertexPosition;
 in vec3 vertexColor;
@@ -13,8 +15,8 @@ out vec3 vNormal;
 
 void main()
 {
-    vPosition = vec4(vertexPosition, 1);
-	vNormal = normalize(vertexNormal);
+    vPosition = viewMatrix * modelMatrix * vec4(vertexPosition, 1.);
+	vNormal = normalize( ( vec4( vertexNormal, 0. ) ).xyz );
 	
 	vColor = vertexColor;
 }
