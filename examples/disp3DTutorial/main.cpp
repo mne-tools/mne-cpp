@@ -110,12 +110,12 @@ int main(int argc, char *argv[])
     QCommandLineParser parser;
     parser.setApplicationDescription("Disp3D Example");
     parser.addHelpOption();
-    QCommandLineOption surfOption("surfType", "Surface type <type>.", "type", "inflated");
+    QCommandLineOption surfOption("surfType", "Surface type <type>.", "type", "orig");
     QCommandLineOption annotOption("annotType", "Annotation type <type>.", "type", "aparc.a2009s");
     QCommandLineOption hemiOption("hemi", "Selected hemisphere <hemi>.", "hemi", "2");
     QCommandLineOption subjectOption("subject", "Selected subject <subject>.", "subject", "sample");
     QCommandLineOption subjectPathOption("subjectPath", "Selected subject path <subjectPath>.", "subjectPath", "./MNE-sample-data/subjects");
-    QCommandLineOption sourceLocOption("doSourceLoc", "Do real time source localization <doSourceLoc>.", "doSourceLoc", "false");
+    QCommandLineOption sourceLocOption("doSourceLoc", "Do real time source localization <doSourceLoc>.", "doSourceLoc", "true");
     QCommandLineOption fwdOption("fwd", "Path to forwad solution <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
     QCommandLineOption invOpOption("inv", "Path to inverse operator <file>.", "file", "");
     QCommandLineOption clustOption("doClust", "Path to clustered inverse operator <doClust>.", "doClust", "true");

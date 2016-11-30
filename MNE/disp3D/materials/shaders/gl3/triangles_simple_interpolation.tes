@@ -1,6 +1,6 @@
 #version 400 core
 
-layout( triangles, fractional_odd_spacing, ccw ) in;
+layout( triangles, equal_spacing, ccw ) in;
 
 //fractional_odd_spacing, fractional_even_spacing, equal_spacing
 
