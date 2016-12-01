@@ -243,9 +243,21 @@ public:
     */
     bool addDigitizerData(const QString& subject, const QString& set, const FIFFLIB::FiffDigPointSet &tDigitizer);
 
+    //=========================================================================================================
+    /**
+    * Returns the 3D model root eneity.
+    *
+    * @return   The model's root entity to acess the scenegraph.
+    */
     QPointer<Qt3DCore::QEntity> getRootEntity();
 
 protected:
+    //=========================================================================================================
+    /**
+    * Init the meta types
+    */
+    void initMetatypes();
+
     QStandardItem*                   m_pRootItem;            /**< The root item of the tree model. */
     QPointer<Qt3DCore::QEntity>      m_pModelEntity;         /**< The parent 3D entity for this model. */
 };

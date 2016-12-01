@@ -39,9 +39,9 @@
 //=============================================================================================================
 
 #include "view3D.h"
-#include "3DObjects/common/renderable3Dentity.h"
-#include "3DObjects/common/types.h"
-#include "3DObjects/data3Dtreemodel.h"
+#include "model/common/renderable3Dentity.h"
+#include "model/common/types.h"
+#include "model/data3Dtreemodel.h"
 
 #include <mne/mne_sourceestimate.h>
 #include <fiff/fiff_dig_point_set.h>
@@ -100,7 +100,6 @@ View3D::View3D()
 , m_vecCameraRotationOld(QVector3D(-90.0,130.0,0.0))
 , m_pCameraTransform(new Qt3DCore::QTransform())
 {
-    initMetatypes();
     init();
 }
 
@@ -109,33 +108,6 @@ View3D::View3D()
 
 View3D::~View3D()
 {
-}
-
-
-//*************************************************************************************************************
-
-void View3D::initMetatypes()
-{
-    qRegisterMetaType<QByteArray>();
-    qRegisterMetaType<QPair<QByteArray, QByteArray> >();
-
-    qRegisterMetaType<Eigen::MatrixX3i>();
-    qRegisterMetaType<Eigen::MatrixXd>();
-    qRegisterMetaType<Eigen::MatrixX3f>();
-    qRegisterMetaType<Eigen::VectorXf>();
-    qRegisterMetaType<Eigen::VectorXi>();
-    qRegisterMetaType<Eigen::VectorXd>();
-    qRegisterMetaType<Eigen::RowVectorXf>();
-    qRegisterMetaType<Eigen::Vector3f>();
-
-    qRegisterMetaType<MatrixX3i>();
-    qRegisterMetaType<MatrixXd>();
-    qRegisterMetaType<MatrixX3f>();
-    qRegisterMetaType<VectorXf>();
-    qRegisterMetaType<VectorXi>();
-    qRegisterMetaType<VectorXd>();
-    qRegisterMetaType<RowVectorXf>();
-    qRegisterMetaType<Vector3f>();
 }
 
 

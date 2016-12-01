@@ -42,7 +42,7 @@
 //=============================================================================================================
 
 #include "../../disp3D_global.h"
-#include "../../3DObjects/common/abstracttreeitem.h"
+#include "../common/abstracttreeitem.h"
 
 #include <fiff/fiff_types.h>
 

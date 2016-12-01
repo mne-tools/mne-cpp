@@ -39,7 +39,7 @@
 //=============================================================================================================
 
 #include "brainrtconnectivitydatatreeitem.h"
-#include "../../rt/rtSourceLoc/rtsourcelocdataworker.h"
+#include "../workers/rtSourceLoc/rtsourcelocdataworker.h"
 #include "../common/metatreeitem.h"
 #include "../common/renderable3Dentity.h"
 

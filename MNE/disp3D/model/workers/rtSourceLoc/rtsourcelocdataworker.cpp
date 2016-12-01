@@ -39,7 +39,7 @@
 //=============================================================================================================
 
 #include "rtsourcelocdataworker.h"
-#include "../../3DObjects/common/types.h"
+#include "../../common/types.h"
 
 #include <disp/helpers/colormap.h>
 #include <fs/label.h>

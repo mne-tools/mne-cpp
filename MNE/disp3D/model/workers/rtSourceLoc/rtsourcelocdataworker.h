@@ -41,8 +41,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../../disp3D_global.h"
-#include "../../3DObjects/common/types.h"
+#include "../../../disp3D_global.h"
+#include "../../common/types.h"
 
 
 //*************************************************************************************************************
@@ -268,9 +268,9 @@ private:
 signals:
     //=========================================================================================================
     /**
-    * Emit this signal whenever this item should send a new sample to its listening threads.
+    * Emit this signal whenever this item should send new colors to its listeners.
     *
-    * @param[in] colorPair     The samples data in form of a QPair rgb colors as QByteArray.
+    * @param[in] colorPair     The samples data in form of a QPair rgb colors as QByteArray for each (left, right) hemisphere.
     */
     void newRtData(const QPair<QByteArray, QByteArray>& colorPair);
 };
