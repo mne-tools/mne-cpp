@@ -70,8 +70,10 @@ void main()
 	vec3 n011 = normalize( n2 + n3 - v23 * (p3-p2) );
 	vec3 n101 = normalize( n3 + n1 - v31 * (p1-p3) );
 
-	teNormal = n200 * w * w + n020 * u * u + n002 * v * v +
-			   n110 * w * u + n011 * u * v + n101 * w * v;
+	teNormal = normalize( n200 * w * w + n020 * u * u + n002 * v * v +
+			   n110 * w * u + n011 * u * v + n101 * w * v );
 	
+	//teNormal = tcNormal[0] * u + tcNormal[1] * v + tcNormal[2] * w;
+
 	tePosition = vec4(xyz, 1.);	
 }
