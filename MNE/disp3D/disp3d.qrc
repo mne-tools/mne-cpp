@@ -1,14 +1,14 @@
 <RCC>
     <qresource prefix="/">
-        <file>materials/shaders/gl3/pervertexphongalpha.frag</file>
-        <file>materials/shaders/gl3/pervertexphongalpha.vert</file>
-        <file>materials/shaders/gl3/light.inc.frag</file>
-        <file>materials/shaders/gl3/pervertexphongalpha.geom</file>
-        <file>materials/shaders/gl3/triangles.tcs</file>
-        <file>materials/shaders/gl3/pervertexphongalpha_old.frag</file>
-        <file>materials/shaders/gl3/pervertexphongalpha_old.geom</file>
-        <file>materials/shaders/gl3/pervertexphongalpha_old.vert</file>
-        <file>materials/shaders/gl3/triangles_bezier_interpolation.tes</file>
-        <file>materials/shaders/gl3/triangles_simple_interpolation.tes</file>
+        <file>model/materials/shaders/gl3/light.inc.frag</file>
+        <file>model/materials/shaders/gl3/pervertexphongalpha.frag</file>
+        <file>model/materials/shaders/gl3/pervertexphongalpha.geom</file>
+        <file>model/materials/shaders/gl3/pervertexphongalpha.vert</file>
+        <file>model/materials/shaders/gl3/pervertexphongalpha_old.frag</file>
+        <file>model/materials/shaders/gl3/pervertexphongalpha_old.geom</file>
+        <file>model/materials/shaders/gl3/pervertexphongalpha_old.vert</file>
+        <file>model/materials/shaders/gl3/triangles.tcs</file>
+        <file>model/materials/shaders/gl3/triangles_bezier_interpolation.tes</file>
+        <file>model/materials/shaders/gl3/triangles_simple_interpolation.tes</file>
     </qresource>
 </RCC>

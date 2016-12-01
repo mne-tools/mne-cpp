@@ -117,7 +117,7 @@ SOURCES += \
     model/digitizer/digitizersettreeitem.cpp \
     control/control3dwidget.cpp \
     model/workers/rtSourceLoc/rtsourcelocdataworker.cpp \
-    materials/shadermaterial.cpp \
+    model/materials/shadermaterial.cpp \
 
 HEADERS += \
     view3D.h \
@@ -143,7 +143,7 @@ HEADERS += \
     control/control3dwidget.h \
     disp3D_global.h \
     model/workers/rtSourceLoc/rtsourcelocdataworker.h \
-    materials/shadermaterial.h \
+    model/materials/shadermaterial.h \
 
 FORMS += \
     control/control3dwidget.ui \
