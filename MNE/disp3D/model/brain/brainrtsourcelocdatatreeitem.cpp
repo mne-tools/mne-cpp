@@ -39,7 +39,7 @@
 //=============================================================================================================
 
 #include "brainrtsourcelocdatatreeitem.h"
-#include "../../rt/rtSourceLoc/rtsourcelocdataworker.h"
+#include "../workers/rtSourceLoc/rtsourcelocdataworker.h"
 #include "../common/metatreeitem.h"
 
 #include <mne/mne_sourceestimate.h>

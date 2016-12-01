@@ -42,8 +42,8 @@
 
 #include <disp3D/view3D.h>
 #include <disp3D/control/control3dwidget.h>
-#include <disp3D/3DObjects/brain/brainrtsourcelocdatatreeitem.h>
-#include <disp3D/3DObjects/data3Dtreemodel.h>
+#include <disp3D/model/brain/brainrtsourcelocdatatreeitem.h>
+#include <disp3D/model/data3Dtreemodel.h>
 
 #include <fs/label.h>
 #include <fs/surfaceset.h>
@@ -116,7 +116,7 @@ int main(int argc, char *argv[])
     QCommandLineOption hemiOption("hemi", "Selected hemisphere <hemi>.", "hemi", "2");
     QCommandLineOption subjectOption("subject", "Selected subject <subject>.", "subject", "sample");
     QCommandLineOption subjectPathOption("subjectPath", "Selected subject path <subjectPath>.", "subjectPath", "./MNE-sample-data/subjects");
-    QCommandLineOption sourceLocOption("doSourceLoc", "Do real time source localization <doSourceLoc>.", "doSourceLoc", "false");
+    QCommandLineOption sourceLocOption("doSourceLoc", "Do real time source localization <doSourceLoc>.", "doSourceLoc", "true");
     QCommandLineOption fwdOption("fwd", "Path to forwad solution <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
     QCommandLineOption invOpOption("inv", "Path to inverse operator <file>.", "file", "");
     QCommandLineOption clustOption("doClust", "Path to clustered inverse operator <doClust>.", "doClust", "true");

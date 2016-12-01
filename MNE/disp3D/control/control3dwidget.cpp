@@ -41,8 +41,8 @@
 #include "control3dwidget.h"
 #include "disp/helpers/roundededgeswidget.h"
 
-#include "../3DObjects/data3Dtreedelegate.h"
-#include "3DObjects/data3Dtreemodel.h"
+#include "../model/data3Dtreedelegate.h"
+#include "../model/data3Dtreemodel.h"
 #include "../view3D.h"
 
 

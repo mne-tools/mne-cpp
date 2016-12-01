@@ -90,6 +90,8 @@ Data3DTreeModel::Data3DTreeModel(QObject* parent)
 {
     m_pRootItem = this->invisibleRootItem();
     m_pRootItem->setText("Loaded 3D Data");
+
+    initMetatypes();
 }
 
 
@@ -98,6 +100,34 @@ Data3DTreeModel::Data3DTreeModel(QObject* parent)
 Data3DTreeModel::~Data3DTreeModel()
 {
     //delete m_pRootItem;
+}
+
+
+//*************************************************************************************************************
+
+void Data3DTreeModel::initMetatypes()
+{
+    //Init metatypes
+    qRegisterMetaType<QByteArray>();
+    qRegisterMetaType<QPair<QByteArray, QByteArray> >();
+
+    qRegisterMetaType<Eigen::MatrixX3i>();
+    qRegisterMetaType<Eigen::MatrixXd>();
+    qRegisterMetaType<Eigen::MatrixX3f>();
+    qRegisterMetaType<Eigen::VectorXf>();
+    qRegisterMetaType<Eigen::VectorXi>();
+    qRegisterMetaType<Eigen::VectorXd>();
+    qRegisterMetaType<Eigen::RowVectorXf>();
+    qRegisterMetaType<Eigen::Vector3f>();
+
+    qRegisterMetaType<MatrixX3i>();
+    qRegisterMetaType<MatrixXd>();
+    qRegisterMetaType<MatrixX3f>();
+    qRegisterMetaType<VectorXf>();
+    qRegisterMetaType<VectorXi>();
+    qRegisterMetaType<VectorXd>();
+    qRegisterMetaType<RowVectorXf>();
+    qRegisterMetaType<Vector3f>();
 }
 
 
