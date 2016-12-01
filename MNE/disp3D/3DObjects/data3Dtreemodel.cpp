@@ -84,9 +84,9 @@ using namespace CONNECTIVITYLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Data3DTreeModel::Data3DTreeModel(QObject* parent, Qt3DCore::QEntity* parentEntity)
+Data3DTreeModel::Data3DTreeModel(QObject* parent)
 : QStandardItemModel(parent)
-, m_pParentEntity(parentEntity)
+, m_pModelEntity(new Qt3DCore::QEntity())
 {
     m_pRootItem = this->invisibleRootItem();
     m_pRootItem->setText("Loaded 3D Data");
@@ -160,7 +160,7 @@ Qt::ItemFlags Data3DTreeModel::flags(const QModelIndex &index) const
 
 //*************************************************************************************************************
 
-bool Data3DTreeModel::addData(const QString& subject, const QString& set, const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet)
+bool Data3DTreeModel::addSurfaceSet(const QString& subject, const QString& set, const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet)
 {
     //Find the subject
     QList<QStandardItem*> itemSubjectList = this->findItems(subject);
@@ -186,7 +186,7 @@ bool Data3DTreeModel::addData(const QString& subject, const QString& set, const 
 
             if(!itemList.isEmpty() && (itemList.at(0)->type() == Data3DTreeModelItemTypes::SurfaceSetItem)) {
                 BrainSurfaceSetTreeItem* pSurfaceSetItem = dynamic_cast<BrainSurfaceSetTreeItem*>(itemList.at(0));
-                state = pSurfaceSetItem->addData(tSurfaceSet, tAnnotationSet, m_pParentEntity);
+                state = pSurfaceSetItem->addData(tSurfaceSet, tAnnotationSet, m_pModelEntity);
             } else {
                 BrainSurfaceSetTreeItem* pSurfaceSetItem = new BrainSurfaceSetTreeItem(Data3DTreeModelItemTypes::SurfaceSetItem, set);
 
@@ -195,7 +195,7 @@ bool Data3DTreeModel::addData(const QString& subject, const QString& set, const 
                 list << new QStandardItem(pSurfaceSetItem->toolTip());
                 pSubjectItem->appendRow(list);
 
-                state = pSurfaceSetItem->addData(tSurfaceSet, tAnnotationSet, m_pParentEntity);
+                state = pSurfaceSetItem->addData(tSurfaceSet, tAnnotationSet, m_pModelEntity);
             }
         }
     }
@@ -206,7 +206,7 @@ bool Data3DTreeModel::addData(const QString& subject, const QString& set, const 
 
 //*************************************************************************************************************
 
-bool Data3DTreeModel::addData(const QString& subject, const QString& set, const Surface& tSurface, const Annotation &tAnnotation)
+bool Data3DTreeModel::addSurface(const QString& subject, const QString& set, const Surface& tSurface, const Annotation &tAnnotation)
 {
     //Find the subject
     QList<QStandardItem*> itemSubjectList = this->findItems(subject);
@@ -232,7 +232,7 @@ bool Data3DTreeModel::addData(const QString& subject, const QString& set, const 
 
             if(!itemList.isEmpty() && (itemList.at(0)->type() == Data3DTreeModelItemTypes::SurfaceSetItem)) {
                 BrainSurfaceSetTreeItem* pSurfaceSetItem = dynamic_cast<BrainSurfaceSetTreeItem*>(itemList.at(0));
-                state = pSurfaceSetItem->addData(tSurface, tAnnotation, m_pParentEntity);
+                state = pSurfaceSetItem->addData(tSurface, tAnnotation, m_pModelEntity);
             } else {
                 BrainSurfaceSetTreeItem* pSurfaceSetItem = new BrainSurfaceSetTreeItem(Data3DTreeModelItemTypes::SurfaceSetItem, set);
 
@@ -241,7 +241,7 @@ bool Data3DTreeModel::addData(const QString& subject, const QString& set, const 
                 list << new QStandardItem(pSurfaceSetItem->toolTip());
                 pSubjectItem->appendRow(list);
 
-                state = pSurfaceSetItem->addData(tSurface, tAnnotation, m_pParentEntity);
+                state = pSurfaceSetItem->addData(tSurface, tAnnotation, m_pModelEntity);
             }
         }
     }
@@ -252,7 +252,7 @@ bool Data3DTreeModel::addData(const QString& subject, const QString& set, const 
 
 //*************************************************************************************************************
 
-bool Data3DTreeModel::addData(const QString& subject, const QString& set, const MNESourceSpace& tSourceSpace)
+bool Data3DTreeModel::addSourceSpace(const QString& subject, const QString& set, const MNESourceSpace& tSourceSpace)
 {
     //Find the subject
     QList<QStandardItem*> itemSubjectList = this->findItems(subject);
@@ -278,7 +278,7 @@ bool Data3DTreeModel::addData(const QString& subject, const QString& set, const 
 
             if(!itemList.isEmpty() && (itemList.at(0)->type() == Data3DTreeModelItemTypes::SurfaceSetItem)) {
                 BrainSurfaceSetTreeItem* pSurfaceSetItem = dynamic_cast<BrainSurfaceSetTreeItem*>(itemList.at(0));
-                state = pSurfaceSetItem->addData(tSourceSpace, m_pParentEntity);
+                state = pSurfaceSetItem->addData(tSourceSpace, m_pModelEntity);
             } else {
                 BrainSurfaceSetTreeItem* pSurfaceSetItem = new BrainSurfaceSetTreeItem(Data3DTreeModelItemTypes::SurfaceSetItem, set);
 
@@ -287,7 +287,7 @@ bool Data3DTreeModel::addData(const QString& subject, const QString& set, const 
                 list << new QStandardItem(pSurfaceSetItem->toolTip());
                 pSubjectItem->appendRow(list);
 
-                state = pSurfaceSetItem->addData(tSourceSpace, m_pParentEntity);
+                state = pSurfaceSetItem->addData(tSourceSpace, m_pModelEntity);
             }
         }
     }
@@ -298,7 +298,15 @@ bool Data3DTreeModel::addData(const QString& subject, const QString& set, const 
 
 //*************************************************************************************************************
 
-QList<BrainRTSourceLocDataTreeItem*> Data3DTreeModel::addData(const QString& subject, const QString& set, const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution)
+bool Data3DTreeModel::addForwardSolution(const QString& subject, const QString& set, const MNEForwardSolution& tForwardSolution)
+{
+    return this->addSourceSpace(subject, set, tForwardSolution.src);
+}
+
+
+//*************************************************************************************************************
+
+QList<BrainRTSourceLocDataTreeItem*> Data3DTreeModel::addSourceData(const QString& subject, const QString& set, const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution)
 {
     QList<BrainRTSourceLocDataTreeItem*> returnList;
 
@@ -346,7 +354,7 @@ QList<BrainRTSourceLocDataTreeItem*> Data3DTreeModel::addData(const QString& sub
 
 //*************************************************************************************************************
 
-QList<BrainRTConnectivityDataTreeItem*> Data3DTreeModel::addData(const QString& subject, const QString& set, Network::SPtr pNetworkData)
+QList<BrainRTConnectivityDataTreeItem*> Data3DTreeModel::addConnectivityData(const QString& subject, const QString& set, Network::SPtr pNetworkData)
 {
     QList<BrainRTConnectivityDataTreeItem*> returnList;
 
@@ -365,7 +373,7 @@ QList<BrainRTConnectivityDataTreeItem*> Data3DTreeModel::addData(const QString& 
 
             if(!itemList.isEmpty() && (itemList.at(0)->type() == Data3DTreeModelItemTypes::SurfaceSetItem)) {
                 BrainSurfaceSetTreeItem* pSurfaceSetItem = dynamic_cast<BrainSurfaceSetTreeItem*>(itemList.at(0));
-                returnList.append(pSurfaceSetItem->addData(pNetworkData, m_pParentEntity));
+                returnList.append(pSurfaceSetItem->addData(pNetworkData, m_pModelEntity));
             } else {
                 BrainSurfaceSetTreeItem* pSurfaceSetItem = new BrainSurfaceSetTreeItem(Data3DTreeModelItemTypes::SurfaceSetItem, set);
 
@@ -374,7 +382,7 @@ QList<BrainRTConnectivityDataTreeItem*> Data3DTreeModel::addData(const QString& 
                 list << new QStandardItem(pSurfaceSetItem->toolTip());
                 pSubjectItem->appendRow(list);
 
-                returnList.append(pSurfaceSetItem->addData(pNetworkData, m_pParentEntity));
+                returnList.append(pSurfaceSetItem->addData(pNetworkData, m_pModelEntity));
             }
 
 //            //Find the "set" items and add the source estimates as items
@@ -382,7 +390,7 @@ QList<BrainRTConnectivityDataTreeItem*> Data3DTreeModel::addData(const QString& 
 //                for(int i = 0; i<itemList.size(); i++) {
 //                    if(itemList.at(i)->type() == Data3DTreeModelItemTypes::SurfaceSetItem) {
 //                        if(BrainSurfaceSetTreeItem* pSetItem = dynamic_cast<BrainSurfaceSetTreeItem*>(itemList.at(i))) {
-//                            returnList.append(pSetItem->addData(pNetworkData, m_pParentEntity));
+//                            returnList.append(pSetItem->addData(pNetworkData, m_pModelEntity));
 //                        }
 //                    }
 //                }
@@ -408,7 +416,7 @@ QList<BrainRTConnectivityDataTreeItem*> Data3DTreeModel::addData(const QString& 
 
 //*************************************************************************************************************
 
-bool Data3DTreeModel::addData(const QString& subject, const QString& set, const MNELIB::MNEBem& tBem)
+bool Data3DTreeModel::addBemData(const QString& subject, const QString& set, const MNELIB::MNEBem& tBem)
 {
     //Find the subject
     QList<QStandardItem*> itemSubjectList = this->findItems(subject);
@@ -434,7 +442,7 @@ bool Data3DTreeModel::addData(const QString& subject, const QString& set, const 
 
             if(!itemList.isEmpty() && (itemList.at(0)->type() == Data3DTreeModelItemTypes::BemItem)) {
                 BemTreeItem* pBemItem = dynamic_cast<BemTreeItem*>(itemList.at(0));
-                state = pBemItem->addData(tBem, m_pParentEntity);
+                state = pBemItem->addData(tBem, m_pModelEntity);
             } else {
                 BemTreeItem* pBemItem = new BemTreeItem(Data3DTreeModelItemTypes::BemItem, set);
 
@@ -443,7 +451,7 @@ bool Data3DTreeModel::addData(const QString& subject, const QString& set, const 
                 list << new QStandardItem(pBemItem->toolTip());
                 pSubjectItem->appendRow(list);
 
-                state = pBemItem->addData(tBem, m_pParentEntity);
+                state = pBemItem->addData(tBem, m_pModelEntity);
             }
         }
     }
@@ -454,7 +462,7 @@ bool Data3DTreeModel::addData(const QString& subject, const QString& set, const 
 
 //*************************************************************************************************************
 
-bool Data3DTreeModel::addData(const QString& subject, const QString& set, const FIFFLIB::FiffDigPointSet& tDigitizer)
+bool Data3DTreeModel::addDigitizerData(const QString& subject, const QString& set, const FIFFLIB::FiffDigPointSet& tDigitizer)
 {
     //Find the subject
     QList<QStandardItem*> itemSubjectList = this->findItems(subject);
@@ -480,7 +488,7 @@ bool Data3DTreeModel::addData(const QString& subject, const QString& set, const 
 
             if(!itemList.isEmpty() && (itemList.at(0)->type() == Data3DTreeModelItemTypes::SurfaceSetItem)) {
                 BrainSurfaceSetTreeItem* pSurfaceSetItem = dynamic_cast<BrainSurfaceSetTreeItem*>(itemList.at(0));
-                state = pSurfaceSetItem->addData(tDigitizer, m_pParentEntity);
+                state = pSurfaceSetItem->addData(tDigitizer, m_pModelEntity);
             } else {
                 BrainSurfaceSetTreeItem* pSurfaceSetItem = new BrainSurfaceSetTreeItem(Data3DTreeModelItemTypes::SurfaceSetItem, set);
 
@@ -489,11 +497,19 @@ bool Data3DTreeModel::addData(const QString& subject, const QString& set, const 
                 list << new QStandardItem(pSurfaceSetItem->toolTip());
                 pSubjectItem->appendRow(list);
 
-                state = pSurfaceSetItem->addData(tDigitizer, m_pParentEntity);
+                state = pSurfaceSetItem->addData(tDigitizer, m_pModelEntity);
             }
         }
     }
 
     return state;
+}
+
+
+//*************************************************************************************************************
+
+QPointer<Qt3DCore::QEntity> Data3DTreeModel::getRootEntity()
+{
+    return m_pModelEntity;
 }
 

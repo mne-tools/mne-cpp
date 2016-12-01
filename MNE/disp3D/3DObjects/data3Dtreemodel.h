@@ -126,9 +126,8 @@ public:
     * Default constructor.
     *
     * @param[in] parent         The parent of this class.
-    * @param[in] parentEntity         The parent of this class.
     */
-    explicit Data3DTreeModel(QObject *parent = 0, Qt3DCore::QEntity * parentEntity = 0);
+    explicit Data3DTreeModel(QObject *parent = 0);
 
     //=========================================================================================================
     /**
@@ -156,7 +155,7 @@ public:
     *
     * @return                       Returns true if successful.
     */
-    bool addData(const QString& subject, const QString& set, const FSLIB::SurfaceSet& tSurfaceSet, const FSLIB::AnnotationSet& tAnnotationSet);
+    bool addSurfaceSet(const QString& subject, const QString& set, const FSLIB::SurfaceSet& tSurfaceSet, const FSLIB::AnnotationSet& tAnnotationSet = FSLIB::AnnotationSet());
 
     //=========================================================================================================
     /**
@@ -169,7 +168,7 @@ public:
     *
     * @return                       Returns true if successful.
     */
-    bool addData(const QString& subject, const QString& set, const FSLIB::Surface& tSurface, const FSLIB::Annotation& tAnnotation);
+    bool addSurface(const QString& subject, const QString& set, const FSLIB::Surface& tSurface, const FSLIB::Annotation& tAnnotation = FSLIB::Annotation());
 
     //=========================================================================================================
     /**
@@ -181,7 +180,19 @@ public:
     *
     * @return                       Returns true if successful.
     */
-    bool addData(const QString& subject, const QString& set, const MNELIB::MNESourceSpace& tSourceSpace);
+    bool addSourceSpace(const QString& subject, const QString& set, const MNELIB::MNESourceSpace& tSourceSpace);
+
+    //=========================================================================================================
+    /**
+    * Adds a forward solution data to the brain tree model. Convenient function to addBrainData(const QString& text, const MNESourceSpace& tSourceSpace).
+    *
+    * @param[in] subject            The name of the subject.
+    * @param[in] set                The text of the surface set tree item which this data should be added to. If no item with text exists it will be created.
+    * @param[in] tForwardSolution   The forward solution information.
+    *
+    * @return                       Returns true if successful.
+    */
+    bool addForwardSolution(const QString& subject, const QString& set, const MNELIB::MNEForwardSolution& tForwardSolution);
 
     //=========================================================================================================
     /**
@@ -194,7 +205,7 @@ public:
     *
     * @return                       Returns a list with the tree items which now hold the activation data. Use this list to update the data, i.e. during real time applications.
     */
-    QList<BrainRTSourceLocDataTreeItem*> addData(const QString& subject, const QString& set, const MNELIB::MNESourceEstimate& tSourceEstimate, const MNELIB::MNEForwardSolution& tForwardSolution = MNELIB::MNEForwardSolution());
+    QList<BrainRTSourceLocDataTreeItem*> addSourceData(const QString& subject, const QString& set, const MNELIB::MNESourceEstimate& tSourceEstimate, const MNELIB::MNEForwardSolution& tForwardSolution = MNELIB::MNEForwardSolution());
 
     //=========================================================================================================
     /**
@@ -206,7 +217,7 @@ public:
     *
     * @return                       Returns a list with the tree items which now hold the activation data. Use this list to update the data, i.e. during real time applications.
     */
-    QList<BrainRTConnectivityDataTreeItem*> addData(const QString& subject, const QString& set, CONNECTIVITYLIB::Network::SPtr pNetworkData);
+    QList<BrainRTConnectivityDataTreeItem*> addConnectivityData(const QString& subject, const QString& set, CONNECTIVITYLIB::Network::SPtr pNetworkData);
 
     //=========================================================================================================
     /**
@@ -218,7 +229,7 @@ public:
     *
     * @return                       Returns true if successful.
     */
-    bool addData(const QString& subject, const QString& set, const MNELIB::MNEBem& tBem);
+    bool addBemData(const QString& subject, const QString& set, const MNELIB::MNEBem& tBem);
 
     //=========================================================================================================
     /**
@@ -230,11 +241,13 @@ public:
     *
     * @return                       Returns true if successful.
     */
-    bool addData(const QString& subject, const QString& set, const FIFFLIB::FiffDigPointSet &tDigitizer);
+    bool addDigitizerData(const QString& subject, const QString& set, const FIFFLIB::FiffDigPointSet &tDigitizer);
+
+    QPointer<Qt3DCore::QEntity> getRootEntity();
 
 protected:
     QStandardItem*                   m_pRootItem;            /**< The root item of the tree model. */
-    QPointer<Qt3DCore::QEntity>      m_pParentEntity;        /**< The parent 3D entity. */
+    QPointer<Qt3DCore::QEntity>      m_pModelEntity;         /**< The parent 3D entity for this model. */
 };
 
 } // NAMESPACE
