@@ -40,7 +40,9 @@
 
 #include "control3dwidget.h"
 #include "disp/helpers/roundededgeswidget.h"
+
 #include "../3DObjects/data3Dtreedelegate.h"
+#include "3DObjects/data3Dtreemodel.h"
 #include "../view3D.h"
 
 
@@ -178,29 +180,29 @@ Control3DWidget::~Control3DWidget()
 
 //*************************************************************************************************************
 
-void Control3DWidget::setView3D(QSharedPointer<View3D> view3D)
+void Control3DWidget::init(QSharedPointer<Data3DTreeModel> pData3DTreeModel, QSharedPointer<View3D> pView3D)
 {
     //Do the connects from this control widget to the View3D
-    ui->m_treeView_loadedData->setModel(view3D->getData3DTreeModel());
+    ui->m_treeView_loadedData->setModel(pData3DTreeModel.data());
 
     //Do the connects
     connect(this, &Control3DWidget::sceneColorChanged,
-            view3D.data(), &View3D::setSceneColor);
+            pView3D.data(), &View3D::setSceneColor);
 
     connect(this, &Control3DWidget::rotationChanged,
-            view3D.data(), &View3D::startStopModelRotation);
+            pView3D.data(), &View3D::startStopModelRotation);
 
     connect(this, &Control3DWidget::showCoordAxis,
-            view3D.data(), &View3D::toggleCoordAxis);
+            pView3D.data(), &View3D::toggleCoordAxis);
 
     connect(this, &Control3DWidget::showFullScreen,
-            view3D.data(), &View3D::showFullScreen);
+            pView3D.data(), &View3D::showFullScreen);
 
     connect(this, &Control3DWidget::lightColorChanged,
-            view3D.data(), &View3D::setLightColor);
+            pView3D.data(), &View3D::setLightColor);
 
     connect(this, &Control3DWidget::lightIntensityChanged,
-            view3D.data(), &View3D::setLightIntensity);
+            pView3D.data(), &View3D::setLightIntensity);
 
     //Set description hidden as default
     this->onTreeViewDescriptionHide();

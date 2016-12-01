@@ -43,6 +43,7 @@
 #include <disp3D/view3D.h>
 #include <disp3D/control/control3dwidget.h>
 #include <disp3D/3DObjects/brain/brainrtsourcelocdatatreeitem.h>
+#include <disp3D/3DObjects/data3Dtreemodel.h>
 
 #include <fs/label.h>
 #include <fs/surfaceset.h>
@@ -242,30 +243,30 @@ int main(int argc, char *argv[])
 
     std::cout<<"Creating BrainView"<<std::endl;
 
-    //Create the 3D view
-    View3D::SPtr testWindow = View3D::SPtr(new View3D());
+    //Create 3D data model
+    Data3DTreeModel::SPtr p3DDataModel = Data3DTreeModel::SPtr(new Data3DTreeModel());
 
     //Add fressurfer surface set including both hemispheres
-    testWindow->addSurfaceSet(parser.value(subjectOption), evoked.comment, tSurfSet, tAnnotSet);
+    p3DDataModel->addSurfaceSet(parser.value(subjectOption), evoked.comment, tSurfSet, tAnnotSet);
 
 //    //Read and show BEM
 //    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif");
 //    MNEBem t_Bem(t_fileBem);
-//    testWindow->addBemData(parser.value(subjectOption), "BEM", t_Bem);
+//    p3DDataModel->addBemData(parser.value(subjectOption), "BEM", t_Bem);
 
 //    //Read and show sensor helmets
 //    QFile t_filesensorSurfaceVV("./resources/sensorSurfaces/306m_rt.fif");
 //    MNEBem t_sensorSurfaceVV(t_filesensorSurfaceVV);
-//    testWindow->addBemData("Sensors", "VectorView", t_sensorSurfaceVV);
+//    p3DDataModel->addBemData("Sensors", "VectorView", t_sensorSurfaceVV);
 
 //    // Read & show digitizer points
 //    QFile t_fileDig("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
 //    FiffDigPointSet t_Dig(t_fileDig);
-//    testWindow->addDigitizerData(parser.value(subjectOption), evoked.comment, t_Dig);
+//    p3DDataModel->addDigitizerData(parser.value(subjectOption), evoked.comment, t_Dig);
 
     if(bAddRtSourceLoc) {
         //Add rt source loc data
-        QList<BrainRTSourceLocDataTreeItem*> rtItemList_RV = testWindow->addSourceData(parser.value(subjectOption), evoked.comment, sourceEstimate, t_clusteredFwd);
+        QList<BrainRTSourceLocDataTreeItem*> rtItemList_RV = p3DDataModel->addSourceData(parser.value(subjectOption), evoked.comment, sourceEstimate, t_clusteredFwd);
 
         //Init some rt related values for right visual data
         for(int i = 0; i < rtItemList_RV.size(); ++i) {
@@ -279,10 +280,13 @@ int main(int argc, char *argv[])
         }
     }
 
+    //Create the 3D view
+    View3D::SPtr testWindow = View3D::SPtr(new View3D());
+    testWindow->setModel(p3DDataModel);
     testWindow->show();
 
     Control3DWidget::SPtr control3DWidget = Control3DWidget::SPtr(new Control3DWidget());
-    control3DWidget->setView3D(testWindow);
+    control3DWidget->init(p3DDataModel, testWindow);
     control3DWidget->show();
 
     //########################################################################################

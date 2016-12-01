@@ -41,6 +41,7 @@
 #include "view3D.h"
 #include "3DObjects/common/renderable3Dentity.h"
 #include "3DObjects/common/types.h"
+#include "3DObjects/data3Dtreemodel.h"
 
 #include <mne/mne_sourceestimate.h>
 #include <fiff/fiff_dig_point_set.h>
@@ -90,7 +91,6 @@ View3D::View3D()
 , m_p3DObjectsEntity(new Qt3DCore::QEntity(m_pRootEntity))
 , m_pLightEntity(new Qt3DCore::QEntity(m_pRootEntity))
 , m_pCameraEntity(this->camera())
-, m_pData3DTreeModel(Data3DTreeModel::SPtr(new Data3DTreeModel(0, m_p3DObjectsEntity)))
 , m_bCameraRotationMode(false)
 , m_bCameraTransMode(false)
 , m_bModelRotationMode(false)
@@ -235,73 +235,9 @@ void View3D::initTransformations()
 
 //*************************************************************************************************************
 
-bool View3D::addSurfaceSet(const QString& subject, const QString& set, const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet)
+void View3D::setModel(Data3DTreeModel::SPtr pModel)
 {
-    return m_pData3DTreeModel->addData(subject, set, tSurfaceSet, tAnnotationSet);
-}
-
-
-//*************************************************************************************************************
-
-bool View3D::addSurface(const QString& subject, const QString& set, const Surface& tSurface, const Annotation& tAnnotation)
-{
-    return m_pData3DTreeModel->addData(subject, set, tSurface, tAnnotation);
-}
-
-
-//*************************************************************************************************************
-
-bool View3D::addSourceSpace(const QString& subject, const QString& set, const MNESourceSpace& tSourceSpace)
-{
-    return m_pData3DTreeModel->addData(subject, set, tSourceSpace);
-}
-
-
-//*************************************************************************************************************
-
-bool View3D::addForwardSolution(const QString& subject, const QString& set, const MNEForwardSolution& tForwardSolution)
-{
-    return m_pData3DTreeModel->addData(subject, set, tForwardSolution.src);
-}
-
-
-//*************************************************************************************************************
-
-QList<BrainRTSourceLocDataTreeItem*> View3D::addSourceData(const QString& subject, const QString& set, const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution)
-{
-    return m_pData3DTreeModel->addData(subject, set, tSourceEstimate, tForwardSolution);
-}
-
-
-//*************************************************************************************************************
-
-QList<BrainRTConnectivityDataTreeItem*> View3D::addConnectivityData(const QString& subject, const QString& set, Network::SPtr pNetworkData)
-{
-    return m_pData3DTreeModel->addData(subject, set, pNetworkData);
-}
-
-
-//*************************************************************************************************************
-
-bool View3D::addBemData(const QString& subject, const QString& set, const MNELIB::MNEBem& tBem)
-{
-    return m_pData3DTreeModel->addData(subject, set, tBem);
-}
-
-
-//*************************************************************************************************************
-
-bool View3D::addDigitizerData(const QString& subject, const QString& set, const FiffDigPointSet& tDigitizer)
-{
-    return m_pData3DTreeModel->addData(subject, set, tDigitizer);
-}
-
-
-//*************************************************************************************************************
-
-Data3DTreeModel* View3D::getData3DTreeModel()
-{
-    return m_pData3DTreeModel.data();
+    pModel->getRootEntity()->setParent(m_p3DObjectsEntity);
 }
 
 
@@ -310,14 +246,6 @@ Data3DTreeModel* View3D::getData3DTreeModel()
 void View3D::setSceneColor(const QColor& colSceneColor)
 {
     this->defaultFramegraph()->setClearColor(colSceneColor);
-}
-
-
-//*************************************************************************************************************
-
-Qt3DCore::QEntity* View3D::get3DRootEntity()
-{
-    return m_pRootEntity;
 }
 
 

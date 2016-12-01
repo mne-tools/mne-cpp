@@ -42,7 +42,6 @@
 //=============================================================================================================
 
 #include "disp3D_global.h"
-#include "3DObjects/data3Dtreemodel.h"
 
 #include <fs/annotationset.h>
 #include <fs/annotation.h>
@@ -113,6 +112,7 @@ namespace DISP3DLIB
 
 class BrainRTSourceLocDataTreeItem;
 class BrainRTConnectivityDataTreeItem;
+class Data3DTreeModel;
 
 
 //=============================================================================================================
@@ -144,110 +144,11 @@ public:
 
     //=========================================================================================================
     /**
-    * Adds FreeSurfer brain data SET.
-    *
-    * @param[in] subject            The name of the subject.
-    * @param[in] set                The text of the surface set tree item which this data should be added to. If no item with text exists it will be created.
-    * @param[in] tSurfaceSet        FreeSurfer surface set.
-    * @param[in] tAnnotationSet     FreeSurfer annotation set.
-    *
-    * @return                       Returns true if successful.
-    */
-    bool addSurfaceSet(const QString& subject, const QString& set, const FSLIB::SurfaceSet& tSurfaceSet, const FSLIB::AnnotationSet& tAnnotationSet = FSLIB::AnnotationSet());
-
-    //=========================================================================================================
-    /**
-    * Adds FreeSurfer single brain data.
-    *
-    * @param[in] subject            The name of the subject.
-    * @param[in] set                The text of the surface set tree item which this data should be added to. If no item with text exists it will be created.
-    * @param[in] tSurface           FreeSurfer surface.
-    * @param[in] tAnnotation        FreeSurfer annotation.
-    *
-    * @return                       Returns true if successful.
-    */
-    bool addSurface(const QString& subject, const QString& set, const FSLIB::Surface& tSurface, const FSLIB::Annotation& tAnnotation = FSLIB::Annotation());
-
-    //=========================================================================================================
-    /**
-    * Adds source space data to the brain tree model.
-    *
-    * @param[in] subject            The name of the subject.
-    * @param[in] set                The text of the surface set tree item which this data should be added to. If no item with text exists it will be created.
-    * @param[in] tSourceSpace       The source space information.
-    *
-    * @return                       Returns true if successful.
-    */
-    bool addSourceSpace(const QString& subject, const QString& set, const MNELIB::MNESourceSpace& tSourceSpace);
-
-    //=========================================================================================================
-    /**
-    * Adds a forward solution data to the brain tree model. Convenient function to addBrainData(const QString& text, const MNESourceSpace& tSourceSpace).
-    *
-    * @param[in] subject            The name of the subject.
-    * @param[in] set                The text of the surface set tree item which this data should be added to. If no item with text exists it will be created.
-    * @param[in] tForwardSolution   The forward solution information.
-    *
-    * @return                       Returns true if successful.
-    */
-    bool addForwardSolution(const QString& subject, const QString& set, const MNELIB::MNEForwardSolution& tForwardSolution);
-
-    //=========================================================================================================
-    /**
-    * Adds source activity data to the brain tree model.
-    *
-    * @param[in] subject                The name of the subject.
-    * @param[in] set                    The name of the hemisphere surface set to which this data should be added.
-    * @param[in] tSourceEstimate        The MNESourceEstimate data.
-    * @param[in] tForwardSolution       The MNEForwardSolution data.
-    *
-    * @return                           Returns a list of the BrainRTSourceLocDataTreeItem where the data was appended to.
-    */
-    QList<BrainRTSourceLocDataTreeItem*> addSourceData(const QString& subject, const QString& set, const MNELIB::MNESourceEstimate& tSourceEstimate, const MNELIB::MNEForwardSolution& tForwardSolution = MNELIB::MNEForwardSolution());
-
-    //=========================================================================================================
-    /**
-    * Adds connectivity data to the brain tree model.
-    *
-    * @param[in] subject                The name of the subject.
-    * @param[in] set                    The name of the hemisphere surface set to which this data should be added.
-    * @param[in] pNetworkData           The connectivity data.
-    *
-    * @return                           Returns a list of the BrainRTSourceLocDataTreeItem where the data was appended to.
-    */
-    QList<BrainRTConnectivityDataTreeItem*> addConnectivityData(const QString& subject, const QString& set, CONNECTIVITYLIB::Network::SPtr pNetworkData);
-
-    //=========================================================================================================
-    /**
-    * Adds BEM data.
-    *
-    * @param[in] subject            The name of the subject.
-    * @param[in] set                The name of the bem set to which the data is to be added.
-    * @param[in] tBem               The Bem information.
-    *
-    * @return                       Returns true if successful.
-    */
-    bool addBemData(const QString& subject, const QString& set, const MNELIB::MNEBem& tBem);
-
-    //=========================================================================================================
-    /**
-    * Adds Digitizer data.
-    *
-    * @param[in] subject            The name of the subject.
-    * @param[in] set                The name of the measurment set to which the data is to be added.
-    * @param[in] tDigitizer         The Digitizer data.
-    *
-    * @return                       Returns true if successful.
-    */
-    bool addDigitizerData(const QString& subject, const QString& set, const FIFFLIB::FiffDigPointSet &tDigitizer);
-
-    //=========================================================================================================
-    /**
     * Return the tree model which holds the subject information.
     *
-    * @return          The SubjectTreeModel pointer.
+    * @param[in] pModel     The tree model holding the 3d models.
     */
-    Data3DTreeModel* getData3DTreeModel();
+    void setModel(QSharedPointer<DISP3DLIB::Data3DTreeModel> pModel);
 
     //=========================================================================================================
     /**
@@ -256,14 +157,6 @@ public:
     * @param[in] colSceneColor          The new background color of the view.
     */
     void setSceneColor(const QColor& colSceneColor);
-
-    //=========================================================================================================
-    /**
-    * Return the Qt3D root entity.
-    *
-    * @return          The SubjectTreeModel pointer.
-    */
-    Qt3DCore::QEntity* get3DRootEntity();
 
     void startModelRotationRecursive(QObject* pObject);
 
@@ -351,8 +244,6 @@ protected:
     QSharedPointer<Qt3DCore::QEntity>   m_ZAxisEntity;                  /**< The entity representing a torus in z direction. */
 
     QPointer<Qt3DCore::QTransform>      m_pCameraTransform;             /**< The main camera transform. */
-
-    Data3DTreeModel::SPtr               m_pData3DTreeModel;             /**< Pointer to the data3D class, which holds all 3D data. */
 
     bool                                m_bCameraTransMode;             /**< Flag for activating/deactivating the translation camera mode. */
     bool                                m_bCameraRotationMode;          /**< Flag for activating/deactivating the rotation camera mode. */
