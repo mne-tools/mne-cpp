@@ -542,7 +542,9 @@ QByteArray RtSourceLocDataWorker::transformDataToColor(const VectorXd& data)
             QColor colSample(qRgb);
             rawArrayColors[idxColor++] = colSample.redF();
             rawArrayColors[idxColor++] = colSample.greenF();
-            rawArrayColors[idxColor++] = colSample.blueF();
+            rawArrayColors[idxColor++] = colSample.blueF();            
+
+            colSample = colSample.darker(200);
         }
 
         return arrayColor;

@@ -175,9 +175,9 @@ void View3D::initLight()
         light1->setIntensity(lLightIntensities.at(i));
         enitityLight->addComponent(light1);
 
-        Qt3DExtras::QSphereMesh* lightSphere = new Qt3DExtras::QSphereMesh(enitityLight);
-        lightSphere->setRadius(0.1f);
-        enitityLight->addComponent(lightSphere);
+//        Qt3DExtras::QSphereMesh* lightSphere = new Qt3DExtras::QSphereMesh(enitityLight);
+//        lightSphere->setRadius(0.1f);
+//        enitityLight->addComponent(lightSphere);
 
         Qt3DExtras::QPhongMaterial* material = new Qt3DExtras::QPhongMaterial(enitityLight);
         material->setAmbient(lLightColor.at(i));

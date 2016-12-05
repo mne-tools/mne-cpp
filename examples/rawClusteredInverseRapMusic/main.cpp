@@ -121,6 +121,7 @@ int main(int argc, char *argv[])
     QCommandLineOption numDipolePairsOption("numDip", "<number> of dipole pairs to localize.", "number", "1");
     QCommandLineOption evokedIdxOption("aveIdx", "The average <index> to choose from the average file.", "index", "1");
     QCommandLineOption hemiOption("hemi", "Selected hemisphere <hemi>.", "hemi", "2");
+    QCommandLineOption doMovieOption("doMovie", "Create overlapping movie.");
 
     parser.addOption(inputOption);
     parser.addOption(eventsFileOption);
@@ -133,6 +134,7 @@ int main(int argc, char *argv[])
     parser.addOption(numDipolePairsOption);
     parser.addOption(evokedIdxOption);
     parser.addOption(hemiOption);
+    parser.addOption(doMovieOption);
 
     parser.process(a);
 
@@ -152,13 +154,16 @@ int main(int argc, char *argv[])
     qint32 event = parser.value(evokedIdxOption).toInt();
 
     float tmin = -0.2f;
-    float tmax = 0.4f;
+    float tmax = 0.5f;
 
     bool keep_comp = false;
     fiff_int_t dest_comp = 0;
     bool pick_all  = true;
 
     qint32 k, p;
+
+    //bool doMovie = parser.isSet(doMovieOption);
+    bool doMovie = true;
 
     //
     // Load data
@@ -457,6 +462,10 @@ int main(int argc, char *argv[])
     //
     RapMusic t_rapMusic(t_clusteredFwd, false, numDipolePairs);
 
+    int iWinSize = 100;
+    if(doMovie)
+        t_rapMusic.setStcAttr(iWinSize, 0.5);
+
     MNESourceEstimate sourceEstimate = t_rapMusic.calculateInverse(pickedEvoked);
 
     if(sourceEstimate.isEmpty())
@@ -468,6 +477,14 @@ int main(int argc, char *argv[])
     std::cout << "timeMin\n" << sourceEstimate.times[0] << std::endl;
     std::cout << "timeMax\n" << sourceEstimate.times[sourceEstimate.times.size()-1] << std::endl;
     std::cout << "time step\n" << sourceEstimate.tstep << std::endl;
+
+    MatrixXd dataPicked(sourceEstimate.data.rows(), int(std::floor(sourceEstimate.data.cols()/iWinSize)));
+
+    for(int i = 0; i < dataPicked.cols(); ++i) {
+        dataPicked.col(i) = sourceEstimate.data.col(i*iWinSize);
+    }
+
+    sourceEstimate.data = dataPicked;
 
     //Source Estimate end
     //########################################################################################
