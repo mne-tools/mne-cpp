@@ -111,7 +111,7 @@ int main(int argc, char *argv[])
     QCommandLineOption subjectDirectoryOption("subjDir", "Path to subject <directory>.", "directory", "./MNE-sample-data/subjects");
     QCommandLineOption subjectOption("subj", "Selected <subject>.", "subject", "sample");
     QCommandLineOption stcFileOption("stcOut", "Path to stc <file>, which is to be written.", "file", "");//"RapMusic.stc");
-    QCommandLineOption doMovieOption("movie", "Create overlapping movie.");
+    QCommandLineOption doMovieOption("doMovie", "Create overlapping movie.");
     QCommandLineOption annotOption("annotType", "Annotation type <type>.", "type", "aparc.a2009s");
     QCommandLineOption numDipolePairsOption("numDip", "<number> of dipole pairs to localize.", "number", "1");
     QCommandLineOption surfOption("surfType", "Surface type <type>.", "type", "orig");
@@ -173,7 +173,6 @@ int main(int argc, char *argv[])
 
     if(doMovie)
         t_rapMusic.setStcAttr(100,0.6);
-
 
     MNESourceEstimate sourceEstimate = t_rapMusic.calculateInverse(pickedEvoked);
     if(sourceEstimate.isEmpty())
