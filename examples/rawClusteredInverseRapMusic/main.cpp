@@ -57,6 +57,7 @@
 #include <disp3D/view3D.h>
 #include <disp3D/control/control3dwidget.h>
 #include <disp3D/model/data3Dtreemodel.h>
+#include <disp3D/model/brain/brainrtsourcelocdatatreeitem.h>
 
 #include <utils/mnemath.h>
 
@@ -117,7 +118,7 @@ int main(int argc, char *argv[])
     QCommandLineOption subjectOption("subject", "Selected subject <subject>.", "subject", "sample");
     QCommandLineOption subjectPathOption("subjectPath", "Selected subject path <subjectPath>.", "subjectPath", "./MNE-sample-data/subjects");
     QCommandLineOption stcFileOption("stcOut", "Path to stc <file>, which is to be written.", "file", "");
-    QCommandLineOption numDipolePairsOption("numDip", "<number> of dipole pairs to localize.", "number", "7");
+    QCommandLineOption numDipolePairsOption("numDip", "<number> of dipole pairs to localize.", "number", "1");
     QCommandLineOption evokedIdxOption("aveIdx", "The average <index> to choose from the average file.", "index", "1");
     QCommandLineOption hemiOption("hemi", "Selected hemisphere <hemi>.", "hemi", "2");
 
@@ -414,22 +415,22 @@ int main(int argc, char *argv[])
 
 
     // Calculate the average
-    // Option 1 - Random selection
-    VectorXi vecSel(2);
-
-    for(qint32 i = 0; i < vecSel.size(); ++i)
-    {
-        qint32 val = rand() % count;
-        vecSel(i) = val;
-    }
-
-//    //Option 3 - Take all epochs
-//    VectorXi vecSel(data.size());
+//    // Option 1 - Random selection
+//    VectorXi vecSel(30);
 
 //    for(qint32 i = 0; i < vecSel.size(); ++i)
 //    {
-//        vecSel(i) = i;
+//        qint32 val = rand() % count;
+//        vecSel(i) = val;
 //    }
+
+    //Option 2 - Take all epochs
+    VectorXi vecSel(data.size());
+
+    for(qint32 i = 0; i < vecSel.size(); ++i)
+    {
+        vecSel(i) = i;
+    }
 
 //    //Option 3 - Manual selection
 //    VectorXi vecSel(20);
@@ -461,12 +462,12 @@ int main(int argc, char *argv[])
     if(sourceEstimate.isEmpty())
         return 1;
 
-//    // View activation time-series
-//    std::cout << "\nsourceEstimate:\n" << sourceEstimate.data.block(0,0,10,10) << std::endl;
-//    std::cout << "time\n" << sourceEstimate.times.block(0,0,1,10) << std::endl;
-//    std::cout << "timeMin\n" << sourceEstimate.times[0] << std::endl;
-//    std::cout << "timeMax\n" << sourceEstimate.times[sourceEstimate.times.size()-1] << std::endl;
-//    std::cout << "time step\n" << sourceEstimate.tstep << std::endl;
+    // View activation time-series
+    std::cout << "\nsourceEstimate:\n" << sourceEstimate.data.block(0,0,10,10) << std::endl;
+    std::cout << "time\n" << sourceEstimate.times.block(0,0,1,10) << std::endl;
+    std::cout << "timeMin\n" << sourceEstimate.times[0] << std::endl;
+    std::cout << "timeMax\n" << sourceEstimate.times[sourceEstimate.times.size()-1] << std::endl;
+    std::cout << "time step\n" << sourceEstimate.tstep << std::endl;
 
     //Source Estimate end
     //########################################################################################
@@ -490,7 +491,19 @@ int main(int argc, char *argv[])
 
     p3DDataModel->addSurfaceSet("Subject01", "HemiLRSet", t_surfSet, t_annotationSet);
 
+    //Add rt source loc data
     QList<BrainRTSourceLocDataTreeItem*> rtItemList = p3DDataModel->addSourceData("Subject01", "HemiLRSet", sourceEstimate, t_clusteredFwd);
+
+    //Init some rt related values for right visual data
+    for(int i = 0; i < rtItemList.size(); ++i) {
+        rtItemList.at(i)->setLoopState(true);
+        rtItemList.at(i)->setTimeInterval(17);
+        rtItemList.at(i)->setNumberAverages(1);
+        rtItemList.at(i)->setStreamingActive(true);
+        rtItemList.at(i)->setNormalization(QVector3D(0.0,5.5,10));
+        rtItemList.at(i)->setVisualizationType("Annotation based");
+        rtItemList.at(i)->setColortable("Hot");
+    }
 
     testWindow->show();
 

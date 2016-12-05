@@ -55,6 +55,7 @@
 #include <disp3D/view3D.h>
 #include <disp3D/control/control3dwidget.h>
 #include <disp3D/model/data3Dtreemodel.h>
+#include <disp3D/model/brain/brainrtsourcelocdatatreeitem.h>
 
 #include <utils/mnemath.h>
 
@@ -112,7 +113,7 @@ int main(int argc, char *argv[])
     QCommandLineOption stcFileOption("stcOut", "Path to stc <file>, which is to be written.", "file", "");//"RapMusic.stc");
     QCommandLineOption doMovieOption("movie", "Create overlapping movie.");
     QCommandLineOption annotOption("annotType", "Annotation type <type>.", "type", "aparc.a2009s");
-    QCommandLineOption numDipolePairsOption("numDip", "<number> of dipole pairs to localize.", "number", "7");
+    QCommandLineOption numDipolePairsOption("numDip", "<number> of dipole pairs to localize.", "number", "1");
     QCommandLineOption surfOption("surfType", "Surface type <type>.", "type", "orig");
 
     parser.addOption(fwdFileOption);
@@ -138,12 +139,13 @@ int main(int argc, char *argv[])
 
     qint32 numDipolePairs = parser.value(numDipolePairsOption).toInt();
 
-    bool doMovie = parser.isSet(doMovieOption);
+    //bool doMovie = parser.isSet(doMovieOption);
+    bool doMovie = true;
 
     qDebug() << "Start calculation with stc:" << t_sFileNameStc;
 
     // Load data
-    fiff_int_t setno = 0;
+    fiff_int_t setno = 1;
     QPair<QVariant, QVariant> baseline(QVariant(), 0);
     FiffEvoked evoked(t_fileEvoked, setno, baseline);
     if(evoked.isEmpty())
@@ -170,13 +172,14 @@ int main(int argc, char *argv[])
     RapMusic t_rapMusic(t_clusteredFwd, false, numDipolePairs);
 
     if(doMovie)
-        t_rapMusic.setStcAttr(200,0.5);
+        t_rapMusic.setStcAttr(100,0.6);
 
 
     MNESourceEstimate sourceEstimate = t_rapMusic.calculateInverse(pickedEvoked);
     if(sourceEstimate.isEmpty())
         return 1;
 
+    //Visualize the results
     View3D::SPtr testWindow = View3D::SPtr(new View3D());
     Data3DTreeModel::SPtr p3DDataModel = Data3DTreeModel::SPtr(new Data3DTreeModel());
 
@@ -185,6 +188,17 @@ int main(int argc, char *argv[])
     p3DDataModel->addSurfaceSet("Subject01", "HemiLRSet", t_surfSet, t_annotationSet);
 
     QList<BrainRTSourceLocDataTreeItem*> rtItemList = p3DDataModel->addSourceData("Subject01", "HemiLRSet", sourceEstimate, t_clusteredFwd);
+
+    //Init some rt related values for right visual data
+    for(int i = 0; i < rtItemList.size(); ++i) {
+        rtItemList.at(i)->setLoopState(true);
+        rtItemList.at(i)->setTimeInterval(17);
+        rtItemList.at(i)->setNumberAverages(1);
+        rtItemList.at(i)->setStreamingActive(true);
+        rtItemList.at(i)->setNormalization(QVector3D(0.0,5.5,10));
+        rtItemList.at(i)->setVisualizationType("Annotation based");
+        rtItemList.at(i)->setColortable("Hot");
+    }
 
     testWindow->show();
 
