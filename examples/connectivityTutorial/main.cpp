@@ -42,7 +42,9 @@
 
 #include <disp3D/view3D.h>
 #include <disp3D/control/control3dwidget.h>
-#include <disp3D/3DObjects/brain/brainrtsourcelocdatatreeitem.h>
+#include <disp3D/model/brain/brainrtsourcelocdatatreeitem.h>
+#include <disp3D/model/data3Dtreemodel.h>
+
 #include <disp/imagesc.h>
 
 #include <fs/label.h>
@@ -288,11 +290,14 @@ int main(int argc, char *argv[])
     //########################################################################################
 
     View3D::SPtr testWindow = View3D::SPtr(new View3D());
-    testWindow->addSurfaceSet(parser.value(subjectOption), evoked.comment, tSurfSet, tAnnotSet);
+    Data3DTreeModel::SPtr p3DDataModel = Data3DTreeModel::SPtr(new Data3DTreeModel());
+    testWindow->setModel(p3DDataModel);
 
-    QList<BrainRTConnectivityDataTreeItem*> rtItemListConnect= testWindow->addConnectivityData(parser.value(subjectOption), evoked.comment, pConnect_LA);
+    p3DDataModel->addSurfaceSet(parser.value(subjectOption), evoked.comment, tSurfSet, tAnnotSet);
 
-    QList<BrainRTSourceLocDataTreeItem*> rtItemListSourceLoc = testWindow->addSourceData(parser.value(subjectOption), evoked.comment, sourceEstimate, t_clusteredFwd);
+    QList<BrainRTConnectivityDataTreeItem*> rtItemListConnect= p3DDataModel->addConnectivityData(parser.value(subjectOption), evoked.comment, pConnect_LA);
+    QList<BrainRTSourceLocDataTreeItem*> rtItemListSourceLoc = p3DDataModel->addSourceData(parser.value(subjectOption), evoked.comment, sourceEstimate, t_clusteredFwd);
+
     //Init some rt related values for right visual data
     for(int i = 0; i < rtItemListSourceLoc.size(); ++i) {
         rtItemListSourceLoc.at(i)->setLoopState(true);
@@ -307,7 +312,7 @@ int main(int argc, char *argv[])
     testWindow->show();
 
     Control3DWidget::SPtr control3DWidget = Control3DWidget::SPtr(new Control3DWidget());
-    control3DWidget->setView3D(testWindow);
+    control3DWidget->init(p3DDataModel, testWindow);
     control3DWidget->show();
 
     //########################################################################################

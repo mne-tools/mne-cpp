@@ -56,6 +56,7 @@
 #include <QPushButton>
 
 #include <disp3D/view3D.h>
+#include <disp3D/model/data3Dtreemodel.h>
 
 #include <fs/surfaceset.h>
 
@@ -96,8 +97,8 @@ private:
     QWidget *m_view3d_container;
     QGridLayout *m_view3d_gridlayout;
     //Surface
-    View3D *m_BrainView;
-
+    View3D* m_BrainView;
+    Data3DTreeModel::SPtr m_p3DDataModel;
 };
 
 #endif // VIEW3DANALYZE_H

@@ -46,13 +46,15 @@
 
 #include <fiff/fiff_evoked.h>
 #include <fiff/fiff.h>
-#include <mne/mne.h>
 
+#include <mne/mne.h>
 #include <mne/mne_sourceestimate.h>
+
 #include <inverse/rapMusic/rapmusic.h>
 
 #include <disp3D/view3D.h>
 #include <disp3D/control/control3dwidget.h>
+#include <disp3D/model/data3Dtreemodel.h>
 
 #include <utils/mnemath.h>
 
@@ -176,14 +178,18 @@ int main(int argc, char *argv[])
         return 1;
 
     View3D::SPtr testWindow = View3D::SPtr(new View3D());
-    testWindow->addSurfaceSet("Subject01", "HemiLRSet", t_surfSet, t_annotationSet);
+    Data3DTreeModel::SPtr p3DDataModel = Data3DTreeModel::SPtr(new Data3DTreeModel());
 
-    QList<BrainRTSourceLocDataTreeItem*> rtItemList = testWindow->addSourceData("Subject01", "HemiLRSet", sourceEstimate, t_clusteredFwd);
+    testWindow->setModel(p3DDataModel);
+
+    p3DDataModel->addSurfaceSet("Subject01", "HemiLRSet", t_surfSet, t_annotationSet);
+
+    QList<BrainRTSourceLocDataTreeItem*> rtItemList = p3DDataModel->addSourceData("Subject01", "HemiLRSet", sourceEstimate, t_clusteredFwd);
 
     testWindow->show();
 
     Control3DWidget::SPtr control3DWidget = Control3DWidget::SPtr(new Control3DWidget());
-    control3DWidget->setView3D(testWindow);
+    control3DWidget->init(p3DDataModel, testWindow);
     control3DWidget->show();
 
     if(!t_sFileNameStc.isEmpty())
