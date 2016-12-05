@@ -42,6 +42,7 @@
 
 #include <disp3D/view3D.h>
 #include <disp3D/control/control3dwidget.h>
+#include <disp3D/model/data3Dtreemodel.h>
 
 #include <fs/surfaceset.h>
 
@@ -105,34 +106,37 @@ int main(int argc, char *argv[])
     // pial
     //
     SurfaceSet tSurfSetPial (subject, hemi, "pial", subjectPath);
+    Data3DTreeModel::SPtr p3DDataModel = Data3DTreeModel::SPtr(new Data3DTreeModel());
 
     View3D::SPtr t_BrainView = View3D::SPtr(new View3D());
-    t_BrainView->addSurfaceSet(subject, "pial", tSurfSetPial);
+    t_BrainView->setModel(p3DDataModel);
+
+    p3DDataModel->addSurfaceSet(subject, "pial", tSurfSetPial);
 
     //
     // inflated
     //
     SurfaceSet tSurfSetInflated (subject, hemi, "inflated", subjectPath);
-    t_BrainView->addSurfaceSet(subject, "inflated", tSurfSetInflated);
+    p3DDataModel->addSurfaceSet(subject, "inflated", tSurfSetInflated);
 
     //
     // orig
     //
     SurfaceSet tSurfSetOrig (subject, hemi, "orig", subjectPath);
-    t_BrainView->addSurfaceSet(subject, "orig", tSurfSetOrig);
+    p3DDataModel->addSurfaceSet(subject, "orig", tSurfSetOrig);
 
     //
     // white
     //
     SurfaceSet tSurfSetWhite (subject, hemi, "white", subjectPath);
-    t_BrainView->addSurfaceSet(subject, "white", tSurfSetWhite);
+    p3DDataModel->addSurfaceSet(subject, "white", tSurfSetWhite);
 
     t_BrainView->show();
 
     //3D control
     Control3DWidget::SPtr control3DWidget = Control3DWidget::SPtr(new Control3DWidget());
     control3DWidget->setWindowFlags(Qt::WindowStaysOnTopHint);
-    control3DWidget->setView3D(t_BrainView);
+    control3DWidget->init(p3DDataModel, t_BrainView);
     control3DWidget->show();
 
     return a.exec();
