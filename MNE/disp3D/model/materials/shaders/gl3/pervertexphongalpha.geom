@@ -20,7 +20,7 @@ vec3 CG;
 
 void ProduceVertex(int v) 
 {
-	gl_Position = projectionMatrix * vec4( CG + 0.95 * ( tePosition[v].xyz - CG ), 1. );
+	gl_Position = projectionMatrix * vec4( CG + 1.0 * ( tePosition[v].xyz - CG ), 1. );
 	//gl_Position = projectionMatrix * tePosition[v];
 	gNormal = teNormal[v];
 	gColor = teColor[v];
