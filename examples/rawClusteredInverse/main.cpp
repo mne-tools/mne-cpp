@@ -52,6 +52,8 @@
 #include <mne/mne_epoch_data_list.h>
 #include <mne/mne_sourceestimate.h>
 
+#include <time.h>
+
 #include <inverse/minimumNorm/minimumnorm.h>
 
 #include <disp3D/view3D.h>
@@ -414,6 +416,7 @@ int main(int argc, char *argv[])
     // Calculate the average
     // Option 1 - Random selection
     VectorXi vecSel(50);
+    srand (time(NULL)); // initialize random seed
 
     for(qint32 i = 0; i < vecSel.size(); ++i)
     {

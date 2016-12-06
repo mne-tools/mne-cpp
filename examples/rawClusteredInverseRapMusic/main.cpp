@@ -110,15 +110,20 @@ int main(int argc, char *argv[])
     parser.setApplicationDescription("Raw Clustered Inverse Rap Music Example");
     parser.addHelpOption();
 
-    QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", "./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
-    QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif");
-    QCommandLineOption fwdOption("fwd", "Path to forwad solution <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
+//    QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", "F:/MIND/MEG/mind006/raw/mind006_060627_auditory02_raw.fif");
+//    QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", "F:/MIND/MEG/mind006/raw/mind006_060627_auditory02_raw-eve.fif");
+//    QCommandLineOption fwdOption("fwd", "Path to forwad solution <file>.", "file", "F:/MIND/MEG/mind006/fwd/mind006_060626_auditory01-ave-oct-5-fwd.fif");
+
+    QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", "F:/MIND/MEG/mind006/raw/mind006_060626_auditory01_raw.fif");
+    QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", "F:/MIND/MEG/mind006/raw/mind006_060626_auditory01_raw-eve.fif");
+    QCommandLineOption fwdOption("fwd", "Path to forwad solution <file>.", "file", "F:/MIND/MEG/mind006/fwd/mind006_060626_auditory01-ave-oct-5-fwd.fif");
+
     QCommandLineOption surfOption("surfType", "Surface type <type>.", "type", "orig");
     QCommandLineOption annotOption("annotType", "Annotation type <type>.", "type", "aparc.a2009s");
-    QCommandLineOption subjectOption("subject", "Selected subject <subject>.", "subject", "sample");
-    QCommandLineOption subjectPathOption("subjectPath", "Selected subject path <subjectPath>.", "subjectPath", "./MNE-sample-data/subjects");
+    QCommandLineOption subjectOption("subject", "Selected subject <subject>.", "subject", "Mind06");
+    QCommandLineOption subjectPathOption("subjectPath", "Selected subject path <subjectPath>.", "subjectPath", "F:/Reconstructed");
     QCommandLineOption stcFileOption("stcOut", "Path to stc <file>, which is to be written.", "file", "");
-    QCommandLineOption numDipolePairsOption("numDip", "<number> of dipole pairs to localize.", "number", "1");
+    QCommandLineOption numDipolePairsOption("numDip", "<number> of dipole pairs to localize.", "number", "5");
     QCommandLineOption evokedIdxOption("aveIdx", "The average <index> to choose from the average file.", "index", "1");
     QCommandLineOption hemiOption("hemi", "Selected hemisphere <hemi>.", "hemi", "2");
     QCommandLineOption doMovieOption("doMovie", "Create overlapping movie.");
@@ -153,7 +158,7 @@ int main(int argc, char *argv[])
     //Choose average
     qint32 event = parser.value(evokedIdxOption).toInt();
 
-    float tmin = -0.2f;
+    float tmin = -0.5f;
     float tmax = 0.5f;
 
     bool keep_comp = false;
@@ -421,7 +426,8 @@ int main(int argc, char *argv[])
 
     // Calculate the average
 //    // Option 1 - Random selection
-//    VectorXi vecSel(30);
+//    VectorXi vecSel(2);
+//    srand (time(NULL)); // initialize random seed
 
 //    for(qint32 i = 0; i < vecSel.size(); ++i)
 //    {
@@ -429,18 +435,25 @@ int main(int argc, char *argv[])
 //        vecSel(i) = val;
 //    }
 
-    //Option 2 - Take all epochs
-    VectorXi vecSel(data.size());
+//    //Option 2 - Take all epochs
+//    VectorXi vecSel(data.size());
 
-    for(qint32 i = 0; i < vecSel.size(); ++i)
-    {
-        vecSel(i) = i;
-    }
+//    for(qint32 i = 0; i < vecSel.size(); ++i)
+//    {
+//        vecSel(i) = i;
+//    }
 
 //    //Option 3 - Manual selection
-//    VectorXi vecSel(20);
+//    VectorXi vecSel(15);
+//    //vecSel << 76, 74, 13, 61, 97, 94, 75, 71, 60, 56, 26, 57, 56, 0, 52, 72, 33, 86, 96, 67;
+//    vecSel << 41, 17, 184, 55, 104, 144, 203, 43, 107, 69, 170, 60, 116, 17, 121;
+//    //vecSel << 13, 106, 99, 163, 46, 115, 33, 180, 179, 125, 63, 52, 18, 128, 197;
+//    //vecSel << 77, 170, 147, 28, 182, 135, 58, 196, 99, 99, 17, 194, 196, 99, 184;
+//    //vecSel << 90, 57, 38, 132, 166, 106, 171, 108, 158, 97, 11, 161, 10, 166, 14;
 
-//    vecSel << 76, 74, 13, 61, 97, 94, 75, 71, 60, 56, 26, 57, 56, 0, 52, 72, 33, 86, 96, 67;
+    VectorXi vecSel(2);
+    vecSel << 201,43;
+
 
     std::cout << "Select following epochs to average:\n" << vecSel << std::endl;
 
@@ -462,9 +475,9 @@ int main(int argc, char *argv[])
     //
     RapMusic t_rapMusic(t_clusteredFwd, false, numDipolePairs);
 
-    int iWinSize = 100;
+    int iWinSize = 200;
     if(doMovie)
-        t_rapMusic.setStcAttr(iWinSize, 0.5);
+        t_rapMusic.setStcAttr(iWinSize, 0.6);
 
     MNESourceEstimate sourceEstimate = t_rapMusic.calculateInverse(pickedEvoked);
 
@@ -517,7 +530,7 @@ int main(int argc, char *argv[])
         rtItemList.at(i)->setTimeInterval(17);
         rtItemList.at(i)->setNumberAverages(1);
         rtItemList.at(i)->setStreamingActive(true);
-        rtItemList.at(i)->setNormalization(QVector3D(0.0,5.5,10));
+        rtItemList.at(i)->setNormalization(QVector3D(0.1, 0.5, 1.0));
         rtItemList.at(i)->setVisualizationType("Annotation based");
         rtItemList.at(i)->setColortable("Hot");
     }
