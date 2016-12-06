@@ -14416,8 +14416,17 @@ static int c_dsvd(double **mat,		/* The matrix */
 
     fromDoubleEigenVector(svd.singularValues(), sing, svd.singularValues().size());
 
-    if ( uu != NULL )
+    std::cout << "uu\n";
+    std::cout << svd.matrixU().rows() << "x" << svd.matrixU().cols() << std::endl;
+
+    if ( uu != NULL ) {
         fromDoubleEigenMatrix(svd.matrixU(), uu, udim, m);
+        for (int j = 0; j < udim; j++){
+          for (int k = 0; k < m; k++)
+            printf("%f ",uu[j][k]);
+          printf("\n\n");
+        }
+    }
 
     if ( vv != NULL )
         fromDoubleEigenMatrix(svd.matrixV().transpose(), vv, udim, udim);
@@ -14468,18 +14477,18 @@ static double tryit (double **p,
 
 
 static int simplex_minimize(double **p,		     /* The initial simplex */
-                            double *y,		     /* Function values at the vertices */
-                            int   ndim,		     /* Number of variables */
-                            double ftol,	     /* Relative convergence tolerance */
-                            double (*func)(double *fitpar,int npar,void *user_data),
-                                                     /* The function to be evaluated */
-                            void  *user_data,	     /* Data to be passed to the above function in each evaluation */
-                            int   max_eval,	     /* Maximum number of function evaluations */
-                            int   *neval,	     /* Number of function evaluations */
-                            int   report,	     /* How often to report (-1 = no_reporting) */
-                            int   (*report_func)(int loop,
-                                                 double *fitpar, int npar,
-                                                 double fval)) /* The function to be called when reporting */
+                double *y,		     /* Function values at the vertices */
+                int   ndim,		     /* Number of variables */
+                double ftol,	     /* Relative convergence tolerance */
+                double (*func)(double *fitpar,int npar,void *user_data),
+                                         /* The function to be evaluated */
+                void  *user_data,	     /* Data to be passed to the above function in each evaluation */
+                int   max_eval,	     /* Maximum number of function evaluations */
+                int   *neval,	     /* Number of function evaluations */
+                int   report,	     /* How often to report (-1 = no_reporting) */
+                int   (*report_func)(int loop,
+                         double *fitpar, int npar,
+                         double fval)) /* The function to be called when reporting */
 
      /*
       * Minimization with the simplex algorithm
@@ -14510,10 +14519,10 @@ static int simplex_minimize(double **p,		     /* The initial simplex */
     for (i = 0; i < mpts; i++) {
       if (y[i]  <  y[ilo]) ilo = i;
       if (y[i] > y[ihi]) {
-        inhi = ihi;
-        ihi = i;
+    inhi = ihi;
+    ihi = i;
       } else if (y[i] > y[inhi])
-        if (i !=  ihi) inhi = i;
+    if (i !=  ihi) inhi = i;
     }
     rtol = 2.0*fabs(y[ihi]-y[ilo])/(fabs(y[ihi])+fabs(y[ilo]));
     /*
@@ -14521,15 +14530,15 @@ static int simplex_minimize(double **p,		     /* The initial simplex */
      */
     if (count == report && report_func != NULL) {
       if (report_func (loop,p[ilo],ndim,y[ilo])) {
-        printf("Interation interrupted.");
-        result = -1;
-        break;
+        qCritical("Interation interrupted.");
+    result = -1;
+    break;
       }
       count = 0;
     }
     if (rtol < ftol) break;
     if (*neval >=  max_eval) {
-      printf("Maximum number of evaluations exceeded.");
+      qCritical("Maximum number of evaluations exceeded.");
       result  =  -1;
       break;
     }
@@ -14540,21 +14549,21 @@ static int simplex_minimize(double **p,		     /* The initial simplex */
       ysave = y[ihi];
       ytry = tryit(p,y,psum,ndim,func,user_data,ihi,neval,BETA);
       if (ytry >= ysave) {
-        for (i = 0; i < mpts; i++) {
-          if (i !=  ilo) {
-            for (j = 0; j < ndim; j++) {
-              psum[j] = 0.5*(p[i][j]+p[ilo][j]);
-              p[i][j] = psum[j];
-            }
-            y[i] = (*func)(psum,ndim,user_data);
-          }
-        }
-        *neval +=  ndim;
+    for (i = 0; i < mpts; i++) {
+      if (i !=  ilo) {
         for (j = 0; j < ndim; j++) {
-          for (i = 0,sum = 0.0; i < mpts; i++)
-            sum +=  p[i][j];
-          psum[j] = sum;
+          psum[j] = 0.5*(p[i][j]+p[ilo][j]);
+          p[i][j] = psum[j];
         }
+        y[i] = (*func)(psum,ndim,user_data);
+      }
+    }
+    *neval +=  ndim;
+    for (j = 0; j < ndim; j++) {
+      for (i = 0,sum = 0.0; i < mpts; i++)
+        sum +=  p[i][j];
+      psum[j] = sum;
+    }
       }
     }
   }
@@ -14635,12 +14644,12 @@ static int report_fit(int    loop,
       * Report our progress
       */
 {
-#ifdef LOG_FIT
+//#ifdef LOG_FIT
   int k;
   for (k = 0; k < nfit; k++)
     fprintf(stderr,"%g ",mu[k]);
   fprintf(stderr,"%g\n",Smin);
-#endif
+//#endif
   return 0;
 }
 
@@ -14757,7 +14766,6 @@ static double one_step (double *mu, int nfit, void *user_data)
   /*
    * Compute SVD
    */
-  printf("############## DEBUG c_dsvd");
   c_dsvd(u->M,u->nterms-1,u->nfit-1,u->sing,u->uu,NULL);
   /*
    * Compute the residuals
@@ -14847,8 +14855,11 @@ int fwd_eeg_fit_berg_scherg(fwdEegSphereModel m,       /* Conductor model defini
     /*
     mu[k] = (k+1)*0.1*f;
     */
-//    mu[k] = drand48()*f;
+#if defined(_WIN32) || defined(_WIN32_WCE)
     mu[k] = (rand() / (RAND_MAX + 1.0))*f;
+#else
+    mu[k] = drand48()*f;
+#endif
   }
 
   simplex = get_initial_simplex(mu,nfit,simplex_size);
@@ -16405,9 +16416,12 @@ fwdEegSphereModel setup_eeg_sphere_model(char  *eeg_model_file,   /* Contains th
 
   eeg_models = fwd_load_eeg_sphere_models(eeg_model_file,NULL);
   fwd_list_eeg_sphere_models(stderr,eeg_models);
+// ToDo: Up to this point all OK
 
   if ((eeg_model = fwd_select_eeg_sphere_model(eeg_model_name,eeg_models)) == NULL)
     goto bad;
+
+// ToDo: Up to this point all OK
   if (fwd_setup_eeg_sphere_model(eeg_model,eeg_sphere_rad,TRUE,3) == FAIL)
     goto bad;
   printf("Using EEG sphere model \"%s\" with scalp radius %7.1f mm\n",
@@ -21059,6 +21073,7 @@ static char  *mriname     = NULL;		 /* Gives the MRI <-> head transform */
 static char  *guessname   = NULL;		 /* Initial guess grid (if not present, the values below
                           * will be employed to generate the grid) */
 static char  *guess_surfname = NULL;		 /* Load the inner skull surface from this BEM file */
+static float guess_rad     = 0.080;              /* Radius of spherical guess surface */
 static float guess_mindist = 0.010;		 /* Minimum allowed distance to the surface */
 static float guess_exclude = 0.020;		 /* Exclude points closer than this to the origin */
 static float guess_grid    = 0.010;		 /* Grid spacing */
@@ -21782,6 +21797,7 @@ int main(int argc, char *argv[])
         projnames[0] = mne_strdup(measname);
     }
 
+    printf("\n");
 //    mne_print_version_info(stderr,argv[0],PROGRAM_VERSION,__DATE__,__TIME__);
     printf("%s version %s\n",argv[0],PROGRAM_VERSION);//,__DATE__,__TIME__);
 
@@ -21797,6 +21813,10 @@ int main(int argc, char *argv[])
     if (guessname)
         printf("Guesses          : %s\n",guessname);
     else {
+        if (guess_surfname)
+          fprintf(stderr,"Guess space bounded by %s\n",guess_surfname);
+        else
+          fprintf(stderr,"Spherical guess space, rad = %.1f mm\n",1000*guess_rad);
         printf("Guess grid       : %6.1f mm\n",1000*guess_grid);
         if (guess_mindist > 0.0)
             printf("Guess mindist    : %6.1f mm\n",1000*guess_mindist);
