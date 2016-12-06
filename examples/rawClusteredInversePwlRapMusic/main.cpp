@@ -59,6 +59,7 @@
 #include <disp3D/model/data3Dtreemodel.h>
 
 #include <utils/mnemath.h>
+#include <utils/ioutils.h>
 
 #include <iostream>
 
@@ -418,7 +419,8 @@ int main(int argc, char *argv[])
 
     // Calculate the average
     // Option 1 - Random selection
-    VectorXi vecSel(2);
+    VectorXi vecSel(2);    
+    srand (time(NULL)); // initialize random seed
 
     for(qint32 i = 0; i < vecSel.size(); ++i)
     {
@@ -447,7 +449,7 @@ int main(int argc, char *argv[])
     QStringList ch_sel_names = t_Fwd.info.ch_names;
     FiffEvoked pickedEvoked = evoked.pick_channels(ch_sel_names);
 
-
+    IOUtils::write_eigen_matrix(evoked.data, QString("C:/Git/mne-cpp-LorenzE/bin/avr.txt"), "");
 
     //########################################################################################
     // RAP MUSIC Source Estimate

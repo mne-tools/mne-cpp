@@ -139,8 +139,7 @@ int main(int argc, char *argv[])
 
     qint32 numDipolePairs = parser.value(numDipolePairsOption).toInt();
 
-    //bool doMovie = parser.isSet(doMovieOption);
-    bool doMovie = true;
+    bool doMovie = parser.isSet(doMovieOption);
 
     qDebug() << "Start calculation with stc:" << t_sFileNameStc;
 
