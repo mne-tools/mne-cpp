@@ -59,7 +59,6 @@
 #include <disp3D/model/data3Dtreemodel.h>
 
 #include <utils/mnemath.h>
-#include <utils/ioutils.h>
 
 #include <iostream>
 
@@ -449,8 +448,6 @@ int main(int argc, char *argv[])
     QStringList ch_sel_names = t_Fwd.info.ch_names;
     FiffEvoked pickedEvoked = evoked.pick_channels(ch_sel_names);
 
-    IOUtils::write_eigen_matrix(evoked.data, QString("C:/Git/mne-cpp-LorenzE/bin/avr.txt"), "");
-
     //########################################################################################
     // RAP MUSIC Source Estimate
 
@@ -530,9 +527,9 @@ int main(int argc, char *argv[])
     Data3DTreeModel::SPtr p3DDataModel = Data3DTreeModel::SPtr(new Data3DTreeModel());
     testWindow->setModel(p3DDataModel);
 
-    p3DDataModel->addSurfaceSet("Subject01", "HemiLRSet", t_surfSet, t_annotationSet);
+    p3DDataModel->addSurfaceSet(parser.value(subjectOption), "HemiLRSet", t_surfSet, t_annotationSet);
 
-    QList<BrainRTSourceLocDataTreeItem*> rtItemList = p3DDataModel->addSourceData("Subject01", "HemiLRSet", sourceEstimate, t_clusteredFwd);
+    QList<BrainRTSourceLocDataTreeItem*> rtItemList = p3DDataModel->addSourceData(parser.value(subjectOption), "HemiLRSet", sourceEstimate, t_clusteredFwd);
 
     testWindow->show();
 
