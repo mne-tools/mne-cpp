@@ -4,11 +4,13 @@
         <file>model/materials/shaders/gl3/pervertexphongalpha.frag</file>
         <file>model/materials/shaders/gl3/pervertexphongalpha.geom</file>
         <file>model/materials/shaders/gl3/pervertexphongalpha.vert</file>
-        <file>model/materials/shaders/gl3/pervertexphongalpha_old.frag</file>
-        <file>model/materials/shaders/gl3/pervertexphongalpha_old.geom</file>
-        <file>model/materials/shaders/gl3/pervertexphongalpha_old.vert</file>
-        <file>model/materials/shaders/gl3/triangles.tcs</file>
-        <file>model/materials/shaders/gl3/triangles_bezier_interpolation.tes</file>
-        <file>model/materials/shaders/gl3/triangles_simple_interpolation.tes</file>
+        <file>model/materials/shaders/gl3/default.frag</file>
+        <file>model/materials/shaders/gl3/default.geom</file>
+        <file>model/materials/shaders/gl3/default.tcs</file>
+        <file>model/materials/shaders/gl3/default.tes</file>
+        <file>model/materials/shaders/gl3/default.vert</file>
+        <file>model/materials/shaders/gl3/pervertexphongalpha.tcs</file>
+        <file>model/materials/shaders/gl3/pervertexphongalpha_pn_traingles.tes</file>
+        <file>model/materials/shaders/gl3/pervertexphongalpha_simple.tes</file>
     </qresource>
 </RCC>

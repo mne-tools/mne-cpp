@@ -85,6 +85,9 @@ ShaderMaterial::ShaderMaterial(QNode *parent)
 , m_pDiffuseParameter(new QParameter(QStringLiteral("kd"), QColor::fromRgbF(0.7f, 0.7f, 0.7f, 1.0f)))
 , m_pSpecularParameter(new QParameter(QStringLiteral("ks"), QColor::fromRgbF(0.1f, 0.1f, 0.1f, 1.0f)))
 , m_pShininessParameter(new QParameter(QStringLiteral("shininess"), 15.0f))
+, m_pInnerTessParameter(new QParameter(QStringLiteral("innerTess"), 1.0f))
+, m_pOuterTessParameter(new QParameter(QStringLiteral("outerTess"), 1.0f))
+, m_pTriangleScaleParameter(new QParameter(QStringLiteral("triangleScale"), 0.95f))
 , m_pAlphaParameter(new QParameter("alpha", 0.5f))
 , m_pVertexGL3Technique(new QTechnique())
 , m_pVertexGL3RenderPass(new QRenderPass())
@@ -127,20 +130,23 @@ ShaderMaterial::~ShaderMaterial()
 
 void ShaderMaterial::init()
 {
-//    //Old with no tesselation
-//    m_pVertexGL3Shader->setVertexShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl3/pervertexphongalpha_old.vert"))));
-//    m_pVertexGL3Shader->setFragmentShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl3/pervertexphongalpha_old.frag"))));
+    //Old with no tesselation
+    m_pVertexGL3Shader->setVertexShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl3/default.vert"))));
+    m_pVertexGL3Shader->setTessellationControlShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl3/default.tcs"))));
+    m_pVertexGL3Shader->setTessellationEvaluationShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl3/default.tes"))));
+    m_pVertexGL3Shader->setGeometryShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl3/default.geom"))));
+    m_pVertexGL3Shader->setFragmentShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl3/default.frag"))));
 
-    //New with tesselation
-    m_pVertexGL3Shader->setVertexShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl3/pervertexphongalpha.vert"))));
+//    //New with tesselation
+//    m_pVertexGL3Shader->setVertexShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl3/pervertexphongalpha.vert"))));
 
-    m_pVertexGL3Shader->setTessellationControlShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl3/triangles.tcs"))));
-    m_pVertexGL3Shader->setTessellationEvaluationShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl3/triangles_bezier_interpolation.tes"))));
-    //m_pVertexGL3Shader->setTessellationEvaluationShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl3/triangles_simple_interpolation.tes"))));
+//    m_pVertexGL3Shader->setTessellationControlShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl3/triangles.tcs"))));
+//    m_pVertexGL3Shader->setTessellationEvaluationShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl3/pervertexphongalpha_pn_triangles.tes"))));
+//    //m_pVertexGL3Shader->setTessellationEvaluationShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl3/pervertexphongalpha_simple.tes"))));
 
-    m_pVertexGL3Shader->setGeometryShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl3/pervertexphongalpha.geom"))));
+//    m_pVertexGL3Shader->setGeometryShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl3/pervertexphongalpha.geom"))));
 
-    m_pVertexGL3Shader->setFragmentShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl3/pervertexphongalpha.frag"))));
+//    m_pVertexGL3Shader->setFragmentShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl3/pervertexphongalpha.frag"))));
 
     //Set OpenGL version
     m_pVertexGL3Technique->graphicsApiFilter()->setApi(QGraphicsApiFilter::OpenGL);
@@ -172,6 +178,9 @@ void ShaderMaterial::init()
     m_pVertexEffect->addParameter(m_pSpecularParameter);
     m_pVertexEffect->addParameter(m_pShininessParameter);
     m_pVertexEffect->addParameter(m_pAlphaParameter);
+    m_pVertexEffect->addParameter(m_pInnerTessParameter);
+    m_pVertexEffect->addParameter(m_pOuterTessParameter);
+    m_pVertexEffect->addParameter(m_pTriangleScaleParameter);
 
     this->setEffect(m_pVertexEffect);
 }
@@ -192,3 +201,30 @@ void ShaderMaterial::setAlpha(float alpha)
     m_pAlphaParameter->setValue(alpha);
 }
 
+
+//*************************************************************************************************************
+
+void ShaderMaterial::setShader(const QUrl& sShader)
+{
+    QString fileName = sShader.fileName();
+
+    if(fileName.contains(".vert")) {
+        m_pVertexGL3Shader->setVertexShaderCode(QShaderProgram::loadSource(sShader));
+    }
+
+    if(fileName.contains(".tcs")) {
+        m_pVertexGL3Shader->setTessellationControlShaderCode(QShaderProgram::loadSource(sShader));
+    }
+
+    if(fileName.contains(".tes")) {
+        m_pVertexGL3Shader->setTessellationEvaluationShaderCode(QShaderProgram::loadSource(sShader));
+    }
+
+    if(fileName.contains(".geom")) {
+        m_pVertexGL3Shader->setGeometryShaderCode(QShaderProgram::loadSource(sShader));
+    }
+
+    if(fileName.contains(".frag")) {
+        m_pVertexGL3Shader->setFragmentShaderCode(QShaderProgram::loadSource(sShader));
+    }
+}
