@@ -258,10 +258,6 @@ void BrainRTConnectivityDataTreeItem::plotNetwork(QSharedPointer<CONNECTIVITYLIB
 
 //    m_lNodes.clear();
 
-    //Initial transform
-    m_pRenderable3DEntity->setRotX(90);
-    m_pRenderable3DEntity->setRotY(180);
-
     //Create network vertices and normals
     QList<NetworkNode::SPtr> lNetworkNodes = pNetworkData->getNodes();
 
@@ -355,7 +351,7 @@ void BrainRTConnectivityDataTreeItem::plotNetwork(QSharedPointer<CONNECTIVITYLIB
     }
 
     //Generate line primitive based network
-    m_pRenderable3DEntity->setMeshData(tMatVert, tMatNorm, tMatTris, arrayCurvatureColor, Qt3DRender::QGeometryRenderer::Lines);
+    m_pRenderable3DEntity->setMeshData(tMatVert, tMatNorm, tMatTris, arrayCurvatureColor, Qt3DRender::QGeometryRenderer::Patches);
 }
 
 
