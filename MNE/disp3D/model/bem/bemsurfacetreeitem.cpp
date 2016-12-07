@@ -57,6 +57,7 @@
 #include <QColor>
 #include <QStandardItem>
 #include <QStandardItemModel>
+#include <QUrl>
 
 
 //*************************************************************************************************************
@@ -142,6 +143,13 @@ bool BemSurfaceTreeItem::addData(const MNEBemSurface& tBemSurface, Qt3DCore::QEn
 
     //Set renderable 3D entity mesh and color data
     m_pRenderable3DEntity->setMeshData(tBemSurface.rr, tBemSurface.nn, tBemSurface.tris, arrayVertColor, Qt3DRender::QGeometryRenderer::Patches);
+
+    //Set shaders
+    m_pRenderable3DEntity->setShader(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl3/pervertexphongalpha.vert")));
+    m_pRenderable3DEntity->setShader(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl3/pervertexphongalpha.tcs")));
+    m_pRenderable3DEntity->setShader(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl3/pervertexphongalpha_simple.tes")));
+    m_pRenderable3DEntity->setShader(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl3/pervertexphongalpha.geom")));
+    m_pRenderable3DEntity->setShader(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl3/pervertexphongalpha.frag")));
 
     //Find out BEM layer type and change items name
     this->setText(MNEBemSurface::id_name(tBemSurface.id));

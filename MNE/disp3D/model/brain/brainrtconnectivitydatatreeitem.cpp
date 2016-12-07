@@ -64,6 +64,7 @@
 #include <Qt3DExtras/QSphereMesh>
 #include <Qt3DExtras/QPhongMaterial>
 #include <Qt3DCore/QTransform>
+#include <QUrl>
 
 
 //*************************************************************************************************************
@@ -140,6 +141,10 @@ bool BrainRTConnectivityDataTreeItem::init(Qt3DCore::QEntity* parent)
     //Create renderable 3D entity
     m_pParentEntity = parent;
     m_pRenderable3DEntity = new Renderable3DEntity(parent);
+
+    //Set shaders
+    m_pRenderable3DEntity->setShader(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl3/networkEdge.vert")));
+    m_pRenderable3DEntity->setShader(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl3/networkEdge.frag")));
 
     //Add meta information as item children
     QList<QStandardItem*> list;
@@ -351,7 +356,7 @@ void BrainRTConnectivityDataTreeItem::plotNetwork(QSharedPointer<CONNECTIVITYLIB
     }
 
     //Generate line primitive based network
-    m_pRenderable3DEntity->setMeshData(tMatVert, tMatNorm, tMatTris, arrayCurvatureColor, Qt3DRender::QGeometryRenderer::Patches);
+    m_pRenderable3DEntity->setMeshData(tMatVert, tMatNorm, tMatTris, arrayCurvatureColor, Qt3DRender::QGeometryRenderer::Lines);
 }
 
 
