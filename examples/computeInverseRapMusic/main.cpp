@@ -167,13 +167,24 @@ int main(int argc, char *argv[])
 //    std::cout << "Size " << t_clusteredFwd.sol->data.rows() << " x " << t_clusteredFwd.sol->data.cols() << std::endl;
 //    std::cout << "Clustered Fwd:\n" << t_clusteredFwd.sol->data.row(0) << std::endl;
 
-
     RapMusic t_rapMusic(t_clusteredFwd, false, numDipolePairs);
 
-    if(doMovie)
-        t_rapMusic.setStcAttr(100,0.6);
+    int iWinSize = 200;
+    if(doMovie) {
+        t_rapMusic.setStcAttr(iWinSize,0.6);
+    }
 
     MNESourceEstimate sourceEstimate = t_rapMusic.calculateInverse(pickedEvoked);
+
+    //Select only the activations once
+    MatrixXd dataPicked(sourceEstimate.data.rows(), int(std::floor(sourceEstimate.data.cols()/iWinSize)));
+
+    for(int i = 0; i < dataPicked.cols(); ++i) {
+        dataPicked.col(i) = sourceEstimate.data.col(i*iWinSize);
+    }
+
+    sourceEstimate.data = dataPicked;
+
     if(sourceEstimate.isEmpty())
         return 1;
 
@@ -193,7 +204,7 @@ int main(int argc, char *argv[])
         rtItemList.at(i)->setTimeInterval(17);
         rtItemList.at(i)->setNumberAverages(1);
         rtItemList.at(i)->setStreamingActive(true);
-        rtItemList.at(i)->setNormalization(QVector3D(0.0,5.5,10));
+        rtItemList.at(i)->setNormalization(QVector3D(0.01,0.5,1.0));
         rtItemList.at(i)->setVisualizationType("Annotation based");
         rtItemList.at(i)->setColortable("Hot");
     }

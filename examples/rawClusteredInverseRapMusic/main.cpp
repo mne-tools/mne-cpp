@@ -60,6 +60,7 @@
 #include <disp3D/model/brain/brainrtsourcelocdatatreeitem.h>
 
 #include <utils/mnemath.h>
+#include <utils/ioutils.h>
 
 #include <iostream>
 
@@ -113,15 +114,23 @@ int main(int argc, char *argv[])
 //    QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", "F:/MIND/MEG/mind006/raw/mind006_060627_auditory02_raw.fif");
 //    QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", "F:/MIND/MEG/mind006/raw/mind006_060627_auditory02_raw-eve.fif");
 //    QCommandLineOption fwdOption("fwd", "Path to forwad solution <file>.", "file", "F:/MIND/MEG/mind006/fwd/mind006_060626_auditory01-ave-oct-5-fwd.fif");
+//    QCommandLineOption subjectOption("subject", "Selected subject <subject>.", "subject", "Mind06");
+//    QCommandLineOption subjectPathOption("subjectPath", "Selected subject path <subjectPath>.", "subjectPath", "F:/Reconstructed");
 
-    QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", "F:/MIND/MEG/mind006/raw/mind006_060626_auditory01_raw.fif");
-    QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", "F:/MIND/MEG/mind006/raw/mind006_060626_auditory01_raw-eve.fif");
-    QCommandLineOption fwdOption("fwd", "Path to forwad solution <file>.", "file", "F:/MIND/MEG/mind006/fwd/mind006_060626_auditory01-ave-oct-5-fwd.fif");
+    QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", "D:/SoersStation/Dokumente/Karriere/Publikationen/2015_12_RTC_MUSIC/Lolo_vergesslich/mind006_060626_auditory01_raw.fif");
+    QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", "D:/SoersStation/Dokumente/Karriere/Publikationen/2015_12_RTC_MUSIC/Lolo_vergesslich/mind006_060626_auditory01_raw-eve.fif");
+    QCommandLineOption fwdOption("fwd", "Path to forwad solution <file>.", "file", "D:/SoersStation/Dokumente/Karriere/Publikationen/2015_12_RTC_MUSIC/Lolo_vergesslich/mind006_060626_auditory01-ave-oct-5-fwd.fif");
+    QCommandLineOption subjectOption("subject", "Selected subject <subject>.", "subject", "Mind06");
+    QCommandLineOption subjectPathOption("subjectPath", "Selected subject path <subjectPath>.", "subjectPath", "D:/SoersStation/Dokumente/Karriere/Publikationen/2015_12_RTC_MUSIC/Reconstructed");
+
+//    QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", "./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
+//    QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif");
+//    QCommandLineOption fwdOption("fwd", "Path to forwad solution <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
+//    QCommandLineOption subjectOption("subject", "Selected subject <subject>.", "subject", "sample");
+//    QCommandLineOption subjectPathOption("subjectPath", "Selected subject path <subjectPath>.", "subjectPath", "./MNE-sample-data/subjects");
 
     QCommandLineOption surfOption("surfType", "Surface type <type>.", "type", "orig");
     QCommandLineOption annotOption("annotType", "Annotation type <type>.", "type", "aparc.a2009s");
-    QCommandLineOption subjectOption("subject", "Selected subject <subject>.", "subject", "Mind06");
-    QCommandLineOption subjectPathOption("subjectPath", "Selected subject path <subjectPath>.", "subjectPath", "F:/Reconstructed");
     QCommandLineOption stcFileOption("stcOut", "Path to stc <file>, which is to be written.", "file", "");
     QCommandLineOption numDipolePairsOption("numDip", "<number> of dipole pairs to localize.", "number", "5");
     QCommandLineOption evokedIdxOption("aveIdx", "The average <index> to choose from the average file.", "index", "1");
@@ -167,8 +176,7 @@ int main(int argc, char *argv[])
 
     qint32 k, p;
 
-    //bool doMovie = parser.isSet(doMovieOption);
-    bool doMovie = true;
+    bool doMovie = parser.isSet(doMovieOption);
 
     //
     // Load data
@@ -459,6 +467,8 @@ int main(int argc, char *argv[])
 
     FiffEvoked evoked = data.average(raw.info, tmin*raw.info.sfreq, floor(tmax*raw.info.sfreq + 0.5), vecSel);
 
+    IOUtils::write_eigen_matrix(evoked.data, QString("C:/Git/mne-cpp-LorenzE/bin/avr.txt"));
+
     QStringList ch_sel_names = t_Fwd.info.ch_names;
     FiffEvoked pickedEvoked = evoked.pick_channels(ch_sel_names);
 
@@ -476,21 +486,23 @@ int main(int argc, char *argv[])
     RapMusic t_rapMusic(t_clusteredFwd, false, numDipolePairs);
 
     int iWinSize = 200;
-    if(doMovie)
+    if(doMovie) {
         t_rapMusic.setStcAttr(iWinSize, 0.6);
+    }
 
     MNESourceEstimate sourceEstimate = t_rapMusic.calculateInverse(pickedEvoked);
 
     if(sourceEstimate.isEmpty())
         return 1;
 
-    // View activation time-series
-    std::cout << "\nsourceEstimate:\n" << sourceEstimate.data.block(0,0,10,10) << std::endl;
-    std::cout << "time\n" << sourceEstimate.times.block(0,0,1,10) << std::endl;
-    std::cout << "timeMin\n" << sourceEstimate.times[0] << std::endl;
-    std::cout << "timeMax\n" << sourceEstimate.times[sourceEstimate.times.size()-1] << std::endl;
-    std::cout << "time step\n" << sourceEstimate.tstep << std::endl;
+//    // View activation time-series
+//    std::cout << "\nsourceEstimate:\n" << sourceEstimate.data.block(0,0,10,10) << std::endl;
+//    std::cout << "time\n" << sourceEstimate.times.block(0,0,1,10) << std::endl;
+//    std::cout << "timeMin\n" << sourceEstimate.times[0] << std::endl;
+//    std::cout << "timeMax\n" << sourceEstimate.times[sourceEstimate.times.size()-1] << std::endl;
+//    std::cout << "time step\n" << sourceEstimate.tstep << std::endl;
 
+    //Select only the activations once
     MatrixXd dataPicked(sourceEstimate.data.rows(), int(std::floor(sourceEstimate.data.cols()/iWinSize)));
 
     for(int i = 0; i < dataPicked.cols(); ++i) {
@@ -519,10 +531,10 @@ int main(int argc, char *argv[])
     Data3DTreeModel::SPtr p3DDataModel = Data3DTreeModel::SPtr(new Data3DTreeModel());
     testWindow->setModel(p3DDataModel);
 
-    p3DDataModel->addSurfaceSet("Subject01", "HemiLRSet", t_surfSet, t_annotationSet);
+    p3DDataModel->addSurfaceSet(parser.value(subjectOption), "HemiLRSet", t_surfSet, t_annotationSet);
 
     //Add rt source loc data
-    QList<BrainRTSourceLocDataTreeItem*> rtItemList = p3DDataModel->addSourceData("Subject01", "HemiLRSet", sourceEstimate, t_clusteredFwd);
+    QList<BrainRTSourceLocDataTreeItem*> rtItemList = p3DDataModel->addSourceData(parser.value(subjectOption), "HemiLRSet", sourceEstimate, t_clusteredFwd);
 
     //Init some rt related values for right visual data
     for(int i = 0; i < rtItemList.size(); ++i) {
