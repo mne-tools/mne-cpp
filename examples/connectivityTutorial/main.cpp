@@ -120,7 +120,6 @@ int main(int argc, char *argv[])
     QCommandLineOption hemiOption("hemi", "Selected hemisphere <hemi>.", "hemi", "2");
     QCommandLineOption subjectOption("subj", "Selected subject <subject>.", "subject", "sample");
     QCommandLineOption subjectPathOption("subjDir", "Selected subject path <subjectPath>.", "subjectPath", "./MNE-sample-data/subjects");
-    QCommandLineOption sourceLocOption("doSourceLoc", "Do real time source localization <doSourceLoc>.", "doSourceLoc", "true");
     QCommandLineOption fwdOption("fwd", "Path to forwad solution <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
     QCommandLineOption invOpOption("inv", "Path to inverse operator <file>, which is to be written.", "file", "");
     QCommandLineOption clustOption("doClust", "Path to clustered inverse operator <doClust>.", "doClust", "true");
@@ -135,7 +134,6 @@ int main(int argc, char *argv[])
     parser.addOption(hemiOption);
     parser.addOption(subjectOption);
     parser.addOption(subjectPathOption);
-    parser.addOption(sourceLocOption);
     parser.addOption(fwdOption);
     parser.addOption(invOpOption);
     parser.addOption(clustOption);
@@ -146,7 +144,6 @@ int main(int argc, char *argv[])
     parser.addOption(evokedIndexOption);
     parser.process(a);
 
-    bool bAddRtSourceLoc = parser.value(sourceLocOption) == "false" ? false : true;
     bool bDoClustering = parser.value(clustOption) == "false" ? false : true;
 
     //Inits
@@ -173,65 +170,63 @@ int main(int argc, char *argv[])
     MNESourceEstimate sourceEstimate;
     FiffEvoked evoked(t_fileEvoked, parser.value(evokedIndexOption).toInt(), baseline);
 
-    if(bAddRtSourceLoc) {
-        double snr = parser.value(snrOption).toDouble();
-        double lambda2 = 1.0 / pow(snr, 2);
-        QString method(parser.value(methodOption));
+    double snr = parser.value(snrOption).toDouble();
+    double lambda2 = 1.0 / pow(snr, 2);
+    QString method(parser.value(methodOption));
 
-        t_fileEvoked.close();
+    t_fileEvoked.close();
 
-        if(evoked.isEmpty())
-            return 1;
+    if(evoked.isEmpty())
+        return 1;
 
-        std::cout << std::endl;
-        std::cout << "Evoked description: " << evoked.comment.toLatin1().constData() << std::endl;
+    std::cout << std::endl;
+    std::cout << "Evoked description: " << evoked.comment.toLatin1().constData() << std::endl;
 
-        if(t_Fwd.isEmpty())
-            return 1;
+    if(t_Fwd.isEmpty())
+        return 1;
 
-        FiffCov noise_cov(t_fileCov);
+    FiffCov noise_cov(t_fileCov);
 
-        // regularize noise covariance
-        noise_cov = noise_cov.regularize(evoked.info, 0.05, 0.05, 0.1, true);
+    // regularize noise covariance
+    noise_cov = noise_cov.regularize(evoked.info, 0.05, 0.05, 0.1, true);
 
-        //
-        // Cluster forward solution;
-        //
-        if(bDoClustering) {
-            t_clusteredFwd = t_Fwd.cluster_forward_solution(tAnnotSet, 40);
-        } else {
-            t_clusteredFwd = t_Fwd;
-        }
-
-        //
-        // make an inverse operators
-        //
-        FiffInfo info = evoked.info;
-
-        MNEInverseOperator inverse_operator(info, t_clusteredFwd, noise_cov, 0.2f, 0.8f);
-
-        if(!t_sFileClusteredInverse.isEmpty())
-        {
-            QFile t_fileClusteredInverse(t_sFileClusteredInverse);
-            inverse_operator.write(t_fileClusteredInverse);
-        }
-
-        //
-        // Compute inverse solution
-        //
-        MinimumNorm minimumNorm(inverse_operator, lambda2, method);
-        sourceEstimate = minimumNorm.calculateInverse(evoked);
-
-        if(sourceEstimate.isEmpty())
-            return 1;
-
-        // View activation time-series
-        std::cout << "\nsourceEstimate:\n" << sourceEstimate.data.block(0,0,10,10) << std::endl;
-        std::cout << "time\n" << sourceEstimate.times.block(0,0,1,10) << std::endl;
-        std::cout << "timeMin\n" << sourceEstimate.times[0] << std::endl;
-        std::cout << "timeMax\n" << sourceEstimate.times[sourceEstimate.times.size()-1] << std::endl;
-        std::cout << "time step\n" << sourceEstimate.tstep << std::endl;
+    //
+    // Cluster forward solution;
+    //
+    if(bDoClustering) {
+        t_clusteredFwd = t_Fwd.cluster_forward_solution(tAnnotSet, 40);
+    } else {
+        t_clusteredFwd = t_Fwd;
     }
+
+    //
+    // make an inverse operators
+    //
+    FiffInfo info = evoked.info;
+
+    MNEInverseOperator inverse_operator(info, t_clusteredFwd, noise_cov, 0.2f, 0.8f);
+
+    if(!t_sFileClusteredInverse.isEmpty())
+    {
+        QFile t_fileClusteredInverse(t_sFileClusteredInverse);
+        inverse_operator.write(t_fileClusteredInverse);
+    }
+
+    //
+    // Compute inverse solution
+    //
+    MinimumNorm minimumNorm(inverse_operator, lambda2, method);
+    sourceEstimate = minimumNorm.calculateInverse(evoked);
+
+    if(sourceEstimate.isEmpty())
+        return 1;
+
+    // View activation time-series
+    std::cout << "\nsourceEstimate:\n" << sourceEstimate.data.block(0,0,10,10) << std::endl;
+    std::cout << "time\n" << sourceEstimate.times.block(0,0,1,10) << std::endl;
+    std::cout << "timeMin\n" << sourceEstimate.times[0] << std::endl;
+    std::cout << "timeMax\n" << sourceEstimate.times[sourceEstimate.times.size()-1] << std::endl;
+    std::cout << "time step\n" << sourceEstimate.tstep << std::endl;
 
     //########################################################################################
     //
