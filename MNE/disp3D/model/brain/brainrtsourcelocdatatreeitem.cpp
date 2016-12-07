@@ -57,6 +57,7 @@
 #include <QColor>
 #include <QStandardItem>
 #include <QStandardItemModel>
+#include <Qt3DRender/qshaderprogram.h>
 
 
 //*************************************************************************************************************

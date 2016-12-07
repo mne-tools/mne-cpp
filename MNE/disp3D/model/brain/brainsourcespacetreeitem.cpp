@@ -64,6 +64,7 @@
 #include <Qt3DExtras/QSphereMesh>
 #include <Qt3DExtras/QPhongMaterial>
 #include <Qt3DCore/QTransform>
+#include <QUrl>
 
 
 //*************************************************************************************************************
@@ -196,6 +197,13 @@ bool BrainSourceSpaceTreeItem::addData(const MNEHemisphere& tHemisphere, Qt3DCor
 
     //Set renderable 3D entity mesh and color data
     m_pRenderable3DEntity->setMeshData(tHemisphere.rr, tHemisphere.nn, tHemisphere.tris, arrayVertColor, Qt3DRender::QGeometryRenderer::Patches);
+
+    //Set shaders
+    m_pRenderable3DEntity->setShader(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl3/pervertexphongalpha.vert")));
+    m_pRenderable3DEntity->setShader(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl3/pervertexphongalpha.tcs")));
+    m_pRenderable3DEntity->setShader(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl3/pervertexphongalpha_simple.tes")));
+    m_pRenderable3DEntity->setShader(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl3/pervertexphongalpha.geom")));
+    m_pRenderable3DEntity->setShader(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl3/pervertexphongalpha.frag")));
 
     //Add data which is held by this BrainSourceSpaceTreeItem
     QVariant data;
