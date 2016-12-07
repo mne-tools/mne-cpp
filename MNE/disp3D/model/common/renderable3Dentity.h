@@ -92,6 +92,8 @@ namespace DISP3DLIB
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+class ShaderMaterial;
+
 
 //=============================================================================================================
 /**
@@ -178,7 +180,7 @@ public:
     *
     * @return If successful returns true, false otherwise.
     */
-    bool setMaterial(QSharedPointer<Qt3DRender::QMaterial> pMaterial);
+    bool setMaterial(QSharedPointer<ShaderMaterial> pMaterial);
 
     //=========================================================================================================
     /**
@@ -189,6 +191,16 @@ public:
     * @return If successful returns true, false otherwise.
     */
     bool setAlpha(float fAlpha);
+
+    //=========================================================================================================
+    /**
+    * Sets the entity's material sahder. This is a convenient function.
+    *
+    * @param[in] sShader     The new shader. Must be present in the qrc resource file.
+    *
+    * @return If successful returns true, false otherwise.
+    */
+    bool setShader(const QUrl &sShader);
 
     //=========================================================================================================
     /**
@@ -257,7 +269,7 @@ public:
 protected: 
     QPointer<CustomMesh>                        m_pCustomMesh;           /**< The actual mesh information (vertices, normals, colors). */
     QPointer<Qt3DCore::QTransform>              m_pTransform;            /**< The main transformation. */
-    QPointer<Qt3DRender::QMaterial>             m_pMaterial;             /**< The material to be used for this entity. */
+    QPointer<ShaderMaterial>                    m_pMaterial;             /**< The material to be used for this entity. */
 
     float                                       m_fRotX;                 /**< The x axis rotation value. */
     float                                       m_fRotY;                 /**< The y axis rotation value. */

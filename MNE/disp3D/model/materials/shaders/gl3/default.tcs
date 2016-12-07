@@ -1,0 +1,29 @@
+#version 400 core
+
+uniform float innerTess;
+uniform float outerTess;
+
+layout( vertices = 3 ) out;
+
+in vec4 vPosition[];
+in vec3 vColor[];
+in vec3 vNormal[];
+
+out vec4 tcPosition[];
+out vec3 tcColor[];
+out vec3 tcNormal[];
+
+void main()
+{
+	// Pass along the vertex position, normal and color unmodified
+    tcPosition[gl_InvocationID] = vPosition[gl_InvocationID];	
+    tcColor[gl_InvocationID] = vColor[gl_InvocationID];
+	tcNormal[gl_InvocationID] = vNormal[gl_InvocationID];
+
+    // Set the tessellation levels from the uniforms
+	gl_TessLevelOuter[0] = outerTess;	
+    gl_TessLevelOuter[1] = outerTess;
+    gl_TessLevelOuter[2] = outerTess;
+	
+	gl_TessLevelInner[0] = innerTess;	
+}

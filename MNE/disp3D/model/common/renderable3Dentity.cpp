@@ -91,8 +91,6 @@ Renderable3DEntity::Renderable3DEntity(Qt3DCore::QEntity* parent)
 , m_pCustomMesh(new CustomMesh())
 , m_pTransform(new Qt3DCore::QTransform())
 , m_pMaterial(new ShaderMaterial())
-//, m_pMaterial(new Qt3DExtras::QPerVertexColorMaterial)
-//, m_pMaterial(new Qt3DExtras::QPhongMaterial(this))
 , m_fAlpha(1.0f)
 , m_fRotX(0.0f)
 , m_fRotY(0.0f)
@@ -111,8 +109,6 @@ Renderable3DEntity::Renderable3DEntity(const MatrixX3f& tMatVert, const MatrixX3
 , m_pCustomMesh(new CustomMesh(tMatVert, tMatNorm, tMatTris))
 , m_pTransform(new Qt3DCore::QTransform())
 , m_pMaterial(new ShaderMaterial())
-//, m_pMaterial(new Qt3DExtras::QPerVertexColorMaterial)
-//, m_pMaterial(new Qt3DExtras::QPhongMaterial(this))
 , m_fAlpha(1.0f)
 , m_fRotX(0.0f)
 , m_fRotY(0.0f)
@@ -147,7 +143,9 @@ bool Renderable3DEntity::setMeshData(const MatrixX3f& tMatVert,
                                      const QByteArray& tArrayColors,
                                      Qt3DRender::QGeometryRenderer::PrimitiveType primitiveType)
 {
-    return m_pCustomMesh->setMeshData(tMatVert, tMatNorm, tMatTris, tArrayColors, primitiveType);
+    if(!m_pCustomMesh.isNull()) {
+        return m_pCustomMesh->setMeshData(tMatVert, tMatNorm, tMatTris, tArrayColors, primitiveType);
+    }
 }
 
 
@@ -155,7 +153,9 @@ bool Renderable3DEntity::setMeshData(const MatrixX3f& tMatVert,
 
 bool Renderable3DEntity::setTransform(QSharedPointer<Qt3DCore::QTransform> pTransform)
 {
-    m_pTransform = pTransform.data();
+    if(!m_pTransform.isNull()) {
+        m_pTransform = pTransform.data();
+    }
 
     return true;
 }
@@ -163,9 +163,11 @@ bool Renderable3DEntity::setTransform(QSharedPointer<Qt3DCore::QTransform> pTran
 
 //*************************************************************************************************************
 
-bool Renderable3DEntity::setMaterial(QSharedPointer<Qt3DRender::QMaterial> pMaterial)
+bool Renderable3DEntity::setMaterial(QSharedPointer<ShaderMaterial> pMaterial)
 {
-    m_pMaterial = pMaterial.data();
+    if(!pMaterial.isNull()) {
+        m_pMaterial = pMaterial.data();
+    }
 
     return true;
 }
@@ -185,6 +187,20 @@ bool Renderable3DEntity::setAlpha(float fAlpha)
     }
 
     qWarning() << "Renderable3DEntity::setAlpha - Could not set alpha value to material, since it does not support it (use i.e ShaderMaterial).";
+
+    return false;
+}
+
+
+//*************************************************************************************************************
+
+bool Renderable3DEntity::setShader(const QUrl& sShader)
+{
+    if(!m_pMaterial.isNull()) {
+        m_pMaterial->setShader(sShader);
+
+        return true;
+    }
 
     return false;
 }

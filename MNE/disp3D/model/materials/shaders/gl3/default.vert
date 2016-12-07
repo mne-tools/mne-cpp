@@ -2,6 +2,8 @@
 
 uniform mat4 modelMatrix;
 uniform mat4 viewMatrix;
+uniform mat4 modelViewNormal;
+uniform mat4 modelNormalMatrix;
 
 in vec3 vertexPosition;
 in vec3 vertexColor;
