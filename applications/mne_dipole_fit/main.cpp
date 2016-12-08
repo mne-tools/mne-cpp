@@ -14847,11 +14847,7 @@ int fwd_eeg_fit_berg_scherg(fwdEegSphereModel m,       /* Conductor model defini
     /*
     mu[k] = (k+1)*0.1*f;
     */
-#if defined(_WIN32) || defined(_WIN32_WCE)
-    mu[k] = (rand() / (RAND_MAX + 1.0))*f;
-#else
-    mu[k] = drand48()*f;
-#endif
+    mu[k] = (rand() / (RAND_MAX + 1.0))*f;//replacement for: mu[k] = drand48()*f;
   }
 
   simplex = get_initial_simplex(mu,nfit,simplex_size);
