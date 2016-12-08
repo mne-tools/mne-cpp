@@ -136,7 +136,7 @@ bool CustomMesh::setVertColor(const QByteArray& tArrayColors)
 
 bool CustomMesh::setMeshData(const MatrixX3f& tMatVert,
                              const MatrixX3f& tMatNorm,
-                             const MatrixX3i& tMatTris,
+                             const MatrixXi& tMatTris,
                              const QByteArray& tArrayColors,
                              Qt3DRender::QGeometryRenderer::PrimitiveType primitiveType)
 {
@@ -149,7 +149,7 @@ bool CustomMesh::setMeshData(const MatrixX3f& tMatVert,
 
 bool CustomMesh::createCustomMesh(const MatrixX3f& tMatVert,
                                   const MatrixX3f& tMatNorm,
-                                  const MatrixX3i& tMatTris,
+                                  const MatrixXi& tMatTris,
                                   const QByteArray& tArrayColors,
                                   Qt3DRender::QGeometryRenderer::PrimitiveType primitiveType)
 {
@@ -180,7 +180,7 @@ bool CustomMesh::createCustomMesh(const MatrixX3f& tMatVert,
     normalBufferData.resize(tMatVert.rows() * 3 * (int)sizeof(float));
     float *rawNormalArray = reinterpret_cast<float *>(normalBufferData.data());
 
-    QByteArray colorBufferData;
+    QByteArray colorBufferData = tArrayColors;
     colorBufferData.resize(tMatVert.rows() * 3 * (int)sizeof(float));
     float *rawColorArray = reinterpret_cast<float *>(colorBufferData.data());
 
@@ -207,27 +207,20 @@ bool CustomMesh::createCustomMesh(const MatrixX3f& tMatVert,
             rawColorArray[idxColor++] = 1.0f;
             rawColorArray[idxColor++] = 1.0f;
             rawColorArray[idxColor++] = 1.0f;
-        } else {
-            rawColorArray[idxColor] = tArrayColors[idxColor];
-            idxColor++;
-            rawColorArray[idxColor] = tArrayColors[idxColor];
-            idxColor++;
-            rawColorArray[idxColor] = tArrayColors[idxColor];
-            idxColor++;
         }
     }
 
-    //Fill indexBufferData with data which holds the triangulation information (faces/tris)
+    //Fill indexBufferData with data which holds the triangulation information (patches/tris/lines)
     QByteArray indexBufferData;
-    indexBufferData.resize(tMatTris.rows() * 3 * (int)sizeof(uint));
+    indexBufferData.resize(tMatTris.rows() * tMatTris.cols() * (int)sizeof(uint));
     uint *rawIndexArray = reinterpret_cast<uint *>(indexBufferData.data());
     int idxTris = 0;
 
     for(int i = 0; i < tMatTris.rows(); ++i) {
-        //Faces/Tris
-        rawIndexArray[idxTris++] = tMatTris(i,0);
-        rawIndexArray[idxTris++] = tMatTris(i,1);
-        rawIndexArray[idxTris++] = tMatTris(i,2);
+        //patches/tris/lines
+        for(int f = 0; f < tMatTris.cols(); ++f) {
+            rawIndexArray[idxTris++] = tMatTris(i,f);
+        }
     }
 
     //Set data to buffers
@@ -275,9 +268,9 @@ bool CustomMesh::createCustomMesh(const MatrixX3f& tMatVert,
     indexAttribute->setBuffer(m_pIndexDataBuffer);
     //indexAttribute->setBuffer(m_pIndexDataBuffer.data());
     indexAttribute->setDataType(Qt3DRender::QAttribute::UnsignedInt);
-    indexAttribute->setDataSize(1);
+    indexAttribute->setDataSize(tMatTris.cols());
     indexAttribute->setByteOffset(0);
-    indexAttribute->setByteStride(0);
+    indexAttribute->setByteStride(tMatTris.cols() * sizeof(uint));
     indexAttribute->setCount(tMatTris.rows());
 
     customGeometry->addAttribute(positionAttribute);
@@ -287,9 +280,8 @@ bool CustomMesh::createCustomMesh(const MatrixX3f& tMatVert,
 
     //Set the final geometry and primitive type
     this->setPrimitiveType(primitiveType);
-    this->setVerticesPerPatch(3);
+    this->setVerticesPerPatch(tMatTris.cols());
     this->setGeometry(customGeometry);
-
 
 //    this->setInstanceCount(1);
 //    this->setIndexOffset(0);

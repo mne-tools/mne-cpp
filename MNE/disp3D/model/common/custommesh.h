@@ -152,7 +152,7 @@ public:
     */
     bool setMeshData(const Eigen::MatrixX3f& tMatVert,
                      const Eigen::MatrixX3f& tMatNorm,
-                     const Eigen::MatrixX3i& tMatTris,
+                     const Eigen::MatrixXi &tMatTris,
                      const QByteArray &tArrayColors = QByteArray(),
                      Qt3DRender::QGeometryRenderer::PrimitiveType primitiveType = Qt3DRender::QGeometryRenderer::Triangles);
 
@@ -172,7 +172,7 @@ protected:
     */
     bool createCustomMesh(const Eigen::MatrixX3f& tMatVert,
                           const Eigen::MatrixX3f& tMatNorm,
-                          const Eigen::MatrixX3i& tMatTris,
+                          const Eigen::MatrixXi &tMatTris,
                           const QByteArray& tArrayColors,
                           Qt3DRender::QGeometryRenderer::PrimitiveType primitiveType);
 

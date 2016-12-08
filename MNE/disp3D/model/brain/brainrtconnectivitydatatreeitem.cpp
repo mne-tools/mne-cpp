@@ -112,6 +112,10 @@ BrainRTConnectivityDataTreeItem::~BrainRTConnectivityDataTreeItem()
 {
     //Schedule deletion/Decouple of all entities so that the SceneGraph is NOT plotting them anymore.
     //Cannot delete m_pParentEntity since we do not know who else holds it, that is why we use a QPointer for m_pParentEntity.
+    for(int i = 0; i < m_lNodes.size(); ++i) {
+        m_lNodes.at(i)->deleteLater();
+    }
+
     if(!m_pRenderable3DEntity.isNull()) {
         m_pRenderable3DEntity->deleteLater();
     }
@@ -254,7 +258,7 @@ void BrainRTConnectivityDataTreeItem::plotNetwork(QSharedPointer<CONNECTIVITYLIB
 //    qDebug() << "Deleted children from qt3d entity:" << counter;
 
 //    //Delete all nodes
-//    QMutableListIterator<Renderable3DEntity*> i(m_lNodes);
+//    QMutableListIterator<QPointer<Renderable3DEntity> > i(m_lNodes);
 
 //    while(i.hasNext()) {
 //        delete i.next();
@@ -289,9 +293,6 @@ void BrainRTConnectivityDataTreeItem::plotNetwork(QSharedPointer<CONNECTIVITYLIB
 
             Renderable3DEntity* sourceSphereEntity = new Renderable3DEntity(m_pRenderable3DEntity);
 
-            sourceSphereEntity->setRotX(90);
-            sourceSphereEntity->setRotY(180);
-
             Qt3DExtras::QSphereMesh* sourceSphere = new Qt3DExtras::QSphereMesh();
             sourceSphere->setRadius(0.001f);
             sourceSphereEntity->addComponent(sourceSphere);
@@ -313,17 +314,16 @@ void BrainRTConnectivityDataTreeItem::plotNetwork(QSharedPointer<CONNECTIVITYLIB
     }
 
     //Generate connection indices for Qt3D buffer
-    MatrixX3i tMatTris;
+    MatrixXi tMatLines;
     int count = 0;
 
     for(int i = 0; i < lNetworkNodes.size(); ++i) {
         //Plot in edges
         for(int j = 0; j < lNetworkNodes.at(i)->getEdgesIn().size(); ++j) {
             if(lNetworkNodes.at(i)->getEdgesIn().at(j)->getWeight() >= vecThreshold.x()) {
-                tMatTris.conservativeResize(count+1,3);
-                tMatTris(count,0) = lNetworkNodes.at(i)->getEdgesIn().at(j)->getStartNode()->getId();
-                tMatTris(count,1) = lNetworkNodes.at(i)->getEdgesIn().at(j)->getEndNode()->getId();
-                tMatTris(count,2) = lNetworkNodes.at(i)->getEdgesIn().at(j)->getStartNode()->getId();
+                tMatLines.conservativeResize(count+1,2);
+                tMatLines(count,0) = lNetworkNodes.at(i)->getEdgesIn().at(j)->getStartNode()->getId();
+                tMatLines(count,1) = lNetworkNodes.at(i)->getEdgesIn().at(j)->getEndNode()->getId();
                 ++count;
             }
         }
@@ -331,32 +331,31 @@ void BrainRTConnectivityDataTreeItem::plotNetwork(QSharedPointer<CONNECTIVITYLIB
         //Plot out edges
         for(int j = 0; j < lNetworkNodes.at(i)->getEdgesOut().size(); ++j) {
             if(lNetworkNodes.at(i)->getEdgesOut().at(j)->getWeight() >= vecThreshold.x()) {
-                tMatTris.conservativeResize(count+1,3);
-                tMatTris(count,0) = lNetworkNodes.at(i)->getEdgesOut().at(j)->getStartNode()->getId();
-                tMatTris(count,1) = lNetworkNodes.at(i)->getEdgesOut().at(j)->getEndNode()->getId();
-                tMatTris(count,2) = lNetworkNodes.at(i)->getEdgesOut().at(j)->getStartNode()->getId();
+                tMatLines.conservativeResize(count+1,2);
+                tMatLines(count,0) = lNetworkNodes.at(i)->getEdgesOut().at(j)->getStartNode()->getId();
+                tMatLines(count,1) = lNetworkNodes.at(i)->getEdgesOut().at(j)->getEndNode()->getId();
                 ++count;
             }
         }
     }
 
     //Generate connection indices and colors for Qt3D buffer
-    QByteArray arrayCurvatureColor;
-    arrayCurvatureColor.resize(pNetworkData->getNodes().size() * 3 * (int)sizeof(float));
-    float *rawColorArray = reinterpret_cast<float *>(arrayCurvatureColor.data());
+    QByteArray arrayLineColor;
+    arrayLineColor.resize(tMatVert.rows() * 3 * (int)sizeof(float));
+    float *rawColorArray = reinterpret_cast<float *>(arrayLineColor.data());
     int idxColor = 0;
 
-    for(int i = 0; i < pNetworkData->getNodes().size(); ++i) {
-        rawColorArray[idxColor] = 0;
+    for(int i = 0; i < tMatVert.rows(); ++i) {
+        rawColorArray[idxColor] = 0.0f;
         idxColor++;
-        rawColorArray[idxColor] = 0;
+        rawColorArray[idxColor] = 0.0f;
         idxColor++;
-        rawColorArray[idxColor] = 1;
+        rawColorArray[idxColor] = 1.0f;
         idxColor++;
     }
 
     //Generate line primitive based network
-    m_pRenderable3DEntity->setMeshData(tMatVert, tMatNorm, tMatTris, arrayCurvatureColor, Qt3DRender::QGeometryRenderer::Lines);
+    m_pRenderable3DEntity->setMeshData(tMatVert, tMatNorm, tMatLines, arrayLineColor, Qt3DRender::QGeometryRenderer::Lines);
 }
 
 
