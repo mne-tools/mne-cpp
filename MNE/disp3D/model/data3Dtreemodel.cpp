@@ -384,9 +384,9 @@ QList<BrainRTSourceLocDataTreeItem*> Data3DTreeModel::addSourceData(const QStrin
 
 //*************************************************************************************************************
 
-QList<BrainRTConnectivityDataTreeItem*> Data3DTreeModel::addConnectivityData(const QString& subject, const QString& set, Network::SPtr pNetworkData)
+QList<NetworkTreeItem*> Data3DTreeModel::addConnectivityData(const QString& subject, const QString& set, Network::SPtr pNetworkData)
 {
-    QList<BrainRTConnectivityDataTreeItem*> returnList;
+    QList<NetworkTreeItem*> returnList;
 
     //Find the subject
     QList<QStandardItem*> itemSubjectList = this->findItems(subject);

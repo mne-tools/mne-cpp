@@ -111,7 +111,7 @@ namespace DISP3DLIB
 //=============================================================================================================
 
 class BrainRTSourceLocDataTreeItem;
-class BrainRTConnectivityDataTreeItem;
+class NetworkTreeItem;
 class Data3DTreeModel;
 
 

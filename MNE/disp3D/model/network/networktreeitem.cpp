@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     brainrtconnectivitydatatreeitem.cpp
+* @file     networktreeitem.cpp
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    BrainRTConnectivityDataTreeItem class definition.
+* @brief    NetworkTreeItem class definition.
 *
 */
 
@@ -38,7 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "brainrtconnectivitydatatreeitem.h"
+#include "networktreeitem.h"
 #include "../workers/rtSourceLoc/rtsourcelocdataworker.h"
 #include "../common/metatreeitem.h"
 #include "../common/renderable3Dentity.h"
@@ -91,7 +91,7 @@ using namespace CONNECTIVITYLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-BrainRTConnectivityDataTreeItem::BrainRTConnectivityDataTreeItem(int iType, const QString &text)
+NetworkTreeItem::NetworkTreeItem(int iType, const QString &text)
 : AbstractTreeItem(iType, text)
 , m_bIsInit(false)
 , m_bNodesPlotted(false)
@@ -102,13 +102,13 @@ BrainRTConnectivityDataTreeItem::BrainRTConnectivityDataTreeItem(int iType, cons
     this->setEditable(false);
     this->setCheckable(true);
     this->setCheckState(Qt::Checked);
-    this->setToolTip("Real time connectivity data");
+    this->setToolTip("Network/Connectivity data");
 }
 
 
 //*************************************************************************************************************
 
-BrainRTConnectivityDataTreeItem::~BrainRTConnectivityDataTreeItem()
+NetworkTreeItem::~NetworkTreeItem()
 {
     //Schedule deletion/Decouple of all entities so that the SceneGraph is NOT plotting them anymore.
     //Cannot delete m_pParentEntity since we do not know who else holds it, that is why we use a QPointer for m_pParentEntity.
@@ -124,7 +124,7 @@ BrainRTConnectivityDataTreeItem::~BrainRTConnectivityDataTreeItem()
 
 //*************************************************************************************************************
 
-QVariant BrainRTConnectivityDataTreeItem::data(int role) const
+QVariant NetworkTreeItem::data(int role) const
 {
     return AbstractTreeItem::data(role);
 }
@@ -132,7 +132,7 @@ QVariant BrainRTConnectivityDataTreeItem::data(int role) const
 
 //*************************************************************************************************************
 
-void  BrainRTConnectivityDataTreeItem::setData(const QVariant& value, int role)
+void  NetworkTreeItem::setData(const QVariant& value, int role)
 {
     AbstractTreeItem::setData(value, role);
 }
@@ -140,7 +140,7 @@ void  BrainRTConnectivityDataTreeItem::setData(const QVariant& value, int role)
 
 //*************************************************************************************************************
 
-bool BrainRTConnectivityDataTreeItem::init(Qt3DCore::QEntity* parent)
+bool NetworkTreeItem::init(Qt3DCore::QEntity* parent)
 {
     //Create renderable 3D entity
     m_pParentEntity = parent;
@@ -163,7 +163,7 @@ bool BrainRTConnectivityDataTreeItem::init(Qt3DCore::QEntity* parent)
     data.setValue(vecEdgeTrehshold);
     m_pItemNetworkThreshold->setData(data, MetaTreeItemRoles::NetworkThreshold);
     connect(m_pItemNetworkThreshold, &MetaTreeItem::networkThresholdChanged,
-            this, &BrainRTConnectivityDataTreeItem::onNetworkThresholdChanged);
+            this, &NetworkTreeItem::onNetworkThresholdChanged);
 
     list.clear();
     MetaTreeItem* pItemNetworkMatrix = new MetaTreeItem(MetaTreeItemTypes::NetworkMatrix, "Show network matrix");
@@ -179,14 +179,14 @@ bool BrainRTConnectivityDataTreeItem::init(Qt3DCore::QEntity* parent)
 
 //*************************************************************************************************************
 
-bool BrainRTConnectivityDataTreeItem::addData(Network::SPtr pNetworkData)
+bool NetworkTreeItem::addData(Network::SPtr pNetworkData)
 {
     if(!m_bIsInit) {
-        qDebug() << "BrainRTConnectivityDataTreeItem::updateData - BrainRTConnectivityDataTreeItem has not been initialized yet!";
+        qDebug() << "NetworkTreeItem::updateData - NetworkTreeItem has not been initialized yet!";
         return false;
     }
 
-    //Add data which is held by this BrainRTConnectivityDataTreeItem
+    //Add data which is held by this NetworkTreeItem
     QVariant data;
 
     data.setValue(pNetworkData);
@@ -206,7 +206,7 @@ bool BrainRTConnectivityDataTreeItem::addData(Network::SPtr pNetworkData)
 
 //*************************************************************************************************************
 
-void BrainRTConnectivityDataTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
+void NetworkTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
 {
     this->setVisible(checkState == Qt::Unchecked ? false : true);
 }
@@ -214,7 +214,7 @@ void BrainRTConnectivityDataTreeItem::onCheckStateChanged(const Qt::CheckState& 
 
 //*************************************************************************************************************
 
-void BrainRTConnectivityDataTreeItem::setVisible(bool state)
+void NetworkTreeItem::setVisible(bool state)
 {
     for(int i = 0; i < m_lNodes.size(); ++i) {
         m_lNodes.at(i)->setParent(state ? m_pRenderable3DEntity : Q_NULLPTR);
@@ -226,7 +226,7 @@ void BrainRTConnectivityDataTreeItem::setVisible(bool state)
 
 //*************************************************************************************************************
 
-void BrainRTConnectivityDataTreeItem::onNetworkThresholdChanged(const QVector3D& vecThresholds)
+void NetworkTreeItem::onNetworkThresholdChanged(const QVector3D& vecThresholds)
 {
     Network::SPtr pNetwork = this->data(Data3DTreeModelItemRoles::NetworkData).value<Network::SPtr>();
 
@@ -236,7 +236,7 @@ void BrainRTConnectivityDataTreeItem::onNetworkThresholdChanged(const QVector3D&
 
 //*************************************************************************************************************
 
-void BrainRTConnectivityDataTreeItem::plotNetwork(QSharedPointer<CONNECTIVITYLIB::Network> pNetworkData, const QVector3D& vecThreshold)
+void NetworkTreeItem::plotNetwork(QSharedPointer<CONNECTIVITYLIB::Network> pNetworkData, const QVector3D& vecThreshold)
 {
 //    // Delete all old renderable children
 //    Renderable3DEntity* pParentTemp = new Renderable3DEntity();

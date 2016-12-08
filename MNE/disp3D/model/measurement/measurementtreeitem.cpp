@@ -41,7 +41,7 @@
 #include "measurementtreeitem.h"
 #include "../brain/brainhemispheretreeitem.h"
 #include "../brain/brainrtsourcelocdatatreeitem.h"
-#include "../brain/brainrtconnectivitydatatreeitem.h"
+#include "../network/networktreeitem.h"
 #include "../brain/brainsurfacetreeitem.h"
 #include "../brain/brainannotationtreeitem.h"
 #include "../digitizer/digitizersettreeitem.h"
@@ -97,7 +97,7 @@ using namespace CONNECTIVITYLIB;
 MeasurementTreeItem::MeasurementTreeItem(int iType, const QString& text)
 : AbstractTreeItem(iType, text)
 , m_pBrainRTSourceLocDataTreeItem(new BrainRTSourceLocDataTreeItem())
-, m_pBrainRTConnectivityDataTreeItem(new BrainRTConnectivityDataTreeItem())
+, m_pNetworkTreeItem(new NetworkTreeItem())
 {
     this->setEditable(false);
     this->setCheckable(true);
@@ -385,31 +385,31 @@ bool MeasurementTreeItem::addData(const FiffDigPointSet &tDigitizer, Qt3DCore::Q
 
 //*************************************************************************************************************
 
-BrainRTConnectivityDataTreeItem* MeasurementTreeItem::addData(Network::SPtr pNetworkData, Qt3DCore::QEntity* p3DEntityParent)
+NetworkTreeItem* MeasurementTreeItem::addData(Network::SPtr pNetworkData, Qt3DCore::QEntity* p3DEntityParent)
 {
     if(!pNetworkData->getNodes().isEmpty()) {
         //Add source estimation data as child
         if(this->findChildren(Data3DTreeModelItemTypes::RTConnectivityDataItem).size() == 0) {
             //If rt data item does not exists yet, create it here!
-            m_pBrainRTConnectivityDataTreeItem = new BrainRTConnectivityDataTreeItem();
+            m_pNetworkTreeItem = new NetworkTreeItem();
 
             QList<QStandardItem*> list;
-            list << m_pBrainRTConnectivityDataTreeItem;
-            list << new QStandardItem(m_pBrainRTConnectivityDataTreeItem->toolTip());
+            list << m_pNetworkTreeItem;
+            list << new QStandardItem(m_pNetworkTreeItem->toolTip());
             this->appendRow(list);
 
-            m_pBrainRTConnectivityDataTreeItem->init(p3DEntityParent);
-            m_pBrainRTConnectivityDataTreeItem->addData(pNetworkData);
+            m_pNetworkTreeItem->init(p3DEntityParent);
+            m_pNetworkTreeItem->addData(pNetworkData);
         } else {
-            m_pBrainRTConnectivityDataTreeItem->addData(pNetworkData);
+            m_pNetworkTreeItem->addData(pNetworkData);
         }
 
-        return m_pBrainRTConnectivityDataTreeItem;
+        return m_pNetworkTreeItem;
     } else {
         qDebug() << "MeasurementTreeItem::addData - network data is empty";
     }
 
-    return new BrainRTConnectivityDataTreeItem();
+    return new NetworkTreeItem();
 }
 
 
