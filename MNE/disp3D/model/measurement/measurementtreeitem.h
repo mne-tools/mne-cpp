@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     brainsurfacesettreeitem.h
+* @file     measurement.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     November, 2015
+* @date     November, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2015, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     BrainSurfaceSetTreeItem class declaration.
+* @brief     MeasurementTreeItem class declaration.
 *
 */
 
-#ifndef BRAINSURFACESETTREEITEM_H
-#define BRAINSURFACESETTREEITEM_H
+#ifndef MEASUREMENTTREEITEM_H
+#define MEASUREMENTTREEITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -107,17 +107,17 @@ class BrainRTConnectivityDataTreeItem;
 
 //=============================================================================================================
 /**
-* BrainSurfaceSetTreeItem provides a generic brain tree item to hold of brain data (hemi, vertices, tris, etc.) from different sources (FreeSurfer, etc.).
+* MeasurementTreeItem provides a generic brain tree item to hold of brain data (hemi, vertices, tris, etc.) from different sources (FreeSurfer, etc.).
 *
-* @brief Provides a generic BrainSurfaceSetTreeItem.
+* @brief Provides a generic MeasurementTreeItem.
 */
-class DISP3DNEWSHARED_EXPORT BrainSurfaceSetTreeItem : public AbstractTreeItem
+class DISP3DNEWSHARED_EXPORT MeasurementTreeItem : public AbstractTreeItem
 {
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<BrainSurfaceSetTreeItem> SPtr;             /**< Shared pointer type for BrainSurfaceSetTreeItem class. */
-    typedef QSharedPointer<const BrainSurfaceSetTreeItem> ConstSPtr;  /**< Const shared pointer type for BrainSurfaceSetTreeItem class. */
+    typedef QSharedPointer<MeasurementTreeItem> SPtr;             /**< Shared pointer type for MeasurementTreeItem class. */
+    typedef QSharedPointer<const MeasurementTreeItem> ConstSPtr;  /**< Const shared pointer type for MeasurementTreeItem class. */
 
     //=========================================================================================================
     /**
@@ -126,13 +126,13 @@ public:
     * @param[in] iType      The type of the item. See types.h for declaration and definition.
     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
     */
-    explicit BrainSurfaceSetTreeItem(int iType = Data3DTreeModelItemTypes::SurfaceSetItem, const QString& text = "");
+    explicit MeasurementTreeItem(int iType = Data3DTreeModelItemTypes::MeasurementItem, const QString& text = "");
 
     //=========================================================================================================
     /**
     * Default destructor
     */
-    ~BrainSurfaceSetTreeItem();
+    ~MeasurementTreeItem();
 
     //=========================================================================================================
     /**
@@ -238,4 +238,4 @@ private:
 
 } //NAMESPACE DISP3DLIB
 
-#endif // BRAINSURFACESETTREEITEM_H
+#endif // MEASUREMENTTREEITEM_H

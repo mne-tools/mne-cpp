@@ -81,7 +81,7 @@ namespace DISP3DLIB
 namespace Data3DTreeModelItemTypes
 {
     enum ItemType{UnknownItem = QStandardItem::UserType,
-                    SurfaceSetItem = QStandardItem::UserType + 1,
+                    MeasurementItem = QStandardItem::UserType + 1,
                     HemisphereItem = QStandardItem::UserType + 2,
                     SurfaceItem = QStandardItem::UserType + 3,
                     AnnotationItem = QStandardItem::UserType + 4,

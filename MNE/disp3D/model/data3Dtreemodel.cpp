@@ -42,7 +42,7 @@
 #include "bem/bemtreeitem.h"
 #include "subject/subjecttreeitem.h"
 #include "brain/brainsurfacetreeitem.h"
-#include "brain/brainsurfacesettreeitem.h"
+#include "measurement/measurementtreeitem.h"
 #include "digitizer/digitizertreeitem.h"
 #include "common/renderable3Dentity.h"
 
@@ -214,18 +214,18 @@ bool Data3DTreeModel::addSurfaceSet(const QString& subject, const QString& set, 
             //Find already existing set items and add the new data to the first search result
             QList<QStandardItem*> itemList = pSubjectItem->findChildren(set);
 
-            if(!itemList.isEmpty() && (itemList.at(0)->type() == Data3DTreeModelItemTypes::SurfaceSetItem)) {
-                BrainSurfaceSetTreeItem* pSurfaceSetItem = dynamic_cast<BrainSurfaceSetTreeItem*>(itemList.at(0));
-                state = pSurfaceSetItem->addData(tSurfaceSet, tAnnotationSet, m_pModelEntity);
+            if(!itemList.isEmpty() && (itemList.at(0)->type() == Data3DTreeModelItemTypes::MeasurementItem)) {
+                MeasurementTreeItem* pMeasurementItem = dynamic_cast<MeasurementTreeItem*>(itemList.at(0));
+                state = pMeasurementItem->addData(tSurfaceSet, tAnnotationSet, m_pModelEntity);
             } else {
-                BrainSurfaceSetTreeItem* pSurfaceSetItem = new BrainSurfaceSetTreeItem(Data3DTreeModelItemTypes::SurfaceSetItem, set);
+                MeasurementTreeItem* pMeasurementItem = new MeasurementTreeItem(Data3DTreeModelItemTypes::MeasurementItem, set);
 
                 QList<QStandardItem*> list;
-                list << pSurfaceSetItem;
-                list << new QStandardItem(pSurfaceSetItem->toolTip());
+                list << pMeasurementItem;
+                list << new QStandardItem(pMeasurementItem->toolTip());
                 pSubjectItem->appendRow(list);
 
-                state = pSurfaceSetItem->addData(tSurfaceSet, tAnnotationSet, m_pModelEntity);
+                state = pMeasurementItem->addData(tSurfaceSet, tAnnotationSet, m_pModelEntity);
             }
         }
     }
@@ -260,18 +260,18 @@ bool Data3DTreeModel::addSurface(const QString& subject, const QString& set, con
             //Find already existing surface items and add the new data to the first search result
             QList<QStandardItem*> itemList = pSubjectItem->findChildren(set);
 
-            if(!itemList.isEmpty() && (itemList.at(0)->type() == Data3DTreeModelItemTypes::SurfaceSetItem)) {
-                BrainSurfaceSetTreeItem* pSurfaceSetItem = dynamic_cast<BrainSurfaceSetTreeItem*>(itemList.at(0));
-                state = pSurfaceSetItem->addData(tSurface, tAnnotation, m_pModelEntity);
+            if(!itemList.isEmpty() && (itemList.at(0)->type() == Data3DTreeModelItemTypes::MeasurementItem)) {
+                MeasurementTreeItem* pMeasurementItem = dynamic_cast<MeasurementTreeItem*>(itemList.at(0));
+                state = pMeasurementItem->addData(tSurface, tAnnotation, m_pModelEntity);
             } else {
-                BrainSurfaceSetTreeItem* pSurfaceSetItem = new BrainSurfaceSetTreeItem(Data3DTreeModelItemTypes::SurfaceSetItem, set);
+                MeasurementTreeItem* pMeasurementItem = new MeasurementTreeItem(Data3DTreeModelItemTypes::MeasurementItem, set);
 
                 QList<QStandardItem*> list;
-                list << pSurfaceSetItem;
-                list << new QStandardItem(pSurfaceSetItem->toolTip());
+                list << pMeasurementItem;
+                list << new QStandardItem(pMeasurementItem->toolTip());
                 pSubjectItem->appendRow(list);
 
-                state = pSurfaceSetItem->addData(tSurface, tAnnotation, m_pModelEntity);
+                state = pMeasurementItem->addData(tSurface, tAnnotation, m_pModelEntity);
             }
         }
     }
@@ -306,18 +306,18 @@ bool Data3DTreeModel::addSourceSpace(const QString& subject, const QString& set,
             //Find already existing surface items and add the new data to the first search result
             QList<QStandardItem*> itemList = pSubjectItem->findChildren(set);
 
-            if(!itemList.isEmpty() && (itemList.at(0)->type() == Data3DTreeModelItemTypes::SurfaceSetItem)) {
-                BrainSurfaceSetTreeItem* pSurfaceSetItem = dynamic_cast<BrainSurfaceSetTreeItem*>(itemList.at(0));
-                state = pSurfaceSetItem->addData(tSourceSpace, m_pModelEntity);
+            if(!itemList.isEmpty() && (itemList.at(0)->type() == Data3DTreeModelItemTypes::MeasurementItem)) {
+                MeasurementTreeItem* pMeasurementItem = dynamic_cast<MeasurementTreeItem*>(itemList.at(0));
+                state = pMeasurementItem->addData(tSourceSpace, m_pModelEntity);
             } else {
-                BrainSurfaceSetTreeItem* pSurfaceSetItem = new BrainSurfaceSetTreeItem(Data3DTreeModelItemTypes::SurfaceSetItem, set);
+                MeasurementTreeItem* pMeasurementItem = new MeasurementTreeItem(Data3DTreeModelItemTypes::MeasurementItem, set);
 
                 QList<QStandardItem*> list;
-                list << pSurfaceSetItem;
-                list << new QStandardItem(pSurfaceSetItem->toolTip());
+                list << pMeasurementItem;
+                list << new QStandardItem(pMeasurementItem->toolTip());
                 pSubjectItem->appendRow(list);
 
-                state = pSurfaceSetItem->addData(tSourceSpace, m_pModelEntity);
+                state = pMeasurementItem->addData(tSourceSpace, m_pModelEntity);
             }
         }
     }
@@ -356,8 +356,8 @@ QList<BrainRTSourceLocDataTreeItem*> Data3DTreeModel::addSourceData(const QStrin
             //Find the "set" items and add the source estimates as items
             if(!itemList.isEmpty()) {
                 for(int i = 0; i < itemList.size(); ++i) {
-                    if(itemList.at(i)->type() == Data3DTreeModelItemTypes::SurfaceSetItem) {
-                        if(BrainSurfaceSetTreeItem* pSetItem = dynamic_cast<BrainSurfaceSetTreeItem*>(itemList.at(i))) {
+                    if(itemList.at(i)->type() == Data3DTreeModelItemTypes::MeasurementItem) {
+                        if(MeasurementTreeItem* pSetItem = dynamic_cast<MeasurementTreeItem*>(itemList.at(i))) {
                             returnList.append(pSetItem->addData(tSourceEstimate, tForwardSolution));
                         }
                     }
@@ -401,25 +401,25 @@ QList<BrainRTConnectivityDataTreeItem*> Data3DTreeModel::addConnectivityData(con
             //Find already existing surface items and add the new data to the first search result
             QList<QStandardItem*> itemList = pSubjectItem->findChildren(set);
 
-            if(!itemList.isEmpty() && (itemList.at(0)->type() == Data3DTreeModelItemTypes::SurfaceSetItem)) {
-                BrainSurfaceSetTreeItem* pSurfaceSetItem = dynamic_cast<BrainSurfaceSetTreeItem*>(itemList.at(0));
-                returnList.append(pSurfaceSetItem->addData(pNetworkData, m_pModelEntity));
+            if(!itemList.isEmpty() && (itemList.at(0)->type() == Data3DTreeModelItemTypes::MeasurementItem)) {
+                MeasurementTreeItem* pMeasurementItem = dynamic_cast<MeasurementTreeItem*>(itemList.at(0));
+                returnList.append(pMeasurementItem->addData(pNetworkData, m_pModelEntity));
             } else {
-                BrainSurfaceSetTreeItem* pSurfaceSetItem = new BrainSurfaceSetTreeItem(Data3DTreeModelItemTypes::SurfaceSetItem, set);
+                MeasurementTreeItem* pMeasurementItem = new MeasurementTreeItem(Data3DTreeModelItemTypes::MeasurementItem, set);
 
                 QList<QStandardItem*> list;
-                list << pSurfaceSetItem;
-                list << new QStandardItem(pSurfaceSetItem->toolTip());
+                list << pMeasurementItem;
+                list << new QStandardItem(pMeasurementItem->toolTip());
                 pSubjectItem->appendRow(list);
 
-                returnList.append(pSurfaceSetItem->addData(pNetworkData, m_pModelEntity));
+                returnList.append(pMeasurementItem->addData(pNetworkData, m_pModelEntity));
             }
 
 //            //Find the "set" items and add the source estimates as items
 //            if(!itemList.isEmpty()) {
 //                for(int i = 0; i<itemList.size(); i++) {
-//                    if(itemList.at(i)->type() == Data3DTreeModelItemTypes::SurfaceSetItem) {
-//                        if(BrainSurfaceSetTreeItem* pSetItem = dynamic_cast<BrainSurfaceSetTreeItem*>(itemList.at(i))) {
+//                    if(itemList.at(i)->type() == Data3DTreeModelItemTypes::MeasurementItem) {
+//                        if(MeasurementTreeItem* pSetItem = dynamic_cast<MeasurementTreeItem*>(itemList.at(i))) {
 //                            returnList.append(pSetItem->addData(pNetworkData, m_pModelEntity));
 //                        }
 //                    }
@@ -516,18 +516,18 @@ bool Data3DTreeModel::addDigitizerData(const QString& subject, const QString& se
             //Find already existing set items and add the new data to the first search result
             QList<QStandardItem*> itemList = pSubjectItem->findChildren(set);
 
-            if(!itemList.isEmpty() && (itemList.at(0)->type() == Data3DTreeModelItemTypes::SurfaceSetItem)) {
-                BrainSurfaceSetTreeItem* pSurfaceSetItem = dynamic_cast<BrainSurfaceSetTreeItem*>(itemList.at(0));
-                state = pSurfaceSetItem->addData(tDigitizer, m_pModelEntity);
+            if(!itemList.isEmpty() && (itemList.at(0)->type() == Data3DTreeModelItemTypes::MeasurementItem)) {
+                MeasurementTreeItem* pMeasurementItem = dynamic_cast<MeasurementTreeItem*>(itemList.at(0));
+                state = pMeasurementItem->addData(tDigitizer, m_pModelEntity);
             } else {
-                BrainSurfaceSetTreeItem* pSurfaceSetItem = new BrainSurfaceSetTreeItem(Data3DTreeModelItemTypes::SurfaceSetItem, set);
+                MeasurementTreeItem* pMeasurementItem = new MeasurementTreeItem(Data3DTreeModelItemTypes::MeasurementItem, set);
 
                 QList<QStandardItem*> list;
-                list << pSurfaceSetItem;
-                list << new QStandardItem(pSurfaceSetItem->toolTip());
+                list << pMeasurementItem;
+                list << new QStandardItem(pMeasurementItem->toolTip());
                 pSubjectItem->appendRow(list);
 
-                state = pSurfaceSetItem->addData(tDigitizer, m_pModelEntity);
+                state = pMeasurementItem->addData(tDigitizer, m_pModelEntity);
             }
         }
     }
