@@ -272,13 +272,6 @@ int main(int argc, char *argv[])
     //Source Estimate end
     //########################################################################################
 
-<<<<<<< HEAD
-    SurfaceSet t_surfSet("./MNE-sample-data/subjects/sample/surf/lh.white", "./MNE-sample-data/subjects/sample/surf/rh.white");
-//    SurfaceSet t_surfSet("/home/chdinh/sl_data/subjects/mind006/surf/lh.white", "/home/chdinh/sl_data/subjects/mind006/surf/rh.white");
-//    SurfaceSet t_surfSet("E:/Data/sl_data/subjects/mind006/surf/lh.white", "E:/Data/sl_data/subjects/mind006/surf/rh.white");
-
-=======
->>>>>>> 2eeef1e8e4ffeb4228f41e65ee10b8c7ef4a06ad
 //    //only one time point - P100
 //    qint32 sample = 0;
 //    for(qint32 i = 0; i < sourceEstimate.times.size(); ++i)
