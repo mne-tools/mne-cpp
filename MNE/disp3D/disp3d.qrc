@@ -7,7 +7,7 @@
         <file>model/common/shaders/gl3/pervertexphongalpha.geom</file>
         <file>model/common/shaders/gl3/pervertexphongalpha.tcs</file>
         <file>model/common/shaders/gl3/pervertexphongalpha.vert</file>
-        <file>model/common/shaders/gl3/pervertexphongalpha_pn_traingles.tes</file>
         <file>model/common/shaders/gl3/pervertexphongalpha_simple.tes</file>
+        <file>model/common/shaders/gl3/pervertexphongalpha_pn_triangles.tes</file>
     </qresource>
 </RCC>

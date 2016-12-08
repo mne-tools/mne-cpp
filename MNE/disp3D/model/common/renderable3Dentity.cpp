@@ -186,7 +186,56 @@ bool Renderable3DEntity::setAlpha(float fAlpha)
         }
     }
 
-    qWarning() << "Renderable3DEntity::setAlpha - Could not set alpha value to material, since it does not support it (use i.e ShaderMaterial).";
+    return false;
+}
+
+
+//*************************************************************************************************************
+
+bool Renderable3DEntity::setTessInner(float fTessInner)
+{
+    m_fTessInner = fTessInner;
+
+    for(int i = 0; i < m_pMaterial->effect()->parameters().size(); i++) {
+        if(m_pMaterial->effect()->parameters().at(i)->name() == "innerTess") {
+            m_pMaterial->effect()->parameters().at(i)->setValue(m_fTessInner);
+            return true;
+        }
+    }
+
+    return false;
+}
+
+
+//*************************************************************************************************************
+
+bool Renderable3DEntity::setTessOuter(float fTessOuter)
+{
+    m_fTessOuter = fTessOuter;
+
+    for(int i = 0; i < m_pMaterial->effect()->parameters().size(); i++) {
+        if(m_pMaterial->effect()->parameters().at(i)->name() == "outerTess") {
+            m_pMaterial->effect()->parameters().at(i)->setValue(m_fTessOuter);
+            return true;
+        }
+    }
+
+    return false;
+}
+
+
+//*************************************************************************************************************
+
+bool Renderable3DEntity::setTriangleScale(float fTriangleScale)
+{
+    m_fTriangleScale = fTriangleScale;
+
+    for(int i = 0; i < m_pMaterial->effect()->parameters().size(); i++) {
+        if(m_pMaterial->effect()->parameters().at(i)->name() == "triangleScale") {
+            m_pMaterial->effect()->parameters().at(i)->setValue(m_fTriangleScale);
+            return true;
+        }
+    }
 
     return false;
 }

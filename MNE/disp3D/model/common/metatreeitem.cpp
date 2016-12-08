@@ -130,6 +130,15 @@ MetaTreeItem::MetaTreeItem(int iType, const QString& text)
         case MetaTreeItemTypes::SurfaceAlpha:
             sToolTip = "Surface alpha value";
             break;
+        case MetaTreeItemTypes::SurfaceTessInner:
+            sToolTip = "Surface inner tesselation value";
+            break;
+        case MetaTreeItemTypes::SurfaceTessOuter:
+            sToolTip = "Surface outer tesselation value";
+            break;
+        case MetaTreeItemTypes::SurfaceTriangleScale:
+            sToolTip = "Surface triangle scale value";
+            break;
         case MetaTreeItemTypes::SurfaceTranslateX:
             sToolTip = "Surface x translation value";
             break;
@@ -223,6 +232,21 @@ void  MetaTreeItem::setData(const QVariant& value, int role)
 
         case MetaTreeItemRoles::SurfaceAlpha: {
             emit surfaceAlphaChanged(value.toFloat());
+            break;
+        }
+
+        case MetaTreeItemRoles::SurfaceTessInner: {
+            emit surfaceTessInnerChanged(value.toFloat());
+            break;
+        }
+
+        case MetaTreeItemRoles::SurfaceTessOuter: {
+            emit surfaceTessOuterChanged(value.toFloat());
+            break;
+        }
+
+        case MetaTreeItemRoles::SurfaceTriangleScale: {
+            emit surfaceTriangleScaleChanged(value.toFloat());
             break;
         }
 

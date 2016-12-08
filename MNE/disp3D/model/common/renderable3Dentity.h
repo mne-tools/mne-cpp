@@ -194,6 +194,36 @@ public:
 
     //=========================================================================================================
     /**
+    * Sets the entity's inner tesselation value.
+    *
+    * @param[in] fTessInner     The new inner tesselation value.
+    *
+    * @return If successful returns true, false otherwise.
+    */
+    bool setTessInner(float fTessInner);
+
+    //=========================================================================================================
+    /**
+    * Sets the entity's outer tesselation value.
+    *
+    * @param[in] fTessOuter     The new outer tesselation value.
+    *
+    * @return If successful returns true, false otherwise.
+    */
+    bool setTessOuter(float fTessOuter);
+
+    //=========================================================================================================
+    /**
+    * Sets the entity's triangle scale value.
+    *
+    * @param[in] fTriangleScale     The triangle scale value.
+    *
+    * @return If successful returns true, false otherwise.
+    */
+    bool setTriangleScale(float fTriangleScale);
+
+    //=========================================================================================================
+    /**
     * Sets the entity's material sahder. This is a convenient function.
     *
     * @param[in] sShader     The new shader. Must be present in the qrc resource file.
@@ -276,6 +306,9 @@ protected:
     float                                       m_fRotZ;                 /**< The z axis rotation value. */
     QVector3D                                   m_position;              /**< The position/translation value. */
     float                                       m_fAlpha;                /**< The alpha value. */
+    float                                       m_fTessInner;            /**< The inner tesselation value. */
+    float                                       m_fTessOuter;            /**< The outer tesselation value. */
+    float                                       m_fTriangleScale;        /**< The triangle scale value. */
 
     //=========================================================================================================
     /**
