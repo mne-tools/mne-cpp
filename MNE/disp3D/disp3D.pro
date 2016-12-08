@@ -102,7 +102,7 @@ SOURCES += \
     model/subject/subjecttreeitem.cpp \
     model/common/metatreeitem.cpp \
     model/brain/brainsurfacetreeitem.cpp \
-    model/brain/brainsurfacesettreeitem.cpp \
+    model/measurement/measurementtreeitem.cpp \
     model/brain/brainannotationtreeitem.cpp \
     model/brain/brainhemispheretreeitem.cpp \
     model/brain/brainrtsourcelocdatatreeitem.cpp \
@@ -126,7 +126,7 @@ HEADERS += \
     model/subject/subjecttreeitem.h \
     model/common/metatreeitem.h \
     model/brain/brainsurfacetreeitem.h \
-    model/brain/brainsurfacesettreeitem.h \
+    model/measurement/measurementtreeitem.h \
     model/brain/brainannotationtreeitem.h \
     model/brain/brainhemispheretreeitem.h \
     model/brain/brainrtsourcelocdatatreeitem.h \

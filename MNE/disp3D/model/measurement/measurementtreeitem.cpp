@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     brainsurfacesettreeitem.cpp
+* @file     measurementsettreeitem.cpp
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     November, 2015
+* @date     November, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2015, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    BrainSurfaceSetTreeItem class definition.
+* @brief    MeasurementTreeItem class definition.
 *
 */
 
@@ -38,15 +38,14 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "brainsurfacesettreeitem.h"
-#include "brainhemispheretreeitem.h"
-#include "brainrtsourcelocdatatreeitem.h"
-#include "brainrtconnectivitydatatreeitem.h"
-#include "brainsurfacetreeitem.h"
-#include "brainannotationtreeitem.h"
+#include "measurementtreeitem.h"
+#include "../brain/brainhemispheretreeitem.h"
+#include "../brain/brainrtsourcelocdatatreeitem.h"
+#include "../brain/brainrtconnectivitydatatreeitem.h"
+#include "../brain/brainsurfacetreeitem.h"
+#include "../brain/brainannotationtreeitem.h"
 #include "../digitizer/digitizersettreeitem.h"
 #include "../digitizer/digitizertreeitem.h"
-
 
 #include <fs/label.h>
 #include <fs/annotationset.h>
@@ -95,7 +94,7 @@ using namespace CONNECTIVITYLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-BrainSurfaceSetTreeItem::BrainSurfaceSetTreeItem(int iType, const QString& text)
+MeasurementTreeItem::MeasurementTreeItem(int iType, const QString& text)
 : AbstractTreeItem(iType, text)
 , m_pBrainRTSourceLocDataTreeItem(new BrainRTSourceLocDataTreeItem())
 , m_pBrainRTConnectivityDataTreeItem(new BrainRTConnectivityDataTreeItem())
@@ -103,20 +102,20 @@ BrainSurfaceSetTreeItem::BrainSurfaceSetTreeItem(int iType, const QString& text)
     this->setEditable(false);
     this->setCheckable(true);
     this->setCheckState(Qt::Checked);
-    this->setToolTip("Brain surface set");
+    this->setToolTip("Measurement item");
 }
 
 
 //*************************************************************************************************************
 
-BrainSurfaceSetTreeItem::~BrainSurfaceSetTreeItem()
+MeasurementTreeItem::~MeasurementTreeItem()
 {
 }
 
 
 //*************************************************************************************************************
 
-QVariant BrainSurfaceSetTreeItem::data(int role) const
+QVariant MeasurementTreeItem::data(int role) const
 {
     switch(role) {
         case Data3DTreeModelItemRoles::SurfaceSetName:
@@ -129,7 +128,7 @@ QVariant BrainSurfaceSetTreeItem::data(int role) const
 
 //*************************************************************************************************************
 
-void  BrainSurfaceSetTreeItem::setData(const QVariant& value, int role)
+void  MeasurementTreeItem::setData(const QVariant& value, int role)
 {
     AbstractTreeItem::setData(value, role);
 }
@@ -137,7 +136,7 @@ void  BrainSurfaceSetTreeItem::setData(const QVariant& value, int role)
 
 //*************************************************************************************************************
 
-bool BrainSurfaceSetTreeItem::addData(const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet, Qt3DCore::QEntity* p3DEntityParent)
+bool MeasurementTreeItem::addData(const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet, Qt3DCore::QEntity* p3DEntityParent)
 {
     //Generate child items based on surface set input parameters
     bool state = false;
@@ -187,7 +186,7 @@ bool BrainSurfaceSetTreeItem::addData(const SurfaceSet& tSurfaceSet, const Annot
             }
 
             connect(pHemiItem->getSurfaceItem(), &BrainSurfaceTreeItem::colorInfoOriginChanged,
-                this, &BrainSurfaceSetTreeItem::onColorInfoOriginChanged);
+                this, &MeasurementTreeItem::onColorInfoOriginChanged);
         }
 
         hemiItemFound = false;
@@ -199,7 +198,7 @@ bool BrainSurfaceSetTreeItem::addData(const SurfaceSet& tSurfaceSet, const Annot
 
 //*************************************************************************************************************
 
-bool BrainSurfaceSetTreeItem::addData(const Surface& tSurface, const Annotation& tAnnotation, Qt3DCore::QEntity* p3DEntityParent)
+bool MeasurementTreeItem::addData(const Surface& tSurface, const Annotation& tAnnotation, Qt3DCore::QEntity* p3DEntityParent)
 {
     //Generate child items based on surface set input parameters
     bool state = false;
@@ -239,7 +238,7 @@ bool BrainSurfaceSetTreeItem::addData(const Surface& tSurface, const Annotation&
         this->appendRow(list);
 
         connect(pHemiItem->getSurfaceItem(), &BrainSurfaceTreeItem::colorInfoOriginChanged,
-            this, &BrainSurfaceSetTreeItem::onColorInfoOriginChanged);
+            this, &MeasurementTreeItem::onColorInfoOriginChanged);
     }
 
     return state;
@@ -248,7 +247,7 @@ bool BrainSurfaceSetTreeItem::addData(const Surface& tSurface, const Annotation&
 
 //*************************************************************************************************************
 
-bool BrainSurfaceSetTreeItem::addData(const MNESourceSpace& tSourceSpace, Qt3DCore::QEntity* p3DEntityParent)
+bool MeasurementTreeItem::addData(const MNESourceSpace& tSourceSpace, Qt3DCore::QEntity* p3DEntityParent)
 {
     //Generate child items based on surface set input parameters
     bool state = false;
@@ -290,7 +289,7 @@ bool BrainSurfaceSetTreeItem::addData(const MNESourceSpace& tSourceSpace, Qt3DCo
 
 //*************************************************************************************************************
 
-BrainRTSourceLocDataTreeItem* BrainSurfaceSetTreeItem::addData(const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution)
+BrainRTSourceLocDataTreeItem* MeasurementTreeItem::addData(const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution)
 {
     if(!tSourceEstimate.isEmpty()) {
         //Add source estimation data as child
@@ -305,7 +304,7 @@ BrainRTSourceLocDataTreeItem* BrainSurfaceSetTreeItem::addData(const MNESourceEs
                 this->appendRow(list);
 
                 connect(m_pBrainRTSourceLocDataTreeItem, &BrainRTSourceLocDataTreeItem::rtVertColorChanged,
-                        this, &BrainSurfaceSetTreeItem::onRtVertColorChanged);
+                        this, &MeasurementTreeItem::onRtVertColorChanged);
 
                 //Divide into left right hemi
                 QList<QStandardItem*> itemList = this->findChildren(Data3DTreeModelItemTypes::HemisphereItem);
@@ -339,7 +338,7 @@ BrainRTSourceLocDataTreeItem* BrainSurfaceSetTreeItem::addData(const MNESourceEs
 
                 m_pBrainRTSourceLocDataTreeItem->addData(tSourceEstimate);
             } else {
-                qDebug() << "BrainSurfaceSetTreeItem::addData - Cannot add real time data since the forwad solution was not provided and therefore the rt source localization data item has not been initilaized yet. Returning...";
+                qDebug() << "MeasurementTreeItem::addData - Cannot add real time data since the forwad solution was not provided and therefore the rt source localization data item has not been initilaized yet. Returning...";
             }
         } else {
             m_pBrainRTSourceLocDataTreeItem->addData(tSourceEstimate);
@@ -347,7 +346,7 @@ BrainRTSourceLocDataTreeItem* BrainSurfaceSetTreeItem::addData(const MNESourceEs
 
         return m_pBrainRTSourceLocDataTreeItem;
     } else {
-        qDebug() << "BrainSurfaceSetTreeItem::addData - tSourceEstimate is empty";
+        qDebug() << "MeasurementTreeItem::addData - tSourceEstimate is empty";
     }
 
     return new BrainRTSourceLocDataTreeItem();
@@ -356,7 +355,7 @@ BrainRTSourceLocDataTreeItem* BrainSurfaceSetTreeItem::addData(const MNESourceEs
 
 //*************************************************************************************************************
 
-bool BrainSurfaceSetTreeItem::addData(const FiffDigPointSet &tDigitizer, Qt3DCore::QEntity *p3DEntityParent)
+bool MeasurementTreeItem::addData(const FiffDigPointSet &tDigitizer, Qt3DCore::QEntity *p3DEntityParent)
 {
     //Find the digitizer kind
     QList<QStandardItem*> itemDigitizerList = this->findChildren(Data3DTreeModelItemTypes::DigitizerSetItem);
@@ -386,7 +385,7 @@ bool BrainSurfaceSetTreeItem::addData(const FiffDigPointSet &tDigitizer, Qt3DCor
 
 //*************************************************************************************************************
 
-BrainRTConnectivityDataTreeItem* BrainSurfaceSetTreeItem::addData(Network::SPtr pNetworkData, Qt3DCore::QEntity* p3DEntityParent)
+BrainRTConnectivityDataTreeItem* MeasurementTreeItem::addData(Network::SPtr pNetworkData, Qt3DCore::QEntity* p3DEntityParent)
 {
     if(!pNetworkData->getNodes().isEmpty()) {
         //Add source estimation data as child
@@ -407,7 +406,7 @@ BrainRTConnectivityDataTreeItem* BrainSurfaceSetTreeItem::addData(Network::SPtr 
 
         return m_pBrainRTConnectivityDataTreeItem;
     } else {
-        qDebug() << "BrainSurfaceSetTreeItem::addData - network data is empty";
+        qDebug() << "MeasurementTreeItem::addData - network data is empty";
     }
 
     return new BrainRTConnectivityDataTreeItem();
@@ -416,7 +415,7 @@ BrainRTConnectivityDataTreeItem* BrainSurfaceSetTreeItem::addData(Network::SPtr 
 
 //*************************************************************************************************************
 
-void BrainSurfaceSetTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
+void MeasurementTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
 {
     for(int i = 0; i < this->rowCount(); ++i) {
         if(this->child(i)->isCheckable()) {
@@ -428,7 +427,7 @@ void BrainSurfaceSetTreeItem::onCheckStateChanged(const Qt::CheckState& checkSta
 
 //*************************************************************************************************************
 
-void BrainSurfaceSetTreeItem::onRtVertColorChanged(const QPair<QByteArray, QByteArray>& sourceColorSamples)
+void MeasurementTreeItem::onRtVertColorChanged(const QPair<QByteArray, QByteArray>& sourceColorSamples)
 {
     QList<QStandardItem*> itemList = this->findChildren(Data3DTreeModelItemTypes::HemisphereItem);
 
@@ -446,7 +445,7 @@ void BrainSurfaceSetTreeItem::onRtVertColorChanged(const QPair<QByteArray, QByte
 
 //*************************************************************************************************************
 
-void BrainSurfaceSetTreeItem::onColorInfoOriginChanged()
+void MeasurementTreeItem::onColorInfoOriginChanged()
 {
     QList<QStandardItem*> itemList = this->findChildren(Data3DTreeModelItemTypes::HemisphereItem);
 
