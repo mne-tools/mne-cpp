@@ -131,11 +131,11 @@ ShaderMaterial::~ShaderMaterial()
 void ShaderMaterial::init()
 {
 //    //Set default
-//    m_pVertexGL3Shader->setVertexShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl3/pervertexphongalpha.vert"))));
-//    m_pVertexGL3Shader->setTessellationControlShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl3/pervertexphongalpha.tcs"))));
-//    m_pVertexGL3Shader->setTessellationEvaluationShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl3/pervertexphongalpha_simple.tes"))));
-//    m_pVertexGL3Shader->setGeometryShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl3/pervertexphongalpha.geom"))));
-//    m_pVertexGL3Shader->setFragmentShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl3/pervertexphongalpha.frag"))));
+//    m_pVertexGL3Shader->setVertexShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/common/shaders/gl3/pervertexphongalpha.vert"))));
+//    m_pVertexGL3Shader->setTessellationControlShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/common/shaders/gl3/pervertexphongalpha.tcs"))));
+//    m_pVertexGL3Shader->setTessellationEvaluationShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/common/shaders/gl3/pervertexphongalpha_simple.tes"))));
+//    m_pVertexGL3Shader->setGeometryShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/common/shaders/gl3/pervertexphongalpha.geom"))));
+//    m_pVertexGL3Shader->setFragmentShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/common/shaders/gl3/pervertexphongalpha.frag"))));
 
     //Set OpenGL version
     m_pVertexGL3Technique->graphicsApiFilter()->setApi(QGraphicsApiFilter::OpenGL);

@@ -163,11 +163,11 @@ bool BrainSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* p
     m_pRenderable3DEntity->setMeshData(tSurface.rr(), tSurface.nn(), tSurface.tris(), arrayCurvatureColor, Qt3DRender::QGeometryRenderer::Patches);
 
     //Set shaders
-    m_pRenderable3DEntity->setShader(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl3/pervertexphongalpha.vert")));
-    m_pRenderable3DEntity->setShader(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl3/pervertexphongalpha.tcs")));
-    m_pRenderable3DEntity->setShader(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl3/pervertexphongalpha_simple.tes")));
-    m_pRenderable3DEntity->setShader(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl3/pervertexphongalpha.geom")));
-    m_pRenderable3DEntity->setShader(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl3/pervertexphongalpha.frag")));
+    m_pRenderable3DEntity->setShader(QUrl(QStringLiteral("qrc:/model/common/shaders/gl3/pervertexphongalpha.vert")));
+    m_pRenderable3DEntity->setShader(QUrl(QStringLiteral("qrc:/model/common/shaders/gl3/pervertexphongalpha.tcs")));
+    m_pRenderable3DEntity->setShader(QUrl(QStringLiteral("qrc:/model/common/shaders/gl3/pervertexphongalpha_simple.tes")));
+    m_pRenderable3DEntity->setShader(QUrl(QStringLiteral("qrc:/model/common/shaders/gl3/pervertexphongalpha.geom")));
+    m_pRenderable3DEntity->setShader(QUrl(QStringLiteral("qrc:/model/common/shaders/gl3/pervertexphongalpha.frag")));
 
     //Generate activation overlay surface
 //    MatrixX3f overlayAdds = tSurface.rr();

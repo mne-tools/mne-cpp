@@ -147,8 +147,8 @@ bool BrainRTConnectivityDataTreeItem::init(Qt3DCore::QEntity* parent)
     m_pRenderable3DEntity = new Renderable3DEntity(parent);
 
     //Set shaders
-    m_pRenderable3DEntity->setShader(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl3/networkEdge.vert")));
-    m_pRenderable3DEntity->setShader(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl3/networkEdge.frag")));
+    m_pRenderable3DEntity->setShader(QUrl(QStringLiteral("qrc:/model/common/shaders/gl3/networkEdge.vert")));
+    m_pRenderable3DEntity->setShader(QUrl(QStringLiteral("qrc:/model/common/shaders/gl3/networkEdge.frag")));
 
     //Add meta information as item children
     QList<QStandardItem*> list;
