@@ -62,10 +62,8 @@
 
 #include <time.h>
 
-
 #include <Eigen/Dense>
 #include <unsupported/Eigen/FFT>
-
 
 
 //*************************************************************************************************************
@@ -88,7 +86,6 @@ using namespace UTILSLIB;
 //using namespace MNELIB;
 
 
-
 #ifndef TRUE
 #define TRUE 1
 #endif
@@ -105,7 +102,6 @@ using namespace UTILSLIB;
 #ifndef OK
 #define OK 0
 #endif
-
 
 
 //============================= dot.h =============================
@@ -152,8 +148,6 @@ using namespace UTILSLIB;
 #define FIFFV_MNE_COORD_SURFACE_RAS   FIFFV_COORD_MRI    /* The surface RAS coordinates */
 
 
-
-
 //============================= ctf_types.h =============================
 
 #ifndef FIFFV_COIL_CTF_GRAD
@@ -171,8 +165,6 @@ using namespace UTILSLIB;
 #ifndef FIFFV_COIL_CTF_OFFDIAG_REF_GRAD
 #define FIFFV_COIL_CTF_OFFDIAG_REF_GRAD 5004
 #endif
-
-
 
 
 //============================= allocs.h =============================
@@ -21721,16 +21713,6 @@ static int check_args (int *argc,char **argv)
 }
 
 
-
-
-
-
-
-
-
-
-
-
 //*************************************************************************************************************
 //=============================================================================================================
 // MAIN
@@ -21949,8 +21931,7 @@ int main(int argc, char *argv[])
             exit (0);
     }
 
-
-//    return app.exec();
+    return app.exec();
 }
 
 //*************************************************************************************************************
