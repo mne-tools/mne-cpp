@@ -130,9 +130,16 @@ bool BrainAnnotationTreeItem::addData(const Surface& tSurface, const Annotation&
         for(int i = 0; i < qListLabels.size(); ++i) {
             FSLIB::Label label = qListLabels.at(i);
             for(int j = 0; j<label.vertices.rows(); j++) {
-                rawArrayColors[label.vertices(j)*3+0] = qListLabelRGBAs.at(i)(0)/255.0;
-                rawArrayColors[label.vertices(j)*3+1] = qListLabelRGBAs.at(i)(1)/255.0;
-                rawArrayColors[label.vertices(j)*3+2] = qListLabelRGBAs.at(i)(2)/255.0;
+                QColor patchColor;
+                patchColor.setRed(qListLabelRGBAs.at(i)(0));
+                patchColor.setGreen(qListLabelRGBAs.at(i)(1));
+                patchColor.setBlue(qListLabelRGBAs.at(i)(2));
+
+                patchColor = patchColor.darker(200);
+
+                rawArrayColors[label.vertices(j)*3+0] = patchColor.redF();
+                rawArrayColors[label.vertices(j)*3+1] = patchColor.greenF();
+                rawArrayColors[label.vertices(j)*3+2] = patchColor.blueF();
             }
         }
 

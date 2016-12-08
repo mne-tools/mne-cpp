@@ -2,6 +2,7 @@
 /**
 * @file     main.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     July, 2012
@@ -54,6 +55,8 @@
 
 #include <QtCore/QCoreApplication>
 #include <QFile>
+#include <QCommandLineParser>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -81,9 +84,23 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
-    QFile t_fileIn("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
+    // Command Line Parser
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Read Write Raw Example");
+    parser.addHelpOption();
 
-    QFile t_fileOut("./MNE-sample-data/MEG/sample/test_output.fif");
+    QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", "./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
+    QCommandLineOption outputOption("fileOut", "The output file <out>.", "out", "./MNE-sample-data/MEG/sample/test_output.fif");
+
+    parser.addOption(inputOption);
+    parser.addOption(outputOption);
+
+    parser.process(a);
+
+    //Load data
+    QFile t_fileIn(parser.value(inputOption));
+
+    QFile t_fileOut(parser.value(outputOption));
 
     //
     //   Setup for reading the raw data

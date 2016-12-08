@@ -2,6 +2,7 @@
 /**
 * @file     main.cpp
 * @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
+*           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0

@@ -358,7 +358,7 @@ BrainRTSourceLocDataTreeItem* BrainSurfaceSetTreeItem::addData(const MNESourceEs
 
 bool BrainSurfaceSetTreeItem::addData(const FiffDigPointSet &tDigitizer, Qt3DCore::QEntity *p3DEntityParent)
 {
-    //Find the digitizerkind
+    //Find the digitizer kind
     QList<QStandardItem*> itemDigitizerList = this->findChildren(Data3DTreeModelItemTypes::DigitizerSetItem);
 
     //If digitizer does not exist, create a new one
@@ -376,8 +376,7 @@ bool BrainSurfaceSetTreeItem::addData(const FiffDigPointSet &tDigitizer, Qt3DCor
     if((itemDigitizerList.at(0)->type() == Data3DTreeModelItemTypes::DigitizerSetItem)) {
         DigitizerSetTreeItem* pDigitizerSetItem = dynamic_cast<DigitizerSetTreeItem*>(itemDigitizerList.at(0));
         state = pDigitizerSetItem->addData(tDigitizer, p3DEntityParent);
-    }
-    else{
+    } else {
         state = false;
     }
 
