@@ -598,7 +598,7 @@ int mne_svd(float **mat,	/* The matrix */
   fromFloatEigenVector(svd.singularValues(), sing, svd.singularValues().size());
 
   if (uu != NULL)
-    fromFloatEigenMatrix(svd.matrixU(), uu, udim, m);
+    fromFloatEigenMatrix(svd.matrixU().transpose(), uu, udim, m);
 
   if (vv != NULL)
     fromFloatEigenMatrix(svd.matrixV().transpose(), vv, m, n);
@@ -14409,6 +14409,7 @@ static int c_dsvd(double **mat,		/* The matrix */
       */
 {
     int    udim = MIN(m,n);
+
     MatrixXd eigen_mat = toDoubleEigenMatrix(mat, m, n);
 
     //ToDo Optimize computation depending of whether uu or vv are defined
@@ -14416,20 +14417,11 @@ static int c_dsvd(double **mat,		/* The matrix */
 
     fromDoubleEigenVector(svd.singularValues(), sing, svd.singularValues().size());
 
-    std::cout << "uu\n";
-    std::cout << svd.matrixU().rows() << "x" << svd.matrixU().cols() << std::endl;
-
-    if ( uu != NULL ) {
-        fromDoubleEigenMatrix(svd.matrixU(), uu, udim, m);
-        for (int j = 0; j < udim; j++){
-          for (int k = 0; k < m; k++)
-            printf("%f ",uu[j][k]);
-          printf("\n\n");
-        }
-    }
+    if ( uu != NULL )
+        fromDoubleEigenMatrix(svd.matrixU().transpose(), uu, udim, m);
 
     if ( vv != NULL )
-        fromDoubleEigenMatrix(svd.matrixV().transpose(), vv, udim, udim);
+        fromDoubleEigenMatrix(svd.matrixV().transpose(), vv, n, n);
 
     return 0;
 //  return info;
@@ -14644,12 +14636,12 @@ static int report_fit(int    loop,
       * Report our progress
       */
 {
-//#ifdef LOG_FIT
+#ifdef LOG_FIT
   int k;
   for (k = 0; k < nfit; k++)
     fprintf(stderr,"%g ",mu[k]);
   fprintf(stderr,"%g\n",Smin);
-//#endif
+#endif
   return 0;
 }
 
@@ -14718,7 +14710,7 @@ static double compute_linear_parameters(double *mu,
   double sum;
 
   compose_linear_fitting_data(mu,u);
-  printf("############## DEBUG c_dsvd");
+
   c_dsvd(u->M,u->nterms-1,u->nfit-1,u->sing,u->uu,u->vv);
   /*
    * Compute the residuals
@@ -14865,6 +14857,7 @@ int fwd_eeg_fit_berg_scherg(fwdEegSphereModel m,       /* Conductor model defini
   simplex = get_initial_simplex(mu,nfit,simplex_size);
   for (k = 0; k < nfit+1; k++)
     func_val[k] = one_step(simplex[k],u->nfit,u);
+
   /*
    * (5) Do the nonlinear minimization
    */
@@ -14874,8 +14867,10 @@ int fwd_eeg_fit_berg_scherg(fwdEegSphereModel m,       /* Conductor model defini
                               max_eval,&neval,
                               report,report_fit)) != OK)
     goto out;
+
   for (k = 0; k < nfit; k++)
     mu[k] = simplex[0][k];
+
   /*
    * (6) Do the final step: calculation of the linear parameters
    */
@@ -14894,7 +14889,7 @@ int fwd_eeg_fit_berg_scherg(fwdEegSphereModel m,       /* Conductor model defini
      */
     m->lambda[k] = lambda[k]/m->layers[m->nlayer-1].sigma;
 #ifdef LOG_FIT
-    fprintf(stderr,"lambda%d = %g\tmu%d = %g\n",k+1,lambda[k],k+1,mu[k]);
+    printf("lambda%d = %g\tmu%d = %g\n",k+1,lambda[k],k+1,mu[k]);
 #endif
   }
   /*
@@ -14918,10 +14913,6 @@ int fwd_eeg_fit_berg_scherg(fwdEegSphereModel m,       /* Conductor model defini
     return res;
   }
 }
-
-
-
-
 
 
 
@@ -16416,12 +16407,10 @@ fwdEegSphereModel setup_eeg_sphere_model(char  *eeg_model_file,   /* Contains th
 
   eeg_models = fwd_load_eeg_sphere_models(eeg_model_file,NULL);
   fwd_list_eeg_sphere_models(stderr,eeg_models);
-// ToDo: Up to this point all OK
 
   if ((eeg_model = fwd_select_eeg_sphere_model(eeg_model_name,eeg_models)) == NULL)
     goto bad;
 
-// ToDo: Up to this point all OK
   if (fwd_setup_eeg_sphere_model(eeg_model,eeg_sphere_rad,TRUE,3) == FAIL)
     goto bad;
   printf("Using EEG sphere model \"%s\" with scalp radius %7.1f mm\n",
