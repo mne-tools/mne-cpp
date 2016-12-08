@@ -2,14 +2,16 @@
 /**
 * @file     rthpis.h
 * @author   Chiran Doshi <chiran.doshi@childrens.harvard.edu>;
+*           Lorenz Esch <Lorenz.Esch@ntu-ilmenau.de>;
 *           Limin Sun <liminsun@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+*
 * @version  1.0
-* @date     March, 2015
+* @date     November, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2015, Chiran Doshi, Limin Sun, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Chiran Doshi, Lorenz Esch, Limin Sun, and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -44,21 +46,15 @@
 
 #include "rtprocessing_global.h"
 
-//*************************************************************************************************************
-//=============================================================================================================
-// FIFF INCLUDES
-//=============================================================================================================
-
-#include <fiff/fiff_cov.h>
-#include <fiff/fiff_info.h>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Generics INCLUDES
-//=============================================================================================================
-
 #include <generics/circularmatrixbuffer.h>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
 
 
 //*************************************************************************************************************
@@ -73,10 +69,13 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Eigen INCLUDES
+// FORWARD DECLARATIONS
 //=============================================================================================================
 
-#include <Eigen/Core>
+namespace FIFFLIB{
+    class FiffInfo;
+    class FiffCoordTrans;
+}
 
 
 //*************************************************************************************************************
@@ -87,15 +86,6 @@
 namespace RTPROCESSINGLIB
 {
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace Eigen;
-using namespace IOBUFFER;
-using namespace FIFFLIB;
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -112,6 +102,7 @@ struct coilParam {
 struct dipError {
     double error;
     Eigen::MatrixXd moment;
+    int numIterations;
 };
 
 struct sens {
@@ -130,6 +121,7 @@ struct sens {
 class RTPROCESSINGSHARED_EXPORT RtHPIS : public QThread
 {
     Q_OBJECT
+
 public:
     typedef QSharedPointer<RtHPIS> SPtr;             /**< Shared pointer type for RtHPIS. */
     typedef QSharedPointer<const RtHPIS> ConstSPtr;  /**< Const shared pointer type for RtHPIS. */
@@ -142,7 +134,7 @@ public:
     * @param[in] p_pFiffInfo        Associated Fiff Information
     * @param[in] parent     Parent QObject (optional)
     */
-    explicit RtHPIS(FiffInfo::SPtr p_pFiffInfo, QObject *parent = 0);
+    explicit RtHPIS(QSharedPointer<FIFFLIB::FiffInfo> p_pFiffInfo, QObject *parent = 0);
 
     //=========================================================================================================
     /**
@@ -152,11 +144,22 @@ public:
 
     //=========================================================================================================
     /**
+    * Inits the rt HPI processing and performs one single fit.
+    *
+    * @param[in] t_mat          Data to estimate the HPI positions from
+    * @param[out] transDevHead  The final dev head transformation matrix
+    * @param[out] vGof           The goodness of fit in mm for each fitted HPI coil.
+    * @param[in] vFreqs         The frequencies for each coil.
+    */
+    void singleHPIFit(const Eigen::MatrixXd& t_mat, FIFFLIB::FiffCoordTrans &transDevHead, const QVector<int>& vFreqs, QVector<double> &vGof);
+
+    //=========================================================================================================
+    /**
     * Slot to receive incoming data.
     *
-    * @param[in] p_DataSegment  Data to estimate the spectrum from -> ToDo Replace this by shared data pointer
+    * @param[in] p_DataSegment  Data to estimate the HPI positions from
     */
-    void append(const MatrixXd &p_DataSegment);
+    void append(const Eigen::MatrixXd &p_DataSegment);
 
     //=========================================================================================================
     /**
@@ -165,7 +168,6 @@ public:
     * @return true if is running, false otherwise
     */
     inline bool isRunning();
-
 
     //=========================================================================================================
     /**
@@ -183,16 +185,19 @@ public:
     */
     virtual bool stop();
 
-    dipError dipfitError (Eigen::MatrixXd, Eigen::MatrixXd, struct sens);
-    Eigen::MatrixXd ft_compute_leadfield(Eigen::MatrixXd, struct sens);
-    Eigen::MatrixXd magnetic_dipole(Eigen::MatrixXd, Eigen::MatrixXd, Eigen::MatrixXd);
     coilParam dipfit(struct coilParam, struct sens, Eigen::MatrixXd, int numCoils);
-    Eigen::MatrixXd fminsearch(Eigen::MatrixXd,int, int, int, Eigen::MatrixXd, struct sens);
-    static bool compar (int, int);
-    Eigen::MatrixXd pinv(Eigen::MatrixXd);
     Eigen::Matrix4d computeTransformation(Eigen::MatrixXd, Eigen::MatrixXd);
+    Eigen::MatrixXd fminsearch(Eigen::MatrixXd,int, int, int, Eigen::MatrixXd, struct sens);
 
-    void test();
+    //void test();
+
+    QMutex m_mutex;
+
+    bool SendDataToBuffer;
+
+    int simplex_numitr;
+
+    //MatrixXd SpecData;
 
 signals:
     //=========================================================================================================
@@ -212,44 +217,32 @@ protected:
     */
     virtual void run();
 
-private:
-    QMutex      mutex;                  /**< Provides access serialization between threads*/
+    IOBUFFER::CircularMatrixBuffer<double>::SPtr m_pRawMatrixBuffer;    /**< The Circular Raw Matrix Buffer. */
 
-    quint32      m_iMaxSamples;         /**< Maximal amount of samples received, before covariance is estimated.*/
+    QMutex              mutex;                                          /**< Provides access serialization between threads*/
 
-    quint32      m_iNewMaxSamples;      /**< New maximal amount of samples received, before covariance is estimated.*/
+    int                 m_iMaxSamples;                                  /**< Maximal amount of samples received, before covariance is estimated.*/
+    int                 m_iNewMaxSamples;                               /**< New maximal amount of samples received, before covariance is estimated.*/
+    int                 m_iCounter;
 
-    FiffInfo::SPtr  m_pFiffInfo;        /**< Holds the fiff measurement information. */
+    bool                m_bIsRunning;                                   /**< Holds if real-time Covariance estimation is running.*/
 
-    bool        m_bIsRunning;           /**< Holds if real-time Covariance estimation is running.*/
+    static std::vector <double>         base_arr;
+    QSharedPointer<FIFFLIB::FiffInfo>   m_pFiffInfo;                    /**< Holds the fiff measurement information. */
 
-    CircularMatrixBuffer<double>::SPtr m_pRawMatrixBuffer;   /**< The Circular Raw Matrix Buffer. */
+    //QVector <float> m_fWin;
 
-//    QVector <float> m_fWin;
+    //double m_Fs;
 
-//    double m_Fs;
+    //qint32 m_iFFTlength;
+    //qint32 m_dataLength;
 
-//    qint32 m_iFFTlength;
-//    qint32 m_dataLength;
+    //int NumOfBlocks;
+    //int BlockSize  ;
+    //int Sensors    ;
+    //int BlockIndex ;
 
-    static std::vector <double>base_arr;
-
-
-//protected:
-//    int NumOfBlocks;
-//    int BlockSize  ;
-//    int Sensors    ;
-//    int BlockIndex ;
-
-//    MatrixXd CircBuf;
-
-public:
-    MatrixXd SpecData;
-    QMutex ReadMutex;
-
-    bool SendDataToBuffer;
-
-    int simplex_numitr;
+    //MatrixXd CircBuf;
 
 };
 
@@ -270,4 +263,4 @@ inline bool RtHPIS::isRunning()
 Q_DECLARE_METATYPE(Eigen::MatrixXd); /**< Provides QT META type declaration of the MatrixXd type. For signal/slot usage.*/
 #endif
 
-#endif // RtHPIS_H
+#endif // RTHPIS_H

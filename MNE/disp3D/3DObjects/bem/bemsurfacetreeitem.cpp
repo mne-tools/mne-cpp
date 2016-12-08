@@ -40,7 +40,7 @@
 
 #include "bemsurfacetreeitem.h"
 #include "../common/metatreeitem.h"
-#include "../../helpers/renderable3Dentity.h"
+#include "../common/renderable3Dentity.h"
 
 #include <mne/mne_bem.h>
 #include <fiff/fiff_constants.h>
@@ -97,6 +97,11 @@ BemSurfaceTreeItem::BemSurfaceTreeItem(int iType, const QString& text)
 
 BemSurfaceTreeItem::~BemSurfaceTreeItem()
 {
+    //Schedule deletion/Decouple of all entities so that the SceneGraph is NOT plotting them anymore.
+    //Cannot delete m_pParentEntity since we do not know who else holds it, that is why we use a QPointer for m_pParentEntity.
+    if(!m_pRenderable3DEntity.isNull()) {
+        m_pRenderable3DEntity->deleteLater();
+    }
 }
 
 

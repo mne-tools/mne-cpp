@@ -39,7 +39,7 @@
 //=============================================================================================================
 
 #include "digitizertreeitem.h"
-#include "../../helpers/renderable3Dentity.h"
+#include "../common/renderable3Dentity.h"
 #include "../common/metatreeitem.h"
 
 #include <fiff/fiff_constants.h>
@@ -79,13 +79,28 @@ using namespace DISP3DLIB;
 
 DigitizerTreeItem::DigitizerTreeItem(int iType, const QString& text)
 : AbstractTreeItem(iType, text)
-, m_pParentEntity(new Qt3DCore::QEntity())
-, m_pRenderable3DEntity(new Renderable3DEntity())
+, m_pParentEntity(Q_NULLPTR)
+, m_pRenderable3DEntity(Q_NULLPTR)
 {
     this->setEditable(false);
     this->setCheckable(true);
     this->setCheckState(Qt::Checked);
     this->setToolTip(text);
+
+    //Add color picker item as meta information item
+    QVariant data;
+    QList<QStandardItem*> list;
+
+    MetaTreeItem* pItemSurfCol = new MetaTreeItem(MetaTreeItemTypes::PointColor, "Point color");
+    connect(pItemSurfCol, &MetaTreeItem::surfaceColorChanged,
+            this, &DigitizerTreeItem::onSurfaceColorChanged);
+    list.clear();
+    list << pItemSurfCol;
+    list << new QStandardItem(pItemSurfCol->toolTip());
+    this->appendRow(list);
+    data.setValue(Qt::blue);
+    pItemSurfCol->setData(data, MetaTreeItemRoles::PointColor);
+    pItemSurfCol->setData(data, Qt::DecorationRole);
 }
 
 
@@ -93,6 +108,15 @@ DigitizerTreeItem::DigitizerTreeItem(int iType, const QString& text)
 
 DigitizerTreeItem::~DigitizerTreeItem()
 {
+    //Schedule deletion/Decouple of all entities so that the SceneGraph is NOT plotting them anymore.
+    //Cannot delete m_pParentEntity since we do not know who else holds it, that is why we use a QPointer for m_pParentEntity.
+    for(int i = 0; i < m_lSpheres.size(); ++i) {
+        m_lSpheres.at(i)->deleteLater();
+    }
+
+    if(!m_pRenderable3DEntity.isNull()) {
+        m_pRenderable3DEntity->deleteLater();
+    }
 }
 
 
@@ -112,7 +136,9 @@ void  DigitizerTreeItem::setData(const QVariant& value, int role)
 
     switch(role) {
     case Data3DTreeModelItemRoles::SurfaceCurrentColorVert:
-        m_pRenderable3DEntity->setVertColor(value.value<QByteArray>());
+        if(!m_pRenderable3DEntity.isNull()) {
+            m_pRenderable3DEntity->setVertColor(value.value<QByteArray>());
+        }
         break;
     }
 }
@@ -122,8 +148,16 @@ void  DigitizerTreeItem::setData(const QVariant& value, int role)
 
 bool DigitizerTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer, Qt3DCore::QEntity* parent)
 {
+    //Clear all data
+    m_lSpheres.clear();
+
     //Create renderable 3D entity
     m_pParentEntity = parent;
+
+//    if(!m_pRenderable3DEntity.isNull()) {
+//        m_pRenderable3DEntity->deleteLater();
+//    }
+
     m_pRenderable3DEntity = new Renderable3DEntity(m_pParentEntity);
 
     //Initial transformation also regarding the surface offset
@@ -183,20 +217,14 @@ bool DigitizerTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer, 
         m_lSpheres.append(pSourceSphereEntity);
     }
 
-    //Add surface meta information as item children
-    QVariant data;
-    QList<QStandardItem*> list;
+    QList<QStandardItem*> items = this->findChildren(MetaTreeItemTypes::PointColor);
 
-    MetaTreeItem* pItemSurfCol = new MetaTreeItem(MetaTreeItemTypes::PointColor, "Point color");
-    connect(pItemSurfCol, &MetaTreeItem::surfaceColorChanged,
-            this, &DigitizerTreeItem::onSurfaceColorChanged);
-    list.clear();
-    list << pItemSurfCol;
-    list << new QStandardItem(pItemSurfCol->toolTip());
-    this->appendRow(list);
-    data.setValue(colDefault);
-    pItemSurfCol->setData(data, MetaTreeItemRoles::PointColor);
-    pItemSurfCol->setData(data, Qt::DecorationRole);
+    for(int i = 0; i < items.size(); ++i) {
+        MetaTreeItem* item = dynamic_cast<MetaTreeItem*>(items.at(i));
+        QVariant data;
+        data.setValue(colDefault);
+        item->setData(data, MetaTreeItemRoles::PointColor);
+    }
 
     return true;
 }
@@ -206,8 +234,12 @@ bool DigitizerTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer, 
 
 void DigitizerTreeItem::setVisible(bool state)
 {
-    for(int i = 0; i < m_lSpheres.size(); ++i) {
-        m_lSpheres.at(i)->setParent(state ? m_pRenderable3DEntity : Q_NULLPTR);
+    if(!m_pRenderable3DEntity.isNull() && !m_pParentEntity.isNull()) {
+        for(int i = 0; i < m_lSpheres.size(); ++i) {
+            m_lSpheres.at(i)->setParent(state ? m_pRenderable3DEntity : Q_NULLPTR);
+        }
+
+        m_pRenderable3DEntity->setParent(state ? m_pParentEntity : Q_NULLPTR);
     }
 }
 

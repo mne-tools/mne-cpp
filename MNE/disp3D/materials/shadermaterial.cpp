@@ -84,7 +84,7 @@ ShaderMaterial::ShaderMaterial(QNode *parent)
 , m_pAmbientParameter(new QParameter(QStringLiteral("ka"), QColor::fromRgbF(0.05f, 0.05f, 0.05f, 1.0f)))
 , m_pDiffuseParameter(new QParameter(QStringLiteral("kd"), QColor::fromRgbF(0.7f, 0.7f, 0.7f, 1.0f)))
 , m_pSpecularParameter(new QParameter(QStringLiteral("ks"), QColor::fromRgbF(0.1f, 0.1f, 0.1f, 1.0f)))
-, m_pShininessParameter(new QParameter(QStringLiteral("shininess"), 1.0f))
+, m_pShininessParameter(new QParameter(QStringLiteral("shininess"), 10.0f))
 , m_pAlphaParameter(new QParameter("alpha", 0.5f))
 , m_pVertexGL3Technique(new QTechnique())
 , m_pVertexGL3RenderPass(new QRenderPass())
@@ -103,23 +103,23 @@ ShaderMaterial::ShaderMaterial(QNode *parent)
 ShaderMaterial::~ShaderMaterial()
 {
     //Not sure if Qt3d module implemented internal garbage handling, so I do it manually here
-    delete m_pAmbientParameter;
-    delete m_pDiffuseParameter;
-    delete m_pSpecularParameter;
-    delete m_pShininessParameter;
-    delete m_pAlphaParameter;
-    delete m_pFilterKey;
+//    delete m_pAmbientParameter;
+//    delete m_pDiffuseParameter;
+//    delete m_pSpecularParameter;
+//    delete m_pShininessParameter;
+//    delete m_pAlphaParameter;
+//    delete m_pFilterKey;
 
-    delete m_pVertexGL3Shader;
-    delete m_pVertexGL3RenderPass;
+//    delete m_pVertexGL3Shader;
+//    delete m_pVertexGL3RenderPass;
 
-    delete m_pVertexGL3Technique;
+//    delete m_pVertexGL3Technique;
 
-    delete m_pNoDepthMask;
-    delete m_pBlendState;
-    delete m_pBlendEquation;
+//    delete m_pNoDepthMask;
+//    delete m_pBlendState;
+//    delete m_pBlendEquation;
 
-    delete m_pVertexEffect;
+//    delete m_pVertexEffect;
 }
 
 

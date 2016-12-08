@@ -42,13 +42,15 @@
 //=============================================================================================================
 
 #include "../../disp3D_global.h"
-#include "../../helpers/abstracttreeitem.h"
+#include "../common/abstracttreeitem.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
+
+#include <QPointer>
 
 
 //*************************************************************************************************************
@@ -136,14 +138,6 @@ public:
     */
     bool addData(const FIFFLIB::FiffDigPointSet& tDigitizer, Qt3DCore::QEntity* parent);
 
-    //=========================================================================================================
-    /**
-    * Call this function whenever you want to change the visibilty of the 3D rendered content.
-    *
-    * @param[in] state     The visiblity flag.
-    */
-    void setVisible(bool state);
-
 private:
     //=========================================================================================================
     /**
@@ -153,10 +147,8 @@ private:
     */
     virtual void onCheckStateChanged(const Qt::CheckState& checkState);
 
-    Qt3DCore::QEntity*      m_pParentEntity;                            /**< The parent 3D entity. */
-    Renderable3DEntity*     m_pRenderable3DEntity;                      /**< The renderable 3D entity. */
-
-    QObjectList             m_lChildren;
+    QPointer<Qt3DCore::QEntity>      m_pParentEntity;                            /**< The parent 3D entity. */
+    QPointer<Renderable3DEntity>     m_pRenderable3DEntity;                      /**< The renderable 3D entity. */
 };
 
 } // NAMESPACE DISP3DLIB
