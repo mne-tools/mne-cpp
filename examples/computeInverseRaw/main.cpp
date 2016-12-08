@@ -2,6 +2,7 @@
 /**
 * @file     main.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     July, 2012
@@ -59,6 +60,7 @@
 //=============================================================================================================
 
 #include <QtCore/QCoreApplication>
+#include <QCommandLineParser>
 
 
 //*************************************************************************************************************
@@ -88,22 +90,40 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
-//  fname_data  - Name of the data file
-//  setno       - Data set number
-//  fname_inv   - Inverse operator file name
-//  nave        - Number of averages (scales the noise covariance)
-//             If negative, the number of averages in the data will be
-//             used
-//  lambda2     - The regularization factor
-//  dSPM        - do dSPM?
-//  sLORETA     - do sLORETA?
-    QFile t_fileEvoked("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
-    QFile t_fileInv("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-meg-eeg-inv.fif");
-    qint32 nave = 40;
-    float snr = 3.0f;
+    // Command Line Parser
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Compute Inverse Powell RAP-MUSIC Example");
+    parser.addHelpOption();
+    QCommandLineOption sampleEvokedFileOption("ave", "Path to evoked <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    QCommandLineOption invFileOption("inv", "Path to inverse <file>, which is to be loaded.", "file", "");
+    QCommandLineOption snrOption("snr", "The SNR value used for computation <snr>.", "snr", "1.0f");//3.0f;//0.1f;//3.0f;
+    QCommandLineOption numberAveragesOption("numAve", "The <value> for the number of averages.", "value", "40");
+    QCommandLineOption methodOption("method", "Inverse estimation <method>, i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM");//"MNE" | "dSPM" | "sLORETA"
+
+    parser.addOption(sampleEvokedFileOption);
+    parser.addOption(invFileOption);
+    parser.addOption(snrOption);
+    parser.addOption(numberAveragesOption);
+    parser.addOption(methodOption);
+
+    //Load data
+    QFile t_fileEvoked(parser.value(sampleEvokedFileOption));
+    QFile t_fileInv(parser.value(invFileOption));
+
+    qint32 nave = parser.value(numberAveragesOption).toInt();
+    float snr = parser.value(snrOption).toFloat();
     float lambda2 = pow(1.0f / snr, 2.0f);
+
+    QString method = parser.value(methodOption);
+
     bool dSPM = false;
-    bool sLORETA = true;
+    bool sLORETA = false;
+
+    if(method == "dSPM") {
+        dSPM = true;
+    } else if(method == "sLORETA") {
+        sLORETA = true;
+    }
 
     //
     //   Read the data first

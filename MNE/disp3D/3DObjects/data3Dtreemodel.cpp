@@ -44,7 +44,7 @@
 #include "brain/brainsurfacetreeitem.h"
 #include "brain/brainsurfacesettreeitem.h"
 #include "digitizer/digitizertreeitem.h"
-#include "../helpers/renderable3Dentity.h"
+#include "common/renderable3Dentity.h"
 
 #include <mne/mne_bem.h>
 #include <fs/surfaceset.h>
@@ -474,7 +474,6 @@ bool Data3DTreeModel::addData(const QString& subject, const QString& set, const 
         //Check if it is really a subject tree item
         if((itemSubjectList.at(i)->type() == Data3DTreeModelItemTypes::SubjectItem)) {
             SubjectTreeItem* pSubjectItem = dynamic_cast<SubjectTreeItem*>(itemSubjectList.at(i));
-
 
             //Find already existing set items and add the new data to the first search result
             QList<QStandardItem*> itemList = pSubjectItem->findChildren(set);
