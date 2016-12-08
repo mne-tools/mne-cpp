@@ -205,6 +205,39 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
             return pDoubleSpinBox;
         }
 
+        case MetaTreeItemTypes::SurfaceTessInner: {
+            QDoubleSpinBox* pDoubleSpinBox = new QDoubleSpinBox(parent);
+            connect(pDoubleSpinBox, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+                    this, &Data3DTreeDelegate::onEditorEdited);
+            pDoubleSpinBox->setMinimum(1.0);
+            pDoubleSpinBox->setMaximum(100.0);
+            pDoubleSpinBox->setSingleStep(1.0);
+            pDoubleSpinBox->setValue(index.model()->data(index, MetaTreeItemRoles::SurfaceTessInner).toDouble());
+            return pDoubleSpinBox;
+        }
+
+        case MetaTreeItemTypes::SurfaceTessOuter: {
+            QDoubleSpinBox* pDoubleSpinBox = new QDoubleSpinBox(parent);
+            connect(pDoubleSpinBox, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+                    this, &Data3DTreeDelegate::onEditorEdited);
+            pDoubleSpinBox->setMinimum(1.0);
+            pDoubleSpinBox->setMaximum(100.0);
+            pDoubleSpinBox->setSingleStep(1.0);
+            pDoubleSpinBox->setValue(index.model()->data(index, MetaTreeItemRoles::SurfaceTessOuter).toDouble());
+            return pDoubleSpinBox;
+        }
+
+        case MetaTreeItemTypes::SurfaceTriangleScale: {
+            QDoubleSpinBox* pDoubleSpinBox = new QDoubleSpinBox(parent);
+            connect(pDoubleSpinBox, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+                    this, &Data3DTreeDelegate::onEditorEdited);
+            pDoubleSpinBox->setMinimum(0.01);
+            pDoubleSpinBox->setMaximum(100.0);
+            pDoubleSpinBox->setSingleStep(0.01);
+            pDoubleSpinBox->setValue(index.model()->data(index, MetaTreeItemRoles::SurfaceTriangleScale).toDouble());
+            return pDoubleSpinBox;
+        }
+
         case MetaTreeItemTypes::SurfaceTranslateX: {
             QDoubleSpinBox* pDoubleSpinBox = new QDoubleSpinBox(parent);
             connect(pDoubleSpinBox, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
@@ -358,6 +391,27 @@ void Data3DTreeDelegate::setEditorData(QWidget* editor, const QModelIndex& index
 
         case MetaTreeItemTypes::SurfaceAlpha: {
             int value = index.model()->data(index, MetaTreeItemRoles::SurfaceAlpha).toDouble();
+            QSpinBox* pSpinBox = static_cast<QSpinBox*>(editor);
+            pSpinBox->setValue(value);
+            break;
+        }
+
+        case MetaTreeItemTypes::SurfaceTessInner: {
+            int value = index.model()->data(index, MetaTreeItemRoles::SurfaceTessInner).toDouble();
+            QSpinBox* pSpinBox = static_cast<QSpinBox*>(editor);
+            pSpinBox->setValue(value);
+            break;
+        }
+
+        case MetaTreeItemTypes::SurfaceTessOuter: {
+            int value = index.model()->data(index, MetaTreeItemRoles::SurfaceTessOuter).toDouble();
+            QSpinBox* pSpinBox = static_cast<QSpinBox*>(editor);
+            pSpinBox->setValue(value);
+            break;
+        }
+
+        case MetaTreeItemTypes::SurfaceTriangleScale: {
+            int value = index.model()->data(index, MetaTreeItemRoles::SurfaceTriangleScale).toDouble();
             QSpinBox* pSpinBox = static_cast<QSpinBox*>(editor);
             pSpinBox->setValue(value);
             break;
@@ -524,6 +578,36 @@ void Data3DTreeDelegate::setModelData(QWidget* editor, QAbstractItemModel* model
             data.setValue(pDoubleSpinBox->value());
 
             model->setData(index, data, MetaTreeItemRoles::SurfaceAlpha);
+            model->setData(index, data, Qt::DisplayRole);
+            break;
+        }
+
+        case MetaTreeItemTypes::SurfaceTessInner: {
+            QDoubleSpinBox* pDoubleSpinBox = static_cast<QDoubleSpinBox*>(editor);
+            QVariant data;
+            data.setValue(pDoubleSpinBox->value());
+
+            model->setData(index, data, MetaTreeItemRoles::SurfaceTessInner);
+            model->setData(index, data, Qt::DisplayRole);
+            break;
+        }
+
+        case MetaTreeItemTypes::SurfaceTessOuter: {
+            QDoubleSpinBox* pDoubleSpinBox = static_cast<QDoubleSpinBox*>(editor);
+            QVariant data;
+            data.setValue(pDoubleSpinBox->value());
+
+            model->setData(index, data, MetaTreeItemRoles::SurfaceTessOuter);
+            model->setData(index, data, Qt::DisplayRole);
+            break;
+        }
+
+        case MetaTreeItemTypes::SurfaceTriangleScale: {
+            QDoubleSpinBox* pDoubleSpinBox = static_cast<QDoubleSpinBox*>(editor);
+            QVariant data;
+            data.setValue(pDoubleSpinBox->value());
+
+            model->setData(index, data, MetaTreeItemRoles::SurfaceTriangleScale);
             model->setData(index, data, Qt::DisplayRole);
             break;
         }

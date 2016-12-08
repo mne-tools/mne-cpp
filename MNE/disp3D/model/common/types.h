@@ -119,7 +119,10 @@ namespace MetaTreeItemTypes
                     SurfaceTranslateZ = QStandardItem::UserType + 119,
                     PointColor = QStandardItem::UserType + 120,
                     NetworkThreshold = QStandardItem::UserType + 121,
-                    NetworkMatrix = QStandardItem::UserType + 122};
+                    NetworkMatrix = QStandardItem::UserType + 122,
+                    SurfaceTessInner = QStandardItem::UserType + 123,
+                    SurfaceTessOuter = QStandardItem::UserType + 124,
+                    SurfaceTriangleScale = QStandardItem::UserType + 125};
 }
 
 // Model item roles
@@ -184,7 +187,10 @@ namespace MetaTreeItemRoles
                     SurfaceTranslateY = Qt::UserRole + 19,
                     SurfaceTranslateZ = Qt::UserRole + 20,
                     PointColor = Qt::UserRole + 21,
-                    NetworkThreshold = Qt::UserRole + 22};
+                    NetworkThreshold = Qt::UserRole + 22,
+                    SurfaceTessInner = Qt::UserRole + 23,
+                    SurfaceTessOuter = Qt::UserRole + 24,
+                    SurfaceTriangleScale = Qt::UserRole + 25};
 }
 
 } //NAMESPACE DISP3DLIB

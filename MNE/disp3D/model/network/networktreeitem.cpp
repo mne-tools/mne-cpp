@@ -339,7 +339,7 @@ void NetworkTreeItem::plotNetwork(QSharedPointer<CONNECTIVITYLIB::Network> pNetw
         }
     }
 
-    //Generate connection indices and colors for Qt3D buffer
+    //Generate colors for Qt3D buffer
     QByteArray arrayLineColor;
     arrayLineColor.resize(tMatVert.rows() * 3 * (int)sizeof(float));
     float *rawColorArray = reinterpret_cast<float *>(arrayLineColor.data());

@@ -165,7 +165,8 @@ bool BrainSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* p
     //Set shaders
     m_pRenderable3DEntity->setShader(QUrl(QStringLiteral("qrc:/model/common/shaders/gl3/pervertexphongalpha.vert")));
     m_pRenderable3DEntity->setShader(QUrl(QStringLiteral("qrc:/model/common/shaders/gl3/pervertexphongalpha.tcs")));
-    m_pRenderable3DEntity->setShader(QUrl(QStringLiteral("qrc:/model/common/shaders/gl3/pervertexphongalpha_simple.tes")));
+    //m_pRenderable3DEntity->setShader(QUrl(QStringLiteral("qrc:/model/common/shaders/gl3/pervertexphongalpha_simple.tes")));
+    m_pRenderable3DEntity->setShader(QUrl(QStringLiteral("qrc:/model/common/shaders/gl3/pervertexphongalpha_pn_triangles.tes")));
     m_pRenderable3DEntity->setShader(QUrl(QStringLiteral("qrc:/model/common/shaders/gl3/pervertexphongalpha.geom")));
     m_pRenderable3DEntity->setShader(QUrl(QStringLiteral("qrc:/model/common/shaders/gl3/pervertexphongalpha.frag")));
 
@@ -241,6 +242,36 @@ bool BrainSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* p
     this->appendRow(list);
     data.setValue(1.0);
     itemAlpha->setData(data, MetaTreeItemRoles::SurfaceAlpha);
+
+    MetaTreeItem *itemTessInner = new MetaTreeItem(MetaTreeItemTypes::SurfaceTessInner, "1.0");
+    connect(itemTessInner, &MetaTreeItem::surfaceTessInnerChanged,
+            this, &BrainSurfaceTreeItem::onSurfaceTessInnerChanged);
+    list.clear();
+    list << itemTessInner;
+    list << new QStandardItem(itemTessInner->toolTip());
+    this->appendRow(list);
+    data.setValue(1.0);
+    itemTessInner->setData(data, MetaTreeItemRoles::SurfaceTessInner);
+
+    MetaTreeItem *itemTessOuter = new MetaTreeItem(MetaTreeItemTypes::SurfaceTessOuter, "1.0");
+    connect(itemTessOuter, &MetaTreeItem::surfaceTessOuterChanged,
+            this, &BrainSurfaceTreeItem::onSurfaceTessOuterChanged);
+    list.clear();
+    list << itemTessOuter;
+    list << new QStandardItem(itemTessOuter->toolTip());
+    this->appendRow(list);
+    data.setValue(1.0);
+    itemTessOuter->setData(data, MetaTreeItemRoles::SurfaceTessOuter);
+
+    MetaTreeItem *itemTriangleScale = new MetaTreeItem(MetaTreeItemTypes::SurfaceTriangleScale, "1.0");
+    connect(itemTriangleScale, &MetaTreeItem::surfaceTriangleScaleChanged,
+            this, &BrainSurfaceTreeItem::onSurfaceTriangleScaleChanged);
+    list.clear();
+    list << itemTriangleScale;
+    list << new QStandardItem(itemTriangleScale->toolTip());
+    this->appendRow(list);
+    data.setValue(1.0);
+    itemTriangleScale->setData(data, MetaTreeItemRoles::SurfaceTriangleScale);
 
     MetaTreeItem *itemSurfFileName = new MetaTreeItem(MetaTreeItemTypes::FileName, tSurface.fileName());
     itemSurfFileName->setEditable(false);
@@ -391,6 +422,33 @@ void BrainSurfaceTreeItem::onSurfaceAlphaChanged(float fAlpha)
 {
     m_pRenderable3DEntity->setAlpha(fAlpha);
     m_pRenderable3DEntityActivationOverlay->setAlpha(fAlpha);
+}
+
+
+//*************************************************************************************************************
+
+void BrainSurfaceTreeItem::onSurfaceTessInnerChanged(float fTessInner)
+{
+    m_pRenderable3DEntity->setTessInner(fTessInner);
+    m_pRenderable3DEntityActivationOverlay->setTessInner(fTessInner);
+}
+
+
+//*************************************************************************************************************
+
+void BrainSurfaceTreeItem::onSurfaceTessOuterChanged(float fTessOuter)
+{
+    m_pRenderable3DEntity->setTessOuter(fTessOuter);
+    m_pRenderable3DEntityActivationOverlay->setTessOuter(fTessOuter);
+}
+
+
+//*************************************************************************************************************
+
+void BrainSurfaceTreeItem::onSurfaceTriangleScaleChanged(float fTriangleScale)
+{
+    m_pRenderable3DEntity->setTriangleScale(fTriangleScale);
+    m_pRenderable3DEntityActivationOverlay->setTriangleScale(fTriangleScale);
 }
 
 

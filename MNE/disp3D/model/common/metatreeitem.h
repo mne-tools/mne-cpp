@@ -173,6 +173,30 @@ signals:
 
     //=========================================================================================================
     /**
+    * Emit this signal whenever the surface inner tesselation value has changed.
+    *
+    * @param[in] fTessInner     The new inner tesselation value.
+    */
+    void surfaceTessInnerChanged(float fTessInner);
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the surface outer tesselation value has changed.
+    *
+    * @param[in] fTessOuter     The new outer tesselation value.
+    */
+    void surfaceTessOuterChanged(float fTessOuter);
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the surface triangle scale value has changed.
+    *
+    * @param[in] fTriangleScale     The triangle scale value.
+    */
+    void surfaceTriangleScaleChanged(float fTriangleScale);
+
+    //=========================================================================================================
+    /**
     * Emit this signal whenever the surface translation x value changed has changed.
     *
     * @param[in] xTrans     The new translation x value.

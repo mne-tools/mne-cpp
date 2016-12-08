@@ -168,11 +168,35 @@ private:
 
     //=========================================================================================================
     /**
-    * Call this function whenever the curvature color or origin of color information (curvature or annotation) changed.
+    * Call this function whenever the alpha value changed.
     *
     * @param[in] fAlpha     The new alpha value.
     */
     void onSurfaceAlphaChanged(float fAlpha);
+
+    //=========================================================================================================
+    /**
+    * Call this function whenever the inner tesselation value changed.
+    *
+    * @param[in] fTessInner     The new inner tesselation value.
+    */
+    void onSurfaceTessInnerChanged(float fTessInner);
+
+    //=========================================================================================================
+    /**
+    * Call this function whenever the outer tesselation value changed.
+    *
+    * @param[in] fTessOuter     The new outer tesselation value.
+    */
+    void onSurfaceTessOuterChanged(float fTessOuter);
+
+    //=========================================================================================================
+    /**
+    * Call this function whenever the triangle scale value changed.
+    *
+    * @param[in] fTriangleScale     The triangle scale value.
+    */
+    void onSurfaceTriangleScaleChanged(float fTriangleScale);
 
     //=========================================================================================================
     /**
