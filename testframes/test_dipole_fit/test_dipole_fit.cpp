@@ -191,4 +191,4 @@ void TestDipoleFit::cleanupTestCase()
 //=============================================================================================================
 
 QTEST_APPLESS_MAIN(TestDipoleFit)
-#include "test_fiff_rwr.moc"
+#include "test_dipole_fit.moc"
