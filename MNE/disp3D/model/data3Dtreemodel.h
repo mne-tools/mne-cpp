@@ -104,7 +104,7 @@ namespace DISP3DLIB
 //=============================================================================================================
 
 class BrainRTSourceLocDataTreeItem;
-class BrainRTConnectivityDataTreeItem;
+class NetworkTreeItem;
 
 
 //=============================================================================================================
@@ -217,7 +217,7 @@ public:
     *
     * @return                       Returns a list with the tree items which now hold the activation data. Use this list to update the data, i.e. during real time applications.
     */
-    QList<BrainRTConnectivityDataTreeItem*> addConnectivityData(const QString& subject, const QString& set, CONNECTIVITYLIB::Network::SPtr pNetworkData);
+    QList<NetworkTreeItem*> addConnectivityData(const QString& subject, const QString& set, CONNECTIVITYLIB::Network::SPtr pNetworkData);
 
     //=========================================================================================================
     /**

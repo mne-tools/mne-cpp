@@ -106,7 +106,7 @@ SOURCES += \
     model/brain/brainannotationtreeitem.cpp \
     model/brain/brainhemispheretreeitem.cpp \
     model/brain/brainrtsourcelocdatatreeitem.cpp \
-    model/brain/brainrtconnectivitydatatreeitem.cpp \
+    model/network/networktreeitem.cpp \
     model/bem/bemtreeitem.cpp \
     model/bem/bemsurfacetreeitem.cpp \
     model/digitizer/digitizertreeitem.cpp \
@@ -130,7 +130,7 @@ HEADERS += \
     model/brain/brainannotationtreeitem.h \
     model/brain/brainhemispheretreeitem.h \
     model/brain/brainrtsourcelocdatatreeitem.h \
-    model/brain/brainrtconnectivitydatatreeitem.h \
+    model/network/networktreeitem.h \
     model/bem/bemtreeitem.h \
     model/bem/bemsurfacetreeitem.h \
     model/digitizer/digitizertreeitem.h \

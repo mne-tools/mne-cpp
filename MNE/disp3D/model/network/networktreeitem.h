@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     brainrtconnectivitydatatreeitem.h
+* @file     networktreeitem.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     BrainRTConnectivityDataTreeItem class declaration.
+* @brief     NetworkTreeItem class declaration.
 *
 */
 
-#ifndef BRAINRTCONNECTIVITYDATATREEITEM_H
-#define BRAINRTCONNECTIVITYDATATREEITEM_H
+#ifndef NETWORKTREEITEM_H
+#define NETWORKTREEITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -101,17 +101,17 @@ class MetaTreeItem;
 
 //=============================================================================================================
 /**
-* BrainRTConnectivityDataTreeItem provides a generic item to hold information about real time connectivity data to plot onto the brain surface.
+* NetworkTreeItem provides a generic item to hold information about real time connectivity data to plot onto the brain surface.
 *
 * @brief Provides a generic brain tree item to hold real time data.
 */
-class DISP3DNEWSHARED_EXPORT BrainRTConnectivityDataTreeItem : public AbstractTreeItem
+class DISP3DNEWSHARED_EXPORT NetworkTreeItem : public AbstractTreeItem
 {
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<BrainRTConnectivityDataTreeItem> SPtr;             /**< Shared pointer type for BrainRTConnectivityDataTreeItem class. */
-    typedef QSharedPointer<const BrainRTConnectivityDataTreeItem> ConstSPtr;  /**< Const shared pointer type for BrainRTConnectivityDataTreeItem class. */
+    typedef QSharedPointer<NetworkTreeItem> SPtr;             /**< Shared pointer type for NetworkTreeItem class. */
+    typedef QSharedPointer<const NetworkTreeItem> ConstSPtr;  /**< Const shared pointer type for NetworkTreeItem class. */
 
     //=========================================================================================================
     /**
@@ -120,13 +120,13 @@ public:
     * @param[in] iType      The type of the item. See types.h for declaration and definition.
     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
     */
-    explicit BrainRTConnectivityDataTreeItem(int iType = Data3DTreeModelItemTypes::RTConnectivityDataItem, const QString& text = "RT Connectivity Data");
+    explicit NetworkTreeItem(int iType = Data3DTreeModelItemTypes::RTConnectivityDataItem, const QString& text = "RT Connectivity Data");
 
     //=========================================================================================================
     /**
     * Default destructor
     */
-    ~BrainRTConnectivityDataTreeItem();
+    ~NetworkTreeItem();
 
     //=========================================================================================================
     /**
@@ -216,7 +216,7 @@ signals:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline bool BrainRTConnectivityDataTreeItem::isInit() const
+inline bool NetworkTreeItem::isInit() const
 {
     return m_bIsInit;
 }
@@ -228,4 +228,4 @@ inline bool BrainRTConnectivityDataTreeItem::isInit() const
 Q_DECLARE_METATYPE(CONNECTIVITYLIB::Network::SPtr);
 #endif
 
-#endif // BRAINRTCONNECTIVITYDATATREEITEM_H
+#endif // NETWORKTREEITEM_H

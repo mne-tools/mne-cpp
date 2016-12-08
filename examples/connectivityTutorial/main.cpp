@@ -290,7 +290,7 @@ int main(int argc, char *argv[])
 
     p3DDataModel->addSurfaceSet(parser.value(subjectOption), evoked.comment, tSurfSet, tAnnotSet);
 
-    QList<BrainRTConnectivityDataTreeItem*> rtItemListConnect= p3DDataModel->addConnectivityData(parser.value(subjectOption), evoked.comment, pConnect_LA);
+    QList<NetworkTreeItem*> rtItemListConnect= p3DDataModel->addConnectivityData(parser.value(subjectOption), evoked.comment, pConnect_LA);
     QList<BrainRTSourceLocDataTreeItem*> rtItemListSourceLoc = p3DDataModel->addSourceData(parser.value(subjectOption), evoked.comment, sourceEstimate, t_clusteredFwd);
 
     //Init some rt related values for right visual data
