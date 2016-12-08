@@ -248,7 +248,7 @@ void Downloader::readyToExtract(bool stat, QString zip, QString current)
 //*************************************************************************************************************
 
 
-#elif __linux__
+#else //Linux & OSX
 
 void Downloader::readyToExtract(bool stat)
 {

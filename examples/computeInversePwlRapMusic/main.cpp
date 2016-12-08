@@ -1,7 +1,8 @@
 //=============================================================================================================
 /**
 * @file     main.cpp
-* @author   Christoph Dinh <christoph.dinh@tu-ilmenau.de>
+* @author   Christoph Dinh <christoph.dinh@tu-ilmenau.de>;
+*           Lorenz Esch <lorenz.esch@tu-ilmenau.de>
 * @version  1.0
 * @date     July, 2013
 *
@@ -102,52 +103,40 @@ int main(int argc, char *argv[])
     QCommandLineParser parser;
     parser.setApplicationDescription("Compute Inverse Powell RAP-MUSIC Example");
     parser.addHelpOption();
-    QCommandLineOption sampleFwdFileOption("f", "Path to forward solution <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
-    QCommandLineOption sampleEvokedFileOption("e", "Path to evoked <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
-    QCommandLineOption sampleSubjectDirectoryOption("d", "Path to subject <directory>.", "directory", "./MNE-sample-data/subjects");
-    QCommandLineOption sampleSubjectOption("s", "Selected <subject>.", "subject", "sample");
-    QCommandLineOption stcFileOption("t", "Path to <target> where stc is stored to.", "target", "");//"RapMusic.stc");
-    QCommandLineOption numDipolePairsOption("n", "<number> of dipole pairs to localize.", "number", "7");
-    QCommandLineOption doMovieOption("m", "Create overlapping movie.");
+    QCommandLineOption fwdFileOption("fwd", "Path to forward solution <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
+    QCommandLineOption evokedFileOption("ave", "Path to evoked <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    QCommandLineOption subjectDirectoryOption("subjDir", "Path to subject <directory>.", "directory", "./MNE-sample-data/subjects");
+    QCommandLineOption subjectOption("subj", "Selected <subject>.", "subject", "sample");
+    QCommandLineOption stcFileOption("stcOut", "Path to stc <file>, which is to be written.", "file", "");//"RapMusic.stc");
+    QCommandLineOption numDipolePairsOption("numDip", "<number> of dipole pairs to localize.", "number", "7");
+    QCommandLineOption doMovieOption("movie", "Create overlapping movie.");
+    QCommandLineOption annotOption("annotType", "Annotation type <type>.", "type", "aparc.a2009s");
+    QCommandLineOption surfOption("surfType", "Surface type <type>.", "type", "orig");
 
-    parser.addOption(sampleFwdFileOption);
-    parser.addOption(sampleEvokedFileOption);
-    parser.addOption(sampleSubjectDirectoryOption);
-    parser.addOption(sampleSubjectOption);
+    parser.addOption(fwdFileOption);
+    parser.addOption(evokedFileOption);
+    parser.addOption(subjectDirectoryOption);
+    parser.addOption(subjectOption);
     parser.addOption(stcFileOption);
     parser.addOption(numDipolePairsOption);
     parser.addOption(doMovieOption);
+    parser.addOption(annotOption);
+    parser.addOption(surfOption);
     parser.process(app);
 
-
-    //########################################################################################
-    // Source Estimate
-
-    QFile t_fileFwd(parser.value(sampleFwdFileOption));
-    QFile t_fileEvoked(parser.value(sampleEvokedFileOption));
-    QString subject(parser.value(sampleSubjectOption)); QString subjectDir(parser.value(sampleSubjectDirectoryOption));
-    AnnotationSet t_annotationSet(subject, 2, "aparc.a2009s", subjectDir);
-    SurfaceSet t_surfSet(subject, 2, "white", subjectDir);
+    // Parse command line parameters
+    QFile t_fileFwd(parser.value(fwdFileOption));
+    QFile t_fileEvoked(parser.value(evokedFileOption));
+    QString subject(parser.value(subjectOption));
+    QString subjectDir(parser.value(subjectDirectoryOption));
+    AnnotationSet t_annotationSet(subject, 2, parser.value(annotOption), subjectDir);
+    SurfaceSet t_surfSet(subject, 2, parser.value(surfOption), subjectDir);
 
     QString t_sFileNameStc(parser.value(stcFileOption));
 
     qint32 numDipolePairs = parser.value(numDipolePairsOption).toInt();
 
     bool doMovie = parser.isSet(doMovieOption);
-
-    // Parse command line parameters
-    for(qint32 i = 0; i < argc; ++i)
-    {
-        if(strcmp(argv[i], "-stc") == 0 || strcmp(argv[i], "--stc") == 0)
-        {
-            if(i + 1 < argc)
-                t_sFileNameStc = QString::fromUtf8(argv[i+1]);
-        }else if(strcmp(argv[i], "-num") == 0 || strcmp(argv[i], "--num") == 0)
-        {
-            if(i + 1 < argc)
-                numDipolePairs = atof(argv[i+1]);
-        }
-    }
 
     qDebug() << "Start calculation with stc:" << t_sFileNameStc;
 

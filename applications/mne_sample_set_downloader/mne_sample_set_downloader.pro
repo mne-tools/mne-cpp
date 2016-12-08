@@ -37,7 +37,7 @@ include(../../mne-cpp.pri)
 
 VERSION = $${MNE_CPP_VERSION}
 
-CONFIG   += qt
+TEMPLATE = app
 
 QT       += core gui widgets network
 
@@ -48,8 +48,6 @@ TARGET = mne_sample_data_downloader
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
-
-TEMPLATE = app
 
 DESTDIR =  $${MNE_BINARY_DIR}
 

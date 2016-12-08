@@ -184,10 +184,12 @@ public:
     /**
     * Sets the artifact reduction
     *
-    * @param[in] bActivate      Whether to activate artifact reduction or not
-    * @param[in] dThreshold     The artifact threshold
+    * @param[in] bActivateThreshold     Whether to activate threshold artifact reduction or not
+    * @param[in] dValueThreshold        The artifact threshold value
+    * @param[in] bActivateVariance      Whether to activate variance artifact reduction or not
+    * @param[in] dValueVariance         The artifact variance value
     */
-    void setArtifactReduction(bool bActivate, double dThreshold);
+    void setArtifactReduction(bool bActivateThreshold, double dValueThreshold, bool bActivateVariance, double dValueVariance);
 
     //=========================================================================================================
     /**
@@ -288,11 +290,10 @@ private:
     * Checks the givven matrix for artifacts beyond a threshold value.
     *
     * @param[in] data           The data matrix.
-    * @param[in] dThreshold     The threshold value.
     *
     * @return   Whether a thresold artifact was detected.
     */
-    bool checkForArtifact(Eigen::MatrixXd& data, double dThreshold);
+    bool checkForArtifact(Eigen::MatrixXd& data);
 
     //=========================================================================================================
     /**
@@ -331,9 +332,8 @@ private:
 
     float                                           m_fTriggerThreshold;        /**< Threshold to detect trigger */
 
-    double                                          m_dArtifactThreshold;       /**< Threshold to detect artifacts */
-
-    bool                                            m_bDoArtifactReduction;     /**< Whether to do artifact reduction or not. */
+    bool                                            m_bActivateThreshold;       /**< Whether to do threshold artifact reduction or not. */
+    bool                                            m_bActivateVariance;        /**< Whether to do variance artifact reduction or not. */
     bool                                            m_bIsRunning;               /**< Holds if real-time Covariance estimation is running.*/
     bool                                            m_bAutoAspect;              /**< Auto aspect detection on or off. */
     bool                                            m_bDoBaselineCorrection;    /**< Whether to perform baseline correction. */

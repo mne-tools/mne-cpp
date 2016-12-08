@@ -40,7 +40,7 @@
 
 #include "brainsurfacetreeitem.h"
 #include "../common/metatreeitem.h"
-#include "../../helpers/renderable3Dentity.h"
+#include "../common//renderable3Dentity.h"
 
 #include <fs/label.h>
 #include <fs/surface.h>
@@ -102,6 +102,15 @@ BrainSurfaceTreeItem::BrainSurfaceTreeItem(int iType, const QString& text)
 
 BrainSurfaceTreeItem::~BrainSurfaceTreeItem()
 {
+    //Schedule deletion/Decouple of all entities so that the SceneGraph is NOT plotting them anymore.
+    //Cannot delete m_pParentEntity since we do not know who else holds it, that is why we use a QPointer for m_pParentEntity.
+    if(!m_pRenderable3DEntity.isNull()) {
+        m_pRenderable3DEntity->deleteLater();
+    }
+
+    if(!m_pRenderable3DEntityActivationOverlay.isNull()) {
+        m_pRenderable3DEntityActivationOverlay->deleteLater();
+    }
 }
 
 
@@ -318,6 +327,7 @@ void BrainSurfaceTreeItem::onAnnotationVisibilityChanged(bool isVisible)
 void BrainSurfaceTreeItem::setVisible(bool state)
 {
     m_pRenderable3DEntity->setParent(state ? m_pParentEntity : Q_NULLPTR);
+    m_pRenderable3DEntityActivationOverlay->setParent(state ? m_pParentEntity : Q_NULLPTR);
 }
 
 

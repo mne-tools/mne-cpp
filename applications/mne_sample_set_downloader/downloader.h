@@ -186,9 +186,8 @@ private:
     void readyToExtract(bool stat, QString zip, QString current);
 
 
-#endif
+#else //Linux & OSX
 
-#ifdef __linux__
 private:
     //=========================================================================================================
     /**
