@@ -50,6 +50,7 @@
 //=============================================================================================================
 
 #include <Qt3DRender/qmaterial.h>
+#include <QPointer>
 
 
 //*************************************************************************************************************
@@ -142,22 +143,22 @@ private:
     */
     void init();
 
-    Qt3DRender::QEffect*            m_pVertexEffect;
+    QPointer<Qt3DRender::QEffect>            m_pVertexEffect;
 
-    Qt3DRender::QParameter*         m_pAmbientParameter;
-    Qt3DRender::QParameter*         m_pDiffuseParameter;
-    Qt3DRender::QParameter*         m_pSpecularParameter;
-    Qt3DRender::QParameter*         m_pShininessParameter;
-    Qt3DRender::QParameter*         m_pAlphaParameter;
-    Qt3DRender::QFilterKey*         m_pFilterKey;
+    QPointer<Qt3DRender::QParameter>         m_pAmbientParameter;
+    QPointer<Qt3DRender::QParameter>         m_pDiffuseParameter;
+    QPointer<Qt3DRender::QParameter>         m_pSpecularParameter;
+    QPointer<Qt3DRender::QParameter>         m_pShininessParameter;
+    QPointer<Qt3DRender::QParameter>         m_pAlphaParameter;
+    QPointer<Qt3DRender::QFilterKey>         m_pFilterKey;
 
-    Qt3DRender::QTechnique*         m_pVertexGL3Technique;
-    Qt3DRender::QRenderPass*        m_pVertexGL3RenderPass;
-    Qt3DRender::QShaderProgram*     m_pVertexGL3Shader;
+    QPointer<Qt3DRender::QTechnique>         m_pVertexGL3Technique;
+    QPointer<Qt3DRender::QRenderPass>        m_pVertexGL3RenderPass;
+    QPointer<Qt3DRender::QShaderProgram>     m_pVertexGL3Shader;
 
-    Qt3DRender::QNoDepthMask*                   m_pNoDepthMask;
-    Qt3DRender::QBlendEquationArguments*        m_pBlendState;
-    Qt3DRender::QBlendEquation*                 m_pBlendEquation;
+    QPointer<Qt3DRender::QNoDepthMask>                   m_pNoDepthMask;
+    QPointer<Qt3DRender::QBlendEquationArguments>        m_pBlendState;
+    QPointer<Qt3DRender::QBlendEquation>                 m_pBlendEquation;
 };
 
 } // namespace DISP3DLIB

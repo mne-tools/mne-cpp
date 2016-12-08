@@ -2,6 +2,7 @@
 /**
 * @file     main.cpp
 * @author   Lorenz Esc <Lorenz.Esch@tu-ilmenau.de>;
+*           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     January, 2015
@@ -89,12 +90,11 @@ int main(int argc, char *argv[])
 
     // Command Line Parser
     QCommandLineParser parser;
-    parser.setApplicationDescription("Start disp3D tutorial");
+    parser.setApplicationDescription("Make Layout Example");
     parser.addHelpOption();
-    QCommandLineOption inputOption("in", "The input file <in>.", "in", "./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
-    //QCommandLineOption inputOption("in", "The input file <in>.", "in", "./mne_scan_plugins/resources/tmsi/loc_files/standard_waveguard128.elc");
+    QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", "./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
     QCommandLineOption chKindOption("coilType", "The coil type <out>.", "coilType", "3012"); // 3012 = FIFFV_COIL_VV_PLANAR_T1, use coil type instead of kind because this way we can distinguish between different layers (outer, inner, etc.), see fiff_constants for details FIFFV_REF_MEG_CH FIFFV_COIL_BABY_REF_MAG FIFFV_COIL_BABY_MAG
-    QCommandLineOption outputOption("out", "The output file <out>.", "out", "makeLayout_default.lout");
+    QCommandLineOption outputOption("fileOut", "The output file <out>.", "out", "makeLayout_default.lout");
     QCommandLineOption mirrorxOption("mirrorX", "Mirror final layout along x-axis <mirrorX>.", "mirrorX", "0");
     QCommandLineOption mirroryOption("mirrorY", "Mirror final layout along <-axis <mirrorY>.", "mirrorY", "0");
 

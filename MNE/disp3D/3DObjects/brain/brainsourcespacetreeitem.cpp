@@ -40,7 +40,7 @@
 
 #include "brainsourcespacetreeitem.h"
 #include "../common/metatreeitem.h"
-#include "../../helpers/renderable3Dentity.h"
+#include "../common/renderable3Dentity.h"
 
 #include <fs/label.h>
 #include <fs/surface.h>
@@ -105,6 +105,11 @@ BrainSourceSpaceTreeItem::BrainSourceSpaceTreeItem(int iType, const QString& tex
 
 BrainSourceSpaceTreeItem::~BrainSourceSpaceTreeItem()
 {
+    //Schedule deletion/Decouple of all entities so that the SceneGraph is NOT plotting them anymore.
+    //Cannot delete m_pParentEntity since we do not know who else holds it, that is why we use a QPointer for m_pParentEntity.
+    if(!m_pRenderable3DEntity.isNull()) {
+        m_pRenderable3DEntity->deleteLater();
+    }
 }
 
 
@@ -235,11 +240,11 @@ bool BrainSourceSpaceTreeItem::addData(const MNEHemisphere& tHemisphere, Qt3DCor
 
 void BrainSourceSpaceTreeItem::setVisible(bool state)
 {
-//    m_pRenderable3DEntity->setParent(state ? m_pParentEntity : Q_NULLPTR);
+    for(int i = 0; i < m_lSpheres.size(); ++i) {
+        m_lSpheres.at(i)->setParent(state ? m_pRenderable3DEntity : Q_NULLPTR);
+    }
 
-//    for(int i = 0; i < m_lSpheres.size(); ++i) {
-//        m_lSpheres.at(i)->setParent(state ? m_pRenderable3DEntity : Q_NULLPTR);
-//    }
+    m_pRenderable3DEntity->setParent(state ? m_pParentEntity : Q_NULLPTR);
 }
 
 

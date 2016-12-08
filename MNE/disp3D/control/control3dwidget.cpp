@@ -41,6 +41,7 @@
 #include "control3dwidget.h"
 #include "disp/helpers/roundededgeswidget.h"
 #include "../3DObjects/data3Dtreedelegate.h"
+#include "../view3D.h"
 
 
 //*************************************************************************************************************
@@ -79,38 +80,71 @@ using namespace DISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Control3DWidget::Control3DWidget(QWidget* parent, Qt::WindowType type)
+Control3DWidget::Control3DWidget(QWidget* parent, const QStringList& slFlags, Qt::WindowType type)
 : QWidget(parent, type)/*RoundedEdgesWidget(parent, type)*/
 , ui(new Ui::Control3DWidget)
 , m_colCurrentSceneColor(QColor(0,0,0))
+, m_colCurrentLightColor(QColor(255,255,255))
 {
     ui->setupUi(this);
 
-    //Do connect for internal widget use (non dependent on a view3D)
-    connect(ui->m_pushButton_minimize, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
-            this, &Control3DWidget::onMinimizeWidget);
+    //Parse flags
+    if(slFlags.contains("Minimize")) {
+        ui->m_pushButton_minimize->show();
+        connect(ui->m_pushButton_minimize, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
+             this, &Control3DWidget::onMinimizeWidget);
+    } else {
+        ui->m_pushButton_minimize->hide();
+    }
 
-    connect(ui->m_horizontalSlider_opacity, &QSlider::valueChanged,
-            this, &Control3DWidget::onOpacityChange);
+    if(slFlags.contains("Data")) {
+        ui->m_treeView_loadedData->show();
+    } else {
+        ui->m_treeView_loadedData->hide();
+    }
 
-    connect(ui->m_pushButton_sceneColorPicker, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
-            this, &Control3DWidget::onSceneColorPicker);
+    if(slFlags.contains("Window")) {
+        ui->m_groupBox_windowOptions->show();
+        connect(ui->m_horizontalSlider_opacity, &QSlider::valueChanged,
+                this, &Control3DWidget::onOpacityChange);
+    } else {
+        ui->m_groupBox_windowOptions->hide();
+    }
 
-    connect(ui->m_checkBox_alwaysOnTop, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
-            this, &Control3DWidget::onAlwaysOnTop);
+    if(slFlags.contains("View")) {
+        ui->m_groupBox_viewOptions->show();
 
-    //Connect animation and fullscreen and coord axis
-    connect(ui->m_checkBox_showFullScreen, &QCheckBox::clicked,
-            this, &Control3DWidget::onShowFullScreen);
+        connect(ui->m_pushButton_sceneColorPicker, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
+                this, &Control3DWidget::onSceneColorPicker);
+        connect(ui->m_checkBox_alwaysOnTop, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
+                this, &Control3DWidget::onAlwaysOnTop);
+        connect(ui->m_checkBox_showFullScreen, &QCheckBox::clicked,
+                this, &Control3DWidget::onShowFullScreen);
 
-    connect(ui->m_checkBox_rotate, &QCheckBox::clicked,
-            this, &Control3DWidget::onRotationClicked);
+        connect(ui->m_checkBox_rotate, &QCheckBox::clicked,
+                this, &Control3DWidget::onRotationClicked);
 
-    connect(ui->m_checkBox_coordAxis, &QCheckBox::clicked,
-            this, &Control3DWidget::onCoordAxisClicked);
+        connect(ui->m_checkBox_coordAxis, &QCheckBox::clicked,
+                this, &Control3DWidget::onCoordAxisClicked);
+    } else {
+        ui->m_groupBox_viewOptions->hide();
+    }
+
+    if(slFlags.contains("Light")) {
+        ui->m_groupBox_lightOptions->show();
+
+        connect(ui->m_pushButton_lightColorPicker, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
+                this, &Control3DWidget::onLightColorPicker);
+        connect(ui->m_doubleSpinBox_colorIntensity, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+                this, &Control3DWidget::onLightIntensityChanged);
+    } else {
+        ui->m_groupBox_lightOptions->hide();
+    }
+
 
     //Init's
     ui->m_pushButton_sceneColorPicker->setStyleSheet(QString("background-color: rgb(0, 0, 0);"));
+    ui->m_pushButton_lightColorPicker->setStyleSheet(QString("background-color: rgb(255, 255, 255);"));
 
     this->adjustSize();
     this->setWindowOpacity(1/(100.0/90.0));
@@ -144,16 +178,56 @@ Control3DWidget::~Control3DWidget()
 
 //*************************************************************************************************************
 
-void Control3DWidget::setView3D(View3D::SPtr view3D)
+void Control3DWidget::setView3D(QSharedPointer<View3D> view3D)
 {
     //Do the connects from this control widget to the View3D
     ui->m_treeView_loadedData->setModel(view3D->getData3DTreeModel());
 
-    //Add the view3D to the list of connected view3D's
-    m_lView3D.append(view3D);
+    //Do the connects
+    connect(this, &Control3DWidget::sceneColorChanged,
+            view3D.data(), &View3D::setSceneColor);
+
+    connect(this, &Control3DWidget::rotationChanged,
+            view3D.data(), &View3D::startStopModelRotation);
+
+    connect(this, &Control3DWidget::showCoordAxis,
+            view3D.data(), &View3D::toggleCoordAxis);
+
+    connect(this, &Control3DWidget::showFullScreen,
+            view3D.data(), &View3D::showFullScreen);
+
+    connect(this, &Control3DWidget::lightColorChanged,
+            view3D.data(), &View3D::setLightColor);
+
+    connect(this, &Control3DWidget::lightIntensityChanged,
+            view3D.data(), &View3D::setLightIntensity);
 
     //Set description hidden as default
     this->onTreeViewDescriptionHide();
+}
+
+
+//*************************************************************************************************************
+
+void Control3DWidget::onTreeViewHeaderHide()
+{
+    if(!ui->m_treeView_loadedData->isHeaderHidden()) {
+        ui->m_treeView_loadedData->setHeaderHidden(true);
+    } else {
+        ui->m_treeView_loadedData->setHeaderHidden(false);
+    }
+}
+
+
+//*************************************************************************************************************
+
+void Control3DWidget::onTreeViewDescriptionHide()
+{
+    if(ui->m_treeView_loadedData->isColumnHidden(1)) {
+        ui->m_treeView_loadedData->setColumnHidden(1, false);
+    } else {
+        ui->m_treeView_loadedData->setColumnHidden(1, true);
+    }
 }
 
 
@@ -195,10 +269,8 @@ void Control3DWidget::onSceneColorPicker()
     pDialog->setCurrentColor(m_colCurrentSceneColor);
 
     //Update all connected View3D's scene colors
-    for(int i = 0; i<m_lView3D.size(); i++) {
-        connect(pDialog, &QColorDialog::currentColorChanged,
-                m_lView3D.at(i).data(), &View3D::setSceneColor);
-    }
+    connect(pDialog, &QColorDialog::currentColorChanged,
+            this, &Control3DWidget::onSceneColorChanged);
 
     pDialog->exec();
     m_colCurrentSceneColor = pDialog->currentColor();
@@ -231,30 +303,6 @@ void Control3DWidget::onCustomContextMenuRequested(QPoint pos)
 
 //*************************************************************************************************************
 
-void Control3DWidget::onTreeViewHeaderHide()
-{
-    if(!ui->m_treeView_loadedData->isHeaderHidden()) {
-        ui->m_treeView_loadedData->setHeaderHidden(true);
-    } else {
-        ui->m_treeView_loadedData->setHeaderHidden(false);
-    }
-}
-
-
-//*************************************************************************************************************
-
-void Control3DWidget::onTreeViewDescriptionHide()
-{
-    if(ui->m_treeView_loadedData->isColumnHidden(1)) {
-        ui->m_treeView_loadedData->setColumnHidden(1, false);
-    } else {
-        ui->m_treeView_loadedData->setColumnHidden(1, true);
-    }
-}
-
-
-//*************************************************************************************************************
-
 void Control3DWidget::onAlwaysOnTop(bool state)
 {
     if(state) {
@@ -266,19 +314,19 @@ void Control3DWidget::onAlwaysOnTop(bool state)
     }
 }
 
+//*************************************************************************************************************
+
+void Control3DWidget::onSceneColorChanged(const QColor& color)
+{
+    emit sceneColorChanged(color);
+}
+
 
 //*************************************************************************************************************
 
 void Control3DWidget::onShowFullScreen(bool checked)
 {
-    //Update all connected View3D's scene colors
-    for(int i = 0; i < m_lView3D.size(); ++i) {
-        if(checked) {
-            m_lView3D.at(i)->showFullScreen();
-        } else {
-            m_lView3D.at(i)->showNormal();
-        }
-    }
+    emit showFullScreen(checked);
 }
 
 
@@ -286,14 +334,7 @@ void Control3DWidget::onShowFullScreen(bool checked)
 
 void Control3DWidget::onRotationClicked(bool checked)
 {
-    //Update all connected View3D's scene colors
-    for(int i = 0; i<m_lView3D.size(); i++) {
-        if(checked) {
-            m_lView3D.at(i)->startModelRotation();
-        } else {
-            m_lView3D.at(i)->stopModelRotation();
-        }
-    }
+    emit rotationChanged(checked);
 }
 
 
@@ -301,10 +342,41 @@ void Control3DWidget::onRotationClicked(bool checked)
 
 void Control3DWidget::onCoordAxisClicked(bool checked)
 {
-    //Update all connected View3D's scene colors
-    for(int i = 0; i<m_lView3D.size(); i++) {
-        m_lView3D.at(i)->toggleCoordAxis(checked);
-    }
+    emit showCoordAxis(checked);
 }
 
+
+//*************************************************************************************************************
+
+void Control3DWidget::onLightColorPicker()
+{
+    QColorDialog* pDialog = new QColorDialog(this);
+    pDialog->setCurrentColor(m_colCurrentLightColor);
+
+    //Update all connected View3D's scene colors
+    connect(pDialog, &QColorDialog::currentColorChanged,
+            this, &Control3DWidget::onLightColorChanged);
+
+    pDialog->exec();
+    m_colCurrentLightColor = pDialog->currentColor();
+
+    //Set color of button new new scene color
+    ui->m_pushButton_lightColorPicker->setStyleSheet(QString("background-color: rgb(%1, %2, %3);").arg(m_colCurrentLightColor.red()).arg(m_colCurrentLightColor.green()).arg(m_colCurrentLightColor.blue()));
+}
+
+
+//*************************************************************************************************************
+
+void Control3DWidget::onLightColorChanged(const QColor &color)
+{
+    emit lightColorChanged(color);
+}
+
+
+//*************************************************************************************************************
+
+void Control3DWidget::onLightIntensityChanged(double value)
+{
+    emit lightIntensityChanged(value);
+}
 
