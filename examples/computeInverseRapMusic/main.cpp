@@ -171,10 +171,21 @@ int main(int argc, char *argv[])
 
     int iWinSize = 200;
     if(doMovie) {
-        t_rapMusic.setStcAttr(iWinSize,0.6);
+        t_rapMusic.setStcAttr(iWinSize, 0.6);
     }
 
     MNESourceEstimate sourceEstimate = t_rapMusic.calculateInverse(pickedEvoked);
+
+    if(doMovie) {
+        //Select only the activations once
+        MatrixXd dataPicked(sourceEstimate.data.rows(), int(std::floor(sourceEstimate.data.cols()/iWinSize)));
+
+        for(int i = 0; i < dataPicked.cols(); ++i) {
+            dataPicked.col(i) = sourceEstimate.data.col(i*iWinSize);
+        }
+
+        sourceEstimate.data = dataPicked;
+    }
 
     //Select only the activations once
     MatrixXd dataPicked(sourceEstimate.data.rows(), int(std::floor(sourceEstimate.data.cols()/iWinSize)));
@@ -194,9 +205,9 @@ int main(int argc, char *argv[])
 
     testWindow->setModel(p3DDataModel);
 
-    p3DDataModel->addSurfaceSet("Subject01", "HemiLRSet", t_surfSet, t_annotationSet);
+    p3DDataModel->addSurfaceSet(parser.value(subjectOption), "HemiLRSet", t_surfSet, t_annotationSet);
 
-    QList<BrainRTSourceLocDataTreeItem*> rtItemList = p3DDataModel->addSourceData("Subject01", "HemiLRSet", sourceEstimate, t_clusteredFwd);
+    QList<BrainRTSourceLocDataTreeItem*> rtItemList = p3DDataModel->addSourceData(parser.value(subjectOption), "HemiLRSet", sourceEstimate, t_clusteredFwd);
 
     //Init some rt related values for right visual data
     for(int i = 0; i < rtItemList.size(); ++i) {

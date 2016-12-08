@@ -60,7 +60,6 @@
 #include <disp3D/model/brain/brainrtsourcelocdatatreeitem.h>
 
 #include <utils/mnemath.h>
-#include <utils/ioutils.h>
 
 #include <iostream>
 
@@ -111,28 +110,15 @@ int main(int argc, char *argv[])
     parser.setApplicationDescription("Raw Clustered Inverse Rap Music Example");
     parser.addHelpOption();
 
-//    QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", "F:/MIND/MEG/mind006/raw/mind006_060627_auditory02_raw.fif");
-//    QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", "F:/MIND/MEG/mind006/raw/mind006_060627_auditory02_raw-eve.fif");
-//    QCommandLineOption fwdOption("fwd", "Path to forwad solution <file>.", "file", "F:/MIND/MEG/mind006/fwd/mind006_060626_auditory01-ave-oct-5-fwd.fif");
-//    QCommandLineOption subjectOption("subject", "Selected subject <subject>.", "subject", "Mind06");
-//    QCommandLineOption subjectPathOption("subjectPath", "Selected subject path <subjectPath>.", "subjectPath", "F:/Reconstructed");
-
-    QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", "D:/SoersStation/Dokumente/Karriere/Publikationen/2015_12_RTC_MUSIC/Lolo_vergesslich/mind006_060626_auditory01_raw.fif");
-    QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", "D:/SoersStation/Dokumente/Karriere/Publikationen/2015_12_RTC_MUSIC/Lolo_vergesslich/mind006_060626_auditory01_raw-eve.fif");
-    QCommandLineOption fwdOption("fwd", "Path to forwad solution <file>.", "file", "D:/SoersStation/Dokumente/Karriere/Publikationen/2015_12_RTC_MUSIC/Lolo_vergesslich/mind006_060626_auditory01-ave-oct-5-fwd.fif");
-    QCommandLineOption subjectOption("subject", "Selected subject <subject>.", "subject", "Mind06");
-    QCommandLineOption subjectPathOption("subjectPath", "Selected subject path <subjectPath>.", "subjectPath", "D:/SoersStation/Dokumente/Karriere/Publikationen/2015_12_RTC_MUSIC/Reconstructed");
-
-//    QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", "./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
-//    QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif");
-//    QCommandLineOption fwdOption("fwd", "Path to forwad solution <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
-//    QCommandLineOption subjectOption("subject", "Selected subject <subject>.", "subject", "sample");
-//    QCommandLineOption subjectPathOption("subjectPath", "Selected subject path <subjectPath>.", "subjectPath", "./MNE-sample-data/subjects");
-
+    QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", "./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
+    QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif");
+    QCommandLineOption fwdOption("fwd", "Path to forwad solution <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
+    QCommandLineOption subjectOption("subject", "Selected subject <subject>.", "subject", "sample");
+    QCommandLineOption subjectPathOption("subjectPath", "Selected subject path <subjectPath>.", "subjectPath", "./MNE-sample-data/subjects");
     QCommandLineOption surfOption("surfType", "Surface type <type>.", "type", "orig");
     QCommandLineOption annotOption("annotType", "Annotation type <type>.", "type", "aparc.a2009s");
     QCommandLineOption stcFileOption("stcOut", "Path to stc <file>, which is to be written.", "file", "");
-    QCommandLineOption numDipolePairsOption("numDip", "<number> of dipole pairs to localize.", "number", "5");
+    QCommandLineOption numDipolePairsOption("numDip", "<number> of dipole pairs to localize.", "number", "1");
     QCommandLineOption evokedIdxOption("aveIdx", "The average <index> to choose from the average file.", "index", "1");
     QCommandLineOption hemiOption("hemi", "Selected hemisphere <hemi>.", "hemi", "2");
     QCommandLineOption doMovieOption("doMovie", "Create overlapping movie.");
@@ -433,15 +419,15 @@ int main(int argc, char *argv[])
 
 
     // Calculate the average
-//    // Option 1 - Random selection
-//    VectorXi vecSel(2);
-//    srand (time(NULL)); // initialize random seed
+    // Option 1 - Random selection
+    VectorXi vecSel(2);
+    srand (time(NULL)); // initialize random seed
 
-//    for(qint32 i = 0; i < vecSel.size(); ++i)
-//    {
-//        qint32 val = rand() % count;
-//        vecSel(i) = val;
-//    }
+    for(qint32 i = 0; i < vecSel.size(); ++i)
+    {
+        qint32 val = rand() % count;
+        vecSel(i) = val;
+    }
 
 //    //Option 2 - Take all epochs
 //    VectorXi vecSel(data.size());
@@ -453,21 +439,10 @@ int main(int argc, char *argv[])
 
 //    //Option 3 - Manual selection
 //    VectorXi vecSel(15);
-//    //vecSel << 76, 74, 13, 61, 97, 94, 75, 71, 60, 56, 26, 57, 56, 0, 52, 72, 33, 86, 96, 67;
-//    vecSel << 41, 17, 184, 55, 104, 144, 203, 43, 107, 69, 170, 60, 116, 17, 121;
-//    //vecSel << 13, 106, 99, 163, 46, 115, 33, 180, 179, 125, 63, 52, 18, 128, 197;
-//    //vecSel << 77, 170, 147, 28, 182, 135, 58, 196, 99, 99, 17, 194, 196, 99, 184;
-//    //vecSel << 90, 57, 38, 132, 166, 106, 171, 108, 158, 97, 11, 161, 10, 166, 14;
-
-    VectorXi vecSel(2);
-    vecSel << 201,43;
-
-
+//    vecSel << 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15;
     std::cout << "Select following epochs to average:\n" << vecSel << std::endl;
 
     FiffEvoked evoked = data.average(raw.info, tmin*raw.info.sfreq, floor(tmax*raw.info.sfreq + 0.5), vecSel);
-
-    IOUtils::write_eigen_matrix(evoked.data, QString("C:/Git/mne-cpp-LorenzE/bin/avr.txt"));
 
     QStringList ch_sel_names = t_Fwd.info.ch_names;
     FiffEvoked pickedEvoked = evoked.pick_channels(ch_sel_names);
@@ -492,8 +467,20 @@ int main(int argc, char *argv[])
 
     MNESourceEstimate sourceEstimate = t_rapMusic.calculateInverse(pickedEvoked);
 
-    if(sourceEstimate.isEmpty())
+    if(doMovie) {
+        //Select only the activations once
+        MatrixXd dataPicked(sourceEstimate.data.rows(), int(std::floor(sourceEstimate.data.cols()/iWinSize)));
+
+        for(int i = 0; i < dataPicked.cols(); ++i) {
+            dataPicked.col(i) = sourceEstimate.data.col(i*iWinSize);
+        }
+
+        sourceEstimate.data = dataPicked;
+    }
+
+    if(sourceEstimate.isEmpty()) {
         return 1;
+    }
 
 //    // View activation time-series
 //    std::cout << "\nsourceEstimate:\n" << sourceEstimate.data.block(0,0,10,10) << std::endl;
@@ -501,15 +488,6 @@ int main(int argc, char *argv[])
 //    std::cout << "timeMin\n" << sourceEstimate.times[0] << std::endl;
 //    std::cout << "timeMax\n" << sourceEstimate.times[sourceEstimate.times.size()-1] << std::endl;
 //    std::cout << "time step\n" << sourceEstimate.tstep << std::endl;
-
-    //Select only the activations once
-    MatrixXd dataPicked(sourceEstimate.data.rows(), int(std::floor(sourceEstimate.data.cols()/iWinSize)));
-
-    for(int i = 0; i < dataPicked.cols(); ++i) {
-        dataPicked.col(i) = sourceEstimate.data.col(i*iWinSize);
-    }
-
-    sourceEstimate.data = dataPicked;
 
     //Source Estimate end
     //########################################################################################
