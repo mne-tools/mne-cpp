@@ -51,6 +51,7 @@
 
 #include <disp3D/view3D.h>
 #include <disp3D/control/control3dwidget.h>
+#include <disp3D/model/data3Dtreemodel.h>
 
 #include <utils/mnemath.h>
 
@@ -286,9 +287,13 @@ int main(int argc, char *argv[])
 //    sourceEstimate = sourceEstimate.reduce(sample, 1);
 
     View3D::SPtr testWindow = View3D::SPtr(new View3D());
-    testWindow->addSurfaceSet(parser.value(subjectOption), "HemiLR", t_surfSet, t_annotationSet);
+    Data3DTreeModel::SPtr p3DDataModel = Data3DTreeModel::SPtr(new Data3DTreeModel());
 
-    QList<BrainRTSourceLocDataTreeItem*> rtItemList = testWindow->addSourceData(parser.value(subjectOption), "HemiLR", sourceEstimate, t_clusteredFwd);
+    testWindow->setModel(p3DDataModel);
+
+    p3DDataModel->addSurfaceSet(parser.value(subjectOption), "HemiLR", t_surfSet, t_annotationSet);
+
+    QList<BrainRTSourceLocDataTreeItem*> rtItemList = p3DDataModel->addSourceData(parser.value(subjectOption), "HemiLR", sourceEstimate, t_clusteredFwd);
 
     testWindow->show();
 
