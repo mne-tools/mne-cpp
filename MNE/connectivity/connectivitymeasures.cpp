@@ -91,7 +91,7 @@ ConnectivityMeasures::ConnectivityMeasures()
 
 Network::SPtr ConnectivityMeasures::pearsonsCorrelationCoeff(const MatrixXd& matData, const MatrixX3f& matVert)
 {
-    Network::SPtr finalNetwork  = Network::SPtr(new Network("Pearson's Correlation Coefficient"));
+    Network::SPtr finalNetwork = Network::SPtr(new Network("Pearson's Correlation Coefficient"));
 
     //Create nodes
     for(int i = 0; i < matData.rows(); ++i) {

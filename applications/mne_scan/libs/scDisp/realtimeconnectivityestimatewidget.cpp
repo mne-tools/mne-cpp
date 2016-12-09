@@ -44,7 +44,10 @@
 
 #include <scMeas/realtimeconnectivityestimate.h>
 
-#include <disp3D/3DObjects/brain/brainrtconnectivitydatatreeitem.h>
+#include <disp3D/model/network/networktreeitem.h>
+#include <disp3D/model/data3Dtreemodel.h>
+#include <disp3D/view3D.h>
+#include <disp3D/control/control3dwidget.h>
 
 #include <mne/mne_forwardsolution.h>
 #include <mne/mne_inverse_operator.h>
@@ -109,9 +112,12 @@ RealTimeConnectivityEstimateWidget::RealTimeConnectivityEstimateWidget(QSharedPo
     m_pAction3DControl->setVisible(true);
 
     m_p3DView = View3D::SPtr(new View3D());
+    m_pData3DModel = Data3DTreeModel::SPtr(new Data3DTreeModel());
+
+    m_p3DView->setModel(m_pData3DModel);
 
     m_pControl3DView = Control3DWidget::SPtr(new Control3DWidget(this));
-    m_pControl3DView->setView3D(m_p3DView);
+    m_pControl3DView->init(m_pData3DModel, m_p3DView);
 
     QGridLayout *mainLayoutView = new QGridLayout;
     QWidget *pWidgetContainer = QWidget::createWindowContainer(m_p3DView.data());
@@ -155,7 +161,7 @@ void RealTimeConnectivityEstimateWidget::getData()
         //
         if(m_lRtItem.isEmpty()) {
             qDebug()<<"RealTimeConnectivityEstimateWidget::getData - Creating m_lRtItem list";
-            m_lRtItem = m_p3DView->addConnectivityData("Subject01", "HemiLRSet", m_pRTCE->getValue());
+            m_lRtItem = m_pData3DModel->addConnectivityData("Subject01", "HemiLRSet", m_pRTCE->getValue());
         } else {
             qDebug()<<"RealTimeConnectivityEstimateWidget::getData - Working with m_lRtItem list";
 
@@ -174,7 +180,7 @@ void RealTimeConnectivityEstimateWidget::getData()
             //
             // Add brain data
             //
-            m_p3DView->addSurfaceSet("Subject01", "HemiLRSet", *m_pRTCE->getSurfSet(), *m_pRTCE->getAnnotSet());
+            m_pData3DModel->addSurfaceSet("Subject01", "HemiLRSet", *m_pRTCE->getSurfSet(), *m_pRTCE->getAnnotSet());
         }
     }
 }
