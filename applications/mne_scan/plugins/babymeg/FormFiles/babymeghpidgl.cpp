@@ -45,6 +45,7 @@
 
 #include <disp3D/view3D.h>
 #include <disp3D/control/control3dwidget.h>
+#include <disp3D/model/data3Dtreemodel.h>
 
 #include <mne/mne_bem.h>
 
@@ -86,6 +87,7 @@ BabyMEGHPIDgl::BabyMEGHPIDgl(BabyMEG* p_pBabyMEG,QWidget *parent)
 , ui(new Ui::BabyMEGHPIDgl)
 , m_pBabyMEG(p_pBabyMEG)
 , m_pView3D(View3D::SPtr(new View3D))
+, m_pData3DModel(Data3DTreeModel::SPtr(new Data3DTreeModel))
 {
     ui->setupUi(this);
 
@@ -108,15 +110,18 @@ BabyMEGHPIDgl::BabyMEGHPIDgl(BabyMEG* p_pBabyMEG,QWidget *parent)
     connect(ui->m_spinBox_freqCoil4, static_cast<void(QSpinBox::*)(const QString &)>(&QSpinBox::valueChanged),
             this, &BabyMEGHPIDgl::onFreqsChanged);
 
-    //Setup Vie3D
+    //Setup View3D
+    m_pView3D->setModel(m_pData3DModel);
+
     QWidget *pWidgetContainer = QWidget::createWindowContainer(m_pView3D.data());
     ui->m_gridLayout_main->addWidget(pWidgetContainer,0,0,5,1);
 
     QStringList slFlag = QStringList() << "Data";
 
     Control3DWidget* control3DWidget = new Control3DWidget(this, slFlag);
-    control3DWidget->setView3D(m_pView3D);
+    control3DWidget->init(m_pData3DModel, m_pView3D);
     control3DWidget->onTreeViewDescriptionHide();
+
     QGridLayout* gridLayout = new QGridLayout();
     gridLayout->addWidget(control3DWidget);
     ui->m_groupBox_3dControl->setLayout(gridLayout);
@@ -124,7 +129,7 @@ BabyMEGHPIDgl::BabyMEGHPIDgl(BabyMEG* p_pBabyMEG,QWidget *parent)
     //Add sensor surface
     QFile t_fileSensorSurfaceBEM("./resources/sensorSurfaces/BabyMEG.fif");
     MNEBem t_sensorSurfaceBEM(t_fileSensorSurfaceBEM);
-    m_pView3D->addBemData("Device", "BabyMEG", t_sensorSurfaceBEM);
+    m_pData3DModel->addBemData("Device", "BabyMEG", t_sensorSurfaceBEM);
 
     //Always on top
     //this->setWindowFlags(this->windowFlags() | Qt::WindowStaysOnTopHint);
@@ -316,7 +321,7 @@ void BabyMEGHPIDgl::setDigitizerDataToView3D(const FiffDigPointSet& digPointSet,
             }
         }
 
-        m_pView3D->addDigitizerData("Head", "Digitizer", t_digSetWithoutAdditional);
+        m_pData3DModel->addDigitizerData("Head", "Digitizer", t_digSetWithoutAdditional);
 
         //Update gof labels and transform from m to mm
         QString sGof("0mm");
@@ -340,7 +345,7 @@ void BabyMEGHPIDgl::setDigitizerDataToView3D(const FiffDigPointSet& digPointSet,
             ui->m_label_gofCoil4->setText(sGof);
         }
     } else {
-        m_pView3D->addDigitizerData("Head", "Digitizer", digPointSet);
+        m_pData3DModel->addDigitizerData("Head", "Digitizer", digPointSet);
     }
 }
 

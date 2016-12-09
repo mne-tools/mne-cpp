@@ -414,7 +414,9 @@ inline RapMusic::MatrixXT RapMusic::makeSquareMat(const MatrixXT& p_matF)
     //Make rectangular - p_matF*p_matF^T
     //MatrixXT FFT = p_matF*p_matF.transpose();
 
-    return p_matF*p_matF.transpose();
+    MatrixXT mat = p_matF.transpose();
+
+    return p_matF*mat;
 }
 
 } //NAMESPACE
