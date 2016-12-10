@@ -224,9 +224,9 @@ bool DipoleFit::calculateFit()
     }
 
     if ((fit_data = setup_dipole_fit_data(mriname,measname,bemname,r0,eeg_model,accurate,
-        badname,noisename,grad_std,mag_std,eeg_std,
-        mag_reg,grad_reg,eeg_reg,
-        diagnoise,projnames,nproj,include_meg,include_eeg)) == NULL)
+                                          badname,noisename,grad_std,mag_std,eeg_std,
+                                          mag_reg,grad_reg,eeg_reg,
+                                          diagnoise,projnames,nproj,include_meg,include_eeg)) == NULL)
         goto out;
 
     fit_data->fit_mag_dipoles = fit_mag_dipoles;
@@ -247,26 +247,26 @@ bool DipoleFit::calculateFit()
                 qCritical ("All desired channels were not available");
                 goto out;
             }
-            printf("\tChannel selection created.\n");
-            /*
+        printf("\tChannel selection created.\n");
+        /*
             * Let's be a little generous here
             */
-            t1 = raw->first_samp/raw->info->sfreq;
-            t2 = (raw->first_samp+raw->nsamp-1)/raw->info->sfreq;
-            if (tmin < t1 + integ)
+        t1 = raw->first_samp/raw->info->sfreq;
+        t2 = (raw->first_samp+raw->nsamp-1)/raw->info->sfreq;
+        if (tmin < t1 + integ)
             tmin = t1 + integ;
-            if (tmax > t2 - integ)
+        if (tmax > t2 - integ)
             tmax =  t2 - integ;
-            if (tstep < 0)
+        if (tstep < 0)
             tstep = 1.0/raw->info->sfreq;
 
-            printf("\tOpened raw data file %s : %d MEG and %d EEG \n",
-            measname,fit_data->nmeg,fit_data->neeg);
-        }
+        printf("\tOpened raw data file %s : %d MEG and %d EEG \n",
+               measname,fit_data->nmeg,fit_data->neeg);
+    }
     else {
         printf("\n---- Reading data...\n\n");
         if ((data = mne_read_meas_data(measname,setno,NULL,NULL,
-            fit_data->ch_names,fit_data->nmeg+fit_data->neeg)) == NULL)
+                                       fit_data->ch_names,fit_data->nmeg+fit_data->neeg)) == NULL)
             goto out;
         if (do_baseline)
             mne_adjust_baselines(data,bmin,bmax);
@@ -280,7 +280,7 @@ bool DipoleFit::calculateFit()
             tstep = data->current->tstep;
 
         printf("\tRead data set %d from %s : %d MEG and %d EEG \n",
-        setno,measname,fit_data->nmeg,fit_data->neeg);
+               setno,measname,fit_data->nmeg,fit_data->neeg);
         if (noisename) {
             printf("\nScaling the noise covariance...\n");
             if (scale_noise_cov(fit_data,data->current->nave) == FAIL)
@@ -293,10 +293,10 @@ bool DipoleFit::calculateFit()
     */
     printf("\n---- Computing the forward solution for the guesses...\n\n");
     if ((guess = make_guess_data(guessname, guess_surfname, guess_mindist, guess_exclude, guess_grid, fit_data)) == NULL)
-    goto out;
+        goto out;
 
     fprintf (stderr,"\n---- Fitting : %7.1f ... %7.1f ms (step: %6.1f ms integ: %6.1f ms)\n\n",
-    1000*tmin,1000*tmax,1000*tstep,1000*integ);
+             1000*tmin,1000*tmax,1000*tstep,1000*integ);
 
 
     if (raw) {
@@ -312,14 +312,14 @@ bool DipoleFit::calculateFit()
     /*
     * Saving...
     */
-    if (save_dipoles_dip(dipname,set) == FAIL)
-    goto out;
-    if (save_dipoles_bdip(bdipname,set) == FAIL)
-    goto out;
-//    free_ecd_set(set);
+    if (!set.save_dipoles_dip(dipname))
+        goto out;
+    if (!set.save_dipoles_bdip(bdipname))
+        goto out;
+    //    free_ecd_set(set);
     res = OK;
 
-    out : {
+out : {
         if (res == FAIL) {
             return false;
         }
