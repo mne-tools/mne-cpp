@@ -101,6 +101,14 @@ public:
     */
     ~ECD();
 
+    //=========================================================================================================
+    /**
+    * prints the ECD to an stdio file stream.
+    *
+    * @param[in] f      the file stream to print to;
+    */
+    void print(FILE *f);
+
 public:
     bool            valid;  /**< Is this dipole valid */
     float           time;   /**< Time point */

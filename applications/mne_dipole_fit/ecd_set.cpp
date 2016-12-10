@@ -98,8 +98,6 @@ void ECDSet::addEcd(const ECD& p_ecd)
 }
 
 
-
-
 //*************************************************************************************************************
 
 const ECD& ECDSet::operator[] (qint32 idx) const
