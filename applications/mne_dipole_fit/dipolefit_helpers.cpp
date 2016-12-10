@@ -20289,70 +20289,6 @@ guessData get_dipole_fit_guess_data(mshMegEegData d)
 
 //============================= fit_dipoles.c =============================
 
-static ecd new_ecd()
-
-{
-  ecd res = MALLOC(1,ecdRec);
-  res->valid = FALSE;
-  return res;
-}
-
-static void free_ecd(ecd d)
-
-{
-  if (!d)
-    return;
-  FREE(d);
-  return;
-}
-
-static ecdSet new_ecd_set()
-
-{
-  ecdSet res = MALLOC(1,ecdSetRec);
-
-  res->dataname = NULL;
-  res->ndip = 0;
-  res->dips = NULL;
-  return res;
-}
-
-void free_ecd_set(ecdSet s)
-
-{
-  int k;
-
-  if (!s)
-    return;
-
-  FREE(s->dataname);
-  for (k = 0; k < s->ndip; k++)
-    free_ecd(s->dips[k]);
-  FREE(s->dips);
-  FREE(s);
-  return;
-}
-
-
-static void print_ecd(FILE *f, const ECD& dip)
-
-{
-  if (!f || !dip.valid)
-    return;
-
-  fprintf(f,"%6.1f %7.2f %7.2f %7.2f %6.2f %6.2f %6.2f %6.2f %6.2f %6.2f %d\n",
-          1000*dip.time,				/* Time */
-          1000*dip.rd[0],				/* Dipole location */
-          1000*dip.rd[1],
-          1000*dip.rd[2],
-          1e9*dip.Q.norm(),				/* Dipole moment */
-          1e9*dip.Q[0],1e9*dip.Q[1],1e9*dip.Q[2],
-          dip.khi2/dip.nfree,                        /* This is the reduced khi^2 value */
-          100*dip.good,                               /* Goodness of fit */
-          dip.neval);				       /* Number of function evaluations required */
-}
-
-
 typedef struct {
   float          limit;
   int            report_dim;
@@ -20734,7 +20670,7 @@ int fit_dipoles_raw(char           *dataname,
         else {
             set.addEcd(dip);
             if (verbose)
-                print_ecd(stdout,dip);
+                dip.print(stdout);
             else {
                 if (set.size() % report_interval == 0)
                     fprintf(stderr,"%d..",set.size());
@@ -20860,7 +20796,7 @@ int    fit_dipoles(char          *dataname,
         else {
             set.addEcd(dip);
             if (verbose)
-                print_ecd(stdout,dip);
+                dip.print(stdout);
             else {
                 if (set.size() % report_interval == 0)
                     fprintf(stderr,"%d..",set.size());
