@@ -123,6 +123,22 @@ public:
 
     //=========================================================================================================
     /**
+    * Save dipoles in the bdip format employed by xfit
+    *
+    * @param[in] name   File name to save to.
+    */
+    bool save_dipoles_bdip(char *name);
+
+    //=========================================================================================================
+    /**
+    * Save dipoles in the dip format suitable for mrilab
+    *
+    * @param[in] name   File name to save to.
+    */
+    bool save_dipoles_dip(char *name) const;
+
+    //=========================================================================================================
+    /**
     * Returns the number of stored ECDs
     *
     * @return number of stored ECDs
