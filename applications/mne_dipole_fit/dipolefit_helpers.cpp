@@ -21043,61 +21043,6 @@ int save_dipoles_bdip(char   *name,
 
 #define BIG_TIME 1e6
 
-static char  *bemname     = NULL;		 /* Boundary-element model */
-static float r0[]         = { 0.0,0.0,0.04 };    /* Sphere model origin  */
-static int   accurate     = FALSE;		 /* Use accurate coil definitions? */
-static char  *mriname     = NULL;		 /* Gives the MRI <-> head transform */
-
-static char  *guessname   = NULL;		 /* Initial guess grid (if not present, the values below
-                          * will be employed to generate the grid) */
-static char  *guess_surfname = NULL;		 /* Load the inner skull surface from this BEM file */
-static float guess_rad     = 0.080;              /* Radius of spherical guess surface */
-static float guess_mindist = 0.010;		 /* Minimum allowed distance to the surface */
-static float guess_exclude = 0.020;		 /* Exclude points closer than this to the origin */
-static float guess_grid    = 0.010;		 /* Grid spacing */
-
-static char  *noisename   = NULL;		 /* Noise-covariance matrix */
-static float grad_std     = 5e-13;               /* Standard deviations to be used if noise covariance is not specified */
-static float mag_std      = 20e-15;
-static float eeg_std      = 0.2e-6;
-static int   diagnoise    = FALSE;		 /* Use only the diagonals of the noise-covariance matrix */
-
-static char  *measname    = NULL;		 /* Data file */
-static int   is_raw       = FALSE;		 /* Is this a raw data file */
-static char  *badname     = NULL;		 /* Bad channels */
-static int   include_meg  = FALSE;		 /* Use MEG? */
-static int   include_eeg  = FALSE;		 /* Use EEG? */
-static float tmin         = -2*BIG_TIME;	 /* Possibility to set these from the command line */
-static float tmax         = 2*BIG_TIME;
-static float tstep        = -1.0;		 /* Step between fits */
-static float integ        = 0.0;
-static float bmin         = BIG_TIME;	         /* Possibility to set these from the command line */
-static float bmax         = BIG_TIME;
-static int   do_baseline  = FALSE;	         /* Are both baseline limits set? */
-static int   setno        = 1;		         /* Which data set */
-static int   verbose      = FALSE;
-static mneFilterDefRec filter = { TRUE,		 /* Filter on? */
-                  4096,		 /* size */
-                  2048,		 /* taper_size */
-                  0.0, 0.0,	 /* highpass corner and width */
-                  40.0, 5.0,	 /* lowpass corner and width */
-                  0.0, 0.0,	 /* EOG highpass corner and width */
-                  40.0, 5.0 };	 /* EOG Lowpass corner and width */
-static char **projnames   = NULL;                /* Projection file names */
-static int  nproj         = 0;
-static int  omit_data_proj = FALSE;
-
-static char   *eeg_model_file = NULL;            /* File of EEG sphere model specifications */
-static char   *eeg_model_name = NULL;		 /* Name of the EEG model to use */
-static float  eeg_sphere_rad = 0.09;		 /* Scalp radius to use in EEG sphere model */
-static int    scale_eeg_pos  = FALSE;	         /* Scale the electrode locations to scalp in the sphere model */
-static float  mag_reg      = 0.1;                /* Noise-covariance matrix regularization for MEG (magnetometers and axial gradiometers)  */
-static int   fit_mag_dipoles = FALSE;
-
-static float  grad_reg     = 0.1;               /* Noise-covariance matrix regularization for EEG (planar gradiometers) */
-static float  eeg_reg      = 0.1;               /* Noise-covariance matrix regularization for EEG  */
-static char   *dipname     = NULL;		/* Output file in dip format */
-static char   *bdipname    = NULL;		/* Output file in bdip format */
 
 
 
