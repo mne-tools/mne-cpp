@@ -5,7 +5,7 @@
  * Type definitions for forward calculations
  */
 
-#include "fiff_types_old.h"
+#include "fiff_types.h"
 #include "mne_types.h"
 
 #if defined(__cplusplus) 

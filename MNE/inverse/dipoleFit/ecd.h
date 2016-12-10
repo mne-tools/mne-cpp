@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     ecd_set.h
+* @file     ecd.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -18,7 +18,7 @@
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
 *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
-*
+* 
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
 * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
@@ -29,20 +29,27 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     FiffDigPointSet class declaration.
+* @brief    Electric Current Dipole (ECD) class declaration.
 *
 */
 
-#ifndef ECD_SET_H
-#define ECD_SET_H
-
+#ifndef ECD_H
+#define ECD_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "ecd.h"
+#include "../inverse_global.h"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
 
 
 //*************************************************************************************************************
@@ -51,20 +58,7 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
-#include <QList>
-#include <QString>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Eigen INCLUDES
-//=============================================================================================================
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
+#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -72,121 +66,71 @@
 // DEFINE NAMESPACE INVERSELIB
 //=============================================================================================================
 
-namespace INVERSELIB {
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FIFFLIB FORWARD DECLARATIONS
-//=============================================================================================================
+namespace INVERSELIB
+{
 
 
 //=============================================================================================================
 /**
-* Implements Electric Current Dipole Set (Replaces *ecdSet,ecdSetRec struct of MNE-C fit_types.h).
+* Implements one Electric Current Dipole (Replaces *ecd,ecdRec struct of MNE-C fit_types.h).
 *
-* @brief Holds a set of Electric Current Dipoles.
+* @brief Electric Current Dipole description
 */
-
-class ECDSet
+class INVERSESHARED_EXPORT ECD
 {
-
 public:
-    typedef QSharedPointer<ECDSet> SPtr;            /**< Shared pointer type for ECDSet. */
-    typedef QSharedPointer<const ECDSet> ConstSPtr; /**< Const shared pointer type for ECDSet. */
+    typedef QSharedPointer<ECD> SPtr;              /**< Shared pointer type for ECD. */
+    typedef QSharedPointer<const ECD> ConstSPtr;   /**< Const shared pointer type for ECD. */
 
     //=========================================================================================================
     /**
-    * Constructs a Electric Current Dipole Set object.
+    * Constructs the Electric Current Dipole
     */
-    ECDSet();
+    ECD();
 
     //=========================================================================================================
     /**
     * Copy constructor.
     *
-    * @param[in] p_ECDSet       Electric Current Dipole Set which should be copied
+    * @param[in] p_ECD      Electric Current Dipole which should be copied
     */
-    ECDSet(const ECDSet &p_ECDSet);
+    ECD(const ECD& p_ECD);
 
     //=========================================================================================================
     /**
     * Destroys the Electric Current Dipole description
     */
-    ~ECDSet();
+    ~ECD();
 
     //=========================================================================================================
     /**
-    * Appends an Electric Current Dipole to the set
+    * prints the ECD to an stdio file stream.
+    *
+    * @param[in] f      the file stream to print to;
     */
-    void addEcd(const ECD& p_ecd);
-
-    //=========================================================================================================
-    /**
-    * Save dipoles in the bdip format employed by xfit
-    *
-    * @param[in] name   File name to save to.
-    */
-    bool save_dipoles_bdip(char *name);
-
-    //=========================================================================================================
-    /**
-    * Save dipoles in the dip format suitable for mrilab
-    *
-    * @param[in] name   File name to save to.
-    */
-    bool save_dipoles_dip(char *name) const;
-
-    //=========================================================================================================
-    /**
-    * Returns the number of stored ECDs
-    *
-    * @return number of stored ECDs
-    */
-    inline qint32 size() const;
-
-    //=========================================================================================================
-    /**
-    * Subscript operator [] to access FiffDigPoint by index
-    *
-    * @param[in] idx    the ECD index.
-    *
-    * @return ECD related to the parameter index.
-    */
-    const ECD& operator[] (qint32 idx) const;
-
-    //=========================================================================================================
-    /**
-    * Subscript operator [] to access ECD by index
-    *
-    * @param[in] idx    the ECD index.
-    *
-    * @return ECD related to the parameter index.
-    */
-    ECD& operator[] (qint32 idx);
-
-    //=========================================================================================================
-    /**
-    * Subscript operator << to add a new ECD
-    *
-    * @param[in] p_ecd      ECD to be added
-    *
-    * @return ECDSet
-    */
-    ECDSet& operator<< (const ECD& p_ecd);
+    void print(FILE *f);
 
 public:
-    QString dataname;   /**< The associated data file */
-
-private:
-    QList<ECD> m_qListDips;    /**< List of Electric Current Dipoles. */
+    bool            valid;  /**< Is this dipole valid */
+    float           time;   /**< Time point */
+    Eigen::Vector3f rd;     /**< Dipole location */
+    Eigen::Vector3f Q;      /**< Dipole moment */
+    float           good;   /**< Goodness of fit */
+    float           khi2;   /**< khi^2 value */
+    int             nfree;  /**< Degrees of freedom for the above */
+    int             neval;  /**< Number of function evaluations required for this fit */
 
 // ### OLD STRUCT ###
 //    typedef struct {
-//      char *dataname;		/* The associated data file */
-//      int  ndip;			/* How many dipoles */
-//      ecd  *dips;			/* The dipoles themselves */
-//    } *ecdSet,ecdSetRec;		/* A set of ECDs */
+//      int   valid;			/* Is this dipole valid */
+//      float time;			/* Time point */
+//      float rd[3];			/* Dipole location */
+//      float Q[3];			/* Dipole moment */
+//      float good;			/* Goodness of fit */
+//      float khi2;			/* khi^2 value */
+//      int   nfree;			/* Degrees of freedom for the above */
+//      int   neval;			/* Number of function evaluations required for this fit */
+//    } *ecd,ecdRec;			/* One ECD */
 
 };
 
@@ -196,11 +140,7 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline qint32 ECDSet::size() const
-{
-    return m_qListDips.size();
-}
 
 } // NAMESPACE INVERSELIB
 
-#endif // ECD_SET_H
+#endif // ECD_H

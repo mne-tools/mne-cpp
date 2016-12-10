@@ -4,7 +4,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "dipolefit.h"
+#include <inverse/dipoleFit/dipolefit.h>
 
 #include <QCoreApplication>
 
