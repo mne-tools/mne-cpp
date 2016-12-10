@@ -70,10 +70,14 @@ DESTDIR =  $${MNE_BINARY_DIR}
 
 SOURCES += \
     main.cpp \
+    ecd.cpp \
+    ecd_set.cpp \
     dipolefit.cpp \
     dipolefit_helpers.cpp
 
 HEADERS += \
+    ecd.h \
+    ecd_set.h \
     fiff_types.h \
     mne_types.h \
     fit_types.h \
