@@ -96,6 +96,10 @@ else {
 }
 
 SOURCES += \
+    dipoleFit/ecd.cpp \
+    dipoleFit/ecd_set.cpp \
+    dipoleFit/dipolefit.cpp \
+    dipoleFit/dipolefit_helpers.cpp \
     minimumNorm/minimumnorm.cpp \
     rapMusic/rapmusic.cpp \
     rapMusic/pwlrapmusic.cpp \
@@ -104,6 +108,16 @@ SOURCES += \
 HEADERS +=\
     inverse_global.h \
     IInverseAlgorithm.h \
+    dipoleFit/ecd.h \
+    dipoleFit/ecd_set.h \
+    dipoleFit/fiff_types.h \
+    dipoleFit/mne_types.h \
+    dipoleFit/fit_types.h \
+    dipoleFit/fwd_types.h \
+    dipoleFit/fiff_file.h \
+    dipoleFit/fiff_explain.h \
+    dipoleFit/analyze_types.h \
+    dipoleFit/dipolefit.h \
     minimumNorm/minimumnorm.h \
     rapMusic/rapmusic.h \
     rapMusic/pwlrapmusic.h \

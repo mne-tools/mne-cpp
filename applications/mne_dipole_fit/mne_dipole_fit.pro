@@ -56,36 +56,24 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Utilsd \
             -lMNE$${MNE_LIB_VERSION}Fsd \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
-            -lMNE$${MNE_LIB_VERSION}Mned
+            -lMNE$${MNE_LIB_VERSION}Inversed
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
             -lMNE$${MNE_LIB_VERSION}Utils \
             -lMNE$${MNE_LIB_VERSION}Fs \
             -lMNE$${MNE_LIB_VERSION}Fiff \
-            -lMNE$${MNE_LIB_VERSION}Mne
+            -lMNE$${MNE_LIB_VERSION}Mne \
+            -lMNE$${MNE_LIB_VERSION}Inverse
 }
 
 DESTDIR =  $${MNE_BINARY_DIR}
 
 SOURCES += \
-    main.cpp \
-    ecd.cpp \
-    ecd_set.cpp \
-    dipolefit.cpp \
-    dipolefit_helpers.cpp
+    main.cpp
 
 HEADERS += \
-    ecd.h \
-    ecd_set.h \
-    fiff_types.h \
-    mne_types.h \
-    fit_types.h \
-    fwd_types.h \
-    fiff_file.h \
-    fiff_explain.h \
-    analyze_types.h \
-    dipolefit.h
+
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
