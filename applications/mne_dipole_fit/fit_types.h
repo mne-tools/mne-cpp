@@ -77,19 +77,19 @@ typedef struct {		      /* This structure holds all fitting-related data */
   fitUserFreeFunc   user_free;	      /* Function to free the above */
 } *dipoleFitData,dipoleFitDataRec;
 
-typedef struct {
-  int   valid;			/* Is this dipole valid */
-  float time;			/* Fitting time */
-  float begin;			/* Begin time if this is a time span */
-  float end;			/* End time if this is a time span */
-  float rd[3];			/* Dipole location */
-  float Q[3];			/* Dipole moment */
-  float good;			/* Goodness of fit */
-  float khi2;			/* khi^2 value */
-  int   nfree;			/* Degrees of freedom for the above */
-  int   neval;			/* Number of function evaluations required for this fit */
-  float color[4];		/* Paint with this color */
-} *ECD,ECDRec;			/* One ECD */
+//typedef struct {
+//  int   valid;			/* Is this dipole valid */
+//  float time;			/* Fitting time */
+//  float begin;			/* Begin time if this is a time span */
+//  float end;			/* End time if this is a time span */
+//  float rd[3];			/* Dipole location */
+//  float Q[3];			/* Dipole moment */
+//  float good;			/* Goodness of fit */
+//  float khi2;			/* khi^2 value */
+//  int   nfree;			/* Degrees of freedom for the above */
+//  int   neval;			/* Number of function evaluations required for this fit */
+//  float color[4];		/* Paint with this color */
+//} *ECD,ECDRec;			/* One ECD */
 
 
 
@@ -118,16 +118,17 @@ typedef struct {
 #define DIPOLE_MODEL_COLLECTION  3   /* Collection of dipoles transferred via drag and drop */
 #define DIPOLE_MODEL_MULTI       4   /* Multiple dipoles, single time point */
 #define DIPOLE_MODEL_MULTI_RANGE 5   /* Multiple dipoles, time range */
-/*
- * These are used for bookkeeping of dipole models
- */
-typedef struct {
-  ECD             *ECDs;	     /* The current dipoles */
-  int             ndip;		     /* How many? */
-  int             model_kind;	     /* One of the above */
-  void            *pars;             /* Opaque parameter data */
-  mneUserFreeFunc pars_free;         /* Frees the above */
-} *dipoleModel,dipoleModelRec;
+
+///*
+// * These are used for bookkeeping of dipole models
+// */
+//typedef struct {
+//  ECD             *ECDs;	     /* The current dipoles */
+//  int             ndip;		     /* How many? */
+//  int             model_kind;	     /* One of the above */
+//  void            *pars;             /* Opaque parameter data */
+//  mneUserFreeFunc pars_free;         /* Frees the above */
+//} *dipoleModel,dipoleModelRec;
 
 //typedef void (*dipoleFunc)(Widget,dipoleModel);
 

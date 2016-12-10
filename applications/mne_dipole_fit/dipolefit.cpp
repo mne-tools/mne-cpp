@@ -8,7 +8,40 @@
 using namespace INVERSELIB;
 
 
+//*************************************************************************************************************
+//=============================================================================================================
+// STATIC DEFINITIONS
+//=============================================================================================================
 
+#ifndef PROGRAM_VERSION
+#define PROGRAM_VERSION     "1.00"
+#endif
+
+
+#ifndef FAIL
+#define FAIL -1
+#endif
+
+#ifndef OK
+#define OK 0
+#endif
+
+#ifndef TRUE
+#define TRUE 1
+#endif
+
+#ifndef FALSE
+#define FALSE 0
+#endif
+
+
+#define BIG_TIME 1e6
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// STATIC DEFINITIONS ToDo make members
+//=============================================================================================================
 
 static char  *bemname     = NULL;		 /* Boundary-element model */
 static float r0[]         = { 0.0,0.0,0.04 };    /* Sphere model origin  */
@@ -74,7 +107,11 @@ static char   *bdipname    = NULL;		/* Output file in bdip format */
 
 
 
+
 //*************************************************************************************************************
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
 
 DipoleFit::DipoleFit(int *argc,char **argv)
 {
@@ -173,7 +210,7 @@ bool DipoleFit::calculateFit()
 {
     int                 res      = FAIL;
     guessData           guess    = NULL;
-    ecdSet              set      = NULL;
+    ECDSet              set;
     fwdEegSphereModel   eeg_model = NULL;
     dipoleFitData       fit_data = NULL;
     mneMeasData         data     = NULL;
@@ -263,14 +300,14 @@ bool DipoleFit::calculateFit()
 
 
     if (raw) {
-        if (fit_dipoles_raw(measname,raw,sel,fit_data,guess,tmin,tmax,tstep,integ,verbose,NULL) == FAIL)
+        if (fit_dipoles_raw(measname,raw,sel,fit_data,guess,tmin,tmax,tstep,integ,verbose) == FAIL)
             goto out;
     }
     else {
-        if (fit_dipoles(measname,data,fit_data,guess,tmin,tmax,tstep,integ,verbose,&set) == FAIL)
+        if (fit_dipoles(measname,data,fit_data,guess,tmin,tmax,tstep,integ,verbose,set) == FAIL)
             goto out;
     }
-    printf("%d dipoles fitted\n",set->ndip);
+    printf("%d dipoles fitted\n",set.size());
 
     /*
     * Saving...
@@ -279,7 +316,7 @@ bool DipoleFit::calculateFit()
     goto out;
     if (save_dipoles_bdip(bdipname,set) == FAIL)
     goto out;
-    free_ecd_set(set);
+//    free_ecd_set(set);
     res = OK;
 
     out : {

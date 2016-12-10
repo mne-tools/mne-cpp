@@ -4,6 +4,8 @@
 // INCLUDES
 //=============================================================================================================
 
+
+#include "ecd_set.h"
 #include <iostream>
 #include <vector>
 #include <Eigen/Core>
@@ -49,7 +51,7 @@
 //=============================================================================================================
 
 using namespace UTILSLIB;
-
+using namespace INVERSELIB;
 
 #ifndef TRUE
 #define TRUE 1
@@ -20331,32 +20333,23 @@ void free_ecd_set(ecdSet s)
   return;
 }
 
-static void add_to_ecd_set(ecdSet s, ecd d)
+
+static void print_ecd(FILE *f, const ECD& dip)
 
 {
-  if (!s || !d)
-    return;
-  s->dips = REALLOC(s->dips,s->ndip+1,ecd);
-  s->dips[s->ndip++] = d;
-  return;
-}
-
-static void print_ecd(FILE *f, ecd dip)
-
-{
-  if (!f || !dip)
+  if (!f || !dip.valid)
     return;
 
   fprintf(f,"%6.1f %7.2f %7.2f %7.2f %6.2f %6.2f %6.2f %6.2f %6.2f %6.2f %d\n",
-          1000*dip->time,				/* Time */
-          1000*dip->rd[0],				/* Dipole location */
-          1000*dip->rd[1],
-          1000*dip->rd[2],
-          1e9*VEC_LEN(dip->Q),				/* Dipole moment */
-          1e9*dip->Q[0],1e9*dip->Q[1],1e9*dip->Q[2],
-          dip->khi2/dip->nfree,                        /* This is the reduced khi^2 value */
-          100*dip->good,                               /* Goodness of fit */
-          dip->neval);				       /* Number of function evaluations required */
+          1000*dip.time,				/* Time */
+          1000*dip.rd[0],				/* Dipole location */
+          1000*dip.rd[1],
+          1000*dip.rd[2],
+          1e9*dip.Q.norm(),				/* Dipole moment */
+          1e9*dip.Q[0],1e9*dip.Q[1],1e9*dip.Q[2],
+          dip.khi2/dip.nfree,                        /* This is the reduced khi^2 value */
+          100*dip.good,                               /* Goodness of fit */
+          dip.neval);				       /* Number of function evaluations required */
 }
 
 
@@ -20541,137 +20534,139 @@ static float rtol(float *vals,int nval)
 }
 
 
-static ecd fit_one(dipoleFitData fit,	            /* Precomputed fitting data */
+static bool fit_one(dipoleFitData fit,	            /* Precomputed fitting data */
                    guessData     guess,	            /* The initial guesses */
-                   float         time,		    /* Which time is it? */
+                   float         time,              /* Which time is it? */
                    float         *B,	            /* The field to fit */
-                   int           verbose)
+                   int           verbose,
+                   ECD&          res               /* The fitted dipole */
+                    )
 /*
  * Fit a single dipole to the given data
  */
 {
-  float  **simplex       = NULL;	       /* The simplex */
-  float  vals[4];			       /* Values at the vertices */
-  float  limit           = 0.2;	               /* (pseudo) radial component omission limit */
-  float  size            = 1e-2;	       /* Size of the initial simplex */
-  float  ftol[]          = { 1e-2, 1e-2 };     /* Tolerances on the the two passes */
-  float  atol[]          = { 0.2e-3, 0.2e-3 }; /* If dipole movement between two iterations is less than this,
+    float  **simplex       = NULL;	       /* The simplex */
+    float  vals[4];			       /* Values at the vertices */
+    float  limit           = 0.2;	               /* (pseudo) radial component omission limit */
+    float  size            = 1e-2;	       /* Size of the initial simplex */
+    float  ftol[]          = { 1e-2, 1e-2 };     /* Tolerances on the the two passes */
+    float  atol[]          = { 0.2e-3, 0.2e-3 }; /* If dipole movement between two iterations is less than this,
                                                   we consider to have converged */
-  int    ntol            = 2;
-  int    max_eval        = 1000;	       /* Limit for fit function evaluations */
-  int    report_interval = verbose ? 1 : -1;   /* How often to report the intermediate result */
+    int    ntol            = 2;
+    int    max_eval        = 1000;	       /* Limit for fit function evaluations */
+    int    report_interval = verbose ? 1 : -1;   /* How often to report the intermediate result */
 
-  int        best;
-  float      good,rd_guess[3],rd_final[3],Q[3],final_val;
-  fitDipUserRec user;
-  int        k,p,neval,neval_tot,nchan,ncomp;
-  int        fit_fail;
-  ecd        res = NULL;
+    int        best;
+    float      good,rd_guess[3],rd_final[3],Q[3],final_val;
+    fitDipUserRec user;
+    int        k,p,neval,neval_tot,nchan,ncomp;
+    int        fit_fail;
 
-  nchan = fit->nmeg+fit->neeg;
-  user.fwd = NULL;
+    nchan = fit->nmeg+fit->neeg;
+    user.fwd = NULL;
 
-  if (mne_proj_op_proj_vector(fit->proj,B,nchan,TRUE) == FAIL)
-    goto bad;
+    if (mne_proj_op_proj_vector(fit->proj,B,nchan,TRUE) == FAIL)
+        goto bad;
 
-  if (mne_whiten_one_data(B,B,nchan,fit->noise) == FAIL)
-    goto bad;
-  /*
+    if (mne_whiten_one_data(B,B,nchan,fit->noise) == FAIL)
+        goto bad;
+    /*
    * Get the initial guess
    */
-  if (find_best_guess(B,nchan,guess,limit,&best,&good) < 0)
-    goto bad;
+    if (find_best_guess(B,nchan,guess,limit,&best,&good) < 0)
+        goto bad;
 
 
-  user.limit = limit;
-  user.B     = B;
-  user.B2    = mne_dot_vectors(B,B,nchan);
-  user.fwd   = NULL;
-  user.report_dim = FALSE;
-  fit->user  = &user;
+    user.limit = limit;
+    user.B     = B;
+    user.B2    = mne_dot_vectors(B,B,nchan);
+    user.fwd   = NULL;
+    user.report_dim = FALSE;
+    fit->user  = &user;
 
-  VEC_COPY(rd_guess,guess->rr[best]);
-  VEC_COPY(rd_final,guess->rr[best]);
+    VEC_COPY(rd_guess,guess->rr[best]);
+    VEC_COPY(rd_final,guess->rr[best]);
 
-  neval_tot = 0;
-  fit_fail = FALSE;
-  for (k = 0; k < ntol; k++) {
-    /*
+    neval_tot = 0;
+    fit_fail = FALSE;
+    for (k = 0; k < ntol; k++) {
+        /*
      * Do first pass with the sphere model
      */
-    if (k == 0)
-      fit->funcs = fit->sphere_funcs;
-    else
-      fit->funcs = fit->bemname ? fit->bem_funcs : fit->sphere_funcs;
+        if (k == 0)
+            fit->funcs = fit->sphere_funcs;
+        else
+            fit->funcs = fit->bemname ? fit->bem_funcs : fit->sphere_funcs;
 
-    simplex = make_initial_dipole_simplex(rd_guess,size);
-    for (p = 0; p < 4; p++)
-      vals[p] = fit_eval(simplex[p],3,fit);
-    if (simplex_minimize(simplex,           /* The initial simplex */
-                         vals,              /* Function values at the vertices */
-                         3,	            /* Number of variables */
-                         ftol[k],           /* Relative convergence tolerance for the target function */
-                         atol[k],           /* Absolute tolerance for the change in the parameters */
-                         fit_eval,          /* The function to be evaluated */
-                         fit,	            /* Data to be passed to the above function in each evaluation */
-                         max_eval,          /* Maximum number of function evaluations */
-                         &neval,            /* Number of function evaluations */
-                         report_interval,   /* How often to report (-1 = no_reporting) */
-                         report_func) != OK) {
-      if (k == 0)
-        goto bad;
-      else {
-        printf("\nWarning (t = %8.1f ms) : g = %6.1f %% final val = %7.3f rtol = %f\n",
-               1000*time,100*(1 - vals[0]/user.B2),vals[0],rtol(vals,4));
-        fit_fail = TRUE;
-      }
+        simplex = make_initial_dipole_simplex(rd_guess,size);
+        for (p = 0; p < 4; p++)
+            vals[p] = fit_eval(simplex[p],3,fit);
+        if (simplex_minimize(simplex,           /* The initial simplex */
+                             vals,              /* Function values at the vertices */
+                             3,	            /* Number of variables */
+                             ftol[k],           /* Relative convergence tolerance for the target function */
+                             atol[k],           /* Absolute tolerance for the change in the parameters */
+                             fit_eval,          /* The function to be evaluated */
+                             fit,	            /* Data to be passed to the above function in each evaluation */
+                             max_eval,          /* Maximum number of function evaluations */
+                             &neval,            /* Number of function evaluations */
+                             report_interval,   /* How often to report (-1 = no_reporting) */
+                             report_func) != OK) {
+            if (k == 0)
+                goto bad;
+            else {
+                printf("\nWarning (t = %8.1f ms) : g = %6.1f %% final val = %7.3f rtol = %f\n",
+                       1000*time,100*(1 - vals[0]/user.B2),vals[0],rtol(vals,4));
+                fit_fail = TRUE;
+            }
+        }
+        VEC_COPY(rd_final,simplex[0]);
+        VEC_COPY(rd_guess,simplex[0]);
+        FREE_CMATRIX(simplex); simplex = NULL;
+
+        neval_tot += neval;
+        final_val  = vals[0];
     }
-    VEC_COPY(rd_final,simplex[0]);
-    VEC_COPY(rd_guess,simplex[0]);
-    FREE_CMATRIX(simplex); simplex = NULL;
-
-    neval_tot += neval;
-    final_val  = vals[0];
-  }
-  /*
+    /*
    * Confidence limits should be computed here
    */
-  /*
+    /*
    * Compute the dipole moment at the final point
    */
-  if (fit_Q(fit,user.B,rd_final,user.limit,Q,&ncomp,&final_val) == OK) {
-    res = new_ecd();
-    res->time  = time;
-    res->valid = TRUE;
-    VEC_COPY(res->rd,rd_final);
-    VEC_COPY(res->Q,Q);
-    res->good  = 1.0 - final_val/user.B2;
-    if (fit_fail)
-      res->good = -res->good;
-    res->khi2  = final_val;
-    if (fit->proj)
-      res->nfree = nchan-3-ncomp-fit->proj->nvec;
+    if (fit_Q(fit,user.B,rd_final,user.limit,Q,&ncomp,&final_val) == OK) {
+        res.time  = time;
+        res.valid = true;
+        for(int i = 0; i < 3; ++i)
+            res.rd[i] = rd_final[i];
+        for(int i = 0; i < 3; ++i)
+            res.Q[i] = Q[i];
+        res.good  = 1.0 - final_val/user.B2;
+        if (fit_fail)
+            res.good = -res.good;
+        res.khi2  = final_val;
+        if (fit->proj)
+            res.nfree = nchan-3-ncomp-fit->proj->nvec;
+        else
+            res.nfree = nchan-3-ncomp;
+        res.neval = neval_tot;
+    }
     else
-      res->nfree = nchan-3-ncomp;
-    res->neval = neval_tot;
-  }
-  else
-    goto bad;
-  free_dipole_forward(user.fwd);
-  FREE_CMATRIX(simplex);
-
-  return res;
-
- bad : {
+        goto bad;
     free_dipole_forward(user.fwd);
     FREE_CMATRIX(simplex);
-    free_ecd(res);
-    return NULL;
-  }
+
+    return true;
+
+bad : {
+        free_dipole_forward(user.fwd);
+        FREE_CMATRIX(simplex);
+        return false;
+    }
 }
 
 
 #define SEG_LEN 10.0
+
 
 int fit_dipoles_raw(char           *dataname,
                     mneRawData     raw,          /* The raw data description */
@@ -20683,7 +20678,7 @@ int fit_dipoles_raw(char           *dataname,
                     float          tstep,        /* Time step to use */
                     float          integ,        /* Integration time */
                     int            verbose,      /* Verbose output? */
-                    ecdSet         *setp)	 /* Return all results here
+                    ECDSet&        p_set)	 /* Return all results here
                                                   * Warning: for large data files this may take
                                                   * a lot of memory */
 
@@ -20691,79 +20686,95 @@ int fit_dipoles_raw(char           *dataname,
  * Fit a single dipole to each time point of the data
  */
 {
-  float *one    = MALLOC(sel->nchan,float);
-  float sfreq   = raw->info->sfreq;
-  float myinteg = integ > 0.0 ? 2*integ : 0.1;
-  int   overlap = ceil(myinteg*sfreq);
-  int   length  = SEG_LEN*sfreq;
-  int   step    = length - overlap;
-  int   stepo   = step + overlap/2;
-  int   start   = raw->first_samp;
-  int   s,picks;
-  float time,stime;
-  float **data  = ALLOC_CMATRIX(sel->nchan,length);
-  ecdSet set = NULL;
-  ecd    dip;
-  int    report_interval = 10;
+    float *one    = MALLOC(sel->nchan,float);
+    float sfreq   = raw->info->sfreq;
+    float myinteg = integ > 0.0 ? 2*integ : 0.1;
+    int   overlap = ceil(myinteg*sfreq);
+    int   length  = SEG_LEN*sfreq;
+    int   step    = length - overlap;
+    int   stepo   = step + overlap/2;
+    int   start   = raw->first_samp;
+    int   s,picks;
+    float time,stime;
+    float **data  = ALLOC_CMATRIX(sel->nchan,length);
+    ECD    dip;
+    ECDSet set;
+    int    report_interval = 10;
 
-  if (setp) {
-    set = new_ecd_set();
-    set->dataname = mne_strdup(dataname);
-  }
-  /*
+    set.dataname = QString(dataname);
+
+    /*
    * Load the initial data segment
    */
-  stime = start/sfreq;
-  if (mne_raw_pick_data_filt(raw,sel,start,length,data) == FAIL)
-    goto bad;
-  fprintf(stderr,"Fitting...%c",verbose ? '\n' : '\0');
-  for (s = 0, time = tmin; time < tmax; s++, time = tmin  + s*tstep) {
-    picks = time*sfreq - start;
-    if (picks > stepo) {		/* Need a new data segment? */
-      start = start + step;
-      if (mne_raw_pick_data_filt(raw,sel,start,length,data) == FAIL)
+    stime = start/sfreq;
+    if (mne_raw_pick_data_filt(raw,sel,start,length,data) == FAIL)
         goto bad;
-      picks = time*sfreq - start;
-      stime = start/sfreq;
-    }
-    /*
+    fprintf(stderr,"Fitting...%c",verbose ? '\n' : '\0');
+    for (s = 0, time = tmin; time < tmax; s++, time = tmin  + s*tstep) {
+        picks = time*sfreq - start;
+        if (picks > stepo) {		/* Need a new data segment? */
+            start = start + step;
+            if (mne_raw_pick_data_filt(raw,sel,start,length,data) == FAIL)
+                goto bad;
+            picks = time*sfreq - start;
+            stime = start/sfreq;
+        }
+        /*
      * Get the values
      */
-    if (mne_get_values_from_data_ch (time,integ,data,length,sel->nchan,stime,sfreq,FALSE,one) == FAIL) {
-      fprintf(stderr,"Cannot pick time: %8.3f s\n",time);
-      continue;
-    }
-    /*
+        if (mne_get_values_from_data_ch (time,integ,data,length,sel->nchan,stime,sfreq,FALSE,one) == FAIL) {
+            fprintf(stderr,"Cannot pick time: %8.3f s\n",time);
+            continue;
+        }
+        /*
      * Fit
      */
-    if ((dip = fit_one(fit,guess,time,one,verbose)) == NULL)
-      qWarning() << "Error";
-    else {
-      add_to_ecd_set(set,dip);
-      if (verbose)
-        print_ecd(stdout,dip);
-      else {
-        if (set->ndip % report_interval == 0)
-          fprintf(stderr,"%d..",set->ndip);
-      }
+        if (!fit_one(fit,guess,time,one,verbose,dip))
+            qWarning() << "Error";
+        else {
+            set.addEcd(dip);
+            if (verbose)
+                print_ecd(stdout,dip);
+            else {
+                if (set.size() % report_interval == 0)
+                    fprintf(stderr,"%d..",set.size());
+            }
+        }
     }
-  }
-  if (!verbose)
-    fprintf(stderr,"[done]\n");
-  FREE_CMATRIX(data);
-  FREE(one);
-  if (setp)
-    *setp = set;
-  return OK;
-
- bad : {
+    if (!verbose)
+        fprintf(stderr,"[done]\n");
     FREE_CMATRIX(data);
     FREE(one);
-    free_ecd_set(set);
-    return FAIL;
-  }
+    p_set = set;
+    return OK;
+
+bad : {
+        FREE_CMATRIX(data);
+        FREE(one);
+        return FAIL;
+    }
 }
 
+
+
+
+int fit_dipoles_raw(char           *dataname,
+                    mneRawData     raw,          /* The raw data description */
+                    mneChSelection sel,	         /* Channel selection to use */
+                    dipoleFitData  fit,	         /* Precomputed fitting data */
+                    guessData      guess,        /* The initial guesses */
+                    float          tmin,         /* Time range */
+                    float          tmax,
+                    float          tstep,        /* Time step to use */
+                    float          integ,        /* Integration time */
+                    int            verbose)
+/*
+ * Fit a single dipole to each time point of the data
+ */
+{
+    ECDSet set;
+    return fit_dipoles_raw(dataname, raw, sel, fit, guess, tmin, tmax, tstep, integ, verbose, set);
+}
 
 
 void print_fields(float       *rd,
@@ -20819,60 +20830,55 @@ int    fit_dipoles(char          *dataname,
                    float         tstep,	     /* Time step to use */
                    float         integ,	     /* Integration time */
                    int           verbose,    /* Verbose output? */
-                   ecdSet        *setp)
+                   ECDSet&       p_set)
 /*
  * Fit a single dipole to each time point of the data
  */
 {
-  float *one = MALLOC(data->nchan,float);
-  float time;
+    float *one = MALLOC(data->nchan,float);
+    float time;
+    ECDSet set;
+    ECD   dip;
+    int   s;
+    int   report_interval = 10;
 
-  ecdSet set = NULL;
-  ecd    dip;
-  int   s;
-  int   report_interval = 10;
+    set.dataname = QString(dataname);
 
-  if (setp) {
-    set = new_ecd_set();
-    set->dataname = mne_strdup(dataname);
-  }
-
-  fprintf(stderr,"Fitting...%c",verbose ? '\n' : '\0');
-  for (s = 0, time = tmin; time < tmax; s++, time = tmin  + s*tstep) {
-    /*
+    fprintf(stderr,"Fitting...%c",verbose ? '\n' : '\0');
+    for (s = 0, time = tmin; time < tmax; s++, time = tmin  + s*tstep) {
+        /*
      * Pick the data point
      */
-    if (mne_get_values_from_data(time,integ,data->current->data,data->current->np,data->nchan,data->current->tmin,
-                                 1.0/data->current->tstep,FALSE,one) == FAIL) {
-      fprintf(stderr,"Cannot pick time: %7.1f ms\n",1000*time);
-      continue;
-    }
+        if (mne_get_values_from_data(time,integ,data->current->data,data->current->np,data->nchan,data->current->tmin,
+                                     1.0/data->current->tstep,FALSE,one) == FAIL) {
+            fprintf(stderr,"Cannot pick time: %7.1f ms\n",1000*time);
+            continue;
+        }
 
-    if ((dip = fit_one(fit,guess,time,one,verbose)) == NULL)
-      printf("t = %7.1f ms : %s\n",1000*time,"error (tbd: catch)");
-    else {
-      add_to_ecd_set(set,dip);
-      if (verbose)
-        print_ecd(stdout,dip);
-      else {
-        if (set->ndip % report_interval == 0)
-          fprintf(stderr,"%d..",set->ndip);
-      }
+        if (!fit_one(fit,guess,time,one,verbose,dip))
+            printf("t = %7.1f ms : %s\n",1000*time,"error (tbd: catch)");
+        else {
+            set.addEcd(dip);
+            if (verbose)
+                print_ecd(stdout,dip);
+            else {
+                if (set.size() % report_interval == 0)
+                    fprintf(stderr,"%d..",set.size());
+            }
+        }
     }
-  }
-  if (!verbose)
-    fprintf(stderr,"[done]\n");
-  FREE(one);
-  if (setp)
-    *setp = set;
-  return OK;
+    if (!verbose)
+        fprintf(stderr,"[done]\n");
+    FREE(one);
+    p_set = set;
+    return OK;
 }
 
 
 //============================= save_dipoles.c =============================
 
 int save_dipoles_dip(char   *name,
-                     ecdSet set)
+                     const ECDSet& set)
   /*
    * Save dipoles in the dip format suitable for mrilab
    */
@@ -20880,9 +20886,9 @@ int save_dipoles_dip(char   *name,
 {
   FILE *out = NULL;
   int  k,nsave;
-  ecd  one;
+  ECD  one;
 
-  if (!name || strlen(name) == 0 || !set || set->ndip == 0)
+  if (!name || strlen(name) == 0 || set.size() == 0)
     return OK;
   if ((out = fopen(name,"w")) == NULL) {
     printf(name);
@@ -20891,13 +20897,13 @@ int save_dipoles_dip(char   *name,
   fprintf(out,"# CoordinateSystem \"Head\"\n");
   fprintf (out,"# %7s %7s %8s %8s %8s %8s %8s %8s %8s %6s\n",
            "begin","end","X (mm)","Y (mm)","Z (mm)","Q(nAm)","Qx(nAm)","Qy(nAm)","Qz(nAm)","g/%");
-  for (k = 0, nsave = 0; k < set->ndip; k++) {
-    one = set->dips[k];
-    if (one->valid) {
+  for (k = 0, nsave = 0; k < set.size(); k++) {
+    one = set[k];
+    if (one.valid) {
       fprintf(out,"  %7.1f %7.1f %8.2f %8.2f %8.2f %8.3f %8.3f %8.3f %8.3f %6.1f\n",
-              1000*one->time,1000*one->time,
-              1000*one->rd[X],1000*one->rd[Y],1000*one->rd[2],
-              1e9*VEC_LEN(one->Q),1e9*one->Q[X],1e9*one->Q[Y],1e9*one->Q[Z],100.0*one->good);
+              1000*one.time,1000*one.time,
+              1000*one.rd[X],1000*one.rd[Y],1000*one.rd[2],
+              1e9*one.Q.norm(),1e9*one.Q[X],1e9*one.Q[Y],1e9*one.Q[Z],100.0*one.good);
       nsave++;
     }
   }
@@ -20956,18 +20962,18 @@ typedef struct {
 
 
 int save_dipoles_bdip(char   *name,
-                      ecdSet set)
+                      const ECDSet& set)
   /*
    * Save dipoles in the bdip format employed by xfit
    */
 {
   FILE        *out = NULL;
   bdipEcdRec  one_out;
-  ecd         one;
+  ECD         one;
   int         k,p;
   int         nsave;
 
-  if (!name || strlen(name) == 0 || !set || set->ndip == 0)
+  if (!name || strlen(name) == 0 || set.size() == 0)
     return OK;
 
   if ((out = fopen(name,"w")) == NULL) {
@@ -20975,19 +20981,19 @@ int save_dipoles_bdip(char   *name,
     return FAIL;
   }
 
-  for (k = 0, nsave = 0; k < set->ndip; k++) {
-    one = set->dips[k];
-    if (one->valid) {
+  for (k = 0, nsave = 0; k < set.size(); k++) {
+    one = set[k];
+    if (one.valid) {
       one_out.dipole = swap_int(1);
-      one_out.begin  = swap_float(one->time);
+      one_out.begin  = swap_float(one.time);
       for (p = 0; p < 3; p++) {
         one_out.r0[p] = swap_float(0.0);
-        one_out.rd[p] = swap_float(one->rd[p]);
-        one_out.Q[p]  = swap_float(one->Q[p]);
+        one_out.rd[p] = swap_float(one.rd[p]);
+        one_out.Q[p]  = swap_float(one.Q[p]);
       }
-      one_out.goodness = swap_float(one->good);
+      one_out.goodness = swap_float(one.good);
       one_out.errors_computed = swap_int(0);
-      one_out.khi2            = swap_float(one->khi2);
+      one_out.khi2            = swap_float(one.khi2);
       if (fwrite(&one_out,sizeof(bdipEcdRec),1,out) != 1) {
         printf("Failed to write a dipole");
         goto bad;
@@ -21012,38 +21018,4 @@ int save_dipoles_bdip(char   *name,
     return FAIL;
   }
 }
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// STATIC DEFINITIONS
-//=============================================================================================================
-
-#ifndef PROGRAM_VERSION
-#define PROGRAM_VERSION     "1.00"
-#endif
-
-
-#ifndef FAIL
-#define FAIL -1
-#endif
-
-#ifndef OK
-#define OK 0
-#endif
-
-#ifndef TRUE
-#define TRUE 1
-#endif
-
-#ifndef FALSE
-#define FALSE 0
-#endif
-
-
-#define BIG_TIME 1e6
-
-
-
-
 

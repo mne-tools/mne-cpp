@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     dipolefit.h
+* @file     ecd.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,81 +29,64 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Dipole Fit class declaration.
+* @brief    Implementation of the Electric Current Dipole (ECD) Class.
 *
 */
-
-#ifndef DIPOLEFIT_H
-#define DIPOLEFIT_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "ecd_set.h"
+#include "ecd.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// USED NAMESPACES
 //=============================================================================================================
 
-#include <QSharedPointer>
+using namespace Eigen;
+using namespace INVERSELIB;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE INVERSELIB
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-namespace INVERSELIB
+ECD::ECD()
+: valid(false)
+, time(-1)
+, rd(Vector3f::Zero(3))
+, Q(Vector3f::Zero(3))
+, good(0)
+, khi2(0)
+, nfree(0)
+, neval(-1)
 {
 
+}
+
+
 //*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
 
-
-//=============================================================================================================
-/**
-* Implements all required dipole fitting routines
-*
-* @brief Dipole Fit implementation
-*/
-class DipoleFit
+ECD::ECD(const ECD& p_ECD)
+: valid(p_ECD.valid)
+, time(p_ECD.time)
+, rd(p_ECD.rd)
+, Q(p_ECD.Q)
+, good(p_ECD.good)
+, khi2(p_ECD.khi2)
+, nfree(p_ECD.nfree)
+, neval(p_ECD.neval)
 {
-public:
-    typedef QSharedPointer<DipoleFit> SPtr;             /**< Shared pointer type for DipoleFit. */
-    typedef QSharedPointer<const DipoleFit> ConstSPtr;  /**< Const shared pointer type for DipoleFit. */
+}
 
-    //=========================================================================================================
-    /**
-    * Constructs Dipole Fit algorithm
-    */
-    explicit DipoleFit(int *argc,char **argv);
-
-    virtual ~DipoleFit(){}
-
-    bool calculateFit();
-//    virtual const char* getName() const;
-
-private:
-
-    static void usage(char *name);
-    static int check_unrecognized_args(int argc, char **argv);
-    static int check_args (int *argc,char **argv);
-
-
-};
 
 //*************************************************************************************************************
-//=============================================================================================================
-// INLINE DEFINITIONS
-//=============================================================================================================
 
+ECD::~ECD()
+{
 
-} //NAMESPACE
-
-#endif // DIPOLEFIT_H
+}

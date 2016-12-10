@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     dipolefit.h
+* @file     ecd_set.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,19 +29,20 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Dipole Fit class declaration.
+* @brief     FiffDigPointSet class declaration.
 *
 */
 
-#ifndef DIPOLEFIT_H
-#define DIPOLEFIT_H
+#ifndef ECD_SET_H
+#define ECD_SET_H
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "ecd_set.h"
+#include "ecd.h"
 
 
 //*************************************************************************************************************
@@ -50,15 +51,15 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
+#include <QList>
+#include <QString>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE INVERSELIB
+// Eigen INCLUDES
 //=============================================================================================================
 
-namespace INVERSELIB
-{
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -66,44 +67,124 @@ namespace INVERSELIB
 //=============================================================================================================
 
 
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE INVERSELIB
+//=============================================================================================================
+
+namespace INVERSELIB {
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FIFFLIB FORWARD DECLARATIONS
+//=============================================================================================================
+
+
 //=============================================================================================================
 /**
-* Implements all required dipole fitting routines
+* Implements Electric Current Dipole Set (Replaces *ecdSet,ecdSetRec struct of MNE-C fit_types.h).
 *
-* @brief Dipole Fit implementation
+* @brief Holds a set of Electric Current Dipoles.
 */
-class DipoleFit
+
+class ECDSet
 {
+
 public:
-    typedef QSharedPointer<DipoleFit> SPtr;             /**< Shared pointer type for DipoleFit. */
-    typedef QSharedPointer<const DipoleFit> ConstSPtr;  /**< Const shared pointer type for DipoleFit. */
+    typedef QSharedPointer<ECDSet> SPtr;            /**< Shared pointer type for ECDSet. */
+    typedef QSharedPointer<const ECDSet> ConstSPtr; /**< Const shared pointer type for ECDSet. */
 
     //=========================================================================================================
     /**
-    * Constructs Dipole Fit algorithm
+    * Constructs a Electric Current Dipole Set object.
     */
-    explicit DipoleFit(int *argc,char **argv);
+    ECDSet();
 
-    virtual ~DipoleFit(){}
+    //=========================================================================================================
+    /**
+    * Copy constructor.
+    *
+    * @param[in] p_ECDSet       Electric Current Dipole Set which should be copied
+    */
+    ECDSet(const ECDSet &p_ECDSet);
 
-    bool calculateFit();
-//    virtual const char* getName() const;
+    //=========================================================================================================
+    /**
+    * Destroys the Electric Current Dipole description
+    */
+    ~ECDSet();
+
+    //=========================================================================================================
+    /**
+    * Appends an Electric Current Dipole to the set
+    */
+    void addEcd(const ECD& p_ecd);
+
+    //=========================================================================================================
+    /**
+    * Returns the number of stored ECDs
+    *
+    * @return number of stored ECDs
+    */
+    inline qint32 size() const;
+
+    //=========================================================================================================
+    /**
+    * Subscript operator [] to access FiffDigPoint by index
+    *
+    * @param[in] idx    the ECD index.
+    *
+    * @return ECD related to the parameter index.
+    */
+    const ECD& operator[] (qint32 idx) const;
+
+    //=========================================================================================================
+    /**
+    * Subscript operator [] to access ECD by index
+    *
+    * @param[in] idx    the ECD index.
+    *
+    * @return ECD related to the parameter index.
+    */
+    ECD& operator[] (qint32 idx);
+
+    //=========================================================================================================
+    /**
+    * Subscript operator << to add a new ECD
+    *
+    * @param[in] p_ecd      ECD to be added
+    *
+    * @return ECDSet
+    */
+    ECDSet& operator<< (const ECD& p_ecd);
+
+public:
+    QString dataname;   /**< The associated data file */
 
 private:
+    QList<ECD> m_qListDips;    /**< List of Electric Current Dipoles. */
 
-    static void usage(char *name);
-    static int check_unrecognized_args(int argc, char **argv);
-    static int check_args (int *argc,char **argv);
-
+// ### OLD STRUCT ###
+//    typedef struct {
+//      char *dataname;		/* The associated data file */
+//      int  ndip;			/* How many dipoles */
+//      ecd  *dips;			/* The dipoles themselves */
+//    } *ecdSet,ecdSetRec;		/* A set of ECDs */
 
 };
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
 
+inline qint32 ECDSet::size() const
+{
+    return m_qListDips.size();
+}
 
-} //NAMESPACE
+} // NAMESPACE INVERSELIB
 
-#endif // DIPOLEFIT_H
+#endif // ECD_SET_H

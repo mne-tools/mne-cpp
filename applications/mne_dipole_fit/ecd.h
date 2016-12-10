@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     dipolefit.h
+* @file     ecd.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -18,7 +18,7 @@
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
 *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
-*
+* 
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
 * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
@@ -29,19 +29,26 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Dipole Fit class declaration.
+* @brief    Electric Current Dipole (ECD) class declaration.
 *
 */
 
-#ifndef DIPOLEFIT_H
-#define DIPOLEFIT_H
+#ifndef ECD_H
+#define ECD_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "ecd_set.h"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
 
 
 //*************************************************************************************************************
@@ -50,6 +57,7 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
+#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -60,43 +68,63 @@
 namespace INVERSELIB
 {
 
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
 
 //=============================================================================================================
 /**
-* Implements all required dipole fitting routines
+* Implements one Electric Current Dipole (Replaces *ecd,ecdRec struct of MNE-C fit_types.h).
 *
-* @brief Dipole Fit implementation
+* @brief Electric Current Dipole description
 */
-class DipoleFit
+class ECD
 {
 public:
-    typedef QSharedPointer<DipoleFit> SPtr;             /**< Shared pointer type for DipoleFit. */
-    typedef QSharedPointer<const DipoleFit> ConstSPtr;  /**< Const shared pointer type for DipoleFit. */
+    typedef QSharedPointer<ECD> SPtr;              /**< Shared pointer type for ECD. */
+    typedef QSharedPointer<const ECD> ConstSPtr;   /**< Const shared pointer type for ECD. */
 
     //=========================================================================================================
     /**
-    * Constructs Dipole Fit algorithm
+    * Constructs the Electric Current Dipole
     */
-    explicit DipoleFit(int *argc,char **argv);
+    ECD();
 
-    virtual ~DipoleFit(){}
+    //=========================================================================================================
+    /**
+    * Copy constructor.
+    *
+    * @param[in] p_ECD      Electric Current Dipole which should be copied
+    */
+    ECD(const ECD& p_ECD);
 
-    bool calculateFit();
-//    virtual const char* getName() const;
+    //=========================================================================================================
+    /**
+    * Destroys the Electric Current Dipole description
+    */
+    ~ECD();
 
-private:
+public:
+    bool            valid;  /**< Is this dipole valid */
+    float           time;   /**< Time point */
+    Eigen::Vector3f rd;     /**< Dipole location */
+    Eigen::Vector3f Q;      /**< Dipole moment */
+    float           good;   /**< Goodness of fit */
+    float           khi2;   /**< khi^2 value */
+    int             nfree;  /**< Degrees of freedom for the above */
+    int             neval;  /**< Number of function evaluations required for this fit */
 
-    static void usage(char *name);
-    static int check_unrecognized_args(int argc, char **argv);
-    static int check_args (int *argc,char **argv);
-
+// ### OLD STRUCT ###
+//    typedef struct {
+//      int   valid;			/* Is this dipole valid */
+//      float time;			/* Time point */
+//      float rd[3];			/* Dipole location */
+//      float Q[3];			/* Dipole moment */
+//      float good;			/* Goodness of fit */
+//      float khi2;			/* khi^2 value */
+//      int   nfree;			/* Degrees of freedom for the above */
+//      int   neval;			/* Number of function evaluations required for this fit */
+//    } *ecd,ecdRec;			/* One ECD */
 
 };
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -104,6 +132,6 @@ private:
 //=============================================================================================================
 
 
-} //NAMESPACE
+} // NAMESPACE INVERSELIB
 
-#endif // DIPOLEFIT_H
+#endif // ECD_H
