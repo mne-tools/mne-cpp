@@ -21719,36 +21719,33 @@ static int check_args (int *argc,char **argv)
 
 DipoleFit::DipoleFit(int *argc,char **argv)
 {
-    int            res      = FAIL;
-    int                  k;
-
     if (check_args(argc,argv) == FAIL)
-        goto out;
+        return;
 
     do_baseline = (bmin < BIG_TIME && bmax < BIG_TIME);
 
     if (!measname) {
         qCritical ("Data file name missing. Please specify one using the --meas option.");
-        goto out;
+        return;
     }
     if (!dipname && !bdipname) {
         qCritical ("Output file name missing. Please use the --dip or --bdip options to do this.");
-        goto out;
+        return;
     }
     if (!guessname) {
         if (!bemname && guess_surfname && !mriname) {
             qCritical ("Please specify the MRI/head coordinate transformation with the --mri option");
-            goto out;
+            return;
         }
     }
     if (!include_meg && !include_eeg) {
         qCritical ("Specify one or both of the --eeg and --meg options");
-        goto out;
+        return;
     }
     if (!omit_data_proj) {
         projnames = REALLOC(projnames,nproj+1,char *);
         nproj++;
-        for (k = 1; k < nproj; k++)
+        for (int k = 1; k < nproj; k++)
             projnames[k] = projnames[k-1];
         projnames[0] = mne_strdup(measname);
     }
@@ -21782,7 +21779,7 @@ DipoleFit::DipoleFit(int *argc,char **argv)
     printf("Data             : %s\n",measname);
     if (nproj > 0) {
         printf("SSP sources      :\n");
-    for (k = 0; k < nproj; k++)
+    for (int k = 0; k < nproj; k++)
         printf("\t%s\n",projnames[k]);
     }
     if (badname)
@@ -21808,17 +21805,6 @@ DipoleFit::DipoleFit(int *argc,char **argv)
     if (bdipname)
         printf("bdip output     : %s\n",bdipname);
     printf("\n");
-    printf("---- Setting up...\n\n");
-
-    res = OK;
-
-    out : {
-        if (res == FAIL) {
-            return;
-        }
-        else
-            return;
-    }
 }
 
 
@@ -21835,7 +21821,7 @@ bool DipoleFit::calculateInverse()
     mneRawData          raw      = NULL;
     mneChSelection      sel      = NULL;
 
-
+    printf("---- Setting up...\n\n");
     if (include_eeg) {
         if ((eeg_model = setup_eeg_sphere_model(eeg_model_file,eeg_model_name,eeg_sphere_rad)) == NULL)
             goto out;
