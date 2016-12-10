@@ -85,6 +85,7 @@ public:
 
     virtual ~DipoleFit(){}
 
+    bool calculateInverse();
 //    virtual const char* getName() const;
 
 private:

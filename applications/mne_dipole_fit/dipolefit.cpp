@@ -21720,14 +21720,6 @@ static int check_args (int *argc,char **argv)
 DipoleFit::DipoleFit(int *argc,char **argv)
 {
     int            res      = FAIL;
-    dipoleFitData  fit_data = NULL;
-    mneMeasData    data     = NULL;
-    mneRawData     raw      = NULL;
-    guessData      guess    = NULL;
-    mneChSelection sel      = NULL;
-    ecdSet         set      = NULL;
-
-    fwdEegSphereModel    eeg_model = NULL;
     int                  k;
 
     if (check_args(argc,argv) == FAIL)
@@ -21817,6 +21809,32 @@ DipoleFit::DipoleFit(int *argc,char **argv)
         printf("bdip output     : %s\n",bdipname);
     printf("\n");
     printf("---- Setting up...\n\n");
+
+    res = OK;
+
+    out : {
+        if (res == FAIL) {
+            return;
+        }
+        else
+            return;
+    }
+}
+
+
+//*************************************************************************************************************
+
+bool DipoleFit::calculateInverse()
+{
+    int                 res      = FAIL;
+    guessData           guess    = NULL;
+    ecdSet              set      = NULL;
+    fwdEegSphereModel   eeg_model = NULL;
+    dipoleFitData       fit_data = NULL;
+    mneMeasData         data     = NULL;
+    mneRawData          raw      = NULL;
+    mneChSelection      sel      = NULL;
+
 
     if (include_eeg) {
         if ((eeg_model = setup_eeg_sphere_model(eeg_model_file,eeg_model_name,eeg_sphere_rad)) == NULL)
@@ -21921,12 +21939,15 @@ DipoleFit::DipoleFit(int *argc,char **argv)
 
     out : {
         if (res == FAIL) {
-            return;
+            return false;
         }
         else
-            return;
+            return true;
     }
 }
+
+
+
 
 //*************************************************************************************************************
 //=============================================================================================================
