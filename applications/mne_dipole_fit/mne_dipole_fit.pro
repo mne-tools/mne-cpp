@@ -69,8 +69,9 @@ else {
 DESTDIR =  $${MNE_BINARY_DIR}
 
 SOURCES += \
-        main.cpp \
-        dipolefit.cpp
+    main.cpp \
+    dipolefit.cpp \
+    dipolefit_helpers.cpp
 
 HEADERS += \
     fiff_types.h \

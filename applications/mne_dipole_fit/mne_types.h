@@ -363,7 +363,7 @@ typedef struct {		/* A forward solution */
   mneSourceSpace *spaces;	/* The source spaces */
   int            nspace;	/* Number of source spaces */
   fiffCoordTrans mri_head_t;	/* MRI <-> head coordinate transformation */
-  fiffCoordTrans meg_head_t;    /* MEG <-> head coordinate transformation */ 
+  fiffCoordTrans meg_head_t;    /* MEG <-> head coordinate transformation */
   int            methods;	/* EEG, MEG or EEG+MEG (see mne_fiff.h) */
   int            coord_frame;	/* The coordinate frame employed in the forward calculations */
   int            source_ori;	/* Fixed or free source orientations */
@@ -388,7 +388,7 @@ typedef struct {		          /* An inverse operator */
   fiffId         meas_id;                 /* The assosiated measurement ID */
   mneSourceSpace *spaces;	          /* The source spaces */
   int            nspace;	          /* Number of source spaces */
-  fiffCoordTrans meg_head_t;              /* MEG device <-> head coordinate transformation */ 
+  fiffCoordTrans meg_head_t;              /* MEG device <-> head coordinate transformation */
   fiffCoordTrans mri_head_t;	          /* MRI device <-> head coordinate transformation */
   int            methods;	          /* EEG, MEG or EEG+MEG (see mne_fiff.h) */
   int            nchan;		          /* Number of measurement channels */
@@ -622,7 +622,7 @@ typedef struct {		        /* A collection of derivations */
 
 typedef struct {			/* A comprehensive raw data structure */
   char             *filename;           /* This is our file */
-  fiffFile         file;	        
+  fiffFile         file;
   mneRawInfo       info;	        /* Loaded using the mne routines */
   char             **ch_names;		/* Useful to have the channel names as a single list */
   char             **badlist;		/* Bad channel names */
@@ -701,7 +701,7 @@ typedef struct {		 /* Measurement data representation in MNE calculations */
   fiffTimeRec        meas_date;	 /* The measurement date from the file */
   fiffChInfo         chs;	 /* The channel information */
   fiffCoordTrans     meg_head_t; /* MEG device <-> head coordinate transformation */
-  fiffCoordTrans     mri_head_t; /* MRI device <-> head coordinate transformation 
+  fiffCoordTrans     mri_head_t; /* MRI device <-> head coordinate transformation
 				    (duplicated from the inverse operator or loaded separately) */
   float              sfreq;	 /* Sampling frequency */
   int                nchan;	 /* Number of channels */
