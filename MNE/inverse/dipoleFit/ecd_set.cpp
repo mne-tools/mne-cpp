@@ -143,8 +143,8 @@ ECDSet::ECDSet()
 //*************************************************************************************************************
 
 ECDSet::ECDSet(const ECDSet &p_ECDSet)
-: dataname(p_ECDSet.dataname)
-, m_qListDips(p_ECDSet.m_qListDips)
+    : dataname(p_ECDSet.dataname)
+    , m_qListDips(p_ECDSet.m_qListDips)
 {
 
 }
@@ -168,8 +168,8 @@ void ECDSet::addEcd(const ECD& p_ecd)
 
 //*************************************************************************************************************
 
-bool ECDSet::save_dipoles_bdip(char   *name)
-  /*
+bool ECDSet::save_dipoles_bdip(const QString& name)
+/*
    * Save dipoles in the bdip format employed by xfit
    */
 {
@@ -179,11 +179,11 @@ bool ECDSet::save_dipoles_bdip(char   *name)
     int         k,p;
     int         nsave;
 
-    if (!name || strlen(name) == 0 || this->size() == 0)
+    if (name.isEmpty() || this->size() == 0)
         return true;
 
-    if ((out = fopen(name,"w")) == NULL) {
-        printf(name);
+    if ((out = fopen(name.toLatin1().data(),"w")) == NULL) {
+        printf(name.toLatin1().data());
         return false;
     }
 
@@ -209,16 +209,16 @@ bool ECDSet::save_dipoles_bdip(char   *name)
     }
     if (fclose(out) != 0) {
         out = NULL;
-        printf(name);
+        printf(name.toLatin1().data());
         goto bad;
     }
-    fprintf(stderr,"Save %d dipoles in bdip format to %s\n",nsave,name);
+    fprintf(stderr,"Save %d dipoles in bdip format to %s\n",nsave,name.toLatin1().data());
     return true;
 
 bad : {
         if (out) {
             fclose(out);
-            unlink(name);
+            unlink(name.toLatin1().data());
         }
         return false;
     }
@@ -227,47 +227,47 @@ bad : {
 
 //*************************************************************************************************************
 
-bool ECDSet::save_dipoles_dip(char   *name) const
+bool ECDSet::save_dipoles_dip(const QString& name) const
 {
-  FILE *out = NULL;
-  int  k,nsave;
-  ECD  one;
+    FILE *out = NULL;
+    int  k,nsave;
+    ECD  one;
 
-  if (!name || strlen(name) == 0 || this->size() == 0)
+    if (name.isEmpty() || this->size() == 0)
+        return true;
+    if ((out = fopen(name.toLatin1().data(),"w")) == NULL) {
+        printf(name.toLatin1().data());
+        return false;
+    }
+    fprintf(out,"# CoordinateSystem \"Head\"\n");
+    fprintf (out,"# %7s %7s %8s %8s %8s %8s %8s %8s %8s %6s\n",
+             "begin","end","X (mm)","Y (mm)","Z (mm)","Q(nAm)","Qx(nAm)","Qy(nAm)","Qz(nAm)","g/%");
+    for (k = 0, nsave = 0; k < this->size(); k++) {
+        one = this->m_qListDips[k];
+        if (one.valid) {
+            fprintf(out,"  %7.1f %7.1f %8.2f %8.2f %8.2f %8.3f %8.3f %8.3f %8.3f %6.1f\n",
+                    1000*one.time,1000*one.time,
+                    1000*one.rd[X],1000*one.rd[Y],1000*one.rd[Z],
+                    1e9*one.Q.norm(),1e9*one.Q[X],1e9*one.Q[Y],1e9*one.Q[Z],100.0*one.good);
+            nsave++;
+        }
+    }
+    fprintf(out,"## Name \"%s dipoles\" Style \"Dipoles\"\n","ALL");
+    if (fclose(out) != 0) {
+        out = NULL;
+        printf(name.toLatin1().data());
+        goto bad;
+    }
+    fprintf(stderr,"Save %d dipoles in dip format to %s\n",nsave,name.toLatin1().data());
     return true;
-  if ((out = fopen(name,"w")) == NULL) {
-    printf(name);
-    return false;
-  }
-  fprintf(out,"# CoordinateSystem \"Head\"\n");
-  fprintf (out,"# %7s %7s %8s %8s %8s %8s %8s %8s %8s %6s\n",
-           "begin","end","X (mm)","Y (mm)","Z (mm)","Q(nAm)","Qx(nAm)","Qy(nAm)","Qz(nAm)","g/%");
-  for (k = 0, nsave = 0; k < this->size(); k++) {
-    one = this->m_qListDips[k];
-    if (one.valid) {
-      fprintf(out,"  %7.1f %7.1f %8.2f %8.2f %8.2f %8.3f %8.3f %8.3f %8.3f %6.1f\n",
-              1000*one.time,1000*one.time,
-              1000*one.rd[X],1000*one.rd[Y],1000*one.rd[Z],
-              1e9*one.Q.norm(),1e9*one.Q[X],1e9*one.Q[Y],1e9*one.Q[Z],100.0*one.good);
-      nsave++;
-    }
-  }
-  fprintf(out,"## Name \"%s dipoles\" Style \"Dipoles\"\n","ALL");
-  if (fclose(out) != 0) {
-    out = NULL;
-    printf(name);
-    goto bad;
-  }
-  fprintf(stderr,"Save %d dipoles in dip format to %s\n",nsave,name);
-  return true;
 
- bad : {
-    if (out) {
-      fclose(out);
-      unlink(name);
+bad : {
+        if (out) {
+            fclose(out);
+            unlink(name.toLatin1().data());
+        }
+        return false;
     }
-    return false;
-  }
 }
 
 

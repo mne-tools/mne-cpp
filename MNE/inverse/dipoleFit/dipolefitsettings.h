@@ -174,8 +174,8 @@ public:
 
     float  grad_reg     = 0.1f;              /* Noise-covariance matrix regularization for EEG (planar gradiometers) */
     float  eeg_reg      = 0.1f;              /* Noise-covariance matrix regularization for EEG  */
-    char   *dipname     = NULL;              /* Output file in dip format */
-    char   *bdipname    = NULL;              /* Output file in bdip format */
+    QString dipname;              /* Output file in dip format */
+    QString bdipname;              /* Output file in bdip format */
 
 private:
 
