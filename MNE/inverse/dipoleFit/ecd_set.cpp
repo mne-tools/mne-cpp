@@ -43,6 +43,14 @@
 #include <fiff/fiff_types.h>
 
 
+//ToDo don't use access and unlink -> use QT stuff instead
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
+#include <io.h>
+#else
+#include <unistd.h>
+#endif
+
+
 //*************************************************************************************************************
 //=============================================================================================================
 // Qt INCLUDES
