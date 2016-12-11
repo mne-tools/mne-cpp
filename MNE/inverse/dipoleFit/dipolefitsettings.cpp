@@ -1,10 +1,9 @@
 
 
-#include "dipolefit.h"
-
-#include "dipolefit_helpers.cpp"
+#include "dipolefitsettings.h"
 
 
+using namespace Eigen;
 using namespace INVERSELIB;
 
 
@@ -13,29 +12,34 @@ using namespace INVERSELIB;
 // STATIC DEFINITIONS
 //=============================================================================================================
 
+char *mne_strdup_settings(const char *s)
+{
+  char *res;
+  if (s == NULL)
+    return NULL;
+  res = (char*) malloc(strlen(s)+1);
+  strcpy(res,s);
+  return res;
+}
+
+
+/*
+ * Basics...
+ */
+#define MALLOC(x,t) (t *)malloc((x)*sizeof(t))
+#define REALLOC(x,y,t) (t *)((x == NULL) ? malloc((y)*sizeof(t)) : realloc((x),(y)*sizeof(t)))
+#define FREE(x) if ((char *)(x) != NULL) free((char *)(x))
+
+
+#define X 0
+#define Y 1
+#define Z 2
+
+
 #ifndef PROGRAM_VERSION
 #define PROGRAM_VERSION     "1.00"
 #endif
 
-
-#ifndef FAIL
-#define FAIL -1
-#endif
-
-#ifndef OK
-#define OK 0
-#endif
-
-#ifndef TRUE
-#define TRUE 1
-#endif
-
-#ifndef FALSE
-#define FALSE 0
-#endif
-
-
-#define BIG_TIME 1e6
 
 
 //*************************************************************************************************************
@@ -43,79 +47,28 @@ using namespace INVERSELIB;
 // STATIC DEFINITIONS ToDo make members
 //=============================================================================================================
 
-static char  *bemname     = NULL;		 /* Boundary-element model */
-static float r0[]         = { 0.0,0.0,0.04 };    /* Sphere model origin  */
-static int   accurate     = FALSE;		 /* Use accurate coil definitions? */
-static char  *mriname     = NULL;		 /* Gives the MRI <-> head transform */
-
-static char  *guessname   = NULL;		 /* Initial guess grid (if not present, the values below
-                          * will be employed to generate the grid) */
-static char  *guess_surfname = NULL;		 /* Load the inner skull surface from this BEM file */
-static float guess_rad     = 0.080;              /* Radius of spherical guess surface */
-static float guess_mindist = 0.010;		 /* Minimum allowed distance to the surface */
-static float guess_exclude = 0.020;		 /* Exclude points closer than this to the origin */
-static float guess_grid    = 0.010;		 /* Grid spacing */
-
-static char  *noisename   = NULL;		 /* Noise-covariance matrix */
-static float grad_std     = 5e-13;               /* Standard deviations to be used if noise covariance is not specified */
-static float mag_std      = 20e-15;
-static float eeg_std      = 0.2e-6;
-static int   diagnoise    = FALSE;		 /* Use only the diagonals of the noise-covariance matrix */
-
-static char  *measname    = NULL;		 /* Data file */
-static int   is_raw       = FALSE;		 /* Is this a raw data file */
-static char  *badname     = NULL;		 /* Bad channels */
-static int   include_meg  = FALSE;		 /* Use MEG? */
-static int   include_eeg  = FALSE;		 /* Use EEG? */
-static float tmin         = -2*BIG_TIME;	 /* Possibility to set these from the command line */
-static float tmax         = 2*BIG_TIME;
-static float tstep        = -1.0;		 /* Step between fits */
-static float integ        = 0.0;
-static float bmin         = BIG_TIME;	         /* Possibility to set these from the command line */
-static float bmax         = BIG_TIME;
-static int   do_baseline  = FALSE;	         /* Are both baseline limits set? */
-static int   setno        = 1;		         /* Which data set */
-static int   verbose      = FALSE;
-static mneFilterDefRec filter = { TRUE,		 /* Filter on? */
-                  4096,		 /* size */
-                  2048,		 /* taper_size */
-                  0.0, 0.0,	 /* highpass corner and width */
-                  40.0, 5.0,	 /* lowpass corner and width */
-                  0.0, 0.0,	 /* EOG highpass corner and width */
-                  40.0, 5.0 };	 /* EOG Lowpass corner and width */
-static char **projnames   = NULL;                /* Projection file names */
-static int  nproj         = 0;
-static int  omit_data_proj = FALSE;
-
-static char   *eeg_model_file = NULL;            /* File of EEG sphere model specifications */
-static char   *eeg_model_name = NULL;		 /* Name of the EEG model to use */
-static float  eeg_sphere_rad = 0.09f;		 /* Scalp radius to use in EEG sphere model */
-static int    scale_eeg_pos  = FALSE;	         /* Scale the electrode locations to scalp in the sphere model */
-static float  mag_reg      = 0.1f;                /* Noise-covariance matrix regularization for MEG (magnetometers and axial gradiometers)  */
-static int   fit_mag_dipoles = FALSE;
-
-static float  grad_reg     = 0.1f;               /* Noise-covariance matrix regularization for EEG (planar gradiometers) */
-static float  eeg_reg      = 0.1f;               /* Noise-covariance matrix regularization for EEG  */
-static char   *dipname     = NULL;		/* Output file in dip format */
-static char   *bdipname    = NULL;		/* Output file in bdip format */
-
-
-
-
-
-
-
-
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-DipoleFit::DipoleFit(int *argc,char **argv)
+DipoleFitSettings::DipoleFitSettings(int *argc,char **argv)
 {
-    if (check_args(argc,argv) == FAIL)
+    // Init origin
+    r0 << 0.0f,0.0f,0.04f;
+
+
+    filter = {  true,         /* Filter on? */
+                 4096,                         /* size */
+                 2048,                         /* taper_size */
+                 0.0, 0.0,                     /* highpass corner and width */
+                 40.0, 5.0,                    /* lowpass corner and width */
+                 0.0, 0.0,                     /* EOG highpass corner and width */
+                 40.0, 5.0 };                  /* EOG Lowpass corner and width */
+
+
+    if (!check_args(argc,argv))
         return;
 
     do_baseline = (bmin < BIG_TIME && bmax < BIG_TIME);
@@ -143,7 +96,7 @@ DipoleFit::DipoleFit(int *argc,char **argv)
         nproj++;
         for (int k = 1; k < nproj; k++)
             projnames[k] = projnames[k-1];
-        projnames[0] = mne_strdup(measname);
+        projnames[0] = mne_strdup_settings(measname);
     }
 
     printf("\n");
@@ -181,8 +134,7 @@ DipoleFit::DipoleFit(int *argc,char **argv)
     if (badname)
         printf("Bad channels     : %s\n",badname);
     if (do_baseline)
-        printf("Baseline         : %10.2f ... %10.2f ms\n",
-    1000*bmin,1000*bmax);
+        printf("Baseline         : %10.2f ... %10.2f ms\n", 1000*bmin,1000*bmax);
     if (noisename) {
         printf("Noise covariance : %s\n",noisename);
         if (include_meg) {
@@ -206,128 +158,15 @@ DipoleFit::DipoleFit(int *argc,char **argv)
 
 //*************************************************************************************************************
 
-ECDSet DipoleFit::calculateFit() const
+DipoleFitSettings::~DipoleFitSettings()
 {
-    guessData           guess    = NULL;
-    ECDSet              set;
-    fwdEegSphereModel   eeg_model = NULL;
-    dipoleFitData       fit_data = NULL;
-    mneMeasData         data     = NULL;
-    mneRawData          raw      = NULL;
-    mneChSelection      sel      = NULL;
-
-    printf("---- Setting up...\n\n");
-    if (include_eeg) {
-        if ((eeg_model = setup_eeg_sphere_model(eeg_model_file,eeg_model_name,eeg_sphere_rad)) == NULL)
-            goto out;
-    }
-
-    if ((fit_data = setup_dipole_fit_data(mriname,measname,bemname,r0,eeg_model,accurate,
-                                          badname,noisename,grad_std,mag_std,eeg_std,
-                                          mag_reg,grad_reg,eeg_reg,
-                                          diagnoise,projnames,nproj,include_meg,include_eeg)) == NULL)
-        goto out;
-
-    fit_data->fit_mag_dipoles = fit_mag_dipoles;
-    if (is_raw) {
-        int c;
-        float t1,t2;
-
-        printf("\n---- Opening a raw data file...\n\n");
-        if ((raw = mne_raw_open_file(measname,TRUE,FALSE,&filter)) == NULL)
-            goto out;
-        /*
-        * A channel selection is needed to access the data
-        */
-        sel = mne_ch_selection_these("fit",fit_data->ch_names,fit_data->nmeg+fit_data->neeg);
-        mne_ch_selection_assign_chs(sel,raw);
-        for (c = 0; c < sel->nchan; c++)
-            if (sel->pick[c] < 0) {
-                qCritical ("All desired channels were not available");
-                goto out;
-            }
-        printf("\tChannel selection created.\n");
-        /*
-            * Let's be a little generous here
-            */
-        t1 = raw->first_samp/raw->info->sfreq;
-        t2 = (raw->first_samp+raw->nsamp-1)/raw->info->sfreq;
-        if (tmin < t1 + integ)
-            tmin = t1 + integ;
-        if (tmax > t2 - integ)
-            tmax =  t2 - integ;
-        if (tstep < 0)
-            tstep = 1.0/raw->info->sfreq;
-
-        printf("\tOpened raw data file %s : %d MEG and %d EEG \n",
-               measname,fit_data->nmeg,fit_data->neeg);
-    }
-    else {
-        printf("\n---- Reading data...\n\n");
-        if ((data = mne_read_meas_data(measname,setno,NULL,NULL,
-                                       fit_data->ch_names,fit_data->nmeg+fit_data->neeg)) == NULL)
-            goto out;
-        if (do_baseline)
-            mne_adjust_baselines(data,bmin,bmax);
-        else
-            printf("\tNo baseline setting in effect.\n");
-        if (tmin < data->current->tmin + integ/2.0)
-            tmin = data->current->tmin + integ/2.0;
-        if (tmax > data->current->tmin + (data->current->np-1)*data->current->tstep - integ/2.0)
-            tmax =  data->current->tmin + (data->current->np-1)*data->current->tstep - integ/2.0;
-        if (tstep < 0)
-            tstep = data->current->tstep;
-
-        printf("\tRead data set %d from %s : %d MEG and %d EEG \n",
-               setno,measname,fit_data->nmeg,fit_data->neeg);
-        if (noisename) {
-            printf("\nScaling the noise covariance...\n");
-            if (scale_noise_cov(fit_data,data->current->nave) == FAIL)
-                goto out;
-        }
-    }
-
-    /*
-    * Proceed to computing the fits
-    */
-    printf("\n---- Computing the forward solution for the guesses...\n\n");
-    if ((guess = make_guess_data(guessname, guess_surfname, guess_mindist, guess_exclude, guess_grid, fit_data)) == NULL)
-        goto out;
-
-    fprintf (stderr,"\n---- Fitting : %7.1f ... %7.1f ms (step: %6.1f ms integ: %6.1f ms)\n\n",
-             1000*tmin,1000*tmax,1000*tstep,1000*integ);
-
-
-    if (raw) {
-        if (fit_dipoles_raw(measname,raw,sel,fit_data,guess,tmin,tmax,tstep,integ,verbose) == FAIL)
-            goto out;
-    }
-    else {
-        if (fit_dipoles(measname,data,fit_data,guess,tmin,tmax,tstep,integ,verbose,set) == FAIL)
-            goto out;
-    }
-    printf("%d dipoles fitted\n",set.size());
-
-    /*
-    * Saving...
-    */
-    if (!set.save_dipoles_dip(dipname))
-        goto out;
-    if (!set.save_dipoles_bdip(bdipname))
-        goto out;
-
-out : {
-        return set;
-    }
+    //ToDo Garbage collection
 }
 
 
 //*************************************************************************************************************
-//=============================================================================================================
-// STATIC DEFINITIONS
-//=============================================================================================================
 
-void DipoleFit::usage(char *name)
+void DipoleFitSettings::usage(char *name)
 {
     printf("usage: %s [options]\n",name);
     printf("This is a program for sequential single dipole fitting.\n");
@@ -403,7 +242,7 @@ void DipoleFit::usage(char *name)
 
 //*************************************************************************************************************
 
-int DipoleFit::check_unrecognized_args(int argc, char **argv)
+bool DipoleFitSettings::check_unrecognized_args(int argc, char **argv)
 {
     if ( argc > 1 ) {
         printf("Unrecognized arguments : ");
@@ -411,15 +250,15 @@ int DipoleFit::check_unrecognized_args(int argc, char **argv)
             printf("%s ",argv[k]);
         printf("\n");
         qCritical ("Check the command line.");
-        return FAIL;
+        return false;
     }
-    return OK;
+    return true;
 }
 
 
 //*************************************************************************************************************
 
-int DipoleFit::check_args (int *argc,char **argv)
+bool DipoleFitSettings::check_args (int *argc,char **argv)
 {
     int found;
     float fval;
@@ -440,7 +279,7 @@ int DipoleFit::check_args (int *argc,char **argv)
             found = 2;
             if (k == *argc - 1) {
                 qCritical ("--guess: argument required.");
-                return FAIL;
+                return false;
             }
             guessname = strdup(argv[k+1]);
         }
@@ -448,7 +287,7 @@ int DipoleFit::check_args (int *argc,char **argv)
             found = 2;
             if (k == *argc - 1) {
                 qCritical ("--gsurf: argument required.");
-                return FAIL;
+                return false;
             }
             guess_surfname = strdup(argv[k+1]);
         }
@@ -456,11 +295,11 @@ int DipoleFit::check_args (int *argc,char **argv)
             found = 2;
             if (k == *argc - 1) {
                 qCritical ("--mindist: argument required.");
-                return FAIL;
+                return false;
             }
             if (sscanf(argv[k+1],"%f",&fval) != 1) {
                 qCritical ("Could not interpret the distance.");
-                return FAIL;
+                return false;
             }
             guess_mindist = fval/1000.0;
             if (guess_mindist <= 0.0)
@@ -470,11 +309,11 @@ int DipoleFit::check_args (int *argc,char **argv)
             found = 2;
             if (k == *argc - 1) {
                 qCritical ("--exclude: argument required.");
-                return FAIL;
+                return false;
             }
             if (sscanf(argv[k+1],"%f",&fval) != 1) {
                 qCritical ("Could not interpret the distance.");
-                return FAIL;
+                return false;
             }
             guess_exclude = fval/1000.0;
             if (guess_exclude <= 0.0)
@@ -484,15 +323,15 @@ int DipoleFit::check_args (int *argc,char **argv)
             found = 2;
             if (k == *argc - 1) {
                 qCritical ("--grid: argument required.");
-                return FAIL;
+                return false;
             }
             if (sscanf(argv[k+1],"%f",&fval) != 1) {
                 qCritical ("Could not interpret the distance.");
-                return FAIL;
+                return false;
             }
             if (fval <= 0.0) {
                 qCritical ("Grid spacing should be positive");
-                return FAIL;
+                return false;
             }
             guess_grid = guess_grid/1000.0;
         }
@@ -500,7 +339,7 @@ int DipoleFit::check_args (int *argc,char **argv)
             found = 2;
             if (k == *argc - 1) {
                 qCritical ("--mri: argument required.");
-                return FAIL;
+                return false;
             }
             mriname = strdup(argv[k+1]);
         }
@@ -508,31 +347,31 @@ int DipoleFit::check_args (int *argc,char **argv)
             found = 2;
             if (k == *argc - 1) {
                 qCritical ("--bem: argument required.");
-                return FAIL;
+                return false;
             }
             bemname = strdup(argv[k+1]);
         }
         else if (strcmp(argv[k],"--accurate") == 0) {
             found = 1;
-            accurate = TRUE;
+            accurate = true;
         }
         else if (strcmp(argv[k],"--meg") == 0) {
             found = 1;
-            include_meg = TRUE;
+            include_meg = true;
         }
         else if (strcmp(argv[k],"--eeg") == 0) {
             found = 1;
-            include_eeg = TRUE;
+            include_eeg = true;
         }
         else if (strcmp(argv[k],"--origin") == 0) {
             found = 2;
             if (k == *argc - 1) {
                 qCritical ("--origin: argument required.");
-                return FAIL;
+                return false;
             }
-            if (sscanf(argv[k+1],"%f:%f:%f",r0+X,r0+Y,r0+Z) != 3) {
+            if (sscanf(argv[k+1],"%f:%f:%f",r0[X],r0[Y],r0[Z]) != 3) {
                 qCritical ("Could not interpret the origin.");
-                return FAIL;
+                return false;
             }
             r0[X] = r0[X]/1000.0;
             r0[Y] = r0[Y]/1000.0;
@@ -542,15 +381,15 @@ int DipoleFit::check_args (int *argc,char **argv)
             found = 2;
             if (k == *argc - 1) {
                 qCritical ("--eegrad: argument required.");
-                return FAIL;
+                return false;
             }
             if (sscanf(argv[k+1],"%g",&eeg_sphere_rad) != 1) {
                 qCritical () << "Incomprehensible radius:" << argv[k+1];
-                return FAIL;
+                return false;
             }
             if (eeg_sphere_rad <= 0) {
                 qCritical ("Radius must be positive");
-                return FAIL;
+                return false;
             }
             eeg_sphere_rad = eeg_sphere_rad/1000.0;
         }
@@ -558,7 +397,7 @@ int DipoleFit::check_args (int *argc,char **argv)
             found = 2;
             if (k == *argc - 1) {
                 qCritical ("--eegmodels: argument required.");
-                return FAIL;
+                return false;
             }
             eeg_model_file = strdup(argv[k+1]);
         }
@@ -566,50 +405,50 @@ int DipoleFit::check_args (int *argc,char **argv)
             found = 2;
             if (k == *argc - 1) {
                 qCritical ("--eegmodel: argument required.");
-                return FAIL;
+                return false;
             }
             eeg_model_name = strdup(argv[k+1]);
         }
         else if (strcmp(argv[k],"--eegscalp") == 0) {
             found         = 1;
-            scale_eeg_pos = TRUE;
+            scale_eeg_pos = true;
         }
         else if (strcmp(argv[k],"--meas") == 0) {
             found = 2;
             if (k == *argc - 1) {
                 qCritical ("--meas: argument required.");
-                return FAIL;
+                return false;
             }
             measname = strdup(argv[k+1]);
-            is_raw = FALSE;
+            is_raw = false;
         }
         else if (strcmp(argv[k],"--raw") == 0) {
             found = 2;
             if (k == *argc - 1) {
                 qCritical ("--raw: argument required.");
-                return FAIL;
+                return false;
             }
             measname = strdup(argv[k+1]);
-            is_raw = TRUE;
+            is_raw = true;
         }
         else if (strcmp(argv[k],"--proj") == 0) {
             found = 2;
             if (k == *argc - 1) {
                 qCritical ("--proj: argument required.");
-                return FAIL;
+                return false;
             }
             projnames = REALLOC(projnames,nproj+1,char *);
             projnames[nproj++] = strdup(argv[k+1]);
         }
         else if (strcmp(argv[k],"--noproj") == 0) {
             found = 1;
-            omit_data_proj = TRUE;
+            omit_data_proj = true;
         }
         else if (strcmp(argv[k],"--bad") == 0) {
             found = 2;
             if (k == *argc - 1) {
                 qCritical ("--bad: argument required.");
-                return FAIL;
+                return false;
             }
             badname = strdup(argv[k+1]);
         }
@@ -617,7 +456,7 @@ int DipoleFit::check_args (int *argc,char **argv)
             found = 2;
             if (k == *argc - 1) {
                 qCritical ("--noise: argument required.");
-                return FAIL;
+                return false;
             }
             noisename = strdup(argv[k+1]);
         }
@@ -625,15 +464,15 @@ int DipoleFit::check_args (int *argc,char **argv)
             found = 2;
             if (k == *argc - 1) {
                 qCritical ("--gradnoise: argument required.");
-                return FAIL;
+                return false;
             }
             if (sscanf(argv[k+1],"%g",&fval) != 1) {
                 qCritical() << "Incomprehensible value:" << argv[k+1];
-                return FAIL;
+                return false;
             }
             if (fval < 0.0) {
                 qCritical ("Value should be positive");
-                return FAIL;
+                return false;
             }
             grad_std = 1e-13*fval;
         }
@@ -641,15 +480,15 @@ int DipoleFit::check_args (int *argc,char **argv)
             found = 2;
             if (k == *argc - 1) {
                 qCritical ("--magnoise: argument required.");
-                return FAIL;
+                return false;
             }
             if (sscanf(argv[k+1],"%g",&fval) != 1) {
                 qCritical() << "Incomprehensible value:" << argv[k+1];
-                return FAIL;
+                return false;
             }
             if (fval < 0.0) {
                 qCritical ("Value should be positive");
-                return FAIL;
+                return false;
             }
             mag_std = 1e-15*fval;
         }
@@ -657,35 +496,35 @@ int DipoleFit::check_args (int *argc,char **argv)
             found = 2;
             if (k == *argc - 1) {
                 qCritical ("--eegnoise: argument required.");
-                return FAIL;
+                return false;
             }
             if (sscanf(argv[k+1],"%g",&fval) != 1) {
                 qCritical () << "Incomprehensible value:" << argv[k+1];
-                return FAIL;
+                return false;
             }
             if (fval < 0.0) {
                 qCritical ("Value should be positive");
-                return FAIL;
+                return false;
             }
             eeg_std = 1e-6*fval;
         }
         else if (strcmp(argv[k],"--diagnoise") == 0) {
             found = 1;
-            diagnoise = TRUE;
+            diagnoise = true;
         }
         else if (strcmp(argv[k],"--eegreg") == 0) {
             found = 2;
             if (k == *argc - 1) {
                 qCritical ("--eegreg: argument required.");
-                return FAIL;
+                return false;
             }
             if (sscanf(argv[k+1],"%g",&fval) != 1) {
                 qCritical () << "Incomprehensible value:" << argv[k+1];
-                return FAIL;
+                return false;
             }
             if (fval < 0 || fval > 1) {
                 qCritical ("Regularization value should be positive and smaller than one.");
-                return FAIL;
+                return false;
             }
             eeg_reg = fval;
         }
@@ -693,15 +532,15 @@ int DipoleFit::check_args (int *argc,char **argv)
             found = 2;
             if (k == *argc - 1) {
                 qCritical ("--magreg: argument required.");
-                return FAIL;
+                return false;
             }
             if (sscanf(argv[k+1],"%g",&fval) != 1) {
                 qCritical () << "Incomprehensible value:" << argv[k+1];
-                return FAIL;
+                return false;
             }
             if (fval < 0 || fval > 1) {
                 qCritical ("Regularization value should be positive and smaller than one.");
-                return FAIL;
+                return false;
             }
             mag_reg = fval;
         }
@@ -709,15 +548,15 @@ int DipoleFit::check_args (int *argc,char **argv)
             found = 2;
             if (k == *argc - 1) {
                 qCritical ("--gradreg: argument required.");
-                return FAIL;
+                return false;
             }
             if (sscanf(argv[k+1],"%g",&fval) != 1) {
                 qCritical () << "Incomprehensible value:" << argv[k+1] ;
-                return FAIL;
+                return false;
             }
             if (fval < 0 || fval > 1) {
                 qCritical ("Regularization value should be positive and smaller than one.");
-                return FAIL;
+                return false;
             }
             grad_reg = fval;
         }
@@ -725,15 +564,15 @@ int DipoleFit::check_args (int *argc,char **argv)
             found = 2;
             if (k == *argc - 1) {
                 qCritical ("--reg: argument required.");
-                return FAIL;
+                return false;
             }
             if (sscanf(argv[k+1],"%g",&fval) != 1) {
                 qCritical () << "Incomprehensible value:" << argv[k+1];
-                return FAIL;
+                return false;
             }
             if (fval < 0 || fval > 1) {
                 qCritical ("Regularization value should be positive and smaller than one.");
-                return FAIL;
+                return false;
             }
             grad_reg = fval;
             mag_reg = fval;
@@ -743,15 +582,15 @@ int DipoleFit::check_args (int *argc,char **argv)
             found = 2;
             if (k == *argc - 1) {
                 qCritical ("--tstep: argument required.");
-                return FAIL;
+                return false;
             }
             if (sscanf(argv[k+1],"%g",&fval) != 1) {
                 qCritical() << "Incomprehensible tstep:" << argv[k+1];
-                return FAIL;
+                return false;
             }
             if (fval < 0.0) {
                 qCritical ("Time step should be positive");
-                return FAIL;
+                return false;
             }
             tstep = fval/1000.0;
         }
@@ -759,15 +598,15 @@ int DipoleFit::check_args (int *argc,char **argv)
             found = 2;
             if (k == *argc - 1) {
                 qCritical ("--integ: argument required.");
-                return FAIL;
+                return false;
             }
             if (sscanf(argv[k+1],"%g",&fval) != 1) {
                 qCritical() << "Incomprehensible integration time:" << argv[k+1];
-                return FAIL;
+                return false;
             }
             if (fval <= 0.0) {
                 qCritical ("Integration time should be positive.");
-                return FAIL;
+                return false;
             }
             integ = fval/1000.0;
         }
@@ -775,11 +614,11 @@ int DipoleFit::check_args (int *argc,char **argv)
             found = 2;
             if (k == *argc - 1) {
                 qCritical ("--tmin: argument required.");
-                return FAIL;
+                return false;
             }
             if (sscanf(argv[k+1],"%g",&fval) != 1) {
                 qCritical() << "Incomprehensible tmin:" << argv[k+1];
-                return FAIL;
+                return false;
             }
             tmin = fval/1000.0;
         }
@@ -787,11 +626,11 @@ int DipoleFit::check_args (int *argc,char **argv)
             found = 2;
             if (k == *argc - 1) {
                 qCritical ("--tmax: argument required.");
-                return FAIL;
+                return false;
             }
             if (sscanf(argv[k+1],"%g",&fval) != 1) {
                 qCritical() << "Incomprehensible tmax:" << argv[k+1];
-                return FAIL;
+                return false;
             }
             tmax = fval/1000.0;
         }
@@ -799,11 +638,11 @@ int DipoleFit::check_args (int *argc,char **argv)
             found = 2;
             if (k == *argc - 1) {
                 qCritical ("--bmin: argument required.");
-                return FAIL;
+                return false;
             }
             if (sscanf(argv[k+1],"%g",&fval) != 1) {
                 qCritical() << "Incomprehensible bmin:" << argv[k+1];
-                return FAIL;
+                return false;
             }
             bmin = fval/1000.0;
         }
@@ -811,11 +650,11 @@ int DipoleFit::check_args (int *argc,char **argv)
             found = 2;
             if (k == *argc - 1) {
                 qCritical ("--bmax: argument required.");
-                return FAIL;
+                return false;
             }
             if (sscanf(argv[k+1],"%g",&fval) != 1) {
                 qCritical() << "Incomprehensible bmax:" << argv[k+1];
-                return FAIL;
+                return false;
             }
             bmax = fval/1000.0;
         }
@@ -823,34 +662,34 @@ int DipoleFit::check_args (int *argc,char **argv)
             found = 2;
             if (k == *argc - 1) {
                 qCritical ("--set: argument required.");
-                return FAIL;
+                return false;
             }
             if (sscanf(argv[k+1],"%d",&setno) != 1) {
                 qCritical() << "Incomprehensible data set number:" << argv[k+1];
-                return FAIL;
+                return false;
             }
             if (setno <= 0) {
                 qCritical ("Data set number must be > 0");
-                return FAIL;
+                return false;
             }
         }
         else if (strcmp(argv[k],"--filteroff") == 0) {
             found = 1;
-            filter.filter_on = FALSE;
+            filter.filter_on = false;
         }
         else if (strcmp(argv[k],"--lowpass") == 0) {
             found = 2;
             if (k == *argc - 1) {
                 qCritical ("--lowpass: argument required.");
-                return FAIL;
+                return false;
             }
             if (sscanf(argv[k+1],"%g",&fval) != 1) {
                 qCritical() << "Illegal number:" << argv[k+1];
-                return FAIL;
+                return false;
             }
             if (fval <= 0) {
                 qCritical ("Lowpass corner must be positive");
-                return FAIL;
+                return false;
             }
             filter.lowpass = fval;
         }
@@ -858,15 +697,15 @@ int DipoleFit::check_args (int *argc,char **argv)
             found = 2;
             if (k == *argc - 1) {
                 qCritical ("--lowpassw: argument required.");
-                return FAIL;
+                return false;
             }
             if (sscanf(argv[k+1],"%g",&fval) != 1) {
                 qCritical() << "Illegal number:" << argv[k+1];
-                return FAIL;
+                return false;
             }
             if (fval <= 0) {
                 qCritical ("Lowpass width must be positive");
-                return FAIL;
+                return false;
             }
             filter.lowpass_width = fval;
         }
@@ -874,15 +713,15 @@ int DipoleFit::check_args (int *argc,char **argv)
             found = 2;
             if (k == *argc - 1) {
                 qCritical ("--highpass: argument required.");
-                return FAIL;
+                return false;
             }
             if (sscanf(argv[k+1],"%g",&fval) != 1) {
                 qCritical() << "Illegal number:" << argv[k+1];
-                return FAIL;
+                return false;
             }
             if (fval <= 0) {
                 qCritical ("Highpass corner must be positive");
-                return FAIL;
+                return false;
             }
             filter.highpass = fval;
         }
@@ -890,15 +729,15 @@ int DipoleFit::check_args (int *argc,char **argv)
             found = 2;
             if (k == *argc - 1) {
                 qCritical ("--filtersize: argument required.");
-                return FAIL;
+                return false;
             }
             if (sscanf(argv[k+1],"%d",&ival) != 1) {
                 qCritical() << "Illegal number:" << argv[k+1];
-                return FAIL;
+                return false;
             }
             if (ival < 1024) {
                 qCritical ("Filtersize should be at least 1024.");
-                return FAIL;
+                return false;
             }
             for (filter_size = 1024; filter_size < ival; filter_size = 2*filter_size)
                 ;
@@ -907,13 +746,13 @@ int DipoleFit::check_args (int *argc,char **argv)
         }
         else if (strcmp(argv[k],"--magdip") == 0) {
             found = 1;
-            fit_mag_dipoles = TRUE;
+            fit_mag_dipoles = true;
         }
         else if (strcmp(argv[k],"--dip") == 0) {
             found = 2;
             if (k == *argc - 1) {
                 qCritical ("--dip: argument required.");
-                return FAIL;
+                return false;
             }
             dipname = strdup(argv[k+1]);
         }
@@ -921,13 +760,13 @@ int DipoleFit::check_args (int *argc,char **argv)
             found = 2;
             if (k == *argc - 1) {
                 qCritical ("--bdip: argument required.");
-                return FAIL;
+                return false;
             }
             bdipname = strdup(argv[k+1]);
         }
         else if (strcmp(argv[k],"--verbose") == 0) {
             found = 1;
-            verbose = TRUE;
+            verbose = true;
         }
         if (found) {
             for (int p = k; p < *argc-found; p++)

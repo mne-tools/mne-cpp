@@ -87,7 +87,7 @@ public:
 
     virtual ~DipoleFit(){}
 
-    bool calculateFit();
+    ECDSet calculateFit() const;
 //    virtual const char* getName() const;
 
 private:
