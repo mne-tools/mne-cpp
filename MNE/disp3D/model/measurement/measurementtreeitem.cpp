@@ -149,19 +149,19 @@ bool MeasurementTreeItem::addData(const SurfaceSet& tSurfaceSet, const Annotatio
     //Search for already created hemi items and add source space data respectivley
     for(int i = 0; i < tSurfaceSet.size(); ++i) {
         for(int j = 0; j < itemList.size(); ++j) {
-            BrainHemisphereTreeItem* pHemiItem = dynamic_cast<BrainHemisphereTreeItem*>(itemList.at(j));
+            if(BrainHemisphereTreeItem* pHemiItem = dynamic_cast<BrainHemisphereTreeItem*>(itemList.at(j))) {
+                if(pHemiItem->data(Data3DTreeModelItemRoles::SurfaceHemi).toInt() == tSurfaceSet[i].hemi()) {
+                    hemiItemFound = true;
 
-            if(pHemiItem->data(Data3DTreeModelItemRoles::SurfaceHemi).toInt() == tSurfaceSet[i].hemi()) {
-                hemiItemFound = true;
-
-                if(i < tAnnotationSet.size()) {
-                    if(tAnnotationSet[i].hemi() == tSurfaceSet[i].hemi()) {
-                        state = pHemiItem->addData(tSurfaceSet[i], tAnnotationSet[i], p3DEntityParent);
+                    if(i < tAnnotationSet.size()) {
+                        if(tAnnotationSet[i].hemi() == tSurfaceSet[i].hemi()) {
+                            state = pHemiItem->addData(tSurfaceSet[i], tAnnotationSet[i], p3DEntityParent);
+                        } else {
+                            state = pHemiItem->addData(tSurfaceSet[i], Annotation(), p3DEntityParent);
+                        }
                     } else {
                         state = pHemiItem->addData(tSurfaceSet[i], Annotation(), p3DEntityParent);
                     }
-                } else {
-                    state = pHemiItem->addData(tSurfaceSet[i], Annotation(), p3DEntityParent);
                 }
             }
         }
