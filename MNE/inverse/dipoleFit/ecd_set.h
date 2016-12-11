@@ -124,19 +124,27 @@ public:
 
     //=========================================================================================================
     /**
+    * Read dipoles from the dip format compatible with mrilab
+    *
+    * @param[in] name   File name to read from.
+    */
+    static ECDSet read_dipoles_dip(const QString& fileName);
+
+    //=========================================================================================================
+    /**
     * Save dipoles in the bdip format employed by xfit
     *
-    * @param[in] name   File name to save to.
+    * @param[in] fileName   File name to save to.
     */
-    bool save_dipoles_bdip(const QString& name);
+    bool save_dipoles_bdip(const QString& fileName);
 
     //=========================================================================================================
     /**
     * Save dipoles in the dip format suitable for mrilab
     *
-    * @param[in] name   File name to save to.
+    * @param[in] fileName   File name to save to.
     */
-    bool save_dipoles_dip(const QString& name) const;
+    bool save_dipoles_dip(const QString& fileName) const;
 
     //=========================================================================================================
     /**
