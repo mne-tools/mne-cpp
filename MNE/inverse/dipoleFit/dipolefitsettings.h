@@ -44,8 +44,22 @@
 #include "../inverse_global.h"
 #include "ecd_set.h"
 
-#include "mne_types.h"
-
+#ifndef MNEFILTERDEF
+#define MNEFILTERDEF
+typedef struct {
+  bool  filter_on;          /* Is it on? */
+  int   size;               /* Length in samples (must be a power of 2) */
+  int   taper_size;         /* How long a taper in the beginning and end */
+  float highpass;           /* Highpass in Hz */
+  float highpass_width;     /* Highpass transition width in Hz */
+  float lowpass;            /* Lowpass in Hz */
+  float lowpass_width;      /* Lowpass transition width in Hz */
+  float eog_highpass;       /* EOG highpass in Hz */
+  float eog_highpass_width; /* EOG highpass transition width in Hz */
+  float eog_lowpass;        /* EOG lowpass in Hz */
+  float eog_lowpass_width;  /* EOG lowpass transition width in Hz */
+} *mneFilterDef,mneFilterDefRec;
+#endif
 
 //*************************************************************************************************************
 //=============================================================================================================
