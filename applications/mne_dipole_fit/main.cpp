@@ -32,6 +32,14 @@ int main(int argc, char *argv[])
     DipoleFit dipFit(&settings);
     ECDSet set = dipFit.calculateFit();
 
+    /*
+    * Saving...
+    */
+    if (!set.save_dipoles_dip(settings.dipname))
+        printf("Dipoles could not be safed to %s.",settings.dipname);
+    if (!set.save_dipoles_bdip(settings.bdipname))
+        printf("Dipoles could not be safed to %s.",settings.bdipname);
+
     return app.exec();
 }
 

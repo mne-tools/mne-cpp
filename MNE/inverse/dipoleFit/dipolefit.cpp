@@ -160,13 +160,6 @@ ECDSet DipoleFit::calculateFit() const
     }
     printf("%d dipoles fitted\n",set.size());
 
-    /*
-    * Saving...
-    */
-    if (!set.save_dipoles_dip(settings->dipname))
-        goto out;
-    if (!set.save_dipoles_bdip(settings->bdipname))
-        goto out;
 
 out : {
         return set;
