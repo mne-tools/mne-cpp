@@ -43,6 +43,7 @@
 
 #include "../inverse_global.h"
 #include "ecd_set.h"
+#include "dipolefitsettings.h"
 
 
 //*************************************************************************************************************
@@ -83,7 +84,7 @@ public:
     /**
     * Constructs Dipole Fit algorithm
     */
-    explicit DipoleFit(int *argc,char **argv);
+    explicit DipoleFit(DipoleFitSettings* p_settings);
 
     virtual ~DipoleFit(){}
 
@@ -91,12 +92,7 @@ public:
 //    virtual const char* getName() const;
 
 private:
-
-    static void usage(char *name);
-    static int check_unrecognized_args(int argc, char **argv);
-    static int check_args (int *argc,char **argv);
-
-
+    DipoleFitSettings* settings;
 };
 
 //*************************************************************************************************************

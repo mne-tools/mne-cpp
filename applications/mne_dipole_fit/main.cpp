@@ -4,6 +4,8 @@
 // INCLUDES
 //=============================================================================================================
 
+
+#include <inverse/dipoleFit/dipolefitsettings.h>
 #include <inverse/dipoleFit/dipolefit.h>
 
 #include <QCoreApplication>
@@ -26,7 +28,8 @@ int main(int argc, char *argv[])
 {
     QCoreApplication app(argc, argv);
 
-    DipoleFit dipFit(&argc,argv);
+    DipoleFitSettings settings(&argc,argv);
+    DipoleFit dipFit(&settings);
     ECDSet set = dipFit.calculateFit();
 
     return app.exec();

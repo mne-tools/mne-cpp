@@ -16655,7 +16655,7 @@ dipoleFitData setup_dipole_fit_data(char  *mriname,		 /* This gives the MRI/head
                     char  *measname,		 /* This gives the MEG/head transform and
                                   * sensor locations */
                     char  *bemname,		 /* BEM model */
-                    float *r0,			 /* Sphere model origin in head coordinates (optional) */
+                    Eigen::Vector3f *r0,			 /* Sphere model origin in head coordinates (optional) */
                     fwdEegSphereModel eeg_model, /* EEG sphere model definition */
                     int   accurate_coils,	 /* Use accurate coil definitions? */
                     char  *badname,		 /* Bad channels list */
@@ -16786,9 +16786,9 @@ dipoleFitData setup_dipole_fit_data(char  *mriname,		 /* This gives the MRI/head
    */
   res->bemname   = mne_strdup(bemname);
   if (r0) {
-    res->r0[0]     = r0[0];
-    res->r0[1]     = r0[1];
-    res->r0[2]     = r0[2];
+    res->r0[0]     = (*r0)[0];
+    res->r0[1]     = (*r0)[1];
+    res->r0[2]     = (*r0)[2];
   }
   res->eeg_model = eeg_model;
   /*
