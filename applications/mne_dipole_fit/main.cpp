@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
     QCoreApplication app(argc, argv);
 
     DipoleFit dipFit(&argc,argv);
-    dipFit.calculateFit();
+    ECDSet set = dipFit.calculateFit();
 
     return app.exec();
 }

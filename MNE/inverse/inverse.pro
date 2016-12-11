@@ -99,6 +99,7 @@ SOURCES += \
     dipoleFit/ecd.cpp \
     dipoleFit/ecd_set.cpp \
     dipoleFit/dipolefit.cpp \
+    dipoleFit/dipolefitsettings.cpp \
     dipoleFit/dipolefit_helpers.cpp \
     minimumNorm/minimumnorm.cpp \
     rapMusic/rapmusic.cpp \
@@ -118,6 +119,7 @@ HEADERS +=\
     dipoleFit/fiff_explain.h \
     dipoleFit/analyze_types.h \
     dipoleFit/dipolefit.h \
+    dipoleFit/dipolefitsettings.h \
     minimumNorm/minimumnorm.h \
     rapMusic/rapmusic.h \
     rapMusic/pwlrapmusic.h \
