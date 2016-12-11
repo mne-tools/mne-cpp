@@ -77,7 +77,7 @@ DipoleFitSettings::DipoleFitSettings(int *argc,char **argv)
         qCritical ("Data file name missing. Please specify one using the --meas option.");
         return;
     }
-    if (!dipname && !bdipname) {
+    if (dipname.isEmpty() && bdipname.isEmpty()) {
         qCritical ("Output file name missing. Please use the --dip or --bdip options to do this.");
         return;
     }
@@ -148,10 +148,10 @@ DipoleFitSettings::DipoleFitSettings(int *argc,char **argv)
     }
     if (fit_mag_dipoles)
         printf("Fit data with magnetic dipoles\n");
-    if (dipname)
-        printf("dip output      : %s\n",dipname);
-    if (bdipname)
-        printf("bdip output     : %s\n",bdipname);
+    if (!dipname.isEmpty())
+        printf("dip output      : %s\n",dipname.toLatin1().data());
+    if (!bdipname.isEmpty())
+        printf("bdip output     : %s\n",bdipname.toLatin1().data());
     printf("\n");
 }
 
@@ -754,7 +754,7 @@ bool DipoleFitSettings::check_args (int *argc,char **argv)
                 qCritical ("--dip: argument required.");
                 return false;
             }
-            dipname = strdup(argv[k+1]);
+            dipname = QString(argv[k+1]);
         }
         else if (strcmp(argv[k],"--bdip") == 0) {
             found = 2;
@@ -762,7 +762,7 @@ bool DipoleFitSettings::check_args (int *argc,char **argv)
                 qCritical ("--bdip: argument required.");
                 return false;
             }
-            bdipname = strdup(argv[k+1]);
+            bdipname = QString(argv[k+1]);
         }
         else if (strcmp(argv[k],"--verbose") == 0) {
             found = 1;

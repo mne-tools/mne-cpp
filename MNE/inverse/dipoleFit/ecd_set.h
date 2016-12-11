@@ -128,7 +128,7 @@ public:
     *
     * @param[in] name   File name to save to.
     */
-    bool save_dipoles_bdip(char *name);
+    bool save_dipoles_bdip(const QString& name);
 
     //=========================================================================================================
     /**
@@ -136,7 +136,7 @@ public:
     *
     * @param[in] name   File name to save to.
     */
-    bool save_dipoles_dip(char *name) const;
+    bool save_dipoles_dip(const QString& name) const;
 
     //=========================================================================================================
     /**
