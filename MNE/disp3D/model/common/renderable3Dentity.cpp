@@ -95,6 +95,9 @@ Renderable3DEntity::Renderable3DEntity(Qt3DCore::QEntity* parent)
 , m_fRotX(0.0f)
 , m_fRotY(0.0f)
 , m_fRotZ(0.0f)
+, m_fTessInner(1.0f)
+, m_fTessOuter(1.0f)
+, m_fTriangleScale(1.0f)
 {
     this->addComponent(m_pCustomMesh);
     this->addComponent(m_pTransform);
@@ -146,6 +149,8 @@ bool Renderable3DEntity::setMeshData(const MatrixX3f& tMatVert,
     if(!m_pCustomMesh.isNull()) {
         return m_pCustomMesh->setMeshData(tMatVert, tMatNorm, tMatTris, tArrayColors, primitiveType);
     }
+
+    return false;
 }
 
 
