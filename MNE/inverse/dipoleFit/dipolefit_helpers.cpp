@@ -18,12 +18,6 @@
 #include <fiff/fiff_constants.h>
 #include "fiff_file.h"
 
-#if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
-#include <io.h>
-#else
-#include <unistd.h>
-#endif
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
