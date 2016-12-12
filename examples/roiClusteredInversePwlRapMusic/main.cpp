@@ -114,6 +114,8 @@ int main(int argc, char *argv[])
     QCommandLineOption stcFileOption("stcOut", "Path to stc <file>, which is to be written.", "file", "");
     QCommandLineOption numDipolePairsOption("numDip", "<number> of dipole pairs to localize.", "number", "7");
     QCommandLineOption hemiOption("hemi", "Selected hemisphere <hemi>.", "hemi", "2");
+    QCommandLineOption inSamplesOption("inSamples", "Timing is set in samples.", "inSamples", "true");
+    QCommandLineOption keepCompOption("keepComp", "Keep compensators.", "keepComp", "true");
 
     parser.addOption(inputOption);
     parser.addOption(fwdOption);
@@ -124,6 +126,8 @@ int main(int argc, char *argv[])
     parser.addOption(stcFileOption);
     parser.addOption(numDipolePairsOption);
     parser.addOption(hemiOption);
+    parser.addOption(inSamplesOption);
+    parser.addOption(keepCompOption);
 
     parser.process(a);
 
@@ -144,8 +148,19 @@ int main(int argc, char *argv[])
     qint32 startSample = 0;
     qint32 numSample = 40000;
 
-    bool in_samples = true;
-    bool keep_comp = true;
+    bool in_samples = false;
+    if(parser.value(inSamplesOption) == "false" || parser.value(inSamplesOption) == "0") {
+        in_samples = false;
+    } else if(parser.value(inSamplesOption) == "true" || parser.value(inSamplesOption) == "1") {
+        in_samples = true;
+    }
+
+    bool keep_comp = false;
+    if(parser.value(keepCompOption) == "false" || parser.value(keepCompOption) == "0") {
+        keep_comp = false;
+    } else if(parser.value(keepCompOption) == "true" || parser.value(keepCompOption) == "1") {
+        keep_comp = true;
+    }
 
     //
     // Read raw data
