@@ -91,9 +91,12 @@ int main(int argc, char *argv[])
     QCommandLineParser parser;
     parser.setApplicationDescription("Evoked Grad Amp Example");
     parser.addHelpOption();
+
     QCommandLineOption evokedFileOption("ave", "Path to the evoked/average <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    QCommandLineOption doBaselineption("doBaseline", "Do baseline correction.", "doBaseline", "false");
 
     parser.addOption(evokedFileOption);
+    parser.addOption(doBaselineption);
 
     parser.process(a);
 
@@ -113,6 +116,12 @@ int main(int argc, char *argv[])
 
     //settings
     bool do_baseline = false;
+    if(parser.value(doBaselineption) == "false" || parser.value(doBaselineption) == "0") {
+        do_baseline = false;
+    } else if(parser.value(doBaselineption) == "true" || parser.value(doBaselineption) == "1") {
+        do_baseline = true;
+    }
+
     fiff_int_t b1 = 1;
     fiff_int_t b2 = 1;
     fiff_double_t bmin = 0;
