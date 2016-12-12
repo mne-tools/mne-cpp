@@ -396,24 +396,24 @@ QList<NetworkTreeItem*> Data3DTreeModel::addConnectivityData(const QString& subj
     for(int i = 0; i < itemSubjectList.size(); ++i) {
         //Check if it is really a subject tree item
         if((itemSubjectList.at(i)->type() == Data3DTreeModelItemTypes::SubjectItem)) {
-            SubjectTreeItem* pSubjectItem = dynamic_cast<SubjectTreeItem*>(itemSubjectList.at(i));
+            if(SubjectTreeItem* pSubjectItem = dynamic_cast<SubjectTreeItem*>(itemSubjectList.at(i))) {
+                //Find already existing surface items and add the new data to the first search result
+                QList<QStandardItem*> itemList = pSubjectItem->findChildren(set);
 
-            //Find already existing surface items and add the new data to the first search result
-            QList<QStandardItem*> itemList = pSubjectItem->findChildren(set);
+                if(!itemList.isEmpty() && (itemList.at(0)->type() == Data3DTreeModelItemTypes::MeasurementItem)) {
+                    if(MeasurementTreeItem* pMeasurementItem = dynamic_cast<MeasurementTreeItem*>(itemList.at(0))) {
+                        returnList.append(pMeasurementItem->addData(pNetworkData, m_pModelEntity));
+                    }
+                } else {
+                    MeasurementTreeItem* pMeasurementItem = new MeasurementTreeItem(Data3DTreeModelItemTypes::MeasurementItem, set);
 
-            if(!itemList.isEmpty() && (itemList.at(0)->type() == Data3DTreeModelItemTypes::MeasurementItem)) {
-                MeasurementTreeItem* pMeasurementItem = dynamic_cast<MeasurementTreeItem*>(itemList.at(0));
-                returnList.append(pMeasurementItem->addData(pNetworkData, m_pModelEntity));
-            } else {
-                MeasurementTreeItem* pMeasurementItem = new MeasurementTreeItem(Data3DTreeModelItemTypes::MeasurementItem, set);
+                    QList<QStandardItem*> list;
+                    list << pMeasurementItem;
+                    list << new QStandardItem(pMeasurementItem->toolTip());
+                    pSubjectItem->appendRow(list);
 
-                QList<QStandardItem*> list;
-                list << pMeasurementItem;
-                list << new QStandardItem(pMeasurementItem->toolTip());
-                pSubjectItem->appendRow(list);
-
-                returnList.append(pMeasurementItem->addData(pNetworkData, m_pModelEntity));
-            }
+                    returnList.append(pMeasurementItem->addData(pNetworkData, m_pModelEntity));
+                }
 
 //            //Find the "set" items and add the source estimates as items
 //            if(!itemList.isEmpty()) {
@@ -437,6 +437,7 @@ QList<NetworkTreeItem*> Data3DTreeModel::addConnectivityData(const QString& subj
 //                    }
 //                }
 //            }
+            }
         }
     }
 
