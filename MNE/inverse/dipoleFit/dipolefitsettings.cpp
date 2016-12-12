@@ -14,12 +14,12 @@ using namespace INVERSELIB;
 
 char *mne_strdup_settings(const char *s)
 {
-  char *res;
-  if (s == NULL)
-    return NULL;
-  res = (char*) malloc(strlen(s)+1);
-  strcpy(res,s);
-  return res;
+    char *res;
+    if (s == NULL)
+        return NULL;
+    res = (char*) malloc(strlen(s)+1);
+    strcpy(res,s);
+    return res;
 }
 
 
@@ -53,27 +53,52 @@ char *mne_strdup_settings(const char *s)
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-DipoleFitSettings::DipoleFitSettings(int *argc,char **argv)
+DipoleFitSettings::DipoleFitSettings()
 {
     // Init origin
     r0 << 0.0f,0.0f,0.04f;
 
 
     filter = {  true,         /* Filter on? */
-                 4096,                         /* size */
-                 2048,                         /* taper_size */
-                 0.0, 0.0,                     /* highpass corner and width */
-                 40.0, 5.0,                    /* lowpass corner and width */
-                 0.0, 0.0,                     /* EOG highpass corner and width */
-                 40.0, 5.0 };                  /* EOG Lowpass corner and width */
+                4096,                         /* size */
+                2048,                         /* taper_size */
+                0.0, 0.0,                     /* highpass corner and width */
+                40.0, 5.0,                    /* lowpass corner and width */
+                0.0, 0.0,                     /* EOG highpass corner and width */
+                40.0, 5.0 };                  /* EOG Lowpass corner and width */
+}
 
 
+//*************************************************************************************************************
+
+DipoleFitSettings::DipoleFitSettings(int *argc,char **argv)
+    : DipoleFitSettings() // Call default constructor for default inits (C++11 feature)
+{
     if (!check_args(argc,argv))
         return;
 
+//    mne_print_version_info(stderr,argv[0],PROGRAM_VERSION,__DATE__,__TIME__);
+    printf("%s version %s compiled at %s %s\n",argv[0],PROGRAM_VERSION,__DATE__,__TIME__);
+
+    checkIntegrity();
+}
+
+
+//*************************************************************************************************************
+
+DipoleFitSettings::~DipoleFitSettings()
+{
+    //ToDo Garbage collection
+}
+
+
+//*************************************************************************************************************
+
+void DipoleFitSettings::checkIntegrity()
+{
     do_baseline = (bmin < BIG_TIME && bmax < BIG_TIME);
 
-    if (!measname) {
+    if (measname.isEmpty()) {
         qCritical ("Data file name missing. Please specify one using the --meas option.");
         return;
     }
@@ -96,18 +121,15 @@ DipoleFitSettings::DipoleFitSettings(int *argc,char **argv)
         nproj++;
         for (int k = 1; k < nproj; k++)
             projnames[k] = projnames[k-1];
-        projnames[0] = mne_strdup_settings(measname);
+        projnames[0] = measname.isEmpty() ? NULL : measname.toLatin1().data();
     }
-
     printf("\n");
-//    mne_print_version_info(stderr,argv[0],PROGRAM_VERSION,__DATE__,__TIME__);
-    printf("%s version %s\n",argv[0],PROGRAM_VERSION);//,__DATE__,__TIME__);
 
     if (bemname)
         printf("BEM              : %s\n",bemname);
     else {
         printf("Sphere model     : origin at (% 7.2f % 7.2f % 7.2f) mm\n",
-        1000*r0[X],1000*r0[Y],1000*r0[Z]);
+               1000*r0[X],1000*r0[Y],1000*r0[Z]);
     }
     printf("Using %s MEG coil definitions.\n",accurate ? "accurate" : "standard");
     if (mriname)
@@ -116,9 +138,9 @@ DipoleFitSettings::DipoleFitSettings(int *argc,char **argv)
         printf("Guesses          : %s\n",guessname);
     else {
         if (guess_surfname)
-          fprintf(stderr,"Guess space bounded by %s\n",guess_surfname);
+            fprintf(stderr,"Guess space bounded by %s\n",guess_surfname);
         else
-          fprintf(stderr,"Spherical guess space, rad = %.1f mm\n",1000*guess_rad);
+            fprintf(stderr,"Spherical guess space, rad = %.1f mm\n",1000*guess_rad);
         printf("Guess grid       : %6.1f mm\n",1000*guess_grid);
         if (guess_mindist > 0.0)
             printf("Guess mindist    : %6.1f mm\n",1000*guess_mindist);
@@ -128,8 +150,8 @@ DipoleFitSettings::DipoleFitSettings(int *argc,char **argv)
     printf("Data             : %s\n",measname);
     if (nproj > 0) {
         printf("SSP sources      :\n");
-    for (int k = 0; k < nproj; k++)
-        printf("\t%s\n",projnames[k]);
+        for (int k = 0; k < nproj; k++)
+            printf("\t%s\n",projnames[k]);
     }
     if (badname)
         printf("Bad channels     : %s\n",badname);
@@ -153,14 +175,6 @@ DipoleFitSettings::DipoleFitSettings(int *argc,char **argv)
     if (!bdipname.isEmpty())
         printf("bdip output     : %s\n",bdipname.toLatin1().data());
     printf("\n");
-}
-
-
-//*************************************************************************************************************
-
-DipoleFitSettings::~DipoleFitSettings()
-{
-    //ToDo Garbage collection
 }
 
 
@@ -268,7 +282,7 @@ bool DipoleFitSettings::check_args (int *argc,char **argv)
         found = 0;
         if (strcmp(argv[k],"--version") == 0) {
             printf("%s version %s compiled at %s %s\n",
-            argv[0],PROGRAM_VERSION,__DATE__,__TIME__);
+                   argv[0],PROGRAM_VERSION,__DATE__,__TIME__);
             exit(0);
         }
         else if (strcmp(argv[k],"--help") == 0) {
@@ -608,7 +622,7 @@ bool DipoleFitSettings::check_args (int *argc,char **argv)
                 qCritical ("Integration time should be positive.");
                 return false;
             }
-            integ = fval/1000.0;
+            integ = fval/1000.0f;
         }
         else if (strcmp(argv[k],"--tmin") == 0) {
             found = 2;
@@ -620,7 +634,7 @@ bool DipoleFitSettings::check_args (int *argc,char **argv)
                 qCritical() << "Incomprehensible tmin:" << argv[k+1];
                 return false;
             }
-            tmin = fval/1000.0;
+            tmin = fval/1000.0f;
         }
         else if (strcmp(argv[k],"--tmax") == 0) {
             found = 2;
@@ -644,7 +658,7 @@ bool DipoleFitSettings::check_args (int *argc,char **argv)
                 qCritical() << "Incomprehensible bmin:" << argv[k+1];
                 return false;
             }
-            bmin = fval/1000.0;
+            bmin = fval/1000.0f;
         }
         else if (strcmp(argv[k],"--bmax") == 0) {
             found = 2;
@@ -656,7 +670,7 @@ bool DipoleFitSettings::check_args (int *argc,char **argv)
                 qCritical() << "Incomprehensible bmax:" << argv[k+1];
                 return false;
             }
-            bmax = fval/1000.0;
+            bmax = fval/1000.0f;
         }
         else if (strcmp(argv[k],"--set") == 0) {
             found = 2;
