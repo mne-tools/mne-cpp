@@ -90,8 +90,13 @@ int main(int argc, char *argv[])
     QCommandLineParser parser;
     parser.setApplicationDescription("Cancel Noise Example");
     parser.addHelpOption();
+
     QCommandLineOption evokedFileOption("ave", "Path to the evoked/average <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    QCommandLineOption destCompsOption("destComps", "<Destination> of the compensator which is to be calculated.", "destination", "2");
+
     parser.addOption(evokedFileOption);
+    parser.addOption(destCompsOption);
+
     parser.process(app);
 
     //generate FiffEvokedSet
@@ -100,7 +105,7 @@ int main(int argc, char *argv[])
 
     //cancelNoise example
     qint32 comp_now = p_FiffEvokedSet.info.get_current_comp();
-    qint32 dest_comp = 2;
+    qint32 dest_comp = parser.value(destCompsOption).toInt();
 
     if(comp_now != dest_comp)
         p_FiffEvokedSet.compensate_to(p_FiffEvokedSet,dest_comp);

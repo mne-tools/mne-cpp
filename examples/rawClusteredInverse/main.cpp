@@ -125,7 +125,10 @@ int main(int argc, char *argv[])
     QCommandLineOption methodOption("method", "Inverse estimation <method>, i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM");//"MNE" | "dSPM" | "sLORETA"
     QCommandLineOption snrOption("snr", "The SNR value used for computation <snr>.", "snr", "1.0");//3.0f;//0.1f;//3.0f;
     QCommandLineOption invFileOutOption("invOut", "Path to inverse <file>, which is to be written.", "file", "");
-    QCommandLineOption stcFileOutOption("stcOut", "Path to stc <file>, which is to be written.", "file", "");
+    QCommandLineOption stcFileOutOption("stcOut", "Path to stc <file>, which is to be written.", "file", "");    
+    QCommandLineOption keepCompOption("keepComp", "Keep compensators.", "keepComp", "false");
+    QCommandLineOption pickAllOption("pickAll", "Pick all channels.", "pickAll", "true");
+    QCommandLineOption destCompsOption("destComps", "<Destination> of the compensator which is to be calculated.", "destination", "0");
 
     parser.addOption(inputOption);
     parser.addOption(surfOption);
@@ -141,6 +144,9 @@ int main(int argc, char *argv[])
     parser.addOption(snrOption);
     parser.addOption(invFileOutOption);
     parser.addOption(stcFileOutOption);
+    parser.addOption(keepCompOption);
+    parser.addOption(pickAllOption);
+    parser.addOption(destCompsOption);
 
     parser.process(a);
 
@@ -159,8 +165,20 @@ int main(int argc, char *argv[])
     float tmax = 0.4f;
 
     bool keep_comp = false;
-    fiff_int_t dest_comp = 0;
-    bool pick_all  = true;
+    if(parser.value(keepCompOption) == "false" || parser.value(keepCompOption) == "0") {
+        keep_comp = false;
+    } else if(parser.value(keepCompOption) == "true" || parser.value(keepCompOption) == "1") {
+        keep_comp = true;
+    }
+
+    fiff_int_t dest_comp = parser.value(destCompsOption).toInt();
+
+    bool pick_all = false;
+    if(parser.value(pickAllOption) == "false" || parser.value(pickAllOption) == "0") {
+        pick_all = false;
+    } else if(parser.value(pickAllOption) == "true" || parser.value(pickAllOption) == "1") {
+        pick_all = true;
+    }
 
     qint32 k, p;
 
