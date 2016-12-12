@@ -117,7 +117,7 @@ void TestDipoleFit::initTestCase()
     printf(">>>>>>>>>>>>>>>>>>>>>>>>> Dipole Fit Settings >>>>>>>>>>>>>>>>>>>>>>>>>\n");
 
     //Following is equivalent to: --meas ./mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif --set 1 --meg --eeg --tmin 32 --tmax 148 --bmin -100 --bmax 0 --dip ./mne-cpp-test-data/Result/dip_fit.dat
-    m_settings.measname = "D:/GitHub/mne-cpp/bin/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif";
+    m_settings.measname = "./mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif";
     m_settings.is_raw = false;
     m_settings.setno = 1;
     m_settings.include_meg = true;
@@ -126,7 +126,7 @@ void TestDipoleFit::initTestCase()
     m_settings.tmax = 148.0f/1000.0f;
     m_settings.bmin = -100.0f/1000.0f;
     m_settings.bmax = 0.0f/1000.0f;
-    m_settings.dipname = "D:/GitHub/mne-cpp/bin/mne-cpp-test-data/Result/dip_fit.dat";
+    m_settings.dipname = "./mne-cpp-test-data/Result/dip_fit.dat";
 
     m_settings.checkIntegrity();
 
@@ -140,9 +140,21 @@ void TestDipoleFit::initTestCase()
     printf(">>>>>>>>>>>>>>>>>>>>>>>>> Compute Dipole Fit >>>>>>>>>>>>>>>>>>>>>>>>>\n");
 
     DipoleFit dipFit(&m_settings);
-    m_ECDSet = dipFit.calculateFit();
+    ECDSet set = dipFit.calculateFit();
 
     printf("<<<<<<<<<<<<<<<<<<<<<<<<< Compute Dipole Fit Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
+
+
+    //*********************************************************************************************************
+    // Write Read Dipole Fit
+    //*********************************************************************************************************
+
+    printf(">>>>>>>>>>>>>>>>>>>>>>>>> Write Read Dipole Fit >>>>>>>>>>>>>>>>>>>>>>>>>\n");
+
+    set.save_dipoles_dip(m_settings.dipname);
+    m_ECDSet = ECDSet::read_dipoles_dip(m_settings.dipname);
+
+    printf("<<<<<<<<<<<<<<<<<<<<<<<<< Write Read Dipole Fit Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
 
 }
 
@@ -151,10 +163,36 @@ void TestDipoleFit::initTestCase()
 
 void TestDipoleFit::compareFit()
 {
-    qDebug() << "m_refECDSet.size()" << m_refECDSet.size();
-    qDebug() << "m_ECDSet.size()" << m_ECDSet.size();
+    //*********************************************************************************************************
+    // Write Read Dipole Fit
+    //*********************************************************************************************************
+
+    printf(">>>>>>>>>>>>>>>>>>>>>>>>> Compare Dipole Fits >>>>>>>>>>>>>>>>>>>>>>>>>\n");
+
     QVERIFY( m_refECDSet.size() == m_ECDSet.size() );
-//    QVERIFY( times_diff.sum() < epsilon );
+
+    for (int i = 0; i < m_refECDSet.size(); ++i)
+    {
+        printf("Compare orig Dipole %d: %7.1f %7.1f %8.2f %8.2f %8.2f %8.3f %8.3f %8.3f %8.3f %6.1f\n", i,
+                1000*m_ECDSet[i].time,1000*m_ECDSet[i].time,
+                1000*m_ECDSet[i].rd[0],1000*m_ECDSet[i].rd[1],1000*m_ECDSet[i].rd[2],
+                1e9*m_ECDSet[i].Q.norm(),1e9*m_ECDSet[i].Q[0],1e9*m_ECDSet[i].Q[1],1e9*m_ECDSet[i].Q[2],100.0*m_ECDSet[i].good);
+        printf("         ref Dipole %d: %7.1f %7.1f %8.2f %8.2f %8.2f %8.3f %8.3f %8.3f %8.3f %6.1f\n", i,
+                1000*m_refECDSet[i].time,1000*m_refECDSet[i].time,
+                1000*m_refECDSet[i].rd[0],1000*m_refECDSet[i].rd[1],1000*m_refECDSet[i].rd[2],
+                1e9*m_refECDSet[i].Q.norm(),1e9*m_refECDSet[i].Q[0],1e9*m_refECDSet[i].Q[1],1e9*m_refECDSet[i].Q[2],100.0*m_refECDSet[i].good);
+
+        QVERIFY( m_ECDSet[i].valid == m_refECDSet[i].valid );
+        QVERIFY( m_ECDSet[i].time - m_refECDSet[i].time < epsilon );
+        QVERIFY( m_ECDSet[i].rd == m_refECDSet[i].rd );
+        QVERIFY( m_ECDSet[i].Q == m_refECDSet[i].Q );
+        QVERIFY( m_ECDSet[i].good - m_refECDSet[i].good < epsilon );
+        QVERIFY( m_ECDSet[i].khi2 - m_refECDSet[i].khi2 < epsilon );
+        QVERIFY( m_ECDSet[i].nfree == m_refECDSet[i].nfree );
+        QVERIFY( m_ECDSet[i].neval == m_refECDSet[i].neval );
+    }
+
+    printf("<<<<<<<<<<<<<<<<<<<<<<<<< Compare Dipole Fits Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
 }
 
 
