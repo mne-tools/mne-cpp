@@ -111,7 +111,7 @@ int main(int argc, char *argv[])
     QCommandLineOption subjectDirectoryOption("subjDir", "Path to subject <directory>.", "directory", "./MNE-sample-data/subjects");
     QCommandLineOption subjectOption("subj", "Selected <subject>.", "subject", "sample");
     QCommandLineOption stcFileOption("stcOut", "Path to stc <file>, which is to be written.", "file", "");//"RapMusic.stc");
-    QCommandLineOption doMovieOption("doMovie", "Create overlapping movie.");
+    QCommandLineOption doMovieOption("doMovie", "Create overlapping movie.", "doMovie", "false");
     QCommandLineOption annotOption("annotType", "Annotation type <type>.", "type", "aparc.a2009s");
     QCommandLineOption numDipolePairsOption("numDip", "<number> of dipole pairs to localize.", "number", "1");
     QCommandLineOption surfOption("surfType", "Surface type <type>.", "type", "orig");
@@ -139,7 +139,12 @@ int main(int argc, char *argv[])
 
     qint32 numDipolePairs = parser.value(numDipolePairsOption).toInt();
 
-    bool doMovie = parser.isSet(doMovieOption);
+    bool doMovie = false;
+    if(parser.value(doMovieOption) == "false" || parser.value(doMovieOption) == "0") {
+        doMovie = false;
+    } else if(parser.value(doMovieOption) == "true" || parser.value(doMovieOption) == "1") {
+        doMovie = true;
+    }
 
     qDebug() << "Start calculation with stc:" << t_sFileNameStc;
 

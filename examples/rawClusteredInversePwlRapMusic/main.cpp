@@ -124,7 +124,10 @@ int main(int argc, char *argv[])
     QCommandLineOption numDipolePairsOption("numDip", "<number> of dipole pairs to localize.", "number", "7");
     QCommandLineOption evokedIdxOption("aveIdx", "The average <index> to choose from the average file.", "index", "1");
     QCommandLineOption hemiOption("hemi", "Selected hemisphere <hemi>.", "hemi", "2");
-    QCommandLineOption doMovieOption("doMovie", "Create overlapping movie.");
+    QCommandLineOption doMovieOption("doMovie", "Create overlapping movie.", "doMovie", "false");
+    QCommandLineOption keepCompOption("keepComp", "Keep compensators.", "keepComp", "false");
+    QCommandLineOption pickAllOption("pickAll", "Pick all channels.", "pickAll", "true");
+    QCommandLineOption destCompsOption("destComps", "<Destination> of the compensator which is to be calculated.", "destination", "0");
 
     parser.addOption(inputOption);
     parser.addOption(eventsFileOption);
@@ -138,6 +141,9 @@ int main(int argc, char *argv[])
     parser.addOption(evokedIdxOption);
     parser.addOption(hemiOption);
     parser.addOption(doMovieOption);
+    parser.addOption(keepCompOption);
+    parser.addOption(pickAllOption);
+    parser.addOption(destCompsOption);
 
     parser.process(a);
 
@@ -160,12 +166,29 @@ int main(int argc, char *argv[])
     float tmax = 0.2f;
 
     bool keep_comp = false;
-    fiff_int_t dest_comp = 0;
-    bool pick_all  = true;
+    if(parser.value(keepCompOption) == "false" || parser.value(keepCompOption) == "0") {
+        keep_comp = false;
+    } else if(parser.value(keepCompOption) == "true" || parser.value(keepCompOption) == "1") {
+        keep_comp = true;
+    }
+
+    fiff_int_t dest_comp = parser.value(destCompsOption).toInt();
+
+    bool pick_all = false;
+    if(parser.value(pickAllOption) == "false" || parser.value(pickAllOption) == "0") {
+        pick_all = false;
+    } else if(parser.value(pickAllOption) == "true" || parser.value(pickAllOption) == "1") {
+        pick_all = true;
+    }
 
     qint32 k, p;
 
-    bool doMovie = parser.isSet(doMovieOption);
+    bool doMovie = false;
+    if(parser.value(doMovieOption) == "false" || parser.value(doMovieOption) == "0") {
+        pick_all = false;
+    } else if(parser.value(doMovieOption) == "true" || parser.value(doMovieOption) == "1") {
+        pick_all = true;
+    }
 
     //
     // Load data
