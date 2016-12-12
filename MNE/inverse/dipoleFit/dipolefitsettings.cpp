@@ -55,25 +55,16 @@ char *mne_strdup_settings(const char *s)
 
 DipoleFitSettings::DipoleFitSettings()
 {
-    // Init origin
-    r0 << 0.0f,0.0f,0.04f;
-
-
-    filter = {  true,         /* Filter on? */
-                4096,                         /* size */
-                2048,                         /* taper_size */
-                0.0, 0.0,                     /* highpass corner and width */
-                40.0, 5.0,                    /* lowpass corner and width */
-                0.0, 0.0,                     /* EOG highpass corner and width */
-                40.0, 5.0 };                  /* EOG Lowpass corner and width */
+    initMembers();
 }
 
 
 //*************************************************************************************************************
 
 DipoleFitSettings::DipoleFitSettings(int *argc,char **argv)
-: DipoleFitSettings() // Call default constructor for default inits (C++11 feature)
 {
+    initMembers();
+
     if (!check_args(argc,argv))
         return;
 
@@ -89,6 +80,24 @@ DipoleFitSettings::DipoleFitSettings(int *argc,char **argv)
 DipoleFitSettings::~DipoleFitSettings()
 {
     //ToDo Garbage collection
+}
+
+
+//*************************************************************************************************************
+
+void DipoleFitSettings::initMembers()
+{
+    // Init origin
+    r0 << 0.0f,0.0f,0.04f;
+
+
+    filter = {  true,         /* Filter on? */
+                4096,                         /* size */
+                2048,                         /* taper_size */
+                0.0, 0.0,                     /* highpass corner and width */
+                40.0, 5.0,                    /* lowpass corner and width */
+                0.0, 0.0,                     /* EOG highpass corner and width */
+                40.0, 5.0 };                  /* EOG Lowpass corner and width */
 }
 
 
