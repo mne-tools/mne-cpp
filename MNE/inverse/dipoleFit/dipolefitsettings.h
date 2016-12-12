@@ -187,7 +187,7 @@ public:
     QString bdipname;              /* Output file in bdip format */
 
 private:
-
+    void initMembers();
     void usage(char *name);
     bool check_unrecognized_args(int argc, char **argv);
     bool check_args (int *argc,char **argv);
