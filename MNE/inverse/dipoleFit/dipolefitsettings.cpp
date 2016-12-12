@@ -156,7 +156,7 @@ void DipoleFitSettings::checkIntegrity()
         if (guess_exclude > 0)
             printf("Guess exclude    : %6.1f mm\n",1000*guess_exclude);
     }
-    printf("Data             : %s\n",measname);
+    printf("Data             : %s\n",measname.toLatin1().data());
     if (nproj > 0) {
         printf("SSP sources      :\n");
         for (int k = 0; k < nproj; k++)
