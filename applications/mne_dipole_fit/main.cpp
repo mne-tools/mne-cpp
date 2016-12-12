@@ -36,9 +36,9 @@ int main(int argc, char *argv[])
     * Saving...
     */
     if (!set.save_dipoles_dip(settings.dipname))
-        printf("Dipoles could not be safed to %s.",settings.dipname);
+        printf("Dipoles could not be safed to %s.",settings.dipname.toLatin1().data());
     if (!set.save_dipoles_bdip(settings.bdipname))
-        printf("Dipoles could not be safed to %s.",settings.bdipname);
+        printf("Dipoles could not be safed to %s.",settings.bdipname.toLatin1().data());
 
 
     ECDSet::read_dipoles_dip(settings.dipname);
