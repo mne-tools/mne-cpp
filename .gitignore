@@ -199,6 +199,20 @@
 /bin/platforminputcontexts
 /bin/QtQml
 /bin/MNE-sample-data/Result
+/bin/connectivityTutoriald
+/bin/disp3DTutoriald
+/bin/histogramd
+/bin/makeLayoutd
+/bin/mne_analyzed
+/bin/mne_dipole_fitd
+/bin/mne_launchd
+/bin/mne_matching_pursuitd
+/bin/mne_sample_data_downloaderd
+/bin/readBEMd
+/bin/test_codecovd
+/bin/test_dipole_fit
+/bin/test_dipole_fitd
+/bin/test_fiff_rwrd
 
 /applications/mne_scan/plugins/tmsi/*.dll
 
