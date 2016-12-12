@@ -198,6 +198,7 @@ ECDSet ECDSet::read_dipoles_dip(const QString& fileName)
             }
             else {
                 ECD     one;
+                one.valid = true;
                 one.time = list[1].toFloat() / 1000.0f;
                 one.rd[X] = list[3].toFloat() / 1000.0f;
                 one.rd[Y] = list[4].toFloat() / 1000.0f;

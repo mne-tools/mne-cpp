@@ -72,7 +72,7 @@ DipoleFitSettings::DipoleFitSettings()
 //*************************************************************************************************************
 
 DipoleFitSettings::DipoleFitSettings(int *argc,char **argv)
-    : DipoleFitSettings() // Call default constructor for default inits (C++11 feature)
+: DipoleFitSettings() // Call default constructor for default inits (C++11 feature)
 {
     if (!check_args(argc,argv))
         return;
