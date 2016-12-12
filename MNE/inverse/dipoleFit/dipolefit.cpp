@@ -74,7 +74,7 @@ ECDSet DipoleFit::calculateFit() const
             goto out;
     }
 
-    if ((fit_data = setup_dipole_fit_data(settings->mriname,settings->measname,settings->bemname,&settings->r0,eeg_model,settings->accurate,
+    if ((fit_data = setup_dipole_fit_data(settings->mriname,settings->measname.isEmpty() ? NULL : settings->measname.toLatin1().data(),settings->bemname,&settings->r0,eeg_model,settings->accurate,
                                           settings->badname,settings->noisename,settings->grad_std,settings->mag_std,settings->eeg_std,
                                           settings->mag_reg,settings->grad_reg,settings->eeg_reg,
                                           settings->diagnoise,settings->projnames,settings->nproj,settings->include_meg,settings->include_eeg)) == NULL)
@@ -86,7 +86,7 @@ ECDSet DipoleFit::calculateFit() const
         float t1,t2;
 
         printf("\n---- Opening a raw data file...\n\n");
-        if ((raw = mne_raw_open_file(settings->measname,TRUE,FALSE,&(settings->filter))) == NULL)
+        if ((raw = mne_raw_open_file(settings->measname.isEmpty() ? NULL : settings->measname.toLatin1().data(),TRUE,FALSE,&(settings->filter))) == NULL)
             goto out;
         /*
         * A channel selection is needed to access the data
@@ -112,11 +112,11 @@ ECDSet DipoleFit::calculateFit() const
             settings->tstep = 1.0/raw->info->sfreq;
 
         printf("\tOpened raw data file %s : %d MEG and %d EEG \n",
-               settings->measname,fit_data->nmeg,fit_data->neeg);
+               settings->measname.toLatin1().data(),fit_data->nmeg,fit_data->neeg);
     }
     else {
         printf("\n---- Reading data...\n\n");
-        if ((data = mne_read_meas_data(settings->measname,settings->setno,NULL,NULL,
+        if ((data = mne_read_meas_data(settings->measname.isEmpty() ? NULL : settings->measname.toLatin1().data(),settings->setno,NULL,NULL,
                                        fit_data->ch_names,fit_data->nmeg+fit_data->neeg)) == NULL)
             goto out;
         if (settings->do_baseline)
@@ -131,7 +131,7 @@ ECDSet DipoleFit::calculateFit() const
             settings->tstep = data->current->tstep;
 
         printf("\tRead data set %d from %s : %d MEG and %d EEG \n",
-               settings->setno,settings->measname,fit_data->nmeg,fit_data->neeg);
+               settings->setno,settings->measname.toLatin1().data(),fit_data->nmeg,fit_data->neeg);
         if (settings->noisename) {
             printf("\nScaling the noise covariance...\n");
             if (scale_noise_cov(fit_data,data->current->nave) == FAIL)
@@ -151,11 +151,11 @@ ECDSet DipoleFit::calculateFit() const
 
 
     if (raw) {
-        if (fit_dipoles_raw(settings->measname,raw,sel,fit_data,guess,settings->tmin,settings->tmax,settings->tstep,settings->integ,settings->verbose) == FAIL)
+        if (fit_dipoles_raw(settings->measname.isEmpty() ? NULL : settings->measname.toLatin1().data(),raw,sel,fit_data,guess,settings->tmin,settings->tmax,settings->tstep,settings->integ,settings->verbose) == FAIL)
             goto out;
     }
     else {
-        if (fit_dipoles(settings->measname,data,fit_data,guess,settings->tmin,settings->tmax,settings->tstep,settings->integ,settings->verbose,set) == FAIL)
+        if (fit_dipoles(settings->measname.isEmpty() ? NULL : settings->measname.toLatin1().data(),data,fit_data,guess,settings->tmin,settings->tmax,settings->tstep,settings->integ,settings->verbose,set) == FAIL)
             goto out;
     }
     printf("%d dipoles fitted\n",set.size());

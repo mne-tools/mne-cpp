@@ -110,7 +110,16 @@ public:
 
     //=========================================================================================================
     /**
+    * Default Constructor
+    */
+    explicit DipoleFitSettings();
+
+    //=========================================================================================================
+    /**
     * Constructs Dipole Fit Settings
+    *
+    * @param [in] argc (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
+    * @param [in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
     */
     explicit DipoleFitSettings(int *argc,char **argv);
 
@@ -119,6 +128,12 @@ public:
     * Destructs the Dipole Fit Settings
     */
     virtual ~DipoleFitSettings();
+
+    //=========================================================================================================
+    /**
+    * Check whether Dipole Fit Settings are correctly set.
+    */
+    void checkIntegrity();
 
 public:
     char  *bemname     = NULL;              /**< Boundary-element model */
@@ -140,7 +155,7 @@ public:
     float eeg_std      = 0.2e-6f;
     bool  diagnoise    = false;              /* Use only the diagonals of the noise-covariance matrix */
 
-    char  *measname    = NULL;               /* Data file */
+    QString measname;                        /* Data file */
     bool  is_raw       = false;              /* Is this a raw data file */
     char  *badname     = NULL;               /* Bad channels */
     bool  include_meg  = false;              /* Use MEG? */

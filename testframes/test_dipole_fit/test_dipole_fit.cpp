@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     main.cpp
+* @file     test_dipole_fit.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     December, 2015
+* @date     December, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2015, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -39,9 +39,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <fiff/fiff.h>
-
-#include <iostream>
+#include <inverse/dipoleFit/dipolefitsettings.h>
+#include <inverse/dipoleFit/dipolefit.h>
 
 
 //*************************************************************************************************************
@@ -57,7 +56,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFLIB;
+using namespace INVERSELIB;
+
 
 //=============================================================================================================
 /**
@@ -75,13 +75,15 @@ public:
 
 private slots:
     void initTestCase();
-    void compareData();
-    void compareTimes();
-    void compareInfo();
+    void compareFit();
     void cleanupTestCase();
 
 private:
     double epsilon;
+
+    DipoleFitSettings m_settings;
+    ECDSet m_ECDSet;
+    ECDSet m_refECDSet;
 };
 
 
@@ -93,90 +95,68 @@ TestDipoleFit::TestDipoleFit()
 }
 
 
-
 //*************************************************************************************************************
 
 void TestDipoleFit::initTestCase()
 {
-    qDebug() << "Epsilon" << epsilon;
+    //*********************************************************************************************************
+    // Load reference Dipole Set
+    //*********************************************************************************************************
 
-    QFile t_fileIn("./mne-cpp-test-data/MEG/sample/sample_audvis_raw_short.fif");
-    QFile t_fileOut("./mne-cpp-test-data/MEG/sample/sample_audvis_raw_short_test_rwr_out.fif");
+    printf(">>>>>>>>>>>>>>>>>>>>>>>>> Load Dipole Fit Reference Set >>>>>>>>>>>>>>>>>>>>>>>>>\n");
+    QString refFileName("./mne-cpp-test-data/Result/ref_dip_fit.dat");
+    m_refECDSet = ECDSet::read_dipoles_dip(refFileName);
 
-    //
-    //   Make sure test folder exists
-    //
-    QFileInfo t_fileOutInfo(t_fileOut);
-    QDir().mkdir(t_fileOutInfo.path());
+    printf("<<<<<<<<<<<<<<<<<<<<<<<<< Dipole Fit Reference Set Loaded <<<<<<<<<<<<<<<<<<<<<<<<<\n");
 
 
     //*********************************************************************************************************
-    // First Read & Write
+    // Dipole Fit Settings
     //*********************************************************************************************************
 
-    printf(">>>>>>>>>>>>>>>>>>>>>>>>> Read & Write >>>>>>>>>>>>>>>>>>>>>>>>>\n");
+    printf(">>>>>>>>>>>>>>>>>>>>>>>>> Dipole Fit Settings >>>>>>>>>>>>>>>>>>>>>>>>>\n");
 
-    printf("<<<<<<<<<<<<<<<<<<<<<<<<< Read & Write Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
+    //Following is equivalent to: --meas ./mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif --set 1 --meg --eeg --tmin 32 --tmax 148 --bmin -100 --bmax 0 --dip ./mne-cpp-test-data/Result/dip_fit.dat
+    m_settings.measname = "D:/GitHub/mne-cpp/bin/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif";
+    m_settings.is_raw = false;
+    m_settings.setno = 1;
+    m_settings.include_meg = true;
+    m_settings.include_eeg = true;
+    m_settings.tmin = 32.0f/1000.0f;
+    m_settings.tmax = 148.0f/1000.0f;
+    m_settings.bmin = -100.0f/1000.0f;
+    m_settings.bmax = 0.0f/1000.0f;
+    m_settings.dipname = "D:/GitHub/mne-cpp/bin/mne-cpp-test-data/Result/dip_fit.dat";
+
+    m_settings.checkIntegrity();
+
+    printf("<<<<<<<<<<<<<<<<<<<<<<<<< Dipole Fit Settings Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
 
 
     //*********************************************************************************************************
-    // Second Read
+    // Compute Dipole Fit
     //*********************************************************************************************************
 
-    printf(">>>>>>>>>>>>>>>>>>>>>>>>> Read Again >>>>>>>>>>>>>>>>>>>>>>>>>\n");
+    printf(">>>>>>>>>>>>>>>>>>>>>>>>> Compute Dipole Fit >>>>>>>>>>>>>>>>>>>>>>>>>\n");
 
-    printf("<<<<<<<<<<<<<<<<<<<<<<<<< Read Again Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
+    DipoleFit dipFit(&m_settings);
+    m_ECDSet = dipFit.calculateFit();
+
+    printf("<<<<<<<<<<<<<<<<<<<<<<<<< Compute Dipole Fit Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
+
 }
 
 
 //*************************************************************************************************************
 
-void TestDipoleFit::compareData()
+void TestDipoleFit::compareFit()
 {
-
-//    QVERIFY( data_diff.sum() < epsilon );
-}
-
-
-//*************************************************************************************************************
-
-void TestDipoleFit::compareTimes()
-{
-
+    qDebug() << "m_refECDSet.size()" << m_refECDSet.size();
+    qDebug() << "m_ECDSet.size()" << m_ECDSet.size();
+    QVERIFY( m_refECDSet.size() == m_ECDSet.size() );
 //    QVERIFY( times_diff.sum() < epsilon );
 }
 
-
-//*************************************************************************************************************
-
-void TestDipoleFit::compareInfo()
-{
-//    //Sampling frequency
-//    std::cout << "[1] Sampling Frequency Check\n";
-//    QVERIFY( first_in_raw.info.sfreq == second_in_raw.info.sfreq );
-
-//    //Projection
-//    std::cout << "[2] Projection Check\n";
-//    QVERIFY( first_in_raw.info.projs.size() == second_in_raw.info.projs.size() );
-
-//    for( qint32 i = 0; i < first_in_raw.info.projs.size(); ++i )
-//    {
-//        std::cout << "Projector " << i << std::endl;
-//        MatrixXd tmp = first_in_raw.info.projs[i].data->data - second_in_raw.info.projs[i].data->data;
-//        QVERIFY( tmp.sum() < epsilon );
-//    }
-
-//    //Compensators
-//    std::cout << "[3] Compensator Check\n";
-//    QVERIFY( first_in_raw.info.comps.size() == second_in_raw.info.comps.size() );
-
-//    for( qint32 i = 0; i < first_in_raw.info.comps.size(); ++i )
-//    {
-//        std::cout << "Compensator " << i << std::endl;
-//        MatrixXd tmp = first_in_raw.info.comps[i].data->data - second_in_raw.info.comps[i].data->data;
-//        QVERIFY( tmp.sum() < epsilon );
-//    }
-}
 
 //*************************************************************************************************************
 
