@@ -199,6 +199,8 @@ dipError dipfitError(Eigen::MatrixXd pos, Eigen::MatrixXd data, struct sens sens
 
     e.error = dif.array().square().sum()/data.array().square().sum();
 
+    e.numIterations = 0;
+
     return e;
 }
 
