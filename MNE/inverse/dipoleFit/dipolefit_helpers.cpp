@@ -15128,7 +15128,7 @@ static fwdEegSphereModelSet fwd_add_default_eeg_sphere_model(fwdEegSphereModelSe
 #endif
 
 
-fwdEegSphereModelSet fwd_load_eeg_sphere_models(char *filename, fwdEegSphereModelSet now)
+fwdEegSphereModelSet fwd_load_eeg_sphere_models(const QString& filename, fwdEegSphereModelSet now)
 /*
       * Load all models available in the specified file
       */
@@ -15145,19 +15145,19 @@ fwdEegSphereModelSet fwd_load_eeg_sphere_models(char *filename, fwdEegSphereMode
     if (!now)
         now = fwd_add_default_eeg_sphere_model(now);
 
-    if (!filename)
+    if (filename.isEmpty())
         return now;
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
-    if (_access(filename,R_OK) != OK)	/* Never mind about an unaccesible file */
+    if (_access(filename.toLatin1().data(),R_OK) != OK)	/* Never mind about an unaccesible file */
         return now;
 #else
-    if (access(filename,R_OK) != OK)	/* Never mind about an unaccesible file */
+    if (access(filename.toLatin1().data(),R_OK) != OK)	/* Never mind about an unaccesible file */
         return now;
 #endif
 
-    if ((fp = fopen(filename,"r")) == NULL) {
-        printf(filename);
+    if ((fp = fopen(filename.toLatin1().data(),"r")) == NULL) {
+        printf(filename.toLatin1().data());
         goto bad;
     }
     while (fgets(line,MAXLINE,fp) != NULL) {
@@ -15196,7 +15196,7 @@ fwdEegSphereModelSet fwd_load_eeg_sphere_models(char *filename, fwdEegSphereMode
         }
     }
     if (ferror(fp)) {
-        printf(filename);
+        printf(filename.toLatin1().data());
         goto bad;
     }
     fclose(fp);
@@ -16388,7 +16388,7 @@ bad :
     return FAIL;
 }
 
-fwdEegSphereModel setup_eeg_sphere_model(char  *eeg_model_file,   /* Contains the model specifications */
+fwdEegSphereModel setup_eeg_sphere_model(const QString& eeg_model_file,   /* Contains the model specifications */
                                          QString eeg_model_name,	  /* Name of the model to use */
                                          float eeg_sphere_rad)    /* Outer surface radius */
 /*

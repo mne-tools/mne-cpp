@@ -174,10 +174,10 @@ public:
     int  nproj         = 0;
     bool omit_data_proj = false;
 
-    char   *eeg_model_file = NULL;          /* File of EEG sphere model specifications */
+    QString eeg_model_file;                 /* File of EEG sphere model specifications */
     QString eeg_model_name;                 /* Name of the EEG model to use */
     float  eeg_sphere_rad = 0.09f;          /* Scalp radius to use in EEG sphere model */
-    bool    scale_eeg_pos  = false;	        /* Scale the electrode locations to scalp in the sphere model */
+    bool    scale_eeg_pos  = false;         /* Scale the electrode locations to scalp in the sphere model */
     float  mag_reg      = 0.1f;             /* Noise-covariance matrix regularization for MEG (magnetometers and axial gradiometers)  */
     bool   fit_mag_dipoles = false;
 
