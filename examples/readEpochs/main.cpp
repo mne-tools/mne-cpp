@@ -99,10 +99,16 @@ int main(int argc, char *argv[])
     QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", "./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
     QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif");
     QCommandLineOption evokedIdxOption("aveIdx", "The average <index> to choose from the average file.", "index", "1");
+    QCommandLineOption pickAllOption("pickAll", "Pick all channels.", "pickAll", "true");
+    QCommandLineOption keepCompOption("keepComp", "Keep compensators.", "keepComp", "false");
+    QCommandLineOption destCompsOption("destComps", "<Destination> of the compensator which is to be calculated.", "destination", "0");
 
     parser.addOption(inputOption);
     parser.addOption(eventsFileOption);
     parser.addOption(evokedIdxOption);
+    parser.addOption(pickAllOption);
+    parser.addOption(keepCompOption);
+    parser.addOption(destCompsOption);
 
     parser.process(a);
 
@@ -115,8 +121,20 @@ int main(int argc, char *argv[])
     float tmax = 1.5;
 
     bool keep_comp = false;
-    fiff_int_t dest_comp = 0;
-    bool pick_all  = true;
+    if(parser.value(keepCompOption) == "false" || parser.value(keepCompOption) == "0") {
+        keep_comp = false;
+    } else if(parser.value(keepCompOption) == "true" || parser.value(keepCompOption) == "1") {
+        keep_comp = true;
+    }
+
+    fiff_int_t dest_comp = parser.value(destCompsOption).toInt();
+
+    bool pick_all = false;
+    if(parser.value(pickAllOption) == "false" || parser.value(pickAllOption) == "0") {
+        pick_all = false;
+    } else if(parser.value(pickAllOption) == "true" || parser.value(pickAllOption) == "1") {
+        pick_all = true;
+    }
 
     qint32 k, p;
 

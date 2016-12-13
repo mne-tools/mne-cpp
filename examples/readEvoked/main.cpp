@@ -93,6 +93,7 @@ int main(int argc, char *argv[])
 
     QCommandLineOption evokedFileOption("ave", "Path to the evoked/average <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
     QCommandLineOption evokedIdxOption("aveIdx", "The average <index> to choose from the average file.", "index", "2");
+    QCommandLineOption useCTFCompOption("useCTFComp", "Use the CTF compensator, if available.");
 
     parser.addOption(evokedFileOption);
     parser.addOption(evokedIdxOption);
@@ -104,7 +105,7 @@ int main(int argc, char *argv[])
     FiffEvoked p_FiffEvoked(t_sampleFile,QVariant(parser.value(evokedIdxOption)));
 
     //Select the head coordinate system
-    bool use_ctf_head = 1;
+    bool use_ctf_head = parser.isSet(useCTFCompOption);
     FiffCoordTrans meg_trans;
 
     if(use_ctf_head) {
