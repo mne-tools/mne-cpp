@@ -20,9 +20,9 @@ void main()
     vec3 p2 = tcPosition[1].xyz;
     vec3 p3 = tcPosition[2].xyz;
 	
-	vec3 n1 = tcNormal[0];
-    vec3 n2 = tcNormal[1];
-    vec3 n3 = tcNormal[2];
+	vec3 n1 = normalize( tcNormal[0] );
+    vec3 n2 = normalize( tcNormal[1] );
+    vec3 n3 = normalize( tcNormal[2] );
 		
 	float u = gl_TessCoord.x;
     float v = gl_TessCoord.y;
@@ -62,18 +62,20 @@ void main()
 	float v23 = 2. * dot( p3-p2, n2+n3 ) / dot( p3-p2, p3-p2 );
 	float v31 = 2. * dot( p1-p3, n3+n1 ) / dot( p1-p3, p1-p3 );
 	
-	vec3 n200 = n1;
-	vec3 n020 = n2;
-	vec3 n002 = n3;
+	vec3 n200 = normalize( n1 );
+	vec3 n020 = normalize( n2 );
+	vec3 n002 = normalize( n3 );
 	
 	vec3 n110 = normalize( n1 + n2 - v12 * (p2-p1) );
 	vec3 n011 = normalize( n2 + n3 - v23 * (p3-p2) );
 	vec3 n101 = normalize( n3 + n1 - v31 * (p1-p3) );
-
+			   
+	//Quadratic varying normals
 	teNormal = normalize( n200 * w * w + n020 * u * u + n002 * v * v +
 			   n110 * w * u + n011 * u * v + n101 * w * v );
 	
-	//teNormal = tcNormal[0] * u + tcNormal[1] * v + tcNormal[2] * w;
-
+	//Linear varying normals
+//	teNormal = tcNormal[0] * w + tcNormal[1] * u + tcNormal[2] * v;
+	
 	tePosition = vec4(xyz, 1.);	
 }
