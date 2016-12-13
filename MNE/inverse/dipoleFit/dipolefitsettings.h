@@ -136,20 +136,19 @@ public:
     void checkIntegrity();
 
 public:
-    char  *bemname     = NULL;              /**< Boundary-element model */
-    Eigen::Vector3f r0;                     /**< Sphere model origin  */
-    bool   accurate    = false;             /**< Use accurate coil definitions? */
-    char  *mriname     = NULL;              /**< Gives the MRI <-> head transform */
+    QString bemname;                    /**< Boundary-element model */
+    Eigen::Vector3f r0;                 /**< Sphere model origin  */
+    bool   accurate    = false;         /**< Use accurate coil definitions? */
+    QString mriname;                    /**< Gives the MRI <-> head transform */
 
-    char  *guessname   = NULL;               /* Initial guess grid (if not present, the values below
-                                                     * will be employed to generate the grid) */
-    char  *guess_surfname = NULL;            /* Load the inner skull surface from this BEM file */
-    float guess_rad     = 0.080f;            /* Radius of spherical guess surface */
-    float guess_mindist = 0.010f;            /* Minimum allowed distance to the surface */
-    float guess_exclude = 0.020f;            /* Exclude points closer than this to the origin */
-    float guess_grid    = 0.010f;            /* Grid spacing */
+    QString guessname;                  /**< Initial guess grid (if not present, the values below will be employed to generate the grid) */
+    QString guess_surfname;             /**< Load the inner skull surface from this BEM file */
+    float guess_rad     = 0.080f;       /**< Radius of spherical guess surface */
+    float guess_mindist = 0.010f;       /**< Minimum allowed distance to the surface */
+    float guess_exclude = 0.020f;       /**< Exclude points closer than this to the origin */
+    float guess_grid    = 0.010f;       /**< Grid spacing */
 
-    char  *noisename   = NULL;               /* Noise-covariance matrix */
+    QString noisename;                  /**< Noise-covariance matrix */
     float grad_std     = 5e-13f;             /* Standard deviations to be used if noise covariance is not specified */
     float mag_std      = 20e-15f;
     float eeg_std      = 0.2e-6f;

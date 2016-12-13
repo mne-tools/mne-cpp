@@ -12,24 +12,11 @@ using namespace INVERSELIB;
 // STATIC DEFINITIONS
 //=============================================================================================================
 
-char *mne_strdup_settings(const char *s)
-{
-    char *res;
-    if (s == NULL)
-        return NULL;
-    res = (char*) malloc(strlen(s)+1);
-    strcpy(res,s);
-    return res;
-}
-
-
 /*
  * Basics...
  */
 #define MALLOC(x,t) (t *)malloc((x)*sizeof(t))
 #define REALLOC(x,y,t) (t *)((x == NULL) ? malloc((y)*sizeof(t)) : realloc((x),(y)*sizeof(t)))
-#define FREE(x) if ((char *)(x) != NULL) free((char *)(x))
-
 
 #define X 0
 #define Y 1
@@ -115,8 +102,8 @@ void DipoleFitSettings::checkIntegrity()
         qCritical ("Output file name missing. Please use the --dip or --bdip options to do this.");
         return;
     }
-    if (!guessname) {
-        if (!bemname && guess_surfname && !mriname) {
+    if (guessname.isEmpty()) {
+        if (bemname.isEmpty() && !guess_surfname.isEmpty() && mriname.isEmpty()) {
             qCritical ("Please specify the MRI/head coordinate transformation with the --mri option");
             return;
         }
@@ -134,20 +121,20 @@ void DipoleFitSettings::checkIntegrity()
     }
     printf("\n");
 
-    if (bemname)
-        printf("BEM              : %s\n",bemname);
+    if (!bemname.isEmpty())
+        printf("BEM              : %s\n",bemname.toLatin1().data());
     else {
         printf("Sphere model     : origin at (% 7.2f % 7.2f % 7.2f) mm\n",
                1000*r0[X],1000*r0[Y],1000*r0[Z]);
     }
     printf("Using %s MEG coil definitions.\n",accurate ? "accurate" : "standard");
-    if (mriname)
-        printf("MRI transform    : %s\n",mriname);
-    if (guessname)
-        printf("Guesses          : %s\n",guessname);
+    if (!mriname.isEmpty())
+        printf("MRI transform    : %s\n",mriname.toLatin1().data());
+    if (!guessname.isEmpty())
+        printf("Guesses          : %s\n",guessname.toLatin1().data());
     else {
-        if (guess_surfname)
-            fprintf(stderr,"Guess space bounded by %s\n",guess_surfname);
+        if (!guess_surfname.isEmpty())
+            fprintf(stderr,"Guess space bounded by %s\n",guess_surfname.toLatin1().data());
         else
             fprintf(stderr,"Spherical guess space, rad = %.1f mm\n",1000*guess_rad);
         printf("Guess grid       : %6.1f mm\n",1000*guess_grid);
@@ -166,8 +153,8 @@ void DipoleFitSettings::checkIntegrity()
         printf("Bad channels     : %s\n",badname);
     if (do_baseline)
         printf("Baseline         : %10.2f ... %10.2f ms\n", 1000*bmin,1000*bmax);
-    if (noisename) {
-        printf("Noise covariance : %s\n",noisename);
+    if (!noisename.isEmpty()) {
+        printf("Noise covariance : %s\n",noisename.toLatin1().data());
         if (include_meg) {
             if (mag_reg > 0.0)
                 printf("\tNoise-covariange regularization (mag)     : %-5.2f\n",mag_reg);
@@ -304,7 +291,7 @@ bool DipoleFitSettings::check_args (int *argc,char **argv)
                 qCritical ("--guess: argument required.");
                 return false;
             }
-            guessname = strdup(argv[k+1]);
+            guessname = QString(argv[k+1]);
         }
         else if (strcmp(argv[k],"--gsurf") == 0) {
             found = 2;
@@ -372,7 +359,7 @@ bool DipoleFitSettings::check_args (int *argc,char **argv)
                 qCritical ("--bem: argument required.");
                 return false;
             }
-            bemname = strdup(argv[k+1]);
+            bemname = QString(argv[k+1]);
         }
         else if (strcmp(argv[k],"--accurate") == 0) {
             found = 1;
@@ -481,7 +468,7 @@ bool DipoleFitSettings::check_args (int *argc,char **argv)
                 qCritical ("--noise: argument required.");
                 return false;
             }
-            noisename = strdup(argv[k+1]);
+            noisename = QString(argv[k+1]);
         }
         else if (strcmp(argv[k],"--gradnoise") == 0) {
             found = 2;
