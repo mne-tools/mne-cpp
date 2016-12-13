@@ -351,7 +351,7 @@ bool DipoleFitSettings::check_args (int *argc,char **argv)
                 qCritical ("--mri: argument required.");
                 return false;
             }
-            mriname = strdup(argv[k+1]);
+            mriname = QString(argv[k+1]);
         }
         else if (strcmp(argv[k],"--bem") == 0) {
             found = 2;
@@ -438,7 +438,7 @@ bool DipoleFitSettings::check_args (int *argc,char **argv)
                 qCritical ("--raw: argument required.");
                 return false;
             }
-            measname = strdup(argv[k+1]);
+            measname = QString(argv[k+1]);
             is_raw = true;
         }
         else if (strcmp(argv[k],"--proj") == 0) {
