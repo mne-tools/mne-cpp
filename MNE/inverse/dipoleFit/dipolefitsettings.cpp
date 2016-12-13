@@ -422,7 +422,7 @@ bool DipoleFitSettings::check_args (int *argc,char **argv)
                 qCritical ("--eegmodels: argument required.");
                 return false;
             }
-            eeg_model_file = strdup(argv[k+1]);
+            eeg_model_file = QString(argv[k+1]);
         }
         else if (strcmp(argv[k],"--eegmodel") == 0) {
             found = 2;
