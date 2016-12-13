@@ -136,7 +136,7 @@ namespace Data3DTreeModelItemRoles
                     SurfaceOffset = Qt::UserRole + 105,
                     SurfaceRenderable3DEntity = Qt::UserRole + 106,
                     SurfaceCurvatureColorVert = Qt::UserRole + 107,
-                    SurfaceRTSourceLocColor = Qt::UserRole + 108,
+                    NetworkDataMatrix = Qt::UserRole + 108,
                     SurfaceAnnotationColorVert = Qt::UserRole + 109,
                     SurfaceRenderable3DEntityAcivationOverlay = Qt::UserRole + 110,
                     SurfaceSetName = Qt::UserRole + 111,
@@ -160,8 +160,7 @@ namespace Data3DTreeModelItemRoles
                     RTEndIdxRightHemi = Qt::UserRole + 129,
                     RTVertNoRightHemi = Qt::UserRole + 130,
                     SourceVertices = Qt::UserRole + 131,
-                    NetworkData = Qt::UserRole + 132,
-                    NetworkDataMatrix = Qt::UserRole + 133};
+                    NetworkData = Qt::UserRole + 132};
 }
 
 namespace MetaTreeItemRoles

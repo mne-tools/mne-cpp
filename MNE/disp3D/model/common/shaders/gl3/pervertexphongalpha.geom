@@ -21,8 +21,8 @@ vec3 CG;
 
 void ProduceVertex(int v) 
 {
-	gl_Position = projectionMatrix * vec4( CG + triangleScale * ( tePosition[v].xyz - CG ), 1. );
-	//gl_Position = projectionMatrix * tePosition[v];
+	gl_Position = modelViewProjection * vec4( CG + triangleScale * ( tePosition[v].xyz - CG ), 1. );
+	//gl_Position = modelViewProjection * tePosition[v];
 	gNormal = teNormal[v];
 	gColor = teColor[v];
 	gPosition = gl_Position.xyz;
@@ -36,5 +36,5 @@ void main()
 	ProduceVertex(0);  
 	ProduceVertex(1);
 	ProduceVertex(2);  
-	//EndPrimitive();
+	EndPrimitive();
 }

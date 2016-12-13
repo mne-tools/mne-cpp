@@ -120,7 +120,7 @@ int main(int argc, char *argv[])
     QCommandLineOption sourceLocOption("doSourceLoc", "Do real time source localization.", "doSourceLoc", "false");
     QCommandLineOption fwdOption("fwd", "Path to forwad solution <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
     QCommandLineOption invOpOption("inv", "Path to inverse operator <file>.", "file", "");
-    QCommandLineOption clustOption("doClust", "Path to clustered inverse operator <doClust>.", "doClust", "false");
+    QCommandLineOption clustOption("doClust", "Path to clustered inverse operator <doClust>.", "doClust", "true");
     QCommandLineOption covFileOption("cov", "Path to the covariance <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
     QCommandLineOption evokedFileOption("ave", "Path to the evoked/average <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
     QCommandLineOption methodOption("method", "Inverse estimation <method>, i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM");//"MNE" | "dSPM" | "sLORETA"
