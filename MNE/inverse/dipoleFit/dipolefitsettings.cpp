@@ -430,7 +430,7 @@ bool DipoleFitSettings::check_args (int *argc,char **argv)
                 qCritical ("--eegmodel: argument required.");
                 return false;
             }
-            eeg_model_name = strdup(argv[k+1]);
+            eeg_model_name = QString(argv[k+1]);
         }
         else if (strcmp(argv[k],"--eegscalp") == 0) {
             found         = 1;
@@ -442,7 +442,7 @@ bool DipoleFitSettings::check_args (int *argc,char **argv)
                 qCritical ("--meas: argument required.");
                 return false;
             }
-            measname = strdup(argv[k+1]);
+            measname = QString(argv[k+1]);
             is_raw = false;
         }
         else if (strcmp(argv[k],"--raw") == 0) {

@@ -15236,15 +15236,15 @@ void fwd_list_eeg_sphere_models(FILE *f, fwdEegSphereModelSet s)
 
 
 
-fwdEegSphereModel fwd_select_eeg_sphere_model(const char *name,fwdEegSphereModelSet s)
+fwdEegSphereModel fwd_select_eeg_sphere_model(QString name,fwdEegSphereModelSet s)
 /*
  * Find a model with a given name and return a duplicate
  */
 {
     int k;
 
-    if (name == NULL)
-        name = "Default";
+    if (name.isEmpty())
+        name = QString("Default");
 
     if (!s || s->nmodel == 0) {
         printf("No EEG sphere model definitions available");
@@ -15252,12 +15252,12 @@ fwdEegSphereModel fwd_select_eeg_sphere_model(const char *name,fwdEegSphereModel
     }
 
     for (k = 0; k < s->nmodel; k++) {
-        if (strcasecmp(s->models[k]->name,name) == 0) {
+        if (strcasecmp(s->models[k]->name,name.toLatin1().data()) == 0) {
             fprintf(stderr,"Selected model: %s\n",s->models[k]->name);
             return fwd_dup_eeg_sphere_model(s->models[k]);
         }
     }
-    printf("EEG sphere model %s not found.",name);
+    printf("EEG sphere model %s not found.",name.toLatin1().data());
     return NULL;
 }
 
@@ -16389,7 +16389,7 @@ bad :
 }
 
 fwdEegSphereModel setup_eeg_sphere_model(char  *eeg_model_file,   /* Contains the model specifications */
-                                         char  *eeg_model_name,	  /* Name of the model to use */
+                                         QString eeg_model_name,	  /* Name of the model to use */
                                          float eeg_sphere_rad)    /* Outer surface radius */
 /*
       * Set up the desired sphere model for EEG
@@ -16398,10 +16398,10 @@ fwdEegSphereModel setup_eeg_sphere_model(char  *eeg_model_file,   /* Contains th
     fwdEegSphereModelSet eeg_models = NULL;
     fwdEegSphereModel    eeg_model  = NULL;
 
-    if (!eeg_model_name)
-        eeg_model_name = mne_strdup("Default");
-    else
-        eeg_model_name = mne_strdup(eeg_model_name);
+    if (eeg_model_name.isEmpty())
+        eeg_model_name = QString("Default");
+//    else
+//        eeg_model_name = mne_strdup(eeg_model_name);
 
     eeg_models = fwd_load_eeg_sphere_models(eeg_model_file,NULL);
     fwd_list_eeg_sphere_models(stderr,eeg_models);
@@ -16414,14 +16414,14 @@ fwdEegSphereModel setup_eeg_sphere_model(char  *eeg_model_file,   /* Contains th
     printf("Using EEG sphere model \"%s\" with scalp radius %7.1f mm\n",
            eeg_model->name,1000*eeg_sphere_rad);
     printf("\n");
-    FREE(eeg_model_name);
+//    FREE(eeg_model_name);
     fwd_free_eeg_sphere_model_set(eeg_models);
     return eeg_model;
 
 bad : {
         fwd_free_eeg_sphere_model_set(eeg_models);
         fwd_free_eeg_sphere_model(eeg_model);
-        FREE(eeg_model_name);
+//        FREE(eeg_model_name);
         return NULL;
     }
 }
