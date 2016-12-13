@@ -363,7 +363,7 @@ void BrainSurfaceTreeItem::onAnnotationVisibilityChanged(bool isVisible)
 
 void BrainSurfaceTreeItem::setVisible(bool state)
 {
-    //m_pRenderable3DEntityNormals->setParent(state ? m_pParentEntity : Q_NULLPTR);
+    m_pRenderable3DEntityNormals->setParent(state ? m_pParentEntity : Q_NULLPTR);
     m_pRenderable3DEntity->setParent(state ? m_pParentEntity : Q_NULLPTR);
 }
 
