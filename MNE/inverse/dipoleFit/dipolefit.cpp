@@ -74,8 +74,13 @@ ECDSet DipoleFit::calculateFit() const
             goto out;
     }
 
-    if ((fit_data = setup_dipole_fit_data(settings->mriname,settings->measname.isEmpty() ? NULL : settings->measname.toLatin1().data(),settings->bemname,&settings->r0,eeg_model,settings->accurate,
-                                          settings->badname,settings->noisename,settings->grad_std,settings->mag_std,settings->eeg_std,
+    if ((fit_data = setup_dipole_fit_data(settings->mriname.isEmpty() ? NULL : settings->mriname.toLatin1().data(),
+                                          settings->measname.isEmpty() ? NULL : settings->measname.toLatin1().data(),
+                                          settings->bemname.isEmpty() ? NULL : settings->bemname.toLatin1().data(),
+                                          &settings->r0,eeg_model,settings->accurate,
+                                          settings->badname,
+                                          settings->noisename.isEmpty() ? NULL : settings->noisename.toLatin1().data(),
+                                          settings->grad_std,settings->mag_std,settings->eeg_std,
                                           settings->mag_reg,settings->grad_reg,settings->eeg_reg,
                                           settings->diagnoise,settings->projnames,settings->nproj,settings->include_meg,settings->include_eeg)) == NULL)
         goto out;
@@ -132,7 +137,7 @@ ECDSet DipoleFit::calculateFit() const
 
         printf("\tRead data set %d from %s : %d MEG and %d EEG \n",
                settings->setno,settings->measname.toLatin1().data(),fit_data->nmeg,fit_data->neeg);
-        if (settings->noisename) {
+        if (!settings->noisename.isEmpty()) {
             printf("\nScaling the noise covariance...\n");
             if (scale_noise_cov(fit_data,data->current->nave) == FAIL)
                 goto out;
@@ -143,7 +148,9 @@ ECDSet DipoleFit::calculateFit() const
     * Proceed to computing the fits
     */
     printf("\n---- Computing the forward solution for the guesses...\n\n");
-    if ((guess = make_guess_data(settings->guessname, settings->guess_surfname, settings->guess_mindist, settings->guess_exclude, settings->guess_grid, fit_data)) == NULL)
+    if ((guess = make_guess_data(settings->guessname.toLatin1().data() ? NULL : settings->guessname.toLatin1().data(),
+                                 settings->guess_surfname.toLatin1().data() ? NULL : settings->guess_surfname.toLatin1().data(),
+                                 settings->guess_mindist, settings->guess_exclude, settings->guess_grid, fit_data)) == NULL)
         goto out;
 
     fprintf (stderr,"\n---- Fitting : %7.1f ... %7.1f ms (step: %6.1f ms integ: %6.1f ms)\n\n",
