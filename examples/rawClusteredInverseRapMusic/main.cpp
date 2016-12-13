@@ -47,15 +47,17 @@
 
 #include <fiff/fiff_evoked.h>
 #include <fiff/fiff.h>
+
 #include <mne/mne.h>
-
 #include <mne/mne_epoch_data_list.h>
-
 #include <mne/mne_sourceestimate.h>
+
 #include <inverse/rapMusic/rapmusic.h>
 
 #include <disp3D/view3D.h>
 #include <disp3D/control/control3dwidget.h>
+#include <disp3D/model/data3Dtreemodel.h>
+#include <disp3D/model/brain/brainrtsourcelocdatatreeitem.h>
 
 #include <utils/mnemath.h>
 
@@ -111,14 +113,18 @@ int main(int argc, char *argv[])
     QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", "./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
     QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif");
     QCommandLineOption fwdOption("fwd", "Path to forwad solution <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
-    QCommandLineOption surfOption("surfType", "Surface type <type>.", "type", "orig");
-    QCommandLineOption annotOption("annotType", "Annotation type <type>.", "type", "aparc.a2009s");
     QCommandLineOption subjectOption("subject", "Selected subject <subject>.", "subject", "sample");
     QCommandLineOption subjectPathOption("subjectPath", "Selected subject path <subjectPath>.", "subjectPath", "./MNE-sample-data/subjects");
+    QCommandLineOption surfOption("surfType", "Surface type <type>.", "type", "orig");
+    QCommandLineOption annotOption("annotType", "Annotation type <type>.", "type", "aparc.a2009s");
     QCommandLineOption stcFileOption("stcOut", "Path to stc <file>, which is to be written.", "file", "");
-    QCommandLineOption numDipolePairsOption("numDip", "<number> of dipole pairs to localize.", "number", "7");
+    QCommandLineOption numDipolePairsOption("numDip", "<number> of dipole pairs to localize.", "number", "1");
     QCommandLineOption evokedIdxOption("aveIdx", "The average <index> to choose from the average file.", "index", "1");
     QCommandLineOption hemiOption("hemi", "Selected hemisphere <hemi>.", "hemi", "2");
+    QCommandLineOption doMovieOption("doMovie", "Create overlapping movie.", "doMovie", "false");
+    QCommandLineOption pickAllOption("pickAll", "Pick all channels.", "pickAll", "true");
+    QCommandLineOption keepCompOption("keepComp", "Keep compensators.", "keepComp", "false");
+    QCommandLineOption destCompsOption("destComps", "<Destination> of the compensator which is to be calculated.", "destination", "0");
 
     parser.addOption(inputOption);
     parser.addOption(eventsFileOption);
@@ -131,6 +137,10 @@ int main(int argc, char *argv[])
     parser.addOption(numDipolePairsOption);
     parser.addOption(evokedIdxOption);
     parser.addOption(hemiOption);
+    parser.addOption(doMovieOption);
+    parser.addOption(pickAllOption);
+    parser.addOption(keepCompOption);
+    parser.addOption(destCompsOption);
 
     parser.process(a);
 
@@ -149,14 +159,33 @@ int main(int argc, char *argv[])
     //Choose average
     qint32 event = parser.value(evokedIdxOption).toInt();
 
-    float tmin = -0.2f;
-    float tmax = 0.4f;
+    float tmin = -0.5f;
+    float tmax = 0.5f;
 
     bool keep_comp = false;
-    fiff_int_t dest_comp = 0;
-    bool pick_all  = true;
+    if(parser.value(keepCompOption) == "false" || parser.value(keepCompOption) == "0") {
+        keep_comp = false;
+    } else if(parser.value(keepCompOption) == "true" || parser.value(keepCompOption) == "1") {
+        keep_comp = true;
+    }
+
+    fiff_int_t dest_comp = parser.value(destCompsOption).toInt();
+
+    bool pick_all = false;
+    if(parser.value(pickAllOption) == "false" || parser.value(pickAllOption) == "0") {
+        pick_all = false;
+    } else if(parser.value(pickAllOption) == "true" || parser.value(pickAllOption) == "1") {
+        pick_all = true;
+    }
 
     qint32 k, p;
+
+    bool doMovie = false;
+    if(parser.value(doMovieOption) == "false" || parser.value(doMovieOption) == "0") {
+        doMovie = false;
+    } else if(parser.value(doMovieOption) == "true" || parser.value(doMovieOption) == "1") {
+        doMovie = true;
+    }
 
     //
     // Load data
@@ -415,6 +444,7 @@ int main(int argc, char *argv[])
     // Calculate the average
     // Option 1 - Random selection
     VectorXi vecSel(2);
+    srand (time(NULL)); // initialize random seed
 
     for(qint32 i = 0; i < vecSel.size(); ++i)
     {
@@ -422,7 +452,7 @@ int main(int argc, char *argv[])
         vecSel(i) = val;
     }
 
-//    //Option 3 - Take all epochs
+//    //Option 2 - Take all epochs
 //    VectorXi vecSel(data.size());
 
 //    for(qint32 i = 0; i < vecSel.size(); ++i)
@@ -431,10 +461,8 @@ int main(int argc, char *argv[])
 //    }
 
 //    //Option 3 - Manual selection
-//    VectorXi vecSel(20);
-
-//    vecSel << 76, 74, 13, 61, 97, 94, 75, 71, 60, 56, 26, 57, 56, 0, 52, 72, 33, 86, 96, 67;
-
+//    VectorXi vecSel(15);
+//    vecSel << 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15;
     std::cout << "Select following epochs to average:\n" << vecSel << std::endl;
 
     FiffEvoked evoked = data.average(raw.info, tmin*raw.info.sfreq, floor(tmax*raw.info.sfreq + 0.5), vecSel);
@@ -455,10 +483,27 @@ int main(int argc, char *argv[])
     //
     RapMusic t_rapMusic(t_clusteredFwd, false, numDipolePairs);
 
+    int iWinSize = 200;
+    if(doMovie) {
+        t_rapMusic.setStcAttr(iWinSize, 0.6);
+    }
+
     MNESourceEstimate sourceEstimate = t_rapMusic.calculateInverse(pickedEvoked);
 
-    if(sourceEstimate.isEmpty())
+    if(doMovie) {
+        //Select only the activations once
+        MatrixXd dataPicked(sourceEstimate.data.rows(), int(std::floor(sourceEstimate.data.cols()/iWinSize)));
+
+        for(int i = 0; i < dataPicked.cols(); ++i) {
+            dataPicked.col(i) = sourceEstimate.data.col(i*iWinSize);
+        }
+
+        sourceEstimate.data = dataPicked;
+    }
+
+    if(sourceEstimate.isEmpty()) {
         return 1;
+    }
 
 //    // View activation time-series
 //    std::cout << "\nsourceEstimate:\n" << sourceEstimate.data.block(0,0,10,10) << std::endl;
@@ -484,14 +529,29 @@ int main(int argc, char *argv[])
 //    sourceEstimate = sourceEstimate.reduce(sample, 1);
 
     View3D::SPtr testWindow = View3D::SPtr(new View3D());
-    testWindow->addSurfaceSet("Subject01", "HemiLRSet", t_surfSet, t_annotationSet);
+    Data3DTreeModel::SPtr p3DDataModel = Data3DTreeModel::SPtr(new Data3DTreeModel());
+    testWindow->setModel(p3DDataModel);
 
-    QList<BrainRTSourceLocDataTreeItem*> rtItemList = testWindow->addSourceData("Subject01", "HemiLRSet", sourceEstimate, t_clusteredFwd);
+    p3DDataModel->addSurfaceSet(parser.value(subjectOption), "HemiLRSet", t_surfSet, t_annotationSet);
+
+    //Add rt source loc data
+    QList<BrainRTSourceLocDataTreeItem*> rtItemList = p3DDataModel->addSourceData(parser.value(subjectOption), "HemiLRSet", sourceEstimate, t_clusteredFwd);
+
+    //Init some rt related values for right visual data
+    for(int i = 0; i < rtItemList.size(); ++i) {
+        rtItemList.at(i)->setLoopState(true);
+        rtItemList.at(i)->setTimeInterval(17);
+        rtItemList.at(i)->setNumberAverages(1);
+        rtItemList.at(i)->setStreamingActive(true);
+        rtItemList.at(i)->setNormalization(QVector3D(0.1, 0.5, 1.0));
+        rtItemList.at(i)->setVisualizationType("Annotation based");
+        rtItemList.at(i)->setColortable("Hot");
+    }
 
     testWindow->show();
 
     Control3DWidget::SPtr control3DWidget = Control3DWidget::SPtr(new Control3DWidget());
-    control3DWidget->setView3D(testWindow);
+    control3DWidget->init(p3DDataModel, testWindow);
     control3DWidget->show();
 
     if(!t_sFileNameStc.isEmpty())
