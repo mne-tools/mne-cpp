@@ -72,9 +72,9 @@ namespace INVERSELIB
 
 //=============================================================================================================
 /**
-* Implements DipoleForward (Replaces *dipoleForward,dipoleForwardRec struct of MNE-C fit_types.h).
+* Implements GuessData (Replaces *guessData,guessDataRec struct of MNE-C fit_types.h).
 *
-* @brief DipoleForward description
+* @brief GuessData description
 */
 class INVERSESHARED_EXPORT GuessData
 {

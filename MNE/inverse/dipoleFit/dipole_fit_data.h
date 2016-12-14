@@ -63,12 +63,18 @@
 
 #include <QSharedPointer>
 
+// ToDo move to cpp
+#define COLUMN_NORM_NONE 0	    /* No column normalization requested */
+#define COLUMN_NORM_COMP 1	    /* Componentwise normalization */
+#define COLUMN_NORM_LOC  2	    /* Dipole locationwise normalization */
+
 
 /*
  * These are the type definitions for dipole fitting
  */
 typedef void (*fitUserFreeFunc)(void *);
 
+// (Replaces *dipoleFitFuncs,dipoleFitFuncsRec struct of MNE-C fit_types.h).
 
 typedef struct {
   fwdFieldFunc    meg_field;	    /* MEG forward calculation functions */
@@ -99,7 +105,7 @@ namespace INVERSELIB
 
 //=============================================================================================================
 /**
-* Implements the dipole fit data parser
+* Implements the dipole fit data parser (Replaces *dipoleFitData,dipoleFitDataRec struct of MNE-C fit_types.h).
 *
 * @brief Dipole Fit Data implementation
 */
