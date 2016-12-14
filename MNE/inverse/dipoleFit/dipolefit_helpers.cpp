@@ -7343,6 +7343,7 @@ int mne_make_ctf_comp(mneCTFcompDataSet set,         /* The available compensati
  * Make compensation data to apply to a set of channels to yield (or uncompensated) compensated data
  */
 {
+    qDebug() << "###### [0] int mne_make_ctf_comp";
     int *comps = NULL;
     int need_comp;
     int first_comp;
@@ -7657,6 +7658,7 @@ int mne_ctf_compensate_to(mneCTFcompDataSet set,            /* The compensation 
    */
     if (mne_make_ctf_comp(set,chs,nchan,comp_chs,ncomp_chan) == FAIL)
         goto bad;
+    qDebug() << "###### [1] After int mne_make_ctf_comp";
     /*
    * Are we there already?
    */
@@ -7685,6 +7687,7 @@ int mne_ctf_compensate_to(mneCTFcompDataSet set,            /* The compensation 
                 comp_was = set->current->mne_kind;
             if (mne_make_ctf_comp(set,chs,nchan,comp_chs,ncomp_chan) == FAIL)
                 goto bad;
+            qDebug() << "###### [2] After int mne_make_ctf_comp";
             /*
        * Do the third-order gradient compensation
        */
@@ -7750,6 +7753,7 @@ int mne_ctf_set_compensation(mneCTFcompDataSet set,            /* The compensati
    */
     if (mne_make_ctf_comp(set,chs,nchan,comp_chs,ncomp_chan) == FAIL)
         goto bad;
+    qDebug() << "###### [3] After int mne_make_ctf_comp";
     /*
    * Are we there already?
    */
@@ -7772,6 +7776,7 @@ int mne_ctf_set_compensation(mneCTFcompDataSet set,            /* The compensati
             comp_was = MNE_CTFV_NOGRAD;
         if (mne_make_ctf_comp(set,chs,nchan,comp_chs,ncomp_chan) == FAIL)
             goto bad;
+        qDebug() << "###### [4] After int mne_make_ctf_comp";
         fprintf(stderr,"Compensation set up as requested (%s -> %s).\n",
                 mne_explain_ctf_comp(mne_map_ctf_comp_kind(comp_was)),
                 mne_explain_ctf_comp(set->current->kind));
@@ -13826,9 +13831,13 @@ static int fwd_make_ctf_comp_coils(mneCTFcompDataSet set,          /* The availa
         ncomp = comp_coils->ncoil;
     }
     res = mne_make_ctf_comp(set,chs,nchan,compchs,ncomp);
+    qDebug() << "###### [5] After int mne_make_ctf_comp";
 
     FREE(chs);
     FREE(compchs);
+
+
+    qDebug() << "###### [6]";
 
     return res;
 }
@@ -13861,9 +13870,15 @@ fwdCompData fwd_make_comp_data(mneCTFcompDataSet set,           /* The CTF compe
                                 coils,
                                 comp->comp_coils) != OK) {
         fwd_free_comp_data(comp);
+
+        qDebug() << "###### [7]";
+
         return NULL;
     }
     else {
+
+        qDebug() << "###### [8]";
+
         return comp;
     }
 }
@@ -16179,6 +16194,9 @@ static int setup_forward_model(DipoleFitData* d, mneCTFcompDataSet comp_data, fw
        */
             comp = fwd_make_comp_data(comp_data,d->meg_coils,comp_coils,
                                       fwd_bem_field,NULL,NULL,d->bem_model,NULL);
+
+            qDebug() << "###### [9]";
+
             if (!comp)
                 goto out;
             printf("Compensation setup done.\n");
@@ -16226,6 +16244,9 @@ static int setup_forward_model(DipoleFitData* d, mneCTFcompDataSet comp_data, fw
                                   fwd_sphere_field_vec,
                                   NULL,
                                   d->r0,NULL);
+
+        qDebug() << "###### [10]";
+
         if (!comp)
             goto out;
         f->meg_field       = fwd_comp_field;
@@ -16249,13 +16270,24 @@ static int setup_forward_model(DipoleFitData* d, mneCTFcompDataSet comp_data, fw
                                   fwd_mag_dipole_field_vec,
                                   NULL,
                                   NULL,NULL);
+
+        qDebug() << "###### [11]";
+
         if (!comp)
             goto out;
+
+
+        qDebug() << "###### [12]";
+
         f->meg_field       = fwd_comp_field;
         f->meg_vec_field   = fwd_comp_field_vec;
         f->meg_client      = comp;
         f->meg_client_free = fwd_free_comp_data;
     }
+
+
+    qDebug() << "###### [13]";
+
     f->eeg_pot     = fwd_mag_dipole_field;
     f->eeg_vec_pot = fwd_mag_dipole_field_vec;
     /*
@@ -16835,12 +16867,17 @@ DipoleFitData* setup_dipole_fit_data(char  *mriname,		 /* This gives the MRI/hea
    */
     if (setup_forward_model(res,comp_data,comp_coils) == FAIL)
         goto bad;
+
+    qDebug() << "###### [14]";
+
     res->column_norm = COLUMN_NORM_LOC;
     /*
    * Projection data should go here
    */
     if (make_projection(projnames,nproj,res->chs,res->nmeg+res->neeg,&res->proj) == FAIL)
         goto bad;
+
+    qDebug() << "###### [15]";
 
     if (res->proj && res->proj->nitems > 0) {
         fprintf(stderr,"Final projection operator is:\n");
@@ -16853,6 +16890,9 @@ DipoleFitData* setup_dipole_fit_data(char  *mriname,		 /* This gives the MRI/hea
     }
     else
         printf("No projection will be applied to the data.\n");
+
+
+    qDebug() << "###### [16]";
 
     /*
    * Noise covariance
