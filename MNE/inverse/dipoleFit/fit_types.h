@@ -21,11 +21,11 @@ typedef void (*fitUserFreeFunc)(void *);
 //  int   nch;			    /* Number of channels */
 //} *dipoleForward,dipoleForwardRec;
 
-typedef struct {
-    float          **rr;                    /**< These are the guess dipole locations */
-    INVERSELIB::DipoleForward** guess_fwd;  /**< Forward solutions for the guesses */
-    int            nguess;                  /**< How many sources */
-} *guessData,guessDataRec;
+//typedef struct {
+//    float          **rr;                    /**< These are the guess dipole locations */
+//    INVERSELIB::DipoleForward** guess_fwd;  /**< Forward solutions for the guesses */
+//    int            nguess;                  /**< How many sources */
+//} *guessData,guessDataRec;
 
 typedef struct {
   fwdFieldFunc    meg_field;	    /* MEG forward calculation functions */

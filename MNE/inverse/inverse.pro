@@ -98,6 +98,7 @@ else {
 SOURCES += \
     dipoleFit/ecd.cpp \
     dipoleFit/ecd_set.cpp \
+    dipoleFit/guess_data.cpp \
     dipoleFit/dipole_forward.cpp \
     dipoleFit/dipolefit.cpp \
     dipoleFit/dipolefitsettings.cpp \
@@ -122,6 +123,7 @@ HEADERS +=\
     dipoleFit/fiff_file.h \
     dipoleFit/fiff_explain.h \
     dipoleFit/analyze_types.h \
+    dipoleFit/guess_data.h \
     dipoleFit/dipole_forward.h \
     dipoleFit/dipolefit.h \
     dipoleFit/dipolefitsettings.h \

@@ -38,6 +38,7 @@
 
 
 #include "fwd_eeg_sphere_model_set.h"
+#include "guess_data.h"
 
 
 //*************************************************************************************************************
@@ -15981,10 +15982,10 @@ int fwd_mag_dipole_field_vec(float        *rm,	        /* The dipole location */
 //============================= dipole_fit_setup.c =============================
 
 
-guessData new_guess_data()
+GuessData* new_guess_data()
 
 {
-    guessData res = MALLOC(1,guessDataRec);
+    GuessData* res = MALLOC(1,GuessData);
 
     res->rr        = NULL;
     res->guess_fwd = NULL;
@@ -15992,7 +15993,7 @@ guessData new_guess_data()
     return res;
 }
 
-void free_guess_data(guessData g)
+void free_guess_data(GuessData* g)
 
 {
     int k;
@@ -16962,7 +16963,7 @@ bad : {
 
 
 
-int compute_guess_fields(guessData guess,
+int compute_guess_fields(GuessData* guess,
                          dipoleFitData f)
 /*
       * Once the guess locations have been set up we can compute the fields
@@ -17004,7 +17005,7 @@ bad : {
     }
 }
 
-guessData make_guess_data(char          *guessname,
+GuessData* make_guess_data(char          *guessname,
                           char          *guess_surfname,
                           float         mindist,
                           float         exclude,
@@ -17015,7 +17016,7 @@ guessData make_guess_data(char          *guessname,
 {
     mneSourceSpace *sp = NULL;
     int            nsp = 0;
-    guessData      res = NULL;
+    GuessData*      res = NULL;
     int            k,p;
     float          guessrad = 0.080;
     mneSourceSpace guesses = NULL;
@@ -17111,7 +17112,7 @@ bad : {
 
 //============================= setup.c =============================
 
-guessData make_guess_data(char          *guessname,
+GuessData* make_guess_data(char          *guessname,
                           char          *guess_surfname,
                           float         mindist,
                           float         exclude,
@@ -17121,7 +17122,7 @@ guessData make_guess_data(char          *guessname,
 {
     mneSourceSpace *sp = NULL;
     int            nsp = 0;
-    guessData      res = new_guess_data();
+    GuessData*      res = new_guess_data();
     int            k,p;
     float          guessrad = 0.080;
     mneSourceSpace guesses = NULL;
@@ -20263,7 +20264,7 @@ typedef struct {
    */
     FwdEegSphereModel* eeg_model;	/* The actual model based on the above settings */
     dipoleFitData     fitdata;	/* The actual setup data */
-    guessData         guessdata;	/* The initial guess data */
+    GuessData*         guessdata;	/* The initial guess data */
     /*
    * Additional data
    */
@@ -20283,7 +20284,7 @@ dipoleFitData get_dipole_fit_data(mshMegEegData d)
         return ((dipoleFitSetup)(d->dipole_fit_setup))->fitdata;
 }
 
-guessData get_dipole_fit_guess_data(mshMegEegData d)
+GuessData* get_dipole_fit_guess_data(mshMegEegData d)
 /*
  * Pick up the guess data from the opaque structure
  */
@@ -20308,7 +20309,7 @@ typedef struct {
 
 static int find_best_guess(float     *B,         /* The whitened data */
                            int       nch,
-                           guessData guess,	 /* Guesses */
+                           GuessData* guess,	 /* Guesses */
                            float     limit,	 /* Pseudoradial component omission limit */
                            int       *bestp,	 /* Which is the best */
                            float     *goodp)	 /* Best goodness of fit */
@@ -20480,7 +20481,7 @@ static float rtol(float *vals,int nval)
 
 
 static bool fit_one(dipoleFitData fit,	            /* Precomputed fitting data */
-                    guessData     guess,	            /* The initial guesses */
+                    GuessData*     guess,	            /* The initial guesses */
                     float         time,              /* Which time is it? */
                     float         *B,	            /* The field to fit */
                     int           verbose,
@@ -20617,7 +20618,7 @@ int fit_dipoles_raw(char           *dataname,
                     mneRawData     raw,          /* The raw data description */
                     mneChSelection sel,	         /* Channel selection to use */
                     dipoleFitData  fit,	         /* Precomputed fitting data */
-                    guessData      guess,        /* The initial guesses */
+                    GuessData*      guess,        /* The initial guesses */
                     float          tmin,         /* Time range */
                     float          tmax,
                     float          tstep,        /* Time step to use */
@@ -20707,7 +20708,7 @@ int fit_dipoles_raw(char           *dataname,
                     mneRawData     raw,          /* The raw data description */
                     mneChSelection sel,	         /* Channel selection to use */
                     dipoleFitData  fit,	         /* Precomputed fitting data */
-                    guessData      guess,        /* The initial guesses */
+                    GuessData*      guess,        /* The initial guesses */
                     float          tmin,         /* Time range */
                     float          tmax,
                     float          tstep,        /* Time step to use */
@@ -20769,7 +20770,7 @@ out : {
 int    fit_dipoles(char          *dataname,
                    mneMeasData   data,       /* The measured data */
                    dipoleFitData fit,	     /* Precomputed fitting data */
-                   guessData     guess,	     /* The initial guesses */
+                   GuessData*     guess,	     /* The initial guesses */
                    float         tmin,	     /* Time range */
                    float         tmax,
                    float         tstep,	     /* Time step to use */
