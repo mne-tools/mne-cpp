@@ -105,6 +105,8 @@ SOURCES += \
     dipoleFit/fwd_eeg_sphere_layer.cpp \
     dipoleFit/fwd_eeg_sphere_model.cpp \
     dipoleFit/fwd_eeg_sphere_model_set.cpp \
+    dipoleFit/fwd_coil.cpp \
+    dipoleFit/fwd_coil_set.cpp \
     minimumNorm/minimumnorm.cpp \
     rapMusic/rapmusic.cpp \
     rapMusic/pwlrapmusic.cpp \
@@ -129,6 +131,8 @@ HEADERS +=\
     dipoleFit/fwd_eeg_sphere_layer.h \
     dipoleFit/fwd_eeg_sphere_model.h \
     dipoleFit/fwd_eeg_sphere_model_set.h \
+    dipoleFit/fwd_coil.h \
+    dipoleFit/fwd_coil_set.h \
     minimumNorm/minimumnorm.h \
     rapMusic/rapmusic.h \
     rapMusic/pwlrapmusic.h \

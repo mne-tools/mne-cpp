@@ -188,14 +188,14 @@ public:
     QString dataname;   /**< The associated data file */
 
 private:
-    QList<ECD> m_qListDips;    /**< List of Electric Current Dipoles. */
+    QList<ECD> m_qListDips;     /**< List of Electric Current Dipoles. */
 
 // ### OLD STRUCT ###
 //    typedef struct {
-//      char *dataname;		/* The associated data file */
-//      int  ndip;			/* How many dipoles */
-//      ecd  *dips;			/* The dipoles themselves */
-//    } *ecdSet,ecdSetRec;		/* A set of ECDs */
+//      char *dataname;     /* The associated data file */
+//      int  ndip;          /* How many dipoles */
+//      ecd  *dips;         /* The dipoles themselves */
+//    } *ecdSet,ecdSetRec;  /* A set of ECDs */
 };
 
 

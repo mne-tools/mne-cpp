@@ -56,6 +56,9 @@
        
 #define NOISE_NORMALIZED(e) ((e) == ESTIMATE_dSPM || (e) == ESTIMATE_sLORETA)
 
+
+#include "fwd_coil_set.h"
+
 typedef struct {
   float  megmin,megmax;				     /* MEG gradiometer vertical scale [T/m] */
   float  megaxmult;				     /* Multiplier for the magnetometer scaling [m] */
@@ -191,7 +194,7 @@ typedef struct {		                     /* This is used for field mapping with he
   float        **smooth_weights;                     /* The smoothing weights */
   int          nch;			             /* How many channels */
   int          *pick;		                     /* Which channels are of this modality in the original data */
-  fwdCoilSet   coils;		                     /* Coils */
+  FwdCoilSet*   coils;		                     /* Coils */
   float        origin[3];		             /* Origin */
   float        miss;		                     /* Amount of unexplained variance */
   float        **self_dots;	                     /* Dot products between the original leads */
@@ -286,13 +289,13 @@ typedef struct {
   mneMeasData   meas;		                     /* The measurement */
   float         raw_tmin,raw_tmax;		     /* Time range for raw data segments */
   int           sample;				     /* Which channel is the sample */
-  int           firstp;		                     /* First data point in the current time range selection */ 
+  int           firstp;		                     /* First data point in the current time range selection */
   int           np;		                     /* Number of data points in the current time range selection */
   float         tmin,tmax;	                     /* Corresponding time values (precalculated for convenience) */
   float         picked_time;	                     /* Current time point */
   int           have_picked;			     /* Have we picked a time */
-  double        abs_picked_time;                     /* Absolute time picked from the start of the raw data 
-						      * (good to use double because of the possibly long time span) */
+  double        abs_picked_time;                     /* Absolute time picked from the start of the raw data
+                              * (good to use double because of the possibly long time span) */
   int           *bads;		                     /* Which channels are bad */
   int           *sels;		                     /* Which channels have been selected for dipole fitting? */
   char          *selname;	                     /* Name of the current channel selection (if any) */

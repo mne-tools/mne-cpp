@@ -57,7 +57,7 @@ DipoleFit::DipoleFit(DipoleFitSettings* p_settings)
 
 
 //*************************************************************************************************************
-
+//todo split in initFit where the settings are handed over and the actual fit
 ECDSet DipoleFit::calculateFit() const
 {
     GuessData*          guess    = NULL;

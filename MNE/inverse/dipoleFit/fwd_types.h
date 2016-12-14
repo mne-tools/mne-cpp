@@ -8,62 +8,64 @@
 #include "fiff_types.h"
 #include "mne_types.h"
 
+#include "fwd_coil_set.h"
+
 
 #if defined(__cplusplus) 
 extern "C" {
 #endif
 
-#define FWD_COIL_UNKNOWN      0
+//#define FWD_COIL_UNKNOWN      0
 
-#define FWD_COILC_UNKNOWN     0
-#define FWD_COILC_EEG         1000
-#define FWD_COILC_MAG         1
-#define FWD_COILC_AXIAL_GRAD  2
-#define FWD_COILC_PLANAR_GRAD 3
-#define FWD_COILC_AXIAL_GRAD2 4
+//#define FWD_COILC_UNKNOWN     0
+//#define FWD_COILC_EEG         1000
+//#define FWD_COILC_MAG         1
+//#define FWD_COILC_AXIAL_GRAD  2
+//#define FWD_COILC_PLANAR_GRAD 3
+//#define FWD_COILC_AXIAL_GRAD2 4
 
-#define FWD_COIL_ACCURACY_POINT    0
-#define FWD_COIL_ACCURACY_NORMAL   1
-#define FWD_COIL_ACCURACY_ACCURATE 2
+//#define FWD_COIL_ACCURACY_POINT    0
+//#define FWD_COIL_ACCURACY_NORMAL   1
+//#define FWD_COIL_ACCURACY_ACCURATE 2
 
-#define FWD_IS_MEG_COIL(x) ((x) != FWD_COILC_EEG && (x) != FWD_COILC_UNKNOWN)
+//#define FWD_IS_MEG_COIL(x) ((x) != FWD_COILC_EEG && (x) != FWD_COILC_UNKNOWN)
 
 typedef void (*fwdUserFreeFunc)(void *);  /* General purpose */
 
-typedef struct {
-  char         *chname;		/* Name of this channel */
-  int          coord_frame;	/* Which coordinate frame are we in? */
-  char         *desc;	        /* Description for this type of a coil */
-  int          coil_class;	/* Coil class */
-  int          type;		/* Coil type */
-  int          accuracy;	/* Accuracy */
-  float        size;		/* Coil size */
-  float        base;		/* Baseline */
-  float        r0[3];		/* Coil coordinate system origin */
-  float        ex[3];		/* Coil coordinate system unit vectors */
-  float        ey[3];		/* This stupid construction needs to be replaced with */
-  float        ez[3];		/* a coordinate transformation */
-  int          np;		/* Number of integration points */
-  float        **rmag;		/* The field point locations */
-  float        **cosmag;	/* The corresponding direction cosines */
-  float        *w;		/* The weighting coefficients */
-} *fwdCoil,fwdCoilRec;
+//typedef struct {
+//  char         *chname;		/* Name of this channel */
+//  int          coord_frame;	/* Which coordinate frame are we in? */
+//  char         *desc;	        /* Description for this type of a coil */
+//  int          coil_class;	/* Coil class */
+//  int          type;		/* Coil type */
+//  int          accuracy;	/* Accuracy */
+//  float        size;		/* Coil size */
+//  float        base;		/* Baseline */
+//  float        r0[3];		/* Coil coordinate system origin */
+//  float        ex[3];		/* Coil coordinate system unit vectors */
+//  float        ey[3];		/* This stupid construction needs to be replaced with */
+//  float        ez[3];		/* a coordinate transformation */
+//  int          np;		/* Number of integration points */
+//  float        **rmag;		/* The field point locations */
+//  float        **cosmag;	/* The corresponding direction cosines */
+//  float        *w;		/* The weighting coefficients */
+//} *fwdCoil,fwdCoilRec;
 
 
-typedef struct {
-  fwdCoil *coils;		/* The coil or electrode positions */
-  int     ncoil;
-  int     coord_frame;		/* Common coordinate frame */
-  void    *user_data;		/* We can put whatever in here */
-  fwdUserFreeFunc user_data_free;
-} *fwdCoilSet,fwdCoilSetRec;	/* A collection of the above */
+//typedef struct {
+//  fwdCoil *coils;		/* The coil or electrode positions */
+//  int     ncoil;
+//  int     coord_frame;		/* Common coordinate frame */
+//  void    *user_data;		/* We can put whatever in here */
+//  fwdUserFreeFunc user_data_free;
+//} *fwdCoilSet,fwdCoilSetRec;	/* A collection of the above */
 
 /*
  * This is a convenient generic field / potential computation function
  */
-typedef int (*fwdFieldFunc)(float *rd,float *Q,fwdCoilSet coils,float *res,void *client);
-typedef int (*fwdVecFieldFunc)(float *rd,fwdCoilSet coils,float **res,void *client);
-typedef int (*fwdFieldGradFunc)(float *rd,float *Q,fwdCoilSet coils, float *res, 
+typedef int (*fwdFieldFunc)(float *rd,float *Q,INVERSELIB::FwdCoilSet* coils,float *res,void *client);
+typedef int (*fwdVecFieldFunc)(float *rd,INVERSELIB::FwdCoilSet* coils,float **res,void *client);
+typedef int (*fwdFieldGradFunc)(float *rd,float *Q,INVERSELIB::FwdCoilSet* coils, float *res,
 				float *xgrad, float *ygrad, float *zgrad, void *client);
 
 
@@ -151,7 +153,7 @@ typedef struct {
 
 typedef struct {
   mneCTFcompDataSet set;	         /* The compensation data set */
-  fwdCoilSet        comp_coils;	         /* The compensation coil definitions */
+  INVERSELIB::FwdCoilSet*        comp_coils;	         /* The compensation coil definitions */
   fwdFieldFunc      field;	         /* Computes the field of given direction dipole */
   fwdVecFieldFunc   vec_field;	         /* Computes the fields of all three dipole components  */
   fwdFieldGradFunc  field_grad;	         /* Computes the field and gradient of one dipole direction */

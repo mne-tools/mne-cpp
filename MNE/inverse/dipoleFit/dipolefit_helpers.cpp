@@ -2970,10 +2970,10 @@ fiffCoordTrans mne_read_meas_transform(const QString& name)
 /*
  * This is the old interface which should be eventually deleted
  */
-static fwdCoil    fwd_new_coil(int np)
+static FwdCoil*    fwd_new_coil(int np)
 
 {
-    fwdCoil res = MALLOC(1,fwdCoilRec);
+    FwdCoil* res = MALLOC(1,FwdCoil);
     int     k;
 
     res->chname     = NULL;
@@ -3002,7 +3002,7 @@ static fwdCoil    fwd_new_coil(int np)
     return res;
 }
 
-static void fwd_free_coil(fwdCoil coil)
+static void fwd_free_coil(FwdCoil* coil)
 
 {
     if (!coil)
@@ -3017,10 +3017,10 @@ static void fwd_free_coil(fwdCoil coil)
 }
 
 
-fwdCoilSet fwd_new_coil_set()
+FwdCoilSet* fwd_new_coil_set()
 
 {
-    fwdCoilSet s = MALLOC(1,fwdCoilSetRec);
+    FwdCoilSet* s = MALLOC(1,FwdCoilSet);
 
     s->coils = NULL;
     s->ncoil = 0;
@@ -3030,7 +3030,7 @@ fwdCoilSet fwd_new_coil_set()
     return s;
 }
 
-void fwd_free_coil_set_user_data(fwdCoilSet set)
+void fwd_free_coil_set_user_data(FwdCoilSet* set)
 
 {
     if (!set)
@@ -3041,7 +3041,7 @@ void fwd_free_coil_set_user_data(fwdCoilSet set)
     return;
 }
 
-void fwd_free_coil_set(fwdCoilSet set)
+void fwd_free_coil_set(FwdCoilSet* set)
 
 {
     int k;
@@ -3059,7 +3059,7 @@ void fwd_free_coil_set(fwdCoilSet set)
     return;
 }
 
-int fwd_is_axial_coil(fwdCoil coil)
+int fwd_is_axial_coil(FwdCoil* coil)
 
 {
     return (coil->coil_class == FWD_COILC_MAG ||
@@ -3067,26 +3067,26 @@ int fwd_is_axial_coil(fwdCoil coil)
             coil->coil_class == FWD_COILC_AXIAL_GRAD2);
 }
 
-int fwd_is_magnetometer_coil(fwdCoil coil)
+int fwd_is_magnetometer_coil(FwdCoil* coil)
 
 {
     return coil->coil_class == FWD_COILC_MAG;
 }
 
-int fwd_is_planar_coil(fwdCoil coil)
+int fwd_is_planar_coil(FwdCoil* coil)
 
 {
     return coil->coil_class == FWD_COILC_PLANAR_GRAD;
 }
 
-int fwd_is_eeg_electrode(fwdCoil coil)
+int fwd_is_eeg_electrode(FwdCoil* coil)
 
 {
     return coil->coil_class == FWD_COILC_EEG;
 }
 
 int fwd_is_planar_coil_type(int type,            /* This is the coil type we are interested in */
-                            fwdCoilSet set)	 /* Set of templates */
+                            FwdCoilSet* set)	 /* Set of templates */
 
 {
     int k;
@@ -3103,7 +3103,7 @@ int fwd_is_planar_coil_type(int type,            /* This is the coil type we are
 
 
 int fwd_is_axial_coil_type(int type,             /* This is the coil type we are interested in */
-                           fwdCoilSet set)	 /* Set of templates */
+                           FwdCoilSet* set)	 /* Set of templates */
 
 {
     int k;
@@ -3121,7 +3121,7 @@ int fwd_is_axial_coil_type(int type,             /* This is the coil type we are
 }
 
 int fwd_is_magnetometer_coil_type(int type,             /* This is the coil type we are interested in */
-                                  fwdCoilSet set)	/* Set of templates */
+                                  FwdCoilSet* set)	/* Set of templates */
 
 {
     int k;
@@ -3137,7 +3137,7 @@ int fwd_is_magnetometer_coil_type(int type,             /* This is the coil type
 }
 
 int fwd_is_eeg_electrode_type(int type,		 /*  */
-                              fwdCoilSet set)	 /* Templates are included for symmetry */
+                              FwdCoilSet* set)	 /* Templates are included for symmetry */
 
 {
     return type == FIFFV_COIL_EEG;
@@ -3158,11 +3158,11 @@ static void normalize(float *rr)
     return;
 }
 
-static fwdCoil fwd_add_coil_to_set(fwdCoilSet set,
+static FwdCoil* fwd_add_coil_to_set(FwdCoilSet* set,
                                    int type, int coil_class, int acc, int np, float size, float base, char *desc)
 
 {
-    fwdCoil def;
+    FwdCoil* def;
 
     if (set == NULL) {
         qWarning ("No coil definition set to augment.");
@@ -3186,7 +3186,7 @@ static fwdCoil fwd_add_coil_to_set(fwdCoilSet set,
         return NULL;
     }
 
-    set->coils = REALLOC(set->coils,set->ncoil+1,fwdCoil);
+    set->coils = REALLOC(set->coils,set->ncoil+1,FwdCoil*);
     def = set->coils[set->ncoil++] = fwd_new_coil(np);
 
     def->type       = type;
@@ -3313,7 +3313,7 @@ static int get_fval(FILE *in, float *fval)
 
 
 
-fwdCoilSet fwd_read_coil_defs(const char *name)
+FwdCoilSet* fwd_read_coil_defs(const char *name)
 /*
       * Read a coil definition file
       */
@@ -3323,8 +3323,8 @@ fwdCoilSet fwd_read_coil_defs(const char *name)
     int     type,coil_class,acc,np;
     int     p;
     float   size,base;
-    fwdCoilSet res = NULL;
-    fwdCoil def;
+    FwdCoilSet* res = NULL;
+    FwdCoil* def;
 
     if (in == NULL) {
         qWarning(name);
@@ -3401,7 +3401,7 @@ bad : {
 
 
 
-fwdCoil fwd_create_meg_coil(fwdCoilSet     set,      /* These are the available coil definitions */
+FwdCoil* fwd_create_meg_coil(FwdCoilSet*     set,      /* These are the available coil definitions */
                             fiffChInfo     ch,       /* Channel information to use */
                             int            acc,	     /* Required accuracy */
                             fiffCoordTrans t)	     /* Transform the points using this */
@@ -3411,8 +3411,8 @@ fwdCoil fwd_create_meg_coil(fwdCoilSet     set,      /* These are the available 
       */
 {
     int        k,p,c;
-    fwdCoil    def;
-    fwdCoil    res = NULL;
+    FwdCoil*    def;
+    FwdCoil*    res = NULL;
 
     if (ch->kind != FIFFV_MEG_CH && ch->kind != FIFFV_REF_MEG_CH) {
         printf("%s is not a MEG channel. Cannot create a coil definition.",ch->ch_name);
@@ -3479,21 +3479,21 @@ bad : {
 
 
 
-fwdCoilSet fwd_create_meg_coils(fwdCoilSet      set,      /* These are the available coil definitions */
+FwdCoilSet* fwd_create_meg_coils(FwdCoilSet*      set,      /* These are the available coil definitions */
                                 fiffChInfo      chs,      /* Channel information to use */
                                 int             nch,
                                 int             acc,	  /* Required accuracy */
                                 fiffCoordTrans t)	  /* Transform the points using this */
 
 {
-    fwdCoilSet res = fwd_new_coil_set();
-    fwdCoil    next;
+    FwdCoilSet* res = fwd_new_coil_set();
+    FwdCoil*    next;
     int        k;
 
     for (k = 0; k < nch; k++) {
         if ((next = fwd_create_meg_coil(set,chs+k,acc,t)) == NULL)
             goto bad;
-        res->coils = REALLOC(res->coils,res->ncoil+1,fwdCoil);
+        res->coils = REALLOC(res->coils,res->ncoil+1,FwdCoil*);
         res->coils[res->ncoil++] = next;
     }
     if (t)
@@ -3508,13 +3508,13 @@ bad : {
 
 
 
-fwdCoil fwd_create_eeg_el(fiffChInfo     ch,         /* Channel information to use */
+FwdCoil* fwd_create_eeg_el(fiffChInfo     ch,         /* Channel information to use */
                           fiffCoordTrans t)	     /* Transform the points using this */
 /*
       * Create an electrode definition. Transform coordinate frame if so desired.
       */
 {
-    fwdCoil    res = NULL;
+    FwdCoil*    res = NULL;
     int        c;
 
     if (ch->kind != FIFFV_EEG_CH) {
@@ -3572,19 +3572,19 @@ bad : {
 }
 
 
-fwdCoilSet fwd_create_eeg_els(fiffChInfo      chs,      /* Channel information to use */
+FwdCoilSet* fwd_create_eeg_els(fiffChInfo      chs,      /* Channel information to use */
                               int             nch,
                               fiffCoordTrans t)	 /* Transform the points using this */
 
 {
-    fwdCoilSet res = fwd_new_coil_set();
-    fwdCoil    next;
+    FwdCoilSet* res = fwd_new_coil_set();
+    FwdCoil*    next;
     int        k;
 
     for (k = 0; k < nch; k++) {
         if ((next = fwd_create_eeg_el(chs+k,t)) == NULL)
             goto bad;
-        res->coils = REALLOC(res->coils,res->ncoil+1,fwdCoil);
+        res->coils = REALLOC(res->coils,res->ncoil+1,FwdCoil*);
         res->coils[res->ncoil++] = next;
     }
     if (t)
@@ -3599,12 +3599,12 @@ bad : {
 
 
 
-fwdCoil fwd_dup_coil(fwdCoil c)
+FwdCoil* fwd_dup_coil(FwdCoil* c)
 /*
  * Make a carbon copy
  */
 {
-    fwdCoil res;
+    FwdCoil* res;
     int p;
     /*
    * Create the result
@@ -3638,14 +3638,14 @@ fwdCoil fwd_dup_coil(fwdCoil c)
 
 
 
-fwdCoilSet fwd_dup_coil_set(fwdCoilSet s,
+FwdCoilSet* fwd_dup_coil_set(FwdCoilSet* s,
                             fiffCoordTrans t)
 /*
  * Make a duplicate
  */
 {
-    fwdCoilSet res;
-    fwdCoil    coil;
+    FwdCoilSet* res;
+    FwdCoil*    coil;
     int k,p;
 
     if (!s) {
@@ -3664,7 +3664,7 @@ fwdCoilSet fwd_dup_coil_set(fwdCoilSet s,
     else
         res->coord_frame = s->coord_frame;
 
-    res->coils = MALLOC(s->ncoil,fwdCoil);
+    res->coils = MALLOC(s->ncoil,FwdCoil*);
     res->ncoil = s->ncoil;
 
     for (k = 0; k < s->ncoil; k++) {
@@ -12678,12 +12678,12 @@ float fwd_bem_inf_pot (float *rd,	/* Dipole position */
 
 
 int fwd_bem_specify_els(fwdBemModel m,
-                        fwdCoilSet  els)
+                        FwdCoilSet*  els)
 /*
  * Set up for computing the solution at a set of electrodes
  */
 {
-    fwdCoil     el;
+    FwdCoil*     el;
     mneSurface  scalp;
     int         k,p,q,v;
     float       *one_sol,*pick_sol;
@@ -12695,7 +12695,7 @@ int fwd_bem_specify_els(fwdBemModel m,
 
     extern fwdBemSolution fwd_bem_new_coil_solution();
     extern void fwd_bem_free_coil_solution(void *user);
-    extern void fwd_free_coil_set_user_data(fwdCoilSet set);
+    extern void fwd_free_coil_set_user_data(FwdCoilSet* set);
 
     if (!m) {
         printf("Model missing in fwd_bem_specify_els");
@@ -12782,7 +12782,7 @@ bad : {
 static void fwd_bem_lin_pot_calc (float       *rd,		/* Dipole position */
                                   float       *Q,		/* Dipole orientation */
                                   fwdBemModel m,		/* The model */
-                                  fwdCoilSet  els,              /* Use this electrode set if available */
+                                  FwdCoilSet*  els,              /* Use this electrode set if available */
                                   int         all_surfs,	/* Compute on all surfaces? */
                                   float      *pot)              /* Put the result here */
 /*
@@ -12834,7 +12834,7 @@ static void fwd_bem_lin_pot_calc (float       *rd,		/* Dipole position */
 static void fwd_bem_pot_calc (float       *rd,	     /* Dipole position */
                               float       *Q,        /* Dipole orientation */
                               fwdBemModel m,	     /* The model */
-                              fwdCoilSet  els,       /* Use this electrode set if available */
+                              FwdCoilSet*  els,       /* Use this electrode set if available */
                               int         all_surfs, /* Compute solution on all surfaces? */
                               float       *pot)
 /*
@@ -12883,7 +12883,7 @@ static void fwd_bem_pot_calc (float       *rd,	     /* Dipole position */
 
 int fwd_bem_pot_els (float       *rd,	  /* Dipole position */
                      float       *Q,	  /* Dipole orientation */
-                     fwdCoilSet  els,     /* Electrode descriptors */
+                     FwdCoilSet*  els,     /* Electrode descriptors */
                      float       *pot,    /* Result */
                      void        *client) /* The model */
 /*
@@ -13144,15 +13144,15 @@ static double one_field_coeff (float       *dest,	/* The destination field point
 
 
 float **fwd_bem_field_coeff(fwdBemModel m,	/* The model */
-                            fwdCoilSet  coils)	/* Gradiometer coil positions */
+                            FwdCoilSet*  coils)	/* Gradiometer coil positions */
 /*
  * Compute the weighting factors to obtain the magnetic field
  */
 {
     mneSurface     surf;
     mneTriangle    tri;
-    fwdCoil        coil;
-    fwdCoilSet     tcoils = NULL;
+    FwdCoil*        coil;
+    FwdCoilSet*     tcoils = NULL;
     int            ntri;
     float          **coeff = NULL;
     int            j,k,p,s,off;
@@ -13378,7 +13378,7 @@ void fwd_bem_one_lin_field_coeff_simple (float       *dest,    /* The destinatio
 typedef void (* linFieldIntFunc)(float *dest,float *dir,mneTriangle tri, double *res);
 
 float **fwd_bem_lin_field_coeff (fwdBemModel m,	        /* The model */
-                                 fwdCoilSet  coils,	/* Coil information */
+                                 FwdCoilSet*  coils,	/* Coil information */
                                  int         method)	/* Which integration formula to use */
 /*
       * Compute the weighting factors to obtain the magnetic field
@@ -13387,8 +13387,8 @@ float **fwd_bem_lin_field_coeff (fwdBemModel m,	        /* The model */
 {
     mneSurface  surf;
     mneTriangle tri;
-    fwdCoil     coil;
-    fwdCoilSet  tcoils = NULL;
+    FwdCoil*     coil;
+    FwdCoilSet*  tcoils = NULL;
     int         ntri;
     float       **coeff  = NULL;
     int         j,k,p,pp,off,s;
@@ -13477,7 +13477,7 @@ float **fwd_bem_lin_field_coeff (fwdBemModel m,	        /* The model */
 
 
 int fwd_bem_specify_coils(fwdBemModel m,
-                          fwdCoilSet  coils)
+                          FwdCoilSet*  coils)
 /*
  * Set up for computing the solution at a set of coils
   */
@@ -13531,7 +13531,7 @@ bad : {
 
 static void fwd_bem_lin_field_calc(float       *rd,
                                    float       *Q,
-                                   fwdCoilSet  coils,
+                                   FwdCoilSet*  coils,
                                    fwdBemModel m,
                                    float       *B)
 /*
@@ -13540,7 +13540,7 @@ static void fwd_bem_lin_field_calc(float       *rd,
 {
     float *v0;
     int   s,k,p,np;
-    fwdCoil coil;
+    FwdCoil* coil;
     float  mult;
     float  **rr;
     float  my_rd[3],my_Q[3];
@@ -13596,7 +13596,7 @@ static void fwd_bem_lin_field_calc(float       *rd,
 
 static void fwd_bem_field_calc(float       *rd,
                                float       *Q,
-                               fwdCoilSet  coils,
+                               FwdCoilSet*  coils,
                                fwdBemModel m,
                                float       *B)
 /*
@@ -13605,7 +13605,7 @@ static void fwd_bem_field_calc(float       *rd,
 {
     float *v0;
     int   s,k,p,ntri;
-    fwdCoil coil;
+    FwdCoil* coil;
     mneTriangle tri;
     float   mult;
     float  my_rd[3],my_Q[3];
@@ -13663,7 +13663,7 @@ static void fwd_bem_field_calc(float       *rd,
 
 int fwd_bem_field(float       *rd,	/* Dipole position */
                   float       *Q,	/* Dipole orientation */
-                  fwdCoilSet  coils,    /* Coil descriptors */
+                  FwdCoilSet*  coils,    /* Coil descriptors */
                   float       *B,       /* Result */
                   void        *client)  /* The model */
 /*
@@ -13700,7 +13700,7 @@ int fwd_bem_field(float       *rd,	/* Dipole position */
 
 
 
-int fwd_comp_field(float *rd,float *Q, fwdCoilSet coils, float *res, void *client)
+int fwd_comp_field(float *rd,float *Q, FwdCoilSet* coils, float *res, void *client)
 /*
       * Calculate the compensated field (one dipole component)
       */
@@ -13786,8 +13786,8 @@ fwdCompData fwd_new_comp_data()
 
 
 static int fwd_make_ctf_comp_coils(mneCTFcompDataSet set,          /* The available compensation data */
-                                   fwdCoilSet        coils,        /* The main coil set */
-                                   fwdCoilSet        comp_coils)   /* The compensation coil set */
+                                   FwdCoilSet*        coils,        /* The main coil set */
+                                   FwdCoilSet*        comp_coils)   /* The compensation coil set */
 /*
       * Call mne_make_ctf_comp using the information in the coil sets
       */
@@ -13796,7 +13796,7 @@ static int fwd_make_ctf_comp_coils(mneCTFcompDataSet set,          /* The availa
     fiffChInfo compchs = NULL;
     int        nchan   = 0;
     int        ncomp   = 0;
-    fwdCoil coil;
+    FwdCoil* coil;
     int k,res;
 
     if (!coils || coils->ncoil <= 0) {
@@ -13836,8 +13836,8 @@ static int fwd_make_ctf_comp_coils(mneCTFcompDataSet set,          /* The availa
 
 
 fwdCompData fwd_make_comp_data(mneCTFcompDataSet set,           /* The CTF compensation data read from the file */
-                               fwdCoilSet        coils,         /* The principal set of coils */
-                               fwdCoilSet        comp_coils,    /* The compensation coils */
+                               FwdCoilSet*        coils,         /* The principal set of coils */
+                               FwdCoilSet*        comp_coils,    /* The compensation coils */
                                fwdFieldFunc      field,	        /* The field computation functions */
                                fwdVecFieldFunc   vec_field,
                                fwdFieldGradFunc  field_grad,    /* The field and gradient computation function */
@@ -13870,7 +13870,7 @@ fwdCompData fwd_make_comp_data(mneCTFcompDataSet set,           /* The CTF compe
 
 
 
-int fwd_comp_field_vec(float *rd, fwdCoilSet coils, float **res, void *client)
+int fwd_comp_field_vec(float *rd, FwdCoilSet* coils, float **res, void *client)
 /*
       * Calculate the compensated field (all dipole components)
       */
@@ -13911,469 +13911,6 @@ int fwd_comp_field_vec(float *rd, fwdCoilSet coils, float **res, void *client)
     }
     return OK;
 }
-
-
-
-
-//============================= fwd_multi_spherepot.c =============================
-
-
-
-
-double fwd_eeg_get_multi_sphere_model_coeff(FwdEegSphereModel* m, int n)
-/*
-      * Get the model depended weighting factor for n
-      */
-{
-    double **M,**Mn,**help,**Mm;
-    static double **mat1 = NULL;
-    static double **mat2 = NULL;
-    static double **mat3 = NULL;
-    static double *c1 = NULL;
-    static double *c2 = NULL;
-    static double *cr = NULL;
-    static double *cr_mult = NULL;
-    double div,div_mult;
-    double n1;
-#ifdef TEST
-    double rel1,rel2;
-    double b,c;
-#endif
-    int    k;
-
-    if (m->nlayer == 0 || m->nlayer == 1)
-        return 1.0;
-    /*
-   * Now follows the tricky case
-   */
-#ifdef TEST
-    if (m->nlayer == 2) {
-        rel1 = layers[0].sigma/layers[1].sigma;
-        n1 = n + 1.0;
-        div_mult = 2.0*n + 1;
-        b = pow(m->layers[0].rel_rad,div_mult);
-        return div_mult/((n1 + n*rel1) + b*n1*(rel1-1.0));
-    }
-    else if (m->nlayer == 3) {
-        rel1 = m->layers[0].sigma/m->layers[1].sigma;
-        rel2 = m->layers[1].sigma/m->layers[2].sigma;
-        n1 = n + 1.0;
-        div_mult = 2.0*n + 1.0;
-        b = pow(m->layers[0].rel_rad,div_mult);
-        c = pow(m->layers[1].rel_rad,div_mult);
-        div_mult = div_mult*div_mult;
-        div = (b*n*n1*(rel1-1.0)*(rel2-1.0) + c*(rel1*n + n1)*(rel2*n + n1))/c +
-                n1*(b*(rel1-1.0)*(rel2*n1 + n) + c*(rel1*n + n1)*(rel2-1.0));
-        return div_mult/div;
-    }
-#endif
-    if (n == 1) {
-        /*
-     * Initialize the arrays
-     */
-        c1 = REALLOC(c1,m->nlayer-1,double);
-        c2 = REALLOC(c2,m->nlayer-1,double);
-        cr = REALLOC(cr,m->nlayer-1,double);
-        cr_mult = REALLOC(cr_mult,m->nlayer-1,double);
-        for (k = 0; k < m->nlayer-1; k++) {
-            c1[k] = m->layers[k].sigma/m->layers[k+1].sigma;
-            c2[k] = c1[k] - 1.0;
-            cr_mult[k] = m->layers[k].rel_rad;
-            cr[k] = cr_mult[k];
-            cr_mult[k] = cr_mult[k]*cr_mult[k];
-        }
-        if (mat1 == NULL)
-            mat1 = ALLOC_DCMATRIX(2,2);
-        if (mat2 == NULL)
-            mat2 = ALLOC_DCMATRIX(2,2);
-        if (mat3 == NULL)
-            mat3 = ALLOC_DCMATRIX(2,2);
-    }
-    /*
-   * Increment the radius coefficients
-   */
-    for (k = 0; k < m->nlayer-1; k++)
-        cr[k] = cr[k]*cr_mult[k];
-    /*
-   * Multiply the matrices
-   */
-    M  = mat1;
-    Mn = mat2;
-    Mm = mat3;
-    M[0][0] = M[1][1] = 1.0;
-    M[0][1] = M[1][0] = 0.0;
-    div      = 1.0;
-    div_mult = 2.0*n + 1.0;
-    n1       = n + 1.0;
-
-    for (k = m->nlayer-2; k >= 0; k--) {
-
-        Mm[0][0] = (n + n1*c1[k]);
-        Mm[0][1] = n1*c2[k]/cr[k];
-        Mm[1][0] = n*c2[k]*cr[k];
-        Mm[1][1] = n1 + n*c1[k];
-
-        Mn[0][0] = Mm[0][0]*M[0][0] + Mm[0][1]*M[1][0];
-        Mn[0][1] = Mm[0][0]*M[0][1] + Mm[0][1]*M[1][1];
-        Mn[1][0] = Mm[1][0]*M[0][0] + Mm[1][1]*M[1][0];
-        Mn[1][1] = Mm[1][0]*M[0][1] + Mm[1][1]*M[1][1];
-        help = M;
-        M = Mn;
-        Mn = help;
-        div = div*div_mult;
-
-    }
-    return n*div/(n*M[1][1] + n1*M[1][0]);
-}
-
-
-
-int fwd_eeg_spherepot_vec(float   *rd,          /* Dipole position */
-                          float   **el,         /* Electrode positions */
-                          int     neeg,	        /* Number of electrodes */
-                          float   **Vval_vec,	/* The potential values
-                                                                           * Vval_vec[0][k] potentials given by Q = (1.0,0.0,0.0) at electrode k
-                                                                           * Vval_vec[1][k] potentials given by Q = (0.0,1.0,0.0) at electrode k
-                                                                           * Vval_vec[2][k] potentials given by Q = (0.0,0.0,1.0) at electrode k
-                                                                           */
-                          void    *client)
-/*
-      * Compute the electric potentials in a set of electrodes in spherically
-      * Symmetric head model. This routine calculates the fields for all
-      * dipole directions.
-      *
-      * The code is based on the formulas presented in
-      *
-      * J.C. Moscher, R.M. Leahy, and P.S. Lewis, Matrix Kernels for
-      * Modeling of EEG and MEG Data, Los Alamos Technical Report,
-      * LA-UR-96-1993, 1996.
-      *
-      * This routine uses the acceleration with help of equivalent sources
-      * in the homogeneous sphere.
-      *
-      */
-{
-    FwdEegSphereModel* m = (FwdEegSphereModel*)client;
-    float fact = 0.25/M_PI;
-    float a_vec[3];
-    float a,a2,a3;
-    float rrd,rd2,rd2_inv,r,r2,ra,rda;
-    float F;
-    float c1,c2,m1,m2;
-    int   k,p,eq;
-    float *this_pos;
-    float orig_rd[3],scaled_rd[3];
-    float pos[3],pos_len;
-    /*
-   * Shift to the sphere model coordinates
-   */
-    for (p = 0; p < 3; p++)
-        orig_rd[p] = rd[p] - m->r0[p];
-    rd = scaled_rd;
-    /*
-   * Initialize the arrays
-   */
-    for (k = 0 ; k < neeg ; k++) {
-        Vval_vec[X][k] = 0.0;
-        Vval_vec[Y][k] = 0.0;
-        Vval_vec[Z][k] = 0.0;
-    }
-    /*
-   * Ignore dipoles outside the innermost sphere
-   */
-    if (VEC_LEN(orig_rd) >= m->layers[0].rad)
-        return OK;
-    /*
-   * Default to homogeneous model if no model was previously set
-   */
-#ifdef FOO
-    if (nequiv == 0) /* what to do */
-        eeg_set_homog_sphere_model();
-#endif
-    /*
-   * Make a weighted sum over the equivalence parameters
-   */
-    for (eq = 0; eq < m->nfit; eq++) {
-        /*
-     * Scale the dipole position
-     */
-        for (p = 0; p < 3; p++)
-            rd[p] = m->mu[eq]*orig_rd[p];
-
-        rd2     = VEC_DOT(rd,rd);
-        rd2_inv = 1.0/rd2;
-
-        /*
-     * Go over all electrodes
-     */
-        for (k = 0; k < neeg ; k++) {
-            this_pos = el[k];
-
-            for (p = 0; p < 3; p++)
-                pos[p] = this_pos[p] - m->r0[p];
-            /*
-       * Scale location onto the surface of the sphere
-       */
-            if (m->scale_pos) {
-                pos_len = m->layers[m->nlayer-1].rad/VEC_LEN(pos);
-                for (p = 0; p < 3; p++)
-                    pos[p] = pos_len*pos[p];
-            }
-            this_pos = pos;
-
-            /* Vector from dipole to the field point */
-
-            VEC_DIFF (rd,this_pos,a_vec);
-
-            /* Compute the dot products needed */
-
-            a2  = VEC_DOT(a_vec,a_vec);       a = sqrt(a2);
-            a3  = 2.0/(a2*a);
-            r2  = VEC_DOT(this_pos,this_pos); r = sqrt(r2);
-            rrd = VEC_DOT(this_pos,rd);
-            ra  = r2 - rrd;
-            rda = rrd - rd2;
-
-            /* The main ingredients */
-
-            F  = a*(r*a + ra);
-            c1 = a3*rda + 1.0/a - 1.0/r;
-            c2 = a3 + (a+r)/(r*F);
-
-            /* Mix them together and scale by lambda/(rd*rd) */
-
-            m1 = (c1 - c2*rrd);
-            m2 = c2*rd2;
-
-            Vval_vec[X][k] = Vval_vec[X][k] + m->lambda[eq]*rd2_inv*(m1*rd[X] + m2*this_pos[X]);
-            Vval_vec[Y][k] = Vval_vec[Y][k] + m->lambda[eq]*rd2_inv*(m1*rd[Y] + m2*this_pos[Y]);
-            Vval_vec[Z][k] = Vval_vec[Z][k] + m->lambda[eq]*rd2_inv*(m1*rd[Z] + m2*this_pos[Z]);
-        }             /* All electrodes done */
-    }               /* All equivalent dipoles done */
-    /*
-   * Finish by scaling by 1/(4*M_PI);
-   */
-    for (k = 0; k  < neeg; k++) {
-        Vval_vec[X][k] = fact*Vval_vec[X][k];
-        Vval_vec[Y][k] = fact*Vval_vec[Y][k];
-        Vval_vec[Z][k] = fact*Vval_vec[Z][k];
-    }
-    return OK;
-}
-
-
-
-
-
-int fwd_eeg_spherepot(float   *rd,       /* Dipole position */
-                      float   *Q,	 /* Dipole moment */
-                      float   **el,	 /* Electrode positions */
-                      int     neeg,	 /* Number of electrodes */
-                      float   *Vval,	 /* The potential values */
-                      void    *client)
-/*
-      * This routine calculates the potentials for a specific dipole direction
-      *
-      * This routine uses the acceleration with help of equivalent sources
-      * in the homogeneous sphere.
-      */
-{
-    FwdEegSphereModel* m = (FwdEegSphereModel*)client;
-    float fact = 0.25/M_PI;
-    float a_vec[3];
-    float a,a2,a3;
-    float rrd,rd2,rd2_inv,r,r2,ra,rda;
-    float F;
-    float c1,c2,m1,m2,f1,f2;
-    int   k,p,eq;
-    float *this_pos;
-    float orig_rd[3],scaled_rd[3];
-    float pos[3],pos_len;
-    /*
-   * Shift to the sphere model coordinates
-   */
-    for (p = 0; p < 3; p++)
-        orig_rd[p] = rd[p] - m->r0[p];
-    rd = scaled_rd;
-    /*
-   * Initialize the arrays
-   */
-    for (k = 0 ; k < neeg ; k++)
-        Vval[k] = 0.0;
-    /*
-   * Ignore dipoles outside the innermost sphere
-   */
-    if (VEC_LEN(orig_rd) >= m->layers[0].rad)
-        return OK;
-    /*
-   * Default to homogeneous model if no model was previously set
-   */
-#ifdef FOO
-    if (nequiv == 0) /* what to do */
-        eeg_set_homog_sphere_model();
-#endif
-    /*
-   * Make a weighted sum over the equivalence parameters
-   */
-    for (eq = 0; eq < m->nfit; eq++) {
-        /*
-     * Scale the dipole position
-     */
-        for (p = 0; p < 3; p++)
-            rd[p] = m->mu[eq]*orig_rd[p];
-
-        rd2     = VEC_DOT(rd,rd);
-        rd2_inv = 1.0/rd2;
-
-        f1 = VEC_DOT(rd,Q);
-        /*
-     * Go over all electrodes
-     */
-        for (k = 0; k < neeg ; k++) {
-            this_pos = el[k];
-
-            for (p = 0; p < 3; p++)
-                pos[p] = this_pos[p] - m->r0[p];
-            /*
-       * Scale location onto the surface of the sphere
-       */
-            if (m->scale_pos) {
-                pos_len = m->layers[m->nlayer-1].rad/VEC_LEN(pos);
-                for (p = 0; p < 3; p++)
-                    pos[p] = pos_len*pos[p];
-            }
-            this_pos = pos;
-
-            /* Vector from dipole to the field point */
-
-            VEC_DIFF (rd,this_pos,a_vec);
-
-            /* Compute the dot products needed */
-
-            a2  = VEC_DOT(a_vec,a_vec);       a = sqrt(a2);
-            a3  = 2.0/(a2*a);
-            r2  = VEC_DOT(this_pos,this_pos); r = sqrt(r2);
-            rrd = VEC_DOT(this_pos,rd);
-            ra  = r2 - rrd;
-            rda = rrd - rd2;
-
-            /* The main ingredients */
-
-            F  = a*(r*a + ra);
-            c1 = a3*rda + 1.0/a - 1.0/r;
-            c2 = a3 + (a+r)/(r*F);
-
-            /* Mix them together and scale by lambda/(rd*rd) */
-
-            m1 = (c1 - c2*rrd);
-            m2 = c2*rd2;
-
-            f2 = VEC_DOT(this_pos,Q);
-            Vval[k] = Vval[k] + m->lambda[eq]*rd2_inv*(m1*f1 + m2*f2);
-        }             /* All electrodes done */
-    }               /* All equivalent dipoles done */
-    /*
-   * Finish by scaling by 1/(4*M_PI);
-   */
-    for (k = 0; k  < neeg; k++)
-        Vval[k] = fact*Vval[k];
-    return OK;
-}
-
-
-
-
-int fwd_eeg_spherepot_coil(float      *rd,     /* Dipole position */
-                           float      *Q,      /* Dipole moment */
-                           fwdCoilSet els,     /* Electrode positions */
-                           float      *Vval,   /* The potential values */
-                           void       *client)
-/*
-      * Calculate the EEG in the sphere model using the megCoil structure
-      * MEG channels are skipped
-      */
-{
-    float *vval_one = NULL,val;
-    int   nvval = 0;
-    int   k,c;
-    fwdCoil el;
-
-    for (k = 0; k < els->ncoil; k++, el++) {
-        el = els->coils[k];
-        if (el->coil_class == FWD_COILC_EEG) {
-            if (el->np > nvval) {
-                vval_one = REALLOC(vval_one,el->np,float);
-                nvval = el->np;
-            }
-            if (fwd_eeg_spherepot(rd,Q,el->rmag,el->np,vval_one,client) != OK) {
-                FREE(vval_one);
-                return FAIL;
-            }
-            for (c = 0, val = 0.0; c < el->np; c++)
-                val += el->w[c]*vval_one[c];
-            *Vval = val;
-        }
-        Vval++;
-    }
-    FREE(vval_one);
-    return OK;
-}
-
-
-
-int fwd_eeg_spherepot_coil_vec(float      *rd,        /* Dipole position */
-                               fwdCoilSet els,        /* Electrode positions */
-                               float      **Vval_vec, /* The potential values
-                                                                                      * Vval_vec[0][k] potentials given by Q = (1.0,0.0,0.0) at electrode k
-                                                                                      * Vval_vec[1][k] potentials given by Q = (0.0,1.0,0.0) at electrode k
-                                                                                      * Vval_vec[2][k] potentials given by Q = (0.0,0.0,1.0) at electrode k
-                                                                                      */
-                               void       *client)
-/*
-      * Calculate the EEG in the sphere model using the fwdCoilSet structure
-      * MEG channels are skipped
-      *
-      * This routine uses the acceleration with help of equivalent sources
-      * in the homogeneous sphere.
-      */
-{
-    float **vval_one = NULL;
-    float val;
-    int   nvval = 0;
-    int   k,c,p;
-    fwdCoil el;
-
-    for (k = 0; k < els->ncoil; k++, el++) {
-        el = els->coils[k];
-        if (el->coil_class == FWD_COILC_EEG) {
-            if (el->np > nvval) {
-                FREE_CMATRIX(vval_one);
-                vval_one = ALLOC_CMATRIX(3,el->np);
-                nvval = el->np;
-            }
-            if (fwd_eeg_spherepot_vec(rd,el->rmag,el->np,vval_one,client) != OK) {
-                FREE_CMATRIX(vval_one);
-                return FAIL;
-            }
-            for (p = 0; p < 3; p++) {
-                for (c = 0, val = 0.0; c < el->np; c++)
-                    val += el->w[c]*vval_one[p][c];
-                Vval_vec[p][k] = val;
-            }
-        }
-    }
-    FREE_CMATRIX(vval_one);
-    return OK;
-}
-
-
-
-
-
-
-
-
-
 
 
 
@@ -14815,7 +14352,7 @@ int fwd_eeg_fit_berg_scherg(FwdEegSphereModel* m,       /* Conductor model defin
    * (1) Calculate the coefficients of the true expansion
    */
     for (k = 0; k < nterms; k++)
-        u->fn[k] = fwd_eeg_get_multi_sphere_model_coeff(m,k+1);
+        u->fn[k] = m->fwd_eeg_get_multi_sphere_model_coeff(k+1);
     /*
    * (2) Calculate the weighting
    */
@@ -15327,7 +14864,7 @@ bad :
 
 int fwd_sphere_field(float        *rd,	        /* The dipole location */
                      float        Q[],	        /* The dipole components (xyz) */
-                     fwdCoilSet   coils,	/* The coil definitions */
+                     FwdCoilSet*   coils,	/* The coil definitions */
                      float        Bval[],	/* Results */
                      void         *client)	/* Client data will be the sphere model origin */
 
@@ -15353,7 +14890,7 @@ int fwd_sphere_field(float        *rd,	        /* The dipole location */
     float vr,ve,re,r0e;
     float F,g0,gr,result,sum;
     int   j,k,p;
-    fwdCoil this_coil;
+    FwdCoil* this_coil;
     float *this_pos,*this_dir;	/* These point to the coil structure! */
     int   np;
     float myrd[3];
@@ -15433,7 +14970,7 @@ int fwd_sphere_field(float        *rd,	        /* The dipole location */
 
 
 int fwd_sphere_field_vec(float        *rd,	/* The dipole location */
-                         fwdCoilSet   coils,	/* The coil definitions */
+                         FwdCoilSet*   coils,	/* The coil definitions */
                          float        **Bval,  /* Results: rows are the fields of the x,y, and z direction dipoles */
                          void         *client)	/* Client data will be the sphere model origin */
 
@@ -15465,7 +15002,7 @@ int fwd_sphere_field_vec(float        *rd,	/* The dipole location */
     float re,r0e;
     float F,g0,gr,g,sum[3];
     int   j,k,p;
-    fwdCoil this_coil;
+    FwdCoil* this_coil;
     float *this_pos,*this_dir;	/* These point to the coil structure! */
     int   np;
     float myrd[3];
@@ -15895,7 +15432,7 @@ out : {
 
 int fwd_mag_dipole_field(float        *rm,      /* The dipole location in the same coordinate system as the coils */
                          float        M[],	/* The dipole components (xyz) */
-                         fwdCoilSet   coils,	/* The coil definitions */
+                         FwdCoilSet*   coils,	/* The coil definitions */
                          float        Bval[],	/* Results */
                          void         *client)	/* Client data will be the sphere model origin */
 /*
@@ -15903,7 +15440,7 @@ int fwd_mag_dipole_field(float        *rm,      /* The dipole location in the sa
  */
 {
     int     j,k,np;
-    fwdCoil this_coil;
+    FwdCoil* this_coil;
     float   sum,diff[3],dist,dist2,dist5,*dir;
 
 
@@ -15933,7 +15470,7 @@ int fwd_mag_dipole_field(float        *rm,      /* The dipole location in the sa
 }
 
 int fwd_mag_dipole_field_vec(float        *rm,	        /* The dipole location */
-                             fwdCoilSet   coils,	/* The coil definitions */
+                             FwdCoilSet*   coils,	/* The coil definitions */
                              float        **Bval,       /* Results: rows are the fields of the x,y, and z direction dipoles */
                              void         *client)	/* Client data will be the sphere model origin */
 /*
@@ -15942,7 +15479,7 @@ int fwd_mag_dipole_field_vec(float        *rm,	        /* The dipole location */
  */
 {
     int     j,k,p,np;
-    fwdCoil this_coil;
+    FwdCoil* this_coil;
     float   sum[3],diff[3],dist,dist2,dist5,*dir;
 
 
@@ -16114,7 +15651,7 @@ void free_dipole_fit_data(DipoleFitData* d)
 }
 
 
-static int setup_forward_model(DipoleFitData* d, mneCTFcompDataSet comp_data, fwdCoilSet comp_coils)
+static int setup_forward_model(DipoleFitData* d, mneCTFcompDataSet comp_data, FwdCoilSet* comp_coils)
 /*
  * Take care of some hairy details
  */
@@ -16212,8 +15749,8 @@ static int setup_forward_model(DipoleFitData* d, mneCTFcompDataSet comp_data, fw
     d->sphere_funcs = f = new_dipole_fit_funcs();
     if (d->neeg > 0) {
         VEC_COPY(d->eeg_model->r0,d->r0);
-        f->eeg_pot     = fwd_eeg_spherepot_coil;
-        f->eeg_vec_pot = fwd_eeg_spherepot_coil_vec;
+        f->eeg_pot     = FwdEegSphereModel::fwd_eeg_spherepot_coil;
+        f->eeg_vec_pot = FwdEegSphereModel::fwd_eeg_spherepot_coil_vec;
         f->eeg_client  = d->eeg_model;
     }
     if (d->nmeg > 0) {
@@ -16272,8 +15809,8 @@ out :
 
 
 
-static mneCovMatrix ad_hoc_noise(fwdCoilSet meg,          /* Channel name lists to define which channels are gradiometers */
-                                 fwdCoilSet eeg,
+static mneCovMatrix ad_hoc_noise(FwdCoilSet* meg,          /* Channel name lists to define which channels are gradiometers */
+                                 FwdCoilSet* eeg,
                                  float      grad_std,
                                  float      mag_std,
                                  float      eeg_std)
@@ -16690,9 +16227,9 @@ DipoleFitData* setup_dipole_fit_data(   const QString& mriname,         /**< Thi
     int            file_nbad;
     int            coord_frame = FIFFV_COORD_HEAD;
     mneCovMatrix cov;
-    fwdCoilSet     templates = NULL;
+    FwdCoilSet*     templates = NULL;
     mneCTFcompDataSet comp_data  = NULL;
-    fwdCoilSet        comp_coils = NULL;
+    FwdCoilSet*        comp_coils = NULL;
 
     /*
    * Read the coordinate transformations
@@ -20621,7 +20158,7 @@ int fit_dipoles_raw(char           *dataname,
                     float          tstep,        /* Time step to use */
                     float          integ,        /* Integration time */
                     int            verbose,      /* Verbose output? */
-                    ECDSet&        p_set)	 /* Return all results here
+                    ECDSet&        p_set)       /* Return all results here
                                                   * Warning: for large data files this may take
                                                   * a lot of memory */
 
