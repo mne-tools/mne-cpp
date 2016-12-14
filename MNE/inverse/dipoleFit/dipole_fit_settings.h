@@ -149,28 +149,27 @@ public:
     float guess_grid    = 0.010f;       /**< Grid spacing */
 
     QString noisename;                  /**< Noise-covariance matrix */
-    float grad_std     = 5e-13f;             /* Standard deviations to be used if noise covariance is not specified */
+    float grad_std     = 5e-13f;        /**< Standard deviations to be used if noise covariance is not specified */
     float mag_std      = 20e-15f;
     float eeg_std      = 0.2e-6f;
-    bool  diagnoise    = false;              /* Use only the diagonals of the noise-covariance matrix */
+    bool  diagnoise    = false;         /**< Use only the diagonals of the noise-covariance matrix */
 
-    QString measname;                        /* Data file */
-    bool  is_raw       = false;              /* Is this a raw data file */
-    char  *badname     = NULL;               /* Bad channels */
-    bool  include_meg  = false;              /* Use MEG? */
-    bool  include_eeg  = false;              /* Use EEG? */
-    float tmin         = -2*BIG_TIME;        /* Possibility to set these from the command line */
+    QString measname;                   /**< Data file */
+    bool  is_raw       = false;         /**< Is this a raw data file */
+    char  *badname     = NULL;          /**< Bad channels */
+    bool  include_meg  = false;         /**< Use MEG? */
+    bool  include_eeg  = false;         /**< Use EEG? */
+    float tmin         = -2*BIG_TIME;   /**< Possibility to set these from the command line */
     float tmax         = 2*BIG_TIME;
-    float tstep        = -1.0;               /* Step between fits */
+    float tstep        = -1.0;          /**< Step between fits */
     float integ        = 0.0;
-    float bmin         = BIG_TIME;	        /* Possibility to set these from the command line */
+    float bmin         = BIG_TIME;      /**< Possibility to set these from the command line */
     float bmax         = BIG_TIME;
-    bool  do_baseline  = false;              /* Are both baseline limits set? */
-    int   setno        = 1;                  /* Which data set */
+    bool  do_baseline  = false;         /**< Are both baseline limits set? */
+    int   setno        = 1;             /**< Which data set */
     bool  verbose      = false;
     mneFilterDefRec     filter;
-    char **projnames   = NULL;               /* Projection file names */
-    int  nproj         = 0;
+    QList<QString> projnames;           /**< Projection file names */
     bool omit_data_proj = false;
 
     QString eeg_model_file;                 /* File of EEG sphere model specifications */

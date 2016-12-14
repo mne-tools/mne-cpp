@@ -113,13 +113,8 @@ void DipoleFitSettings::checkIntegrity()
         qCritical ("Specify one or both of the --eeg and --meg options");
         return;
     }
-    if (!omit_data_proj) {
-        projnames = REALLOC(projnames,nproj+1,char *);
-        nproj++;
-        for (int k = 1; k < nproj; k++)
-            projnames[k] = projnames[k-1];
-        projnames[0] = measname.isEmpty() ? NULL : measname.toLatin1().data();
-    }
+    if (!omit_data_proj)
+        projnames.prepend(measname);
     printf("\n");
 
     if (!bemname.isEmpty())
@@ -145,10 +140,10 @@ void DipoleFitSettings::checkIntegrity()
             printf("Guess exclude    : %6.1f mm\n",1000*guess_exclude);
     }
     printf("Data             : %s\n",measname.toLatin1().data());
-    if (nproj > 0) {
+    if (projnames.size() > 0) {
         printf("SSP sources      :\n");
-        for (int k = 0; k < nproj; k++)
-            printf("\t%s\n",projnames[k]);
+        for (int k = 0; k < projnames.size(); k++)
+            printf("\t%s\n",projnames[k].toLatin1().data());
     }
     if (badname)
         printf("Bad channels     : %s\n",badname);
@@ -448,8 +443,7 @@ bool DipoleFitSettings::check_args (int *argc,char **argv)
                 qCritical ("--proj: argument required.");
                 return false;
             }
-            projnames = REALLOC(projnames,nproj+1,char *);
-            projnames[nproj++] = strdup(argv[k+1]);
+            projnames.append(QString(argv[k+1]));
         }
         else if (strcmp(argv[k],"--noproj") == 0) {
             found = 1;
