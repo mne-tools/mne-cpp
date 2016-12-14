@@ -1,6 +1,7 @@
 
 
 #include "dipolefitsettings.h"
+#include "mne_allocs_helper.h"
 
 
 using namespace Eigen;
@@ -17,6 +18,7 @@ using namespace INVERSELIB;
  */
 #define MALLOC(x,t) (t *)malloc((x)*sizeof(t))
 #define REALLOC(x,y,t) (t *)((x == NULL) ? malloc((y)*sizeof(t)) : realloc((x),(y)*sizeof(t)))
+
 
 #define X 0
 #define Y 1
