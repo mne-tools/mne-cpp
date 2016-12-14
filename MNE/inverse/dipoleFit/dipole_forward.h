@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     fwd_eeg_sphere_layer.h
+* @file     dipole_forward.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    FwdEegSphereLayer class declaration.
+* @brief    DipoleForward class declaration.
 *
 */
 
-#ifndef FWDEEGSPHERELAYER_H
-#define FWDEEGSPHERELAYER_H
+#ifndef DIPOLEFORWARD_H
+#define DIPOLEFORWARD_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -72,47 +72,57 @@ namespace INVERSELIB
 
 //=============================================================================================================
 /**
-* Implements FwdEegSphereLayer (Replaces *fwdEegSphereLayer,fwdEegSphereLayerRec struct of MNE-C fwd_types.h).
+* Implements DipoleForward (Replaces *dipoleForward,dipoleForwardRec struct of MNE-C fit_types.h).
 *
-* @brief FwdEegSphereLayer description
+* @brief DipoleForward description
 */
-class INVERSESHARED_EXPORT FwdEegSphereLayer
+class INVERSESHARED_EXPORT DipoleForward
 {
 public:
-    typedef QSharedPointer<FwdEegSphereLayer> SPtr;              /**< Shared pointer type for FwdEegSphereLayer. */
-    typedef QSharedPointer<const FwdEegSphereLayer> ConstSPtr;   /**< Const shared pointer type for FwdEegSphereLayer. */
+    typedef QSharedPointer<DipoleForward> SPtr;              /**< Shared pointer type for DipoleForward. */
+    typedef QSharedPointer<const DipoleForward> ConstSPtr;   /**< Const shared pointer type for DipoleForward. */
 
     //=========================================================================================================
     /**
-    * Constructs the Electric Current Dipole
+    * Constructs the Dipole Forward
     */
-    FwdEegSphereLayer();
+    DipoleForward();
 
 //    //=========================================================================================================
 //    /**
 //    * Copy constructor.
 //    *
-//    * @param[in] p_FwdEegSphereLayer      FwdEegSphereLayer which should be copied
+//    * @param[in] p_DipoleForward    DipoleForward which should be copied
 //    */
-//    FwdEegSphereLayer(const FwdEegSphereLayer& p_FwdEegSphereLayer);
+//    DipoleForward(const DipoleForward& p_DipoleForward);
 
     //=========================================================================================================
     /**
-    * Destroys the Forward EEG Sphere Layer description
+    * Destroys the Dipole Forward description
     */
-    ~FwdEegSphereLayer();
+    ~DipoleForward();
 
 public:
-    float rad;          /**< The actual rads */
-    float rel_rad;      /**< Relative rads */
-    float sigma;        /**< Conductivity */
+    float **rd;         /**< Dipole locations */
+    int   ndip;         /**< How many dipoles */
+    float **fwd;        /**< The forward solution (projected and whitened) */
+    float *scales;      /**< Scales applied to the columns of fwd */
+    float **uu;         /**< The left singular vectors of the forward matrix */
+    float **vv;         /**< The right singular vectors of the forward matrix */
+    float *sing;        /**< The singular values */
+    int   nch;          /**< Number of channels */
 
 // ### OLD STRUCT ###
 //    typedef struct {
-//      float rad;          /* The actual rads */
-//      float rel_rad;      /* Relative rads */
-//      float sigma;        /* Conductivity */
-//    } *fwdEegSphereLayer,fwdEegSphereLayerRec;
+//      float **rd;			    /* Dipole locations */
+//      int   ndip;			    /* How many dipoles */
+//      float **fwd;			    /* The forward solution (projected and whitened) */
+//      float *scales;		    /* Scales applied to the columns of fwd */
+//      float **uu;			    /* The left singular vectors of the forward matrix */
+//      float **vv;			    /* The right singular vectors of the forward matrix */
+//      float *sing;			    /* The singular values */
+//      int   nch;			    /* Number of channels */
+//    } *dipoleForward,dipoleForwardRec;
 };
 
 
@@ -124,4 +134,4 @@ public:
 
 } // NAMESPACE INVERSELIB
 
-#endif // FWDEEGSPHERELAYER_H
+#endif // DIPOLEFORWARD_H

@@ -36,6 +36,10 @@
 #endif
 
 
+
+#include "fwd_eeg_sphere_model_set.h"
+
+
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
@@ -9661,10 +9665,10 @@ int mne_transform_source_spaces_to(int            coord_frame,   /* Which coord 
 //============================= dipole_forward.c =============================
 
 
-dipoleForward new_dipole_forward()
+DipoleForward* new_dipole_forward()
 
 {
-    dipoleForward res = MALLOC(1,dipoleForwardRec);
+    DipoleForward* res = MALLOC(1,DipoleForward);
 
     res->rd     = NULL;
     res->fwd    = NULL;
@@ -9681,7 +9685,7 @@ dipoleForward new_dipole_forward()
 
 
 
-void free_dipole_forward ( dipoleForward f )
+void free_dipole_forward ( DipoleForward* f )
 {
     if (!f)
         return;
@@ -9791,15 +9795,15 @@ bad :
 
 
 
-dipoleForward dipole_forward(dipoleFitData d,
+DipoleForward* dipole_forward(dipoleFitData d,
                              float         **rd,
                              int           ndip,
-                             dipoleForward old)
+                             DipoleForward* old)
 /*
  * Compute the forward solution and do other nice stuff
  */
 {
-    dipoleForward res;
+    DipoleForward* res;
     float         **this_fwd;
     float         S[3];
     int           k,p;
@@ -9878,9 +9882,9 @@ bad : {
     }
 }
 
-dipoleForward dipole_forward_one(dipoleFitData d,
+DipoleForward* dipole_forward_one(dipoleFitData d,
                                  float         *rd,
-                                 dipoleForward old)
+                                 DipoleForward* old)
 /*
  * Convenience function to compute the field of one dipole
  */
@@ -13915,7 +13919,7 @@ int fwd_comp_field_vec(float *rd, fwdCoilSet coils, float **res, void *client)
 
 
 
-double fwd_eeg_get_multi_sphere_model_coeff(fwdEegSphereModel m, int n)
+double fwd_eeg_get_multi_sphere_model_coeff(FwdEegSphereModel* m, int n)
 /*
       * Get the model depended weighting factor for n
       */
@@ -14048,7 +14052,7 @@ int fwd_eeg_spherepot_vec(float   *rd,          /* Dipole position */
       *
       */
 {
-    fwdEegSphereModel m = (fwdEegSphereModel)client;
+    FwdEegSphereModel* m = (FwdEegSphereModel*)client;
     float fact = 0.25/M_PI;
     float a_vec[3];
     float a,a2,a3;
@@ -14173,7 +14177,7 @@ int fwd_eeg_spherepot(float   *rd,       /* Dipole position */
       * in the homogeneous sphere.
       */
 {
-    fwdEegSphereModel m = (fwdEegSphereModel)client;
+    FwdEegSphereModel* m = (FwdEegSphereModel*)client;
     float fact = 0.25/M_PI;
     float a_vec[3];
     float a,a2,a3;
@@ -14777,7 +14781,7 @@ static double one_step (double *mu, int nfit, void *user_data)
 }
 
 
-int fwd_eeg_fit_berg_scherg(fwdEegSphereModel m,       /* Conductor model definition */
+int fwd_eeg_fit_berg_scherg(FwdEegSphereModel* m,       /* Conductor model definition */
                             int   nterms,              /* Number of terms to use in the series expansion
                                                                                     * when fitting the parameters */
                             int   nfit,	               /* Number of equivalent dipoles to fit */
@@ -14918,10 +14922,10 @@ out : {
 /*
  * Basic routines for EEG sphere model bookkeeping
  */
-static fwdEegSphereModel fwd_new_eeg_sphere_model()
+static FwdEegSphereModel* fwd_new_eeg_sphere_model()
 
 {
-    fwdEegSphereModel m = MALLOC(1,fwdEegSphereModelRec);
+    FwdEegSphereModel* m = MALLOC(1,FwdEegSphereModel);
 
     m->name    = NULL;
     m->nlayer  = 0;
@@ -14939,7 +14943,7 @@ static fwdEegSphereModel fwd_new_eeg_sphere_model()
 }
 
 
-void fwd_free_eeg_sphere_model(fwdEegSphereModel m)
+void fwd_free_eeg_sphere_model(FwdEegSphereModel* m)
 
 {
     if (!m)
@@ -14956,10 +14960,10 @@ void fwd_free_eeg_sphere_model(fwdEegSphereModel m)
 
 
 
-fwdEegSphereModel fwd_dup_eeg_sphere_model(fwdEegSphereModel m)
+FwdEegSphereModel* fwd_dup_eeg_sphere_model(FwdEegSphereModel* m)
 
 {
-    fwdEegSphereModel dup;
+    FwdEegSphereModel* dup;
     int k;
 
     if (!m)
@@ -14970,7 +14974,7 @@ fwdEegSphereModel fwd_dup_eeg_sphere_model(fwdEegSphereModel m)
     if (m->name)
         dup->name = mne_strdup(m->name);
     if (m->nlayer > 0) {
-        dup->layers = MALLOC(m->nlayer,fwdEegSphereLayerRec);
+        dup->layers = MALLOC(m->nlayer,INVERSELIB::FwdEegSphereLayer);
         dup->nlayer = m->nlayer;
         for (k = 0; k < m->nlayer; k++)
             dup->layers[k] = m->layers[k];
@@ -15002,8 +15006,8 @@ static int comp_layers(const void *p1,const void *p2)
       * Comparison function for sorting layers
       */
 {
-    fwdEegSphereLayer v1 = (fwdEegSphereLayer)p1;
-    fwdEegSphereLayer v2 = (fwdEegSphereLayer)p2;
+    FwdEegSphereLayer* v1 = (FwdEegSphereLayer*)p1;
+    FwdEegSphereLayer* v2 = (FwdEegSphereLayer*)p2;
 
     if (v1->rad > v2->rad)
         return 1;
@@ -15015,7 +15019,7 @@ static int comp_layers(const void *p1,const void *p2)
 
 
 
-static fwdEegSphereModel fwd_create_eeg_sphere_model(const char *name,
+static FwdEegSphereModel* fwd_create_eeg_sphere_model(const char *name,
                                                      int nlayer,
                                                      const float *rads,
                                                      const float *sigmas)
@@ -15023,14 +15027,14 @@ static fwdEegSphereModel fwd_create_eeg_sphere_model(const char *name,
       * Produce a new sphere model structure
       */
 {
-    fwdEegSphereModel new_model = fwd_new_eeg_sphere_model();
+    FwdEegSphereModel* new_model = fwd_new_eeg_sphere_model();
     int            k;
-    fwdEegSphereLayer layers;
+    FwdEegSphereLayer* layers;
     float          R,rR;
 
     new_model->name   = mne_strdup(name);
     new_model->nlayer = nlayer;
-    new_model->layers = layers = MALLOC(nlayer,fwdEegSphereLayerRec);
+    new_model->layers = layers = MALLOC(nlayer,FwdEegSphereLayer);
 
     for (k = 0; k < nlayer; k++) {
         layers[k].rad    = layers[k].rel_rad = rads[k];
@@ -15039,7 +15043,7 @@ static fwdEegSphereModel fwd_create_eeg_sphere_model(const char *name,
     /*
    * Sort...
    */
-    qsort (layers, nlayer, sizeof(fwdEegSphereLayerRec), comp_layers);
+    qsort (layers, nlayer, sizeof(FwdEegSphereLayer), comp_layers);
     /*
    * Scale the radiuses
    */
@@ -15054,17 +15058,17 @@ static fwdEegSphereModel fwd_create_eeg_sphere_model(const char *name,
 
 
 
-static fwdEegSphereModelSet fwd_new_eeg_sphere_model_set()
+static FwdEegSphereModelSet* fwd_new_eeg_sphere_model_set()
 
 {
-    fwdEegSphereModelSet s = MALLOC(1,fwdEegSphereModelSetRec);
+    FwdEegSphereModelSet* s = MALLOC(1,FwdEegSphereModelSet);
 
     s->models  = NULL;
     s->nmodel  = 0;
     return s;
 }
 
-void fwd_free_eeg_sphere_model_set(fwdEegSphereModelSet s)
+void fwd_free_eeg_sphere_model_set(FwdEegSphereModelSet* s)
 
 {
     int k;
@@ -15080,8 +15084,8 @@ void fwd_free_eeg_sphere_model_set(fwdEegSphereModelSet s)
 
 
 
-static fwdEegSphereModelSet fwd_add_to_eeg_sphere_model_set(fwdEegSphereModelSet s,
-                                                            fwdEegSphereModel m)
+static FwdEegSphereModelSet* fwd_add_to_eeg_sphere_model_set(FwdEegSphereModelSet* s,
+                                                            FwdEegSphereModel* m)
 /*
  * Add a new model to a set.
  * The model should not be deallocated after this since it is attached to the set
@@ -15090,14 +15094,14 @@ static fwdEegSphereModelSet fwd_add_to_eeg_sphere_model_set(fwdEegSphereModelSet
     if (!s)
         s = fwd_new_eeg_sphere_model_set();
 
-    s->models = REALLOC(s->models,s->nmodel+1,fwdEegSphereModel);
+    s->models = REALLOC(s->models,s->nmodel+1,FwdEegSphereModel*);
     s->models[s->nmodel++] = m;
     return s;
 }
 
 
 
-static fwdEegSphereModelSet fwd_add_default_eeg_sphere_model(fwdEegSphereModelSet s)
+static FwdEegSphereModelSet* fwd_add_default_eeg_sphere_model(FwdEegSphereModelSet* s)
 /*
       * Choose and setup the default EEG sphere model
       */
@@ -15127,7 +15131,7 @@ static fwdEegSphereModelSet fwd_add_default_eeg_sphere_model(fwdEegSphereModelSe
 #endif
 
 
-fwdEegSphereModelSet fwd_load_eeg_sphere_models(const QString& filename, fwdEegSphereModelSet now)
+FwdEegSphereModelSet* fwd_load_eeg_sphere_models(const QString& filename, FwdEegSphereModelSet* now)
 /*
       * Load all models available in the specified file
       */
@@ -15213,13 +15217,13 @@ bad : {
 
 
 
-void fwd_list_eeg_sphere_models(FILE *f, fwdEegSphereModelSet s)
+void fwd_list_eeg_sphere_models(FILE *f, FwdEegSphereModelSet* s)
 /*
  * List the properties of available models
  */
 {
     int k,p;
-    fwdEegSphereModel this_model;
+    FwdEegSphereModel* this_model;
 
     if (!s || s->nmodel < 0)
         return;
@@ -15235,7 +15239,7 @@ void fwd_list_eeg_sphere_models(FILE *f, fwdEegSphereModelSet s)
 
 
 
-fwdEegSphereModel fwd_select_eeg_sphere_model(QString name,fwdEegSphereModelSet s)
+FwdEegSphereModel* fwd_select_eeg_sphere_model(QString name,FwdEegSphereModelSet* s)
 /*
  * Find a model with a given name and return a duplicate
  */
@@ -15261,7 +15265,7 @@ fwdEegSphereModel fwd_select_eeg_sphere_model(QString name,fwdEegSphereModelSet 
 }
 
 
-int fwd_setup_eeg_sphere_model(fwdEegSphereModel m,
+int fwd_setup_eeg_sphere_model(FwdEegSphereModel* m,
                                float rad,
                                int   fit_berg_scherg,
                                int   nfit)
@@ -16387,15 +16391,15 @@ bad :
     return FAIL;
 }
 
-fwdEegSphereModel setup_eeg_sphere_model(const QString& eeg_model_file,   /* Contains the model specifications */
+FwdEegSphereModel* setup_eeg_sphere_model(const QString& eeg_model_file,   /* Contains the model specifications */
                                          QString eeg_model_name,	  /* Name of the model to use */
                                          float eeg_sphere_rad)    /* Outer surface radius */
 /*
       * Set up the desired sphere model for EEG
       */
 {
-    fwdEegSphereModelSet eeg_models = NULL;
-    fwdEegSphereModel    eeg_model  = NULL;
+    FwdEegSphereModelSet* eeg_models = NULL;
+    FwdEegSphereModel*    eeg_model  = NULL;
 
     if (eeg_model_name.isEmpty())
         eeg_model_name = QString("Default");
@@ -16660,7 +16664,7 @@ dipoleFitData setup_dipole_fit_data(char  *mriname,		 /* This gives the MRI/head
                                                                       * sensor locations */
                                     char  *bemname,		 /* BEM model */
                                     Eigen::Vector3f *r0,			 /* Sphere model origin in head coordinates (optional) */
-                                    fwdEegSphereModel eeg_model, /* EEG sphere model definition */
+                                    FwdEegSphereModel* eeg_model, /* EEG sphere model definition */
                                     int   accurate_coils,	 /* Use accurate coil definitions? */
                                     char  *badname,		 /* Bad channels list */
                                     char  *noisename,		 /* Noise covariance matrix */
@@ -17085,7 +17089,7 @@ guessData make_guess_data(char          *guessname,
         }
     mne_free_source_space(guesses); guesses = NULL;
 
-    res->guess_fwd = MALLOC(res->nguess,dipoleForward);
+    res->guess_fwd = MALLOC(res->nguess,DipoleForward*);
     for (k = 0; k < res->nguess; k++)
         res->guess_fwd[k] = NULL;
     /*
@@ -17175,7 +17179,7 @@ guessData make_guess_data(char          *guessname,
     mne_free_source_space(guesses); guesses = NULL;
 
     fprintf(stderr,"Go through all guess source locations...");
-    res->guess_fwd = MALLOC(res->nguess,dipoleForward);
+    res->guess_fwd = MALLOC(res->nguess,DipoleForward*);
     for (k = 0; k < res->nguess; k++)
         res->guess_fwd[k] = NULL;
     /*
@@ -20257,7 +20261,7 @@ typedef struct {
     /*
    * Data links
    */
-    fwdEegSphereModel eeg_model;	/* The actual model based on the above settings */
+    FwdEegSphereModel* eeg_model;	/* The actual model based on the above settings */
     dipoleFitData     fitdata;	/* The actual setup data */
     guessData         guessdata;	/* The initial guess data */
     /*
@@ -20299,7 +20303,7 @@ typedef struct {
     int            report_dim;
     float          *B;
     double         B2;
-    dipoleForward  fwd;
+    DipoleForward*  fwd;
 } *fitDipUser,fitDipUserRec;
 
 static int find_best_guess(float     *B,         /* The whitened data */
@@ -20316,7 +20320,7 @@ static int find_best_guess(float     *B,         /* The whitened data */
     double B2,Bm2,this_good,one;
     int    best = -1;
     float  good = 0.0;
-    dipoleForward fwd;
+    DipoleForward* fwd;
     int    ncomp;
 
     B2 = mne_dot_vectors(B,B,nch);
@@ -20409,7 +20413,7 @@ static int fit_Q(dipoleFitData fit,	     /* The fit data */
  */
 {
     int c;
-    dipoleForward fwd = dipole_forward_one(fit,rd,NULL);
+    DipoleForward* fwd = dipole_forward_one(fit,rd,NULL);
     float Bm2,one;
 
     if (!fwd)
@@ -20441,7 +20445,7 @@ static float fit_eval(float *rd,int npar,void *user)
  */
 {
     dipoleFitData fit   = (dipoleFitData)user;
-    dipoleForward fwd;
+    DipoleForward* fwd;
     fitDipUser       fuser = (fitDipUser)fit->user;
     double        Bm2,one;
     int           ncomp,c;

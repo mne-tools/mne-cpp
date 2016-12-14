@@ -62,7 +62,7 @@ ECDSet DipoleFit::calculateFit() const
 {
     guessData           guess    = NULL;
     ECDSet              set;
-    fwdEegSphereModel   eeg_model = NULL;
+    FwdEegSphereModel*  eeg_model = NULL;
     dipoleFitData       fit_data = NULL;
     mneMeasData         data     = NULL;
     mneRawData          raw      = NULL;

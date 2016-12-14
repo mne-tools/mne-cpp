@@ -75,13 +75,13 @@ FwdEegSphereModelSet::FwdEegSphereModelSet()
 }
 
 
-//*************************************************************************************************************
+////*************************************************************************************************************
 
-FwdEegSphereModelSet::FwdEegSphereModelSet(const FwdEegSphereModelSet &p_FwdEegSphereModelSet)
-: m_qListModels(p_FwdEegSphereModelSet.m_qListModels)
-{
+//FwdEegSphereModelSet::FwdEegSphereModelSet(const FwdEegSphereModelSet &p_FwdEegSphereModelSet)
+//: m_qListModels(p_FwdEegSphereModelSet.m_qListModels)
+//{
 
-}
+//}
 
 
 //*************************************************************************************************************
@@ -92,44 +92,44 @@ FwdEegSphereModelSet::~FwdEegSphereModelSet()
 }
 
 
-//*************************************************************************************************************
+////*************************************************************************************************************
 
-void FwdEegSphereModelSet::addFwdEegSphereModel(const FwdEegSphereModel &p_FwdEegSphereModel)
-{
-    m_qListModels.append(p_FwdEegSphereModel);
-}
-
-
-//*************************************************************************************************************
-
-const FwdEegSphereModel& FwdEegSphereModelSet::operator[] (qint32 idx) const
-{
-    if (idx>=m_qListModels.length())
-    {
-        qWarning("Warning: Required FwdEegSphereModel doesn't exist! Returning FwdEegSphereModel '0'.");
-        idx=0;
-    }
-    return m_qListModels[idx];
-}
+//void FwdEegSphereModelSet::addFwdEegSphereModel(const FwdEegSphereModel &p_FwdEegSphereModel)
+//{
+//    m_qListModels.append(p_FwdEegSphereModel);
+//}
 
 
-//*************************************************************************************************************
+////*************************************************************************************************************
 
-FwdEegSphereModel& FwdEegSphereModelSet::operator[] (qint32 idx)
-{
-    if (idx >= m_qListModels.length())
-    {
-        qWarning("Warning: Required FwdEegSphereModel doesn't exist! Returning FwdEegSphereModel '0'.");
-        idx = 0;
-    }
-    return m_qListModels[idx];
-}
+//const FwdEegSphereModel& FwdEegSphereModelSet::operator[] (qint32 idx) const
+//{
+//    if (idx>=m_qListModels.length())
+//    {
+//        qWarning("Warning: Required FwdEegSphereModel doesn't exist! Returning FwdEegSphereModel '0'.");
+//        idx=0;
+//    }
+//    return m_qListModels[idx];
+//}
 
 
-//*************************************************************************************************************
+////*************************************************************************************************************
 
-FwdEegSphereModelSet &FwdEegSphereModelSet::operator<<(const FwdEegSphereModel &p_FwdEegSphereModel)
-{
-    this->m_qListModels.append(p_FwdEegSphereModel);
-    return *this;
-}
+//FwdEegSphereModel& FwdEegSphereModelSet::operator[] (qint32 idx)
+//{
+//    if (idx >= m_qListModels.length())
+//    {
+//        qWarning("Warning: Required FwdEegSphereModel doesn't exist! Returning FwdEegSphereModel '0'.");
+//        idx = 0;
+//    }
+//    return m_qListModels[idx];
+//}
+
+
+////*************************************************************************************************************
+
+//FwdEegSphereModelSet &FwdEegSphereModelSet::operator<<(const FwdEegSphereModel &p_FwdEegSphereModel)
+//{
+//    this->m_qListModels.append(p_FwdEegSphereModel);
+//    return *this;
+//}

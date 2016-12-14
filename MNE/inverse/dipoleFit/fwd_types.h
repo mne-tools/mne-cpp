@@ -8,6 +8,7 @@
 #include "fiff_types.h"
 #include "mne_types.h"
 
+
 #if defined(__cplusplus) 
 extern "C" {
 #endif
@@ -82,32 +83,32 @@ typedef double (*fwdIntApproxEvalFunc)(fwdIntPoints int_points, double *r0, void
  * Definitions for the EEG sphere model
  */
 
-typedef struct {
-  float rad;			/* The actual rads */
-  float rel_rad;		/* Relative rads */
-  float sigma;			/* Conductivity */
-} *fwdEegSphereLayer,fwdEegSphereLayerRec;
+//typedef struct {
+//  float rad;			/* The actual rads */
+//  float rel_rad;		/* Relative rads */
+//  float sigma;			/* Conductivity */
+//} *fwdEegSphereLayer,fwdEegSphereLayerRec;
 
 
-typedef struct {
-  char  *name;			/* Textual identifier */
-  int   nlayer;			/* Number of layers */
-  fwdEegSphereLayer layers;	/* An array of layers */
-  float  r0[3];			/* The origin */
+//typedef struct {
+//  char  *name;                              /* Textual identifier */
+//  int   nlayer;                             /* Number of layers */
+//  INVERSELIB::FwdEegSphereLayer* layers;    /* An array of layers */
+//  float  r0[3];                             /* The origin */
 
-  double *fn;		        /* Coefficients saved to speed up the computations */
-  int    nterms;		/* How many? */
+//  double *fn;                               /* Coefficients saved to speed up the computations */
+//  int    nterms;                            /* How many? */
 
-  float  *mu;			/* The Berg-Scherg equivalence parameters */
-  float  *lambda;
-  int    nfit;			/* How many? */
-  int    scale_pos;		/* Scale the positions to the surface of the sphere? */
-} *fwdEegSphereModel,fwdEegSphereModelRec;
+//  float  *mu;                               /* The Berg-Scherg equivalence parameters */
+//  float  *lambda;
+//  int    nfit;                              /* How many? */
+//  int    scale_pos;                         /* Scale the positions to the surface of the sphere? */
+//} *fwdEegSphereModel,fwdEegSphereModelRec;
 
-typedef struct {
-  fwdEegSphereModel *models;	/* Set of EEG sphere model definitions */
-  int               nmodel;
-} *fwdEegSphereModelSet,fwdEegSphereModelSetRec;
+//typedef struct {
+//  INVERSELIB::FwdEegSphereModel** models;	/* Set of EEG sphere model definitions */
+//  int               nmodel;
+//} *fwdEegSphereModelSet,fwdEegSphereModelSetRec;
 
 #define FWD_BEM_UNKNOWN           -1
 #define FWD_BEM_CONSTANT_COLL     1

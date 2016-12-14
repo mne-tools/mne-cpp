@@ -40,7 +40,6 @@
 
 #include "fwd_eeg_sphere_model.h"
 
-#include "mne_allocs_helper.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -57,10 +56,6 @@ using namespace INVERSELIB;
 //=============================================================================================================
 
 FwdEegSphereModel::FwdEegSphereModel()
-: r0(Eigen::Vector3f::Zero(3))
-, nterms(0)
-, nfit(0)
-, scale_pos(0)
 {
 
 }
@@ -68,19 +63,19 @@ FwdEegSphereModel::FwdEegSphereModel()
 
 //*************************************************************************************************************
 
-FwdEegSphereModel::FwdEegSphereModel(const FwdEegSphereModel& p_FwdEegSphereModel)
-: name(p_FwdEegSphereModel.name)
-, layers(p_FwdEegSphereModel.layers)
-, r0(p_FwdEegSphereModel.r0)
-, fn(p_FwdEegSphereModel.fn)
-, nterms(p_FwdEegSphereModel.nterms)
-, mu(p_FwdEegSphereModel.mu)
-, lambda(p_FwdEegSphereModel.lambda)
-, nfit(p_FwdEegSphereModel.nfit)
-, scale_pos(p_FwdEegSphereModel.scale_pos)
-{
+//FwdEegSphereModel::FwdEegSphereModel(const FwdEegSphereModel& p_FwdEegSphereModel)
+//: name(p_FwdEegSphereModel.name)
+//, layers(p_FwdEegSphereModel.layers)
+//, r0(p_FwdEegSphereModel.r0)
+//, fn(p_FwdEegSphereModel.fn)
+//, nterms(p_FwdEegSphereModel.nterms)
+//, mu(p_FwdEegSphereModel.mu)
+//, lambda(p_FwdEegSphereModel.lambda)
+//, nfit(p_FwdEegSphereModel.nfit)
+//, scale_pos(p_FwdEegSphereModel.scale_pos)
+//{
 
-}
+//}
 
 
 //*************************************************************************************************************

@@ -89,13 +89,13 @@ public:
     */
     FwdEegSphereModel();
 
-    //=========================================================================================================
-    /**
-    * Copy constructor.
-    *
-    * @param[in] p_FwdEegSphereModel      Forward EEG Sphere Model which should be copied
-    */
-    FwdEegSphereModel(const FwdEegSphereModel& p_FwdEegSphereModel);
+//    //=========================================================================================================
+//    /**
+//    * Copy constructor.
+//    *
+//    * @param[in] p_FwdEegSphereModel      Forward EEG Sphere Model which should be copied
+//    */
+//    FwdEegSphereModel(const FwdEegSphereModel& p_FwdEegSphereModel);
 
     //=========================================================================================================
     /**
@@ -103,13 +103,6 @@ public:
     */
     ~FwdEegSphereModel();
 
-    //=========================================================================================================
-    /**
-    * Returns the number of layers
-    *
-    * @return the number of layers
-    */
-    int nlayer() { return layers.size(); }
 
 //    // fwd_multi_spherepot.c
 //    /*
@@ -119,19 +112,18 @@ public:
 
 
 public:
-    QString name;                       /**< Textual identifier */
-    QList<FwdEegSphereLayer> layers;    /**< A list of layers */
-    Eigen::Vector3f  r0;                /**< The origin */
+    char  *name;                /**< Textual identifier */
+    int   nlayer;               /**< Number of layers */
+    FwdEegSphereLayer* layers;  /**< An array of layers */
+    float  r0[3];               /**< The origin */
 
-    Eigen::VectorXd fn;                 /**< Coefficients saved to speed up the computations */
-    int    nterms;                      /**< How many? */
+    double *fn;                 /**< Coefficients saved to speed up the computations */
+    int    nterms;              /**< How many? */
 
-    Eigen::VectorXf mu;                 /**< The Berg-Scherg equivalence parameters */
-    Eigen::VectorXf lambda;
-    int    nfit;                        /**< How many? */
-    int    scale_pos;                   /**< Scale the positions to the surface of the sphere? */
-
-
+    float  *mu;                 /**< The Berg-Scherg equivalence parameters */
+    float  *lambda;
+    int    nfit;                /**< How many? */
+    int    scale_pos;           /**< Scale the positions to the surface of the sphere? */
 
 
 // ### OLD STRUCT ###
