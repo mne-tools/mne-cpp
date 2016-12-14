@@ -39,8 +39,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <inverse/dipoleFit/dipolefitsettings.h>
-#include <inverse/dipoleFit/dipolefit.h>
+#include <inverse/dipoleFit/dipole_fit_settings.h>
+#include <inverse/dipoleFit/dipole_fit.h>
 
 
 //*************************************************************************************************************

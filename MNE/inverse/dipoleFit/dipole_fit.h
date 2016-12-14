@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     dipolefit.h
+* @file     dipole_fit.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -43,7 +43,7 @@
 
 #include "../inverse_global.h"
 #include "ecd_set.h"
-#include "dipolefitsettings.h"
+#include "dipole_fit_settings.h"
 
 
 //*************************************************************************************************************

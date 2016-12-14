@@ -39,6 +39,7 @@
 
 #include "fwd_eeg_sphere_model_set.h"
 #include "guess_data.h"
+#include "dipole_fit_data.h"
 
 
 //*************************************************************************************************************
@@ -9704,7 +9705,7 @@ void free_dipole_forward ( DipoleForward* f )
 
 
 
-int compute_dipole_field(dipoleFitData d, float *rd, int whiten, float **fwd)
+int compute_dipole_field(DipoleFitData* d, float *rd, int whiten, float **fwd)
 /*
  * Compute the field and take whitening and projection into account
  */
@@ -9796,7 +9797,7 @@ bad :
 
 
 
-DipoleForward* dipole_forward(dipoleFitData d,
+DipoleForward* dipole_forward(DipoleFitData* d,
                              float         **rd,
                              int           ndip,
                              DipoleForward* old)
@@ -9883,7 +9884,7 @@ bad : {
     }
 }
 
-DipoleForward* dipole_forward_one(dipoleFitData d,
+DipoleForward* dipole_forward_one(DipoleFitData* d,
                                  float         *rd,
                                  DipoleForward* old)
 /*
@@ -16043,10 +16044,10 @@ static void free_dipole_fit_funcs(dipoleFitFuncs f)
 }
 
 
-dipoleFitData new_dipole_fit_data()
+DipoleFitData* new_dipole_fit_data()
 
 {
-    dipoleFitData res = MALLOC(1,dipoleFitDataRec);
+    DipoleFitData* res = MALLOC(1,DipoleFitData);
 
     res->mri_head_t    = NULL;
     res->meg_head_t    = NULL;
@@ -16082,7 +16083,7 @@ dipoleFitData new_dipole_fit_data()
 }
 
 
-void free_dipole_fit_data(dipoleFitData d)
+void free_dipole_fit_data(DipoleFitData* d)
 
 {
     if (!d)
@@ -16114,7 +16115,7 @@ void free_dipole_fit_data(dipoleFitData d)
 }
 
 
-static int setup_forward_model(dipoleFitData d, mneCTFcompDataSet comp_data, fwdCoilSet comp_coils)
+static int setup_forward_model(DipoleFitData* d, mneCTFcompDataSet comp_data, fwdCoilSet comp_coils)
 /*
  * Take care of some hairy details
  */
@@ -16431,7 +16432,7 @@ bad : {
 }
 
 
-int scale_noise_cov(dipoleFitData f,int nave)
+int scale_noise_cov(DipoleFitData* f,int nave)
 
 {
     float nave_ratio = ((float)f->nave)/(float)nave;
@@ -16527,7 +16528,7 @@ static void regularize_cov(mneCovMatrix c,       /* The matrix to regularize */
 
 
 
-static int scale_dipole_fit_noise_cov(dipoleFitData f,int nave)
+static int scale_dipole_fit_noise_cov(DipoleFitData* f,int nave)
 
 {
     float nave_ratio = ((float)f->nave)/(float)nave;
@@ -16578,7 +16579,7 @@ bad :
 
 
 
-int select_dipole_fit_noise_cov(dipoleFitData f, mshMegEegData d)
+int select_dipole_fit_noise_cov(DipoleFitData* f, mshMegEegData d)
 /*
  * Do the channel selection and scale with nave
  */
@@ -16660,7 +16661,7 @@ int select_dipole_fit_noise_cov(dipoleFitData f, mshMegEegData d)
 
 
 
-dipoleFitData setup_dipole_fit_data(char  *mriname,		 /* This gives the MRI/head transform */
+DipoleFitData* setup_dipole_fit_data(char  *mriname,		 /* This gives the MRI/head transform */
                                     char  *measname,		 /* This gives the MEG/head transform and
                                                                       * sensor locations */
                                     char  *bemname,		 /* BEM model */
@@ -16684,7 +16685,7 @@ dipoleFitData setup_dipole_fit_data(char  *mriname,		 /* This gives the MRI/head
       * Background work for modelling
       */
 {
-    dipoleFitData  res = new_dipole_fit_data();
+    DipoleFitData*  res = new_dipole_fit_data();
     int            k;
     char           **badlist = NULL;
     int            nbad      = 0;
@@ -16964,7 +16965,7 @@ bad : {
 
 
 int compute_guess_fields(GuessData* guess,
-                         dipoleFitData f)
+                         DipoleFitData* f)
 /*
       * Once the guess locations have been set up we can compute the fields
       */
@@ -17010,7 +17011,7 @@ GuessData* make_guess_data(char          *guessname,
                           float         mindist,
                           float         exclude,
                           float         grid,
-                          dipoleFitData f,
+                          DipoleFitData* f,
                           char          *guess_save_name)
 
 {
@@ -17117,7 +17118,7 @@ GuessData* make_guess_data(char          *guessname,
                           float         mindist,
                           float         exclude,
                           float         grid,
-                          dipoleFitData f)
+                          DipoleFitData* f)
 
 {
     mneSourceSpace *sp = NULL;
@@ -20263,7 +20264,7 @@ typedef struct {
    * Data links
    */
     FwdEegSphereModel* eeg_model;	/* The actual model based on the above settings */
-    dipoleFitData     fitdata;	/* The actual setup data */
+    DipoleFitData*     fitdata;	/* The actual setup data */
     GuessData*         guessdata;	/* The initial guess data */
     /*
    * Additional data
@@ -20273,7 +20274,7 @@ typedef struct {
 } *dipoleFitSetup,dipoleFitSetupRec;
 
 
-dipoleFitData get_dipole_fit_data(mshMegEegData d)
+DipoleFitData* get_dipole_fit_data(mshMegEegData d)
 /*
  * Pick up the fitting data from the opaque structure
  */
@@ -20402,7 +20403,7 @@ static int report_func(int     loop,
 }
 
 
-static int fit_Q(dipoleFitData fit,	     /* The fit data */
+static int fit_Q(DipoleFitData* fit,	     /* The fit data */
                  float *B,		     /* Measurement */
                  float *rd,		     /* Dipole position */
                  float limit,		     /* Radial component omission limit */
@@ -20445,7 +20446,7 @@ static float fit_eval(float *rd,int npar,void *user)
  * Calculate the residual sum of squares
  */
 {
-    dipoleFitData fit   = (dipoleFitData)user;
+    DipoleFitData* fit   = (DipoleFitData*)user;
     DipoleForward* fwd;
     fitDipUser       fuser = (fitDipUser)fit->user;
     double        Bm2,one;
@@ -20480,7 +20481,7 @@ static float rtol(float *vals,int nval)
 }
 
 
-static bool fit_one(dipoleFitData fit,	            /* Precomputed fitting data */
+static bool fit_one(DipoleFitData* fit,	            /* Precomputed fitting data */
                     GuessData*     guess,	            /* The initial guesses */
                     float         time,              /* Which time is it? */
                     float         *B,	            /* The field to fit */
@@ -20617,7 +20618,7 @@ bad : {
 int fit_dipoles_raw(char           *dataname,
                     mneRawData     raw,          /* The raw data description */
                     mneChSelection sel,	         /* Channel selection to use */
-                    dipoleFitData  fit,	         /* Precomputed fitting data */
+                    DipoleFitData*  fit,	         /* Precomputed fitting data */
                     GuessData*      guess,        /* The initial guesses */
                     float          tmin,         /* Time range */
                     float          tmax,
@@ -20707,7 +20708,7 @@ bad : {
 int fit_dipoles_raw(char           *dataname,
                     mneRawData     raw,          /* The raw data description */
                     mneChSelection sel,	         /* Channel selection to use */
-                    dipoleFitData  fit,	         /* Precomputed fitting data */
+                    DipoleFitData*  fit,	         /* Precomputed fitting data */
                     GuessData*      guess,        /* The initial guesses */
                     float          tmin,         /* Time range */
                     float          tmax,
@@ -20727,7 +20728,7 @@ void print_fields(float       *rd,
                   float       *Q,
                   float       time,
                   float       integ,
-                  dipoleFitData fit,
+                  DipoleFitData* fit,
                   mneMeasData data)
 
 {
@@ -20769,7 +20770,7 @@ out : {
 
 int    fit_dipoles(char          *dataname,
                    mneMeasData   data,       /* The measured data */
-                   dipoleFitData fit,	     /* Precomputed fitting data */
+                   DipoleFitData* fit,	     /* Precomputed fitting data */
                    GuessData*     guess,	     /* The initial guesses */
                    float         tmin,	     /* Time range */
                    float         tmax,
