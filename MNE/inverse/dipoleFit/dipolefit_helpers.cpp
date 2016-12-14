@@ -2119,7 +2119,7 @@ int mne_decompose_eigen (double *mat,
 
 
 
-int mne_read_meg_comp_eeg_ch_info(char           *name,
+int mne_read_meg_comp_eeg_ch_info(const QString& name,
                                   fiffChInfo     *megp,	 /* MEG channels */
                                   int            *nmegp,
                                   fiffChInfo     *meg_compp,
@@ -2150,11 +2150,11 @@ int mne_read_meg_comp_eeg_ch_info(char           *name,
     fiffFile     in = NULL;
     fiffCoordTrans t = NULL;
     int j,k,to_find;
-    extern fiffCoordTrans mne_read_meas_transform(char *name);
+    extern fiffCoordTrans mne_read_meas_transform(const QString& name);
 
     tag.data = NULL;
 
-    if ((in = fiff_open(name)) == NULL)
+    if ((in = fiff_open(name.toLatin1().data())) == NULL)
         goto bad;
 
     nodes = fiff_dir_tree_find(in->dirtree,FIFFB_MNE_PARENT_MEAS_FILE);
@@ -2448,10 +2448,10 @@ bad : {
 }
 
 
-static int read_ch_info(char       *name,
-                        fiffChInfo *chsp,
-                        int        *nchanp,
-                        fiffId     *idp)
+static int read_ch_info(const QString&  name,
+                        fiffChInfo      *chsp,
+                        int             *nchanp,
+                        fiffId          *idp)
 /*
       * Read channel information from a measurement file
       */
@@ -2466,7 +2466,7 @@ static int read_ch_info(char       *name,
     fiffDirNode    node;
 
     tag.data = NULL;
-    if ((in = fiff_open(name)) == NULL)
+    if ((in = fiff_open(name.toLatin1().data())) == NULL)
         goto bad;
     meas = fiff_dir_tree_find(in->dirtree,FIFFB_MEAS);
     if (meas[0] == NULL) {
@@ -2533,7 +2533,7 @@ static int accept_ch(fiffChInfo ch,
 
 
 
-int read_meg_eeg_ch_info(char       *name,       /* Input file */
+int read_meg_eeg_ch_info(const QString& name,       /* Input file */
                          int        do_meg,	 /* Use MEG */
                          int        do_eeg,	 /* Use EEG */
                          char       **bads,	 /* List of bad channels */
@@ -2897,7 +2897,7 @@ out : {
 }
 
 
-fiffCoordTrans mne_read_transform(char *name,int from, int to)
+fiffCoordTrans mne_read_transform(const QString& name,int from, int to)
 /*
       * Read the specified coordinate transformation
       */
@@ -2909,7 +2909,7 @@ fiffCoordTrans mne_read_transform(char *name,int from, int to)
     int k;
 
     tag.data = NULL;
-    if ((in = fiff_open(name)) == NULL)
+    if ((in = fiff_open(name.toLatin1().data())) == NULL)
         goto out;
     for (k = 0, dir = in->dir; k < in->nent; k++,dir++)
         if (dir->kind == FIFF_COORD_TRANS) {
@@ -2938,7 +2938,7 @@ out : {
     return res;
 }
 
-fiffCoordTrans mne_read_mri_transform(char *name)
+fiffCoordTrans mne_read_mri_transform(const QString& name)
 /*
       * Read the MRI -> HEAD coordinate transformation
       */
@@ -2947,7 +2947,7 @@ fiffCoordTrans mne_read_mri_transform(char *name)
 }
 
 
-fiffCoordTrans mne_read_meas_transform(char *name)
+fiffCoordTrans mne_read_meas_transform(const QString& name)
 /*
       * Read the MEG device -> HEAD coordinate transformation
       */
@@ -6778,10 +6778,10 @@ bad : {
     }
 }
 
-mneProjOp mne_read_proj_op(char *name)
+mneProjOp mne_read_proj_op(const QString& name)
 
 {
-    fiffFile    in  = fiff_open(name);
+    fiffFile    in  = fiff_open(name.toLatin1().data());
     mneProjOp   res = NULL;
 
     if (in == NULL)
@@ -7153,7 +7153,7 @@ static int mne_calibrate_ctf_comp(mneCTFcompData one,
 
 
 
-mneCTFcompDataSet mne_read_ctf_comp_data(char *name)
+mneCTFcompDataSet mne_read_ctf_comp_data(const QString& name)
 /*
  * Read all CTF compensation data from a given file
  */
@@ -7190,7 +7190,7 @@ mneCTFcompDataSet mne_read_ctf_comp_data(char *name)
     /*
    * Read the rest of the stuff
    */
-    if ((in = fiff_open(name)) == NULL)
+    if ((in = fiff_open(name.toLatin1().data())) == NULL)
         goto bad;
     set = mne_new_ctf_comp_data_set();
     /*
@@ -7343,7 +7343,6 @@ int mne_make_ctf_comp(mneCTFcompDataSet set,         /* The available compensati
  * Make compensation data to apply to a set of channels to yield (or uncompensated) compensated data
  */
 {
-    qDebug() << "###### [0] int mne_make_ctf_comp";
     int *comps = NULL;
     int need_comp;
     int first_comp;
@@ -7658,10 +7657,9 @@ int mne_ctf_compensate_to(mneCTFcompDataSet set,            /* The compensation 
    */
     if (mne_make_ctf_comp(set,chs,nchan,comp_chs,ncomp_chan) == FAIL)
         goto bad;
-    qDebug() << "###### [1] After int mne_make_ctf_comp";
     /*
-   * Are we there already?
-   */
+    * Are we there already?
+    */
     if (set->current && set->current->mne_kind == compensate_to) {
         fprintf(stderr,"The data were already compensated as desired (%s)\n",mne_explain_ctf_comp(set->current->kind));
         return OK;
@@ -7687,10 +7685,9 @@ int mne_ctf_compensate_to(mneCTFcompDataSet set,            /* The compensation 
                 comp_was = set->current->mne_kind;
             if (mne_make_ctf_comp(set,chs,nchan,comp_chs,ncomp_chan) == FAIL)
                 goto bad;
-            qDebug() << "###### [2] After int mne_make_ctf_comp";
             /*
-       * Do the third-order gradient compensation
-       */
+            * Do the third-order gradient compensation
+            */
             for (k = 0; k < np; k++)
                 if (mne_apply_ctf_comp(set,TRUE,data[k],nchan,comp_data[k],ncomp_chan) == FAIL)
                     goto bad;
@@ -7753,7 +7750,6 @@ int mne_ctf_set_compensation(mneCTFcompDataSet set,            /* The compensati
    */
     if (mne_make_ctf_comp(set,chs,nchan,comp_chs,ncomp_chan) == FAIL)
         goto bad;
-    qDebug() << "###### [3] After int mne_make_ctf_comp";
     /*
    * Are we there already?
    */
@@ -7776,7 +7772,6 @@ int mne_ctf_set_compensation(mneCTFcompDataSet set,            /* The compensati
             comp_was = MNE_CTFV_NOGRAD;
         if (mne_make_ctf_comp(set,chs,nchan,comp_chs,ncomp_chan) == FAIL)
             goto bad;
-        qDebug() << "###### [4] After int mne_make_ctf_comp";
         fprintf(stderr,"Compensation set up as requested (%s -> %s).\n",
                 mne_explain_ctf_comp(mne_map_ctf_comp_kind(comp_was)),
                 mne_explain_ctf_comp(set->current->kind));
@@ -7823,7 +7818,7 @@ static char *next_line(char *line, int n, FILE *in)
 
 #define MAXLINE 500
 
-int mne_read_bad_channels(char *name, char ***listp, int *nlistp)
+int mne_read_bad_channels(const QString& name, char ***listp, int *nlistp)
 /*
       * Read bad channel names
       */
@@ -7835,11 +7830,11 @@ int mne_read_bad_channels(char *name, char ***listp, int *nlistp)
     char *next;
 
 
-    if (!name || strlen(name) == 0)
+    if (name.isEmpty())
         return OK;
 
-    if ((in = fopen(name,"r")) == NULL) {
-        qCritical(name);
+    if ((in = fopen(name.toLatin1().data(),"r")) == NULL) {
+        qCritical() << name;
         goto bad;
     }
     while ((next = next_line(line,MAXLINE,in)) != NULL) {
@@ -7898,10 +7893,10 @@ int mne_read_bad_channel_list_from_node(fiffFile in, fiffDirNode node, char ***l
     return OK;
 }
 
-int mne_read_bad_channel_list(char *name, char ***listp, int *nlistp)
+int mne_read_bad_channel_list(const QString& name, char ***listp, int *nlistp)
 
 {
-    fiffFile in = fiff_open(name);
+    fiffFile in = fiff_open(name.toLatin1().data());
     int res;
 
     if (in == NULL)
@@ -8281,7 +8276,7 @@ static int check_cov_data(double *vals, int nval)
 
 
 
-mneCovMatrix mne_read_cov(char *name,int kind)
+mneCovMatrix mne_read_cov(const QString& name,int kind)
 /*
       * Read a covariance matrix from a fiff
       */
@@ -8310,11 +8305,11 @@ mneCovMatrix mne_read_cov(char *name,int kind)
     mneSssData     sss = NULL;
 
 
-    if ((in = fiff_open(name)) == NULL)
+    if ((in = fiff_open(name.toLatin1().data())) == NULL)
         goto out;
     nodes = fiff_dir_tree_find(in->dirtree,FIFFB_MNE_COV);
     if (nodes[0] == NULL) {
-        printf("No covariance matrix available in %s",name);
+        printf("No covariance matrix available in %s",name.toLatin1().data());
         goto out;
     }
     /*
@@ -13831,13 +13826,9 @@ static int fwd_make_ctf_comp_coils(mneCTFcompDataSet set,          /* The availa
         ncomp = comp_coils->ncoil;
     }
     res = mne_make_ctf_comp(set,chs,nchan,compchs,ncomp);
-    qDebug() << "###### [5] After int mne_make_ctf_comp";
 
     FREE(chs);
     FREE(compchs);
-
-
-    qDebug() << "###### [6]";
 
     return res;
 }
@@ -13870,15 +13861,9 @@ fwdCompData fwd_make_comp_data(mneCTFcompDataSet set,           /* The CTF compe
                                 coils,
                                 comp->comp_coils) != OK) {
         fwd_free_comp_data(comp);
-
-        qDebug() << "###### [7]";
-
         return NULL;
     }
     else {
-
-        qDebug() << "###### [8]";
-
         return comp;
     }
 }
@@ -16194,9 +16179,6 @@ static int setup_forward_model(DipoleFitData* d, mneCTFcompDataSet comp_data, fw
        */
             comp = fwd_make_comp_data(comp_data,d->meg_coils,comp_coils,
                                       fwd_bem_field,NULL,NULL,d->bem_model,NULL);
-
-            qDebug() << "###### [9]";
-
             if (!comp)
                 goto out;
             printf("Compensation setup done.\n");
@@ -16244,9 +16226,6 @@ static int setup_forward_model(DipoleFitData* d, mneCTFcompDataSet comp_data, fw
                                   fwd_sphere_field_vec,
                                   NULL,
                                   d->r0,NULL);
-
-        qDebug() << "###### [10]";
-
         if (!comp)
             goto out;
         f->meg_field       = fwd_comp_field;
@@ -16270,43 +16249,22 @@ static int setup_forward_model(DipoleFitData* d, mneCTFcompDataSet comp_data, fw
                                   fwd_mag_dipole_field_vec,
                                   NULL,
                                   NULL,NULL);
-
-        qDebug() << "###### [11]";
-
         if (!comp)
             goto out;
-
-
-        qDebug() << "###### [12]";
-
         f->meg_field       = fwd_comp_field;
         f->meg_vec_field   = fwd_comp_field_vec;
         f->meg_client      = comp;
         f->meg_client_free = fwd_free_comp_data;
     }
-
-
-    qDebug() << "###### [13]";
-
     f->eeg_pot     = fwd_mag_dipole_field;
-
-    qDebug() << "###### [13.1]";
-
     f->eeg_vec_pot = fwd_mag_dipole_field_vec;
-
-
-    qDebug() << "###### [13.2]";
-
     /*
-   * Select the appropriate fitting function
-   */
+    * Select the appropriate fitting function
+    */
     d->funcs = d->bemname ? d->bem_funcs : d->sphere_funcs;
-
-    qDebug() << "###### [13.4]";
 
     fprintf (stderr,"\n");
     return OK;
-
 
 out :
     return FAIL;
@@ -16369,8 +16327,7 @@ static mneCovMatrix ad_hoc_noise(fwdCoilSet meg,          /* Channel name lists 
     return mne_new_cov(FIFFV_MNE_NOISE_COV,nchan,names,NULL,stds);
 }
 
-static int make_projection(char       **projnames,
-                           int        nproj,
+static int make_projection(const QList<QString>& projnames,
                            fiffChInfo chs,
                            int        nch,
                            mneProjOp  *res)
@@ -16383,38 +16340,27 @@ static int make_projection(char       **projnames,
     int       k,found;
     int       neeg;
 
-
-    qDebug() << "###### [14.1]";
-
     for (k = 0, neeg = 0; k < nch; k++)
         if (chs[k].kind == FIFFV_EEG_CH)
             neeg++;
 
-    qDebug() << "###### [14.2]";
-
-    if (nproj == 0 && neeg == 0)
+    if (projnames.size() == 0 && neeg == 0)
         return OK;
 
-
-    qDebug() << "###### [14.3]";
-
-    for (k = 0; k < nproj; k++) {
+    for (k = 0; k < projnames.size(); k++) {
         if ((one = mne_read_proj_op(projnames[k])) == NULL)
             goto bad;
         if (one->nitems == 0) {
-            printf("No linear projection information in %s.\n",projnames[k]);
+            printf("No linear projection information in %s.\n",projnames[k].toLatin1().data());
             mne_free_proj_op(one); one = NULL;
         }
         else {
-            printf("Loaded projection from %s:\n",projnames[k]);
+            printf("Loaded projection from %s:\n",projnames[k].toLatin1().data());
             mne_proj_op_report(stderr,"\t",one);
             all = mne_proj_op_combine(all,one);
             mne_free_proj_op(one); one = NULL;
         }
     }
-
-
-    qDebug() << "###### [14.4]";
 
     if (neeg > 0) {
         found = FALSE;
@@ -16714,26 +16660,24 @@ int select_dipole_fit_noise_cov(DipoleFitData* f, mshMegEegData d)
 
 
 
-DipoleFitData* setup_dipole_fit_data(char  *mriname,		 /* This gives the MRI/head transform */
-                                    char  *measname,		 /* This gives the MEG/head transform and
-                                                                      * sensor locations */
-                                    char  *bemname,         /* BEM model */
-                                    Eigen::Vector3f *r0,			 /* Sphere model origin in head coordinates (optional) */
-                                    FwdEegSphereModel* eeg_model, /* EEG sphere model definition */
-                                    int   accurate_coils,	 /* Use accurate coil definitions? */
-                                    char  *badname,		 /* Bad channels list */
-                                    char  *noisename,		 /* Noise covariance matrix */
-                                    float grad_std,              /* Standard deviations for the ad-hoc noise cov (planar gradiometers) */
-                                    float mag_std,               /* Ditto for magnetometers */
-                                    float eeg_std,               /* Ditto for EEG */
-                                    float mag_reg,               /* Noise-covariance regularization factors */
-                                    float grad_reg,
-                                    float eeg_reg,
-                                    int   diagnoise,		 /* Use only the diagonal elements of the noise-covariance matrix */
-                                    char  **projnames,           /* SSP file names */
-                                    int   nproj,                 /* How many of them */
-                                    int   include_meg,           /* Include MEG in the fitting? */
-                                    int   include_eeg)           /* Include EEG in the fitting? */
+DipoleFitData* setup_dipole_fit_data(   const QString& mriname,         /**< This gives the MRI/head transform */
+                                        const QString& measname,        /**< This gives the MEG/head transform and sensor locations */
+                                        char  *bemname,                 /**< BEM model */
+                                        Eigen::Vector3f *r0,            /**< Sphere model origin in head coordinates (optional) */
+                                        FwdEegSphereModel* eeg_model,   /**< EEG sphere model definition */
+                                        int   accurate_coils,           /**< Use accurate coil definitions? */
+                                        const QString& badname,         /**< Bad channels list */
+                                        const QString& noisename,               /**< Noise covariance matrix */
+                                        float grad_std,                 /**< Standard deviations for the ad-hoc noise cov (planar gradiometers) */
+                                        float mag_std,                  /**< Ditto for magnetometers */
+                                        float eeg_std,                  /**< Ditto for EEG */
+                                        float mag_reg,                  /**< Noise-covariance regularization factors */
+                                        float grad_reg,
+                                        float eeg_reg,
+                                        int   diagnoise,                /**< Use only the diagonal elements of the noise-covariance matrix */
+                                        const QList<QString>& projnames,/**< SSP file names */
+                                        int   include_meg,              /**< Include MEG in the fitting? */
+                                        int   include_eeg)              /**< Include EEG in the fitting? */
 /*
       * Background work for modelling
       */
@@ -16753,7 +16697,7 @@ DipoleFitData* setup_dipole_fit_data(char  *mriname,		 /* This gives the MRI/hea
     /*
    * Read the coordinate transformations
    */
-    if (mriname) {
+    if (!mriname.isEmpty()) {
         if ((res->mri_head_t = mne_read_mri_transform(mriname)) == NULL)
             goto bad;
     }
@@ -16776,7 +16720,7 @@ DipoleFitData* setup_dipole_fit_data(char  *mriname,		 /* This gives the MRI/hea
     /*
    * Read the bad channel lists
    */
-    if (badname) {
+    if (!badname.isEmpty()) {
         if (mne_read_bad_channels(badname,&badlist,&nbad) != OK)
             goto bad;
         printf("%d bad channels read from %s.\n",nbad,badname);
@@ -16889,18 +16833,12 @@ DipoleFitData* setup_dipole_fit_data(char  *mriname,		 /* This gives the MRI/hea
    */
     if (setup_forward_model(res,comp_data,comp_coils) == FAIL)
         goto bad;
-
-    qDebug() << "###### [14]";
-
     res->column_norm = COLUMN_NORM_LOC;
     /*
    * Projection data should go here
    */
-    if (make_projection(projnames,nproj,res->chs,res->nmeg+res->neeg,&res->proj) == FAIL)
+    if (make_projection(projnames,res->chs,res->nmeg+res->neeg,&res->proj) == FAIL)
         goto bad;
-
-    qDebug() << "###### [15]";
-
     if (res->proj && res->proj->nitems > 0) {
         fprintf(stderr,"Final projection operator is:\n");
         mne_proj_op_report(stderr,"\t",res->proj);
@@ -16913,17 +16851,14 @@ DipoleFitData* setup_dipole_fit_data(char  *mriname,		 /* This gives the MRI/hea
     else
         printf("No projection will be applied to the data.\n");
 
-
-    qDebug() << "###### [16]";
-
     /*
-   * Noise covariance
-   */
-    if (noisename) {
+    * Noise covariance
+    */
+    if (!noisename.isEmpty()) {
         if ((cov = mne_read_cov(noisename,FIFFV_MNE_SENSOR_COV)) == NULL)
             goto bad;
         printf("Read a %s noise-covariance matrix from %s\n",
-               cov->cov_diag ? "diagonal" : "full", noisename);
+               cov->cov_diag ? "diagonal" : "full", noisename.toLatin1().data());
     }
     else {
         if ((cov = ad_hoc_noise(res->meg_coils,res->eeg_els,grad_std,mag_std,eeg_std)) == NULL)
