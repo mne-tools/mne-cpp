@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     ecd_set.h
+* @file     fwd_eeg_sphere_model.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -18,7 +18,7 @@
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
 *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
-*
+* 
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
 * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
@@ -29,13 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     FiffDigPointSet class declaration.
+* @brief    FwdEegSphereModel class declaration.
 *
 */
 
-#ifndef ECD_SET_H
-#define ECD_SET_H
-
+#ifndef FWDEEGSPHEREMODEL_H
+#define FWDEEGSPHEREMODEL_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -43,7 +42,15 @@
 //=============================================================================================================
 
 #include "../inverse_global.h"
-#include "ecd.h"
+#include "fwd_eeg_sphere_layer.h"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
 
 
 //*************************************************************************************************************
@@ -52,20 +59,7 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
-#include <QList>
-#include <QString>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Eigen INCLUDES
-//=============================================================================================================
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
+#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -73,129 +67,89 @@
 // DEFINE NAMESPACE INVERSELIB
 //=============================================================================================================
 
-namespace INVERSELIB {
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FIFFLIB FORWARD DECLARATIONS
-//=============================================================================================================
+namespace INVERSELIB
+{
 
 
 //=============================================================================================================
 /**
-* Implements Electric Current Dipole Set (Replaces *ecdSet,ecdSetRec struct of MNE-C fit_types.h).
+* Implements FwdEegSphereModel (Replaces *fwdEegSphereModel,fwdEegSphereModelRec struct of MNE-C fwd_types.h).
 *
-* @brief Holds a set of Electric Current Dipoles.
+* @brief Electric Current Dipole description
 */
-
-class INVERSESHARED_EXPORT ECDSet
+class INVERSESHARED_EXPORT FwdEegSphereModel
 {
-
 public:
-    typedef QSharedPointer<ECDSet> SPtr;            /**< Shared pointer type for ECDSet. */
-    typedef QSharedPointer<const ECDSet> ConstSPtr; /**< Const shared pointer type for ECDSet. */
+    typedef QSharedPointer<FwdEegSphereModel> SPtr;              /**< Shared pointer type for FwdEegSphereModel. */
+    typedef QSharedPointer<const FwdEegSphereModel> ConstSPtr;   /**< Const shared pointer type for FwdEegSphereModel. */
 
     //=========================================================================================================
     /**
-    * Constructs a Electric Current Dipole Set object.
+    * Constructs the Forward EEG Sphere Model
     */
-    ECDSet();
+    FwdEegSphereModel();
 
     //=========================================================================================================
     /**
     * Copy constructor.
     *
-    * @param[in] p_ECDSet       Electric Current Dipole Set which should be copied
+    * @param[in] p_FwdEegSphereModel      Forward EEG Sphere Model which should be copied
     */
-    ECDSet(const ECDSet &p_ECDSet);
+    FwdEegSphereModel(const FwdEegSphereModel& p_FwdEegSphereModel);
 
     //=========================================================================================================
     /**
     * Destroys the Electric Current Dipole description
     */
-    ~ECDSet();
+    ~FwdEegSphereModel();
 
     //=========================================================================================================
     /**
-    * Appends an Electric Current Dipole to the set
+    * Returns the number of layers
+    *
+    * @return the number of layers
     */
-    void addEcd(const ECD& p_ecd);
+    int nlayer() { return layers.size(); }
 
-    //=========================================================================================================
-    /**
-    * Read dipoles from the dip format compatible with mrilab
-    *
-    * @param[in] name   File name to read from.
-    */
-    static ECDSet read_dipoles_dip(const QString& fileName);
+//    // fwd_multi_spherepot.c
+//    /*
+//    * Get the model depended weighting factor for n
+//    */
+//    double fwd_eeg_get_multi_sphere_model_coeff(int n);
 
-    //=========================================================================================================
-    /**
-    * Save dipoles in the bdip format employed by xfit
-    *
-    * @param[in] fileName   File name to save to.
-    */
-    bool save_dipoles_bdip(const QString& fileName);
-
-    //=========================================================================================================
-    /**
-    * Save dipoles in the dip format suitable for mrilab
-    *
-    * @param[in] fileName   File name to save to.
-    */
-    bool save_dipoles_dip(const QString& fileName) const;
-
-    //=========================================================================================================
-    /**
-    * Returns the number of stored ECDs
-    *
-    * @return number of stored ECDs
-    */
-    inline qint32 size() const;
-
-    //=========================================================================================================
-    /**
-    * Subscript operator [] to access ECD by index
-    *
-    * @param[in] idx    the ECD index.
-    *
-    * @return ECD related to the parameter index.
-    */
-    const ECD& operator[] (qint32 idx) const;
-
-    //=========================================================================================================
-    /**
-    * Subscript operator [] to access ECD by index
-    *
-    * @param[in] idx    the ECD index.
-    *
-    * @return ECD related to the parameter index.
-    */
-    ECD& operator[] (qint32 idx);
-
-    //=========================================================================================================
-    /**
-    * Subscript operator << to add a new ECD
-    *
-    * @param[in] p_ecd      ECD to be added
-    *
-    * @return ECDSet
-    */
-    ECDSet& operator<< (const ECD& p_ecd);
 
 public:
-    QString dataname;   /**< The associated data file */
+    QString name;                       /**< Textual identifier */
+    QList<FwdEegSphereLayer> layers;    /**< A list of layers */
+    Eigen::Vector3f  r0;                /**< The origin */
 
-private:
-    QList<ECD> m_qListDips;    /**< List of Electric Current Dipoles. */
+    Eigen::VectorXd fn;                 /**< Coefficients saved to speed up the computations */
+    int    nterms;                      /**< How many? */
+
+    Eigen::VectorXf mu;                 /**< The Berg-Scherg equivalence parameters */
+    Eigen::VectorXf lambda;
+    int    nfit;                        /**< How many? */
+    int    scale_pos;                   /**< Scale the positions to the surface of the sphere? */
+
+
+
 
 // ### OLD STRUCT ###
 //    typedef struct {
-//      char *dataname;		/* The associated data file */
-//      int  ndip;			/* How many dipoles */
-//      ecd  *dips;			/* The dipoles themselves */
-//    } *ecdSet,ecdSetRec;		/* A set of ECDs */
+//      char  *name;            /* Textual identifier */
+//      int   nlayer;			/* Number of layers */
+//      fwdEegSphereLayer layers;	/* An array of layers */
+//      float  r0[3];			/* The origin */
+
+//      double *fn;		        /* Coefficients saved to speed up the computations */
+//      int    nterms;		/* How many? */
+
+//      float  *mu;			/* The Berg-Scherg equivalence parameters */
+//      float  *lambda;
+//      int    nfit;			/* How many? */
+//      int    scale_pos;		/* Scale the positions to the surface of the sphere? */
+//    } *fwdEegSphereModel,fwdEegSphereModelRec;
+
 };
 
 
@@ -204,11 +158,7 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline qint32 ECDSet::size() const
-{
-    return m_qListDips.size();
-}
 
 } // NAMESPACE INVERSELIB
 
-#endif // ECD_SET_H
+#endif // FWDEEGSPHEREMODEL_H

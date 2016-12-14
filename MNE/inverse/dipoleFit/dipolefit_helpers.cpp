@@ -185,38 +185,6 @@ using namespace INVERSELIB;
 
 
 
-//============================= mne_allocs.h =============================
-
-/*
- * Basics...
- */
-#define MALLOC(x,t) (t *)malloc((x)*sizeof(t))
-#define REALLOC(x,y,t) (t *)((x == NULL) ? malloc((y)*sizeof(t)) : realloc((x),(y)*sizeof(t)))
-#define FREE(x) if ((char *)(x) != NULL) free((char *)(x))
-/*
- * Float, double, and int arrays
- */
-#define ALLOC_FLOAT(x) MALLOC(x,float)
-#define ALLOC_DOUBLE(x) MALLOC(x,double)
-#define ALLOC_INT(x) MALLOC(x,int)
-#define REALLOC_FLOAT(x,y) REALLOC(x,y,float)
-#define REALLOC_DOUBLE(x,y) REALLOC(x,y,double)
-#define REALLOC_INT(x,y) REALLOC(x,y,int)
-/*
- * float matrices
- */
-#define ALLOC_CMATRIX(x,y) mne_cmatrix((x),(y))
-#define FREE_CMATRIX(m) mne_free_cmatrix((m))
-#define CMATRIX ALLOC_CMATRIX
-/*
- * double matrices
- */
-#define ALLOC_DCMATRIX(x,y) mne_dmatrix((x),(y))
-#define ALLOC_COMPLEX_DCMATRIX(x,y) mne_complex_dmatrix((x),(y))
-#define FREE_DCMATRIX(m) mne_free_dcmatrix((m))
-#define FREE_COMPLEX_DCMATRIX(m) mne_free_dcmatrix((m))
-
-
 //============================= Refactoring helpers =============================
 
 //float
@@ -293,6 +261,37 @@ void fromDoubleEigenVector(const Eigen::VectorXd& from_vec, double *to_vec)
 }
 
 
+
+//============================= mne_allocs.h =============================
+
+/*
+ * Basics...
+ */
+#define MALLOC(x,t) (t *)malloc((x)*sizeof(t))
+#define REALLOC(x,y,t) (t *)((x == NULL) ? malloc((y)*sizeof(t)) : realloc((x),(y)*sizeof(t)))
+#define FREE(x) if ((char *)(x) != NULL) free((char *)(x))
+/*
+ * Float, double, and int arrays
+ */
+#define ALLOC_FLOAT(x) MALLOC(x,float)
+#define ALLOC_DOUBLE(x) MALLOC(x,double)
+#define ALLOC_INT(x) MALLOC(x,int)
+#define REALLOC_FLOAT(x,y) REALLOC(x,y,float)
+#define REALLOC_DOUBLE(x,y) REALLOC(x,y,double)
+#define REALLOC_INT(x,y) REALLOC(x,y,int)
+/*
+ * float matrices
+ */
+#define ALLOC_CMATRIX(x,y) mne_cmatrix((x),(y))
+#define FREE_CMATRIX(m) mne_free_cmatrix((m))
+#define CMATRIX ALLOC_CMATRIX
+/*
+ * double matrices
+ */
+#define ALLOC_DCMATRIX(x,y) mne_dmatrix((x),(y))
+#define ALLOC_COMPLEX_DCMATRIX(x,y) mne_complex_dmatrix((x),(y))
+#define FREE_DCMATRIX(m) mne_free_dcmatrix((m))
+#define FREE_COMPLEX_DCMATRIX(m) mne_free_dcmatrix((m))
 
 
 //============================= mne_allocs.c =============================

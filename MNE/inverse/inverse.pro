@@ -101,6 +101,9 @@ SOURCES += \
     dipoleFit/dipolefit.cpp \
     dipoleFit/dipolefitsettings.cpp \
     dipoleFit/dipolefit_helpers.cpp \
+    dipoleFit/fwd_eeg_sphere_layer.cpp \
+    dipoleFit/fwd_eeg_sphere_model.cpp \
+    dipoleFit/fwd_eeg_sphere_model_set.cpp \
     minimumNorm/minimumnorm.cpp \
     rapMusic/rapmusic.cpp \
     rapMusic/pwlrapmusic.cpp \
@@ -120,6 +123,10 @@ HEADERS +=\
     dipoleFit/analyze_types.h \
     dipoleFit/dipolefit.h \
     dipoleFit/dipolefitsettings.h \
+    dipoleFit/mne_allocs_helper.h \
+    dipoleFit/fwd_eeg_sphere_layer.h \
+    dipoleFit/fwd_eeg_sphere_model.h \
+    dipoleFit/fwd_eeg_sphere_model_set.h \
     minimumNorm/minimumnorm.h \
     rapMusic/rapmusic.h \
     rapMusic/pwlrapmusic.h \

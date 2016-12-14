@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     ecd_set.h
+* @file     fwd_eeg_sphere_model_set.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     FiffDigPointSet class declaration.
+* @brief     FwdEegSphereModelSet class declaration.
 *
 */
 
-#ifndef ECD_SET_H
-#define ECD_SET_H
+#ifndef FWDEEGSPHEREMODELSET_H
+#define FWDEEGSPHEREMODELSET_H
 
 
 //*************************************************************************************************************
@@ -43,7 +43,7 @@
 //=============================================================================================================
 
 #include "../inverse_global.h"
-#include "ecd.h"
+#include "fwd_eeg_sphere_model.h"
 
 
 //*************************************************************************************************************
@@ -84,118 +84,90 @@ namespace INVERSELIB {
 
 //=============================================================================================================
 /**
-* Implements Electric Current Dipole Set (Replaces *ecdSet,ecdSetRec struct of MNE-C fit_types.h).
+* Definitions for the EEG Sphere Model Set (Replaces *fwdEegSphereModelSet,fwdEegSphereModelSetRec struct of MNE-C fwd_types.h).
 *
 * @brief Holds a set of Electric Current Dipoles.
 */
 
-class INVERSESHARED_EXPORT ECDSet
+class INVERSESHARED_EXPORT FwdEegSphereModelSet
 {
 
 public:
-    typedef QSharedPointer<ECDSet> SPtr;            /**< Shared pointer type for ECDSet. */
-    typedef QSharedPointer<const ECDSet> ConstSPtr; /**< Const shared pointer type for ECDSet. */
+    typedef QSharedPointer<FwdEegSphereModelSet> SPtr;            /**< Shared pointer type for FwdEegSphereModelSet. */
+    typedef QSharedPointer<const FwdEegSphereModelSet> ConstSPtr; /**< Const shared pointer type for FwdEegSphereModelSet. */
 
     //=========================================================================================================
     /**
-    * Constructs a Electric Current Dipole Set object.
+    * Constructs a Forward EEG Sphere Model Set object.
     */
-    ECDSet();
+    FwdEegSphereModelSet();
 
     //=========================================================================================================
     /**
     * Copy constructor.
     *
-    * @param[in] p_ECDSet       Electric Current Dipole Set which should be copied
+    * @param[in] p_FwdEegSphereModelSet     Forward EEG Sphere Model Set which should be copied
     */
-    ECDSet(const ECDSet &p_ECDSet);
+    FwdEegSphereModelSet(const FwdEegSphereModelSet &p_FwdEegSphereModelSet);
 
     //=========================================================================================================
     /**
-    * Destroys the Electric Current Dipole description
+    * Destroys the Forward EEG Sphere Model Set description
     */
-    ~ECDSet();
+    ~FwdEegSphereModelSet();
 
     //=========================================================================================================
     /**
-    * Appends an Electric Current Dipole to the set
+    * Appends an orward EEG Sphere Model to the set
     */
-    void addEcd(const ECD& p_ecd);
+    void addFwdEegSphereModel(const FwdEegSphereModel& p_FwdEegSphereModel);
 
     //=========================================================================================================
     /**
-    * Read dipoles from the dip format compatible with mrilab
+    * Returns the number of stored FwdEegSphereModels
     *
-    * @param[in] name   File name to read from.
-    */
-    static ECDSet read_dipoles_dip(const QString& fileName);
-
-    //=========================================================================================================
-    /**
-    * Save dipoles in the bdip format employed by xfit
-    *
-    * @param[in] fileName   File name to save to.
-    */
-    bool save_dipoles_bdip(const QString& fileName);
-
-    //=========================================================================================================
-    /**
-    * Save dipoles in the dip format suitable for mrilab
-    *
-    * @param[in] fileName   File name to save to.
-    */
-    bool save_dipoles_dip(const QString& fileName) const;
-
-    //=========================================================================================================
-    /**
-    * Returns the number of stored ECDs
-    *
-    * @return number of stored ECDs
+    * @return number of stored FwdEegSphereModels
     */
     inline qint32 size() const;
 
     //=========================================================================================================
     /**
-    * Subscript operator [] to access ECD by index
+    * Subscript operator [] to access FwdEegSphereModel by index
     *
-    * @param[in] idx    the ECD index.
+    * @param[in] idx    the FwdEegSphereModel index.
     *
-    * @return ECD related to the parameter index.
+    * @return FwdEegSphereModel related to the parameter index.
     */
-    const ECD& operator[] (qint32 idx) const;
+    const FwdEegSphereModel& operator[] (qint32 idx) const;
 
     //=========================================================================================================
     /**
-    * Subscript operator [] to access ECD by index
+    * Subscript operator [] to access FwdEegSphereModel by index
     *
-    * @param[in] idx    the ECD index.
+    * @param[in] idx    the FwdEegSphereModel index.
     *
-    * @return ECD related to the parameter index.
+    * @return FwdEegSphereModel related to the parameter index.
     */
-    ECD& operator[] (qint32 idx);
+    FwdEegSphereModel& operator[] (qint32 idx);
 
     //=========================================================================================================
     /**
-    * Subscript operator << to add a new ECD
+    * Subscript operator << to add a new FwdEegSphereModel
     *
-    * @param[in] p_ecd      ECD to be added
+    * @param[in] p_FwdEegSphereModel      FwdEegSphereModel to be added
     *
-    * @return ECDSet
+    * @return FwdEegSphereModelSet
     */
-    ECDSet& operator<< (const ECD& p_ecd);
-
-public:
-    QString dataname;   /**< The associated data file */
+    FwdEegSphereModelSet& operator<< (const FwdEegSphereModel& p_FwdEegSphereModel);
 
 private:
-    QList<ECD> m_qListDips;    /**< List of Electric Current Dipoles. */
+    QList<FwdEegSphereModel> m_qListModels;    /**< Set of EEG sphere model definitions. */
 
 // ### OLD STRUCT ###
 //    typedef struct {
-//      char *dataname;		/* The associated data file */
-//      int  ndip;			/* How many dipoles */
-//      ecd  *dips;			/* The dipoles themselves */
-//    } *ecdSet,ecdSetRec;		/* A set of ECDs */
+//      fwdEegSphereModel *models;  /* Set of EEG sphere model definitions */
+//      int               nmodel;
+//    } *fwdEegSphereModelSet,fwdEegSphereModelSetRec;
 };
 
 
@@ -204,11 +176,11 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline qint32 ECDSet::size() const
+inline qint32 FwdEegSphereModelSet::size() const
 {
-    return m_qListDips.size();
+    return m_qListModels.size();
 }
 
 } // NAMESPACE INVERSELIB
 
-#endif // ECD_SET_H
+#endif // FWDEEGSPHEREMODELSET_H
