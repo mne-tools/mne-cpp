@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     ecd.h
+* @file     fwd_coil_set.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Electric Current Dipole (ECD) class declaration.
+* @brief    FwdCoilSet class declaration.
 *
 */
 
-#ifndef ECD_H
-#define ECD_H
+#ifndef FWDCOILSET_H
+#define FWDCOILSET_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -42,6 +42,7 @@
 //=============================================================================================================
 
 #include "../inverse_global.h"
+#include "fwd_coil.h"
 
 
 //*************************************************************************************************************
@@ -58,7 +59,10 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
-#include <QDebug>
+
+
+
+typedef void (*fwdUserFreeFunc)(void *);  /* General purpose */
 
 
 //*************************************************************************************************************
@@ -72,66 +76,51 @@ namespace INVERSELIB
 
 //=============================================================================================================
 /**
-* Implements one Electric Current Dipole (Replaces *ecd,ecdRec struct of MNE-C fit_types.h).
+* Implements FwdCoilSet (Replaces *fwdCoilSet,fwdCoilSetRec; struct of MNE-C fwd_types.h).
 *
-* @brief Electric Current Dipole description
+* @brief FwdCoilSet description
 */
-class INVERSESHARED_EXPORT ECD
+class INVERSESHARED_EXPORT FwdCoilSet
 {
 public:
-    typedef QSharedPointer<ECD> SPtr;              /**< Shared pointer type for ECD. */
-    typedef QSharedPointer<const ECD> ConstSPtr;   /**< Const shared pointer type for ECD. */
+    typedef QSharedPointer<FwdCoilSet> SPtr;              /**< Shared pointer type for FwdCoilSet. */
+    typedef QSharedPointer<const FwdCoilSet> ConstSPtr;   /**< Const shared pointer type for FwdCoilSet. */
 
     //=========================================================================================================
     /**
-    * Constructs the Electric Current Dipole
+    * Constructs the Forward Coil Set description
     */
-    ECD();
+    FwdCoilSet();
+
+//    //=========================================================================================================
+//    /**
+//    * Copy constructor.
+//    *
+//    * @param[in] p_FwdCoilSet      FwdCoilSet which should be copied
+//    */
+//    FwdCoilSet(const FwdCoilSet& p_FwdCoilSet);
 
     //=========================================================================================================
     /**
-    * Copy constructor.
-    *
-    * @param[in] p_ECD      Electric Current Dipole which should be copied
+    * Destroys the Forward Coil Set description
     */
-    ECD(const ECD& p_ECD);
-
-    //=========================================================================================================
-    /**
-    * Destroys the Electric Current Dipole description
-    */
-    ~ECD();
-
-    //=========================================================================================================
-    /**
-    * prints the ECD to an stdio file stream.
-    *
-    * @param[in] f      the file stream to print to;
-    */
-    void print(FILE *f);
+    ~FwdCoilSet();
 
 public:
-    bool            valid;  /**< Is this dipole valid */
-    float           time;   /**< Time point */
-    Eigen::Vector3f rd;     /**< Dipole location */
-    Eigen::Vector3f Q;      /**< Dipole moment */
-    float           good;   /**< Goodness of fit */
-    float           khi2;   /**< khi^2 value */
-    int             nfree;  /**< Degrees of freedom for the above */
-    int             neval;  /**< Number of function evaluations required for this fit */
+    FwdCoil **coils;                 /* The coil or electrode positions */
+    int     ncoil;
+    int     coord_frame;            /* Common coordinate frame */
+    void    *user_data;             /* We can put whatever in here */
+    fwdUserFreeFunc user_data_free;
 
 // ### OLD STRUCT ###
 //    typedef struct {
-//      int   valid;        /* Is this dipole valid */
-//      float time;         /* Time point */
-//      float rd[3];        /* Dipole location */
-//      float Q[3];         /* Dipole moment */
-//      float good;         /* Goodness of fit */
-//      float khi2;         /* khi^2 value */
-//      int   nfree;        /* Degrees of freedom for the above */
-//      int   neval;        /* Number of function evaluations required for this fit */
-//    } *ecd,ecdRec;        /* One ECD */
-
+//      fwdCoil *coils;		/* The coil or electrode positions */
+//      int     ncoil;
+//      int     coord_frame;		/* Common coordinate frame */
+//      void    *user_data;		/* We can put whatever in here */
+//      fwdUserFreeFunc user_data_free;
+//    } *fwdCoilSet,fwdCoilSetRec;	/* A collection of the above */
 };
 
 
@@ -143,4 +132,4 @@ public:
 
 } // NAMESPACE INVERSELIB
 
-#endif // ECD_H
+#endif // FWDCOILSET_H

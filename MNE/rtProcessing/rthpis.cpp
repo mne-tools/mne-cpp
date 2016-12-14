@@ -50,8 +50,7 @@
 #include <fiff/fiff_cov.h>
 #include <fstream>
 
-#define _USE_MATH_DEFINES
-#include <math.h>
+#include <qmath.h>
 
 
 //*************************************************************************************************************

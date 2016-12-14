@@ -729,135 +729,135 @@ typedef struct {		 /* Measurement data representation in MNE calculations */
 } *mneMeasData,mneMeasDataRec;
 
 
-typedef struct {		/* Identifier for the automatic parcellation */
-  char  *name;			/* Name of this area */
-  int   index;			/* Index in the parcellation */
-  int   flag;			/* Flag read from  the color table (whatever it means) */
-  float r,g,b,alpha;		/* The color values */
-  int   *vert;		        /* The vertices belonging to this one */
-  int   nvert;
-} *mneParc,mneParcRec;
+//typedef struct {		/* Identifier for the automatic parcellation */
+//  char  *name;			/* Name of this area */
+//  int   index;			/* Index in the parcellation */
+//  int   flag;			/* Flag read from  the color table (whatever it means) */
+//  float r,g,b,alpha;		/* The color values */
+//  int   *vert;		        /* The vertices belonging to this one */
+//  int   nvert;
+//} *mneParc,mneParcRec;
 
-typedef struct {		/* A set of the above */
-  int       *vert;		/* The assignment of each vertex */
-  int       nvert;		/* How many */
-  mneParc   *parcs;		/* The 'parcels' */
-  int       nparc;
-} *mneParcSet,mneParcSetRec;
+//typedef struct {		/* A set of the above */
+//  int       *vert;		/* The assignment of each vertex */
+//  int       nvert;		/* How many */
+//  mneParc   *parcs;		/* The 'parcels' */
+//  int       nparc;
+//} *mneParcSet,mneParcSetRec;
 
-typedef struct {
-  mneParcSet   lh_parc;
-  mneParcSet   rh_parc;
-} *mneParcData,mneParcDataRec;	/* This is the complete parcellation data */
+//typedef struct {
+//  mneParcSet   lh_parc;
+//  mneParcSet   rh_parc;
+//} *mneParcData,mneParcDataRec;	/* This is the complete parcellation data */
 
-/*
- * The following are included for reading and writing MRI data in the mgh and mgz formats
- */
-#define MNE_MRI_VERSION       1
-#define MNE_MRI_UCHAR         0
-#define MNE_MRI_INT           1
-#define MNE_MRI_LONG          2
-#define MNE_MRI_FLOAT         3
-#define MNE_MRI_SHORT         4
-#define MNE_MRI_BITMAP        5
-#define MNE_MRI_TENSOR        6
+///*
+// * The following are included for reading and writing MRI data in the mgh and mgz formats
+// */
+//#define MNE_MRI_VERSION       1
+//#define MNE_MRI_UCHAR         0
+//#define MNE_MRI_INT           1
+//#define MNE_MRI_LONG          2
+//#define MNE_MRI_FLOAT         3
+//#define MNE_MRI_SHORT         4
+//#define MNE_MRI_BITMAP        5
+//#define MNE_MRI_TENSOR        6
 
-#define MNE_MRI_ALL_FRAMES    -1	     /* Load all frames */
-#define MNE_MRI_NO_FRAMES     -2	     /* Do not load data at all */
+//#define MNE_MRI_ALL_FRAMES    -1	     /* Load all frames */
+//#define MNE_MRI_NO_FRAMES     -2	     /* Do not load data at all */
 
-typedef union {
-  unsigned char uval;
-  short         sval;
-  int           ival;
-  float         fval;
-} mneMRIvoxelVal;
+//typedef union {
+//  unsigned char uval;
+//  short         sval;
+//  int           ival;
+//  float         fval;
+//} mneMRIvoxelVal;
 
-typedef union {
-  unsigned char   ***uslices;	             /* Different types of voxels */
-  short           ***sslices;
-  int             ***islices;
-  float           ***fslices;
-} mneMRIvoxels;
+//typedef union {
+//  unsigned char   ***uslices;	             /* Different types of voxels */
+//  short           ***sslices;
+//  int             ***islices;
+//  float           ***fslices;
+//} mneMRIvoxels;
 
-typedef struct {
-  int             type;			     /* Data type duplicated from mneMRIdata */
-  int             width;		     /* Size of the stack duplicated from mneMRIdata*/
-  int             height;
-  int             depth;
-  void            *data;		     /* These are the actual voxels stored sequentially */
-  int             nbytes;		     /* How many bytes in data (just a convenience) */
-  mneMRIvoxels    voxels;		     /* Different types of voxels */
-  int             frame;		     /* Which frame is this in the original data */
-  void            *user_data;                /* Anything else we want */
-  mneUserFreeFunc user_data_free;            /* Function to set the above free */
-} *mneMRIvolume,mneMRIvolumeRec;	     /* One volume of data */
+//typedef struct {
+//  int             type;			     /* Data type duplicated from mneMRIdata */
+//  int             width;		     /* Size of the stack duplicated from mneMRIdata*/
+//  int             height;
+//  int             depth;
+//  void            *data;		     /* These are the actual voxels stored sequentially */
+//  int             nbytes;		     /* How many bytes in data (just a convenience) */
+//  mneMRIvoxels    voxels;		     /* Different types of voxels */
+//  int             frame;		     /* Which frame is this in the original data */
+//  void            *user_data;                /* Anything else we want */
+//  mneUserFreeFunc user_data_free;            /* Function to set the above free */
+//} *mneMRIvolume,mneMRIvolumeRec;	     /* One volume of data */
 
-typedef struct {
-  char           *filename;                  /* Name of the source file */
-  int            version;	             /* Version number of the data file */
-  int            width;		             /* Size of the stack */
-  int            height;
-  int            depth;
-  int            nframes;		     /* Number of frames in the original */
-  int            dof;
-  int            ras_good;                   /* Indicates that the values below are good */
-  float          xsize,ysize,zsize;	     /* Increments in the three voxel directions */
-  float          x_ras[3],y_ras[3],z_ras[3]; /* these are the RAS distances across the whole volume */
-  float          c_ras[3];                   /* Center of the RAS coordinates 
-					      * This is irrelevant to the MNE software because we work in
-					      * surface RAS coordinates */
-  fiffCoordTrans voxel_surf_RAS_t;           /* Transform from voxel coordinate to the surface RAS (MRI) coordinates */
-  fiffCoordTrans surf_RAS_RAS_t;             /* Transform from surface RAS to RAS (nonzero origin) coordinates */
-  fiffCoordTrans head_surf_RAS_t;	     /* Transform from MEG head coordinates to surface RAS */
-  fiffCoordTrans RAS_MNI_tal_t;              /* Transform from RAS (nonzero origin) to MNI Talairach coordinates */
-  fiffCoordTrans MNI_tal_tal_gtz_t;          /* Transform MNI Talairach to FreeSurfer Talairach coordinates (z > 0) */
-  fiffCoordTrans MNI_tal_tal_ltz_t;          /* Transform MNI Talairach to FreeSurfer Talairach coordinates (z < 0) */
-  int            type;                       /* Data type for voxels */
-  mneMRIvolume   *volumes;	             /* The volumes loaded */
-  int            nvol;		             /* How many loaded volumes */
-  int            current_vol;		     /* Which volume is the current destination for modifications */
-  float          TR;			     /* Recovery time */
-  float          TE;			     /* Echo time time */
-  float          TI;			     /* Inversion time */
-  float          flip_angle;		     /* Flip angle */
-  float          fov;			     /* Field of view */
-  void            *tags;		     /* The format of the tag information is kept private */
-  void            *user_data;                /* Anything else we want */
-  mneUserFreeFunc user_data_free;            /* Function to set the above free */
-} *mneMRIdata,mneMRIdataRec;		     /* MRI data description suitable for handling mgh and mgz data files */
+//typedef struct {
+//  char           *filename;                  /* Name of the source file */
+//  int            version;	             /* Version number of the data file */
+//  int            width;		             /* Size of the stack */
+//  int            height;
+//  int            depth;
+//  int            nframes;		     /* Number of frames in the original */
+//  int            dof;
+//  int            ras_good;                   /* Indicates that the values below are good */
+//  float          xsize,ysize,zsize;	     /* Increments in the three voxel directions */
+//  float          x_ras[3],y_ras[3],z_ras[3]; /* these are the RAS distances across the whole volume */
+//  float          c_ras[3];                   /* Center of the RAS coordinates
+//					      * This is irrelevant to the MNE software because we work in
+//					      * surface RAS coordinates */
+//  fiffCoordTrans voxel_surf_RAS_t;           /* Transform from voxel coordinate to the surface RAS (MRI) coordinates */
+//  fiffCoordTrans surf_RAS_RAS_t;             /* Transform from surface RAS to RAS (nonzero origin) coordinates */
+//  fiffCoordTrans head_surf_RAS_t;	     /* Transform from MEG head coordinates to surface RAS */
+//  fiffCoordTrans RAS_MNI_tal_t;              /* Transform from RAS (nonzero origin) to MNI Talairach coordinates */
+//  fiffCoordTrans MNI_tal_tal_gtz_t;          /* Transform MNI Talairach to FreeSurfer Talairach coordinates (z > 0) */
+//  fiffCoordTrans MNI_tal_tal_ltz_t;          /* Transform MNI Talairach to FreeSurfer Talairach coordinates (z < 0) */
+//  int            type;                       /* Data type for voxels */
+//  mneMRIvolume   *volumes;	             /* The volumes loaded */
+//  int            nvol;		             /* How many loaded volumes */
+//  int            current_vol;		     /* Which volume is the current destination for modifications */
+//  float          TR;			     /* Recovery time */
+//  float          TE;			     /* Echo time time */
+//  float          TI;			     /* Inversion time */
+//  float          flip_angle;		     /* Flip angle */
+//  float          fov;			     /* Field of view */
+//  void            *tags;		     /* The format of the tag information is kept private */
+//  void            *user_data;                /* Anything else we want */
+//  mneUserFreeFunc user_data_free;            /* Function to set the above free */
+//} *mneMRIdata,mneMRIdataRec;		     /* MRI data description suitable for handling mgh and mgz data files */
 
-/*
- * Wavelet transform structures
- */
-typedef struct {
-  float sfreq;			/* The sampling frequency */
-  int   nfreq;		        /* How many frequencies */
-  float **W;			/* The corresponding wavelets */
-  float **W_power;              /* Power spectra of the above */
-  int   *np;                    /* Number of points in each */
-  float *freqs;                 /* The corresponding frequencies */
-  float **W_fft;		/* Fourier transforms of the wavelets for convolution */
-  int   *np_fft;                /* Number of points in each the above */
-  /*
-   * Possibility to add user-defined data
-   */
-  void             *user_data;      /* Anything else we want */
-  mneUserFreeFunc  user_data_free;  /* Function to set the above free */
-} *mneWaveletSet,mneWaveletSetRec;
+///*
+// * Wavelet transform structures
+// */
+//typedef struct {
+//  float sfreq;			/* The sampling frequency */
+//  int   nfreq;		        /* How many frequencies */
+//  float **W;			/* The corresponding wavelets */
+//  float **W_power;              /* Power spectra of the above */
+//  int   *np;                    /* Number of points in each */
+//  float *freqs;                 /* The corresponding frequencies */
+//  float **W_fft;		/* Fourier transforms of the wavelets for convolution */
+//  int   *np_fft;                /* Number of points in each the above */
+//  /*
+//   * Possibility to add user-defined data
+//   */
+//  void             *user_data;      /* Anything else we want */
+//  mneUserFreeFunc  user_data_free;  /* Function to set the above free */
+//} *mneWaveletSet,mneWaveletSetRec;
 
-typedef struct {                /* Used to store the wavelet transform */
-  int   type;                   /* What is stored here? */
-  int   nchan;			/* Number of channels */
-  int   nsamp;			/* Number of time samples */
-  float sfreq;                  /* Sampling frequency */
-  float *freqs;			/* Wavelet frequencies */
-  int   nfreq;                  /* Number of frequencies */
-  float tmin;                   /* Time scale minimum */
-  float ***trans;               /* The transforms */
-} *mneWaveletTransform,mneWaveletTransformRec;
+//typedef struct {                /* Used to store the wavelet transform */
+//  int   type;                   /* What is stored here? */
+//  int   nchan;			/* Number of channels */
+//  int   nsamp;			/* Number of time samples */
+//  float sfreq;                  /* Sampling frequency */
+//  float *freqs;			/* Wavelet frequencies */
+//  int   nfreq;                  /* Number of frequencies */
+//  float tmin;                   /* Time scale minimum */
+//  float ***trans;               /* The transforms */
+//} *mneWaveletTransform,mneWaveletTransformRec;
 
-#define MNE_WAVELET_COMPLEX 1
-#define MNE_WAVELET_POWER   2
+//#define MNE_WAVELET_COMPLEX 1
+//#define MNE_WAVELET_POWER   2
 
 /*
  * Environment variables and others

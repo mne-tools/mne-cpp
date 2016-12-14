@@ -22,5 +22,5 @@ DipoleFitData::DipoleFitData()
 
 DipoleFitData::~DipoleFitData()
 {
-    //ToDo Garbage collection
+
 }

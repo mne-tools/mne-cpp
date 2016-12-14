@@ -136,8 +136,8 @@ public:
       int               neeg;               /**< How many EEG */
       char              **ch_names;         /**< List of all channel names */
       mneSparseMatrix   pick;               /**< Matrix to pick data from the full data set which may contain channels we are not interested in */
-      fwdCoilSet        meg_coils;          /**< MEG coil definitions */
-      fwdCoilSet        eeg_els;            /**< EEG electrode definitions */
+      FwdCoilSet*        meg_coils;          /**< MEG coil definitions */
+      FwdCoilSet*        eeg_els;            /**< EEG electrode definitions */
       float             r0[3];              /**< Sphere model origin */
       char              *bemname;           /**< Using a BEM? */
 

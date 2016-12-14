@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     ecd.h
+* @file     fwd_coil.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Electric Current Dipole (ECD) class declaration.
+* @brief    FwdCoil class declaration.
 *
 */
 
-#ifndef ECD_H
-#define ECD_H
+#ifndef FWDCOIL_H
+#define FWDCOIL_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -58,7 +58,24 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
-#include <QDebug>
+
+
+
+#define FWD_COIL_UNKNOWN      0
+
+#define FWD_COILC_UNKNOWN     0
+#define FWD_COILC_EEG         1000
+#define FWD_COILC_MAG         1
+#define FWD_COILC_AXIAL_GRAD  2
+#define FWD_COILC_PLANAR_GRAD 3
+#define FWD_COILC_AXIAL_GRAD2 4
+
+#define FWD_COIL_ACCURACY_POINT    0
+#define FWD_COIL_ACCURACY_NORMAL   1
+#define FWD_COIL_ACCURACY_ACCURATE 2
+
+#define FWD_IS_MEG_COIL(x) ((x) != FWD_COILC_EEG && (x) != FWD_COILC_UNKNOWN)
+
 
 
 //*************************************************************************************************************
@@ -72,66 +89,73 @@ namespace INVERSELIB
 
 //=============================================================================================================
 /**
-* Implements one Electric Current Dipole (Replaces *ecd,ecdRec struct of MNE-C fit_types.h).
+* Implements FwdCoil (Replaces *fwdCoil,fwdCoilRec; struct of MNE-C fwd_types.h).
 *
-* @brief Electric Current Dipole description
+* @brief FwdCoil description
 */
-class INVERSESHARED_EXPORT ECD
+class INVERSESHARED_EXPORT FwdCoil
 {
 public:
-    typedef QSharedPointer<ECD> SPtr;              /**< Shared pointer type for ECD. */
-    typedef QSharedPointer<const ECD> ConstSPtr;   /**< Const shared pointer type for ECD. */
+    typedef QSharedPointer<FwdCoil> SPtr;              /**< Shared pointer type for FwdCoil. */
+    typedef QSharedPointer<const FwdCoil> ConstSPtr;   /**< Const shared pointer type for FwdCoil. */
 
     //=========================================================================================================
     /**
-    * Constructs the Electric Current Dipole
+    * Constructs the Forward Coil
     */
-    ECD();
+    FwdCoil();
+
+//    //=========================================================================================================
+//    /**
+//    * Copy constructor.
+//    *
+//    * @param[in] p_FwdCoil      FwdCoil which should be copied
+//    */
+//    FwdCoil(const FwdCoil& p_FwdCoil);
 
     //=========================================================================================================
     /**
-    * Copy constructor.
-    *
-    * @param[in] p_ECD      Electric Current Dipole which should be copied
+    * Destroys the Forward Coil description
     */
-    ECD(const ECD& p_ECD);
-
-    //=========================================================================================================
-    /**
-    * Destroys the Electric Current Dipole description
-    */
-    ~ECD();
-
-    //=========================================================================================================
-    /**
-    * prints the ECD to an stdio file stream.
-    *
-    * @param[in] f      the file stream to print to;
-    */
-    void print(FILE *f);
+    ~FwdCoil();
 
 public:
-    bool            valid;  /**< Is this dipole valid */
-    float           time;   /**< Time point */
-    Eigen::Vector3f rd;     /**< Dipole location */
-    Eigen::Vector3f Q;      /**< Dipole moment */
-    float           good;   /**< Goodness of fit */
-    float           khi2;   /**< khi^2 value */
-    int             nfree;  /**< Degrees of freedom for the above */
-    int             neval;  /**< Number of function evaluations required for this fit */
+    char    *chname;        /**< Name of this channel */
+    int     coord_frame;    /**< Which coordinate frame are we in? */
+    char    *desc;	        /**< Description for this type of a coil */
+    int     coil_class;     /**< Coil class */
+    int     type;           /**< Coil type */
+    int     accuracy;       /**< Accuracy */
+    float   size;           /**< Coil size */
+    float   base;           /**< Baseline */
+    float   r0[3];          /**< Coil coordinate system origin */
+    float   ex[3];          /**< Coil coordinate system unit vectors */
+    float   ey[3];          /**< This stupid construction needs to be replaced with */
+    float   ez[3];          /**< a coordinate transformation */
+    int     np;             /**< Number of integration points */
+    float   **rmag;         /**< The field point locations */
+    float   **cosmag;       /**< The corresponding direction cosines */
+    float   *w;             /**< The weighting coefficients */
 
 // ### OLD STRUCT ###
 //    typedef struct {
-//      int   valid;        /* Is this dipole valid */
-//      float time;         /* Time point */
-//      float rd[3];        /* Dipole location */
-//      float Q[3];         /* Dipole moment */
-//      float good;         /* Goodness of fit */
-//      float khi2;         /* khi^2 value */
-//      int   nfree;        /* Degrees of freedom for the above */
-//      int   neval;        /* Number of function evaluations required for this fit */
-//    } *ecd,ecdRec;        /* One ECD */
-
+//      char         *chname;		/* Name of this channel */
+//      int          coord_frame;	/* Which coordinate frame are we in? */
+//      char         *desc;	        /* Description for this type of a coil */
+//      int          coil_class;	/* Coil class */
+//      int          type;		/* Coil type */
+//      int          accuracy;	/* Accuracy */
+//      float        size;		/* Coil size */
+//      float        base;		/* Baseline */
+//      float        r0[3];		/* Coil coordinate system origin */
+//      float        ex[3];		/* Coil coordinate system unit vectors */
+//      float        ey[3];		/* This stupid construction needs to be replaced with */
+//      float        ez[3];		/* a coordinate transformation */
+//      int          np;		/* Number of integration points */
+//      float        **rmag;		/* The field point locations */
+//      float        **cosmag;	/* The corresponding direction cosines */
+//      float        *w;		/* The weighting coefficients */
+//    } *fwdCoil,fwdCoilRec;
 };
 
 
@@ -143,4 +167,4 @@ public:
 
 } // NAMESPACE INVERSELIB
 
-#endif // ECD_H
+#endif // FWDCOIL_H
