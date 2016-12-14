@@ -394,7 +394,6 @@ void mne_free_dcmatrix (double **m)
 
 #include "fiff_types.h"
 #include "mne_types.h"
-#include "fit_types.h"
 #include "analyze_types.h"
 
 
