@@ -1,6 +1,6 @@
 
 
-#include "dipolefit.h"
+#include "dipole_fit.h"
 
 #include "dipolefit_helpers.cpp"
 
@@ -60,10 +60,10 @@ DipoleFit::DipoleFit(DipoleFitSettings* p_settings)
 
 ECDSet DipoleFit::calculateFit() const
 {
-    GuessData*           guess    = NULL;
+    GuessData*          guess    = NULL;
     ECDSet              set;
     FwdEegSphereModel*  eeg_model = NULL;
-    dipoleFitData       fit_data = NULL;
+    DipoleFitData*      fit_data = NULL;
     mneMeasData         data     = NULL;
     mneRawData          raw      = NULL;
     mneChSelection      sel      = NULL;

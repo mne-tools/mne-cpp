@@ -1,6 +1,6 @@
 
 
-#include "dipolefitsettings.h"
+#include "dipole_fit_settings.h"
 
 
 using namespace Eigen;
