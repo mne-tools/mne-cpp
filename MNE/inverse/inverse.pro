@@ -123,7 +123,6 @@ HEADERS +=\
     dipoleFit/analyze_types.h \
     dipoleFit/dipolefit.h \
     dipoleFit/dipolefitsettings.h \
-    dipoleFit/mne_allocs_helper.h \
     dipoleFit/fwd_eeg_sphere_layer.h \
     dipoleFit/fwd_eeg_sphere_model.h \
     dipoleFit/fwd_eeg_sphere_model_set.h \
