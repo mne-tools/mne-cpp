@@ -66,12 +66,12 @@ FwdEegSphereLayer::FwdEegSphereLayer()
 
 //*************************************************************************************************************
 
-FwdEegSphereLayer::FwdEegSphereLayer(const FwdEegSphereLayer& p_FwdEegSphereLayer)
-: rad(p_FwdEegSphereLayer.rad)
-, rel_rad(p_FwdEegSphereLayer.rel_rad)
-, sigma(p_FwdEegSphereLayer.sigma)
-{
-}
+//FwdEegSphereLayer::FwdEegSphereLayer(const FwdEegSphereLayer& p_FwdEegSphereLayer)
+//: rad(p_FwdEegSphereLayer.rad)
+//, rel_rad(p_FwdEegSphereLayer.rel_rad)
+//, sigma(p_FwdEegSphereLayer.sigma)
+//{
+//}
 
 
 //*************************************************************************************************************

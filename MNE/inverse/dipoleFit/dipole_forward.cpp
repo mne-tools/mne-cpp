@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     fwd_eeg_sphere_layer.h
+* @file     dipole_forward.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -18,7 +18,7 @@
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
 *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
-* 
+*
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
 * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
@@ -29,99 +29,48 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    FwdEegSphereLayer class declaration.
+* @brief    Implementation of the DipoleForward Class.
 *
 */
-
-#ifndef FWDEEGSPHERELAYER_H
-#define FWDEEGSPHERELAYER_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../inverse_global.h"
+#include "dipole_forward.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Eigen INCLUDES
+// USED NAMESPACES
 //=============================================================================================================
 
-#include <Eigen/Core>
+using namespace Eigen;
+using namespace INVERSELIB;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-#include <QSharedPointer>
-#include <QDebug>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE INVERSELIB
-//=============================================================================================================
-
-namespace INVERSELIB
+DipoleForward::DipoleForward()
 {
 
+}
 
-//=============================================================================================================
-/**
-* Implements FwdEegSphereLayer (Replaces *fwdEegSphereLayer,fwdEegSphereLayerRec struct of MNE-C fwd_types.h).
-*
-* @brief FwdEegSphereLayer description
-*/
-class INVERSESHARED_EXPORT FwdEegSphereLayer
-{
-public:
-    typedef QSharedPointer<FwdEegSphereLayer> SPtr;              /**< Shared pointer type for FwdEegSphereLayer. */
-    typedef QSharedPointer<const FwdEegSphereLayer> ConstSPtr;   /**< Const shared pointer type for FwdEegSphereLayer. */
 
-    //=========================================================================================================
-    /**
-    * Constructs the Electric Current Dipole
-    */
-    FwdEegSphereLayer();
+////*************************************************************************************************************
 
-//    //=========================================================================================================
-//    /**
-//    * Copy constructor.
-//    *
-//    * @param[in] p_FwdEegSphereLayer      FwdEegSphereLayer which should be copied
-//    */
-//    FwdEegSphereLayer(const FwdEegSphereLayer& p_FwdEegSphereLayer);
-
-    //=========================================================================================================
-    /**
-    * Destroys the Forward EEG Sphere Layer description
-    */
-    ~FwdEegSphereLayer();
-
-public:
-    float rad;          /**< The actual rads */
-    float rel_rad;      /**< Relative rads */
-    float sigma;        /**< Conductivity */
-
-// ### OLD STRUCT ###
-//    typedef struct {
-//      float rad;          /* The actual rads */
-//      float rel_rad;      /* Relative rads */
-//      float sigma;        /* Conductivity */
-//    } *fwdEegSphereLayer,fwdEegSphereLayerRec;
-};
+//DipoleForward::DipoleForward(const DipoleForward& p_DipoleForward)
+//{
+//}
 
 
 //*************************************************************************************************************
-//=============================================================================================================
-// INLINE DEFINITIONS
-//=============================================================================================================
 
+DipoleForward::~DipoleForward()
+{
 
-} // NAMESPACE INVERSELIB
-
-#endif // FWDEEGSPHERELAYER_H
+}

@@ -102,13 +102,13 @@ public:
     */
     FwdEegSphereModelSet();
 
-    //=========================================================================================================
-    /**
-    * Copy constructor.
-    *
-    * @param[in] p_FwdEegSphereModelSet     Forward EEG Sphere Model Set which should be copied
-    */
-    FwdEegSphereModelSet(const FwdEegSphereModelSet &p_FwdEegSphereModelSet);
+//    //=========================================================================================================
+//    /**
+//    * Copy constructor.
+//    *
+//    * @param[in] p_FwdEegSphereModelSet     Forward EEG Sphere Model Set which should be copied
+//    */
+//    FwdEegSphereModelSet(const FwdEegSphereModelSet &p_FwdEegSphereModelSet);
 
     //=========================================================================================================
     /**
@@ -116,52 +116,55 @@ public:
     */
     ~FwdEegSphereModelSet();
 
-    //=========================================================================================================
-    /**
-    * Appends an orward EEG Sphere Model to the set
-    */
-    void addFwdEegSphereModel(const FwdEegSphereModel& p_FwdEegSphereModel);
+//    //=========================================================================================================
+//    /**
+//    * Appends an orward EEG Sphere Model to the set
+//    */
+//    void addFwdEegSphereModel(const FwdEegSphereModel& p_FwdEegSphereModel);
 
-    //=========================================================================================================
-    /**
-    * Returns the number of stored FwdEegSphereModels
-    *
-    * @return number of stored FwdEegSphereModels
-    */
-    inline qint32 size() const;
+//    //=========================================================================================================
+//    /**
+//    * Returns the number of stored FwdEegSphereModels
+//    *
+//    * @return number of stored FwdEegSphereModels
+//    */
+//    inline qint32 size() const;
 
-    //=========================================================================================================
-    /**
-    * Subscript operator [] to access FwdEegSphereModel by index
-    *
-    * @param[in] idx    the FwdEegSphereModel index.
-    *
-    * @return FwdEegSphereModel related to the parameter index.
-    */
-    const FwdEegSphereModel& operator[] (qint32 idx) const;
+//    //=========================================================================================================
+//    /**
+//    * Subscript operator [] to access FwdEegSphereModel by index
+//    *
+//    * @param[in] idx    the FwdEegSphereModel index.
+//    *
+//    * @return FwdEegSphereModel related to the parameter index.
+//    */
+//    const FwdEegSphereModel& operator[] (qint32 idx) const;
 
-    //=========================================================================================================
-    /**
-    * Subscript operator [] to access FwdEegSphereModel by index
-    *
-    * @param[in] idx    the FwdEegSphereModel index.
-    *
-    * @return FwdEegSphereModel related to the parameter index.
-    */
-    FwdEegSphereModel& operator[] (qint32 idx);
+//    //=========================================================================================================
+//    /**
+//    * Subscript operator [] to access FwdEegSphereModel by index
+//    *
+//    * @param[in] idx    the FwdEegSphereModel index.
+//    *
+//    * @return FwdEegSphereModel related to the parameter index.
+//    */
+//    FwdEegSphereModel& operator[] (qint32 idx);
 
-    //=========================================================================================================
-    /**
-    * Subscript operator << to add a new FwdEegSphereModel
-    *
-    * @param[in] p_FwdEegSphereModel      FwdEegSphereModel to be added
-    *
-    * @return FwdEegSphereModelSet
-    */
-    FwdEegSphereModelSet& operator<< (const FwdEegSphereModel& p_FwdEegSphereModel);
+//    //=========================================================================================================
+//    /**
+//    * Subscript operator << to add a new FwdEegSphereModel
+//    *
+//    * @param[in] p_FwdEegSphereModel      FwdEegSphereModel to be added
+//    *
+//    * @return FwdEegSphereModelSet
+//    */
+//    FwdEegSphereModelSet& operator<< (const FwdEegSphereModel& p_FwdEegSphereModel);
 
-private:
-    QList<FwdEegSphereModel> m_qListModels;    /**< Set of EEG sphere model definitions. */
+public:
+//    QList<FwdEegSphereModel> m_qListModels;    /**< Set of EEG sphere model definitions. */
+
+    FwdEegSphereModel** models;     /**< Set of EEG sphere model definitions */
+    int               nmodel;
 
 // ### OLD STRUCT ###
 //    typedef struct {
@@ -176,10 +179,10 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline qint32 FwdEegSphereModelSet::size() const
-{
-    return m_qListModels.size();
-}
+//inline qint32 FwdEegSphereModelSet::size() const
+//{
+//    return m_qListModels.size();
+//}
 
 } // NAMESPACE INVERSELIB
 

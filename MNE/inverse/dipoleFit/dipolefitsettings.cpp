@@ -1,7 +1,6 @@
 
 
 #include "dipolefitsettings.h"
-#include "mne_allocs_helper.h"
 
 
 using namespace Eigen;

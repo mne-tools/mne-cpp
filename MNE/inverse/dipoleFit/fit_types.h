@@ -3,26 +3,28 @@
 
 #include "fwd_types.h"
 
+#include "dipole_forward.h"
+
 /*
  * These are the type definitions for dipole fitting
  */
 typedef void (*fitUserFreeFunc)(void *);
 
-typedef struct {
-  float **rd;			    /* Dipole locations */
-  int   ndip;			    /* How many dipoles */
-  float **fwd;			    /* The forward solution (projected and whitened) */
-  float *scales;		    /* Scales applied to the columns of fwd */
-  float **uu;			    /* The left singular vectors of the forward matrix */
-  float **vv;			    /* The right singular vectors of the forward matrix */
-  float *sing;			    /* The singular values */
-  int   nch;			    /* Number of channels */
-} *dipoleForward,dipoleForwardRec;
+//typedef struct {
+//  float **rd;			    /* Dipole locations */
+//  int   ndip;			    /* How many dipoles */
+//  float **fwd;			    /* The forward solution (projected and whitened) */
+//  float *scales;		    /* Scales applied to the columns of fwd */
+//  float **uu;			    /* The left singular vectors of the forward matrix */
+//  float **vv;			    /* The right singular vectors of the forward matrix */
+//  float *sing;			    /* The singular values */
+//  int   nch;			    /* Number of channels */
+//} *dipoleForward,dipoleForwardRec;
 
 typedef struct {
-  float          **rr;		    /* These are the guess dipole locations */
-  dipoleForward  *guess_fwd;	    /* Forward solutions for the guesses */
-  int            nguess;	    /* How many sources */
+    float          **rr;                    /**< These are the guess dipole locations */
+    INVERSELIB::DipoleForward** guess_fwd;  /**< Forward solutions for the guesses */
+    int            nguess;                  /**< How many sources */
 } *guessData,guessDataRec;
 
 typedef struct {
@@ -57,7 +59,7 @@ typedef struct {		      /* This structure holds all fitting-related data */
   float             r0[3];	      /* Sphere model origin */
   char              *bemname;	      /* Using a BEM? */
 
-  fwdEegSphereModel eeg_model;	      /* EEG sphere model definition */
+  FwdEegSphereModel *eeg_model;	      /* EEG sphere model definition */
   fwdBemModel       bem_model;	      /* BEM model definition */
 
   dipoleFitFuncs    sphere_funcs;     /* These are the sphere model forward functions */
