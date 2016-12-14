@@ -16289,11 +16289,21 @@ static int setup_forward_model(DipoleFitData* d, mneCTFcompDataSet comp_data, fw
     qDebug() << "###### [13]";
 
     f->eeg_pot     = fwd_mag_dipole_field;
+
+    qDebug() << "###### [13.1]";
+
     f->eeg_vec_pot = fwd_mag_dipole_field_vec;
+
+
+    qDebug() << "###### [13.2]";
+
     /*
    * Select the appropriate fitting function
    */
     d->funcs = d->bemname ? d->bem_funcs : d->sphere_funcs;
+
+    qDebug() << "###### [13.4]";
+
     fprintf (stderr,"\n");
     return OK;
 
@@ -16373,12 +16383,20 @@ static int make_projection(char       **projnames,
     int       k,found;
     int       neeg;
 
+
+    qDebug() << "###### [14.1]";
+
     for (k = 0, neeg = 0; k < nch; k++)
         if (chs[k].kind == FIFFV_EEG_CH)
             neeg++;
 
+    qDebug() << "###### [14.2]";
+
     if (nproj == 0 && neeg == 0)
         return OK;
+
+
+    qDebug() << "###### [14.3]";
 
     for (k = 0; k < nproj; k++) {
         if ((one = mne_read_proj_op(projnames[k])) == NULL)
@@ -16394,6 +16412,10 @@ static int make_projection(char       **projnames,
             mne_free_proj_op(one); one = NULL;
         }
     }
+
+
+    qDebug() << "###### [14.4]";
+
     if (neeg > 0) {
         found = FALSE;
         if (all) {
@@ -16695,7 +16717,7 @@ int select_dipole_fit_noise_cov(DipoleFitData* f, mshMegEegData d)
 DipoleFitData* setup_dipole_fit_data(char  *mriname,		 /* This gives the MRI/head transform */
                                     char  *measname,		 /* This gives the MEG/head transform and
                                                                       * sensor locations */
-                                    char  *bemname,		 /* BEM model */
+                                    char  *bemname,         /* BEM model */
                                     Eigen::Vector3f *r0,			 /* Sphere model origin in head coordinates (optional) */
                                     FwdEegSphereModel* eeg_model, /* EEG sphere model definition */
                                     int   accurate_coils,	 /* Use accurate coil definitions? */
