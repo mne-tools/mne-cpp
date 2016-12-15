@@ -99,13 +99,12 @@ int main(int argc, char *argv[])
     SurfaceSet tSurfSet ("sample", 2, "orig", "./MNE-sample-data/subjects");
     AnnotationSet tAnnotSet ("sample", 2, "orig", "./MNE-sample-data/subjects");
 
-    //Create 3D data model
+    //Create 3D data model and add data to model
     Data3DTreeModel::SPtr p3DDataModel = Data3DTreeModel::SPtr(new Data3DTreeModel());
 
-    //Add data to model
     ECDSet::SPtr pSet = ECDSet::SPtr(new ECDSet(set));
-    p3DDataModel->addSurfaceSet("Subject", "Dipole test", tSurfSet, tAnnotSet);
-    p3DDataModel->addDipoleFitData("Subject", "Dipole test", pSet);
+    p3DDataModel->addSurfaceSet("sample", "Dipole test", tSurfSet, tAnnotSet);
+    p3DDataModel->addDipoleFitData("sample", "Dipole test", pSet);
 
     //Create the 3D view
     View3D::SPtr testWindow = View3D::SPtr(new View3D());

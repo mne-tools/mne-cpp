@@ -200,7 +200,7 @@ void ECDDataTreeItem::plotDipoles(QSharedPointer<ECDSet> pECDSet)
         Renderable3DEntity* dipoleEntity = new Renderable3DEntity(m_pRenderable3DEntity);
 
         Qt3DExtras::QSphereMesh* sourceSphere = new Qt3DExtras::QSphereMesh();
-        sourceSphere->setRadius(0.001f);
+        sourceSphere->setRadius(0.0001f);
         dipoleEntity->addComponent(sourceSphere);
 
         //Set dipole position and orientation
@@ -211,7 +211,7 @@ void ECDDataTreeItem::plotDipoles(QSharedPointer<ECDSet> pECDSet)
         dipoleEntity->addComponent(transform);
 
         Qt3DExtras::QPhongMaterial* material = new Qt3DExtras::QPhongMaterial();
-        material->setAmbient(Qt::blue);
+        material->setAmbient(QColor(rand()%255, rand()%255, rand()%255));
         dipoleEntity->addComponent(material);
 
         m_lDipoles.append(dipoleEntity);
