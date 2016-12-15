@@ -92,7 +92,8 @@ namespace Data3DTreeModelItemTypes
                     BemItem = QStandardItem::UserType + 9,
                     BemSurfaceItem = QStandardItem::UserType + 10,
                     DigitizerSetItem = QStandardItem::UserType + 11,
-                    DigitizerItem = QStandardItem::UserType + 12};
+                    DigitizerItem = QStandardItem::UserType + 12,
+                    ECDSetDataItem = QStandardItem::UserType + 13};
 }
 
 namespace MetaTreeItemTypes
@@ -136,7 +137,7 @@ namespace Data3DTreeModelItemRoles
                     SurfaceOffset = Qt::UserRole + 105,
                     SurfaceRenderable3DEntity = Qt::UserRole + 106,
                     SurfaceCurvatureColorVert = Qt::UserRole + 107,
-                    SurfaceRTSourceLocColor = Qt::UserRole + 108,
+                    NetworkDataMatrix = Qt::UserRole + 108,
                     SurfaceAnnotationColorVert = Qt::UserRole + 109,
                     SurfaceRenderable3DEntityAcivationOverlay = Qt::UserRole + 110,
                     SurfaceSetName = Qt::UserRole + 111,
@@ -161,7 +162,7 @@ namespace Data3DTreeModelItemRoles
                     RTVertNoRightHemi = Qt::UserRole + 130,
                     SourceVertices = Qt::UserRole + 131,
                     NetworkData = Qt::UserRole + 132,
-                    NetworkDataMatrix = Qt::UserRole + 133};
+                    ECDSetData = Qt::UserRole + 133};
 }
 
 namespace MetaTreeItemRoles

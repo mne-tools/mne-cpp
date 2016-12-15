@@ -94,7 +94,7 @@ View3D::View3D()
 , m_bCameraRotationMode(false)
 , m_bCameraTransMode(false)
 , m_bModelRotationMode(false)
-, m_vecCameraTrans(QVector3D(0.0,0.0,-0.5))
+, m_vecCameraTrans(QVector3D(0.0,-0.025,-0.25))
 , m_vecCameraTransOld(QVector3D(0.0,0.0,-0.5))
 , m_vecCameraRotation(QVector3D(-90.0,130.0,0.0))
 , m_vecCameraRotationOld(QVector3D(-90.0,130.0,0.0))
@@ -364,9 +364,9 @@ void View3D::mousePressEvent(QMouseEvent* e)
 void View3D::wheelEvent(QWheelEvent* e)
 {
     if(e->angleDelta().y() > 0)
-        m_vecCameraTrans.setZ(m_vecCameraTrans.z() + 0.05f);
+        m_vecCameraTrans.setZ(m_vecCameraTrans.z() + 0.005f);
     else
-        m_vecCameraTrans.setZ(m_vecCameraTrans.z() - 0.05f);
+        m_vecCameraTrans.setZ(m_vecCameraTrans.z() - 0.005f);
 
     // Transform
     m_pCameraTransform->setTranslation(m_vecCameraTrans);
