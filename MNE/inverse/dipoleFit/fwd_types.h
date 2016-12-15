@@ -5,10 +5,12 @@
  * Type definitions for forward calculations
  */
 
-#include "fiff_types.h"
+#include <fiff/fiff_types.h>
 #include "mne_types.h"
 
 #include "fwd_coil_set.h"
+
+using namespace FIFFLIB;
 
 
 #if defined(__cplusplus) 

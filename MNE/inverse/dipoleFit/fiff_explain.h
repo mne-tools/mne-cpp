@@ -1,7 +1,7 @@
 #ifndef _fiff_explain_h
 #define _fiff_explain_h
 
-#include "fiff_types.h"
+#include <fiff/fiff_types.h>
 #include "fiff_file.h"
 
 typedef struct {
