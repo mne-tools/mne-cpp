@@ -59,6 +59,7 @@
 #include <Qt3DExtras/QSphereMesh>
 #include <Qt3DExtras/QPhongMaterial>
 #include <Qt3DCore/QTransform>
+#include <Qt3DExtras/QConeMesh>
 
 
 //*************************************************************************************************************
@@ -199,9 +200,11 @@ void ECDDataTreeItem::plotDipoles(QSharedPointer<ECDSet> pECDSet)
 
         Renderable3DEntity* dipoleEntity = new Renderable3DEntity(m_pRenderable3DEntity);
 
-        Qt3DExtras::QSphereMesh* sourceSphere = new Qt3DExtras::QSphereMesh();
-        sourceSphere->setRadius(0.0001f);
-        dipoleEntity->addComponent(sourceSphere);
+        Qt3DExtras::QConeMesh* dipoleCone = new Qt3DExtras::QConeMesh();
+        dipoleCone->setBottomRadius(0.001f);
+        dipoleCone->setLength(0.003f);
+
+        dipoleEntity->addComponent(dipoleCone);
 
         //Set dipole position and orientation
         Qt3DCore::QTransform* transform = new Qt3DCore::QTransform();
