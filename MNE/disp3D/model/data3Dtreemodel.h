@@ -88,6 +88,10 @@ namespace FIFFLIB{
     class FiffDigPointSet;
 }
 
+namespace INVERSELIB{
+    class ECDSet;
+}
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -105,6 +109,7 @@ namespace DISP3DLIB
 
 class BrainRTSourceLocDataTreeItem;
 class NetworkTreeItem;
+class ECDDataTreeItem;
 
 
 //=============================================================================================================
@@ -196,7 +201,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Adds source estimated activation data.
+    * Adds source estimated activation data (MNE or RTC-MUSIC).
     *
     * @param[in] subject            The name of the subject.
     * @param[in] set                The name of the surface set to which the actiavtion data is to be added.
@@ -206,6 +211,18 @@ public:
     * @return                       Returns a list with the tree items which now hold the activation data. Use this list to update the data, i.e. during real time applications.
     */
     QList<BrainRTSourceLocDataTreeItem*> addSourceData(const QString& subject, const QString& set, const MNELIB::MNESourceEstimate& tSourceEstimate, const MNELIB::MNEForwardSolution& tForwardSolution = MNELIB::MNEForwardSolution());
+
+    //=========================================================================================================
+    /**
+    * Adds source estimated activation data (dipole fit).
+    *
+    * @param[in] subject            The name of the subject.
+    * @param[in] set                The name of the surface set to which the actiavtion data is to be added.
+    * @param[in] pECDSet            The ECDSet dipole data.
+    *
+    * @return                       Returns a pointer to the added tree item. Null pointer if no item was added.
+    */
+    ECDDataTreeItem* addDipoleFitData(const QString& subject, const QString& set, QSharedPointer<INVERSELIB::ECDSet> &pECDSet);
 
     //=========================================================================================================
     /**

@@ -47,8 +47,12 @@
 #include "common/renderable3Dentity.h"
 
 #include <mne/mne_bem.h>
+
+#include <inverse/dipoleFit/ecd_set.h>
+
 #include <fs/surfaceset.h>
 #include <fs/annotationset.h>
+
 #include <fiff/fiff_dig_point_set.h>
 
 
@@ -76,6 +80,7 @@
 using namespace FSLIB;
 using namespace MNELIB;
 using namespace DISP3DLIB;
+using namespace INVERSELIB;
 using namespace CONNECTIVITYLIB;
 
 
@@ -379,6 +384,38 @@ QList<BrainRTSourceLocDataTreeItem*> Data3DTreeModel::addSourceData(const QStrin
     }
 
     return returnList;
+}
+
+
+//*************************************************************************************************************
+
+ECDDataTreeItem* Data3DTreeModel::addDipoleFitData(const QString& subject, const QString& set, INVERSELIB::ECDSet::SPtr& pECDSet)
+{
+    //Find the subject
+    QList<QStandardItem*> itemSubjectList = this->findItems(subject);
+
+    //Iterate through subject items and add new data respectivley
+
+    for(int i = 0; i < itemSubjectList.size(); ++i) {
+        //Check if it is really a subject tree item
+        if((itemSubjectList.at(i)->type() == Data3DTreeModelItemTypes::SubjectItem)) {
+            SubjectTreeItem* pSubjectItem = dynamic_cast<SubjectTreeItem*>(itemSubjectList.at(i));
+
+            //Find already existing surface items and add the new data to the first search result
+            QList<QStandardItem*> itemList = pSubjectItem->findChildren(set);
+
+            //Find the "set" items and add the source estimates as items
+            if(!itemList.isEmpty()) {
+                if(itemList.first()->type() == Data3DTreeModelItemTypes::MeasurementItem) {
+                    if(MeasurementTreeItem* pSetItem = dynamic_cast<MeasurementTreeItem*>(itemList.first())) {
+                        return pSetItem->addData(pECDSet, m_pModelEntity);
+                    }
+                }
+            }
+        }
+    }
+
+    return Q_NULLPTR;
 }
 
 

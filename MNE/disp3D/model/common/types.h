@@ -92,7 +92,8 @@ namespace Data3DTreeModelItemTypes
                     BemItem = QStandardItem::UserType + 9,
                     BemSurfaceItem = QStandardItem::UserType + 10,
                     DigitizerSetItem = QStandardItem::UserType + 11,
-                    DigitizerItem = QStandardItem::UserType + 12};
+                    DigitizerItem = QStandardItem::UserType + 12,
+                    ECDSetDataItem = QStandardItem::UserType + 13};
 }
 
 namespace MetaTreeItemTypes
@@ -160,7 +161,8 @@ namespace Data3DTreeModelItemRoles
                     RTEndIdxRightHemi = Qt::UserRole + 129,
                     RTVertNoRightHemi = Qt::UserRole + 130,
                     SourceVertices = Qt::UserRole + 131,
-                    NetworkData = Qt::UserRole + 132};
+                    NetworkData = Qt::UserRole + 132,
+                    ECDSetData = Qt::UserRole + 133};
 }
 
 namespace MetaTreeItemRoles
