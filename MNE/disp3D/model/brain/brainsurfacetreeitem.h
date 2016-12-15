@@ -242,8 +242,8 @@ private:
 
     QString                         m_sColorInfoOrigin;                         /**< The surface color origin. */
     QPointer<Qt3DCore::QEntity>     m_pParentEntity;                            /**< The parent 3D entity. */
-    Renderable3DEntity*    m_pRenderable3DEntity;                      /**< The surface renderable 3D entity. */
-    Renderable3DEntity*    m_pRenderable3DEntityNormals;               /**< The normals renderable 3D entity. */
+    QPointer<Renderable3DEntity>    m_pRenderable3DEntity;                      /**< The surface renderable 3D entity. */
+    QPointer<Renderable3DEntity>    m_pRenderable3DEntityNormals;               /**< The normals renderable 3D entity. */
 
     //These are stored as member variables because we do not wat to look for them everytime we call functions, especially not when we perform rt source loc
     MetaTreeItem*                   m_pItemSurfColSulci;                        /**< The item which holds the sulci color information. */
