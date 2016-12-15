@@ -357,32 +357,32 @@ typedef struct {		/* Covariance matrix storage */
   int        nbad;		/* How many of them */
 } *mneCovMatrix,mneCovMatrixRec;
 
-typedef struct {		/* A forward solution */
-  char           *fwdname;	/* Name of the file this was loaded from */
-  fiffId         meas_id;       /* The assosiated measurement ID */
-  mneSourceSpace *spaces;	/* The source spaces */
-  int            nspace;	/* Number of source spaces */
-  fiffCoordTrans mri_head_t;	/* MRI <-> head coordinate transformation */
-  fiffCoordTrans meg_head_t;    /* MEG <-> head coordinate transformation */
-  int            methods;	/* EEG, MEG or EEG+MEG (see mne_fiff.h) */
-  int            coord_frame;	/* The coordinate frame employed in the forward calculations */
-  int            source_ori;	/* Fixed or free source orientations */
-  float          **rr_source;	/* The active source points */
-  float          **nn_source;	/* The source orientations 
-				 * (These are equal to the cortex normals 
-				 * in the fixed orientation case) */
-  int            nsource;	/* Number of source (recalculated for convenience) */
-  fiffChInfo     chs;		/* The channel list */
-  int            nch;		/* Number of channels */
-  mneNamedMatrix fwd;	        /* The forward solution (may be whitened) */
-  mneNamedMatrix fwd_proc;	/* This is an alternate matrix for a processed forward matrix (linear projection 
-				 * and whitening) As a rule, this field is not used but rater the operations are 
-				 * applied to the field fwd itself */
-  float          *patch_areas;  /* Contains the patch areas if the CSD transformation has been applied */
-  int            fwd_whitened;	/* Has the noise covariance been applied to the field fwd? */
-  mneCovMatrix   noise_cov;	/* The noise covariance matrix employed in whitening */
-  mneProjOp      proj;		/* Associated projection operator */
-} *mneForwardSolution,mneForwardSolutionRec;
+//typedef struct {		/* A forward solution */
+//  char           *fwdname;	/* Name of the file this was loaded from */
+//  fiffId         meas_id;       /* The assosiated measurement ID */
+//  mneSourceSpace *spaces;	/* The source spaces */
+//  int            nspace;	/* Number of source spaces */
+//  fiffCoordTrans mri_head_t;	/* MRI <-> head coordinate transformation */
+//  fiffCoordTrans meg_head_t;    /* MEG <-> head coordinate transformation */
+//  int            methods;	/* EEG, MEG or EEG+MEG (see mne_fiff.h) */
+//  int            coord_frame;	/* The coordinate frame employed in the forward calculations */
+//  int            source_ori;	/* Fixed or free source orientations */
+//  float          **rr_source;	/* The active source points */
+//  float          **nn_source;	/* The source orientations
+//				 * (These are equal to the cortex normals
+//				 * in the fixed orientation case) */
+//  int            nsource;	/* Number of source (recalculated for convenience) */
+//  fiffChInfo     chs;		/* The channel list */
+//  int            nch;		/* Number of channels */
+//  mneNamedMatrix fwd;	        /* The forward solution (may be whitened) */
+//  mneNamedMatrix fwd_proc;	/* This is an alternate matrix for a processed forward matrix (linear projection
+//				 * and whitening) As a rule, this field is not used but rater the operations are
+//				 * applied to the field fwd itself */
+//  float          *patch_areas;  /* Contains the patch areas if the CSD transformation has been applied */
+//  int            fwd_whitened;	/* Has the noise covariance been applied to the field fwd? */
+//  mneCovMatrix   noise_cov;	/* The noise covariance matrix employed in whitening */
+//  mneProjOp      proj;		/* Associated projection operator */
+//} *mneForwardSolution,mneForwardSolutionRec;
 
 typedef struct {		          /* An inverse operator */
   fiffId         meas_id;                 /* The assosiated measurement ID */
