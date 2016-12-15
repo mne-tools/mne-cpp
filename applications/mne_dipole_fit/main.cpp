@@ -93,29 +93,6 @@ int main(int argc, char *argv[])
     ECDSet set = dipFit.calculateFit();
 
     /*
-    * Visualize the dipoles
-    */
-    //Load FS set
-    SurfaceSet tSurfSet ("sample", 2, "orig", "./MNE-sample-data/subjects");
-    AnnotationSet tAnnotSet ("sample", 2, "orig", "./MNE-sample-data/subjects");
-
-    //Create 3D data model and add data to model
-    Data3DTreeModel::SPtr p3DDataModel = Data3DTreeModel::SPtr(new Data3DTreeModel());
-
-    ECDSet::SPtr pSet = ECDSet::SPtr(new ECDSet(set));
-    p3DDataModel->addSurfaceSet("sample", "Dipole test", tSurfSet, tAnnotSet);
-    p3DDataModel->addDipoleFitData("sample", "Dipole test", pSet);
-
-    //Create the 3D view
-    View3D::SPtr testWindow = View3D::SPtr(new View3D());
-    testWindow->setModel(p3DDataModel);
-    testWindow->show();
-
-    Control3DWidget::SPtr control3DWidget = Control3DWidget::SPtr(new Control3DWidget());
-    control3DWidget->init(p3DDataModel, testWindow);
-    control3DWidget->show();
-
-    /*
     * Saving...
     */
     if (!set.save_dipoles_dip(settings.dipname))
@@ -127,6 +104,30 @@ int main(int argc, char *argv[])
     * Reading again - Test
     */
     ECDSet::read_dipoles_dip(settings.dipname);
+
+/// ToDo use settings and make visualization optional
+//    /*
+//    * Visualize the dipoles
+//    */
+//    //Load FS set
+//    SurfaceSet tSurfSet ("sample", 2, "orig", "./MNE-sample-data/subjects");
+//    AnnotationSet tAnnotSet ("sample", 2, "orig", "./MNE-sample-data/subjects");
+
+//    //Create 3D data model and add data to model
+//    Data3DTreeModel::SPtr p3DDataModel = Data3DTreeModel::SPtr(new Data3DTreeModel());
+
+//    ECDSet::SPtr pSet = ECDSet::SPtr(new ECDSet(set));
+//    p3DDataModel->addSurfaceSet("sample", "Dipole test", tSurfSet, tAnnotSet);
+//    p3DDataModel->addDipoleFitData("sample", "Dipole test", pSet);
+
+//    //Create the 3D view
+//    View3D::SPtr testWindow = View3D::SPtr(new View3D());
+//    testWindow->setModel(p3DDataModel);
+//    testWindow->show();
+
+//    Control3DWidget::SPtr control3DWidget = Control3DWidget::SPtr(new Control3DWidget());
+//    control3DWidget->init(p3DDataModel, testWindow);
+//    control3DWidget->show();
 
     return app.exec();
 }
