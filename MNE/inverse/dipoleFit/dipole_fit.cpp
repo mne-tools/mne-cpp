@@ -121,7 +121,7 @@ ECDSet DipoleFit::calculateFit() const
     }
     else {
         printf("\n---- Reading data...\n\n");
-        if ((data = mne_read_meas_data(settings->measname.isEmpty() ? NULL : settings->measname.toLatin1().data(),settings->setno,NULL,NULL,
+        if ((data = mne_read_meas_data(settings->measname,settings->setno,NULL,NULL,
                                        fit_data->ch_names,fit_data->nmeg+fit_data->neeg)) == NULL)
             goto out;
         if (settings->do_baseline)
@@ -148,8 +148,8 @@ ECDSet DipoleFit::calculateFit() const
     * Proceed to computing the fits
     */
     printf("\n---- Computing the forward solution for the guesses...\n\n");
-    if ((guess = make_guess_data(settings->guessname.toLatin1().data() ? NULL : settings->guessname.toLatin1().data(),
-                                 settings->guess_surfname.toLatin1().data() ? NULL : settings->guess_surfname.toLatin1().data(),
+    if ((guess = make_guess_data(settings->guessname,
+                                 settings->guess_surfname,
                                  settings->guess_mindist, settings->guess_exclude, settings->guess_grid, fit_data)) == NULL)
         goto out;
 
@@ -158,11 +158,11 @@ ECDSet DipoleFit::calculateFit() const
 
 
     if (raw) {
-        if (fit_dipoles_raw(settings->measname.isEmpty() ? NULL : settings->measname.toLatin1().data(),raw,sel,fit_data,guess,settings->tmin,settings->tmax,settings->tstep,settings->integ,settings->verbose) == FAIL)
+        if (fit_dipoles_raw(settings->measname,raw,sel,fit_data,guess,settings->tmin,settings->tmax,settings->tstep,settings->integ,settings->verbose) == FAIL)
             goto out;
     }
     else {
-        if (fit_dipoles(settings->measname.isEmpty() ? NULL : settings->measname.toLatin1().data(),data,fit_data,guess,settings->tmin,settings->tmax,settings->tstep,settings->integ,settings->verbose,set) == FAIL)
+        if (fit_dipoles(settings->measname,data,fit_data,guess,settings->tmin,settings->tmax,settings->tstep,settings->integ,settings->verbose,set) == FAIL)
             goto out;
     }
     printf("%d dipoles fitted\n",set.size());
@@ -172,3 +172,48 @@ out : {
         return set;
     }
 }
+
+
+////*************************************************************************************************************
+//// fit_dipoles.c
+//int DipoleFit::fit_dipoles(char *dataname, mneMeasData data,  DipoleFitData* fit, GuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose, ECDSet& p_set)
+//{
+//    float *one = MALLOC(data->nchan,float);
+//    float time;
+//    ECDSet set;
+//    ECD   dip;
+//    int   s;
+//    int   report_interval = 10;
+
+//    set.dataname = QString(dataname);
+
+//    fprintf(stderr,"Fitting...%c",verbose ? '\n' : '\0');
+//    for (s = 0, time = tmin; time < tmax; s++, time = tmin  + s*tstep) {
+//        /*
+//     * Pick the data point
+//     */
+//        if (mne_get_values_from_data(time,integ,data->current->data,data->current->np,data->nchan,data->current->tmin,
+//                                     1.0/data->current->tstep,FALSE,one) == FAIL) {
+//            fprintf(stderr,"Cannot pick time: %7.1f ms\n",1000*time);
+//            continue;
+//        }
+
+//        if (!fit_one(fit,guess,time,one,verbose,dip))
+//            printf("t = %7.1f ms : %s\n",1000*time,"error (tbd: catch)");
+//        else {
+//            set.addEcd(dip);
+//            if (verbose)
+//                dip.print(stdout);
+//            else {
+//                if (set.size() % report_interval == 0)
+//                    fprintf(stderr,"%d..",set.size());
+//            }
+//        }
+//    }
+//    if (!verbose)
+//        fprintf(stderr,"[done]\n");
+//    FREE(one);
+//    p_set = set;
+//    return OK;
+//}
+

@@ -5602,7 +5602,7 @@ static void remove_artefacts (float *resp,
 }
 
 
-int mne_read_evoked(char       *name,           /* Name of the file */
+int mne_read_evoked(const QString& name,           /* Name of the file */
                     int        setno,		/* Which data set */
                     int        *nchanp,		/* How many channels */
                     int        *nsampp,		/* Number of time points */
@@ -5654,7 +5654,7 @@ int mne_read_evoked(char       *name,           /* Name of the file */
         printf ("Evoked response selector must be positive!");
         goto out;
     }
-    if ((in = fiff_open(name)) == NULL)
+    if ((in = fiff_open(name.toLatin1().data())) == NULL)
         goto out;
     /*
    * Select correct data set
@@ -9239,7 +9239,7 @@ mneSourceSpace mne_new_source_space(int np)
 
 
 
-int mne_read_source_spaces(char *name,               /* Read from here */
+int mne_read_source_spaces(const QString& name,               /* Read from here */
                            mneSourceSpace **spacesp, /* These are the results */
                            int            *nspacep)
 /*
@@ -9263,7 +9263,7 @@ int mne_read_source_spaces(char *name,               /* Read from here */
 
     extern void mne_add_triangle_data(mneSourceSpace s);
 
-    if ((in = fiff_open(name)) == NULL)
+    if ((in = fiff_open(name.toLatin1().data())) == NULL)
         goto bad;
 
     sources = fiff_dir_tree_find(in->dirtree,FIFFB_MNE_SOURCE_SPACE);
@@ -10342,11 +10342,11 @@ int mne_add_vertex_normals(mneSourceSpace s)
 //============================= mne_bem_surface_io.c =============================
 
 
-static mneSurface read_bem_surface(char *name,	        /* Filename */
-                                   int  which,		/* Which surface are we looking for (-1 loads the first one)*/
-                                   int  add_geometry,	/* Add the geometry information */
-                                   float *sigmap,	/* Conductivity? */
-                                   int   check_too_many_neighbors)
+static mneSurface read_bem_surface( const QString& name,    /* Filename */
+                                    int  which,             /* Which surface are we looking for (-1 loads the first one)*/
+                                    int  add_geometry,      /* Add the geometry information */
+                                    float *sigmap,          /* Conductivity? */
+                                    int   check_too_many_neighbors)
 /*
  * Read a Neuromag-style BEM surface description
  */
@@ -10366,7 +10366,7 @@ static mneSurface read_bem_surface(char *name,	        /* Filename */
     int coord_frame = FIFFV_COORD_MRI;
     float sigma = -1.0;
 
-    if ((in = fiff_open(name)) == NULL)
+    if ((in = fiff_open(name.toLatin1().data())) == NULL)
         goto bad;
     /*
    * Check for the existence of BEM coord frame
@@ -10507,10 +10507,10 @@ bad : {
     }
 }
 
-mneSurface mne_read_bem_surface(char *name,	        /* Filename */
-                                int  which,		/* Which surface are we looking for (-1 loads the first one)*/
-                                int  add_geometry,	/* Add the geometry information */
-                                float *sigmap)		/* Conductivity? */
+mneSurface mne_read_bem_surface(const QString&  name,   /* Filename */
+                                int  which,             /* Which surface are we looking for (-1 loads the first one)*/
+                                int  add_geometry,      /* Add the geometry information */
+                                float *sigmap)          /* Conductivity? */
 
 
 {
@@ -16539,13 +16539,13 @@ bad : {
     }
 }
 
-GuessData* make_guess_data(char          *guessname,
-                          char          *guess_surfname,
-                          float         mindist,
-                          float         exclude,
-                          float         grid,
-                          DipoleFitData* f,
-                          char          *guess_save_name)
+GuessData* make_guess_data( const QString& guessname,
+                            const QString& guess_surfname,
+                            float         mindist,
+                            float         exclude,
+                            float         grid,
+                            DipoleFitData* f,
+                            char          *guess_save_name)
 
 {
     mneSourceSpace *sp = NULL;
@@ -16555,7 +16555,7 @@ GuessData* make_guess_data(char          *guessname,
     float          guessrad = 0.080;
     mneSourceSpace guesses = NULL;
 
-    if (guessname) {
+    if (!guessname.isEmpty()) {
         /*
      * Read the guesses and transform to the appropriate coordinate frame
      */
@@ -16583,8 +16583,8 @@ GuessData* make_guess_data(char          *guessname,
             if ((inner_skull = fwd_bem_find_surface(f->bem_model,FIFFV_BEM_SURF_ID_BRAIN)) == NULL)
                 goto bad;
         }
-        else if (guess_surfname) {
-            printf("Reading inner skull surface from %s...\n",guess_surfname);
+        else if (!guess_surfname.isEmpty()) {
+            printf("Reading inner skull surface from %s...\n",guess_surfname.toLatin1().data());
             if ((inner_skull = mne_read_bem_surface(guess_surfname,FIFFV_BEM_SURF_ID_BRAIN,TRUE,NULL)) == NULL)
                 goto bad;
             free_inner_skull = TRUE;
@@ -16646,12 +16646,12 @@ bad : {
 
 //============================= setup.c =============================
 
-GuessData* make_guess_data(char          *guessname,
-                          char          *guess_surfname,
-                          float         mindist,
-                          float         exclude,
-                          float         grid,
-                          DipoleFitData* f)
+GuessData* make_guess_data( const QString& guessname,
+                            const QString& guess_surfname,
+                            float         mindist,
+                            float         exclude,
+                            float         grid,
+                            DipoleFitData* f)
 
 {
     mneSourceSpace *sp = NULL;
@@ -16662,10 +16662,10 @@ GuessData* make_guess_data(char          *guessname,
     mneSourceSpace guesses = NULL;
     dipoleFitFuncs orig;
 
-    if (guessname) {
+    if (!guessname.isEmpty()) {
         /*
-     * Read the guesses and transform to the appropriate coordinate frame
-     */
+        * Read the guesses and transform to the appropriate coordinate frame
+        */
         if (mne_read_source_spaces(guessname,&sp,&nsp) == FAIL)
             goto bad;
         if (nsp != 1) {
@@ -16690,8 +16690,8 @@ GuessData* make_guess_data(char          *guessname,
             if ((inner_skull = fwd_bem_find_surface(f->bem_model,FIFFV_BEM_SURF_ID_BRAIN)) == NULL)
                 goto bad;
         }
-        else if (guess_surfname) {
-            fprintf(stderr,"Reading inner skull surface from %s...\n",guess_surfname);
+        else if (!guess_surfname.isEmpty()) {
+            fprintf(stderr,"Reading inner skull surface from %s...\n",guess_surfname.toLatin1().data());
             if ((inner_skull = mne_read_bem_surface(guess_surfname,FIFFV_BEM_SURF_ID_BRAIN,TRUE,NULL)) == NULL)
                 goto bad;
             free_inner_skull = TRUE;
@@ -19209,13 +19209,13 @@ void mne_free_meas_data(mneMeasData m)
 }
 
 
-mneMeasData mne_read_meas_data_add(char               *name,       /* Name of the measurement file */
-                                   int                set,         /* Which data set */
-                                   mneInverseOperator op,	   /* For consistency checks */
-                                   mneNamedMatrix     fwd,         /* Another option for consistency checks */
-                                   char               **namesp,    /* Yet another option: explicit name list */
-                                   int                nnamesp,
-                                   mneMeasData        add_to)	   /* Add to this */
+mneMeasData mne_read_meas_data_add(const QString&       name,       /* Name of the measurement file */
+                                   int                  set,        /* Which data set */
+                                   mneInverseOperator   op,         /* For consistency checks */
+                                   mneNamedMatrix       fwd,        /* Another option for consistency checks */
+                                   char                 **namesp,   /* Yet another option: explicit name list */
+                                   int                  nnamesp,
+                                   mneMeasData          add_to)     /* Add to this */
 /*
       * Read an evoked-response data file
       */
@@ -19346,7 +19346,7 @@ mneMeasData mne_read_meas_data_add(char               *name,       /* Name of th
    */
     if (!new_data) {			/* We need a new meas data structure */
         new_data     = mne_new_meas_data();
-        new_data->filename  = mne_strdup(name);
+        new_data->filename  = mne_strdup(name.toLatin1().data());
         new_data->meas_id   = id; id = NULL;
         /*
      * Getting starting time from measurement ID is not too accurate...
@@ -19487,12 +19487,12 @@ out : {
 }
 
 
-mneMeasData mne_read_meas_data(char               *name,       /* Name of the measurement file */
-                               int                set,         /* Which data set */
-                               mneInverseOperator op,	       /* For consistency checks */
-                               mneNamedMatrix     fwd,         /* Another option for consistency checks */
-                               char               **namesp,    /* Yet another option: explicit name list */
-                               int                nnamesp)
+mneMeasData mne_read_meas_data(const QString&       name,       /* Name of the measurement file */
+                               int                  set,        /* Which data set */
+                               mneInverseOperator   op,         /* For consistency checks */
+                               mneNamedMatrix       fwd,        /* Another option for consistency checks */
+                               char                 **namesp,   /* Yet another option: explicit name list */
+                               int                  nnamesp)
 
 {
     return mne_read_meas_data_add(name,set,op,fwd,namesp,nnamesp,NULL);
@@ -20148,19 +20148,19 @@ bad : {
 #define SEG_LEN 10.0
 
 
-int fit_dipoles_raw(char           *dataname,
-                    mneRawData     raw,          /* The raw data description */
-                    mneChSelection sel,	         /* Channel selection to use */
-                    DipoleFitData*  fit,	         /* Precomputed fitting data */
-                    GuessData*      guess,        /* The initial guesses */
-                    float          tmin,         /* Time range */
-                    float          tmax,
-                    float          tstep,        /* Time step to use */
-                    float          integ,        /* Integration time */
-                    int            verbose,      /* Verbose output? */
-                    ECDSet&        p_set)       /* Return all results here
-                                                  * Warning: for large data files this may take
-                                                  * a lot of memory */
+int fit_dipoles_raw(const QString&  dataname,
+                    mneRawData      raw,            /* The raw data description */
+                    mneChSelection  sel,            /* Channel selection to use */
+                    DipoleFitData*  fit,            /* Precomputed fitting data */
+                    GuessData*      guess,          /* The initial guesses */
+                    float           tmin,           /* Time range */
+                    float           tmax,
+                    float           tstep,          /* Time step to use */
+                    float           integ,          /* Integration time */
+                    int             verbose,        /* Verbose output? */
+                    ECDSet&         p_set)          /* Return all results here
+                                                     * Warning: for large data files this may take
+                                                     * a lot of memory */
 
 /*
  * Fit a single dipole to each time point of the data
@@ -20181,7 +20181,7 @@ int fit_dipoles_raw(char           *dataname,
     ECDSet set;
     int    report_interval = 10;
 
-    set.dataname = QString(dataname);
+    set.dataname = dataname;
 
     /*
    * Load the initial data segment
@@ -20238,7 +20238,7 @@ bad : {
 
 
 
-int fit_dipoles_raw(char           *dataname,
+int fit_dipoles_raw(const QString& dataname,
                     mneRawData     raw,          /* The raw data description */
                     mneChSelection sel,	         /* Channel selection to use */
                     DipoleFitData*  fit,	         /* Precomputed fitting data */
@@ -20301,16 +20301,16 @@ out : {
 }
 
 
-int    fit_dipoles(char          *dataname,
-                   mneMeasData   data,       /* The measured data */
-                   DipoleFitData* fit,	     /* Precomputed fitting data */
-                   GuessData*     guess,	     /* The initial guesses */
-                   float         tmin,	     /* Time range */
-                   float         tmax,
-                   float         tstep,	     /* Time step to use */
-                   float         integ,	     /* Integration time */
-                   int           verbose,    /* Verbose output? */
-                   ECDSet&       p_set)
+int    fit_dipoles( const QString&  dataname,
+                    mneMeasData     data,       /* The measured data */
+                    DipoleFitData*  fit,        /* Precomputed fitting data */
+                    GuessData*      guess,      /* The initial guesses */
+                    float           tmin,       /* Time range */
+                    float           tmax,
+                    float           tstep,      /* Time step to use */
+                    float           integ,      /* Integration time */
+                    int             verbose,    /* Verbose output? */
+                    ECDSet&         p_set)
 /*
  * Fit a single dipole to each time point of the data
  */
@@ -20322,7 +20322,7 @@ int    fit_dipoles(char          *dataname,
     int   s;
     int   report_interval = 10;
 
-    set.dataname = QString(dataname);
+    set.dataname = dataname;
 
     fprintf(stderr,"Fitting...%c",verbose ? '\n' : '\0');
     for (s = 0, time = tmin; time < tmax; s++, time = tmin  + s*tstep) {
