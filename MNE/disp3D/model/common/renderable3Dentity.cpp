@@ -116,6 +116,9 @@ Renderable3DEntity::Renderable3DEntity(const MatrixX3f& tMatVert, const MatrixX3
 , m_fRotX(0.0f)
 , m_fRotY(0.0f)
 , m_fRotZ(0.0f)
+, m_fTessInner(1.0f)
+, m_fTessOuter(1.0f)
+, m_fTriangleScale(1.0f)
 {
     this->addComponent(m_pCustomMesh);
     this->addComponent(m_pTransform);

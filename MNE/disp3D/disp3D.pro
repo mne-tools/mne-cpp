@@ -118,6 +118,7 @@ SOURCES += \
     control/control3dwidget.cpp \
     model/workers/rtSourceLoc/rtsourcelocdataworker.cpp \
     model/common/shadermaterial.cpp \
+    model/sourceactivity/ecddatatreeitem.cpp \
 
 HEADERS += \
     view3D.h \
@@ -144,6 +145,7 @@ HEADERS += \
     disp3D_global.h \
     model/workers/rtSourceLoc/rtsourcelocdataworker.h \
     model/common/shadermaterial.h \
+    model/sourceactivity/ecddatatreeitem.h \
 
 FORMS += \
     control/control3dwidget.ui \

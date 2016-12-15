@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     brainsurfacetreeitem.h
+* @file     ecddatatreeitem.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     BrainSurfaceTreeItem class declaration.
+* @brief     ECDDataTreeItem class declaration.
 *
 */
 
-#ifndef BRAINSURFACETREEITEM_H
-#define BRAINSURFACETREEITEM_H
+#ifndef ECDDATATREEITEM_H
+#define ECDDATATREEITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -43,7 +43,8 @@
 
 #include "../../disp3D_global.h"
 #include "../common/abstracttreeitem.h"
-#include "../common/types.h"
+
+#include <inverse/dipoleFit/ecd_set.h>
 
 
 //*************************************************************************************************************
@@ -65,6 +66,10 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+namespace INVERSELIB {
+    class ECDSet;
+}
+
 namespace Qt3DCore {
     class QEntity;
 }
@@ -84,23 +89,22 @@ namespace DISP3DLIB
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class MetaTreeItem;
 class Renderable3DEntity;
 
 
 //=============================================================================================================
 /**
-* BrainSurfaceTreeItem provides a generic brain tree item to hold of brain data (hemi, vertices, tris, etc.) from different sources (FreeSurfer, etc.).
+* ECDDataTreeItem provides a generic item to hold information dipole fit source localization data to plot onto the brain surface.
 *
-* @brief Provides a generic brain tree item.
+* @brief Provides a generic brain tree item to hold real time data.
 */
-class DISP3DNEWSHARED_EXPORT BrainSurfaceTreeItem : public AbstractTreeItem
+class DISP3DNEWSHARED_EXPORT ECDDataTreeItem : public AbstractTreeItem
 {
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<BrainSurfaceTreeItem> SPtr;             /**< Shared pointer type for BrainSurfaceTreeItem class. */
-    typedef QSharedPointer<const BrainSurfaceTreeItem> ConstSPtr;  /**< Const shared pointer type for BrainSurfaceTreeItem class. */
+    typedef QSharedPointer<ECDDataTreeItem> SPtr;             /**< Shared pointer type for ECDDataTreeItem class. */
+    typedef QSharedPointer<const ECDDataTreeItem> ConstSPtr;  /**< Const shared pointer type for ECDDataTreeItem class. */
 
     //=========================================================================================================
     /**
@@ -109,13 +113,13 @@ public:
     * @param[in] iType      The type of the item. See types.h for declaration and definition.
     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
     */
-    explicit BrainSurfaceTreeItem(int iType = Data3DTreeModelItemTypes::SurfaceItem, const QString& text = "Surface");
+    explicit ECDDataTreeItem(int iType = Data3DTreeModelItemTypes::ECDSetDataItem, const QString& text = "Dipole fit data");
 
     //=========================================================================================================
     /**
     * Default destructor
     */
-    ~BrainSurfaceTreeItem();
+    ~ECDDataTreeItem();
 
     //=========================================================================================================
     /**
@@ -126,78 +130,33 @@ public:
 
     //=========================================================================================================
     /**
-    * Adds FreeSurfer data based on surface and annotation data to this item.
+    * Initializes the rt data item with neccessary information for visualization computations.
     *
-    * @param[in] tSurface           FreeSurfer surface.
-    * @param[in] parent             The Qt3D entity parent of the new item.
+    * @param[in] parent                 The Qt3D entity parent of the new item.
     *
-    * @return                       Returns true if successful.
+    * @return   Returns true if successful.
     */
-    bool addData(const FSLIB::Surface& tSurface, Qt3DCore::QEntity* parent);
+    bool init(Qt3DCore::QEntity *parent);
 
     //=========================================================================================================
     /**
-    * Call this function whenever new colors for the activation data plotting are available.
+    * Adds actual rt data which is streamed by this item's worker thread item. In order for this function to worker, you must call init(...) beforehand.
     *
-    * @param[in] sourceColorSamples     The color values for each estimated source.
+    * @param[in] pECDSet        The ECDSet dipole fit data.
+    *
+    * @return   Returns true if successful.
     */
-    void onRtVertColorChanged(const QByteArray& sourceColorSamples);
+    bool addData(QSharedPointer<INVERSELIB::ECDSet> pECDSet);
 
     //=========================================================================================================
     /**
-    * Call this function whenever visibilty of teh annoation has changed.
+    * Updates the rt data which is streamed by this item's worker thread item.
     *
-    * @param[in] isVisible     The visibility flag.
+    * @return                       Returns true if this item is initialized.
     */
-    void onAnnotationVisibilityChanged(bool isVisible);
-
-    //=========================================================================================================
-    /**
-    * Call this function whenever you want to change the visibilty of the 3D rendered content.
-    *
-    * @param[in] state     The visiblity flag.
-    */
-    void setVisible(bool state);
+    inline bool isInit() const;
 
 private:
-    //=========================================================================================================
-    /**
-    * Call this function whenever the curvature color or origin of color information (curvature or annotation) changed.
-    */
-    void onColorInfoOriginOrCurvColorChanged();
-
-    //=========================================================================================================
-    /**
-    * Call this function whenever the alpha value changed.
-    *
-    * @param[in] fAlpha     The new alpha value.
-    */
-    void onSurfaceAlphaChanged(float fAlpha);
-
-    //=========================================================================================================
-    /**
-    * Call this function whenever the inner tesselation value changed.
-    *
-    * @param[in] fTessInner     The new inner tesselation value.
-    */
-    void onSurfaceTessInnerChanged(float fTessInner);
-
-    //=========================================================================================================
-    /**
-    * Call this function whenever the outer tesselation value changed.
-    *
-    * @param[in] fTessOuter     The new outer tesselation value.
-    */
-    void onSurfaceTessOuterChanged(float fTessOuter);
-
-    //=========================================================================================================
-    /**
-    * Call this function whenever the triangle scale value changed.
-    *
-    * @param[in] fTriangleScale     The triangle scale value.
-    */
-    void onSurfaceTriangleScaleChanged(float fTriangleScale);
-
     //=========================================================================================================
     /**
     * Call this function whenever the check box of this item was checked.
@@ -208,55 +167,46 @@ private:
 
     //=========================================================================================================
     /**
-    * Call this function whenever the the translation x of this item changed.
+    * Call this function whenever you want to change the visibilty of the 3D rendered content.
     *
-    * @param[in] fTransX        The current x translation.
+    * @param[in] state     The visiblity flag.
     */
-    void onSurfaceTranslationXChanged(float fTransX);
+    void setVisible(bool state);
 
     //=========================================================================================================
     /**
-    * Call this function whenever the the translation y of this item changed.
+    * Call this function whenever you want to plot the dipoles.
     *
-    * @param[in] fTransY        The current y translation.
+    * @param[in] pECDSet     The dipole set data.
     */
-    void onSurfaceTranslationYChanged(float fTransY);
+    void plotDipoles(QSharedPointer<INVERSELIB::ECDSet> pECDSet);
 
-    //=========================================================================================================
-    /**
-    * Call this function whenever the the translation z of this item changed.
-    *
-    * @param[in] fTransZ        The current z translation.
-    */
-    void onSurfaceTranslationZChanged(float fTransZ);
+    bool                                    m_bIsInit;                      /**< The init flag. */
 
-    //=========================================================================================================
-    /**
-    * Creates a QByteArray of colors for given curvature and color data.
-    *
-    * @param[in] curvature      The curvature information.
-    * @param[in] colSulci       The sulci color information.
-    * @param[in] colGyri        The gyri color information.
-    */
-    QByteArray createCurvatureVertColor(const Eigen::VectorXf& curvature, const QColor& colSulci = QColor(50,50,50), const QColor& colGyri = QColor(125,125,125));
+    QPointer<Qt3DCore::QEntity>             m_pParentEntity;                /**< The parent 3D entity. */
+    QPointer<Renderable3DEntity>            m_pRenderable3DEntity;          /**< The renderable 3D entity. */
 
-    QString                         m_sColorInfoOrigin;                         /**< The surface color origin. */
-    QPointer<Qt3DCore::QEntity>     m_pParentEntity;                            /**< The parent 3D entity. */
-    QPointer<Renderable3DEntity>    m_pRenderable3DEntity;                      /**< The surface renderable 3D entity. */
-    QPointer<Renderable3DEntity>    m_pRenderable3DEntityNormals;               /**< The normals renderable 3D entity. */
-
-    //These are stored as member variables because we do not wat to look for them everytime we call functions, especially not when we perform rt source loc
-    MetaTreeItem*                   m_pItemSurfColSulci;                        /**< The item which holds the sulci color information. */
-    MetaTreeItem*                   m_pItemSurfColGyri;                         /**< The item which holds the gyri color information. */
+    QList<QPointer<Renderable3DEntity> >    m_lDipoles;                     /**< The currently displayed dipoles as 3D objects. */
 
 signals:
-    //=========================================================================================================
-    /**
-    * Emit this signal whenever the origin of the vertex color (from curvature, from annotation) changed.
-    */
-    void colorInfoOriginChanged();
+
 };
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+inline bool ECDDataTreeItem::isInit() const
+{
+    return m_bIsInit;
+}
 
 } //NAMESPACE DISP3DLIB
 
-#endif // BRAINSURFACETREEITEM_H
+#ifndef metatype_ecdsetsptr
+#define metatype_ecdsetsptr
+Q_DECLARE_METATYPE(INVERSELIB::ECDSet::SPtr);
+#endif
+
+#endif // ECDDataTreeItem_H

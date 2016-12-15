@@ -42,13 +42,22 @@
 #include <inverse/dipoleFit/dipole_fit_settings.h>
 #include <inverse/dipoleFit/dipole_fit.h>
 
+#include <disp3D/view3D.h>
+#include <disp3D/control/control3dwidget.h>
+#include <disp3D/model/sourceactivity/ecddatatreeitem.h>
+#include <disp3D/model/data3Dtreemodel.h>
+
+#include <fs/label.h>
+#include <fs/surfaceset.h>
+#include <fs/annotationset.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // Qt INCLUDES
 //=============================================================================================================
 
-#include <QCoreApplication>
+#include <QApplication>
 
 
 //*************************************************************************************************************
@@ -57,6 +66,8 @@
 //=============================================================================================================
 
 using namespace INVERSELIB;
+using namespace DISP3DLIB;
+using namespace FSLIB;
 
 
 //*************************************************************************************************************
@@ -75,11 +86,34 @@ using namespace INVERSELIB;
 */
 int main(int argc, char *argv[])
 {
-    QCoreApplication app(argc, argv);
+    QApplication app(argc, argv);
 
     DipoleFitSettings settings(&argc,argv);
     DipoleFit dipFit(&settings);
     ECDSet set = dipFit.calculateFit();
+
+    /*
+    * Visualize the dipoles
+    */
+    //Load FS set
+    SurfaceSet tSurfSet ("sample", 2, "orig", "./MNE-sample-data/subjects");
+    AnnotationSet tAnnotSet ("sample", 2, "orig", "./MNE-sample-data/subjects");
+
+    //Create 3D data model and add data to model
+    Data3DTreeModel::SPtr p3DDataModel = Data3DTreeModel::SPtr(new Data3DTreeModel());
+
+    ECDSet::SPtr pSet = ECDSet::SPtr(new ECDSet(set));
+    p3DDataModel->addSurfaceSet("sample", "Dipole test", tSurfSet, tAnnotSet);
+    p3DDataModel->addDipoleFitData("sample", "Dipole test", pSet);
+
+    //Create the 3D view
+    View3D::SPtr testWindow = View3D::SPtr(new View3D());
+    testWindow->setModel(p3DDataModel);
+    testWindow->show();
+
+    Control3DWidget::SPtr control3DWidget = Control3DWidget::SPtr(new Control3DWidget());
+    control3DWidget->init(p3DDataModel, testWindow);
+    control3DWidget->show();
 
     /*
     * Saving...

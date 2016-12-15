@@ -88,7 +88,7 @@ BrainSurfaceTreeItem::BrainSurfaceTreeItem(int iType, const QString& text)
 , m_sColorInfoOrigin("Color from curvature")
 , m_pParentEntity(new Qt3DCore::QEntity())
 , m_pRenderable3DEntity(new Renderable3DEntity())
-, m_pRenderable3DEntityActivationOverlay(new Renderable3DEntity())
+, m_pRenderable3DEntityNormals(new Renderable3DEntity())
 , m_pItemSurfColGyri(new MetaTreeItem())
 , m_pItemSurfColSulci(new MetaTreeItem())
 {
@@ -105,12 +105,12 @@ BrainSurfaceTreeItem::~BrainSurfaceTreeItem()
 {
     //Schedule deletion/Decouple of all entities so that the SceneGraph is NOT plotting them anymore.
     //Cannot delete m_pParentEntity since we do not know who else holds it, that is why we use a QPointer for m_pParentEntity.
-    if(!m_pRenderable3DEntity.isNull()) {
+    if(!m_pRenderable3DEntity) {
         m_pRenderable3DEntity->deleteLater();
     }
 
-    if(!m_pRenderable3DEntityActivationOverlay.isNull()) {
-        m_pRenderable3DEntityActivationOverlay->deleteLater();
+    if(!m_pRenderable3DEntityNormals) {
+        m_pRenderable3DEntityNormals->deleteLater();
     }
 }
 
@@ -134,10 +134,6 @@ void  BrainSurfaceTreeItem::setData(const QVariant& value, int role)
             m_pRenderable3DEntity->setVertColor(value.value<QByteArray>());
             break;
 
-//    case Data3DTreeModelItemRoles::SurfaceRTSourceLocColor:
-//        m_pRenderable3DEntityActivationOverlay->setVertColor(value.value<MatrixX3f>());
-//        break;
-
         default: // do nothing;
                  break;
     }
@@ -151,16 +147,18 @@ bool BrainSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* p
     //Create renderable 3D entity
     m_pParentEntity = parent;
     m_pRenderable3DEntity = new Renderable3DEntity(m_pParentEntity);
-    m_pRenderable3DEntityActivationOverlay = new Renderable3DEntity(m_pParentEntity);
+    m_pRenderable3DEntityNormals = new Renderable3DEntity(m_pRenderable3DEntity);
 
     //Initial transformation also regarding the surface offset
     m_pRenderable3DEntity->setPosition(QVector3D(-tSurface.offset()(0), -tSurface.offset()(1), -tSurface.offset()(2)));
+    //m_pRenderable3DEntityNormals->setPosition(QVector3D(-tSurface.offset()(0), -tSurface.offset()(1), -tSurface.offset()(2)));
 
     //Create color from curvature information with default gyri and sulcus colors
     QByteArray arrayCurvatureColor = createCurvatureVertColor(tSurface.curv());
 
     //Set renderable 3D entity mesh and color data
     m_pRenderable3DEntity->setMeshData(tSurface.rr(), tSurface.nn(), tSurface.tris(), arrayCurvatureColor, Qt3DRender::QGeometryRenderer::Patches);
+    //m_pRenderable3DEntityNormals->setMeshData(tSurface.rr(), tSurface.nn(), tSurface.tris(), arrayCurvatureColor, Qt3DRender::QGeometryRenderer::Points);
 
     //Set shaders
     m_pRenderable3DEntity->setShader(QUrl(QStringLiteral("qrc:/model/common/shaders/gl3/pervertexphongalpha.vert")));
@@ -169,6 +167,10 @@ bool BrainSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* p
     m_pRenderable3DEntity->setShader(QUrl(QStringLiteral("qrc:/model/common/shaders/gl3/pervertexphongalpha_pn_triangles.tes")));
     m_pRenderable3DEntity->setShader(QUrl(QStringLiteral("qrc:/model/common/shaders/gl3/pervertexphongalpha.geom")));
     m_pRenderable3DEntity->setShader(QUrl(QStringLiteral("qrc:/model/common/shaders/gl3/pervertexphongalpha.frag")));
+
+    m_pRenderable3DEntityNormals->setShader(QUrl(QStringLiteral("qrc:/model/common/shaders/gl3/shownormals.vert")));
+    m_pRenderable3DEntityNormals->setShader(QUrl(QStringLiteral("qrc:/model/common/shaders/gl3/shownormals.geom")));
+    m_pRenderable3DEntityNormals->setShader(QUrl(QStringLiteral("qrc:/model/common/shaders/gl3/shownormals.frag")));
 
     //Generate activation overlay surface
 //    MatrixX3f overlayAdds = tSurface.rr();
@@ -179,7 +181,7 @@ bool BrainSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* p
 //        overlayAdds.row(i) = direction*0.0001;
 //    }
 
-//    m_pRenderable3DEntityActivationOverlay->setMeshData(tSurface.rr()+overlayAdds, tSurface.nn(), tSurface.tris(), -tSurface.offset(), matCurvatureColor);
+//    m_pRenderable3DEntityNormals->setMeshData(tSurface.rr()+overlayAdds, tSurface.nn(), tSurface.tris(), -tSurface.offset(), matCurvatureColor);
 
     //Add data which is held by this BrainSurfaceTreeItem
     QVariant data;
@@ -206,7 +208,7 @@ bool BrainSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* p
     data.setValue(m_pRenderable3DEntity);
     this->setData(data, Data3DTreeModelItemRoles::SurfaceRenderable3DEntity);
 
-    data.setValue(m_pRenderable3DEntityActivationOverlay);
+    data.setValue(m_pRenderable3DEntityNormals);
     this->setData(data, Data3DTreeModelItemRoles::SurfaceRenderable3DEntityAcivationOverlay);
 
     //Add surface meta information as item children
@@ -233,44 +235,48 @@ bool BrainSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* p
     m_pItemSurfColGyri->setData(data, MetaTreeItemRoles::SurfaceColorGyri);
     m_pItemSurfColGyri->setData(data, Qt::DecorationRole);
 
-    MetaTreeItem *itemAlpha = new MetaTreeItem(MetaTreeItemTypes::SurfaceAlpha, "1.0");
+    float fAlpha = 0.35;
+    MetaTreeItem *itemAlpha = new MetaTreeItem(MetaTreeItemTypes::SurfaceAlpha, QString("%1").arg(fAlpha));
     connect(itemAlpha, &MetaTreeItem::surfaceAlphaChanged,
             this, &BrainSurfaceTreeItem::onSurfaceAlphaChanged);
     list.clear();
     list << itemAlpha;
     list << new QStandardItem(itemAlpha->toolTip());
     this->appendRow(list);
-    data.setValue(1.0);
+    data.setValue(fAlpha);
     itemAlpha->setData(data, MetaTreeItemRoles::SurfaceAlpha);
 
-    MetaTreeItem *itemTessInner = new MetaTreeItem(MetaTreeItemTypes::SurfaceTessInner, "1.0");
+    float fTessInner = 1.0;
+    MetaTreeItem *itemTessInner = new MetaTreeItem(MetaTreeItemTypes::SurfaceTessInner, QString("%1").arg(fTessInner));
     connect(itemTessInner, &MetaTreeItem::surfaceTessInnerChanged,
             this, &BrainSurfaceTreeItem::onSurfaceTessInnerChanged);
     list.clear();
     list << itemTessInner;
     list << new QStandardItem(itemTessInner->toolTip());
     this->appendRow(list);
-    data.setValue(1.0);
+    data.setValue(fTessInner);
     itemTessInner->setData(data, MetaTreeItemRoles::SurfaceTessInner);
 
-    MetaTreeItem *itemTessOuter = new MetaTreeItem(MetaTreeItemTypes::SurfaceTessOuter, "1.0");
+        float fTessOuter = 1.0;
+    MetaTreeItem *itemTessOuter = new MetaTreeItem(MetaTreeItemTypes::SurfaceTessOuter, QString("%1").arg(fTessOuter));
     connect(itemTessOuter, &MetaTreeItem::surfaceTessOuterChanged,
             this, &BrainSurfaceTreeItem::onSurfaceTessOuterChanged);
     list.clear();
     list << itemTessOuter;
     list << new QStandardItem(itemTessOuter->toolTip());
     this->appendRow(list);
-    data.setValue(1.0);
+    data.setValue(fTessOuter);
     itemTessOuter->setData(data, MetaTreeItemRoles::SurfaceTessOuter);
 
-    MetaTreeItem *itemTriangleScale = new MetaTreeItem(MetaTreeItemTypes::SurfaceTriangleScale, "1.0");
+        float fTriangleScale = 1.0;
+    MetaTreeItem *itemTriangleScale = new MetaTreeItem(MetaTreeItemTypes::SurfaceTriangleScale, QString("%1").arg(fTriangleScale));
     connect(itemTriangleScale, &MetaTreeItem::surfaceTriangleScaleChanged,
             this, &BrainSurfaceTreeItem::onSurfaceTriangleScaleChanged);
     list.clear();
     list << itemTriangleScale;
     list << new QStandardItem(itemTriangleScale->toolTip());
     this->appendRow(list);
-    data.setValue(1.0);
+    data.setValue(fTriangleScale);
     itemTriangleScale->setData(data, MetaTreeItemRoles::SurfaceTriangleScale);
 
     MetaTreeItem *itemSurfFileName = new MetaTreeItem(MetaTreeItemTypes::FileName, tSurface.fileName());
@@ -339,7 +345,6 @@ void BrainSurfaceTreeItem::onRtVertColorChanged(const QByteArray& sourceColorSam
     //In setData(data, Data3DTreeModelItemRoles::SurfaceCurrentColorVert) we pass the new color values to the renderer (see setData function).
     QVariant data;
     data.setValue(sourceColorSamples);
-    this->setData(data, Data3DTreeModelItemRoles::SurfaceRTSourceLocColor);
     this->setData(data, Data3DTreeModelItemRoles::SurfaceCurrentColorVert);
 }
 
@@ -362,8 +367,8 @@ void BrainSurfaceTreeItem::onAnnotationVisibilityChanged(bool isVisible)
 
 void BrainSurfaceTreeItem::setVisible(bool state)
 {
+    m_pRenderable3DEntityNormals->setParent(state ? m_pParentEntity : Q_NULLPTR);
     m_pRenderable3DEntity->setParent(state ? m_pParentEntity : Q_NULLPTR);
-    m_pRenderable3DEntityActivationOverlay->setParent(state ? m_pParentEntity : Q_NULLPTR);
 }
 
 
@@ -421,7 +426,6 @@ void BrainSurfaceTreeItem::onColorInfoOriginOrCurvColorChanged()
 void BrainSurfaceTreeItem::onSurfaceAlphaChanged(float fAlpha)
 {
     m_pRenderable3DEntity->setAlpha(fAlpha);
-    m_pRenderable3DEntityActivationOverlay->setAlpha(fAlpha);
 }
 
 
@@ -430,7 +434,6 @@ void BrainSurfaceTreeItem::onSurfaceAlphaChanged(float fAlpha)
 void BrainSurfaceTreeItem::onSurfaceTessInnerChanged(float fTessInner)
 {
     m_pRenderable3DEntity->setTessInner(fTessInner);
-    m_pRenderable3DEntityActivationOverlay->setTessInner(fTessInner);
 }
 
 
@@ -439,7 +442,6 @@ void BrainSurfaceTreeItem::onSurfaceTessInnerChanged(float fTessInner)
 void BrainSurfaceTreeItem::onSurfaceTessOuterChanged(float fTessOuter)
 {
     m_pRenderable3DEntity->setTessOuter(fTessOuter);
-    m_pRenderable3DEntityActivationOverlay->setTessOuter(fTessOuter);
 }
 
 
@@ -448,7 +450,6 @@ void BrainSurfaceTreeItem::onSurfaceTessOuterChanged(float fTessOuter)
 void BrainSurfaceTreeItem::onSurfaceTriangleScaleChanged(float fTriangleScale)
 {
     m_pRenderable3DEntity->setTriangleScale(fTriangleScale);
-    m_pRenderable3DEntityActivationOverlay->setTriangleScale(fTriangleScale);
 }
 
 
@@ -467,6 +468,7 @@ void BrainSurfaceTreeItem::onSurfaceTranslationXChanged(float fTransX)
     QVector3D position = m_pRenderable3DEntity->position();
     position.setX(fTransX);
     m_pRenderable3DEntity->setPosition(position);
+    m_pRenderable3DEntityNormals->setPosition(position);
 }
 
 
@@ -477,6 +479,7 @@ void BrainSurfaceTreeItem::onSurfaceTranslationYChanged(float fTransY)
     QVector3D position = m_pRenderable3DEntity->position();
     position.setY(fTransY);
     m_pRenderable3DEntity->setPosition(position);
+    m_pRenderable3DEntityNormals->setPosition(position);
 }
 
 
@@ -487,6 +490,7 @@ void BrainSurfaceTreeItem::onSurfaceTranslationZChanged(float fTransZ)
     QVector3D position = m_pRenderable3DEntity->position();
     position.setZ(fTransZ);
     m_pRenderable3DEntity->setPosition(position);
+    m_pRenderable3DEntityNormals->setPosition(position);
 }
 
 

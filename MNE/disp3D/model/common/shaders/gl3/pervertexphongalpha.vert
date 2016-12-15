@@ -13,7 +13,7 @@ out vec3 vNormal;
 
 void main()
 {
-    vPosition = viewMatrix * modelMatrix * vec4(vertexPosition, 1.);
+    vPosition = vec4(vertexPosition, 1.);
 	
 	vNormal = normalize( vertexNormal );
 	

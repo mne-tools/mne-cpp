@@ -83,6 +83,10 @@ namespace FIFFLIB{
     class FiffDigPointSet;
 }
 
+namespace INVERSELIB{
+    class ECDSet;
+}
+
 namespace Qt3DCore {
     class QEntity;
 }
@@ -103,6 +107,7 @@ namespace DISP3DLIB
 
 class BrainRTSourceLocDataTreeItem;
 class NetworkTreeItem;
+class ECDDataTreeItem;
 
 
 //=============================================================================================================
@@ -178,7 +183,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Adds source estimated activation data.
+    * Adds source estimated activation data (MNE, RTC-MUSIC) to this item.
     *
     * @param[in] tSourceEstimate    The MNESourceEstimate.
     * @param[in] tForwardSolution   The MNEForwardSolution.
@@ -186,6 +191,17 @@ public:
     * @return                       Returns a list with the tree items which now hold the activation data. Use this list to update the data, i.e. during real time applications.
     */
     BrainRTSourceLocDataTreeItem* addData(const MNELIB::MNESourceEstimate& tSourceEstimate, const MNELIB::MNEForwardSolution& tForwardSolution = MNELIB::MNEForwardSolution());
+
+    //=========================================================================================================
+    /**
+    * Adds source estimated activation data (dipole fit) to this item.
+    *
+    * @param[in] tECDSet            The ECDSet dipole data.
+    * @param[in] p3DEntityParent    The Qt3D entity parent of the new item.
+    *
+    * @return                       Returns a pointer to the added tree item. Null pointer if no item was added.
+    */
+    ECDDataTreeItem* addData(QSharedPointer<INVERSELIB::ECDSet> &pECDSet, Qt3DCore::QEntity* p3DEntityParent = 0);
 
     //=========================================================================================================
     /**
@@ -232,8 +248,9 @@ private:
     */
     void onColorInfoOriginChanged();
 
-    BrainRTSourceLocDataTreeItem*       m_pBrainRTSourceLocDataTreeItem;        /**< The rt source loc data item of this hemisphere item. Multiple rt data item's can be added to this hemipshere item. */
-    NetworkTreeItem*                    m_pNetworkTreeItem;                     /**< The rt connecntivity data item of this hemisphere item. Multiple rt data item's can be added to this hemipshere item. */
+    BrainRTSourceLocDataTreeItem*       m_pBrainRTSourceLocDataTreeItem;        /**< The rt source loc data item of this item. */
+    NetworkTreeItem*                    m_pNetworkTreeItem;                     /**< The rt connectivity data item of this item. */
+    ECDDataTreeItem*                    m_ECDDataTreeItem;                      /**< The rt dipole fit data item of this item. */
 };
 
 } //NAMESPACE DISP3DLIB

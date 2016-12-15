@@ -46,6 +46,7 @@
 #include "../brain/brainannotationtreeitem.h"
 #include "../digitizer/digitizersettreeitem.h"
 #include "../digitizer/digitizertreeitem.h"
+#include "../sourceactivity/ecddatatreeitem.h"
 
 #include <fs/label.h>
 #include <fs/annotationset.h>
@@ -55,6 +56,8 @@
 #include <mne/mne_sourcespace.h>
 
 #include <fiff/fiff_dig_point_set.h>
+
+#include <inverse/dipoleFit/ecd_set.h>
 
 
 //*************************************************************************************************************
@@ -86,6 +89,7 @@
 using namespace FSLIB;
 using namespace MNELIB;
 using namespace DISP3DLIB;
+using namespace INVERSELIB;
 using namespace CONNECTIVITYLIB;
 
 
@@ -98,6 +102,7 @@ MeasurementTreeItem::MeasurementTreeItem(int iType, const QString& text)
 : AbstractTreeItem(iType, text)
 , m_pBrainRTSourceLocDataTreeItem(new BrainRTSourceLocDataTreeItem())
 , m_pNetworkTreeItem(new NetworkTreeItem())
+, m_ECDDataTreeItem(new ECDDataTreeItem())
 {
     this->setEditable(false);
     this->setCheckable(true);
@@ -349,7 +354,38 @@ BrainRTSourceLocDataTreeItem* MeasurementTreeItem::addData(const MNESourceEstima
         qDebug() << "MeasurementTreeItem::addData - tSourceEstimate is empty";
     }
 
-    return new BrainRTSourceLocDataTreeItem();
+    return Q_NULLPTR;
+}
+
+
+//*************************************************************************************************************
+
+ECDDataTreeItem* MeasurementTreeItem::addData(INVERSELIB::ECDSet::SPtr &pECDSet, Qt3DCore::QEntity* p3DEntityParent)
+{
+    if(pECDSet->size() > 0) {
+        //Add source estimation data as child
+        if(this->findChildren(Data3DTreeModelItemTypes::ECDSetDataItem).size() == 0) {
+            //If rt data item does not exists yet, create it here!
+            m_ECDDataTreeItem = new ECDDataTreeItem();
+
+            QList<QStandardItem*> list;
+            list << m_ECDDataTreeItem;
+            list << new QStandardItem(m_ECDDataTreeItem->toolTip());
+            this->appendRow(list);
+
+            m_ECDDataTreeItem->init(p3DEntityParent);
+            m_ECDDataTreeItem->addData(pECDSet);
+
+        } else {
+            m_ECDDataTreeItem->addData(pECDSet);
+        }
+
+        return m_ECDDataTreeItem;
+    } else {
+        qDebug() << "MeasurementTreeItem::addData - pECDSet is empty";
+    }
+
+    return Q_NULLPTR;
 }
 
 
@@ -373,8 +409,9 @@ bool MeasurementTreeItem::addData(const FiffDigPointSet &tDigitizer, Qt3DCore::Q
 
     //Check if it is really a digitizer tree item
     if((itemDigitizerList.at(0)->type() == Data3DTreeModelItemTypes::DigitizerSetItem)) {
-        DigitizerSetTreeItem* pDigitizerSetItem = dynamic_cast<DigitizerSetTreeItem*>(itemDigitizerList.at(0));
-        state = pDigitizerSetItem->addData(tDigitizer, p3DEntityParent);
+        if(DigitizerSetTreeItem* pDigitizerSetItem = dynamic_cast<DigitizerSetTreeItem*>(itemDigitizerList.at(0))) {
+            state = pDigitizerSetItem->addData(tDigitizer, p3DEntityParent);
+        }
     } else {
         state = false;
     }
@@ -409,7 +446,7 @@ NetworkTreeItem* MeasurementTreeItem::addData(Network::SPtr pNetworkData, Qt3DCo
         qDebug() << "MeasurementTreeItem::addData - network data is empty";
     }
 
-    return new NetworkTreeItem();
+    return Q_NULLPTR;
 }
 
 
