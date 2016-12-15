@@ -2470,7 +2470,7 @@ static int read_ch_info(const QString&  name,
         goto bad;
     meas = fiff_dir_tree_find(in->dirtree,FIFFB_MEAS);
     if (meas[0] == NULL) {
-        qCritical ("%s : no MEG data available here",name);
+        qCritical ("%s : no MEG data available here",name.toLatin1().data());
         goto bad;
     }
     node = meas[0]; FREE(meas);
@@ -2926,7 +2926,7 @@ fiffCoordTrans mne_read_transform(const QString& name,int from, int to)
             }
             res = NULL;
         }
-    qCritical("No suitable coordinate transformation found in %s.",name);
+    qCritical("No suitable coordinate transformation found in %s.",name.toLatin1().data());
     goto out;
 
 out : {
@@ -8326,7 +8326,7 @@ mneCovMatrix mne_read_cov(const QString& name,int kind)
         TAG_FREE(tag);
     }
     if (covnode == NULL) {
-        printf("Desired covariance matrix not found from %s",name);
+        printf("Desired covariance matrix not found from %s",name.toLatin1().data());
         goto out;
     }
     /*
@@ -16260,7 +16260,7 @@ DipoleFitData* setup_dipole_fit_data(   const QString& mriname,         /**< Thi
     if (!badname.isEmpty()) {
         if (mne_read_bad_channels(badname,&badlist,&nbad) != OK)
             goto bad;
-        printf("%d bad channels read from %s.\n",nbad,badname);
+        printf("%d bad channels read from %s.\n",nbad,badname.toLatin1().data());
     }
     if (mne_read_bad_channel_list(measname,&file_bads,&file_nbad) == OK && file_nbad > 0) {
         if (!badlist)
@@ -16280,9 +16280,9 @@ DipoleFitData* setup_dipole_fit_data(   const QString& mriname,         /**< Thi
         goto bad;
 
     if (res->nmeg > 0)
-        printf("Will use %3d MEG channels from %s\n",res->nmeg,measname);
+        printf("Will use %3d MEG channels from %s\n",res->nmeg,measname.toLatin1().data());
     if (res->neeg > 0)
-        printf("Will use %3d EEG channels from %s\n",res->neeg,measname);
+        printf("Will use %3d EEG channels from %s\n",res->neeg,measname.toLatin1().data());
     {
         char *s = mne_channel_names_to_string(res->chs,res->nmeg+res->neeg);
         int  n;
@@ -16348,7 +16348,7 @@ DipoleFitData* setup_dipole_fit_data(   const QString& mriname,         /**< Thi
         fiffChInfo comp_chs = NULL;
         int        ncomp    = 0;
 
-        printf("%d compensation data sets in %s\n",comp_data->ncomp,measname);
+        printf("%d compensation data sets in %s\n",comp_data->ncomp,measname.toLatin1().data());
         if (mne_read_meg_comp_eeg_ch_info(measname,NULL,0,&comp_chs,&ncomp,NULL,NULL,NULL,NULL) == FAIL)
             goto bad;
         if (ncomp > 0) {
@@ -16357,7 +16357,7 @@ DipoleFitData* setup_dipole_fit_data(   const QString& mriname,         /**< Thi
                 FREE(comp_chs);
                 goto bad;
             }
-            printf("%d compensation channels in %s\n",comp_coils->ncoil,measname);
+            printf("%d compensation channels in %s\n",comp_coils->ncoil,measname.toLatin1().data());
         }
         FREE(comp_chs);
     }
