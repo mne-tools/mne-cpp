@@ -150,19 +150,17 @@ bool Sphere::fit_sphere_to_points ( const MatrixXf &rr, float simplex_size, Vect
     VectorXf   init_vals(4);
 
     VectorXf   cm(3);
-    float      R0;
-    int        k;
+    float      R0 = 0.1f;
 
     user.rr = rr;
 
-    R0 = (float) 0.1;
     calculate_cm_ave_dist(rr, cm, R0);// [done]
 
     init_simplex = make_initial_simplex( cm, simplex_size );
 
     user.report = false;
 
-    for (k = 0; k < 4; k++) {
+    for (int k = 0; k < 4; k++) {
         init_vals[k] = fit_eval( static_cast<VectorXf>(init_simplex.row(k)), &user );
     }
 
