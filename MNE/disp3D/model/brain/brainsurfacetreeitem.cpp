@@ -246,34 +246,37 @@ bool BrainSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* p
     data.setValue(fAlpha);
     itemAlpha->setData(data, MetaTreeItemRoles::SurfaceAlpha);
 
-    MetaTreeItem *itemTessInner = new MetaTreeItem(MetaTreeItemTypes::SurfaceTessInner, "1.0");
+    float fTessInner = 1.0;
+    MetaTreeItem *itemTessInner = new MetaTreeItem(MetaTreeItemTypes::SurfaceTessInner, QString("%1").arg(fTessInner));
     connect(itemTessInner, &MetaTreeItem::surfaceTessInnerChanged,
             this, &BrainSurfaceTreeItem::onSurfaceTessInnerChanged);
     list.clear();
     list << itemTessInner;
     list << new QStandardItem(itemTessInner->toolTip());
     this->appendRow(list);
-    data.setValue(1.0);
+    data.setValue(fTessInner);
     itemTessInner->setData(data, MetaTreeItemRoles::SurfaceTessInner);
 
-    MetaTreeItem *itemTessOuter = new MetaTreeItem(MetaTreeItemTypes::SurfaceTessOuter, "1.0");
+        float fTessOuter = 1.0;
+    MetaTreeItem *itemTessOuter = new MetaTreeItem(MetaTreeItemTypes::SurfaceTessOuter, QString("%1").arg(fTessOuter));
     connect(itemTessOuter, &MetaTreeItem::surfaceTessOuterChanged,
             this, &BrainSurfaceTreeItem::onSurfaceTessOuterChanged);
     list.clear();
     list << itemTessOuter;
     list << new QStandardItem(itemTessOuter->toolTip());
     this->appendRow(list);
-    data.setValue(1.0);
+    data.setValue(fTessOuter);
     itemTessOuter->setData(data, MetaTreeItemRoles::SurfaceTessOuter);
 
-    MetaTreeItem *itemTriangleScale = new MetaTreeItem(MetaTreeItemTypes::SurfaceTriangleScale, "1.0");
+        float fTriangleScale = 1.0;
+    MetaTreeItem *itemTriangleScale = new MetaTreeItem(MetaTreeItemTypes::SurfaceTriangleScale, QString("%1").arg(fTriangleScale));
     connect(itemTriangleScale, &MetaTreeItem::surfaceTriangleScaleChanged,
             this, &BrainSurfaceTreeItem::onSurfaceTriangleScaleChanged);
     list.clear();
     list << itemTriangleScale;
     list << new QStandardItem(itemTriangleScale->toolTip());
     this->appendRow(list);
-    data.setValue(1.0);
+    data.setValue(fTriangleScale);
     itemTriangleScale->setData(data, MetaTreeItemRoles::SurfaceTriangleScale);
 
     MetaTreeItem *itemSurfFileName = new MetaTreeItem(MetaTreeItemTypes::FileName, tSurface.fileName());
