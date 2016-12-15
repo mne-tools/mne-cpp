@@ -19398,7 +19398,7 @@ mneMeasData mne_read_meas_data_add(const QString&       name,       /* Name of t
             if (new_data->comp == NULL)
                 goto out;
             if (new_data->comp->ncomp > 0)
-                fprintf(stderr,"\tRead %d compensation data sets from %s\n",new_data->comp->ncomp,name);
+                fprintf(stderr,"\tRead %d compensation data sets from %s\n",new_data->comp->ncomp,name.toLatin1().data());
         }
         /*
      * Th bad channel stuff
@@ -19419,7 +19419,7 @@ mneMeasData mne_read_meas_data_add(const QString&       name,       /* Name of t
                         }
                     }
                 }
-                fprintf(stderr,"\t%d bad channels read from %s%s",new_data->nbad,name,new_data->nbad > 0 ? ":\n" : "\n");
+                fprintf(stderr,"\t%d bad channels read from %s%s",new_data->nbad,name.toLatin1().data(),new_data->nbad > 0 ? ":\n" : "\n");
                 if (new_data->nbad > 0) {
                     fprintf(stderr,"\t\t");
                     for (k = 0; k < new_data->nbad; k++)
@@ -19469,7 +19469,7 @@ mneMeasData mne_read_meas_data_add(const QString&       name,       /* Name of t
     res = new_data;
     fprintf(stderr,"\t%s dataset %s from %s\n",
             add_to ? "Added" : "Loaded",
-            new_data->sets[new_data->nset-1]->comment ? new_data->sets[new_data->nset-1]->comment : "unknown",name);
+            new_data->sets[new_data->nset-1]->comment ? new_data->sets[new_data->nset-1]->comment : "unknown",name.toLatin1().data());
 
 out : {
         FREE(sel);
