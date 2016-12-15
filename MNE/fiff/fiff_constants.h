@@ -60,9 +60,6 @@ namespace FIFFLIB
 #define  FIFF_FAIL -1
 #define  FIFF_OK    0
 
-#define FIFFV_NEXT_SEQ   0
-#define FIFFV_NEXT_NONE -1
-
 #define FIFFC_TAG_INFO_SIZE (sizeof(fiffTag) - sizeof(fiff_data_t *))
 #define FIFFC_DATA_OFFSET FIFFC_TAG_INFO_SIZE
 #define FIFFM_TAG_INFO(x) &((x)->kind)
@@ -222,14 +219,6 @@ namespace FIFFLIB
 
 #define FIFFM_IS_VV_COIL(c) ((c)/1000 == 3)
 
-#define FIFFV_POINT_CARDINAL 1
-#define FIFFV_POINT_HPI      2
-#define FIFFV_POINT_EEG      3
-#define FIFFV_POINT_EXTRA    4
-
-#define FIFFV_POINT_LPA      1
-#define FIFFV_POINT_NASION   2
-#define FIFFV_POINT_RPA      3
 /*
 * These are the cardinal points for MCG data
 * Left and right are supposed to be located below the sternum point
@@ -461,9 +450,9 @@ namespace FIFFLIB
 #define FIFFV_POINT_ECG      FIFFV_POINT_EEG
 #define FIFFV_POINT_EXTRA    4
 
-#define FIFFV_POINT_LPA 1
-#define FIFFV_POINT_NASION 2
-#define FIFFV_POINT_RPA 3
+#define FIFFV_POINT_LPA         1
+#define FIFFV_POINT_NASION      2
+#define FIFFV_POINT_RPA         3
     //
     //   SSP
     //

@@ -149,17 +149,17 @@ typedef struct _fiffLayerRec {
 
 /** Structure for sparse matrices */
 
-//typedef struct _fiff_sparse_matrix {
-// fiff_int_t   coding;          /**< coding (storage) type of the sparse matrix */
-// fiff_int_t   m;	        /**< m rows */
-// fiff_int_t   n;               /**< n columns */
-// fiff_int_t   nz;              /**< nz nonzeros */
-// fiff_float_t *data;           /**< owns the data */
-// fiff_int_t   *inds;           /**< index list, points into data, no dealloc! */
-// fiff_int_t   *ptrs;           /**< pointer list, points into data, no dealloc! */
-//} *fiffSparseMatrix, fiffSparseMatrixRec;
+typedef struct _fiff_sparse_matrix {
+ fiff_int_t   coding;          /**< coding (storage) type of the sparse matrix */
+ fiff_int_t   m;	        /**< m rows */
+ fiff_int_t   n;               /**< n columns */
+ fiff_int_t   nz;              /**< nz nonzeros */
+ fiff_float_t *data;           /**< owns the data */
+ fiff_int_t   *inds;           /**< index list, points into data, no dealloc! */
+ fiff_int_t   *ptrs;           /**< pointer list, points into data, no dealloc! */
+} *fiffSparseMatrix, fiffSparseMatrixRec;
 
-//typedef fiffSparseMatrixRec  fiff_sparse_matrix_t;
+typedef fiffSparseMatrixRec  fiff_sparse_matrix_t;
 
 /** Structure for event bits */
 
@@ -169,6 +169,7 @@ typedef struct _fiff_event_bits {
  fiff_int_t to_mask;           /**< to mask */
  fiff_int_t to_state;          /**< to state */
 } *fiffEventBits, fiffEventBitsRec;
+
 
 /** Structure for hpi coil */
 
@@ -193,6 +194,231 @@ typedef struct _fiff_data_ref {
     fiff_long_t     size;       /**< Size of the data, can be over 2 GB  */
     fiff_long_t     offset;     /**< Offset to the data in the external file  */
 } *fiffDataRef,fiffDataRefRec;
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+/// Outdated STUFF!!!!!!!!!!!!!!!!!!!!! ToDo Remove
+//=============================================================================================================
+
+
+/// ToDo Old implementation use new fiff_tag.h instead
+/**
+* FIFF data tag
+*
+* Tags are used in front of data items to tell what they are.
+*/
+
+typedef struct _fiffTagRec {
+ fiff_int_t  kind;		/**< Tag number.
+                 *   This defines the meaning of the item */
+ fiff_int_t  type;		/**< Data type.
+                 *   This defines the reperentation of the data. */
+ fiff_int_t  size;		/**< Size of the data.
+                 *   The size is given in bytes and defines the
+                 *   total size of the data. */
+ fiff_int_t  next;		/**< Pointer to the next object.
+                 *   Zero if the object follows
+                 *   sequentially in file.
+                 *   Negative at the end of file */
+ fiff_data_t *data;		/**< Pointer to the data.
+                 *   This point to the data read or to be written. */
+} *fiffTag,fiffTagRec;   /**< FIFF data tag */
+
+/// ToDo Old implementation use new fiff_id.h instead
+/**
+* A file ID.
+*
+* These universially unique identifiers are also
+* used to identify blocks within fthe files.
+*/
+
+typedef struct _fiffIdRec {
+ fiff_int_t version;	   /**< File version */
+ fiff_int_t machid[2];	   /**< Unique machine ID */
+ fiffTimeRec time;	   /**< Time of the ID creation */
+} *fiffId,fiffIdRec;	   /**< This is the file identifier */
+
+typedef fiffIdRec fiff_id_t;
+
+
+
+
+/// ToDo Old implementation use new fiff_dir_entry.h instead
+/** Directories are composed of these structures. */
+
+typedef struct _fiffDirEntryRec {
+ fiff_int_t  kind;		/**< Tag number */
+ fiff_int_t  type;		/**< Data type */
+ fiff_int_t  size;		/**< How many bytes */
+ fiff_int_t  pos;		/**< Location in file
+                 * Note: the data is located at pos +
+                 * FIFFC_DATA_OFFSET */
+} fiffDirEntryRec,*fiffDirEntry;/**< Directory is composed of these */
+
+/** Alias for fiffDirEntryRec */
+
+typedef fiffDirEntryRec fiff_dir_entry_t;
+
+
+
+/// ToDo Old implementation
+/** Digitization point description */
+
+typedef struct _fiffDigPointRec {
+ fiff_int_t kind;		 /**< FIFFV_POINT_CARDINAL,
+                  *   FIFFV_POINT_HPI, or
+                  *   FIFFV_POINT_EEG */
+ fiff_int_t ident;		 /**< Number identifying this point */
+ fiff_float_t r[3];		 /**< Point location */
+} *fiffDigPoint,fiffDigPointRec; /**< Digitization point description */
+
+
+/** Structure representing digitized strings. */
+
+
+typedef fiffDigPointRec  fiff_dig_point_t;
+typedef fiffDigStringRec fiff_dig_string_t;
+
+
+
+/// ToDo Old implementation
+/** Directory tree structure used by the fiff library routines. */
+
+typedef struct _fiffDirNode {
+ int                 type;	 /**< Block type for this directory */
+ fiffId              id;        /**< Id of this block if any */
+ fiffDirEntry        dir;	 /**< Directory of tags in this node */
+ int                 nent;	 /**< Number of entries in this node */
+ fiffDirEntry        dir_tree;	 /**< Directory of tags within this node
+                  * subtrees as well as FIFF_BLOCK_START and FIFF_BLOCK_END
+                  * included. NOTE: While dir is allocated separately
+                  * dir_tree is a pointer to the dirtree field
+                  * in the fiffFile structure. The dir_tree and nent_tree
+                  * fields are only used within the library to facilitate
+                  * certain operations. */
+ int                 nent_tree; /**< Number of entries in the directory tree node */
+ struct _fiffDirNode *parent;	 /**< Parent node */
+ struct _fiffDirNode **children;/**< Child nodes */
+ int                 nchild;	 /**< Number of child nodes */
+} fiffDirNodeRec,*fiffDirNode; 	 /**< Directory tree structure used by the fiff library routines. */
+
+
+/// ToDo Old implementation
+/** FIFF file handle returned by fiff_open(). */
+
+typedef struct _fiffFileRec {
+  char         *file_name;	/**< Name of the file */
+  FILE         *fd;		/**< The normal file descriptor */
+  fiffId       id;		/**< The file identifier */
+  fiffDirEntry dir;		/**< This is the directory.
+                 * If no directory exists, fiff_open
+                 * automatically scans the file to create one. */
+  int         nent;	        /**< How many entries? */
+  fiffDirNode dirtree;		/**< Directory compiled into a tree */
+  char        *ext_file_name;	/**< Name of the file holding the external data */
+  FILE        *ext_fd;		/**< The file descriptor of the above file if open  */
+} *fiffFile,fiffFileRec;	/**< FIFF file handle. fiff_open() returns this. */
+
+
+
+/// ToDo Old implementation use new fiff_coord_trans.h instead
+/** Coordinate transformation descriptor */
+
+typedef struct _fiffCoordTransRec {
+ fiff_int_t   from;		      /**< Source coordinate system. */
+ fiff_int_t   to;		      /**< Destination coordinate system. */
+ fiff_float_t rot[3][3];	      /**< The forward transform (rotation part) */
+ fiff_float_t move[3];		      /**< The forward transform (translation part) */
+ fiff_float_t invrot[3][3];	      /**< The inverse transform (rotation part) */
+ fiff_float_t invmove[3];            /**< The inverse transform (translation part) */
+} *fiffCoordTrans, fiffCoordTransRec; /**< Coordinate transformation descriptor */
+
+typedef fiffCoordTransRec fiff_coord_trans_t;
+
+/// ToDo Old implementation use new fiff_info.h instead
+
+
+/** Measurement channel position and coil type. */
+
+typedef struct _fiffChPosRec {
+ fiff_int_t   coil_type;		   /**< What kind of coil. */
+ fiff_float_t r0[3];			   /**< Coil coordinate system origin */
+ fiff_float_t ex[3];			   /**< Coil coordinate system x-axis unit vector */
+ fiff_float_t ey[3];			   /**< Coil coordinate system y-axis unit vector */
+ fiff_float_t ez[3];	                   /**< Coil coordinate system z-axis unit vector */
+} fiffChPosRec,*fiffChPos;                 /**< Measurement channel position and coil type */
+
+typedef fiffChPosRec fiff_ch_pos_t;
+
+/*
+* Coil types
+*/
+
+/* \def FIFFV_COIL_NONE */
+
+#define FIFFV_COIL_NONE                  0  /**< The location info contains no data */
+#define FIFFV_COIL_EEG                   1  /**< EEG electrode position in r0 */
+#define FIFFV_COIL_NM_122                2  /**< Neuromag 122 coils */
+#define FIFFV_COIL_NM_24                 3  /**< Old 24 channel system in HUT */
+#define FIFFV_COIL_NM_MCG_AXIAL          4  /**< The axial devices in the HUCS MCG system */
+#define FIFFV_COIL_EEG_BIPOLAR           5  /**< Bipolar EEG lead */
+
+#define FIFFV_COIL_DIPOLE              200  /**< Time-varying dipole definition
+                         * The coil info contains dipole location (r0) and
+                         * direction (ex) */
+#define FIFFV_COIL_MCG_42             1000  /**< For testing the MCG software */
+
+#define FIFFV_COIL_POINT_MAGNETOMETER 2000  /**< Simple point magnetometer */
+#define FIFFV_COIL_AXIAL_GRAD_5CM     2001  /**< Generic axial gradiometer */
+
+#define FIFFV_COIL_VV_PLANAR_W        3011  /**< VV prototype wirewound planar sensor */
+#define FIFFV_COIL_VV_PLANAR_T1       3012  /**< Vectorview SQ20483N planar gradiometer */
+#define FIFFV_COIL_VV_PLANAR_T2       3013  /**< Vectorview SQ20483N-A planar gradiometer */
+#define FIFFV_COIL_VV_PLANAR_T3       3014  /**< Vectorview SQ20950N planar gradiometer */
+#define FIFFV_COIL_VV_MAG_W           3021  /**< VV prototype wirewound magnetometer */
+#define FIFFV_COIL_VV_MAG_T1          3022  /**< Vectorview SQ20483N magnetometer */
+#define FIFFV_COIL_VV_MAG_T2          3023  /**< Vectorview SQ20483-A magnetometer */
+#define FIFFV_COIL_VV_MAG_T3          3024  /**< Vectorview SQ20950N magnetometer */
+
+
+#define FIFFV_COIL_MAGNES_MAG         4001  /**< Magnes WH magnetometer */
+#define FIFFV_COIL_MAGNES_GRAD        4002  /**< Magnes WH gradiometer  */
+#define FIFFV_COIL_CTF_GRAD           5001  /**< CTF axial gradiometer */
+
+#define FIFFM_IS_VV_COIL(c) ((c)/1000 == 3)
+
+
+/** Description of one channel */
+
+typedef struct _fiffChInfoRec {
+ fiff_int_t    scanNo;		/**< Scanning order number */
+ fiff_int_t    logNo;		/**< Logical channel # */
+ fiff_int_t    kind;		/**< Kind of channel */
+ fiff_float_t  range;		/**< Voltmeter range (-1 = auto ranging) */
+ fiff_float_t  cal;		/**< Calibration from volts to units used */
+ fiff_ch_pos_t chpos;		/**< Channel location */
+ fiff_int_t    unit;		/**< Unit of measurement */
+ fiff_int_t    unit_mul;	/**< Unit multiplier exponent */
+ fiff_char_t   ch_name[16];	/**< Descriptive name for the channel */
+} fiffChInfoRec,*fiffChInfo;	/**< Description of one channel */
+
+/** Alias for fiffChInfoRec */
+typedef fiffChInfoRec fiff_ch_info_t;
+
+#define FIFFM_CHPOS(x) &((x)->chpos)
+
+
+
+
+
+
+
+
+
+
+
+
 
 }//NAMESPACE
 

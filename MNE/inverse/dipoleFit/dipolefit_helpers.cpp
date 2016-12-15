@@ -392,9 +392,11 @@ void mne_free_dcmatrix (double **m)
 #define FREE_CMATRIX(m) mne_free_cmatrix((m))
 
 
-#include "fiff_types.h"
+#include <fiff/fiff_types.h>
 #include "mne_types.h"
 #include "analyze_types.h"
+
+using namespace FIFFLIB;
 
 
 
@@ -20301,55 +20303,55 @@ out : {
 }
 
 
-int    fit_dipoles( const QString&  dataname,
-                    mneMeasData     data,       /* The measured data */
-                    DipoleFitData*  fit,        /* Precomputed fitting data */
-                    GuessData*      guess,      /* The initial guesses */
-                    float           tmin,       /* Time range */
-                    float           tmax,
-                    float           tstep,      /* Time step to use */
-                    float           integ,      /* Integration time */
-                    int             verbose,    /* Verbose output? */
-                    ECDSet&         p_set)
-/*
- * Fit a single dipole to each time point of the data
- */
-{
-    float *one = MALLOC(data->nchan,float);
-    float time;
-    ECDSet set;
-    ECD   dip;
-    int   s;
-    int   report_interval = 10;
+//int    fit_dipoles( const QString&  dataname,
+//                    mneMeasData     data,       /* The measured data */
+//                    DipoleFitData*  fit,        /* Precomputed fitting data */
+//                    GuessData*      guess,      /* The initial guesses */
+//                    float           tmin,       /* Time range */
+//                    float           tmax,
+//                    float           tstep,      /* Time step to use */
+//                    float           integ,      /* Integration time */
+//                    int             verbose,    /* Verbose output? */
+//                    ECDSet&         p_set)
+///*
+// * Fit a single dipole to each time point of the data
+// */
+//{
+//    float *one = MALLOC(data->nchan,float);
+//    float time;
+//    ECDSet set;
+//    ECD   dip;
+//    int   s;
+//    int   report_interval = 10;
 
-    set.dataname = dataname;
+//    set.dataname = dataname;
 
-    fprintf(stderr,"Fitting...%c",verbose ? '\n' : '\0');
-    for (s = 0, time = tmin; time < tmax; s++, time = tmin  + s*tstep) {
-        /*
-     * Pick the data point
-     */
-        if (mne_get_values_from_data(time,integ,data->current->data,data->current->np,data->nchan,data->current->tmin,
-                                     1.0/data->current->tstep,FALSE,one) == FAIL) {
-            fprintf(stderr,"Cannot pick time: %7.1f ms\n",1000*time);
-            continue;
-        }
+//    fprintf(stderr,"Fitting...%c",verbose ? '\n' : '\0');
+//    for (s = 0, time = tmin; time < tmax; s++, time = tmin  + s*tstep) {
+//        /*
+//     * Pick the data point
+//     */
+//        if (mne_get_values_from_data(time,integ,data->current->data,data->current->np,data->nchan,data->current->tmin,
+//                                     1.0/data->current->tstep,FALSE,one) == FAIL) {
+//            fprintf(stderr,"Cannot pick time: %7.1f ms\n",1000*time);
+//            continue;
+//        }
 
-        if (!fit_one(fit,guess,time,one,verbose,dip))
-            printf("t = %7.1f ms : %s\n",1000*time,"error (tbd: catch)");
-        else {
-            set.addEcd(dip);
-            if (verbose)
-                dip.print(stdout);
-            else {
-                if (set.size() % report_interval == 0)
-                    fprintf(stderr,"%d..",set.size());
-            }
-        }
-    }
-    if (!verbose)
-        fprintf(stderr,"[done]\n");
-    FREE(one);
-    p_set = set;
-    return OK;
-}
+//        if (!fit_one(fit,guess,time,one,verbose,dip))
+//            printf("t = %7.1f ms : %s\n",1000*time,"error (tbd: catch)");
+//        else {
+//            set.addEcd(dip);
+//            if (verbose)
+//                dip.print(stdout);
+//            else {
+//                if (set.size() % report_interval == 0)
+//                    fprintf(stderr,"%d..",set.size());
+//            }
+//        }
+//    }
+//    if (!verbose)
+//        fprintf(stderr,"[done]\n");
+//    FREE(one);
+//    p_set = set;
+//    return OK;
+//}

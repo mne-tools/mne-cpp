@@ -119,7 +119,6 @@ HEADERS +=\
     IInverseAlgorithm.h \
     dipoleFit/ecd.h \
     dipoleFit/ecd_set.h \
-    dipoleFit/fiff_types.h \
     dipoleFit/mne_types.h \
     dipoleFit/fwd_types.h \
     dipoleFit/fiff_file.h \
