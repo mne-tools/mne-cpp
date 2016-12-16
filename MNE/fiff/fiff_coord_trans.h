@@ -197,6 +197,32 @@ public:
 
     //=========================================================================================================
     /**
+    * ### MNE C root function ###: Implementation of the fiff_make_transform function
+    *
+    * Compose the coordinate transformation structure
+    * from a known forward transform
+    *
+    * @param[in] from   Source coordinate system
+    * @param[in] to     Destination coordinate system
+    * @param[in] rot    The forward transform (rotation part)
+    * @param[in] move   The forward transform (translation part)
+    *
+    * @return the composed transform
+    */
+    static FiffCoordTrans make(int from, int to, const Matrix3f& rot, const VectorXf& move);
+
+    //=========================================================================================================
+    /**
+    * ### MNE C root function ###: Implementation of the add_inverse function
+    *
+    * @param[in] t      Fiff coordinate transform to which the inverse should be added
+    *
+    * @return True when successful
+    */
+    static bool addInverse(FiffCoordTrans& t);
+
+    //=========================================================================================================
+    /**
     * ### MNE C root function ###: Implementation of the mne_print_coord_transform & mne_print_coord_transform_label function
     *
     * Prints the coordinate transform. TODO: overload stream operator

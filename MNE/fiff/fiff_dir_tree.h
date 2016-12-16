@@ -71,7 +71,7 @@ class FiffTag;
 
 //=============================================================================================================
 /**
-* Replaces _fiffDirNode struct
+* Replaces _fiffDirNode struct fiffDirNodeRec,*fiffDirNode
 *
 * @brief Directory tree structure
 */
@@ -150,6 +150,7 @@ public:
 
     //=========================================================================================================
     /**
+    * ### MNE C function ###: implementation of the fiff_dir_tree_find
     * ### MNE toolbox root function ###: implementation of the fiff_dir_tree_find function
     *
     * Find nodes of the given kind from a directory tree structure
@@ -162,7 +163,8 @@ public:
 
     //=========================================================================================================
     /**
-    * Implementation of the find_tag function in various files e.g. fiff_read_named_matrix.m
+    * ### MNE C function ###: implementation of the fiff_dir_tree_get_tag
+    * Implementation of the find_tag function in various files e.g. fiff_read_named_matrix.m,
     *
     * Founds a tag of a given kind within a tree, and reeds it from file.
     * Note: In difference to mne-matlab this is not a static function. This is a method of the FiffDirTree
@@ -195,6 +197,74 @@ public:
     * @return true when fiff_dir_tree contains kind
     */
     bool has_kind(fiff_int_t p_kind) const;
+
+
+
+
+
+
+
+
+
+//    static void print_id (fiffId id)
+
+//    {
+//        printf ("\t%d.%d ",id->version>>16,id->version & 0xFFFF);
+//        printf ("0x%x%x ",id->machid[0],id->machid[1]);
+//        printf ("%d %d ",id->time.secs,id->time.usecs);
+//    }
+
+
+//    static void print_tree(fiffDirNode node,int indent)
+
+//    {
+//        int j,k;
+//        int prev_kind,count;
+//        fiffDirEntry dentry;
+
+//        if (node == NULL)
+//            return;
+//        for (k = 0; k < indent; k++)
+//            putchar(' ');
+//        fiff_explain_block (node->type);
+//        printf (" { ");
+//        if (node->id != NULL)
+//            print_id(node->id);
+//        printf ("\n");
+
+//        for (j = 0, prev_kind = -1, count = 0, dentry = node->dir;
+//             j < node->nent; j++,dentry++) {
+//            if (dentry->kind != prev_kind) {
+//                if (count > 1)
+//                    printf (" [%d]\n",count);
+//                else if (j > 0)
+//                    putchar('\n');
+//                for (k = 0; k < indent+2; k++)
+//                    putchar(' ');
+//                fiff_explain (dentry->kind);
+//                prev_kind = dentry->kind;
+//                count = 1;
+//            }
+//            else
+//                count++;
+//            prev_kind = dentry->kind;
+//        }
+//        if (count > 1)
+//            printf (" [%d]\n",count);
+//        else if (j > 0)
+//            putchar ('\n');
+//        for (j = 0; j < node->nchild; j++)
+//            print_tree(node->children[j],indent+5);
+//        for (k = 0; k < indent; k++)
+//            putchar(' ');
+//        printf ("}\n");
+//    }
+
+
+
+
+
+
 
 public:
     fiff_int_t          block;      /**< Block type for this directory */
