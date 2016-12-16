@@ -60,6 +60,7 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
+#include <QList>
 #include <QDebug>
 
 
@@ -107,8 +108,10 @@ public:
     //=========================================================================================================
     /**
     * Constructs the Forward EEG Sphere Model
+    * Refactored: fwd_new_eeg_sphere_model
+    *
     */
-    FwdEegSphereModel();
+    explicit FwdEegSphereModel();
 
     //=========================================================================================================
     /**
@@ -117,29 +120,14 @@ public:
     *
     * @param[in] p_FwdEegSphereModel      Forward EEG Sphere Model which should be copied
     */
-    FwdEegSphereModel(const FwdEegSphereModel& p_FwdEegSphereModel);
+    explicit FwdEegSphereModel(const FwdEegSphereModel& p_FwdEegSphereModel);
 
     //=========================================================================================================
     /**
     * Destroys the Electric Current Dipole description
+    * Refactored: fwd_free_eeg_sphere_model
     */
-    ~FwdEegSphereModel();
-
-
-
-
-//    /*
-//     * Basic routines for EEG sphere model bookkeeping
-//     */
-//    static FwdEegSphereModel* fwd_new_eeg_sphere_model();
-
-
-
-
-
-
-//    FwdEegSphereModel* fwd_dup_eeg_sphere_model();
-
+    virtual ~FwdEegSphereModel();
 
 
 
@@ -154,22 +142,13 @@ public:
 
 
 
-
-
-//    static void fwd_free_eeg_sphere_model(FwdEegSphereModel* m);
-
-
-
-
-
-
     /*
           * Produce a new sphere model structure
           */
     static FwdEegSphereModel* fwd_create_eeg_sphere_model(const char *name,
                                                          int nlayer,
-                                                         const float *rads,
-                                                         const float *sigmas);
+                                                         const Eigen::VectorXf& rads,
+                                                         const Eigen::VectorXf& sigmas);
 
 
 
@@ -321,7 +300,7 @@ public:
 
     // fwd_fit_berg_scherg.c
 
-    static void compose_linear_fitting_data(double *mu,fitUser u);
+    static void compose_linear_fitting_data(const Eigen::VectorXd& mu,fitUser u);
 
 
     // fwd_fit_berg_scherg.c
@@ -329,7 +308,7 @@ public:
           * Compute the best-fitting linear parameters
           * Return the corresponding RV
           */
-    static double compute_linear_parameters(double *mu, double *lambda, fitUser u);
+    static double compute_linear_parameters(const Eigen::VectorXd& mu, Eigen::VectorXd& lambda, fitUser u);
 
 
 
@@ -338,7 +317,7 @@ public:
           * Evaluate the residual sum of squares fit for one set of
           * mu values
           */
-    static double one_step (double *mu, int nfit, void *user_data);
+    static double one_step (const Eigen::VectorXd& mu, const void *user_data);
 
 
     /*
@@ -346,27 +325,32 @@ public:
           * dipole parameters by minimizing the difference between the
           * actual and approximative series expansions
           */
-    int fwd_eeg_fit_berg_scherg(int   nterms,              /* Number of terms to use in the series expansion
+    bool fwd_eeg_fit_berg_scherg(int   nterms,              /* Number of terms to use in the series expansion
                                                                                         * when fitting the parameters */
                                 int   nfit,	               /* Number of equivalent dipoles to fit */
                                 float *rv);
 
 
 
+/**< Number of layers */
+    int   nlayer() const
+    {
+        return layers.size();
+    }
+
 
 public:
-    char  *name;                /**< Textual identifier */
-    int   nlayer;               /**< Number of layers */
-    FwdEegSphereLayer* layers;  /**< An array of layers */
-    float  r0[3];               /**< The origin */
+    char  *name;                        /**< Textual identifier */
+    QList<FwdEegSphereLayer>    layers; /**< An array of layers */
+    float  r0[3];                       /**< The origin */
 
-    double *fn;                 /**< Coefficients saved to speed up the computations */
-    int    nterms;              /**< How many? */
+    Eigen::VectorXd fn;                         /**< Coefficients saved to speed up the computations */
+    int    nterms;                      /**< How many? */
 
-    float  *mu;                 /**< The Berg-Scherg equivalence parameters */
-    float  *lambda;
-    int    nfit;                /**< How many? */
-    int    scale_pos;           /**< Scale the positions to the surface of the sphere? */
+    Eigen::VectorXf mu;                         /**< The Berg-Scherg equivalence parameters */
+    Eigen::VectorXf lambda;
+    int    nfit;                        /**< How many? */
+    int    scale_pos;                   /**< Scale the positions to the surface of the sphere? */
 
 
 // ### OLD STRUCT ###

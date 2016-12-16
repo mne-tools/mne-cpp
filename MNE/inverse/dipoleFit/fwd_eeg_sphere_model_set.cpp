@@ -56,6 +56,11 @@
 
 #include <QString>
 
+#include <Eigen/Core>
+
+
+using namespace Eigen;
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -197,8 +202,10 @@ FwdEegSphereModelSet* FwdEegSphereModelSet::fwd_add_to_eeg_sphere_model_set(FwdE
 FwdEegSphereModelSet* FwdEegSphereModelSet::fwd_add_default_eeg_sphere_model(FwdEegSphereModelSet* s)
 {
     static const int   def_nlayer        = 4;
-    static const float def_unit_rads[]   = {0.90,0.92,0.97,1.0};
-    static const float def_sigmas[]      = {0.33,1.0,0.4e-2,0.33};
+    VectorXf def_unit_rads(def_nlayer);
+    def_unit_rads << 0.90f,0.92f,0.97f,1.0f;
+    VectorXf def_sigmas(def_nlayer);
+    def_sigmas << 0.33f,1.0f,0.4e-2f,0.33f;
 
     return FwdEegSphereModelSet::fwd_add_to_eeg_sphere_model_set(s,FwdEegSphereModel::fwd_create_eeg_sphere_model("Default",
                                                                          def_nlayer,def_unit_rads,def_sigmas));
@@ -212,8 +219,8 @@ FwdEegSphereModelSet* FwdEegSphereModelSet::fwd_load_eeg_sphere_models(const QSt
     char line[MAXLINE];
     FILE *fp = NULL;
     char  *name   = NULL;
-    float *rads   = NULL;
-    float *sigmas = NULL;
+    VectorXf rads;
+    VectorXf sigmas;
     int   nlayer  = 0;
     char  *one,*two;
     char  *tag = NULL;
@@ -254,13 +261,13 @@ FwdEegSphereModelSet* FwdEegSphereModelSet::fwd_load_eeg_sphere_models(const QSt
                 two = strtok(NULL,SEP);
                 if (two == NULL)
                     break;
-                rads   = REALLOC_2(rads,nlayer+1,float);
-                sigmas = REALLOC_2(sigmas,nlayer+1,float);
-                if (sscanf(one,"%g",rads+nlayer) != 1) {
+                rads.resize(nlayer+1);
+                sigmas.resize(nlayer+1);
+                if (sscanf(one,"%g",rads[nlayer]) != 1) {
                     nlayer = 0;
                     break;
                 }
-                if (sscanf(two,"%g",sigmas+nlayer) != 1) {
+                if (sscanf(two,"%g",sigmas[nlayer]) != 1) {
                     nlayer = 0;
                     break;
                 }
@@ -326,8 +333,8 @@ void FwdEegSphereModelSet::fwd_list_eeg_sphere_models(FILE *f)
     fprintf(f,"Available EEG sphere models:\n");
     for (k = 0; k < this->nmodel; k++) {
         this_model = this->models[k];
-        fprintf(f,"\t%s : %d",this_model->name,this_model->nlayer);
-        for (p = 0; p < this_model->nlayer; p++)
+        fprintf(f,"\t%s : %d",this_model->name,this_model->nlayer());
+        for (p = 0; p < this_model->nlayer(); p++)
             fprintf(f," : %7.3f : %7.3f",this_model->layers[p].rel_rad,this_model->layers[p].sigma);
         fprintf(f,"\n");
     }
