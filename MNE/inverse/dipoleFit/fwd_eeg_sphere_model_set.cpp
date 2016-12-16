@@ -159,7 +159,7 @@ void FwdEegSphereModelSet::fwd_free_eeg_sphere_model_set(FwdEegSphereModelSet* s
     if (!s)
         return;
     for (k = 0; k < s->nmodel; k++)
-        FwdEegSphereModel::fwd_free_eeg_sphere_model(s->models[k]);
+        delete s->models[k];
     FREE_2(s->models);
     FREE_2(s);
 

@@ -127,10 +127,10 @@ public:
 
 
 
-    /*
-     * Basic routines for EEG sphere model bookkeeping
-     */
-    static FwdEegSphereModel* fwd_new_eeg_sphere_model();
+//    /*
+//     * Basic routines for EEG sphere model bookkeeping
+//     */
+//    static FwdEegSphereModel* fwd_new_eeg_sphere_model();
 
 
 
@@ -155,7 +155,7 @@ public:
 
 
 
-    static void fwd_free_eeg_sphere_model(FwdEegSphereModel* m);
+//    static void fwd_free_eeg_sphere_model(FwdEegSphereModel* m);
 
 
 
