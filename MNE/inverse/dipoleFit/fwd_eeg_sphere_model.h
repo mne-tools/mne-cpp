@@ -63,6 +63,26 @@
 #include <QDebug>
 
 
+
+
+
+/*
+ * This is the beginning of the specific code
+ */
+typedef struct {
+    double *y;
+    double *resi;
+    double **M;
+    double **uu;
+    double **vv;
+    double *sing;
+    double *fn;
+    double *w;
+    int    nfit;
+    int    nterms;
+} *fitUser,fitUserRec;
+
+
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE NAMESPACE INVERSELIB
@@ -103,6 +123,53 @@ public:
     * Destroys the Electric Current Dipole description
     */
     ~FwdEegSphereModel();
+
+
+
+
+    /*
+     * Basic routines for EEG sphere model bookkeeping
+     */
+    static FwdEegSphereModel* fwd_new_eeg_sphere_model();
+
+
+
+
+
+
+    FwdEegSphereModel* fwd_dup_eeg_sphere_model();
+
+
+
+
+
+
+
+
+    static fitUser new_fit_user(int nfit, int nterms);
+
+
+
+
+
+
+
+
+    static void fwd_free_eeg_sphere_model(FwdEegSphereModel* m);
+
+
+
+
+
+
+    /*
+          * Produce a new sphere model structure
+          */
+    static FwdEegSphereModel* fwd_create_eeg_sphere_model(const char *name,
+                                                         int nlayer,
+                                                         const float *rads,
+                                                         const float *sigmas);
+
 
 
 
@@ -202,6 +269,89 @@ public:
     * @return true when successful
     */
     static int fwd_eeg_spherepot_coil(float *rd, float *Q, FwdCoilSet* els, float *Vval, void *client);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    //=========================================================================================================
+    /**
+    * dipole_fit_setup.c
+    *
+    * Set up the desired sphere model for EEG
+    *
+    * @param[in] eeg_model_file     Contains the model specifications
+    * @param[in] eeg_model_name     Name of the model to use
+    * @param[in] eeg_sphere_rad     Outer surface radius
+    *
+    * @return the setup eeg sphere model
+    */
+    static FwdEegSphereModel* setup_eeg_sphere_model(const QString& eeg_model_file, QString eeg_model_name, float eeg_sphere_rad);
+
+
+
+
+
+    // fwd_eeg_sphere_models.c
+    /*
+     * Setup the EEG sphere model calculations
+     */
+    int fwd_setup_eeg_sphere_model( float rad, int fit_berg_scherg, int nfit);
+
+
+
+
+
+
+
+
+    // fwd_fit_berg_scherg.c
+
+    static void compose_linear_fitting_data(double *mu,fitUser u);
+
+
+    // fwd_fit_berg_scherg.c
+    /*
+          * Compute the best-fitting linear parameters
+          * Return the corresponding RV
+          */
+    static double compute_linear_parameters(double *mu, double *lambda, fitUser u);
+
+
+
+    // fwd_fit_berg_scherg.c
+    /*
+          * Evaluate the residual sum of squares fit for one set of
+          * mu values
+          */
+    static double one_step (double *mu, int nfit, void *user_data);
+
+
+    /*
+          * This routine fits the Berg-Scherg equivalent spherical model
+          * dipole parameters by minimizing the difference between the
+          * actual and approximative series expansions
+          */
+    int fwd_eeg_fit_berg_scherg(int   nterms,              /* Number of terms to use in the series expansion
+                                                                                        * when fitting the parameters */
+                                int   nfit,	               /* Number of equivalent dipoles to fit */
+                                float *rv);
+
+
+
 
 public:
     char  *name;                /**< Textual identifier */
