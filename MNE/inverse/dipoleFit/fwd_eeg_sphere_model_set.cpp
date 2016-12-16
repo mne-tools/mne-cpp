@@ -306,7 +306,7 @@ FwdEegSphereModel* FwdEegSphereModelSet::fwd_select_eeg_sphere_model(const QStri
     for (k = 0; k < this->nmodel; k++) {
         if (strcasecmp(this->models[k]->name,name.toLatin1().data()) == 0) {
             fprintf(stderr,"Selected model: %s\n",this->models[k]->name);
-            return this->models[k]->fwd_dup_eeg_sphere_model();
+            return new FwdEegSphereModel(*(this->models[k]));
         }
     }
     printf("EEG sphere model %s not found.",name.toLatin1().data());

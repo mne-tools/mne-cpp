@@ -244,19 +244,36 @@ FwdEegSphereModel::FwdEegSphereModel()
 
 //*************************************************************************************************************
 
-//FwdEegSphereModel::FwdEegSphereModel(const FwdEegSphereModel& p_FwdEegSphereModel)
-//: name(p_FwdEegSphereModel.name)
-//, layers(p_FwdEegSphereModel.layers)
-//, r0(p_FwdEegSphereModel.r0)
-//, fn(p_FwdEegSphereModel.fn)
-//, nterms(p_FwdEegSphereModel.nterms)
-//, mu(p_FwdEegSphereModel.mu)
-//, lambda(p_FwdEegSphereModel.lambda)
-//, nfit(p_FwdEegSphereModel.nfit)
-//, scale_pos(p_FwdEegSphereModel.scale_pos)
-//{
+FwdEegSphereModel::FwdEegSphereModel(const FwdEegSphereModel& p_FwdEegSphereModel)
+{
+    int k;
 
-//}
+    if (p_FwdEegSphereModel.name)
+        this->name = mne_strdup_1(p_FwdEegSphereModel.name);
+    if (p_FwdEegSphereModel.nlayer > 0) {
+        this->layers = MALLOC_1(p_FwdEegSphereModel.nlayer,INVERSELIB::FwdEegSphereLayer);
+        this->nlayer = p_FwdEegSphereModel.nlayer;
+        for (k = 0; k < p_FwdEegSphereModel.nlayer; k++)
+            this->layers[k] = p_FwdEegSphereModel.layers[k];
+    }
+    VEC_COPY_1(this->r0,p_FwdEegSphereModel.r0);
+    if (p_FwdEegSphereModel.nterms > 0) {
+        this->fn = MALLOC_1(p_FwdEegSphereModel.nterms,double);
+        this->nterms = p_FwdEegSphereModel.nterms;
+        for (k = 0; k < p_FwdEegSphereModel.nterms; k++)
+            this->fn[k] = p_FwdEegSphereModel.fn[k];
+    }
+    if (p_FwdEegSphereModel.nfit > 0) {
+        this->mu     = MALLOC_1(p_FwdEegSphereModel.nfit,float);
+        this->lambda = MALLOC_1(p_FwdEegSphereModel.nfit,float);
+        this->nfit   = p_FwdEegSphereModel.nfit;
+        for (k = 0; k < p_FwdEegSphereModel.nfit; k++) {
+            this->mu[k] = p_FwdEegSphereModel.mu[k];
+            this->lambda[k] = p_FwdEegSphereModel.lambda[k];
+        }
+    }
+    this->scale_pos = p_FwdEegSphereModel.scale_pos;
+}
 
 
 //*************************************************************************************************************
@@ -297,41 +314,41 @@ FwdEegSphereModel::~FwdEegSphereModel()
 
 //*************************************************************************************************************
 
-FwdEegSphereModel* FwdEegSphereModel::fwd_dup_eeg_sphere_model()
-{
-    FwdEegSphereModel* dup;
-    int k;
+//FwdEegSphereModel* FwdEegSphereModel::fwd_dup_eeg_sphere_model()
+//{
+//    FwdEegSphereModel* dup;
+//    int k;
 
 
-    dup = new FwdEegSphereModel();//fwd_new_eeg_sphere_model();
+//    dup = new FwdEegSphereModel();//fwd_new_eeg_sphere_model();
 
-    if (this->name)
-        dup->name = mne_strdup_1(this->name);
-    if (this->nlayer > 0) {
-        dup->layers = MALLOC_1(this->nlayer,INVERSELIB::FwdEegSphereLayer);
-        dup->nlayer = this->nlayer;
-        for (k = 0; k < this->nlayer; k++)
-            dup->layers[k] = this->layers[k];
-    }
-    VEC_COPY_1(dup->r0,this->r0);
-    if (this->nterms > 0) {
-        dup->fn = MALLOC_1(this->nterms,double);
-        dup->nterms = this->nterms;
-        for (k = 0; k < this->nterms; k++)
-            dup->fn[k] = this->fn[k];
-    }
-    if (this->nfit > 0) {
-        dup->mu     = MALLOC_1(this->nfit,float);
-        dup->lambda = MALLOC_1(this->nfit,float);
-        dup->nfit   = this->nfit;
-        for (k = 0; k < this->nfit; k++) {
-            dup->mu[k] = this->mu[k];
-            dup->lambda[k] = this->lambda[k];
-        }
-    }
-    dup->scale_pos = this->scale_pos;
-    return dup;
-}
+//    if (this->name)
+//        dup->name = mne_strdup_1(this->name);
+//    if (this->nlayer > 0) {
+//        dup->layers = MALLOC_1(this->nlayer,INVERSELIB::FwdEegSphereLayer);
+//        dup->nlayer = this->nlayer;
+//        for (k = 0; k < this->nlayer; k++)
+//            dup->layers[k] = this->layers[k];
+//    }
+//    VEC_COPY_1(dup->r0,this->r0);
+//    if (this->nterms > 0) {
+//        dup->fn = MALLOC_1(this->nterms,double);
+//        dup->nterms = this->nterms;
+//        for (k = 0; k < this->nterms; k++)
+//            dup->fn[k] = this->fn[k];
+//    }
+//    if (this->nfit > 0) {
+//        dup->mu     = MALLOC_1(this->nfit,float);
+//        dup->lambda = MALLOC_1(this->nfit,float);
+//        dup->nfit   = this->nfit;
+//        for (k = 0; k < this->nfit; k++) {
+//            dup->mu[k] = this->mu[k];
+//            dup->lambda[k] = this->lambda[k];
+//        }
+//    }
+//    dup->scale_pos = this->scale_pos;
+//    return dup;
+//}
 
 
 

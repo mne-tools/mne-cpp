@@ -110,13 +110,14 @@ public:
     */
     FwdEegSphereModel();
 
-//    //=========================================================================================================
-//    /**
-//    * Copy constructor.
-//    *
-//    * @param[in] p_FwdEegSphereModel      Forward EEG Sphere Model which should be copied
-//    */
-//    FwdEegSphereModel(const FwdEegSphereModel& p_FwdEegSphereModel);
+    //=========================================================================================================
+    /**
+    * Copy constructor.
+    * Refactored: fwd_dup_eeg_sphere_model
+    *
+    * @param[in] p_FwdEegSphereModel      Forward EEG Sphere Model which should be copied
+    */
+    FwdEegSphereModel(const FwdEegSphereModel& p_FwdEegSphereModel);
 
     //=========================================================================================================
     /**
@@ -137,7 +138,7 @@ public:
 
 
 
-    FwdEegSphereModel* fwd_dup_eeg_sphere_model();
+//    FwdEegSphereModel* fwd_dup_eeg_sphere_model();
 
 
 
