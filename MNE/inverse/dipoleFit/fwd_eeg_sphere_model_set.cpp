@@ -169,29 +169,6 @@ void FwdEegSphereModelSet::fwd_free_eeg_sphere_model_set(FwdEegSphereModelSet* s
 
 //*************************************************************************************************************
 
-void FwdEegSphereModelSet::fwd_list_eeg_sphere_models(FILE *f)
-/*
- * List the properties of available models
- */
-{
-    int k,p;
-    FwdEegSphereModel* this_model;
-
-    if ( this->nmodel < 0 )
-        return;
-    fprintf(f,"Available EEG sphere models:\n");
-    for (k = 0; k < this->nmodel; k++) {
-        this_model = this->models[k];
-        fprintf(f,"\t%s : %d",this_model->name,this_model->nlayer);
-        for (p = 0; p < this_model->nlayer; p++)
-            fprintf(f," : %7.3f : %7.3f",this_model->layers[p].rel_rad,this_model->layers[p].sigma);
-        fprintf(f,"\n");
-    }
-}
-
-
-//*************************************************************************************************************
-
 FwdEegSphereModelSet* FwdEegSphereModelSet::fwd_new_eeg_sphere_model_set()
 {
     FwdEegSphereModelSet* s = MALLOC_2(1,FwdEegSphereModelSet);
@@ -216,11 +193,8 @@ FwdEegSphereModelSet* FwdEegSphereModelSet::fwd_add_to_eeg_sphere_model_set(FwdE
 
 
 //*************************************************************************************************************
-
+//fwd_eeg_sphere_models.c
 FwdEegSphereModelSet* FwdEegSphereModelSet::fwd_add_default_eeg_sphere_model(FwdEegSphereModelSet* s)
-/*
-      * Choose and setup the default EEG sphere model
-      */
 {
     static const int   def_nlayer        = 4;
     static const float def_unit_rads[]   = {0.90,0.92,0.97,1.0};
@@ -232,11 +206,8 @@ FwdEegSphereModelSet* FwdEegSphereModelSet::fwd_add_default_eeg_sphere_model(Fwd
 
 
 //*************************************************************************************************************
-
+//fwd_eeg_sphere_models.c
 FwdEegSphereModelSet* FwdEegSphereModelSet::fwd_load_eeg_sphere_models(const QString& filename, FwdEegSphereModelSet* now)
-/*
-      * Load all models available in the specified file
-      */
 {
     char line[MAXLINE];
     FILE *fp = NULL;
@@ -317,11 +288,8 @@ bad : {
 
 
 //*************************************************************************************************************
-
+//fwd_eeg_sphere_models.c
 FwdEegSphereModel* FwdEegSphereModelSet::fwd_select_eeg_sphere_model(const QString& p_sName)
-/*
- * Find a model with a given name and return a duplicate
- */
 {
     int k;
 
@@ -346,10 +314,24 @@ FwdEegSphereModel* FwdEegSphereModelSet::fwd_select_eeg_sphere_model(const QStri
 }
 
 
+//*************************************************************************************************************
+//dipole_fit_setup.c
+void FwdEegSphereModelSet::fwd_list_eeg_sphere_models(FILE *f)
+{
+    int k,p;
+    FwdEegSphereModel* this_model;
 
-
-
-
+    if ( this->nmodel < 0 )
+        return;
+    fprintf(f,"Available EEG sphere models:\n");
+    for (k = 0; k < this->nmodel; k++) {
+        this_model = this->models[k];
+        fprintf(f,"\t%s : %d",this_model->name,this_model->nlayer);
+        for (p = 0; p < this_model->nlayer; p++)
+            fprintf(f," : %7.3f : %7.3f",this_model->layers[p].rel_rad,this_model->layers[p].sigma);
+        fprintf(f,"\n");
+    }
+}
 
 
 
