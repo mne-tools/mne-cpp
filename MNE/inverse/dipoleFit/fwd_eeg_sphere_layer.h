@@ -103,20 +103,15 @@ public:
     ~FwdEegSphereLayer();
 
 
-    static int comp_layers(const void *p1,const void *p2)
+    static bool comp_layers(const FwdEegSphereLayer& v1,const FwdEegSphereLayer& v2)
     /*
           * Comparison function for sorting layers
           */
     {
-        FwdEegSphereLayer* v1 = (FwdEegSphereLayer*)p1;
-        FwdEegSphereLayer* v2 = (FwdEegSphereLayer*)p2;
-
-        if (v1->rad > v2->rad)
-            return 1;
-        else if (v1->rad < v2->rad)
-            return -1;
+        if (v1.rad < v2.rad)
+            return true;
         else
-            return 0;
+            return false;
     }
 
 

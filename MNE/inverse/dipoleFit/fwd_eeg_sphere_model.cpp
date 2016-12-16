@@ -41,9 +41,14 @@
 #include "fwd_eeg_sphere_model.h"
 #include "fwd_eeg_sphere_model_set.h"
 
+
+#include <QtAlgorithms>
+
+
 #include <qmath.h>
 
 
+#include <Eigen/Core>
 #include <Eigen/Dense>
 
 
@@ -227,8 +232,6 @@ char *mne_strdup_1(const char *s)
 
 FwdEegSphereModel::FwdEegSphereModel()
 : name(NULL)
-, nlayer(0)
-, layers(NULL)
 , fn(NULL)
 , nterms  (0)
 , lambda  (NULL)
@@ -250,22 +253,20 @@ FwdEegSphereModel::FwdEegSphereModel(const FwdEegSphereModel& p_FwdEegSphereMode
 
     if (p_FwdEegSphereModel.name)
         this->name = mne_strdup_1(p_FwdEegSphereModel.name);
-    if (p_FwdEegSphereModel.nlayer > 0) {
-        this->layers = MALLOC_1(p_FwdEegSphereModel.nlayer,INVERSELIB::FwdEegSphereLayer);
-        this->nlayer = p_FwdEegSphereModel.nlayer;
-        for (k = 0; k < p_FwdEegSphereModel.nlayer; k++)
-            this->layers[k] = p_FwdEegSphereModel.layers[k];
+    if (p_FwdEegSphereModel.nlayer() > 0) {
+        for (k = 0; k < p_FwdEegSphereModel.nlayer(); k++)
+            this->layers.append(p_FwdEegSphereModel.layers[k]);
     }
     VEC_COPY_1(this->r0,p_FwdEegSphereModel.r0);
     if (p_FwdEegSphereModel.nterms > 0) {
-        this->fn = MALLOC_1(p_FwdEegSphereModel.nterms,double);
+        this->fn = VectorXd(p_FwdEegSphereModel.nterms);
         this->nterms = p_FwdEegSphereModel.nterms;
         for (k = 0; k < p_FwdEegSphereModel.nterms; k++)
             this->fn[k] = p_FwdEegSphereModel.fn[k];
     }
     if (p_FwdEegSphereModel.nfit > 0) {
-        this->mu     = MALLOC_1(p_FwdEegSphereModel.nfit,float);
-        this->lambda = MALLOC_1(p_FwdEegSphereModel.nfit,float);
+        this->mu     = VectorXf(p_FwdEegSphereModel.nfit);
+        this->lambda = VectorXf(p_FwdEegSphereModel.nfit);
         this->nfit   = p_FwdEegSphereModel.nfit;
         for (k = 0; k < p_FwdEegSphereModel.nfit; k++) {
             this->mu[k] = p_FwdEegSphereModel.mu[k];
@@ -283,72 +284,7 @@ FwdEegSphereModel::~FwdEegSphereModel()
 //    if (!m)
 //        return;
     FREE(name);
-    FREE(layers);
-    FREE(fn);
-    FREE(mu);
-    FREE(lambda);
 }
-
-
-//*************************************************************************************************************
-
-//FwdEegSphereModel* FwdEegSphereModel::fwd_new_eeg_sphere_model()
-//{
-//    FwdEegSphereModel* m = MALLOC_1(1,FwdEegSphereModel);
-
-//    m->name    = NULL;
-//    m->nlayer  = 0;
-//    m->layers  = NULL;
-//    m->fn      = NULL;
-//    m->nterms  = 0;
-//    m->r0[0]   = 0.0;
-//    m->r0[1]   = 0.0;
-//    m->r0[2]   = 0.0;
-//    m->lambda  = NULL;
-//    m->mu      = NULL;
-//    m->nfit    = 0;
-//    m->scale_pos = 0;
-//    return m;
-//}
-
-
-//*************************************************************************************************************
-
-//FwdEegSphereModel* FwdEegSphereModel::fwd_dup_eeg_sphere_model()
-//{
-//    FwdEegSphereModel* dup;
-//    int k;
-
-
-//    dup = new FwdEegSphereModel();//fwd_new_eeg_sphere_model();
-
-//    if (this->name)
-//        dup->name = mne_strdup_1(this->name);
-//    if (this->nlayer > 0) {
-//        dup->layers = MALLOC_1(this->nlayer,INVERSELIB::FwdEegSphereLayer);
-//        dup->nlayer = this->nlayer;
-//        for (k = 0; k < this->nlayer; k++)
-//            dup->layers[k] = this->layers[k];
-//    }
-//    VEC_COPY_1(dup->r0,this->r0);
-//    if (this->nterms > 0) {
-//        dup->fn = MALLOC_1(this->nterms,double);
-//        dup->nterms = this->nterms;
-//        for (k = 0; k < this->nterms; k++)
-//            dup->fn[k] = this->fn[k];
-//    }
-//    if (this->nfit > 0) {
-//        dup->mu     = MALLOC_1(this->nfit,float);
-//        dup->lambda = MALLOC_1(this->nfit,float);
-//        dup->nfit   = this->nfit;
-//        for (k = 0; k < this->nfit; k++) {
-//            dup->mu[k] = this->mu[k];
-//            dup->lambda[k] = this->lambda[k];
-//        }
-//    }
-//    dup->scale_pos = this->scale_pos;
-//    return dup;
-//}
 
 
 
@@ -374,56 +310,39 @@ fitUser FwdEegSphereModel::new_fit_user(int nfit, int nterms)
 
 //*************************************************************************************************************
 
-//void FwdEegSphereModel::fwd_free_eeg_sphere_model(FwdEegSphereModel* m)
-
-//{
-//    if (!m)
-//        return;
-//    FREE(m->name);
-//    FREE(m->layers);
-//    FREE(m->fn);
-//    FREE(m->mu);
-//    FREE(m->lambda);
-//    FREE(m);
-//    return;
-//}
-
-
-//*************************************************************************************************************
-
 FwdEegSphereModel* FwdEegSphereModel::fwd_create_eeg_sphere_model(const char *name,
                                                      int nlayer,
-                                                     const float *rads,
-                                                     const float *sigmas)
+                                                     const VectorXf& rads,
+                                                     const VectorXf& sigmas)
 /*
       * Produce a new sphere model structure
       */
 {
-    FwdEegSphereModel* new_model = new FwdEegSphereModel();//fwd_new_eeg_sphere_model();
+    FwdEegSphereModel* new_model = new FwdEegSphereModel();
     int            k;
-    FwdEegSphereLayer* layers;
     float          R,rR;
 
     new_model->name   = mne_strdup_1(name);
-    new_model->nlayer = nlayer;
-    new_model->layers = layers = MALLOC_1(nlayer,FwdEegSphereLayer);
 
     for (k = 0; k < nlayer; k++) {
-        layers[k].rad    = layers[k].rel_rad = rads[k];
-        layers[k].sigma  = sigmas[k];
+        FwdEegSphereLayer layer;
+        layer.rad = layer.rel_rad = rads[k];
+        layer.sigma = sigmas[k];
+        new_model->layers.append(layer);
     }
     /*
    * Sort...
    */
-    qsort (layers, nlayer, sizeof(FwdEegSphereLayer), FwdEegSphereLayer::comp_layers);
+    qSort (new_model->layers.begin(), new_model->layers.end(), FwdEegSphereLayer::comp_layers);
+
     /*
    * Scale the radiuses
    */
-    R  = layers[nlayer-1].rad;
-    rR = layers[nlayer-1].rel_rad;
+    R  = new_model->layers[nlayer-1].rad;
+    rR = new_model->layers[nlayer-1].rel_rad;
     for (k = 0; k < nlayer; k++) {
-        layers[k].rad     = layers[k].rad/R;
-        layers[k].rel_rad = layers[k].rel_rad/rR;
+        new_model->layers[k].rad     = new_model->layers[k].rad/R;
+        new_model->layers[k].rel_rad = new_model->layers[k].rel_rad/rR;
     }
     return new_model;
 }
@@ -433,14 +352,14 @@ FwdEegSphereModel* FwdEegSphereModel::fwd_create_eeg_sphere_model(const char *na
 // fwd_multi_spherepot.c
 double FwdEegSphereModel::fwd_eeg_get_multi_sphere_model_coeff(int n)
 {
-    double **M,**Mn,**help,**Mm;
-    static double **mat1 = NULL;
-    static double **mat2 = NULL;
-    static double **mat3 = NULL;
-    static double *c1 = NULL;
-    static double *c2 = NULL;
-    static double *cr = NULL;
-    static double *cr_mult = NULL;
+    MatrixXd M,Mn,help,Mm;
+    static MatrixXd mat1;
+    static MatrixXd mat2;
+    static MatrixXd mat3;
+    static VectorXd c1;
+    static VectorXd c2;
+    static VectorXd cr;
+    static VectorXd cr_mult;
     double div,div_mult;
     double n1;
 #ifdef TEST
@@ -449,7 +368,7 @@ double FwdEegSphereModel::fwd_eeg_get_multi_sphere_model_coeff(int n)
 #endif
     int    k;
 
-    if (this->nlayer == 0 || this->nlayer == 1)
+    if (this->nlayer() == 0 || this->nlayer() == 1)
         return 1.0;
     /*
    * Now follows the tricky case
@@ -479,28 +398,28 @@ double FwdEegSphereModel::fwd_eeg_get_multi_sphere_model_coeff(int n)
         /*
      * Initialize the arrays
      */
-        c1 = REALLOC_1(c1,this->nlayer-1,double);
-        c2 = REALLOC_1(c2,this->nlayer-1,double);
-        cr = REALLOC_1(cr,this->nlayer-1,double);
-        cr_mult = REALLOC_1(cr_mult,this->nlayer-1,double);
-        for (k = 0; k < this->nlayer-1; k++) {
+        c1.resize(this->nlayer()-1);
+        c2.resize(this->nlayer()-1);
+        cr.resize(this->nlayer()-1);
+        cr_mult.resize(this->nlayer()-1);
+        for (k = 0; k < this->nlayer()-1; k++) {
             c1[k] = this->layers[k].sigma/this->layers[k+1].sigma;
             c2[k] = c1[k] - 1.0;
             cr_mult[k] = this->layers[k].rel_rad;
             cr[k] = cr_mult[k];
             cr_mult[k] = cr_mult[k]*cr_mult[k];
         }
-        if (mat1 == NULL)
-            mat1 = ALLOC_DCMATRIX_1(2,2);
-        if (mat2 == NULL)
-            mat2 = ALLOC_DCMATRIX_1(2,2);
-        if (mat3 == NULL)
-            mat3 = ALLOC_DCMATRIX_1(2,2);
+        if (mat1.cols() == 0)
+            mat1 = MatrixXd(2,2);
+        if (mat2.cols() == 0)
+            mat2 = MatrixXd(2,2);
+        if (mat3.cols() == 0)
+            mat3 = MatrixXd(2,2);
     }
     /*
    * Increment the radius coefficients
    */
-    for (k = 0; k < this->nlayer-1; k++)
+    for (k = 0; k < this->nlayer()-1; k++)
         cr[k] = cr[k]*cr_mult[k];
     /*
    * Multiply the matrices
@@ -508,30 +427,30 @@ double FwdEegSphereModel::fwd_eeg_get_multi_sphere_model_coeff(int n)
     M  = mat1;
     Mn = mat2;
     Mm = mat3;
-    M[0][0] = M[1][1] = 1.0;
-    M[0][1] = M[1][0] = 0.0;
+    M(0,0) = M(1,1) = 1.0;
+    M(0,1) = M(1,0) = 0.0;
     div      = 1.0;
     div_mult = 2.0*n + 1.0;
     n1       = n + 1.0;
 
-    for (k = this->nlayer-2; k >= 0; k--) {
+    for (k = this->nlayer()-2; k >= 0; k--) {
 
-        Mm[0][0] = (n + n1*c1[k]);
-        Mm[0][1] = n1*c2[k]/cr[k];
-        Mm[1][0] = n*c2[k]*cr[k];
-        Mm[1][1] = n1 + n*c1[k];
+        Mm(0,0) = (n + n1*c1[k]);
+        Mm(0,1) = n1*c2[k]/cr[k];
+        Mm(1,0) = n*c2[k]*cr[k];
+        Mm(1,1) = n1 + n*c1[k];
 
-        Mn[0][0] = Mm[0][0]*M[0][0] + Mm[0][1]*M[1][0];
-        Mn[0][1] = Mm[0][0]*M[0][1] + Mm[0][1]*M[1][1];
-        Mn[1][0] = Mm[1][0]*M[0][0] + Mm[1][1]*M[1][0];
-        Mn[1][1] = Mm[1][0]*M[0][1] + Mm[1][1]*M[1][1];
+        Mn(0,0) = Mm(0,0)*M(0,0) + Mm(0,1)*M(1,0);
+        Mn(0,1) = Mm(0,0)*M(0,1) + Mm(0,1)*M(1,1);
+        Mn(1,0) = Mm(1,0)*M(0,0) + Mm(1,1)*M(1,0);
+        Mn(1,1) = Mm(1,0)*M(0,1) + Mm(1,1)*M(1,1);
         help = M;
         M = Mn;
         Mn = help;
         div = div*div_mult;
 
     }
-    return n*div/(n*M[1][1] + n1*M[1][0]);
+    return n*div/(n*M(1,1) + n1*M(1,0));
 }
 
 
@@ -601,7 +520,7 @@ bool FwdEegSphereModel::fwd_eeg_spherepot_vec( float   *rd, float   **el, int ne
        * Scale location onto the surface of the sphere
        */
             if (m->scale_pos) {
-                pos_len = m->layers[m->nlayer-1].rad/VEC_LEN_1(pos);
+                pos_len = m->layers[m->nlayer()-1].rad/VEC_LEN_1(pos);
                 for (p = 0; p < 3; p++)
                     pos[p] = pos_len*pos[p];
             }
@@ -757,7 +676,7 @@ int FwdEegSphereModel::fwd_eeg_spherepot(   float   *rd,       /* Dipole positio
        * Scale location onto the surface of the sphere
        */
             if (m->scale_pos) {
-                pos_len = m->layers[m->nlayer-1].rad/VEC_LEN_1(pos);
+                pos_len = m->layers[m->nlayer()-1].rad/VEC_LEN_1(pos);
                 for (p = 0; p < 3; p++)
                     pos[p] = pos_len*pos[p];
             }
@@ -878,20 +797,21 @@ int FwdEegSphereModel::fwd_setup_eeg_sphere_model(float rad, int fit_berg_scherg
     /*
     * Scale the relative radiuses
     */
-    for (k = 0; k < this->nlayer; k++)
+    for (k = 0; k < this->nlayer(); k++)
         this->layers[k].rad = rad*this->layers[k].rel_rad;
 
     if (fit_berg_scherg) {
-        if (this->fwd_eeg_fit_berg_scherg(nterms,nfit,&rv) == OK) {
+        if (this->fwd_eeg_fit_berg_scherg(nterms,nfit,&rv)) {
             fprintf(stderr,"Equiv. model fitting -> ");
             fprintf(stderr,"RV = %g %%\n",100*rv);
             for (k = 0; k < nfit; k++)
                 fprintf(stderr,"mu%d = %g\tlambda%d = %g\n",
-                        k+1,this->mu[k],k+1,this->layers[this->nlayer-1].sigma*this->lambda[k]);
+                        k+1,this->mu[k],k+1,this->layers[this->nlayer()-1].sigma*this->lambda[k]);
         }
         else
             goto bad;
     }
+
     fprintf(stderr,"Defined EEG sphere model with rad = %7.2f mm\n",
             1000.0*rad);
     return OK;
@@ -1020,52 +940,55 @@ static int c_dsvd(double **mat,		/* The matrix */
 #define BETA 0.5
 #define GAMMA 2.0
 //============================= fwd_fit_berg_scherg.c
-static double tryit (double **p,
-                     double *y,
-                     double *psum,
-                     int ndim,
-                     double (*func)(double *,int,void *),
-                     void   *user_data,
+static double tryit (MatrixXd& p,
+                     VectorXd& y,
+                     VectorXd& psum,
+                     double (*func)(const VectorXd &,const void *),
+                     const void   *user_data,
                      int ihi,
-                     int *neval,
+                     int &neval,
                      double fac)
 
 {
+    int ndim = p.cols();
     int j;
-    double fac1,fac2,ytry,*ptry;
+    double fac1,fac2,ytry;
 
-    ptry = MALLOC_1(ndim,double);
+    VectorXd ptry(ndim);
     fac1 = (1.0-fac)/ndim;
     fac2 = fac1-fac;
-    for (j = 0; j < ndim; j++)
-        ptry[j] = psum[j]*fac1-p[ihi][j]*fac2;
-    ytry = (*func)(ptry,ndim,user_data);
-    ++(*neval);
+
+//    for (j = 0; j < ndim; j++)
+//        ptry[j] = psum[j]*fac1-p[ihi][j]*fac2;
+    ptry = psum * fac1 - p.row(ihi).transpose() * fac2;
+
+    ytry = (*func)(ptry,user_data);
+    ++neval;
+
     if (ytry < y[ihi]) {
         y[ihi] = ytry;
-        for (j = 0; j < ndim; j++) {
-            psum[j] +=  ptry[j]-p[ihi][j];
-            p[ihi][j] = ptry[j];
-        }
+//        for (j = 0; j < ndim; j++) {
+//            psum[j] +=  ptry[j]-p[ihi][j];
+//            p[ihi][j] = ptry[j];
+//        }
+        psum += ptry - p.row(ihi).transpose();
+        p.row(ihi) = ptry;
     }
-    FREE(ptry);
     return ytry;
 }
 
 //============================= fwd_fit_berg_scherg.c
-static int simplex_minimize(double **p,		     /* The initial simplex */
-                            double *y,		     /* Function values at the vertices */
-                            int   ndim,		     /* Number of variables */
-                            double ftol,	     /* Relative convergence tolerance */
-                            double (*func)(double *fitpar,int npar,void *user_data),
-                            /* The function to be evaluated */
-                            void  *user_data,	     /* Data to be passed to the above function in each evaluation */
-                            int   max_eval,	     /* Maximum number of function evaluations */
-                            int   *neval,	     /* Number of function evaluations */
-                            int   report,	     /* How often to report (-1 = no_reporting) */
-                            int   (*report_func)(int loop,
-                                                 double *fitpar, int npar,
-                                                 double fval)) /* The function to be called when reporting */
+static bool simplex_minimize(   MatrixXd& p,                /* The initial simplex */
+                                VectorXd& y,                /* Function values at the vertices */
+                                double ftol,                /* Relative convergence tolerance */
+                                double (*func)( const VectorXd &fitpar,const void *user_data),
+                                /* The function to be evaluated */
+                                const void  *user_data,     /* Data to be passed to the above function in each evaluation */
+                                int   max_eval,             /* Maximum number of function evaluations */
+                                int   &neval,               /* Number of function evaluations */
+                                int   report,               /* How often to report (-1 = no_reporting) */
+                                bool   (*report_func)(int loop,
+                                                 const VectorXd &fitpar, double fval)) /* The function to be called when reporting */
 
 /*
       * Minimization with the simplex algorithm
@@ -1073,22 +996,27 @@ static int simplex_minimize(double **p,		     /* The initial simplex */
       */
 
 {
+    int   ndim = p.cols();  /* Number of variables */
     int   i,j,ilo,ihi,inhi;
     int   mpts = ndim+1;
-    double ytry,ysave,sum,rtol,*psum;
-    int   result = 0;
+    double ytry,ysave,sum,rtol;
+    bool  result = true;
     int   count = 0;
     int   loop  = 1;
 
-    psum   = MALLOC_1(ndim,double);
-    *neval = 0;
-    for (j = 0; j < ndim; j++) {
-        for (i = 0,sum = 0.0; i<mpts; i++)
-            sum +=  p[i][j];
-        psum[j] = sum;
+    VectorXd psum(ndim);
+    neval = 0;
+
+    psum = p.colwise().sum();
+//    for (j = 0; j < ndim; j++) {
+//        for (i = 0,sum = 0.0; i<mpts; i++)
+//            sum +=  p[i][j];
+//        psum[j] = sum;
+//    }
+
+    if (report_func != NULL && report > 0){
+        report_func(0,static_cast<VectorXd>(p.row(0)),-1.0);
     }
-    if (report_func != NULL && report > 0)
-        (void)report_func (0,p[0],ndim,-1.0);
 
     for (;;count++,loop++) {
         ilo = 1;
@@ -1106,46 +1034,48 @@ static int simplex_minimize(double **p,		     /* The initial simplex */
      * Report that we are proceeding...
      */
         if (count == report && report_func != NULL) {
-            if (report_func (loop,p[ilo],ndim,y[ilo])) {
+            if (!report_func(loop,static_cast<VectorXd>(p.row(ilo)),y[ilo])) {
                 qCritical("Interation interrupted.");
-                result = -1;
+                result = false;
                 break;
             }
             count = 0;
         }
         if (rtol < ftol) break;
-        if (*neval >=  max_eval) {
+        if (neval >=  max_eval) {
             qCritical("Maximum number of evaluations exceeded.");
-            result  =  -1;
+            result  =  false;
             break;
         }
-        ytry = tryit(p,y,psum,ndim,func,user_data,ihi,neval,-ALPHA);
+        ytry = tryit(p,y,psum,func,user_data,ihi,neval,-ALPHA);
         if (ytry <= y[ilo])
-            ytry = tryit(p,y,psum,ndim,func,user_data,ihi,neval,GAMMA);
+            ytry = tryit(p,y,psum,func,user_data,ihi,neval,GAMMA);
         else if (ytry >= y[inhi]) {
             ysave = y[ihi];
-            ytry = tryit(p,y,psum,ndim,func,user_data,ihi,neval,BETA);
+            ytry = tryit(p,y,psum,func,user_data,ihi,neval,BETA);
             if (ytry >= ysave) {
                 for (i = 0; i < mpts; i++) {
                     if (i !=  ilo) {
-                        for (j = 0; j < ndim; j++) {
-                            psum[j] = 0.5*(p[i][j]+p[ilo][j]);
-                            p[i][j] = psum[j];
-                        }
-                        y[i] = (*func)(psum,ndim,user_data);
+//                        for (j = 0; j < ndim; j++) {
+//                            psum[j] = 0.5*(p[i][j]+p[ilo][j]);
+//                            p[i][j] = psum[j];
+//                        }
+                        psum = 0.5 * ( p.row(i) + p.row(ilo) );
+                        p.row(i) = psum;
+                        y[i] = (*func)(psum,user_data);
                     }
                 }
-                *neval +=  ndim;
-                for (j = 0; j < ndim; j++) {
-                    for (i = 0,sum = 0.0; i < mpts; i++)
-                        sum +=  p[i][j];
-                    psum[j] = sum;
-                }
+                neval +=  ndim;
+//                for (j = 0; j < ndim; j++) {
+//                    for (i = 0,sum = 0.0; i < mpts; i++)
+//                        sum +=  p[i][j];
+//                    psum[j] = sum;
+//                }
+                psum = p.colwise().sum();
             }
         }
     }
-    FREE (psum);
-    return (result);
+    return result;
 }
 
 #undef ALPHA
@@ -1178,7 +1108,7 @@ static int comp_pars(const void *p1,const void *p2)
 }
 
 //============================= fwd_fit_berg_scherg.c
-static void sort_parameters(double *mu,double *lambda,int nfit)
+static void sort_parameters(VectorXd& mu,VectorXd& lambda,int nfit)
 /*
       * Sort the parameters so that largest mu comes first
       */
@@ -1200,37 +1130,38 @@ static void sort_parameters(double *mu,double *lambda,int nfit)
 
 
 //============================= fwd_fit_berg_scherg.c
-static int report_fit(int    loop,
-                      double  *mu,
-                      int    nfit,
+static bool report_fit(int    loop,
+                      const VectorXd &fitpar,
                       double Smin)
+
 /*
       * Report our progress
       */
 {
 #ifdef LOG_FIT
-    int k;
-    for (k = 0; k < nfit; k++)
+    for (int k = 0; k < fitpar.size(); k++)
         fprintf(stderr,"%g ",mu[k]);
     fprintf(stderr,"%g\n",Smin);
 #endif
-    return 0;
+    return true;
 }
 
 //============================= fwd_fit_berg_scherg.c
-static double **get_initial_simplex(double  *pars,
-                                    int    npar,
+static MatrixXd get_initial_simplex(const VectorXd &pars,
                                     double simplex_size)
 
 {
-    double **simplex = ALLOC_DCMATRIX_1(npar+1,npar);
-    int k;
+    int npar = pars.size();
 
-    for (k = 0; k < npar+1; k++)
-        memcpy (simplex[k],pars,npar*sizeof(double));
-    for (k = 1; k < npar+1; k++)
-        simplex[k][k-1] = simplex[k][k-1] + simplex_size;
-    return (simplex);
+    MatrixXd simplex = MatrixXd::Zero(npar+1,npar);
+
+
+    simplex.rowwise() += pars.transpose();
+
+    for (int k = 1; k < npar+1; k++)
+        simplex(k,k-1) += simplex_size;
+
+    return simplex;
 }
 
 
@@ -1257,7 +1188,7 @@ static double **get_initial_simplex(double  *pars,
 
 
 
-void FwdEegSphereModel::compose_linear_fitting_data(double *mu,fitUser u)
+void FwdEegSphereModel::compose_linear_fitting_data(const VectorXd& mu,fitUser u)
 {
     double mu1n,k1;
     int k,p;
@@ -1278,8 +1209,8 @@ void FwdEegSphereModel::compose_linear_fitting_data(double *mu,fitUser u)
 
 
 // fwd_fit_berg_scherg.c
-double FwdEegSphereModel::compute_linear_parameters(double *mu,
-                                        double *lambda,
+double FwdEegSphereModel::compute_linear_parameters(const VectorXd& mu,
+                                        VectorXd& lambda,
                                         fitUser u)
 /*
       * Compute the best-fitting linear parameters
@@ -1287,7 +1218,7 @@ double FwdEegSphereModel::compute_linear_parameters(double *mu,
       */
 {
     int k,p,q;
-    double *vec = MALLOC_1(u->nfit-1,double);
+    VectorXd vec(u->nfit-1);
     double sum;
 
     compose_linear_fitting_data(mu,u);
@@ -1314,7 +1245,6 @@ double FwdEegSphereModel::compute_linear_parameters(double *mu,
     for (p = 1, sum = 0.0; p < u->nfit; p++)
         sum += lambda[p];
     lambda[0] = u->fn[0] - sum;
-    FREE(vec);
     return dot_dvectors(u->resi,u->resi,u->nterms-1)/dot_dvectors(u->y,u->y,u->nterms-1);
 }
 
@@ -1322,7 +1252,7 @@ double FwdEegSphereModel::compute_linear_parameters(double *mu,
 
 
 // fwd_fit_berg_scherg.c
-double FwdEegSphereModel::one_step (double *mu, int nfit, void *user_data)
+double FwdEegSphereModel::one_step (const VectorXd& mu, const void *user_data)
 /*
       * Evaluate the residual sum of squares fit for one set of
       * mu values
@@ -1366,7 +1296,7 @@ double FwdEegSphereModel::one_step (double *mu, int nfit, void *user_data)
 
 
 // fwd_fit_berg_scherg.c
-int FwdEegSphereModel::fwd_eeg_fit_berg_scherg(int   nterms,              /* Number of terms to use in the series expansion
+bool FwdEegSphereModel::fwd_eeg_fit_berg_scherg(int   nterms,              /* Number of terms to use in the series expansion
                                                                                     * when fitting the parameters */
                             int   nfit,	               /* Number of equivalent dipoles to fit */
                             float *rv)
@@ -1376,15 +1306,15 @@ int FwdEegSphereModel::fwd_eeg_fit_berg_scherg(int   nterms,              /* Num
       * actual and approximative series expansions
       */
 {
-    int   res = FAIL;
+    bool res = false;
     int   k;
     double rd,R,f;
     double simplex_size = 0.01;
-    double **simplex = NULL;
-    double *func_val = NULL;
+    MatrixXd simplex;
+    VectorXd func_val;
     double ftol = 1e-9;
-    double *lambda = NULL;
-    double *mu     = NULL;
+    VectorXd lambda;
+    VectorXd mu;
     int   neval;
     int   max_eval = 1000;
     int   report   = 1;
@@ -1394,22 +1324,25 @@ int FwdEegSphereModel::fwd_eeg_fit_berg_scherg(int   nterms,              /* Num
         printf("fwd_fit_berg_scherg does not work with less than two equivalent sources.");
         return FAIL;
     }
+
     /*
    * (1) Calculate the coefficients of the true expansion
    */
     for (k = 0; k < nterms; k++)
         u->fn[k] = this->fwd_eeg_get_multi_sphere_model_coeff(k+1);
+
     /*
    * (2) Calculate the weighting
    */
     rd = R = this->layers[0].rad;
-    for (k = 1; k < this->nlayer; k++) {
+    for (k = 1; k < this->nlayer(); k++) {
         if (this->layers[k].rad > R)
             R = this->layers[k].rad;
         if (this->layers[k].rad < rd)
             rd = this->layers[k].rad;
     }
     f = rd/R;
+
 #ifdef ZHANG
     /*
    * This is the Zhang weighting
@@ -1423,12 +1356,13 @@ int FwdEegSphereModel::fwd_eeg_fit_berg_scherg(int   nterms,              /* Num
     for (k = 1; k < nterms; k++)
         u->w[k-1] = sqrt((2.0*k+1)*(3.0*k+1.0)/k)*pow(f,(k-1.0));
 #endif
+
     /*
    * (3) Prepare for simplex minimization
    */
-    func_val = MALLOC_1(nfit+1,double);
-    lambda   = MALLOC_1(nfit,double);
-    mu       = MALLOC_1(nfit,double);
+    func_val = VectorXd(nfit+1);
+    lambda   = VectorXd(nfit);
+    mu       = VectorXd(nfit);
     /*
    * (4) Rather arbitrary initial guess
    */
@@ -1439,49 +1373,54 @@ int FwdEegSphereModel::fwd_eeg_fit_berg_scherg(int   nterms,              /* Num
         mu[k] = (rand() / (RAND_MAX + 1.0))*f;//replacement for: mu[k] = drand48()*f;
     }
 
-    simplex = get_initial_simplex(mu,nfit,simplex_size);
+    simplex = get_initial_simplex(mu,simplex_size);
     for (k = 0; k < nfit+1; k++)
-        func_val[k] = one_step(simplex[k],u->nfit,u);
+        func_val[k] = one_step(static_cast<VectorXd>(simplex.row(k)),u);
 
     /*
    * (5) Do the nonlinear minimization
    */
-    if ((res = simplex_minimize(simplex,func_val,nfit,
-                                ftol,one_step,
-                                u,
-                                max_eval,&neval,
-                                report,report_fit)) != OK)
+    if (!(res = simplex_minimize(  simplex,
+                            func_val,
+                            ftol,
+                            one_step,
+                            u,
+                            max_eval,
+                            neval,
+                            report,
+                            report_fit)))
         goto out;
 
     for (k = 0; k < nfit; k++)
-        mu[k] = simplex[0][k];
+        mu[k] = simplex(0,k);
 
     /*
    * (6) Do the final step: calculation of the linear parameters
    */
     *rv = compute_linear_parameters(mu,lambda,u);
+
     sort_parameters(mu,lambda,nfit);
 #ifdef LOG_FIT
     fprintf(stderr,"RV = %g %%\n",100*(*rv));
 #endif
-    this->mu     = REALLOC_1(this->mu,nfit,float);
-    this->lambda = REALLOC_1(this->lambda,nfit,float);
+    this->mu.resize(nfit);
+    this->lambda.resize(nfit);
     this->nfit   = nfit;
     for (k = 0; k < nfit; k++) {
         this->mu[k] = mu[k];
         /*
      * This division takes into account the actual conductivities
      */
-        this->lambda[k] = lambda[k]/this->layers[this->nlayer-1].sigma;
+        this->lambda[k] = lambda[k]/this->layers[this->nlayer()-1].sigma;
 #ifdef LOG_FIT
         printf("lambda%d = %g\tmu%d = %g\n",k+1,lambda[k],k+1,mu[k]);
 #endif
     }
+
     /*
    * This is the cleanup code
    */
 out : {
-        FREE_DCMATRIX_1(simplex);
         if (u) {
             FREE(u->fn);
             FREE_DCMATRIX_1(u->M);
@@ -1492,9 +1431,6 @@ out : {
             FREE(u->resi);
             FREE(u->sing);
         }
-        FREE(func_val);
-        FREE(lambda);
-        FREE(mu);
         return res;
     }
 }

@@ -142,7 +142,7 @@ bool Sphere::fit_sphere_to_points ( const MatrixXf &rr, float simplex_size, Vect
     * Find the optimal sphere origin
     */
     fitUserRecNew user;
-    float      ftol            = (float) 1e-5;
+    float      ftol            = 1e-5f;
     int        max_eval        = 500;
     int        report_interval = -1;
     int        neval;

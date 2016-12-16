@@ -129,7 +129,7 @@ bool MinimizerSimplex::mne_simplex_minimize(    MatrixXf& p,
         */
         if (count == report && report_func != NULL) {
             if (!report_func(loop,static_cast<VectorXf>(p.row(ilo)),y[ilo])) {
-                std::cout<<"Interation interrupted.";
+                qCritical("Interation interrupted.");
                 result = false;
                 break;
             }
@@ -138,7 +138,7 @@ bool MinimizerSimplex::mne_simplex_minimize(    MatrixXf& p,
         if (rtol < ftol)
             break;
         if (neval >=  max_eval) {
-            std::cout<<"Maximum number of evaluations exceeded.";
+            qCritical("Maximum number of evaluations exceeded.");
             result  =  false;
             break;
         }
