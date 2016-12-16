@@ -76,7 +76,7 @@ ECDSet DipoleFit::calculateFit() const
 
     if ((fit_data = setup_dipole_fit_data(settings->mriname,
                                           settings->measname,
-                                          settings->bemname,
+                                          settings->bemname.isEmpty() ? NULL : settings->bemname.toLatin1().data(),
                                           &settings->r0,eeg_model,settings->accurate,
                                           settings->badname,
                                           settings->noisename,
@@ -176,7 +176,7 @@ out : {
 
 ////*************************************************************************************************************
 //// fit_dipoles.c
-//int DipoleFit::fit_dipoles(const QString&  dataname, mneMeasData data,  DipoleFitData* fit, GuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose, ECDSet& p_set)
+//int DipoleFit::fit_dipoles(char *dataname, mneMeasData data,  DipoleFitData* fit, GuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose, ECDSet& p_set)
 //{
 //    float *one = MALLOC(data->nchan,float);
 //    float time;
@@ -185,7 +185,7 @@ out : {
 //    int   s;
 //    int   report_interval = 10;
 
-//    set.dataname = dataname;
+//    set.dataname = QString(dataname);
 
 //    fprintf(stderr,"Fitting...%c",verbose ? '\n' : '\0');
 //    for (s = 0, time = tmin; time < tmax; s++, time = tmin  + s*tstep) {

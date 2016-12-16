@@ -131,7 +131,7 @@ public:
       fiffCoordTrans    mri_head_t;         /**< MRI <-> head coordinate transformation */
       fiffCoordTrans    meg_head_t;         /**< MEG <-> head coordinate transformation */
       int               coord_frame;        /**< Common coordinate frame */
-      FiffChInfo        chs;                /**< Channels */
+      fiffChInfo        chs;                /**< Channels */
       int               nmeg;               /**< How many MEG */
       int               neeg;               /**< How many EEG */
       char              **ch_names;         /**< List of all channel names */
