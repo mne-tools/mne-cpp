@@ -58,8 +58,6 @@
 // Eigen INCLUDES
 //=============================================================================================================
 
-#include <Eigen/LU>
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -67,6 +65,7 @@
 //=============================================================================================================
 
 using namespace FIFFLIB;
+using namespace Eigen;
 
 
 //*************************************************************************************************************
@@ -224,9 +223,41 @@ QString FiffCoordTrans::frame_name (int frame)
 
 //*************************************************************************************************************
 
+FiffCoordTrans FiffCoordTrans::make(int from, int to, const Matrix3f& rot, const VectorXf& move)
+{
+    FiffCoordTrans t;
+    t.trans = MatrixXf::Zero(4,4);
+
+    t.from = from;
+    t.to   = to;
+
+    t.trans.block<3,3>(0,0) = rot;
+    t.trans.block<3,1>(0,3) = move;
+    t.trans(3,3) = 1.0f;
+
+    FiffCoordTrans::addInverse(t);
+
+    return t;
+}
+
+
+//*************************************************************************************************************
+
+bool FiffCoordTrans::addInverse(FiffCoordTrans &t)
+{
+    t.invtrans = t.trans.inverse();
+    return true;
+}
+
+
+//*************************************************************************************************************
+
 void FiffCoordTrans::print() const
 {
-    std::cout << "Coordinate transformation:\n";
+    std::cout << "Coordinate transformation: ";
     std::cout << (QString("%1 -> %2\n").arg(frame_name(this->from)).arg(frame_name(this->to))).toLatin1().data();
-    std::cout << trans << std::endl;
+
+    for (int p = 0; p < 3; p++)
+        printf("\t% 8.6f % 8.6f % 8.6f\t% 7.2f mm\n", trans(p,0),trans(p,1),trans(p,2),1000*trans(p,3));
+    printf("\t% 8.6f % 8.6f % 8.6f   % 7.2f\n",trans(3,0),trans(3,1),trans(3,2),trans(3,3));
 }

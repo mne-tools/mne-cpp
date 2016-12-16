@@ -110,6 +110,10 @@
  *
  */
 #include <fiff/fiff_types.h>
+#include <fiff/fiff_id.h>
+#include <fiff/fiff_ch_info.h>
+#include <fiff/fiff_coord_trans.h>
+#include <fiff/fiff_dir_entry.h>
 
 using namespace FIFFLIB;
 
@@ -438,15 +442,15 @@ typedef struct {
 } *mneStcData,mneStcDataRec;
 
 typedef struct {		/* Information about raw data in fiff file */
-  char          *filename;	/* The name of the file this comes from */
-  fiffId        id;		/* Measurement id from the file */
+  QString       filename;	/* The name of the file this comes from */
+  FiffId        id;		/* Measurement id from the file */
   int           nchan;		/* Number of channels */
-  fiffChInfo    chInfo;		/* Channel info data  */
+  FiffChInfo    chInfo;		/* Channel info data  */
   int           coord_frame;	/* 
 				 * Which coordinate frame are the
 				 * positions defined in? 
 				 */
-  fiffCoordTrans trans;	        /* This is the coordinate transformation
+  FiffCoordTrans trans;	        /* This is the coordinate transformation
 				 * FIFF_COORD_HEAD <--> FIFF_COORD_DEVICE
 				 */
   float         sfreq;		/* Sampling frequency */
@@ -458,7 +462,7 @@ typedef struct {		/* Information about raw data in fiff file */
 				 * whence it may be inaccurate. */
   int           buf_size;	/* Buffer size in samples */
   int           maxshield_data; /* Are these unprocessed MaxShield data */
-  fiffDirEntry  rawDir;		/* Directory of raw data tags 
+  FiffDirEntry  rawDir;		/* Directory of raw data tags
 				 * These may be of type
 				 *       FIFF_DATA_BUFFER
 				 *       FIFF_DATA_SKIP
@@ -601,7 +605,7 @@ typedef struct {
 typedef struct {
   mneCTFcompData *comps;	/* All available compensation data sets */
   int            ncomp;		/* How many? */
-  fiffChInfo     chs;		/* Channel information */
+  FiffChInfo     chs;		/* Channel information */
   int            nch;		/* How many of the above */
   mneCTFcompData undo;		/* Compensation data to undo the current compensation before applying current */
   mneCTFcompData current;	/* The current compensation data composed from the above 
@@ -616,7 +620,7 @@ typedef struct {		        /* One item in a derivation data set */
 					 * (This field is not always used) */
   int                  *valid;		/* Which of the derivations are valid considering the units of the input 
 					 * channels (This field is not always used) */
-  fiffChInfo           chs;		/* First matching channel info in each derivation */
+  FiffChInfo           chs;		/* First matching channel info in each derivation */
 } *mneDeriv,mneDerivRec;
 
 typedef struct {		        /* A collection of derivations */
@@ -704,7 +708,7 @@ typedef struct {		 /* Measurement data representation in MNE calculations */
   char               *filename;	 /* The source file name */
   fiffId             meas_id;	 /* The id from the measurement file */
   fiffTimeRec        meas_date;	 /* The measurement date from the file */
-  fiffChInfo         chs;	 /* The channel information */
+  FiffChInfo         chs;	 /* The channel information */
   fiffCoordTrans     meg_head_t; /* MEG device <-> head coordinate transformation */
   fiffCoordTrans     mri_head_t; /* MRI device <-> head coordinate transformation
 				    (duplicated from the inverse operator or loaded separately) */
