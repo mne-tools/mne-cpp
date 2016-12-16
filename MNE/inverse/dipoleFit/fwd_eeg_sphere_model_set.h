@@ -116,6 +116,57 @@ public:
     */
     ~FwdEegSphereModelSet();
 
+
+
+    static void fwd_free_eeg_sphere_model_set(FwdEegSphereModelSet* s);
+
+
+    /*
+     * List the properties of available models
+     */
+    void fwd_list_eeg_sphere_models(FILE *f);
+
+
+
+
+    static FwdEegSphereModelSet* fwd_new_eeg_sphere_model_set();
+
+
+    /*
+     * ToDo make non static member
+     * Add a new model to a set.
+     * The model should not be deallocated after this since it is attached to the set
+     */
+    static FwdEegSphereModelSet* fwd_add_to_eeg_sphere_model_set(FwdEegSphereModelSet* s, FwdEegSphereModel* m);
+
+
+
+
+    /*
+          * Choose and setup the default EEG sphere model
+          */
+    static FwdEegSphereModelSet* fwd_add_default_eeg_sphere_model(FwdEegSphereModelSet* s);
+
+
+
+
+    /*
+    * Load all models available in the specified file
+    */
+    static FwdEegSphereModelSet* fwd_load_eeg_sphere_models(const QString& filename, FwdEegSphereModelSet* now);
+
+
+
+    /*
+     * Find a model with a given name and return a duplicate
+     */
+    FwdEegSphereModel* fwd_select_eeg_sphere_model(const QString& p_sName);
+
+
+
+
+
+
 //    //=========================================================================================================
 //    /**
 //    * Appends an orward EEG Sphere Model to the set
