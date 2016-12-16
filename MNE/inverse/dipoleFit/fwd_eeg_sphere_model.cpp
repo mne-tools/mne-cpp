@@ -226,8 +226,19 @@ char *mne_strdup_1(const char *s)
 //=============================================================================================================
 
 FwdEegSphereModel::FwdEegSphereModel()
+: name(NULL)
+, nlayer(0)
+, layers(NULL)
+, fn(NULL)
+, nterms  (0)
+, lambda  (NULL)
+, mu      (NULL)
+, nfit    (0)
+, scale_pos (0)
 {
-
+    r0[0] = 0.0;
+    r0[1] = 0.0;
+    r0[2] = 0.0;
 }
 
 
@@ -252,30 +263,36 @@ FwdEegSphereModel::FwdEegSphereModel()
 
 FwdEegSphereModel::~FwdEegSphereModel()
 {
-
+//    if (!m)
+//        return;
+    FREE(name);
+    FREE(layers);
+    FREE(fn);
+    FREE(mu);
+    FREE(lambda);
 }
 
 
 //*************************************************************************************************************
 
-FwdEegSphereModel* FwdEegSphereModel::fwd_new_eeg_sphere_model()
-{
-    FwdEegSphereModel* m = MALLOC_1(1,FwdEegSphereModel);
+//FwdEegSphereModel* FwdEegSphereModel::fwd_new_eeg_sphere_model()
+//{
+//    FwdEegSphereModel* m = MALLOC_1(1,FwdEegSphereModel);
 
-    m->name    = NULL;
-    m->nlayer  = 0;
-    m->layers  = NULL;
-    m->fn      = NULL;
-    m->nterms  = 0;
-    m->r0[0]   = 0.0;
-    m->r0[1]   = 0.0;
-    m->r0[2]   = 0.0;
-    m->lambda  = NULL;
-    m->mu      = NULL;
-    m->nfit    = 0;
-    m->scale_pos = 0;
-    return m;
-}
+//    m->name    = NULL;
+//    m->nlayer  = 0;
+//    m->layers  = NULL;
+//    m->fn      = NULL;
+//    m->nterms  = 0;
+//    m->r0[0]   = 0.0;
+//    m->r0[1]   = 0.0;
+//    m->r0[2]   = 0.0;
+//    m->lambda  = NULL;
+//    m->mu      = NULL;
+//    m->nfit    = 0;
+//    m->scale_pos = 0;
+//    return m;
+//}
 
 
 //*************************************************************************************************************
@@ -286,7 +303,7 @@ FwdEegSphereModel* FwdEegSphereModel::fwd_dup_eeg_sphere_model()
     int k;
 
 
-    dup = fwd_new_eeg_sphere_model();
+    dup = new FwdEegSphereModel();//fwd_new_eeg_sphere_model();
 
     if (this->name)
         dup->name = mne_strdup_1(this->name);
@@ -340,19 +357,19 @@ fitUser FwdEegSphereModel::new_fit_user(int nfit, int nterms)
 
 //*************************************************************************************************************
 
-void FwdEegSphereModel::fwd_free_eeg_sphere_model(FwdEegSphereModel* m)
+//void FwdEegSphereModel::fwd_free_eeg_sphere_model(FwdEegSphereModel* m)
 
-{
-    if (!m)
-        return;
-    FREE(m->name);
-    FREE(m->layers);
-    FREE(m->fn);
-    FREE(m->mu);
-    FREE(m->lambda);
-    FREE(m);
-    return;
-}
+//{
+//    if (!m)
+//        return;
+//    FREE(m->name);
+//    FREE(m->layers);
+//    FREE(m->fn);
+//    FREE(m->mu);
+//    FREE(m->lambda);
+//    FREE(m);
+//    return;
+//}
 
 
 //*************************************************************************************************************
@@ -365,7 +382,7 @@ FwdEegSphereModel* FwdEegSphereModel::fwd_create_eeg_sphere_model(const char *na
       * Produce a new sphere model structure
       */
 {
-    FwdEegSphereModel* new_model = fwd_new_eeg_sphere_model();
+    FwdEegSphereModel* new_model = new FwdEegSphereModel();//fwd_new_eeg_sphere_model();
     int            k;
     FwdEegSphereLayer* layers;
     float          R,rR;
@@ -826,7 +843,7 @@ FwdEegSphereModel* FwdEegSphereModel::setup_eeg_sphere_model(const QString& eeg_
 
 bad : {
         FwdEegSphereModelSet::fwd_free_eeg_sphere_model_set(eeg_models);
-        FwdEegSphereModel::fwd_free_eeg_sphere_model(eeg_model);
+        delete eeg_model;
 //        FREE(eeg_model_name);
         return NULL;
     }

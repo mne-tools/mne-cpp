@@ -14724,7 +14724,7 @@ void free_dipole_fit_data(DipoleFitData* d)
     mne_free_name_list(d->ch_names,d->nmeg+d->neeg);
     mne_free_sparse(d->pick);
     fwd_bem_free_model(d->bem_model);
-    FwdEegSphereModel::fwd_free_eeg_sphere_model(d->eeg_model);
+    delete d->eeg_model;
     if (d->user_free)
         d->user_free(d->user);
 
