@@ -223,11 +223,15 @@ public:
 //    */
 //    FwdEegSphereModelSet& operator<< (const FwdEegSphereModel& p_FwdEegSphereModel);
 
+    int nmodel() const
+    {
+        return models.size();
+    }
+
 public:
 //    QList<FwdEegSphereModel> m_qListModels;    /**< Set of EEG sphere model definitions. */
 
-    FwdEegSphereModel** models;     /**< Set of EEG sphere model definitions */
-    int               nmodel;
+    QList<FwdEegSphereModel*> models;     /**< Set of EEG sphere model definitions */
 
 // ### OLD STRUCT ###
 //    typedef struct {
