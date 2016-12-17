@@ -15152,21 +15152,14 @@ bad : {
 
 
 
-GuessData* make_guess_data( const QString& guessname,
-                            const QString& guess_surfname,
-                            float         mindist,
-                            float         exclude,
-                            float         grid,
-                            DipoleFitData* f,
-                            char          *guess_save_name)
-
+GuessData* make_guess_data( const QString& guessname, const QString& guess_surfname, float mindist, float exclude, float grid, DipoleFitData* f, char *guess_save_name)
 {
     mneSourceSpace *sp = NULL;
-    int            nsp = 0;
+    int             nsp = 0;
     GuessData*      res = NULL;
-    int            k,p;
-    float          guessrad = 0.080;
-    mneSourceSpace guesses = NULL;
+    int             k,p;
+    float           guessrad = 0.080f;
+    mneSourceSpace  guesses = NULL;
 
     if (!guessname.isEmpty()) {
         /*
@@ -15181,7 +15174,7 @@ GuessData* make_guess_data( const QString& guessname,
             FREE(sp);
             goto bad;
         }
-        printf("Read guesses from %s\n",guessname);
+        printf("Read guesses from %s\n",guessname.toLatin1().constData());
         guesses = sp[0]; FREE(sp);
     }
     else {
@@ -15241,9 +15234,9 @@ GuessData* make_guess_data( const QString& guessname,
     for (k = 0; k < res->nguess; k++)
         res->guess_fwd[k] = NULL;
     /*
-   * Compute the guesses using the sphere model for speed
-   */
-    if (GuessData::compute_guess_fields(res,f) == FAIL)
+    * Compute the guesses using the sphere model for speed
+    */
+    if (!res->compute_guess_fields(f))
         goto bad;
 
     return res;
@@ -15288,7 +15281,7 @@ GuessData* make_guess_data( const QString& guessname,
             FREE(sp);
             goto bad;
         }
-        fprintf(stderr,"Read guesses from %s\n",guessname);
+        fprintf(stderr,"Read guesses from %s\n",guessname.toLatin1().constData());
         guesses = sp[0]; FREE(sp);
     }
     else {
@@ -15331,8 +15324,8 @@ GuessData* make_guess_data( const QString& guessname,
     for (k = 0; k < res->nguess; k++)
         res->guess_fwd[k] = NULL;
     /*
-   * Compute the guesses using the sphere model for speed
-   */
+    * Compute the guesses using the sphere model for speed
+    */
     orig = f->funcs;
     if (f->fit_mag_dipoles)
         f->funcs = f->mag_dipole_funcs;

@@ -102,16 +102,11 @@ GuessData::~GuessData()
 
 //*************************************************************************************************************
 
-int GuessData::compute_guess_fields(GuessData* guess,
-                         DipoleFitData* f)
-/*
-      * Once the guess locations have been set up we can compute the fields
-      */
+bool GuessData::compute_guess_fields(DipoleFitData* f)
 {
     dipoleFitFuncs orig = NULL;
-    int k;
 
-    if (!guess || !f) {
+    if (!f) {
         qCritical("Data missing in compute_guess_fields");
         goto bad;
     }
@@ -125,21 +120,22 @@ int GuessData::compute_guess_fields(GuessData* guess,
         f->funcs = f->mag_dipole_funcs;
     else
         f->funcs = f->sphere_funcs;
-    for (k = 0; k < guess->nguess; k++) {
-        if ((guess->guess_fwd[k] = DipoleFitData::dipole_forward_one(f,guess->rr[k],guess->guess_fwd[k])) == NULL)
+    for (int k = 0; k < this->nguess; k++) {
+        if ((this->guess_fwd[k] = DipoleFitData::dipole_forward_one(f,this->rr[k],this->guess_fwd[k])) == NULL)
             goto bad;
 #ifdef DEBUG
-        sing = guess->guess_fwd[k]->sing;
+        sing = this->guess_fwd[k]->sing;
         printf("%f %f %f\n",sing[0],sing[1],sing[2]);
 #endif
     }
     f->funcs = orig;
-    printf("[done %d sources]\n",guess->nguess);
-    return OK;
+    printf("[done %d sources]\n",this->nguess);
+
+    return true;
 
 bad : {
         if (orig)
             f->funcs = orig;
-        return FAIL;
+        return false;
     }
 }
