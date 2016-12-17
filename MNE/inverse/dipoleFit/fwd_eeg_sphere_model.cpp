@@ -325,11 +325,11 @@ FwdEegSphereModel* FwdEegSphereModel::setup_eeg_sphere_model(const QString& eeg_
     printf("Using EEG sphere model \"%s\" with scalp radius %7.1f mm\n",
            eeg_model->name.toLatin1().constData(),1000*eeg_sphere_rad);
     printf("\n");
-    FwdEegSphereModelSet::fwd_free_eeg_sphere_model_set(eeg_models);
+    delete eeg_models;
     return eeg_model;
 
 bad : {
-        FwdEegSphereModelSet::fwd_free_eeg_sphere_model_set(eeg_models);
+        delete eeg_models;
         delete eeg_model;
         return NULL;
     }

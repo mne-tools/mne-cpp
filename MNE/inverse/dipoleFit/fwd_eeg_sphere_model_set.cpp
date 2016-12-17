@@ -144,33 +144,32 @@ FwdEegSphereModelSet::FwdEegSphereModelSet()
 
 FwdEegSphereModelSet::~FwdEegSphereModelSet()
 {
-
+    for (int k = 0; k < this->nmodel(); k++)
+        delete this->models[k];
 }
 
 
 //*************************************************************************************************************
 
-void FwdEegSphereModelSet::fwd_free_eeg_sphere_model_set(FwdEegSphereModelSet* s)
+//void FwdEegSphereModelSet::fwd_free_eeg_sphere_model_set(FwdEegSphereModelSet* s)
 
-{
-    if (!s)
-        return;
-    for (int k = 0; k < s->nmodel(); k++)
-        delete s->models[k];
-    delete s;
+//{
+//    if (!s)
+//        return;
 
-    return;
-}
+
+//    return;
+//}
 
 
 //*************************************************************************************************************
 
-FwdEegSphereModelSet* FwdEegSphereModelSet::fwd_new_eeg_sphere_model_set()
-{
-    FwdEegSphereModelSet* s = new FwdEegSphereModelSet;
+//FwdEegSphereModelSet* FwdEegSphereModelSet::fwd_new_eeg_sphere_model_set()
+//{
+//    FwdEegSphereModelSet* s = new FwdEegSphereModelSet;
 
-    return s;
-}
+//    return s;
+//}
 
 
 //*************************************************************************************************************
@@ -178,7 +177,7 @@ FwdEegSphereModelSet* FwdEegSphereModelSet::fwd_new_eeg_sphere_model_set()
 FwdEegSphereModelSet* FwdEegSphereModelSet::fwd_add_to_eeg_sphere_model_set(FwdEegSphereModelSet* s, FwdEegSphereModel* m)
 {
     if (!s)
-        s = fwd_new_eeg_sphere_model_set();
+        s = new FwdEegSphereModelSet;
 
     s->models.append(m);
     return s;
@@ -276,7 +275,7 @@ FwdEegSphereModelSet* FwdEegSphereModelSet::fwd_load_eeg_sphere_models(const QSt
 bad : {
         if (fp)
             fclose(fp);
-        fwd_free_eeg_sphere_model_set(now);
+        delete now;
         return NULL;
     }
 }
