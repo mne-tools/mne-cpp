@@ -40,6 +40,7 @@
 #include "fwd_eeg_sphere_model_set.h"
 #include "guess_data.h"
 #include "dipole_fit_data.h"
+#include "guess_data.h"
 
 
 //*************************************************************************************************************
@@ -8948,71 +8949,6 @@ void mne_regularize_cov(mneCovMatrix c,       /* The matrix to regularize */
 
 
 
-
-
-
-//============================= mne_whiten.c =============================
-
-int mne_whiten_data(float **data, float **whitened_data, int np, int nchan, mneCovMatrix C)
-/*
-      * Apply the whitening operation
-      */
-{
-    int    j,k;
-    float  *one = NULL,*orig,*white;
-    double *inv;
-
-    if (data == NULL || np <= 0)
-        return OK;
-
-    if (C->ncov != nchan) {
-        printf("Incompatible covariance matrix. Cannot whiten the data.");
-        return FAIL;
-    }
-    inv = C->inv_lambda;
-    if (mne_is_diag_cov(C)) {
-        //    printf("<DEBUG> Performing Diag\n");
-        for (j = 0; j < np; j++) {
-            orig = data[j];
-            white = whitened_data[j];
-            for (k = 0; k < nchan; k++)
-                white[k] = orig[k]*inv[k];
-        }
-    }
-    else {
-        /*
-     * This is arranged so that whitened_data can be the same matrix as the original
-     */
-        one = MALLOC(nchan,float);
-        for (j = 0; j < np; j++) {
-            orig = data[j];
-            white = whitened_data[j];
-            for (k = C->nzero; k < nchan; k++)
-                one[k] = mne_dot_vectors(C->eigen[k],orig,nchan);
-            for (k = 0; k < C->nzero; k++)
-                white[k] = 0.0;
-            for (k = C->nzero; k < nchan; k++)
-                white[k] = one[k]*inv[k];
-        }
-        FREE(one);
-    }
-    return OK;
-}
-
-
-int mne_whiten_one_data(float *data, float *whitened_data, int nchan, mneCovMatrix C)
-
-{
-    float *datap[1];
-    float *whitened_datap[1];
-
-    datap[0] = data;
-    whitened_datap[0] = whitened_data;
-
-    return mne_whiten_data(datap,whitened_datap,1,nchan,C);
-}
-
-
 //============================= mne_mgh_mri_io.c =============================
 
 
@@ -9640,237 +9576,12 @@ int mne_transform_source_spaces_to(int            coord_frame,   /* Which coord 
 
 
 
-//============================= dipole_forward.c =============================
-
-
-DipoleForward* new_dipole_forward()
-
-{
-    DipoleForward* res = MALLOC(1,DipoleForward);
-
-    res->rd     = NULL;
-    res->fwd    = NULL;
-    res->scales = NULL;
-    res->uu     = NULL;
-    res->vv     = NULL;
-    res->sing   = NULL;
-    res->nch    = 0;
-    res->ndip   = 0;
-
-    return res;
-}
-
-
-
-
-void free_dipole_forward ( DipoleForward* f )
-{
-    if (!f)
-        return;
-    FREE_CMATRIX(f->rd);
-    FREE_CMATRIX(f->fwd);
-    FREE_CMATRIX(f->uu);
-    FREE_CMATRIX(f->vv);
-    FREE(f->sing);
-    FREE(f->scales);
-    FREE(f);
-    return;
-}
 
 
 
 
 
-int compute_dipole_field(DipoleFitData* d, float *rd, int whiten, float **fwd)
-/*
- * Compute the field and take whitening and projection into account
- */
-{
-    float *eeg_fwd[3];
-    static float Qx[] = {1.0,0.0,0.0};
-    static float Qy[] = {0.0,1.0,0.0};
-    static float Qz[] = {0.0,0.0,1.0};
-    int k;
-    /*
-   * Compute the fields
-   */
-    if (d->nmeg > 0) {
-        if (d->funcs->meg_vec_field) {
-            if (d->funcs->meg_vec_field(rd,d->meg_coils,fwd,d->funcs->meg_client) != OK)
-                goto bad;
-        }
-        else {
-            if (d->funcs->meg_field(rd,Qx,d->meg_coils,fwd[0],d->funcs->meg_client) != OK)
-                goto bad;
-            if (d->funcs->meg_field(rd,Qy,d->meg_coils,fwd[1],d->funcs->meg_client) != OK)
-                goto bad;
-            if (d->funcs->meg_field(rd,Qz,d->meg_coils,fwd[2],d->funcs->meg_client) != OK)
-                goto bad;
-        }
-    }
 
-    if (d->neeg > 0) {
-        if (d->funcs->eeg_vec_pot) {
-            eeg_fwd[0] = fwd[0]+d->nmeg;
-            eeg_fwd[1] = fwd[1]+d->nmeg;
-            eeg_fwd[2] = fwd[2]+d->nmeg;
-            if (d->funcs->eeg_vec_pot(rd,d->eeg_els,eeg_fwd,d->funcs->eeg_client) != OK)
-                goto bad;
-        }
-        else {
-            if (d->funcs->eeg_pot(rd,Qx,d->eeg_els,fwd[0]+d->nmeg,d->funcs->eeg_client) != OK)
-                goto bad;
-            if (d->funcs->eeg_pot(rd,Qy,d->eeg_els,fwd[1]+d->nmeg,d->funcs->eeg_client) != OK)
-                goto bad;
-            if (d->funcs->eeg_pot(rd,Qz,d->eeg_els,fwd[2]+d->nmeg,d->funcs->eeg_client) != OK)
-                goto bad;
-        }
-    }
-
-    /*
-   * Apply projection
-   */
-#ifdef DEBUG
-    fprintf(stdout,"orig : ");
-    for (k = 0; k < 3; k++)
-        fprintf(stdout,"%g ",sqrt(mne_dot_vectors(fwd[k],fwd[k],d->nmeg+d->neeg)));
-    fprintf(stdout,"\n");
-#endif
-
-    for (k = 0; k < 3; k++)
-        if (mne_proj_op_proj_vector(d->proj,fwd[k],d->nmeg+d->neeg,TRUE) == FAIL)
-            goto bad;
-
-#ifdef DEBUG
-    fprintf(stdout,"proj : ");
-    for (k = 0; k < 3; k++)
-        fprintf(stdout,"%g ",sqrt(mne_dot_vectors(fwd[k],fwd[k],d->nmeg+d->neeg)));
-    fprintf(stdout,"\n");
-#endif
-
-    /*
-   * Whiten
-   */
-    if (d->noise && whiten) {
-        if (mne_whiten_data(fwd,fwd,3,d->nmeg+d->neeg,d->noise) == FAIL)
-            goto bad;
-    }
-
-#ifdef DEBUG
-    fprintf(stdout,"white : ");
-    for (k = 0; k < 3; k++)
-        fprintf(stdout,"%g ",sqrt(mne_dot_vectors(fwd[k],fwd[k],d->nmeg+d->neeg)));
-    fprintf(stdout,"\n");
-#endif
-
-    return OK;
-
-bad :
-    return FAIL;
-}
-
-
-
-
-
-DipoleForward* dipole_forward(DipoleFitData* d,
-                             float         **rd,
-                             int           ndip,
-                             DipoleForward* old)
-/*
- * Compute the forward solution and do other nice stuff
- */
-{
-    DipoleForward* res;
-    float         **this_fwd;
-    float         S[3];
-    int           k,p;
-    /*
-   * Allocate data if necessary
-   */
-    if (old && old->ndip == ndip && old->nch == d->nmeg+d->neeg) {
-        res = old;
-    }
-    else {
-        free_dipole_forward(old); old = NULL;
-        res = new_dipole_forward();
-        res->fwd  = ALLOC_CMATRIX(3*ndip,d->nmeg+d->neeg);
-        res->uu   = ALLOC_CMATRIX(3*ndip,d->nmeg+d->neeg);
-        res->vv   = ALLOC_CMATRIX(3*ndip,3);
-        res->sing = MALLOC(3*ndip,float);
-        res->nch  = d->nmeg+d->neeg;
-        res->rd   = ALLOC_CMATRIX(ndip,3);
-        res->scales = MALLOC(3*ndip,float);
-        res->ndip = ndip;
-    }
-
-    for (k = 0; k < ndip; k++) {
-        VEC_COPY(res->rd[k],rd[k]);
-        this_fwd = res->fwd + 3*k;
-        /*
-     * Calculate the field of three orthogonal dipoles
-     */
-        if ((compute_dipole_field(d,rd[k],TRUE,this_fwd)) == FAIL)
-            goto bad;
-        /*
-     * Choice of column normalization
-     * (componentwise normalization is not recommended)
-     */
-        if (d->column_norm == COLUMN_NORM_LOC || d->column_norm == COLUMN_NORM_COMP) {
-            for (p = 0; p < 3; p++)
-                S[p] = mne_dot_vectors(res->fwd[3*k+p],res->fwd[3*k+p],res->nch);
-            if (d->column_norm == COLUMN_NORM_COMP) {
-                for (p = 0; p < 3; p++)
-                    res->scales[3*k+p] = sqrt(S[p]);
-            }
-            else {
-                /*
-     * Divide by three or not?
-     */
-                res->scales[3*k+0] = res->scales[3*k+1] = res->scales[3*k+2] = sqrt(S[0]+S[1]+S[2])/3.0;
-            }
-            for (p = 0; p < 3; p++) {
-                if (res->scales[3*k+p] > 0.0) {
-                    res->scales[3*k+p] = 1.0/res->scales[3*k+p];
-                    mne_scale_vector(res->scales[3*k+p],res->fwd[3*k+p],res->nch);
-                }
-                else
-                    res->scales[3*k+p] = 1.0;
-            }
-        }
-        else {
-            res->scales[3*k]   = 1.0;
-            res->scales[3*k+1] = 1.0;
-            res->scales[3*k+2] = 1.0;
-        }
-    }
-
-    /*
-   * SVD
-   */
-    if (mne_svd(res->fwd,3*ndip,d->nmeg+d->neeg,res->sing,res->vv,res->uu) != 0)
-        goto bad;
-
-    return res;
-
-bad : {
-        if (!old)
-            free_dipole_forward(res);
-        return NULL;
-    }
-}
-
-DipoleForward* dipole_forward_one(DipoleFitData* d,
-                                 float         *rd,
-                                 DipoleForward* old)
-/*
- * Convenience function to compute the field of one dipole
- */
-{
-    float *rds[1];
-    rds[0] = rd;
-    return dipole_forward(d,rds,1,old);
-}
 
 
 //============================= mne_add_geometry_info.c =============================
@@ -12141,160 +11852,6 @@ char *fwd_bem_make_bem_sol_name(char *name)
 
 
 //============================= simplex_minimize.c =============================
-
-
-/*
- * This routine comes from Numerical recipes
- */
-
-#define ALPHA 1.0
-#define BETA 0.5
-#define GAMMA 2.0
-#define MIN_STOL_LOOP 5
-
-static float tryf (float **p,
-                   float *y,
-                   float *psum,
-                   int   ndim,
-                   float (*func)(float *x,int npar,void *user_data),	  /* The function to be evaluated */
-                   void  *user_data,				          /* Data to be passed to the above function in each evaluation */
-                   int   ihi,
-                   int   *neval,
-                   float fac)
-
-{
-    int j;
-    float fac1,fac2,ytry,*ptry;
-
-    ptry = ALLOC_FLOAT(ndim);
-    fac1 = (1.0-fac)/ndim;
-    fac2 = fac1-fac;
-    for (j = 0; j < ndim; j++)
-        ptry[j] = psum[j]*fac1-p[ihi][j]*fac2;
-    ytry = (*func)(ptry,ndim,user_data);
-    ++(*neval);
-    if (ytry < y[ihi]) {
-        y[ihi] = ytry;
-        for (j = 0; j < ndim; j++) {
-            psum[j] +=  ptry[j]-p[ihi][j];
-            p[ihi][j] = ptry[j];
-        }
-    }
-    FREE(ptry);
-    return ytry;
-}
-
-
-int simplex_minimize(float **p,		                              /* The initial simplex */
-                     float *y,		                              /* Function values at the vertices */
-                     int   ndim,	                              /* Number of variables */
-                     float ftol,	                              /* Relative convergence tolerance */
-                     float stol,
-                     float (*func)(float *x,int npar,void *user_data),/* The function to be evaluated */
-                     void  *user_data,				      /* Data to be passed to the above function in each evaluation */
-                     int   max_eval,	                              /* Maximum number of function evaluations */
-                     int   *neval,	                              /* Number of function evaluations */
-                     int   report,                                    /* How often to report (-1 = no_reporting) */
-                     int   (*report_func)(int loop,
-                                          float *fitpar, int npar,
-                                          double fval_lo,
-                                          double fval_hi,
-                                          double par_diff))            /* The function to be called when reporting */
-/*
-      * Minimization with the simplex algorithm
-      * Modified from Numerical recipes
-      */
-
-{
-    int   i,j,ilo,ihi,inhi;
-    int   mpts = ndim+1;
-    float ytry,ysave,sum,rtol,*psum;
-    double dsum,diff;
-    int   result = 0;
-    int   count = 0;
-    int   loop  = 1;
-
-    psum = ALLOC_FLOAT(ndim);
-    *neval = 0;
-    for (j = 0; j < ndim; j++) {
-        for (i = 0,sum = 0.0; i<mpts; i++)
-            sum +=  p[i][j];
-        psum[j] = sum;
-    }
-    if (report_func != NULL && report > 0)
-        (void)report_func (0,p[0],ndim,-1.0,-1.0,0.0);
-
-    dsum = 0.0;
-    for (;;count++,loop++) {
-        ilo = 1;
-        ihi  =  y[1]>y[2] ? (inhi = 2,1) : (inhi = 1,2);
-        for (i = 0; i < mpts; i++) {
-            if (y[i]  <  y[ilo]) ilo = i;
-            if (y[i] > y[ihi]) {
-                inhi = ihi;
-                ihi = i;
-            } else if (y[i] > y[inhi])
-                if (i !=  ihi) inhi = i;
-        }
-        rtol = 2.0*fabs(y[ihi]-y[ilo])/(fabs(y[ihi])+fabs(y[ilo]));
-        /*
-     * Report that we are proceeding...
-     */
-        if (count == report && report_func != NULL) {
-            if (report_func (loop,p[ilo],ndim,y[ilo],y[ihi],sqrt(dsum))) {
-                printf("Interation interrupted.");
-                result = -1;
-                break;
-            }
-            count = 0;
-        }
-        if (rtol < ftol) break;
-        if (*neval >=  max_eval) {
-            printf("Maximum number of evaluations exceeded.");
-            result  =  -1;
-            break;
-        }
-        if (stol > 0) {		/* Has the simplex collapsed? */
-            for (dsum = 0.0, j = 0; j < ndim; j++) {
-                diff = p[ilo][j] - p[ihi][j];
-                dsum += diff*diff;
-            }
-            if (loop > MIN_STOL_LOOP && sqrt(dsum) < stol)
-                break;
-        }
-        ytry = tryf(p,y,psum,ndim,func,user_data,ihi,neval,-ALPHA);
-        if (ytry <= y[ilo])
-            ytry = tryf(p,y,psum,ndim,func,user_data,ihi,neval,GAMMA);
-        else if (ytry >= y[inhi]) {
-            ysave = y[ihi];
-            ytry = tryf(p,y,psum,ndim,func,user_data,ihi,neval,BETA);
-            if (ytry >= ysave) {
-                for (i = 0; i < mpts; i++) {
-                    if (i !=  ilo) {
-                        for (j = 0; j < ndim; j++) {
-                            psum[j] = 0.5*(p[i][j]+p[ilo][j]);
-                            p[i][j] = psum[j];
-                        }
-                        y[i] = (*func)(psum,ndim,user_data);
-                    }
-                }
-                *neval +=  ndim;
-                for (j = 0; j < ndim; j++) {
-                    for (i = 0,sum = 0.0; i < mpts; i++)
-                        sum +=  p[i][j];
-                    psum[j] = sum;
-                }
-            }
-        }
-    }
-    FREE (psum);
-    return (result);
-}
-
-
-
-
-
 
 
 
@@ -14618,6 +14175,21 @@ GuessData* new_guess_data()
     return res;
 }
 
+
+void free_dipole_forward_2 ( DipoleForward* f )
+{
+    if (!f)
+        return;
+    FREE_CMATRIX(f->rd);
+    FREE_CMATRIX(f->fwd);
+    FREE_CMATRIX(f->uu);
+    FREE_CMATRIX(f->vv);
+    FREE(f->sing);
+    FREE(f->scales);
+    FREE(f);
+    return;
+}
+
 void free_guess_data(GuessData* g)
 
 {
@@ -14628,7 +14200,7 @@ void free_guess_data(GuessData* g)
     FREE_CMATRIX(g->rr);
     if (g->guess_fwd) {
         for (k = 0; k < g->nguess; k++)
-            free_dipole_forward(g->guess_fwd[k]);
+            free_dipole_forward_2(g->guess_fwd[k]);
         FREE(g->guess_fwd);
     }
     FREE(g);
@@ -15575,47 +15147,10 @@ bad : {
 
 
 
-int compute_guess_fields(GuessData* guess,
-                         DipoleFitData* f)
-/*
-      * Once the guess locations have been set up we can compute the fields
-      */
-{
-    dipoleFitFuncs orig = NULL;
-    int k;
 
-    if (!guess || !f) {
-        qCritical("Data missing in compute_guess_fields");
-        goto bad;
-    }
-    if (!f->noise) {
-        qCritical("Noise covariance missing in compute_guess_fields");
-        goto bad;
-    }
-    printf("Go through all guess source locations...");
-    orig = f->funcs;
-    if (f->fit_mag_dipoles)
-        f->funcs = f->mag_dipole_funcs;
-    else
-        f->funcs = f->sphere_funcs;
-    for (k = 0; k < guess->nguess; k++) {
-        if ((guess->guess_fwd[k] = dipole_forward_one(f,guess->rr[k],guess->guess_fwd[k])) == NULL)
-            goto bad;
-#ifdef DEBUG
-        sing = guess->guess_fwd[k]->sing;
-        printf("%f %f %f\n",sing[0],sing[1],sing[2]);
-#endif
-    }
-    f->funcs = orig;
-    printf("[done %d sources]\n",guess->nguess);
-    return OK;
 
-bad : {
-        if (orig)
-            f->funcs = orig;
-        return FAIL;
-    }
-}
+
+
 
 GuessData* make_guess_data( const QString& guessname,
                             const QString& guess_surfname,
@@ -15708,7 +15243,7 @@ GuessData* make_guess_data( const QString& guessname,
     /*
    * Compute the guesses using the sphere model for speed
    */
-    if (compute_guess_fields(res,f) == FAIL)
+    if (GuessData::compute_guess_fields(res,f) == FAIL)
         goto bad;
 
     return res;
@@ -15805,7 +15340,7 @@ GuessData* make_guess_data( const QString& guessname,
         f->funcs = f->sphere_funcs;
 
     for (k = 0; k < res->nguess; k++) {
-        if ((res->guess_fwd[k] = dipole_forward_one(f,res->rr[k],NULL)) == NULL)
+        if ((res->guess_fwd[k] = DipoleFitData::dipole_forward_one(f,res->rr[k],NULL)) == NULL)
             goto bad;
 #ifdef DEBUG
         sing = res->guess_fwd[k]->sing;
@@ -18469,7 +18004,7 @@ mneMeasData mne_read_meas_data_add(const QString&       name,       /* Name of t
         else {
             new_data->proj = mne_read_proj_op(name);
             if (new_data->proj && new_data->proj->nitems > 0) {
-                fprintf(stderr,"\tLoaded projection from %s:\n",name);
+                fprintf(stderr,"\tLoaded projection from %s:\n",name.toLatin1().data());
                 mne_proj_op_report(stderr,"\t\t",new_data->proj);
             }
             new_data->comp = mne_read_ctf_comp_data(name);
@@ -18911,316 +18446,19 @@ GuessData* get_dipole_fit_guess_data(mshMegEegData d)
 
 //============================= fit_dipoles.c =============================
 
-typedef struct {
-    float          limit;
-    int            report_dim;
-    float          *B;
-    double         B2;
-    DipoleForward*  fwd;
-} *fitDipUser,fitDipUserRec;
-
-static int find_best_guess(float     *B,         /* The whitened data */
-                           int       nch,
-                           GuessData* guess,	 /* Guesses */
-                           float     limit,	 /* Pseudoradial component omission limit */
-                           int       *bestp,	 /* Which is the best */
-                           float     *goodp)	 /* Best goodness of fit */
-/*
- * Thanks to the precomputed SVD everything is really simple
- */
-{
-    int    k,c;
-    double B2,Bm2,this_good,one;
-    int    best = -1;
-    float  good = 0.0;
-    DipoleForward* fwd;
-    int    ncomp;
-
-    B2 = mne_dot_vectors(B,B,nch);
-    for (k = 0; k < guess->nguess; k++) {
-        fwd = guess->guess_fwd[k];
-        if (fwd->nch == nch) {
-            ncomp = fwd->sing[2]/fwd->sing[0] > limit ? 3 : 2;
-            for (c = 0, Bm2 = 0.0; c < ncomp; c++) {
-                one = mne_dot_vectors(fwd->uu[c],B,nch);
-                Bm2 = Bm2 + one*one;
-            }
-            this_good = 1.0 - (B2 - Bm2)/B2;
-            if (this_good > good) {
-                best = k;
-                good = this_good;
-            }
-        }
-    }
-    if (best < 0) {
-        printf("No reasonable initial guess found.");
-        return FAIL;
-    }
-    *bestp = best;
-    *goodp = good;
-    return OK;
-}
 
 
-static float **make_initial_dipole_simplex(float  *r0,
-                                           float  size)
-/*
-      * Make the initial tetrahedron
-      */
-{
-    /*
-   * For this definition of a regular tetrahedron, see
-   *
-   * http://mathworld.wolfram.com/Tetrahedron.html
-   *
-   */
-    float x = sqrt(3.0)/3.0;
-    float r = sqrt(6.0)/12.0;
-    float R = 3*r;
-    float d = x/2.0;
-    float rr[][3] = { { x , 0.0,  -r },
-                      { -d, 0.5,  -r },
-                      { -d, -0.5, -r },
-                      { 0.0, 0.0, R } };
-
-    float **simplex = ALLOC_CMATRIX(4,3);
-    int j,k;
-
-    for (j = 0; j < 4; j++) {
-        VEC_COPY(simplex[j],rr[j]);
-        for (k = 0; k < 3; k++)
-            simplex[j][k] = size*simplex[j][k] + r0[k];
-    }
-    return simplex;
-}
 
 
-static int report_func(int     loop,
-                       float   *fitpar,
-                       int     npar,
-                       double  fval_lo,
-                       double  fval_hi,
-                       double  par_diff)
-/*
-      * Report periodically
-      */
-{
-    float *r0 = fitpar;
-
-    fprintf(stdout,"loop %d rd %7.2f %7.2f %7.2f fval %g %g par diff %g\n",
-            loop,1000*r0[0],1000*r0[1],1000*r0[2],fval_lo,fval_hi,1000*par_diff);
-
-    return OK;
-}
 
 
-static int fit_Q(DipoleFitData* fit,	     /* The fit data */
-                 float *B,		     /* Measurement */
-                 float *rd,		     /* Dipole position */
-                 float limit,		     /* Radial component omission limit */
-                 float *Q,		     /* The result */
-                 int   *ncomp,
-                 float *res)	             /* Residual sum of squares */
-/*
- * fit the dipole moment once the location is known
- */
-{
-    int c;
-    DipoleForward* fwd = dipole_forward_one(fit,rd,NULL);
-    float Bm2,one;
-
-    if (!fwd)
-        return FAIL;
-
-    *ncomp = fwd->sing[2]/fwd->sing[0] > limit ? 3 : 2;
-
-    Q[0] = Q[1] = Q[2] = 0.0;
-    for (c = 0, Bm2 = 0.0; c < *ncomp; c++) {
-        one = mne_dot_vectors(fwd->uu[c],B,fwd->nch);
-        mne_add_scaled_vector_to(fwd->vv[c],one/fwd->sing[c],Q,3);
-        Bm2 = Bm2 + one*one;
-    }
-    /*
-   * Counteract the effect of column normalization
-   */
-    for (c = 0; c < 3; c++)
-        Q[c] = fwd->scales[c]*Q[c];
-    *res = mne_dot_vectors(B,B,fwd->nch) - Bm2;
-
-    free_dipole_forward(fwd);
-
-    return OK;
-}
-
-static float fit_eval(float *rd,int npar,void *user)
-/*
- * Calculate the residual sum of squares
- */
-{
-    DipoleFitData* fit   = (DipoleFitData*)user;
-    DipoleForward* fwd;
-    fitDipUser       fuser = (fitDipUser)fit->user;
-    double        Bm2,one;
-    int           ncomp,c;
-
-    fwd   = fuser->fwd = dipole_forward_one(fit,rd,fuser->fwd);
-    ncomp = fwd->sing[2]/fwd->sing[0] > fuser->limit ? 3 : 2;
-    if (fuser->report_dim)
-        fprintf(stderr,"ncomp = %d\n",ncomp);
-
-    for (c = 0, Bm2 = 0.0; c < ncomp; c++) {
-        one = mne_dot_vectors(fwd->uu[c],fuser->B,fwd->nch);
-        Bm2 = Bm2 + one*one;
-    }
-    return fuser->B2-Bm2;
-}
-
-static float rtol(float *vals,int nval)
-
-{
-    float minv,maxv;
-    int   k;
-
-    minv = maxv = vals[0];
-    for (k = 1; k < nval; k++) {
-        if (vals[k] < minv)
-            minv = vals[k];
-        if (vals[k] > maxv)
-            maxv = vals[k];
-    }
-    return 2.0*(maxv-minv)/(maxv+minv);
-}
 
 
-static bool fit_one(DipoleFitData* fit,	            /* Precomputed fitting data */
-                    GuessData*     guess,	            /* The initial guesses */
-                    float         time,              /* Which time is it? */
-                    float         *B,	            /* The field to fit */
-                    int           verbose,
-                    ECD&          res               /* The fitted dipole */
-                    )
-/*
- * Fit a single dipole to the given data
- */
-{
-    float  **simplex       = NULL;	       /* The simplex */
-    float  vals[4];			       /* Values at the vertices */
-    float  limit           = 0.2;	               /* (pseudo) radial component omission limit */
-    float  size            = 1e-2;	       /* Size of the initial simplex */
-    float  ftol[]          = { 1e-2, 1e-2 };     /* Tolerances on the the two passes */
-    float  atol[]          = { 0.2e-3, 0.2e-3 }; /* If dipole movement between two iterations is less than this,
-                                                  we consider to have converged */
-    int    ntol            = 2;
-    int    max_eval        = 1000;	       /* Limit for fit function evaluations */
-    int    report_interval = verbose ? 1 : -1;   /* How often to report the intermediate result */
-
-    int        best;
-    float      good,rd_guess[3],rd_final[3],Q[3],final_val;
-    fitDipUserRec user;
-    int        k,p,neval,neval_tot,nchan,ncomp;
-    int        fit_fail;
-
-    nchan = fit->nmeg+fit->neeg;
-    user.fwd = NULL;
-
-    if (mne_proj_op_proj_vector(fit->proj,B,nchan,TRUE) == FAIL)
-        goto bad;
-
-    if (mne_whiten_one_data(B,B,nchan,fit->noise) == FAIL)
-        goto bad;
-    /*
-   * Get the initial guess
-   */
-    if (find_best_guess(B,nchan,guess,limit,&best,&good) < 0)
-        goto bad;
 
 
-    user.limit = limit;
-    user.B     = B;
-    user.B2    = mne_dot_vectors(B,B,nchan);
-    user.fwd   = NULL;
-    user.report_dim = FALSE;
-    fit->user  = &user;
 
-    VEC_COPY(rd_guess,guess->rr[best]);
-    VEC_COPY(rd_final,guess->rr[best]);
 
-    neval_tot = 0;
-    fit_fail = FALSE;
-    for (k = 0; k < ntol; k++) {
-        /*
-     * Do first pass with the sphere model
-     */
-        if (k == 0)
-            fit->funcs = fit->sphere_funcs;
-        else
-            fit->funcs = fit->bemname ? fit->bem_funcs : fit->sphere_funcs;
 
-        simplex = make_initial_dipole_simplex(rd_guess,size);
-        for (p = 0; p < 4; p++)
-            vals[p] = fit_eval(simplex[p],3,fit);
-        if (simplex_minimize(simplex,           /* The initial simplex */
-                             vals,              /* Function values at the vertices */
-                             3,	            /* Number of variables */
-                             ftol[k],           /* Relative convergence tolerance for the target function */
-                             atol[k],           /* Absolute tolerance for the change in the parameters */
-                             fit_eval,          /* The function to be evaluated */
-                             fit,	            /* Data to be passed to the above function in each evaluation */
-                             max_eval,          /* Maximum number of function evaluations */
-                             &neval,            /* Number of function evaluations */
-                             report_interval,   /* How often to report (-1 = no_reporting) */
-                             report_func) != OK) {
-            if (k == 0)
-                goto bad;
-            else {
-                printf("\nWarning (t = %8.1f ms) : g = %6.1f %% final val = %7.3f rtol = %f\n",
-                       1000*time,100*(1 - vals[0]/user.B2),vals[0],rtol(vals,4));
-                fit_fail = TRUE;
-            }
-        }
-        VEC_COPY(rd_final,simplex[0]);
-        VEC_COPY(rd_guess,simplex[0]);
-        FREE_CMATRIX(simplex); simplex = NULL;
-
-        neval_tot += neval;
-        final_val  = vals[0];
-    }
-    /*
-   * Confidence limits should be computed here
-   */
-    /*
-   * Compute the dipole moment at the final point
-   */
-    if (fit_Q(fit,user.B,rd_final,user.limit,Q,&ncomp,&final_val) == OK) {
-        res.time  = time;
-        res.valid = true;
-        for(int i = 0; i < 3; ++i)
-            res.rd[i] = rd_final[i];
-        for(int i = 0; i < 3; ++i)
-            res.Q[i] = Q[i];
-        res.good  = 1.0 - final_val/user.B2;
-        if (fit_fail)
-            res.good = -res.good;
-        res.khi2  = final_val;
-        if (fit->proj)
-            res.nfree = nchan-3-ncomp-fit->proj->nvec;
-        else
-            res.nfree = nchan-3-ncomp;
-        res.neval = neval_tot;
-    }
-    else
-        goto bad;
-    free_dipole_forward(user.fwd);
-    FREE_CMATRIX(simplex);
-
-    return true;
-
-bad : {
-        free_dipole_forward(user.fwd);
-        FREE_CMATRIX(simplex);
-        return false;
-    }
-}
 
 
 #define SEG_LEN 10.0
@@ -19287,7 +18525,7 @@ int fit_dipoles_raw(const QString&  dataname,
         /*
      * Fit
      */
-        if (!fit_one(fit,guess,time,one,verbose,dip))
+        if (!DipoleFitData::fit_one(fit,guess,time,one,verbose,dip))
             qWarning() << "Error";
         else {
             set.addEcd(dip);
@@ -19335,49 +18573,6 @@ int fit_dipoles_raw(const QString& dataname,
 }
 
 
-void print_fields(float       *rd,
-                  float       *Q,
-                  float       time,
-                  float       integ,
-                  DipoleFitData* fit,
-                  mneMeasData data)
-
-{
-    float *one = MALLOC(data->nchan,float);
-    int   k;
-    float **fwd = NULL;
-
-    if (mne_get_values_from_data(time,integ,data->current->data,data->current->np,data->nchan,data->current->tmin,
-                                 1.0/data->current->tstep,FALSE,one) == FAIL) {
-        fprintf(stderr,"Cannot pick time: %7.1f ms\n",1000*time);
-        return;
-    }
-    for (k = 0; k < data->nchan; k++)
-        if (data->chs[k].chpos.coil_type == FIFFV_COIL_CTF_REF_GRAD ||
-                data->chs[k].chpos.coil_type == FIFFV_COIL_CTF_OFFDIAG_REF_GRAD) {
-            printf("%g ",1e15*one[k]);
-        }
-    printf("\n");
-
-
-    fwd = ALLOC_CMATRIX(3,fit->nmeg+fit->neeg);
-    if (compute_dipole_field(fit,rd,FALSE,fwd) == FAIL)
-        goto out;
-
-    for (k = 0; k < data->nchan; k++)
-        if (data->chs[k].chpos.coil_type == FIFFV_COIL_CTF_REF_GRAD ||
-                data->chs[k].chpos.coil_type == FIFFV_COIL_CTF_OFFDIAG_REF_GRAD) {
-            printf("%g ",1e15*(Q[X]*fwd[X][k]+Q[Y]*fwd[Y][k]+Q[Z]*fwd[Z][k]));
-        }
-    printf("\n");
-
-out : {
-        FREE(one);
-        FREE_CMATRIX(fwd);
-    }
-    return;
-}
-
 
 int    fit_dipoles( const QString&  dataname,
                     mneMeasData     data,       /* The measured data */
@@ -19413,7 +18608,7 @@ int    fit_dipoles( const QString&  dataname,
             continue;
         }
 
-        if (!fit_one(fit,guess,time,one,verbose,dip))
+        if (!DipoleFitData::fit_one(fit,guess,time,one,verbose,dip))
             printf("t = %7.1f ms : %s\n",1000*time,"error (tbd: catch)");
         else {
             set.addEcd(dip);
