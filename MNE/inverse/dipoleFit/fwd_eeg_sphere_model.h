@@ -340,7 +340,7 @@ public:
 
 
 public:
-    char  *name;                        /**< Textual identifier */
+    QString name;                       /**< Textual identifier */
     QList<FwdEegSphereLayer>    layers; /**< An array of layers */
     float  r0[3];                       /**< The origin */
 
