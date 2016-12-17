@@ -95,13 +95,6 @@ using namespace Eigen;
 #endif
 
 
-#if defined(_WIN32) || defined(_WIN64)
-#define snprintf _snprintf
-#define vsnprintf _vsnprintf
-#define strcasecmp _stricmp
-#define strncasecmp _strnicmp
-#endif
-
 
 char *mne_strdup_2(const char *s)
 {
@@ -311,12 +304,12 @@ FwdEegSphereModel* FwdEegSphereModelSet::fwd_select_eeg_sphere_model(const QStri
     }
 
     for (k = 0; k < this->nmodel; k++) {
-        if (strcasecmp(this->models[k]->name,name.toLatin1().data()) == 0) {
-            fprintf(stderr,"Selected model: %s\n",this->models[k]->name);
+        if (this->models[k]->name.compare(name) == 0) {
+            fprintf(stderr,"Selected model: %s\n",this->models[k]->name.toLatin1().constData());
             return new FwdEegSphereModel(*(this->models[k]));
         }
     }
-    printf("EEG sphere model %s not found.",name.toLatin1().data());
+    printf("EEG sphere model %s not found.",name.toLatin1().constData());
     return NULL;
 }
 
@@ -333,7 +326,7 @@ void FwdEegSphereModelSet::fwd_list_eeg_sphere_models(FILE *f)
     fprintf(f,"Available EEG sphere models:\n");
     for (k = 0; k < this->nmodel; k++) {
         this_model = this->models[k];
-        fprintf(f,"\t%s : %d",this_model->name,this_model->nlayer());
+        fprintf(f,"\t%s : %d",this_model->name.toLatin1().constData(),this_model->nlayer());
         for (p = 0; p < this_model->nlayer(); p++)
             fprintf(f," : %7.3f : %7.3f",this_model->layers[p].rel_rad,this_model->layers[p].sigma);
         fprintf(f,"\n");

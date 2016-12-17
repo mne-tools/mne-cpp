@@ -208,31 +208,13 @@ void mne_free_dcmatrix_1 (double **m)
 }
 
 
-char *mne_strdup_1(const char *s)
-{
-    char *res;
-    if (s == NULL)
-        return NULL;
-    res = (char*) malloc(strlen(s)+1);
-    strcpy(res,s);
-    return res;
-}
-
-
-
-
-
-
-
-
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
 FwdEegSphereModel::FwdEegSphereModel()
-: name(NULL)
-, fn(NULL)
+: fn(NULL)
 , nterms  (0)
 , lambda  (NULL)
 , mu      (NULL)
@@ -251,8 +233,8 @@ FwdEegSphereModel::FwdEegSphereModel(const FwdEegSphereModel& p_FwdEegSphereMode
 {
     int k;
 
-    if (p_FwdEegSphereModel.name)
-        this->name = mne_strdup_1(p_FwdEegSphereModel.name);
+    if (!p_FwdEegSphereModel.name.isEmpty())
+        this->name = p_FwdEegSphereModel.name;
     if (p_FwdEegSphereModel.nlayer() > 0) {
         for (k = 0; k < p_FwdEegSphereModel.nlayer(); k++)
             this->layers.append(p_FwdEegSphereModel.layers[k]);
@@ -281,9 +263,6 @@ FwdEegSphereModel::FwdEegSphereModel(const FwdEegSphereModel& p_FwdEegSphereMode
 
 FwdEegSphereModel::~FwdEegSphereModel()
 {
-//    if (!m)
-//        return;
-    FREE(name);
 }
 
 
