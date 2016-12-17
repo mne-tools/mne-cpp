@@ -261,10 +261,79 @@ FwdEegSphereModel::FwdEegSphereModel(const FwdEegSphereModel& p_FwdEegSphereMode
 
 //*************************************************************************************************************
 
+FwdEegSphereModel* FwdEegSphereModel::fwd_create_eeg_sphere_model(const QString& name,
+                                                     int nlayer,
+                                                     const VectorXf& rads,
+                                                     const VectorXf& sigmas)
+/*
+      * Produce a new sphere model structure
+      */
+{
+    FwdEegSphereModel* new_model = new FwdEegSphereModel();
+
+    new_model->name   = name;
+
+    for (int k = 0; k < nlayer; k++) {
+        FwdEegSphereLayer layer;
+        layer.rad = layer.rel_rad = rads[k];
+        layer.sigma = sigmas[k];
+        new_model->layers.append(layer);
+    }
+    /*
+   * Sort...
+   */
+    qSort (new_model->layers.begin(), new_model->layers.end(), FwdEegSphereLayer::comp_layers);
+
+    /*
+   * Scale the radiuses
+   */
+    float R  = new_model->layers[nlayer-1].rad;
+    float rR = new_model->layers[nlayer-1].rel_rad;
+    for (int k = 0; k < nlayer; k++) {
+        new_model->layers[k].rad     = new_model->layers[k].rad/R;
+        new_model->layers[k].rel_rad = new_model->layers[k].rel_rad/rR;
+    }
+    return new_model;
+}
+
+
+//*************************************************************************************************************
+
 FwdEegSphereModel::~FwdEegSphereModel()
 {
 }
 
+
+//*************************************************************************************************************
+
+FwdEegSphereModel* FwdEegSphereModel::setup_eeg_sphere_model(const QString& eeg_model_file, QString eeg_model_name, float eeg_sphere_rad)
+{
+    FwdEegSphereModelSet* eeg_models = NULL;
+    FwdEegSphereModel*    eeg_model  = NULL;
+
+    if (eeg_model_name.isEmpty())
+        eeg_model_name = QString("Default");
+
+    eeg_models = FwdEegSphereModelSet::fwd_load_eeg_sphere_models(eeg_model_file,NULL);
+    eeg_models->fwd_list_eeg_sphere_models(stderr);
+
+    if ((eeg_model = eeg_models->fwd_select_eeg_sphere_model(eeg_model_name)) == NULL)
+        goto bad;
+
+    if (!eeg_model->fwd_setup_eeg_sphere_model(eeg_sphere_rad,true,3))
+        goto bad;
+    printf("Using EEG sphere model \"%s\" with scalp radius %7.1f mm\n",
+           eeg_model->name.toLatin1().constData(),1000*eeg_sphere_rad);
+    printf("\n");
+    FwdEegSphereModelSet::fwd_free_eeg_sphere_model_set(eeg_models);
+    return eeg_model;
+
+bad : {
+        FwdEegSphereModelSet::fwd_free_eeg_sphere_model_set(eeg_models);
+        delete eeg_model;
+        return NULL;
+    }
+}
 
 
 //*************************************************************************************************************
@@ -284,46 +353,6 @@ fitUser FwdEegSphereModel::new_fit_user(int nfit, int nterms)
     u->nfit   = nfit;
     u->nterms = nterms;
     return u;
-}
-
-
-//*************************************************************************************************************
-
-FwdEegSphereModel* FwdEegSphereModel::fwd_create_eeg_sphere_model(const QString& name,
-                                                     int nlayer,
-                                                     const VectorXf& rads,
-                                                     const VectorXf& sigmas)
-/*
-      * Produce a new sphere model structure
-      */
-{
-    FwdEegSphereModel* new_model = new FwdEegSphereModel();
-    int            k;
-    float          R,rR;
-
-    new_model->name   = name;
-
-    for (k = 0; k < nlayer; k++) {
-        FwdEegSphereLayer layer;
-        layer.rad = layer.rel_rad = rads[k];
-        layer.sigma = sigmas[k];
-        new_model->layers.append(layer);
-    }
-    /*
-   * Sort...
-   */
-    qSort (new_model->layers.begin(), new_model->layers.end(), FwdEegSphereLayer::comp_layers);
-
-    /*
-   * Scale the radiuses
-   */
-    R  = new_model->layers[nlayer-1].rad;
-    rR = new_model->layers[nlayer-1].rel_rad;
-    for (k = 0; k < nlayer; k++) {
-        new_model->layers[k].rad     = new_model->layers[k].rad/R;
-        new_model->layers[k].rel_rad = new_model->layers[k].rel_rad/rR;
-    }
-    return new_model;
 }
 
 
@@ -438,7 +467,7 @@ double FwdEegSphereModel::fwd_eeg_get_multi_sphere_model_coeff(int n)
 bool FwdEegSphereModel::fwd_eeg_spherepot_vec( float   *rd, float   **el, int neeg, float **Vval_vec, void *client)
 {
     FwdEegSphereModel* m = (FwdEegSphereModel*)client;
-    float fact = 0.25/M_PI;
+    float fact = 0.25f/M_PI;
     float a_vec[3];
     float a,a2,a3;
     float rrd,rd2,rd2_inv,r,r2,ra,rda;
@@ -596,7 +625,7 @@ int FwdEegSphereModel::fwd_eeg_spherepot(   float   *rd,       /* Dipole positio
       */
 {
     FwdEegSphereModel* m = (FwdEegSphereModel*)client;
-    float fact = 0.25/M_PI;
+    float fact = 0.25f/M_PI;
     float a_vec[3];
     float a,a2,a3;
     float rrd,rd2,rd2_inv,r,r2,ra,rda;
@@ -729,80 +758,34 @@ int FwdEegSphereModel::fwd_eeg_spherepot_coil(  float *rd, float *Q, FwdCoilSet*
 }
 
 
-//*************************************************************************************************************
-
-FwdEegSphereModel* FwdEegSphereModel::setup_eeg_sphere_model(const QString& eeg_model_file, QString eeg_model_name, float eeg_sphere_rad)
-{
-    FwdEegSphereModelSet* eeg_models = NULL;
-    FwdEegSphereModel*    eeg_model  = NULL;
-
-    if (eeg_model_name.isEmpty())
-        eeg_model_name = QString("Default");
-//    else
-//        eeg_model_name = mne_strdup(eeg_model_name);
-
-    eeg_models = FwdEegSphereModelSet::fwd_load_eeg_sphere_models(eeg_model_file,NULL);
-    eeg_models->fwd_list_eeg_sphere_models(stderr);
-
-    if ((eeg_model = eeg_models->fwd_select_eeg_sphere_model(eeg_model_name)) == NULL)
-        goto bad;
-
-    if (eeg_model->fwd_setup_eeg_sphere_model(eeg_sphere_rad,TRUE,3) == FAIL)
-        goto bad;
-    printf("Using EEG sphere model \"%s\" with scalp radius %7.1f mm\n",
-           eeg_model->name,1000*eeg_sphere_rad);
-    printf("\n");
-//    FREE(eeg_model_name);
-    FwdEegSphereModelSet::fwd_free_eeg_sphere_model_set(eeg_models);
-    return eeg_model;
-
-bad : {
-        FwdEegSphereModelSet::fwd_free_eeg_sphere_model_set(eeg_models);
-        delete eeg_model;
-//        FREE(eeg_model_name);
-        return NULL;
-    }
-}
-
 
 //*************************************************************************************************************
 // fwd_eeg_sphere_models.c
-int FwdEegSphereModel::fwd_setup_eeg_sphere_model(float rad, int fit_berg_scherg, int nfit)
+bool FwdEegSphereModel::fwd_setup_eeg_sphere_model(float rad, bool fit_berg_scherg, int nfit)
 {
-    static const int nterms = 200;
+    int nterms = 200;
     float  rv;
-    int    k;
 
     /*
     * Scale the relative radiuses
     */
-    for (k = 0; k < this->nlayer(); k++)
+    for (int k = 0; k < this->nlayer(); k++)
         this->layers[k].rad = rad*this->layers[k].rel_rad;
 
     if (fit_berg_scherg) {
-        if (this->fwd_eeg_fit_berg_scherg(nterms,nfit,&rv)) {
+        if (this->fwd_eeg_fit_berg_scherg(nterms,nfit,rv)) {
             fprintf(stderr,"Equiv. model fitting -> ");
             fprintf(stderr,"RV = %g %%\n",100*rv);
-            for (k = 0; k < nfit; k++)
-                fprintf(stderr,"mu%d = %g\tlambda%d = %g\n",
-                        k+1,this->mu[k],k+1,this->layers[this->nlayer()-1].sigma*this->lambda[k]);
+            for (int k = 0; k < nfit; k++)
+                fprintf(stderr,"mu%d = %g\tlambda%d = %g\n", k+1,this->mu[k],k+1,this->layers[this->nlayer()-1].sigma*this->lambda[k]);
         }
         else
-            goto bad;
+            return false;
     }
 
-    fprintf(stderr,"Defined EEG sphere model with rad = %7.2f mm\n",
-            1000.0*rad);
-    return OK;
-
-bad :
-    return FAIL;
+    fprintf(stderr,"Defined EEG sphere model with rad = %7.2f mm\n", 1000.0*rad);
+    return true;
 }
-
-
-
-
-
 
 
 
@@ -930,7 +913,6 @@ static double tryit (MatrixXd& p,
 
 {
     int ndim = p.cols();
-    int j;
     double fac1,fac2,ytry;
 
     VectorXd ptry(ndim);
@@ -1278,7 +1260,7 @@ double FwdEegSphereModel::one_step (const VectorXd& mu, const void *user_data)
 bool FwdEegSphereModel::fwd_eeg_fit_berg_scherg(int   nterms,              /* Number of terms to use in the series expansion
                                                                                     * when fitting the parameters */
                             int   nfit,	               /* Number of equivalent dipoles to fit */
-                            float *rv)
+                            float &rv)
 /*
       * This routine fits the Berg-Scherg equivalent spherical model
       * dipole parameters by minimizing the difference between the
@@ -1301,7 +1283,7 @@ bool FwdEegSphereModel::fwd_eeg_fit_berg_scherg(int   nterms,              /* Nu
 
     if (nfit < 2) {
         printf("fwd_fit_berg_scherg does not work with less than two equivalent sources.");
-        return FAIL;
+        return false;
     }
 
     /*
@@ -1376,11 +1358,11 @@ bool FwdEegSphereModel::fwd_eeg_fit_berg_scherg(int   nterms,              /* Nu
     /*
    * (6) Do the final step: calculation of the linear parameters
    */
-    *rv = compute_linear_parameters(mu,lambda,u);
+    rv = compute_linear_parameters(mu,lambda,u);
 
     sort_parameters(mu,lambda,nfit);
 #ifdef LOG_FIT
-    fprintf(stderr,"RV = %g %%\n",100*(*rv));
+    fprintf(stderr,"RV = %g %%\n",100*rv);
 #endif
     this->mu.resize(nfit);
     this->lambda.resize(nfit);
