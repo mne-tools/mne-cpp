@@ -89,6 +89,8 @@ typedef struct {
 } *dipoleFitFuncs,dipoleFitFuncsRec;
 
 
+
+
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE NAMESPACE INVERSELIB
@@ -101,6 +103,10 @@ namespace INVERSELIB
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
+
+class GuessData;
+class ECD;
+
 
 
 //=============================================================================================================
@@ -126,6 +132,53 @@ public:
     * Destructs the Dipole Fit Data
     */
     virtual ~DipoleFitData();
+
+
+
+    static bool fit_one(DipoleFitData* fit,	            /* Precomputed fitting data */
+                        GuessData*     guess,	            /* The initial guesses */
+                        float         time,              /* Which time is it? */
+                        float         *B,	            /* The field to fit */
+                        int           verbose,
+                        ECD&          res               /* The fitted dipole */
+                        );
+
+
+
+//============================= dipole_forward.c
+
+    static int compute_dipole_field(DipoleFitData* d, float *rd, int whiten, float **fwd);
+
+    //============================= dipole_forward.c
+
+
+
+    static DipoleForward* dipole_forward_one(DipoleFitData* d,
+                                     float         *rd,
+                                     DipoleForward* old);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 public:
       fiffCoordTrans    mri_head_t;         /**< MRI <-> head coordinate transformation */

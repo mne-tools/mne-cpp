@@ -70,6 +70,9 @@ namespace INVERSELIB
 {
 
 
+class DipoleFitData;
+
+
 //=============================================================================================================
 /**
 * Implements GuessData (Replaces *guessData,guessDataRec struct of MNE-C fit_types.h).
@@ -101,6 +104,21 @@ public:
     * Destroys the Guess Data description
     */
     ~GuessData();
+
+
+
+
+
+    static int compute_guess_fields(GuessData* guess,
+                             DipoleFitData* f);
+    /*
+          * Once the guess locations have been set up we can compute the fields
+          */
+
+
+
+
+
 
 public:
     float          **rr;            /**< These are the guess dipole locations */
