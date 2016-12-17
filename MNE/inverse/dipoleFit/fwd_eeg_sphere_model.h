@@ -145,7 +145,7 @@ public:
     /*
           * Produce a new sphere model structure
           */
-    static FwdEegSphereModel* fwd_create_eeg_sphere_model(const char *name,
+    static FwdEegSphereModel* fwd_create_eeg_sphere_model(const QString& name,
                                                          int nlayer,
                                                          const Eigen::VectorXf& rads,
                                                          const Eigen::VectorXf& sigmas);

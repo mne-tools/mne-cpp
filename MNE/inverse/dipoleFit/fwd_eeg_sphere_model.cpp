@@ -289,7 +289,7 @@ fitUser FwdEegSphereModel::new_fit_user(int nfit, int nterms)
 
 //*************************************************************************************************************
 
-FwdEegSphereModel* FwdEegSphereModel::fwd_create_eeg_sphere_model(const char *name,
+FwdEegSphereModel* FwdEegSphereModel::fwd_create_eeg_sphere_model(const QString& name,
                                                      int nlayer,
                                                      const VectorXf& rads,
                                                      const VectorXf& sigmas)
@@ -301,7 +301,7 @@ FwdEegSphereModel* FwdEegSphereModel::fwd_create_eeg_sphere_model(const char *na
     int            k;
     float          R,rR;
 
-    new_model->name   = mne_strdup_1(name);
+    new_model->name   = name;
 
     for (k = 0; k < nlayer; k++) {
         FwdEegSphereLayer layer;
