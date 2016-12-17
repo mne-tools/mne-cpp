@@ -113,16 +113,17 @@ public:
     //=========================================================================================================
     /**
     * Destroys the Forward EEG Sphere Model Set description
+    * Refactored: fwd_free_eeg_sphere_model_set
     */
     ~FwdEegSphereModelSet();
 
 
-    //ToDo move to destructor
-    static void fwd_free_eeg_sphere_model_set(FwdEegSphereModelSet* s);
+//    //ToDo move to destructor
+//    static void fwd_free_eeg_sphere_model_set(FwdEegSphereModelSet* s);
 
 
 
-    static FwdEegSphereModelSet* fwd_new_eeg_sphere_model_set();
+//    static FwdEegSphereModelSet* fwd_new_eeg_sphere_model_set();
 
 
     /*
