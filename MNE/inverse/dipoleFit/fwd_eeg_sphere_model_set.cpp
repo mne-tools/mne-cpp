@@ -153,13 +153,11 @@ FwdEegSphereModelSet::~FwdEegSphereModelSet()
 void FwdEegSphereModelSet::fwd_free_eeg_sphere_model_set(FwdEegSphereModelSet* s)
 
 {
-    int k;
     if (!s)
         return;
-    for (k = 0; k < s->nmodel; k++)
+    for (int k = 0; k < s->nmodel(); k++)
         delete s->models[k];
-    FREE_2(s->models);
-    FREE_2(s);
+    delete s;
 
     return;
 }
@@ -169,10 +167,8 @@ void FwdEegSphereModelSet::fwd_free_eeg_sphere_model_set(FwdEegSphereModelSet* s
 
 FwdEegSphereModelSet* FwdEegSphereModelSet::fwd_new_eeg_sphere_model_set()
 {
-    FwdEegSphereModelSet* s = MALLOC_2(1,FwdEegSphereModelSet);
+    FwdEegSphereModelSet* s = new FwdEegSphereModelSet;
 
-    s->models  = NULL;
-    s->nmodel  = 0;
     return s;
 }
 
@@ -184,8 +180,7 @@ FwdEegSphereModelSet* FwdEegSphereModelSet::fwd_add_to_eeg_sphere_model_set(FwdE
     if (!s)
         s = fwd_new_eeg_sphere_model_set();
 
-    s->models = REALLOC_2(s->models,s->nmodel+1,FwdEegSphereModel*);
-    s->models[s->nmodel++] = m;
+    s->models.append(m);
     return s;
 }
 
@@ -298,12 +293,12 @@ FwdEegSphereModel* FwdEegSphereModelSet::fwd_select_eeg_sphere_model(const QStri
     if (!p_sName.isEmpty())
         name = p_sName;
 
-    if (this->nmodel == 0) {
+    if (this->nmodel() == 0) {
         printf("No EEG sphere model definitions available");
         return NULL;
     }
 
-    for (k = 0; k < this->nmodel; k++) {
+    for (k = 0; k < this->nmodel(); k++) {
         if (this->models[k]->name.compare(name) == 0) {
             fprintf(stderr,"Selected model: %s\n",this->models[k]->name.toLatin1().constData());
             return new FwdEegSphereModel(*(this->models[k]));
@@ -321,10 +316,10 @@ void FwdEegSphereModelSet::fwd_list_eeg_sphere_models(FILE *f)
     int k,p;
     FwdEegSphereModel* this_model;
 
-    if ( this->nmodel < 0 )
+    if ( this->nmodel() < 0 )
         return;
     fprintf(f,"Available EEG sphere models:\n");
-    for (k = 0; k < this->nmodel; k++) {
+    for (k = 0; k < this->nmodel(); k++) {
         this_model = this->models[k];
         fprintf(f,"\t%s : %d",this_model->name.toLatin1().constData(),this_model->nlayer());
         for (p = 0; p < this_model->nlayer(); p++)
