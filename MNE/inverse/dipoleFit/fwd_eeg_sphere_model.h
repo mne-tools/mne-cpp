@@ -247,7 +247,7 @@ public:
     *
     * @return true when successful
     */
-    static int fwd_eeg_spherepot( float *rd, float *Q, float **el, int neeg, float *Vval, void *client);
+    static int fwd_eeg_spherepot( float *rd, float *Q, float **el, int neeg, Eigen::VectorXf& Vval, void *client);
 
 
     //=========================================================================================================

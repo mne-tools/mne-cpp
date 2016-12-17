@@ -615,7 +615,7 @@ int FwdEegSphereModel::fwd_eeg_spherepot(   float   *rd,       /* Dipole positio
                                             float   *Q,	 /* Dipole moment */
                                             float   **el,	 /* Electrode positions */
                                             int     neeg,	 /* Number of electrodes */
-                                            float   *Vval,	 /* The potential values */
+                                            VectorXf& Vval,	 /* The potential values */
                                             void    *client)
 /*
       * This routine calculates the potentials for a specific dipole direction
@@ -731,7 +731,8 @@ int FwdEegSphereModel::fwd_eeg_spherepot(   float   *rd,       /* Dipole positio
 // fwd_multi_spherepot.c
 int FwdEegSphereModel::fwd_eeg_spherepot_coil(  float *rd, float *Q, FwdCoilSet* els, float *Vval, void *client)
 {
-    float *vval_one = NULL,val;
+    VectorXf vval_one;
+    float val;
     int   nvval = 0;
     int   k,c;
     FwdCoil* el;
@@ -740,11 +741,10 @@ int FwdEegSphereModel::fwd_eeg_spherepot_coil(  float *rd, float *Q, FwdCoilSet*
         el = els->coils[k];
         if (el->coil_class == FWD_COILC_EEG) {
             if (el->np > nvval) {
-                vval_one = REALLOC_1(vval_one,el->np,float);
+                vval_one.resize(el->np);
                 nvval = el->np;
             }
             if (fwd_eeg_spherepot(rd,Q,el->rmag,el->np,vval_one,client) != OK) {
-                free(vval_one);
                 return FAIL;
             }
             for (c = 0, val = 0.0; c < el->np; c++)
@@ -753,7 +753,6 @@ int FwdEegSphereModel::fwd_eeg_spherepot_coil(  float *rd, float *Q, FwdCoilSet*
         }
         Vval++;
     }
-    free(vval_one);
     return OK;
 }
 
