@@ -105,26 +105,20 @@ public:
     */
     ~GuessData();
 
-
-
-
-
-    static int compute_guess_fields(GuessData* guess,
-                             DipoleFitData* f);
-    /*
-          * Once the guess locations have been set up we can compute the fields
-          */
-
-
-
-
-
+    //=========================================================================================================
+    /**
+    * Once the guess locations have been set up we can compute the fields
+    *
+    * @param[in] f      Dipole Fit Data to the Compute Guess Fields
+    *
+    * @return true when successful
+    */
+    bool compute_guess_fields(DipoleFitData* f);
 
 public:
     float          **rr;            /**< These are the guess dipole locations */
     DipoleForward** guess_fwd;      /**< Forward solutions for the guesses */
     int            nguess;          /**< How many sources */
-
 
 // ### OLD STRUCT ###
 //    typedef struct {
