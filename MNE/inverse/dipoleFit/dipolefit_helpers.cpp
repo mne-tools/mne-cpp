@@ -7219,7 +7219,7 @@ mneCTFcompDataSet mne_read_ctf_comp_data(const QString& name)
         one->calibrated          = calibrated;
 
         if (mne_calibrate_ctf_comp(one,set->chs,set->nch,TRUE) == FAIL) {
-            printf("Warning: %s Compensation data for '%s' omitted\n");//,err_get_error(),mne_explain_ctf_comp(one->kind));
+            printf("Warning: Compensation data for '%s' omitted\n", mne_explain_ctf_comp(one->kind));//,err_get_error(),mne_explain_ctf_comp(one->kind));
             mne_free_ctf_comp_data(one);
         }
         else {
@@ -10070,7 +10070,7 @@ static mneSurface read_bem_surface( const QString& name,    /* Filename */
     }
     surfs = fiff_dir_tree_find(in->dirtree,FIFFB_BEM_SURF);
     if (surfs == NULL || surfs[0] == NULL) {
-        printf ("No BEM surfaces found in %s",name);
+        printf ("No BEM surfaces found in %s",name.toLatin1().constData());
         goto bad;
     }
     if (which >= 0) {
@@ -10089,7 +10089,7 @@ static mneSurface read_bem_surface( const QString& name,    /* Filename */
             }
         }
         if (id != which) {
-            printf("Desired surface not found in %s",name);
+            printf("Desired surface not found in %s",name.toLatin1().constData());
             goto bad;
         }
     }
@@ -10167,7 +10167,7 @@ static mneSurface read_bem_surface( const QString& name,    /* Filename */
                 goto bad;
         }
     }
-    else if (s->nn == NULL) {			/* Normals only */
+    else if (s->nn == NULL) {       /* Normals only */
         if (mne_add_vertex_normals(s) != OK)
             goto bad;
     }
