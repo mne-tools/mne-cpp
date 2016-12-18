@@ -40,7 +40,7 @@
 //=============================================================================================================
 
 #include "layoutmaker.h"
-#include "minimizersimplex.h"
+#include "simplex_algorithm.h"
 #include "sphere.h"
 
 
