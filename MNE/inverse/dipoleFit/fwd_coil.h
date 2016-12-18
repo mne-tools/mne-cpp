@@ -102,20 +102,23 @@ public:
     //=========================================================================================================
     /**
     * Constructs the Forward Coil
+    * Refactored: fwd_new_coil
     */
-    FwdCoil();
+    FwdCoil(int p_np);
 
-//    //=========================================================================================================
-//    /**
-//    * Copy constructor.
-//    *
-//    * @param[in] p_FwdCoil      FwdCoil which should be copied
-//    */
-//    FwdCoil(const FwdCoil& p_FwdCoil);
+    //=========================================================================================================
+    /**
+    * Copy constructor.
+    * Refactored: fwd_dup_coil
+    *
+    * @param[in] p_FwdCoil      FwdCoil which should be copied
+    */
+    FwdCoil(const FwdCoil& p_FwdCoil);
 
     //=========================================================================================================
     /**
     * Destroys the Forward Coil description
+    * Refactored: fwd_free_coil
     */
     ~FwdCoil();
 

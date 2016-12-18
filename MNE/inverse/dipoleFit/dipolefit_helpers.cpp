@@ -2945,97 +2945,7 @@ fiffCoordTrans mne_read_meas_transform(const QString& name)
 
 
 
-/*
- * This is the old interface which should be eventually deleted
- */
-static FwdCoil*    fwd_new_coil(int np)
 
-{
-    FwdCoil* res = MALLOC(1,FwdCoil);
-    int     k;
-
-    res->chname     = NULL;
-    res->desc       = NULL;
-    res->coil_class = FWD_COILC_UNKNOWN;
-    res->accuracy   = FWD_COIL_ACCURACY_POINT;
-    res->base       = 0.0;
-    res->size       = 0.0;
-    res->np         = np;
-    res->rmag       = ALLOC_CMATRIX(np,3);
-    res->cosmag     = ALLOC_CMATRIX(np,3);
-    res->w          = MALLOC(np,float);
-    /*
-   * Reasonable defaults
-   */
-    for (k = 0; k < 3; k++) {
-        res->r0[k] = 0.0;
-        res->ex[k] = 0.0;
-        res->ey[k] = 0.0;
-        res->ez[k] = 0.0;
-    }
-    res->ex[0] = 1.0;
-    res->ey[1] = 1.0;
-    res->ez[2] = 1.0;
-
-    return res;
-}
-
-static void fwd_free_coil(FwdCoil* coil)
-
-{
-    if (!coil)
-        return;
-
-    FREE(coil->chname);
-    FREE(coil->desc);
-    FREE_CMATRIX(coil->rmag);
-    FREE_CMATRIX(coil->cosmag);
-    FREE(coil->w);
-    FREE(coil);
-}
-
-
-FwdCoilSet* fwd_new_coil_set()
-
-{
-    FwdCoilSet* s = MALLOC(1,FwdCoilSet);
-
-    s->coils = NULL;
-    s->ncoil = 0;
-    s->coord_frame = FIFFV_COORD_UNKNOWN;
-    s->user_data = NULL;
-    s->user_data_free = NULL;
-    return s;
-}
-
-void fwd_free_coil_set_user_data(FwdCoilSet* set)
-
-{
-    if (!set)
-        return;
-    if (set->user_data_free && set->user_data)
-        set->user_data_free(set->user_data);
-    set->user_data = NULL;
-    return;
-}
-
-void fwd_free_coil_set(FwdCoilSet* set)
-
-{
-    int k;
-
-    if (!set)
-        return;
-
-    for (k = 0; k < set->ncoil; k++)
-        fwd_free_coil(set->coils[k]);
-    FREE(set->coils);
-
-    fwd_free_coil_set_user_data(set);
-
-    FREE(set);
-    return;
-}
 
 int fwd_is_axial_coil(FwdCoil* coil)
 
@@ -3165,7 +3075,7 @@ static FwdCoil* fwd_add_coil_to_set(FwdCoilSet* set,
     }
 
     set->coils = REALLOC(set->coils,set->ncoil+1,FwdCoil*);
-    def = set->coils[set->ncoil++] = fwd_new_coil(np);
+    def = set->coils[set->ncoil++] = new FwdCoil(np);
 
     def->type       = type;
     def->coil_class = coil_class;
@@ -3309,7 +3219,7 @@ FwdCoilSet* fwd_read_coil_defs(const char *name)
         goto bad;
     }
 
-    res = fwd_new_coil_set();
+    res = new FwdCoilSet();
     while (1) {
         /*
      * Read basic info
@@ -3370,7 +3280,7 @@ FwdCoilSet* fwd_read_coil_defs(const char *name)
     return res;
 
 bad : {
-        fwd_free_coil_set(res);
+        delete res;
         FREE(desc);
         return NULL;
     }
@@ -3412,7 +3322,7 @@ FwdCoil* fwd_create_meg_coil(FwdCoilSet*     set,      /* These are the availabl
     /*
    * Create the result
    */
-    res = fwd_new_coil(def->np);
+    res = new FwdCoil(def->np);
 
     res->chname   = mne_strdup(ch->ch_name);
     if (def->desc)
@@ -3464,7 +3374,7 @@ FwdCoilSet* fwd_create_meg_coils(FwdCoilSet*      set,      /* These are the ava
                                 fiffCoordTrans t)	  /* Transform the points using this */
 
 {
-    FwdCoilSet* res = fwd_new_coil_set();
+    FwdCoilSet* res = new FwdCoilSet();
     FwdCoil*    next;
     int        k;
 
@@ -3479,7 +3389,7 @@ FwdCoilSet* fwd_create_meg_coils(FwdCoilSet*      set,      /* These are the ava
     return res;
 
 bad : {
-        fwd_free_coil_set(res);
+        delete res;
         return NULL;
     }
 }
@@ -3505,9 +3415,9 @@ FwdCoil* fwd_create_eeg_el(fiffChInfo     ch,         /* Channel information to 
     }
 
     if (VEC_LEN(ch->chpos.ex) < 1e-4)
-        res = fwd_new_coil(1);	             /* No reference electrode */
+        res = new FwdCoil(1);	             /* No reference electrode */
     else
-        res = fwd_new_coil(2);		     /* Reference electrode present */
+        res = new FwdCoil(2);		     /* Reference electrode present */
 
     res->chname     = mne_strdup(ch->ch_name);
     res->desc       = mne_strdup("EEG electrode");
@@ -3555,7 +3465,7 @@ FwdCoilSet* fwd_create_eeg_els(fiffChInfo      chs,      /* Channel information 
                               fiffCoordTrans t)	 /* Transform the points using this */
 
 {
-    FwdCoilSet* res = fwd_new_coil_set();
+    FwdCoilSet* res = new FwdCoilSet();
     FwdCoil*    next;
     int        k;
 
@@ -3570,49 +3480,12 @@ FwdCoilSet* fwd_create_eeg_els(fiffChInfo      chs,      /* Channel information 
     return res;
 
 bad : {
-        fwd_free_coil_set(res);
+        delete res;
         return NULL;
     }
 }
 
 
-
-FwdCoil* fwd_dup_coil(FwdCoil* c)
-/*
- * Make a carbon copy
- */
-{
-    FwdCoil* res;
-    int p;
-    /*
-   * Create the result
-   */
-    res = fwd_new_coil(c->np);
-
-    if (c->chname)
-        res->chname   = mne_strdup(c->chname);
-    if (c->desc)
-        res->desc   = mne_strdup(c->desc);
-    res->coil_class = c->coil_class;
-    res->accuracy   = c->accuracy;
-    res->base       = c->base;
-    res->size       = c->size;
-    res->type       = c->type;
-
-    VEC_COPY(res->r0,c->r0);
-    VEC_COPY(res->ex,c->ex);
-    VEC_COPY(res->ey,c->ey);
-    VEC_COPY(res->ez,c->ez);
-
-    for (p = 0; p < c->np; p++) {
-        res->w[p] = c->w[p];
-        VEC_COPY(res->rmag[p],c->rmag[p]);
-        VEC_COPY(res->cosmag[p],c->cosmag[p]);
-    }
-    res->coord_frame = c->coord_frame;
-
-    return res;
-}
 
 
 
@@ -3636,7 +3509,7 @@ FwdCoilSet* fwd_dup_coil_set(FwdCoilSet* s,
             return NULL;
         }
     }
-    res = fwd_new_coil_set();
+    res = new FwdCoilSet();
     if (t)
         res->coord_frame = t->to;
     else
@@ -3646,7 +3519,7 @@ FwdCoilSet* fwd_dup_coil_set(FwdCoilSet* s,
     res->ncoil = s->ncoil;
 
     for (k = 0; k < s->ncoil; k++) {
-        coil = res->coils[k] = fwd_dup_coil(s->coils[k]);
+        coil = res->coils[k] = new FwdCoil(*(s->coils[k]));
         /*
      * Optional coordinate transformation
      */
@@ -12229,7 +12102,6 @@ int fwd_bem_specify_els(fwdBemModel m,
 
     extern fwdBemSolution fwd_bem_new_coil_solution();
     extern void fwd_bem_free_coil_solution(void *user);
-    extern void fwd_free_coil_set_user_data(FwdCoilSet* set);
 
     if (!m) {
         printf("Model missing in fwd_bem_specify_els");
@@ -12241,7 +12113,7 @@ int fwd_bem_specify_els(fwdBemModel m,
     }
     if (!els || els->ncoil == 0)
         return OK;
-    fwd_free_coil_set_user_data(els);
+    els->fwd_free_coil_set_user_data();
     /*
    * Hard work follows
    */
@@ -12305,7 +12177,7 @@ int fwd_bem_specify_els(fwdBemModel m,
     return OK;
 
 bad : {
-        fwd_free_coil_set_user_data(els);
+        els->fwd_free_coil_set_user_data();
         return FAIL;
     }
 }
@@ -12741,7 +12613,7 @@ float **fwd_bem_field_coeff(fwdBemModel m,	/* The model */
         }
         off = off + ntri;
     }
-    fwd_free_coil_set(tcoils);
+    delete tcoils;
     return coeff;
 }
 
@@ -13004,7 +12876,7 @@ float **fwd_bem_lin_field_coeff (fwdBemModel m,	        /* The model */
     /*
    * Discard the duplicate
    */
-    fwd_free_coil_set(tcoils);
+    delete tcoils;
     return (coeff);
 }
 
@@ -13027,7 +12899,7 @@ int fwd_bem_specify_coils(fwdBemModel m,
         printf("Solution not computed in fwd_bem_specify_coils");
         goto bad;
     }
-    fwd_free_coil_set_user_data(coils);
+    coils->fwd_free_coil_set_user_data();
     if (!coils || coils->ncoil == 0)
         return OK;
     if (m->bem_method == FWD_BEM_CONSTANT_COLL)
@@ -13284,7 +13156,7 @@ void fwd_free_comp_data(void *d)
 
     if (!comp)
         return;
-    fwd_free_coil_set(comp->comp_coils);
+    delete comp->comp_coils;
     mne_free_ctf_comp_data_set(comp->set);
     FREE(comp->work);
     FREE_CMATRIX(comp->vec_work);
@@ -14288,8 +14160,8 @@ void free_dipole_fit_data(DipoleFitData* d)
     FREE(d->mri_head_t);
     FREE(d->meg_head_t);
     FREE(d->chs);
-    fwd_free_coil_set(d->meg_coils);
-    fwd_free_coil_set(d->eeg_els);
+    delete d->meg_coils;
+    delete d->eeg_els;
     FREE(d->bemname);
     mne_free_cov(d->noise);
     mne_free_cov(d->noise_orig);
@@ -15129,16 +15001,16 @@ DipoleFitData* setup_dipole_fit_data(   const QString& mriname,         /**< Thi
     }
 
     mne_free_name_list(badlist,nbad);
-    fwd_free_coil_set(templates);
-    fwd_free_coil_set(comp_coils);
+    delete templates;
+    delete comp_coils;
     mne_free_ctf_comp_data_set(comp_data);
     return res;
 
 
 bad : {
         mne_free_name_list(badlist,nbad);
-        fwd_free_coil_set(templates);
-        fwd_free_coil_set(comp_coils);
+        delete templates;
+        delete comp_coils;
         mne_free_ctf_comp_data_set(comp_data);
         free_dipole_fit_data(res);
         return NULL;

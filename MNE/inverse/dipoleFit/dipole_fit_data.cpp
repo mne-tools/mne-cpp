@@ -606,47 +606,6 @@ DipoleFitData::~DipoleFitData()
 //============================= dipole_forward.c =============================
 
 
-DipoleForward* new_dipole_forward()
-
-{
-    DipoleForward* res = MALLOC_3(1,DipoleForward);
-
-    res->rd     = NULL;
-    res->fwd    = NULL;
-    res->scales = NULL;
-    res->uu     = NULL;
-    res->vv     = NULL;
-    res->sing   = NULL;
-    res->nch    = 0;
-    res->ndip   = 0;
-
-    return res;
-}
-
-
-
-
-void free_dipole_forward ( DipoleForward* f )
-{
-    if (!f)
-        return;
-    FREE_CMATRIX_3(f->rd);
-    FREE_CMATRIX_3(f->fwd);
-    FREE_CMATRIX_3(f->uu);
-    FREE_CMATRIX_3(f->vv);
-    FREE_3(f->sing);
-    FREE_3(f->scales);
-    FREE_3(f);
-    return;
-}
-
-
-
-
-
-
-
-
 void print_fields(float       *rd,
                   float       *Q,
                   float       time,
@@ -726,8 +685,8 @@ DipoleForward* dipole_forward(DipoleFitData* d,
         res = old;
     }
     else {
-        free_dipole_forward(old); old = NULL;
-        res = new_dipole_forward();
+        delete old; old = NULL;
+        res = new DipoleForward;
         res->fwd  = ALLOC_CMATRIX_3(3*ndip,d->nmeg+d->neeg);
         res->uu   = ALLOC_CMATRIX_3(3*ndip,d->nmeg+d->neeg);
         res->vv   = ALLOC_CMATRIX_3(3*ndip,3);
@@ -789,7 +748,7 @@ DipoleForward* dipole_forward(DipoleFitData* d,
 
 bad : {
         if (!old)
-            free_dipole_forward(res);
+            delete res;
         return NULL;
     }
 }
@@ -1003,7 +962,7 @@ static int fit_Q(DipoleFitData* fit,	     /* The fit data */
         Q[c] = fwd->scales[c]*Q[c];
     *res = mne_dot_vectors_3(B,B,fwd->nch) - Bm2;
 
-    free_dipole_forward(fwd);
+    delete fwd;
 
     return OK;
 }
@@ -1338,13 +1297,13 @@ bool DipoleFitData::fit_one(DipoleFitData* fit,	            /* Precomputed fitti
     }
     else
         goto bad;
-    free_dipole_forward(user.fwd);
+    delete user.fwd;
     FREE_CMATRIX_3(simplex);
 
     return true;
 
 bad : {
-        free_dipole_forward(user.fwd);
+        delete user.fwd;
         FREE_CMATRIX_3(simplex);
         return false;
     }

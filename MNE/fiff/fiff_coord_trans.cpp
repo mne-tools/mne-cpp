@@ -245,7 +245,7 @@ FiffCoordTrans FiffCoordTrans::make(int from, int to, const Matrix3f& rot, const
 
 bool FiffCoordTrans::addInverse(FiffCoordTrans &t)
 {
-    t.invtrans = t.trans.inverse();
+    t.invtrans = t.trans.inverse().eval();
     return true;
 }
 
