@@ -471,7 +471,7 @@ double FwdEegSphereModel::fwd_eeg_get_multi_sphere_model_coeff(int n)
 bool FwdEegSphereModel::fwd_eeg_spherepot_vec( float   *rd, float   **el, int neeg, float **Vval_vec, void *client)
 {
     FwdEegSphereModel* m = (FwdEegSphereModel*)client;
-    float fact = 0.25f/M_PI;
+    float fact = 0.25f/(float)M_PI;
     float a_vec[3];
     float a,a2,a3;
     float rrd,rd2,rd2_inv,r,r2,ra,rda;
@@ -1202,15 +1202,15 @@ bool FwdEegSphereModel::fwd_eeg_fit_berg_scherg(int   nterms,              /* Nu
     /*
    * (5) Do the nonlinear minimization
    */
-    if (!(res = SimplexAlgorithm::simplex_minimize( simplex,
-                                                    func_val,
-                                                    ftol,
-                                                    one_step,
-                                                    u,
-                                                    max_eval,
-                                                    neval,
-                                                    report,
-                                                    report_fit)))
+    if (!(res = SimplexAlgorithm::simplex_minimize<double>( simplex,
+                                                            func_val,
+                                                            ftol,
+                                                            one_step,
+                                                            u,
+                                                            max_eval,
+                                                            neval,
+                                                            report,
+                                                            report_fit)))
         goto out;
 
     for (k = 0; k < nfit; k++)

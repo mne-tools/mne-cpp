@@ -89,8 +89,7 @@ SOURCES += \
     spectrogram.cpp \
     warp.cpp \
     filterTools/sphara.cpp \
-    sphere.cpp \
-    simplex_algorithm.cpp
+    sphere.cpp
 
 HEADERS += \
     kmeans.h\
