@@ -81,7 +81,6 @@ SOURCES += \
     mp/atom.cpp \
     mp/fixdictmp.cpp \
     selectionio.cpp \
-    minimizersimplex.cpp \
     filterTools/cosinefilter.cpp \
     filterTools/parksmcclellan.cpp \
     filterTools/filterdata.cpp \
@@ -90,7 +89,8 @@ SOURCES += \
     spectrogram.cpp \
     warp.cpp \
     filterTools/sphara.cpp \
-    sphere.cpp
+    sphere.cpp \
+    simplex_algorithm.cpp
 
 HEADERS += \
     kmeans.h\
@@ -104,7 +104,6 @@ HEADERS += \
     mp/fixdictmp.h \
     selectionio.h \
     layoutmaker.h \
-    minimizersimplex.h \
     filterTools/cosinefilter.h \
     filterTools/parksmcclellan.h \
     filterTools/filterdata.h \
@@ -113,7 +112,8 @@ HEADERS += \
     spectrogram.h \
     warp.h \
     filterTools/sphara.h \
-    sphere.h
+    sphere.h \
+    simplex_algorithm.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

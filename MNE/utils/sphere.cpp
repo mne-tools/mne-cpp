@@ -39,7 +39,7 @@
 //=============================================================================================================
 
 #include "sphere.h"
-#include "minimizersimplex.h"
+#include "simplex_algorithm.h"
 
 
 //*************************************************************************************************************
@@ -167,7 +167,7 @@ bool Sphere::fit_sphere_to_points ( const MatrixXf &rr, float simplex_size, Vect
     user.report = false;
 
     //Start the minimization
-    if(!MinimizerSimplex::mne_simplex_minimize( init_simplex,   /* The initial simplex */
+    if(!SimplexAlgorithm::simplex_minimize( init_simplex,   /* The initial simplex */
                                                 init_vals,      /* Function values at the vertices */
                                                 ftol,           /* Relative convergence tolerance */
                                                 fit_eval,       /* The function to be evaluated */

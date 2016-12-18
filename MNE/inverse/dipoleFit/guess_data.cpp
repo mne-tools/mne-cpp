@@ -43,9 +43,7 @@
 
 
 
-
-
-
+//ToDo remove later on
 #ifndef TRUE
 #define TRUE 1
 #endif
@@ -61,8 +59,6 @@
 #ifndef OK
 #define OK 0
 #endif
-
-
 
 
 //*************************************************************************************************************
@@ -108,11 +104,11 @@ bool GuessData::compute_guess_fields(DipoleFitData* f)
 
     if (!f) {
         qCritical("Data missing in compute_guess_fields");
-        goto bad;
+        return false;
     }
     if (!f->noise) {
         qCritical("Noise covariance missing in compute_guess_fields");
-        goto bad;
+        return false;
     }
     printf("Go through all guess source locations...");
     orig = f->funcs;
@@ -121,8 +117,11 @@ bool GuessData::compute_guess_fields(DipoleFitData* f)
     else
         f->funcs = f->sphere_funcs;
     for (int k = 0; k < this->nguess; k++) {
-        if ((this->guess_fwd[k] = DipoleFitData::dipole_forward_one(f,this->rr[k],this->guess_fwd[k])) == NULL)
-            goto bad;
+        if ((this->guess_fwd[k] = DipoleFitData::dipole_forward_one(f,this->rr[k],this->guess_fwd[k])) == NULL){
+            if (orig)
+                f->funcs = orig;
+            return false;
+        }
 #ifdef DEBUG
         sing = this->guess_fwd[k]->sing;
         printf("%f %f %f\n",sing[0],sing[1],sing[2]);
@@ -132,10 +131,4 @@ bool GuessData::compute_guess_fields(DipoleFitData* f)
     printf("[done %d sources]\n",this->nguess);
 
     return true;
-
-bad : {
-        if (orig)
-            f->funcs = orig;
-        return false;
-    }
 }
