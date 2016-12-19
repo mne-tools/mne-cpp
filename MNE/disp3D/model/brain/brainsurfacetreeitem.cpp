@@ -135,7 +135,7 @@ void  BrainSurfaceTreeItem::setData(const QVariant& value, int role)
             break;
 
         default: // do nothing;
-                 break;
+            break;
     }
 }
 
@@ -168,9 +168,9 @@ bool BrainSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* p
     m_pRenderable3DEntity->setShader(QUrl(QStringLiteral("qrc:/model/common/shaders/gl3/pervertexphongalpha.geom")));
     m_pRenderable3DEntity->setShader(QUrl(QStringLiteral("qrc:/model/common/shaders/gl3/pervertexphongalpha.frag")));
 
-//    m_pRenderable3DEntityNormals->setShader(QUrl(QStringLiteral("qrc:/model/common/shaders/gl3/shownormals.vert")));
-//    m_pRenderable3DEntityNormals->setShader(QUrl(QStringLiteral("qrc:/model/common/shaders/gl3/shownormals.geom")));
-//    m_pRenderable3DEntityNormals->setShader(QUrl(QStringLiteral("qrc:/model/common/shaders/gl3/shownormals.frag")));
+    m_pRenderable3DEntityNormals->setShader(QUrl(QStringLiteral("qrc:/model/common/shaders/gl3/shownormals.vert")));
+    m_pRenderable3DEntityNormals->setShader(QUrl(QStringLiteral("qrc:/model/common/shaders/gl3/shownormals.geom")));
+    m_pRenderable3DEntityNormals->setShader(QUrl(QStringLiteral("qrc:/model/common/shaders/gl3/shownormals.frag")));
 
     //Generate activation overlay surface
 //    MatrixX3f overlayAdds = tSurface.rr();

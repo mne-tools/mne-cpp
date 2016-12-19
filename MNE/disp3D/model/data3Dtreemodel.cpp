@@ -367,18 +367,6 @@ QList<BrainRTSourceLocDataTreeItem*> Data3DTreeModel::addSourceData(const QStrin
                     }
                 }
             }
-
-//            //Find the all the hemispheres of the set "set" and add the source estimates as items
-//            if(!itemList.isEmpty()) {
-//                for(int i = 0; i<itemList.size(); i++) {
-//                    for(int j = 0; j<itemList.at(i)->rowCount(); j++) {
-//                        if(itemList.at(i)->child(j,0)->type() == Data3DTreeModelItemTypes::HemisphereItem) {
-//                            BrainHemisphereTreeItem* pHemiItem = dynamic_cast<BrainHemisphereTreeItem*>(itemList.at(i)->child(j,0));
-//                            returnList.append(pHemiItem->addData(tSourceEstimate, tForwardSolution));
-//                        }
-//                    }
-//                }
-//            }
         }
     }
 
@@ -410,13 +398,20 @@ ECDDataTreeItem* Data3DTreeModel::addDipoleFitData(const QString& subject, const
             //Find already existing surface items and add the new data to the first search result
             QList<QStandardItem*> itemList = pSubjectItem->findChildren(set);
 
-            //Find the "set" items and add the source estimates as items
-            if(!itemList.isEmpty()) {
-                if(itemList.first()->type() == Data3DTreeModelItemTypes::MeasurementItem) {
-                    if(MeasurementTreeItem* pSetItem = dynamic_cast<MeasurementTreeItem*>(itemList.first())) {
-                        return pSetItem->addData(pECDSet, m_pModelEntity);
-                    }
+            //Find the "set" items and add the dipole fits as items
+            if(!itemList.isEmpty() && (itemList.at(0)->type() == Data3DTreeModelItemTypes::MeasurementItem)) {
+                if(MeasurementTreeItem* pMeasurementItem = dynamic_cast<MeasurementTreeItem*>(itemList.at(0))) {
+                    return pMeasurementItem->addData(pECDSet, m_pModelEntity);
                 }
+            } else {
+                MeasurementTreeItem* pMeasurementItem = new MeasurementTreeItem(Data3DTreeModelItemTypes::MeasurementItem, set);
+
+                QList<QStandardItem*> list;
+                list << pMeasurementItem;
+                list << new QStandardItem(pMeasurementItem->toolTip());
+                pSubjectItem->appendRow(list);
+
+                return pMeasurementItem->addData(pECDSet, m_pModelEntity);
             }
         }
     }
@@ -465,29 +460,6 @@ QList<NetworkTreeItem*> Data3DTreeModel::addConnectivityData(const QString& subj
 
                     returnList.append(pMeasurementItem->addData(pNetworkData, m_pModelEntity));
                 }
-
-//            //Find the "set" items and add the source estimates as items
-//            if(!itemList.isEmpty()) {
-//                for(int i = 0; i<itemList.size(); i++) {
-//                    if(itemList.at(i)->type() == Data3DTreeModelItemTypes::MeasurementItem) {
-//                        if(MeasurementTreeItem* pSetItem = dynamic_cast<MeasurementTreeItem*>(itemList.at(i))) {
-//                            returnList.append(pSetItem->addData(pNetworkData, m_pModelEntity));
-//                        }
-//                    }
-//                }
-//            }
-
-//            //Find the all the hemispheres of the set "set" and add the source estimates as items
-//            if(!itemList.isEmpty()) {
-//                for(int i = 0; i<itemList.size(); i++) {
-//                    for(int j = 0; j<itemList.at(i)->rowCount(); j++) {
-//                        if(itemList.at(i)->child(j,0)->type() == Data3DTreeModelItemTypes::HemisphereItem) {
-//                            BrainHemisphereTreeItem* pHemiItem = dynamic_cast<BrainHemisphereTreeItem*>(itemList.at(i)->child(j,0));
-//                            returnList.append(pHemiItem->addData(tSourceEstimate, tForwardSolution));
-//                        }
-//                    }
-//                }
-//            }
             }
         }
     }
