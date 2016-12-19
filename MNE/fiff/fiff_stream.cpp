@@ -2043,9 +2043,6 @@ void FiffStream::write_float(fiff_int_t kind, const float* data, fiff_int_t nel)
 
 void FiffStream::write_float_matrix(fiff_int_t kind, const MatrixXf& mat)
 {
-//    qint32 FIFFT_MATRIX = 1 << 30;
-//    qint32 FIFFT_MATRIX_FLOAT = FIFFT_FLOAT | FIFFT_MATRIX;
-
     qint32 numel = mat.rows() * mat.cols();
 
     fiff_int_t datasize = 4*numel + 4*3;
@@ -2075,9 +2072,6 @@ void FiffStream::write_float_matrix(fiff_int_t kind, const MatrixXf& mat)
 
 void FiffStream::write_float_sparse_ccs(fiff_int_t kind, const SparseMatrix<float>& mat)
 {
-//    qint32 FIFFT_MATRIX = 16400 << 16;  // 4010
-//    qint32 FIFFT_MATRIX_FLOAT_CCS = FIFFT_FLOAT | FIFFT_MATRIX;
-
     //
     //   nnz values
     //   nnz row indices
@@ -2168,9 +2162,6 @@ void FiffStream::write_float_sparse_ccs(fiff_int_t kind, const SparseMatrix<floa
 
 void FiffStream::write_float_sparse_rcs(fiff_int_t kind, const SparseMatrix<float>& mat)
 {
-//    qint32 FIFFT_MATRIX = 16416 << 16;  // 4020
-//    qint32 FIFFT_MATRIX_FLOAT_RCS = FIFFT_FLOAT | FIFFT_MATRIX;
-
     //
     //   nnz values
     //   nnz column indices
