@@ -102,6 +102,20 @@ public:
     */
     ~FwdEegSphereLayer();
 
+
+    static bool comp_layers(const FwdEegSphereLayer& v1,const FwdEegSphereLayer& v2)
+    /*
+          * Comparison function for sorting layers
+          */
+    {
+        if (v1.rad < v2.rad)
+            return true;
+        else
+            return false;
+    }
+
+
+
 public:
     float rad;          /**< The actual rads */
     float rel_rad;      /**< Relative rads */

@@ -1,15 +1,15 @@
 //=============================================================================================================
 /**
-* @file     layoutmaker.cpp
-* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+* @file     simplex_algorithm.h
+* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     September, 2014
+* @date     December, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Christoph Dinh, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,39 +30,27 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the MinimizerSimplex class
+* @brief    SimplexAlgorithm Template Implementation.
 *
 */
 
-//*************************************************************************************************************
-//=============================================================================================================
-// INCLUDES
-//=============================================================================================================
-
-#include "minimizersimplex.h"
-
+#ifndef SIMPLEXALGORITHM_H
+#define SIMPLEXALGORITHM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include <iostream>
+#include "utils_global.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// Eigen INCLUDES
 //=============================================================================================================
 
-using namespace UTILSLIB;
-using namespace Eigen;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINES
-//=============================================================================================================
+#include <Eigen/Core>
 
 #define ALPHA 1.0
 #define BETA 0.5
@@ -71,34 +59,88 @@ using namespace Eigen;
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE MEMBER METHODS
+// DEFINE NAMESPACE MNELIB
 //=============================================================================================================
 
-MinimizerSimplex::MinimizerSimplex()
+namespace UTILSLIB
 {
-}
+
+using namespace Eigen;
+
+//=============================================================================================================
+/**
+* Simplex algorithm is an optimization method to solve linear optimization problems.
+*
+* @brief Simplex algorithm
+*/
+class UTILSSHARED_EXPORT SimplexAlgorithm
+{
+
+protected:
+    //=========================================================================================================
+    /**
+    * Protected Constrcutor to make class non-instantiable.
+    */
+    SimplexAlgorithm();
+
+public:
+    //=========================================================================================================
+    /**
+    * mne_simplex_fit.c
+    * Refactored: mne_simplex_minimize
+    *
+    * Minimization with the simplex algorithm. Float implementation
+    * Modified from Numerical recipes
+    *
+    * @param[in] p              The initial simplex
+    * @param[in] y              Function values at the vertices
+    * @param[in] ftol           Relative convergence tolerance
+    * @param[in] func           The function to be evaluated
+    * @param[in] user_data      Data to be passed to the above function in each evaluation
+    * @param[in] max_eval       Maximum number of function evaluations
+    * @param[in] neval          Number of function evaluations
+    * @param[in] report         How often to report (-1 = no_reporting)
+    * @param[in] report_func    The function to be called when reporting
+    *
+    * @return True when setup was successful, false otherwise
+    */
+    template <typename T>
+    static bool simplex_minimize(   Matrix<T,Dynamic,Dynamic>& p, Matrix<T,Dynamic, 1>& y, T ftol,
+                                    T (*func)(const Matrix<T,Dynamic, 1>& x, const void *user_data),
+                                    const void *user_data, int max_eval, int &neval, int report,
+                                    bool (*report_func)(int loop, const Matrix<T,Dynamic, 1>& fitpar, double fval));
+
+private:
+
+    template <typename T>
+    static T tryit( Matrix<T,Dynamic,Dynamic> &p,
+                    Matrix<T,Dynamic, 1> &y,
+                    Matrix<T,Dynamic, 1> &psum,
+                    T (*func)(  const Matrix<T,Dynamic, 1> &x,
+                                        const void *user_data),                     /* The function to be evaluated */
+                    const void *user_data,                                      /* Data to be passed to the above function in each evaluation */
+                    int   ihi,
+                    int &neval,
+                    T fac);
+};
 
 
 //*************************************************************************************************************
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
 
-bool MinimizerSimplex::mne_simplex_minimize(    MatrixXf& p,
-                                                VectorXf& y,
-                                                float ftol,
-                                                float (*func)(  const VectorXf &x,
-                                                                const void *user_data),
-                                                const void  *user_data,
-                                                int   max_eval,
-                                                int   &neval,
-                                                int   report,
-                                                bool   (*report_func)(int loop,
-                                                        const VectorXf &fitpar,
-                                                        double fval))
+template <typename T>
+bool SimplexAlgorithm::simplex_minimize(   Matrix<T,Dynamic,Dynamic>& p, Matrix<T,Dynamic, 1>& y, T ftol,
+                                T (*func)(const Matrix<T,Dynamic, 1>& x, const void *user_data),
+                                const void *user_data, int max_eval, int &neval, int report,
+                                bool (*report_func)(int loop, const Matrix<T,Dynamic, 1>& fitpar, double fval))
 {
     int   ndim = p.cols();  /* Number of variables */
     int   i,ilo,ihi,inhi;
     int   mpts = ndim+1;
-    float ytry,ysave,rtol;
-    VectorXf psum(ndim);
+    T ytry,ysave,rtol;
+    Matrix<T,Dynamic, 1> psum(ndim);
     bool  result = true;
     int   count = 0;
     int   loop  = 1;
@@ -107,7 +149,7 @@ bool MinimizerSimplex::mne_simplex_minimize(    MatrixXf& p,
     psum = p.colwise().sum();
 
     if (report_func != NULL && report > 0) {
-        report_func(0,static_cast<VectorXf>(p.row(0)),-1.0);
+        report_func(0,static_cast< Matrix<T,Dynamic, 1> >(p.row(0)),-1.0);
     }
 
     for (;;count++,loop++) {
@@ -128,26 +170,25 @@ bool MinimizerSimplex::mne_simplex_minimize(    MatrixXf& p,
         * Report that we are proceeding...
         */
         if (count == report && report_func != NULL) {
-            if (!report_func(loop,static_cast<VectorXf>(p.row(ilo)),y[ilo])) {
-                std::cout<<"Interation interrupted.";
+            if (!report_func(loop,static_cast< Matrix<T,Dynamic, 1> >(p.row(ilo)),y[ilo])) {
+                qCritical("Interation interrupted.");
                 result = false;
                 break;
             }
             count = 0;
         }
-        if (rtol < ftol)
-            break;
+        if (rtol < ftol) break;
         if (neval >=  max_eval) {
-            std::cout<<"Maximum number of evaluations exceeded.";
+            qCritical("Maximum number of evaluations exceeded.");
             result  =  false;
             break;
         }
-        ytry = tryit(p,y,psum,func,user_data,ihi,neval,-ALPHA);
+        ytry = tryit<T>(p,y,psum,func,user_data,ihi,neval,-ALPHA);
         if (ytry <= y[ilo])
-            tryit(p,y,psum,func,user_data,ihi,neval,GAMMA);
+            tryit<T>(p,y,psum,func,user_data,ihi,neval,GAMMA);
         else if (ytry >= y[inhi]) {
             ysave = y[ihi];
-            ytry = tryit(p,y,psum,func,user_data,ihi,neval,BETA);
+            ytry = tryit<T>(p,y,psum,func,user_data,ihi,neval,BETA);
             if (ytry >= ysave) {
                 for (i = 0; i < mpts; i++) {
                     if (i !=  ilo) {
@@ -168,18 +209,21 @@ bool MinimizerSimplex::mne_simplex_minimize(    MatrixXf& p,
 
 //*************************************************************************************************************
 
-float MinimizerSimplex::tryit(MatrixXf& p,
-                              VectorXf& y,
-                              VectorXf& psum,
-                              float (*func)(const VectorXf &x, const void *user_data),
-                              const void  *user_data,
-                              int   ihi,
-                              int &neval,
-                              float fac)
+template <typename T>
+T SimplexAlgorithm::tryit(  Matrix<T,Dynamic,Dynamic> &p,
+                            Matrix<T,Dynamic, 1> &y,
+                            Matrix<T,Dynamic, 1> &psum,
+                            T (*func)(  const Matrix<T,Dynamic, 1> &x,
+                                    const void *user_data),                     /* The function to be evaluated */
+                            const void *user_data,                                      /* Data to be passed to the above function in each evaluation */
+                            int   ihi,
+                            int &neval,
+                            T fac)
 {
     int ndim = p.cols();
-    float fac1,fac2,ytry;
-    VectorXf ptry(ndim);
+    T fac1,fac2,ytry;
+
+    Matrix<T,Dynamic, 1> ptry(ndim);
 
     fac1 = (1.0-fac)/ndim;
     fac2 = fac1-fac;
@@ -199,6 +243,11 @@ float MinimizerSimplex::tryit(MatrixXf& p,
     return ytry;
 }
 
+} //NAMESPACE
+
 #undef ALPHA
 #undef BETA
 #undef GAMMA
+
+
+#endif // SIMPLEXALGORITHM_H

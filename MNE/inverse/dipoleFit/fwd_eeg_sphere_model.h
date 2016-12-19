@@ -60,7 +60,28 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
+#include <QList>
 #include <QDebug>
+
+
+
+
+
+/*
+ * This is the beginning of the specific code
+ */
+typedef struct {
+    double *y;
+    double *resi;
+    double **M;
+    double **uu;
+    double **vv;
+    double *sing;
+    double *fn;
+    double *w;
+    int    nfit;
+    int    nterms;
+} *fitUser,fitUserRec;
 
 
 //*************************************************************************************************************
@@ -87,22 +108,65 @@ public:
     //=========================================================================================================
     /**
     * Constructs the Forward EEG Sphere Model
+    * Refactored: fwd_new_eeg_sphere_model
+    *
     */
-    FwdEegSphereModel();
+    explicit FwdEegSphereModel();
 
-//    //=========================================================================================================
-//    /**
-//    * Copy constructor.
-//    *
-//    * @param[in] p_FwdEegSphereModel      Forward EEG Sphere Model which should be copied
-//    */
-//    FwdEegSphereModel(const FwdEegSphereModel& p_FwdEegSphereModel);
+    //=========================================================================================================
+    /**
+    * Copy constructor.
+    * Refactored: fwd_dup_eeg_sphere_model
+    *
+    * @param[in] p_FwdEegSphereModel      Forward EEG Sphere Model which should be copied
+    */
+    explicit FwdEegSphereModel(const FwdEegSphereModel& p_FwdEegSphereModel);
+
+    /*
+          * Produce a new sphere model structure
+          */
+    static FwdEegSphereModel* fwd_create_eeg_sphere_model(const QString& name,
+                                                         int nlayer,
+                                                         const Eigen::VectorXf& rads,
+                                                         const Eigen::VectorXf& sigmas);
+
 
     //=========================================================================================================
     /**
     * Destroys the Electric Current Dipole description
+    * Refactored: fwd_free_eeg_sphere_model
     */
-    ~FwdEegSphereModel();
+    virtual ~FwdEegSphereModel();
+
+    //=========================================================================================================
+    /**
+    * dipole_fit_setup.c
+    *
+    * Set up the desired sphere model for EEG
+    *
+    * @param[in] eeg_model_file     Contains the model specifications
+    * @param[in] eeg_model_name     Name of the model to use
+    * @param[in] eeg_sphere_rad     Outer surface radius
+    *
+    * @return the setup eeg sphere model
+    */
+    static FwdEegSphereModel* setup_eeg_sphere_model(const QString& eeg_model_file, QString eeg_model_name, float eeg_sphere_rad);
+
+
+
+
+
+
+
+    static fitUser new_fit_user(int nfit, int nterms);
+
+
+
+
+
+
+
+
 
 
 
@@ -183,7 +247,7 @@ public:
     *
     * @return true when successful
     */
-    static int fwd_eeg_spherepot( float *rd, float *Q, float **el, int neeg, float *Vval, void *client);
+    static int fwd_eeg_spherepot( float *rd, float *Q, float **el, int neeg, Eigen::VectorXf& Vval, void *client);
 
 
     //=========================================================================================================
@@ -203,35 +267,96 @@ public:
     */
     static int fwd_eeg_spherepot_coil(float *rd, float *Q, FwdCoilSet* els, float *Vval, void *client);
 
+
+    //=========================================================================================================
+    /**
+    * fwd_eeg_sphere_models.c
+    *
+    * Setup the EEG sphere model calculations
+    *
+    * @param[in] rad
+    * @param[in] fit_berg_scherg    If Fit Berg Scherg should be performed
+    * @param[in] nfit
+    *
+    * @return True when setup was successful, false otherwise
+    */
+    bool fwd_setup_eeg_sphere_model(float rad, bool fit_berg_scherg, int nfit);
+
+
+
+
+
+
+
+
+    // fwd_fit_berg_scherg.c
+
+    static void compose_linear_fitting_data(const Eigen::VectorXd& mu,fitUser u);
+
+
+    // fwd_fit_berg_scherg.c
+    /*
+          * Compute the best-fitting linear parameters
+          * Return the corresponding RV
+          */
+    static double compute_linear_parameters(const Eigen::VectorXd& mu, Eigen::VectorXd& lambda, fitUser u);
+
+
+
+    // fwd_fit_berg_scherg.c
+    /*
+          * Evaluate the residual sum of squares fit for one set of
+          * mu values
+          */
+    static double one_step (const Eigen::VectorXd& mu, const void *user_data);
+
+
+    /*
+          * This routine fits the Berg-Scherg equivalent spherical model
+          * dipole parameters by minimizing the difference between the
+          * actual and approximative series expansions
+          */
+    bool fwd_eeg_fit_berg_scherg(int   nterms,              /* Number of terms to use in the series expansion
+                                                                                        * when fitting the parameters */
+                                int   nfit,	               /* Number of equivalent dipoles to fit */
+                                float &rv);
+
+
+
+/**< Number of layers */
+    int   nlayer() const
+    {
+        return layers.size();
+    }
+
+
 public:
-    char  *name;                /**< Textual identifier */
-    int   nlayer;               /**< Number of layers */
-    FwdEegSphereLayer* layers;  /**< An array of layers */
-    float  r0[3];               /**< The origin */
+    QString                     name;   /**< Textual identifier */
+    QList<FwdEegSphereLayer>    layers; /**< An array of layers */
+    Eigen::Vector3f             r0;     /**< The origin */
 
-    double *fn;                 /**< Coefficients saved to speed up the computations */
-    int    nterms;              /**< How many? */
+    Eigen::VectorXd fn;                 /**< Coefficients saved to speed up the computations */
+    int             nterms;             /**< How many? */
 
-    float  *mu;                 /**< The Berg-Scherg equivalence parameters */
-    float  *lambda;
-    int    nfit;                /**< How many? */
-    int    scale_pos;           /**< Scale the positions to the surface of the sphere? */
-
+    Eigen::VectorXf mu;             /**< The Berg-Scherg equivalence parameters */
+    Eigen::VectorXf lambda;
+    int             nfit;           /**< How many? */
+    int             scale_pos;      /**< Scale the positions to the surface of the sphere? */
 
 // ### OLD STRUCT ###
 //    typedef struct {
-//      char  *name;            /* Textual identifier */
-//      int   nlayer;			/* Number of layers */
-//      fwdEegSphereLayer layers;	/* An array of layers */
-//      float  r0[3];			/* The origin */
+//      char  *name;                /* Textual identifier */
+//      int   nlayer;               /* Number of layers */
+//      fwdEegSphereLayer layers;   /* An array of layers */
+//      float  r0[3];               /* The origin */
 
-//      double *fn;		        /* Coefficients saved to speed up the computations */
-//      int    nterms;		/* How many? */
+//      double *fn;         /* Coefficients saved to speed up the computations */
+//      int    nterms;      /* How many? */
 
-//      float  *mu;			/* The Berg-Scherg equivalence parameters */
+//      float  *mu;         /* The Berg-Scherg equivalence parameters */
 //      float  *lambda;
-//      int    nfit;			/* How many? */
-//      int    scale_pos;		/* Scale the positions to the surface of the sphere? */
+//      int    nfit;        /* How many? */
+//      int    scale_pos;   /* Scale the positions to the surface of the sphere? */
 //    } *fwdEegSphereModel,fwdEegSphereModelRec;
 
 };

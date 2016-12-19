@@ -10,6 +10,8 @@
 
 #include "fwd_coil_set.h"
 
+//using namespace FIFFLIB;
+
 
 #if defined(__cplusplus) 
 extern "C" {
