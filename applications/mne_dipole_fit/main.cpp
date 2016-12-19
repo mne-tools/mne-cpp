@@ -42,6 +42,8 @@
 #include <inverse/dipoleFit/dipole_fit_settings.h>
 #include <inverse/dipoleFit/dipole_fit.h>
 
+#include <mne/mne_bem.h>
+
 #include <disp3D/view3D.h>
 #include <disp3D/control/control3dwidget.h>
 #include <disp3D/model/sourceactivity/ecddatatreeitem.h>
@@ -68,6 +70,7 @@
 using namespace INVERSELIB;
 using namespace DISP3DLIB;
 using namespace FSLIB;
+using namespace MNELIB;
 
 
 //*************************************************************************************************************
@@ -99,10 +102,16 @@ int main(int argc, char *argv[])
     SurfaceSet tSurfSet ("sample", 2, "orig", "./MNE-sample-data/subjects");
     AnnotationSet tAnnotSet ("sample", 2, "orig", "./MNE-sample-data/subjects");
 
+    //Read and show BEM
+    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif");
+    MNEBem t_Bem(t_fileBem);
+
+
     //Create 3D data model and add data to model
     Data3DTreeModel::SPtr p3DDataModel = Data3DTreeModel::SPtr(new Data3DTreeModel());
 
     ECDSet::SPtr pSet = ECDSet::SPtr(new ECDSet(set));
+    p3DDataModel->addBemData("sample", "BEM", t_Bem);
     p3DDataModel->addSurfaceSet("sample", "Dipole test", tSurfSet, tAnnotSet);
     p3DDataModel->addDipoleFitData("sample", "Dipole test", pSet);
 

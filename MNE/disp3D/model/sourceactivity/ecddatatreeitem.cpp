@@ -59,6 +59,7 @@
 #include <Qt3DExtras/QSphereMesh>
 #include <Qt3DExtras/QPhongMaterial>
 #include <Qt3DCore/QTransform>
+#include <QQuaternion>
 #include <Qt3DExtras/QConeMesh>
 
 
@@ -191,12 +192,31 @@ void ECDDataTreeItem::setVisible(bool state)
 void ECDDataTreeItem::plotDipoles(QSharedPointer<ECDSet> pECDSet)
 {
     //Plot dipoles
-    QVector3D pos;
+    QVector3D pos,to,from;
 
     for(int i = 0; i < pECDSet->size(); ++i) {
         pos.setX((*pECDSet)[i].rd(0));
         pos.setY((*pECDSet)[i].rd(1));
         pos.setZ((*pECDSet)[i].rd(2));
+
+        to.setX((*pECDSet)[i].Q(0));
+        to.setY((*pECDSet)[i].Q(1));
+        to.setZ((*pECDSet)[i].Q(2));
+
+//        from = QVector3D(0.0, 1.0, 0.0) - pos;
+//        from = from.normalized();
+
+//        qDebug()<<"ECDDataTreeItem::plotDipoles - from" << from;
+//        qDebug()<<"ECDDataTreeItem::plotDipoles - to" << to;
+
+//        pos *= 1000;
+//        pos = pos.normalized();
+
+//        to *= 1000;
+//        to = to.normalized();
+
+//        QQuaternion final = QQuaternion::rotationTo(from, to);
+//        pos = final.rotatedVector(pos)/1000;
 
         Renderable3DEntity* dipoleEntity = new Renderable3DEntity(m_pRenderable3DEntity);
 

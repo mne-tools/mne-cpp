@@ -349,7 +349,6 @@ QList<BrainRTSourceLocDataTreeItem*> Data3DTreeModel::addSourceData(const QStrin
     QList<QStandardItem*> itemSubjectList = this->findItems(subject);
 
     //Iterate through subject items and add new data respectivley
-
     for(int i = 0; i < itemSubjectList.size(); ++i) {
         //Check if it is really a subject tree item
         if((itemSubjectList.at(i)->type() == Data3DTreeModelItemTypes::SubjectItem)) {
@@ -394,8 +393,15 @@ ECDDataTreeItem* Data3DTreeModel::addDipoleFitData(const QString& subject, const
     //Find the subject
     QList<QStandardItem*> itemSubjectList = this->findItems(subject);
 
-    //Iterate through subject items and add new data respectivley
+    //If subject does not exist, create a new one
+    if(itemSubjectList.size() == 0) {
+        SubjectTreeItem* subjectItem = new SubjectTreeItem(Data3DTreeModelItemTypes::SubjectItem, subject);
+        itemSubjectList << subjectItem;
+        itemSubjectList << new QStandardItem(subjectItem->toolTip());
+        m_pRootItem->appendRow(itemSubjectList);
+    }
 
+    //Iterate through subject items and add new data respectivley
     for(int i = 0; i < itemSubjectList.size(); ++i) {
         //Check if it is really a subject tree item
         if((itemSubjectList.at(i)->type() == Data3DTreeModelItemTypes::SubjectItem)) {
@@ -427,6 +433,14 @@ QList<NetworkTreeItem*> Data3DTreeModel::addConnectivityData(const QString& subj
 
     //Find the subject
     QList<QStandardItem*> itemSubjectList = this->findItems(subject);
+
+    //If subject does not exist, create a new one
+    if(itemSubjectList.size() == 0) {
+        SubjectTreeItem* subjectItem = new SubjectTreeItem(Data3DTreeModelItemTypes::SubjectItem, subject);
+        itemSubjectList << subjectItem;
+        itemSubjectList << new QStandardItem(subjectItem->toolTip());
+        m_pRootItem->appendRow(itemSubjectList);
+    }
 
     //Iterate through subject items and add new data respectivley
 
