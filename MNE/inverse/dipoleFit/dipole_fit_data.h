@@ -133,15 +133,19 @@ public:
     */
     virtual ~DipoleFitData();
 
-
-
-    static bool fit_one(DipoleFitData* fit,	            /* Precomputed fitting data */
-                        GuessData*     guess,	            /* The initial guesses */
-                        float         time,              /* Which time is it? */
-                        float         *B,	            /* The field to fit */
-                        int           verbose,
-                        ECD&          res               /* The fitted dipole */
-                        );
+    //=========================================================================================================
+    /**
+    * Fit a single dipole to the given data
+    * Refactored: fit_one (fit_dipoles.c)
+    *
+    * @param[in] fit        Precomputed fitting data
+    * @param[in] guess      The initial guesses
+    * @param[in] time       Which time is it?
+    * @param[in] B          The field to fit
+    * @param[in] verbose
+    * @param[in] res        The fitted dipole
+    */
+    static bool fit_one(DipoleFitData* fit, GuessData* guess, float time, float *B, int verbose, ECD& res);
 
 
 
