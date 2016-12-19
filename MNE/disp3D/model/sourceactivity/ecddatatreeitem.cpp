@@ -202,21 +202,14 @@ void ECDDataTreeItem::plotDipoles(QSharedPointer<ECDSet> pECDSet)
         to.setX((*pECDSet)[i].Q(0));
         to.setY((*pECDSet)[i].Q(1));
         to.setZ((*pECDSet)[i].Q(2));
+        //to.normalize();
 
-//        from = QVector3D(0.0, 1.0, 0.0) - pos;
-//        from = from.normalized();
+        qDebug()<<"ECDDataTreeItem::plotDipoles - from" << from;
+        qDebug()<<"ECDDataTreeItem::plotDipoles - to" << to;
 
-//        qDebug()<<"ECDDataTreeItem::plotDipoles - from" << from;
-//        qDebug()<<"ECDDataTreeItem::plotDipoles - to" << to;
-
-//        pos *= 1000;
-//        pos = pos.normalized();
-
-//        to *= 1000;
-//        to = to.normalized();
-
-//        QQuaternion final = QQuaternion::rotationTo(from, to);
-//        pos = final.rotatedVector(pos)/1000;
+        //The Qt3D default cone orientation and the top of the cone lies in line with the positive y-axis.
+        from = QVector3D(0.0, 1.0, 0.0);
+        QQuaternion final = QQuaternion::rotationTo(from, to);
 
         Renderable3DEntity* dipoleEntity = new Renderable3DEntity(m_pRenderable3DEntity);
 
@@ -230,6 +223,7 @@ void ECDDataTreeItem::plotDipoles(QSharedPointer<ECDSet> pECDSet)
         Qt3DCore::QTransform* transform = new Qt3DCore::QTransform();
         QMatrix4x4 m;
         m.translate(pos);
+        m.rotate(final);
         transform->setMatrix(m);
         dipoleEntity->addComponent(transform);
 

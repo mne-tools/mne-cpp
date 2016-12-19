@@ -53,6 +53,8 @@
 #include <fs/surfaceset.h>
 #include <fs/annotationset.h>
 
+#include <iostream>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -96,6 +98,39 @@ int main(int argc, char *argv[])
     ECDSet set = dipFit.calculateFit();
 
     /*
+    * Perform Head->MRI coord. transformation
+    */
+    FiffCoordTrans coordTrans(QFile("C:/Git/mne-cpp-LorenzE/bin/MNE-sample-data/MEG/sample/sample_audvis_raw-trans.fif"));
+
+    std::cout << std::endl << "coordTrans" << coordTrans.trans;
+    std::cout << std::endl << "coordTransInv" << coordTrans.invtrans;
+
+    for(int i = 0; i < set.size() ; ++i) {
+        MatrixX3f dipoles(1, 3);
+        //transform location
+        dipoles(0,0) = set[i].rd(0);
+        dipoles(0,1) = set[i].rd(1);
+        dipoles(0,2) = set[i].rd(2);
+
+        dipoles = coordTrans.apply_trans(dipoles);
+
+        set[i].rd(0) = dipoles(0,0);
+        set[i].rd(1) = dipoles(0,1);
+        set[i].rd(2) = dipoles(0,2);
+
+        //transform orientation
+        dipoles(0,0) = set[i].Q(0);
+        dipoles(0,1) = set[i].Q(1);
+        dipoles(0,2) = set[i].Q(2);
+
+        dipoles = coordTrans.apply_trans(dipoles);
+
+        set[i].Q(0) = dipoles(0,0);
+        set[i].Q(1) = dipoles(0,1);
+        set[i].Q(2) = dipoles(0,2);
+    }
+
+    /*
     * Visualize the dipoles
     */
     //Load FS set
@@ -105,7 +140,6 @@ int main(int argc, char *argv[])
     //Read and show BEM
     QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif");
     MNEBem t_Bem(t_fileBem);
-
 
     //Create 3D data model and add data to model
     Data3DTreeModel::SPtr p3DDataModel = Data3DTreeModel::SPtr(new Data3DTreeModel());
