@@ -597,14 +597,9 @@ DipoleFitData::~DipoleFitData()
 }
 
 
-
-
-
-
-
+//*************************************************************************************************************
 
 //============================= dipole_forward.c =============================
-
 
 void print_fields(float       *rd,
                   float       *Q,
@@ -650,21 +645,7 @@ out : {
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+//*************************************************************************************************************
 
 DipoleForward* dipole_forward(DipoleFitData* d,
                              float         **rd,
@@ -754,8 +735,7 @@ bad : {
 }
 
 
-
-
+//*************************************************************************************************************
 
 DipoleForward* DipoleFitData::dipole_forward_one(DipoleFitData* d,
                                  float         *rd,
@@ -770,20 +750,8 @@ DipoleForward* DipoleFitData::dipole_forward_one(DipoleFitData* d,
 }
 
 
-
-
-
-
-
-
-//============================= fit_dipoles.c =============================
-
-
-
-
-
-
-
+//*************************************************************************************************************
+// fit_dipoles.c
 static float fit_eval(float *rd,int npar,void *user)
 /*
  * Calculate the residual sum of squares
@@ -1151,34 +1119,8 @@ int simplex_minimize(float **p,		                              /* The initial si
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+//*************************************************************************************************************
+// fit_dipoles.c
 bool DipoleFitData::fit_one(DipoleFitData* fit,	            /* Precomputed fitting data */
                     GuessData*     guess,	            /* The initial guesses */
                     float         time,              /* Which time is it? */
@@ -1186,9 +1128,6 @@ bool DipoleFitData::fit_one(DipoleFitData* fit,	            /* Precomputed fitti
                     int           verbose,
                     ECD&          res               /* The fitted dipole */
                     )
-/*
- * Fit a single dipole to the given data
- */
 {
     float  **simplex       = NULL;	       /* The simplex */
     float  vals[4];			       /* Values at the vertices */

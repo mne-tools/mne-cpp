@@ -128,7 +128,7 @@ public:
     fiff_int_t machid[2];   /**< Unique machine ID */
     fiffTimeRec time;       /**< Time of the ID creation */
 
-
+// ### OLD STRUCT ###
 // typedef struct _fiffIdRec {
 //  fiff_int_t version;     /**< File version *
 //  fiff_int_t machid[2];   /**< Unique machine ID *
