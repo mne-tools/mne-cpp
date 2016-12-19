@@ -89,6 +89,7 @@ public:
     //=========================================================================================================
     /**
     * Constructs the Forward Coil Set description
+    * Refactored: fwd_new_coil_set
     */
     FwdCoilSet();
 
@@ -103,8 +104,19 @@ public:
     //=========================================================================================================
     /**
     * Destroys the Forward Coil Set description
+    * Refactored: fwd_free_coil_set, fwd_free_coil_set_user_data
     */
     ~FwdCoilSet();
+
+
+    void fwd_free_coil_set_user_data()
+    {
+        if (user_data_free && user_data)
+            user_data_free(user_data);
+        user_data = NULL;
+    }
+
+
 
 public:
     FwdCoil **coils;                 /* The coil or electrode positions */

@@ -85,6 +85,7 @@ public:
     //=========================================================================================================
     /**
     * Constructs the Dipole Forward
+    * Refactored: new_dipole_forward (dipole_forward.c)
     */
     DipoleForward();
 

@@ -89,6 +89,8 @@ typedef struct {
 } *dipoleFitFuncs,dipoleFitFuncsRec;
 
 
+
+
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE NAMESPACE INVERSELIB
@@ -101,6 +103,10 @@ namespace INVERSELIB
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
+
+class GuessData;
+class ECD;
+
 
 
 //=============================================================================================================
@@ -126,6 +132,57 @@ public:
     * Destructs the Dipole Fit Data
     */
     virtual ~DipoleFitData();
+
+    //=========================================================================================================
+    /**
+    * Fit a single dipole to the given data
+    * Refactored: fit_one (fit_dipoles.c)
+    *
+    * @param[in] fit        Precomputed fitting data
+    * @param[in] guess      The initial guesses
+    * @param[in] time       Which time is it?
+    * @param[in] B          The field to fit
+    * @param[in] verbose
+    * @param[in] res        The fitted dipole
+    */
+    static bool fit_one(DipoleFitData* fit, GuessData* guess, float time, float *B, int verbose, ECD& res);
+
+
+
+//============================= dipole_forward.c
+
+    static int compute_dipole_field(DipoleFitData* d, float *rd, int whiten, float **fwd);
+
+    //============================= dipole_forward.c
+
+
+
+    static DipoleForward* dipole_forward_one(DipoleFitData* d,
+                                     float         *rd,
+                                     DipoleForward* old);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 public:
       fiffCoordTrans    mri_head_t;         /**< MRI <-> head coordinate transformation */

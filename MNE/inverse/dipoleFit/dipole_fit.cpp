@@ -70,7 +70,7 @@ ECDSet DipoleFit::calculateFit() const
 
     printf("---- Setting up...\n\n");
     if (settings->include_eeg) {
-        if ((eeg_model = setup_eeg_sphere_model(settings->eeg_model_file,settings->eeg_model_name,settings->eeg_sphere_rad)) == NULL)
+        if ((eeg_model = FwdEegSphereModel::setup_eeg_sphere_model(settings->eeg_model_file,settings->eeg_model_name,settings->eeg_sphere_rad)) == NULL)
             goto out;
     }
 

@@ -39,6 +39,26 @@
 //=============================================================================================================
 
 #include "guess_data.h"
+#include "dipole_fit_data.h"
+
+
+
+//ToDo remove later on
+#ifndef TRUE
+#define TRUE 1
+#endif
+
+#ifndef FALSE
+#define FALSE 0
+#endif
+
+#ifndef FAIL
+#define FAIL -1
+#endif
+
+#ifndef OK
+#define OK 0
+#endif
 
 
 //*************************************************************************************************************
@@ -73,4 +93,42 @@ GuessData::GuessData()
 GuessData::~GuessData()
 {
 
+}
+
+
+//*************************************************************************************************************
+
+bool GuessData::compute_guess_fields(DipoleFitData* f)
+{
+    dipoleFitFuncs orig = NULL;
+
+    if (!f) {
+        qCritical("Data missing in compute_guess_fields");
+        return false;
+    }
+    if (!f->noise) {
+        qCritical("Noise covariance missing in compute_guess_fields");
+        return false;
+    }
+    printf("Go through all guess source locations...");
+    orig = f->funcs;
+    if (f->fit_mag_dipoles)
+        f->funcs = f->mag_dipole_funcs;
+    else
+        f->funcs = f->sphere_funcs;
+    for (int k = 0; k < this->nguess; k++) {
+        if ((this->guess_fwd[k] = DipoleFitData::dipole_forward_one(f,this->rr[k],this->guess_fwd[k])) == NULL){
+            if (orig)
+                f->funcs = orig;
+            return false;
+        }
+#ifdef DEBUG
+        sing = this->guess_fwd[k]->sing;
+        printf("%f %f %f\n",sing[0],sing[1],sing[2]);
+#endif
+    }
+    f->funcs = orig;
+    printf("[done %d sources]\n",this->nguess);
+
+    return true;
 }

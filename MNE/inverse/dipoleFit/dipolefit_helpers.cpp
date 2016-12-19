@@ -16,7 +16,7 @@
 #include <utils/sphere.h>
 
 #include <fiff/fiff_constants.h>
-#include "fiff_file.h"
+#include <fiff/fiff_file.h>
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -40,6 +40,7 @@
 #include "fwd_eeg_sphere_model_set.h"
 #include "guess_data.h"
 #include "dipole_fit_data.h"
+#include "guess_data.h"
 
 
 //*************************************************************************************************************
@@ -232,39 +233,16 @@ void fromFloatEigenVector(const Eigen::VectorXf& from_vec, float *to_vec)
 
 
 //double
-Eigen::MatrixXd toDoubleEigenMatrix(double **mat, const int m, const int n)
-{
-    Eigen::MatrixXd eigen_mat(m,n);
+//Eigen::MatrixXd toDoubleEigenMatrix(double **mat, const int m, const int n)
+//{
+//    Eigen::MatrixXd eigen_mat(m,n);
 
-    for ( int i = 0; i < m; ++i)
-        for ( int j = 0; j < n; ++j)
-            eigen_mat(i,j) = mat[i][j];
+//    for ( int i = 0; i < m; ++i)
+//        for ( int j = 0; j < n; ++j)
+//            eigen_mat(i,j) = mat[i][j];
 
-    return eigen_mat;
-}
-
-void fromDoubleEigenMatrix(const Eigen::MatrixXd& from_mat, double **to_mat, const int m, const int n)
-{
-    for ( int i = 0; i < m; ++i)
-        for ( int j = 0; j < n; ++j)
-            to_mat[i][j] = from_mat(i,j);
-}
-
-void fromDoubleEigenMatrix(const Eigen::MatrixXd& from_mat, double **to_mat)
-{
-    fromDoubleEigenMatrix(from_mat, to_mat, from_mat.rows(), from_mat.cols());
-}
-
-void fromDoubleEigenVector(const Eigen::VectorXd& from_vec, double *to_vec, const int n)
-{
-    for ( int i = 0; i < n; ++i)
-        to_vec[i] = from_vec[i];
-}
-
-void fromDoubleEigenVector(const Eigen::VectorXd& from_vec, double *to_vec)
-{
-    fromDoubleEigenVector(from_vec, to_vec, from_vec.size());
-}
+//    return eigen_mat;
+//}
 
 
 
@@ -1470,64 +1448,7 @@ int fiff_read_this_tag_ext (fiffFile file,	/* Read from here */
 
 
 
-#include "fiff_explain.h"
-
-
-//============================= fiff_explain.c =============================
-
-
-void fiff_explain (int kind)
-/*
-      * Try to explain...
-      *
-      */
-{
-    int k;
-    for (k = 0; _fiff_explanations[k].kind >= 0; k++) {
-        if (_fiff_explanations[k].kind == kind) {
-            printf ("%d = %s",kind,_fiff_explanations[k].text);
-            return;
-        }
-    }
-    printf ("Cannot explain: %d",kind);
-}
-
-
-const char *fiff_get_tag_explanation (int kind)
-/*
-      * Get textual explanation of a tag
-      */
-{
-    int k;
-    for (k = 0; _fiff_explanations[k].kind >= 0; k++) {
-        if (_fiff_explanations[k].kind == kind)
-            return _fiff_explanations[k].text;
-    }
-    return "unknown";
-}
-
-
-void fiff_explain_block (int kind)
-/*
-      * Try to explain a block...
-      */
-{
-    int k;
-    for (k = 0; _fiff_block_explanations[k].kind >= 0; k++) {
-        if (_fiff_block_explanations[k].kind == kind) {
-            printf ("%d = %s",kind,_fiff_block_explanations[k].text);
-            return;
-        }
-    }
-    printf ("Cannot explain: %d",kind);
-}
-
-
-
-
-
-
-
+#include <fiff/fiff_dir_tree.h>
 
 
 //============================= fiff_dir_tree.c =============================
@@ -1659,69 +1580,6 @@ int fiff_dir_tree_create(fiffFile file)
 
 
 
-static void print_id (fiffId id)
-
-{
-    printf ("\t%d.%d ",id->version>>16,id->version & 0xFFFF);
-    printf ("0x%x%x ",id->machid[0],id->machid[1]);
-    printf ("%d %d ",id->time.secs,id->time.usecs);
-}
-
-
-static void print_tree(fiffDirNode node,int indent)
-
-{
-    int j,k;
-    int prev_kind,count;
-    fiffDirEntry dentry;
-
-    if (node == NULL)
-        return;
-    for (k = 0; k < indent; k++)
-        putchar(' ');
-    fiff_explain_block (node->type);
-    printf (" { ");
-    if (node->id != NULL)
-        print_id(node->id);
-    printf ("\n");
-
-    for (j = 0, prev_kind = -1, count = 0, dentry = node->dir;
-         j < node->nent; j++,dentry++) {
-        if (dentry->kind != prev_kind) {
-            if (count > 1)
-                printf (" [%d]\n",count);
-            else if (j > 0)
-                putchar('\n');
-            for (k = 0; k < indent+2; k++)
-                putchar(' ');
-            fiff_explain (dentry->kind);
-            prev_kind = dentry->kind;
-            count = 1;
-        }
-        else
-            count++;
-        prev_kind = dentry->kind;
-    }
-    if (count > 1)
-        printf (" [%d]\n",count);
-    else if (j > 0)
-        putchar ('\n');
-    for (j = 0; j < node->nchild; j++)
-        print_tree(node->children[j],indent+5);
-    for (k = 0; k < indent; k++)
-        putchar(' ');
-    printf ("}\n");
-}
-
-void fiff_dir_tree_print(fiffDirNode tree)
-/*
-      * Print contents of the directory tree for
-      * checking
-      */
-{
-    print_tree(tree,0);
-}
-
 int fiff_dir_tree_count(fiffDirNode tree)
 /*
       * Find the number of nodes
@@ -1800,7 +1658,7 @@ fiffTag fiff_dir_tree_get_tag(fiffFile file,fiffDirNode node,int kind)
                 return (tag);
         }
     qWarning("Desired tag (%s [%d]) not found",
-             fiff_get_tag_explanation(kind),kind);
+             FIFFLIB::FiffDirTree::get_tag_explanation(kind),kind);
     return (NULL);
 }
 
@@ -2967,97 +2825,7 @@ fiffCoordTrans mne_read_meas_transform(const QString& name)
 
 
 
-/*
- * This is the old interface which should be eventually deleted
- */
-static FwdCoil*    fwd_new_coil(int np)
 
-{
-    FwdCoil* res = MALLOC(1,FwdCoil);
-    int     k;
-
-    res->chname     = NULL;
-    res->desc       = NULL;
-    res->coil_class = FWD_COILC_UNKNOWN;
-    res->accuracy   = FWD_COIL_ACCURACY_POINT;
-    res->base       = 0.0;
-    res->size       = 0.0;
-    res->np         = np;
-    res->rmag       = ALLOC_CMATRIX(np,3);
-    res->cosmag     = ALLOC_CMATRIX(np,3);
-    res->w          = MALLOC(np,float);
-    /*
-   * Reasonable defaults
-   */
-    for (k = 0; k < 3; k++) {
-        res->r0[k] = 0.0;
-        res->ex[k] = 0.0;
-        res->ey[k] = 0.0;
-        res->ez[k] = 0.0;
-    }
-    res->ex[0] = 1.0;
-    res->ey[1] = 1.0;
-    res->ez[2] = 1.0;
-
-    return res;
-}
-
-static void fwd_free_coil(FwdCoil* coil)
-
-{
-    if (!coil)
-        return;
-
-    FREE(coil->chname);
-    FREE(coil->desc);
-    FREE_CMATRIX(coil->rmag);
-    FREE_CMATRIX(coil->cosmag);
-    FREE(coil->w);
-    FREE(coil);
-}
-
-
-FwdCoilSet* fwd_new_coil_set()
-
-{
-    FwdCoilSet* s = MALLOC(1,FwdCoilSet);
-
-    s->coils = NULL;
-    s->ncoil = 0;
-    s->coord_frame = FIFFV_COORD_UNKNOWN;
-    s->user_data = NULL;
-    s->user_data_free = NULL;
-    return s;
-}
-
-void fwd_free_coil_set_user_data(FwdCoilSet* set)
-
-{
-    if (!set)
-        return;
-    if (set->user_data_free && set->user_data)
-        set->user_data_free(set->user_data);
-    set->user_data = NULL;
-    return;
-}
-
-void fwd_free_coil_set(FwdCoilSet* set)
-
-{
-    int k;
-
-    if (!set)
-        return;
-
-    for (k = 0; k < set->ncoil; k++)
-        fwd_free_coil(set->coils[k]);
-    FREE(set->coils);
-
-    fwd_free_coil_set_user_data(set);
-
-    FREE(set);
-    return;
-}
 
 int fwd_is_axial_coil(FwdCoil* coil)
 
@@ -3187,7 +2955,7 @@ static FwdCoil* fwd_add_coil_to_set(FwdCoilSet* set,
     }
 
     set->coils = REALLOC(set->coils,set->ncoil+1,FwdCoil*);
-    def = set->coils[set->ncoil++] = fwd_new_coil(np);
+    def = set->coils[set->ncoil++] = new FwdCoil(np);
 
     def->type       = type;
     def->coil_class = coil_class;
@@ -3331,7 +3099,7 @@ FwdCoilSet* fwd_read_coil_defs(const char *name)
         goto bad;
     }
 
-    res = fwd_new_coil_set();
+    res = new FwdCoilSet();
     while (1) {
         /*
      * Read basic info
@@ -3392,7 +3160,7 @@ FwdCoilSet* fwd_read_coil_defs(const char *name)
     return res;
 
 bad : {
-        fwd_free_coil_set(res);
+        delete res;
         FREE(desc);
         return NULL;
     }
@@ -3434,7 +3202,7 @@ FwdCoil* fwd_create_meg_coil(FwdCoilSet*     set,      /* These are the availabl
     /*
    * Create the result
    */
-    res = fwd_new_coil(def->np);
+    res = new FwdCoil(def->np);
 
     res->chname   = mne_strdup(ch->ch_name);
     if (def->desc)
@@ -3486,7 +3254,7 @@ FwdCoilSet* fwd_create_meg_coils(FwdCoilSet*      set,      /* These are the ava
                                 fiffCoordTrans t)	  /* Transform the points using this */
 
 {
-    FwdCoilSet* res = fwd_new_coil_set();
+    FwdCoilSet* res = new FwdCoilSet();
     FwdCoil*    next;
     int        k;
 
@@ -3501,7 +3269,7 @@ FwdCoilSet* fwd_create_meg_coils(FwdCoilSet*      set,      /* These are the ava
     return res;
 
 bad : {
-        fwd_free_coil_set(res);
+        delete res;
         return NULL;
     }
 }
@@ -3527,9 +3295,9 @@ FwdCoil* fwd_create_eeg_el(fiffChInfo     ch,         /* Channel information to 
     }
 
     if (VEC_LEN(ch->chpos.ex) < 1e-4)
-        res = fwd_new_coil(1);	             /* No reference electrode */
+        res = new FwdCoil(1);	             /* No reference electrode */
     else
-        res = fwd_new_coil(2);		     /* Reference electrode present */
+        res = new FwdCoil(2);		     /* Reference electrode present */
 
     res->chname     = mne_strdup(ch->ch_name);
     res->desc       = mne_strdup("EEG electrode");
@@ -3577,7 +3345,7 @@ FwdCoilSet* fwd_create_eeg_els(fiffChInfo      chs,      /* Channel information 
                               fiffCoordTrans t)	 /* Transform the points using this */
 
 {
-    FwdCoilSet* res = fwd_new_coil_set();
+    FwdCoilSet* res = new FwdCoilSet();
     FwdCoil*    next;
     int        k;
 
@@ -3592,49 +3360,12 @@ FwdCoilSet* fwd_create_eeg_els(fiffChInfo      chs,      /* Channel information 
     return res;
 
 bad : {
-        fwd_free_coil_set(res);
+        delete res;
         return NULL;
     }
 }
 
 
-
-FwdCoil* fwd_dup_coil(FwdCoil* c)
-/*
- * Make a carbon copy
- */
-{
-    FwdCoil* res;
-    int p;
-    /*
-   * Create the result
-   */
-    res = fwd_new_coil(c->np);
-
-    if (c->chname)
-        res->chname   = mne_strdup(c->chname);
-    if (c->desc)
-        res->desc   = mne_strdup(c->desc);
-    res->coil_class = c->coil_class;
-    res->accuracy   = c->accuracy;
-    res->base       = c->base;
-    res->size       = c->size;
-    res->type       = c->type;
-
-    VEC_COPY(res->r0,c->r0);
-    VEC_COPY(res->ex,c->ex);
-    VEC_COPY(res->ey,c->ey);
-    VEC_COPY(res->ez,c->ez);
-
-    for (p = 0; p < c->np; p++) {
-        res->w[p] = c->w[p];
-        VEC_COPY(res->rmag[p],c->rmag[p]);
-        VEC_COPY(res->cosmag[p],c->cosmag[p]);
-    }
-    res->coord_frame = c->coord_frame;
-
-    return res;
-}
 
 
 
@@ -3658,7 +3389,7 @@ FwdCoilSet* fwd_dup_coil_set(FwdCoilSet* s,
             return NULL;
         }
     }
-    res = fwd_new_coil_set();
+    res = new FwdCoilSet();
     if (t)
         res->coord_frame = t->to;
     else
@@ -3668,7 +3399,7 @@ FwdCoilSet* fwd_dup_coil_set(FwdCoilSet* s,
     res->ncoil = s->ncoil;
 
     for (k = 0; k < s->ncoil; k++) {
-        coil = res->coils[k] = fwd_dup_coil(s->coils[k]);
+        coil = res->coils[k] = new FwdCoil(*(s->coils[k]));
         /*
      * Optional coordinate transformation
      */
@@ -7241,7 +6972,7 @@ mneCTFcompDataSet mne_read_ctf_comp_data(const QString& name)
         one->calibrated          = calibrated;
 
         if (mne_calibrate_ctf_comp(one,set->chs,set->nch,TRUE) == FAIL) {
-            printf("Warning: %s Compensation data for '%s' omitted\n");//,err_get_error(),mne_explain_ctf_comp(one->kind));
+            printf("Warning: Compensation data for '%s' omitted\n", mne_explain_ctf_comp(one->kind));//,err_get_error(),mne_explain_ctf_comp(one->kind));
             mne_free_ctf_comp_data(one);
         }
         else {
@@ -8971,71 +8702,6 @@ void mne_regularize_cov(mneCovMatrix c,       /* The matrix to regularize */
 
 
 
-
-
-
-//============================= mne_whiten.c =============================
-
-int mne_whiten_data(float **data, float **whitened_data, int np, int nchan, mneCovMatrix C)
-/*
-      * Apply the whitening operation
-      */
-{
-    int    j,k;
-    float  *one = NULL,*orig,*white;
-    double *inv;
-
-    if (data == NULL || np <= 0)
-        return OK;
-
-    if (C->ncov != nchan) {
-        printf("Incompatible covariance matrix. Cannot whiten the data.");
-        return FAIL;
-    }
-    inv = C->inv_lambda;
-    if (mne_is_diag_cov(C)) {
-        //    printf("<DEBUG> Performing Diag\n");
-        for (j = 0; j < np; j++) {
-            orig = data[j];
-            white = whitened_data[j];
-            for (k = 0; k < nchan; k++)
-                white[k] = orig[k]*inv[k];
-        }
-    }
-    else {
-        /*
-     * This is arranged so that whitened_data can be the same matrix as the original
-     */
-        one = MALLOC(nchan,float);
-        for (j = 0; j < np; j++) {
-            orig = data[j];
-            white = whitened_data[j];
-            for (k = C->nzero; k < nchan; k++)
-                one[k] = mne_dot_vectors(C->eigen[k],orig,nchan);
-            for (k = 0; k < C->nzero; k++)
-                white[k] = 0.0;
-            for (k = C->nzero; k < nchan; k++)
-                white[k] = one[k]*inv[k];
-        }
-        FREE(one);
-    }
-    return OK;
-}
-
-
-int mne_whiten_one_data(float *data, float *whitened_data, int nchan, mneCovMatrix C)
-
-{
-    float *datap[1];
-    float *whitened_datap[1];
-
-    datap[0] = data;
-    whitened_datap[0] = whitened_data;
-
-    return mne_whiten_data(datap,whitened_datap,1,nchan,C);
-}
-
-
 //============================= mne_mgh_mri_io.c =============================
 
 
@@ -9663,237 +9329,12 @@ int mne_transform_source_spaces_to(int            coord_frame,   /* Which coord 
 
 
 
-//============================= dipole_forward.c =============================
-
-
-DipoleForward* new_dipole_forward()
-
-{
-    DipoleForward* res = MALLOC(1,DipoleForward);
-
-    res->rd     = NULL;
-    res->fwd    = NULL;
-    res->scales = NULL;
-    res->uu     = NULL;
-    res->vv     = NULL;
-    res->sing   = NULL;
-    res->nch    = 0;
-    res->ndip   = 0;
-
-    return res;
-}
-
-
-
-
-void free_dipole_forward ( DipoleForward* f )
-{
-    if (!f)
-        return;
-    FREE_CMATRIX(f->rd);
-    FREE_CMATRIX(f->fwd);
-    FREE_CMATRIX(f->uu);
-    FREE_CMATRIX(f->vv);
-    FREE(f->sing);
-    FREE(f->scales);
-    FREE(f);
-    return;
-}
 
 
 
 
 
-int compute_dipole_field(DipoleFitData* d, float *rd, int whiten, float **fwd)
-/*
- * Compute the field and take whitening and projection into account
- */
-{
-    float *eeg_fwd[3];
-    static float Qx[] = {1.0,0.0,0.0};
-    static float Qy[] = {0.0,1.0,0.0};
-    static float Qz[] = {0.0,0.0,1.0};
-    int k;
-    /*
-   * Compute the fields
-   */
-    if (d->nmeg > 0) {
-        if (d->funcs->meg_vec_field) {
-            if (d->funcs->meg_vec_field(rd,d->meg_coils,fwd,d->funcs->meg_client) != OK)
-                goto bad;
-        }
-        else {
-            if (d->funcs->meg_field(rd,Qx,d->meg_coils,fwd[0],d->funcs->meg_client) != OK)
-                goto bad;
-            if (d->funcs->meg_field(rd,Qy,d->meg_coils,fwd[1],d->funcs->meg_client) != OK)
-                goto bad;
-            if (d->funcs->meg_field(rd,Qz,d->meg_coils,fwd[2],d->funcs->meg_client) != OK)
-                goto bad;
-        }
-    }
 
-    if (d->neeg > 0) {
-        if (d->funcs->eeg_vec_pot) {
-            eeg_fwd[0] = fwd[0]+d->nmeg;
-            eeg_fwd[1] = fwd[1]+d->nmeg;
-            eeg_fwd[2] = fwd[2]+d->nmeg;
-            if (d->funcs->eeg_vec_pot(rd,d->eeg_els,eeg_fwd,d->funcs->eeg_client) != OK)
-                goto bad;
-        }
-        else {
-            if (d->funcs->eeg_pot(rd,Qx,d->eeg_els,fwd[0]+d->nmeg,d->funcs->eeg_client) != OK)
-                goto bad;
-            if (d->funcs->eeg_pot(rd,Qy,d->eeg_els,fwd[1]+d->nmeg,d->funcs->eeg_client) != OK)
-                goto bad;
-            if (d->funcs->eeg_pot(rd,Qz,d->eeg_els,fwd[2]+d->nmeg,d->funcs->eeg_client) != OK)
-                goto bad;
-        }
-    }
-
-    /*
-   * Apply projection
-   */
-#ifdef DEBUG
-    fprintf(stdout,"orig : ");
-    for (k = 0; k < 3; k++)
-        fprintf(stdout,"%g ",sqrt(mne_dot_vectors(fwd[k],fwd[k],d->nmeg+d->neeg)));
-    fprintf(stdout,"\n");
-#endif
-
-    for (k = 0; k < 3; k++)
-        if (mne_proj_op_proj_vector(d->proj,fwd[k],d->nmeg+d->neeg,TRUE) == FAIL)
-            goto bad;
-
-#ifdef DEBUG
-    fprintf(stdout,"proj : ");
-    for (k = 0; k < 3; k++)
-        fprintf(stdout,"%g ",sqrt(mne_dot_vectors(fwd[k],fwd[k],d->nmeg+d->neeg)));
-    fprintf(stdout,"\n");
-#endif
-
-    /*
-   * Whiten
-   */
-    if (d->noise && whiten) {
-        if (mne_whiten_data(fwd,fwd,3,d->nmeg+d->neeg,d->noise) == FAIL)
-            goto bad;
-    }
-
-#ifdef DEBUG
-    fprintf(stdout,"white : ");
-    for (k = 0; k < 3; k++)
-        fprintf(stdout,"%g ",sqrt(mne_dot_vectors(fwd[k],fwd[k],d->nmeg+d->neeg)));
-    fprintf(stdout,"\n");
-#endif
-
-    return OK;
-
-bad :
-    return FAIL;
-}
-
-
-
-
-
-DipoleForward* dipole_forward(DipoleFitData* d,
-                             float         **rd,
-                             int           ndip,
-                             DipoleForward* old)
-/*
- * Compute the forward solution and do other nice stuff
- */
-{
-    DipoleForward* res;
-    float         **this_fwd;
-    float         S[3];
-    int           k,p;
-    /*
-   * Allocate data if necessary
-   */
-    if (old && old->ndip == ndip && old->nch == d->nmeg+d->neeg) {
-        res = old;
-    }
-    else {
-        free_dipole_forward(old); old = NULL;
-        res = new_dipole_forward();
-        res->fwd  = ALLOC_CMATRIX(3*ndip,d->nmeg+d->neeg);
-        res->uu   = ALLOC_CMATRIX(3*ndip,d->nmeg+d->neeg);
-        res->vv   = ALLOC_CMATRIX(3*ndip,3);
-        res->sing = MALLOC(3*ndip,float);
-        res->nch  = d->nmeg+d->neeg;
-        res->rd   = ALLOC_CMATRIX(ndip,3);
-        res->scales = MALLOC(3*ndip,float);
-        res->ndip = ndip;
-    }
-
-    for (k = 0; k < ndip; k++) {
-        VEC_COPY(res->rd[k],rd[k]);
-        this_fwd = res->fwd + 3*k;
-        /*
-     * Calculate the field of three orthogonal dipoles
-     */
-        if ((compute_dipole_field(d,rd[k],TRUE,this_fwd)) == FAIL)
-            goto bad;
-        /*
-     * Choice of column normalization
-     * (componentwise normalization is not recommended)
-     */
-        if (d->column_norm == COLUMN_NORM_LOC || d->column_norm == COLUMN_NORM_COMP) {
-            for (p = 0; p < 3; p++)
-                S[p] = mne_dot_vectors(res->fwd[3*k+p],res->fwd[3*k+p],res->nch);
-            if (d->column_norm == COLUMN_NORM_COMP) {
-                for (p = 0; p < 3; p++)
-                    res->scales[3*k+p] = sqrt(S[p]);
-            }
-            else {
-                /*
-     * Divide by three or not?
-     */
-                res->scales[3*k+0] = res->scales[3*k+1] = res->scales[3*k+2] = sqrt(S[0]+S[1]+S[2])/3.0;
-            }
-            for (p = 0; p < 3; p++) {
-                if (res->scales[3*k+p] > 0.0) {
-                    res->scales[3*k+p] = 1.0/res->scales[3*k+p];
-                    mne_scale_vector(res->scales[3*k+p],res->fwd[3*k+p],res->nch);
-                }
-                else
-                    res->scales[3*k+p] = 1.0;
-            }
-        }
-        else {
-            res->scales[3*k]   = 1.0;
-            res->scales[3*k+1] = 1.0;
-            res->scales[3*k+2] = 1.0;
-        }
-    }
-
-    /*
-   * SVD
-   */
-    if (mne_svd(res->fwd,3*ndip,d->nmeg+d->neeg,res->sing,res->vv,res->uu) != 0)
-        goto bad;
-
-    return res;
-
-bad : {
-        if (!old)
-            free_dipole_forward(res);
-        return NULL;
-    }
-}
-
-DipoleForward* dipole_forward_one(DipoleFitData* d,
-                                 float         *rd,
-                                 DipoleForward* old)
-/*
- * Convenience function to compute the field of one dipole
- */
-{
-    float *rds[1];
-    rds[0] = rd;
-    return dipole_forward(d,rds,1,old);
-}
 
 
 //============================= mne_add_geometry_info.c =============================
@@ -10382,7 +9823,7 @@ static mneSurface read_bem_surface( const QString& name,    /* Filename */
     }
     surfs = fiff_dir_tree_find(in->dirtree,FIFFB_BEM_SURF);
     if (surfs == NULL || surfs[0] == NULL) {
-        printf ("No BEM surfaces found in %s",name);
+        printf ("No BEM surfaces found in %s",name.toLatin1().constData());
         goto bad;
     }
     if (which >= 0) {
@@ -10401,7 +9842,7 @@ static mneSurface read_bem_surface( const QString& name,    /* Filename */
             }
         }
         if (id != which) {
-            printf("Desired surface not found in %s",name);
+            printf("Desired surface not found in %s",name.toLatin1().constData());
             goto bad;
         }
     }
@@ -10479,7 +9920,7 @@ static mneSurface read_bem_surface( const QString& name,    /* Filename */
                 goto bad;
         }
     }
-    else if (s->nn == NULL) {			/* Normals only */
+    else if (s->nn == NULL) {       /* Normals only */
         if (mne_add_vertex_normals(s) != OK)
             goto bad;
     }
@@ -12166,160 +11607,6 @@ char *fwd_bem_make_bem_sol_name(char *name)
 //============================= simplex_minimize.c =============================
 
 
-/*
- * This routine comes from Numerical recipes
- */
-
-#define ALPHA 1.0
-#define BETA 0.5
-#define GAMMA 2.0
-#define MIN_STOL_LOOP 5
-
-static float tryf (float **p,
-                   float *y,
-                   float *psum,
-                   int   ndim,
-                   float (*func)(float *x,int npar,void *user_data),	  /* The function to be evaluated */
-                   void  *user_data,				          /* Data to be passed to the above function in each evaluation */
-                   int   ihi,
-                   int   *neval,
-                   float fac)
-
-{
-    int j;
-    float fac1,fac2,ytry,*ptry;
-
-    ptry = ALLOC_FLOAT(ndim);
-    fac1 = (1.0-fac)/ndim;
-    fac2 = fac1-fac;
-    for (j = 0; j < ndim; j++)
-        ptry[j] = psum[j]*fac1-p[ihi][j]*fac2;
-    ytry = (*func)(ptry,ndim,user_data);
-    ++(*neval);
-    if (ytry < y[ihi]) {
-        y[ihi] = ytry;
-        for (j = 0; j < ndim; j++) {
-            psum[j] +=  ptry[j]-p[ihi][j];
-            p[ihi][j] = ptry[j];
-        }
-    }
-    FREE(ptry);
-    return ytry;
-}
-
-
-int simplex_minimize(float **p,		                              /* The initial simplex */
-                     float *y,		                              /* Function values at the vertices */
-                     int   ndim,	                              /* Number of variables */
-                     float ftol,	                              /* Relative convergence tolerance */
-                     float stol,
-                     float (*func)(float *x,int npar,void *user_data),/* The function to be evaluated */
-                     void  *user_data,				      /* Data to be passed to the above function in each evaluation */
-                     int   max_eval,	                              /* Maximum number of function evaluations */
-                     int   *neval,	                              /* Number of function evaluations */
-                     int   report,                                    /* How often to report (-1 = no_reporting) */
-                     int   (*report_func)(int loop,
-                                          float *fitpar, int npar,
-                                          double fval_lo,
-                                          double fval_hi,
-                                          double par_diff))            /* The function to be called when reporting */
-/*
-      * Minimization with the simplex algorithm
-      * Modified from Numerical recipes
-      */
-
-{
-    int   i,j,ilo,ihi,inhi;
-    int   mpts = ndim+1;
-    float ytry,ysave,sum,rtol,*psum;
-    double dsum,diff;
-    int   result = 0;
-    int   count = 0;
-    int   loop  = 1;
-
-    psum = ALLOC_FLOAT(ndim);
-    *neval = 0;
-    for (j = 0; j < ndim; j++) {
-        for (i = 0,sum = 0.0; i<mpts; i++)
-            sum +=  p[i][j];
-        psum[j] = sum;
-    }
-    if (report_func != NULL && report > 0)
-        (void)report_func (0,p[0],ndim,-1.0,-1.0,0.0);
-
-    dsum = 0.0;
-    for (;;count++,loop++) {
-        ilo = 1;
-        ihi  =  y[1]>y[2] ? (inhi = 2,1) : (inhi = 1,2);
-        for (i = 0; i < mpts; i++) {
-            if (y[i]  <  y[ilo]) ilo = i;
-            if (y[i] > y[ihi]) {
-                inhi = ihi;
-                ihi = i;
-            } else if (y[i] > y[inhi])
-                if (i !=  ihi) inhi = i;
-        }
-        rtol = 2.0*fabs(y[ihi]-y[ilo])/(fabs(y[ihi])+fabs(y[ilo]));
-        /*
-     * Report that we are proceeding...
-     */
-        if (count == report && report_func != NULL) {
-            if (report_func (loop,p[ilo],ndim,y[ilo],y[ihi],sqrt(dsum))) {
-                printf("Interation interrupted.");
-                result = -1;
-                break;
-            }
-            count = 0;
-        }
-        if (rtol < ftol) break;
-        if (*neval >=  max_eval) {
-            printf("Maximum number of evaluations exceeded.");
-            result  =  -1;
-            break;
-        }
-        if (stol > 0) {		/* Has the simplex collapsed? */
-            for (dsum = 0.0, j = 0; j < ndim; j++) {
-                diff = p[ilo][j] - p[ihi][j];
-                dsum += diff*diff;
-            }
-            if (loop > MIN_STOL_LOOP && sqrt(dsum) < stol)
-                break;
-        }
-        ytry = tryf(p,y,psum,ndim,func,user_data,ihi,neval,-ALPHA);
-        if (ytry <= y[ilo])
-            ytry = tryf(p,y,psum,ndim,func,user_data,ihi,neval,GAMMA);
-        else if (ytry >= y[inhi]) {
-            ysave = y[ihi];
-            ytry = tryf(p,y,psum,ndim,func,user_data,ihi,neval,BETA);
-            if (ytry >= ysave) {
-                for (i = 0; i < mpts; i++) {
-                    if (i !=  ilo) {
-                        for (j = 0; j < ndim; j++) {
-                            psum[j] = 0.5*(p[i][j]+p[ilo][j]);
-                            p[i][j] = psum[j];
-                        }
-                        y[i] = (*func)(psum,ndim,user_data);
-                    }
-                }
-                *neval +=  ndim;
-                for (j = 0; j < ndim; j++) {
-                    for (i = 0,sum = 0.0; i < mpts; i++)
-                        sum +=  p[i][j];
-                    psum[j] = sum;
-                }
-            }
-        }
-    }
-    FREE (psum);
-    return (result);
-}
-
-
-
-
-
-
-
 
 
 
@@ -12695,7 +11982,6 @@ int fwd_bem_specify_els(fwdBemModel m,
 
     extern fwdBemSolution fwd_bem_new_coil_solution();
     extern void fwd_bem_free_coil_solution(void *user);
-    extern void fwd_free_coil_set_user_data(FwdCoilSet* set);
 
     if (!m) {
         printf("Model missing in fwd_bem_specify_els");
@@ -12707,7 +11993,7 @@ int fwd_bem_specify_els(fwdBemModel m,
     }
     if (!els || els->ncoil == 0)
         return OK;
-    fwd_free_coil_set_user_data(els);
+    els->fwd_free_coil_set_user_data();
     /*
    * Hard work follows
    */
@@ -12771,7 +12057,7 @@ int fwd_bem_specify_els(fwdBemModel m,
     return OK;
 
 bad : {
-        fwd_free_coil_set_user_data(els);
+        els->fwd_free_coil_set_user_data();
         return FAIL;
     }
 }
@@ -13207,7 +12493,7 @@ float **fwd_bem_field_coeff(fwdBemModel m,	/* The model */
         }
         off = off + ntri;
     }
-    fwd_free_coil_set(tcoils);
+    delete tcoils;
     return coeff;
 }
 
@@ -13470,7 +12756,7 @@ float **fwd_bem_lin_field_coeff (fwdBemModel m,	        /* The model */
     /*
    * Discard the duplicate
    */
-    fwd_free_coil_set(tcoils);
+    delete tcoils;
     return (coeff);
 }
 
@@ -13493,7 +12779,7 @@ int fwd_bem_specify_coils(fwdBemModel m,
         printf("Solution not computed in fwd_bem_specify_coils");
         goto bad;
     }
-    fwd_free_coil_set_user_data(coils);
+    coils->fwd_free_coil_set_user_data();
     if (!coils || coils->ncoil == 0)
         return OK;
     if (m->bem_method == FWD_BEM_CONSTANT_COLL)
@@ -13750,7 +13036,7 @@ void fwd_free_comp_data(void *d)
 
     if (!comp)
         return;
-    fwd_free_coil_set(comp->comp_coils);
+    delete comp->comp_coils;
     mne_free_ctf_comp_data_set(comp->set);
     FREE(comp->work);
     FREE_CMATRIX(comp->vec_work);
@@ -13916,741 +13202,24 @@ int fwd_comp_field_vec(float *rd, FwdCoilSet* coils, float **res, void *client)
 
 //============================= fwd_fit_berg_scherg.c =============================
 
-static double dot_dvectors (double *v1,
-                            double *v2,
-                            int   nn)
-{
-    double result = 0.0;
-    int   k;
 
-    for (k = 0; k < nn; k++)
-        result = result + v1[k]*v2[k];
-    return (result);
-}
-
-static int c_dsvd(double **mat,		/* The matrix */
-                  int   m,int n,	/* m rows n columns */
-                  double *sing,	        /* Singular values (must have size
-                                                           * MIN(m,n)+1 */
-                  double **uu,		/* Left eigenvectors */
-                  double **vv)		/* Right eigenvectors */
-/*
-      * Compute the SVD of mat.
-      * The singular vector calculations depend on whether
-      * or not u and v are given.
-      * The allocations should be done as follows
-      *
-      * mat = ALLOC_DCMATRIX(m,n);
-      * vv  = ALLOC_DCMATRIX(MIN(m,n),n);
-      * uu  = ALLOC_DCMATRIX(MIN(m,n),m);
-      * sing = MALLOC(MIN(m,n),double);
-      *
-      * mat is modified by this operation
-      *
-      * This simply allocates the workspace and calls the
-      * LAPACK Fortran routine
-      */
-{
-    int    udim = MIN(m,n);
-
-    Eigen::MatrixXd eigen_mat = toDoubleEigenMatrix(mat, m, n);
-
-    //ToDo Optimize computation depending of whether uu or vv are defined
-    Eigen::JacobiSVD< Eigen::MatrixXd > svd(eigen_mat,Eigen::ComputeFullU | Eigen::ComputeFullV);
-
-    fromDoubleEigenVector(svd.singularValues(), sing, svd.singularValues().size());
-
-    if ( uu != NULL )
-        fromDoubleEigenMatrix(svd.matrixU().transpose(), uu, udim, m);
-
-    if ( vv != NULL )
-        fromDoubleEigenMatrix(svd.matrixV().transpose(), vv, n, n);
-
-    return 0;
-    //  return info;
-}
-
-/*
- * Include the simplex and SVD code here.
- * It is not too much of a problem
- */
-#define ALPHA 1.0
-#define BETA 0.5
-#define GAMMA 2.0
-
-static double tryit (double **p,
-                     double *y,
-                     double *psum,
-                     int ndim,
-                     double (*func)(double *,int,void *),
-                     void   *user_data,
-                     int ihi,
-                     int *neval,
-                     double fac)
-
-{
-    int j;
-    double fac1,fac2,ytry,*ptry;
-
-    ptry = MALLOC(ndim,double);
-    fac1 = (1.0-fac)/ndim;
-    fac2 = fac1-fac;
-    for (j = 0; j < ndim; j++)
-        ptry[j] = psum[j]*fac1-p[ihi][j]*fac2;
-    ytry = (*func)(ptry,ndim,user_data);
-    ++(*neval);
-    if (ytry < y[ihi]) {
-        y[ihi] = ytry;
-        for (j = 0; j < ndim; j++) {
-            psum[j] +=  ptry[j]-p[ihi][j];
-            p[ihi][j] = ptry[j];
-        }
-    }
-    FREE(ptry);
-    return ytry;
-}
-
-
-static int simplex_minimize(double **p,		     /* The initial simplex */
-                            double *y,		     /* Function values at the vertices */
-                            int   ndim,		     /* Number of variables */
-                            double ftol,	     /* Relative convergence tolerance */
-                            double (*func)(double *fitpar,int npar,void *user_data),
-                            /* The function to be evaluated */
-                            void  *user_data,	     /* Data to be passed to the above function in each evaluation */
-                            int   max_eval,	     /* Maximum number of function evaluations */
-                            int   *neval,	     /* Number of function evaluations */
-                            int   report,	     /* How often to report (-1 = no_reporting) */
-                            int   (*report_func)(int loop,
-                                                 double *fitpar, int npar,
-                                                 double fval)) /* The function to be called when reporting */
-
-/*
-      * Minimization with the simplex algorithm
-      * Modified from Numerical recipes
-      */
-
-{
-    int   i,j,ilo,ihi,inhi;
-    int   mpts = ndim+1;
-    double ytry,ysave,sum,rtol,*psum;
-    int   result = 0;
-    int   count = 0;
-    int   loop  = 1;
-
-    psum   = MALLOC(ndim,double);
-    *neval = 0;
-    for (j = 0; j < ndim; j++) {
-        for (i = 0,sum = 0.0; i<mpts; i++)
-            sum +=  p[i][j];
-        psum[j] = sum;
-    }
-    if (report_func != NULL && report > 0)
-        (void)report_func (0,p[0],ndim,-1.0);
-
-    for (;;count++,loop++) {
-        ilo = 1;
-        ihi  =  y[1]>y[2] ? (inhi = 2,1) : (inhi = 1,2);
-        for (i = 0; i < mpts; i++) {
-            if (y[i]  <  y[ilo]) ilo = i;
-            if (y[i] > y[ihi]) {
-                inhi = ihi;
-                ihi = i;
-            } else if (y[i] > y[inhi])
-                if (i !=  ihi) inhi = i;
-        }
-        rtol = 2.0*fabs(y[ihi]-y[ilo])/(fabs(y[ihi])+fabs(y[ilo]));
-        /*
-     * Report that we are proceeding...
-     */
-        if (count == report && report_func != NULL) {
-            if (report_func (loop,p[ilo],ndim,y[ilo])) {
-                qCritical("Interation interrupted.");
-                result = -1;
-                break;
-            }
-            count = 0;
-        }
-        if (rtol < ftol) break;
-        if (*neval >=  max_eval) {
-            qCritical("Maximum number of evaluations exceeded.");
-            result  =  -1;
-            break;
-        }
-        ytry = tryit(p,y,psum,ndim,func,user_data,ihi,neval,-ALPHA);
-        if (ytry <= y[ilo])
-            ytry = tryit(p,y,psum,ndim,func,user_data,ihi,neval,GAMMA);
-        else if (ytry >= y[inhi]) {
-            ysave = y[ihi];
-            ytry = tryit(p,y,psum,ndim,func,user_data,ihi,neval,BETA);
-            if (ytry >= ysave) {
-                for (i = 0; i < mpts; i++) {
-                    if (i !=  ilo) {
-                        for (j = 0; j < ndim; j++) {
-                            psum[j] = 0.5*(p[i][j]+p[ilo][j]);
-                            p[i][j] = psum[j];
-                        }
-                        y[i] = (*func)(psum,ndim,user_data);
-                    }
-                }
-                *neval +=  ndim;
-                for (j = 0; j < ndim; j++) {
-                    for (i = 0,sum = 0.0; i < mpts; i++)
-                        sum +=  p[i][j];
-                    psum[j] = sum;
-                }
-            }
-        }
-    }
-    FREE (psum);
-    return (result);
-}
-
-#undef ALPHA
-#undef BETA
-#undef GAMMA
-
-/*
- * This is the beginning of the specific code
- */
-typedef struct {
-    double *y;
-    double *resi;
-    double **M;
-    double **uu;
-    double **vv;
-    double *sing;
-    double *fn;
-    double *w;
-    int    nfit;
-    int    nterms;
-} *fitUser,fitUserRec;
-
-
-typedef struct {
-    double lambda;		/* Magnitude for the apparent dipole */
-    double mu;			/* Distance multiplier for the apparent dipole */
-} *bergSchergPar,bergSchergParRec;
-
-
-static int comp_pars(const void *p1,const void *p2)
-/*
-      * Comparison function for sorting layers
-      */
-{
-    bergSchergPar v1 = (bergSchergPar)p1;
-    bergSchergPar v2 = (bergSchergPar)p2;
-
-    if (v1->mu > v2->mu)
-        return -1;
-    else if (v1->mu < v2->mu)
-        return 1;
-    else
-        return 0;
-}
-
-static void sort_parameters(double *mu,double *lambda,int nfit)
-/*
-      * Sort the parameters so that largest mu comes first
-      */
-{
-    int k;
-    bergSchergPar pars = MALLOC(nfit,bergSchergParRec);
-
-    for (k = 0; k < nfit; k++) {
-        pars[k].mu = mu[k];
-        pars[k].lambda = lambda[k];
-    }
-    qsort (pars, nfit, sizeof(bergSchergParRec), comp_pars);
-    for (k = 0; k < nfit; k++) {
-        mu[k]     = pars[k].mu;
-        lambda[k] = pars[k].lambda;
-    }
-    return;
-}
-
-
-
-static int report_fit(int    loop,
-                      double  *mu,
-                      int    nfit,
-                      double Smin)
-/*
-      * Report our progress
-      */
-{
-#ifdef LOG_FIT
-    int k;
-    for (k = 0; k < nfit; k++)
-        fprintf(stderr,"%g ",mu[k]);
-    fprintf(stderr,"%g\n",Smin);
-#endif
-    return 0;
-}
-
-
-static double **get_initial_simplex(double  *pars,
-                                    int    npar,
-                                    double simplex_size)
-
-{
-    double **simplex = ALLOC_DCMATRIX(npar+1,npar);
-    int k;
-
-    for (k = 0; k < npar+1; k++)
-        memcpy (simplex[k],pars,npar*sizeof(double));
-    for (k = 1; k < npar+1; k++)
-        simplex[k][k-1] = simplex[k][k-1] + simplex_size;
-    return (simplex);
-}
-
-
-static fitUser new_fit_user(int nfit, int nterms)
-
-{
-    fitUser u = MALLOC(1,fitUserRec);
-    u->y      = MALLOC(nterms-1,double);
-    u->resi   = MALLOC(nterms-1,double);
-    u->M      = ALLOC_DCMATRIX(nterms-1,nfit-1);
-    u->uu     = ALLOC_DCMATRIX(nfit-1,nterms-1);
-    u->vv     = ALLOC_DCMATRIX(nfit-1,nfit-1);
-    u->sing   = MALLOC(nfit,double);
-    u->fn     = MALLOC(nterms,double);
-    u->w      = MALLOC(nterms,double);
-    u->nfit   = nfit;
-    u->nterms = nterms;
-    return u;
-}
-
-static void compose_linear_fitting_data(double *mu,fitUser u)
-
-{
-    double mu1n,k1;
-    int k,p;
-    /*
-   * y is the data to be fitted (nterms-1 x 1)
-   * M is the model matrix      (nterms-1 x nfit-1)
-   */
-    for (k = 0; k < u->nterms-1; k++) {
-        k1 = k + 1;
-        mu1n = pow(mu[0],k1);
-        u->y[k] = u->w[k]*(u->fn[k+1] - mu1n*u->fn[0]);
-        for (p = 0; p < u->nfit-1; p++)
-            u->M[k][p] = u->w[k]*(pow(mu[p+1],k1)-mu1n);
-    }
-}
-
-static double compute_linear_parameters(double *mu,
-                                        double *lambda,
-                                        fitUser u)
-/*
-      * Compute the best-fitting linear parameters
-      * Return the corresponding RV
-      */
-{
-    int k,p,q;
-    double *vec = MALLOC(u->nfit-1,double);
-    double sum;
-
-    compose_linear_fitting_data(mu,u);
-
-    c_dsvd(u->M,u->nterms-1,u->nfit-1,u->sing,u->uu,u->vv);
-    /*
-   * Compute the residuals
-   */
-    for (k = 0; k < u->nterms-1; k++)
-        u->resi[k] = u->y[k];
-
-    for (p = 0; p < u->nfit-1; p++) {
-        vec[p] = dot_dvectors(u->uu[p],u->y,u->nterms-1);
-        for (k = 0; k < u->nterms-1; k++)
-            u->resi[k] = u->resi[k] - u->uu[p][k]*vec[p];
-        vec[p] = vec[p]/u->sing[p];
-    }
-
-    for (p = 0; p < u->nfit-1; p++) {
-        for (q = 0, sum = 0.0; q < u->nfit-1; q++)
-            sum += u->vv[q][p]*vec[q];
-        lambda[p+1] = sum;
-    }
-    for (p = 1, sum = 0.0; p < u->nfit; p++)
-        sum += lambda[p];
-    lambda[0] = u->fn[0] - sum;
-    FREE(vec);
-    return dot_dvectors(u->resi,u->resi,u->nterms-1)/dot_dvectors(u->y,u->y,u->nterms-1);
-}
-
-static double one_step (double *mu, int nfit, void *user_data)
-/*
-      * Evaluate the residual sum of squares fit for one set of
-      * mu values
-      */
-{
-    int k,p;
-    double  dot;
-    fitUser u = (fitUser)user_data;
-
-    for (k = 0; k < u->nfit; k++) {
-        if (fabs(mu[k]) > 1.0)
-            return 1.0;
-    }
-    /*
-   * Compose the data for the linear fitting
-   */
-    compose_linear_fitting_data(mu,u);
-    /*
-   * Compute SVD
-   */
-    c_dsvd(u->M,u->nterms-1,u->nfit-1,u->sing,u->uu,NULL);
-    /*
-   * Compute the residuals
-   */
-    for (k = 0; k < u->nterms-1; k++)
-        u->resi[k] = u->y[k];
-    for (p = 0; p < u->nfit-1; p++) {
-        dot = dot_dvectors(u->uu[p],u->y,u->nterms-1);
-        for (k = 0; k < u->nterms-1; k++)
-            u->resi[k] = u->resi[k] - u->uu[p][k]*dot;
-    }
-    /*
-   * Return their sum of squares
-   */
-    return dot_dvectors(u->resi,u->resi,u->nterms-1);
-}
-
-
-int fwd_eeg_fit_berg_scherg(FwdEegSphereModel* m,       /* Conductor model definition */
-                            int   nterms,              /* Number of terms to use in the series expansion
-                                                                                    * when fitting the parameters */
-                            int   nfit,	               /* Number of equivalent dipoles to fit */
-                            float *rv)
-/*
-      * This routine fits the Berg-Scherg equivalent spherical model
-      * dipole parameters by minimizing the difference between the
-      * actual and approximative series expansions
-      */
-{
-    int   res = FAIL;
-    int   k;
-    double rd,R,f;
-    double simplex_size = 0.01;
-    double **simplex = NULL;
-    double *func_val = NULL;
-    double ftol = 1e-9;
-    double *lambda = NULL;
-    double *mu     = NULL;
-    int   neval;
-    int   max_eval = 1000;
-    int   report   = 1;
-    fitUser u = new_fit_user(nfit,nterms);
-
-    if (nfit < 2) {
-        printf("fwd_fit_berg_scherg does not work with less than two equivalent sources.");
-        return FAIL;
-    }
-    /*
-   * (1) Calculate the coefficients of the true expansion
-   */
-    for (k = 0; k < nterms; k++)
-        u->fn[k] = m->fwd_eeg_get_multi_sphere_model_coeff(k+1);
-    /*
-   * (2) Calculate the weighting
-   */
-    rd = R = m->layers[0].rad;
-    for (k = 1; k < m->nlayer; k++) {
-        if (m->layers[k].rad > R)
-            R = m->layers[k].rad;
-        if (m->layers[k].rad < rd)
-            rd = m->layers[k].rad;
-    }
-    f = rd/R;
-#ifdef ZHANG
-    /*
-   * This is the Zhang weighting
-   */
-    for (k = 1; k < nterms; k++)
-        u->w[k-1] = pow(f,k);
-#else
-    /*
-   * This is the correct weighting
-   */
-    for (k = 1; k < nterms; k++)
-        u->w[k-1] = sqrt((2.0*k+1)*(3.0*k+1.0)/k)*pow(f,(k-1.0));
-#endif
-    /*
-   * (3) Prepare for simplex minimization
-   */
-    func_val = MALLOC(nfit+1,double);
-    lambda   = MALLOC(nfit,double);
-    mu       = MALLOC(nfit,double);
-    /*
-   * (4) Rather arbitrary initial guess
-   */
-    for (k = 0; k < nfit; k++) {
-        /*
-    mu[k] = (k+1)*0.1*f;
-    */
-        mu[k] = (rand() / (RAND_MAX + 1.0))*f;//replacement for: mu[k] = drand48()*f;
-    }
-
-    simplex = get_initial_simplex(mu,nfit,simplex_size);
-    for (k = 0; k < nfit+1; k++)
-        func_val[k] = one_step(simplex[k],u->nfit,u);
-
-    /*
-   * (5) Do the nonlinear minimization
-   */
-    if ((res = simplex_minimize(simplex,func_val,nfit,
-                                ftol,one_step,
-                                u,
-                                max_eval,&neval,
-                                report,report_fit)) != OK)
-        goto out;
-
-    for (k = 0; k < nfit; k++)
-        mu[k] = simplex[0][k];
-
-    /*
-   * (6) Do the final step: calculation of the linear parameters
-   */
-    *rv = compute_linear_parameters(mu,lambda,u);
-    sort_parameters(mu,lambda,nfit);
-#ifdef LOG_FIT
-    fprintf(stderr,"RV = %g %%\n",100*(*rv));
-#endif
-    m->mu     = REALLOC(m->mu,nfit,float);
-    m->lambda = REALLOC(m->lambda,nfit,float);
-    m->nfit   = nfit;
-    for (k = 0; k < nfit; k++) {
-        m->mu[k] = mu[k];
-        /*
-     * This division takes into account the actual conductivities
-     */
-        m->lambda[k] = lambda[k]/m->layers[m->nlayer-1].sigma;
-#ifdef LOG_FIT
-        printf("lambda%d = %g\tmu%d = %g\n",k+1,lambda[k],k+1,mu[k]);
-#endif
-    }
-    /*
-   * This is the cleanup code
-   */
-out : {
-        FREE_DCMATRIX(simplex);
-        if (u) {
-            FREE(u->fn);
-            FREE_DCMATRIX(u->M);
-            FREE_DCMATRIX(u->uu);
-            FREE_DCMATRIX(u->vv);
-            FREE(u->y);
-            FREE(u->w);
-            FREE(u->resi);
-            FREE(u->sing);
-        }
-        FREE(func_val);
-        FREE(lambda);
-        FREE(mu);
-        return res;
-    }
-}
 
 
 
 //============================= fwd_eeg_sphere_models.c =============================
 
-/*
- * Basic routines for EEG sphere model bookkeeping
- */
-static FwdEegSphereModel* fwd_new_eeg_sphere_model()
-
-{
-    FwdEegSphereModel* m = MALLOC(1,FwdEegSphereModel);
-
-    m->name    = NULL;
-    m->nlayer  = 0;
-    m->layers  = NULL;
-    m->fn      = NULL;
-    m->nterms  = 0;
-    m->r0[0]   = 0.0;
-    m->r0[1]   = 0.0;
-    m->r0[2]   = 0.0;
-    m->lambda  = NULL;
-    m->mu      = NULL;
-    m->nfit    = 0;
-    m->scale_pos = 0;
-    return m;
-}
-
-
-void fwd_free_eeg_sphere_model(FwdEegSphereModel* m)
-
-{
-    if (!m)
-        return;
-    FREE(m->name);
-    FREE(m->layers);
-    FREE(m->fn);
-    FREE(m->mu);
-    FREE(m->lambda);
-    FREE(m);
-    return;
-}
 
 
 
 
-FwdEegSphereModel* fwd_dup_eeg_sphere_model(FwdEegSphereModel* m)
-
-{
-    FwdEegSphereModel* dup;
-    int k;
-
-    if (!m)
-        return NULL;
-
-    dup = fwd_new_eeg_sphere_model();
-
-    if (m->name)
-        dup->name = mne_strdup(m->name);
-    if (m->nlayer > 0) {
-        dup->layers = MALLOC(m->nlayer,INVERSELIB::FwdEegSphereLayer);
-        dup->nlayer = m->nlayer;
-        for (k = 0; k < m->nlayer; k++)
-            dup->layers[k] = m->layers[k];
-    }
-    VEC_COPY(dup->r0,m->r0);
-    if (m->nterms > 0) {
-        dup->fn = MALLOC(m->nterms,double);
-        dup->nterms = m->nterms;
-        for (k = 0; k < m->nterms; k++)
-            dup->fn[k] = m->fn[k];
-    }
-    if (m->nfit > 0) {
-        dup->mu     = MALLOC(m->nfit,float);
-        dup->lambda = MALLOC(m->nfit,float);
-        dup->nfit   = m->nfit;
-        for (k = 0; k < m->nfit; k++) {
-            dup->mu[k] = m->mu[k];
-            dup->lambda[k] = m->lambda[k];
-        }
-    }
-    dup->scale_pos = m->scale_pos;
-    return dup;
-}
 
 
 
-static int comp_layers(const void *p1,const void *p2)
-/*
-      * Comparison function for sorting layers
-      */
-{
-    FwdEegSphereLayer* v1 = (FwdEegSphereLayer*)p1;
-    FwdEegSphereLayer* v2 = (FwdEegSphereLayer*)p2;
-
-    if (v1->rad > v2->rad)
-        return 1;
-    else if (v1->rad < v2->rad)
-        return -1;
-    else
-        return 0;
-}
 
 
 
-static FwdEegSphereModel* fwd_create_eeg_sphere_model(const char *name,
-                                                     int nlayer,
-                                                     const float *rads,
-                                                     const float *sigmas)
-/*
-      * Produce a new sphere model structure
-      */
-{
-    FwdEegSphereModel* new_model = fwd_new_eeg_sphere_model();
-    int            k;
-    FwdEegSphereLayer* layers;
-    float          R,rR;
-
-    new_model->name   = mne_strdup(name);
-    new_model->nlayer = nlayer;
-    new_model->layers = layers = MALLOC(nlayer,FwdEegSphereLayer);
-
-    for (k = 0; k < nlayer; k++) {
-        layers[k].rad    = layers[k].rel_rad = rads[k];
-        layers[k].sigma  = sigmas[k];
-    }
-    /*
-   * Sort...
-   */
-    qsort (layers, nlayer, sizeof(FwdEegSphereLayer), comp_layers);
-    /*
-   * Scale the radiuses
-   */
-    R  = layers[nlayer-1].rad;
-    rR = layers[nlayer-1].rel_rad;
-    for (k = 0; k < nlayer; k++) {
-        layers[k].rad     = layers[k].rad/R;
-        layers[k].rel_rad = layers[k].rel_rad/rR;
-    }
-    return new_model;
-}
 
 
-
-static FwdEegSphereModelSet* fwd_new_eeg_sphere_model_set()
-
-{
-    FwdEegSphereModelSet* s = MALLOC(1,FwdEegSphereModelSet);
-
-    s->models  = NULL;
-    s->nmodel  = 0;
-    return s;
-}
-
-void fwd_free_eeg_sphere_model_set(FwdEegSphereModelSet* s)
-
-{
-    int k;
-    if (!s)
-        return;
-    for (k = 0; k < s->nmodel; k++)
-        fwd_free_eeg_sphere_model(s->models[k]);
-    FREE(s->models);
-    FREE(s);
-
-    return;
-}
-
-
-
-static FwdEegSphereModelSet* fwd_add_to_eeg_sphere_model_set(FwdEegSphereModelSet* s,
-                                                            FwdEegSphereModel* m)
-/*
- * Add a new model to a set.
- * The model should not be deallocated after this since it is attached to the set
- */
-{
-    if (!s)
-        s = fwd_new_eeg_sphere_model_set();
-
-    s->models = REALLOC(s->models,s->nmodel+1,FwdEegSphereModel*);
-    s->models[s->nmodel++] = m;
-    return s;
-}
-
-
-
-static FwdEegSphereModelSet* fwd_add_default_eeg_sphere_model(FwdEegSphereModelSet* s)
-/*
-      * Choose and setup the default EEG sphere model
-      */
-{
-    static const int   def_nlayer        = 4;
-    static const float def_unit_rads[]   = {0.90,0.92,0.97,1.0};
-    static const float def_sigmas[]      = {0.33,1.0,0.4e-2,0.33};
-
-    return fwd_add_to_eeg_sphere_model_set(s,fwd_create_eeg_sphere_model("Default",
-                                                                         def_nlayer,def_unit_rads,def_sigmas));
-}
 
 
 
@@ -14669,180 +13238,8 @@ static FwdEegSphereModelSet* fwd_add_default_eeg_sphere_model(FwdEegSphereModelS
 #endif
 
 
-FwdEegSphereModelSet* fwd_load_eeg_sphere_models(const QString& filename, FwdEegSphereModelSet* now)
-/*
-      * Load all models available in the specified file
-      */
-{
-    char line[MAXLINE];
-    FILE *fp = NULL;
-    char  *name   = NULL;
-    float *rads   = NULL;
-    float *sigmas = NULL;
-    int   nlayer  = 0;
-    char  *one,*two;
-    char  *tag = NULL;
-
-    if (!now)
-        now = fwd_add_default_eeg_sphere_model(now);
-
-    if (filename.isEmpty())
-        return now;
-
-#if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
-    if (_access(filename.toLatin1().data(),R_OK) != OK)	/* Never mind about an unaccesible file */
-        return now;
-#else
-    if (access(filename.toLatin1().data(),R_OK) != OK)	/* Never mind about an unaccesible file */
-        return now;
-#endif
-
-    if ((fp = fopen(filename.toLatin1().data(),"r")) == NULL) {
-        printf(filename.toLatin1().data());
-        goto bad;
-    }
-    while (fgets(line,MAXLINE,fp) != NULL) {
-        if (line[0] == '#')
-            continue;
-        one = strtok(line,SEP);
-        if (one != NULL) {
-            if (!tag || strlen(tag) == 0)
-                name = mne_strdup(one);
-            else {
-                name = MALLOC(strlen(one)+strlen(tag)+10,char);
-                sprintf(name,"%s %s",one,tag);
-            }
-            while (1) {
-                one = strtok(NULL,SEP);
-                if (one == NULL)
-                    break;
-                two = strtok(NULL,SEP);
-                if (two == NULL)
-                    break;
-                rads   = REALLOC(rads,nlayer+1,float);
-                sigmas = REALLOC(sigmas,nlayer+1,float);
-                if (sscanf(one,"%g",rads+nlayer) != 1) {
-                    nlayer = 0;
-                    break;
-                }
-                if (sscanf(two,"%g",sigmas+nlayer) != 1) {
-                    nlayer = 0;
-                    break;
-                }
-                nlayer++;
-            }
-            if (nlayer > 0)
-                now = fwd_add_to_eeg_sphere_model_set(now,fwd_create_eeg_sphere_model(name,nlayer,rads,sigmas));
-            nlayer = 0;
-        }
-    }
-    if (ferror(fp)) {
-        printf(filename.toLatin1().data());
-        goto bad;
-    }
-    fclose(fp);
-    return now;
-
-bad : {
-        if (fp)
-            fclose(fp);
-        fwd_free_eeg_sphere_model_set(now);
-        return NULL;
-    }
-}
 
 
-
-
-
-void fwd_list_eeg_sphere_models(FILE *f, FwdEegSphereModelSet* s)
-/*
- * List the properties of available models
- */
-{
-    int k,p;
-    FwdEegSphereModel* this_model;
-
-    if (!s || s->nmodel < 0)
-        return;
-    fprintf(f,"Available EEG sphere models:\n");
-    for (k = 0; k < s->nmodel; k++) {
-        this_model = s->models[k];
-        fprintf(f,"\t%s : %d",this_model->name,this_model->nlayer);
-        for (p = 0; p < this_model->nlayer; p++)
-            fprintf(f," : %7.3f : %7.3f",this_model->layers[p].rel_rad,this_model->layers[p].sigma);
-        fprintf(f,"\n");
-    }
-}
-
-
-
-FwdEegSphereModel* fwd_select_eeg_sphere_model(QString name,FwdEegSphereModelSet* s)
-/*
- * Find a model with a given name and return a duplicate
- */
-{
-    int k;
-
-    if (name.isEmpty())
-        name = QString("Default");
-
-    if (!s || s->nmodel == 0) {
-        printf("No EEG sphere model definitions available");
-        return NULL;
-    }
-
-    for (k = 0; k < s->nmodel; k++) {
-        if (strcasecmp(s->models[k]->name,name.toLatin1().data()) == 0) {
-            fprintf(stderr,"Selected model: %s\n",s->models[k]->name);
-            return fwd_dup_eeg_sphere_model(s->models[k]);
-        }
-    }
-    printf("EEG sphere model %s not found.",name.toLatin1().data());
-    return NULL;
-}
-
-
-int fwd_setup_eeg_sphere_model(FwdEegSphereModel* m,
-                               float rad,
-                               int   fit_berg_scherg,
-                               int   nfit)
-/*
- * Setup the EEG sphere model calculations
- */
-{
-    static const int nterms = 200;
-    float  rv;
-    int    k;
-
-    if (!m) {
-        printf("No EEG model specified");
-        return FAIL;
-    }
-    /*
-   * Scale the relative radiuses
-   */
-    for (k = 0; k < m->nlayer; k++)
-        m->layers[k].rad = rad*m->layers[k].rel_rad;
-
-    if (fit_berg_scherg) {
-        if (fwd_eeg_fit_berg_scherg(m,nterms,nfit,&rv) == OK) {
-            fprintf(stderr,"Equiv. model fitting -> ");
-            fprintf(stderr,"RV = %g %%\n",100*rv);
-            for (k = 0; k < nfit; k++)
-                fprintf(stderr,"mu%d = %g\tlambda%d = %g\n",
-                        k+1,m->mu[k],k+1,m->layers[m->nlayer-1].sigma*m->lambda[k]);
-        }
-        else
-            goto bad;
-    }
-    fprintf(stderr,"Defined EEG sphere model with rad = %7.2f mm\n",
-            1000.0*rad);
-    return OK;
-
-bad :
-    return FAIL;
-}
 
 
 
@@ -15530,6 +13927,21 @@ GuessData* new_guess_data()
     return res;
 }
 
+
+void free_dipole_forward_2 ( DipoleForward* f )
+{
+    if (!f)
+        return;
+    FREE_CMATRIX(f->rd);
+    FREE_CMATRIX(f->fwd);
+    FREE_CMATRIX(f->uu);
+    FREE_CMATRIX(f->vv);
+    FREE(f->sing);
+    FREE(f->scales);
+    FREE(f);
+    return;
+}
+
 void free_guess_data(GuessData* g)
 
 {
@@ -15540,7 +13952,7 @@ void free_guess_data(GuessData* g)
     FREE_CMATRIX(g->rr);
     if (g->guess_fwd) {
         for (k = 0; k < g->nguess; k++)
-            free_dipole_forward(g->guess_fwd[k]);
+            free_dipole_forward_2(g->guess_fwd[k]);
         FREE(g->guess_fwd);
     }
     FREE(g);
@@ -15628,15 +14040,15 @@ void free_dipole_fit_data(DipoleFitData* d)
     FREE(d->mri_head_t);
     FREE(d->meg_head_t);
     FREE(d->chs);
-    fwd_free_coil_set(d->meg_coils);
-    fwd_free_coil_set(d->eeg_els);
+    delete d->meg_coils;
+    delete d->eeg_els;
     FREE(d->bemname);
     mne_free_cov(d->noise);
     mne_free_cov(d->noise_orig);
     mne_free_name_list(d->ch_names,d->nmeg+d->neeg);
     mne_free_sparse(d->pick);
     fwd_bem_free_model(d->bem_model);
-    fwd_free_eeg_sphere_model(d->eeg_model);
+    delete d->eeg_model;
     if (d->user_free)
         d->user_free(d->user);
 
@@ -15929,43 +14341,33 @@ bad :
     return FAIL;
 }
 
-FwdEegSphereModel* setup_eeg_sphere_model(const QString& eeg_model_file,   /* Contains the model specifications */
-                                         QString eeg_model_name,	  /* Name of the model to use */
-                                         float eeg_sphere_rad)    /* Outer surface radius */
-/*
-      * Set up the desired sphere model for EEG
-      */
-{
-    FwdEegSphereModelSet* eeg_models = NULL;
-    FwdEegSphereModel*    eeg_model  = NULL;
 
-    if (eeg_model_name.isEmpty())
-        eeg_model_name = QString("Default");
-//    else
-//        eeg_model_name = mne_strdup(eeg_model_name);
 
-    eeg_models = fwd_load_eeg_sphere_models(eeg_model_file,NULL);
-    fwd_list_eeg_sphere_models(stderr,eeg_models);
 
-    if ((eeg_model = fwd_select_eeg_sphere_model(eeg_model_name,eeg_models)) == NULL)
-        goto bad;
 
-    if (fwd_setup_eeg_sphere_model(eeg_model,eeg_sphere_rad,TRUE,3) == FAIL)
-        goto bad;
-    printf("Using EEG sphere model \"%s\" with scalp radius %7.1f mm\n",
-           eeg_model->name,1000*eeg_sphere_rad);
-    printf("\n");
-//    FREE(eeg_model_name);
-    fwd_free_eeg_sphere_model_set(eeg_models);
-    return eeg_model;
 
-bad : {
-        fwd_free_eeg_sphere_model_set(eeg_models);
-        fwd_free_eeg_sphere_model(eeg_model);
-//        FREE(eeg_model_name);
-        return NULL;
-    }
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 int scale_noise_cov(DipoleFitData* f,int nave)
@@ -16479,16 +14881,16 @@ DipoleFitData* setup_dipole_fit_data(   const QString& mriname,         /**< Thi
     }
 
     mne_free_name_list(badlist,nbad);
-    fwd_free_coil_set(templates);
-    fwd_free_coil_set(comp_coils);
+    delete templates;
+    delete comp_coils;
     mne_free_ctf_comp_data_set(comp_data);
     return res;
 
 
 bad : {
         mne_free_name_list(badlist,nbad);
-        fwd_free_coil_set(templates);
-        fwd_free_coil_set(comp_coils);
+        delete templates;
+        delete comp_coils;
         mne_free_ctf_comp_data_set(comp_data);
         free_dipole_fit_data(res);
         return NULL;
@@ -16497,63 +14899,19 @@ bad : {
 
 
 
-int compute_guess_fields(GuessData* guess,
-                         DipoleFitData* f)
-/*
-      * Once the guess locations have been set up we can compute the fields
-      */
-{
-    dipoleFitFuncs orig = NULL;
-    int k;
 
-    if (!guess || !f) {
-        qCritical("Data missing in compute_guess_fields");
-        goto bad;
-    }
-    if (!f->noise) {
-        qCritical("Noise covariance missing in compute_guess_fields");
-        goto bad;
-    }
-    printf("Go through all guess source locations...");
-    orig = f->funcs;
-    if (f->fit_mag_dipoles)
-        f->funcs = f->mag_dipole_funcs;
-    else
-        f->funcs = f->sphere_funcs;
-    for (k = 0; k < guess->nguess; k++) {
-        if ((guess->guess_fwd[k] = dipole_forward_one(f,guess->rr[k],guess->guess_fwd[k])) == NULL)
-            goto bad;
-#ifdef DEBUG
-        sing = guess->guess_fwd[k]->sing;
-        printf("%f %f %f\n",sing[0],sing[1],sing[2]);
-#endif
-    }
-    f->funcs = orig;
-    printf("[done %d sources]\n",guess->nguess);
-    return OK;
 
-bad : {
-        if (orig)
-            f->funcs = orig;
-        return FAIL;
-    }
-}
 
-GuessData* make_guess_data( const QString& guessname,
-                            const QString& guess_surfname,
-                            float         mindist,
-                            float         exclude,
-                            float         grid,
-                            DipoleFitData* f,
-                            char          *guess_save_name)
 
+
+GuessData* make_guess_data( const QString& guessname, const QString& guess_surfname, float mindist, float exclude, float grid, DipoleFitData* f, char *guess_save_name)
 {
     mneSourceSpace *sp = NULL;
-    int            nsp = 0;
+    int             nsp = 0;
     GuessData*      res = NULL;
-    int            k,p;
-    float          guessrad = 0.080;
-    mneSourceSpace guesses = NULL;
+    int             k,p;
+    float           guessrad = 0.080f;
+    mneSourceSpace  guesses = NULL;
 
     if (!guessname.isEmpty()) {
         /*
@@ -16568,7 +14926,7 @@ GuessData* make_guess_data( const QString& guessname,
             FREE(sp);
             goto bad;
         }
-        printf("Read guesses from %s\n",guessname);
+        printf("Read guesses from %s\n",guessname.toLatin1().constData());
         guesses = sp[0]; FREE(sp);
     }
     else {
@@ -16628,9 +14986,9 @@ GuessData* make_guess_data( const QString& guessname,
     for (k = 0; k < res->nguess; k++)
         res->guess_fwd[k] = NULL;
     /*
-   * Compute the guesses using the sphere model for speed
-   */
-    if (compute_guess_fields(res,f) == FAIL)
+    * Compute the guesses using the sphere model for speed
+    */
+    if (!res->compute_guess_fields(f))
         goto bad;
 
     return res;
@@ -16675,7 +15033,7 @@ GuessData* make_guess_data( const QString& guessname,
             FREE(sp);
             goto bad;
         }
-        fprintf(stderr,"Read guesses from %s\n",guessname);
+        fprintf(stderr,"Read guesses from %s\n",guessname.toLatin1().constData());
         guesses = sp[0]; FREE(sp);
     }
     else {
@@ -16718,8 +15076,8 @@ GuessData* make_guess_data( const QString& guessname,
     for (k = 0; k < res->nguess; k++)
         res->guess_fwd[k] = NULL;
     /*
-   * Compute the guesses using the sphere model for speed
-   */
+    * Compute the guesses using the sphere model for speed
+    */
     orig = f->funcs;
     if (f->fit_mag_dipoles)
         f->funcs = f->mag_dipole_funcs;
@@ -16727,7 +15085,7 @@ GuessData* make_guess_data( const QString& guessname,
         f->funcs = f->sphere_funcs;
 
     for (k = 0; k < res->nguess; k++) {
-        if ((res->guess_fwd[k] = dipole_forward_one(f,res->rr[k],NULL)) == NULL)
+        if ((res->guess_fwd[k] = DipoleFitData::dipole_forward_one(f,res->rr[k],NULL)) == NULL)
             goto bad;
 #ifdef DEBUG
         sing = res->guess_fwd[k]->sing;
@@ -19391,7 +17749,7 @@ mneMeasData mne_read_meas_data_add(const QString&       name,       /* Name of t
         else {
             new_data->proj = mne_read_proj_op(name);
             if (new_data->proj && new_data->proj->nitems > 0) {
-                fprintf(stderr,"\tLoaded projection from %s:\n",name);
+                fprintf(stderr,"\tLoaded projection from %s:\n",name.toLatin1().data());
                 mne_proj_op_report(stderr,"\t\t",new_data->proj);
             }
             new_data->comp = mne_read_ctf_comp_data(name);
@@ -19833,316 +18191,19 @@ GuessData* get_dipole_fit_guess_data(mshMegEegData d)
 
 //============================= fit_dipoles.c =============================
 
-typedef struct {
-    float          limit;
-    int            report_dim;
-    float          *B;
-    double         B2;
-    DipoleForward*  fwd;
-} *fitDipUser,fitDipUserRec;
-
-static int find_best_guess(float     *B,         /* The whitened data */
-                           int       nch,
-                           GuessData* guess,	 /* Guesses */
-                           float     limit,	 /* Pseudoradial component omission limit */
-                           int       *bestp,	 /* Which is the best */
-                           float     *goodp)	 /* Best goodness of fit */
-/*
- * Thanks to the precomputed SVD everything is really simple
- */
-{
-    int    k,c;
-    double B2,Bm2,this_good,one;
-    int    best = -1;
-    float  good = 0.0;
-    DipoleForward* fwd;
-    int    ncomp;
-
-    B2 = mne_dot_vectors(B,B,nch);
-    for (k = 0; k < guess->nguess; k++) {
-        fwd = guess->guess_fwd[k];
-        if (fwd->nch == nch) {
-            ncomp = fwd->sing[2]/fwd->sing[0] > limit ? 3 : 2;
-            for (c = 0, Bm2 = 0.0; c < ncomp; c++) {
-                one = mne_dot_vectors(fwd->uu[c],B,nch);
-                Bm2 = Bm2 + one*one;
-            }
-            this_good = 1.0 - (B2 - Bm2)/B2;
-            if (this_good > good) {
-                best = k;
-                good = this_good;
-            }
-        }
-    }
-    if (best < 0) {
-        printf("No reasonable initial guess found.");
-        return FAIL;
-    }
-    *bestp = best;
-    *goodp = good;
-    return OK;
-}
 
 
-static float **make_initial_dipole_simplex(float  *r0,
-                                           float  size)
-/*
-      * Make the initial tetrahedron
-      */
-{
-    /*
-   * For this definition of a regular tetrahedron, see
-   *
-   * http://mathworld.wolfram.com/Tetrahedron.html
-   *
-   */
-    float x = sqrt(3.0)/3.0;
-    float r = sqrt(6.0)/12.0;
-    float R = 3*r;
-    float d = x/2.0;
-    float rr[][3] = { { x , 0.0,  -r },
-                      { -d, 0.5,  -r },
-                      { -d, -0.5, -r },
-                      { 0.0, 0.0, R } };
-
-    float **simplex = ALLOC_CMATRIX(4,3);
-    int j,k;
-
-    for (j = 0; j < 4; j++) {
-        VEC_COPY(simplex[j],rr[j]);
-        for (k = 0; k < 3; k++)
-            simplex[j][k] = size*simplex[j][k] + r0[k];
-    }
-    return simplex;
-}
 
 
-static int report_func(int     loop,
-                       float   *fitpar,
-                       int     npar,
-                       double  fval_lo,
-                       double  fval_hi,
-                       double  par_diff)
-/*
-      * Report periodically
-      */
-{
-    float *r0 = fitpar;
-
-    fprintf(stdout,"loop %d rd %7.2f %7.2f %7.2f fval %g %g par diff %g\n",
-            loop,1000*r0[0],1000*r0[1],1000*r0[2],fval_lo,fval_hi,1000*par_diff);
-
-    return OK;
-}
 
 
-static int fit_Q(DipoleFitData* fit,	     /* The fit data */
-                 float *B,		     /* Measurement */
-                 float *rd,		     /* Dipole position */
-                 float limit,		     /* Radial component omission limit */
-                 float *Q,		     /* The result */
-                 int   *ncomp,
-                 float *res)	             /* Residual sum of squares */
-/*
- * fit the dipole moment once the location is known
- */
-{
-    int c;
-    DipoleForward* fwd = dipole_forward_one(fit,rd,NULL);
-    float Bm2,one;
-
-    if (!fwd)
-        return FAIL;
-
-    *ncomp = fwd->sing[2]/fwd->sing[0] > limit ? 3 : 2;
-
-    Q[0] = Q[1] = Q[2] = 0.0;
-    for (c = 0, Bm2 = 0.0; c < *ncomp; c++) {
-        one = mne_dot_vectors(fwd->uu[c],B,fwd->nch);
-        mne_add_scaled_vector_to(fwd->vv[c],one/fwd->sing[c],Q,3);
-        Bm2 = Bm2 + one*one;
-    }
-    /*
-   * Counteract the effect of column normalization
-   */
-    for (c = 0; c < 3; c++)
-        Q[c] = fwd->scales[c]*Q[c];
-    *res = mne_dot_vectors(B,B,fwd->nch) - Bm2;
-
-    free_dipole_forward(fwd);
-
-    return OK;
-}
-
-static float fit_eval(float *rd,int npar,void *user)
-/*
- * Calculate the residual sum of squares
- */
-{
-    DipoleFitData* fit   = (DipoleFitData*)user;
-    DipoleForward* fwd;
-    fitDipUser       fuser = (fitDipUser)fit->user;
-    double        Bm2,one;
-    int           ncomp,c;
-
-    fwd   = fuser->fwd = dipole_forward_one(fit,rd,fuser->fwd);
-    ncomp = fwd->sing[2]/fwd->sing[0] > fuser->limit ? 3 : 2;
-    if (fuser->report_dim)
-        fprintf(stderr,"ncomp = %d\n",ncomp);
-
-    for (c = 0, Bm2 = 0.0; c < ncomp; c++) {
-        one = mne_dot_vectors(fwd->uu[c],fuser->B,fwd->nch);
-        Bm2 = Bm2 + one*one;
-    }
-    return fuser->B2-Bm2;
-}
-
-static float rtol(float *vals,int nval)
-
-{
-    float minv,maxv;
-    int   k;
-
-    minv = maxv = vals[0];
-    for (k = 1; k < nval; k++) {
-        if (vals[k] < minv)
-            minv = vals[k];
-        if (vals[k] > maxv)
-            maxv = vals[k];
-    }
-    return 2.0*(maxv-minv)/(maxv+minv);
-}
 
 
-static bool fit_one(DipoleFitData* fit,	            /* Precomputed fitting data */
-                    GuessData*     guess,	            /* The initial guesses */
-                    float         time,              /* Which time is it? */
-                    float         *B,	            /* The field to fit */
-                    int           verbose,
-                    ECD&          res               /* The fitted dipole */
-                    )
-/*
- * Fit a single dipole to the given data
- */
-{
-    float  **simplex       = NULL;	       /* The simplex */
-    float  vals[4];			       /* Values at the vertices */
-    float  limit           = 0.2;	               /* (pseudo) radial component omission limit */
-    float  size            = 1e-2;	       /* Size of the initial simplex */
-    float  ftol[]          = { 1e-2, 1e-2 };     /* Tolerances on the the two passes */
-    float  atol[]          = { 0.2e-3, 0.2e-3 }; /* If dipole movement between two iterations is less than this,
-                                                  we consider to have converged */
-    int    ntol            = 2;
-    int    max_eval        = 1000;	       /* Limit for fit function evaluations */
-    int    report_interval = verbose ? 1 : -1;   /* How often to report the intermediate result */
-
-    int        best;
-    float      good,rd_guess[3],rd_final[3],Q[3],final_val;
-    fitDipUserRec user;
-    int        k,p,neval,neval_tot,nchan,ncomp;
-    int        fit_fail;
-
-    nchan = fit->nmeg+fit->neeg;
-    user.fwd = NULL;
-
-    if (mne_proj_op_proj_vector(fit->proj,B,nchan,TRUE) == FAIL)
-        goto bad;
-
-    if (mne_whiten_one_data(B,B,nchan,fit->noise) == FAIL)
-        goto bad;
-    /*
-   * Get the initial guess
-   */
-    if (find_best_guess(B,nchan,guess,limit,&best,&good) < 0)
-        goto bad;
 
 
-    user.limit = limit;
-    user.B     = B;
-    user.B2    = mne_dot_vectors(B,B,nchan);
-    user.fwd   = NULL;
-    user.report_dim = FALSE;
-    fit->user  = &user;
 
-    VEC_COPY(rd_guess,guess->rr[best]);
-    VEC_COPY(rd_final,guess->rr[best]);
 
-    neval_tot = 0;
-    fit_fail = FALSE;
-    for (k = 0; k < ntol; k++) {
-        /*
-     * Do first pass with the sphere model
-     */
-        if (k == 0)
-            fit->funcs = fit->sphere_funcs;
-        else
-            fit->funcs = fit->bemname ? fit->bem_funcs : fit->sphere_funcs;
 
-        simplex = make_initial_dipole_simplex(rd_guess,size);
-        for (p = 0; p < 4; p++)
-            vals[p] = fit_eval(simplex[p],3,fit);
-        if (simplex_minimize(simplex,           /* The initial simplex */
-                             vals,              /* Function values at the vertices */
-                             3,	            /* Number of variables */
-                             ftol[k],           /* Relative convergence tolerance for the target function */
-                             atol[k],           /* Absolute tolerance for the change in the parameters */
-                             fit_eval,          /* The function to be evaluated */
-                             fit,	            /* Data to be passed to the above function in each evaluation */
-                             max_eval,          /* Maximum number of function evaluations */
-                             &neval,            /* Number of function evaluations */
-                             report_interval,   /* How often to report (-1 = no_reporting) */
-                             report_func) != OK) {
-            if (k == 0)
-                goto bad;
-            else {
-                printf("\nWarning (t = %8.1f ms) : g = %6.1f %% final val = %7.3f rtol = %f\n",
-                       1000*time,100*(1 - vals[0]/user.B2),vals[0],rtol(vals,4));
-                fit_fail = TRUE;
-            }
-        }
-        VEC_COPY(rd_final,simplex[0]);
-        VEC_COPY(rd_guess,simplex[0]);
-        FREE_CMATRIX(simplex); simplex = NULL;
-
-        neval_tot += neval;
-        final_val  = vals[0];
-    }
-    /*
-   * Confidence limits should be computed here
-   */
-    /*
-   * Compute the dipole moment at the final point
-   */
-    if (fit_Q(fit,user.B,rd_final,user.limit,Q,&ncomp,&final_val) == OK) {
-        res.time  = time;
-        res.valid = true;
-        for(int i = 0; i < 3; ++i)
-            res.rd[i] = rd_final[i];
-        for(int i = 0; i < 3; ++i)
-            res.Q[i] = Q[i];
-        res.good  = 1.0 - final_val/user.B2;
-        if (fit_fail)
-            res.good = -res.good;
-        res.khi2  = final_val;
-        if (fit->proj)
-            res.nfree = nchan-3-ncomp-fit->proj->nvec;
-        else
-            res.nfree = nchan-3-ncomp;
-        res.neval = neval_tot;
-    }
-    else
-        goto bad;
-    free_dipole_forward(user.fwd);
-    FREE_CMATRIX(simplex);
-
-    return true;
-
-bad : {
-        free_dipole_forward(user.fwd);
-        FREE_CMATRIX(simplex);
-        return false;
-    }
-}
 
 
 #define SEG_LEN 10.0
@@ -20209,7 +18270,7 @@ int fit_dipoles_raw(const QString&  dataname,
         /*
      * Fit
      */
-        if (!fit_one(fit,guess,time,one,verbose,dip))
+        if (!DipoleFitData::fit_one(fit,guess,time,one,verbose,dip))
             qWarning() << "Error";
         else {
             set.addEcd(dip);
@@ -20257,49 +18318,6 @@ int fit_dipoles_raw(const QString& dataname,
 }
 
 
-void print_fields(float       *rd,
-                  float       *Q,
-                  float       time,
-                  float       integ,
-                  DipoleFitData* fit,
-                  mneMeasData data)
-
-{
-    float *one = MALLOC(data->nchan,float);
-    int   k;
-    float **fwd = NULL;
-
-    if (mne_get_values_from_data(time,integ,data->current->data,data->current->np,data->nchan,data->current->tmin,
-                                 1.0/data->current->tstep,FALSE,one) == FAIL) {
-        fprintf(stderr,"Cannot pick time: %7.1f ms\n",1000*time);
-        return;
-    }
-    for (k = 0; k < data->nchan; k++)
-        if (data->chs[k].chpos.coil_type == FIFFV_COIL_CTF_REF_GRAD ||
-                data->chs[k].chpos.coil_type == FIFFV_COIL_CTF_OFFDIAG_REF_GRAD) {
-            printf("%g ",1e15*one[k]);
-        }
-    printf("\n");
-
-
-    fwd = ALLOC_CMATRIX(3,fit->nmeg+fit->neeg);
-    if (compute_dipole_field(fit,rd,FALSE,fwd) == FAIL)
-        goto out;
-
-    for (k = 0; k < data->nchan; k++)
-        if (data->chs[k].chpos.coil_type == FIFFV_COIL_CTF_REF_GRAD ||
-                data->chs[k].chpos.coil_type == FIFFV_COIL_CTF_OFFDIAG_REF_GRAD) {
-            printf("%g ",1e15*(Q[X]*fwd[X][k]+Q[Y]*fwd[Y][k]+Q[Z]*fwd[Z][k]));
-        }
-    printf("\n");
-
-out : {
-        FREE(one);
-        FREE_CMATRIX(fwd);
-    }
-    return;
-}
-
 
 int    fit_dipoles( const QString&  dataname,
                     mneMeasData     data,       /* The measured data */
@@ -20335,7 +18353,7 @@ int    fit_dipoles( const QString&  dataname,
             continue;
         }
 
-        if (!fit_one(fit,guess,time,one,verbose,dip))
+        if (!DipoleFitData::fit_one(fit,guess,time,one,verbose,dip))
             printf("t = %7.1f ms : %s\n",1000*time,"error (tbd: catch)");
         else {
             set.addEcd(dip);

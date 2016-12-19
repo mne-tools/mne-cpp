@@ -119,7 +119,7 @@ public:
 //    *
 //    * @return true when successful
 //    */
-//    static int fit_dipoles(char *dataname, mneMeasData data, DipoleFitData* fit, GuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose, ECDSet& p_set);
+//    static int fit_dipoles(const QString&  dataname, mneMeasData data, DipoleFitData* fit, GuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose, ECDSet& p_set);
 
 private:
     DipoleFitSettings* settings;

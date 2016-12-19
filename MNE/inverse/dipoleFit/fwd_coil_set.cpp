@@ -50,6 +50,10 @@ using namespace Eigen;
 using namespace INVERSELIB;
 
 
+#define FREE_6(x) if ((char *)(x) != NULL) free((char *)(x))
+
+#define FIFFV_COORD_UNKNOWN     0
+
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -57,7 +61,11 @@ using namespace INVERSELIB;
 
 FwdCoilSet::FwdCoilSet()
 {
-
+    coils = NULL;
+    ncoil = 0;
+    coord_frame = FIFFV_COORD_UNKNOWN;
+    user_data = NULL;
+    user_data_free = NULL;
 }
 
 
@@ -72,5 +80,9 @@ FwdCoilSet::FwdCoilSet()
 
 FwdCoilSet::~FwdCoilSet()
 {
+    for (int k = 0; k < ncoil; k++)
+        delete coils[k];
+    FREE_6(coils);
 
+    this->fwd_free_coil_set_user_data();
 }
