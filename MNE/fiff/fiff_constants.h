@@ -291,8 +291,6 @@ namespace FIFFLIB
 #define FIFFB_SMSH_ASPECT        120
 #define FIFFB_BEM                310  /**< A BEM description. */
 #define FIFFB_BEM_SURF           311  /**< Describes one BEM surface. */
-#define FIFFB_PROJ               313
-#define FIFFB_PROJ_ITEM          314
 #define FIFFB_MRI                200
 #define FIFFB_MRI_SET            201
 #define FIFFB_MRI_SLICE          202
@@ -464,7 +462,6 @@ namespace FIFFLIB
     //
     //   MRIs
     //
-#define FIFF_MRI_SOURCE_PATH       1101
 #define FIFF_MRI_SOURCE_FORMAT     2002
 #define FIFF_MRI_PIXEL_ENCODING    2003
 #define FIFF_MRI_PIXEL_DATA_OFFSET 2004

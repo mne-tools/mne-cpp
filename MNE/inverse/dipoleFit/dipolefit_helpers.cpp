@@ -16,7 +16,7 @@
 #include <utils/sphere.h>
 
 #include <fiff/fiff_constants.h>
-#include "fiff_file.h"
+#include <fiff/fiff_file.h>
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -1448,64 +1448,7 @@ int fiff_read_this_tag_ext (fiffFile file,	/* Read from here */
 
 
 
-#include "fiff_explain.h"
-
-
-//============================= fiff_explain.c =============================
-
-
-void fiff_explain (int kind)
-/*
-      * Try to explain...
-      *
-      */
-{
-    int k;
-    for (k = 0; _fiff_explanations[k].kind >= 0; k++) {
-        if (_fiff_explanations[k].kind == kind) {
-            printf ("%d = %s",kind,_fiff_explanations[k].text);
-            return;
-        }
-    }
-    printf ("Cannot explain: %d",kind);
-}
-
-
-const char *fiff_get_tag_explanation (int kind)
-/*
-      * Get textual explanation of a tag
-      */
-{
-    int k;
-    for (k = 0; _fiff_explanations[k].kind >= 0; k++) {
-        if (_fiff_explanations[k].kind == kind)
-            return _fiff_explanations[k].text;
-    }
-    return "unknown";
-}
-
-
-void fiff_explain_block (int kind)
-/*
-      * Try to explain a block...
-      */
-{
-    int k;
-    for (k = 0; _fiff_block_explanations[k].kind >= 0; k++) {
-        if (_fiff_block_explanations[k].kind == kind) {
-            printf ("%d = %s",kind,_fiff_block_explanations[k].text);
-            return;
-        }
-    }
-    printf ("Cannot explain: %d",kind);
-}
-
-
-
-
-
-
-
+#include <fiff/fiff_dir_tree.h>
 
 
 //============================= fiff_dir_tree.c =============================
@@ -1637,69 +1580,6 @@ int fiff_dir_tree_create(fiffFile file)
 
 
 
-static void print_id (fiffId id)
-
-{
-    printf ("\t%d.%d ",id->version>>16,id->version & 0xFFFF);
-    printf ("0x%x%x ",id->machid[0],id->machid[1]);
-    printf ("%d %d ",id->time.secs,id->time.usecs);
-}
-
-
-static void print_tree(fiffDirNode node,int indent)
-
-{
-    int j,k;
-    int prev_kind,count;
-    fiffDirEntry dentry;
-
-    if (node == NULL)
-        return;
-    for (k = 0; k < indent; k++)
-        putchar(' ');
-    fiff_explain_block (node->type);
-    printf (" { ");
-    if (node->id != NULL)
-        print_id(node->id);
-    printf ("\n");
-
-    for (j = 0, prev_kind = -1, count = 0, dentry = node->dir;
-         j < node->nent; j++,dentry++) {
-        if (dentry->kind != prev_kind) {
-            if (count > 1)
-                printf (" [%d]\n",count);
-            else if (j > 0)
-                putchar('\n');
-            for (k = 0; k < indent+2; k++)
-                putchar(' ');
-            fiff_explain (dentry->kind);
-            prev_kind = dentry->kind;
-            count = 1;
-        }
-        else
-            count++;
-        prev_kind = dentry->kind;
-    }
-    if (count > 1)
-        printf (" [%d]\n",count);
-    else if (j > 0)
-        putchar ('\n');
-    for (j = 0; j < node->nchild; j++)
-        print_tree(node->children[j],indent+5);
-    for (k = 0; k < indent; k++)
-        putchar(' ');
-    printf ("}\n");
-}
-
-void fiff_dir_tree_print(fiffDirNode tree)
-/*
-      * Print contents of the directory tree for
-      * checking
-      */
-{
-    print_tree(tree,0);
-}
-
 int fiff_dir_tree_count(fiffDirNode tree)
 /*
       * Find the number of nodes
@@ -1778,7 +1658,7 @@ fiffTag fiff_dir_tree_get_tag(fiffFile file,fiffDirNode node,int kind)
                 return (tag);
         }
     qWarning("Desired tag (%s [%d]) not found",
-             fiff_get_tag_explanation(kind),kind);
+             FIFFLIB::FiffDirTree::get_tag_explanation(kind),kind);
     return (NULL);
 }
 

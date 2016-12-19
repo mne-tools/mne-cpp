@@ -46,6 +46,7 @@
 #include "fiff_types.h"
 #include "fiff_dir_entry.h"
 #include "fiff_id.h"
+#include "fiff_explain.h"
 
 
 //*************************************************************************************************************
@@ -198,73 +199,43 @@ public:
     */
     bool has_kind(fiff_int_t p_kind) const;
 
+    //=========================================================================================================
+    /**
+    * Prints elements of a tree.
+    * Refactored: print_tree (fiff_dir_tree.c)
+    *
+    * @param[in] indent     number of intendations
+    *
+    * @return true when fiff_dir_tree contains kind
+    */
+    void print(int indent) const;
 
+    //=========================================================================================================
+    /**
+    * Try to explain a block...
+    * Refactored: fiff_explain_block (fiff_explain.c)
+    *
+    * @param[in] kind   Block kind
+    */
+    static void explain_block(int kind);
 
+    //=========================================================================================================
+    /**
+    * Try to explain...
+    * Refactored: fiff_explain (fiff_explain.c)
+    *
+    * @param[in] kind   directory kind
+    */
+    static void explain (int kind);
 
-
-
-
-
-
-//    static void print_id (fiffId id)
-
-//    {
-//        printf ("\t%d.%d ",id->version>>16,id->version & 0xFFFF);
-//        printf ("0x%x%x ",id->machid[0],id->machid[1]);
-//        printf ("%d %d ",id->time.secs,id->time.usecs);
-//    }
-
-
-//    static void print_tree(fiffDirNode node,int indent)
-
-//    {
-//        int j,k;
-//        int prev_kind,count;
-//        fiffDirEntry dentry;
-
-//        if (node == NULL)
-//            return;
-//        for (k = 0; k < indent; k++)
-//            putchar(' ');
-//        fiff_explain_block (node->type);
-//        printf (" { ");
-//        if (node->id != NULL)
-//            print_id(node->id);
-//        printf ("\n");
-
-//        for (j = 0, prev_kind = -1, count = 0, dentry = node->dir;
-//             j < node->nent; j++,dentry++) {
-//            if (dentry->kind != prev_kind) {
-//                if (count > 1)
-//                    printf (" [%d]\n",count);
-//                else if (j > 0)
-//                    putchar('\n');
-//                for (k = 0; k < indent+2; k++)
-//                    putchar(' ');
-//                fiff_explain (dentry->kind);
-//                prev_kind = dentry->kind;
-//                count = 1;
-//            }
-//            else
-//                count++;
-//            prev_kind = dentry->kind;
-//        }
-//        if (count > 1)
-//            printf (" [%d]\n",count);
-//        else if (j > 0)
-//            putchar ('\n');
-//        for (j = 0; j < node->nchild; j++)
-//            print_tree(node->children[j],indent+5);
-//        for (k = 0; k < indent; k++)
-//            putchar(' ');
-//        printf ("}\n");
-//    }
-
-
-
-
-
-
+    //=========================================================================================================
+    /**
+    * Get textual explanation of a tag
+    * Refactored: fiff_get_tag_explanation (fiff_explain.c)
+    *
+    * @param[in] kind   directory kind
+    */
+    static const char *get_tag_explanation (int kind);
 
 public:
     fiff_int_t          block;      /**< Block type for this directory */
@@ -276,23 +247,23 @@ public:
     QList<FiffDirTree>  children;   /**< Child nodes */
     fiff_int_t          nchild;     /**< Number of child nodes */
 
-// typedef struct _fiffDirNode {
-//  int                 type;    /**< Block type for this directory *
-//  fiffId              id;      /**< Id of this block if any *
-//  fiffDirEntry        dir;     /**< Directory of tags in this node *
-//  int                 nent;    /**< Number of entries in this node *
-//  fiffDirEntry        dir_tree;    /**< Directory of tags within this node
-//                                     * subtrees as well as FIFF_BLOCK_START and FIFF_BLOCK_END
-//                   * included. NOTE: While dir is allocated separately
-//                   * dir_tree is a pointer to the dirtree field
-//                   * in the FiffStream structure. The dir_tree and nent_tree
-//                   * fields are only used within the library to facilitate
-//                   * certain operations. *
-//  int                 nent_tree;   /**< Number of entries in the directory tree node *
-//  struct _fiffDirNode *parent;     /**< Parent node *
-//  struct _fiffDirNode **children;  /**< Child nodes *
-//  int                 nchild;      /**< Number of child nodes *
-// } fiffDirNodeRec,*fiffDirNode;    /**< Directory tree structure used by the fiff library routines. *
+    // typedef struct _fiffDirNode {
+    //  int                 type;    /**< Block type for this directory *
+    //  fiffId              id;      /**< Id of this block if any *
+    //  fiffDirEntry        dir;     /**< Directory of tags in this node *
+    //  int                 nent;    /**< Number of entries in this node *
+    //  fiffDirEntry        dir_tree;    /**< Directory of tags within this node
+    //                                     * subtrees as well as FIFF_BLOCK_START and FIFF_BLOCK_END
+    //                   * included. NOTE: While dir is allocated separately
+    //                   * dir_tree is a pointer to the dirtree field
+    //                   * in the FiffStream structure. The dir_tree and nent_tree
+    //                   * fields are only used within the library to facilitate
+    //                   * certain operations. *
+    //  int                 nent_tree;   /**< Number of entries in the directory tree node *
+    //  struct _fiffDirNode *parent;     /**< Parent node *
+    //  struct _fiffDirNode **children;  /**< Child nodes *
+    //  int                 nchild;      /**< Number of child nodes *
+    // } fiffDirNodeRec,*fiffDirNode;    /**< Directory tree structure used by the fiff library routines. *
 };
 
 } // NAMESPACE
