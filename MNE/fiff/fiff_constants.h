@@ -269,10 +269,11 @@ namespace FIFFLIB
     //
     // Channel types
     //
-#define FIFFV_MEG_CH       1
+#define FIFFV_MAGN_CH    1
+#define FIFFV_EL_CH      2
+#define FIFFV_MEG_CH     FIFFV_MAGN_CH
 #define FIFFV_REF_MEG_CH 301
-#define FIFFV_EL_CH        2
-#define FIFFV_EEG_CH       FIFFV_EL_CH
+#define FIFFV_EEG_CH     FIFFV_EL_CH
 #define FIFFV_MCG_CH     201
 #define FIFFV_STIM_CH      3
 #define FIFFV_EOG_CH     202
