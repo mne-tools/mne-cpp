@@ -46,6 +46,7 @@
 #include "fiff_global.h"
 #include "fiff_info.h"
 #include "fiff_types.h"
+#include "fiff_file.h"
 
 
 //*************************************************************************************************************

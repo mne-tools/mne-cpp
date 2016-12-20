@@ -226,7 +226,7 @@ namespace FIFFLIB
 #define FIFFT_INT                   3
 #define FIFFT_FLOAT                 4
 #define FIFFT_DOUBLE                5
-#define FIFFT_JULIAN                6	/**< Julian day */
+#define FIFFT_JULIAN                6   /**< Julian day */
 #define FIFFT_USHORT                7
 #define FIFFT_UINT                  8
 #define FIFFT_ULONG                 9
@@ -278,6 +278,9 @@ namespace FIFFLIB
 
 #define FIFFM_MESSAGE_GROUP(x) ((x) / 100 == 0)
 
+/*
+ * Real-time shmem
+ */
 #define FIFF_NEW_FILE            1
 #define FIFF_CLOSE_FILE          2
 #define FIFF_DISCARD_FILE        3
@@ -293,11 +296,10 @@ namespace FIFFLIB
 #define FIFF_RESUME_READING     13
 #define FIFF_DACQ_SYSTEM_TYPE   14
 #define FIFF_SELECT_RAW_CH      15  /**< Instruct rawdisp to select this channel */
-#define FIFF_PLAYBACK_MODE      16  /**< Tell that we are playing data back from the hard
-				     * disks in the data acquisition front end */
+#define FIFF_PLAYBACK_MODE      16  /**< Tell that we are playing data back from the hard disks in the data acquisition front end */
 #define FIFF_CONTINUE_FILE      17  /**< Used to inform that data is saved into a continuation file. */
 #define FIFF_JITTER_MAX         18  /**< Used to tell the jitter in the timing of data packets */
-#define  FIFF_STREAM_SEGMENT    19  /**< A segment of data stream */
+#define FIFF_STREAM_SEGMENT     19  /**< A segment of data stream */
 /*
 define FIFF_DECIMATION_FACTOR  19  * Collector; not used anywhere? 
 */
@@ -308,9 +310,7 @@ define FIFF_DECIMATION_FACTOR  19  * Collector; not used anywhere?
 #define FIFFV_DACQ_SYSTEM_ORION   3 
 
 #ifdef _DATA_SERVER
-#define FIFF_MEM_DATA_BUFFER 10300  /**< This is only used by
-				     * cm_sender to indicate a data buffer 
-				     * which is not logged into the file */
+#define FIFF_MEM_DATA_BUFFER 10300  /**< This is only used by cm_sender to indicate a data buffer which is not logged into the file */
 #endif
 
 /*
@@ -435,52 +435,51 @@ define FIFF_DECIMATION_FACTOR  19  * Collector; not used anywhere?
 * Different aspects of data
 */
 
-#define FIFFV_ASPECT_AVERAGE       100	  /**< Normal average of epochs */
-#define FIFFV_ASPECT_STD_ERR       101	  /**< Std. error of mean */
-#define FIFFV_ASPECT_SINGLE        102	  /**< Single epoch cut out from the continuous data */
-#define FIFFV_ASPECT_SUBAVERAGE    103	  
-#define FIFFV_ASPECT_ALTAVERAGE    104	  /**< Alternating subaverage */
-#define FIFFV_ASPECT_SAMPLE        105	  /**< A sample cut out by graph */
-#define FIFFV_ASPECT_POWER_DENSITY 106    /**< Power density spectrum */
-#define FIFFV_ASPECT_DIPOLE_WAVE   200    /**< Dipole amplitude curve */
+#define FIFFV_ASPECT_AVERAGE       100  /**< Normal average of epochs */
+#define FIFFV_ASPECT_STD_ERR       101  /**< Std. error of mean */
+#define FIFFV_ASPECT_SINGLE        102  /**< Single epoch cut out from the continuous data */
+#define FIFFV_ASPECT_SUBAVERAGE    103
+#define FIFFV_ASPECT_ALTAVERAGE    104  /**< Alternating subaverage */
+#define FIFFV_ASPECT_SAMPLE        105  /**< A sample cut out by graph */
+#define FIFFV_ASPECT_POWER_DENSITY 106  /**< Power density spectrum */
+#define FIFFV_ASPECT_DIPOLE_WAVE   200  /**< Dipole amplitude curve */
 
 /*
 * Tags used in data files
 */
 
-#define FIFF_NCHAN           200	  /**< Number of channels */
-#define FIFF_SFREQ           201	  /**< Sampling frequency (Hz) */
-#define FIFF_DATA_PACK       202	  /**< How the raw data is packed */
-#define FIFF_CH_INFO         203          /**< Channel descriptor */
-#define FIFF_MEAS_DATE       204          /**< Measurement date */
-#define FIFF_SUBJECT         205	  /**< This might be deleted later */
-#define FIFF_COMMENT         206          /**< This is used in a questionable way... */
-#define FIFF_NAVE            207          /**< Number of averages */
-#define FIFF_FIRST_SAMPLE    208          /**< The first sample of an epoch */
-#define FIFF_LAST_SAMPLE     209          /**< The last sample of an epoch */
-#define FIFF_ASPECT_KIND     210          /**< Aspect label */
-#define FIFF_REF_EVENT       211          /**< Reference event */
-#define FIFF_EXPERIMENTER    212          /**< Experimenter name */
-#define FIFF_DIG_POINT       213          /**< Digitization point */
-#define FIFF_CH_POS_VEC      214          /**< Channel positions */
-#define FIFF_HPI_SLOPES      215          /**< HPI data */
-#define FIFF_HPI_NCOIL       216          /**< Number of HPI coils */
-#define FIFF_REQ_EVENT       217          /**< Required event */
-#define FIFF_REQ_LIMIT       218          /**< Window for required event */
-#define FIFF_LOWPASS         219	  /**< Analog lowpass */
-#define FIFF_BAD_CHS         220          /**< List of bad channels */
-#define FIFF_ARTEF_REMOVAL   221	  /**< Artifact removal */
-#define FIFF_COORD_TRANS     222	  /**< Coordinate transformation */
-#define FIFF_HIGHPASS        223	  /**< Analog highpass */
-#define FIFF_CH_CALS_VEC     224	  /**< This will not occur in new files */
-#define FIFF_HPI_BAD_CHS     225          /**< List of channels considered to be bad in hpi */
-#define FIFF_HPI_CORR_COEFF  226	  /**< Hpi curve fit correlations */
-#define FIFF_EVENT_COMMENT   227          /**< Comment about the events used in averaging */
-#define FIFF_NO_SAMPLES      228          /**< Number of samples in an epoch */
-#define FIFF_FIRST_TIME      229          /**< Time scale minimum */
-#define FIFF_SUBAVE_SIZE     230	  /**< Size of a subaverage */
-#define FIFF_SUBAVE_FIRST    231	  /**< The first epoch # contained in the
-					   * subaverage */
+#define FIFF_NCHAN           200        /**< Number of channels */
+#define FIFF_SFREQ           201        /**< Sampling frequency (Hz) */
+#define FIFF_DATA_PACK       202        /**< How the raw data is packed */
+#define FIFF_CH_INFO         203        /**< Channel descriptor */
+#define FIFF_MEAS_DATE       204        /**< Measurement date */
+#define FIFF_SUBJECT         205        /**< This might be deleted later */
+#define FIFF_COMMENT         206        /**< This is used in a questionable way... */
+#define FIFF_NAVE            207        /**< Number of averages */
+#define FIFF_FIRST_SAMPLE    208        /**< The first sample of an epoch */
+#define FIFF_LAST_SAMPLE     209        /**< The last sample of an epoch */
+#define FIFF_ASPECT_KIND     210        /**< Aspect label */
+#define FIFF_REF_EVENT       211        /**< Reference event */
+#define FIFF_EXPERIMENTER    212        /**< Experimenter name */
+#define FIFF_DIG_POINT       213        /**< Digitization point */
+#define FIFF_CH_POS_VEC      214        /**< Channel positions */
+#define FIFF_HPI_SLOPES      215        /**< HPI data */
+#define FIFF_HPI_NCOIL       216        /**< Number of HPI coils */
+#define FIFF_REQ_EVENT       217        /**< Required event */
+#define FIFF_REQ_LIMIT       218        /**< Window for required event */
+#define FIFF_LOWPASS         219        /**< Analog lowpass */
+#define FIFF_BAD_CHS         220        /**< List of bad channels */
+#define FIFF_ARTEF_REMOVAL   221        /**< Artifact removal */
+#define FIFF_COORD_TRANS     222        /**< Coordinate transformation */
+#define FIFF_HIGHPASS        223        /**< Analog highpass */
+#define FIFF_CH_CALS_VEC     224        /**< This will not occur in new files */
+#define FIFF_HPI_BAD_CHS     225        /**< List of channels considered to be bad in hpi */
+#define FIFF_HPI_CORR_COEFF  226        /**< Hpi curve fit correlations */
+#define FIFF_EVENT_COMMENT   227        /**< Comment about the events used in averaging */
+#define FIFF_NO_SAMPLES      228        /**< Number of samples in an epoch */
+#define FIFF_FIRST_TIME      229        /**< Time scale minimum */
+#define FIFF_SUBAVE_SIZE     230        /**< Size of a subaverage */
+#define FIFF_SUBAVE_FIRST    231        /**< The first epoch # contained in the subaverage */
 #define FIFF_NAME            233          /**< Intended to be a short name. */
 #define FIFF_DESCRIPTION     FIFF_COMMENT /**< (Textual) Description of an object */
 #define FIFF_DIG_STRING      234          /**< String of digitized points */
@@ -709,7 +708,7 @@ define FIFF_DECIMATION_FACTOR  19  * Collector; not used anywhere?
 /*
 * Sphere model     (3000...)
 */
-#define FIFF_CONDUCTOR_MODEL_KIND 3000     /**< What kind of conductor model */
+#define FIFF_CONDUCTOR_MODEL_KIND 3000      /**< What kind of conductor model */
 /*
 * These are the models we support
 */
@@ -719,27 +718,26 @@ define FIFF_DECIMATION_FACTOR  19  * Collector; not used anywhere?
 #define FIFFV_COND_MODEL_BEM         3      /**< Multilayer BEM model */
 
 #define FIFF_SPHERE_ORIGIN          3001
-#define FIFF_SPHERE_COORD_FRAME     3002   /**< Which coordinate frame are we using? */
-#define FIFF_SPHERE_LAYERS          3003   /**< Array of layer structures */
+#define FIFF_SPHERE_COORD_FRAME     3002    /**< Which coordinate frame are we using? */
+#define FIFF_SPHERE_LAYERS          3003    /**< Array of layer structures */
 /*
 * Surfaces for BEM (3100...)
 */
-#define FIFF_BEM_SURF_ID            3101   /**< int    surface number */
-#define FIFF_BEM_SURF_NAME          3102   /**< string surface name */
-#define FIFF_BEM_SURF_NNODE	    3103   /**< int    # of nodes on a surface */
-#define FIFF_BEM_SURF_NTRI	    3104   /**< int    # number of triangles on a surface */
-#define FIFF_BEM_SURF_NODES         3105   /**< float  surface nodes (nnode,3) */
-#define FIFF_BEM_SURF_TRIANGLES     3106   /**< int    surface triangles (ntri,3) */
-#define FIFF_BEM_SURF_NORMALS       3107   /**< float  surface node normal unit vectors (nnode,3) */
-#define FIFF_BEM_SURF_CURVS         3108   /**< float  surface node first principal curvature unit
-					    * vectors (nnode,3) */
-#define FIFF_BEM_SURF_CURV_VALUES   3109   /**< float  the two curvature values (nnode,2) */
+#define FIFF_BEM_SURF_ID            3101    /**< int    surface number */
+#define FIFF_BEM_SURF_NAME          3102    /**< string surface name */
+#define FIFF_BEM_SURF_NNODE         3103    /**< int    # of nodes on a surface */
+#define FIFF_BEM_SURF_NTRI          3104    /**< int    # number of triangles on a surface */
+#define FIFF_BEM_SURF_NODES         3105    /**< float  surface nodes (nnode,3) */
+#define FIFF_BEM_SURF_TRIANGLES     3106    /**< int    surface triangles (ntri,3) */
+#define FIFF_BEM_SURF_NORMALS       3107    /**< float  surface node normal unit vectors (nnode,3) */
+#define FIFF_BEM_SURF_CURVS         3108    /**< float  surface node first principal curvature unit vectors (nnode,3) */
+#define FIFF_BEM_SURF_CURV_VALUES   3109    /**< float  the two curvature values (nnode,2) */
 
 
-#define FIFF_BEM_POT_SOLUTION       3110   /**< float ** The solution matrix */
-#define FIFF_BEM_APPROX             3111   /**< int    approximation method, see below */
-#define FIFF_BEM_COORD_FRAME        3112   /**< The coordinate frame of the model */
-#define FIFF_BEM_SIGMA              3113   /**< Conductivity of a compartment */
+#define FIFF_BEM_POT_SOLUTION       3110    /**< float ** The solution matrix */
+#define FIFF_BEM_APPROX             3111    /**< int    approximation method, see below */
+#define FIFF_BEM_COORD_FRAME        3112    /**< The coordinate frame of the model */
+#define FIFF_BEM_SIGMA              3113    /**< Conductivity of a compartment */
 /*
 * FIFF_BEM_SURF_ID can be one of the following
 */
@@ -845,26 +843,19 @@ define FIFF_DECIMATION_FACTOR  19  * Collector; not used anywhere?
 */
 #define FIFF_VOL_ID                  4001
 #define FIFF_VOL_NAME                4002
-#define FIFF_VOL_OWNER_ID            4003      /**< User id of the owner */
-#define FIFF_VOL_OWNER_NAME          4004      /**< User name of the owner */
-#define FIFF_VOL_OWNER_REAL_NAME     4005      /**< User name of the owner */
-#define FIFF_VOL_TYPE                4006      /**< See below... */
-#define FIFF_VOL_HOST                4007      /**< Where does the volume reside */
-#define FIFF_VOL_REAL_ROOT           4008      /**< The root of the volume in
-						* in the machine where the file 
-						* system is mounted */
-#define FIFF_VOL_SYMBOLIC_ROOT       4009      /**< Symbolic link to the
-						* root of the volume (if any)
-						* system is mounted */
-#define FIFF_VOL_MOUNT_POINT         4010      /**< Last mount point of the volume */
-#define FIFF_VOL_BLOCKS              4011      /**< Total # of blocks */
-#define FIFF_VOL_FREE_BLOCKS         4012      /**< # of free blocks */
-#define FIFF_VOL_AVAIL_BLOCKS        4013      /**< # of free blocks available to non-superuser */
-#define FIFF_VOL_BLOCK_SIZE          4014      /**< Block size in bytes */
-#define FIFF_VOL_DIRECTORY           4015      /**< Contents of the volume
-						  in a special format 
-						  the data type will be
-						  FIFF_VOID */
+#define FIFF_VOL_OWNER_ID            4003   /**< User id of the owner */
+#define FIFF_VOL_OWNER_NAME          4004   /**< User name of the owner */
+#define FIFF_VOL_OWNER_REAL_NAME     4005   /**< User name of the owner */
+#define FIFF_VOL_TYPE                4006   /**< See below... */
+#define FIFF_VOL_HOST                4007   /**< Where does the volume reside */
+#define FIFF_VOL_REAL_ROOT           4008   /**< The root of the volume in in the machine where the file system is mounted */
+#define FIFF_VOL_SYMBOLIC_ROOT       4009   /**< Symbolic link to the root of the volume (if any) system is mounted */
+#define FIFF_VOL_MOUNT_POINT         4010   /**< Last mount point of the volume */
+#define FIFF_VOL_BLOCKS              4011   /**< Total # of blocks */
+#define FIFF_VOL_FREE_BLOCKS         4012   /**< # of free blocks */
+#define FIFF_VOL_AVAIL_BLOCKS        4013   /**< # of free blocks available to non-superuser */
+#define FIFF_VOL_BLOCK_SIZE          4014   /**< Block size in bytes */
+#define FIFF_VOL_DIRECTORY           4015   /**< Contents of the volume in a special format the data type will be FIFF_VOID */
 /*
 * Index
 */
@@ -877,8 +868,9 @@ define FIFF_DECIMATION_FACTOR  19  * Collector; not used anywhere?
 *
 *=====================================================================*/
 
-/**< Values for FIFF_REF_ROLE. The role of a reference */
-
+/*
+* Values for FIFF_REF_ROLE. The role of a reference
+*/
 #define FIFFV_ROLE_PREV_FILE   1
 #define FIFFV_ROLE_NEXT_FILE   2
 
@@ -890,10 +882,12 @@ define FIFF_DECIMATION_FACTOR  19  * Collector; not used anywhere?
 #define FIFFV_PROJ_BY_SPACE          1
 
 
-/**< Volume types used in FIFF_VOL_TYPE */
+/*
+* Volume types used in FIFF_VOL_TYPE
+*/
 
-#define FIFFV_VOL_TYPE_HD            1	       /**< Hard disk */
-#define FIFFV_VOL_TYPE_MOD           2	       /**< Magneto-optical disk */
+#define FIFFV_VOL_TYPE_HD            1      /**< Hard disk */
+#define FIFFV_VOL_TYPE_MOD           2      /**< Magneto-optical disk */
 
 /*
  * Byte order
