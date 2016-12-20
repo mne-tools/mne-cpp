@@ -66,29 +66,19 @@ namespace FIFFLIB
 
 
 
-#define FIFFV_MAGN_CH    1
-#define FIFFV_EL_CH      2
-#define FIFFV_MCG_CH     201
-#define FIFFV_STIM_CH    3
-
-#define FIFFV_EOG_CH   202
-#define FIFFV_EMG_CH   302
-#define FIFFV_ECG_CH   402
-#define FIFFV_MISC_CH  502
-#define FIFFV_RESP_CH  602		     /* Respiration monitoring */
 /*
 * Quaternion channels for head position monitoring
 */
-#define FIFFV_QUAT_0   700                 /* Quaternion parameter q0; obsolete for unit quaternion */
-#define FIFFV_QUAT_1   701                 /* Quaternion parameter q1; rotation */
-#define FIFFV_QUAT_2   702                 /* Quaternion parameter q2; rotation */
-#define FIFFV_QUAT_3   703                 /* Quaternion parameter q3; rotation */
-#define FIFFV_QUAT_4   704                 /* Quaternion parameter q4; translation */
-#define FIFFV_QUAT_5   705                 /* Quaternion parameter q5; translation */
-#define FIFFV_QUAT_6   706                 /* Quaternion parameter q6; translation */
-#define FIFFV_HPI_G    707                 /* Goodness-of-fit in continuous hpi */
-#define FIFFV_HPI_ERR  708                 /* Estimation error in continuous hpi */
-#define FIFFV_HPI_MOV  709                 /* Estimated head movement speed in continuous hpi */
+#define FIFFV_QUAT_0   700  /**< Quaternion parameter q0; obsolete for unit quaternion */
+#define FIFFV_QUAT_1   701  /**< Quaternion parameter q1; rotation */
+#define FIFFV_QUAT_2   702  /**< Quaternion parameter q2; rotation */
+#define FIFFV_QUAT_3   703  /**< Quaternion parameter q3; rotation */
+#define FIFFV_QUAT_4   704  /**< Quaternion parameter q4; translation */
+#define FIFFV_QUAT_5   705  /**< Quaternion parameter q5; translation */
+#define FIFFV_QUAT_6   706  /**< Quaternion parameter q6; translation */
+#define FIFFV_HPI_G    707  /**< Goodness-of-fit in continuous hpi */
+#define FIFFV_HPI_ERR  708  /**< Estimation error in continuous hpi */
+#define FIFFV_HPI_MOV  709  /**< Estimated head movement speed in continuous hpi */
 
 #define FIFFM_QUAT_CH(X) ((X >= FIFFV_QUAT_0) && (X <= FIFFV_HPI_MOV))   /* Check for a quaternion channel */
 
@@ -227,8 +217,9 @@ namespace FIFFLIB
 #define FIFFV_POINT_CHEST_STERNUM   2
 #define FIFFV_POINT_CHEST_RIGHT     3
 
-/** Coordinate transformation descriptor */
-
+/*
+* Coordinate transformation descriptor
+*/
 #define FIFFV_COORD_UNKNOWN     0
 #define FIFFV_COORD_DEVICE      1
 #define FIFFV_COORD_ISOTRAK     2
@@ -270,81 +261,6 @@ namespace FIFFLIB
 #define FIFFV_XFIT_MAP_SURF_SENSORS 0  /**< Xfit contours on the sensor array */
 #define FIFFV_XFIT_MAP_SURF_HEAD    1  /**< Xfit contours on a head surface */
 #define FIFFV_XFIT_MAP_SURF_SPHERE  2  /**< Xfit contours on a spherical surface */
-
-//
-// Blocks - Standard tags used in all blocks
-//
-#define FIFFB_MEAS               100
-#define FIFFB_MEAS_INFO          101
-#define FIFFB_RAW_DATA           102
-#define FIFFB_PROCESSED_DATA     103
-#define FIFFB_CONTINUOUS_DATA    112
-#define FIFFB_EVOKED             104
-#define FIFFB_ASPECT             105
-#define FIFFB_SUBJECT            106
-#define FIFFB_ISOTRAK            107
-#define FIFFB_HPI_MEAS           108
-#define FIFFB_HPI_RESULT         109
-#define FIFFB_DACQ_PARS          117
-#define FIFFB_REF                118
-#define FIFFB_SMSH_RAW_DATA      119
-#define FIFFB_SMSH_ASPECT        120
-#define FIFFB_BEM                310  /**< A BEM description. */
-#define FIFFB_BEM_SURF           311  /**< Describes one BEM surface. */
-#define FIFFB_MRI                200
-#define FIFFB_MRI_SET            201
-#define FIFFB_MRI_SLICE          202
-#define FIFFB_PROCESSING_HISTORY 900
-#define FIFFB_SSS_INFO           502
-#define FIFFB_SSS_CAL_ADJUST     503
-#define FIFFB_SSS_ST_INFO        504
-#define FIFFB_SSS_BASES          505
-//
-// Of general interest
-//
-#define FIFF_FILE_ID         100
-#define FIFF_DIR_POINTER     101
-#define FIFF_BLOCK_ID        103
-#define FIFF_BLOCK_START     104
-#define FIFF_BLOCK_END       105
-#define FIFF_FREE_LIST       106
-#define FIFF_FREE_BLOCK      107
-#define FIFF_NOP             108
-#define FIFF_PARENT_FILE_ID  109
-#define FIFF_PARENT_BLOCK_ID 110
-#define FIFF_BLOCK_NAME      111
-#define FIFF_BLOCK_VERSION   112
-#define FIFF_CREATOR         113   /* Program that created the file (string)  */
-#define FIFF_MODIFIER        114   /* Program that modified the file (string) */
-
-#define FIFF_REF_ROLE        115
-#define FIFF_REF_FILE_ID     116
-#define FIFF_REF_FILE_NUM    117
-#define FIFF_REF_FILE_NAME   118
-/* reserverd                 119 */
-#define FIFF_REF_BLOCK_ID    120
-//
-//  Megacq saves the parameters in these tags
-//
-#define FIFF_DACQ_PARS      150
-#define FIFF_DACQ_STIM      151
-
-#define FIFF_SFREQ       201
-#define FIFF_NCHAN       200
-#define FIFF_DATA_PACK   202
-#define FIFF_CH_INFO     203
-#define FIFF_MEAS_DATE   204
-#define FIFF_SUBJECT     205
-#define FIFF_COMMENT     206
-#define FIFF_NAVE        207
-#define FIFF_DIG_POINT   213
-#define FIFF_HPI_NCOIL   216
-#define FIFF_LOWPASS     219
-#define FIFF_COORD_TRANS 222
-#define FIFF_HIGHPASS    223
-#define FIFF_NAME        233
-#define FIFF_LINE_FREQ   235
-#define FIFF_DESCRIPTION FIFF_COMMENT
     //
     // Pointers
     //
@@ -353,9 +269,11 @@ namespace FIFFLIB
     //
     // Channel types
     //
-#define FIFFV_MEG_CH       1
+#define FIFFV_MAGN_CH    1
+#define FIFFV_EL_CH      2
+#define FIFFV_MEG_CH     FIFFV_MAGN_CH
 #define FIFFV_REF_MEG_CH 301
-#define FIFFV_EEG_CH       2
+#define FIFFV_EEG_CH     FIFFV_EL_CH
 #define FIFFV_MCG_CH     201
 #define FIFFV_STIM_CH      3
 #define FIFFV_EOG_CH     202
@@ -363,76 +281,6 @@ namespace FIFFLIB
 #define FIFFV_ECG_CH     402
 #define FIFFV_MISC_CH    502
 #define FIFFV_RESP_CH    602   /**< Respiration monitoring*/
-    //
-    // Quaternion channels for head position monitoring
-    //
-#define FIFFV_QUAT_0   700     /**< Quaternion param q0 obsolete for unit quaternion*/
-#define FIFFV_QUAT_1   701     /**< Quaternion param q1 rotation*/
-#define FIFFV_QUAT_2   702     /**< Quaternion param q2 rotation*/
-#define FIFFV_QUAT_3   703     /**< Quaternion param q3 rotation*/
-#define FIFFV_QUAT_4   704     /**< Quaternion param q4 translation*/
-#define FIFFV_QUAT_5   705     /**< Quaternion param q5 translation*/
-#define FIFFV_QUAT_6   706     /**< Quaternion param q6 translation*/
-#define FIFFV_HPI_G    707     /**< Goodness-of-fit in continuous hpi*/
-#define FIFFV_HPI_ERR  708     /**< Estimation error in continuous hpi*/
-#define FIFFV_HPI_MOV  709     /**< Estimated head movement speed in continuous hpi*/
-    //
-    // Coordinate frames
-    //
-#define FIFFV_COORD_UNKNOWN        0
-#define FIFFV_COORD_DEVICE         1
-#define FIFFV_COORD_ISOTRAK        2
-#define FIFFV_COORD_HPI            3
-#define FIFFV_COORD_HEAD           4
-#define FIFFV_COORD_MRI            5
-#define FIFFV_COORD_MRI_SLICE      6
-#define FIFFV_COORD_MRI_DISPLAY    7
-#define FIFFV_COORD_DICOM_DEVICE   8
-#define FIFFV_COORD_IMAGING_DEVICE 9
-    //
-    // Needed for raw and evoked-response data
-    //
-#define FIFF_FIRST_SAMPLE   208
-#define FIFF_LAST_SAMPLE    209
-#define FIFF_ASPECT_KIND    210
-#define FIFF_DATA_BUFFER    300      /**< Buffer containing measurement data*/
-#define FIFF_DATA_SKIP      301      /**< Data skip in buffers*/
-#define FIFF_EPOCH          302      /**< Buffer containing one epoch and channel*/
-#define FIFF_DATA_SKIP_SAMP 303      /**< Data skip in samples*/
-
-    //
-    // Different aspects of data
-    //
-#define FIFFV_ASPECT_AVERAGE       100    /**< Normal average of epochs*/
-#define FIFFV_ASPECT_STD_ERR       101    /**< Std. error of mean*/
-#define FIFFV_ASPECT_SINGLE        102    /**< Single epoch cut out from the continuous data*/
-#define FIFFV_ASPECT_SUBAVERAGE    103
-#define FIFFV_ASPECT_ALTAVERAGE    104    /**< Alternating subaverage*/
-#define FIFFV_ASPECT_SAMPLE        105    /**< A sample cut out by graph*/
-#define FIFFV_ASPECT_POWER_DENSITY 106    /**< Power density spectrum*/
-#define FIFFV_ASPECT_DIPOLE_WAVE   200    /**< Dipole amplitude curve*/
-
-    //
-    // Conductor models
-    //
-#define FIFF_BEM_SURF_ID        3101  /**< int    - surface number */
-#define FIFF_BEM_SURF_NAME      3102  /**< string - surface name */
-#define FIFF_BEM_SURF_NNODE     3103  /**< int    - # of nodes on a surface */
-#define FIFF_BEM_SURF_NTRI      3104  /**< int    - # number of triangles on a surface */
-#define FIFF_BEM_SURF_NODES     3105  /**< float* - surface nodes */
-#define FIFF_BEM_SURF_TRIANGLES 3106  /**< int*   - surface triangles */
-#define FIFF_BEM_SURF_NORMALS   3107  /**< float* - surface node normal unit vectors */
-#define FIFF_BEM_COORD_FRAME    3112  /**< enum   - the coordinate frame of the mode */
-#define FIFF_BEM_SIGMA          3113  /**< float  - conductivity of a compartment */
-
-    //
-    // BEM surface IDs
-    //
-#define FIFFV_BEM_SURF_ID_UNKNOWN    -1
-#define FIFFV_BEM_SURF_ID_BRAIN      1
-#define FIFFV_BEM_SURF_ID_SKULL      3
-#define FIFFV_BEM_SURF_ID_HEAD       4
-
     //
     // More of those defined in MNE
     //
@@ -451,33 +299,6 @@ namespace FIFFLIB
 #define FIFFV_POINT_LPA         1
 #define FIFFV_POINT_NASION      2
 #define FIFFV_POINT_RPA         3
-    //
-    //   SSP
-    //
-#define FIFF_PROJ_ITEM_KIND         3411
-#define FIFF_PROJ_ITEM_TIME         3412
-#define FIFF_PROJ_ITEM_NVEC         3414
-#define FIFF_PROJ_ITEM_VECTORS      3415
-#define FIFF_PROJ_ITEM_CH_NAME_LIST 3417
-    //
-    //   MRIs
-    //
-#define FIFF_MRI_SOURCE_FORMAT     2002
-#define FIFF_MRI_PIXEL_ENCODING    2003
-#define FIFF_MRI_PIXEL_DATA_OFFSET 2004
-#define FIFF_MRI_PIXEL_SCALE       2005
-#define FIFF_MRI_PIXEL_DATA        2006
-#define FIFF_MRI_WIDTH             2010
-#define FIFF_MRI_WIDTH_M           2011
-#define FIFF_MRI_HEIGHT            2012
-#define FIFF_MRI_HEIGHT_M          2013
-#define FIFF_MRI_DEPTH             2014
-#define FIFF_MRI_DEPTH_M           2015
-    //
-#define FIFFV_MRI_PIXEL_BYTE       1
-#define FIFFV_MRI_PIXEL_WORD       2
-#define FIFFV_MRI_PIXEL_SWAP_WORD  3
-#define FIFFV_MRI_PIXEL_FLOAT      4
     //
     //   These are the MNE fiff definitions
     //
@@ -510,9 +331,9 @@ namespace FIFFLIB
 #define FIFF_MNE_NROW                   3504
 #define FIFF_MNE_NCOL                   3505
 #define FIFF_MNE_COORD_FRAME            3506    /**< Coordinate frame employed. Defaults:*/
-                                //FIFFB_MNE_SOURCE_SPACE   #define FIFFV_COORD_MRI
-                                //FIFFB_MNE_FORWARD_SOLUTION   FIFFV_COORD_HEAD
-                                //FIFFB_MNE_INVERSE_SOLUTION   FIFFV_COORD_HEAD
+//FIFFB_MNE_SOURCE_SPACE   #define FIFFV_COORD_MRI
+//FIFFB_MNE_FORWARD_SOLUTION   FIFFV_COORD_HEAD
+//FIFFB_MNE_INVERSE_SOLUTION   FIFFV_COORD_HEAD
 #define FIFF_MNE_CH_NAME_LIST           3507
 #define FIFF_MNE_FILE_NAME              3508    /**< This removes the collision with fiff_stream.h (used to be 3501)*/
     //
@@ -645,12 +466,6 @@ namespace FIFFLIB
     //
     // Projection item kinds
     //
-#define FIFFV_PROJ_ITEM_NONE           0
-#define FIFFV_PROJ_ITEM_FIELD          1
-#define FIFFV_PROJ_ITEM_DIP_FIX        2
-#define FIFFV_PROJ_ITEM_DIP_ROT        3
-#define FIFFV_PROJ_ITEM_HOMOG_GRAD     4
-#define FIFFV_PROJ_ITEM_HOMOG_FIELD    5
 #define FIFFV_MNE_PROJ_ITEM_EEG_AVREF  10
     //
     // Additional coordinate frames
@@ -669,188 +484,10 @@ namespace FIFFLIB
     //
     //FIFFV_REF_MEG_CH             301
     //
-    //   Data types
-    //
-#define FIFFT_VOID                  0
-#define FIFFT_BYTE                  1
-#define FIFFT_SHORT                 2
-#define FIFFT_INT                   3
-#define FIFFT_FLOAT                 4
-#define FIFFT_DOUBLE                5
-#define FIFFT_JULIAN                6
-#define FIFFT_USHORT                7
-#define FIFFT_UINT                  8
-#define FIFFT_ULONG                 9
-#define FIFFT_STRING                10
-#define FIFFT_LONG                  11
-#define FIFFT_DAU_PACK13            13
-#define FIFFT_DAU_PACK14            14
-#define FIFFT_DAU_PACK16            16
-#define FIFFT_COMPLEX_FLOAT         20
-#define FIFFT_COMPLEX_DOUBLE        21
-#define FIFFT_OLD_PACK              23
-#define FIFFT_CH_INFO_STRUCT        30
-#define FIFFT_ID_STRUCT             31
-#define FIFFT_DIR_ENTRY_STRUCT      32
-#define FIFFT_DIG_POINT_STRUCT      33
-#define FIFFT_CH_POS_STRUCT         34
-#define FIFFT_COORD_TRANS_STRUCT    35
-#define FIFFT_DIG_STRING_STRUCT     36
-#define FIFFT_STREAM_SEGMENT_STRUCT 37
-    //
-    // Units of measurement
-    //
-#define FIFF_UNIT_NONE -1
-    //
-    // SI base units
-    //
-#define FIFF_UNIT_M   1
-#define FIFF_UNIT_KG  2
-#define FIFF_UNIT_SEC 3
-#define FIFF_UNIT_A   4
-#define FIFF_UNIT_K   5
-#define FIFF_UNIT_MOL 6
-    //
-    // SI Supplementary units
-    //
-#define FIFF_UNIT_RAD 7
-#define FIFF_UNIT_SR  8
-    //
-    // SI base candela
-    //
-#define FIFF_UNIT_CD  9
-    //
-    // SI derived units
-    //
-#define FIFF_UNIT_HZ  101
-#define FIFF_UNIT_N   102
-#define FIFF_UNIT_PA  103
-#define FIFF_UNIT_J   104
-#define FIFF_UNIT_W   105
-#define FIFF_UNIT_C   106
-#define FIFF_UNIT_V   107
-#define FIFF_UNIT_F   108
-#define FIFF_UNIT_OHM 109
-#define FIFF_UNIT_MHO 110
-#define FIFF_UNIT_WB  111
-#define FIFF_UNIT_T   112
-#define FIFF_UNIT_H   113
-#define FIFF_UNIT_CEL 114
-#define FIFF_UNIT_LM  115
-#define FIFF_UNIT_LX  116
-    //
     // Others we need
     //
-#define FIFF_UNIT_T_M   201    /**< T/m*/
-#define FIFF_UNIT_AM    202    /**< Am*/
 #define FIFF_UNIT_AM_M2 203    /**< Am/m^2*/
 #define FIFF_UNIT_AM_M3 204    /**< Am/m^3*/
-    //
-    // Multipliers
-    //
-#define FIFF_UNITM_E    18
-#define FIFF_UNITM_PET  15
-#define FIFF_UNITM_T    12
-#define FIFF_UNITM_MEG  6
-#define FIFF_UNITM_K    3
-#define FIFF_UNITM_H    2
-#define FIFF_UNITM_DA   1
-#define FIFF_UNITM_NONE 0
-#define FIFF_UNITM_D    -1
-#define FIFF_UNITM_C    -2
-#define FIFF_UNITM_M    -3
-#define FIFF_UNITM_MU   -6
-#define FIFF_UNITM_N    -9
-#define FIFF_UNITM_P    -12
-#define FIFF_UNITM_F    -15
-#define FIFF_UNITM_A    -18
-
-
-
-
-
-
-
-#define FIFFT_DATA_REF_STRUCT       38
-
-/*
-* These are for matrices of any of the above
-*/
-
-#define FIFFTS_FS_MASK        0xFF000000
-#define FIFFTS_BASE_MASK      0x00000FFF
-#define FIFFTS_MC_MASK        0x00FF0000
-
-#define FIFFTS_FS_SCALAR      0x00000000
-#define FIFFTS_FS_MATRIX      0x40000000
-
-#define FIFFTS_MC_DENSE       0x00000000
-#define FIFFTS_MC_CCS         0x00100000
-#define FIFFTS_MC_RCS         0x00200000
-
-
-/*
- * Real-time shmem
- */
-#define FIFF_NEW_FILE            1
-#define FIFF_CLOSE_FILE          2
-#define FIFF_DISCARD_FILE        3
-#define FIFF_ERROR_MESSAGE       4
-#define FIFF_SUSPEND_READING     5
-#define FIFF_FATAL_ERROR_MESSAGE 6
-#define FIFF_CONNECTION_CHECK    7
-#define FIFF_SUSPEND_FILING      8
-#define FIFF_RESUME_FILING       9
-#define FIFF_RAW_PREBASE        10
-#define FIFF_RAW_PICK_LIST      11
-#define FIFF_ECHO               12
-#define FIFF_RESUME_READING     13
-#define FIFF_DACQ_SYSTEM_TYPE   14
-#define FIFF_SELECT_RAW_CH      15  /* Instruct rawdisp to select this channel */
-#define FIFF_PLAYBACK_MODE      16  /* Tell that we are playing data back from the hard
-                     * disks in the data acquisition front end */
-#define FIFF_CONTINUE_FILE      17  /* Used to inform that data is saved into a continuation file. */
-#define FIFF_JITTER_MAX         18  /* Used to tell the jitter in the timing of data packets */
-#define FIFF_STREAM_SEGMENT    19  /* A segment of data stream */
-
-
-/*
-* Index
-*/
-#define FIFF_INDEX_KIND              5001
-#define FIFF_INDEX                   5002
-
-
-/*======================================================================
-* Enumerated types used as tag values.
-*=====================================================================*/
-
-/* Values for FIFF_REF_ROLE. The role of a reference */
-
-#define FIFFV_ROLE_PREV_FILE   1
-#define FIFFV_ROLE_NEXT_FILE   2
-
-
-/*
-* Method by which a projection is defined (FIFF_PROJ_ITEM_DEFINITION).
-* If tag is not present, FIFF_PROJ_BY_COMPLEMENT should be assumed.
-*/
-#define FIFFV_PROJ_BY_COMPLEMENT     0
-#define FIFFV_PROJ_BY_SPACE          1
-
-
-/* Volume types used in FIFF_VOL_TYPE */
-
-#define FIFFV_VOL_TYPE_HD            1	       /* Hard disk */
-#define FIFFV_VOL_TYPE_MOD           2	       /* Magneto-optical disk */
-
-
-/*
- * Byte order
- */
-#define FIFFV_NATIVE_ENDIAN     0        /* This refers to the byte order in the current system */
-#define FIFFV_LITTLE_ENDIAN     1        /* The little-endian (Intel) byte order */
-#define FIFFV_BIG_ENDIAN        2        /* The big-endian (Motorola) byte order */
 
 } // NAMESPACE
 

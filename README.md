@@ -68,7 +68,7 @@ MNE-CPP is **BSD-licensed** (3 clause):
     This software is OSI Certified Open Source Software.
     OSI Certified is a certification mark of the Open Source Initiative.
 
-    Copyright (C) 2010-2016, authors of MNE-CPP.
+    Copyright (C) 2010-2017, [authors](http://doc.mne-cpp.org/#authors_sec) of MNE-CPP.
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without

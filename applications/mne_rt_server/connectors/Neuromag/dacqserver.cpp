@@ -42,8 +42,8 @@
 #include "neuromag.h"
 #include "collectorsocket.h"
 #include "shmemsocket.h"
-#include <fiff/fiff_constants.h>
 #include <fiff/fiff_stream.h>
+#include <fiff/fiff_file.h>
 
 
 //*************************************************************************************************************
