@@ -114,7 +114,7 @@ void  BrainAnnotationTreeItem::setData(const QVariant& value, int role)
 
 //*************************************************************************************************************
 
-bool BrainAnnotationTreeItem::addData(const Surface& tSurface, const Annotation& tAnnotation)
+void BrainAnnotationTreeItem::addData(const Surface& tSurface, const Annotation& tAnnotation)
 {
     //Create color from annotation data if annotation is not empty
     if(!tAnnotation.isEmpty()) {
@@ -174,8 +174,6 @@ bool BrainAnnotationTreeItem::addData(const Surface& tSurface, const Annotation&
         data.setValue(tAnnotation.filePath());
         itemAnnotFileName->setData(data, Data3DTreeModelItemRoles::FilePath);
     }
-
-    return true;
 }
 
 

@@ -97,7 +97,7 @@ BrainHemisphereTreeItem::BrainHemisphereTreeItem(int iType, const QString& text)
     this->setEditable(false);    
     this->setCheckable(true);
     this->setCheckState(Qt::Checked);
-    this->setToolTip("Brain hemisphere");
+    this->setToolTip("Brain hemisphere item");
 }
 
 
@@ -134,18 +134,18 @@ int  BrainHemisphereTreeItem::columnCount() const
 
 //*************************************************************************************************************
 
-bool BrainHemisphereTreeItem::addData(const Surface& tSurface, const Annotation& tAnnotation, Qt3DCore::QEntity* p3DEntityParent)
+BrainSurfaceTreeItem* BrainHemisphereTreeItem::addData(const Surface& tSurface, const Annotation& tAnnotation, Qt3DCore::QEntity* p3DEntityParent)
 {
     //Set name of BrainHemisphereTreeItem based on the hemisphere information
     switch (tSurface.hemi()) {
     case 0:
-        this->setText("Left");
+        this->setText("Left hemisphere");
         break;
     case 1:
-        this->setText("Right");
+        this->setText("Right hemisphere");
         break;
     default:
-        this->setText("Unknown");
+        this->setText("Unknown hemisphere");
         break;
     }
 
@@ -163,7 +163,7 @@ bool BrainHemisphereTreeItem::addData(const Surface& tSurface, const Annotation&
     list << new QStandardItem(m_pSurfaceItem->toolTip());
     this->appendRow(list);
 
-    bool state = m_pSurfaceItem->addData(tSurface, p3DEntityParent);
+    m_pSurfaceItem->addData(tSurface, p3DEntityParent);
 
     //Add annotation child
     if(!tAnnotation.isEmpty()) {
@@ -176,10 +176,10 @@ bool BrainHemisphereTreeItem::addData(const Surface& tSurface, const Annotation&
         list << new QStandardItem(m_pAnnotItem->toolTip());
         this->appendRow(list);
 
-        state = m_pAnnotItem->addData(tSurface, tAnnotation);
+        m_pAnnotItem->addData(tSurface, tAnnotation);
     }
 
-    return state;
+    return m_pSurfaceItem;
 }
 
 

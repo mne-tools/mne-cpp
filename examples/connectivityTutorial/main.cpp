@@ -295,19 +295,17 @@ int main(int argc, char *argv[])
 
     p3DDataModel->addSurfaceSet(parser.value(subjectOption), evoked.comment, tSurfSet, tAnnotSet);
 
-    QList<NetworkTreeItem*> rtItemListConnect= p3DDataModel->addConnectivityData(parser.value(subjectOption), evoked.comment, pConnect_LA);
-    QList<BrainRTSourceLocDataTreeItem*> rtItemListSourceLoc = p3DDataModel->addSourceData(parser.value(subjectOption), evoked.comment, sourceEstimate, t_clusteredFwd);
+    NetworkTreeItem* pRTNetworkDataItem= p3DDataModel->addConnectivityData(parser.value(subjectOption), evoked.comment, pConnect_LA);
+    BrainRTSourceLocDataTreeItem* pRTDataItem = p3DDataModel->addSourceData(parser.value(subjectOption), evoked.comment, sourceEstimate, t_clusteredFwd);
 
     //Init some rt related values for right visual data
-    for(int i = 0; i < rtItemListSourceLoc.size(); ++i) {
-        rtItemListSourceLoc.at(i)->setLoopState(true);
-        rtItemListSourceLoc.at(i)->setTimeInterval(17);
-        rtItemListSourceLoc.at(i)->setNumberAverages(1);
-        rtItemListSourceLoc.at(i)->setStreamingActive(true);
-        rtItemListSourceLoc.at(i)->setNormalization(QVector3D(0.0,5.5,10));
-        rtItemListSourceLoc.at(i)->setVisualizationType("Annotation based");
-        rtItemListSourceLoc.at(i)->setColortable("Hot");
-    }
+    pRTDataItem->setLoopState(true);
+    pRTDataItem->setTimeInterval(17);
+    pRTDataItem->setNumberAverages(1);
+    pRTDataItem->setStreamingActive(true);
+    pRTDataItem->setNormalization(QVector3D(0.01,0.5,1.0));
+    pRTDataItem->setVisualizationType("Annotation based");
+    pRTDataItem->setColortable("Hot");
 
     testWindow->show();
 

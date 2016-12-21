@@ -195,8 +195,10 @@ Qt::ItemFlags Data3DTreeModel::flags(const QModelIndex &index) const
 
 //*************************************************************************************************************
 
-bool Data3DTreeModel::addSurfaceSet(const QString& subject, const QString& set, const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet)
+QList<BrainSurfaceTreeItem*> Data3DTreeModel::addSurfaceSet(const QString& subject, const QString& set, const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet)
 {
+    QList<BrainSurfaceTreeItem*> returnItemList;
+
     //Find the subject
     QList<QStandardItem*> itemSubjectList = this->findItems(subject);
 
@@ -208,43 +210,40 @@ bool Data3DTreeModel::addSurfaceSet(const QString& subject, const QString& set, 
         m_pRootItem->appendRow(itemSubjectList);
     }
 
-    //Iterate through subject items and add new data respectivley
-    bool state = false;
 
-    for(int i = 0; i < itemSubjectList.size(); ++i) {
-        //Check if it is really a subject tree item
-        if((itemSubjectList.at(i)->type() == Data3DTreeModelItemTypes::SubjectItem)) {
-            SubjectTreeItem* pSubjectItem = dynamic_cast<SubjectTreeItem*>(itemSubjectList.at(i));
+    //Check if it is really a subject tree item
+    if((itemSubjectList.first()->type() == Data3DTreeModelItemTypes::SubjectItem)) {
+        SubjectTreeItem* pSubjectItem = dynamic_cast<SubjectTreeItem*>(itemSubjectList.first());
 
-            //Find already existing set items and add the new data to the first search result
-            QList<QStandardItem*> itemList = pSubjectItem->findChildren(set);
+        //Find already existing set items and add the new data to the first search result
+        QList<QStandardItem*> itemList = pSubjectItem->findChildren(set);
 
-            if(!itemList.isEmpty() && (itemList.at(0)->type() == Data3DTreeModelItemTypes::MeasurementItem)) {
-                MeasurementTreeItem* pMeasurementItem = dynamic_cast<MeasurementTreeItem*>(itemList.at(0));
-                state = pMeasurementItem->addData(tSurfaceSet, tAnnotationSet, m_pModelEntity);
-            } else {
-                MeasurementTreeItem* pMeasurementItem = new MeasurementTreeItem(Data3DTreeModelItemTypes::MeasurementItem, set);
+        if(!itemList.isEmpty() && (itemList.at(0)->type() == Data3DTreeModelItemTypes::MeasurementItem)) {
+            MeasurementTreeItem* pMeasurementItem = dynamic_cast<MeasurementTreeItem*>(itemList.at(0));
+            returnItemList = pMeasurementItem->addData(tSurfaceSet, tAnnotationSet, m_pModelEntity);
+        } else {
+            MeasurementTreeItem* pMeasurementItem = new MeasurementTreeItem(Data3DTreeModelItemTypes::MeasurementItem, set);
 
-                QList<QStandardItem*> list;
-                list << pMeasurementItem;
-                list << new QStandardItem(pMeasurementItem->toolTip());
-                pSubjectItem->appendRow(list);
+            QList<QStandardItem*> list;
+            list << pMeasurementItem;
+            list << new QStandardItem(pMeasurementItem->toolTip());
+            pSubjectItem->appendRow(list);
 
-                state = pMeasurementItem->addData(tSurfaceSet, tAnnotationSet, m_pModelEntity);
-            }
+            returnItemList = pMeasurementItem->addData(tSurfaceSet, tAnnotationSet, m_pModelEntity);
         }
     }
 
-    return state;
+    return returnItemList;
 }
 
 
 //*************************************************************************************************************
 
-bool Data3DTreeModel::addSurface(const QString& subject, const QString& set, const Surface& tSurface, const Annotation &tAnnotation)
+BrainSurfaceTreeItem* Data3DTreeModel::addSurface(const QString& subject, const QString& set, const Surface& tSurface, const Annotation &tAnnotation)
 {
     //Find the subject
     QList<QStandardItem*> itemSubjectList = this->findItems(subject);
+    BrainSurfaceTreeItem* pReturnItem = Q_NULLPTR;
 
     //If subject does not exist, create a new one
     if(itemSubjectList.size() == 0) {
@@ -255,8 +254,6 @@ bool Data3DTreeModel::addSurface(const QString& subject, const QString& set, con
     }
 
     //Iterate through subject items and add new data respectivley
-    bool state = false;
-
     for(int i = 0; i < itemSubjectList.size(); ++i) {
         //Check if it is really a subject tree item
         if((itemSubjectList.at(i)->type() == Data3DTreeModelItemTypes::SubjectItem)) {
@@ -267,7 +264,7 @@ bool Data3DTreeModel::addSurface(const QString& subject, const QString& set, con
 
             if(!itemList.isEmpty() && (itemList.at(0)->type() == Data3DTreeModelItemTypes::MeasurementItem)) {
                 MeasurementTreeItem* pMeasurementItem = dynamic_cast<MeasurementTreeItem*>(itemList.at(0));
-                state = pMeasurementItem->addData(tSurface, tAnnotation, m_pModelEntity);
+                pReturnItem = pMeasurementItem->addData(tSurface, tAnnotation, m_pModelEntity);
             } else {
                 MeasurementTreeItem* pMeasurementItem = new MeasurementTreeItem(Data3DTreeModelItemTypes::MeasurementItem, set);
 
@@ -276,12 +273,12 @@ bool Data3DTreeModel::addSurface(const QString& subject, const QString& set, con
                 list << new QStandardItem(pMeasurementItem->toolTip());
                 pSubjectItem->appendRow(list);
 
-                state = pMeasurementItem->addData(tSurface, tAnnotation, m_pModelEntity);
+                pReturnItem = pMeasurementItem->addData(tSurface, tAnnotation, m_pModelEntity);
             }
         }
     }
 
-    return state;
+    return pReturnItem;
 }
 
 
@@ -341,10 +338,8 @@ bool Data3DTreeModel::addForwardSolution(const QString& subject, const QString& 
 
 //*************************************************************************************************************
 
-QList<BrainRTSourceLocDataTreeItem*> Data3DTreeModel::addSourceData(const QString& subject, const QString& set, const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution)
+BrainRTSourceLocDataTreeItem* Data3DTreeModel::addSourceData(const QString& subject, const QString& set, const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution)
 {
-    QList<BrainRTSourceLocDataTreeItem*> returnList;
-
     //Find the subject
     QList<QStandardItem*> itemSubjectList = this->findItems(subject);
 
@@ -359,18 +354,16 @@ QList<BrainRTSourceLocDataTreeItem*> Data3DTreeModel::addSourceData(const QStrin
 
             //Find the "set" items and add the source estimates as items
             if(!itemList.isEmpty()) {
-                for(int i = 0; i < itemList.size(); ++i) {
-                    if(itemList.at(i)->type() == Data3DTreeModelItemTypes::MeasurementItem) {
-                        if(MeasurementTreeItem* pSetItem = dynamic_cast<MeasurementTreeItem*>(itemList.at(i))) {
-                            returnList.append(pSetItem->addData(tSourceEstimate, tForwardSolution));
-                        }
+                if(itemList.first()->type() == Data3DTreeModelItemTypes::MeasurementItem) {
+                    if(MeasurementTreeItem* pMeasurementItem = dynamic_cast<MeasurementTreeItem*>(itemList.at(i))) {
+                        return pMeasurementItem->addData(tSourceEstimate, tForwardSolution);
                     }
                 }
             }
         }
     }
 
-    return returnList;
+    return Q_NULLPTR;
 }
 
 
@@ -422,10 +415,8 @@ ECDDataTreeItem* Data3DTreeModel::addDipoleFitData(const QString& subject, const
 
 //*************************************************************************************************************
 
-QList<NetworkTreeItem*> Data3DTreeModel::addConnectivityData(const QString& subject, const QString& set, Network::SPtr pNetworkData)
+NetworkTreeItem* Data3DTreeModel::addConnectivityData(const QString& subject, const QString& set, Network::SPtr pNetworkData)
 {
-    QList<NetworkTreeItem*> returnList;
-
     //Find the subject
     QList<QStandardItem*> itemSubjectList = this->findItems(subject);
 
@@ -448,7 +439,7 @@ QList<NetworkTreeItem*> Data3DTreeModel::addConnectivityData(const QString& subj
 
                 if(!itemList.isEmpty() && (itemList.at(0)->type() == Data3DTreeModelItemTypes::MeasurementItem)) {
                     if(MeasurementTreeItem* pMeasurementItem = dynamic_cast<MeasurementTreeItem*>(itemList.at(0))) {
-                        returnList.append(pMeasurementItem->addData(pNetworkData, m_pModelEntity));
+                        return pMeasurementItem->addData(pNetworkData, m_pModelEntity);
                     }
                 } else {
                     MeasurementTreeItem* pMeasurementItem = new MeasurementTreeItem(Data3DTreeModelItemTypes::MeasurementItem, set);
@@ -458,13 +449,13 @@ QList<NetworkTreeItem*> Data3DTreeModel::addConnectivityData(const QString& subj
                     list << new QStandardItem(pMeasurementItem->toolTip());
                     pSubjectItem->appendRow(list);
 
-                    returnList.append(pMeasurementItem->addData(pNetworkData, m_pModelEntity));
+                    return pMeasurementItem->addData(pNetworkData, m_pModelEntity);
                 }
             }
         }
     }
 
-    return returnList;
+    return Q_NULLPTR;
 }
 
 

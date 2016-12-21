@@ -142,7 +142,7 @@ void  BrainSurfaceTreeItem::setData(const QVariant& value, int role)
 
 //*************************************************************************************************************
 
-bool BrainSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* parent)
+void BrainSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* parent)
 {
     //Create renderable 3D entity
     m_pParentEntity = parent;
@@ -332,8 +332,6 @@ bool BrainSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* p
     list << itemZTrans;
     list << new QStandardItem(itemZTrans->toolTip());
     this->appendRow(list);
-
-    return true;
 }
 
 

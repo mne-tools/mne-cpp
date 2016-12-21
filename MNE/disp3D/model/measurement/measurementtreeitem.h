@@ -108,6 +108,7 @@ namespace DISP3DLIB
 class BrainRTSourceLocDataTreeItem;
 class NetworkTreeItem;
 class ECDDataTreeItem;
+class BrainSurfaceTreeItem;
 
 
 //=============================================================================================================
@@ -154,9 +155,11 @@ public:
     * @param[in] tAnnotationSet     FreeSurfer annotation set.
     * @param[in] p3DEntityParent    The Qt3D entity parent of the new item.
     *
-    * @return                       Returns true if successful.
+    * @return                       Returns a QList with the added surface tree items. The ordering
+    *                               of the list hereby corresponds to the ordering of the input surface set.
+    *                               The list is empty if no item was added.
     */
-    bool addData(const FSLIB::SurfaceSet& tSurfaceSet, const FSLIB::AnnotationSet& tAnnotationSet, Qt3DCore::QEntity* p3DEntityParent = 0);
+    QList<BrainSurfaceTreeItem*> addData(const FSLIB::SurfaceSet& tSurfaceSet, const FSLIB::AnnotationSet& tAnnotationSet, Qt3DCore::QEntity* p3DEntityParent = 0);
 
     //=========================================================================================================
     /**
@@ -166,9 +169,9 @@ public:
     * @param[in] tAnnotation        FreeSurfer annotation.
     * @param[in] p3DEntityParent    The Qt3D entity parent of the new item.
     *
-    * @return                       Returns true if successful.
+    * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
-    bool addData(const FSLIB::Surface& tSurface, const FSLIB::Annotation& tAnnotation, Qt3DCore::QEntity* p3DEntityParent = 0);
+    BrainSurfaceTreeItem* addData(const FSLIB::Surface& tSurface, const FSLIB::Annotation& tAnnotation, Qt3DCore::QEntity* p3DEntityParent = 0);
 
     //=========================================================================================================
     /**
@@ -177,7 +180,7 @@ public:
     * @param[in] tSourceSpace       The source space data.
     * @param[in] p3DEntityParent    The Qt3D entity parent of the new item.
     *
-    * @return                       Returns true if successful.
+    * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
     bool addData(const MNELIB::MNESourceSpace& tSourceSpace, Qt3DCore::QEntity* p3DEntityParent = 0);
 
@@ -188,7 +191,7 @@ public:
     * @param[in] tSourceEstimate    The MNESourceEstimate.
     * @param[in] tForwardSolution   The MNEForwardSolution.
     *
-    * @return                       Returns a list with the tree items which now hold the activation data. Use this list to update the data, i.e. during real time applications.
+    * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
     BrainRTSourceLocDataTreeItem* addData(const MNELIB::MNESourceEstimate& tSourceEstimate, const MNELIB::MNEForwardSolution& tForwardSolution = MNELIB::MNEForwardSolution());
 
@@ -199,7 +202,7 @@ public:
     * @param[in] tECDSet            The ECDSet dipole data.
     * @param[in] p3DEntityParent    The Qt3D entity parent of the new item.
     *
-    * @return                       Returns a pointer to the added tree item. Null pointer if no item was added.
+    * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
     ECDDataTreeItem* addData(QSharedPointer<INVERSELIB::ECDSet> &pECDSet, Qt3DCore::QEntity* p3DEntityParent = 0);
 
@@ -211,7 +214,7 @@ public:
     * @param[in] tDigitizer         The digitizer data.
     * @param[in] p3DEntityParent    The Qt3D entity parent of the new item.
     *
-    * @return                       Returns true if successful.
+    * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
     bool addData(const FIFFLIB::FiffDigPointSet& tDigitizer, Qt3DCore::QEntity* p3DEntityParent = 0);
 
@@ -221,7 +224,7 @@ public:
     *
     * @param[in] pNetworkData       The connectivity data.
     *
-    * @return                       Returns a list with the tree items which now hold the activation data. Use this list to update the data, i.e. during real time applications.
+    * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
     NetworkTreeItem* addData(CONNECTIVITYLIB::Network::SPtr pNetworkData, Qt3DCore::QEntity* p3DEntityParent = 0);
 

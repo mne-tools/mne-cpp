@@ -278,18 +278,16 @@ int main(int argc, char *argv[])
 
     if(bAddRtSourceLoc) {
         //Add rt source loc data
-        QList<BrainRTSourceLocDataTreeItem*> rtItemList_RV = p3DDataModel->addSourceData(parser.value(subjectOption), evoked.comment, sourceEstimate, t_clusteredFwd);
+        BrainRTSourceLocDataTreeItem* pRTDataItem = p3DDataModel->addSourceData(parser.value(subjectOption), evoked.comment, sourceEstimate, t_clusteredFwd);
 
         //Init some rt related values for right visual data
-        for(int i = 0; i < rtItemList_RV.size(); ++i) {
-            rtItemList_RV.at(i)->setLoopState(true);
-            rtItemList_RV.at(i)->setTimeInterval(17);
-            rtItemList_RV.at(i)->setNumberAverages(1);
-            rtItemList_RV.at(i)->setStreamingActive(true);
-            rtItemList_RV.at(i)->setNormalization(QVector3D(0.0,5.5,10));
-            rtItemList_RV.at(i)->setVisualizationType("Annotation based");
-            rtItemList_RV.at(i)->setColortable("Hot");
-        }
+        pRTDataItem->setLoopState(true);
+        pRTDataItem->setTimeInterval(17);
+        pRTDataItem->setNumberAverages(1);
+        pRTDataItem->setStreamingActive(true);
+        pRTDataItem->setNormalization(QVector3D(0.3,0.5,10.0));
+        pRTDataItem->setVisualizationType("Annotation based");
+        pRTDataItem->setColortable("Hot");
     }
 
     //Create the 3D view
