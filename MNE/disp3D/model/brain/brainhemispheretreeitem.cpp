@@ -41,7 +41,7 @@
 #include "brainhemispheretreeitem.h"
 #include "brainsurfacetreeitem.h"
 #include "brainannotationtreeitem.h"
-#include "brainrtsourcelocdatatreeitem.h"
+#include "mneestimatetreeitem.h"
 #include "brainsourcespacetreeitem.h"
 
 #include <fs/label.h>

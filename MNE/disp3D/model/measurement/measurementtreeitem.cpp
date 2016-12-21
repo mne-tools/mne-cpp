@@ -41,7 +41,7 @@
 #include "measurementtreeitem.h"
 #include "../brain/brainhemispheretreeitem.h"
 #include "../brain/brainsourcespacetreeitem.h"
-#include "../brain/brainrtsourcelocdatatreeitem.h"
+#include "../sourceactivity/mneestimatetreeitem.h"
 #include "../network/networktreeitem.h"
 #include "../brain/brainsurfacetreeitem.h"
 #include "../brain/brainannotationtreeitem.h"
@@ -101,7 +101,7 @@ using namespace CONNECTIVITYLIB;
 
 MeasurementTreeItem::MeasurementTreeItem(int iType, const QString& text)
 : AbstractTreeItem(iType, text)
-, m_pBrainRTSourceLocDataTreeItem(new BrainRTSourceLocDataTreeItem())
+, m_pMneEstimateTreeItem(new MneEstimateTreeItem())
 , m_pNetworkTreeItem(new NetworkTreeItem())
 , m_ECDDataTreeItem(new ECDDataTreeItem())
 {
@@ -294,21 +294,21 @@ BrainSourceSpaceTreeItem* MeasurementTreeItem::addData(const MNESourceSpace& tSo
 
 //*************************************************************************************************************
 
-BrainRTSourceLocDataTreeItem* MeasurementTreeItem::addData(const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution)
+MneEstimateTreeItem* MeasurementTreeItem::addData(const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution)
 {
     if(!tSourceEstimate.isEmpty()) {
         //Add source estimation data as child
         if(this->findChildren(Data3DTreeModelItemTypes::RTSourceLocDataItem).size() == 0) {
             //If rt data item does not exists yet, create it here!
             if(!tForwardSolution.isEmpty()) {
-                m_pBrainRTSourceLocDataTreeItem = new BrainRTSourceLocDataTreeItem();
+                m_pMneEstimateTreeItem = new MneEstimateTreeItem();
 
                 QList<QStandardItem*> list;
-                list << m_pBrainRTSourceLocDataTreeItem;
-                list << new QStandardItem(m_pBrainRTSourceLocDataTreeItem->toolTip());
+                list << m_pMneEstimateTreeItem;
+                list << new QStandardItem(m_pMneEstimateTreeItem->toolTip());
                 this->appendRow(list);
 
-                connect(m_pBrainRTSourceLocDataTreeItem, &BrainRTSourceLocDataTreeItem::rtVertColorChanged,
+                connect(m_pMneEstimateTreeItem, &MneEstimateTreeItem::rtVertColorChanged,
                         this, &MeasurementTreeItem::onRtVertColorChanged);
 
                 //Divide into left right hemi
@@ -332,7 +332,7 @@ BrainRTSourceLocDataTreeItem* MeasurementTreeItem::addData(const MNESourceEstima
                 }
 
                 if(pSurfaceTreeItemLeft && pSurfaceTreeItemRight && pAnnotTreeItemLeft && pAnnotTreeItemRight) {
-                    m_pBrainRTSourceLocDataTreeItem->init(tForwardSolution,
+                    m_pMneEstimateTreeItem->init(tForwardSolution,
                                                         pSurfaceTreeItemLeft->data(Data3DTreeModelItemRoles::SurfaceCurrentColorVert).value<QByteArray>(),
                                                         pSurfaceTreeItemRight->data(Data3DTreeModelItemRoles::SurfaceCurrentColorVert).value<QByteArray>(),
                                                         pAnnotTreeItemLeft->data(Data3DTreeModelItemRoles::LabeIds).value<VectorXi>(),
@@ -341,15 +341,15 @@ BrainRTSourceLocDataTreeItem* MeasurementTreeItem::addData(const MNESourceEstima
                                                         pAnnotTreeItemRight->data(Data3DTreeModelItemRoles::LabeList).value<QList<FSLIB::Label>>());
                 }
 
-                m_pBrainRTSourceLocDataTreeItem->addData(tSourceEstimate);
+                m_pMneEstimateTreeItem->addData(tSourceEstimate);
             } else {
                 qDebug() << "MeasurementTreeItem::addData - Cannot add real time data since the forwad solution was not provided and therefore the rt source localization data item has not been initilaized yet. Returning...";
             }
         } else {
-            m_pBrainRTSourceLocDataTreeItem->addData(tSourceEstimate);
+            m_pMneEstimateTreeItem->addData(tSourceEstimate);
         }
 
-        return m_pBrainRTSourceLocDataTreeItem;
+        return m_pMneEstimateTreeItem;
     } else {
         qDebug() << "MeasurementTreeItem::addData - tSourceEstimate is empty";
     }
@@ -497,7 +497,7 @@ void MeasurementTreeItem::onColorInfoOriginChanged()
     }
 
     if(pSurfaceTreeItemLeft && pSurfaceTreeItemRight && !this->findChildren(Data3DTreeModelItemTypes::RTSourceLocDataItem).isEmpty()) {
-        m_pBrainRTSourceLocDataTreeItem->onColorInfoOriginChanged(pSurfaceTreeItemLeft->data(Data3DTreeModelItemRoles::SurfaceCurrentColorVert).value<QByteArray>(),
+        m_pMneEstimateTreeItem->onColorInfoOriginChanged(pSurfaceTreeItemLeft->data(Data3DTreeModelItemRoles::SurfaceCurrentColorVert).value<QByteArray>(),
                                                                     pSurfaceTreeItemRight->data(Data3DTreeModelItemRoles::SurfaceCurrentColorVert).value<QByteArray>());
     }
 }

@@ -92,7 +92,7 @@ namespace DISP3DLIB
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class BrainRTSourceLocDataTreeItem;
+class MneEstimateTreeItem;
 class BrainSurfaceTreeItem;
 class BrainAnnotationTreeItem;
 class BrainSourceSpaceTreeItem;

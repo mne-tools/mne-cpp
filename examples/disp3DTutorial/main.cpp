@@ -42,7 +42,7 @@
 
 #include <disp3D/view3D.h>
 #include <disp3D/control/control3dwidget.h>
-#include <disp3D/model/brain/brainrtsourcelocdatatreeitem.h>
+#include <disp3D/model/sourceactivity/mneestimatetreeitem.h>
 #include <disp3D/model/data3Dtreemodel.h>
 
 #include <fs/label.h>
@@ -278,7 +278,7 @@ int main(int argc, char *argv[])
 
     if(bAddRtSourceLoc) {
         //Add rt source loc data
-        BrainRTSourceLocDataTreeItem* pRTDataItem = p3DDataModel->addSourceData(parser.value(subjectOption), evoked.comment, sourceEstimate, t_clusteredFwd);
+        MneEstimateTreeItem* pRTDataItem = p3DDataModel->addSourceData(parser.value(subjectOption), evoked.comment, sourceEstimate, t_clusteredFwd);
 
         //Init some rt related values for right visual data
         pRTDataItem->setLoopState(true);
