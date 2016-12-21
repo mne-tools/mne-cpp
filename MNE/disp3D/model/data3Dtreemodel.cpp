@@ -367,6 +367,7 @@ ECDDataTreeItem* Data3DTreeModel::addDipoleFitData(const QString& subject, const
 {
     //Find the subject
     QList<QStandardItem*> itemSubjectList = this->findItems(subject);
+    ECDDataTreeItem* pReturnItem = Q_NULLPTR;
 
     //If subject does not exist, create a new one
     if(itemSubjectList.size() == 0) {
@@ -387,7 +388,7 @@ ECDDataTreeItem* Data3DTreeModel::addDipoleFitData(const QString& subject, const
         //Find the "set" items and add the dipole fits as items
         if(!itemList.isEmpty() && (itemList.first()->type() == Data3DTreeModelItemTypes::MeasurementItem)) {
             if(MeasurementTreeItem* pMeasurementItem = dynamic_cast<MeasurementTreeItem*>(itemList.first())) {
-                return pMeasurementItem->addData(pECDSet, m_pModelEntity);
+                pReturnItem = pMeasurementItem->addData(pECDSet, m_pModelEntity);
             }
         } else {
             MeasurementTreeItem* pMeasurementItem = new MeasurementTreeItem(Data3DTreeModelItemTypes::MeasurementItem, set);
@@ -397,11 +398,11 @@ ECDDataTreeItem* Data3DTreeModel::addDipoleFitData(const QString& subject, const
             list << new QStandardItem(pMeasurementItem->toolTip());
             pSubjectItem->appendRow(list);
 
-            return pMeasurementItem->addData(pECDSet, m_pModelEntity);
+            pReturnItem = pMeasurementItem->addData(pECDSet, m_pModelEntity);
         }
     }
 
-    return Q_NULLPTR;
+    return pReturnItem;
 }
 
 
@@ -411,6 +412,7 @@ NetworkTreeItem* Data3DTreeModel::addConnectivityData(const QString& subject, co
 {
     //Find the subject
     QList<QStandardItem*> itemSubjectList = this->findItems(subject);
+    NetworkTreeItem* pReturnItem = Q_NULLPTR;
 
     //If subject does not exist, create a new one
     if(itemSubjectList.size() == 0) {
@@ -429,7 +431,7 @@ NetworkTreeItem* Data3DTreeModel::addConnectivityData(const QString& subject, co
 
             if(!itemList.isEmpty() && (itemList.first()->type() == Data3DTreeModelItemTypes::MeasurementItem)) {
                 if(MeasurementTreeItem* pMeasurementItem = dynamic_cast<MeasurementTreeItem*>(itemList.first())) {
-                    return pMeasurementItem->addData(pNetworkData, m_pModelEntity);
+                    pReturnItem = pMeasurementItem->addData(pNetworkData, m_pModelEntity);
                 }
             } else {
                 MeasurementTreeItem* pMeasurementItem = new MeasurementTreeItem(Data3DTreeModelItemTypes::MeasurementItem, set);
@@ -439,21 +441,22 @@ NetworkTreeItem* Data3DTreeModel::addConnectivityData(const QString& subject, co
                 list << new QStandardItem(pMeasurementItem->toolTip());
                 pSubjectItem->appendRow(list);
 
-                return pMeasurementItem->addData(pNetworkData, m_pModelEntity);
+                pReturnItem = pMeasurementItem->addData(pNetworkData, m_pModelEntity);
             }
         }
     }
 
-    return Q_NULLPTR;
+    return pReturnItem;
 }
 
 
 //*************************************************************************************************************
 
-bool Data3DTreeModel::addBemData(const QString& subject, const QString& set, const MNELIB::MNEBem& tBem)
+BemTreeItem* Data3DTreeModel::addBemData(const QString& subject, const QString& set, const MNELIB::MNEBem& tBem)
 {
     //Find the subject
     QList<QStandardItem*> itemSubjectList = this->findItems(subject);
+    BemTreeItem* pReturnItem = Q_NULLPTR;
 
     //If subject does not exist, create a new one
     if(itemSubjectList.size() == 0) {
@@ -464,8 +467,6 @@ bool Data3DTreeModel::addBemData(const QString& subject, const QString& set, con
     }
 
     //Iterate through subject items and add new data respectivley
-    bool state = false;
-
     //Check if it is really a subject tree item
     if((itemSubjectList.first()->type() == Data3DTreeModelItemTypes::SubjectItem)) {
         SubjectTreeItem* pSubjectItem = dynamic_cast<SubjectTreeItem*>(itemSubjectList.first());
@@ -474,30 +475,31 @@ bool Data3DTreeModel::addBemData(const QString& subject, const QString& set, con
         QList<QStandardItem*> itemList = pSubjectItem->findChildren(set);
 
         if(!itemList.isEmpty() && (itemList.first()->type() == Data3DTreeModelItemTypes::BemItem)) {
-            BemTreeItem* pBemItem = dynamic_cast<BemTreeItem*>(itemList.first());
-            state = pBemItem->addData(tBem, m_pModelEntity);
+            pReturnItem = dynamic_cast<BemTreeItem*>(itemList.first());
+            pReturnItem->addData(tBem, m_pModelEntity);
         } else {
-            BemTreeItem* pBemItem = new BemTreeItem(Data3DTreeModelItemTypes::BemItem, set);
+            pReturnItem = new BemTreeItem(Data3DTreeModelItemTypes::BemItem, set);
 
             QList<QStandardItem*> list;
-            list << pBemItem;
-            list << new QStandardItem(pBemItem->toolTip());
+            list << pReturnItem;
+            list << new QStandardItem(pReturnItem->toolTip());
             pSubjectItem->appendRow(list);
 
-            state = pBemItem->addData(tBem, m_pModelEntity);
+            pReturnItem->addData(tBem, m_pModelEntity);
         }
     }
 
-    return state;
+    return pReturnItem;
 }
 
 
 //*************************************************************************************************************
 
-bool Data3DTreeModel::addDigitizerData(const QString& subject, const QString& set, const FIFFLIB::FiffDigPointSet& tDigitizer)
+DigitizerSetTreeItem* Data3DTreeModel::addDigitizerData(const QString& subject, const QString& set, const FIFFLIB::FiffDigPointSet& tDigitizer)
 {
     //Find the subject
     QList<QStandardItem*> itemSubjectList = this->findItems(subject);
+    DigitizerSetTreeItem* pReturnItem = Q_NULLPTR;
 
     //If subject does not exist, create a new one
     if(itemSubjectList.size() == 0) {
@@ -508,33 +510,29 @@ bool Data3DTreeModel::addDigitizerData(const QString& subject, const QString& se
     }
 
     //Iterate through subject items and add new data respectivley
-    bool state = false;
+    //Check if it is really a subject tree item
+    if((itemSubjectList.first()->type() == Data3DTreeModelItemTypes::SubjectItem)) {
+        SubjectTreeItem* pSubjectItem = dynamic_cast<SubjectTreeItem*>(itemSubjectList.first());
 
-    for(int i = 0; i < itemSubjectList.size(); ++i) {
-        //Check if it is really a subject tree item
-        if((itemSubjectList.at(i)->type() == Data3DTreeModelItemTypes::SubjectItem)) {
-            SubjectTreeItem* pSubjectItem = dynamic_cast<SubjectTreeItem*>(itemSubjectList.at(i));
+        //Find already existing set items and add the new data to the first search result
+        QList<QStandardItem*> itemList = pSubjectItem->findChildren(set);
 
-            //Find already existing set items and add the new data to the first search result
-            QList<QStandardItem*> itemList = pSubjectItem->findChildren(set);
+        if(!itemList.isEmpty() && (itemList.first()->type() == Data3DTreeModelItemTypes::MeasurementItem)) {
+            MeasurementTreeItem* pMeasurementItem = dynamic_cast<MeasurementTreeItem*>(itemList.first());
+            pReturnItem = pMeasurementItem->addData(tDigitizer, m_pModelEntity);
+        } else {
+            MeasurementTreeItem* pMeasurementItem = new MeasurementTreeItem(Data3DTreeModelItemTypes::MeasurementItem, set);
 
-            if(!itemList.isEmpty() && (itemList.at(0)->type() == Data3DTreeModelItemTypes::MeasurementItem)) {
-                MeasurementTreeItem* pMeasurementItem = dynamic_cast<MeasurementTreeItem*>(itemList.at(0));
-                state = pMeasurementItem->addData(tDigitizer, m_pModelEntity);
-            } else {
-                MeasurementTreeItem* pMeasurementItem = new MeasurementTreeItem(Data3DTreeModelItemTypes::MeasurementItem, set);
+            QList<QStandardItem*> list;
+            list << pMeasurementItem;
+            list << new QStandardItem(pMeasurementItem->toolTip());
+            pSubjectItem->appendRow(list);
 
-                QList<QStandardItem*> list;
-                list << pMeasurementItem;
-                list << new QStandardItem(pMeasurementItem->toolTip());
-                pSubjectItem->appendRow(list);
-
-                state = pMeasurementItem->addData(tDigitizer, m_pModelEntity);
-            }
+            pReturnItem = pMeasurementItem->addData(tDigitizer, m_pModelEntity);
         }
     }
 
-    return state;
+    return pReturnItem;
 }
 
 

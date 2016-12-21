@@ -133,10 +133,8 @@ public:
     *
     * @param[in] tDigitizer         The digitizer data.
     * @param[in] parent             The Qt3D entity parent of the new item.
-    *
-    * @return                       Returns true if successful.
     */
-    bool addData(const FIFFLIB::FiffDigPointSet& tDigitizer, Qt3DCore::QEntity* parent);
+    void addData(const FIFFLIB::FiffDigPointSet& tDigitizer, Qt3DCore::QEntity* parent);
 
 private:
     //=========================================================================================================

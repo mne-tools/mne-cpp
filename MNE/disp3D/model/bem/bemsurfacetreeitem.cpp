@@ -132,7 +132,7 @@ void  BemSurfaceTreeItem::setData(const QVariant& value, int role)
 
 //*************************************************************************************************************
 
-bool BemSurfaceTreeItem::addData(const MNEBemSurface& tBemSurface, Qt3DCore::QEntity* parent)
+void BemSurfaceTreeItem::addData(const MNEBemSurface& tBemSurface, Qt3DCore::QEntity* parent)
 {
     //Create renderable 3D entity
     m_pParentEntity = parent;
@@ -222,8 +222,6 @@ bool BemSurfaceTreeItem::addData(const MNEBemSurface& tBemSurface, Qt3DCore::QEn
     list << itemZTrans;
     list << new QStandardItem(itemZTrans->toolTip());
     this->appendRow(list);
-
-    return true;
 }
 
 
