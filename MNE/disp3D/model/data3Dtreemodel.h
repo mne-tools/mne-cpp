@@ -109,7 +109,7 @@ namespace DISP3DLIB
 
 class MneEstimateTreeItem;
 class NetworkTreeItem;
-class ECDDataTreeItem;
+class EcdDataTreeItem;
 class BrainSurfaceTreeItem;
 class BrainSourceSpaceTreeItem;
 class BemTreeItem;
@@ -228,7 +228,7 @@ public:
     *
     * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
-    ECDDataTreeItem* addDipoleFitData(const QString& subject, const QString& set, QSharedPointer<INVERSELIB::ECDSet> &pECDSet);
+    EcdDataTreeItem* addDipoleFitData(const QString& subject, const QString& set, QSharedPointer<INVERSELIB::ECDSet> &pECDSet);
 
     //=========================================================================================================
     /**

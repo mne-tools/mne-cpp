@@ -107,7 +107,7 @@ namespace DISP3DLIB
 
 class MneEstimateTreeItem;
 class NetworkTreeItem;
-class ECDDataTreeItem;
+class EcdDataTreeItem;
 class BrainSurfaceTreeItem;
 class BrainSourceSpaceTreeItem;
 class DigitizerSetTreeItem;
@@ -206,7 +206,7 @@ public:
     *
     * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
-    ECDDataTreeItem* addData(QSharedPointer<INVERSELIB::ECDSet> &pECDSet, Qt3DCore::QEntity* p3DEntityParent = 0);
+    EcdDataTreeItem* addData(QSharedPointer<INVERSELIB::ECDSet> &pECDSet, Qt3DCore::QEntity* p3DEntityParent = 0);
 
     //=========================================================================================================
     /**
@@ -255,7 +255,7 @@ private:
 
     MneEstimateTreeItem*       m_pMneEstimateTreeItem;        /**< The rt source loc data item of this item. */
     NetworkTreeItem*                    m_pNetworkTreeItem;                     /**< The rt connectivity data item of this item. */
-    ECDDataTreeItem*                    m_ECDDataTreeItem;                      /**< The rt dipole fit data item of this item. */
+    EcdDataTreeItem*                    m_EcdDataTreeItem;                      /**< The rt dipole fit data item of this item. */
 };
 
 } //NAMESPACE DISP3DLIB

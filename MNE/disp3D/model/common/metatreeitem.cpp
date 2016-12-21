@@ -97,28 +97,28 @@ MetaTreeItem::MetaTreeItem(int iType, const QString& text)
         case MetaTreeItemTypes::SurfaceColorSulci:
             sToolTip = "Color Sulci";
             break;
-        case MetaTreeItemTypes::RTDataStreamStatus:
+        case MetaTreeItemTypes::StreamStatus:
             sToolTip = "Turn real time data streaming on/off";
             break;
-        case MetaTreeItemTypes::RTDataSourceSpaceType:
+        case MetaTreeItemTypes::SourceSpaceType:
             sToolTip = "The source space type";
             break;
-        case MetaTreeItemTypes::RTDataColormapType:
+        case MetaTreeItemTypes::ColormapType:
             sToolTip = "The color map type";
             break;
-        case MetaTreeItemTypes::RTDataTimeInterval:
+        case MetaTreeItemTypes::StreamingTimeInterval:
             sToolTip = "The m seconds waited in between each sample";
             break;
-        case MetaTreeItemTypes::RTDataLoopedStreaming:
+        case MetaTreeItemTypes::LoopedStreaming:
             sToolTip = "Turn looped streaming on/off";
             break;
-        case MetaTreeItemTypes::RTDataNumberAverages:
+        case MetaTreeItemTypes::NumberAverages:
             sToolTip = "The number of samples averaged together (downsampling)";
             break;
-        case MetaTreeItemTypes::RTDataNormalizationValue:
+        case MetaTreeItemTypes::ThresholdValue:
             sToolTip = "The value to normalize the source localization result";
             break;
-        case MetaTreeItemTypes::RTDataVisualizationType:
+        case MetaTreeItemTypes::VisualizationType:
             sToolTip = "The visualization type";
             break;
         case MetaTreeItemTypes::SurfaceColor:
@@ -194,23 +194,23 @@ void  MetaTreeItem::setData(const QVariant& value, int role)
             break;
         }
 
-        case MetaTreeItemRoles::RTDataTimeInterval: {
+        case MetaTreeItemRoles::StreamingTimeInterval: {
             emit rtDataTimeIntervalChanged(value.toInt());
             break;
         }
 
-        case MetaTreeItemRoles::RTDataNormalizationValue: {
+        case MetaTreeItemRoles::ThresholdValue: {
             QVector3D vecTemp = value.value<QVector3D>();
             emit rtDataNormalizationValueChanged(vecTemp);
             break;
         }
 
-        case MetaTreeItemRoles::RTDataColormapType: {
+        case MetaTreeItemRoles::ColormapType: {
             emit rtDataColormapTypeChanged(value.toString());
             break;
         }
 
-        case MetaTreeItemRoles::RTDataVisualizationType: {
+        case MetaTreeItemRoles::VisualizationType: {
             emit rtDataVisualizationTypeChanged(value.toString());
             break;
         }
@@ -225,7 +225,7 @@ void  MetaTreeItem::setData(const QVariant& value, int role)
             break;
         }
 
-        case MetaTreeItemRoles::RTDataNumberAverages: {
+        case MetaTreeItemRoles::NumberAverages: {
             emit rtDataNumberAveragesChanged(value.toInt());
             break;
         }
