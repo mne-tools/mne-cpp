@@ -130,10 +130,8 @@ public:
     *
     * @param[in] tSurface           FreeSurfer surface.
     * @param[in] parent             The Qt3D entity parent of the new item.
-    *
-    * @return                       Returns true if successful.
     */
-    bool addData(const FSLIB::Surface& tSurface, Qt3DCore::QEntity* parent);
+    void addData(const FSLIB::Surface& tSurface, Qt3DCore::QEntity* parent);
 
     //=========================================================================================================
     /**

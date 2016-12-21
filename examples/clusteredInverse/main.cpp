@@ -293,7 +293,7 @@ int main(int argc, char *argv[])
 
     p3DDataModel->addSurfaceSet(parser.value(subjectOption), "HemiLR", t_surfSet, t_annotationSet);
 
-    QList<BrainRTSourceLocDataTreeItem*> rtItemList = p3DDataModel->addSourceData(parser.value(subjectOption), "HemiLR", sourceEstimate, t_clusteredFwd);
+    BrainRTSourceLocDataTreeItem* rtItemList = p3DDataModel->addSourceData(parser.value(subjectOption), "HemiLR", sourceEstimate, t_clusteredFwd);
 
     testWindow->show();
 

@@ -110,6 +110,7 @@ namespace DISP3DLIB
 class BrainRTSourceLocDataTreeItem;
 class NetworkTreeItem;
 class ECDDataTreeItem;
+class BrainSurfaceTreeItem;
 
 
 //=============================================================================================================
@@ -158,9 +159,11 @@ public:
     * @param[in] tSurfaceSet        FreeSurfer surface set.
     * @param[in] tAnnotationSet     FreeSurfer annotation set.
     *
-    * @return                       Returns true if successful.
+    * @return                       Returns a QList with the added surface tree items. The ordering
+    *                               of the list hereby corresponds to the ordering of the input surface set.
+    *                               The list is empty if no item was added.
     */
-    bool addSurfaceSet(const QString& subject, const QString& set, const FSLIB::SurfaceSet& tSurfaceSet, const FSLIB::AnnotationSet& tAnnotationSet = FSLIB::AnnotationSet());
+    QList<BrainSurfaceTreeItem*> addSurfaceSet(const QString& subject, const QString& set, const FSLIB::SurfaceSet& tSurfaceSet, const FSLIB::AnnotationSet& tAnnotationSet = FSLIB::AnnotationSet());
 
     //=========================================================================================================
     /**
@@ -171,9 +174,9 @@ public:
     * @param[in] pSurface           FreeSurfer surface.
     * @param[in] pAnnotation        FreeSurfer annotation.
     *
-    * @return                       Returns true if successful.
+    * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
-    bool addSurface(const QString& subject, const QString& set, const FSLIB::Surface& tSurface, const FSLIB::Annotation& tAnnotation = FSLIB::Annotation());
+    BrainSurfaceTreeItem* addSurface(const QString& subject, const QString& set, const FSLIB::Surface& tSurface, const FSLIB::Annotation& tAnnotation = FSLIB::Annotation());
 
     //=========================================================================================================
     /**
@@ -183,7 +186,7 @@ public:
     * @param[in] set                The name of the surface set to which the data is to be added.
     * @param[in] tSourceSpace       The source space information.
     *
-    * @return                       Returns true if successful.
+    * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
     bool addSourceSpace(const QString& subject, const QString& set, const MNELIB::MNESourceSpace& tSourceSpace);
 
@@ -195,7 +198,7 @@ public:
     * @param[in] set                The text of the surface set tree item which this data should be added to. If no item with text exists it will be created.
     * @param[in] tForwardSolution   The forward solution information.
     *
-    * @return                       Returns true if successful.
+    * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
     bool addForwardSolution(const QString& subject, const QString& set, const MNELIB::MNEForwardSolution& tForwardSolution);
 
@@ -208,9 +211,9 @@ public:
     * @param[in] tSourceEstimate    The MNESourceEstimate.
     * @param[in] tForwardSolution   The MNEForwardSolution.
     *
-    * @return                       Returns a list with the tree items which now hold the activation data. Use this list to update the data, i.e. during real time applications.
+    * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
-    QList<BrainRTSourceLocDataTreeItem*> addSourceData(const QString& subject, const QString& set, const MNELIB::MNESourceEstimate& tSourceEstimate, const MNELIB::MNEForwardSolution& tForwardSolution = MNELIB::MNEForwardSolution());
+    BrainRTSourceLocDataTreeItem* addSourceData(const QString& subject, const QString& set, const MNELIB::MNESourceEstimate& tSourceEstimate, const MNELIB::MNEForwardSolution& tForwardSolution = MNELIB::MNEForwardSolution());
 
     //=========================================================================================================
     /**
@@ -220,7 +223,7 @@ public:
     * @param[in] set                The name of the surface set to which the actiavtion data is to be added.
     * @param[in] pECDSet            The ECDSet dipole data.
     *
-    * @return                       Returns a pointer to the added tree item. Null pointer if no item was added.
+    * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
     ECDDataTreeItem* addDipoleFitData(const QString& subject, const QString& set, QSharedPointer<INVERSELIB::ECDSet> &pECDSet);
 
@@ -232,9 +235,9 @@ public:
     * @param[in] set                The name of the surface set to which the actiavtion data is to be added.
     * @param[in] pNetworkData       The connectivity data.
     *
-    * @return                       Returns a list with the tree items which now hold the activation data. Use this list to update the data, i.e. during real time applications.
+    * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
-    QList<NetworkTreeItem*> addConnectivityData(const QString& subject, const QString& set, CONNECTIVITYLIB::Network::SPtr pNetworkData);
+    NetworkTreeItem* addConnectivityData(const QString& subject, const QString& set, CONNECTIVITYLIB::Network::SPtr pNetworkData);
 
     //=========================================================================================================
     /**
@@ -244,7 +247,7 @@ public:
     * @param[in] set                The name of the bem set to which the data is to be added.
     * @param[in] tBem               The Bem information.
     *
-    * @return                       Returns true if successful.
+    * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
     bool addBemData(const QString& subject, const QString& set, const MNELIB::MNEBem& tBem);
 

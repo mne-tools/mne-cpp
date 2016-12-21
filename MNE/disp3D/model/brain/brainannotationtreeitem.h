@@ -129,10 +129,8 @@ public:
     *
     * @param[in] tSurface           FreeSurfer surface.
     * @param[in] tAnnotation        FreeSurfer annotation.
-    *
-    * @return                       Returns true if successful.
     */
-    bool addData(const FSLIB::Surface& tSurface, const FSLIB::Annotation& tAnnotation);
+    void addData(const FSLIB::Surface& tSurface, const FSLIB::Annotation& tAnnotation);
 
 private:
     //=========================================================================================================

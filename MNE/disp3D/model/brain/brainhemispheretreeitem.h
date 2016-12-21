@@ -142,9 +142,9 @@ public:
     * @param[in] tAnnotation        FreeSurfer annotation.
     * @param[in] p3DEntityParent    The Qt3D entity parent of the new item.
     *
-    * @return                       Returns true if successful.
+    * @return                       Returns a pointer to the added tree item.
     */
-    bool addData(const FSLIB::Surface& tSurface, const FSLIB::Annotation& tAnnotation, Qt3DCore::QEntity* p3DEntityParent = 0);
+    BrainSurfaceTreeItem* addData(const FSLIB::Surface& tSurface, const FSLIB::Annotation& tAnnotation, Qt3DCore::QEntity* p3DEntityParent = 0);
 
     //=========================================================================================================
     /**

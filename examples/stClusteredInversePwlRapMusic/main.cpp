@@ -374,11 +374,9 @@ int main(int argc, char *argv[])
     Data3DTreeModel::SPtr p3DDataModel = Data3DTreeModel::SPtr(new Data3DTreeModel());
 
     testWindow->setModel(p3DDataModel);
-    p3DDataModel->addSurfaceSet("Subject01", "HemiLRSet", t_surfSet, t_annotationSet);
+    p3DDataModel->addSurfaceSet(parser.value(subjectOption), "HemiLRSet", t_surfSet, t_annotationSet);
 
-    QList<BrainRTSourceLocDataTreeItem*> rtItemList = p3DDataModel->addSourceData("Subject01", "HemiLRSet", sourceEstimate, t_clusteredFwd);
-
-    testWindow->show();
+    BrainRTSourceLocDataTreeItem* pRTDataItem = p3DDataModel->addSourceData(parser.value(subjectOption), "HemiLRSet", sourceEstimate, t_clusteredFwd);
 
     Control3DWidget::SPtr control3DWidget = Control3DWidget::SPtr(new Control3DWidget());
     control3DWidget->init(p3DDataModel, testWindow);

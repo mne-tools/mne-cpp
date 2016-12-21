@@ -141,12 +141,11 @@ void  MeasurementTreeItem::setData(const QVariant& value, int role)
 
 //*************************************************************************************************************
 
-bool MeasurementTreeItem::addData(const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet, Qt3DCore::QEntity* p3DEntityParent)
+QList<BrainSurfaceTreeItem*> MeasurementTreeItem::addData(const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet, Qt3DCore::QEntity* p3DEntityParent)
 {
     //Generate child items based on surface set input parameters
-    bool state = false;
-
     QList<QStandardItem*> itemList = this->findChildren(Data3DTreeModelItemTypes::HemisphereItem);
+    QList<BrainSurfaceTreeItem*> returnItemList;
 
     //If there are more hemispheres in tSourceSpace than in the tree model
     bool hemiItemFound = false;
@@ -160,12 +159,12 @@ bool MeasurementTreeItem::addData(const SurfaceSet& tSurfaceSet, const Annotatio
 
                     if(i < tAnnotationSet.size()) {
                         if(tAnnotationSet[i].hemi() == tSurfaceSet[i].hemi()) {
-                            state = pHemiItem->addData(tSurfaceSet[i], tAnnotationSet[i], p3DEntityParent);
+                            returnItemList.append(pHemiItem->addData(tSurfaceSet[i], tAnnotationSet[i], p3DEntityParent));
                         } else {
-                            state = pHemiItem->addData(tSurfaceSet[i], Annotation(), p3DEntityParent);
+                            returnItemList.append(pHemiItem->addData(tSurfaceSet[i], Annotation(), p3DEntityParent));
                         }
                     } else {
-                        state = pHemiItem->addData(tSurfaceSet[i], Annotation(), p3DEntityParent);
+                        returnItemList.append(pHemiItem->addData(tSurfaceSet[i], Annotation(), p3DEntityParent));
                     }
                 }
             }
@@ -182,12 +181,12 @@ bool MeasurementTreeItem::addData(const SurfaceSet& tSurfaceSet, const Annotatio
 
             if(i < tAnnotationSet.size()) {
                 if(tAnnotationSet[i].hemi() == tSurfaceSet[i].hemi()) {
-                    state = pHemiItem->addData(tSurfaceSet[i], tAnnotationSet[i], p3DEntityParent);
+                    returnItemList.append(pHemiItem->addData(tSurfaceSet[i], tAnnotationSet[i], p3DEntityParent));
                 } else {
-                    state = pHemiItem->addData(tSurfaceSet[i], Annotation(), p3DEntityParent);
+                    returnItemList.append(pHemiItem->addData(tSurfaceSet[i], Annotation(), p3DEntityParent));
                 }
             } else {
-                state = pHemiItem->addData(tSurfaceSet[i], Annotation(), p3DEntityParent);
+                returnItemList.append(pHemiItem->addData(tSurfaceSet[i], Annotation(), p3DEntityParent));
             }
 
             connect(pHemiItem->getSurfaceItem(), &BrainSurfaceTreeItem::colorInfoOriginChanged,
@@ -197,16 +196,16 @@ bool MeasurementTreeItem::addData(const SurfaceSet& tSurfaceSet, const Annotatio
         hemiItemFound = false;
     }
 
-    return state;
+    return returnItemList;
 }
 
 
 //*************************************************************************************************************
 
-bool MeasurementTreeItem::addData(const Surface& tSurface, const Annotation& tAnnotation, Qt3DCore::QEntity* p3DEntityParent)
+BrainSurfaceTreeItem* MeasurementTreeItem::addData(const Surface& tSurface, const Annotation& tAnnotation, Qt3DCore::QEntity* p3DEntityParent)
 {
     //Generate child items based on surface set input parameters
-    bool state = false;
+    BrainSurfaceTreeItem* pReturnItem = Q_NULLPTR;
 
     QList<QStandardItem*> itemList = this->findChildren(Data3DTreeModelItemTypes::HemisphereItem);
 
@@ -219,9 +218,9 @@ bool MeasurementTreeItem::addData(const Surface& tSurface, const Annotation& tAn
                 hemiItemFound = true;
 
                 if(tAnnotation.hemi() == tSurface.hemi()) {
-                    state = pHemiItem->addData(tSurface, tAnnotation, p3DEntityParent);
+                    pReturnItem = pHemiItem->addData(tSurface, tAnnotation, p3DEntityParent);
                 } else {
-                    state = pHemiItem->addData(tSurface, Annotation(), p3DEntityParent);
+                    pReturnItem = pHemiItem->addData(tSurface, Annotation(), p3DEntityParent);
                 }
             }
         }
@@ -232,9 +231,9 @@ bool MeasurementTreeItem::addData(const Surface& tSurface, const Annotation& tAn
         BrainHemisphereTreeItem* pHemiItem = new BrainHemisphereTreeItem(Data3DTreeModelItemTypes::HemisphereItem);
 
         if(tAnnotation.hemi() == tSurface.hemi()) {
-            state = pHemiItem->addData(tSurface, tAnnotation, p3DEntityParent);
+            pReturnItem = pHemiItem->addData(tSurface, tAnnotation, p3DEntityParent);
         } else {
-            state = pHemiItem->addData(tSurface, Annotation(), p3DEntityParent);
+            pReturnItem = pHemiItem->addData(tSurface, Annotation(), p3DEntityParent);
         }
 
         QList<QStandardItem*> list;
@@ -246,7 +245,7 @@ bool MeasurementTreeItem::addData(const Surface& tSurface, const Annotation& tAn
             this, &MeasurementTreeItem::onColorInfoOriginChanged);
     }
 
-    return state;
+    return pReturnItem;
 }
 
 

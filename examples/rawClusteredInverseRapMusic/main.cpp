@@ -535,18 +535,16 @@ int main(int argc, char *argv[])
     p3DDataModel->addSurfaceSet(parser.value(subjectOption), "HemiLRSet", t_surfSet, t_annotationSet);
 
     //Add rt source loc data
-    QList<BrainRTSourceLocDataTreeItem*> rtItemList = p3DDataModel->addSourceData(parser.value(subjectOption), "HemiLRSet", sourceEstimate, t_clusteredFwd);
+    QPointer<BrainRTSourceLocDataTreeItem> pRTDataItem = p3DDataModel->addSourceData(parser.value(subjectOption), "HemiLRSet", sourceEstimate, t_clusteredFwd);
 
     //Init some rt related values for right visual data
-    for(int i = 0; i < rtItemList.size(); ++i) {
-        rtItemList.at(i)->setLoopState(true);
-        rtItemList.at(i)->setTimeInterval(17);
-        rtItemList.at(i)->setNumberAverages(1);
-        rtItemList.at(i)->setStreamingActive(true);
-        rtItemList.at(i)->setNormalization(QVector3D(0.1, 0.5, 1.0));
-        rtItemList.at(i)->setVisualizationType("Annotation based");
-        rtItemList.at(i)->setColortable("Hot");
-    }
+    pRTDataItem->setLoopState(true);
+    pRTDataItem->setTimeInterval(17);
+    pRTDataItem->setNumberAverages(1);
+    pRTDataItem->setStreamingActive(true);
+    pRTDataItem->setNormalization(QVector3D(0.01,0.5,1.0));
+    pRTDataItem->setVisualizationType("Annotation based");
+    pRTDataItem->setColortable("Hot");
 
     testWindow->show();
 

@@ -55,6 +55,8 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QPointer>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -181,7 +183,7 @@ private:
     QSharedPointer<DISP3DLIB::Control3DWidget>          m_pControl3DView;   /**< The Disp3D control. */
     QSharedPointer<DISP3DLIB::Data3DTreeModel>          m_pData3DModel;     /**< The Disp3D model. */
 
-    QList<DISP3DLIB::BrainRTSourceLocDataTreeItem*>     m_lRtItem;          /**< The Disp3D real time items. */
+    DISP3DLIB::BrainRTSourceLocDataTreeItem*            m_pRtItem;          /**< The Disp3D real time items. */
 
     QAction*                                            m_pAction3DControl; /**< Show 3D View control widget */
 
