@@ -112,6 +112,8 @@ class NetworkTreeItem;
 class ECDDataTreeItem;
 class BrainSurfaceTreeItem;
 class BrainSourceSpaceTreeItem;
+class BemTreeItem;
+class DigitizerSetTreeItem;
 
 
 //=============================================================================================================
@@ -250,7 +252,7 @@ public:
     *
     * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
-    bool addBemData(const QString& subject, const QString& set, const MNELIB::MNEBem& tBem);
+    BemTreeItem* addBemData(const QString& subject, const QString& set, const MNELIB::MNEBem& tBem);
 
     //=========================================================================================================
     /**
@@ -260,9 +262,9 @@ public:
     * @param[in] set                The name of the measurment set to which the data is to be added.
     * @param[in] tDigitizer         The digitizer information.
     *
-    * @return                       Returns true if successful.
+    * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
-    bool addDigitizerData(const QString& subject, const QString& set, const FIFFLIB::FiffDigPointSet &tDigitizer);
+    DigitizerSetTreeItem* addDigitizerData(const QString& subject, const QString& set, const FIFFLIB::FiffDigPointSet &tDigitizer);
 
     //=========================================================================================================
     /**

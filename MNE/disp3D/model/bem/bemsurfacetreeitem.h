@@ -136,10 +136,8 @@ public:
     *
     * @param[in] tBemSurface        The bem data.
     * @param[in] parent             The Qt3D entity parent of the new item.
-    *
-    * @return                       Returns true if successful.
     */
-    bool addData(const MNELIB::MNEBemSurface &tBemSurface, Qt3DCore::QEntity* parent);
+    void addData(const MNELIB::MNEBemSurface &tBemSurface, Qt3DCore::QEntity* parent);
 
     //=========================================================================================================
     /**

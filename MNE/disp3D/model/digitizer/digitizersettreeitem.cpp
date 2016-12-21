@@ -128,7 +128,7 @@ void  DigitizerSetTreeItem::setData(const QVariant& value, int role)
 
 //*************************************************************************************************************
 
-bool DigitizerSetTreeItem::addData(const FIFFLIB::FiffDigPointSet& tDigitizer, Qt3DCore::QEntity* parent)
+void DigitizerSetTreeItem::addData(const FIFFLIB::FiffDigPointSet& tDigitizer, Qt3DCore::QEntity* parent)
 {
     //Add data
     bool state = false;
@@ -275,8 +275,6 @@ bool DigitizerSetTreeItem::addData(const FIFFLIB::FiffDigPointSet& tDigitizer, Q
 //        itemListExtra << new QStandardItem(digitizerItem->toolTip());
 //        this->appendRow(itemListExtra);
 //    }
-
-    return state;
 }
 
 

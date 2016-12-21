@@ -391,10 +391,11 @@ ECDDataTreeItem* MeasurementTreeItem::addData(INVERSELIB::ECDSet::SPtr &pECDSet,
 
 //*************************************************************************************************************
 
-bool MeasurementTreeItem::addData(const FiffDigPointSet &tDigitizer, Qt3DCore::QEntity *p3DEntityParent)
+DigitizerSetTreeItem* MeasurementTreeItem::addData(const FiffDigPointSet &tDigitizer, Qt3DCore::QEntity *p3DEntityParent)
 {
     //Find the digitizer kind
     QList<QStandardItem*> itemDigitizerList = this->findChildren(Data3DTreeModelItemTypes::DigitizerSetItem);
+    DigitizerSetTreeItem* pReturnItem = Q_NULLPTR;
 
     //If digitizer does not exist, create a new one
     if(itemDigitizerList.size() == 0) {
@@ -405,18 +406,14 @@ bool MeasurementTreeItem::addData(const FiffDigPointSet &tDigitizer, Qt3DCore::Q
     }
 
     // Add Data to the first Digitizer Set Item
-    bool state = false;
-
     //Check if it is really a digitizer tree item
-    if((itemDigitizerList.at(0)->type() == Data3DTreeModelItemTypes::DigitizerSetItem)) {
+    if(itemDigitizerList.at(0)->type() == Data3DTreeModelItemTypes::DigitizerSetItem) {
         if(DigitizerSetTreeItem* pDigitizerSetItem = dynamic_cast<DigitizerSetTreeItem*>(itemDigitizerList.at(0))) {
-            state = pDigitizerSetItem->addData(tDigitizer, p3DEntityParent);
+            pDigitizerSetItem->addData(tDigitizer, p3DEntityParent);
         }
-    } else {
-        state = false;
     }
 
-    return state;
+    return pReturnItem;
 }
 
 

@@ -110,6 +110,7 @@ class NetworkTreeItem;
 class ECDDataTreeItem;
 class BrainSurfaceTreeItem;
 class BrainSourceSpaceTreeItem;
+class DigitizerSetTreeItem;
 
 
 //=============================================================================================================
@@ -217,7 +218,7 @@ public:
     *
     * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
-    bool addData(const FIFFLIB::FiffDigPointSet& tDigitizer, Qt3DCore::QEntity* p3DEntityParent = 0);
+    DigitizerSetTreeItem* addData(const FIFFLIB::FiffDigPointSet& tDigitizer, Qt3DCore::QEntity* p3DEntityParent = 0);
 
     //=========================================================================================================
     /**

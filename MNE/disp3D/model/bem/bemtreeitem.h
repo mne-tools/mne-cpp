@@ -129,10 +129,8 @@ public:
     *
     * @param[in] tBem               The BEM data.
     * @param[in] p3DEntityParent    The Qt3D entity parent of the new item.
-    *
-    * @return                       Returns true if successful.
     */
-    bool addData(const MNELIB::MNEBem& tBem, Qt3DCore::QEntity* p3DEntityParent = 0);
+    void addData(const MNELIB::MNEBem& tBem, Qt3DCore::QEntity* p3DEntityParent = 0);
 
 private:
     //=========================================================================================================

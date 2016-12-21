@@ -122,11 +122,9 @@ void  BemTreeItem::setData(const QVariant& value, int role)
 
 //*************************************************************************************************************
 
-bool BemTreeItem::addData(const MNEBem &tBem, Qt3DCore::QEntity* p3DEntityParent)
+void BemTreeItem::addData(const MNEBem &tBem, Qt3DCore::QEntity* p3DEntityParent)
 {
     //Generate child items based on BEM input parameters
-    bool state = false;
-
     for(int i = 0; i < tBem.size(); ++i) {
         QString sBemSurfName;
         sBemSurfName = QString("%1").arg(tBem[i].id);
@@ -138,8 +136,6 @@ bool BemTreeItem::addData(const MNEBem &tBem, Qt3DCore::QEntity* p3DEntityParent
         list << new QStandardItem(pSurfItem->toolTip());
         this->appendRow(list);
     }
-
-    return state;
 }
 
 
