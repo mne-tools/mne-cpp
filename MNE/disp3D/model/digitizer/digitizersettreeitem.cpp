@@ -95,7 +95,7 @@ DigitizerSetTreeItem::DigitizerSetTreeItem(int iType, const QString& text)
     this->setEditable(false);
     this->setCheckable(true);
     this->setCheckState(Qt::Checked);
-    this->setToolTip("Digitizer Set");
+    this->setToolTip("Digitizer set item");
 }
 
 

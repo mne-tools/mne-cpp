@@ -85,7 +85,7 @@ BrainAnnotationTreeItem::BrainAnnotationTreeItem(int iType, const QString & text
     this->setEditable(false);
     this->setCheckable(true);
     this->setCheckState(Qt::Unchecked);
-    this->setToolTip("Brain annotation");
+    this->setToolTip("Brain annotation item");
 }
 
 
