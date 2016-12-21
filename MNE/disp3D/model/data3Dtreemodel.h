@@ -111,6 +111,7 @@ class BrainRTSourceLocDataTreeItem;
 class NetworkTreeItem;
 class ECDDataTreeItem;
 class BrainSurfaceTreeItem;
+class BrainSourceSpaceTreeItem;
 
 
 //=============================================================================================================
@@ -188,7 +189,7 @@ public:
     *
     * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
-    bool addSourceSpace(const QString& subject, const QString& set, const MNELIB::MNESourceSpace& tSourceSpace);
+    BrainSourceSpaceTreeItem* addSourceSpace(const QString& subject, const QString& set, const MNELIB::MNESourceSpace& tSourceSpace);
 
     //=========================================================================================================
     /**
@@ -200,7 +201,7 @@ public:
     *
     * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
-    bool addForwardSolution(const QString& subject, const QString& set, const MNELIB::MNEForwardSolution& tForwardSolution);
+    BrainSourceSpaceTreeItem* addForwardSolution(const QString& subject, const QString& set, const MNELIB::MNEForwardSolution& tForwardSolution);
 
     //=========================================================================================================
     /**
