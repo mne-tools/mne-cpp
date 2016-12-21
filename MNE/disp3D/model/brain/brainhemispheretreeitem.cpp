@@ -41,8 +41,8 @@
 #include "brainhemispheretreeitem.h"
 #include "brainsurfacetreeitem.h"
 #include "brainannotationtreeitem.h"
-#include "mneestimatetreeitem.h"
 #include "brainsourcespacetreeitem.h"
+#include "../sourceactivity/mneestimatetreeitem.h"
 
 #include <fs/label.h>
 #include <fs/annotationset.h>
@@ -118,7 +118,7 @@ QVariant BrainHemisphereTreeItem::data(int role) const
 
 //*************************************************************************************************************
 
-void  BrainHemisphereTreeItem::setData(const QVariant& value, int role)
+void BrainHemisphereTreeItem::setData(const QVariant& value, int role)
 {
     AbstractTreeItem::setData(value, role);
 }
@@ -126,7 +126,7 @@ void  BrainHemisphereTreeItem::setData(const QVariant& value, int role)
 
 //*************************************************************************************************************
 
-int  BrainHemisphereTreeItem::columnCount() const
+int BrainHemisphereTreeItem::columnCount() const
 {
     return 2;
 }
@@ -191,18 +191,18 @@ BrainSourceSpaceTreeItem* BrainHemisphereTreeItem::addData(const MNEHemisphere& 
     QVariant data;
 
     switch (tHemisphere.id) {
-    case 101:
-        this->setText("Left");
-        data.setValue(0);
-        break;
-    case 102:
-        this->setText("Right");
-        data.setValue(1);
-        break;
-    default:
-        this->setText("Unknown");
-        data.setValue(-1);
-        break;
+        case 101:
+            this->setText("Left hemisphere");
+            data.setValue(0);
+            break;
+        case 102:
+            this->setText("Right hemisphere");
+            data.setValue(1);
+            break;
+        default:
+            this->setText("Unknown hemisphere");
+            data.setValue(-1);
+            break;
     }
 
     this->setData(data, Data3DTreeModelItemRoles::SurfaceHemi);
