@@ -110,7 +110,7 @@ namespace DISP3DLIB
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class BrainRTSourceLocDataTreeItem;
+class MneEstimateTreeItem;
 class NetworkTreeItem;
 class Data3DTreeModel;
 

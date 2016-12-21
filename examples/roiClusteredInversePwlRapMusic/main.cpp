@@ -390,7 +390,7 @@ int main(int argc, char *argv[])
 
     p3DDataModel->addSurfaceSet(parser.value(subjectOption), "HemiLRSet", t_surfSet, t_annotationSet);
 
-    BrainRTSourceLocDataTreeItem* pRTDataItem = p3DDataModel->addSourceData(parser.value(subjectOption), "HemiLRSet", sourceEstimate, t_clusteredFwd);
+    MneEstimateTreeItem* pRTDataItem = p3DDataModel->addSourceData(parser.value(subjectOption), "HemiLRSet", sourceEstimate, t_clusteredFwd);
 
     Control3DWidget::SPtr control3DWidget = Control3DWidget::SPtr(new Control3DWidget());
     control3DWidget->init(p3DDataModel, testWindow);

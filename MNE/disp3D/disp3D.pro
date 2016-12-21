@@ -105,7 +105,7 @@ SOURCES += \
     model/measurement/measurementtreeitem.cpp \
     model/brain/brainannotationtreeitem.cpp \
     model/brain/brainhemispheretreeitem.cpp \
-    model/brain/brainrtsourcelocdatatreeitem.cpp \
+    model/sourceactivity/mneestimatetreeitem.cpp \
     model/network/networktreeitem.cpp \
     model/bem/bemtreeitem.cpp \
     model/bem/bemsurfacetreeitem.cpp \
@@ -130,7 +130,7 @@ HEADERS += \
     model/measurement/measurementtreeitem.h \
     model/brain/brainannotationtreeitem.h \
     model/brain/brainhemispheretreeitem.h \
-    model/brain/brainrtsourcelocdatatreeitem.h \
+    model/sourceactivity/mneestimatetreeitem.h \
     model/network/networktreeitem.h \
     model/bem/bemtreeitem.h \
     model/bem/bemsurfacetreeitem.h \

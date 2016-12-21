@@ -333,11 +333,11 @@ BrainSourceSpaceTreeItem* Data3DTreeModel::addForwardSolution(const QString& sub
 
 //*************************************************************************************************************
 
-BrainRTSourceLocDataTreeItem* Data3DTreeModel::addSourceData(const QString& subject, const QString& set, const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution)
+MneEstimateTreeItem* Data3DTreeModel::addSourceData(const QString& subject, const QString& set, const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution)
 {
     //Find the subject
     QList<QStandardItem*> itemSubjectList = this->findItems(subject);
-    BrainRTSourceLocDataTreeItem* pReturnItem = Q_NULLPTR;
+    MneEstimateTreeItem* pReturnItem = Q_NULLPTR;
 
     //Iterate through subject items and add new data respectivley
     //Check if it is really a subject tree item
