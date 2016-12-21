@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    ECDDataTreeItem class definition.
+* @brief    EcdDataTreeItem class definition.
 *
 */
 
@@ -86,7 +86,7 @@ using namespace DISP3DLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ECDDataTreeItem::ECDDataTreeItem(int iType, const QString &text)
+EcdDataTreeItem::EcdDataTreeItem(int iType, const QString &text)
 : AbstractTreeItem(iType, text)
 , m_bIsInit(false)
 {
@@ -97,7 +97,7 @@ ECDDataTreeItem::ECDDataTreeItem(int iType, const QString &text)
 
 //*************************************************************************************************************
 
-ECDDataTreeItem::~ECDDataTreeItem()
+EcdDataTreeItem::~EcdDataTreeItem()
 {
     //Schedule deletion/Decouple of all entities so that the SceneGraph is NOT plotting them anymore.
     //Cannot delete m_pParentEntity since we do not know who else holds it, that is why we use a QPointer for m_pParentEntity.
@@ -113,7 +113,7 @@ ECDDataTreeItem::~ECDDataTreeItem()
 
 //*************************************************************************************************************
 
-QVariant ECDDataTreeItem::data(int role) const
+QVariant EcdDataTreeItem::data(int role) const
 {
     return AbstractTreeItem::data(role);
 }
@@ -121,7 +121,7 @@ QVariant ECDDataTreeItem::data(int role) const
 
 //*************************************************************************************************************
 
-void ECDDataTreeItem::setData(const QVariant& value, int role)
+void EcdDataTreeItem::setData(const QVariant& value, int role)
 {
     AbstractTreeItem::setData(value, role);
 }
@@ -129,7 +129,7 @@ void ECDDataTreeItem::setData(const QVariant& value, int role)
 
 //*************************************************************************************************************
 
-bool ECDDataTreeItem::init(Qt3DCore::QEntity* parent)
+bool EcdDataTreeItem::init(Qt3DCore::QEntity* parent)
 {      
     //Create renderable 3D entity
     m_pParentEntity = parent;
@@ -147,7 +147,7 @@ bool ECDDataTreeItem::init(Qt3DCore::QEntity* parent)
 
 //*************************************************************************************************************
 
-bool ECDDataTreeItem::addData(ECDSet::SPtr pECDSet)
+bool EcdDataTreeItem::addData(ECDSet::SPtr pECDSet)
 {
     if(!m_bIsInit) {
         qDebug() << "NetworkTreeItem::updateData - NetworkTreeItem has not been initialized yet!";
@@ -169,7 +169,7 @@ bool ECDDataTreeItem::addData(ECDSet::SPtr pECDSet)
 
 //*************************************************************************************************************
 
-void ECDDataTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
+void EcdDataTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
 {
     this->setVisible(checkState == Qt::Unchecked ? false : true);
 }
@@ -177,7 +177,7 @@ void ECDDataTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
 
 //*************************************************************************************************************
 
-void ECDDataTreeItem::setVisible(bool state)
+void EcdDataTreeItem::setVisible(bool state)
 {
     for(int i = 0; i < m_lDipoles.size(); ++i) {
         m_lDipoles.at(i)->setParent(state ? m_pRenderable3DEntity : Q_NULLPTR);
@@ -189,7 +189,7 @@ void ECDDataTreeItem::setVisible(bool state)
 
 //*************************************************************************************************************
 
-void ECDDataTreeItem::plotDipoles(QSharedPointer<ECDSet> pECDSet)
+void EcdDataTreeItem::plotDipoles(QSharedPointer<ECDSet> pECDSet)
 {
     //Plot dipoles
     QVector3D pos,to,from;
@@ -204,8 +204,8 @@ void ECDDataTreeItem::plotDipoles(QSharedPointer<ECDSet> pECDSet)
         to.setZ((*pECDSet)[i].Q(2));
         //to.normalize();
 
-        qDebug()<<"ECDDataTreeItem::plotDipoles - from" << from;
-        qDebug()<<"ECDDataTreeItem::plotDipoles - to" << to;
+        qDebug()<<"EcdDataTreeItem::plotDipoles - from" << from;
+        qDebug()<<"EcdDataTreeItem::plotDipoles - to" << to;
 
         //The Qt3D default cone orientation and the top of the cone lies in line with the positive y-axis.
         from = QVector3D(0.0, 1.0, 0.0);

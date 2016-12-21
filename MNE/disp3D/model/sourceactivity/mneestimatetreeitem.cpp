@@ -180,19 +180,19 @@ bool MneEstimateTreeItem::init(const MNEForwardSolution& tForwardSolution,
     //Add meta information as item children
     QList<QStandardItem*> list;
 
-    MetaTreeItem* pItemRTDataStreamStatus = new MetaTreeItem(MetaTreeItemTypes::RTDataStreamStatus, "Stream data on/off");
-    connect(pItemRTDataStreamStatus, &MetaTreeItem::checkStateChanged,
+    MetaTreeItem* pItemStreamStatus = new MetaTreeItem(MetaTreeItemTypes::StreamStatus, "Stream data on/off");
+    connect(pItemStreamStatus, &MetaTreeItem::checkStateChanged,
             this, &MneEstimateTreeItem::onCheckStateWorkerChanged);
-    list << pItemRTDataStreamStatus;
-    list << new QStandardItem(pItemRTDataStreamStatus->toolTip());
+    list << pItemStreamStatus;
+    list << new QStandardItem(pItemStreamStatus->toolTip());
     this->appendRow(list);
-    pItemRTDataStreamStatus->setCheckable(true);
-    pItemRTDataStreamStatus->setCheckState(Qt::Unchecked);
+    pItemStreamStatus->setCheckable(true);
+    pItemStreamStatus->setCheckState(Qt::Unchecked);
 
     data.setValue(false);
-    pItemRTDataStreamStatus->setData(data, MetaTreeItemRoles::RTDataStreamStatus);
+    pItemStreamStatus->setData(data, MetaTreeItemRoles::StreamStatus);
 
-    MetaTreeItem* pItemVisuaizationType = new MetaTreeItem(MetaTreeItemTypes::RTDataVisualizationType, "Vertex based");
+    MetaTreeItem* pItemVisuaizationType = new MetaTreeItem(MetaTreeItemTypes::VisualizationType, "Vertex based");
     connect(pItemVisuaizationType, &MetaTreeItem::rtDataVisualizationTypeChanged,
             this, &MneEstimateTreeItem::onVisualizationTypeChanged);
     list.clear();
@@ -200,19 +200,19 @@ bool MneEstimateTreeItem::init(const MNEForwardSolution& tForwardSolution,
     list << new QStandardItem(pItemVisuaizationType->toolTip());
     this->appendRow(list);
     data.setValue(QString("Vertex based"));
-    pItemVisuaizationType->setData(data, MetaTreeItemRoles::RTDataVisualizationType);
+    pItemVisuaizationType->setData(data, MetaTreeItemRoles::VisualizationType);
 
     QString sIsClustered = isClustered ? "Clustered" : "Full";
-    MetaTreeItem* pItemSourceSpaceType = new MetaTreeItem(MetaTreeItemTypes::RTDataSourceSpaceType, sIsClustered);
+    MetaTreeItem* pItemSourceSpaceType = new MetaTreeItem(MetaTreeItemTypes::SourceSpaceType, sIsClustered);
     pItemSourceSpaceType->setEditable(false);
     list.clear();
     list << pItemSourceSpaceType;
     list << new QStandardItem(pItemSourceSpaceType->toolTip());
     this->appendRow(list);
     data.setValue(sIsClustered);
-    pItemSourceSpaceType->setData(data, MetaTreeItemRoles::RTDataSourceSpaceType);
+    pItemSourceSpaceType->setData(data, MetaTreeItemRoles::SourceSpaceType);
 
-    MetaTreeItem* pItemColormapType = new MetaTreeItem(MetaTreeItemTypes::RTDataColormapType, "Hot Negative 2");
+    MetaTreeItem* pItemColormapType = new MetaTreeItem(MetaTreeItemTypes::ColormapType, "Hot Negative 2");
     connect(pItemColormapType, &MetaTreeItem::rtDataColormapTypeChanged,
             this, &MneEstimateTreeItem::onColormapTypeChanged);
     list.clear();
@@ -220,9 +220,9 @@ bool MneEstimateTreeItem::init(const MNEForwardSolution& tForwardSolution,
     list << new QStandardItem(pItemColormapType->toolTip());
     this->appendRow(list);
     data.setValue(QString("Hot Negative 2"));
-    pItemColormapType->setData(data, MetaTreeItemRoles::RTDataColormapType);
+    pItemColormapType->setData(data, MetaTreeItemRoles::ColormapType);
 
-    MetaTreeItem* pItemSourceLocNormValue = new MetaTreeItem(MetaTreeItemTypes::RTDataNormalizationValue, "0.0,5.5,15");
+    MetaTreeItem* pItemSourceLocNormValue = new MetaTreeItem(MetaTreeItemTypes::ThresholdValue, "0.0,5.5,15");
     connect(pItemSourceLocNormValue, &MetaTreeItem::rtDataNormalizationValueChanged,
             this, &MneEstimateTreeItem::onDataNormalizationValueChanged);
     list.clear();
@@ -230,9 +230,9 @@ bool MneEstimateTreeItem::init(const MNEForwardSolution& tForwardSolution,
     list << new QStandardItem(pItemSourceLocNormValue->toolTip());
     this->appendRow(list);
     data.setValue(QVector3D(0.0,5.5,15));
-    pItemSourceLocNormValue->setData(data, MetaTreeItemRoles::RTDataNormalizationValue);
+    pItemSourceLocNormValue->setData(data, MetaTreeItemRoles::ThresholdValue);
 
-    MetaTreeItem *pItemStreamingInterval = new MetaTreeItem(MetaTreeItemTypes::RTDataTimeInterval, "50");
+    MetaTreeItem *pItemStreamingInterval = new MetaTreeItem(MetaTreeItemTypes::StreamingTimeInterval, "50");
     connect(pItemStreamingInterval, &MetaTreeItem::rtDataTimeIntervalChanged,
             this, &MneEstimateTreeItem::onTimeIntervalChanged);
     list.clear();
@@ -240,9 +240,9 @@ bool MneEstimateTreeItem::init(const MNEForwardSolution& tForwardSolution,
     list << new QStandardItem(pItemStreamingInterval->toolTip());
     this->appendRow(list);
     data.setValue(50);
-    pItemStreamingInterval->setData(data, MetaTreeItemRoles::RTDataTimeInterval);
+    pItemStreamingInterval->setData(data, MetaTreeItemRoles::StreamingTimeInterval);
 
-    MetaTreeItem *pItemLoopedStreaming = new MetaTreeItem(MetaTreeItemTypes::RTDataLoopedStreaming, "Looping on/off");
+    MetaTreeItem *pItemLoopedStreaming = new MetaTreeItem(MetaTreeItemTypes::LoopedStreaming, "Looping on/off");
     connect(pItemLoopedStreaming, &MetaTreeItem::checkStateChanged,
             this, &MneEstimateTreeItem::onCheckStateLoopedStateChanged);
     pItemLoopedStreaming->setCheckable(true);
@@ -252,7 +252,7 @@ bool MneEstimateTreeItem::init(const MNEForwardSolution& tForwardSolution,
     list << new QStandardItem(pItemLoopedStreaming->toolTip());
     this->appendRow(list);
 
-    MetaTreeItem *pItemAveragedStreaming = new MetaTreeItem(MetaTreeItemTypes::RTDataNumberAverages, "1");
+    MetaTreeItem *pItemAveragedStreaming = new MetaTreeItem(MetaTreeItemTypes::NumberAverages, "1");
     connect(pItemAveragedStreaming, &MetaTreeItem::rtDataNumberAveragesChanged,
             this, &MneEstimateTreeItem::onNumberAveragesChanged);
     list.clear();
@@ -260,7 +260,7 @@ bool MneEstimateTreeItem::init(const MNEForwardSolution& tForwardSolution,
     list << new QStandardItem(pItemAveragedStreaming->toolTip());
     this->appendRow(list);
     data.setValue(1);
-    pItemAveragedStreaming->setData(data, MetaTreeItemRoles::RTDataNumberAverages);
+    pItemAveragedStreaming->setData(data, MetaTreeItemRoles::NumberAverages);
 
     //set rt data corresponding to the hemisphere
     m_pSourceLocRtDataWorker->setSurfaceData(arraySurfaceVertColorLeftHemi,
@@ -303,14 +303,14 @@ bool MneEstimateTreeItem::addData(const MNESourceEstimate& tSourceEstimate)
 
 void MneEstimateTreeItem::setLoopState(bool state)
 {
-    QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::RTDataLoopedStreaming);
+    QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::LoopedStreaming);
 
     for(int i = 0; i < lItems.size(); i++) {
         if(MetaTreeItem* pAbstractItem = dynamic_cast<MetaTreeItem*>(lItems.at(i))) {
             pAbstractItem->setCheckState(state == true ? Qt::Checked : Qt::Unchecked);
             QVariant data;
             data.setValue(state);
-            pAbstractItem->setData(data, MetaTreeItemRoles::RTDataLoopedStreaming);
+            pAbstractItem->setData(data, MetaTreeItemRoles::LoopedStreaming);
         }
     }
 }
@@ -320,14 +320,14 @@ void MneEstimateTreeItem::setLoopState(bool state)
 
 void MneEstimateTreeItem::setStreamingActive(bool state)
 {
-    QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::RTDataStreamStatus);
+    QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::StreamStatus);
 
     for(int i = 0; i < lItems.size(); i++) {
         if(MetaTreeItem* pAbstractItem = dynamic_cast<MetaTreeItem*>(lItems.at(i))) {
             pAbstractItem->setCheckState(state == true ? Qt::Checked : Qt::Unchecked);
             QVariant data;
             data.setValue(state);
-            pAbstractItem->setData(data, MetaTreeItemRoles::RTDataStreamStatus);
+            pAbstractItem->setData(data, MetaTreeItemRoles::StreamStatus);
         }
     }
 }
@@ -337,14 +337,14 @@ void MneEstimateTreeItem::setStreamingActive(bool state)
 
 void MneEstimateTreeItem::setTimeInterval(int iMSec)
 {
-    QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::RTDataTimeInterval);
+    QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::StreamingTimeInterval);
 
     for(int i = 0; i < lItems.size(); i++) {
         if(MetaTreeItem* pAbstractItem = dynamic_cast<MetaTreeItem*>(lItems.at(i))) {
             qDebug() << "MneEstimateTreeItem::setTimeInterval";
             QVariant data;
             data.setValue(iMSec);
-            pAbstractItem->setData(data, MetaTreeItemRoles::RTDataTimeInterval);
+            pAbstractItem->setData(data, MetaTreeItemRoles::StreamingTimeInterval);
             pAbstractItem->setData(data, Qt::DisplayRole);
         }
     }
@@ -355,13 +355,13 @@ void MneEstimateTreeItem::setTimeInterval(int iMSec)
 
 void MneEstimateTreeItem::setNumberAverages(int iNumberAverages)
 {
-    QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::RTDataNumberAverages);
+    QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::NumberAverages);
 
     for(int i = 0; i < lItems.size(); i++) {
         if(MetaTreeItem* pAbstractItem = dynamic_cast<MetaTreeItem*>(lItems.at(i))) {
             QVariant data;
             data.setValue(iNumberAverages);
-            pAbstractItem->setData(data, MetaTreeItemRoles::RTDataNumberAverages);
+            pAbstractItem->setData(data, MetaTreeItemRoles::NumberAverages);
             pAbstractItem->setData(data, Qt::DisplayRole);
         }
     }
@@ -372,13 +372,13 @@ void MneEstimateTreeItem::setNumberAverages(int iNumberAverages)
 
 void MneEstimateTreeItem::setColortable(const QString& sColortable)
 {
-    QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::RTDataColormapType);
+    QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::ColormapType);
 
     for(int i = 0; i < lItems.size(); i++) {
         if(MetaTreeItem* pAbstractItem = dynamic_cast<MetaTreeItem*>(lItems.at(i))) {
             QVariant data;
             data.setValue(sColortable);
-            pAbstractItem->setData(data, MetaTreeItemRoles::RTDataColormapType);
+            pAbstractItem->setData(data, MetaTreeItemRoles::ColormapType);
             pAbstractItem->setData(data, Qt::DisplayRole);
         }
     }
@@ -389,13 +389,13 @@ void MneEstimateTreeItem::setColortable(const QString& sColortable)
 
 void MneEstimateTreeItem::setVisualizationType(const QString& sVisualizationType)
 {
-    QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::RTDataVisualizationType);
+    QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::VisualizationType);
 
     for(int i = 0; i < lItems.size(); i++) {
         if(MetaTreeItem* pAbstractItem = dynamic_cast<MetaTreeItem*>(lItems.at(i))) {
             QVariant data;
             data.setValue(sVisualizationType);
-            pAbstractItem->setData(data, MetaTreeItemRoles::RTDataVisualizationType);
+            pAbstractItem->setData(data, MetaTreeItemRoles::VisualizationType);
             pAbstractItem->setData(data, Qt::DisplayRole);
         }
     }
@@ -406,13 +406,13 @@ void MneEstimateTreeItem::setVisualizationType(const QString& sVisualizationType
 
 void MneEstimateTreeItem::setNormalization(const QVector3D& vecThresholds)
 {
-    QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::RTDataNormalizationValue);
+    QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::ThresholdValue);
 
     for(int i = 0; i < lItems.size(); i++) {
         if(MetaTreeItem* pAbstractItem = dynamic_cast<MetaTreeItem*>(lItems.at(i))) {
             QVariant data;
             data.setValue(vecThresholds);
-            pAbstractItem->setData(data, MetaTreeItemRoles::RTDataNormalizationValue);
+            pAbstractItem->setData(data, MetaTreeItemRoles::ThresholdValue);
 
             QString sTemp = QString("%1,%2,%3").arg(vecThresholds.x()).arg(vecThresholds.y()).arg(vecThresholds.z());
             data.setValue(sTemp);

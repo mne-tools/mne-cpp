@@ -103,7 +103,7 @@ MeasurementTreeItem::MeasurementTreeItem(int iType, const QString& text)
 : AbstractTreeItem(iType, text)
 , m_pMneEstimateTreeItem(new MneEstimateTreeItem())
 , m_pNetworkTreeItem(new NetworkTreeItem())
-, m_ECDDataTreeItem(new ECDDataTreeItem())
+, m_EcdDataTreeItem(new EcdDataTreeItem())
 {
     this->setEditable(false);
     this->setCheckable(true);
@@ -298,7 +298,7 @@ MneEstimateTreeItem* MeasurementTreeItem::addData(const MNESourceEstimate& tSour
 {
     if(!tSourceEstimate.isEmpty()) {
         //Add source estimation data as child
-        if(this->findChildren(Data3DTreeModelItemTypes::RTSourceLocDataItem).size() == 0) {
+        if(this->findChildren(Data3DTreeModelItemTypes::MNEEstimateItem).size() == 0) {
             //If rt data item does not exists yet, create it here!
             if(!tForwardSolution.isEmpty()) {
                 m_pMneEstimateTreeItem = new MneEstimateTreeItem();
@@ -360,27 +360,27 @@ MneEstimateTreeItem* MeasurementTreeItem::addData(const MNESourceEstimate& tSour
 
 //*************************************************************************************************************
 
-ECDDataTreeItem* MeasurementTreeItem::addData(INVERSELIB::ECDSet::SPtr &pECDSet, Qt3DCore::QEntity* p3DEntityParent)
+EcdDataTreeItem* MeasurementTreeItem::addData(INVERSELIB::ECDSet::SPtr &pECDSet, Qt3DCore::QEntity* p3DEntityParent)
 {
     if(pECDSet->size() > 0) {
         //Add source estimation data as child
         if(this->findChildren(Data3DTreeModelItemTypes::ECDSetDataItem).size() == 0) {
             //If rt data item does not exists yet, create it here!
-            m_ECDDataTreeItem = new ECDDataTreeItem();
+            m_EcdDataTreeItem = new EcdDataTreeItem();
 
             QList<QStandardItem*> list;
-            list << m_ECDDataTreeItem;
-            list << new QStandardItem(m_ECDDataTreeItem->toolTip());
+            list << m_EcdDataTreeItem;
+            list << new QStandardItem(m_EcdDataTreeItem->toolTip());
             this->appendRow(list);
 
-            m_ECDDataTreeItem->init(p3DEntityParent);
-            m_ECDDataTreeItem->addData(pECDSet);
+            m_EcdDataTreeItem->init(p3DEntityParent);
+            m_EcdDataTreeItem->addData(pECDSet);
 
         } else {
-            m_ECDDataTreeItem->addData(pECDSet);
+            m_EcdDataTreeItem->addData(pECDSet);
         }
 
-        return m_ECDDataTreeItem;
+        return m_EcdDataTreeItem;
     } else {
         qDebug() << "MeasurementTreeItem::addData - pECDSet is empty";
     }
@@ -496,7 +496,7 @@ void MeasurementTreeItem::onColorInfoOriginChanged()
         }
     }
 
-    if(pSurfaceTreeItemLeft && pSurfaceTreeItemRight && !this->findChildren(Data3DTreeModelItemTypes::RTSourceLocDataItem).isEmpty()) {
+    if(pSurfaceTreeItemLeft && pSurfaceTreeItemRight && !this->findChildren(Data3DTreeModelItemTypes::MNEEstimateItem).isEmpty()) {
         m_pMneEstimateTreeItem->onColorInfoOriginChanged(pSurfaceTreeItemLeft->data(Data3DTreeModelItemRoles::SurfaceCurrentColorVert).value<QByteArray>(),
                                                                     pSurfaceTreeItemRight->data(Data3DTreeModelItemRoles::SurfaceCurrentColorVert).value<QByteArray>());
     }

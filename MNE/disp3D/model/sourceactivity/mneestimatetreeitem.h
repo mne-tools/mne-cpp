@@ -109,7 +109,7 @@ public:
     * @param[in] iType      The type of the item. See types.h for declaration and definition.
     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
     */
-    explicit MneEstimateTreeItem(int iType = Data3DTreeModelItemTypes::RTSourceLocDataItem, const QString& text = "RT Source Loc Data");
+    explicit MneEstimateTreeItem(int iType = Data3DTreeModelItemTypes::MNEEstimateItem, const QString& text = "RT Source Loc Data");
 
     //=========================================================================================================
     /**

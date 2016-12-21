@@ -363,11 +363,11 @@ MneEstimateTreeItem* Data3DTreeModel::addSourceData(const QString& subject, cons
 
 //*************************************************************************************************************
 
-ECDDataTreeItem* Data3DTreeModel::addDipoleFitData(const QString& subject, const QString& set, INVERSELIB::ECDSet::SPtr& pECDSet)
+EcdDataTreeItem* Data3DTreeModel::addDipoleFitData(const QString& subject, const QString& set, INVERSELIB::ECDSet::SPtr& pECDSet)
 {
     //Find the subject
     QList<QStandardItem*> itemSubjectList = this->findItems(subject);
-    ECDDataTreeItem* pReturnItem = Q_NULLPTR;
+    EcdDataTreeItem* pReturnItem = Q_NULLPTR;
 
     //If subject does not exist, create a new one
     if(itemSubjectList.size() == 0) {
