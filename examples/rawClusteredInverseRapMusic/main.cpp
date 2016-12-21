@@ -534,17 +534,16 @@ int main(int argc, char *argv[])
 
     p3DDataModel->addSurfaceSet(parser.value(subjectOption), "HemiLRSet", t_surfSet, t_annotationSet);
 
-    //Add rt source loc data
-    QPointer<MneEstimateTreeItem> pRTDataItem = p3DDataModel->addSourceData(parser.value(subjectOption), "HemiLRSet", sourceEstimate, t_clusteredFwd);
-
-    //Init some rt related values for right visual data
-    pRTDataItem->setLoopState(true);
-    pRTDataItem->setTimeInterval(17);
-    pRTDataItem->setNumberAverages(1);
-    pRTDataItem->setStreamingActive(true);
-    pRTDataItem->setNormalization(QVector3D(0.01,0.5,1.0));
-    pRTDataItem->setVisualizationType("Annotation based");
-    pRTDataItem->setColortable("Hot");
+    //Add rt source loc data and init some visualization values
+    if(MneEstimateTreeItem* pRTDataItem = p3DDataModel->addSourceData(parser.value(subjectOption), evoked.comment, sourceEstimate, t_clusteredFwd)) {
+        pRTDataItem->setLoopState(true);
+        pRTDataItem->setTimeInterval(17);
+        pRTDataItem->setNumberAverages(1);
+        pRTDataItem->setStreamingActive(true);
+        pRTDataItem->setNormalization(QVector3D(0.01,0.5,1.0));
+        pRTDataItem->setVisualizationType("Annotation based");
+        pRTDataItem->setColortable("Hot");
+    }
 
     testWindow->show();
 
