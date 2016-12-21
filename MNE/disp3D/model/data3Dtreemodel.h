@@ -292,6 +292,15 @@ protected:
     */
     SubjectTreeItem* addSubject(const QString& subject);
 
+    //=========================================================================================================
+    /**
+    * Adds an item with its toolTip as second coulm item as description to the model.
+    *
+    * @param[in] pItemParent         The parent item.
+    * @param[in] pItemAdd            The item which is added as a row to the parent item.
+    */
+    void addItemWithDescription(QStandardItem* pItemParent, QStandardItem* pItemAdd);
+
     QStandardItem*                   m_pRootItem;            /**< The root item of the tree model. */
     QPointer<Qt3DCore::QEntity>      m_pModelEntity;         /**< The parent 3D entity for this model. */
 };
