@@ -184,10 +184,7 @@ QList<BrainSurfaceTreeItem*> Data3DTreeModel::addSurfaceSet(const QString& subje
     } else {
         MeasurementTreeItem* pMeasurementItem = new MeasurementTreeItem(Data3DTreeModelItemTypes::MeasurementItem, set);
 
-        QList<QStandardItem*> list;
-        list << pMeasurementItem;
-        list << new QStandardItem(pMeasurementItem->toolTip());
-        pSubjectItem->appendRow(list);
+        addItemWithDescription(pSubjectItem, pMeasurementItem);
 
         returnItemList = pMeasurementItem->addData(tSurfaceSet, tAnnotationSet, m_pModelEntity);
     }
@@ -214,10 +211,7 @@ BrainSurfaceTreeItem* Data3DTreeModel::addSurface(const QString& subject, const 
     } else {
         MeasurementTreeItem* pMeasurementItem = new MeasurementTreeItem(Data3DTreeModelItemTypes::MeasurementItem, set);
 
-        QList<QStandardItem*> list;
-        list << pMeasurementItem;
-        list << new QStandardItem(pMeasurementItem->toolTip());
-        pSubjectItem->appendRow(list);
+        addItemWithDescription(pReturnItem, pMeasurementItem);
 
         pReturnItem = pMeasurementItem->addData(tSurface, tAnnotation, m_pModelEntity);
     }
@@ -244,10 +238,7 @@ BrainSourceSpaceTreeItem* Data3DTreeModel::addSourceSpace(const QString& subject
     } else {
         MeasurementTreeItem* pMeasurementItem = new MeasurementTreeItem(Data3DTreeModelItemTypes::MeasurementItem, set);
 
-        QList<QStandardItem*> list;
-        list << pMeasurementItem;
-        list << new QStandardItem(pMeasurementItem->toolTip());
-        pSubjectItem->appendRow(list);
+        addItemWithDescription(pReturnItem, pMeasurementItem);
 
         pReturnItem = pMeasurementItem->addData(tSourceSpace, m_pModelEntity);
     }
@@ -309,10 +300,7 @@ EcdDataTreeItem* Data3DTreeModel::addDipoleFitData(const QString& subject, const
     } else {
         MeasurementTreeItem* pMeasurementItem = new MeasurementTreeItem(Data3DTreeModelItemTypes::MeasurementItem, set);
 
-        QList<QStandardItem*> list;
-        list << pMeasurementItem;
-        list << new QStandardItem(pMeasurementItem->toolTip());
-        pSubjectItem->appendRow(list);
+        addItemWithDescription(pSubjectItem, pMeasurementItem);
 
         pReturnItem = pMeasurementItem->addData(pECDSet, m_pModelEntity);
     }
@@ -340,10 +328,7 @@ NetworkTreeItem* Data3DTreeModel::addConnectivityData(const QString& subject, co
     } else {
         MeasurementTreeItem* pMeasurementItem = new MeasurementTreeItem(Data3DTreeModelItemTypes::MeasurementItem, set);
 
-        QList<QStandardItem*> list;
-        list << pMeasurementItem;
-        list << new QStandardItem(pMeasurementItem->toolTip());
-        pSubjectItem->appendRow(list);
+        addItemWithDescription(pSubjectItem, pMeasurementItem);
 
         pReturnItem = pMeasurementItem->addData(pNetworkData, m_pModelEntity);
     }
@@ -370,10 +355,7 @@ BemTreeItem* Data3DTreeModel::addBemData(const QString& subject, const QString& 
     } else {
         pReturnItem = new BemTreeItem(Data3DTreeModelItemTypes::BemItem, set);
 
-        QList<QStandardItem*> list;
-        list << pReturnItem;
-        list << new QStandardItem(pReturnItem->toolTip());
-        pSubjectItem->appendRow(list);
+        addItemWithDescription(pSubjectItem, pReturnItem);
 
         pReturnItem->addData(tBem, m_pModelEntity);
     }
@@ -400,10 +382,7 @@ DigitizerSetTreeItem* Data3DTreeModel::addDigitizerData(const QString& subject, 
     } else {
         MeasurementTreeItem* pMeasurementItem = new MeasurementTreeItem(Data3DTreeModelItemTypes::MeasurementItem, set);
 
-        QList<QStandardItem*> list;
-        list << pMeasurementItem;
-        list << new QStandardItem(pMeasurementItem->toolTip());
-        pSubjectItem->appendRow(list);
+        addItemWithDescription(pSubjectItem, pMeasurementItem);
 
         pReturnItem = pMeasurementItem->addData(tDigitizer, m_pModelEntity);
     }
@@ -468,6 +447,17 @@ SubjectTreeItem* Data3DTreeModel::addSubject(const QString& subject)
     }
 
     return pReturnItem;
+}
+
+
+//*************************************************************************************************************
+
+void Data3DTreeModel::addItemWithDescription(QStandardItem* pItemParent, QStandardItem* pItemAdd)
+{
+    QList<QStandardItem*> list;
+    list << pItemAdd;
+    list << new QStandardItem(pItemAdd->toolTip());
+    pItemParent->appendRow(list);
 }
 
 
