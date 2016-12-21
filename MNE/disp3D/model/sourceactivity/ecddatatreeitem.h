@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     ECDDataTreeItem class declaration.
+* @brief     EcdDataTreeItem class declaration.
 *
 */
 
@@ -94,17 +94,17 @@ class Renderable3DEntity;
 
 //=============================================================================================================
 /**
-* ECDDataTreeItem provides a generic item to hold information dipole fit source localization data to plot onto the brain surface.
+* EcdDataTreeItem provides a generic item to hold information dipole fit source localization data to plot onto the brain surface.
 *
 * @brief Provides a generic brain tree item to hold real time data.
 */
-class DISP3DNEWSHARED_EXPORT ECDDataTreeItem : public AbstractTreeItem
+class DISP3DNEWSHARED_EXPORT EcdDataTreeItem : public AbstractTreeItem
 {
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<ECDDataTreeItem> SPtr;             /**< Shared pointer type for ECDDataTreeItem class. */
-    typedef QSharedPointer<const ECDDataTreeItem> ConstSPtr;  /**< Const shared pointer type for ECDDataTreeItem class. */
+    typedef QSharedPointer<EcdDataTreeItem> SPtr;             /**< Shared pointer type for EcdDataTreeItem class. */
+    typedef QSharedPointer<const EcdDataTreeItem> ConstSPtr;  /**< Const shared pointer type for EcdDataTreeItem class. */
 
     //=========================================================================================================
     /**
@@ -113,13 +113,13 @@ public:
     * @param[in] iType      The type of the item. See types.h for declaration and definition.
     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
     */
-    explicit ECDDataTreeItem(int iType = Data3DTreeModelItemTypes::ECDSetDataItem, const QString& text = "Dipole fit data");
+    explicit EcdDataTreeItem(int iType = Data3DTreeModelItemTypes::ECDSetDataItem, const QString& text = "Dipole fit data");
 
     //=========================================================================================================
     /**
     * Default destructor
     */
-    ~ECDDataTreeItem();
+    ~EcdDataTreeItem();
 
     //=========================================================================================================
     /**
@@ -197,7 +197,7 @@ signals:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline bool ECDDataTreeItem::isInit() const
+inline bool EcdDataTreeItem::isInit() const
 {
     return m_bIsInit;
 }
@@ -209,4 +209,4 @@ inline bool ECDDataTreeItem::isInit() const
 Q_DECLARE_METATYPE(INVERSELIB::ECDSet::SPtr);
 #endif
 
-#endif // ECDDataTreeItem_H
+#endif // EcdDataTreeItem_H
