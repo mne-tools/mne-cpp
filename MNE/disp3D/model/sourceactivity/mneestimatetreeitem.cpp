@@ -92,7 +92,7 @@ MneEstimateTreeItem::MneEstimateTreeItem(int iType, const QString &text)
             this, &MneEstimateTreeItem::onNewRtData);
 
     this->setEditable(false);
-    this->setToolTip("MNE Estiamte source localization data item");
+    this->setToolTip("MNE Estimate item");
 }
 
 

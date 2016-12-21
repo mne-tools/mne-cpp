@@ -102,7 +102,7 @@ NetworkTreeItem::NetworkTreeItem(int iType, const QString &text)
     this->setEditable(false);
     this->setCheckable(true);
     this->setCheckState(Qt::Checked);
-    this->setToolTip("Network/Connectivity data");
+    this->setToolTip("Network item");
 }
 
 

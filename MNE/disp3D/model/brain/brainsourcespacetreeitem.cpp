@@ -98,7 +98,7 @@ BrainSourceSpaceTreeItem::BrainSourceSpaceTreeItem(int iType, const QString& tex
     this->setEditable(false);
     this->setCheckable(true);
     this->setCheckState(Qt::Checked);
-    this->setToolTip("Source space");
+    this->setToolTip("Source space item");
 }
 
 
