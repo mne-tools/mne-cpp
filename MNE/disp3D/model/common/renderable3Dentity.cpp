@@ -162,7 +162,9 @@ bool Renderable3DEntity::setMeshData(const MatrixX3f& tMatVert,
 bool Renderable3DEntity::setTransform(QSharedPointer<Qt3DCore::QTransform> pTransform)
 {
     if(!m_pTransform.isNull()) {
+        this->removeComponent(m_pTransform);
         m_pTransform = pTransform.data();
+        this->addComponent(m_pTransform);
     }
 
     return true;
@@ -174,7 +176,9 @@ bool Renderable3DEntity::setTransform(QSharedPointer<Qt3DCore::QTransform> pTran
 bool Renderable3DEntity::setMaterial(QSharedPointer<ShaderMaterial> pMaterial)
 {
     if(!pMaterial.isNull()) {
+        this->removeComponent(m_pMaterial);
         m_pMaterial = pMaterial.data();
+        this->addComponent(m_pMaterial);
     }
 
     return true;
@@ -187,7 +191,7 @@ bool Renderable3DEntity::setAlpha(float fAlpha)
 {
     m_fAlpha = fAlpha;
 
-    for(int i = 0; i < m_pMaterial->effect()->parameters().size(); i++) {
+    for(int i = 0; i < m_pMaterial->effect()->parameters().size(); ++i) {
         if(m_pMaterial->effect()->parameters().at(i)->name() == "alpha") {
             m_pMaterial->effect()->parameters().at(i)->setValue(m_fAlpha);
             return true;
@@ -204,7 +208,7 @@ bool Renderable3DEntity::setTessInner(float fTessInner)
 {
     m_fTessInner = fTessInner;
 
-    for(int i = 0; i < m_pMaterial->effect()->parameters().size(); i++) {
+    for(int i = 0; i < m_pMaterial->effect()->parameters().size(); ++i) {
         if(m_pMaterial->effect()->parameters().at(i)->name() == "innerTess") {
             m_pMaterial->effect()->parameters().at(i)->setValue(m_fTessInner);
             return true;
@@ -221,7 +225,7 @@ bool Renderable3DEntity::setTessOuter(float fTessOuter)
 {
     m_fTessOuter = fTessOuter;
 
-    for(int i = 0; i < m_pMaterial->effect()->parameters().size(); i++) {
+    for(int i = 0; i < m_pMaterial->effect()->parameters().size(); ++i) {
         if(m_pMaterial->effect()->parameters().at(i)->name() == "outerTess") {
             m_pMaterial->effect()->parameters().at(i)->setValue(m_fTessOuter);
             return true;
@@ -238,7 +242,7 @@ bool Renderable3DEntity::setTriangleScale(float fTriangleScale)
 {
     m_fTriangleScale = fTriangleScale;
 
-    for(int i = 0; i < m_pMaterial->effect()->parameters().size(); i++) {
+    for(int i = 0; i < m_pMaterial->effect()->parameters().size(); ++i) {
         if(m_pMaterial->effect()->parameters().at(i)->name() == "triangleScale") {
             m_pMaterial->effect()->parameters().at(i)->setValue(m_fTriangleScale);
             return true;
@@ -299,8 +303,9 @@ QVector3D Renderable3DEntity::position() const
 
 void Renderable3DEntity::setRotX(float rotX)
 {
-    if (m_fRotX == rotX)
+    if(m_fRotX == rotX) {
         return;
+    }
 
     m_fRotX = rotX;
     emit rotXChanged(rotX);
@@ -312,8 +317,9 @@ void Renderable3DEntity::setRotX(float rotX)
 
 void Renderable3DEntity::setRotY(float rotY)
 {
-    if (m_fRotY == rotY)
+    if(m_fRotY == rotY) {
         return;
+    }
 
     m_fRotY = rotY;
     emit rotYChanged(rotY);
@@ -325,8 +331,9 @@ void Renderable3DEntity::setRotY(float rotY)
 
 void Renderable3DEntity::setRotZ(float rotZ)
 {
-    if (m_fRotZ == rotZ)
+    if(m_fRotZ == rotZ) {
         return;
+    }
 
     m_fRotZ = rotZ;
     emit rotZChanged(rotZ);
@@ -338,8 +345,9 @@ void Renderable3DEntity::setRotZ(float rotZ)
 
 void Renderable3DEntity::setPosition(QVector3D position)
 {
-    if (m_position == position)
+    if(m_position == position) {
         return;
+    }
 
     m_position = position;
     emit positionChanged(position);
