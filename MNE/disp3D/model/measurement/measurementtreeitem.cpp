@@ -40,6 +40,7 @@
 
 #include "measurementtreeitem.h"
 #include "../brain/brainhemispheretreeitem.h"
+#include "../brain/brainsourcespacetreeitem.h"
 #include "../brain/brainrtsourcelocdatatreeitem.h"
 #include "../network/networktreeitem.h"
 #include "../brain/brainsurfacetreeitem.h"
@@ -251,10 +252,10 @@ BrainSurfaceTreeItem* MeasurementTreeItem::addData(const Surface& tSurface, cons
 
 //*************************************************************************************************************
 
-bool MeasurementTreeItem::addData(const MNESourceSpace& tSourceSpace, Qt3DCore::QEntity* p3DEntityParent)
+BrainSourceSpaceTreeItem* MeasurementTreeItem::addData(const MNESourceSpace& tSourceSpace, Qt3DCore::QEntity* p3DEntityParent)
 {
     //Generate child items based on surface set input parameters
-    bool state = false;
+    BrainSourceSpaceTreeItem* pReturnItem = Q_NULLPTR;
 
     QList<QStandardItem*> itemList = this->findChildren(Data3DTreeModelItemTypes::HemisphereItem);
 
@@ -267,7 +268,7 @@ bool MeasurementTreeItem::addData(const MNESourceSpace& tSourceSpace, Qt3DCore::
             if(BrainHemisphereTreeItem* pHemiItem = dynamic_cast<BrainHemisphereTreeItem*>(itemList.at(j))) {
                 if(pHemiItem->data(Data3DTreeModelItemRoles::SurfaceHemi).toInt() == i) {
                     hemiItemFound = true;
-                    state = pHemiItem->addData(tSourceSpace[i], p3DEntityParent);
+                    pReturnItem = pHemiItem->addData(tSourceSpace[i], p3DEntityParent);
                 }
             }
         }
@@ -276,7 +277,7 @@ bool MeasurementTreeItem::addData(const MNESourceSpace& tSourceSpace, Qt3DCore::
             //Item does not exist yet, create it here.
             BrainHemisphereTreeItem* pHemiItem = new BrainHemisphereTreeItem(Data3DTreeModelItemTypes::HemisphereItem);
 
-            state = pHemiItem->addData(tSourceSpace[i], p3DEntityParent);
+            pReturnItem = pHemiItem->addData(tSourceSpace[i], p3DEntityParent);
 
             QList<QStandardItem*> list;
             list << pHemiItem;
@@ -287,7 +288,7 @@ bool MeasurementTreeItem::addData(const MNESourceSpace& tSourceSpace, Qt3DCore::
         hemiItemFound = false;
     }
 
-    return state;
+    return pReturnItem;
 }
 
 

@@ -138,7 +138,7 @@ void  BrainSourceSpaceTreeItem::setData(const QVariant& value, int role)
 
 //*************************************************************************************************************
 
-bool BrainSourceSpaceTreeItem::addData(const MNEHemisphere& tHemisphere, Qt3DCore::QEntity* parent)
+void BrainSourceSpaceTreeItem::addData(const MNEHemisphere& tHemisphere, Qt3DCore::QEntity* parent)
 {
     //Create renderable 3D entity
     m_pParentEntity = parent;
@@ -235,8 +235,6 @@ bool BrainSourceSpaceTreeItem::addData(const MNEHemisphere& tHemisphere, Qt3DCor
     data.setValue(QColor(100,100,100));
     pItemSurfCol->setData(data, MetaTreeItemRoles::SurfaceColor);
     pItemSurfCol->setData(data, Qt::DecorationRole);
-
-    return true;
 }
 
 

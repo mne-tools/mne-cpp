@@ -132,10 +132,8 @@ public:
     *
     * @param[in] tHemisphere        The hemisphere data of the source space.
     * @param[in] parent             The Qt3D entity parent of the new item.
-    *
-    * @return                       Returns true if successful.
     */
-    bool addData(const MNELIB::MNEHemisphere& tHemisphere, Qt3DCore::QEntity* parent);
+    void addData(const MNELIB::MNEHemisphere& tHemisphere, Qt3DCore::QEntity* parent);
 
     //=========================================================================================================
     /**

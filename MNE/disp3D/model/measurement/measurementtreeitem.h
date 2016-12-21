@@ -109,6 +109,7 @@ class BrainRTSourceLocDataTreeItem;
 class NetworkTreeItem;
 class ECDDataTreeItem;
 class BrainSurfaceTreeItem;
+class BrainSourceSpaceTreeItem;
 
 
 //=============================================================================================================
@@ -182,7 +183,7 @@ public:
     *
     * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
-    bool addData(const MNELIB::MNESourceSpace& tSourceSpace, Qt3DCore::QEntity* p3DEntityParent = 0);
+    BrainSourceSpaceTreeItem* addData(const MNELIB::MNESourceSpace& tSourceSpace, Qt3DCore::QEntity* p3DEntityParent = 0);
 
     //=========================================================================================================
     /**
