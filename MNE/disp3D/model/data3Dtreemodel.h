@@ -114,6 +114,7 @@ class BrainSurfaceTreeItem;
 class BrainSourceSpaceTreeItem;
 class BemTreeItem;
 class DigitizerSetTreeItem;
+class SubjectTreeItem;
 
 
 //=============================================================================================================
@@ -280,6 +281,16 @@ protected:
     * Init the meta types
     */
     void initMetatypes();
+
+    //=========================================================================================================
+    /**
+    * Create a subject tree item if the item was not found. This is a convenience function.
+    *
+    * @param[in] subject            The name of the subject.
+    *
+    * @return                       Returns a pointer to the first found or created subject tree item. Default is a NULL pointer if no item was found.
+    */
+    SubjectTreeItem* addSubject(const QString& subject);
 
     QStandardItem*                   m_pRootItem;            /**< The root item of the tree model. */
     QPointer<Qt3DCore::QEntity>      m_pModelEntity;         /**< The parent 3D entity for this model. */
