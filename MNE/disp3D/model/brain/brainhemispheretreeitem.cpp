@@ -185,7 +185,7 @@ BrainSurfaceTreeItem* BrainHemisphereTreeItem::addData(const Surface& tSurface, 
 
 //*************************************************************************************************************
 
-bool BrainHemisphereTreeItem::addData(const MNEHemisphere& tHemisphere, Qt3DCore::QEntity* p3DEntityParent)
+BrainSourceSpaceTreeItem* BrainHemisphereTreeItem::addData(const MNEHemisphere& tHemisphere, Qt3DCore::QEntity* p3DEntityParent)
 {
     //Set name of BrainHemisphereTreeItem based on the hemisphere information
     QVariant data;
@@ -216,9 +216,9 @@ bool BrainHemisphereTreeItem::addData(const MNEHemisphere& tHemisphere, Qt3DCore
     list << new QStandardItem(pSourceSpaceItem->toolTip());
     this->appendRow(list);
 
-    bool state = pSourceSpaceItem->addData(tHemisphere, p3DEntityParent);
+    pSourceSpaceItem->addData(tHemisphere, p3DEntityParent);
 
-    return state;
+    return pSourceSpaceItem;
 }
 
 

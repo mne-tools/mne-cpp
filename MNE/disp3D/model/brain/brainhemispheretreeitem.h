@@ -95,6 +95,7 @@ namespace DISP3DLIB
 class BrainRTSourceLocDataTreeItem;
 class BrainSurfaceTreeItem;
 class BrainAnnotationTreeItem;
+class BrainSourceSpaceTreeItem;
 
 
 //=============================================================================================================
@@ -153,9 +154,9 @@ public:
     * @param[in] tHemisphere        The MNEHemisphere.
     * @param[in] p3DEntityParent    The Qt3D entity parent of the new item.
     *
-    * @return                       Returns true if successful.
+    * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
-    bool addData(const MNELIB::MNEHemisphere& tHemisphere, Qt3DCore::QEntity* p3DEntityParent = 0);
+    BrainSourceSpaceTreeItem* addData(const MNELIB::MNEHemisphere& tHemisphere, Qt3DCore::QEntity* p3DEntityParent = 0);
 
     //=========================================================================================================
     /**

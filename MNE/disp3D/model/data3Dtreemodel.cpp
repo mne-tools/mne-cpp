@@ -337,6 +337,7 @@ BrainRTSourceLocDataTreeItem* Data3DTreeModel::addSourceData(const QString& subj
 {
     //Find the subject
     QList<QStandardItem*> itemSubjectList = this->findItems(subject);
+    BrainRTSourceLocDataTreeItem* pReturnItem = Q_NULLPTR;
 
     //Iterate through subject items and add new data respectivley
     //Check if it is really a subject tree item
@@ -350,13 +351,13 @@ BrainRTSourceLocDataTreeItem* Data3DTreeModel::addSourceData(const QString& subj
         if(!itemList.isEmpty()) {
             if(itemList.first()->type() == Data3DTreeModelItemTypes::MeasurementItem) {
                 if(MeasurementTreeItem* pMeasurementItem = dynamic_cast<MeasurementTreeItem*>(itemList.first())) {
-                    return pMeasurementItem->addData(tSourceEstimate, tForwardSolution);
+                    pReturnItem = pMeasurementItem->addData(tSourceEstimate, tForwardSolution);
                 }
             }
         }
     }
 
-    return Q_NULLPTR;
+    return pReturnItem;
 }
 
 
