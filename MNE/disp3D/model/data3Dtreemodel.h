@@ -269,7 +269,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns the 3D model root eneity.
+    * Returns the 3D model root entity.
     *
     * @return   The model's root entity to acess the scenegraph.
     */
