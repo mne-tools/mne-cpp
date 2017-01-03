@@ -160,10 +160,6 @@ bool DigitizerTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer, 
 
     m_pRenderable3DEntity = new Renderable3DEntity(m_pParentEntity);
 
-    //Initial transformation also regarding the surface offset
-    m_pRenderable3DEntity->setRotX(90);
-    m_pRenderable3DEntity->setRotY(180);
-
     //Create sources as small 3D spheres
     QVector3D pos;
     QColor colDefault(100,100,100);

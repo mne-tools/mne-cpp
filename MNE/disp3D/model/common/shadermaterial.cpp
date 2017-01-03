@@ -96,6 +96,7 @@ ShaderMaterial::ShaderMaterial(QNode *parent)
 , m_pNoDepthMask(new QNoDepthMask())
 , m_pBlendState(new QBlendEquationArguments())
 , m_pBlendEquation(new QBlendEquation())
+, m_bShaderInit(false)
 {
     this->init();
 }
@@ -130,20 +131,11 @@ ShaderMaterial::~ShaderMaterial()
 
 void ShaderMaterial::init()
 {
-//    //Set default
-//    m_pVertexGL3Shader->setVertexShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/common/shaders/gl3/pervertexphongalpha.vert"))));
-//    m_pVertexGL3Shader->setTessellationControlShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/common/shaders/gl3/pervertexphongalpha.tcs"))));
-//    m_pVertexGL3Shader->setTessellationEvaluationShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/common/shaders/gl3/pervertexphongalpha_simple.tes"))));
-//    m_pVertexGL3Shader->setGeometryShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/common/shaders/gl3/pervertexphongalpha.geom"))));
-//    m_pVertexGL3Shader->setFragmentShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/common/shaders/gl3/pervertexphongalpha.frag"))));
-
     //Set OpenGL version
     m_pVertexGL3Technique->graphicsApiFilter()->setApi(QGraphicsApiFilter::OpenGL);
     m_pVertexGL3Technique->graphicsApiFilter()->setMajorVersion(4);
     m_pVertexGL3Technique->graphicsApiFilter()->setMinorVersion(0);
     m_pVertexGL3Technique->graphicsApiFilter()->setProfile(QGraphicsApiFilter::CoreProfile);
-
-    m_pVertexGL3RenderPass->setShaderProgram(m_pVertexGL3Shader);
 
     //Setup transparency
     m_pBlendState->setSourceRgb(QBlendEquationArguments::SourceAlpha);
@@ -215,5 +207,10 @@ void ShaderMaterial::setShader(const QUrl& sShader)
 
     if(fileName.contains(".frag")) {
         m_pVertexGL3Shader->setFragmentShaderCode(QShaderProgram::loadSource(sShader));
+    }    
+
+    if(!m_bShaderInit) {
+        m_pVertexGL3RenderPass->setShaderProgram(m_pVertexGL3Shader);
+        m_bShaderInit = true;
     }
 }
