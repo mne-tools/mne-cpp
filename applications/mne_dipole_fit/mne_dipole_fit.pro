@@ -44,7 +44,7 @@ QT -= gui
 CONFIG   += console
 CONFIG   -= app_bundle
 
-TARGET = dipoleFit
+TARGET = mne_dipole_fit
 
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
@@ -72,6 +72,14 @@ SOURCES += \
         main.cpp \
 
 HEADERS += \
+    fiff_types.h \
+    mne_types.h \
+    fit_types.h \
+    fwd.h \
+    fwd_types.h \
+    fiff_file.h \
+    fiff_explain.h \
+    analyze_types.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
