@@ -2,7 +2,6 @@
 
 #pragma include light.inc.frag
 
-uniform vec3 ka;            // Ambient reflectivity
 uniform vec3 kd;            // Diffuse reflectivity
 uniform vec3 ks;            // Specular reflectivity
 uniform float shininess;    // Specular shininess factor

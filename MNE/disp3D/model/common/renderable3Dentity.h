@@ -174,14 +174,6 @@ public:
 
     //=========================================================================================================
     /**
-    * Adds a material to this entity.
-    *
-    * @param[in] pMaterial      The new entity's material.
-    */
-    void addMaterial(Qt3DRender::QMaterial* pMaterial);
-
-    //=========================================================================================================
-    /**
     * Sets the entity's alpha value.
     *
     * @param[in] fAlpha     The new alpha value.
