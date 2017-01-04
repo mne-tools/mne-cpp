@@ -81,7 +81,6 @@ using namespace Qt3DRender;
 PerVertexPhongAlphaMaterial::PerVertexPhongAlphaMaterial(QNode *parent)
 : QMaterial(parent)
 , m_pVertexEffect(new QEffect())
-, m_pAmbientParameter(new QParameter(QStringLiteral("ka"), QColor::fromRgbF(0.05f, 0.05f, 0.05f, 1.0f)))
 , m_pDiffuseParameter(new QParameter(QStringLiteral("kd"), QColor::fromRgbF(0.7f, 0.7f, 0.7f, 1.0f)))
 , m_pSpecularParameter(new QParameter(QStringLiteral("ks"), QColor::fromRgbF(0.1f, 0.1f, 0.1f, 1.0f)))
 , m_pShininessParameter(new QParameter(QStringLiteral("shininess"), 15.0f))
@@ -137,7 +136,6 @@ void PerVertexPhongAlphaMaterial::init()
 
     m_pVertexEffect->addTechnique(m_pVertexGL3Technique);
 
-    m_pVertexEffect->addParameter(m_pAmbientParameter);
     m_pVertexEffect->addParameter(m_pDiffuseParameter);
     m_pVertexEffect->addParameter(m_pSpecularParameter);
     m_pVertexEffect->addParameter(m_pShininessParameter);
@@ -162,35 +160,3 @@ void PerVertexPhongAlphaMaterial::setAlpha(float alpha)
     m_pAlphaParameter->setValue(alpha);
 }
 
-
-//*************************************************************************************************************
-
-void PerVertexPhongAlphaMaterial::setShader(const QUrl& sShader)
-{
-    QString fileName = sShader.fileName();
-
-    if(fileName.contains(".vert")) {
-        m_pVertexGL3Shader->setVertexShaderCode(QShaderProgram::loadSource(sShader));
-    }
-
-    if(fileName.contains(".tcs")) {
-        m_pVertexGL3Shader->setTessellationControlShaderCode(QShaderProgram::loadSource(sShader));
-    }
-
-    if(fileName.contains(".tes")) {
-        m_pVertexGL3Shader->setTessellationEvaluationShaderCode(QShaderProgram::loadSource(sShader));
-    }
-
-    if(fileName.contains(".geom")) {
-        m_pVertexGL3Shader->setGeometryShaderCode(QShaderProgram::loadSource(sShader));
-    }
-
-    if(fileName.contains(".frag")) {
-        m_pVertexGL3Shader->setFragmentShaderCode(QShaderProgram::loadSource(sShader));
-    }    
-
-    if(!m_bShaderInit) {
-        m_pVertexGL3RenderPass->setShaderProgram(m_pVertexGL3Shader);
-        m_bShaderInit = true;
-    }
-}

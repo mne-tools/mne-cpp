@@ -169,6 +169,8 @@ void RtAve::setAverageMode(qint32 mode)
 
 void RtAve::setPreStim(qint32 samples, qint32 secs)
 {
+    Q_UNUSED(secs);
+
     QMutexLocker locker(&m_qMutex);
     m_iNewPreStimSamples = samples;
 }
@@ -178,6 +180,8 @@ void RtAve::setPreStim(qint32 samples, qint32 secs)
 
 void RtAve::setPostStim(qint32 samples, qint32 secs)
 {
+    Q_UNUSED(samples);
+
     QMutexLocker locker(&m_qMutex);
     m_iNewPostStimSamples = samples;
 }

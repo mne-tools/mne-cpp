@@ -106,24 +106,6 @@ ShaderMaterial::ShaderMaterial(QNode *parent)
 
 ShaderMaterial::~ShaderMaterial()
 {
-    //Not sure if Qt3d module implemented internal garbage handling, so I do it manually here
-//    delete m_pAmbientParameter;
-//    delete m_pDiffuseParameter;
-//    delete m_pSpecularParameter;
-//    delete m_pShininessParameter;
-//    delete m_pAlphaParameter;
-//    delete m_pFilterKey;
-
-//    delete m_pVertexGL3Shader;
-//    delete m_pVertexGL3RenderPass;
-
-//    delete m_pVertexGL3Technique;
-
-//    delete m_pNoDepthMask;
-//    delete m_pBlendState;
-//    delete m_pBlendEquation;
-
-//    delete m_pVertexEffect;
 }
 
 

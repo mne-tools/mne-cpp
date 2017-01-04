@@ -136,16 +136,6 @@ public:
     */
     void setAlpha(float alpha);
 
-    //=========================================================================================================
-    /**
-    * Sets the entity's material sahder. This is a convenient function.
-    *
-    * @param[in] sShader     The new shader. Must be present in the qrc resource file.
-    *
-    * @return If successful returns true, false otherwise.
-    */
-    void setShader(const QUrl& sShader);
-
 private:
     //=========================================================================================================
     /**
@@ -155,16 +145,11 @@ private:
 
     QPointer<Qt3DRender::QEffect>           m_pVertexEffect;
 
-    QPointer<Qt3DRender::QParameter>        m_pAmbientParameter;
     QPointer<Qt3DRender::QParameter>        m_pDiffuseParameter;
     QPointer<Qt3DRender::QParameter>        m_pSpecularParameter;
     QPointer<Qt3DRender::QParameter>        m_pShininessParameter;
     QPointer<Qt3DRender::QParameter>        m_pAlphaParameter;
     QPointer<Qt3DRender::QFilterKey>        m_pFilterKey;
-
-    QPointer<Qt3DRender::QParameter>        m_pInnerTessParameter;
-    QPointer<Qt3DRender::QParameter>        m_pOuterTessParameter;
-    QPointer<Qt3DRender::QParameter>        m_pTriangleScaleParameter;
 
     QPointer<Qt3DRender::QTechnique>        m_pVertexGL3Technique;
     QPointer<Qt3DRender::QRenderPass>       m_pVertexGL3RenderPass;
@@ -177,4 +162,4 @@ private:
 
 } // namespace DISP3DLIB
 
-#endif // PerVertexPhongAlphaMaterial_H
+#endif // PERVERTEXPHONGALPHAMATERIAL_H

@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     shadermaterial.cpp
+* @file     shownormalsmaterial.cpp
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     Februaray, 2016
+* @date     January, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    ShaderMaterial class definition
+* @brief    ShowNormalsMaterial class definition
 */
 
 
@@ -38,7 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "shadermaterial.h"
+#include "shownormalsmaterial.h"
 
 
 //*************************************************************************************************************
@@ -78,25 +78,13 @@ using namespace Qt3DRender;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ShaderMaterial::ShaderMaterial(QNode *parent)
+ShowNormalsMaterial::ShowNormalsMaterial(QNode *parent)
 : QMaterial(parent)
 , m_pVertexEffect(new QEffect())
-, m_pAmbientParameter(new QParameter(QStringLiteral("ka"), QColor::fromRgbF(0.05f, 0.05f, 0.05f, 1.0f)))
-, m_pDiffuseParameter(new QParameter(QStringLiteral("kd"), QColor::fromRgbF(0.7f, 0.7f, 0.7f, 1.0f)))
-, m_pSpecularParameter(new QParameter(QStringLiteral("ks"), QColor::fromRgbF(0.1f, 0.1f, 0.1f, 1.0f)))
-, m_pShininessParameter(new QParameter(QStringLiteral("shininess"), 15.0f))
-, m_pInnerTessParameter(new QParameter("innerTess", 1.0f))
-, m_pOuterTessParameter(new QParameter("outerTess", 1.0f))
-, m_pTriangleScaleParameter(new QParameter("triangleScale", 1.0f))
-, m_pAlphaParameter(new QParameter("alpha", 0.5f))
 , m_pVertexGL3Technique(new QTechnique())
 , m_pVertexGL3RenderPass(new QRenderPass())
 , m_pVertexGL3Shader(new QShaderProgram())
 , m_pFilterKey(new QFilterKey)
-, m_pNoDepthMask(new QNoDepthMask())
-, m_pBlendState(new QBlendEquationArguments())
-, m_pBlendEquation(new QBlendEquation())
-, m_bShaderInit(false)
 {
     this->init();
 }
@@ -104,47 +92,26 @@ ShaderMaterial::ShaderMaterial(QNode *parent)
 
 //*************************************************************************************************************
 
-ShaderMaterial::~ShaderMaterial()
+ShowNormalsMaterial::~ShowNormalsMaterial()
 {
-    //Not sure if Qt3d module implemented internal garbage handling, so I do it manually here
-//    delete m_pAmbientParameter;
-//    delete m_pDiffuseParameter;
-//    delete m_pSpecularParameter;
-//    delete m_pShininessParameter;
-//    delete m_pAlphaParameter;
-//    delete m_pFilterKey;
-
-//    delete m_pVertexGL3Shader;
-//    delete m_pVertexGL3RenderPass;
-
-//    delete m_pVertexGL3Technique;
-
-//    delete m_pNoDepthMask;
-//    delete m_pBlendState;
-//    delete m_pBlendEquation;
-
-//    delete m_pVertexEffect;
 }
 
 
 //*************************************************************************************************************
 
-void ShaderMaterial::init()
+void ShowNormalsMaterial::init()
 {
+    //Set shader
+    m_pVertexGL3Shader->setVertexShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl3/shownormals.vert"))));
+    m_pVertexGL3Shader->setGeometryShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl3/shownormals.geom"))));
+    m_pVertexGL3Shader->setFragmentShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl3/shownormals.frag"))));
+    m_pVertexGL3RenderPass->setShaderProgram(m_pVertexGL3Shader);
+
     //Set OpenGL version
     m_pVertexGL3Technique->graphicsApiFilter()->setApi(QGraphicsApiFilter::OpenGL);
     m_pVertexGL3Technique->graphicsApiFilter()->setMajorVersion(4);
     m_pVertexGL3Technique->graphicsApiFilter()->setMinorVersion(0);
     m_pVertexGL3Technique->graphicsApiFilter()->setProfile(QGraphicsApiFilter::CoreProfile);
-
-    //Setup transparency
-    m_pBlendState->setSourceRgb(QBlendEquationArguments::SourceAlpha);
-    m_pBlendState->setDestinationRgb(QBlendEquationArguments::OneMinusSourceAlpha);
-    m_pBlendEquation->setBlendFunction(QBlendEquation::Add);
-
-    m_pVertexGL3RenderPass->addRenderState(m_pBlendEquation);
-    m_pVertexGL3RenderPass->addRenderState(m_pNoDepthMask);
-    m_pVertexGL3RenderPass->addRenderState(m_pBlendState);
 
     m_pFilterKey->setName(QStringLiteral("renderingStyle"));
     m_pFilterKey->setValue(QStringLiteral("forward"));
@@ -154,63 +121,5 @@ void ShaderMaterial::init()
 
     m_pVertexEffect->addTechnique(m_pVertexGL3Technique);
 
-    m_pVertexEffect->addParameter(m_pAmbientParameter);
-    m_pVertexEffect->addParameter(m_pDiffuseParameter);
-    m_pVertexEffect->addParameter(m_pSpecularParameter);
-    m_pVertexEffect->addParameter(m_pShininessParameter);
-    m_pVertexEffect->addParameter(m_pAlphaParameter);
-    m_pVertexEffect->addParameter(m_pInnerTessParameter);
-    m_pVertexEffect->addParameter(m_pOuterTessParameter);
-    m_pVertexEffect->addParameter(m_pTriangleScaleParameter);
-
     this->setEffect(m_pVertexEffect);
-}
-
-
-//*************************************************************************************************************
-
-float ShaderMaterial::alpha()
-{
-    return m_pAlphaParameter->value().toFloat();
-}
-
-
-//*************************************************************************************************************
-
-void ShaderMaterial::setAlpha(float alpha)
-{
-    m_pAlphaParameter->setValue(alpha);
-}
-
-
-//*************************************************************************************************************
-
-void ShaderMaterial::setShader(const QUrl& sShader)
-{
-    QString fileName = sShader.fileName();
-
-    if(fileName.contains(".vert")) {
-        m_pVertexGL3Shader->setVertexShaderCode(QShaderProgram::loadSource(sShader));
-    }
-
-    if(fileName.contains(".tcs")) {
-        m_pVertexGL3Shader->setTessellationControlShaderCode(QShaderProgram::loadSource(sShader));
-    }
-
-    if(fileName.contains(".tes")) {
-        m_pVertexGL3Shader->setTessellationEvaluationShaderCode(QShaderProgram::loadSource(sShader));
-    }
-
-    if(fileName.contains(".geom")) {
-        m_pVertexGL3Shader->setGeometryShaderCode(QShaderProgram::loadSource(sShader));
-    }
-
-    if(fileName.contains(".frag")) {
-        m_pVertexGL3Shader->setFragmentShaderCode(QShaderProgram::loadSource(sShader));
-    }    
-
-    if(!m_bShaderInit) {
-        m_pVertexGL3RenderPass->setShaderProgram(m_pVertexGL3Shader);
-        m_bShaderInit = true;
-    }
 }

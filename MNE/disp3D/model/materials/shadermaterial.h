@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     pervertexphongalphamaterial.h
+* @file     shadermaterial.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,11 +29,11 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    PerVertexPhongAlphaMaterial class declaration
+* @brief    ShaderMaterial class declaration
 */
 
-#ifndef PERVERTEXPHONGALPHAMATERIAL_H
-#define PERVERTEXPHONGALPHAMATERIAL_H
+#ifndef SHADERMATERIAL_H
+#define SHADERMATERIAL_H
 
 
 //*************************************************************************************************************
@@ -97,11 +97,11 @@ namespace DISP3DLIB
 
 //=============================================================================================================
 /**
-* PerVertexPhongAlphaMaterial is provides a Qt3D material with own shader support.
+* ShaderMaterial is provides a Qt3D material with own shader support.
 *
-* @brief PerVertexPhongAlphaMaterial is provides a Qt3D material with own shader support.
+* @brief ShaderMaterial is provides a Qt3D material with own shader support.
 */
-class DISP3DNEWSHARED_EXPORT PerVertexPhongAlphaMaterial : public Qt3DRender::QMaterial
+class DISP3DNEWSHARED_EXPORT ShaderMaterial : public Qt3DRender::QMaterial
 {
     Q_OBJECT
 
@@ -112,13 +112,13 @@ public:
     *
     * @param[in] parent         The parent of this class.
     */
-    explicit PerVertexPhongAlphaMaterial(Qt3DCore::QNode *parent = 0);
+    explicit ShaderMaterial(Qt3DCore::QNode *parent = 0);
 
     //=========================================================================================================
     /**
     * Default destructor.
     */
-    ~PerVertexPhongAlphaMaterial();
+    ~ShaderMaterial();
 
     //=========================================================================================================
     /**
@@ -149,7 +149,7 @@ public:
 private:
     //=========================================================================================================
     /**
-    * Init the PerVertexPhongAlphaMaterial class.
+    * Init the ShaderMaterial class.
     */
     void init();
 
@@ -179,4 +179,4 @@ private:
 
 } // namespace DISP3DLIB
 
-#endif // PerVertexPhongAlphaMaterial_H
+#endif // ShaderMaterial_H

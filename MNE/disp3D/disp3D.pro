@@ -125,7 +125,7 @@ SOURCES += \
     control/control3dwidget.cpp \
 
 HEADERS += \
-    view3D.cpp \
+    view3D.h \
     model/data3Dtreemodel.h \
     model/data3Dtreedelegate.h \
     model/subject/subjecttreeitem.h \
