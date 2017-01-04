@@ -169,16 +169,6 @@ bool Renderable3DEntity::setTransform(QSharedPointer<Qt3DCore::QTransform> pTran
 
 //*************************************************************************************************************
 
-void Renderable3DEntity::addMaterial(QMaterial* pMaterial)
-{
-    if(pMaterial) {
-        this->addComponent(pMaterial);
-    }
-}
-
-
-//*************************************************************************************************************
-
 void Renderable3DEntity::setAlpha(float fAlpha)
 {
     m_fAlpha = fAlpha;

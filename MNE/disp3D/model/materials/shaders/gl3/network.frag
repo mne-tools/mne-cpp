@@ -3,7 +3,6 @@
 #pragma include light.inc.frag
 
 // TODO: Replace with a struct
-uniform vec3 ka;            // Ambient reflectivity
 uniform vec3 kd;            // Diffuse reflectivity
 uniform vec3 ks;            // Specular reflectivity
 uniform float shininess;    // Specular shininess factor

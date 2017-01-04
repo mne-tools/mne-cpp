@@ -147,7 +147,7 @@ void BemSurfaceTreeItem::addData(const MNEBemSurface& tBemSurface, Qt3DCore::QEn
 
     //Set shaders
     PerVertexPhongAlphaMaterial* pPerVertexPhongAlphaMaterial = new PerVertexPhongAlphaMaterial();
-    m_pRenderable3DEntity->addMaterial(pPerVertexPhongAlphaMaterial);
+    m_pRenderable3DEntity->addComponent(pPerVertexPhongAlphaMaterial);
 
     //Find out BEM layer type and change items name
     this->setText(MNEBemSurface::id_name(tBemSurface.id));

@@ -201,7 +201,7 @@ void BrainSourceSpaceTreeItem::addData(const MNEHemisphere& tHemisphere, Qt3DCor
 
     //Set shaders
     PerVertexPhongAlphaMaterial* pPerVertexPhongAlphaMaterial = new PerVertexPhongAlphaMaterial();
-    m_pRenderable3DEntity->addMaterial(pPerVertexPhongAlphaMaterial);
+    m_pRenderable3DEntity->addComponent(pPerVertexPhongAlphaMaterial);
 
     //Add data which is held by this BrainSourceSpaceTreeItem
     QVariant data;

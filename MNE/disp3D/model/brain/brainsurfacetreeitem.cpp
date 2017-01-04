@@ -163,7 +163,7 @@ void BrainSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* p
 
     //Set shaders
     PerVertexTessPhongAlphaMaterial* pPerVertexTessPhongAlphaMaterial = new PerVertexTessPhongAlphaMaterial();
-    m_pRenderable3DEntity->addMaterial(pPerVertexTessPhongAlphaMaterial);
+    m_pRenderable3DEntity->addComponent(pPerVertexTessPhongAlphaMaterial);
 
 //    ShowNormalsMaterial* pShowNormalsMaterial = new ShowNormalsMaterial();
 //    m_pRenderable3DEntity->addMaterial(pShowNormalsMaterial);
