@@ -81,14 +81,6 @@ using namespace Qt3DRender;
 ShaderMaterial::ShaderMaterial(QNode *parent)
 : QMaterial(parent)
 , m_pVertexEffect(new QEffect())
-, m_pAmbientParameter(new QParameter(QStringLiteral("ka"), QColor::fromRgbF(0.05f, 0.05f, 0.05f, 1.0f)))
-, m_pDiffuseParameter(new QParameter(QStringLiteral("kd"), QColor::fromRgbF(0.7f, 0.7f, 0.7f, 1.0f)))
-, m_pSpecularParameter(new QParameter(QStringLiteral("ks"), QColor::fromRgbF(0.1f, 0.1f, 0.1f, 1.0f)))
-, m_pShininessParameter(new QParameter(QStringLiteral("shininess"), 15.0f))
-, m_pInnerTessParameter(new QParameter("innerTess", 1.0f))
-, m_pOuterTessParameter(new QParameter("outerTess", 1.0f))
-, m_pTriangleScaleParameter(new QParameter("triangleScale", 1.0f))
-, m_pAlphaParameter(new QParameter("alpha", 0.5f))
 , m_pVertexGL3Technique(new QTechnique())
 , m_pVertexGL3RenderPass(new QRenderPass())
 , m_pVertexGL3Shader(new QShaderProgram())
@@ -136,32 +128,7 @@ void ShaderMaterial::init()
 
     m_pVertexEffect->addTechnique(m_pVertexGL3Technique);
 
-    m_pVertexEffect->addParameter(m_pAmbientParameter);
-    m_pVertexEffect->addParameter(m_pDiffuseParameter);
-    m_pVertexEffect->addParameter(m_pSpecularParameter);
-    m_pVertexEffect->addParameter(m_pShininessParameter);
-    m_pVertexEffect->addParameter(m_pAlphaParameter);
-    m_pVertexEffect->addParameter(m_pInnerTessParameter);
-    m_pVertexEffect->addParameter(m_pOuterTessParameter);
-    m_pVertexEffect->addParameter(m_pTriangleScaleParameter);
-
     this->setEffect(m_pVertexEffect);
-}
-
-
-//*************************************************************************************************************
-
-float ShaderMaterial::alpha()
-{
-    return m_pAlphaParameter->value().toFloat();
-}
-
-
-//*************************************************************************************************************
-
-void ShaderMaterial::setAlpha(float alpha)
-{
-    m_pAlphaParameter->setValue(alpha);
 }
 
 
