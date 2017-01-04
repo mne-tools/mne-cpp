@@ -149,11 +149,9 @@ void BrainSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* p
     //Create renderable 3D entity
     m_pParentEntity = parent;
     m_pRenderable3DEntity = new Renderable3DEntity(m_pParentEntity);
-    m_pRenderable3DEntityNormals = new Renderable3DEntity(m_pRenderable3DEntity);
 
     //Initial transformation also regarding the surface offset
     m_pRenderable3DEntity->setPosition(QVector3D(-tSurface.offset()(0), -tSurface.offset()(1), -tSurface.offset()(2)));
-    //m_pRenderable3DEntityNormals->setPosition(QVector3D(-tSurface.offset()(0), -tSurface.offset()(1), -tSurface.offset()(2)));
 
     //Create color from curvature information with default gyri and sulcus colors
     QByteArray arrayCurvatureColor = createCurvatureVertColor(tSurface.curv());
@@ -165,8 +163,12 @@ void BrainSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* p
     PerVertexTessPhongAlphaMaterial* pPerVertexTessPhongAlphaMaterial = new PerVertexTessPhongAlphaMaterial();
     m_pRenderable3DEntity->addComponent(pPerVertexTessPhongAlphaMaterial);
 
+//    //Render nromals
+//    m_pRenderable3DEntityNormals = new Renderable3DEntity(m_pRenderable3DEntity);
+//    m_pRenderable3DEntityNormals->setMeshData(tSurface.rr(), tSurface.nn(), tSurface.tris(), arrayCurvatureColor, Qt3DRender::QGeometryRenderer::Triangles);
+//    m_pRenderable3DEntityNormals->setPosition(QVector3D(-tSurface.offset()(0), -tSurface.offset()(1), -tSurface.offset()(2)));
 //    ShowNormalsMaterial* pShowNormalsMaterial = new ShowNormalsMaterial();
-//    m_pRenderable3DEntity->addMaterial(pShowNormalsMaterial);
+//    m_pRenderable3DEntityNormals->addComponent(pShowNormalsMaterial);
 
     //Generate activation overlay surface
 //    MatrixX3f overlayAdds = tSurface.rr();

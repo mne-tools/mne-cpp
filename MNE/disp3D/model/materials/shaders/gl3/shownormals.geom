@@ -2,9 +2,8 @@
 
 uniform mat4 mvp;
 
-layout(points) in;
-
-layout(line_strip, max_vertices = 2) out;
+layout(triangles) in;
+layout(line_strip, max_vertices = 6) out;
 
 uniform float normal_length = 0.0005f;
 
@@ -17,16 +16,23 @@ in Vertex
 
 out vec4 vertex_color;
 
-void main()
+void ProduceVertexNormal(int v) 
 {
-	gl_Position = mvp * vVertex[0].position;
+	gl_Position = mvp * vVertex[v].position;
 	vertex_color = vec4(1.0, 0.0, 0.0, 1.0);
 	EmitVertex();
 
-	gl_Position = mvp * (vVertex[0].position + vVertex[0].normal * normal_length);
+	gl_Position = mvp * (vVertex[v].position + vVertex[v].normal * normal_length);
 	vertex_color = vec4(1.0, 0.0, 0.0, 1.0);
 	EmitVertex();
 
 	EndPrimitive();
+}
+
+void main()
+{
+	ProduceVertexNormal(0);
+	ProduceVertexNormal(1);
+	ProduceVertexNormal(2);
 }
 

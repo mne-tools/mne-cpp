@@ -1,8 +1,5 @@
 #version 400 core
 
-uniform mat4 modelMatrix;
-uniform mat4 viewMatrix;
-
 in vec3 vertexPosition;
 in vec3 vertexColor;
 in vec3 vertexNormal;
