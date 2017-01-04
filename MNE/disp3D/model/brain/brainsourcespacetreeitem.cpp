@@ -41,6 +41,7 @@
 #include "brainsourcespacetreeitem.h"
 #include "../common/metatreeitem.h"
 #include "../common/renderable3Dentity.h"
+#include "../materials/pervertexphongalphamaterial.h"
 
 #include <fs/label.h>
 #include <fs/surface.h>
@@ -199,11 +200,8 @@ void BrainSourceSpaceTreeItem::addData(const MNEHemisphere& tHemisphere, Qt3DCor
     m_pRenderable3DEntity->setMeshData(tHemisphere.rr, tHemisphere.nn, tHemisphere.tris, arrayVertColor, Qt3DRender::QGeometryRenderer::Patches);
 
     //Set shaders
-    m_pRenderable3DEntity->setShader(QUrl(QStringLiteral("qrc:/model/common/shaders/gl3/pervertexphongalpha.vert")));
-    m_pRenderable3DEntity->setShader(QUrl(QStringLiteral("qrc:/model/common/shaders/gl3/pervertexphongalpha.tcs")));
-    m_pRenderable3DEntity->setShader(QUrl(QStringLiteral("qrc:/model/common/shaders/gl3/pervertexphongalpha_simple.tes")));
-    m_pRenderable3DEntity->setShader(QUrl(QStringLiteral("qrc:/model/common/shaders/gl3/pervertexphongalpha.geom")));
-    m_pRenderable3DEntity->setShader(QUrl(QStringLiteral("qrc:/model/common/shaders/gl3/pervertexphongalpha.frag")));
+    PerVertexPhongAlphaMaterial* pPerVertexPhongAlphaMaterial = new PerVertexPhongAlphaMaterial();
+    m_pRenderable3DEntity->addMaterial(pPerVertexPhongAlphaMaterial);
 
     //Add data which is held by this BrainSourceSpaceTreeItem
     QVariant data;

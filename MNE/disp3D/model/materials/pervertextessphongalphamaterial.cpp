@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     shadermaterial.cpp
+* @file     pervertextessphongalphamaterial.cpp
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     Februaray, 2016
+* @date     January, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    ShaderMaterial class definition
+* @brief    PerVertexTessPhongAlphaMaterial class definition
 */
 
 
@@ -38,7 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "shadermaterial.h"
+#include "pervertextessphongalphamaterial.h"
 
 
 //*************************************************************************************************************
@@ -78,10 +78,9 @@ using namespace Qt3DRender;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ShaderMaterial::ShaderMaterial(QNode *parent)
+PerVertexTessPhongAlphaMaterial::PerVertexTessPhongAlphaMaterial(QNode *parent)
 : QMaterial(parent)
 , m_pVertexEffect(new QEffect())
-, m_pAmbientParameter(new QParameter(QStringLiteral("ka"), QColor::fromRgbF(0.05f, 0.05f, 0.05f, 1.0f)))
 , m_pDiffuseParameter(new QParameter(QStringLiteral("kd"), QColor::fromRgbF(0.7f, 0.7f, 0.7f, 1.0f)))
 , m_pSpecularParameter(new QParameter(QStringLiteral("ks"), QColor::fromRgbF(0.1f, 0.1f, 0.1f, 1.0f)))
 , m_pShininessParameter(new QParameter(QStringLiteral("shininess"), 15.0f))
@@ -96,7 +95,6 @@ ShaderMaterial::ShaderMaterial(QNode *parent)
 , m_pNoDepthMask(new QNoDepthMask())
 , m_pBlendState(new QBlendEquationArguments())
 , m_pBlendEquation(new QBlendEquation())
-, m_bShaderInit(false)
 {
     this->init();
 }
@@ -104,33 +102,25 @@ ShaderMaterial::ShaderMaterial(QNode *parent)
 
 //*************************************************************************************************************
 
-ShaderMaterial::~ShaderMaterial()
+PerVertexTessPhongAlphaMaterial::~PerVertexTessPhongAlphaMaterial()
 {
-    //Not sure if Qt3d module implemented internal garbage handling, so I do it manually here
-//    delete m_pAmbientParameter;
-//    delete m_pDiffuseParameter;
-//    delete m_pSpecularParameter;
-//    delete m_pShininessParameter;
-//    delete m_pAlphaParameter;
-//    delete m_pFilterKey;
-
-//    delete m_pVertexGL3Shader;
-//    delete m_pVertexGL3RenderPass;
-
-//    delete m_pVertexGL3Technique;
-
-//    delete m_pNoDepthMask;
-//    delete m_pBlendState;
-//    delete m_pBlendEquation;
-
-//    delete m_pVertexEffect;
 }
 
 
 //*************************************************************************************************************
 
-void ShaderMaterial::init()
+void PerVertexTessPhongAlphaMaterial::init()
 {
+    //Set shader
+    m_pVertexGL3Shader->setVertexShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/common/shaders/gl3/pervertextessphongalpha.vert"))));
+    m_pVertexGL3Shader->setTessellationControlShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/common/shaders/gl3/pervertextessphongalpha.tcs"))));
+    //m_pVertexGL3Shader->setTessellationEvaluationShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/common/shaders/gl3/pervertexphongalpha_simple.tes"))));
+    m_pVertexGL3Shader->setTessellationEvaluationShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/common/shaders/gl3/pervertexphongalpha_pn_triangles.tes"))));
+    m_pVertexGL3Shader->setGeometryShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/common/shaders/gl3/pervertextessphongalpha.geom"))));
+    m_pVertexGL3Shader->setFragmentShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/common/shaders/gl3/pervertextessphongalpha.frag"))));
+
+    m_pVertexGL3RenderPass->setShaderProgram(m_pVertexGL3Shader);
+
     //Set OpenGL version
     m_pVertexGL3Technique->graphicsApiFilter()->setApi(QGraphicsApiFilter::OpenGL);
     m_pVertexGL3Technique->graphicsApiFilter()->setMajorVersion(4);
@@ -154,7 +144,6 @@ void ShaderMaterial::init()
 
     m_pVertexEffect->addTechnique(m_pVertexGL3Technique);
 
-    m_pVertexEffect->addParameter(m_pAmbientParameter);
     m_pVertexEffect->addParameter(m_pDiffuseParameter);
     m_pVertexEffect->addParameter(m_pSpecularParameter);
     m_pVertexEffect->addParameter(m_pShininessParameter);
@@ -169,7 +158,7 @@ void ShaderMaterial::init()
 
 //*************************************************************************************************************
 
-float ShaderMaterial::alpha()
+float PerVertexTessPhongAlphaMaterial::alpha()
 {
     return m_pAlphaParameter->value().toFloat();
 }
@@ -177,40 +166,7 @@ float ShaderMaterial::alpha()
 
 //*************************************************************************************************************
 
-void ShaderMaterial::setAlpha(float alpha)
+void PerVertexTessPhongAlphaMaterial::setAlpha(float alpha)
 {
     m_pAlphaParameter->setValue(alpha);
-}
-
-
-//*************************************************************************************************************
-
-void ShaderMaterial::setShader(const QUrl& sShader)
-{
-    QString fileName = sShader.fileName();
-
-    if(fileName.contains(".vert")) {
-        m_pVertexGL3Shader->setVertexShaderCode(QShaderProgram::loadSource(sShader));
-    }
-
-    if(fileName.contains(".tcs")) {
-        m_pVertexGL3Shader->setTessellationControlShaderCode(QShaderProgram::loadSource(sShader));
-    }
-
-    if(fileName.contains(".tes")) {
-        m_pVertexGL3Shader->setTessellationEvaluationShaderCode(QShaderProgram::loadSource(sShader));
-    }
-
-    if(fileName.contains(".geom")) {
-        m_pVertexGL3Shader->setGeometryShaderCode(QShaderProgram::loadSource(sShader));
-    }
-
-    if(fileName.contains(".frag")) {
-        m_pVertexGL3Shader->setFragmentShaderCode(QShaderProgram::loadSource(sShader));
-    }    
-
-    if(!m_bShaderInit) {
-        m_pVertexGL3RenderPass->setShaderProgram(m_pVertexGL3Shader);
-        m_bShaderInit = true;
-    }
 }

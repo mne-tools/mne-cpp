@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     shadermaterial.h
+* @file     pervertextessphongalphamaterial.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2016
+* @date     January, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,11 +29,11 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    ShaderMaterial class declaration
+* @brief    PerVertexTessPhongAlphaMaterial class declaration
 */
 
-#ifndef SHADERMATERIAL_H
-#define SHADERMATERIAL_H
+#ifndef PERVERTEXTESSPHONGALPHAMATERIAL_H
+#define PERVERTEXTESSPHONGALPHAMATERIAL_H
 
 
 //*************************************************************************************************************
@@ -97,11 +97,11 @@ namespace DISP3DLIB
 
 //=============================================================================================================
 /**
-* ShaderMaterial is provides a Qt3D material with own shader support.
+* PerVertexTessPhongAlphaMaterial is provides a Qt3D material with own shader support.
 *
-* @brief ShaderMaterial is provides a Qt3D material with own shader support.
+* @brief PerVertexTessPhongAlphaMaterial is provides a Qt3D material with own shader support.
 */
-class DISP3DNEWSHARED_EXPORT ShaderMaterial : public Qt3DRender::QMaterial
+class DISP3DNEWSHARED_EXPORT PerVertexTessPhongAlphaMaterial : public Qt3DRender::QMaterial
 {
     Q_OBJECT
 
@@ -112,13 +112,13 @@ public:
     *
     * @param[in] parent         The parent of this class.
     */
-    explicit ShaderMaterial(Qt3DCore::QNode *parent = 0);
+    explicit PerVertexTessPhongAlphaMaterial(Qt3DCore::QNode *parent = 0);
 
     //=========================================================================================================
     /**
     * Default destructor.
     */
-    ~ShaderMaterial();
+    ~PerVertexTessPhongAlphaMaterial();
 
     //=========================================================================================================
     /**
@@ -136,28 +136,15 @@ public:
     */
     void setAlpha(float alpha);
 
-    //=========================================================================================================
-    /**
-    * Sets the entity's material sahder. This is a convenient function.
-    *
-    * @param[in] sShader     The new shader. Must be present in the qrc resource file.
-    *
-    * @return If successful returns true, false otherwise.
-    */
-    void setShader(const QUrl& sShader);
-
 private:
     //=========================================================================================================
     /**
-    * Init the ShaderMaterial class.
+    * Init the PerVertexTessPhongAlphaMaterial class.
     */
     void init();
 
-    bool                                    m_bShaderInit;
-
     QPointer<Qt3DRender::QEffect>           m_pVertexEffect;
 
-    QPointer<Qt3DRender::QParameter>        m_pAmbientParameter;
     QPointer<Qt3DRender::QParameter>        m_pDiffuseParameter;
     QPointer<Qt3DRender::QParameter>        m_pSpecularParameter;
     QPointer<Qt3DRender::QParameter>        m_pShininessParameter;
@@ -179,4 +166,4 @@ private:
 
 } // namespace DISP3DLIB
 
-#endif // SHADERMATERIAL_H
+#endif // PERVERTEXTESSPHONGALPHAMATERIAL_H

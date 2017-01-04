@@ -174,53 +174,43 @@ public:
 
     //=========================================================================================================
     /**
-    * Sets the entity's material.
+    * Adds a material to this entity.
     *
     * @param[in] pMaterial      The new entity's material.
-    *
-    * @return If successful returns true, false otherwise.
     */
-    bool setMaterial(Qt3DRender::QMaterial* pMaterial);
+    void addMaterial(Qt3DRender::QMaterial* pMaterial);
 
     //=========================================================================================================
     /**
     * Sets the entity's alpha value.
     *
     * @param[in] fAlpha     The new alpha value.
-    *
-    * @return If successful returns true, false otherwise.
     */
-    bool setAlpha(float fAlpha);
+    void setAlpha(float fAlpha);
 
     //=========================================================================================================
     /**
     * Sets the entity's inner tesselation value.
     *
     * @param[in] fTessInner     The new inner tesselation value.
-    *
-    * @return If successful returns true, false otherwise.
     */
-    bool setTessInner(float fTessInner);
+    void setTessInner(float fTessInner);
 
     //=========================================================================================================
     /**
     * Sets the entity's outer tesselation value.
     *
     * @param[in] fTessOuter     The new outer tesselation value.
-    *
-    * @return If successful returns true, false otherwise.
     */
-    bool setTessOuter(float fTessOuter);
+    void setTessOuter(float fTessOuter);
 
     //=========================================================================================================
     /**
     * Sets the entity's triangle scale value.
     *
     * @param[in] fTriangleScale     The triangle scale value.
-    *
-    * @return If successful returns true, false otherwise.
     */
-    bool setTriangleScale(float fTriangleScale);
+    void setTriangleScale(float fTriangleScale);
 
     //=========================================================================================================
     /**
@@ -289,7 +279,6 @@ public:
 protected: 
     QPointer<CustomMesh>                        m_pCustomMesh;           /**< The actual mesh information (vertices, normals, colors). */
     QPointer<Qt3DCore::QTransform>              m_pTransform;            /**< The main transformation. */
-    QPointer<ShaderMaterial>                    m_pMaterial;             /**< The material to be used for this entity. */
 
     float                                       m_fRotX;                 /**< The x axis rotation value. */
     float                                       m_fRotY;                 /**< The y axis rotation value. */
@@ -305,6 +294,15 @@ protected:
     * Update the set transformation with the currently set translation and rotation values.
     */
     void updateTransform();
+
+    //=========================================================================================================
+    /**
+    * Sets the value of a specific paramater of the materials for this entity.
+    *
+    * @param[in] fValue             The value to be set.
+    * @param[in] sParameterName     The name of the parameter to be set.
+    */
+    void setMaterialParameter(float fValue, QString sParameterName);
 
 signals:
     //=========================================================================================================

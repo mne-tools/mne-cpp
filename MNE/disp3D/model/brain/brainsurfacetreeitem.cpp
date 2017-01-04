@@ -41,6 +41,8 @@
 #include "brainsurfacetreeitem.h"
 #include "../common/metatreeitem.h"
 #include "../common//renderable3Dentity.h"
+#include "../materials/pervertextessphongalphamaterial.h"
+#include "../materials/shownormalsmaterial.h"
 
 #include <fs/label.h>
 #include <fs/surface.h>
@@ -158,19 +160,13 @@ void BrainSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* p
 
     //Set renderable 3D entity mesh and color data
     m_pRenderable3DEntity->setMeshData(tSurface.rr(), tSurface.nn(), tSurface.tris(), arrayCurvatureColor, Qt3DRender::QGeometryRenderer::Patches);
-    //m_pRenderable3DEntityNormals->setMeshData(tSurface.rr(), tSurface.nn(), tSurface.tris(), arrayCurvatureColor, Qt3DRender::QGeometryRenderer::Points);
 
     //Set shaders
-    m_pRenderable3DEntity->setShader(QUrl(QStringLiteral("qrc:/model/common/shaders/gl3/pervertexphongalpha.vert")));
-    m_pRenderable3DEntity->setShader(QUrl(QStringLiteral("qrc:/model/common/shaders/gl3/pervertexphongalpha.tcs")));
-    m_pRenderable3DEntity->setShader(QUrl(QStringLiteral("qrc:/model/common/shaders/gl3/pervertexphongalpha_simple.tes")));
-    //m_pRenderable3DEntity->setShader(QUrl(QStringLiteral("qrc:/model/common/shaders/gl3/pervertexphongalpha_pn_triangles.tes")));
-    m_pRenderable3DEntity->setShader(QUrl(QStringLiteral("qrc:/model/common/shaders/gl3/pervertexphongalpha.geom")));
-    m_pRenderable3DEntity->setShader(QUrl(QStringLiteral("qrc:/model/common/shaders/gl3/pervertexphongalpha.frag")));
+    PerVertexTessPhongAlphaMaterial* pPerVertexTessPhongAlphaMaterial = new PerVertexTessPhongAlphaMaterial();
+    m_pRenderable3DEntity->addMaterial(pPerVertexTessPhongAlphaMaterial);
 
-    m_pRenderable3DEntityNormals->setShader(QUrl(QStringLiteral("qrc:/model/common/shaders/gl3/shownormals.vert")));
-    m_pRenderable3DEntityNormals->setShader(QUrl(QStringLiteral("qrc:/model/common/shaders/gl3/shownormals.geom")));
-    m_pRenderable3DEntityNormals->setShader(QUrl(QStringLiteral("qrc:/model/common/shaders/gl3/shownormals.frag")));
+//    ShowNormalsMaterial* pShowNormalsMaterial = new ShowNormalsMaterial();
+//    m_pRenderable3DEntity->addMaterial(pShowNormalsMaterial);
 
     //Generate activation overlay surface
 //    MatrixX3f overlayAdds = tSurface.rr();
@@ -235,7 +231,7 @@ void BrainSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* p
     m_pItemSurfColGyri->setData(data, MetaTreeItemRoles::SurfaceColorGyri);
     m_pItemSurfColGyri->setData(data, Qt::DecorationRole);
 
-    float fAlpha = 0.35;
+    float fAlpha = 0.35f;
     MetaTreeItem *itemAlpha = new MetaTreeItem(MetaTreeItemTypes::SurfaceAlpha, QString("%1").arg(fAlpha));
     connect(itemAlpha, &MetaTreeItem::surfaceAlphaChanged,
             this, &BrainSurfaceTreeItem::onSurfaceAlphaChanged);

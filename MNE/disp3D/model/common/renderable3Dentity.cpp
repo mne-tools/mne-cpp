@@ -39,7 +39,6 @@
 //=============================================================================================================
 
 #include "renderable3Dentity.h"
-#include "shadermaterial.h"
 
 
 //*************************************************************************************************************
@@ -91,7 +90,6 @@ Renderable3DEntity::Renderable3DEntity(Qt3DCore::QEntity* parent)
 : Qt3DCore::QEntity(parent)
 , m_pCustomMesh(new CustomMesh())
 , m_pTransform(new Qt3DCore::QTransform())
-, m_pMaterial(new ShaderMaterial())
 , m_fAlpha(1.0f)
 , m_fRotX(0.0f)
 , m_fRotY(0.0f)
@@ -102,7 +100,6 @@ Renderable3DEntity::Renderable3DEntity(Qt3DCore::QEntity* parent)
 {
     this->addComponent(m_pCustomMesh);
     this->addComponent(m_pTransform);
-    this->addComponent(m_pMaterial);
 }
 
 
@@ -112,7 +109,6 @@ Renderable3DEntity::Renderable3DEntity(const MatrixX3f& tMatVert, const MatrixX3
 : Qt3DCore::QEntity(parent)
 , m_pCustomMesh(new CustomMesh(tMatVert, tMatNorm, tMatTris))
 , m_pTransform(new Qt3DCore::QTransform())
-, m_pMaterial(new ShaderMaterial())
 , m_fAlpha(1.0f)
 , m_fRotX(0.0f)
 , m_fRotY(0.0f)
@@ -123,7 +119,6 @@ Renderable3DEntity::Renderable3DEntity(const MatrixX3f& tMatVert, const MatrixX3
 {
     this->addComponent(m_pCustomMesh);
     this->addComponent(m_pTransform);
-    this->addComponent(m_pMaterial);
 }
 
 
@@ -174,83 +169,51 @@ bool Renderable3DEntity::setTransform(QSharedPointer<Qt3DCore::QTransform> pTran
 
 //*************************************************************************************************************
 
-bool Renderable3DEntity::setMaterial(QMaterial* pMaterial)
+void Renderable3DEntity::addMaterial(QMaterial* pMaterial)
 {
-    if(!pMaterial.isNull()) {
-        this->removeComponent(m_pMaterial);
-        m_pMaterial = pMaterial.data();
-        this->addComponent(m_pMaterial);
+    if(pMaterial) {
+        this->addComponent(pMaterial);
     }
-
-    return true;
 }
 
 
 //*************************************************************************************************************
 
-bool Renderable3DEntity::setAlpha(float fAlpha)
+void Renderable3DEntity::setAlpha(float fAlpha)
 {
     m_fAlpha = fAlpha;
 
-    for(int i = 0; i < m_pMaterial->effect()->parameters().size(); ++i) {
-        if(m_pMaterial->effect()->parameters().at(i)->name() == "alpha") {
-            m_pMaterial->effect()->parameters().at(i)->setValue(m_fAlpha);
-            return true;
-        }
-    }
-
-    return false;
+    this->setMaterialParameter(fAlpha, "alpha");
 }
-
 
 //*************************************************************************************************************
 
-bool Renderable3DEntity::setTessInner(float fTessInner)
+void Renderable3DEntity::setTessInner(float fTessInner)
 {
     m_fTessInner = fTessInner;
 
-    for(int i = 0; i < m_pMaterial->effect()->parameters().size(); ++i) {
-        if(m_pMaterial->effect()->parameters().at(i)->name() == "innerTess") {
-            m_pMaterial->effect()->parameters().at(i)->setValue(m_fTessInner);
-            return true;
-        }
-    }
-
-    return false;
+    this->setMaterialParameter(fTessInner, "innerTess");
 }
 
 
 //*************************************************************************************************************
 
-bool Renderable3DEntity::setTessOuter(float fTessOuter)
+void Renderable3DEntity::setTessOuter(float fTessOuter)
 {
     m_fTessOuter = fTessOuter;
 
-    for(int i = 0; i < m_pMaterial->effect()->parameters().size(); ++i) {
-        if(m_pMaterial->effect()->parameters().at(i)->name() == "outerTess") {
-            m_pMaterial->effect()->parameters().at(i)->setValue(m_fTessOuter);
-            return true;
-        }
-    }
-
-    return false;
+    this->setMaterialParameter(fTessOuter, "outerTess");
 }
 
 
 //*************************************************************************************************************
 
-bool Renderable3DEntity::setTriangleScale(float fTriangleScale)
+void Renderable3DEntity::setTriangleScale(float fTriangleScale)
 {
     m_fTriangleScale = fTriangleScale;
 
-    for(int i = 0; i < m_pMaterial->effect()->parameters().size(); ++i) {
-        if(m_pMaterial->effect()->parameters().at(i)->name() == "triangleScale") {
-            m_pMaterial->effect()->parameters().at(i)->setValue(m_fTriangleScale);
-            return true;
-        }
-    }
+    this->setMaterialParameter(fTriangleScale, "triangleScale");
 
-    return false;
 }
 
 
@@ -356,3 +319,23 @@ void Renderable3DEntity::updateTransform()
 
     m_pTransform->setMatrix(m);
 }
+
+
+//*************************************************************************************************************
+
+void Renderable3DEntity::setMaterialParameter(float fValue, QString sParameterName)
+{
+    //Look for all materials and the corresponding parameters
+    QComponentVector vComponents = this->components();
+
+    for(int j = 0; j < vComponents.size(); ++j) {
+        if(QMaterial* pMaterial = dynamic_cast<QMaterial*>(vComponents.at(j))) {
+            for(int i = 0; i < pMaterial->effect()->parameters().size(); ++i) {
+                if(pMaterial->effect()->parameters().at(i)->name() == sParameterName) {
+                    pMaterial->effect()->parameters().at(i)->setValue(fValue);
+                }
+            }
+        }
+    }
+}
+

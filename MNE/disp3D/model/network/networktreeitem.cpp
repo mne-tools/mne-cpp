@@ -149,7 +149,7 @@ bool NetworkTreeItem::init(Qt3DCore::QEntity* parent)
 
     //Set shaders
     NetworkMaterial* pNetworkMaterial = new NetworkMaterial();
-    m_pRenderable3DEntity->setMaterial(pNetworkMaterial);
+    m_pRenderable3DEntity->addMaterial(pNetworkMaterial);
 
     //Add meta information as item children
     QList<QStandardItem*> list;
