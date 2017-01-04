@@ -162,7 +162,7 @@ public:
     *
     * @return ECD related to the parameter index.
     */
-    const ECD& operator[] (qint32 idx) const;
+    const ECD& operator[] (int idx) const;
 
     //=========================================================================================================
     /**
@@ -172,7 +172,7 @@ public:
     *
     * @return ECD related to the parameter index.
     */
-    ECD& operator[] (qint32 idx);
+    ECD& operator[] (int idx);
 
     //=========================================================================================================
     /**
