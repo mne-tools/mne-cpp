@@ -1,7 +1,5 @@
 #version 400 core
 
-uniform mat4 modelMatrix;
-uniform mat4 viewMatrix;
 uniform mat4 projectionMatrix;
 uniform mat4 modelViewProjection;
 uniform float triangleScale;

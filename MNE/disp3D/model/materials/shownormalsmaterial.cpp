@@ -85,6 +85,9 @@ ShowNormalsMaterial::ShowNormalsMaterial(QNode *parent)
 , m_pVertexGL3RenderPass(new QRenderPass())
 , m_pVertexGL3Shader(new QShaderProgram())
 , m_pFilterKey(new QFilterKey)
+, m_pNoDepthMask(new QNoDepthMask())
+, m_pBlendState(new QBlendEquationArguments())
+, m_pBlendEquation(new QBlendEquation())
 {
     this->init();
 }
@@ -106,6 +109,15 @@ void ShowNormalsMaterial::init()
     m_pVertexGL3Shader->setGeometryShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl3/shownormals.geom"))));
     m_pVertexGL3Shader->setFragmentShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl3/shownormals.frag"))));
     m_pVertexGL3RenderPass->setShaderProgram(m_pVertexGL3Shader);
+
+    //Setup transparency
+    m_pBlendState->setSourceRgb(QBlendEquationArguments::SourceAlpha);
+    m_pBlendState->setDestinationRgb(QBlendEquationArguments::OneMinusSourceAlpha);
+    m_pBlendEquation->setBlendFunction(QBlendEquation::Add);
+
+    m_pVertexGL3RenderPass->addRenderState(m_pBlendEquation);
+    m_pVertexGL3RenderPass->addRenderState(m_pNoDepthMask);
+    m_pVertexGL3RenderPass->addRenderState(m_pBlendState);
 
     //Set OpenGL version
     m_pVertexGL3Technique->graphicsApiFilter()->setApi(QGraphicsApiFilter::OpenGL);
