@@ -29,15 +29,15 @@ Requirements
 
 **Windows**
 
-\>= MSVC2013
+\>= MSVC 2015
 
 **Linux**
 
-\>= gcc 4.6.3
+\>= gcc 4.9.1
 
-**OS X**
+**macOS**
 
-\>= Clang 3.2
+\>= Clang 3.5
 
 
 Dependencies
