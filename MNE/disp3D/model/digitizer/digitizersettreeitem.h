@@ -144,9 +144,6 @@ private:
     * @param[in] checkState        The current checkstate.
     */
     virtual void onCheckStateChanged(const Qt::CheckState& checkState);
-
-    QPointer<Qt3DCore::QEntity>      m_pParentEntity;                            /**< The parent 3D entity. */
-    QPointer<Renderable3DEntity>     m_pRenderable3DEntity;                      /**< The renderable 3D entity. */
 };
 
 } // NAMESPACE DISP3DLIB

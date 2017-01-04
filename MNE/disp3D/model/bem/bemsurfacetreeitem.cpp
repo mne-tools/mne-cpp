@@ -85,7 +85,6 @@ using namespace MNELIB;
 
 BemSurfaceTreeItem::BemSurfaceTreeItem(int iType, const QString& text)
 : AbstractTreeItem(iType, text)
-, m_pParentEntity(new Qt3DCore::QEntity())
 , m_pRenderable3DEntity(new Renderable3DEntity())
 {
     this->setEditable(false);
@@ -100,7 +99,6 @@ BemSurfaceTreeItem::BemSurfaceTreeItem(int iType, const QString& text)
 BemSurfaceTreeItem::~BemSurfaceTreeItem()
 {
     //Schedule deletion/Decouple of all entities so that the SceneGraph is NOT plotting them anymore.
-    //Cannot delete m_pParentEntity since we do not know who else holds it, that is why we use a QPointer for m_pParentEntity.
     if(!m_pRenderable3DEntity.isNull()) {
         m_pRenderable3DEntity->deleteLater();
     }
@@ -136,14 +134,13 @@ void  BemSurfaceTreeItem::setData(const QVariant& value, int role)
 void BemSurfaceTreeItem::addData(const MNEBemSurface& tBemSurface, Qt3DCore::QEntity* parent)
 {
     //Create renderable 3D entity
-    m_pParentEntity = parent;
     m_pRenderable3DEntity = new Renderable3DEntity(parent);
 
     //Create color from curvature information with default gyri and sulcus colors
     QByteArray arrayVertColor = createVertColor(tBemSurface.rr);
 
     //Set renderable 3D entity mesh and color data
-    m_pRenderable3DEntity->setMeshData(tBemSurface.rr, tBemSurface.nn, tBemSurface.tris, arrayVertColor, Qt3DRender::QGeometryRenderer::Patches);
+    m_pRenderable3DEntity->setMeshData(tBemSurface.rr, tBemSurface.nn, tBemSurface.tris, arrayVertColor, Qt3DRender::QGeometryRenderer::Triangles);
 
     //Set shaders
     PerVertexPhongAlphaMaterial* pPerVertexPhongAlphaMaterial = new PerVertexPhongAlphaMaterial();
@@ -227,7 +224,7 @@ void BemSurfaceTreeItem::addData(const MNEBemSurface& tBemSurface, Qt3DCore::QEn
 
 void BemSurfaceTreeItem::setVisible(bool state)
 {
-    m_pRenderable3DEntity->setParent(state ? m_pParentEntity : Q_NULLPTR);
+    m_pRenderable3DEntity->setEnabled(state);
 }
 
 

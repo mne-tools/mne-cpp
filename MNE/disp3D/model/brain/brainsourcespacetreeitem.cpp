@@ -93,7 +93,6 @@ using namespace DISP3DLIB;
 
 BrainSourceSpaceTreeItem::BrainSourceSpaceTreeItem(int iType, const QString& text)
 : AbstractTreeItem(iType, text)
-, m_pParentEntity(new Qt3DCore::QEntity())
 , m_pRenderable3DEntity(new Renderable3DEntity())
 {
     this->setEditable(false);
@@ -108,7 +107,6 @@ BrainSourceSpaceTreeItem::BrainSourceSpaceTreeItem(int iType, const QString& tex
 BrainSourceSpaceTreeItem::~BrainSourceSpaceTreeItem()
 {
     //Schedule deletion/Decouple of all entities so that the SceneGraph is NOT plotting them anymore.
-    //Cannot delete m_pParentEntity since we do not know who else holds it, that is why we use a QPointer for m_pParentEntity.
     if(!m_pRenderable3DEntity.isNull()) {
         m_pRenderable3DEntity->deleteLater();
     }
@@ -142,8 +140,7 @@ void  BrainSourceSpaceTreeItem::setData(const QVariant& value, int role)
 void BrainSourceSpaceTreeItem::addData(const MNEHemisphere& tHemisphere, Qt3DCore::QEntity* parent)
 {
     //Create renderable 3D entity
-    m_pParentEntity = parent;
-    m_pRenderable3DEntity = new Renderable3DEntity(m_pParentEntity);
+    m_pRenderable3DEntity = new Renderable3DEntity(parent);
 
     //Create sources as small 3D spheres
     RowVector3f sourcePos;
@@ -241,10 +238,10 @@ void BrainSourceSpaceTreeItem::addData(const MNEHemisphere& tHemisphere, Qt3DCor
 void BrainSourceSpaceTreeItem::setVisible(bool state)
 {
     for(int i = 0; i < m_lSpheres.size(); ++i) {
-        m_lSpheres.at(i)->setParent(state ? m_pRenderable3DEntity : Q_NULLPTR);
+        m_lSpheres.at(i)->setEnabled(state);
     }
 
-    m_pRenderable3DEntity->setParent(state ? m_pParentEntity : Q_NULLPTR);
+    m_pRenderable3DEntity->setEnabled(state);
 }
 
 

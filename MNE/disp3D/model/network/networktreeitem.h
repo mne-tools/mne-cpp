@@ -120,7 +120,7 @@ public:
     * @param[in] iType      The type of the item. See types.h for declaration and definition.
     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
     */
-    explicit NetworkTreeItem(int iType = Data3DTreeModelItemTypes::RTConnectivityDataItem, const QString& text = "RT Connectivity Data");
+    explicit NetworkTreeItem(int iType = Data3DTreeModelItemTypes::RTConnectivityDataItem, const QString& text = "Connectivity Data");
 
     //=========================================================================================================
     /**
@@ -202,7 +202,6 @@ private:
 
     MetaTreeItem*                               m_pItemNetworkThreshold;        /**< The item to access the threshold values. */
 
-    QPointer<Qt3DCore::QEntity>                 m_pParentEntity;                /**< The parent 3D entity. */
     QPointer<Renderable3DEntity>                m_pRenderable3DEntity;          /**< The renderable 3D entity. */
 
     QList<QPointer<Renderable3DEntity> >        m_lNodes;                       /**< The currently displayed node points as 3D spheres. */

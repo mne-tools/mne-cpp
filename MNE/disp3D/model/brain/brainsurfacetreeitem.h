@@ -239,7 +239,6 @@ private:
     QByteArray createCurvatureVertColor(const Eigen::VectorXf& curvature, const QColor& colSulci = QColor(50,50,50), const QColor& colGyri = QColor(125,125,125));
 
     QString                         m_sColorInfoOrigin;                         /**< The surface color origin. */
-    QPointer<Qt3DCore::QEntity>     m_pParentEntity;                            /**< The parent 3D entity. */
     QPointer<Renderable3DEntity>    m_pRenderable3DEntity;                      /**< The surface renderable 3D entity. */
     QPointer<Renderable3DEntity>    m_pRenderable3DEntityNormals;               /**< The normals renderable 3D entity. */
 

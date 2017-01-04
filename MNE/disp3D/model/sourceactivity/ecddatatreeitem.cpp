@@ -100,7 +100,6 @@ EcdDataTreeItem::EcdDataTreeItem(int iType, const QString &text)
 EcdDataTreeItem::~EcdDataTreeItem()
 {
     //Schedule deletion/Decouple of all entities so that the SceneGraph is NOT plotting them anymore.
-    //Cannot delete m_pParentEntity since we do not know who else holds it, that is why we use a QPointer for m_pParentEntity.
     for(int i = 0; i < m_lDipoles.size(); ++i) {
         m_lDipoles.at(i)->deleteLater();
     }
@@ -132,7 +131,6 @@ void EcdDataTreeItem::setData(const QVariant& value, int role)
 bool EcdDataTreeItem::init(Qt3DCore::QEntity* parent)
 {      
     //Create renderable 3D entity
-    m_pParentEntity = parent;
     m_pRenderable3DEntity = new Renderable3DEntity(parent);
 
     //Add meta information as item children
@@ -180,10 +178,10 @@ void EcdDataTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
 void EcdDataTreeItem::setVisible(bool state)
 {
     for(int i = 0; i < m_lDipoles.size(); ++i) {
-        m_lDipoles.at(i)->setParent(state ? m_pRenderable3DEntity : Q_NULLPTR);
+        m_lDipoles.at(i)->setEnabled(state);
     }
 
-    m_pRenderable3DEntity->setParent(state ? m_pParentEntity : Q_NULLPTR);
+    m_pRenderable3DEntity->setEnabled(state);
 }
 
 
