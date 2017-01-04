@@ -205,7 +205,6 @@ private:
     */
     QByteArray createVertColor(const Eigen::MatrixXf& vertices, const QColor& color = QColor(100,100,100)) const;
 
-    QPointer<Qt3DCore::QEntity>         m_pParentEntity;                /**< The parent 3D entity. */
     QPointer<Renderable3DEntity>        m_pRenderable3DEntity;          /**< The renderable 3D entity. */
 
 signals:

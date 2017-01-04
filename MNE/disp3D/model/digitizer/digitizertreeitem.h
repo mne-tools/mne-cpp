@@ -161,7 +161,6 @@ private:
     */
     void onSurfaceColorChanged(const QColor &color);
 
-    QPointer<Qt3DCore::QEntity>                 m_pParentEntity;            /**< The parent 3D entity. */
     QPointer<Renderable3DEntity>                m_pRenderable3DEntity;      /**< The renderable 3D entity. */
 
     QList<QPointer<Renderable3DEntity> >        m_lSpheres;                 /**< The currently displayed digitizer points as 3D spheres. */

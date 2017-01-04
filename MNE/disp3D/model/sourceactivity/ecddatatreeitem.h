@@ -183,7 +183,6 @@ private:
 
     bool                                    m_bIsInit;                      /**< The init flag. */
 
-    QPointer<Qt3DCore::QEntity>             m_pParentEntity;                /**< The parent 3D entity. */
     QPointer<Renderable3DEntity>            m_pRenderable3DEntity;          /**< The renderable 3D entity. */
 
     QList<QPointer<Renderable3DEntity> >    m_lDipoles;                     /**< The currently displayed dipoles as 3D objects. */

@@ -97,7 +97,6 @@ NetworkTreeItem::NetworkTreeItem(int iType, const QString &text)
 , m_bIsInit(false)
 , m_bNodesPlotted(false)
 , m_pItemNetworkThreshold(new MetaTreeItem())
-, m_pParentEntity(new Qt3DCore::QEntity())
 , m_pRenderable3DEntity(new Renderable3DEntity())
 {
     this->setEditable(false);
@@ -112,7 +111,6 @@ NetworkTreeItem::NetworkTreeItem(int iType, const QString &text)
 NetworkTreeItem::~NetworkTreeItem()
 {
     //Schedule deletion/Decouple of all entities so that the SceneGraph is NOT plotting them anymore.
-    //Cannot delete m_pParentEntity since we do not know who else holds it, that is why we use a QPointer for m_pParentEntity.
     for(int i = 0; i < m_lNodes.size(); ++i) {
         m_lNodes.at(i)->deleteLater();
     }
@@ -144,7 +142,6 @@ void  NetworkTreeItem::setData(const QVariant& value, int role)
 bool NetworkTreeItem::init(Qt3DCore::QEntity* parent)
 {
     //Create renderable 3D entity
-    m_pParentEntity = parent;
     m_pRenderable3DEntity = new Renderable3DEntity(parent);
 
     //Set shaders
@@ -218,10 +215,10 @@ void NetworkTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
 void NetworkTreeItem::setVisible(bool state)
 {
     for(int i = 0; i < m_lNodes.size(); ++i) {
-        m_lNodes.at(i)->setParent(state ? m_pRenderable3DEntity : Q_NULLPTR);
+        m_lNodes.at(i)->setEnabled(state);
     }
 
-    m_pRenderable3DEntity->setParent(state ? m_pParentEntity : Q_NULLPTR);
+    m_pRenderable3DEntity->setEnabled(state);
 }
 
 

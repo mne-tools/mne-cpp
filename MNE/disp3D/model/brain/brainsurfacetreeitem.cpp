@@ -88,7 +88,6 @@ using namespace FSLIB;
 BrainSurfaceTreeItem::BrainSurfaceTreeItem(int iType, const QString& text)
 : AbstractTreeItem(iType, text)
 , m_sColorInfoOrigin("Color from curvature")
-, m_pParentEntity(new Qt3DCore::QEntity())
 , m_pRenderable3DEntity(new Renderable3DEntity())
 , m_pRenderable3DEntityNormals(new Renderable3DEntity())
 , m_pItemSurfColGyri(new MetaTreeItem())
@@ -106,7 +105,6 @@ BrainSurfaceTreeItem::BrainSurfaceTreeItem(int iType, const QString& text)
 BrainSurfaceTreeItem::~BrainSurfaceTreeItem()
 {
     //Schedule deletion/Decouple of all entities so that the SceneGraph is NOT plotting them anymore.
-    //Cannot delete m_pParentEntity since we do not know who else holds it, that is why we use a QPointer for m_pParentEntity.
     if(!m_pRenderable3DEntity) {
         m_pRenderable3DEntity->deleteLater();
     }
@@ -147,8 +145,7 @@ void  BrainSurfaceTreeItem::setData(const QVariant& value, int role)
 void BrainSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* parent)
 {
     //Create renderable 3D entity
-    m_pParentEntity = parent;
-    m_pRenderable3DEntity = new Renderable3DEntity(m_pParentEntity);
+    m_pRenderable3DEntity = new Renderable3DEntity(parent);
 
     //Initial transformation also regarding the surface offset
     m_pRenderable3DEntity->setPosition(QVector3D(-tSurface.offset()(0), -tSurface.offset()(1), -tSurface.offset()(2)));
@@ -363,8 +360,8 @@ void BrainSurfaceTreeItem::onAnnotationVisibilityChanged(bool isVisible)
 
 void BrainSurfaceTreeItem::setVisible(bool state)
 {
-    m_pRenderable3DEntityNormals->setParent(state ? m_pParentEntity : Q_NULLPTR);
-    m_pRenderable3DEntity->setParent(state ? m_pParentEntity : Q_NULLPTR);
+    m_pRenderable3DEntity->setEnabled(state);
+    m_pRenderable3DEntityNormals->setEnabled(state);
 }
 
 
@@ -452,8 +449,9 @@ void BrainSurfaceTreeItem::onSurfaceTriangleScaleChanged(float fTriangleScale)
 //*************************************************************************************************************
 
 void BrainSurfaceTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
-{
-    this->setVisible(checkState == Qt::Unchecked ? false : true);
+{    
+    m_pRenderable3DEntity->setEnabled(checkState == Qt::Unchecked ? false : true);
+    m_pRenderable3DEntityNormals->setEnabled(checkState == Qt::Unchecked ? false : true);
 }
 
 

@@ -79,7 +79,6 @@ using namespace DISP3DLIB;
 
 DigitizerTreeItem::DigitizerTreeItem(int iType, const QString& text)
 : AbstractTreeItem(iType, text)
-, m_pParentEntity(Q_NULLPTR)
 , m_pRenderable3DEntity(Q_NULLPTR)
 {
     this->setEditable(false);
@@ -109,7 +108,6 @@ DigitizerTreeItem::DigitizerTreeItem(int iType, const QString& text)
 DigitizerTreeItem::~DigitizerTreeItem()
 {
     //Schedule deletion/Decouple of all entities so that the SceneGraph is NOT plotting them anymore.
-    //Cannot delete m_pParentEntity since we do not know who else holds it, that is why we use a QPointer for m_pParentEntity.
     for(int i = 0; i < m_lSpheres.size(); ++i) {
         m_lSpheres.at(i)->deleteLater();
     }
@@ -151,14 +149,11 @@ bool DigitizerTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer, 
     //Clear all data
     m_lSpheres.clear();
 
-    //Create renderable 3D entity
-    m_pParentEntity = parent;
-
 //    if(!m_pRenderable3DEntity.isNull()) {
 //        m_pRenderable3DEntity->deleteLater();
 //    }
 
-    m_pRenderable3DEntity = new Renderable3DEntity(m_pParentEntity);
+    m_pRenderable3DEntity = new Renderable3DEntity(parent);
 
     //Create digitizers as small 3D spheres
     QVector3D pos;
@@ -231,12 +226,12 @@ bool DigitizerTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer, 
 
 void DigitizerTreeItem::setVisible(bool state)
 {
-    if(!m_pRenderable3DEntity.isNull() && !m_pParentEntity.isNull()) {
+    if(!m_pRenderable3DEntity.isNull()) {
         for(int i = 0; i < m_lSpheres.size(); ++i) {
-            m_lSpheres.at(i)->setParent(state ? m_pRenderable3DEntity : Q_NULLPTR);
+            m_lSpheres.at(i)->setEnabled(state);
         }
 
-        m_pRenderable3DEntity->setParent(state ? m_pParentEntity : Q_NULLPTR);
+        m_pRenderable3DEntity->setEnabled(state);
     }
 }
 
