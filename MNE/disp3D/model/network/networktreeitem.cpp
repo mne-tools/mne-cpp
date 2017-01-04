@@ -42,6 +42,7 @@
 #include "../workers/rtSourceLoc/rtsourcelocdataworker.h"
 #include "../common/metatreeitem.h"
 #include "../common/renderable3Dentity.h"
+#include "../materials/networkmaterial.h"
 
 #include <fiff/fiff_types.h>
 
@@ -147,8 +148,8 @@ bool NetworkTreeItem::init(Qt3DCore::QEntity* parent)
     m_pRenderable3DEntity = new Renderable3DEntity(parent);
 
     //Set shaders
-    m_pRenderable3DEntity->setShader(QUrl(QStringLiteral("qrc:/model/common/shaders/gl3/networkEdge.vert")));
-    m_pRenderable3DEntity->setShader(QUrl(QStringLiteral("qrc:/model/common/shaders/gl3/networkEdge.frag")));
+    NetworkMaterial* pNetworkMaterial = new NetworkMaterial();
+    m_pRenderable3DEntity->setMaterial(pNetworkMaterial);
 
     //Add meta information as item children
     QList<QStandardItem*> list;

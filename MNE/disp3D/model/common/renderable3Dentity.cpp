@@ -79,6 +79,7 @@
 using namespace DISP3DLIB;
 using namespace Eigen;
 using namespace Qt3DCore;
+using namespace Qt3DRender;
 
 
 //*************************************************************************************************************
@@ -173,7 +174,7 @@ bool Renderable3DEntity::setTransform(QSharedPointer<Qt3DCore::QTransform> pTran
 
 //*************************************************************************************************************
 
-bool Renderable3DEntity::setMaterial(QSharedPointer<ShaderMaterial> pMaterial)
+bool Renderable3DEntity::setMaterial(QMaterial* pMaterial)
 {
     if(!pMaterial.isNull()) {
         this->removeComponent(m_pMaterial);
@@ -247,20 +248,6 @@ bool Renderable3DEntity::setTriangleScale(float fTriangleScale)
             m_pMaterial->effect()->parameters().at(i)->setValue(m_fTriangleScale);
             return true;
         }
-    }
-
-    return false;
-}
-
-
-//*************************************************************************************************************
-
-bool Renderable3DEntity::setShader(const QUrl& sShader)
-{
-    if(!m_pMaterial.isNull()) {
-        m_pMaterial->setShader(sShader);
-
-        return true;
     }
 
     return false;
