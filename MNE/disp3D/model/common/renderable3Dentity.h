@@ -180,7 +180,7 @@ public:
     *
     * @return If successful returns true, false otherwise.
     */
-    bool setMaterial(QSharedPointer<ShaderMaterial> pMaterial);
+    bool setMaterial(Qt3DRender::QMaterial* pMaterial);
 
     //=========================================================================================================
     /**
@@ -221,16 +221,6 @@ public:
     * @return If successful returns true, false otherwise.
     */
     bool setTriangleScale(float fTriangleScale);
-
-    //=========================================================================================================
-    /**
-    * Sets the entity's material sahder. This is a convenient function.
-    *
-    * @param[in] sShader     The new shader. Must be present in the qrc resource file.
-    *
-    * @return If successful returns true, false otherwise.
-    */
-    bool setShader(const QUrl &sShader);
 
     //=========================================================================================================
     /**

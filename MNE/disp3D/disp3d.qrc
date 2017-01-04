@@ -1,16 +1,16 @@
 <RCC>
     <qresource prefix="/">
-        <file>model/common/shaders/gl3/light.inc.frag</file>
-        <file>model/common/shaders/gl3/networkEdge.frag</file>
-        <file>model/common/shaders/gl3/networkEdge.vert</file>
-        <file>model/common/shaders/gl3/pervertexphongalpha.frag</file>
-        <file>model/common/shaders/gl3/pervertexphongalpha.geom</file>
-        <file>model/common/shaders/gl3/pervertexphongalpha.tcs</file>
-        <file>model/common/shaders/gl3/pervertexphongalpha.vert</file>
-        <file>model/common/shaders/gl3/pervertexphongalpha_simple.tes</file>
-        <file>model/common/shaders/gl3/pervertexphongalpha_pn_triangles.tes</file>
-        <file>model/common/shaders/gl3/shownormals.frag</file>
-        <file>model/common/shaders/gl3/shownormals.geom</file>
-        <file>model/common/shaders/gl3/shownormals.vert</file>
+        <file>model/materials/shaders/gl3/light.inc.frag</file>
+        <file>model/materials/shaders/gl3/pervertexphongalpha.frag</file>
+        <file>model/materials/shaders/gl3/pervertexphongalpha.vert</file>
+        <file>model/materials/shaders/gl3/shownormals.frag</file>
+        <file>model/materials/shaders/gl3/shownormals.geom</file>
+        <file>model/materials/shaders/gl3/shownormals.vert</file>
+        <file>model/materials/shaders/gl3/tesselation.frag</file>
+        <file>model/materials/shaders/gl3/tesselation.geom</file>
+        <file>model/materials/shaders/gl3/tesselation.tcs</file>
+        <file>model/materials/shaders/gl3/tesselation.vert</file>
+        <file>model/materials/shaders/gl3/tesselation_pn_triangles.tes</file>
+        <file>model/materials/shaders/gl3/tesselation_simple.tes</file>
     </qresource>
 </RCC>

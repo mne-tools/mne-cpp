@@ -100,52 +100,60 @@ SOURCES += \
     model/data3Dtreemodel.cpp \
     model/data3Dtreedelegate.cpp \
     model/subject/subjecttreeitem.cpp \
-    model/common/metatreeitem.cpp \
-    model/brain/brainsurfacetreeitem.cpp \
     model/measurement/measurementtreeitem.cpp \
+    model/brain/brainsurfacetreeitem.cpp \
     model/brain/brainannotationtreeitem.cpp \
     model/brain/brainhemispheretreeitem.cpp \
+    model/brain/brainsourcespacetreeitem.cpp \
     model/sourceactivity/mneestimatetreeitem.cpp \
+    model/sourceactivity/ecddatatreeitem.cpp \
+    model/workers/rtSourceLoc/rtsourcelocdataworker.cpp \
     model/network/networktreeitem.cpp \
     model/bem/bemtreeitem.cpp \
     model/bem/bemsurfacetreeitem.cpp \
     model/digitizer/digitizertreeitem.cpp \
+    model/digitizer/digitizersettreeitem.cpp \
     model/common/abstracttreeitem.cpp \
     model/common/renderable3Dentity.cpp \
     model/common/custommesh.cpp \
-    model/brain/brainsourcespacetreeitem.cpp \
-    model/digitizer/digitizersettreeitem.cpp \
+    model/common/metatreeitem.cpp \
+    model/materials/pervertexphongalphamaterial.cpp \
+    model/materials/pervertextessphongalphamaterial.cpp \
+    model/materials/shadermaterial.cpp \
+    model/materials/shownormalsmaterial.cpp \
+    model/materials/networkmaterial.cpp \
     control/control3dwidget.cpp \
-    model/workers/rtSourceLoc/rtsourcelocdataworker.cpp \
-    model/common/shadermaterial.cpp \
-    model/sourceactivity/ecddatatreeitem.cpp \
 
 HEADERS += \
-    view3D.h \
+    view3D.cpp \
     model/data3Dtreemodel.h \
     model/data3Dtreedelegate.h \
     model/subject/subjecttreeitem.h \
-    model/common/metatreeitem.h \
-    model/brain/brainsurfacetreeitem.h \
     model/measurement/measurementtreeitem.h \
+    model/brain/brainsurfacetreeitem.h \
     model/brain/brainannotationtreeitem.h \
     model/brain/brainhemispheretreeitem.h \
+    model/brain/brainsourcespacetreeitem.h \
     model/sourceactivity/mneestimatetreeitem.h \
+    model/sourceactivity/ecddatatreeitem.h \
+    model/workers/rtSourceLoc/rtsourcelocdataworker.h \
     model/network/networktreeitem.h \
     model/bem/bemtreeitem.h \
     model/bem/bemsurfacetreeitem.h \
     model/digitizer/digitizertreeitem.h \
+    model/digitizer/digitizersettreeitem.h \
     model/common/abstracttreeitem.h \
     model/common/renderable3Dentity.h \
     model/common/custommesh.h \
+    model/common/metatreeitem.h \
     model/common/types.h \
-    model/brain/brainsourcespacetreeitem.h \
-    model/digitizer/digitizersettreeitem.h \
+    model/materials/pervertexphongalphamaterial.h \
+    model/materials/pervertextessphongalphamaterial.h \
+    model/materials/shadermaterial.h \
+    model/materials/shownormalsmaterial.h \
+    model/materials/networkmaterial.h \
     control/control3dwidget.h \
     disp3D_global.h \
-    model/workers/rtSourceLoc/rtsourcelocdataworker.h \
-    model/common/shadermaterial.h \
-    model/sourceactivity/ecddatatreeitem.h \
 
 FORMS += \
     control/control3dwidget.ui \
