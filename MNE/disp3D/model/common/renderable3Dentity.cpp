@@ -123,39 +123,35 @@ Renderable3DEntity::~Renderable3DEntity()
 
 //*************************************************************************************************************
 
-bool Renderable3DEntity::setVertColor(const QByteArray& tArrayColors)
+void Renderable3DEntity::setVertColor(const QByteArray& tArrayColors)
 {
-    return m_pCustomMesh->setVertColor(tArrayColors);
+    m_pCustomMesh->setVertColor(tArrayColors);
 }
 
 
 //*************************************************************************************************************
 
-bool Renderable3DEntity::setMeshData(const MatrixX3f& tMatVert,
+void Renderable3DEntity::setMeshData(const MatrixX3f& tMatVert,
                                      const MatrixX3f& tMatNorm,
                                      const MatrixXi& tMatTris,
                                      const QByteArray& tArrayColors,
                                      Qt3DRender::QGeometryRenderer::PrimitiveType primitiveType)
 {
     if(!m_pCustomMesh.isNull()) {
-        return m_pCustomMesh->setMeshData(tMatVert, tMatNorm, tMatTris, tArrayColors, primitiveType);
+        m_pCustomMesh->setMeshData(tMatVert, tMatNorm, tMatTris, tArrayColors, primitiveType);
     }
-
-    return false;
 }
 
 
 //*************************************************************************************************************
 
-bool Renderable3DEntity::setTransform(QSharedPointer<Qt3DCore::QTransform> pTransform)
+void Renderable3DEntity::setTransform(QSharedPointer<Qt3DCore::QTransform> pTransform)
 {
     if(!m_pTransform.isNull()) {
         this->removeComponent(m_pTransform);
         m_pTransform = pTransform.data();
         this->addComponent(m_pTransform);
     }
-
-    return true;
 }
 
 //*************************************************************************************************************
@@ -236,7 +232,7 @@ void Renderable3DEntity::setRotZ(float rotZ)
 
 void Renderable3DEntity::setMaterialParameter(float fValue, QString sParameterName)
 {
-    //Look for all materials and the corresponding parameters
+    //Look for all materials and set the corresponding parameters
     QComponentVector vComponents = this->components();
 
     for(int j = 0; j < vComponents.size(); ++j) {

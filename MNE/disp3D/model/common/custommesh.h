@@ -135,7 +135,7 @@ public:
     *
     * @param[in] tArrayColors     New color information for the vertices.
     */
-    bool setVertColor(const QByteArray& tArrayColors);
+    void setVertColor(const QByteArray& tArrayColors);
 
     //=========================================================================================================
     /**
@@ -147,10 +147,8 @@ public:
     * @param[in] tVecOffset     The offset which is to be used on all the vertices.
     * @param[in] tArrayColors   The color info of all the vertices.
     * @param[in] primitiveType  The primitive type of the mesh lines, triangles, etc.
-    *
-    * @return If successful returns true, false otherwise.
     */
-    bool setMeshData(const Eigen::MatrixX3f& tMatVert,
+    void setMeshData(const Eigen::MatrixX3f& tMatVert,
                      const Eigen::MatrixX3f& tMatNorm,
                      const Eigen::MatrixXi &tMatTris,
                      const QByteArray &tArrayColors = QByteArray(),
@@ -170,7 +168,7 @@ protected:
     *
     * @return If successful returns true, false otherwise.
     */
-    bool createCustomMesh(const Eigen::MatrixX3f& tMatVert,
+    void createCustomMesh(const Eigen::MatrixX3f& tMatVert,
                           const Eigen::MatrixX3f& tMatNorm,
                           const Eigen::MatrixXi &tMatTris,
                           const QByteArray& tArrayColors,

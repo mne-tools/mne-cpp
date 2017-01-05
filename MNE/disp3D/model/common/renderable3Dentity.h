@@ -144,7 +144,7 @@ public:
     *
     * @param[in] tArrayColors     New color information for the vertices.
     */
-    bool setVertColor(const QByteArray &tArrayColors);
+    void setVertColor(const QByteArray &tArrayColors);
 
     //=========================================================================================================
     /**
@@ -153,10 +153,8 @@ public:
     * @param[in] tMatVert       Vertices in form of a matrix.
     * @param[in] tMatNorm       Normals in form of a matrix.
     * @param[in] tMatTris       Tris/Faces in form of a matrix.
-    *
-    * @return If successful returns true, false otherwise.
     */
-    bool setMeshData(const Eigen::MatrixX3f& tMatVert,
+    void setMeshData(const Eigen::MatrixX3f& tMatVert,
                      const Eigen::MatrixX3f& tMatNorm,
                      const Eigen::MatrixXi &tMatTris,
                      const QByteArray &tArrayColors = QByteArray(),
@@ -167,10 +165,8 @@ public:
     * Sets the entity's transformation.
     *
     * @param[in] pTransform     The new entity's transform.
-    *
-    * @return If successful returns true, false otherwise.
     */
-    bool setTransform(QSharedPointer<Qt3DCore::QTransform> pTransform);
+    void setTransform(QSharedPointer<Qt3DCore::QTransform> pTransform);
 
     //=========================================================================================================
     /**
