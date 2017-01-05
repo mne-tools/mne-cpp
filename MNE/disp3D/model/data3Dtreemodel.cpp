@@ -183,10 +183,8 @@ QList<FsSurfaceTreeItem*> Data3DTreeModel::addSurfaceSet(const QString& subject,
         returnItemList = pMeasurementItem->addData(tSurfaceSet, tAnnotationSet, m_pModelEntity);
     } else {
         MeasurementTreeItem* pMeasurementItem = new MeasurementTreeItem(Data3DTreeModelItemTypes::MeasurementItem, set);
-
-        addItemWithDescription(pSubjectItem, pMeasurementItem);
-
         returnItemList = pMeasurementItem->addData(tSurfaceSet, tAnnotationSet, m_pModelEntity);
+        addItemWithDescription(pSubjectItem, pMeasurementItem);
     }
 
     return returnItemList;
@@ -210,10 +208,8 @@ FsSurfaceTreeItem* Data3DTreeModel::addSurface(const QString& subject, const QSt
         pReturnItem = pMeasurementItem->addData(tSurface, tAnnotation, m_pModelEntity);
     } else {
         MeasurementTreeItem* pMeasurementItem = new MeasurementTreeItem(Data3DTreeModelItemTypes::MeasurementItem, set);
-
-        addItemWithDescription(pReturnItem, pMeasurementItem);
-
         pReturnItem = pMeasurementItem->addData(tSurface, tAnnotation, m_pModelEntity);
+        addItemWithDescription(pSubjectItem, pMeasurementItem);
     }
 
     return pReturnItem;
@@ -237,10 +233,8 @@ SourceSpaceTreeItem* Data3DTreeModel::addSourceSpace(const QString& subject, con
         pReturnItem = pMeasurementItem->addData(tSourceSpace, m_pModelEntity);
     } else {
         MeasurementTreeItem* pMeasurementItem = new MeasurementTreeItem(Data3DTreeModelItemTypes::MeasurementItem, set);
-
-        this->addItemWithDescription(pReturnItem, pMeasurementItem);
-
         pReturnItem = pMeasurementItem->addData(tSourceSpace, m_pModelEntity);
+        addItemWithDescription(pSubjectItem, pMeasurementItem);
     }
 
     return pReturnItem;
@@ -299,10 +293,8 @@ EcdDataTreeItem* Data3DTreeModel::addDipoleFitData(const QString& subject, const
         }
     } else {
         MeasurementTreeItem* pMeasurementItem = new MeasurementTreeItem(Data3DTreeModelItemTypes::MeasurementItem, set);
-
-        addItemWithDescription(pSubjectItem, pMeasurementItem);
-
         pReturnItem = pMeasurementItem->addData(pECDSet, m_pModelEntity);
+        addItemWithDescription(pSubjectItem, pMeasurementItem);
     }
 
     return pReturnItem;
@@ -327,10 +319,8 @@ NetworkTreeItem* Data3DTreeModel::addConnectivityData(const QString& subject, co
         }
     } else {
         MeasurementTreeItem* pMeasurementItem = new MeasurementTreeItem(Data3DTreeModelItemTypes::MeasurementItem, set);
-
-        addItemWithDescription(pSubjectItem, pMeasurementItem);
-
         pReturnItem = pMeasurementItem->addData(pNetworkData, m_pModelEntity);
+        addItemWithDescription(pSubjectItem, pMeasurementItem);
     }
 
     return pReturnItem;
@@ -354,10 +344,8 @@ BemTreeItem* Data3DTreeModel::addBemData(const QString& subject, const QString& 
         pReturnItem->addData(tBem, m_pModelEntity);
     } else {
         pReturnItem = new BemTreeItem(Data3DTreeModelItemTypes::BemItem, set);
-
-        addItemWithDescription(pSubjectItem, pReturnItem);
-
         pReturnItem->addData(tBem, m_pModelEntity);
+        addItemWithDescription(pSubjectItem, pReturnItem);
     }
 
     return pReturnItem;
@@ -381,10 +369,8 @@ DigitizerSetTreeItem* Data3DTreeModel::addDigitizerData(const QString& subject, 
         pReturnItem = pMeasurementItem->addData(tDigitizer, m_pModelEntity);
     } else {
         MeasurementTreeItem* pMeasurementItem = new MeasurementTreeItem(Data3DTreeModelItemTypes::MeasurementItem, set);
-
-        addItemWithDescription(pSubjectItem, pMeasurementItem);
-
         pReturnItem = pMeasurementItem->addData(tDigitizer, m_pModelEntity);
+        addItemWithDescription(pSubjectItem, pMeasurementItem);
     }
 
     return pReturnItem;
