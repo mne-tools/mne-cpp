@@ -234,6 +234,16 @@ private:
     MneEstimateTreeItem*                m_pMneEstimateTreeItem;        /**< The rt source loc data item of this item. */
     NetworkTreeItem*                    m_pNetworkTreeItem;                     /**< The rt connectivity data item of this item. */
     EcdDataTreeItem*                    m_EcdDataTreeItem;                      /**< The rt dipole fit data item of this item. */
+
+signals:
+    //=========================================================================================================
+    /**
+    * emit this signal whenver the color info of the underlying hemisphere surfaes changed.
+    *
+    * @param[in] sourceColorSamples        Real tiem colors for both hemispheres.
+    */
+    void rtVertColorChanged(const QPair<QByteArray, QByteArray>& sourceColorSamples);
+
 };
 
 } //NAMESPACE DISP3DLIB
