@@ -368,17 +368,7 @@ void MeasurementTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
 
 void MeasurementTreeItem::onRtVertColorChanged(const QPair<QByteArray, QByteArray>& sourceColorSamples)
 {
-    QList<QStandardItem*> itemList = this->findChildren(Data3DTreeModelItemTypes::HemisphereItem);
-
-    for(int j = 0; j < itemList.size(); ++j) {
-        if(HemisphereTreeItem* pHemiItem = dynamic_cast<HemisphereTreeItem*>(itemList.at(j))) {
-            if(pHemiItem->data(Data3DTreeModelItemRoles::SurfaceHemi).toInt() == 0) {
-                pHemiItem->onRtVertColorChanged(sourceColorSamples.first);
-            } else if (pHemiItem->data(Data3DTreeModelItemRoles::SurfaceHemi).toInt() == 1) {
-                pHemiItem->onRtVertColorChanged(sourceColorSamples.second);
-            }
-        }
-    }
+    emit rtVertColorChanged(sourceColorSamples);
 }
 
 

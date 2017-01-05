@@ -281,6 +281,16 @@ MneEstimateTreeItem* Data3DTreeModel::addSourceData(const QString& subject, cons
         MeasurementTreeItem* pMeasurementItem = new MeasurementTreeItem(Data3DTreeModelItemTypes::MeasurementItem, set);
         addItemWithDescription(pSubjectItem, pMeasurementItem);
         pReturnItem = pMeasurementItem->addData(tSourceEstimate, tForwardSolution);
+
+        //Connect mri item with all measurement tree items in case the real tiem color changes (i.e. rt source loc)
+        QList<QStandardItem*> mriItemList = pSubjectItem->findChildren(Data3DTreeModelItemTypes::MriItem);
+
+        for(int i = 0; i < mriItemList.size(); ++i) {
+            if(MriTreeItem* pMriItem = dynamic_cast<MriTreeItem*>(mriItemList.at(i))) {
+                connect(pMeasurementItem, &MeasurementTreeItem::rtVertColorChanged,
+                    pMriItem, &MriTreeItem::onRtVertColorChanged);
+            }
+        }
     }
 
     return pReturnItem;

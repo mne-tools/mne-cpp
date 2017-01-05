@@ -157,6 +157,14 @@ public:
     */
     FsSurfaceTreeItem* addData(const FSLIB::Surface& tSurface, const FSLIB::Annotation& tAnnotation, Qt3DCore::QEntity* p3DEntityParent = 0);
 
+    //=========================================================================================================
+    /**
+    * Call this function whenever new colors for the activation data plotting are available.
+    *
+    * @param[in] sourceColorSamples     The color values for each estimated source for left and right hemisphere.
+    */
+    void onRtVertColorChanged(const QPair<QByteArray, QByteArray>& sourceColorSamples);
+
 private:
     //=========================================================================================================
     /**
