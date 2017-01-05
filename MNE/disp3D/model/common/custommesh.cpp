@@ -117,24 +117,22 @@ CustomMesh::~CustomMesh()
 
 //*************************************************************************************************************
 
-bool CustomMesh::setVertColor(const QByteArray& tArrayColors)
+void CustomMesh::setVertColor(const QByteArray& tArrayColors)
 {
     //Check dimensions
     if(tArrayColors.size() != m_iNumVert * 3 * (int)sizeof(float)) {
         qDebug() << "CustomMesh::updateVertColors - new color and vertices dimensions do not match or mesh data was not set yet!";
-        return false;
+        return;
     }
 
     //Update color
     m_pColorDataBuffer->setData(tArrayColors);
-
-    return true;
 }
 
 
 //*************************************************************************************************************
 
-bool CustomMesh::setMeshData(const MatrixX3f& tMatVert,
+void CustomMesh::setMeshData(const MatrixX3f& tMatVert,
                              const MatrixX3f& tMatNorm,
                              const MatrixXi& tMatTris,
                              const QByteArray& tArrayColors,
@@ -142,12 +140,12 @@ bool CustomMesh::setMeshData(const MatrixX3f& tMatVert,
 {
     m_iNumVert = tMatVert.rows();
 
-    return createCustomMesh(tMatVert, tMatNorm, tMatTris, tArrayColors, primitiveType);
+    this->createCustomMesh(tMatVert, tMatNorm, tMatTris, tArrayColors, primitiveType);
 }
 
 //*************************************************************************************************************
 
-bool CustomMesh::createCustomMesh(const MatrixX3f& tMatVert,
+void CustomMesh::createCustomMesh(const MatrixX3f& tMatVert,
                                   const MatrixX3f& tMatNorm,
                                   const MatrixXi& tMatTris,
                                   const QByteArray& tArrayColors,
@@ -288,8 +286,5 @@ bool CustomMesh::createCustomMesh(const MatrixX3f& tMatVert,
 //    //this->setFirstVertex(0);
 //    this->setFirstInstance(0);
 
-
     this->setVertexCount(tMatTris.rows()*3);
-
-    return true;
 }
