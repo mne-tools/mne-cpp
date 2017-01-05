@@ -174,38 +174,6 @@ public:
 
     //=========================================================================================================
     /**
-    * Sets the entity's alpha value.
-    *
-    * @param[in] fAlpha     The new alpha value.
-    */
-    void setAlpha(float fAlpha);
-
-    //=========================================================================================================
-    /**
-    * Sets the entity's inner tesselation value.
-    *
-    * @param[in] fTessInner     The new inner tesselation value.
-    */
-    void setTessInner(float fTessInner);
-
-    //=========================================================================================================
-    /**
-    * Sets the entity's outer tesselation value.
-    *
-    * @param[in] fTessOuter     The new outer tesselation value.
-    */
-    void setTessOuter(float fTessOuter);
-
-    //=========================================================================================================
-    /**
-    * Sets the entity's triangle scale value.
-    *
-    * @param[in] fTriangleScale     The triangle scale value.
-    */
-    void setTriangleScale(float fTriangleScale);
-
-    //=========================================================================================================
-    /**
     * Returns the current rotation around the x-axis.
     *
     * @return The x-axis rotation value.
@@ -268,25 +236,6 @@ public:
     */
     void setPosition(QVector3D position);
 
-protected: 
-    QPointer<CustomMesh>                        m_pCustomMesh;           /**< The actual mesh information (vertices, normals, colors). */
-    QPointer<Qt3DCore::QTransform>              m_pTransform;            /**< The main transformation. */
-
-    float                                       m_fRotX;                 /**< The x axis rotation value. */
-    float                                       m_fRotY;                 /**< The y axis rotation value. */
-    float                                       m_fRotZ;                 /**< The z axis rotation value. */
-    QVector3D                                   m_position;              /**< The position/translation value. */
-    float                                       m_fAlpha;                /**< The alpha value. */
-    float                                       m_fTessInner;            /**< The inner tesselation value. */
-    float                                       m_fTessOuter;            /**< The outer tesselation value. */
-    float                                       m_fTriangleScale;        /**< The triangle scale value. */
-
-    //=========================================================================================================
-    /**
-    * Update the set transformation with the currently set translation and rotation values.
-    */
-    void updateTransform();
-
     //=========================================================================================================
     /**
     * Sets the value of a specific paramater of the materials for this entity.
@@ -295,6 +244,21 @@ protected:
     * @param[in] sParameterName     The name of the parameter to be set.
     */
     void setMaterialParameter(float fValue, QString sParameterName);
+
+protected: 
+    QPointer<CustomMesh>                        m_pCustomMesh;           /**< The actual mesh information (vertices, normals, colors). */
+    QPointer<Qt3DCore::QTransform>              m_pTransform;            /**< The main transformation. */
+
+    float                                       m_fRotX;                 /**< The x axis rotation value. */
+    float                                       m_fRotY;                 /**< The y axis rotation value. */
+    float                                       m_fRotZ;                 /**< The z axis rotation value. */
+    QVector3D                                   m_position;              /**< The position/translation value. */
+
+    //=========================================================================================================
+    /**
+    * Update the set transformation with the currently set translation and rotation values.
+    */
+    void updateTransform();
 
 signals:
     //=========================================================================================================

@@ -232,7 +232,7 @@ void BemSurfaceTreeItem::setVisible(bool state)
 
 void BemSurfaceTreeItem::onSurfaceAlphaChanged(float fAlpha)
 {
-    m_pRenderable3DEntity->setAlpha(fAlpha);
+    m_pRenderable3DEntity->setMaterialParameter(fAlpha, "alpha");
 }
 
 

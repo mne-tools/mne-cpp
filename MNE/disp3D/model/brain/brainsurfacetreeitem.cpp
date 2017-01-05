@@ -418,7 +418,7 @@ void BrainSurfaceTreeItem::onColorInfoOriginOrCurvColorChanged()
 
 void BrainSurfaceTreeItem::onSurfaceAlphaChanged(float fAlpha)
 {
-    m_pRenderable3DEntity->setAlpha(fAlpha);
+    m_pRenderable3DEntity->setMaterialParameter(fAlpha, "alpha");
 }
 
 
@@ -426,7 +426,7 @@ void BrainSurfaceTreeItem::onSurfaceAlphaChanged(float fAlpha)
 
 void BrainSurfaceTreeItem::onSurfaceTessInnerChanged(float fTessInner)
 {
-    m_pRenderable3DEntity->setTessInner(fTessInner);
+    m_pRenderable3DEntity->setMaterialParameter(fTessInner, "innerTess");
 }
 
 
@@ -434,7 +434,7 @@ void BrainSurfaceTreeItem::onSurfaceTessInnerChanged(float fTessInner)
 
 void BrainSurfaceTreeItem::onSurfaceTessOuterChanged(float fTessOuter)
 {
-    m_pRenderable3DEntity->setTessOuter(fTessOuter);
+    m_pRenderable3DEntity->setMaterialParameter(fTessOuter, "outerTess");
 }
 
 
@@ -442,7 +442,7 @@ void BrainSurfaceTreeItem::onSurfaceTessOuterChanged(float fTessOuter)
 
 void BrainSurfaceTreeItem::onSurfaceTriangleScaleChanged(float fTriangleScale)
 {
-    m_pRenderable3DEntity->setTriangleScale(fTriangleScale);
+    m_pRenderable3DEntity->setMaterialParameter(fTriangleScale, "triangleScale");
 }
 
 
