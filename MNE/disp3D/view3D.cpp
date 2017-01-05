@@ -126,7 +126,7 @@ void View3D::init()
     Qt3DExtras::QFirstPersonCameraController *camController = new Qt3DExtras::QFirstPersonCameraController(m_pRootEntity);
     camController->setCamera(m_pCameraEntity);
 
-    this->defaultFramegraph()->setClearColor(QColor::fromRgbF(0.0, 0.0, 0.0, 0.5));
+    this->defaultFrameGraph()->setClearColor(QColor::fromRgbF(0.0, 0.0, 0.0, 0.5));
 
     //Init the transforms
     initTransformations();
@@ -217,7 +217,7 @@ void View3D::setModel(Data3DTreeModel::SPtr pModel)
 
 void View3D::setSceneColor(const QColor& colSceneColor)
 {
-    this->defaultFramegraph()->setClearColor(colSceneColor);
+    this->defaultFrameGraph()->setClearColor(colSceneColor);
 }
 
 

@@ -82,7 +82,6 @@ else {
 }
 
 SOURCES += fiff.cpp \
-#    fiff_parser.cpp \
     fiff_tag.cpp \
     fiff_dir_tree.cpp \
     fiff_coord_trans.cpp \
@@ -127,7 +126,7 @@ HEADERS += fiff.h \
     fiff_stream.h \
     fiff_info_base.h \
     fiff_evoked.h \
-    fiff_evoked_set.h \ \
+    fiff_evoked_set.h \
     fiff_io.h \
     fiff_dig_point_set.h
 
