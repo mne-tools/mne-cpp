@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     brainannotationtreeitem.cpp
+* @file     fsannotationtreeitem.cpp
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    BrainAnnotationTreeItem class definition.
+* @brief    FsAnnotationTreeItem class definition.
 *
 */
 
@@ -38,7 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "brainannotationtreeitem.h"
+#include "fsannotationtreeitem.h"
 #include "../common/metatreeitem.h"
 
 #include <fs/label.h>
@@ -79,26 +79,26 @@ using namespace FSLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-BrainAnnotationTreeItem::BrainAnnotationTreeItem(int iType, const QString & text)
+FsAnnotationTreeItem::FsAnnotationTreeItem(int iType, const QString & text)
 : AbstractTreeItem(iType, text)
 {
     this->setEditable(false);
     this->setCheckable(true);
     this->setCheckState(Qt::Unchecked);
-    this->setToolTip("Brain annotation item");
+    this->setToolTip("Freesurfer annotation item");
 }
 
 
 //*************************************************************************************************************
 
-BrainAnnotationTreeItem::~BrainAnnotationTreeItem()
+FsAnnotationTreeItem::~FsAnnotationTreeItem()
 {
 }
 
 
 //*************************************************************************************************************
 
-QVariant BrainAnnotationTreeItem::data(int role) const
+QVariant FsAnnotationTreeItem::data(int role) const
 {
     return AbstractTreeItem::data(role);
 }
@@ -106,7 +106,7 @@ QVariant BrainAnnotationTreeItem::data(int role) const
 
 //*************************************************************************************************************
 
-void  BrainAnnotationTreeItem::setData(const QVariant& value, int role)
+void  FsAnnotationTreeItem::setData(const QVariant& value, int role)
 {
     AbstractTreeItem::setData(value, role);
 }
@@ -114,7 +114,7 @@ void  BrainAnnotationTreeItem::setData(const QVariant& value, int role)
 
 //*************************************************************************************************************
 
-void BrainAnnotationTreeItem::addData(const Surface& tSurface, const Annotation& tAnnotation)
+void FsAnnotationTreeItem::addData(const Surface& tSurface, const Annotation& tAnnotation)
 {
     //Create color from annotation data if annotation is not empty
     if(!tAnnotation.isEmpty()) {
@@ -143,7 +143,7 @@ void BrainAnnotationTreeItem::addData(const Surface& tSurface, const Annotation&
             }
         }
 
-        //Add data which is held by this BrainAnnotationTreeItem
+        //Add data which is held by this FsAnnotationTreeItem
         QVariant data;
         data.setValue(arrayColorsAnnot);
         this->setData(data, Data3DTreeModelItemRoles::AnnotColors);
@@ -179,7 +179,7 @@ void BrainAnnotationTreeItem::addData(const Surface& tSurface, const Annotation&
 
 //*************************************************************************************************************
 
-void BrainAnnotationTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
+void FsAnnotationTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
 {
     emit annotationVisibiltyChanged(checkState==Qt::Unchecked ? false : true);
 }

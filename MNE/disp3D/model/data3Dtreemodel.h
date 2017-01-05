@@ -110,8 +110,8 @@ namespace DISP3DLIB
 class MneEstimateTreeItem;
 class NetworkTreeItem;
 class EcdDataTreeItem;
-class BrainSurfaceTreeItem;
-class BrainSourceSpaceTreeItem;
+class FsSurfaceTreeItem;
+class SourceSpaceTreeItem;
 class BemTreeItem;
 class DigitizerSetTreeItem;
 class SubjectTreeItem;
@@ -167,7 +167,7 @@ public:
     *                               of the list hereby corresponds to the ordering of the input surface set.
     *                               The list is empty if no item was added.
     */
-    QList<BrainSurfaceTreeItem*> addSurfaceSet(const QString& subject, const QString& set, const FSLIB::SurfaceSet& tSurfaceSet, const FSLIB::AnnotationSet& tAnnotationSet = FSLIB::AnnotationSet());
+    QList<FsSurfaceTreeItem*> addSurfaceSet(const QString& subject, const QString& set, const FSLIB::SurfaceSet& tSurfaceSet, const FSLIB::AnnotationSet& tAnnotationSet = FSLIB::AnnotationSet());
 
     //=========================================================================================================
     /**
@@ -180,7 +180,7 @@ public:
     *
     * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
-    BrainSurfaceTreeItem* addSurface(const QString& subject, const QString& set, const FSLIB::Surface& tSurface, const FSLIB::Annotation& tAnnotation = FSLIB::Annotation());
+    FsSurfaceTreeItem* addSurface(const QString& subject, const QString& set, const FSLIB::Surface& tSurface, const FSLIB::Annotation& tAnnotation = FSLIB::Annotation());
 
     //=========================================================================================================
     /**
@@ -192,7 +192,7 @@ public:
     *
     * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
-    BrainSourceSpaceTreeItem* addSourceSpace(const QString& subject, const QString& set, const MNELIB::MNESourceSpace& tSourceSpace);
+    SourceSpaceTreeItem* addSourceSpace(const QString& subject, const QString& set, const MNELIB::MNESourceSpace& tSourceSpace);
 
     //=========================================================================================================
     /**
@@ -204,7 +204,7 @@ public:
     *
     * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
-    BrainSourceSpaceTreeItem* addForwardSolution(const QString& subject, const QString& set, const MNELIB::MNEForwardSolution& tForwardSolution);
+    SourceSpaceTreeItem* addForwardSolution(const QString& subject, const QString& set, const MNELIB::MNEForwardSolution& tForwardSolution);
 
     //=========================================================================================================
     /**

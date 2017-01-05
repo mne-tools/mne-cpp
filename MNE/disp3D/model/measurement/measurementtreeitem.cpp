@@ -39,12 +39,12 @@
 //=============================================================================================================
 
 #include "measurementtreeitem.h"
-#include "../brain/brainhemispheretreeitem.h"
-#include "../brain/brainsourcespacetreeitem.h"
+#include "../hemisphere/hemispheretreeitem.h"
+#include "../sourcespace/sourcespacetreeitem.h"
 #include "../sourceactivity/mneestimatetreeitem.h"
 #include "../network/networktreeitem.h"
-#include "../brain/brainsurfacetreeitem.h"
-#include "../brain/brainannotationtreeitem.h"
+#include "../freesurfer/fssurfacetreeitem.h"
+#include "../freesurfer/fsannotationtreeitem.h"
 #include "../digitizer/digitizersettreeitem.h"
 #include "../digitizer/digitizertreeitem.h"
 #include "../sourceactivity/ecddatatreeitem.h"
@@ -142,11 +142,11 @@ void  MeasurementTreeItem::setData(const QVariant& value, int role)
 
 //*************************************************************************************************************
 
-QList<BrainSurfaceTreeItem*> MeasurementTreeItem::addData(const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet, Qt3DCore::QEntity* p3DEntityParent)
+QList<FsSurfaceTreeItem*> MeasurementTreeItem::addData(const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet, Qt3DCore::QEntity* p3DEntityParent)
 {
     //Generate child items based on surface set input parameters
     QList<QStandardItem*> itemList = this->findChildren(Data3DTreeModelItemTypes::HemisphereItem);
-    QList<BrainSurfaceTreeItem*> returnItemList;
+    QList<FsSurfaceTreeItem*> returnItemList;
 
     //If there are more hemispheres in tSourceSpace than in the tree model
     bool hemiItemFound = false;
@@ -154,7 +154,7 @@ QList<BrainSurfaceTreeItem*> MeasurementTreeItem::addData(const SurfaceSet& tSur
     //Search for already created hemi items and add source space data respectivley
     for(int i = 0; i < tSurfaceSet.size(); ++i) {
         for(int j = 0; j < itemList.size(); ++j) {
-            if(BrainHemisphereTreeItem* pHemiItem = dynamic_cast<BrainHemisphereTreeItem*>(itemList.at(j))) {
+            if(HemisphereTreeItem* pHemiItem = dynamic_cast<HemisphereTreeItem*>(itemList.at(j))) {
                 if(pHemiItem->data(Data3DTreeModelItemRoles::SurfaceHemi).toInt() == tSurfaceSet[i].hemi()) {
                     hemiItemFound = true;
 
@@ -173,7 +173,7 @@ QList<BrainSurfaceTreeItem*> MeasurementTreeItem::addData(const SurfaceSet& tSur
 
         if(!hemiItemFound) {
             //Item does not exist yet, create it here.
-            BrainHemisphereTreeItem* pHemiItem = new BrainHemisphereTreeItem(Data3DTreeModelItemTypes::HemisphereItem);            
+            HemisphereTreeItem* pHemiItem = new HemisphereTreeItem(Data3DTreeModelItemTypes::HemisphereItem);
 
             QList<QStandardItem*> list;
             list << pHemiItem;
@@ -190,7 +190,7 @@ QList<BrainSurfaceTreeItem*> MeasurementTreeItem::addData(const SurfaceSet& tSur
                 returnItemList.append(pHemiItem->addData(tSurfaceSet[i], Annotation(), p3DEntityParent));
             }
 
-            connect(pHemiItem->getSurfaceItem(), &BrainSurfaceTreeItem::colorInfoOriginChanged,
+            connect(pHemiItem->getSurfaceItem(), &FsSurfaceTreeItem::colorInfoOriginChanged,
                 this, &MeasurementTreeItem::onColorInfoOriginChanged);
         }
 
@@ -203,10 +203,10 @@ QList<BrainSurfaceTreeItem*> MeasurementTreeItem::addData(const SurfaceSet& tSur
 
 //*************************************************************************************************************
 
-BrainSurfaceTreeItem* MeasurementTreeItem::addData(const Surface& tSurface, const Annotation& tAnnotation, Qt3DCore::QEntity* p3DEntityParent)
+FsSurfaceTreeItem* MeasurementTreeItem::addData(const Surface& tSurface, const Annotation& tAnnotation, Qt3DCore::QEntity* p3DEntityParent)
 {
     //Generate child items based on surface set input parameters
-    BrainSurfaceTreeItem* pReturnItem = Q_NULLPTR;
+    FsSurfaceTreeItem* pReturnItem = Q_NULLPTR;
 
     QList<QStandardItem*> itemList = this->findChildren(Data3DTreeModelItemTypes::HemisphereItem);
 
@@ -214,7 +214,7 @@ BrainSurfaceTreeItem* MeasurementTreeItem::addData(const Surface& tSurface, cons
 
     //Search for already created hemi items and add data respectivley
     for(int j = 0; j < itemList.size(); ++j) {
-        if(BrainHemisphereTreeItem* pHemiItem = dynamic_cast<BrainHemisphereTreeItem*>(itemList.at(j))) {
+        if(HemisphereTreeItem* pHemiItem = dynamic_cast<HemisphereTreeItem*>(itemList.at(j))) {
             if(pHemiItem->data(Data3DTreeModelItemRoles::SurfaceHemi).toInt() == tSurface.hemi()) {
                 hemiItemFound = true;
 
@@ -229,7 +229,7 @@ BrainSurfaceTreeItem* MeasurementTreeItem::addData(const Surface& tSurface, cons
 
     if(!hemiItemFound) {
         //Item does not exist yet, create it here.
-        BrainHemisphereTreeItem* pHemiItem = new BrainHemisphereTreeItem(Data3DTreeModelItemTypes::HemisphereItem);
+        HemisphereTreeItem* pHemiItem = new HemisphereTreeItem(Data3DTreeModelItemTypes::HemisphereItem);
 
         if(tAnnotation.hemi() == tSurface.hemi()) {
             pReturnItem = pHemiItem->addData(tSurface, tAnnotation, p3DEntityParent);
@@ -242,7 +242,7 @@ BrainSurfaceTreeItem* MeasurementTreeItem::addData(const Surface& tSurface, cons
         list << new QStandardItem(pHemiItem->toolTip());
         this->appendRow(list);
 
-        connect(pHemiItem->getSurfaceItem(), &BrainSurfaceTreeItem::colorInfoOriginChanged,
+        connect(pHemiItem->getSurfaceItem(), &FsSurfaceTreeItem::colorInfoOriginChanged,
             this, &MeasurementTreeItem::onColorInfoOriginChanged);
     }
 
@@ -252,10 +252,10 @@ BrainSurfaceTreeItem* MeasurementTreeItem::addData(const Surface& tSurface, cons
 
 //*************************************************************************************************************
 
-BrainSourceSpaceTreeItem* MeasurementTreeItem::addData(const MNESourceSpace& tSourceSpace, Qt3DCore::QEntity* p3DEntityParent)
+SourceSpaceTreeItem* MeasurementTreeItem::addData(const MNESourceSpace& tSourceSpace, Qt3DCore::QEntity* p3DEntityParent)
 {
     //Generate child items based on surface set input parameters
-    BrainSourceSpaceTreeItem* pReturnItem = Q_NULLPTR;
+    SourceSpaceTreeItem* pReturnItem = Q_NULLPTR;
 
     QList<QStandardItem*> itemList = this->findChildren(Data3DTreeModelItemTypes::HemisphereItem);
 
@@ -265,7 +265,7 @@ BrainSourceSpaceTreeItem* MeasurementTreeItem::addData(const MNESourceSpace& tSo
     //Search for already created hemi items and add source space data respectivley
     for(int i = 0; i < tSourceSpace.size(); ++i) {
         for(int j = 0; j < itemList.size(); ++j) {
-            if(BrainHemisphereTreeItem* pHemiItem = dynamic_cast<BrainHemisphereTreeItem*>(itemList.at(j))) {
+            if(HemisphereTreeItem* pHemiItem = dynamic_cast<HemisphereTreeItem*>(itemList.at(j))) {
                 if(pHemiItem->data(Data3DTreeModelItemRoles::SurfaceHemi).toInt() == i) {
                     hemiItemFound = true;
                     pReturnItem = pHemiItem->addData(tSourceSpace[i], p3DEntityParent);
@@ -275,7 +275,7 @@ BrainSourceSpaceTreeItem* MeasurementTreeItem::addData(const MNESourceSpace& tSo
 
         if(!hemiItemFound) {
             //Item does not exist yet, create it here.
-            BrainHemisphereTreeItem* pHemiItem = new BrainHemisphereTreeItem(Data3DTreeModelItemTypes::HemisphereItem);
+            HemisphereTreeItem* pHemiItem = new HemisphereTreeItem(Data3DTreeModelItemTypes::HemisphereItem);
 
             pReturnItem = pHemiItem->addData(tSourceSpace[i], p3DEntityParent);
 
@@ -314,13 +314,13 @@ MneEstimateTreeItem* MeasurementTreeItem::addData(const MNESourceEstimate& tSour
                 //Divide into left right hemi
                 QList<QStandardItem*> itemList = this->findChildren(Data3DTreeModelItemTypes::HemisphereItem);
 
-                BrainSurfaceTreeItem* pSurfaceTreeItemLeft = Q_NULLPTR;
-                BrainSurfaceTreeItem* pSurfaceTreeItemRight = Q_NULLPTR;
-                BrainAnnotationTreeItem* pAnnotTreeItemLeft = Q_NULLPTR;
-                BrainAnnotationTreeItem* pAnnotTreeItemRight = Q_NULLPTR;
+                FsSurfaceTreeItem* pSurfaceTreeItemLeft = Q_NULLPTR;
+                FsSurfaceTreeItem* pSurfaceTreeItemRight = Q_NULLPTR;
+                FsAnnotationTreeItem* pAnnotTreeItemLeft = Q_NULLPTR;
+                FsAnnotationTreeItem* pAnnotTreeItemRight = Q_NULLPTR;
 
                 for(int j = 0; j < itemList.size(); ++j) {
-                    if(BrainHemisphereTreeItem* pHemiItem = dynamic_cast<BrainHemisphereTreeItem*>(itemList.at(j))) {
+                    if(HemisphereTreeItem* pHemiItem = dynamic_cast<HemisphereTreeItem*>(itemList.at(j))) {
                         if(pHemiItem->data(Data3DTreeModelItemRoles::SurfaceHemi).toInt() == 0) {
                             pSurfaceTreeItemLeft = pHemiItem->getSurfaceItem();
                             pAnnotTreeItemLeft = pHemiItem->getAnnotItem();
@@ -466,7 +466,7 @@ void MeasurementTreeItem::onRtVertColorChanged(const QPair<QByteArray, QByteArra
     QList<QStandardItem*> itemList = this->findChildren(Data3DTreeModelItemTypes::HemisphereItem);
 
     for(int j = 0; j < itemList.size(); ++j) {
-        if(BrainHemisphereTreeItem* pHemiItem = dynamic_cast<BrainHemisphereTreeItem*>(itemList.at(j))) {
+        if(HemisphereTreeItem* pHemiItem = dynamic_cast<HemisphereTreeItem*>(itemList.at(j))) {
             if(pHemiItem->data(Data3DTreeModelItemRoles::SurfaceHemi).toInt() == 0) {
                 pHemiItem->onRtVertColorChanged(sourceColorSamples.first);
             } else if (pHemiItem->data(Data3DTreeModelItemRoles::SurfaceHemi).toInt() == 1) {
@@ -483,11 +483,11 @@ void MeasurementTreeItem::onColorInfoOriginChanged()
 {
     QList<QStandardItem*> itemList = this->findChildren(Data3DTreeModelItemTypes::HemisphereItem);
 
-    BrainSurfaceTreeItem* pSurfaceTreeItemLeft = Q_NULLPTR;
-    BrainSurfaceTreeItem* pSurfaceTreeItemRight = Q_NULLPTR;
+    FsSurfaceTreeItem* pSurfaceTreeItemLeft = Q_NULLPTR;
+    FsSurfaceTreeItem* pSurfaceTreeItemRight = Q_NULLPTR;
 
     for(int j = 0; j < itemList.size(); ++j) {
-        if(BrainHemisphereTreeItem* pHemiItem = dynamic_cast<BrainHemisphereTreeItem*>(itemList.at(j))) {
+        if(HemisphereTreeItem* pHemiItem = dynamic_cast<HemisphereTreeItem*>(itemList.at(j))) {
             if(pHemiItem->data(Data3DTreeModelItemRoles::SurfaceHemi).toInt() == 0) {
                 pSurfaceTreeItemLeft = pHemiItem->getSurfaceItem();
             } else if(pHemiItem->data(Data3DTreeModelItemRoles::SurfaceHemi).toInt() == 1) {

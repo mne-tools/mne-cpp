@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     brainsurfacetreeitem.h
+* @file     fssurfacetreeitem.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     BrainSurfaceTreeItem class declaration.
+* @brief     FsSurfaceTreeItem class declaration.
 *
 */
 
-#ifndef BRAINSURFACETREEITEM_H
-#define BRAINSURFACETREEITEM_H
+#ifndef FSSURFACETREEITEM_H
+#define FSSURFACETREEITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -90,17 +90,17 @@ class Renderable3DEntity;
 
 //=============================================================================================================
 /**
-* BrainSurfaceTreeItem provides a generic brain tree item to hold of brain data (hemi, vertices, tris, etc.) from different sources (FreeSurfer, etc.).
+* FsSurfaceTreeItem provides a generic brain tree item to hold of brain data (hemi, vertices, tris, etc.) from different sources (FreeSurfer, etc.).
 *
 * @brief Provides a generic brain tree item.
 */
-class DISP3DNEWSHARED_EXPORT BrainSurfaceTreeItem : public AbstractTreeItem
+class DISP3DNEWSHARED_EXPORT FsSurfaceTreeItem : public AbstractTreeItem
 {
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<BrainSurfaceTreeItem> SPtr;             /**< Shared pointer type for BrainSurfaceTreeItem class. */
-    typedef QSharedPointer<const BrainSurfaceTreeItem> ConstSPtr;  /**< Const shared pointer type for BrainSurfaceTreeItem class. */
+    typedef QSharedPointer<FsSurfaceTreeItem> SPtr;             /**< Shared pointer type for FsSurfaceTreeItem class. */
+    typedef QSharedPointer<const FsSurfaceTreeItem> ConstSPtr;  /**< Const shared pointer type for FsSurfaceTreeItem class. */
 
     //=========================================================================================================
     /**
@@ -109,13 +109,13 @@ public:
     * @param[in] iType      The type of the item. See types.h for declaration and definition.
     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
     */
-    explicit BrainSurfaceTreeItem(int iType = Data3DTreeModelItemTypes::SurfaceItem, const QString& text = "Surface");
+    explicit FsSurfaceTreeItem(int iType = Data3DTreeModelItemTypes::SurfaceItem, const QString& text = "Surface");
 
     //=========================================================================================================
     /**
     * Default destructor
     */
-    ~BrainSurfaceTreeItem();
+    ~FsSurfaceTreeItem();
 
     //=========================================================================================================
     /**
@@ -256,4 +256,4 @@ signals:
 
 } //NAMESPACE DISP3DLIB
 
-#endif // BRAINSURFACETREEITEM_H
+#endif // FSSURFACETREEITEM_H

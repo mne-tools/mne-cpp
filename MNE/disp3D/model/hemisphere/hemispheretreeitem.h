@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     brainhemispheretreeitem.h
+* @file     hemispheretreeitem.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     BrainHemisphereTreeItem class declaration.
+* @brief     HemisphereTreeItem class declaration.
 *
 */
 
-#ifndef BRAINHEMISPHERETREEITEM_H
-#define BRAINHEMISPHERETREEITEM_H
+#ifndef HEMISPHERETREEITEM_H
+#define HEMISPHERETREEITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -93,24 +93,24 @@ namespace DISP3DLIB
 //=============================================================================================================
 
 class MneEstimateTreeItem;
-class BrainSurfaceTreeItem;
-class BrainAnnotationTreeItem;
-class BrainSourceSpaceTreeItem;
+class FsSurfaceTreeItem;
+class FsAnnotationTreeItem;
+class SourceSpaceTreeItem;
 
 
 //=============================================================================================================
 /**
-* BrainHemisphereTreeItem provides a generic brain tree item to hold of brain data (hemi, vertices, tris, etc.) from different sources (FreeSurfer, etc.).
+* HemisphereTreeItem provides a generic brain tree item to hold of brain data (hemi, vertices, tris, etc.) from different sources (FreeSurfer, etc.).
 *
 * @brief Provides a generic brain tree item.
 */
-class DISP3DNEWSHARED_EXPORT BrainHemisphereTreeItem : public AbstractTreeItem
+class DISP3DNEWSHARED_EXPORT HemisphereTreeItem : public AbstractTreeItem
 {
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<BrainHemisphereTreeItem> SPtr;             /**< Shared pointer type for BrainHemisphereTreeItem class. */
-    typedef QSharedPointer<const BrainHemisphereTreeItem> ConstSPtr;  /**< Const shared pointer type for BrainHemisphereTreeItem class. */
+    typedef QSharedPointer<HemisphereTreeItem> SPtr;             /**< Shared pointer type for HemisphereTreeItem class. */
+    typedef QSharedPointer<const HemisphereTreeItem> ConstSPtr;  /**< Const shared pointer type for HemisphereTreeItem class. */
 
     //=========================================================================================================
     /**
@@ -119,13 +119,13 @@ public:
     * @param[in] iType      The type of the item. See types.h for declaration and definition.
     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
     */
-    explicit BrainHemisphereTreeItem(int iType = Data3DTreeModelItemTypes::HemisphereItem, const QString& text = "Unknown");
+    explicit HemisphereTreeItem(int iType = Data3DTreeModelItemTypes::HemisphereItem, const QString& text = "Unknown");
 
     //=========================================================================================================
     /**
     * Default destructor
     */
-    ~BrainHemisphereTreeItem();
+    ~HemisphereTreeItem();
 
     //=========================================================================================================
     /**
@@ -145,7 +145,7 @@ public:
     *
     * @return                       Returns a pointer to the added tree item.
     */
-    BrainSurfaceTreeItem* addData(const FSLIB::Surface& tSurface, const FSLIB::Annotation& tAnnotation, Qt3DCore::QEntity* p3DEntityParent = 0);
+    FsSurfaceTreeItem* addData(const FSLIB::Surface& tSurface, const FSLIB::Annotation& tAnnotation, Qt3DCore::QEntity* p3DEntityParent = 0);
 
     //=========================================================================================================
     /**
@@ -156,7 +156,7 @@ public:
     *
     * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
-    BrainSourceSpaceTreeItem* addData(const MNELIB::MNEHemisphere& tHemisphere, Qt3DCore::QEntity* p3DEntityParent = 0);
+    SourceSpaceTreeItem* addData(const MNELIB::MNEHemisphere& tHemisphere, Qt3DCore::QEntity* p3DEntityParent = 0);
 
     //=========================================================================================================
     /**
@@ -172,7 +172,7 @@ public:
     *
     * @return The current surface tree item.
     */
-    BrainSurfaceTreeItem* getSurfaceItem();
+    FsSurfaceTreeItem* getSurfaceItem();
 
     //=========================================================================================================
     /**
@@ -180,7 +180,7 @@ public:
     *
     * @return The current annotation tree item.
     */
-    BrainAnnotationTreeItem* getAnnotItem();
+    FsAnnotationTreeItem* getAnnotItem();
 
 private:
     //=========================================================================================================
@@ -191,10 +191,10 @@ private:
     */
     virtual void onCheckStateChanged(const Qt::CheckState& checkState);
 
-    BrainSurfaceTreeItem*           m_pSurfaceItem;                     /**< The surface item of this hemisphere item. Only one surface item may exists under a hemisphere item. */
-    BrainAnnotationTreeItem*        m_pAnnotItem;                       /**< The annotation item of this hemisphere item. Only one annotation item may exists under a hemisphere item. */
+    FsSurfaceTreeItem*           m_pSurfaceItem;                     /**< The surface item of this hemisphere item. Only one surface item may exists under a hemisphere item. */
+    FsAnnotationTreeItem*        m_pAnnotItem;                       /**< The annotation item of this hemisphere item. Only one annotation item may exists under a hemisphere item. */
 };
 
 } //NAMESPACE DISP3DLIB
 
-#endif // BRAINHEMISPHERETREEITEM_H
+#endif // HEMISPHERETREEITEM_H

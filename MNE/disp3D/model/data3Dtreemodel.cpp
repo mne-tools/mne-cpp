@@ -41,8 +41,8 @@
 #include "data3Dtreemodel.h"
 #include "bem/bemtreeitem.h"
 #include "subject/subjecttreeitem.h"
-#include "brain/brainsurfacetreeitem.h"
-#include "brain/brainsourcespacetreeitem.h"
+#include "freesurfer/fssurfacetreeitem.h"
+#include "sourcespace/sourcespacetreeitem.h"
 #include "measurement/measurementtreeitem.h"
 #include "digitizer/digitizertreeitem.h"
 #include "common/renderable3Dentity.h"
@@ -168,9 +168,9 @@ Qt::ItemFlags Data3DTreeModel::flags(const QModelIndex &index) const
 
 //*************************************************************************************************************
 
-QList<BrainSurfaceTreeItem*> Data3DTreeModel::addSurfaceSet(const QString& subject, const QString& set, const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet)
+QList<FsSurfaceTreeItem*> Data3DTreeModel::addSurfaceSet(const QString& subject, const QString& set, const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet)
 {
-    QList<BrainSurfaceTreeItem*> returnItemList;
+    QList<FsSurfaceTreeItem*> returnItemList;
 
     //Handle subject item
     SubjectTreeItem* pSubjectItem = addSubject(subject);
@@ -195,9 +195,9 @@ QList<BrainSurfaceTreeItem*> Data3DTreeModel::addSurfaceSet(const QString& subje
 
 //*************************************************************************************************************
 
-BrainSurfaceTreeItem* Data3DTreeModel::addSurface(const QString& subject, const QString& set, const Surface& tSurface, const Annotation &tAnnotation)
+FsSurfaceTreeItem* Data3DTreeModel::addSurface(const QString& subject, const QString& set, const Surface& tSurface, const Annotation &tAnnotation)
 {
-    BrainSurfaceTreeItem* pReturnItem = Q_NULLPTR;
+    FsSurfaceTreeItem* pReturnItem = Q_NULLPTR;
 
     //Handle subject item
     SubjectTreeItem* pSubjectItem = addSubject(subject);
@@ -222,9 +222,9 @@ BrainSurfaceTreeItem* Data3DTreeModel::addSurface(const QString& subject, const 
 
 //*************************************************************************************************************
 
-BrainSourceSpaceTreeItem* Data3DTreeModel::addSourceSpace(const QString& subject, const QString& set, const MNESourceSpace& tSourceSpace)
+SourceSpaceTreeItem* Data3DTreeModel::addSourceSpace(const QString& subject, const QString& set, const MNESourceSpace& tSourceSpace)
 {
-    BrainSourceSpaceTreeItem* pReturnItem = Q_NULLPTR;
+    SourceSpaceTreeItem* pReturnItem = Q_NULLPTR;
 
     //Handle subject item
     SubjectTreeItem* pSubjectItem = addSubject(subject);
@@ -238,7 +238,7 @@ BrainSourceSpaceTreeItem* Data3DTreeModel::addSourceSpace(const QString& subject
     } else {
         MeasurementTreeItem* pMeasurementItem = new MeasurementTreeItem(Data3DTreeModelItemTypes::MeasurementItem, set);
 
-        addItemWithDescription(pReturnItem, pMeasurementItem);
+        this->addItemWithDescription(pReturnItem, pMeasurementItem);
 
         pReturnItem = pMeasurementItem->addData(tSourceSpace, m_pModelEntity);
     }
@@ -249,7 +249,7 @@ BrainSourceSpaceTreeItem* Data3DTreeModel::addSourceSpace(const QString& subject
 
 //*************************************************************************************************************
 
-BrainSourceSpaceTreeItem* Data3DTreeModel::addForwardSolution(const QString& subject, const QString& set, const MNEForwardSolution& tForwardSolution)
+SourceSpaceTreeItem* Data3DTreeModel::addForwardSolution(const QString& subject, const QString& set, const MNEForwardSolution& tForwardSolution)
 {
     return this->addSourceSpace(subject, set, tForwardSolution.src);
 }
