@@ -440,10 +440,12 @@ SubjectTreeItem* Data3DTreeModel::addSubject(const QString& subject)
 
 void Data3DTreeModel::addItemWithDescription(QStandardItem* pItemParent, QStandardItem* pItemAdd)
 {
-    QList<QStandardItem*> list;
-    list << pItemAdd;
-    list << new QStandardItem(pItemAdd->toolTip());
-    pItemParent->appendRow(list);
+    if(pItemParent && pItemAdd) {
+        QList<QStandardItem*> list;
+        list << pItemAdd;
+        list << new QStandardItem(pItemAdd->toolTip());
+        pItemParent->appendRow(list);
+    }
 }
 
 
