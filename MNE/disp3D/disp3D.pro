@@ -113,6 +113,7 @@ SOURCES += \
     model/bem/bemsurfacetreeitem.cpp \
     model/digitizer/digitizertreeitem.cpp \
     model/digitizer/digitizersettreeitem.cpp \
+    model/mri/mritreeitem.cpp \
     model/common/abstracttreeitem.cpp \
     model/common/renderable3Dentity.cpp \
     model/common/custommesh.cpp \
@@ -142,6 +143,7 @@ HEADERS += \
     model/bem/bemsurfacetreeitem.h \
     model/digitizer/digitizertreeitem.h \
     model/digitizer/digitizersettreeitem.h \
+    model/mri/mritreeitem.h \
     model/common/abstracttreeitem.h \
     model/common/renderable3Dentity.h \
     model/common/custommesh.h \

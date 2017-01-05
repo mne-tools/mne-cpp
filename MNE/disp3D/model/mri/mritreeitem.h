@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     measurement.h
+* @file     mritreeitem.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     MeasurementTreeItem class declaration.
+* @brief     MriTreeItem class declaration.
 *
 */
 
-#ifndef MEASUREMENTTREEITEM_H
-#define MEASUREMENTTREEITEM_H
+#ifndef MRITREEITEM_H
+#define MRITREEITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -74,19 +74,6 @@ namespace FSLIB {
     class Annotation;
 }
 
-namespace MNELIB {
-    class MNESourceSpace;
-    class MNESourceEstimate;
-}
-
-namespace FIFFLIB{
-    class FiffDigPointSet;
-}
-
-namespace INVERSELIB{
-    class ECDSet;
-}
-
 namespace Qt3DCore {
     class QEntity;
 }
@@ -105,27 +92,22 @@ namespace DISP3DLIB
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class MneEstimateTreeItem;
-class NetworkTreeItem;
-class EcdDataTreeItem;
 class FsSurfaceTreeItem;
-class SourceSpaceTreeItem;
-class DigitizerSetTreeItem;
 
 
 //=============================================================================================================
 /**
-* MeasurementTreeItem provides a generic brain tree item to hold of brain data (hemi, vertices, tris, etc.) from different sources (FreeSurfer, etc.).
+* MriTreeItem provides a generic brain tree item to hold of brain data (hemi, vertices, tris, etc.) from different sources (FreeSurfer, etc.).
 *
-* @brief Provides a generic MeasurementTreeItem.
+* @brief Provides a generic MriTreeItem.
 */
-class DISP3DNEWSHARED_EXPORT MeasurementTreeItem : public AbstractTreeItem
+class DISP3DNEWSHARED_EXPORT MriTreeItem : public AbstractTreeItem
 {
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<MeasurementTreeItem> SPtr;             /**< Shared pointer type for MeasurementTreeItem class. */
-    typedef QSharedPointer<const MeasurementTreeItem> ConstSPtr;  /**< Const shared pointer type for MeasurementTreeItem class. */
+    typedef QSharedPointer<MriTreeItem> SPtr;             /**< Shared pointer type for MriTreeItem class. */
+    typedef QSharedPointer<const MriTreeItem> ConstSPtr;  /**< Const shared pointer type for MriTreeItem class. */
 
     //=========================================================================================================
     /**
@@ -134,13 +116,13 @@ public:
     * @param[in] iType      The type of the item. See types.h for declaration and definition.
     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
     */
-    explicit MeasurementTreeItem(int iType = Data3DTreeModelItemTypes::MeasurementItem, const QString& text = "Unknown measurement");
+    explicit MriTreeItem(int iType = Data3DTreeModelItemTypes::MriItem, const QString& text = "MRI");
 
     //=========================================================================================================
     /**
     * Default destructor
     */
-    ~MeasurementTreeItem();
+    ~MriTreeItem();
 
     //=========================================================================================================
     /**
@@ -175,61 +157,6 @@ public:
     */
     FsSurfaceTreeItem* addData(const FSLIB::Surface& tSurface, const FSLIB::Annotation& tAnnotation, Qt3DCore::QEntity* p3DEntityParent = 0);
 
-    //=========================================================================================================
-    /**
-    * Adds source space data to this item.
-    *
-    * @param[in] tSourceSpace       The source space data.
-    * @param[in] p3DEntityParent    The Qt3D entity parent of the new item.
-    *
-    * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
-    */
-    SourceSpaceTreeItem* addData(const MNELIB::MNESourceSpace& tSourceSpace, Qt3DCore::QEntity* p3DEntityParent = 0);
-
-    //=========================================================================================================
-    /**
-    * Adds source estimated activation data (MNE, RTC-MUSIC) to this item.
-    *
-    * @param[in] tSourceEstimate    The MNESourceEstimate.
-    * @param[in] tForwardSolution   The MNEForwardSolution.
-    *
-    * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
-    */
-    MneEstimateTreeItem* addData(const MNELIB::MNESourceEstimate& tSourceEstimate, const MNELIB::MNEForwardSolution& tForwardSolution = MNELIB::MNEForwardSolution());
-
-    //=========================================================================================================
-    /**
-    * Adds source estimated activation data (dipole fit) to this item.
-    *
-    * @param[in] tECDSet            The ECDSet dipole data.
-    * @param[in] p3DEntityParent    The Qt3D entity parent of the new item.
-    *
-    * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
-    */
-    EcdDataTreeItem* addData(QSharedPointer<INVERSELIB::ECDSet> &pECDSet, Qt3DCore::QEntity* p3DEntityParent = 0);
-
-    //=========================================================================================================
-    /**
-    * Adds digitizer data to this item.
-    *
-    * @param[in] digitizerkind      The kind of the digitizer data.
-    * @param[in] tDigitizer         The digitizer data.
-    * @param[in] p3DEntityParent    The Qt3D entity parent of the new item.
-    *
-    * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
-    */
-    DigitizerSetTreeItem* addData(const FIFFLIB::FiffDigPointSet& tDigitizer, Qt3DCore::QEntity* p3DEntityParent = 0);
-
-    //=========================================================================================================
-    /**
-    * Adds connectivity estimation data.
-    *
-    * @param[in] pNetworkData       The connectivity data.
-    *
-    * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
-    */
-    NetworkTreeItem* addData(CONNECTIVITYLIB::Network::SPtr pNetworkData, Qt3DCore::QEntity* p3DEntityParent = 0);
-
 private:
     //=========================================================================================================
     /**
@@ -241,23 +168,18 @@ private:
 
     //=========================================================================================================
     /**
-    * Call this function whenever new colors for the activation data plotting are available.
-    *
-    * @param[in] sourceColorSamples     The color values for each estimated source for left and right hemisphere.
-    */
-    void onRtVertColorChanged(const QPair<QByteArray, QByteArray>& sourceColorSamples);
-
-    //=========================================================================================================
-    /**
     * This function gets called whenever the origin of the surface vertex color (curvature, annoation, etc.) changed.
     */
     void onColorInfoOriginChanged();
 
-    MneEstimateTreeItem*                m_pMneEstimateTreeItem;        /**< The rt source loc data item of this item. */
-    NetworkTreeItem*                    m_pNetworkTreeItem;                     /**< The rt connectivity data item of this item. */
-    EcdDataTreeItem*                    m_EcdDataTreeItem;                      /**< The rt dipole fit data item of this item. */
+signals:
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the origin of the vertex color (from curvature, from annotation) changed.
+    */
+    void colorInfoOriginChanged();
 };
 
 } //NAMESPACE DISP3DLIB
 
-#endif // MEASUREMENTTREEITEM_H
+#endif // MRITREEITEM_H

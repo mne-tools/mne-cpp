@@ -44,6 +44,7 @@
 #include "freesurfer/fssurfacetreeitem.h"
 #include "sourcespace/sourcespacetreeitem.h"
 #include "measurement/measurementtreeitem.h"
+#include "mri/mritreeitem.h"
 #include "digitizer/digitizertreeitem.h"
 #include "common/renderable3Dentity.h"
 
@@ -175,16 +176,16 @@ QList<FsSurfaceTreeItem*> Data3DTreeModel::addSurfaceSet(const QString& subject,
     //Handle subject item
     SubjectTreeItem* pSubjectItem = addSubject(subject);
 
-    //Find already existing set items and add the new data to the first search result
+    //Find already existing MRI items and add the new data to the first search result
     QList<QStandardItem*> itemList = pSubjectItem->findChildren(set);
 
-    if(!itemList.isEmpty() && (itemList.first()->type() == Data3DTreeModelItemTypes::MeasurementItem)) {
-        MeasurementTreeItem* pMeasurementItem = dynamic_cast<MeasurementTreeItem*>(itemList.first());
-        returnItemList = pMeasurementItem->addData(tSurfaceSet, tAnnotationSet, m_pModelEntity);
+    if(!itemList.isEmpty()) {
+        MriTreeItem* pMriItem = dynamic_cast<MriTreeItem*>(itemList.first());
+        returnItemList = pMriItem->addData(tSurfaceSet, tAnnotationSet, m_pModelEntity);
     } else {
-        MeasurementTreeItem* pMeasurementItem = new MeasurementTreeItem(Data3DTreeModelItemTypes::MeasurementItem, set);
-        returnItemList = pMeasurementItem->addData(tSurfaceSet, tAnnotationSet, m_pModelEntity);
-        addItemWithDescription(pSubjectItem, pMeasurementItem);
+        MriTreeItem* pMriItem = new MriTreeItem(Data3DTreeModelItemTypes::MriItem, set);
+        returnItemList = pMriItem->addData(tSurfaceSet, tAnnotationSet, m_pModelEntity);
+        addItemWithDescription(pSubjectItem, pMriItem);
     }
 
     return returnItemList;
@@ -200,16 +201,16 @@ FsSurfaceTreeItem* Data3DTreeModel::addSurface(const QString& subject, const QSt
     //Handle subject item
     SubjectTreeItem* pSubjectItem = addSubject(subject);
 
-    //Find already existing surface items and add the new data to the first search result
-    QList<QStandardItem*> itemList = pSubjectItem->findChildren(set);
+    //Find already existing MRI items and add the new data to the first search result
+    QList<QStandardItem*> itemList = pSubjectItem->findChildren(Data3DTreeModelItemTypes::MriItem);
 
-    if(!itemList.isEmpty() && (itemList.first()->type() == Data3DTreeModelItemTypes::MeasurementItem)) {
-        MeasurementTreeItem* pMeasurementItem = dynamic_cast<MeasurementTreeItem*>(itemList.first());
-        pReturnItem = pMeasurementItem->addData(tSurface, tAnnotation, m_pModelEntity);
+    if(!itemList.isEmpty()) {
+        MriTreeItem* pMriItem = dynamic_cast<MriTreeItem*>(itemList.first());
+        pReturnItem = pMriItem->addData(tSurface, tAnnotation, m_pModelEntity);
     } else {
-        MeasurementTreeItem* pMeasurementItem = new MeasurementTreeItem(Data3DTreeModelItemTypes::MeasurementItem, set);
-        pReturnItem = pMeasurementItem->addData(tSurface, tAnnotation, m_pModelEntity);
-        addItemWithDescription(pSubjectItem, pMeasurementItem);
+        MriTreeItem* pMriItem = new MriTreeItem(Data3DTreeModelItemTypes::MriItem, set);
+        pReturnItem = pMriItem->addData(tSurface, tAnnotation, m_pModelEntity);
+        addItemWithDescription(pSubjectItem, pMriItem);
     }
 
     return pReturnItem;
@@ -440,12 +441,12 @@ SubjectTreeItem* Data3DTreeModel::addSubject(const QString& subject)
 
 void Data3DTreeModel::addItemWithDescription(QStandardItem* pItemParent, QStandardItem* pItemAdd)
 {
-    if(pItemParent && pItemAdd) {
+    //if(pItemParent && pItemAdd) {
         QList<QStandardItem*> list;
         list << pItemAdd;
         list << new QStandardItem(pItemAdd->toolTip());
         pItemParent->appendRow(list);
-    }
+    //}
 }
 
 
