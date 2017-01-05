@@ -135,10 +135,8 @@ public:
     * @param[in] vecLabelIdsRightHemi               The label ids for each right hemispheresurface vertex index.
     * @param[in] lLabelsLeftHemi                    The label list for the left hemisphere.
     * @param[in] lLabelsRightHemi                   The label list for the right hemisphere.
-    *
-    * @return   Returns true if successful.
     */
-    bool init(const MNELIB::MNEForwardSolution& tForwardSolution,
+    void init(const MNELIB::MNEForwardSolution& tForwardSolution,
             const QByteArray &arraySurfaceVertColorLeftHemi,
             const QByteArray &arraySurfaceVertColorRightHemi,
             const Eigen::VectorXi& vecLabelIdsLeftHemi = FIFFLIB::defaultVectorXi,

@@ -151,32 +151,6 @@ public:
 
     //=========================================================================================================
     /**
-    * Adds FreeSurfer data based on surfaces and annotation SETS to this item.
-    *
-    * @param[in] tSurfaceSet        FreeSurfer surface set.
-    * @param[in] tAnnotationSet     FreeSurfer annotation set.
-    * @param[in] p3DEntityParent    The Qt3D entity parent of the new item.
-    *
-    * @return                       Returns a QList with the added surface tree items. The ordering
-    *                               of the list hereby corresponds to the ordering of the input surface set.
-    *                               The list is empty if no item was added.
-    */
-    QList<FsSurfaceTreeItem*> addData(const FSLIB::SurfaceSet& tSurfaceSet, const FSLIB::AnnotationSet& tAnnotationSet, Qt3DCore::QEntity* p3DEntityParent = 0);
-
-    //=========================================================================================================
-    /**
-    * Adds FreeSurfer data based on surfaces and annotation data to this item.
-    *
-    * @param[in] tSurface           FreeSurfer surface.
-    * @param[in] tAnnotation        FreeSurfer annotation.
-    * @param[in] p3DEntityParent    The Qt3D entity parent of the new item.
-    *
-    * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
-    */
-    FsSurfaceTreeItem* addData(const FSLIB::Surface& tSurface, const FSLIB::Annotation& tAnnotation, Qt3DCore::QEntity* p3DEntityParent = 0);
-
-    //=========================================================================================================
-    /**
     * Adds source space data to this item.
     *
     * @param[in] tSourceSpace       The source space data.
@@ -230,6 +204,16 @@ public:
     */
     NetworkTreeItem* addData(CONNECTIVITYLIB::Network::SPtr pNetworkData, Qt3DCore::QEntity* p3DEntityParent = 0);
 
+    //=========================================================================================================
+    /**
+    * This function gets called whenever the origin of the surface vertex color (curvature, annotation, etc.) changed.
+    * The color generation then based on the current user chosen color origin.
+    *
+    * @param[in] leftHemiColor        Color of the left hemisphere.
+    * @param[in] rightHemiColor       Color of the right hemisphere.
+    */
+    void onColorInfoOriginChanged(const QByteArray& leftHemiColor, const QByteArray& rightHemiColor);
+
 private:
     //=========================================================================================================
     /**
@@ -246,12 +230,6 @@ private:
     * @param[in] sourceColorSamples     The color values for each estimated source for left and right hemisphere.
     */
     void onRtVertColorChanged(const QPair<QByteArray, QByteArray>& sourceColorSamples);
-
-    //=========================================================================================================
-    /**
-    * This function gets called whenever the origin of the surface vertex color (curvature, annoation, etc.) changed.
-    */
-    void onColorInfoOriginChanged();
 
     MneEstimateTreeItem*                m_pMneEstimateTreeItem;        /**< The rt source loc data item of this item. */
     NetworkTreeItem*                    m_pNetworkTreeItem;                     /**< The rt connectivity data item of this item. */
