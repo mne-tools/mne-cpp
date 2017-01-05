@@ -125,7 +125,7 @@ void MneEstimateTreeItem::setData(const QVariant& value, int role)
 
 //*************************************************************************************************************
 
-bool MneEstimateTreeItem::init(const MNEForwardSolution& tForwardSolution,
+void MneEstimateTreeItem::init(const MNEForwardSolution& tForwardSolution,
                                         const QByteArray& arraySurfaceVertColorLeftHemi,
                                         const QByteArray& arraySurfaceVertColorRightHemi,
                                         const VectorXi& vecLabelIdsLeftHemi,
@@ -134,7 +134,7 @@ bool MneEstimateTreeItem::init(const MNEForwardSolution& tForwardSolution,
                                         const QList<FSLIB::Label>& lLabelsRightHemi)
 {   
     if(tForwardSolution.src.size() < 2) {
-        return false;
+        return;
     }
 
     //Set data based on clusterd or full source space
@@ -274,8 +274,6 @@ bool MneEstimateTreeItem::init(const MNEForwardSolution& tForwardSolution,
                                                 lLabelsRightHemi);
 
     m_bIsInit = true;
-
-    return true;
 }
 
 

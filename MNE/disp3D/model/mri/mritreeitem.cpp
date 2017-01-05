@@ -232,5 +232,23 @@ void MriTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
 
 void MriTreeItem::onColorInfoOriginChanged()
 {
-    emit colorInfoOriginChanged();
+    QList<QStandardItem*> itemList = this->findChildren(Data3DTreeModelItemTypes::HemisphereItem);
+
+    FsSurfaceTreeItem* pSurfaceTreeItemLeft = Q_NULLPTR;
+    FsSurfaceTreeItem* pSurfaceTreeItemRight = Q_NULLPTR;
+
+    for(int j = 0; j < itemList.size(); ++j) {
+        if(HemisphereTreeItem* pHemiItem = dynamic_cast<HemisphereTreeItem*>(itemList.at(j))) {
+            if(pHemiItem->data(Data3DTreeModelItemRoles::SurfaceHemi).toInt() == 0) {
+                pSurfaceTreeItemLeft = pHemiItem->getSurfaceItem();
+            } else if(pHemiItem->data(Data3DTreeModelItemRoles::SurfaceHemi).toInt() == 1) {
+                pSurfaceTreeItemRight = pHemiItem->getSurfaceItem();
+            }
+        }
+    }
+
+    if(pSurfaceTreeItemLeft && pSurfaceTreeItemRight) {
+        emit colorInfoChanged(pSurfaceTreeItemLeft->data(Data3DTreeModelItemRoles::SurfaceCurrentColorVert).value<QByteArray>(),
+                              pSurfaceTreeItemRight->data(Data3DTreeModelItemRoles::SurfaceCurrentColorVert).value<QByteArray>());
+    }
 }

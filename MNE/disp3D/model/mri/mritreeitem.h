@@ -175,9 +175,12 @@ private:
 signals:
     //=========================================================================================================
     /**
-    * Emit this signal whenever the origin of the vertex color (from curvature, from annotation) changed.
+    * emit this signal whenver the color info of the underlying hemisphere surfaes changed.
+    *
+    * @param[in] leftHemiColor        Color of the left hemisphere.
+    * @param[in] rightHemiColor       Color of the right hemisphere.
     */
-    void colorInfoOriginChanged();
+    void colorInfoChanged(const QByteArray& leftHemiColor, const QByteArray& rightHemiColor);
 };
 
 } //NAMESPACE DISP3DLIB

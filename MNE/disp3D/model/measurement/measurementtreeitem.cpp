@@ -48,6 +48,8 @@
 #include "../digitizer/digitizersettreeitem.h"
 #include "../digitizer/digitizertreeitem.h"
 #include "../sourceactivity/ecddatatreeitem.h"
+#include "../mri/mritreeitem.h"
+#include "../subject/subjecttreeitem.h"
 
 #include <fs/label.h>
 #include <fs/annotationset.h>
@@ -137,116 +139,6 @@ void  MeasurementTreeItem::setData(const QVariant& value, int role)
 
 //*************************************************************************************************************
 
-QList<FsSurfaceTreeItem*> MeasurementTreeItem::addData(const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet, Qt3DCore::QEntity* p3DEntityParent)
-{
-    //Generate child items based on surface set input parameters
-    QList<QStandardItem*> itemList = this->findChildren(Data3DTreeModelItemTypes::HemisphereItem);
-    QList<FsSurfaceTreeItem*> returnItemList;
-
-    //If there are more hemispheres in tSourceSpace than in the tree model
-    bool hemiItemFound = false;
-
-    //Search for already created hemi items and add source space data respectivley
-    for(int i = 0; i < tSurfaceSet.size(); ++i) {
-        for(int j = 0; j < itemList.size(); ++j) {
-            if(HemisphereTreeItem* pHemiItem = dynamic_cast<HemisphereTreeItem*>(itemList.at(j))) {
-                if(pHemiItem->data(Data3DTreeModelItemRoles::SurfaceHemi).toInt() == tSurfaceSet[i].hemi()) {
-                    hemiItemFound = true;
-
-                    if(i < tAnnotationSet.size()) {
-                        if(tAnnotationSet[i].hemi() == tSurfaceSet[i].hemi()) {
-                            returnItemList.append(pHemiItem->addData(tSurfaceSet[i], tAnnotationSet[i], p3DEntityParent));
-                        } else {
-                            returnItemList.append(pHemiItem->addData(tSurfaceSet[i], Annotation(), p3DEntityParent));
-                        }
-                    } else {
-                        returnItemList.append(pHemiItem->addData(tSurfaceSet[i], Annotation(), p3DEntityParent));
-                    }
-                }
-            }
-        }
-
-        if(!hemiItemFound) {
-            //Item does not exist yet, create it here.
-            HemisphereTreeItem* pHemiItem = new HemisphereTreeItem(Data3DTreeModelItemTypes::HemisphereItem);
-
-            QList<QStandardItem*> list;
-            list << pHemiItem;
-            list << new QStandardItem(pHemiItem->toolTip());
-            this->appendRow(list);
-
-            if(i < tAnnotationSet.size()) {
-                if(tAnnotationSet[i].hemi() == tSurfaceSet[i].hemi()) {
-                    returnItemList.append(pHemiItem->addData(tSurfaceSet[i], tAnnotationSet[i], p3DEntityParent));
-                } else {
-                    returnItemList.append(pHemiItem->addData(tSurfaceSet[i], Annotation(), p3DEntityParent));
-                }
-            } else {
-                returnItemList.append(pHemiItem->addData(tSurfaceSet[i], Annotation(), p3DEntityParent));
-            }
-
-            connect(pHemiItem->getSurfaceItem(), &FsSurfaceTreeItem::colorInfoOriginChanged,
-                this, &MeasurementTreeItem::onColorInfoOriginChanged);
-        }
-
-        hemiItemFound = false;
-    }
-
-    return returnItemList;
-}
-
-
-//*************************************************************************************************************
-
-FsSurfaceTreeItem* MeasurementTreeItem::addData(const Surface& tSurface, const Annotation& tAnnotation, Qt3DCore::QEntity* p3DEntityParent)
-{
-    //Generate child items based on surface set input parameters
-    FsSurfaceTreeItem* pReturnItem = Q_NULLPTR;
-
-    QList<QStandardItem*> itemList = this->findChildren(Data3DTreeModelItemTypes::HemisphereItem);
-
-    bool hemiItemFound = false;
-
-    //Search for already created hemi items and add data respectivley
-    for(int j = 0; j < itemList.size(); ++j) {
-        if(HemisphereTreeItem* pHemiItem = dynamic_cast<HemisphereTreeItem*>(itemList.at(j))) {
-            if(pHemiItem->data(Data3DTreeModelItemRoles::SurfaceHemi).toInt() == tSurface.hemi()) {
-                hemiItemFound = true;
-
-                if(tAnnotation.hemi() == tSurface.hemi()) {
-                    pReturnItem = pHemiItem->addData(tSurface, tAnnotation, p3DEntityParent);
-                } else {
-                    pReturnItem = pHemiItem->addData(tSurface, Annotation(), p3DEntityParent);
-                }
-            }
-        }
-    }
-
-    if(!hemiItemFound) {
-        //Item does not exist yet, create it here.
-        HemisphereTreeItem* pHemiItem = new HemisphereTreeItem(Data3DTreeModelItemTypes::HemisphereItem);
-
-        if(tAnnotation.hemi() == tSurface.hemi()) {
-            pReturnItem = pHemiItem->addData(tSurface, tAnnotation, p3DEntityParent);
-        } else {
-            pReturnItem = pHemiItem->addData(tSurface, Annotation(), p3DEntityParent);
-        }
-
-        QList<QStandardItem*> list;
-        list << pHemiItem;
-        list << new QStandardItem(pHemiItem->toolTip());
-        this->appendRow(list);
-
-        connect(pHemiItem->getSurfaceItem(), &FsSurfaceTreeItem::colorInfoOriginChanged,
-            this, &MeasurementTreeItem::onColorInfoOriginChanged);
-    }
-
-    return pReturnItem;
-}
-
-
-//*************************************************************************************************************
-
 SourceSpaceTreeItem* MeasurementTreeItem::addData(const MNESourceSpace& tSourceSpace, Qt3DCore::QEntity* p3DEntityParent)
 {
     //Generate child items based on surface set input parameters
@@ -307,33 +199,51 @@ MneEstimateTreeItem* MeasurementTreeItem::addData(const MNESourceEstimate& tSour
                         this, &MeasurementTreeItem::onRtVertColorChanged);
 
                 //Divide into left right hemi
-                QList<QStandardItem*> itemList = this->findChildren(Data3DTreeModelItemTypes::HemisphereItem);
+                //Find MRI data set and hemisphere from parent item
+                QString sMRISetName = "MRI";
 
-                FsSurfaceTreeItem* pSurfaceTreeItemLeft = Q_NULLPTR;
-                FsSurfaceTreeItem* pSurfaceTreeItemRight = Q_NULLPTR;
-                FsAnnotationTreeItem* pAnnotTreeItemLeft = Q_NULLPTR;
-                FsAnnotationTreeItem* pAnnotTreeItemRight = Q_NULLPTR;
+                if(SubjectTreeItem* pParent = dynamic_cast<SubjectTreeItem*>(this->QStandardItem::parent())) {
+                    QList<QStandardItem*> lMRIChildren = pParent->findChildren(Data3DTreeModelItemTypes::MriItem);
+                    MriTreeItem* pMriItem = Q_NULLPTR;
 
-                for(int j = 0; j < itemList.size(); ++j) {
-                    if(HemisphereTreeItem* pHemiItem = dynamic_cast<HemisphereTreeItem*>(itemList.at(j))) {
-                        if(pHemiItem->data(Data3DTreeModelItemRoles::SurfaceHemi).toInt() == 0) {
-                            pSurfaceTreeItemLeft = pHemiItem->getSurfaceItem();
-                            pAnnotTreeItemLeft = pHemiItem->getAnnotItem();
-                        } else if(pHemiItem->data(Data3DTreeModelItemRoles::SurfaceHemi).toInt() == 1) {
-                            pSurfaceTreeItemRight = pHemiItem->getSurfaceItem();
-                            pAnnotTreeItemRight = pHemiItem->getAnnotItem();
+                    for(int i = 0; i < lMRIChildren.size(); ++i) {
+                        if(lMRIChildren.at(i)->text() == sMRISetName) {
+                            if(pMriItem = dynamic_cast<MriTreeItem*>(lMRIChildren.at(i))) {
+                                i = lMRIChildren.size();
+                            }
                         }
                     }
-                }
 
-                if(pSurfaceTreeItemLeft && pSurfaceTreeItemRight && pAnnotTreeItemLeft && pAnnotTreeItemRight) {
-                    m_pMneEstimateTreeItem->init(tForwardSolution,
-                                                pSurfaceTreeItemLeft->data(Data3DTreeModelItemRoles::SurfaceCurrentColorVert).value<QByteArray>(),
-                                                pSurfaceTreeItemRight->data(Data3DTreeModelItemRoles::SurfaceCurrentColorVert).value<QByteArray>(),
-                                                pAnnotTreeItemLeft->data(Data3DTreeModelItemRoles::LabeIds).value<VectorXi>(),
-                                                pAnnotTreeItemRight->data(Data3DTreeModelItemRoles::LabeIds).value<VectorXi>(),
-                                                pAnnotTreeItemLeft->data(Data3DTreeModelItemRoles::LabeList).value<QList<FSLIB::Label>>(),
-                                                pAnnotTreeItemRight->data(Data3DTreeModelItemRoles::LabeList).value<QList<FSLIB::Label>>());
+                    if(pMriItem) {
+                        QList<QStandardItem*> itemList = pMriItem->findChildren(Data3DTreeModelItemTypes::HemisphereItem);
+
+                        FsSurfaceTreeItem* pSurfaceTreeItemLeft = Q_NULLPTR;
+                        FsSurfaceTreeItem* pSurfaceTreeItemRight = Q_NULLPTR;
+                        FsAnnotationTreeItem* pAnnotTreeItemLeft = Q_NULLPTR;
+                        FsAnnotationTreeItem* pAnnotTreeItemRight = Q_NULLPTR;
+
+                        for(int j = 0; j < itemList.size(); ++j) {
+                            if(HemisphereTreeItem* pHemiItem = dynamic_cast<HemisphereTreeItem*>(itemList.at(j))) {
+                                if(pHemiItem->data(Data3DTreeModelItemRoles::SurfaceHemi).toInt() == 0) {
+                                    pSurfaceTreeItemLeft = pHemiItem->getSurfaceItem();
+                                    pAnnotTreeItemLeft = pHemiItem->getAnnotItem();
+                                } else if(pHemiItem->data(Data3DTreeModelItemRoles::SurfaceHemi).toInt() == 1) {
+                                    pSurfaceTreeItemRight = pHemiItem->getSurfaceItem();
+                                    pAnnotTreeItemRight = pHemiItem->getAnnotItem();
+                                }
+                            }
+                        }
+
+                        if(pSurfaceTreeItemLeft && pSurfaceTreeItemRight && pAnnotTreeItemLeft && pAnnotTreeItemRight) {
+                            m_pMneEstimateTreeItem->init(tForwardSolution,
+                                                        pSurfaceTreeItemLeft->data(Data3DTreeModelItemRoles::SurfaceCurrentColorVert).value<QByteArray>(),
+                                                        pSurfaceTreeItemRight->data(Data3DTreeModelItemRoles::SurfaceCurrentColorVert).value<QByteArray>(),
+                                                        pAnnotTreeItemLeft->data(Data3DTreeModelItemRoles::LabeIds).value<VectorXi>(),
+                                                        pAnnotTreeItemRight->data(Data3DTreeModelItemRoles::LabeIds).value<VectorXi>(),
+                                                        pAnnotTreeItemLeft->data(Data3DTreeModelItemRoles::LabeList).value<QList<FSLIB::Label>>(),
+                                                        pAnnotTreeItemRight->data(Data3DTreeModelItemRoles::LabeList).value<QList<FSLIB::Label>>());
+                        }
+                    }
                 }
 
                 m_pMneEstimateTreeItem->addData(tSourceEstimate);
@@ -474,7 +384,7 @@ void MeasurementTreeItem::onRtVertColorChanged(const QPair<QByteArray, QByteArra
 
 //*************************************************************************************************************
 
-void MeasurementTreeItem::onColorInfoOriginChanged()
+void MeasurementTreeItem::onColorInfoOriginChanged(const QByteArray& leftHemiColor, const QByteArray& rightHemiColor)
 {
     QList<QStandardItem*> itemList = this->findChildren(Data3DTreeModelItemTypes::HemisphereItem);
 
@@ -491,9 +401,8 @@ void MeasurementTreeItem::onColorInfoOriginChanged()
         }
     }
 
-    if(pSurfaceTreeItemLeft && pSurfaceTreeItemRight && !this->findChildren(Data3DTreeModelItemTypes::MNEEstimateItem).isEmpty()) {
-        m_pMneEstimateTreeItem->onColorInfoOriginChanged(pSurfaceTreeItemLeft->data(Data3DTreeModelItemRoles::SurfaceCurrentColorVert).value<QByteArray>(),
-                                                                    pSurfaceTreeItemRight->data(Data3DTreeModelItemRoles::SurfaceCurrentColorVert).value<QByteArray>());
+    if(pSurfaceTreeItemLeft && pSurfaceTreeItemRight) {
+        m_pMneEstimateTreeItem->onColorInfoOriginChanged(leftHemiColor, rightHemiColor);
     }
 }
 
