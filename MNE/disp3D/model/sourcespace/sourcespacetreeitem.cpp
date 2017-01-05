@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     brainsourcespacetreeitem.cpp
+* @file     sourcespacetreeitem.cpp
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    BrainSourceSpaceTreeItem class definition.
+* @brief    SourceSpaceTreeItem class definition.
 *
 */
 
@@ -38,7 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "brainsourcespacetreeitem.h"
+#include "SourceSpaceTreeItem.h"
 #include "../common/metatreeitem.h"
 #include "../common/renderable3Dentity.h"
 #include "../materials/pervertexphongalphamaterial.h"
@@ -91,7 +91,7 @@ using namespace DISP3DLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-BrainSourceSpaceTreeItem::BrainSourceSpaceTreeItem(int iType, const QString& text)
+SourceSpaceTreeItem::SourceSpaceTreeItem(int iType, const QString& text)
 : AbstractTreeItem(iType, text)
 , m_pRenderable3DEntity(new Renderable3DEntity())
 {
@@ -104,7 +104,7 @@ BrainSourceSpaceTreeItem::BrainSourceSpaceTreeItem(int iType, const QString& tex
 
 //*************************************************************************************************************
 
-BrainSourceSpaceTreeItem::~BrainSourceSpaceTreeItem()
+SourceSpaceTreeItem::~SourceSpaceTreeItem()
 {
     //Schedule deletion/Decouple of all entities so that the SceneGraph is NOT plotting them anymore.
     if(!m_pRenderable3DEntity.isNull()) {
@@ -115,7 +115,7 @@ BrainSourceSpaceTreeItem::~BrainSourceSpaceTreeItem()
 
 //*************************************************************************************************************
 
-QVariant BrainSourceSpaceTreeItem::data(int role) const
+QVariant SourceSpaceTreeItem::data(int role) const
 {
     return AbstractTreeItem::data(role);
 }
@@ -123,7 +123,7 @@ QVariant BrainSourceSpaceTreeItem::data(int role) const
 
 //*************************************************************************************************************
 
-void  BrainSourceSpaceTreeItem::setData(const QVariant& value, int role)
+void  SourceSpaceTreeItem::setData(const QVariant& value, int role)
 {
     AbstractTreeItem::setData(value, role);
 
@@ -137,7 +137,7 @@ void  BrainSourceSpaceTreeItem::setData(const QVariant& value, int role)
 
 //*************************************************************************************************************
 
-void BrainSourceSpaceTreeItem::addData(const MNEHemisphere& tHemisphere, Qt3DCore::QEntity* parent)
+void SourceSpaceTreeItem::addData(const MNEHemisphere& tHemisphere, Qt3DCore::QEntity* parent)
 {
     //Create renderable 3D entity
     m_pRenderable3DEntity = new Renderable3DEntity(parent);
@@ -200,7 +200,7 @@ void BrainSourceSpaceTreeItem::addData(const MNEHemisphere& tHemisphere, Qt3DCor
     PerVertexPhongAlphaMaterial* pPerVertexPhongAlphaMaterial = new PerVertexPhongAlphaMaterial();
     m_pRenderable3DEntity->addComponent(pPerVertexPhongAlphaMaterial);
 
-    //Add data which is held by this BrainSourceSpaceTreeItem
+    //Add data which is held by this SourceSpaceTreeItem
     QVariant data;
 
     data.setValue(arrayVertColor);
@@ -223,7 +223,7 @@ void BrainSourceSpaceTreeItem::addData(const MNEHemisphere& tHemisphere, Qt3DCor
 
     MetaTreeItem* pItemSurfCol = new MetaTreeItem(MetaTreeItemTypes::SurfaceColor, "Surface color");
     connect(pItemSurfCol, &MetaTreeItem::surfaceColorChanged,
-            this, &BrainSourceSpaceTreeItem::onSurfaceColorChanged);
+            this, &SourceSpaceTreeItem::onSurfaceColorChanged);
     list << pItemSurfCol;
     list << new QStandardItem(pItemSurfCol->toolTip());
     this->appendRow(list);
@@ -235,7 +235,7 @@ void BrainSourceSpaceTreeItem::addData(const MNEHemisphere& tHemisphere, Qt3DCor
 
 //*************************************************************************************************************
 
-void BrainSourceSpaceTreeItem::setVisible(bool state)
+void SourceSpaceTreeItem::setVisible(bool state)
 {
     for(int i = 0; i < m_lSpheres.size(); ++i) {
         m_lSpheres.at(i)->setEnabled(state);
@@ -247,7 +247,7 @@ void BrainSourceSpaceTreeItem::setVisible(bool state)
 
 //*************************************************************************************************************
 
-void BrainSourceSpaceTreeItem::onSurfaceColorChanged(const QColor& color)
+void SourceSpaceTreeItem::onSurfaceColorChanged(const QColor& color)
 {
     QVariant data;
     QByteArray arrayNewVertColor = createVertColor(this->data(Data3DTreeModelItemRoles::SurfaceVert).value<MatrixX3f>(), color);
@@ -259,7 +259,7 @@ void BrainSourceSpaceTreeItem::onSurfaceColorChanged(const QColor& color)
 
 //*************************************************************************************************************
 
-void BrainSourceSpaceTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
+void SourceSpaceTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
 {
     this->setVisible(checkState==Qt::Unchecked ? false : true);
 }
@@ -267,7 +267,7 @@ void BrainSourceSpaceTreeItem::onCheckStateChanged(const Qt::CheckState& checkSt
 
 //*************************************************************************************************************
 
-QByteArray BrainSourceSpaceTreeItem::createVertColor(const MatrixXf& vertices, const QColor& color) const
+QByteArray SourceSpaceTreeItem::createVertColor(const MatrixXf& vertices, const QColor& color) const
 {
     QByteArray arrayCurvatureColor;
     arrayCurvatureColor.resize(vertices.rows() * 3 * (int)sizeof(float));

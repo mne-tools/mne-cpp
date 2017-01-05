@@ -101,10 +101,10 @@ SOURCES += \
     model/data3Dtreedelegate.cpp \
     model/subject/subjecttreeitem.cpp \
     model/measurement/measurementtreeitem.cpp \
-    model/brain/brainsurfacetreeitem.cpp \
-    model/brain/brainannotationtreeitem.cpp \
-    model/brain/brainhemispheretreeitem.cpp \
-    model/brain/brainsourcespacetreeitem.cpp \
+    model/freesurfer/fssurfacetreeitem.cpp \
+    model/freesurfer/fsannotationtreeitem.cpp \
+    model/hemisphere/hemispheretreeitem.cpp \
+    model/sourcespace/sourcespacetreeitem.cpp \
     model/sourceactivity/mneestimatetreeitem.cpp \
     model/sourceactivity/ecddatatreeitem.cpp \
     model/workers/rtSourceLoc/rtsourcelocdataworker.cpp \
@@ -130,10 +130,10 @@ HEADERS += \
     model/data3Dtreedelegate.h \
     model/subject/subjecttreeitem.h \
     model/measurement/measurementtreeitem.h \
-    model/brain/brainsurfacetreeitem.h \
-    model/brain/brainannotationtreeitem.h \
-    model/brain/brainhemispheretreeitem.h \
-    model/brain/brainsourcespacetreeitem.h \
+    model/freesurfer/fssurfacetreeitem.h \
+    model/freesurfer/fsannotationtreeitem.h \
+    model/hemisphere/hemispheretreeitem.h \
+    model/sourcespace/sourcespacetreeitem.h \
     model/sourceactivity/mneestimatetreeitem.h \
     model/sourceactivity/ecddatatreeitem.h \
     model/workers/rtSourceLoc/rtsourcelocdataworker.h \

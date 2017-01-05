@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     brainannotationtreeitem.h
+* @file     fsannotationtreeitem.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     BrainAnnotationTreeItem class declaration.
+* @brief     FsAnnotationTreeItem class declaration.
 *
 */
 
-#ifndef BRAINANNOTATIONTREEITEM_H
-#define BRAINANNOTATIONTREEITEM_H
+#ifndef FSANNOTATIONTREEITEM_H
+#define FSANNOTATIONTREEITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -89,17 +89,17 @@ namespace DISP3DLIB
 
 //=============================================================================================================
 /**
-* BrainAnnotationTreeItem provides a generic item to hold information about brain annotation information.
+* FsAnnotationTreeItem provides a generic item to hold information about brain annotation information.
 *
 * @brief Provides a generic brain tree item.
 */
-class DISP3DNEWSHARED_EXPORT BrainAnnotationTreeItem : public AbstractTreeItem
+class DISP3DNEWSHARED_EXPORT FsAnnotationTreeItem : public AbstractTreeItem
 {
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<BrainAnnotationTreeItem> SPtr;             /**< Shared pointer type for BrainAnnotationTreeItem class. */
-    typedef QSharedPointer<const BrainAnnotationTreeItem> ConstSPtr;  /**< Const shared pointer type for BrainAnnotationTreeItem class. */
+    typedef QSharedPointer<FsAnnotationTreeItem> SPtr;             /**< Shared pointer type for FsAnnotationTreeItem class. */
+    typedef QSharedPointer<const FsAnnotationTreeItem> ConstSPtr;  /**< Const shared pointer type for FsAnnotationTreeItem class. */
 
     //=========================================================================================================
     /**
@@ -108,13 +108,13 @@ public:
     * @param[in] iType      The type of the item. See types.h for declaration and definition.
     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
     */
-    explicit BrainAnnotationTreeItem(int iType = Data3DTreeModelItemTypes::AnnotationItem, const QString& text = "Annotation" );
+    explicit FsAnnotationTreeItem(int iType = Data3DTreeModelItemTypes::AnnotationItem, const QString& text = "Annotation" );
 
     //=========================================================================================================
     /**
     * Default destructor
     */
-    ~BrainAnnotationTreeItem();
+    ~FsAnnotationTreeItem();
 
     //=========================================================================================================
     /**
@@ -153,4 +153,4 @@ signals:
 
 } //NAMESPACE DISP3DLIB
 
-#endif // BRAINANNOTATIONTREEITEM_H
+#endif // FSANNOTATIONTREEITEM_H

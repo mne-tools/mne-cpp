@@ -108,8 +108,8 @@ namespace DISP3DLIB
 class MneEstimateTreeItem;
 class NetworkTreeItem;
 class EcdDataTreeItem;
-class BrainSurfaceTreeItem;
-class BrainSourceSpaceTreeItem;
+class FsSurfaceTreeItem;
+class SourceSpaceTreeItem;
 class DigitizerSetTreeItem;
 
 
@@ -161,7 +161,7 @@ public:
     *                               of the list hereby corresponds to the ordering of the input surface set.
     *                               The list is empty if no item was added.
     */
-    QList<BrainSurfaceTreeItem*> addData(const FSLIB::SurfaceSet& tSurfaceSet, const FSLIB::AnnotationSet& tAnnotationSet, Qt3DCore::QEntity* p3DEntityParent = 0);
+    QList<FsSurfaceTreeItem*> addData(const FSLIB::SurfaceSet& tSurfaceSet, const FSLIB::AnnotationSet& tAnnotationSet, Qt3DCore::QEntity* p3DEntityParent = 0);
 
     //=========================================================================================================
     /**
@@ -173,7 +173,7 @@ public:
     *
     * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
-    BrainSurfaceTreeItem* addData(const FSLIB::Surface& tSurface, const FSLIB::Annotation& tAnnotation, Qt3DCore::QEntity* p3DEntityParent = 0);
+    FsSurfaceTreeItem* addData(const FSLIB::Surface& tSurface, const FSLIB::Annotation& tAnnotation, Qt3DCore::QEntity* p3DEntityParent = 0);
 
     //=========================================================================================================
     /**
@@ -184,7 +184,7 @@ public:
     *
     * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
-    BrainSourceSpaceTreeItem* addData(const MNELIB::MNESourceSpace& tSourceSpace, Qt3DCore::QEntity* p3DEntityParent = 0);
+    SourceSpaceTreeItem* addData(const MNELIB::MNESourceSpace& tSourceSpace, Qt3DCore::QEntity* p3DEntityParent = 0);
 
     //=========================================================================================================
     /**

@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     brainsourcespacetreeitem.h
+* @file     sourcespacetreeitem.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     BrainSourceSpaceTreeItem class declaration.
+* @brief     SourceSpaceTreeItem class declaration.
 *
 */
 
-#ifndef BRAINSOURCESPACETREEITEM_H
-#define BRAINSOURCESPACETREEITEM_H
+#ifndef SOURCESPACETREEITEM_H
+#define SOURCESPACETREEITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -92,17 +92,17 @@ class Renderable3DEntity;
 
 //=============================================================================================================
 /**
-* BrainSourceSpaceTreeItem provides a generic brain tree item to hold data about the source space.
+* SourceSpaceTreeItem provides a generic brain tree item to hold data about the source space.
 *
 * @brief Provides a generic brain tree item.
 */
-class DISP3DNEWSHARED_EXPORT BrainSourceSpaceTreeItem : public AbstractTreeItem
+class DISP3DNEWSHARED_EXPORT SourceSpaceTreeItem : public AbstractTreeItem
 {
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<BrainSourceSpaceTreeItem> SPtr;             /**< Shared pointer type for BrainSourceSpaceTreeItem class. */
-    typedef QSharedPointer<const BrainSourceSpaceTreeItem> ConstSPtr;  /**< Const shared pointer type for BrainSourceSpaceTreeItem class. */
+    typedef QSharedPointer<SourceSpaceTreeItem> SPtr;             /**< Shared pointer type for SourceSpaceTreeItem class. */
+    typedef QSharedPointer<const SourceSpaceTreeItem> ConstSPtr;  /**< Const shared pointer type for SourceSpaceTreeItem class. */
 
     //=========================================================================================================
     /**
@@ -111,13 +111,13 @@ public:
     * @param[in] iType      The type of the item. See types.h for declaration and definition.
     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
     */
-    explicit BrainSourceSpaceTreeItem(int iType = Data3DTreeModelItemTypes::SourceSpaceItem, const QString& text = "Source space");
+    explicit SourceSpaceTreeItem(int iType = Data3DTreeModelItemTypes::SourceSpaceItem, const QString& text = "Source space");
 
     //=========================================================================================================
     /**
     * Default destructor
     */
-    ~BrainSourceSpaceTreeItem();
+    ~SourceSpaceTreeItem();
 
     //=========================================================================================================
     /**
@@ -185,4 +185,4 @@ signals:
 
 } //NAMESPACE DISP3DLIB
 
-#endif // BRAINSOURCESPACETREEITEM_H
+#endif // SOURCESPACETREEITEM_H

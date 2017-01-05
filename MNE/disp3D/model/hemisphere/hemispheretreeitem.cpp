@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     brainhemispheretreeitem.cpp
+* @file     hemispheretreeitem.cpp
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    BrainHemisphereTreeItem class definition.
+* @brief    HemisphereTreeItem class definition.
 *
 */
 
@@ -38,10 +38,10 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "brainhemispheretreeitem.h"
-#include "brainsurfacetreeitem.h"
-#include "brainannotationtreeitem.h"
-#include "brainsourcespacetreeitem.h"
+#include "hemispheretreeitem.h"
+#include "../freesurfer/fssurfacetreeitem.h"
+#include "../freesurfer/fsannotationtreeitem.h"
+#include "../sourcespace/sourcespacetreeitem.h"
 #include "../sourceactivity/mneestimatetreeitem.h"
 
 #include <fs/label.h>
@@ -89,7 +89,7 @@ using namespace DISP3DLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-BrainHemisphereTreeItem::BrainHemisphereTreeItem(int iType, const QString& text)
+HemisphereTreeItem::HemisphereTreeItem(int iType, const QString& text)
 : AbstractTreeItem(iType, text)
 , m_pSurfaceItem(Q_NULLPTR)
 , m_pAnnotItem(Q_NULLPTR)
@@ -103,14 +103,14 @@ BrainHemisphereTreeItem::BrainHemisphereTreeItem(int iType, const QString& text)
 
 //*************************************************************************************************************
 
-BrainHemisphereTreeItem::~BrainHemisphereTreeItem()
+HemisphereTreeItem::~HemisphereTreeItem()
 {
 }
 
 
 //*************************************************************************************************************
 
-QVariant BrainHemisphereTreeItem::data(int role) const
+QVariant HemisphereTreeItem::data(int role) const
 {
     return AbstractTreeItem::data(role);
 }
@@ -118,7 +118,7 @@ QVariant BrainHemisphereTreeItem::data(int role) const
 
 //*************************************************************************************************************
 
-void BrainHemisphereTreeItem::setData(const QVariant& value, int role)
+void HemisphereTreeItem::setData(const QVariant& value, int role)
 {
     AbstractTreeItem::setData(value, role);
 }
@@ -126,7 +126,7 @@ void BrainHemisphereTreeItem::setData(const QVariant& value, int role)
 
 //*************************************************************************************************************
 
-int BrainHemisphereTreeItem::columnCount() const
+int HemisphereTreeItem::columnCount() const
 {
     return 2;
 }
@@ -134,9 +134,9 @@ int BrainHemisphereTreeItem::columnCount() const
 
 //*************************************************************************************************************
 
-BrainSurfaceTreeItem* BrainHemisphereTreeItem::addData(const Surface& tSurface, const Annotation& tAnnotation, Qt3DCore::QEntity* p3DEntityParent)
+FsSurfaceTreeItem* HemisphereTreeItem::addData(const Surface& tSurface, const Annotation& tAnnotation, Qt3DCore::QEntity* p3DEntityParent)
 {
-    //Set name of BrainHemisphereTreeItem based on the hemisphere information
+    //Set name of HemisphereTreeItem based on the hemisphere information
     switch (tSurface.hemi()) {
     case 0:
         this->setText("Left hemisphere");
@@ -156,7 +156,7 @@ BrainSurfaceTreeItem* BrainHemisphereTreeItem::addData(const Surface& tSurface, 
 
     //Add childs
     //Add surface child
-    m_pSurfaceItem = new BrainSurfaceTreeItem(Data3DTreeModelItemTypes::SurfaceItem);
+    m_pSurfaceItem = new FsSurfaceTreeItem(Data3DTreeModelItemTypes::SurfaceItem);
 
     QList<QStandardItem*> list;
     list << m_pSurfaceItem;
@@ -167,9 +167,9 @@ BrainSurfaceTreeItem* BrainHemisphereTreeItem::addData(const Surface& tSurface, 
 
     //Add annotation child
     if(!tAnnotation.isEmpty()) {
-        m_pAnnotItem = new BrainAnnotationTreeItem(Data3DTreeModelItemTypes::AnnotationItem);
-        connect(m_pAnnotItem, &BrainAnnotationTreeItem::annotationVisibiltyChanged,
-                m_pSurfaceItem, &BrainSurfaceTreeItem::onAnnotationVisibilityChanged);
+        m_pAnnotItem = new FsAnnotationTreeItem(Data3DTreeModelItemTypes::AnnotationItem);
+        connect(m_pAnnotItem, &FsAnnotationTreeItem::annotationVisibiltyChanged,
+                m_pSurfaceItem, &FsSurfaceTreeItem::onAnnotationVisibilityChanged);
 
         list.clear();
         list << m_pAnnotItem;
@@ -185,9 +185,9 @@ BrainSurfaceTreeItem* BrainHemisphereTreeItem::addData(const Surface& tSurface, 
 
 //*************************************************************************************************************
 
-BrainSourceSpaceTreeItem* BrainHemisphereTreeItem::addData(const MNEHemisphere& tHemisphere, Qt3DCore::QEntity* p3DEntityParent)
+SourceSpaceTreeItem* HemisphereTreeItem::addData(const MNEHemisphere& tHemisphere, Qt3DCore::QEntity* p3DEntityParent)
 {
-    //Set name of BrainHemisphereTreeItem based on the hemisphere information
+    //Set name of HemisphereTreeItem based on the hemisphere information
     QVariant data;
 
     switch (tHemisphere.id) {
@@ -209,7 +209,7 @@ BrainSourceSpaceTreeItem* BrainHemisphereTreeItem::addData(const MNEHemisphere& 
 
     //Add childs
     //Add surface child
-    BrainSourceSpaceTreeItem* pSourceSpaceItem = new BrainSourceSpaceTreeItem(Data3DTreeModelItemTypes::SourceSpaceItem);
+    SourceSpaceTreeItem* pSourceSpaceItem = new SourceSpaceTreeItem(Data3DTreeModelItemTypes::SourceSpaceItem);
 
     QList<QStandardItem*> list;
     list << pSourceSpaceItem;
@@ -224,7 +224,7 @@ BrainSourceSpaceTreeItem* BrainHemisphereTreeItem::addData(const MNEHemisphere& 
 
 //*************************************************************************************************************
 
-void BrainHemisphereTreeItem::onRtVertColorChanged(const QByteArray& sourceColorSamples)
+void HemisphereTreeItem::onRtVertColorChanged(const QByteArray& sourceColorSamples)
 {
     if(m_pSurfaceItem) {
         m_pSurfaceItem->onRtVertColorChanged(sourceColorSamples);
@@ -234,7 +234,7 @@ void BrainHemisphereTreeItem::onRtVertColorChanged(const QByteArray& sourceColor
 
 //*************************************************************************************************************
 
-BrainSurfaceTreeItem* BrainHemisphereTreeItem::getSurfaceItem()
+FsSurfaceTreeItem* HemisphereTreeItem::getSurfaceItem()
 {
    return m_pSurfaceItem;
 }
@@ -242,7 +242,7 @@ BrainSurfaceTreeItem* BrainHemisphereTreeItem::getSurfaceItem()
 
 //*************************************************************************************************************
 
-BrainAnnotationTreeItem* BrainHemisphereTreeItem::getAnnotItem()
+FsAnnotationTreeItem* HemisphereTreeItem::getAnnotItem()
 {
     return m_pAnnotItem;
 }
@@ -250,7 +250,7 @@ BrainAnnotationTreeItem* BrainHemisphereTreeItem::getAnnotItem()
 
 //*************************************************************************************************************
 
-void BrainHemisphereTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
+void HemisphereTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
 {
     for(int i = 0; i < this->rowCount(); i++) {
         if(this->child(i)->isCheckable()) {
