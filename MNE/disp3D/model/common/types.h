@@ -93,7 +93,8 @@ namespace Data3DTreeModelItemTypes
                     BemSurfaceItem = QStandardItem::UserType + 10,
                     DigitizerSetItem = QStandardItem::UserType + 11,
                     DigitizerItem = QStandardItem::UserType + 12,
-                    ECDSetDataItem = QStandardItem::UserType + 13};
+                    ECDSetDataItem = QStandardItem::UserType + 13,
+                    MriItem = QStandardItem::UserType + 14};
 }
 
 namespace MetaTreeItemTypes

@@ -123,11 +123,6 @@ MeasurementTreeItem::~MeasurementTreeItem()
 
 QVariant MeasurementTreeItem::data(int role) const
 {
-    switch(role) {
-        case Data3DTreeModelItemRoles::SurfaceSetName:
-            return QVariant();
-    }
-
     return AbstractTreeItem::data(role);
 }
 
