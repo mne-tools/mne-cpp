@@ -199,20 +199,24 @@ MneEstimateTreeItem* MeasurementTreeItem::addData(const MNESourceEstimate& tSour
                         this, &MeasurementTreeItem::onRtVertColorChanged);
 
                 //Divide into left right hemi
-                //Find MRI data set and hemisphere from parent item
-                QString sMRISetName = "MRI";
-
                 if(SubjectTreeItem* pParent = dynamic_cast<SubjectTreeItem*>(this->QStandardItem::parent())) {
                     QList<QStandardItem*> lMRIChildren = pParent->findChildren(Data3DTreeModelItemTypes::MriItem);
                     MriTreeItem* pMriItem = Q_NULLPTR;
 
-                    for(int i = 0; i < lMRIChildren.size(); ++i) {
-                        if(lMRIChildren.at(i)->text() == sMRISetName) {
-                            if(pMriItem = dynamic_cast<MriTreeItem*>(lMRIChildren.at(i))) {
-                                i = lMRIChildren.size();
-                            }
-                        }
-                    }
+                    //Find MRI data set and hemisphere from parent item
+                    //Option 1 - Choose first found MRI set
+                    pMriItem = dynamic_cast<MriTreeItem*>(lMRIChildren.first());
+
+//                    //Option 2 - Choose MRI set by its name
+//                    QString sMRISetName = "MRI";
+
+//                    for(int i = 0; i < lMRIChildren.size(); ++i) {
+//                        if(lMRIChildren.at(i)->text() == sMRISetName) {
+//                            if(pMriItem = dynamic_cast<MriTreeItem*>(lMRIChildren.at(i))) {
+//                                i = lMRIChildren.size();
+//                            }
+//                        }
+//                    }
 
                     if(pMriItem) {
                         QList<QStandardItem*> itemList = pMriItem->findChildren(Data3DTreeModelItemTypes::HemisphereItem);
@@ -354,27 +358,7 @@ NetworkTreeItem* MeasurementTreeItem::addData(Network::SPtr pNetworkData, Qt3DCo
 
 //*************************************************************************************************************
 
-void MeasurementTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
-{
-    for(int i = 0; i < this->rowCount(); ++i) {
-        if(this->child(i)->isCheckable()) {
-            this->child(i)->setCheckState(checkState);
-        }
-    }
-}
-
-
-//*************************************************************************************************************
-
-void MeasurementTreeItem::onRtVertColorChanged(const QPair<QByteArray, QByteArray>& sourceColorSamples)
-{
-    emit rtVertColorChanged(sourceColorSamples);
-}
-
-
-//*************************************************************************************************************
-
-void MeasurementTreeItem::onColorInfoOriginChanged(const QByteArray& leftHemiColor, const QByteArray& rightHemiColor)
+void MeasurementTreeItem::setColorOrigin(const QByteArray& leftHemiColor, const QByteArray& rightHemiColor)
 {
     QList<QStandardItem*> itemList = this->findChildren(Data3DTreeModelItemTypes::HemisphereItem);
 
@@ -394,5 +378,25 @@ void MeasurementTreeItem::onColorInfoOriginChanged(const QByteArray& leftHemiCol
     if(pSurfaceTreeItemLeft && pSurfaceTreeItemRight) {
         m_pMneEstimateTreeItem->onColorInfoOriginChanged(leftHemiColor, rightHemiColor);
     }
+}
+
+
+//*************************************************************************************************************
+
+void MeasurementTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
+{
+    for(int i = 0; i < this->rowCount(); ++i) {
+        if(this->child(i)->isCheckable()) {
+            this->child(i)->setCheckState(checkState);
+        }
+    }
+}
+
+
+//*************************************************************************************************************
+
+void MeasurementTreeItem::onRtVertColorChanged(const QPair<QByteArray, QByteArray>& sourceColorSamples)
+{
+    emit rtVertColorChanged(sourceColorSamples);
 }
 

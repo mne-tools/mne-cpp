@@ -157,7 +157,7 @@ QList<FsSurfaceTreeItem*> MriTreeItem::addData(const SurfaceSet& tSurfaceSet, co
             }
 
             connect(pHemiItem->getSurfaceItem(), &FsSurfaceTreeItem::colorInfoOriginChanged,
-                this, &MriTreeItem::onColorInfoOriginChanged);
+                this, &MriTreeItem::onColorOriginChanged);
         }
 
         hemiItemFound = false;
@@ -209,7 +209,7 @@ FsSurfaceTreeItem* MriTreeItem::addData(const Surface& tSurface, const Annotatio
         this->appendRow(list);
 
         connect(pHemiItem->getSurfaceItem(), &FsSurfaceTreeItem::colorInfoOriginChanged,
-            this, &MriTreeItem::onColorInfoOriginChanged);
+            this, &MriTreeItem::onColorOriginChanged);
     }
 
     return pReturnItem;
@@ -248,7 +248,7 @@ void MriTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
 
 //*************************************************************************************************************
 
-void MriTreeItem::onColorInfoOriginChanged()
+void MriTreeItem::onColorOriginChanged()
 {
     QList<QStandardItem*> itemList = this->findChildren(Data3DTreeModelItemTypes::HemisphereItem);
 
@@ -266,7 +266,7 @@ void MriTreeItem::onColorInfoOriginChanged()
     }
 
     if(pSurfaceTreeItemLeft && pSurfaceTreeItemRight) {
-        emit colorInfoChanged(pSurfaceTreeItemLeft->data(Data3DTreeModelItemRoles::SurfaceCurrentColorVert).value<QByteArray>(),
+        emit colorOriginChanged(pSurfaceTreeItemLeft->data(Data3DTreeModelItemRoles::SurfaceCurrentColorVert).value<QByteArray>(),
                               pSurfaceTreeItemRight->data(Data3DTreeModelItemRoles::SurfaceCurrentColorVert).value<QByteArray>());
     }
 }

@@ -192,8 +192,8 @@ QList<FsSurfaceTreeItem*> Data3DTreeModel::addSurfaceSet(const QString& subject,
 
         for(int i = 0; i < measItemList.size(); ++i) {
             if(MeasurementTreeItem* pMeasItem = dynamic_cast<MeasurementTreeItem*>(measItemList.at(i))) {
-                connect(pMriItem, &MriTreeItem::colorInfoChanged,
-                    pMeasItem, &MeasurementTreeItem::onColorInfoOriginChanged);
+                connect(pMriItem, &MriTreeItem::colorOriginChanged,
+                    pMeasItem, &MeasurementTreeItem::setColorOrigin);
             }
         }
     }

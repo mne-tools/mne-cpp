@@ -212,7 +212,7 @@ public:
     * @param[in] leftHemiColor        Color of the left hemisphere.
     * @param[in] rightHemiColor       Color of the right hemisphere.
     */
-    void onColorInfoOriginChanged(const QByteArray& leftHemiColor, const QByteArray& rightHemiColor);
+    void setColorOrigin(const QByteArray& leftHemiColor, const QByteArray& rightHemiColor);
 
 private:
     //=========================================================================================================
