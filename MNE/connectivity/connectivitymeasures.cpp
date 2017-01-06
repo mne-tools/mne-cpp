@@ -183,8 +183,8 @@ QPair<int,double> ConnectivityMeasures::calcCrossCorrelation(const RowVectorXd& 
     //Compute the FFT size as the "next power of 2" of the input vector's length (max)
     int b = ceil(log2(2.0 * N - 1));
     int fftsize = pow(2,b);
-    int end = fftsize - 1;
-    int maxlag = N - 1;
+//    int end = fftsize - 1;
+//    int maxlag = N - 1;
 
     //Zero Padd
     RowVectorXd xCorrInputVecFirst = RowVectorXd::Zero(fftsize);

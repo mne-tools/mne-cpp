@@ -102,6 +102,7 @@ RealTimeConnectivityEstimateWidget::RealTimeConnectivityEstimateWidget(QSharedPo
 : NewMeasurementWidget(parent)
 , m_pRTCE(pRTCE)
 , m_bInitialized(false)
+, m_pRtItem(Q_NULLPTR)
 {
     m_pAction3DControl = new QAction(QIcon(":/images/3DControl.png"), tr("Shows the 3D control widget (F9)"),this);
     m_pAction3DControl->setShortcut(tr("F9"));
@@ -159,14 +160,14 @@ void RealTimeConnectivityEstimateWidget::getData()
         //
         // Add rt brain data
         //
-        if(m_lRtItem.isEmpty()) {
-            qDebug()<<"RealTimeConnectivityEstimateWidget::getData - Creating m_lRtItem list";
-            m_lRtItem = m_pData3DModel->addConnectivityData("Subject01", "HemiLRSet", m_pRTCE->getValue());
+        if(!m_pRtItem) {
+            qDebug()<<"RealTimeConnectivityEstimateWidget::getData - Creating m_pRtItem list";
+            m_pRtItem = m_pData3DModel->addConnectivityData("Subject01", "HemiLRSet", m_pRTCE->getValue());
         } else {
-            qDebug()<<"RealTimeConnectivityEstimateWidget::getData - Working with m_lRtItem list";
+            qDebug()<<"RealTimeConnectivityEstimateWidget::getData - Working with m_pRtItem list";
 
-            for(int i = 0; i<m_lRtItem.size(); i++) {
-                m_lRtItem.at(i)->addData(m_pRTCE->getValue());
+            if(m_pRtItem) {
+                m_pRtItem->addData(m_pRTCE->getValue());
             }
         }
     }

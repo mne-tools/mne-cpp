@@ -112,15 +112,16 @@ int main(int argc, char *argv[])
     Data3DTreeModel::SPtr p3DDataModel = Data3DTreeModel::SPtr(new Data3DTreeModel());
     testWindow->setModel(p3DDataModel);
 
-    //Option 1 - Visualize full source space
-//    testWindow->addForwardSolution("Subject01", "ForwardSolution", t_forwardSolution);
+//    //Option 1 - Visualize full source space
+//    p3DDataModel->addForwardSolution(parser.value(subjectOption), "FullForwardSolution", t_forwardSolution);
 
     //Option 2 - Visualize clustered source space
     AnnotationSet t_annotationSet (parser.value(subjectOption), parser.value(hemiOption).toInt(), parser.value(annotOption), parser.value(subjectPathOption));
 
     MNEForwardSolution t_clusteredFwd = t_forwardSolution.cluster_forward_solution(t_annotationSet, 40);
-    p3DDataModel->addForwardSolution(parser.value(subjectOption), "ForwardSolution", t_clusteredFwd);
+    p3DDataModel->addForwardSolution(parser.value(subjectOption), "ClusteredForwardSolution", t_clusteredFwd);
 
+    //Visualize result in 3D
     testWindow->show();
     Control3DWidget::SPtr control3DWidget = Control3DWidget::SPtr(new Control3DWidget());
     control3DWidget->init(p3DDataModel, testWindow);

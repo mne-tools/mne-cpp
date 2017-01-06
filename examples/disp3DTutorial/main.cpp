@@ -42,7 +42,7 @@
 
 #include <disp3D/view3D.h>
 #include <disp3D/control/control3dwidget.h>
-#include <disp3D/model/brain/brainrtsourcelocdatatreeitem.h>
+#include <disp3D/model/sourceactivity/mneestimatetreeitem.h>
 #include <disp3D/model/data3Dtreemodel.h>
 
 #include <fs/label.h>
@@ -117,7 +117,7 @@ int main(int argc, char *argv[])
     QCommandLineOption hemiOption("hemi", "Selected hemisphere <hemi>.", "hemi", "2");
     QCommandLineOption subjectOption("subject", "Selected subject <subject>.", "subject", "sample");
     QCommandLineOption subjectPathOption("subjectPath", "Selected subject path <subjectPath>.", "subjectPath", "./MNE-sample-data/subjects");
-    QCommandLineOption sourceLocOption("doSourceLoc", "Do real time source localization.", "doSourceLoc", "false");
+    QCommandLineOption sourceLocOption("doSourceLoc", "Do real time source localization.", "doSourceLoc", "true");
     QCommandLineOption fwdOption("fwd", "Path to forwad solution <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
     QCommandLineOption invOpOption("inv", "Path to inverse operator <file>.", "file", "");
     QCommandLineOption clustOption("doClust", "Path to clustered inverse operator <doClust>.", "doClust", "true");
@@ -259,7 +259,7 @@ int main(int argc, char *argv[])
     Data3DTreeModel::SPtr p3DDataModel = Data3DTreeModel::SPtr(new Data3DTreeModel());
 
     //Add fressurfer surface set including both hemispheres
-    p3DDataModel->addSurfaceSet(parser.value(subjectOption), evoked.comment, tSurfSet, tAnnotSet);
+    p3DDataModel->addSurfaceSet(parser.value(subjectOption), "MRI", tSurfSet, tAnnotSet);
 
 //    //Read and show BEM
 //    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif");
@@ -277,18 +277,15 @@ int main(int argc, char *argv[])
 //    p3DDataModel->addDigitizerData(parser.value(subjectOption), evoked.comment, t_Dig);
 
     if(bAddRtSourceLoc) {
-        //Add rt source loc data
-        QList<BrainRTSourceLocDataTreeItem*> rtItemList_RV = p3DDataModel->addSourceData(parser.value(subjectOption), evoked.comment, sourceEstimate, t_clusteredFwd);
-
-        //Init some rt related values for right visual data
-        for(int i = 0; i < rtItemList_RV.size(); ++i) {
-            rtItemList_RV.at(i)->setLoopState(true);
-            rtItemList_RV.at(i)->setTimeInterval(17);
-            rtItemList_RV.at(i)->setNumberAverages(1);
-            rtItemList_RV.at(i)->setStreamingActive(true);
-            rtItemList_RV.at(i)->setNormalization(QVector3D(0.0,5.5,10));
-            rtItemList_RV.at(i)->setVisualizationType("Annotation based");
-            rtItemList_RV.at(i)->setColortable("Hot");
+        //Add rt source loc data and init some visualization values
+        if(MneEstimateTreeItem* pRTDataItem = p3DDataModel->addSourceData(parser.value(subjectOption), evoked.comment, sourceEstimate, t_clusteredFwd)) {
+            pRTDataItem->setLoopState(true);
+            pRTDataItem->setTimeInterval(17);
+            pRTDataItem->setNumberAverages(1);
+            pRTDataItem->setStreamingActive(true);
+            pRTDataItem->setNormalization(QVector3D(0.3,0.5,10.0));
+            pRTDataItem->setVisualizationType("Annotation based");
+            pRTDataItem->setColortable("Hot");
         }
     }
 
