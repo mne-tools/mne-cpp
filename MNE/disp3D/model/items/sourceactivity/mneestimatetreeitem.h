@@ -41,8 +41,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../../disp3D_global.h"
-#include "../common/abstracttreeitem.h"
+#include "../../../disp3D_global.h"
+#include "../../common/abstracttreeitem.h"
 
 #include <fiff/fiff_types.h>
 

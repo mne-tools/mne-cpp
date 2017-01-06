@@ -39,13 +39,13 @@
 //=============================================================================================================
 
 #include "data3Dtreemodel.h"
-#include "bem/bemtreeitem.h"
-#include "subject/subjecttreeitem.h"
-#include "freesurfer/fssurfacetreeitem.h"
-#include "sourcespace/sourcespacetreeitem.h"
-#include "measurement/measurementtreeitem.h"
-#include "mri/mritreeitem.h"
-#include "digitizer/digitizertreeitem.h"
+#include "items/bem/bemtreeitem.h"
+#include "items/subject/subjecttreeitem.h"
+#include "items/freesurfer/fssurfacetreeitem.h"
+#include "items/sourcespace/sourcespacetreeitem.h"
+#include "items/measurement/measurementtreeitem.h"
+#include "items/mri/mritreeitem.h"
+#include "items/digitizer/digitizertreeitem.h"
 #include "common/renderable3Dentity.h"
 
 #include <mne/mne_bem.h>

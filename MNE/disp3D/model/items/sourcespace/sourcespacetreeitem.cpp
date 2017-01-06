@@ -39,9 +39,9 @@
 //=============================================================================================================
 
 #include "SourceSpaceTreeItem.h"
-#include "../common/metatreeitem.h"
-#include "../common/renderable3Dentity.h"
-#include "../materials/pervertexphongalphamaterial.h"
+#include "../../common/metatreeitem.h"
+#include "../../common/renderable3Dentity.h"
+#include "../../materials/pervertexphongalphamaterial.h"
 
 #include <fs/label.h>
 #include <fs/surface.h>

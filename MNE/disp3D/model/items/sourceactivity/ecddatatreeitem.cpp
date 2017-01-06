@@ -39,8 +39,8 @@
 //=============================================================================================================
 
 #include "ecddatatreeitem.h"
-#include "../common/metatreeitem.h"
-#include "../common/renderable3Dentity.h"
+#include "../../common/metatreeitem.h"
+#include "../../common/renderable3Dentity.h"
 
 
 //*************************************************************************************************************

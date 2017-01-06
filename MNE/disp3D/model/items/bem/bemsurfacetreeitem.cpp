@@ -39,9 +39,9 @@
 //=============================================================================================================
 
 #include "bemsurfacetreeitem.h"
-#include "../common/metatreeitem.h"
-#include "../common/renderable3Dentity.h"
-#include "../materials/pervertexphongalphamaterial.h"
+#include "../../common/metatreeitem.h"
+#include "../../common/renderable3Dentity.h"
+#include "../../materials/pervertexphongalphamaterial.h"
 
 #include <mne/mne_bem.h>
 #include <fiff/fiff_constants.h>
