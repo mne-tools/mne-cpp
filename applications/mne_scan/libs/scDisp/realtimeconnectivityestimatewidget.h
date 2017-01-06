@@ -45,8 +45,6 @@
 #include "scdisp_global.h"
 
 #include "newmeasurementwidget.h"
-#include <disp3D/view3D.h>
-#include <disp3D/control/control3dwidget.h>
 
 #include "fs/annotationset.h"
 #include "fs/surfaceset.h"
@@ -72,7 +70,10 @@
 class QTime;
 
 namespace DISP3DLIB {
-    class BrainRTConnectivityDataTreeItem;
+    class NetworkTreeItem;
+    class View3D;
+    class Control3DWidget;
+    class Data3DTreeModel;
 }
 
 namespace SCMEASLIB {
@@ -174,9 +175,12 @@ private:
     FSLIB::AnnotationSet                                        m_annotationSet;    /**< The current annotation set. */
     FSLIB::SurfaceSet                                           m_surfSet;          /**< The current surface set. */
 
-    DISP3DLIB::View3D::SPtr                                     m_p3DView;          /**< The Disp3D view. */
-    DISP3DLIB::Control3DWidget::SPtr                            m_pControl3DView;   /**< The Disp3D control. */
-    QList<DISP3DLIB::BrainRTConnectivityDataTreeItem*>          m_lRtItem;          /**< The Disp3D real time items. */
+
+    QSharedPointer<DISP3DLIB::View3D>                           m_p3DView;          /**< The Disp3D view. */
+    QSharedPointer<DISP3DLIB::Control3DWidget>                  m_pControl3DView;   /**< The Disp3D control. */
+    QSharedPointer<DISP3DLIB::Data3DTreeModel>                  m_pData3DModel;     /**< The Disp3D model. */
+
+    QList<DISP3DLIB::NetworkTreeItem*>          m_lRtItem;          /**< The Disp3D real time items. */
 
     QAction*                                                    m_pAction3DControl; /**< Show 3D View control widget */
 

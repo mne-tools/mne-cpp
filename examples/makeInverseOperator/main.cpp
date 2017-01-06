@@ -2,6 +2,7 @@
 /**
 * @file     main.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     July, 2012
@@ -50,6 +51,7 @@
 //=============================================================================================================
 
 #include <iostream>
+#include <QCommandLineParser>
 
 
 //*************************************************************************************************************
@@ -88,14 +90,34 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
-    QFile t_fileFwdMeeg("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
-    QFile t_fileFwdEeg("./MNE-sample-data/MEG/sample/sample_audvis-eeg-oct-6-fwd.fif");
-    QFile t_fileCov("./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
-    QFile t_fileEvoked("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    // Command Line Parser
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Make Inverse Operator Example");
+    parser.addHelpOption();
+    QCommandLineOption fwdMEGOption("fwdMEG", "Path to forwad solution <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
+    QCommandLineOption fwdEEGOption("fwdEEG", "Path to forwad solution <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-eeg-oct-6-fwd.fif");
+    QCommandLineOption covFileOption("cov", "Path to the covariance <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
+    QCommandLineOption evokedFileOption("ave", "Path to the evoked/average <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    QCommandLineOption methodOption("method", "Inverse estimation <method>, i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM");
+    QCommandLineOption snrOption("snr", "The SNR value used for computation <snr>.", "snr", "3.0");//3.0f;//0.1f;//3.0f;
 
-    double snr = 3.0;
+    parser.addOption(fwdMEGOption);
+    parser.addOption(fwdEEGOption);
+    parser.addOption(covFileOption);
+    parser.addOption(evokedFileOption);
+    parser.addOption(methodOption);
+    parser.addOption(snrOption);
+
+    parser.process(a);
+
+    QFile t_fileFwdMeeg(parser.value(fwdMEGOption));
+    QFile t_fileFwdEeg(parser.value(fwdEEGOption));
+    QFile t_fileCov(parser.value(covFileOption));
+    QFile t_fileEvoked(parser.value(evokedFileOption));
+
+    double snr = parser.value(snrOption).toDouble();
     double lambda2 = 1.0 / pow(snr, 2);
-    QString method("dSPM"); //"MNE" | "dSPM" | "sLORETA"
+    QString method(parser.value(methodOption));
 
     // Load data
     fiff_int_t setno = 0;

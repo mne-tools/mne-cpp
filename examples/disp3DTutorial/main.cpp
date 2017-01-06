@@ -2,6 +2,7 @@
 /**
 * @file     main.cpp
 * @author   Lorenz Esch Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+*           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     July, 2016
@@ -41,7 +42,8 @@
 
 #include <disp3D/view3D.h>
 #include <disp3D/control/control3dwidget.h>
-#include <disp3D/3DObjects/brain/brainrtsourcelocdatatreeitem.h>
+#include <disp3D/model/brain/brainrtsourcelocdatatreeitem.h>
+#include <disp3D/model/data3Dtreemodel.h>
 
 #include <fs/label.h>
 #include <fs/surfaceset.h>
@@ -107,49 +109,66 @@ int main(int argc, char *argv[])
 
     // Command Line Parser
     QCommandLineParser parser;
-    parser.setApplicationDescription("Start disp3D tutorial");
+    parser.setApplicationDescription("Disp3D Example");
     parser.addHelpOption();
-    QCommandLineOption sampleSurfOption("surfType", "Surface type <type>.", "type", "orig");
-    QCommandLineOption sampleAnnotOption("annotType", "Annotation type <type>.", "type", "aparc.a2009s");
-    QCommandLineOption sampleHemiOption("hemi", "Selected hemisphere <hemi>.", "hemi", "2");
-    QCommandLineOption sampleSubjectOption("subject", "Selected subject <subject>.", "subject", "sample");
-    QCommandLineOption sampleSubjectPathOption("subjectPath", "Selected subject path <subjectPath>.", "subjectPath", "./MNE-sample-data/subjects");
-    QCommandLineOption sampleSourceLocOption("doSourceLoc", "Do real time source localization <doSourceLoc>.", "doSourceLoc", "true");
-    QCommandLineOption sampleFwdOption("fwd", "Path to forwad solution <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
-    QCommandLineOption sampleInvOpOption("invOp", "Path to inverse operator <file>.", "file", "");
-    QCommandLineOption sampleClustOption("doClust", "Path to clustered inverse operator <doClust>.", "doClust", "true");
 
-    parser.addOption(sampleSurfOption);
-    parser.addOption(sampleAnnotOption);
-    parser.addOption(sampleHemiOption);
-    parser.addOption(sampleSubjectOption);
-    parser.addOption(sampleSubjectPathOption);
-    parser.addOption(sampleSourceLocOption);
-    parser.addOption(sampleFwdOption);
-    parser.addOption(sampleInvOpOption);
-    parser.addOption(sampleClustOption);
+    QCommandLineOption surfOption("surfType", "Surface type <type>.", "type", "orig");
+    QCommandLineOption annotOption("annotType", "Annotation type <type>.", "type", "aparc.a2009s");
+    QCommandLineOption hemiOption("hemi", "Selected hemisphere <hemi>.", "hemi", "2");
+    QCommandLineOption subjectOption("subject", "Selected subject <subject>.", "subject", "sample");
+    QCommandLineOption subjectPathOption("subjectPath", "Selected subject path <subjectPath>.", "subjectPath", "./MNE-sample-data/subjects");
+    QCommandLineOption sourceLocOption("doSourceLoc", "Do real time source localization.", "doSourceLoc", "false");
+    QCommandLineOption fwdOption("fwd", "Path to forwad solution <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
+    QCommandLineOption invOpOption("inv", "Path to inverse operator <file>.", "file", "");
+    QCommandLineOption clustOption("doClust", "Path to clustered inverse operator <doClust>.", "doClust", "false");
+    QCommandLineOption covFileOption("cov", "Path to the covariance <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
+    QCommandLineOption evokedFileOption("ave", "Path to the evoked/average <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    QCommandLineOption methodOption("method", "Inverse estimation <method>, i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM");//"MNE" | "dSPM" | "sLORETA"
+    QCommandLineOption snrOption("snr", "The SNR value used for computation <snr>.", "snr", "3.0");//3.0f;//0.1f;//3.0f;
+    QCommandLineOption evokedIndexOption("aveIdx", "The average <index> to choose from the average file.", "index", "0");
+
+    parser.addOption(surfOption);
+    parser.addOption(annotOption);
+    parser.addOption(hemiOption);
+    parser.addOption(subjectOption);
+    parser.addOption(subjectPathOption);
+    parser.addOption(sourceLocOption);
+    parser.addOption(fwdOption);
+    parser.addOption(invOpOption);
+    parser.addOption(clustOption);
+    parser.addOption(covFileOption);
+    parser.addOption(evokedFileOption);
+    parser.addOption(methodOption);
+    parser.addOption(snrOption);
+    parser.addOption(evokedIndexOption);
     parser.process(a);
 
-    bool bAddRtSourceLoc = parser.value(sampleSourceLocOption) == "false" ? false : true;
-    bool bDoClustering = parser.value(sampleClustOption) == "false" ? false : true;
+    bool bAddRtSourceLoc = false;
+    if(parser.value(sourceLocOption) == "false" || parser.value(sourceLocOption) == "0") {
+        bAddRtSourceLoc = false;
+    } else if(parser.value(sourceLocOption) == "true" || parser.value(sourceLocOption) == "1") {
+        bAddRtSourceLoc = true;
+    }
+
+    bool bDoClustering = false;
+    if(parser.value(clustOption) == "false" || parser.value(clustOption) == "0") {
+        bDoClustering = false;
+    } else if(parser.value(clustOption) == "true" || parser.value(clustOption) == "1") {
+        bDoClustering = true;
+    }
 
     //Inits
-    SurfaceSet tSurfSet (parser.value(sampleSubjectOption), parser.value(sampleHemiOption).toInt(), parser.value(sampleSurfOption), parser.value(sampleSubjectPathOption));
-    AnnotationSet tAnnotSet (parser.value(sampleSubjectOption), parser.value(sampleHemiOption).toInt(), parser.value(sampleAnnotOption), parser.value(sampleSubjectPathOption));
+    SurfaceSet tSurfSet (parser.value(subjectOption), parser.value(hemiOption).toInt(), parser.value(surfOption), parser.value(subjectPathOption));
+    AnnotationSet tAnnotSet (parser.value(subjectOption), parser.value(hemiOption).toInt(), parser.value(annotOption), parser.value(subjectPathOption));
 
-//    Surface tSurfRight ("sample", 1, "pial", "./MNE-sample-data/subjects");
-//    Annotation tAnnotRight ("sample", 1, "aparc.a2009s", "./MNE-sample-data/subjects");
-//    Surface tSurfLeft ("sample", 0, "orig", "./MNE-sample-data/subjects");
-//    Annotation tAnnotLeft ("sample", 0, "aparc.a2009s", "./MNE-sample-data/subjects");
-
-    QFile t_fileFwd(parser.value(sampleFwdOption));
+    QFile t_fileFwd(parser.value(fwdOption));
     MNEForwardSolution t_Fwd(t_fileFwd);
     MNEForwardSolution t_clusteredFwd;
 
-    QString t_sFileClusteredInverse(parser.value(sampleInvOpOption));//QFile t_fileClusteredInverse("./clusteredInverse-inv.fif");
+    QString t_sFileClusteredInverse(parser.value(invOpOption));
 
-    QFile t_fileCov("./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
-    QFile t_fileEvoked("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    QFile t_fileCov(parser.value(covFileOption));
+    QFile t_fileEvoked(parser.value(evokedFileOption));
 
     //########################################################################################
     //
@@ -157,34 +176,23 @@ int main(int argc, char *argv[])
     //
     //########################################################################################
 
-    MNESourceEstimate sourceEstimate_LA;
-    MNESourceEstimate sourceEstimate_RA;
-    MNESourceEstimate sourceEstimate_LV;
-    MNESourceEstimate sourceEstimate_RV;
+    // Load data
+    QPair<QVariant, QVariant> baseline(QVariant(), 0);
+    MNESourceEstimate sourceEstimate;
+    FiffEvoked evoked(t_fileEvoked, parser.value(evokedIndexOption).toInt(), baseline);
 
     if(bAddRtSourceLoc) {
-        double snr = 3.0;
+        double snr = parser.value(snrOption).toDouble();
         double lambda2 = 1.0 / pow(snr, 2);
-        QString method("dSPM"); //"MNE" | "dSPM" | "sLORETA"
+        QString method(parser.value(methodOption));
 
         // Load data
-        QPair<QVariant, QVariant> baseline(QVariant(), 0);
-        FiffEvoked evoked_LA(t_fileEvoked, 0, baseline);
         t_fileEvoked.close();
-        FiffEvoked evoked_RA(t_fileEvoked, 1, baseline);
-        t_fileEvoked.close();
-        FiffEvoked evoked_LV(t_fileEvoked, 2, baseline);
-        t_fileEvoked.close();
-        FiffEvoked evoked_RV(t_fileEvoked, 3, baseline);
-        t_fileEvoked.close();
-        if(evoked_LA.isEmpty() || evoked_RA.isEmpty() ||evoked_LV.isEmpty() || evoked_RV.isEmpty())
+        if(evoked.isEmpty())
             return 1;
 
         std::cout << std::endl;
-        std::cout << "Evoked description: " << evoked_LA.comment.toLatin1().constData() << std::endl;
-        std::cout << "Evoked description: " << evoked_RA.comment.toLatin1().constData() << std::endl;
-        std::cout << "Evoked description: " << evoked_LV.comment.toLatin1().constData() << std::endl;
-        std::cout << "Evoked description: " << evoked_RV.comment.toLatin1().constData() << std::endl;
+        std::cout << "Evoked description: " << evoked.comment.toLatin1().constData() << std::endl;
 
         if(t_Fwd.isEmpty())
             return 1;
@@ -192,7 +200,7 @@ int main(int argc, char *argv[])
         FiffCov noise_cov(t_fileCov);
 
         // regularize noise covariance
-        noise_cov = noise_cov.regularize(evoked_LA.info, 0.05, 0.05, 0.1, true);
+        noise_cov = noise_cov.regularize(evoked.info, 0.05, 0.05, 0.1, true);
 
         //
         // Cluster forward solution;
@@ -206,7 +214,7 @@ int main(int argc, char *argv[])
         //
         // make an inverse operators
         //
-        FiffInfo info = evoked_LA.info;
+        FiffInfo info = evoked.info;
 
         MNEInverseOperator inverse_operator(info, t_clusteredFwd, noise_cov, 0.2f, 0.8f);
 
@@ -220,20 +228,17 @@ int main(int argc, char *argv[])
         // Compute inverse solution
         //
         MinimumNorm minimumNorm(inverse_operator, lambda2, method);
-        sourceEstimate_LA = minimumNorm.calculateInverse(evoked_LA);
-        sourceEstimate_RA = minimumNorm.calculateInverse(evoked_RA);
-        sourceEstimate_LV = minimumNorm.calculateInverse(evoked_LV);
-        sourceEstimate_RV = minimumNorm.calculateInverse(evoked_RV);
+        sourceEstimate = minimumNorm.calculateInverse(evoked);
 
-        if(sourceEstimate_LA.isEmpty() || sourceEstimate_RA.isEmpty() ||sourceEstimate_LV.isEmpty() || sourceEstimate_RV.isEmpty())
+        if(sourceEstimate.isEmpty())
             return 1;
 
         // View activation time-series
-        std::cout << "\nsourceEstimate:\n" << sourceEstimate_LA.data.block(0,0,10,10) << std::endl;
-        std::cout << "time\n" << sourceEstimate_LA.times.block(0,0,1,10) << std::endl;
-        std::cout << "timeMin\n" << sourceEstimate_LA.times[0] << std::endl;
-        std::cout << "timeMax\n" << sourceEstimate_LA.times[sourceEstimate_LA.times.size()-1] << std::endl;
-        std::cout << "time step\n" << sourceEstimate_LA.tstep << std::endl;
+        std::cout << "\nsourceEstimate:\n" << sourceEstimate.data.block(0,0,10,10) << std::endl;
+        std::cout << "time\n" << sourceEstimate.times.block(0,0,1,10) << std::endl;
+        std::cout << "timeMin\n" << sourceEstimate.times[0] << std::endl;
+        std::cout << "timeMax\n" << sourceEstimate.times[sourceEstimate.times.size()-1] << std::endl;
+        std::cout << "time step\n" << sourceEstimate.tstep << std::endl;
     }
 
     //########################################################################################
@@ -250,48 +255,30 @@ int main(int argc, char *argv[])
 
     std::cout<<"Creating BrainView"<<std::endl;
 
-    //Create the 3D view
-    View3D::SPtr testWindow = View3D::SPtr(new View3D());
-
-    //Add fressurfer surfaces per hemisphere
-//    testWindow->addSurface("Subject01", "HemiLRSet", tSurfLeft, tAnnotLeft);
-//    testWindow->addSurface("Subject01", "HemiLRSet", tSurfRight, tAnnotRight);
+    //Create 3D data model
+    Data3DTreeModel::SPtr p3DDataModel = Data3DTreeModel::SPtr(new Data3DTreeModel());
 
     //Add fressurfer surface set including both hemispheres
-    //testWindow->addSurfaceSet("Subject01", "Right Auditory", tSurfSet, tAnnotSet);
-    testWindow->addSurfaceSet("Subject01", "Right Visual", tSurfSet, tAnnotSet);
-    //testWindow->addSurfaceSet("Subject01", "Left Auditory", tSurfSet, tAnnotSet);
-    //testWindow->addSurfaceSet("Subject01", "Left Visual", tSurfSet, tAnnotSet);
+    p3DDataModel->addSurfaceSet(parser.value(subjectOption), evoked.comment, tSurfSet, tAnnotSet);
 
-    //Read and show BEM
-    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif");
-    MNEBem t_Bem(t_fileBem);
-    testWindow->addBemData("Subject01", "BEM", t_Bem);
+//    //Read and show BEM
+//    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif");
+//    MNEBem t_Bem(t_fileBem);
+//    p3DDataModel->addBemData(parser.value(subjectOption), "BEM", t_Bem);
 
-//    QFile t_fileBem2("./MNE-sample-data/subjects/sample/bem/sample-head.fif");
-//    MNEBem t_Bem2(t_fileBem2);
-//    testWindow->addBemData("Subject01", "BEM", t_Bem2);
+//    //Read and show sensor helmets
+//    QFile t_filesensorSurfaceVV("./resources/sensorSurfaces/306m_rt.fif");
+//    MNEBem t_sensorSurfaceVV(t_filesensorSurfaceVV);
+//    p3DDataModel->addBemData("Sensors", "VectorView", t_sensorSurfaceVV);
 
-    //Read and show sensor helmets
-    QFile t_filesensorSurfaceVV("./resources/sensorSurfaces/306m_rt.fif");
-    MNEBem t_sensorSurfaceVV(t_filesensorSurfaceVV);
-    testWindow->addBemData("Sensors", "VectorView", t_sensorSurfaceVV);
-
-//    QFile t_filesensorSurfaceBM("./resources/sensorSurfaces/BabyMEG.fif");
-//    MNEBem t_sensorSurfaceBM(t_filesensorSurfaceBM);
-//    testWindow->addBemData("Sensors", "BabyMEG", t_sensorSurfaceBM);
-
-    // Read & show digitizer points
-    QFile t_fileDig("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
-    FiffDigPointSet t_Dig(t_fileDig);
-    testWindow->addDigitizerData("Subject01", "Left Auditory", t_Dig);
+//    // Read & show digitizer points
+//    QFile t_fileDig("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+//    FiffDigPointSet t_Dig(t_fileDig);
+//    p3DDataModel->addDigitizerData(parser.value(subjectOption), evoked.comment, t_Dig);
 
     if(bAddRtSourceLoc) {
         //Add rt source loc data
-        //QList<BrainRTSourceLocDataTreeItem*> rtItemList_LA = testWindow->addSourceData("Subject01", "Left Auditory", sourceEstimate_LA, t_clusteredFwd);
-        //QList<BrainRTSourceLocDataTreeItem*> rtItemList_RA = testWindow->addSourceData("Subject01", "Right Auditory", sourceEstimate_RA, t_clusteredFwd);
-        //QList<BrainRTSourceLocDataTreeItem*> rtItemList_LV = testWindow->addSourceData("Subject01", "Left Visual", sourceEstimate_LV, t_clusteredFwd);
-        QList<BrainRTSourceLocDataTreeItem*> rtItemList_RV = testWindow->addSourceData("Subject01", "Right Visual", sourceEstimate_RV, t_clusteredFwd);
+        QList<BrainRTSourceLocDataTreeItem*> rtItemList_RV = p3DDataModel->addSourceData(parser.value(subjectOption), evoked.comment, sourceEstimate, t_clusteredFwd);
 
         //Init some rt related values for right visual data
         for(int i = 0; i < rtItemList_RV.size(); ++i) {
@@ -305,10 +292,13 @@ int main(int argc, char *argv[])
         }
     }
 
+    //Create the 3D view
+    View3D::SPtr testWindow = View3D::SPtr(new View3D());
+    testWindow->setModel(p3DDataModel);
     testWindow->show();
 
     Control3DWidget::SPtr control3DWidget = Control3DWidget::SPtr(new Control3DWidget());
-    control3DWidget->setView3D(testWindow);
+    control3DWidget->init(p3DDataModel, testWindow);
     control3DWidget->show();
 
     //########################################################################################
