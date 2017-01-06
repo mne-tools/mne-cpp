@@ -97,53 +97,53 @@ else {
 
 SOURCES += \
     view3D.cpp \
-    3DObjects/data3Dtreemodel.cpp \
-    3DObjects/data3Dtreedelegate.cpp \
-    3DObjects/subject/subjecttreeitem.cpp \
-    3DObjects/common/metatreeitem.cpp \
-    3DObjects/brain/brainsurfacetreeitem.cpp \
-    3DObjects/brain/brainsurfacesettreeitem.cpp \
-    3DObjects/brain/brainannotationtreeitem.cpp \
-    3DObjects/brain/brainhemispheretreeitem.cpp \
-    3DObjects/brain/brainrtsourcelocdatatreeitem.cpp \
-    3DObjects/brain/brainrtconnectivitydatatreeitem.cpp \
-    3DObjects/bem/bemtreeitem.cpp \
-    3DObjects/bem/bemsurfacetreeitem.cpp \
-    3DObjects/digitizer/digitizertreeitem.cpp \
-    helpers/abstracttreeitem.cpp \
-    helpers/renderable3Dentity.cpp \
-    helpers/custommesh.cpp \
+    model/data3Dtreemodel.cpp \
+    model/data3Dtreedelegate.cpp \
+    model/subject/subjecttreeitem.cpp \
+    model/common/metatreeitem.cpp \
+    model/brain/brainsurfacetreeitem.cpp \
+    model/measurement/measurementtreeitem.cpp \
+    model/brain/brainannotationtreeitem.cpp \
+    model/brain/brainhemispheretreeitem.cpp \
+    model/brain/brainrtsourcelocdatatreeitem.cpp \
+    model/network/networktreeitem.cpp \
+    model/bem/bemtreeitem.cpp \
+    model/bem/bemsurfacetreeitem.cpp \
+    model/digitizer/digitizertreeitem.cpp \
+    model/common/abstracttreeitem.cpp \
+    model/common/renderable3Dentity.cpp \
+    model/common/custommesh.cpp \
+    model/brain/brainsourcespacetreeitem.cpp \
+    model/digitizer/digitizersettreeitem.cpp \
     control/control3dwidget.cpp \
-    rt/rtSourceLoc/rtsourcelocdataworker.cpp \
-    3DObjects/brain/brainsourcespacetreeitem.cpp \
-    materials/shadermaterial.cpp \
-    3DObjects/digitizer/digitizersettreeitem.cpp
+    model/workers/rtSourceLoc/rtsourcelocdataworker.cpp \
+    model/common/shadermaterial.cpp \
 
 HEADERS += \
     view3D.h \
-    3DObjects/data3Dtreemodel.h \
-    3DObjects/data3Dtreedelegate.h \
-    3DObjects/subject/subjecttreeitem.h \
-    3DObjects/common/metatreeitem.h \
-    3DObjects/brain/brainsurfacetreeitem.h \
-    3DObjects/brain/brainsurfacesettreeitem.h \
-    3DObjects/brain/brainannotationtreeitem.h \
-    3DObjects/brain/brainhemispheretreeitem.h \
-    3DObjects/brain/brainrtsourcelocdatatreeitem.h \
-    3DObjects/brain/brainrtconnectivitydatatreeitem.h \
-    3DObjects/bem/bemtreeitem.h \
-    3DObjects/bem/bemsurfacetreeitem.h \
-    3DObjects/digitizer/digitizertreeitem.h \
-    helpers/abstracttreeitem.h \
-    helpers/renderable3Dentity.h \
-    helpers/custommesh.h \
-    helpers/types.h \
+    model/data3Dtreemodel.h \
+    model/data3Dtreedelegate.h \
+    model/subject/subjecttreeitem.h \
+    model/common/metatreeitem.h \
+    model/brain/brainsurfacetreeitem.h \
+    model/measurement/measurementtreeitem.h \
+    model/brain/brainannotationtreeitem.h \
+    model/brain/brainhemispheretreeitem.h \
+    model/brain/brainrtsourcelocdatatreeitem.h \
+    model/network/networktreeitem.h \
+    model/bem/bemtreeitem.h \
+    model/bem/bemsurfacetreeitem.h \
+    model/digitizer/digitizertreeitem.h \
+    model/common/abstracttreeitem.h \
+    model/common/renderable3Dentity.h \
+    model/common/custommesh.h \
+    model/common/types.h \
+    model/brain/brainsourcespacetreeitem.h \
+    model/digitizer/digitizersettreeitem.h \
     control/control3dwidget.h \
     disp3D_global.h \
-    rt/rtSourceLoc/rtsourcelocdataworker.h \
-    3DObjects/brain/brainsourcespacetreeitem.h \
-    materials/shadermaterial.h \
-    3DObjects/digitizer/digitizersettreeitem.h
+    model/workers/rtSourceLoc/rtsourcelocdataworker.h \
+    model/common/shadermaterial.h \
 
 FORMS += \
     control/control3dwidget.ui \

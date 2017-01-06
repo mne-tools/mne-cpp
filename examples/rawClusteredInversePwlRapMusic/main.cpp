@@ -2,6 +2,7 @@
 /**
 * @file     main.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     July, 2013
@@ -46,15 +47,17 @@
 
 #include <fiff/fiff_evoked.h>
 #include <fiff/fiff.h>
+
 #include <mne/mne.h>
-
 #include <mne/mne_epoch_data_list.h>
-
 #include <mne/mne_sourceestimate.h>
+
 #include <inverse/rapMusic/pwlrapmusic.h>
 
 #include <disp3D/view3D.h>
 #include <disp3D/control/control3dwidget.h>
+#include <disp3D/model/data3Dtreemodel.h>
+#include <disp3D/model/brain/brainrtsourcelocdatatreeitem.h>
 
 #include <utils/mnemath.h>
 
@@ -69,6 +72,7 @@
 #include <QApplication>
 #include <QSet>
 #include <QElapsedTimer>
+#include <QCommandLineParser>
 
 //#define BENCHMARK
 
@@ -104,65 +108,86 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-//    QFile t_fileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
-//    QString t_sEventName = "./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif";
-//    QFile t_fileFwd("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
-//    AnnotationSet t_annotationSet("sample", 2, "aparc.a2009s", "./MNE-sample-data/subjects");
-//    SurfaceSet t_surfSet("sample", 2, "white", "./MNE-sample-data/subjects");
+    // Command Line Parser
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Raw Clustered Inverse Powell Rap Music Example");
+    parser.addHelpOption();
 
+    QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", "./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
+    QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif");
+    QCommandLineOption fwdOption("fwd", "Path to forwad solution <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
+    QCommandLineOption surfOption("surfType", "Surface type <type>.", "type", "orig");
+    QCommandLineOption annotOption("annotType", "Annotation type <type>.", "type", "aparc.a2009s");
+    QCommandLineOption subjectOption("subject", "Selected subject <subject>.", "subject", "sample");
+    QCommandLineOption subjectPathOption("subjectPath", "Selected subject path <subjectPath>.", "subjectPath", "./MNE-sample-data/subjects");
+    QCommandLineOption stcFileOption("stcOut", "Path to stc <file>, which is to be written.", "file", "");
+    QCommandLineOption numDipolePairsOption("numDip", "<number> of dipole pairs to localize.", "number", "7");
+    QCommandLineOption evokedIdxOption("aveIdx", "The average <index> to choose from the average file.", "index", "1");
+    QCommandLineOption hemiOption("hemi", "Selected hemisphere <hemi>.", "hemi", "2");
+    QCommandLineOption doMovieOption("doMovie", "Create overlapping movie.", "doMovie", "false");
+    QCommandLineOption keepCompOption("keepComp", "Keep compensators.", "keepComp", "false");
+    QCommandLineOption pickAllOption("pickAll", "Pick all channels.", "pickAll", "true");
+    QCommandLineOption destCompsOption("destComps", "<Destination> of the compensator which is to be calculated.", "destination", "0");
 
-//    QFile t_fileRaw("D:/Users/Christoph/SkyDrive/Thesis_Data/MIND/mind004_050924_median01_raw.fif");
-//    QString t_sEventName = "D:/Users/Christoph/SkyDrive/Thesis_Data/MIND/mind004_050924_median01_raw-eve.fif";
-//    QFile t_fileFwd("D:/Users/Christoph/SkyDrive/Thesis_Data/MIND/mind004_050924_median01_raw-oct-6-fwd.fif");
-//    AnnotationSet t_annotationSet("mind004", 2, "aparc.a2009s", "D:/Users/Christoph/SkyDrive/Thesis_Data/subjects");
-//    SurfaceSet t_surfSet("mind004", 2, "white", "D:/Users/Christoph/SkyDrive/Thesis_Data/subjects");
+    parser.addOption(inputOption);
+    parser.addOption(eventsFileOption);
+    parser.addOption(fwdOption);
+    parser.addOption(surfOption);
+    parser.addOption(annotOption);
+    parser.addOption(subjectOption);
+    parser.addOption(subjectPathOption);
+    parser.addOption(stcFileOption);
+    parser.addOption(numDipolePairsOption);
+    parser.addOption(evokedIdxOption);
+    parser.addOption(hemiOption);
+    parser.addOption(doMovieOption);
+    parser.addOption(keepCompOption);
+    parser.addOption(pickAllOption);
+    parser.addOption(destCompsOption);
 
+    parser.process(a);
 
-    QFile t_fileRaw("D:/Users/Christoph/SkyDrive/Thesis_Data/MIND/mind006_051209_auditory01_raw.fif");
-    QString t_sEventName = "D:/Users/Christoph/SkyDrive/Thesis_Data/MIND/mind006_051209_auditory01_raw-eve.fif";
-    QFile t_fileFwd("D:/Users/Christoph/SkyDrive/Thesis_Data/MIND/mind006_051209_auditory01_raw-oct-6-fwd.fif");
-    AnnotationSet t_annotationSet("mind006", 2, "aparc.a2009s", "D:/Users/Christoph/SkyDrive/Thesis_Data/subjects");
-    SurfaceSet t_surfSet("mind006", 2, "white", "D:/Users/Christoph/SkyDrive/Thesis_Data/subjects");
+    //Load data
+    QFile t_fileRaw(parser.value(inputOption));
+    QString t_sEventName = parser.value(eventsFileOption);
+    QFile t_fileFwd(parser.value(fwdOption));
 
-//    QFile t_fileRaw("D:/Users/Christoph/SkyDrive/Thesis_Data/MIND/mind006_051210_median02_raw.fif");
-//    QString t_sEventName = "D:/Users/Christoph/SkyDrive/Thesis_Data/MIND/mind006_051210_median02_raw-eve.fif";
-//    QFile t_fileFwd("D:/Users/Christoph/SkyDrive/Thesis_Data/MIND/mind006_051210_median02_raw-oct-6-fwd.fif");
-//    AnnotationSet t_annotationSet("mind006", 2, "aparc.a2009s", "D:/Users/Christoph/SkyDrive/Thesis_Data/subjects");
-//    SurfaceSet t_surfSet("mind006", 2, "white", "D:/Users/Christoph/SkyDrive/Thesis_Data/subjects");
+    SurfaceSet t_surfSet (parser.value(subjectOption), parser.value(hemiOption).toInt(), parser.value(surfOption), parser.value(subjectPathOption));
+    AnnotationSet t_annotationSet (parser.value(subjectOption), parser.value(hemiOption).toInt(), parser.value(annotOption), parser.value(subjectPathOption));
 
-    QString t_sFileNameStc("");//("mind006_051209_auditory01.stc");
+    QString t_sFileNameStc(parser.value(stcFileOption));
 
+    qint32 numDipolePairs = parser.value(numDipolePairsOption).toInt();
 
-    bool doMovie = false;
-
-    qint32 numDipolePairs = 1;//7;
-
-//    //Right Medianus MIND004
-//    qint32 event = 65;
-//    float tmin = 0.0f;
-//    float tmax = 0.1f;
-
-    //Right500 Auditory MIND006
-    qint32 event = 2;
+    //Choose average
+    qint32 event = parser.value(evokedIdxOption).toInt();
 
     float tmin = 0.1f;
     float tmax = 0.2f;
 
     bool keep_comp = false;
-    fiff_int_t dest_comp = 0;
-    bool pick_all  = true;
+    if(parser.value(keepCompOption) == "false" || parser.value(keepCompOption) == "0") {
+        keep_comp = false;
+    } else if(parser.value(keepCompOption) == "true" || parser.value(keepCompOption) == "1") {
+        keep_comp = true;
+    }
+
+    fiff_int_t dest_comp = parser.value(destCompsOption).toInt();
+
+    bool pick_all = false;
+    if(parser.value(pickAllOption) == "false" || parser.value(pickAllOption) == "0") {
+        pick_all = false;
+    } else if(parser.value(pickAllOption) == "true" || parser.value(pickAllOption) == "1") {
+        pick_all = true;
+    }
 
     qint32 k, p;
 
-
-    // Parse command line parameters
-    for(qint32 i = 0; i < argc; ++i)
-    {
-        if(strcmp(argv[i], "-stc") == 0 || strcmp(argv[i], "--stc") == 0)
-        {
-            if(i + 1 < argc)
-                t_sFileNameStc = QString::fromUtf8(argv[i+1]);
-        }
+    bool doMovie = false;
+    if(parser.value(doMovieOption) == "false" || parser.value(doMovieOption) == "0") {
+        pick_all = false;
+    } else if(parser.value(doMovieOption) == "true" || parser.value(doMovieOption) == "1") {
+        pick_all = true;
     }
 
     //
@@ -418,49 +443,10 @@ int main(int argc, char *argv[])
 //        qDebug() << times.rows() << " x " << times.cols();
     }
 
-    //
-    // calculate the average
-    //
-//    //Option 1
-//    qint32 numAverages = 99;
-//    VectorXi vecSel(numAverages);
-//    srand (time(NULL)); // initialize random seed
 
-//    for(qint32 i = 0; i < vecSel.size(); ++i)
-//    {
-//        qint32 val = rand() % data.size();
-//        vecSel(i) = val;
-//    }
-
-    //Option 2
-//    VectorXi vecSel(20);
-
-////    vecSel << 76, 74, 13, 61, 97, 94, 75, 71, 60, 56, 26, 57, 56, 0, 52, 72, 33, 86, 96, 67;
-
-//    vecSel << 65, 22, 47, 55, 16, 29, 14, 36, 57, 97, 89, 46, 9, 93, 83, 52, 71, 52, 3, 96;
-
-//    //Option 3 Newest
-//    VectorXi vecSel(10);
-
-//    vecSel << 0, 96, 80, 55, 66, 25, 26, 2, 55, 58, 6, 88;
-
-
-//    VectorXi vecSel(1);
-
-//    vecSel << 0;//2,3;
-
-
-    VectorXi vecSel(2);//153, 147 or 146, 113
-//    //MIND 004 medianus 01
-//    vecSel << 147, 153;
-
-    //MIND 006 auditory 01
-//    vecSel << 42, 48; //1
-//    vecSel << 77, 113; //Perfect!
-//    vecSel << 48, 85; //3
-//    vecSel << 56, 83; //3
-
-
+    // Calculate the average
+    // Option 1 - Random selection
+    VectorXi vecSel(2);    
     srand (time(NULL)); // initialize random seed
 
     for(qint32 i = 0; i < vecSel.size(); ++i)
@@ -469,6 +455,19 @@ int main(int argc, char *argv[])
         vecSel(i) = val;
     }
 
+//    //Option 3 - Take all epochs
+//    VectorXi vecSel(data.size());
+
+//    for(qint32 i = 0; i < vecSel.size(); ++i)
+//    {
+//        vecSel(i) = i;
+//    }
+
+//    //Option 3 - Manual selection
+//    VectorXi vecSel(20);
+
+//    vecSel << 76, 74, 13, 61, 97, 94, 75, 71, 60, 56, 26, 57, 56, 0, 52, 72, 33, 86, 96, 67;
+
 
     std::cout << "Select following epochs to average:\n" << vecSel << std::endl;
 
@@ -476,8 +475,6 @@ int main(int argc, char *argv[])
 
     QStringList ch_sel_names = t_Fwd.info.ch_names;
     FiffEvoked pickedEvoked = evoked.pick_channels(ch_sel_names);
-
-
 
     //########################################################################################
     // RAP MUSIC Source Estimate
@@ -491,10 +488,6 @@ int main(int argc, char *argv[])
     // Compute inverse solution
     //
     PwlRapMusic t_pwlRapMusic(t_clusteredFwd, false, numDipolePairs);
-
-    if(doMovie)
-        t_pwlRapMusic.setStcAttr(200,0.5);
-
 
 #ifdef BENCHMARK
     MNESourceEstimate sourceEstimate;
@@ -529,7 +522,28 @@ int main(int argc, char *argv[])
     qDebug() << "RAP-MUSIC calculation took" << meanTime << "+-" << varTime << "ms in average";
 
 #else
+    int iWinSize = 200;
+    if(doMovie) {
+        t_pwlRapMusic.setStcAttr(iWinSize, 0.6);
+    }
+
     MNESourceEstimate sourceEstimate = t_pwlRapMusic.calculateInverse(pickedEvoked);
+
+    if(doMovie) {
+        //Select only the activations once
+        MatrixXd dataPicked(sourceEstimate.data.rows(), int(std::floor(sourceEstimate.data.cols()/iWinSize)));
+
+        for(int i = 0; i < dataPicked.cols(); ++i) {
+            dataPicked.col(i) = sourceEstimate.data.col(i*iWinSize);
+        }
+
+        sourceEstimate.data = dataPicked;
+    }
+
+    if(sourceEstimate.isEmpty()) {
+        return 1;
+    }
+
 #endif
 
     if(sourceEstimate.isEmpty())
@@ -559,14 +573,28 @@ int main(int argc, char *argv[])
 //    sourceEstimate = sourceEstimate.reduce(sample, 1);
 
     View3D::SPtr testWindow = View3D::SPtr(new View3D());
-    testWindow->addSurfaceSet("Subject01", "HemiLRSet", t_surfSet, t_annotationSet);
+    Data3DTreeModel::SPtr p3DDataModel = Data3DTreeModel::SPtr(new Data3DTreeModel());
+    testWindow->setModel(p3DDataModel);
 
-    QList<BrainRTSourceLocDataTreeItem*> rtItemList = testWindow->addSourceData("Subject01", "HemiLRSet", sourceEstimate, t_clusteredFwd);
+    p3DDataModel->addSurfaceSet(parser.value(subjectOption), "HemiLRSet", t_surfSet, t_annotationSet);
+
+    QList<BrainRTSourceLocDataTreeItem*> rtItemList = p3DDataModel->addSourceData(parser.value(subjectOption), "HemiLRSet", sourceEstimate, t_clusteredFwd);
+
+    //Init some rt related values for right visual data
+    for(int i = 0; i < rtItemList.size(); ++i) {
+        rtItemList.at(i)->setLoopState(true);
+        rtItemList.at(i)->setTimeInterval(17);
+        rtItemList.at(i)->setNumberAverages(1);
+        rtItemList.at(i)->setStreamingActive(true);
+        rtItemList.at(i)->setNormalization(QVector3D(0.01,0.5,1.0));
+        rtItemList.at(i)->setVisualizationType("Annotation based");
+        rtItemList.at(i)->setColortable("Hot");
+    }
 
     testWindow->show();
 
     Control3DWidget::SPtr control3DWidget = Control3DWidget::SPtr(new Control3DWidget());
-    control3DWidget->setView3D(testWindow);
+    control3DWidget->init(p3DDataModel, testWindow);
     control3DWidget->show();
 
     QList<Label> t_qListLabels;

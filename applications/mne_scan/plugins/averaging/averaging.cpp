@@ -106,7 +106,9 @@ Averaging::Averaging()
 , m_pAveragingWidget(AveragingSettingsWidget::SPtr())
 , m_pActionShowAdjustment(Q_NULLPTR)
 , m_bDoBaselineCorrection(false)
-, m_bDoArtifactReduction(0)
+, m_bDoArtifactThresholdReduction(false)
+, m_bDoArtifactVarianceReduction(false)
+, m_dArtifactVariance(0.5)
 , m_iPreStimSamples(0)
 , m_iPostStimSamples(0)
 , m_iBaselineFromSamples(0)
@@ -163,9 +165,11 @@ void Averaging::unload()
     settings.setValue(QString("Plugin/%1/stimChannelIdx").arg(this->getName()), m_iStimChanIdx);
     settings.setValue(QString("Plugin/%1/averageMode").arg(this->getName()), m_iAverageMode);
 
-    settings.setValue(QString("Plugin/%1/doArtifactReduction").arg(this->getName()), m_bDoArtifactReduction);
+    settings.setValue(QString("Plugin/%1/doArtifactThresholdReduction").arg(this->getName()), m_bDoArtifactThresholdReduction);
+    settings.setValue(QString("Plugin/%1/doArtifactVarianceReduction").arg(this->getName()), m_bDoArtifactVarianceReduction);
     settings.setValue(QString("Plugin/%1/artifactThresholdFirst").arg(this->getName()), m_dArtifactThresholdFirst);
     settings.setValue(QString("Plugin/%1/artifactThresholdSecond").arg(this->getName()), m_iArtifactThresholdSecond);
+    settings.setValue(QString("Plugin/%1/artifactVariance").arg(this->getName()), m_dArtifactVariance);
 
     settings.setValue(QString("Plugin/%1/baselineFromSeconds").arg(this->getName()), m_iBaselineFromSeconds);
     settings.setValue(QString("Plugin/%1/baselineToSeconds").arg(this->getName()), m_iBaselineToSeconds);
@@ -336,9 +340,11 @@ void Averaging::init()
     m_iBaselineFromSamples = settings.value(QString("Plugin/%1/baselineFromSamples").arg(this->getName()), 0).toInt();
     m_iBaselineToSamples = settings.value(QString("Plugin/%1/baselineToSamples").arg(this->getName()), 0).toInt();
 
-    m_bDoArtifactReduction = settings.value(QString("Plugin/%1/doArtifactReduction").arg(this->getName()), false).toBool();
+    m_bDoArtifactThresholdReduction = settings.value(QString("Plugin/%1/doArtifactThresholdReduction").arg(this->getName()), false).toBool();
+    m_bDoArtifactVarianceReduction = settings.value(QString("Plugin/%1/doArtifactVarianceReduction").arg(this->getName()), false).toBool();
     m_dArtifactThresholdFirst = settings.value(QString("Plugin/%1/artifactThresholdFirst").arg(this->getName()), 300).toDouble();
     m_iArtifactThresholdSecond = settings.value(QString("Plugin/%1/artifactThresholdSecond").arg(this->getName()), -6).toInt();
+    m_dArtifactVariance = settings.value(QString("Plugin/%1/artifactVariance").arg(this->getName()), 3).toInt();
 
     m_iNumAverages = settings.value(QString("Plugin/%1/numAverages").arg(this->getName()), 10).toInt();
     m_iStimChan = settings.value(QString("Plugin/%1/stimChannel").arg(this->getName()), 0).toInt();
@@ -457,21 +463,49 @@ void Averaging::changeArtifactThreshold(double thresholdFirst, int thresholdSeco
     m_dArtifactThresholdFirst = thresholdFirst;
 
     if(m_pRtAve) {
-        m_pRtAve->setArtifactReduction(m_bDoArtifactReduction, m_dArtifactThresholdFirst * pow(10, m_iArtifactThresholdSecond));
+        m_pRtAve->setArtifactReduction(m_bDoArtifactThresholdReduction, m_dArtifactThresholdFirst * pow(10, m_iArtifactThresholdSecond), m_bDoArtifactVarianceReduction, m_dArtifactVariance);
     }
 }
 
 
 //*************************************************************************************************************
 
-void Averaging::changeArtifactReductionActive(bool state)
+void Averaging::changeArtifactThresholdReductionActive(bool state)
 {
     QMutexLocker locker(&m_qMutex);
 
-    m_bDoArtifactReduction = state;
+    m_bDoArtifactThresholdReduction = state;
 
     if(m_pRtAve) {
-        m_pRtAve->setArtifactReduction(m_bDoArtifactReduction, m_dArtifactThresholdFirst * pow(10, m_iArtifactThresholdSecond));
+        m_pRtAve->setArtifactReduction(m_bDoArtifactThresholdReduction, m_dArtifactThresholdFirst * pow(10, m_iArtifactThresholdSecond), m_bDoArtifactVarianceReduction, m_dArtifactVariance);
+    }
+}
+
+
+//*************************************************************************************************************
+
+void Averaging::changeArtifactVariance(double dVariance)
+{
+    QMutexLocker locker(&m_qMutex);
+
+    m_dArtifactVariance = dVariance;
+
+    if(m_pRtAve) {
+        m_pRtAve->setArtifactReduction(m_bDoArtifactThresholdReduction, m_dArtifactThresholdFirst * pow(10, m_iArtifactThresholdSecond), m_bDoArtifactVarianceReduction, m_dArtifactVariance);
+    }
+}
+
+
+//*************************************************************************************************************
+
+void Averaging::changeArtifactVarianceReductionActive(bool state)
+{
+    QMutexLocker locker(&m_qMutex);
+
+    m_bDoArtifactVarianceReduction = state;
+
+    if(m_pRtAve) {
+        m_pRtAve->setArtifactReduction(m_bDoArtifactThresholdReduction, m_dArtifactThresholdFirst * pow(10, m_iArtifactThresholdSecond), m_bDoArtifactVarianceReduction, m_dArtifactVariance);
     }
 }
 
@@ -610,7 +644,7 @@ void Averaging::run()
     m_pRtAve->setBaselineTo(m_iBaselineToSamples, m_iBaselineToSeconds);
     m_pRtAve->setBaselineActive(m_bDoBaselineCorrection);
     m_pRtAve->setAverageMode(m_iAverageMode);
-    m_pRtAve->setArtifactReduction(m_bDoArtifactReduction, m_dArtifactThresholdFirst * pow(10, m_iArtifactThresholdSecond));
+    m_pRtAve->setArtifactReduction(m_bDoArtifactThresholdReduction, m_dArtifactThresholdFirst * pow(10, m_iArtifactThresholdSecond), m_bDoArtifactVarianceReduction, m_dArtifactVariance);
 
     connect(m_pRtAve.data(), &RtAve::evokedStim,
             this, &Averaging::appendEvoked);
