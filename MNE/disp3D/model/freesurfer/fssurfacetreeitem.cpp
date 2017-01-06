@@ -332,7 +332,7 @@ void FsSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* pare
 
 //*************************************************************************************************************
 
-void FsSurfaceTreeItem::onRtVertColorChanged(const QByteArray& sourceColorSamples)
+void FsSurfaceTreeItem::setRtVertColor(const QByteArray& sourceColorSamples)
 {
     //Set new data.
     //In setData(data, Data3DTreeModelItemRoles::SurfaceCurrentColorVert) we pass the new color values to the renderer (see setData function).
@@ -385,7 +385,7 @@ void FsSurfaceTreeItem::onColorInfoOriginOrCurvColorChanged()
             this->setData(data, Data3DTreeModelItemRoles::SurfaceCurrentColorVert);
 
             //Emit the new colors which are to be used during rt source loc plotting
-            emit colorInfoOriginChanged();
+            emit colorOriginChanged();
 
             //Return here because the new colors will be set to the renderable entity in the setData() function with the role Data3DTreeModelItemRoles::SurfaceCurrentColorVert
             return;
@@ -403,7 +403,7 @@ void FsSurfaceTreeItem::onColorInfoOriginOrCurvColorChanged()
                     this->setData(data, Data3DTreeModelItemRoles::SurfaceCurrentColorVert);
 
                     //Emit the new colors which are to be used during rt source loc plotting
-                    emit colorInfoOriginChanged();
+                    emit colorOriginChanged();
 
                     //Return here because the new colors will be set to the renderable entity in the setData() function with the role Data3DTreeModelItemRoles::SurfaceCurrentColorVert
                     return;

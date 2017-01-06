@@ -139,7 +139,7 @@ public:
     *
     * @param[in] sourceColorSamples     The color values for each estimated source.
     */
-    void onRtVertColorChanged(const QByteArray& sourceColorSamples);
+    void setRtVertColor(const QByteArray& sourceColorSamples);
 
     //=========================================================================================================
     /**
@@ -251,7 +251,7 @@ signals:
     /**
     * Emit this signal whenever the origin of the vertex color (from curvature, from annotation) changed.
     */
-    void colorInfoOriginChanged();
+    void colorOriginChanged();
 };
 
 } //NAMESPACE DISP3DLIB

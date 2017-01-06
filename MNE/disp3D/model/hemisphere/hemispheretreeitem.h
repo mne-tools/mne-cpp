@@ -164,7 +164,7 @@ public:
     *
     * @param[in] sourceColorSamples     The color values for each estimated source.
     */
-    void onRtVertColorChanged(const QByteArray& sourceColorSamples);
+    void setRtVertColor(const QByteArray& sourceColorSamples);
 
     //=========================================================================================================
     /**

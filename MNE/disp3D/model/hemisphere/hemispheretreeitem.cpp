@@ -224,10 +224,10 @@ SourceSpaceTreeItem* HemisphereTreeItem::addData(const MNEHemisphere& tHemispher
 
 //*************************************************************************************************************
 
-void HemisphereTreeItem::onRtVertColorChanged(const QByteArray& sourceColorSamples)
+void HemisphereTreeItem::setRtVertColor(const QByteArray& sourceColorSamples)
 {
     if(m_pSurfaceItem) {
-        m_pSurfaceItem->onRtVertColorChanged(sourceColorSamples);
+        m_pSurfaceItem->setRtVertColor(sourceColorSamples);
     }
 }
 
