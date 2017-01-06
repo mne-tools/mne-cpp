@@ -40,7 +40,7 @@
 
 #include "bemsurfacetreeitem.h"
 #include "../../common/metatreeitem.h"
-#include "../../common/renderable3Dentity.h"
+#include "../../3dhelpers/renderable3Dentity.h"
 #include "../../materials/pervertexphongalphamaterial.h"
 
 #include <mne/mne_bem.h>
@@ -154,18 +154,6 @@ void BemSurfaceTreeItem::addData(const MNEBemSurface& tBemSurface, Qt3DCore::QEn
 
     data.setValue(arrayVertColor);
     this->setData(data, Data3DTreeModelItemRoles::SurfaceCurrentColorVert);
-
-    data.setValue(tBemSurface.rr);
-    this->setData(data, Data3DTreeModelItemRoles::SurfaceVert);
-
-    data.setValue(tBemSurface.tris);
-    this->setData(data, Data3DTreeModelItemRoles::SurfaceTris);
-
-    data.setValue(tBemSurface.nn);
-    this->setData(data, Data3DTreeModelItemRoles::SurfaceNorm);
-
-    data.setValue(m_pRenderable3DEntity);
-    this->setData(data, Data3DTreeModelItemRoles::SurfaceRenderable3DEntity);
 
     //Add surface meta information as item children
     QList<QStandardItem*> list;

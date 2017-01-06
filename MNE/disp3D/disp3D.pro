@@ -115,9 +115,9 @@ SOURCES += \
     model/items/mri/mritreeitem.cpp \
     model/workers/rtSourceLoc/rtsourcelocdataworker.cpp \
     model/common/abstracttreeitem.cpp \
-    model/common/renderable3Dentity.cpp \
-    model/common/custommesh.cpp \
     model/common/metatreeitem.cpp \
+    model/3dhelpers/renderable3Dentity.cpp \
+    model/3dhelpers/custommesh.cpp \
     model/materials/pervertexphongalphamaterial.cpp \
     model/materials/pervertextessphongalphamaterial.cpp \
     model/materials/shadermaterial.cpp \
@@ -145,9 +145,9 @@ HEADERS += \
     model/items/mri/mritreeitem.h \
     model/workers/rtSourceLoc/rtsourcelocdataworker.h \
     model/common/abstracttreeitem.h \
-    model/common/renderable3Dentity.h \
-    model/common/custommesh.h \
     model/common/metatreeitem.h \
+    model/3dhelpers/renderable3Dentity.h \
+    model/3dhelpers/custommesh.h \
     model/common/types.h \
     model/materials/pervertexphongalphamaterial.h \
     model/materials/pervertextessphongalphamaterial.h \

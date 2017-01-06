@@ -40,7 +40,7 @@
 
 #include "fssurfacetreeitem.h"
 #include "../../common/metatreeitem.h"
-#include "../../common//renderable3Dentity.h"
+#include "../../3dhelpers/renderable3Dentity.h"
 #include "../../materials/pervertextessphongalphamaterial.h"
 #include "../../materials/shownormalsmaterial.h"
 
@@ -184,27 +184,6 @@ void FsSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* pare
     data.setValue(arrayCurvatureColor);
     this->setData(data, Data3DTreeModelItemRoles::SurfaceCurrentColorVert);
     this->setData(data, Data3DTreeModelItemRoles::SurfaceCurvatureColorVert);
-
-    data.setValue(tSurface.rr());
-    this->setData(data, Data3DTreeModelItemRoles::SurfaceVert);
-
-    data.setValue(tSurface.tris());
-    this->setData(data, Data3DTreeModelItemRoles::SurfaceTris);
-
-    data.setValue(tSurface.nn());
-    this->setData(data, Data3DTreeModelItemRoles::SurfaceNorm);
-
-    data.setValue(tSurface.curv());
-    this->setData(data, Data3DTreeModelItemRoles::SurfaceCurv);
-
-    data.setValue(tSurface.offset());
-    this->setData(data, Data3DTreeModelItemRoles::SurfaceOffset);
-
-    data.setValue(m_pRenderable3DEntity);
-    this->setData(data, Data3DTreeModelItemRoles::SurfaceRenderable3DEntity);
-
-    data.setValue(m_pRenderable3DEntityNormals);
-    this->setData(data, Data3DTreeModelItemRoles::SurfaceRenderable3DEntityAcivationOverlay);
 
     //Add surface meta information as item children
     QList<QStandardItem*> list;

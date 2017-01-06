@@ -47,7 +47,7 @@
 //=============================================================================================================
 
 #include "digitizertreeitem.h"
-#include "../../common/renderable3Dentity.h"
+#include "../../3dhelpers/renderable3Dentity.h"
 
 #include <fiff/fiff_constants.h>
 #include <fiff/fiff_dig_point.h>
