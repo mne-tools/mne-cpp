@@ -39,7 +39,7 @@
 //=============================================================================================================
 
 #include "view3D.h"
-#include "model/common/renderable3Dentity.h"
+#include "model/3dhelpers/renderable3Dentity.h"
 #include "model/common/types.h"
 #include "model/data3Dtreemodel.h"
 

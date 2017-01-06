@@ -46,7 +46,7 @@
 #include "items/measurement/measurementtreeitem.h"
 #include "items/mri/mritreeitem.h"
 #include "items/digitizer/digitizertreeitem.h"
-#include "common/renderable3Dentity.h"
+#include "3dhelpers/renderable3Dentity.h"
 
 #include <mne/mne_bem.h>
 

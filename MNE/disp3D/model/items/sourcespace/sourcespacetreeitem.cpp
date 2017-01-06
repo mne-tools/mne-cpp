@@ -40,7 +40,7 @@
 
 #include "SourceSpaceTreeItem.h"
 #include "../../common/metatreeitem.h"
-#include "../../common/renderable3Dentity.h"
+#include "../../3dhelpers/renderable3Dentity.h"
 #include "../../materials/pervertexphongalphamaterial.h"
 
 #include <fs/label.h>
@@ -205,18 +205,6 @@ void SourceSpaceTreeItem::addData(const MNEHemisphere& tHemisphere, Qt3DCore::QE
 
     data.setValue(arrayVertColor);
     this->setData(data, Data3DTreeModelItemRoles::SurfaceCurrentColorVert);
-
-    data.setValue(tHemisphere.rr);
-    this->setData(data, Data3DTreeModelItemRoles::SurfaceVert);
-
-    data.setValue(tHemisphere.tris);
-    this->setData(data, Data3DTreeModelItemRoles::SurfaceTris);
-
-    data.setValue(tHemisphere.nn);
-    this->setData(data, Data3DTreeModelItemRoles::SurfaceNorm);
-
-    data.setValue(m_pRenderable3DEntity);
-    this->setData(data, Data3DTreeModelItemRoles::SurfaceRenderable3DEntity);
 
     //Add surface meta information as item children
     QList<QStandardItem*> list;
