@@ -39,8 +39,8 @@
 //=============================================================================================================
 
 #include "mneestimatetreeitem.h"
-#include "../workers/rtSourceLoc/rtsourcelocdataworker.h"
-#include "../common/metatreeitem.h"
+#include "../../workers/rtSourceLoc/rtsourcelocdataworker.h"
+#include "../../common/metatreeitem.h"
 
 #include <mne/mne_sourceestimate.h>
 #include <mne/mne_forwardsolution.h>
