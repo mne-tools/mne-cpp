@@ -163,7 +163,7 @@ public:
     *
     * @param[in] sourceColorSamples     The color values for each estimated source for left and right hemisphere.
     */
-    void onRtVertColorChanged(const QPair<QByteArray, QByteArray>& sourceColorSamples);
+    void setRtVertColor(const QPair<QByteArray, QByteArray>& sourceColorSamples);
 
 private:
     //=========================================================================================================

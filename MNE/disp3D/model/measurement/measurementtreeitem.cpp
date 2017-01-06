@@ -360,23 +360,8 @@ NetworkTreeItem* MeasurementTreeItem::addData(Network::SPtr pNetworkData, Qt3DCo
 
 void MeasurementTreeItem::setColorOrigin(const QByteArray& leftHemiColor, const QByteArray& rightHemiColor)
 {
-    QList<QStandardItem*> itemList = this->findChildren(Data3DTreeModelItemTypes::HemisphereItem);
-
-    FsSurfaceTreeItem* pSurfaceTreeItemLeft = Q_NULLPTR;
-    FsSurfaceTreeItem* pSurfaceTreeItemRight = Q_NULLPTR;
-
-    for(int j = 0; j < itemList.size(); ++j) {
-        if(HemisphereTreeItem* pHemiItem = dynamic_cast<HemisphereTreeItem*>(itemList.at(j))) {
-            if(pHemiItem->data(Data3DTreeModelItemRoles::SurfaceHemi).toInt() == 0) {
-                pSurfaceTreeItemLeft = pHemiItem->getSurfaceItem();
-            } else if(pHemiItem->data(Data3DTreeModelItemRoles::SurfaceHemi).toInt() == 1) {
-                pSurfaceTreeItemRight = pHemiItem->getSurfaceItem();
-            }
-        }
-    }
-
-    if(pSurfaceTreeItemLeft && pSurfaceTreeItemRight) {
-        m_pMneEstimateTreeItem->onColorInfoOriginChanged(leftHemiColor, rightHemiColor);
+    if(m_pMneEstimateTreeItem) {
+        m_pMneEstimateTreeItem->setColorOrigin(leftHemiColor, rightHemiColor);
     }
 }
 

@@ -111,56 +111,15 @@ void  MriTreeItem::setData(const QVariant& value, int role)
 QList<FsSurfaceTreeItem*> MriTreeItem::addData(const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet, Qt3DCore::QEntity* p3DEntityParent)
 {
     //Generate child items based on surface set input parameters
-    QList<QStandardItem*> itemList = this->findChildren(Data3DTreeModelItemTypes::HemisphereItem);
     QList<FsSurfaceTreeItem*> returnItemList;
-
-    //If there are more hemispheres in tSourceSpace than in the tree model
-    bool hemiItemFound = false;
 
     //Search for already created hemi items and add source space data respectivley
     for(int i = 0; i < tSurfaceSet.size(); ++i) {
-        for(int j = 0; j < itemList.size(); ++j) {
-            if(HemisphereTreeItem* pHemiItem = dynamic_cast<HemisphereTreeItem*>(itemList.at(j))) {
-                if(pHemiItem->data(Data3DTreeModelItemRoles::SurfaceHemi).toInt() == tSurfaceSet[i].hemi()) {
-                    hemiItemFound = true;
-
-                    if(i < tAnnotationSet.size()) {
-                        if(tAnnotationSet[i].hemi() == tSurfaceSet[i].hemi()) {
-                            returnItemList.append(pHemiItem->addData(tSurfaceSet[i], tAnnotationSet[i], p3DEntityParent));
-                        } else {
-                            returnItemList.append(pHemiItem->addData(tSurfaceSet[i], Annotation(), p3DEntityParent));
-                        }
-                    } else {
-                        returnItemList.append(pHemiItem->addData(tSurfaceSet[i], Annotation(), p3DEntityParent));
-                    }
-                }
-            }
+        if(i < tAnnotationSet.size()) {
+            returnItemList.append(addData(tSurfaceSet[i], tAnnotationSet[i], p3DEntityParent));
+        } else {
+            returnItemList.append(addData(tSurfaceSet[i], Annotation(), p3DEntityParent));
         }
-
-        if(!hemiItemFound) {
-            //Item does not exist yet, create it here.
-            HemisphereTreeItem* pHemiItem = new HemisphereTreeItem(Data3DTreeModelItemTypes::HemisphereItem);
-
-            QList<QStandardItem*> list;
-            list << pHemiItem;
-            list << new QStandardItem(pHemiItem->toolTip());
-            this->appendRow(list);
-
-            if(i < tAnnotationSet.size()) {
-                if(tAnnotationSet[i].hemi() == tSurfaceSet[i].hemi()) {
-                    returnItemList.append(pHemiItem->addData(tSurfaceSet[i], tAnnotationSet[i], p3DEntityParent));
-                } else {
-                    returnItemList.append(pHemiItem->addData(tSurfaceSet[i], Annotation(), p3DEntityParent));
-                }
-            } else {
-                returnItemList.append(pHemiItem->addData(tSurfaceSet[i], Annotation(), p3DEntityParent));
-            }
-
-            connect(pHemiItem->getSurfaceItem(), &FsSurfaceTreeItem::colorInfoOriginChanged,
-                this, &MriTreeItem::onColorOriginChanged);
-        }
-
-        hemiItemFound = false;
     }
 
     return returnItemList;
@@ -208,7 +167,7 @@ FsSurfaceTreeItem* MriTreeItem::addData(const Surface& tSurface, const Annotatio
         list << new QStandardItem(pHemiItem->toolTip());
         this->appendRow(list);
 
-        connect(pHemiItem->getSurfaceItem(), &FsSurfaceTreeItem::colorInfoOriginChanged,
+        connect(pHemiItem->getSurfaceItem(), &FsSurfaceTreeItem::colorOriginChanged,
             this, &MriTreeItem::onColorOriginChanged);
     }
 
@@ -218,16 +177,16 @@ FsSurfaceTreeItem* MriTreeItem::addData(const Surface& tSurface, const Annotatio
 
 //*************************************************************************************************************
 
-void MriTreeItem::onRtVertColorChanged(const QPair<QByteArray, QByteArray>& sourceColorSamples)
+void MriTreeItem::setRtVertColor(const QPair<QByteArray, QByteArray>& sourceColorSamples)
 {
     QList<QStandardItem*> itemList = this->findChildren(Data3DTreeModelItemTypes::HemisphereItem);
 
     for(int j = 0; j < itemList.size(); ++j) {
         if(HemisphereTreeItem* pHemiItem = dynamic_cast<HemisphereTreeItem*>(itemList.at(j))) {
             if(pHemiItem->data(Data3DTreeModelItemRoles::SurfaceHemi).toInt() == 0) {
-                pHemiItem->onRtVertColorChanged(sourceColorSamples.first);
+                pHemiItem->setRtVertColor(sourceColorSamples.first);
             } else if (pHemiItem->data(Data3DTreeModelItemRoles::SurfaceHemi).toInt() == 1) {
-                pHemiItem->onRtVertColorChanged(sourceColorSamples.second);
+                pHemiItem->setRtVertColor(sourceColorSamples.second);
             }
         }
     }

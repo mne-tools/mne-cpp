@@ -173,28 +173,11 @@ QList<FsSurfaceTreeItem*> Data3DTreeModel::addSurfaceSet(const QString& subject,
 {
     QList<FsSurfaceTreeItem*> returnItemList;
 
-    //Handle subject item
-    SubjectTreeItem* pSubjectItem = addSubject(subject);
-
-    //Find already existing MRI items and add the new data to the first search result
-    QList<QStandardItem*> itemList = pSubjectItem->findChildren(set);
-
-    if(!itemList.isEmpty()) {
-        MriTreeItem* pMriItem = dynamic_cast<MriTreeItem*>(itemList.first());
-        returnItemList = pMriItem->addData(tSurfaceSet, tAnnotationSet, m_pModelEntity);
-    } else {
-        MriTreeItem* pMriItem = new MriTreeItem(Data3DTreeModelItemTypes::MriItem, set);
-        addItemWithDescription(pSubjectItem, pMriItem);
-        returnItemList = pMriItem->addData(tSurfaceSet, tAnnotationSet, m_pModelEntity);
-
-        //Connect mri item with all measurement tree items in case the user changes the color origin
-        QList<QStandardItem*> measItemList = pSubjectItem->findChildren(Data3DTreeModelItemTypes::MeasurementItem);
-
-        for(int i = 0; i < measItemList.size(); ++i) {
-            if(MeasurementTreeItem* pMeasItem = dynamic_cast<MeasurementTreeItem*>(measItemList.at(i))) {
-                connect(pMriItem, &MriTreeItem::colorOriginChanged,
-                    pMeasItem, &MeasurementTreeItem::setColorOrigin);
-            }
+    for(int i = 0; i < tSurfaceSet.size(); ++i) {
+        if(i < tAnnotationSet.size()) {
+            returnItemList.append(addSurface(subject, set, tSurfaceSet[i], tAnnotationSet[i]));
+        } else {
+            returnItemList.append(addSurface(subject, set,tSurfaceSet[i], Annotation()));
         }
     }
 
@@ -282,13 +265,17 @@ MneEstimateTreeItem* Data3DTreeModel::addSourceData(const QString& subject, cons
         addItemWithDescription(pSubjectItem, pMeasurementItem);
         pReturnItem = pMeasurementItem->addData(tSourceEstimate, tForwardSolution);
 
-        //Connect mri item with all measurement tree items in case the real tiem color changes (i.e. rt source loc)
+        //Connect mri item with all measurement tree items in case the real time color changes (i.e. rt source loc)
+        //or the user changes the color origin
         QList<QStandardItem*> mriItemList = pSubjectItem->findChildren(Data3DTreeModelItemTypes::MriItem);
 
         for(int i = 0; i < mriItemList.size(); ++i) {
             if(MriTreeItem* pMriItem = dynamic_cast<MriTreeItem*>(mriItemList.at(i))) {
                 connect(pMeasurementItem, &MeasurementTreeItem::rtVertColorChanged,
-                    pMriItem, &MriTreeItem::onRtVertColorChanged);
+                    pMriItem, &MriTreeItem::setRtVertColor);
+
+                connect(pMriItem, &MriTreeItem::colorOriginChanged,
+                    pMeasurementItem, &MeasurementTreeItem::setColorOrigin);
             }
         }
     }

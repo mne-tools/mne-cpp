@@ -422,7 +422,7 @@ void MneEstimateTreeItem::setNormalization(const QVector3D& vecThresholds)
 
 //*************************************************************************************************************
 
-void MneEstimateTreeItem::onColorInfoOriginChanged(const QByteArray& arrayVertColorLeftHemisphere, const QByteArray& arrayVertColorRightHemisphere)
+void MneEstimateTreeItem::setColorOrigin(const QByteArray& arrayVertColorLeftHemisphere, const QByteArray& arrayVertColorRightHemisphere)
 {
     m_pSourceLocRtDataWorker->setSurfaceData(arrayVertColorLeftHemisphere,
                                              arrayVertColorRightHemisphere,

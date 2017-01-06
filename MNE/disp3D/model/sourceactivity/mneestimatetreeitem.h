@@ -225,7 +225,7 @@ public:
     * @param[in] arrayVertColorLeftHemisphere       The new vertex colors for the left hemisphere.
     * @param[in] arrayVertColorRightHemisphere      The new vertex colors for the right hemisphere.
     */
-    void onColorInfoOriginChanged(const QByteArray& arrayVertColorLeftHemisphere, const QByteArray& arrayVertColorRightHemisphere);
+    void setColorOrigin(const QByteArray& arrayVertColorLeftHemisphere, const QByteArray& arrayVertColorRightHemisphere);
 
 private:
     //=========================================================================================================
