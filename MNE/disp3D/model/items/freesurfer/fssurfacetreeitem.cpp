@@ -39,7 +39,7 @@
 //=============================================================================================================
 
 #include "fssurfacetreeitem.h"
-#include "../../common/metatreeitem.h"
+#include "../common/metatreeitem.h"
 #include "../../3dhelpers/renderable3Dentity.h"
 #include "../../materials/pervertextessphongalphamaterial.h"
 #include "../../materials/shownormalsmaterial.h"

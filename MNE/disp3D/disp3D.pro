@@ -113,9 +113,9 @@ SOURCES += \
     model/items/digitizer/digitizertreeitem.cpp \
     model/items/digitizer/digitizersettreeitem.cpp \
     model/items/mri/mritreeitem.cpp \
+    model/items/common/abstracttreeitem.cpp \
+    model/items/common/metatreeitem.cpp \
     model/workers/rtSourceLoc/rtsourcelocdataworker.cpp \
-    model/common/abstracttreeitem.cpp \
-    model/common/metatreeitem.cpp \
     model/3dhelpers/renderable3Dentity.cpp \
     model/3dhelpers/custommesh.cpp \
     model/materials/pervertexphongalphamaterial.cpp \
@@ -143,9 +143,9 @@ HEADERS += \
     model/items/digitizer/digitizertreeitem.h \
     model/items/digitizer/digitizersettreeitem.h \
     model/items/mri/mritreeitem.h \
+    model/items/common/abstracttreeitem.h \
+    model/items/common/metatreeitem.h \
     model/workers/rtSourceLoc/rtsourcelocdataworker.h \
-    model/common/abstracttreeitem.h \
-    model/common/metatreeitem.h \
     model/3dhelpers/renderable3Dentity.h \
     model/3dhelpers/custommesh.h \
     model/common/types.h \
