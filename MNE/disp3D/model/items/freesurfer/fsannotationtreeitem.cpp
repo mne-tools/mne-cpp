@@ -39,7 +39,7 @@
 //=============================================================================================================
 
 #include "fsannotationtreeitem.h"
-#include "../../common/metatreeitem.h"
+#include "../common/metatreeitem.h"
 
 #include <fs/label.h>
 #include <fs/surface.h>

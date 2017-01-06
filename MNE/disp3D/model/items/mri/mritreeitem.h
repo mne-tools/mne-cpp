@@ -42,7 +42,7 @@
 //=============================================================================================================
 
 #include "../../../disp3D_global.h"
-#include "../../common/abstracttreeitem.h"
+#include "../common/abstracttreeitem.h"
 
 #include <mne/mne_forwardsolution.h>
 #include <connectivity/network/network.h>

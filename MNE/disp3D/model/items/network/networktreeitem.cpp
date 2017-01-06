@@ -40,7 +40,7 @@
 
 #include "networktreeitem.h"
 #include "../../workers/rtSourceLoc/rtsourcelocdataworker.h"
-#include "../../common/metatreeitem.h"
+#include "../common/metatreeitem.h"
 #include "../../3dhelpers/renderable3Dentity.h"
 #include "../../materials/networkmaterial.h"
 

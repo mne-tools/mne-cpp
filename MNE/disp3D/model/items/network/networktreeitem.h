@@ -43,8 +43,8 @@
 
 #include "../../../disp3D_global.h"
 
-#include "../../common/abstracttreeitem.h"
-#include "../../common/types.h"
+#include "../common/abstracttreeitem.h"
+#include "../common/types.h"
 
 #include <connectivity/network/network.h>
 
