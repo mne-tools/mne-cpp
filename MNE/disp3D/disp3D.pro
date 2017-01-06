@@ -99,21 +99,21 @@ SOURCES += \
     view3D.cpp \
     model/data3Dtreemodel.cpp \
     model/data3Dtreedelegate.cpp \
-    model/subject/subjecttreeitem.cpp \
-    model/measurement/measurementtreeitem.cpp \
-    model/freesurfer/fssurfacetreeitem.cpp \
-    model/freesurfer/fsannotationtreeitem.cpp \
-    model/hemisphere/hemispheretreeitem.cpp \
-    model/sourcespace/sourcespacetreeitem.cpp \
-    model/sourceactivity/mneestimatetreeitem.cpp \
-    model/sourceactivity/ecddatatreeitem.cpp \
+    model/items/subject/subjecttreeitem.cpp \
+    model/items/measurement/measurementtreeitem.cpp \
+    model/items/freesurfer/fssurfacetreeitem.cpp \
+    model/items/freesurfer/fsannotationtreeitem.cpp \
+    model/items/hemisphere/hemispheretreeitem.cpp \
+    model/items/sourcespace/sourcespacetreeitem.cpp \
+    model/items/sourceactivity/mneestimatetreeitem.cpp \
+    model/items/sourceactivity/ecddatatreeitem.cpp \
+    model/items/network/networktreeitem.cpp \
+    model/items/bem/bemtreeitem.cpp \
+    model/items/bem/bemsurfacetreeitem.cpp \
+    model/items/digitizer/digitizertreeitem.cpp \
+    model/items/digitizer/digitizersettreeitem.cpp \
+    model/items/mri/mritreeitem.cpp \
     model/workers/rtSourceLoc/rtsourcelocdataworker.cpp \
-    model/network/networktreeitem.cpp \
-    model/bem/bemtreeitem.cpp \
-    model/bem/bemsurfacetreeitem.cpp \
-    model/digitizer/digitizertreeitem.cpp \
-    model/digitizer/digitizersettreeitem.cpp \
-    model/mri/mritreeitem.cpp \
     model/common/abstracttreeitem.cpp \
     model/common/renderable3Dentity.cpp \
     model/common/custommesh.cpp \
@@ -129,21 +129,21 @@ HEADERS += \
     view3D.h \
     model/data3Dtreemodel.h \
     model/data3Dtreedelegate.h \
-    model/subject/subjecttreeitem.h \
-    model/measurement/measurementtreeitem.h \
-    model/freesurfer/fssurfacetreeitem.h \
-    model/freesurfer/fsannotationtreeitem.h \
-    model/hemisphere/hemispheretreeitem.h \
-    model/sourcespace/sourcespacetreeitem.h \
-    model/sourceactivity/mneestimatetreeitem.h \
-    model/sourceactivity/ecddatatreeitem.h \
+    model/items/subject/subjecttreeitem.h \
+    model/items/measurement/measurementtreeitem.h \
+    model/items/freesurfer/fssurfacetreeitem.h \
+    model/items/freesurfer/fsannotationtreeitem.h \
+    model/items/hemisphere/hemispheretreeitem.h \
+    model/items/sourcespace/sourcespacetreeitem.h \
+    model/items/sourceactivity/mneestimatetreeitem.h \
+    model/items/sourceactivity/ecddatatreeitem.h \
+    model/items/network/networktreeitem.h \
+    model/items/bem/bemtreeitem.h \
+    model/items/bem/bemsurfacetreeitem.h \
+    model/items/digitizer/digitizertreeitem.h \
+    model/items/digitizer/digitizersettreeitem.h \
+    model/items/mri/mritreeitem.h \
     model/workers/rtSourceLoc/rtsourcelocdataworker.h \
-    model/network/networktreeitem.h \
-    model/bem/bemtreeitem.h \
-    model/bem/bemsurfacetreeitem.h \
-    model/digitizer/digitizertreeitem.h \
-    model/digitizer/digitizersettreeitem.h \
-    model/mri/mritreeitem.h \
     model/common/abstracttreeitem.h \
     model/common/renderable3Dentity.h \
     model/common/custommesh.h \
