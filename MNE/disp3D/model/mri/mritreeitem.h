@@ -178,7 +178,7 @@ private:
     /**
     * This function gets called whenever the origin of the surface vertex color (curvature, annoation, etc.) changed.
     */
-    void onColorInfoOriginChanged();
+    void onColorOriginChanged();
 
 signals:
     //=========================================================================================================
@@ -188,7 +188,7 @@ signals:
     * @param[in] leftHemiColor        Color of the left hemisphere.
     * @param[in] rightHemiColor       Color of the right hemisphere.
     */
-    void colorInfoChanged(const QByteArray& leftHemiColor, const QByteArray& rightHemiColor);
+    void colorOriginChanged(const QByteArray& leftHemiColor, const QByteArray& rightHemiColor);
 };
 
 } //NAMESPACE DISP3DLIB
