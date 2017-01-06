@@ -329,7 +329,7 @@ bad : {
 
 //*************************************************************************************************************
 
-const ECD& ECDSet::operator[] (qint32 idx) const
+const ECD& ECDSet::operator[] (int idx) const
 {
     if (idx>=m_qListDips.length())
     {
@@ -342,7 +342,7 @@ const ECD& ECDSet::operator[] (qint32 idx) const
 
 //*************************************************************************************************************
 
-ECD& ECDSet::operator[] (qint32 idx)
+ECD& ECDSet::operator[] (int idx)
 {
     if (idx >= m_qListDips.length())
     {
