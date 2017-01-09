@@ -211,4 +211,9 @@ inline qint32 ECDSet::size() const
 
 } // NAMESPACE INVERSELIB
 
+#ifndef metatype_ecdsetsptr
+#define metatype_ecdsetsptr
+Q_DECLARE_METATYPE(QSharedPointer<INVERSELIB::ECDSet>);
+#endif
+
 #endif // ECD_SET_H

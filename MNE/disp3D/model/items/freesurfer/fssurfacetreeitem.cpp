@@ -125,7 +125,7 @@ QVariant FsSurfaceTreeItem::data(int role) const
 
 //*************************************************************************************************************
 
-void  FsSurfaceTreeItem::setData(const QVariant& value, int role)
+void FsSurfaceTreeItem::setData(const QVariant& value, int role)
 {
     AbstractTreeItem::setData(value, role);
 
