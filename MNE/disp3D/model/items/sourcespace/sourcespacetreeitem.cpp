@@ -38,7 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "SourceSpaceTreeItem.h"
+#include "sourcespacetreeitem.h"
 #include "../common/metatreeitem.h"
 #include "../../3dhelpers/renderable3Dentity.h"
 #include "../../materials/pervertexphongalphamaterial.h"
