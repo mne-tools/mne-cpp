@@ -100,7 +100,8 @@ int main(int argc, char *argv[])
     /*
     * Perform Head->MRI coord. transformation
     */
-    FiffCoordTrans coordTrans(QFile("./MNE-sample-data/MEG/sample/sample_audvis_raw-trans.fif"));
+    QFile file("./MNE-sample-data/MEG/sample/sample_audvis_raw-trans.fif");
+    FiffCoordTrans coordTrans(file);
 
     std::cout << std::endl << "coordTrans" << coordTrans.trans;
     std::cout << std::endl << "coordTransInv" << coordTrans.invtrans;
