@@ -349,7 +349,7 @@ QPair<QByteArray, QByteArray> RtSourceLocDataWorker::performVisualizationTypeCal
 
     //NOTE: This function is called for every new sample point and therefore must be kept highly efficient!
     if(sourceColorSamples.rows() != m_vecVertNoLeftHemi.rows() + m_vecVertNoRightHemi.rows()) {
-        qDebug() << "RtSourceLocDataWorker::performVisualizationTypeCalculation - number of rows in sample (" << sourceColorSamples.rows() << ") do not not match with idx/no number of rows in vertex (" << m_vecVertNoLeftHemi.rows() + m_vecVertNoRightHemi.rows() << "). Returning...";
+        qDebug() << "RtSourceLocDataWorker::performVisualizationTypeCalculation - Number of new vertex colors (" << sourceColorSamples.rows() << ") do not match with previously set number of vertices (" << m_vecVertNoLeftHemi.rows() + m_vecVertNoRightHemi.rows() << "). Returning...";
         return colorPair;
     }
 

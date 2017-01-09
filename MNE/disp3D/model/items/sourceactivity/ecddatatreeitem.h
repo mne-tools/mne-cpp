@@ -44,8 +44,6 @@
 #include "../../../disp3D_global.h"
 #include "../common/abstracttreeitem.h"
 
-#include <inverse/dipoleFit/ecd_set.h>
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -202,10 +200,5 @@ inline bool EcdDataTreeItem::isInit() const
 }
 
 } //NAMESPACE DISP3DLIB
-
-#ifndef metatype_ecdsetsptr
-#define metatype_ecdsetsptr
-Q_DECLARE_METATYPE(INVERSELIB::ECDSet::SPtr);
-#endif
 
 #endif // EcdDataTreeItem_H
