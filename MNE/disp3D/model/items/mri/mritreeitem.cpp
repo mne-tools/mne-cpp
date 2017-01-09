@@ -152,8 +152,8 @@ FsSurfaceTreeItem* MriTreeItem::addData(const Surface& tSurface, const Annotatio
         }
     }
 
+    //If item does not exist yet, create it here.
     if(!hemiItemFound) {
-        //Item does not exist yet, create it here.
         HemisphereTreeItem* pHemiItem = new HemisphereTreeItem(Data3DTreeModelItemTypes::HemisphereItem);
 
         if(tAnnotation.hemi() == tSurface.hemi()) {
