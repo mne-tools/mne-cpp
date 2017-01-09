@@ -139,7 +139,6 @@ void RtSourceLocDataWorker::setSurfaceData(const QByteArray& arraySurfaceVertCol
                                            const Eigen::VectorXi& vecVertNoLeftHemi,
                                            const Eigen::VectorXi& vecVertNoRightHemi)
 {
-    qDebug() << "RtSourceLocDataWorker::setSurfaceData - Changing color origin";
     QMutexLocker locker(&m_qMutex);
 
     if(arraySurfaceVertColorLeftHemi.size() == 0 || vecVertNoLeftHemi.rows() == 0 || arraySurfaceVertColorRightHemi.size() == 0 || vecVertNoRightHemi.rows() == 0) {
