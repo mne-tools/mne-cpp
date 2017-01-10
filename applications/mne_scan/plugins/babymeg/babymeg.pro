@@ -57,9 +57,11 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Fiffd \
             -lMNE$${MNE_LIB_VERSION}Mned \
             -lMNE$${MNE_LIB_VERSION}Inversed \
+            -lMNE$${MNE_LIB_VERSION}Connectivityd \
             -lMNE$${MNE_LIB_VERSION}RtProcessingd \
             -lMNE$${MNE_LIB_VERSION}RtCommandd \
             -lMNE$${MNE_LIB_VERSION}RtClientd \
+            -lMNE$${MNE_LIB_VERSION}Dispd \
             -lMNE$${MNE_LIB_VERSION}DispChartsd \
             -lMNE$${MNE_LIB_VERSION}Disp3Dd \
             -lscMeasd \
@@ -73,9 +75,11 @@ else {
             -lMNE$${MNE_LIB_VERSION}Fiff \
             -lMNE$${MNE_LIB_VERSION}Mne \
             -lMNE$${MNE_LIB_VERSION}Inverse \
+            -lMNE$${MNE_LIB_VERSION}Connectivity \
             -lMNE$${MNE_LIB_VERSION}RtProcessing \
             -lMNE$${MNE_LIB_VERSION}RtCommand \
             -lMNE$${MNE_LIB_VERSION}RtClient \
+            -lMNE$${MNE_LIB_VERSION}Disp \
             -lMNE$${MNE_LIB_VERSION}DispCharts \
             -lMNE$${MNE_LIB_VERSION}Disp3D \
             -lscMeas \

@@ -265,9 +265,9 @@ void View3D::startStopModelRotation(bool checked)
 
 void View3D::toggleCoordAxis(bool checked)
 {
-    m_XAxisEntity->setParent(checked ? m_p3DObjectsEntity : Q_NULLPTR);
-    m_YAxisEntity->setParent(checked ? m_p3DObjectsEntity : Q_NULLPTR);
-    m_ZAxisEntity->setParent(checked ? m_p3DObjectsEntity : Q_NULLPTR);
+    m_XAxisEntity->setEnabled(checked);
+    m_YAxisEntity->setEnabled(checked);
+    m_ZAxisEntity->setEnabled(checked);
 }
 
 
