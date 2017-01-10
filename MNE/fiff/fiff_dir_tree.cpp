@@ -60,10 +60,10 @@ using namespace FIFFLIB;
 //=============================================================================================================
 
 FiffDirTree::FiffDirTree()
-: block(-1)
-, nent(-1)
-, nent_tree(-1)
-, nchild(-1)
+    : block(-1)
+    , nent(-1)
+    , nent_tree(-1)
+    , nchild(-1)
 {
 }
 
@@ -71,14 +71,14 @@ FiffDirTree::FiffDirTree()
 //*************************************************************************************************************
 
 FiffDirTree::FiffDirTree(const FiffDirTree &p_FiffDirTree)
-: block(p_FiffDirTree.block)
-, id(p_FiffDirTree.id)
-, parent_id(p_FiffDirTree.parent_id)
-, dir(p_FiffDirTree.dir)
-, nent(p_FiffDirTree.nent)
-, nent_tree(p_FiffDirTree.nent_tree)
-, children(p_FiffDirTree.children)
-, nchild(p_FiffDirTree.nchild)
+    : block(p_FiffDirTree.block)
+    , id(p_FiffDirTree.id)
+    , parent_id(p_FiffDirTree.parent_id)
+    , dir(p_FiffDirTree.dir)
+    , nent(p_FiffDirTree.nent)
+    , nent_tree(p_FiffDirTree.nent_tree)
+    , children(p_FiffDirTree.children)
+    , nchild(p_FiffDirTree.nchild)
 {
 
 }
@@ -88,10 +88,10 @@ FiffDirTree::FiffDirTree(const FiffDirTree &p_FiffDirTree)
 
 FiffDirTree::~FiffDirTree()
 {
-//    QList<FiffDirTree*>::iterator i;
-//    for (i = this->children.begin(); i != this->children.end(); ++i)
-//        if (*i)
-//            delete *i;
+    //    QList<FiffDirTree*>::iterator i;
+    //    for (i = this->children.begin(); i != this->children.end(); ++i)
+    //        if (*i)
+    //            delete *i;
 }
 
 
@@ -147,7 +147,7 @@ bool FiffDirTree::copy_tree(FiffStream::SPtr p_pStreamIn, FiffId& in_id, QList<F
                 return false;
             }
 
-//ToDo this is the same like read_tag
+            //ToDo this is the same like read_tag
             FiffTag::SPtr tag(new FiffTag());
             //QDataStream in(fidin);
             FiffStream::SPtr in = p_pStreamIn;
@@ -199,8 +199,8 @@ bool FiffDirTree::copy_tree(FiffStream::SPtr p_pStreamIn, FiffId& in_id, QList<F
 
 qint32 FiffDirTree::make_dir_tree(FiffStream* p_pStream, QList<FiffDirEntry>& p_Dir, FiffDirTree& p_Tree, qint32 start)
 {
-//    if (p_pTree != NULL)
-//        delete p_pTree;
+    //    if (p_pTree != NULL)
+    //        delete p_pTree;
     p_Tree.clear();
 
     FiffTag::SPtr t_pTag;
@@ -216,7 +216,7 @@ qint32 FiffDirTree::make_dir_tree(FiffStream* p_pStream, QList<FiffDirEntry>& p_
         block = 0;
     }
 
-//    qDebug() << "start { " << p_pTree->block;
+    //    qDebug() << "start { " << p_pTree->block;
 
     qint32 current = start;
 
@@ -281,8 +281,8 @@ qint32 FiffDirTree::make_dir_tree(FiffStream* p_pStream, QList<FiffDirEntry>& p_
     if(p_Tree.nent == 0)
         p_Tree.dir.clear();
 
-//    qDebug() << "block =" << p_pTree->block << "nent =" << p_pTree->nent << "nchild =" << p_pTree->nchild;
-//    qDebug() << "end } " << block;
+    //    qDebug() << "block =" << p_pTree->block << "nent =" << p_pTree->nent << "nchild =" << p_pTree->nchild;
+    //    qDebug() << "end } " << block;
 
     return current;
 }
@@ -310,11 +310,11 @@ bool FiffDirTree::find_tag(FiffStream* p_pStream, fiff_int_t findkind, FiffTag::
 {
     for (qint32 p = 0; p < this->nent; ++p)
     {
-       if (this->dir[p].kind == findkind)
-       {
-          FiffTag::read_tag(p_pStream,p_pTag,this->dir[p].pos);
-          return true;
-       }
+        if (this->dir[p].kind == findkind)
+        {
+            FiffTag::read_tag(p_pStream,p_pTag,this->dir[p].pos);
+            return true;
+        }
     }
     if (p_pTag)
         p_pTag.clear();
@@ -330,8 +330,9 @@ bool FiffDirTree::has_tag(fiff_int_t findkind)
     for(qint32 p = 0; p < this->nent; ++p)
         if(this->dir.at(p).kind == findkind)
             return true;
-   return false;
+    return false;
 }
+
 
 //*************************************************************************************************************
 
@@ -346,4 +347,89 @@ bool FiffDirTree::has_kind(fiff_int_t p_kind) const
             return true;
 
     return false;
+}
+
+
+//*************************************************************************************************************
+
+void FiffDirTree::print(int indent) const
+{
+    int j, prev_kind,count;
+    QList<FiffDirEntry> dentry = this->dir;
+
+    for (int k = 0; k < indent; k++)
+        putchar(' ');
+    explain_block (this->block);
+    printf (" { ");
+    if (!this->id.isEmpty())
+        this->id.print();
+    printf ("\n");
+
+    for (j = 0, prev_kind = -1, count = 0; j < this->nent; j++) {
+        if (dentry[j].kind != prev_kind) {
+            if (count > 1)
+                printf (" [%d]\n",count);
+            else if (j > 0)
+                putchar('\n');
+            for (int k = 0; k < indent+2; k++)
+                putchar(' ');
+            explain (dentry[j].kind);
+            prev_kind = dentry[j].kind;
+            count = 1;
+        }
+        else
+            count++;
+        prev_kind = dentry[j].kind;
+    }
+    if (count > 1)
+        printf (" [%d]\n",count);
+    else if (j > 0)
+        putchar ('\n');
+    for (j = 0; j < this->nchild; j++)
+        this->children[j].print(indent+5);
+    for (int k = 0; k < indent; k++)
+        putchar(' ');
+    printf ("}\n");
+}
+
+
+//*************************************************************************************************************
+
+void FiffDirTree::explain_block(int kind)
+{
+    for (int k = 0; _fiff_block_explanations[k].kind >= 0; k++) {
+        if (_fiff_block_explanations[k].kind == kind) {
+            printf ("%d = %s",kind,_fiff_block_explanations[k].text);
+            return;
+        }
+    }
+    printf ("Cannot explain: %d",kind);
+}
+
+
+//*************************************************************************************************************
+
+void FiffDirTree::explain(int kind)
+{
+    int k;
+    for (k = 0; _fiff_explanations[k].kind >= 0; k++) {
+        if (_fiff_explanations[k].kind == kind) {
+            printf ("%d = %s",kind,_fiff_explanations[k].text);
+            return;
+        }
+    }
+    printf ("Cannot explain: %d",kind);
+}
+
+
+//*************************************************************************************************************
+
+const char *FiffDirTree::get_tag_explanation(int kind)
+{
+    int k;
+    for (k = 0; _fiff_explanations[k].kind >= 0; k++) {
+        if (_fiff_explanations[k].kind == kind)
+            return _fiff_explanations[k].text;
+    }
+    return "unknown";
 }

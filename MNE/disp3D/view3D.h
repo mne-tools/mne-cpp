@@ -42,7 +42,6 @@
 //=============================================================================================================
 
 #include "disp3D_global.h"
-#include "3DObjects/data3Dtreemodel.h"
 
 #include <fs/annotationset.h>
 #include <fs/annotation.h>
@@ -57,6 +56,7 @@
 
 #include <Qt3DExtras/Qt3DWindow>
 #include <QVector3D>
+#include <QPointer>
 
 
 //*************************************************************************************************************
@@ -66,25 +66,19 @@
 
 class QPropertyAnimation;
 
-namespace MNELIB{
-    class MNESourceEstimate;
-    class MNESourceSpace;
-    class MNEBem;
-}
-
-namespace FSLIB{
-    class Surface;
-    class SurfaceSet;
-    class Surface;
-}
-
 namespace Qt3DCore {
     class QTransform;
 }
 
-namespace FIFFLIB{
-    class FiffDigPointSet;
+namespace Qt3DRender {
+    class QPointLight;
+    class QDirectionalLight;
 }
+
+namespace Qt3DExtras {
+    class QPhongMaterial;
+}
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -100,8 +94,7 @@ namespace DISP3DLIB
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class BrainRTSourceLocDataTreeItem;
-class BrainRTConnectivityDataTreeItem;
+class Data3DTreeModel;
 
 
 //=============================================================================================================
@@ -133,110 +126,11 @@ public:
 
     //=========================================================================================================
     /**
-    * Adds FreeSurfer brain data SET.
-    *
-    * @param[in] subject            The name of the subject.
-    * @param[in] set                The text of the surface set tree item which this data should be added to. If no item with text exists it will be created.
-    * @param[in] tSurfaceSet        FreeSurfer surface set.
-    * @param[in] tAnnotationSet     FreeSurfer annotation set.
-    *
-    * @return                       Returns true if successful.
-    */
-    bool addSurfaceSet(const QString& subject, const QString& set, const FSLIB::SurfaceSet& tSurfaceSet, const FSLIB::AnnotationSet& tAnnotationSet = FSLIB::AnnotationSet());
-
-    //=========================================================================================================
-    /**
-    * Adds FreeSurfer single brain data.
-    *
-    * @param[in] subject            The name of the subject.
-    * @param[in] set                The text of the surface set tree item which this data should be added to. If no item with text exists it will be created.
-    * @param[in] tSurface           FreeSurfer surface.
-    * @param[in] tAnnotation        FreeSurfer annotation.
-    *
-    * @return                       Returns true if successful.
-    */
-    bool addSurface(const QString& subject, const QString& set, const FSLIB::Surface& tSurface, const FSLIB::Annotation& tAnnotation = FSLIB::Annotation());
-
-    //=========================================================================================================
-    /**
-    * Adds source space data to the brain tree model.
-    *
-    * @param[in] subject            The name of the subject.
-    * @param[in] set                The text of the surface set tree item which this data should be added to. If no item with text exists it will be created.
-    * @param[in] tSourceSpace       The source space information.
-    *
-    * @return                       Returns true if successful.
-    */
-    bool addSourceSpace(const QString& subject, const QString& set, const MNELIB::MNESourceSpace& tSourceSpace);
-
-    //=========================================================================================================
-    /**
-    * Adds a forward solution data to the brain tree model. Convenient function to addBrainData(const QString& text, const MNESourceSpace& tSourceSpace).
-    *
-    * @param[in] subject            The name of the subject.
-    * @param[in] set                The text of the surface set tree item which this data should be added to. If no item with text exists it will be created.
-    * @param[in] tForwardSolution   The forward solution information.
-    *
-    * @return                       Returns true if successful.
-    */
-    bool addForwardSolution(const QString& subject, const QString& set, const MNELIB::MNEForwardSolution& tForwardSolution);
-
-    //=========================================================================================================
-    /**
-    * Adds source activity data to the brain tree model.
-    *
-    * @param[in] subject                The name of the subject.
-    * @param[in] set                    The name of the hemisphere surface set to which this data should be added.
-    * @param[in] tSourceEstimate        The MNESourceEstimate data.
-    * @param[in] tForwardSolution       The MNEForwardSolution data.
-    *
-    * @return                           Returns a list of the BrainRTSourceLocDataTreeItem where the data was appended to.
-    */
-    QList<BrainRTSourceLocDataTreeItem*> addSourceData(const QString& subject, const QString& set, const MNELIB::MNESourceEstimate& tSourceEstimate, const MNELIB::MNEForwardSolution& tForwardSolution = MNELIB::MNEForwardSolution());
-
-    //=========================================================================================================
-    /**
-    * Adds connectivity data to the brain tree model.
-    *
-    * @param[in] subject                The name of the subject.
-    * @param[in] set                    The name of the hemisphere surface set to which this data should be added.
-    * @param[in] pNetworkData           The connectivity data.
-    *
-    * @return                           Returns a list of the BrainRTSourceLocDataTreeItem where the data was appended to.
-    */
-    QList<BrainRTConnectivityDataTreeItem*> addConnectivityData(const QString& subject, const QString& set, CONNECTIVITYLIB::Network::SPtr pNetworkData);
-
-    //=========================================================================================================
-    /**
-    * Adds BEM data.
-    *
-    * @param[in] subject            The name of the subject.
-    * @param[in] set                The name of the bem set to which the data is to be added.
-    * @param[in] tBem               The Bem information.
-    *
-    * @return                       Returns true if successful.
-    */
-    bool addBemData(const QString& subject, const QString& set, const MNELIB::MNEBem& tBem);
-
-    //=========================================================================================================
-    /**
-    * Adds Digitizer data.
-    *
-    * @param[in] subject            The name of the subject.
-    * @param[in] set                The name of the measurment set to which the data is to be added.
-    * @param[in] tDigitizer         The Digitizer data.
-    *
-    * @return                       Returns true if successful.
-    */
-    bool addDigitizerData(const QString& subject, const QString& set, const FIFFLIB::FiffDigPointSet &tDigitizer);
-
-    //=========================================================================================================
-    /**
     * Return the tree model which holds the subject information.
     *
-    * @return          The SubjectTreeModel pointer.
+    * @param[in] pModel     The tree model holding the 3d models.
     */
-    Data3DTreeModel* getData3DTreeModel();
+    void setModel(QSharedPointer<DISP3DLIB::Data3DTreeModel> pModel);
 
     //=========================================================================================================
     /**
@@ -246,27 +140,13 @@ public:
     */
     void setSceneColor(const QColor& colSceneColor);
 
-    //=========================================================================================================
-    /**
-    * Return the Qt3D root entity.
-    *
-    * @return          The SubjectTreeModel pointer.
-    */
-    Qt3DCore::QEntity* get3DRootEntity();
-
     void startModelRotationRecursive(QObject* pObject);
 
     //=========================================================================================================
     /**
-    * Starts to rotate all loaded 3D models.
+    * Starts or stops to rotate all loaded 3D models.
     */
-    void startModelRotation();
-
-    //=========================================================================================================
-    /**
-    * Stops to rotate all loaded 3D models.
-    */
-    void stopModelRotation();    
+    void startStopModelRotation(bool checked);
 
     //=========================================================================================================
     /**
@@ -274,18 +154,36 @@ public:
     */
     void toggleCoordAxis(bool checked);
 
-protected:
     //=========================================================================================================
     /**
-    * Init the meta types
+    * Show fullscreen.
     */
-    void initMetatypes();
+    void showFullScreen(bool checked);
 
+    //=========================================================================================================
+    /**
+    * Change light color.
+    */
+    void setLightColor(QColor color);
+
+    //=========================================================================================================
+    /**
+    * Set light intensity.
+    */
+    void setLightIntensity(double value);
+
+protected:
     //=========================================================================================================
     /**
     * Init the 3D view
     */
     void init();
+
+    //=========================================================================================================
+    /**
+    * Init the light for the 3D view
+    */
+    void initLight();
 
     //=========================================================================================================
     /**
@@ -312,16 +210,16 @@ protected:
     */
     void createCoordSystem(Qt3DCore::QEntity *parent);
 
-    Qt3DCore::QEntity*                  m_pRootEntity;                  /**< The root/most top level entity buffer. */
-    Qt3DRender::QCamera*                m_pCameraEntity;                /**< The camera entity. */
+    QPointer<Qt3DCore::QEntity>         m_pRootEntity;                  /**< The root/most top level entity buffer. */
+    QPointer<Qt3DCore::QEntity>         m_p3DObjectsEntity;             /**< The root/most top level entity buffer. */
+    QPointer<Qt3DCore::QEntity>         m_pLightEntity;                 /**< The root/most top level entity buffer. */
+    QPointer<Qt3DRender::QCamera>       m_pCameraEntity;                /**< The camera entity. */
 
     QSharedPointer<Qt3DCore::QEntity>   m_XAxisEntity;                  /**< The entity representing a torus in x direction. */
     QSharedPointer<Qt3DCore::QEntity>   m_YAxisEntity;                  /**< The entity representing a torus in y direction. */
     QSharedPointer<Qt3DCore::QEntity>   m_ZAxisEntity;                  /**< The entity representing a torus in z direction. */
 
-    Qt3DCore::QTransform*               m_pCameraTransform;             /**< The main camera transform. */
-
-    Data3DTreeModel::SPtr               m_pData3DTreeModel;             /**< Pointer to the data3D class, which holds all 3D data. */
+    QPointer<Qt3DCore::QTransform>      m_pCameraTransform;             /**< The main camera transform. */
 
     bool                                m_bCameraTransMode;             /**< Flag for activating/deactivating the translation camera mode. */
     bool                                m_bCameraRotationMode;          /**< Flag for activating/deactivating the rotation camera mode. */
@@ -334,7 +232,8 @@ protected:
     QVector3D                           m_vecCameraRotation;            /**< The camera rotation vector. */
     QVector3D                           m_vecCameraRotationOld;         /**< The camera old rotation vector. */
 
-    QList<QPropertyAnimation*>          m_lPropertyAnimations;          /**< The animations for each 3D object. */
+    QList<QPointer<QPropertyAnimation> >  m_lPropertyAnimations;        /**< The animations for each 3D object. */
+    QList<QPair<QPointer<Qt3DRender::QDirectionalLight> , QPointer<Qt3DExtras::QPhongMaterial> > >  m_lLightSources;        /**< The light sources. */
 };
 
 } // NAMESPACE

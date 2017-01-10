@@ -58,9 +58,6 @@
 
 using namespace std;
 
-namespace Ui {
-class Extract;
-}
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -95,7 +92,6 @@ signals:
     void extractionDone();
 
 private:
-    Ui::Extract     *ui;                                /**< Sets up the GUI. */
     QStringList     m_qArguments;                       /**< List of extractionarguments for 7zip. */
     QString         m_qCurrentPath;                     /**< Temporary filepath of the sample data set. */
     QString         m_q7zipPath;                        /**< Location of 7z.exe, */

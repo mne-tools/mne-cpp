@@ -10,7 +10,7 @@ export LD_LIBRARY_PATH=$(pwd)/lib:$LD_LIBRARY_PATH
 MNECPP_ROOT=$(pwd)
 
 # Tests to run - tbd: find required tests automatically with grep
-tests=( test_codecov test_fiff_rwr )
+tests=( test_codecov test_fiff_rwr test_dipole_fit )
 
 for test in ${tests[*]};
 do

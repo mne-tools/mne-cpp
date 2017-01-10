@@ -2,6 +2,7 @@
 /**
 * @file     main.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     July, 2012
@@ -50,6 +51,7 @@
 
 #include <disp3D/view3D.h>
 #include <disp3D/control/control3dwidget.h>
+#include <disp3D/model/data3Dtreemodel.h>
 
 #include <utils/mnemath.h>
 
@@ -101,52 +103,51 @@ int main(int argc, char *argv[])
     QCommandLineParser parser;
     parser.setApplicationDescription("Clustered Inverse Example");
     parser.addHelpOption();
-    QCommandLineOption sampleFwdFileOption("f", "Path to forward solution <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
-    QCommandLineOption sampleCovFileOption("c", "Path to covariance <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
-    QCommandLineOption sampleEvokedFileOption("e", "Path to evoked <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+
+    QCommandLineOption sampleFwdFileOption("fwd", "Path to the forward solution <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
+    QCommandLineOption sampleCovFileOption("cov", "Path to the covariance <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
+    QCommandLineOption sampleEvokedFileOption("ave", "Path to the evoked/average <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    QCommandLineOption snrOption("snr", "The <snr> value used for computation.", "snr", "1.0");//3.0f;//0.1f;//3.0f;
+    QCommandLineOption methodOption("method", "Inverse estimation <method>, i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM");//"MNE" | "dSPM" | "sLORETA"
+    QCommandLineOption invFileOption("invOut", "Path to inverse <file>, which is to be written.", "file", "");
+    QCommandLineOption stcFileOption("stcOut", "Path to stc <file>, which is to be written.", "file", "");
+    QCommandLineOption surfOption("surfType", "Surface type <type>.", "type", "orig");
+    QCommandLineOption annotOption("annotType", "Annotation type <type>.", "type", "aparc.a2009s");
+    QCommandLineOption hemiOption("hemi", "Selected hemisphere <hemi>.", "hemi", "2");
+    QCommandLineOption subjectOption("subject", "Selected subject <subject>.", "subject", "sample");
+    QCommandLineOption subjectPathOption("subjectPath", "Selected subject path <subjectPath>.", "subjectPath", "./MNE-sample-data/subjects");
+
     parser.addOption(sampleFwdFileOption);
     parser.addOption(sampleCovFileOption);
     parser.addOption(sampleEvokedFileOption);
+    parser.addOption(snrOption);
+    parser.addOption(methodOption);
+    parser.addOption(invFileOption);
+    parser.addOption(stcFileOption);
+    parser.addOption(surfOption);
+    parser.addOption(annotOption);
+    parser.addOption(hemiOption);
+    parser.addOption(subjectOption);
+    parser.addOption(subjectPathOption);
+
     parser.process(app);
 
-    //########################################################################################
-    // Source Estimate
+    //Parse inputs
     QFile t_fileFwd(parser.value(sampleFwdFileOption));
     QFile t_fileCov(parser.value(sampleCovFileOption));
     QFile t_fileEvoked(parser.value(sampleEvokedFileOption));
 
-    double snr = 1.0f;//3.0f;//0.1f;//3.0f;
-    QString method("dSPM"); //"MNE" | "dSPM" | "sLORETA"
+    double snr = parser.value(snrOption).toDouble();
+    QString method = parser.value(methodOption);
 
-    QString t_sFileNameClusteredInv("");
-    QString t_sFileNameStc("");
-
-    // Parse command line parameters
-    for(qint32 i = 0; i < argc; ++i)
-    {
-        if(strcmp(argv[i], "-snr") == 0 || strcmp(argv[i], "--snr") == 0)
-        {
-            if(i + 1 < argc)
-                snr = atof(argv[i+1]);
-        }
-        else if(strcmp(argv[i], "-method") == 0 || strcmp(argv[i], "--method") == 0)
-        {
-            if(i + 1 < argc)
-                method = QString::fromUtf8(argv[i+1]);
-        }
-        else if(strcmp(argv[i], "-inv") == 0 || strcmp(argv[i], "--inv") == 0)
-        {
-            if(i + 1 < argc)
-                t_sFileNameClusteredInv = QString::fromUtf8(argv[i+1]);
-        }
-        else if(strcmp(argv[i], "-stc") == 0 || strcmp(argv[i], "--stc") == 0)
-        {
-            if(i + 1 < argc)
-                t_sFileNameStc = QString::fromUtf8(argv[i+1]);
-        }
-    }
+    QString t_sFileNameClusteredInv = parser.value(invFileOption);
+    QString t_sFileNameStc = parser.value(stcFileOption);
 
     double lambda2 = 1.0 / pow(snr, 2);
+
+    SurfaceSet t_surfSet (parser.value(subjectOption), parser.value(hemiOption).toInt(), parser.value(surfOption), parser.value(subjectPathOption));
+    AnnotationSet t_annotationSet (parser.value(subjectOption), parser.value(hemiOption).toInt(), parser.value(annotOption), parser.value(subjectPathOption));
+
     qDebug() << "Start calculation with: SNR" << snr << "; Lambda" << lambda2 << "; Method" << method << "; stc:" << t_sFileNameStc;
 
     // Load data
@@ -161,8 +162,6 @@ int main(int argc, char *argv[])
     MNEForwardSolution t_Fwd(t_fileFwd);
     if(t_Fwd.isEmpty())
         return 1;
-
-    AnnotationSet t_annotationSet("sample", 2, "aparc.a2009s", "./MNE-sample-data/subjects");
 
     FiffCov noise_cov(t_fileCov);
 
@@ -274,10 +273,6 @@ int main(int argc, char *argv[])
     //Source Estimate end
     //########################################################################################
 
-//    SurfaceSet t_surfSet("./MNE-sample-data/subjects/sample/surf/lh.white", "./MNE-sample-data/subjects/sample/surf/rh.white");
-//    SurfaceSet t_surfSet("/home/chdinh/sl_data/subjects/mind006/surf/lh.white", "/home/chdinh/sl_data/subjects/mind006/surf/rh.white");
-    SurfaceSet t_surfSet("E:/Data/sl_data/subjects/mind006/surf/lh.white", "E:/Data/sl_data/subjects/mind006/surf/rh.white");
-
 //    //only one time point - P100
 //    qint32 sample = 0;
 //    for(qint32 i = 0; i < sourceEstimate.times.size(); ++i)
@@ -291,12 +286,16 @@ int main(int argc, char *argv[])
 //    sample += (qint32)ceil(0.106/sourceEstimate.tstep); //100ms
 //    sourceEstimate = sourceEstimate.reduce(sample, 1);
 
-//    View3D::SPtr testWindow = View3D::SPtr(new View3D());
-//    testWindow->addBrainData("HemiLRSet", t_surfSet, t_annotationSet);
+    View3D::SPtr testWindow = View3D::SPtr(new View3D());
+    Data3DTreeModel::SPtr p3DDataModel = Data3DTreeModel::SPtr(new Data3DTreeModel());
 
-//    QList<BrainRTSourceLocDataTreeItem*> rtItemList = testWindow->addRtBrainData("HemiLRSet", sourceEstimate, t_clusteredFwd);
+    testWindow->setModel(p3DDataModel);
 
-//    testWindow->show();
+    p3DDataModel->addSurfaceSet(parser.value(subjectOption), "HemiLR", t_surfSet, t_annotationSet);
+
+    MneEstimateTreeItem* rtItemList = p3DDataModel->addSourceData(parser.value(subjectOption), "HemiLR", sourceEstimate, t_clusteredFwd);
+
+    testWindow->show();
 
     if(!t_sFileNameStc.isEmpty())
     {
