@@ -244,6 +244,17 @@ void RtSourceLocDataWorker::setLoop(bool looping)
 
 //*************************************************************************************************************
 
+void RtSourceLocDataWorker::setNeighborInfo(const QList<QPair<int, QVector<int> > >& lVertexNeighborsLeftHemi, const QList<QPair<int, QVector<int> > >& lVertexNeighborsRightHemi)
+{
+    QMutexLocker locker(&m_qMutex);
+
+    m_lVertexNeighborsLeftHemi = lVertexNeighborsLeftHemi;
+    m_lVertexNeighborsRightHemi = lVertexNeighborsRightHemi;
+
+}
+
+//*************************************************************************************************************
+
 void RtSourceLocDataWorker::start()
 {
     m_qMutex.lock();
@@ -353,153 +364,23 @@ QPair<QByteArray, QByteArray> RtSourceLocDataWorker::performVisualizationTypeCal
     }
 
     //Cut out left and right hemisphere from source data
-    VectorXd sourceColorSamplesLeftHemi = sourceColorSamples.segment(0,m_vecVertNoLeftHemi.rows());
-    VectorXd sourceColorSamplesRightHemi = sourceColorSamples.segment(m_vecVertNoLeftHemi.rows()+1,m_vecVertNoRightHemi.rows());
+    VectorXd sourceColorSamplesLeftHemi = sourceColorSamples.segment(0, m_vecVertNoLeftHemi.rows());
+    VectorXd sourceColorSamplesRightHemi = sourceColorSamples.segment(m_vecVertNoLeftHemi.rows()+1, m_vecVertNoRightHemi.rows());
 
     //Generate color data for vertices
     switch(m_iVisualizationType) {
         case Data3DTreeModelItemRoles::VertexBased: {
-            if(!m_bSurfaceDataIsInit) {
-                qDebug() << "RtSourceLocDataWorker::performVisualizationTypeCalculation - Surface data was not initialized. Returning ...";
-                return colorPair;
-            }
-
-            //Left hemisphere
-            QByteArray arrayCurrentVertColorLeftHemi = m_arraySurfaceVertColorLeftHemi;
-            float *rawArrayCurrentVertColorLeftHemi = reinterpret_cast<float *>(arrayCurrentVertColorLeftHemi.data());
-
-            //Create final QByteArray with colors based on the current anatomical information
-            for(int i = 0; i < m_vecVertNoLeftHemi.rows(); ++i) {
-                VectorXd vecActivationLeftHemi(1);
-                vecActivationLeftHemi(0) = sourceColorSamplesLeftHemi(i);
-
-                if(vecActivationLeftHemi(0) >= m_vecThresholds.x()) {
-                    QByteArray sourceColorSamplesColorLeftHemi = transformDataToColor(vecActivationLeftHemi);
-                    const float *rawSourceColorSamplesColorLeftHemi = reinterpret_cast<const float *>(sourceColorSamplesColorLeftHemi.data());
-
-                    rawArrayCurrentVertColorLeftHemi[m_vecVertNoLeftHemi(i)*3+0] = rawSourceColorSamplesColorLeftHemi[0];
-                    rawArrayCurrentVertColorLeftHemi[m_vecVertNoLeftHemi(i)*3+1] = rawSourceColorSamplesColorLeftHemi[1];
-                    rawArrayCurrentVertColorLeftHemi[m_vecVertNoLeftHemi(i)*3+2] = rawSourceColorSamplesColorLeftHemi[2];
-                }
-            }
-
-            colorPair.first = arrayCurrentVertColorLeftHemi;
-
-            //Right hemisphere
-            QByteArray arrayCurrentVertColorRightHemi = m_arraySurfaceVertColorRightHemi;
-            float *rawArrayCurrentVertColorRightHemi = reinterpret_cast<float *>(arrayCurrentVertColorRightHemi.data());
-
-            //Create final QByteArray with colors based on the current anatomical information
-            for(int i = 0; i < m_vecVertNoRightHemi.rows(); ++i) {
-                VectorXd vecActivationRightHemi(1);
-                vecActivationRightHemi(0) = sourceColorSamplesRightHemi(i);
-
-                if(vecActivationRightHemi(0) >= m_vecThresholds.x()) {
-                    QByteArray sourceColorSamplesColorRightHemi = transformDataToColor(vecActivationRightHemi);
-                    const float *rawSourceColorSamplesColorRightHemi = reinterpret_cast<const float *>(sourceColorSamplesColorRightHemi.data());
-
-                    rawArrayCurrentVertColorRightHemi[m_vecVertNoRightHemi(i)*3+0] = rawSourceColorSamplesColorRightHemi[0];
-                    rawArrayCurrentVertColorRightHemi[m_vecVertNoRightHemi(i)*3+1] = rawSourceColorSamplesColorRightHemi[1];
-                    rawArrayCurrentVertColorRightHemi[m_vecVertNoRightHemi(i)*3+2] = rawSourceColorSamplesColorRightHemi[2];
-                }
-            }
-
-            colorPair.second = arrayCurrentVertColorRightHemi;
-
-            return colorPair;
+            return generateColorsPerVertex(sourceColorSamplesLeftHemi, sourceColorSamplesRightHemi);
         }
 
         case Data3DTreeModelItemRoles::AnnotationBased: {
-            if(!m_bAnnotationDataIsInit) {
-                qDebug() << "RtSourceLocDataWorker::performVisualizationTypeCalculation - Annotation data was not initialized. Returning ...";
-
-                return colorPair;
-            }
-
-            //Find maximum actiavtion for each label
-            QMap<qint32, double> vecLabelActivationLeftHemi;
-
-            for(int i = 0; i < m_vecVertNoLeftHemi.rows(); ++i) {
-                //Find out label for source
-                qint32 labelIdxLeftHemi = m_mapLabelIdSourcesLeftHemi[m_vecVertNoLeftHemi(i)];
-
-                if(fabs(sourceColorSamplesLeftHemi(i)) > fabs(vecLabelActivationLeftHemi[labelIdxLeftHemi]))
-                    vecLabelActivationLeftHemi.insert(labelIdxLeftHemi, sourceColorSamplesLeftHemi(i));
-            }
-
-            QMap<qint32, double> vecLabelActivationRightHemi;
-            for(int i = 0; i < m_vecVertNoRightHemi.rows(); ++i) {
-                //Find out label for source
-                qint32 labelIdxRightHemi = m_mapLabelIdSourcesRightHemi[m_vecVertNoRightHemi(i)];
-
-                if(fabs(sourceColorSamplesRightHemi(i)) > fabs(vecLabelActivationRightHemi[labelIdxRightHemi]))
-                    vecLabelActivationRightHemi.insert(labelIdxRightHemi, sourceColorSamplesRightHemi(i));
-            }
-
-            //Color all labels respectivley to their activation
-            //Left hemisphere
-            QByteArray arrayCurrentVertColorLeftHemi;
-            //arrayCurrentVertColor.resize(m_arraySurfaceVertColor.size());
-            arrayCurrentVertColorLeftHemi = m_arraySurfaceVertColorLeftHemi;
-
-            float *rawArrayCurrentVertColorLeftHemi = reinterpret_cast<float *>(arrayCurrentVertColorLeftHemi.data());
-
-            for(int i = 0; i<m_lLabelsLeftHemi.size(); i++) {
-                FSLIB::Label labelLeftHemi = m_lLabelsLeftHemi.at(i);
-
-                //Transform label activations to rgb colors
-                VectorXd vecActivationLeftHemi(1);
-                vecActivationLeftHemi(0) = vecLabelActivationLeftHemi[labelLeftHemi.label_id];
-
-                //Check if value is bigger than lower threshold. If not, don't plot activation
-                if(vecActivationLeftHemi(0) >= m_vecThresholds.x()) {
-                    QByteArray arrayLabelColorsLeftHemi = transformDataToColor(vecActivationLeftHemi);
-                    float *rawArrayLabelColorsLeftHemi = reinterpret_cast<float *>(arrayLabelColorsLeftHemi.data());
-
-                    for(int j = 0; j<labelLeftHemi.vertices.rows(); j++) {
-                        rawArrayCurrentVertColorLeftHemi[labelLeftHemi.vertices(j)*3+0] = rawArrayLabelColorsLeftHemi[0];
-                        rawArrayCurrentVertColorLeftHemi[labelLeftHemi.vertices(j)*3+1] = rawArrayLabelColorsLeftHemi[1];
-                        rawArrayCurrentVertColorLeftHemi[labelLeftHemi.vertices(j)*3+2] = rawArrayLabelColorsLeftHemi[2];
-                    }
-                }
-            }
-
-            colorPair.first = arrayCurrentVertColorLeftHemi;
-
-            //Right hemisphere
-            QByteArray arrayCurrentVertColorRightHemi;
-            //arrayCurrentVertColor.resize(m_arraySurfaceVertColor.size());
-            arrayCurrentVertColorRightHemi = m_arraySurfaceVertColorRightHemi;
-
-            float *rawArrayCurrentVertColorRightHemi = reinterpret_cast<float *>(arrayCurrentVertColorRightHemi.data());
-
-            for(int i = 0; i<m_lLabelsRightHemi.size(); i++) {
-                FSLIB::Label labelRightHemi = m_lLabelsRightHemi.at(i);
-
-                //Transform label activations to rgb colors
-                VectorXd vecActivationRightHemi(1);
-                vecActivationRightHemi(0) = vecLabelActivationRightHemi[labelRightHemi.label_id];
-
-                //Check if value is bigger than lower threshold. If not, don't plot activation
-                if(vecActivationRightHemi(0) >= m_vecThresholds.x()) {
-                    QByteArray arrayLabelColorsRightHemi = transformDataToColor(vecActivationRightHemi);
-                    float *rawArrayLabelColorsRightHemi = reinterpret_cast<float *>(arrayLabelColorsRightHemi.data());
-
-                    for(int j = 0; j<labelRightHemi.vertices.rows(); j++) {
-                        rawArrayCurrentVertColorRightHemi[labelRightHemi.vertices(j)*3+0] = rawArrayLabelColorsRightHemi[0];
-                        rawArrayCurrentVertColorRightHemi[labelRightHemi.vertices(j)*3+1] = rawArrayLabelColorsRightHemi[1];
-                        rawArrayCurrentVertColorRightHemi[labelRightHemi.vertices(j)*3+2] = rawArrayLabelColorsRightHemi[2];
-                    }
-                }
-            }
-
-            colorPair.second = arrayCurrentVertColorRightHemi;
-
-            return colorPair;
+            return generateColorsPerAnnotation(sourceColorSamplesLeftHemi, sourceColorSamplesRightHemi);
         }        
 
         case Data3DTreeModelItemRoles::SmoothingBased: {
-            //TODO: Smooth here!
+            colorPair.first = generateSmoothedColors(sourceColorSamplesLeftHemi, m_vecVertNoLeftHemi, m_arraySurfaceVertColorLeftHemi, m_lVertexNeighborsLeftHemi);
+            colorPair.second = generateSmoothedColors(sourceColorSamplesRightHemi, m_vecVertNoRightHemi, m_arraySurfaceVertColorRightHemi, m_lVertexNeighborsRightHemi);
+
             break;
         }
     }
@@ -507,6 +388,255 @@ QPair<QByteArray, QByteArray> RtSourceLocDataWorker::performVisualizationTypeCal
     return colorPair;
 }
 
+
+//*************************************************************************************************************
+
+QPair<QByteArray, QByteArray> RtSourceLocDataWorker::generateColorsPerVertex(const VectorXd& sourceColorSamplesLeftHemi, const VectorXd& sourceColorSamplesRightHemi)
+{
+    QPair<QByteArray, QByteArray> colorPair;
+    colorPair.first = m_arraySurfaceVertColorLeftHemi;
+    colorPair.second = m_arraySurfaceVertColorRightHemi;
+
+    if(!m_bSurfaceDataIsInit) {
+        qDebug() << "RtSourceLocDataWorker::generateColorsPerVertex - Surface data was not initialized. Returning ...";
+        return colorPair;
+    }
+
+    //Left hemisphere
+    QByteArray arrayCurrentVertColorLeftHemi = m_arraySurfaceVertColorLeftHemi;
+    float *rawArrayCurrentVertColorLeftHemi = reinterpret_cast<float *>(arrayCurrentVertColorLeftHemi.data());
+
+    //Create final QByteArray with colors based on the current anatomical information
+    for(int i = 0; i < m_vecVertNoLeftHemi.rows(); ++i) {
+        VectorXd vecActivationLeftHemi(1);
+        vecActivationLeftHemi(0) = sourceColorSamplesLeftHemi(i);
+
+        if(vecActivationLeftHemi(0) >= m_vecThresholds.x()) {
+            QByteArray sourceColorSamplesColorLeftHemi = transformDataToColor(vecActivationLeftHemi);
+            const float *rawSourceColorSamplesColorLeftHemi = reinterpret_cast<const float *>(sourceColorSamplesColorLeftHemi.data());
+
+            rawArrayCurrentVertColorLeftHemi[m_vecVertNoLeftHemi(i)*3+0] = rawSourceColorSamplesColorLeftHemi[0];
+            rawArrayCurrentVertColorLeftHemi[m_vecVertNoLeftHemi(i)*3+1] = rawSourceColorSamplesColorLeftHemi[1];
+            rawArrayCurrentVertColorLeftHemi[m_vecVertNoLeftHemi(i)*3+2] = rawSourceColorSamplesColorLeftHemi[2];
+        }
+    }
+
+    colorPair.first = arrayCurrentVertColorLeftHemi;
+
+    //Right hemisphere
+    QByteArray arrayCurrentVertColorRightHemi = m_arraySurfaceVertColorRightHemi;
+    float *rawArrayCurrentVertColorRightHemi = reinterpret_cast<float *>(arrayCurrentVertColorRightHemi.data());
+
+    //Create final QByteArray with colors based on the current anatomical information
+    for(int i = 0; i < m_vecVertNoRightHemi.rows(); ++i) {
+        VectorXd vecActivationRightHemi(1);
+        vecActivationRightHemi(0) = sourceColorSamplesRightHemi(i);
+
+        if(vecActivationRightHemi(0) >= m_vecThresholds.x()) {
+            QByteArray sourceColorSamplesColorRightHemi = transformDataToColor(vecActivationRightHemi);
+            const float *rawSourceColorSamplesColorRightHemi = reinterpret_cast<const float *>(sourceColorSamplesColorRightHemi.data());
+
+            rawArrayCurrentVertColorRightHemi[m_vecVertNoRightHemi(i)*3+0] = rawSourceColorSamplesColorRightHemi[0];
+            rawArrayCurrentVertColorRightHemi[m_vecVertNoRightHemi(i)*3+1] = rawSourceColorSamplesColorRightHemi[1];
+            rawArrayCurrentVertColorRightHemi[m_vecVertNoRightHemi(i)*3+2] = rawSourceColorSamplesColorRightHemi[2];
+        }
+    }
+
+    colorPair.second = arrayCurrentVertColorRightHemi;
+
+    return colorPair;
+}
+
+
+//*************************************************************************************************************
+
+QPair<QByteArray, QByteArray> RtSourceLocDataWorker::generateColorsPerAnnotation(const VectorXd& sourceColorSamplesLeftHemi, const VectorXd& sourceColorSamplesRightHemi)
+{
+    QPair<QByteArray, QByteArray> colorPair;
+    colorPair.first = m_arraySurfaceVertColorLeftHemi;
+    colorPair.second = m_arraySurfaceVertColorRightHemi;
+
+    if(!m_bAnnotationDataIsInit) {
+        qDebug() << "RtSourceLocDataWorker::generateColorsPerAnnotation - Annotation data was not initialized. Returning ...";
+        return colorPair;
+    }
+
+    //Find maximum actiavtion for each label
+    QMap<qint32, double> vecLabelActivationLeftHemi;
+
+    for(int i = 0; i < m_vecVertNoLeftHemi.rows(); ++i) {
+        //Find out label for source
+        qint32 labelIdxLeftHemi = m_mapLabelIdSourcesLeftHemi[m_vecVertNoLeftHemi(i)];
+
+        if(fabs(sourceColorSamplesLeftHemi(i)) > fabs(vecLabelActivationLeftHemi[labelIdxLeftHemi]))
+            vecLabelActivationLeftHemi.insert(labelIdxLeftHemi, sourceColorSamplesLeftHemi(i));
+    }
+
+    QMap<qint32, double> vecLabelActivationRightHemi;
+    for(int i = 0; i < m_vecVertNoRightHemi.rows(); ++i) {
+        //Find out label for source
+        qint32 labelIdxRightHemi = m_mapLabelIdSourcesRightHemi[m_vecVertNoRightHemi(i)];
+
+        if(fabs(sourceColorSamplesRightHemi(i)) > fabs(vecLabelActivationRightHemi[labelIdxRightHemi]))
+            vecLabelActivationRightHemi.insert(labelIdxRightHemi, sourceColorSamplesRightHemi(i));
+    }
+
+    //Color all labels respectivley to their activation
+    //Left hemisphere
+    QByteArray arrayCurrentVertColorLeftHemi;
+    //arrayCurrentVertColor.resize(m_arraySurfaceVertColor.size());
+    arrayCurrentVertColorLeftHemi = m_arraySurfaceVertColorLeftHemi;
+
+    float *rawArrayCurrentVertColorLeftHemi = reinterpret_cast<float *>(arrayCurrentVertColorLeftHemi.data());
+
+    for(int i = 0; i<m_lLabelsLeftHemi.size(); i++) {
+        FSLIB::Label labelLeftHemi = m_lLabelsLeftHemi.at(i);
+
+        //Transform label activations to rgb colors
+        VectorXd vecActivationLeftHemi(1);
+        vecActivationLeftHemi(0) = vecLabelActivationLeftHemi[labelLeftHemi.label_id];
+
+        //Check if value is bigger than lower threshold. If not, don't plot activation
+        if(vecActivationLeftHemi(0) >= m_vecThresholds.x()) {
+            QByteArray arrayLabelColorsLeftHemi = transformDataToColor(vecActivationLeftHemi);
+            float *rawArrayLabelColorsLeftHemi = reinterpret_cast<float *>(arrayLabelColorsLeftHemi.data());
+
+            for(int j = 0; j<labelLeftHemi.vertices.rows(); j++) {
+                rawArrayCurrentVertColorLeftHemi[labelLeftHemi.vertices(j)*3+0] = rawArrayLabelColorsLeftHemi[0];
+                rawArrayCurrentVertColorLeftHemi[labelLeftHemi.vertices(j)*3+1] = rawArrayLabelColorsLeftHemi[1];
+                rawArrayCurrentVertColorLeftHemi[labelLeftHemi.vertices(j)*3+2] = rawArrayLabelColorsLeftHemi[2];
+            }
+        }
+    }
+
+    colorPair.first = arrayCurrentVertColorLeftHemi;
+
+    //Right hemisphere
+    QByteArray arrayCurrentVertColorRightHemi;
+    //arrayCurrentVertColor.resize(m_arraySurfaceVertColor.size());
+    arrayCurrentVertColorRightHemi = m_arraySurfaceVertColorRightHemi;
+
+    float *rawArrayCurrentVertColorRightHemi = reinterpret_cast<float *>(arrayCurrentVertColorRightHemi.data());
+
+    for(int i = 0; i<m_lLabelsRightHemi.size(); i++) {
+        FSLIB::Label labelRightHemi = m_lLabelsRightHemi.at(i);
+
+        //Transform label activations to rgb colors
+        VectorXd vecActivationRightHemi(1);
+        vecActivationRightHemi(0) = vecLabelActivationRightHemi[labelRightHemi.label_id];
+
+        //Check if value is bigger than lower threshold. If not, don't plot activation
+        if(vecActivationRightHemi(0) >= m_vecThresholds.x()) {
+            QByteArray arrayLabelColorsRightHemi = transformDataToColor(vecActivationRightHemi);
+            float *rawArrayLabelColorsRightHemi = reinterpret_cast<float *>(arrayLabelColorsRightHemi.data());
+
+            for(int j = 0; j<labelRightHemi.vertices.rows(); j++) {
+                rawArrayCurrentVertColorRightHemi[labelRightHemi.vertices(j)*3+0] = rawArrayLabelColorsRightHemi[0];
+                rawArrayCurrentVertColorRightHemi[labelRightHemi.vertices(j)*3+1] = rawArrayLabelColorsRightHemi[1];
+                rawArrayCurrentVertColorRightHemi[labelRightHemi.vertices(j)*3+2] = rawArrayLabelColorsRightHemi[2];
+            }
+        }
+    }
+
+    colorPair.second = arrayCurrentVertColorRightHemi;
+
+    return colorPair;
+}
+
+
+//*************************************************************************************************************
+
+QByteArray RtSourceLocDataWorker::generateSmoothedColors(const VectorXd& sourceColorSamples, const VectorXi& vertno, const QByteArray& arrayCurrentVertColor, const QList<QPair<int, QVector<int> > >& lVertexNeighbors)
+{
+    //Do the smooting here
+    if(lVertexNeighbors.isEmpty()) {
+        qDebug() << "RtSourceLocDataWorker::generateSmoothedColors - The neighboring information has not been set. Returning ...";
+        return QByteArray();
+    }
+
+    //Init the variables
+    int n,k,p,it,nn,nv;
+    float sum;
+    int niter = 15;
+
+    int nSurfaceVerts = arrayCurrentVertColor.size() / (sizeof(float) * 3);
+    int nvert = sourceColorSamples.rows();
+
+    QVector<bool> undef(nSurfaceVerts);
+    QVector<bool> prev_undef(nSurfaceVerts);
+    QVector<float> prev_val(nSurfaceVerts);
+    QVector<float> smooth_val(nSurfaceVerts);
+
+    //Set all vertex activations to 0
+    for (k = 0; k < nSurfaceVerts; k++) {
+        undef[k] = true;
+        smooth_val[k] = 0;
+    }
+
+    //Set all vertex activation of the actually chosen sources to their current activation
+    for (k = 0; k < nvert; k++) {
+        undef[vertno[k]] = false;
+        smooth_val[vertno[k]] = sourceColorSamples[k];
+    }
+
+    //Smooth here
+    for (it = 0; it < niter; it++) {
+        for (k = 0; k < nSurfaceVerts; k++) {
+            prev_undef[k] = undef[k];
+            prev_val[k]  = smooth_val[k];
+        }
+
+        for (k = 0; k < nSurfaceVerts; k++) {
+            sum = 0;
+            n   = 0;
+            if (!prev_undef[k]) {
+                sum = smooth_val[k];
+                n = 1;
+            }
+
+            nn = lVertexNeighbors.at(k).second.size();
+
+            for (p = 0; p < nn; p++) {
+                nv = lVertexNeighbors.at(k).second.at(p);
+                if (!prev_undef[nv]) {
+                    sum += prev_val[nv];
+                    n++;
+                }
+            }
+
+            if (n > 0) {
+                smooth_val[k] = sum/n;
+                undef[k] = false;
+
+            }
+        }
+    }
+
+    //Produce final color
+    VectorXd vecActivation(1);
+
+    QByteArray finalColors = arrayCurrentVertColor;
+    float *rawfinalColors = reinterpret_cast<float *>(finalColors.data());
+    int idxVert = 0;
+
+    for (k = 0; k < nSurfaceVerts; k++) {
+        vecActivation(0) = smooth_val[k];
+
+        if(vecActivation(0) >= m_vecThresholds.x()) {
+            QByteArray arrayVertColor = transformDataToColor(vecActivation);
+
+            float *rawVertColor = reinterpret_cast<float *>(arrayVertColor.data());
+
+            rawfinalColors[idxVert] = rawVertColor[0];
+            rawfinalColors[idxVert+1] = rawVertColor[1];
+            rawfinalColors[idxVert+2] = rawVertColor[2];
+        }
+
+        idxVert += 3;
+    }
+
+    return finalColors;
+}
 
 //*************************************************************************************************************
 

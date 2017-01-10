@@ -225,7 +225,6 @@ public:
 
     QList<QPair<int, QVector<int> > > neighbor_tri;           /**< Map of neighboring triangles for each vertex */
     QList<QPair<int, QVector<int> > > neighbor_vert;          /**< Map of neighboring vertices for each vertex */
-    QVector<SparseMatrix<double> > smoothOperatorList;
 
     MNEClusterInfo cluster_info; /**< Holds the cluster information. */
 private:

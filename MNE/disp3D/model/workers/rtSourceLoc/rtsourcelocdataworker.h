@@ -201,6 +201,15 @@ public:
 
     //=========================================================================================================
     /**
+    * Set the neighboring information for smoothing the activity.
+    *
+    * @param[in] lVertexNeighborsLeftHemi       The neighbor vertices for the left hemisphere.
+    * @param[in] lVertexNeighborsRightHemi      The neighbor vertices for the right hemisphere.
+    */
+    void setNeighborInfo(const QList<QPair<int, QVector<int> > >& lVertexNeighborsLeftHemi, const QList<QPair<int, QVector<int> > >& lVertexNeighborsRightHemi);
+
+    //=========================================================================================================
+    /**
     * QThread functions
     */
     void stop();
@@ -216,13 +225,48 @@ protected:
 private:
     //=========================================================================================================
     /**
-    * Perfrom the needed visualization type computations, such as smoothing, annoation coliring, etc..
+    * Perfrom the needed visualization type computations.
     *
     * @param[in] sourceColorSamples         The color data for the sources.
     *
     * @return                               Returns the final colors in form of a QByteArray for the left and right hemisphere.
     */
     QPair<QByteArray, QByteArray> performVisualizationTypeCalculation(const Eigen::VectorXd& sourceColorSamples);
+
+    //=========================================================================================================
+    /**
+    * Gerenate the colors based on vertex/source based coloring.
+    *
+    * @param[in] sourceColorSamplesLeftHemi         The color data for the left hemisphere sources.
+    * @param[in] sourceColorSamplesRightHemi        The color data for the right hemisphere sources.
+    *
+    * @return                               Returns the final colors in form of a QByteArray for the left and right hemisphere.
+    */
+    QPair<QByteArray, QByteArray> generateColorsPerVertex(const VectorXd& sourceColorSamplesLeftHemi, const VectorXd& sourceColorSamplesRightHemi);
+
+    //=========================================================================================================
+    /**
+    * Gerenate the colors based on annotation based coloring.
+    *
+    * @param[in] sourceColorSamplesLeftHemi         The color data for the left hemisphere sources.
+    * @param[in] sourceColorSamplesRightHemi        The color data for the right hemisphere sources.
+    *
+    * @return                               Returns the final colors in form of a QByteArray for the left and right hemisphere.
+    */
+    QPair<QByteArray, QByteArray> generateColorsPerAnnotation(const VectorXd& sourceColorSamplesLeftHemi, const VectorXd& sourceColorSamplesRightHemi);
+
+    //=========================================================================================================
+    /**
+    * Gerenate the colors based on smoothing.
+    *
+    * @param[in] sourceColorSamples         The color data for one hemisphere sources.
+    * @param[in] vertno                     The vertex numbers of the chosen sources.
+    * @param[in] arrayCurrentVertColor      The default colors of the complete surface.
+    * @param[in] lVertexNeighbors           The neighboring information.
+    *
+    * @return                               Returns the final colors in form of a QByteArray for the hemisphere.
+    */
+    QByteArray generateSmoothedColors(const VectorXd& sourceColorSamples, const VectorXi &vertno, const QByteArray& arrayCurrentVertColor, const QList<QPair<int, QVector<int> > >& lVertexNeighbors);
 
     //=========================================================================================================
     /**
@@ -264,6 +308,9 @@ private:
     QList<FSLIB::Label>     m_lLabelsRightHemi;                 /**< The list of current labels for the right hemisphere. */
     QMap<qint32, qint32>    m_mapLabelIdSourcesLeftHemi;        /**< The sources mapped to their corresponding labels for the left hemisphere. */
     QMap<qint32, qint32>    m_mapLabelIdSourcesRightHemi;       /**< The sources mapped to their corresponding labels for the right hemisphere. */
+
+    QList<QPair<int, QVector<int> > >   m_lVertexNeighborsLeftHemi;
+    QList<QPair<int, QVector<int> > >   m_lVertexNeighborsRightHemi;
 
 signals:
     //=========================================================================================================

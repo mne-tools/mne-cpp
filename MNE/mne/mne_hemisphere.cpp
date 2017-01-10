@@ -115,7 +115,6 @@ MNEHemisphere::MNEHemisphere(const MNEHemisphere& p_MNEHemisphere)
 , use_tri_area(p_MNEHemisphere.use_tri_area)
 , neighbor_tri(p_MNEHemisphere.neighbor_tri)
 , neighbor_vert(p_MNEHemisphere.neighbor_vert)
-, smoothOperatorList(p_MNEHemisphere.smoothOperatorList)
 , cluster_info(p_MNEHemisphere.cluster_info)
 , m_TriCoords(p_MNEHemisphere.m_TriCoords)
 {
@@ -184,58 +183,6 @@ bool MNEHemisphere::add_geometry_info()
             }
         }
     }
-
-//    //Create smooth operators - This takes way too long, due to about 600000 element entries in the sparse matrix -> split into sub matrices
-//    std::cout<<"Creating smooth operator matrices "<<std::endl;
-//    this->smoothOperatorList.clear();
-
-//    SparseMatrix<double> sparseSmoothMatrix;
-//    int numberMatrix = 10000;
-//    int numberVerticesForMatrix;
-//    int matrixCount = numberMatrix;
-//    int last = this->np % 10;
-//    if(last!=0)
-//        matrixCount++;
-
-//    std::cout<<"last "<<last<<std::endl;
-//    std::cout<<"numberMatrix "<<numberMatrix<<std::endl;
-//    std::cout<<"numberVerticesForMatrix "<<numberVerticesForMatrix<<std::endl;
-//    std::cout<<"matrixCount "<<matrixCount<<std::endl;
-
-//    int vertexIndex = 0;
-
-//    for(int i=0; i<matrixCount; i++) {
-//        //std::cout<<"matrixCount "<<i<<std::endl;
-
-//        if(i==matrixCount-1 && last!=0)
-//            numberVerticesForMatrix = last;
-//        else
-//            numberVerticesForMatrix = this->np/numberMatrix;
-
-//        sparseSmoothMatrix = SparseMatrix<double>(numberVerticesForMatrix, this->np);
-
-//        //std::cout<<"before "<<std::endl;
-//        for(int r=0; r<numberVerticesForMatrix; r++)
-//            for(int v=0; v<this->neighbor_vert[r+vertexIndex].size(); v++)
-//                sparseSmoothMatrix.insert(r, this->neighbor_vert[r+vertexIndex][v]) = 1 / this->neighbor_vert[r+vertexIndex].size();
-//        //std::cout<<"after "<<std::endl;
-
-//        if(i==matrixCount-1 && last!=0)
-//            vertexIndex += last;
-//        else
-//            vertexIndex += this->np/numberMatrix;
-
-//        //std::cout<<"appending before "<<std::endl;
-//        this->smoothOperatorList.push_back(sparseSmoothMatrix);
-//        //std::cout<<"appending after "<<std::endl;
-//    }
-
-//    std::cout<<"size smooth operator list "<<this->smoothOperatorList.size()<<std::endl;
-//    std::cout<<"nonzero() "<<this->smoothOperatorList[0].nonZeros()<<std::endl;
-//    std::cout<<"rows() "<<this->smoothOperatorList[0].rows()<<std::endl;
-//    std::cout<<"cols() "<<this->smoothOperatorList[0].cols()<<std::endl;
-//    std::cout<<"innerSize() "<<this->smoothOperatorList.innerSize()<<std::endl;
-//    std::cout<<"outerSize() "<<this->smoothOperatorList.outerSize()<<std::endl;
 
     return true;
 }
