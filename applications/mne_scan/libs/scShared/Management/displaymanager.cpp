@@ -43,10 +43,8 @@
 
 #include <scDisp/realtimesamplearraywidget.h>
 #include <scDisp/realtimemultisamplearraywidget.h>
-#if defined(QT3D_LIBRARY_AVAILABLE)
 #include <scDisp/realtimesourceestimatewidget.h>
 #include <scDisp/realtimeconnectivityestimatewidget.h>
-#endif
 #include <scDisp/realtimeevokedwidget.h>
 #include <scDisp/realtimeevokedsetwidget.h>
 #include <scDisp/realtimecovwidget.h>
@@ -158,7 +156,6 @@ QWidget* DisplayManager::show(IPlugin::OutputConnectorList &outputConnectorList,
             vboxLayout->addWidget(rtmsaWidget);
             rtmsaWidget->init();
         }
-        #if defined(QT3D_LIBRARY_AVAILABLE)
         else if(pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeSourceEstimate> >())
         {
             QSharedPointer<RealTimeSourceEstimate>* pRealTimeSourceEstimate = &pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeSourceEstimate> >()->data();
@@ -187,7 +184,6 @@ QWidget* DisplayManager::show(IPlugin::OutputConnectorList &outputConnectorList,
             vboxLayout->addWidget(rtseWidget);
             rtseWidget->init();
         }
-        #endif
         else if(pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeEvoked> >())
         {
             QSharedPointer<RealTimeEvoked>* pRealTimeEvoked = &pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeEvoked> >()->data();

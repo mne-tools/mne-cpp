@@ -39,7 +39,7 @@
 //=============================================================================================================
 
 #include "sphere.h"
-#include "minimizersimplex.h"
+#include "simplex_algorithm.h"
 
 
 //*************************************************************************************************************
@@ -142,7 +142,7 @@ bool Sphere::fit_sphere_to_points ( const MatrixXf &rr, float simplex_size, Vect
     * Find the optimal sphere origin
     */
     fitUserRecNew user;
-    float      ftol            = (float) 1e-5;
+    float      ftol            = 1e-5f;
     int        max_eval        = 500;
     int        report_interval = -1;
     int        neval;
@@ -150,34 +150,32 @@ bool Sphere::fit_sphere_to_points ( const MatrixXf &rr, float simplex_size, Vect
     VectorXf   init_vals(4);
 
     VectorXf   cm(3);
-    float      R0;
-    int        k;
+    float      R0 = 0.1f;
 
     user.rr = rr;
 
-    R0 = (float) 0.1;
     calculate_cm_ave_dist(rr, cm, R0);// [done]
 
     init_simplex = make_initial_simplex( cm, simplex_size );
 
     user.report = false;
 
-    for (k = 0; k < 4; k++) {
+    for (int k = 0; k < 4; k++) {
         init_vals[k] = fit_eval( static_cast<VectorXf>(init_simplex.row(k)), &user );
     }
 
     user.report = false;
 
     //Start the minimization
-    if(!MinimizerSimplex::mne_simplex_minimize( init_simplex,   /* The initial simplex */
-                                                init_vals,      /* Function values at the vertices */
-                                                ftol,           /* Relative convergence tolerance */
-                                                fit_eval,       /* The function to be evaluated */
-                                                &user,          /* Data to be passed to the above function in each evaluation */
-                                                max_eval,       /* Maximum number of function evaluations */
-                                                neval,          /* Number of function evaluations */
-                                                report_interval,/* How often to report (-1 = no_reporting) */
-                                                report_func)) /* The function to be called when reporting */
+    if(!SimplexAlgorithm::simplex_minimize<float>(  init_simplex,   /* The initial simplex */
+                                                    init_vals,      /* Function values at the vertices */
+                                                    ftol,           /* Relative convergence tolerance */
+                                                    fit_eval,       /* The function to be evaluated */
+                                                    &user,          /* Data to be passed to the above function in each evaluation */
+                                                    max_eval,       /* Maximum number of function evaluations */
+                                                    neval,          /* Number of function evaluations */
+                                                    report_interval,/* How often to report (-1 = no_reporting) */
+                                                    report_func))   /* The function to be called when reporting */
         return false;
 
     r0 = init_simplex.row(0);

@@ -55,7 +55,7 @@
 #include <disp3D/view3D.h>
 #include <disp3D/control/control3dwidget.h>
 #include <disp3D/model/data3Dtreemodel.h>
-#include <disp3D/model/brain/brainrtsourcelocdatatreeitem.h>
+#include <disp3D/model/items/sourceactivity/mneestimatetreeitem.h>
 
 #include <utils/mnemath.h>
 
@@ -210,21 +210,18 @@ int main(int argc, char *argv[])
 
     testWindow->setModel(p3DDataModel);
 
-    p3DDataModel->addSurfaceSet(parser.value(subjectOption), "HemiLRSet", t_surfSet, t_annotationSet);
+    p3DDataModel->addSurfaceSet(parser.value(subjectOption), evoked.comment, t_surfSet, t_annotationSet);
 
-    QList<BrainRTSourceLocDataTreeItem*> rtItemList = p3DDataModel->addSourceData(parser.value(subjectOption), "HemiLRSet", sourceEstimate, t_clusteredFwd);
-
-    //Init some rt related values for right visual data
-    for(int i = 0; i < rtItemList.size(); ++i) {
-        rtItemList.at(i)->setLoopState(true);
-        rtItemList.at(i)->setTimeInterval(17);
-        rtItemList.at(i)->setNumberAverages(1);
-        rtItemList.at(i)->setStreamingActive(true);
-        rtItemList.at(i)->setNormalization(QVector3D(0.01,0.5,1.0));
-        rtItemList.at(i)->setVisualizationType("Annotation based");
-        rtItemList.at(i)->setColortable("Hot");
+    //Add rt source loc data and init some visualization values
+    if(MneEstimateTreeItem* pRTDataItem = p3DDataModel->addSourceData(parser.value(subjectOption), evoked.comment, sourceEstimate, t_clusteredFwd)) {
+        pRTDataItem->setLoopState(true);
+        pRTDataItem->setTimeInterval(17);
+        pRTDataItem->setNumberAverages(1);
+        pRTDataItem->setStreamingActive(true);
+        pRTDataItem->setNormalization(QVector3D(0.01,0.5,1.0));
+        pRTDataItem->setVisualizationType("Annotation based");
+        pRTDataItem->setColortable("Hot");
     }
-
     testWindow->show();
 
     Control3DWidget::SPtr control3DWidget = Control3DWidget::SPtr(new Control3DWidget());
