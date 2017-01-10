@@ -63,7 +63,6 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Dispd \
             -lMNE$${MNE_LIB_VERSION}DispChartsd \
             -lMNE$${MNE_LIB_VERSION}Disp3Dd
-
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \

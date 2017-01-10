@@ -160,14 +160,14 @@ void FsSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* pare
     PerVertexTessPhongAlphaMaterial* pPerVertexTessPhongAlphaMaterial = new PerVertexTessPhongAlphaMaterial();
     m_pRenderable3DEntity->addComponent(pPerVertexTessPhongAlphaMaterial);
 
-//    //Render nromals
+//    //Render normals
 //    m_pRenderable3DEntityNormals = new Renderable3DEntity(m_pRenderable3DEntity);
 //    m_pRenderable3DEntityNormals->setMeshData(tSurface.rr(), tSurface.nn(), tSurface.tris(), arrayCurvatureColor, Qt3DRender::QGeometryRenderer::Triangles);
 //    m_pRenderable3DEntityNormals->setPosition(QVector3D(-tSurface.offset()(0), -tSurface.offset()(1), -tSurface.offset()(2)));
 //    ShowNormalsMaterial* pShowNormalsMaterial = new ShowNormalsMaterial();
 //    m_pRenderable3DEntityNormals->addComponent(pShowNormalsMaterial);
 
-    //Generate activation overlay surface
+//    //Generate activation overlay surface
 //    MatrixX3f overlayAdds = tSurface.rr();
 //    for(int i = 0; i<tSurface.nn().rows(); i++) {
 //        RowVector3f direction = tSurface.nn().row(i);
@@ -184,6 +184,9 @@ void FsSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* pare
     data.setValue(arrayCurvatureColor);
     this->setData(data, Data3DTreeModelItemRoles::SurfaceCurrentColorVert);
     this->setData(data, Data3DTreeModelItemRoles::SurfaceCurvatureColorVert);
+
+    data.setValue(tSurface.curv());
+    this->setData(data, Data3DTreeModelItemRoles::SurfaceCurv);
 
     //Add surface meta information as item children
     QList<QStandardItem*> list;
@@ -231,7 +234,7 @@ void FsSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* pare
     data.setValue(fTessInner);
     itemTessInner->setData(data, MetaTreeItemRoles::SurfaceTessInner);
 
-        float fTessOuter = 1.0;
+    float fTessOuter = 1.0;
     MetaTreeItem *itemTessOuter = new MetaTreeItem(MetaTreeItemTypes::SurfaceTessOuter, QString("%1").arg(fTessOuter));
     connect(itemTessOuter, &MetaTreeItem::surfaceTessOuterChanged,
             this, &FsSurfaceTreeItem::onSurfaceTessOuterChanged);
@@ -242,7 +245,7 @@ void FsSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* pare
     data.setValue(fTessOuter);
     itemTessOuter->setData(data, MetaTreeItemRoles::SurfaceTessOuter);
 
-        float fTriangleScale = 1.0;
+    float fTriangleScale = 1.0;
     MetaTreeItem *itemTriangleScale = new MetaTreeItem(MetaTreeItemTypes::SurfaceTriangleScale, QString("%1").arg(fTriangleScale));
     connect(itemTriangleScale, &MetaTreeItem::surfaceTriangleScaleChanged,
             this, &FsSurfaceTreeItem::onSurfaceTriangleScaleChanged);
