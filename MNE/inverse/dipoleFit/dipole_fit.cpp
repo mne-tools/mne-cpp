@@ -2,7 +2,7 @@
 
 #include "dipole_fit.h"
 
-#include "dipolefit_helpers.cpp"
+#include "dipolefit_helpers.h"
 
 
 using namespace INVERSELIB;

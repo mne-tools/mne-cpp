@@ -1,4 +1,9 @@
 
+
+#ifndef DIPOLEFITHELPERS_H
+#define DIPOLEFITHELPERS_H
+
+
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
@@ -18376,3 +18381,6 @@ int    fit_dipoles( const QString&  dataname,
     p_set = set;
     return OK;
 }
+
+#endif // DIPOLEFITHELPERS_H
+
