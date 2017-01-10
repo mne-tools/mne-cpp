@@ -407,7 +407,7 @@ struct dense_assignment_loop<Kernel, LinearVectorizedTraversal, NoUnrolling>
                                                             : int(Kernel::AssignmentTraits::DstAlignment),
       srcAlignment = Kernel::AssignmentTraits::JointAlignment
     };
-    const Index alignedStart = dstIsAligned ? 0 : internal::first_aligned<requestedAlignment>(&kernel.dstEvaluator().coeffRef(0), size);
+    const Index alignedStart = dstIsAligned ? 0 : internal::first_aligned<requestedAlignment>(kernel.dstDataPtr(), size);
     const Index alignedEnd = alignedStart + ((size-alignedStart)/packetSize)*packetSize;
 
     unaligned_dense_assignment_loop<dstIsAligned!=0>::run(kernel, 0, alignedStart);
@@ -527,7 +527,7 @@ struct dense_assignment_loop<Kernel, SliceVectorizedTraversal, NoUnrolling>
       dstAlignment = alignable ? int(requestedAlignment)
                                : int(Kernel::AssignmentTraits::DstAlignment)
     };
-    const Scalar *dst_ptr = &kernel.dstEvaluator().coeffRef(0,0);
+    const Scalar *dst_ptr = kernel.dstDataPtr();
     if((!bool(dstIsAligned)) && (UIntPtr(dst_ptr) % sizeof(Scalar))>0)
     {
       // the pointer is not aligend-on scalar, so alignment is not possible
@@ -682,6 +682,11 @@ public:
       : int(Traits::RowsAtCompileTime) == 1 ? inner
       : int(DstEvaluatorType::Flags)&RowMajorBit ? inner
       : outer;
+  }
+
+  EIGEN_DEVICE_FUNC const Scalar* dstDataPtr() const
+  {
+    return m_dstExpr.data();
   }
   
 protected:
@@ -875,6 +880,34 @@ struct Assignment<DstXprType, SrcXprType, Functor, EigenBase2EigenBase, Weak>
 
     eigen_assert(dst.rows() == src.rows() && dst.cols() == src.cols());
     src.evalTo(dst);
+  }
+
+  // NOTE The following two functions are templated to avoid their instanciation if not needed
+  //      This is needed because some expressions supports evalTo only and/or have 'void' as scalar type.
+  template<typename SrcScalarType>
+  EIGEN_DEVICE_FUNC
+  static EIGEN_STRONG_INLINE void run(DstXprType &dst, const SrcXprType &src, const internal::add_assign_op<typename DstXprType::Scalar,SrcScalarType> &/*func*/)
+  {
+    Index dstRows = src.rows();
+    Index dstCols = src.cols();
+    if((dst.rows()!=dstRows) || (dst.cols()!=dstCols))
+      dst.resize(dstRows, dstCols);
+
+    eigen_assert(dst.rows() == src.rows() && dst.cols() == src.cols());
+    src.addTo(dst);
+  }
+
+  template<typename SrcScalarType>
+  EIGEN_DEVICE_FUNC
+  static EIGEN_STRONG_INLINE void run(DstXprType &dst, const SrcXprType &src, const internal::sub_assign_op<typename DstXprType::Scalar,SrcScalarType> &/*func*/)
+  {
+    Index dstRows = src.rows();
+    Index dstCols = src.cols();
+    if((dst.rows()!=dstRows) || (dst.cols()!=dstCols))
+      dst.resize(dstRows, dstCols);
+
+    eigen_assert(dst.rows() == src.rows() && dst.cols() == src.cols());
+    src.subTo(dst);
   }
 };
 

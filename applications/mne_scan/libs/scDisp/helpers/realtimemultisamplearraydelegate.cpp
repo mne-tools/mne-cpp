@@ -481,12 +481,15 @@ void RealTimeMultiSampleArrayDelegate::createPlotPath(const QModelIndex &index, 
                 if(t_pModel->getScaling().contains(FIFF_UNIT_T_M))
                     fMaxValue = t_pModel->getScaling()[FIFF_UNIT_T_M];
             }
-            else if(unit == FIFF_UNIT_T) //magnitometers
+            else if(unit == FIFF_UNIT_T) //magnetometers
             {
-                if(t_pModel->getCoil(index.row()) == FIFFV_COIL_BABY_MAG)
-                    fMaxValue = 1e-11f;
-                else
-                    fMaxValue = 1e-11f;
+                fMaxValue = 1e-11f;
+
+                //TODO: Debug this
+//                if(t_pModel->getCoil(index.row()) == FIFFV_COIL_BABY_MAG)
+//                    fMaxValue = 1e-11f;
+//                else
+//                    fMaxValue = 1e-11f;
 
                 if(t_pModel->getScaling().contains(FIFF_UNIT_T))
                     fMaxValue = t_pModel->getScaling()[FIFF_UNIT_T];

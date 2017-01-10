@@ -40,6 +40,7 @@ TEMPLATE = subdirs
 SUBDIRS += \
     test_codecov \
     test_fiff_rwr \
+    test_dipole_fit \
 #    test_mne_libs \
 #    test_mne_rt \
 #    mne_x_plugin_com \

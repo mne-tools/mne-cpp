@@ -1,10 +1,18 @@
 <RCC>
     <qresource prefix="/">
-        <file>materials/shaders/gl3/brain.frag</file>
-        <file>materials/shaders/gl3/brain.vert</file>
-        <file>materials/shaders/gl3/pervertexphongalpha.frag</file>
-        <file>materials/shaders/gl3/pervertexphongalpha.vert</file>
-        <file>materials/shaders/gl3/light.inc.frag</file>
-        <file>materials/shaders/gl3/pervertexphongalpha.geom</file>
+        <file>model/materials/shaders/gl3/light.inc.frag</file>
+        <file>model/materials/shaders/gl3/pervertexphongalpha.frag</file>
+        <file>model/materials/shaders/gl3/pervertexphongalpha.vert</file>
+        <file>model/materials/shaders/gl3/shownormals.frag</file>
+        <file>model/materials/shaders/gl3/shownormals.geom</file>
+        <file>model/materials/shaders/gl3/shownormals.vert</file>
+        <file>model/materials/shaders/gl3/network.frag</file>
+        <file>model/materials/shaders/gl3/network.vert</file>
+        <file>model/materials/shaders/gl3/pervertextessphongalpha.frag</file>
+        <file>model/materials/shaders/gl3/pervertextessphongalpha.geom</file>
+        <file>model/materials/shaders/gl3/pervertextessphongalpha.tcs</file>
+        <file>model/materials/shaders/gl3/pervertextessphongalpha.vert</file>
+        <file>model/materials/shaders/gl3/pervertextessphongalpha_pn_triangles.tes</file>
+        <file>model/materials/shaders/gl3/pervertextessphongalpha_simple.tes</file>
     </qresource>
 </RCC>
