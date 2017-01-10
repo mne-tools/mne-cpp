@@ -111,7 +111,7 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
             return pColorDialog;
         }
 
-        case MetaTreeItemTypes::RTDataColormapType: {
+        case MetaTreeItemTypes::ColormapType: {
             QComboBox* pComboBox = new QComboBox(parent);
             connect(pComboBox, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
                     this, &Data3DTreeDelegate::onEditorEdited);
@@ -121,7 +121,7 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
             return pComboBox;
         }
 
-        case MetaTreeItemTypes::RTDataNormalizationValue: {
+        case MetaTreeItemTypes::ThresholdValue: {
             Spline* pSpline = new Spline("Spline Histogram", 0);
             connect(pSpline, static_cast<void (Spline::*)(double, double, double)>(&Spline::borderChanged),
             this, &Data3DTreeDelegate::onEditorEdited);
@@ -132,20 +132,20 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
             Eigen::VectorXi resultFrequency;
             MNEMath::histcounts(matRTData, false, 50, resultClassLimit, resultFrequency, 0.0, 0.0);
             pSpline->setData(resultClassLimit, resultFrequency, 0);
-            QVector3D vecThresholdValues = index.model()->data(index, MetaTreeItemRoles::RTDataNormalizationValue).value<QVector3D>();
+            QVector3D vecThresholdValues = index.model()->data(index, MetaTreeItemRoles::ThresholdValue).value<QVector3D>();
             pSpline->setThreshold(vecThresholdValues);
             AbstractTreeItem* pParentItemAbstract = static_cast<AbstractTreeItem*>(pParentItem);
-            QList<QStandardItem*> pColormapItem = pParentItemAbstract->findChildren(MetaTreeItemTypes::RTDataColormapType);
+            QList<QStandardItem*> pColormapItem = pParentItemAbstract->findChildren(MetaTreeItemTypes::ColormapType);
             for(int i = 0; i < pColormapItem.size(); ++i)
             {
                 QModelIndex indexColormapItem = pData3DTreeModel->indexFromItem(pColormapItem.at(i));
-                QString colorMap = index.model()->data(indexColormapItem, MetaTreeItemRoles::RTDataColormapType).value<QString>();
+                QString colorMap = index.model()->data(indexColormapItem, MetaTreeItemRoles::ColormapType).value<QString>();
                 pSpline->setColorMap(colorMap);
             }
             return pSpline;
         }
 
-        case MetaTreeItemTypes::RTDataTimeInterval: {
+        case MetaTreeItemTypes::StreamingTimeInterval: {
             QSpinBox* pSpinBox = new QSpinBox(parent);
             connect(pSpinBox, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
                     this, &Data3DTreeDelegate::onEditorEdited);
@@ -153,11 +153,11 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
             pSpinBox->setMinimum(17);
             pSpinBox->setMaximum(50000);
             pSpinBox->setSingleStep(10);
-            pSpinBox->setValue(index.model()->data(index, MetaTreeItemRoles::RTDataTimeInterval).toInt());
+            pSpinBox->setValue(index.model()->data(index, MetaTreeItemRoles::StreamingTimeInterval).toInt());
             return pSpinBox;
         }
 
-        case MetaTreeItemTypes::RTDataVisualizationType: {
+        case MetaTreeItemTypes::VisualizationType: {
             QComboBox* pComboBox = new QComboBox(parent);
             pComboBox->addItem("Vertex based");
             pComboBox->addItem("Smoothing based");
@@ -183,14 +183,14 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
             return pColorDialog;
         }
 
-        case MetaTreeItemTypes::RTDataNumberAverages: {
+        case MetaTreeItemTypes::NumberAverages: {
             QSpinBox* pSpinBox = new QSpinBox(parent);
             connect(pSpinBox, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
                     this, &Data3DTreeDelegate::onEditorEdited);
             pSpinBox->setMinimum(1);
             pSpinBox->setMaximum(100);
             pSpinBox->setSingleStep(1);
-            pSpinBox->setValue(index.model()->data(index, MetaTreeItemRoles::RTDataNumberAverages).toInt());
+            pSpinBox->setValue(index.model()->data(index, MetaTreeItemRoles::NumberAverages).toInt());
             return pSpinBox;
         }
 
@@ -330,14 +330,14 @@ void Data3DTreeDelegate::setEditorData(QWidget* editor, const QModelIndex& index
             break;
         }
 
-        case MetaTreeItemTypes::RTDataColormapType: {
-            QString colormap = index.model()->data(index, MetaTreeItemRoles::RTDataColormapType).toString();
+        case MetaTreeItemTypes::ColormapType: {
+            QString colormap = index.model()->data(index, MetaTreeItemRoles::ColormapType).toString();
             QComboBox* pComboBox = static_cast<QComboBox*>(editor);
             pComboBox->setCurrentText(colormap);
             break;
         }
 
-        case MetaTreeItemTypes::RTDataNormalizationValue: {
+        case MetaTreeItemTypes::ThresholdValue: {
             Spline* pSpline = static_cast<Spline*>(editor);
             int width = pSpline->size().width();
             int height = pSpline->size().height();
@@ -354,15 +354,15 @@ void Data3DTreeDelegate::setEditorData(QWidget* editor, const QModelIndex& index
             return;
         }
 
-        case MetaTreeItemTypes::RTDataTimeInterval: {
-            int value = index.model()->data(index, MetaTreeItemRoles::RTDataTimeInterval).toInt();
+        case MetaTreeItemTypes::StreamingTimeInterval: {
+            int value = index.model()->data(index, MetaTreeItemRoles::StreamingTimeInterval).toInt();
             QSpinBox* pSpinBox = static_cast<QSpinBox*>(editor);
             pSpinBox->setValue(value);
             break;
         }
 
-        case MetaTreeItemTypes::RTDataVisualizationType: {
-            QString visType = index.model()->data(index, MetaTreeItemRoles::RTDataVisualizationType).toString();
+        case MetaTreeItemTypes::VisualizationType: {
+            QString visType = index.model()->data(index, MetaTreeItemRoles::VisualizationType).toString();
             QComboBox* pComboBox = static_cast<QComboBox*>(editor);
             pComboBox->setCurrentText(visType);
             break;
@@ -382,8 +382,8 @@ void Data3DTreeDelegate::setEditorData(QWidget* editor, const QModelIndex& index
             break;
         }
 
-        case MetaTreeItemTypes::RTDataNumberAverages: {
-            int value = index.model()->data(index, MetaTreeItemRoles::RTDataNumberAverages).toInt();
+        case MetaTreeItemTypes::NumberAverages: {
+            int value = index.model()->data(index, MetaTreeItemRoles::NumberAverages).toInt();
             QSpinBox* pSpinBox = static_cast<QSpinBox*>(editor);
             pSpinBox->setValue(value);
             break;
@@ -493,17 +493,17 @@ void Data3DTreeDelegate::setModelData(QWidget* editor, QAbstractItemModel* model
             return;
         }
 
-        case MetaTreeItemTypes::RTDataColormapType: {
+        case MetaTreeItemTypes::ColormapType: {
             QComboBox* pColorMapType = static_cast<QComboBox*>(editor);
             QVariant data;
             data.setValue(pColorMapType->currentText());
 
-            model->setData(index, data, MetaTreeItemRoles::RTDataColormapType);
+            model->setData(index, data, MetaTreeItemRoles::ColormapType);
             model->setData(index, data, Qt::DisplayRole);
             return;
         }
 
-        case MetaTreeItemTypes::RTDataNormalizationValue: {
+        case MetaTreeItemTypes::ThresholdValue: {
             Spline* pSpline = static_cast<Spline*>(editor);
             QVector3D returnVector;
             returnVector = pSpline->getThreshold();
@@ -514,27 +514,27 @@ void Data3DTreeDelegate::setModelData(QWidget* editor, QAbstractItemModel* model
             dataDisplay.setValue(displayThreshold);
             model->setData(index, dataDisplay, Qt::DisplayRole);
 
-            model->setData(index, returnVector, MetaTreeItemRoles::RTDataNormalizationValue);
+            model->setData(index, returnVector, MetaTreeItemRoles::ThresholdValue);
             return;
         }
 
-        case MetaTreeItemTypes::RTDataTimeInterval: {
+        case MetaTreeItemTypes::StreamingTimeInterval: {
             QSpinBox* pSpinBox = static_cast<QSpinBox*>(editor);
 
             QVariant data;
             data.setValue(pSpinBox->value());
 
-            model->setData(index, data, MetaTreeItemRoles::RTDataTimeInterval);
+            model->setData(index, data, MetaTreeItemRoles::StreamingTimeInterval);
             model->setData(index, data, Qt::DisplayRole);
             break;
         }
 
-        case MetaTreeItemTypes::RTDataVisualizationType: {
+        case MetaTreeItemTypes::VisualizationType: {
             QComboBox* pVisType = static_cast<QComboBox*>(editor);
             QVariant data;
             data.setValue(pVisType->currentText());
 
-            model->setData(index, data, MetaTreeItemRoles::RTDataVisualizationType);
+            model->setData(index, data, MetaTreeItemRoles::VisualizationType);
             model->setData(index, data, Qt::DisplayRole);
             return;
         }
@@ -561,13 +561,13 @@ void Data3DTreeDelegate::setModelData(QWidget* editor, QAbstractItemModel* model
             return;
         }
 
-        case MetaTreeItemTypes::RTDataNumberAverages: {
+        case MetaTreeItemTypes::NumberAverages: {
             QSpinBox* pSpinBox = static_cast<QSpinBox*>(editor);
 
             QVariant data;
             data.setValue(pSpinBox->value());
 
-            model->setData(index, data, MetaTreeItemRoles::RTDataNumberAverages);
+            model->setData(index, data, MetaTreeItemRoles::NumberAverages);
             model->setData(index, data, Qt::DisplayRole);
             break;
         }

@@ -106,6 +106,8 @@ SOURCES += fiff.cpp \
 
 HEADERS += fiff.h \
     fiff_global.h \
+    fiff_explain.h \
+    fiff_file.h \
     fiff_types.h \
     fiff_id.h \
     fiff_constants.h \
