@@ -46,8 +46,8 @@ Dependencies
 [>= Qt 5.7.1](http://download.qt.io/official_releases/qt/)
 
 
-Contact information
-===================
+Contact
+=======
 
 A list of contact persons can be found [here](http://www.mne-cpp.org/index.php/contact/).
 
@@ -60,8 +60,8 @@ Releases
 [1.0.0](http://wiki.mne-cpp.org/index.php/ChangeLog)
 
 
-Licensing
-----------
+License
+=======
 
 MNE-CPP is **BSD-licensed** (3 clause):
 
