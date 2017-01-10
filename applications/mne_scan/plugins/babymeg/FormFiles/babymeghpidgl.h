@@ -165,11 +165,11 @@ private:
     */
     void onFreqsChanged();
 
-    Ui::BabyMEGHPIDgl*                          ui;
+    Ui::BabyMEGHPIDgl*                          ui;                 /**< The HPI dialog. */
 
-    QVector<int>                                m_vCoilFreqs;
+    QVector<int>                                m_vCoilFreqs;       /**< Vector contains the HPI coil frequencies. */
 
-    QSharedPointer<DISP3DLIB::View3D>           m_pView3D;
+    QSharedPointer<DISP3DLIB::View3D>           m_pView3D;          /**< The 3D view. */
     QSharedPointer<DISP3DLIB::Data3DTreeModel>  m_pData3DModel;     /**< The Disp3D model. */
 
 signals:

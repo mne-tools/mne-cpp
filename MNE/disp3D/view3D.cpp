@@ -39,8 +39,8 @@
 //=============================================================================================================
 
 #include "view3D.h"
-#include "model/common/renderable3Dentity.h"
-#include "model/common/types.h"
+#include "model/3dhelpers/renderable3Dentity.h"
+#include "model/items/common/types.h"
 #include "model/data3Dtreemodel.h"
 
 #include <mne/mne_sourceestimate.h>
@@ -94,7 +94,7 @@ View3D::View3D()
 , m_bCameraRotationMode(false)
 , m_bCameraTransMode(false)
 , m_bModelRotationMode(false)
-, m_vecCameraTrans(QVector3D(0.0,0.0,-0.5))
+, m_vecCameraTrans(QVector3D(0.0f,-0.025f,-0.25f))
 , m_vecCameraTransOld(QVector3D(0.0,0.0,-0.5))
 , m_vecCameraRotation(QVector3D(-90.0,130.0,0.0))
 , m_vecCameraRotationOld(QVector3D(-90.0,130.0,0.0))
@@ -265,9 +265,9 @@ void View3D::startStopModelRotation(bool checked)
 
 void View3D::toggleCoordAxis(bool checked)
 {
-    m_XAxisEntity->setParent(checked ? m_p3DObjectsEntity : Q_NULLPTR);
-    m_YAxisEntity->setParent(checked ? m_p3DObjectsEntity : Q_NULLPTR);
-    m_ZAxisEntity->setParent(checked ? m_p3DObjectsEntity : Q_NULLPTR);
+    m_XAxisEntity->setEnabled(checked);
+    m_YAxisEntity->setEnabled(checked);
+    m_ZAxisEntity->setEnabled(checked);
 }
 
 
@@ -364,9 +364,9 @@ void View3D::mousePressEvent(QMouseEvent* e)
 void View3D::wheelEvent(QWheelEvent* e)
 {
     if(e->angleDelta().y() > 0)
-        m_vecCameraTrans.setZ(m_vecCameraTrans.z() + 0.05f);
+        m_vecCameraTrans.setZ(m_vecCameraTrans.z() + 0.005f);
     else
-        m_vecCameraTrans.setZ(m_vecCameraTrans.z() - 0.05f);
+        m_vecCameraTrans.setZ(m_vecCameraTrans.z() - 0.005f);
 
     // Transform
     m_pCameraTransform->setTranslation(m_vecCameraTrans);

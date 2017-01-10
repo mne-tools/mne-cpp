@@ -44,7 +44,7 @@
 //=============================================================================================================
 
 #include "../disp3D_global.h"
-#include "common/abstracttreeitem.h"
+#include "items/common/abstracttreeitem.h"
 
 #include <utils/mnemath.h>
 #include <dispCharts/spline.h>
