@@ -11650,6 +11650,8 @@ mneSurface make_guesses(mneSurface guess_surf,     /* Predefined boundary for th
         QFile bemFile(QString("./resources/surf2bem/icos.fif"));
         if ( !QCoreApplication::startingUp() )
             bemFile.setFileName(QCoreApplication::applicationDirPath() + QString("/resources/surf2bem/icos.fif"));
+        else if (!bemFile.exists())
+            bemFile.setFileName("./bin/resources/surf2bem/icos.fif");
 
         if( !bemFile.exists () ){
             qDebug() << bemFile.fileName() << "does not exists.";
@@ -14705,8 +14707,11 @@ DipoleFitData* setup_dipole_fit_data(   const QString& mriname,         /**< Thi
         //    QString qPath("/usr/pubsw/packages/mne/stable/share/mne/coil_def.dat");
 
         QString qPath = QString("./resources/coilDefinitions/coil_def.dat");
+        QFile file(qPath);
         if ( !QCoreApplication::startingUp() )
             qPath = QCoreApplication::applicationDirPath() + QString("/resources/coilDefinitions/coil_def.dat");
+        else if (!file.exists())
+            qPath = "./bin/resources/coilDefinitions/coil_def.dat";
 
         char *coilfile = MALLOC(strlen(qPath.toLatin1().data())+1,char);
         strcpy(coilfile,qPath.toLatin1().data());

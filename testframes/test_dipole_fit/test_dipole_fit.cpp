@@ -104,7 +104,7 @@ void TestDipoleFit::initTestCase()
     //*********************************************************************************************************
 
     printf(">>>>>>>>>>>>>>>>>>>>>>>>> Load Dipole Fit Reference Set >>>>>>>>>>>>>>>>>>>>>>>>>\n");
-    QString refFileName("./mne-cpp-test-data/Result/ref_dip_fit.dat");
+    QString refFileName(QDir::currentPath()+"/mne-cpp-test-data/Result/ref_dip_fit.dat");
     m_refECDSet = ECDSet::read_dipoles_dip(refFileName);
 
     printf("<<<<<<<<<<<<<<<<<<<<<<<<< Dipole Fit Reference Set Loaded <<<<<<<<<<<<<<<<<<<<<<<<<\n");
@@ -117,7 +117,7 @@ void TestDipoleFit::initTestCase()
     printf(">>>>>>>>>>>>>>>>>>>>>>>>> Dipole Fit Settings >>>>>>>>>>>>>>>>>>>>>>>>>\n");
 
     //Following is equivalent to: --meas ./mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif --set 1 --meg --eeg --tmin 32 --tmax 148 --bmin -100 --bmax 0 --dip ./mne-cpp-test-data/Result/dip_fit.dat
-    m_settings.measname = "./mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif";
+    m_settings.measname = QDir::currentPath()+"/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif";
     m_settings.is_raw = false;
     m_settings.setno = 1;
     m_settings.include_meg = true;
@@ -126,7 +126,7 @@ void TestDipoleFit::initTestCase()
     m_settings.tmax = 148.0f/1000.0f;
     m_settings.bmin = -100.0f/1000.0f;
     m_settings.bmax = 0.0f/1000.0f;
-    m_settings.dipname = "./mne-cpp-test-data/Result/dip_fit.dat";
+    m_settings.dipname = QDir::currentPath()+"/mne-cpp-test-data/Result/dip_fit.dat";
 
     m_settings.checkIntegrity();
 
