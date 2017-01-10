@@ -39,10 +39,6 @@ TEMPLATE = lib
 
 QT += widgets svg
 
-qtHaveModule(charts) {
-    DEFINES += QT3D_LIBRARY_AVAILABLE
-}
-
 DEFINES += SCSHARED_LIBRARY
 
 TARGET = scShared

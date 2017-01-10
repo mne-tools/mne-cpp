@@ -94,3 +94,15 @@ void FiffId::clear()
     time.secs = -1;
     time.usecs = -1;
 }
+
+
+//*************************************************************************************************************
+
+void FiffId::print() const
+{
+    if(!isEmpty()) {
+        printf ("\t%d.%d ",this->version>>16,this->version & 0xFFFF);
+        printf ("0x%x%x ",this->machid[0],this->machid[1]);
+        printf ("%d %d ",this->time.secs,this->time.usecs);
+    }
+}

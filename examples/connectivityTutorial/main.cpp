@@ -42,7 +42,7 @@
 
 #include <disp3D/view3D.h>
 #include <disp3D/control/control3dwidget.h>
-#include <disp3D/model/brain/brainrtsourcelocdatatreeitem.h>
+#include <disp3D/model/items/sourceactivity/mneestimatetreeitem.h>
 #include <disp3D/model/data3Dtreemodel.h>
 
 #include <disp/imagesc.h>
@@ -293,22 +293,20 @@ int main(int argc, char *argv[])
     Data3DTreeModel::SPtr p3DDataModel = Data3DTreeModel::SPtr(new Data3DTreeModel());
     testWindow->setModel(p3DDataModel);
 
-    p3DDataModel->addSurfaceSet(parser.value(subjectOption), evoked.comment, tSurfSet, tAnnotSet);
+    p3DDataModel->addSurfaceSet(parser.value(subjectOption), "MRI", tSurfSet, tAnnotSet);
 
-    QList<NetworkTreeItem*> rtItemListConnect= p3DDataModel->addConnectivityData(parser.value(subjectOption), evoked.comment, pConnect_LA);
-    QList<BrainRTSourceLocDataTreeItem*> rtItemListSourceLoc = p3DDataModel->addSourceData(parser.value(subjectOption), evoked.comment, sourceEstimate, t_clusteredFwd);
+    NetworkTreeItem* pRTNetworkDataItem= p3DDataModel->addConnectivityData(parser.value(subjectOption), evoked.comment, pConnect_LA);
 
-    //Init some rt related values for right visual data
-    for(int i = 0; i < rtItemListSourceLoc.size(); ++i) {
-        rtItemListSourceLoc.at(i)->setLoopState(true);
-        rtItemListSourceLoc.at(i)->setTimeInterval(17);
-        rtItemListSourceLoc.at(i)->setNumberAverages(1);
-        rtItemListSourceLoc.at(i)->setStreamingActive(true);
-        rtItemListSourceLoc.at(i)->setNormalization(QVector3D(0.0,5.5,10));
-        rtItemListSourceLoc.at(i)->setVisualizationType("Annotation based");
-        rtItemListSourceLoc.at(i)->setColortable("Hot");
+    //Add rt source loc data and init some visualization values
+    if(MneEstimateTreeItem* pRTDataItem = p3DDataModel->addSourceData(parser.value(subjectOption), evoked.comment, sourceEstimate, t_clusteredFwd)) {
+        pRTDataItem->setLoopState(true);
+        pRTDataItem->setTimeInterval(17);
+        pRTDataItem->setNumberAverages(1);
+        pRTDataItem->setStreamingActive(true);
+        pRTDataItem->setNormalization(QVector3D(0.01,0.5,1.0));
+        pRTDataItem->setVisualizationType("Annotation based");
+        pRTDataItem->setColortable("Hot");
     }
-
     testWindow->show();
 
     Control3DWidget::SPtr control3DWidget = Control3DWidget::SPtr(new Control3DWidget());

@@ -82,6 +82,7 @@
 
 #include "fiff_global.h"
 #include "fiff_constants.h"
+#include "fiff_file.h"
 #include "fiff_types.h"
 #include "fiff_id.h"
 #include "fiff_coord_trans.h"
