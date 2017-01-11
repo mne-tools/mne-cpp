@@ -60,10 +60,9 @@ namespace FIFFLIB
 #define  FIFF_FAIL -1
 #define  FIFF_OK    0
 
-#define FIFFC_TAG_INFO_SIZE (sizeof(fiffTag) - sizeof(fiff_data_t *))
-#define FIFFC_DATA_OFFSET FIFFC_TAG_INFO_SIZE
-#define FIFFM_TAG_INFO(x) &((x)->kind)
-
+//#define FIFFC_TAG_INFO_SIZE (sizeof(fiffTag) - sizeof(fiff_data_t *))
+//#define FIFFC_DATA_OFFSET FIFFC_TAG_INFO_SIZE
+//#define FIFFM_TAG_INFO(x) &((x)->kind)
 
 
 /*
