@@ -376,7 +376,7 @@ void mne_free_dcmatrix (double **m)
 #define FREE_CMATRIX(m) mne_free_cmatrix((m))
 
 
-#include "fiff_types.h"
+#include <fiff/fiff_types.h>
 #include "mne_types.h"
 #include "analyze_types.h"
 
