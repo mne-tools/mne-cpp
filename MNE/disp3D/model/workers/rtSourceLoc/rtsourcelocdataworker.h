@@ -203,10 +203,11 @@ public:
     /**
     * Set the neighboring information for smoothing the activity.
     *
-    * @param[in] lVertexNeighborsLeftHemi       The neighbor vertices for the left hemisphere.
-    * @param[in] lVertexNeighborsRightHemi      The neighbor vertices for the right hemisphere.
+    * @param[in] mapVertexNeighborsLeftHemi       The neighbor vertices for the left hemisphere.
+    * @param[in] mapVertexNeighborsRightHemi      The neighbor vertices for the right hemisphere.
     */
-    void setNeighborInfo(const QList<QPair<int, QVector<int> > >& lVertexNeighborsLeftHemi, const QList<QPair<int, QVector<int> > >& lVertexNeighborsRightHemi);
+    void setNeighborInfo(const QMap<int, QVector<int> >& mapVertexNeighborsLeftHemi,
+                         const QMap<int, QVector<int> >& mapVertexNeighborsRightHemi);
 
     //=========================================================================================================
     /**
@@ -262,11 +263,14 @@ private:
     * @param[in] sourceColorSamples         The color data for one hemisphere sources.
     * @param[in] vertno                     The vertex numbers of the chosen sources.
     * @param[in] arrayCurrentVertColor      The default colors of the complete surface.
-    * @param[in] lVertexNeighbors           The neighboring information.
+    * @param[in] mapVertexNeighbors         The neighboring information.
     *
     * @return                               Returns the final colors in form of a QByteArray for the hemisphere.
     */
-    QByteArray generateSmoothedColors(const VectorXd& sourceColorSamples, const VectorXi &vertno, const QByteArray& arrayCurrentVertColor, const QList<QPair<int, QVector<int> > >& lVertexNeighbors);
+    QByteArray generateSmoothedColors(const VectorXd& sourceColorSamples,
+                                      const VectorXi &vertno,
+                                      const QByteArray& arrayCurrentVertColor,
+                                      const QMap<int, QVector<int> >& mapVertexNeighbors);
 
     //=========================================================================================================
     /**
@@ -309,8 +313,8 @@ private:
     QMap<qint32, qint32>    m_mapLabelIdSourcesLeftHemi;        /**< The sources mapped to their corresponding labels for the left hemisphere. */
     QMap<qint32, qint32>    m_mapLabelIdSourcesRightHemi;       /**< The sources mapped to their corresponding labels for the right hemisphere. */
 
-    QList<QPair<int, QVector<int> > >   m_lVertexNeighborsLeftHemi;
-    QList<QPair<int, QVector<int> > >   m_lVertexNeighborsRightHemi;
+    QMap<int, QVector<int> >   m_mapVertexNeighborsLeftHemi;
+    QMap<int, QVector<int> >   m_mapVertexNeighborsRightHemi;
 
 signals:
     //=========================================================================================================
