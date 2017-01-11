@@ -120,7 +120,6 @@ HEADERS +=\
     dipoleFit/ecd_set.h \
     dipoleFit/mne_types.h \
     dipoleFit/fwd_types.h \
-    dipoleFit/fiff_types.h \
     dipoleFit/fiff_explain.h \
     dipoleFit/analyze_types.h \
     dipoleFit/guess_data.h \

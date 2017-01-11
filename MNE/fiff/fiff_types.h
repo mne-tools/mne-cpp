@@ -283,6 +283,13 @@ typedef struct _fiffDigPointRec {
 
 
 /// ToDo Old implementation
+
+
+/*----------------------------------------------------------------------
+* Following types are used by the fiff library. They are not used
+* within the files.
+*---------------------------------------------------------------------*/
+
 /** Directory tree structure used by the fiff library routines. */
 
 typedef struct _fiffDirNode {
@@ -342,69 +349,32 @@ typedef struct _fiffCoordTransRec {
 /** Measurement channel position and coil type. */
 
 typedef struct _fiffChPosRec {
- fiff_int_t   coil_type;		   /**< What kind of coil. */
- fiff_float_t r0[3];			   /**< Coil coordinate system origin */
- fiff_float_t ex[3];			   /**< Coil coordinate system x-axis unit vector */
- fiff_float_t ey[3];			   /**< Coil coordinate system y-axis unit vector */
- fiff_float_t ez[3];	                   /**< Coil coordinate system z-axis unit vector */
-} fiffChPosRec,*fiffChPos;                 /**< Measurement channel position and coil type */
+    fiff_int_t   coil_type;     /**< What kind of coil. */
+    fiff_float_t r0[3];         /**< Coil coordinate system origin */
+    fiff_float_t ex[3];         /**< Coil coordinate system x-axis unit vector */
+    fiff_float_t ey[3];         /**< Coil coordinate system y-axis unit vector */
+    fiff_float_t ez[3];         /**< Coil coordinate system z-axis unit vector */
+} fiffChPosRec,*fiffChPos;      /**< Measurement channel position and coil type */
 
 typedef fiffChPosRec fiff_ch_pos_t;
-
-/*
-* Coil types
-*/
-
-/* \def FIFFV_COIL_NONE */
-
-#define FIFFV_COIL_NONE                  0  /**< The location info contains no data */
-#define FIFFV_COIL_EEG                   1  /**< EEG electrode position in r0 */
-#define FIFFV_COIL_NM_122                2  /**< Neuromag 122 coils */
-#define FIFFV_COIL_NM_24                 3  /**< Old 24 channel system in HUT */
-#define FIFFV_COIL_NM_MCG_AXIAL          4  /**< The axial devices in the HUCS MCG system */
-#define FIFFV_COIL_EEG_BIPOLAR           5  /**< Bipolar EEG lead */
-
-#define FIFFV_COIL_DIPOLE              200  /**< Time-varying dipole definition
-                         * The coil info contains dipole location (r0) and
-                         * direction (ex) */
-#define FIFFV_COIL_MCG_42             1000  /**< For testing the MCG software */
-
-#define FIFFV_COIL_POINT_MAGNETOMETER 2000  /**< Simple point magnetometer */
-#define FIFFV_COIL_AXIAL_GRAD_5CM     2001  /**< Generic axial gradiometer */
-
-#define FIFFV_COIL_VV_PLANAR_W        3011  /**< VV prototype wirewound planar sensor */
-#define FIFFV_COIL_VV_PLANAR_T1       3012  /**< Vectorview SQ20483N planar gradiometer */
-#define FIFFV_COIL_VV_PLANAR_T2       3013  /**< Vectorview SQ20483N-A planar gradiometer */
-#define FIFFV_COIL_VV_PLANAR_T3       3014  /**< Vectorview SQ20950N planar gradiometer */
-#define FIFFV_COIL_VV_MAG_W           3021  /**< VV prototype wirewound magnetometer */
-#define FIFFV_COIL_VV_MAG_T1          3022  /**< Vectorview SQ20483N magnetometer */
-#define FIFFV_COIL_VV_MAG_T2          3023  /**< Vectorview SQ20483-A magnetometer */
-#define FIFFV_COIL_VV_MAG_T3          3024  /**< Vectorview SQ20950N magnetometer */
-
-
-#define FIFFV_COIL_MAGNES_MAG         4001  /**< Magnes WH magnetometer */
-#define FIFFV_COIL_MAGNES_GRAD        4002  /**< Magnes WH gradiometer  */
-#define FIFFV_COIL_CTF_GRAD           5001  /**< CTF axial gradiometer */
-
-#define FIFFM_IS_VV_COIL(c) ((c)/1000 == 3)
 
 
 /** Description of one channel */
 
-//typedef struct _fiffChInfoRec {
-// fiff_int_t    scanNo;		/**< Scanning order number */
-// fiff_int_t    logNo;		/**< Logical channel # */
-// fiff_int_t    kind;		/**< Kind of channel */
-// fiff_float_t  range;		/**< Voltmeter range (-1 = auto ranging) */
-// fiff_float_t  cal;		/**< Calibration from volts to units used */
-// fiff_ch_pos_t chpos;		/**< Channel location */
-// fiff_int_t    unit;		/**< Unit of measurement */
-// fiff_int_t    unit_mul;	/**< Unit multiplier exponent */
-// fiff_char_t   ch_name[16];	/**< Descriptive name for the channel */
-//} fiffChInfoRec,*fiffChInfo;	/**< Description of one channel */
+typedef struct _fiffChInfoRec {
+    fiff_int_t    scanNo;       /**< Scanning order number */
+    fiff_int_t    logNo;        /**< Logical channel # */
+    fiff_int_t    kind;         /**< Kind of channel */
+    fiff_float_t  range;        /**< Voltmeter range (-1 = auto ranging) */
+    fiff_float_t  cal;          /**< Calibration from volts to units used */
+    fiff_ch_pos_t chpos;        /**< Channel location */
+    fiff_int_t    unit;         /**< Unit of measurement */
+    fiff_int_t    unit_mul;     /**< Unit multiplier exponent */
+    fiff_char_t   ch_name[16];  /**< Descriptive name for the channel */
+} fiffChInfoRec,*fiffChInfo;    /**< Description of one channel */
 
-///** Alias for fiffChInfoRec */
-//typedef fiffChInfoRec fiff_ch_info_t;
+/** Alias for fiffChInfoRec */
+typedef fiffChInfoRec fiff_ch_info_t;
 
 #define FIFFM_CHPOS(x) &((x)->chpos)
 
