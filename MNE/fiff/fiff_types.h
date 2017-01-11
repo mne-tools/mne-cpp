@@ -120,14 +120,14 @@ typedef struct _fiffTimeRec {
 
 /** Structure representing digitized strings. */
 
-typedef struct _fiffDigStringRec {
- fiff_int_t kind;		  /**< Most commonly FIFF_POINT_EXTRA */
- fiff_int_t ident;		  /**< Number identifying this string */
- fiff_int_t np;		  /**< How many points */
- fiff_float_t **rr;		  /**< Array of point locations */
-} fiffDigStringRec, *fiffDigString;/**< Structure representing digitized strings. */
+//typedef struct _fiffDigStringRec {
+// fiff_int_t kind;		  /**< Most commonly FIFF_POINT_EXTRA */
+// fiff_int_t ident;		  /**< Number identifying this string */
+// fiff_int_t np;		  /**< How many points */
+// fiff_float_t **rr;		  /**< Array of point locations */
+//} fiffDigStringRec, *fiffDigString;/**< Structure representing digitized strings. */
 
-typedef fiffDigStringRec fiff_dig_string_t;
+//typedef fiffDigStringRec fiff_dig_string_t;
 
 
 /*
@@ -136,10 +136,10 @@ typedef fiffDigStringRec fiff_dig_string_t;
 
 /** Layer descriptor for a layered sphere model */
 
-typedef struct _fiffLayerRec {
- fiff_int_t   id;		/**< Id # of this layer (see below) */
- fiff_float_t rad;		/**< Radius of this layer (m) */
-} *fiffLayer, fiffLayerRec;      /**< Layer descriptor for a layered sphere model */
+//typedef struct _fiffLayerRec {
+// fiff_int_t   id;		/**< Id # of this layer (see below) */
+// fiff_float_t rad;		/**< Radius of this layer (m) */
+//} *fiffLayer, fiffLayerRec;      /**< Layer descriptor for a layered sphere model */
 
 
 //*************************************************************************************************************
@@ -163,12 +163,12 @@ typedef fiffSparseMatrixRec  fiff_sparse_matrix_t;
 
 /** Structure for event bits */
 
-typedef struct _fiff_event_bits {
- fiff_int_t from_mask;         /**< from mask */
- fiff_int_t from_state;        /**< from state */
- fiff_int_t to_mask;           /**< to mask */
- fiff_int_t to_state;          /**< to state */
-} *fiffEventBits, fiffEventBitsRec;
+//typedef struct _fiff_event_bits {
+// fiff_int_t from_mask;         /**< from mask */
+// fiff_int_t from_state;        /**< from state */
+// fiff_int_t to_mask;           /**< to mask */
+// fiff_int_t to_state;          /**< to state */
+//} *fiffEventBits, fiffEventBitsRec;
 
 
 /** Structure for hpi coil */
@@ -277,8 +277,8 @@ typedef struct _fiffDigPointRec {
 /** Structure representing digitized strings. */
 
 
-typedef fiffDigPointRec  fiff_dig_point_t;
-typedef fiffDigStringRec fiff_dig_string_t;
+//typedef fiffDigPointRec  fiff_dig_point_t;
+//typedef fiffDigStringRec fiff_dig_string_t;
 
 
 
@@ -334,7 +334,7 @@ typedef struct _fiffCoordTransRec {
  fiff_float_t invmove[3];            /**< The inverse transform (translation part) */
 } *fiffCoordTrans, fiffCoordTransRec; /**< Coordinate transformation descriptor */
 
-typedef fiffCoordTransRec fiff_coord_trans_t;
+//typedef fiffCoordTransRec fiff_coord_trans_t;
 
 /// ToDo Old implementation use new fiff_info.h instead
 

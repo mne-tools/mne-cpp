@@ -115,18 +115,18 @@
 extern "C" {
 #endif
 
-/*
- * Complex data
- */
-typedef struct {
-  float re;
-  float im;
-} *mneComplex,**mneComplexMatrix,mneComplexRec;
+///*
+// * Complex data
+// */
+//typedef struct {
+//  float re;
+//  float im;
+//} *mneComplex,**mneComplexMatrix,mneComplexRec;
 
-typedef struct {
-  double re;
-  double im;
-} *mneDoubleComplex,**mneDoubleComplexMatrix,mneDoubleComplexRec;
+//typedef struct {
+//  double re;
+//  double im;
+//} *mneDoubleComplex,**mneDoubleComplexMatrix,mneDoubleComplexRec;
 
 typedef void (*mneUserFreeFunc)(void *);  /* General purpose */
 typedef fiffSparseMatrix mneSparseMatrix;
@@ -249,28 +249,28 @@ typedef struct {		    /* This defines a source space or a surface */
  * These are the aliases
  */
 typedef mneSurfaceOrVolume mneSourceSpace;
-typedef mneSurfaceOrVolume mneSourceVolume;
+//typedef mneSurfaceOrVolume mneSourceVolume;
 typedef mneSurfaceOrVolume mneSurface;
-typedef mneSurfaceOrVolume mneVolume;
+//typedef mneSurfaceOrVolume mneVolume;
 
 typedef mneSurfaceOrVolumeRec mneSourceSpaceRec;
-typedef mneSurfaceOrVolumeRec mneSourceVolumeRecRec;
+//typedef mneSurfaceOrVolumeRec mneSourceVolumeRecRec;
 typedef mneSurfaceOrVolumeRec mneSurfaceRec;
-typedef mneSurfaceOrVolumeRec mneVolumeRec;
+//typedef mneSurfaceOrVolumeRec mneVolumeRec;
 
-typedef struct {		    /* FreeSurfer patches */
-  mneSurface       s;		    /* Patch represented as a surface */
-  int              *vert;	    /* Vertex numbers in the complete surface*/
-  int              *surf_vert;	    /* Which vertex corresponds to each complete surface vertex here? */
-  int              np_surf;	    /* How many points on the complete surface? */
-  int              *tri;	    /* Which triangles in the complete surface correspond to our triangles? */
-  int              *surf_tri;	    /* Which of our triangles corresponds to each triangle on the complete surface? */
-  int              ntri_surf;	    /* How many triangles on the complete surface */
-  int              *border;	    /* Is this vertex on the border? */
-  int              flat;	    /* Is this a flat patch? */
-  void             *user_data;      /* Anything else we want */
-  mneUserFreeFunc  user_data_free;  /* Function to set the above free */
-} *mneSurfacePatch,mneSurfacePatchRec;
+//typedef struct {		    /* FreeSurfer patches */
+//  mneSurface       s;		    /* Patch represented as a surface */
+//  int              *vert;	    /* Vertex numbers in the complete surface*/
+//  int              *surf_vert;	    /* Which vertex corresponds to each complete surface vertex here? */
+//  int              np_surf;	    /* How many points on the complete surface? */
+//  int              *tri;	    /* Which triangles in the complete surface correspond to our triangles? */
+//  int              *surf_tri;	    /* Which of our triangles corresponds to each triangle on the complete surface? */
+//  int              ntri_surf;	    /* How many triangles on the complete surface */
+//  int              *border;	    /* Is this vertex on the border? */
+//  int              flat;	    /* Is this a flat patch? */
+//  void             *user_data;      /* Anything else we want */
+//  mneUserFreeFunc  user_data_free;  /* Function to set the above free */
+//} *mneSurfacePatch,mneSurfacePatchRec;
 
 typedef struct {		/* Matrix specification with a channel list */
   int   nrow;			/* Number of rows */
@@ -415,25 +415,25 @@ typedef struct {		          /* An inverse operator */
 } *mneInverseOperator,mneInverseOperatorRec;
 
 
-typedef struct {		/* For storing the wdata */
-  int   id;			/* Surface id these data belong to */
-  int   kind;			/* What kind of data */
-  float lat;			/* Latency */
-  int   nvert;			/* Number of vertices */
-  int   *vertno;		/* Vertex numbers */
-  float *vals;			/* The values */
-} *mneWdata,mneWdataRec;
+//typedef struct {		/* For storing the wdata */
+//  int   id;			/* Surface id these data belong to */
+//  int   kind;			/* What kind of data */
+//  float lat;			/* Latency */
+//  int   nvert;			/* Number of vertices */
+//  int   *vertno;		/* Vertex numbers */
+//  float *vals;			/* The values */
+//} *mneWdata,mneWdataRec;
 
-typedef struct {
-  int   id;			/* Surface id these data belong to */
-  int   kind;			/* What kind of data */
-  float tmin;			/* First time */
-  float tstep;			/* Step between times */
-  int   ntime;			/* Number of times */
-  int   nvert;			/* Number of vertices */
-  int   *vertno;		/* The vertex numbers */
-  float **data;			/* The data, time by time */
-} *mneStcData,mneStcDataRec;
+//typedef struct {
+//  int   id;			/* Surface id these data belong to */
+//  int   kind;			/* What kind of data */
+//  float tmin;			/* First time */
+//  float tstep;			/* Step between times */
+//  int   ntime;			/* Number of times */
+//  int   nvert;			/* Number of vertices */
+//  int   *vertno;		/* The vertex numbers */
+//  float **data;			/* The data, time by time */
+//} *mneStcData,mneStcDataRec;
 
 typedef struct {		/* Information about raw data in fiff file */
   char          *filename;	/* The name of the file this comes from */
@@ -468,17 +468,17 @@ typedef struct {		/* Information about raw data in fiff file */
 } mneRawInfoRec, *mneRawInfo;
 
 
-typedef struct {		/* Spatiotemporal map */
-  int kind;			/* What kind of data */
-  int coord_frame;		/* Coordinate frame for vector values */
-  int nvert;			/* Number of vertex values */
-  int ntime;			/* Number of time points */
-  int nval_vert;		/* Number of values per vertex */
-  float tmin;			/* First time point */
-  float tstep;			/* Step between the time points */
-  int   *vertno;		/* Vertex numbers in the full triangulation (starting with zero) */
-  float **data;			/* The data values (time by time) */
-} mneMapRec, *mneMap;
+//typedef struct {		/* Spatiotemporal map */
+//  int kind;			/* What kind of data */
+//  int coord_frame;		/* Coordinate frame for vector values */
+//  int nvert;			/* Number of vertex values */
+//  int ntime;			/* Number of time points */
+//  int nval_vert;		/* Number of values per vertex */
+//  float tmin;			/* First time point */
+//  float tstep;			/* Step between the time points */
+//  int   *vertno;		/* Vertex numbers in the full triangulation (starting with zero) */
+//  float **data;			/* The data values (time by time) */
+//} mneMapRec, *mneMap;
 
 typedef struct {				     /* Plotter layout port definition */
   int   portno;					     /* Running number of this viewport */
@@ -520,12 +520,12 @@ typedef struct {
   int  kind;			/* Loaded from file or created here? */
 } *mneChSelection,mneChSelectionRec;
 
-typedef struct {
-  char        *name;		/* Name of this set */
-  mneChSelection *sels;		/* These are the selections */
-  int         nsel;		/* How many */
-  int         current;		/* Which is active now? */
-} *mneChSelectionSet, mneChSelectionSetRec;
+//typedef struct {
+//  char        *name;		/* Name of this set */
+//  mneChSelection *sels;		/* These are the selections */
+//  int         nsel;		/* How many */
+//  int         current;		/* Which is active now? */
+//} *mneChSelectionSet, mneChSelectionSetRec;
 
 typedef struct {
   unsigned int from;		/* Source transition value */
@@ -864,7 +864,7 @@ typedef struct {		 /* Measurement data representation in MNE calculations */
  */
 #define MNE_DEFAULT_TRIGGER_CH "STI 014"
 #define MNE_ENV_TRIGGER_CH          "MNE_TRIGGER_CH_NAME"
-#define MNE_ENV_TRIGGER_CH_MASK     "MNE_TRIGGER_CH_MASK"
+//#define MNE_ENV_TRIGGER_CH_MASK     "MNE_TRIGGER_CH_MASK"
 #define MNE_ENV_ROOT                "MNE_ROOT"
 
 #if defined(__cplusplus) 
