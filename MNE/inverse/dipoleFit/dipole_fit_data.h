@@ -155,28 +155,9 @@ public:
 
     //============================= dipole_forward.c
 
-
-
     static DipoleForward* dipole_forward_one(DipoleFitData* d,
                                      float         *rd,
                                      DipoleForward* old);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

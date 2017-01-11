@@ -2772,7 +2772,6 @@ fiffCoordTrans mne_read_transform(const QString& name,int from, int to)
     int k;
 
     tag.data = NULL;
-    qDebug() << "!!!!!! DEBUG" << name;
     if ((in = fiff_open(name.toLatin1().data())) == NULL)
         goto out;
     for (k = 0, dir = in->dir; k < in->nent; k++,dir++)
@@ -18116,87 +18115,6 @@ int mne_get_values_from_data_ch (float time,      /* Interesting time point */
     return (0);
 }
 
-
-//============================= setup_dipole_fitting.c =============================
-
-
-typedef struct {
-    /*
-   * Current settings derived from data
-   */
-    char   *measname;		/* Data file name */
-    char   *selname;              /* Name of the channel selection */
-    char   *mriname;		/* Source of MRI/MEG coordinate transform */
-    char   *bemname;		/* BEM model file */
-    float  r0[3];			/* Sphere model origin */
-    int    accurate;		/* Use accurate field computations? */
-    char   *badname;		/* Get bad channel info from here */
-    char   *noisename;		/* Noise covariance matrix file name */
-    float  grad_std;		/* Gradiometer standard deviation */
-    float  mag_std;		/* Magnetometer standard deviation */
-    float  eeg_std;		/* EEG standard deviation */
-    float  grad_reg;		/* Gradiometer noise-covariance matrix regularization */
-    float  mag_reg;		/* Magnetometer noise-covariance matrix regularization */
-    float  eeg_reg;		/* EEG noise-covariance matrix regularization */
-    int    diagnoise;		/* Restrict to diagonal elements of the noise-covariance matrix */
-    char   **projnames;		/* SSP file names */
-    int    nproj;			/* How many of them */
-    int    include_meg;		/* Use MEG? */
-    int    include_eeg;		/* Use EEG? */
-    char   *eeg_model_file;	/* Load EEG sphere models from here */
-    char   *eeg_model_name;	/* Current EEG model name */
-    float  eeg_sphere_rad;	/* EEG sphere model scalp radius */
-    char   *guessname;		/* Load the initial guess locations from here */
-    char   *guess_surfname;	/* Load the inner skull surface from this BEM file */
-    float  guess_mindist;		/* Minimum allowed distance to the surface */
-    float  guess_exclude;		/* Exclude points closer than this to the origin */
-    float  guess_grid;		/* Grid spacing */
-    int    nref;			/* How many references we have to this instance? */
-} *dipoleFitSetupPar,dipoleFitSetupParRec;
-
-
-typedef struct {
-    mshMegEegData     data;       /* The data this setup is associated with */
-    /*
-   * Parameters
-   */
-    dipoleFitSetupPar pars;	/* The parameters in effect */
-    dipoleFitSetupPar new_pars;	/* Parameters being edited */
-    /*
-   * Data links
-   */
-    FwdEegSphereModel* eeg_model;	/* The actual model based on the above settings */
-    DipoleFitData*     fitdata;	/* The actual setup data */
-    GuessData*         guessdata;	/* The initial guess data */
-    /*
-   * Additional data
-   */
-    void              *user_data;	        /* Will be the user interface */
-    mneUserFreeFunc   user_data_free;     /* Way to free this item */
-} *dipoleFitSetup,dipoleFitSetupRec;
-
-
-DipoleFitData* get_dipole_fit_data(mshMegEegData d)
-/*
- * Pick up the fitting data from the opaque structure
- */
-{
-    if (!d || !d->dipole_fit_setup)
-        return NULL;
-    else
-        return ((dipoleFitSetup)(d->dipole_fit_setup))->fitdata;
-}
-
-GuessData* get_dipole_fit_guess_data(mshMegEegData d)
-/*
- * Pick up the guess data from the opaque structure
- */
-{
-    if (!d || !d->dipole_fit_setup)
-        return NULL;
-    else
-        return ((dipoleFitSetup)(d->dipole_fit_setup))->guessdata;
-}
 
 #endif // DIPOLEFITHELPERS_H
 
