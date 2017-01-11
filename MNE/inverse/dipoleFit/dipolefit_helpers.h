@@ -66,6 +66,7 @@
 
 using namespace UTILSLIB;
 using namespace INVERSELIB;
+using namespace FIFFLIB;
 
 #ifndef TRUE
 #define TRUE 1
