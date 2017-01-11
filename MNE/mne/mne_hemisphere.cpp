@@ -139,37 +139,28 @@ bool MNEHemisphere::add_geometry_info()
 
     //Clear neighboring triangle list
     this->neighbor_tri.clear();
-    QVector<int> temp;
-    for(int i=0; i<this->tris.rows(); i++) {
-        QPair<int, QVector<int> > tempPair (i,temp);
-        this->neighbor_tri.append(tempPair);
-    }
 
     //Create neighbor_tri information
     for (p = 0; p < this->tris.rows(); p++)
         for (k = 0; k < 3; k++)
-            this->neighbor_tri[this->tris(p,k)].second.append(p);
+            this->neighbor_tri[this->tris(p,k)].append(p);
 
     //std::cout<<"MNESourceSpace::add_geometry_info() - this->neighbor_tri[100].size(): "<<this->neighbor_tri[100].size()<<std::endl;
 
-    //Determine the neighboring vertices and smooth operator
+    //Determine the neighboring vertices
     this->neighbor_vert.clear();
-    for(int i=0; i<this->np; i++) {
-        QPair<int, QVector<int> > tempPair (i,temp);
-        this->neighbor_vert.append(tempPair);
-    }
 
     for (k = 0; k < this->np; k++) {
-        for (p = 0; p < this->neighbor_tri[k].second.size(); p++) {
+        for (p = 0; p < this->neighbor_tri[k].size(); p++) {
             //Fit in the other vertices of the neighboring triangle
             for (c = 0; c < 3; c++) {
-                int vert = this->tris(this->neighbor_tri[k].second[p], c);
+                int vert = this->tris(this->neighbor_tri[k][p], c);
 
                 if (vert != k) {
                     found = false;
 
-                    for (q = 0; q < this->neighbor_vert[k].second.size(); q++) {
-                        if (this->neighbor_vert[k].second[q] == vert) {
+                    for (q = 0; q < this->neighbor_vert[k].size(); q++) {
+                        if (this->neighbor_vert[k][q] == vert) {
                             found = true;
                             break;
                         }
@@ -177,7 +168,7 @@ bool MNEHemisphere::add_geometry_info()
 
                     if(!found) {
 //                        std::cout<<"MNESourceSpace::add_geometry_info() - Found vert: "<<vert<<std::endl;
-                        this->neighbor_vert[k].second.append(vert);
+                        this->neighbor_vert[k].append(vert);
                     }
                 }
             }
@@ -218,8 +209,8 @@ void MNEHemisphere::clear()
     use_tri_nn = MatrixX3d::Zero(0,3);
     use_tri_area = VectorXd::Zero(0);
 
-    neighbor_tri = QList<QPair<int, QVector<int> > >();
-    neighbor_vert = QList<QPair<int, QVector<int> > >();
+    neighbor_tri = QMap<int, QVector<int> >();
+    neighbor_vert = QMap<int, QVector<int> >();
 
     cluster_info.clear();
 
