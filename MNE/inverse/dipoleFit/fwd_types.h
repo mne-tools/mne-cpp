@@ -71,17 +71,17 @@ typedef int (*fwdFieldGradFunc)(float *rd,float *Q,INVERSELIB::FwdCoilSet* coils
 				float *xgrad, float *ygrad, float *zgrad, void *client);
 
 
-/*
- * This is used in the function which evaluates integrals over triangles
- */
+///*
+// * This is used in the function which evaluates integrals over triangles
+// */
 
-typedef struct {
-  double **xyz; 	         /* The coordinates */
-  double *w;			 /* Weights */
-  int    np;			 /* How many */
-} *fwdIntPoints,fwdIntPointsRec; /* Integration points in a triangle */
+//typedef struct {
+//  double **xyz; 	         /* The coordinates */
+//  double *w;			 /* Weights */
+//  int    np;			 /* How many */
+//} *fwdIntPoints,fwdIntPointsRec; /* Integration points in a triangle */
 
-typedef double (*fwdIntApproxEvalFunc)(fwdIntPoints int_points, double *r0, void *user);
+//typedef double (*fwdIntApproxEvalFunc)(fwdIntPoints int_points, double *r0, void *user);
 
 /*
  * Definitions for the EEG sphere model
