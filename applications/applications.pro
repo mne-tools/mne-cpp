@@ -58,4 +58,3 @@ SUBDIRS += \
 }
 
 CONFIG += ordered
-

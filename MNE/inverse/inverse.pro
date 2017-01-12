@@ -101,7 +101,6 @@ SOURCES += \
     dipoleFit/guess_data.cpp \
     dipoleFit/dipole_forward.cpp \
     dipoleFit/dipole_fit_data.cpp \
-    dipoleFit/dipolefit_helpers.cpp \
     dipoleFit/fwd_eeg_sphere_layer.cpp \
     dipoleFit/fwd_eeg_sphere_model.cpp \
     dipoleFit/fwd_eeg_sphere_model_set.cpp \
@@ -121,7 +120,6 @@ HEADERS +=\
     dipoleFit/ecd_set.h \
     dipoleFit/mne_types.h \
     dipoleFit/fwd_types.h \
-    dipoleFit/fiff_types.h \
     dipoleFit/fiff_explain.h \
     dipoleFit/analyze_types.h \
     dipoleFit/guess_data.h \
@@ -137,7 +135,8 @@ HEADERS +=\
     rapMusic/pwlrapmusic.h \
     rapMusic/dipole.h \
     dipoleFit/dipole_fit_settings.h \
-    dipoleFit/dipole_fit.h
+    dipoleFit/dipole_fit.h \
+    dipoleFit/dipolefit_helpers.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
