@@ -274,7 +274,9 @@ void MneEstimateTreeItem::init(const MNEForwardSolution& tForwardSolution,
                                                 lLabelsRightHemi);
 
     m_pSourceLocRtDataWorker->setNeighborInfo(tForwardSolution.src[0].neighbor_vert,
-                                                tForwardSolution.src[1].neighbor_vert);
+                                                tForwardSolution.src[1].neighbor_vert,
+                                                tForwardSolution.src[0].rr,
+                                                tForwardSolution.src[1].rr);
 
     m_bIsInit = true;
 }

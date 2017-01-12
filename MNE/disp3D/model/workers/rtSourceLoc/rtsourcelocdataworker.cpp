@@ -42,8 +42,11 @@
 #include "../../items/common/types.h"
 
 #include <disp/helpers/colormap.h>
+#include <utils/ioutils.h>
 #include <fs/label.h>
 #include <fs/annotation.h>
+
+#include <iostream>
 
 
 //*************************************************************************************************************
@@ -56,6 +59,7 @@
 #include <QSharedPointer>
 #include <QTime>
 #include <QDebug>
+#include <QtConcurrent>
 
 
 //*************************************************************************************************************
@@ -75,6 +79,7 @@ using namespace DISP3DLIB;
 using namespace Eigen;
 using namespace DISPLIB;
 using namespace FSLIB;
+using namespace UTILSLIB;
 
 
 //*************************************************************************************************************
@@ -228,8 +233,6 @@ void RtSourceLocDataWorker::setNormalization(const QVector3D& vecThresholds)
 {
     QMutexLocker locker(&m_qMutex);
     m_vecThresholds = vecThresholds;
-
-    //m_dNormalization = (m_dNormalizationMax/100.0) * dValue;
 }
 
 
@@ -245,13 +248,110 @@ void RtSourceLocDataWorker::setLoop(bool looping)
 //*************************************************************************************************************
 
 void RtSourceLocDataWorker::setNeighborInfo(const QMap<int, QVector<int> >& mapVertexNeighborsLeftHemi,
-                                            const QMap<int, QVector<int> >& mapVertexNeighborsRightHemi)
+                                            const QMap<int, QVector<int> >& mapVertexNeighborsRightHemi,
+                                            const MatrixX3f& matVertPosLeftHemi,
+                                            const MatrixX3f& matVertPosRightHemi)
 {
     QMutexLocker locker(&m_qMutex);
 
     m_mapVertexNeighborsLeftHemi = mapVertexNeighborsLeftHemi;
     m_mapVertexNeighborsRightHemi = mapVertexNeighborsRightHemi;
 
+    //Create smooth operator in multi thread
+
+
+    //Create distance weighted smoothing operator for left hemi
+    QVector3D from, to;
+    double dWeightsSum, dist, valueWeight, max;
+    double threshold = 0.5;
+    int distPow = 5;
+    VectorXd vWeights(m_vecVertNoLeftHemi.rows());
+    m_sparseSmoothMatrixLeftHemi.resize(matVertPosLeftHemi.rows(), m_vecVertNoLeftHemi.rows());
+
+    for(int i = 0; i < matVertPosLeftHemi.rows(); ++i) {
+        from.setX(matVertPosLeftHemi(i,0));
+        from.setY(matVertPosLeftHemi(i,1));
+        from.setZ(matVertPosLeftHemi(i,2));
+        dWeightsSum = 0;
+        max = 0;
+
+        for(int j = 0; j < m_vecVertNoLeftHemi.rows(); ++j) {
+            to.setX(matVertPosLeftHemi(m_vecVertNoLeftHemi(j),0));
+            to.setY(matVertPosLeftHemi(m_vecVertNoLeftHemi(j),1));
+            to.setZ(matVertPosLeftHemi(m_vecVertNoLeftHemi(j),2));
+
+            dist = from.distanceToPoint(to);
+            if(m_vecVertNoLeftHemi(j) == i) {
+                dist = 0.000000000001;
+            }
+
+            valueWeight = abs(1/pow(dist,distPow));
+
+            if(valueWeight > max) {
+                max = valueWeight;
+            }
+
+            dWeightsSum += valueWeight;
+            vWeights(j) = valueWeight;
+        }
+
+        for(int j = 0; j < m_vecVertNoLeftHemi.rows(); ++j) {
+            if(vWeights(j) > max*threshold) {
+                m_sparseSmoothMatrixLeftHemi.insert(i,j) = vWeights(j)/dWeightsSum;
+            }
+        }
+    }
+
+    //Create distance weighted smoothing operator for right hemi
+    vWeights.resize(m_vecVertNoRightHemi.rows());
+    m_sparseSmoothMatrixRightHemi.resize(matVertPosRightHemi.rows(), m_vecVertNoRightHemi.rows());
+
+    for(int i = 0; i < matVertPosRightHemi.rows(); ++i) {
+        from.setX(matVertPosRightHemi(i,0));
+        from.setY(matVertPosRightHemi(i,1));
+        from.setZ(matVertPosRightHemi(i,2));
+        dWeightsSum = 0;
+        max = 0;
+
+        for(int j = 0; j < m_vecVertNoRightHemi.rows(); ++j) {
+            to.setX(matVertPosRightHemi(m_vecVertNoRightHemi(j),0));
+            to.setY(matVertPosRightHemi(m_vecVertNoRightHemi(j),1));
+            to.setZ(matVertPosRightHemi(m_vecVertNoRightHemi(j),2));
+
+            dist = from.distanceToPoint(to);
+            //qDebug() << dist;
+
+            if(m_vecVertNoRightHemi(j) == i) {
+                dist = 0.000000000001;
+            }
+
+            valueWeight = abs(1/pow(dist,distPow));
+
+            if(valueWeight > max) {
+                max = valueWeight;
+            }
+
+            dWeightsSum += valueWeight;
+            vWeights(j) = valueWeight;
+        }
+
+        for(int j = 0; j < m_vecVertNoRightHemi.rows(); ++j) {
+            if(vWeights(j) > max*threshold) {
+                m_sparseSmoothMatrixRightHemi.insert(i,j) = vWeights(j)/dWeightsSum;
+            }
+        }
+    }
+
+    qDebug() << "non zero left " << m_sparseSmoothMatrixLeftHemi.nonZeros();
+    qDebug() << "non zero right " << m_sparseSmoothMatrixRightHemi.nonZeros();
+
+//    MatrixXd a;
+//    a = MatrixXd(m_sparseSmoothMatrixLeftHemi);
+//    UTILSLIB::IOUtils::write_eigen_matrix(a, "m_sparseSmoothMatrixLeftHemi.txt");
+
+//    MatrixXd b;
+//    b = MatrixXd(m_sparseSmoothMatrixRightHemi);
+//    UTILSLIB::IOUtils::write_eigen_matrix(b, "m_sparseSmoothMatrixRightHemi.txt");
 }
 
 //*************************************************************************************************************
@@ -379,8 +479,17 @@ QPair<QByteArray, QByteArray> RtSourceLocDataWorker::performVisualizationTypeCal
         }        
 
         case Data3DTreeModelItemRoles::SmoothingBased: {
-            colorPair.first = generateSmoothedColors(sourceColorSamplesLeftHemi, m_vecVertNoLeftHemi, m_arraySurfaceVertColorLeftHemi, m_mapVertexNeighborsLeftHemi);
-            colorPair.second = generateSmoothedColors(sourceColorSamplesRightHemi, m_vecVertNoRightHemi, m_arraySurfaceVertColorRightHemi, m_mapVertexNeighborsRightHemi);
+            colorPair.first = generateSmoothedColors(sourceColorSamplesLeftHemi,
+                                                     m_vecVertNoLeftHemi,
+                                                     m_arraySurfaceVertColorLeftHemi,
+                                                     m_mapVertexNeighborsLeftHemi,
+                                                     m_sparseSmoothMatrixLeftHemi);
+
+            colorPair.second = generateSmoothedColors(sourceColorSamplesRightHemi,
+                                                      m_vecVertNoRightHemi,
+                                                      m_arraySurfaceVertColorRightHemi,
+                                                      m_mapVertexNeighborsRightHemi,
+                                                      m_sparseSmoothMatrixRightHemi);
 
             break;
         }
@@ -547,72 +656,231 @@ QPair<QByteArray, QByteArray> RtSourceLocDataWorker::generateColorsPerAnnotation
 
 //*************************************************************************************************************
 
+struct smoothInfo {
+    QMap<int, QVector<int> > mapVertNeighbor;
+    double dActivation;
+    int iVertNo;
+};
+
+VectorXd smoothData(const smoothInfo& inputData)
+{
+    int nSurfaceVerts = inputData.mapVertNeighbor.size();
+    int iVertNo = inputData.iVertNo;
+    int nn, nv, p, sum, n;
+
+    QVector<bool> undef(nSurfaceVerts, true);
+    undef[iVertNo] = false;
+
+    VectorXd smooth_val = VectorXd::Zero(nSurfaceVerts);
+    smooth_val(iVertNo) = inputData.dActivation;
+
+    for(int k = 0; k < nSurfaceVerts; ++k) {
+        sum = 0;
+        n = 0;
+
+        if (!undef[k]) {
+            //If vertex color was defined
+            sum = smooth_val[k];
+            n = 1;
+        }
+
+        //Generate the color of the current vertex at pos k based on neighbor information
+        nn = inputData.mapVertNeighbor[k].size();
+
+        for (p = 0; p < nn; p++) {
+            nv = inputData.mapVertNeighbor[k].at(p);
+
+            if (!undef[nv]) {
+                //If vertex color was defined
+                sum += smooth_val[nv];
+                n++;
+            }
+        }
+
+        if (n > 0) {
+            smooth_val[k] = sum/(float)n;
+            undef[k] = false;
+        }
+    }
+
+    return smooth_val;
+}
+
+void reduce(VectorXd& outputData, const VectorXd& inputData)
+{
+    if(outputData.rows() == 0) {
+        outputData = inputData;
+    } else {
+        outputData += inputData;
+    }
+}
+
+//*************************************************************************************************************
+
 QByteArray RtSourceLocDataWorker::generateSmoothedColors(const VectorXd& sourceColorSamples,
                                                          const VectorXi& vertno,
                                                          const QByteArray& arrayCurrentVertColor,
-                                                         const QMap<int, QVector<int> >& mapVertexNeighbors)
+                                                         const QMap<int, QVector<int> >& mapVertexNeighbors,
+                                                         const SparseMatrix<double>& matWDistSmooth)
 {
-    //Do the smooting here
-    if(mapVertexNeighbors.isEmpty()) {
-        qDebug() << "RtSourceLocDataWorker::generateSmoothedColors - The neighboring information has not been set. Returning ...";
-        return QByteArray();
-    }
+//    //Option 1 - Use mapReduce
+//    QTime myTimer;
+//    myTimer.start();
 
-    //Init the variables
-    int n,k,p,it,nn,nv;
-    float sum;
-    int niter = 6;
+//    //Do the smooting here
+//    if(mapVertexNeighbors.isEmpty()) {
+//        qDebug() << "RtSourceLocDataWorker::generateSmoothedColors - The neighboring information has not been set. Returning ...";
+//        return QByteArray();
+//    }
 
-    int nSurfaceVerts = arrayCurrentVertColor.size() / (sizeof(float) * 3);
-    int nvert = sourceColorSamples.rows();
+//    //Prepare input data
+//    QTime prepareDataTimer;
+//    prepareDataTimer.start();
 
-    QVector<bool> undef(nSurfaceVerts, true);
-    QVector<bool> prev_undef(nSurfaceVerts);
-    QVector<bool> isSource(nSurfaceVerts, false);
-    QVector<float> prev_val(nSurfaceVerts);
-    QVector<float> smooth_val(nSurfaceVerts, 0);
+//    QList<smoothInfo> inputData;
+//    smoothInfo info;
 
-    //Set all vertex activation of the actually chosen sources to their current activation
-    for (k = 0; k < nvert; k++) {
-        undef[vertno[k]] = false;
-        smooth_val[vertno[k]] = sourceColorSamples[k];
-        isSource[vertno[k]] = true;
-    }
+//    for (int k = 0; k < vertno.rows(); ++k) {
+//        info.mapVertNeighbor = mapVertexNeighbors;
+//        info.iVertNo = vertno[k];
+//        info.dActivation = sourceColorSamples[k];
 
-    //Smooth here
-    for (it = 0; it < niter; it++) {
-        prev_undef = undef;
-        prev_val = smooth_val;
+//        inputData.append(info);
+//    }
 
-        for (k = 0; k < nSurfaceVerts; k++) {
-            sum = 0;
-            n   = 0;
+//    qDebug() << "Prep data" << prepareDataTimer.elapsed();
 
-            if (!prev_undef[k]) {
-                //If vertex color was defined
-                sum = smooth_val[k];
-                n = 1;
-            }
+//    //Start multithreading
+//    QTime generateDataTimer;
+//    generateDataTimer.start();
 
-            //Generate the color of the current vertex at pos k based on neighbor information
-            nn = mapVertexNeighbors[k].size();
+//    QFuture<VectorXd> final = QtConcurrent::mappedReduced(inputData, smoothData, reduce);
+//    final.waitForFinished();
 
-            for (p = 0; p < nn; p++) {
-                nv = mapVertexNeighbors[k].at(p);
+//    qDebug() << "Gen data" << generateDataTimer.elapsed();
 
-                if (!prev_undef[nv]) {
-                    //If vertex color was defined
-                    sum += prev_val[nv];
-                    n++;
-                }
-            }
+//    //Generate final colors
+//    VectorXd smoothedData = final.result();
+//    VectorXd vecActivation(1);
 
-            if (n > 0) {
-                smooth_val[k] = sum/(float)n;
-                undef[k] = false;
-            }
-        }
-    }
+//    QByteArray finalColors = arrayCurrentVertColor;
+//    float *rawfinalColors = reinterpret_cast<float *>(finalColors.data());
+//    int idxVert = 0;
+
+//    for (int k = 0; k < smoothedData.rows(); ++k) {
+//        vecActivation(0) = smoothedData(k);
+
+//        if(smoothedData(k) > m_vecThresholds.x()) {
+//            QByteArray arrayVertColor = transformDataToColor(vecActivation);
+
+//            float *rawVertColor = reinterpret_cast<float *>(arrayVertColor.data());
+
+//            rawfinalColors[idxVert] = rawVertColor[0];
+//            rawfinalColors[idxVert+1] = rawVertColor[1];
+//            rawfinalColors[idxVert+2] = rawVertColor[2];
+//        }
+
+//        idxVert += 3;
+//    }
+
+//    qDebug() << "All timer" << myTimer.elapsed();
+
+//    return finalColors;
+
+
+//    //Option 2 - Use Matti's version. Smoothes between different source "patches".
+//    //Activity is spread evenly around every source and then smoothed to neighboring source patches.
+//    //Init the variables
+//    int n,k,p,it,nn,nv;
+//    float sum;
+//    int niter = 20;
+
+//    int nSurfaceVerts = arrayCurrentVertColor.size() / (sizeof(float) * 3);
+//    int nvert = sourceColorSamples.rows();
+
+//    QVector<bool> undef(nSurfaceVerts, true);
+//    QVector<bool> prev_undef(nSurfaceVerts);
+//    QVector<bool> isSource(nSurfaceVerts, false);
+//    QVector<float> prev_val(nSurfaceVerts);
+//    QVector<float> smooth_val(nSurfaceVerts, 0);
+
+//    //Set all vertex activation of the actually chosen sources to their current activation
+//    for (k = 0; k < nvert; k++) {
+//        undef[vertno[k]] = false;
+//        smooth_val[vertno[k]] = sourceColorSamples[k];
+//        isSource[vertno[k]] = true;
+//    }
+
+//    //Smooth here
+//    for (it = 0; it < niter; it++) {
+//        prev_undef = undef;
+//        prev_val = smooth_val;
+
+//        for (k = 0; k < nSurfaceVerts; k++) {
+//            sum = 0;
+//            n   = 0;
+
+//            if (!prev_undef[k]) {
+//                //If vertex color was defined during last step
+//                sum = smooth_val[k];
+//                n = 1;
+//            }
+
+//            //Generate the color of the current vertex at pos k based on its neighbor information
+//            nn = mapVertexNeighbors[k].size();
+
+//            for (p = 0; p < nn; p++) {
+//                nv = mapVertexNeighbors[k].at(p);
+
+//                if (!prev_undef[nv]) {
+//                    //If vertex color was defined during last step
+//                    sum += prev_val[nv];
+//                    n++;
+//                }
+//            }
+
+//            if (n > 0) {
+//                smooth_val[k] = sum/(float)n;
+//                undef[k] = false;
+//            }
+//        }
+//    }
+
+//    //Produce final color
+//    VectorXd vecActivation(1);
+
+//    QByteArray finalColors = arrayCurrentVertColor;
+//    float *rawfinalColors = reinterpret_cast<float *>(finalColors.data());
+//    int idxVert = 0;
+
+//    for (k = 0; k < nSurfaceVerts; k++) {
+//        vecActivation(0) = smooth_val[k];
+
+//        if(vecActivation(0) > m_vecThresholds.x()) {
+//            QByteArray arrayVertColor = transformDataToColor(vecActivation);
+
+//            float *rawVertColor = reinterpret_cast<float *>(arrayVertColor.data());
+
+//            rawfinalColors[idxVert] = rawVertColor[0];
+//            rawfinalColors[idxVert+1] = rawVertColor[1];
+//            rawfinalColors[idxVert+2] = rawVertColor[2];
+//        }
+
+//        idxVert += 3;
+//    }
+
+//    return finalColors;
+
+    //Option 3 - Weighted distance
+    QTime multDataTimer;
+    multDataTimer.start();
+
+    VectorXd vecSmoothedData = matWDistSmooth * sourceColorSamples;
+
+    qDebug() << "Mult time" << multDataTimer.elapsed();
+
+    //QTime prodDataTimer;
+    //prodDataTimer.start();
 
     //Produce final color
     VectorXd vecActivation(1);
@@ -621,10 +889,10 @@ QByteArray RtSourceLocDataWorker::generateSmoothedColors(const VectorXd& sourceC
     float *rawfinalColors = reinterpret_cast<float *>(finalColors.data());
     int idxVert = 0;
 
-    for (k = 0; k < nSurfaceVerts; k++) {
-        vecActivation(0) = smooth_val[k];
+    for (int k = 0; k < vecSmoothedData.rows(); k++) {
+        vecActivation(0) = vecSmoothedData[k];
 
-        if(vecActivation(0) >= m_vecThresholds.x()) {
+        if(vecActivation(0) > m_vecThresholds.x()) {
             QByteArray arrayVertColor = transformDataToColor(vecActivation);
 
             float *rawVertColor = reinterpret_cast<float *>(arrayVertColor.data());
@@ -637,60 +905,9 @@ QByteArray RtSourceLocDataWorker::generateSmoothedColors(const VectorXd& sourceC
         idxVert += 3;
     }
 
+    //qDebug() << "Produce time" << prodDataTimer.elapsed();
+
     return finalColors;
-
-    //    //Create smooth operators - This takes way too long, due to about 600000 element entries in the sparse matrix -> split into sub matrices
-    //    std::cout<<"Creating smooth operator matrices "<<std::endl;
-    //    this->smoothOperatorList.clear();
-
-    //    SparseMatrix<double> sparseSmoothMatrix;
-    //    int numberMatrix = 10000;
-    //    int numberVerticesForMatrix;
-    //    int matrixCount = numberMatrix;
-    //    int last = this->np % 10;
-    //    if(last!=0)
-    //        matrixCount++;
-
-    //    std::cout<<"last "<<last<<std::endl;
-    //    std::cout<<"numberMatrix "<<numberMatrix<<std::endl;
-    //    std::cout<<"numberVerticesForMatrix "<<numberVerticesForMatrix<<std::endl;
-    //    std::cout<<"matrixCount "<<matrixCount<<std::endl;
-
-    //    int vertexIndex = 0;
-
-    //    for(int i=0; i<matrixCount; i++) {
-    //        //std::cout<<"matrixCount "<<i<<std::endl;
-
-    //        if(i==matrixCount-1 && last!=0)
-    //            numberVerticesForMatrix = last;
-    //        else
-    //            numberVerticesForMatrix = this->np/numberMatrix;
-
-    //        sparseSmoothMatrix = SparseMatrix<double>(numberVerticesForMatrix, this->np);
-
-    //        //std::cout<<"before "<<std::endl;
-    //        for(int r=0; r<numberVerticesForMatrix; r++)
-    //            for(int v=0; v<this->neighbor_vert[r+vertexIndex].size(); v++)
-    //                sparseSmoothMatrix.insert(r, this->neighbor_vert[r+vertexIndex][v]) = 1 / this->neighbor_vert[r+vertexIndex].size();
-    //        //std::cout<<"after "<<std::endl;
-
-    //        if(i==matrixCount-1 && last!=0)
-    //            vertexIndex += last;
-    //        else
-    //            vertexIndex += this->np/numberMatrix;
-
-    //        //std::cout<<"appending before "<<std::endl;
-    //        this->smoothOperatorList.push_back(sparseSmoothMatrix);
-    //        //std::cout<<"appending after "<<std::endl;
-    //    }
-
-    //    std::cout<<"size smooth operator list "<<this->smoothOperatorList.size()<<std::endl;
-    //    std::cout<<"nonzero() "<<this->smoothOperatorList[0].nonZeros()<<std::endl;
-    //    std::cout<<"rows() "<<this->smoothOperatorList[0].rows()<<std::endl;
-    //    std::cout<<"cols() "<<this->smoothOperatorList[0].cols()<<std::endl;
-    //    std::cout<<"innerSize() "<<this->smoothOperatorList.innerSize()<<std::endl;
-    //    std::cout<<"outerSize() "<<this->smoothOperatorList.outerSize()<<std::endl;
-
 }
 
 //*************************************************************************************************************
