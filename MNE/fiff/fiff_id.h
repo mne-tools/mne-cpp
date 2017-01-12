@@ -136,13 +136,19 @@ public:
     fiffTimeRec time;       /**< Time of the ID creation */
 
 // ### OLD STRUCT ###
-// typedef struct _fiffIdRec {
-//  fiff_int_t version;     /**< File version *
-//  fiff_int_t machid[2];   /**< Unique machine ID *
-//  fiffTimeRec time;       /**< Time of the ID creation *
-//} fiffIdRec,*fiffId;     /**< This is the file identifier *
+/**
+* A file ID.
+*
+* These universially unique identifiers are also
+* used to identify blocks within fthe files.
+*/
+typedef struct _fiffIdRec {
+    fiff_int_t version;     /**< File version */
+    fiff_int_t machid[2];   /**< Unique machine ID */
+    fiffTimeRec time;       /**< Time of the ID creation */
+} fiffIdRec,*fiffId;        /**< This is the file identifier */
 
-// typedef fiffIdRec fiff_id_t;
+typedef fiffIdRec fiff_id_t;
 };
 
 
