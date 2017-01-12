@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     ecd.h
+* @file     mne_sss_data.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     December, 2016
+* @date     January, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) 2016, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -18,7 +18,7 @@
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
 *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
-* 
+*
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
 * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Electric Current Dipole (ECD) class declaration.
+* @brief    MNE SSS Data (MneSssData) class declaration.
 *
 */
 
-#ifndef ECD_H
-#define ECD_H
+#ifndef MNESSSDATA_H
+#define MNESSSDATA_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -72,65 +72,73 @@ namespace INVERSELIB
 
 //=============================================================================================================
 /**
-* Implements one Electric Current Dipole (Replaces *ecd,ecdRec struct of MNE-C fit_types.h).
+* Implements MNE SSS Data (Replaces *mneSssData,mneSssDataRec struct of MNE-C mne_types.h).
 *
-* @brief Electric Current Dipole description
+* @brief MNE SSS Data description
 */
-class INVERSESHARED_EXPORT ECD
+class INVERSESHARED_EXPORT MneSssData
 {
 public:
-    typedef QSharedPointer<ECD> SPtr;              /**< Shared pointer type for ECD. */
-    typedef QSharedPointer<const ECD> ConstSPtr;   /**< Const shared pointer type for ECD. */
+    typedef QSharedPointer<MneSssData> SPtr;              /**< Shared pointer type for ECD. */
+    typedef QSharedPointer<const MneSssData> ConstSPtr;   /**< Const shared pointer type for ECD. */
 
     //=========================================================================================================
     /**
-    * Constructs the Electric Current Dipole
+    * Constructs the MNE SSS Data
     */
-    ECD();
+    MneSssData();
 
     //=========================================================================================================
+    //============================= mne_sss_data.c =============================
     /**
     * Copy constructor.
+    * Refactored: mne_dup_sss_data
     *
-    * @param[in] p_ECD      Electric Current Dipole which should be copied
+    * @param[in] p_MneSssData   MNE SSS Data which should be copied
     */
-    ECD(const ECD& p_ECD);
+    MneSssData(const MneSssData& p_MneSssData);
+
 
     //=========================================================================================================
     /**
-    * Destroys the Electric Current Dipole description
+    * Destroys the MNE SSS Data description
     */
-    ~ECD();
+    ~MneSssData();
 
-    //=========================================================================================================
-    /**
-    * prints the ECD to an stdio file stream.
-    *
-    * @param[in] f      the file stream to print to;
-    */
+
+    //============================= mne_sss_data.c =============================
+    // mne_print_sss_data
+    /*
+     * Output the SSS information for debugging purposes
+     */
     void print(FILE *f) const;
 
+
 public:
-    bool            valid;  /**< Is this dipole valid */
-    float           time;   /**< Time point */
-    Eigen::Vector3f rd;     /**< Dipole location */
-    Eigen::Vector3f Q;      /**< Dipole moment */
-    float           good;   /**< Goodness of fit */
-    float           khi2;   /**< khi^2 value */
-    int             nfree;  /**< Degrees of freedom for the above */
-    int             neval;  /**< Number of function evaluations required for this fit */
+    int   job;                  /**< Value of FIFF_SSS_JOB tag */
+    int   coord_frame;          /**< Coordinate frame */
+    float origin[3];            /**< The expansion origin */
+    int   nchan;                /**< How many channels */
+    int   out_order;            /**< Order of the outside expansion */
+    int   in_order;             /**< Order of the inside expansion */
+    int* comp_info;  /**< Which components are included */
+    int   ncomp;                /**< How many entries in the above */
+    int   in_nuse;              /**< How many components included in the inside expansion */
+    int   out_nuse;             /**< How many components included in the outside expansion */
 
 // ### OLD STRUCT ###
-//    typedef struct {
-//      int   valid;        /* Is this dipole valid */
-//      float time;         /* Time point */
-//      float rd[3];        /* Dipole location */
-//      float Q[3];         /* Dipole moment */
-//      float good;         /* Goodness of fit */
-//      float khi2;         /* khi^2 value */
-//      int   nfree;        /* Degrees of freedom for the above */
-//      int   neval;        /* Number of function evaluations required for this fit */
-//    } *ecd,ecdRec;        /* One ECD */
+//typedef struct {
+//    int   job;			/* Value of FIFF_SSS_JOB tag */
+//    int   coord_frame;		/* Coordinate frame */
+//    float origin[3];		/* The expansion origin */
+//    int   nchan;			/* How many channels */
+//    int   out_order;		/* Order of the outside expansion */
+//    int   in_order;		/* Order of the inside expansion */
+//    int   *comp_info;		/* Which components are included */
+//    int   ncomp;			/* How many entries in the above */
+//    int   in_nuse;		/* How many components included in the inside expansion */
+//    int   out_nuse;		/* How many components included in the outside expansion */
+//} *mneSssData,mneSssDataRec;	/* Essential information about SSS */
 
 };
 
@@ -143,4 +151,4 @@ public:
 
 } // NAMESPACE INVERSELIB
 
-#endif // ECD_H
+#endif // MNESSSDATA_H
