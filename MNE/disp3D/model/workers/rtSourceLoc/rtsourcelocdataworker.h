@@ -60,6 +60,8 @@
 // Eigen INCLUDES
 //=============================================================================================================
 
+#include <Eigen/SparseCore>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -203,11 +205,15 @@ public:
     /**
     * Set the neighboring information for smoothing the activity.
     *
-    * @param[in] mapVertexNeighborsLeftHemi       The neighbor vertices for the left hemisphere.
-    * @param[in] mapVertexNeighborsRightHemi      The neighbor vertices for the right hemisphere.
+    * @param[in] mapVertexNeighborsLeftHemi         The neighbor vertices for the left hemisphere.
+    * @param[in] mapVertexNeighborsRightHemi        The neighbor vertices for the right hemisphere.
+    * @param[in] matVertPosLeftHemi                 The surface vertices in 3D space for the left hemisphere.
+    * @param[in] matVertPosRightHemi                The surface vertices in 3D space for the right hemisphere.
     */
     void setNeighborInfo(const QMap<int, QVector<int> >& mapVertexNeighborsLeftHemi,
-                         const QMap<int, QVector<int> >& mapVertexNeighborsRightHemi);
+                         const QMap<int, QVector<int> >& mapVertexNeighborsRightHemi,
+                         const MatrixX3f& matVertPosLeftHemi,
+                         const MatrixX3f& matVertPosRightHemi);
 
     //=========================================================================================================
     /**
@@ -270,7 +276,8 @@ private:
     QByteArray generateSmoothedColors(const VectorXd& sourceColorSamples,
                                       const VectorXi &vertno,
                                       const QByteArray& arrayCurrentVertColor,
-                                      const QMap<int, QVector<int> >& mapVertexNeighbors);
+                                      const QMap<int, QVector<int> >& mapVertexNeighbors,
+                                      const SparseMatrix<double>& matWDistSmooth);
 
     //=========================================================================================================
     /**
@@ -315,6 +322,9 @@ private:
 
     QMap<int, QVector<int> >   m_mapVertexNeighborsLeftHemi;
     QMap<int, QVector<int> >   m_mapVertexNeighborsRightHemi;
+
+    SparseMatrix<double> m_sparseSmoothMatrixLeftHemi;
+    SparseMatrix<double> m_sparseSmoothMatrixRightHemi;
 
 signals:
     //=========================================================================================================
