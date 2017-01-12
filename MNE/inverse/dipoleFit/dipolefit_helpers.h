@@ -1,4 +1,9 @@
 
+
+#ifndef DIPOLEFITHELPERS_H
+#define DIPOLEFITHELPERS_H
+
+
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
@@ -61,6 +66,7 @@
 
 using namespace UTILSLIB;
 using namespace INVERSELIB;
+using namespace FIFFLIB;
 
 #ifndef TRUE
 #define TRUE 1
@@ -370,7 +376,7 @@ void mne_free_dcmatrix (double **m)
 #define FREE_CMATRIX(m) mne_free_cmatrix((m))
 
 
-#include "fiff_types.h"
+#include <fiff/fiff_types.h>
 #include "mne_types.h"
 #include "analyze_types.h"
 
@@ -18111,268 +18117,5 @@ int mne_get_values_from_data_ch (float time,      /* Interesting time point */
 }
 
 
-//============================= setup_dipole_fitting.c =============================
+#endif // DIPOLEFITHELPERS_H
 
-
-typedef struct {
-    /*
-   * Current settings derived from data
-   */
-    char   *measname;		/* Data file name */
-    char   *selname;              /* Name of the channel selection */
-    char   *mriname;		/* Source of MRI/MEG coordinate transform */
-    char   *bemname;		/* BEM model file */
-    float  r0[3];			/* Sphere model origin */
-    int    accurate;		/* Use accurate field computations? */
-    char   *badname;		/* Get bad channel info from here */
-    char   *noisename;		/* Noise covariance matrix file name */
-    float  grad_std;		/* Gradiometer standard deviation */
-    float  mag_std;		/* Magnetometer standard deviation */
-    float  eeg_std;		/* EEG standard deviation */
-    float  grad_reg;		/* Gradiometer noise-covariance matrix regularization */
-    float  mag_reg;		/* Magnetometer noise-covariance matrix regularization */
-    float  eeg_reg;		/* EEG noise-covariance matrix regularization */
-    int    diagnoise;		/* Restrict to diagonal elements of the noise-covariance matrix */
-    char   **projnames;		/* SSP file names */
-    int    nproj;			/* How many of them */
-    int    include_meg;		/* Use MEG? */
-    int    include_eeg;		/* Use EEG? */
-    char   *eeg_model_file;	/* Load EEG sphere models from here */
-    char   *eeg_model_name;	/* Current EEG model name */
-    float  eeg_sphere_rad;	/* EEG sphere model scalp radius */
-    char   *guessname;		/* Load the initial guess locations from here */
-    char   *guess_surfname;	/* Load the inner skull surface from this BEM file */
-    float  guess_mindist;		/* Minimum allowed distance to the surface */
-    float  guess_exclude;		/* Exclude points closer than this to the origin */
-    float  guess_grid;		/* Grid spacing */
-    int    nref;			/* How many references we have to this instance? */
-} *dipoleFitSetupPar,dipoleFitSetupParRec;
-
-
-typedef struct {
-    mshMegEegData     data;       /* The data this setup is associated with */
-    /*
-   * Parameters
-   */
-    dipoleFitSetupPar pars;	/* The parameters in effect */
-    dipoleFitSetupPar new_pars;	/* Parameters being edited */
-    /*
-   * Data links
-   */
-    FwdEegSphereModel* eeg_model;	/* The actual model based on the above settings */
-    DipoleFitData*     fitdata;	/* The actual setup data */
-    GuessData*         guessdata;	/* The initial guess data */
-    /*
-   * Additional data
-   */
-    void              *user_data;	        /* Will be the user interface */
-    mneUserFreeFunc   user_data_free;     /* Way to free this item */
-} *dipoleFitSetup,dipoleFitSetupRec;
-
-
-DipoleFitData* get_dipole_fit_data(mshMegEegData d)
-/*
- * Pick up the fitting data from the opaque structure
- */
-{
-    if (!d || !d->dipole_fit_setup)
-        return NULL;
-    else
-        return ((dipoleFitSetup)(d->dipole_fit_setup))->fitdata;
-}
-
-GuessData* get_dipole_fit_guess_data(mshMegEegData d)
-/*
- * Pick up the guess data from the opaque structure
- */
-{
-    if (!d || !d->dipole_fit_setup)
-        return NULL;
-    else
-        return ((dipoleFitSetup)(d->dipole_fit_setup))->guessdata;
-}
-
-
-
-//============================= fit_dipoles.c =============================
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#define SEG_LEN 10.0
-
-
-int fit_dipoles_raw(const QString&  dataname,
-                    mneRawData      raw,            /* The raw data description */
-                    mneChSelection  sel,            /* Channel selection to use */
-                    DipoleFitData*  fit,            /* Precomputed fitting data */
-                    GuessData*      guess,          /* The initial guesses */
-                    float           tmin,           /* Time range */
-                    float           tmax,
-                    float           tstep,          /* Time step to use */
-                    float           integ,          /* Integration time */
-                    int             verbose,        /* Verbose output? */
-                    ECDSet&         p_set)          /* Return all results here
-                                                     * Warning: for large data files this may take
-                                                     * a lot of memory */
-
-/*
- * Fit a single dipole to each time point of the data
- */
-{
-    float *one    = MALLOC(sel->nchan,float);
-    float sfreq   = raw->info->sfreq;
-    float myinteg = integ > 0.0 ? 2*integ : 0.1;
-    int   overlap = ceil(myinteg*sfreq);
-    int   length  = SEG_LEN*sfreq;
-    int   step    = length - overlap;
-    int   stepo   = step + overlap/2;
-    int   start   = raw->first_samp;
-    int   s,picks;
-    float time,stime;
-    float **data  = ALLOC_CMATRIX(sel->nchan,length);
-    ECD    dip;
-    ECDSet set;
-    int    report_interval = 10;
-
-    set.dataname = dataname;
-
-    /*
-   * Load the initial data segment
-   */
-    stime = start/sfreq;
-    if (mne_raw_pick_data_filt(raw,sel,start,length,data) == FAIL)
-        goto bad;
-    fprintf(stderr,"Fitting...%c",verbose ? '\n' : '\0');
-    for (s = 0, time = tmin; time < tmax; s++, time = tmin  + s*tstep) {
-        picks = time*sfreq - start;
-        if (picks > stepo) {		/* Need a new data segment? */
-            start = start + step;
-            if (mne_raw_pick_data_filt(raw,sel,start,length,data) == FAIL)
-                goto bad;
-            picks = time*sfreq - start;
-            stime = start/sfreq;
-        }
-        /*
-     * Get the values
-     */
-        if (mne_get_values_from_data_ch (time,integ,data,length,sel->nchan,stime,sfreq,FALSE,one) == FAIL) {
-            fprintf(stderr,"Cannot pick time: %8.3f s\n",time);
-            continue;
-        }
-        /*
-     * Fit
-     */
-        if (!DipoleFitData::fit_one(fit,guess,time,one,verbose,dip))
-            qWarning() << "Error";
-        else {
-            set.addEcd(dip);
-            if (verbose)
-                dip.print(stdout);
-            else {
-                if (set.size() % report_interval == 0)
-                    fprintf(stderr,"%d..",set.size());
-            }
-        }
-    }
-    if (!verbose)
-        fprintf(stderr,"[done]\n");
-    FREE_CMATRIX(data);
-    FREE(one);
-    p_set = set;
-    return OK;
-
-bad : {
-        FREE_CMATRIX(data);
-        FREE(one);
-        return FAIL;
-    }
-}
-
-
-
-
-int fit_dipoles_raw(const QString& dataname,
-                    mneRawData     raw,          /* The raw data description */
-                    mneChSelection sel,	         /* Channel selection to use */
-                    DipoleFitData*  fit,	         /* Precomputed fitting data */
-                    GuessData*      guess,        /* The initial guesses */
-                    float          tmin,         /* Time range */
-                    float          tmax,
-                    float          tstep,        /* Time step to use */
-                    float          integ,        /* Integration time */
-                    int            verbose)
-/*
- * Fit a single dipole to each time point of the data
- */
-{
-    ECDSet set;
-    return fit_dipoles_raw(dataname, raw, sel, fit, guess, tmin, tmax, tstep, integ, verbose, set);
-}
-
-
-
-int    fit_dipoles( const QString&  dataname,
-                    mneMeasData     data,       /* The measured data */
-                    DipoleFitData*  fit,        /* Precomputed fitting data */
-                    GuessData*      guess,      /* The initial guesses */
-                    float           tmin,       /* Time range */
-                    float           tmax,
-                    float           tstep,      /* Time step to use */
-                    float           integ,      /* Integration time */
-                    int             verbose,    /* Verbose output? */
-                    ECDSet&         p_set)
-/*
- * Fit a single dipole to each time point of the data
- */
-{
-    float *one = MALLOC(data->nchan,float);
-    float time;
-    ECDSet set;
-    ECD   dip;
-    int   s;
-    int   report_interval = 10;
-
-    set.dataname = dataname;
-
-    fprintf(stderr,"Fitting...%c",verbose ? '\n' : '\0');
-    for (s = 0, time = tmin; time < tmax; s++, time = tmin  + s*tstep) {
-        /*
-     * Pick the data point
-     */
-        if (mne_get_values_from_data(time,integ,data->current->data,data->current->np,data->nchan,data->current->tmin,
-                                     1.0/data->current->tstep,FALSE,one) == FAIL) {
-            fprintf(stderr,"Cannot pick time: %7.1f ms\n",1000*time);
-            continue;
-        }
-
-        if (!DipoleFitData::fit_one(fit,guess,time,one,verbose,dip))
-            printf("t = %7.1f ms : %s\n",1000*time,"error (tbd: catch)");
-        else {
-            set.addEcd(dip);
-            if (verbose)
-                dip.print(stdout);
-            else {
-                if (set.size() % report_interval == 0)
-                    fprintf(stderr,"%d..",set.size());
-            }
-        }
-    }
-    if (!verbose)
-        fprintf(stderr,"[done]\n");
-    FREE(one);
-    p_set = set;
-    return OK;
-}

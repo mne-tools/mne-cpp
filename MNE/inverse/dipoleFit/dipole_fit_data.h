@@ -43,6 +43,7 @@
 
 #include "../inverse_global.h"
 
+#include <fiff/fiff_types.h>
 #include "fwd_types.h"
 #include "fwd_eeg_sphere_model.h"
 #include "dipole_forward.h"
@@ -155,8 +156,6 @@ public:
 
     //============================= dipole_forward.c
 
-
-
     static DipoleForward* dipole_forward_one(DipoleFitData* d,
                                      float         *rd,
                                      DipoleForward* old);
@@ -167,28 +166,11 @@ public:
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 public:
-      fiffCoordTrans    mri_head_t;         /**< MRI <-> head coordinate transformation */
-      fiffCoordTrans    meg_head_t;         /**< MEG <-> head coordinate transformation */
+      FIFFLIB::fiffCoordTrans    mri_head_t;         /**< MRI <-> head coordinate transformation */
+      FIFFLIB::fiffCoordTrans    meg_head_t;         /**< MEG <-> head coordinate transformation */
       int               coord_frame;        /**< Common coordinate frame */
-      fiffChInfo        chs;                /**< Channels */
+      FIFFLIB::fiffChInfo        chs;                /**< Channels */
       int               nmeg;               /**< How many MEG */
       int               neeg;               /**< How many EEG */
       char              **ch_names;         /**< List of all channel names */

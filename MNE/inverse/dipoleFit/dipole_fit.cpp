@@ -2,7 +2,7 @@
 
 #include "dipole_fit.h"
 
-#include "dipolefit_helpers.cpp"
+#include "dipolefit_helpers.h"
 
 
 using namespace INVERSELIB;
@@ -36,6 +36,8 @@ using namespace INVERSELIB;
 
 
 #define BIG_TIME 1e6
+
+#define SEG_LEN 10.0
 
 
 //*************************************************************************************************************
@@ -174,46 +176,128 @@ out : {
 }
 
 
-////*************************************************************************************************************
-//// fit_dipoles.c
-//int DipoleFit::fit_dipoles(char *dataname, mneMeasData data,  DipoleFitData* fit, GuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose, ECDSet& p_set)
-//{
-//    float *one = MALLOC(data->nchan,float);
-//    float time;
-//    ECDSet set;
-//    ECD   dip;
-//    int   s;
-//    int   report_interval = 10;
+//*************************************************************************************************************
 
-//    set.dataname = QString(dataname);
+int DipoleFit::fit_dipoles( const QString& dataname, mneMeasData data, DipoleFitData* fit, GuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose, ECDSet& p_set)
+{
+    float *one = MALLOC(data->nchan,float);
+    float time;
+    ECDSet set;
+    ECD   dip;
+    int   s;
+    int   report_interval = 10;
 
-//    fprintf(stderr,"Fitting...%c",verbose ? '\n' : '\0');
-//    for (s = 0, time = tmin; time < tmax; s++, time = tmin  + s*tstep) {
-//        /*
-//     * Pick the data point
-//     */
-//        if (mne_get_values_from_data(time,integ,data->current->data,data->current->np,data->nchan,data->current->tmin,
-//                                     1.0/data->current->tstep,FALSE,one) == FAIL) {
-//            fprintf(stderr,"Cannot pick time: %7.1f ms\n",1000*time);
-//            continue;
-//        }
+    set.dataname = dataname;
 
-//        if (!fit_one(fit,guess,time,one,verbose,dip))
-//            printf("t = %7.1f ms : %s\n",1000*time,"error (tbd: catch)");
-//        else {
-//            set.addEcd(dip);
-//            if (verbose)
-//                dip.print(stdout);
-//            else {
-//                if (set.size() % report_interval == 0)
-//                    fprintf(stderr,"%d..",set.size());
-//            }
-//        }
-//    }
-//    if (!verbose)
-//        fprintf(stderr,"[done]\n");
-//    FREE(one);
-//    p_set = set;
-//    return OK;
-//}
+    fprintf(stderr,"Fitting...%c",verbose ? '\n' : '\0');
+    for (s = 0, time = tmin; time < tmax; s++, time = tmin  + s*tstep) {
+        /*
+     * Pick the data point
+     */
+        if (mne_get_values_from_data(time,integ,data->current->data,data->current->np,data->nchan,data->current->tmin,
+                                     1.0/data->current->tstep,FALSE,one) == FAIL) {
+            fprintf(stderr,"Cannot pick time: %7.1f ms\n",1000*time);
+            continue;
+        }
 
+        if (!DipoleFitData::fit_one(fit,guess,time,one,verbose,dip))
+            printf("t = %7.1f ms : %s\n",1000*time,"error (tbd: catch)");
+        else {
+            set.addEcd(dip);
+            if (verbose)
+                dip.print(stdout);
+            else {
+                if (set.size() % report_interval == 0)
+                    fprintf(stderr,"%d..",set.size());
+            }
+        }
+    }
+    if (!verbose)
+        fprintf(stderr,"[done]\n");
+    FREE(one);
+    p_set = set;
+    return OK;
+}
+
+
+//*************************************************************************************************************
+
+int DipoleFit::fit_dipoles_raw(const QString& dataname, mneRawData raw, mneChSelection sel, DipoleFitData* fit, GuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose, ECDSet& p_set)
+{
+    float *one    = MALLOC(sel->nchan,float);
+    float sfreq   = raw->info->sfreq;
+    float myinteg = integ > 0.0 ? 2*integ : 0.1;
+    int   overlap = ceil(myinteg*sfreq);
+    int   length  = SEG_LEN*sfreq;
+    int   step    = length - overlap;
+    int   stepo   = step + overlap/2;
+    int   start   = raw->first_samp;
+    int   s,picks;
+    float time,stime;
+    float **data  = ALLOC_CMATRIX(sel->nchan,length);
+    ECD    dip;
+    ECDSet set;
+    int    report_interval = 10;
+
+    set.dataname = dataname;
+
+    /*
+   * Load the initial data segment
+   */
+    stime = start/sfreq;
+    if (mne_raw_pick_data_filt(raw,sel,start,length,data) == FAIL)
+        goto bad;
+    fprintf(stderr,"Fitting...%c",verbose ? '\n' : '\0');
+    for (s = 0, time = tmin; time < tmax; s++, time = tmin  + s*tstep) {
+        picks = time*sfreq - start;
+        if (picks > stepo) {		/* Need a new data segment? */
+            start = start + step;
+            if (mne_raw_pick_data_filt(raw,sel,start,length,data) == FAIL)
+                goto bad;
+            picks = time*sfreq - start;
+            stime = start/sfreq;
+        }
+        /*
+     * Get the values
+     */
+        if (mne_get_values_from_data_ch (time,integ,data,length,sel->nchan,stime,sfreq,FALSE,one) == FAIL) {
+            fprintf(stderr,"Cannot pick time: %8.3f s\n",time);
+            continue;
+        }
+        /*
+     * Fit
+     */
+        if (!DipoleFitData::fit_one(fit,guess,time,one,verbose,dip))
+            qWarning() << "Error";
+        else {
+            set.addEcd(dip);
+            if (verbose)
+                dip.print(stdout);
+            else {
+                if (set.size() % report_interval == 0)
+                    fprintf(stderr,"%d..",set.size());
+            }
+        }
+    }
+    if (!verbose)
+        fprintf(stderr,"[done]\n");
+    FREE_CMATRIX(data);
+    FREE(one);
+    p_set = set;
+    return OK;
+
+bad : {
+        FREE_CMATRIX(data);
+        FREE(one);
+        return FAIL;
+    }
+}
+
+
+//*************************************************************************************************************
+
+int DipoleFit::fit_dipoles_raw(const QString& dataname, mneRawData raw, mneChSelection sel, DipoleFitData* fit, GuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose)
+{
+    ECDSet set;
+    return fit_dipoles_raw(dataname, raw, sel, fit, guess, tmin, tmax, tstep, integ, verbose, set);
+}

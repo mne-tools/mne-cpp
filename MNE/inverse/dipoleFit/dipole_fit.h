@@ -45,7 +45,8 @@
 #include "ecd_set.h"
 #include "dipole_fit_settings.h"
 
-//#include "mne_types.h"
+#include "dipole_fit_data.h"
+#include "mne_types.h"
 
 
 //*************************************************************************************************************
@@ -99,33 +100,73 @@ public:
 //    virtual const char* getName() const;
 
 public:
-//    //=========================================================================================================
-//    /**
-//    * fit_dipoles.c
-//    *
-//    * Fit a single dipole to each time point of the data
-//    *
-//    *
-//    * @param[in] dataname
-//    * @param[in] data       The measured data
-//    * @param[in] fit        Precomputed fitting data
-//    * @param[in] guess      The initial guesses
-//    * @param[in] tmin       Time range
-//    * @param[in] tmax
-//    * @param[in] tstep      Time step to use
-//    * @param[in] integ      Integration time
-//    * @param[in] verbose    Verbose output?
-//    * @param[out] p_set     the fitted ECD Set
-//    *
-//    * @return true when successful
-//    */
-//    static int fit_dipoles(const QString&  dataname, mneMeasData data, DipoleFitData* fit, GuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose, ECDSet& p_set);
+
+    //=========================================================================================================
+    /**
+    *
+    * Fit a single dipole to each time point of the data
+    * Refactored: fit_dipoles (fit_dipoles.c)
+    *
+    * @param[in] dataname
+    * @param[in] data       The measured data
+    * @param[in] fit        Precomputed fitting data
+    * @param[in] guess      The initial guesses
+    * @param[in] tmin       Time range
+    * @param[in] tmax
+    * @param[in] tstep      Time step to use
+    * @param[in] integ      Integration time
+    * @param[in] verbose    Verbose output?
+    * @param[out] p_set     the fitted ECD Set
+    *
+    * @return true when successful
+    */
+    static int fit_dipoles( const QString& dataname, mneMeasData data, DipoleFitData* fit, GuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose, ECDSet& p_set);
+
+    //=========================================================================================================
+    /**
+    *
+    * Fit a single dipole to each time point of the data
+    * Refactored: fit_dipoles_raw (fit_dipoles.c)
+    *
+    * @param[in] dataname
+    * @param[in] raw        The raw data description
+    * @param[in] sel        Channel selection to use
+    * @param[in] fit        Precomputed fitting data
+    * @param[in] guess      The initial guesses
+    * @param[in] tmin       Time range
+    * @param[in] tmax
+    * @param[in] tstep      Time step to use
+    * @param[in] integ      Integration time
+    * @param[in] verbose    Verbose output?
+    * @param[out] p_set     Return all results here. Warning: for large data files this may take a lot of memory
+    *
+    * @return true when successful
+    */
+    static int fit_dipoles_raw(const QString& dataname, mneRawData raw, mneChSelection sel, DipoleFitData* fit, GuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose, ECDSet& p_set);
+
+    //=========================================================================================================
+    /**
+    *
+    * Fit a single dipole to each time point of the data
+    * Refactored: fit_dipoles_raw (fit_dipoles.c)
+    *
+    * @param[in] dataname
+    * @param[in] raw        The raw data description
+    * @param[in] sel        Channel selection to use
+    * @param[in] fit        Precomputed fitting data
+    * @param[in] guess      The initial guesses
+    * @param[in] tmin       Time range
+    * @param[in] tmax
+    * @param[in] tstep      Time step to use
+    * @param[in] integ      Integration time
+    * @param[in] verbose    Verbose output?
+    *
+    * @return true when successful
+    */
+    static int fit_dipoles_raw(const QString& dataname, mneRawData raw, mneChSelection sel, DipoleFitData* fit, GuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose);
 
 private:
     DipoleFitSettings* settings;
-
-
-
 
 };
 
