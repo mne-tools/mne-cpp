@@ -210,7 +210,7 @@ public:
     * @param[in] matVertPosLeftHemi                 The surface vertices in 3D space for the left hemisphere.
     * @param[in] matVertPosRightHemi                The surface vertices in 3D space for the right hemisphere.
     */
-    void setNeighborInfo(const QMap<int, QVector<int> >& mapVertexNeighborsLeftHemi,
+    void setSmootingInfo(const QMap<int, QVector<int> >& mapVertexNeighborsLeftHemi,
                          const QMap<int, QVector<int> >& mapVertexNeighborsRightHemi,
                          const MatrixX3f& matVertPosLeftHemi,
                          const MatrixX3f& matVertPosRightHemi);
