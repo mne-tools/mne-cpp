@@ -110,6 +110,7 @@
  *
  */
 #include <fiff/fiff_types.h>
+#include "mne_sss_data.h"
 
 #if defined(__cplusplus) 
 extern "C" {
@@ -351,7 +352,7 @@ typedef struct {		/* Covariance matrix storage */
   float      **eigen;		/* Eigenvectors of cov */
   double     *chol;		/* Cholesky decomposition */
   mneProjOp  proj;		/* The projection which was active when this matrix was computed */
-  mneSssData sss;		/* The SSS data present in the associated raw data file */
+  INVERSELIB::MneSssData* sss;		/* The SSS data present in the associated raw data file */
   int        *ch_class;		/* This will allow grouping of channels for regularization (MEG [T/m], MEG [T], EEG [V] */
   char       **bads;		/* Which channels were designated bad when this noise covariance matrix was computed? */
   int        nbad;		/* How many of them */
@@ -636,13 +637,13 @@ typedef struct {			/* A comprehensive raw data structure */
   mneRawBufDef     filt_bufs;	        /* These are the filtered ones */
   int              nfilt_buf;
   int              first_samp;          /* First sample? */
-  int              omit_samp;		/* How many samples of skip omitted in the beginning */
+  int              omit_samp;           /* How many samples of skip omitted in the beginning */
   int              first_samp_old;      /* This is the value first_samp would have in the old versions */
   int              omit_samp_old;       /* This is the value omit_samp would have in the old versions */
-  int              nsamp;	        /* How many samples in total? */
-  float            *first_sample_val;	/* Values at the first sample (for dc offset correction before filtering) */
-  mneProjOp        proj;		/* Projection operator */
-  mneSssData       sss;			/* SSS data found in this file */
+  int              nsamp;               /* How many samples in total? */
+  float            *first_sample_val;   /* Values at the first sample (for dc offset correction before filtering) */
+  mneProjOp        proj;                /* Projection operator */
+  INVERSELIB::MneSssData* sss;        /* SSS data found in this file */
   mneCTFcompDataSet comp;		/* Compensation data */
   int              comp_file;           /* Compensation status of these raw data in file */
   int              comp_now;            /* Compensation status of these raw data in file */
