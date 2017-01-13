@@ -495,7 +495,7 @@ private:
     *
     * @return True if succeeded, false otherwise
     */
-    static bool read_one(FiffStream* p_pStream, const FiffDirTree& p_Node, MNEForwardSolution& one);
+    static bool read_one(FiffStream* p_pStream, const FiffDirNode& p_Node, MNEForwardSolution& one);
 
 public:
     FiffInfoBase info;                  /**< light weighted measurement info */
