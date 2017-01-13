@@ -247,100 +247,141 @@ void RtSourceLocDataWorker::setLoop(bool looping)
 
 //*************************************************************************************************************
 
-void RtSourceLocDataWorker::setNeighborInfo(const QMap<int, QVector<int> >& mapVertexNeighborsLeftHemi,
+struct SmoothOperatorInfo {
+    VectorXi                vecVertNo;
+    SparseMatrix<double>    sparseSmoothMatrix;
+    MatrixX3f               matVertPos;
+    int                     iDistPow;
+    double                  dThresholdDistance;
+};
+
+struct VertexInfo {
+    int                                 iVertIdx;
+    QList<Eigen::Triplet<double> >      lTriplets;
+    QList<QVector3D>                    lSourcePos;
+    QVector3D                           vVertPos;
+    int                                 iDistPow;
+    double                              dThresholdDistance;
+};
+
+void generateWeightsPerVertex(VertexInfo& input)
+{
+    QVector3D from = input.vVertPos;
+    QVector3D to;
+
+    double dist, valueWeight;
+    double dWeightsSum = 0;
+
+    for(int j = 0; j < input.lSourcePos.size(); ++j) {
+        to = input.lSourcePos.at(j);
+
+        if(to == from) {
+            dist = 0.0000000000000000000000000000000001;
+        } else {
+            dist = from.distanceToPoint(to);
+        }
+
+        if(dist <= input.dThresholdDistance) {
+            valueWeight = abs(1/pow(dist,input.iDistPow));
+
+            input.lTriplets.append(Eigen::Triplet<double>(input.iVertIdx, j, valueWeight));
+            dWeightsSum += valueWeight;
+        }
+    }
+
+    //Divide by the sum of all weights
+    for(int j = 0; j < input.lTriplets.size(); ++j) {
+        input.lTriplets[j] = Eigen::Triplet<double>(input.lTriplets.at(j).row(), input.lTriplets.at(j).col(), input.lTriplets.at(j).value()/dWeightsSum);
+    }
+}
+
+void generateSmoothOperator(SmoothOperatorInfo& input)
+{
+    //Prepare data
+    QList<VertexInfo> lInputData;
+    VertexInfo vertInfo;
+    QList<QVector3D> lSourcePos;
+    QVector3D vertPos;
+
+    //Create list with all source positions
+    for(int j = 0; j < input.vecVertNo.rows(); ++j) {
+        vertPos.setX(input.matVertPos(input.vecVertNo(j),0));
+        vertPos.setY(input.matVertPos(input.vecVertNo(j),1));
+        vertPos.setZ(input.matVertPos(input.vecVertNo(j),2));
+
+        lSourcePos.append(vertPos);
+    }
+
+    for(int j = 0; j < input.matVertPos.rows(); ++j) {
+        vertPos.setX(input.matVertPos(j,0));
+        vertPos.setY(input.matVertPos(j,1));
+        vertPos.setZ(input.matVertPos(j,2));
+
+        vertInfo.vVertPos = vertPos;
+        vertInfo.dThresholdDistance = input.dThresholdDistance;
+        vertInfo.lSourcePos = lSourcePos;
+        vertInfo.iDistPow = input.iDistPow;
+        vertInfo.iVertIdx = j;
+
+        lInputData << vertInfo;
+    }
+
+    //Do the vertex dist weight calculation for each vertex in a different thread
+    QFuture<void> future = QtConcurrent::map(lInputData, generateWeightsPerVertex);
+    future.waitForFinished();
+
+    QList<Eigen::Triplet<double> > lFinalTriplets;
+    for(int j = 0; j < lInputData.size(); ++j) {
+        lFinalTriplets.append(lInputData.at(j).lTriplets);
+    }
+
+    input.sparseSmoothMatrix.setFromTriplets(lFinalTriplets.begin(), lFinalTriplets.end());
+}
+
+
+//*************************************************************************************************************
+
+void RtSourceLocDataWorker::setSmootingInfo(const QMap<int, QVector<int> >& mapVertexNeighborsLeftHemi,
                                             const QMap<int, QVector<int> >& mapVertexNeighborsRightHemi,
                                             const MatrixX3f& matVertPosLeftHemi,
                                             const MatrixX3f& matVertPosRightHemi)
 {
     QMutexLocker locker(&m_qMutex);
 
+    QTime timer;
+    timer.start();
+
     m_mapVertexNeighborsLeftHemi = mapVertexNeighborsLeftHemi;
     m_mapVertexNeighborsRightHemi = mapVertexNeighborsRightHemi;
 
     //Create smooth operator in multi thread
+    QList<SmoothOperatorInfo> inputData;
 
-
-    //Create distance weighted smoothing operator for left hemi
-    QVector3D from, to;
-    double dWeightsSum, dist, valueWeight, max;
-    double threshold = 0.5;
-    int distPow = 5;
-    VectorXd vWeights(m_vecVertNoLeftHemi.rows());
+    SmoothOperatorInfo leftHemi;
     m_sparseSmoothMatrixLeftHemi.resize(matVertPosLeftHemi.rows(), m_vecVertNoLeftHemi.rows());
+    leftHemi.sparseSmoothMatrix = m_sparseSmoothMatrixLeftHemi;
+    leftHemi.vecVertNo = m_vecVertNoLeftHemi;
+    leftHemi.matVertPos = matVertPosLeftHemi;
+    leftHemi.iDistPow = 3;
+    leftHemi.dThresholdDistance = 0.03;
+    inputData.append(leftHemi);
 
-    for(int i = 0; i < matVertPosLeftHemi.rows(); ++i) {
-        from.setX(matVertPosLeftHemi(i,0));
-        from.setY(matVertPosLeftHemi(i,1));
-        from.setZ(matVertPosLeftHemi(i,2));
-        dWeightsSum = 0;
-        max = 0;
-
-        for(int j = 0; j < m_vecVertNoLeftHemi.rows(); ++j) {
-            to.setX(matVertPosLeftHemi(m_vecVertNoLeftHemi(j),0));
-            to.setY(matVertPosLeftHemi(m_vecVertNoLeftHemi(j),1));
-            to.setZ(matVertPosLeftHemi(m_vecVertNoLeftHemi(j),2));
-
-            dist = from.distanceToPoint(to);
-            if(m_vecVertNoLeftHemi(j) == i) {
-                dist = 0.000000000001;
-            }
-
-            valueWeight = abs(1/pow(dist,distPow));
-
-            if(valueWeight > max) {
-                max = valueWeight;
-            }
-
-            dWeightsSum += valueWeight;
-            vWeights(j) = valueWeight;
-        }
-
-        for(int j = 0; j < m_vecVertNoLeftHemi.rows(); ++j) {
-            if(vWeights(j) > max*threshold) {
-                m_sparseSmoothMatrixLeftHemi.insert(i,j) = vWeights(j)/dWeightsSum;
-            }
-        }
-    }
-
-    //Create distance weighted smoothing operator for right hemi
-    vWeights.resize(m_vecVertNoRightHemi.rows());
+    SmoothOperatorInfo rightHemi;
     m_sparseSmoothMatrixRightHemi.resize(matVertPosRightHemi.rows(), m_vecVertNoRightHemi.rows());
+    rightHemi.sparseSmoothMatrix = m_sparseSmoothMatrixRightHemi;
+    rightHemi.vecVertNo = m_vecVertNoRightHemi;
+    rightHemi.matVertPos = matVertPosRightHemi;
+    rightHemi.iDistPow = 3;
+    rightHemi.dThresholdDistance = 0.03;
+    inputData.append(rightHemi);
 
-    for(int i = 0; i < matVertPosRightHemi.rows(); ++i) {
-        from.setX(matVertPosRightHemi(i,0));
-        from.setY(matVertPosRightHemi(i,1));
-        from.setZ(matVertPosRightHemi(i,2));
-        dWeightsSum = 0;
-        max = 0;
+    QFuture<void> future = QtConcurrent::map(inputData, generateSmoothOperator);
+    future.waitForFinished();
 
-        for(int j = 0; j < m_vecVertNoRightHemi.rows(); ++j) {
-            to.setX(matVertPosRightHemi(m_vecVertNoRightHemi(j),0));
-            to.setY(matVertPosRightHemi(m_vecVertNoRightHemi(j),1));
-            to.setZ(matVertPosRightHemi(m_vecVertNoRightHemi(j),2));
+    m_sparseSmoothMatrixLeftHemi = inputData.at(0).sparseSmoothMatrix;
+    m_sparseSmoothMatrixRightHemi = inputData.at(1).sparseSmoothMatrix;
 
-            dist = from.distanceToPoint(to);
-            //qDebug() << dist;
-
-            if(m_vecVertNoRightHemi(j) == i) {
-                dist = 0.000000000001;
-            }
-
-            valueWeight = abs(1/pow(dist,distPow));
-
-            if(valueWeight > max) {
-                max = valueWeight;
-            }
-
-            dWeightsSum += valueWeight;
-            vWeights(j) = valueWeight;
-        }
-
-        for(int j = 0; j < m_vecVertNoRightHemi.rows(); ++j) {
-            if(vWeights(j) > max*threshold) {
-                m_sparseSmoothMatrixRightHemi.insert(i,j) = vWeights(j)/dWeightsSum;
-            }
-        }
-    }
+    qDebug() << "RtSourceLocDataWorker::setSmootingInfo - time:" << timer.elapsed();
 
     qDebug() << "non zero left " << m_sparseSmoothMatrixLeftHemi.nonZeros();
     qDebug() << "non zero right " << m_sparseSmoothMatrixRightHemi.nonZeros();
@@ -871,7 +912,10 @@ QByteArray RtSourceLocDataWorker::generateSmoothedColors(const VectorXd& sourceC
 
 //    return finalColors;
 
-    //Option 3 - Weighted distance
+    //Option 3 - Inverse weighted distance
+    QTime allTimer;
+    allTimer.start();
+
     QTime multDataTimer;
     multDataTimer.start();
 
@@ -879,8 +923,8 @@ QByteArray RtSourceLocDataWorker::generateSmoothedColors(const VectorXd& sourceC
 
     qDebug() << "Mult time" << multDataTimer.elapsed();
 
-    //QTime prodDataTimer;
-    //prodDataTimer.start();
+    QTime prodDataTimer;
+    prodDataTimer.start();
 
     //Produce final color
     VectorXd vecActivation(1);
@@ -905,7 +949,8 @@ QByteArray RtSourceLocDataWorker::generateSmoothedColors(const VectorXd& sourceC
         idxVert += 3;
     }
 
-    //qDebug() << "Produce time" << prodDataTimer.elapsed();
+    qDebug() << "Produce time" << prodDataTimer.elapsed();
+    qDebug() << "All time" << allTimer.elapsed();
 
     return finalColors;
 }
