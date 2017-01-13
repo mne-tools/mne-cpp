@@ -47,7 +47,7 @@
 #include "fiff_global.h"
 #include "fiff_constants.h"
 #include "fiff_coord_trans.h"
-#include "fiff_dir_tree.h"
+#include "fiff_dir_node.h"
 #include "fiff_dir_entry.h"
 #include "fiff_named_matrix.h"
 #include "fiff_tag.h"
@@ -125,7 +125,7 @@ public:
     *
     * ### MNE toolbox root function ###
     *
-    * Wrapper for the static FiffDirTree::copy_tree function
+    * Wrapper for the static FiffDirNode::copy_tree function
     *
     * Copies directory subtrees from fidin to fidout
     *
@@ -136,9 +136,9 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    inline static bool copy_tree(FiffStream::SPtr p_pStreamIn, FiffId& in_id, QList<FiffDirTree>& p_Nodes, FiffStream::SPtr p_pStreamOut)
+    inline static bool copy_tree(FiffStream::SPtr p_pStreamIn, FiffId& in_id, QList<FiffDirNode>& p_Nodes, FiffStream::SPtr p_pStreamOut)
     {
-        return FiffDirTree::copy_tree(p_pStreamIn, in_id, p_Nodes, p_pStreamOut);
+        return FiffDirNode::copy_tree(p_pStreamIn, in_id, p_Nodes, p_pStreamOut);
     }
 
     //=========================================================================================================
@@ -199,7 +199,7 @@ public:
     *
     * ### MNE toolbox root function ###
     *
-    * Wrapper for the FiffDirTree dir_tree_find member function
+    * Wrapper for the FiffDirNode dir_tree_find member function
     *
     * Find nodes of the given kind from a directory tree structure
     *
@@ -208,7 +208,7 @@ public:
     *
     * @return the found nodes
     */
-    inline static QList<FiffDirTree> dir_tree_find(FiffDirTree& p_Node, fiff_int_t p_kind)
+    inline static QList<FiffDirNode> dir_tree_find(FiffDirNode& p_Node, fiff_int_t p_kind)
     {
         return p_Node.dir_tree_find(p_kind);
     }
@@ -247,9 +247,9 @@ public:
     *
     * @return index of the last read dir entry
     */
-    inline static qint32 make_dir_tree(FiffStream* p_pStream, QList<FiffDirEntry>& p_Dir, FiffDirTree& p_Tree, qint32 start = 0)
+    inline static qint32 make_dir_tree(FiffStream* p_pStream, QList<FiffDirEntry>& p_Dir, FiffDirNode& p_Tree, qint32 start = 0)
     {
-        return FiffDirTree::make_dir_tree(p_pStream, p_Dir, p_Tree, start);
+        return FiffDirNode::make_dir_tree(p_pStream, p_Dir, p_Tree, start);
     }
 
     //=========================================================================================================
@@ -269,7 +269,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    static bool open(QIODevice& p_IODevice, FiffStream::SPtr& p_pStream, FiffDirTree& p_Tree, QList<FiffDirEntry>& p_Dir)
+    static bool open(QIODevice& p_IODevice, FiffStream::SPtr& p_pStream, FiffDirNode& p_Tree, QList<FiffDirEntry>& p_Dir)
     {
         p_pStream = FiffStream::SPtr(new FiffStream(&p_IODevice));
 
@@ -395,7 +395,7 @@ public:
     *
     * @return the bad channel list
     */
-    static inline QStringList read_bad_channels(FiffStream* p_pStream, FiffDirTree& p_Node)
+    static inline QStringList read_bad_channels(FiffStream* p_pStream, FiffDirNode& p_Node)
     {
         return p_pStream->read_bad_channels(p_Node);
     }
@@ -416,7 +416,7 @@ public:
     *
     * @return the CTF software compensation data
     */
-    static inline QList<FiffCtfComp> read_ctf_comp(FiffStream* p_pStream, const FiffDirTree& p_Node, const QList<FiffChInfo>& p_Chs)
+    static inline QList<FiffCtfComp> read_ctf_comp(FiffStream* p_pStream, const FiffDirNode& p_Node, const QList<FiffChInfo>& p_Chs)
     {
         return p_pStream->read_ctf_comp(p_Node, p_Chs);
     }
@@ -480,7 +480,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    static inline bool read_meas_info(FiffStream* p_pStream, FiffDirTree& p_Node, FiffInfo& p_Info, FiffDirTree& p_NodeInfo)
+    static inline bool read_meas_info(FiffStream* p_pStream, FiffDirNode& p_Node, FiffInfo& p_Info, FiffDirNode& p_NodeInfo)
     {
         return p_pStream->read_meas_info(p_Node, p_Info, p_NodeInfo);
     }
@@ -502,7 +502,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    static inline bool read_named_matrix(FiffStream* p_pStream, const FiffDirTree& p_Node, fiff_int_t matkind, FiffNamedMatrix& mat)
+    static inline bool read_named_matrix(FiffStream* p_pStream, const FiffDirNode& p_Node, fiff_int_t matkind, FiffNamedMatrix& mat)
     {
         return p_pStream->read_named_matrix(p_Node, matkind, mat);
     }
@@ -522,7 +522,7 @@ public:
     *
     * @return a list of SSP projectors
     */
-    static inline QList<FiffProj> read_proj(FiffStream* p_pStream, const FiffDirTree& p_Node)
+    static inline QList<FiffProj> read_proj(FiffStream* p_pStream, const FiffDirNode& p_Node)
     {
         return p_pStream->read_proj(p_Node);
     }

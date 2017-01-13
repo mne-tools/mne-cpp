@@ -48,7 +48,7 @@
 //=============================================================================================================
 
 #include "fiff_dig_point.h"
-#include "fiff_dir_tree.h"
+#include "fiff_dir_node.h"
 #include "fiff_tag.h"
 #include "fiff_types.h"
 
@@ -106,7 +106,7 @@ FiffDigPointSet::FiffDigPointSet(QIODevice &p_IODevice)   //const FiffDigPointSe
     //   Open the file
     //
     FiffStream::SPtr t_pStream(new FiffStream(&p_IODevice));
-    FiffDirTree t_Tree;
+    FiffDirNode t_Tree;
 
     if(!FiffDigPointSet::readFromStream(t_pStream, t_Tree, *this))
     {
@@ -126,7 +126,7 @@ FiffDigPointSet::~FiffDigPointSet()
 
 //*************************************************************************************************************
 
-bool FiffDigPointSet::readFromStream(FiffStream::SPtr &p_pStream, FiffDirTree &p_Tree, FiffDigPointSet &p_Dig)
+bool FiffDigPointSet::readFromStream(FiffStream::SPtr &p_pStream, FiffDirNode &p_Tree, FiffDigPointSet &p_Dig)
 {
     //
     //   Open the file, create directory
@@ -160,7 +160,7 @@ bool FiffDigPointSet::readFromStream(FiffStream::SPtr &p_pStream, FiffDirTree &p
     //
     //   Locate the Electrodes
     //
-    QList<FiffDirTree> isotrak = p_Tree.dir_tree_find(FIFFB_ISOTRAK);
+    QList<FiffDirNode> isotrak = p_Tree.dir_tree_find(FIFFB_ISOTRAK);
 
     fiff_int_t coord_frame = FIFFV_COORD_HEAD;
     FiffCoordTrans dig_trans;

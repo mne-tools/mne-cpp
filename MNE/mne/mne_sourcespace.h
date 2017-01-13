@@ -51,7 +51,7 @@
 //=============================================================================================================
 
 #include <fiff/fiff_types.h>
-#include <fiff/fiff_dir_tree.h>
+#include <fiff/fiff_dir_node.h>
 #include <fiff/fiff.h>
 
 
@@ -219,7 +219,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    static bool readFromStream(FiffStream::SPtr& p_pStream, bool add_geom, FiffDirTree& p_Tree, MNESourceSpace& p_SourceSpace);
+    static bool readFromStream(FiffStream::SPtr& p_pStream, bool add_geom, FiffDirNode& p_Tree, MNESourceSpace& p_SourceSpace);
 
     //=========================================================================================================
     /**
@@ -322,7 +322,7 @@ private:
     *
     * @return true if succeeded, false otherwise
     */
-    static bool read_source_space(FiffStream* p_pStream, const FiffDirTree& p_Tree, MNEHemisphere& p_Hemisphere);
+    static bool read_source_space(FiffStream* p_pStream, const FiffDirNode& p_Tree, MNEHemisphere& p_Hemisphere);
 
 private:
     QList<MNEHemisphere> m_qListHemispheres;    /**< List of the hemispheres containing the source space information. */

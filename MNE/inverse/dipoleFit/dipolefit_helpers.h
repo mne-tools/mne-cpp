@@ -1449,7 +1449,7 @@ int fiff_read_this_tag_ext (fiffFile file,	/* Read from here */
 
 
 
-#include <fiff/fiff_dir_tree.h>
+#include <fiff/fiff_dir_node.h>
 
 
 //============================= fiff_dir_tree.c =============================
@@ -1659,7 +1659,7 @@ fiffTag fiff_dir_tree_get_tag(fiffFile file,fiffDirNode node,int kind)
                 return (tag);
         }
     qWarning("Desired tag (%s [%d]) not found",
-             FIFFLIB::FiffDirTree::get_tag_explanation(kind),kind);
+             FIFFLIB::FiffDirNode::get_tag_explanation(kind),kind);
     return (NULL);
 }
 

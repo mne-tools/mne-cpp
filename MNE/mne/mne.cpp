@@ -71,7 +71,7 @@ bool MNE::read_events(QIODevice &p_IODevice, MatrixXi& eventlist)
     // Open file
     //
     FiffStream::SPtr t_pFile(new FiffStream(&p_IODevice));
-    FiffDirTree t_Tree;
+    FiffDirNode t_Tree;
     QList<FiffDirEntry> t_Dir;
 
     if(!t_pFile->open(t_Tree, t_Dir))
@@ -87,7 +87,7 @@ bool MNE::read_events(QIODevice &p_IODevice, MatrixXi& eventlist)
     //
     //   Find the desired block
     //
-    QList<FiffDirTree> events = t_Tree.dir_tree_find(FIFFB_MNE_EVENTS);
+    QList<FiffDirNode> events = t_Tree.dir_tree_find(FIFFB_MNE_EVENTS);
 
     if (events.size() == 0)
     {

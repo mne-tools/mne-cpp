@@ -52,7 +52,7 @@
 //=============================================================================================================
 
 #include <fiff/fiff_types.h>
-#include <fiff/fiff_dir_tree.h>
+#include <fiff/fiff_dir_node.h>
 #include <fiff/fiff.h>
 
 
@@ -163,7 +163,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    static bool readFromStream(FiffStream::SPtr& p_pStream, bool add_geom, FiffDirTree& p_Tree, MNEBem &p_Bem);
+    static bool readFromStream(FiffStream::SPtr& p_pStream, bool add_geom, FiffDirNode& p_Tree, MNEBem &p_Bem);
 
     //=========================================================================================================
     /**
@@ -245,7 +245,7 @@ protected:
     *
     * @return true if succeeded, false otherwise
     */
-    static bool readBemSurface(FiffStream* p_pStream, const FiffDirTree& p_Tree, MNEBemSurface& p_BemSurface);
+    static bool readBemSurface(FiffStream* p_pStream, const FiffDirNode& p_Tree, MNEBemSurface& p_BemSurface);
 
 private:
     QList<MNEBemSurface> m_qListBemSurface;    /**< List of the BEM Surfaces. */

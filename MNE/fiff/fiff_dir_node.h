@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     fiff_dir_tree.h
+* @file     fiff_dir_node.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    FiffDirTree class declaration, which provides fiff dir tree processing methods.
+* @brief    FiffDirNode class declaration, which provides fiff dir tree processing methods.
 *
 */
 
@@ -74,19 +74,19 @@ class FiffTag;
 /**
 * Replaces _fiffDirNode struct fiffDirNodeRec,*fiffDirNode
 *
-* @brief Directory tree structure
+* @brief Directory Node structure
 */
-class FIFFSHARED_EXPORT FiffDirTree {
+class FIFFSHARED_EXPORT FiffDirNode {
 
 public:
-    typedef QSharedPointer<FiffDirTree> SPtr;               /**< Shared pointer type for FiffDirTree. */
-    typedef QSharedPointer<const FiffDirTree> ConstSPtr;    /**< Const shared pointer type for FiffDirTree. */
+    typedef QSharedPointer<FiffDirNode> SPtr;               /**< Shared pointer type for FiffDirNode. */
+    typedef QSharedPointer<const FiffDirNode> ConstSPtr;    /**< Const shared pointer type for FiffDirNode. */
 
     //=========================================================================================================
     /**
     * Constructors the directory tree structure.
     */
-    FiffDirTree();
+    FiffDirNode();
 
     //=========================================================================================================
     /**
@@ -94,13 +94,14 @@ public:
     *
     * @param[in] p_FiffDirTree  Directory tree structure which should be copied
     */
-    FiffDirTree(const FiffDirTree &p_FiffDirTree);
+    FiffDirNode(const FiffDirNode &p_FiffDirTree);
+
 
     //=========================================================================================================
     /**
     * Destroys the fiffDirTree.
     */
-    ~FiffDirTree();
+    ~FiffDirNode();
 
     //=========================================================================================================
     /**
@@ -121,7 +122,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    static bool copy_tree(QSharedPointer<FiffStream> p_pStreamIn, FiffId& in_id, QList<FiffDirTree>& p_Nodes, QSharedPointer<FiffStream> p_pStreamOut);
+    static bool copy_tree(QSharedPointer<FiffStream> p_pStreamIn, FiffId& in_id, QList<FiffDirNode>& p_Nodes, QSharedPointer<FiffStream> p_pStreamOut);
 
     //=========================================================================================================
     /**
@@ -147,7 +148,7 @@ public:
     *
     * @return index of the last read dir entry
     */
-    static qint32 make_dir_tree(FiffStream* p_pStream, QList<FiffDirEntry>& p_Dir, FiffDirTree& p_Tree, qint32 start = 0);
+    static qint32 make_dir_tree(FiffStream* p_pStream, QList<FiffDirEntry>& p_Dir, FiffDirNode& p_Tree, qint32 start = 0);
 
     //=========================================================================================================
     /**
@@ -160,7 +161,7 @@ public:
     *
     * @return list of the found nodes
     */
-    QList<FiffDirTree> dir_tree_find(fiff_int_t p_kind) const;
+    QList<FiffDirNode> dir_tree_find(fiff_int_t p_kind) const;
 
     //=========================================================================================================
     /**
@@ -168,7 +169,7 @@ public:
     * Implementation of the find_tag function in various files e.g. fiff_read_named_matrix.m,
     *
     * Founds a tag of a given kind within a tree, and reeds it from file.
-    * Note: In difference to mne-matlab this is not a static function. This is a method of the FiffDirTree
+    * Note: In difference to mne-matlab this is not a static function. This is a method of the FiffDirNode
     *       class, that's why a tree object doesn't need to be handed to the function.
     *
     * @param[in] p_pStream the opened fif file
@@ -185,17 +186,17 @@ public:
     *
     * @param[in] findkind kind to find
     *
-    * @return true when fiff_dir_tree contains kind
+    * @return true when fiff_dir_node contains kind
     */
     bool has_tag(fiff_int_t findkind);
 
     //=========================================================================================================
     /**
-    * Checks whether a DirTree has a specific kind
+    * Checks whether a FiffDirNode has a specific kind
     *
     * @param[in] findkind kind to find
     *
-    * @return true when fiff_dir_tree contains kind
+    * @return true when fiff_dir_node contains kind
     */
     bool has_kind(fiff_int_t p_kind) const;
 
@@ -205,8 +206,6 @@ public:
     * Refactored: print_tree (fiff_dir_tree.c)
     *
     * @param[in] indent     number of intendations
-    *
-    * @return true when fiff_dir_tree contains kind
     */
     void print(int indent) const;
 
@@ -244,7 +243,7 @@ public:
     QList<FiffDirEntry> dir;        /**< Directory of tags in this node */
     fiff_int_t          nent;       /**< Number of entries in this node */
     fiff_int_t          nent_tree;  /**< Number of entries in the directory tree node */
-    QList<FiffDirTree>  children;   /**< Child nodes */
+    QList<FiffDirNode>  children;   /**< Child nodes */
     fiff_int_t          nchild;     /**< Number of child nodes */
 
     // typedef struct _fiffDirNode {

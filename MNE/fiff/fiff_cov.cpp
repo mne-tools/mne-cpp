@@ -41,7 +41,7 @@
 #include "fiff_cov.h"
 #include "fiff_stream.h"
 #include "fiff_info_base.h"
-#include "fiff_dir_tree.h"
+#include "fiff_dir_node.h"
 
 #include <utils/mnemath.h>
 
@@ -96,7 +96,7 @@ FiffCov::FiffCov(QIODevice &p_IODevice)
 , nfree(-1)
 {
     FiffStream::SPtr t_pStream(new FiffStream(&p_IODevice));
-    FiffDirTree t_Tree;
+    FiffDirNode t_Tree;
     QList<FiffDirEntry> t_Dir;
 
     if(!t_pStream->open(t_Tree, t_Dir))

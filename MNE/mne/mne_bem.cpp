@@ -96,7 +96,7 @@ MNEBem::MNEBem(QIODevice &p_IODevice)   //const MNEBem &p_MNEBem
 //: m_qListBemSurface()
 {
     FiffStream::SPtr t_pStream(new FiffStream(&p_IODevice));
-    FiffDirTree t_Tree;
+    FiffDirNode t_Tree;
 
     if(!MNEBem::readFromStream(t_pStream, true, t_Tree, *this))
     {
@@ -127,7 +127,7 @@ void MNEBem::clear()
 
 //*************************************************************************************************************
 
-bool MNEBem::readFromStream(FiffStream::SPtr& p_pStream, bool add_geom, FiffDirTree& p_Tree, MNEBem& p_Bem)
+bool MNEBem::readFromStream(FiffStream::SPtr& p_pStream, bool add_geom, FiffDirNode& p_Tree, MNEBem& p_Bem)
 {
     //
     //   Open the file, create directory
@@ -156,7 +156,7 @@ bool MNEBem::readFromStream(FiffStream::SPtr& p_pStream, bool add_geom, FiffDirT
     //
 
 
-    QList<FiffDirTree>bem = p_Tree.dir_tree_find(FIFFB_BEM);
+    QList<FiffDirNode>bem = p_Tree.dir_tree_find(FIFFB_BEM);
     if(bem.isEmpty())
     {
         qCritical() << "No BEM block found!";
@@ -167,7 +167,7 @@ bool MNEBem::readFromStream(FiffStream::SPtr& p_pStream, bool add_geom, FiffDirT
         return false;
     }
 
-    QList<FiffDirTree>bemsurf = p_Tree.dir_tree_find(FIFFB_BEM_SURF);
+    QList<FiffDirNode>bemsurf = p_Tree.dir_tree_find(FIFFB_BEM_SURF);
     if(bemsurf.isEmpty())
     {
         qCritical() << "No BEM surfaces found!";
@@ -206,7 +206,7 @@ bool MNEBem::readFromStream(FiffStream::SPtr& p_pStream, bool add_geom, FiffDirT
 
 //*************************************************************************************************************
 
-bool MNEBem::readBemSurface(FiffStream *p_pStream, const FiffDirTree &p_Tree, MNEBemSurface &p_BemSurface)
+bool MNEBem::readBemSurface(FiffStream *p_pStream, const FiffDirNode &p_Tree, MNEBemSurface &p_BemSurface)
 {
     p_BemSurface.clear();
 

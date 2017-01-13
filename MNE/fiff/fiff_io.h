@@ -141,7 +141,7 @@ public:
     * @return true if succeeded, false otherwise
     */
 
-    static bool setup_read(QIODevice& p_IODevice, FiffInfo& info, FiffDirTree& Tree, FiffDirTree& dirTree);
+    static bool setup_read(QIODevice& p_IODevice, FiffInfo& info, FiffDirNode& Tree, FiffDirNode& dirTree);
 
     //=========================================================================================================
     /**
