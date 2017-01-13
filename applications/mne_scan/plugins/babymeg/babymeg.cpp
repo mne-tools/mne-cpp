@@ -54,7 +54,7 @@
 #include <rtProcessing/rthpis.h>
 #include <utils/detecttrigger.h>
 #include <fiff/fiff_types.h>
-#include <fiff/fiff_dir_tree.h>
+#include <fiff/fiff_dir_node.h>
 #include <fiff/fiff_dig_point_set.h>
 #include <rtClient/rtcmdclient.h>
 #include <scMeas/newrealtimemultisamplearray.h>
@@ -1014,7 +1014,7 @@ bool BabyMEG::readProjectors()
 
     printf("Opening header data %s...\n",t_sFileName.toUtf8().constData());
 
-    FiffDirTree t_Tree;
+    FiffDirNode t_Tree;
     QList<FiffDirEntry> t_Dir;
 
     if(!t_pStream->open(t_Tree, t_Dir))
@@ -1055,7 +1055,7 @@ bool BabyMEG::readCompensators()
 
     printf("Opening compensator data %s...\n",t_sFileName.toUtf8().constData());
 
-    FiffDirTree t_Tree;
+    FiffDirNode t_Tree;
     QList<FiffDirEntry> t_Dir;
 
     if(!t_pStream->open(t_Tree, t_Dir))

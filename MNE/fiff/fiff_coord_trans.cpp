@@ -42,7 +42,7 @@
 
 #include "fiff_stream.h"
 #include "fiff_tag.h"
-#include "fiff_dir_tree.h"
+#include "fiff_dir_node.h"
 
 
 //*************************************************************************************************************
@@ -148,7 +148,7 @@ bool FiffCoordTrans::invert_transform()
 bool FiffCoordTrans::read(QIODevice& p_IODevice, FiffCoordTrans& p_Trans)
 {
     FiffStream::SPtr t_pStream(new FiffStream(&p_IODevice));
-    FiffDirTree t_Tree;
+    FiffDirNode t_Tree;
     QList<FiffDirEntry> t_Dir;
 
     printf("Reading coordinate transform from %s...\n", t_pStream->streamName().toUtf8().constData());

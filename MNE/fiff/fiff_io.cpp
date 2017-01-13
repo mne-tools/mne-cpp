@@ -87,7 +87,7 @@ FiffIO::FiffIO(QList<QIODevice*>& p_qlistIODevices)
 
 //*************************************************************************************************************
 
-bool FiffIO::setup_read(QIODevice& p_IODevice, FiffInfo& info, FiffDirTree& Tree, FiffDirTree& dirTree)
+bool FiffIO::setup_read(QIODevice& p_IODevice, FiffInfo& info, FiffDirNode& Tree, FiffDirNode& dirTree)
 {
     //Open the file
     FiffStream::SPtr p_pStream(new FiffStream(&p_IODevice));
@@ -112,8 +112,8 @@ bool FiffIO::read(QIODevice& p_IODevice)
 {
     //Read dirTree from fiff data (raw,evoked,fwds,cov)
     FiffInfo t_fiffInfo;
-    FiffDirTree t_Tree;
-    FiffDirTree t_dirTree;
+    FiffDirNode t_Tree;
+    FiffDirNode t_dirTree;
     bool hasRaw=false,hasEvoked=false; // hasFwds=false;
 
     FiffIO::setup_read(p_IODevice,t_fiffInfo,t_Tree,t_dirTree);

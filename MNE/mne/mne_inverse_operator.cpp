@@ -1107,7 +1107,7 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
     //
     FiffStream::SPtr t_pStream(new FiffStream(&p_IODevice));
     printf("Reading inverse operator decomposition from %s...\n",t_pStream->streamName().toUtf8().constData());
-    FiffDirTree t_Tree;
+    FiffDirNode t_Tree;
     QList<FiffDirEntry> t_Dir;
 
     if(!t_pStream->open(t_Tree, t_Dir))
@@ -1115,17 +1115,17 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
     //
     //   Find all inverse operators
     //
-    QList <FiffDirTree> invs_list = t_Tree.dir_tree_find(FIFFB_MNE_INVERSE_SOLUTION);
+    QList <FiffDirNode> invs_list = t_Tree.dir_tree_find(FIFFB_MNE_INVERSE_SOLUTION);
     if ( invs_list.size()== 0)
     {
         printf("No inverse solutions in %s\n", t_pStream->streamName().toUtf8().constData());
         return false;
     }
-    FiffDirTree* invs = &invs_list[0];
+    FiffDirNode* invs = &invs_list[0];
     //
     //   Parent MRI data
     //
-    QList <FiffDirTree> parent_mri = t_Tree.dir_tree_find(FIFFB_MNE_PARENT_MRI_FILE);
+    QList <FiffDirNode> parent_mri = t_Tree.dir_tree_find(FIFFB_MNE_PARENT_MRI_FILE);
     if (parent_mri.size() == 0)
     {
         printf("No parent MRI information in %s", t_pStream->streamName().toUtf8().constData());

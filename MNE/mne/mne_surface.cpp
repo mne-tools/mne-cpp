@@ -73,7 +73,7 @@ MNESurface::MNESurface()
 bool MNESurface::read(QIODevice& p_IODevice, QList<MNESurface::SPtr>& surfaces)
 {
     FiffStream::SPtr fiffStream(new FiffStream(&p_IODevice));
-    FiffDirTree fiffDirTree;
+    FiffDirNode fiffDirTree;
     QList<FiffDirEntry>fiffDirEntries;
 
     if(!fiffStream->open(fiffDirTree, fiffDirEntries))
@@ -88,7 +88,7 @@ bool MNESurface::read(QIODevice& p_IODevice, QList<MNESurface::SPtr>& surfaces)
 //*************************************************************************************************************
 
 bool MNESurface::read(FiffStream::SPtr& p_pStream, bool add_geom,
-        FiffDirTree& p_Tree, QList<MNESurface::SPtr>& surfaces)
+        FiffDirNode& p_Tree, QList<MNESurface::SPtr>& surfaces)
 {
     if(add_geom)
     {
@@ -96,14 +96,14 @@ bool MNESurface::read(FiffStream::SPtr& p_pStream, bool add_geom,
         qWarning() << "add_geom flag is not yet implemented!";
     }
 
-    QList<FiffDirTree>bem = p_Tree.dir_tree_find(FIFFB_BEM);
+    QList<FiffDirNode>bem = p_Tree.dir_tree_find(FIFFB_BEM);
     if(bem.isEmpty())
     {
         qCritical() << "No BEM block found!";
         return false;
     }
 
-    QList<FiffDirTree>bemsurf = p_Tree.dir_tree_find(FIFFB_BEM_SURF);
+    QList<FiffDirNode>bemsurf = p_Tree.dir_tree_find(FIFFB_BEM_SURF);
     if(bemsurf.isEmpty())
     {
         qCritical() << "No BEM surfaces found!";
@@ -121,7 +121,7 @@ bool MNESurface::read(FiffStream::SPtr& p_pStream, bool add_geom,
         coord_frame = FIFFV_COORD_MRI;
     }
 
-    QList<FiffDirTree>::Iterator itBemsurf;
+    QList<FiffDirNode>::Iterator itBemsurf;
     for(itBemsurf = bemsurf.begin(); itBemsurf != bemsurf.end(); ++itBemsurf)
     {
         MNESurface::SPtr surf;
@@ -140,7 +140,7 @@ bool MNESurface::read(FiffStream::SPtr& p_pStream, bool add_geom,
 //*************************************************************************************************************
 
 bool MNESurface::read(FIFFLIB::FiffStream* fiffStream,
-        const FIFFLIB::FiffDirTree& dir, const fiff_int_t def_coord_frame,
+        const FIFFLIB::FiffDirNode& dir, const fiff_int_t def_coord_frame,
         MNESurface::SPtr& surf)
 {
     surf.reset(new MNESurface);

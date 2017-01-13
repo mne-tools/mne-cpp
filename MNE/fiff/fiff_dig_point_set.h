@@ -83,7 +83,7 @@ namespace FIFFLIB {
 //=============================================================================================================
 
 class FiffDigPoint;
-class FiffDirTree;
+class FiffDirNode;
 
 
 //=============================================================================================================
@@ -135,7 +135,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    static bool readFromStream(FiffStream::SPtr& p_pStream, FiffDirTree& p_Tree, FiffDigPointSet& p_Dig);
+    static bool readFromStream(FiffStream::SPtr& p_pStream, FiffDirNode& p_Tree, FiffDigPointSet& p_Dig);
 
     //=========================================================================================================
     /**

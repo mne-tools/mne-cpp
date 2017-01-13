@@ -346,7 +346,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    inline static bool read_cov(FiffStream* p_pStream, FiffDirTree& p_Node, fiff_int_t cov_kind, FiffCov& p_covData)
+    inline static bool read_cov(FiffStream* p_pStream, FiffDirNode& p_Node, fiff_int_t cov_kind, FiffCov& p_covData)
     {
         return p_pStream->read_cov(p_Node, cov_kind, p_covData);
     }
@@ -413,7 +413,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    static bool read_source_spaces(FiffStream::SPtr& p_pStream, bool add_geom, FiffDirTree& p_Tree, MNESourceSpace& p_SourceSpace)
+    static bool read_source_spaces(FiffStream::SPtr& p_pStream, bool add_geom, FiffDirNode& p_Tree, MNESourceSpace& p_SourceSpace)
     {
         return MNESourceSpace::readFromStream(p_pStream, add_geom, p_Tree, p_SourceSpace);
     }
@@ -436,7 +436,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    static bool read_bem_surface(FiffStream::SPtr& p_pStream, bool add_geom, FiffDirTree& p_Tree, QList<MNESurface::SPtr>& p_Surfaces)
+    static bool read_bem_surface(FiffStream::SPtr& p_pStream, bool add_geom, FiffDirNode& p_Tree, QList<MNESurface::SPtr>& p_Surfaces)
     {
         return MNESurface::read(p_pStream, add_geom, p_Tree, p_Surfaces);
     }

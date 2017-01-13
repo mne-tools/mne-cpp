@@ -44,7 +44,7 @@
 #include "FormFiles/neuromagsetupwidget.h"
 
 #include <utils/ioutils.h>
-#include <fiff/fiff_dir_tree.h>
+#include <fiff/fiff_dir_node.h>
 
 
 //*************************************************************************************************************
@@ -404,7 +404,7 @@ bool Neuromag::readHeader()
 
     printf("Opening header data %s...\n",t_sFileName.toUtf8().constData());
 
-    FiffDirTree t_Tree;
+    FiffDirNode t_Tree;
     QList<FiffDirEntry> t_Dir;
 
     if(!t_pStream->open(t_Tree, t_Dir))
