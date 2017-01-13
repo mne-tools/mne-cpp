@@ -407,15 +407,14 @@ public:
     *
     * @param [in] p_pStream         The open fiff file
     * @param [in] add_geom          Add geometry information to the source spaces
-    * @param [in] p_Tree            Search for the source spaces here
     *
     * @param [out] p_SourceSpace    The read source spaces
     *
     * @return true if succeeded, false otherwise
     */
-    static bool read_source_spaces(FiffStream::SPtr& p_pStream, bool add_geom, FiffDirNode& p_Tree, MNESourceSpace& p_SourceSpace)
+    static bool read_source_spaces(FiffStream::SPtr& p_pStream, bool add_geom, MNESourceSpace& p_SourceSpace)
     {
-        return MNESourceSpace::readFromStream(p_pStream, add_geom, p_Tree, p_SourceSpace);
+        return MNESourceSpace::readFromStream(p_pStream, add_geom, p_SourceSpace);
     }
 
     //=========================================================================================================

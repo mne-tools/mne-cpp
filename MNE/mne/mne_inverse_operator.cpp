@@ -1107,15 +1107,13 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
     //
     FiffStream::SPtr t_pStream(new FiffStream(&p_IODevice));
     printf("Reading inverse operator decomposition from %s...\n",t_pStream->streamName().toUtf8().constData());
-    FiffDirNode t_Tree;
-    QList<FiffDirEntry> t_Dir;
 
-    if(!t_pStream->open(t_Tree, t_Dir))
+    if(!t_pStream->open())
         return false;
     //
     //   Find all inverse operators
     //
-    QList <FiffDirNode> invs_list = t_Tree.dir_tree_find(FIFFB_MNE_INVERSE_SOLUTION);
+    QList <FiffDirNode> invs_list = t_pStream->tree().dir_tree_find(FIFFB_MNE_INVERSE_SOLUTION);
     if ( invs_list.size()== 0)
     {
         printf("No inverse solutions in %s\n", t_pStream->streamName().toUtf8().constData());
@@ -1125,7 +1123,7 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
     //
     //   Parent MRI data
     //
-    QList <FiffDirNode> parent_mri = t_Tree.dir_tree_find(FIFFB_MNE_PARENT_MRI_FILE);
+    QList <FiffDirNode> parent_mri = t_pStream->tree().dir_tree_find(FIFFB_MNE_PARENT_MRI_FILE);
     if (parent_mri.size() == 0)
     {
         printf("No parent MRI information in %s", t_pStream->streamName().toUtf8().constData());
@@ -1272,7 +1270,7 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
     //
     //   Read the source spaces
     //
-    if(!MNESourceSpace::readFromStream(t_pStream, false, t_Tree, inv.src))
+    if(!MNESourceSpace::readFromStream(t_pStream, false, inv.src))
     {
         printf("\tError: Could not read the source spaces.\n");
         return false;
@@ -1308,7 +1306,7 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
     //
     // get parent MEG info
     //
-    t_pStream->read_meas_info_base(t_Tree, inv.info);
+    t_pStream->read_meas_info_base(t_pStream->tree(), inv.info);
 
     //
     //   Transform the source spaces to the correct coordinate frame
@@ -1323,7 +1321,7 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
     //
     //  We also need the SSP operator
     //
-    inv.projs     = t_pStream->read_proj(t_Tree);
+    inv.projs     = t_pStream->read_proj(t_pStream->tree());
     //
     //  Some empty fields to be filled in later
     //

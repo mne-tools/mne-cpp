@@ -404,13 +404,10 @@ bool Neuromag::readHeader()
 
     printf("Opening header data %s...\n",t_sFileName.toUtf8().constData());
 
-    FiffDirNode t_Tree;
-    QList<FiffDirEntry> t_Dir;
-
-    if(!t_pStream->open(t_Tree, t_Dir))
+    if(!t_pStream->open())
         return false;
 
-    QList<FiffProj> q_ListProj = t_pStream->read_proj(t_Tree);
+    QList<FiffProj> q_ListProj = t_pStream->read_proj(t_pStream->tree());
 
     if (q_ListProj.size() == 0)
     {

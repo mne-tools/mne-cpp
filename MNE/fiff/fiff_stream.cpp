@@ -115,6 +115,22 @@ FiffStream::FiffStream(QByteArray * a, QIODevice::OpenMode mode)
 
 //*************************************************************************************************************
 
+const QList<FiffDirEntry>& FiffStream::dir() const
+{
+    return m_dir;
+}
+
+
+//*************************************************************************************************************
+
+const FiffDirNode& FiffStream::tree() const
+{
+    return m_tree;
+}
+
+
+//*************************************************************************************************************
+
 void FiffStream::end_block(fiff_int_t kind)
 {
     this->write_int(FIFF_BLOCK_END,&kind);
@@ -205,7 +221,7 @@ bool FiffStream::get_evoked_entries(const QList<FiffDirNode> &evoked_node, QStri
 
 //*************************************************************************************************************
 
-bool FiffStream::open(FiffDirNode& p_Tree, QList<FiffDirEntry>& p_Dir)
+bool FiffStream::open()
 {
     QString t_sFileName = this->streamName();
 
@@ -248,12 +264,12 @@ bool FiffStream::open(FiffDirNode& p_Tree, QList<FiffDirEntry>& p_Dir)
     //
     printf("\nCreating tag directory for %s...", t_sFileName.toUtf8().constData());
 
-    p_Dir.clear();
+    m_dir.clear();
     qint32 dirpos = *t_pTag->toInt();
     if (dirpos > 0)
     {
         FiffTag::read_tag(this, t_pTag, dirpos);
-        p_Dir = t_pTag->toDirEntry();
+        m_dir = t_pTag->toDirEntry();
     }
     else
     {
@@ -268,14 +284,14 @@ bool FiffStream::open(FiffDirNode& p_Tree, QList<FiffDirEntry>& p_Dir)
             t_fiffDirEntry.kind = t_pTag->kind;
             t_fiffDirEntry.type = t_pTag->type;
             t_fiffDirEntry.size = t_pTag->size();
-            p_Dir.append(t_fiffDirEntry);
+            m_dir.append(t_fiffDirEntry);
         }
     }
     //
     //   Create the directory tree structure
     //
 
-    FiffDirNode::make_dir_tree(this, p_Dir, p_Tree);
+    FiffDirNode::make_dir_tree(this, m_dir, m_tree);
 
     printf("[done]\n");
 
@@ -1324,15 +1340,12 @@ bool FiffStream::setup_read_raw(QIODevice &p_IODevice, FiffRawData& data, bool a
     //
     //   Open the file
     //
-    FiffStream::SPtr p_pStream(new FiffStream(&p_IODevice));
-    QString t_sFileName = p_pStream->streamName();
+    FiffStream::SPtr t_pStream(new FiffStream(&p_IODevice));
+    QString t_sFileName = t_pStream->streamName();
 
     printf("Opening raw data %s...\n",t_sFileName.toUtf8().constData());
 
-    FiffDirNode t_Tree;
-    QList<FiffDirEntry> t_Dir;
-
-    if(!p_pStream->open(t_Tree, t_Dir))
+    if(!t_pStream->open())
         return false;
 
     //
@@ -1340,7 +1353,7 @@ bool FiffStream::setup_read_raw(QIODevice &p_IODevice, FiffRawData& data, bool a
     //
     FiffInfo info;// = NULL;
     FiffDirNode meas;
-    if(!p_pStream->read_meas_info(t_Tree, info, meas))
+    if(!t_pStream->read_meas_info(t_pStream->tree(), info, meas))
         return false;
 
     //
@@ -1377,7 +1390,7 @@ bool FiffStream::setup_read_raw(QIODevice &p_IODevice, FiffRawData& data, bool a
     info.filename   = t_sFileName;
 
     data.clear();
-    data.file = p_pStream;// fid;
+    data.file = t_pStream;// fid;
     data.info = info;
     data.first_samp = 0;
     data.last_samp  = 0;
@@ -1397,7 +1410,7 @@ bool FiffStream::setup_read_raw(QIODevice &p_IODevice, FiffRawData& data, bool a
     FiffTag::SPtr t_pTag;
     if (dir[first].kind == FIFF_FIRST_SAMPLE)
     {
-        FiffTag::read_tag(p_pStream.data(), t_pTag, dir[first].pos);
+        FiffTag::read_tag(t_pStream.data(), t_pTag, dir[first].pos);
         first_samp = *t_pTag->toInt();
         ++first;
     }
@@ -1410,7 +1423,7 @@ bool FiffStream::setup_read_raw(QIODevice &p_IODevice, FiffRawData& data, bool a
         //
         //  This first skip can be applied only after we know the buffer size
         //
-        FiffTag::read_tag(p_pStream.data(), t_pTag, dir[first].pos);
+        FiffTag::read_tag(t_pStream.data(), t_pTag, dir[first].pos);
         first_skip = *t_pTag->toInt();
         ++first;
     }
@@ -1428,7 +1441,7 @@ bool FiffStream::setup_read_raw(QIODevice &p_IODevice, FiffRawData& data, bool a
         FiffDirEntry ent = dir.at(k);
         if (ent.kind == FIFF_DATA_SKIP)
         {
-            FiffTag::read_tag(p_pStream.data(), t_pTag, ent.pos);
+            FiffTag::read_tag(t_pStream.data(), t_pTag, ent.pos);
             nskip = *t_pTag->toInt();
         }
         else if(ent.kind == FIFF_DATA_BUFFER)
@@ -1609,14 +1622,12 @@ FiffStream::SPtr FiffStream::start_writing_raw(QIODevice &p_IODevice, const Fiff
         QFile t_qFile(info.filename);//ToDo this has to be adapted for TCPSocket
         FiffStream::SPtr t_pStream2(new FiffStream(&t_qFile));
 
-        FiffDirNode t_Tree;
-        QList<FiffDirEntry> t_Dir;
-        t_pStream2->open(t_Tree, t_Dir);
+        t_pStream2->open();
 
         for(qint32 k = 0; k < blocks.size(); ++k)
         {
-            QList<FiffDirNode> nodes = t_Tree.dir_tree_find(blocks[k]);
-            FiffDirNode::copy_tree(t_pStream2,t_Tree.id,nodes,t_pStream);
+            QList<FiffDirNode> nodes = t_pStream2->tree().dir_tree_find(blocks[k]);
+            FiffDirNode::copy_tree(t_pStream2,t_pStream2->tree().id,nodes,t_pStream);
             if(blocks[k] == FIFFB_HPI_RESULT && nodes.size() > 0)
                 have_hpi_result = true;
 

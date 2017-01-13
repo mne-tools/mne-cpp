@@ -112,7 +112,7 @@ void FiffDirNode::clear()
 
 //*************************************************************************************************************
 
-bool FiffDirNode::copy_tree(FiffStream::SPtr p_pStreamIn, FiffId& in_id, QList<FiffDirNode>& p_Nodes, FiffStream::SPtr p_pStreamOut)
+bool FiffDirNode::copy_tree(FiffStream::SPtr p_pStreamIn, const FiffId& in_id, const QList<FiffDirNode>& p_Nodes, FiffStream::SPtr p_pStreamOut)
 {
     if(p_Nodes.size() <= 0)
         return false;

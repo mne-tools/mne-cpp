@@ -45,6 +45,10 @@
 #include "fiff_types.h"
 #include "fiff_id.h"
 
+#include "fiff_dir_node.h"
+#include "fiff_dir_entry.h"
+
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -89,8 +93,6 @@ class FiffRawData;
 class FiffInfo;
 class FiffInfoBase;
 class FiffCov;
-class FiffDirNode;
-class FiffDirEntry;
 class FiffProj;
 class FiffNamedMatrix;
 class FiffDigPoint;
@@ -111,6 +113,7 @@ using namespace Eigen;
 //=============================================================================================================
 /**
 * FiffStream provides an interface for reading from and writing to fiff files
+* Comparable to: fiffFile (struct *fiffFile,fiffFileRec)
 *
 * @brief FIFF File I/O routines.
 **/
@@ -137,6 +140,22 @@ public:
     * @param[in] mode   The open mode
     */
     explicit FiffStream(QByteArray * a, QIODevice::OpenMode mode);
+
+    //=========================================================================================================
+    /**
+    * Returns the directory compiled into a tree
+    *
+    * @return the directory
+    */
+    const QList<FiffDirEntry>& dir() const;
+
+    //=========================================================================================================
+    /**
+    * Returns the directory compiled into a tree
+    *
+    * @return the compiled directory
+    */
+    const FiffDirNode& tree() const;
 
     //=========================================================================================================
     /**
@@ -192,15 +211,13 @@ public:
     * fiff_open
     *
     * ### MNE toolbox root function ###
+    * Refactored: open_file (fiff_open.c)
     *
     * Opens a fif file and provides the directory of tags
     *
-    * @param[out] p_Tree    tag directory organized into a tree
-    * @param[out] p_Dir     the sequential tag directory
-    *
     * @return true if succeeded, false otherwise
     */
-    bool open(FiffDirNode& p_Tree, QList<FiffDirEntry>& p_Dir);
+    bool open();
 
     //=========================================================================================================
     /**
@@ -675,6 +692,25 @@ public:
     * @param[in] data       The string data to write
     */
     void write_rt_command(fiff_int_t command, const QString& data);
+
+private:
+    QList<FiffDirEntry> m_dir; /**< This is the directory. If no directory exists, open automatically scans the file to create one. */
+    FiffDirNode m_tree;        /**< Directory compiled into a tree */
+
+//    /** FIFF file handle returned by fiff_open(). */
+//    typedef struct _fiffFileRec {
+//      char         *file_name;	/**< Name of the file */
+//      FILE         *fd;		/**< The normal file descriptor */
+//      fiffId       id;		/**< The file identifier */
+//      fiffDirEntry dir;		/**< This is the directory.
+//                     * If no directory exists, fiff_open
+//                     * automatically scans the file to create one. */
+//      int         nent;	        /**< How many entries? */
+//      fiffDirNode dirtree;		/**< Directory compiled into a tree */
+//      char        *ext_file_name;	/**< Name of the file holding the external data */
+//      FILE        *ext_fd;		/**< The file descriptor of the above file if open  */
+//    } *fiffFile,fiffFileRec;	/**< FIFF file handle. fiff_open() returns this. */
+
 };
 
 } // NAMESPACE
