@@ -1,5 +1,3 @@
-
-
 #ifndef DIPOLEFITHELPERS_H
 #define DIPOLEFITHELPERS_H
 
@@ -9,8 +7,8 @@
 // INCLUDES
 //=============================================================================================================
 
-
 #include "ecd_set.h"
+#include "mne_sss_data.h"
 #include <iostream>
 #include <vector>
 #include <Eigen/Core>
@@ -84,9 +82,6 @@ using namespace FIFFLIB;
 #ifndef OK
 #define OK 0
 #endif
-
-
-
 
 
 /* NOTE:
@@ -1454,7 +1449,7 @@ int fiff_read_this_tag_ext (fiffFile file,	/* Read from here */
 
 
 
-#include <fiff/fiff_dir_tree.h>
+#include <fiff/fiff_dir_node.h>
 
 
 //============================= fiff_dir_tree.c =============================
@@ -1664,7 +1659,7 @@ fiffTag fiff_dir_tree_get_tag(fiffFile file,fiffDirNode node,int kind)
                 return (tag);
         }
     qWarning("Desired tag (%s [%d]) not found",
-             FIFFLIB::FiffDirTree::get_tag_explanation(kind),kind);
+             FIFFLIB::FiffDirNode::get_tag_explanation(kind),kind);
     return (NULL);
 }
 
@@ -7652,100 +7647,13 @@ int mne_read_bad_channel_list(const QString& name, char ***listp, int *nlistp)
 //============================= mne_sss_data.c =============================
 
 
-static mneSssData mne_new_sss_data()
 
-{
-    mneSssData s   = MALLOC(1,mneSssDataRec);
-    s->job         = FIFFV_SSS_JOB_NOTHING;
-    s->coord_frame = FIFFV_COORD_UNKNOWN;
-    s->nchan       = 0;
-    s->in_order    = 0;
-    s->out_order   = 0;
-    s->in_nuse     = 0;
-    s->out_nuse    = 0;
-    s->comp_info   = NULL;
-    s->ncomp       = 0;
-    return s;
-}
-
-
-void mne_free_sss_data(mneSssData s)
-
-{
-    if (!s)
-        return;
-    FREE(s->comp_info);
-    FREE(s);
-    return;
-}
-
-
-void mne_print_sss_data(FILE *f, mneSssData s)
-/*
- * Output the SSS information for debugging purposes
- */
-{
-    int j,p,q,n;
-
-    if (!s)
-        return;
-    fprintf(f,"job         : %d\n",s->job);
-    fprintf(f,"coord frame : %s\n",mne_coord_frame_name(s->coord_frame));
-    fprintf(f,"origin      : %6.1f %6.1f %6.1f mm\n",1000*s->origin[0],1000*s->origin[1],1000*s->origin[2]);
-    fprintf(f,"in order    : %d\n",s->in_order);
-    fprintf(f,"out order   : %d\n",s->out_order);
-    fprintf(f,"nchan       : %d\n",s->nchan);
-    fprintf(f,"ncomp       : %d\n",s->ncomp);
-    fprintf(f,"in nuse     : %d\n",s->in_nuse);
-    fprintf(f,"out nuse    : %d\n",s->out_nuse);
-    fprintf(f,"comps       : ");
-    /*
-   * This produces the same output as maxfilter
-   */
-    for (j = 0, n = 3, p = 0; j < s->in_order; j++, n = n + 2) {
-        if (j > 0)
-            fprintf(f,";");
-        for (q = 0; q < n; q++, p++)
-            fprintf(f,"%1d",s->comp_info[p]);
-    }
-    fprintf(f,"//");
-    for (j = 0, n = 3; j < s->out_order; j++, n = n + 2) {
-        if (j > 0)
-            fprintf(f,";");
-        for (q = 0; q < n; q++, p++)
-            fprintf(f,"%1d",s->comp_info[p]);
-    }
-    fprintf(f,"\n");
-    return;
-}
-
-
-mneSssData mne_dup_sss_data(mneSssData s)
-
-{
-    mneSssData dup = mne_new_sss_data();
-    int        k;
-
-    if (!s)
-        return NULL;
-
-    *dup = *s;
-    dup->comp_info = MALLOC(dup->ncomp,int);
-
-    for (k = 0; k < dup->ncomp; k++)
-        dup->comp_info[k] = s->comp_info[k];
-
-    return dup;
-}
-
-
-
-mneSssData mne_read_sss_data_from_node(fiffFile in, fiffDirNode start)
+MneSssData* mne_read_sss_data_from_node(fiffFile in, fiffDirNode start)
 /*
  * Read the SSS data from the given node of an open file
  */
 {
-    mneSssData s  = mne_new_sss_data();
+    MneSssData* s  = new MneSssData();
     fiffDirNode *sss = NULL;
     fiffDirNode node;
     fiffTag     tag;
@@ -7823,7 +7731,8 @@ bad : {
         /*
      * Not entirely happy
      */
-        mne_free_sss_data(s);
+        if (s)
+            delete s;
         return NULL;
     }
 }
@@ -7956,7 +7865,7 @@ mneCovMatrix mne_dup_cov(mneCovMatrix c)
     res->bads = mne_dup_name_list(c->bads,c->nbad);
     res->nbad = c->nbad;
     res->proj = mne_dup_proj_op(c->proj);
-    res->sss  = mne_dup_sss_data(c->sss);
+    res->sss  = new MneSssData(*(c->sss));
 
     return res;
 }
@@ -7980,7 +7889,8 @@ void mne_free_cov(mneCovMatrix c)
     FREE(c->chol);
     FREE(c->ch_class);
     mne_free_proj_op(c->proj);
-    mne_free_sss_data(c->sss);
+    if (c->sss)
+        delete c->sss;
     mne_free_name_list(c->bads,c->nbad);
     FREE(c);
     return;
@@ -8039,7 +7949,7 @@ mneCovMatrix mne_read_cov(const QString& name,int kind)
     int            k,p,nn;
     float          *f;
     mneProjOp      op = NULL;
-    mneSssData     sss = NULL;
+    MneSssData*     sss = NULL;
 
 
     if ((in = fiff_open(name.toLatin1().data())) == NULL)
@@ -8194,7 +8104,8 @@ mneCovMatrix mne_read_cov(const QString& name,int kind)
 out : {
         fiff_close(in);
         mne_free_proj_op(op);
-        mne_free_sss_data(sss);
+        if(sss)
+            delete sss;
 
         if (!res) {
             mne_free_name_list(names,nnames);
@@ -8304,7 +8215,7 @@ mneCovMatrix mne_pick_chs_cov_omit(mneCovMatrix c, char **new_names, int ncov, i
     res->bads = mne_dup_name_list(c->bads,c->nbad);
     res->nbad = c->nbad;
     res->proj = mne_dup_proj_op(c->proj);
-    res->sss  = mne_dup_sss_data(c->sss);
+    res->sss  = c->sss ? new MneSssData(*(c->sss)) : NULL;
 
     if (c->ch_class) {
         res->ch_class = MALLOC(res->ncov,int);
@@ -16076,14 +15987,14 @@ void mne_free_deriv_set(mneDerivSet s)
 
 //============================= mne_sss_data.c =============================
 
-
-mneSssData mne_read_sss_data(char *name)
+//TODO: move to MneSssData
+MneSssData* mne_read_sss_data(char *name)
 /*
  * Read SSS data from anywhere in a file
  */
 {
     fiffFile   in = fiff_open(name);
-    mneSssData s  = NULL;
+    MneSssData* s  = NULL;
 
     if (!in)
         goto out;
@@ -16190,7 +16101,8 @@ void mne_raw_free_data(mneRawData d)
     FREE(d->bad);
     FREE(d->offsets);
     mne_free_ctf_comp_data_set(d->comp);
-    mne_free_sss_data(d->sss);
+    if(d->sss)
+        delete d->sss;
 
     if (d->filter_data_free)
         d->filter_data_free(d->filter_data);
@@ -17012,11 +16924,12 @@ mneRawData mne_raw_open_file_comp(char *name, int omit_skip, int allow_maxshield
     data->sss = mne_read_sss_data(data->filename);
     if (data->sss && data->sss->job != FIFFV_SSS_JOB_NOTHING && data->sss->ncomp > 0) {
         fprintf(stderr,"SSS data read from %s :\n",data->filename);
-        mne_print_sss_data(stderr,data->sss);
+        data->sss->print(stderr);
     }
     else {
         fprintf(stderr,"No SSS data in %s\n",data->filename);
-        mne_free_sss_data(data->sss);
+        if(data->sss)
+            delete data->sss;
         data->sss = NULL;
     }
     /*
@@ -17868,13 +17781,6 @@ mneMeasData mne_read_meas_data(const QString&       name,       /* Name of the m
 }
 
 
-
-
-
-
-
-
-
 //============================= mne_get_values.c =============================
 
 #define EPS 0.05
@@ -18116,6 +18022,4 @@ int mne_get_values_from_data_ch (float time,      /* Interesting time point */
     return (0);
 }
 
-
 #endif // DIPOLEFITHELPERS_H
-

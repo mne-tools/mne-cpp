@@ -108,7 +108,7 @@ public:
     *
     * @param[in] f      the file stream to print to;
     */
-    void print(FILE *f);
+    void print(FILE *f) const;
 
 public:
     bool            valid;  /**< Is this dipole valid */
