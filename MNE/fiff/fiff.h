@@ -264,16 +264,14 @@ public:
     *
     * @param[in] p_IODevice    A fiff IO device like a fiff QFile or QTCPSocket
     * @param[out] p_pStream    file which is openened
-    * @param[out] p_Tree       tag directory organized into a tree
-    * @param[out] p_Dir        the sequential tag directory
     *
     * @return true if succeeded, false otherwise
     */
-    static bool open(QIODevice& p_IODevice, FiffStream::SPtr& p_pStream, FiffDirNode& p_Tree, QList<FiffDirEntry>& p_Dir)
+    static bool open(QIODevice& p_IODevice, FiffStream::SPtr& p_pStream)
     {
         p_pStream = FiffStream::SPtr(new FiffStream(&p_IODevice));
 
-        return p_pStream->open(p_Tree, p_Dir);
+        return p_pStream->open();
     }
 
     //=========================================================================================================

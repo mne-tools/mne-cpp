@@ -269,7 +269,7 @@ MNESourceSpace MNESourceSpace::pick_regions(const QList<Label> &p_qListLabels) c
 
 //*************************************************************************************************************
 
-bool MNESourceSpace::readFromStream(FiffStream::SPtr& p_pStream, bool add_geom, FiffDirNode& p_Tree, MNESourceSpace& p_SourceSpace)
+bool MNESourceSpace::readFromStream(FiffStream::SPtr& p_pStream, bool add_geom, MNESourceSpace& p_SourceSpace)
 {
 //    if (p_pSourceSpace != NULL)
 //        delete p_pSourceSpace;
@@ -289,7 +289,7 @@ bool MNESourceSpace::readFromStream(FiffStream::SPtr& p_pStream, bool add_geom, 
 
         t_file.setFileName(t_sFileName);
         p_pStream = FiffStream::SPtr(new FiffStream(&t_file));
-        if(!p_pStream->open(p_Tree, t_Dir))
+        if(!p_pStream->open())
             return false;
         open_here = true;
 //        if(t_pDir)
@@ -298,7 +298,7 @@ bool MNESourceSpace::readFromStream(FiffStream::SPtr& p_pStream, bool add_geom, 
     //
     //   Find all source spaces
     //
-    QList<FiffDirNode> spaces = p_Tree.dir_tree_find(FIFFB_MNE_SOURCE_SPACE);
+    QList<FiffDirNode> spaces = p_pStream->tree().dir_tree_find(FIFFB_MNE_SOURCE_SPACE);
     if (spaces.size() == 0)
     {
         if(open_here)

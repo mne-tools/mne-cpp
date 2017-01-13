@@ -117,12 +117,12 @@ public:
     *
     * @param[in] p_pStreamIn    fiff file to copy from
     * @param[in] in_id          file id description
-    * @param[out] p_Nodes       subtree directories to be copied
-    * @param[in] p_pStreamOut   fiff file to write to
+    * @param[in] p_Nodes        subtree directories to be copied
+    * @param[out] p_pStreamOut   fiff file to write to
     *
     * @return true if succeeded, false otherwise
     */
-    static bool copy_tree(QSharedPointer<FiffStream> p_pStreamIn, FiffId& in_id, QList<FiffDirNode>& p_Nodes, QSharedPointer<FiffStream> p_pStreamOut);
+    static bool copy_tree(QSharedPointer<FiffStream> p_pStreamIn, const FiffId& in_id, const QList<FiffDirNode>& p_Nodes, QSharedPointer<FiffStream> p_pStreamOut);
 
     //=========================================================================================================
     /**
@@ -138,6 +138,7 @@ public:
     //=========================================================================================================
     /**
     * ### MNE toolbox root function ###: Implementation of the fiff_make_dir_tree function
+    * Refactored: make_subtree (fiff_dir_tree.c)
     *
     * Create the directory tree structure
     *

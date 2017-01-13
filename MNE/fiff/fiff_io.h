@@ -135,13 +135,12 @@ public:
     *
     * @param[in] p_IODevice     An fiff IO device like a fiff QFile or QTCPSocket
     * @param[in] info           Overall info for fiff IO device
-    * @param[out] Tree          Directory tree structure
     * @param[out] dirTree       Node directory structure
     *
     * @return true if succeeded, false otherwise
     */
 
-    static bool setup_read(QIODevice& p_IODevice, FiffInfo& info, FiffDirNode& Tree, FiffDirNode& dirTree);
+    static bool setup_read(QIODevice& p_IODevice, FiffInfo& info, FiffDirNode& dirTree);
 
     //=========================================================================================================
     /**

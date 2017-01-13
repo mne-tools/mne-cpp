@@ -159,11 +159,10 @@ public:
     *
     * @param [in,out] p_pStream     The opened fif file
     * @param [in] add_geom          Add geometry information to the Bem Surface
-    * @param [in, out] p_Tree       Search for the bem surface here
     *
     * @return true if succeeded, false otherwise
     */
-    static bool readFromStream(FiffStream::SPtr& p_pStream, bool add_geom, FiffDirNode& p_Tree, MNEBem &p_Bem);
+    static bool readFromStream(FiffStream::SPtr& p_pStream, bool add_geom, MNEBem &p_Bem);
 
     //=========================================================================================================
     /**

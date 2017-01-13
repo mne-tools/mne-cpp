@@ -73,22 +73,19 @@ MNESurface::MNESurface()
 bool MNESurface::read(QIODevice& p_IODevice, QList<MNESurface::SPtr>& surfaces)
 {
     FiffStream::SPtr fiffStream(new FiffStream(&p_IODevice));
-    FiffDirNode fiffDirTree;
-    QList<FiffDirEntry>fiffDirEntries;
 
-    if(!fiffStream->open(fiffDirTree, fiffDirEntries))
+    if(!fiffStream->open())
     {
         qCritical() << "Could not open FIFF stream!";
         return false;
     }
 
-    return read(fiffStream, false, fiffDirTree, surfaces);
+    return read(fiffStream, false, fiffStream->tree(), surfaces);
 }
 
 //*************************************************************************************************************
 
-bool MNESurface::read(FiffStream::SPtr& p_pStream, bool add_geom,
-        FiffDirNode& p_Tree, QList<MNESurface::SPtr>& surfaces)
+bool MNESurface::read(FiffStream::SPtr& p_pStream, bool add_geom, const FiffDirNode& p_Tree, QList<MNESurface::SPtr>& surfaces)
 {
     if(add_geom)
     {

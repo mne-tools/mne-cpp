@@ -140,8 +140,7 @@ public:
      *
      * @return true if succeeded, false otherwise
      */
-    static bool read(FIFFLIB::FiffStream::SPtr& p_pStream, bool add_geom,
-            FIFFLIB::FiffDirNode& p_Tree, QList<MNESurface::SPtr>& surfaces);
+    static bool read(FIFFLIB::FiffStream::SPtr& p_pStream, bool add_geom, const FIFFLIB::FiffDirNode& p_Tree, QList<MNESurface::SPtr>& surfaces);
 
     //=========================================================================================================
 

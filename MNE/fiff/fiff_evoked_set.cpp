@@ -229,16 +229,14 @@ bool FiffEvokedSet::read(QIODevice& p_IODevice, FiffEvokedSet& p_FiffEvokedSet, 
     QString t_sFileName = t_pStream->streamName();
 
     printf("Exploring %s ...\n",t_sFileName.toUtf8().constData());
-    FiffDirNode t_Tree;
-    QList<FiffDirEntry> t_Dir;
 
-    if(!t_pStream->open(t_Tree, t_Dir))
+    if(!t_pStream->open())
         return false;
     //
     //   Read the measurement info
     //
     FiffDirNode meas;
-    if(!t_pStream->read_meas_info(t_Tree, p_FiffEvokedSet.info, meas))
+    if(!t_pStream->read_meas_info(t_pStream->tree(), p_FiffEvokedSet.info, meas))
         return false;
     p_FiffEvokedSet.info.filename = t_sFileName; //move fname storage to read_meas_info member function
     //

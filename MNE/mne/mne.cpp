@@ -70,24 +70,16 @@ bool MNE::read_events(QIODevice &p_IODevice, MatrixXi& eventlist)
     //
     // Open file
     //
-    FiffStream::SPtr t_pFile(new FiffStream(&p_IODevice));
-    FiffDirNode t_Tree;
-    QList<FiffDirEntry> t_Dir;
+    FiffStream::SPtr t_file(new FiffStream(&p_IODevice));
 
-    if(!t_pFile->open(t_Tree, t_Dir))
-    {
-//        if(t_pTree)
-//            delete t_pTree;
-//        if(t_pDir)
-//            delete t_pDir;
-
+    if(!t_file->open()) {
         return false;
     }
 
     //
     //   Find the desired block
     //
-    QList<FiffDirNode> events = t_Tree.dir_tree_find(FIFFB_MNE_EVENTS);
+    QList<FiffDirNode> events = t_file->tree().dir_tree_find(FIFFB_MNE_EVENTS);
 
     if (events.size() == 0)
     {
@@ -107,7 +99,7 @@ bool MNE::read_events(QIODevice &p_IODevice, MatrixXi& eventlist)
         pos  = events[0].dir[k].pos;
         if (kind == FIFF_MNE_EVENT_LIST)
         {
-            FiffTag::read_tag(t_pFile.data(),t_pTag,pos);
+            FiffTag::read_tag(t_file.data(),t_pTag,pos);
             if(t_pTag->type == FIFFT_UINT)
             {
                 serial_eventlist_uint = t_pTag->toUnsignedInt();
