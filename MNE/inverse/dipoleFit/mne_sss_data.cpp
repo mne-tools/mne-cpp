@@ -149,9 +149,6 @@ const char *mne_coord_frame_name_1(int frame)
 //*************************************************************************************************************
 
 void MneSssData::print(FILE *f) const
-/*
- * Output the SSS information for debugging purposes
- */
 {
     int j,p,q,n;
 

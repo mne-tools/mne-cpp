@@ -279,7 +279,7 @@ public:
     * @param[out] p_Info      The read measurement info
     * @param[out] p_NodeInfo  The to measurement corresponding fiff_dir_node.
     *
-    * @return true wehen successful.
+    * @return true if successful.
     */
     bool read_meas_info(const FiffDirNode& p_Node, FiffInfo& p_Info, FiffDirNode& p_NodeInfo);
 

@@ -79,8 +79,8 @@ namespace INVERSELIB
 class INVERSESHARED_EXPORT MneSssData
 {
 public:
-    typedef QSharedPointer<MneSssData> SPtr;              /**< Shared pointer type for ECD. */
-    typedef QSharedPointer<const MneSssData> ConstSPtr;   /**< Const shared pointer type for ECD. */
+    typedef QSharedPointer<MneSssData> SPtr;              /**< Shared pointer type for MneSssData. */
+    typedef QSharedPointer<const MneSssData> ConstSPtr;   /**< Const shared pointer type for MneSssData. */
 
     //=========================================================================================================
     /**
@@ -89,15 +89,13 @@ public:
     MneSssData();
 
     //=========================================================================================================
-    //============================= mne_sss_data.c =============================
     /**
     * Copy constructor.
-    * Refactored: mne_dup_sss_data
+    * Refactored: mne_dup_sss_data (mne_sss_data.c)
     *
     * @param[in] p_MneSssData   MNE SSS Data which should be copied
     */
     MneSssData(const MneSssData& p_MneSssData);
-
 
     //=========================================================================================================
     /**
@@ -105,26 +103,26 @@ public:
     */
     ~MneSssData();
 
-
-    //============================= mne_sss_data.c =============================
-    // mne_print_sss_data
-    /*
-     * Output the SSS information for debugging purposes
-     */
+    //=========================================================================================================
+    /**
+    * Output the SSS information for debugging purposes
+    * Refactored: mne_print_sss_data (mne_sss_data.c)
+    *
+    * @param[in] f      the file stream to print to;
+    */
     void print(FILE *f) const;
 
-
 public:
-    int   job;                  /**< Value of FIFF_SSS_JOB tag */
-    int   coord_frame;          /**< Coordinate frame */
-    float origin[3];            /**< The expansion origin */
-    int   nchan;                /**< How many channels */
-    int   out_order;            /**< Order of the outside expansion */
-    int   in_order;             /**< Order of the inside expansion */
-    int* comp_info;  /**< Which components are included */
-    int   ncomp;                /**< How many entries in the above */
-    int   in_nuse;              /**< How many components included in the inside expansion */
-    int   out_nuse;             /**< How many components included in the outside expansion */
+    int   job;          /**< Value of FIFF_SSS_JOB tag */
+    int   coord_frame;  /**< Coordinate frame */
+    float origin[3];    /**< The expansion origin */
+    int   nchan;        /**< How many channels */
+    int   out_order;    /**< Order of the outside expansion */
+    int   in_order;     /**< Order of the inside expansion */
+    int* comp_info;     /**< Which components are included */
+    int   ncomp;        /**< How many entries in the above */
+    int   in_nuse;      /**< How many components included in the inside expansion */
+    int   out_nuse;     /**< How many components included in the outside expansion */
 
 // ### OLD STRUCT ###
 //typedef struct {
@@ -139,15 +137,12 @@ public:
 //    int   in_nuse;		/* How many components included in the inside expansion */
 //    int   out_nuse;		/* How many components included in the outside expansion */
 //} *mneSssData,mneSssDataRec;	/* Essential information about SSS */
-
 };
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-
 
 } // NAMESPACE INVERSELIB
 
