@@ -1,15 +1,14 @@
 //=============================================================================================================
 /**
-* @file     rthpisetupwidget.h
-* @author   Chiran Doshi <chiran.doshi@childrens.harvard.edu>
-*           Limin Sun <liminsun@nmr.mgh.harvard.edu>
+* @file     mne_sss_data.h
+* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     March, 2015
+* @date     January, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) 2015, Chiran Doshi, Limin Sun and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,117 +29,121 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the RtHpiSetupWidget class.
+* @brief    MNE SSS Data (MneSssData) class declaration.
 *
 */
 
-#ifndef RTHPISETUPWIDGET_H
-#define RTHPISETUPWIDGET_H
-
+#ifndef MNESSSDATA_H
+#define MNESSSDATA_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_rthpisetup.h"
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FIFF INCLUDES
-//=============================================================================================================
-
-#include <fiff/fiff_info.h>
-#include <fiff/fiff.h>
-
-//*************************************************************************************************************
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QtWidgets>
+#include "../inverse_global.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// Eigen INCLUDES
 //=============================================================================================================
+
+#include <Eigen/Core>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE RtHpiPlugin
+// Qt INCLUDES
 //=============================================================================================================
 
-namespace RtHpiPlugin
+#include <QSharedPointer>
+#include <QDebug>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE INVERSELIB
+//=============================================================================================================
+
+namespace INVERSELIB
 {
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-class RtHpi;
-
-using namespace FIFFLIB;
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS RtHpiSetupWidget
+* Implements MNE SSS Data (Replaces *mneSssData,mneSssDataRec struct of MNE-C mne_types.h).
 *
-* @brief The RtHpiSetupWidget class provides the RtHpi configuration window.
+* @brief MNE SSS Data description
 */
-class RtHpiSetupWidget : public QWidget
+class INVERSESHARED_EXPORT MneSssData
 {
-    Q_OBJECT
+public:
+    typedef QSharedPointer<MneSssData> SPtr;              /**< Shared pointer type for MneSssData. */
+    typedef QSharedPointer<const MneSssData> ConstSPtr;   /**< Const shared pointer type for MneSssData. */
+
+    //=========================================================================================================
+    /**
+    * Constructs the MNE SSS Data
+    */
+    MneSssData();
+
+    //=========================================================================================================
+    /**
+    * Copy constructor.
+    * Refactored: mne_dup_sss_data (mne_sss_data.c)
+    *
+    * @param[in] p_MneSssData   MNE SSS Data which should be copied
+    */
+    MneSssData(const MneSssData& p_MneSssData);
+
+    //=========================================================================================================
+    /**
+    * Destroys the MNE SSS Data description
+    */
+    ~MneSssData();
+
+    //=========================================================================================================
+    /**
+    * Output the SSS information for debugging purposes
+    * Refactored: mne_print_sss_data (mne_sss_data.c)
+    *
+    * @param[in] f      the file stream to print to;
+    */
+    void print(FILE *f) const;
 
 public:
+    int   job;          /**< Value of FIFF_SSS_JOB tag */
+    int   coord_frame;  /**< Coordinate frame */
+    float origin[3];    /**< The expansion origin */
+    int   nchan;        /**< How many channels */
+    int   out_order;    /**< Order of the outside expansion */
+    int   in_order;     /**< Order of the inside expansion */
+    int* comp_info;     /**< Which components are included */
+    int   ncomp;        /**< How many entries in the above */
+    int   in_nuse;      /**< How many components included in the inside expansion */
+    int   out_nuse;     /**< How many components included in the outside expansion */
 
-    //=========================================================================================================
-    /**
-    * Constructs a RtHpiSetupWidget which is a child of parent.
-    *
-    * @param [in] toolbox a pointer to the corresponding RtHpi.
-    * @param [in] parent pointer to parent widget; If parent is 0, the new RtHpiSetupWidget becomes a window. If parent is another widget, RtHpiSetupWidget becomes a child window inside parent. RtHpiSetupWidget is deleted when its parent is deleted.
-    */
-    RtHpiSetupWidget(RtHpi* toolbox, QWidget *parent = 0);
-
-    //=========================================================================================================
-    /**
-    * Destroys the RtHpiSetupWidget.
-    * All RtHpiSetupWidget's children are deleted first. The application exits if RtHpiSetupWidget is the main widget.
-    */
-    ~RtHpiSetupWidget();
-
-//    void ReadPolhemusDig(QString fileName);
-
-//    bool read_hpi_info(FiffStream *t_pStream, const FiffDirNode& p_Node, FiffInfo& info);
-signals:
-
-
-private slots:
-    //=========================================================================================================
-    /**
-    * Shows the About Dialog
-    *
-    */
-    void showAboutDialog();
-//    //=========================================================================================================
-//    /**
-//    * Load a Polhemus file
-//    *
-//    */
-//    void bnLoadPolhemusFile();
-
-private:
-
-    RtHpi* m_pRtHpi;	/**< Holds a pointer to corresponding RtHpi.*/
-
-    Ui::RtHpiSetupWidgetClass ui;	/**< Holds the user interface for the RtHpiSetupWidget.*/
+// ### OLD STRUCT ###
+//typedef struct {
+//    int   job;			/* Value of FIFF_SSS_JOB tag */
+//    int   coord_frame;		/* Coordinate frame */
+//    float origin[3];		/* The expansion origin */
+//    int   nchan;			/* How many channels */
+//    int   out_order;		/* Order of the outside expansion */
+//    int   in_order;		/* Order of the inside expansion */
+//    int   *comp_info;		/* Which components are included */
+//    int   ncomp;			/* How many entries in the above */
+//    int   in_nuse;		/* How many components included in the inside expansion */
+//    int   out_nuse;		/* How many components included in the outside expansion */
+//} *mneSssData,mneSssDataRec;	/* Essential information about SSS */
 };
 
-} // NAMESPACE
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
 
-#endif // RTHPISETUPWIDGET_H
+} // NAMESPACE INVERSELIB
+
+#endif // MNESSSDATA_H
