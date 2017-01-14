@@ -913,15 +913,15 @@ QByteArray RtSourceLocDataWorker::generateSmoothedColors(const VectorXd& sourceC
 //    return finalColors;
 
     //Option 3 - Inverse weighted distance
-    QTime allTimer;
-    allTimer.start();
+//    QTime allTimer;
+//    allTimer.start();
 
-    QTime multDataTimer;
-    multDataTimer.start();
+//    QTime multDataTimer;
+//    multDataTimer.start();
 
     VectorXd vecSmoothedData = matWDistSmooth * sourceColorSamples;
 
-    qDebug() << "Mult time" << multDataTimer.elapsed();
+//    qDebug() << "Mult time" << multDataTimer.elapsed();
 
     QTime prodDataTimer;
     prodDataTimer.start();
@@ -949,8 +949,8 @@ QByteArray RtSourceLocDataWorker::generateSmoothedColors(const VectorXd& sourceC
         idxVert += 3;
     }
 
-    qDebug() << "Produce time" << prodDataTimer.elapsed();
-    qDebug() << "All time" << allTimer.elapsed();
+//    qDebug() << "Produce time" << prodDataTimer.elapsed();
+//    qDebug() << "All time" << allTimer.elapsed();
 
     return finalColors;
 }
