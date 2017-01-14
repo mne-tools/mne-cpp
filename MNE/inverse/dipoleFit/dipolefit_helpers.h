@@ -20,6 +20,9 @@
 
 #include <fiff/fiff_constants.h>
 #include <fiff/fiff_file.h>
+#include <fiff/fiff_stream.h>
+#include <fiff/fiff_tag.h>
+#include <fiff/fiff_types.h>
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -1454,214 +1457,209 @@ int fiff_read_this_tag_ext (fiffFile file,	/* Read from here */
 
 //============================= fiff_dir_tree.c =============================
 
-/*
- * Take care of directory trees
- */
+///*
+// * Take care of directory trees
+// */
 
-void fiff_dir_tree_free(fiffDirNode node)
+//void fiff_dir_tree_free(fiffDirNode node)
 
-{
-    int k;
-    if (node == NULL)
-        return;
-    FREE(node->dir);
-    FREE(node->id);
-    for (k = 0; k < node->nchild; k++)
-        fiff_dir_tree_free(node->children[k]);
-    FREE(node);
-}
-
-
+//{
+//    int k;
+//    if (node == NULL)
+//        return;
+//    FREE(node->dir);
+//    FREE(node->id);
+//    for (k = 0; k < node->nchild; k++)
+//        fiff_dir_tree_free(node->children[k]);
+//    FREE(node);
+//}
 
 
+//static fiffDirNode make_subtree(fiffFile file,fiffDirEntry dentry)
 
-static fiffDirNode make_subtree(fiffFile file,fiffDirEntry dentry)
+//{
+//    fiffDirNode node = (fiffDirNode)malloc(sizeof(fiffDirNodeRec));
+//    fiffDirNode child;
+//    fiffTagRec tag;
+//    int        k;
+//    int        level;
+//    fiffDirEntry dir;
+//    int          nent;
 
-{
-    fiffDirNode node = (fiffDirNode)malloc(sizeof(fiffDirNodeRec));
-    fiffDirNode child;
-    fiffTagRec tag;
-    int        k;
-    int        level;
-    fiffDirEntry dir;
-    int          nent;
+//    dir  = node->dir  = MALLOC(file->nent,fiffDirEntryRec);
+//    nent = node->nent = 0;
+//    node->dir_tree    = dentry;
+//    node->nent_tree   = 1;
+//    node->parent      = NULL;
+//    node->children    = NULL;
+//    node->nchild      = 0;
+//    node->id          = NULL;
+//    tag.data = NULL;
 
-    dir  = node->dir  = MALLOC(file->nent,fiffDirEntryRec);
-    nent = node->nent = 0;
-    node->dir_tree    = dentry;
-    node->nent_tree   = 1;
-    node->parent      = NULL;
-    node->children    = NULL;
-    node->nchild      = 0;
-    node->id          = NULL;
-    tag.data = NULL;
+//    node->type = FIFFB_ROOT;
+//    if (dentry->kind == FIFF_BLOCK_START) {
+//        if (fiff_read_this_tag (file->fd,dentry->pos,&tag) == -1)
+//            goto bad;
+//        else
+//            node->type = *(int *)tag.data;
+//    }
+//    else {
+//        node->id   = (fiffId)malloc(sizeof(fiffIdRec));
+//        memcpy(node->id,file->id,sizeof(fiffIdRec));
+//    }
+//    dentry++;
 
-    node->type = FIFFB_ROOT;
-    if (dentry->kind == FIFF_BLOCK_START) {
-        if (fiff_read_this_tag (file->fd,dentry->pos,&tag) == -1)
-            goto bad;
-        else
-            node->type = *(int *)tag.data;
-    }
-    else {
-        node->id   = (fiffId)malloc(sizeof(fiffIdRec));
-        memcpy(node->id,file->id,sizeof(fiffIdRec));
-    }
-    dentry++;
+//    for (level = 0,k = dentry-file->dir; k < file->nent; k++,dentry++) {
+//        node->nent_tree = node->nent_tree + 1;
+//        if (dentry->kind == FIFF_BLOCK_START) {
+//            level++;
+//            if (level == 1) {
+//                if ((child = make_subtree(file,dentry)) == NULL)
+//                    goto bad;
+//                child->parent = node;
+//                node->children = REALLOC(node->children,node->nchild+1,fiffDirNode);
+//                node->children[node->nchild++] = child;
+//            }
+//        }
+//        else if (dentry->kind == FIFF_BLOCK_END) {
+//            level--;
+//            if (level < 0)
+//                break;
+//        }
+//        else if (dentry->kind == -1)
+//            break;
+//        else if (level == 0) {
+//            /*
+//       * Take the node id from the parent block id,
+//       * block id, or file id. Let the block id
+//       * take precedence over parent block id and file id
+//       */
+//            if (((dentry->kind == FIFF_PARENT_BLOCK_ID || dentry->kind == FIFF_FILE_ID)
+//                 && node->id == NULL) ||
+//                    dentry->kind == FIFF_BLOCK_ID) {
+//                FREE(node->id);
+//                node->id = NULL;
+//                if (fiff_read_this_tag (file->fd,dentry->pos,&tag) == -1)
+//                    goto bad;
+//                node->id = (fiffId)tag.data;
+//                tag.data = NULL;
+//            }
+//            memcpy(dir+nent,dentry,sizeof(fiffDirEntryRec));
+//            nent++;
+//        }
+//    }
+//    /*
+//   * Strip unused entries
+//   */
+//    node->nent = nent;
+//    node->dir = REALLOC(node->dir,node->nent,fiffDirEntryRec);
+//    FREE(tag.data);
+//    return (node);
 
-    for (level = 0,k = dentry-file->dir; k < file->nent; k++,dentry++) {
-        node->nent_tree = node->nent_tree + 1;
-        if (dentry->kind == FIFF_BLOCK_START) {
-            level++;
-            if (level == 1) {
-                if ((child = make_subtree(file,dentry)) == NULL)
-                    goto bad;
-                child->parent = node;
-                node->children = REALLOC(node->children,node->nchild+1,fiffDirNode);
-                node->children[node->nchild++] = child;
-            }
-        }
-        else if (dentry->kind == FIFF_BLOCK_END) {
-            level--;
-            if (level < 0)
-                break;
-        }
-        else if (dentry->kind == -1)
-            break;
-        else if (level == 0) {
-            /*
-       * Take the node id from the parent block id,
-       * block id, or file id. Let the block id
-       * take precedence over parent block id and file id
-       */
-            if (((dentry->kind == FIFF_PARENT_BLOCK_ID || dentry->kind == FIFF_FILE_ID)
-                 && node->id == NULL) ||
-                    dentry->kind == FIFF_BLOCK_ID) {
-                FREE(node->id);
-                node->id = NULL;
-                if (fiff_read_this_tag (file->fd,dentry->pos,&tag) == -1)
-                    goto bad;
-                node->id = (fiffId)tag.data;
-                tag.data = NULL;
-            }
-            memcpy(dir+nent,dentry,sizeof(fiffDirEntryRec));
-            nent++;
-        }
-    }
-    /*
-   * Strip unused entries
-   */
-    node->nent = nent;
-    node->dir = REALLOC(node->dir,node->nent,fiffDirEntryRec);
-    FREE(tag.data);
-    return (node);
-
-bad :
-    fiff_dir_tree_free(node);
-    return (NULL);
-}
+//bad :
+//    fiff_dir_tree_free(node);
+//    return (NULL);
+//}
 
 
-int fiff_dir_tree_create(fiffFile file)
-/*
-      * Make a directory tree
-      */
-{
-    fiff_dir_tree_free(file->dirtree);
-    file->dirtree = NULL;
-    if (file->fd == NULL)
-        return (FIFF_FAIL);
-    if ((file->dirtree = make_subtree(file,file->dir)) == NULL)
-        return (FIFF_FAIL);
-    else {
-        file->dirtree->parent = NULL;
-        return (FIFF_OK);
-    }
-}
+//int fiff_dir_tree_create(fiffFile file)
+///*
+//      * Make a directory tree
+//      */
+//{
+//    fiff_dir_tree_free(file->dirtree);
+//    file->dirtree = NULL;
+//    if (file->fd == NULL)
+//        return (FIFF_FAIL);
+//    if ((file->dirtree = make_subtree(file,file->dir)) == NULL)
+//        return (FIFF_FAIL);
+//    else {
+//        file->dirtree->parent = NULL;
+//        return (FIFF_OK);
+//    }
+//}
 
 
 
-int fiff_dir_tree_count(fiffDirNode tree)
-/*
-      * Find the number of nodes
-      */
-{
-    int res,k;
-    if (tree == NULL)
-        res = 0;
-    else {
-        res = 1;
-        for (k = 0; k < tree->nchild; k++)
-            res = res + fiff_dir_tree_count(tree->children[k]);
-    }
-    return (res);
-}
+//int fiff_dir_tree_count(fiffDirNode tree)
+///*
+//      * Find the number of nodes
+//      */
+//{
+//    int res,k;
+//    if (tree == NULL)
+//        res = 0;
+//    else {
+//        res = 1;
+//        for (k = 0; k < tree->nchild; k++)
+//            res = res + fiff_dir_tree_count(tree->children[k]);
+//    }
+//    return (res);
+//}
 
 
 
+//static fiffDirNode *found = NULL;
+//static int count = 0;
 
+//static void find_nodes (fiffDirNode tree,int kind)
 
-static fiffDirNode *found = NULL;
-static int count = 0;
+//{
+//    int k;
+//    if (tree->type == kind) {
+//        found[count++] = tree;
+//        found[count] = NULL;
+//    }
+//    for (k = 0; k < tree->nchild; k++)
+//        find_nodes(tree->children[k],kind);
+//    return;
+//}
 
-static void find_nodes (fiffDirNode tree,int kind)
+//fiffDirNode *fiff_dir_tree_find(fiffDirNode tree,
+//                                int kind)
 
-{
-    int k;
-    if (tree->type == kind) {
-        found[count++] = tree;
-        found[count] = NULL;
-    }
-    for (k = 0; k < tree->nchild; k++)
-        find_nodes(tree->children[k],kind);
-    return;
-}
-
-fiffDirNode *fiff_dir_tree_find(fiffDirNode tree,
-                                int kind)
-
-{
-    /*
-   * Make room for all nodes
-   */
-    found = MALLOC(fiff_dir_tree_count(tree)+1,fiffDirNode);
-    count = 0;
-    found[count] = NULL;
-    find_nodes(tree,kind);
-    /*
-   * Shrink the size
-   */
-    found = REALLOC(found,count+1,fiffDirNode);
-    return (found);
-}
+//{
+//    /*
+//   * Make room for all nodes
+//   */
+//    found = MALLOC(fiff_dir_tree_count(tree)+1,fiffDirNode);
+//    count = 0;
+//    found[count] = NULL;
+//    find_nodes(tree,kind);
+//    /*
+//   * Shrink the size
+//   */
+//    found = REALLOC(found,count+1,fiffDirNode);
+//    return (found);
+//}
 
 
 
-fiffTag fiff_dir_tree_get_tag(fiffFile file,fiffDirNode node,int kind)
-/*
-      * Scan a dir node for a tag and read it
-      */
-{
-    fiffTag tag;
-    int k;
-    fiffDirEntry dir;
+//fiffTag fiff_dir_tree_get_tag(fiffFile file,fiffDirNode node,int kind)
+///*
+//      * Scan a dir node for a tag and read it
+//      */
+//{
+//    fiffTag tag;
+//    int k;
+//    fiffDirEntry dir;
 
-    for (k = 0, dir = node->dir; k < node->nent; k++,dir++)
-        if (dir->kind == kind) {
-            tag = MALLOC(1,fiffTagRec);
-            tag->data = NULL;
-            if (fiff_read_this_tag_ext(file,dir->pos,tag) == -1) {
-                FREE(tag->data);
-                FREE(tag);
-                return (NULL);
-            }
-            else
-                return (tag);
-        }
-    qWarning("Desired tag (%s [%d]) not found",
-             FIFFLIB::FiffDirNode::get_tag_explanation(kind),kind);
-    return (NULL);
-}
+//    for (k = 0, dir = node->dir; k < node->nent; k++,dir++)
+//        if (dir->kind == kind) {
+//            tag = MALLOC(1,fiffTagRec);
+//            tag->data = NULL;
+//            if (fiff_read_this_tag_ext(file,dir->pos,tag) == -1) {
+//                FREE(tag->data);
+//                FREE(tag);
+//                return (NULL);
+//            }
+//            else
+//                return (tag);
+//        }
+//    qWarning("Desired tag (%s [%d]) not found",
+//             FIFFLIB::FiffDirNode::get_tag_explanation(kind),kind);
+//    return (NULL);
+//}
 
 
 
@@ -1670,84 +1668,84 @@ fiffTag fiff_dir_tree_get_tag(fiffFile file,fiffDirNode node,int kind)
 #define ALLOC_SIZE 100		/* Allocate this many entries at once */
 
 
-fiffDirEntry fiff_make_dir (FILE *fd)
-/*
-      * Scan the tag list to create a directory
-      */
-{
-    fiffTagRec tag;
-    fiffDirEntry dir = NULL;
-    int nent = 0;
-    int still_free= 0;
-    fiff_int_t pos;
-    /*
-   * Start from the very beginning...
-   */
-    if (fseek(fd,0L,SEEK_SET) == -1)
-        return (NULL);
-    tag.data = NULL;
-    while ((pos = fiff_read_tag_info(fd,&tag)) != -1) {
-        /*
-     * Check that we haven't run into the directory
-     */
-        if (tag.kind == FIFF_DIR)
-            break;
-        /*
-     * Alloc in chunks for better performance...
-     */
-        if (still_free < 1) {
-            dir = REALLOC(dir,nent+ALLOC_SIZE,fiffDirEntryRec);
-            still_free = ALLOC_SIZE;
-        }
-        /*
-     * Put in the new entry
-     */
-        dir[nent].kind = tag.kind;
-        dir[nent].type = tag.type;
-        dir[nent].size = tag.size;
-        dir[nent].pos = pos;
-        nent++; still_free--;
-        if (tag.next < 0)
-            break;
-    }
-    if (ferror(fd)) {
-        FREE(dir);
-        return (NULL);
-    }
-    else {
-        /*
-     * Put in the new the terminating entry
-     */
-        if (still_free < 1) {
-            dir = REALLOC(dir,nent+ALLOC_SIZE,fiffDirEntryRec);
-            still_free = ALLOC_SIZE;
-        }
-        dir[nent].kind = -1;
-        dir[nent].type = -1;
-        dir[nent].size = -1;
-        dir[nent].pos  = -1;
-        nent++; still_free--;
-        /*
-     * Possibly shrink a little bit
-     */
-        if (still_free > 0)
-            dir = REALLOC(dir,nent,fiffDirEntryRec);
-        return (dir);
-    }
-}
+//fiffDirEntry fiff_make_dir (FILE *fd)
+///*
+//      * Scan the tag list to create a directory
+//      */
+//{
+//    fiffTagRec tag;
+//    fiffDirEntry dir = NULL;
+//    int nent = 0;
+//    int still_free= 0;
+//    fiff_int_t pos;
+//    /*
+//   * Start from the very beginning...
+//   */
+//    if (fseek(fd,0L,SEEK_SET) == -1)
+//        return (NULL);
+//    tag.data = NULL;
+//    while ((pos = fiff_read_tag_info(fd,&tag)) != -1) {
+//        /*
+//     * Check that we haven't run into the directory
+//     */
+//        if (tag.kind == FIFF_DIR)
+//            break;
+//        /*
+//     * Alloc in chunks for better performance...
+//     */
+//        if (still_free < 1) {
+//            dir = REALLOC(dir,nent+ALLOC_SIZE,fiffDirEntryRec);
+//            still_free = ALLOC_SIZE;
+//        }
+//        /*
+//     * Put in the new entry
+//     */
+//        dir[nent].kind = tag.kind;
+//        dir[nent].type = tag.type;
+//        dir[nent].size = tag.size;
+//        dir[nent].pos = pos;
+//        nent++; still_free--;
+//        if (tag.next < 0)
+//            break;
+//    }
+//    if (ferror(fd)) {
+//        FREE(dir);
+//        return (NULL);
+//    }
+//    else {
+//        /*
+//     * Put in the new the terminating entry
+//     */
+//        if (still_free < 1) {
+//            dir = REALLOC(dir,nent+ALLOC_SIZE,fiffDirEntryRec);
+//            still_free = ALLOC_SIZE;
+//        }
+//        dir[nent].kind = -1;
+//        dir[nent].type = -1;
+//        dir[nent].size = -1;
+//        dir[nent].pos  = -1;
+//        nent++; still_free--;
+//        /*
+//     * Possibly shrink a little bit
+//     */
+//        if (still_free > 0)
+//            dir = REALLOC(dir,nent,fiffDirEntryRec);
+//        return (dir);
+//    }
+//}
 
 
-int fiff_how_many_entries (fiffDirEntry dir)
-/*
-      * Count directory entries
-      */
-{
-    int nent = 0;
-    if (dir != NULL)
-        for (nent = 1; dir->kind != -1; nent++,dir++)
-            ;
-    return (nent);
-}
+//int fiff_how_many_entries (fiffDirEntry dir)
+///*
+//      * Count directory entries
+//      */
+//{
+//    int nent = 0;
+//    if (dir != NULL)
+//        for (nent = 1; dir->kind != -1; nent++,dir++)
+//            ;
+//    return (nent);
+//}
 
 
 
@@ -1775,140 +1773,140 @@ static int check_beginning (FILE *in, const char *name)
     return 0;
 }
 
-/*! Close file, free structures
- *
- * \param file File to be closed
- */
+///*! Close file, free structures
+// *
+// * \param file File to be closed
+// */
 
-void fiff_close (fiffFile file)
+//void fiff_close (fiffFile file)
 
-{
-    if (file == NULL)
-        return;
-    if (file->fd != NULL)
-        (void)fclose(file->fd);
-    FREE(file->file_name);
-    FREE(file->dir);
-    FREE(file->id);
-    FREE(file->ext_file_name);
-    if (file->ext_fd)
-        (void)fclose(file->ext_fd);
-    /*
-   * Destroy the directory tree
-   */
-    fiff_dir_tree_free(file->dirtree);
-    FREE(file);
-}
-
-
-/*
- * This is the same for both update open
- * and read-only open
- */
-
-static fiffFile open_file (const char *name, const char *mode)
-
-{
-    //  void fiff_close();
-    fiffFile file = MALLOC(1,fiffFileRec);
-    fiffTagRec tag;
-    long dirpos;
-    /*
-   * Clean fiff file descriptor
-   */
-    file->fd = NULL;
-    file->file_name = NULL;
-    file->id = NULL;
-    file->dir = NULL;
-    file->nent = 0;
-    file->dirtree = NULL;
-    file->ext_file_name = NULL;
-    file->ext_fd        = NULL;
-    /*
-   * Try to open...
-   */
-    if ((file->fd = fopen(name,mode)) == NULL) {
-        qCritical((char *)name);
-        fiff_close(file);
-        return (NULL);
-    }
-    file->file_name = MALLOC(strlen(name)+1,char);
-    strcpy(file->file_name,name);
-    tag.data = NULL;
-
-    if (check_beginning(file->fd,name) == -1)
-        goto bad;
-    /*
-   * Read id and directory pointer
-   */
-    if (fiff_read_tag(file->fd,&tag) == -1)
-        goto bad;
-    if (tag.kind != FIFF_FILE_ID) {
-        qCritical("FIFF file should start with FIFF_FILE_ID!");
-        goto bad;
-    }
-    file->id = (fiffId)tag.data;
-    tag.data = NULL;
-    if (fiff_read_tag(file->fd,&tag) == -1)
-        goto bad;
-    if (tag.kind != FIFF_DIR_POINTER) {
-        qCritical("FIFF_DIR_POINTER should follow FIFF_FILE_ID!");
-        goto bad;
-    }
-    /*
-   * Do we have a directory or not?
-   */
-    dirpos = *(fiff_int_t *)(tag.data);
-    FREE(tag.data); tag.data = NULL;
-    if (dirpos <= 0) {		/* Must do it in the hard way... */
-        if ((file->dir = fiff_make_dir (file->fd)) == NULL) {
-            qCritical ("Could not create tag directory!");
-            goto bad;
-        }
-    }
-    else {			/* Just read the directory */
-        if (fiff_read_this_tag(file->fd,dirpos,&tag) == -1) {
-            qCritical ("Could not read the tag directory (file probably damaged)!");
-            goto bad;
-        }
-        file->dir = (fiffDirEntry)tag.data;
-    }
-    file->nent = fiff_how_many_entries(file->dir);
-    /*
-   * Check for a mistake
-   */
-    if (file->dir[file->nent-2].kind == FIFF_DIR) {
-        file->nent--;
-        file->dir[file->nent-1].kind = -1;
-        file->dir[file->nent-1].type = -1;
-        file->dir[file->nent-1].size = -1;
-        file->dir[file->nent-1].pos  = -1;
-    }
-    if (fiff_dir_tree_create(file) == -1)
-        goto bad;
-    (void)fseek(file->fd,0L,SEEK_SET);
-    return (file);
-
-bad : {
-        fiff_close(file);
-        return(NULL);
-    }
-}
+//{
+//    if (file == NULL)
+//        return;
+//    if (file->fd != NULL)
+//        (void)fclose(file->fd);
+//    FREE(file->file_name);
+//    FREE(file->dir);
+//    FREE(file->id);
+//    FREE(file->ext_file_name);
+//    if (file->ext_fd)
+//        (void)fclose(file->ext_fd);
+//    /*
+//   * Destroy the directory tree
+//   */
+//    fiff_dir_tree_free(file->dirtree);
+//    FREE(file);
+//}
 
 
-/*! Open fiff file for reading
- *
- * \param name File to open
- * \return Function returns a fiffFile object representing the
- * open file.
- */
+///*
+// * This is the same for both update open
+// * and read-only open
+// */
 
-fiffFile fiff_open (const char *name)
-{
-    fiffFile res = open_file(name,"rb");
+//static fiffFile open_file (const char *name, const char *mode)
 
-    return (res);
-}
+//{
+//    //  void fiff_close();
+//    fiffFile file = MALLOC(1,fiffFileRec);
+//    fiffTagRec tag;
+//    long dirpos;
+//    /*
+//   * Clean fiff file descriptor
+//   */
+//    file->fd = NULL;
+//    file->file_name = NULL;
+//    file->id = NULL;
+//    file->dir = NULL;
+//    file->nent = 0;
+//    file->dirtree = NULL;
+//    file->ext_file_name = NULL;
+//    file->ext_fd        = NULL;
+//    /*
+//   * Try to open...
+//   */
+//    if ((file->fd = fopen(name,mode)) == NULL) {
+//        qCritical((char *)name);
+//        fiff_close(file);
+//        return (NULL);
+//    }
+//    file->file_name = MALLOC(strlen(name)+1,char);
+//    strcpy(file->file_name,name);
+//    tag.data = NULL;
+
+//    if (check_beginning(file->fd,name) == -1)
+//        goto bad;
+//    /*
+//   * Read id and directory pointer
+//   */
+//    if (fiff_read_tag(file->fd,&tag) == -1)
+//        goto bad;
+//    if (tag.kind != FIFF_FILE_ID) {
+//        qCritical("FIFF file should start with FIFF_FILE_ID!");
+//        goto bad;
+//    }
+//    file->id = (fiffId)tag.data;
+//    tag.data = NULL;
+//    if (fiff_read_tag(file->fd,&tag) == -1)
+//        goto bad;
+//    if (tag.kind != FIFF_DIR_POINTER) {
+//        qCritical("FIFF_DIR_POINTER should follow FIFF_FILE_ID!");
+//        goto bad;
+//    }
+//    /*
+//   * Do we have a directory or not?
+//   */
+//    dirpos = *(fiff_int_t *)(tag.data);
+//    FREE(tag.data); tag.data = NULL;
+//    if (dirpos <= 0) {		/* Must do it in the hard way... */
+//        if ((file->dir = fiff_make_dir (file->fd)) == NULL) {
+//            qCritical ("Could not create tag directory!");
+//            goto bad;
+//        }
+//    }
+//    else {			/* Just read the directory */
+//        if (fiff_read_this_tag(file->fd,dirpos,&tag) == -1) {
+//            qCritical ("Could not read the tag directory (file probably damaged)!");
+//            goto bad;
+//        }
+//        file->dir = (fiffDirEntry)tag.data;
+//    }
+//    file->nent = fiff_how_many_entries(file->dir);
+//    /*
+//   * Check for a mistake
+//   */
+//    if (file->dir[file->nent-2].kind == FIFF_DIR) {
+//        file->nent--;
+//        file->dir[file->nent-1].kind = -1;
+//        file->dir[file->nent-1].type = -1;
+//        file->dir[file->nent-1].size = -1;
+//        file->dir[file->nent-1].pos  = -1;
+//    }
+//    if (fiff_dir_tree_create(file) == -1)
+//        goto bad;
+//    (void)fseek(file->fd,0L,SEEK_SET);
+//    return (file);
+
+//bad : {
+//        fiff_close(file);
+//        return(NULL);
+//    }
+//}
+
+
+///*! Open fiff file for reading
+// *
+// * \param name File to open
+// * \return Function returns a fiffFile object representing the
+// * open file.
+// */
+
+//fiffFile fiff_open (const char *name)
+//{
+//    fiffFile res = open_file(name,"rb");
+
+//    return (res);
+//}
 
 
 //============================= mne_decompose.c =============================
@@ -1992,6 +1990,10 @@ int mne_read_meg_comp_eeg_ch_info(const QString& name,
       * one for MEG, one for MEG compensation channels, and one for EEG
       */
 {
+    QFile file(name);
+    FiffStream::SPtr stream(new FiffStream(&file));
+
+
     fiffChInfo chs   = NULL;
     int        nchan = 0;
     fiffChInfo meg   = NULL;
@@ -2001,39 +2003,50 @@ int mne_read_meg_comp_eeg_ch_info(const QString& name,
     fiffChInfo eeg   = NULL;
     int        neeg  = 0;
     fiffId     id    = NULL;
-    fiffDirNode *nodes = NULL;
-    fiffDirNode info = NULL;
-    fiffDirEntry this_ent;
+    QList<FiffDirNode> nodes;
+    FiffDirNode info;
+//    FiffDirEntry this_ent;
+    FiffTag::SPtr t_pTag;
     fiffTagRec   tag;
     fiffChInfo   this_ch;
     fiffFile     in = NULL;
     fiffCoordTrans t = NULL;
+    fiff_int_t kind, pos;
     int j,k,to_find;
     extern fiffCoordTrans mne_read_meas_transform(const QString& name);
 
     tag.data = NULL;
 
-    if ((in = fiff_open(name.toLatin1().data())) == NULL)
+//    if ((in = fiff_open(name.toLatin1().data())) == NULL)
+//        goto bad;
+    if(!stream->open())
         goto bad;
 
-    nodes = fiff_dir_tree_find(in->dirtree,FIFFB_MNE_PARENT_MEAS_FILE);
-    if (nodes[0] == NULL) {
-        FREE(nodes);
-        nodes = fiff_dir_tree_find(in->dirtree,FIFFB_MEAS_INFO);
-        if (nodes[0] == NULL) {
+//    nodes = fiff_dir_tree_find(in->dirtree,FIFFB_MNE_PARENT_MEAS_FILE);
+    nodes = stream->tree().dir_tree_find(FIFFB_MNE_PARENT_MEAS_FILE);
+
+    if (nodes.size() == 0) {
+//        FREE(nodes);
+//        nodes = fiff_dir_tree_find(in->dirtree,FIFFB_MEAS_INFO);
+        nodes = stream->tree().dir_tree_find(FIFFB_MEAS_INFO);
+        if (nodes.size() == 0) {
             qCritical ("Could not find the channel information.");
             goto bad;
         }
     }
-    info = nodes[0]; FREE(nodes);
+    info = nodes[0];// FREE(nodes);
     to_find = 0;
-    for (k = 0,this_ent = info->dir; k < info->nent; k++,this_ent++) {
-        switch (this_ent->kind) {
-
+    for (k = 0; k < info.nent; k++) {
+        kind = info.dir[k].kind;
+        pos  = info.dir[k].pos;
+        switch (kind) {
         case FIFF_NCHAN :
-            if (fiff_read_this_tag (in->fd,this_ent->pos,&tag) == FIFF_FAIL)
+//            if (fiff_read_this_tag (in->fd,this_ent->pos,&tag) == FIFF_FAIL)
+//                goto bad;
+//            nchan = *(int *)(tag.data);
+            if (!FiffTag::read_tag(stream.data(),t_pTag,pos))
                 goto bad;
-            nchan = *(int *)(tag.data);
+            nchan = *t_pTag->toInt();
             chs = MALLOC(nchan,fiffChInfoRec);
             for (j = 0; j < nchan; j++)
                 chs[j].scanNo = -1;
@@ -2041,16 +2054,23 @@ int mne_read_meg_comp_eeg_ch_info(const QString& name,
             break;
 
         case FIFF_PARENT_BLOCK_ID :
-            if (fiff_read_this_tag (in->fd,this_ent->pos,&tag) == FIFF_FAIL)
+//            if (fiff_read_this_tag (in->fd,this_ent->pos,&tag) == FIFF_FAIL)
+//                goto bad;
+//            *id = *(fiffId)tag.data;
+            if(!FiffTag::read_tag(stream.data(), t_pTag, pos))
                 goto bad;
-            id = MALLOC(1,fiffIdRec);
-            *id = *(fiffId)tag.data;
+//            id = t_pTag->toFiffID();
+            *id = *(fiffId)t_pTag->data();
             break;
 
         case FIFF_COORD_TRANS :
-            if (fiff_read_this_tag (in->fd,this_ent->pos,&tag) == FIFF_FAIL)
+//            if (fiff_read_this_tag (in->fd,this_ent->pos,&tag) == FIFF_FAIL)
+//                goto bad;
+//            t = (fiffCoordTrans)tag.data;
+            if(!FiffTag::read_tag(stream.data(), t_pTag, pos))
                 goto bad;
-            t = (fiffCoordTrans)tag.data;
+//            t = t_pTag->toCoordTrans();
+            t = (fiffCoordTrans)t_pTag->data();
             if (t->from != FIFFV_COORD_DEVICE ||
                     t->to   != FIFFV_COORD_HEAD)
                 t = NULL;
@@ -2059,9 +2079,13 @@ int mne_read_meg_comp_eeg_ch_info(const QString& name,
             break;
 
         case FIFF_CH_INFO :		/* Information about one channel */
-            if (fiff_read_this_tag (in->fd,this_ent->pos,&tag) == FIFF_FAIL)
+//            if (fiff_read_this_tag (in->fd,this_ent->pos,&tag) == FIFF_FAIL)
+//                goto bad;
+//            this_ch = (fiffChInfo)(tag.data);
+            if(!FiffTag::read_tag(stream.data(), t_pTag, pos))
                 goto bad;
-            this_ch = (fiffChInfo)(tag.data);
+//            this_ch = t_pTag->toChInfo();
+            this_ch = (fiffChInfo)(t_pTag->data());
             if (this_ch->scanNo <= 0 || this_ch->scanNo > nchan) {
                 printf ("FIFF_CH_INFO : scan # out of range %d (%d)!",this_ch->scanNo,nchan);
                 goto bad;
@@ -2110,7 +2134,8 @@ int mne_read_meg_comp_eeg_ch_info(const QString& name,
             meg_comp[nmeg_comp++] = chs[k];
         else if (chs[k].kind == FIFFV_EEG_CH)
             eeg[neeg++] = chs[k];
-    fiff_close(in);
+//    fiff_close(in);
+    stream->device()->close();
     FREE(chs);
     if (megp) {
         *megp  = meg;
@@ -2144,7 +2169,8 @@ int mne_read_meg_comp_eeg_ch_info(const QString& name,
     return FIFF_OK;
 
 bad : {
-        fiff_close(in);
+//        fiff_close(in);
+        stream->device()->close();
         FREE(chs);
         FREE(meg);
         FREE(eeg);

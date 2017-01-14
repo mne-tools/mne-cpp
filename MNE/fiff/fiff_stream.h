@@ -144,6 +144,7 @@ public:
     //=========================================================================================================
     /**
     * Returns the directory compiled into a tree
+    * dir is set when open() was called.
     *
     * @return the directory
     */
@@ -152,6 +153,7 @@ public:
     //=========================================================================================================
     /**
     * Returns the directory compiled into a tree
+    * tree is set when open() was called.
     *
     * @return the compiled directory
     */
