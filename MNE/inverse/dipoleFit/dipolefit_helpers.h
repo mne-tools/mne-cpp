@@ -4696,21 +4696,34 @@ static void get_aspect_name_type(fiffFile file,fiffDirNode start, char **namep, 
 }
 
 
-static char *get_meas_date (fiffFile file,fiffDirNode node)
+static char *get_meas_date (//fiffFile file,
+                            FiffStream::SPtr& stream,
+                            const FiffDirNode& node)
 
 {
     int k;
-    fiffTagRec tag;
-    fiffDirEntry ent;
+//    fiffTagRec tag;
+    FiffTag::SPtr t_pTag;
+//    fiffDirEntry ent;
     char *res = NULL;
+    fiff_int_t kind, pos;
+    QList<FiffDirNode> meas_info;
 
-    if ((node = find_meas_info(node)) == NULL)
+    meas_info = node.dir_tree_find(FIFFB_MEAS_INFO);
+//    if ((node = find_meas_info(node)) == NULL) {
+    if (meas_info.count() == 0) {
         return res;
-    tag.data = NULL;
-    for (k = 0, ent = node->dir; k < node->nent; ent++,k++)
-        if (ent->kind == FIFF_MEAS_DATE)
-            if (fiff_read_this_tag (file->fd,ent->pos,&tag) != -1) {
-                fiffTime meas_date = (fiffTime)tag.data;
+    }
+//    tag.data = NULL;
+    for (k = 0; k < meas_info[0].nent;k++) {
+        kind = meas_info[0].dir[k].kind;
+        pos  = meas_info[0].dir[k].pos;
+        if (kind == FIFF_MEAS_DATE)
+        {
+ //           if (fiff_read_this_tag (file->fd,ent->pos,&tag) != -1) {
+            if (FiffTag::read_tag(stream.data(),t_pTag,pos)) {
+//                fiffTime meas_date = (fiffTime)tag.data;
+                fiffTime meas_date = (fiffTime)t_pTag->data();
                 time_t   time = meas_date->secs;
                 struct   tm *ltime;
 
@@ -4719,11 +4732,14 @@ static char *get_meas_date (fiffFile file,fiffDirNode node)
                 (void)strftime(res,MAXDATE,"%x %X",ltime);
                 break;
             }
-    FREE(tag.data);
+        }
+    }
+//    FREE(tag.data);
     return res;
 }
 
-int mne_find_evoked_types_comments (fiffFile    file,
+int mne_find_evoked_types_comments (//fiffFile    file,
+                                    FiffStream::SPtr& stream,
                                     fiffDirNode **nodesp,
                                     int         **aspect_typesp,
                                     char        ***commentsp)
@@ -4731,48 +4747,55 @@ int mne_find_evoked_types_comments (fiffFile    file,
       * Find all data we are able to process
       */
 {
-    fiffDirNode *evoked;
-    fiffDirNode *meas;
-    fiffDirNode *nodes = NULL;
+//    fiffDirNode *evoked;
+    QList<FiffDirNode> evoked;
+//    fiffDirNode *meas;
+    QList<FiffDirNode> meas;
+    QList<FiffDirNode> nodes;
     int         evoked_count,count;
     char        *part,*type,*meas_date;
     char        **comments = NULL;
     int         *types = NULL;
     int         j,k,p;
 
-    if (file == NULL)
+    if (stream == NULL)
         return 0;
     /*
-   * First find all measurements
-   */
-    meas = fiff_dir_tree_find(file->dirtree,FIFFB_MEAS);
+    * First find all measurements
+    */
+//    meas = fiff_dir_tree_find(file->dirtree,FIFFB_MEAS);
+    meas = stream->tree().dir_tree_find(FIFFB_MEAS);
     /*
    * Process each measurement
    */
-    for (count = 0,p = 0; meas[p] != NULL; p++) {
-        evoked = fiff_dir_tree_find(meas[p],FIFFB_EVOKED);
+    for (count = 0,p = 0; p < meas.size(); p++) {
+//        evoked = fiff_dir_tree_find(meas[p],FIFFB_EVOKED);
+        evoked = meas[p].dir_tree_find(FIFFB_EVOKED);
         /*
-     * Count the entries
-     */
-        for (evoked_count = 0, j = 0; evoked[j] != NULL; j++)
-            for (k = 0; k < evoked[j]->nchild; k++)
-                if (evoked[j]->children[k]->type == FIFFB_ASPECT)
+        * Count the entries
+        */
+        for (evoked_count = 0, j = 0; j < evoked.size(); j++) {
+            for (k = 0; k < evoked[j].nchild; k++) {
+                if (evoked[j].children[k].type == FIFFB_ASPECT) {
                     evoked_count++;
+                }
+            }
+        }
         /*
-     * Enlarge tables
-     */
+        * Enlarge tables
+        */
         comments = REALLOC(comments,count+evoked_count+1,char *);
         types    = REALLOC(types,count+evoked_count+1,int);
-        nodes    = REALLOC(nodes,count+evoked_count+1,fiffDirNode);
+//        nodes    = REALLOC(nodes,count+evoked_count+1,fiffDirNode);
         /*
      * Insert node references and compile associated comments...
      */
-        for (j = 0; evoked[j] != NULL; j++)	/* Evoked data */
-            for (k = 0; k < evoked[j]->nchild; k++)
-                if (evoked[j]->children[k]->type == FIFFB_ASPECT) {
-                    meas_date = get_meas_date(file,evoked[j]);
+        for (j = 0; j < evoked.size(); j++)	/* Evoked data */
+            for (k = 0; k < evoked[j].nchild; k++)
+                if (evoked[j].children[k].type == FIFFB_ASPECT) {
+                    meas_date = get_meas_date(stream,evoked[j]);
                     part      = get_comment(file,evoked[j]);
-                    get_aspect_name_type(file,evoked[j]->children[k],&type,types+count);
+                    get_aspect_name_type(file,evoked[j].children[k],&type,types+count);
                     if (meas_date) {
                         comments[count] = MALLOC(strlen(part)+strlen(type)+strlen(meas_date)+10,char);
                         sprintf(comments[count],"%s>%s>%s",meas_date,part,type);
@@ -4781,7 +4804,8 @@ int mne_find_evoked_types_comments (fiffFile    file,
                         comments[count] = MALLOC(strlen(part)+strlen(type)+10,char);
                         sprintf(comments[count],"%s>%s",part,type);
                     }
-                    nodes[count] = evoked[j]->children[k];
+//                    nodes[count] = evoked[j]->children[k];
+                    nodes.append(evoked[j].children[k]);
                     count++;
                 }
     }
