@@ -238,7 +238,7 @@ public:
     static const char *get_tag_explanation (int kind);
 
 public:
-    fiff_int_t          block;      /**< Block type for this directory */
+    fiff_int_t          type;       /**< Block type for this directory */
     FiffId              id;         /**< Id of this block if any */
     FiffId              parent_id;  /**< Newly added to stay consistent with MATLAB implementation */
     QList<FiffDirEntry> dir;        /**< Directory of tags in this node */
