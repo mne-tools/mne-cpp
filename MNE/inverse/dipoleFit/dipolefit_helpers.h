@@ -3500,249 +3500,238 @@ FwdCoilSet* fwd_dup_coil_set(FwdCoilSet* s,
 //============================= fiff_matrix.c =============================
 
 
-int *fiff_get_matrix_dims(fiffTag tag)
-/*
-      * Interpret dimensions from matrix data (dense and sparse)
-      */
-{
-    int ndim;
-    int *dims;
-    int *res,k;
-    unsigned int tsize = tag->size;
-    /*
-   * Initial checks
-   */
-    if (tag->data == NULL) {
-        qCritical("fiff_get_matrix_dims: no data available!");
-        return NULL;
-    }
-    if (fiff_type_fundamental(tag->type) != FIFFTS_FS_MATRIX) {
-        qCritical("fiff_get_matrix_dims: tag does not contain a matrix!");
-        return NULL;
-    }
-    if (tsize < sizeof(fiff_int_t)) {
-        qCritical("fiff_get_matrix_dims: too small matrix data!");
-        return NULL;
-    }
-    /*
-   * Get the number of dimensions and check
-   */
-    ndim = *((fiff_int_t *)((fiff_byte_t *)(tag->data)+tag->size-sizeof(fiff_int_t)));
-    if (ndim <= 0 || ndim > FIFFC_MATRIX_MAX_DIM) {
-        qCritical("fiff_get_matrix_dims: unreasonable # of dimensions!");
-        return NULL;
-    }
-    if (fiff_type_matrix_coding(tag->type) == FIFFTS_MC_DENSE) {
-        if (tsize < (ndim+1)*sizeof(fiff_int_t)) {
-            qCritical("fiff_get_matrix_dims: too small matrix data!");
-            return NULL;
-        }
-        res = MALLOC(ndim+1,int);
-        res[0] = ndim;
-        dims = ((fiff_int_t *)((fiff_byte_t *)(tag->data)+tag->size)) - ndim - 1;
-        for (k = 0; k < ndim; k++)
-            res[k+1] = dims[k];
-    }
-    else if (fiff_type_matrix_coding(tag->type) == FIFFTS_MC_CCS ||
-             fiff_type_matrix_coding(tag->type) == FIFFTS_MC_RCS) {
-        if (tsize < (ndim+2)*sizeof(fiff_int_t)) {
-            qCritical("fiff_get_matrix_sparse_dims: too small matrix data!");
-            return NULL; }
+//int *fiff_get_matrix_dims(fiffTag tag)
+///*
+//      * Interpret dimensions from matrix data (dense and sparse)
+//      */
+//{
+//    int ndim;
+//    int *dims;
+//    int *res,k;
+//    unsigned int tsize = tag->size;
+//    /*
+//   * Initial checks
+//   */
+//    if (tag->data == NULL) {
+//        qCritical("fiff_get_matrix_dims: no data available!");
+//        return NULL;
+//    }
+//    if (fiff_type_fundamental(tag->type) != FIFFTS_FS_MATRIX) {
+//        qCritical("fiff_get_matrix_dims: tag does not contain a matrix!");
+//        return NULL;
+//    }
+//    if (tsize < sizeof(fiff_int_t)) {
+//        qCritical("fiff_get_matrix_dims: too small matrix data!");
+//        return NULL;
+//    }
+//    /*
+//   * Get the number of dimensions and check
+//   */
+//    ndim = *((fiff_int_t *)((fiff_byte_t *)(tag->data)+tag->size-sizeof(fiff_int_t)));
+//    if (ndim <= 0 || ndim > FIFFC_MATRIX_MAX_DIM) {
+//        qCritical("fiff_get_matrix_dims: unreasonable # of dimensions!");
+//        return NULL;
+//    }
+//    if (fiff_type_matrix_coding(tag->type) == FIFFTS_MC_DENSE) {
+//        if (tsize < (ndim+1)*sizeof(fiff_int_t)) {
+//            qCritical("fiff_get_matrix_dims: too small matrix data!");
+//            return NULL;
+//        }
+//        res = MALLOC(ndim+1,int);
+//        res[0] = ndim;
+//        dims = ((fiff_int_t *)((fiff_byte_t *)(tag->data)+tag->size)) - ndim - 1;
+//        for (k = 0; k < ndim; k++)
+//            res[k+1] = dims[k];
+//    }
+//    else if (fiff_type_matrix_coding(tag->type) == FIFFTS_MC_CCS ||
+//             fiff_type_matrix_coding(tag->type) == FIFFTS_MC_RCS) {
+//        if (tsize < (ndim+2)*sizeof(fiff_int_t)) {
+//            qCritical("fiff_get_matrix_sparse_dims: too small matrix data!");
+//            return NULL; }
 
-        res = MALLOC(ndim+2,int);
-        res[0] = ndim;
-        dims = ((fiff_int_t *)((fiff_byte_t *)(tag->data)+tag->size)) - ndim - 1;
-        for (k = 0; k < ndim; k++)
-            res[k+1] = dims[k];
-        res[ndim+1] = dims[-1];
-    }
-    else {
-        qCritical("fiff_get_matrix_dims: unknown matrix coding.");
-        return NULL;
-    }
-    return res;
-}
-
-
-int **fiff_get_int_matrix(fiffTag tag)
-/*
-      * Conversion into the standard
-      * representation
-      */
-{
-    int *dims;
-    int k;
-    int **res;
-    int *data;
-    unsigned int tsize = tag->size;
-    /*
-   * Checks first!
-   */
-    if ( fiff_type_fundamental(tag->type)   != FIFFT_MATRIX ||
-         fiff_type_base(tag->type)          != FIFFT_INT ||
-         fiff_type_matrix_coding(tag->type) != FIFFTS_MC_DENSE) {
-        printf("fiff_get_int_matrix: wrong data type!");
-        return NULL;
-    }
-    if ((dims = fiff_get_matrix_dims(tag)) == NULL)
-        return NULL;
-    if (dims[0] != 2) {
-        printf("fiff_get_int_matrix: wrong # of dimensions!");
-        return NULL;
-    }
-    if (tsize != dims[1]*dims[2]*sizeof(fiff_int_t) +
-            3*sizeof(fiff_int_t)) {
-        printf("fiff_get_int_matrix: wrong data size!");
-        FREE(dims);
-        return NULL;
-    }
-    /*
-   * Set up pointers
-   */
-    res = MALLOC(dims[2],int *);
-    data = (int *)(tag->data);
-    for (k = 0; k < dims[2]; k++)
-        res[k] = data+k*dims[1];
-    /*
-   * Free unnecessary data and exit
-   */
-    FREE(dims);
-    tag->data = NULL;
-    return res;
-}
-
-float **fiff_get_float_matrix(fiffTag tag)
-/*
-      * Conversion into the standard
-      * representation
-      */
-{
-    int *dims;
-    int k;
-    float **res;
-    float *data;
-    unsigned int tsize = tag->size;
-    /*
-   * Checks first!
-   */
-    if ( fiff_type_fundamental(tag->type)   != FIFFT_MATRIX ||
-         fiff_type_base(tag->type)          != FIFFT_FLOAT ||
-         fiff_type_matrix_coding(tag->type) != FIFFTS_MC_DENSE) {
-        qCritical("fiff_get_float_matrix: wrong data type!");
-        return NULL;
-    }
-    if ((dims = fiff_get_matrix_dims(tag)) == NULL)
-        return NULL;
-    if (dims[0] != 2) {
-        qCritical("fiff_get_float_matrix: wrong # of dimensions!");
-        return NULL;
-    }
-    if (tsize != dims[1]*dims[2]*sizeof(fiff_float_t) +
-            3*sizeof(fiff_int_t)) {
-        qCritical("fiff_get_float_matrix: wrong data size!");
-        FREE(dims);
-        return NULL;
-    }
-    /*
-   * Set up pointers
-   */
-    res = MALLOC(dims[2],float *);
-    data = (float *)(tag->data);
-    for (k = 0; k < dims[2]; k++)
-        res[k] = data+k*dims[1];
-    /*
-   * Free unnecessary data and exit
-   */
-    FREE(dims);
-    tag->data = NULL;
-    return res;
-}
+//        res = MALLOC(ndim+2,int);
+//        res[0] = ndim;
+//        dims = ((fiff_int_t *)((fiff_byte_t *)(tag->data)+tag->size)) - ndim - 1;
+//        for (k = 0; k < ndim; k++)
+//            res[k+1] = dims[k];
+//        res[ndim+1] = dims[-1];
+//    }
+//    else {
+//        qCritical("fiff_get_matrix_dims: unknown matrix coding.");
+//        return NULL;
+//    }
+//    return res;
+//}
 
 
+//int **fiff_get_int_matrix(fiffTag tag)
+///*
+//      * Conversion into the standard
+//      * representation
+//      */
+//{
+//    int *dims;
+//    int k;
+//    int **res;
+//    int *data;
+//    unsigned int tsize = tag->size;
+//    /*
+//   * Checks first!
+//   */
+//    if ( fiff_type_fundamental(tag->type)   != FIFFT_MATRIX ||
+//         fiff_type_base(tag->type)          != FIFFT_INT ||
+//         fiff_type_matrix_coding(tag->type) != FIFFTS_MC_DENSE) {
+//        printf("fiff_get_int_matrix: wrong data type!");
+//        return NULL;
+//    }
+//    if ((dims = fiff_get_matrix_dims(tag)) == NULL)
+//        return NULL;
+//    if (dims[0] != 2) {
+//        printf("fiff_get_int_matrix: wrong # of dimensions!");
+//        return NULL;
+//    }
+//    if (tsize != dims[1]*dims[2]*sizeof(fiff_int_t) +
+//            3*sizeof(fiff_int_t)) {
+//        printf("fiff_get_int_matrix: wrong data size!");
+//        FREE(dims);
+//        return NULL;
+//    }
+//    /*
+//   * Set up pointers
+//   */
+//    res = MALLOC(dims[2],int *);
+//    data = (int *)(tag->data);
+//    for (k = 0; k < dims[2]; k++)
+//        res[k] = data+k*dims[1];
+//    /*
+//   * Free unnecessary data and exit
+//   */
+//    FREE(dims);
+//    tag->data = NULL;
+//    return res;
+//}
 
-
-
-
-
+//float **fiff_get_float_matrix(fiffTag tag)
+///*
+//      * Conversion into the standard
+//      * representation
+//      */
+//{
+//    int *dims;
+//    int k;
+//    float **res;
+//    float *data;
+//    unsigned int tsize = tag->size;
+//    /*
+//   * Checks first!
+//   */
+//    if ( fiff_type_fundamental(tag->type)   != FIFFT_MATRIX ||
+//         fiff_type_base(tag->type)          != FIFFT_FLOAT ||
+//         fiff_type_matrix_coding(tag->type) != FIFFTS_MC_DENSE) {
+//        qCritical("fiff_get_float_matrix: wrong data type!");
+//        return NULL;
+//    }
+//    if ((dims = fiff_get_matrix_dims(tag)) == NULL)
+//        return NULL;
+//    if (dims[0] != 2) {
+//        qCritical("fiff_get_float_matrix: wrong # of dimensions!");
+//        return NULL;
+//    }
+//    if (tsize != dims[1]*dims[2]*sizeof(fiff_float_t) +
+//            3*sizeof(fiff_int_t)) {
+//        qCritical("fiff_get_float_matrix: wrong data size!");
+//        FREE(dims);
+//        return NULL;
+//    }
+//    /*
+//   * Set up pointers
+//   */
+//    res = MALLOC(dims[2],float *);
+//    data = (float *)(tag->data);
+//    for (k = 0; k < dims[2]; k++)
+//        res[k] = data+k*dims[1];
+//    /*
+//   * Free unnecessary data and exit
+//   */
+//    FREE(dims);
+//    tag->data = NULL;
+//    return res;
+//}
 
 
 //============================= fiff_sparse.c =============================
 
+//fiff_int_t *fiff_get_matrix_sparse_dims(fiffTag tag)
+///*
+//   * Interpret dimensions and nz from matrix data
+//   */
+//{
+//    return fiff_get_matrix_dims(tag);
+//}
 
 
-fiff_int_t *fiff_get_matrix_sparse_dims(fiffTag tag)
-/*
-   * Interpret dimensions and nz from matrix data
-   */
-{
-    return fiff_get_matrix_dims(tag);
-}
+//fiff_sparse_matrix_t *fiff_get_float_sparse_matrix(fiffTag tag)
+///*
+//   * Conversion into the standard representation
+//   */
+//{
+//    int *dims;
+//    fiff_sparse_matrix_t *res = NULL;
+//    int   m,n,nz;
+//    int   coding,correct_size;
 
+//    if ( fiff_type_fundamental(tag->type)   != FIFFT_MATRIX ||
+//         fiff_type_base(tag->type)          != FIFFT_FLOAT ||
+//         (fiff_type_matrix_coding(tag->type) != FIFFTS_MC_CCS &&
+//          fiff_type_matrix_coding(tag->type) != FIFFTS_MC_RCS) ) {
+//        printf("fiff_get_float_ccs_matrix: wrong data type!");
+//        return NULL;
+//    }
 
+//    if ((dims = fiff_get_matrix_sparse_dims(tag)) == NULL)
+//        return NULL;
 
+//    if (dims[0] != 2) {
+//        printf("fiff_get_float_sparse_matrix: wrong # of dimensions!");
+//        return NULL;
+//    }
 
-fiff_sparse_matrix_t *fiff_get_float_sparse_matrix(fiffTag tag)
-/*
-   * Conversion into the standard representation
-   */
-{
-    int *dims;
-    fiff_sparse_matrix_t *res = NULL;
-    int   m,n,nz;
-    int   coding,correct_size;
+//    m   = dims[1];
+//    n   = dims[2];
+//    nz  = dims[3];
 
-    if ( fiff_type_fundamental(tag->type)   != FIFFT_MATRIX ||
-         fiff_type_base(tag->type)          != FIFFT_FLOAT ||
-         (fiff_type_matrix_coding(tag->type) != FIFFTS_MC_CCS &&
-          fiff_type_matrix_coding(tag->type) != FIFFTS_MC_RCS) ) {
-        printf("fiff_get_float_ccs_matrix: wrong data type!");
-        return NULL;
-    }
+//    coding = fiff_type_matrix_coding(tag->type);
+//    if (coding == FIFFTS_MC_CCS)
+//        correct_size = nz*(sizeof(fiff_float_t) + sizeof(fiff_int_t)) +
+//                (n+1+dims[0]+2)*(sizeof(fiff_int_t));
+//    else if (coding == FIFFTS_MC_RCS)
+//        correct_size = nz*(sizeof(fiff_float_t) + sizeof(fiff_int_t)) +
+//                (m+1+dims[0]+2)*(sizeof(fiff_int_t));
+//    else {
+//        printf("fiff_get_float_sparse_matrix: Incomprehensible sparse matrix coding");
+//        return NULL;
+//    }
+//    if (tag->size != correct_size) {
+//        printf("fiff_get_float_sparse_matrix: wrong data size!");
+//        FREE(dims);
+//        return NULL;
+//    }
+//    /*
+//   * Set up structure
+//   */
+//    res = MALLOC(1,fiff_sparse_matrix_t);
+//    res->m      = m;
+//    res->n      = n;
+//    res->nz     = nz;
+//    res->data   = (float *)(tag->data);  tag->data = NULL;
+//    res->coding = coding;
+//    res->inds   = (int *)(res->data + res->nz);
+//    res->ptrs   = res->inds + res->nz;
 
-    if ((dims = fiff_get_matrix_sparse_dims(tag)) == NULL)
-        return NULL;
+//    FREE(dims);
 
-    if (dims[0] != 2) {
-        printf("fiff_get_float_sparse_matrix: wrong # of dimensions!");
-        return NULL;
-    }
-
-    m   = dims[1];
-    n   = dims[2];
-    nz  = dims[3];
-
-    coding = fiff_type_matrix_coding(tag->type);
-    if (coding == FIFFTS_MC_CCS)
-        correct_size = nz*(sizeof(fiff_float_t) + sizeof(fiff_int_t)) +
-                (n+1+dims[0]+2)*(sizeof(fiff_int_t));
-    else if (coding == FIFFTS_MC_RCS)
-        correct_size = nz*(sizeof(fiff_float_t) + sizeof(fiff_int_t)) +
-                (m+1+dims[0]+2)*(sizeof(fiff_int_t));
-    else {
-        printf("fiff_get_float_sparse_matrix: Incomprehensible sparse matrix coding");
-        return NULL;
-    }
-    if (tag->size != correct_size) {
-        printf("fiff_get_float_sparse_matrix: wrong data size!");
-        FREE(dims);
-        return NULL;
-    }
-    /*
-   * Set up structure
-   */
-    res = MALLOC(1,fiff_sparse_matrix_t);
-    res->m      = m;
-    res->n      = n;
-    res->nz     = nz;
-    res->data   = (float *)(tag->data);  tag->data = NULL;
-    res->coding = coding;
-    res->inds   = (int *)(res->data + res->nz);
-    res->ptrs   = res->inds + res->nz;
-
-    FREE(dims);
-
-    return res;
-}
+//    return res;
+//}
 
 
 
@@ -4398,122 +4387,125 @@ void mne_channel_names_to_name_list(fiffChInfo chs, int nch,
 }
 
 
-mneNamedMatrix mne_read_named_matrix(//fiffFile in,
-                                     FiffStream::SPtr& stream,
-                                     FiffDirNode& node,int kind)
-/*
-      * Read a named matrix from the specified node
-      */
-{
-    char **colnames = NULL;
-    char **rownames = NULL;
-    int  ncol = 0;
-    int  nrow = 0;
-    int  *dims = NULL;
-    float **data = NULL;
-    int  val;
-    char *s;
-    fiffTag tag;
-    int     k;
-    /*
-   * If the node is a named-matrix mode, use it.
-   * Otherwise, look in first-generation children
-   */
-    if (node.type == FIFFB_MNE_NAMED_MATRIX) {
-        if ((tag = fiff_dir_tree_get_tag(in,node,kind)) == NULL)
-            goto bad;
-        if ((dims = fiff_get_matrix_dims(tag)) == NULL)
-            goto bad;
-        if (dims[0] != 2) {
-            qCritical("mne_read_named_matrix only works with two-dimensional matrices");
-            goto bad;
-        }
-        if ((data = fiff_get_float_matrix(tag)) == NULL) {
-            TAG_FREE(tag);
-            goto bad;
-        }
-    }
-    else {
-        for (k = 0; k < node->nchild; k++) {
-            if (node->children[k]->type == FIFFB_MNE_NAMED_MATRIX) {
-                if ((tag = fiff_dir_tree_get_tag(in,node->children[k],kind)) != NULL) {
-                    if ((dims = fiff_get_matrix_dims(tag)) == NULL)
-                        goto bad;
-                    if (dims[0] != 2) {
-                        qCritical("mne_read_named_matrix only works with two-dimensional matrices");
-                        goto bad;
-                    }
-                    if ((data = fiff_get_float_matrix(tag)) == NULL) {
-                        TAG_FREE(tag);
-                        goto bad;
-                    }
-                    FREE(tag);
-                    node = node->children[k];
-                    break;
-                }
-            }
-        }
-        if (!data)
-            goto bad;
-    }
-    /*
-   * Separate FIFF_MNE_NROW is now optional
-   */
-    if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_NROW)) == NULL)
-        nrow = dims[2];
-    else {
-        nrow = *(int *)(tag->data);
-        if (nrow != dims[2]) {
-            qCritical("Number of rows in the FIFF_MNE_NROW tag and in the matrix data conflict.");
-            goto bad;
-        }
-    }
-    TAG_FREE(tag);
-    /*
-   * Separate FIFF_MNE_NCOL is now optional
-   */
-    if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_NCOL)) == NULL)
-        ncol = dims[1];
-    else {
-        ncol = *(int *)(tag->data);
-        if (ncol != dims[1]) {
-            qCritical("Number of columns in the FIFF_MNE_NCOL tag and in the matrix data conflict.");
-            goto bad;
-        }
-    }
-    TAG_FREE(tag);
+//mneNamedMatrix mne_read_named_matrix(//fiffFile in,
+//                                     FiffStream::SPtr& stream,
+//                                     FiffDirNode& node,int kind)
+///*
+//      * Read a named matrix from the specified node
+//      */
+//{
+//    char **colnames = NULL;
+//    char **rownames = NULL;
+//    int  ncol = 0;
+//    int  nrow = 0;
+//    int  *dims = NULL;
+//    float **data = NULL;
+//    int  val;
+//    char *s;
+//    FiffTag::SPtr t_pTag;
+////    fiffTag tag;
+//    int     k;
+//    /*
+//   * If the node is a named-matrix mode, use it.
+//   * Otherwise, look in first-generation children
+//   */
+//    if (node.type == FIFFB_MNE_NAMED_MATRIX) {
+////        if ((tag = fiff_dir_tree_get_tag(in,node,kind)) == NULL)
+////            goto bad;
+//        if(!node.find_tag(stream.data(), kind, t_pTag))
+//            goto bad;
+//        if ((dims = fiff_get_matrix_dims(tag)) == NULL)
+//            goto bad;
+//        if (dims[0] != 2) {
+//            qCritical("mne_read_named_matrix only works with two-dimensional matrices");
+//            goto bad;
+//        }
+//        if ((data = fiff_get_float_matrix(tag)) == NULL) {
+//            TAG_FREE(tag);
+//            goto bad;
+//        }
+//    }
+//    else {
+//        for (k = 0; k < node->nchild; k++) {
+//            if (node->children[k]->type == FIFFB_MNE_NAMED_MATRIX) {
+//                if ((tag = fiff_dir_tree_get_tag(in,node->children[k],kind)) != NULL) {
+//                    if ((dims = fiff_get_matrix_dims(tag)) == NULL)
+//                        goto bad;
+//                    if (dims[0] != 2) {
+//                        qCritical("mne_read_named_matrix only works with two-dimensional matrices");
+//                        goto bad;
+//                    }
+//                    if ((data = fiff_get_float_matrix(tag)) == NULL) {
+//                        TAG_FREE(tag);
+//                        goto bad;
+//                    }
+//                    FREE(tag);
+//                    node = node->children[k];
+//                    break;
+//                }
+//            }
+//        }
+//        if (!data)
+//            goto bad;
+//    }
+//    /*
+//   * Separate FIFF_MNE_NROW is now optional
+//   */
+//    if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_NROW)) == NULL)
+//        nrow = dims[2];
+//    else {
+//        nrow = *(int *)(tag->data);
+//        if (nrow != dims[2]) {
+//            qCritical("Number of rows in the FIFF_MNE_NROW tag and in the matrix data conflict.");
+//            goto bad;
+//        }
+//    }
+//    TAG_FREE(tag);
+//    /*
+//   * Separate FIFF_MNE_NCOL is now optional
+//   */
+//    if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_NCOL)) == NULL)
+//        ncol = dims[1];
+//    else {
+//        ncol = *(int *)(tag->data);
+//        if (ncol != dims[1]) {
+//            qCritical("Number of columns in the FIFF_MNE_NCOL tag and in the matrix data conflict.");
+//            goto bad;
+//        }
+//    }
+//    TAG_FREE(tag);
 
-    if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_ROW_NAMES)) != NULL) {
-        s = (char *)(tag->data);
-        mne_string_to_name_list(s,&rownames,&val);
-        TAG_FREE(tag);
-        if (val != nrow) {
-            qCritical("Incorrect number of entries in the row name list");
-            nrow = val;
-            goto bad;
-        }
-    }
-    if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_COL_NAMES)) != NULL) {
-        s = (char *)(tag->data);
-        mne_string_to_name_list(s,&colnames,&val);
-        TAG_FREE(tag);
-        if (val != ncol) {
-            qCritical("Incorrect number of entries in the column name list");
-            ncol = val;
-            goto bad;
-        }
-    }
-    FREE(dims);
-    return mne_build_named_matrix(nrow,ncol,rownames,colnames,data);
+//    if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_ROW_NAMES)) != NULL) {
+//        s = (char *)(tag->data);
+//        mne_string_to_name_list(s,&rownames,&val);
+//        TAG_FREE(tag);
+//        if (val != nrow) {
+//            qCritical("Incorrect number of entries in the row name list");
+//            nrow = val;
+//            goto bad;
+//        }
+//    }
+//    if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_COL_NAMES)) != NULL) {
+//        s = (char *)(tag->data);
+//        mne_string_to_name_list(s,&colnames,&val);
+//        TAG_FREE(tag);
+//        if (val != ncol) {
+//            qCritical("Incorrect number of entries in the column name list");
+//            ncol = val;
+//            goto bad;
+//        }
+//    }
+//    FREE(dims);
+//    return mne_build_named_matrix(nrow,ncol,rownames,colnames,data);
 
-bad : {
-        mne_free_name_list(rownames,nrow);
-        mne_free_name_list(colnames,ncol);
-        FREE_CMATRIX(data);
-        FREE(dims);
-        return NULL;
-    }
-}
+//bad : {
+//        mne_free_name_list(rownames,nrow);
+//        mne_free_name_list(colnames,ncol);
+//        FREE_CMATRIX(data);
+//        FREE(dims);
+//        return NULL;
+//    }
+//}
 
 mneNamedMatrix mne_pick_from_named_matrix(mneNamedMatrix mat,
                                           char           **pickrowlist,
