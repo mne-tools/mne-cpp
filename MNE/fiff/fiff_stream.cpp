@@ -786,8 +786,7 @@ bool FiffStream::read_meas_info(const FiffDirNode& p_Node, FiffInfo& info, FiffD
     }
     //
     QList<FiffDirNode> meas_info = meas[0].dir_tree_find(FIFFB_MEAS_INFO);
-    if (meas_info.count() == 0)
-    {
+    if (meas_info.count() == 0) {
         printf("Could not find measurement info\n");
 //        delete meas[0];
         return false;
@@ -1091,11 +1090,11 @@ bool FiffStream::read_named_matrix(const FiffDirNode& p_Node, fiff_int_t matkind
     //   Descend one level if necessary
     //
     bool found_it = false;
-    if (node.block != FIFFB_MNE_NAMED_MATRIX)
+    if (node.type != FIFFB_MNE_NAMED_MATRIX)
     {
         for (int k = 0; k < node.nchild; ++k)
         {
-            if (node.children[k].block == FIFFB_MNE_NAMED_MATRIX)
+            if (node.children[k].type == FIFFB_MNE_NAMED_MATRIX)
             {
                 if(node.children[k].has_tag(matkind))
                 {
