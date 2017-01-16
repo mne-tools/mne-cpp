@@ -175,3 +175,6 @@ win32 {
     #  warning($${DEPLOY_COMMAND} $${DEPLOY_TARGET})
     QMAKE_POST_LINK += $${DEPLOY_COMMAND} $${DEPLOY_TARGET}
 }
+
+DISTFILES += \
+    dipoleFit/dipolefit_helpers_bak.txt
