@@ -88,6 +88,10 @@ namespace FIFFLIB{
     class FiffDigPointSet;
 }
 
+namespace INVERSELIB{
+    class ECDSet;
+}
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -103,8 +107,15 @@ namespace DISP3DLIB
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class BrainRTSourceLocDataTreeItem;
+class MneEstimateTreeItem;
 class NetworkTreeItem;
+class EcdDataTreeItem;
+class FsSurfaceTreeItem;
+class SourceSpaceTreeItem;
+class BemTreeItem;
+class DigitizerSetTreeItem;
+class SubjectTreeItem;
+class MeasurementTreeItem;
 
 
 //=============================================================================================================
@@ -153,9 +164,11 @@ public:
     * @param[in] tSurfaceSet        FreeSurfer surface set.
     * @param[in] tAnnotationSet     FreeSurfer annotation set.
     *
-    * @return                       Returns true if successful.
+    * @return                       Returns a QList with the added surface tree items. The ordering
+    *                               of the list hereby corresponds to the ordering of the input surface set.
+    *                               The list is empty if no item was added.
     */
-    bool addSurfaceSet(const QString& subject, const QString& set, const FSLIB::SurfaceSet& tSurfaceSet, const FSLIB::AnnotationSet& tAnnotationSet = FSLIB::AnnotationSet());
+    QList<FsSurfaceTreeItem*> addSurfaceSet(const QString& subject, const QString& set, const FSLIB::SurfaceSet& tSurfaceSet, const FSLIB::AnnotationSet& tAnnotationSet = FSLIB::AnnotationSet());
 
     //=========================================================================================================
     /**
@@ -166,9 +179,9 @@ public:
     * @param[in] pSurface           FreeSurfer surface.
     * @param[in] pAnnotation        FreeSurfer annotation.
     *
-    * @return                       Returns true if successful.
+    * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
-    bool addSurface(const QString& subject, const QString& set, const FSLIB::Surface& tSurface, const FSLIB::Annotation& tAnnotation = FSLIB::Annotation());
+    FsSurfaceTreeItem* addSurface(const QString& subject, const QString& set, const FSLIB::Surface& tSurface, const FSLIB::Annotation& tAnnotation = FSLIB::Annotation());
 
     //=========================================================================================================
     /**
@@ -178,9 +191,9 @@ public:
     * @param[in] set                The name of the surface set to which the data is to be added.
     * @param[in] tSourceSpace       The source space information.
     *
-    * @return                       Returns true if successful.
+    * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
-    bool addSourceSpace(const QString& subject, const QString& set, const MNELIB::MNESourceSpace& tSourceSpace);
+    SourceSpaceTreeItem* addSourceSpace(const QString& subject, const QString& set, const MNELIB::MNESourceSpace& tSourceSpace);
 
     //=========================================================================================================
     /**
@@ -190,22 +203,34 @@ public:
     * @param[in] set                The text of the surface set tree item which this data should be added to. If no item with text exists it will be created.
     * @param[in] tForwardSolution   The forward solution information.
     *
-    * @return                       Returns true if successful.
+    * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
-    bool addForwardSolution(const QString& subject, const QString& set, const MNELIB::MNEForwardSolution& tForwardSolution);
+    SourceSpaceTreeItem* addForwardSolution(const QString& subject, const QString& set, const MNELIB::MNEForwardSolution& tForwardSolution);
 
     //=========================================================================================================
     /**
-    * Adds source estimated activation data.
+    * Adds source estimated activation data (MNE or RTC-MUSIC).
     *
     * @param[in] subject            The name of the subject.
     * @param[in] set                The name of the surface set to which the actiavtion data is to be added.
     * @param[in] tSourceEstimate    The MNESourceEstimate.
     * @param[in] tForwardSolution   The MNEForwardSolution.
     *
-    * @return                       Returns a list with the tree items which now hold the activation data. Use this list to update the data, i.e. during real time applications.
+    * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
-    QList<BrainRTSourceLocDataTreeItem*> addSourceData(const QString& subject, const QString& set, const MNELIB::MNESourceEstimate& tSourceEstimate, const MNELIB::MNEForwardSolution& tForwardSolution = MNELIB::MNEForwardSolution());
+    MneEstimateTreeItem* addSourceData(const QString& subject, const QString& set, const MNELIB::MNESourceEstimate& tSourceEstimate, const MNELIB::MNEForwardSolution& tForwardSolution = MNELIB::MNEForwardSolution());
+
+    //=========================================================================================================
+    /**
+    * Adds source estimated activation data (dipole fit).
+    *
+    * @param[in] subject            The name of the subject.
+    * @param[in] set                The name of the surface set to which the actiavtion data is to be added.
+    * @param[in] pECDSet            The ECDSet dipole data.
+    *
+    * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
+    */
+    EcdDataTreeItem* addDipoleFitData(const QString& subject, const QString& set, QSharedPointer<INVERSELIB::ECDSet> &pECDSet);
 
     //=========================================================================================================
     /**
@@ -215,9 +240,9 @@ public:
     * @param[in] set                The name of the surface set to which the actiavtion data is to be added.
     * @param[in] pNetworkData       The connectivity data.
     *
-    * @return                       Returns a list with the tree items which now hold the activation data. Use this list to update the data, i.e. during real time applications.
+    * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
-    QList<NetworkTreeItem*> addConnectivityData(const QString& subject, const QString& set, CONNECTIVITYLIB::Network::SPtr pNetworkData);
+    NetworkTreeItem* addConnectivityData(const QString& subject, const QString& set, CONNECTIVITYLIB::Network::SPtr pNetworkData);
 
     //=========================================================================================================
     /**
@@ -227,9 +252,9 @@ public:
     * @param[in] set                The name of the bem set to which the data is to be added.
     * @param[in] tBem               The Bem information.
     *
-    * @return                       Returns true if successful.
+    * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
-    bool addBemData(const QString& subject, const QString& set, const MNELIB::MNEBem& tBem);
+    BemTreeItem* addBemData(const QString& subject, const QString& set, const MNELIB::MNEBem& tBem);
 
     //=========================================================================================================
     /**
@@ -239,13 +264,13 @@ public:
     * @param[in] set                The name of the measurment set to which the data is to be added.
     * @param[in] tDigitizer         The digitizer information.
     *
-    * @return                       Returns true if successful.
+    * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
-    bool addDigitizerData(const QString& subject, const QString& set, const FIFFLIB::FiffDigPointSet &tDigitizer);
+    DigitizerSetTreeItem* addDigitizerData(const QString& subject, const QString& set, const FIFFLIB::FiffDigPointSet &tDigitizer);
 
     //=========================================================================================================
     /**
-    * Returns the 3D model root eneity.
+    * Returns the 3D model root entity.
     *
     * @return   The model's root entity to acess the scenegraph.
     */
@@ -257,6 +282,34 @@ protected:
     * Init the meta types
     */
     void initMetatypes();
+
+    //=========================================================================================================
+    /**
+    * Create a subject tree item if the item was not found. This is a convenience function.
+    *
+    * @param[in] subject            The name of the subject.
+    *
+    * @return                       Returns a pointer to the first found or created subject tree item. Default is a NULL pointer if no item was found.
+    */
+    SubjectTreeItem* addSubject(const QString& subject);
+
+    //=========================================================================================================
+    /**
+    * Adds an item with its toolTip as second coulm item as description to the model.
+    *
+    * @param[in] pItemParent         The parent item.
+    * @param[in] pItemAdd            The item which is added as a row to the parent item.
+    */
+    void addItemWithDescription(QStandardItem* pItemParent, QStandardItem* pItemAdd);
+
+    //=========================================================================================================
+    /**
+    * Connects measurement items and their data (i.e. MNE source data) to already loaded MRI data
+    *
+    * @param[in] pSubjectItem           The subject item which holds the MRI data items.
+    * @param[in] pMeasurementItem       The measurement item which is to be connected.
+    */
+    void connectMeasurementToMriItems(SubjectTreeItem* pSubjectItem, MeasurementTreeItem* pMeasurementItem);
 
     QStandardItem*                   m_pRootItem;            /**< The root item of the tree model. */
     QPointer<Qt3DCore::QEntity>      m_pModelEntity;         /**< The parent 3D entity for this model. */
