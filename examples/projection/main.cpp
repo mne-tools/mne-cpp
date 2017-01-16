@@ -40,6 +40,7 @@
 #include <mne/mne.h>
 #include <disp3D/view3D.h>
 #include <disp3D/control/control3dwidget.h>
+#include <disp3D/model/data3Dtreemodel.h>
 #include <fiff/fiff_dig_point_set.h>
 #include <utils/warp.h>
 #include <iostream>
@@ -292,22 +293,27 @@ int main(int argc, char *argv[])
 //    t_Bem.write(t_fileBemTrans);
 //    t_fileBemTrans.close();
 
+
+//Create 3D data model
+    Data3DTreeModel::SPtr p3DDataModel = Data3DTreeModel::SPtr(new Data3DTreeModel());
+
+    p3DDataModel->addBemData("AVG2-0Years", "BEM", t_Bem);
+    p3DDataModel->addBemData("warped AVG2-0Years", "BEM", t_BemWarped);
+//    p3DDataModel->addBemData("4926787", "BEM", t_BemPatient);
+//    p3DDataModel->addBemData("4841721", "BEM", t_BemPatient);
+    p3DDataModel->addBemData("4982400", "BEM", t_BemPatient);
+    p3DDataModel->addDigitizerData("Original", "Dig", t_Dig);
+//    p3DDataModel->addDigitizerData("4982400", "Dig", t_DigClean);
+    p3DDataModel->addDigitizerData("warped AVG2-0Years", "Dig", t_DigPatient);
+    p3DDataModel->addDigitizerData("AVG2-0Years", "Projected Dig", t_DigProject);
+
 //    Show
     View3D::SPtr testWindow = View3D::SPtr(new View3D());
-    testWindow->addBemData("AVG2-0Years", "BEM", t_Bem);
-    testWindow->addBemData("warped AVG2-0Years", "BEM", t_BemWarped);
-//    testWindow->addBemData("4926787", "BEM", t_BemPatient);
-//    testWindow->addBemData("4841721", "BEM", t_BemPatient);
-    testWindow->addBemData("4982400", "BEM", t_BemPatient);
-    testWindow->addDigitizerData("Original", "Dig", t_Dig);
-//    testWindow->addDigitizerData("4982400", "Dig", t_DigClean);
-    testWindow->addDigitizerData("warped AVG2-0Years", "Dig", t_DigPatient);
-    testWindow->addDigitizerData("AVG2-0Years", "Projected Dig", t_DigProject);
-
+    testWindow->setModel(p3DDataModel);
     testWindow->show();
 
     Control3DWidget::SPtr control3DWidget = Control3DWidget::SPtr(new Control3DWidget());
-    control3DWidget->setView3D(testWindow);
+    control3DWidget->init(p3DDataModel, testWindow);
     control3DWidget->show();
 
     return app.exec();
