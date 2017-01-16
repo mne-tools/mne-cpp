@@ -39,7 +39,7 @@
 //=============================================================================================================
 
 #include "rtsourcelocdataworker.h"
-#include "../../common/types.h"
+#include "../../items/common/types.h"
 
 #include <disp/helpers/colormap.h>
 #include <fs/label.h>
@@ -348,7 +348,7 @@ QPair<QByteArray, QByteArray> RtSourceLocDataWorker::performVisualizationTypeCal
 
     //NOTE: This function is called for every new sample point and therefore must be kept highly efficient!
     if(sourceColorSamples.rows() != m_vecVertNoLeftHemi.rows() + m_vecVertNoRightHemi.rows()) {
-        qDebug() << "RtSourceLocDataWorker::performVisualizationTypeCalculation - number of rows in sample (" << sourceColorSamples.rows() << ") do not not match with idx/no number of rows in vertex (" << m_vecVertNoLeftHemi.rows() + m_vecVertNoRightHemi.rows() << "). Returning...";
+        qDebug() << "RtSourceLocDataWorker::performVisualizationTypeCalculation - Number of new vertex colors (" << sourceColorSamples.rows() << ") do not match with previously set number of vertices (" << m_vecVertNoLeftHemi.rows() + m_vecVertNoRightHemi.rows() << "). Returning...";
         return colorPair;
     }
 
@@ -423,7 +423,7 @@ QPair<QByteArray, QByteArray> RtSourceLocDataWorker::performVisualizationTypeCal
                 //Find out label for source
                 qint32 labelIdxLeftHemi = m_mapLabelIdSourcesLeftHemi[m_vecVertNoLeftHemi(i)];
 
-                if(abs(sourceColorSamplesLeftHemi(i)) > abs(vecLabelActivationLeftHemi[labelIdxLeftHemi]))
+                if(fabs(sourceColorSamplesLeftHemi(i)) > fabs(vecLabelActivationLeftHemi[labelIdxLeftHemi]))
                     vecLabelActivationLeftHemi.insert(labelIdxLeftHemi, sourceColorSamplesLeftHemi(i));
             }
 
@@ -432,7 +432,7 @@ QPair<QByteArray, QByteArray> RtSourceLocDataWorker::performVisualizationTypeCal
                 //Find out label for source
                 qint32 labelIdxRightHemi = m_mapLabelIdSourcesRightHemi[m_vecVertNoRightHemi(i)];
 
-                if(abs(sourceColorSamplesRightHemi(i)) > abs(vecLabelActivationRightHemi[labelIdxRightHemi]))
+                if(fabs(sourceColorSamplesRightHemi(i)) > fabs(vecLabelActivationRightHemi[labelIdxRightHemi]))
                     vecLabelActivationRightHemi.insert(labelIdxRightHemi, sourceColorSamplesRightHemi(i));
             }
 

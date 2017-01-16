@@ -88,7 +88,7 @@ using namespace Eigen;
 
 //=============================================================================================================
 /**
-* Source estimation which holds results of MNE-CPP inverse routines
+* Source estimation which holds results of MNE-CPP inverse routines. (Replaces *mneStcData,mneStcDataRec struct of MNE-C mne_types.h).
 *
 * @brief Source estimation
 */

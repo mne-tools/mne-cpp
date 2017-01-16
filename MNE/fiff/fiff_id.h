@@ -109,6 +109,13 @@ public:
 
     //=========================================================================================================
     /**
+    * Prints the id
+    * Refactored: print_id (fiff_dir_tree.c)
+    */
+    void print() const;
+
+    //=========================================================================================================
+    /**
     * True if FIFF id is empty.
     *
     * @return true if FIFF id is empty
@@ -128,14 +135,20 @@ public:
     fiff_int_t machid[2];   /**< Unique machine ID */
     fiffTimeRec time;       /**< Time of the ID creation */
 
+// ### OLD STRUCT ###
+/**
+* A file ID.
+*
+* These universially unique identifiers are also
+* used to identify blocks within fthe files.
+*/
+typedef struct _fiffIdRec {
+    fiff_int_t version;     /**< File version */
+    fiff_int_t machid[2];   /**< Unique machine ID */
+    fiffTimeRec time;       /**< Time of the ID creation */
+} fiffIdRec,*fiffId;        /**< This is the file identifier */
 
-// typedef struct _fiffIdRec {
-//  fiff_int_t version;     /**< File version *
-//  fiff_int_t machid[2];   /**< Unique machine ID *
-//  fiffTimeRec time;       /**< Time of the ID creation *
-//} fiffIdRec,*fiffId;     /**< This is the file identifier *
-
-// typedef fiffIdRec fiff_id_t;
+typedef fiffIdRec fiff_id_t;
 };
 
 

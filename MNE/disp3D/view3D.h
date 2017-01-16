@@ -66,18 +66,6 @@
 
 class QPropertyAnimation;
 
-namespace MNELIB{
-    class MNESourceEstimate;
-    class MNESourceSpace;
-    class MNEBem;
-}
-
-namespace FSLIB{
-    class Surface;
-    class SurfaceSet;
-    class Surface;
-}
-
 namespace Qt3DCore {
     class QTransform;
 }
@@ -89,10 +77,6 @@ namespace Qt3DRender {
 
 namespace Qt3DExtras {
     class QPhongMaterial;
-}
-
-namespace FIFFLIB{
-    class FiffDigPointSet;
 }
 
 
@@ -110,8 +94,6 @@ namespace DISP3DLIB
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class BrainRTSourceLocDataTreeItem;
-class NetworkTreeItem;
 class Data3DTreeModel;
 
 

@@ -43,20 +43,22 @@ SUBDIRS += \
     fs \
     fiff \
     mne \
-    connectivity \
     inverse \
+    connectivity \
     rtCommand \
     rtClient \
     rtProcessing \
 
 !contains(MNECPP_CONFIG, minimalVersion) {
     SUBDIRS += \
-            disp \
+        disp \
 
     qtHaveModule(charts) {
         SUBDIRS += \
             dispCharts \
             disp3D \
+    } else {
+        message("MNE.pro - The Qt Charts module is missing. Please install to build the complete set of MNE-CPP features.")
     }
 }
 

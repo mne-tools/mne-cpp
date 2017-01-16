@@ -267,7 +267,7 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(const Annotation
             if (label_ids[i] != 0)
             {
                 QString curr_name = t_CurrentColorTable.struct_names[i];//obj.label2AtlasName(label(i));
-                printf("\tCluster %d / %d %s...", i+1, label_ids.rows(), curr_name.toUtf8().constData());
+                printf("\tCluster %d / %ld %s...", i+1, label_ids.rows(), curr_name.toUtf8().constData());
 
                 //
                 // Get source space indeces
@@ -890,7 +890,7 @@ FiffCov MNEForwardSolution::compute_depth_prior(const MatrixXd &Gain, const Fiff
         }
     }
 
-    printf("\tlimit = %d/%lld = %f", n_limit + 1, d.size(), sqrt(limit / ws[0]));
+    printf("\tlimit = %d/%ld = %f", n_limit + 1, d.size(), sqrt(limit / ws[0]));
     double scale = 1.0 / limit;
     printf("\tscale = %g exp = %g", scale, exp);
 
@@ -1202,16 +1202,14 @@ void MNEForwardSolution::prepare_forward(const FiffInfo &p_info, const FiffCov &
 bool MNEForwardSolution::read(QIODevice& p_IODevice, MNEForwardSolution& fwd, bool force_fixed, bool surf_ori, const QStringList& include, const QStringList& exclude, bool bExcludeBads)
 {
     FiffStream::SPtr t_pStream(new FiffStream(&p_IODevice));
-    FiffDirTree t_Tree;
-    QList<FiffDirEntry> t_Dir;
 
     printf("Reading forward solution from %s...\n", t_pStream->streamName().toUtf8().constData());
-    if(!t_pStream->open(t_Tree, t_Dir))
+    if(!t_pStream->open())
         return false;
     //
     //   Find all forward solutions
     //
-    QList<FiffDirTree> fwds = t_Tree.dir_tree_find(FIFFB_MNE_FORWARD_SOLUTION);
+    QList<FiffDirNode> fwds = t_pStream->tree().dir_tree_find(FIFFB_MNE_FORWARD_SOLUTION);
 
     if (fwds.size() == 0)
     {
@@ -1222,7 +1220,7 @@ bool MNEForwardSolution::read(QIODevice& p_IODevice, MNEForwardSolution& fwd, bo
     //
     //   Parent MRI data
     //
-    QList<FiffDirTree> parent_mri = t_Tree.dir_tree_find(FIFFB_MNE_PARENT_MRI_FILE);
+    QList<FiffDirNode> parent_mri = t_pStream->tree().dir_tree_find(FIFFB_MNE_PARENT_MRI_FILE);
     if (parent_mri.size() == 0)
     {
         t_pStream->device()->close();
@@ -1231,7 +1229,7 @@ bool MNEForwardSolution::read(QIODevice& p_IODevice, MNEForwardSolution& fwd, bo
     }
 
     MNESourceSpace t_SourceSpace;// = NULL;
-    if(!MNESourceSpace::readFromStream(t_pStream, true, t_Tree, t_SourceSpace))
+    if(!MNESourceSpace::readFromStream(t_pStream, true, t_SourceSpace))
     {
         t_pStream->device()->close();
         std::cout << "Could not read the source spaces\n"; // ToDo throw error
@@ -1248,7 +1246,7 @@ bool MNEForwardSolution::read(QIODevice& p_IODevice, MNEForwardSolution& fwd, bo
     QStringList bads;
     if(bExcludeBads)
     {
-        bads = t_pStream->read_bad_channels(t_Tree);
+        bads = t_pStream->read_bad_channels(t_pStream->tree());
         if(bads.size() > 0)
         {
             printf("\t%d bad channels ( ",bads.size());
@@ -1262,8 +1260,8 @@ bool MNEForwardSolution::read(QIODevice& p_IODevice, MNEForwardSolution& fwd, bo
     //   Locate and read the forward solutions
     //
     FiffTag::SPtr t_pTag;
-    FiffDirTree megnode;
-    FiffDirTree eegnode;
+    FiffDirNode megnode;
+    FiffDirNode eegnode;
     for(qint32 k = 0; k < fwds.size(); ++k)
     {
         if(!fwds[k].find_tag(t_pStream.data(), FIFF_MNE_INCLUDED_METHODS, t_pTag))
@@ -1375,7 +1373,7 @@ bool MNEForwardSolution::read(QIODevice& p_IODevice, MNEForwardSolution& fwd, bo
     //
     // get parent MEG info -> from python package
     //
-    t_pStream->read_meas_info_base(t_Tree, fwd.info);
+    t_pStream->read_meas_info_base(t_pStream->tree(), fwd.info);
 
 
     t_pStream->device()->close();
@@ -1689,7 +1687,7 @@ bool MNEForwardSolution::read(QIODevice& p_IODevice, MNEForwardSolution& fwd, bo
 
 //*************************************************************************************************************
 
-bool MNEForwardSolution::read_one(FiffStream* p_pStream, const FiffDirTree& p_Node, MNEForwardSolution& one)
+bool MNEForwardSolution::read_one(FiffStream* p_pStream, const FiffDirNode& p_Node, MNEForwardSolution& one)
 {
     //
     //   Read all interesting stuff for one forward solution
@@ -1781,7 +1779,7 @@ void MNEForwardSolution::restrict_gain_matrix(MatrixXd &G, const FiffInfo &info)
     // Figure out which ones have been used
     if(info.chs.size() != G.rows())
     {
-        printf("Error G.rows() and length of info.chs do not match: %lld != %i", G.rows(), info.chs.size()); //ToDo throw
+        printf("Error G.rows() and length of info.chs do not match: %ld != %i", G.rows(), info.chs.size()); //ToDo throw
         return;
     }
 
@@ -1791,7 +1789,7 @@ void MNEForwardSolution::restrict_gain_matrix(MatrixXd &G, const FiffInfo &info)
         for(qint32 i = 0; i < sel.size(); ++i)
             G.row(i) = G.row(sel[i]);
         G.conservativeResize(sel.size(), G.cols());
-        printf("\t%lld planar channels", sel.size());
+        printf("\t%ld planar channels", sel.size());
     }
     else
     {
@@ -1801,7 +1799,7 @@ void MNEForwardSolution::restrict_gain_matrix(MatrixXd &G, const FiffInfo &info)
             for(qint32 i = 0; i < sel.size(); ++i)
                 G.row(i) = G.row(sel[i]);
             G.conservativeResize(sel.size(), G.cols());
-            printf("\t%lld magnetometer or axial gradiometer channels", sel.size());
+            printf("\t%ld magnetometer or axial gradiometer channels", sel.size());
         }
         else
         {
@@ -1811,7 +1809,7 @@ void MNEForwardSolution::restrict_gain_matrix(MatrixXd &G, const FiffInfo &info)
                 for(qint32 i = 0; i < sel.size(); ++i)
                     G.row(i) = G.row(sel[i]);
                 G.conservativeResize(sel.size(), G.cols());
-                printf("\t%lld EEG channels\n", sel.size());
+                printf("\t%ld EEG channels\n", sel.size());
             }
             else
                 printf("Could not find MEG or EEG channels\n");
