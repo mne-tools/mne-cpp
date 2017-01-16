@@ -4352,8 +4352,9 @@ static void unpack_data(double offset,
 }
 
 
-static float **get_epochs (fiffFile file,	/* This is our file */
-                           fiffDirNode node,	/* The interesting node */
+static float **get_epochs (//fiffFile file,	/* This is our file */
+                           FiffStream::SPtr& stream,
+                           const FiffDirNode& node,	/* The interesting node */
                            int nchan,
                            int nsamp)	        /* Number of channels and
                                                  * number of samples to be expected */
@@ -4361,66 +4362,85 @@ static float **get_epochs (fiffFile file,	/* This is our file */
       * Get the evoked response epochs
       */
 {
-    fiffTagRec tag;
+//    fiffTagRec tag;
+    fiff_int_t kind, pos;
+    FiffTag::SPtr t_pTag;
     int k;
     int ch;
     float **epochs = NULL;
     float offset,scale;
     short *packed;
-    fiffDirEntry start;
-    int *dims;
+//    fiffDirEntry start;
+//    int *dims;
 
-    tag.data = NULL;
-    for (k = 0, ch = 0, start = node->dir;
-         k < node->nent && ch < nchan; k++,start++)
-        if (start->kind == FIFF_EPOCH) {
-            if (fiff_read_this_tag (file->fd,start->pos,&tag) == -1)
+//    tag.data = NULL;
+
+    for (k = 0, ch = 0; k < node.nent && ch < nchan; k++) {
+        kind = node.dir[k].kind;
+        pos  = node.dir[k].pos;
+        if (kind == FIFF_EPOCH) {
+//            if (fiff_read_this_tag (file->fd,start->pos,&tag) == -1)
+//                goto bad;
+            if (!FiffTag::read_tag(stream.data(),t_pTag,pos))
                 goto bad;
-            if (tag.type & FIFFT_MATRIX) {
-                if ((tag.type & ~FIFFT_MATRIX) != FIFFT_FLOAT) {
+//            if (tag.type & FIFFT_MATRIX) {
+            if (t_pTag->type & FIFFT_MATRIX) {
+                if ((t_pTag->type & ~FIFFT_MATRIX) != FIFFT_FLOAT) {
                     printf("Epochs in matrix should be floats!");
                     goto bad;
                 }
-                dims = fiff_get_matrix_dims(&tag);
-                if (dims[0] != 2) {
+
+//                dims = fiff_get_matrix_dims(&tag);
+                qint32 ndim;
+                QVector<qint32> dims;
+                t_pTag->getMatrixDimensions(ndim, dims);
+
+//                if (dims[0] != 2) {
+                if (ndim != 2) {
                     printf("Data matrix dimension should be two!");
                     goto bad;
                 }
+//                if (dims[1] != nsamp) {
                 if (dims[1] != nsamp) {
                     printf("Incorrect number of samples in data matrix!");
                     goto bad;
                 }
-                if (dims[2] != nchan) {
+//                if (dims[2] != nchan) {
+                if (dims[0] != nchan) {
                     printf("Incorrect number of channels in data matrix!");
                     goto bad;
                 }
-                FREE(dims);
-                if ((epochs = fiff_get_float_matrix(&tag)) == NULL)
-                    goto bad;
+//                FREE(dims);
+                MatrixXf tmp_epochs = t_pTag->toFloatMatrix();
+                qDebug() << "<<<ToDo>>> Eventually a tranposition of epochs required!";
+                fromFloatEigenMatrix(tmp_epochs, epochs);
+//                if ((epochs = fiff_get_float_matrix(&tag)) == NULL)
+//                    goto bad;
                 ch = nchan;
                 break;			/* We have the data */
             }
             else {			/* Individual epochs */
                 if (epochs == NULL)
                     epochs = ALLOC_CMATRIX(nchan,nsamp);
-                if (tag.type == FIFFT_OLD_PACK) {
-                    offset = ((float *)tag.data)[0];
-                    scale  = ((float *)tag.data)[1];
-                    packed = (short *)(((float *)tag.data)+2);
+                if (t_pTag->type == FIFFT_OLD_PACK) {
+                    offset = ((float *)t_pTag->data())[0];
+                    scale  = ((float *)t_pTag->data())[1];
+                    packed = (short *)(((float *)t_pTag->data())+2);
                     unpack_data(offset,scale,packed,nsamp,epochs[ch++]);
                 }
-                else if (tag.type == FIFFT_FLOAT)
-                    memcpy(epochs[ch++],tag.data,nsamp*sizeof(float));
+                else if (t_pTag->type == FIFFT_FLOAT)
+                    memcpy(epochs[ch++],t_pTag->data(),nsamp*sizeof(float));
                 else {
                     printf ("Unknown data packing type!");
                     FREE_CMATRIX (epochs);
-                    FREE(tag.data);
+//                    FREE(tag.data);
                     return (NULL);
                 }
             }
             if (ch == nchan)
                 return (epochs);
         }
+    }
     if (ch < nchan) {
         printf ("All epochs were not found!");
         goto bad;
@@ -4429,22 +4449,10 @@ static float **get_epochs (fiffFile file,	/* This is our file */
 
 bad : {
         FREE_CMATRIX (epochs);
-        FREE(tag.data);
+//        FREE(tag.data);
         return (NULL);
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -4518,8 +4526,11 @@ int mne_read_evoked(const QString& name,           /* Name of the file */
       * Load evoked-response data from a fif file
       */
 {
-    fiffFile    in      = NULL;
-    fiffDirNode *evoked = NULL;			/* The evoked data nodes */
+    QFile file(name);
+    FiffStream::SPtr stream(new FiffStream(&file));
+//    fiffFile    in      = NULL;
+
+    QList<FiffDirNode> evoked;			/* The evoked data nodes */
     int         nset    = 0;
     int         nchan   = 0;		        /* How many channels */
     char        **comments = NULL;	        /* The associated comments */
@@ -4547,13 +4558,18 @@ int mne_read_evoked(const QString& name,           /* Name of the file */
         printf ("Evoked response selector must be positive!");
         goto out;
     }
-    if ((in = fiff_open(name.toLatin1().data())) == NULL)
+
+//    if ((in = fiff_open(name.toLatin1().data())) == NULL)
+//        goto out;
+    if(!stream->open())
         goto out;
+
     /*
    * Select correct data set
    */
-    evoked = mne_find_evoked(in,(commentp == NULL) ? NULL : &comments);
-    if (evoked == NULL) {
+//    evoked = mne_find_evoked(in,(commentp == NULL) ? NULL : &comments);
+    evoked = mne_find_evoked(stream,(commentp == NULL) ? NULL : &comments);
+    if (!evoked.size()) {
         printf ("No evoked response data available here");
         goto out;
     }

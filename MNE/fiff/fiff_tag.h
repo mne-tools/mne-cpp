@@ -253,6 +253,7 @@ public:
     //=========================================================================================================
     /**
     * Returns matrix dimensions
+    * Refactors: fiff_get_matrix_dims (fiff_matrix.c)
     *
     * @param[out] p_ndim    number of dimensions
     * @param[out] p_Dims    vector containing the size of each dimension
