@@ -4535,7 +4535,7 @@ int mne_read_evoked(const QString& name,           /* Name of the file */
     int         nchan   = 0;		        /* How many channels */
     char        **comments = NULL;	        /* The associated comments */
     float       sfreq = 0.0;		        /* What sampling frequency */
-    fiffDirNode start;
+    FiffDirNode start;
     fiffChInfo   chs     = NULL;			/* Channel info */
     int          *artefs = NULL;			/* Artefact limits */
     int           nartef = 0;			/* How many */
@@ -4573,21 +4573,23 @@ int mne_read_evoked(const QString& name,           /* Name of the file */
         printf ("No evoked response data available here");
         goto out;
     }
-    for (k = 0, nset = 0; evoked[k] != NULL; k++)
-        nset++;
+//    for (k = 0, nset = 0; evoked[k] != NULL; k++)
+//        nset++;
+    nset = evoked.size();
+
     if (setno < nset) {
         start = evoked[setno];
-        FREE(evoked);
+//        FREE(evoked);
     }
     else {
         printf ("Too few evoked response data sets (how come?)");
-        FREE (evoked);
+//        FREE (evoked);
         goto out;
     }
     /*
    * Get various things...
    */
-    if (get_meas_info (in,start,&id,&meas_date,&nchan,&sfreq,&highpass,&lowpass,
+    if (get_meas_info (stream,start,&id,&meas_date,&nchan,&sfreq,&highpass,&lowpass,
                        &chs,&trans) == -1)
         goto out;
     /*
@@ -4595,19 +4597,20 @@ int mne_read_evoked(const QString& name,           /* Name of the file */
    * there might be an individual one in the
    * evoked-response data
    */
-    if (get_evoked_essentials(in,start,&sfreq,
-                              &tmin,&nsamp,&nave,&aspect_kind,
-                              &artefs,&nartef) == -1)
-        goto out;
+//TODO
+//    if (get_evoked_essentials(in,start,&sfreq,
+//                              &tmin,&nsamp,&nave,&aspect_kind,
+//                              &artefs,&nartef) == -1)
+//        goto out;
     /*
    * Some things may be redefined at a lower level
    */
-    if (get_evoked_optional(in,start,&nchan,&chs) == -1)
+    if (get_evoked_optional(stream,start,&nchan,&chs) == -1)
         goto out;
     /*
    * Omit nonmagnetic channels
    */
-    if ((epochs = get_epochs(in,start,nchan,nsamp)) == NULL)
+    if ((epochs = get_epochs(stream,start,nchan,nsamp)) == NULL)
         goto out;
     /*
    * Change artefact limits to start from 0
@@ -4672,7 +4675,8 @@ out : {
         FREE (id);
         FREE (meas_date);
         FREE_CMATRIX(epochs);
-        fiff_close(in);
+//        fiff_close(in);
+        stream->device()->close();
         return res;
     }
 }
@@ -5531,16 +5535,19 @@ mneProjOp mne_proj_op_average_eeg_ref(fiffChInfo chs,
 //============================= mne_lin_proj_io.c =============================
 
 
-mneProjOp mne_read_proj_op_from_node(fiffFile in, fiffDirNode start)
+mneProjOp mne_read_proj_op_from_node(//fiffFile in,
+                                     FiffStream::SPtr& stream,
+                                     const FiffDirNode& start)
 /*
       * Load all the linear projection data
       */
 {
     mneProjOp   op     = NULL;
-    fiffDirNode *proj  = NULL;
-    fiffDirNode *items = NULL;
-    fiffDirNode node;
-    fiffTag     tag;
+    QList<FiffDirNode> proj;
+    FiffDirNode start_node;
+    QList<FiffDirNode> items;
+    FiffDirNode node;
+//    fiffTag     tag;
     int         k;
     char        *item_desc,*desc_tag,*lf;
     int         global_nchan,item_nchan,nlist;
@@ -5550,38 +5557,46 @@ mneProjOp mne_read_proj_op_from_node(fiffFile in, fiffDirNode start)
     int         item_nvec;
     int         item_active;
     mneNamedMatrix item;
+    FiffTag::SPtr t_pTag;
 
-    if (!in) {
+    if (!stream) {
         qCritical("File not open mne_read_proj_op_from_node");
         goto bad;
     }
-    if (!start)
-        start = in->dirtree;
+//    if (start.isEmpty())
+//        start = in->dirtree;
+    if (start.isEmpty())
+        start_node = stream->tree();
+    else
+        start_node = start;
 
     op = mne_new_proj_op();
-    proj = fiff_dir_tree_find(start,FIFFB_PROJ);
-    if (proj == NULL || proj[0] == NULL)   /* The caller must recognize an empty projection */
+    proj = start_node.dir_tree_find(FIFFB_PROJ);
+    if (proj.size() == 0 || proj[0].isEmpty())   /* The caller must recognize an empty projection */
         goto out;
     /*
    * Only the first projection block is recognized
    */
-    items = fiff_dir_tree_find(proj[0],FIFFB_PROJ_ITEM);
-    if (items == NULL || items[0] == NULL)   /* The caller must recognize an empty projection */
+    items = proj[0].dir_tree_find(FIFFB_PROJ_ITEM);
+    if (items.size() == 0 || items[0].isEmpty())   /* The caller must recognize an empty projection */
         goto out;
     /*
    * Get a common number of channels
    */
     node = proj[0];
-    if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_NCHAN)) == NULL)
+//    if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_NCHAN)) == NULL)
+//        global_nchan = 0;
+    if(!node.find_tag(stream.data(), FIFF_NCHAN, t_pTag))
         global_nchan = 0;
     else {
-        global_nchan = *(int *)tag->data;
-        TAG_FREE(tag);
+        global_nchan = *t_pTag->toInt();
+//        TAG_FREE(tag);
     }
     /*
    * Proceess each item
    */
-    for (node = items[0],k = 0; node != NULL; k++, node = items[k]) {
+    for (k = 0; k < items.size(); k++) {
+        node = items[k];
         /*
      * Complicated procedure for getting the description
      */
@@ -5590,7 +5605,7 @@ mneProjOp mne_read_proj_op_from_node(fiffFile in, fiffDirNode start)
                                          FIFF_NAME)) != NULL) {
             item_desc = add_string(item_desc,(char *)tag->data);
         }
-        FREE(tag);
+//        FREE(tag);
         /*
      * Take the first line of description if it exists
      */
@@ -5605,7 +5620,7 @@ mneProjOp mne_read_proj_op_from_node(fiffFile in, fiffDirNode start)
             item_desc = add_string(item_desc,(char *)desc_tag);
             FREE(desc_tag);
         }
-        FREE(tag);
+//        FREE(tag);
         /*
      * Possibility to override number of channels here
      */
@@ -5647,7 +5662,7 @@ mneProjOp mne_read_proj_op_from_node(fiffFile in, fiffDirNode start)
                                          FIFF_PROJ_ITEM_NVEC)) == NULL)
             goto bad;
         item_nvec = *(int *)tag->data;
-        TAG_FREE(tag);
+//        TAG_FREE(tag);
         /*
      * The projection data
      */
@@ -5655,17 +5670,17 @@ mneProjOp mne_read_proj_op_from_node(fiffFile in, fiffDirNode start)
                                          FIFF_PROJ_ITEM_VECTORS)) == NULL)
             goto bad;
         if ((item_vectors = fiff_get_float_matrix(tag)) == NULL) {
-            TAG_FREE(tag);
+//            TAG_FREE(tag);
             goto bad;
         }
-        FREE(tag); tag = NULL;
+//        FREE(tag); tag = NULL;
         /*
      * Is this item active?
      */
         if ((tag = fiff_dir_tree_get_tag(in,node,
                                          FIFF_MNE_PROJ_ITEM_ACTIVE)) != NULL) {
             item_active = *(int *)tag->data;
-            TAG_FREE(tag);
+//            TAG_FREE(tag);
         }
         else
             item_active = FALSE;
