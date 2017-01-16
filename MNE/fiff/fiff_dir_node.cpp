@@ -230,10 +230,10 @@ qint32 FiffDirNode::make_dir_tree(FiffStream* p_pStream, QList<FiffDirEntry>& p_
         {
             if (current != start)
             {
-                FiffDirNode t_ChildTree;
-                current = FiffDirNode::make_dir_tree(p_pStream,p_Dir,t_ChildTree, current);
+                FiffDirNode child;
+                current = FiffDirNode::make_dir_tree(p_pStream,p_Dir,child, current);
                 ++p_Tree.nchild;
-                p_Tree.children.append(t_ChildTree);
+                p_Tree.children.append(child);
             }
         }
         else if(p_Dir[current].kind == FIFF_BLOCK_END)
