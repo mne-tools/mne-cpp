@@ -362,8 +362,8 @@ void RtSourceLocDataWorker::setSmootingInfo(const QMap<int, QVector<int> >& mapV
     leftHemi.sparseSmoothMatrix = m_sparseSmoothMatrixLeftHemi;
     leftHemi.vecVertNo = m_vecVertNoLeftHemi;
     leftHemi.matVertPos = matVertPosLeftHemi;
-    leftHemi.iDistPow = 3;
-    leftHemi.dThresholdDistance = 0.03;
+    leftHemi.iDistPow = 5;
+    leftHemi.dThresholdDistance = 0.02;
     inputData.append(leftHemi);
 
     SmoothOperatorInfo rightHemi;
@@ -371,8 +371,8 @@ void RtSourceLocDataWorker::setSmootingInfo(const QMap<int, QVector<int> >& mapV
     rightHemi.sparseSmoothMatrix = m_sparseSmoothMatrixRightHemi;
     rightHemi.vecVertNo = m_vecVertNoRightHemi;
     rightHemi.matVertPos = matVertPosRightHemi;
-    rightHemi.iDistPow = 3;
-    rightHemi.dThresholdDistance = 0.03;
+    rightHemi.iDistPow = 5;
+    rightHemi.dThresholdDistance = 0.02;
     inputData.append(rightHemi);
 
     QFuture<void> future = QtConcurrent::map(inputData, generateSmoothOperator);
@@ -559,11 +559,8 @@ QPair<QByteArray, QByteArray> RtSourceLocDataWorker::generateColorsPerVertex(con
 
     //Create final QByteArray with colors based on the current anatomical information
     for(int i = 0; i < m_vecVertNoLeftHemi.rows(); ++i) {
-        VectorXd vecActivationLeftHemi(1);
-        vecActivationLeftHemi(0) = sourceColorSamplesLeftHemi(i);
-
-        if(vecActivationLeftHemi(0) >= m_vecThresholds.x()) {
-            QByteArray sourceColorSamplesColorLeftHemi = transformDataToColor(vecActivationLeftHemi);
+        if(sourceColorSamplesLeftHemi(i) >= m_vecThresholds.x()) {
+            QByteArray sourceColorSamplesColorLeftHemi = transformDataToColor(sourceColorSamplesLeftHemi(i));
             const float *rawSourceColorSamplesColorLeftHemi = reinterpret_cast<const float *>(sourceColorSamplesColorLeftHemi.data());
 
             rawArrayCurrentVertColorLeftHemi[m_vecVertNoLeftHemi(i)*3+0] = rawSourceColorSamplesColorLeftHemi[0];
@@ -580,11 +577,8 @@ QPair<QByteArray, QByteArray> RtSourceLocDataWorker::generateColorsPerVertex(con
 
     //Create final QByteArray with colors based on the current anatomical information
     for(int i = 0; i < m_vecVertNoRightHemi.rows(); ++i) {
-        VectorXd vecActivationRightHemi(1);
-        vecActivationRightHemi(0) = sourceColorSamplesRightHemi(i);
-
-        if(vecActivationRightHemi(0) >= m_vecThresholds.x()) {
-            QByteArray sourceColorSamplesColorRightHemi = transformDataToColor(vecActivationRightHemi);
+        if(sourceColorSamplesRightHemi(i) >= m_vecThresholds.x()) {
+            QByteArray sourceColorSamplesColorRightHemi = transformDataToColor(sourceColorSamplesRightHemi(i));
             const float *rawSourceColorSamplesColorRightHemi = reinterpret_cast<const float *>(sourceColorSamplesColorRightHemi.data());
 
             rawArrayCurrentVertColorRightHemi[m_vecVertNoRightHemi(i)*3+0] = rawSourceColorSamplesColorRightHemi[0];
@@ -644,12 +638,9 @@ QPair<QByteArray, QByteArray> RtSourceLocDataWorker::generateColorsPerAnnotation
         FSLIB::Label labelLeftHemi = m_lLabelsLeftHemi.at(i);
 
         //Transform label activations to rgb colors
-        VectorXd vecActivationLeftHemi(1);
-        vecActivationLeftHemi(0) = vecLabelActivationLeftHemi[labelLeftHemi.label_id];
-
         //Check if value is bigger than lower threshold. If not, don't plot activation
-        if(vecActivationLeftHemi(0) >= m_vecThresholds.x()) {
-            QByteArray arrayLabelColorsLeftHemi = transformDataToColor(vecActivationLeftHemi);
+        if(vecLabelActivationLeftHemi[labelLeftHemi.label_id] >= m_vecThresholds.x()) {
+            QByteArray arrayLabelColorsLeftHemi = transformDataToColor(vecLabelActivationLeftHemi[labelLeftHemi.label_id]);
             float *rawArrayLabelColorsLeftHemi = reinterpret_cast<float *>(arrayLabelColorsLeftHemi.data());
 
             for(int j = 0; j<labelLeftHemi.vertices.rows(); j++) {
@@ -673,12 +664,9 @@ QPair<QByteArray, QByteArray> RtSourceLocDataWorker::generateColorsPerAnnotation
         FSLIB::Label labelRightHemi = m_lLabelsRightHemi.at(i);
 
         //Transform label activations to rgb colors
-        VectorXd vecActivationRightHemi(1);
-        vecActivationRightHemi(0) = vecLabelActivationRightHemi[labelRightHemi.label_id];
-
         //Check if value is bigger than lower threshold. If not, don't plot activation
-        if(vecActivationRightHemi(0) >= m_vecThresholds.x()) {
-            QByteArray arrayLabelColorsRightHemi = transformDataToColor(vecActivationRightHemi);
+        if(vecLabelActivationRightHemi[labelRightHemi.label_id] >= m_vecThresholds.x()) {
+            QByteArray arrayLabelColorsRightHemi = transformDataToColor(vecLabelActivationRightHemi[labelRightHemi.label_id]);
             float *rawArrayLabelColorsRightHemi = reinterpret_cast<float *>(arrayLabelColorsRightHemi.data());
 
             for(int j = 0; j<labelRightHemi.vertices.rows(); j++) {
@@ -697,139 +685,13 @@ QPair<QByteArray, QByteArray> RtSourceLocDataWorker::generateColorsPerAnnotation
 
 //*************************************************************************************************************
 
-struct smoothInfo {
-    QMap<int, QVector<int> > mapVertNeighbor;
-    double dActivation;
-    int iVertNo;
-};
-
-VectorXd smoothData(const smoothInfo& inputData)
-{
-    int nSurfaceVerts = inputData.mapVertNeighbor.size();
-    int iVertNo = inputData.iVertNo;
-    int nn, nv, p, sum, n;
-
-    QVector<bool> undef(nSurfaceVerts, true);
-    undef[iVertNo] = false;
-
-    VectorXd smooth_val = VectorXd::Zero(nSurfaceVerts);
-    smooth_val(iVertNo) = inputData.dActivation;
-
-    for(int k = 0; k < nSurfaceVerts; ++k) {
-        sum = 0;
-        n = 0;
-
-        if (!undef[k]) {
-            //If vertex color was defined
-            sum = smooth_val[k];
-            n = 1;
-        }
-
-        //Generate the color of the current vertex at pos k based on neighbor information
-        nn = inputData.mapVertNeighbor[k].size();
-
-        for (p = 0; p < nn; p++) {
-            nv = inputData.mapVertNeighbor[k].at(p);
-
-            if (!undef[nv]) {
-                //If vertex color was defined
-                sum += smooth_val[nv];
-                n++;
-            }
-        }
-
-        if (n > 0) {
-            smooth_val[k] = sum/(float)n;
-            undef[k] = false;
-        }
-    }
-
-    return smooth_val;
-}
-
-void reduce(VectorXd& outputData, const VectorXd& inputData)
-{
-    if(outputData.rows() == 0) {
-        outputData = inputData;
-    } else {
-        outputData += inputData;
-    }
-}
-
-//*************************************************************************************************************
-
 QByteArray RtSourceLocDataWorker::generateSmoothedColors(const VectorXd& sourceColorSamples,
                                                          const VectorXi& vertno,
                                                          const QByteArray& arrayCurrentVertColor,
                                                          const QMap<int, QVector<int> >& mapVertexNeighbors,
                                                          const SparseMatrix<double>& matWDistSmooth)
 {
-//    //Option 1 - Use mapReduce
-//    QTime myTimer;
-//    myTimer.start();
-
-//    //Do the smooting here
-//    if(mapVertexNeighbors.isEmpty()) {
-//        qDebug() << "RtSourceLocDataWorker::generateSmoothedColors - The neighboring information has not been set. Returning ...";
-//        return QByteArray();
-//    }
-
-//    //Prepare input data
-//    QTime prepareDataTimer;
-//    prepareDataTimer.start();
-
-//    QList<smoothInfo> inputData;
-//    smoothInfo info;
-
-//    for (int k = 0; k < vertno.rows(); ++k) {
-//        info.mapVertNeighbor = mapVertexNeighbors;
-//        info.iVertNo = vertno[k];
-//        info.dActivation = sourceColorSamples[k];
-
-//        inputData.append(info);
-//    }
-
-//    qDebug() << "Prep data" << prepareDataTimer.elapsed();
-
-//    //Start multithreading
-//    QTime generateDataTimer;
-//    generateDataTimer.start();
-
-//    QFuture<VectorXd> final = QtConcurrent::mappedReduced(inputData, smoothData, reduce);
-//    final.waitForFinished();
-
-//    qDebug() << "Gen data" << generateDataTimer.elapsed();
-
-//    //Generate final colors
-//    VectorXd smoothedData = final.result();
-//    VectorXd vecActivation(1);
-
-//    QByteArray finalColors = arrayCurrentVertColor;
-//    float *rawfinalColors = reinterpret_cast<float *>(finalColors.data());
-//    int idxVert = 0;
-
-//    for (int k = 0; k < smoothedData.rows(); ++k) {
-//        vecActivation(0) = smoothedData(k);
-
-//        if(smoothedData(k) > m_vecThresholds.x()) {
-//            QByteArray arrayVertColor = transformDataToColor(vecActivation);
-
-//            float *rawVertColor = reinterpret_cast<float *>(arrayVertColor.data());
-
-//            rawfinalColors[idxVert] = rawVertColor[0];
-//            rawfinalColors[idxVert+1] = rawVertColor[1];
-//            rawfinalColors[idxVert+2] = rawVertColor[2];
-//        }
-
-//        idxVert += 3;
-//    }
-
-//    qDebug() << "All timer" << myTimer.elapsed();
-
-//    return finalColors;
-
-
-//    //Option 2 - Use Matti's version. Smoothes between different source "patches".
+//    //Option 1 - Use Matti's version. Smoothes between different source "patches".
 //    //Activity is spread evenly around every source and then smoothed to neighboring source patches.
 //    //Init the variables
 //    int n,k,p,it,nn,nv;
@@ -912,7 +774,7 @@ QByteArray RtSourceLocDataWorker::generateSmoothedColors(const VectorXd& sourceC
 
 //    return finalColors;
 
-    //Option 3 - Inverse weighted distance
+    //Option 2 - Inverse weighted distance
 //    QTime allTimer;
 //    allTimer.start();
 
@@ -926,30 +788,40 @@ QByteArray RtSourceLocDataWorker::generateSmoothedColors(const VectorXd& sourceC
     QTime prodDataTimer;
     prodDataTimer.start();
 
-    //Produce final color
-    VectorXd vecActivation(1);
+//    //Produce final color
+//    VectorXd vecActivation(1);
 
-    QByteArray finalColors = arrayCurrentVertColor;
-    float *rawfinalColors = reinterpret_cast<float *>(finalColors.data());
-    int idxVert = 0;
+//    QByteArray finalColors = arrayCurrentVertColor;
+//    float *rawfinalColors = reinterpret_cast<float *>(finalColors.data());
+//    int idxVert = 0;
 
-    for (int k = 0; k < vecSmoothedData.rows(); k++) {
-        vecActivation(0) = vecSmoothedData[k];
+//    int sumTimer = 0;
 
-        if(vecActivation(0) > m_vecThresholds.x()) {
-            QByteArray arrayVertColor = transformDataToColor(vecActivation);
+//    for (int k = 0; k < vecSmoothedData.rows(); k++) {
+//        vecActivation(0) = vecSmoothedData[k];
 
-            float *rawVertColor = reinterpret_cast<float *>(arrayVertColor.data());
+//        if(vecActivation(0) > m_vecThresholds.x()) {
+//            QByteArray arrayVertColor = transformDataToColor(vecActivation);
 
-            rawfinalColors[idxVert] = rawVertColor[0];
-            rawfinalColors[idxVert+1] = rawVertColor[1];
-            rawfinalColors[idxVert+2] = rawVertColor[2];
-        }
+//            QTime timer;
+//            timer.start();
 
-        idxVert += 3;
-    }
+//            float *rawVertColor = reinterpret_cast<float *>(arrayVertColor.data());
 
-//    qDebug() << "Produce time" << prodDataTimer.elapsed();
+//            rawfinalColors[idxVert] = rawVertColor[0];
+//            rawfinalColors[idxVert+1] = rawVertColor[1];
+//            rawfinalColors[idxVert+2] = rawVertColor[2];
+
+//            sumTimer += timer.elapsed();
+//        }
+
+//        idxVert += 3;
+//    }
+
+    QByteArray finalColors = transformDataToColor(vecSmoothedData, arrayCurrentVertColor);
+
+    //qDebug() << "sumTimer" << sumTimer;
+    qDebug() << "Produce time" << prodDataTimer.elapsed();
 //    qDebug() << "All time" << allTimer.elapsed();
 
     return finalColors;
@@ -957,10 +829,12 @@ QByteArray RtSourceLocDataWorker::generateSmoothedColors(const VectorXd& sourceC
 
 //*************************************************************************************************************
 
-QByteArray RtSourceLocDataWorker::transformDataToColor(const VectorXd& data)
+QByteArray RtSourceLocDataWorker::transformDataToColor(const VectorXd& data, const QByteArray& arrayCurrentVertColor)
 {
+//    QElapsedTimer timer;
+//    timer.start();
     //Note: This function needs to be implemented extremley efficient
-    QByteArray arrayColor;
+    QByteArray arrayColor = arrayCurrentVertColor;
     int idxColor = 0;
 
     if(m_sColormap == "Hot Negative 1") {
@@ -1049,6 +923,99 @@ QByteArray RtSourceLocDataWorker::transformDataToColor(const VectorXd& data)
             rawArrayColors[idxColor++] = colSample.greenF();
             rawArrayColors[idxColor++] = colSample.blueF();
         }
+
+//        int elapsed = timer.elapsed();
+//        qDebug()<<"RtSourceLocDataWorker::transformDataToColor - elapsed"<<elapsed;
+
+        return arrayColor;
+    }
+
+    return arrayColor;
+}
+
+
+//*************************************************************************************************************
+
+QByteArray RtSourceLocDataWorker::transformDataToColor(float fSample)
+{
+    //Note: This function needs to be implemented extremley efficient
+    QByteArray arrayColor;
+    int idxColor = 0;
+
+    if(m_sColormap == "Hot Negative 1") {
+        arrayColor.resize(3 * (int)sizeof(float));
+        float *rawArrayColors = reinterpret_cast<float *>(arrayColor.data());
+
+        //Check lower and upper thresholds and normalize to one
+        if(fSample > m_vecThresholds.z()) {
+            fSample = 1.0;
+        } else if(fSample < m_vecThresholds.x()) {
+            fSample = 0.0;
+        } else {
+            fSample = (fSample - m_vecThresholds.x()) / (m_vecThresholds.z() - m_vecThresholds.x());
+        }
+
+//            qDebug() << "dSample" << dSample;
+//            qDebug() << "data(r)" << data(r);
+//            qDebug() << "m_vecThresholds" << m_vecThresholds;
+
+        QRgb qRgb;
+        qRgb = ColorMap::valueToHotNegative1(fSample);
+
+        QColor colSample(qRgb);
+        rawArrayColors[idxColor++] = colSample.redF();
+        rawArrayColors[idxColor++] = colSample.greenF();
+        rawArrayColors[idxColor++] = colSample.blueF();
+
+        colSample = colSample.darker(200);
+
+        return arrayColor;
+    }
+
+    if(m_sColormap == "Hot Negative 2") {
+        arrayColor.resize(3 * (int)sizeof(float));
+        float *rawArrayColors = reinterpret_cast<float *>(arrayColor.data());
+
+        //Check lower and upper thresholds and normalize to one
+        if(fSample > m_vecThresholds.z()) {
+            fSample = 1.0;
+        } else if(fSample < m_vecThresholds.x()) {
+            fSample = 0.0;
+        } else {
+            fSample = (fSample - m_vecThresholds.x()) / (m_vecThresholds.z() - m_vecThresholds.x());
+        }
+
+        QRgb qRgb;
+        qRgb = ColorMap::valueToHotNegative2(fSample);
+
+        QColor colSample(qRgb);
+        rawArrayColors[idxColor++] = colSample.redF();
+        rawArrayColors[idxColor++] = colSample.greenF();
+        rawArrayColors[idxColor++] = colSample.blueF();
+
+        return arrayColor;
+    }
+
+    if(m_sColormap == "Hot") {
+        arrayColor.resize(3 * (int)sizeof(float));
+        float *rawArrayColors = reinterpret_cast<float *>(arrayColor.data());
+
+        //Check lower and upper thresholds and normalize to one
+        if(fSample > m_vecThresholds.z()) {
+            fSample = 1.0;
+        } else if(fSample < m_vecThresholds.x()) {
+            fSample = 0.0;
+        } else {
+            fSample = (fSample - m_vecThresholds.x()) / (m_vecThresholds.z() - m_vecThresholds.x());
+        }
+
+        QRgb qRgb;
+        qRgb = ColorMap::valueToHot(fSample);
+
+        QColor colSample(qRgb);
+        rawArrayColors[idxColor++] = colSample.redF();
+        rawArrayColors[idxColor++] = colSample.greenF();
+        rawArrayColors[idxColor++] = colSample.blueF();
 
         return arrayColor;
     }
