@@ -6961,28 +6961,36 @@ bad : {
 
 
 
-int mne_read_bad_channel_list_from_node(fiffFile in, fiffDirNode node, char ***listp, int *nlistp)
+int mne_read_bad_channel_list_from_node(//fiffFile in,
+                                        FiffStream::SPtr& stream,
+                                        const FiffDirNode& pNode, char ***listp, int *nlistp)
 
 {
-    fiffDirNode bad,*temp;
+    FiffDirNode node,bad;
+    QList<FiffDirNode> temp;
     char **list = NULL;
     int  nlist  = 0;
-    fiffTag tag;
+//    fiffTag tag;
+    FiffTag::SPtr t_pTag;
     char *names;
 
-    if (!node)
-        node = in->dirtree;
+    if (pNode.isEmpty())
+        node = stream->tree();
+    else
+        node = pNode;
 
-    temp = fiff_dir_tree_find(node,FIFFB_MNE_BAD_CHANNELS);
-    if (temp && temp[0]) {
+//    temp = fiff_dir_tree_find(node,FIFFB_MNE_BAD_CHANNELS);
+    temp = node.dir_tree_find(FIFFB_MNE_BAD_CHANNELS);
+    if (temp.size() > 0) {
         bad = temp[0];
-        FREE(temp);
+//        FREE(temp);
 
-        if ((tag = fiff_dir_tree_get_tag(in,bad,FIFF_MNE_CH_NAME_LIST)) != NULL) {
-            names = (char *)tag->data;
-            FREE(tag);
+        bad.find_tag(stream.data(), FIFF_MNE_CH_NAME_LIST, t_pTag);
+        if (t_pTag) {
+            names = (char *)t_pTag->data();
+//            FREE(tag);
             mne_string_to_name_list(names,&list,&nlist);
-            FREE(names);
+//            FREE(names);
         }
     }
     *listp = list;
@@ -6993,15 +7001,20 @@ int mne_read_bad_channel_list_from_node(fiffFile in, fiffDirNode node, char ***l
 int mne_read_bad_channel_list(const QString& name, char ***listp, int *nlistp)
 
 {
-    fiffFile in = fiff_open(name.toLatin1().data());
+    QFile file(name);
+    FiffStream::SPtr stream(new FiffStream(&file));
+
+//    fiffFile in = fiff_open(name.toLatin1().data());
     int res;
 
-    if (in == NULL)
+//    if (in == NULL)
+    if(!stream->open())
         return FAIL;
 
-    res = mne_read_bad_channel_list_from_node(in,in->dirtree,listp,nlistp);
+    res = mne_read_bad_channel_list_from_node(stream,stream->tree(),listp,nlistp);
 
-    fiff_close(in);
+//    fiff_close(in);
+    stream->device()->close();
 
     return res;
 }
@@ -7013,26 +7026,28 @@ int mne_read_bad_channel_list(const QString& name, char ***listp, int *nlistp)
 
 
 
-MneSssData* mne_read_sss_data_from_node(fiffFile in, fiffDirNode start)
+MneSssData* mne_read_sss_data_from_node(//fiffFile in,
+                                        FiffStream::SPtr& stream, const FiffDirNode& start)
 /*
  * Read the SSS data from the given node of an open file
  */
 {
     MneSssData* s  = new MneSssData();
-    fiffDirNode *sss = NULL;
-    fiffDirNode node;
+    QList<FiffDirNode> sss;
+    FiffDirNode node;
     fiffTag     tag;
     float       *r0;
     int j,p,q,n;
     /*
-   * Locate the SSS information
-   */
-    sss = fiff_dir_tree_find(start,FIFFB_SSS_INFO);
-    if (sss && sss[0]) {
-        node = sss[0]; FREE(sss);
+    * Locate the SSS information
+    */
+//    sss = fiff_dir_tree_find(start,FIFFB_SSS_INFO);
+    sss = start.dir_tree_find(FIFFB_SSS_INFO);
+    if (sss.size() > 0) {
+        node = sss[0];// FREE(sss);
         /*
-     * Read the SSS information, require all tags to be present
-     */
+        * Read the SSS information, require all tags to be present
+        */
         if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_SSS_JOB)) == NULL)
             goto bad;
         s->job = *(fiff_int_t *)tag->data;
