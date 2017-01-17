@@ -835,37 +835,38 @@ QByteArray RtSourceLocDataWorker::transformDataToColor(const VectorXd& data, con
 //    timer.start();
     //Note: This function needs to be implemented extremley efficient
     QByteArray arrayColor = arrayCurrentVertColor;
+    float *rawArrayColors = reinterpret_cast<float *>(arrayColor.data());
     int idxColor = 0;
+    float dSample;
 
     if(m_sColormap == "Hot Negative 1") {
         arrayColor.resize(data.rows() * 3 * (int)sizeof(float));
-        float *rawArrayColors = reinterpret_cast<float *>(arrayColor.data());
 
         for(int r = 0; r < data.rows(); ++r) {
-            float dSample = data(r);
+            dSample = data(r);
 
-            //Check lower and upper thresholds and normalize to one
-            if(dSample > m_vecThresholds.z()) {
-                dSample = 1.0;
-            } else if(dSample < m_vecThresholds.x()) {
-                dSample = 0.0;
+            if(dSample > m_vecThresholds.x()) {
+                //Check lower and upper thresholds and normalize to one
+                if(dSample >= m_vecThresholds.z()) {
+                    dSample = 1.0;
+                } else if(dSample < m_vecThresholds.x()) {
+                    dSample = 0.0;
+                } else {
+                    dSample = (dSample - m_vecThresholds.x()) / (m_vecThresholds.z() - m_vecThresholds.x());
+                }
+
+                QRgb qRgb;
+                qRgb = ColorMap::valueToHotNegative1(dSample);
+
+                QColor colSample(qRgb);
+                rawArrayColors[idxColor++] = colSample.redF();
+                rawArrayColors[idxColor++] = colSample.greenF();
+                rawArrayColors[idxColor++] = colSample.blueF();
+
+                colSample = colSample.darker(200);
             } else {
-                dSample = (dSample - m_vecThresholds.x()) / (m_vecThresholds.z() - m_vecThresholds.x());
+                idxColor += 3;
             }
-
-//            qDebug() << "dSample" << dSample;
-//            qDebug() << "data(r)" << data(r);
-//            qDebug() << "m_vecThresholds" << m_vecThresholds;
-
-            QRgb qRgb;
-            qRgb = ColorMap::valueToHotNegative1(dSample);
-
-            QColor colSample(qRgb);
-            rawArrayColors[idxColor++] = colSample.redF();
-            rawArrayColors[idxColor++] = colSample.greenF();
-            rawArrayColors[idxColor++] = colSample.blueF();            
-
-            colSample = colSample.darker(200);
         }
 
         return arrayColor;
@@ -873,27 +874,29 @@ QByteArray RtSourceLocDataWorker::transformDataToColor(const VectorXd& data, con
 
     if(m_sColormap == "Hot Negative 2") {
         arrayColor.resize(data.rows() * 3 * (int)sizeof(float));
-        float *rawArrayColors = reinterpret_cast<float *>(arrayColor.data());
 
         for(int r = 0; r < data.rows(); ++r) {
-            float dSample = data(r);
+            dSample = data(r);
+            if(dSample > m_vecThresholds.x()) {
+                //Check lower and upper thresholds and normalize to one
+                if(dSample >= m_vecThresholds.z()) {
+                    dSample = 1.0;
+                } else if(dSample < m_vecThresholds.x()) {
+                    dSample = 0.0;
+                } else {
+                    dSample = (dSample - m_vecThresholds.x()) / (m_vecThresholds.z() - m_vecThresholds.x());
+                }
 
-            //Check lower and upper thresholds and normalize to one
-            if(dSample > m_vecThresholds.z()) {
-                dSample = 1.0;
-            } else if(dSample < m_vecThresholds.x()) {
-                dSample = 0.0;
+                QRgb qRgb;
+                qRgb = ColorMap::valueToHotNegative2(dSample);
+
+                QColor colSample(qRgb);
+                rawArrayColors[idxColor++] = colSample.redF();
+                rawArrayColors[idxColor++] = colSample.greenF();
+                rawArrayColors[idxColor++] = colSample.blueF();
             } else {
-                dSample = (dSample - m_vecThresholds.x()) / (m_vecThresholds.z() - m_vecThresholds.x());
+                idxColor += 3;
             }
-
-            QRgb qRgb;
-            qRgb = ColorMap::valueToHotNegative2(dSample);
-
-            QColor colSample(qRgb);
-            rawArrayColors[idxColor++] = colSample.redF();
-            rawArrayColors[idxColor++] = colSample.greenF();
-            rawArrayColors[idxColor++] = colSample.blueF();
         }
 
         return arrayColor;
@@ -901,27 +904,30 @@ QByteArray RtSourceLocDataWorker::transformDataToColor(const VectorXd& data, con
 
     if(m_sColormap == "Hot") {
         arrayColor.resize(data.rows() * 3 * (int)sizeof(float));
-        float *rawArrayColors = reinterpret_cast<float *>(arrayColor.data());
 
         for(int r = 0; r < data.rows(); ++r) {
-            float dSample = data(r);
+            dSample = data(r);
 
-            //Check lower and upper thresholds and normalize to one
-            if(dSample > m_vecThresholds.z()) {
-                dSample = 1.0;
-            } else if(dSample < m_vecThresholds.x()) {
-                dSample = 0.0;
+            if(dSample >= m_vecThresholds.x()) {
+                //Check lower and upper thresholds and normalize to one
+                if(dSample > m_vecThresholds.z()) {
+                    dSample = 1.0;
+                } else if(dSample < m_vecThresholds.x()) {
+                    dSample = 0.0;
+                } else {
+                    dSample = (dSample - m_vecThresholds.x()) / (m_vecThresholds.z() - m_vecThresholds.x());
+                }
+
+                QRgb qRgb;
+                qRgb = ColorMap::valueToHot(dSample);
+
+                QColor colSample(qRgb);
+                rawArrayColors[idxColor++] = colSample.redF();
+                rawArrayColors[idxColor++] = colSample.greenF();
+                rawArrayColors[idxColor++] = colSample.blueF();
             } else {
-                dSample = (dSample - m_vecThresholds.x()) / (m_vecThresholds.z() - m_vecThresholds.x());
+                idxColor += 3;
             }
-
-            QRgb qRgb;
-            qRgb = ColorMap::valueToHot(dSample);
-
-            QColor colSample(qRgb);
-            rawArrayColors[idxColor++] = colSample.redF();
-            rawArrayColors[idxColor++] = colSample.greenF();
-            rawArrayColors[idxColor++] = colSample.blueF();
         }
 
 //        int elapsed = timer.elapsed();
