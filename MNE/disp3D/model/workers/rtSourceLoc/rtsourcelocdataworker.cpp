@@ -95,11 +95,11 @@ RtSourceLocDataWorker::RtSourceLocDataWorker(QObject* parent)
 , m_iCurrentSample(0)
 , m_iVisualizationType(Data3DTreeModelItemRoles::VertexBased)
 , m_iMSecIntervall(50)
-, m_sColormap("Hot Negative 2")
 , m_dNormalization(1.0)
 , m_dNormalizationMax(10.0)
 , m_bSurfaceDataIsInit(false)
 , m_bAnnotationDataIsInit(false)
+, m_functionHandlerColorMap(ColorMap::valueToHotNegative2)
 {
 }
 
@@ -223,7 +223,15 @@ void RtSourceLocDataWorker::setVisualizationType(const int& iVisType)
 void RtSourceLocDataWorker::setColormapType(const QString& sColormapType)
 {
     QMutexLocker locker(&m_qMutex);
-    m_sColormap = sColormapType;
+
+    //Create function handler to corresponding color map function
+    if(sColormapType == "Hot Negative 1") {
+        m_functionHandlerColorMap = ColorMap::valueToHotNegative1;
+    } else if(sColormapType == "Hot Negative 2") {
+        m_functionHandlerColorMap = ColorMap::valueToHotNegative2;
+    } else if(sColormapType == "Hot") {
+        m_functionHandlerColorMap = ColorMap::valueToHot;
+    }
 }
 
 
@@ -690,13 +698,16 @@ QByteArray RtSourceLocDataWorker::generateSmoothedColors(const VectorXd& sourceC
                                                          const QByteArray& arrayCurrentVertColor,
                                                          const QMap<int, QVector<int> >& mapVertexNeighbors,
                                                          const SparseMatrix<double>& matWDistSmooth)
-{
+{    
+    //QTime prodDataTimer;
+    //prodDataTimer.start();
+
 //    //Option 1 - Use Matti's version. Smoothes between different source "patches".
 //    //Activity is spread evenly around every source and then smoothed to neighboring source patches.
 //    //Init the variables
 //    int n,k,p,it,nn,nv;
 //    float sum;
-//    int niter = 20;
+//    int niter = 2;
 
 //    int nSurfaceVerts = arrayCurrentVertColor.size() / (sizeof(float) * 3);
 //    int nvert = sourceColorSamples.rows();
@@ -704,8 +715,9 @@ QByteArray RtSourceLocDataWorker::generateSmoothedColors(const VectorXd& sourceC
 //    QVector<bool> undef(nSurfaceVerts, true);
 //    QVector<bool> prev_undef(nSurfaceVerts);
 //    QVector<bool> isSource(nSurfaceVerts, false);
-//    QVector<float> prev_val(nSurfaceVerts);
-//    QVector<float> smooth_val(nSurfaceVerts, 0);
+//    VectorXd prev_val(nSurfaceVerts);
+//    VectorXd smooth_val(nSurfaceVerts);
+//    smooth_val.setZero();
 
 //    //Set all vertex activation of the actually chosen sources to their current activation
 //    for (k = 0; k < nvert; k++) {
@@ -749,165 +761,63 @@ QByteArray RtSourceLocDataWorker::generateSmoothedColors(const VectorXd& sourceC
 //        }
 //    }
 
-//    //Produce final color
-//    VectorXd vecActivation(1);
-
-//    QByteArray finalColors = arrayCurrentVertColor;
-//    float *rawfinalColors = reinterpret_cast<float *>(finalColors.data());
-//    int idxVert = 0;
-
-//    for (k = 0; k < nSurfaceVerts; k++) {
-//        vecActivation(0) = smooth_val[k];
-
-//        if(vecActivation(0) > m_vecThresholds.x()) {
-//            QByteArray arrayVertColor = transformDataToColor(vecActivation);
-
-//            float *rawVertColor = reinterpret_cast<float *>(arrayVertColor.data());
-
-//            rawfinalColors[idxVert] = rawVertColor[0];
-//            rawfinalColors[idxVert+1] = rawVertColor[1];
-//            rawfinalColors[idxVert+2] = rawVertColor[2];
-//        }
-
-//        idxVert += 3;
-//    }
-
-//    return finalColors;
-
-    //Option 2 - Inverse weighted distance
-//    QTime allTimer;
-//    allTimer.start();
-
-//    QTime multDataTimer;
-//    multDataTimer.start();
-
-    VectorXd vecSmoothedData = matWDistSmooth * sourceColorSamples;
-
-//    qDebug() << "Mult time" << multDataTimer.elapsed();
-
-    QTime prodDataTimer;
-    prodDataTimer.start();
+    //Option 2 - Inverse weighted distance smoothing operator
+    VectorXd smooth_val = matWDistSmooth * sourceColorSamples;
 
     //Produce final color
-    QByteArray finalColors = transformDataToColor(vecSmoothedData, arrayCurrentVertColor);
+    QByteArray finalColors = arrayCurrentVertColor;
+    transformDataToColor(smooth_val, finalColors);
 
-    //qDebug() << "sumTimer" << sumTimer;
-    //qDebug() << "Produce time" << prodDataTimer.elapsed();
-//    qDebug() << "All time" << allTimer.elapsed();
+    //int iAllTimer = allTimer.elapsed();
+    //qDebug() << "All time" << iAllTimer;
 
     return finalColors;
 }
 
+
 //*************************************************************************************************************
 
-QByteArray RtSourceLocDataWorker::transformDataToColor(const VectorXd& data, const QByteArray& arrayCurrentVertColor)
+void RtSourceLocDataWorker::transformDataToColor(const VectorXd& data, QByteArray& arrayCurrentVertColor)
 {
-//    QElapsedTimer timer;
-//    timer.start();
-    //Note: This function needs to be implemented extremley efficient
-    QByteArray arrayColor = arrayCurrentVertColor;
-    float *rawArrayColors = reinterpret_cast<float *>(arrayColor.data());
+    //Note: This function needs to be implemented extremley efficient. That is why we have three if clauses.
+    //      Otherwise we would have to check which color map to take for each vertex.
+    //QElapsedTimer timer;
+    //timer.start();
+
+    if(data.rows() != arrayCurrentVertColor.size()/(3*sizeof(float))) {
+        qDebug() << "RtSourceLocDataWorker::transformDataToColor - Sizes of input vectors do not match. Returning ...";
+    }
+
+    float *rawArrayColors = reinterpret_cast<float *>(arrayCurrentVertColor.data());
     int idxColor = 0;
     float dSample;
+    QRgb qRgb;
 
-    if(m_sColormap == "Hot Negative 1") {
-        arrayColor.resize(data.rows() * 3 * (int)sizeof(float));
+    for(int r = 0; r < data.rows(); ++r) {
+        dSample = data(r);
 
-        for(int r = 0; r < data.rows(); ++r) {
-            dSample = data(r);
-
-            if(dSample > m_vecThresholds.x()) {
-                //Check lower and upper thresholds and normalize to one
-                if(dSample >= m_vecThresholds.z()) {
-                    dSample = 1.0;
-                } else if(dSample < m_vecThresholds.x()) {
-                    dSample = 0.0;
-                } else {
-                    dSample = (dSample - m_vecThresholds.x()) / (m_vecThresholds.z() - m_vecThresholds.x());
-                }
-
-                QRgb qRgb;
-                qRgb = ColorMap::valueToHotNegative1(dSample);
-
-                QColor colSample(qRgb);
-                rawArrayColors[idxColor++] = colSample.redF();
-                rawArrayColors[idxColor++] = colSample.greenF();
-                rawArrayColors[idxColor++] = colSample.blueF();
-
-                colSample = colSample.darker(200);
+        if(dSample > m_vecThresholds.x()) {
+            //Check lower and upper thresholds and normalize to one
+            if(dSample >= m_vecThresholds.z()) {
+                dSample = 1.0;
+            } else if(dSample < m_vecThresholds.x()) {
+                dSample = 0.0;
             } else {
-                idxColor += 3;
+                dSample = (dSample - m_vecThresholds.x()) / (m_vecThresholds.z() - m_vecThresholds.x());
             }
-        }
 
-        return arrayColor;
+            qRgb = m_functionHandlerColorMap(dSample);
+
+            rawArrayColors[idxColor++] = (float)qRed(qRgb)/255.0f;
+            rawArrayColors[idxColor++] = (float)qGreen(qRgb)/255.0f;
+            rawArrayColors[idxColor++] = (float)qBlue(qRgb)/255.0f;
+        } else {
+            idxColor += 3;
+        }
     }
 
-    if(m_sColormap == "Hot Negative 2") {
-        arrayColor.resize(data.rows() * 3 * (int)sizeof(float));
-
-        for(int r = 0; r < data.rows(); ++r) {
-            dSample = data(r);
-            if(dSample > m_vecThresholds.x()) {
-                //Check lower and upper thresholds and normalize to one
-                if(dSample >= m_vecThresholds.z()) {
-                    dSample = 1.0;
-                } else if(dSample < m_vecThresholds.x()) {
-                    dSample = 0.0;
-                } else {
-                    dSample = (dSample - m_vecThresholds.x()) / (m_vecThresholds.z() - m_vecThresholds.x());
-                }
-
-                QRgb qRgb;
-                qRgb = ColorMap::valueToHotNegative2(dSample);
-
-                QColor colSample(qRgb);
-                rawArrayColors[idxColor++] = colSample.redF();
-                rawArrayColors[idxColor++] = colSample.greenF();
-                rawArrayColors[idxColor++] = colSample.blueF();
-            } else {
-                idxColor += 3;
-            }
-        }
-
-        return arrayColor;
-    }
-
-    if(m_sColormap == "Hot") {
-        arrayColor.resize(data.rows() * 3 * (int)sizeof(float));
-
-        for(int r = 0; r < data.rows(); ++r) {
-            dSample = data(r);
-
-            if(dSample >= m_vecThresholds.x()) {
-                //Check lower and upper thresholds and normalize to one
-                if(dSample > m_vecThresholds.z()) {
-                    dSample = 1.0;
-                } else if(dSample < m_vecThresholds.x()) {
-                    dSample = 0.0;
-                } else {
-                    dSample = (dSample - m_vecThresholds.x()) / (m_vecThresholds.z() - m_vecThresholds.x());
-                }
-
-                QRgb qRgb;
-                qRgb = ColorMap::valueToHot(dSample);
-
-                QColor colSample(qRgb);
-                rawArrayColors[idxColor++] = colSample.redF();
-                rawArrayColors[idxColor++] = colSample.greenF();
-                rawArrayColors[idxColor++] = colSample.blueF();
-            } else {
-                idxColor += 3;
-            }
-        }
-
-//        int elapsed = timer.elapsed();
-//        qDebug()<<"RtSourceLocDataWorker::transformDataToColor - elapsed"<<elapsed;
-
-        return arrayColor;
-    }
-
-    return arrayColor;
+    //int elapsed = timer.elapsed();
+    //qDebug()<<"RtSourceLocDataWorker::transformDataToColor - elapsed"<<elapsed;
 }
 
 
@@ -919,83 +829,27 @@ QByteArray RtSourceLocDataWorker::transformDataToColor(float fSample)
     QByteArray arrayColor;
     int idxColor = 0;
 
-    if(m_sColormap == "Hot Negative 1") {
-        arrayColor.resize(3 * (int)sizeof(float));
-        float *rawArrayColors = reinterpret_cast<float *>(arrayColor.data());
+    arrayColor.resize(3 * (int)sizeof(float));
+    float *rawArrayColors = reinterpret_cast<float *>(arrayColor.data());
 
-        //Check lower and upper thresholds and normalize to one
-        if(fSample > m_vecThresholds.z()) {
-            fSample = 1.0;
-        } else if(fSample < m_vecThresholds.x()) {
-            fSample = 0.0;
-        } else {
-            fSample = (fSample - m_vecThresholds.x()) / (m_vecThresholds.z() - m_vecThresholds.x());
-        }
-
-//            qDebug() << "dSample" << dSample;
-//            qDebug() << "data(r)" << data(r);
-//            qDebug() << "m_vecThresholds" << m_vecThresholds;
-
-        QRgb qRgb;
-        qRgb = ColorMap::valueToHotNegative1(fSample);
-
-        QColor colSample(qRgb);
-        rawArrayColors[idxColor++] = colSample.redF();
-        rawArrayColors[idxColor++] = colSample.greenF();
-        rawArrayColors[idxColor++] = colSample.blueF();
-
-        colSample = colSample.darker(200);
-
-        return arrayColor;
+    //Check lower and upper thresholds and normalize to one
+    if(fSample > m_vecThresholds.z()) {
+        fSample = 1.0;
+    } else if(fSample < m_vecThresholds.x()) {
+        fSample = 0.0;
+    } else {
+        fSample = (fSample - m_vecThresholds.x()) / (m_vecThresholds.z() - m_vecThresholds.x());
     }
 
-    if(m_sColormap == "Hot Negative 2") {
-        arrayColor.resize(3 * (int)sizeof(float));
-        float *rawArrayColors = reinterpret_cast<float *>(arrayColor.data());
+    QRgb qRgb;
+    qRgb = qRgb = (m_functionHandlerColorMap)(fSample);
 
-        //Check lower and upper thresholds and normalize to one
-        if(fSample > m_vecThresholds.z()) {
-            fSample = 1.0;
-        } else if(fSample < m_vecThresholds.x()) {
-            fSample = 0.0;
-        } else {
-            fSample = (fSample - m_vecThresholds.x()) / (m_vecThresholds.z() - m_vecThresholds.x());
-        }
+    QColor colSample(qRgb);
+    rawArrayColors[idxColor++] = colSample.redF();
+    rawArrayColors[idxColor++] = colSample.greenF();
+    rawArrayColors[idxColor++] = colSample.blueF();
 
-        QRgb qRgb;
-        qRgb = ColorMap::valueToHotNegative2(fSample);
-
-        QColor colSample(qRgb);
-        rawArrayColors[idxColor++] = colSample.redF();
-        rawArrayColors[idxColor++] = colSample.greenF();
-        rawArrayColors[idxColor++] = colSample.blueF();
-
-        return arrayColor;
-    }
-
-    if(m_sColormap == "Hot") {
-        arrayColor.resize(3 * (int)sizeof(float));
-        float *rawArrayColors = reinterpret_cast<float *>(arrayColor.data());
-
-        //Check lower and upper thresholds and normalize to one
-        if(fSample > m_vecThresholds.z()) {
-            fSample = 1.0;
-        } else if(fSample < m_vecThresholds.x()) {
-            fSample = 0.0;
-        } else {
-            fSample = (fSample - m_vecThresholds.x()) / (m_vecThresholds.z() - m_vecThresholds.x());
-        }
-
-        QRgb qRgb;
-        qRgb = ColorMap::valueToHot(fSample);
-
-        QColor colSample(qRgb);
-        rawArrayColors[idxColor++] = colSample.redF();
-        rawArrayColors[idxColor++] = colSample.greenF();
-        rawArrayColors[idxColor++] = colSample.blueF();
-
-        return arrayColor;
-    }
+    colSample = colSample.darker(200);
 
     return arrayColor;
 }
