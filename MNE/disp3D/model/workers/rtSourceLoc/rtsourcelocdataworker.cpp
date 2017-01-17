@@ -564,12 +564,14 @@ QPair<QByteArray, QByteArray> RtSourceLocDataWorker::generateColorsPerVertex(con
     //Left hemisphere
     QByteArray arrayCurrentVertColorLeftHemi = m_arraySurfaceVertColorLeftHemi;
     float *rawArrayCurrentVertColorLeftHemi = reinterpret_cast<float *>(arrayCurrentVertColorLeftHemi.data());
+    QByteArray sourceColorSample;
+    sourceColorSample.resize(3 * sizeof(float));
 
     //Create final QByteArray with colors based on the current anatomical information
     for(int i = 0; i < m_vecVertNoLeftHemi.rows(); ++i) {
         if(sourceColorSamplesLeftHemi(i) >= m_vecThresholds.x()) {
-            QByteArray sourceColorSamplesColorLeftHemi = transformDataToColor(sourceColorSamplesLeftHemi(i));
-            const float *rawSourceColorSamplesColorLeftHemi = reinterpret_cast<const float *>(sourceColorSamplesColorLeftHemi.data());
+            transformDataToColor(sourceColorSamplesLeftHemi(i), sourceColorSample);
+            const float *rawSourceColorSamplesColorLeftHemi = reinterpret_cast<const float *>(sourceColorSample.data());
 
             rawArrayCurrentVertColorLeftHemi[m_vecVertNoLeftHemi(i)*3+0] = rawSourceColorSamplesColorLeftHemi[0];
             rawArrayCurrentVertColorLeftHemi[m_vecVertNoLeftHemi(i)*3+1] = rawSourceColorSamplesColorLeftHemi[1];
@@ -586,8 +588,8 @@ QPair<QByteArray, QByteArray> RtSourceLocDataWorker::generateColorsPerVertex(con
     //Create final QByteArray with colors based on the current anatomical information
     for(int i = 0; i < m_vecVertNoRightHemi.rows(); ++i) {
         if(sourceColorSamplesRightHemi(i) >= m_vecThresholds.x()) {
-            QByteArray sourceColorSamplesColorRightHemi = transformDataToColor(sourceColorSamplesRightHemi(i));
-            const float *rawSourceColorSamplesColorRightHemi = reinterpret_cast<const float *>(sourceColorSamplesColorRightHemi.data());
+            transformDataToColor(sourceColorSamplesRightHemi(i), sourceColorSample);
+            const float *rawSourceColorSamplesColorRightHemi = reinterpret_cast<const float *>(sourceColorSample.data());
 
             rawArrayCurrentVertColorRightHemi[m_vecVertNoRightHemi(i)*3+0] = rawSourceColorSamplesColorRightHemi[0];
             rawArrayCurrentVertColorRightHemi[m_vecVertNoRightHemi(i)*3+1] = rawSourceColorSamplesColorRightHemi[1];
@@ -637,8 +639,9 @@ QPair<QByteArray, QByteArray> RtSourceLocDataWorker::generateColorsPerAnnotation
     //Color all labels respectivley to their activation
     //Left hemisphere
     QByteArray arrayCurrentVertColorLeftHemi;
-    //arrayCurrentVertColor.resize(m_arraySurfaceVertColor.size());
     arrayCurrentVertColorLeftHemi = m_arraySurfaceVertColorLeftHemi;
+    QByteArray sourceColorSample;
+    sourceColorSample.resize(3 * sizeof(float));
 
     float *rawArrayCurrentVertColorLeftHemi = reinterpret_cast<float *>(arrayCurrentVertColorLeftHemi.data());
 
@@ -648,8 +651,8 @@ QPair<QByteArray, QByteArray> RtSourceLocDataWorker::generateColorsPerAnnotation
         //Transform label activations to rgb colors
         //Check if value is bigger than lower threshold. If not, don't plot activation
         if(vecLabelActivationLeftHemi[labelLeftHemi.label_id] >= m_vecThresholds.x()) {
-            QByteArray arrayLabelColorsLeftHemi = transformDataToColor(vecLabelActivationLeftHemi[labelLeftHemi.label_id]);
-            float *rawArrayLabelColorsLeftHemi = reinterpret_cast<float *>(arrayLabelColorsLeftHemi.data());
+            transformDataToColor(vecLabelActivationLeftHemi[labelLeftHemi.label_id], sourceColorSample);
+            float *rawArrayLabelColorsLeftHemi = reinterpret_cast<float *>(sourceColorSample.data());
 
             for(int j = 0; j<labelLeftHemi.vertices.rows(); j++) {
                 rawArrayCurrentVertColorLeftHemi[labelLeftHemi.vertices(j)*3+0] = rawArrayLabelColorsLeftHemi[0];
@@ -674,8 +677,8 @@ QPair<QByteArray, QByteArray> RtSourceLocDataWorker::generateColorsPerAnnotation
         //Transform label activations to rgb colors
         //Check if value is bigger than lower threshold. If not, don't plot activation
         if(vecLabelActivationRightHemi[labelRightHemi.label_id] >= m_vecThresholds.x()) {
-            QByteArray arrayLabelColorsRightHemi = transformDataToColor(vecLabelActivationRightHemi[labelRightHemi.label_id]);
-            float *rawArrayLabelColorsRightHemi = reinterpret_cast<float *>(arrayLabelColorsRightHemi.data());
+            transformDataToColor(vecLabelActivationRightHemi[labelRightHemi.label_id], sourceColorSample);
+            float *rawArrayLabelColorsRightHemi = reinterpret_cast<float *>(sourceColorSample.data());
 
             for(int j = 0; j<labelRightHemi.vertices.rows(); j++) {
                 rawArrayCurrentVertColorRightHemi[labelRightHemi.vertices(j)*3+0] = rawArrayLabelColorsRightHemi[0];
@@ -777,18 +780,18 @@ QByteArray RtSourceLocDataWorker::generateSmoothedColors(const VectorXd& sourceC
 
 //*************************************************************************************************************
 
-void RtSourceLocDataWorker::transformDataToColor(const VectorXd& data, QByteArray& arrayCurrentVertColor)
+void RtSourceLocDataWorker::transformDataToColor(const VectorXd& data, QByteArray& arrayFinalVertColor)
 {
     //Note: This function needs to be implemented extremley efficient. That is why we have three if clauses.
     //      Otherwise we would have to check which color map to take for each vertex.
     //QElapsedTimer timer;
     //timer.start();
 
-    if(data.rows() != arrayCurrentVertColor.size()/(3*sizeof(float))) {
+    if(data.rows() != arrayFinalVertColor.size()/(3*sizeof(float))) {
         qDebug() << "RtSourceLocDataWorker::transformDataToColor - Sizes of input vectors do not match. Returning ...";
     }
 
-    float *rawArrayColors = reinterpret_cast<float *>(arrayCurrentVertColor.data());
+    float *rawArrayColors = reinterpret_cast<float *>(arrayFinalVertColor.data());
     int idxColor = 0;
     float dSample;
     QRgb qRgb;
@@ -823,14 +826,17 @@ void RtSourceLocDataWorker::transformDataToColor(const VectorXd& data, QByteArra
 
 //*************************************************************************************************************
 
-QByteArray RtSourceLocDataWorker::transformDataToColor(float fSample)
+void RtSourceLocDataWorker::transformDataToColor(float fSample, QByteArray& arrayFinalVertColor)
 {
-    //Note: This function needs to be implemented extremley efficient
-    QByteArray arrayColor;
+    //Note: This function needs to be implemented extremley efficient. That is why we have three if clauses.
+    //      Otherwise we would have to check which color map to take for each vertex.
+    if(arrayFinalVertColor.size()/(sizeof(float)) != 3) {
+        qDebug() << "RtSourceLocDataWorker::transformDataToColor - Sizes of input QByteArray must be 3. Returning ...";
+    }
+
     int idxColor = 0;
 
-    arrayColor.resize(3 * (int)sizeof(float));
-    float *rawArrayColors = reinterpret_cast<float *>(arrayColor.data());
+    float *rawArrayColors = reinterpret_cast<float *>(arrayFinalVertColor.data());
 
     //Check lower and upper thresholds and normalize to one
     if(fSample > m_vecThresholds.z()) {
@@ -844,12 +850,7 @@ QByteArray RtSourceLocDataWorker::transformDataToColor(float fSample)
     QRgb qRgb;
     qRgb = qRgb = (m_functionHandlerColorMap)(fSample);
 
-    QColor colSample(qRgb);
-    rawArrayColors[idxColor++] = colSample.redF();
-    rawArrayColors[idxColor++] = colSample.greenF();
-    rawArrayColors[idxColor++] = colSample.blueF();
-
-    colSample = colSample.darker(200);
-
-    return arrayColor;
+    rawArrayColors[idxColor++] = (float)qRed(qRgb)/255.0f;
+    rawArrayColors[idxColor++] = (float)qGreen(qRgb)/255.0f;
+    rawArrayColors[idxColor++] = (float)qBlue(qRgb)/255.0f;
 }
