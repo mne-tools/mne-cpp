@@ -283,11 +283,22 @@ private:
     /**
     * Transform the data sample values to color values.
     *
-    * @param[in] data               The data which is to be transformed.
+    * @param[in] data                   The data which is to be transformed.
+    * @param[in] arrayCurrentVertColor  The current vertex colors, i.e. may contain the curret curvature color information.
     *
     * @return                       Returns the colors in form of a QByteArray.
     */
-    QByteArray transformDataToColor(const Eigen::VectorXd& data);
+    QByteArray transformDataToColor(const Eigen::VectorXd& data, const QByteArray& arrayCurrentVertColor);
+
+    //=========================================================================================================
+    /**
+    * Transform the data sample values to color values.
+    *
+    * @param[in] fSample            The data which is to be transformed.
+    *
+    * @return                       Returns the colors in form of a QByteArray.
+    */
+    QByteArray transformDataToColor(float fSample);
 
     QMutex                  m_qMutex;                           /**< The thread's mutex. */
 
