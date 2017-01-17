@@ -84,195 +84,10 @@ using namespace UTILSLIB;
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE MEMBER METHODS
+// DEFINE GLOBAL METHODS
 //=============================================================================================================
 
-RtSourceLocDataWorker::RtSourceLocDataWorker(QObject* parent)
-: QThread(parent)
-, m_bIsRunning(false)
-, m_bIsLooping(true)
-, m_iAverageSamples(1)
-, m_iCurrentSample(0)
-, m_iVisualizationType(Data3DTreeModelItemRoles::VertexBased)
-, m_iMSecIntervall(50)
-, m_dNormalization(1.0)
-, m_dNormalizationMax(10.0)
-, m_bSurfaceDataIsInit(false)
-, m_bAnnotationDataIsInit(false)
-, m_functionHandlerColorMap(ColorMap::valueToHotNegative2)
-{
-}
-
-
-//*************************************************************************************************************
-
-RtSourceLocDataWorker::~RtSourceLocDataWorker()
-{
-    if(this->isRunning()) {
-        stop();
-    }
-}
-
-
-//*************************************************************************************************************
-
-void RtSourceLocDataWorker::addData(const MatrixXd& data)
-{
-    QMutexLocker locker(&m_qMutex);
-    if(data.rows() == 0)
-        return;
-
-    //Transform from matrix to list for easier handling in non loop mode
-    for(int i = 0; i<data.cols(); i++) {
-        m_lData.append(data.col(i));
-    }
-}
-
-
-//*************************************************************************************************************
-
-void RtSourceLocDataWorker::clear()
-{
-    QMutexLocker locker(&m_qMutex);
-}
-
-
-//*************************************************************************************************************
-
-void RtSourceLocDataWorker::setSurfaceData(const QByteArray& arraySurfaceVertColorLeftHemi,
-                                           const QByteArray& arraySurfaceVertColorRightHemi,
-                                           const Eigen::VectorXi& vecVertNoLeftHemi,
-                                           const Eigen::VectorXi& vecVertNoRightHemi)
-{
-    QMutexLocker locker(&m_qMutex);
-
-    if(arraySurfaceVertColorLeftHemi.size() == 0 || vecVertNoLeftHemi.rows() == 0 || arraySurfaceVertColorRightHemi.size() == 0 || vecVertNoRightHemi.rows() == 0) {
-        qDebug() << "RtSourceLocDataWorker::setSurfaceData - Surface data is empty. Returning ...";
-        return;
-    }
-
-    m_arraySurfaceVertColorLeftHemi = arraySurfaceVertColorLeftHemi;
-    m_vecVertNoLeftHemi = vecVertNoLeftHemi;
-
-    m_arraySurfaceVertColorRightHemi = arraySurfaceVertColorRightHemi;
-    m_vecVertNoRightHemi = vecVertNoRightHemi;
-
-    m_bSurfaceDataIsInit = true;
-}
-
-
-//*************************************************************************************************************
-
-void RtSourceLocDataWorker::setAnnotationData(const Eigen::VectorXi& vecLabelIdsLeftHemi,
-                                              const Eigen::VectorXi& vecLabelIdsRightHemi,
-                                              const QList<FSLIB::Label>& lLabelsLeftHemi,
-                                              const QList<FSLIB::Label>& lLabelsRightHemi)
-{
-    QMutexLocker locker(&m_qMutex);
-
-    if(vecLabelIdsLeftHemi.rows() == 0 || lLabelsLeftHemi.isEmpty() || vecLabelIdsRightHemi.rows() == 0 || lLabelsRightHemi.isEmpty()) {
-        qDebug() << "RtSourceLocDataWorker::setAnnotationData - Annotation data is empty. Returning ...";
-        return;
-    }
-
-    m_lLabelsLeftHemi = lLabelsLeftHemi;
-    m_lLabelsRightHemi = lLabelsRightHemi;
-
-    //Generate fast lookup map for each source and corresponding label
-    for(qint32 i = 0; i < m_vecVertNoLeftHemi.rows(); ++i) {
-        m_mapLabelIdSourcesLeftHemi.insert(m_vecVertNoLeftHemi(i), vecLabelIdsLeftHemi(m_vecVertNoLeftHemi(i)));
-    }
-
-    for(qint32 i = 0; i < m_vecVertNoRightHemi.rows(); ++i) {
-        m_mapLabelIdSourcesRightHemi.insert(m_vecVertNoRightHemi(i), vecLabelIdsRightHemi(m_vecVertNoRightHemi(i)));
-    }
-
-    m_bAnnotationDataIsInit = true;
-}
-
-
-//*************************************************************************************************************
-
-void RtSourceLocDataWorker::setNumberAverages(const int &iNumAvr)
-{
-    QMutexLocker locker(&m_qMutex);
-    m_iAverageSamples = iNumAvr;
-}
-
-
-//*************************************************************************************************************
-
-void RtSourceLocDataWorker::setInterval(const int& iMSec)
-{
-    QMutexLocker locker(&m_qMutex);
-    m_iMSecIntervall = iMSec;
-}
-
-
-//*************************************************************************************************************
-
-void RtSourceLocDataWorker::setVisualizationType(const int& iVisType)
-{
-    QMutexLocker locker(&m_qMutex);
-    m_iVisualizationType = iVisType;
-}
-
-
-//*************************************************************************************************************
-
-void RtSourceLocDataWorker::setColormapType(const QString& sColormapType)
-{
-    QMutexLocker locker(&m_qMutex);
-
-    //Create function handler to corresponding color map function
-    if(sColormapType == "Hot Negative 1") {
-        m_functionHandlerColorMap = ColorMap::valueToHotNegative1;
-    } else if(sColormapType == "Hot Negative 2") {
-        m_functionHandlerColorMap = ColorMap::valueToHotNegative2;
-    } else if(sColormapType == "Hot") {
-        m_functionHandlerColorMap = ColorMap::valueToHot;
-    }
-}
-
-
-//*************************************************************************************************************
-
-void RtSourceLocDataWorker::setNormalization(const QVector3D& vecThresholds)
-{
-    QMutexLocker locker(&m_qMutex);
-    m_vecThresholds = vecThresholds;
-}
-
-
-//*************************************************************************************************************
-
-void RtSourceLocDataWorker::setLoop(bool looping)
-{
-    QMutexLocker locker(&m_qMutex);
-    m_bIsLooping = looping;
-}
-
-
-//*************************************************************************************************************
-
-struct SmoothOperatorInfo {
-    VectorXi                vecVertNo;
-    SparseMatrix<double>    sparseSmoothMatrix;
-    MatrixX3f               matVertPos;
-    int                     iDistPow;
-    double                  dThresholdDistance;
-};
-
-struct VertexInfo {
-    int                                 iVertIdx;
-    QList<Eigen::Triplet<double> >      lTriplets;
-    QList<QVector3D>                    lSourcePos;
-    QVector3D                           vVertPos;
-    int                                 iDistPow;
-    double                              dThresholdDistance;
-};
-
-void generateWeightsPerVertex(VertexInfo& input)
+void generateWeightsPerVertex(RtSourceLocDataWorker::SmoothVertexInfo& input)
 {
     QVector3D from = input.vVertPos;
     QVector3D to;
@@ -284,13 +99,13 @@ void generateWeightsPerVertex(VertexInfo& input)
         to = input.lSourcePos.at(j);
 
         if(to == from) {
-            dist = 0.0000000000000000000000000000000001;
+            dist = exp(-25);
         } else {
             dist = from.distanceToPoint(to);
         }
 
         if(dist <= input.dThresholdDistance) {
-            valueWeight = abs(1/pow(dist,input.iDistPow));
+            valueWeight = fabs(1.0/pow(dist,input.iDistPow));
 
             input.lTriplets.append(Eigen::Triplet<double>(input.iVertIdx, j, valueWeight));
             dWeightsSum += valueWeight;
@@ -303,11 +118,14 @@ void generateWeightsPerVertex(VertexInfo& input)
     }
 }
 
-void generateSmoothOperator(SmoothOperatorInfo& input)
+
+//*************************************************************************************************************
+
+void generateSmoothOperator(RtSourceLocDataWorker::SmoothOperatorInfo& input)
 {
     //Prepare data
-    QList<VertexInfo> lInputData;
-    VertexInfo vertInfo;
+    QList<RtSourceLocDataWorker::SmoothVertexInfo> lInputData;
+    RtSourceLocDataWorker::SmoothVertexInfo vertInfo;
     QList<QVector3D> lSourcePos;
     QVector3D vertPos;
 
@@ -349,59 +167,424 @@ void generateSmoothOperator(SmoothOperatorInfo& input)
 
 //*************************************************************************************************************
 
-void RtSourceLocDataWorker::setSmootingInfo(const QMap<int, QVector<int> >& mapVertexNeighborsLeftHemi,
-                                            const QMap<int, QVector<int> >& mapVertexNeighborsRightHemi,
-                                            const MatrixX3f& matVertPosLeftHemi,
-                                            const MatrixX3f& matVertPosRightHemi)
+void transformDataToColor(const VectorXd& data, QByteArray& arrayFinalVertColor, double dTrehsoldX, double dTrehsoldZ, QRgb (*functionHandlerColorMap)(double v))
+{
+    //Note: This function needs to be implemented extremley efficient. That is why we have three if clauses.
+    //      Otherwise we would have to check which color map to take for each vertex.
+    //QElapsedTimer timer;
+    //timer.start();
+
+    if(data.rows() != arrayFinalVertColor.size()/(3*sizeof(float))) {
+        qDebug() << "RtSourceLocDataWorker::transformDataToColor - Sizes of input vectors do not match. Returning ...";
+    }
+
+    float *rawArrayColors = reinterpret_cast<float *>(arrayFinalVertColor.data());
+    int idxColor = 0;
+    float dSample;
+    QRgb qRgb;
+    double dTrehsoldDiff = dTrehsoldZ - dTrehsoldX;
+
+    for(int r = 0; r < data.rows(); ++r) {
+        dSample = data(r);
+
+        if(dSample >= dTrehsoldX) {
+            //Check lower and upper thresholds and normalize to one
+            if(dSample >= dTrehsoldZ) {
+                dSample = 1.0;
+            } else if(dSample < dTrehsoldX) {
+                dSample = 0.0;
+            } else {
+                dSample = (dSample - dTrehsoldX) / (dTrehsoldDiff);
+            }
+
+            qRgb = functionHandlerColorMap(dSample);
+
+            rawArrayColors[idxColor++] = (float)qRed(qRgb)/255.0f;
+            rawArrayColors[idxColor++] = (float)qGreen(qRgb)/255.0f;
+            rawArrayColors[idxColor++] = (float)qBlue(qRgb)/255.0f;
+        } else {
+            idxColor += 3;
+        }
+    }
+
+    //int elapsed = timer.elapsed();
+    //qDebug()<<"RtSourceLocDataWorker::transformDataToColor - elapsed"<<elapsed;
+}
+
+
+//*************************************************************************************************************
+
+void transformDataToColor(float fSample, QByteArray& arrayFinalVertColor, double dTrehsoldX, double dTrehsoldZ, QRgb (*functionHandlerColorMap)(double v))
+{
+    //Note: This function needs to be implemented extremley efficient. That is why we have three if clauses.
+    //      Otherwise we would have to check which color map to take for each vertex.
+    if(arrayFinalVertColor.size()/(sizeof(float)) != 3) {
+        qDebug() << "RtSourceLocDataWorker::transformDataToColor - Sizes of input QByteArray must be 3. Returning ...";
+    }
+
+    int idxColor = 0;
+
+    float *rawArrayColors = reinterpret_cast<float *>(arrayFinalVertColor.data());
+
+    double dTrehsoldDiff = dTrehsoldZ - dTrehsoldX;
+
+    //Check lower and upper thresholds and normalize to one
+    if(fSample >= dTrehsoldZ) {
+        fSample = 1.0;
+    } else if(fSample < dTrehsoldX) {
+        fSample = 0.0;
+    } else {
+        fSample = (fSample - dTrehsoldX) / dTrehsoldDiff;
+    }
+
+    QRgb qRgb;
+    qRgb = qRgb = (functionHandlerColorMap)(fSample);
+
+    rawArrayColors[idxColor++] = (float)qRed(qRgb)/255.0f;
+    rawArrayColors[idxColor++] = (float)qGreen(qRgb)/255.0f;
+    rawArrayColors[idxColor++] = (float)qBlue(qRgb)/255.0f;
+}
+
+
+//*************************************************************************************************************
+
+void generateColorsPerVertex(RtSourceLocDataWorker::VisualizationInfo& input)
+{
+    //Left hemisphere
+    float *rawArrayCurrentVertColor = reinterpret_cast<float *>(input.arrayFinalVertColor.data());
+    QByteArray sourceColorSample;
+    sourceColorSample.resize(3 * sizeof(float));
+
+    //Fill final QByteArray with colors based on the current anatomical information
+    for(int i = 0; i < input.vVertNo.rows(); ++i) {
+        if(input.vSourceColorSamples(i) >= input.dThresholdX) {
+            transformDataToColor(input.vSourceColorSamples(i), sourceColorSample, input.dThresholdX, input.dThresholdZ, input.functionHandlerColorMap);
+            const float *rawSourceColorSamplesColor = reinterpret_cast<const float *>(sourceColorSample.data());
+
+            rawArrayCurrentVertColor[input.vVertNo(i)*3+0] = rawSourceColorSamplesColor[0];
+            rawArrayCurrentVertColor[input.vVertNo(i)*3+1] = rawSourceColorSamplesColor[1];
+            rawArrayCurrentVertColor[input.vVertNo(i)*3+2] = rawSourceColorSamplesColor[2];
+        }
+    }
+}
+
+
+//*************************************************************************************************************
+
+void generateColorsPerAnnotation(RtSourceLocDataWorker::VisualizationInfo& input)
+{
+    //Find maximum actiavtion for each label
+    QMap<qint32, double> vecLabelActivation;
+
+    for(int i = 0; i < input.vSourceColorSamples.rows(); ++i) {
+        //Find out label for source
+        qint32 labelIdx = input.mapLabelIdSources[input.vVertNo(i)];
+
+        if(fabs(input.vSourceColorSamples(i)) > fabs(vecLabelActivation[labelIdx]))
+            vecLabelActivation.insert(labelIdx, input.vSourceColorSamples(i));
+    }
+
+    //Color all labels respectivley to their activation
+    QByteArray sourceColorSample;
+    sourceColorSample.resize(3 * sizeof(float));
+
+    float *rawArrayCurrentVertColor = reinterpret_cast<float *>(input.arrayFinalVertColor.data());
+
+    for(int i = 0; i<input.lLabels.size(); i++) {
+        FSLIB::Label label = input.lLabels.at(i);
+
+        //Transform label activations to rgb colors
+        //Check if value is bigger than lower threshold. If not, don't plot activation
+        if(vecLabelActivation[label.label_id] >= input.dThresholdX) {
+            transformDataToColor(vecLabelActivation[label.label_id], sourceColorSample, input.dThresholdX, input.dThresholdZ, input.functionHandlerColorMap);
+            float *rawArrayLabelColors = reinterpret_cast<float *>(sourceColorSample.data());
+
+            for(int j = 0; j<label.vertices.rows(); j++) {
+                rawArrayCurrentVertColor[label.vertices(j)*3+0] = rawArrayLabelColors[0];
+                rawArrayCurrentVertColor[label.vertices(j)*3+1] = rawArrayLabelColors[1];
+                rawArrayCurrentVertColor[label.vertices(j)*3+2] = rawArrayLabelColors[2];
+            }
+        }
+    }
+}
+
+
+//*************************************************************************************************************
+
+void generateSmoothedColors(RtSourceLocDataWorker::VisualizationInfo& input)
+{
+    //QTime prodDataTimer;
+    //prodDataTimer.start();
+
+//    //Option 1 - Use Matti's version. Smoothes between different source "patches".
+//    //Activity is spread evenly around every source and then smoothed to neighboring source patches.
+//    //Init the variables
+//    int n,k,p,it,nn,nv;
+//    float sum;
+//    int niter = 2;
+
+//    int nSurfaceVerts = arrayFinalVertColor.size() / (sizeof(float) * 3);
+//    int nvert = sourceColorSamples.rows();
+
+//    QVector<bool> undef(nSurfaceVerts, true);
+//    QVector<bool> prev_undef(nSurfaceVerts);
+//    QVector<bool> isSource(nSurfaceVerts, false);
+//    VectorXd prev_val(nSurfaceVerts);
+//    VectorXd smooth_val(nSurfaceVerts);
+//    smooth_val.setZero();
+
+//    //Set all vertex activation of the actually chosen sources to their current activation
+//    for (k = 0; k < nvert; k++) {
+//        undef[vertno[k]] = false;
+//        smooth_val[vertno[k]] = sourceColorSamples[k];
+//        isSource[vertno[k]] = true;
+//    }
+
+//    //Smooth here
+//    for (it = 0; it < niter; it++) {
+//        prev_undef = undef;
+//        prev_val = smooth_val;
+
+//        for (k = 0; k < nSurfaceVerts; k++) {
+//            sum = 0;
+//            n   = 0;
+
+//            if (!prev_undef[k]) {
+//                //If vertex color was defined during last step
+//                sum = smooth_val[k];
+//                n = 1;
+//            }
+
+//            //Generate the color of the current vertex at pos k based on its neighbor information
+//            nn = mapVertexNeighbors[k].size();
+
+//            for (p = 0; p < nn; p++) {
+//                nv = mapVertexNeighbors[k].at(p);
+
+//                if (!prev_undef[nv]) {
+//                    //If vertex color was defined during last step
+//                    sum += prev_val[nv];
+//                    n++;
+//                }
+//            }
+
+//            if (n > 0) {
+//                smooth_val[k] = sum/(float)n;
+//                undef[k] = false;
+//            }
+//        }
+//    }
+
+    //Option 2 - Inverse weighted distance smoothing operator
+    VectorXd smooth_val = input.matWDistSmooth * input.vSourceColorSamples;
+
+    //Produce final color
+    transformDataToColor(smooth_val, input.arrayFinalVertColor, input.dThresholdX, input.dThresholdZ, input.functionHandlerColorMap);
+
+    //int iAllTimer = allTimer.elapsed();
+    //qDebug() << "All time" << iAllTimer;
+}
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+RtSourceLocDataWorker::RtSourceLocDataWorker(QObject* parent)
+: QThread(parent)
+, m_bIsRunning(false)
+, m_bIsLooping(true)
+, m_iAverageSamples(1)
+, m_iCurrentSample(0)
+, m_iVisualizationType(Data3DTreeModelItemRoles::VertexBased)
+, m_iMSecIntervall(50)
+, m_dNormalization(1.0)
+, m_dNormalizationMax(10.0)
+, m_bSurfaceDataIsInit(false)
+, m_bAnnotationDataIsInit(false)
+{
+    m_lVisualizationInfo << VisualizationInfo() << VisualizationInfo();
+    m_lVisualizationInfo[0].functionHandlerColorMap = ColorMap::valueToHotNegative2;
+}
+
+
+//*************************************************************************************************************
+
+RtSourceLocDataWorker::~RtSourceLocDataWorker()
+{
+    if(this->isRunning()) {
+        stop();
+    }
+}
+
+
+//*************************************************************************************************************
+
+void RtSourceLocDataWorker::addData(const MatrixXd& data)
+{
+    QMutexLocker locker(&m_qMutex);
+    if(data.rows() == 0)
+        return;
+
+    //Transform from matrix to list for easier handling in non loop mode
+    for(int i = 0; i<data.cols(); i++) {
+        m_lData.append(data.col(i));
+    }
+}
+
+
+//*************************************************************************************************************
+
+void RtSourceLocDataWorker::clear()
+{
+    QMutexLocker locker(&m_qMutex);
+}
+
+
+//*************************************************************************************************************
+
+void RtSourceLocDataWorker::setSurfaceData(const Eigen::VectorXi& vecVertNoLeftHemi,
+                                           const Eigen::VectorXi& vecVertNoRightHemi,
+                                           const QMap<int, QVector<int> > &mapVertexNeighborsLeftHemi,
+                                           const QMap<int, QVector<int> > &mapVertexNeighborsRightHemi,
+                                           const MatrixX3f &matVertPosLeftHemi,
+                                           const MatrixX3f &matVertPosRightHemi)
 {
     QMutexLocker locker(&m_qMutex);
 
-    QTime timer;
-    timer.start();
+    if(vecVertNoLeftHemi.rows() == 0 || vecVertNoRightHemi.rows() == 0) {
+        qDebug() << "RtSourceLocDataWorker::setSurfaceData - Surface data is empty. Returning ...";
+        return;
+    }
 
-    m_mapVertexNeighborsLeftHemi = mapVertexNeighborsLeftHemi;
-    m_mapVertexNeighborsRightHemi = mapVertexNeighborsRightHemi;
+    m_lVisualizationInfo[0].vVertNo = vecVertNoLeftHemi;
+    m_lVisualizationInfo[1].vVertNo = vecVertNoRightHemi;
 
-    //Create smooth operator in multi thread
-    QList<SmoothOperatorInfo> inputData;
+    m_lVisualizationInfo[0].mapVertexNeighbors = mapVertexNeighborsLeftHemi;
+    m_lVisualizationInfo[1].mapVertexNeighbors = mapVertexNeighborsRightHemi;
 
-    SmoothOperatorInfo leftHemi;
-    m_sparseSmoothMatrixLeftHemi.resize(matVertPosLeftHemi.rows(), m_vecVertNoLeftHemi.rows());
-    leftHemi.sparseSmoothMatrix = m_sparseSmoothMatrixLeftHemi;
-    leftHemi.vecVertNo = m_vecVertNoLeftHemi;
-    leftHemi.matVertPos = matVertPosLeftHemi;
-    leftHemi.iDistPow = 5;
-    leftHemi.dThresholdDistance = 0.02;
-    inputData.append(leftHemi);
+    createSmoothingOperator(matVertPosLeftHemi, matVertPosRightHemi);
 
-    SmoothOperatorInfo rightHemi;
-    m_sparseSmoothMatrixRightHemi.resize(matVertPosRightHemi.rows(), m_vecVertNoRightHemi.rows());
-    rightHemi.sparseSmoothMatrix = m_sparseSmoothMatrixRightHemi;
-    rightHemi.vecVertNo = m_vecVertNoRightHemi;
-    rightHemi.matVertPos = matVertPosRightHemi;
-    rightHemi.iDistPow = 5;
-    rightHemi.dThresholdDistance = 0.02;
-    inputData.append(rightHemi);
-
-    QFuture<void> future = QtConcurrent::map(inputData, generateSmoothOperator);
-    future.waitForFinished();
-
-    m_sparseSmoothMatrixLeftHemi = inputData.at(0).sparseSmoothMatrix;
-    m_sparseSmoothMatrixRightHemi = inputData.at(1).sparseSmoothMatrix;
-
-    qDebug() << "RtSourceLocDataWorker::setSmootingInfo - time:" << timer.elapsed();
-
-    qDebug() << "non zero left " << m_sparseSmoothMatrixLeftHemi.nonZeros();
-    qDebug() << "non zero right " << m_sparseSmoothMatrixRightHemi.nonZeros();
-
-//    MatrixXd a;
-//    a = MatrixXd(m_sparseSmoothMatrixLeftHemi);
-//    UTILSLIB::IOUtils::write_eigen_matrix(a, "m_sparseSmoothMatrixLeftHemi.txt");
-
-//    MatrixXd b;
-//    b = MatrixXd(m_sparseSmoothMatrixRightHemi);
-//    UTILSLIB::IOUtils::write_eigen_matrix(b, "m_sparseSmoothMatrixRightHemi.txt");
+    m_bSurfaceDataIsInit = true;
 }
+
+
+//*************************************************************************************************************
+
+void RtSourceLocDataWorker::setSurfaceColor(const QByteArray& arraySurfaceVertColorLeftHemi,
+                                           const QByteArray& arraySurfaceVertColorRightHemi)
+{
+    QMutexLocker locker(&m_qMutex);
+
+    if(arraySurfaceVertColorLeftHemi.size() == 0 || arraySurfaceVertColorRightHemi.size() == 0) {
+        qDebug() << "RtSourceLocDataWorker::setSurfaceColor - Surface color data is empty. Returning ...";
+        return;
+    }
+
+    m_lVisualizationInfo[0].arrayOriginalVertColor = arraySurfaceVertColorLeftHemi;
+    m_lVisualizationInfo[1].arrayOriginalVertColor = arraySurfaceVertColorRightHemi;
+}
+
+
+//*************************************************************************************************************
+
+void RtSourceLocDataWorker::setAnnotationData(const Eigen::VectorXi& vecLabelIdsLeftHemi,
+                                              const Eigen::VectorXi& vecLabelIdsRightHemi,
+                                              const QList<FSLIB::Label>& lLabelsLeftHemi,
+                                              const QList<FSLIB::Label>& lLabelsRightHemi)
+{
+    QMutexLocker locker(&m_qMutex);
+
+    if(vecLabelIdsLeftHemi.rows() == 0 || lLabelsLeftHemi.isEmpty() || vecLabelIdsRightHemi.rows() == 0 || lLabelsRightHemi.isEmpty()) {
+        qDebug() << "RtSourceLocDataWorker::setAnnotationData - Annotation data is empty. Returning ...";
+        return;
+    }
+
+    m_lVisualizationInfo[0].lLabels = lLabelsLeftHemi;
+    m_lVisualizationInfo[1].lLabels = lLabelsRightHemi;
+
+    //Generate fast lookup map for each source and corresponding label
+    for(qint32 i = 0; i < m_lVisualizationInfo[0].vVertNo.rows(); ++i) {
+        m_lVisualizationInfo[0].mapLabelIdSources.insert(m_lVisualizationInfo[0].vVertNo(i), vecLabelIdsLeftHemi(m_lVisualizationInfo[0].vVertNo(i)));
+    }
+
+    for(qint32 i = 0; i < m_lVisualizationInfo[1].vVertNo.rows(); ++i) {
+        m_lVisualizationInfo[1].mapLabelIdSources.insert(m_lVisualizationInfo[1].vVertNo(i), vecLabelIdsRightHemi(m_lVisualizationInfo[1].vVertNo(i)));
+    }
+
+    m_bAnnotationDataIsInit = true;
+}
+
+
+//*************************************************************************************************************
+
+void RtSourceLocDataWorker::setNumberAverages(const int &iNumAvr)
+{
+    QMutexLocker locker(&m_qMutex);
+    m_iAverageSamples = iNumAvr;
+}
+
+
+//*************************************************************************************************************
+
+void RtSourceLocDataWorker::setInterval(const int& iMSec)
+{
+    QMutexLocker locker(&m_qMutex);
+    m_iMSecIntervall = iMSec;
+}
+
+
+//*************************************************************************************************************
+
+void RtSourceLocDataWorker::setVisualizationType(const int& iVisType)
+{
+    QMutexLocker locker(&m_qMutex);
+    m_iVisualizationType = iVisType;
+}
+
+
+//*************************************************************************************************************
+
+void RtSourceLocDataWorker::setColormapType(const QString& sColormapType)
+{
+    QMutexLocker locker(&m_qMutex);
+
+    //Create function handler to corresponding color map function
+    if(sColormapType == "Hot Negative 1") {
+        m_lVisualizationInfo[0].functionHandlerColorMap = ColorMap::valueToHotNegative1;
+        m_lVisualizationInfo[1].functionHandlerColorMap = ColorMap::valueToHotNegative1;
+    } else if(sColormapType == "Hot Negative 2") {
+        m_lVisualizationInfo[0].functionHandlerColorMap = ColorMap::valueToHotNegative2;
+        m_lVisualizationInfo[1].functionHandlerColorMap = ColorMap::valueToHotNegative2;
+    } else if(sColormapType == "Hot") {        
+        m_lVisualizationInfo[0].functionHandlerColorMap = ColorMap::valueToHot;
+        m_lVisualizationInfo[1].functionHandlerColorMap = ColorMap::valueToHot;
+    }
+}
+
+
+//*************************************************************************************************************
+
+void RtSourceLocDataWorker::setNormalization(const QVector3D& vecThresholds)
+{
+    QMutexLocker locker(&m_qMutex);
+    m_lVisualizationInfo[0].dThresholdX = vecThresholds.x();
+    m_lVisualizationInfo[1].dThresholdX = vecThresholds.x();
+
+    m_lVisualizationInfo[0].dThresholdZ = vecThresholds.z();
+    m_lVisualizationInfo[1].dThresholdZ = vecThresholds.z();
+}
+
+
+//*************************************************************************************************************
+
+void RtSourceLocDataWorker::setLoop(bool looping)
+{
+    QMutexLocker locker(&m_qMutex);
+    m_bIsLooping = looping;
+}
+
 
 //*************************************************************************************************************
 
@@ -501,356 +684,124 @@ void RtSourceLocDataWorker::run()
 
 //*************************************************************************************************************
 
-QPair<QByteArray, QByteArray> RtSourceLocDataWorker::performVisualizationTypeCalculation(const VectorXd& sourceColorSamples)
+QPair<QByteArray, QByteArray> RtSourceLocDataWorker::performVisualizationTypeCalculation(const VectorXd& vSourceColorSamples)
 {
-    QPair<QByteArray, QByteArray> colorPair;
-    colorPair.first = m_arraySurfaceVertColorLeftHemi;
-    colorPair.second = m_arraySurfaceVertColorRightHemi;
-
     //NOTE: This function is called for every new sample point and therefore must be kept highly efficient!
-    if(sourceColorSamples.rows() != m_vecVertNoLeftHemi.rows() + m_vecVertNoRightHemi.rows()) {
-        qDebug() << "RtSourceLocDataWorker::performVisualizationTypeCalculation - Number of new vertex colors (" << sourceColorSamples.rows() << ") do not match with previously set number of vertices (" << m_vecVertNoLeftHemi.rows() + m_vecVertNoRightHemi.rows() << "). Returning...";
+    QTime allTimer;
+    allTimer.start();
+
+    if(vSourceColorSamples.rows() != m_lVisualizationInfo[0].vVertNo.rows() + m_lVisualizationInfo[1].vVertNo.rows()) {
+        qDebug() << "RtSourceLocDataWorker::performVisualizationTypeCalculation - Number of new vertex colors (" << vSourceColorSamples.rows() << ") do not match with previously set number of vertices (" << m_lVisualizationInfo[0].vVertNo.rows() + m_lVisualizationInfo[1].vVertNo.rows() << "). Returning...";
+        QPair<QByteArray, QByteArray> colorPair;
+        colorPair.first =  m_lVisualizationInfo[0].arrayOriginalVertColor;
+        colorPair.second = m_lVisualizationInfo[1].arrayOriginalVertColor;
+        return colorPair;
+    }
+
+    if(!m_bSurfaceDataIsInit) {
+        qDebug() << "RtSourceLocDataWorker::performVisualizationTypeCalculation - Surface data was not initialized. Returning ...";
+        QPair<QByteArray, QByteArray> colorPair;
+        colorPair.first =  m_lVisualizationInfo[0].arrayOriginalVertColor;
+        colorPair.second = m_lVisualizationInfo[1].arrayOriginalVertColor;
+        return colorPair;
+    }
+
+    if(!m_bAnnotationDataIsInit) {
+        qDebug() << "RtSourceLocDataWorker::performVisualizationTypeCalculation - Annotation data was not initialized. Returning ...";
+        QPair<QByteArray, QByteArray> colorPair;
+        colorPair.first =  m_lVisualizationInfo[0].arrayOriginalVertColor;
+        colorPair.second = m_lVisualizationInfo[1].arrayOriginalVertColor;
         return colorPair;
     }
 
     //Cut out left and right hemisphere from source data
-    VectorXd sourceColorSamplesLeftHemi = sourceColorSamples.segment(0, m_vecVertNoLeftHemi.rows());
-    VectorXd sourceColorSamplesRightHemi = sourceColorSamples.segment(m_vecVertNoLeftHemi.rows()+1, m_vecVertNoRightHemi.rows());
+    m_lVisualizationInfo[0].vSourceColorSamples = vSourceColorSamples.segment(0, m_lVisualizationInfo[0].vVertNo.rows());
+    m_lVisualizationInfo[1].vSourceColorSamples = vSourceColorSamples.segment(m_lVisualizationInfo[0].vVertNo.rows()+1, m_lVisualizationInfo[1].vVertNo.rows());
+
+    //Reset to original color as default
+    m_lVisualizationInfo[0].arrayFinalVertColor = m_lVisualizationInfo[0].arrayOriginalVertColor;
+    m_lVisualizationInfo[1].arrayFinalVertColor = m_lVisualizationInfo[1].arrayOriginalVertColor;
 
     //Generate color data for vertices
     switch(m_iVisualizationType) {
         case Data3DTreeModelItemRoles::VertexBased: {
-            return generateColorsPerVertex(sourceColorSamplesLeftHemi, sourceColorSamplesRightHemi);
+            QFuture<void> future = QtConcurrent::map(m_lVisualizationInfo, generateColorsPerVertex);
+            future.waitForFinished();
+
+            break;
         }
 
         case Data3DTreeModelItemRoles::AnnotationBased: {
-            return generateColorsPerAnnotation(sourceColorSamplesLeftHemi, sourceColorSamplesRightHemi);
-        }        
+            QFuture<void> future = QtConcurrent::map(m_lVisualizationInfo, generateColorsPerAnnotation);
+            future.waitForFinished();
+
+            break;
+        }
 
         case Data3DTreeModelItemRoles::SmoothingBased: {
-            colorPair.first = generateSmoothedColors(sourceColorSamplesLeftHemi,
-                                                     m_vecVertNoLeftHemi,
-                                                     m_arraySurfaceVertColorLeftHemi,
-                                                     m_mapVertexNeighborsLeftHemi,
-                                                     m_sparseSmoothMatrixLeftHemi);
-
-            colorPair.second = generateSmoothedColors(sourceColorSamplesRightHemi,
-                                                      m_vecVertNoRightHemi,
-                                                      m_arraySurfaceVertColorRightHemi,
-                                                      m_mapVertexNeighborsRightHemi,
-                                                      m_sparseSmoothMatrixRightHemi);
+            QFuture<void> future = QtConcurrent::map(m_lVisualizationInfo, generateSmoothedColors);
+            future.waitForFinished();
 
             break;
         }
     }
 
-    return colorPair;
-}
+    int iAllTimer = allTimer.elapsed();
+    qDebug() << "All time" << iAllTimer;
 
-
-//*************************************************************************************************************
-
-QPair<QByteArray, QByteArray> RtSourceLocDataWorker::generateColorsPerVertex(const VectorXd& sourceColorSamplesLeftHemi, const VectorXd& sourceColorSamplesRightHemi)
-{
     QPair<QByteArray, QByteArray> colorPair;
-    colorPair.first = m_arraySurfaceVertColorLeftHemi;
-    colorPair.second = m_arraySurfaceVertColorRightHemi;
-
-    if(!m_bSurfaceDataIsInit) {
-        qDebug() << "RtSourceLocDataWorker::generateColorsPerVertex - Surface data was not initialized. Returning ...";
-        return colorPair;
-    }
-
-    //Left hemisphere
-    QByteArray arrayCurrentVertColorLeftHemi = m_arraySurfaceVertColorLeftHemi;
-    float *rawArrayCurrentVertColorLeftHemi = reinterpret_cast<float *>(arrayCurrentVertColorLeftHemi.data());
-    QByteArray sourceColorSample;
-    sourceColorSample.resize(3 * sizeof(float));
-
-    //Create final QByteArray with colors based on the current anatomical information
-    for(int i = 0; i < m_vecVertNoLeftHemi.rows(); ++i) {
-        if(sourceColorSamplesLeftHemi(i) >= m_vecThresholds.x()) {
-            transformDataToColor(sourceColorSamplesLeftHemi(i), sourceColorSample);
-            const float *rawSourceColorSamplesColorLeftHemi = reinterpret_cast<const float *>(sourceColorSample.data());
-
-            rawArrayCurrentVertColorLeftHemi[m_vecVertNoLeftHemi(i)*3+0] = rawSourceColorSamplesColorLeftHemi[0];
-            rawArrayCurrentVertColorLeftHemi[m_vecVertNoLeftHemi(i)*3+1] = rawSourceColorSamplesColorLeftHemi[1];
-            rawArrayCurrentVertColorLeftHemi[m_vecVertNoLeftHemi(i)*3+2] = rawSourceColorSamplesColorLeftHemi[2];
-        }
-    }
-
-    colorPair.first = arrayCurrentVertColorLeftHemi;
-
-    //Right hemisphere
-    QByteArray arrayCurrentVertColorRightHemi = m_arraySurfaceVertColorRightHemi;
-    float *rawArrayCurrentVertColorRightHemi = reinterpret_cast<float *>(arrayCurrentVertColorRightHemi.data());
-
-    //Create final QByteArray with colors based on the current anatomical information
-    for(int i = 0; i < m_vecVertNoRightHemi.rows(); ++i) {
-        if(sourceColorSamplesRightHemi(i) >= m_vecThresholds.x()) {
-            transformDataToColor(sourceColorSamplesRightHemi(i), sourceColorSample);
-            const float *rawSourceColorSamplesColorRightHemi = reinterpret_cast<const float *>(sourceColorSample.data());
-
-            rawArrayCurrentVertColorRightHemi[m_vecVertNoRightHemi(i)*3+0] = rawSourceColorSamplesColorRightHemi[0];
-            rawArrayCurrentVertColorRightHemi[m_vecVertNoRightHemi(i)*3+1] = rawSourceColorSamplesColorRightHemi[1];
-            rawArrayCurrentVertColorRightHemi[m_vecVertNoRightHemi(i)*3+2] = rawSourceColorSamplesColorRightHemi[2];
-        }
-    }
-
-    colorPair.second = arrayCurrentVertColorRightHemi;
-
+    colorPair.first =  m_lVisualizationInfo[0].arrayFinalVertColor;
+    colorPair.second = m_lVisualizationInfo[1].arrayFinalVertColor;
     return colorPair;
 }
 
 
 //*************************************************************************************************************
 
-QPair<QByteArray, QByteArray> RtSourceLocDataWorker::generateColorsPerAnnotation(const VectorXd& sourceColorSamplesLeftHemi, const VectorXd& sourceColorSamplesRightHemi)
+void RtSourceLocDataWorker::createSmoothingOperator(const MatrixX3f& matVertPosLeftHemi, const MatrixX3f& matVertPosRightHemi)
 {
-    QPair<QByteArray, QByteArray> colorPair;
-    colorPair.first = m_arraySurfaceVertColorLeftHemi;
-    colorPair.second = m_arraySurfaceVertColorRightHemi;
+    QTime timer;
+    timer.start();
 
-    if(!m_bAnnotationDataIsInit) {
-        qDebug() << "RtSourceLocDataWorker::generateColorsPerAnnotation - Annotation data was not initialized. Returning ...";
-        return colorPair;
-    }
+    //Create smooth operator in multi thread
+    QList<SmoothOperatorInfo> inputData;
 
-    //Find maximum actiavtion for each label
-    QMap<qint32, double> vecLabelActivationLeftHemi;
+    SmoothOperatorInfo leftHemi;
+    m_lVisualizationInfo[0].matWDistSmooth.resize(matVertPosLeftHemi.rows(), m_lVisualizationInfo[0].vVertNo.rows());
+    leftHemi.sparseSmoothMatrix = m_lVisualizationInfo[0].matWDistSmooth;
+    leftHemi.vecVertNo = m_lVisualizationInfo[0].vVertNo;
+    leftHemi.matVertPos = matVertPosLeftHemi;
+    leftHemi.iDistPow = 5;
+    leftHemi.dThresholdDistance = 0.03;
+    inputData.append(leftHemi);
 
-    for(int i = 0; i < m_vecVertNoLeftHemi.rows(); ++i) {
-        //Find out label for source
-        qint32 labelIdxLeftHemi = m_mapLabelIdSourcesLeftHemi[m_vecVertNoLeftHemi(i)];
+    SmoothOperatorInfo rightHemi;
+    m_lVisualizationInfo[1].matWDistSmooth.resize(matVertPosRightHemi.rows(), m_lVisualizationInfo[1].vVertNo.rows());
+    rightHemi.sparseSmoothMatrix = m_lVisualizationInfo[1].matWDistSmooth;
+    rightHemi.vecVertNo = m_lVisualizationInfo[1].vVertNo;
+    rightHemi.matVertPos = matVertPosRightHemi;
+    rightHemi.iDistPow = 5;
+    rightHemi.dThresholdDistance = 0.03;
+    inputData.append(rightHemi);
 
-        if(fabs(sourceColorSamplesLeftHemi(i)) > fabs(vecLabelActivationLeftHemi[labelIdxLeftHemi]))
-            vecLabelActivationLeftHemi.insert(labelIdxLeftHemi, sourceColorSamplesLeftHemi(i));
-    }
+    QFuture<void> future = QtConcurrent::map(inputData, generateSmoothOperator);
+    future.waitForFinished();
 
-    QMap<qint32, double> vecLabelActivationRightHemi;
-    for(int i = 0; i < m_vecVertNoRightHemi.rows(); ++i) {
-        //Find out label for source
-        qint32 labelIdxRightHemi = m_mapLabelIdSourcesRightHemi[m_vecVertNoRightHemi(i)];
+    m_lVisualizationInfo[0].matWDistSmooth = inputData.at(0).sparseSmoothMatrix;
+    m_lVisualizationInfo[1].matWDistSmooth = inputData.at(1).sparseSmoothMatrix;
 
-        if(fabs(sourceColorSamplesRightHemi(i)) > fabs(vecLabelActivationRightHemi[labelIdxRightHemi]))
-            vecLabelActivationRightHemi.insert(labelIdxRightHemi, sourceColorSamplesRightHemi(i));
-    }
+    qDebug() << "RtSourceLocDataWorker::setSmootingInfo - time needed for smooth operator creation:" << timer.elapsed();
 
-    //Color all labels respectivley to their activation
-    //Left hemisphere
-    QByteArray arrayCurrentVertColorLeftHemi;
-    arrayCurrentVertColorLeftHemi = m_arraySurfaceVertColorLeftHemi;
-    QByteArray sourceColorSample;
-    sourceColorSample.resize(3 * sizeof(float));
+    qDebug() << "non zero left " << m_lVisualizationInfo[0].matWDistSmooth.nonZeros();
+    qDebug() << "non zero right " << m_lVisualizationInfo[1].matWDistSmooth.nonZeros();
 
-    float *rawArrayCurrentVertColorLeftHemi = reinterpret_cast<float *>(arrayCurrentVertColorLeftHemi.data());
+//    MatrixXd a;
+//    a = MatrixXd(m_sparseSmoothMatrixLeftHemi);
+//    UTILSLIB::IOUtils::write_eigen_matrix(a, "m_sparseSmoothMatrixLeftHemi.txt");
 
-    for(int i = 0; i<m_lLabelsLeftHemi.size(); i++) {
-        FSLIB::Label labelLeftHemi = m_lLabelsLeftHemi.at(i);
-
-        //Transform label activations to rgb colors
-        //Check if value is bigger than lower threshold. If not, don't plot activation
-        if(vecLabelActivationLeftHemi[labelLeftHemi.label_id] >= m_vecThresholds.x()) {
-            transformDataToColor(vecLabelActivationLeftHemi[labelLeftHemi.label_id], sourceColorSample);
-            float *rawArrayLabelColorsLeftHemi = reinterpret_cast<float *>(sourceColorSample.data());
-
-            for(int j = 0; j<labelLeftHemi.vertices.rows(); j++) {
-                rawArrayCurrentVertColorLeftHemi[labelLeftHemi.vertices(j)*3+0] = rawArrayLabelColorsLeftHemi[0];
-                rawArrayCurrentVertColorLeftHemi[labelLeftHemi.vertices(j)*3+1] = rawArrayLabelColorsLeftHemi[1];
-                rawArrayCurrentVertColorLeftHemi[labelLeftHemi.vertices(j)*3+2] = rawArrayLabelColorsLeftHemi[2];
-            }
-        }
-    }
-
-    colorPair.first = arrayCurrentVertColorLeftHemi;
-
-    //Right hemisphere
-    QByteArray arrayCurrentVertColorRightHemi;
-    //arrayCurrentVertColor.resize(m_arraySurfaceVertColor.size());
-    arrayCurrentVertColorRightHemi = m_arraySurfaceVertColorRightHemi;
-
-    float *rawArrayCurrentVertColorRightHemi = reinterpret_cast<float *>(arrayCurrentVertColorRightHemi.data());
-
-    for(int i = 0; i<m_lLabelsRightHemi.size(); i++) {
-        FSLIB::Label labelRightHemi = m_lLabelsRightHemi.at(i);
-
-        //Transform label activations to rgb colors
-        //Check if value is bigger than lower threshold. If not, don't plot activation
-        if(vecLabelActivationRightHemi[labelRightHemi.label_id] >= m_vecThresholds.x()) {
-            transformDataToColor(vecLabelActivationRightHemi[labelRightHemi.label_id], sourceColorSample);
-            float *rawArrayLabelColorsRightHemi = reinterpret_cast<float *>(sourceColorSample.data());
-
-            for(int j = 0; j<labelRightHemi.vertices.rows(); j++) {
-                rawArrayCurrentVertColorRightHemi[labelRightHemi.vertices(j)*3+0] = rawArrayLabelColorsRightHemi[0];
-                rawArrayCurrentVertColorRightHemi[labelRightHemi.vertices(j)*3+1] = rawArrayLabelColorsRightHemi[1];
-                rawArrayCurrentVertColorRightHemi[labelRightHemi.vertices(j)*3+2] = rawArrayLabelColorsRightHemi[2];
-            }
-        }
-    }
-
-    colorPair.second = arrayCurrentVertColorRightHemi;
-
-    return colorPair;
+//    MatrixXd b;
+//    b = MatrixXd(m_sparseSmoothMatrixRightHemi);
+//    UTILSLIB::IOUtils::write_eigen_matrix(b, "m_sparseSmoothMatrixRightHemi.txt");
 }
 
 
-//*************************************************************************************************************
-
-QByteArray RtSourceLocDataWorker::generateSmoothedColors(const VectorXd& sourceColorSamples,
-                                                         const VectorXi& vertno,
-                                                         const QByteArray& arrayCurrentVertColor,
-                                                         const QMap<int, QVector<int> >& mapVertexNeighbors,
-                                                         const SparseMatrix<double>& matWDistSmooth)
-{    
-    //QTime prodDataTimer;
-    //prodDataTimer.start();
-
-//    //Option 1 - Use Matti's version. Smoothes between different source "patches".
-//    //Activity is spread evenly around every source and then smoothed to neighboring source patches.
-//    //Init the variables
-//    int n,k,p,it,nn,nv;
-//    float sum;
-//    int niter = 2;
-
-//    int nSurfaceVerts = arrayCurrentVertColor.size() / (sizeof(float) * 3);
-//    int nvert = sourceColorSamples.rows();
-
-//    QVector<bool> undef(nSurfaceVerts, true);
-//    QVector<bool> prev_undef(nSurfaceVerts);
-//    QVector<bool> isSource(nSurfaceVerts, false);
-//    VectorXd prev_val(nSurfaceVerts);
-//    VectorXd smooth_val(nSurfaceVerts);
-//    smooth_val.setZero();
-
-//    //Set all vertex activation of the actually chosen sources to their current activation
-//    for (k = 0; k < nvert; k++) {
-//        undef[vertno[k]] = false;
-//        smooth_val[vertno[k]] = sourceColorSamples[k];
-//        isSource[vertno[k]] = true;
-//    }
-
-//    //Smooth here
-//    for (it = 0; it < niter; it++) {
-//        prev_undef = undef;
-//        prev_val = smooth_val;
-
-//        for (k = 0; k < nSurfaceVerts; k++) {
-//            sum = 0;
-//            n   = 0;
-
-//            if (!prev_undef[k]) {
-//                //If vertex color was defined during last step
-//                sum = smooth_val[k];
-//                n = 1;
-//            }
-
-//            //Generate the color of the current vertex at pos k based on its neighbor information
-//            nn = mapVertexNeighbors[k].size();
-
-//            for (p = 0; p < nn; p++) {
-//                nv = mapVertexNeighbors[k].at(p);
-
-//                if (!prev_undef[nv]) {
-//                    //If vertex color was defined during last step
-//                    sum += prev_val[nv];
-//                    n++;
-//                }
-//            }
-
-//            if (n > 0) {
-//                smooth_val[k] = sum/(float)n;
-//                undef[k] = false;
-//            }
-//        }
-//    }
-
-    //Option 2 - Inverse weighted distance smoothing operator
-    VectorXd smooth_val = matWDistSmooth * sourceColorSamples;
-
-    //Produce final color
-    QByteArray finalColors = arrayCurrentVertColor;
-    transformDataToColor(smooth_val, finalColors);
-
-    //int iAllTimer = allTimer.elapsed();
-    //qDebug() << "All time" << iAllTimer;
-
-    return finalColors;
-}
-
-
-//*************************************************************************************************************
-
-void RtSourceLocDataWorker::transformDataToColor(const VectorXd& data, QByteArray& arrayFinalVertColor)
-{
-    //Note: This function needs to be implemented extremley efficient. That is why we have three if clauses.
-    //      Otherwise we would have to check which color map to take for each vertex.
-    //QElapsedTimer timer;
-    //timer.start();
-
-    if(data.rows() != arrayFinalVertColor.size()/(3*sizeof(float))) {
-        qDebug() << "RtSourceLocDataWorker::transformDataToColor - Sizes of input vectors do not match. Returning ...";
-    }
-
-    float *rawArrayColors = reinterpret_cast<float *>(arrayFinalVertColor.data());
-    int idxColor = 0;
-    float dSample;
-    QRgb qRgb;
-
-    for(int r = 0; r < data.rows(); ++r) {
-        dSample = data(r);
-
-        if(dSample >= m_vecThresholds.x()) {
-            //Check lower and upper thresholds and normalize to one
-            if(dSample >= m_vecThresholds.z()) {
-                dSample = 1.0;
-            } else if(dSample < m_vecThresholds.x()) {
-                dSample = 0.0;
-            } else {
-                dSample = (dSample - m_vecThresholds.x()) / (m_vecThresholds.z() - m_vecThresholds.x());
-            }
-
-            qRgb = m_functionHandlerColorMap(dSample);
-
-            rawArrayColors[idxColor++] = (float)qRed(qRgb)/255.0f;
-            rawArrayColors[idxColor++] = (float)qGreen(qRgb)/255.0f;
-            rawArrayColors[idxColor++] = (float)qBlue(qRgb)/255.0f;
-        } else {
-            idxColor += 3;
-        }
-    }
-
-    //int elapsed = timer.elapsed();
-    //qDebug()<<"RtSourceLocDataWorker::transformDataToColor - elapsed"<<elapsed;
-}
-
-
-//*************************************************************************************************************
-
-void RtSourceLocDataWorker::transformDataToColor(float fSample, QByteArray& arrayFinalVertColor)
-{
-    //Note: This function needs to be implemented extremley efficient. That is why we have three if clauses.
-    //      Otherwise we would have to check which color map to take for each vertex.
-    if(arrayFinalVertColor.size()/(sizeof(float)) != 3) {
-        qDebug() << "RtSourceLocDataWorker::transformDataToColor - Sizes of input QByteArray must be 3. Returning ...";
-    }
-
-    int idxColor = 0;
-
-    float *rawArrayColors = reinterpret_cast<float *>(arrayFinalVertColor.data());
-
-    //Check lower and upper thresholds and normalize to one
-    if(fSample >= m_vecThresholds.z()) {
-        fSample = 1.0;
-    } else if(fSample < m_vecThresholds.x()) {
-        fSample = 0.0;
-    } else {
-        fSample = (fSample - m_vecThresholds.x()) / (m_vecThresholds.z() - m_vecThresholds.x());
-    }
-
-    QRgb qRgb;
-    qRgb = qRgb = (m_functionHandlerColorMap)(fSample);
-
-    rawArrayColors[idxColor++] = (float)qRed(qRgb)/255.0f;
-    rawArrayColors[idxColor++] = (float)qGreen(qRgb)/255.0f;
-    rawArrayColors[idxColor++] = (float)qBlue(qRgb)/255.0f;
-}

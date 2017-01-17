@@ -94,6 +94,38 @@ class DISP3DNEWSHARED_EXPORT RtSourceLocDataWorker : public QThread
 {
     Q_OBJECT
 public:
+    struct SmoothOperatorInfo {
+        VectorXi                vecVertNo;
+        SparseMatrix<double>    sparseSmoothMatrix;
+        MatrixX3f               matVertPos;
+        int                     iDistPow;
+        double                  dThresholdDistance;
+    };
+
+
+    struct SmoothVertexInfo {
+        int                                 iVertIdx;
+        QList<Eigen::Triplet<double> >      lTriplets;
+        QList<QVector3D>                    lSourcePos;
+        QVector3D                           vVertPos;
+        int                                 iDistPow;
+        double                              dThresholdDistance;
+    };
+
+    struct VisualizationInfo {
+        VectorXd                    vSourceColorSamples;
+        VectorXi                    vVertNo;
+        QList<FSLIB::Label>         lLabels;
+        QMap<qint32, qint32>        mapLabelIdSources;
+        QMap<int, QVector<int> >    mapVertexNeighbors;
+        SparseMatrix<double>        matWDistSmooth;
+        double                      dThresholdX;
+        double                      dThresholdZ;
+        QRgb (*functionHandlerColorMap)(double v);
+        QByteArray                  arrayOriginalVertColor;
+        QByteArray                  arrayFinalVertColor;
+    };
+
     typedef QSharedPointer<RtSourceLocDataWorker> SPtr;            /**< Shared pointer type for RtSourceLocDataWorker class. */
     typedef QSharedPointer<const RtSourceLocDataWorker> ConstSPtr; /**< Const shared pointer type for RtSourceLocDataWorker class. */
 
@@ -127,17 +159,31 @@ public:
 
     //=========================================================================================================
     /**
-    * Set surface data which the streamed data is plotted on.
+    * Set surface data.
+    *
+    * @param[in] vecVertNoLeftHemi                  The vertex indexes for the left hemipshere.
+    * @param[in] vecVertNoRightHemi                 The vertex indexes for the right hemipshere.
+    * @param[in] mapVertexNeighborsLeftHemi         The neighbor vertices for the left hemisphere.
+    * @param[in] mapVertexNeighborsRightHemi        The neighbor vertices for the right hemisphere.
+    * @param[in] matVertPosLeftHemi                 The surface vertices in 3D space for the left hemisphere.
+    * @param[in] matVertPosRightHemi                The surface vertices in 3D space for the right hemisphere.
+    */
+    void setSurfaceData(const Eigen::VectorXi& vecVertNoLeftHemi,
+                        const Eigen::VectorXi& vecVertNoRightHemi,
+                        const QMap<int, QVector<int> >& mapVertexNeighborsLeftHemi,
+                        const QMap<int, QVector<int> >& mapVertexNeighborsRightHemi,
+                        const MatrixX3f& matVertPosLeftHemi,
+                        const MatrixX3f& matVertPosRightHemi);
+
+    //=========================================================================================================
+    /**
+    * Set surface color data which the streamed data is plotted on.
     *
     * @param[in] arraySurfaceVertColorLeftHemi      The vertex colors for the left hemipshere surface where the data is to be plotted on.
     * @param[in] arraySurfaceVertColorRightHemi     The vertex colors for the right hemipshere surface where the data is to be plotted on.
-    * @param[in] vecVertNoLeftHemi                  The vertex indexes for the left hemipshere.
-    * @param[in] vecVertNoRightHemi                 The vertex indexes for the right hemipshere.
     */
-    void setSurfaceData(const QByteArray& arraySurfaceVertColorLeftHemi,
-                        const QByteArray& arraySurfaceVertColorRightHemi,
-                        const Eigen::VectorXi& vecVertNoLeftHemi,
-                        const Eigen::VectorXi& vecVertNoRightHemi);
+    void setSurfaceColor(const QByteArray& arraySurfaceVertColorLeftHemi,
+                        const QByteArray& arraySurfaceVertColorRightHemi);
 
     //=========================================================================================================
     /**
@@ -203,20 +249,6 @@ public:
 
     //=========================================================================================================
     /**
-    * Set the neighboring information for smoothing the activity.
-    *
-    * @param[in] mapVertexNeighborsLeftHemi         The neighbor vertices for the left hemisphere.
-    * @param[in] mapVertexNeighborsRightHemi        The neighbor vertices for the right hemisphere.
-    * @param[in] matVertPosLeftHemi                 The surface vertices in 3D space for the left hemisphere.
-    * @param[in] matVertPosRightHemi                The surface vertices in 3D space for the right hemisphere.
-    */
-    void setSmootingInfo(const QMap<int, QVector<int> >& mapVertexNeighborsLeftHemi,
-                         const QMap<int, QVector<int> >& mapVertexNeighborsRightHemi,
-                         const MatrixX3f& matVertPosLeftHemi,
-                         const MatrixX3f& matVertPosRightHemi);
-
-    //=========================================================================================================
-    /**
     * QThread functions
     */
     void stop();
@@ -234,50 +266,63 @@ private:
     /**
     * Perfrom the needed visualization type computations.
     *
-    * @param[in] sourceColorSamples         The color data for the sources.
+    * @param[in] vSourceColorSamples        The color data for the sources.
     *
     * @return                               Returns the final colors in form of a QByteArray for the left and right hemisphere.
     */
-    QPair<QByteArray, QByteArray> performVisualizationTypeCalculation(const Eigen::VectorXd& sourceColorSamples);
+    QPair<QByteArray, QByteArray> performVisualizationTypeCalculation(const Eigen::VectorXd& vSourceColorSamples);
+
+    //=========================================================================================================
+    /**
+    * Set the neighboring information for smoothing the activity.
+    *
+    * @param[in] matVertPosLeftHemi                 The surface vertices in 3D space for the left hemisphere.
+    * @param[in] matVertPosRightHemi                The surface vertices in 3D space for the right hemisphere.
+    */
+    void createSmoothingOperator(const MatrixX3f& matVertPosLeftHemi, const MatrixX3f& matVertPosRightHemi);
 
     //=========================================================================================================
     /**
     * Gerenate the colors based on vertex/source based coloring.
     *
-    * @param[in] sourceColorSamplesLeftHemi         The color data for the left hemisphere sources.
-    * @param[in] sourceColorSamplesRightHemi        The color data for the right hemisphere sources.
-    *
-    * @return                               Returns the final colors in form of a QByteArray for the left and right hemisphere.
+    * @param[in]  vSourceColorSamples       The source activation.
+    * @param[out] arrayFinalVertColor       The currently set color information for each vertex.
+    * @param[in]  vVertNo                   The indices for all sources related to the whole surface.
     */
-    QPair<QByteArray, QByteArray> generateColorsPerVertex(const VectorXd& sourceColorSamplesLeftHemi, const VectorXd& sourceColorSamplesRightHemi);
+//    void generateColorsPerVertex(const VectorXd& vSourceColorSamples,
+//                                  QByteArray& arrayFinalVertColor,
+//                                  const VectorXi& vVertNo);
 
     //=========================================================================================================
     /**
     * Gerenate the colors based on annotation based coloring.
     *
-    * @param[in] sourceColorSamplesLeftHemi         The color data for the left hemisphere sources.
-    * @param[in] sourceColorSamplesRightHemi        The color data for the right hemisphere sources.
-    *
-    * @return                               Returns the final colors in form of a QByteArray for the left and right hemisphere.
+    * @param[in]  vSourceColorSample         The source activation.
+    * @param[out] arrayFinalVertColor       The currently set color information for each vertex.
+    * @param[in]  vVertNo                    The indices for all sources related to the whole surface.
+    * @param[in]  lLabels                    The labels/annotation patch information.
+    * @param[in]  mapLabelIdSources          The map containing info about which source belongs to which patch.
     */
-    QPair<QByteArray, QByteArray> generateColorsPerAnnotation(const VectorXd& sourceColorSamplesLeftHemi, const VectorXd& sourceColorSamplesRightHemi);
+//    void generateColorsPerAnnotation(const VectorXd& vSourceColorSample,
+//                                      QByteArray& arrayFinalVertColor,
+//                                      const VectorXi& vVertNo,
+//                                      const QList<FSLIB::Label>& lLabels,
+//                                      const QMap<qint32, qint32>& mapLabelIdSources);
 
     //=========================================================================================================
     /**
     * Gerenate the colors based on smoothing.
     *
-    * @param[in] sourceColorSamples         The color data for one hemisphere sources.
-    * @param[in] vertno                     The vertex numbers of the chosen sources.
-    * @param[in] arrayCurrentVertColor      The default colors of the complete surface.
-    * @param[in] mapVertexNeighbors         The neighboring information.
-    *
-    * @return                               Returns the final colors in form of a QByteArray for the hemisphere.
+    * @param[in]  sourceColorSamples         The color data for one hemisphere sources.
+    * @param[in]  vertno                     The vertex numbers of the chosen sources.
+    * @param[out] arrayFinalVertColor       The default colors of the complete surface.
+    * @param[in]  mapVertexNeighbors         The neighboring information.
     */
-    QByteArray generateSmoothedColors(const VectorXd& sourceColorSamples,
-                                      const VectorXi &vertno,
-                                      const QByteArray& arrayCurrentVertColor,
-                                      const QMap<int, QVector<int> >& mapVertexNeighbors,
-                                      const SparseMatrix<double>& matWDistSmooth);
+//    void generateSmoothedColors(const VectorXd& sourceColorSamples,
+//                                      const VectorXi &vertno,
+//                                      QByteArray& arrayFinalVertColor,
+//                                      const QMap<int, QVector<int> >& mapVertexNeighbors,
+//                                      const SparseMatrix<double>& matWDistSmooth);
 
     //=========================================================================================================
     /**
@@ -286,16 +331,16 @@ private:
     * @param[in]  data                      The data which is to be transformed.
     * @param[out] arrayFinalVertColor       The final vertex colors, i.e. may already contain the curret curvature color information.
     */
-    void transformDataToColor(const Eigen::VectorXd& data, QByteArray &arrayFinalVertColor);
+//    void transformDataToColor(const Eigen::VectorXd& data, QByteArray &arrayFinalVertColor);
 
     //=========================================================================================================
     /**
     * Transform the data sample values to color values.
     *
-    * @param[in] fSample                The data which is to be transformed.
+    * @param[in]  fSample                The data which is to be transformed.
     * @param[out] arrayFinalVertColor   The final vertex color.
     */
-    void transformDataToColor(float fSample, QByteArray &arrayFinalVertColor);
+//    void transformDataToColor(float fSample, QByteArray &arrayFinalVertColor);
 
     QMutex                  m_qMutex;                           /**< The thread's mutex. */
 
@@ -329,10 +374,7 @@ private:
     QMap<int, QVector<int> >   m_mapVertexNeighborsLeftHemi;    /**< The map of all vertices and neighbors for the left hemisphere. */
     QMap<int, QVector<int> >   m_mapVertexNeighborsRightHemi;   /**< The map of all vertices and neighbors for the right hemisphere. */
 
-    SparseMatrix<double> m_sparseSmoothMatrixLeftHemi;          /**< The sparse smoothing operator based on inverse distance weightning for the left hemisphere. */
-    SparseMatrix<double> m_sparseSmoothMatrixRightHemi;         /**< The sparse smoothing operator based on inverse distance weightning for the right hemisphere. */
-
-    QRgb (*m_functionHandlerColorMap)(double v);                /**< The function handler to the currently chosen colormap function. */
+    QList<VisualizationInfo>    m_lVisualizationInfo;           /**< The list holding all information needed to do the visualization for both hemispheres (0-left, 1-right). */
 
 signals:
     //=========================================================================================================
