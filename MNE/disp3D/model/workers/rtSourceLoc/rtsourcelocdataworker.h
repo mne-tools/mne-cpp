@@ -284,11 +284,11 @@ private:
     * Transform the data sample values to color values.
     *
     * @param[in] data                   The data which is to be transformed.
-    * @param[in] arrayCurrentVertColor  The current vertex colors, i.e. may contain the curret curvature color information.
+    * @param[out] arrayFinalVertColor   The final vertex colors, i.e. may contain the curret curvature color information.
     *
     * @return                       Returns the colors in form of a QByteArray.
     */
-    QByteArray transformDataToColor(const Eigen::VectorXd& data, const QByteArray& arrayCurrentVertColor);
+    void transformDataToColor(const Eigen::VectorXd& data, QByteArray &arrayCurrentVertColor);
 
     //=========================================================================================================
     /**
@@ -322,8 +322,6 @@ private:
     double                  m_dNormalization;                   /**< Normalization value. */
     double                  m_dNormalizationMax;                /**< Value to normalize to. */
 
-    QString                 m_sColormap;                        /**< The type of colormap ("Hot", "Hot Negative 1", etc.). */
-
     QVector3D               m_vecThresholds;                    /**< The threshold values used for normalizing the data. */
 
     QList<FSLIB::Label>     m_lLabelsLeftHemi;                  /**< The list of current labels for the left hemisphere. */
@@ -331,11 +329,13 @@ private:
     QMap<qint32, qint32>    m_mapLabelIdSourcesLeftHemi;        /**< The sources mapped to their corresponding labels for the left hemisphere. */
     QMap<qint32, qint32>    m_mapLabelIdSourcesRightHemi;       /**< The sources mapped to their corresponding labels for the right hemisphere. */
 
-    QMap<int, QVector<int> >   m_mapVertexNeighborsLeftHemi;
-    QMap<int, QVector<int> >   m_mapVertexNeighborsRightHemi;
+    QMap<int, QVector<int> >   m_mapVertexNeighborsLeftHemi;    /**< The map of all vertices and neighbors for the left hemisphere. */
+    QMap<int, QVector<int> >   m_mapVertexNeighborsRightHemi;   /**< The map of all vertices and neighbors for the right hemisphere. */
 
-    SparseMatrix<double> m_sparseSmoothMatrixLeftHemi;
-    SparseMatrix<double> m_sparseSmoothMatrixRightHemi;
+    SparseMatrix<double> m_sparseSmoothMatrixLeftHemi;          /**< The sparse smoothing operator based on inverse distance weightning for the left hemisphere. */
+    SparseMatrix<double> m_sparseSmoothMatrixRightHemi;         /**< The sparse smoothing operator based on inverse distance weightning for the right hemisphere. */
+
+    QRgb (*m_functionHandlerColorMap)(double v);                /**< The function handler to the currently chosen colormap function. */
 
 signals:
     //=========================================================================================================
