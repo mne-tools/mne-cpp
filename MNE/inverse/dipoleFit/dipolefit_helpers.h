@@ -3490,6 +3490,158 @@ void mne_channel_names_to_name_list(fiffChInfo chs, int nch,
     return;
 }
 
+
+
+
+mneNamedMatrix mne_read_named_matrix(//fiffFile in,
+                                     FiffStream::SPtr& stream,
+                                     FiffDirNode& node,int kind)
+/*
+      * Read a named matrix from the specified node
+      */
+{
+    char **colnames = NULL;
+    char **rownames = NULL;
+    int  ncol = 0;
+    int  nrow = 0;
+    qint32 ndim;
+    QVector<qint32> dims;
+    float **data = NULL;
+    int  val;
+    char *s;
+    FiffTag::SPtr t_pTag;
+//    fiffTag tag;
+    int     k;
+    /*
+   * If the node is a named-matrix mode, use it.
+   * Otherwise, look in first-generation children
+   */
+    if (node.type == FIFFB_MNE_NAMED_MATRIX) {
+//        if ((tag = fiff_dir_tree_get_tag(in,node,kind)) == NULL)
+//            goto bad;
+        if(!node.find_tag(stream.data(), kind, t_pTag))
+            goto bad;
+//        if ((dims = fiff_get_matrix_dims(tag)) == NULL)
+//            goto bad;
+        qint32 ndim;
+        QVector<qint32> dims;
+        t_pTag->getMatrixDimensions(ndim, dims);
+
+//        if (dims[0] != 2) {
+        if (ndim != 2) {
+            qCritical("mne_read_named_matrix only works with two-dimensional matrices");
+            goto bad;
+        }
+//        if ((data = fiff_get_float_matrix(tag)) == NULL) {
+//            TAG_FREE(tag);
+//            goto bad;
+//        }
+        MatrixXf tmp_data = t_pTag->toFloatMatrix();
+        qDebug() << "<<<TODO>>> Eventually a transposition of data required!";
+        fromFloatEigenMatrix(tmp_data, data);
+    }
+    else {
+        for (k = 0; k < node.nchild; k++) {
+            if (node.children[k].type == FIFFB_MNE_NAMED_MATRIX) {
+//                if ((tag = fiff_dir_tree_get_tag(in,node->children[k],kind)) != NULL) {
+                if(node.children[k].find_tag(stream.data(), kind, t_pTag)) {
+//                    if ((dims = fiff_get_matrix_dims(tag)) == NULL)
+//                        goto bad;
+                    t_pTag->getMatrixDimensions(ndim, dims);
+//                    if (dims[0] != 2) {
+                    if (ndim != 2) {
+                        qCritical("mne_read_named_matrix only works with two-dimensional matrices");
+                        goto bad;
+                    }
+//                    if ((data = fiff_get_float_matrix(tag)) == NULL) {
+//                        TAG_FREE(tag);
+//                        goto bad;
+//                    }
+//                    FREE(tag);
+                    MatrixXf tmp_data = t_pTag->toFloatMatrix();
+                    qDebug() << "<<<TODO>>> Eventually a transposition of data required!";
+                    fromFloatEigenMatrix(tmp_data, data);
+
+                    node = node.children[k];
+                    break;
+                }
+            }
+        }
+        if (!data)
+            goto bad;
+    }
+    /*
+   * Separate FIFF_MNE_NROW is now optional
+   */
+//    if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_NROW)) == NULL)
+//        nrow = dims[2];
+    if (!node.find_tag(stream.data(), FIFF_MNE_NROW, t_pTag))
+        nrow = dims[0];
+    else {
+        nrow = *t_pTag->toInt();
+        if (nrow != dims[0]) {
+            qCritical("Number of rows in the FIFF_MNE_NROW tag and in the matrix data conflict.");
+            goto bad;
+        }
+    }
+//    TAG_FREE(tag);
+    /*
+    * Separate FIFF_MNE_NCOL is now optional
+    */
+//    if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_NCOL)) == NULL)
+//        ncol = dims[1];
+    if(!node.find_tag(stream.data(), FIFF_MNE_NCOL, t_pTag))
+        ncol = dims[1];
+    else {
+//        ncol = *(int *)(tag->data);
+        ncol = *t_pTag->toInt();
+        if (ncol != dims[1]) {
+            qCritical("Number of columns in the FIFF_MNE_NCOL tag and in the matrix data conflict.");
+            goto bad;
+        }
+    }
+//    TAG_FREE(tag);
+
+//    if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_ROW_NAMES)) != NULL) {
+//        s = (char *)(tag->data);
+    if(!node.find_tag(stream.data(), FIFF_MNE_ROW_NAMES, t_pTag)) {
+        s = (char *)(t_pTag->data());
+        mne_string_to_name_list(s,&rownames,&val);
+//        TAG_FREE(tag);
+        if (val != nrow) {
+            qCritical("Incorrect number of entries in the row name list");
+            nrow = val;
+            goto bad;
+        }
+    }
+//    if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_COL_NAMES)) != NULL) {
+//        s = (char *)(tag->data);
+    if(!node.find_tag(stream.data(), FIFF_MNE_COL_NAMES, t_pTag)) {
+        s = (char *)(t_pTag->data());
+        mne_string_to_name_list(s,&colnames,&val);
+//        TAG_FREE(tag);
+        if (val != ncol) {
+            qCritical("Incorrect number of entries in the column name list");
+            ncol = val;
+            goto bad;
+        }
+    }
+//    FREE(dims);
+    return mne_build_named_matrix(nrow,ncol,rownames,colnames,data);
+
+bad : {
+        mne_free_name_list(rownames,nrow);
+        mne_free_name_list(colnames,ncol);
+        FREE_CMATRIX(data);
+//        FREE(dims);
+        return NULL;
+    }
+}
+
+
+
+
+
 mneNamedMatrix mne_pick_from_named_matrix(mneNamedMatrix mat,
                                           char           **pickrowlist,
                                           int            picknrow,
@@ -4412,7 +4564,7 @@ static float **get_epochs (//fiffFile file,	/* This is our file */
                 }
 //                FREE(dims);
                 MatrixXf tmp_epochs = t_pTag->toFloatMatrix();
-                qDebug() << "<<<ToDo>>> Eventually a tranposition of epochs required!";
+                qDebug() << "<<<TODO>>> Eventually a transposition of epochs required!";
                 fromFloatEigenMatrix(tmp_epochs, epochs);
 //                if ((epochs = fiff_get_float_matrix(&tag)) == NULL)
 //                    goto bad;
@@ -5601,17 +5753,21 @@ mneProjOp mne_read_proj_op_from_node(//fiffFile in,
      * Complicated procedure for getting the description
      */
         item_desc = NULL;
-        if ((tag = fiff_dir_tree_get_tag(in,node,
-                                         FIFF_NAME)) != NULL) {
-            item_desc = add_string(item_desc,(char *)tag->data);
+//        if ((tag = fiff_dir_tree_get_tag(in,node, FIFF_NAME)) != NULL) {
+//            item_desc = add_string(item_desc,(char *)tag->data);
+//        }
+        if (node.find_tag(stream.data(), FIFF_NAME, t_pTag)) {
+            item_desc = add_string(item_desc,(char *)t_pTag->data());
         }
 //        FREE(tag);
         /*
      * Take the first line of description if it exists
      */
-        if ((tag = fiff_dir_tree_get_tag(in,node,
-                                         FIFF_DESCRIPTION)) != NULL) {
-            desc_tag = (char *)tag->data;
+//        if ((tag = fiff_dir_tree_get_tag(in,node,
+//                                         FIFF_DESCRIPTION)) != NULL) {
+//            desc_tag = (char *)tag->data;
+        if (node.find_tag(stream.data(), FIFF_DESCRIPTION, t_pTag)) {
+            desc_tag = (char *)t_pTag->data();
             if ((lf = strchr(desc_tag,'\n')) != NULL)
                 *lf = '\0';
             //      if (item_desc != NULL)
@@ -5622,13 +5778,18 @@ mneProjOp mne_read_proj_op_from_node(//fiffFile in,
         }
 //        FREE(tag);
         /*
-     * Possibility to override number of channels here
-     */
-        if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_NCHAN)) == NULL)
+        * Possibility to override number of channels here
+        */
+//        if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_NCHAN)) == NULL)
+//            item_nchan = global_nchan;
+//        else {
+//            item_nchan = *(int *)tag->data;
+//            TAG_FREE(tag); tag = NULL;
+//        }
+        if (!node.find_tag(stream.data(), FIFF_NCHAN, t_pTag))
             item_nchan = global_nchan;
         else {
-            item_nchan = *(int *)tag->data;
-            TAG_FREE(tag); tag = NULL;
+            item_nchan = *t_pTag->toInt();
         }
         if (item_nchan <= 0) {
             qCritical("Number of channels incorrectly specified for one of the projection items.");
@@ -5637,56 +5798,65 @@ mneProjOp mne_read_proj_op_from_node(//fiffFile in,
         /*
      * Take care of the channel names
      */
-        if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_PROJ_ITEM_CH_NAME_LIST)) == NULL)
+//        if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_PROJ_ITEM_CH_NAME_LIST)) == NULL)
+        if (!node.find_tag(stream.data(), FIFF_PROJ_ITEM_CH_NAME_LIST, t_pTag))
             goto bad;
-        mne_string_to_name_list((char *)(tag->data),&item_names,&nlist);
+//        mne_string_to_name_list((char *)(tag->data),&item_names,&nlist);
+        mne_string_to_name_list((char *)(t_pTag->data()),&item_names,&nlist);
         if (nlist != item_nchan) {
             printf("Channel name list incorrectly specified for proj item # %d",k+1);
             mne_free_name_list(item_names,nlist);
-            TAG_FREE(tag);
-            goto bad;
-        }
-        TAG_FREE(tag);
-        /*
-     * Kind of item
-     */
-        if ((tag = fiff_dir_tree_get_tag(in,node,
-                                         FIFF_PROJ_ITEM_KIND)) == NULL)
-            goto bad;
-        item_kind = *(int *)tag->data;
-        TAG_FREE(tag);
-        /*
-     * How many vectors
-     */
-        if ((tag = fiff_dir_tree_get_tag(in,node,
-                                         FIFF_PROJ_ITEM_NVEC)) == NULL)
-            goto bad;
-        item_nvec = *(int *)tag->data;
-//        TAG_FREE(tag);
-        /*
-     * The projection data
-     */
-        if ((tag = fiff_dir_tree_get_tag(in,node,
-                                         FIFF_PROJ_ITEM_VECTORS)) == NULL)
-            goto bad;
-        if ((item_vectors = fiff_get_float_matrix(tag)) == NULL) {
 //            TAG_FREE(tag);
             goto bad;
         }
+//        TAG_FREE(tag);
+        /*
+     * Kind of item
+     */
+//        if ((tag = fiff_dir_tree_get_tag(in, node, FIFF_PROJ_ITEM_KIND)) == NULL)
+        if (!node.find_tag(stream.data(), FIFF_PROJ_ITEM_KIND, t_pTag))
+            goto bad;
+//        item_kind = *(int *)tag->data;
+        item_kind = *t_pTag->toInt();
+//        TAG_FREE(tag);
+        /*
+        * How many vectors
+        */
+//        if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_PROJ_ITEM_NVEC)) == NULL)
+        if (!node.find_tag(stream.data(),FIFF_PROJ_ITEM_NVEC, t_pTag))
+            goto bad;
+//        item_nvec = *(int *)tag->data;
+        item_nvec = *t_pTag->toInt();
+//        TAG_FREE(tag);
+        /*
+        * The projection data
+        */
+//        if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_PROJ_ITEM_VECTORS)) == NULL)
+        if (!node.find_tag(stream.data(),FIFF_PROJ_ITEM_VECTORS, t_pTag))
+            goto bad;
+//        if ((item_vectors = fiff_get_float_matrix(tag)) == NULL) {
+////            TAG_FREE(tag);
+//            goto bad;
+//        }
+        MatrixXf tmp_item_vectors = t_pTag->toFloatMatrix();
+        qDebug() << "<<<TODO>>> Eventually a transposition of item_vectors required!";
+        fromFloatEigenMatrix(tmp_item_vectors, item_vectors);
+
 //        FREE(tag); tag = NULL;
         /*
-     * Is this item active?
-     */
-        if ((tag = fiff_dir_tree_get_tag(in,node,
-                                         FIFF_MNE_PROJ_ITEM_ACTIVE)) != NULL) {
-            item_active = *(int *)tag->data;
+        * Is this item active?
+        */
+//        if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_PROJ_ITEM_ACTIVE)) != NULL) {
+//            item_active = *(int *)tag->data;
+        if (node.find_tag(stream.data(), FIFF_MNE_PROJ_ITEM_ACTIVE, t_pTag)) {
+            item_active = *t_pTag->toInt();
 //            TAG_FREE(tag);
         }
         else
             item_active = FALSE;
         /*
-     * Ready to add
-     */
+        * Ready to add
+        */
         item = mne_build_named_matrix(item_nvec,item_nchan,NULL,item_names,item_vectors);
         mne_proj_op_add_item_act(op,item,item_kind,item_desc,item_active);
         mne_free_named_matrix(item);
@@ -5705,35 +5875,26 @@ bad : {
 mneProjOp mne_read_proj_op(const QString& name)
 
 {
-    fiffFile    in  = fiff_open(name.toLatin1().data());
+    QFile file(name);
+    FiffStream::SPtr stream(new FiffStream(&file));
+
+//    fiffFile    in  = fiff_open(name.toLatin1().data());
+
+    if(!stream->open())
+        return NULL;
+//    if (in == NULL)
+//        return NULL;
+
     mneProjOp   res = NULL;
 
-    if (in == NULL)
-        return NULL;
+    FiffDirNode t_default;
+    res = mne_read_proj_op_from_node(stream,t_default);
 
-    res = mne_read_proj_op_from_node(in,NULL);
-
-    fiff_close(in);
+//    fiff_close(in);
+    stream->device()->close();
 
     return res;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 //============================= mne_ctf_comp.c =============================
@@ -6082,15 +6243,19 @@ mneCTFcompDataSet mne_read_ctf_comp_data(const QString& name)
  * Read all CTF compensation data from a given file
  */
 {
-    fiffFile          in = NULL;
+    QFile file(name);
+    FiffStream::SPtr stream(new FiffStream(&file));
+
+//    fiffFile          in = NULL;
     mneCTFcompDataSet set = NULL;
     mneCTFcompData    one;
-    fiffDirNode       *nodes = NULL;
-    fiffDirNode       *comps = NULL;
+    QList<FiffDirNode> nodes;
+    QList<FiffDirNode> comps;
     int               ncomp;
     mneNamedMatrix    mat = NULL;
     int               kind,k;
-    fiffTag           tag;
+//    fiffTag           tag;
+    FiffTag::SPtr t_pTag;
     fiffChInfo        chs = NULL;
     int               nch = 0;
     int               calibrated;
@@ -6114,44 +6279,50 @@ mneCTFcompDataSet mne_read_ctf_comp_data(const QString& name)
     /*
    * Read the rest of the stuff
    */
-    if ((in = fiff_open(name.toLatin1().data())) == NULL)
+//    if ((in = fiff_open(name.toLatin1().data())) == NULL)
+    if(!stream->open())
         goto bad;
     set = mne_new_ctf_comp_data_set();
     /*
-   * Locate the compensation data sets
-   */
-    nodes = fiff_dir_tree_find(in->dirtree,FIFFB_MNE_CTF_COMP);
-    if (!nodes || !nodes[0])
+    * Locate the compensation data sets
+    */
+//    nodes = fiff_dir_tree_find(in->dirtree,FIFFB_MNE_CTF_COMP);
+    nodes = stream->tree().dir_tree_find(FIFFB_MNE_CTF_COMP);
+    if (nodes.size() == 0)
         goto good;			/* Nothing more to do */
-    comps = fiff_dir_tree_find(nodes[0],FIFFB_MNE_CTF_COMP_DATA);
-    if (!comps || !comps[0])
+//    comps = fiff_dir_tree_find(nodes[0],FIFFB_MNE_CTF_COMP_DATA);
+    comps = nodes[0].dir_tree_find(FIFFB_MNE_CTF_COMP_DATA);
+    if (comps.size() == 0)
         goto good;
-    for (ncomp = 0; comps[ncomp] != NULL; ncomp++)
-        ;
-    FREE(nodes); nodes = NULL;
+//    for (ncomp = 0; comps[ncomp] != NULL; ncomp++)
+//        ;
+//    FREE(nodes); nodes = NULL;
+    ncomp = comps.size();
     /*
-   * Set the channel info
-   */
+    * Set the channel info
+    */
     set->chs = chs; chs = NULL;
     set->nch = nch;
     /*
    * Read each data set
    */
     for (k = 0; k < ncomp; k++) {
-        mat = mne_read_named_matrix(in,comps[k],FIFF_MNE_CTF_COMP_DATA);
+        mat = mne_read_named_matrix(stream,comps[k],FIFF_MNE_CTF_COMP_DATA);
         if (!mat)
             goto bad;
-        tag = fiff_dir_tree_get_tag(in,comps[k],FIFF_MNE_CTF_COMP_KIND);
-        if (tag) {
-            kind = *(int *)tag->data;
-            TAG_FREE(tag);
+//        tag = fiff_dir_tree_get_tag(in,comps[k],FIFF_MNE_CTF_COMP_KIND);
+        comps[k].find_tag(stream.data(), FIFF_MNE_CTF_COMP_KIND, t_pTag);
+        if (t_pTag) {
+            kind = *t_pTag->toInt();
+//            TAG_FREE(tag);
         }
         else
             goto bad;
-        tag = fiff_dir_tree_get_tag(in,comps[k],FIFF_MNE_CTF_COMP_CALIBRATED);
-        if (tag) {
-            calibrated = *(int *)tag->data;
-            TAG_FREE(tag);
+//        tag = fiff_dir_tree_get_tag(in,comps[k],FIFF_MNE_CTF_COMP_CALIBRATED);
+        comps[k].find_tag(stream.data(), FIFF_MNE_CTF_COMP_CALIBRATED, t_pTag);
+        if (t_pTag) {
+            calibrated = *t_pTag->toInt();
+//            TAG_FREE(tag);
         }
         else
             calibrated = FALSE;
@@ -6180,18 +6351,20 @@ mneCTFcompDataSet mne_read_ctf_comp_data(const QString& name)
 
 bad : {
         mne_free_named_matrix(mat);
-        FREE(nodes);
-        FREE(comps);
-        fiff_close(in);
+//        FREE(nodes);
+//        FREE(comps);
+//        fiff_close(in);
+        stream->device()->close();
         mne_free_ctf_comp_data_set(set);
         return NULL;
     }
 
 good : {
         FREE(chs);
-        FREE(nodes);
-        FREE(comps);
-        fiff_close(in);
+//        FREE(nodes);
+//        FREE(comps);
+//        fiff_close(in);
+        stream->device()->close();
         return set;
     }
 }
@@ -8024,7 +8197,7 @@ int mne_read_source_spaces(const QString& name,               /* Read from here 
     QFile file(name);
     FiffStream::SPtr stream(new FiffStream(&file));
 
-    fiffFile       in = NULL;
+//    fiffFile       in = NULL;
     int            nspace = 0;
     mneSourceSpace *spaces = NULL;
     mneSourceSpace  new_space = NULL;
