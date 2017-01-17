@@ -788,40 +788,11 @@ QByteArray RtSourceLocDataWorker::generateSmoothedColors(const VectorXd& sourceC
     QTime prodDataTimer;
     prodDataTimer.start();
 
-//    //Produce final color
-//    VectorXd vecActivation(1);
-
-//    QByteArray finalColors = arrayCurrentVertColor;
-//    float *rawfinalColors = reinterpret_cast<float *>(finalColors.data());
-//    int idxVert = 0;
-
-//    int sumTimer = 0;
-
-//    for (int k = 0; k < vecSmoothedData.rows(); k++) {
-//        vecActivation(0) = vecSmoothedData[k];
-
-//        if(vecActivation(0) > m_vecThresholds.x()) {
-//            QByteArray arrayVertColor = transformDataToColor(vecActivation);
-
-//            QTime timer;
-//            timer.start();
-
-//            float *rawVertColor = reinterpret_cast<float *>(arrayVertColor.data());
-
-//            rawfinalColors[idxVert] = rawVertColor[0];
-//            rawfinalColors[idxVert+1] = rawVertColor[1];
-//            rawfinalColors[idxVert+2] = rawVertColor[2];
-
-//            sumTimer += timer.elapsed();
-//        }
-
-//        idxVert += 3;
-//    }
-
+    //Produce final color
     QByteArray finalColors = transformDataToColor(vecSmoothedData, arrayCurrentVertColor);
 
     //qDebug() << "sumTimer" << sumTimer;
-    qDebug() << "Produce time" << prodDataTimer.elapsed();
+    //qDebug() << "Produce time" << prodDataTimer.elapsed();
 //    qDebug() << "All time" << allTimer.elapsed();
 
     return finalColors;
