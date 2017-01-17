@@ -799,7 +799,7 @@ void RtSourceLocDataWorker::transformDataToColor(const VectorXd& data, QByteArra
     for(int r = 0; r < data.rows(); ++r) {
         dSample = data(r);
 
-        if(dSample > m_vecThresholds.x()) {
+        if(dSample >= m_vecThresholds.x()) {
             //Check lower and upper thresholds and normalize to one
             if(dSample >= m_vecThresholds.z()) {
                 dSample = 1.0;
@@ -839,7 +839,7 @@ void RtSourceLocDataWorker::transformDataToColor(float fSample, QByteArray& arra
     float *rawArrayColors = reinterpret_cast<float *>(arrayFinalVertColor.data());
 
     //Check lower and upper thresholds and normalize to one
-    if(fSample > m_vecThresholds.z()) {
+    if(fSample >= m_vecThresholds.z()) {
         fSample = 1.0;
     } else if(fSample < m_vecThresholds.x()) {
         fSample = 0.0;
