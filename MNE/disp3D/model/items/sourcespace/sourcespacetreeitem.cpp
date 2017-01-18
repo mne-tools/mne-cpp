@@ -206,6 +206,9 @@ void SourceSpaceTreeItem::addData(const MNEHemisphere& tHemisphere, Qt3DCore::QE
     data.setValue(arrayVertColor);
     this->setData(data, Data3DTreeModelItemRoles::SurfaceCurrentColorVert);
 
+    data.setValue(tHemisphere.rr);
+    this->setData(data, Data3DTreeModelItemRoles::SurfaceVert);
+
     //Add surface meta information as item children
     QList<QStandardItem*> list;
 
