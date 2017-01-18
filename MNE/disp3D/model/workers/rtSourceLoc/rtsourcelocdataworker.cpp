@@ -238,7 +238,7 @@ void transformDataToColor(float fSample, QByteArray& arrayFinalVertColor, double
     }
 
     QRgb qRgb;
-    qRgb = qRgb = (functionHandlerColorMap)(fSample);
+    qRgb = (functionHandlerColorMap)(fSample);
 
     rawArrayColors[idxColor++] = (float)qRed(qRgb)/255.0f;
     rawArrayColors[idxColor++] = (float)qGreen(qRgb)/255.0f;
