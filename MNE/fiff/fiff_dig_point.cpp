@@ -41,7 +41,7 @@
 #include "fiff_dig_point.h"
 #include "fiff_coord_trans.h"
 #include "fiff_stream.h"
-#include "fiff_dir_tree.h"
+#include "fiff_dir_node.h"
 #include "fiff_tag.h"
 
 
