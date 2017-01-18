@@ -45,6 +45,10 @@
 #include "fiff_types.h"
 #include "fiff_id.h"
 
+#include "fiff_dir_node.h"
+#include "fiff_dir_entry.h"
+
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -89,8 +93,6 @@ class FiffRawData;
 class FiffInfo;
 class FiffInfoBase;
 class FiffCov;
-class FiffDirTree;
-class FiffDirEntry;
 class FiffProj;
 class FiffNamedMatrix;
 class FiffDigPoint;
@@ -111,6 +113,7 @@ using namespace Eigen;
 //=============================================================================================================
 /**
 * FiffStream provides an interface for reading from and writing to fiff files
+* Comparable to: fiffFile (struct *fiffFile,fiffFileRec)
 *
 * @brief FIFF File I/O routines.
 **/
@@ -137,6 +140,24 @@ public:
     * @param[in] mode   The open mode
     */
     explicit FiffStream(QByteArray * a, QIODevice::OpenMode mode);
+
+    //=========================================================================================================
+    /**
+    * Returns the directory compiled into a tree
+    * dir is set when open() was called.
+    *
+    * @return the directory
+    */
+    const QList<FiffDirEntry>& dir() const;
+
+    //=========================================================================================================
+    /**
+    * Returns the directory compiled into a tree
+    * tree is set when open() was called.
+    *
+    * @return the compiled directory
+    */
+    const FiffDirNode& tree() const;
 
     //=========================================================================================================
     /**
@@ -177,7 +198,7 @@ public:
     *
     * @return true if information is available, fasle otherwise
     */
-    bool get_evoked_entries(const QList<FiffDirTree> &evoked_node, QStringList &comments, QList<fiff_int_t> &aspect_kinds, QString &t);
+    bool get_evoked_entries(const QList<FiffDirNode> &evoked_node, QStringList &comments, QList<fiff_int_t> &aspect_kinds, QString &t);
 
     //=========================================================================================================
     /**
@@ -192,15 +213,13 @@ public:
     * fiff_open
     *
     * ### MNE toolbox root function ###
+    * Refactored: open_file (fiff_open.c)
     *
     * Opens a fif file and provides the directory of tags
     *
-    * @param[out] p_Tree    tag directory organized into a tree
-    * @param[out] p_Dir     the sequential tag directory
-    *
     * @return true if succeeded, false otherwise
     */
-    bool open(FiffDirTree& p_Tree, QList<FiffDirEntry>& p_Dir);
+    bool open();
 
     //=========================================================================================================
     /**
@@ -209,14 +228,14 @@ public:
     * ### MNE toolbox root function ###
     *
     * Reads the bad channel list from a node if it exists
-    * Note: In difference to mne-matlab this is not a static function. This is a method of the FiffDirTree
+    * Note: In difference to mne-matlab this is not a static function. This is a method of the FiffDirNode
     *       class, that's why a tree object doesn't need to be handed to the function.
     *
     * @param[in] p_Node The node of interest
     *
     * @return the bad channel list
     */
-    QStringList read_bad_channels(const FiffDirTree& p_Node);
+    QStringList read_bad_channels(const FiffDirNode& p_Node);
 
     //=========================================================================================================
     /**
@@ -232,7 +251,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    bool read_cov(const FiffDirTree& p_Node, fiff_int_t cov_kind, FiffCov& p_covData);
+    bool read_cov(const FiffDirNode& p_Node, fiff_int_t cov_kind, FiffCov& p_covData);
 
     //=========================================================================================================
     /**
@@ -247,7 +266,7 @@ public:
     *
     * @return the CTF software compensation data
     */
-    QList<FiffCtfComp> read_ctf_comp(const FiffDirTree& p_Node, const QList<FiffChInfo>& p_Chs);
+    QList<FiffCtfComp> read_ctf_comp(const FiffDirNode& p_Node, const QList<FiffChInfo>& p_Chs);
 
     //=========================================================================================================
     /**
@@ -260,11 +279,11 @@ public:
     *
     * @param[in] p_Node       The node of interest
     * @param[out] p_Info      The read measurement info
-    * @param[out] p_NodeInfo  The to measurement corresponding fiff_dir_tree.
+    * @param[out] p_NodeInfo  The to measurement corresponding fiff_dir_node.
     *
-    * @return the to measurement corresponding fiff_dir_tree.
+    * @return true if successful.
     */
-    bool read_meas_info(const FiffDirTree& p_Node, FiffInfo& p_Info, FiffDirTree& p_NodeInfo);
+    bool read_meas_info(const FiffDirNode& p_Node, FiffInfo& p_Info, FiffDirNode& p_NodeInfo);
 
     //=========================================================================================================
     /**
@@ -275,9 +294,9 @@ public:
     * @param[in] p_Node         The node of interest
     * @param[out] p_InfoForward The read light measurement info
     *
-    * @return the to measurement corresponding fiff_dir_tree.
+    * @return true when successful.
     */
-    bool read_meas_info_base(const FiffDirTree& p_Node, FiffInfoBase& p_InfoForward);
+    bool read_meas_info_base(const FiffDirNode& p_Node, FiffInfoBase& p_InfoForward);
 
     //=========================================================================================================
     /**
@@ -293,7 +312,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    bool read_named_matrix(const FiffDirTree& p_Node, fiff_int_t matkind, FiffNamedMatrix& mat);
+    bool read_named_matrix(const FiffDirNode& p_Node, fiff_int_t matkind, FiffNamedMatrix& mat);
 
     //=========================================================================================================
     /**
@@ -309,7 +328,7 @@ public:
     *
     * @return a list of SSP projectors
     */
-    QList<FiffProj> read_proj(const FiffDirTree& p_Node);
+    QList<FiffProj> read_proj(const FiffDirNode& p_Node);
 
     //=========================================================================================================
     /**
@@ -675,6 +694,25 @@ public:
     * @param[in] data       The string data to write
     */
     void write_rt_command(fiff_int_t command, const QString& data);
+
+private:
+    QList<FiffDirEntry> m_dir; /**< This is the directory. If no directory exists, open automatically scans the file to create one. */
+    FiffDirNode m_tree;        /**< Directory compiled into a tree */
+
+//    /** FIFF file handle returned by fiff_open(). */
+//    typedef struct _fiffFileRec {
+//      char         *file_name;	/**< Name of the file */
+//      FILE         *fd;		/**< The normal file descriptor */
+//      fiffId       id;		/**< The file identifier */
+//      fiffDirEntry dir;		/**< This is the directory.
+//                     * If no directory exists, fiff_open
+//                     * automatically scans the file to create one. */
+//      int         nent;	        /**< How many entries? */
+//      fiffDirNode dirtree;		/**< Directory compiled into a tree */
+//      char        *ext_file_name;	/**< Name of the file holding the external data */
+//      FILE        *ext_fd;		/**< The file descriptor of the above file if open  */
+//    } *fiffFile,fiffFileRec;	/**< FIFF file handle. fiff_open() returns this. */
+
 };
 
 } // NAMESPACE
