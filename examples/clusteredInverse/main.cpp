@@ -52,6 +52,7 @@
 #include <disp3D/view3D.h>
 #include <disp3D/control/control3dwidget.h>
 #include <disp3D/model/data3Dtreemodel.h>
+#include <disp3D/model/items/sourceactivity/mneestimatetreeitem.h>
 
 #include <utils/mnemath.h>
 
@@ -291,11 +292,23 @@ int main(int argc, char *argv[])
 
     testWindow->setModel(p3DDataModel);
 
-    p3DDataModel->addSurfaceSet(parser.value(subjectOption), "HemiLR", t_surfSet, t_annotationSet);
+    p3DDataModel->addSurfaceSet(parser.value(subjectOption), "MRI", t_surfSet, t_annotationSet);
 
-    MneEstimateTreeItem* rtItemList = p3DDataModel->addSourceData(parser.value(subjectOption), "HemiLR", sourceEstimate, t_clusteredFwd);
+    if(MneEstimateTreeItem* pRTDataItem = p3DDataModel->addSourceData(parser.value(subjectOption), evoked.comment, sourceEstimate, t_clusteredFwd)) {
+        pRTDataItem->setLoopState(true);
+        pRTDataItem->setTimeInterval(17);
+        pRTDataItem->setNumberAverages(1);
+        pRTDataItem->setStreamingActive(true);
+        pRTDataItem->setNormalization(QVector3D(0.0,0.5,10.0));
+        pRTDataItem->setVisualizationType("Smoothing based");
+        pRTDataItem->setColortable("Hot");
+    }
 
     testWindow->show();
+
+    Control3DWidget::SPtr control3DWidget = Control3DWidget::SPtr(new Control3DWidget());
+    control3DWidget->init(p3DDataModel, testWindow);
+    control3DWidget->show();
 
     if(!t_sFileNameStc.isEmpty())
     {
