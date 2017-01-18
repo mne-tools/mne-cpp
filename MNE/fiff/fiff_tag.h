@@ -642,8 +642,10 @@ inline quint32* FiffTag::toUnsignedInt()
 
 inline qint32* FiffTag::toInt()
 {
-    if(this->isMatrix() || this->getType() != FIFFT_INT)
+    if(this->isMatrix() || this->getType() != FIFFT_INT) {
+        printf("Expected an integer tag : %d (found data type %d instead)\n",this->kind,this->getType());
         return NULL;
+    }
     else
         return (qint32*)this->data();
 }
