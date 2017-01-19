@@ -235,6 +235,33 @@ void fromFloatEigenVector(const Eigen::VectorXf& from_vec, float *to_vec)
 }
 
 
+//int
+Eigen::MatrixXi toFloatEigenMatrix(int **mat, const int m, const int n)
+{
+    Eigen::MatrixXi eigen_mat(m,n);
+
+    for ( int i = 0; i < m; ++i)
+        for ( int j = 0; j < n; ++j)
+            eigen_mat(i,j) = mat[i][j];
+
+    return eigen_mat;
+}
+
+void fromIntEigenMatrix(const Eigen::MatrixXi& from_mat, int **to_mat, const int m, const int n)
+{
+    for ( int i = 0; i < m; ++i)
+        for ( int j = 0; j < n; ++j)
+            to_mat[i][j] = from_mat(i,j);
+}
+
+void fromIntEigenMatrix(const Eigen::MatrixXi& from_mat, int **to_mat)
+{
+    fromIntEigenMatrix(from_mat, to_mat, from_mat.rows(), from_mat.cols());
+}
+
+
+
+
 //============================= mne_allocs.h =============================
 
 /*
@@ -2840,6 +2867,154 @@ FwdCoilSet* fwd_dup_coil_set(FwdCoilSet* s,
     }
     return res;
 }
+
+
+
+
+//============================= fiff_matrix.c =============================
+
+
+int *fiff_get_matrix_dims(FiffTag::SPtr& tag)
+/*
+      * Interpret dimensions from matrix data (dense and sparse)
+      */
+{
+    int ndim;
+    int *dims;
+    int *res,k;
+    unsigned int tsize = tag->size();
+    /*
+   * Initial checks
+   */
+    if (tag->data() == NULL) {
+        qCritical("fiff_get_matrix_dims: no data available!");
+        return NULL;
+    }
+    if (fiff_type_fundamental(tag->getType()) != FIFFTS_FS_MATRIX) {
+        qCritical("fiff_get_matrix_dims: tag does not contain a matrix!");
+        return NULL;
+    }
+    if (tsize < sizeof(fiff_int_t)) {
+        qCritical("fiff_get_matrix_dims: too small matrix data!");
+        return NULL;
+    }
+    /*
+   * Get the number of dimensions and check
+   */
+    ndim = *((fiff_int_t *)((fiff_byte_t *)(tag->data())+tag->size()-sizeof(fiff_int_t)));
+    if (ndim <= 0 || ndim > FIFFC_MATRIX_MAX_DIM) {
+        qCritical("fiff_get_matrix_dims: unreasonable # of dimensions!");
+        return NULL;
+    }
+    if (fiff_type_matrix_coding(tag->getType()) == FIFFTS_MC_DENSE) {
+        if (tsize < (ndim+1)*sizeof(fiff_int_t)) {
+            qCritical("fiff_get_matrix_dims: too small matrix data!");
+            return NULL;
+        }
+        res = MALLOC(ndim+1,int);
+        res[0] = ndim;
+        dims = ((fiff_int_t *)((fiff_byte_t *)(tag->data())+tag->size())) - ndim - 1;
+        for (k = 0; k < ndim; k++)
+            res[k+1] = dims[k];
+    }
+    else if (fiff_type_matrix_coding(tag->getType()) == FIFFTS_MC_CCS ||
+             fiff_type_matrix_coding(tag->getType()) == FIFFTS_MC_RCS) {
+        if (tsize < (ndim+2)*sizeof(fiff_int_t)) {
+            qCritical("fiff_get_matrix_sparse_dims: too small matrix data!");
+            return NULL; }
+
+        res = MALLOC(ndim+2,int);
+        res[0] = ndim;
+        dims = ((fiff_int_t *)((fiff_byte_t *)(tag->data())+tag->size())) - ndim - 1;
+        for (k = 0; k < ndim; k++)
+            res[k+1] = dims[k];
+        res[ndim+1] = dims[-1];
+    }
+    else {
+        qCritical("fiff_get_matrix_dims: unknown matrix coding.");
+        return NULL;
+    }
+    return res;
+}
+
+
+//============================= fiff_sparse.c =============================
+
+fiff_int_t *fiff_get_matrix_sparse_dims(FiffTag::SPtr& tag)
+/*
+   * Interpret dimensions and nz from matrix data
+   */
+{
+    return fiff_get_matrix_dims(tag);
+}
+
+
+fiff_sparse_matrix_t *fiff_get_float_sparse_matrix(FiffTag::SPtr& tag)
+/*
+   * Conversion into the standard representation
+   */
+{
+    int *dims;
+    fiff_sparse_matrix_t *res = NULL;
+    int   m,n,nz;
+    int   coding,correct_size;
+
+    if ( fiff_type_fundamental(tag->getType())   != FIFFT_MATRIX ||
+         fiff_type_base(tag->getType())          != FIFFT_FLOAT ||
+         (fiff_type_matrix_coding(tag->getType()) != FIFFTS_MC_CCS &&
+          fiff_type_matrix_coding(tag->getType()) != FIFFTS_MC_RCS) ) {
+        printf("fiff_get_float_ccs_matrix: wrong data type!");
+        return NULL;
+    }
+
+    if ((dims = fiff_get_matrix_sparse_dims(tag)) == NULL)
+        return NULL;
+
+    if (dims[0] != 2) {
+        printf("fiff_get_float_sparse_matrix: wrong # of dimensions!");
+        return NULL;
+    }
+
+    m   = dims[1];
+    n   = dims[2];
+    nz  = dims[3];
+
+    coding = fiff_type_matrix_coding(tag->getType());
+    if (coding == FIFFTS_MC_CCS)
+        correct_size = nz*(sizeof(fiff_float_t) + sizeof(fiff_int_t)) +
+                (n+1+dims[0]+2)*(sizeof(fiff_int_t));
+    else if (coding == FIFFTS_MC_RCS)
+        correct_size = nz*(sizeof(fiff_float_t) + sizeof(fiff_int_t)) +
+                (m+1+dims[0]+2)*(sizeof(fiff_int_t));
+    else {
+        printf("fiff_get_float_sparse_matrix: Incomprehensible sparse matrix coding");
+        return NULL;
+    }
+    if (tag->size() != correct_size) {
+        printf("fiff_get_float_sparse_matrix: wrong data size!");
+        FREE(dims);
+        return NULL;
+    }
+    /*
+   * Set up structure
+   */
+    res = MALLOC(1,fiff_sparse_matrix_t);
+    res->m      = m;
+    res->n      = n;
+    res->nz     = nz;
+    qDebug() << "ToDo: Check if data are correctlz set!";
+    res->data   = tag->toFloat();
+    res->coding = coding;
+    res->inds   = (int *)(res->data + res->nz);
+    res->ptrs   = res->inds + res->nz;
+
+    FREE(dims);
+
+    return res;
+}
+
+
+
 
 
 //============================= mne_named_vector.c =============================
@@ -7035,7 +7210,8 @@ MneSssData* mne_read_sss_data_from_node(//fiffFile in,
     MneSssData* s  = new MneSssData();
     QList<FiffDirNode> sss;
     FiffDirNode node;
-    fiffTag     tag;
+//    fiffTag     tag;
+    FiffTag::SPtr t_pTag;
     float       *r0;
     int j,p,q,n;
     /*
@@ -7048,42 +7224,57 @@ MneSssData* mne_read_sss_data_from_node(//fiffFile in,
         /*
         * Read the SSS information, require all tags to be present
         */
-        if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_SSS_JOB)) == NULL)
+//        if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_SSS_JOB)) == NULL)
+//            goto bad;
+        if (!node.find_tag(stream.data(), FIFF_SSS_JOB, t_pTag))
             goto bad;
-        s->job = *(fiff_int_t *)tag->data;
-        TAG_FREE(tag);
+        s->job = *t_pTag->toInt();
+//        TAG_FREE(tag);
 
-        if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_SSS_FRAME)) == NULL)
+//        if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_SSS_FRAME)) == NULL)
+//            goto bad;
+        if (!node.find_tag(stream.data(), FIFF_SSS_FRAME, t_pTag))
             goto bad;
-        s->coord_frame = *(fiff_int_t *)tag->data;
-        TAG_FREE(tag);
+        s->coord_frame = *t_pTag->toInt();
+//        TAG_FREE(tag);
 
-        if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_SSS_ORIGIN)) == NULL)
+//        if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_SSS_ORIGIN)) == NULL)
+//            goto bad;
+        if (!node.find_tag(stream.data(), FIFF_SSS_ORIGIN, t_pTag))
             goto bad;
-        r0 = (float *)tag->data;
+        r0 = t_pTag->toFloat();;
         VEC_COPY(s->origin,r0);
-        TAG_FREE(tag);
+//        TAG_FREE(tag);
 
-        if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_SSS_ORD_IN)) == NULL)
+//        if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_SSS_ORD_IN)) == NULL)
+//            goto bad;
+        if (!node.find_tag(stream.data(), FIFF_SSS_ORD_IN, t_pTag))
             goto bad;
-        s->in_order = *(fiff_int_t *)tag->data;
-        TAG_FREE(tag);
+        s->in_order = *t_pTag->toInt();
+//        TAG_FREE(tag);
 
-        if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_SSS_ORD_OUT)) == NULL)
+//        if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_SSS_ORD_OUT)) == NULL)
+//            goto bad;
+        if (!node.find_tag(stream.data(), FIFF_SSS_ORD_OUT, t_pTag))
             goto bad;
-        s->out_order = *(fiff_int_t *)tag->data;
-        TAG_FREE(tag);
+        s->out_order = *t_pTag->toInt();
+//        TAG_FREE(tag);
 
-        if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_SSS_NMAG)) == NULL)
+//        if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_SSS_NMAG)) == NULL)
+//            goto bad;
+        if (!node.find_tag(stream.data(), FIFF_SSS_NMAG, t_pTag))
             goto bad;
-        s->nchan = *(fiff_int_t *)tag->data;
-        TAG_FREE(tag);
+        s->nchan = *t_pTag->toInt();
+//        TAG_FREE(tag);
 
-        if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_SSS_COMPONENTS)) == NULL)
+//        if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_SSS_COMPONENTS)) == NULL)
+//            goto bad;
+        if (!node.find_tag(stream.data(), FIFF_SSS_COMPONENTS, t_pTag))
             goto bad;
-        s->comp_info = (fiff_int_t *)tag->data; tag->data = NULL;
-        s->ncomp     = tag->size/sizeof(fiff_int_t);
-        TAG_FREE(tag);
+        qDebug() << "ToDo: Check whether comp_info contains the right stuff!!! - use VectorXi instead";
+        s->comp_info = t_pTag->toInt(); //tag->data = NULL;
+        s->ncomp     = t_pTag->size()/sizeof(fiff_int_t);
+//        TAG_FREE(tag);
 
         if (s->ncomp != (s->in_order*(2+s->in_order) + s->out_order*(2+s->out_order))) {
             printf("Number of SSS components does not match the expansion orders listed in the file");
@@ -7308,10 +7499,15 @@ mneCovMatrix mne_read_cov(const QString& name,int kind)
       * Read a covariance matrix from a fiff
       */
 {
-    fiffFile       in = NULL;
-    fiffTag        tag;
-    fiffDirNode    *nodes = NULL;
-    fiffDirNode    covnode;
+    QFile file(name);
+    FiffStream::SPtr stream(new FiffStream(&file));
+
+//    fiffFile       in = NULL;
+//    fiffTag        tag;
+    FiffTag::SPtr t_pTag;
+//    fiffDirNode    *nodes = NULL;
+    QList<FiffDirNode> nodes;
+    FiffDirNode    covnode;
 
     char            **names    = NULL;	/* Optional channel name list */
     int             nnames     = 0;
@@ -7320,6 +7516,7 @@ mneCovMatrix mne_read_cov(const QString& name,int kind)
     mneSparseMatrix cov_sparse = NULL;
     double          *lambda    = NULL;
     float           **eigen    = NULL;
+    MatrixXf        tmp_eigen;
     char            **bads     = NULL;
     int             nbad       = 0;
     int             ncov       = 0;
@@ -7332,116 +7529,148 @@ mneCovMatrix mne_read_cov(const QString& name,int kind)
     MneSssData*     sss = NULL;
 
 
-    if ((in = fiff_open(name.toLatin1().data())) == NULL)
+//    if ((in = fiff_open(name.toLatin1().data())) == NULL)
+//        goto out;
+    if(!stream->open())
         goto out;
-    nodes = fiff_dir_tree_find(in->dirtree,FIFFB_MNE_COV);
-    if (nodes[0] == NULL) {
+//    nodes = fiff_dir_tree_find(in->dirtree,FIFFB_MNE_COV);
+    nodes = stream->tree().dir_tree_find(FIFFB_MNE_COV);
+
+    if (nodes.size() == 0) {
         printf("No covariance matrix available in %s",name.toLatin1().data());
         goto out;
     }
     /*
-   * Locate the desired matrix
-   */
-    for (covnode = NULL, k = 0 ; nodes[k] != NULL; k++) {
-        if ((tag = fiff_dir_tree_get_tag(in,nodes[k],FIFF_MNE_COV_KIND)) == NULL)
+    * Locate the desired matrix
+    */
+    for (k = 0 ; k < nodes.size(); ++k) {
+//        if ((tag = fiff_dir_tree_get_tag(in,nodes[k],FIFF_MNE_COV_KIND)) == NULL)
+//            continue;
+        if (!nodes[k].find_tag(stream.data(), FIFF_MNE_COV_KIND, t_pTag))
             continue;
-        if (*(int *)tag->data == kind) {
+
+//        if (*(int *)tag->data == kind) {
+//            covnode = nodes[k];
+        if (*t_pTag->toInt() == kind) {
             covnode = nodes[k];
-            TAG_FREE(tag);
+//            TAG_FREE(tag);
             break;
         }
-        TAG_FREE(tag);
+//        TAG_FREE(tag);
     }
-    if (covnode == NULL) {
+    if (covnode.isEmpty()) {
         printf("Desired covariance matrix not found from %s",name.toLatin1().data());
         goto out;
     }
     /*
    * Read the data
    */
-    if ((tag = fiff_dir_tree_get_tag(in,nodes[k],FIFF_MNE_COV_DIM)) == NULL)
+//    if ((tag = fiff_dir_tree_get_tag(in,nodes[k],FIFF_MNE_COV_DIM)) == NULL)
+//        goto out;
+    if (!nodes[k].find_tag(stream.data(), FIFF_MNE_COV_DIM, t_pTag))
         goto out;
-    ncov = *(int *)(tag->data);
-    TAG_FREE(tag);
+    ncov = *t_pTag->toInt();
+//    TAG_FREE(tag);
 
-    if ((tag = fiff_dir_tree_get_tag(in,nodes[k],FIFF_MNE_COV_NFREE)) != NULL) {
-        nfree = *(int *)(tag->data);
-        TAG_FREE(tag);
+//    if ((tag = fiff_dir_tree_get_tag(in,nodes[k],FIFF_MNE_COV_NFREE)) != NULL) {
+    if (nodes[k].find_tag(stream.data(), FIFF_MNE_COV_NFREE, t_pTag)) {
+        nfree = *t_pTag->toInt();
+//        TAG_FREE(tag);
     }
-    if ((tag = fiff_dir_tree_get_tag(in,covnode,FIFF_MNE_ROW_NAMES)) != NULL) {
-        mne_string_to_name_list((char *)(tag->data),&names,&nnames);
-        TAG_FREE(tag);
+//    if ((tag = fiff_dir_tree_get_tag(in,covnode,FIFF_MNE_ROW_NAMES)) != NULL) {
+    if (covnode.find_tag(stream.data(), FIFF_MNE_ROW_NAMES, t_pTag)) {
+        mne_string_to_name_list((char *)(t_pTag->data()),&names,&nnames);
+//        TAG_FREE(tag);
         if (nnames != ncov) {
             qCritical("Incorrect number of channel names for a covariance matrix");
             goto out;
         }
     }
-    if ((tag = fiff_dir_tree_get_tag(in,nodes[k],FIFF_MNE_COV)) == NULL) {
-        if ((tag = fiff_dir_tree_get_tag(in,nodes[k],FIFF_MNE_COV_DIAG)) == NULL)
+//    if ((tag = fiff_dir_tree_get_tag(in,nodes[k],FIFF_MNE_COV)) == NULL) {
+    if (!nodes[k].find_tag(stream.data(), FIFF_MNE_COV, t_pTag)) {
+//        if ((tag = fiff_dir_tree_get_tag(in,nodes[k],FIFF_MNE_COV_DIAG)) == NULL)
+        if (!nodes[k].find_tag(stream.data(), FIFF_MNE_COV_DIAG, t_pTag))
             goto out;
         else {
-            if (tag->type == FIFFT_DOUBLE) {
-                cov_diag = (double *)(tag->data);
+//            if (tag->type == FIFFT_DOUBLE) {
+            if (t_pTag->getType() == FIFFT_DOUBLE) {
+                qDebug() << "ToDo: Check whether cov_diag contains the right stuff!!! - use VectorXd instead";
+                cov_diag = t_pTag->toDouble();
                 if (check_cov_data(cov_diag,ncov) != OK)
                     goto out;
             }
-            else if (tag->type == FIFFT_FLOAT) {
+            else if (t_pTag->getType() == FIFFT_FLOAT) {
                 cov_diag = MALLOC(ncov,double);
-                f = (float *)(tag->data);
+                qDebug() << "ToDo: Check whether f contains the right stuff!!! - use VectorXf instead";
+                f = t_pTag->toFloat();
                 for (p = 0; p < ncov; p++)
                     cov_diag[p] = f[p];
-                FREE(tag->data);
+//                FREE(tag->data);
             }
             else {
                 printf("Illegal data type for covariance matrix");
                 goto out;
             }
-            FREE(tag);
+//            FREE(tag);
         }
     }
     else {
         nn = ncov*(ncov+1)/2;
-        if (tag->type == FIFFT_DOUBLE) {
-            cov = (double *)(tag->data);
+        if (t_pTag->getType() == FIFFT_DOUBLE) {
+            qDebug() << "ToDo: Check whether cov contains the right stuff!!! - use VectorXd instead";
+            cov = t_pTag->toDouble();
             if (check_cov_data(cov,nn) != OK)
                 goto out;
         }
-        else if (tag->type == FIFFT_FLOAT) {
+        else if (t_pTag->getType() == FIFFT_FLOAT) {
             cov = MALLOC(nn,double);
-            f = (float *)(tag->data);
+            f = t_pTag->toFloat();
             for (p = 0; p < nn; p++)
                 cov[p] = f[p];
-            FREE(tag->data);
+//            FREE(tag->data);
         }
-        else if ((cov_sparse = fiff_get_float_sparse_matrix(tag)) == NULL) {
-            TAG_FREE(tag);
+        else if ((cov_sparse = fiff_get_float_sparse_matrix(t_pTag)) == NULL) {
+//            TAG_FREE(tag);
             goto out;
         }
-        FREE(tag);
-        if ((tag = fiff_dir_tree_get_tag(in,nodes[k],FIFF_MNE_COV_EIGENVALUES)) != NULL) {
-            lambda = (double *)tag->data;
-            FREE(tag);
-            if ((tag = fiff_dir_tree_get_tag(in,nodes[k],FIFF_MNE_COV_EIGENVECTORS)) == NULL)
+//        FREE(tag);
+
+
+
+
+
+//        if ((tag = fiff_dir_tree_get_tag(in,nodes[k],FIFF_MNE_COV_EIGENVALUES)) != NULL) {
+        if (nodes[k].find_tag(stream.data(), FIFF_MNE_COV_EIGENVALUES, t_pTag)) {
+            lambda = (double *)t_pTag->toDouble();
+//            FREE(tag);
+//            if ((tag = fiff_dir_tree_get_tag(in,nodes[k],FIFF_MNE_COV_EIGENVECTORS)) == NULL)
+            if (nodes[k].find_tag(stream.data(), FIFF_MNE_COV_EIGENVECTORS, t_pTag))
                 goto out;
-            if ((eigen = fiff_get_float_matrix(tag)) == NULL) {
-                TAG_FREE(tag);
-                goto out;
-            }
+
+
+            tmp_eigen = t_pTag->toFloatMatrix();
+
+            fromFloatEigenMatrix(tmp_eigen, eigen);
+
+//            if ((eigen = fiff_get_float_matrix(tag)) == NULL) {
+////                TAG_FREE(tag);
+//                goto out;
+//            }
         }
         /*
      * Read the optional projection operator
      */
-        if ((op = mne_read_proj_op_from_node(in,nodes[k])) == NULL)
+        if ((op = mne_read_proj_op_from_node(stream,nodes[k])) == NULL)
             goto out;
         /*
      * Read the optional SSS data
      */
-        if ((sss = mne_read_sss_data_from_node(in,nodes[k])) == NULL)
+        if ((sss = mne_read_sss_data_from_node(stream,nodes[k])) == NULL)
             goto out;
         /*
      * Read the optional bad channel list
      */
-        if (mne_read_bad_channel_list_from_node(in,nodes[k],&bads,&nbad) == FAIL)
+        if (mne_read_bad_channel_list_from_node(stream,nodes[k],&bads,&nbad) == FAIL)
             goto out;
     }
     if (cov_sparse)
@@ -7482,7 +7711,8 @@ mneCovMatrix mne_read_cov(const QString& name,int kind)
     }
 
 out : {
-        fiff_close(in);
+//        fiff_close(in);
+        stream->device()->close();
         mne_free_proj_op(op);
         if(sss)
             delete sss;
@@ -7494,7 +7724,7 @@ out : {
             FREE(cov_diag);
             mne_free_sparse(cov_sparse);
         }
-        FREE(nodes);
+//        FREE(nodes);
         return res;
     }
 
@@ -8216,9 +8446,10 @@ int mne_read_source_spaces(const QString& name,               /* Read from here 
     int            nspace = 0;
     mneSourceSpace *spaces = NULL;
     mneSourceSpace  new_space = NULL;
-    fiffDirNode     *sources = NULL;
-    fiffDirNode     node;
-    fiffTag         tag = NULL;
+    QList<FiffDirNode> sources;
+    FiffDirNode     node;
+    FiffTag::SPtr t_pTag;
+//    fiffTag         tag = NULL;
     int             j,k,p,q;
     int             ntri;
     int             *nearest = NULL;
@@ -8229,89 +8460,108 @@ int mne_read_source_spaces(const QString& name,               /* Read from here 
 
     extern void mne_add_triangle_data(mneSourceSpace s);
 
-    if ((in = fiff_open(name.toLatin1().data())) == NULL)
+//    if ((in = fiff_open(name.toLatin1().data())) == NULL)
+//        goto bad;
+    if(!stream->open())
         goto bad;
 
-    sources = fiff_dir_tree_find(in->dirtree,FIFFB_MNE_SOURCE_SPACE);
-    if (sources[0] == NULL) {
+//    sources = fiff_dir_tree_find(in->dirtree,FIFFB_MNE_SOURCE_SPACE);
+    sources = stream->tree().dir_tree_find(FIFFB_MNE_SOURCE_SPACE);
+    if (sources.size() == 0) {
         printf("No source spaces available here");
         goto bad;
     }
-    for (j = 0; sources[j] != NULL; j++) {
+    for (j = 0; j < sources.size(); j++) {
         new_space = mne_new_source_space(0);
         node = sources[j];
         /*
-     * Get the mandatory data first
-     */
-        if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_SOURCE_SPACE_NPOINTS)) == NULL) {
-            TAG_FREE(tag);
+        * Get the mandatory data first
+        */
+//        if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_SOURCE_SPACE_NPOINTS)) == NULL) {
+        if (!node.find_tag(stream.data(), FIFF_MNE_SOURCE_SPACE_NPOINTS, t_pTag)) {
+//            TAG_FREE(tag);
             goto bad;
         }
-        new_space->np = *(int *)tag->data;
-        TAG_FREE(tag);
+        new_space->np = *t_pTag->toInt();
+//        TAG_FREE(tag);
         if (new_space->np == 0) {
             printf("No points in this source space");
             goto bad;
         }
-        if ((tag = fiff_dir_tree_get_tag(in,node,
-                                         FIFF_MNE_SOURCE_SPACE_POINTS)) == NULL)
+//        if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_SOURCE_SPACE_POINTS)) == NULL)
+        if (!node.find_tag(stream.data(), FIFF_MNE_SOURCE_SPACE_POINTS, t_pTag))
             goto bad;
-        if ((new_space->rr = fiff_get_float_matrix(tag)) == NULL) {
-            TAG_FREE(tag);
+        MatrixXf tmp_rr = t_pTag->toFloatMatrix();
+        fromFloatEigenMatrix(tmp_rr,new_space->rr);
+//        if ((new_space->rr = fiff_get_float_matrix(tag)) == NULL) {
+////            TAG_FREE(tag);
+//            goto bad;
+//        }
+//        FREE(tag);
+//        if ((tag = fiff_dir_tree_get_tag(in,node, FIFF_MNE_SOURCE_SPACE_NORMALS)) == NULL)
+        if (!node.find_tag(stream.data(), FIFF_MNE_SOURCE_SPACE_NORMALS, t_pTag))
             goto bad;
-        }
-        FREE(tag);
-        if ((tag = fiff_dir_tree_get_tag(in,node,
-                                         FIFF_MNE_SOURCE_SPACE_NORMALS)) == NULL)
-            goto bad;
-        if ((new_space->nn = fiff_get_float_matrix(tag)) == NULL) {
-            TAG_FREE(tag);
-            goto bad;
-        }
-        FREE(tag);
+        MatrixXf tmp_nn = t_pTag->toFloatMatrix();
+        fromFloatEigenMatrix(tmp_nn,new_space->nn);
+//        if ((new_space->nn = fiff_get_float_matrix(tag)) == NULL) {
+////            TAG_FREE(tag);
+//            goto bad;
+//        }
+//        FREE(tag);
 
-        if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_COORD_FRAME)) == NULL) {
+//        if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_COORD_FRAME)) == NULL) {
+        if (!node.find_tag(stream.data(), FIFF_MNE_COORD_FRAME, t_pTag)) {
             new_space->coord_frame = FIFFV_COORD_MRI;
         }
         else {
-            new_space->coord_frame = *(int *)tag->data;
-            TAG_FREE(tag);
+            new_space->coord_frame = *t_pTag->toInt();
+//            TAG_FREE(tag);
         }
-        if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_SOURCE_SPACE_ID)) != NULL) {
-            new_space->id = *(int *)tag->data;
-            TAG_FREE(tag);
+//        if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_SOURCE_SPACE_ID)) != NULL) {
+        if (node.find_tag(stream.data(), FIFF_MNE_SOURCE_SPACE_ID, t_pTag)) {
+            new_space->id = *t_pTag->toInt();
+//            TAG_FREE(tag);
         }
-        if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_SUBJ_HIS_ID)) != NULL) {
-            new_space->subject = (char *)tag->data;
-            FREE(tag);
+//        if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_SUBJ_HIS_ID)) != NULL) {
+        if (node.find_tag(stream.data(), FIFF_SUBJ_HIS_ID, t_pTag)) {
+            new_space->subject = (char *)t_pTag->data();
+//            FREE(tag);
         }
-        if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_SOURCE_SPACE_TYPE)) != NULL) {
-            new_space->type = *(int *)tag->data;
-            TAG_FREE(tag);
+//        if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_SOURCE_SPACE_TYPE)) != NULL) {
+        if (node.find_tag(stream.data(), FIFF_MNE_SOURCE_SPACE_TYPE, t_pTag)) {
+            new_space->type = *t_pTag->toInt();
+//            TAG_FREE(tag);
         }
         ntri = 0;
-        if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_BEM_SURF_NTRI))) {
-            ntri = *(int *)tag->data;
-            TAG_FREE(tag);
+//        if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_BEM_SURF_NTRI))) {
+        if (node.find_tag(stream.data(), FIFF_BEM_SURF_NTRI, t_pTag)) {
+            ntri = *t_pTag->toInt();
+//            TAG_FREE(tag);
         }
-        else if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_SOURCE_SPACE_NTRI))) {
-            ntri = *(int *)tag->data;
-            TAG_FREE(tag);
+//        else if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_SOURCE_SPACE_NTRI))) {
+        else if (node.find_tag(stream.data(), FIFF_MNE_SOURCE_SPACE_NTRI, t_pTag)) {
+            ntri = *t_pTag->toInt();
+//            TAG_FREE(tag);
         }
         if (ntri > 0) {
             int **itris = NULL;
 
-            if ((tag = fiff_dir_tree_get_tag(in,node,
-                                             FIFF_BEM_SURF_TRIANGLES)) == NULL) {
-                if ((tag = fiff_dir_tree_get_tag(in,node,
-                                                 FIFF_MNE_SOURCE_SPACE_TRIANGLES)) == NULL)
+//            if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_BEM_SURF_TRIANGLES)) == NULL) {
+            if (!node.find_tag(stream.data(), FIFF_BEM_SURF_TRIANGLES, t_pTag)) {
+//                if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_SOURCE_SPACE_TRIANGLES)) == NULL)
+                if (node.find_tag(stream.data(), FIFF_MNE_SOURCE_SPACE_TRIANGLES, t_pTag))
                     goto bad;
             }
-            if ((itris = fiff_get_int_matrix(tag)) == NULL) {
-                TAG_FREE(tag);
-                goto bad;
-            }
-            FREE(tag);
+
+            MatrixXi tmp_itris = t_pTag->toIntMatrix();
+
+            fromIntEigenMatrix(tmp_itris, itris);
+
+//            if ((itris = fiff_get_int_matrix(tag)) == NULL) {
+////                TAG_FREE(tag);
+//                goto bad;
+//            }
+//            FREE(tag);
             for (p = 0; p < ntri; p++) { /* Adjust the numbering */
                 itris[p][X]--;
                 itris[p][Y]--;
@@ -8320,7 +8570,8 @@ int mne_read_source_spaces(const QString& name,               /* Read from here 
             new_space->itris = itris; itris = NULL;
             new_space->ntri = ntri;
         }
-        if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_SOURCE_SPACE_NUSE)) == NULL) {
+//        if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_SOURCE_SPACE_NUSE)) == NULL) {
+        if (!node.find_tag(stream.data(), FIFF_MNE_SOURCE_SPACE_NUSE, t_pTag)) {
             if (new_space->type == FIFFV_MNE_SPACE_VOLUME) {
                 /*
          * Use all
@@ -8346,16 +8597,19 @@ int mne_read_source_spaces(const QString& name,               /* Read from here 
             }
         }
         else {
-            new_space->nuse = *(int *)tag->data;
-            TAG_FREE(tag);
-            if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_SOURCE_SPACE_SELECTION)) == NULL) {
-                TAG_FREE(tag);
+            new_space->nuse = *t_pTag->toInt();
+//            TAG_FREE(tag);
+//            if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_SOURCE_SPACE_SELECTION)) == NULL) {
+            if (!node.find_tag(stream.data(), FIFF_MNE_SOURCE_SPACE_SELECTION, t_pTag)) {
+//                TAG_FREE(tag);
                 goto bad;
             }
-            new_space->inuse  = (int *)tag->data;
+
+            qDebug() << "ToDo: Check whether new_space->inuse contains the right stuff!!! - use VectorXi instead";
+            new_space->inuse  = t_pTag->toInt();
             if (new_space->nuse > 0) {
                 new_space->vertno = MALLOC(new_space->nuse,int);
-                FREE(tag);
+//                FREE(tag);
                 for (k = 0, p = 0; k < new_space->np; k++)
                     if (new_space->inuse[k])
                         new_space->vertno[p++] = k;
@@ -8365,25 +8619,28 @@ int mne_read_source_spaces(const QString& name,               /* Read from here 
                 new_space->vertno = NULL;
             }
             /*
-       * Selection triangulation
-       */
+            * Selection triangulation
+            */
             ntri = 0;
-            if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_SOURCE_SPACE_NUSE_TRI))) {
-                ntri = *(int *)tag->data;
-                TAG_FREE(tag);
+//            if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_SOURCE_SPACE_NUSE_TRI))) {
+            if (node.find_tag(stream.data(), FIFF_MNE_SOURCE_SPACE_NUSE_TRI, t_pTag)) {
+                ntri = *t_pTag->toInt();
+//                TAG_FREE(tag);
             }
             if (ntri > 0) {
                 int **itris = NULL;
 
-                if ((tag = fiff_dir_tree_get_tag(in,node,
-                                                 FIFF_MNE_SOURCE_SPACE_USE_TRIANGLES)) == NULL)
+//                if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_SOURCE_SPACE_USE_TRIANGLES)) == NULL)
+                if (!node.find_tag(stream.data(), FIFF_MNE_SOURCE_SPACE_USE_TRIANGLES, t_pTag))
                     goto bad;
 
-                if ((itris = fiff_get_int_matrix(tag)) == NULL) {
-                    TAG_FREE(tag);
-                    goto bad;
-                }
-                FREE(tag);
+                MatrixXi tmp_itris = t_pTag->toIntMatrix();
+                fromIntEigenMatrix(tmp_itris, itris);
+//                if ((itris = fiff_get_int_matrix(tag)) == NULL) {
+////                    TAG_FREE(tag);
+//                    goto bad;
+//                }
+//                FREE(tag);
                 for (p = 0; p < ntri; p++) { /* Adjust the numbering */
                     itris[p][X]--;
                     itris[p][Y]--;
@@ -8393,17 +8650,20 @@ int mne_read_source_spaces(const QString& name,               /* Read from here 
                 new_space->nuse_tri = ntri;
             }
             /*
-       * The patch information becomes relevant here
-       */
-            if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_SOURCE_SPACE_NEAREST)) != NULL) {
-                nearest  = (int *)tag->data;
-                FREE(tag);
-                if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_SOURCE_SPACE_NEAREST_DIST)) == NULL) {
-                    TAG_FREE(tag);
+            * The patch information becomes relevant here
+            */
+//            if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_SOURCE_SPACE_NEAREST)) != NULL) {
+            if (node.find_tag(stream.data(), FIFF_MNE_SOURCE_SPACE_NEAREST, t_pTag)) {
+                nearest  = t_pTag->toInt();
+//                FREE(tag);
+//                if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_SOURCE_SPACE_NEAREST_DIST)) == NULL) {
+                if (!node.find_tag(stream.data(), FIFF_MNE_SOURCE_SPACE_NEAREST_DIST, t_pTag)) {
+//                    TAG_FREE(tag);
                     goto bad;
                 }
-                nearest_dist = (float *)tag->data;
-                FREE(tag);
+                qDebug() << "ToDo: Check whether nearest_dist contains the right stuff!!! - use VectorXf instead";
+                nearest_dist = t_pTag->toFloat();
+//                FREE(tag);
                 new_space->nearest = MALLOC(new_space->np,mneNearestRec);
                 for (k = 0; k < new_space->np; k++) {
                     new_space->nearest[k].vert = k;
@@ -8415,16 +8675,18 @@ int mne_read_source_spaces(const QString& name,               /* Read from here 
                 FREE(nearest_dist); nearest_dist = NULL;
             }
             /*
-       * We may have the distance matrix
-       */
-            if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_SOURCE_SPACE_DIST_LIMIT)) != NULL) {
-                new_space->dist_limit = *(int *)tag->data;
-                TAG_FREE(tag);
-                if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_SOURCE_SPACE_DIST)) != NULL) {
-                    mneSparseMatrix dist = fiff_get_float_sparse_matrix(tag);
+            * We may have the distance matrix
+            */
+//            if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_SOURCE_SPACE_DIST_LIMIT)) != NULL) {
+            if (node.find_tag(stream.data(), FIFF_MNE_SOURCE_SPACE_DIST_LIMIT, t_pTag)) {
+                new_space->dist_limit = *t_pTag->toInt();
+//                TAG_FREE(tag);
+//                if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_SOURCE_SPACE_DIST)) != NULL) {
+                if (node.find_tag(stream.data(), FIFF_MNE_SOURCE_SPACE_DIST, t_pTag)) {
+                    mneSparseMatrix dist = fiff_get_float_sparse_matrix(t_pTag);
                     new_space->dist = mne_add_upper_triangle_rcs(dist);
                     mne_free_sparse(dist);
-                    TAG_FREE(tag);
+//                    TAG_FREE(tag);
                     if (!new_space->dist)
                         goto bad;
                 }
@@ -8433,23 +8695,27 @@ int mne_read_source_spaces(const QString& name,               /* Read from here 
             }
         }
         /*
-     * For volume source spaces we might have the neighborhood information
-     */
+        * For volume source spaces we might have the neighborhood information
+        */
         if (new_space->type == FIFFV_MNE_SPACE_VOLUME) {
             int ntot,nvert,ntot_count,nneigh;
             int *neigh;
 
             nneighbors = neighbors = NULL;
             ntot = nvert = 0;
-            if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_SOURCE_SPACE_NEIGHBORS)) != NULL) {
-                neighbors = (int *)tag->data;
-                ntot      = tag->size/sizeof(fiff_int_t);
-                FREE(tag);
+//            if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_SOURCE_SPACE_NEIGHBORS)) != NULL) {
+            if (node.find_tag(stream.data(), FIFF_MNE_SOURCE_SPACE_NEIGHBORS, t_pTag)) {
+                qDebug() << "ToDo: Check whether neighbors contains the right stuff!!! - use VectorXi instead";
+                neighbors = t_pTag->toInt();
+                ntot      = t_pTag->size()/sizeof(fiff_int_t);
+//                FREE(tag);
             }
-            if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_SOURCE_SPACE_NNEIGHBORS)) != NULL) {
-                nneighbors = (int *)tag->data;
-                nvert      = tag->size/sizeof(fiff_int_t);
-                FREE(tag);
+//            if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_SOURCE_SPACE_NNEIGHBORS)) != NULL) {
+            if (node.find_tag(stream.data(), FIFF_MNE_SOURCE_SPACE_NNEIGHBORS, t_pTag)) {
+                qDebug() << "ToDo: Check whether nneighbors contains the right stuff!!! - use VectorXi instead";
+                nneighbors = t_pTag->toInt();
+                nvert      = t_pTag->size()/sizeof(fiff_int_t);
+//                FREE(tag);
             }
             if (neighbors && nneighbors) {
                 if (nvert != new_space->np) {
@@ -8475,54 +8741,64 @@ int mne_read_source_spaces(const QString& name,               /* Read from here 
             FREE(nneighbors);
             nneighbors = neighbors = NULL;
             /*
-       * There might be a coordinate transformation and dimensions
-       */
-            new_space->voxel_surf_RAS_t   = mne_read_transform_from_node(in, node, FIFFV_MNE_COORD_MRI_VOXEL, FIFFV_MNE_COORD_SURFACE_RAS);
-            if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_SOURCE_SPACE_VOXEL_DIMS)) != NULL) {
-                vol_dims = (int *)tag->data;
-                FREE(tag);
+            * There might be a coordinate transformation and dimensions
+            */
+            new_space->voxel_surf_RAS_t   = mne_read_transform_from_node(stream, node, FIFFV_MNE_COORD_MRI_VOXEL, FIFFV_MNE_COORD_SURFACE_RAS);
+//            if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_SOURCE_SPACE_VOXEL_DIMS)) != NULL) {
+            if (!node.find_tag(stream.data(), FIFF_MNE_SOURCE_SPACE_VOXEL_DIMS, t_pTag)) {
+                qDebug() << "ToDo: Check whether vol_dims contains the right stuff!!! - use VectorXi instead";
+                vol_dims = t_pTag->toInt();
+//                FREE(tag);
             }
             if (vol_dims)
                 VEC_COPY(new_space->vol_dims,vol_dims);
             {
-                fiffDirNode     *mris = fiff_dir_tree_find(node,FIFFB_MNE_PARENT_MRI_FILE);
+                QList<FiffDirNode>  mris = node.dir_tree_find(FIFFB_MNE_PARENT_MRI_FILE);
 
-                if (!mris || mris[0] == NULL) { /* The old way */
-                    new_space->MRI_surf_RAS_RAS_t = mne_read_transform_from_node(in, node, FIFFV_MNE_COORD_SURFACE_RAS, FIFFV_MNE_COORD_RAS);
-                    if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_SOURCE_SPACE_MRI_FILE)) != NULL) {
-                        new_space->MRI_volume = (char *)tag->data;
-                        FREE(tag);
+                if (mris.size() == 0) { /* The old way */
+                    new_space->MRI_surf_RAS_RAS_t = mne_read_transform_from_node(stream, node, FIFFV_MNE_COORD_SURFACE_RAS, FIFFV_MNE_COORD_RAS);
+//                    if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_SOURCE_SPACE_MRI_FILE)) != NULL) {
+                    if (node.find_tag(stream.data(), FIFF_MNE_SOURCE_SPACE_MRI_FILE, t_pTag)) {
+                        qDebug() << "ToDo: Check whether new_space->MRI_volume  contains the right stuff!!! - use QString instead";
+                        new_space->MRI_volume = (char *)t_pTag->data();
+//                        FREE(tag);
                     }
-                    if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_SOURCE_SPACE_INTERPOLATOR)) != NULL) {
-                        new_space->interpolator = fiff_get_float_sparse_matrix(tag);
-                        TAG_FREE(tag);
+//                    if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_SOURCE_SPACE_INTERPOLATOR)) != NULL) {
+                    if (node.find_tag(stream.data(), FIFF_MNE_SOURCE_SPACE_INTERPOLATOR, t_pTag)) {
+                        new_space->interpolator = fiff_get_float_sparse_matrix(t_pTag);
+//                        TAG_FREE(tag);
                     }
                 }
                 else {
-                    if ((tag = fiff_dir_tree_get_tag(in,mris[0],FIFF_MNE_FILE_NAME)) != NULL) {
-                        new_space->MRI_volume = (char *)tag->data;
-                        FREE(tag);
+//                    if ((tag = fiff_dir_tree_get_tag(in,mris[0],FIFF_MNE_FILE_NAME)) != NULL) {
+                    if (node.find_tag(stream.data(), FIFF_MNE_FILE_NAME, t_pTag)) {
+                        new_space->MRI_volume = (char *)t_pTag->data();
+//                        FREE(tag);
                     }
-                    new_space->MRI_surf_RAS_RAS_t = mne_read_transform_from_node(in, mris[0], FIFFV_MNE_COORD_SURFACE_RAS, FIFFV_MNE_COORD_RAS);
-                    new_space->MRI_voxel_surf_RAS_t   = mne_read_transform_from_node(in, mris[0], FIFFV_MNE_COORD_MRI_VOXEL, FIFFV_MNE_COORD_SURFACE_RAS);
-                    if ((tag = fiff_dir_tree_get_tag(in,mris[0],FIFF_MNE_SOURCE_SPACE_INTERPOLATOR)) != NULL) {
-                        new_space->interpolator = fiff_get_float_sparse_matrix(tag);
-                        TAG_FREE(tag);
+                    new_space->MRI_surf_RAS_RAS_t = mne_read_transform_from_node(stream, mris[0], FIFFV_MNE_COORD_SURFACE_RAS, FIFFV_MNE_COORD_RAS);
+                    new_space->MRI_voxel_surf_RAS_t   = mne_read_transform_from_node(stream, mris[0], FIFFV_MNE_COORD_MRI_VOXEL, FIFFV_MNE_COORD_SURFACE_RAS);
+//                    if ((tag = fiff_dir_tree_get_tag(in,mris[0],FIFF_MNE_SOURCE_SPACE_INTERPOLATOR)) != NULL) {
+                    if (mris[0].find_tag(stream.data(), FIFF_MNE_SOURCE_SPACE_INTERPOLATOR, t_pTag)) {
+                        new_space->interpolator = fiff_get_float_sparse_matrix(t_pTag);
+//                        TAG_FREE(tag);
                     }
-                    if ((tag = fiff_dir_tree_get_tag(in,mris[0],FIFF_MRI_WIDTH))) {
-                        new_space->MRI_vol_dims[0] = *(int *)tag->data;
-                        TAG_FREE(tag);
+//                    if ((tag = fiff_dir_tree_get_tag(in,mris[0],FIFF_MRI_WIDTH))) {
+                    if (mris[0].find_tag(stream.data(), FIFF_MRI_WIDTH, t_pTag)) {
+                        new_space->MRI_vol_dims[0] = *t_pTag->toInt();
+//                        TAG_FREE(tag);
                     }
-                    if ((tag = fiff_dir_tree_get_tag(in,mris[0],FIFF_MRI_HEIGHT))) {
-                        new_space->MRI_vol_dims[1] = *(int *)tag->data;
-                        TAG_FREE(tag);
+//                    if ((tag = fiff_dir_tree_get_tag(in,mris[0],FIFF_MRI_HEIGHT))) {
+                    if (mris[0].find_tag(stream.data(), FIFF_MRI_HEIGHT, t_pTag)) {
+                        new_space->MRI_vol_dims[1] = *t_pTag->toInt();
+//                        TAG_FREE(tag);
                     }
-                    if ((tag = fiff_dir_tree_get_tag(in,mris[0],FIFF_MRI_DEPTH))) {
-                        new_space->MRI_vol_dims[2] = *(int *)tag->data;
-                        TAG_FREE(tag);
+//                    if ((tag = fiff_dir_tree_get_tag(in,mris[0],FIFF_MRI_DEPTH))) {
+                    if (mris[0].find_tag(stream.data(), FIFF_MRI_DEPTH, t_pTag)) {
+                        new_space->MRI_vol_dims[2] = *t_pTag->toInt();
+//                        TAG_FREE(tag);
                     }
                 }
-                FREE(mris);
+//                FREE(mris);
             }
         }
         mne_add_triangle_data(new_space);
@@ -8536,7 +8812,7 @@ int mne_read_source_spaces(const QString& name,               /* Read from here 
     *spacesp = spaces;
     *nspacep = nspace;
 
-    FREE(sources);
+//    FREE(sources);
     return FIFF_OK;
 
 
@@ -8547,7 +8823,7 @@ bad : {
         for (k = 0; k < nspace; k++)
             mne_free_source_space(spaces[k]);
         FREE(spaces);
-        FREE(sources);
+//        FREE(sources);
         FREE(nearest);
         FREE(nearest_dist);
         FREE(neighbors);
