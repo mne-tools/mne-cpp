@@ -1673,10 +1673,9 @@ static int get_all_chs (//fiffFile file,	        /* The file we are reading */
     /*
     * Others from FIFFB_MEAS_INFO
     */
-    for (k = 0; k < meas_info[0].nent; k++)
+    for (k = 0; k < meas_info[0].nent; k++) {
         kind = meas_info[0].dir[k].kind;
         pos  = meas_info[0].dir[k].pos;
-
         switch (kind) {
         case FIFF_NCHAN :
 //            if (fiff_read_this_tag (file->fd,this_entry->pos,&tag) == -1)
@@ -1708,6 +1707,7 @@ static int get_all_chs (//fiffFile file,	        /* The file we are reading */
             to_find--;
             break;
         }
+    }
 //    FREE (tag.data);
     *chp = ch;
     return FIFF_OK;
@@ -2198,7 +2198,7 @@ fiffCoordTrans mne_read_transform(const QString& name,int from, int to)
 
 
     fiffCoordTrans res = NULL;
-    fiffFile       in = NULL;
+//    fiffFile       in = NULL;
     FiffTag::SPtr t_pTag;
 //    fiffTagRec     tag;
 //    fiffDirEntry   dir;
@@ -2211,8 +2211,7 @@ fiffCoordTrans mne_read_transform(const QString& name,int from, int to)
     if(!stream->open())
         goto out;
 
-
-    for (k = 0; k < in->nent; k++)
+    for (k = 0; k < stream->dir().size(); k++) {
         kind = stream->dir()[k].kind;
         pos  = stream->dir()[k].pos;
         if (kind == FIFF_COORD_TRANS) {
@@ -2232,6 +2231,7 @@ fiffCoordTrans mne_read_transform(const QString& name,int from, int to)
             }
             res = NULL;
         }
+    }
     qCritical("No suitable coordinate transformation found in %s.",name.toLatin1().data());
     goto out;
 
