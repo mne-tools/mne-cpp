@@ -110,6 +110,7 @@
  *
  */
 #include <fiff/fiff_types.h>
+#include <fiff/fiff_stream.h>
 #include "mne_sss_data.h"
 
 #if defined(__cplusplus) 
@@ -457,7 +458,7 @@ typedef struct {		/* Information about raw data in fiff file */
 				 * whence it may be inaccurate. */
   int           buf_size;	/* Buffer size in samples */
   int           maxshield_data; /* Are these unprocessed MaxShield data */
-  FIFFLIB::fiffDirEntry  rawDir;		/* Directory of raw data tags
+  QList<FIFFLIB::FiffDirEntry>  rawDir;		/* Directory of raw data tags
 				 * These may be of type
 				 *       FIFF_DATA_BUFFER
 				 *       FIFF_DATA_SKIP
@@ -560,7 +561,7 @@ typedef struct {
 #endif
 
 typedef struct {
-  FIFFLIB::fiffDirEntry ent;		/* Where is this in the file (file bufs only, pointer to info) */
+  FIFFLIB::FiffDirEntry ent;		/* Where is this in the file (file bufs only, pointer to info) */
   int   firsts,lasts;		/* First and last sample */
   int   ntaper;			/* For filtered buffers: taper length */
   int   ns;			/* Number of samples (last - first + 1) */
@@ -626,7 +627,8 @@ typedef struct {		        /* A collection of derivations */
 
 typedef struct {			/* A comprehensive raw data structure */
   char             *filename;           /* This is our file */
-  FIFFLIB::fiffFile         file;
+//  FIFFLIB::fiffFile         file;
+  FIFFLIB::FiffStream::SPtr stream;
   mneRawInfo       info;	        /* Loaded using the mne routines */
   char             **ch_names;		/* Useful to have the channel names as a single list */
   char             **badlist;		/* Bad channel names */
