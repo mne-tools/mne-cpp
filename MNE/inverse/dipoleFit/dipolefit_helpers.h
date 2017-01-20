@@ -1628,7 +1628,7 @@ static int get_all_chs (//fiffFile file,	        /* The file we are reading */
       */
 {
 //    fiffTagRec tag;
-    fiffDirEntry this_entry;
+//    fiffDirEntry this_entry;
     fiffChInfo ch;
     fiffChInfo this_ch;
     int j,k;
@@ -3002,7 +3002,7 @@ fiff_sparse_matrix_t *fiff_get_float_sparse_matrix(FiffTag::SPtr& tag)
     res->m      = m;
     res->n      = n;
     res->nz     = nz;
-    qDebug() << "ToDo: Check if data are correctlz set!";
+    qDebug() << "ToDo: Check if data are correctly set!";
     res->data   = tag->toFloat();
     res->coding = coding;
     res->inds   = (int *)(res->data + res->nz);
@@ -4334,7 +4334,7 @@ static int get_meas_info (//fiffFile file,	 /* The file we are reading */
 
         case FIFF_COORD_TRANS :
 //            if (fiff_read_this_tag (in->fd,dir->pos,&tag) == FIFF_FAIL)
-//                goto out;
+//                goto bad;
 //            t = (fiffCoordTrans)tag.data;
             if (!FiffTag::read_tag(stream.data(),t_pTag,pos))
                 goto bad;
@@ -4581,7 +4581,7 @@ static int get_evoked_optional(//fiffFile file,	 /* The file we are reading */
       */
 {
     int res = FIFF_FAIL;
-    fiffDirEntry this_ent;
+//    fiffDirEntry this_ent;
     fiffChInfo   new_ch = NULL;
     int          new_nchan = *nchan;
     int          k,to_find;
@@ -4916,8 +4916,7 @@ int mne_read_evoked(const QString& name,           /* Name of the file */
     /*
    * Get various things...
    */
-    if (get_meas_info (stream,start,&id,&meas_date,&nchan,&sfreq,&highpass,&lowpass,
-                       &chs,&trans) == -1)
+    if (get_meas_info (stream,start,&id,&meas_date,&nchan,&sfreq,&highpass,&lowpass,&chs,&trans) == -1)
         goto out;
     /*
    * sfreq is listed here again because
@@ -14871,7 +14870,7 @@ void mne_free_raw_info(mneRawInfo info)
     FREE(info->filename);
     FREE(info->chInfo);
     FREE(info->trans);
-    FREE(info->rawDir);
+//    FREE(info->rawDir);
     FREE(info->id);
     FREE(info);
     return;
@@ -14925,29 +14924,32 @@ int mne_read_raw_buffer_t(//fiffFile     in,        /* Input file */
             printf("Incorrect number of samples in buffer.");
             goto bad;
         }
-        this_samplef = (fiff_float_t *)tag.data;
+        qDebug() << "ToDo: Check whether this_samplef contains the right stuff!!! - use VectorXf instead";
+        this_samplef = t_pTag->toFloat();
         for (s = 0; s < nsamp; s++, this_samplef += nchan) {
             for (c = 0; c < npick; c++)
                 data[c][s] = mult[c]*this_samplef[pickno[c]];
         }
     }
     else if (ent.type == FIFFT_SHORT || ent.type == FIFFT_DAU_PACK16) {
-        if ((int)(tag.size/(sizeof(fiff_short_t)*nchan)) != nsamp) {
+        if ((int)(t_pTag->size()/(sizeof(fiff_short_t)*nchan)) != nsamp) {
             printf("Incorrect number of samples in buffer.");
             goto bad;
         }
-        this_samples = (fiff_short_t *)tag.data;
+        qDebug() << "ToDo: Check whether this_samples contains the right stuff!!! - use VectorXi instead";
+        this_samples = (fiff_short_t *)t_pTag->data();
         for (s = 0; s < nsamp; s++, this_samples += nchan) {
             for (c = 0; c < npick; c++)
                 data[c][s] = mult[c]*this_samples[pickno[c]];
         }
     }
     else if (ent.type == FIFFT_INT) {
-        if ((int)(tag.size/(sizeof(fiff_int_t)*nchan)) != nsamp) {
+        if ((int)(t_pTag->size()/(sizeof(fiff_int_t)*nchan)) != nsamp) {
             printf("Incorrect number of samples in buffer.");
             goto bad;
         }
-        this_sample = (fiff_int_t *)tag.data;
+        qDebug() << "ToDo: Check whether this_sample contains the right stuff!!! - use VectorXi instead";
+        this_sample = t_pTag->toInt();
         for (s = 0; s < nsamp; s++, this_sample += nchan) {
             for (c = 0; c < npick; c++)
                 data[c][s] = mult[c]*this_sample[pickno[c]];
@@ -15305,8 +15307,9 @@ static FiffDirNode find_maxshield (const FiffDirNode& node)
 }
 
 
-static int get_meas_info (fiffFile file,	 /* The file we are reading */
-                          fiffDirNode node,	 /* The directory node containing our data */
+static int get_meas_info (//fiffFile file,	 /* The file we are reading */
+                          FiffStream::SPtr& stream,
+                          FiffDirNode& node,	 /* The directory node containing our data */
                           fiffId *id,	         /* The block id from the nearest FIFFB_MEAS
                                                                               parent */
                           int *nchan,	         /* Number of channels */
@@ -15323,51 +15326,70 @@ static int get_meas_info (fiffFile file,	 /* The file we are reading */
       * node.
       */
 {
-    fiffTagRec tag;
-    fiffDirEntry this_ent;
+    FiffTag::SPtr t_pTag;
+//    fiffTagRec tag;
+//    fiffDirEntry this_ent;
     fiffChInfo ch;
     fiffChInfo this_ch;
     fiffCoordTrans t;
     int j,k;
     int to_find = 4;
-    fiffDirNode *hpi,meas;
+    QList<FiffDirNode> hpi;
+    QList<FiffDirNode> meas;
+    QList<FiffDirNode> meas_info;
+    fiff_int_t kind, pos;
 
-    tag.data    = NULL;
+//    tag.data    = NULL;
     *chp        = NULL;
     ch          = NULL;
     *trans      = NULL;
     *id         = NULL;
     *start_time = NULL;
     /*
-   * Find desired parents
-   */
-    if ((meas = find_meas(node)) == NULL) {
+    * Find desired parents
+    */
+    meas = node.dir_tree_find(FIFFB_MEAS);
+//    if ((meas = find_meas(node)) == NULL) {
+    if (meas.size() == 0) {
         printf ("Meas. block not found!");
         goto bad;
     }
-    if ((node = find_meas_info(node)) == NULL) {
+
+    meas_info = node.dir_tree_find(FIFFB_MEAS_INFO);
+//    if ((node = find_meas_info(node)) == NULL) {
+    if (meas_info.count() == 0) {
         printf ("Meas. info not found!");
         goto bad;
     }
     /*
    * Is there a block id is in the FIFFB_MEAS node?
    */
-    if (meas->id != NULL) {
+//    if (meas->id != NULL) {
+    if (!meas[0].id.isEmpty()) {
         *id = MALLOC(1,fiffIdRec);
-        memcpy (*id,meas->id,sizeof(fiffIdRec));
+//        memcpy (*id,meas[0].id,sizeof(fiffIdRec));
+        (*id)->version = meas[0].id.version;
+        (*id)->machid[0] = meas[0].id.machid[0];
+        (*id)->machid[1] = meas[0].id.machid[1];
+        (*id)->time = meas[0].id.time;
     }
     /*
    * Others from FIFFB_MEAS_INFO
    */
     *lowpass  = -1;
     *highpass = -1;
-    for (k = 0,this_ent = node->dir; k < node->nent; k++,this_ent++) {
-        switch (this_ent->kind) {
+    for (k = 0; k < meas_info[0].nent; k++) {
+        kind = meas_info[0].dir[k].kind;
+        pos  = meas_info[0].dir[k].pos;
+        switch (kind) {
 
         case FIFF_NCHAN :
-            if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
+//            if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
+//                goto bad;
+//            *nchan = *(int *)(tag.data);
+            if (!FiffTag::read_tag(stream.data(),t_pTag,pos))
                 goto bad;
-            *nchan = *(int *)(tag.data);
+            *nchan = *t_pTag->toInt();
             ch = MALLOC(*nchan,fiffChInfoRec);
             for (j = 0; j < *nchan; j++)
                 ch[j].scanNo = -1;
@@ -15375,32 +15397,44 @@ static int get_meas_info (fiffFile file,	 /* The file we are reading */
             break;
 
         case FIFF_SFREQ :
-            if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
+//            if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
+//                goto bad;
+//            *sfreq = *(float *)(tag.data);
+            if (!FiffTag::read_tag(stream.data(),t_pTag,pos))
                 goto bad;
-            *sfreq = *(float *)(tag.data);
+            *sfreq = *t_pTag->toFloat();
             to_find--;
             break;
 
         case FIFF_LOWPASS :
-            if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
+//            if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
+//                goto bad;
+//            *lowpass = *(float *)(tag.data);
+            if (!FiffTag::read_tag(stream.data(),t_pTag,pos))
                 goto bad;
-            *lowpass = *(float *)(tag.data);
+            *lowpass = *t_pTag->toFloat();
             to_find--;
             break;
 
         case FIFF_HIGHPASS :
-            if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
+//            if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
+//                goto bad;
+//            *highpass = *(float *)(tag.data);
+            if (!FiffTag::read_tag(stream.data(),t_pTag,pos))
                 goto bad;
-            *highpass = *(float *)(tag.data);
+            *highpass = *t_pTag->toFloat();
             to_find--;
             break;
 
         case FIFF_CH_INFO :		/* Information about one channel */
-            if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
+//            if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
+//                goto bad;
+//            this_ch = (fiffChInfo)(tag.data);
+            if (!FiffTag::read_tag(stream.data(),t_pTag,pos))
                 goto bad;
-            this_ch = (fiffChInfo)(tag.data);
+            this_ch = (fiffChInfo)t_pTag->data();
             if (this_ch->scanNo <= 0 || this_ch->scanNo > *nchan) {
-                printf ("FIFF_CH_INFO : scan # out of range!");
+                qCritical ("FIFF_CH_INFO : scan # out of range!");
                 goto bad;
             }
             else
@@ -15410,47 +15444,59 @@ static int get_meas_info (fiffFile file,	 /* The file we are reading */
             break;
 
         case FIFF_MEAS_DATE :
-            if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
+//            if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
+//                goto bad;
+            if (!FiffTag::read_tag(stream.data(),t_pTag,pos))
                 goto bad;
             if (*start_time)
                 FREE(*start_time);
-            *start_time = (fiffTime)tag.data;
-            tag.data = NULL;
+//            *start_time = (fiffTime)tag.data;
+            *start_time = (fiffTime)t_pTag->data();
+//            tag.data = NULL;
             break;
 
         case FIFF_COORD_TRANS :
-            if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
+//            if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
+//                goto bad;
+//            t = (fiffCoordTrans)tag.data;
+            if (!FiffTag::read_tag(stream.data(),t_pTag,pos))
                 goto bad;
-            t = (fiffCoordTrans)tag.data;
+            t = (fiffCoordTrans)t_pTag->data();
             /*
-       * Require this particular transform!
-       */
+            * Require this particular transform!
+            */
             if (t->from == FIFFV_COORD_DEVICE && t->to == FIFFV_COORD_HEAD) {
                 *trans = t;
-                tag.data = NULL;
+//                tag.data = NULL;
                 break;
             }
         }
     }
     /*
-   * Search for the coordinate transformation from
-   * HPI_RESULT block if it was not previously found
-   */
-    hpi = fiff_dir_tree_find(node,FIFFB_HPI_RESULT);
-    node = hpi[0];
-    FREE(hpi);
-    if (node != NULL && *trans == NULL)
-        for (k = 0,this_ent = node->dir; k < node->nent; k++,this_ent++)
-            if (this_ent->kind ==  FIFF_COORD_TRANS) {
-                if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
+    * Search for the coordinate transformation from
+    * HPI_RESULT block if it was not previously found
+    */
+//    hpi = fiff_dir_tree_find(node,FIFFB_HPI_RESULT);
+//    node = hpi[0];
+
+    hpi = meas_info[0].dir_tree_find(FIFFB_HPI_RESULT);
+//    FREE(hpi);
+    if (hpi.size() > 0 && *trans == NULL)
+        for (k = 0; k < hpi[0].nent; k++)
+            if (hpi[0].dir[k].kind ==  FIFF_COORD_TRANS) {
+//                if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
+//                    goto bad;
+//                t = (fiffCoordTrans)tag.data;
+                if (!FiffTag::read_tag(stream.data(),t_pTag,hpi[0].dir[k].pos))
                     goto bad;
-                t = (fiffCoordTrans)tag.data;
+                t = (fiffCoordTrans)t_pTag->data();
+
                 /*
-         * Require this particular transform!
-         */
+                * Require this particular transform!
+                */
                 if (t->from == FIFFV_COORD_DEVICE && t->to == FIFFV_COORD_HEAD) {
                     *trans = t;
-                    tag.data = NULL;
+//                    tag.data = NULL;
                     break;
                 }
             }
@@ -15468,13 +15514,13 @@ static int get_meas_info (fiffFile file,	 /* The file we are reading */
         printf ("Not all essential tags were found!");
         goto bad;
     }
-    FREE (tag.data);
+//    FREE (tag.data);
     *chp = ch;
     return (0);
 
 bad : {
         FREE (ch);
-        FREE (tag.data);
+//        FREE (tag.data);
         return (-1);
     }
 }
@@ -15485,30 +15531,38 @@ int mne_load_raw_info(char *name,int allow_maxshield,mneRawInfo *infop)
       * Load raw data information from a fiff file
       */
 {
-    fiffFile       in       = NULL;
+    QFile file(name);
+    FiffStream::SPtr stream(new FiffStream(&file));
+
+//    fiffFile       in       = NULL;
+
     int            res      = FIFF_FAIL;
     fiffChInfo     chs      = NULL;	/* Channel info */
     fiffCoordTrans trans    = NULL;	/* The coordinate transformation */
     fiffId         id       = NULL;	/* Measurement id */
-    fiffDirEntry   rawDir   = NULL;	/* Directory of raw data tags */
+    QList<FiffDirEntry>   rawDir;	/* Directory of raw data tags */
     mneRawInfo     info     = NULL;
     int            nchan    = 0;		/* Number of channels */
     float          sfreq    = 0.0;	/* Sampling frequency */
     float          highpass;		/* Highpass filter frequency */
     float          lowpass;		/* Lowpass filter frequency */
-    fiffDirNode    raw;
-    fiffDirEntry   one;
+    FiffDirNode    raw;
+//    FiffDirEntry   one;
     fiffTime       start_time = NULL;
     int            k;
     int            maxshield_data = FALSE;
     /*
    * Open file
    */
-    if ((in = fiff_open(name)) == NULL)
+//    if ((in = fiff_open(name)) == NULL)
+//        goto out;
+    if(!stream->open())
         goto out;
-    if ((raw = find_raw(in->dirtree)) == NULL) {
+    raw = find_raw(stream->tree());
+    if (raw.isEmpty()) {
         if (allow_maxshield) {
-            if ((raw = find_maxshield(in->dirtree)) == NULL) {
+            raw = find_maxshield(stream->tree());
+            if (raw.isEmpty()) {
                 printf("No raw data in this file.");
                 goto out;
             }
@@ -15522,14 +15576,14 @@ int mne_load_raw_info(char *name,int allow_maxshield,mneRawInfo *infop)
     /*
    * Get the essential measurement information
    */
-    if (get_meas_info (in,raw,&id,&nchan,&sfreq,&highpass,&lowpass,
-                       &chs,&trans,&start_time) < 0)
+    if (get_meas_info (stream,raw,&id,&nchan,&sfreq,&highpass,&lowpass,&chs,&trans,&start_time) < 0)
         goto out;
     /*
-   * Get the raw directory
-   */
-    rawDir = MALLOC(raw->nent,fiffDirEntryRec);
-    memcpy(rawDir,raw->dir,raw->nent*sizeof(fiffDirEntryRec));
+    * Get the raw directory
+    */
+//    rawDir = MALLOC(raw->nent,fiffDirEntryRec);
+//    memcpy(rawDir,raw->dir,raw->nent*sizeof(fiffDirEntryRec));
+    rawDir = raw.dir;
     /*
    * Ready to put everything together
    */
@@ -15542,7 +15596,7 @@ int mne_load_raw_info(char *name,int allow_maxshield,mneRawInfo *infop)
     info->sfreq          = sfreq;
     info->lowpass        = lowpass;
     info->highpass       = highpass;
-    info->rawDir         = NULL;
+//    info->rawDir         = NULL;
     info->maxshield_data = maxshield_data;
     if (id) {
         info->id           = MALLOC(1,fiffIdRec);
@@ -15564,16 +15618,20 @@ int mne_load_raw_info(char *name,int allow_maxshield,mneRawInfo *infop)
         }
     }
     info->buf_size   = 0;
-    for (k = 0, one = raw->dir; k < raw->nent; k++, one++) {
-        if (one->kind == FIFF_DATA_BUFFER) {
-            if (one->type == FIFFT_DAU_PACK16 || one->type == FIFFT_SHORT)
-                info->buf_size = one->size/(nchan*sizeof(fiff_short_t));
-            else if (one->type == FIFFT_FLOAT)
-                info->buf_size = one->size/(nchan*sizeof(fiff_float_t));
-            else if (one->type == FIFFT_INT)
-                info->buf_size = one->size/(nchan*sizeof(fiff_int_t));
+//    for (k = 0, one = raw->dir; k < raw->nent; k++, one++) {
+    for (k = 0; k < raw.nent; k++) {
+//        raw.dir[k].kind
+//                raw.dir[k].type
+//                raw.dir[k].size
+        if (raw.dir[k].kind == FIFF_DATA_BUFFER) {
+            if (raw.dir[k].type == FIFFT_DAU_PACK16 || raw.dir[k].type == FIFFT_SHORT)
+                info->buf_size = raw.dir[k].size/(nchan*sizeof(fiff_short_t));
+            else if (raw.dir[k].type == FIFFT_FLOAT)
+                info->buf_size = raw.dir[k].size/(nchan*sizeof(fiff_float_t));
+            else if (raw.dir[k].type == FIFFT_INT)
+                info->buf_size = raw.dir[k].size/(nchan*sizeof(fiff_int_t));
             else {
-                printf("We are not prepared to handle raw data type: %d",one->type);
+                printf("We are not prepared to handle raw data type: %d",raw.dir[k].type);
                 goto out;
             }
             break;
@@ -15584,7 +15642,7 @@ int mne_load_raw_info(char *name,int allow_maxshield,mneRawInfo *infop)
         goto out;
     }
     info->rawDir     = rawDir;
-    info->ndir       = raw->nent;
+    info->ndir       = raw.nent;
     *infop = info;
     res = FIFF_OK;
 
@@ -15592,11 +15650,12 @@ out : {
         if (res != FIFF_OK) {
             FREE(chs);
             FREE(trans);
-            FREE(rawDir);
+//            FREE(rawDir);
             FREE(info);
         }
         FREE(id);
-        fiff_close(in);
+//        fiff_close(in);
+        stream->device()->close();
         return (res);
     }
 }
@@ -15712,7 +15771,7 @@ static mneRawData new_raw_data()
 {
     mneRawData new_data        = MALLOC(1,mneRawDataRec);
     new_data->filename         = NULL;
-    new_data->file             = NULL;
+//    new_data->file             = NULL;
     new_data->info             = NULL;
     new_data->bufs             = NULL;
     new_data->nbuf             = 0;
@@ -15770,7 +15829,8 @@ void mne_raw_free_data(mneRawData d)
 {
     if (!d)
         return;
-    fiff_close(d->file);
+//    fiff_close(d->file);
+    d->stream->device()->close();
     FREE(d->filename);
     mne_free_name_list(d->ch_names,d->info->nchan);
 
@@ -15875,7 +15935,7 @@ static void setup_filter_bufs(mneRawData data)
         bufs[k].ns          = filter->size + 2*filter->taper_size;
         bufs[k].firsts      = firstsamp;
         bufs[k].lasts       = firstsamp + bufs[k].ns - 1;
-        bufs[k].ent         = NULL;
+//        bufs[k].ent         = NULL;
         bufs[k].nchan       = data->info->nchan;
         bufs[k].is_skip     = FALSE;
         bufs[k].vals        = NULL;
@@ -15902,7 +15962,7 @@ static int load_one_buffer(mneRawData data, mneRawBufDef buf)
  * load just one
  */
 {
-    if (buf->ent->kind == FIFF_DATA_SKIP) {
+    if (buf->ent.kind == FIFF_DATA_SKIP) {
         printf("Cannot load a skip");
         return FAIL;
     }
@@ -15917,7 +15977,7 @@ static int load_one_buffer(mneRawData data, mneRawBufDef buf)
     fprintf(stderr,"Read buffer %d .. %d\n",buf->firsts,buf->lasts);
 #endif
 
-    if (mne_read_raw_buffer_t(data->file,
+    if (mne_read_raw_buffer_t(data->stream,
                               buf->ent,
                               buf->vals,
                               buf->nchan,
@@ -16537,14 +16597,21 @@ mneRawData mne_raw_open_file_comp(char *name, int omit_skip, int allow_maxshield
 {
     mneRawInfo         info  = NULL;
     mneRawData         data  = NULL;
-    fiffFile           in    = NULL;
-    fiffDirEntry dir,dir0;
-    fiffTagRec   tag;
+
+    QFile file(name);
+    FiffStream::SPtr stream(new FiffStream(&file));
+//    fiffFile           in    = NULL;
+
+    FiffDirEntry dir;
+    QList<FiffDirEntry> dir0;
+//    fiffTagRec   tag;
+    FiffTag::SPtr t_pTag;
     fiffChInfo   ch;
     mneRawBufDef bufs;
     int k, b, nbuf, ndir, nnames;
+    int current_dir0 = 0;
 
-    tag.data = NULL;
+//    tag.data = NULL;
 
     if (mne_load_raw_info(name,allow_maxshield,&info) == FAIL)
         goto bad;
@@ -16566,12 +16633,14 @@ mneRawData mne_raw_open_file_comp(char *name, int omit_skip, int allow_maxshield
             ch->unit_mul = 0;
         }
     }
-    if ((in = fiff_open(name)) == NULL)
+//    if ((in = fiff_open(name)) == NULL)
+//        goto bad;
+    if(!stream->open())
         goto bad;
 
     data           = new_raw_data();
     data->filename = mne_strdup(name);
-    data->file     = in;
+    data->stream   = stream;
     data->info     = info;
     /*
    * Add the channel name list
@@ -16625,26 +16694,32 @@ mneRawData mne_raw_open_file_comp(char *name, int omit_skip, int allow_maxshield
     /*
    * Take into account the first sample
    */
-    if (dir0->kind == FIFF_FIRST_SAMPLE) {
-        if (fiff_read_this_tag(in->fd,dir0->pos,&tag) == FIFF_FAIL)
+    if (dir0[current_dir0].kind == FIFF_FIRST_SAMPLE) {
+//        if (fiff_read_this_tag(in->fd,dir0->pos,&tag) == FIFF_FAIL)
+//            goto bad;
+        if (!FiffTag::read_tag(stream.data(),t_pTag,dir0[current_dir0].pos))
             goto bad;
-        data->first_samp = *(int *)tag.data;
-        dir0++;
+        data->first_samp = *t_pTag->toInt();
+        current_dir0++;
         ndir--;
     }
-    if (dir0->kind == FIFF_DATA_SKIP) {
+    if (dir0[current_dir0].kind == FIFF_DATA_SKIP) {
         int nsamp_skip;
-        if (fiff_read_this_tag(in->fd,dir0->pos,&tag) == FIFF_FAIL)
+//        if (fiff_read_this_tag(in->fd,dir0->pos,&tag) == FIFF_FAIL)
+//            goto bad;
+        if (!FiffTag::read_tag(stream.data(),t_pTag,dir0[current_dir0].pos))
             goto bad;
-        nsamp_skip = data->info->buf_size*(*(int  *)tag.data);
+        nsamp_skip = data->info->buf_size*(*t_pTag->toInt());
         fprintf(stderr,"Data skip of %d samples in the beginning\n",nsamp_skip);
-        dir0++;
+        current_dir0++;
         ndir--;
-        if (dir0->kind == FIFF_FIRST_SAMPLE) {
-            if (fiff_read_this_tag(in->fd,dir0->pos,&tag) == FIFF_FAIL)
+        if (dir0[current_dir0].kind == FIFF_FIRST_SAMPLE) {
+//            if (fiff_read_this_tag(in->fd,dir0->pos,&tag) == FIFF_FAIL)
+//                goto bad;
+            if (!FiffTag::read_tag(stream.data(),t_pTag,dir0[current_dir0].pos))
                 goto bad;
-            data->first_samp += *(int *)tag.data;
-            dir0++;
+            data->first_samp += *t_pTag->toInt();
+            current_dir0++;
             ndir--;
         }
         if (omit_skip) {
@@ -16666,19 +16741,21 @@ mneRawData mne_raw_open_file_comp(char *name, int omit_skip, int allow_maxshield
     /*
    * Figure out the buffers
    */
-    for (k = 0, dir = dir0, nbuf = 0; k < ndir; k++, dir++)
-        if (dir->kind == FIFF_DATA_BUFFER ||
-                dir->kind == FIFF_DATA_SKIP)
+//    for (k = 0, dir = dir0, nbuf = 0; k < ndir; k++, dir++)
+    for (k = 0, nbuf = 0; k < ndir; k++)
+        if (dir0[k].kind == FIFF_DATA_BUFFER ||
+                dir0[k].kind == FIFF_DATA_SKIP)
             nbuf++;
     bufs = MALLOC(nbuf,mneRawBufDefRec);
 
-    for (k = 0, nbuf = 0, dir = dir0; k < ndir; k++, dir++)
-        if (dir->kind == FIFF_DATA_BUFFER ||
-                dir->kind == FIFF_DATA_SKIP) {
+//    for (k = 0, nbuf = 0, dir = dir0; k < ndir; k++, dir++)
+    for (k = 0, nbuf = 0; k < ndir; k++)
+        if (dir0[k].kind == FIFF_DATA_BUFFER ||
+                dir0[k].kind == FIFF_DATA_SKIP) {
             bufs[nbuf].ns          = 0;
-            bufs[nbuf].ent         = dir;
+            bufs[nbuf].ent         = dir0[k];
             bufs[nbuf].nchan       = data->info->nchan;
-            bufs[nbuf].is_skip     = dir->kind == FIFF_DATA_SKIP;
+            bufs[nbuf].is_skip     = dir0[k].kind == FIFF_DATA_SKIP;
             bufs[nbuf].vals        = NULL;
             bufs[nbuf].valid       = FALSE;
             bufs[nbuf].ch_filtered = NULL;
@@ -16690,28 +16767,30 @@ mneRawData mne_raw_open_file_comp(char *name, int omit_skip, int allow_maxshield
     data->nsamp = 0;
     for (k = 0; k < nbuf; k++) {
         dir = bufs[k].ent;
-        if (dir->kind == FIFF_DATA_BUFFER) {
-            if (dir->type == FIFFT_DAU_PACK16 || dir->type == FIFFT_SHORT)
-                bufs[k].ns = dir->size/(data->info->nchan*sizeof(fiff_dau_pack16_t));
-            else if (dir->type == FIFFT_FLOAT)
-                bufs[k].ns = dir->size/(data->info->nchan*sizeof(fiff_float_t));
-            else if (dir->type == FIFFT_INT)
-                bufs[k].ns = dir->size/(data->info->nchan*sizeof(fiff_int_t));
+        if (dir.kind == FIFF_DATA_BUFFER) {
+            if (dir.type == FIFFT_DAU_PACK16 || dir.type == FIFFT_SHORT)
+                bufs[k].ns = dir.size/(data->info->nchan*sizeof(fiff_dau_pack16_t));
+            else if (dir.type == FIFFT_FLOAT)
+                bufs[k].ns = dir.size/(data->info->nchan*sizeof(fiff_float_t));
+            else if (dir.type == FIFFT_INT)
+                bufs[k].ns = dir.size/(data->info->nchan*sizeof(fiff_int_t));
             else {
-                printf("We are not prepared to handle raw data type: %d",dir->type);
+                printf("We are not prepared to handle raw data type: %d",dir.type);
                 goto bad;
             }
         }
-        else if (dir->kind == FIFF_DATA_SKIP) {
-            if (fiff_read_this_tag(in->fd,dir->pos,&tag) == FIFF_FAIL)
+        else if (dir.kind == FIFF_DATA_SKIP) {
+//            if (fiff_read_this_tag(in->fd,dir->pos,&tag) == FIFF_FAIL)
+//                goto bad;
+            if (!FiffTag::read_tag(stream.data(),t_pTag,dir.pos))
                 goto bad;
-            bufs[k].ns = data->info->buf_size*(*(int  *)tag.data);
+            bufs[k].ns = data->info->buf_size*(*t_pTag->toInt());
         }
         bufs[k].firsts = k == 0 ? data->first_samp : bufs[k-1].lasts + 1;
         bufs[k].lasts  = bufs[k].firsts + bufs[k].ns - 1;
         data->nsamp += bufs[k].ns;
     }
-    FREE(tag.data);
+//    FREE(tag.data);
     /*
    * Set up the first sample values
    */
@@ -16722,8 +16801,8 @@ mneRawData mne_raw_open_file_comp(char *name, int omit_skip, int allow_maxshield
         data->offsets[k] = 0.0;
     }
     /*
-   * Th bad channel stuff
-   */
+    * Th bad channel stuff
+    */
     {
         if (mne_read_bad_channel_list(name,&data->badlist,&data->nbad) == OK) {
             for (b = 0; b < data->nbad; b++) {
