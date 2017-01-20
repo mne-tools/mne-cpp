@@ -1,11 +1,14 @@
+#ifndef DIPOLEFITHELPERS_H
+#define DIPOLEFITHELPERS_H
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-
 #include "ecd_set.h"
+#include "mne_sss_data.h"
 #include <iostream>
 #include <vector>
 #include <Eigen/Core>
@@ -61,6 +64,7 @@
 
 using namespace UTILSLIB;
 using namespace INVERSELIB;
+using namespace FIFFLIB;
 
 #ifndef TRUE
 #define TRUE 1
@@ -78,9 +82,6 @@ using namespace INVERSELIB;
 #ifndef OK
 #define OK 0
 #endif
-
-
-
 
 
 /* NOTE:
@@ -370,7 +371,7 @@ void mne_free_dcmatrix (double **m)
 #define FREE_CMATRIX(m) mne_free_cmatrix((m))
 
 
-#include "fiff_types.h"
+#include <fiff/fiff_types.h>
 #include "mne_types.h"
 #include "analyze_types.h"
 
@@ -1448,7 +1449,7 @@ int fiff_read_this_tag_ext (fiffFile file,	/* Read from here */
 
 
 
-#include <fiff/fiff_dir_tree.h>
+#include <fiff/fiff_dir_node.h>
 
 
 //============================= fiff_dir_tree.c =============================
@@ -1658,7 +1659,7 @@ fiffTag fiff_dir_tree_get_tag(fiffFile file,fiffDirNode node,int kind)
                 return (tag);
         }
     qWarning("Desired tag (%s [%d]) not found",
-             FIFFLIB::FiffDirTree::get_tag_explanation(kind),kind);
+             FIFFLIB::FiffDirNode::get_tag_explanation(kind),kind);
     return (NULL);
 }
 
@@ -7646,100 +7647,13 @@ int mne_read_bad_channel_list(const QString& name, char ***listp, int *nlistp)
 //============================= mne_sss_data.c =============================
 
 
-static mneSssData mne_new_sss_data()
 
-{
-    mneSssData s   = MALLOC(1,mneSssDataRec);
-    s->job         = FIFFV_SSS_JOB_NOTHING;
-    s->coord_frame = FIFFV_COORD_UNKNOWN;
-    s->nchan       = 0;
-    s->in_order    = 0;
-    s->out_order   = 0;
-    s->in_nuse     = 0;
-    s->out_nuse    = 0;
-    s->comp_info   = NULL;
-    s->ncomp       = 0;
-    return s;
-}
-
-
-void mne_free_sss_data(mneSssData s)
-
-{
-    if (!s)
-        return;
-    FREE(s->comp_info);
-    FREE(s);
-    return;
-}
-
-
-void mne_print_sss_data(FILE *f, mneSssData s)
-/*
- * Output the SSS information for debugging purposes
- */
-{
-    int j,p,q,n;
-
-    if (!s)
-        return;
-    fprintf(f,"job         : %d\n",s->job);
-    fprintf(f,"coord frame : %s\n",mne_coord_frame_name(s->coord_frame));
-    fprintf(f,"origin      : %6.1f %6.1f %6.1f mm\n",1000*s->origin[0],1000*s->origin[1],1000*s->origin[2]);
-    fprintf(f,"in order    : %d\n",s->in_order);
-    fprintf(f,"out order   : %d\n",s->out_order);
-    fprintf(f,"nchan       : %d\n",s->nchan);
-    fprintf(f,"ncomp       : %d\n",s->ncomp);
-    fprintf(f,"in nuse     : %d\n",s->in_nuse);
-    fprintf(f,"out nuse    : %d\n",s->out_nuse);
-    fprintf(f,"comps       : ");
-    /*
-   * This produces the same output as maxfilter
-   */
-    for (j = 0, n = 3, p = 0; j < s->in_order; j++, n = n + 2) {
-        if (j > 0)
-            fprintf(f,";");
-        for (q = 0; q < n; q++, p++)
-            fprintf(f,"%1d",s->comp_info[p]);
-    }
-    fprintf(f,"//");
-    for (j = 0, n = 3; j < s->out_order; j++, n = n + 2) {
-        if (j > 0)
-            fprintf(f,";");
-        for (q = 0; q < n; q++, p++)
-            fprintf(f,"%1d",s->comp_info[p]);
-    }
-    fprintf(f,"\n");
-    return;
-}
-
-
-mneSssData mne_dup_sss_data(mneSssData s)
-
-{
-    mneSssData dup = mne_new_sss_data();
-    int        k;
-
-    if (!s)
-        return NULL;
-
-    *dup = *s;
-    dup->comp_info = MALLOC(dup->ncomp,int);
-
-    for (k = 0; k < dup->ncomp; k++)
-        dup->comp_info[k] = s->comp_info[k];
-
-    return dup;
-}
-
-
-
-mneSssData mne_read_sss_data_from_node(fiffFile in, fiffDirNode start)
+MneSssData* mne_read_sss_data_from_node(fiffFile in, fiffDirNode start)
 /*
  * Read the SSS data from the given node of an open file
  */
 {
-    mneSssData s  = mne_new_sss_data();
+    MneSssData* s  = new MneSssData();
     fiffDirNode *sss = NULL;
     fiffDirNode node;
     fiffTag     tag;
@@ -7817,7 +7731,8 @@ bad : {
         /*
      * Not entirely happy
      */
-        mne_free_sss_data(s);
+        if (s)
+            delete s;
         return NULL;
     }
 }
@@ -7950,7 +7865,7 @@ mneCovMatrix mne_dup_cov(mneCovMatrix c)
     res->bads = mne_dup_name_list(c->bads,c->nbad);
     res->nbad = c->nbad;
     res->proj = mne_dup_proj_op(c->proj);
-    res->sss  = mne_dup_sss_data(c->sss);
+    res->sss  = new MneSssData(*(c->sss));
 
     return res;
 }
@@ -7974,7 +7889,8 @@ void mne_free_cov(mneCovMatrix c)
     FREE(c->chol);
     FREE(c->ch_class);
     mne_free_proj_op(c->proj);
-    mne_free_sss_data(c->sss);
+    if (c->sss)
+        delete c->sss;
     mne_free_name_list(c->bads,c->nbad);
     FREE(c);
     return;
@@ -8033,7 +7949,7 @@ mneCovMatrix mne_read_cov(const QString& name,int kind)
     int            k,p,nn;
     float          *f;
     mneProjOp      op = NULL;
-    mneSssData     sss = NULL;
+    MneSssData*     sss = NULL;
 
 
     if ((in = fiff_open(name.toLatin1().data())) == NULL)
@@ -8188,7 +8104,8 @@ mneCovMatrix mne_read_cov(const QString& name,int kind)
 out : {
         fiff_close(in);
         mne_free_proj_op(op);
-        mne_free_sss_data(sss);
+        if(sss)
+            delete sss;
 
         if (!res) {
             mne_free_name_list(names,nnames);
@@ -8298,7 +8215,7 @@ mneCovMatrix mne_pick_chs_cov_omit(mneCovMatrix c, char **new_names, int ncov, i
     res->bads = mne_dup_name_list(c->bads,c->nbad);
     res->nbad = c->nbad;
     res->proj = mne_dup_proj_op(c->proj);
-    res->sss  = mne_dup_sss_data(c->sss);
+    res->sss  = c->sss ? new MneSssData(*(c->sss)) : NULL;
 
     if (c->ch_class) {
         res->ch_class = MALLOC(res->ncov,int);
@@ -16070,14 +15987,14 @@ void mne_free_deriv_set(mneDerivSet s)
 
 //============================= mne_sss_data.c =============================
 
-
-mneSssData mne_read_sss_data(char *name)
+//TODO: move to MneSssData
+MneSssData* mne_read_sss_data(char *name)
 /*
  * Read SSS data from anywhere in a file
  */
 {
     fiffFile   in = fiff_open(name);
-    mneSssData s  = NULL;
+    MneSssData* s  = NULL;
 
     if (!in)
         goto out;
@@ -16184,7 +16101,8 @@ void mne_raw_free_data(mneRawData d)
     FREE(d->bad);
     FREE(d->offsets);
     mne_free_ctf_comp_data_set(d->comp);
-    mne_free_sss_data(d->sss);
+    if(d->sss)
+        delete d->sss;
 
     if (d->filter_data_free)
         d->filter_data_free(d->filter_data);
@@ -17006,11 +16924,12 @@ mneRawData mne_raw_open_file_comp(char *name, int omit_skip, int allow_maxshield
     data->sss = mne_read_sss_data(data->filename);
     if (data->sss && data->sss->job != FIFFV_SSS_JOB_NOTHING && data->sss->ncomp > 0) {
         fprintf(stderr,"SSS data read from %s :\n",data->filename);
-        mne_print_sss_data(stderr,data->sss);
+        data->sss->print(stderr);
     }
     else {
         fprintf(stderr,"No SSS data in %s\n",data->filename);
-        mne_free_sss_data(data->sss);
+        if(data->sss)
+            delete data->sss;
         data->sss = NULL;
     }
     /*
@@ -17862,13 +17781,6 @@ mneMeasData mne_read_meas_data(const QString&       name,       /* Name of the m
 }
 
 
-
-
-
-
-
-
-
 //============================= mne_get_values.c =============================
 
 #define EPS 0.05
@@ -18110,269 +18022,4 @@ int mne_get_values_from_data_ch (float time,      /* Interesting time point */
     return (0);
 }
 
-
-//============================= setup_dipole_fitting.c =============================
-
-
-typedef struct {
-    /*
-   * Current settings derived from data
-   */
-    char   *measname;		/* Data file name */
-    char   *selname;              /* Name of the channel selection */
-    char   *mriname;		/* Source of MRI/MEG coordinate transform */
-    char   *bemname;		/* BEM model file */
-    float  r0[3];			/* Sphere model origin */
-    int    accurate;		/* Use accurate field computations? */
-    char   *badname;		/* Get bad channel info from here */
-    char   *noisename;		/* Noise covariance matrix file name */
-    float  grad_std;		/* Gradiometer standard deviation */
-    float  mag_std;		/* Magnetometer standard deviation */
-    float  eeg_std;		/* EEG standard deviation */
-    float  grad_reg;		/* Gradiometer noise-covariance matrix regularization */
-    float  mag_reg;		/* Magnetometer noise-covariance matrix regularization */
-    float  eeg_reg;		/* EEG noise-covariance matrix regularization */
-    int    diagnoise;		/* Restrict to diagonal elements of the noise-covariance matrix */
-    char   **projnames;		/* SSP file names */
-    int    nproj;			/* How many of them */
-    int    include_meg;		/* Use MEG? */
-    int    include_eeg;		/* Use EEG? */
-    char   *eeg_model_file;	/* Load EEG sphere models from here */
-    char   *eeg_model_name;	/* Current EEG model name */
-    float  eeg_sphere_rad;	/* EEG sphere model scalp radius */
-    char   *guessname;		/* Load the initial guess locations from here */
-    char   *guess_surfname;	/* Load the inner skull surface from this BEM file */
-    float  guess_mindist;		/* Minimum allowed distance to the surface */
-    float  guess_exclude;		/* Exclude points closer than this to the origin */
-    float  guess_grid;		/* Grid spacing */
-    int    nref;			/* How many references we have to this instance? */
-} *dipoleFitSetupPar,dipoleFitSetupParRec;
-
-
-typedef struct {
-    mshMegEegData     data;       /* The data this setup is associated with */
-    /*
-   * Parameters
-   */
-    dipoleFitSetupPar pars;	/* The parameters in effect */
-    dipoleFitSetupPar new_pars;	/* Parameters being edited */
-    /*
-   * Data links
-   */
-    FwdEegSphereModel* eeg_model;	/* The actual model based on the above settings */
-    DipoleFitData*     fitdata;	/* The actual setup data */
-    GuessData*         guessdata;	/* The initial guess data */
-    /*
-   * Additional data
-   */
-    void              *user_data;	        /* Will be the user interface */
-    mneUserFreeFunc   user_data_free;     /* Way to free this item */
-} *dipoleFitSetup,dipoleFitSetupRec;
-
-
-DipoleFitData* get_dipole_fit_data(mshMegEegData d)
-/*
- * Pick up the fitting data from the opaque structure
- */
-{
-    if (!d || !d->dipole_fit_setup)
-        return NULL;
-    else
-        return ((dipoleFitSetup)(d->dipole_fit_setup))->fitdata;
-}
-
-GuessData* get_dipole_fit_guess_data(mshMegEegData d)
-/*
- * Pick up the guess data from the opaque structure
- */
-{
-    if (!d || !d->dipole_fit_setup)
-        return NULL;
-    else
-        return ((dipoleFitSetup)(d->dipole_fit_setup))->guessdata;
-}
-
-
-
-//============================= fit_dipoles.c =============================
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#define SEG_LEN 10.0
-
-
-int fit_dipoles_raw(const QString&  dataname,
-                    mneRawData      raw,            /* The raw data description */
-                    mneChSelection  sel,            /* Channel selection to use */
-                    DipoleFitData*  fit,            /* Precomputed fitting data */
-                    GuessData*      guess,          /* The initial guesses */
-                    float           tmin,           /* Time range */
-                    float           tmax,
-                    float           tstep,          /* Time step to use */
-                    float           integ,          /* Integration time */
-                    int             verbose,        /* Verbose output? */
-                    ECDSet&         p_set)          /* Return all results here
-                                                     * Warning: for large data files this may take
-                                                     * a lot of memory */
-
-/*
- * Fit a single dipole to each time point of the data
- */
-{
-    float *one    = MALLOC(sel->nchan,float);
-    float sfreq   = raw->info->sfreq;
-    float myinteg = integ > 0.0 ? 2*integ : 0.1;
-    int   overlap = ceil(myinteg*sfreq);
-    int   length  = SEG_LEN*sfreq;
-    int   step    = length - overlap;
-    int   stepo   = step + overlap/2;
-    int   start   = raw->first_samp;
-    int   s,picks;
-    float time,stime;
-    float **data  = ALLOC_CMATRIX(sel->nchan,length);
-    ECD    dip;
-    ECDSet set;
-    int    report_interval = 10;
-
-    set.dataname = dataname;
-
-    /*
-   * Load the initial data segment
-   */
-    stime = start/sfreq;
-    if (mne_raw_pick_data_filt(raw,sel,start,length,data) == FAIL)
-        goto bad;
-    fprintf(stderr,"Fitting...%c",verbose ? '\n' : '\0');
-    for (s = 0, time = tmin; time < tmax; s++, time = tmin  + s*tstep) {
-        picks = time*sfreq - start;
-        if (picks > stepo) {		/* Need a new data segment? */
-            start = start + step;
-            if (mne_raw_pick_data_filt(raw,sel,start,length,data) == FAIL)
-                goto bad;
-            picks = time*sfreq - start;
-            stime = start/sfreq;
-        }
-        /*
-     * Get the values
-     */
-        if (mne_get_values_from_data_ch (time,integ,data,length,sel->nchan,stime,sfreq,FALSE,one) == FAIL) {
-            fprintf(stderr,"Cannot pick time: %8.3f s\n",time);
-            continue;
-        }
-        /*
-     * Fit
-     */
-        if (!DipoleFitData::fit_one(fit,guess,time,one,verbose,dip))
-            qWarning() << "Error";
-        else {
-            set.addEcd(dip);
-            if (verbose)
-                dip.print(stdout);
-            else {
-                if (set.size() % report_interval == 0)
-                    fprintf(stderr,"%d..",set.size());
-            }
-        }
-    }
-    if (!verbose)
-        fprintf(stderr,"[done]\n");
-    FREE_CMATRIX(data);
-    FREE(one);
-    p_set = set;
-    return OK;
-
-bad : {
-        FREE_CMATRIX(data);
-        FREE(one);
-        return FAIL;
-    }
-}
-
-
-
-
-int fit_dipoles_raw(const QString& dataname,
-                    mneRawData     raw,          /* The raw data description */
-                    mneChSelection sel,	         /* Channel selection to use */
-                    DipoleFitData*  fit,	         /* Precomputed fitting data */
-                    GuessData*      guess,        /* The initial guesses */
-                    float          tmin,         /* Time range */
-                    float          tmax,
-                    float          tstep,        /* Time step to use */
-                    float          integ,        /* Integration time */
-                    int            verbose)
-/*
- * Fit a single dipole to each time point of the data
- */
-{
-    ECDSet set;
-    return fit_dipoles_raw(dataname, raw, sel, fit, guess, tmin, tmax, tstep, integ, verbose, set);
-}
-
-
-
-int    fit_dipoles( const QString&  dataname,
-                    mneMeasData     data,       /* The measured data */
-                    DipoleFitData*  fit,        /* Precomputed fitting data */
-                    GuessData*      guess,      /* The initial guesses */
-                    float           tmin,       /* Time range */
-                    float           tmax,
-                    float           tstep,      /* Time step to use */
-                    float           integ,      /* Integration time */
-                    int             verbose,    /* Verbose output? */
-                    ECDSet&         p_set)
-/*
- * Fit a single dipole to each time point of the data
- */
-{
-    float *one = MALLOC(data->nchan,float);
-    float time;
-    ECDSet set;
-    ECD   dip;
-    int   s;
-    int   report_interval = 10;
-
-    set.dataname = dataname;
-
-    fprintf(stderr,"Fitting...%c",verbose ? '\n' : '\0');
-    for (s = 0, time = tmin; time < tmax; s++, time = tmin  + s*tstep) {
-        /*
-     * Pick the data point
-     */
-        if (mne_get_values_from_data(time,integ,data->current->data,data->current->np,data->nchan,data->current->tmin,
-                                     1.0/data->current->tstep,FALSE,one) == FAIL) {
-            fprintf(stderr,"Cannot pick time: %7.1f ms\n",1000*time);
-            continue;
-        }
-
-        if (!DipoleFitData::fit_one(fit,guess,time,one,verbose,dip))
-            printf("t = %7.1f ms : %s\n",1000*time,"error (tbd: catch)");
-        else {
-            set.addEcd(dip);
-            if (verbose)
-                dip.print(stdout);
-            else {
-                if (set.size() % report_interval == 0)
-                    fprintf(stderr,"%d..",set.size());
-            }
-        }
-    }
-    if (!verbose)
-        fprintf(stderr,"[done]\n");
-    FREE(one);
-    p_set = set;
-    return OK;
-}
+#endif // DIPOLEFITHELPERS_H

@@ -116,7 +116,7 @@ public:
 
 //    void ReadPolhemusDig(QString fileName);
 
-//    bool read_hpi_info(FiffStream *t_pStream, const FiffDirTree& p_Node, FiffInfo& info);
+//    bool read_hpi_info(FiffStream *t_pStream, const FiffDirNode& p_Node, FiffInfo& info);
 signals:
 
 

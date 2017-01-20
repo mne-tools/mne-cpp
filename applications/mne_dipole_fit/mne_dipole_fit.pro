@@ -44,7 +44,7 @@ QT += widgets 3dextras
 CONFIG   += console
 CONFIG   -= app_bundle
 
-TARGET = mne_dipole_fit_new
+TARGET = mne_dipole_fit
 
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)

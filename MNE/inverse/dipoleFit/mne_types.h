@@ -109,28 +109,29 @@
  *    Changed field names in mneMeasDataSet structure
  *
  */
-#include "fiff_types.h"
+#include <fiff/fiff_types.h>
+#include "mne_sss_data.h"
 
 #if defined(__cplusplus) 
 extern "C" {
 #endif
 
-/*
- * Complex data
- */
-typedef struct {
-  float re;
-  float im;
-} *mneComplex,**mneComplexMatrix,mneComplexRec;
+///*
+// * Complex data
+// */
+//typedef struct {
+//  float re;
+//  float im;
+//} *mneComplex,**mneComplexMatrix,mneComplexRec;
 
-typedef struct {
-  double re;
-  double im;
-} *mneDoubleComplex,**mneDoubleComplexMatrix,mneDoubleComplexRec;
+//typedef struct {
+//  double re;
+//  double im;
+//} *mneDoubleComplex,**mneDoubleComplexMatrix,mneDoubleComplexRec;
 
 typedef void (*mneUserFreeFunc)(void *);  /* General purpose */
-typedef fiffSparseMatrix mneSparseMatrix;
-typedef fiffSparseMatrixRec mneSparseMatrixRec;
+typedef FIFFLIB::fiffSparseMatrix mneSparseMatrix;
+typedef FIFFLIB::fiffSparseMatrixRec mneSparseMatrixRec;
 
 typedef struct {
   int   vert;			/* Which vertex does this apply to */
@@ -229,15 +230,15 @@ typedef struct {		    /* This defines a source space or a surface */
   /*
    * These are for volumes only
    */
-  fiffCoordTrans   voxel_surf_RAS_t;/* Transform from voxel coordinate to the surface RAS (MRI) coordinates */
+  FIFFLIB::fiffCoordTrans   voxel_surf_RAS_t;/* Transform from voxel coordinate to the surface RAS (MRI) coordinates */
   int              vol_dims[3];     /* Dimensions of the volume grid (width x height x depth) 
 				     * NOTE: This will be present only if the source space is a complete 
 				     * rectangular grid with unused vertices included */
   float            voxel_size[3];   /* Derived from the above */
   mneSparseMatrix  interpolator;    /* Matrix to interpolate into an MRI volume */
   char             *MRI_volume;     /* The name of the file the above interpolator is based on */
-  fiffCoordTrans   MRI_voxel_surf_RAS_t;
-  fiffCoordTrans   MRI_surf_RAS_RAS_t;  /* Transform from surface RAS to RAS coordinates in the associated MRI volume */
+  FIFFLIB::fiffCoordTrans   MRI_voxel_surf_RAS_t;
+  FIFFLIB::fiffCoordTrans   MRI_surf_RAS_RAS_t;  /* Transform from surface RAS to RAS coordinates in the associated MRI volume */
   int              MRI_vol_dims[3];     /* Dimensions of the MRI volume (width x height x depth) */
   /*
    * Possibility to add user-defined data
@@ -249,28 +250,28 @@ typedef struct {		    /* This defines a source space or a surface */
  * These are the aliases
  */
 typedef mneSurfaceOrVolume mneSourceSpace;
-typedef mneSurfaceOrVolume mneSourceVolume;
+//typedef mneSurfaceOrVolume mneSourceVolume;
 typedef mneSurfaceOrVolume mneSurface;
-typedef mneSurfaceOrVolume mneVolume;
+//typedef mneSurfaceOrVolume mneVolume;
 
 typedef mneSurfaceOrVolumeRec mneSourceSpaceRec;
-typedef mneSurfaceOrVolumeRec mneSourceVolumeRecRec;
+//typedef mneSurfaceOrVolumeRec mneSourceVolumeRecRec;
 typedef mneSurfaceOrVolumeRec mneSurfaceRec;
-typedef mneSurfaceOrVolumeRec mneVolumeRec;
+//typedef mneSurfaceOrVolumeRec mneVolumeRec;
 
-typedef struct {		    /* FreeSurfer patches */
-  mneSurface       s;		    /* Patch represented as a surface */
-  int              *vert;	    /* Vertex numbers in the complete surface*/
-  int              *surf_vert;	    /* Which vertex corresponds to each complete surface vertex here? */
-  int              np_surf;	    /* How many points on the complete surface? */
-  int              *tri;	    /* Which triangles in the complete surface correspond to our triangles? */
-  int              *surf_tri;	    /* Which of our triangles corresponds to each triangle on the complete surface? */
-  int              ntri_surf;	    /* How many triangles on the complete surface */
-  int              *border;	    /* Is this vertex on the border? */
-  int              flat;	    /* Is this a flat patch? */
-  void             *user_data;      /* Anything else we want */
-  mneUserFreeFunc  user_data_free;  /* Function to set the above free */
-} *mneSurfacePatch,mneSurfacePatchRec;
+//typedef struct {		    /* FreeSurfer patches */
+//  mneSurface       s;		    /* Patch represented as a surface */
+//  int              *vert;	    /* Vertex numbers in the complete surface*/
+//  int              *surf_vert;	    /* Which vertex corresponds to each complete surface vertex here? */
+//  int              np_surf;	    /* How many points on the complete surface? */
+//  int              *tri;	    /* Which triangles in the complete surface correspond to our triangles? */
+//  int              *surf_tri;	    /* Which of our triangles corresponds to each triangle on the complete surface? */
+//  int              ntri_surf;	    /* How many triangles on the complete surface */
+//  int              *border;	    /* Is this vertex on the border? */
+//  int              flat;	    /* Is this a flat patch? */
+//  void             *user_data;      /* Anything else we want */
+//  mneUserFreeFunc  user_data_free;  /* Function to set the above free */
+//} *mneSurfacePatch,mneSurfacePatchRec;
 
 typedef struct {		/* Matrix specification with a channel list */
   int   nrow;			/* Number of rows */
@@ -351,7 +352,7 @@ typedef struct {		/* Covariance matrix storage */
   float      **eigen;		/* Eigenvectors of cov */
   double     *chol;		/* Cholesky decomposition */
   mneProjOp  proj;		/* The projection which was active when this matrix was computed */
-  mneSssData sss;		/* The SSS data present in the associated raw data file */
+  INVERSELIB::MneSssData* sss;		/* The SSS data present in the associated raw data file */
   int        *ch_class;		/* This will allow grouping of channels for regularization (MEG [T/m], MEG [T], EEG [V] */
   char       **bads;		/* Which channels were designated bad when this noise covariance matrix was computed? */
   int        nbad;		/* How many of them */
@@ -385,11 +386,11 @@ typedef struct {		/* Covariance matrix storage */
 //} *mneForwardSolution,mneForwardSolutionRec;
 
 typedef struct {		          /* An inverse operator */
-  fiffId         meas_id;                 /* The assosiated measurement ID */
+  FIFFLIB::fiffId         meas_id;                 /* The assosiated measurement ID */
   mneSourceSpace *spaces;	          /* The source spaces */
   int            nspace;	          /* Number of source spaces */
-  fiffCoordTrans meg_head_t;              /* MEG device <-> head coordinate transformation */
-  fiffCoordTrans mri_head_t;	          /* MRI device <-> head coordinate transformation */
+  FIFFLIB::fiffCoordTrans meg_head_t;              /* MEG device <-> head coordinate transformation */
+  FIFFLIB::fiffCoordTrans mri_head_t;	          /* MRI device <-> head coordinate transformation */
   int            methods;	          /* EEG, MEG or EEG+MEG (see mne_fiff.h) */
   int            nchan;		          /* Number of measurement channels */
   int            nsource;	          /* Number of source points */
@@ -415,48 +416,48 @@ typedef struct {		          /* An inverse operator */
 } *mneInverseOperator,mneInverseOperatorRec;
 
 
-typedef struct {		/* For storing the wdata */
-  int   id;			/* Surface id these data belong to */
-  int   kind;			/* What kind of data */
-  float lat;			/* Latency */
-  int   nvert;			/* Number of vertices */
-  int   *vertno;		/* Vertex numbers */
-  float *vals;			/* The values */
-} *mneWdata,mneWdataRec;
+//typedef struct {		/* For storing the wdata */
+//  int   id;			/* Surface id these data belong to */
+//  int   kind;			/* What kind of data */
+//  float lat;			/* Latency */
+//  int   nvert;			/* Number of vertices */
+//  int   *vertno;		/* Vertex numbers */
+//  float *vals;			/* The values */
+//} *mneWdata,mneWdataRec;
 
-typedef struct {
-  int   id;			/* Surface id these data belong to */
-  int   kind;			/* What kind of data */
-  float tmin;			/* First time */
-  float tstep;			/* Step between times */
-  int   ntime;			/* Number of times */
-  int   nvert;			/* Number of vertices */
-  int   *vertno;		/* The vertex numbers */
-  float **data;			/* The data, time by time */
-} *mneStcData,mneStcDataRec;
+//typedef struct {
+//  int   id;			/* Surface id these data belong to */
+//  int   kind;			/* What kind of data */
+//  float tmin;			/* First time */
+//  float tstep;			/* Step between times */
+//  int   ntime;			/* Number of times */
+//  int   nvert;			/* Number of vertices */
+//  int   *vertno;		/* The vertex numbers */
+//  float **data;			/* The data, time by time */
+//} *mneStcData,mneStcDataRec;
 
 typedef struct {		/* Information about raw data in fiff file */
   char          *filename;	/* The name of the file this comes from */
-  fiffId        id;		/* Measurement id from the file */
+  FIFFLIB::fiffId        id;		/* Measurement id from the file */
   int           nchan;		/* Number of channels */
-  fiffChInfo    chInfo;		/* Channel info data  */
+  FIFFLIB::fiffChInfo    chInfo;		/* Channel info data  */
   int           coord_frame;	/* 
 				 * Which coordinate frame are the
 				 * positions defined in? 
 				 */
-  fiffCoordTrans trans;	        /* This is the coordinate transformation
+  FIFFLIB::fiffCoordTrans trans;	        /* This is the coordinate transformation
 				 * FIFF_COORD_HEAD <--> FIFF_COORD_DEVICE
 				 */
   float         sfreq;		/* Sampling frequency */
   float         lowpass;	/* Lowpass filter setting */
   float         highpass;       /* Highpass filter setting */
-  fiffTimeRec   start_time;	/* Starting time of the acquisition
+  FIFFLIB::fiffTimeRec   start_time;	/* Starting time of the acquisition
 				 * taken from the meas date 
 				 * or the meas block id
 				 * whence it may be inaccurate. */
   int           buf_size;	/* Buffer size in samples */
   int           maxshield_data; /* Are these unprocessed MaxShield data */
-  fiffDirEntry  rawDir;		/* Directory of raw data tags 
+  FIFFLIB::fiffDirEntry  rawDir;		/* Directory of raw data tags
 				 * These may be of type
 				 *       FIFF_DATA_BUFFER
 				 *       FIFF_DATA_SKIP
@@ -468,17 +469,17 @@ typedef struct {		/* Information about raw data in fiff file */
 } mneRawInfoRec, *mneRawInfo;
 
 
-typedef struct {		/* Spatiotemporal map */
-  int kind;			/* What kind of data */
-  int coord_frame;		/* Coordinate frame for vector values */
-  int nvert;			/* Number of vertex values */
-  int ntime;			/* Number of time points */
-  int nval_vert;		/* Number of values per vertex */
-  float tmin;			/* First time point */
-  float tstep;			/* Step between the time points */
-  int   *vertno;		/* Vertex numbers in the full triangulation (starting with zero) */
-  float **data;			/* The data values (time by time) */
-} mneMapRec, *mneMap;
+//typedef struct {		/* Spatiotemporal map */
+//  int kind;			/* What kind of data */
+//  int coord_frame;		/* Coordinate frame for vector values */
+//  int nvert;			/* Number of vertex values */
+//  int ntime;			/* Number of time points */
+//  int nval_vert;		/* Number of values per vertex */
+//  float tmin;			/* First time point */
+//  float tstep;			/* Step between the time points */
+//  int   *vertno;		/* Vertex numbers in the full triangulation (starting with zero) */
+//  float **data;			/* The data values (time by time) */
+//} mneMapRec, *mneMap;
 
 typedef struct {				     /* Plotter layout port definition */
   int   portno;					     /* Running number of this viewport */
@@ -520,12 +521,12 @@ typedef struct {
   int  kind;			/* Loaded from file or created here? */
 } *mneChSelection,mneChSelectionRec;
 
-typedef struct {
-  char        *name;		/* Name of this set */
-  mneChSelection *sels;		/* These are the selections */
-  int         nsel;		/* How many */
-  int         current;		/* Which is active now? */
-} *mneChSelectionSet, mneChSelectionSetRec;
+//typedef struct {
+//  char        *name;		/* Name of this set */
+//  mneChSelection *sels;		/* These are the selections */
+//  int         nsel;		/* How many */
+//  int         current;		/* Which is active now? */
+//} *mneChSelectionSet, mneChSelectionSetRec;
 
 typedef struct {
   unsigned int from;		/* Source transition value */
@@ -559,7 +560,7 @@ typedef struct {
 #endif
 
 typedef struct {
-  fiffDirEntry ent;		/* Where is this in the file (file bufs only, pointer to info) */
+  FIFFLIB::fiffDirEntry ent;		/* Where is this in the file (file bufs only, pointer to info) */
   int   firsts,lasts;		/* First and last sample */
   int   ntaper;			/* For filtered buffers: taper length */
   int   ns;			/* Number of samples (last - first + 1) */
@@ -599,7 +600,7 @@ typedef struct {
 typedef struct {
   mneCTFcompData *comps;	/* All available compensation data sets */
   int            ncomp;		/* How many? */
-  fiffChInfo     chs;		/* Channel information */
+  FIFFLIB::fiffChInfo     chs;		/* Channel information */
   int            nch;		/* How many of the above */
   mneCTFcompData undo;		/* Compensation data to undo the current compensation before applying current */
   mneCTFcompData current;	/* The current compensation data composed from the above 
@@ -614,7 +615,7 @@ typedef struct {		        /* One item in a derivation data set */
 					 * (This field is not always used) */
   int                  *valid;		/* Which of the derivations are valid considering the units of the input 
 					 * channels (This field is not always used) */
-  fiffChInfo           chs;		/* First matching channel info in each derivation */
+  FIFFLIB::fiffChInfo           chs;		/* First matching channel info in each derivation */
 } *mneDeriv,mneDerivRec;
 
 typedef struct {		        /* A collection of derivations */
@@ -625,7 +626,7 @@ typedef struct {		        /* A collection of derivations */
 
 typedef struct {			/* A comprehensive raw data structure */
   char             *filename;           /* This is our file */
-  fiffFile         file;
+  FIFFLIB::fiffFile         file;
   mneRawInfo       info;	        /* Loaded using the mne routines */
   char             **ch_names;		/* Useful to have the channel names as a single list */
   char             **badlist;		/* Bad channel names */
@@ -636,13 +637,13 @@ typedef struct {			/* A comprehensive raw data structure */
   mneRawBufDef     filt_bufs;	        /* These are the filtered ones */
   int              nfilt_buf;
   int              first_samp;          /* First sample? */
-  int              omit_samp;		/* How many samples of skip omitted in the beginning */
+  int              omit_samp;           /* How many samples of skip omitted in the beginning */
   int              first_samp_old;      /* This is the value first_samp would have in the old versions */
   int              omit_samp_old;       /* This is the value omit_samp would have in the old versions */
-  int              nsamp;	        /* How many samples in total? */
-  float            *first_sample_val;	/* Values at the first sample (for dc offset correction before filtering) */
-  mneProjOp        proj;		/* Projection operator */
-  mneSssData       sss;			/* SSS data found in this file */
+  int              nsamp;               /* How many samples in total? */
+  float            *first_sample_val;   /* Values at the first sample (for dc offset correction before filtering) */
+  mneProjOp        proj;                /* Projection operator */
+  INVERSELIB::MneSssData* sss;        /* SSS data found in this file */
   mneCTFcompDataSet comp;		/* Compensation data */
   int              comp_file;           /* Compensation status of these raw data in file */
   int              comp_now;            /* Compensation status of these raw data in file */
@@ -700,11 +701,11 @@ typedef struct {		 /* Measurement data representation in MNE calculations */
    * These are common to all data sets
    */
   char               *filename;	 /* The source file name */
-  fiffId             meas_id;	 /* The id from the measurement file */
-  fiffTimeRec        meas_date;	 /* The measurement date from the file */
-  fiffChInfo         chs;	 /* The channel information */
-  fiffCoordTrans     meg_head_t; /* MEG device <-> head coordinate transformation */
-  fiffCoordTrans     mri_head_t; /* MRI device <-> head coordinate transformation
+  FIFFLIB::fiffId             meas_id;	 /* The id from the measurement file */
+  FIFFLIB::fiffTimeRec        meas_date;	 /* The measurement date from the file */
+  FIFFLIB::fiffChInfo         chs;	 /* The channel information */
+  FIFFLIB::fiffCoordTrans     meg_head_t; /* MEG device <-> head coordinate transformation */
+  FIFFLIB::fiffCoordTrans     mri_head_t; /* MRI device <-> head coordinate transformation
 				    (duplicated from the inverse operator or loaded separately) */
   float              sfreq;	 /* Sampling frequency */
   int                nchan;	 /* Number of channels */
@@ -864,7 +865,7 @@ typedef struct {		 /* Measurement data representation in MNE calculations */
  */
 #define MNE_DEFAULT_TRIGGER_CH "STI 014"
 #define MNE_ENV_TRIGGER_CH          "MNE_TRIGGER_CH_NAME"
-#define MNE_ENV_TRIGGER_CH_MASK     "MNE_TRIGGER_CH_MASK"
+//#define MNE_ENV_TRIGGER_CH_MASK     "MNE_TRIGGER_CH_MASK"
 #define MNE_ENV_ROOT                "MNE_ROOT"
 
 #if defined(__cplusplus) 

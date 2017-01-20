@@ -119,6 +119,10 @@ public:
     */
     bool compute_guess_fields(DipoleFitData* f);
 
+
+
+
+
 public:
     float          **rr;            /**< These are the guess dipole locations */
     DipoleForward** guess_fwd;      /**< Forward solutions for the guesses */
