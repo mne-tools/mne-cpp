@@ -13,19 +13,19 @@ For more information please visit http://www.mne-cpp.org.
 
 
 Get and build the latest code
-=============================
+-----------------------------
 
 To get the latest code and build it follow this [guide](http://wiki.mne-cpp.org/index.php/Step_by_Step_Setup_Guide). 
 
 
 Get involved
-============
+------------
 
 If you want to contribute to MNE-CPP you can find all necessary information [here](http://wiki.mne-cpp.org/index.php/Portal:Contribute).
 
 
 Requirements
-==========
+------------
 
 **Windows**
 
@@ -41,13 +41,13 @@ Requirements
 
 
 Dependencies
-============
+------------
 
 [>= Qt 5.7.1](http://download.qt.io/official_releases/qt/)
 
 
-Contact information
-===================
+Contact
+-------
 
 A list of contact persons can be found [here](http://www.mne-cpp.org/index.php/contact/).
 
@@ -55,13 +55,13 @@ Mailing List: http://mail.nmr.mgh.harvard.edu/mailman/listinfo/mne_analysis
 
 
 Releases
-========
+--------
 
 [1.0.0](http://wiki.mne-cpp.org/index.php/ChangeLog)
 
 
-Licensing
-----------
+License
+-------
 
 MNE-CPP is **BSD-licensed** (3 clause):
 

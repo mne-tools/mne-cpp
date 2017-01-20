@@ -60,11 +60,9 @@ namespace FIFFLIB
 #define  FIFF_FAIL -1
 #define  FIFF_OK    0
 
-#define FIFFC_TAG_INFO_SIZE (sizeof(fiffTag) - sizeof(fiff_data_t *))
+#define FIFFC_TAG_INFO_SIZE (sizeof(fiffTagRec) - sizeof(fiff_data_t *))
 #define FIFFC_DATA_OFFSET FIFFC_TAG_INFO_SIZE
 #define FIFFM_TAG_INFO(x) &((x)->kind)
-
-
 
 /*
 * Quaternion channels for head position monitoring
@@ -261,35 +259,36 @@ namespace FIFFLIB
 #define FIFFV_XFIT_MAP_SURF_SENSORS 0  /**< Xfit contours on the sensor array */
 #define FIFFV_XFIT_MAP_SURF_HEAD    1  /**< Xfit contours on a head surface */
 #define FIFFV_XFIT_MAP_SURF_SPHERE  2  /**< Xfit contours on a spherical surface */
-    //
-    // Pointers
-    //
+//
+// Pointers
+//
 #define FIFFV_NEXT_SEQ    0
 #define FIFFV_NEXT_NONE   -1
-    //
-    // Channel types
-    //
+//
+// Channel types
+//
 #define FIFFV_MAGN_CH    1
 #define FIFFV_EL_CH      2
 #define FIFFV_MEG_CH     FIFFV_MAGN_CH
-#define FIFFV_REF_MEG_CH 301
-#define FIFFV_EEG_CH     FIFFV_EL_CH
 #define FIFFV_MCG_CH     201
+#define FIFFV_REF_MEG_CH 301    /**< CTF coil and channel type */
+#define FIFFV_EEG_CH     FIFFV_EL_CH
 #define FIFFV_STIM_CH      3
+
 #define FIFFV_EOG_CH     202
 #define FIFFV_EMG_CH     302
 #define FIFFV_ECG_CH     402
 #define FIFFV_MISC_CH    502
 #define FIFFV_RESP_CH    602   /**< Respiration monitoring*/
-    //
-    // More of those defined in MNE
-    //
+//
+// More of those defined in MNE
+//
 #define FIFFV_MNE_SURF_UNKNOWN       -1
 #define FIFFV_MNE_SURF_LEFT_HEMI     101
 #define FIFFV_MNE_SURF_RIGHT_HEMI    102
-    //
-    //   These relate to the Isotrak data
-    //
+//
+//   These relate to the Isotrak data
+//
 #define FIFFV_POINT_CARDINAL 1
 #define FIFFV_POINT_HPI      2
 #define FIFFV_POINT_EEG      3
@@ -299,9 +298,9 @@ namespace FIFFLIB
 #define FIFFV_POINT_LPA         1
 #define FIFFV_POINT_NASION      2
 #define FIFFV_POINT_RPA         3
-    //
-    //   These are the MNE fiff definitions
-    //
+//
+//   These are the MNE fiff definitions
+//
 #define FIFFB_MNE                    350
 #define FIFFB_MNE_SOURCE_SPACE       351
 #define FIFFB_MNE_FORWARD_SOLUTION   352
@@ -479,13 +478,10 @@ namespace FIFFLIB
 #define FIFFV_MNE_COORD_FS_TAL_GTZ  2004           /**< FreeSurfer Talairach coordinates (MNI z > 0)*/
 #define FIFFV_MNE_COORD_FS_TAL_LTZ  2005           /**< FreeSurfer Talairach coordinates (MNI z < 0)*/
 #define FIFFV_MNE_COORD_FS_TAL      2006           /**< FreeSurfer Talairach coordinates*/
-    //
-    // CTF coil and channel types
-    //
-    //FIFFV_REF_MEG_CH             301
-    //
-    // Others we need
-    //
+
+//
+// Others we need
+//
 #define FIFF_UNIT_AM_M2 203    /**< Am/m^2*/
 #define FIFF_UNIT_AM_M3 204    /**< Am/m^3*/
 

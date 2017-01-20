@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     fiff_id.h
+* @file     mne_sss_data.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     July, 2012
+* @date     January, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -18,7 +18,7 @@
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
 *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
-* 
+*
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
 * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
@@ -29,20 +29,27 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    FiffId class declaration.
+* @brief    MNE SSS Data (MneSssData) class declaration.
 *
 */
 
-#ifndef FIFF_ID_H
-#define FIFF_ID_H
+#ifndef MNESSSDATA_H
+#define MNESSSDATA_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "fiff_global.h"
-#include "fiff_types.h"
+#include "../inverse_global.h"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
 
 
 //*************************************************************************************************************
@@ -51,125 +58,92 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
+#include <QDebug>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE FIFFLIB
+// DEFINE NAMESPACE INVERSELIB
 //=============================================================================================================
 
-namespace FIFFLIB
+namespace INVERSELIB
 {
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
 
 
 //=============================================================================================================
 /**
-* These universially unique identifiers are also used to identify blocks within the files.
-* Replaces fiffIdRec which had a size of 5*4 = 20
+* Implements MNE SSS Data (Replaces *mneSssData,mneSssDataRec struct of MNE-C mne_types.h).
 *
-* @brief Universially unique identifier.
-**/
-
-class FIFFSHARED_EXPORT FiffId {
-
+* @brief MNE SSS Data description
+*/
+class INVERSESHARED_EXPORT MneSssData
+{
 public:
-    typedef QSharedPointer<FiffId> SPtr;            /**< Shared pointer type for FiffId. */
-    typedef QSharedPointer<const FiffId> ConstSPtr; /**< Const shared pointer type for FiffId. */
+    typedef QSharedPointer<MneSssData> SPtr;              /**< Shared pointer type for MneSssData. */
+    typedef QSharedPointer<const MneSssData> ConstSPtr;   /**< Const shared pointer type for MneSssData. */
 
     //=========================================================================================================
     /**
-    * Default Constructor
+    * Constructs the MNE SSS Data
     */
-    FiffId();
+    MneSssData();
 
     //=========================================================================================================
     /**
     * Copy constructor.
+    * Refactored: mne_dup_sss_data (mne_sss_data.c)
     *
-    * @param[in] p_FiffId   Universially unique identifier which should be copied
+    * @param[in] p_MneSssData   MNE SSS Data which should be copied
     */
-    FiffId(const FiffId& p_FiffId);
+    MneSssData(const MneSssData& p_MneSssData);
 
     //=========================================================================================================
     /**
-    * Destroys the universially unique identifier.
+    * Destroys the MNE SSS Data description
     */
-    ~FiffId();
+    ~MneSssData();
 
     //=========================================================================================================
     /**
-    * Initializes FIFF identifier.
-    */
-    void clear();
-
-    //=========================================================================================================
-    /**
-    * Prints the id
-    * Refactored: print_id (fiff_dir_tree.c)
-    */
-    void print() const;
-
-    //=========================================================================================================
-    /**
-    * True if FIFF id is empty.
+    * Output the SSS information for debugging purposes
+    * Refactored: mne_print_sss_data (mne_sss_data.c)
     *
-    * @return true if FIFF id is empty
+    * @param[in] f      the file stream to print to;
     */
-    inline bool isEmpty() const;
-
-    //=========================================================================================================
-    /**
-    * Size of the old struct (fiffIdRec) 5*int = 5*4 = 20
-    *
-    * @return the size of the old struct fiffIdRec.
-    */
-    inline static qint32 storageSize();
+    void print(FILE *f) const;
 
 public:
-    fiff_int_t version;     /**< File version */
-    fiff_int_t machid[2];   /**< Unique machine ID */
-    fiffTimeRec time;       /**< Time of the ID creation */
+    int   job;          /**< Value of FIFF_SSS_JOB tag */
+    int   coord_frame;  /**< Coordinate frame */
+    float origin[3];    /**< The expansion origin */
+    int   nchan;        /**< How many channels */
+    int   out_order;    /**< Order of the outside expansion */
+    int   in_order;     /**< Order of the inside expansion */
+    int* comp_info;     /**< Which components are included */
+    int   ncomp;        /**< How many entries in the above */
+    int   in_nuse;      /**< How many components included in the inside expansion */
+    int   out_nuse;     /**< How many components included in the outside expansion */
 
 // ### OLD STRUCT ###
-/**
-* A file ID.
-*
-* These universially unique identifiers are also
-* used to identify blocks within fthe files.
-*/
-typedef struct _fiffIdRec {
-    fiff_int_t version;     /**< File version */
-    fiff_int_t machid[2];   /**< Unique machine ID */
-    fiffTimeRec time;       /**< Time of the ID creation */
-} fiffIdRec,*fiffId;        /**< This is the file identifier */
-
-typedef fiffIdRec fiff_id_t;
+//typedef struct {
+//    int   job;			/* Value of FIFF_SSS_JOB tag */
+//    int   coord_frame;		/* Coordinate frame */
+//    float origin[3];		/* The expansion origin */
+//    int   nchan;			/* How many channels */
+//    int   out_order;		/* Order of the outside expansion */
+//    int   in_order;		/* Order of the inside expansion */
+//    int   *comp_info;		/* Which components are included */
+//    int   ncomp;			/* How many entries in the above */
+//    int   in_nuse;		/* How many components included in the inside expansion */
+//    int   out_nuse;		/* How many components included in the outside expansion */
+//} *mneSssData,mneSssDataRec;	/* Essential information about SSS */
 };
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline bool FiffId::isEmpty() const
-{
-    return this->version <= 0;
-}
+} // NAMESPACE INVERSELIB
 
-
-//*************************************************************************************************************
-
-inline qint32 FiffId::storageSize()
-{
-    return 20;
-}
-
-} // NAMESPACE
-
-#endif // FIFF_ID_H
+#endif // MNESSSDATA_H

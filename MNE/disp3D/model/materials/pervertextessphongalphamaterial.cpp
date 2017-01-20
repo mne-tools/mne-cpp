@@ -127,14 +127,14 @@ void PerVertexTessPhongAlphaMaterial::init()
     m_pVertexGL3Technique->graphicsApiFilter()->setMinorVersion(0);
     m_pVertexGL3Technique->graphicsApiFilter()->setProfile(QGraphicsApiFilter::CoreProfile);
 
-    //Setup transparency
-    m_pBlendState->setSourceRgb(QBlendEquationArguments::SourceAlpha);
-    m_pBlendState->setDestinationRgb(QBlendEquationArguments::OneMinusSourceAlpha);
-    m_pBlendEquation->setBlendFunction(QBlendEquation::Add);
+//    //Setup transparency
+//    m_pBlendState->setSourceRgb(QBlendEquationArguments::SourceAlpha);
+//    m_pBlendState->setDestinationRgb(QBlendEquationArguments::OneMinusSourceAlpha);
+//    m_pBlendEquation->setBlendFunction(QBlendEquation::Add);
 
-    m_pVertexGL3RenderPass->addRenderState(m_pBlendEquation);
-    m_pVertexGL3RenderPass->addRenderState(m_pNoDepthMask);
-    m_pVertexGL3RenderPass->addRenderState(m_pBlendState);
+//    m_pVertexGL3RenderPass->addRenderState(m_pBlendEquation);
+//    m_pVertexGL3RenderPass->addRenderState(m_pNoDepthMask);
+//    m_pVertexGL3RenderPass->addRenderState(m_pBlendState);
 
     m_pFilterKey->setName(QStringLiteral("renderingStyle"));
     m_pFilterKey->setValue(QStringLiteral("forward"));
