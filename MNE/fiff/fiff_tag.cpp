@@ -117,7 +117,7 @@ FiffTag::~FiffTag()
 
 //*************************************************************************************************************
 
-bool FiffTag::read_tag_data(FiffStream* p_pStream, FiffTag::SPtr& p_pTag, qint64 pos)
+bool FiffTag::read_tag_data(FiffStream::SPtr& p_pStream, FiffTag::SPtr& p_pTag, qint64 pos)
 {
     if(pos >= 0)
     {
@@ -140,6 +140,14 @@ bool FiffTag::read_tag_data(FiffStream* p_pStream, FiffTag::SPtr& p_pTag, qint64
         p_pStream->device()->seek(p_pTag->next);//fseek(fid,tag.next,'bof');
 
     return true;
+}
+
+
+//*************************************************************************************************************
+
+bool FiffTag::read_tag_info(FiffStream::SPtr& p_pStream, FiffTag::SPtr &p_pTag, bool p_bDoSkip)
+{
+    return read_tag_info(p_pStream.data(), p_pTag, p_bDoSkip);
 }
 
 
@@ -192,7 +200,7 @@ bool FiffTag::read_tag_info(FiffStream* p_pStream, FiffTag::SPtr &p_pTag, bool p
 
 //*************************************************************************************************************
 
-bool FiffTag::read_rt_tag(FiffStream* p_pStream, FiffTag::SPtr& p_pTag)
+bool FiffTag::read_rt_tag(FiffStream::SPtr& p_pStream, FiffTag::SPtr& p_pTag)
 {
     while(p_pStream->device()->bytesAvailable() < 16)
         p_pStream->device()->waitForReadyRead(10);
@@ -207,6 +215,14 @@ bool FiffTag::read_rt_tag(FiffStream* p_pStream, FiffTag::SPtr& p_pTag)
         return false;
 
     return true;
+}
+
+
+//*************************************************************************************************************
+
+bool FiffTag::read_tag(FiffStream::SPtr& p_pStream, FiffTag::SPtr& p_pTag, qint64 pos)
+{
+    read_tag(p_pStream.data(), p_pTag, pos);
 }
 
 

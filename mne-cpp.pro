@@ -48,7 +48,7 @@ SUBDIRS += \
     applications
 
 !contains(MNECPP_CONFIG, noExamples) {
-    SUBDIRS += examples
+#    SUBDIRS += examples
 }
 
 !contains(MNECPP_CONFIG, noTests) {

@@ -77,7 +77,7 @@ class FiffTag;
 * @brief Directory Node structure
 */
 class FIFFSHARED_EXPORT FiffDirNode {
-
+    friend class FiffStream;
 public:
     typedef QSharedPointer<FiffDirNode> SPtr;               /**< Shared pointer type for FiffDirNode. */
     typedef QSharedPointer<const FiffDirNode> ConstSPtr;    /**< Const shared pointer type for FiffDirNode. */
@@ -94,7 +94,7 @@ public:
     *
     * @param[in] p_FiffDirTree  Directory tree structure which should be copied
     */
-    FiffDirNode(const FiffDirNode &p_FiffDirTree);
+    FiffDirNode(const FiffDirNode* p_FiffDirTree);
 
 
     //=========================================================================================================
@@ -122,7 +122,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    static bool copy_tree(QSharedPointer<FiffStream> p_pStreamIn, const FiffId& in_id, const QList<FiffDirNode>& p_Nodes, QSharedPointer<FiffStream> p_pStreamOut);
+    static bool copy_tree(QSharedPointer<FiffStream>& p_pStreamIn, const FiffId& in_id, const QList< QSharedPointer<FiffDirNode> >& p_Nodes, QSharedPointer<FiffStream>& p_pStreamOut);
 
     //=========================================================================================================
     /**
@@ -132,7 +132,7 @@ public:
     */
     inline bool isEmpty() const
     {
-        return this->nent <= 0;
+        return this->type < 0;
     }
 
     //=========================================================================================================
@@ -149,8 +149,26 @@ public:
     *
     * @return index of the last read dir entry
     */
-    static qint32 make_dir_tree(FiffStream* p_pStream, QList<FiffDirEntry>& p_Dir, FiffDirNode& p_Tree, qint32 start = 0);
+    static qint32 make_subtree(QSharedPointer<FiffStream>& p_pStream, QList<FiffDirEntry::SPtr>& p_Dir, FiffDirNode::SPtr& p_Tree, qint32 start = 0);
 
+private:
+    //=========================================================================================================
+    /**
+    * ### MNE toolbox root function ###: Implementation of the fiff_make_dir_tree function
+    * Refactored: make_subtree (fiff_dir_tree.c)
+    *
+    * Create the directory tree structure
+    *
+    * @param[in] p_pStream the opened fiff file
+    * @param[in] p_Dir the dir entries of which the tree should be constructed
+    * @param[out] p_Tree the created dir tree
+    * @param[in] start dir entry to start (optional, by default 0)
+    *
+    * @return index of the last read dir entry
+    */
+    static qint32 make_subtree(FiffStream* p_pStream, QList<FiffDirEntry::SPtr>& p_Dir, FiffDirNode::SPtr& p_Tree, qint32 start = 0);
+
+public:
     //=========================================================================================================
     /**
     * ### MNE C function ###: implementation of the fiff_dir_tree_find
@@ -162,8 +180,26 @@ public:
     *
     * @return list of the found nodes
     */
-    QList<FiffDirNode> dir_tree_find(fiff_int_t p_kind) const;
+    QList<FiffDirNode::SPtr> dir_tree_find(fiff_int_t p_kind) const;
 
+    //=========================================================================================================
+    /**
+    * ### MNE C function ###: implementation of the fiff_dir_tree_get_tag
+    * Implementation of the find_tag function in various files e.g. fiff_read_named_matrix.m,
+    *
+    * Founds a tag of a given kind within a tree, and reeds it from file.
+    * Note: In difference to mne-matlab this is not a static function. This is a method of the FiffDirNode
+    *       class, that's why a tree object doesn't need to be handed to the function.
+    *
+    * @param[in] p_pStream the opened fif file
+    * @param[in] findkind the kind which should be found
+    * @param[out] p_pTag the found tag
+    *
+    * @return true if found, false otherwise
+    */
+    bool find_tag(QSharedPointer<FiffStream>& p_pStream, fiff_int_t findkind, QSharedPointer<FiffTag>& p_pTag) const;
+
+private:
     //=========================================================================================================
     /**
     * ### MNE C function ###: implementation of the fiff_dir_tree_get_tag
@@ -181,6 +217,7 @@ public:
     */
     bool find_tag(FiffStream* p_pStream, fiff_int_t findkind, QSharedPointer<FiffTag>& p_pTag) const;
 
+public:
     //=========================================================================================================
     /**
     * Implementation of the has_tag function in fiff_read_named_matrix.m
@@ -238,14 +275,17 @@ public:
     static const char *get_tag_explanation (int kind);
 
 public:
-    fiff_int_t          type;       /**< Block type for this directory */
-    FiffId              id;         /**< Id of this block if any */
-    FiffId              parent_id;  /**< Newly added to stay consistent with MATLAB implementation */
-    QList<FiffDirEntry> dir;        /**< Directory of tags in this node */
-    fiff_int_t          nent;       /**< Number of entries in this node */
-    fiff_int_t          nent_tree;  /**< Number of entries in the directory tree node */
-    QList<FiffDirNode>  children;   /**< Child nodes */
-    fiff_int_t          nchild;     /**< Number of child nodes */
+    fiff_int_t                  type;       /**< Block type for this directory */
+    FiffId                      id;         /**< Id of this block if any */
+    QList<FiffDirEntry::SPtr>   dir;        /**< Directory of tags in this node */
+    fiff_int_t                  nent;       /**< Number of entries in this node */
+    QList<FiffDirEntry::SPtr>   dir_tree;   /**< Directory of tags within this node subtrees
+                                                 as well as FIFF_BLOCK_START and FIFF_BLOCK_END */
+    fiff_int_t                  nent_tree;  /**< Number of entries in the directory tree node */
+    FiffDirNode::SPtr           parent;     /**< Parent node */
+    FiffId                      parent_id;  /**< Newly added to stay consistent with MATLAB implementation */
+    QList<FiffDirNode::SPtr>    children;   /**< Child nodes */
+    fiff_int_t                  nchild;     /**< Number of child nodes */
 
     // typedef struct _fiffDirNode {
     //  int                 type;    /**< Block type for this directory *
