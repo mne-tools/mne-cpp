@@ -77,7 +77,6 @@ class FiffTag;
 * @brief Directory Node structure
 */
 class FIFFSHARED_EXPORT FiffDirNode {
-    friend class FiffStream;
 public:
     typedef QSharedPointer<FiffDirNode> SPtr;               /**< Shared pointer type for FiffDirNode. */
     typedef QSharedPointer<const FiffDirNode> ConstSPtr;    /**< Const shared pointer type for FiffDirNode. */
@@ -149,9 +148,8 @@ public:
     *
     * @return index of the last read dir entry
     */
-    static qint32 make_subtree(QSharedPointer<FiffStream>& p_pStream, QList<FiffDirEntry::SPtr>& p_Dir, FiffDirNode::SPtr& p_Tree, qint32 start = 0);
+    inline static qint32 make_subtree(QSharedPointer<FiffStream>& p_pStream, QList<FiffDirEntry::SPtr>& p_Dir, FiffDirNode::SPtr& p_Tree, qint32 start = 0);
 
-private:
     //=========================================================================================================
     /**
     * ### MNE toolbox root function ###: Implementation of the fiff_make_dir_tree function
@@ -168,7 +166,6 @@ private:
     */
     static qint32 make_subtree(FiffStream* p_pStream, QList<FiffDirEntry::SPtr>& p_Dir, FiffDirNode::SPtr& p_Tree, qint32 start = 0);
 
-public:
     //=========================================================================================================
     /**
     * ### MNE C function ###: implementation of the fiff_dir_tree_find
@@ -197,9 +194,8 @@ public:
     *
     * @return true if found, false otherwise
     */
-    bool find_tag(QSharedPointer<FiffStream>& p_pStream, fiff_int_t findkind, QSharedPointer<FiffTag>& p_pTag) const;
+    inline bool find_tag(QSharedPointer<FiffStream>& p_pStream, fiff_int_t findkind, QSharedPointer<FiffTag>& p_pTag) const;
 
-private:
     //=========================================================================================================
     /**
     * ### MNE C function ###: implementation of the fiff_dir_tree_get_tag
@@ -217,7 +213,6 @@ private:
     */
     bool find_tag(FiffStream* p_pStream, fiff_int_t findkind, QSharedPointer<FiffTag>& p_pTag) const;
 
-public:
     //=========================================================================================================
     /**
     * Implementation of the has_tag function in fiff_read_named_matrix.m
@@ -305,6 +300,24 @@ public:
     //  int                 nchild;      /**< Number of child nodes *
     // } fiffDirNodeRec,*fiffDirNode;    /**< Directory tree structure used by the fiff library routines. *
 };
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+qint32 FiffDirNode::make_subtree(QSharedPointer<FiffStream> &p_pStream, QList<FiffDirEntry::SPtr> &p_Dir, FiffDirNode::SPtr &p_Tree, qint32 start)
+{
+    return make_subtree(p_pStream.data(), p_Dir, p_Tree, start);
+}
+
+
+//*************************************************************************************************************
+
+inline bool FiffDirNode::find_tag(QSharedPointer<FiffStream> &p_pStream, fiff_int_t findkind, QSharedPointer<FiffTag> &p_pTag) const
+{
+    return find_tag(p_pStream.data(), findkind, p_pTag);
+}
 
 } // NAMESPACE
 

@@ -107,7 +107,7 @@ void FiffDirNode::clear()
     dir.clear();
     nent = -1;
     nent_tree = -1;
-    parent = NULL;
+    parent.reset();
     children.clear();
     nchild = -1;
 }
@@ -200,17 +200,9 @@ bool FiffDirNode::copy_tree(FiffStream::SPtr& p_pStreamIn, const FiffId& in_id, 
 
 //*************************************************************************************************************
 
-qint32 FiffDirNode::make_subtree(FiffStream::SPtr& p_pStream, QList<FiffDirEntry::SPtr>& p_Dir, FiffDirNode::SPtr& node, qint32 start)
+qint32 FiffDirNode::make_subtree(FiffStream* p_pStream, QList<FiffDirEntry::SPtr>& p_Dir, FiffDirNode::SPtr& p_Tree, qint32 start)
 {
-    return make_subtree(p_pStream.data(), p_Dir, node, start);
-}
-
-
-//*************************************************************************************************************
-
-qint32 FiffDirNode::make_subtree(FiffStream* p_pStream, QList<FiffDirEntry::SPtr>& p_Dir, FiffDirNode::SPtr& node, qint32 start)
-{
-    node.clear();
+    p_Tree.clear();
 
     FiffTag::SPtr t_pTag;
 
@@ -231,38 +223,38 @@ qint32 FiffDirNode::make_subtree(FiffStream* p_pStream, QList<FiffDirEntry::SPtr
 
     qint32 current = start;
 
-    node->nent = 0;
-    node->dir_tree = p_Dir;
-    node->parent = NULL;
-    node->nchild = 0;
+    p_Tree->nent = 0;
+    p_Tree->dir_tree = p_Dir;
+    p_Tree->parent.reset();
+    p_Tree->nchild = 0;
 
-    node->type = block;
+    p_Tree->type = block;
 
 
     while (current < p_Dir.size())
     {
-        ++node->nent_tree;
+        ++p_Tree->nent_tree;
         if (p_Dir[current]->kind == FIFF_BLOCK_START)
         {
             if (current != start)
             {
                 FiffDirNode::SPtr child = FiffDirNode::SPtr(new FiffDirNode);
                 current = FiffDirNode::make_subtree(p_pStream,p_Dir,child, current);
-                child->parent = node;
-                ++node->nchild;
-                node->children.append(child);
+                child->parent = p_Tree;
+                ++p_Tree->nchild;
+                p_Tree->children.append(child);
             }
         }
         else if(p_Dir[current]->kind == FIFF_BLOCK_END)
         {
             FiffTag::read_tag(p_pStream, t_pTag, p_Dir[start]->pos);
-            if (*t_pTag->toInt() == node->type)
+            if (*t_pTag->toInt() == p_Tree->type)
                 break;
         }
         else
         {
-            ++node->nent;
-            node->dir.append(p_Dir[current]);
+            ++p_Tree->nent;
+            p_Tree->dir.append(p_Dir[current]);
 
             //
             //  Add the id information if available
@@ -272,7 +264,7 @@ qint32 FiffDirNode::make_subtree(FiffStream* p_pStream, QList<FiffDirEntry::SPtr
                 if (p_Dir[current]->kind == FIFF_FILE_ID)
                 {
                     FiffTag::read_tag(p_pStream, t_pTag, p_Dir[current]->pos);
-                    node->id = t_pTag->toFiffID();
+                    p_Tree->id = t_pTag->toFiffID();
                 }
             }
             else
@@ -280,12 +272,12 @@ qint32 FiffDirNode::make_subtree(FiffStream* p_pStream, QList<FiffDirEntry::SPtr
                 if (p_Dir[current]->kind == FIFF_BLOCK_ID)
                 {
                     FiffTag::read_tag(p_pStream, t_pTag, p_Dir[current]->pos);
-                    node->id = t_pTag->toFiffID();
+                    p_Tree->id = t_pTag->toFiffID();
                 }
                 else if (p_Dir[current]->kind == FIFF_PARENT_BLOCK_ID)
                 {
                     FiffTag::read_tag(p_pStream, t_pTag, p_Dir[current]->pos);
-                    node->parent_id = t_pTag->toFiffID();
+                    p_Tree->parent_id = t_pTag->toFiffID();
                 }
             }
         }
@@ -295,8 +287,8 @@ qint32 FiffDirNode::make_subtree(FiffStream* p_pStream, QList<FiffDirEntry::SPtr
     //
     // Eliminate the empty directory
     //
-    if(node->nent == 0)
-        node->dir.clear();
+    if(p_Tree->nent == 0)
+        p_Tree->dir.clear();
 
     //    qDebug() << "block =" << p_pTree->block << "nent =" << p_pTree->nent << "nchild =" << p_pTree->nchild;
     //    qDebug() << "end } " << block;
@@ -318,14 +310,6 @@ QList<FiffDirNode::SPtr> FiffDirNode::dir_tree_find(fiff_int_t p_kind) const
         nodes.append((*i)->dir_tree_find(p_kind));
 
     return nodes;
-}
-
-
-//*************************************************************************************************************
-
-bool FiffDirNode::find_tag(FiffStream::SPtr& p_pStream, fiff_int_t findkind, FiffTag::SPtr& p_pTag) const
-{
-    return find_tag(p_pStream, findkind, p_pTag);
 }
 
 

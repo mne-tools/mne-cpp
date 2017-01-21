@@ -155,8 +155,6 @@ const fiff_int_t DATA_TYPE           = 65535;      /**< DATA_TYPE encoding. ffff
 * @brief FIFF data tag
 */
 class FIFFSHARED_EXPORT FiffTag : public QByteArray {
-    friend class FiffStream;
-    friend class FiffDirNode;
 public:
     typedef QSharedPointer<FiffTag> SPtr;            /**< Shared pointer type for FiffTag. */
     typedef QSharedPointer<const FiffTag> ConstSPtr; /**< Const shared pointer type for FiffTag. */
@@ -192,7 +190,22 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    static bool read_tag_data(FiffStream::SPtr& p_pStream, FiffTag::SPtr& p_pTag, qint64 pos = -1);
+    inline static bool read_tag_data(FiffStream::SPtr& p_pStream, FiffTag::SPtr& p_pTag, qint64 pos = -1);
+
+    //=========================================================================================================
+    /**
+    * ### MNE toolbox root function ###: Implementation of the fiff_read_tag function
+    *
+    * Read tag data from a fif file.
+    * if pos is not provided, reading starts from the current file position
+    *
+    * @param[in] p_pStream opened fif file
+    * @param[out] p_pTag the read tag
+    * @param[in] pos position of the tag inside the fif file
+    *
+    * @return true if succeeded, false otherwise
+    */
+    static bool read_tag_data(FiffStream* p_pStream, FiffTag::SPtr& p_pTag, qint64 pos = -1);
 
     //=========================================================================================================
     /**
@@ -207,10 +220,8 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    static bool read_tag_info(FiffStream::SPtr& p_pStream, FiffTag::SPtr& p_pTag, bool p_bDoSkip = true);
+    inline static bool read_tag_info(FiffStream::SPtr& p_pStream, FiffTag::SPtr& p_pTag, bool p_bDoSkip = true);
 
-
-private:
     //=========================================================================================================
     /**
     * ### MNE toolbox root function ###: Implementation of the fiff_read_tag_info function
@@ -226,8 +237,6 @@ private:
     */
     static bool read_tag_info(FiffStream* p_pStream, FiffTag::SPtr& p_pTag, bool p_bDoSkip = true);
 
-
-public:
     //=========================================================================================================
     /**
     * Read one tag from a fif real-time stream.
@@ -238,7 +247,19 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    static bool read_rt_tag(FiffStream::SPtr& p_pStream, FiffTag::SPtr& p_pTag);
+    inline static bool read_rt_tag(FiffStream::SPtr& p_pStream, FiffTag::SPtr& p_pTag);
+
+    //=========================================================================================================
+    /**
+    * Read one tag from a fif real-time stream.
+    * difference to the other read tag functions is: that this function has blocking behaviour (waitForReadyRead)
+    *
+    * @param[in] p_pStream opened fif file
+    * @param[out] p_pTag the read tag
+    *
+    * @return true if succeeded, false otherwise
+    */
+    static bool read_rt_tag(FiffStream* p_pStream, FiffTag::SPtr& p_pTag);
 
     //=========================================================================================================
     /**
@@ -253,9 +274,8 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    static bool read_tag(FiffStream::SPtr& p_pStream, FiffTag::SPtr& p_pTag, qint64 pos = -1);
+    inline static bool read_tag(FiffStream::SPtr& p_pStream, FiffTag::SPtr& p_pTag, qint64 pos = -1);
 
-private:
     //=========================================================================================================
     /**
     * ### MNE toolbox root function ###: Implementation of the fiff_read_tag function
@@ -271,7 +291,6 @@ private:
     */
     static bool read_tag(FiffStream* p_pStream, FiffTag::SPtr& p_pTag, qint64 pos = -1);
 
-public:
     //=========================================================================================================
     /**
     * Provides information about matrix coding
@@ -629,6 +648,36 @@ private:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
+
+inline bool FiffTag::read_tag_data(FiffStream::SPtr &p_pStream, FiffTag::SPtr &p_pTag, qint64 pos)
+{
+    return read_tag_data(p_pStream.data(), p_pTag, pos);
+}
+
+
+//*************************************************************************************************************
+
+inline bool FiffTag::read_tag_info(FiffStream::SPtr &p_pStream, FiffTag::SPtr &p_pTag, bool p_bDoSkip)
+{
+    return read_tag_info(p_pStream.data(), p_pTag, p_bDoSkip);
+}
+
+
+//*************************************************************************************************************
+
+inline bool FiffTag::read_rt_tag(FiffStream::SPtr &p_pStream, FiffTag::SPtr &p_pTag)
+{
+    return read_rt_tag(p_pStream.data(), p_pTag);
+}
+
+
+//*************************************************************************************************************
+
+bool FiffTag::read_tag(FiffStream::SPtr &p_pStream, FiffTag::SPtr &p_pTag, qint64 pos)
+{
+    return read_tag(p_pStream.data(), p_pTag, pos);
+}
+
 
 //*************************************************************************************************************
 //=============================================================================================================
