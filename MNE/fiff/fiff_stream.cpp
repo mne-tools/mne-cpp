@@ -275,9 +275,10 @@ bool FiffStream::open()
     {
         qint32 k = 0;
         this->device()->seek(0);//fseek(fid,0,'bof');
-        FiffDirEntry::SPtr t_pFiffDirEntry = FiffDirEntry::SPtr(new FiffDirEntry);
+        FiffDirEntry::SPtr t_pFiffDirEntry;
         while (t_pTag->next >= 0)
         {
+            t_pFiffDirEntry = FiffDirEntry::SPtr(new FiffDirEntry);
             t_pFiffDirEntry->pos = this->device()->pos();//pos = ftell(fid);
             FiffTag::read_tag_info(this, t_pTag);
             ++k;
