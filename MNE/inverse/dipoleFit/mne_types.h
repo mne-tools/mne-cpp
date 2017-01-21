@@ -456,9 +456,9 @@ typedef struct {		/* Information about raw data in fiff file */
 				 * taken from the meas date 
 				 * or the meas block id
 				 * whence it may be inaccurate. */
-  int           buf_size;	/* Buffer size in samples */
-  int           maxshield_data; /* Are these unprocessed MaxShield data */
-  QList<FIFFLIB::FiffDirEntry>  rawDir;		/* Directory of raw data tags
+  int           buf_size;                       /**< Buffer size in samples */
+  int           maxshield_data;                 /**< Are these unprocessed MaxShield data */
+  QList<FIFFLIB::FiffDirEntry::SPtr> rawDir;    /**< Directory of raw data tags
 				 * These may be of type
 				 *       FIFF_DATA_BUFFER
 				 *       FIFF_DATA_SKIP
@@ -561,7 +561,7 @@ typedef struct {
 #endif
 
 typedef struct {
-  FIFFLIB::FiffDirEntry ent;		/* Where is this in the file (file bufs only, pointer to info) */
+  FIFFLIB::FiffDirEntry::SPtr ent;		/* Where is this in the file (file bufs only, pointer to info) */
   int   firsts,lasts;		/* First and last sample */
   int   ntaper;			/* For filtered buffers: taper length */
   int   ns;			/* Number of samples (last - first + 1) */
