@@ -1009,10 +1009,11 @@ inline QList< QSharedPointer<FiffDirEntry> > FiffTag::toDirEntry() const
         return p_ListFiffDir;
     else
     {
-        QSharedPointer<FiffDirEntry> t_pFiffDirEntry = QSharedPointer<FiffDirEntry>(new FiffDirEntry);
+        QSharedPointer<FiffDirEntry> t_pFiffDirEntry;
         qint32* t_pInt32 = (qint32*)this->data();
         for (int k = 0; k < this->size()/16; ++k)
         {
+            t_pFiffDirEntry = QSharedPointer<FiffDirEntry>(new FiffDirEntry);
             t_pFiffDirEntry->kind = t_pInt32[k*4];//fread(fid,1,'int32');
             t_pFiffDirEntry->type = t_pInt32[k*4+1];//fread(fid,1,'uint32');
             t_pFiffDirEntry->size = t_pInt32[k*4+2];//fread(fid,1,'int32');
