@@ -188,7 +188,7 @@ bool FiffEvokedSet::compensate_to(FiffEvokedSet& p_FiffEvokedSet, fiff_int_t to)
 
     for(qint16 i=0; i < p_FiffEvokedSet.evoked.size(); ++i)
     {
-        p_FiffEvokedSet.evoked[i].data = ctf_comp.data->data*p_FiffEvokedSet.evoked.at(i).data;
+        p_FiffEvokedSet.evoked[i].data = ctf_comp.data->data*p_FiffEvokedSet.evoked[i].data;
     }
 
     //Update the compensation info in the channel descriptors
