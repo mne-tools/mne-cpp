@@ -235,21 +235,21 @@ bool FiffEvokedSet::read(QIODevice& p_IODevice, FiffEvokedSet& p_FiffEvokedSet, 
     //
     //   Read the measurement info
     //
-    FiffDirNode meas;
+    FiffDirNode::SPtr meas;
     if(!t_pStream->read_meas_info(t_pStream->tree(), p_FiffEvokedSet.info, meas))
         return false;
     p_FiffEvokedSet.info.filename = t_sFileName; //move fname storage to read_meas_info member function
     //
     //   Locate the data of interest
     //
-    QList<FiffDirNode> processed = meas.dir_tree_find(FIFFB_PROCESSED_DATA);
+    QList<FiffDirNode::SPtr> processed = meas->dir_tree_find(FIFFB_PROCESSED_DATA);
     if (processed.size() == 0)
     {
         qWarning("Could not find processed data");
         return false;
     }
     //
-    QList<FiffDirNode> evoked_node = meas.dir_tree_find(FIFFB_EVOKED);
+    QList<FiffDirNode::SPtr> evoked_node = meas->dir_tree_find(FIFFB_EVOKED);
     if (evoked_node.size() == 0)
     {
         qWarning("Could not find evoked data");

@@ -1209,7 +1209,7 @@ bool MNEForwardSolution::read(QIODevice& p_IODevice, MNEForwardSolution& fwd, bo
     //
     //   Find all forward solutions
     //
-    QList<FiffDirNode> fwds = t_pStream->tree().dir_tree_find(FIFFB_MNE_FORWARD_SOLUTION);
+    QList<FiffDirNode::SPtr> fwds = t_pStream->tree()->dir_tree_find(FIFFB_MNE_FORWARD_SOLUTION);
 
     if (fwds.size() == 0)
     {
@@ -1220,7 +1220,7 @@ bool MNEForwardSolution::read(QIODevice& p_IODevice, MNEForwardSolution& fwd, bo
     //
     //   Parent MRI data
     //
-    QList<FiffDirNode> parent_mri = t_pStream->tree().dir_tree_find(FIFFB_MNE_PARENT_MRI_FILE);
+    QList<FiffDirNode::SPtr> parent_mri = t_pStream->tree()->dir_tree_find(FIFFB_MNE_PARENT_MRI_FILE);
     if (parent_mri.size() == 0)
     {
         t_pStream->device()->close();
@@ -1260,11 +1260,11 @@ bool MNEForwardSolution::read(QIODevice& p_IODevice, MNEForwardSolution& fwd, bo
     //   Locate and read the forward solutions
     //
     FiffTag::SPtr t_pTag;
-    FiffDirNode megnode;
-    FiffDirNode eegnode;
+    FiffDirNode::SPtr megnode;
+    FiffDirNode::SPtr eegnode;
     for(qint32 k = 0; k < fwds.size(); ++k)
     {
-        if(!fwds[k].find_tag(t_pStream.data(), FIFF_MNE_INCLUDED_METHODS, t_pTag))
+        if(!fwds[k]->find_tag(t_pStream, FIFF_MNE_INCLUDED_METHODS, t_pTag))
         {
             t_pStream->device()->close();
             std::cout << "Methods not listed for one of the forward solutions\n"; // ToDo throw error
@@ -1278,13 +1278,13 @@ bool MNEForwardSolution::read(QIODevice& p_IODevice, MNEForwardSolution& fwd, bo
         else if(*t_pTag->toInt() == FIFFV_MNE_EEG)
         {
             printf("EEG solution found\n");
-            eegnode = fwds.at(k);
+            eegnode = fwds[k];
         }
     }
 
     MNEForwardSolution megfwd;
     QString ori;
-    if (read_one(t_pStream.data(), megnode, megfwd))
+    if (read_one(t_pStream, megnode, megfwd))
     {
         if (megfwd.source_ori == FIFFV_MNE_FIXED_ORI)
             ori = QString("fixed");
@@ -1293,7 +1293,7 @@ bool MNEForwardSolution::read(QIODevice& p_IODevice, MNEForwardSolution& fwd, bo
         printf("\tRead MEG forward solution (%d sources, %d channels, %s orientations)\n", megfwd.nsource,megfwd.nchan,ori.toUtf8().constData());
     }
     MNEForwardSolution eegfwd;
-    if (read_one(t_pStream.data(), eegnode, eegfwd))
+    if (read_one(t_pStream, eegnode, eegfwd))
     {
         if (eegfwd.source_ori == FIFFV_MNE_FIXED_ORI)
             ori = QString("fixed");
@@ -1348,7 +1348,7 @@ bool MNEForwardSolution::read(QIODevice& p_IODevice, MNEForwardSolution& fwd, bo
     //
     //   Get the MRI <-> head coordinate transformation
     //
-    if(!parent_mri[0].find_tag(t_pStream.data(), FIFF_COORD_TRANS, t_pTag))
+    if(!parent_mri[0]->find_tag(t_pStream, FIFF_COORD_TRANS, t_pTag))
     {
         t_pStream->device()->close();
         std::cout << "MRI/head coordinate transformation not found\n"; // ToDo throw error
@@ -1687,18 +1687,18 @@ bool MNEForwardSolution::read(QIODevice& p_IODevice, MNEForwardSolution& fwd, bo
 
 //*************************************************************************************************************
 
-bool MNEForwardSolution::read_one(FiffStream* p_pStream, const FiffDirNode& p_Node, MNEForwardSolution& one)
+bool MNEForwardSolution::read_one(FiffStream::SPtr& p_pStream, const FiffDirNode::SPtr& p_Node, MNEForwardSolution& one)
 {
     //
     //   Read all interesting stuff for one forward solution
     //
-    if(p_Node.isEmpty())
+    if(p_Node->isEmpty())
         return false;
 
     one.clear();
     FiffTag::SPtr t_pTag;
 
-    if(!p_Node.find_tag(p_pStream, FIFF_MNE_SOURCE_ORIENTATION, t_pTag))
+    if(!p_Node->find_tag(p_pStream, FIFF_MNE_SOURCE_ORIENTATION, t_pTag))
     {
         p_pStream->device()->close();
         std::cout << "Source orientation tag not found."; //ToDo: throw error.
@@ -1707,7 +1707,7 @@ bool MNEForwardSolution::read_one(FiffStream* p_pStream, const FiffDirNode& p_No
 
     one.source_ori = *t_pTag->toInt();
 
-    if(!p_Node.find_tag(p_pStream, FIFF_MNE_COORD_FRAME, t_pTag))
+    if(!p_Node->find_tag(p_pStream, FIFF_MNE_COORD_FRAME, t_pTag))
     {
         p_pStream->device()->close();
         std::cout << "Coordinate frame tag not found."; //ToDo: throw error.
@@ -1716,7 +1716,7 @@ bool MNEForwardSolution::read_one(FiffStream* p_pStream, const FiffDirNode& p_No
 
     one.coord_frame = *t_pTag->toInt();
 
-    if(!p_Node.find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_NPOINTS, t_pTag))
+    if(!p_Node->find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_NPOINTS, t_pTag))
     {
         p_pStream->device()->close();
         std::cout << "Number of sources not found."; //ToDo: throw error.
@@ -1725,7 +1725,7 @@ bool MNEForwardSolution::read_one(FiffStream* p_pStream, const FiffDirNode& p_No
 
     one.nsource = *t_pTag->toInt();
 
-    if(!p_Node.find_tag(p_pStream, FIFF_NCHAN, t_pTag))
+    if(!p_Node->find_tag(p_pStream, FIFF_NCHAN, t_pTag))
     {
         p_pStream->device()->close();
         printf("Number of channels not found."); //ToDo: throw error.

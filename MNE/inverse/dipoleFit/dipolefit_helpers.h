@@ -1368,8 +1368,8 @@ int mne_read_meg_comp_eeg_ch_info(const QString& name,
     fiffChInfo eeg   = NULL;
     int        neeg  = 0;
     fiffId     id    = NULL;
-    QList<FiffDirNode> nodes;
-    FiffDirNode info;
+    QList<FiffDirNode::SPtr> nodes;
+    FiffDirNode::SPtr info;
 //    FiffDirEntry this_ent;
     FiffTag::SPtr t_pTag;
 //    fiffTagRec   tag;
@@ -1388,12 +1388,12 @@ int mne_read_meg_comp_eeg_ch_info(const QString& name,
         goto bad;
 
 //    nodes = fiff_dir_tree_find(in->dirtree,FIFFB_MNE_PARENT_MEAS_FILE);
-    nodes = stream->tree().dir_tree_find(FIFFB_MNE_PARENT_MEAS_FILE);
+    nodes = stream->tree()->dir_tree_find(FIFFB_MNE_PARENT_MEAS_FILE);
 
     if (nodes.size() == 0) {
 //        FREE(nodes);
 //        nodes = fiff_dir_tree_find(in->dirtree,FIFFB_MEAS_INFO);
-        nodes = stream->tree().dir_tree_find(FIFFB_MEAS_INFO);
+        nodes = stream->tree()->dir_tree_find(FIFFB_MEAS_INFO);
         if (nodes.size() == 0) {
             qCritical ("Could not find the channel information.");
             goto bad;
@@ -1401,15 +1401,15 @@ int mne_read_meg_comp_eeg_ch_info(const QString& name,
     }
     info = nodes[0];// FREE(nodes);
     to_find = 0;
-    for (k = 0; k < info.nent; k++) {
-        kind = info.dir[k].kind;
-        pos  = info.dir[k].pos;
+    for (k = 0; k < info->nent; k++) {
+        kind = info->dir[k]->kind;
+        pos  = info->dir[k]->pos;
         switch (kind) {
         case FIFF_NCHAN :
 //            if (fiff_read_this_tag (in->fd,this_ent->pos,&tag) == FIFF_FAIL)
 //                goto bad;
 //            nchan = *(int *)(tag.data);
-            if (!FiffTag::read_tag(stream.data(),t_pTag,pos))
+            if (!FiffTag::read_tag(stream,t_pTag,pos))
                 goto bad;
             nchan = *t_pTag->toInt();
             chs = MALLOC(nchan,fiffChInfoRec);
@@ -1422,7 +1422,7 @@ int mne_read_meg_comp_eeg_ch_info(const QString& name,
 //            if (fiff_read_this_tag (in->fd,this_ent->pos,&tag) == FIFF_FAIL)
 //                goto bad;
 //            *id = *(fiffId)tag.data;
-            if(!FiffTag::read_tag(stream.data(), t_pTag, pos))
+            if(!FiffTag::read_tag(stream, t_pTag, pos))
                 goto bad;
 //            id = t_pTag->toFiffID();
             *id = *(fiffId)t_pTag->data();
@@ -1432,7 +1432,7 @@ int mne_read_meg_comp_eeg_ch_info(const QString& name,
 //            if (fiff_read_this_tag (in->fd,this_ent->pos,&tag) == FIFF_FAIL)
 //                goto bad;
 //            t = (fiffCoordTrans)tag.data;
-            if(!FiffTag::read_tag(stream.data(), t_pTag, pos))
+            if(!FiffTag::read_tag(stream, t_pTag, pos))
                 goto bad;
 //            t = t_pTag->toCoordTrans();
             t = (fiffCoordTrans)t_pTag->data();
@@ -1447,7 +1447,7 @@ int mne_read_meg_comp_eeg_ch_info(const QString& name,
 //            if (fiff_read_this_tag (in->fd,this_ent->pos,&tag) == FIFF_FAIL)
 //                goto bad;
 //            this_ch = (fiffChInfo)(tag.data);
-            if(!FiffTag::read_tag(stream.data(), t_pTag, pos))
+            if(!FiffTag::read_tag(stream, t_pTag, pos))
                 goto bad;
 //            this_ch = t_pTag->toChInfo();
             this_ch = (fiffChInfo)(t_pTag->data());
@@ -1583,7 +1583,7 @@ void mne_merge_channels(fiffChInfo chs1, int nch1,
 
 //============================= read_ch_info.c =============================
 
-//static FiffDirNode find_meas (FiffDirNode& node)
+//static FiffDirNode find_meas (FiffDirNode::SPtr& node)
 ///*
 //      * Find corresponding meas node
 //      */
@@ -1616,7 +1616,7 @@ void mne_merge_channels(fiffChInfo chs1, int nch1,
 
 static int get_all_chs (//fiffFile file,	        /* The file we are reading */
                         FiffStream::SPtr& stream,
-                        FiffDirNode& node,	/* The directory node containing our data */
+                        FiffDirNode::SPtr& node,	/* The directory node containing our data */
                         fiffId *id,		/* The block id from the nearest FIFFB_MEAS
                                                    parent */
                         fiffChInfo *chp,	/* Channel descriptions */
@@ -1633,8 +1633,8 @@ static int get_all_chs (//fiffFile file,	        /* The file we are reading */
     fiffChInfo this_ch;
     int j,k;
     int to_find = 0;
-    QList<FiffDirNode> meas;
-    QList<FiffDirNode> meas_info;
+    QList<FiffDirNode::SPtr> meas;
+    QList<FiffDirNode::SPtr> meas_info;
     fiff_int_t kind, pos;
     FiffTag::SPtr t_pTag;
 
@@ -1645,14 +1645,14 @@ static int get_all_chs (//fiffFile file,	        /* The file we are reading */
     /*
    * Find desired parents
    */
-    meas = node.dir_tree_find(FIFFB_MEAS);
+    meas = node->dir_tree_find(FIFFB_MEAS);
 //    if ((meas = find_meas(node)) == NULL) {
     if (meas.size() == 0) {
         qCritical ("Meas. block not found!");
         goto bad;
     }
 
-    meas_info = meas[0].dir_tree_find(FIFFB_MEAS_INFO);
+    meas_info = meas[0]->dir_tree_find(FIFFB_MEAS_INFO);
 //    if ((node = find_meas_info(node)) == NULL) {
     if (meas_info.count() == 0) {
         qCritical ("Meas. info not found!");
@@ -1662,26 +1662,26 @@ static int get_all_chs (//fiffFile file,	        /* The file we are reading */
    * Is there a block id is in the FIFFB_MEAS node?
    */
 //    if (meas->id != NULL) {
-    if (!meas[0].id.isEmpty()) {
+    if (!meas[0]->id.isEmpty()) {
         *id = MALLOC(1,fiffIdRec);
 //        memcpy (*id,meas[0].id,sizeof(fiffIdRec));
-        (*id)->version = meas[0].id.version;
-        (*id)->machid[0] = meas[0].id.machid[0];
-        (*id)->machid[1] = meas[0].id.machid[1];
-        (*id)->time = meas[0].id.time;
+        (*id)->version = meas[0]->id.version;
+        (*id)->machid[0] = meas[0]->id.machid[0];
+        (*id)->machid[1] = meas[0]->id.machid[1];
+        (*id)->time = meas[0]->id.time;
     }
     /*
     * Others from FIFFB_MEAS_INFO
     */
-    for (k = 0; k < meas_info[0].nent; k++) {
-        kind = meas_info[0].dir[k].kind;
-        pos  = meas_info[0].dir[k].pos;
+    for (k = 0; k < meas_info[0]->nent; k++) {
+        kind = meas_info[0]->dir[k]->kind;
+        pos  = meas_info[0]->dir[k]->pos;
         switch (kind) {
         case FIFF_NCHAN :
 //            if (fiff_read_this_tag (file->fd,this_entry->pos,&tag) == -1)
 //                goto bad;
 //            *nchan = *(int *)(tag.data);
-            if (!FiffTag::read_tag(stream.data(),t_pTag,pos))
+            if (!FiffTag::read_tag(stream,t_pTag,pos))
                 goto bad;
             *nchan = *t_pTag->toInt();
             ch = MALLOC(*nchan,fiffChInfoRec);
@@ -1694,7 +1694,7 @@ static int get_all_chs (//fiffFile file,	        /* The file we are reading */
 //            if (fiff_read_this_tag (file->fd,this_entry->pos,&tag) == -1)
 //                goto bad;
 //            this_ch = (fiffChInfo)(tag.data);
-            if (!FiffTag::read_tag(stream.data(),t_pTag,pos))
+            if (!FiffTag::read_tag(stream,t_pTag,pos))
                 goto bad;
             this_ch = (fiffChInfo)t_pTag->data();
             if (this_ch->scanNo <= 0 || this_ch->scanNo > *nchan) {
@@ -1737,8 +1737,8 @@ static int read_ch_info(const QString&  name,
 
     fiffFile       in = NULL;
     fiffTagRec     tag;
-    QList<FiffDirNode> meas;
-    FiffDirNode    node;
+    QList<FiffDirNode::SPtr> meas;
+    FiffDirNode::SPtr    node;
 
     tag.data = NULL;
 //    if ((in = fiff_open(name.toLatin1().data())) == NULL)
@@ -1747,7 +1747,7 @@ static int read_ch_info(const QString&  name,
         goto bad;
 
 //    meas = fiff_dir_tree_find(in->dirtree,FIFFB_MEAS);
-    meas = stream->tree().dir_tree_find(FIFFB_MEAS);
+    meas = stream->tree()->dir_tree_find(FIFFB_MEAS);
     if (meas.size() == 0) {
         qCritical ("%s : no MEG data available here",name.toLatin1().data());
         goto bad;
@@ -2144,7 +2144,7 @@ void mne_print_coord_transform(FILE *log, fiffCoordTrans t)
 
 fiffCoordTrans mne_read_transform_from_node(//fiffFile in,
                                             FiffStream::SPtr& stream,
-                                            const FiffDirNode& node,
+                                            const FiffDirNode::SPtr& node,
                                             int from, int to)
 /*
       * Read the specified coordinate transformation
@@ -2158,14 +2158,14 @@ fiffCoordTrans mne_read_transform_from_node(//fiffFile in,
     int k;
 
 //    tag.data = NULL;
-    for (k = 0; k < node.nent; k++)
-        kind = node.dir[k].kind;
-        pos  = node.dir[k].pos;
+    for (k = 0; k < node->nent; k++)
+        kind = node->dir[k]->kind;
+        pos  = node->dir[k]->pos;
         if (kind == FIFF_COORD_TRANS) {
 //            if (fiff_read_this_tag (in->fd,dir->pos,&tag) == FIFF_FAIL)
 //                goto out;
 //            res = (fiffCoordTrans)tag.data;
-            if (!FiffTag::read_tag(stream.data(),t_pTag,pos))
+            if (!FiffTag::read_tag(stream,t_pTag,pos))
                 goto out;
             res = (fiffCoordTrans)t_pTag->data();
             if (res->from == from && res->to == to) {
@@ -2212,13 +2212,13 @@ fiffCoordTrans mne_read_transform(const QString& name,int from, int to)
         goto out;
 
     for (k = 0; k < stream->dir().size(); k++) {
-        kind = stream->dir()[k].kind;
-        pos  = stream->dir()[k].pos;
+        kind = stream->dir()[k]->kind;
+        pos  = stream->dir()[k]->pos;
         if (kind == FIFF_COORD_TRANS) {
 //            if (fiff_read_this_tag (in->fd,dir->pos,&tag) == FIFF_FAIL)
 //                goto out;
 //            res = (fiffCoordTrans)tag.data;
-            if (!FiffTag::read_tag(stream.data(),t_pTag,pos))
+            if (!FiffTag::read_tag(stream,t_pTag,pos))
                 goto out;
             res = (fiffCoordTrans)t_pTag->data();
             if (res->from == from && res->to == to) {
@@ -3670,7 +3670,7 @@ void mne_channel_names_to_name_list(fiffChInfo chs, int nch,
 
 mneNamedMatrix mne_read_named_matrix(//fiffFile in,
                                      FiffStream::SPtr& stream,
-                                     FiffDirNode& node,int kind)
+                                     FiffDirNode::SPtr& node,int kind)
 /*
       * Read a named matrix from the specified node
       */
@@ -3691,10 +3691,10 @@ mneNamedMatrix mne_read_named_matrix(//fiffFile in,
    * If the node is a named-matrix mode, use it.
    * Otherwise, look in first-generation children
    */
-    if (node.type == FIFFB_MNE_NAMED_MATRIX) {
+    if (node->type == FIFFB_MNE_NAMED_MATRIX) {
 //        if ((tag = fiff_dir_tree_get_tag(in,node,kind)) == NULL)
 //            goto bad;
-        if(!node.find_tag(stream.data(), kind, t_pTag))
+        if(!node->find_tag(stream, kind, t_pTag))
             goto bad;
 //        if ((dims = fiff_get_matrix_dims(tag)) == NULL)
 //            goto bad;
@@ -3716,10 +3716,10 @@ mneNamedMatrix mne_read_named_matrix(//fiffFile in,
         fromFloatEigenMatrix(tmp_data, data);
     }
     else {
-        for (k = 0; k < node.nchild; k++) {
-            if (node.children[k].type == FIFFB_MNE_NAMED_MATRIX) {
+        for (k = 0; k < node->nchild; k++) {
+            if (node->children[k]->type == FIFFB_MNE_NAMED_MATRIX) {
 //                if ((tag = fiff_dir_tree_get_tag(in,node->children[k],kind)) != NULL) {
-                if(node.children[k].find_tag(stream.data(), kind, t_pTag)) {
+                if(node->children[k].find_tag(stream, kind, t_pTag)) {
 //                    if ((dims = fiff_get_matrix_dims(tag)) == NULL)
 //                        goto bad;
                     t_pTag->getMatrixDimensions(ndim, dims);
@@ -3737,7 +3737,7 @@ mneNamedMatrix mne_read_named_matrix(//fiffFile in,
                     qDebug() << "<<<TODO>>> Eventually a transposition of data required!";
                     fromFloatEigenMatrix(tmp_data, data);
 
-                    node = node.children[k];
+                    node = node->children[k];
                     break;
                 }
             }
@@ -3750,7 +3750,7 @@ mneNamedMatrix mne_read_named_matrix(//fiffFile in,
    */
 //    if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_NROW)) == NULL)
 //        nrow = dims[2];
-    if (!node.find_tag(stream.data(), FIFF_MNE_NROW, t_pTag))
+    if (!node->find_tag(stream, FIFF_MNE_NROW, t_pTag))
         nrow = dims[0];
     else {
         nrow = *t_pTag->toInt();
@@ -3765,7 +3765,7 @@ mneNamedMatrix mne_read_named_matrix(//fiffFile in,
     */
 //    if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_NCOL)) == NULL)
 //        ncol = dims[1];
-    if(!node.find_tag(stream.data(), FIFF_MNE_NCOL, t_pTag))
+    if(!node->find_tag(stream, FIFF_MNE_NCOL, t_pTag))
         ncol = dims[1];
     else {
 //        ncol = *(int *)(tag->data);
@@ -3779,7 +3779,7 @@ mneNamedMatrix mne_read_named_matrix(//fiffFile in,
 
 //    if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_ROW_NAMES)) != NULL) {
 //        s = (char *)(tag->data);
-    if(!node.find_tag(stream.data(), FIFF_MNE_ROW_NAMES, t_pTag)) {
+    if(!node->find_tag(stream, FIFF_MNE_ROW_NAMES, t_pTag)) {
         s = (char *)(t_pTag->data());
         mne_string_to_name_list(s,&rownames,&val);
 //        TAG_FREE(tag);
@@ -3791,7 +3791,7 @@ mneNamedMatrix mne_read_named_matrix(//fiffFile in,
     }
 //    if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_COL_NAMES)) != NULL) {
 //        s = (char *)(tag->data);
-    if(!node.find_tag(stream.data(), FIFF_MNE_COL_NAMES, t_pTag)) {
+    if(!node->find_tag(stream, FIFF_MNE_COL_NAMES, t_pTag)) {
         s = (char *)(t_pTag->data());
         mne_string_to_name_list(s,&colnames,&val);
 //        TAG_FREE(tag);
@@ -3942,19 +3942,19 @@ bad : {
 
 static char *get_comment (//fiffFile file,
                           FiffStream::SPtr& stream,
-                          const FiffDirNode& start)
+                          const FiffDirNode::SPtr& start)
 
 {
     int k;
 //    fiffTagRec tag;
     FiffTag::SPtr t_pTag;
-    QList<FiffDirEntry> ent = start.dir;
+    QList<FiffDirEntry> ent = start->dir;
 //    tag.data = NULL;
     for (k = 0; k < start.nent; k++)
-        if (ent[k].kind == FIFF_COMMENT) {
+        if (ent[k]->kind == FIFF_COMMENT) {
 //            if (fiff_read_this_tag (file->fd,ent->pos,&tag) != -1)
 //                return ((char *)tag.data);
-            if (FiffTag::read_tag(stream.data(),t_pTag,ent[k].pos)) {
+            if (FiffTag::read_tag(stream,t_pTag,ent[k].pos)) {
                 return ((char *)t_pTag->data());
             }
         }
@@ -3963,22 +3963,22 @@ static char *get_comment (//fiffFile file,
 
 static void get_aspect_name_type(//fiffFile file,
                                  FiffStream::SPtr& stream,
-                                 const FiffDirNode& start,
+                                 const FiffDirNode::SPtr& start,
                                  char **namep, int *typep)
 
 {
     int k;
 //    fiffTagRec tag;
     FiffTag::SPtr t_pTag;
-    QList<FiffDirEntry> ent = start.dir;
+    QList<FiffDirEntry::SPtr> ent = start->dir;
     const char *res = "unknown";
     int  type = -1;
 
 //    tag.data = NULL;
     for (k = 0; k < start.nent; k++)
-        if (ent[k].kind == FIFF_ASPECT_KIND) {
+        if (ent[k]->kind == FIFF_ASPECT_KIND) {
 //            if (fiff_read_this_tag (file->fd,ent->pos,&tag) != -1) {
-            if (FiffTag::read_tag(stream.data(),t_pTag,ent[k].pos)) {
+            if (FiffTag::read_tag(stream,t_pTag,ent[k].pos)) {
 //                type = *(int *)(tag.data);
                 type = *t_pTag->toInt();
                 switch (type) {
@@ -4021,7 +4021,7 @@ static void get_aspect_name_type(//fiffFile file,
 
 static char *get_meas_date (//fiffFile file,
                             FiffStream::SPtr& stream,
-                            const FiffDirNode& node)
+                            const FiffDirNode::SPtr& node)
 
 {
     int k;
@@ -4030,21 +4030,21 @@ static char *get_meas_date (//fiffFile file,
 //    fiffDirEntry ent;
     char *res = NULL;
     fiff_int_t kind, pos;
-    QList<FiffDirNode> meas_info;
+    QList<FiffDirNode::SPtr> meas_info;
 
-    meas_info = node.dir_tree_find(FIFFB_MEAS_INFO);
+    meas_info = node->dir_tree_find(FIFFB_MEAS_INFO);
 //    if ((node = find_meas_info(node)) == NULL) {
     if (meas_info.count() == 0) {
         return res;
     }
 //    tag.data = NULL;
     for (k = 0; k < meas_info[0].nent;k++) {
-        kind = meas_info[0].dir[k].kind;
-        pos  = meas_info[0].dir[k].pos;
+        kind = meas_info[0]->dir[k]->kind;
+        pos  = meas_info[0]->dir[k].pos;
         if (kind == FIFF_MEAS_DATE)
         {
  //           if (fiff_read_this_tag (file->fd,ent->pos,&tag) != -1) {
-            if (FiffTag::read_tag(stream.data(),t_pTag,pos)) {
+            if (FiffTag::read_tag(stream,t_pTag,pos)) {
 //                fiffTime meas_date = (fiffTime)tag.data;
                 fiffTime meas_date = (fiffTime)t_pTag->data();
                 time_t   time = meas_date->secs;
@@ -4063,7 +4063,7 @@ static char *get_meas_date (//fiffFile file,
 
 int mne_find_evoked_types_comments (//fiffFile    file,
                                     FiffStream::SPtr& stream,
-                                    QList<FiffDirNode>& nodesp,
+                                    QList<FiffDirNode::SPtr>& nodesp,
                                     int         **aspect_typesp,
                                     char        ***commentsp)
 /*
@@ -4071,10 +4071,10 @@ int mne_find_evoked_types_comments (//fiffFile    file,
       */
 {
 //    fiffDirNode *evoked;
-    QList<FiffDirNode> evoked;
+    QList<FiffDirNode::SPtr> evoked;
 //    fiffDirNode *meas;
-    QList<FiffDirNode> meas;
-    QList<FiffDirNode> nodes;
+    QList<FiffDirNode::SPtr> meas;
+    QList<FiffDirNode::SPtr> nodes;
     int         evoked_count,count;
     char        *part,*type,*meas_date;
     char        **comments = NULL;
@@ -4087,19 +4087,19 @@ int mne_find_evoked_types_comments (//fiffFile    file,
     * First find all measurements
     */
 //    meas = fiff_dir_tree_find(file->dirtree,FIFFB_MEAS);
-    meas = stream->tree().dir_tree_find(FIFFB_MEAS);
+    meas = stream->tree()->dir_tree_find(FIFFB_MEAS);
     /*
    * Process each measurement
    */
     for (count = 0,p = 0; p < meas.size(); p++) {
 //        evoked = fiff_dir_tree_find(meas[p],FIFFB_EVOKED);
-        evoked = meas[p].dir_tree_find(FIFFB_EVOKED);
+        evoked = meas[p]->dir_tree_find(FIFFB_EVOKED);
         /*
         * Count the entries
         */
         for (evoked_count = 0, j = 0; j < evoked.size(); j++) {
             for (k = 0; k < evoked[j].nchild; k++) {
-                if (evoked[j].children[k].type == FIFFB_ASPECT) {
+                if (evoked[j].children[k]->type == FIFFB_ASPECT) {
                     evoked_count++;
                 }
             }
@@ -4115,7 +4115,7 @@ int mne_find_evoked_types_comments (//fiffFile    file,
      */
         for (j = 0; j < evoked.size(); j++)	/* Evoked data */
             for (k = 0; k < evoked[j].nchild; k++)
-                if (evoked[j].children[k].type == FIFFB_ASPECT) {
+                if (evoked[j].children[k]->type == FIFFB_ASPECT) {
                     meas_date = get_meas_date(stream,evoked[j]);
                     part      = get_comment(stream,evoked[j]);
                     get_aspect_name_type(stream,evoked[j].children[k],&type,types+count);
@@ -4166,13 +4166,13 @@ int mne_find_evoked_types_comments (//fiffFile    file,
 }
 
 
-QList<FiffDirNode> mne_find_evoked (//fiffFile file,
+QList<FiffDirNode::SPtr> mne_find_evoked (//fiffFile file,
                                     FiffStream::SPtr& stream,
                                     char ***commentsp)  /* Optionally return the compiled
                                                      comments here */
 
 {
-    QList<FiffDirNode> evoked;
+    QList<FiffDirNode::SPtr> evoked;
     mne_find_evoked_types_comments(stream,evoked,NULL,commentsp);
     return evoked;
 }
@@ -4187,7 +4187,7 @@ QList<FiffDirNode> mne_find_evoked (//fiffFile file,
 
 static int get_meas_info (//fiffFile file,	 /* The file we are reading */
                           FiffStream::SPtr& stream,
-                          const FiffDirNode& node,	 /* The directory node containing our data */
+                          const FiffDirNode::SPtr& node,	 /* The directory node containing our data */
                           fiffId *id,		 /* The block id from the nearest FIFFB_MEAS
                                                                               parent */
                           fiffTime *meas_date,   /* Measurement date */
@@ -4211,9 +4211,9 @@ static int get_meas_info (//fiffFile file,	 /* The file we are reading */
     fiffCoordTrans t;
     int j,k;
     int to_find = 4;
-    QList<FiffDirNode> hpi;
-    QList<FiffDirNode> meas;
-    QList<FiffDirNode> meas_info;
+    QList<FiffDirNode::SPtr> hpi;
+    QList<FiffDirNode::SPtr> meas;
+    QList<FiffDirNode::SPtr> meas_info;
     fiff_int_t kind, pos;
     FiffTag::SPtr t_pTag;
 
@@ -4225,14 +4225,14 @@ static int get_meas_info (//fiffFile file,	 /* The file we are reading */
     /*
    * Find desired parents
    */
-    meas = node.dir_tree_find(FIFFB_MEAS);
+    meas = node->dir_tree_find(FIFFB_MEAS);
 //    if ((meas = find_meas(node)) == NULL) {
     if (meas.size() == 0) {
         printf ("Meas. block not found!");
         goto bad;
     }
 
-    meas_info = node.dir_tree_find(FIFFB_MEAS_INFO);
+    meas_info = node->dir_tree_find(FIFFB_MEAS_INFO);
 //    if ((node = find_meas_info(node)) == NULL) {
     if (meas_info.count() == 0) {
         printf ("Meas. info not found!");
@@ -4256,15 +4256,15 @@ static int get_meas_info (//fiffFile file,	 /* The file we are reading */
     *lowpass = -1;
     *highpass = -1;
     for (k = 0; k < meas_info[0].nent; k++) {
-        kind = meas_info[0].dir[k].kind;
-        pos  = meas_info[0].dir[k].pos;
+        kind = meas_info[0]->dir[k]->kind;
+        pos  = meas_info[0]->dir[k].pos;
         switch (kind) {
 
         case FIFF_NCHAN :
 //            if (fiff_read_this_tag (file->fd,this_entry->pos,&tag) == -1)
 //                goto bad;
 //            *nchan = *(int *)(tag.data);
-            if (!FiffTag::read_tag(stream.data(),t_pTag,pos))
+            if (!FiffTag::read_tag(stream,t_pTag,pos))
                 goto bad;
             *nchan = *t_pTag->toInt();
             ch = MALLOC(*nchan,fiffChInfoRec);
@@ -4277,7 +4277,7 @@ static int get_meas_info (//fiffFile file,	 /* The file we are reading */
 //            if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
 //                goto bad;
 //            *sfreq = *(float *)(tag.data);
-            if (!FiffTag::read_tag(stream.data(),t_pTag,pos))
+            if (!FiffTag::read_tag(stream,t_pTag,pos))
                 goto bad;
             *sfreq = *t_pTag->toFloat();
             to_find--;
@@ -4286,7 +4286,7 @@ static int get_meas_info (//fiffFile file,	 /* The file we are reading */
         case FIFF_MEAS_DATE :
 //            if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
 //                goto bad;
-            if (!FiffTag::read_tag(stream.data(),t_pTag,pos))
+            if (!FiffTag::read_tag(stream,t_pTag,pos))
                 goto bad;
             if (*meas_date)
                 FREE(*meas_date);
@@ -4299,7 +4299,7 @@ static int get_meas_info (//fiffFile file,	 /* The file we are reading */
 //            if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
 //                goto bad;
 //            *lowpass = *(float *)(tag.data);
-            if (!FiffTag::read_tag(stream.data(),t_pTag,pos))
+            if (!FiffTag::read_tag(stream,t_pTag,pos))
                 goto bad;
             *lowpass = *t_pTag->toFloat();
             to_find--;
@@ -4309,7 +4309,7 @@ static int get_meas_info (//fiffFile file,	 /* The file we are reading */
 //            if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
 //                goto bad;
 //            *highpass = *(float *)(tag.data);
-            if (!FiffTag::read_tag(stream.data(),t_pTag,pos))
+            if (!FiffTag::read_tag(stream,t_pTag,pos))
                 goto bad;
             *highpass = *t_pTag->toFloat();
             to_find--;
@@ -4319,7 +4319,7 @@ static int get_meas_info (//fiffFile file,	 /* The file we are reading */
 //            if (fiff_read_this_tag (file->fd,this_entry->pos,&tag) == -1)
 //                goto bad;
 //            this_ch = (fiffChInfo)(tag.data);
-            if (!FiffTag::read_tag(stream.data(),t_pTag,pos))
+            if (!FiffTag::read_tag(stream,t_pTag,pos))
                 goto bad;
             this_ch = (fiffChInfo)t_pTag->data();
             if (this_ch->scanNo <= 0 || this_ch->scanNo > *nchan) {
@@ -4336,7 +4336,7 @@ static int get_meas_info (//fiffFile file,	 /* The file we are reading */
 //            if (fiff_read_this_tag (in->fd,dir->pos,&tag) == FIFF_FAIL)
 //                goto bad;
 //            t = (fiffCoordTrans)tag.data;
-            if (!FiffTag::read_tag(stream.data(),t_pTag,pos))
+            if (!FiffTag::read_tag(stream,t_pTag,pos))
                 goto bad;
             t = (fiffCoordTrans)t_pTag->data();
             /*
@@ -4356,15 +4356,15 @@ static int get_meas_info (//fiffFile file,	 /* The file we are reading */
 //    hpi = fiff_dir_tree_find(node,FIFFB_HPI_RESULT);
 //    node = hpi[0];
 
-    hpi = meas_info[0].dir_tree_find(FIFFB_HPI_RESULT);
+    hpi = meas_info[0]->dir_tree_find(FIFFB_HPI_RESULT);
 //    FREE(hpi);
     if (hpi.size() > 0 && *trans == NULL)
         for (k = 0; k < hpi[0].nent; k++)
-            if (hpi[0].dir[k].kind ==  FIFF_COORD_TRANS) {
+            if (hpi[0]->dir[k]->kind ==  FIFF_COORD_TRANS) {
 //                if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
 //                    goto bad;
 //                t = (fiffCoordTrans)tag.data;
-                if (!FiffTag::read_tag(stream.data(),t_pTag,hpi[0].dir[k].pos))
+                if (!FiffTag::read_tag(stream,t_pTag,hpi[0]->dir[k].pos))
                     goto bad;
                 t = (fiffCoordTrans)t_pTag->data();
 
@@ -4404,8 +4404,8 @@ bad : {
 //TODO: PARENT is missing in current node structure
 //static int find_between (//fiffFile in,
 //                         FiffStream::SPtr& stream,
-//                         const FiffDirNode& low_node,
-//                         const FiffDirNode& high_node,
+//                         const FiffDirNode::SPtr& low_node,
+//                         const FiffDirNode::SPtr& high_node,
 //                         int kind,
 //                         fiff_byte_t **data)
 
@@ -4421,14 +4421,14 @@ bad : {
 //    *data = NULL;
 //    node = low_node;
 //    while (node != NULL) {
-//        for (k = 0; k < node.nent; k++)
+//        for (k = 0; k < node->nent; k++)
 //        {
-//            kind_1 = node.dir[k].kind;
-//            pos  = node.dir[k].pos;
+//            kind_1 = node->dir[k]->kind;
+//            pos  = node->dir[k].pos;
 //            if (kind_1 == kind) {
 //                FREE (*data);
 ////                if (fiff_read_this_tag (in->fd,dir->pos,&tag) == -1) {
-//                if (!FiffTag::read_tag(stream.data(),t_pTag,pos)) {
+//                if (!FiffTag::read_tag(stream,t_pTag,pos)) {
 ////                    FREE(tag.data);
 //                    return (FIFF_FAIL);
 //                }
@@ -4573,7 +4573,7 @@ bad : {
 
 static int get_evoked_optional(//fiffFile file,	 /* The file we are reading */
                                FiffStream::SPtr& stream,
-                               const FiffDirNode& node, /* The directory node containing our data */
+                               const FiffDirNode::SPtr& node, /* The directory node containing our data */
                                int *nchan,	 /* Number of channels */
                                fiffChInfo *chp)	 /* Channel descriptions */
 /*
@@ -4596,7 +4596,7 @@ static int get_evoked_optional(//fiffFile file,	 /* The file we are reading */
 //        res = FIFF_OK;
 //        goto out;
 //    }
-    QList<FiffDirNode> evoked_node = node.dir_tree_find(FIFFB_EVOKED);
+    QList<FiffDirNode::SPtr> evoked_node = node->dir_tree_find(FIFFB_EVOKED);
     if (evoked_node.size() == 0)
     {
         res = FIFF_OK;
@@ -4609,14 +4609,14 @@ static int get_evoked_optional(//fiffFile file,	 /* The file we are reading */
 //        FREE(tagp->data);
 //        FREE(tagp);
 //    }
-    if(!evoked_node[0].find_tag(stream.data(), FIFF_NCHAN, t_pTag))
+    if(!evoked_node[0].find_tag(stream, FIFF_NCHAN, t_pTag))
         new_nchan = *t_pTag->toInt();
     else
         new_nchan = *nchan;
 
     for (k = 0; k < evoked_node[0].nent; k++) {
-        kind = evoked_node[0].dir[k].kind;
-        pos  = evoked_node[0].dir[k].pos;
+        kind = evoked_node[0]->dir[k]->kind;
+        pos  = evoked_node[0]->dir[k].pos;
         if (kind == FIFF_CH_INFO) {	/* Information about one channel */
             if (new_ch == NULL) {
                 new_ch = MALLOC(new_nchan,fiffChInfoRec);
@@ -4625,7 +4625,7 @@ static int get_evoked_optional(//fiffFile file,	 /* The file we are reading */
 //            if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
 //                goto out;
 //            this_ch = (fiffChInfo)(tag.data);
-            if (!FiffTag::read_tag(stream.data(),t_pTag,pos))
+            if (!FiffTag::read_tag(stream,t_pTag,pos))
                 goto out;
             this_ch = (fiffChInfo)t_pTag->data();
             if (this_ch->scanNo <= 0 || this_ch->scanNo > new_nchan) {
@@ -4681,7 +4681,7 @@ static void unpack_data(double offset,
 
 static float **get_epochs (//fiffFile file,	/* This is our file */
                            FiffStream::SPtr& stream,
-                           const FiffDirNode& node,	/* The interesting node */
+                           const FiffDirNode::SPtr& node,	/* The interesting node */
                            int nchan,
                            int nsamp)	        /* Number of channels and
                                                  * number of samples to be expected */
@@ -4702,13 +4702,13 @@ static float **get_epochs (//fiffFile file,	/* This is our file */
 
 //    tag.data = NULL;
 
-    for (k = 0, ch = 0; k < node.nent && ch < nchan; k++) {
-        kind = node.dir[k].kind;
-        pos  = node.dir[k].pos;
+    for (k = 0, ch = 0; k < node->nent && ch < nchan; k++) {
+        kind = node->dir[k]->kind;
+        pos  = node->dir[k].pos;
         if (kind == FIFF_EPOCH) {
 //            if (fiff_read_this_tag (file->fd,start->pos,&tag) == -1)
 //                goto bad;
-            if (!FiffTag::read_tag(stream.data(),t_pTag,pos))
+            if (!FiffTag::read_tag(stream,t_pTag,pos))
                 goto bad;
 //            if (tag.type & FIFFT_MATRIX) {
             if (t_pTag->type & FIFFT_MATRIX) {
@@ -4857,7 +4857,7 @@ int mne_read_evoked(const QString& name,           /* Name of the file */
     FiffStream::SPtr stream(new FiffStream(&file));
 //    fiffFile    in      = NULL;
 
-    QList<FiffDirNode> evoked;			/* The evoked data nodes */
+    QList<FiffDirNode::SPtr> evoked;			/* The evoked data nodes */
     int         nset    = 0;
     int         nchan   = 0;		        /* How many channels */
     char        **comments = NULL;	        /* The associated comments */
@@ -5863,16 +5863,16 @@ mneProjOp mne_proj_op_average_eeg_ref(fiffChInfo chs,
 
 mneProjOp mne_read_proj_op_from_node(//fiffFile in,
                                      FiffStream::SPtr& stream,
-                                     const FiffDirNode& start)
+                                     const FiffDirNode::SPtr& start)
 /*
       * Load all the linear projection data
       */
 {
     mneProjOp   op     = NULL;
-    QList<FiffDirNode> proj;
+    QList<FiffDirNode::SPtr> proj;
     FiffDirNode start_node;
-    QList<FiffDirNode> items;
-    FiffDirNode node;
+    QList<FiffDirNode::SPtr> items;
+    FiffDirNode::SPtr node;
 //    fiffTag     tag;
     int         k;
     char        *item_desc,*desc_tag,*lf;
@@ -5897,13 +5897,13 @@ mneProjOp mne_read_proj_op_from_node(//fiffFile in,
         start_node = start;
 
     op = mne_new_proj_op();
-    proj = start_node.dir_tree_find(FIFFB_PROJ);
+    proj = start_node->dir_tree_find(FIFFB_PROJ);
     if (proj.size() == 0 || proj[0].isEmpty())   /* The caller must recognize an empty projection */
         goto out;
     /*
    * Only the first projection block is recognized
    */
-    items = proj[0].dir_tree_find(FIFFB_PROJ_ITEM);
+    items = proj[0]->dir_tree_find(FIFFB_PROJ_ITEM);
     if (items.size() == 0 || items[0].isEmpty())   /* The caller must recognize an empty projection */
         goto out;
     /*
@@ -5912,7 +5912,7 @@ mneProjOp mne_read_proj_op_from_node(//fiffFile in,
     node = proj[0];
 //    if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_NCHAN)) == NULL)
 //        global_nchan = 0;
-    if(!node.find_tag(stream.data(), FIFF_NCHAN, t_pTag))
+    if(!node->find_tag(stream, FIFF_NCHAN, t_pTag))
         global_nchan = 0;
     else {
         global_nchan = *t_pTag->toInt();
@@ -5930,7 +5930,7 @@ mneProjOp mne_read_proj_op_from_node(//fiffFile in,
 //        if ((tag = fiff_dir_tree_get_tag(in,node, FIFF_NAME)) != NULL) {
 //            item_desc = add_string(item_desc,(char *)tag->data);
 //        }
-        if (node.find_tag(stream.data(), FIFF_NAME, t_pTag)) {
+        if (node->find_tag(stream, FIFF_NAME, t_pTag)) {
             item_desc = add_string(item_desc,(char *)t_pTag->data());
         }
 //        FREE(tag);
@@ -5940,7 +5940,7 @@ mneProjOp mne_read_proj_op_from_node(//fiffFile in,
 //        if ((tag = fiff_dir_tree_get_tag(in,node,
 //                                         FIFF_DESCRIPTION)) != NULL) {
 //            desc_tag = (char *)tag->data;
-        if (node.find_tag(stream.data(), FIFF_DESCRIPTION, t_pTag)) {
+        if (node->find_tag(stream, FIFF_DESCRIPTION, t_pTag)) {
             desc_tag = (char *)t_pTag->data();
             if ((lf = strchr(desc_tag,'\n')) != NULL)
                 *lf = '\0';
@@ -5960,7 +5960,7 @@ mneProjOp mne_read_proj_op_from_node(//fiffFile in,
 //            item_nchan = *(int *)tag->data;
 //            TAG_FREE(tag); tag = NULL;
 //        }
-        if (!node.find_tag(stream.data(), FIFF_NCHAN, t_pTag))
+        if (!node->find_tag(stream, FIFF_NCHAN, t_pTag))
             item_nchan = global_nchan;
         else {
             item_nchan = *t_pTag->toInt();
@@ -5973,7 +5973,7 @@ mneProjOp mne_read_proj_op_from_node(//fiffFile in,
      * Take care of the channel names
      */
 //        if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_PROJ_ITEM_CH_NAME_LIST)) == NULL)
-        if (!node.find_tag(stream.data(), FIFF_PROJ_ITEM_CH_NAME_LIST, t_pTag))
+        if (!node->find_tag(stream, FIFF_PROJ_ITEM_CH_NAME_LIST, t_pTag))
             goto bad;
 //        mne_string_to_name_list((char *)(tag->data),&item_names,&nlist);
         mne_string_to_name_list((char *)(t_pTag->data()),&item_names,&nlist);
@@ -5988,7 +5988,7 @@ mneProjOp mne_read_proj_op_from_node(//fiffFile in,
      * Kind of item
      */
 //        if ((tag = fiff_dir_tree_get_tag(in, node, FIFF_PROJ_ITEM_KIND)) == NULL)
-        if (!node.find_tag(stream.data(), FIFF_PROJ_ITEM_KIND, t_pTag))
+        if (!node->find_tag(stream, FIFF_PROJ_ITEM_KIND, t_pTag))
             goto bad;
 //        item_kind = *(int *)tag->data;
         item_kind = *t_pTag->toInt();
@@ -5997,7 +5997,7 @@ mneProjOp mne_read_proj_op_from_node(//fiffFile in,
         * How many vectors
         */
 //        if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_PROJ_ITEM_NVEC)) == NULL)
-        if (!node.find_tag(stream.data(),FIFF_PROJ_ITEM_NVEC, t_pTag))
+        if (!node->find_tag(stream,FIFF_PROJ_ITEM_NVEC, t_pTag))
             goto bad;
 //        item_nvec = *(int *)tag->data;
         item_nvec = *t_pTag->toInt();
@@ -6006,7 +6006,7 @@ mneProjOp mne_read_proj_op_from_node(//fiffFile in,
         * The projection data
         */
 //        if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_PROJ_ITEM_VECTORS)) == NULL)
-        if (!node.find_tag(stream.data(),FIFF_PROJ_ITEM_VECTORS, t_pTag))
+        if (!node->find_tag(stream,FIFF_PROJ_ITEM_VECTORS, t_pTag))
             goto bad;
 //        if ((item_vectors = fiff_get_float_matrix(tag)) == NULL) {
 ////            TAG_FREE(tag);
@@ -6022,7 +6022,7 @@ mneProjOp mne_read_proj_op_from_node(//fiffFile in,
         */
 //        if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_PROJ_ITEM_ACTIVE)) != NULL) {
 //            item_active = *(int *)tag->data;
-        if (node.find_tag(stream.data(), FIFF_MNE_PROJ_ITEM_ACTIVE, t_pTag)) {
+        if (node->find_tag(stream, FIFF_MNE_PROJ_ITEM_ACTIVE, t_pTag)) {
             item_active = *t_pTag->toInt();
 //            TAG_FREE(tag);
         }
@@ -6423,8 +6423,8 @@ mneCTFcompDataSet mne_read_ctf_comp_data(const QString& name)
 //    fiffFile          in = NULL;
     mneCTFcompDataSet set = NULL;
     mneCTFcompData    one;
-    QList<FiffDirNode> nodes;
-    QList<FiffDirNode> comps;
+    QList<FiffDirNode::SPtr> nodes;
+    QList<FiffDirNode::SPtr> comps;
     int               ncomp;
     mneNamedMatrix    mat = NULL;
     int               kind,k;
@@ -6461,11 +6461,11 @@ mneCTFcompDataSet mne_read_ctf_comp_data(const QString& name)
     * Locate the compensation data sets
     */
 //    nodes = fiff_dir_tree_find(in->dirtree,FIFFB_MNE_CTF_COMP);
-    nodes = stream->tree().dir_tree_find(FIFFB_MNE_CTF_COMP);
+    nodes = stream->tree()->dir_tree_find(FIFFB_MNE_CTF_COMP);
     if (nodes.size() == 0)
         goto good;			/* Nothing more to do */
 //    comps = fiff_dir_tree_find(nodes[0],FIFFB_MNE_CTF_COMP_DATA);
-    comps = nodes[0].dir_tree_find(FIFFB_MNE_CTF_COMP_DATA);
+    comps = nodes[0]->dir_tree_find(FIFFB_MNE_CTF_COMP_DATA);
     if (comps.size() == 0)
         goto good;
 //    for (ncomp = 0; comps[ncomp] != NULL; ncomp++)
@@ -6485,7 +6485,7 @@ mneCTFcompDataSet mne_read_ctf_comp_data(const QString& name)
         if (!mat)
             goto bad;
 //        tag = fiff_dir_tree_get_tag(in,comps[k],FIFF_MNE_CTF_COMP_KIND);
-        comps[k].find_tag(stream.data(), FIFF_MNE_CTF_COMP_KIND, t_pTag);
+        comps[k].find_tag(stream, FIFF_MNE_CTF_COMP_KIND, t_pTag);
         if (t_pTag) {
             kind = *t_pTag->toInt();
 //            TAG_FREE(tag);
@@ -6493,7 +6493,7 @@ mneCTFcompDataSet mne_read_ctf_comp_data(const QString& name)
         else
             goto bad;
 //        tag = fiff_dir_tree_get_tag(in,comps[k],FIFF_MNE_CTF_COMP_CALIBRATED);
-        comps[k].find_tag(stream.data(), FIFF_MNE_CTF_COMP_CALIBRATED, t_pTag);
+        comps[k].find_tag(stream, FIFF_MNE_CTF_COMP_CALIBRATED, t_pTag);
         if (t_pTag) {
             calibrated = *t_pTag->toInt();
 //            TAG_FREE(tag);
@@ -7137,11 +7137,11 @@ bad : {
 
 int mne_read_bad_channel_list_from_node(//fiffFile in,
                                         FiffStream::SPtr& stream,
-                                        const FiffDirNode& pNode, char ***listp, int *nlistp)
+                                        const FiffDirNode::SPtr& pNode, char ***listp, int *nlistp)
 
 {
     FiffDirNode node,bad;
-    QList<FiffDirNode> temp;
+    QList<FiffDirNode::SPtr> temp;
     char **list = NULL;
     int  nlist  = 0;
 //    fiffTag tag;
@@ -7154,12 +7154,12 @@ int mne_read_bad_channel_list_from_node(//fiffFile in,
         node = pNode;
 
 //    temp = fiff_dir_tree_find(node,FIFFB_MNE_BAD_CHANNELS);
-    temp = node.dir_tree_find(FIFFB_MNE_BAD_CHANNELS);
+    temp = node->dir_tree_find(FIFFB_MNE_BAD_CHANNELS);
     if (temp.size() > 0) {
         bad = temp[0];
 //        FREE(temp);
 
-        bad.find_tag(stream.data(), FIFF_MNE_CH_NAME_LIST, t_pTag);
+        bad.find_tag(stream, FIFF_MNE_CH_NAME_LIST, t_pTag);
         if (t_pTag) {
             names = (char *)t_pTag->data();
 //            FREE(tag);
@@ -7201,14 +7201,14 @@ int mne_read_bad_channel_list(const QString& name, char ***listp, int *nlistp)
 
 
 MneSssData* mne_read_sss_data_from_node(//fiffFile in,
-                                        FiffStream::SPtr& stream, const FiffDirNode& start)
+                                        FiffStream::SPtr& stream, const FiffDirNode::SPtr& start)
 /*
  * Read the SSS data from the given node of an open file
  */
 {
     MneSssData* s  = new MneSssData();
-    QList<FiffDirNode> sss;
-    FiffDirNode node;
+    QList<FiffDirNode::SPtr> sss;
+    FiffDirNode::SPtr node;
 //    fiffTag     tag;
     FiffTag::SPtr t_pTag;
     float       *r0;
@@ -7217,7 +7217,7 @@ MneSssData* mne_read_sss_data_from_node(//fiffFile in,
     * Locate the SSS information
     */
 //    sss = fiff_dir_tree_find(start,FIFFB_SSS_INFO);
-    sss = start.dir_tree_find(FIFFB_SSS_INFO);
+    sss = start->dir_tree_find(FIFFB_SSS_INFO);
     if (sss.size() > 0) {
         node = sss[0];// FREE(sss);
         /*
@@ -7225,21 +7225,21 @@ MneSssData* mne_read_sss_data_from_node(//fiffFile in,
         */
 //        if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_SSS_JOB)) == NULL)
 //            goto bad;
-        if (!node.find_tag(stream.data(), FIFF_SSS_JOB, t_pTag))
+        if (!node->find_tag(stream, FIFF_SSS_JOB, t_pTag))
             goto bad;
         s->job = *t_pTag->toInt();
 //        TAG_FREE(tag);
 
 //        if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_SSS_FRAME)) == NULL)
 //            goto bad;
-        if (!node.find_tag(stream.data(), FIFF_SSS_FRAME, t_pTag))
+        if (!node->find_tag(stream, FIFF_SSS_FRAME, t_pTag))
             goto bad;
         s->coord_frame = *t_pTag->toInt();
 //        TAG_FREE(tag);
 
 //        if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_SSS_ORIGIN)) == NULL)
 //            goto bad;
-        if (!node.find_tag(stream.data(), FIFF_SSS_ORIGIN, t_pTag))
+        if (!node->find_tag(stream, FIFF_SSS_ORIGIN, t_pTag))
             goto bad;
         r0 = t_pTag->toFloat();;
         VEC_COPY(s->origin,r0);
@@ -7247,28 +7247,28 @@ MneSssData* mne_read_sss_data_from_node(//fiffFile in,
 
 //        if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_SSS_ORD_IN)) == NULL)
 //            goto bad;
-        if (!node.find_tag(stream.data(), FIFF_SSS_ORD_IN, t_pTag))
+        if (!node->find_tag(stream, FIFF_SSS_ORD_IN, t_pTag))
             goto bad;
         s->in_order = *t_pTag->toInt();
 //        TAG_FREE(tag);
 
 //        if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_SSS_ORD_OUT)) == NULL)
 //            goto bad;
-        if (!node.find_tag(stream.data(), FIFF_SSS_ORD_OUT, t_pTag))
+        if (!node->find_tag(stream, FIFF_SSS_ORD_OUT, t_pTag))
             goto bad;
         s->out_order = *t_pTag->toInt();
 //        TAG_FREE(tag);
 
 //        if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_SSS_NMAG)) == NULL)
 //            goto bad;
-        if (!node.find_tag(stream.data(), FIFF_SSS_NMAG, t_pTag))
+        if (!node->find_tag(stream, FIFF_SSS_NMAG, t_pTag))
             goto bad;
         s->nchan = *t_pTag->toInt();
 //        TAG_FREE(tag);
 
 //        if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_SSS_COMPONENTS)) == NULL)
 //            goto bad;
-        if (!node.find_tag(stream.data(), FIFF_SSS_COMPONENTS, t_pTag))
+        if (!node->find_tag(stream, FIFF_SSS_COMPONENTS, t_pTag))
             goto bad;
         qDebug() << "ToDo: Check whether comp_info contains the right stuff!!! - use VectorXi instead";
         s->comp_info = t_pTag->toInt(); //tag->data = NULL;
@@ -7505,8 +7505,8 @@ mneCovMatrix mne_read_cov(const QString& name,int kind)
 //    fiffTag        tag;
     FiffTag::SPtr t_pTag;
 //    fiffDirNode    *nodes = NULL;
-    QList<FiffDirNode> nodes;
-    FiffDirNode    covnode;
+    QList<FiffDirNode::SPtr> nodes;
+    FiffDirNode::SPtr    covnode;
 
     char            **names    = NULL;	/* Optional channel name list */
     int             nnames     = 0;
@@ -7533,7 +7533,7 @@ mneCovMatrix mne_read_cov(const QString& name,int kind)
     if(!stream->open())
         goto out;
 //    nodes = fiff_dir_tree_find(in->dirtree,FIFFB_MNE_COV);
-    nodes = stream->tree().dir_tree_find(FIFFB_MNE_COV);
+    nodes = stream->tree()->dir_tree_find(FIFFB_MNE_COV);
 
     if (nodes.size() == 0) {
         printf("No covariance matrix available in %s",name.toLatin1().data());
@@ -7545,7 +7545,7 @@ mneCovMatrix mne_read_cov(const QString& name,int kind)
     for (k = 0 ; k < nodes.size(); ++k) {
 //        if ((tag = fiff_dir_tree_get_tag(in,nodes[k],FIFF_MNE_COV_KIND)) == NULL)
 //            continue;
-        if (!nodes[k].find_tag(stream.data(), FIFF_MNE_COV_KIND, t_pTag))
+        if (!nodes[k].find_tag(stream, FIFF_MNE_COV_KIND, t_pTag))
             continue;
 
 //        if (*(int *)tag->data == kind) {
@@ -7557,7 +7557,7 @@ mneCovMatrix mne_read_cov(const QString& name,int kind)
         }
 //        TAG_FREE(tag);
     }
-    if (covnode.isEmpty()) {
+    if (covnode->isEmpty()) {
         printf("Desired covariance matrix not found from %s",name.toLatin1().data());
         goto out;
     }
@@ -7566,18 +7566,18 @@ mneCovMatrix mne_read_cov(const QString& name,int kind)
    */
 //    if ((tag = fiff_dir_tree_get_tag(in,nodes[k],FIFF_MNE_COV_DIM)) == NULL)
 //        goto out;
-    if (!nodes[k].find_tag(stream.data(), FIFF_MNE_COV_DIM, t_pTag))
+    if (!nodes[k].find_tag(stream, FIFF_MNE_COV_DIM, t_pTag))
         goto out;
     ncov = *t_pTag->toInt();
 //    TAG_FREE(tag);
 
 //    if ((tag = fiff_dir_tree_get_tag(in,nodes[k],FIFF_MNE_COV_NFREE)) != NULL) {
-    if (nodes[k].find_tag(stream.data(), FIFF_MNE_COV_NFREE, t_pTag)) {
+    if (nodes[k].find_tag(stream, FIFF_MNE_COV_NFREE, t_pTag)) {
         nfree = *t_pTag->toInt();
 //        TAG_FREE(tag);
     }
 //    if ((tag = fiff_dir_tree_get_tag(in,covnode,FIFF_MNE_ROW_NAMES)) != NULL) {
-    if (covnode.find_tag(stream.data(), FIFF_MNE_ROW_NAMES, t_pTag)) {
+    if (covnode->find_tag(stream, FIFF_MNE_ROW_NAMES, t_pTag)) {
         mne_string_to_name_list((char *)(t_pTag->data()),&names,&nnames);
 //        TAG_FREE(tag);
         if (nnames != ncov) {
@@ -7586,9 +7586,9 @@ mneCovMatrix mne_read_cov(const QString& name,int kind)
         }
     }
 //    if ((tag = fiff_dir_tree_get_tag(in,nodes[k],FIFF_MNE_COV)) == NULL) {
-    if (!nodes[k].find_tag(stream.data(), FIFF_MNE_COV, t_pTag)) {
+    if (!nodes[k].find_tag(stream, FIFF_MNE_COV, t_pTag)) {
 //        if ((tag = fiff_dir_tree_get_tag(in,nodes[k],FIFF_MNE_COV_DIAG)) == NULL)
-        if (!nodes[k].find_tag(stream.data(), FIFF_MNE_COV_DIAG, t_pTag))
+        if (!nodes[k].find_tag(stream, FIFF_MNE_COV_DIAG, t_pTag))
             goto out;
         else {
 //            if (tag->type == FIFFT_DOUBLE) {
@@ -7639,11 +7639,11 @@ mneCovMatrix mne_read_cov(const QString& name,int kind)
 
 
 //        if ((tag = fiff_dir_tree_get_tag(in,nodes[k],FIFF_MNE_COV_EIGENVALUES)) != NULL) {
-        if (nodes[k].find_tag(stream.data(), FIFF_MNE_COV_EIGENVALUES, t_pTag)) {
+        if (nodes[k].find_tag(stream, FIFF_MNE_COV_EIGENVALUES, t_pTag)) {
             lambda = (double *)t_pTag->toDouble();
 //            FREE(tag);
 //            if ((tag = fiff_dir_tree_get_tag(in,nodes[k],FIFF_MNE_COV_EIGENVECTORS)) == NULL)
-            if (nodes[k].find_tag(stream.data(), FIFF_MNE_COV_EIGENVECTORS, t_pTag))
+            if (nodes[k].find_tag(stream, FIFF_MNE_COV_EIGENVECTORS, t_pTag))
                 goto out;
 
 
@@ -8445,8 +8445,8 @@ int mne_read_source_spaces(const QString& name,               /* Read from here 
     int            nspace = 0;
     mneSourceSpace *spaces = NULL;
     mneSourceSpace  new_space = NULL;
-    QList<FiffDirNode> sources;
-    FiffDirNode     node;
+    QList<FiffDirNode::SPtr> sources;
+    FiffDirNode::SPtr     node;
     FiffTag::SPtr t_pTag;
 //    fiffTag         tag = NULL;
     int             j,k,p,q;
@@ -8465,7 +8465,7 @@ int mne_read_source_spaces(const QString& name,               /* Read from here 
         goto bad;
 
 //    sources = fiff_dir_tree_find(in->dirtree,FIFFB_MNE_SOURCE_SPACE);
-    sources = stream->tree().dir_tree_find(FIFFB_MNE_SOURCE_SPACE);
+    sources = stream->tree()->dir_tree_find(FIFFB_MNE_SOURCE_SPACE);
     if (sources.size() == 0) {
         printf("No source spaces available here");
         goto bad;
@@ -8477,7 +8477,7 @@ int mne_read_source_spaces(const QString& name,               /* Read from here 
         * Get the mandatory data first
         */
 //        if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_SOURCE_SPACE_NPOINTS)) == NULL) {
-        if (!node.find_tag(stream.data(), FIFF_MNE_SOURCE_SPACE_NPOINTS, t_pTag)) {
+        if (!node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_NPOINTS, t_pTag)) {
 //            TAG_FREE(tag);
             goto bad;
         }
@@ -8488,7 +8488,7 @@ int mne_read_source_spaces(const QString& name,               /* Read from here 
             goto bad;
         }
 //        if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_SOURCE_SPACE_POINTS)) == NULL)
-        if (!node.find_tag(stream.data(), FIFF_MNE_SOURCE_SPACE_POINTS, t_pTag))
+        if (!node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_POINTS, t_pTag))
             goto bad;
         MatrixXf tmp_rr = t_pTag->toFloatMatrix();
         fromFloatEigenMatrix(tmp_rr,new_space->rr);
@@ -8498,7 +8498,7 @@ int mne_read_source_spaces(const QString& name,               /* Read from here 
 //        }
 //        FREE(tag);
 //        if ((tag = fiff_dir_tree_get_tag(in,node, FIFF_MNE_SOURCE_SPACE_NORMALS)) == NULL)
-        if (!node.find_tag(stream.data(), FIFF_MNE_SOURCE_SPACE_NORMALS, t_pTag))
+        if (!node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_NORMALS, t_pTag))
             goto bad;
         MatrixXf tmp_nn = t_pTag->toFloatMatrix();
         fromFloatEigenMatrix(tmp_nn,new_space->nn);
@@ -8509,7 +8509,7 @@ int mne_read_source_spaces(const QString& name,               /* Read from here 
 //        FREE(tag);
 
 //        if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_COORD_FRAME)) == NULL) {
-        if (!node.find_tag(stream.data(), FIFF_MNE_COORD_FRAME, t_pTag)) {
+        if (!node->find_tag(stream, FIFF_MNE_COORD_FRAME, t_pTag)) {
             new_space->coord_frame = FIFFV_COORD_MRI;
         }
         else {
@@ -8517,28 +8517,28 @@ int mne_read_source_spaces(const QString& name,               /* Read from here 
 //            TAG_FREE(tag);
         }
 //        if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_SOURCE_SPACE_ID)) != NULL) {
-        if (node.find_tag(stream.data(), FIFF_MNE_SOURCE_SPACE_ID, t_pTag)) {
+        if (node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_ID, t_pTag)) {
             new_space->id = *t_pTag->toInt();
 //            TAG_FREE(tag);
         }
 //        if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_SUBJ_HIS_ID)) != NULL) {
-        if (node.find_tag(stream.data(), FIFF_SUBJ_HIS_ID, t_pTag)) {
+        if (node->find_tag(stream, FIFF_SUBJ_HIS_ID, t_pTag)) {
             new_space->subject = (char *)t_pTag->data();
 //            FREE(tag);
         }
 //        if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_SOURCE_SPACE_TYPE)) != NULL) {
-        if (node.find_tag(stream.data(), FIFF_MNE_SOURCE_SPACE_TYPE, t_pTag)) {
+        if (node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_TYPE, t_pTag)) {
             new_space->type = *t_pTag->toInt();
 //            TAG_FREE(tag);
         }
         ntri = 0;
 //        if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_BEM_SURF_NTRI))) {
-        if (node.find_tag(stream.data(), FIFF_BEM_SURF_NTRI, t_pTag)) {
+        if (node->find_tag(stream, FIFF_BEM_SURF_NTRI, t_pTag)) {
             ntri = *t_pTag->toInt();
 //            TAG_FREE(tag);
         }
 //        else if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_SOURCE_SPACE_NTRI))) {
-        else if (node.find_tag(stream.data(), FIFF_MNE_SOURCE_SPACE_NTRI, t_pTag)) {
+        else if (node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_NTRI, t_pTag)) {
             ntri = *t_pTag->toInt();
 //            TAG_FREE(tag);
         }
@@ -8546,9 +8546,9 @@ int mne_read_source_spaces(const QString& name,               /* Read from here 
             int **itris = NULL;
 
 //            if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_BEM_SURF_TRIANGLES)) == NULL) {
-            if (!node.find_tag(stream.data(), FIFF_BEM_SURF_TRIANGLES, t_pTag)) {
+            if (!node->find_tag(stream, FIFF_BEM_SURF_TRIANGLES, t_pTag)) {
 //                if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_SOURCE_SPACE_TRIANGLES)) == NULL)
-                if (node.find_tag(stream.data(), FIFF_MNE_SOURCE_SPACE_TRIANGLES, t_pTag))
+                if (node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_TRIANGLES, t_pTag))
                     goto bad;
             }
 
@@ -8570,7 +8570,7 @@ int mne_read_source_spaces(const QString& name,               /* Read from here 
             new_space->ntri = ntri;
         }
 //        if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_SOURCE_SPACE_NUSE)) == NULL) {
-        if (!node.find_tag(stream.data(), FIFF_MNE_SOURCE_SPACE_NUSE, t_pTag)) {
+        if (!node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_NUSE, t_pTag)) {
             if (new_space->type == FIFFV_MNE_SPACE_VOLUME) {
                 /*
          * Use all
@@ -8599,7 +8599,7 @@ int mne_read_source_spaces(const QString& name,               /* Read from here 
             new_space->nuse = *t_pTag->toInt();
 //            TAG_FREE(tag);
 //            if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_SOURCE_SPACE_SELECTION)) == NULL) {
-            if (!node.find_tag(stream.data(), FIFF_MNE_SOURCE_SPACE_SELECTION, t_pTag)) {
+            if (!node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_SELECTION, t_pTag)) {
 //                TAG_FREE(tag);
                 goto bad;
             }
@@ -8622,7 +8622,7 @@ int mne_read_source_spaces(const QString& name,               /* Read from here 
             */
             ntri = 0;
 //            if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_SOURCE_SPACE_NUSE_TRI))) {
-            if (node.find_tag(stream.data(), FIFF_MNE_SOURCE_SPACE_NUSE_TRI, t_pTag)) {
+            if (node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_NUSE_TRI, t_pTag)) {
                 ntri = *t_pTag->toInt();
 //                TAG_FREE(tag);
             }
@@ -8630,7 +8630,7 @@ int mne_read_source_spaces(const QString& name,               /* Read from here 
                 int **itris = NULL;
 
 //                if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_SOURCE_SPACE_USE_TRIANGLES)) == NULL)
-                if (!node.find_tag(stream.data(), FIFF_MNE_SOURCE_SPACE_USE_TRIANGLES, t_pTag))
+                if (!node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_USE_TRIANGLES, t_pTag))
                     goto bad;
 
                 MatrixXi tmp_itris = t_pTag->toIntMatrix();
@@ -8652,11 +8652,11 @@ int mne_read_source_spaces(const QString& name,               /* Read from here 
             * The patch information becomes relevant here
             */
 //            if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_SOURCE_SPACE_NEAREST)) != NULL) {
-            if (node.find_tag(stream.data(), FIFF_MNE_SOURCE_SPACE_NEAREST, t_pTag)) {
+            if (node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_NEAREST, t_pTag)) {
                 nearest  = t_pTag->toInt();
 //                FREE(tag);
 //                if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_SOURCE_SPACE_NEAREST_DIST)) == NULL) {
-                if (!node.find_tag(stream.data(), FIFF_MNE_SOURCE_SPACE_NEAREST_DIST, t_pTag)) {
+                if (!node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_NEAREST_DIST, t_pTag)) {
 //                    TAG_FREE(tag);
                     goto bad;
                 }
@@ -8677,11 +8677,11 @@ int mne_read_source_spaces(const QString& name,               /* Read from here 
             * We may have the distance matrix
             */
 //            if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_SOURCE_SPACE_DIST_LIMIT)) != NULL) {
-            if (node.find_tag(stream.data(), FIFF_MNE_SOURCE_SPACE_DIST_LIMIT, t_pTag)) {
+            if (node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_DIST_LIMIT, t_pTag)) {
                 new_space->dist_limit = *t_pTag->toInt();
 //                TAG_FREE(tag);
 //                if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_SOURCE_SPACE_DIST)) != NULL) {
-                if (node.find_tag(stream.data(), FIFF_MNE_SOURCE_SPACE_DIST, t_pTag)) {
+                if (node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_DIST, t_pTag)) {
                     mneSparseMatrix dist = fiff_get_float_sparse_matrix(t_pTag);
                     new_space->dist = mne_add_upper_triangle_rcs(dist);
                     mne_free_sparse(dist);
@@ -8703,14 +8703,14 @@ int mne_read_source_spaces(const QString& name,               /* Read from here 
             nneighbors = neighbors = NULL;
             ntot = nvert = 0;
 //            if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_SOURCE_SPACE_NEIGHBORS)) != NULL) {
-            if (node.find_tag(stream.data(), FIFF_MNE_SOURCE_SPACE_NEIGHBORS, t_pTag)) {
+            if (node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_NEIGHBORS, t_pTag)) {
                 qDebug() << "ToDo: Check whether neighbors contains the right stuff!!! - use VectorXi instead";
                 neighbors = t_pTag->toInt();
                 ntot      = t_pTag->size()/sizeof(fiff_int_t);
 //                FREE(tag);
             }
 //            if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_SOURCE_SPACE_NNEIGHBORS)) != NULL) {
-            if (node.find_tag(stream.data(), FIFF_MNE_SOURCE_SPACE_NNEIGHBORS, t_pTag)) {
+            if (node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_NNEIGHBORS, t_pTag)) {
                 qDebug() << "ToDo: Check whether nneighbors contains the right stuff!!! - use VectorXi instead";
                 nneighbors = t_pTag->toInt();
                 nvert      = t_pTag->size()/sizeof(fiff_int_t);
@@ -8744,7 +8744,7 @@ int mne_read_source_spaces(const QString& name,               /* Read from here 
             */
             new_space->voxel_surf_RAS_t   = mne_read_transform_from_node(stream, node, FIFFV_MNE_COORD_MRI_VOXEL, FIFFV_MNE_COORD_SURFACE_RAS);
 //            if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_SOURCE_SPACE_VOXEL_DIMS)) != NULL) {
-            if (!node.find_tag(stream.data(), FIFF_MNE_SOURCE_SPACE_VOXEL_DIMS, t_pTag)) {
+            if (!node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_VOXEL_DIMS, t_pTag)) {
                 qDebug() << "ToDo: Check whether vol_dims contains the right stuff!!! - use VectorXi instead";
                 vol_dims = t_pTag->toInt();
 //                FREE(tag);
@@ -8752,47 +8752,47 @@ int mne_read_source_spaces(const QString& name,               /* Read from here 
             if (vol_dims)
                 VEC_COPY(new_space->vol_dims,vol_dims);
             {
-                QList<FiffDirNode>  mris = node.dir_tree_find(FIFFB_MNE_PARENT_MRI_FILE);
+                QList<FiffDirNode::SPtr>  mris = node->dir_tree_find(FIFFB_MNE_PARENT_MRI_FILE);
 
                 if (mris.size() == 0) { /* The old way */
                     new_space->MRI_surf_RAS_RAS_t = mne_read_transform_from_node(stream, node, FIFFV_MNE_COORD_SURFACE_RAS, FIFFV_MNE_COORD_RAS);
 //                    if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_SOURCE_SPACE_MRI_FILE)) != NULL) {
-                    if (node.find_tag(stream.data(), FIFF_MNE_SOURCE_SPACE_MRI_FILE, t_pTag)) {
+                    if (node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_MRI_FILE, t_pTag)) {
                         qDebug() << "ToDo: Check whether new_space->MRI_volume  contains the right stuff!!! - use QString instead";
                         new_space->MRI_volume = (char *)t_pTag->data();
 //                        FREE(tag);
                     }
 //                    if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_SOURCE_SPACE_INTERPOLATOR)) != NULL) {
-                    if (node.find_tag(stream.data(), FIFF_MNE_SOURCE_SPACE_INTERPOLATOR, t_pTag)) {
+                    if (node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_INTERPOLATOR, t_pTag)) {
                         new_space->interpolator = fiff_get_float_sparse_matrix(t_pTag);
 //                        TAG_FREE(tag);
                     }
                 }
                 else {
 //                    if ((tag = fiff_dir_tree_get_tag(in,mris[0],FIFF_MNE_FILE_NAME)) != NULL) {
-                    if (node.find_tag(stream.data(), FIFF_MNE_FILE_NAME, t_pTag)) {
+                    if (node->find_tag(stream, FIFF_MNE_FILE_NAME, t_pTag)) {
                         new_space->MRI_volume = (char *)t_pTag->data();
 //                        FREE(tag);
                     }
                     new_space->MRI_surf_RAS_RAS_t = mne_read_transform_from_node(stream, mris[0], FIFFV_MNE_COORD_SURFACE_RAS, FIFFV_MNE_COORD_RAS);
                     new_space->MRI_voxel_surf_RAS_t   = mne_read_transform_from_node(stream, mris[0], FIFFV_MNE_COORD_MRI_VOXEL, FIFFV_MNE_COORD_SURFACE_RAS);
 //                    if ((tag = fiff_dir_tree_get_tag(in,mris[0],FIFF_MNE_SOURCE_SPACE_INTERPOLATOR)) != NULL) {
-                    if (mris[0].find_tag(stream.data(), FIFF_MNE_SOURCE_SPACE_INTERPOLATOR, t_pTag)) {
+                    if (mris[0].find_tag(stream, FIFF_MNE_SOURCE_SPACE_INTERPOLATOR, t_pTag)) {
                         new_space->interpolator = fiff_get_float_sparse_matrix(t_pTag);
 //                        TAG_FREE(tag);
                     }
 //                    if ((tag = fiff_dir_tree_get_tag(in,mris[0],FIFF_MRI_WIDTH))) {
-                    if (mris[0].find_tag(stream.data(), FIFF_MRI_WIDTH, t_pTag)) {
+                    if (mris[0].find_tag(stream, FIFF_MRI_WIDTH, t_pTag)) {
                         new_space->MRI_vol_dims[0] = *t_pTag->toInt();
 //                        TAG_FREE(tag);
                     }
 //                    if ((tag = fiff_dir_tree_get_tag(in,mris[0],FIFF_MRI_HEIGHT))) {
-                    if (mris[0].find_tag(stream.data(), FIFF_MRI_HEIGHT, t_pTag)) {
+                    if (mris[0].find_tag(stream, FIFF_MRI_HEIGHT, t_pTag)) {
                         new_space->MRI_vol_dims[1] = *t_pTag->toInt();
 //                        TAG_FREE(tag);
                     }
 //                    if ((tag = fiff_dir_tree_get_tag(in,mris[0],FIFF_MRI_DEPTH))) {
-                    if (mris[0].find_tag(stream.data(), FIFF_MRI_DEPTH, t_pTag)) {
+                    if (mris[0].find_tag(stream, FIFF_MRI_DEPTH, t_pTag)) {
                         new_space->MRI_vol_dims[2] = *t_pTag->toInt();
 //                        TAG_FREE(tag);
                     }
@@ -9372,9 +9372,9 @@ static mneSurface read_bem_surface( const QString& name,    /* Filename */
     FiffStream::SPtr stream(new FiffStream(&file));
 
 //    fiffFile in = NULL;
-    QList<FiffDirNode> surfs;
-    QList<FiffDirNode> bems;
-    FiffDirNode node;
+    QList<FiffDirNode::SPtr> surfs;
+    QList<FiffDirNode::SPtr> bems;
+    FiffDirNode::SPtr node;
     FiffTag::SPtr t_pTag;
 //    fiffTag tag = NULL;
     int     id = -1;
@@ -9397,18 +9397,18 @@ static mneSurface read_bem_surface( const QString& name,    /* Filename */
    * Check for the existence of BEM coord frame
    */
 //    bems = fiff_dir_tree_find(in->dirtree,FIFFB_BEM);
-    bems = stream->tree().dir_tree_find(FIFFB_BEM);
+    bems = stream->tree()->dir_tree_find(FIFFB_BEM);
     if (bems.size() > 0) {
         node = bems[0];
 //        FREE(bems);
 //        if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_BEM_COORD_FRAME)) != NULL) {
-        if (node.find_tag(stream.data(), FIFF_BEM_COORD_FRAME, t_pTag)) {
+        if (node->find_tag(stream, FIFF_BEM_COORD_FRAME, t_pTag)) {
             coord_frame = *t_pTag->toInt();
 //            TAG_FREE(tag);
         }
     }
 //    surfs = fiff_dir_tree_find(in->dirtree,FIFFB_BEM_SURF);
-    surfs = stream->tree().dir_tree_find(FIFFB_BEM_SURF);
+    surfs = stream->tree()->dir_tree_find(FIFFB_BEM_SURF);
     if (surfs.size() == 0) {
         printf ("No BEM surfaces found in %s",name.toLatin1().constData());
         goto bad;
@@ -9420,7 +9420,7 @@ static mneSurface read_bem_surface( const QString& name,    /* Filename */
             * Read the data from this node
             */
 //            tag = fiff_dir_tree_get_tag(in,node,FIFF_BEM_SURF_ID);
-            if (node.find_tag(stream.data(), FIFF_BEM_SURF_ID, t_pTag)) {
+            if (node->find_tag(stream, FIFF_BEM_SURF_ID, t_pTag)) {
                 id = *t_pTag->toInt();
 //                FREE(tag->data);
 //                FREE(tag);
@@ -9439,19 +9439,19 @@ static mneSurface read_bem_surface( const QString& name,    /* Filename */
    * Get the compulsory tags
    */
 //    if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_BEM_SURF_NNODE)) == NULL)
-    if (!node.find_tag(stream.data(), FIFF_BEM_SURF_NNODE, t_pTag))
+    if (!node->find_tag(stream, FIFF_BEM_SURF_NNODE, t_pTag))
         goto bad;
     nnode = *t_pTag->toInt();
 //    TAG_FREE(tag);
 
 //    if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_BEM_SURF_NTRI)) == NULL)
-    if (!node.find_tag(stream.data(), FIFF_BEM_SURF_NTRI, t_pTag))
+    if (!node->find_tag(stream, FIFF_BEM_SURF_NTRI, t_pTag))
         goto bad;
     ntri = *t_pTag->toInt();
 //    TAG_FREE(tag);
 
 //    if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_BEM_SURF_NODES)) == NULL)
-    if (!node.find_tag(stream.data(), FIFF_BEM_SURF_NODES, t_pTag))
+    if (!node->find_tag(stream, FIFF_BEM_SURF_NODES, t_pTag))
         goto bad;
     tmp_nodes = t_pTag->toFloatMatrix();
     fromFloatEigenMatrix(tmp_nodes, nodes);
@@ -9460,7 +9460,7 @@ static mneSurface read_bem_surface( const QString& name,    /* Filename */
 ////    FREE(tag);
 
 //    if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_BEM_SURF_NORMALS)) != NULL) {
-    if (node.find_tag(stream.data(), FIFF_BEM_SURF_NORMALS, t_pTag)) {\
+    if (node->find_tag(stream, FIFF_BEM_SURF_NORMALS, t_pTag)) {\
         MatrixXf tmp_node_normals = t_pTag->toFloatMatrix();
         fromFloatEigenMatrix(tmp_node_normals, node_normals);
 //        if ((node_normals = fiff_get_float_matrix(tag)) == NULL)
@@ -9469,7 +9469,7 @@ static mneSurface read_bem_surface( const QString& name,    /* Filename */
     }
 
 //    if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_BEM_SURF_TRIANGLES)) == NULL)
-    if (!node.find_tag(stream.data(), FIFF_BEM_SURF_TRIANGLES, t_pTag))
+    if (!node->find_tag(stream, FIFF_BEM_SURF_TRIANGLES, t_pTag))
         goto bad;
     tmp_triangles = t_pTag->toIntMatrix();
     fromIntEigenMatrix(tmp_triangles, triangles);
@@ -9478,17 +9478,17 @@ static mneSurface read_bem_surface( const QString& name,    /* Filename */
 ////    FREE(tag);
 
 //    if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_COORD_FRAME)) != NULL) {
-    if (node.find_tag(stream.data(), FIFF_MNE_COORD_FRAME, t_pTag)) {
+    if (node->find_tag(stream, FIFF_MNE_COORD_FRAME, t_pTag)) {
         coord_frame = *t_pTag->toInt();
 //        TAG_FREE(tag);
     }
 //    else if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_BEM_COORD_FRAME)) != NULL) {
-    else if (node.find_tag(stream.data(), FIFF_BEM_COORD_FRAME, t_pTag)) {
+    else if (node->find_tag(stream, FIFF_BEM_COORD_FRAME, t_pTag)) {
         coord_frame = *t_pTag->toInt();
 //        TAG_FREE(tag);
     }
 //    if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_BEM_SIGMA)) != NULL) {
-    if (node.find_tag(stream.data(), FIFF_BEM_SIGMA, t_pTag)) {
+    if (node->find_tag(stream, FIFF_BEM_SIGMA, t_pTag)) {
         sigma = *t_pTag->toFloat();
 //        TAG_FREE(tag);
     }
@@ -10922,7 +10922,7 @@ fwdBemModel fwd_bem_load_three_layer_surfaces(char *name)
 }
 
 static int get_int(//fiffFile in,
-                   FiffStream::SPtr& stream, const FiffDirNode& node,int what,int *res)
+                   FiffStream::SPtr& stream, const FiffDirNode::SPtr& node,int what,int *res)
 /*
       * Wrapper to get int's
       */
@@ -10930,7 +10930,7 @@ static int get_int(//fiffFile in,
     FiffTag::SPtr t_pTag;
 //    fiffTag tag;
 //    if ((tag = fiff_dir_tree_get_tag(in,node,what)) != NULL) {
-    if(node.find_tag(stream.data(), what, t_pTag)) {
+    if(node->find_tag(stream, what, t_pTag)) {
         if (t_pTag->getType() != FIFFT_INT) {
             printf("Expected an integer tag : %d (found data type %d instead)\n",what,t_pTag->getType() );
 //            FREE(tag->data);
@@ -10963,7 +10963,7 @@ int fwd_bem_load_solution(char *name, int bem_method, fwdBemModel m)
 
 //    fiffFile    in = fiff_open(name);
     float       **sol = NULL;
-    FiffDirNode bem_node;
+    FiffDirNode::SPtr bem_node;
     int         method;
     FiffTag::SPtr t_pTag;
 //    fiffTag     tag = NULL;
@@ -10976,7 +10976,7 @@ int fwd_bem_load_solution(char *name, int bem_method, fwdBemModel m)
    * Find the BEM data
    */
     {
-        QList<FiffDirNode> nodes = stream->tree().dir_tree_find(FIFFB_BEM);
+        QList<FiffDirNode::SPtr> nodes = stream->tree()->dir_tree_find(FIFFB_BEM);
 
         if (nodes.size() == 0) {
             printf ("No BEM data in %s",name);
@@ -11007,7 +11007,7 @@ int fwd_bem_load_solution(char *name, int bem_method, fwdBemModel m)
         int         dim,k;
 
 //        if ((tag = fiff_dir_tree_get_tag(in,bem_node,FIFF_BEM_POT_SOLUTION)) == NULL)
-        if (!bem_node.find_tag(stream.data(), FIFF_BEM_POT_SOLUTION, t_pTag))
+        if (!bem_node->find_tag(stream, FIFF_BEM_POT_SOLUTION, t_pTag))
             goto bad;
 //        if ((dims = fiff_get_matrix_dims(tag)) == NULL)
 //            goto bad;
@@ -14916,7 +14916,7 @@ int mne_read_raw_buffer_t(//fiffFile     in,        /* Input file */
 
 //    if (fiff_read_this_tag(in->fd,ent->pos,&tag) ==  FIFF_FAIL)
 //        goto bad;
-    if (!FiffTag::read_tag(stream.data(),t_pTag,ent.pos))
+    if (!FiffTag::read_tag(stream,t_pTag,ent.pos))
         goto bad;
 
     if (ent.type == FIFFT_FLOAT) {
@@ -15276,16 +15276,16 @@ int mne_apply_filter(mneFilterDef filter, void *datap, float *data, int ns, int 
 
 //============================= mne_raw_routines.c =============================
 
-static FiffDirNode find_raw (const FiffDirNode& node)
+static FiffDirNode find_raw (const FiffDirNode::SPtr& node)
 /*
       * Find the raw data
       */
 {
     FiffDirNode raw;
-    QList<FiffDirNode> temp;
-    temp = node.dir_tree_find(FIFFB_RAW_DATA);
+    QList<FiffDirNode::SPtr> temp;
+    temp = node->dir_tree_find(FIFFB_RAW_DATA);
     if (temp.size() == 0) {
-        temp = node.dir_tree_find(FIFFB_CONTINUOUS_DATA);
+        temp = node->dir_tree_find(FIFFB_CONTINUOUS_DATA);
         if (temp.size() > 0)
             raw = temp[0];
     }
@@ -15295,12 +15295,12 @@ static FiffDirNode find_raw (const FiffDirNode& node)
 }
 
 
-static FiffDirNode find_maxshield (const FiffDirNode& node)
+static FiffDirNode find_maxshield (const FiffDirNode::SPtr& node)
 
 {
     FiffDirNode raw;
-    QList<FiffDirNode> temp;
-    temp = node.dir_tree_find(FIFFB_SMSH_RAW_DATA);
+    QList<FiffDirNode::SPtr> temp;
+    temp = node->dir_tree_find(FIFFB_SMSH_RAW_DATA);
     if (temp.size() > 0)
         raw = temp[0];
     return (raw);
@@ -15309,7 +15309,7 @@ static FiffDirNode find_maxshield (const FiffDirNode& node)
 
 static int get_meas_info (//fiffFile file,	 /* The file we are reading */
                           FiffStream::SPtr& stream,
-                          FiffDirNode& node,	 /* The directory node containing our data */
+                          FiffDirNode::SPtr& node,	 /* The directory node containing our data */
                           fiffId *id,	         /* The block id from the nearest FIFFB_MEAS
                                                                               parent */
                           int *nchan,	         /* Number of channels */
@@ -15334,9 +15334,9 @@ static int get_meas_info (//fiffFile file,	 /* The file we are reading */
     fiffCoordTrans t;
     int j,k;
     int to_find = 4;
-    QList<FiffDirNode> hpi;
-    QList<FiffDirNode> meas;
-    QList<FiffDirNode> meas_info;
+    QList<FiffDirNode::SPtr> hpi;
+    QList<FiffDirNode::SPtr> meas;
+    QList<FiffDirNode::SPtr> meas_info;
     fiff_int_t kind, pos;
 
 //    tag.data    = NULL;
@@ -15348,14 +15348,14 @@ static int get_meas_info (//fiffFile file,	 /* The file we are reading */
     /*
     * Find desired parents
     */
-    meas = node.dir_tree_find(FIFFB_MEAS);
+    meas = node->dir_tree_find(FIFFB_MEAS);
 //    if ((meas = find_meas(node)) == NULL) {
     if (meas.size() == 0) {
         printf ("Meas. block not found!");
         goto bad;
     }
 
-    meas_info = node.dir_tree_find(FIFFB_MEAS_INFO);
+    meas_info = node->dir_tree_find(FIFFB_MEAS_INFO);
 //    if ((node = find_meas_info(node)) == NULL) {
     if (meas_info.count() == 0) {
         printf ("Meas. info not found!");
@@ -15379,15 +15379,15 @@ static int get_meas_info (//fiffFile file,	 /* The file we are reading */
     *lowpass  = -1;
     *highpass = -1;
     for (k = 0; k < meas_info[0].nent; k++) {
-        kind = meas_info[0].dir[k].kind;
-        pos  = meas_info[0].dir[k].pos;
+        kind = meas_info[0]->dir[k]->kind;
+        pos  = meas_info[0]->dir[k].pos;
         switch (kind) {
 
         case FIFF_NCHAN :
 //            if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
 //                goto bad;
 //            *nchan = *(int *)(tag.data);
-            if (!FiffTag::read_tag(stream.data(),t_pTag,pos))
+            if (!FiffTag::read_tag(stream,t_pTag,pos))
                 goto bad;
             *nchan = *t_pTag->toInt();
             ch = MALLOC(*nchan,fiffChInfoRec);
@@ -15400,7 +15400,7 @@ static int get_meas_info (//fiffFile file,	 /* The file we are reading */
 //            if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
 //                goto bad;
 //            *sfreq = *(float *)(tag.data);
-            if (!FiffTag::read_tag(stream.data(),t_pTag,pos))
+            if (!FiffTag::read_tag(stream,t_pTag,pos))
                 goto bad;
             *sfreq = *t_pTag->toFloat();
             to_find--;
@@ -15410,7 +15410,7 @@ static int get_meas_info (//fiffFile file,	 /* The file we are reading */
 //            if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
 //                goto bad;
 //            *lowpass = *(float *)(tag.data);
-            if (!FiffTag::read_tag(stream.data(),t_pTag,pos))
+            if (!FiffTag::read_tag(stream,t_pTag,pos))
                 goto bad;
             *lowpass = *t_pTag->toFloat();
             to_find--;
@@ -15420,7 +15420,7 @@ static int get_meas_info (//fiffFile file,	 /* The file we are reading */
 //            if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
 //                goto bad;
 //            *highpass = *(float *)(tag.data);
-            if (!FiffTag::read_tag(stream.data(),t_pTag,pos))
+            if (!FiffTag::read_tag(stream,t_pTag,pos))
                 goto bad;
             *highpass = *t_pTag->toFloat();
             to_find--;
@@ -15430,7 +15430,7 @@ static int get_meas_info (//fiffFile file,	 /* The file we are reading */
 //            if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
 //                goto bad;
 //            this_ch = (fiffChInfo)(tag.data);
-            if (!FiffTag::read_tag(stream.data(),t_pTag,pos))
+            if (!FiffTag::read_tag(stream,t_pTag,pos))
                 goto bad;
             this_ch = (fiffChInfo)t_pTag->data();
             if (this_ch->scanNo <= 0 || this_ch->scanNo > *nchan) {
@@ -15446,7 +15446,7 @@ static int get_meas_info (//fiffFile file,	 /* The file we are reading */
         case FIFF_MEAS_DATE :
 //            if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
 //                goto bad;
-            if (!FiffTag::read_tag(stream.data(),t_pTag,pos))
+            if (!FiffTag::read_tag(stream,t_pTag,pos))
                 goto bad;
             if (*start_time)
                 FREE(*start_time);
@@ -15459,7 +15459,7 @@ static int get_meas_info (//fiffFile file,	 /* The file we are reading */
 //            if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
 //                goto bad;
 //            t = (fiffCoordTrans)tag.data;
-            if (!FiffTag::read_tag(stream.data(),t_pTag,pos))
+            if (!FiffTag::read_tag(stream,t_pTag,pos))
                 goto bad;
             t = (fiffCoordTrans)t_pTag->data();
             /*
@@ -15479,15 +15479,15 @@ static int get_meas_info (//fiffFile file,	 /* The file we are reading */
 //    hpi = fiff_dir_tree_find(node,FIFFB_HPI_RESULT);
 //    node = hpi[0];
 
-    hpi = meas_info[0].dir_tree_find(FIFFB_HPI_RESULT);
+    hpi = meas_info[0]->dir_tree_find(FIFFB_HPI_RESULT);
 //    FREE(hpi);
     if (hpi.size() > 0 && *trans == NULL)
         for (k = 0; k < hpi[0].nent; k++)
-            if (hpi[0].dir[k].kind ==  FIFF_COORD_TRANS) {
+            if (hpi[0]->dir[k]->kind ==  FIFF_COORD_TRANS) {
 //                if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
 //                    goto bad;
 //                t = (fiffCoordTrans)tag.data;
-                if (!FiffTag::read_tag(stream.data(),t_pTag,hpi[0].dir[k].pos))
+                if (!FiffTag::read_tag(stream,t_pTag,hpi[0]->dir[k]->pos))
                     goto bad;
                 t = (fiffCoordTrans)t_pTag->data();
 
@@ -15546,7 +15546,7 @@ int mne_load_raw_info(char *name,int allow_maxshield,mneRawInfo *infop)
     float          sfreq    = 0.0;	/* Sampling frequency */
     float          highpass;		/* Highpass filter frequency */
     float          lowpass;		/* Lowpass filter frequency */
-    FiffDirNode    raw;
+    FiffDirNode::SPtr    raw;
 //    FiffDirEntry   one;
     fiffTime       start_time = NULL;
     int            k;
@@ -15583,7 +15583,7 @@ int mne_load_raw_info(char *name,int allow_maxshield,mneRawInfo *infop)
     */
 //    rawDir = MALLOC(raw->nent,fiffDirEntryRec);
 //    memcpy(rawDir,raw->dir,raw->nent*sizeof(fiffDirEntryRec));
-    rawDir = raw.dir;
+    rawDir = raw->dir;
     /*
    * Ready to put everything together
    */
@@ -15620,18 +15620,18 @@ int mne_load_raw_info(char *name,int allow_maxshield,mneRawInfo *infop)
     info->buf_size   = 0;
 //    for (k = 0, one = raw->dir; k < raw->nent; k++, one++) {
     for (k = 0; k < raw.nent; k++) {
-//        raw.dir[k].kind
-//                raw.dir[k].type
-//                raw.dir[k].size
-        if (raw.dir[k].kind == FIFF_DATA_BUFFER) {
-            if (raw.dir[k].type == FIFFT_DAU_PACK16 || raw.dir[k].type == FIFFT_SHORT)
-                info->buf_size = raw.dir[k].size/(nchan*sizeof(fiff_short_t));
-            else if (raw.dir[k].type == FIFFT_FLOAT)
-                info->buf_size = raw.dir[k].size/(nchan*sizeof(fiff_float_t));
-            else if (raw.dir[k].type == FIFFT_INT)
-                info->buf_size = raw.dir[k].size/(nchan*sizeof(fiff_int_t));
+//        raw->dir[k]->kind
+//                raw->dir[k]->type
+//                raw->dir[k].size
+        if (raw->dir[k]->kind == FIFF_DATA_BUFFER) {
+            if (raw->dir[k]->type == FIFFT_DAU_PACK16 || raw->dir[k]->type == FIFFT_SHORT)
+                info->buf_size = raw->dir[k].size/(nchan*sizeof(fiff_short_t));
+            else if (raw->dir[k]->type == FIFFT_FLOAT)
+                info->buf_size = raw->dir[k].size/(nchan*sizeof(fiff_float_t));
+            else if (raw->dir[k]->type == FIFFT_INT)
+                info->buf_size = raw->dir[k].size/(nchan*sizeof(fiff_int_t));
             else {
-                printf("We are not prepared to handle raw data type: %d",raw.dir[k].type);
+                printf("We are not prepared to handle raw data type: %d",raw->dir[k]->type);
                 goto out;
             }
             break;
@@ -16697,7 +16697,7 @@ mneRawData mne_raw_open_file_comp(char *name, int omit_skip, int allow_maxshield
     if (dir0[current_dir0].kind == FIFF_FIRST_SAMPLE) {
 //        if (fiff_read_this_tag(in->fd,dir0->pos,&tag) == FIFF_FAIL)
 //            goto bad;
-        if (!FiffTag::read_tag(stream.data(),t_pTag,dir0[current_dir0].pos))
+        if (!FiffTag::read_tag(stream,t_pTag,dir0[current_dir0].pos))
             goto bad;
         data->first_samp = *t_pTag->toInt();
         current_dir0++;
@@ -16707,7 +16707,7 @@ mneRawData mne_raw_open_file_comp(char *name, int omit_skip, int allow_maxshield
         int nsamp_skip;
 //        if (fiff_read_this_tag(in->fd,dir0->pos,&tag) == FIFF_FAIL)
 //            goto bad;
-        if (!FiffTag::read_tag(stream.data(),t_pTag,dir0[current_dir0].pos))
+        if (!FiffTag::read_tag(stream,t_pTag,dir0[current_dir0].pos))
             goto bad;
         nsamp_skip = data->info->buf_size*(*t_pTag->toInt());
         fprintf(stderr,"Data skip of %d samples in the beginning\n",nsamp_skip);
@@ -16716,7 +16716,7 @@ mneRawData mne_raw_open_file_comp(char *name, int omit_skip, int allow_maxshield
         if (dir0[current_dir0].kind == FIFF_FIRST_SAMPLE) {
 //            if (fiff_read_this_tag(in->fd,dir0->pos,&tag) == FIFF_FAIL)
 //                goto bad;
-            if (!FiffTag::read_tag(stream.data(),t_pTag,dir0[current_dir0].pos))
+            if (!FiffTag::read_tag(stream,t_pTag,dir0[current_dir0].pos))
                 goto bad;
             data->first_samp += *t_pTag->toInt();
             current_dir0++;
@@ -16782,7 +16782,7 @@ mneRawData mne_raw_open_file_comp(char *name, int omit_skip, int allow_maxshield
         else if (dir.kind == FIFF_DATA_SKIP) {
 //            if (fiff_read_this_tag(in->fd,dir->pos,&tag) == FIFF_FAIL)
 //                goto bad;
-            if (!FiffTag::read_tag(stream.data(),t_pTag,dir.pos))
+            if (!FiffTag::read_tag(stream,t_pTag,dir.pos))
                 goto bad;
             bufs[k].ns = data->info->buf_size*(*t_pTag->toInt());
         }

@@ -148,7 +148,7 @@ public:
     *
     * @return the directory
     */
-    const QList<FiffDirEntry>& dir() const;
+    const QList<FiffDirEntry::SPtr>& dir() const;
 
     //=========================================================================================================
     /**
@@ -157,7 +157,7 @@ public:
     *
     * @return the compiled directory
     */
-    const FiffDirNode& tree() const;
+    const FiffDirNode::SPtr& tree() const;
 
     //=========================================================================================================
     /**
@@ -198,7 +198,7 @@ public:
     *
     * @return true if information is available, fasle otherwise
     */
-    bool get_evoked_entries(const QList<FiffDirNode> &evoked_node, QStringList &comments, QList<fiff_int_t> &aspect_kinds, QString &t);
+    bool get_evoked_entries(const QList<FiffDirNode::SPtr> &evoked_node, QStringList &comments, QList<fiff_int_t> &aspect_kinds, QString &t);
 
     //=========================================================================================================
     /**
@@ -235,7 +235,7 @@ public:
     *
     * @return the bad channel list
     */
-    QStringList read_bad_channels(const FiffDirNode& p_Node);
+    QStringList read_bad_channels(const FiffDirNode::SPtr& p_Node);
 
     //=========================================================================================================
     /**
@@ -251,7 +251,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    bool read_cov(const FiffDirNode& p_Node, fiff_int_t cov_kind, FiffCov& p_covData);
+    bool read_cov(const FiffDirNode::SPtr& p_Node, fiff_int_t cov_kind, FiffCov& p_covData);
 
     //=========================================================================================================
     /**
@@ -266,7 +266,7 @@ public:
     *
     * @return the CTF software compensation data
     */
-    QList<FiffCtfComp> read_ctf_comp(const FiffDirNode& p_Node, const QList<FiffChInfo>& p_Chs);
+    QList<FiffCtfComp> read_ctf_comp(const FiffDirNode::SPtr& p_Node, const QList<FiffChInfo>& p_Chs);
 
     //=========================================================================================================
     /**
@@ -283,7 +283,7 @@ public:
     *
     * @return true if successful.
     */
-    bool read_meas_info(const FiffDirNode& p_Node, FiffInfo& p_Info, FiffDirNode& p_NodeInfo);
+    bool read_meas_info(const FiffDirNode::SPtr& p_Node, FiffInfo& p_Info, FiffDirNode::SPtr& p_NodeInfo);
 
     //=========================================================================================================
     /**
@@ -296,7 +296,7 @@ public:
     *
     * @return true when successful.
     */
-    bool read_meas_info_base(const FiffDirNode& p_Node, FiffInfoBase& p_InfoForward);
+    bool read_meas_info_base(const FiffDirNode::SPtr& p_Node, FiffInfoBase& p_InfoForward);
 
     //=========================================================================================================
     /**
@@ -312,7 +312,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    bool read_named_matrix(const FiffDirNode& p_Node, fiff_int_t matkind, FiffNamedMatrix& mat);
+    bool read_named_matrix(const FiffDirNode::SPtr& p_Node, fiff_int_t matkind, FiffNamedMatrix& mat);
 
     //=========================================================================================================
     /**
@@ -328,7 +328,7 @@ public:
     *
     * @return a list of SSP projectors
     */
-    QList<FiffProj> read_proj(const FiffDirNode& p_Node);
+    QList<FiffProj> read_proj(const FiffDirNode::SPtr& p_Node);
 
     //=========================================================================================================
     /**
@@ -696,8 +696,8 @@ public:
     void write_rt_command(fiff_int_t command, const QString& data);
 
 private:
-    QList<FiffDirEntry> m_dir; /**< This is the directory. If no directory exists, open automatically scans the file to create one. */
-    FiffDirNode m_tree;        /**< Directory compiled into a tree */
+    QList<FiffDirEntry::SPtr> m_dir; /**< This is the directory. If no directory exists, open automatically scans the file to create one. */
+    FiffDirNode::SPtr m_tree;        /**< Directory compiled into a tree */
 
 //    /** FIFF file handle returned by fiff_open(). */
 //    typedef struct _fiffFileRec {
