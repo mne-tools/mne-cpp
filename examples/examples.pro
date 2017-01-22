@@ -45,6 +45,7 @@ SUBDIRS += \
     readFwd \
     readEpochs \
     readEvoked \
+	ex_disp \
     computeInverse \
     computeInverseRaw \
     makeInverseOperator \
