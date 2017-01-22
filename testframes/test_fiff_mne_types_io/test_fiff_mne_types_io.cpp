@@ -116,7 +116,7 @@ void TestFiffMneTypesIO::checkFiffCoordTrans()
 
     FiffTag::SPtr t_pTag;
     fiffCoordTransRec reference_trans;
-    FiffCoordTrans trans;
+    FiffCoordTrans test_trans;
 
     bool trans_found = false;
 
@@ -125,13 +125,35 @@ void TestFiffMneTypesIO::checkFiffCoordTrans()
             if(!FiffTag::read_tag(stream, t_pTag, stream->dir()[k]->pos))
                 QFAIL("Failed to read FIFF_COORD_TRANS tag.");
             reference_trans = *(fiffCoordTrans)t_pTag->data();
-            trans = t_pTag->toCoordTrans();
+            test_trans = t_pTag->toCoordTrans();
 
             //CHECKS
-            QVERIFY(reference_trans.from == trans.from);
-            QVERIFY(reference_trans.to == trans.to);
-
-            qDebug() << "Some more checks required";
+            QVERIFY(reference_trans.from == test_trans.from);
+            QVERIFY(reference_trans.to == test_trans.to);
+            //Check rot
+            for (int i = 0; i < 3; ++i) {
+                for (int j = 0; j < 3; ++j) {
+//                    printf("rot %f == %f ", reference_trans.rot[i][j], test_trans.trans(i,j));
+                    QVERIFY(reference_trans.rot[i][j] == test_trans.trans(i,j));
+                }
+            }
+            //Check move
+            for (int i = 0; i < 3; ++i) {
+//                    printf("move %f == %f ", reference_trans.move[i], test_trans.trans(i,3));
+                    QVERIFY(reference_trans.move[i] == test_trans.trans(i,3));
+            }
+            //Check invrot
+            for (int i = 0; i < 3; ++i) {
+                for (int j = 0; j < 3; ++j) {
+//                    printf("invrot %f == %f ", reference_trans.invrot[i][j], test_trans.invtrans(i,j));
+                    QVERIFY(reference_trans.invrot[i][j] == test_trans.invtrans(i,j));
+                }
+            }
+            //Check invmove
+            for (int i = 0; i < 3; ++i) {
+//                    printf("invmove %f == %f ", reference_trans.invmove[i], test_trans.invtrans(i,3));
+                    QVERIFY(reference_trans.invmove[i] == test_trans.invtrans(i,3));
+            }
 
             trans_found = true;
         }
