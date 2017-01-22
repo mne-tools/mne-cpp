@@ -1373,7 +1373,7 @@ int mne_read_meg_comp_eeg_ch_info(const QString& name,
 //    FiffDirEntry this_ent;
     FiffTag::SPtr t_pTag;
 //    fiffTagRec   tag;
-    fiffChInfo   this_ch;
+    fiffChInfo   this_ch = NULL;
     fiffFile     in = NULL;
     fiffCoordTrans t = NULL;
     fiff_int_t kind, pos;
@@ -1435,7 +1435,8 @@ int mne_read_meg_comp_eeg_ch_info(const QString& name,
             if(!FiffTag::read_tag(stream, t_pTag, pos))
                 goto bad;
 //            t = t_pTag->toCoordTrans();
-            t = (fiffCoordTrans)t_pTag->data();
+            t = (fiffCoordTrans)malloc(sizeof(fiffCoordTransRec));
+            *t = *(fiffCoordTrans)t_pTag->data();
             if (t->from != FIFFV_COORD_DEVICE ||
                     t->to   != FIFFV_COORD_HEAD)
                 t = NULL;
@@ -1450,7 +1451,9 @@ int mne_read_meg_comp_eeg_ch_info(const QString& name,
             if(!FiffTag::read_tag(stream, t_pTag, pos))
                 goto bad;
 //            this_ch = t_pTag->toChInfo();
-            this_ch = (fiffChInfo)(t_pTag->data());
+
+            this_ch = (fiffChInfo)malloc(sizeof(fiffChInfoRec));
+            *this_ch = *(fiffChInfo)(t_pTag->data());
             if (this_ch->scanNo <= 0 || this_ch->scanNo > nchan) {
                 printf ("FIFF_CH_INFO : scan # out of range %d (%d)!",this_ch->scanNo,nchan);
                 goto bad;
@@ -1630,7 +1633,7 @@ static int get_all_chs (//fiffFile file,	        /* The file we are reading */
 //    fiffTagRec tag;
 //    fiffDirEntry this_entry;
     fiffChInfo ch;
-    fiffChInfo this_ch;
+    fiffChInfo this_ch = NULL;
     int j,k;
     int to_find = 0;
     QList<FiffDirNode::SPtr> meas;
@@ -1696,7 +1699,8 @@ static int get_all_chs (//fiffFile file,	        /* The file we are reading */
 //            this_ch = (fiffChInfo)(tag.data);
             if (!FiffTag::read_tag(stream,t_pTag,pos))
                 goto bad;
-            this_ch = (fiffChInfo)t_pTag->data();
+            this_ch = (fiffChInfo)malloc(sizeof(fiffChInfoRec));
+            *this_ch = *(fiffChInfo)t_pTag->data();
             if (this_ch->scanNo <= 0 || this_ch->scanNo > *nchan) {
                 qCritical ("FIFF_CH_INFO : scan # out of range!");
                 goto bad;
@@ -2167,7 +2171,8 @@ fiffCoordTrans mne_read_transform_from_node(//fiffFile in,
 //            res = (fiffCoordTrans)tag.data;
             if (!FiffTag::read_tag(stream,t_pTag,pos))
                 goto out;
-            res = (fiffCoordTrans)t_pTag->data();
+            res = (fiffCoordTrans)malloc(sizeof(fiffCoordTransRec));
+            *res = *(fiffCoordTrans)t_pTag->data();
             if (res->from == from && res->to == to) {
 //                tag.data = NULL;
                 goto out;
@@ -2220,7 +2225,9 @@ fiffCoordTrans mne_read_transform(const QString& name,int from, int to)
 //            res = (fiffCoordTrans)tag.data;
             if (!FiffTag::read_tag(stream,t_pTag,pos))
                 goto out;
-            res = (fiffCoordTrans)t_pTag->data();
+
+            res = (fiffCoordTrans)malloc(sizeof(fiffCoordTransRec));
+            *res = *(fiffCoordTrans)t_pTag->data();
             if (res->from == from && res->to == to) {
 //                tag.data = NULL;
                 goto out;
