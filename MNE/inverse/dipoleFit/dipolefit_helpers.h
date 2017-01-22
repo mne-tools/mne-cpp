@@ -195,73 +195,6 @@ using namespace FIFFLIB;
 #define ICMATRIX ALLOC_ICMATRIX
 
 
-
-//============================= Refactoring helpers =============================
-
-//float
-Eigen::MatrixXf toFloatEigenMatrix(float **mat, const int m, const int n)
-{
-    Eigen::MatrixXf eigen_mat(m,n);
-
-    for ( int i = 0; i < m; ++i)
-        for ( int j = 0; j < n; ++j)
-            eigen_mat(i,j) = mat[i][j];
-
-    return eigen_mat;
-}
-
-void fromFloatEigenMatrix(const Eigen::MatrixXf& from_mat, float **to_mat, const int m, const int n)
-{
-    for ( int i = 0; i < m; ++i)
-        for ( int j = 0; j < n; ++j)
-            to_mat[i][j] = from_mat(i,j);
-}
-
-void fromFloatEigenMatrix(const Eigen::MatrixXf& from_mat, float **to_mat)
-{
-    fromFloatEigenMatrix(from_mat, to_mat, from_mat.rows(), from_mat.cols());
-}
-
-
-void fromFloatEigenVector(const Eigen::VectorXf& from_vec, float *to_vec, const int n)
-{
-    for ( int i = 0; i < n; ++i)
-        to_vec[i] = from_vec[i];
-}
-
-void fromFloatEigenVector(const Eigen::VectorXf& from_vec, float *to_vec)
-{
-    fromFloatEigenVector(from_vec, to_vec, from_vec.size());
-}
-
-
-//int
-Eigen::MatrixXi toFloatEigenMatrix(int **mat, const int m, const int n)
-{
-    Eigen::MatrixXi eigen_mat(m,n);
-
-    for ( int i = 0; i < m; ++i)
-        for ( int j = 0; j < n; ++j)
-            eigen_mat(i,j) = mat[i][j];
-
-    return eigen_mat;
-}
-
-void fromIntEigenMatrix(const Eigen::MatrixXi& from_mat, int **to_mat, const int m, const int n)
-{
-    for ( int i = 0; i < m; ++i)
-        for ( int j = 0; j < n; ++j)
-            to_mat[i][j] = from_mat(i,j);
-}
-
-void fromIntEigenMatrix(const Eigen::MatrixXi& from_mat, int **to_mat)
-{
-    fromIntEigenMatrix(from_mat, to_mat, from_mat.rows(), from_mat.cols());
-}
-
-
-
-
 //============================= mne_allocs.h =============================
 
 /*
@@ -384,6 +317,88 @@ void mne_free_dcmatrix (double **m)
  */
 
 #define FREE_CMATRIX(m) mne_free_cmatrix((m))
+
+
+
+
+
+
+
+
+//============================= Refactoring helpers =============================
+
+//float
+Eigen::MatrixXf toFloatEigenMatrix(float **mat, const int m, const int n)
+{
+    Eigen::MatrixXf eigen_mat(m,n);
+
+    for ( int i = 0; i < m; ++i)
+        for ( int j = 0; j < n; ++j)
+            eigen_mat(i,j) = mat[i][j];
+
+    return eigen_mat;
+}
+
+void fromFloatEigenMatrix(const Eigen::MatrixXf& from_mat, float **& to_mat, const int m, const int n)
+{
+    to_mat = ALLOC_CMATRIX(m,n);
+
+    for ( int i = 0; i < m; ++i)
+        for ( int j = 0; j < n; ++j)
+            to_mat[i][j] = from_mat(i,j);
+}
+
+void fromFloatEigenMatrix(const Eigen::MatrixXf& from_mat, float **& to_mat)
+{
+    fromFloatEigenMatrix(from_mat, to_mat, from_mat.rows(), from_mat.cols());
+}
+
+
+void fromFloatEigenVector(const Eigen::VectorXf& from_vec, float *&to_vec, const int n)
+{
+    to_vec = ALLOC_FLOAT(n);
+
+    for ( int i = 0; i < n; ++i)
+        to_vec[i] = from_vec[i];
+}
+
+void fromFloatEigenVector(const Eigen::VectorXf& from_vec, float *&to_vec)
+{
+    fromFloatEigenVector(from_vec, to_vec, from_vec.size());
+}
+
+
+//int
+Eigen::MatrixXi toIntEigenMatrix(int **mat, const int m, const int n)
+{
+    Eigen::MatrixXi eigen_mat(m,n);
+
+    for ( int i = 0; i < m; ++i)
+        for ( int j = 0; j < n; ++j)
+            eigen_mat(i,j) = mat[i][j];
+
+    return eigen_mat;
+}
+
+void fromIntEigenMatrix(const Eigen::MatrixXi& from_mat, int **&to_mat, const int m, const int n)
+{
+    to_mat = (int **)malloc(m * sizeof(int *));
+    for (int i = 0; i < m; ++i)
+        to_mat[i] = (int *)malloc(n * sizeof(int));
+
+    for ( int i = 0; i < m; ++i)
+        for ( int j = 0; j < n; ++j)
+            to_mat[i][j] = from_mat(i,j);
+}
+
+void fromIntEigenMatrix(const Eigen::MatrixXi& from_mat, int **&to_mat)
+{
+    fromIntEigenMatrix(from_mat, to_mat, from_mat.rows(), from_mat.cols());
+}
+
+
+
+
 
 
 #include <fiff/fiff_types.h>
@@ -1425,6 +1440,8 @@ int mne_read_meg_comp_eeg_ch_info(const QString& name,
             if(!FiffTag::read_tag(stream, t_pTag, pos))
                 goto bad;
 //            id = t_pTag->toFiffID();
+
+//            id = (fiffId)malloc(sizeof(fiffIdRec));
             *id = *(fiffId)t_pTag->data();
             break;
 
@@ -5898,7 +5915,7 @@ mneProjOp mne_read_proj_op_from_node(//fiffFile in,
     }
 //    if (start->isEmpty())
 //        start = in->dirtree;
-    if (start->isEmpty())
+    if (!start || start->isEmpty())
         start_node = stream->tree();
     else
         start_node = start;
