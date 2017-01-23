@@ -1603,37 +1603,39 @@ void mne_merge_channels(fiffChInfo chs1, int nch1,
 
 //============================= read_ch_info.c =============================
 
-static FiffDirNode::SPtr find_meas (FiffDirNode::SPtr& node)
+static FiffDirNode::SPtr find_meas (const FiffDirNode::SPtr& node)
 /*
       * Find corresponding meas node
       */
 {
     FiffDirNode::SPtr empty_node;
+    FiffDirNode::SPtr tmp_node = node;
 
-    while (node->type != FIFFB_MEAS) {
-        if (node->parent == NULL)
+    while (tmp_node->type != FIFFB_MEAS) {
+        if (tmp_node->parent == NULL)
             return empty_node;//(NULL);
-        node = node->parent;
+        tmp_node = tmp_node->parent;
     }
-    return (node);
+    return (tmp_node);
 }
 
-static FiffDirNode::SPtr find_meas_info (FiffDirNode::SPtr& node)
+static FiffDirNode::SPtr find_meas_info (const FiffDirNode::SPtr& node)
 /*
       * Find corresponding meas info node
       */
 {
     int k;
     FiffDirNode::SPtr empty_node;
+    FiffDirNode::SPtr tmp_node = node;
 
-    while (node->type != FIFFB_MEAS) {
-        if (node->parent == NULL)
+    while (tmp_node->type != FIFFB_MEAS) {
+        if (tmp_node->parent == NULL)
             return empty_node;//(NULL);
-        node = node->parent;
+        tmp_node = tmp_node->parent;
     }
-    for (k = 0; k < node->nchild; k++)
-        if (node->children[k]->type == FIFFB_MEAS_INFO)
-            return (node->children[k]);
+    for (k = 0; k < tmp_node->nchild; k++)
+        if (tmp_node->children[k]->type == FIFFB_MEAS_INFO)
+            return (tmp_node->children[k]);
     return empty_node;//(NULL);
 }
 
@@ -4213,7 +4215,7 @@ QList<FiffDirNode::SPtr> mne_find_evoked (//fiffFile file,
 
 static int get_meas_info (//fiffFile file,	 /* The file we are reading */
                           FiffStream::SPtr& stream,
-                          FiffDirNode::SPtr& node,	 /* The directory node containing our data */
+                          const FiffDirNode::SPtr& node,	 /* The directory node containing our data */
                           fiffId *id,		 /* The block id from the nearest FIFFB_MEAS
                                                                               parent */
                           fiffTime *meas_date,   /* Measurement date */
@@ -4239,6 +4241,7 @@ static int get_meas_info (//fiffFile file,	 /* The file we are reading */
     int to_find = 4;
     QList<FiffDirNode::SPtr> hpi;
     FiffDirNode::SPtr meas;
+    FiffDirNode::SPtr meas_info;
     fiff_int_t kind, pos;
     FiffTag::SPtr t_pTag;
 
@@ -4258,7 +4261,7 @@ static int get_meas_info (//fiffFile file,	 /* The file we are reading */
     }
 
 //    meas_info = node->dir_tree_find(FIFFB_MEAS_INFO);
-    if (!(node = find_meas_info(node))) {
+    if (!(meas_info = find_meas_info(node))) {
 //    if (meas_info.count() == 0) {
         printf ("Meas. info not found!");
         goto bad;
@@ -4280,9 +4283,9 @@ static int get_meas_info (//fiffFile file,	 /* The file we are reading */
    */
     *lowpass = -1;
     *highpass = -1;
-    for (k = 0; k < node->nent; k++) {
-        kind = node->dir[k]->kind;
-        pos  = node->dir[k]->pos;
+    for (k = 0; k < meas_info->nent; k++) {
+        kind = meas_info->dir[k]->kind;
+        pos  = meas_info->dir[k]->pos;
         switch (kind) {
 
         case FIFF_NCHAN :
@@ -4383,7 +4386,7 @@ static int get_meas_info (//fiffFile file,	 /* The file we are reading */
 //    node = hpi[0];
 
     hpi = node->dir_tree_find(FIFFB_HPI_RESULT);
-    node = hpi[0];
+//    node = hpi[0];
 
 //    FREE(hpi);
     if (hpi.size() > 0 && *trans == NULL)
@@ -4461,7 +4464,13 @@ static int find_between (//fiffFile in,
                     return (FIFF_FAIL);
                 }
                 else {
-                    *data = (fiff_byte_t *)t_pTag->data();
+                    fiff_byte_t* tmp =  MALLOC(t_pTag->size(),fiff_byte_t);
+                    fiff_byte_t* tmp_current = (fiff_byte_t *)t_pTag->data();
+
+                    for( int k = 0; k < t_pTag->size(); ++k )
+                        tmp[k] = tmp_current[k];
+
+                    *data = tmp;
                     return (FIFF_OK);
                 }
             }
@@ -4475,7 +4484,7 @@ static int find_between (//fiffFile in,
 
 static int get_evoked_essentials (//fiffFile file,	/* This is our file */
                                   FiffStream::SPtr& stream,
-                                  FiffDirNode::SPtr& node,	/* The interesting node */
+                                  const FiffDirNode::SPtr& node,	/* The interesting node */
                                   float *sfreq,		/* Sampling frequency
                                                                                            * The value pointed by this is not
                                                                                            * modified if individual sampling
@@ -4504,22 +4513,25 @@ static int get_evoked_essentials (//fiffFile file,	/* This is our file */
     fiff_int_t kind, pos;
 
     fiff_byte_t *tempb;
+
+    FiffDirNode::SPtr tmp_node = node;
+
     /*
-   * This is rather difficult...
-   */
-    if (find_between (stream,node,node->parent,FIFF_NAVE,&tempb) == FIFF_FAIL)
+    * This is rather difficult...
+    */
+    if (find_between (stream,tmp_node,tmp_node->parent,FIFF_NAVE,&tempb) == FIFF_FAIL)
         return res;
     if (tempb)
         *nave = *(int *)tempb;
     FREE(tempb);
-    if (find_between (stream,node,node->parent,
+    if (find_between (stream,tmp_node,tmp_node->parent,
                       FIFF_SFREQ,&tempb) == FIFF_FAIL)
         return res;
     if (tempb)
         *sfreq = *(float *)tempb;
     FREE(tempb);
 
-    if (find_between (stream,node,node->parent,
+    if (find_between (stream,tmp_node,tmp_node->parent,
                       FIFF_ASPECT_KIND,&tempb) == FIFF_FAIL)
         return res;
     if (tempb)
@@ -4530,11 +4542,12 @@ static int get_evoked_essentials (//fiffFile file,	/* This is our file */
     /*
    * Find evoked response descriptive data
    */
-    node = node->parent;
+    tmp_node = tmp_node->parent;
+
 //    tag.data = NULL;
-    for (k = 0; k < node->nent; k++)
-        kind = node->dir[k]->kind;
-        pos  = node->dir[k]->pos;
+    for (k = 0; k < tmp_node->dir_tree.size(); k++) {
+        kind = tmp_node->dir_tree[k]->kind;
+        pos  = tmp_node->dir_tree[k]->pos;
         switch (kind) {
 
         case FIFF_FIRST_SAMPLE :
@@ -4591,6 +4604,7 @@ static int get_evoked_essentials (//fiffFile file,	/* This is our file */
             *nartef = t_pTag->size()/(3*sizeof(int));
             break;
         }
+    }
 //    FREE (tag.data); tag.data = NULL;
     if (to_find > 0) {
         printf ("Not all essential tags were found!");
@@ -4967,6 +4981,7 @@ int mne_read_evoked(const QString& name,           /* Name of the file */
    */
     if (get_meas_info (stream,start,&id,&meas_date,&nchan,&sfreq,&highpass,&lowpass,&chs,&trans) == -1)
         goto out;
+
     /*
     * sfreq is listed here again because
     * there might be an individual one in the
