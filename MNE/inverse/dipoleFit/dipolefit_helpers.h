@@ -1641,7 +1641,7 @@ static FiffDirNode::SPtr find_meas_info (const FiffDirNode::SPtr& node)
 
 static int get_all_chs (//fiffFile file,	        /* The file we are reading */
                         FiffStream::SPtr& stream,
-                        FiffDirNode::SPtr& node,	/* The directory node containing our data */
+                        const FiffDirNode::SPtr& p_node,	/* The directory node containing our data */
                         fiffId *id,		/* The block id from the nearest FIFFB_MEAS
                                                    parent */
                         fiffChInfo *chp,	/* Channel descriptions */
@@ -1659,6 +1659,7 @@ static int get_all_chs (//fiffFile file,	        /* The file we are reading */
     int j,k;
     int to_find = 0;
     FiffDirNode::SPtr meas;
+    FiffDirNode::SPtr meas_info;
     fiff_int_t kind, pos;
     FiffTag::SPtr t_pTag;
 
@@ -1670,14 +1671,14 @@ static int get_all_chs (//fiffFile file,	        /* The file we are reading */
    * Find desired parents
    */
 //    meas = node->dir_tree_find(FIFFB_MEAS);
-    if (!(meas = find_meas(node))) {
+    if (!(meas = find_meas(p_node))) {
 //    if (meas.size() == 0) {
         qCritical ("Meas. block not found!");
         goto bad;
     }
 
 //    meas_info = meas[0]->dir_tree_find(FIFFB_MEAS_INFO);
-    if (!(node = find_meas_info(node))) {
+    if (!(meas_info = find_meas_info(p_node))) {
 //    if (meas_info.count() == 0) {
         qCritical ("Meas. info not found!");
         goto bad;
@@ -1697,9 +1698,9 @@ static int get_all_chs (//fiffFile file,	        /* The file we are reading */
     /*
     * Others from FIFFB_MEAS_INFO
     */
-    for (k = 0; k < node->nent; k++) {
-        kind = node->dir[k]->kind;
-        pos  = node->dir[k]->pos;
+    for (k = 0; k < meas_info->nent; k++) {
+        kind = meas_info->dir[k]->kind;
+        pos  = meas_info->dir[k]->pos;
         switch (kind) {
         case FIFF_NCHAN :
 //            if (fiff_read_this_tag (file->fd,this_entry->pos,&tag) == -1)
@@ -3981,7 +3982,7 @@ static char *get_comment (//fiffFile file,
 //            if (fiff_read_this_tag (file->fd,ent->pos,&tag) != -1)
 //                return ((char *)tag.data);
             if (FiffTag::read_tag(stream,t_pTag,ent[k]->pos)) {
-                return ((char *)t_pTag->data());
+                return (mne_strdup((char *)t_pTag->data()));
             }
         }
     return (mne_strdup("No comment"));
@@ -4056,17 +4057,17 @@ static char *get_meas_date (//fiffFile file,
 //    fiffDirEntry ent;
     char *res = NULL;
     fiff_int_t kind, pos;
-    QList<FiffDirNode::SPtr> meas_info;
+    FiffDirNode::SPtr meas_info;
 
-    meas_info = node->dir_tree_find(FIFFB_MEAS_INFO);
-//    if ((node = find_meas_info(node)) == NULL) {
-    if (meas_info.count() == 0) {
+//    meas_info = node->dir_tree_find(FIFFB_MEAS_INFO);
+    if (!(meas_info = find_meas_info(node))) {
+//    if (meas_info.count() == 0) {
         return res;
     }
 //    tag.data = NULL;
-    for (k = 0; k < meas_info[0]->nent;k++) {
-        kind = meas_info[0]->dir[k]->kind;
-        pos  = meas_info[0]->dir[k]->pos;
+    for (k = 0; k < meas_info->nent;k++) {
+        kind = meas_info->dir[k]->kind;
+        pos  = meas_info->dir[k]->pos;
         if (kind == FIFF_MEAS_DATE)
         {
  //           if (fiff_read_this_tag (file->fd,ent->pos,&tag) != -1) {
@@ -4317,6 +4318,7 @@ static int get_meas_info (//fiffFile file,	 /* The file we are reading */
             if (*meas_date)
                 FREE(*meas_date);
 //            *meas_date = (fiffTime)tag.data;
+            *meas_date = MALLOC(1,fiffTimeRec);
             *meas_date = (fiffTime)t_pTag->data();
 //            tag.data = NULL;
             break;
@@ -4377,9 +4379,9 @@ static int get_meas_info (//fiffFile file,	 /* The file we are reading */
         }
     }
     /*
-   * Search for the coordinate transformation from
-   * HPI_RESULT block if it was not previously found
-   */
+    * Search for the coordinate transformation from
+    * HPI_RESULT block if it was not previously found
+    */
 //    hpi = fiff_dir_tree_find(node,FIFFB_HPI_RESULT);
 //    node = hpi[0];
 
@@ -4688,6 +4690,7 @@ static int get_evoked_optional(//fiffFile file,	 /* The file we are reading */
 //            this_ch = (fiffChInfo)(tag.data);
             if (!FiffTag::read_tag(stream,t_pTag,pos))
                 goto out;
+            this_ch = MALLOC(1,fiffChInfoRec);
             this_ch = (fiffChInfo)t_pTag->data();
             if (this_ch->scanNo <= 0 || this_ch->scanNo > new_nchan) {
                 printf ("FIFF_CH_INFO : scan # out of range!");
@@ -17392,6 +17395,7 @@ mneMeasData mne_read_meas_data_add(const QString&       name,       /* Name of t
                         &nchan_file,&nsamp,&dtmin,&sfreq,&chs,&data,
                         &comment,&highpass,&lowpass,&nave,&aspect_kind,&t,&id,&meas_date) == FAIL)
         goto out;
+
     if (id)
         printf("\tMeasurement file id: %s\n",mne_format_file_id(id));
 
