@@ -34,8 +34,8 @@
 *
 */
 
-#ifndef EEGREF_EEGREF_H
-#define EEGREF_EEGREF_H
+#ifndef EEGREF_H
+#define EEGREF_H
 
 
 //*************************************************************************************************************
@@ -43,6 +43,9 @@
 // INCLUDES
 //=============================================================================================================
 
+#include "utils_global.h"
+#include <fiff/fiff_info.h>
+#include <ioutils.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -57,7 +60,7 @@
 // Eigen INCLUDES
 //=============================================================================================================
 
-#include <Eigen/SparseCore>
+#include <Eigen/Dense>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -67,10 +70,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE EEGREF
+// DEFINE NAMESPACE UTILSLIB
 //=============================================================================================================
 
-namespace EEGREF {
+namespace UTILSLIB {
 
 
 //*************************************************************************************************************
@@ -86,7 +89,7 @@ namespace EEGREF {
 * @brief Brief description of this class.
 */
 
-class EEGRef
+class UTILSSHARED_EXPORT EEGRef
 {
 
 public:
@@ -99,13 +102,19 @@ public:
     */
     EEGRef();
 
+    //=========================================================================================================
+    /**
+    * emits the common average reference (CAR) operator to an EEG data matrix with indifferent electrode reference.
+    *
+    * @param[in] matIER     EEG data matrix with indefferent electrode reference
+    *
+    * @return EEG data matrix with common average reference
+    */
+    Eigen::MatrixXd applyCAR(Eigen::MatrixXd& matIER, FIFFLIB::FiffInfo::SPtr pFiffInfo);
+
 protected:
 
 private:
-
-    Eigen::MatrixXd     m_matIER;               /**< contains EEG data with indifferent electrode reference. */
-    Eigen::MatrixXd     m_matCAR;               /**< contains EEG data with common average reference. */
-
 
 };
 
@@ -116,6 +125,6 @@ private:
 //=============================================================================================================
 
 
-} // namespace EEGREF
+} // namespace UTILSLIB
 
-#endif // EEGREF_EEGREF_H
+#endif // EEGREF_H
