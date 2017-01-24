@@ -48,6 +48,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <Eigen/Dense>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -66,7 +67,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace EEGREF;
+using namespace UTILSLIB;
+using namespace Eigen;
 
 
 //*************************************************************************************************************
@@ -86,3 +88,31 @@ EEGRef::EEGRef()
 
 
 //*************************************************************************************************************
+
+MatrixXd EEGRef::applyCAR(MatrixXd &matIER, FIFFLIB::FiffInfo::SPtr pFiffInfo)
+{
+    unsigned int numTrueCh  = 0;
+    unsigned int numCh      = pFiffInfo->chs.size();
+    MatrixXd matOnes        = MatrixXd::Ones(numCh, numCh);
+    MatrixXd matCenter      = MatrixXd::Identity(numCh, numCh);
+
+    //determine the number of true channels
+    for(unsigned int i = 0; i < numCh; ++i)
+    {
+        if(pFiffInfo->chs.at(i).ch_name.contains("EEG") && !pFiffInfo->bads.contains(pFiffInfo->chs.at(i).ch_name))
+        {
+            numTrueCh++;
+        }
+        else
+        {
+            matOnes.row(i).setZero();
+            matCenter.row(i).setZero();
+        }
+    }
+
+    //detrmine centering matrix
+    matCenter = matCenter - (1/numTrueCh)*matOnes;
+    IOUtils::write_eigen_matrix(matCenter, "centeringMatrix.txt", "centering matrix");
+
+    return matCenter*matIER;
+}
