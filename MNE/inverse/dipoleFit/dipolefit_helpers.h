@@ -3739,8 +3739,7 @@ mneNamedMatrix mne_read_named_matrix(//fiffFile in,
 //            TAG_FREE(tag);
 //            goto bad;
 //        }
-        MatrixXf tmp_data = t_pTag->toFloatMatrix();
-        qDebug() << "<<<TODO>>> Eventually a transposition of data required!";
+        MatrixXf tmp_data = t_pTag->toFloatMatrix().transpose();
         fromFloatEigenMatrix(tmp_data, data);
     }
     else {
@@ -3761,8 +3760,7 @@ mneNamedMatrix mne_read_named_matrix(//fiffFile in,
 //                        goto bad;
 //                    }
 //                    FREE(tag);
-                    MatrixXf tmp_data = t_pTag->toFloatMatrix();
-                    qDebug() << "<<<TODO>>> Eventually a transposition of data required!";
+                    MatrixXf tmp_data = t_pTag->toFloatMatrix().transpose();
                     fromFloatEigenMatrix(tmp_data, data);
 
                     node = node->children[k];
@@ -4804,8 +4802,7 @@ static float **get_epochs (//fiffFile file,	/* This is our file */
                     goto bad;
                 }
 //                FREE(dims);
-                MatrixXf tmp_epochs = t_pTag->toFloatMatrix();
-                qDebug() << "<<<TODO>>> Eventually a transposition of epochs required!";
+                MatrixXf tmp_epochs = t_pTag->toFloatMatrix().transpose();
                 fromFloatEigenMatrix(tmp_epochs, epochs);
 //                if ((epochs = fiff_get_float_matrix(&tag)) == NULL)
 //                    goto bad;
@@ -4990,7 +4987,6 @@ int mne_read_evoked(const QString& name,           /* Name of the file */
     * there might be an individual one in the
     * evoked-response data
     */
-    start->print(4);
     if (get_evoked_essentials(stream,start,sfreq,
                               tmin,nsamp,nave,aspect_kind,
                               artefs,nartef) == -1)
@@ -4998,19 +4994,18 @@ int mne_read_evoked(const QString& name,           /* Name of the file */
     /*
     * Some things may be redefined at a lower level
     */
-    start->print(4);
     if (get_evoked_optional(stream,start,&nchan,&chs) == -1)
         goto out;
     /*
     * Omit nonmagnetic channels
     */
-    start->print(4);
     if ((epochs = get_epochs(stream,start,nchan,nsamp)) == NULL)
         goto out;
     /*
     * Change artefact limits to start from 0
     */
     for (k = 0; k < nartef; k++) {
+        qDebug() << "TODO: Artefact Vectors do not contain the right stuff!";
         artefs[2*k+1] = artefs[2*k+1] - sfreq*tmin;
         artefs[2*k+2] = artefs[2*k+2] - sfreq*tmin;
     }
@@ -6081,8 +6076,7 @@ mneProjOp mne_read_proj_op_from_node(//fiffFile in,
 ////            TAG_FREE(tag);
 //            goto bad;
 //        }
-        MatrixXf tmp_item_vectors = t_pTag->toFloatMatrix();
-        qDebug() << "<<<TODO>>> Eventually a transposition of item_vectors required!";
+        MatrixXf tmp_item_vectors = t_pTag->toFloatMatrix().transpose();
         fromFloatEigenMatrix(tmp_item_vectors, item_vectors);
 
 //        FREE(tag); tag = NULL;
@@ -7716,8 +7710,7 @@ mneCovMatrix mne_read_cov(const QString& name,int kind)
                 goto out;
 
 
-            tmp_eigen = t_pTag->toFloatMatrix();
-
+            tmp_eigen = t_pTag->toFloatMatrix().transpose();
             fromFloatEigenMatrix(tmp_eigen, eigen);
 
 //            if ((eigen = fiff_get_float_matrix(tag)) == NULL) {
@@ -8559,7 +8552,7 @@ int mne_read_source_spaces(const QString& name,               /* Read from here 
 //        if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_SOURCE_SPACE_POINTS)) == NULL)
         if (!node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_POINTS, t_pTag))
             goto bad;
-        MatrixXf tmp_rr = t_pTag->toFloatMatrix();
+        MatrixXf tmp_rr = t_pTag->toFloatMatrix().transpose();
         fromFloatEigenMatrix(tmp_rr,new_space->rr);
 //        if ((new_space->rr = fiff_get_float_matrix(tag)) == NULL) {
 ////            TAG_FREE(tag);
@@ -8569,7 +8562,7 @@ int mne_read_source_spaces(const QString& name,               /* Read from here 
 //        if ((tag = fiff_dir_tree_get_tag(in,node, FIFF_MNE_SOURCE_SPACE_NORMALS)) == NULL)
         if (!node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_NORMALS, t_pTag))
             goto bad;
-        MatrixXf tmp_nn = t_pTag->toFloatMatrix();
+        MatrixXf tmp_nn = t_pTag->toFloatMatrix().transpose();
         fromFloatEigenMatrix(tmp_nn,new_space->nn);
 //        if ((new_space->nn = fiff_get_float_matrix(tag)) == NULL) {
 ////            TAG_FREE(tag);
@@ -8621,8 +8614,7 @@ int mne_read_source_spaces(const QString& name,               /* Read from here 
                     goto bad;
             }
 
-            MatrixXi tmp_itris = t_pTag->toIntMatrix();
-
+            MatrixXi tmp_itris = t_pTag->toIntMatrix().transpose();
             fromIntEigenMatrix(tmp_itris, itris);
 
 //            if ((itris = fiff_get_int_matrix(tag)) == NULL) {
@@ -8702,7 +8694,7 @@ int mne_read_source_spaces(const QString& name,               /* Read from here 
                 if (!node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_USE_TRIANGLES, t_pTag))
                     goto bad;
 
-                MatrixXi tmp_itris = t_pTag->toIntMatrix();
+                MatrixXi tmp_itris = t_pTag->toIntMatrix().transpose();
                 fromIntEigenMatrix(tmp_itris, itris);
 //                if ((itris = fiff_get_int_matrix(tag)) == NULL) {
 ////                    TAG_FREE(tag);
@@ -8992,7 +8984,6 @@ static void add_triangle_data(mneTriangle tri)
 {
     float size,sizey;
     int   c;
-
     VEC_DIFF (tri->r1,tri->r2,tri->r12);
     VEC_DIFF (tri->r1,tri->r3,tri->r13);
     CROSS_PRODUCT (tri->r12,tri->r13,tri->nn);
@@ -9522,7 +9513,7 @@ static mneSurface read_bem_surface( const QString& name,    /* Filename */
 //    if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_BEM_SURF_NODES)) == NULL)
     if (!node->find_tag(stream, FIFF_BEM_SURF_NODES, t_pTag))
         goto bad;
-    tmp_nodes = t_pTag->toFloatMatrix();
+    tmp_nodes = t_pTag->toFloatMatrix().transpose();
     fromFloatEigenMatrix(tmp_nodes, nodes);
 //    if ((nodes = fiff_get_float_matrix(tag)) == NULL)
 //        goto bad;
@@ -9530,7 +9521,7 @@ static mneSurface read_bem_surface( const QString& name,    /* Filename */
 
 //    if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_BEM_SURF_NORMALS)) != NULL) {
     if (node->find_tag(stream, FIFF_BEM_SURF_NORMALS, t_pTag)) {\
-        MatrixXf tmp_node_normals = t_pTag->toFloatMatrix();
+        MatrixXf tmp_node_normals = t_pTag->toFloatMatrix().transpose();
         fromFloatEigenMatrix(tmp_node_normals, node_normals);
 //        if ((node_normals = fiff_get_float_matrix(tag)) == NULL)
 //            goto bad;
@@ -9540,7 +9531,7 @@ static mneSurface read_bem_surface( const QString& name,    /* Filename */
 //    if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_BEM_SURF_TRIANGLES)) == NULL)
     if (!node->find_tag(stream, FIFF_BEM_SURF_TRIANGLES, t_pTag))
         goto bad;
-    tmp_triangles = t_pTag->toIntMatrix();
+    tmp_triangles = t_pTag->toIntMatrix().transpose();
     fromIntEigenMatrix(tmp_triangles, triangles);
 //    if ((triangles = fiff_get_int_matrix(tag)) == NULL)
 //        goto bad;
@@ -11097,8 +11088,7 @@ int fwd_bem_load_solution(char *name, int bem_method, fwdBemModel m)
             goto not_found;
         }
 
-        MatrixXf tmp_sol = t_pTag->toFloatMatrix();
-        qDebug() << "<<<TODO>>> Eventually a transposition of sol required!";
+        MatrixXf tmp_sol = t_pTag->toFloatMatrix().transpose();
         fromFloatEigenMatrix(tmp_sol, sol);
 //        if ((sol = fiff_get_float_matrix(tag)) == NULL) {
 //            printf("Could not read potential solution.");
@@ -14828,6 +14818,7 @@ void mne_adjust_baselines(mneMeasData meas, float bmin, float bmax)
             for (s = 0; s < meas->current->np; s++)
                 data[s][c] = data[s][c] - ave;
         }
+        qDebug() << "TODO: Check comments content";
         fprintf(stderr,"\t%s : using baseline %7.1f ... %7.1f ms\n",
                 meas->current->comment ? meas->current->comment : "unknown",
                 1000*(tmin+b1/sfreq),
