@@ -4485,16 +4485,16 @@ static int find_between (//fiffFile in,
 static int get_evoked_essentials (//fiffFile file,	/* This is our file */
                                   FiffStream::SPtr& stream,
                                   const FiffDirNode::SPtr& node,	/* The interesting node */
-                                  float *sfreq,		/* Sampling frequency
+                                  float& sfreq,		/* Sampling frequency
                                                                                            * The value pointed by this is not
                                                                                            * modified if individual sampling
                                                                                            * frequency is found */
-                                  float *tmin,          /* Time scale minimum */
-                                  int *nsamp,		/* Number of samples */
-                                  int *nave,		/* Number of averaged responses */
-                                  int *akind,		/* Aspect type */
-                                  int **artefs,		/* Artefact removal parameters */
-                                  int *nartef)
+                                  float& tmin,          /* Time scale minimum */
+                                  int& nsamp,		/* Number of samples */
+                                  int& nave,		/* Number of averaged responses */
+                                  int& akind,		/* Aspect type */
+                                  int *& artefs,		/* Artefact removal parameters */
+                                  int& nartef)
 /*
       * Get the essential info for
       * given evoked response data
@@ -4505,10 +4505,10 @@ static int get_evoked_essentials (//fiffFile file,	/* This is our file */
     int k;
     int to_find = 2;
 //    fiffDirEntry start;
-    int   *first = NULL;
-    int   *last  = NULL;
-    int   *my_nsamp = NULL;
-    float *my_tmin  = NULL;
+    int   first = -1;
+    int   last = -1;
+    int   my_nsamp = -1;
+    float my_tmin = -1;
     int   res = -1;
     fiff_int_t kind, pos;
 
@@ -4522,22 +4522,22 @@ static int get_evoked_essentials (//fiffFile file,	/* This is our file */
     if (find_between (stream,tmp_node,tmp_node->parent,FIFF_NAVE,&tempb) == FIFF_FAIL)
         return res;
     if (tempb)
-        *nave = *(int *)tempb;
+        nave = *(int *)tempb;
     FREE(tempb);
     if (find_between (stream,tmp_node,tmp_node->parent,
                       FIFF_SFREQ,&tempb) == FIFF_FAIL)
         return res;
     if (tempb)
-        *sfreq = *(float *)tempb;
+        sfreq = *(float *)tempb;
     FREE(tempb);
 
     if (find_between (stream,tmp_node,tmp_node->parent,
                       FIFF_ASPECT_KIND,&tempb) == FIFF_FAIL)
         return res;
     if (tempb)
-        *akind = *(int *)tempb;
+        akind = *(int *)tempb;
     else
-        *akind = FIFFV_ASPECT_AVERAGE; /* Just a guess */
+        akind = FIFFV_ASPECT_AVERAGE; /* Just a guess */
     FREE(tempb);
     /*
    * Find evoked response descriptive data
@@ -4557,7 +4557,7 @@ static int get_evoked_essentials (//fiffFile file,	/* This is our file */
 //            tag.data = NULL;
             if (!FiffTag::read_tag(stream,t_pTag,pos))
                 goto out;
-            *first = *t_pTag->toInt(); to_find--;
+            first = *t_pTag->toInt(); to_find--;
             break;
 
         case FIFF_LAST_SAMPLE :
@@ -4567,7 +4567,7 @@ static int get_evoked_essentials (//fiffFile file,	/* This is our file */
 //            tag.data = NULL;
             if (!FiffTag::read_tag(stream,t_pTag,pos))
                 goto out;
-            *last = *t_pTag->toInt(); to_find--;
+            last = *t_pTag->toInt(); to_find--;
             break;
 
         case FIFF_NO_SAMPLES :
@@ -4577,7 +4577,7 @@ static int get_evoked_essentials (//fiffFile file,	/* This is our file */
 //            tag.data = NULL;
             if (!FiffTag::read_tag(stream,t_pTag,pos))
                 goto out;
-            *my_nsamp = *t_pTag->toInt(); to_find--;
+            my_nsamp = *t_pTag->toInt(); to_find--;
             break;
 
         case FIFF_FIRST_TIME :
@@ -4587,7 +4587,7 @@ static int get_evoked_essentials (//fiffFile file,	/* This is our file */
 //            tag.data = NULL;
             if (!FiffTag::read_tag(stream,t_pTag,pos))
                 goto out;
-            *my_tmin = *t_pTag->toFloat(); to_find--;
+            my_tmin = *t_pTag->toFloat(); to_find--;
             break;
 
 
@@ -4600,8 +4600,8 @@ static int get_evoked_essentials (//fiffFile file,	/* This is our file */
             if (!FiffTag::read_tag(stream,t_pTag,pos))
                 goto out;
             qDebug() << "TODO: check whether artefs contains the right stuff -> use MatrixXi instead";
-            *artefs = t_pTag->toInt();
-            *nartef = t_pTag->size()/(3*sizeof(int));
+            artefs = t_pTag->toInt();
+            nartef = t_pTag->size()/(3*sizeof(int));
             break;
         }
     }
@@ -4610,13 +4610,13 @@ static int get_evoked_essentials (//fiffFile file,	/* This is our file */
         printf ("Not all essential tags were found!");
         goto out;
     }
-    if (first != NULL && last != NULL) {
-        *nsamp = (*last)-(*first)+1;
-        *tmin  = (*first)/(*sfreq);
+    if (first != -1 && last != -1) {
+        nsamp = (last)-(first)+1;
+        tmin  = (first)/(sfreq);
     }
-    else if (my_tmin != NULL && my_nsamp != NULL) {
-        *tmin = *my_tmin;
-        *nsamp = *my_nsamp;
+    else if (my_tmin != -1 && my_nsamp != -1) {
+        tmin = my_tmin;
+        nsamp = my_nsamp;
     }
     else {
         printf("Not enough data for time scale definition!");
@@ -4625,10 +4625,10 @@ static int get_evoked_essentials (//fiffFile file,	/* This is our file */
     res = 0;
 
 out : {
-        FREE(my_tmin);
-        FREE(my_nsamp);
-        FREE(last); FREE(first);
-   //     FREE(tag.data);
+//        FREE(my_tmin);
+//        FREE(my_nsamp);
+//        FREE(last); FREE(first);
+//        FREE(tag.data);
         return res;
     }
 }
@@ -4987,9 +4987,9 @@ int mne_read_evoked(const QString& name,           /* Name of the file */
     * there might be an individual one in the
     * evoked-response data
     */
-    if (get_evoked_essentials(stream,start,&sfreq,
-                              &tmin,&nsamp,&nave,&aspect_kind,
-                              &artefs,&nartef) == -1)
+    if (get_evoked_essentials(stream,start,sfreq,
+                              tmin,nsamp,nave,aspect_kind,
+                              artefs,nartef) == -1)
         goto out;
     /*
    * Some things may be redefined at a lower level
