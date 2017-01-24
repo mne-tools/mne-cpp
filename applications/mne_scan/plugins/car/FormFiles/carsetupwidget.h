@@ -1,15 +1,14 @@
 //=============================================================================================================
 /**
-* @file     eegref.h
-* @author   Viktor Klüber <v.klueber@gmx.net>;
-*           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+* @file     carsetupwidget.h
+* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     January, 2017
+* @date     February, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2017, Viktor Klüber, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     EEGRef class declaration.
+* @brief    Contains the declaration of the carSetupWidget class.
 *
 */
 
-#ifndef EEGREF_H
-#define EEGREF_H
+#ifndef CARSETUPWIDGET_H
+#define CARSETUPWIDGET_H
 
 
 //*************************************************************************************************************
@@ -43,89 +42,80 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "utils_global.h"
-#include <fiff/fiff_info.h>
-#include <ioutils.h>
+#include "../ui_carsetup.h"
+#include "caraboutwidget.h"
+#include "../car.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QSharedPointer>
+#include <QtWidgets>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Eigen INCLUDES
+// DEFINE NAMESPACE carPlugin
 //=============================================================================================================
 
-#include <Eigen/Dense>
+namespace CARPLUGIN
+{
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE UTILSLIB
-//=============================================================================================================
-
-namespace UTILSLIB {
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// EEGREF FORWARD DECLARATIONS
-//=============================================================================================================
+class Car;
 
 
 //=============================================================================================================
 /**
-* This class provides transformations for EEG reference operations.
+* DECLARE CLASS carSetupWidget
 *
-* @brief This class provides transformations for EEG reference operations.
+* @brief The carSetupWidget class provides the car configuration window.
 */
-
-class UTILSSHARED_EXPORT EEGRef
+class CarSetupWidget : public QWidget
 {
+    Q_OBJECT
 
 public:
-    typedef QSharedPointer<EEGRef> SPtr;            /**< Shared pointer type for EEGRef. */
-    typedef QSharedPointer<const EEGRef> ConstSPtr; /**< Const shared pointer type for EEGRef. */
 
     //=========================================================================================================
     /**
-    * Constructs a EEGRef object.
+    * Constructs a carSetupWidget which is a child of parent.
+    *
+    * @param [in] toolbox a pointer to the corresponding car.
+    * @param [in] parent pointer to parent widget; If parent is 0, the new carSetupWidget becomes a window. If parent is another widget, carSetupWidget becomes a child window inside parent. carSetupWidget is deleted when its parent is deleted.
     */
-    EEGRef();
+    CarSetupWidget(Car* toolbox, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * transforms the EEG data matrix with indifferent electrode reference to an EEG data matrix with common average reference.
-    *
-    * @param[in] matIER         EEG data matrix with indefferent electrode reference
-    * @param[in] pFiffInfo      pointer to the corresponding Fiff-Info of the EEG data stream
-    *
-    * @return EEG data matrix with common average reference
+    * Destroys the carSetupWidget.
+    * All carSetupWidget's children are deleted first. The application exits if carSetupWidget is the main widget.
     */
-    Eigen::MatrixXd applyCAR(Eigen::MatrixXd& matIER, FIFFLIB::FiffInfo::SPtr pFiffInfo);
+    ~CarSetupWidget();
 
-protected:
+
+private slots:
+    //=========================================================================================================
+    /**
+    * Shows the About Dialog
+    *
+    */
+    void showAboutDialog();
 
 private:
 
+    Car* m_pCar;	/**< Holds a pointer to corresponding car.*/
+
+    Ui::CarSetupWidgetClass ui;	/**< Holds the user interface for the carSetupWidget.*/
 };
 
+} // NAMESPACE
 
-//*************************************************************************************************************
-//=============================================================================================================
-// INLINE DEFINITIONS
-//=============================================================================================================
-
-
-} // namespace UTILSLIB
-
-#endif // EEGREF_H
+#endif // CARSETUPWIDGET_H
