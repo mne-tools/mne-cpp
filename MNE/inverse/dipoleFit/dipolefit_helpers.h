@@ -4785,18 +4785,21 @@ static float **get_epochs (//fiffFile file,	/* This is our file */
                 QVector<qint32> dims;
                 t_pTag->getMatrixDimensions(ndim, dims);
 
+                qDebug() << "dims" << dims;
+
+
 //                if (dims[0] != 2) {
                 if (ndim != 2) {
                     printf("Data matrix dimension should be two!");
                     goto bad;
                 }
 //                if (dims[1] != nsamp) {
-                if (dims[1] != nsamp) {
+                if (dims[0] != nsamp) {
                     printf("Incorrect number of samples in data matrix!");
                     goto bad;
                 }
 //                if (dims[2] != nchan) {
-                if (dims[0] != nchan) {
+                if (dims[1] != nchan) {
                     printf("Incorrect number of channels in data matrix!");
                     goto bad;
                 }
@@ -4977,8 +4980,8 @@ int mne_read_evoked(const QString& name,           /* Name of the file */
         goto out;
     }
     /*
-   * Get various things...
-   */
+    * Get various things...
+    */
     if (get_meas_info (stream,start,&id,&meas_date,&nchan,&sfreq,&highpass,&lowpass,&chs,&trans) == -1)
         goto out;
 
@@ -4987,23 +4990,26 @@ int mne_read_evoked(const QString& name,           /* Name of the file */
     * there might be an individual one in the
     * evoked-response data
     */
+    start->print(4);
     if (get_evoked_essentials(stream,start,sfreq,
                               tmin,nsamp,nave,aspect_kind,
                               artefs,nartef) == -1)
         goto out;
     /*
-   * Some things may be redefined at a lower level
-   */
+    * Some things may be redefined at a lower level
+    */
+    start->print(4);
     if (get_evoked_optional(stream,start,&nchan,&chs) == -1)
         goto out;
     /*
-   * Omit nonmagnetic channels
-   */
+    * Omit nonmagnetic channels
+    */
+    start->print(4);
     if ((epochs = get_epochs(stream,start,nchan,nsamp)) == NULL)
         goto out;
     /*
-   * Change artefact limits to start from 0
-   */
+    * Change artefact limits to start from 0
+    */
     for (k = 0; k < nartef; k++) {
         artefs[2*k+1] = artefs[2*k+1] - sfreq*tmin;
         artefs[2*k+2] = artefs[2*k+2] - sfreq*tmin;
@@ -11086,7 +11092,7 @@ int fwd_bem_load_solution(char *name, int bem_method, fwdBemModel m)
         for (k = 0, dim = 0; k < m->nsurf; k++)
             dim = dim + ((method == FWD_BEM_LINEAR_COLL) ? m->surfs[k]->np : m->surfs[k]->ntri);
 //        if (dims[1] != dim || dims[2] != dim) {
-        if (dims[1] != dim || dims[0] != dim) {
+        if (dims[0] != dim || dims[1] != dim) {
             printf("Expected a %d x %d solution matrix instead of a %d x %d  one",dim,dim,dims[0],dims[1]);
             goto not_found;
         }
