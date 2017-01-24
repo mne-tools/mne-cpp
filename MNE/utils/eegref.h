@@ -57,6 +57,7 @@
 // Eigen INCLUDES
 //=============================================================================================================
 
+#include <Eigen/SparseCore>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -101,6 +102,9 @@ public:
 protected:
 
 private:
+
+    Eigen::MatrixXd     m_matIER;               /**< contains EEG data with indifferent electrode reference. */
+    Eigen::MatrixXd     m_matCAR;               /**< contains EEG data with common average reference. */
 
 
 };
