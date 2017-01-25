@@ -231,26 +231,10 @@ bool FiffStream::open()
         return false;
     }
 
+    if(!check_beginning())
+        return false;
+
     FiffTag::SPtr t_pTag;
-    FiffTag::read_tag_info(this, t_pTag);
-
-    if (t_pTag->kind != FIFF_FILE_ID)
-    {
-        printf("Fiff::open: file does not start with a file id tag");//consider throw
-        return false;
-    }
-
-    if (t_pTag->type != FIFFT_ID_STRUCT)
-    {
-        printf("Fiff::open: file does not start with a file id tag");//consider throw
-        return false;
-    }
-    if (t_pTag->size() != 20)
-    {
-        printf("Fiff::open: file does not start with a file id tag");//consider throw
-        return false;
-    }
-
     FiffTag::read_tag(this, t_pTag);
 
     if (t_pTag->kind != FIFF_DIR_POINTER)
@@ -2560,3 +2544,32 @@ void FiffStream::write_rt_command(fiff_int_t command, const QString& data)
 
     this->writeRawData(data.toUtf8().constData(),datasize);
 }
+
+
+//*************************************************************************************************************
+
+bool FiffStream::check_beginning()
+{
+    FiffTag::SPtr t_pTag;
+    FiffTag::read_tag_info(this, t_pTag);
+
+    if (t_pTag->kind != FIFF_FILE_ID)
+    {
+        printf("Fiff::open: file does not start with a file id tag");//consider throw
+        return false;
+    }
+
+    if (t_pTag->type != FIFFT_ID_STRUCT)
+    {
+        printf("Fiff::open: file does not start with a file id tag");//consider throw
+        return false;
+    }
+    if (t_pTag->size() != 20)
+    {
+        printf("Fiff::open: file does not start with a file id tag");//consider throw
+        return false;
+    }
+
+    return true;
+}
+

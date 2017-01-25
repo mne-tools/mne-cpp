@@ -696,6 +696,17 @@ public:
     void write_rt_command(fiff_int_t command, const QString& data);
 
 private:
+    //=========================================================================================================
+    /**
+    * Check that the file starts properly.
+    *
+    * Refactored: check_beginning (fiff_open.c)
+    *
+    * @return true if beginning is correct, false otherwise
+    */
+    bool check_beginning();
+
+private:
     QList<FiffDirEntry::SPtr> m_dir; /**< This is the directory. If no directory exists, open automatically scans the file to create one. */
     FiffDirNode::SPtr m_tree;        /**< Directory compiled into a tree */
 
