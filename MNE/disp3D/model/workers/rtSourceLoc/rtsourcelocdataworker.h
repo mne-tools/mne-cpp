@@ -281,73 +281,7 @@ private:
     */
     void createSmoothingOperator(const MatrixX3f& matVertPosLeftHemi, const MatrixX3f& matVertPosRightHemi);
 
-    //=========================================================================================================
-    /**
-    * Gerenate the colors based on vertex/source based coloring.
-    *
-    * @param[in]  vSourceColorSamples       The source activation.
-    * @param[out] arrayFinalVertColor       The currently set color information for each vertex.
-    * @param[in]  vVertNo                   The indices for all sources related to the whole surface.
-    */
-//    void generateColorsPerVertex(const VectorXd& vSourceColorSamples,
-//                                  QByteArray& arrayFinalVertColor,
-//                                  const VectorXi& vVertNo);
-
-    //=========================================================================================================
-    /**
-    * Gerenate the colors based on annotation based coloring.
-    *
-    * @param[in]  vSourceColorSample         The source activation.
-    * @param[out] arrayFinalVertColor       The currently set color information for each vertex.
-    * @param[in]  vVertNo                    The indices for all sources related to the whole surface.
-    * @param[in]  lLabels                    The labels/annotation patch information.
-    * @param[in]  mapLabelIdSources          The map containing info about which source belongs to which patch.
-    */
-//    void generateColorsPerAnnotation(const VectorXd& vSourceColorSample,
-//                                      QByteArray& arrayFinalVertColor,
-//                                      const VectorXi& vVertNo,
-//                                      const QList<FSLIB::Label>& lLabels,
-//                                      const QMap<qint32, qint32>& mapLabelIdSources);
-
-    //=========================================================================================================
-    /**
-    * Gerenate the colors based on smoothing.
-    *
-    * @param[in]  sourceColorSamples         The color data for one hemisphere sources.
-    * @param[in]  vertno                     The vertex numbers of the chosen sources.
-    * @param[out] arrayFinalVertColor       The default colors of the complete surface.
-    * @param[in]  mapVertexNeighbors         The neighboring information.
-    */
-//    void generateSmoothedColors(const VectorXd& sourceColorSamples,
-//                                      const VectorXi &vertno,
-//                                      QByteArray& arrayFinalVertColor,
-//                                      const QMap<int, QVector<int> >& mapVertexNeighbors,
-//                                      const SparseMatrix<double>& matWDistSmooth);
-
-    //=========================================================================================================
-    /**
-    * Transform the data sample values to color values.
-    *
-    * @param[in]  data                      The data which is to be transformed.
-    * @param[out] arrayFinalVertColor       The final vertex colors, i.e. may already contain the curret curvature color information.
-    */
-//    void transformDataToColor(const Eigen::VectorXd& data, QByteArray &arrayFinalVertColor);
-
-    //=========================================================================================================
-    /**
-    * Transform the data sample values to color values.
-    *
-    * @param[in]  fSample                The data which is to be transformed.
-    * @param[out] arrayFinalVertColor   The final vertex color.
-    */
-//    void transformDataToColor(float fSample, QByteArray &arrayFinalVertColor);
-
     QMutex                  m_qMutex;                           /**< The thread's mutex. */
-
-    QByteArray              m_arraySurfaceVertColorLeftHemi;    /**< The vertex colors for the left hemisphere surface where the data is to be plotted on. */
-    QByteArray              m_arraySurfaceVertColorRightHemi;   /**< The vertex colors for the left hemisphere surface where the data is to be plotted on. */
-    VectorXi                m_vecVertNoLeftHemi;                /**< Vector with the source vertx indexes for the left hemisphere. */
-    VectorXi                m_vecVertNoRightHemi;               /**< Vector with the source vertx indexes for the right hemisphere. */
 
     QList<Eigen::VectorXd>  m_lData;                            /**< List that holds the fiff matrix data <n_channels x n_samples>. */
 
@@ -360,19 +294,6 @@ private:
     int                     m_iCurrentSample;                   /**< Number of the current sample which is/was streamed. */
     int                     m_iMSecIntervall;                   /**< Length in milli Seconds to wait inbetween data samples. */
     int                     m_iVisualizationType;               /**< The visualization type (single vertex, smoothing, annotation based). */
-
-    double                  m_dNormalization;                   /**< Normalization value. */
-    double                  m_dNormalizationMax;                /**< Value to normalize to. */
-
-    QVector3D               m_vecThresholds;                    /**< The threshold values used for normalizing the data. */
-
-    QList<FSLIB::Label>     m_lLabelsLeftHemi;                  /**< The list of current labels for the left hemisphere. */
-    QList<FSLIB::Label>     m_lLabelsRightHemi;                 /**< The list of current labels for the right hemisphere. */
-    QMap<qint32, qint32>    m_mapLabelIdSourcesLeftHemi;        /**< The sources mapped to their corresponding labels for the left hemisphere. */
-    QMap<qint32, qint32>    m_mapLabelIdSourcesRightHemi;       /**< The sources mapped to their corresponding labels for the right hemisphere. */
-
-    QMap<int, QVector<int> >   m_mapVertexNeighborsLeftHemi;    /**< The map of all vertices and neighbors for the left hemisphere. */
-    QMap<int, QVector<int> >   m_mapVertexNeighborsRightHemi;   /**< The map of all vertices and neighbors for the right hemisphere. */
 
     QList<VisualizationInfo>    m_lVisualizationInfo;           /**< The list holding all information needed to do the visualization for both hemispheres (0-left, 1-right). */
 
