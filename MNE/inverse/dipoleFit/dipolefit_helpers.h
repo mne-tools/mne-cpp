@@ -341,8 +341,6 @@ Eigen::MatrixXf toFloatEigenMatrix(float **mat, const int m, const int n)
 
 void fromFloatEigenMatrix(const Eigen::MatrixXf& from_mat, float **& to_mat, const int m, const int n)
 {
-    to_mat = ALLOC_CMATRIX(m,n);
-
     for ( int i = 0; i < m; ++i)
         for ( int j = 0; j < n; ++j)
             to_mat[i][j] = from_mat(i,j);
@@ -356,7 +354,9 @@ void fromFloatEigenMatrix(const Eigen::MatrixXf& from_mat, float **& to_mat)
 
 void fromFloatEigenVector(const Eigen::VectorXf& from_vec, float *&to_vec, const int n)
 {
-    to_vec = ALLOC_FLOAT(n);
+    if(to_vec == NULL) {
+        to_vec = ALLOC_FLOAT(n);
+    }
 
     for ( int i = 0; i < n; ++i)
         to_vec[i] = from_vec[i];
@@ -382,10 +382,6 @@ Eigen::MatrixXi toIntEigenMatrix(int **mat, const int m, const int n)
 
 void fromIntEigenMatrix(const Eigen::MatrixXi& from_mat, int **&to_mat, const int m, const int n)
 {
-    to_mat = (int **)malloc(m * sizeof(int *));
-    for (int i = 0; i < m; ++i)
-        to_mat[i] = (int *)malloc(n * sizeof(int));
-
     for ( int i = 0; i < m; ++i)
         for ( int j = 0; j < n; ++j)
             to_mat[i][j] = from_mat(i,j);
@@ -3741,6 +3737,7 @@ mneNamedMatrix mne_read_named_matrix(//fiffFile in,
 //            goto bad;
 //        }
         MatrixXf tmp_data = t_pTag->toFloatMatrix().transpose();
+        data = ALLOC_CMATRIX(tmp_data.rows(),tmp_data.cols());
         fromFloatEigenMatrix(tmp_data, data);
     }
     else {
@@ -3762,6 +3759,7 @@ mneNamedMatrix mne_read_named_matrix(//fiffFile in,
 //                    }
 //                    FREE(tag);
                     MatrixXf tmp_data = t_pTag->toFloatMatrix().transpose();
+                    data = ALLOC_CMATRIX(tmp_data.rows(),tmp_data.cols());
                     fromFloatEigenMatrix(tmp_data, data);
 
                     node = node->children[k];
@@ -4806,6 +4804,7 @@ static float **get_epochs (//fiffFile file,	/* This is our file */
                 }
 //                FREE(dims);
                 MatrixXf tmp_epochs = t_pTag->toFloatMatrix().transpose();
+                epochs = ALLOC_CMATRIX(tmp_epochs.rows(),tmp_epochs.cols());
                 fromFloatEigenMatrix(tmp_epochs, epochs);
 //                if ((epochs = fiff_get_float_matrix(&tag)) == NULL)
 //                    goto bad;
@@ -5946,7 +5945,7 @@ mneProjOp mne_read_proj_op_from_node(//fiffFile in,
     int         global_nchan,item_nchan,nlist;
     char        **item_names;
     int         item_kind;
-    float       **item_vectors;
+    float       **item_vectors = NULL;
     int         item_nvec;
     int         item_active;
     mneNamedMatrix item;
@@ -6080,6 +6079,7 @@ mneProjOp mne_read_proj_op_from_node(//fiffFile in,
 //            goto bad;
 //        }
         MatrixXf tmp_item_vectors = t_pTag->toFloatMatrix().transpose();
+        item_vectors = ALLOC_CMATRIX(tmp_item_vectors.rows(),tmp_item_vectors.cols());
         fromFloatEigenMatrix(tmp_item_vectors, item_vectors);
 
 //        FREE(tag); tag = NULL;
@@ -7714,6 +7714,7 @@ mneCovMatrix mne_read_cov(const QString& name,int kind)
 
 
             tmp_eigen = t_pTag->toFloatMatrix().transpose();
+            eigen = ALLOC_CMATRIX(tmp_eigen.rows(),tmp_eigen.cols());
             fromFloatEigenMatrix(tmp_eigen, eigen);
 
 //            if ((eigen = fiff_get_float_matrix(tag)) == NULL) {
@@ -8556,6 +8557,7 @@ int mne_read_source_spaces(const QString& name,               /* Read from here 
         if (!node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_POINTS, t_pTag))
             goto bad;
         MatrixXf tmp_rr = t_pTag->toFloatMatrix().transpose();
+        new_space->rr = ALLOC_CMATRIX(tmp_rr.rows(),tmp_rr.cols());
         fromFloatEigenMatrix(tmp_rr,new_space->rr);
 //        if ((new_space->rr = fiff_get_float_matrix(tag)) == NULL) {
 ////            TAG_FREE(tag);
@@ -8566,6 +8568,7 @@ int mne_read_source_spaces(const QString& name,               /* Read from here 
         if (!node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_NORMALS, t_pTag))
             goto bad;
         MatrixXf tmp_nn = t_pTag->toFloatMatrix().transpose();
+        new_space->nn = ALLOC_CMATRIX(tmp_nn.rows(),tmp_nn.cols());
         fromFloatEigenMatrix(tmp_nn,new_space->nn);
 //        if ((new_space->nn = fiff_get_float_matrix(tag)) == NULL) {
 ////            TAG_FREE(tag);
@@ -8618,6 +8621,9 @@ int mne_read_source_spaces(const QString& name,               /* Read from here 
             }
 
             MatrixXi tmp_itris = t_pTag->toIntMatrix().transpose();
+            itris = (int **)malloc(tmp_itris.rows() * sizeof(int *));
+            for (int i = 0; i < tmp_itris.rows(); ++i)
+                itris[i] = (int *)malloc(tmp_itris.cols() * sizeof(int));
             fromIntEigenMatrix(tmp_itris, itris);
 
 //            if ((itris = fiff_get_int_matrix(tag)) == NULL) {
@@ -8698,6 +8704,9 @@ int mne_read_source_spaces(const QString& name,               /* Read from here 
                     goto bad;
 
                 MatrixXi tmp_itris = t_pTag->toIntMatrix().transpose();
+                itris = (int **)malloc(tmp_itris.rows() * sizeof(int *));
+                for (int i = 0; i < tmp_itris.rows(); ++i)
+                    itris[i] = (int *)malloc(tmp_itris.cols() * sizeof(int));
                 fromIntEigenMatrix(tmp_itris, itris);
 //                if ((itris = fiff_get_int_matrix(tag)) == NULL) {
 ////                    TAG_FREE(tag);
@@ -9517,6 +9526,7 @@ static mneSurface read_bem_surface( const QString& name,    /* Filename */
     if (!node->find_tag(stream, FIFF_BEM_SURF_NODES, t_pTag))
         goto bad;
     tmp_nodes = t_pTag->toFloatMatrix().transpose();
+    nodes = ALLOC_CMATRIX(tmp_nodes.rows(),tmp_nodes.cols());
     fromFloatEigenMatrix(tmp_nodes, nodes);
 //    if ((nodes = fiff_get_float_matrix(tag)) == NULL)
 //        goto bad;
@@ -9525,6 +9535,7 @@ static mneSurface read_bem_surface( const QString& name,    /* Filename */
 //    if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_BEM_SURF_NORMALS)) != NULL) {
     if (node->find_tag(stream, FIFF_BEM_SURF_NORMALS, t_pTag)) {\
         MatrixXf tmp_node_normals = t_pTag->toFloatMatrix().transpose();
+        node_normals = ALLOC_CMATRIX(tmp_node_normals.rows(),tmp_node_normals.cols());
         fromFloatEigenMatrix(tmp_node_normals, node_normals);
 //        if ((node_normals = fiff_get_float_matrix(tag)) == NULL)
 //            goto bad;
@@ -9535,6 +9546,9 @@ static mneSurface read_bem_surface( const QString& name,    /* Filename */
     if (!node->find_tag(stream, FIFF_BEM_SURF_TRIANGLES, t_pTag))
         goto bad;
     tmp_triangles = t_pTag->toIntMatrix().transpose();
+    triangles = (int **)malloc(tmp_triangles.rows() * sizeof(int *));
+    for (int i = 0; i < tmp_triangles.rows(); ++i)
+        triangles[i] = (int *)malloc(tmp_triangles.cols() * sizeof(int));
     fromIntEigenMatrix(tmp_triangles, triangles);
 //    if ((triangles = fiff_get_int_matrix(tag)) == NULL)
 //        goto bad;
@@ -11092,6 +11106,7 @@ int fwd_bem_load_solution(char *name, int bem_method, fwdBemModel m)
         }
 
         MatrixXf tmp_sol = t_pTag->toFloatMatrix().transpose();
+        sol = ALLOC_CMATRIX(tmp_sol.rows(),tmp_sol.cols());
         fromFloatEigenMatrix(tmp_sol, sol);
 //        if ((sol = fiff_get_float_matrix(tag)) == NULL) {
 //            printf("Could not read potential solution.");
