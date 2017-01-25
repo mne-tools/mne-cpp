@@ -319,12 +319,6 @@ void mne_free_dcmatrix (double **m)
 #define FREE_CMATRIX(m) mne_free_cmatrix((m))
 
 
-
-
-
-
-
-
 //============================= Refactoring helpers =============================
 
 //float
@@ -369,16 +363,6 @@ void fromFloatEigenVector(const Eigen::VectorXf& from_vec, float *&to_vec)
 
 
 //int
-Eigen::MatrixXi toIntEigenMatrix(int **mat, const int m, const int n)
-{
-    Eigen::MatrixXi eigen_mat(m,n);
-
-    for ( int i = 0; i < m; ++i)
-        for ( int j = 0; j < n; ++j)
-            eigen_mat(i,j) = mat[i][j];
-
-    return eigen_mat;
-}
 
 void fromIntEigenMatrix(const Eigen::MatrixXi& from_mat, int **&to_mat, const int m, const int n)
 {
@@ -394,15 +378,9 @@ void fromIntEigenMatrix(const Eigen::MatrixXi& from_mat, int **&to_mat)
 
 
 
-
-
-
 #include <fiff/fiff_types.h>
 #include "mne_types.h"
 #include "analyze_types.h"
-
-
-
 
 
 //============================= data.c =============================
@@ -429,8 +407,6 @@ int is_selected_in_data(mshMegEegData d, char *ch_name)
         }
     return issel;
 }
-
-
 
 
 //============================= mne_matop.c =============================
@@ -521,7 +497,6 @@ void mne_add_scaled_vector_to(float *v1,float scale, float *v2,int nn)
 #endif
     return;
 }
-
 
 
 void mne_mat_vec_mult2 (float **m,float *v,float *result, int d1,int d2)
@@ -665,8 +640,6 @@ double **mne_dmatt_dmat_mult2 (double **m1,double **m2, int d1,int d2,int d3)
 }
 
 
-
-
 //============================= fiff_type_spec.h =============================
 
 /*
@@ -691,22 +664,7 @@ fiff_int_t fiff_type_matrix_coding(fiff_int_t type)
 }
 
 
-
-
 //============================= fiff_combat.c =============================
-
-static short swap_short (fiff_short_t source)
-
-{
-    unsigned char *csource = (unsigned char *)(&source);
-    fiff_short_t result;
-    unsigned char *cresult =  (unsigned char *)(&result);
-
-    cresult[0] = csource[1];
-    cresult[1] = csource[0];
-    return (result);
-}
-
 
 static fiff_int_t swap_int (fiff_int_t source)
 
@@ -720,66 +678,6 @@ static fiff_int_t swap_int (fiff_int_t source)
     cresult[2] = csource[1];
     cresult[3] = csource[0];
     return (result);
-}
-
-static fiff_long_t swap_long (fiff_long_t source)
-
-{
-    unsigned char *csource =  (unsigned char *)(&source);
-    fiff_long_t    result;
-    unsigned char *cresult =  (unsigned char *)(&result);
-
-    cresult[0] = csource[7];
-    cresult[1] = csource[6];
-    cresult[2] = csource[5];
-    cresult[3] = csource[4];
-    cresult[4] = csource[3];
-    cresult[5] = csource[2];
-    cresult[6] = csource[1];
-    cresult[7] = csource[0];
-    return (result);
-}
-
-static void swap_longp (fiff_long_t *source)
-
-{
-    unsigned char *csource =  (unsigned char *)(source);
-    unsigned char c;
-
-    c = csource[0];
-    csource[0] = csource[7];
-    csource[7] = c;
-
-    c = csource[1];
-    csource[1] = csource[6];
-    csource[6] = c;
-
-    c = csource[2];
-    csource[2] = csource[5];
-    csource[5] = c;
-
-    c = csource[3];
-    csource[3] = csource[4];
-    csource[4] = c;
-
-    return;
-}
-
-static void swap_intp (fiff_int_t *source)
-
-{
-    unsigned char *csource =  (unsigned char *)(source);
-
-    unsigned char c;
-
-    c = csource[3];
-    csource[3] = csource[0];
-    csource[0] = c;
-    c = csource[2];
-    csource[2] = csource[1];
-    csource[1] = c;
-
-    return;
 }
 
 
@@ -796,446 +694,6 @@ static void swap_floatp (float *source)
     csource[2] = csource[1];
     csource[1] = c;
 
-    return;
-}
-
-static void swap_doublep(double *source)
-
-{
-    unsigned char *csource =  (unsigned char *)(source);
-    unsigned char c;
-
-    c = csource[7];
-    csource[7] = csource[0];
-    csource[0] = c;
-
-    c = csource[6];
-    csource[6] = csource[1];
-    csource[1] = c;
-
-    c = csource[5];
-    csource[5] = csource[2];
-    csource[2] = c;
-
-    c = csource[4];
-    csource[4] = csource[3];
-    csource[3] = c;
-
-    return;
-}
-
-
-static void convert_ch_pos(fiffChPos pos)
-
-{
-    int k;
-    pos->coil_type  = swap_int(pos->coil_type);
-    for (k = 0; k < 3; k++) {
-        swap_floatp(&pos->r0[k]);
-        swap_floatp(&pos->ex[k]);
-        swap_floatp(&pos->ey[k]);
-        swap_floatp(&pos->ez[k]);
-    }
-    return;
-}
-
-
-
-static void convert_matrix_from_file_data(fiffTag tag)
-/*
- * Assumes that the input is in the non-native byte order and needs to be swapped to the other one
- */
-{
-    int ndim;
-    int k;
-    int *dimp,*data,kind,np,nz;
-    float *fdata;
-    double *ddata;
-    unsigned int tsize = tag->size;
-
-    if (fiff_type_fundamental(tag->type) != FIFFTS_FS_MATRIX)
-        return;
-    if (tag->data == NULL)
-        return;
-    if (tsize < sizeof(fiff_int_t))
-        return;
-
-    dimp = ((fiff_int_t *)(((char *)tag->data)+tag->size-sizeof(fiff_int_t)));
-    swap_intp(dimp);
-    ndim = *dimp;
-    if (fiff_type_matrix_coding(tag->type) == FIFFTS_MC_DENSE) {
-        if (tsize < (ndim+1)*sizeof(fiff_int_t))
-            return;
-        dimp = dimp - ndim;
-        for (k = 0, np = 1; k < ndim; k++) {
-            swap_intp(dimp+k);
-            np = np*dimp[k];
-        }
-    }
-    else {
-        if (tsize < (ndim+2)*sizeof(fiff_int_t))
-            return;
-        if (ndim > 2)		/* Not quite sure what to do */
-            return;
-        dimp = dimp - ndim - 1;
-        for (k = 0; k < ndim+1; k++)
-            swap_intp(dimp+k);
-        nz = dimp[0];
-        if (fiff_type_matrix_coding(tag->type) == FIFFTS_MC_CCS)
-            np = nz + dimp[2] + 1; /* nz + n + 1 */
-        else if (fiff_type_matrix_coding(tag->type) == FIFFTS_MC_RCS)
-            np = nz + dimp[1] + 1; /* nz + m + 1 */
-        else
-            return;			/* Don't know what to do */
-        /*
-     * Take care of the indices
-     */
-        for (data = (int *)(tag->data)+nz, k = 0; k < np; k++)
-            swap_intp(data+k);
-        np = nz;
-    }
-    /*
-   * Now convert data...
-   */
-    kind = fiff_type_base(tag->type);
-    if (kind == FIFFT_INT) {
-        for (data = (int *)(tag->data), k = 0; k < np; k++)
-            swap_intp(data+k);
-    }
-    else if (kind == FIFFT_FLOAT) {
-        for (fdata = (float *)(tag->data), k = 0; k < np; k++)
-            swap_floatp(fdata+k);
-    }
-    else if (kind == FIFFT_DOUBLE) {
-        for (ddata = (double *)(tag->data), k = 0; k < np; k++)
-            swap_doublep(ddata+k);
-    }
-    return;
-}
-
-
-static void convert_matrix_to_file_data(fiffTag tag)
-/*
- * Assumes that the input is in the NATIVE_ENDIAN byte order and needs to be swapped to the other one
- */
-{
-    int ndim;
-    int k;
-    int *dimp,*data,kind,np;
-    float *fdata;
-    double *ddata;
-    unsigned int tsize = tag->size;
-
-    if (fiff_type_fundamental(tag->type) != FIFFTS_FS_MATRIX)
-        return;
-    if (tag->data == NULL)
-        return;
-    if (tsize < sizeof(fiff_int_t))
-        return;
-
-    dimp = ((fiff_int_t *)(((char *)tag->data)+tag->size-sizeof(fiff_int_t)));
-    ndim = *dimp;
-    swap_intp(dimp);
-
-    if (fiff_type_matrix_coding(tag->type) == FIFFTS_MC_DENSE) {
-        if (tsize < (ndim+1)*sizeof(fiff_int_t))
-            return;
-        dimp = dimp - ndim;
-        for (k = 0, np = 1; k < ndim; k++) {
-            np = np*dimp[k];
-            swap_intp(dimp+k);
-        }
-    }
-    else {
-        if (tsize < (ndim+2)*sizeof(fiff_int_t))
-            return;
-        if (ndim > 2)		/* Not quite sure what to do */
-            return;
-        dimp = dimp - ndim - 1;
-        if (fiff_type_matrix_coding(tag->type) == FIFFTS_MC_CCS)
-            np = dimp[0] + dimp[2] + 1; /* nz + n + 1 */
-        else if (fiff_type_matrix_coding(tag->type) == FIFFTS_MC_RCS)
-            np = dimp[0] + dimp[1] + 1; /* nz + m + 1 */
-        else
-            return;			/* Don't know what to do */
-        for (k = 0; k < ndim+1; k++)
-            swap_intp(dimp+k);
-    }
-    /*
-   * Now convert data...
-   */
-    kind = fiff_type_base(tag->type);
-    if (kind == FIFFT_INT) {
-        for (data = (int *)(tag->data), k = 0; k < np; k++)
-            swap_intp(data+k);
-    }
-    else if (kind == FIFFT_FLOAT) {
-        for (fdata = (float *)(tag->data), k = 0; k < np; k++)
-            swap_floatp(fdata+k);
-    }
-    else if (kind == FIFFT_DOUBLE) {
-        for (ddata = (double *)(tag->data), k = 0; k < np; k++)
-            swap_doublep(ddata+k);
-    }
-    else if (kind == FIFFT_COMPLEX_FLOAT) {
-        for (fdata = (float *)(tag->data), k = 0; k < 2*np; k++)
-            swap_floatp(fdata+k);
-    }
-    else if (kind == FIFFT_COMPLEX_DOUBLE) {
-        for (ddata = (double *)(tag->data), k = 0; k < 2*np; k++)
-            swap_doublep(ddata+k);
-    }
-    return;
-}
-
-
-/*
- * Data type conversions for the little endian systems.
- */
-
-/*! Machine dependent data type conversions (tag info only)
- *
- * from_endian defines the byte order of the input
- * to_endian   defines the byte order of the output
- *
- * Either of these may be specified as FIFFV_LITTLE_ENDIAN, FIFFV_BIG_ENDIAN, or FIFFV_NATIVE_ENDIAN.
- * The last choice means that the native byte order value will be substituted here before proceeding
- */
-
-void fiff_convert_tag_data(fiffTag tag, int from_endian, int to_endian)
-
-{
-    int            np;
-    int            k,r,c;
-    fiff_int_t     *ithis;
-    fiff_short_t   *sthis;
-    fiff_long_t    *lthis;
-    float          *fthis;
-    double         *dthis;
-    fiffDirEntry   dethis;
-    fiffId         idthis;
-    fiffChInfo     chthis;
-    fiffChPos      cpthis;
-    fiffCoordTrans ctthis;
-    fiffDigPoint   dpthis;
-    fiffDataRef    drthis;
-
-    if (tag->data == NULL || tag->size == 0)
-        return;
-
-    if (from_endian == FIFFV_NATIVE_ENDIAN)
-        from_endian = NATIVE_ENDIAN;
-    if (to_endian == FIFFV_NATIVE_ENDIAN)
-        to_endian = NATIVE_ENDIAN;
-
-    if (from_endian == to_endian)
-        return;
-
-    if (fiff_type_fundamental(tag->type) == FIFFTS_FS_MATRIX) {
-        if (from_endian == NATIVE_ENDIAN)
-            convert_matrix_to_file_data(tag);
-        else
-            convert_matrix_from_file_data(tag);
-        return;
-    }
-
-    switch (tag->type) {
-
-    case FIFFT_INT :
-    case FIFFT_JULIAN :
-    case FIFFT_UINT :
-        np = tag->size/sizeof(fiff_int_t);
-        for (ithis = (fiff_int_t *)tag->data, k = 0; k < np; k++, ithis++)
-            swap_intp(ithis);
-        break;
-
-    case FIFFT_LONG :
-    case FIFFT_ULONG :
-        np = tag->size/sizeof(fiff_long_t);
-        for (lthis = (fiff_long_t *)tag->data, k = 0; k < np; k++, lthis++)
-            swap_longp(lthis);
-        break;
-
-    case FIFFT_SHORT :
-    case FIFFT_DAU_PACK16 :
-    case FIFFT_USHORT :
-        np = tag->size/sizeof(fiff_short_t);
-        for (sthis = (fiff_short_t *)tag->data, k = 0; k < np; k++, sthis++)
-            *sthis = swap_short(*sthis);
-        break;
-
-    case FIFFT_FLOAT :
-    case FIFFT_COMPLEX_FLOAT :
-        np = tag->size/sizeof(fiff_float_t);
-        for (fthis = (fiff_float_t *)tag->data, k = 0; k < np; k++, fthis++)
-            swap_floatp(fthis);
-        break;
-
-    case FIFFT_DOUBLE :
-    case FIFFT_COMPLEX_DOUBLE :
-        np = tag->size/sizeof(fiff_double_t);
-        for (dthis = (fiff_double_t *)tag->data, k = 0; k < np; k++, dthis++)
-            swap_doublep(dthis);
-        break;
-
-
-    case FIFFT_OLD_PACK :
-        fthis = (float *)tag->data;
-        /*
-     * Offset and scale...
-     */
-        swap_floatp(fthis+0);
-        swap_floatp(fthis+1);
-        sthis = (short *)(fthis+2);
-        np = (tag->size - 2*sizeof(float))/sizeof(short);
-        for (k = 0; k < np; k++,sthis++)
-            *sthis = swap_short(*sthis);
-        break;
-
-    case FIFFT_DIR_ENTRY_STRUCT :
-        np = tag->size/sizeof(fiffDirEntryRec);
-        for (dethis = (fiffDirEntry)tag->data, k = 0; k < np; k++, dethis++) {
-            dethis->kind = swap_int(dethis->kind);
-            dethis->type = swap_int(dethis->type);
-            dethis->size = swap_int(dethis->size);
-            dethis->pos  = swap_int(dethis->pos);
-        }
-        break;
-
-    case FIFFT_ID_STRUCT :
-        np = tag->size/sizeof(fiffIdRec);
-        for (idthis = (fiffId)tag->data, k = 0; k < np; k++, idthis++) {
-            idthis->version = swap_int(idthis->version);
-            idthis->machid[0] = swap_int(idthis->machid[0]);
-            idthis->machid[1] = swap_int(idthis->machid[1]);
-            idthis->time.secs  = swap_int(idthis->time.secs);
-            idthis->time.usecs = swap_int(idthis->time.usecs);
-        }
-        break;
-
-    case FIFFT_CH_INFO_STRUCT :
-        np = tag->size/sizeof(fiffChInfoRec);
-        for (chthis = (fiffChInfo)tag->data, k = 0; k < np; k++, chthis++) {
-            chthis->scanNo    = swap_int(chthis->scanNo);
-            chthis->logNo     = swap_int(chthis->logNo);
-            chthis->kind      = swap_int(chthis->kind);
-            swap_floatp(&chthis->range);
-            swap_floatp(&chthis->cal);
-            chthis->unit      = swap_int(chthis->unit);
-            chthis->unit_mul  = swap_int(chthis->unit_mul);
-            convert_ch_pos(&(chthis->chpos));
-        }
-        break;
-
-    case FIFFT_CH_POS_STRUCT :
-        np = tag->size/sizeof(fiffChPosRec);
-        for (cpthis = (fiffChPos)tag->data, k = 0; k < np; k++, cpthis++)
-            convert_ch_pos(cpthis);
-        break;
-
-    case FIFFT_DIG_POINT_STRUCT :
-        np = tag->size/sizeof(fiffDigPointRec);
-        for (dpthis = (fiffDigPoint)tag->data, k = 0; k < np; k++, dpthis++) {
-            dpthis->kind = swap_int(dpthis->kind);
-            dpthis->ident = swap_int(dpthis->ident);
-            for (r = 0; r < 3; r++)
-                swap_floatp(&dpthis->r[r]);
-        }
-        break;
-
-    case FIFFT_COORD_TRANS_STRUCT :
-        np = tag->size/sizeof(fiffCoordTransRec);
-        for (ctthis = (fiffCoordTrans)tag->data, k = 0; k < np; k++, ctthis++) {
-            ctthis->from = swap_int(ctthis->from);
-            ctthis->to   = swap_int(ctthis->to);
-            for (r = 0; r < 3; r++) {
-                swap_floatp(&ctthis->move[r]);
-                swap_floatp(&ctthis->invmove[r]);
-                for (c = 0; c < 3; c++) {
-                    swap_floatp(&ctthis->rot[r][c]);
-                    swap_floatp(&ctthis->invrot[r][c]);
-                }
-            }
-        }
-        break;
-
-    case FIFFT_DATA_REF_STRUCT :
-        np = tag->size/sizeof(fiffDataRefRec);
-        for (drthis = (fiffDataRef)tag->data, k = 0; k < np; k++, drthis++) {
-            drthis->type   = swap_int(drthis->type);
-            drthis->endian = swap_int(drthis->endian);
-            drthis->size   = swap_long(drthis->size);
-            drthis->offset = swap_long(drthis->offset);
-        }
-        break;
-
-    default :
-        break;
-    }
-    return;
-}
-
-
-
-
-
-
-//============================= fiff_ext_data.c =============================
-
-
-void *fiff_ext_read_data(fiffFile    file,
-                         fiffDataRef ref)
-
-{
-    printf("external data : type = %d endian = %d size = %ld offset = %ld\n",
-           ref->type,ref->endian,(long)ref->size,(long)ref->offset);
-    qCritical("Cannot read external data yet");
-    return NULL;
-}
-
-
-
-//============================= fiff_io.c =============================
-
-
-typedef struct {		/* One channel is described here */
-    fiff_int_t scanNo;		/* Scanning order # */
-    fiff_int_t logNo;		/* Logical channel # */
-    fiff_int_t kind;		/* Kind of channel:
-                 * 1 = magnetic
-                 * 2 = electric
-                 * 3 = stimulus */
-    fiff_float_t range;		/* Voltmeter range (-1 = auto ranging) */
-    fiff_float_t cal;		/* Calibration from volts to... */
-    fiff_float_t loc[9];		/* Location for a magnetic channel */
-} oldChInfoRec,*oldChInfo;
-
-
-static void convert_loc (float oldloc[9], /*!< These are the old magic numbers */
-float r0[3],     /*!< Coil coordinate system origin */
-float *ex,       /*!< Coil coordinate system unit x-vector */
-float *ey,       /*!< Coil coordinate system unit y-vector */
-float *ez)       /*!< Coil coordinate system unit z-vector */
-/*
-      * Convert the traditional location
-      * information to new format...
-      */
-{
-    float len;
-    int j;
-    VEC_DIFF(oldloc+3,oldloc,ex);	/* From - coil to + coil */
-    len = VEC_LEN(ex);
-    for (j = 0; j < 3; j++) {
-        ex[j] = ex[j]/len;		/* Normalize ex */
-        ez[j] = oldloc[j+6];	/* ez along coil normal */
-    }
-    CROSS_PRODUCT(ez,ex,ey);	/* ey is defined by the other two */
-    len = VEC_LEN(ey);
-    for (j = 0; j < 3; j++) {
-        ey[j] = ey[j]/len;		/* Normalize ey */
-        r0[j] = (oldloc[j] + oldloc[j+3])/2.0;
-        /* Origin lies halfway between the coils */
-    }
     return;
 }
 
@@ -1446,7 +904,7 @@ int mne_read_meg_comp_eeg_ch_info(const QString& name,
         else if (chs[k].kind == FIFFV_EEG_CH)
             eeg[neeg++] = chs[k];
 //    fiff_close(in);
-    stream->device()->close();
+    stream->close();
     FREE(chs);
     if (megp) {
         *megp  = meg;
@@ -1481,7 +939,7 @@ int mne_read_meg_comp_eeg_ch_info(const QString& name,
 
 bad : {
 //        fiff_close(in);
-        stream->device()->close();
+        stream->close();
         FREE(chs);
         FREE(meg);
         FREE(eeg);
@@ -1675,7 +1133,7 @@ static int read_ch_info(const QString&  name,
     *chsp   = chs;
     *nchanp = nchan;
     *idp = id;
-    stream->device()->close();
+    stream->close();
     return FIFF_OK;
 
 bad : {
@@ -1683,7 +1141,7 @@ bad : {
         FREE(chs);
         FREE(id);
 //        fiff_close(in);
-        stream->device()->close();
+        stream->close();
         return FIFF_FAIL;
     }
 }
@@ -2157,7 +1615,7 @@ fiffCoordTrans mne_read_transform(const QString& name,int from, int to)
 out : {
 //        FREE(tag.data);
 //        fiff_close(in);
-        stream->device()->close();
+        stream->close();
         return res;
     }
 
@@ -4962,7 +4420,7 @@ out : {
         FREE (meas_date);
         FREE_CMATRIX(epochs);
 //        fiff_close(in);
-        stream->device()->close();
+        stream->close();
         return res;
     }
 }
@@ -6025,7 +5483,7 @@ mneProjOp mne_read_proj_op(const QString& name)
     res = mne_read_proj_op_from_node(stream,t_default);
 
 //    fiff_close(in);
-    stream->device()->close();
+    stream->close();
 
     return res;
 }
@@ -6488,7 +5946,7 @@ bad : {
 //        FREE(nodes);
 //        FREE(comps);
 //        fiff_close(in);
-        stream->device()->close();
+        stream->close();
         mne_free_ctf_comp_data_set(set);
         return NULL;
     }
@@ -6498,7 +5956,7 @@ good : {
 //        FREE(nodes);
 //        FREE(comps);
 //        fiff_close(in);
-        stream->device()->close();
+        stream->close();
         return set;
     }
 }
@@ -7148,7 +6606,7 @@ int mne_read_bad_channel_list(const QString& name, char ***listp, int *nlistp)
     res = mne_read_bad_channel_list_from_node(stream,stream->tree(),listp,nlistp);
 
 //    fiff_close(in);
-    stream->device()->close();
+    stream->close();
 
     return res;
 }
@@ -7671,7 +7129,7 @@ mneCovMatrix mne_read_cov(const QString& name,int kind)
 
 out : {
 //        fiff_close(in);
-        stream->device()->close();
+        stream->close();
         mne_free_proj_op(op);
         if(sss)
             delete sss;
@@ -8773,7 +8231,7 @@ int mne_read_source_spaces(const QString& name,               /* Read from here 
         new_space = NULL;
     }
 //    fiff_close(in);
-    stream->device()->close();
+    stream->close();
 
     *spacesp = spaces;
     *nspacep = nspace;
@@ -8784,7 +8242,7 @@ int mne_read_source_spaces(const QString& name,               /* Read from here 
 
 bad : {
 //        fiff_close(in);
-        stream->device()->close();
+        stream->close();
         mne_free_source_space(new_space);
         for (k = 0; k < nspace; k++)
             mne_free_source_space(spaces[k]);
@@ -9465,7 +8923,7 @@ static mneSurface read_bem_surface( const QString& name,    /* Filename */
     }
 
 //    fiff_close(in); in = NULL;
-    stream->device()->close();
+    stream->close();
 
     s = mne_new_source_space(0);
     for (k = 0; k < ntri; k++) {
@@ -9517,7 +8975,7 @@ bad : {
         FREE_CMATRIX(node_normals);
         FREE_ICMATRIX(triangles);
 //        fiff_close(in);
-        stream->device()->close();
+        stream->close();
         return NULL;
     }
 }
@@ -11016,13 +10474,13 @@ int fwd_bem_load_solution(char *name, int bem_method, fwdBemModel m)
     m->nsol     = nsol;
     m->bem_method = method;
 //    fiff_close(in);
-    stream->device()->close();
+    stream->close();
 
     return TRUE;
 
 bad : {
 //        fiff_close(in);
-        stream->device()->close();
+        stream->close();
 //        if (tag) {
 //            FREE(tag->data);
 //            FREE(tag);
@@ -11033,7 +10491,7 @@ bad : {
 
 not_found : {
 //        fiff_close(in);
-        stream->device()->close();
+        stream->close();
 //        if (tag) {
 //            FREE(tag->data);
 //            FREE(tag);
@@ -15630,7 +15088,7 @@ out : {
         }
         FREE(id);
 //        fiff_close(in);
-        stream->device()->close();
+        stream->close();
         return (res);
     }
 }
@@ -15721,7 +15179,7 @@ MneSssData* mne_read_sss_data(char *name)
 
 out : {
 //        fiff_close(in);
-        stream->device()->close();
+        stream->close();
         return s;
     }
 
@@ -15805,7 +15263,7 @@ void mne_raw_free_data(mneRawData d)
     if (!d)
         return;
 //    fiff_close(d->file);
-    d->stream->device()->close();
+    d->stream->close();
     FREE(d->filename);
     mne_free_name_list(d->ch_names,d->info->nchan);
 

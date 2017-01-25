@@ -162,7 +162,7 @@ void TestFiffMneTypesIO::checkFiffCoordTrans()
     if(!trans_found)
         QFAIL("No FIFF_COORD_TRANS found.");
 
-    stream->device()->close();
+    stream->close();
 }
 
 //*************************************************************************************************************

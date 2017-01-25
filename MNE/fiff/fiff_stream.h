@@ -223,6 +223,16 @@ public:
 
     //=========================================================================================================
     /**
+    * Close stream
+    *
+    * Refactored: fiff_close (fiff_open.c)
+    *    *
+    * @return true if succeeded, false otherwise
+    */
+    bool close();
+
+    //=========================================================================================================
+    /**
     * fiff_read_bad_channels
     *
     * ### MNE toolbox root function ###

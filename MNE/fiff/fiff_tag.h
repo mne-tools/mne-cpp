@@ -558,7 +558,22 @@ public:
     */
     static void convert_ch_pos(FiffChPos* pos);
 
+    //TODO: Check if this is of interest
 //    static void fiff_convert_tag_info(FiffTag*& tag);
+
+    /*
+    * Data type conversions for the little endian systems.
+    */
+    /*! Machine dependent data type conversions (tag info only)
+     *
+     * from_endian defines the byte order of the input
+     * to_endian   defines the byte order of the output
+     *
+     * Either of these may be specified as FIFFV_LITTLE_ENDIAN, FIFFV_BIG_ENDIAN, or FIFFV_NATIVE_ENDIAN.
+     * The last choice means that the native byte order value will be substituted here before proceeding
+     */
+    //TODO: Check if this is of interest
+//    void fiff_convert_tag_data(fiffTag tag, int from_endian, int to_endian)
 
     //=========================================================================================================
     /**

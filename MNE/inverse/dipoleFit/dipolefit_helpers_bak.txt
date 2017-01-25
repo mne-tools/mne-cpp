@@ -2135,7 +2135,7 @@ int mne_read_meg_comp_eeg_ch_info(const QString& name,
         else if (chs[k].kind == FIFFV_EEG_CH)
             eeg[neeg++] = chs[k];
 //    fiff_close(in);
-    stream->device()->close();
+    stream->close();
     FREE(chs);
     if (megp) {
         *megp  = meg;
@@ -2170,7 +2170,7 @@ int mne_read_meg_comp_eeg_ch_info(const QString& name,
 
 bad : {
 //        fiff_close(in);
-        stream->device()->close();
+        stream->close();
         FREE(chs);
         FREE(meg);
         FREE(eeg);
@@ -2394,7 +2394,7 @@ static int read_ch_info(const QString&  name,
     *nchanp = nchan;
     *idp = id;
 //    fiff_close(in);
-    stream->device()->close();
+    stream->close();
     return FIFF_OK;
 
 bad : {
@@ -2402,7 +2402,7 @@ bad : {
         FREE(chs);
         FREE(id);
 //        fiff_close(in);
-        stream->device()->close();
+        stream->close();
         return FIFF_FAIL;
     }
 }
@@ -2863,7 +2863,7 @@ fiffCoordTrans mne_read_transform(const QString& name,int from, int to)
 out : {
 //        FREE(tag.data);
 //        fiff_close(in);
-        stream->device()->close();
+        stream->close();
         return res;
     }
 
