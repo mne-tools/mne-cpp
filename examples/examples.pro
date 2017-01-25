@@ -45,7 +45,6 @@ SUBDIRS += \
     readFwd \
     readEpochs \
     readEvoked \
-	ex_disp \
     computeInverse \
     computeInverseRaw \
     makeInverseOperator \
@@ -69,6 +68,7 @@ SUBDIRS += \
             stClusteredInversePwlRapMusic  \
             roiClusteredInversePwlRapMusic \
             fsSurface \
+            ex_disp \
             disp3DTutorial \
             histogram \
             connectivityTutorial
