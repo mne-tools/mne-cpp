@@ -238,7 +238,7 @@ void transformDataToColor(float fSample, QByteArray& arrayFinalVertColor, double
     }
 
     QRgb qRgb;
-    qRgb = qRgb = (functionHandlerColorMap)(fSample);
+    qRgb = (functionHandlerColorMap)(fSample);
 
     rawArrayColors[idxColor++] = (float)qRed(qRgb)/255.0f;
     rawArrayColors[idxColor++] = (float)qGreen(qRgb)/255.0f;
@@ -399,8 +399,6 @@ RtSourceLocDataWorker::RtSourceLocDataWorker(QObject* parent)
 , m_iCurrentSample(0)
 , m_iVisualizationType(Data3DTreeModelItemRoles::VertexBased)
 , m_iMSecIntervall(50)
-, m_dNormalization(1.0)
-, m_dNormalizationMax(10.0)
 , m_bSurfaceDataIsInit(false)
 , m_bAnnotationDataIsInit(false)
 {
@@ -760,8 +758,8 @@ QPair<QByteArray, QByteArray> RtSourceLocDataWorker::performVisualizationTypeCal
 
 void RtSourceLocDataWorker::createSmoothingOperator(const MatrixX3f& matVertPosLeftHemi, const MatrixX3f& matVertPosRightHemi)
 {
-    QTime timer;
-    timer.start();
+//    QTime timer;
+//    timer.start();
 
     //Create smooth operator in multi thread
     QList<SmoothOperatorInfo> inputData;
@@ -771,7 +769,7 @@ void RtSourceLocDataWorker::createSmoothingOperator(const MatrixX3f& matVertPosL
     leftHemi.sparseSmoothMatrix = m_lVisualizationInfo[0].matWDistSmooth;
     leftHemi.vecVertNo = m_lVisualizationInfo[0].vVertNo;
     leftHemi.matVertPos = matVertPosLeftHemi;
-    leftHemi.iDistPow = 5;
+    leftHemi.iDistPow = 3;
     leftHemi.dThresholdDistance = 0.03;
     inputData.append(leftHemi);
 
@@ -780,7 +778,7 @@ void RtSourceLocDataWorker::createSmoothingOperator(const MatrixX3f& matVertPosL
     rightHemi.sparseSmoothMatrix = m_lVisualizationInfo[1].matWDistSmooth;
     rightHemi.vecVertNo = m_lVisualizationInfo[1].vVertNo;
     rightHemi.matVertPos = matVertPosRightHemi;
-    rightHemi.iDistPow = 5;
+    rightHemi.iDistPow = 3;
     rightHemi.dThresholdDistance = 0.03;
     inputData.append(rightHemi);
 
@@ -790,10 +788,10 @@ void RtSourceLocDataWorker::createSmoothingOperator(const MatrixX3f& matVertPosL
     m_lVisualizationInfo[0].matWDistSmooth = inputData.at(0).sparseSmoothMatrix;
     m_lVisualizationInfo[1].matWDistSmooth = inputData.at(1).sparseSmoothMatrix;
 
-    qDebug() << "RtSourceLocDataWorker::setSmootingInfo - time needed for smooth operator creation:" << timer.elapsed();
+//    qDebug() << "RtSourceLocDataWorker::setSmootingInfo - time needed for smooth operator creation:" << timer.elapsed();
 
-    qDebug() << "non zero left " << m_lVisualizationInfo[0].matWDistSmooth.nonZeros();
-    qDebug() << "non zero right " << m_lVisualizationInfo[1].matWDistSmooth.nonZeros();
+//    qDebug() << "non zero left " << m_lVisualizationInfo[0].matWDistSmooth.nonZeros();
+//    qDebug() << "non zero right " << m_lVisualizationInfo[1].matWDistSmooth.nonZeros();
 
 //    MatrixXd a;
 //    a = MatrixXd(m_sparseSmoothMatrixLeftHemi);
