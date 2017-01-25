@@ -687,8 +687,8 @@ void RtSourceLocDataWorker::run()
 QPair<QByteArray, QByteArray> RtSourceLocDataWorker::performVisualizationTypeCalculation(const VectorXd& vSourceColorSamples)
 {
     //NOTE: This function is called for every new sample point and therefore must be kept highly efficient!
-    QTime allTimer;
-    allTimer.start();
+//    QTime allTimer;
+//    allTimer.start();
 
     if(vSourceColorSamples.rows() != m_lVisualizationInfo[0].vVertNo.rows() + m_lVisualizationInfo[1].vVertNo.rows()) {
         qDebug() << "RtSourceLocDataWorker::performVisualizationTypeCalculation - Number of new vertex colors (" << vSourceColorSamples.rows() << ") do not match with previously set number of vertices (" << m_lVisualizationInfo[0].vVertNo.rows() + m_lVisualizationInfo[1].vVertNo.rows() << "). Returning...";
@@ -746,8 +746,8 @@ QPair<QByteArray, QByteArray> RtSourceLocDataWorker::performVisualizationTypeCal
         }
     }
 
-    int iAllTimer = allTimer.elapsed();
-    qDebug() << "All time" << iAllTimer;
+//    int iAllTimer = allTimer.elapsed();
+//    qDebug() << "All time" << iAllTimer;
 
     QPair<QByteArray, QByteArray> colorPair;
     colorPair.first =  m_lVisualizationInfo[0].arrayFinalVertColor;
