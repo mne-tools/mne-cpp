@@ -157,7 +157,7 @@ void FiffStream::finish_writing_raw()
     this->end_block(FIFFB_RAW_DATA);
     this->end_block(FIFFB_MEAS);
     this->end_file();
-    this->device()->close();
+    this->close();
 }
 
 
@@ -284,6 +284,17 @@ bool FiffStream::open()
     //   Back to the beginning
     //
     this->device()->seek(0); //fseek(fid,0,'bof');
+    return true;
+}
+
+
+//*************************************************************************************************************
+
+bool FiffStream::close()
+{
+    if(this->device()->isOpen())
+        this->device()->close();
+
     return true;
 }
 
@@ -1506,7 +1517,7 @@ bool FiffStream::setup_read_raw(QIODevice &p_IODevice, FiffRawData& data, bool a
            (double)data.first_samp/data.info.sfreq,
            (double)data.last_samp/data.info.sfreq);
     printf("Ready.\n");
-    data.file->device()->close();
+    data.file->close();
 
     return true;
 }

@@ -1213,7 +1213,7 @@ bool MNEForwardSolution::read(QIODevice& p_IODevice, MNEForwardSolution& fwd, bo
 
     if (fwds.size() == 0)
     {
-        t_pStream->device()->close();
+        t_pStream->close();
         std::cout << "No forward solutions in " << t_pStream->streamName().toUtf8().constData(); // ToDo throw error
         return false;
     }
@@ -1223,7 +1223,7 @@ bool MNEForwardSolution::read(QIODevice& p_IODevice, MNEForwardSolution& fwd, bo
     QList<FiffDirNode::SPtr> parent_mri = t_pStream->tree()->dir_tree_find(FIFFB_MNE_PARENT_MRI_FILE);
     if (parent_mri.size() == 0)
     {
-        t_pStream->device()->close();
+        t_pStream->close();
         std::cout << "No parent MRI information in " << t_pStream->streamName().toUtf8().constData(); // ToDo throw error
         return false;
     }
@@ -1231,7 +1231,7 @@ bool MNEForwardSolution::read(QIODevice& p_IODevice, MNEForwardSolution& fwd, bo
     MNESourceSpace t_SourceSpace;// = NULL;
     if(!MNESourceSpace::readFromStream(t_pStream, true, t_SourceSpace))
     {
-        t_pStream->device()->close();
+        t_pStream->close();
         std::cout << "Could not read the source spaces\n"; // ToDo throw error
         //ToDo error(me,'Could not read the source spaces (%s)',mne_omit_first_line(lasterr));
         return false;
@@ -1266,7 +1266,7 @@ bool MNEForwardSolution::read(QIODevice& p_IODevice, MNEForwardSolution& fwd, bo
     {
         if(!fwds[k]->find_tag(t_pStream, FIFF_MNE_INCLUDED_METHODS, t_pTag))
         {
-            t_pStream->device()->close();
+            t_pStream->close();
             std::cout << "Methods not listed for one of the forward solutions\n"; // ToDo throw error
             return false;
         }
@@ -1314,7 +1314,7 @@ bool MNEForwardSolution::read(QIODevice& p_IODevice, MNEForwardSolution& fwd, bo
                 megfwd.nsource != eegfwd.nsource ||
                 megfwd.coord_frame != eegfwd.coord_frame)
         {
-            t_pStream->device()->close();
+            t_pStream->close();
             std::cout << "The MEG and EEG forward solutions do not match\n"; // ToDo throw error
             return false;
         }
@@ -1350,7 +1350,7 @@ bool MNEForwardSolution::read(QIODevice& p_IODevice, MNEForwardSolution& fwd, bo
     //
     if(!parent_mri[0]->find_tag(t_pStream, FIFF_COORD_TRANS, t_pTag))
     {
-        t_pStream->device()->close();
+        t_pStream->close();
         std::cout << "MRI/head coordinate transformation not found\n"; // ToDo throw error
         return false;
     }
@@ -1363,7 +1363,7 @@ bool MNEForwardSolution::read(QIODevice& p_IODevice, MNEForwardSolution& fwd, bo
             fwd.mri_head_t.invert_transform();
             if (fwd.mri_head_t.from != FIFFV_COORD_MRI || fwd.mri_head_t.to != FIFFV_COORD_HEAD)
             {
-                t_pStream->device()->close();
+                t_pStream->close();
                 std::cout << "MRI/head coordinate transformation not found\n"; // ToDo throw error
                 return false;
             }
@@ -1376,7 +1376,7 @@ bool MNEForwardSolution::read(QIODevice& p_IODevice, MNEForwardSolution& fwd, bo
     t_pStream->read_meas_info_base(t_pStream->tree(), fwd.info);
 
 
-    t_pStream->device()->close();
+    t_pStream->close();
 
     //
     //   Transform the source spaces to the correct coordinate frame
@@ -1679,7 +1679,7 @@ bool MNEForwardSolution::read(QIODevice& p_IODevice, MNEForwardSolution& fwd, bo
 //    }
 
     //garbage collecting
-    t_pStream->device()->close();
+    t_pStream->close();
 
     return true;
 }
@@ -1700,7 +1700,7 @@ bool MNEForwardSolution::read_one(FiffStream::SPtr& p_pStream, const FiffDirNode
 
     if(!p_Node->find_tag(p_pStream, FIFF_MNE_SOURCE_ORIENTATION, t_pTag))
     {
-        p_pStream->device()->close();
+        p_pStream->close();
         std::cout << "Source orientation tag not found."; //ToDo: throw error.
         return false;
     }
@@ -1709,7 +1709,7 @@ bool MNEForwardSolution::read_one(FiffStream::SPtr& p_pStream, const FiffDirNode
 
     if(!p_Node->find_tag(p_pStream, FIFF_MNE_COORD_FRAME, t_pTag))
     {
-        p_pStream->device()->close();
+        p_pStream->close();
         std::cout << "Coordinate frame tag not found."; //ToDo: throw error.
         return false;
     }
@@ -1718,7 +1718,7 @@ bool MNEForwardSolution::read_one(FiffStream::SPtr& p_pStream, const FiffDirNode
 
     if(!p_Node->find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_NPOINTS, t_pTag))
     {
-        p_pStream->device()->close();
+        p_pStream->close();
         std::cout << "Number of sources not found."; //ToDo: throw error.
         return false;
     }
@@ -1727,7 +1727,7 @@ bool MNEForwardSolution::read_one(FiffStream::SPtr& p_pStream, const FiffDirNode
 
     if(!p_Node->find_tag(p_pStream, FIFF_NCHAN, t_pTag))
     {
-        p_pStream->device()->close();
+        p_pStream->close();
         printf("Number of channels not found."); //ToDo: throw error.
         return false;
     }
@@ -1738,7 +1738,7 @@ bool MNEForwardSolution::read_one(FiffStream::SPtr& p_pStream, const FiffDirNode
         one.sol->transpose_named_matrix();
     else
     {
-        p_pStream->device()->close();
+        p_pStream->close();
         printf("Forward solution data not found ."); //ToDo: throw error.
         //error(me,'Forward solution data not found (%s)',mne_omit_first_line(lasterr));
         return false;
@@ -1753,7 +1753,7 @@ bool MNEForwardSolution::read_one(FiffStream::SPtr& p_pStream, const FiffDirNode
     if (one.sol->data.rows() != one.nchan ||
             (one.sol->data.cols() != one.nsource && one.sol->data.cols() != 3*one.nsource))
     {
-        p_pStream->device()->close();
+        p_pStream->close();
         printf("Forward solution matrix has wrong dimensions.\n"); //ToDo: throw error.
         //error(me,'Forward solution matrix has wrong dimensions');
         return false;
@@ -1763,7 +1763,7 @@ bool MNEForwardSolution::read_one(FiffStream::SPtr& p_pStream, const FiffDirNode
         if (one.sol_grad->data.rows() != one.nchan ||
                 (one.sol_grad->data.cols() != 3*one.nsource && one.sol_grad->data.cols() != 3*3*one.nsource))
         {
-            p_pStream->device()->close();
+            p_pStream->close();
             printf("Forward solution gradient matrix has wrong dimensions.\n"); //ToDo: throw error.
             //error(me,'Forward solution gradient matrix has wrong dimensions');
         }

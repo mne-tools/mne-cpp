@@ -109,7 +109,7 @@ FiffDigPointSet::FiffDigPointSet(QIODevice &p_IODevice)   //const FiffDigPointSe
 
     if(!FiffDigPointSet::readFromStream(t_pStream, *this))
     {
-        t_pStream->device()->close();
+        t_pStream->close();
         qDebug() << "Could not read the FiffDigPointSet\n"; // ToDo throw error
     }
 }
@@ -198,7 +198,7 @@ bool FiffDigPointSet::readFromStream(FiffStream::SPtr &p_Stream, FiffDigPointSet
     //
     if(open_here)
     {
-        p_Stream->device()->close();
+        p_Stream->close();
     }
     return true;
 }
