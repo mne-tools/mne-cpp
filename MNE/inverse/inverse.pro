@@ -96,18 +96,49 @@ else {
 }
 
 SOURCES += \
+    dipoleFit/ecd.cpp \
+    dipoleFit/ecd_set.cpp \
+    dipoleFit/guess_data.cpp \
+    dipoleFit/dipole_forward.cpp \
+    dipoleFit/dipole_fit_data.cpp \
+    dipoleFit/fwd_eeg_sphere_layer.cpp \
+    dipoleFit/fwd_eeg_sphere_model.cpp \
+    dipoleFit/fwd_eeg_sphere_model_set.cpp \
+    dipoleFit/fwd_coil.cpp \
+    dipoleFit/fwd_coil_set.cpp \
     minimumNorm/minimumnorm.cpp \
     rapMusic/rapmusic.cpp \
     rapMusic/pwlrapmusic.cpp \
-    rapMusic/dipole.cpp
+    rapMusic/dipole.cpp \
+    dipoleFit/dipole_fit_settings.cpp \
+    dipoleFit/dipole_fit.cpp \
+    dipoleFit/mne_sss_data.cpp
 
 HEADERS +=\
     inverse_global.h \
     IInverseAlgorithm.h \
+    dipoleFit/ecd.h \
+    dipoleFit/ecd_set.h \
+    dipoleFit/mne_types.h \
+    dipoleFit/fwd_types.h \
+    dipoleFit/fiff_explain.h \
+    dipoleFit/analyze_types.h \
+    dipoleFit/guess_data.h \
+    dipoleFit/dipole_forward.h \
+    dipoleFit/dipole_fit_data.h \
+    dipoleFit/fwd_eeg_sphere_layer.h \
+    dipoleFit/fwd_eeg_sphere_model.h \
+    dipoleFit/fwd_eeg_sphere_model_set.h \
+    dipoleFit/fwd_coil.h \
+    dipoleFit/fwd_coil_set.h \
     minimumNorm/minimumnorm.h \
     rapMusic/rapmusic.h \
     rapMusic/pwlrapmusic.h \
-    rapMusic/dipole.h
+    rapMusic/dipole.h \
+    dipoleFit/dipole_fit_settings.h \
+    dipoleFit/dipole_fit.h \
+    dipoleFit/dipolefit_helpers.h \
+    dipoleFit/mne_sss_data.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

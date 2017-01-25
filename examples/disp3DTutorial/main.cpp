@@ -42,7 +42,8 @@
 
 #include <disp3D/view3D.h>
 #include <disp3D/control/control3dwidget.h>
-#include <disp3D/3DObjects/brain/brainrtsourcelocdatatreeitem.h>
+#include <disp3D/model/items/sourceactivity/mneestimatetreeitem.h>
+#include <disp3D/model/data3Dtreemodel.h>
 
 #include <fs/label.h>
 #include <fs/surfaceset.h>
@@ -110,12 +111,13 @@ int main(int argc, char *argv[])
     QCommandLineParser parser;
     parser.setApplicationDescription("Disp3D Example");
     parser.addHelpOption();
-    QCommandLineOption surfOption("surfType", "Surface type <type>.", "type", "orig");
+
+    QCommandLineOption surfOption("surfType", "Surface type <type>.", "type", "inflated");
     QCommandLineOption annotOption("annotType", "Annotation type <type>.", "type", "aparc.a2009s");
     QCommandLineOption hemiOption("hemi", "Selected hemisphere <hemi>.", "hemi", "2");
     QCommandLineOption subjectOption("subject", "Selected subject <subject>.", "subject", "sample");
     QCommandLineOption subjectPathOption("subjectPath", "Selected subject path <subjectPath>.", "subjectPath", "./MNE-sample-data/subjects");
-    QCommandLineOption sourceLocOption("doSourceLoc", "Do real time source localization <doSourceLoc>.", "doSourceLoc", "true");
+    QCommandLineOption sourceLocOption("doSourceLoc", "Do real time source localization.", "doSourceLoc", "true");
     QCommandLineOption fwdOption("fwd", "Path to forwad solution <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
     QCommandLineOption invOpOption("inv", "Path to inverse operator <file>.", "file", "");
     QCommandLineOption clustOption("doClust", "Path to clustered inverse operator <doClust>.", "doClust", "true");
@@ -123,7 +125,7 @@ int main(int argc, char *argv[])
     QCommandLineOption evokedFileOption("ave", "Path to the evoked/average <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
     QCommandLineOption methodOption("method", "Inverse estimation <method>, i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM");//"MNE" | "dSPM" | "sLORETA"
     QCommandLineOption snrOption("snr", "The SNR value used for computation <snr>.", "snr", "3.0");//3.0f;//0.1f;//3.0f;
-    QCommandLineOption evokedIndexOption("aveIdx", "The average <index> to choose from the average file.", "index", "0");
+    QCommandLineOption evokedIndexOption("aveIdx", "The average <index> to choose from the average file.", "index", "3");
 
     parser.addOption(surfOption);
     parser.addOption(annotOption);
@@ -141,8 +143,19 @@ int main(int argc, char *argv[])
     parser.addOption(evokedIndexOption);
     parser.process(a);
 
-    bool bAddRtSourceLoc = parser.value(sourceLocOption) == "false" ? false : true;
-    bool bDoClustering = parser.value(clustOption) == "false" ? false : true;
+    bool bAddRtSourceLoc = false;
+    if(parser.value(sourceLocOption) == "false" || parser.value(sourceLocOption) == "0") {
+        bAddRtSourceLoc = false;
+    } else if(parser.value(sourceLocOption) == "true" || parser.value(sourceLocOption) == "1") {
+        bAddRtSourceLoc = true;
+    }
+
+    bool bDoClustering = false;
+    if(parser.value(clustOption) == "false" || parser.value(clustOption) == "0") {
+        bDoClustering = false;
+    } else if(parser.value(clustOption) == "true" || parser.value(clustOption) == "1") {
+        bDoClustering = true;
+    }
 
     //Inits
     SurfaceSet tSurfSet (parser.value(subjectOption), parser.value(hemiOption).toInt(), parser.value(surfOption), parser.value(subjectPathOption));
@@ -174,8 +187,6 @@ int main(int argc, char *argv[])
         QString method(parser.value(methodOption));
 
         // Load data
-        QPair<QVariant, QVariant> baseline(QVariant(), 0);
-        FiffEvoked evoked(t_fileEvoked, 0, baseline);
         t_fileEvoked.close();
         if(evoked.isEmpty())
             return 1;
@@ -244,47 +255,47 @@ int main(int argc, char *argv[])
 
     std::cout<<"Creating BrainView"<<std::endl;
 
-    //Create the 3D view
-    View3D::SPtr testWindow = View3D::SPtr(new View3D());
+    //Create 3D data model
+    Data3DTreeModel::SPtr p3DDataModel = Data3DTreeModel::SPtr(new Data3DTreeModel());
 
     //Add fressurfer surface set including both hemispheres
-    testWindow->addSurfaceSet(parser.value(subjectOption), evoked.comment, tSurfSet, tAnnotSet);
+    p3DDataModel->addSurfaceSet(parser.value(subjectOption), "MRI", tSurfSet, tAnnotSet);
 
-    //Read and show BEM
-    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif");
-    MNEBem t_Bem(t_fileBem);
-    testWindow->addBemData(parser.value(subjectOption), "BEM", t_Bem);
+//    //Read and show BEM
+//    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-head.fif");
+//    MNEBem t_Bem(t_fileBem);
+//    p3DDataModel->addBemData(parser.value(subjectOption), "BEM", t_Bem);
 
-    //Read and show sensor helmets
-    QFile t_filesensorSurfaceVV("./resources/sensorSurfaces/306m_rt.fif");
-    MNEBem t_sensorSurfaceVV(t_filesensorSurfaceVV);
-    testWindow->addBemData("Sensors", "VectorView", t_sensorSurfaceVV);
+//    //Read and show sensor helmets
+//    QFile t_filesensorSurfaceVV("./resources/sensorSurfaces/306m_rt.fif");
+//    MNEBem t_sensorSurfaceVV(t_filesensorSurfaceVV);
+//    p3DDataModel->addBemData("Sensors", "VectorView", t_sensorSurfaceVV);
 
-    // Read & show digitizer points
-    QFile t_fileDig("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
-    FiffDigPointSet t_Dig(t_fileDig);
-    testWindow->addDigitizerData(parser.value(subjectOption), evoked.comment, t_Dig);
+//    // Read & show digitizer points
+//    QFile t_fileDig("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+//    FiffDigPointSet t_Dig(t_fileDig);
+//    p3DDataModel->addDigitizerData(parser.value(subjectOption), evoked.comment, t_Dig);
 
     if(bAddRtSourceLoc) {
-        //Add rt source loc data
-        QList<BrainRTSourceLocDataTreeItem*> rtItemList_RV = testWindow->addSourceData(parser.value(subjectOption), evoked.comment, sourceEstimate, t_clusteredFwd);
-
-        //Init some rt related values for right visual data
-        for(int i = 0; i < rtItemList_RV.size(); ++i) {
-            rtItemList_RV.at(i)->setLoopState(true);
-            rtItemList_RV.at(i)->setTimeInterval(17);
-            rtItemList_RV.at(i)->setNumberAverages(1);
-            rtItemList_RV.at(i)->setStreamingActive(true);
-            rtItemList_RV.at(i)->setNormalization(QVector3D(0.0,5.5,10));
-            rtItemList_RV.at(i)->setVisualizationType("Annotation based");
-            rtItemList_RV.at(i)->setColortable("Hot");
+        //Add rt source loc data and init some visualization values
+        if(MneEstimateTreeItem* pRTDataItem = p3DDataModel->addSourceData(parser.value(subjectOption), evoked.comment, sourceEstimate, t_clusteredFwd)) {
+            pRTDataItem->setLoopState(true);
+            pRTDataItem->setTimeInterval(17);
+            pRTDataItem->setNumberAverages(1);
+            pRTDataItem->setStreamingActive(true);
+            pRTDataItem->setNormalization(QVector3D(0.0,0.5,10.0));
+            pRTDataItem->setVisualizationType("Smoothing based");
+            pRTDataItem->setColortable("Hot");
         }
     }
 
+    //Create the 3D view
+    View3D::SPtr testWindow = View3D::SPtr(new View3D());
+    testWindow->setModel(p3DDataModel);
     testWindow->show();
 
     Control3DWidget::SPtr control3DWidget = Control3DWidget::SPtr(new Control3DWidget());
-    control3DWidget->setView3D(testWindow);
+    control3DWidget->init(p3DDataModel, testWindow);
     control3DWidget->show();
 
     //########################################################################################

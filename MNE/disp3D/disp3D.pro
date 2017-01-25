@@ -37,7 +37,7 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = lib
 
-QT       += widgets 3dcore 3drender 3dinput 3dextras charts
+QT       += widgets 3dcore 3drender 3dinput 3dextras charts concurrent
 
 DEFINES += DISP3DNEW_LIBRARY
 
@@ -46,8 +46,6 @@ TARGET = $$join(TARGET,,MNE$${MNE_LIB_VERSION},)
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
-.
-RESOURCES += $$PWD/disp3d.qrc \
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
@@ -56,8 +54,8 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Fsd \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
             -lMNE$${MNE_LIB_VERSION}Mned \
-            -lMNE$${MNE_LIB_VERSION}Connectivityd \
             -lMNE$${MNE_LIB_VERSION}Inversed \
+            -lMNE$${MNE_LIB_VERSION}Connectivityd \
             -lMNE$${MNE_LIB_VERSION}Dispd \
             -lMNE$${MNE_LIB_VERSION}DispChartsd
 }
@@ -67,8 +65,8 @@ else {
             -lMNE$${MNE_LIB_VERSION}Fs \
             -lMNE$${MNE_LIB_VERSION}Fiff \
             -lMNE$${MNE_LIB_VERSION}Mne \
-            -lMNE$${MNE_LIB_VERSION}Connectivity \
             -lMNE$${MNE_LIB_VERSION}Inverse \
+            -lMNE$${MNE_LIB_VERSION}Connectivity \
             -lMNE$${MNE_LIB_VERSION}Disp \
             -lMNE$${MNE_LIB_VERSION}DispCharts
 }
@@ -97,56 +95,70 @@ else {
 
 SOURCES += \
     view3D.cpp \
-    3DObjects/data3Dtreemodel.cpp \
-    3DObjects/data3Dtreedelegate.cpp \
-    3DObjects/subject/subjecttreeitem.cpp \
-    3DObjects/common/metatreeitem.cpp \
-    3DObjects/brain/brainsurfacetreeitem.cpp \
-    3DObjects/brain/brainsurfacesettreeitem.cpp \
-    3DObjects/brain/brainannotationtreeitem.cpp \
-    3DObjects/brain/brainhemispheretreeitem.cpp \
-    3DObjects/brain/brainrtsourcelocdatatreeitem.cpp \
-    3DObjects/brain/brainrtconnectivitydatatreeitem.cpp \
-    3DObjects/bem/bemtreeitem.cpp \
-    3DObjects/bem/bemsurfacetreeitem.cpp \
-    3DObjects/digitizer/digitizertreeitem.cpp \
-    3DObjects/common/abstracttreeitem.cpp \
-    3DObjects/common/renderable3Dentity.cpp \
-    3DObjects/common/custommesh.cpp \
-    3DObjects/brain/brainsourcespacetreeitem.cpp \
-    3DObjects/digitizer/digitizersettreeitem.cpp \
+    model/data3Dtreemodel.cpp \
+    model/data3Dtreedelegate.cpp \
+    model/items/subject/subjecttreeitem.cpp \
+    model/items/measurement/measurementtreeitem.cpp \
+    model/items/freesurfer/fssurfacetreeitem.cpp \
+    model/items/freesurfer/fsannotationtreeitem.cpp \
+    model/items/hemisphere/hemispheretreeitem.cpp \
+    model/items/sourcespace/sourcespacetreeitem.cpp \
+    model/items/sourceactivity/mneestimatetreeitem.cpp \
+    model/items/sourceactivity/ecddatatreeitem.cpp \
+    model/items/network/networktreeitem.cpp \
+    model/items/bem/bemtreeitem.cpp \
+    model/items/bem/bemsurfacetreeitem.cpp \
+    model/items/digitizer/digitizertreeitem.cpp \
+    model/items/digitizer/digitizersettreeitem.cpp \
+    model/items/mri/mritreeitem.cpp \
+    model/items/common/abstracttreeitem.cpp \
+    model/items/common/metatreeitem.cpp \
+    model/workers/rtSourceLoc/rtsourcelocdataworker.cpp \
+    model/3dhelpers/renderable3Dentity.cpp \
+    model/3dhelpers/custommesh.cpp \
+    model/materials/pervertexphongalphamaterial.cpp \
+    model/materials/pervertextessphongalphamaterial.cpp \
+    model/materials/shadermaterial.cpp \
+    model/materials/shownormalsmaterial.cpp \
+    model/materials/networkmaterial.cpp \
     control/control3dwidget.cpp \
-    rt/rtSourceLoc/rtsourcelocdataworker.cpp \
-    materials/shadermaterial.cpp \
 
 HEADERS += \
     view3D.h \
-    3DObjects/data3Dtreemodel.h \
-    3DObjects/data3Dtreedelegate.h \
-    3DObjects/subject/subjecttreeitem.h \
-    3DObjects/common/metatreeitem.h \
-    3DObjects/brain/brainsurfacetreeitem.h \
-    3DObjects/brain/brainsurfacesettreeitem.h \
-    3DObjects/brain/brainannotationtreeitem.h \
-    3DObjects/brain/brainhemispheretreeitem.h \
-    3DObjects/brain/brainrtsourcelocdatatreeitem.h \
-    3DObjects/brain/brainrtconnectivitydatatreeitem.h \
-    3DObjects/bem/bemtreeitem.h \
-    3DObjects/bem/bemsurfacetreeitem.h \
-    3DObjects/digitizer/digitizertreeitem.h \
-    3DObjects/common/abstracttreeitem.h \
-    3DObjects/common/renderable3Dentity.h \
-    3DObjects/common/custommesh.h \
-    3DObjects/common/types.h \
-    3DObjects/brain/brainsourcespacetreeitem.h \
-    3DObjects/digitizer/digitizersettreeitem.h \
+    model/data3Dtreemodel.h \
+    model/data3Dtreedelegate.h \
+    model/items/subject/subjecttreeitem.h \
+    model/items/measurement/measurementtreeitem.h \
+    model/items/freesurfer/fssurfacetreeitem.h \
+    model/items/freesurfer/fsannotationtreeitem.h \
+    model/items/hemisphere/hemispheretreeitem.h \
+    model/items/sourcespace/sourcespacetreeitem.h \
+    model/items/sourceactivity/mneestimatetreeitem.h \
+    model/items/sourceactivity/ecddatatreeitem.h \
+    model/items/network/networktreeitem.h \
+    model/items/bem/bemtreeitem.h \
+    model/items/bem/bemsurfacetreeitem.h \
+    model/items/digitizer/digitizertreeitem.h \
+    model/items/digitizer/digitizersettreeitem.h \
+    model/items/mri/mritreeitem.h \
+    model/items/common/abstracttreeitem.h \
+    model/items/common/metatreeitem.h \
+    model/workers/rtSourceLoc/rtsourcelocdataworker.h \
+    model/3dhelpers/renderable3Dentity.h \
+    model/3dhelpers/custommesh.h \
+    model/common/types.h \
+    model/materials/pervertexphongalphamaterial.h \
+    model/materials/pervertextessphongalphamaterial.h \
+    model/materials/shadermaterial.h \
+    model/materials/shownormalsmaterial.h \
+    model/materials/networkmaterial.h \
     control/control3dwidget.h \
     disp3D_global.h \
-    rt/rtSourceLoc/rtsourcelocdataworker.h \
-    materials/shadermaterial.h \
 
 FORMS += \
     control/control3dwidget.ui \
+
+RESOURCES += $$PWD/disp3d.qrc \
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

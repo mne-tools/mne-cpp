@@ -46,13 +46,16 @@
 
 #include <fiff/fiff_evoked.h>
 #include <fiff/fiff.h>
-#include <mne/mne.h>
 
+#include <mne/mne.h>
 #include <mne/mne_sourceestimate.h>
+
 #include <inverse/rapMusic/pwlrapmusic.h>
 
 #include <disp3D/view3D.h>
 #include <disp3D/control/control3dwidget.h>
+#include <disp3D/model/data3Dtreemodel.h>
+#include <disp3D/model/items/sourceactivity/mneestimatetreeitem.h>
 
 #include <utils/mnemath.h>
 
@@ -108,8 +111,8 @@ int main(int argc, char *argv[])
     QCommandLineOption subjectDirectoryOption("subjDir", "Path to subject <directory>.", "directory", "./MNE-sample-data/subjects");
     QCommandLineOption subjectOption("subj", "Selected <subject>.", "subject", "sample");
     QCommandLineOption stcFileOption("stcOut", "Path to stc <file>, which is to be written.", "file", "");//"RapMusic.stc");
-    QCommandLineOption numDipolePairsOption("numDip", "<number> of dipole pairs to localize.", "number", "7");
-    QCommandLineOption doMovieOption("movie", "Create overlapping movie.");
+    QCommandLineOption numDipolePairsOption("numDip", "<number> of dipole pairs to localize.", "number", "1");
+    QCommandLineOption doMovieOption("doMovie", "Create overlapping movie.", "doMovie", "false");
     QCommandLineOption annotOption("annotType", "Annotation type <type>.", "type", "aparc.a2009s");
     QCommandLineOption surfOption("surfType", "Surface type <type>.", "type", "orig");
 
@@ -136,7 +139,12 @@ int main(int argc, char *argv[])
 
     qint32 numDipolePairs = parser.value(numDipolePairsOption).toInt();
 
-    bool doMovie = parser.isSet(doMovieOption);
+    bool doMovie = false;
+    if(parser.value(doMovieOption) == "false" || parser.value(doMovieOption) == "0") {
+        doMovie = false;
+    } else if(parser.value(doMovieOption) == "true" || parser.value(doMovieOption) == "1") {
+        doMovie = true;
+    }
 
     qDebug() << "Start calculation with stc:" << t_sFileNameStc;
 
@@ -167,10 +175,23 @@ int main(int argc, char *argv[])
 
     PwlRapMusic t_pwlRapMusic(t_clusteredFwd, false, numDipolePairs);
 
-    if(doMovie)
-        t_pwlRapMusic.setStcAttr(200,0.5);
+    int iWinSize = 200;
+    if(doMovie) {
+        t_pwlRapMusic.setStcAttr(iWinSize, 0.6);
+    }
 
     MNESourceEstimate sourceEstimate = t_pwlRapMusic.calculateInverse(pickedEvoked);
+
+    if(doMovie) {
+        //Select only the activations once
+        MatrixXd dataPicked(sourceEstimate.data.rows(), int(std::floor(sourceEstimate.data.cols()/iWinSize)));
+
+        for(int i = 0; i < dataPicked.cols(); ++i) {
+            dataPicked.col(i) = sourceEstimate.data.col(i*iWinSize);
+        }
+
+        sourceEstimate.data = dataPicked;
+    }
 
     std::cout << "source estimated" << std::endl;
 
@@ -178,14 +199,26 @@ int main(int argc, char *argv[])
         return 1;
 
     View3D::SPtr testWindow = View3D::SPtr(new View3D());
-    testWindow->addSurfaceSet("Subject01", "HemiLRSet", t_surfSet, t_annotationSet);
+    Data3DTreeModel::SPtr p3DDataModel = Data3DTreeModel::SPtr(new Data3DTreeModel());
+    testWindow->setModel(p3DDataModel);
 
-    QList<BrainRTSourceLocDataTreeItem*> rtItemList = testWindow->addSourceData("Subject01", "HemiLRSet", sourceEstimate, t_clusteredFwd);
+    p3DDataModel->addSurfaceSet(parser.value(subjectOption), evoked.comment, t_surfSet, t_annotationSet);
+
+    //Add rt source loc data and init some visualization values
+    if(MneEstimateTreeItem* pRTDataItem = p3DDataModel->addSourceData(parser.value(subjectOption), evoked.comment, sourceEstimate, t_clusteredFwd)) {
+        pRTDataItem->setLoopState(true);
+        pRTDataItem->setTimeInterval(17);
+        pRTDataItem->setNumberAverages(1);
+        pRTDataItem->setStreamingActive(true);
+        pRTDataItem->setNormalization(QVector3D(0.01,0.5,1.0));
+        pRTDataItem->setVisualizationType("Annotation based");
+        pRTDataItem->setColortable("Hot");
+    }
 
     testWindow->show();
 
     Control3DWidget::SPtr control3DWidget = Control3DWidget::SPtr(new Control3DWidget());
-    control3DWidget->setView3D(testWindow);
+    control3DWidget->init(p3DDataModel, testWindow);
     control3DWidget->show();
 
     if(!t_sFileNameStc.isEmpty())

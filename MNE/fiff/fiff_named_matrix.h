@@ -84,7 +84,7 @@ using namespace Eigen;
 
 //=============================================================================================================
 /**
-* A matrix with named rows and cols. ToDo: derive this from Eigen::Matrix
+* Matrix specification with named rows and cols.
 *
 * @brief A named matrix
 */
@@ -179,6 +179,15 @@ public:
     QStringList row_names;  /**< Row names */
     QStringList col_names;  /**< Column names */
     MatrixXd data;          /**< Matrix data */
+
+// ### OLD STRUCT ###
+//typedef struct {            /* Matrix specification with a channel list */
+//    int   nrow;             /* Number of rows */
+//    int   ncol;             /* Number of columns */
+//    char  **rowlist;        /* Name list for the rows (may be NULL) */
+//    char  **collist;        /* Name list for the columns (may be NULL) */
+//    float **data;           /* The data itself (dense) */
+//} *mneNamedMatrix,mneNamedMatrixRec;
 };
 
 

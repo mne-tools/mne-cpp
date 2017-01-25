@@ -55,6 +55,7 @@
 
 #include <disp3D/view3D.h>
 #include <disp3D/control/control3dwidget.h>
+#include <disp3D/model/data3Dtreemodel.h>
 
 #include <utils/mnemath.h>
 
@@ -116,6 +117,8 @@ int main(int argc, char *argv[])
     QCommandLineOption stcFileOption("stcOut", "Path to stc <file>, which is to be written.", "file", "");
     QCommandLineOption numDipolePairsOption("numDip", "<number> of dipole pairs to localize.", "number", "7");
     QCommandLineOption hemiOption("hemi", "Selected hemisphere <hemi>.", "hemi", "2");
+    QCommandLineOption inSamplesOption("inSamples", "Timing is set in samples.", "inSamples", "true");
+    QCommandLineOption keepCompOption("keepComp", "Keep compensators.", "keepComp", "true");
 
     parser.addOption(inputOption);
     parser.addOption(fwdOption);
@@ -126,6 +129,9 @@ int main(int argc, char *argv[])
     parser.addOption(stcFileOption);
     parser.addOption(numDipolePairsOption);
     parser.addOption(hemiOption);
+    parser.addOption(inSamplesOption);
+    parser.addOption(keepCompOption);
+
 
     parser.process(a);
 
@@ -146,8 +152,19 @@ int main(int argc, char *argv[])
     qint32 startSample = 0;
     qint32 numSample = 100000;
 
-    bool in_samples = true;
-    bool keep_comp = true;
+    bool in_samples = false;
+    if(parser.value(inSamplesOption) == "false" || parser.value(inSamplesOption) == "0") {
+        in_samples = false;
+    } else if(parser.value(inSamplesOption) == "true" || parser.value(inSamplesOption) == "1") {
+        in_samples = true;
+    }
+
+    bool keep_comp = false;
+    if(parser.value(keepCompOption) == "false" || parser.value(keepCompOption) == "0") {
+        keep_comp = false;
+    } else if(parser.value(keepCompOption) == "true" || parser.value(keepCompOption) == "1") {
+        keep_comp = true;
+    }
 
     //
     // Read raw data
@@ -354,14 +371,15 @@ int main(int argc, char *argv[])
 //    sourceEstimate = sourceEstimate.reduce(sample, 1);
 
     View3D::SPtr testWindow = View3D::SPtr(new View3D());
-    testWindow->addSurfaceSet("Subject01", "HemiLRSet", t_surfSet, t_annotationSet);
+    Data3DTreeModel::SPtr p3DDataModel = Data3DTreeModel::SPtr(new Data3DTreeModel());
 
-    QList<BrainRTSourceLocDataTreeItem*> rtItemList = testWindow->addSourceData("Subject01", "HemiLRSet", sourceEstimate, t_clusteredFwd);
+    testWindow->setModel(p3DDataModel);
+    p3DDataModel->addSurfaceSet(parser.value(subjectOption), "HemiLRSet", t_surfSet, t_annotationSet);
 
-    testWindow->show();
+    MneEstimateTreeItem* pRTDataItem = p3DDataModel->addSourceData(parser.value(subjectOption), "HemiLRSet", sourceEstimate, t_clusteredFwd);
 
     Control3DWidget::SPtr control3DWidget = Control3DWidget::SPtr(new Control3DWidget());
-    control3DWidget->setView3D(testWindow);
+    control3DWidget->init(p3DDataModel, testWindow);
     control3DWidget->show();
 
     if(!t_sFileNameStc.isEmpty())

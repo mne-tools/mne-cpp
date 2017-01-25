@@ -42,7 +42,9 @@
 
 #include <disp3D/view3D.h>
 #include <disp3D/control/control3dwidget.h>
-#include <disp3D/3DObjects/brain/brainrtsourcelocdatatreeitem.h>
+#include <disp3D/model/items/sourceactivity/mneestimatetreeitem.h>
+#include <disp3D/model/data3Dtreemodel.h>
+
 #include <disp/imagesc.h>
 
 #include <fs/label.h>
@@ -118,10 +120,9 @@ int main(int argc, char *argv[])
     QCommandLineOption hemiOption("hemi", "Selected hemisphere <hemi>.", "hemi", "2");
     QCommandLineOption subjectOption("subj", "Selected subject <subject>.", "subject", "sample");
     QCommandLineOption subjectPathOption("subjDir", "Selected subject path <subjectPath>.", "subjectPath", "./MNE-sample-data/subjects");
-    QCommandLineOption sourceLocOption("doSourceLoc", "Do real time source localization <doSourceLoc>.", "doSourceLoc", "true");
     QCommandLineOption fwdOption("fwd", "Path to forwad solution <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
     QCommandLineOption invOpOption("inv", "Path to inverse operator <file>, which is to be written.", "file", "");
-    QCommandLineOption clustOption("doClust", "Path to clustered inverse operator <doClust>.", "doClust", "true");
+    QCommandLineOption clustOption("doClust", "Path to clustered inverse operator.", "doClust", "true");
     QCommandLineOption covFileOption("cov", "Path to the covariance <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
     QCommandLineOption evokedFileOption("ave", "Path to the evoked/average <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
     QCommandLineOption methodOption("method", "Inverse estimation <method>, i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM");//"MNE" | "dSPM" | "sLORETA"
@@ -133,7 +134,6 @@ int main(int argc, char *argv[])
     parser.addOption(hemiOption);
     parser.addOption(subjectOption);
     parser.addOption(subjectPathOption);
-    parser.addOption(sourceLocOption);
     parser.addOption(fwdOption);
     parser.addOption(invOpOption);
     parser.addOption(clustOption);
@@ -144,8 +144,12 @@ int main(int argc, char *argv[])
     parser.addOption(evokedIndexOption);
     parser.process(a);
 
-    bool bAddRtSourceLoc = parser.value(sourceLocOption) == "false" ? false : true;
-    bool bDoClustering = parser.value(clustOption) == "false" ? false : true;
+    bool bDoClustering = false;
+    if(parser.value(clustOption) == "false" || parser.value(clustOption) == "0") {
+        bDoClustering = false;
+    } else if(parser.value(clustOption) == "true" || parser.value(clustOption) == "1") {
+        bDoClustering = true;
+    }
 
     //Inits
     SurfaceSet tSurfSet (parser.value(subjectOption), parser.value(hemiOption).toInt(), parser.value(surfOption), parser.value(subjectPathOption));
@@ -171,65 +175,63 @@ int main(int argc, char *argv[])
     MNESourceEstimate sourceEstimate;
     FiffEvoked evoked(t_fileEvoked, parser.value(evokedIndexOption).toInt(), baseline);
 
-    if(bAddRtSourceLoc) {
-        double snr = parser.value(snrOption).toDouble();
-        double lambda2 = 1.0 / pow(snr, 2);
-        QString method(parser.value(methodOption));
+    double snr = parser.value(snrOption).toDouble();
+    double lambda2 = 1.0 / pow(snr, 2);
+    QString method(parser.value(methodOption));
 
-        t_fileEvoked.close();
+    t_fileEvoked.close();
 
-        if(evoked.isEmpty())
-            return 1;
+    if(evoked.isEmpty())
+        return 1;
 
-        std::cout << std::endl;
-        std::cout << "Evoked description: " << evoked.comment.toLatin1().constData() << std::endl;
+    std::cout << std::endl;
+    std::cout << "Evoked description: " << evoked.comment.toLatin1().constData() << std::endl;
 
-        if(t_Fwd.isEmpty())
-            return 1;
+    if(t_Fwd.isEmpty())
+        return 1;
 
-        FiffCov noise_cov(t_fileCov);
+    FiffCov noise_cov(t_fileCov);
 
-        // regularize noise covariance
-        noise_cov = noise_cov.regularize(evoked.info, 0.05, 0.05, 0.1, true);
+    // regularize noise covariance
+    noise_cov = noise_cov.regularize(evoked.info, 0.05, 0.05, 0.1, true);
 
-        //
-        // Cluster forward solution;
-        //
-        if(bDoClustering) {
-            t_clusteredFwd = t_Fwd.cluster_forward_solution(tAnnotSet, 40);
-        } else {
-            t_clusteredFwd = t_Fwd;
-        }
-
-        //
-        // make an inverse operators
-        //
-        FiffInfo info = evoked.info;
-
-        MNEInverseOperator inverse_operator(info, t_clusteredFwd, noise_cov, 0.2f, 0.8f);
-
-        if(!t_sFileClusteredInverse.isEmpty())
-        {
-            QFile t_fileClusteredInverse(t_sFileClusteredInverse);
-            inverse_operator.write(t_fileClusteredInverse);
-        }
-
-        //
-        // Compute inverse solution
-        //
-        MinimumNorm minimumNorm(inverse_operator, lambda2, method);
-        sourceEstimate = minimumNorm.calculateInverse(evoked);
-
-        if(sourceEstimate.isEmpty())
-            return 1;
-
-        // View activation time-series
-        std::cout << "\nsourceEstimate:\n" << sourceEstimate.data.block(0,0,10,10) << std::endl;
-        std::cout << "time\n" << sourceEstimate.times.block(0,0,1,10) << std::endl;
-        std::cout << "timeMin\n" << sourceEstimate.times[0] << std::endl;
-        std::cout << "timeMax\n" << sourceEstimate.times[sourceEstimate.times.size()-1] << std::endl;
-        std::cout << "time step\n" << sourceEstimate.tstep << std::endl;
+    //
+    // Cluster forward solution;
+    //
+    if(bDoClustering) {
+        t_clusteredFwd = t_Fwd.cluster_forward_solution(tAnnotSet, 40);
+    } else {
+        t_clusteredFwd = t_Fwd;
     }
+
+    //
+    // make an inverse operators
+    //
+    FiffInfo info = evoked.info;
+
+    MNEInverseOperator inverse_operator(info, t_clusteredFwd, noise_cov, 0.2f, 0.8f);
+
+    if(!t_sFileClusteredInverse.isEmpty())
+    {
+        QFile t_fileClusteredInverse(t_sFileClusteredInverse);
+        inverse_operator.write(t_fileClusteredInverse);
+    }
+
+    //
+    // Compute inverse solution
+    //
+    MinimumNorm minimumNorm(inverse_operator, lambda2, method);
+    sourceEstimate = minimumNorm.calculateInverse(evoked);
+
+    if(sourceEstimate.isEmpty())
+        return 1;
+
+    // View activation time-series
+    std::cout << "\nsourceEstimate:\n" << sourceEstimate.data.block(0,0,10,10) << std::endl;
+    std::cout << "time\n" << sourceEstimate.times.block(0,0,1,10) << std::endl;
+    std::cout << "timeMin\n" << sourceEstimate.times[0] << std::endl;
+    std::cout << "timeMax\n" << sourceEstimate.times[sourceEstimate.times.size()-1] << std::endl;
+    std::cout << "time step\n" << sourceEstimate.tstep << std::endl;
 
     //########################################################################################
     //
@@ -288,26 +290,27 @@ int main(int argc, char *argv[])
     //########################################################################################
 
     View3D::SPtr testWindow = View3D::SPtr(new View3D());
-    testWindow->addSurfaceSet(parser.value(subjectOption), evoked.comment, tSurfSet, tAnnotSet);
+    Data3DTreeModel::SPtr p3DDataModel = Data3DTreeModel::SPtr(new Data3DTreeModel());
+    testWindow->setModel(p3DDataModel);
 
-    QList<BrainRTConnectivityDataTreeItem*> rtItemListConnect= testWindow->addConnectivityData(parser.value(subjectOption), evoked.comment, pConnect_LA);
+    p3DDataModel->addSurfaceSet(parser.value(subjectOption), "MRI", tSurfSet, tAnnotSet);
 
-    QList<BrainRTSourceLocDataTreeItem*> rtItemListSourceLoc = testWindow->addSourceData(parser.value(subjectOption), evoked.comment, sourceEstimate, t_clusteredFwd);
-    //Init some rt related values for right visual data
-    for(int i = 0; i < rtItemListSourceLoc.size(); ++i) {
-        rtItemListSourceLoc.at(i)->setLoopState(true);
-        rtItemListSourceLoc.at(i)->setTimeInterval(17);
-        rtItemListSourceLoc.at(i)->setNumberAverages(1);
-        rtItemListSourceLoc.at(i)->setStreamingActive(true);
-        rtItemListSourceLoc.at(i)->setNormalization(QVector3D(0.0,5.5,10));
-        rtItemListSourceLoc.at(i)->setVisualizationType("Annotation based");
-        rtItemListSourceLoc.at(i)->setColortable("Hot");
+    NetworkTreeItem* pRTNetworkDataItem= p3DDataModel->addConnectivityData(parser.value(subjectOption), evoked.comment, pConnect_LA);
+
+    //Add rt source loc data and init some visualization values
+    if(MneEstimateTreeItem* pRTDataItem = p3DDataModel->addSourceData(parser.value(subjectOption), evoked.comment, sourceEstimate, t_clusteredFwd)) {
+        pRTDataItem->setLoopState(true);
+        pRTDataItem->setTimeInterval(17);
+        pRTDataItem->setNumberAverages(1);
+        pRTDataItem->setStreamingActive(true);
+        pRTDataItem->setNormalization(QVector3D(0.01,0.5,1.0));
+        pRTDataItem->setVisualizationType("Annotation based");
+        pRTDataItem->setColortable("Hot");
     }
-
     testWindow->show();
 
     Control3DWidget::SPtr control3DWidget = Control3DWidget::SPtr(new Control3DWidget());
-    control3DWidget->setView3D(testWindow);
+    control3DWidget->init(p3DDataModel, testWindow);
     control3DWidget->show();
 
     //########################################################################################

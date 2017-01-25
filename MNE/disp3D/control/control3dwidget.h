@@ -83,6 +83,7 @@ namespace DISP3DLIB
 //=============================================================================================================
 
 class View3D;
+class Data3DTreeModel;
 
 
 //=============================================================================================================
@@ -117,11 +118,12 @@ public:
 
     //=========================================================================================================
     /**
-    * Set/Add a View3D to be controlled by the this GUI widget.
+    * Init the control widget based on the 3D view and data model.
     *
-    * @param[in] view3D         The view3D to bec connected to this widget.
+    * @param[in] pData3DTreeModel   The 3D data tree model.
+    * @param[in] pView3D            The view3D to bec connected to this widget.
     */
-    void setView3D(QSharedPointer<View3D> view3D);
+    void init(QSharedPointer<DISP3DLIB::Data3DTreeModel> pData3DTreeModel, QSharedPointer<View3D> pView3D);
 
     //=========================================================================================================
     /**
