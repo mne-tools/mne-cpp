@@ -63,6 +63,18 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+namespace FIFFLIB
+{
+    class FiffStream;
+    class FiffDirNode;
+}
+
+
+//*************************************************************************************************************
+//=============================================================================================================
 // DEFINE NAMESPACE INVERSELIB
 //=============================================================================================================
 
@@ -105,6 +117,29 @@ public:
 
     //=========================================================================================================
     /**
+    * Read SSS data from anywhere in a file
+    * Refactored: mne_read_sss_data (mne_sss_data.c)
+    *
+    * @param[in] name       Name of the file to read the SSS data from
+    *
+    * @return   The read SSS data.
+    */
+    static MneSssData *read_sss_data(const QString& name);
+
+    //=========================================================================================================
+    /**
+    * Read the SSS data from the given node of an open fiff stream
+    * Refactored: mne_read_sss_data_from_node (mne_sss_data.c)
+    *
+    * @param[in] stream     The open fiff stream
+    * @param[in] start      The node/tree to read the SSS data from
+    *
+    * @return   The read SSS data.
+    */
+    static MneSssData* read_sss_data_from_node( QSharedPointer<FIFFLIB::FiffStream>& stream, const QSharedPointer<FIFFLIB::FiffDirNode>& start );
+
+    //=========================================================================================================
+    /**
     * Output the SSS information for debugging purposes
     * Refactored: mne_print_sss_data (mne_sss_data.c)
     *
@@ -126,16 +161,16 @@ public:
 
 // ### OLD STRUCT ###
 //typedef struct {
-//    int   job;			/* Value of FIFF_SSS_JOB tag */
-//    int   coord_frame;		/* Coordinate frame */
-//    float origin[3];		/* The expansion origin */
-//    int   nchan;			/* How many channels */
-//    int   out_order;		/* Order of the outside expansion */
-//    int   in_order;		/* Order of the inside expansion */
-//    int   *comp_info;		/* Which components are included */
-//    int   ncomp;			/* How many entries in the above */
-//    int   in_nuse;		/* How many components included in the inside expansion */
-//    int   out_nuse;		/* How many components included in the outside expansion */
+//    int   job;            /* Value of FIFF_SSS_JOB tag */
+//    int   coord_frame;    /* Coordinate frame */
+//    float origin[3];      /* The expansion origin */
+//    int   nchan;          /* How many channels */
+//    int   out_order;      /* Order of the outside expansion */
+//    int   in_order;       /* Order of the inside expansion */
+//    int   *comp_info;     /* Which components are included */
+//    int   ncomp;          /* How many entries in the above */
+//    int   in_nuse;        /* How many components included in the inside expansion */
+//    int   out_nuse;       /* How many components included in the outside expansion */
 //} *mneSssData,mneSssDataRec;	/* Essential information about SSS */
 };
 

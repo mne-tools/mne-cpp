@@ -40,10 +40,429 @@ using namespace INVERSELIB;
 #define SEG_LEN 10.0
 
 
+#define EPS_VALUES 0.05
+
+
 //*************************************************************************************************************
 //=============================================================================================================
 // STATIC DEFINITIONS ToDo make members
 //=============================================================================================================
+
+
+
+//============================= mne_ch_selections.c =============================
+
+/*
+ * Mandatory allocation functions
+ */
+static mneChSelection new_ch_selection()
+
+{
+    mneChSelection newsel = MALLOC(1,mneChSelectionRec);
+
+    newsel->name    = NULL;
+    newsel->chdef   = NULL;
+    newsel->chspick = NULL;
+    newsel->chspick_nospace = NULL;
+    newsel->pick    = NULL;
+    newsel->pick_deriv = NULL;
+    newsel->ch_kind = NULL;
+    newsel->ndef    = 0;
+    newsel->nchan   = 0;
+    newsel->kind    = MNE_CH_SELECTION_UNKNOWN;
+    return newsel;
+}
+
+
+mneChSelection mne_ch_selection_these(const char *selname, char **names, int nch)
+/*
+ * Give an explicit list of interesting channels
+ */
+{
+    int c;
+    mneChSelection sel;
+
+    sel        = new_ch_selection();
+    sel->name  = mne_strdup(selname);
+    sel->chdef = MALLOC(nch,char *);
+    sel->ndef  = nch;
+    sel->kind  = MNE_CH_SELECTION_USER;
+
+    for (c = 0; c < nch; c++)
+        sel->chdef[c]  = mne_strdup(names[c]);
+
+    return sel;
+}
+
+
+
+
+
+
+static void omit_spaces(char **names, int nnames)
+
+{
+    char *c,*cc;
+    int  k;
+
+    for (k = 0; k < nnames; k++) {
+        for (c = cc = names[k]; *c != '\0'; c++)
+            if (*c != ' ')
+                *cc++ = *c;
+        *cc = '\0';
+    }
+    return;
+}
+
+
+
+
+
+int mne_ch_selection_assign_chs(mneChSelection sel,
+                                mneRawData     data)
+/*
+      * Make the channel picking real easy
+      */
+{
+    int c,rc,d;
+    mneRawInfo  info;
+    int nch;
+    char *dash;
+
+    if (!sel || !data)
+        return 0;
+
+    info = data->info;
+    mne_free_name_list(sel->chspick,sel->nchan);
+    mne_free_name_list(sel->chspick_nospace,sel->nchan);
+    /*
+   * Expansion of possible regular expressions must be added eventually
+   */
+    sel->chspick         = mne_dup_name_list(sel->chdef,sel->ndef);
+    sel->chspick_nospace = mne_dup_name_list(sel->chdef,sel->ndef);
+    omit_spaces(sel->chspick_nospace,sel->ndef);
+    sel->nchan           = sel->ndef;
+
+    sel->pick        = REALLOC(sel->pick,sel->nchan,int);        /* Just in case */
+    sel->pick_deriv  = REALLOC(sel->pick_deriv,sel->nchan,int);
+    sel->ch_kind     = REALLOC(sel->ch_kind,sel->nchan,int);
+
+    for (c = 0; c < sel->nchan; c++) {
+        sel->pick[c]       = -1;
+        sel->pick_deriv[c] = -1;
+        sel->ch_kind[c]    = -1;
+        for (rc = 0; rc < info->nchan; rc++) {
+            if (strcasecmp(sel->chspick[c],info->chInfo[rc].ch_name) == 0 ||
+                    strcasecmp(sel->chspick_nospace[c],info->chInfo[rc].ch_name) == 0) {
+                sel->pick[c]    = rc;
+                sel->ch_kind[c] = info->chInfo[rc].kind;
+                break;
+            }
+        }
+    }
+    /*
+   * Maybe the derivations will help
+   */
+    sel->nderiv = 0;
+    if (data->deriv_matched) {
+        char **deriv_names = data->deriv_matched->deriv_data->rowlist;
+        int  nderiv        = data->deriv_matched->deriv_data->nrow;
+
+        for (c = 0; c < sel->nchan; c++) {
+            if (sel->pick[c] == -1) {
+                for (d = 0; d < nderiv; d++) {
+                    if (strcasecmp(sel->chspick[c],deriv_names[d]) == 0 &&
+                            data->deriv_matched->valid && data->deriv_matched->valid[d]) {
+                        sel->pick_deriv[c] = d;
+                        sel->ch_kind[c]    = data->deriv_matched->chs[d].kind;
+                        sel->nderiv++;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    /*
+   * Try simple channels again without the part after dashes
+   */
+    for (c = 0; c < sel->nchan; c++) {
+        if (sel->pick[c] == -1 && sel->pick_deriv[c] == -1) {
+            for (rc = 0; rc < info->nchan; rc++) {
+                dash = strchr(info->chInfo[rc].ch_name,'-');
+                if (dash) {
+                    *dash = '\0';
+                    if (strcasecmp(sel->chspick[c],info->chInfo[rc].ch_name) == 0 ||
+                            strcasecmp(sel->chspick_nospace[c],info->chInfo[rc].ch_name) == 0) {
+                        *dash = '-';
+                        sel->pick[c] = rc;
+                        sel->ch_kind[c] = info->chInfo[rc].kind;
+                        break;
+                    }
+                    *dash = '-';
+                }
+            }
+        }
+    }
+    for (c = 0, nch = 0; c < sel->nchan; c++) {
+        if (sel->pick[c] >= 0)
+            nch++;
+    }
+    if (sel->nderiv > 0)
+        fprintf(stderr,"Selection %c%s%c has %d matched derived channels.\n",'"',sel->name,'"',sel->nderiv);
+    return nch;
+}
+
+
+
+//============================= mne_get_values.c =============================
+
+int mne_get_values_from_data (float time,         /* Interesting time point */
+                              float integ,	  /* Time integration */
+                              float **data,	  /* The data values (time by time) */
+                              int   nsamp,	  /* How many time points? */
+                              int   nch,          /* How many channels */
+                              float tmin,	  /* Time of first sample */
+                              float sfreq,	  /* Sampling frequency */
+                              int   use_abs,      /* Use absolute values */
+                              float *value)	  /* The picked values */
+/*
+      * Pick a signal value using linear interpolation
+      */
+{
+    int   n1,n2,k;
+    float s1,s2;
+    float f1,f2;
+    float sum;
+    float width;
+    int   ch;
+
+    for (ch = 0; ch < nch; ch++) {
+        /*
+     * Find out the correct samples
+     */
+        if (fabs(sfreq*integ) < EPS_VALUES) { /* This is the single-sample case */
+            s1 = sfreq*(time - tmin);
+            n1 = floor(s1);
+            f1 = 1.0 + n1 - s1;
+            if (n1 < 0 || n1 > nsamp-1) {
+                printf("Sample value out of range %d (0..%d)",n1,nsamp-1);
+                return(-1);
+            }
+            /*
+       * Avoid rounding error
+       */
+            if (n1 == nsamp-1) {
+                if (fabs(f1-1.0) < 1e-3)
+                    f1 = 1.0;
+            }
+            if (f1 < 1.0 && n1 > nsamp-2) {
+                printf("Sample value out of range %d (0..%d) %.4f",n1,nsamp-1,f1);
+                return(-1);
+            }
+            if (f1 < 1.0) {
+                if (use_abs)
+                    sum = f1*fabs(data[n1][ch]) + (1.0-f1)*fabs(data[n1+1][ch]);
+                else
+                    sum = f1*data[n1][ch] + (1.0-f1)*data[n1+1][ch];
+            }
+            else {
+                if (use_abs)
+                    sum = fabs(data[n1][ch]);
+                else
+                    sum = data[n1][ch];
+            }
+        }
+        else {			/* Multiple samples */
+            s1 = sfreq*(time - 0.5*integ - tmin);
+            s2 = sfreq*(time + 0.5*integ - tmin);
+            n1 = ceil(s1); n2 = floor(s2);
+            if (n2 < n1) {		/* We are within one sample interval */
+                n1 = floor(s1);
+                if (n1 < 0 || n1 > nsamp-2)
+                    return (-1);
+                f1 = s1 - n1;
+                f2 = s2 - n1;
+                if (use_abs)
+                    sum = 0.5*((f1+f2)*fabs(data[n1+1][ch]) + (2.0-f1-f2)*fabs(data[n1][ch]));
+                else
+                    sum = 0.5*((f1+f2)*data[n1+1][ch] + (2.0-f1-f2)*data[n1][ch]);
+            }
+            else {
+                f1 = n1 - s1;
+                f2 = s2 - n2;
+                if (n1 < 0 || n1 > nsamp-1) {
+                    printf("Sample value out of range %d (0..%d)",n1,nsamp-1);
+                    return(-1);
+                }
+                if (n2 < 0 || n2 > nsamp-1) {
+                    printf("Sample value out of range %d (0..%d)",n2,nsamp-1);
+                    return(-1);
+                }
+                if (f1 != 0.0 && n1 < 1)
+                    return(-1);
+                if (f2 != 0.0 && n2 > nsamp-2)
+                    return(-1);
+                sum = 0.0;
+                width = 0.0;
+                if (n2 > n1) {		/* Do the whole intervals */
+                    if (use_abs) {
+                        sum = 0.5*fabs(data[n1][ch]);
+                        for (k = n1+1; k < n2; k++)
+                            sum = sum + fabs(data[k][ch]);
+                        sum = sum + 0.5*fabs(data[n2][ch]);
+                    }
+                    else {
+                        sum = 0.5*data[n1][ch];
+                        for (k = n1+1; k < n2; k++)
+                            sum = sum + data[k][ch];
+                        sum = sum + 0.5*data[n2][ch];
+                    }
+                    width = n2 - n1;
+                }
+                /*
+         * Add tails
+         */
+                if (use_abs) {
+                    if (f1 != 0.0)
+                        sum = sum + 0.5*f1*(f1*fabs(data[n1-1][ch]) + (2.0-f1)*fabs(data[n1][ch]));
+                    if (f2 != 0.0)
+                        sum = sum + 0.5*f2*(f2*fabs(data[n2+1][ch]) + (2.0-f2)*fabs(data[n2][ch]));
+                }
+                else {
+                    if (f1 != 0.0)
+                        sum = sum + 0.5*f1*(f1*data[n1-1][ch] + (2.0-f1)*data[n1][ch]);
+                    if (f2 != 0.0)
+                        sum = sum + 0.5*f2*(f2*data[n2+1][ch] + (2.0-f2)*data[n2][ch]);
+                }
+                width = width + f1 + f2;
+                sum = sum/width;
+            }
+        }
+        value[ch] = sum;
+    }
+    return (0);
+}
+
+
+
+int mne_get_values_from_data_ch (float time,      /* Interesting time point */
+                                 float integ,	  /* Time integration */
+                                 float **data,	  /* The data values (channel by channel) */
+                                 int   nsamp,	  /* How many time points? */
+                                 int   nch,       /* How many channels */
+                                 float tmin,	  /* Time of first sample */
+                                 float sfreq,	  /* Sampling frequency */
+                                 int   use_abs,   /* Use absolute values */
+                                 float *value)	  /* The picked values */
+/*
+      * Pick a signal value using linear interpolation
+      */
+{
+    int   n1,n2,k;
+    float s1,s2;
+    float f1,f2;
+    float sum;
+    float width;
+    int   ch;
+
+    for (ch = 0; ch < nch; ch++) {
+        /*
+     * Find out the correct samples
+     */
+        if (fabs(sfreq*integ) < EPS_VALUES) { /* This is the single-sample case */
+            s1 = sfreq*(time - tmin);
+            n1 = floor(s1);
+            f1 = 1.0 + n1 - s1;
+            if (n1 < 0 || n1 > nsamp-1)
+                return(-1);
+            if (f1 < 1.0 && n1 > nsamp-2)
+                return(-1);
+            if (f1 < 1.0) {
+                if (use_abs)
+                    sum = f1*fabs(data[ch][n1]) + (1.0-f1)*fabs(data[ch][n1+1]);
+                else
+                    sum = f1*data[ch][n1] + (1.0-f1)*data[ch][n1+1];
+            }
+            else {
+                if (use_abs)
+                    sum = fabs(data[ch][n1]);
+                else
+                    sum = data[ch][n1];
+            }
+        }
+        else {			/* Multiple samples */
+            s1 = sfreq*(time - 0.5*integ - tmin);
+            s2 = sfreq*(time + 0.5*integ - tmin);
+            n1 = ceil(s1); n2 = floor(s2);
+            if (n2 < n1) {		/* We are within one sample interval */
+                n1 = floor(s1);
+                if (n1 < 0 || n1 > nsamp-2)
+                    return (-1);
+                f1 = s1 - n1;
+                f2 = s2 - n1;
+                if (use_abs)
+                    sum = 0.5*((f1+f2)*fabs(data[ch][n1+1]) + (2.0-f1-f2)*fabs(data[ch][n1]));
+                else
+                    sum = 0.5*((f1+f2)*data[ch][n1+1] + (2.0-f1-f2)*data[ch][n1]);
+            }
+            else {
+                f1 = n1 - s1;
+                f2 = s2 - n2;
+                if (n1 < 0 || n1 > nsamp-1 || n2 < 0 || n2 > nsamp-1)
+                    return(-1);
+                if (f1 != 0.0 && n1 < 1)
+                    return(-1);
+                if (f2 != 0.0 && n2 > nsamp-2)
+                    return(-1);
+                sum = 0.0;
+                width = 0.0;
+                if (n2 > n1) {		/* Do the whole intervals */
+                    if (use_abs) {
+                        sum = 0.5*fabs(data[ch][n1]);
+                        for (k = n1+1; k < n2; k++)
+                            sum = sum + fabs(data[ch][k]);
+                        sum = sum + 0.5*fabs(data[ch][n2]);
+                    }
+                    else {
+                        sum = 0.5*data[ch][n1];
+                        for (k = n1+1; k < n2; k++)
+                            sum = sum + data[ch][k];
+                        sum = sum + 0.5*data[ch][n2];
+                    }
+                    width = n2 - n1;
+                }
+                /*
+         * Add tails
+         */
+                if (use_abs) {
+                    if (f1 != 0.0)
+                        sum = sum + 0.5*f1*(f1*fabs(data[ch][n1-1]) + (2.0-f1)*fabs(data[ch][n1]));
+                    if (f2 != 0.0)
+                        sum = sum + 0.5*f2*(f2*fabs(data[ch][n2+1]) + (2.0-f2)*fabs(data[ch][n2]));
+                }
+                else {
+                    if (f1 != 0.0)
+                        sum = sum + 0.5*f1*(f1*data[ch][n1-1]+ (2.0-f1)*data[ch][n1]);
+                    if (f2 != 0.0)
+                        sum = sum + 0.5*f2*(f2*data[ch][n2+1] + (2.0-f2)*data[ch][n2]);
+                }
+                width = width + f1 + f2;
+                sum = sum/width;
+            }
+        }
+        value[ch] = sum;
+    }
+    return (0);
+}
+
+
+
+
+
+
+
+
+
 
 
 
