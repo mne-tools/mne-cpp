@@ -45,8 +45,6 @@
 #include "scdisp_global.h"
 
 #include "newmeasurementwidget.h"
-#include <disp3D/view3D.h>
-#include <disp3D/control/control3dwidget.h>
 
 #include "fs/annotationset.h"
 #include "fs/surfaceset.h"
@@ -56,6 +54,8 @@
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
+
+#include <QPointer>
 
 
 //*************************************************************************************************************
@@ -72,7 +72,10 @@
 class QTime;
 
 namespace DISP3DLIB {
-    class BrainRTSourceLocDataTreeItem;
+    class MneEstimateTreeItem;
+    class View3D;
+    class Control3DWidget;
+    class Data3DTreeModel;
 }
 
 namespace SCMEASLIB {
@@ -169,18 +172,20 @@ protected slots:
     void show3DControlWidget();
 
 private:
-    QSharedPointer<SCMEASLIB::RealTimeSourceEstimate>  m_pRTSE;            /**< The real-time source estimate measurement. */
+    QSharedPointer<SCMEASLIB::RealTimeSourceEstimate>   m_pRTSE;            /**< The real-time source estimate measurement. */
 
-    bool                                            m_bInitialized;     /**< Whether init was processed successfully. */
+    bool                                                m_bInitialized;     /**< Whether init was processed successfully. */
 
-    FSLIB::AnnotationSet                            m_annotationSet;    /**< The current annotation set. */
-    FSLIB::SurfaceSet                               m_surfSet;          /**< The current surface set. */
+    FSLIB::AnnotationSet                                m_annotationSet;    /**< The current annotation set. */
+    FSLIB::SurfaceSet                                   m_surfSet;          /**< The current surface set. */
 
-    DISP3DLIB::View3D::SPtr                         m_p3DView;          /**< The Disp3D view. */
-    DISP3DLIB::Control3DWidget::SPtr                m_pControl3DView;   /**< The Disp3D control. */
-    QList<DISP3DLIB::BrainRTSourceLocDataTreeItem*> m_lRtItem;          /**< The Disp3D real time items. */
+    QSharedPointer<DISP3DLIB::View3D>                   m_p3DView;          /**< The Disp3D view. */
+    QSharedPointer<DISP3DLIB::Control3DWidget>          m_pControl3DView;   /**< The Disp3D control. */
+    QSharedPointer<DISP3DLIB::Data3DTreeModel>          m_pData3DModel;     /**< The Disp3D model. */
 
-    QAction*                                        m_pAction3DControl; /**< Show 3D View control widget */
+    DISP3DLIB::MneEstimateTreeItem*            m_pRtItem;          /**< The Disp3D real time items. */
+
+    QAction*                                            m_pAction3DControl; /**< Show 3D View control widget */
 
 signals:
     void startInit();

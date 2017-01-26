@@ -41,8 +41,13 @@
 #include "babymeghpidgl.h"
 #include "ui_babymeghpidgl.h"
 
-#include <fiff/fiff_dir_tree.h>
-#include <fiff/fiff_tag.h>
+#include <fiff/fiff_dig_point_set.h>
+
+#include <disp3D/view3D.h>
+#include <disp3D/control/control3dwidget.h>
+#include <disp3D/model/data3Dtreemodel.h>
+
+#include <mne/mne_bem.h>
 
 
 //*************************************************************************************************************
@@ -68,6 +73,8 @@
 
 using namespace BABYMEGPLUGIN;
 using namespace FIFFLIB;
+using namespace DISP3DLIB;
+using namespace MNELIB;
 
 
 //*************************************************************************************************************
@@ -76,21 +83,59 @@ using namespace FIFFLIB;
 //=============================================================================================================
 
 BabyMEGHPIDgl::BabyMEGHPIDgl(BabyMEG* p_pBabyMEG,QWidget *parent)
-: QDialog(parent)
+: QWidget(parent)
 , ui(new Ui::BabyMEGHPIDgl)
 , m_pBabyMEG(p_pBabyMEG)
+, m_pView3D(View3D::SPtr(new View3D))
+, m_pData3DModel(Data3DTreeModel::SPtr(new Data3DTreeModel))
 {
     ui->setupUi(this);
 
-    connect(ui->bn_PolhemusFile, SIGNAL(released()),
-            this, SLOT(bnLoadPolhemusFile()));
+    //Do the connects
+    connect(ui->m_pushButton_doSingleFit, &QPushButton::released,
+            this, &BabyMEGHPIDgl::onBtnDoSingleFit);
 
     connect(this, &BabyMEGHPIDgl::SendHPIFiffInfo,
             m_pBabyMEG, &BabyMEG::RecvHPIFiffInfo);
 
-    connect(ui->buttonBox,SIGNAL(clicked(QAbstractButton *)),
-            this, SLOT(OKProc(QAbstractButton *)));
-//    connect(ui->buttonBox,SIGNAL(rejected()),this,SLOT(CancelProc));
+    connect(ui->m_pushButton_loadDigitizers, &QPushButton::released,
+            this, &BabyMEGHPIDgl::onBtnLoadPolhemusFile);
+
+    connect(ui->m_spinBox_freqCoil1, static_cast<void(QSpinBox::*)(const QString &)>(&QSpinBox::valueChanged),
+            this, &BabyMEGHPIDgl::onFreqsChanged);
+    connect(ui->m_spinBox_freqCoil2, static_cast<void(QSpinBox::*)(const QString &)>(&QSpinBox::valueChanged),
+            this, &BabyMEGHPIDgl::onFreqsChanged);
+    connect(ui->m_spinBox_freqCoil3, static_cast<void(QSpinBox::*)(const QString &)>(&QSpinBox::valueChanged),
+            this, &BabyMEGHPIDgl::onFreqsChanged);
+    connect(ui->m_spinBox_freqCoil4, static_cast<void(QSpinBox::*)(const QString &)>(&QSpinBox::valueChanged),
+            this, &BabyMEGHPIDgl::onFreqsChanged);
+
+    //Setup View3D
+    m_pView3D->setModel(m_pData3DModel);
+
+    QWidget *pWidgetContainer = QWidget::createWindowContainer(m_pView3D.data());
+    ui->m_gridLayout_main->addWidget(pWidgetContainer,0,0,5,1);
+
+    QStringList slFlag = QStringList() << "Data";
+
+    Control3DWidget* control3DWidget = new Control3DWidget(this, slFlag);
+    control3DWidget->init(m_pData3DModel, m_pView3D);
+    control3DWidget->onTreeViewDescriptionHide();
+
+    QGridLayout* gridLayout = new QGridLayout();
+    gridLayout->addWidget(control3DWidget);
+    ui->m_groupBox_3dControl->setLayout(gridLayout);
+
+    //Add sensor surface
+    QFile t_fileSensorSurfaceBEM("./resources/sensorSurfaces/BabyMEG.fif");
+    MNEBem t_sensorSurfaceBEM(t_fileSensorSurfaceBEM);
+    m_pData3DModel->addBemData("Device", "BabyMEG", t_sensorSurfaceBEM);
+
+    //Always on top
+    //this->setWindowFlags(this->windowFlags() | Qt::WindowStaysOnTopHint);
+
+    //Init coil freqs
+    m_vCoilFreqs << 155 << 165 << 190 << 200;
 }
 
 
@@ -104,52 +149,6 @@ BabyMEGHPIDgl::~BabyMEGHPIDgl()
 
 //*************************************************************************************************************
 
-void BabyMEGHPIDgl::CancelProc()
-{
-
-}
-
-
-//*************************************************************************************************************
-
-void BabyMEGHPIDgl::OKProc(QAbstractButton *b)
-{
-    qDebug()<<"Clicked group button";
-
-    QString s(b->text());
-    qDebug()<<"Clicked group button:"<<s;
-
-    if (s == "OK") {
-        FileName_HPI = ui->ed_PolFileName->text();
-        /* Load Polhemus file*/
-        if (FileName_HPI.isEmpty())
-        {
-            // we do not find a file
-            qDebug()<<"Polhemus File Name is empty. Please input the file name.";
-        }
-        else
-        {
-            FileName_HPI = FileName_HPI.trimmed();
-            QFileInfo checkFile(FileName_HPI);
-
-            if (checkFile.exists() && checkFile.isFile()) {
-                ReadPolhemusDig(FileName_HPI);
-                qDebug()<<"Load file Finish!";
-                m_pBabyMEG->m_pFiffInfo->dig = info.dig;
-                //emit SendHPIFiffInfo(info);
-
-            } else {
-
-                qDebug()<<"Polhemus File is not existed. Please check if it is the full path.";
-            }
-        }
-    }
-
-}
-
-
-//*************************************************************************************************************
-
 void BabyMEGHPIDgl::closeEvent(QCloseEvent *event)
 {
     Q_UNUSED(event)
@@ -158,95 +157,218 @@ void BabyMEGHPIDgl::closeEvent(QCloseEvent *event)
 
 //*************************************************************************************************************
 
-void BabyMEGHPIDgl::bnLoadPolhemusFile()
-{
-    qDebug()<<" Start to load Polhemus File";
-    FileName_HPI = QFileDialog::getOpenFileName(this,
-         tr("Open Polhemus File"), "C:/Users/babyMEG/Desktop", tr("Fiff file (*.fif)"));
-    //display the text on the text control
-    ui->ed_PolFileName->setText(FileName_HPI);
+void BabyMEGHPIDgl::onBtnDoSingleFit()
+{    
+    if(!this->hpiLoaded()) {
+       QMessageBox msgBox;
+       msgBox.setText("Please load a digitizer set with at lesat 3 HPI coils first!");
+       msgBox.exec();
+       return;
+    }
+
+    m_pBabyMEG->performHPIFitting(m_vCoilFreqs);
+
+    if(m_pBabyMEG->m_pFiffInfo) {
+        FiffCoordTrans devHeadTrans = m_pBabyMEG->m_pFiffInfo->dev_head_t;
+
+        ui->m_label_mat00->setNum(devHeadTrans.trans(0,0));
+        ui->m_label_mat01->setNum(devHeadTrans.trans(0,1));
+        ui->m_label_mat02->setNum(devHeadTrans.trans(0,2));
+        ui->m_label_mat03->setNum(devHeadTrans.trans(0,3));
+
+        ui->m_label_mat10->setNum(devHeadTrans.trans(1,0));
+        ui->m_label_mat11->setNum(devHeadTrans.trans(1,1));
+        ui->m_label_mat12->setNum(devHeadTrans.trans(1,2));
+        ui->m_label_mat13->setNum(devHeadTrans.trans(1,3));
+
+        ui->m_label_mat20->setNum(devHeadTrans.trans(2,0));
+        ui->m_label_mat21->setNum(devHeadTrans.trans(2,1));
+        ui->m_label_mat22->setNum(devHeadTrans.trans(2,2));
+        ui->m_label_mat23->setNum(devHeadTrans.trans(2,3));
+
+        ui->m_label_mat30->setNum(devHeadTrans.trans(3,0));
+        ui->m_label_mat31->setNum(devHeadTrans.trans(3,1));
+        ui->m_label_mat32->setNum(devHeadTrans.trans(3,2));
+        ui->m_label_mat33->setNum(devHeadTrans.trans(3,3));
+    }
 }
 
 
 //*************************************************************************************************************
 
-void BabyMEGHPIDgl::ReadPolhemusDig(QString fileName)
+void BabyMEGHPIDgl::onBtnLoadPolhemusFile()
 {
-    //start to load Polhemus file
-    QFile t_headerFiffFile(fileName);
+    //Get file location
+    QString fileName_HPI = QFileDialog::getOpenFileName(this,
+            tr("Open digitizer file"), "", tr("Fiff file (*.fif)"));
 
-    //
-    //   Open the file
-    //
-    FiffStream::SPtr t_pStream(new FiffStream(&t_headerFiffFile));
-    QString t_sFileName = t_pStream->streamName();
+    ui->m_lineEdit_filePath->setText(fileName_HPI);
 
-    printf("Opening header data %s...\n",t_sFileName.toUtf8().constData());
+    //Load Polhemus file
+    if (!fileName_HPI.isEmpty()) {
+        fileName_HPI = fileName_HPI.trimmed();
+        QFileInfo checkFile(fileName_HPI);
 
-    FiffDirTree t_Tree;
-    QList<FiffDirEntry> t_Dir;
+        if (checkFile.exists() && checkFile.isFile()) {
+            QList<FiffDigPoint> lDigPoints = readPolhemusDig(fileName_HPI);
 
-    if(!t_pStream->open(t_Tree, t_Dir))
-    {
-        qDebug()<<"Can not open the Polhemus File";
-        return;
-    }
-    //
-    //   Read the measurement info
-    //
-    //read_hpi_info(t_pStream,t_Tree, info);
-    fiff_int_t kind = -1;
-    fiff_int_t pos = -1;
-    FiffTag::SPtr t_pTag;
-
-    //
-    //   Locate the Polhemus data
-    //
-    QList<FiffDirTree> isotrak = t_Tree.dir_tree_find(FIFFB_ISOTRAK);
-
-    QList<FiffDigPoint> dig;
-    fiff_int_t coord_frame = FIFFV_COORD_HEAD;
-    FiffCoordTrans dig_trans;
-    qint32 k = 0;
-
-    if (isotrak.size() == 1)
-    {
-        for (k = 0; k < isotrak[0].nent; ++k)
-        {
-            kind = isotrak[0].dir[k].kind;
-            pos  = isotrak[0].dir[k].pos;
-            if (kind == FIFF_DIG_POINT)
-            {
-                FiffTag::read_tag(t_pStream.data(), t_pTag, pos);
-                dig.append(t_pTag->toDigPoint());
+            if(m_pBabyMEG->m_pFiffInfo) {
+                m_pBabyMEG->m_pFiffInfo->dig = lDigPoints;
             }
-            else
-            {
-                if (kind == FIFF_MNE_COORD_FRAME)
-                {
-                    FiffTag::read_tag(t_pStream.data(), t_pTag, pos);
-                    qDebug() << "NEEDS To BE DEBBUGED: FIFF_MNE_COORD_FRAME" << t_pTag->getType();
-                    coord_frame = *t_pTag->toInt();
-                }
-                else if (kind == FIFF_COORD_TRANS)
-                {
-                    FiffTag::read_tag(t_pStream.data(), t_pTag, pos);
-                    qDebug() << "NEEDS To BE DEBBUGED: FIFF_COORD_TRANS" << t_pTag->getType();
-                    dig_trans = t_pTag->toCoordTrans();
-                }
-            }
+        } else {
+            QMessageBox msgBox;
+            msgBox.setText("File could not be loaded!");
+            msgBox.exec();
+            return;
         }
     }
-    for(k = 0; k < dig.size(); ++k)
-        dig[k].coord_frame = coord_frame;
-
-    //
-    //   All kinds of auxliary stuff
-    //
-    info.dig   = dig;
-    //garbage collecting
-    t_pStream->device()->close();
-
 }
 
 
+//*************************************************************************************************************
+
+QList<FiffDigPoint> BabyMEGHPIDgl::readPolhemusDig(QString fileName)
+{
+    QFile t_fileDig(fileName);
+    FiffDigPointSet t_digSet(t_fileDig);
+
+    QList<FiffDigPoint> lDigPoints;
+
+    qint16 numHPI = 0;
+    qint16 numDig = 0;
+    qint16 numFiducials = 0;
+    qint16 numEEG = 0;
+
+    for(int i = 0; i < t_digSet.size(); ++i) {
+        lDigPoints.append(t_digSet[i]);
+
+        switch(t_digSet[i].kind)
+        {
+            case FIFFV_POINT_HPI:
+                numHPI++;
+                break;
+
+            case FIFFV_POINT_EXTRA:
+                numDig++;
+                break;
+
+            case FIFFV_POINT_CARDINAL:
+                numFiducials++;
+                break;
+
+            case FIFFV_POINT_EEG:
+                numEEG++;
+                break;
+        }
+    }
+
+    //Add all digitizer but additional points to View3D
+    QVector<double> vGof;
+    vGof << 0.0 << 0.0 << 0.0 << 0.0;
+
+    this->setDigitizerDataToView3D(t_digSet, vGof);
+
+    //Set loaded number of digitizers
+    ui->m_label_numberLoadedCoils->setNum(numHPI);
+    ui->m_label_numberLoadedDigitizers->setNum(numDig);
+    ui->m_label_numberLoadedFiducials->setNum(numFiducials);
+    ui->m_label_numberLoadedEEG->setNum(numEEG);
+
+    //Hdie show frequencies and errors based on the number of coils
+    if(numHPI == 3) {
+        ui->m_label_gofCoil4->hide();
+        ui->m_label_gofCoil4Description->hide();
+        ui->m_label_freqCoil4->hide();
+        ui->m_spinBox_freqCoil4->hide();
+
+        m_vCoilFreqs.clear();
+        m_vCoilFreqs << 155 << 165 << 190;
+    } else {
+        ui->m_label_gofCoil4->show();        
+        ui->m_label_gofCoil4Description->show();
+        ui->m_label_freqCoil4->show();
+        ui->m_spinBox_freqCoil4->show();
+
+        m_vCoilFreqs.clear();
+        m_vCoilFreqs << 155 << 165 << 190 << 200;
+    }
+
+    return lDigPoints;
+}
+
+
+//*************************************************************************************************************
+
+void BabyMEGHPIDgl::setDigitizerDataToView3D(const FiffDigPointSet& digPointSet, const QVector<double>& vGof, bool bSortOutAdditionalDigitizer)
+{
+    if(bSortOutAdditionalDigitizer) {
+        FiffDigPointSet t_digSetWithoutAdditional;
+
+        for(int i = 0; i < digPointSet.size(); ++i) {
+            switch(digPointSet[i].kind)
+            {
+                case FIFFV_POINT_HPI:
+                    t_digSetWithoutAdditional << digPointSet[i];
+                    break;
+
+                case FIFFV_POINT_CARDINAL:
+                    t_digSetWithoutAdditional << digPointSet[i];
+                    break;
+
+                case FIFFV_POINT_EEG:
+                    t_digSetWithoutAdditional << digPointSet[i];
+                    break;
+            }
+        }
+
+        m_pData3DModel->addDigitizerData("Head", "Digitizer", t_digSetWithoutAdditional);
+
+        //Update gof labels and transform from m to mm
+        QString sGof("0mm");
+        if(vGof.size() > 0) {
+            sGof = QString("%1mm").arg(1000*vGof[0]);
+            ui->m_label_gofCoil1->setText(sGof);
+        }
+
+        if(vGof.size() > 1) {
+            sGof = QString("%1mm").arg(1000*vGof[1]);
+            ui->m_label_gofCoil2->setText(sGof);
+        }
+
+        if(vGof.size() > 2) {
+            sGof = QString("%1mm").arg(1000*vGof[2]);
+            ui->m_label_gofCoil3->setText(sGof);
+        }
+
+        if(vGof.size() > 3) {
+            sGof = QString("%1mm").arg(1000*vGof[3]);
+            ui->m_label_gofCoil4->setText(sGof);
+        }
+    } else {
+        m_pData3DModel->addDigitizerData("Head", "Digitizer", digPointSet);
+    }
+}
+
+
+//*************************************************************************************************************
+
+bool BabyMEGHPIDgl::hpiLoaded()
+{
+    if(ui->m_label_numberLoadedCoils->text().toInt() >= 3) {
+        return true;
+    }
+
+    return false;
+}
+
+
+//*************************************************************************************************************
+
+void BabyMEGHPIDgl::onFreqsChanged()
+{
+    m_vCoilFreqs.clear();
+    m_vCoilFreqs.append(ui->m_spinBox_freqCoil1->value());
+    m_vCoilFreqs.append(ui->m_spinBox_freqCoil2->value());
+    m_vCoilFreqs.append(ui->m_spinBox_freqCoil3->value());
+    m_vCoilFreqs.append(ui->m_spinBox_freqCoil4->value());
+}

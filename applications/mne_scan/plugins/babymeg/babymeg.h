@@ -70,6 +70,7 @@
 
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
+#include <QQuaternion>
 
 
 //*************************************************************************************************************
@@ -201,6 +202,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Perform a HPI fitting procedure.
+    *
+    * @param[in] vFreqs    the frequencies for each coil.
+    */
+    void performHPIFitting(const QVector<int>& vFreqs);
+
+    //=========================================================================================================
+    /**
     * Starts or stops a file recording depending on the current recording state.
     */
     void toggleRecordingFile();
@@ -322,7 +331,13 @@ public:
 protected:
     virtual void run();
 
-private:
+private:    
+    //=========================================================================================================
+    /**
+    * Update HPI.
+    */
+    void updateHPI();
+
     //=========================================================================================================
     /**
     * Combines all analog trigger signals to one single digital trigger line.
@@ -390,7 +405,7 @@ private:
     QSharedPointer<BabyMEGInfo>             pInfo;                          /**< Set up the babyMEG info. */
     QSharedPointer<BabyMEGProjectDialog>    m_pBabyMEGProjectDialog;        /**< Window to setup the recording tiem and fiel name. */
     QSharedPointer<BabyMEGSQUIDControlDgl>  SQUIDCtrlDlg;                   /**< Nonmodal dialog for squid control. */
-    QSharedPointer<BabyMEGHPIDgl>           HPIDlg;                         /**< HPI dialog information. */
+    QSharedPointer<BabyMEGHPIDgl>           m_pHPIDlg;                      /**< HPI dialog information. */
 
     QSharedPointer<QTimer>                  m_pUpdateTimeInfoTimer;         /**< timer to control remaining time. */
     QSharedPointer<QTimer>                  m_pBlinkingRecordButtonTimer;   /**< timer to control blinking recording button. */
@@ -418,17 +433,18 @@ private:
     QString                                 m_sBadChannels;                 /**< Filename which contains a list of bad channels */
 
     QFile                                   m_qFileOut;                     /**< QFile for writing to fif file.*/
-    QMutex                                  mutex;                          /**< Mutex to guarantee thread safety.*/
+    QMutex                                  m_mutex;                        /**< Mutex to guarantee thread safety.*/
     QTime                                   m_recordingStartedTime;         /**< The time when the recording started.*/
 
     Eigen::RowVectorXd                      m_cals;                         /**< Calibration vector.*/
     Eigen::SparseMatrix<double>             m_sparseMatCals;                /**< Sparse calibration matrix.*/
+    Eigen::MatrixXf                         m_matValue;                     /**< The current data block.*/
 
-    QAction*                                m_pActionSetupProject;          /**< shows setup project dialog */
-    QAction*                                m_pActionRecordFile;            /**< start recording action */
-    QAction*                                m_pActionSqdCtrl;               /**< show squid control */
-    QAction*                                m_pActionUpdateFiffInfo;        /**< Update Fiff Info action */
-    QAction*                                m_pActionUpdateFiffInfoForHPI;  /**< Update HPI info into Fiff Info action */
+    QAction*                m_pActionSetupProject;          /**< shows setup project dialog */
+    QAction*                m_pActionRecordFile;            /**< start recording action */
+    QAction*                m_pActionSqdCtrl;               /**< show squid control */
+    QAction*                m_pActionUpdateFiffInfo;        /**< Update Fiff Info action */
+    QAction*                m_pActionUpdateFiffInfoForHPI;  /**< Update HPI info into Fiff Info action */
 
 signals:
     //=========================================================================================================
