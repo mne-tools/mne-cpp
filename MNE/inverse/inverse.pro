@@ -112,7 +112,8 @@ SOURCES += \
     rapMusic/dipole.cpp \
     dipoleFit/dipole_fit_settings.cpp \
     dipoleFit/dipole_fit.cpp \
-    dipoleFit/mne_sss_data.cpp
+    dipoleFit/mne_sss_data.cpp \
+    dipoleFit/mne_mne_data.cpp
 
 HEADERS +=\
     inverse_global.h \
@@ -138,7 +139,8 @@ HEADERS +=\
     dipoleFit/dipole_fit_settings.h \
     dipoleFit/dipole_fit.h \
     dipoleFit/dipolefit_helpers.h \
-    dipoleFit/mne_sss_data.h
+    dipoleFit/mne_sss_data.h \
+    dipoleFit/mne_mne_data.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
