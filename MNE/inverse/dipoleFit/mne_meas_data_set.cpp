@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     mne_mne_data.cpp
+* @file     mne_meas_data_set.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the MNE Mne Data (MneMneData) Class.
+* @brief    Implementation of the MNE Meas Data Set (MneMeasDataSet) Class.
 *
 */
 
@@ -39,7 +39,10 @@
 // INCLUDES
 //=============================================================================================================
 
+#include "mne_meas_data_set.h"
 #include "mne_mne_data.h"
+
+#include <fiff/fiff_file.h>
 
 
 //*************************************************************************************************************
@@ -49,19 +52,21 @@
 
 using namespace Eigen;
 using namespace INVERSELIB;
+using namespace FIFFLIB;
 
 
 
-#define FREE_7(x) if ((char *)(x) != NULL) free((char *)(x))
 
-#define FREE_CMATRIX_7(m) mne_free_cmatrix_7((m))
+#define FREE_8(x) if ((char *)(x) != NULL) free((char *)(x))
+
+#define FREE_CMATRIX_8(m) mne_free_cmatrix_8((m))
 
 
-void mne_free_cmatrix_7 (float **m)
+void mne_free_cmatrix_8 (float **m)
 {
     if (m) {
-        FREE_7(*m);
-        FREE_7(m);
+        FREE_8(*m);
+        FREE_8(m);
     }
 }
 
@@ -72,12 +77,21 @@ void mne_free_cmatrix_7 (float **m)
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MneMneData::MneMneData()
-: datap(NULL)
-, predicted(NULL)
-, SNR(NULL)
-, lambda2_est(NULL)
-, lambda2(NULL)
+MneMeasDataSet::MneMeasDataSet()
+:data(NULL)
+,data_filt(NULL)
+,data_proj(NULL)
+,data_white(NULL)
+,stim14(NULL)
+,first(0)
+,np(0)
+,nave(1)
+,kind(FIFFV_ASPECT_AVERAGE)
+,comment(NULL)
+,baselines(NULL)
+,mne(NULL)
+,user_data(NULL)
+,user_data_free(NULL)
 {
 
 }
@@ -85,12 +99,17 @@ MneMneData::MneMneData()
 
 //*************************************************************************************************************
 
-MneMneData::~MneMneData()
+MneMeasDataSet::~MneMeasDataSet()
 {
-    FREE_CMATRIX_7(this->datap);
-    FREE_CMATRIX_7(this->predicted);
-
-    FREE_7(this->SNR);
-    FREE_7(this->lambda2_est);
-    FREE_7(this->lambda2);
+    FREE_CMATRIX_8(data);
+    FREE_CMATRIX_8(data_proj);
+    FREE_CMATRIX_8(data_filt);
+    FREE_CMATRIX_8(data_white);
+    FREE_8(stim14);
+    FREE_8(comment);
+    FREE_8(baselines);
+    if(mne)
+        delete mne;
+    if (user_data && user_data_free)
+        user_data_free(user_data);
 }

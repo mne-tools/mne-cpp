@@ -58,6 +58,7 @@
 
 #include <fiff/fiff_types.h>
 #include "fwd_coil_set.h"
+#include "mne_meas_data.h"
 
 
 
@@ -168,11 +169,11 @@ typedef struct {		                     /* The digitizer data will be loaded from
 } *digitizerData,digitizerDataRec;
 
 typedef struct {
-  char          *meas_file;	                     /* The measurement file */
-  char          *inv_file;			     /* Inverse operator file */
-  char          *mri_trans_file;		     /* Where does the MRI transform come from */
-  int           nave;			             /* If nave < 0 use nave from the measurement data? */
-  mneMeasData   meas;		                     /* The measurement */
+  char          *meas_file;                     /* The measurement file */
+  char          *inv_file;                      /* Inverse operator file */
+  char          *mri_trans_file;                /* Where does the MRI transform come from */
+  int           nave;                           /* If nave < 0 use nave from the measurement data? */
+  INVERSELIB::MneMeasData*  meas;               /* The measurement */
   float         raw_tmin,raw_tmax;		     /* Time range for raw data segments */
   int           sample;				     /* Which channel is the sample */
   int           firstp;		                     /* First data point in the current time range selection */

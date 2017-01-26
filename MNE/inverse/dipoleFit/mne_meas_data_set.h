@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     mne_mne_data.h
+* @file     mne_meas_data_set.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    MNE MNE Data (MneMneData) class declaration.
+* @brief    MNE Meas Data Set (MneMeasDataSet) class declaration.
 *
 */
 
-#ifndef MNEMNEDATA_H
-#define MNEMNEDATA_H
+#ifndef MNEMEASDATASET_H
+#define MNEMEASDATASET_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -61,6 +61,9 @@
 #include <QDebug>
 
 
+typedef void (*mneUserFreeFuncTmp_1)(void *);  /* General purpose */
+
+
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE NAMESPACE INVERSELIB
@@ -69,47 +72,83 @@
 namespace INVERSELIB
 {
 
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+class MneMneData;
+
 
 //=============================================================================================================
 /**
-* Implements MNE Mne Data (Replaces *mneMneData,mneMneDataRec; struct of MNE-C mne_types.h).
+* Implements MNE Meas Data Set (Replaces *mneMeasDataSet,mneMeasDataSetRec; struct of MNE-C mne_types.h).
 *
-* @brief Data associated with MNE computations for each mneMeasDataSet
+* @brief One data set, used in mneMeasData
 */
-class INVERSESHARED_EXPORT MneMneData
+class INVERSESHARED_EXPORT MneMeasDataSet
 {
 public:
-    typedef QSharedPointer<MneMneData> SPtr;              /**< Shared pointer type for MneMneData. */
-    typedef QSharedPointer<const MneMneData> ConstSPtr;   /**< Const shared pointer type for MneMneData. */
+    typedef QSharedPointer<MneMeasDataSet> SPtr;              /**< Shared pointer type for MneMeasDataSet. */
+    typedef QSharedPointer<const MneMeasDataSet> ConstSPtr;   /**< Const shared pointer type for MneMeasDataSet. */
 
     //=========================================================================================================
     /**
-    * Constructs the MNE Mne Data
+    * Constructs the MNE Meas Data Set
+    * Refactored: mne_new_meas_data_set (mne_read_data.c)
     */
-    MneMneData();
+    MneMeasDataSet();
 
     //=========================================================================================================
     /**
-    * Destroys the MNE Mne Data description
-    * Refactored: mne_free_mne_data (mne_inverse_util.c)
+    * Destroys the MNE Meas Data Set description
+    * Refactored: mne_free_meas_data_set (mne_read_data.c)
     */
-    ~MneMneData();
+    ~MneMeasDataSet();
 
 public:
-    float **datap;          /* Projection of the whitened data onto the field eigenvectors */
-    float **predicted;      /* The predicted data */
-    float *SNR;             /* Estimated power SNR as a function of time */
-    float *lambda2_est;     /* Regularization parameter estimated from available data */
-    float *lambda2;         /* Regularization parameter to be used (as a function of time) */
+    /*
+    * These are unique to each data set
+    */
+    char            *comment;       /* Comment associated with these data */
+    float           **data;         /* The measured data */
+    float           **data_proj;    /* Some programs maybe interested in keeping the data after SSP separately */
+    float           **data_filt;    /* Some programs maybe interested in putting a filtered version here */
+    float           **data_white;   /* The whitened data */
+    float           *stim14;        /* Data from the digital stimulus channel */
+    int             first;          /* First sample index for raw data processing */
+    int             np;             /* Number of times */
+    int             nave;           /* Number of averaged responses */
+    int             kind;           /* Which aspect of data */
+    float           tmin;           /* Starting time */
+    float           tstep;          /* Time step */
+    float           *baselines;     /* Baseline values currently applied to the data */
+    MneMneData*     mne;            /* These are the data associated with MNE computations */
+    void            *user_data;     /* Anything else we want */
+    mneUserFreeFuncTmp_1 user_data_free; /* Function to set the above free */
 
 // ### OLD STRUCT ###
-//typedef struct {        /* Data associated with MNE computations for each mneMeasDataSet */
-//    float **datap;          /* Projection of the whitened data onto the field eigenvectors */
-//    float **predicted;      /* The predicted data */
-//    float *SNR;             /* Estimated power SNR as a function of time */
-//    float *lambda2_est;     /* Regularization parameter estimated from available data */
-//    float *lambda2;             /* Regularization parameter to be used (as a function of time) */
-//} *mneMneData,mneMneDataRec;
+//typedef struct {		 /* One data set, used in mneMeasData */
+//    /*
+//    * These are unique to each data set
+//    */
+//    char            *comment;       /* Comment associated with these data */
+//    float           **data;         /* The measured data */
+//    float           **data_proj;    /* Some programs maybe interested in keeping the data after SSP separately */
+//    float           **data_filt;    /* Some programs maybe interested in putting a filtered version here */
+//    float           **data_white;   /* The whitened data */
+//    float           *stim14;        /* Data from the digital stimulus channel */
+//    int             first;          /* First sample index for raw data processing */
+//    int             np;             /* Number of times */
+//    int             nave;           /* Number of averaged responses */
+//    int             kind;           /* Which aspect of data */
+//    float           tmin;           /* Starting time */
+//    float           tstep;          /* Time step */
+//    float           *baselines;     /* Baseline values currently applied to the data */
+//    INVERSELIB::MneMneData*   mne;  /* These are the data associated with MNE computations */
+//    void            *user_data;     /* Anything else we want */
+//    mneUserFreeFunc user_data_free; /* Function to set the above free */
+//} *mneMeasDataSet,mneMeasDataSetRec;
 };
 
 //*************************************************************************************************************
@@ -119,4 +158,4 @@ public:
 
 } // NAMESPACE INVERSELIB
 
-#endif // MNEMNEDATA_H
+#endif // MNEMEASDATASET_H
