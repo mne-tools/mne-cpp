@@ -9,6 +9,7 @@
 
 #include "ecd_set.h"
 #include "mne_sss_data.h"
+#include "mne_meas_data_set.h"
 #include <iostream>
 #include <vector>
 #include <Eigen/Core>
@@ -2776,12 +2777,6 @@ out : {
 
 
 //============================= mne_named_matrix.c =============================
-
-#define TAG_FREE(x) if (x) {\
-    free(x->data);\
-    free(x);\
-    }
-
 
 void mne_free_name_list(char **list, int nlist)
 /*
@@ -13465,7 +13460,7 @@ bad : {
 
 //============================= mne_apply_baselines.c =============================
 
-void mne_adjust_baselines(mneMeasData meas, float bmin, float bmax)
+void mne_adjust_baselines(MneMeasData* meas, float bmin, float bmax)
 /*
       * Change the baseline setting in the current data set
       */
@@ -14423,33 +14418,6 @@ out : {
 }
 
 
-
-//============================= mne_events.c =============================
-
-void mne_free_event(mneEvent e)
-{
-    if (!e)
-        return;
-    FREE(e->comment);
-    FREE(e);
-    return;
-}
-
-
-void mne_free_event_list(mneEventList list)
-
-{
-    int k;
-    if (!list)
-        return;
-    for (k = 0; k < list->nevent; k++)
-        mne_free_event(list->events[k]);
-    FREE(list->events);
-    FREE(list);
-    return;
-}
-
-
 //============================= mne_derivations.c =============================
 
 void mne_free_deriv(mneDeriv d)
@@ -14516,6 +14484,31 @@ out : {
 
 
 
+//============================= mne_events.c =============================
+
+
+void mne_free_event(mneEvent e)
+{
+    if (!e)
+        return;
+    FREE(e->comment);
+    FREE(e);
+    return;
+}
+
+
+void mne_free_event_list(mneEventList list)
+
+{
+    int k;
+    if (!list)
+        return;
+    for (k = 0; k < list->nevent; k++)
+        mne_free_event(list->events[k]);
+    FREE(list->events);
+    FREE(list);
+    return;
+}
 
 
 
@@ -15632,31 +15625,6 @@ mneRawData mne_raw_open_file(char *name, int omit_skip, int allow_maxshield, mne
     return mne_raw_open_file_comp(name,omit_skip,allow_maxshield,filter,-1);
 }
 
-
-//============================= mne_inverse_util.c =============================
-
-void mne_free_mne_data(mneMneData m)
-
-{
-    if (!m)
-        return;
-
-    FREE_CMATRIX(m->datap);
-    FREE_CMATRIX(m->predicted);
-
-    FREE(m->SNR);
-    FREE(m->lambda2_est);
-    FREE(m->lambda2);
-
-    FREE(m);
-
-    return;
-}
-
-
-
-
-
 //============================= mne_ch_selections.c =============================
 
 /*
@@ -15678,23 +15646,6 @@ static mneChSelection new_ch_selection()
     newsel->nchan   = 0;
     newsel->kind    = MNE_CH_SELECTION_UNKNOWN;
     return newsel;
-}
-
-
-void mne_ch_selection_free(mneChSelection s)
-
-{
-    if (!s)
-        return;
-    FREE(s->name);
-    FREE(s->pick);
-    FREE(s->pick_deriv);
-    FREE(s->ch_kind);
-    mne_free_name_list(s->chspick,s->nchan);
-    mne_free_name_list(s->chspick_nospace,s->nchan);
-    mne_free_name_list(s->chdef,s->ndef);
-    FREE(s);
-    return;
 }
 
 
@@ -15916,114 +15867,14 @@ int mne_ch_selection_assign_chs_info(mneChSelection sel,
 
 //============================= mne_read_data.c =============================
 
-mneMeasDataSet mne_new_meas_data_set()
 
-{
-    mneMeasDataSet s = MALLOC(1,mneMeasDataSetRec);
-
-    s->data        = NULL;
-    s->data_filt   = NULL;
-    s->data_proj   = NULL;
-    s->data_white  = NULL;
-    s->stim14      = NULL;
-    s->first       = 0;
-    s->np          = 0;
-    s->nave        = 1;
-    s->kind        = FIFFV_ASPECT_AVERAGE;
-    s->comment     = NULL;
-    s->baselines   = NULL;
-    s->mne         = NULL;
-    s->user_data   = NULL;
-    s->user_data_free = NULL;
-    return s;
-}
-
-void mne_free_meas_data_set(mneMeasDataSet s)
-
-{
-    if (!s)
-        return;
-    FREE_CMATRIX(s->data);
-    FREE_CMATRIX(s->data_proj);
-    FREE_CMATRIX(s->data_filt);
-    FREE_CMATRIX(s->data_white);
-    FREE(s->stim14);
-    FREE(s->comment);
-    FREE(s->baselines);
-    mne_free_mne_data(s->mne);
-    if (s->user_data && s->user_data_free)
-        s->user_data_free(s->user_data);
-    FREE(s);
-    return;
-}
-
-mneMeasData mne_new_meas_data()
-
-{
-    mneMeasData m = MALLOC(1,mneMeasDataRec);
-    m->filename   = NULL;
-    m->meas_id    = NULL;
-    m->meas_date.secs = 0;
-    m->meas_date.usecs = 0;
-    m->current    = NULL;
-    m->ch_major   = FALSE;
-    m->sets       = NULL;
-    m->nset       = 0;
-    m->nchan      = 0;
-    m->op         = NULL;
-    m->fwd        = NULL;
-    m->meg_head_t = NULL;
-    m->mri_head_t = NULL;
-    m->chs        = NULL;
-    m->proj       = NULL;
-    m->comp       = NULL;
-    m->raw        = NULL;
-    m->chsel      = NULL;
-    m->bad        = NULL;
-    m->nbad       = 0;
-    m->badlist    = NULL;
-    return m;
-}
-
-
-void mne_free_meas_data(mneMeasData m)
-/*
-      * NOTE: The inverse operator attached must be free'd separately
-      */
-{
-    int k;
-
-    if (!m)
-        return;
-    FREE(m->filename);
-    FREE(m->meas_id);
-    FREE(m->chs);
-    FREE(m->meg_head_t);
-    FREE(m->mri_head_t);
-    mne_free_proj_op(m->proj);
-    mne_free_ctf_comp_data_set(m->comp);
-    FREE(m->bad);
-    mne_free_name_list(m->badlist,m->nbad);
-
-    for (k = 0; k < m->nset; k++)
-        mne_free_meas_data_set(m->sets[k]);
-    FREE(m->sets);
-
-    mne_raw_free_data(m->raw);
-    mne_ch_selection_free(m->chsel);
-
-    FREE(m);
-    return;
-}
-
-
-mneMeasData mne_read_meas_data_add(const QString&       name,       /* Name of the measurement file */
+MneMeasData* mne_read_meas_data_add(const QString&       name,       /* Name of the measurement file */
                                    int                  set,        /* Which data set */
                                    mneInverseOperator   op,         /* For consistency checks */
                                    mneNamedMatrix       fwd,        /* Another option for consistency checks */
                                    char                 **namesp,   /* Yet another option: explicit name list */
                                    int                  nnamesp,
-                                   mneMeasData          add_to)     /* Add to this */
+                                   MneMeasData*          add_to)     /* Add to this */
 /*
       * Read an evoked-response data file
       */
@@ -16058,9 +15909,9 @@ mneMeasData mne_read_meas_data_add(const QString&       name,       /* Name of t
    */
     float       *source,tmin,tmax;
     int         k,p,c,np,n1,n2;
-    mneMeasData    res = NULL;
-    mneMeasData    new_data = add_to;
-    mneMeasDataSet dataset = NULL;
+    MneMeasData*    res = NULL;
+    MneMeasData*    new_data = add_to;
+    MneMeasDataSet* dataset = NULL;
 
     stim14_name = getenv(MNE_ENV_TRIGGER_CH);
     if (!stim14_name || strlen(stim14_name) == 0)
@@ -16154,7 +16005,7 @@ mneMeasData mne_read_meas_data_add(const QString&       name,       /* Name of t
    * Just put it together
    */
     if (!new_data) {			/* We need a new meas data structure */
-        new_data     = mne_new_meas_data();
+        new_data     = new MneMeasData;
         new_data->filename  = mne_strdup(name.toLatin1().data());
         new_data->meas_id   = id; id = NULL;
         /*
@@ -16240,7 +16091,7 @@ mneMeasData mne_read_meas_data_add(const QString&       name,       /* Name of t
     /*
    * New data set is created anyway
    */
-    dataset = mne_new_meas_data_set();
+    dataset = new MneMeasDataSet;
     dataset->tmin      = tmin;
     dataset->tstep     = 1.0/sfreq;
     dataset->first     = n1;
@@ -16271,8 +16122,8 @@ mneMeasData mne_read_meas_data_add(const QString&       name,       /* Name of t
         for (p = 0; p < np; p++) 	/* Copy the data and correct for the possible non-unit calibration */
             dataset->stim14[p] = source[p+n1]/chs[stim14].cal;
     }
-    new_data->sets    = REALLOC(new_data->sets,new_data->nset+1,mneMeasDataSet);
-    new_data->sets[new_data->nset++] = dataset; dataset = NULL;
+    new_data->sets.append(dataset); dataset = NULL;
+    new_data->nset++;
     if (!add_to)
         new_data->current = new_data->sets[0];
     res = new_data;
@@ -16288,7 +16139,7 @@ out : {
         FREE(t);
         FREE(id);
         if (res == NULL && !add_to)
-            mne_free_meas_data(new_data);
+            delete new_data;
         if (add_to)
             mne_free_name_list(names,nchan);
         return res;
@@ -16296,7 +16147,7 @@ out : {
 }
 
 
-mneMeasData mne_read_meas_data(const QString&       name,       /* Name of the measurement file */
+MneMeasData* mne_read_meas_data(const QString&       name,       /* Name of the measurement file */
                                int                  set,        /* Which data set */
                                mneInverseOperator   op,         /* For consistency checks */
                                mneNamedMatrix       fwd,        /* Another option for consistency checks */

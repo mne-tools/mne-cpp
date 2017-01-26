@@ -113,6 +113,7 @@
 #include <fiff/fiff_stream.h>
 #include "mne_sss_data.h"
 
+
 #if defined(__cplusplus) 
 extern "C" {
 #endif
@@ -668,68 +669,68 @@ typedef struct {			/* A comprehensive raw data structure */
   mneUserFreeFunc  user_free;		/* How this is freed */
 } *mneRawData,mneRawDataRec;		
 
-typedef struct {		 /* Data associated with MNE computations for each mneMeasDataSet */
-  float **datap;		 /* Projection of the whitened data onto the field eigenvectors */
-  float **predicted;		 /* The predicted data */
-  float *SNR;			 /* Estimated power SNR as a function of time */
-  float *lambda2_est;		 /* Regularization parameter estimated from available data */
-  float *lambda2;                /* Regularization parameter to be used (as a function of time) */      
-} *mneMneData,mneMneDataRec;
+//typedef struct {		 /* Data associated with MNE computations for each mneMeasDataSet */
+//  float **datap;		 /* Projection of the whitened data onto the field eigenvectors */
+//  float **predicted;		 /* The predicted data */
+//  float *SNR;			 /* Estimated power SNR as a function of time */
+//  float *lambda2_est;		 /* Regularization parameter estimated from available data */
+//  float *lambda2;                /* Regularization parameter to be used (as a function of time) */
+//} *mneMneData,mneMneDataRec;
 
-typedef struct {		 /* One data set, used in mneMeasData */
-  /*
-   * These are unique to each data set
-   */ 
-  char            *comment;	 /* Comment associated with these data */
-  float           **data;	 /* The measured data */
-  float           **data_proj;	 /* Some programs maybe interested in keeping the data after SSP separately */
-  float           **data_filt;	 /* Some programs maybe interested in putting a filtered version here */
-  float           **data_white;	 /* The whitened data */
-  float           *stim14;	 /* Data from the digital stimulus channel */
-  int             first;	 /* First sample index for raw data processing */
-  int             np;		 /* Number of times */
-  int             nave;		 /* Number of averaged responses */
-  int             kind;		 /* Which aspect of data */
-  float           tmin;		 /* Starting time */
-  float           tstep;	 /* Time step */
-  float           *baselines;	 /* Baseline values currently applied to the data */
-  mneMneData      mne;		 /* These are the data associated with MNE computations */
-  void            *user_data;    /* Anything else we want */
-  mneUserFreeFunc user_data_free;/* Function to set the above free */
-} *mneMeasDataSet,mneMeasDataSetRec;
+//typedef struct {		 /* One data set, used in mneMeasData */
+//  /*
+//   * These are unique to each data set
+//   */
+//  char            *comment;	 /* Comment associated with these data */
+//  float           **data;	 /* The measured data */
+//  float           **data_proj;	 /* Some programs maybe interested in keeping the data after SSP separately */
+//  float           **data_filt;	 /* Some programs maybe interested in putting a filtered version here */
+//  float           **data_white;	 /* The whitened data */
+//  float           *stim14;	 /* Data from the digital stimulus channel */
+//  int             first;	 /* First sample index for raw data processing */
+//  int             np;		 /* Number of times */
+//  int             nave;		 /* Number of averaged responses */
+//  int             kind;		 /* Which aspect of data */
+//  float           tmin;		 /* Starting time */
+//  float           tstep;	 /* Time step */
+//  float           *baselines;	 /* Baseline values currently applied to the data */
+//  INVERSELIB::MneMneData*   mne;    /* These are the data associated with MNE computations */
+//  void            *user_data;    /* Anything else we want */
+//  mneUserFreeFunc user_data_free;/* Function to set the above free */
+//} *mneMeasDataSet,mneMeasDataSetRec;
 
-typedef struct {		 /* Measurement data representation in MNE calculations */
-  /*
-   * These are common to all data sets
-   */
-  char               *filename;	 /* The source file name */
-  FIFFLIB::fiffId             meas_id;	 /* The id from the measurement file */
-  FIFFLIB::fiffTimeRec        meas_date;	 /* The measurement date from the file */
-  FIFFLIB::fiffChInfo         chs;	 /* The channel information */
-  FIFFLIB::fiffCoordTrans     meg_head_t; /* MEG device <-> head coordinate transformation */
-  FIFFLIB::fiffCoordTrans     mri_head_t; /* MRI device <-> head coordinate transformation
-				    (duplicated from the inverse operator or loaded separately) */
-  float              sfreq;	 /* Sampling frequency */
-  int                nchan;	 /* Number of channels */
-  float              highpass;	 /* Highpass filter setting */ 
-  float              lowpass;	 /* Lowpass filter setting */ 
-  mneProjOp          proj;	 /* Associated projection operator (useful if inverse operator is not included) */
-  mneCTFcompDataSet  comp;	 /* The software gradient compensation data */
-  mneInverseOperator op;	 /* Associated inverse operator */
-  mneNamedMatrix     fwd;	 /* Forward operator for dipole fitting */
-  mneRawData         raw;	 /* This will be non-null if the data stems from a raw data file */
-  mneChSelection     chsel;	 /* Channel selection for raw data */
-  char               **badlist;	 /* Bad channel names */
-  int                nbad;	 /* How many? */
-  int                *bad;	 /* Which channels are bad? */
-  /*
-   * These are the data sets loaded
-   */
-  int                ch_major;	 /* Rows are channels rather than times */
-  mneMeasDataSet     *sets;	 /* All loaded data sets */
-  int                nset;	 /* How many */
-  mneMeasDataSet     current;	 /* Which is the current one */
-} *mneMeasData,mneMeasDataRec;
+//typedef struct {		 /* Measurement data representation in MNE calculations */
+//  /*
+//   * These are common to all data sets
+//   */
+//  char               *filename;	 /* The source file name */
+//  FIFFLIB::fiffId             meas_id;	 /* The id from the measurement file */
+//  FIFFLIB::fiffTimeRec        meas_date;	 /* The measurement date from the file */
+//  FIFFLIB::fiffChInfo         chs;	 /* The channel information */
+//  FIFFLIB::fiffCoordTrans     meg_head_t; /* MEG device <-> head coordinate transformation */
+//  FIFFLIB::fiffCoordTrans     mri_head_t; /* MRI device <-> head coordinate transformation
+//				    (duplicated from the inverse operator or loaded separately) */
+//  float              sfreq;	 /* Sampling frequency */
+//  int                nchan;	 /* Number of channels */
+//  float              highpass;	 /* Highpass filter setting */
+//  float              lowpass;	 /* Lowpass filter setting */
+//  mneProjOp          proj;	 /* Associated projection operator (useful if inverse operator is not included) */
+//  mneCTFcompDataSet  comp;	 /* The software gradient compensation data */
+//  mneInverseOperator op;	 /* Associated inverse operator */
+//  mneNamedMatrix     fwd;	 /* Forward operator for dipole fitting */
+//  mneRawData         raw;	 /* This will be non-null if the data stems from a raw data file */
+//  mneChSelection     chsel;	 /* Channel selection for raw data */
+//  char               **badlist;	 /* Bad channel names */
+//  int                nbad;	 /* How many? */
+//  int                *bad;	 /* Which channels are bad? */
+//  /*
+//   * These are the data sets loaded
+//   */
+//  int                ch_major;	 /* Rows are channels rather than times */
+//  INVERSELIB::MneMeasDataSet*     *sets;	 /* All loaded data sets */
+//  int                nset;	 /* How many */
+//  INVERSELIB::MneMeasDataSet*     current;	 /* Which is the current one */
+//} *mneMeasData,mneMeasDataRec;
 
 
 //typedef struct {		/* Identifier for the automatic parcellation */

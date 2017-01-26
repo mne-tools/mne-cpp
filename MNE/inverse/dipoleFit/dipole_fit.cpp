@@ -66,7 +66,7 @@ ECDSet DipoleFit::calculateFit() const
     ECDSet              set;
     FwdEegSphereModel*  eeg_model = NULL;
     DipoleFitData*      fit_data = NULL;
-    mneMeasData         data     = NULL;
+    MneMeasData*        data     = NULL;
     mneRawData          raw      = NULL;
     mneChSelection      sel      = NULL;
 
@@ -178,7 +178,7 @@ out : {
 
 //*************************************************************************************************************
 
-int DipoleFit::fit_dipoles( const QString& dataname, mneMeasData data, DipoleFitData* fit, GuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose, ECDSet& p_set)
+int DipoleFit::fit_dipoles( const QString& dataname, MneMeasData* data, DipoleFitData* fit, GuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose, ECDSet& p_set)
 {
     float *one = MALLOC(data->nchan,float);
     float time;
