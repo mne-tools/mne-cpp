@@ -94,28 +94,13 @@ void mne_free_name_list_9(char **list, int nlist)
 }
 
 
-void mne_free_named_matrix_9(mneNamedMatrix mat)
-/*
-      * Free the matrix and all the data from within
-      */
-{
-
-    if (!mat)
-        return;
-    mne_free_name_list_9(mat->rowlist,mat->nrow);
-    mne_free_name_list_9(mat->collist,mat->ncol);
-    FREE_CMATRIX_9(mat->data);
-    FREE_9(mat);
-    return;
-}
-
 void mne_free_proj_op_item_9(mneProjItem it)
 
 {
     if (it == NULL)
         return;
-
-    mne_free_named_matrix_9(it->vecs);
+    if(it->vecs)
+        delete it->vecs;
     FREE_9(it->desc);
     FREE_9(it);
     return;
@@ -177,7 +162,8 @@ void mne_free_ctf_comp_data_9(mneCTFcompData comp)
     if (!comp)
         return;
 
-    mne_free_named_matrix_9(comp->data);
+    if(comp->data)
+        delete comp->data;
     mne_free_sparse_9(comp->presel);
     mne_free_sparse_9(comp->postsel);
     FREE_9(comp->presel_data);

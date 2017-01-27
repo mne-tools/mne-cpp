@@ -112,6 +112,7 @@
 #include <fiff/fiff_types.h>
 #include <fiff/fiff_stream.h>
 #include "mne_sss_data.h"
+#include "mne_named_matrix.h"
 
 
 #if defined(__cplusplus) 
@@ -275,13 +276,13 @@ typedef mneSurfaceOrVolumeRec mneSurfaceRec;
 //  mneUserFreeFunc  user_data_free;  /* Function to set the above free */
 //} *mneSurfacePatch,mneSurfacePatchRec;
 
-typedef struct {		/* Matrix specification with a channel list */
-  int   nrow;			/* Number of rows */
-  int   ncol;			/* Number of columns */
-  char  **rowlist;		/* Name list for the rows (may be NULL) */
-  char  **collist;		/* Name list for the columns (may be NULL) */
-  float **data;                  /* The data itself (dense) */
-} *mneNamedMatrix,mneNamedMatrixRec;
+//typedef struct {		/* Matrix specification with a channel list */
+//  int   nrow;			/* Number of rows */
+//  int   ncol;			/* Number of columns */
+//  char  **rowlist;		/* Name list for the rows (may be NULL) */
+//  char  **collist;		/* Name list for the columns (may be NULL) */
+//  float **data;                  /* The data itself (dense) */
+//} *mneNamedMatrix,mneNamedMatrixRec;
 
 typedef struct {		/* Matrix specification with a channel list */
   int   nrow;			/* Number of rows (same as in data) */
@@ -298,7 +299,7 @@ typedef struct {		/* Vector specification with a channel list */
 } *mneNamedVector,mneNamedVectorRec;
 
 typedef struct {		/* One linear projection item */
-  mneNamedMatrix vecs;          /* The original projection vectors */
+  INVERSELIB::MneNamedMatrix* vecs;          /* The original projection vectors */
   int            nvec;          /* Number of vectors = vecs->nrow */
   char           *desc;	        /* Projection item description */
   int            kind;          /* Projection item kind */
@@ -410,9 +411,9 @@ typedef struct {		          /* An inverse operator */
   mneCovMatrix   depth_prior;	          /* Depth-weighting prior applied */
   mneCovMatrix   fMRI_prior;	          /* fMRI prior applied */
   float          *sing;		          /* Singular values of the inverse operator */
-  mneNamedMatrix eigen_leads;	          /* The eigen leadfields */
+  INVERSELIB::MneNamedMatrix* eigen_leads;	          /* The eigen leadfields */
   int            eigen_leads_weighted;    /* Have the above been already weighted with R^0.5? */
-  mneNamedMatrix eigen_fields;	          /* Associated field patterns */
+  INVERSELIB::MneNamedMatrix* eigen_fields;	          /* Associated field patterns */
   float          trace_ratio;	          /* tr(GRG^T)/tr(C) */
   mneProjOp      proj;		          /* The associated projection operator */
 } *mneInverseOperator,mneInverseOperatorRec;
@@ -591,7 +592,7 @@ typedef struct {
   int             kind;		     /* The compensation kind (CTF) */
   int             mne_kind;	     /* Our kind */
   int             calibrated;	     /* Are the coefficients in the file calibrated already? */
-  mneNamedMatrix  data;	             /* The compensation data */
+  INVERSELIB::MneNamedMatrix*  data;	             /* The compensation data */
   mneSparseMatrix presel;            /* Apply this selector prior to compensation */
   mneSparseMatrix postsel;	     /* Apply this selector after compensation */
   float           *presel_data;	     /* These are used for the intermediate results in the calculations */

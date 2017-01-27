@@ -2792,8 +2792,6 @@ void mne_free_name_list(char **list, int nlist)
 }
 
 
-
-
 void mne_free_sparse_named_matrix(mneSparseNamedMatrix mat)
 /*
       * Free the matrix and all the data from within
@@ -2812,23 +2810,7 @@ void mne_free_sparse_named_matrix(mneSparseNamedMatrix mat)
 /*
  * Handle matrices whose rows and/or columns are named with a list
  */
-mneNamedMatrix mne_build_named_matrix(int  nrow,        /* Number of rows */
-                                      int  ncol,        /* Number of columns */
-                                      char **rowlist,   /* List of row (channel) names */
-                                      char **collist,   /* List of column (channel) names */
-                                      float **data)
-/*
-      * Build a named matrix from the ingredients
-      */
-{
-    mneNamedMatrix mat = MALLOC(1,mneNamedMatrixRec);
-    mat->nrow    = nrow;
-    mat->ncol    = ncol;
-    mat->rowlist = rowlist;
-    mat->collist = collist;
-    mat->data    = data;
-    return mat;
-}
+
 
 
 int mne_name_list_match(char **list1, int nlist1,
@@ -2851,22 +2833,6 @@ int mne_name_list_match(char **list1, int nlist1,
 }
 
 
-void mne_free_named_matrix(mneNamedMatrix mat)
-/*
-      * Free the matrix and all the data from within
-      */
-{
-
-    if (!mat)
-        return;
-    mne_free_name_list(mat->rowlist,mat->nrow);
-    mne_free_name_list(mat->collist,mat->ncol);
-    FREE_CMATRIX(mat->data);
-    FREE(mat);
-    return;
-}
-
-
 char **mne_dup_name_list(char **list, int nlist)
 /*
  * Duplicate a name list
@@ -2882,24 +2848,6 @@ char **mne_dup_name_list(char **list, int nlist)
         res[k] = mne_strdup(list[k]);
     return res;
 }
-
-
-mneNamedMatrix mne_dup_named_matrix(mneNamedMatrix mat)
-/*
- * Duplicate a named matrix
- */
-{
-    float **data = ALLOC_CMATRIX(mat->nrow,mat->ncol);
-    int   j,k;
-
-    for (j = 0; j < mat->nrow; j++)
-        for (k = 0; k < mat->ncol; k++)
-            data[j][k] = mat->data[j][k];
-    return mne_build_named_matrix(mat->nrow,mat->ncol,
-                                  mne_dup_name_list(mat->rowlist,mat->nrow),
-                                  mne_dup_name_list(mat->collist,mat->ncol),data);
-}
-
 
 void mne_string_to_name_list(char *s,char ***listp,int *nlistp)
 /*
@@ -2983,225 +2931,7 @@ void mne_channel_names_to_name_list(fiffChInfo chs, int nch,
 }
 
 
-mneNamedMatrix mne_read_named_matrix(   FiffStream::SPtr& stream,
-                                        FiffDirNode::SPtr& node,int kind)
-/*
-* Read a named matrix from the specified node
-*/
-{
-    char **colnames = NULL;
-    char **rownames = NULL;
-    int  ncol = 0;
-    int  nrow = 0;
-    qint32 ndim;
-    QVector<qint32> dims;
-    float **data = NULL;
-    int  val;
-    char *s;
-    FiffTag::SPtr t_pTag;
-    int     k;
-    /*
-    * If the node is a named-matrix mode, use it.
-    * Otherwise, look in first-generation children
-    */
-    if (node->type == FIFFB_MNE_NAMED_MATRIX) {
-        if(!node->find_tag(stream, kind, t_pTag))
-            goto bad;
 
-        qint32 ndim;
-        QVector<qint32> dims;
-        t_pTag->getMatrixDimensions(ndim, dims);
-
-        if (ndim != 2) {
-            qCritical("mne_read_named_matrix only works with two-dimensional matrices");
-            goto bad;
-        }
-
-        MatrixXf tmp_data = t_pTag->toFloatMatrix().transpose();
-        data = ALLOC_CMATRIX(tmp_data.rows(),tmp_data.cols());
-        fromFloatEigenMatrix(tmp_data, data);
-    }
-    else {
-        for (k = 0; k < node->nchild; k++) {
-            if (node->children[k]->type == FIFFB_MNE_NAMED_MATRIX) {
-                if(node->children[k]->find_tag(stream, kind, t_pTag)) {
-                    t_pTag->getMatrixDimensions(ndim, dims);
-                    if (ndim != 2) {
-                        qCritical("mne_read_named_matrix only works with two-dimensional matrices");
-                        goto bad;
-                    }
-
-                    MatrixXf tmp_data = t_pTag->toFloatMatrix().transpose();
-                    data = ALLOC_CMATRIX(tmp_data.rows(),tmp_data.cols());
-                    fromFloatEigenMatrix(tmp_data, data);
-
-                    node = node->children[k];
-                    break;
-                }
-            }
-        }
-        if (!data)
-            goto bad;
-    }
-    /*
-    * Separate FIFF_MNE_NROW is now optional
-    */
-    if (!node->find_tag(stream, FIFF_MNE_NROW, t_pTag))
-        nrow = dims[0];
-    else {
-        nrow = *t_pTag->toInt();
-        if (nrow != dims[0]) {
-            qCritical("Number of rows in the FIFF_MNE_NROW tag and in the matrix data conflict.");
-            goto bad;
-        }
-    }
-    /*
-    * Separate FIFF_MNE_NCOL is now optional
-    */
-    if(!node->find_tag(stream, FIFF_MNE_NCOL, t_pTag))
-        ncol = dims[1];
-    else {
-        ncol = *t_pTag->toInt();
-        if (ncol != dims[1]) {
-            qCritical("Number of columns in the FIFF_MNE_NCOL tag and in the matrix data conflict.");
-            goto bad;
-        }
-    }
-    if(!node->find_tag(stream, FIFF_MNE_ROW_NAMES, t_pTag)) {
-        s = (char *)(t_pTag->data());
-        mne_string_to_name_list(s,&rownames,&val);
-        if (val != nrow) {
-            qCritical("Incorrect number of entries in the row name list");
-            nrow = val;
-            goto bad;
-        }
-    }
-    if(!node->find_tag(stream, FIFF_MNE_COL_NAMES, t_pTag)) {
-        s = (char *)(t_pTag->data());
-        mne_string_to_name_list(s,&colnames,&val);
-        if (val != ncol) {
-            qCritical("Incorrect number of entries in the column name list");
-            ncol = val;
-            goto bad;
-        }
-    }
-    return mne_build_named_matrix(nrow,ncol,rownames,colnames,data);
-
-bad : {
-        mne_free_name_list(rownames,nrow);
-        mne_free_name_list(colnames,ncol);
-        FREE_CMATRIX(data);
-        return NULL;
-    }
-}
-
-
-
-
-
-mneNamedMatrix mne_pick_from_named_matrix(mneNamedMatrix mat,
-                                          char           **pickrowlist,
-                                          int            picknrow,
-                                          char           **pickcollist,
-                                          int            pickncol)
-/*
-* Pick appropriate rows and columns and build a new matrix
-*/
-{
-    int *pick_row = NULL;
-    int *pick_col = NULL;
-    char **my_pickrowlist = NULL;
-    char **my_pickcollist = NULL;
-    float **pickdata = NULL;
-    float **data;
-    int   row,j,k;
-    char  *one;
-
-    if (pickcollist && !mat->collist) {
-        printf("Cannot pick columns: no names for columns in original.");
-        return NULL;
-    }
-    if (pickcollist && !mat->collist) {
-        printf("Cannot pick columns: no names for columns in original.");
-        return NULL;
-    }
-    if (!pickrowlist)
-        picknrow = mat->nrow;
-    if (!pickcollist)
-        pickncol = mat->ncol;
-    pick_row = MALLOC(picknrow,int);
-    pick_col = MALLOC(pickncol,int);
-    /*
-   * Decide what to pick
-   */
-    if (pickrowlist) {
-        for (j = 0; j < picknrow; j++) {
-            one = pickrowlist[j];
-            pick_row[j] = -1;
-            for (k = 0; k < mat->nrow; k++) {
-                if (strcmp(one,mat->rowlist[k]) == 0) {
-                    pick_row[j] = k;
-                    break;
-                }
-            }
-            if (pick_row[j] == -1) {
-                printf("Row called %s not found in original matrix",one);
-                goto bad;
-            }
-            my_pickrowlist = mne_dup_name_list(pickrowlist,picknrow);
-        }
-    }
-    else {
-        for (k = 0; k < picknrow; k++)
-            pick_row[k] = k;
-        my_pickrowlist = mne_dup_name_list(mat->rowlist,mat->nrow);
-    }
-    if (pickcollist) {
-        for (j = 0; j < pickncol; j++) {
-            one = pickcollist[j];
-            pick_col[j] = -1;
-            for (k = 0; k < mat->ncol; k++) {
-                if (strcmp(one,mat->collist[k]) == 0) {
-                    pick_col[j] = k;
-                    break;
-                }
-            }
-            if (pick_col[j] == -1) {
-                printf("Column called %s not found in original matrix",one);
-                goto bad;
-            }
-            my_pickcollist = mne_dup_name_list(pickcollist,pickncol);
-        }
-    }
-    else {
-        for (k = 0; k < pickncol; k++)
-            pick_col[k] = k;
-        my_pickcollist = mne_dup_name_list(mat->collist,mat->ncol);
-    }
-    /*
-    * Do the picking of the data accordingly
-    */
-    pickdata = ALLOC_CMATRIX(picknrow,pickncol);
-
-    data = mat->data;
-    for (j = 0; j < picknrow; j++) {
-        row = pick_row[j];
-        for (k = 0; k < pickncol; k++)
-            pickdata[j][k] = data[row][pick_col[k]];
-    }
-
-    FREE(pick_col);
-    FREE(pick_row);
-    return mne_build_named_matrix(picknrow,pickncol,my_pickrowlist,my_pickcollist,pickdata);
-
-bad : {
-        FREE(pick_col);
-        FREE(pick_row);
-        mne_free_name_list(my_pickrowlist,picknrow);
-        mne_free_name_list(my_pickcollist,pickncol);
-        return NULL;
-    }
-}
 
 
 //============================= mne_read_evoked.c =============================
@@ -4242,7 +3972,9 @@ void mne_free_proj_op_item(mneProjItem it)
     if (it == NULL)
         return;
 
-    mne_free_named_matrix(it->vecs);
+    if(it->vecs)
+        delete it->vecs;
+
     FREE(it->desc);
     FREE(it);
     return;
@@ -4268,7 +4000,7 @@ void mne_free_proj_op(mneProjOp op)
 }
 
 
-void mne_proj_op_add_item_act(mneProjOp op, mneNamedMatrix vecs, int kind, const char *desc, int is_active)
+void mne_proj_op_add_item_act(mneProjOp op, MneNamedMatrix* vecs, int kind, const char *desc, int is_active)
 /*
 * Add a new item to an existing projection operator
 */
@@ -4281,7 +4013,7 @@ void mne_proj_op_add_item_act(mneProjOp op, mneNamedMatrix vecs, int kind, const
     op->items[op->nitems] = new_item = mne_new_proj_op_item();
 
     new_item->active      = is_active;
-    new_item->vecs        = mne_dup_named_matrix(vecs);
+    new_item->vecs        = new MneNamedMatrix(*vecs);
 
     if (kind == FIFFV_MNE_PROJ_ITEM_EEG_AVREF) {
         new_item->has_meg = FALSE;
@@ -4315,7 +4047,7 @@ void mne_proj_op_add_item_act(mneProjOp op, mneNamedMatrix vecs, int kind, const
 }
 
 
-void mne_proj_op_add_item(mneProjOp op, mneNamedMatrix vecs, int kind, const char *desc)
+void mne_proj_op_add_item(mneProjOp op, MneNamedMatrix* vecs, int kind, const char *desc)
 
 {
     mne_proj_op_add_item_act(op, vecs, kind, desc, TRUE);
@@ -4389,7 +4121,7 @@ void mne_proj_op_report_data(FILE *out,const char *tag, mneProjOp op, int list_d
 {
     int j,k,p,q;
     mneProjItem it;
-    mneNamedMatrix vecs;
+    MneNamedMatrix* vecs;
     int found;
 
     if (out == NULL)
@@ -4955,7 +4687,7 @@ mneProjOp mne_proj_op_average_eeg_ref(fiffChInfo chs,
     int k;
     float       **vec_data;
     char        **names;
-    mneNamedMatrix vecs;
+    MneNamedMatrix* vecs;
     mneProjOp      op;
 
     for (k = 0; k < nch; k++)
@@ -4976,7 +4708,7 @@ mneProjOp mne_proj_op_average_eeg_ref(fiffChInfo chs,
     for (k = 0; k < eegcount; k++)
         vec_data[0][k] = 1.0/sqrt((double)eegcount);
 
-    vecs = mne_build_named_matrix(1,eegcount,NULL,names,vec_data);
+    vecs = MneNamedMatrix::build_named_matrix(1,eegcount,NULL,names,vec_data);
 
     op = mne_new_proj_op();
     mne_proj_op_add_item(op,vecs,FIFFV_MNE_PROJ_ITEM_EEG_AVREF,"Average EEG reference");
@@ -5007,7 +4739,7 @@ mneProjOp mne_read_proj_op_from_node(//fiffFile in,
     float       **item_vectors = NULL;
     int         item_nvec;
     int         item_active;
-    mneNamedMatrix item;
+    MneNamedMatrix* item;
     FiffTag::SPtr t_pTag;
 
     if (!stream) {
@@ -5123,9 +4855,9 @@ mneProjOp mne_read_proj_op_from_node(//fiffFile in,
         /*
         * Ready to add
         */
-        item = mne_build_named_matrix(item_nvec,item_nchan,NULL,item_names,item_vectors);
+        item = MneNamedMatrix::build_named_matrix(item_nvec,item_nchan,NULL,item_names,item_vectors);
         mne_proj_op_add_item_act(op,item,item_kind,item_desc,item_active);
-        mne_free_named_matrix(item);
+        delete item;
         op->items[op->nitems-1]->active_file = item_active;
     }
 
@@ -5218,7 +4950,8 @@ void mne_free_ctf_comp_data(mneCTFcompData comp)
     if (!comp)
         return;
 
-    mne_free_named_matrix(comp->data);
+    if(comp->data)
+        delete comp->data;
     mne_free_sparse(comp->presel);
     mne_free_sparse(comp->postsel);
     FREE(comp->presel_data);
@@ -5259,7 +4992,7 @@ mneCTFcompData mne_dup_ctf_comp_data(mneCTFcompData data)
     res->kind       = data->kind;
     res->mne_kind   = data->mne_kind;
     res->calibrated = data->calibrated;
-    res->data       = mne_dup_named_matrix(data->data);
+    res->data       = new MneNamedMatrix(*data->data);
 
     res->presel     = mne_dup_sparse_matrix(data->presel);
     res->postsel    = mne_dup_sparse_matrix(data->postsel);
@@ -5498,7 +5231,7 @@ mneCTFcompDataSet mne_read_ctf_comp_data(const QString& name)
     QList<FiffDirNode::SPtr> nodes;
     QList<FiffDirNode::SPtr> comps;
     int               ncomp;
-    mneNamedMatrix    mat = NULL;
+    MneNamedMatrix*    mat = NULL;
     int               kind,k;
     FiffTag::SPtr t_pTag;
     fiffChInfo        chs = NULL;
@@ -5546,7 +5279,7 @@ mneCTFcompDataSet mne_read_ctf_comp_data(const QString& name)
     * Read each data set
     */
     for (k = 0; k < ncomp; k++) {
-        mat = mne_read_named_matrix(stream,comps[k],FIFF_MNE_CTF_COMP_DATA);
+        mat = MneNamedMatrix::read_named_matrix(stream,comps[k],FIFF_MNE_CTF_COMP_DATA);
         if (!mat)
             goto bad;
         comps[k]->find_tag(stream, FIFF_MNE_CTF_COMP_KIND, t_pTag);
@@ -5585,7 +5318,8 @@ mneCTFcompDataSet mne_read_ctf_comp_data(const QString& name)
     goto good;
 
 bad : {
-        mne_free_named_matrix(mat);
+        if(mat)
+            delete mat;
         stream->close();
         mne_free_ctf_comp_data_set(set);
         return NULL;
@@ -5659,7 +5393,7 @@ int mne_make_ctf_comp(mneCTFcompDataSet set,        /* The available compensatio
 
     mneSparseMatrix presel  = NULL;
     mneSparseMatrix postsel = NULL;
-    mneNamedMatrix  data    = NULL;
+    MneNamedMatrix*  data    = NULL;
 
     if (!compchs) {
         compchs = chs;
@@ -5759,7 +5493,7 @@ int mne_make_ctf_comp(mneCTFcompDataSet set,        /* The available compensatio
         if (comps[k] != MNE_CTFV_COMP_NONE)
             names[p++] = chs[k].ch_name;
     }
-    if ((data = mne_pick_from_named_matrix(this_comp->data,names,need_comp,NULL,0)) == NULL)
+    if ((data = this_comp->data->pick_from_named_matrix(names,need_comp,NULL,0)) == NULL)
         goto bad;
     fprintf(stderr,"\tCompensation data matrix created.\n");
     /*
@@ -5798,7 +5532,8 @@ int mne_make_ctf_comp(mneCTFcompDataSet set,        /* The available compensatio
 bad : {
         mne_free_sparse(presel);
         mne_free_sparse(postsel);
-        mne_free_named_matrix(data);
+        if(data)
+            delete data;
         FREE(names);
         FREE(comps);
         FREE(comp_sel);
@@ -15511,7 +15246,7 @@ mneRawData mne_raw_open_file(char *name, int omit_skip, int allow_maxshield, mne
 MneMeasData* mne_read_meas_data_add(const QString&       name,       /* Name of the measurement file */
                                    int                  set,        /* Which data set */
                                    mneInverseOperator   op,         /* For consistency checks */
-                                   mneNamedMatrix       fwd,        /* Another option for consistency checks */
+                                   MneNamedMatrix*       fwd,        /* Another option for consistency checks */
                                    char                 **namesp,   /* Yet another option: explicit name list */
                                    int                  nnamesp,
                                    MneMeasData*          add_to)     /* Add to this */
@@ -15790,7 +15525,7 @@ out : {
 MneMeasData* mne_read_meas_data(const QString&       name,       /* Name of the measurement file */
                                int                  set,        /* Which data set */
                                mneInverseOperator   op,         /* For consistency checks */
-                               mneNamedMatrix       fwd,        /* Another option for consistency checks */
+                               MneNamedMatrix*       fwd,        /* Another option for consistency checks */
                                char                 **namesp,   /* Yet another option: explicit name list */
                                int                  nnamesp)
 
