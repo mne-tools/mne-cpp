@@ -1602,423 +1602,6 @@ fiffCoordTrans mne_read_meas_transform(const QString& name)
 }
 
 
-
-
-
-//============================= fwd_coil_def.c =============================
-
-#define MAXWORD 1000
-
-#define BIG 0.5
-
-
-
-
-
-int fwd_is_axial_coil(FwdCoil* coil)
-
-{
-    return (coil->coil_class == FWD_COILC_MAG ||
-            coil->coil_class == FWD_COILC_AXIAL_GRAD ||
-            coil->coil_class == FWD_COILC_AXIAL_GRAD2);
-}
-
-int fwd_is_magnetometer_coil(FwdCoil* coil)
-
-{
-    return coil->coil_class == FWD_COILC_MAG;
-}
-
-int fwd_is_planar_coil(FwdCoil* coil)
-
-{
-    return coil->coil_class == FWD_COILC_PLANAR_GRAD;
-}
-
-int fwd_is_eeg_electrode(FwdCoil* coil)
-
-{
-    return coil->coil_class == FWD_COILC_EEG;
-}
-
-int fwd_is_planar_coil_type(int type,            /* This is the coil type we are interested in */
-                            FwdCoilSet* set)	 /* Set of templates */
-
-{
-    int k;
-
-    if (type == FIFFV_COIL_EEG)
-        return FALSE;
-    if (!set)
-        return FALSE;
-    for (k = 0; k < set->ncoil; k++)
-        if (set->coils[k]->type == type)
-            return set->coils[k]->coil_class == FWD_COILC_PLANAR_GRAD;
-    return FALSE;
-}
-
-
-int fwd_is_axial_coil_type(int type,             /* This is the coil type we are interested in */
-                           FwdCoilSet* set)	 /* Set of templates */
-
-{
-    int k;
-
-    if (type == FIFFV_COIL_EEG)
-        return FALSE;
-    if (!set)
-        return FALSE;
-    for (k = 0; k < set->ncoil; k++)
-        if (set->coils[k]->type == type)
-            return (set->coils[k]->coil_class == FWD_COILC_MAG ||
-                    set->coils[k]->coil_class == FWD_COILC_AXIAL_GRAD ||
-                    set->coils[k]->coil_class == FWD_COILC_AXIAL_GRAD2);
-    return FALSE;
-}
-
-int fwd_is_magnetometer_coil_type(int type,             /* This is the coil type we are interested in */
-                                  FwdCoilSet* set)	/* Set of templates */
-
-{
-    int k;
-
-    if (type == FIFFV_COIL_EEG)
-        return FALSE;
-    if (!set)
-        return FALSE;
-    for (k = 0; k < set->ncoil; k++)
-        if (set->coils[k]->type == type)
-            return set->coils[k]->coil_class == FWD_COILC_MAG;
-    return FALSE;
-}
-
-int fwd_is_eeg_electrode_type(int type,		 /*  */
-                              FwdCoilSet* set)	 /* Templates are included for symmetry */
-
-{
-    return type == FIFFV_COIL_EEG;
-}
-
-
-static void normalize(float *rr)
-/*
-      * Scale vector to unit length
-      */
-{
-    float ll = VEC_LEN(rr);
-    int k;
-    if (ll > 0) {
-        for (k = 0; k < 3; k++)
-            rr[k] = rr[k]/ll;
-    }
-    return;
-}
-
-static FwdCoil* fwd_add_coil_to_set(FwdCoilSet* set,
-                                   int type, int coil_class, int acc, int np, float size, float base, char *desc)
-
-{
-    FwdCoil* def;
-
-    if (set == NULL) {
-        qWarning ("No coil definition set to augment.");
-        return NULL;
-    }
-    if (np <= 0) {
-        qWarning("Number of integration points should be positive (type = %d acc = %d)",type,acc);
-        return NULL;
-    }
-    if (! (acc == FWD_COIL_ACCURACY_POINT ||
-           acc == FWD_COIL_ACCURACY_NORMAL ||
-           acc == FWD_COIL_ACCURACY_ACCURATE) ) {
-        qWarning("Illegal accuracy (type = %d acc = %d)",type,acc);
-        return NULL;
-    }
-    if (! (coil_class == FWD_COILC_MAG ||
-           coil_class == FWD_COILC_AXIAL_GRAD ||
-           coil_class == FWD_COILC_PLANAR_GRAD ||
-           coil_class == FWD_COILC_AXIAL_GRAD2) ) {
-        qWarning("Illegal coil class (type = %d acc = %d class = %d)",type,acc,coil_class);
-        return NULL;
-    }
-
-    set->coils = REALLOC(set->coils,set->ncoil+1,FwdCoil*);
-    def = set->coils[set->ncoil++] = new FwdCoil(np);
-
-    def->type       = type;
-    def->coil_class = coil_class;
-    def->accuracy   = acc;
-    def->np         = np;
-    def->base       = size;
-    def->base       = base;
-    if (desc)
-        def->desc = mne_strdup(desc);
-    return def;
-}
-
-
-
-static void skip_comments(FILE *in)
-
-{
-    int c;
-
-    while (1) {
-        c = fgetc(in);
-        if (c == '#') {
-            for (c = fgetc(in); c != EOF && c != '\n'; c = fgetc(in))
-                ;
-        }
-        else {
-            ungetc(c,in);
-            return;
-        }
-    }
-}
-
-static int whitespace(int c)
-
-{
-    if (c == '\t' || c == '\n' || c == ' ')
-        return TRUE;
-    else
-        return FALSE;
-}
-
-static int whitespace_quote(int c, int inquote)
-
-{
-    if (inquote)
-        return (c == '"');
-    else
-        return (c == '\t' || c == '\n' || c == ' ');
-}
-
-static char *next_word(FILE *in)
-
-{
-    char *next = MALLOC(MAXWORD,char);
-    int c;
-    int  p,k;
-    int  inquote;
-
-    skip_comments(in);
-
-    inquote = FALSE;
-    for (k = 0, p = 0, c = fgetc(in); c != EOF && !whitespace_quote(c,inquote) ; c = fgetc(in), k++) {
-        if (k == 0 && c == '"')
-            inquote = TRUE;
-        else
-            next[p++] = c;
-    }
-    if (c == EOF && k == 0) {
-        FREE(next);
-        return NULL;
-    }
-    else
-        next[p] = '\0';
-    if (c != EOF) {
-        for (k = 0, c = fgetc(in); whitespace(c) ; c = fgetc(in), k++)
-            ;
-        if (c != EOF)
-            ungetc(c,in);
-    }
-#ifdef DEBUG
-    if (next)
-        printf("<%s>\n",next);
-#endif
-    return next;
-}
-
-static int get_ival(FILE *in, int *ival)
-
-{
-    char *next = next_word(in);
-    if (next == NULL) {
-        qWarning("missing integer");
-        return FAIL;
-    }
-    else if (sscanf(next,"%d",ival) != 1) {
-        qWarning("bad integer : %s",next);
-        FREE(next);
-        return FAIL;
-    }
-    FREE(next);
-    return OK;
-}
-
-static int get_fval(FILE *in, float *fval)
-
-{
-    char *next = next_word(in);
-    if (next == NULL) {
-        qWarning("bad integer");
-        return FAIL;
-    }
-    else if (sscanf(next,"%g",fval) != 1) {
-        qWarning("bad floating point number : %s",next);
-        FREE(next);
-        return FAIL;
-    }
-    FREE(next);
-    return OK;
-}
-
-
-
-
-
-
-FwdCoilSet* fwd_read_coil_defs(const char *name)
-/*
-      * Read a coil definition file
-      */
-{
-    FILE    *in = fopen(name,"r");
-    char    *desc = NULL;
-    int     type,coil_class,acc,np;
-    int     p;
-    float   size,base;
-    FwdCoilSet* res = NULL;
-    FwdCoil* def;
-
-    if (in == NULL) {
-        qWarning(name);
-        goto bad;
-    }
-
-    res = new FwdCoilSet();
-    while (1) {
-        /*
-     * Read basic info
-     */
-        if (get_ival(in,&coil_class) != OK)
-            break;
-        if (get_ival(in,&type) != OK)
-            goto bad;
-        if (get_ival(in,&acc) != OK)
-            goto bad;
-        if (get_ival(in,&np) != OK)
-            goto bad;
-        if (get_fval(in,&size) != OK)
-            goto bad;
-        if (get_fval(in,&base) != OK)
-            goto bad;
-        desc = next_word(in);
-        if (!desc)
-            goto bad;
-
-        def = fwd_add_coil_to_set(res,type,coil_class,acc,np,size,base,desc);
-        if (!def)
-            goto bad;
-        FREE(desc); desc = NULL;
-
-        for (p = 0; p < def->np; p++) {
-            /*
-       * Read and verify data for each integration point
-       */
-            if (get_fval(in,def->w+p) != OK)
-                goto bad;
-            if (get_fval(in,def->rmag[p]+X) != OK)
-                goto bad;
-            if (get_fval(in,def->rmag[p]+Y) != OK)
-                goto bad;
-            if (get_fval(in,def->rmag[p]+Z) != OK)
-                goto bad;
-            if (get_fval(in,def->cosmag[p]+X) != OK)
-                goto bad;
-            if (get_fval(in,def->cosmag[p]+Y) != OK)
-                goto bad;
-            if (get_fval(in,def->cosmag[p]+Z) != OK)
-                goto bad;
-
-            if (VEC_LEN(def->rmag[p]) > BIG) {
-                qWarning("Unreasonable integration point: %f %f %f mm (coil type = %d acc = %d)", 1000*def->rmag[p][X],1000*def->rmag[p][Y],1000*def->rmag[p][Z], def->type,def->accuracy);
-                goto bad;
-            }
-            size = VEC_LEN(def->cosmag[p]);
-            if (size <= 0) {
-                qWarning("Unreasonable normal: %f %f %f (coil type = %d acc = %d)", def->cosmag[p][X],def->cosmag[p][Y],def->cosmag[p][Z], def->type,def->accuracy);
-                goto bad;
-            }
-            normalize(def->cosmag[p]);
-        }
-    }
-    printf("%d coil definitions read\n",res->ncoil);
-    return res;
-
-bad : {
-        delete res;
-        FREE(desc);
-        return NULL;
-    }
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-FwdCoilSet* fwd_dup_coil_set(FwdCoilSet* s,
-                            fiffCoordTrans t)
-/*
- * Make a duplicate
- */
-{
-    FwdCoilSet* res;
-    FwdCoil*    coil;
-    int k,p;
-
-    if (!s) {
-        qWarning("No coils to duplicate");
-        return NULL;
-    }
-    if (t) {
-        if (s->coord_frame != t->from) {
-            qWarning("Coordinate frame of the transformation does not match the coil set in fwd_dup_coil_set");
-            return NULL;
-        }
-    }
-    res = new FwdCoilSet();
-    if (t)
-        res->coord_frame = t->to;
-    else
-        res->coord_frame = s->coord_frame;
-
-    res->coils = MALLOC(s->ncoil,FwdCoil*);
-    res->ncoil = s->ncoil;
-
-    for (k = 0; k < s->ncoil; k++) {
-        coil = res->coils[k] = new FwdCoil(*(s->coils[k]));
-        /*
-     * Optional coordinate transformation
-     */
-        if (t) {
-            fiff_coord_trans(coil->r0,t,FIFFV_MOVE);
-            fiff_coord_trans(coil->ex,t,FIFFV_NO_MOVE);
-            fiff_coord_trans(coil->ey,t,FIFFV_NO_MOVE);
-            fiff_coord_trans(coil->ez,t,FIFFV_NO_MOVE);
-
-            for (p = 0; p < coil->np; p++) {
-                fiff_coord_trans(coil->rmag[p],t,FIFFV_MOVE);
-                fiff_coord_trans(coil->cosmag[p],t,FIFFV_NO_MOVE);
-            }
-            coil->coord_frame = t->to;
-        }
-    }
-    return res;
-}
-
-
-
-
 //============================= fiff_matrix.c =============================
 
 
@@ -10293,10 +9876,14 @@ float **fwd_bem_field_coeff(fwdBemModel m,	/* The model */
                 return NULL;
             }
             else {
+                if (!coils) {
+                    qWarning("No coils to duplicate");
+                    return NULL;
+                }
                 /*
-         * Make a transformed duplicate
-         */
-                if ((tcoils = fwd_dup_coil_set(coils,m->head_mri_t)) == NULL)
+                * Make a transformed duplicate
+                */
+                if ((tcoils = coils->dup_coil_set(m->head_mri_t)) == NULL)
                     return NULL;
                 coils = tcoils;
             }
@@ -10530,10 +10117,14 @@ float **fwd_bem_lin_field_coeff (fwdBemModel m,	        /* The model */
                 return NULL;
             }
             else {
+                if (!coils) {
+                    qWarning("No coils to duplicate");
+                    return NULL;
+                }
                 /*
-         * Make a transformed duplicate
-         */
-                if ((tcoils = fwd_dup_coil_set(coils,m->head_mri_t)) == NULL)
+                * Make a transformed duplicate
+                */
+                if ((tcoils = coils->dup_coil_set(m->head_mri_t)) == NULL)
                     return NULL;
                 coils = tcoils;
             }
@@ -10968,8 +10559,15 @@ fwdCompData fwd_make_comp_data(mneCTFcompDataSet set,           /* The CTF compe
 {
     fwdCompData comp = fwd_new_comp_data();
 
-    comp->set         = mne_dup_ctf_comp_data_set(set);
-    comp->comp_coils  = fwd_dup_coil_set(comp_coils,NULL);
+    comp->set = mne_dup_ctf_comp_data_set(set);
+
+    if (comp_coils) {
+        comp->comp_coils = comp_coils->dup_coil_set(NULL);
+    }
+    else {
+        qWarning("No coils to duplicate");
+        comp->comp_coils = NULL;
+    }
     comp->field       = field;
     comp->vec_field   = vec_field;
     comp->field_grad  = field_grad;
@@ -12084,7 +11682,7 @@ static mneCovMatrix ad_hoc_noise(FwdCoilSet* meg,          /* Channel name lists
     n = 0;
     if (meg) {
         for (k = 0; k < meg->ncoil; k++, n++) {
-            if (fwd_is_axial_coil(meg->coils[k])) {
+            if (meg->coils[k]->is_axial_coil()) {
                 stds[n] = mag_std*mag_std;
 #ifdef TEST_REF
                 if (meg->coils[k]->type == FIFFV_COIL_CTF_REF_MAG ||
@@ -12526,7 +12124,7 @@ DipoleFitData* setup_dipole_fit_data(   const QString& mriname,         /**< Thi
 
         if (!coilfile)
             goto bad;
-        if ((templates = fwd_read_coil_defs(coilfile)) == NULL) {
+        if ((templates = FwdCoilSet::read_coil_defs(coilfile)) == NULL) {
             FREE(coilfile);
             goto bad;
         }
