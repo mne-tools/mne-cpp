@@ -113,6 +113,7 @@
 #include <fiff/fiff_stream.h>
 #include "mne_sss_data.h"
 #include "mne_named_matrix.h"
+#include "mne_deriv_set.h"
 
 
 #if defined(__cplusplus) 
@@ -610,21 +611,21 @@ typedef struct {
 				 * taking into account channels presently available */
 } *mneCTFcompDataSet,mneCTFcompDataSetRec;
 
-typedef struct {		        /* One item in a derivation data set */
-  char                 *filename;       /* Source file name */
-  char                 *shortname;      /* Short nickname for this derivation */
-  mneSparseNamedMatrix deriv_data;	/* The derivation data itself */
-  int                  *in_use;		/* How many non-zero elements on each column of the derivation data 
-					 * (This field is not always used) */
-  int                  *valid;		/* Which of the derivations are valid considering the units of the input 
-					 * channels (This field is not always used) */
-  FIFFLIB::fiffChInfo           chs;		/* First matching channel info in each derivation */
-} *mneDeriv,mneDerivRec;
+//typedef struct {		        /* One item in a derivation data set */
+//  char                 *filename;       /* Source file name */
+//  char                 *shortname;      /* Short nickname for this derivation */
+//  mneSparseNamedMatrix deriv_data;	/* The derivation data itself */
+//  int                  *in_use;		/* How many non-zero elements on each column of the derivation data
+//					 * (This field is not always used) */
+//  int                  *valid;		/* Which of the derivations are valid considering the units of the input
+//					 * channels (This field is not always used) */
+//  FIFFLIB::fiffChInfo           chs;		/* First matching channel info in each derivation */
+//} *mneDeriv,mneDerivRec;
 
-typedef struct {		        /* A collection of derivations */
-  int      nderiv;		        /* How many? */
-  mneDeriv *derivs;			/* Pointers to the items */
-} *mneDerivSet,mneDerivSetRec;
+//typedef struct {		        /* A collection of derivations */
+//  int      nderiv;		        /* How many? */
+//  mneDeriv *derivs;			/* Pointers to the items */
+//} *mneDerivSet,mneDerivSetRec;
 
 
 typedef struct {			/* A comprehensive raw data structure */
@@ -662,8 +663,8 @@ typedef struct {			/* A comprehensive raw data structure */
   void             *ring;	        /* The ringbuffer (structure is of no
 					 * interest to us) */
   void             *filt_ring;          /* Separate ring buffer for filtered data */
-  mneDerivSet      deriv;	        /* Derivation data */
-  mneDeriv         deriv_matched;	/* Derivation data matched to this raw data and 
+  INVERSELIB::MneDerivSet*  deriv;	        /* Derivation data */
+  INVERSELIB::MneDeriv*     deriv_matched;	/* Derivation data matched to this raw data and
 					 * collected into a single item */
   float            *deriv_offsets;	/* Dc offset corrections for display of the derived channels */
   void             *user;	        /* Whatever */

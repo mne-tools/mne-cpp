@@ -10,6 +10,8 @@
 #include "ecd_set.h"
 #include "mne_sss_data.h"
 #include "mne_meas_data_set.h"
+#include "mne_deriv.h"
+#include "mne_deriv_set.h"
 #include <iostream>
 #include <vector>
 #include <Eigen/Core>
@@ -12511,70 +12513,6 @@ bad : {
 }
 
 
-//============================= mne_apply_baselines.c =============================
-
-void mne_adjust_baselines(MneMeasData* meas, float bmin, float bmax)
-/*
-      * Change the baseline setting in the current data set
-      */
-{
-    int b1,b2;
-    float sfreq,tmin,tmax;
-    float **data;
-    float ave;
-    int s,c;
-
-    if (!meas || !meas->current)
-        return;
-
-    sfreq = 1.0/meas->current->tstep;
-    tmin  = meas->current->tmin;
-    tmax  = meas->current->tmin + (meas->current->np-1)/sfreq;
-
-    if (bmin < tmin)
-        b1 = 0;
-    else if (bmin > tmax)
-        b1 = meas->current->np;
-    else {
-        for (b1 = 0; b1/sfreq + tmin < bmin; b1++)
-            ;
-        if (b1 < 0)
-            b1 = 0;
-        else if (b1 > meas->current->np)
-            b1 = meas->current->np;
-    }
-    if (bmax < tmin)
-        b2 = 0;
-    else if (bmax > tmax)
-        b2 = meas->current->np;
-    else {
-        for (b2 = meas->current->np; b2/sfreq + tmin > bmax; b2--)
-            ;
-        if (b2 < 0)
-            b2 = 0;
-        else if (b2 > meas->current->np)
-            b2 = meas->current->np;
-    }
-    data = meas->current->data;
-    if (b2 > b1) {
-        for (c = 0; c < meas->nchan; c++) {
-            for (s = b1, ave = 0.0; s < b2; s++)
-                ave += data[s][c];
-            ave = ave/(b2-b1);
-            meas->current->baselines[c] += ave;
-            for (s = 0; s < meas->current->np; s++)
-                data[s][c] = data[s][c] - ave;
-        }
-        qDebug() << "TODO: Check comments content";
-        fprintf(stderr,"\t%s : using baseline %7.1f ... %7.1f ms\n",
-                meas->current->comment ? meas->current->comment : "unknown",
-                1000*(tmin+b1/sfreq),
-                1000*(tmin+b2/sfreq));
-    }
-    return;
-}
-
-
 //============================= mne_ringbuffer.c =============================
 
 typedef struct {
@@ -13471,42 +13409,6 @@ out : {
 }
 
 
-//============================= mne_derivations.c =============================
-
-void mne_free_deriv(mneDeriv d)
-
-{
-    if (!d)
-        return;
-    FREE(d->filename);
-    FREE(d->shortname);
-    mne_free_sparse_named_matrix(d->deriv_data);
-    FREE(d->in_use);
-    FREE(d->valid);
-    FREE(d->chs);
-    FREE(d);
-    return;
-}
-
-void mne_free_deriv_set(mneDerivSet s)
-
-{
-    int k;
-
-    if (!s)
-        return;
-
-    for (k = 0; k < s->nderiv; k++)
-        mne_free_deriv(s->derivs[k]);
-    FREE(s->derivs);
-    FREE(s);
-    return;
-}
-
-
-
-
-
 //============================= mne_events.c =============================
 
 
@@ -13636,8 +13538,8 @@ void mne_raw_free_data(mneRawData d)
 
     mne_free_raw_info(d->info);
 
-    mne_free_deriv_set(d->deriv);
-    mne_free_deriv(d->deriv_matched);
+    delete d->deriv;
+    delete d->deriv_matched;
     FREE(d->deriv_offsets);
 
     FREE(d);
@@ -14246,7 +14148,7 @@ int mne_raw_pick_data_filt(mneRawData     data,
        * Also check channels included in derivations if they are used
        */
             if (sel->nderiv > 0 && data->deriv_matched) {
-                mneDeriv der = data->deriv_matched;
+                MneDeriv* der = data->deriv_matched;
                 for (c = 0; c < der->deriv_data->ncol; c++) {
                     if (der->in_use[c] > 0 &&
                             !this_buf->ch_filtered[c]) {

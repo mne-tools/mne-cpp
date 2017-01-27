@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     mne_mne_data.cpp
+* @file     mne_deriv.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the MNE Mne Data (MneMneData) Class.
+* @brief    Implementation of the MNE Derivation (MneDeriv) Class.
 *
 */
 
@@ -39,7 +39,59 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "mne_mne_data.h"
+#include "mne_deriv.h"
+
+
+
+
+
+#define FREE_15(x) if ((char *)(x) != NULL) free((char *)(x))
+
+
+
+void mne_free_sparse_15(mneSparseMatrix mat)
+
+{
+    if (mat) {
+        FREE_15(mat->data);
+        FREE_15(mat);
+    }
+}
+
+
+
+void mne_free_name_list_15(char **list, int nlist)
+/*
+* Free a name list array
+*/
+{
+    int k;
+    if (list == NULL || nlist == 0)
+        return;
+    for (k = 0; k < nlist; k++) {
+#ifdef FOO
+        fprintf(stderr,"%d %s\n",k,list[k]);
+#endif
+        FREE_15(list[k]);
+    }
+    FREE_15(list);
+    return;
+}
+
+
+void mne_free_sparse_named_matrix_15(mneSparseNamedMatrix mat)
+/*
+      * Free the matrix and all the data from within
+      */
+{
+    if (!mat)
+        return;
+    mne_free_name_list_15(mat->rowlist,mat->nrow);
+    mne_free_name_list_15(mat->collist,mat->ncol);
+    mne_free_sparse_15(mat->data);
+    FREE_15(mat);
+    return;
+}
 
 
 //*************************************************************************************************************
@@ -51,33 +103,18 @@ using namespace Eigen;
 using namespace INVERSELIB;
 
 
-
-#define FREE_7(x) if ((char *)(x) != NULL) free((char *)(x))
-
-#define FREE_CMATRIX_7(m) mne_free_cmatrix_7((m))
-
-
-void mne_free_cmatrix_7 (float **m)
-{
-    if (m) {
-        FREE_7(*m);
-        FREE_7(m);
-    }
-}
-
-
-
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MneMneData::MneMneData()
-: datap(NULL)
-, predicted(NULL)
-, SNR(NULL)
-, lambda2_est(NULL)
-, lambda2(NULL)
+MneDeriv::MneDeriv()
+: filename(NULL)
+, shortname(NULL)
+, deriv_data(NULL)
+, in_use(NULL)
+, valid(NULL)
+, chs(NULL)
 {
 
 }
@@ -85,12 +122,12 @@ MneMneData::MneMneData()
 
 //*************************************************************************************************************
 
-MneMneData::~MneMneData()
+MneDeriv::~MneDeriv()
 {
-    FREE_CMATRIX_7(this->datap);
-    FREE_CMATRIX_7(this->predicted);
-
-    FREE_7(this->SNR);
-    FREE_7(this->lambda2_est);
-    FREE_7(this->lambda2);
+    FREE_15(filename);
+    FREE_15(shortname);
+    mne_free_sparse_named_matrix_15(deriv_data);
+    FREE_15(in_use);
+    FREE_15(valid);
+    FREE_15(chs);
 }

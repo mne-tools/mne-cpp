@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     mne_mne_data.cpp
+* @file     mne_deriv_set.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the MNE Mne Data (MneMneData) Class.
+* @brief    Implementation of the MNE Derivation Set (MneDerivSet) Class.
 *
 */
 
@@ -39,7 +39,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "mne_mne_data.h"
+#include "mne_deriv_set.h"
+#include "mne_deriv.h"
 
 
 //*************************************************************************************************************
@@ -51,33 +52,12 @@ using namespace Eigen;
 using namespace INVERSELIB;
 
 
-
-#define FREE_7(x) if ((char *)(x) != NULL) free((char *)(x))
-
-#define FREE_CMATRIX_7(m) mne_free_cmatrix_7((m))
-
-
-void mne_free_cmatrix_7 (float **m)
-{
-    if (m) {
-        FREE_7(*m);
-        FREE_7(m);
-    }
-}
-
-
-
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MneMneData::MneMneData()
-: datap(NULL)
-, predicted(NULL)
-, SNR(NULL)
-, lambda2_est(NULL)
-, lambda2(NULL)
+MneDerivSet::MneDerivSet()
 {
 
 }
@@ -85,12 +65,8 @@ MneMneData::MneMneData()
 
 //*************************************************************************************************************
 
-MneMneData::~MneMneData()
+MneDerivSet::~MneDerivSet()
 {
-    FREE_CMATRIX_7(this->datap);
-    FREE_CMATRIX_7(this->predicted);
-
-    FREE_7(this->SNR);
-    FREE_7(this->lambda2_est);
-    FREE_7(this->lambda2);
+    for (int k = 0; k < derivs.size(); k++)
+        delete derivs[k];
 }

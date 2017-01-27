@@ -545,7 +545,7 @@ ECDSet DipoleFit::calculateFit() const
                                        fit_data->ch_names,fit_data->nmeg+fit_data->neeg)) == NULL)
             goto out;
         if (settings->do_baseline)
-            mne_adjust_baselines(data,settings->bmin,settings->bmax);
+            data->adjust_baselines(settings->bmin,settings->bmax);
         else
             printf("\tNo baseline setting in effect.\n");
         if (settings->tmin < data->current->tmin + settings->integ/2.0)

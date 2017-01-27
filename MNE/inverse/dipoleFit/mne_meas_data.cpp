@@ -40,6 +40,7 @@
 //=============================================================================================================
 
 #include "mne_meas_data.h"
+#include "mne_meas_data_set.h"
 
 
 //*************************************************************************************************************
@@ -283,39 +284,6 @@ void mne_free_sparse_named_matrix_9(mneSparseNamedMatrix mat)
     return;
 }
 
-//============================= mne_derivations.c =============================
-
-void mne_free_deriv_9(mneDeriv d)
-
-{
-    if (!d)
-        return;
-    FREE_9(d->filename);
-    FREE_9(d->shortname);
-    mne_free_sparse_named_matrix_9(d->deriv_data);
-    FREE_9(d->in_use);
-    FREE_9(d->valid);
-    FREE_9(d->chs);
-    FREE_9(d);
-    return;
-}
-
-void mne_free_deriv_set_9(mneDerivSet s)
-
-{
-    int k;
-
-    if (!s)
-        return;
-
-    for (k = 0; k < s->nderiv; k++)
-        mne_free_deriv_9(s->derivs[k]);
-    FREE_9(s->derivs);
-    FREE_9(s);
-    return;
-}
-
-
 
 //============================= mne_raw_routines.c =============================
 
@@ -368,8 +336,8 @@ void mne_raw_free_data_9(mneRawData d)
 
     mne_free_raw_info_9(d->info);
 
-    mne_free_deriv_set_9(d->deriv);
-    mne_free_deriv_9(d->deriv_matched);
+    delete d->deriv;
+    delete d->deriv_matched;
     FREE_9(d->deriv_offsets);
 
     FREE_9(d);
@@ -452,5 +420,66 @@ MneMeasData::~MneMeasData()
     mne_raw_free_data_9(raw);
     mne_ch_selection_free_9(chsel);
 
+    return;
+}
+
+
+//*************************************************************************************************************
+
+void MneMeasData::adjust_baselines(float bmin, float bmax)
+{
+    int b1,b2;
+    float sfreq,tmin,tmax;
+    float **data;
+    float ave;
+    int s,c;
+
+    if (this->current)
+        return;
+
+    sfreq = 1.0/ this->current->tstep;
+    tmin  =  this->current->tmin;
+    tmax  =  this->current->tmin + ( this->current->np-1)/sfreq;
+
+    if (bmin < tmin)
+        b1 = 0;
+    else if (bmin > tmax)
+        b1 =  this->current->np;
+    else {
+        for (b1 = 0; b1/sfreq + tmin < bmin; b1++)
+            ;
+        if (b1 < 0)
+            b1 = 0;
+        else if (b1 >  this->current->np)
+            b1 =  this->current->np;
+    }
+    if (bmax < tmin)
+        b2 = 0;
+    else if (bmax > tmax)
+        b2 =  this->current->np;
+    else {
+        for (b2 =  this->current->np; b2/sfreq + tmin > bmax; b2--)
+            ;
+        if (b2 < 0)
+            b2 = 0;
+        else if (b2 >  this->current->np)
+            b2 =  this->current->np;
+    }
+    data =  this->current->data;
+    if (b2 > b1) {
+        for (c = 0; c <  this->nchan; c++) {
+            for (s = b1, ave = 0.0; s < b2; s++)
+                ave += data[s][c];
+            ave = ave/(b2-b1);
+             this->current->baselines[c] += ave;
+            for (s = 0; s <  this->current->np; s++)
+                data[s][c] = data[s][c] - ave;
+        }
+        qDebug() << "TODO: Check comments content";
+        fprintf(stderr,"\t%s : using baseline %7.1f ... %7.1f ms\n",
+                 this->current->comment ?  this->current->comment : "unknown",
+                1000*(tmin+b1/sfreq),
+                1000*(tmin+b2/sfreq));
+    }
     return;
 }

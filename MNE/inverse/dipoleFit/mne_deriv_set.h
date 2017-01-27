@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     mne_mne_data.h
+* @file     mne_deriv_set.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    MNE MNE Data (MneMneData) class declaration.
+* @brief    MNE Derivation Set (MneDerivSet) class declaration.
 *
 */
 
-#ifndef MNEMNEDATA_H
-#define MNEMNEDATA_H
+#ifndef MNEDERIVSET_H
+#define MNEDERIVSET_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -58,7 +58,7 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
-#include <QDebug>
+#include <QList>
 
 
 //*************************************************************************************************************
@@ -69,47 +69,47 @@
 namespace INVERSELIB
 {
 
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+class MneDeriv;
+
 
 //=============================================================================================================
 /**
-* Implements MNE Mne Data (Replaces *mneMneData,mneMneDataRec; struct of MNE-C mne_types.h).
+* Implements an MNE Derivation (Replaces *mneDerivSet,mneDerivSetRec; struct of MNE-C mne_types.h).
 *
-* @brief Data associated with MNE computations for each mneMeasDataSet
+* @brief One item in a derivation data set
 */
-class INVERSESHARED_EXPORT MneMneData
+class INVERSESHARED_EXPORT MneDerivSet
 {
 public:
-    typedef QSharedPointer<MneMneData> SPtr;              /**< Shared pointer type for MneMneData. */
-    typedef QSharedPointer<const MneMneData> ConstSPtr;   /**< Const shared pointer type for MneMneData. */
+    typedef QSharedPointer<MneDerivSet> SPtr;              /**< Shared pointer type for MneDerivSet. */
+    typedef QSharedPointer<const MneDerivSet> ConstSPtr;   /**< Const shared pointer type for MneDerivSet. */
 
     //=========================================================================================================
     /**
-    * Constructs the MNE Mne Data
+    * Constructs the MNE Derivation Set
     */
-    MneMneData();
+    MneDerivSet();
 
     //=========================================================================================================
     /**
-    * Destroys the MNE Mne Data description
-    * Refactored: mne_free_mne_data (mne_inverse_util.c)
+    * Destroys the MNE Derivation Set
+    * Refactored: mne_free_deriv_set (mne_derivations.c)
     */
-    ~MneMneData();
+    ~MneDerivSet();
 
 public:
-    float **datap;          /* Projection of the whitened data onto the field eigenvectors */
-    float **predicted;      /* The predicted data */
-    float *SNR;             /* Estimated power SNR as a function of time */
-    float *lambda2_est;     /* Regularization parameter estimated from available data */
-    float *lambda2;         /* Regularization parameter to be used (as a function of time) */
+    QList<MneDeriv*> derivs;       /* List of deriv items */
 
 // ### OLD STRUCT ###
-//typedef struct {        /* Data associated with MNE computations for each mneMeasDataSet */
-//    float **datap;          /* Projection of the whitened data onto the field eigenvectors */
-//    float **predicted;      /* The predicted data */
-//    float *SNR;             /* Estimated power SNR as a function of time */
-//    float *lambda2_est;     /* Regularization parameter estimated from available data */
-//    float *lambda2;             /* Regularization parameter to be used (as a function of time) */
-//} *mneMneData,mneMneDataRec;
+//typedef struct {            /* A collection of derivations */
+//    int      nderiv;        /* How many? */
+//    mneDeriv *derivs;       /* Pointers to the items */
+//} *mneDerivSet,mneDerivSetRec;
 };
 
 //*************************************************************************************************************
@@ -119,4 +119,4 @@ public:
 
 } // NAMESPACE INVERSELIB
 
-#endif // MNEMNEDATA_H
+#endif // MNEDERIVSET_H
