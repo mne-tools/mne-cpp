@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     mne_mne_data.h
+* @file     mne_deriv.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    MNE MNE Data (MneMneData) class declaration.
+* @brief    MNE Derivation (MneDeriv) class declaration.
 *
 */
 
-#ifndef MNEMNEDATA_H
-#define MNEMNEDATA_H
+#ifndef MNEDERIV_H
+#define MNEDERIV_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -42,6 +42,8 @@
 //=============================================================================================================
 
 #include "../inverse_global.h"
+#include <fiff/fiff_types.h>
+#include "mne_types.h"
 
 
 //*************************************************************************************************************
@@ -58,7 +60,6 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
-#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -72,44 +73,46 @@ namespace INVERSELIB
 
 //=============================================================================================================
 /**
-* Implements MNE Mne Data (Replaces *mneMneData,mneMneDataRec; struct of MNE-C mne_types.h).
+* Implements an MNE Derivation (Replaces *mneDeriv,mneDerivRec; struct of MNE-C mne_types.h).
 *
-* @brief Data associated with MNE computations for each mneMeasDataSet
+* @brief One item in a derivation data set
 */
-class INVERSESHARED_EXPORT MneMneData
+class INVERSESHARED_EXPORT MneDeriv
 {
 public:
-    typedef QSharedPointer<MneMneData> SPtr;              /**< Shared pointer type for MneMneData. */
-    typedef QSharedPointer<const MneMneData> ConstSPtr;   /**< Const shared pointer type for MneMneData. */
+    typedef QSharedPointer<MneDeriv> SPtr;              /**< Shared pointer type for MneDeriv. */
+    typedef QSharedPointer<const MneDeriv> ConstSPtr;   /**< Const shared pointer type for MneDeriv. */
 
     //=========================================================================================================
     /**
-    * Constructs the MNE Mne Data
+    * Constructs the MNE Derivation
     */
-    MneMneData();
+    MneDeriv();
 
     //=========================================================================================================
     /**
-    * Destroys the MNE Mne Data description
-    * Refactored: mne_free_mne_data (mne_inverse_util.c)
+    * Destroys the MNE Derivation
+    * Refactored: mne_free_deriv (mne_derivations.c)
     */
-    ~MneMneData();
+    ~MneDeriv();
 
 public:
-    float **datap;          /* Projection of the whitened data onto the field eigenvectors */
-    float **predicted;      /* The predicted data */
-    float *SNR;             /* Estimated power SNR as a function of time */
-    float *lambda2_est;     /* Regularization parameter estimated from available data */
-    float *lambda2;         /* Regularization parameter to be used (as a function of time) */
+    char                    *filename;  /* Source file name */
+    char                    *shortname; /* Short nickname for this derivation */
+    mneSparseNamedMatrix    deriv_data; /* The derivation data itself */
+    int                     *in_use;    /* How many non-zero elements on each column of the derivation data (This field is not always used) */
+    int                     *valid;     /* Which of the derivations are valid considering the units of the input channels (This field is not always used) */
+    FIFFLIB::fiffChInfo     chs;        /* First matching channel info in each derivation */
 
 // ### OLD STRUCT ###
-//typedef struct {        /* Data associated with MNE computations for each mneMeasDataSet */
-//    float **datap;          /* Projection of the whitened data onto the field eigenvectors */
-//    float **predicted;      /* The predicted data */
-//    float *SNR;             /* Estimated power SNR as a function of time */
-//    float *lambda2_est;     /* Regularization parameter estimated from available data */
-//    float *lambda2;             /* Regularization parameter to be used (as a function of time) */
-//} *mneMneData,mneMneDataRec;
+//typedef struct {                        /* One item in a derivation data set */
+//    char                    *filename;  /* Source file name */
+//    char                    *shortname; /* Short nickname for this derivation */
+//    mneSparseNamedMatrix    deriv_data; /* The derivation data itself */
+//    int                     *in_use;    /* How many non-zero elements on each column of the derivation data (This field is not always used) */
+//    int                     *valid;     /* Which of the derivations are valid considering the units of the input channels (This field is not always used) */
+//    FIFFLIB::fiffChInfo     chs;        /* First matching channel info in each derivation */
+//} *mneDeriv,mneDerivRec;
 };
 
 //*************************************************************************************************************
@@ -119,4 +122,4 @@ public:
 
 } // NAMESPACE INVERSELIB
 
-#endif // MNEMNEDATA_H
+#endif // MNEDERIV_H
