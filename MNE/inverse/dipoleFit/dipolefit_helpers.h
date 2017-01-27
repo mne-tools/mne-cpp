@@ -1955,110 +1955,9 @@ bad : {
 }
 
 
-FwdCoil* fwd_create_meg_coil(FwdCoilSet*    set,    /* These are the available coil definitions */
-                            fiffChInfo      ch,     /* Channel information to use */
-                            int             acc,    /* Required accuracy */
-                            fiffCoordTrans  t)      /* Transform the points using this */
-/*
-* Create a MEG coil definition using a database of templates
-* Change the coordinate frame if so desired
-*/
-{
-    int        k,p,c;
-    FwdCoil*    def;
-    FwdCoil*    res = NULL;
-
-    if (ch->kind != FIFFV_MEG_CH && ch->kind != FIFFV_REF_MEG_CH) {
-        printf("%s is not a MEG channel. Cannot create a coil definition.",ch->ch_name);
-        goto bad;
-    }
-    /*
-    * Simple linear search from the coil definitions
-    */
-    for (k = 0, def = NULL; k < set->ncoil; k++) {
-        if ((set->coils[k]->type == (ch->chpos.coil_type & 0xFFFF)) &&
-                set->coils[k]->accuracy == acc) {
-            def = set->coils[k];
-        }
-    }
-    if (!def) {
-        printf("Desired coil definition not found (type = %d acc = %d)",ch->chpos.coil_type,acc);
-        goto bad;
-    }
-    /*
-    * Create the result
-    */
-    res = new FwdCoil(def->np);
-
-    res->chname   = mne_strdup(ch->ch_name);
-    if (def->desc)
-        res->desc   = mne_strdup(def->desc);
-    res->coil_class = def->coil_class;
-    res->accuracy   = def->accuracy;
-    res->base       = def->base;
-    res->size       = def->size;
-    res->type       = ch->chpos.coil_type;
-
-    VEC_COPY(res->r0,ch->chpos.r0);
-    VEC_COPY(res->ex,ch->chpos.ex);
-    VEC_COPY(res->ey,ch->chpos.ey);
-    VEC_COPY(res->ez,ch->chpos.ez);
-    /*
-    * Apply a coordinate transformation if so desired
-    */
-    if (t) {
-        fiff_coord_trans(res->r0,t,FIFFV_MOVE);
-        fiff_coord_trans(res->ex,t,FIFFV_NO_MOVE);
-        fiff_coord_trans(res->ey,t,FIFFV_NO_MOVE);
-        fiff_coord_trans(res->ez,t,FIFFV_NO_MOVE);
-        res->coord_frame = t->to;
-    }
-    else
-        res->coord_frame = FIFFV_COORD_DEVICE;
-
-    for (p = 0; p < res->np; p++) {
-        res->w[p] = def->w[p];
-        for (c = 0; c < 3; c++) {
-            res->rmag[p][c]   = res->r0[c] + def->rmag[p][X]*res->ex[c] + def->rmag[p][Y]*res->ey[c] + def->rmag[p][Z]*res->ez[c];
-            res->cosmag[p][c] = def->cosmag[p][X]*res->ex[c] + def->cosmag[p][Y]*res->ey[c] + def->cosmag[p][Z]*res->ez[c];
-        }
-    }
-    return res;
-
-bad : {
-        return NULL;
-    }
-}
 
 
 
-
-FwdCoilSet* fwd_create_meg_coils(FwdCoilSet*    set,    /* These are the available coil definitions */
-                                fiffChInfo      chs,    /* Channel information to use */
-                                int             nch,
-                                int             acc,    /* Required accuracy */
-                                fiffCoordTrans t)       /* Transform the points using this */
-
-{
-    FwdCoilSet* res = new FwdCoilSet();
-    FwdCoil*    next;
-    int        k;
-
-    for (k = 0; k < nch; k++) {
-        if ((next = fwd_create_meg_coil(set,chs+k,acc,t)) == NULL)
-            goto bad;
-        res->coils = REALLOC(res->coils,res->ncoil+1,FwdCoil*);
-        res->coils[res->ncoil++] = next;
-    }
-    if (t)
-        res->coord_frame = t->to;
-    return res;
-
-bad : {
-        delete res;
-        return NULL;
-    }
-}
 
 
 
@@ -12720,7 +12619,7 @@ DipoleFitData* setup_dipole_fit_data(   const QString& mriname,         /**< Thi
             goto bad;
         }
 
-        if ((res->meg_coils = fwd_create_meg_coils(templates,res->chs,res->nmeg,
+        if ((res->meg_coils = templates->create_meg_coils(res->chs,res->nmeg,
                                                    accurate_coils ? FWD_COIL_ACCURACY_ACCURATE : FWD_COIL_ACCURACY_NORMAL,
                                                    res->meg_head_t)) == NULL)
             goto bad;
@@ -12755,7 +12654,7 @@ DipoleFitData* setup_dipole_fit_data(   const QString& mriname,         /**< Thi
         if (mne_read_meg_comp_eeg_ch_info(measname,NULL,0,&comp_chs,&ncomp,NULL,NULL,NULL,NULL) == FAIL)
             goto bad;
         if (ncomp > 0) {
-            if ((comp_coils = fwd_create_meg_coils(templates,comp_chs,ncomp,
+            if ((comp_coils = templates->create_meg_coils(comp_chs,ncomp,
                                                    FWD_COIL_ACCURACY_NORMAL,res->meg_head_t)) == NULL) {
                 FREE(comp_chs);
                 goto bad;

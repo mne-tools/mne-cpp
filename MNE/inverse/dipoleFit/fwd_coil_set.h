@@ -43,6 +43,7 @@
 
 #include "../inverse_global.h"
 #include "fwd_coil.h"
+#include <fiff/fiff_types.h>
 
 
 //*************************************************************************************************************
@@ -116,6 +117,34 @@ public:
         user_data = NULL;
     }
 
+    //=========================================================================================================
+    /**
+    * Create a MEG coil definition using a database of templates
+    * Change the coordinate frame if so desired
+    * Refactored: fwd_create_meg_coil (fwd_coil_def.c)
+    *
+    * @param[in] ch     Channel information to use
+    * @param[in] acc    Required accuracy
+    * @param[in] t      Transform the points using this
+    *
+    * @return   The new named matrix.
+    */
+    FwdCoil* create_meg_coil( FIFFLIB::fiffChInfo ch, int acc, FIFFLIB::fiffCoordTrans t);
+
+    //=========================================================================================================
+    /**
+    * Create a MEG coil set definition using a database of templates
+    * Change the coordinate frame if so desired
+    * Refactored: fwd_create_meg_coils (fwd_coil_def.c)
+    *
+    * @param[in] ch     Channel information to use
+    * @param[in] nch    Number of channels
+    * @param[in] acc    Required accuracy
+    * @param[in] t      Transform the points using this
+    *
+    * @return   The new named matrix.
+    */
+    FwdCoilSet* create_meg_coils(FIFFLIB::fiffChInfo chs,  int nch, int acc, FIFFLIB::fiffCoordTrans t);
 
 
 public:
