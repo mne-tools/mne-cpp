@@ -39,6 +39,7 @@
 //=============================================================================================================
 
 #include "fwd_coil_set.h"
+#include "fwd_coil.h"
 
 
 //*************************************************************************************************************
@@ -221,6 +222,31 @@ FwdCoilSet *FwdCoilSet::create_meg_coils(FIFFLIB::fiffChInfo chs, int nch, int a
 
     for (k = 0; k < nch; k++) {
         if ((next = this->create_meg_coil(chs+k,acc,t)) == NULL)
+            goto bad;
+        res->coils = REALLOC_6(res->coils,res->ncoil+1,FwdCoil*);
+        res->coils[res->ncoil++] = next;
+    }
+    if (t)
+        res->coord_frame = t->to;
+    return res;
+
+bad : {
+        delete res;
+        return NULL;
+    }
+}
+
+
+//*************************************************************************************************************
+
+FwdCoilSet *FwdCoilSet::create_eeg_els(fiffChInfo chs, int nch, fiffCoordTrans t)
+{
+    FwdCoilSet* res = new FwdCoilSet();
+    FwdCoil*    next;
+    int        k;
+
+    for (k = 0; k < nch; k++) {
+        if ((next = FwdCoil::create_eeg_el(chs+k,t)) == NULL)
             goto bad;
         res->coils = REALLOC_6(res->coils,res->ncoil+1,FwdCoil*);
         res->coils[res->ncoil++] = next;

@@ -146,6 +146,19 @@ public:
     */
     FwdCoilSet* create_meg_coils(FIFFLIB::fiffChInfo chs,  int nch, int acc, FIFFLIB::fiffCoordTrans t);
 
+    //=========================================================================================================
+    /**
+    * Create a EEG coil set definition using a channel information
+    * Change the coordinate frame if so desired
+    * Refactored: fwd_create_eeg_els (fwd_coil_def.c)
+    *
+    * @param[in] ch     Channel information to use
+    * @param[in] nch    Number of channels
+    * @param[in] t      Transform the points using this
+    *
+    * @return   The created meg coil set.
+    */
+    static FwdCoilSet* create_eeg_els(FIFFLIB::fiffChInfo chs, int nch, FIFFLIB::fiffCoordTrans t);
 
 public:
     FwdCoil **coils;                 /* The coil or electrode positions */
