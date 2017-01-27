@@ -54,8 +54,6 @@ using namespace SCMEASLIB;
 using namespace UTILSLIB;
 using namespace IOBUFFER;
 using namespace Eigen;
-//using namespace DISPLIB;
-//using namespace RTPROCESSINGLIB;
 
 
 //*************************************************************************************************************
@@ -65,40 +63,8 @@ using namespace Eigen;
 
 Car::Car()
 : m_bIsRunning(false)
-//, m_pcarInput(NULL)
-//, m_pcarOutput(NULL)
-//, m_pcarBuffer(CircularMatrixBuffer<double>::SPtr())
-//, m_iMaxFilterTapSize(0)
-//, m_bSpharaActive(false)
-//, m_bFilterActivated(false)
-//, m_bProjActivated(false)
-//, m_bCompActivated(false)
-//, m_sCurrentSystem("VectorView")
 , m_pRTMSA(NewRealTimeMultiSampleArray::SPtr(new NewRealTimeMultiSampleArray()))
-//, m_pFilterWindow(Q_NULLPTR)
 {
-//    if(m_sCurrentSystem == "BabyMEG") {
-//        m_iNBaseFctsFirst = 270;
-//        m_iNBaseFctsSecond = 105;
-//    }
-
-//    if(m_sCurrentSystem == "VectorView") {
-//        m_iNBaseFctsFirst = 102;
-//        m_iNBaseFctsSecond = 102;
-//    }
-
-//    //Create toolbar widgets
-//    m_pOptionsWidget = carOptionsWidget::SPtr(new carOptionsWidget(this));
-//    m_pOptionsWidget->setAcquisitionSystem(m_sCurrentSystem);
-
-//    //Add action which will be visible in the plugin's toolbar
-//    m_pActionShowOptionsWidget = new QAction(QIcon(":/images/options.png"), tr("Noise reduction options"),this);
-//    m_pActionShowOptionsWidget->setShortcut(tr("F12"));
-//    m_pActionShowOptionsWidget->setStatusTip(tr("Noise reduction options"));
-//    connect(m_pActionShowOptionsWidget, &QAction::triggered,
-//            this, &car::showOptionsWidget);
-//    addPluginAction(m_pActionShowOptionsWidget);
-//    m_pActionShowOptionsWidget->setVisible(false);
 }
 
 
@@ -148,31 +114,21 @@ QSharedPointer<IPlugin> Car::clone() const
 
 void Car::init()
 {
-//    // Input
-//    m_pcarInput = PluginInputData<NewRealTimeMultiSampleArray>::create(this, "carIn", "car input data");
-//    connect(m_pcarInput.data(), &PluginInputConnector::notify,
-//            this, &car::update, Qt::DirectConnection);
-//    m_inputConnectors.append(m_pcarInput);
+    // Input
+    m_pCarInput = PluginInputData<NewRealTimeMultiSampleArray>::create(this, "CarIn", "Car input data");
+    connect(m_pCarInput.data(), &PluginInputConnector::notify,
+            this, &Car::update, Qt::DirectConnection);
+    m_inputConnectors.append(m_pCarInput);
 
-//    // Output - Uncomment this if you don't want to send processed data (in form of a matrix) to other plugins.
-//    m_pcarOutput = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "carOut", "car output data");
-//    m_outputConnectors.append(m_pcarOutput);
+    // Output - Uncomment this if you don't want to send processed data (in form of a matrix) to other plugins.
+    m_pCarOutput = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "CarOut", "Car output data");
+    m_outputConnectors.append(m_pCarOutput);
 
-//    QStringList slFlags;
-//    slFlags << "view" << "triggerdetection" << "scaling" << "colors";
-//    m_pcarOutput->data()->setDisplayFlags(slFlags);
+    //Delete Buffer - will be initailzed with first incoming data
+    if(!m_pCarBuffer.isNull())
+        m_pCarBuffer = CircularMatrixBuffer<double>::SPtr();
 
-//    //Delete Buffer - will be initailzed with first incoming data
-//    if(!m_pcarBuffer.isNull())
-//        m_pcarBuffer = CircularMatrixBuffer<double>::SPtr();
 
-//    //Handle projections
-//    connect(m_pOptionsWidget.data(), &carOptionsWidget::projSelectionChanged,
-//            this, &car::updateProjection);
-
-//    //Handle compensators
-//    connect(m_pOptionsWidget.data(), &carOptionsWidget::compSelectionChanged,
-//            this, &car::updateCompensator);
 }
 
 
@@ -236,7 +192,8 @@ QString Car::getName() const
 
 QWidget* Car::setupWidget()
 {
-    CarSetupWidget* setupWidget = new CarSetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
+    //widget is later distroyed by CentralWidget - so it has to be created everytime new
+    CarSetupWidget* setupWidget = new CarSetupWidget(this);
     return setupWidget;
 }
 
@@ -245,7 +202,7 @@ QWidget* Car::setupWidget()
 
 void Car::update(SCMEASLIB::NewMeasurement::SPtr pMeasurement)
 {
-    //QSharedPointer<NewRealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<NewRealTimeMultiSampleArray>();
+//    QSharedPointer<NewRealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<NewRealTimeMultiSampleArray>();
 
     m_pRTMSA = pMeasurement.dynamicCast<NewRealTimeMultiSampleArray>();
 
@@ -259,29 +216,11 @@ void Car::update(SCMEASLIB::NewMeasurement::SPtr pMeasurement)
         if(!m_pFiffInfo) {
             m_pFiffInfo = m_pRTMSA->info();
 
-//            //Init the multiplication matrices
-//            m_matSparseProjMult = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
-//            m_matSparseCompMult = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
-//            m_matSparseSpharaMult = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
-//            m_matSparseProjCompMult = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
-//            m_matSparseFull = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
-
-//            m_matSparseProjMult.setIdentity();
-//            m_matSparseCompMult.setIdentity();
-//            m_matSparseSpharaMult.setIdentity();
-//            m_matSparseProjCompMult.setIdentity();
-//            m_matSparseFull.setIdentity();
-
-//            m_pOptionsWidget->setFiffInfo(m_pFiffInfo);
 
             //Init output - Unocmment this if you also uncommented the m_pcarOutput in the constructor above
             m_pCarOutput->data()->initFromFiffInfo(m_pFiffInfo);
             m_pCarOutput->data()->setMultiArraySize(1);
             m_pCarOutput->data()->setVisibility(true);
-
-//            //Init the filter
-//            m_iMaxFilterTapSize = m_pRTMSA->getMultiSampleArray().at(m_pRTMSA->getMultiSampleArray().size()-1).cols();
-//            initFilter();
         }
 
         MatrixXd t_mat;
@@ -292,426 +231,6 @@ void Car::update(SCMEASLIB::NewMeasurement::SPtr pMeasurement)
         }
     }
 }
-
-
-////*************************************************************************************************************
-
-//void car::setAcquisitionSystem(const QString& sSystem)
-//{
-//    m_mutex.lock();
-//    m_sCurrentSystem = sSystem;
-//    m_mutex.unlock();
-
-//    createSpharaOperator();
-//}
-
-////*************************************************************************************************************
-
-//void car::setSpharaMode(bool state)
-//{
-//    m_mutex.lock();
-//    m_bSpharaActive = state;
-//    m_mutex.unlock();
-//}
-
-
-//*************************************************************************************************************
-
-//void car::setSpharaNBaseFcts(int nBaseFctsGrad, int nBaseFctsMag)
-//{
-//    m_mutex.lock();
-//    m_iNBaseFctsFirst = nBaseFctsGrad;
-//    m_iNBaseFctsSecond = nBaseFctsMag;
-//    m_mutex.unlock();
-
-//    createSpharaOperator();
-//}
-
-
-//*************************************************************************************************************
-
-//void car::updateProjection()
-//{
-//    //
-//    //  Update the SSP projector
-//    //
-//    if(m_pFiffInfo) {
-//        m_mutex.lock();
-//        //If a minimum of one projector is active set m_bProjActivated to true so that this model applies the ssp to the incoming data
-//        m_bProjActivated = false;
-//        for(qint32 i = 0; i < this->m_pFiffInfo->projs.size(); ++i) {
-//            if(this->m_pFiffInfo->projs[i].active) {
-//                m_bProjActivated = true;
-//                break;
-//            }
-//        }
-
-//        MatrixXd matProj;
-//        this->m_pFiffInfo->make_projector(matProj);
-////        qDebug() << "car::updateProjection - New projection calculated.";
-////        qDebug() << "car::updateProjection - m_bProjActivated:"<<m_bProjActivated;
-
-//        //set columns of matrix to zero depending on bad channels indexes
-//        for(qint32 j = 0; j < m_pFiffInfo->bads.size(); ++j) {
-//            int index = m_pFiffInfo->ch_names.indexOf(m_pFiffInfo->bads.at(j));
-//            if(index >= 0 && index<m_pFiffInfo->ch_names.size()) {
-//                matProj.col(index).setZero();
-//            }
-//        }
-
-////        std::cout << "Bads\n" << m_vecBadIdcs << std::endl;
-////        std::cout << "Proj\n";
-////        std::cout << matProj.block(0,0,10,10) << std::endl;
-
-//        //
-//        // Make proj sparse
-//        //
-//        qint32 nchan = this->m_pFiffInfo->nchan;
-//        qint32 i, k;
-
-//        typedef Eigen::Triplet<double> T;
-//        std::vector<T> tripletList;
-//        tripletList.reserve(nchan);
-
-//        tripletList.clear();
-//        tripletList.reserve(matProj.rows()*matProj.cols());
-//        for(i = 0; i < matProj.rows(); ++i) {
-//            for(k = 0; k < matProj.cols(); ++k) {
-//                if(matProj(i,k) != 0) {
-//                    tripletList.push_back(T(i, k, matProj(i,k)));
-//                }
-//            }
-//        }
-
-//        m_matSparseProjMult = SparseMatrix<double>(matProj.rows(),matProj.cols());
-//        if(tripletList.size() > 0)
-//            m_matSparseProjMult.setFromTriplets(tripletList.begin(), tripletList.end());
-
-//        //Create full multiplication matrix
-//        m_matSparseProjCompMult = m_matSparseProjMult * m_matSparseCompMult;
-
-//        m_matSparseFull = m_matSparseProjMult * m_matSparseCompMult;
-//        m_mutex.unlock();
-//    }
-//}
-
-
-////*************************************************************************************************************
-
-//void car::updateCompensator(int to)
-//{
-//    //
-//    //  Update the compensator
-//    //
-//    if(m_pFiffInfo)
-//    {
-//        if(to == 0) {
-//            m_bCompActivated = false;
-//        } else {
-//            m_bCompActivated = true;
-//        }
-
-////        qDebug()<<"to"<<to;
-////        qDebug()<<"from"<<from;
-////        qDebug()<<"m_bCompActivated"<<m_bCompActivated;
-
-//        FiffCtfComp newComp;
-//        this->m_pFiffInfo->make_compensator(0, to, newComp);//Do this always from 0 since we always read new raw data, we never actually perform a multiplication on already existing data
-
-//        this->m_pFiffInfo->set_current_comp(to);
-//        MatrixXd matComp = newComp.data->data;
-
-//        //
-//        // Make proj sparse
-//        //
-//        qint32 nchan = this->m_pFiffInfo->nchan;
-//        qint32 i, k;
-
-//        typedef Eigen::Triplet<double> T;
-//        std::vector<T> tripletList;
-//        tripletList.reserve(nchan);
-
-//        tripletList.clear();
-//        tripletList.reserve(matComp.rows()*matComp.cols());
-//        for(i = 0; i < matComp.rows(); ++i) {
-//            for(k = 0; k < matComp.cols(); ++k) {
-//                if(matComp(i,k) != 0) {
-//                    tripletList.push_back(T(i, k, matComp(i,k)));
-//                }
-//            }
-//        }
-
-//        m_matSparseCompMult = SparseMatrix<double>(matComp.rows(),matComp.cols());
-//        if(tripletList.size() > 0) {
-//            m_matSparseCompMult.setFromTriplets(tripletList.begin(), tripletList.end());
-//        }
-
-//        //Create full multiplication matrix
-//        m_matSparseProjCompMult = m_matSparseProjMult * m_matSparseCompMult;
-
-//        m_matSparseFull = m_matSparseProjMult * m_matSparseCompMult;
-//    }
-//}
-
-
-////*************************************************************************************************************
-
-//void car::setFilterChannelType(QString sType)
-//{
-//    m_sFilterChannelType = sType;
-
-//    //This version is for when all channels of a type are to be filtered (not only the visible ones).
-//    //Create channel filter list independent from channelNames
-//    m_lFilterChannelList.clear();
-
-//    for(int i = 0; i < m_pFiffInfo->chs.size(); ++i) {
-//        if((m_pFiffInfo->chs.at(i).kind == FIFFV_MEG_CH || m_pFiffInfo->chs.at(i).kind == FIFFV_EEG_CH ||
-//            m_pFiffInfo->chs.at(i).kind == FIFFV_EOG_CH || m_pFiffInfo->chs.at(i).kind == FIFFV_ECG_CH ||
-//            m_pFiffInfo->chs.at(i).kind == FIFFV_EMG_CH)/* && !m_pFiffInfo->bads.contains(m_pFiffInfo->chs.at(i).ch_name)*/) {
-
-//            if(m_sFilterChannelType == "All") {
-//                m_lFilterChannelList << i;
-//            } else if(m_pFiffInfo->chs.at(i).ch_name.contains(m_sFilterChannelType)) {
-//                m_lFilterChannelList << i;
-//            }
-//        }
-//    }
-//}
-
-
-////*************************************************************************************************************
-
-//void car::filterChanged(QList<FilterData> filterData)
-//{
-//    m_filterData = filterData;
-
-//    m_iMaxFilterLength = 1;
-//    for(int i = 0; i < filterData.size(); ++i) {
-//        if(m_iMaxFilterLength<filterData.at(i).m_iFilterOrder) {
-//            m_iMaxFilterLength = filterData.at(i).m_iFilterOrder;
-//        }
-//    }
-//}
-
-
-////*************************************************************************************************************
-
-//void car::filterActivated(bool state)
-//{
-//    m_bFilterActivated = state;
-//}
-
-
-////*************************************************************************************************************
-
-//void car::showOptionsWidget()
-//{
-//    m_pOptionsWidget->show();
-//}
-
-
-////*************************************************************************************************************
-
-//void car::initSphara()
-//{
-//    //Load SPHARA matrix
-//    IOUtils::read_eigen_matrix(m_matSpharaVVGradLoaded, QString(QCoreApplication::applicationDirPath() + "/mne_scan_plugins/resources/car/SPHARA/Vectorview_SPHARA_InvEuclidean_Grad.txt"));
-//    IOUtils::read_eigen_matrix(m_matSpharaVVMagLoaded, QString(QCoreApplication::applicationDirPath() + "/mne_scan_plugins/resources/car/SPHARA/Vectorview_SPHARA_InvEuclidean_Mag.txt"));
-
-//    IOUtils::read_eigen_matrix(m_matSpharaBabyMEGInnerLoaded, QString(QCoreApplication::applicationDirPath() + "/mne_scan_plugins/resources/car/SPHARA/BabyMEG_SPHARA_InvEuclidean_Inner.txt"));
-//    IOUtils::read_eigen_matrix(m_matSpharaBabyMEGOuterLoaded, QString(QCoreApplication::applicationDirPath() + "/mne_scan_plugins/resources/car/SPHARA/BabyMEG_SPHARA_InvEuclidean_Outer.txt"));
-
-//    IOUtils::read_eigen_matrix(m_matSpharaEEGLoaded, QString(QCoreApplication::applicationDirPath() + "/mne_scan_plugins/resources/car/SPHARA/Current_SPHARA_EEG.txt"));
-
-//    //Generate indices used to create the SPHARA operators for VectorView
-//    m_vecIndicesFirstVV.resize(0);
-//    m_vecIndicesSecondVV.resize(0);
-
-//    for(int r = 0; r < m_pFiffInfo->chs.size(); ++r) {
-//        //Find GRADIOMETERS
-//        if(m_pFiffInfo->chs.at(r).coil_type == 3012) {
-//            m_vecIndicesFirstVV.conservativeResize(m_vecIndicesFirstVV.rows()+1);
-//            m_vecIndicesFirstVV(m_vecIndicesFirstVV.rows()-1) = r;
-//        }
-
-//        //Find Magnetometers
-//        if(m_pFiffInfo->chs.at(r).coil_type == 3024) {
-//            m_vecIndicesSecondVV.conservativeResize(m_vecIndicesSecondVV.rows()+1);
-//            m_vecIndicesSecondVV(m_vecIndicesSecondVV.rows()-1) = r;
-//        }
-//    }
-
-//    //Generate indices used to create the SPHARA operators for babyMEG
-//    m_vecIndicesFirstBabyMEG.resize(0);
-//    for(int r = 0; r < m_pFiffInfo->chs.size(); ++r) {
-//        //Find INNER LAYER
-//        if(m_pFiffInfo->chs.at(r).coil_type == 7002) {
-//            m_vecIndicesFirstBabyMEG.conservativeResize(m_vecIndicesFirstBabyMEG.rows()+1);
-//            m_vecIndicesFirstBabyMEG(m_vecIndicesFirstBabyMEG.rows()-1) = r;
-//        }
-
-//        //TODO: Find outer layer
-//    }
-
-//    //Generate indices used to create the SPHARA operators for EEG layouts
-//    m_vecIndicesFirstEEG.resize(0);
-//    for(int r = 0; r < m_pFiffInfo->chs.size(); ++r) {
-//        //Find EEG
-//        if(m_pFiffInfo->chs.at(r).kind == FIFFV_EEG_CH) {
-//            m_vecIndicesFirstEEG.conservativeResize(m_vecIndicesFirstEEG.rows()+1);
-//            m_vecIndicesFirstEEG(m_vecIndicesFirstEEG.rows()-1) = r;
-//        }
-//    }
-
-////    qDebug()<<"car::createSpharaOperator - Read VectorView mag matrix "<<m_matSpharaVVMagLoaded.rows()<<m_matSpharaVVMagLoaded.cols()<<"and grad matrix"<<m_matSpharaVVGradLoaded.rows()<<m_matSpharaVVGradLoaded.cols();
-////    qDebug()<<"car::createSpharaOperator - Read BabyMEG inner layer matrix "<<m_matSpharaBabyMEGInnerLoaded.rows()<<m_matSpharaBabyMEGInnerLoaded.cols()<<"and outer layer matrix"<<m_matSpharaBabyMEGOuterFull.rows()<<m_matSpharaBabyMEGOuterFull.cols();
-//}
-
-
-////*************************************************************************************************************
-
-//void car::initFilter()
-//{
-//    m_pFilterWindow = FilterWindow::SPtr(new FilterWindow(m_pOptionsWidget.data(), Qt::Window/*0, Qt::Window | Qt::FramelessWindowHint | Qt::WindowSystemMenuHint*/));
-//    //m_pFilterWindow->setWindowFlags(Qt::WindowStaysOnTopHint);
-
-//    m_pFilterWindow->setFiffInfo(m_pFiffInfo);
-//    m_pFilterWindow->setWindowSize(m_iMaxFilterTapSize);
-//    m_pFilterWindow->setMaxFilterTaps(m_iMaxFilterTapSize);
-
-//    connect(m_pFilterWindow.data(), static_cast<void (FilterWindow::*)(QString)>(&FilterWindow::applyFilter),
-//            this, static_cast<void (car::*)(QString)>(&car::setFilterChannelType));
-
-//    connect(m_pFilterWindow.data(), &FilterWindow::filterChanged,
-//            this, &car::filterChanged);
-
-//    connect(m_pFilterWindow.data(), &FilterWindow::filterActivated,
-//            this, &car::filterActivated);
-
-//    //Handle Filtering
-//    connect(m_pFilterWindow.data(), &FilterWindow::activationCheckBoxListChanged,
-//            m_pOptionsWidget.data(), &carOptionsWidget::filterGroupChanged);
-
-//    connect(m_pOptionsWidget.data(), &carOptionsWidget::showFilterOptions,
-//            this, &car::showFilterWidget);
-
-//    m_pOptionsWidget->filterGroupChanged(m_pFilterWindow->getActivationCheckBoxList());
-
-//    m_pRtFilter = RtFilter::SPtr(new RtFilter());
-
-//    this->setFilterChannelType("MEG");
-
-//    //Set stored filter settings from last session
-//    QString t_sRTMSAName = m_pRTMSA->getName();
-//    QSettings settings;
-//    m_pFilterWindow->setFilterParameters(settings.value(QString("RTNRW/%1/filterHP").arg(t_sRTMSAName), 5.0).toDouble(),
-//                                            settings.value(QString("RTNRW/%1/filterLP").arg(t_sRTMSAName), 40.0).toDouble(),
-//                                            settings.value(QString("RTNRW/%1/filterOrder").arg(t_sRTMSAName), 128).toInt(),
-//                                            settings.value(QString("RTNRW/%1/filterType").arg(t_sRTMSAName), 2).toInt(),
-//                                            settings.value(QString("RTNRW/%1/filterDesignMethod").arg(t_sRTMSAName), 0).toInt(),
-//                                            settings.value(QString("RTNRW/%1/filterTransition").arg(t_sRTMSAName), 5.0).toDouble(),
-//                                            settings.value(QString("RTNRW/%1/filterUserDesignActive").arg(t_sRTMSAName), false).toBool(),
-//                                            settings.value(QString("RTNRW/%1/filterChannelType").arg(t_sRTMSAName), "MEG").toString());
-//}
-
-
-////*************************************************************************************************************
-
-//void car::showFilterWidget(bool state)
-//{
-//    if(state) {
-//        if(m_pFilterWindow->isActiveWindow()) {
-//            m_pFilterWindow->hide();
-//        } else {
-//            m_pFilterWindow->activateWindow();
-//            m_pFilterWindow->show();
-//        }
-//    } else {
-//        m_pFilterWindow->hide();
-//    }
-//}
-
-
-////*************************************************************************************************************
-
-//void car::createSpharaOperator()
-//{
-//    qDebug()<<"car::createSpharaOperator - Creating SPHARA oerpator for"<<m_sCurrentSystem;
-
-//    m_mutex.lock();
-
-//    MatrixXd matSpharaMultFirst = MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
-//    MatrixXd matSpharaMultSecond = MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
-
-//    if(m_sCurrentSystem == "VectorView") {
-//        matSpharaMultFirst = Sphara::makeSpharaProjector(m_matSpharaVVGradLoaded, m_vecIndicesFirstVV, m_pFiffInfo->nchan, m_iNBaseFctsFirst, 1); //GRADIOMETERS
-//        matSpharaMultSecond = Sphara::makeSpharaProjector(m_matSpharaVVMagLoaded, m_vecIndicesSecondVV, m_pFiffInfo->nchan, m_iNBaseFctsSecond, 0); //Magnetometers
-//    }
-
-//    if(m_sCurrentSystem == "BabyMEG") {
-//        matSpharaMultFirst = Sphara::makeSpharaProjector(m_matSpharaBabyMEGInnerLoaded, m_vecIndicesFirstBabyMEG, m_pFiffInfo->nchan, m_iNBaseFctsFirst, 0); //InnerLayer
-//    }
-
-//    if(m_sCurrentSystem == "EEG") {
-//        matSpharaMultFirst = Sphara::makeSpharaProjector(m_matSpharaEEGLoaded, m_vecIndicesFirstEEG, m_pFiffInfo->nchan, m_iNBaseFctsFirst, 0); //InnerLayer
-//    }
-
-//    //Write final operator matrices to file
-////    IOUtils::write_eigen_matrix(matSpharaMultFirst, QString(QCoreApplication::applicationDirPath() + "/mne_scan_plugins/resources/car/SPHARA/matSpharaMultFirst.txt"));
-////    IOUtils::write_eigen_matrix(matSpharaMultSecond, QString(QCoreApplication::applicationDirPath() + "/mne_scan_plugins/resources/car/SPHARA/matSpharaMultSecond.txt"));
-
-//    //
-//    // Make operators sparse
-//    //
-//    qint32 nchan = this->m_pFiffInfo->nchan;
-//    qint32 i, k;
-
-//    typedef Eigen::Triplet<double> T;
-//    std::vector<T> tripletList;
-//    tripletList.reserve(nchan);
-
-//    //First operator
-//    tripletList.clear();
-//    tripletList.reserve(matSpharaMultFirst.rows()*matSpharaMultFirst.cols());
-//    for(i = 0; i < matSpharaMultFirst.rows(); ++i) {
-//        for(k = 0; k < matSpharaMultFirst.cols(); ++k) {
-//            if(matSpharaMultFirst(i,k) != 0) {
-//                tripletList.push_back(T(i, k, matSpharaMultFirst(i,k)));
-//            }
-//        }
-//    }
-
-//    SparseMatrix<double> matSparseSpharaMultFirst = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
-
-//    if(tripletList.size() > 0) {
-//        matSparseSpharaMultFirst.setFromTriplets(tripletList.begin(), tripletList.end());
-//    }
-
-//    //Second operator
-//    tripletList.clear();
-//    tripletList.reserve(matSpharaMultSecond.rows()*matSpharaMultSecond.cols());
-
-//    for(i = 0; i < matSpharaMultSecond.rows(); ++i) {
-//        for(k = 0; k < matSpharaMultSecond.cols(); ++k) {
-//            if(matSpharaMultSecond(i,k) != 0) {
-//                tripletList.push_back(T(i, k, matSpharaMultSecond(i,k)));
-//            }
-//        }
-//    }
-
-//    SparseMatrix<double>matSparseSpharaMultSecond = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
-
-//    if(tripletList.size() > 0) {
-//        matSparseSpharaMultSecond.setFromTriplets(tripletList.begin(), tripletList.end());
-//    }
-
-//    //Create full multiplication matrix
-//    m_matSparseSpharaMult = matSparseSpharaMultFirst * matSparseSpharaMultSecond;
-
-//    m_matSparseFull = m_matSparseProjMult * m_matSparseCompMult;
-
-//    m_mutex.unlock();
-//}
 
 
 //*************************************************************************************************************
@@ -725,82 +244,16 @@ void Car::run()
         msleep(10);// Wait for fiff Info
     }
 
-//    //Set visibility of options tool to true
-//    m_pActionShowOptionsWidget->setVisible(true);
+    while(m_bIsRunning)
+    {
+        //Dispatch the inputs
+        MatrixXd t_mat = m_pCarBuffer->pop();
 
-//    //Read and create SPHARA operator for the first time
-//    initSphara();
-//    createSpharaOperator();
+        m_mutex.lock();
 
-//    while(m_bIsRunning)
-//    {
-//        //Dispatch the inputs
-//        MatrixXd t_mat = m_pcarBuffer->pop();
+        m_mutex.unlock();
 
-//        m_mutex.lock();
-
-//        //Do SSP's and compensators here
-//        if(m_bCompActivated) {
-//            if(m_bProjActivated) {
-//                //Comp + Proj
-//                t_mat = m_matSparseProjCompMult * t_mat;
-//            } else {
-//                //Comp
-//                t_mat = m_matSparseCompMult * t_mat;
-//            }
-//        } else {
-//            if(m_bProjActivated) {
-//                //Proj
-//                t_mat = m_matSparseProjMult * t_mat;
-//            } else {
-//                //None - Raw
-//            }
-//        }
-
-//        //Do temporal filtering here
-//        if(m_bFilterActivated) {
-//            t_mat = m_pRtFilter->filterChannelsConcurrently(t_mat, m_iMaxFilterLength, m_lFilterChannelList, m_filterData);
-//        }
-
-////        qDebug()<<"t_mat dim:"<<t_mat.rows()<<"x"<<t_mat.cols();
-////        qDebug()<<"m_lFilterChannelList.size():"<<m_lFilterChannelList.size();
-////        qDebug()<<"m_filterData.size():"<<m_filterData.size();
-
-//        //Do SPHARA here
-//        if(m_bSpharaActive) {
-//            //Set bad channels to zero so they do not get smeared into
-//            for(int i = 0; i < m_pFiffInfo->bads.size(); ++i) {
-//                t_mat.row(m_pFiffInfo->ch_names.indexOf(m_pFiffInfo->bads.at(i))).setZero();
-//            }
-
-//            t_mat = m_matSparseSpharaMult * t_mat;
-//        }
-
-////        //Common average
-////        MatrixXd commonAvr = MatrixXd(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
-////        commonAvr.setZero();
-
-////        int nEEGCh = 0;
-
-////        for(int i = 0; i <m_pFiffInfo->chs.size(); ++i) {
-////            if(m_pFiffInfo->chs.at(i).ch_name.contains("EEG") && !m_pFiffInfo->bads.contains(m_pFiffInfo->chs.at(i).ch_name)) {
-////                nEEGCh++;
-////            }
-////        }
-
-////        for(int i = 0; i <m_pFiffInfo->chs.size(); ++i) {
-////            for(int j = 0; j < m_pFiffInfo->chs.size(); ++j) {
-////                if(m_pFiffInfo->chs.at(j).ch_name.contains("EEG") && !m_pFiffInfo->bads.contains(m_pFiffInfo->chs.at(j).ch_name)) {
-////                    commonAvr(i,j) = 1/nEEGCh;
-////                }
-////            }
-////        }
-
-////        UTILSLIB::IOUtils::write_eigen_matrix(commonAvr, "commonAvr.txt", "common vaergae matrix");
-
-//        m_mutex.unlock();
-
-//        //Send the data to the connected plugins and the online display
-//        m_pcarOutput->data()->setValue(t_mat);
-//    }
+        //Send the data to the connected plugins and the online display
+        m_pCarOutput->data()->setValue(t_mat);
+    }
 }
