@@ -252,7 +252,7 @@ protected:
     virtual void run();
 
 private:
-//    QMutex                          m_mutex;                                    /**< The threads mutex.*/
+    QMutex                          m_mutex;                                    /**< The threads mutex.*/
 
 //    bool                            m_bCompActivated;                           /**< Compensator activated */
     bool                            m_bIsRunning;                               /**< Flag whether thread is running.*/
