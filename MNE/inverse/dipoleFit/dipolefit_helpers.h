@@ -1965,34 +1965,6 @@ bad : {
 
 
 
-FwdCoilSet* fwd_create_eeg_els(fiffChInfo      chs,      /* Channel information to use */
-                              int             nch,
-                              fiffCoordTrans t)	 /* Transform the points using this */
-
-{
-    FwdCoilSet* res = new FwdCoilSet();
-    FwdCoil*    next;
-    int        k;
-
-    for (k = 0; k < nch; k++) {
-        if ((next = FwdCoil::create_eeg_el(chs+k,t)) == NULL)
-            goto bad;
-        res->coils = REALLOC(res->coils,res->ncoil+1,FwdCoil*);
-        res->coils[res->ncoil++] = next;
-    }
-    if (t)
-        res->coord_frame = t->to;
-    return res;
-
-bad : {
-        delete res;
-        return NULL;
-    }
-}
-
-
-
-
 
 FwdCoilSet* fwd_dup_coil_set(FwdCoilSet* s,
                             fiffCoordTrans t)
@@ -12563,7 +12535,7 @@ DipoleFitData* setup_dipole_fit_data(   const QString& mriname,         /**< Thi
                                                    accurate_coils ? FWD_COIL_ACCURACY_ACCURATE : FWD_COIL_ACCURACY_NORMAL,
                                                    res->meg_head_t)) == NULL)
             goto bad;
-        if ((res->eeg_els = fwd_create_eeg_els(res->chs+res->nmeg,res->neeg,NULL)) == NULL)
+        if ((res->eeg_els = FwdCoilSet::create_eeg_els(res->chs+res->nmeg,res->neeg,NULL)) == NULL)
             goto bad;
         printf("Head coordinate coil definitions created.\n");
     }
