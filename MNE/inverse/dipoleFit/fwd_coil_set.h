@@ -127,7 +127,7 @@ public:
     * @param[in] acc    Required accuracy
     * @param[in] t      Transform the points using this
     *
-    * @return   The new named matrix.
+    * @return   The created meg coil.
     */
     FwdCoil* create_meg_coil( FIFFLIB::fiffChInfo ch, int acc, FIFFLIB::fiffCoordTrans t);
 
@@ -142,7 +142,7 @@ public:
     * @param[in] acc    Required accuracy
     * @param[in] t      Transform the points using this
     *
-    * @return   The new named matrix.
+    * @return   The created meg coil set.
     */
     FwdCoilSet* create_meg_coils(FIFFLIB::fiffChInfo chs,  int nch, int acc, FIFFLIB::fiffCoordTrans t);
 

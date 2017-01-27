@@ -1961,68 +1961,8 @@ bad : {
 
 
 
-FwdCoil* fwd_create_eeg_el(fiffChInfo     ch,         /* Channel information to use */
-                          fiffCoordTrans t)	     /* Transform the points using this */
-/*
-      * Create an electrode definition. Transform coordinate frame if so desired.
-      */
-{
-    FwdCoil*    res = NULL;
-    int        c;
 
-    if (ch->kind != FIFFV_EEG_CH) {
-        printf("%s is not an EEG channel. Cannot create an electrode definition.",ch->ch_name);
-        goto bad;
-    }
-    if (t && t->from != FIFFV_COORD_HEAD) {
-        printf("Inappropriate coordinate transformation in fwd_create_eeg_el");
-        goto bad;
-    }
 
-    if (VEC_LEN(ch->chpos.ex) < 1e-4)
-        res = new FwdCoil(1);	             /* No reference electrode */
-    else
-        res = new FwdCoil(2);		     /* Reference electrode present */
-
-    res->chname     = mne_strdup(ch->ch_name);
-    res->desc       = mne_strdup("EEG electrode");
-    res->coil_class = FWD_COILC_EEG;
-    res->accuracy   = FWD_COIL_ACCURACY_NORMAL;
-    res->type       = ch->chpos.coil_type;
-    VEC_COPY(res->r0,ch->chpos.r0);
-    VEC_COPY(res->ex,ch->chpos.ex);
-    /*
-   * Optional coordinate transformation
-   */
-    if (t) {
-        fiff_coord_trans(res->r0,t,FIFFV_MOVE);
-        fiff_coord_trans(res->ex,t,FIFFV_MOVE);
-        res->coord_frame = t->to;
-    }
-    else
-        res->coord_frame = FIFFV_COORD_HEAD;
-    /*
-   * The electrode location
-   */
-    for (c = 0; c < 3; c++)
-        res->rmag[0][c] = res->cosmag[0][c] = res->r0[c];
-    normalize(res->cosmag[0]);
-    res->w[0] = 1.0;
-    /*
-   * Add the reference electrode, if appropriate
-   */
-    if (res->np == 2) {
-        for (c = 0; c < 3; c++)
-            res->rmag[1][c] = res->cosmag[1][c] = res->ex[c];
-        normalize(res->cosmag[1]);
-        res->w[1] = -1.0;
-    }
-    return res;
-
-bad : {
-        return NULL;
-    }
-}
 
 
 FwdCoilSet* fwd_create_eeg_els(fiffChInfo      chs,      /* Channel information to use */
@@ -2035,7 +1975,7 @@ FwdCoilSet* fwd_create_eeg_els(fiffChInfo      chs,      /* Channel information 
     int        k;
 
     for (k = 0; k < nch; k++) {
-        if ((next = fwd_create_eeg_el(chs+k,t)) == NULL)
+        if ((next = FwdCoil::create_eeg_el(chs+k,t)) == NULL)
             goto bad;
         res->coils = REALLOC(res->coils,res->ncoil+1,FwdCoil*);
         res->coils[res->ncoil++] = next;
