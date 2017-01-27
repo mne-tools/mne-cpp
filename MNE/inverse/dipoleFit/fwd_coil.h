@@ -42,6 +42,7 @@
 //=============================================================================================================
 
 #include "../inverse_global.h"
+#include <fiff/fiff_types.h>
 
 
 //*************************************************************************************************************
@@ -122,6 +123,18 @@ public:
     * Refactored: fwd_free_coil
     */
     ~FwdCoil();
+
+    //=========================================================================================================
+    /**
+    * Create an electrode definition. Transform coordinate frame if so desired.
+    * Refactored: fwd_create_eeg_el (fwd_coil_def.c)
+    *
+    * @param[in] ch     Channel information to use
+    * @param[in] t      Transform the points using this
+    *
+    * @return   The created coil.
+    */
+    static FwdCoil* create_eeg_el( FIFFLIB::fiffChInfo ch,FIFFLIB::fiffCoordTrans t);
 
 public:
     char    *chname;        /**< Name of this channel */
