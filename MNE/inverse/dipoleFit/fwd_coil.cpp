@@ -300,3 +300,37 @@ bad : {
         return NULL;
     }
 }
+
+
+//*************************************************************************************************************
+
+bool FwdCoil::is_axial_coil() const
+{
+    return (this->coil_class == FWD_COILC_MAG ||
+            this->coil_class == FWD_COILC_AXIAL_GRAD ||
+            this->coil_class == FWD_COILC_AXIAL_GRAD2);
+}
+
+
+//*************************************************************************************************************
+
+bool FwdCoil::is_magnetometer_coil() const
+{
+    return this->coil_class == FWD_COILC_MAG;
+}
+
+
+//*************************************************************************************************************
+
+bool FwdCoil::is_planar_coil() const
+{
+    return this->coil_class == FWD_COILC_PLANAR_GRAD;
+}
+
+
+//*************************************************************************************************************
+
+bool FwdCoil::is_eeg_electrode() const
+{
+    return this->coil_class == FWD_COILC_EEG;
+}
