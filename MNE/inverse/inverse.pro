@@ -115,7 +115,8 @@ SOURCES += \
     dipoleFit/mne_sss_data.cpp \
     dipoleFit/mne_mne_data.cpp \
     dipoleFit/mne_meas_data_set.cpp \
-    dipoleFit/mne_meas_data.cpp
+    dipoleFit/mne_meas_data.cpp \
+    dipoleFit/mne_named_matrix.cpp
 
 HEADERS +=\
     inverse_global.h \
@@ -144,7 +145,8 @@ HEADERS +=\
     dipoleFit/mne_sss_data.h \
     dipoleFit/mne_mne_data.h \
     dipoleFit/mne_meas_data_set.h \
-    dipoleFit/mne_meas_data.h
+    dipoleFit/mne_meas_data.h \
+    dipoleFit/mne_named_matrix.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
