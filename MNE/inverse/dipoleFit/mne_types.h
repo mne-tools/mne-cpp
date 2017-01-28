@@ -114,11 +114,27 @@
 #include "mne_sss_data.h"
 #include "mne_named_matrix.h"
 #include "mne_deriv_set.h"
+#include "fiff_sparse_matrix.h"
 
 
 #if defined(__cplusplus) 
 extern "C" {
 #endif
+
+
+namespace INVERSELIB {
+    class MneSurfaceOrVolume;
+
+    /*
+     * These are the aliases
+     */
+    typedef MneSurfaceOrVolume MneCSourceSpace;
+    //typedef mneSurfaceOrVolume mneSourceVolume;
+    typedef MneSurfaceOrVolume MneCSurface;
+    //typedef mneSurfaceOrVolume mneVolume;
+
+}
+
 
 ///*
 // * Complex data
@@ -134,8 +150,8 @@ extern "C" {
 //} *mneDoubleComplex,**mneDoubleComplexMatrix,mneDoubleComplexRec;
 
 typedef void (*mneUserFreeFunc)(void *);  /* General purpose */
-typedef FIFFLIB::fiffSparseMatrix mneSparseMatrix;
-typedef FIFFLIB::fiffSparseMatrixRec mneSparseMatrixRec;
+//typedef FIFFLIB::fiffSparseMatrix mneSparseMatrix;
+//typedef FIFFLIB::fiffSparseMatrixRec mneSparseMatrixRec;
 
 typedef struct {
   int   vert;			/* Which vertex does this apply to */
@@ -180,88 +196,88 @@ typedef struct {
 #define MNE_SOURCE_SPACE_VOLUME   2 /* 3D volume source space */
 #define MNE_SOURCE_SPACE_DISCRETE 3 /* Discrete points */
 
-typedef struct {		    /* This defines a source space or a surface */
-  int              type;	    /* Is this a volume or a surface */
-  char             *subject;	    /* Name (id) of the subject */
-  int              id;		    /* Surface id */
-  int              coord_frame;     /* Which coordinate system are the data in now */
-  /*
-   * These relate to the FreeSurfer way
-   */
-  mneVolGeom       vol_geom;	    /* MRI volume geometry information as FreeSurfer likes it */
-  void             *mgh_tags;	    /* Tags listed in the file */
-  /*
-   * These are meaningful for both surfaces and volumes
-   */
-  int              np;		    /* Number of vertices */
-  float            **rr;	    /* The vertex locations */
-  float            **nn;	    /* Surface normals at these points */
-  float            cm[3];	    /* Center of mass */
+//typedef struct {		    /* This defines a source space or a surface */
+//  int              type;	    /* Is this a volume or a surface */
+//  char             *subject;	    /* Name (id) of the subject */
+//  int              id;		    /* Surface id */
+//  int              coord_frame;     /* Which coordinate system are the data in now */
+//  /*
+//   * These relate to the FreeSurfer way
+//   */
+//  mneVolGeom       vol_geom;	    /* MRI volume geometry information as FreeSurfer likes it */
+//  void             *mgh_tags;	    /* Tags listed in the file */
+//  /*
+//   * These are meaningful for both surfaces and volumes
+//   */
+//  int              np;		    /* Number of vertices */
+//  float            **rr;	    /* The vertex locations */
+//  float            **nn;	    /* Surface normals at these points */
+//  float            cm[3];	    /* Center of mass */
 
-  int              *inuse;	    /* Is this point in use in the source space */
-  int              *vertno;	    /* Vertex numbers of the used vertices in the full source space */
-  int              nuse;	    /* Number of points in use */
+//  int              *inuse;	    /* Is this point in use in the source space */
+//  int              *vertno;	    /* Vertex numbers of the used vertices in the full source space */
+//  int              nuse;	    /* Number of points in use */
 
-  int              **neighbor_vert; /* Vertices neighboring each vertex */
-  int              *nneighbor_vert; /* Number of vertices neighboring each vertex */
-  float            **vert_dist;     /* Distances between neigboring vertices */
-  /*
-   * These are for surfaces only
-   */
-  int              ntri;	    /* Number of triangles */
-  mneTriangle      tris;	    /* The triangulation information */
-  int              **itris;	    /* The vertex numbers */
-  float            tot_area;	    /* Total area of the surface, computed from the triangles */
+//  int              **neighbor_vert; /* Vertices neighboring each vertex */
+//  int              *nneighbor_vert; /* Number of vertices neighboring each vertex */
+//  float            **vert_dist;     /* Distances between neigboring vertices */
+//  /*
+//   * These are for surfaces only
+//   */
+//  int              ntri;	    /* Number of triangles */
+//  mneTriangle      tris;	    /* The triangulation information */
+//  int              **itris;	    /* The vertex numbers */
+//  float            tot_area;	    /* Total area of the surface, computed from the triangles */
 
-  int              nuse_tri;	    /* The triangulation corresponding to the vertices in use */
-  mneTriangle      use_tris;	    /* The triangulation information for the vertices in use */
-  int              **use_itris;	    /* The vertex numbers for the 'use' triangulation */
+//  int              nuse_tri;	    /* The triangulation corresponding to the vertices in use */
+//  mneTriangle      use_tris;	    /* The triangulation information for the vertices in use */
+//  int              **use_itris;	    /* The vertex numbers for the 'use' triangulation */
 
-  int              **neighbor_tri;  /* Neighboring triangles for each vertex 
-				     * Note: number of entries varies for vertex to vertex */
-  int              *nneighbor_tri;  /* Number of neighboring triangles for each vertex */
+//  int              **neighbor_tri;  /* Neighboring triangles for each vertex
+//				     * Note: number of entries varies for vertex to vertex */
+//  int              *nneighbor_tri;  /* Number of neighboring triangles for each vertex */
 
-  mneNearest       nearest;	    /* Nearest inuse vertex info (number of these is the same as the number vertices) */
-  mnePatchInfo     *patches;        /* Patch information (number of these is the same as the number of points in use) */
-  int              npatch;	    /* How many (should be same as nuse) */
+//  mneNearest       nearest;	    /* Nearest inuse vertex info (number of these is the same as the number vertices) */
+//  mnePatchInfo     *patches;        /* Patch information (number of these is the same as the number of points in use) */
+//  int              npatch;	    /* How many (should be same as nuse) */
 
-  mneSparseMatrix  dist;	    /* Distances between the (used) vertices (along the surface). */
-  float            dist_limit;	    /* Distances above this (in volume) have not been calculated. 
-				     * If negative, only used vertices have been considered */
+//  mneSparseMatrix  dist;	    /* Distances between the (used) vertices (along the surface). */
+//  float            dist_limit;	    /* Distances above this (in volume) have not been calculated.
+//				     * If negative, only used vertices have been considered */
 
-  float            *curv;	    /* The FreeSurfer curvature values */
-  float            *val;	    /* Some other values associated with the vertices */
-  /*
-   * These are for volumes only
-   */
-  FIFFLIB::fiffCoordTrans   voxel_surf_RAS_t;/* Transform from voxel coordinate to the surface RAS (MRI) coordinates */
-  int              vol_dims[3];     /* Dimensions of the volume grid (width x height x depth) 
-				     * NOTE: This will be present only if the source space is a complete 
-				     * rectangular grid with unused vertices included */
-  float            voxel_size[3];   /* Derived from the above */
-  mneSparseMatrix  interpolator;    /* Matrix to interpolate into an MRI volume */
-  char             *MRI_volume;     /* The name of the file the above interpolator is based on */
-  FIFFLIB::fiffCoordTrans   MRI_voxel_surf_RAS_t;
-  FIFFLIB::fiffCoordTrans   MRI_surf_RAS_RAS_t;  /* Transform from surface RAS to RAS coordinates in the associated MRI volume */
-  int              MRI_vol_dims[3];     /* Dimensions of the MRI volume (width x height x depth) */
-  /*
-   * Possibility to add user-defined data
-   */
-  void             *user_data;      /* Anything else we want */
-  mneUserFreeFunc  user_data_free;  /* Function to set the above free */
-} *mneSurfaceOrVolume,mneSurfaceOrVolumeRec;
-/*
- * These are the aliases
- */
-typedef mneSurfaceOrVolume mneSourceSpace;
-//typedef mneSurfaceOrVolume mneSourceVolume;
-typedef mneSurfaceOrVolume mneSurface;
-//typedef mneSurfaceOrVolume mneVolume;
+//  float            *curv;	    /* The FreeSurfer curvature values */
+//  float            *val;	    /* Some other values associated with the vertices */
+//  /*
+//   * These are for volumes only
+//   */
+//  FIFFLIB::fiffCoordTrans   voxel_surf_RAS_t;/* Transform from voxel coordinate to the surface RAS (MRI) coordinates */
+//  int              vol_dims[3];     /* Dimensions of the volume grid (width x height x depth)
+//				     * NOTE: This will be present only if the source space is a complete
+//				     * rectangular grid with unused vertices included */
+//  float            voxel_size[3];   /* Derived from the above */
+//  mneSparseMatrix  interpolator;    /* Matrix to interpolate into an MRI volume */
+//  char             *MRI_volume;     /* The name of the file the above interpolator is based on */
+//  FIFFLIB::fiffCoordTrans   MRI_voxel_surf_RAS_t;
+//  FIFFLIB::fiffCoordTrans   MRI_surf_RAS_RAS_t;  /* Transform from surface RAS to RAS coordinates in the associated MRI volume */
+//  int              MRI_vol_dims[3];     /* Dimensions of the MRI volume (width x height x depth) */
+//  /*
+//   * Possibility to add user-defined data
+//   */
+//  void             *user_data;      /* Anything else we want */
+//  mneUserFreeFunc  user_data_free;  /* Function to set the above free */
+//} *mneSurfaceOrVolume,mneSurfaceOrVolumeRec;
+///*
+// * These are the aliases
+// */
+//typedef mneSurfaceOrVolume mneSourceSpace;
+////typedef mneSurfaceOrVolume mneSourceVolume;
+//typedef mneSurfaceOrVolume mneSurface;
+////typedef mneSurfaceOrVolume mneVolume;
 
-typedef mneSurfaceOrVolumeRec mneSourceSpaceRec;
-//typedef mneSurfaceOrVolumeRec mneSourceVolumeRecRec;
-typedef mneSurfaceOrVolumeRec mneSurfaceRec;
-//typedef mneSurfaceOrVolumeRec mneVolumeRec;
+//typedef mneSurfaceOrVolumeRec mneSourceSpaceRec;
+////typedef mneSurfaceOrVolumeRec mneSourceVolumeRecRec;
+//typedef mneSurfaceOrVolumeRec mneSurfaceRec;
+////typedef mneSurfaceOrVolumeRec mneVolumeRec;
 
 //typedef struct {		    /* FreeSurfer patches */
 //  mneSurface       s;		    /* Patch represented as a surface */
@@ -290,7 +306,7 @@ typedef struct {		/* Matrix specification with a channel list */
   int   ncol;			/* Number of columns (same as in data) */
   char  **rowlist;		/* Name list for the rows (may be NULL) */
   char  **collist;		/* Name list for the columns (may be NULL) */
-  mneSparseMatrix data;		/* The data itself (sparse) */
+  INVERSELIB::FiffSparseMatrix* data;		/* The data itself (sparse) */
 } *mneSparseNamedMatrix,mneSparseNamedMatrixRec;
 
 typedef struct {		/* Vector specification with a channel list */
@@ -349,7 +365,7 @@ typedef struct {		/* Covariance matrix storage */
   char       **names;		/* Names of the entries (optional) */
   double     *cov;		/* Covariance matrix in packed representation (lower triangle) */
   double     *cov_diag;		/* Diagonal covariance matrix */
-  mneSparseMatrix cov_sparse;   /* A sparse covariance matrix 
+  INVERSELIB::FiffSparseMatrix* cov_sparse;   /* A sparse covariance matrix
 				 * (Note: data are floats in this which is an inconsistency) */
   double     *lambda;		/* Eigenvalues of cov */
   double     *inv_lambda;	/* Inverses of the square roots of the eigenvalues of cov */
@@ -390,8 +406,8 @@ typedef struct {		/* Covariance matrix storage */
 //} *mneForwardSolution,mneForwardSolutionRec;
 
 typedef struct {		          /* An inverse operator */
-  FIFFLIB::fiffId         meas_id;                 /* The assosiated measurement ID */
-  mneSourceSpace *spaces;	          /* The source spaces */
+  FIFFLIB::fiffId         meas_id;                  /* The assosiated measurement ID */
+  INVERSELIB::MneCSourceSpace* *spaces;               /* The source spaces */
   int            nspace;	          /* Number of source spaces */
   FIFFLIB::fiffCoordTrans meg_head_t;              /* MEG device <-> head coordinate transformation */
   FIFFLIB::fiffCoordTrans mri_head_t;	          /* MRI device <-> head coordinate transformation */
@@ -594,8 +610,8 @@ typedef struct {
   int             mne_kind;	     /* Our kind */
   int             calibrated;	     /* Are the coefficients in the file calibrated already? */
   INVERSELIB::MneNamedMatrix*  data;	             /* The compensation data */
-  mneSparseMatrix presel;            /* Apply this selector prior to compensation */
-  mneSparseMatrix postsel;	     /* Apply this selector after compensation */
+  INVERSELIB::FiffSparseMatrix* presel;            /* Apply this selector prior to compensation */
+  INVERSELIB::FiffSparseMatrix* postsel;	     /* Apply this selector after compensation */
   float           *presel_data;	     /* These are used for the intermediate results in the calculations */
   float           *comp_data;
   float           *postsel_data;

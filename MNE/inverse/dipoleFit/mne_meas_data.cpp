@@ -147,16 +147,6 @@ void mne_free_proj_op_9(mneProjOp op)
 
 
 
-void mne_free_sparse_9(mneSparseMatrix mat)
-
-{
-    if (mat) {
-        FREE_9(mat->data);
-        FREE_9(mat);
-    }
-}
-
-
 void mne_free_ctf_comp_data_9(mneCTFcompData comp)
 
 {
@@ -165,8 +155,10 @@ void mne_free_ctf_comp_data_9(mneCTFcompData comp)
 
     if(comp->data)
         delete comp->data;
-    mne_free_sparse_9(comp->presel);
-    mne_free_sparse_9(comp->postsel);
+    if(comp->presel)
+        delete comp->presel;
+    if(comp->postsel)
+        delete comp->postsel;
     FREE_9(comp->presel_data);
     FREE_9(comp->postsel_data);
     FREE_9(comp->comp_data);
@@ -279,7 +271,8 @@ void mne_free_sparse_named_matrix_9(mneSparseNamedMatrix mat)
         return;
     mne_free_name_list_9(mat->rowlist,mat->nrow);
     mne_free_name_list_9(mat->collist,mat->ncol);
-    mne_free_sparse_9(mat->data);
+    if(mat->data)
+        delete mat->data;
     FREE_9(mat);
     return;
 }

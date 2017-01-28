@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     dipole_forward.h
+* @file     fiff_sparse_matrix.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     December, 2016
+* @date     January, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) 2016, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -18,7 +18,7 @@
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
 *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
-* 
+*
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
 * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    DipoleForward class declaration.
+* @brief    FiffSparseMatrix class declaration.
 *
 */
 
-#ifndef DIPOLEFORWARD_H
-#define DIPOLEFORWARD_H
+#ifndef FIFFSPARSEMATRIX_H
+#define FIFFSPARSEMATRIX_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -42,6 +42,7 @@
 //=============================================================================================================
 
 #include "../inverse_global.h"
+#include <fiff/fiff_types.h>
 
 
 //*************************************************************************************************************
@@ -72,68 +73,65 @@ namespace INVERSELIB
 
 //=============================================================================================================
 /**
-* Implements DipoleForward (Replaces *dipoleForward,dipoleForwardRec struct of MNE-C fit_types.h).
+* Implements MNE Mne Data (Replaces *mneMneData,mneMneDataRec; struct of MNE-C mne_types.h).
 *
-* @brief DipoleForward description
+* @brief Data associated with MNE computations for each mneMeasDataSet
 */
-class INVERSESHARED_EXPORT DipoleForward
+class INVERSESHARED_EXPORT FiffSparseMatrix
 {
 public:
-    typedef QSharedPointer<DipoleForward> SPtr;              /**< Shared pointer type for DipoleForward. */
-    typedef QSharedPointer<const DipoleForward> ConstSPtr;   /**< Const shared pointer type for DipoleForward. */
+    typedef QSharedPointer<FiffSparseMatrix> SPtr;              /**< Shared pointer type for FiffSparseMatrix. */
+    typedef QSharedPointer<const FiffSparseMatrix> ConstSPtr;   /**< Const shared pointer type for FiffSparseMatrix. */
 
     //=========================================================================================================
     /**
-    * Constructs the Dipole Forward
-    * Refactored: new_dipole_forward (dipole_forward.c)
+    * Constructs the FiffSparseMatrix
     */
-    DipoleForward();
-
-//    //=========================================================================================================
-//    /**
-//    * Copy constructor.
-//    *
-//    * @param[in] p_DipoleForward    DipoleForward which should be copied
-//    */
-//    DipoleForward(const DipoleForward& p_DipoleForward);
+    FiffSparseMatrix();
 
     //=========================================================================================================
     /**
-    * Destroys the Dipole Forward description
-    * Refactored: free_dipole_forward_2 (dipole_fit_setup.c)
+    * Copies a FiffSparseMatrix
+    * Refactored: mne_dup_sparse_matrix (mne_sparse_matop.c)
+    *
+    * @param[in] mat     The Sparse Matrix which should be copied
     */
-    ~DipoleForward();
+    FiffSparseMatrix(const FiffSparseMatrix& mat);
+
+    //=========================================================================================================
+    /**
+    * Destroys the FiffSparseMatrix description
+    * Refactored: mne_free_sparse (mne_sparse_matop.c)
+    */
+    ~FiffSparseMatrix();
 
 public:
-    float **rd;         /**< Dipole locations */
-    int   ndip;         /**< How many dipoles */
-    float **fwd;        /**< The forward solution (projected and whitened) */
-    float *scales;      /**< Scales applied to the columns of fwd */
-    float **uu;         /**< The left singular vectors of the forward matrix */
-    float **vv;         /**< The right singular vectors of the forward matrix */
-    float *sing;        /**< The singular values */
-    int   nch;          /**< Number of channels */
+    FIFFLIB::fiff_int_t   coding;    /**< coding (storage) type of the sparse matrix */
+    FIFFLIB::fiff_int_t   m;         /**< m rows */
+    FIFFLIB::fiff_int_t   n;         /**< n columns */
+    FIFFLIB::fiff_int_t   nz;        /**< nz nonzeros */
+    FIFFLIB::fiff_float_t *data;     /**< owns the data */
+    FIFFLIB::fiff_int_t   *inds;     /**< index list, points into data, no dealloc! */
+    FIFFLIB::fiff_int_t   *ptrs;     /**< pointer list, points into data, no dealloc! */
 
 // ### OLD STRUCT ###
-//    typedef struct {
-//      float **rd;			    /* Dipole locations */
-//      int   ndip;			    /* How many dipoles */
-//      float **fwd;			    /* The forward solution (projected and whitened) */
-//      float *scales;		    /* Scales applied to the columns of fwd */
-//      float **uu;			    /* The left singular vectors of the forward matrix */
-//      float **vv;			    /* The right singular vectors of the forward matrix */
-//      float *sing;			    /* The singular values */
-//      int   nch;			    /* Number of channels */
-//    } *dipoleForward,dipoleForwardRec;
+///** Structure for sparse matrices */
+//typedef struct _fiff_sparse_matrix {
+//    fiff_int_t   coding;    /**< coding (storage) type of the sparse matrix */
+//    fiff_int_t   m;         /**< m rows */
+//    fiff_int_t   n;         /**< n columns */
+//    fiff_int_t   nz;        /**< nz nonzeros */
+//    fiff_float_t *data;     /**< owns the data */
+//    fiff_int_t   *inds;     /**< index list, points into data, no dealloc! */
+//    fiff_int_t   *ptrs;     /**< pointer list, points into data, no dealloc! */
+//} *fiffSparseMatrix, fiffSparseMatrixRec;
 };
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-
 } // NAMESPACE INVERSELIB
 
-#endif // DIPOLEFORWARD_H
+#endif // FIFFSPARSEMATRIX_H
