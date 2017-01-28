@@ -53,6 +53,7 @@
 //=============================================================================================================
 
 using namespace Eigen;
+using namespace FIFFLIB;
 using namespace INVERSELIB;
 
 
@@ -110,4 +111,152 @@ FiffSparseMatrix::~FiffSparseMatrix()
 {
     if(data)
         FREE_18(data);
+}
+
+
+//*************************************************************************************************************
+
+fiff_int_t *FiffSparseMatrix::fiff_get_matrix_sparse_dims(FiffTag::SPtr &tag)
+{
+    return fiff_get_matrix_dims(tag);
+}
+
+
+//*************************************************************************************************************
+
+FiffSparseMatrix *FiffSparseMatrix::fiff_get_float_sparse_matrix(FiffTag::SPtr &tag)
+{
+    int *dims;
+    INVERSELIB::FiffSparseMatrix* res = NULL;
+    int   m,n,nz;
+    int   coding,correct_size;
+
+    if ( fiff_type_fundamental(tag->getType())   != FIFFT_MATRIX ||
+         fiff_type_base(tag->getType())          != FIFFT_FLOAT ||
+         (fiff_type_matrix_coding(tag->getType()) != FIFFTS_MC_CCS &&
+          fiff_type_matrix_coding(tag->getType()) != FIFFTS_MC_RCS) ) {
+        printf("fiff_get_float_ccs_matrix: wrong data type!");
+        return NULL;
+    }
+
+    if ((dims = fiff_get_matrix_sparse_dims(tag)) == NULL)
+        return NULL;
+
+    if (dims[0] != 2) {
+        printf("fiff_get_float_sparse_matrix: wrong # of dimensions!");
+        return NULL;
+    }
+
+    m   = dims[1];
+    n   = dims[2];
+    nz  = dims[3];
+
+    coding = fiff_type_matrix_coding(tag->getType());
+    if (coding == FIFFTS_MC_CCS)
+        correct_size = nz*(sizeof(fiff_float_t) + sizeof(fiff_int_t)) +
+                (n+1+dims[0]+2)*(sizeof(fiff_int_t));
+    else if (coding == FIFFTS_MC_RCS)
+        correct_size = nz*(sizeof(fiff_float_t) + sizeof(fiff_int_t)) +
+                (m+1+dims[0]+2)*(sizeof(fiff_int_t));
+    else {
+        printf("fiff_get_float_sparse_matrix: Incomprehensible sparse matrix coding");
+        return NULL;
+    }
+    if (tag->size() != correct_size) {
+        printf("fiff_get_float_sparse_matrix: wrong data size!");
+        FREE(dims);
+        return NULL;
+    }
+    /*
+        * Set up structure
+        */
+    res = new INVERSELIB::FiffSparseMatrix;
+    res->m      = m;
+    res->n      = n;
+    res->nz     = nz;
+    qDebug() << "ToDo: Check if data are correctly set!";
+    res->data   = tag->toFloat();
+    res->coding = coding;
+    res->inds   = (int *)(res->data + res->nz);
+    res->ptrs   = res->inds + res->nz;
+
+    FREE(dims);
+
+    return res;
+}
+
+
+//*************************************************************************************************************
+
+FiffSparseMatrix *FiffSparseMatrix::mne_add_upper_triangle_rcs()
+/*
+    * Fill in upper triangle with the lower triangle values
+    */
+{
+    int *nnz       = NULL;
+    int **colindex = NULL;
+    float **vals   = NULL;
+    INVERSELIB::FiffSparseMatrix* res = NULL;
+    int i,j,k,row;
+    int *nadd = NULL;
+
+    if (this->coding != FIFFTS_MC_RCS) {
+        printf("The input matrix to mne_add_upper_triangle_rcs must be in RCS format");
+        goto out;
+    }
+    if (this->m != this->n) {
+        printf("The input matrix to mne_add_upper_triangle_rcs must be square");
+        goto out;
+    }
+    nnz      = MALLOC(this->m,int);
+    colindex = MALLOC(this->m,int *);
+    vals     = MALLOC(this->m,float *);
+    for (i = 0; i < this->m; i++) {
+        nnz[i]      = this->ptrs[i+1] - this->ptrs[i];
+        if (nnz[i] > 0) {
+            colindex[i] = MALLOC(nnz[i],int);
+            vals[i]   = MALLOC(nnz[i],float);
+            for (j = this->ptrs[i], k = 0; j < this->ptrs[i+1]; j++, k++) {
+                vals[i][k] = this->data[j];
+                colindex[i][k] = this->inds[j];
+            }
+        }
+        else {
+            colindex[i] = NULL;
+            vals[i] = NULL;
+        }
+    }
+    /*
+        * Add the elements
+        */
+    nadd = MALLOC(this->m,int);
+    for (i = 0; i < this->m; i++)
+        nadd[i] = 0;
+    for (i = 0; i < this->m; i++)
+        for (j = this->ptrs[i]; j < this->ptrs[i+1]; j++)
+            nadd[this->inds[j]]++;
+    for (i = 0; i < this->m; i++) {
+        colindex[i] = REALLOC(colindex[i],nnz[i]+nadd[i],int);
+        vals[i]     = REALLOC(vals[i],nnz[i]+nadd[i],float);
+    }
+    for (i = 0; i < this->m; i++)
+        for (j = this->ptrs[i]; j < this->ptrs[i+1]; j++) {
+            row = this->inds[j];
+            colindex[row][nnz[row]] = i;
+            vals[row][nnz[row]]     = this->data[j];
+            nnz[row]++;
+        }
+    res = mne_create_sparse_rcs(this->m,this->n,nnz,colindex,vals);
+
+out : {
+        for (i = 0; i < this->m; i++) {
+            FREE(colindex[i]);
+            FREE(vals[i]);
+        }
+        FREE(nnz);
+        FREE(vals);
+        FREE(colindex);
+        FREE(nadd);
+        return res;
+    }
 }

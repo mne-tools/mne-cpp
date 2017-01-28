@@ -99,6 +99,13 @@ using namespace INVERSELIB;
 #define Z_16 2
 
 
+#define VEC_COPY_16(to,from) {\
+    (to)[X_16] = (from)[X_16];\
+    (to)[Y_16] = (from)[Y_16];\
+    (to)[Z_16] = (from)[Z_16];\
+    }
+
+
 
 #define MALLOC_16(x,t) (t *)malloc((x)*sizeof(t))
 
@@ -189,6 +196,84 @@ void fromIntEigenMatrix_16(const Eigen::MatrixXi& from_mat, int **&to_mat)
 {
     fromIntEigenMatrix_16(from_mat, to_mat, from_mat.rows(), from_mat.cols());
 }
+
+
+
+
+
+
+
+
+//============================= mne_coord_transforms.c =============================
+
+fiffCoordTrans fiff_invert_transform_16 (fiffCoordTrans t)
+
+{
+    fiffCoordTrans ti = (fiffCoordTrans)malloc(sizeof(fiffCoordTransRec));
+    int j,k;
+
+    for (j = 0; j < 3; j++) {
+        ti->move[j] = t->invmove[j];
+        ti->invmove[j] = t->move[j];
+        for (k = 0; k < 3; k++) {
+            ti->rot[j][k]    = t->invrot[j][k];
+            ti->invrot[j][k] = t->rot[j][k];
+        }
+    }
+    ti->from = t->to;
+    ti->to   = t->from;
+    return (ti);
+}
+
+
+
+fiffCoordTrans mne_read_transform_from_node(//fiffFile in,
+                                            FiffStream::SPtr& stream,
+                                            const FiffDirNode::SPtr& node,
+                                            int from, int to)
+/*
+      * Read the specified coordinate transformation
+      */
+{
+    fiffCoordTrans res = NULL;
+    FiffTag::SPtr t_pTag;
+//    fiffTagRec     tag;
+//    fiffDirEntry   dir;
+    fiff_int_t kind, pos;
+    int k;
+
+//    tag.data = NULL;
+    for (k = 0; k < node->nent; k++)
+        kind = node->dir[k]->kind;
+        pos  = node->dir[k]->pos;
+        if (kind == FIFF_COORD_TRANS) {
+//            if (fiff_read_this_tag (in->fd,dir->pos,&tag) == FIFF_FAIL)
+//                goto out;
+//            res = (fiffCoordTrans)tag.data;
+            if (!FiffTag::read_tag(stream,t_pTag,pos))
+                goto out;
+            res = (fiffCoordTrans)malloc(sizeof(fiffCoordTransRec));
+            *res = *(fiffCoordTrans)t_pTag->data();
+            if (res->from == from && res->to == to) {
+//                tag.data = NULL;
+                goto out;
+            }
+            else if (res->from == to && res->to == from) {
+                res = fiff_invert_transform_16(res);
+                goto out;
+            }
+            res = NULL;
+        }
+    printf("No suitable coordinate transformation found");
+    goto out;
+
+out : {
+//        FREE(tag.data);
+        return res;
+    }
+}
+
+
 
 
 //============================= mne_source_space.c =============================
@@ -391,8 +476,8 @@ int mne_read_source_spaces(const QString& name,               /* Read from here 
             if (node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_DIST_LIMIT, t_pTag)) {
                 new_space->dist_limit = *t_pTag->toInt();
                 if (node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_DIST, t_pTag)) {
-                    INVERSELIB::FiffSparseMatrix* dist = fiff_get_float_sparse_matrix(t_pTag);
-                    new_space->dist = mne_add_upper_triangle_rcs(dist);
+                    INVERSELIB::FiffSparseMatrix* dist = INVERSELIB::FiffSparseMatrix::fiff_get_float_sparse_matrix(t_pTag);
+                    new_space->dist = dist->mne_add_upper_triangle_rcs();
                     delete dist;
                     if (!new_space->dist)
                         goto bad;
@@ -452,7 +537,7 @@ int mne_read_source_spaces(const QString& name,               /* Read from here 
                 vol_dims = t_pTag->toInt();
             }
             if (vol_dims)
-                VEC_COPY(new_space->vol_dims,vol_dims);
+                VEC_COPY_16(new_space->vol_dims,vol_dims);
             {
                 QList<FiffDirNode::SPtr>  mris = node->dir_tree_find(FIFFB_MNE_PARENT_MRI_FILE);
 
@@ -463,7 +548,7 @@ int mne_read_source_spaces(const QString& name,               /* Read from here 
                         new_space->MRI_volume = (char *)t_pTag->data();
                     }
                     if (node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_INTERPOLATOR, t_pTag)) {
-                        new_space->interpolator = fiff_get_float_sparse_matrix(t_pTag);
+                        new_space->interpolator = INVERSELIB::FiffSparseMatrix::fiff_get_float_sparse_matrix(t_pTag);
                     }
                 }
                 else {
@@ -474,7 +559,7 @@ int mne_read_source_spaces(const QString& name,               /* Read from here 
                     new_space->MRI_voxel_surf_RAS_t   = mne_read_transform_from_node(stream, mris[0], FIFFV_MNE_COORD_MRI_VOXEL, FIFFV_MNE_COORD_SURFACE_RAS);
 
                     if (mris[0]->find_tag(stream, FIFF_MNE_SOURCE_SPACE_INTERPOLATOR, t_pTag)) {
-                        new_space->interpolator = fiff_get_float_sparse_matrix(t_pTag);
+                        new_space->interpolator = INVERSELIB::FiffSparseMatrix::fiff_get_float_sparse_matrix(t_pTag);
                     }
                     if (mris[0]->find_tag(stream, FIFF_MRI_WIDTH, t_pTag)) {
                         new_space->MRI_vol_dims[0] = *t_pTag->toInt();
@@ -572,7 +657,7 @@ GuessData::GuessData(const QString &guessname, const QString &guess_surfname, fl
         int            free_inner_skull = FALSE;
         float          r0[3];
 
-        VEC_COPY(r0,f->r0);
+        VEC_COPY_16(r0,f->r0);
         fiff_coord_trans_inv(r0,f->mri_head_t,TRUE);
         if (f->bem_model) {
             fprintf(stderr,"Using inner skull surface from the BEM (%s)...\n",f->bemname);
@@ -597,7 +682,7 @@ GuessData::GuessData(const QString &guessname, const QString &guess_surfname, fl
     this->rr      = ALLOC_CMATRIX_16(guesses->nuse,3);
     for (k = 0, p = 0; k < guesses->np; k++)
         if (guesses->inuse[k]) {
-            VEC_COPY(this->rr[p],guesses->rr[k]);
+            VEC_COPY_16(this->rr[p],guesses->rr[k]);
             p++;
         }
     delete guesses; guesses = NULL;
@@ -672,7 +757,7 @@ GuessData::GuessData(const QString &guessname, const QString &guess_surfname, fl
         int            free_inner_skull = FALSE;
         float          r0[3];
 
-        VEC_COPY(r0,f->r0);
+        VEC_COPY_16(r0,f->r0);
         fiff_coord_trans_inv(r0,f->mri_head_t,TRUE);
         if (f->bem_model) {
             printf("Using inner skull surface from the BEM (%s)...\n",f->bemname);
@@ -715,7 +800,7 @@ GuessData::GuessData(const QString &guessname, const QString &guess_surfname, fl
     this->rr      = ALLOC_CMATRIX_16(guesses->nuse,3);
     for (k = 0, p = 0; k < guesses->np; k++)
         if (guesses->inuse[k]) {
-            VEC_COPY(this->rr[p],guesses->rr[k]);
+            VEC_COPY_16(this->rr[p],guesses->rr[k]);
             p++;
         }
     if(guesses)
