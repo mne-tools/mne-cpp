@@ -59,6 +59,7 @@
 #include <fiff/fiff_types.h>
 #include "fwd_coil_set.h"
 #include "mne_meas_data.h"
+#include "mne_surface_or_volume.h"
 
 
 
@@ -130,7 +131,7 @@ typedef struct {
 
 typedef struct {		                     /* This is used for field mapping with help of the sphere-model MNE */
   int          kind;				     /* Either FIELD_MAP_MEG or FIELD_MAP_EEG */
-  mneSurface   surf;		                     /* The surface on which we are mapping */
+  INVERSELIB::MneSurfaceOrVolume::MneCSurface*   surf;		                     /* The surface on which we are mapping */
   char         *surfname;	                     /* The name of the file where the above surface came from */
   int          *surface_sel;			     /* We may calculate the interpolation only in a subset of vertices */
   int          nsurface_sel;			     /* How many points in the above */
@@ -194,7 +195,7 @@ typedef struct {
 
   mnePref             mne_prefs;		     /* MNE calculation preferences */
   float               *cur_vals;                     /* Current values */
-  mneSparseMatrix     nn_vals;			     /* Noise normalization values */
+  INVERSELIB::FiffSparseMatrix* nn_vals;			     /* Noise normalization values */
   mshColorScaleDefRec scale;	                     /* Scale presently used for display */
 
   digitizerData    dig;                              /* These are the Polhemus data */

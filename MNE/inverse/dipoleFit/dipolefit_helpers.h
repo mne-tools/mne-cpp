@@ -161,13 +161,6 @@ using namespace FIFFLIB;
 
 
 
-//============================= mne_fiff.h =============================
-
-#define FIFF_MNE_SOURCE_SPACE_NNEIGHBORS    3594    /* Number of neighbors for each source space point (used for volume source spaces) */
-#define FIFF_MNE_SOURCE_SPACE_NEIGHBORS     3595    /* Neighbors for each source space point (used for volume source spaces) */
-
-#define FIFFV_MNE_COORD_SURFACE_RAS   FIFFV_COORD_MRI    /* The surface RAS coordinates */
-
 
 //============================= ctf_types.h =============================
 
@@ -1682,13 +1675,13 @@ fiff_int_t *fiff_get_matrix_sparse_dims(FiffTag::SPtr& tag)
 }
 
 
-fiff_sparse_matrix_t *fiff_get_float_sparse_matrix(FiffTag::SPtr& tag)
+INVERSELIB::FiffSparseMatrix* fiff_get_float_sparse_matrix(FiffTag::SPtr& tag)
 /*
 * Conversion into the standard representation
 */
 {
     int *dims;
-    fiff_sparse_matrix_t *res = NULL;
+    INVERSELIB::FiffSparseMatrix* res = NULL;
     int   m,n,nz;
     int   coding,correct_size;
 
@@ -1731,7 +1724,7 @@ fiff_sparse_matrix_t *fiff_get_float_sparse_matrix(FiffTag::SPtr& tag)
     /*
     * Set up structure
     */
-    res = MALLOC(1,fiff_sparse_matrix_t);
+    res = new INVERSELIB::FiffSparseMatrix;
     res->m      = m;
     res->n      = n;
     res->nz     = nz;
@@ -1790,57 +1783,9 @@ int mne_pick_from_named_vector(mneNamedVector vec, char **names, int nnames, int
 
 //============================= mne_sparse_matop.c =============================
 
-void mne_free_sparse(mneSparseMatrix mat)
-
-{
-    if (mat) {
-        FREE(mat->data);
-        FREE(mat);
-    }
-}
 
 
-
-
-mneSparseMatrix mne_dup_sparse_matrix(mneSparseMatrix mat)
-
-{
-    mneSparseMatrix res;
-    int             size;
-
-    if (!mat)
-        return NULL;
-
-    res = MALLOC(1,mneSparseMatrixRec);
-    res->coding = mat->coding;
-    res->m      = mat->m;
-    res->n      = mat->n;
-    res->nz     = mat->nz;
-
-    if (mat->coding == FIFFTS_MC_CCS) {
-        size = mat->nz*(sizeof(fiff_float_t) + sizeof(fiff_int_t)) +
-                (mat->n+1)*(sizeof(fiff_int_t));
-    }
-    if (mat->coding == FIFFTS_MC_RCS) {
-        size = mat->nz*(sizeof(fiff_float_t) + sizeof(fiff_int_t)) +
-                (mat->m+1)*(sizeof(fiff_int_t));
-    }
-    else {
-        printf("Illegal sparse matrix storage type: %d",mat->coding);
-        FREE(res);
-        return NULL;
-    }
-    res->data   = (float *)malloc(size);
-    res->inds   = (int *)(res->data+res->nz);
-    res->ptrs   = res->inds+res->nz;
-    memcpy(res->data,mat->data,size);
-
-    return res;
-}
-
-
-
-mneSparseMatrix mne_convert_to_sparse(float **dense,        /* The dense matrix to be converted */
+INVERSELIB::FiffSparseMatrix* mne_convert_to_sparse(float **dense,        /* The dense matrix to be converted */
                                       int   nrow,           /* Number of rows in the dense matrix */
                                       int   ncol,           /* Number of columns in the dense matrix */
                                       int   stor_type,      /* Either FIFFTS_MC_CCS or FIFFTS_MC_RCS */
@@ -1854,7 +1799,7 @@ mneSparseMatrix mne_convert_to_sparse(float **dense,        /* The dense matrix 
     int j,k;
     int nz;
     int ptr;
-    mneSparseMatrix sparse = NULL;
+    INVERSELIB::FiffSparseMatrix* sparse = NULL;
     int size;
 
     if (small < 0) {		/* Automatic scaling */
@@ -1894,7 +1839,7 @@ mneSparseMatrix mne_convert_to_sparse(float **dense,        /* The dense matrix 
         printf("Unknown sparse matrix storage type: %d",stor_type);
         return NULL;
     }
-    sparse = MALLOC(1,mneSparseMatrixRec);
+    sparse = new INVERSELIB::FiffSparseMatrix;
     sparse->coding = stor_type;
     sparse->m      = nrow;
     sparse->n      = ncol;
@@ -1942,14 +1887,14 @@ mneSparseMatrix mne_convert_to_sparse(float **dense,        /* The dense matrix 
 
 
 
-mneSparseMatrix mne_create_sparse_rcs(int nrow,              /* Number of rows */
+INVERSELIB::FiffSparseMatrix* mne_create_sparse_rcs(int nrow,              /* Number of rows */
                                       int ncol, 	     /* Number of columns */
                                       int *nnz, 	     /* Number of non-zero elements on each row */
                                       int **colindex, 	     /* Column indices of non-zero elements on each row */
                                       float **vals) 	     /* The nonzero elements on each row
                                                               * If null, the matrix will be all zeroes */
 {
-    mneSparseMatrix sparse = NULL;
+    INVERSELIB::FiffSparseMatrix* sparse = NULL;
     int j,k,nz,ptr,size,ind;
     int stor_type = FIFFTS_MC_RCS;
 
@@ -1968,7 +1913,7 @@ mneSparseMatrix mne_create_sparse_rcs(int nrow,              /* Number of rows *
         printf("Illegal sparse matrix storage type: %d",stor_type);
         return NULL;
     }
-    sparse = MALLOC(1,mneSparseMatrixRec);
+    sparse = new INVERSELIB::FiffSparseMatrix;
     sparse->coding = stor_type;
     sparse->m      = nrow;
     sparse->n      = ncol;
@@ -2002,13 +1947,14 @@ mneSparseMatrix mne_create_sparse_rcs(int nrow,              /* Number of rows *
     return sparse;
 
 bad : {
-        mne_free_sparse(sparse);
+        if(sparse)
+            delete sparse;
         return NULL;
     }
 }
 
 
-int  mne_sparse_vec_mult2(mneSparseMatrix mat,     /* The sparse matrix */
+int  mne_sparse_vec_mult2(INVERSELIB::FiffSparseMatrix* mat,     /* The sparse matrix */
                           float           *vector, /* Vector to be multiplied */
                           float           *res)    /* Result of the multiplication */
 /*
@@ -2040,7 +1986,7 @@ int  mne_sparse_vec_mult2(mneSparseMatrix mat,     /* The sparse matrix */
 }
 
 
-float *mne_sparse_vec_mult(mneSparseMatrix mat,
+float *mne_sparse_vec_mult(INVERSELIB::FiffSparseMatrix* mat,
                            float *vector)
 
 {
@@ -2054,7 +2000,7 @@ float *mne_sparse_vec_mult(mneSparseMatrix mat,
 }
 
 
-int  mne_sparse_mat_mult2(mneSparseMatrix mat,     /* The sparse matrix */
+int  mne_sparse_mat_mult2(INVERSELIB::FiffSparseMatrix* mat,     /* The sparse matrix */
                           float           **mult,  /* Matrix to be multiplied */
                           int             ncol,	   /* How many columns in the above */
                           float           **res)   /* Result of the multiplication */
@@ -2093,7 +2039,7 @@ int  mne_sparse_mat_mult2(mneSparseMatrix mat,     /* The sparse matrix */
 
 
 
-mneSparseMatrix mne_add_upper_triangle_rcs(mneSparseMatrix mat)
+INVERSELIB::FiffSparseMatrix* mne_add_upper_triangle_rcs(INVERSELIB::FiffSparseMatrix* mat)
 /*
 * Fill in upper triangle with the lower triangle values
 */
@@ -2101,7 +2047,7 @@ mneSparseMatrix mne_add_upper_triangle_rcs(mneSparseMatrix mat)
     int *nnz       = NULL;
     int **colindex = NULL;
     float **vals   = NULL;
-    mneSparseMatrix res = NULL;
+    INVERSELIB::FiffSparseMatrix* res = NULL;
     int i,j,k,row;
     int *nadd = NULL;
 
@@ -2197,7 +2143,8 @@ void mne_free_sparse_named_matrix(mneSparseNamedMatrix mat)
         return;
     mne_free_name_list(mat->rowlist,mat->nrow);
     mne_free_name_list(mat->collist,mat->ncol);
-    mne_free_sparse(mat->data);
+    if(mat->data)
+        delete mat->data;
     FREE(mat);
     return;
 }
@@ -4348,8 +4295,10 @@ void mne_free_ctf_comp_data(mneCTFcompData comp)
 
     if(comp->data)
         delete comp->data;
-    mne_free_sparse(comp->presel);
-    mne_free_sparse(comp->postsel);
+    if(comp->presel)
+        delete comp->presel;
+    if(comp->postsel)
+        delete comp->postsel;
     FREE(comp->presel_data);
     FREE(comp->postsel_data);
     FREE(comp->comp_data);
@@ -4390,8 +4339,8 @@ mneCTFcompData mne_dup_ctf_comp_data(mneCTFcompData data)
     res->calibrated = data->calibrated;
     res->data       = new MneNamedMatrix(*data->data);
 
-    res->presel     = mne_dup_sparse_matrix(data->presel);
-    res->postsel    = mne_dup_sparse_matrix(data->postsel);
+    res->presel     = new FiffSparseMatrix(*data->presel);
+    res->postsel    = new FiffSparseMatrix(*data->postsel);
 
     return res;
 }
@@ -4787,8 +4736,8 @@ int mne_make_ctf_comp(mneCTFcompDataSet set,        /* The available compensatio
     char *name;
     int  j,k,p;
 
-    mneSparseMatrix presel  = NULL;
-    mneSparseMatrix postsel = NULL;
+    INVERSELIB::FiffSparseMatrix* presel  = NULL;
+    INVERSELIB::FiffSparseMatrix* postsel = NULL;
     MneNamedMatrix*  data    = NULL;
 
     if (!compchs) {
@@ -4926,8 +4875,10 @@ int mne_make_ctf_comp(mneCTFcompDataSet set,        /* The available compensatio
     return OK;
 
 bad : {
-        mne_free_sparse(presel);
-        mne_free_sparse(postsel);
+        if(presel)
+            delete presel;
+        if(postsel)
+            delete postsel;
         if(data)
             delete data;
         FREE(names);
@@ -5352,7 +5303,7 @@ static mneCovMatrix new_cov(int    kind,
                             char   **names,
                             double *cov,
                             double *cov_diag,
-                            mneSparseMatrix cov_sparse)
+                            INVERSELIB::FiffSparseMatrix* cov_sparse)
 /*
 * Put it together from ingredients
 */
@@ -5413,7 +5364,7 @@ mneCovMatrix mne_new_cov_diag(int    kind,
 mneCovMatrix mne_new_cov_sparse(int             kind,
                                 int             ncov,
                                 char            **names,
-                                mneSparseMatrix cov_sparse)
+                                INVERSELIB::FiffSparseMatrix* cov_sparse)
 {
     return new_cov(kind,ncov,names,NULL,NULL,cov_sparse);
 }
@@ -5478,7 +5429,8 @@ void mne_free_cov(mneCovMatrix c)
         return;
     FREE(c->cov);
     FREE(c->cov_diag);
-    mne_free_sparse(c->cov_sparse);
+    if(c->cov_sparse)
+        delete c->cov_sparse;
     mne_free_name_list(c->names,c->ncov);
     FREE_CMATRIX(c->eigen);
     FREE(c->lambda);
@@ -5536,7 +5488,7 @@ mneCovMatrix mne_read_cov(const QString& name,int kind)
     int             nnames     = 0;
     double          *cov       = NULL;
     double          *cov_diag  = NULL;
-    mneSparseMatrix cov_sparse = NULL;
+    INVERSELIB::FiffSparseMatrix* cov_sparse = NULL;
     double          *lambda    = NULL;
     float           **eigen    = NULL;
     MatrixXf        tmp_eigen;
@@ -5707,7 +5659,8 @@ out : {
             mne_free_name_list(bads,nbad);
             FREE(cov);
             FREE(cov_diag);
-            mne_free_sparse(cov_sparse);
+            if(cov_sparse)
+                delete cov_sparse;
         }
         return res;
     }
@@ -6200,61 +6153,6 @@ void mne_regularize_cov(mneCovMatrix c,       /* The matrix to regularize */
 }
 
 
-//============================= mne_mgh_mri_io.c =============================
-
-
-/*
- * The tag types are private to this module
- */
-typedef struct {
-    int           tag;
-    long long     len;
-    unsigned char *data;
-} *mneMGHtag,mneMGHtagRec;
-
-typedef struct {
-    int        ntags;
-    mneMGHtag  *tags;
-} *mneMGHtagGroup,mneMGHtagGroupRec;
-
-
-
-void mne_free_vol_geom(mneVolGeom g)
-{
-    if (!g)
-        return;
-    FREE(g->filename);
-    FREE(g);
-    return;
-}
-
-
-static void mne_free_mgh_tag(mneMGHtag t)
-{
-    if (!t)
-        return;
-    FREE(t->data);
-    FREE(t);
-    return;
-}
-
-
-void mne_free_mgh_tag_group(void *gp)
-
-{
-    int k;
-    mneMGHtagGroup g = (mneMGHtagGroup)gp;
-
-    if (!g)
-        return;
-    for (k = 0; k < g->ntags; k++)
-        mne_free_mgh_tag(g->tags[k]);
-    FREE(g->tags);
-    FREE(g);
-
-    return;
-}
-
 
 //============================= mne_source_space.c =============================
 
@@ -6268,462 +6166,6 @@ void mne_free_patch(mnePatchInfo p)
     return;
 }
 
-
-void mne_free_source_space(mneSourceSpace sp)
-/*
-      * Free a source space and all associated data
-      */
-{
-    int k;
-    if (sp == NULL)
-        return;
-    FREE_CMATRIX(sp->rr);
-    FREE_CMATRIX(sp->nn);
-    FREE(sp->inuse);
-    FREE(sp->vertno);
-    FREE(sp->tris);
-    FREE_ICMATRIX(sp->itris);
-
-    FREE(sp->use_tris);
-    FREE_ICMATRIX(sp->use_itris);
-    if (sp->neighbor_tri) {
-        for (k = 0; k < sp->np; k++)
-            FREE(sp->neighbor_tri[k]);
-        FREE(sp->neighbor_tri);
-    }
-    FREE(sp->nneighbor_tri);
-    FREE(sp->curv);
-
-    if (sp->neighbor_vert) {
-        for (k = 0; k < sp->np; k++)
-            FREE(sp->neighbor_vert[k]);
-        FREE(sp->neighbor_vert);
-    }
-    FREE(sp->nneighbor_vert);
-    if (sp->vert_dist) {
-        for (k = 0; k < sp->np; k++)
-            FREE(sp->vert_dist[k]);
-        FREE(sp->vert_dist);
-    }
-    FREE(sp->nearest);
-    if (sp->patches) {
-        for (k = 0; k < sp->npatch; k++)
-            mne_free_patch(sp->patches[k]);
-        FREE(sp->patches);
-    }
-    mne_free_sparse(sp->dist);
-    FREE(sp->voxel_surf_RAS_t);
-    FREE(sp->MRI_voxel_surf_RAS_t);
-    FREE(sp->MRI_surf_RAS_RAS_t);
-    mne_free_sparse(sp->interpolator);
-    FREE(sp->MRI_volume);
-
-    mne_free_vol_geom(sp->vol_geom);
-    mne_free_mgh_tag_group(sp->mgh_tags);
-
-    if (sp->user_data && sp->user_data_free)
-        sp->user_data_free(sp->user_data);
-
-    FREE(sp);
-
-    return;
-}
-
-
-
-mneSourceSpace mne_new_source_space(int np)
-/*
-      * Create a new source space and all associated data
-      */
-{
-    mneSourceSpace res = MALLOC(1,mneSourceSpaceRec);
-    res->np      = np;
-    if (np > 0) {
-        res->rr      = ALLOC_CMATRIX(np,3);
-        res->nn      = ALLOC_CMATRIX(np,3);
-        res->inuse   = ALLOC_INT(np);
-        res->vertno  = ALLOC_INT(np);
-    }
-    else {
-        res->rr      = NULL;
-        res->nn      = NULL;
-        res->inuse   = NULL;
-        res->vertno  = NULL;
-    }
-    res->nuse     = 0;
-    res->ntri     = 0;
-    res->tris     = NULL;
-    res->itris    = NULL;
-    res->tot_area = 0.0;
-
-    res->nuse_tri  = 0;
-    res->use_tris  = NULL;
-    res->use_itris = NULL;
-
-    res->neighbor_tri = NULL;
-    res->nneighbor_tri = NULL;
-    res->curv = NULL;
-    res->val  = NULL;
-
-    res->neighbor_vert = NULL;
-    res->nneighbor_vert = NULL;
-    res->vert_dist = NULL;
-
-    res->coord_frame = FIFFV_COORD_MRI;
-    res->id          = FIFFV_MNE_SURF_UNKNOWN;
-    res->subject     = NULL;
-    res->type        = FIFFV_MNE_SPACE_SURFACE;
-
-    res->nearest = NULL;
-    res->patches = NULL;
-    res->npatch  = 0;
-
-    res->dist       = NULL;
-    res->dist_limit = -1.0;
-
-    res->voxel_surf_RAS_t     = NULL;
-    res->vol_dims[0] = res->vol_dims[1] = res->vol_dims[2] = 0;
-
-    res->MRI_volume           = NULL;
-    res->MRI_surf_RAS_RAS_t   = NULL;
-    res->MRI_voxel_surf_RAS_t = NULL;
-    res->MRI_vol_dims[0] = res->MRI_vol_dims[1] = res->MRI_vol_dims[2] = 0;
-    res->interpolator         = NULL;
-
-    res->vol_geom         = NULL;
-    res->mgh_tags         = NULL;
-    res->user_data        = NULL;
-    res->user_data_free   = NULL;
-
-    res->cm[X] = res->cm[Y] = res->cm[Z] = 0.0;
-
-    return res;
-}
-
-
-
-
-int mne_read_source_spaces(const QString& name,               /* Read from here */
-                           mneSourceSpace **spacesp, /* These are the results */
-                           int            *nspacep)
-/*
-      * Read source spaces from a FIFF file
-      */
-{
-    QFile file(name);
-    FiffStream::SPtr stream(new FiffStream(&file));
-
-    int            nspace = 0;
-    mneSourceSpace *spaces = NULL;
-    mneSourceSpace  new_space = NULL;
-    QList<FiffDirNode::SPtr> sources;
-    FiffDirNode::SPtr     node;
-    FiffTag::SPtr t_pTag;
-    int             j,k,p,q;
-    int             ntri;
-    int             *nearest = NULL;
-    float           *nearest_dist = NULL;
-    int             *nneighbors = NULL;
-    int             *neighbors  = NULL;
-    int             *vol_dims = NULL;
-
-    extern void mne_add_triangle_data(mneSourceSpace s);
-
-    if(!stream->open())
-        goto bad;
-
-    sources = stream->tree()->dir_tree_find(FIFFB_MNE_SOURCE_SPACE);
-    if (sources.size() == 0) {
-        printf("No source spaces available here");
-        goto bad;
-    }
-    for (j = 0; j < sources.size(); j++) {
-        new_space = mne_new_source_space(0);
-        node = sources[j];
-        /*
-        * Get the mandatory data first
-        */
-        if (!node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_NPOINTS, t_pTag)) {
-            goto bad;
-        }
-        new_space->np = *t_pTag->toInt();
-        if (new_space->np == 0) {
-            printf("No points in this source space");
-            goto bad;
-        }
-        if (!node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_POINTS, t_pTag))
-            goto bad;
-        MatrixXf tmp_rr = t_pTag->toFloatMatrix().transpose();
-        new_space->rr = ALLOC_CMATRIX(tmp_rr.rows(),tmp_rr.cols());
-        fromFloatEigenMatrix(tmp_rr,new_space->rr);
-        if (!node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_NORMALS, t_pTag))
-            goto bad;
-        MatrixXf tmp_nn = t_pTag->toFloatMatrix().transpose();
-        new_space->nn = ALLOC_CMATRIX(tmp_nn.rows(),tmp_nn.cols());
-        fromFloatEigenMatrix(tmp_nn,new_space->nn);
-        if (!node->find_tag(stream, FIFF_MNE_COORD_FRAME, t_pTag)) {
-            new_space->coord_frame = FIFFV_COORD_MRI;
-        }
-        else {
-            new_space->coord_frame = *t_pTag->toInt();
-        }
-        if (node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_ID, t_pTag)) {
-            new_space->id = *t_pTag->toInt();
-        }
-        if (node->find_tag(stream, FIFF_SUBJ_HIS_ID, t_pTag)) {
-            new_space->subject = (char *)t_pTag->data();
-        }
-        if (node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_TYPE, t_pTag)) {
-            new_space->type = *t_pTag->toInt();
-        }
-        ntri = 0;
-        if (node->find_tag(stream, FIFF_BEM_SURF_NTRI, t_pTag)) {
-            ntri = *t_pTag->toInt();
-        }
-        else if (node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_NTRI, t_pTag)) {
-            ntri = *t_pTag->toInt();
-        }
-        if (ntri > 0) {
-            int **itris = NULL;
-
-            if (!node->find_tag(stream, FIFF_BEM_SURF_TRIANGLES, t_pTag)) {
-                if (node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_TRIANGLES, t_pTag))
-                    goto bad;
-            }
-
-            MatrixXi tmp_itris = t_pTag->toIntMatrix().transpose();
-            itris = (int **)malloc(tmp_itris.rows() * sizeof(int *));
-            for (int i = 0; i < tmp_itris.rows(); ++i)
-                itris[i] = (int *)malloc(tmp_itris.cols() * sizeof(int));
-            fromIntEigenMatrix(tmp_itris, itris);
-
-            for (p = 0; p < ntri; p++) { /* Adjust the numbering */
-                itris[p][X]--;
-                itris[p][Y]--;
-                itris[p][Z]--;
-            }
-            new_space->itris = itris; itris = NULL;
-            new_space->ntri = ntri;
-        }
-        if (!node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_NUSE, t_pTag)) {
-            if (new_space->type == FIFFV_MNE_SPACE_VOLUME) {
-                /*
-                * Use all
-                */
-                new_space->nuse   = new_space->np;
-                new_space->inuse  = MALLOC(new_space->nuse,int);
-                new_space->vertno = MALLOC(new_space->nuse,int);
-                for (k = 0; k < new_space->nuse; k++) {
-                    new_space->inuse[k]  = TRUE;
-                    new_space->vertno[k] = k;
-                }
-            }
-            else {
-                /*
-                * None in use
-                * NOTE: The consequences of this change have to be evaluated carefully
-                */
-                new_space->nuse   = 0;
-                new_space->inuse  = MALLOC(new_space->np,int);
-                new_space->vertno = NULL;
-                for (k = 0; k < new_space->np; k++)
-                    new_space->inuse[k]  = FALSE;
-            }
-        }
-        else {
-            new_space->nuse = *t_pTag->toInt();
-            if (!node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_SELECTION, t_pTag)) {
-                goto bad;
-            }
-
-            qDebug() << "ToDo: Check whether new_space->inuse contains the right stuff!!! - use VectorXi instead";
-            new_space->inuse  = t_pTag->toInt();
-            if (new_space->nuse > 0) {
-                new_space->vertno = MALLOC(new_space->nuse,int);
-                for (k = 0, p = 0; k < new_space->np; k++)
-                    if (new_space->inuse[k])
-                        new_space->vertno[p++] = k;
-            }
-            else {
-                FREE(new_space->vertno);
-                new_space->vertno = NULL;
-            }
-            /*
-            * Selection triangulation
-            */
-            ntri = 0;
-            if (node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_NUSE_TRI, t_pTag)) {
-                ntri = *t_pTag->toInt();
-            }
-            if (ntri > 0) {
-                int **itris = NULL;
-
-                if (!node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_USE_TRIANGLES, t_pTag))
-                    goto bad;
-
-                MatrixXi tmp_itris = t_pTag->toIntMatrix().transpose();
-                itris = (int **)malloc(tmp_itris.rows() * sizeof(int *));
-                for (int i = 0; i < tmp_itris.rows(); ++i)
-                    itris[i] = (int *)malloc(tmp_itris.cols() * sizeof(int));
-                fromIntEigenMatrix(tmp_itris, itris);
-                for (p = 0; p < ntri; p++) { /* Adjust the numbering */
-                    itris[p][X]--;
-                    itris[p][Y]--;
-                    itris[p][Z]--;
-                }
-                new_space->use_itris = itris; itris = NULL;
-                new_space->nuse_tri = ntri;
-            }
-            /*
-            * The patch information becomes relevant here
-            */
-            if (node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_NEAREST, t_pTag)) {
-                nearest  = t_pTag->toInt();
-                if (!node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_NEAREST_DIST, t_pTag)) {
-                    goto bad;
-                }
-                qDebug() << "ToDo: Check whether nearest_dist contains the right stuff!!! - use VectorXf instead";
-                nearest_dist = t_pTag->toFloat();
-                new_space->nearest = MALLOC(new_space->np,mneNearestRec);
-                for (k = 0; k < new_space->np; k++) {
-                    new_space->nearest[k].vert = k;
-                    new_space->nearest[k].nearest = nearest[k];
-                    new_space->nearest[k].dist = nearest_dist[k];
-                    new_space->nearest[k].patch = NULL;
-                }
-                FREE(nearest); nearest = NULL;
-                FREE(nearest_dist); nearest_dist = NULL;
-            }
-            /*
-            * We may have the distance matrix
-            */
-            if (node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_DIST_LIMIT, t_pTag)) {
-                new_space->dist_limit = *t_pTag->toInt();
-                if (node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_DIST, t_pTag)) {
-                    mneSparseMatrix dist = fiff_get_float_sparse_matrix(t_pTag);
-                    new_space->dist = mne_add_upper_triangle_rcs(dist);
-                    mne_free_sparse(dist);
-                    if (!new_space->dist)
-                        goto bad;
-                }
-                else
-                    new_space->dist_limit = 0.0;
-            }
-        }
-        /*
-        * For volume source spaces we might have the neighborhood information
-        */
-        if (new_space->type == FIFFV_MNE_SPACE_VOLUME) {
-            int ntot,nvert,ntot_count,nneigh;
-            int *neigh;
-
-            nneighbors = neighbors = NULL;
-            ntot = nvert = 0;
-            if (node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_NEIGHBORS, t_pTag)) {
-                qDebug() << "ToDo: Check whether neighbors contains the right stuff!!! - use VectorXi instead";
-                neighbors = t_pTag->toInt();
-                ntot      = t_pTag->size()/sizeof(fiff_int_t);
-            }
-            if (node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_NNEIGHBORS, t_pTag)) {
-                qDebug() << "ToDo: Check whether nneighbors contains the right stuff!!! - use VectorXi instead";
-                nneighbors = t_pTag->toInt();
-                nvert      = t_pTag->size()/sizeof(fiff_int_t);
-            }
-            if (neighbors && nneighbors) {
-                if (nvert != new_space->np) {
-                    printf("Inconsistent neighborhood data in file.");
-                    goto bad;
-                }
-                for (k = 0, ntot_count = 0; k < nvert; k++)
-                    ntot_count += nneighbors[k];
-                if (ntot_count != ntot) {
-                    printf("Inconsistent neighborhood data in file.");
-                    goto bad;
-                }
-                new_space->nneighbor_vert = MALLOC(nvert,int);
-                new_space->neighbor_vert  = MALLOC(nvert,int *);
-                for (k = 0, q = 0; k < nvert; k++) {
-                    new_space->nneighbor_vert[k] = nneigh = nneighbors[k];
-                    new_space->neighbor_vert[k] = neigh = MALLOC(nneigh,int);
-                    for (p = 0; p < nneigh; p++,q++)
-                        neigh[p] = neighbors[q];
-                }
-            }
-            FREE(neighbors);
-            FREE(nneighbors);
-            nneighbors = neighbors = NULL;
-            /*
-            * There might be a coordinate transformation and dimensions
-            */
-            new_space->voxel_surf_RAS_t   = mne_read_transform_from_node(stream, node, FIFFV_MNE_COORD_MRI_VOXEL, FIFFV_MNE_COORD_SURFACE_RAS);
-            if (!node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_VOXEL_DIMS, t_pTag)) {
-                qDebug() << "ToDo: Check whether vol_dims contains the right stuff!!! - use VectorXi instead";
-                vol_dims = t_pTag->toInt();
-            }
-            if (vol_dims)
-                VEC_COPY(new_space->vol_dims,vol_dims);
-            {
-                QList<FiffDirNode::SPtr>  mris = node->dir_tree_find(FIFFB_MNE_PARENT_MRI_FILE);
-
-                if (mris.size() == 0) { /* The old way */
-                    new_space->MRI_surf_RAS_RAS_t = mne_read_transform_from_node(stream, node, FIFFV_MNE_COORD_SURFACE_RAS, FIFFV_MNE_COORD_RAS);
-                    if (node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_MRI_FILE, t_pTag)) {
-                        qDebug() << "ToDo: Check whether new_space->MRI_volume  contains the right stuff!!! - use QString instead";
-                        new_space->MRI_volume = (char *)t_pTag->data();
-                    }
-                    if (node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_INTERPOLATOR, t_pTag)) {
-                        new_space->interpolator = fiff_get_float_sparse_matrix(t_pTag);
-                    }
-                }
-                else {
-                    if (node->find_tag(stream, FIFF_MNE_FILE_NAME, t_pTag)) {
-                        new_space->MRI_volume = (char *)t_pTag->data();
-                    }
-                    new_space->MRI_surf_RAS_RAS_t = mne_read_transform_from_node(stream, mris[0], FIFFV_MNE_COORD_SURFACE_RAS, FIFFV_MNE_COORD_RAS);
-                    new_space->MRI_voxel_surf_RAS_t   = mne_read_transform_from_node(stream, mris[0], FIFFV_MNE_COORD_MRI_VOXEL, FIFFV_MNE_COORD_SURFACE_RAS);
-
-                    if (mris[0]->find_tag(stream, FIFF_MNE_SOURCE_SPACE_INTERPOLATOR, t_pTag)) {
-                        new_space->interpolator = fiff_get_float_sparse_matrix(t_pTag);
-                    }
-                    if (mris[0]->find_tag(stream, FIFF_MRI_WIDTH, t_pTag)) {
-                        new_space->MRI_vol_dims[0] = *t_pTag->toInt();
-                    }
-                    if (mris[0]->find_tag(stream, FIFF_MRI_HEIGHT, t_pTag)) {
-                        new_space->MRI_vol_dims[1] = *t_pTag->toInt();
-                    }
-                    if (mris[0]->find_tag(stream, FIFF_MRI_DEPTH, t_pTag)) {
-                        new_space->MRI_vol_dims[2] = *t_pTag->toInt();
-                    }
-                }
-            }
-        }
-        mne_add_triangle_data(new_space);
-        spaces = REALLOC(spaces,nspace+1,mneSourceSpace);
-        spaces[nspace++] = new_space;
-        new_space = NULL;
-    }
-    stream->close();
-
-    *spacesp = spaces;
-    *nspacep = nspace;
-
-    return FIFF_OK;
-
-bad : {
-        stream->close();
-        mne_free_source_space(new_space);
-        for (k = 0; k < nspace; k++)
-            mne_free_source_space(spaces[k]);
-        FREE(spaces);
-        FREE(nearest);
-        FREE(nearest_dist);
-        FREE(neighbors);
-        FREE(nneighbors);
-        FREE(vol_dims);
-
-        return FIFF_FAIL;
-    }
-}
 
 
 int mne_transform_source_space(mneSourceSpace ss, fiffCoordTrans t)
@@ -11349,49 +10791,6 @@ int fwd_mag_dipole_field_vec(float        *rm,	        /* The dipole location */
 //============================= dipole_fit_setup.c =============================
 
 
-GuessData* new_guess_data()
-
-{
-    GuessData* res = MALLOC(1,GuessData);
-
-    res->rr        = NULL;
-    res->guess_fwd = NULL;
-    res->nguess    = 0;
-    return res;
-}
-
-
-void free_dipole_forward_2 ( DipoleForward* f )
-{
-    if (!f)
-        return;
-    FREE_CMATRIX(f->rd);
-    FREE_CMATRIX(f->fwd);
-    FREE_CMATRIX(f->uu);
-    FREE_CMATRIX(f->vv);
-    FREE(f->sing);
-    FREE(f->scales);
-    FREE(f);
-    return;
-}
-
-void free_guess_data(GuessData* g)
-
-{
-    int k;
-    if (!g)
-        return;
-
-    FREE_CMATRIX(g->rr);
-    if (g->guess_fwd) {
-        for (k = 0; k < g->nguess; k++)
-            free_dipole_forward_2(g->guess_fwd[k]);
-        FREE(g->guess_fwd);
-    }
-    FREE(g);
-    return;
-}
-
 static dipoleFitFuncs new_dipole_fit_funcs()
 
 {
@@ -12305,209 +11704,6 @@ bad : {
         delete comp_coils;
         mne_free_ctf_comp_data_set(comp_data);
         free_dipole_fit_data(res);
-        return NULL;
-    }
-}
-
-
-
-GuessData* make_guess_data( const QString& guessname, const QString& guess_surfname, float mindist, float exclude, float grid, DipoleFitData* f, char *guess_save_name)
-{
-    mneSourceSpace *sp = NULL;
-    int             nsp = 0;
-    GuessData*      res = NULL;
-    int             k,p;
-    float           guessrad = 0.080f;
-    mneSourceSpace  guesses = NULL;
-
-    if (!guessname.isEmpty()) {
-        /*
-     * Read the guesses and transform to the appropriate coordinate frame
-     */
-        if (mne_read_source_spaces(guessname,&sp,&nsp) == FIFF_FAIL)
-            goto bad;
-        if (nsp != 1) {
-            qCritical("Incorrect number of source spaces in guess file");
-            for (k = 0; k < nsp; k++)
-                mne_free_source_space(sp[k]);
-            FREE(sp);
-            goto bad;
-        }
-        printf("Read guesses from %s\n",guessname.toLatin1().constData());
-        guesses = sp[0]; FREE(sp);
-    }
-    else {
-        mneSurface     inner_skull = NULL;
-        int            free_inner_skull = FALSE;
-        float          r0[3];
-
-        VEC_COPY(r0,f->r0);
-        fiff_coord_trans_inv(r0,f->mri_head_t,TRUE);
-        if (f->bem_model) {
-            printf("Using inner skull surface from the BEM (%s)...\n",f->bemname);
-            if ((inner_skull = fwd_bem_find_surface(f->bem_model,FIFFV_BEM_SURF_ID_BRAIN)) == NULL)
-                goto bad;
-        }
-        else if (!guess_surfname.isEmpty()) {
-            printf("Reading inner skull surface from %s...\n",guess_surfname.toLatin1().data());
-            if ((inner_skull = mne_read_bem_surface(guess_surfname,FIFFV_BEM_SURF_ID_BRAIN,TRUE,NULL)) == NULL)
-                goto bad;
-            free_inner_skull = TRUE;
-        }
-        if ((guesses = make_guesses(inner_skull,guessrad,r0,grid,exclude,mindist)) == NULL)
-            goto bad;
-        if (free_inner_skull)
-            mne_free_source_space(inner_skull);
-    }
-    /*
-   * Save the guesses for future use
-   */
-    if (guesses->nuse == 0) {
-        qCritical("No active guess locations remaining.");
-        goto bad;
-    }
-    if (guess_save_name) {
-        printf("###################DEBUG writing source spaces not yet implemented.");
-        //    if (mne_write_source_spaces(guess_save_name,&guesses,1,FALSE) != OK)
-        //      goto bad;
-        //    printf("Wrote guess locations to %s\n",guess_save_name);
-    }
-    /*
-   * Transform the guess locations to the appropriate coordinate frame
-   */
-    if (mne_transform_source_spaces_to(f->coord_frame,f->mri_head_t,&guesses,1) != OK)
-        goto bad;
-    printf("Guess locations are now in %s coordinates.\n",mne_coord_frame_name(f->coord_frame));
-
-    res = new_guess_data();
-    res->nguess  = guesses->nuse;
-    res->rr      = ALLOC_CMATRIX(guesses->nuse,3);
-    for (k = 0, p = 0; k < guesses->np; k++)
-        if (guesses->inuse[k]) {
-            VEC_COPY(res->rr[p],guesses->rr[k]);
-            p++;
-        }
-    mne_free_source_space(guesses); guesses = NULL;
-
-    res->guess_fwd = MALLOC(res->nguess,DipoleForward*);
-    for (k = 0; k < res->nguess; k++)
-        res->guess_fwd[k] = NULL;
-    /*
-    * Compute the guesses using the sphere model for speed
-    */
-    if (!res->compute_guess_fields(f))
-        goto bad;
-
-    return res;
-
-bad : {
-        mne_free_source_space(guesses);
-        free_guess_data(res);
-        return NULL;
-    }
-}
-
-
-
-//============================= setup.c =============================
-
-GuessData* make_guess_data( const QString& guessname,
-                            const QString& guess_surfname,
-                            float         mindist,
-                            float         exclude,
-                            float         grid,
-                            DipoleFitData* f)
-
-{
-    mneSourceSpace *sp = NULL;
-    int            nsp = 0;
-    GuessData*      res = new_guess_data();
-    int            k,p;
-    float          guessrad = 0.080;
-    mneSourceSpace guesses = NULL;
-    dipoleFitFuncs orig;
-
-    if (!guessname.isEmpty()) {
-        /*
-        * Read the guesses and transform to the appropriate coordinate frame
-        */
-        if (mne_read_source_spaces(guessname,&sp,&nsp) == FAIL)
-            goto bad;
-        if (nsp != 1) {
-            printf("Incorrect number of source spaces in guess file");
-            for (k = 0; k < nsp; k++)
-                mne_free_source_space(sp[k]);
-            FREE(sp);
-            goto bad;
-        }
-        fprintf(stderr,"Read guesses from %s\n",guessname.toLatin1().constData());
-        guesses = sp[0]; FREE(sp);
-    }
-    else {
-        mneSurface     inner_skull = NULL;
-        int            free_inner_skull = FALSE;
-        float          r0[3];
-
-        VEC_COPY(r0,f->r0);
-        fiff_coord_trans_inv(r0,f->mri_head_t,TRUE);
-        if (f->bem_model) {
-            fprintf(stderr,"Using inner skull surface from the BEM (%s)...\n",f->bemname);
-            if ((inner_skull = fwd_bem_find_surface(f->bem_model,FIFFV_BEM_SURF_ID_BRAIN)) == NULL)
-                goto bad;
-        }
-        else if (!guess_surfname.isEmpty()) {
-            fprintf(stderr,"Reading inner skull surface from %s...\n",guess_surfname.toLatin1().data());
-            if ((inner_skull = mne_read_bem_surface(guess_surfname,FIFFV_BEM_SURF_ID_BRAIN,TRUE,NULL)) == NULL)
-                goto bad;
-            free_inner_skull = TRUE;
-        }
-        if ((guesses = make_guesses(inner_skull,guessrad,r0,grid,exclude,mindist)) == NULL)
-            goto bad;
-        if (free_inner_skull)
-            mne_free_source_space(inner_skull);
-    }
-    if (mne_transform_source_spaces_to(f->coord_frame,f->mri_head_t,&guesses,1) != OK)
-        goto bad;
-    fprintf(stderr,"Guess locations are now in %s coordinates.\n",mne_coord_frame_name(f->coord_frame));
-    res->nguess  = guesses->nuse;
-    res->rr      = ALLOC_CMATRIX(guesses->nuse,3);
-    for (k = 0, p = 0; k < guesses->np; k++)
-        if (guesses->inuse[k]) {
-            VEC_COPY(res->rr[p],guesses->rr[k]);
-            p++;
-        }
-    mne_free_source_space(guesses); guesses = NULL;
-
-    fprintf(stderr,"Go through all guess source locations...");
-    res->guess_fwd = MALLOC(res->nguess,DipoleForward*);
-    for (k = 0; k < res->nguess; k++)
-        res->guess_fwd[k] = NULL;
-    /*
-    * Compute the guesses using the sphere model for speed
-    */
-    orig = f->funcs;
-    if (f->fit_mag_dipoles)
-        f->funcs = f->mag_dipole_funcs;
-    else
-        f->funcs = f->sphere_funcs;
-
-    for (k = 0; k < res->nguess; k++) {
-        if ((res->guess_fwd[k] = DipoleFitData::dipole_forward_one(f,res->rr[k],NULL)) == NULL)
-            goto bad;
-#ifdef DEBUG
-        sing = res->guess_fwd[k]->sing;
-        printf("%f %f %f\n",sing[0],sing[1],sing[2]);
-#endif
-    }
-    f->funcs = orig;
-
-    fprintf(stderr,"[done %d sources]\n",p);
-
-    return res;
-
-bad : {
-        mne_free_source_space(guesses);
-        free_guess_data(res);
         return NULL;
     }
 }
