@@ -1473,52 +1473,6 @@ void mne_print_coord_transform(FILE *log, fiffCoordTrans t)
 }
 
 
-fiffCoordTrans mne_read_transform_from_node(//fiffFile in,
-                                            FiffStream::SPtr& stream,
-                                            const FiffDirNode::SPtr& node,
-                                            int from, int to)
-/*
-      * Read the specified coordinate transformation
-      */
-{
-    fiffCoordTrans res = NULL;
-    FiffTag::SPtr t_pTag;
-//    fiffTagRec     tag;
-//    fiffDirEntry   dir;
-    fiff_int_t kind, pos;
-    int k;
-
-//    tag.data = NULL;
-    for (k = 0; k < node->nent; k++)
-        kind = node->dir[k]->kind;
-        pos  = node->dir[k]->pos;
-        if (kind == FIFF_COORD_TRANS) {
-//            if (fiff_read_this_tag (in->fd,dir->pos,&tag) == FIFF_FAIL)
-//                goto out;
-//            res = (fiffCoordTrans)tag.data;
-            if (!FiffTag::read_tag(stream,t_pTag,pos))
-                goto out;
-            res = (fiffCoordTrans)malloc(sizeof(fiffCoordTransRec));
-            *res = *(fiffCoordTrans)t_pTag->data();
-            if (res->from == from && res->to == to) {
-//                tag.data = NULL;
-                goto out;
-            }
-            else if (res->from == to && res->to == from) {
-                res = fiff_invert_transform(res);
-                goto out;
-            }
-            res = NULL;
-        }
-    printf("No suitable coordinate transformation found");
-    goto out;
-
-out : {
-//        FREE(tag.data);
-        return res;
-    }
-}
-
 
 fiffCoordTrans mne_read_transform(const QString& name,int from, int to)
 /*
@@ -1663,81 +1617,6 @@ int *fiff_get_matrix_dims(FiffTag::SPtr& tag)
     return res;
 }
 
-
-//============================= fiff_sparse.c =============================
-
-fiff_int_t *fiff_get_matrix_sparse_dims(FiffTag::SPtr& tag)
-/*
-* Interpret dimensions and nz from matrix data
-*/
-{
-    return fiff_get_matrix_dims(tag);
-}
-
-
-INVERSELIB::FiffSparseMatrix* fiff_get_float_sparse_matrix(FiffTag::SPtr& tag)
-/*
-* Conversion into the standard representation
-*/
-{
-    int *dims;
-    INVERSELIB::FiffSparseMatrix* res = NULL;
-    int   m,n,nz;
-    int   coding,correct_size;
-
-    if ( fiff_type_fundamental(tag->getType())   != FIFFT_MATRIX ||
-         fiff_type_base(tag->getType())          != FIFFT_FLOAT ||
-         (fiff_type_matrix_coding(tag->getType()) != FIFFTS_MC_CCS &&
-          fiff_type_matrix_coding(tag->getType()) != FIFFTS_MC_RCS) ) {
-        printf("fiff_get_float_ccs_matrix: wrong data type!");
-        return NULL;
-    }
-
-    if ((dims = fiff_get_matrix_sparse_dims(tag)) == NULL)
-        return NULL;
-
-    if (dims[0] != 2) {
-        printf("fiff_get_float_sparse_matrix: wrong # of dimensions!");
-        return NULL;
-    }
-
-    m   = dims[1];
-    n   = dims[2];
-    nz  = dims[3];
-
-    coding = fiff_type_matrix_coding(tag->getType());
-    if (coding == FIFFTS_MC_CCS)
-        correct_size = nz*(sizeof(fiff_float_t) + sizeof(fiff_int_t)) +
-                (n+1+dims[0]+2)*(sizeof(fiff_int_t));
-    else if (coding == FIFFTS_MC_RCS)
-        correct_size = nz*(sizeof(fiff_float_t) + sizeof(fiff_int_t)) +
-                (m+1+dims[0]+2)*(sizeof(fiff_int_t));
-    else {
-        printf("fiff_get_float_sparse_matrix: Incomprehensible sparse matrix coding");
-        return NULL;
-    }
-    if (tag->size() != correct_size) {
-        printf("fiff_get_float_sparse_matrix: wrong data size!");
-        FREE(dims);
-        return NULL;
-    }
-    /*
-    * Set up structure
-    */
-    res = new INVERSELIB::FiffSparseMatrix;
-    res->m      = m;
-    res->n      = n;
-    res->nz     = nz;
-    qDebug() << "ToDo: Check if data are correctly set!";
-    res->data   = tag->toFloat();
-    res->coding = coding;
-    res->inds   = (int *)(res->data + res->nz);
-    res->ptrs   = res->inds + res->nz;
-
-    FREE(dims);
-
-    return res;
-}
 
 
 
@@ -2037,80 +1916,6 @@ int  mne_sparse_mat_mult2(INVERSELIB::FiffSparseMatrix* mat,     /* The sparse m
     return 0;
 }
 
-
-
-INVERSELIB::FiffSparseMatrix* mne_add_upper_triangle_rcs(INVERSELIB::FiffSparseMatrix* mat)
-/*
-* Fill in upper triangle with the lower triangle values
-*/
-{
-    int *nnz       = NULL;
-    int **colindex = NULL;
-    float **vals   = NULL;
-    INVERSELIB::FiffSparseMatrix* res = NULL;
-    int i,j,k,row;
-    int *nadd = NULL;
-
-    if (mat->coding != FIFFTS_MC_RCS) {
-        printf("The input matrix to mne_add_upper_triangle_rcs must be in RCS format");
-        goto out;
-    }
-    if (mat->m != mat->n) {
-        printf("The input matrix to mne_add_upper_triangle_rcs must be square");
-        goto out;
-    }
-    nnz      = MALLOC(mat->m,int);
-    colindex = MALLOC(mat->m,int *);
-    vals     = MALLOC(mat->m,float *);
-    for (i = 0; i < mat->m; i++) {
-        nnz[i]      = mat->ptrs[i+1] - mat->ptrs[i];
-        if (nnz[i] > 0) {
-            colindex[i] = MALLOC(nnz[i],int);
-            vals[i]   = MALLOC(nnz[i],float);
-            for (j = mat->ptrs[i], k = 0; j < mat->ptrs[i+1]; j++, k++) {
-                vals[i][k] = mat->data[j];
-                colindex[i][k] = mat->inds[j];
-            }
-        }
-        else {
-            colindex[i] = NULL;
-            vals[i] = NULL;
-        }
-    }
-    /*
-    * Add the elements
-    */
-    nadd = MALLOC(mat->m,int);
-    for (i = 0; i < mat->m; i++)
-        nadd[i] = 0;
-    for (i = 0; i < mat->m; i++)
-        for (j = mat->ptrs[i]; j < mat->ptrs[i+1]; j++)
-            nadd[mat->inds[j]]++;
-    for (i = 0; i < mat->m; i++) {
-        colindex[i] = REALLOC(colindex[i],nnz[i]+nadd[i],int);
-        vals[i]     = REALLOC(vals[i],nnz[i]+nadd[i],float);
-    }
-    for (i = 0; i < mat->m; i++)
-        for (j = mat->ptrs[i]; j < mat->ptrs[i+1]; j++) {
-            row = mat->inds[j];
-            colindex[row][nnz[row]] = i;
-            vals[row][nnz[row]]     = mat->data[j];
-            nnz[row]++;
-        }
-    res = mne_create_sparse_rcs(mat->m,mat->n,nnz,colindex,vals);
-
-out : {
-        for (i = 0; i < mat->m; i++) {
-            FREE(colindex[i]);
-            FREE(vals[i]);
-        }
-        FREE(nnz);
-        FREE(vals);
-        FREE(colindex);
-        FREE(nadd);
-        return res;
-    }
-}
 
 
 //============================= mne_named_matrix.c =============================
@@ -6168,7 +5973,7 @@ void mne_free_patch(mnePatchInfo p)
 
 
 
-int mne_transform_source_space(mneSourceSpace ss, fiffCoordTrans t)
+int mne_transform_source_space(MneSurfaceOrVolume::MneCSourceSpace* ss, fiffCoordTrans t)
 /*
 * Transform source space data into another coordinate frame
 */
@@ -6197,13 +6002,13 @@ int mne_transform_source_space(mneSourceSpace ss, fiffCoordTrans t)
 
 int mne_transform_source_spaces_to(int            coord_frame,   /* Which coord frame do we want? */
                                    fiffCoordTrans t,             /* The coordinate transformation */
-                                   mneSourceSpace *spaces,       /* A list of source spaces */
+                                   MneSurfaceOrVolume::MneCSourceSpace* *spaces,       /* A list of source spaces */
                                    int            nspace)
 /*
       * Facilitate the transformation of the source spaces
       */
 {
-    mneSourceSpace s;
+    MneSurfaceOrVolume::MneCSourceSpace* s;
     int k;
     fiffCoordTrans my_t;
 
@@ -6274,7 +6079,7 @@ static void add_triangle_data(mneTriangle tri)
     return;
 }
 
-void mne_add_triangle_data(mneSourceSpace s)
+void mne_add_triangle_data(MneSurfaceOrVolume::MneCSourceSpace* s)
 /*
 * Add the triangle data structures
 */
@@ -6349,7 +6154,7 @@ void mne_compute_cm(float **rr, int np, float *cm)
 }
 
 
-void mne_compute_surface_cm(mneSurface s)
+void mne_compute_surface_cm(MneSurfaceOrVolume::MneCSurface* s)
 /*
  * Compute the center of mass of a surface
  */
@@ -6361,7 +6166,7 @@ void mne_compute_surface_cm(mneSurface s)
     return;
 }
 
-static void calculate_vertex_distances(mneSourceSpace s)
+static void calculate_vertex_distances(MneSurfaceOrVolume::MneCSourceSpace* s)
 
 {
     int   k,p,ndist;
@@ -6397,7 +6202,7 @@ static void calculate_vertex_distances(mneSourceSpace s)
 }
 
 
-static int add_geometry_info(mneSourceSpace s, int do_normals, int *border, int check_too_many_neighbors)
+static int add_geometry_info(MneSurfaceOrVolume::MneCSourceSpace* s, int do_normals, int *border, int check_too_many_neighbors)
 /*
       * Add vertex normals and neighbourhood information
       */
@@ -6622,18 +6427,18 @@ static int add_geometry_info(mneSourceSpace s, int do_normals, int *border, int 
     return OK;
 }
 
-int mne_source_space_add_geometry_info(mneSourceSpace s, int do_normals)
+int mne_source_space_add_geometry_info(MneSurfaceOrVolume::MneCSourceSpace* s, int do_normals)
 {
     return add_geometry_info(s,do_normals,NULL,TRUE);
 }
 
-int mne_source_space_add_geometry_info2(mneSourceSpace s, int do_normals)
+int mne_source_space_add_geometry_info2(MneSurfaceOrVolume::MneCSourceSpace* s, int do_normals)
 
 {
     return add_geometry_info(s,do_normals,NULL,FALSE);
 }
 
-int mne_add_vertex_normals(mneSourceSpace s)
+int mne_add_vertex_normals(MneSurfaceOrVolume::MneCSourceSpace* s)
 
 
 {
@@ -6683,7 +6488,7 @@ int mne_add_vertex_normals(mneSourceSpace s)
 //============================= mne_bem_surface_io.c =============================
 
 
-static mneSurface read_bem_surface( const QString& name,    /* Filename */
+static MneSurfaceOrVolume::MneCSurface* read_bem_surface( const QString& name,    /* Filename */
                                     int  which,             /* Which surface are we looking for (-1 loads the first one)*/
                                     int  add_geometry,      /* Add the geometry information */
                                     float *sigmap,          /* Conductivity? */
@@ -6705,7 +6510,7 @@ static mneSurface read_bem_surface( const QString& name,    /* Filename */
     float   **node_normals = NULL;
     int     **triangles    = NULL;
     int     nnode,ntri;
-    mneSurface s = NULL;
+    MneSurfaceOrVolume::MneCSurface* s = NULL;
     int k;
     int coord_frame = FIFFV_COORD_MRI;
     float sigma = -1.0;
@@ -6845,7 +6650,7 @@ bad : {
     }
 }
 
-mneSurface mne_read_bem_surface(const QString&  name,   /* Filename */
+MneSurfaceOrVolume::MneCSurface* mne_read_bem_surface(const QString&  name,   /* Filename */
                                 int  which,             /* Which surface are we looking for (-1 loads the first one)*/
                                 int  add_geometry,      /* Add the geometry information */
                                 float *sigmap)          /* Conductivity? */
@@ -6884,7 +6689,7 @@ static double solid_angle (float       *from,	/* From this point... */
     return (2.0*atan2(triple,s));
 }
 
-static double sum_solids(float *from, mneSurface surf)
+static double sum_solids(float *from, MneSurfaceOrVolume::MneCSurface* surf)
 
 {
     int k;
@@ -6897,17 +6702,17 @@ static double sum_solids(float *from, mneSurface surf)
 }
 
 
-int mne_filter_source_spaces(mneSurface surf,             /* The bounding surface must be provided */
+int mne_filter_source_spaces(MneSurfaceOrVolume::MneCSurface* surf,             /* The bounding surface must be provided */
                              float limit,                 /* Minimum allowed distance from the surface */
                              fiffCoordTrans mri_head_t,   /* Coordinate transformation (may not be needed) */
-                             mneSourceSpace *spaces,      /* The source spaces  */
+                             MneSurfaceOrVolume::MneCSourceSpace* *spaces,      /* The source spaces  */
                              int nspace,
                              FILE *filtered)	          /* Provide a list of filtered points here */
 /*
 * Remove all source space points closer to the surface than a given limit
 */
 {
-    mneSourceSpace s;
+    MneSurfaceOrVolume::MneCSourceSpace* s;
     int k,p1,p2;
     float r1[3];
     float mindist,dist,diff[3];
@@ -7049,7 +6854,7 @@ static fiffCoordTrans make_voxel_ras_trans(float *r0,
 
 #define NNEIGHBORS 26
 
-mneSourceSpace make_volume_source_space(mneSurface surf,
+MneSurfaceOrVolume::MneCSourceSpace* make_volume_source_space(MneSurfaceOrVolume::MneCSurface* surf,
                                         float grid,
                                         float exclude,
                                         float mindist)
@@ -7061,7 +6866,7 @@ mneSourceSpace make_volume_source_space(mneSurface surf,
     int   minn[3],maxn[3];
     float *node,maxdist,dist,diff[3];
     int   k,c;
-    mneSourceSpace sp = NULL;
+    MneSurfaceOrVolume::MneCSourceSpace* sp = NULL;
     int np,nplane,nrow;
     int *neigh,nneigh;
     int x,y,z;
@@ -7705,7 +7510,7 @@ static void lin_pot_coeff (float  *from,	/* Origin */
 
 
 
-static void correct_auto_elements (mneSurface surf,
+static void correct_auto_elements (MneSurfaceOrVolume::MneCSurface* surf,
                                    float      **mat)
 /*
       * Improve auto-element approximation...
@@ -7776,7 +7581,7 @@ static void correct_auto_elements (mneSurface surf,
 }
 
 
-static float **fwd_bem_lin_pot_coeff (mneSurface *surfs,int nsurf)
+static float **fwd_bem_lin_pot_coeff (MneSurfaceOrVolume::MneCSurface* *surfs,int nsurf)
 /*
       * Calculate the coefficients for linear collocation approach
       */
@@ -7790,7 +7595,7 @@ static float **fwd_bem_lin_pot_coeff (mneSurface *surfs,int nsurf)
     double *row = NULL;
     int    j,k,p,q,c;
     int    joff,koff;
-    mneSurface surf1,surf2;
+    MneSurfaceOrVolume::MneCSurface* surf1,surf2;
 
     for (p = 0, np_tot = np_max = 0; p < nsurf; p++) {
         np_tot += surfs[p]->np;
@@ -7948,12 +7753,12 @@ static int fwd_bem_check_solids (float **angles,int ntri1,int ntri2, float desir
 }
 
 
-static float **fwd_bem_solid_angles (mneSurface *surfs, int nsurf)
+static float **fwd_bem_solid_angles (MneSurfaceOrVolume::MneCSurface* *surfs, int nsurf)
 /*
       * Compute the solid angle matrix
       */
 {
-    mneSurface surf1,surf2;
+    MneSurfaceOrVolume::MneCSurface* surf1,surf2;
     mneTriangle tri;
     int ntri1,ntri2,ntri_tot;
     int j,k,p,q;
@@ -8080,7 +7885,7 @@ const char *fwd_bem_explain_method(int method)
     return method_expl[k].name;
 }
 
-mneSurface fwd_bem_find_surface(fwdBemModel model, int kind)
+MneSurfaceOrVolume::MneCSurface* fwd_bem_find_surface(fwdBemModel model, int kind)
 /*
  * Return a pointer to a specific surface in a BEM
  */
@@ -8105,7 +7910,7 @@ fwdBemModel fwd_bem_load_surfaces(char *name,
  * Load a set of surfaces
  */
 {
-    mneSurface *surfs = NULL;
+    MneSurfaceOrVolume::MneCSurface* *surfs = NULL;
     float      *sigma = NULL;
     float      *sigma1;
     fwdBemModel m = NULL;
@@ -8116,7 +7921,7 @@ fwdBemModel fwd_bem_load_surfaces(char *name,
         return NULL;
     }
 
-    surfs = MALLOC(nkind,mneSurface);
+    surfs = MALLOC(nkind,MneSurfaceOrVolume::MneCSurface*);
     sigma = MALLOC(nkind,float);
     for (k = 0; k < nkind; k++)
         surfs[k] = NULL;
@@ -8170,7 +7975,7 @@ fwdBemModel fwd_bem_load_surfaces(char *name,
 bad : {
         FREE(sigma);
         for (k = 0; k < nkind; k++)
-            mne_free_source_space(surfs[k]);
+            delete surfs[k];
         FREE(surfs);
         return NULL;
     }
@@ -8470,7 +8275,7 @@ char *fwd_bem_make_bem_sol_name(char *name)
 
 //============================= dipole_fit_guesses.c =============================
 
-mneSurface make_guesses(mneSurface guess_surf,     /* Predefined boundary for the guesses */
+MneSurfaceOrVolume::MneCSurface* make_guesses(MneSurfaceOrVolume::MneCSurface* guess_surf,     /* Predefined boundary for the guesses */
                         float guessrad,		   /* Radius for the spherical boundary if the
                                                                             * above is missing */
                         float *guess_r0,           /* Origin for the spherical boundary */
@@ -8485,8 +8290,8 @@ mneSurface make_guesses(mneSurface guess_surf,     /* Predefined boundary for th
  */
 {
     char *bemname     = NULL;
-    mneSurface sphere = NULL;
-    mneSurface res    = NULL;
+    MneSurfaceOrVolume::MneCSurface* sphere = NULL;
+    MneSurfaceOrVolume::MneCSurface* res    = NULL;
     int        k;
     float      dist;
     float      r0[] = { 0.0, 0.0, 0.0 };
@@ -8542,7 +8347,8 @@ mneSurface make_guesses(mneSurface guess_surf,     /* Predefined boundary for th
 
 out : {
         FREE(bemname);
-        mne_free_source_space(sphere);
+        if(sphere)
+            delete sphere;
         return res;
     }
 }
@@ -8564,7 +8370,7 @@ typedef struct {
 
 
 void mne_triangle_coords(float       *r,       /* Location of a point */
-                         mneSurface  s,	       /* The surface */
+                         MneSurfaceOrVolume::MneCSurface*  s,	       /* The surface */
                          int         tri,      /* Which triangle */
                          float       *x,       /* Coordinates of the point on the triangle */
                          float       *y,
@@ -8599,7 +8405,7 @@ void mne_triangle_coords(float       *r,       /* Location of a point */
 
 
 static int nearest_triangle_point(float       *r,    /* Location of a point */
-                                  mneSurface  s,     /* The surface */
+                                  MneSurfaceOrVolume::MneCSurface*  s,     /* The surface */
                                   void        *user, /* Something precomputed */
                                   int         tri,   /* Which triangle */
                                   float       *x,    /* Coordinates of the point on the triangle */
@@ -8716,7 +8522,7 @@ static int nearest_triangle_point(float       *r,    /* Location of a point */
     return TRUE;
 }
 
-static void project_to_triangle(mneSurface s,
+static void project_to_triangle(MneSurfaceOrVolume::MneCSurface* s,
                                 int        tri,
                                 float      p,
                                 float      q,
@@ -8735,7 +8541,7 @@ static void project_to_triangle(mneSurface s,
 }
 
 int mne_nearest_triangle_point(float       *r,    /* Location of a point */
-                               mneSurface  s,     /* The surface */
+                               MneSurfaceOrVolume::MneCSurface*  s,     /* The surface */
                                int         tri,   /* Which triangle */
                                float       *x,    /* Coordinates of the point on the triangle */
                                float       *y,
@@ -8749,7 +8555,7 @@ int mne_nearest_triangle_point(float       *r,    /* Location of a point */
 
 
 
-int mne_project_to_surface(mneSurface s, void *proj_data, float *r, int project_it, float *distp)
+int mne_project_to_surface(MneSurfaceOrVolume::MneCSurface* s, void *proj_data, float *r, int project_it, float *distp)
 /*
       * Project the point onto the closest point on the surface
       */
@@ -8831,7 +8637,7 @@ int fwd_bem_specify_els(fwdBemModel m,
  */
 {
     FwdCoil*     el;
-    mneSurface  scalp;
+    MneSurfaceOrVolume::MneCSurface*  scalp;
     int         k,p,q,v;
     float       *one_sol,*pick_sol;
     float       r[3],w[3],dist;
@@ -9295,7 +9101,7 @@ float **fwd_bem_field_coeff(fwdBemModel m,	/* The model */
  * Compute the weighting factors to obtain the magnetic field
  */
 {
-    mneSurface     surf;
+    MneSurfaceOrVolume::MneCSurface*     surf;
     mneTriangle    tri;
     FwdCoil*        coil;
     FwdCoilSet*     tcoils = NULL;
@@ -9535,7 +9341,7 @@ float **fwd_bem_lin_field_coeff (fwdBemModel m,	        /* The model */
       * in the linear potential approximation
       */
 {
-    mneSurface  surf;
+    MneSurfaceOrVolume::MneCSurface*  surf;
     mneTriangle tri;
     FwdCoil*     coil;
     FwdCoilSet*  tcoils = NULL;
@@ -10938,7 +10744,7 @@ static int setup_forward_model(DipoleFitData* d, mneCTFcompDataSet comp_data, Fw
      * Find the best-fitting sphere
      */
         if (fit_sphere_to_bem) {
-            mneSurface inner_skull;
+            MneSurfaceOrVolume::MneCSurface* inner_skull;
             float      simplex_size = 2e-2;
             float      R;
 

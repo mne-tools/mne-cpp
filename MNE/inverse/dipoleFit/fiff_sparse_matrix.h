@@ -43,6 +43,7 @@
 
 #include "../inverse_global.h"
 #include <fiff/fiff_types.h>
+#include <fiff/fiff_tag.h>
 
 
 //*************************************************************************************************************
@@ -104,6 +105,30 @@ public:
     * Refactored: mne_free_sparse (mne_sparse_matop.c)
     */
     ~FiffSparseMatrix();
+
+
+    //============================= fiff_sparse.c =============================
+    /*
+    * Interpret dimensions and nz from matrix data
+    */
+    static FIFFLIB::fiff_int_t *fiff_get_matrix_sparse_dims(FIFFLIB::FiffTag::SPtr& tag);
+
+    /*
+    * Conversion into the standard representation
+    */
+    static INVERSELIB::FiffSparseMatrix* fiff_get_float_sparse_matrix(FIFFLIB::FiffTag::SPtr& tag);
+
+
+    //============================= mne_sparse_matop.c =============================
+
+
+
+    INVERSELIB::FiffSparseMatrix* mne_add_upper_triangle_rcs();
+
+
+
+
+
 
 public:
     FIFFLIB::fiff_int_t   coding;    /**< coding (storage) type of the sparse matrix */
