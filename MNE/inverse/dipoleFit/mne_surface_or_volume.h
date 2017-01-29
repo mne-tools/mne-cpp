@@ -104,6 +104,37 @@ public:
     */
     ~MneSurfaceOrVolume();
 
+
+
+
+    //============================= make_filter_source_sapces.c =============================
+
+    static double solid_angle (float       *from,	/* From this point... */
+                               mneTriangle tri);
+
+    static double sum_solids(float *from, MneSurfaceOrVolume::MneCSurface* surf);
+
+
+    static int mne_filter_source_spaces(MneSurfaceOrVolume::MneCSurface* surf,             /* The bounding surface must be provided */
+                                 float limit,                 /* Minimum allowed distance from the surface */
+                                 FIFFLIB::fiffCoordTrans mri_head_t,   /* Coordinate transformation (may not be needed) */
+                                 MneSurfaceOrVolume::MneCSourceSpace* *spaces,      /* The source spaces  */
+                                 int nspace,
+                                 FILE *filtered);
+
+
+
+
+    //============================= make_volume_source_space.c =============================
+
+
+
+    static MneSurfaceOrVolume::MneCSourceSpace* make_volume_source_space(MneSurfaceOrVolume::MneCSurface* surf,
+                                            float grid,
+                                            float exclude,
+                                            float mindist);
+
+
     //============================= mne_source_space.c =============================
     static MneCSourceSpace* mne_new_source_space(int np);
 
