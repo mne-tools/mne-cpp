@@ -2166,7 +2166,6 @@ static int get_meas_info (  FiffStream::SPtr& stream,       /* The stream we are
         printf ("Meas. block not found!");
         goto bad;
     }
-
     if (!(meas_info = find_meas_info(node))) {
         printf ("Meas. info not found!");
         goto bad;
@@ -2264,8 +2263,7 @@ static int get_meas_info (  FiffStream::SPtr& stream,       /* The stream we are
     * HPI_RESULT block if it was not previously found
     */
 
-    hpi = node->dir_tree_find(FIFFB_HPI_RESULT);
-//    node = hpi[0];
+    hpi = meas_info->dir_tree_find(FIFFB_HPI_RESULT);
 
     if (hpi.size() > 0 && *trans == NULL)
         for (k = 0; k < hpi[0]->nent; k++)
