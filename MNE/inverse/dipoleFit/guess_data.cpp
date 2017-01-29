@@ -206,6 +206,48 @@ void fromIntEigenMatrix_16(const Eigen::MatrixXi& from_mat, int **&to_mat)
 
 //============================= mne_coord_transforms.c =============================
 
+
+
+
+typedef struct {
+    int frame;
+    const char *name;
+} frameNameRec_16;
+
+
+const char *mne_coord_frame_name_16(int frame)
+
+{
+    static frameNameRec_16 frames[] = {
+        {FIFFV_COORD_UNKNOWN,"unknown"},
+        {FIFFV_COORD_DEVICE,"MEG device"},
+        {FIFFV_COORD_ISOTRAK,"isotrak"},
+        {FIFFV_COORD_HPI,"hpi"},
+        {FIFFV_COORD_HEAD,"head"},
+        {FIFFV_COORD_MRI,"MRI (surface RAS)"},
+        {FIFFV_MNE_COORD_MRI_VOXEL, "MRI voxel"},
+        {FIFFV_COORD_MRI_SLICE,"MRI slice"},
+        {FIFFV_COORD_MRI_DISPLAY,"MRI display"},
+        {FIFFV_MNE_COORD_CTF_DEVICE,"CTF MEG device"},
+        {FIFFV_MNE_COORD_CTF_HEAD,"CTF/4D/KIT head"},
+        {FIFFV_MNE_COORD_RAS,"RAS (non-zero origin)"},
+        {FIFFV_MNE_COORD_MNI_TAL,"MNI Talairach"},
+        {FIFFV_MNE_COORD_FS_TAL_GTZ,"Talairach (MNI z > 0)"},
+        {FIFFV_MNE_COORD_FS_TAL_LTZ,"Talairach (MNI z < 0)"},
+        {-1,"unknown"}
+    };
+    int k;
+    for (k = 0; frames[k].frame != -1; k++) {
+        if (frame == frames[k].frame)
+            return frames[k].name;
+    }
+    return frames[k].name;
+}
+
+
+
+
+
 fiffCoordTrans fiff_invert_transform_16 (fiffCoordTrans t)
 
 {
@@ -606,6 +648,24 @@ bad : {
 
 //============================= fiff_trans.c =============================
 
+void fiff_coord_trans_16 (float r[3],fiffCoordTrans t,int do_move)
+/*
+      * Apply coordinate transformation
+      */
+{
+    int j,k;
+    float res[3];
+
+    for (j = 0; j < 3; j++) {
+        res[j] = (do_move ? t->move[j] :  0.0);
+        for (k = 0; k < 3; k++)
+            res[j] += t->rot[j][k]*r[k];
+    }
+    for (j = 0; j < 3; j++)
+        r[j] = res[j];
+}
+
+
 void fiff_coord_trans_inv_16 (float r[3],fiffCoordTrans t,int do_move)
 /*
       * Apply inverse coordinate transformation
@@ -667,6 +727,89 @@ MneSurfaceOrVolume::MneCSurface* fwd_bem_find_surface_16(fwdBemModel model, int 
            kind,fwd_bem_explain_surface_16(kind));
     return NULL;
 }
+
+
+
+
+
+
+//============================= mne_source_space.c =============================
+
+
+
+int mne_transform_source_space(MneSurfaceOrVolume::MneCSourceSpace* ss, fiffCoordTrans t)
+/*
+* Transform source space data into another coordinate frame
+*/
+{
+    int k;
+    if (ss == NULL)
+        return OK;
+    if (ss->coord_frame == t->to)
+        return OK;
+    if (ss->coord_frame != t->from) {
+        printf("Coordinate transformation does not match with the source space coordinate system.");
+        return FAIL;
+    }
+    for (k = 0; k < ss->np; k++) {
+        fiff_coord_trans_16(ss->rr[k],t,FIFFV_MOVE);
+        fiff_coord_trans_16(ss->nn[k],t,FIFFV_NO_MOVE);
+    }
+    if (ss->tris) {
+        for (k = 0; k < ss->ntri; k++)
+            fiff_coord_trans_16(ss->tris[k].nn,t,FIFFV_NO_MOVE);
+    }
+    ss->coord_frame = t->to;
+    return OK;
+}
+
+
+
+int mne_transform_source_spaces_to(int            coord_frame,   /* Which coord frame do we want? */
+                                   fiffCoordTrans t,             /* The coordinate transformation */
+                                   MneSurfaceOrVolume::MneCSourceSpace* *spaces,       /* A list of source spaces */
+                                   int            nspace)
+/*
+      * Facilitate the transformation of the source spaces
+      */
+{
+    MneSurfaceOrVolume::MneCSourceSpace* s;
+    int k;
+    fiffCoordTrans my_t;
+
+    for (k = 0; k < nspace; k++) {
+        s = spaces[k];
+        if (s->coord_frame != coord_frame) {
+            if (t) {
+                if (s->coord_frame == t->from && t->to == coord_frame) {
+                    if (mne_transform_source_space(s,t) != OK)
+                        return FAIL;
+                }
+                else if (s->coord_frame == t->to && t->from == coord_frame) {
+                    my_t = fiff_invert_transform_16(t);
+                    if (mne_transform_source_space(s,my_t) != OK) {
+                        FREE_16(my_t);
+                        return FAIL;
+                    }
+                    FREE_16(my_t);
+                }
+                else {
+                    printf("Could not transform a source space because of transformation incompatibility.");
+                    return FAIL;
+                }
+            }
+            else {
+                printf("Could not transform a source space because of missing coordinate transformation.");
+                return FAIL;
+            }
+        }
+    }
+    return OK;
+}
+
+
+
+
 
 
 //*************************************************************************************************************
@@ -732,18 +875,18 @@ GuessData::GuessData(const QString &guessname, const QString &guess_surfname, fl
         }
         else if (!guess_surfname.isEmpty()) {
             fprintf(stderr,"Reading inner skull surface from %s...\n",guess_surfname.toLatin1().data());
-            if ((inner_skull = mne_read_bem_surface(guess_surfname,FIFFV_BEM_SURF_ID_BRAIN,TRUE,NULL)) == NULL)
+            if ((inner_skull = MneSurfaceOrVolume::read_bem_surface(guess_surfname,FIFFV_BEM_SURF_ID_BRAIN,TRUE,NULL)) == NULL)
                 goto bad;
             free_inner_skull = TRUE;
         }
-        if ((guesses = make_guesses(inner_skull,guessrad,r0,grid,exclude,mindist)) == NULL)
+        if ((guesses = MneSurfaceOrVolume::MneCSurface::make_guesses(inner_skull,guessrad,r0,grid,exclude,mindist)) == NULL)
             goto bad;
         if (free_inner_skull)
             delete inner_skull;
     }
     if (mne_transform_source_spaces_to(f->coord_frame,f->mri_head_t,&guesses,1) != OK)
         goto bad;
-    fprintf(stderr,"Guess locations are now in %s coordinates.\n",mne_coord_frame_name(f->coord_frame));
+    fprintf(stderr,"Guess locations are now in %s coordinates.\n",mne_coord_frame_name_16(f->coord_frame));
     this->nguess  = guesses->nuse;
     this->rr      = ALLOC_CMATRIX_16(guesses->nuse,3);
     for (k = 0, p = 0; k < guesses->np; k++)
@@ -827,16 +970,16 @@ GuessData::GuessData(const QString &guessname, const QString &guess_surfname, fl
         fiff_coord_trans_inv_16(r0,f->mri_head_t,TRUE);
         if (f->bem_model) {
             printf("Using inner skull surface from the BEM (%s)...\n",f->bemname);
-            if ((inner_skull = fwd_bem_find_surface(f->bem_model,FIFFV_BEM_SURF_ID_BRAIN)) == NULL)
+            if ((inner_skull = fwd_bem_find_surface_16(f->bem_model,FIFFV_BEM_SURF_ID_BRAIN)) == NULL)
                 goto bad;
         }
         else if (!guess_surfname.isEmpty()) {
             printf("Reading inner skull surface from %s...\n",guess_surfname.toLatin1().data());
-            if ((inner_skull = mne_read_bem_surface(guess_surfname,FIFFV_BEM_SURF_ID_BRAIN,TRUE,NULL)) == NULL)
+            if ((inner_skull = MneSurfaceOrVolume::read_bem_surface(guess_surfname,FIFFV_BEM_SURF_ID_BRAIN,TRUE,NULL)) == NULL)
                 goto bad;
             free_inner_skull = TRUE;
         }
-        if ((guesses = make_guesses(inner_skull,guessrad,r0,grid,exclude,mindist)) == NULL)
+        if ((guesses = MneSurfaceOrVolume::MneCSurface::make_guesses(inner_skull,guessrad,r0,grid,exclude,mindist)) == NULL)
             goto bad;
         if (free_inner_skull)
             delete inner_skull;
@@ -859,7 +1002,7 @@ GuessData::GuessData(const QString &guessname, const QString &guess_surfname, fl
        */
     if (mne_transform_source_spaces_to(f->coord_frame,f->mri_head_t,&guesses,1) != OK)
         goto bad;
-    printf("Guess locations are now in %s coordinates.\n",mne_coord_frame_name(f->coord_frame));
+    printf("Guess locations are now in %s coordinates.\n",mne_coord_frame_name_16(f->coord_frame));
 
     res = new GuessData();
     this->nguess  = guesses->nuse;

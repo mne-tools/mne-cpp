@@ -12,6 +12,7 @@
 #include "mne_meas_data_set.h"
 #include "mne_deriv.h"
 #include "mne_deriv_set.h"
+#include "mne_surface_or_volume.h"
 #include <iostream>
 #include <vector>
 #include <Eigen/Core>
@@ -633,30 +634,6 @@ double **mne_dmatt_dmat_mult2 (double **m1,double **m2, int d1,int d2,int d3)
         }
     return result;
 #endif
-}
-
-
-//============================= fiff_type_spec.h =============================
-
-/*
- * These return information about a fiff type.
- */
-
-fiff_int_t fiff_type_base(fiff_int_t type)
-{
-    return type & FIFFTS_BASE_MASK;
-}
-
-
-fiff_int_t fiff_type_fundamental(fiff_int_t type)
-{
-    return type & FIFFTS_FS_MASK;
-}
-
-
-fiff_int_t fiff_type_matrix_coding(fiff_int_t type)
-{
-    return type & FIFFTS_MC_MASK;
 }
 
 
@@ -1551,73 +1528,6 @@ fiffCoordTrans mne_read_meas_transform(const QString& name)
 }
 
 
-//============================= fiff_matrix.c =============================
-
-
-int *fiff_get_matrix_dims(FiffTag::SPtr& tag)
-/*
-      * Interpret dimensions from matrix data (dense and sparse)
-      */
-{
-    int ndim;
-    int *dims;
-    int *res,k;
-    unsigned int tsize = tag->size();
-    /*
-   * Initial checks
-   */
-    if (tag->data() == NULL) {
-        qCritical("fiff_get_matrix_dims: no data available!");
-        return NULL;
-    }
-    if (fiff_type_fundamental(tag->getType()) != FIFFTS_FS_MATRIX) {
-        qCritical("fiff_get_matrix_dims: tag does not contain a matrix!");
-        return NULL;
-    }
-    if (tsize < sizeof(fiff_int_t)) {
-        qCritical("fiff_get_matrix_dims: too small matrix data!");
-        return NULL;
-    }
-    /*
-   * Get the number of dimensions and check
-   */
-    ndim = *((fiff_int_t *)((fiff_byte_t *)(tag->data())+tag->size()-sizeof(fiff_int_t)));
-    if (ndim <= 0 || ndim > FIFFC_MATRIX_MAX_DIM) {
-        qCritical("fiff_get_matrix_dims: unreasonable # of dimensions!");
-        return NULL;
-    }
-    if (fiff_type_matrix_coding(tag->getType()) == FIFFTS_MC_DENSE) {
-        if (tsize < (ndim+1)*sizeof(fiff_int_t)) {
-            qCritical("fiff_get_matrix_dims: too small matrix data!");
-            return NULL;
-        }
-        res = MALLOC(ndim+1,int);
-        res[0] = ndim;
-        dims = ((fiff_int_t *)((fiff_byte_t *)(tag->data())+tag->size())) - ndim - 1;
-        for (k = 0; k < ndim; k++)
-            res[k+1] = dims[k];
-    }
-    else if (fiff_type_matrix_coding(tag->getType()) == FIFFTS_MC_CCS ||
-             fiff_type_matrix_coding(tag->getType()) == FIFFTS_MC_RCS) {
-        if (tsize < (ndim+2)*sizeof(fiff_int_t)) {
-            qCritical("fiff_get_matrix_sparse_dims: too small matrix data!");
-            return NULL; }
-
-        res = MALLOC(ndim+2,int);
-        res[0] = ndim;
-        dims = ((fiff_int_t *)((fiff_byte_t *)(tag->data())+tag->size())) - ndim - 1;
-        for (k = 0; k < ndim; k++)
-            res[k+1] = dims[k];
-        res[ndim+1] = dims[-1];
-    }
-    else {
-        qCritical("fiff_get_matrix_dims: unknown matrix coding.");
-        return NULL;
-    }
-    return res;
-}
-
-
 
 
 
@@ -1765,72 +1675,6 @@ INVERSELIB::FiffSparseMatrix* mne_convert_to_sparse(float **dense,        /* The
 }
 
 
-
-INVERSELIB::FiffSparseMatrix* mne_create_sparse_rcs(int nrow,              /* Number of rows */
-                                      int ncol, 	     /* Number of columns */
-                                      int *nnz, 	     /* Number of non-zero elements on each row */
-                                      int **colindex, 	     /* Column indices of non-zero elements on each row */
-                                      float **vals) 	     /* The nonzero elements on each row
-                                                              * If null, the matrix will be all zeroes */
-{
-    INVERSELIB::FiffSparseMatrix* sparse = NULL;
-    int j,k,nz,ptr,size,ind;
-    int stor_type = FIFFTS_MC_RCS;
-
-    for (j = 0, nz = 0; j < nrow; j++)
-        nz = nz + nnz[j];
-
-    if (nz <= 0) {
-        printf("No nonzero elements specified.");
-        return NULL;
-    }
-    if (stor_type == FIFFTS_MC_RCS) {
-        size = nz*(sizeof(fiff_float_t) + sizeof(fiff_int_t)) +
-                (nrow+1)*(sizeof(fiff_int_t));
-    }
-    else {
-        printf("Illegal sparse matrix storage type: %d",stor_type);
-        return NULL;
-    }
-    sparse = new INVERSELIB::FiffSparseMatrix;
-    sparse->coding = stor_type;
-    sparse->m      = nrow;
-    sparse->n      = ncol;
-    sparse->nz     = nz;
-    sparse->data   = (float *)malloc(size);
-    sparse->inds   = (int *)(sparse->data+nz);
-    sparse->ptrs   = sparse->inds+nz;
-
-    for (j = 0, nz = 0; j < nrow; j++) {
-        ptr = -1;
-        for (k = 0; k < nnz[j]; k++) {
-            if (ptr < 0)
-                ptr = nz;
-            ind = sparse->inds[nz] = colindex[j][k];
-            if (ind < 0 || ind >= ncol) {
-                printf("Column index out of range in mne_create_sparse_rcs");
-                goto bad;
-            }
-            if (vals)
-                sparse->data[nz] = vals[j][k];
-            else
-                sparse->data[nz] = 0.0;
-            nz++;
-        }
-        sparse->ptrs[j] = ptr;
-    }
-    sparse->ptrs[nrow] = nz;
-    for (j = nrow-1; j >= 0; j--) /* Take care of the empty rows */
-        if (sparse->ptrs[j] < 0)
-            sparse->ptrs[j] = sparse->ptrs[j+1];
-    return sparse;
-
-bad : {
-        if(sparse)
-            delete sparse;
-        return NULL;
-    }
-}
 
 
 int  mne_sparse_vec_mult2(INVERSELIB::FiffSparseMatrix* mat,     /* The sparse matrix */
@@ -5387,7 +5231,7 @@ mneCovMatrix mne_read_cov(const QString& name,int kind)
             for (p = 0; p < nn; p++)
                 cov[p] = f[p];
         }
-        else if ((cov_sparse = fiff_get_float_sparse_matrix(t_pTag)) == NULL) {
+        else if ((cov_sparse = FiffSparseMatrix::fiff_get_float_sparse_matrix(t_pTag)) == NULL) {
             goto out;
         }
 
@@ -5973,76 +5817,6 @@ void mne_free_patch(mnePatchInfo p)
 
 
 
-int mne_transform_source_space(MneSurfaceOrVolume::MneCSourceSpace* ss, fiffCoordTrans t)
-/*
-* Transform source space data into another coordinate frame
-*/
-{
-    int k;
-    if (ss == NULL)
-        return OK;
-    if (ss->coord_frame == t->to)
-        return OK;
-    if (ss->coord_frame != t->from) {
-        printf("Coordinate transformation does not match with the source space coordinate system.");
-        return FAIL;
-    }
-    for (k = 0; k < ss->np; k++) {
-        fiff_coord_trans(ss->rr[k],t,FIFFV_MOVE);
-        fiff_coord_trans(ss->nn[k],t,FIFFV_NO_MOVE);
-    }
-    if (ss->tris) {
-        for (k = 0; k < ss->ntri; k++)
-            fiff_coord_trans(ss->tris[k].nn,t,FIFFV_NO_MOVE);
-    }
-    ss->coord_frame = t->to;
-    return OK;
-}
-
-
-int mne_transform_source_spaces_to(int            coord_frame,   /* Which coord frame do we want? */
-                                   fiffCoordTrans t,             /* The coordinate transformation */
-                                   MneSurfaceOrVolume::MneCSourceSpace* *spaces,       /* A list of source spaces */
-                                   int            nspace)
-/*
-      * Facilitate the transformation of the source spaces
-      */
-{
-    MneSurfaceOrVolume::MneCSourceSpace* s;
-    int k;
-    fiffCoordTrans my_t;
-
-    for (k = 0; k < nspace; k++) {
-        s = spaces[k];
-        if (s->coord_frame != coord_frame) {
-            if (t) {
-                if (s->coord_frame == t->from && t->to == coord_frame) {
-                    if (mne_transform_source_space(s,t) != OK)
-                        return FAIL;
-                }
-                else if (s->coord_frame == t->to && t->from == coord_frame) {
-                    my_t = fiff_invert_transform(t);
-                    if (mne_transform_source_space(s,my_t) != OK) {
-                        FREE(my_t);
-                        return FAIL;
-                    }
-                    FREE(my_t);
-                }
-                else {
-                    printf("Could not transform a source space because of transformation incompatibility.");
-                    return FAIL;
-                }
-            }
-            else {
-                printf("Could not transform a source space because of missing coordinate transformation.");
-                return FAIL;
-            }
-        }
-    }
-    return OK;
-}
-
-
 //============================= mne_add_geometry_info.c =============================
 
 
@@ -6485,180 +6259,6 @@ int mne_add_vertex_normals(MneSurfaceOrVolume::MneCSourceSpace* s)
 
 
 
-//============================= mne_bem_surface_io.c =============================
-
-
-static MneSurfaceOrVolume::MneCSurface* read_bem_surface( const QString& name,    /* Filename */
-                                    int  which,             /* Which surface are we looking for (-1 loads the first one)*/
-                                    int  add_geometry,      /* Add the geometry information */
-                                    float *sigmap,          /* Conductivity? */
-                                    int   check_too_many_neighbors)
-/*
- * Read a Neuromag-style BEM surface description
- */
-{
-    QFile file(name);
-    FiffStream::SPtr stream(new FiffStream(&file));
-
-    QList<FiffDirNode::SPtr> surfs;
-    QList<FiffDirNode::SPtr> bems;
-    FiffDirNode::SPtr node;
-    FiffTag::SPtr t_pTag;
-
-    int     id = -1;
-    float   **nodes        = NULL;
-    float   **node_normals = NULL;
-    int     **triangles    = NULL;
-    int     nnode,ntri;
-    MneSurfaceOrVolume::MneCSurface* s = NULL;
-    int k;
-    int coord_frame = FIFFV_COORD_MRI;
-    float sigma = -1.0;
-    MatrixXf tmp_nodes;
-    MatrixXi tmp_triangles;
-
-    if(!stream->open())
-        goto bad;
-    /*
-    * Check for the existence of BEM coord frame
-    */
-    bems = stream->tree()->dir_tree_find(FIFFB_BEM);
-    if (bems.size() > 0) {
-        node = bems[0];
-        if (node->find_tag(stream, FIFF_BEM_COORD_FRAME, t_pTag)) {
-            coord_frame = *t_pTag->toInt();
-        }
-    }
-    surfs = stream->tree()->dir_tree_find(FIFFB_BEM_SURF);
-    if (surfs.size() == 0) {
-        printf ("No BEM surfaces found in %s",name.toLatin1().constData());
-        goto bad;
-    }
-    if (which >= 0) {
-        for (k = 0; k < surfs.size(); ++k) {
-            node = surfs[k];
-            /*
-            * Read the data from this node
-            */
-            if (node->find_tag(stream, FIFF_BEM_SURF_ID, t_pTag)) {
-                id = *t_pTag->toInt();
-                if (id == which)
-                    break;
-            }
-        }
-        if (id != which) {
-            printf("Desired surface not found in %s",name.toLatin1().constData());
-            goto bad;
-        }
-    }
-    else
-        node = surfs[0];
-    /*
-   * Get the compulsory tags
-   */
-    if (!node->find_tag(stream, FIFF_BEM_SURF_NNODE, t_pTag))
-        goto bad;
-    nnode = *t_pTag->toInt();
-
-    if (!node->find_tag(stream, FIFF_BEM_SURF_NTRI, t_pTag))
-        goto bad;
-    ntri = *t_pTag->toInt();
-
-    if (!node->find_tag(stream, FIFF_BEM_SURF_NODES, t_pTag))
-        goto bad;
-    tmp_nodes = t_pTag->toFloatMatrix().transpose();
-    nodes = ALLOC_CMATRIX(tmp_nodes.rows(),tmp_nodes.cols());
-    fromFloatEigenMatrix(tmp_nodes, nodes);
-
-    if (node->find_tag(stream, FIFF_BEM_SURF_NORMALS, t_pTag)) {\
-        MatrixXf tmp_node_normals = t_pTag->toFloatMatrix().transpose();
-        node_normals = ALLOC_CMATRIX(tmp_node_normals.rows(),tmp_node_normals.cols());
-        fromFloatEigenMatrix(tmp_node_normals, node_normals);
-    }
-
-    if (!node->find_tag(stream, FIFF_BEM_SURF_TRIANGLES, t_pTag))
-        goto bad;
-    tmp_triangles = t_pTag->toIntMatrix().transpose();
-    triangles = (int **)malloc(tmp_triangles.rows() * sizeof(int *));
-    for (int i = 0; i < tmp_triangles.rows(); ++i)
-        triangles[i] = (int *)malloc(tmp_triangles.cols() * sizeof(int));
-    fromIntEigenMatrix(tmp_triangles, triangles);
-
-    if (node->find_tag(stream, FIFF_MNE_COORD_FRAME, t_pTag)) {
-        coord_frame = *t_pTag->toInt();
-    }
-    else if (node->find_tag(stream, FIFF_BEM_COORD_FRAME, t_pTag)) {
-        coord_frame = *t_pTag->toInt();
-    }
-    if (node->find_tag(stream, FIFF_BEM_SIGMA, t_pTag)) {
-        sigma = *t_pTag->toFloat();
-    }
-
-    stream->close();
-
-    s = mne_new_source_space(0);
-    for (k = 0; k < ntri; k++) {
-        triangles[k][0]--;
-        triangles[k][1]--;
-        triangles[k][2]--;
-    }
-    s->itris       = triangles;
-    s->id          = which;
-    s->coord_frame = coord_frame;
-    s->rr          = nodes;      nodes = NULL;
-    s->nn          = node_normals; node_normals = NULL;
-    s->ntri        = ntri;
-    s->np          = nnode;
-    s->curv        = NULL;
-    s->val         = NULL;
-
-    if (add_geometry) {
-        if (check_too_many_neighbors) {
-            if (mne_source_space_add_geometry_info(s,!s->nn) != OK)
-                goto bad;
-        }
-        else {
-            if (mne_source_space_add_geometry_info2(s,!s->nn) != OK)
-                goto bad;
-        }
-    }
-    else if (s->nn == NULL) {       /* Normals only */
-        if (mne_add_vertex_normals(s) != OK)
-            goto bad;
-    }
-    else
-        mne_add_triangle_data(s);
-
-    s->nuse   = s->np;
-    s->inuse  = MALLOC(s->np,int);
-    s->vertno = MALLOC(s->np,int);
-    for (k = 0; k < s->np; k++) {
-        s->inuse[k]  = TRUE;
-        s->vertno[k] = k;
-    }
-    if (sigmap)
-        *sigmap = sigma;
-
-    return s;
-
-bad : {
-        FREE_CMATRIX(nodes);
-        FREE_CMATRIX(node_normals);
-        FREE_ICMATRIX(triangles);
-        stream->close();
-        return NULL;
-    }
-}
-
-MneSurfaceOrVolume::MneCSurface* mne_read_bem_surface(const QString&  name,   /* Filename */
-                                int  which,             /* Which surface are we looking for (-1 loads the first one)*/
-                                int  add_geometry,      /* Add the geometry information */
-                                float *sigmap)          /* Conductivity? */
-{
-    return read_bem_surface(name,which,add_geometry,sigmap,TRUE);
-}
-
-
 
 
 //============================= make_filter_source_sapces.c =============================
@@ -6935,7 +6535,7 @@ MneSurfaceOrVolume::MneCSourceSpace* make_volume_source_space(MneSurfaceOrVolume
         np = np*(maxn[c]-minn[c]+1);
     nplane = (maxn[X]-minn[X]+1)*(maxn[Y]-minn[Y]+1);
     nrow   = (maxn[X]-minn[X]+1);
-    sp = mne_new_source_space(np);
+    sp = MneSurfaceOrVolume::mne_new_source_space(np);
     sp->type = MNE_SOURCE_SPACE_VOLUME;
     sp->nneighbor_vert = MALLOC(sp->np,int);
     sp->neighbor_vert = MALLOC(sp->np,int *);
@@ -7107,7 +6707,8 @@ MneSurfaceOrVolume::MneCSourceSpace* make_volume_source_space(MneSurfaceOrVolume
     return sp;
 
 bad : {
-        mne_free_source_space(sp);
+        if(sp)
+            delete sp;
         return NULL;
     }
 }
@@ -7204,7 +6805,7 @@ void fwd_bem_free_model(fwdBemModel m)
 
     FREE(m->surf_name);
     for (k = 0; k < m->nsurf; k++)
-        mne_free_source_space(m->surfs[k]);
+        delete m->surfs[k];
     FREE(m->surfs);
     FREE(m->ntri);
     FREE(m->np);
@@ -7595,7 +7196,8 @@ static float **fwd_bem_lin_pot_coeff (MneSurfaceOrVolume::MneCSurface* *surfs,in
     double *row = NULL;
     int    j,k,p,q,c;
     int    joff,koff;
-    MneSurfaceOrVolume::MneCSurface* surf1,surf2;
+    MneSurfaceOrVolume::MneCSurface* surf1;
+    MneSurfaceOrVolume::MneCSurface* surf2;
 
     for (p = 0, np_tot = np_max = 0; p < nsurf; p++) {
         np_tot += surfs[p]->np;
@@ -7758,7 +7360,8 @@ static float **fwd_bem_solid_angles (MneSurfaceOrVolume::MneCSurface* *surfs, in
       * Compute the solid angle matrix
       */
 {
-    MneSurfaceOrVolume::MneCSurface* surf1,surf2;
+    MneSurfaceOrVolume::MneCSurface* surf1;
+    MneSurfaceOrVolume::MneCSurface* surf2;
     mneTriangle tri;
     int ntri1,ntri2,ntri_tot;
     int j,k,p,q;
@@ -7927,7 +7530,7 @@ fwdBemModel fwd_bem_load_surfaces(char *name,
         surfs[k] = NULL;
 
     for (k = 0; k < nkind; k++) {
-        if ((surfs[k] = mne_read_bem_surface(name,kinds[k],TRUE,sigma+k)) == NULL)
+        if ((surfs[k] = MneSurfaceOrVolume::MneCSurface::read_bem_surface(name,kinds[k],TRUE,sigma+k)) == NULL)
             goto bad;
         if (sigma[k] < 0.0) {
             printf("No conductivity available for surface %s",fwd_bem_explain_surface(kinds[k]));
@@ -10603,7 +10206,8 @@ void free_dipole_fit_data(DipoleFitData* d)
     mne_free_cov(d->noise);
     mne_free_cov(d->noise_orig);
     mne_free_name_list(d->ch_names,d->nmeg+d->neeg);
-    mne_free_sparse(d->pick);
+    if(d->pick)
+        d->pick;
     fwd_bem_free_model(d->bem_model);
     delete d->eeg_model;
     if (d->user_free)
