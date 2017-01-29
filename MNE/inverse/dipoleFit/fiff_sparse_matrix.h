@@ -121,6 +121,12 @@ public:
 
     //============================= mne_sparse_matop.c =============================
 
+    //Refactored: mne_create_sparse_rcs
+    static INVERSELIB::FiffSparseMatrix* create_sparse_rcs( int nrow,       /* Number of rows */
+                                                            int ncol,       /* Number of columns */
+                                                            int *nnz,       /* Number of non-zero elements on each row */
+                                                            int **colindex, /* Column indices of non-zero elements on each row */
+                                                            float **vals);
 
 
     INVERSELIB::FiffSparseMatrix* mne_add_upper_triangle_rcs();

@@ -112,91 +112,31 @@ public:
 
     //============================= dipole_fit_guesses.c =============================
 
-    static MneCSurface* make_guesses(MneSurfaceOrVolume::MneCSurface* guess_surf,     /* Predefined boundary for the guesses */
-                            float guessrad,		   /* Radius for the spherical boundary if the
-                                                                                * above is missing */
-                            float *guess_r0,           /* Origin for the spherical boundary */
-                            float grid,		   /* Spacing between guess points */
-                            float exclude,		   /* Exclude points
-                                                                                  closer than this to the CM of the
-                                                                                  guess boundary surface */
-                            float mindist)		   /* Exclude points closer than this to
-                                                        * the guess boundary surface */
-    /*
-     * Make a guess space inside a sphere
-     */
-    {
-        char *bemname     = NULL;
-        MneSurfaceOrVolume::MneCSurface* sphere = NULL;
-        MneSurfaceOrVolume::MneCSurface* res    = NULL;
-        int        k;
-        float      dist;
-        float      r0[] = { 0.0, 0.0, 0.0 };
-
-        if (!guess_r0)
-            guess_r0 = r0;
-
-        if (!guess_surf) {
-            fprintf(stderr,"Making a spherical guess space with radius %7.1f mm...\n",1000*guessrad);
-            //#ifdef USE_SHARE_PATH
-            //    if ((bemname = mne_compose_mne_name("share/mne","icos.fif")) == NULL)
-            //#else
-            //    if ((bemname = mne_compose_mne_name("setup/mne","icos.fif")) == NULL)
-            //#endif
-            //      goto out;
-
-            //    QFile bemFile("/usr/pubsw/packages/mne/stable/share/mne/icos.fif");
-
-            QFile bemFile(QString("./resources/surf2bem/icos.fif"));
-            if ( !QCoreApplication::startingUp() )
-                bemFile.setFileName(QCoreApplication::applicationDirPath() + QString("/resources/surf2bem/icos.fif"));
-            else if (!bemFile.exists())
-                bemFile.setFileName("./bin/resources/surf2bem/icos.fif");
-
-            if( !bemFile.exists () ){
-                qDebug() << bemFile.fileName() << "does not exists.";
-                goto out;
-            }
-
-            bemname = MALLOC(strlen(bemFile.fileName().toLatin1().data())+1,char);
-            strcpy(bemname,bemFile.fileName().toLatin1().data());
-
-            if ((sphere = mne_read_bem_surface(bemname,9003,FALSE,NULL)) == NULL)
-                goto out;
-
-            for (k = 0; k < sphere->np; k++) {
-                dist = VEC_LEN(sphere->rr[k]);
-                sphere->rr[k][X] = guessrad*sphere->rr[k][X]/dist + guess_r0[X];
-                sphere->rr[k][Y] = guessrad*sphere->rr[k][Y]/dist + guess_r0[Y];
-                sphere->rr[k][Z] = guessrad*sphere->rr[k][Z]/dist + guess_r0[Z];
-            }
-            if (mne_source_space_add_geometry_info(sphere,TRUE) == FAIL)
-                goto out;
-            guess_surf = sphere;
-        }
-        else {
-            fprintf(stderr,"Guess surface (%d = %s) is in %s coordinates\n",
-                    guess_surf->id,fwd_bem_explain_surface(guess_surf->id),
-                    mne_coord_frame_name(guess_surf->coord_frame));
-        }
-        fprintf(stderr,"Filtering (grid = %6.f mm)...\n",1000*grid);
-        res = make_volume_source_space(guess_surf,grid,exclude,mindist);
-
-    out : {
-            FREE(bemname);
-            if(sphere)
-                delete sphere;
-            return res;
-        }
-    }
+    static MneCSurface* make_guesses(MneSurfaceOrVolume::MneCSurface* guess_surf, /* Predefined boundary for the guesses */
+                            float guessrad,     /* Radius for the spherical boundary if the above is missing */
+                            float *guess_r0,    /* Origin for the spherical boundary */
+                            float grid,         /* Spacing between guess points */
+                            float exclude,      /* Exclude points closer than this to the CM of the guess boundary surface */
+                            float mindist);
 
 
 
 
+    //============================= mne_bem_surface_io.c =============================
+
+    //Refactored: mne_read_bem_surface (mne_bem_surface_io.c)
+    static MneCSurface* read_bem_surface(const QString&  name,   /* Filename */
+                                    int  which,             /* Which surface are we looking for (-1 loads the first one)*/
+                                    int  add_geometry,      /* Add the geometry information */
+                                    float *sigmap);
 
 
-
-
+    //Refactored: read_bem_surface (mne_bem_surface_io.c)
+    static MneCSurface* read_bem_surface( const QString& name,    /* Filename */
+                                        int  which,             /* Which surface are we looking for (-1 loads the first one)*/
+                                        int  add_geometry,      /* Add the geometry information */
+                                        float *sigmap,          /* Conductivity? */
+                                        bool   check_too_many_neighbors);
 
 
 

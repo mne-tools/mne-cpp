@@ -568,9 +568,9 @@ ECDSet DipoleFit::calculateFit() const
     * Proceed to computing the fits
     */
     printf("\n---- Computing the forward solution for the guesses...\n\n");
-    if ((guess = make_guess_data(settings->guessname,
-                                 settings->guess_surfname,
-                                 settings->guess_mindist, settings->guess_exclude, settings->guess_grid, fit_data)) == NULL)
+    if ((guess = new GuessData( settings->guessname,
+                                settings->guess_surfname,
+                                settings->guess_mindist, settings->guess_exclude, settings->guess_grid, fit_data)) == NULL)
         goto out;
 
     fprintf (stderr,"\n---- Fitting : %7.1f ... %7.1f ms (step: %6.1f ms integ: %6.1f ms)\n\n",

@@ -41,6 +41,12 @@
 
 #include "mne_surface_or_volume.h"
 
+#include <fiff/fiff_stream.h>
+
+
+#include <QFile>
+#include <QCoreApplication>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -48,14 +54,37 @@
 //=============================================================================================================
 
 using namespace Eigen;
+using namespace FIFFLIB;
 using namespace INVERSELIB;
 
 
 //============================= dot.h =============================
 
+#ifndef TRUE
+#define TRUE 1
+#endif
+
+#ifndef FALSE
+#define FALSE 0
+#endif
+
+#ifndef FAIL
+#define FAIL -1
+#endif
+
+#ifndef OK
+#define OK 0
+#endif
+
+
+
 #define X_17 0
 #define Y_17 1
 #define Z_17 2
+
+
+#define VEC_DOT_17(x,y) ((x)[X_17]*(y)[X_17] + (x)[Y_17]*(y)[Y_17] + (x)[Z_17]*(y)[Z_17])
+#define VEC_LEN_17(x) sqrt(VEC_DOT_17(x,x))
 
 
 
@@ -188,6 +217,38 @@ void mne_free_mgh_tag_group(void *gp)
 
     return;
 }
+
+
+
+
+
+
+void fromFloatEigenMatrix_17(const Eigen::MatrixXf& from_mat, float **& to_mat, const int m, const int n)
+{
+    for ( int i = 0; i < m; ++i)
+        for ( int j = 0; j < n; ++j)
+            to_mat[i][j] = from_mat(i,j);
+}
+
+void fromFloatEigenMatrix_17(const Eigen::MatrixXf& from_mat, float **& to_mat)
+{
+    fromFloatEigenMatrix_17(from_mat, to_mat, from_mat.rows(), from_mat.cols());
+}
+
+
+
+void fromIntEigenMatrix_17(const Eigen::MatrixXi& from_mat, int **&to_mat, const int m, const int n)
+{
+    for ( int i = 0; i < m; ++i)
+        for ( int j = 0; j < n; ++j)
+            to_mat[i][j] = from_mat(i,j);
+}
+
+void fromIntEigenMatrix_17(const Eigen::MatrixXi& from_mat, int **&to_mat)
+{
+    fromIntEigenMatrix_17(from_mat, to_mat, from_mat.rows(), from_mat.cols());
+}
+
 
 
 
@@ -332,4 +393,246 @@ MneSurfaceOrVolume::MneCSourceSpace *MneSurfaceOrVolume::mne_new_source_space(in
     res->cm[X_17] = res->cm[Y_17] = res->cm[Z_17] = 0.0;
 
     return res;
+}
+
+
+//*************************************************************************************************************
+
+MneSurfaceOrVolume::MneCSurface *MneSurfaceOrVolume::make_guesses(MneSurfaceOrVolume::MneCSurface *guess_surf, float guessrad, float *guess_r0, float grid, float exclude, float mindist)		   /* Exclude points closer than this to
+                                                        * the guess boundary surface */
+/*
+     * Make a guess space inside a sphere
+     */
+{
+    char *bemname     = NULL;
+    MneSurfaceOrVolume::MneCSurface* sphere = NULL;
+    MneSurfaceOrVolume::MneCSurface* res    = NULL;
+    int        k;
+    float      dist;
+    float      r0[] = { 0.0, 0.0, 0.0 };
+
+    if (!guess_r0)
+        guess_r0 = r0;
+
+    if (!guess_surf) {
+        fprintf(stderr,"Making a spherical guess space with radius %7.1f mm...\n",1000*guessrad);
+        //#ifdef USE_SHARE_PATH
+        //    if ((bemname = mne_compose_mne_name("share/mne","icos.fif")) == NULL)
+        //#else
+        //    if ((bemname = mne_compose_mne_name("setup/mne","icos.fif")) == NULL)
+        //#endif
+        //      goto out;
+
+        //    QFile bemFile("/usr/pubsw/packages/mne/stable/share/mne/icos.fif");
+
+        QFile bemFile(QString("./resources/surf2bem/icos.fif"));
+        if ( !QCoreApplication::startingUp() )
+            bemFile.setFileName(QCoreApplication::applicationDirPath() + QString("/resources/surf2bem/icos.fif"));
+        else if (!bemFile.exists())
+            bemFile.setFileName("./bin/resources/surf2bem/icos.fif");
+
+        if( !bemFile.exists () ){
+            qDebug() << bemFile.fileName() << "does not exists.";
+            goto out;
+        }
+
+        bemname = MALLOC_17(strlen(bemFile.fileName().toLatin1().data())+1,char);
+        strcpy(bemname,bemFile.fileName().toLatin1().data());
+
+        if ((sphere = MneSurfaceOrVolume::MneCSourceSpace::read_bem_surface(bemname,9003,FALSE,NULL)) == NULL)
+            goto out;
+
+        for (k = 0; k < sphere->np; k++) {
+            dist = VEC_LEN_17(sphere->rr[k]);
+            sphere->rr[k][X_17] = guessrad*sphere->rr[k][X_17]/dist + guess_r0[X_17];
+            sphere->rr[k][Y_17] = guessrad*sphere->rr[k][Y_17]/dist + guess_r0[Y_17];
+            sphere->rr[k][Z_17] = guessrad*sphere->rr[k][Z_17]/dist + guess_r0[Z_17];
+        }
+        if (mne_source_space_add_geometry_info(sphere,TRUE) == FAIL)
+            goto out;
+        guess_surf = sphere;
+    }
+    else {
+        fprintf(stderr,"Guess surface (%d = %s) is in %s coordinates\n",
+                guess_surf->id,fwd_bem_explain_surface(guess_surf->id),
+                mne_coord_frame_name(guess_surf->coord_frame));
+    }
+    fprintf(stderr,"Filtering (grid = %6.f mm)...\n",1000*grid);
+    res = make_volume_source_space(guess_surf,grid,exclude,mindist);
+
+out : {
+        FREE_17(bemname);
+        if(sphere)
+            delete sphere;
+        return res;
+    }
+}
+
+
+//*************************************************************************************************************
+
+MneSurfaceOrVolume::MneCSurface *MneSurfaceOrVolume::read_bem_surface(const QString &name, int which, int add_geometry, float *sigmap)          /* Conductivity? */
+{
+    return read_bem_surface(name,which,add_geometry,sigmap,true);
+}
+
+
+//*************************************************************************************************************
+
+MneSurfaceOrVolume::MneCSurface *MneSurfaceOrVolume::read_bem_surface(const QString &name, int which, int add_geometry, float *sigmap, bool check_too_many_neighbors)
+/*
+     * Read a Neuromag-style BEM surface description
+     */
+{
+    QFile file(name);
+    FiffStream::SPtr stream(new FiffStream(&file));
+
+    QList<FiffDirNode::SPtr> surfs;
+    QList<FiffDirNode::SPtr> bems;
+    FiffDirNode::SPtr node;
+    FiffTag::SPtr t_pTag;
+
+    int     id = -1;
+    float   **nodes        = NULL;
+    float   **node_normals = NULL;
+    int     **triangles    = NULL;
+    int     nnode,ntri;
+    MneSurfaceOrVolume::MneCSurface* s = NULL;
+    int k;
+    int coord_frame = FIFFV_COORD_MRI;
+    float sigma = -1.0;
+    MatrixXf tmp_nodes;
+    MatrixXi tmp_triangles;
+
+    if(!stream->open())
+        goto bad;
+    /*
+        * Check for the existence of BEM coord frame
+        */
+    bems = stream->tree()->dir_tree_find(FIFFB_BEM);
+    if (bems.size() > 0) {
+        node = bems[0];
+        if (node->find_tag(stream, FIFF_BEM_COORD_FRAME, t_pTag)) {
+            coord_frame = *t_pTag->toInt();
+        }
+    }
+    surfs = stream->tree()->dir_tree_find(FIFFB_BEM_SURF);
+    if (surfs.size() == 0) {
+        printf ("No BEM surfaces found in %s",name.toLatin1().constData());
+        goto bad;
+    }
+    if (which >= 0) {
+        for (k = 0; k < surfs.size(); ++k) {
+            node = surfs[k];
+            /*
+                * Read the data from this node
+                */
+            if (node->find_tag(stream, FIFF_BEM_SURF_ID, t_pTag)) {
+                id = *t_pTag->toInt();
+                if (id == which)
+                    break;
+            }
+        }
+        if (id != which) {
+            printf("Desired surface not found in %s",name.toLatin1().constData());
+            goto bad;
+        }
+    }
+    else
+        node = surfs[0];
+    /*
+       * Get the compulsory tags
+       */
+    if (!node->find_tag(stream, FIFF_BEM_SURF_NNODE, t_pTag))
+        goto bad;
+    nnode = *t_pTag->toInt();
+
+    if (!node->find_tag(stream, FIFF_BEM_SURF_NTRI, t_pTag))
+        goto bad;
+    ntri = *t_pTag->toInt();
+
+    if (!node->find_tag(stream, FIFF_BEM_SURF_NODES, t_pTag))
+        goto bad;
+    tmp_nodes = t_pTag->toFloatMatrix().transpose();
+    nodes = ALLOC_CMATRIX_17(tmp_nodes.rows(),tmp_nodes.cols());
+    fromFloatEigenMatrix_17(tmp_nodes, nodes);
+
+    if (node->find_tag(stream, FIFF_BEM_SURF_NORMALS, t_pTag)) {\
+        MatrixXf tmp_node_normals = t_pTag->toFloatMatrix().transpose();
+        node_normals = ALLOC_CMATRIX_17(tmp_node_normals.rows(),tmp_node_normals.cols());
+        fromFloatEigenMatrix_17(tmp_node_normals, node_normals);
+    }
+
+    if (!node->find_tag(stream, FIFF_BEM_SURF_TRIANGLES, t_pTag))
+        goto bad;
+    tmp_triangles = t_pTag->toIntMatrix().transpose();
+    triangles = (int **)malloc(tmp_triangles.rows() * sizeof(int *));
+    for (int i = 0; i < tmp_triangles.rows(); ++i)
+        triangles[i] = (int *)malloc(tmp_triangles.cols() * sizeof(int));
+    fromIntEigenMatrix_17(tmp_triangles, triangles);
+
+    if (node->find_tag(stream, FIFF_MNE_COORD_FRAME, t_pTag)) {
+        coord_frame = *t_pTag->toInt();
+    }
+    else if (node->find_tag(stream, FIFF_BEM_COORD_FRAME, t_pTag)) {
+        coord_frame = *t_pTag->toInt();
+    }
+    if (node->find_tag(stream, FIFF_BEM_SIGMA, t_pTag)) {
+        sigma = *t_pTag->toFloat();
+    }
+
+    stream->close();
+
+    s = mne_new_source_space(0);
+    for (k = 0; k < ntri; k++) {
+        triangles[k][0]--;
+        triangles[k][1]--;
+        triangles[k][2]--;
+    }
+    s->itris       = triangles;
+    s->id          = which;
+    s->coord_frame = coord_frame;
+    s->rr          = nodes;      nodes = NULL;
+    s->nn          = node_normals; node_normals = NULL;
+    s->ntri        = ntri;
+    s->np          = nnode;
+    s->curv        = NULL;
+    s->val         = NULL;
+
+    if (add_geometry) {
+        if (check_too_many_neighbors) {
+            if (mne_source_space_add_geometry_info(s,!s->nn) != OK)
+                goto bad;
+        }
+        else {
+            if (mne_source_space_add_geometry_info2(s,!s->nn) != OK)
+                goto bad;
+        }
+    }
+    else if (s->nn == NULL) {       /* Normals only */
+        if (mne_add_vertex_normals(s) != OK)
+            goto bad;
+    }
+    else
+        mne_add_triangle_data(s);
+
+    s->nuse   = s->np;
+    s->inuse  = MALLOC(s->np,int);
+    s->vertno = MALLOC(s->np,int);
+    for (k = 0; k < s->np; k++) {
+        s->inuse[k]  = TRUE;
+        s->vertno[k] = k;
+    }
+    if (sigmap)
+        *sigmap = sigma;
+
+    return s;
+
+bad : {
+        FREE_CMATRIX(nodes);
+        FREE_CMATRIX(node_normals);
+        FREE_ICMATRIX(triangles);
+        stream->close();
+        return NULL;
+    }
 }
