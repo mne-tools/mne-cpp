@@ -885,11 +885,17 @@ static fiffCoordTrans fiff_make_transform2 (int from,int to,float rot[3][3],floa
         for (k = 0; k < 3; k++)
             t->rot[j][k] = rot[j][k];
     }
+
+    qDebug() << "DEBUG!!!";
+
     if (add_inverse_17(t) == FAIL) {
         printf("Failed to add the inverse coordinate transformation");
         FREE_17(t);
         return NULL;
     }
+
+    qDebug() << "DEBUG!!!";
+
     return (t);
 }
 
@@ -911,9 +917,11 @@ static fiffCoordTrans make_voxel_ras_trans(float *r0,
         rot[j][1] = y_ras[j];
         rot[j][2] = z_ras[j];
     }
+
     for (j = 0; j < 3; j++)
         for (k = 0; k < 3; k++)
             rot[j][k]    = voxel_size[k]*rot[j][k];
+
     t = fiff_make_transform2(FIFFV_MNE_COORD_MRI_VOXEL,FIFFV_COORD_MRI,rot,move);
 
     return t;
@@ -1373,8 +1381,8 @@ MneSurfaceOrVolume::MneCSourceSpace *MneSurfaceOrVolume::make_volume_source_spac
     }
     fprintf(stderr,"[done]\n");
     /*
-       * Set up the volume data (needed for creating the interpolation matrix)
-       */
+    * Set up the volume data (needed for creating the interpolation matrix)
+    */
     {
         float r0[3],voxel_size[3],x_ras[3],y_ras[3],z_ras[3];
         int   width,height,depth;
@@ -1393,17 +1401,20 @@ MneSurfaceOrVolume::MneCSourceSpace *MneSurfaceOrVolume::make_volume_source_spac
 
         for (k = 0; k < 3; k++)
             x_ras[k] = y_ras[k] = z_ras[k] = 0.0;
+
         x_ras[0] = 1.0;
         y_ras[1] = 1.0;
         z_ras[2] = 1.0;
 
         if ((sp->voxel_surf_RAS_t = make_voxel_ras_trans(r0,x_ras,y_ras,z_ras,voxel_size)) == NULL)
             goto bad;
+
         sp->vol_dims[0] = width;
         sp->vol_dims[1] = height;
         sp->vol_dims[2] = depth;
         VEC_COPY_17(sp->voxel_size,voxel_size);
     }
+
     return sp;
 
 bad : {
