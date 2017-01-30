@@ -89,7 +89,7 @@ EEGRef::EEGRef()
 
 //*************************************************************************************************************
 
-MatrixXd EEGRef::applyCAR(MatrixXd &matIER, FIFFLIB::FiffInfo::SPtr pFiffInfo)
+MatrixXd EEGRef::applyCAR(MatrixXd &matIER, FIFFLIB::FiffInfo::SPtr &pFiffInfo)
 {
     unsigned int numTrueCh  = 0;
     unsigned int numCh      = pFiffInfo->chs.size();
@@ -105,14 +105,17 @@ MatrixXd EEGRef::applyCAR(MatrixXd &matIER, FIFFLIB::FiffInfo::SPtr pFiffInfo)
         }
         else
         {
+            // excluding non-EEG channels from the centering matrix
             matOnes.row(i).setZero();
+            matOnes.col(i).setZero();
             matCenter.row(i).setZero();
+            matCenter.col(i).setZero();
         }
     }
 
     //detrmine centering matrix
-    matCenter = matCenter - (1/numTrueCh)*matOnes;
-    IOUtils::write_eigen_matrix(matCenter, "centeringMatrix.txt", "centering matrix");
+    matCenter = matCenter - (1/double(numTrueCh))*matOnes;
+    IOUtils::write_eigen_matrix(matCenter, "matCENTERING.txt", "centering matrix");
 
     return matCenter*matIER;
 }
