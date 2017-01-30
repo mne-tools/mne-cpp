@@ -427,7 +427,7 @@ void MneMeasData::adjust_baselines(float bmin, float bmax)
     float ave;
     int s,c;
 
-    if (this->current)
+    if (!this->current)
         return;
 
     sfreq = 1.0/ this->current->tstep;
