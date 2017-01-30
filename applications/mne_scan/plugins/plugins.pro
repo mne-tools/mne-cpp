@@ -74,7 +74,7 @@ contains(MNECPP_CONFIG, BuildBasicMNESCANVersion) {
         noisereduction \
         ssvepbci \
         neuronalconnectivity \
-        car
+        reref
 
     win32 { #Only compile the TMSI plugin if a windows system is used - TMSi driver is not available for linux yet
         contains(QMAKE_HOST.arch, x86_64) { #Compiling MNE Scan FOR a 64bit system
