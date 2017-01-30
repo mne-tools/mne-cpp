@@ -76,8 +76,8 @@ AveragingSettingsWidget::AveragingSettingsWidget(Averaging *toolbox, QWidget *pa
 
     if(m_pAveragingToolbox->m_pRtAve) {
         ui.m_pSpinBoxNumAverages->setValue(m_pAveragingToolbox->m_iNumAverages);
-        connect(ui.m_pSpinBoxNumAverages, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-                m_pAveragingToolbox, &Averaging::changeNumAverages);
+        connect(ui.m_pSpinBoxNumAverages, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
+                this, &AveragingSettingsWidget::changeNumAverages);
 
         ui.m_comboBox_runningAvr->setCurrentIndex(m_pAveragingToolbox->m_iAverageMode);
         connect(ui.m_comboBox_runningAvr, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
@@ -94,10 +94,14 @@ AveragingSettingsWidget::AveragingSettingsWidget(Averaging *toolbox, QWidget *pa
     connect(ui.m_pSpinBoxPostStimSamples, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
             this, &AveragingSettingsWidget::changePostStim);
 
-    //Baseline Correction
-    ui.m_pcheckBoxArtifactReduction->setChecked(m_pAveragingToolbox->m_bDoArtifactReduction);
-    connect(ui.m_pcheckBoxArtifactReduction, &QCheckBox::clicked,
-            m_pAveragingToolbox, &Averaging::changeArtifactReductionActive);
+    //Artifact rejection
+    ui.m_pcheckBox_artifactReduction->setChecked(m_pAveragingToolbox->m_bDoArtifactThresholdReduction);
+    connect(ui.m_pcheckBox_artifactReduction, &QCheckBox::clicked,
+            m_pAveragingToolbox, &Averaging::changeArtifactThresholdReductionActive);
+
+    ui.m_pcheckBox_varianceReduction->setChecked(m_pAveragingToolbox->m_bDoArtifactVarianceReduction);
+    connect(ui.m_pcheckBox_varianceReduction, &QCheckBox::clicked,
+            m_pAveragingToolbox, &Averaging::changeArtifactVarianceReductionActive);
 
     ui.m_pSpinBox_artifactThresholdFirst->setValue(m_pAveragingToolbox->m_dArtifactThresholdFirst);
     connect(ui.m_pSpinBox_artifactThresholdFirst, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
@@ -106,6 +110,10 @@ AveragingSettingsWidget::AveragingSettingsWidget(Averaging *toolbox, QWidget *pa
     ui.m_pSpinBox_artifactThresholdSecond->setValue(m_pAveragingToolbox->m_iArtifactThresholdSecond);
     connect(ui.m_pSpinBox_artifactThresholdSecond, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             this, &AveragingSettingsWidget::changeArtifactThreshold);
+
+    ui.m_spinBox_variance->setValue(m_pAveragingToolbox->m_dArtifactVariance);
+    connect(ui.m_spinBox_variance, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+            m_pAveragingToolbox, &Averaging::changeArtifactVariance);
 
     //Baseline Correction
     ui.m_pcheckBoxBaselineCorrection->setChecked(m_pAveragingToolbox->m_bDoBaselineCorrection);
@@ -127,8 +135,14 @@ AveragingSettingsWidget::AveragingSettingsWidget(Averaging *toolbox, QWidget *pa
     connect(ui.m_pushButton_reset, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
             m_pAveragingToolbox, &Averaging::resetAverage);
 
-
     setWindowFlags(Qt::WindowStaysOnTopHint);
+
+    // Disable and hide variance rejection
+    ui.m_pcheckBox_varianceReduction->setChecked(false);
+    ui.m_line_adrtifactRejection->hide();
+    ui.m_pcheckBox_varianceReduction->hide();
+    ui.m_label_varianceValue->hide();
+    ui.m_spinBox_variance->hide();
 }
 
 
@@ -194,4 +208,10 @@ void AveragingSettingsWidget::changeArtifactThreshold()
 }
 
 
+//*************************************************************************************************************
+
+void AveragingSettingsWidget::changeNumAverages()
+{
+    m_pAveragingToolbox->changeNumAverages(ui.m_pSpinBoxNumAverages->value());
+}
 

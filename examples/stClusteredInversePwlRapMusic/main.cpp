@@ -1,7 +1,8 @@
 //=============================================================================================================
 /**
 * @file     main.cpp
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
+* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Lorenz Esch <lorenz.esch@tu-ilmenau.de>
 * @version  1.0
 * @date     March, 2014
 *
@@ -54,6 +55,7 @@
 
 #include <disp3D/view3D.h>
 #include <disp3D/control/control3dwidget.h>
+#include <disp3D/model/data3Dtreemodel.h>
 
 #include <utils/mnemath.h>
 
@@ -67,6 +69,7 @@
 
 #include <QApplication>
 #include <QSet>
+#include <QCommandLineParser>
 
 
 //*************************************************************************************************************
@@ -100,24 +103,48 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    QFile t_fileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
-    QFile t_fileFwd("./MNE-sample-data/MEG/sample/sample_audvis-meg-oct-6-fwd.fif");
-    AnnotationSet t_annotationSet("./MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot", "./MNE-sample-data/subjects/sample/label/rh.aparc.a2009s.annot");
-    SurfaceSet t_surfSet("./MNE-sample-data/subjects/sample/surf/lh.white", "./MNE-sample-data/subjects/sample/surf/rh.white");
+    // Command Line Parser
+    QCommandLineParser parser;
+    parser.setApplicationDescription("ROI Clustered Inverse Powell Rap Music Example");
+    parser.addHelpOption();
 
-//    QFile t_fileRaw("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw.fif");
-//    QFile t_fileFwd("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-oct-6p-fwd.fif");
-//    AnnotationSet t_annotationSet("E:/Data/sl_data/subjects/mind006/label/lh.aparc.a2009s.annot", "E:/Data/sl_data/subjects/mind006/label/rh.aparc.a2009s.annot");
-//    SurfaceSet t_surfSet("E:/Data/sl_data/subjects/mind006/surf/lh.white", "E:/Data/sl_data/subjects/mind006/surf/rh.white");
+    QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", "./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
+    QCommandLineOption fwdOption("fwd", "Path to forwad solution <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
+    QCommandLineOption surfOption("surfType", "Surface type <type>.", "type", "orig");
+    QCommandLineOption annotOption("annotType", "Annotation type <type>.", "type", "aparc.a2009s");
+    QCommandLineOption subjectOption("subject", "Selected subject <subject>.", "subject", "sample");
+    QCommandLineOption subjectPathOption("subjectPath", "Selected subject path <subjectPath>.", "subjectPath", "./MNE-sample-data/subjects");
+    QCommandLineOption stcFileOption("stcOut", "Path to stc <file>, which is to be written.", "file", "");
+    QCommandLineOption numDipolePairsOption("numDip", "<number> of dipole pairs to localize.", "number", "7");
+    QCommandLineOption hemiOption("hemi", "Selected hemisphere <hemi>.", "hemi", "2");
+    QCommandLineOption inSamplesOption("inSamples", "Timing is set in samples.", "inSamples", "true");
+    QCommandLineOption keepCompOption("keepComp", "Keep compensators.", "keepComp", "true");
 
-//    QFile t_fileRaw("E:/Data/sl_data/MEG/mind006/mind006_051209_median01_raw.fif");
-//    QFile t_fileFwd("E:/Data/sl_data/MEG/mind006/mind006_051209_median01_raw-oct-6-fwd.fif");
-//    AnnotationSet t_annotationSet("E:/Data/sl_data/subjects/mind006/label/lh.aparc.a2009s.annot", "E:/Data/sl_data/subjects/mind006/label/rh.aparc.a2009s.annot");
-//    SurfaceSet t_surfSet("E:/Data/sl_data/subjects/mind006/surf/lh.white", "E:/Data/sl_data/subjects/mind006/surf/rh.white");
+    parser.addOption(inputOption);
+    parser.addOption(fwdOption);
+    parser.addOption(surfOption);
+    parser.addOption(annotOption);
+    parser.addOption(subjectOption);
+    parser.addOption(subjectPathOption);
+    parser.addOption(stcFileOption);
+    parser.addOption(numDipolePairsOption);
+    parser.addOption(hemiOption);
+    parser.addOption(inSamplesOption);
+    parser.addOption(keepCompOption);
 
-    QString t_sFileNameStc("");//("mind006_051209_auditory01.stc");
 
-    qint32 numDipolePairs = 7;
+    parser.process(a);
+
+    //Load data
+    QFile t_fileRaw(parser.value(inputOption));
+    QFile t_fileFwd(parser.value(fwdOption));
+
+    SurfaceSet t_surfSet (parser.value(subjectOption), parser.value(hemiOption).toInt(), parser.value(surfOption), parser.value(subjectPathOption));
+    AnnotationSet t_annotationSet (parser.value(subjectOption), parser.value(hemiOption).toInt(), parser.value(annotOption), parser.value(subjectPathOption));
+
+    QString t_sFileNameStc(parser.value(stcFileOption));
+
+    qint32 numDipolePairs = parser.value(numDipolePairsOption).toInt();
 
     qint32 samplesStcWindow = 100;
     float stcOverlap = 0.0f;
@@ -125,17 +152,18 @@ int main(int argc, char *argv[])
     qint32 startSample = 0;
     qint32 numSample = 100000;
 
-    bool in_samples = true;
-    bool keep_comp = true;
+    bool in_samples = false;
+    if(parser.value(inSamplesOption) == "false" || parser.value(inSamplesOption) == "0") {
+        in_samples = false;
+    } else if(parser.value(inSamplesOption) == "true" || parser.value(inSamplesOption) == "1") {
+        in_samples = true;
+    }
 
-    // Parse command line parameters
-    for(qint32 i = 0; i < argc; ++i)
-    {
-        if(strcmp(argv[i], "-stc") == 0 || strcmp(argv[i], "--stc") == 0)
-        {
-            if(i + 1 < argc)
-                t_sFileNameStc = QString::fromUtf8(argv[i+1]);
-        }
+    bool keep_comp = false;
+    if(parser.value(keepCompOption) == "false" || parser.value(keepCompOption) == "0") {
+        keep_comp = false;
+    } else if(parser.value(keepCompOption) == "true" || parser.value(keepCompOption) == "1") {
+        keep_comp = true;
     }
 
     //
@@ -343,14 +371,15 @@ int main(int argc, char *argv[])
 //    sourceEstimate = sourceEstimate.reduce(sample, 1);
 
     View3D::SPtr testWindow = View3D::SPtr(new View3D());
-    testWindow->addBrainData("Subject01", "HemiLRSet", t_surfSet, t_annotationSet);
+    Data3DTreeModel::SPtr p3DDataModel = Data3DTreeModel::SPtr(new Data3DTreeModel());
 
-    QList<BrainRTSourceLocDataTreeItem*> rtItemList = testWindow->addRtBrainData("Subject01", "HemiLRSet", sourceEstimate, t_clusteredFwd);
+    testWindow->setModel(p3DDataModel);
+    p3DDataModel->addSurfaceSet(parser.value(subjectOption), "HemiLRSet", t_surfSet, t_annotationSet);
 
-    testWindow->show();
+    MneEstimateTreeItem* pRTDataItem = p3DDataModel->addSourceData(parser.value(subjectOption), "HemiLRSet", sourceEstimate, t_clusteredFwd);
 
     Control3DWidget::SPtr control3DWidget = Control3DWidget::SPtr(new Control3DWidget());
-    control3DWidget->setView3D(testWindow);
+    control3DWidget->init(p3DDataModel, testWindow);
     control3DWidget->show();
 
     if(!t_sFileNameStc.isEmpty())

@@ -57,6 +57,7 @@
 #include <QMutexLocker>
 #include <QDebug>
 #include <QElapsedTimer>
+#include <QtConcurrent/QtConcurrent>
 
 
 //*************************************************************************************************************
@@ -74,6 +75,16 @@ using namespace RTPROCESSINGLIB;
 using namespace FIFFLIB;
 using namespace IOBUFFER;
 using namespace UTILSLIB;
+using namespace Eigen;
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE GLOABAL MEMBER METHODS
+//=============================================================================================================
+
+int             m_dValueVariance = 0.5;           /**< Variance value to detect artifacts */
+double          m_dValueThreshold = 300e-6;          /**< Threshold to detect artifacts */
 
 
 //*************************************************************************************************************
@@ -93,8 +104,6 @@ RtAve::RtAve(quint32 numAverages,
 , m_iNumAverages(numAverages)
 , m_iPreStimSamples(p_iPreStimSamples)
 , m_iPostStimSamples(p_iPostStimSamples)
-, m_iPreStimSeconds(p_iPreStimSamples/p_pFiffInfo->sfreq)
-, m_iPostStimSeconds(p_iPostStimSamples/p_pFiffInfo->sfreq)
 , m_pFiffInfo(p_pFiffInfo)
 , m_bIsRunning(false)
 , m_bAutoAspect(true)
@@ -106,9 +115,8 @@ RtAve::RtAve(quint32 numAverages,
 , m_bDoBaselineCorrection(false)
 , m_pairBaselineSec(qMakePair(QVariant(QString::number(p_iBaselineFromSecs)),QVariant(QString::number(p_iBaselineToSecs))))
 , m_pStimEvokedSet(FiffEvokedSet::SPtr(new FiffEvokedSet))
-, m_iCurrentBlockSize(0)
-, m_dArtifactThreshold(300e-6)
-, m_bDoArtifactReduction(false)
+, m_bActivateThreshold(false)
+, m_bActivateVariance(false)
 {
     qRegisterMetaType<FIFFLIB::FiffEvokedSet::SPtr>("FIFFLIB::FiffEvokedSet::SPtr");
 
@@ -161,9 +169,10 @@ void RtAve::setAverageMode(qint32 mode)
 
 void RtAve::setPreStim(qint32 samples, qint32 secs)
 {
+    Q_UNUSED(secs);
+
     QMutexLocker locker(&m_qMutex);
     m_iNewPreStimSamples = samples;
-    m_iPreStimSeconds = secs;
 }
 
 
@@ -171,9 +180,10 @@ void RtAve::setPreStim(qint32 samples, qint32 secs)
 
 void RtAve::setPostStim(qint32 samples, qint32 secs)
 {
+    Q_UNUSED(samples);
+
     QMutexLocker locker(&m_qMutex);
     m_iNewPostStimSamples = samples;
-    m_iPostStimSeconds = secs;
 }
 
 
@@ -188,11 +198,14 @@ void RtAve::setTriggerChIndx(qint32 idx)
 
 //*************************************************************************************************************
 
-void RtAve::setArtifactReduction(bool bActivate, double dThreshold)
+void RtAve::setArtifactReduction(bool bActivateThreshold, double dValueThreshold, bool bActivateVariance, double dValueVariance)
 {
     QMutexLocker locker(&m_qMutex);
-    m_dArtifactThreshold = dThreshold;
-    m_bDoArtifactReduction = bActivate;
+    m_dValueVariance = dValueVariance;
+    m_dValueThreshold = dValueThreshold;
+
+    m_bActivateThreshold = bActivateThreshold;
+    m_bActivateVariance = bActivateVariance;
 }
 
 
@@ -299,7 +312,7 @@ void RtAve::run()
             //Acquire Data m_pRawMatrixBuffer is thread safe
             MatrixXd rawSegment = m_pRawMatrixBuffer->pop();
 
-            QMutexLocker locker(&m_qMutex);
+            //QMutexLocker locker(&m_qMutex);
             doAveraging(rawSegment);
 
             //qDebug()<<"RtAve::run() - time.elapsed()"<<time.elapsed();
@@ -311,7 +324,7 @@ void RtAve::run()
 //*************************************************************************************************************
 
 void RtAve::doAveraging(const MatrixXd& rawSegment)
-{    
+{
     //qDebug()<<"";
     //qDebug()<<"";
     //qDebug()<<"";
@@ -445,6 +458,8 @@ void RtAve::doAveraging(const MatrixXd& rawSegment)
 
 void RtAve::fillBackBuffer(const MatrixXd &data, double dTriggerType)
 {
+    QMutexLocker locker(&m_qMutex);
+
     int iResidualCols = data.cols();
     if(m_mapMatDataPostIdx[dTriggerType] + data.cols() > m_iPostStimSamples) {
         iResidualCols = m_iPostStimSamples - m_mapMatDataPostIdx[dTriggerType];
@@ -461,6 +476,8 @@ void RtAve::fillBackBuffer(const MatrixXd &data, double dTriggerType)
 
 void RtAve::fillFrontBuffer(const MatrixXd &data, double dTriggerType)
 {
+    QMutexLocker locker(&m_qMutex);
+
     //Init m_mapDataPre
     if(!m_mapDataPre.contains(dTriggerType)) {
         if(dTriggerType != -1.0) {
@@ -489,16 +506,14 @@ void RtAve::fillFrontBuffer(const MatrixXd &data, double dTriggerType)
 
 void RtAve::mergeData(double dTriggerType)
 {
+    QMutexLocker locker(&m_qMutex);
+
     MatrixXd mergedData(m_mapDataPre[dTriggerType].rows(), m_mapDataPre[dTriggerType].cols() + m_mapDataPost[dTriggerType].cols());
 
     mergedData << m_mapDataPre[dTriggerType], m_mapDataPost[dTriggerType];
 
     //Perform artifact threshold
-    bool bArtifactedDetected = false;
-
-    if(m_bDoArtifactReduction) {
-       bArtifactedDetected = checkForArtifact(mergedData, m_dArtifactThreshold);
-    }
+    bool bArtifactedDetected = checkForArtifact(mergedData);
 
     if(bArtifactedDetected == false) {
         //Add cut data to average buffer
@@ -519,43 +534,110 @@ void RtAve::mergeData(double dTriggerType)
 
 //*************************************************************************************************************
 
-bool RtAve::checkForArtifact(MatrixXd& data, double dThreshold)
+void checkChVariance(QPair<bool, RowVectorXd>& pairData)
 {
-    double min = 0;
-    double max = 0;
-//    double sub = 0;
+    RowVectorXd temp = pairData.second;
 
-//    VectorXd subs;
+    double dMedian = temp.norm() / temp.cols();
 
-//    for(int i = 0; i < m_pFiffInfo->chs.size(); ++i) {
-//        if((m_pFiffInfo->chs.at(i).kind == FIFFV_MEG_CH || m_pFiffInfo->chs.at(i).kind == FIFFV_EEG_CH)
-//           && !m_pFiffInfo->bads.contains(m_pFiffInfo->chs.at(i).ch_name)) {
-//            min = data.row(i).minCoeff();
-//            max = data.row(i).maxCoeff();
-//            sub = max - min;
+    temp = temp.array() - dMedian;
+    temp.array().square();
 
-//            subs.resize(subs.rows() + 1);
-//            subs(i) = abs(sub);
-//        }
-//    }
+//    qDebug() << "RtAve::checkForArtifact - dMedian" << abs(dMedian);
+//    qDebug() << "RtAve::checkForArtifact - m_iValueVariance * dMedian" << m_iValueVariance * abs(dMedian);
+//    qDebug() << "RtAve::checkForArtifact - compare value " << abs(pairData.second.norm() / pairData.second.cols());
 
-    //This is the channel index to scan for artifacts
-    int i = 5;
+    //If variance is 3 times bigger than median -> reject
+    if(temp.norm() / temp.cols() > (m_dValueVariance * abs(dMedian))) {
+        pairData.first = true;
+    } else {
+        pairData.first = false;
+    }
+}
 
-    min = data.row(i).minCoeff();
-    max = data.row(i).maxCoeff();
-    double maxSubs = max - min;
 
-    //qDebug()<<"RtAve::checkForArtifact - maxSubs"<<maxSubs;
 
-    bool bArtifactDetected = false;
+//*************************************************************************************************************
 
-    if(maxSubs > dThreshold) {
-        std::cout << '\a';
-        bArtifactDetected = true;
+void checkChThreshold(QPair<bool, RowVectorXd>& pairData)
+{
+    RowVectorXd temp = pairData.second;
+
+    temp = temp.array() - temp(0);
+
+    double min = temp.minCoeff();
+    double max = temp.maxCoeff();
+
+//    qDebug() << "RtAve::checkForArtifact - min" << min;
+//    qDebug() << "RtAve::checkForArtifact - max" << max;
+//    qDebug() << "RtAve::checkForArtifact - m_dValueThreshold" << m_dValueThreshold;
+
+    //If absolute vaue of min or max if bigger than threshold -> reject
+    if((abs(min) > m_dValueThreshold) || (abs(max) > m_dValueThreshold)) {
+        pairData.first = true;
+    } else {
+        pairData.first = false;
+    }
+}
+
+
+//*************************************************************************************************************
+
+bool RtAve::checkForArtifact(MatrixXd& data)
+{
+    bool bReject = false;
+
+    if(m_bActivateThreshold || m_bActivateVariance) {
+        //Prepare concurrent data handling
+        QList<QPair<bool, RowVectorXd> > lchData;
+
+        for(int i = 0; i < m_pFiffInfo->chs.size(); ++i) {
+            if((m_pFiffInfo->chs.at(i).kind == FIFFV_MEG_CH || m_pFiffInfo->chs.at(i).kind == FIFFV_EEG_CH)
+                    && !m_pFiffInfo->bads.contains(m_pFiffInfo->chs.at(i).ch_name) && m_pFiffInfo->chs.at(i).coil_type != FIFFV_COIL_BABY_REF_MAG
+                    && m_pFiffInfo->chs.at(i).coil_type != FIFFV_COIL_BABY_REF_MAG2) {
+                QPair<bool, RowVectorXd> pair;
+                pair.first = false;
+                pair.second = data.row(i);
+                lchData.append(pair);
+            }
+        }
+
+        //qDebug() << "RtAve::checkForArtifact - lchData.size()" << lchData.size();
+
+        if(m_bActivateVariance) {
+            //Start the concurrent processing
+            QFuture<void> future = QtConcurrent::map(lchData, checkChVariance);
+            future.waitForFinished();
+
+            for(int i = 0; i < lchData.size(); ++i) {
+                if(lchData.at(i).first) {
+                    bReject = true;
+                    qDebug() << "RtAve::checkForArtifact - Reject trial";
+                    break;
+                }
+            }
+        }
+
+        if(m_bActivateThreshold && !bReject) {
+            //Start the concurrent processing
+            QFuture<void> future = QtConcurrent::map(lchData, checkChThreshold);
+            future.waitForFinished();
+
+            for(int i = 0; i < lchData.size(); ++i) {
+                if(lchData.at(i).first) {
+                    bReject = true;
+                    qDebug() << "RtAve::checkForArtifact - Reject trial";
+                    break;
+                }
+            }
+        }
     }
 
-    return bArtifactDetected;
+    if(bReject) {
+        qDebug() << "RtAve::checkForArtifact - Reject trial";
+    }
+
+    return bReject;
 }
 
 
@@ -563,6 +645,8 @@ bool RtAve::checkForArtifact(MatrixXd& data, double dThreshold)
 
 void RtAve::generateEvoked(double dTriggerType)
 {
+    QMutexLocker locker(&m_qMutex);
+
     if(m_mapStimAve[dTriggerType].isEmpty()) {
         return;
     }
@@ -649,6 +733,8 @@ void RtAve::reset()
 //    qDebug()<<"RtAve::reset()";
     QMutexLocker locker(&m_qMutex);
 
+    qDebug()<<"RtAve::reset() - 1";
+
     //Reset
     m_iPreStimSamples = m_iNewPreStimSamples;
     m_iPostStimSamples = m_iNewPostStimSamples;
@@ -656,16 +742,29 @@ void RtAve::reset()
     m_iAverageMode = m_iNewAverageMode;
     m_iNumAverages = m_iNewNumAverages;
 
+    qDebug()<<"RtAve::reset() - 2";
 
     //Clear all evoked data information
     m_pStimEvokedSet->evoked.clear();
 
+    qDebug()<<"RtAve::reset() - 3";
+
     //Clear all maps
+//    m_mapDataPre.clear();
+//    m_mapDataPost.clear();
+//    m_mapFillingBackBuffer.clear();
+//    m_mapStimAve.clear();
+//    m_mapNumberCalcAverages.clear();
+
+    m_qMapDetectedTrigger.clear();
+    m_mapStimAve.clear();
     m_mapDataPre.clear();
     m_mapDataPost.clear();
+    m_mapMatDataPostIdx.clear();
     m_mapFillingBackBuffer.clear();
-    m_mapStimAve.clear();
     m_mapNumberCalcAverages.clear();
+
+    qDebug()<<"RtAve::reset() - 4";
 
 //    QMutableMapIterator<double,Eigen::MatrixXd> i0(m_mapDataPre);
 //    while (i0.hasNext()) {

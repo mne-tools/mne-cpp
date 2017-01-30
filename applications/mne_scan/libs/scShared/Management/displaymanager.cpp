@@ -43,9 +43,8 @@
 
 #include <scDisp/realtimesamplearraywidget.h>
 #include <scDisp/realtimemultisamplearraywidget.h>
-#if defined(QT3D_LIBRARY_AVAILABLE)
 #include <scDisp/realtimesourceestimatewidget.h>
-#endif
+#include <scDisp/realtimeconnectivityestimatewidget.h>
 #include <scDisp/realtimeevokedwidget.h>
 #include <scDisp/realtimeevokedsetwidget.h>
 #include <scDisp/realtimecovwidget.h>
@@ -54,6 +53,7 @@
 #include <scMeas/newrealtimesamplearray.h>
 #include <scMeas/newrealtimemultisamplearray.h>
 #include <scMeas/realtimesourceestimate.h>
+#include <scMeas/realtimeconnectivityestimate.h>
 #include <scMeas/realtimeevoked.h>
 #include <scMeas/realtimeevokedset.h>
 #include <scMeas/realtimecov.h>
@@ -156,7 +156,6 @@ QWidget* DisplayManager::show(IPlugin::OutputConnectorList &outputConnectorList,
             vboxLayout->addWidget(rtmsaWidget);
             rtmsaWidget->init();
         }
-        #if defined(QT3D_LIBRARY_AVAILABLE)
         else if(pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeSourceEstimate> >())
         {
             QSharedPointer<RealTimeSourceEstimate>* pRealTimeSourceEstimate = &pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeSourceEstimate> >()->data();
@@ -171,7 +170,20 @@ QWidget* DisplayManager::show(IPlugin::OutputConnectorList &outputConnectorList,
             vboxLayout->addWidget(rtseWidget);
             rtseWidget->init();
         }
-        #endif
+        else if(pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeConnectivityEstimate> >())
+        {
+            QSharedPointer<RealTimeConnectivityEstimate>* pRealTimeConnectivityEstimate = &pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeConnectivityEstimate> >()->data();
+            RealTimeConnectivityEstimateWidget* rtseWidget = new RealTimeConnectivityEstimateWidget(*pRealTimeConnectivityEstimate, newDisp);//new RealTimeConnectivityEstimateWidget(*pRealTimeConnectivityEstimate, pT, newDisp);
+
+            qListActions.append(rtseWidget->getDisplayActions());
+            qListWidgets.append(rtseWidget->getDisplayWidgets());
+
+            connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify,
+                    rtseWidget, &RealTimeConnectivityEstimateWidget::update, Qt::BlockingQueuedConnection);
+
+            vboxLayout->addWidget(rtseWidget);
+            rtseWidget->init();
+        }
         else if(pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeEvoked> >())
         {
             QSharedPointer<RealTimeEvoked>* pRealTimeEvoked = &pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeEvoked> >()->data();

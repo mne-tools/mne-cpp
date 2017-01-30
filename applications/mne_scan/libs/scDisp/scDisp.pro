@@ -58,7 +58,10 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Fiffd \
             -lMNE$${MNE_LIB_VERSION}Mned \
             -lMNE$${MNE_LIB_VERSION}Inversed \
+            -lMNE$${MNE_LIB_VERSION}Connectivityd \
             -lMNE$${MNE_LIB_VERSION}Dispd \
+            -lMNE$${MNE_LIB_VERSION}DispChartsd \
+            -lMNE$${MNE_LIB_VERSION}Disp3Dd \
             -lscMeasd \
 }
 else {
@@ -68,19 +71,11 @@ else {
             -lMNE$${MNE_LIB_VERSION}Fiff \
             -lMNE$${MNE_LIB_VERSION}Mne \
             -lMNE$${MNE_LIB_VERSION}Inverse \
+            -lMNE$${MNE_LIB_VERSION}Connectivity \
             -lMNE$${MNE_LIB_VERSION}Disp \
+            -lMNE$${MNE_LIB_VERSION}DispCharts \
+            -lMNE$${MNE_LIB_VERSION}Disp3D \
             -lscMeas \
-}
-
-qtHaveModule(charts) {
-    CONFIG(debug, debug|release) {
-        LIBS += -lMNE$${MNE_LIB_VERSION}DispChartsd
-        LIBS += -lMNE$${MNE_LIB_VERSION}Disp3Dd
-    }
-    else {
-        LIBS += -lMNE$${MNE_LIB_VERSION}DispCharts
-        LIBS += -lMNE$${MNE_LIB_VERSION}Disp3D
-    }
 }
 
 DESTDIR = $${MNE_LIBRARY_DIR}
@@ -116,6 +111,8 @@ SOURCES += \
     helpers/frequencyspectrumdelegate.cpp \
     helpers/frequencyspectrumsettingswidget.cpp \
     helpers/quickcontrolwidget.cpp \
+    realtimesourceestimatewidget.cpp \
+    realtimeconnectivityestimatewidget.cpp
 
 HEADERS += \
     scdisp_global.h \
@@ -137,15 +134,12 @@ HEADERS += \
     helpers/frequencyspectrummodel.h \
     helpers/frequencyspectrumsettingswidget.h \
     helpers/quickcontrolwidget.h \
+    realtimesourceestimatewidget.h \
+    realtimeconnectivityestimatewidget.h \
 
 FORMS += \
     realtimesamplearraywidget.ui \
     helpers/quickcontrolwidget.ui
-
-qtHaveModule(charts) {
-    SOURCES += realtimesourceestimatewidget.cpp
-    HEADERS += realtimesourceestimatewidget.h
-}
 
 RESOURCES += \
     scDisp.qrc

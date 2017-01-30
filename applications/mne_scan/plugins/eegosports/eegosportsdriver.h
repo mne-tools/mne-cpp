@@ -79,7 +79,7 @@
 // DEFINE NAMESPACE TMSIPlugin
 //=============================================================================================================
 
-namespace EEGoSportsPlugin
+namespace EEGOSPORTSPLUGIN
 {
 
 

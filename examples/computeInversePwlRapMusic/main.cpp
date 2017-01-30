@@ -1,7 +1,8 @@
 //=============================================================================================================
 /**
 * @file     main.cpp
-* @author   Christoph Dinh <christoph.dinh@tu-ilmenau.de>
+* @author   Christoph Dinh <christoph.dinh@tu-ilmenau.de>;
+*           Lorenz Esch <lorenz.esch@tu-ilmenau.de>
 * @version  1.0
 * @date     July, 2013
 *
@@ -45,13 +46,16 @@
 
 #include <fiff/fiff_evoked.h>
 #include <fiff/fiff.h>
-#include <mne/mne.h>
 
+#include <mne/mne.h>
 #include <mne/mne_sourceestimate.h>
+
 #include <inverse/rapMusic/pwlrapmusic.h>
 
 #include <disp3D/view3D.h>
 #include <disp3D/control/control3dwidget.h>
+#include <disp3D/model/data3Dtreemodel.h>
+#include <disp3D/model/items/sourceactivity/mneestimatetreeitem.h>
 
 #include <utils/mnemath.h>
 
@@ -102,51 +106,44 @@ int main(int argc, char *argv[])
     QCommandLineParser parser;
     parser.setApplicationDescription("Compute Inverse Powell RAP-MUSIC Example");
     parser.addHelpOption();
-    QCommandLineOption sampleFwdFileOption("f", "Path to forward solution <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
-    QCommandLineOption sampleEvokedFileOption("e", "Path to evoked <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
-    QCommandLineOption sampleSubjectDirectoryOption("d", "Path to subject <directory>.", "directory", "./MNE-sample-data/subjects");
-    QCommandLineOption sampleSubjectOption("s", "Selected <subject>.", "subject", "sample");
-    QCommandLineOption stcFileOption("t", "Path to <target> where stc is stored to.", "target", "");//"RapMusic.stc");
-    QCommandLineOption numDipolePairsOption("n", "<number> of dipole pairs to localize.", "number", "7");
-    QCommandLineOption doMovieOption("m", "Create overlapping movie.");
+    QCommandLineOption fwdFileOption("fwd", "Path to forward solution <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
+    QCommandLineOption evokedFileOption("ave", "Path to evoked <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    QCommandLineOption subjectDirectoryOption("subjDir", "Path to subject <directory>.", "directory", "./MNE-sample-data/subjects");
+    QCommandLineOption subjectOption("subj", "Selected <subject>.", "subject", "sample");
+    QCommandLineOption stcFileOption("stcOut", "Path to stc <file>, which is to be written.", "file", "");//"RapMusic.stc");
+    QCommandLineOption numDipolePairsOption("numDip", "<number> of dipole pairs to localize.", "number", "1");
+    QCommandLineOption doMovieOption("doMovie", "Create overlapping movie.", "doMovie", "false");
+    QCommandLineOption annotOption("annotType", "Annotation type <type>.", "type", "aparc.a2009s");
+    QCommandLineOption surfOption("surfType", "Surface type <type>.", "type", "orig");
 
-    parser.addOption(sampleFwdFileOption);
-    parser.addOption(sampleEvokedFileOption);
-    parser.addOption(sampleSubjectDirectoryOption);
-    parser.addOption(sampleSubjectOption);
+    parser.addOption(fwdFileOption);
+    parser.addOption(evokedFileOption);
+    parser.addOption(subjectDirectoryOption);
+    parser.addOption(subjectOption);
     parser.addOption(stcFileOption);
     parser.addOption(numDipolePairsOption);
     parser.addOption(doMovieOption);
+    parser.addOption(annotOption);
+    parser.addOption(surfOption);
     parser.process(app);
 
-
-    //########################################################################################
-    // Source Estimate
-
-    QFile t_fileFwd(parser.value(sampleFwdFileOption));
-    QFile t_fileEvoked(parser.value(sampleEvokedFileOption));
-    QString subject(parser.value(sampleSubjectOption)); QString subjectDir(parser.value(sampleSubjectDirectoryOption));
-    AnnotationSet t_annotationSet(subject, 2, "aparc.a2009s", subjectDir);
-    SurfaceSet t_surfSet(subject, 2, "white", subjectDir);
+    // Parse command line parameters
+    QFile t_fileFwd(parser.value(fwdFileOption));
+    QFile t_fileEvoked(parser.value(evokedFileOption));
+    QString subject(parser.value(subjectOption));
+    QString subjectDir(parser.value(subjectDirectoryOption));
+    AnnotationSet t_annotationSet(subject, 2, parser.value(annotOption), subjectDir);
+    SurfaceSet t_surfSet(subject, 2, parser.value(surfOption), subjectDir);
 
     QString t_sFileNameStc(parser.value(stcFileOption));
 
     qint32 numDipolePairs = parser.value(numDipolePairsOption).toInt();
 
-    bool doMovie = parser.isSet(doMovieOption);
-
-    // Parse command line parameters
-    for(qint32 i = 0; i < argc; ++i)
-    {
-        if(strcmp(argv[i], "-stc") == 0 || strcmp(argv[i], "--stc") == 0)
-        {
-            if(i + 1 < argc)
-                t_sFileNameStc = QString::fromUtf8(argv[i+1]);
-        }else if(strcmp(argv[i], "-num") == 0 || strcmp(argv[i], "--num") == 0)
-        {
-            if(i + 1 < argc)
-                numDipolePairs = atof(argv[i+1]);
-        }
+    bool doMovie = false;
+    if(parser.value(doMovieOption) == "false" || parser.value(doMovieOption) == "0") {
+        doMovie = false;
+    } else if(parser.value(doMovieOption) == "true" || parser.value(doMovieOption) == "1") {
+        doMovie = true;
     }
 
     qDebug() << "Start calculation with stc:" << t_sFileNameStc;
@@ -178,10 +175,23 @@ int main(int argc, char *argv[])
 
     PwlRapMusic t_pwlRapMusic(t_clusteredFwd, false, numDipolePairs);
 
-    if(doMovie)
-        t_pwlRapMusic.setStcAttr(200,0.5);
+    int iWinSize = 200;
+    if(doMovie) {
+        t_pwlRapMusic.setStcAttr(iWinSize, 0.6);
+    }
 
     MNESourceEstimate sourceEstimate = t_pwlRapMusic.calculateInverse(pickedEvoked);
+
+    if(doMovie) {
+        //Select only the activations once
+        MatrixXd dataPicked(sourceEstimate.data.rows(), int(std::floor(sourceEstimate.data.cols()/iWinSize)));
+
+        for(int i = 0; i < dataPicked.cols(); ++i) {
+            dataPicked.col(i) = sourceEstimate.data.col(i*iWinSize);
+        }
+
+        sourceEstimate.data = dataPicked;
+    }
 
     std::cout << "source estimated" << std::endl;
 
@@ -189,14 +199,26 @@ int main(int argc, char *argv[])
         return 1;
 
     View3D::SPtr testWindow = View3D::SPtr(new View3D());
-    testWindow->addBrainData("Subject01", "HemiLRSet", t_surfSet, t_annotationSet);
+    Data3DTreeModel::SPtr p3DDataModel = Data3DTreeModel::SPtr(new Data3DTreeModel());
+    testWindow->setModel(p3DDataModel);
 
-    QList<BrainRTSourceLocDataTreeItem*> rtItemList = testWindow->addRtBrainData("Subject01", "HemiLRSet", sourceEstimate, t_clusteredFwd);
+    p3DDataModel->addSurfaceSet(parser.value(subjectOption), evoked.comment, t_surfSet, t_annotationSet);
+
+    //Add rt source loc data and init some visualization values
+    if(MneEstimateTreeItem* pRTDataItem = p3DDataModel->addSourceData(parser.value(subjectOption), evoked.comment, sourceEstimate, t_clusteredFwd)) {
+        pRTDataItem->setLoopState(true);
+        pRTDataItem->setTimeInterval(17);
+        pRTDataItem->setNumberAverages(1);
+        pRTDataItem->setStreamingActive(true);
+        pRTDataItem->setNormalization(QVector3D(0.01,0.5,1.0));
+        pRTDataItem->setVisualizationType("Annotation based");
+        pRTDataItem->setColortable("Hot");
+    }
 
     testWindow->show();
 
     Control3DWidget::SPtr control3DWidget = Control3DWidget::SPtr(new Control3DWidget());
-    control3DWidget->setView3D(testWindow);
+    control3DWidget->init(p3DDataModel, testWindow);
     control3DWidget->show();
 
     if(!t_sFileNameStc.isEmpty())

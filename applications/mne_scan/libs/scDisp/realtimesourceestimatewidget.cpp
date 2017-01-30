@@ -44,7 +44,10 @@
 
 #include <scMeas/realtimesourceestimate.h>
 
-#include <disp3D/3DObjects/brain/brainrtsourcelocdatatreeitem.h>
+#include <disp3D/model/items/sourceactivity/mneestimatetreeitem.h>
+#include <disp3D/view3D.h>
+#include <disp3D/control/control3dwidget.h>
+#include <disp3D/model/data3Dtreemodel.h>
 
 #include <mne/mne_forwardsolution.h>
 #include <mne/mne_inverse_operator.h>
@@ -99,6 +102,7 @@ RealTimeSourceEstimateWidget::RealTimeSourceEstimateWidget(QSharedPointer<RealTi
 : NewMeasurementWidget(parent)
 , m_pRTSE(pRTSE)
 , m_bInitialized(false)
+, m_pRtItem(Q_NULLPTR)
 {
     m_pAction3DControl = new QAction(QIcon(":/images/3DControl.png"), tr("Shows the 3D control widget (F9)"),this);
     m_pAction3DControl->setShortcut(tr("F9"));
@@ -109,9 +113,12 @@ RealTimeSourceEstimateWidget::RealTimeSourceEstimateWidget(QSharedPointer<RealTi
     m_pAction3DControl->setVisible(true);
 
     m_p3DView = View3D::SPtr(new View3D());
+    m_pData3DModel = Data3DTreeModel::SPtr(new Data3DTreeModel());
+
+    m_p3DView->setModel(m_pData3DModel);
 
     m_pControl3DView = Control3DWidget::SPtr(new Control3DWidget(this));
-    m_pControl3DView->setView3D(m_p3DView);
+    m_pControl3DView->init(m_pData3DModel, m_p3DView);
 
     QGridLayout *mainLayoutView = new QGridLayout;
     QWidget *pWidgetContainer = QWidget::createWindowContainer(m_p3DView.data());
@@ -153,25 +160,23 @@ void RealTimeSourceEstimateWidget::getData()
         //
         // Add rt brain data
         //
-        if(m_lRtItem.isEmpty()) {
+        if(!m_pRtItem) {
             qDebug()<<"RealTimeSourceEstimateWidget::getData - Creating m_lRtItem list";
-            m_lRtItem = m_p3DView->addRtBrainData("Subject01", "HemiLRSet", *m_pRTSE->getValue(), *m_pRTSE->getFwdSolution());
+            m_pRtItem = m_pData3DModel->addSourceData("Subject01", "HemiLRSet", *m_pRTSE->getValue(), *m_pRTSE->getFwdSolution());
 
-            for(int i = 0; i<m_lRtItem.size(); i++) {
-                m_lRtItem.at(i)->setLoopState(false);
-                m_lRtItem.at(i)->setTimeInterval(25);
-                m_lRtItem.at(i)->setNormalization(QVector3D(0.0,0.5,10000));
-                m_lRtItem.at(i)->setColortable("Hot Negative 2");
-                m_lRtItem.at(i)->setVisualizationType("Annotation based");
-                //m_lRtItem.at(i)->onTimeIntervalChanged(m_pRTSE->getValue()->tstep*1000000);
-                m_lRtItem.at(i)->setNumberAverages(1);
-                m_lRtItem.at(i)->setStreamingActive(true);
-            }
+            m_pRtItem->setLoopState(false);
+            m_pRtItem->setTimeInterval(17);
+            m_pRtItem->setNormalization(QVector3D(0.0,5,10));
+            m_pRtItem->setColortable("Hot");
+            m_pRtItem->setVisualizationType("Annotation based");
+            //m_pRtItem->onTimeIntervalChanged(m_pRTSE->getValue()->tstep*1000000);
+            m_pRtItem->setNumberAverages(1);
+            m_pRtItem->setStreamingActive(true);
         } else {
             qDebug()<<"RealTimeSourceEstimateWidget::getData - Working with m_lRtItem list";
 
-            for(int i = 0; i<m_lRtItem.size(); i++) {
-                m_lRtItem.at(i)->addData(*m_pRTSE->getValue());
+            if(m_pRtItem) {
+                m_pRtItem->addData(*m_pRTSE->getValue());
             }
         }
     }
@@ -185,7 +190,7 @@ void RealTimeSourceEstimateWidget::getData()
             //
             // Add brain data
             //
-            m_p3DView->addBrainData("Subject01", "HemiLRSet", *m_pRTSE->getSurfSet(), *m_pRTSE->getAnnotSet());
+            m_pData3DModel->addSurfaceSet("Subject01", "HemiLRSet", *m_pRTSE->getSurfSet(), *m_pRTSE->getAnnotSet());
         }
     }
 }

@@ -42,52 +42,32 @@
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
-#include "gusbamp_global.h"
 
-#include <mne_x/Interfaces/ISensor.h>
+#include "gusbamp_global.h"
+#include <scShared/Interfaces/ISensor.h>
 #include <generics/circularmatrixbuffer.h>
-#include <xMeas/newrealtimemultisamplearray.h>
+#include <scMeas/newrealtimemultisamplearray.h>
+#include <fiff/fiff.h>
+
+#include "FormFiles/gusbampsetupwidget.h"
+#include "FormFiles/gusbampsetupprojectwidget.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT STL INCLUDES
+// QT INCLUDES
 //=============================================================================================================
 
 #include <QtWidgets>
 
-#include "FormFiles/gusbampsetupwidget.h"
-
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FIFF INCLUDES
+// DEFINE NAMESPACE GUSBAMPPLUGIN
 //=============================================================================================================
 
-#include <fiff/fiff.h>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE GUSBAmpPlugin
-//=============================================================================================================
-
-namespace GUSBAmpPlugin
+namespace GUSBAMPPLUGIN
 {
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace MNEX;
-using namespace XMEASLIB;
-using namespace IOBuffer;
-using namespace FIFFLIB;
-using namespace std;
-using namespace Eigen;
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -101,17 +81,18 @@ class GUSBAmpProducer;
 /**
 * GUSBAmp...
 *
-* @brief The GUSBAmp class provides an EEG connector for the gTrec USBAmp device.
+* @brief The GUSBAmp class provides an EEG connector for the gTec USBAmp device.
 */
-class GUSBAMPSHARED_EXPORT GUSBAmp : public ISensor
+class GUSBAMPSHARED_EXPORT GUSBAmp : public SCSHAREDLIB::ISensor
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "mne_x/1.0" FILE "gusbamp.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "gusbamp.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(MNEX::ISensor)
+    Q_INTERFACES(SCSHAREDLIB::ISensor)
 
     friend class GUSBAmpProducer;
     friend class GUSBAmpSetupWidget;
+    friend class GUSBAmpSetupProjectWidget;
 
 public:
     //=========================================================================================================
@@ -128,9 +109,15 @@ public:
 
     //=========================================================================================================
     /**
+    * building all setting for the FIFF-data-stream
+    */
+    void setUpFiffInfo();
+
+    //=========================================================================================================
+    /**
     * Clone the plugin
     */
-    virtual QSharedPointer<IPlugin> clone() const;
+    virtual QSharedPointer<SCSHAREDLIB::IPlugin> clone() const;
 
     //=========================================================================================================
     /**
@@ -156,10 +143,53 @@ public:
     */
     virtual bool stop();
 
-    virtual IPlugin::PluginType getType() const;
+    //=========================================================================================================
+    /**
+    * Opens a dialog to setup the project to check the impedance values
+    */
+    void showSetupProjectDialog();
+
+    //=========================================================================================================
+    /**
+    * Starts data recording
+    */
+    void showStartRecording();
+
+    //=========================================================================================================
+    /**
+    * Implements blinking recording button
+    */
+    void changeRecordingButton();
+
+    //=========================================================================================================
+    /**
+    * Checks if a dir exists
+    */
+    bool dirExists(const std::string& dirName_in);
+
+    //=========================================================================================================
+    /**
+    * returns the type of the plug in
+    */
+    virtual SCSHAREDLIB::IPlugin::PluginType getType() const;
+
+    //=========================================================================================================
+    /**
+    * returns the name of the plugin
+    */
     virtual QString getName() const;
 
+    //=========================================================================================================
+    /**
+    * setups the widget
+    */
     virtual QWidget* setupWidget();
+
+    //=========================================================================================================
+    /**
+    * splits the recorded FIFF file
+    */
+    void splitRecordingFile();
 
 protected:
     //=========================================================================================================
@@ -171,15 +201,35 @@ protected:
     virtual void run();
 
 private:
-    PluginOutputData<NewRealTimeMultiSampleArray>::SPtr m_pRMTSA_GUSBAmp;   /**< The RealTimeSampleArray to provide the EEG data.*/
+    SCSHAREDLIB::PluginOutputData<SCMEASLIB::NewRealTimeMultiSampleArray>::SPtr m_pRTMSA_GUSBAmp;               /**< The RealTimeSampleArray to provide the EEG data.*/
+    QSharedPointer<GUSBAmpSetupProjectWidget>                                   m_pGUSBampSetupProjectWidget;   /**< Widget for setup the project file*/
+
+    QSharedPointer<IOBUFFER::RawMatrixBuffer>     m_pRawMatrixBuffer_In;    /**< Holds incoming raw data.*/
 
     QString                             m_qStringResourcePath;              /**< The path to the EEG resource directory.*/
-
     bool                                m_bIsRunning;                       /**< Whether GUSBAmp is running.*/
-
-    QSharedPointer<RawMatrixBuffer>     m_pRawMatrixBuffer_In;              /**< Holds incoming raw data.*/
-
     QSharedPointer<GUSBAmpProducer>     m_pGUSBAmpProducer;                 /**< the GUSBAmpProducer.*/
+    QSharedPointer<FIFFLIB::FiffInfo>   m_pFiffInfo;                        /**< Fiff measurement info.*/
+
+    std::vector<QString>        m_vSerials;                 /**< vector of all Serials (the first one is the master) */
+    int                         m_iSampleRate;              /**< the sample rate in Hz (see documentation of the g.USBamp API for details on this value and the NUMBER_OF_SCANS!)*/
+    int                         m_iSamplesPerBlock;         /**< The samples per block defined by the user via the GUI. */
+    UCHAR                       m_iNumberOfChannels;        /**< the channels that should be acquired from each device */
+    std::vector<int>            m_viSizeOfSampleMatrix;     /**< vector including the size of the two dimensional sample Matrix */
+    std::vector<int>            m_viChannelsToAcquire;      /**< vector of the calling numbers of the channels to be acquired */
+    bool                        m_bWriteToFile;             /**< Flag for File writing*/
+    FIFFLIB::FiffStream::SPtr   m_pOutfid;                  /**< QFile for writing to fif file.*/
+    Eigen::RowVectorXd          m_cals;
+    bool                        m_bSplitFile;               /**< Flag for splitting the recorded file.*/
+    int                         m_iSplitFileSizeMs;         /**< Holds the size of the splitted files in ms.*/
+    int                         m_iSplitCount;              /**< File split count */
+    QString                     m_sOutputFilePath;          /**< Holds the path for the sample output file. Defined by the user via the GUI.*/
+    QFile                       m_fileOut;                  /**< QFile for writing to fiff file.*/
+    QSharedPointer<QTimer>      m_pTimerRecordingChange;    /**< timer to control blinking of the recording icon */
+    qint16                      m_iBlinkStatus;             /**< flag for recording icon blinking */
+    QAction*                    m_pActionStartRecording;    /**< starts to record data */
+    QAction*                    m_pActionSetupProject;      /**< shows setup project dialog */
+
 };
 
 } // NAMESPACE

@@ -1,15 +1,15 @@
 #--------------------------------------------------------------------------------------------------------------
 #
 # @file     GUSBAmp.pro
-# @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
-#           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+# @author   Viktor Klüber <viktor.klueber@tu-ilmenau.de>;
+#           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
-# @date     September, 2013
+# @date     Oktober, 2016
 #
 # @section  LICENSE
 #
-# Copyright (C) 2013, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+# Copyright (C) 2016, Viktor Klüber, Lorenz Esch and Matti Hamalainen. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -48,11 +48,11 @@ DEFINES += GUSBAMP_LIBRARY
 #    }
 #}
 #else {
-#    exists(C:/Windows/SysWOW64/GUSBAmpSDK32bit.dll) { #Compiling MNE-X FOR a 32bit system ON a 64bit system
+#    exists(C:/Windows/SysWOW64/GUSBAmpSDK32bit.dll) { #Compiling MNE-Scan FOR a 32bit system ON a 64bit system
 #        DEFINES += TAKE_GUSBAmpSDK_32_DLL
 #    }
 #    else {
-#        exists(C:/Windows/System32/GUSBAmpSDK.dll) { #Compiling MNE-X FOR a 32bit system ON a 32bit system
+#        exists(C:/Windows/System32/GUSBAmpSDK.dll) { #Compiling MNE-Scan FOR a 32bit system ON a 32bit system
 #            DEFINES += TAKE_GUSBAmpSDK_DLL
 #        }
 #        else {
@@ -63,7 +63,7 @@ DEFINES += GUSBAMP_LIBRARY
 
 QT += core widgets svg
 
-TARGET = gusbamp
+TARGET = gusbamp_temp
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
@@ -74,28 +74,29 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Utilsd \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
             -lMNE$${MNE_LIB_VERSION}Dispd \
-            -lxMeasd \
-            -lxDispd \
-            -lmne_xd
+            -lscMeasd \
+            -lscDispd \
+            -lscSharedd
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
             -lMNE$${MNE_LIB_VERSION}Utils \
             -lMNE$${MNE_LIB_VERSION}Fiff \
             -lMNE$${MNE_LIB_VERSION}Disp \
-            -lxMeas \
-            -lxDisp \
-            -lmne_x
+            -lscMeas \
+            -lscDisp \
+            -lscShared
 }
 
-DESTDIR = $${MNE_BINARY_DIR}/mne_x_plugins
+DESTDIR = $${MNE_BINARY_DIR}/mne_scan_plugins
 
 SOURCES += \
         gusbamp.cpp \
         gusbampproducer.cpp \
         gusbampdriver.cpp \
         FormFiles/gusbampsetupwidget.cpp \
-        FormFiles/gusbampaboutwidget.cpp
+        FormFiles/gusbampaboutwidget.cpp \
+        FormFiles/gusbampsetupprojectwidget.cpp
 
 HEADERS += \
         gusbamp.h\
@@ -103,15 +104,18 @@ HEADERS += \
         gusbampproducer.h \
         gusbampdriver.h \
         FormFiles/gusbampsetupwidget.h \
-        FormFiles/gusbampaboutwidget.h
+        FormFiles/gusbampaboutwidget.h \
+        gtec_gUSBamp.h \
+        FormFiles/gusbampsetupprojectwidget.h
 
 FORMS += \
         FormFiles/gusbampsetupwidget.ui \
-        FormFiles/gusbampabout.ui
+        FormFiles/gusbampabout.ui \
+        FormFiles/gusbampsetupprojectwidget.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
-INCLUDEPATH += $${MNE_X_INCLUDE_DIR}
+INCLUDEPATH += $${MNE_SCAN_INCLUDE_DIR}
 
 OTHER_FILES += gusbamp.json
 

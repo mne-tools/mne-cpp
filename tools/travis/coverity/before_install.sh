@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Update Repositories
-sudo add-apt-repository ppa:beineri/opt-qt57-trusty -y
+sudo add-apt-repository ppa:beineri/opt-qt571-trusty -y
 sudo apt-get update -qq
 
 #install missing Coverity certificate; ToDo: this will be obsolete soon.

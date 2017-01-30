@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Install Qt 5.6
+# Install Qt 5.7
 brew install qt5
 brew linkapps qt5
 brew link --force qt5

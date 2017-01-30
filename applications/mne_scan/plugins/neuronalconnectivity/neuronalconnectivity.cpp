@@ -1,0 +1,298 @@
+//=============================================================================================================
+/**
+* @file     neuronalconnectivity.cpp
+* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+* @version  1.0
+* @date     October, 2016
+*
+* @section  LICENSE
+*
+* Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
+*
+* Redistribution and use in source and binary forms, with or without modification, are permitted provided that
+* the following conditions are met:
+*     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
+*       following disclaimer.
+*     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
+*       the following disclaimer in the documentation and/or other materials provided with the distribution.
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
+*       to endorse or promote products derived from this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+* WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+* INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+* PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+* NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+* POSSIBILITY OF SUCH DAMAGE.
+*
+*
+* @brief    Contains the implementation of the NeuronalConnectivity class.
+*
+*/
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "neuronalconnectivity.h"
+
+#include <connectivity/connectivitymeasures.h>
+
+#include <scMeas/realtimesourceestimate.h>
+#include <scMeas/realtimeconnectivityestimate.h>
+
+#include "FormFiles/neuronalconnectivitysetupwidget.h"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace NEURONALCONNECTIVITYPLUGIN;
+using namespace SCSHAREDLIB;
+using namespace SCMEASLIB;
+using namespace IOBUFFER;
+using namespace CONNECTIVITYLIB;
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+NeuronalConnectivity::NeuronalConnectivity()
+: m_bIsRunning(false)
+, m_iDownSample(4)
+, m_pRTSEInput(Q_NULLPTR)
+, m_pRTCEOutput(Q_NULLPTR)
+, m_pNeuronalConnectivityBuffer(CircularMatrixBuffer<double>::SPtr())
+{
+    //Add action which will be visible in the plugin's toolbar
+    m_pActionShowYourWidget = new QAction(QIcon(":/images/options.png"), tr("Options"),this);
+    m_pActionShowYourWidget->setShortcut(tr("F12"));
+    m_pActionShowYourWidget->setStatusTip(tr("Options"));
+    connect(m_pActionShowYourWidget, &QAction::triggered,
+            this, &NeuronalConnectivity::showYourWidget);
+    addPluginAction(m_pActionShowYourWidget);
+}
+
+
+//*************************************************************************************************************
+
+NeuronalConnectivity::~NeuronalConnectivity()
+{
+    if(this->isRunning()) {
+        stop();
+    }
+}
+
+
+//*************************************************************************************************************
+
+QSharedPointer<IPlugin> NeuronalConnectivity::clone() const
+{
+    QSharedPointer<NeuronalConnectivity> pNeuronalConnectivityClone(new NeuronalConnectivity);
+    return pNeuronalConnectivityClone;
+}
+
+
+//*************************************************************************************************************
+
+void NeuronalConnectivity::init()
+{
+    // Input
+    m_pRTSEInput = PluginInputData<RealTimeSourceEstimate>::create(this, "NeuronalConnectivityInSource", "NeuronalConnectivity source input data");
+    connect(m_pRTSEInput.data(), &PluginInputConnector::notify, this, &NeuronalConnectivity::updateSource, Qt::DirectConnection);
+    m_inputConnectors.append(m_pRTSEInput);
+
+    // Output - Uncomment this if you don't want to send processed data (in form of a matrix) to other plugins.
+    // Also, this output stream will generate an online display in your plugin
+    m_pRTCEOutput = PluginOutputData<RealTimeConnectivityEstimate>::create(this, "NeuronalConnectivityOut", "NeuronalConnectivity output data");
+    m_outputConnectors.append(m_pRTCEOutput);
+    m_pRTCEOutput->data()->setName(this->getName());//Provide name to auto store widget settings
+
+    //Delete Buffer - will be initialized with first incoming data
+    if(!m_pNeuronalConnectivityBuffer.isNull()) {
+        m_pNeuronalConnectivityBuffer = CircularMatrixBuffer<double>::SPtr();
+    }
+}
+
+
+//*************************************************************************************************************
+
+void NeuronalConnectivity::unload()
+{
+
+}
+
+
+//*************************************************************************************************************
+
+bool NeuronalConnectivity::start()
+{
+    //Check if the thread is already or still running. This can happen if the start button is pressed immediately after the stop button was pressed. In this case the stopping process is not finished yet but the start process is initiated.
+    if(this->isRunning()) {
+        QThread::wait();
+    }
+
+    m_bIsRunning = true;
+
+    //Start thread
+    QThread::start();
+
+    return true;
+}
+
+
+//*************************************************************************************************************
+
+bool NeuronalConnectivity::stop()
+{
+    m_bIsRunning = false;
+
+    m_pNeuronalConnectivityBuffer->releaseFromPop();
+    m_pNeuronalConnectivityBuffer->releaseFromPush();
+
+    m_pNeuronalConnectivityBuffer->clear();
+
+    return true;
+}
+
+
+//*************************************************************************************************************
+
+IPlugin::PluginType NeuronalConnectivity::getType() const
+{
+    return _IAlgorithm;
+}
+
+
+//*************************************************************************************************************
+
+QString NeuronalConnectivity::getName() const
+{
+    return "Neuronal Connectivity";
+}
+
+
+//*************************************************************************************************************
+
+QWidget* NeuronalConnectivity::setupWidget()
+{
+    NeuronalConnectivitySetupWidget* setupWidget = new NeuronalConnectivitySetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
+    return setupWidget;
+}
+
+
+//*************************************************************************************************************
+
+void NeuronalConnectivity::updateSource(SCMEASLIB::NewMeasurement::SPtr pMeasurement)
+{
+    QSharedPointer<RealTimeSourceEstimate> pRTSE = pMeasurement.dynamicCast<RealTimeSourceEstimate>();
+
+    if(pRTSE) {
+        //Check if buffer initialized
+        if(!m_pNeuronalConnectivityBuffer) {
+            m_pNeuronalConnectivityBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, pRTSE->getValue()->data.rows(), pRTSE->getValue()->data.cols()));
+        }
+
+        //Fiff information
+        if(!m_pFiffInfo) {
+            m_pFiffInfo = pRTSE->getFiffInfo();
+
+            //Init output - Unocmment this if you also uncommented the m_pRTCEOutput in the constructor above
+            m_pRTCEOutput->data()->setAnnotSet(pRTSE->getAnnotSet());
+            m_pRTCEOutput->data()->setSurfSet(pRTSE->getSurfSet());
+            m_pRTCEOutput->data()->setFwdSolution(pRTSE->getFwdSolution());
+            m_pRTCEOutput->data()->setFiffInfo(m_pFiffInfo);
+
+            //Prepare network creation
+            //Generate node vertices
+            if(pRTSE->getFwdSolution()->isClustered()) {
+                m_matNodeVertLeft.resize(pRTSE->getFwdSolution()->src[0].cluster_info.centroidVertno.size(),3);
+
+                for(int j = 0; j < m_matNodeVertLeft.rows(); ++j) {
+                    m_matNodeVertLeft.row(j) = pRTSE->getSurfSet()->data()[0].rr().row(pRTSE->getFwdSolution()->src[0].cluster_info.centroidVertno.at(j)) - pRTSE->getSurfSet()->data()[0].offset().transpose();
+                }
+
+                m_matNodeVertRight.resize(pRTSE->getFwdSolution()->src[1].cluster_info.centroidVertno.size(),3);
+                for(int j = 0; j < m_matNodeVertRight.rows(); ++j) {
+                    m_matNodeVertRight.row(j) = pRTSE->getSurfSet()->data()[1].rr().row(pRTSE->getFwdSolution()->src[1].cluster_info.centroidVertno.at(j)) - pRTSE->getSurfSet()->data()[1].offset().transpose();
+                }
+            } else {
+                m_matNodeVertLeft.resize(pRTSE->getFwdSolution()->src[0].vertno.rows(),3);
+                for(int j = 0; j < m_matNodeVertLeft.rows(); ++j) {
+                    m_matNodeVertLeft.row(j) = pRTSE->getSurfSet()->data()[0].rr().row(pRTSE->getFwdSolution()->src[0].vertno(j)) - pRTSE->getSurfSet()->data()[0].offset().transpose();
+                }
+
+                m_matNodeVertRight.resize(pRTSE->getFwdSolution()->src[1].vertno.rows(),3);
+                for(int j = 0; j < m_matNodeVertRight.rows(); ++j) {
+                    m_matNodeVertRight.row(j) = pRTSE->getSurfSet()->data()[1].rr().row(pRTSE->getFwdSolution()->src[1].vertno(j)) - pRTSE->getSurfSet()->data()[1].offset().transpose();
+                }
+            }
+
+            m_matNodeVertComb.resize(m_matNodeVertLeft.rows() + m_matNodeVertRight.rows(),3);
+            m_matNodeVertComb << m_matNodeVertLeft, m_matNodeVertRight;
+        }
+
+        MatrixXd t_mat = pRTSE->getValue()->data;
+        m_pNeuronalConnectivityBuffer->push(&t_mat);
+    }
+}
+
+
+//*************************************************************************************************************
+
+void NeuronalConnectivity::run()
+{
+    //
+    // Wait for Fiff Info
+    //
+    while(!m_pFiffInfo) {
+        msleep(10);// Wait for fiff Info
+    }
+
+    int skip_count = 0;
+
+    while(m_bIsRunning)
+    {
+        //Dispatch the inputs
+        MatrixXd t_mat = m_pNeuronalConnectivityBuffer->pop();
+
+        //Do processing after skip count has reached limit
+        if((skip_count % m_iDownSample) == 0)
+        {
+            //ToDo: Implement your algorithm here
+            QElapsedTimer time;
+            time.start();
+
+            Network::SPtr pNetwork = ConnectivityMeasures::crossCorrelation(t_mat, m_matNodeVertComb);
+            Network finalNetowrk = *pNetwork.data();
+            qDebug()<<"----------------------------------------";
+            qDebug()<<"----------------------------------------";
+            qDebug()<<"NeuronalConnectivity::run() - time.elapsed()" << time.elapsed();
+            qDebug()<<"----------------------------------------";
+            qDebug()<<"----------------------------------------";
+
+            //Send the data to the connected plugins and the online display
+            //Unocmment this if you also uncommented the m_pRTCEOutput in the constructor above
+            m_pRTCEOutput->data()->setValue(finalNetowrk);
+        }
+
+        ++skip_count;
+    }
+}
+
+
+//*************************************************************************************************************
+
+void NeuronalConnectivity::showYourWidget()
+{
+    m_pYourWidget = NeuronalConnectivityYourWidget::SPtr(new NeuronalConnectivityYourWidget());
+    m_pYourWidget->show();
+}
