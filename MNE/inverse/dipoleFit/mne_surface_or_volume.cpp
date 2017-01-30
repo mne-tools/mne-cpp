@@ -889,15 +889,11 @@ static fiffCoordTrans fiff_make_transform2 (int from,int to,float rot[3][3],floa
             t->rot[j][k] = rot[j][k];
     }
 
-    qDebug() << "DEBUG!!!";
-
     if (add_inverse_17(t) == FAIL) {
         printf("Failed to add the inverse coordinate transformation");
         FREE_17(t);
         return NULL;
     }
-
-    qDebug() << "DEBUG!!!";
 
     return (t);
 }
