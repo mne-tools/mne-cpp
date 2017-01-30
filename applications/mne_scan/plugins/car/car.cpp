@@ -42,7 +42,6 @@
 #include "FormFiles/carsetupwidget.h"
 
 
-
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
@@ -53,6 +52,7 @@ using namespace SCSHAREDLIB;
 using namespace SCMEASLIB;
 using namespace UTILSLIB;
 using namespace IOBUFFER;
+using namespace std;
 using namespace Eigen;
 
 
@@ -64,6 +64,7 @@ using namespace Eigen;
 Car::Car()
 : m_bIsRunning(false)
 , m_pRTMSA(NewRealTimeMultiSampleArray::SPtr(new NewRealTimeMultiSampleArray()))
+, m_bDisp(true)
 {
 }
 
@@ -75,29 +76,6 @@ Car::~Car()
     if(this->isRunning()) {
         stop();
     }
-
-    //
-    // Store Settings
-    //
-//    if(!m_pRTMSA->getName().isEmpty()) {
-//        QString t_sRTMSAName = m_pRTMSA->getName();
-
-//        QSettings settings;
-
-//        //Store filter
-//        if(m_pFilterWindow != 0) {
-//            FilterData filter = m_pFilterWindow->getUserDesignedFilter();
-
-//            settings.setValue(QString("RTNRW/%1/filterHP").arg(t_sRTMSAName), filter.m_dHighpassFreq);
-//            settings.setValue(QString("RTNRW/%1/filterLP").arg(t_sRTMSAName), filter.m_dLowpassFreq);
-//            settings.setValue(QString("RTNRW/%1/filterOrder").arg(t_sRTMSAName), filter.m_iFilterOrder);
-//            settings.setValue(QString("RTNRW/%1/filterType").arg(t_sRTMSAName), (int)filter.m_Type);
-//            settings.setValue(QString("RTNRW/%1/filterDesignMethod").arg(t_sRTMSAName), (int)filter.m_designMethod);
-//            settings.setValue(QString("RTNRW/%1/filterTransition").arg(t_sRTMSAName), filter.m_dParksWidth*(filter.m_sFreq/2));
-//            settings.setValue(QString("RTNRW/%1/filterUserDesignActive").arg(t_sRTMSAName), m_pFilterWindow->userDesignedFiltersIsActive());
-//            settings.setValue(QString("RTNRW/%1/filterChannelType").arg(t_sRTMSAName), m_pFilterWindow->getChannelType());
-//        }
-//    }
 }
 
 
@@ -166,8 +144,6 @@ bool Car::stop()
     m_pCarBuffer->releaseFromPop();
     m_pCarBuffer->clear();
 
-    m_pCarBuffer->clear();
-
     return true;
 }
 
@@ -216,7 +192,6 @@ void Car::update(SCMEASLIB::NewMeasurement::SPtr pMeasurement)
         if(!m_pFiffInfo) {
             m_pFiffInfo = m_pRTMSA->info();
 
-
             //Init output - Unocmment this if you also uncommented the m_pcarOutput in the constructor above
             m_pCarOutput->data()->initFromFiffInfo(m_pFiffInfo);
             m_pCarOutput->data()->setMultiArraySize(1);
@@ -251,9 +226,19 @@ void Car::run()
 
         m_mutex.lock();
 
+        MatrixXd matCAR = EEGRef::applyCAR(t_mat, m_pFiffInfo);
+
+        if(m_bDisp){
+
+            IOUtils::write_eigen_matrix(t_mat, "matIN.txt");
+            IOUtils::write_eigen_matrix(matCAR, "matOUT.txt");
+
+            m_bDisp = false;
+        }
+
         m_mutex.unlock();
 
         //Send the data to the connected plugins and the online display
-        m_pCarOutput->data()->setValue(t_mat);
+        m_pCarOutput->data()->setValue(matCAR);
     }
 }

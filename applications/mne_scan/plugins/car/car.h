@@ -47,6 +47,8 @@
 
 //#include <utils/filterTools/sphara.h>
 #include <utils/ioutils.h>
+#include <utils/eegref.h>
+#include <iostream>
 
 //#include "disp/filterwindow.h"
 
@@ -292,6 +294,8 @@ private:
 //    QVector<int>                    m_lFilterChannelList;                       /**< The indices of the channels to be filtered.*/
 
     FIFFLIB::FiffInfo::SPtr                         m_pFiffInfo;                /**< Fiff measurement info.*/
+
+    bool            m_bDisp;            /** Flag for displaying. */
 
     IOBUFFER::CircularMatrixBuffer<double>::SPtr    m_pCarBuffer;    /**< Holds incoming data.*/
 

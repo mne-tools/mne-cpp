@@ -45,7 +45,7 @@
 
 #include "utils_global.h"
 #include <fiff/fiff_info.h>
-#include <ioutils.h>
+#include <utils/ioutils.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -111,7 +111,7 @@ public:
     *
     * @return EEG data matrix with common average reference
     */
-    Eigen::MatrixXd applyCAR(Eigen::MatrixXd& matIER, FIFFLIB::FiffInfo::SPtr pFiffInfo);
+    static Eigen::MatrixXd applyCAR(Eigen::MatrixXd& matIER, FIFFLIB::FiffInfo::SPtr &pFiffInfo);
 
 protected:
 
