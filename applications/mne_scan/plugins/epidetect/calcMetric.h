@@ -88,18 +88,18 @@
 * @brief Brief description of this class.
 */
 
-class calcMetric
+class CalcMetric
 {
 
 public:
-    typedef QSharedPointer<calcMetric> SPtr;            /**< Shared pointer type for calcMetric. */
-    typedef QSharedPointer<const calcMetric> ConstSPtr; /**< Const shared pointer type for calcMetric. */
+    typedef QSharedPointer<CalcMetric> SPtr;            /**< Shared pointer type for CalcMetric. */
+    typedef QSharedPointer<const CalcMetric> ConstSPtr; /**< Const shared pointer type for CalcMetric. */
 
     //=========================================================================================================
     /**
-    * Constructs a calcMetric object.
+    * Constructs a CalcMetric object.
     */
-    calcMetric();
+    CalcMetric();
 
     bool calcEn;
     bool historyReady;
@@ -108,10 +108,10 @@ public:
     int m_iFuzzyEnStep;
 
     void setData(Eigen::MatrixXd input);
-    void calcAll(Eigen::MatrixXd input, int dim, double r, double n);
-    void calcP2P();
-    void calcKurtosis(int start, int end);
-    //void calcFuzzyEn(int start, int step, int end, int dim, double r, double n);
+    void CalcAll(Eigen::MatrixXd input, int dim, double r, double n);
+    void CalcP2P();
+    void CalcKurtosis(int start, int end);
+    //void CalcFuzzyEn(int start, int step, int end, int dim, double r, double n);
 
     Eigen::VectorXd onSeizureDetection(int dim, double r, double n, QList<int> checkChs);
 
