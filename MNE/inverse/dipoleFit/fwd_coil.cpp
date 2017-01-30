@@ -212,7 +212,12 @@ FwdCoil::FwdCoil(const FwdCoil& p_FwdCoil)
     this->accuracy   = p_FwdCoil.accuracy;
     this->base       = p_FwdCoil.base;
     this->size       = p_FwdCoil.size;
+    this->np         = p_FwdCoil.np;
     this->type       = p_FwdCoil.type;
+
+    rmag       = ALLOC_CMATRIX_5(this->np,3);
+    cosmag     = ALLOC_CMATRIX_5(this->np,3);
+    w          = MALLOC_5(this->np,float);
 
     VEC_COPY_5(this->r0,p_FwdCoil.r0);
     VEC_COPY_5(this->ex,p_FwdCoil.ex);

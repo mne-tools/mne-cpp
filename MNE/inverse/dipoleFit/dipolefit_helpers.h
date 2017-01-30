@@ -5130,6 +5130,7 @@ mneCovMatrix mne_read_cov(const QString& name,int kind)
 
     int            k,p,nn;
     float          *f;
+    double         *d;
     mneProjOp      op = NULL;
     MneSssData*     sss = NULL;
 
@@ -5180,8 +5181,11 @@ mneCovMatrix mne_read_cov(const QString& name,int kind)
             goto out;
         else {
             if (t_pTag->getType() == FIFFT_DOUBLE) {
+                cov_diag = MALLOC(ncov,double);
                 qDebug() << "ToDo: Check whether cov_diag contains the right stuff!!! - use VectorXd instead";
-                cov_diag = t_pTag->toDouble();
+                d = t_pTag->toDouble();
+                for (p = 0; p < ncov; p++)
+                    cov_diag[p] = d[p];
                 if (check_cov_data(cov_diag,ncov) != OK)
                     goto out;
             }
@@ -5202,7 +5206,11 @@ mneCovMatrix mne_read_cov(const QString& name,int kind)
         nn = ncov*(ncov+1)/2;
         if (t_pTag->getType() == FIFFT_DOUBLE) {
             qDebug() << "ToDo: Check whether cov contains the right stuff!!! - use VectorXd instead";
-            cov = t_pTag->toDouble();
+//            qDebug() << t_pTag->size() / sizeof(double);
+            cov = MALLOC(nn,double);
+            d = t_pTag->toDouble();
+            for (p = 0; p < nn; p++)
+                cov[p] = d[p];
             if (check_cov_data(cov,nn) != OK)
                 goto out;
         }
@@ -8093,7 +8101,8 @@ int fwd_bem_specify_coils(fwdBemModel m,
         printf("Solution not computed in fwd_bem_specify_coils");
         goto bad;
     }
-    coils->fwd_free_coil_set_user_data();
+    if(coils)
+        coils->fwd_free_coil_set_user_data();
     if (!coils || coils->ncoil == 0)
         return OK;
     if (m->bem_method == FWD_BEM_CONSTANT_COLL)
