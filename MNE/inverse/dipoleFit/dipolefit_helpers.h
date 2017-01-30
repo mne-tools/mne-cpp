@@ -2213,7 +2213,7 @@ static int get_meas_info (  FiffStream::SPtr& stream,       /* The stream we are
             if (*meas_date)
                 FREE(*meas_date);
             *meas_date = MALLOC(1,fiffTimeRec);
-            *meas_date = (fiffTime)t_pTag->data();
+            **meas_date = *(fiffTime)t_pTag->data();
             break;
 
         case FIFF_LOWPASS :
