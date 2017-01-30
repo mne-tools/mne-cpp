@@ -61,6 +61,7 @@ contains(MNECPP_CONFIG, BuildBasicMNESCANVersion) {
     #Algorithms
     SUBDIRS += \
         dummytoolbox \
+        mne_epiDetect \
         mne \
         rapmusictoolbox \
         averaging \
