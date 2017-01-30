@@ -272,8 +272,6 @@ void Spline::setThreshold(const QVector3D& vecThresholdValues)
     m_pRightThreshold->append(rightThresholdPoint.x(), 0);
     m_pRightThreshold->append(rightThresholdPoint.x(), m_iMaximumFrequency);
 
-    //qDebug() << "CURRENT THRESHOLD = " << m_pLeftThreshold << m_pMiddleThreshold << m_pRightThreshold;
-
     updateThreshold(m_pLeftThreshold);
     updateThreshold(m_pMiddleThreshold);
     updateThreshold(m_pRightThreshold);
@@ -316,9 +314,6 @@ void Spline::setColorMap(QString colorMap)
     double leftThresholdValue = (m_pLeftThreshold->at(0).x())/ m_dMaxAxisX;
     double middleThresholdValue = (m_pMiddleThreshold->at(0).x())/ m_dMaxAxisX;
     double rightThresholdValue = (m_pRightThreshold->at(0).x())/ m_dMaxAxisX;
-    qDebug() << "updateColorMap::leftThresholdValue = " << leftThresholdValue;
-    qDebug() << "updateColorMap::middleThresholdValue = " << middleThresholdValue;
-    qDebug() << "updateColorMap::rightThresholdValue = " << rightThresholdValue;
     int stepsNumber = 25;
     double stepsSizeLeftMiddle = (middleThresholdValue - leftThresholdValue) / stepsNumber;
     double stepsSizeMiddleRight = (rightThresholdValue - middleThresholdValue) / stepsNumber;
@@ -364,14 +359,10 @@ void Spline::setColorMap(QString colorMap)
 
     else
     {
-//        qDebug() << "updateColorMap error. Check for correct color map names.";
         return;
     }
 
     // Customize plot area background
-    qDebug()<< "leftThresholdValue = " << leftThresholdValue;
-    qDebug()<< "middleThresholdValue = " << middleThresholdValue;
-    qDebug()<< "rightThresholdValue = " << rightThresholdValue;
     plotAreaGradient.setCoordinateMode(QGradient::ObjectBoundingMode);
     m_pChart->setPlotAreaBackgroundBrush(plotAreaGradient);
     m_pChart->setPlotAreaBackgroundVisible(true);
@@ -393,7 +384,6 @@ const QVector3D& Spline::getThreshold()
     originalVector.setY(emitMiddle);
     originalVector.setZ(emitRight);
     m_vecReturnVector = correctionDisplayTrueValue(originalVector, "down");
-    qDebug() << "getThreshold: returnVector = " << m_vecReturnVector;
     return m_vecReturnVector;
 }
 
@@ -442,9 +432,5 @@ QVector3D Spline::correctionDisplayTrueValue(QVector3D vecOriginalValues, QStrin
     returnCorrectedVector.setX(vecOriginalValues.x() * (pow(10, exponent)));
     returnCorrectedVector.setY(vecOriginalValues.y() * (pow(10, exponent)));
     returnCorrectedVector.setZ(vecOriginalValues.z() * (pow(10, exponent)));
-
-//    qDebug() << "Original Vector = " << vecOriginalValues;
-//    qDebug() << "Corrected Vector = " << returnCorrectedVector;
-
     return returnCorrectedVector;
 }

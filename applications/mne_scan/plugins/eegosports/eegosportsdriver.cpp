@@ -50,7 +50,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace EEGoSportsPlugin;
+using namespace EEGOSPORTSPLUGIN;
 using namespace eemagine::sdk;
 
 
@@ -64,7 +64,7 @@ EEGoSportsDriver::EEGoSportsDriver(EEGoSportsProducer* pEEGoSportsProducer)
 , m_bDllLoaded(true)
 , m_bInitDeviceSuccess(false)
 , m_uiNumberOfChannels(64)
-, m_uiSamplingFrequency(1024)
+, m_uiSamplingFrequency(512)
 , m_uiSamplesPerBlock(100)
 , m_bWriteDriverDebugToFile(false)
 , m_sOutputFilePath("/mne_x_plugins/resources/eegosports")
@@ -120,7 +120,7 @@ bool EEGoSportsDriver::initDevice(int iNumberOfChannels,
         } else {            
             //reference_range the range, in volt, for the referential channels. Valid values are: 1, 0.75, 0.15
             //bipolar_range the range, in volt, for the bipolar channels. Valid values are: 4, 1.5, 0.7, 0.35
-            double reference_range = 0.15;
+            double reference_range = 1; //0.15;
             double bipolar_range = 4;
 
             m_pDataStream = m_pAmplifier->OpenEegStream(m_uiSamplingFrequency, reference_range, bipolar_range);

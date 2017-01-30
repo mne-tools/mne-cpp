@@ -67,7 +67,7 @@ using namespace UTILSLIB;
 //=============================================================================================================
 
 BCI::BCI()
-: m_qStringResourcePath(qApp->applicationDirPath()+"/mne_x_plugins/resources/bci/")
+: m_qStringResourcePath(qApp->applicationDirPath()+"/mne_x_plugins/resources/ssvepBCI/")
 , m_bProcessData(false)
 {
 }
@@ -363,7 +363,7 @@ void BCI::updateSensor(XMEASLIB::NewMeasurement::SPtr pMeasurement)
         // Load Fiff information on sensor level
         if(!m_pFiffInfo_Sensor)
         {
-            m_pFiffInfo_Sensor = pRTMSA->getFiffInfo();
+            m_pFiffInfo_Sensor = pRTMSA->info();
 
             // Adjust working matrixes (sliding window and time between windows matrix) size so that the samples from the tmsi plugin stream fit in the matrix perfectly
             int arraySize = pRTMSA->getMultiArraySize();

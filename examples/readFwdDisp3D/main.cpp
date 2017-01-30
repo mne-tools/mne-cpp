@@ -2,6 +2,7 @@
 /**
 * @file     main.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     July, 2012
@@ -40,6 +41,7 @@
 
 #include <disp3D/view3D.h>
 #include <disp3D/control/control3dwidget.h>
+#include <disp3D/model/data3Dtreemodel.h>
 
 #include <mne/mne_forwardsolution.h>
 
@@ -50,6 +52,7 @@
 //=============================================================================================================
 
 #include <QApplication>
+#include <QCommandLineParser>
 
 
 //*************************************************************************************************************
@@ -80,22 +83,48 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    QFile t_File("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
+    // Command Line Parser
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Read Forward and Visualize in 3D Example");
+    parser.addHelpOption();
+
+    QCommandLineOption fwdFileOption("fwd", "Path to the forward solution <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
+    QCommandLineOption surfOption("surfType", "Surface type <type>.", "type", "orig");
+    QCommandLineOption annotOption("annotType", "Annotation type <type>.", "type", "aparc.a2009s");
+    QCommandLineOption subjectOption("subject", "Selected subject <subject>.", "subject", "sample");
+    QCommandLineOption subjectPathOption("subjectPath", "Selected subject path <subjectPath>.", "subjectPath", "./MNE-sample-data/subjects");
+    QCommandLineOption hemiOption("hemi", "Selected hemisphere <hemi>.", "hemi", "2");
+
+    parser.addOption(fwdFileOption);
+    parser.addOption(surfOption);
+    parser.addOption(annotOption);
+    parser.addOption(subjectOption);
+    parser.addOption(subjectPathOption);
+    parser.addOption(hemiOption);
+
+    parser.process(a);
+
+    //Load data
+    QFile t_File(parser.value(fwdFileOption));
     MNEForwardSolution t_forwardSolution(t_File);
 
     View3D::SPtr testWindow = View3D::SPtr(new View3D());
+    Data3DTreeModel::SPtr p3DDataModel = Data3DTreeModel::SPtr(new Data3DTreeModel());
+    testWindow->setModel(p3DDataModel);
 
-    //Option 1 - Visualize full source space
-    testWindow->addBrainData("Subject01", "ForwardSolution", t_forwardSolution);
+//    //Option 1 - Visualize full source space
+//    p3DDataModel->addForwardSolution(parser.value(subjectOption), "FullForwardSolution", t_forwardSolution);
 
     //Option 2 - Visualize clustered source space
-//    AnnotationSet t_annotationSet ("sample", 2, "aparc.a2009s", "./MNE-sample-data/subjects");
-//    MNEForwardSolution t_clusteredFwd = t_forwardSolution.cluster_forward_solution(t_annotationSet, 40);
-//    testWindow->addBrainData("Subject01", "ForwardSolution", t_clusteredFwd);
+    AnnotationSet t_annotationSet (parser.value(subjectOption), parser.value(hemiOption).toInt(), parser.value(annotOption), parser.value(subjectPathOption));
 
+    MNEForwardSolution t_clusteredFwd = t_forwardSolution.cluster_forward_solution(t_annotationSet, 40);
+    p3DDataModel->addForwardSolution(parser.value(subjectOption), "ClusteredForwardSolution", t_clusteredFwd);
+
+    //Visualize result in 3D
     testWindow->show();
     Control3DWidget::SPtr control3DWidget = Control3DWidget::SPtr(new Control3DWidget());
-    control3DWidget->setView3D(testWindow);
+    control3DWidget->init(p3DDataModel, testWindow);
     control3DWidget->show();
 
     return a.exec();

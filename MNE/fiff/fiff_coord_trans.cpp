@@ -42,7 +42,7 @@
 
 #include "fiff_stream.h"
 #include "fiff_tag.h"
-#include "fiff_dir_tree.h"
+#include "fiff_dir_node.h"
 
 
 //*************************************************************************************************************
@@ -58,7 +58,7 @@
 // Eigen INCLUDES
 //=============================================================================================================
 
-#include <Eigen/LU>
+#include <Eigen/Dense>
 
 
 //*************************************************************************************************************
@@ -67,6 +67,7 @@
 //=============================================================================================================
 
 using namespace FIFFLIB;
+using namespace Eigen;
 
 
 //*************************************************************************************************************
@@ -135,8 +136,8 @@ bool FiffCoordTrans::invert_transform()
     fiff_int_t from_new = this->to;
     this->to    = this->from;
     this->from  = from_new;
-    this->trans = this->trans.inverse();
-    this->invtrans = this->invtrans.inverse();
+    this->trans = this->trans.inverse().eval();
+    this->invtrans = this->invtrans.inverse().eval();
 
     return true;
 }
@@ -147,11 +148,9 @@ bool FiffCoordTrans::invert_transform()
 bool FiffCoordTrans::read(QIODevice& p_IODevice, FiffCoordTrans& p_Trans)
 {
     FiffStream::SPtr t_pStream(new FiffStream(&p_IODevice));
-    FiffDirTree t_Tree;
-    QList<FiffDirEntry> t_Dir;
 
     printf("Reading coordinate transform from %s...\n", t_pStream->streamName().toUtf8().constData());
-    if(!t_pStream->open(t_Tree, t_Dir))
+    if(!t_pStream->open())
         return false;
 
     //
@@ -163,11 +162,11 @@ bool FiffCoordTrans::read(QIODevice& p_IODevice, FiffCoordTrans& p_Trans)
     //
     //   Get the MRI <-> head coordinate transformation
     //
-    for ( qint32 k = 0; k < t_Dir.size(); ++k )
+    for ( qint32 k = 0; k < t_pStream->dir().size(); ++k )
     {
-        if ( t_Dir[k].kind == FIFF_COORD_TRANS )
+        if ( t_pStream->dir()[k].kind == FIFF_COORD_TRANS )
         {
-            FiffTag::read_tag(t_pStream.data(),t_pTag,t_Dir[k].pos);
+            FiffTag::read_tag(t_pStream.data(),t_pTag,t_pStream->dir()[k].pos);
             p_Trans = t_pTag->toCoordTrans();
             success = true;
         }
@@ -184,6 +183,16 @@ MatrixX3f FiffCoordTrans::apply_trans (const MatrixX3f& rr) const
     MatrixX4f rr_ones = MatrixX4f::Ones(rr.rows(),4);
     rr_ones.block(0,0,rr.rows(),3) = rr;
     return rr_ones*trans.block<3,4>(0,0).transpose();
+}
+
+
+//*************************************************************************************************************
+
+MatrixX3f FiffCoordTrans::apply_inverse_trans (const MatrixX3f& rr) const
+{
+    MatrixX4f rr_ones = MatrixX4f::Ones(rr.rows(),4);
+    rr_ones.block(0,0,rr.rows(),3) = rr;
+    return rr_ones*invtrans.block<3,4>(0,0).transpose();
 }
 
 
@@ -214,9 +223,41 @@ QString FiffCoordTrans::frame_name (int frame)
 
 //*************************************************************************************************************
 
+FiffCoordTrans FiffCoordTrans::make(int from, int to, const Matrix3f& rot, const VectorXf& move)
+{
+    FiffCoordTrans t;
+    t.trans = MatrixXf::Zero(4,4);
+
+    t.from = from;
+    t.to   = to;
+
+    t.trans.block<3,3>(0,0) = rot;
+    t.trans.block<3,1>(0,3) = move;
+    t.trans(3,3) = 1.0f;
+
+    FiffCoordTrans::addInverse(t);
+
+    return t;
+}
+
+
+//*************************************************************************************************************
+
+bool FiffCoordTrans::addInverse(FiffCoordTrans &t)
+{
+    t.invtrans = t.trans.inverse().eval();
+    return true;
+}
+
+
+//*************************************************************************************************************
+
 void FiffCoordTrans::print() const
 {
-    std::cout << "Coordinate transformation:\n";
+    std::cout << "Coordinate transformation: ";
     std::cout << (QString("%1 -> %2\n").arg(frame_name(this->from)).arg(frame_name(this->to))).toLatin1().data();
-    std::cout << trans << std::endl;
+
+    for (int p = 0; p < 3; p++)
+        printf("\t% 8.6f % 8.6f % 8.6f\t% 7.2f mm\n", trans(p,0),trans(p,1),trans(p,2),1000*trans(p,3));
+    printf("\t% 8.6f % 8.6f % 8.6f   % 7.2f\n",trans(3,0),trans(3,1),trans(3,2),trans(3,3));
 }

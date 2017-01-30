@@ -285,7 +285,7 @@ void RtHpi::run()
             MatrixXd t_mat = m_pRtHpiBuffer->pop();
             m_pRtHPIS->append(t_mat);
         }
-        msleep(1);
+        //msleep(1);
     }
     qDebug()<<"HPI estimation [Run] is done!";
     m_pRtHPIS->stop();

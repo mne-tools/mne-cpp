@@ -50,7 +50,7 @@
 // FIFF INCLUDES
 //=============================================================================================================
 
-#include <fiff/fiff_dir_tree.h>
+#include <fiff/fiff_dir_node.h>
 #include <fiff/fiff_stream.h>
 #include <fiff/fiff_types.h>
 
@@ -140,8 +140,7 @@ public:
      *
      * @return true if succeeded, false otherwise
      */
-    static bool read(FIFFLIB::FiffStream::SPtr& p_pStream, bool add_geom,
-            FIFFLIB::FiffDirTree& p_Tree, QList<MNESurface::SPtr>& surfaces);
+    static bool read(FIFFLIB::FiffStream::SPtr& p_pStream, bool add_geom, const FIFFLIB::FiffDirNode& p_Tree, QList<MNESurface::SPtr>& surfaces);
 
     //=========================================================================================================
 
@@ -167,7 +166,7 @@ private:
      * @return true if succeeded and surf was filled, false otherwise
      */
     static bool read(FIFFLIB::FiffStream* fiffStream,
-            const FIFFLIB::FiffDirTree& dir,
+            const FIFFLIB::FiffDirNode& dir,
             const FIFFLIB::fiff_int_t def_coord_frame, MNESurface::SPtr& surf);
 };
 

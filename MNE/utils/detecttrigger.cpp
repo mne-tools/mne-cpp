@@ -111,7 +111,7 @@ QMap<int,QList<QPair<int,double> > > DetectTrigger::detectTriggerFlanksMax(const
             {
                 QPair<int,double> pair;
                 pair.first = iOffsetIndex+j;
-                pair.second = dMatVal;
+                pair.second = data(iChIdx,j);
 
                 qMapDetectedTrigger[iChIdx].append(pair);
 
@@ -152,7 +152,7 @@ QList<QPair<int,double> > DetectTrigger::detectTriggerFlanksMax(const MatrixXd &
         {
             QPair<int,double> pair;
             pair.first = iOffsetIndex+j;
-            pair.second = dMatVal;
+            pair.second = data(iTriggerChannelIdx,j);
 
             lDetectedTriggers.append(pair);
 
@@ -213,7 +213,7 @@ QMap<int,QList<QPair<int,double> > > DetectTrigger::detectTriggerFlanksGrad(cons
             {
                 QPair<int,double> pair;
                 pair.first = iOffsetIndex+j;
-                pair.second = dMatVal;
+                pair.second = tGradient(j);
 
                 qMapDetectedTrigger[iChIdx].append(pair);
 
@@ -267,7 +267,7 @@ QList<QPair<int,double> > DetectTrigger::detectTriggerFlanksGrad(const MatrixXd 
         {
             QPair<int,double> pair;
             pair.first = iOffsetIndex+j;
-            pair.second = dMatVal;
+            pair.second = tGradient(j);
 
             lDetectedTriggers.append(pair);
 

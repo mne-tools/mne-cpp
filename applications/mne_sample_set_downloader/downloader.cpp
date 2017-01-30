@@ -125,14 +125,19 @@ void Downloader::onDownloadButtonClicked()
     connect(m_qReply.data(), &QNetworkReply::readyRead, this, &Downloader::dataReady);
     connect(m_qReply.data(), &QNetworkReply::finished, this, &Downloader::downloadFinished);
 
-    if (m_qFile.fileName() != "sample.tar.gz")
+    if (m_qFile.fileName() != "sample.tar.gz") {
         m_qFile.setFileName("sample.tar.gz");
-    m_qFile.open(QIODevice::Append);
+    }
+
+    if(!m_qFile.open(QIODevice::Append)) {
+        qDebug() << "Downloader::onDownloadButtonClicked - Cannot open file";
+    }
 
     connect(m_qReply.data(), &QNetworkReply::downloadProgress, this, &Downloader::downloadProgress);
     QEventLoop loop;
     connect(m_qReply.data(), &QNetworkReply::finished, &loop, &QEventLoop::quit);
     loop.exec();
+
     return;
 }
 
@@ -248,7 +253,7 @@ void Downloader::readyToExtract(bool stat, QString zip, QString current)
 //*************************************************************************************************************
 
 
-#elif __linux__
+#else //Linux & OSX
 
 void Downloader::readyToExtract(bool stat)
 {

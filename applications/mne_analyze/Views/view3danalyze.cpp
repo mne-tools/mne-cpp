@@ -69,28 +69,37 @@ View3DAnalyze::View3DAnalyze(int surface_type)
     // pial
     //
         m_BrainView = new View3D();
-        m_BrainView->addBrainData("Subject01", "Set", SurfaceSet("sample", 2, "orig", "./MNE-sample-data/subjects"));
+        m_p3DDataModel = Data3DTreeModel::SPtr(new Data3DTreeModel());
+
+        m_BrainView->setModel(m_p3DDataModel);
+        m_p3DDataModel->addSurfaceSet("Subject01", "Set", SurfaceSet("sample", 2, "orig", "./MNE-sample-data/subjects"));
         break;
     case 2:
     //
     // inflated
     //
         m_BrainView = new View3D();
-        m_BrainView->addBrainData("Subject01", "Set", SurfaceSet("sample", 2, "inflated", "./MNE-sample-data/subjects"));
+        m_p3DDataModel = Data3DTreeModel::SPtr(new Data3DTreeModel());
+        m_BrainView->setModel(m_p3DDataModel);
+        m_p3DDataModel->addSurfaceSet("Subject01", "Set", SurfaceSet("sample", 2, "inflated", "./MNE-sample-data/subjects"));
         break;
     case 3:
     //
     // orig
     //
         m_BrainView = new View3D();
-        m_BrainView->addBrainData("Subject01", "Set", SurfaceSet("sample", 2, "orig", "./MNE-sample-data/subjects"));
+        m_p3DDataModel = Data3DTreeModel::SPtr(new Data3DTreeModel());
+        m_BrainView->setModel(m_p3DDataModel);
+        m_p3DDataModel->addSurfaceSet("Subject01", "Set", SurfaceSet("sample", 2, "orig", "./MNE-sample-data/subjects"));
         break;
     case 4:
     //
     // white
     //
         m_BrainView = new View3D();
-        m_BrainView->addBrainData("Subject01", "Set", SurfaceSet("sample", 2, "white", "./MNE-sample-data/subjects"));
+        m_p3DDataModel = Data3DTreeModel::SPtr(new Data3DTreeModel());
+        m_BrainView->setModel(m_p3DDataModel);
+        m_p3DDataModel->addSurfaceSet("Subject01", "Set", SurfaceSet("sample", 2, "white", "./MNE-sample-data/subjects"));
         break;
     }
     //A container is created to contain the QWindow that comes from BrainView, then a minimum size is set

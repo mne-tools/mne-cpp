@@ -175,6 +175,16 @@ public:
 
     //=========================================================================================================
     /**
+    * Applies the inverse coordinate transform to given coordinates and returns the transformed coordinates
+    *
+    * @param[in] rr     The coordinates
+    *
+    * @return Transformed coordinates
+    */
+    MatrixX3f apply_inverse_trans (const MatrixX3f& rr) const;
+
+    //=========================================================================================================
+    /**
     * ### MNE C root function ###: Implementation of the mne_coord_frame_name function
     *
     * Map coordinate frame integers to human-readable names
@@ -184,6 +194,32 @@ public:
     * @return Human readable form of the coordinate frame.
     */
     static QString frame_name (int frame);
+
+    //=========================================================================================================
+    /**
+    * ### MNE C root function ###: Implementation of the fiff_make_transform function
+    *
+    * Compose the coordinate transformation structure
+    * from a known forward transform
+    *
+    * @param[in] from   Source coordinate system
+    * @param[in] to     Destination coordinate system
+    * @param[in] rot    The forward transform (rotation part)
+    * @param[in] move   The forward transform (translation part)
+    *
+    * @return the composed transform
+    */
+    static FiffCoordTrans make(int from, int to, const Matrix3f& rot, const VectorXf& move);
+
+    //=========================================================================================================
+    /**
+    * ### MNE C root function ###: Implementation of the add_inverse function
+    *
+    * @param[in] t      Fiff coordinate transform to which the inverse should be added
+    *
+    * @return True when successful
+    */
+    static bool addInverse(FiffCoordTrans& t);
 
     //=========================================================================================================
     /**

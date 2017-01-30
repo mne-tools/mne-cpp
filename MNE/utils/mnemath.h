@@ -44,6 +44,7 @@
 //=============================================================================================================
 
 #include "utils_global.h"
+#include <cmath>
 
 
 //*************************************************************************************************************
@@ -537,25 +538,25 @@ void MNEMath::histcounts(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>&
     rawMin = matRawData.minCoeff();        //finds the raw matrix minimum value
     rawMax = matRawData.maxCoeff();        //finds the raw matrix maximum value
 
-    if (bMakeSymmetrical == true)           //in case the user wants the histogram to have symmetrical class ranges
+    if (bMakeSymmetrical == true)          //in case the user wants the histogram to have symmetrical class ranges
     {
-        if (abs(rawMin) > rawMax)       //in case the negative side is larger than the positive side
+        if (fabs(rawMin) > rawMax)          //in case the negative side is larger than the positive side
         {
-            localMax = abs(rawMin);     //positive side is "stretched" to the exact length as negative side
+            localMax = fabs(rawMin);        //positive side is "stretched" to the exact length as negative side
             localMin = rawMin;
         }
-        else if (rawMax > abs(rawMin))      //in case the positive side is larger than the negative side
+        else if (rawMax > fabs(rawMin))     //in case the positive side is larger than the negative side
         {
-            localMin = -(rawMax);           //negative side is "stretched" to the exact length as positive side
+            localMin = -(rawMax);          //negative side is "stretched" to the exact length as positive side
             localMax = rawMax;
         }
-        else                                //in case both sides are exactly the same
+        else                               //in case both sides are exactly the same
         {
             localMin = rawMin;
             localMax = rawMax;
         }
     }
-    else                                    //in case bMakeSymmetrical == false
+    else                                   //in case bMakeSymmetrical == false
     {
         localMin = rawMin;
         localMax = rawMax;
@@ -579,7 +580,7 @@ void MNEMath::histcounts(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>&
     double	range = (vecResultClassLimits(iClassAmount) - vecResultClassLimits(0)),      //calculates the length from maximum positive value to zero
             dynamicUpperClassLimit;
 
-    for (int kr = 0; kr < iClassAmount; ++kr)                                               //dynamically initialize the upper class limit values
+    for (int kr = 0; kr < iClassAmount; ++kr)                                            //dynamically initialize the upper class limit values
     {
         dynamicUpperClassLimit = (vecResultClassLimits(0) + (kr*(range/iClassAmount)));  //generic formula to determine the upper class limit with respect to range and number of class
         vecResultClassLimits(kr) = dynamicUpperClassLimit;                               //places the appropriate upper class limit value to the right position in the QVector
@@ -589,9 +590,9 @@ void MNEMath::histcounts(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>&
     {
         for (int jr = 0; jr<matRawData.cols(); ++jr)     //iterates through all rows of the data matrix
         {
-            for (int kr = 0; kr < iClassAmount; ++kr)          //starts iteration from 1 to iClassAmount
+            for (int kr = 0; kr < iClassAmount; ++kr)    //starts iteration from 1 to iClassAmount
             {
-                if (kr == iClassAmount-1)                    //used for the final iteration; if the data value is exactly the same as the final upper class limit, it will be included in the histogram
+                if (kr == iClassAmount-1)                //used for the final iteration; if the data value is exactly the same as the final upper class limit, it will be included in the histogram
                 {
                     if (matRawData(ir,jr) >= vecResultClassLimits(kr) && matRawData(ir,jr) <= vecResultClassLimits(kr + 1))    //compares value in the matrix with lower and upper limit of each class
                     {
