@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    calcMetric class definition.
+* @brief    CalcMetric class definition.
 *
 */
 
@@ -88,7 +88,7 @@ using namespace QtConcurrent;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-calcMetric::calcMetric()
+CalcMetric::CalcMetric()
 {
     m_iListLength = 10;
     m_iKurtosisHistoryPosition = 0;
@@ -120,7 +120,7 @@ QPair<RowVectorXd, QPair<QList<double>, int>> createInputList(RowVectorXd input,
 
 }
 
-double calcFuzzyEn(QPair<RowVectorXd, QPair<QList<double>, int>> input)//RowVectorXd data, double mean, double stdDev, int dim, double r, double n)
+double CalcFuzzyEn(QPair<RowVectorXd, QPair<QList<double>, int>> input)//RowVectorXd data, double mean, double stdDev, int dim, double r, double n)
 {
     RowVectorXd data = input.first;
     QPair<QList<double>, int> inputValues = input.second;
@@ -201,40 +201,40 @@ double calcFuzzyEn(QPair<RowVectorXd, QPair<QList<double>, int>> input)//RowVect
 
 }
 
-VectorXd calcMetric::getFuzzyEn()
+VectorXd CalcMetric::getFuzzyEn()
 {  
     return m_dvecFuzzyEn;
 }
 
-VectorXd calcMetric::getP2P()
+VectorXd CalcMetric::getP2P()
 {
     return m_dvecP2P;
 }
 
-VectorXd calcMetric::getKurtosis()
+VectorXd CalcMetric::getKurtosis()
 {
     return m_dvecKurtosis;
 }
 
-MatrixXd calcMetric::getFuzzyEnHistory()
+MatrixXd CalcMetric::getFuzzyEnHistory()
 {
     return m_dmatFuzzyEnHistory;
 }
 
 
-MatrixXd calcMetric::getKurtosisHistory()
+MatrixXd CalcMetric::getKurtosisHistory()
 {
     return m_dmatKurtosisHistory;
 }
 
 
-MatrixXd calcMetric::getP2PHistory()
+MatrixXd CalcMetric::getP2PHistory()
 {
     return m_dmatP2PHistory;
 }
 
 
-void calcMetric::setData(Eigen::MatrixXd input)
+void CalcMetric::setData(Eigen::MatrixXd input)
 {
     m_dmatData = input;
     m_iDataLength = m_dmatData.cols();
@@ -252,7 +252,7 @@ void calcMetric::setData(Eigen::MatrixXd input)
     }
 }
 
-VectorXd calcMetric::onSeizureDetection(int dim, double r, double n, QList<int> checkChs)
+VectorXd CalcMetric::onSeizureDetection(int dim, double r, double n, QList<int> checkChs)
 {
     qSort(fuzzyEnUsedChs);
     QList<QPair<RowVectorXd, QPair<QList<double>, int>>> inputList;
@@ -267,7 +267,7 @@ VectorXd calcMetric::onSeizureDetection(int dim, double r, double n, QList<int> 
     }
 
     QList<double> fuzzyEnResults;
-    QFuture<double> fuzzyEnFuture = mapped(inputList, calcFuzzyEn);
+    QFuture<double> fuzzyEnFuture = mapped(inputList, CalcFuzzyEn);
     fuzzyEnFuture.waitForFinished();
     QFutureIterator<double> futureResult(fuzzyEnFuture);
     while (futureResult.hasNext())
@@ -288,7 +288,7 @@ VectorXd calcMetric::onSeizureDetection(int dim, double r, double n, QList<int> 
     return m_dvecFuzzyEn;
 }
 
-VectorXd calcP2P(MatrixXd data)
+VectorXd CalcP2P(MatrixXd data)
 {
     VectorXd max = data.rowwise().maxCoeff();
     VectorXd min = data.rowwise().minCoeff();
@@ -297,7 +297,7 @@ VectorXd calcP2P(MatrixXd data)
 }
 
 
-void calcMetric::calcP2P()
+void CalcMetric::CalcP2P()
 {
 
     if (setNewP2P)
@@ -317,7 +317,7 @@ void calcMetric::calcP2P()
     setNewP2P = true;
 }
 
-QPair<VectorXd, VectorXd> calcKurtosis(MatrixXd data, VectorXd mean, int start, int end)
+QPair<VectorXd, VectorXd> CalcKurtosis(MatrixXd data, VectorXd mean, int start, int end)
 {
     if (end > data.rows())
         end=data.rows();
@@ -360,7 +360,7 @@ QPair<VectorXd, VectorXd> calcKurtosis(MatrixXd data, VectorXd mean, int start, 
 
 }
 
-void calcMetric::calcKurtosis(int start, int end)
+void CalcMetric::CalcKurtosis(int start, int end)
 {
     if (end > m_iChannelCount)
         end=m_iChannelCount;
@@ -409,7 +409,7 @@ void calcMetric::calcKurtosis(int start, int end)
 
 
 /*
-void calcMetric::calcFuzzyEn(int start, int step, int end, int dim, double r, double n)
+void CalcMetric::CalcFuzzyEn(int start, int step, int end, int dim, double r, double n)
 {
     if (end > m_iChannelCount)
         end = m_iChannelCount;
@@ -501,11 +501,11 @@ void calcMetric::calcFuzzyEn(int start, int step, int end, int dim, double r, do
 }
 */
 
-void calcMetric::calcAll(Eigen::MatrixXd input, int dim, double r, double n)
+void CalcMetric::CalcAll(Eigen::MatrixXd input, int dim, double r, double n)
 {
     this->setData(input);
-    this->calcP2P();
-    this->calcKurtosis(0,1000);
+    this->CalcP2P();
+    this->CalcKurtosis(0,1000);
 
     fuzzyEnUsedChs.clear();
 
@@ -531,7 +531,7 @@ void calcMetric::calcAll(Eigen::MatrixXd input, int dim, double r, double n)
     }
 
     QList<double> fuzzyEnResults;
-    QFuture<double> fuzzyEnFuture = mapped(inputList, calcFuzzyEn);
+    QFuture<double> fuzzyEnFuture = mapped(inputList, CalcFuzzyEn);
     fuzzyEnFuture.waitForFinished();
     QFutureIterator<double> futureResult(fuzzyEnFuture);
     while (futureResult.hasNext())
@@ -555,10 +555,10 @@ void calcMetric::calcAll(Eigen::MatrixXd input, int dim, double r, double n)
 
 
 
-    //thread fuzzyCalc1(&calcMetric::calcFuzzyEn,this, 0,4,dim,r,n);
-    //thread fuzzyCalc2(&calcMetric::calcFuzzyEn,this, 1,4,dim,r,n);
-    //thread fuzzyCalc3(&calcMetric::calcFuzzyEn,this, 2,4,dim,r,n);
-    //thread fuzzyCalc4(&calcMetric::calcFuzzyEn,this, 3,4,dim,r,n);
+    //thread fuzzyCalc1(&CalcMetric::CalcFuzzyEn,this, 0,4,dim,r,n);
+    //thread fuzzyCalc2(&CalcMetric::CalcFuzzyEn,this, 1,4,dim,r,n);
+    //thread fuzzyCalc3(&CalcMetric::CalcFuzzyEn,this, 2,4,dim,r,n);
+    //thread fuzzyCalc4(&CalcMetric::CalcFuzzyEn,this, 3,4,dim,r,n);
 
     //fuzzyCalc1.join();
     //fuzzyCalc2.join();
@@ -566,5 +566,5 @@ void calcMetric::calcAll(Eigen::MatrixXd input, int dim, double r, double n)
     //fuzzyCalc4.join();
     //cout << m_iFuzzyEnHistoryPosition;
 
-    //this->calcFuzzyEn(m_iFuzzyEnStart, m_iFuzzyEnStep, dim, r, n);
+    //this->CalcFuzzyEn(m_iFuzzyEnStart, m_iFuzzyEnStep, dim, r, n);
 }
