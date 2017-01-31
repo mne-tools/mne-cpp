@@ -696,10 +696,11 @@ int mne_decompose_eigen (double *mat,
     es.compute(dmat_tmp);
     for ( int i = 0; i < dim; ++i )
         w[i] = es.eigenvalues()[i];
+
     idx = 0;
     for ( int j = 0; j < dim; ++j ) {
         for( int i = 0; i < dim; ++i ) {
-            z[idx] = es.eigenvectors()(i,j); // Column Major
+            z[idx] = es.eigenvectors()(i,j) * es.eigenvectors()(i,j); // Column Major
             ++idx;
         }
     }
