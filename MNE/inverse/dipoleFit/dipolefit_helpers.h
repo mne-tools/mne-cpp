@@ -15,7 +15,6 @@
 #include "mne_surface_or_volume.h"
 #include <iostream>
 #include <vector>
-#include <Eigen/Core>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -34,7 +33,9 @@
 
 #include <time.h>
 
+#include <Eigen/Core>
 #include <Eigen/Dense>
+#include <Eigen/Eigenvalues>
 #include <unsupported/Eigen/FFT>
 
 
@@ -668,14 +669,45 @@ int mne_decompose_eigen (double *mat,
     int    maxi;
     double scale;
 
-    maxi = 0;//idamax(&np,mat,&one);
-    printf("################### DEBUG ToDo: idamax(&np,mat,&one);");
-    scale = 1.0/mat[maxi-1];
+//    maxi = idamax(&np,mat,&one);
+// idamax workaround begin
+    maxi = 0;
+    for(int i = 0; i < np; ++i)
+        if (fabs(mat[i]) > fabs(mat[maxi]))
+            maxi = i;
+// idamax workaround end
+
+    scale = 1.0/mat[maxi];//scale = 1.0/mat[maxi-1];
 
     for (k = 0; k < np; k++)
         dmat[k] = mat[k]*scale;
-    //  dspev(compz,uplo,&dim,dmat,w,z,&dim,work,&info);
-    printf("################### DEBUG ToDo: dspev(compz,uplo,&dim,dmat,w,z,&dim,work,&info);");
+//    dspev(compz,uplo,&dim,dmat,w,z,&dim,work,&info);
+
+    MatrixXd dmat_tmp = MatrixXd::Zero(dim,dim);
+    int idx = 0;
+    for (int i = 0; i < dim; ++i) {
+        for(int j = 0; j <= i; ++j) {
+            dmat_tmp(i,j) = dmat[idx];
+            dmat_tmp(j,i) = dmat[idx];
+            ++idx;
+        }
+    }
+    SelfAdjointEigenSolver<MatrixXd> es;
+    es.compute(dmat_tmp);
+    for ( int i = 0; i < dim; ++i )
+        w[i] = es.eigenvalues()[i];
+    idx = 0;
+    for ( int j = 0; j < dim; ++j ) {
+        for( int i = 0; i < dim; ++i ) {
+            z[idx] = es.eigenvectors()(i,j); // Column Major
+            ++idx;
+        }
+    }
+
+    info = 0;
+
+    qDebug() << "!!!DEBUG ToDo: dspev(compz,uplo,&dim,dmat,w,z,&dim,work,&info);";
+
     FREE(work);
     if (info != 0)
         printf("Eigenvalue decomposition failed (LAPACK info = %d)",info);
@@ -698,14 +730,7 @@ int mne_decompose_eigen (double *mat,
 
 
 
-
-
-
-
 //============================= mne_read_forward_solution.c =============================
-
-
-
 
 int mne_read_meg_comp_eeg_ch_info(const QString& name,
                                   fiffChInfo     *megp,	 /* MEG channels */
