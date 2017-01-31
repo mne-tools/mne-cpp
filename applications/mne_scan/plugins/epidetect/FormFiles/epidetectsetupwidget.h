@@ -4,7 +4,7 @@
 * @author   Louis Eichhorst <louis.eichhorst@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     January, 2016
+* @date     January, 2017
 *
 * @section  LICENSE
 *
