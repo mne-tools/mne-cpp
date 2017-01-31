@@ -4,11 +4,11 @@
 * @author   Louis Eichhorst <louis.eichhorst@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     %{currentdate} Month, Year
+* @date     January, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) Year, Your name and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017, Louis Eichhorst and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -61,24 +61,6 @@
 
 #include <Eigen/Core>
 #include <Eigen/Dense>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE Cannot convert result of " Cpp.namespaces('calcMetric')[0]" to string.
-//=============================================================================================================
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Cannot convert result of " Cpp.namespaces('calcMetric')[0]" to string. FORWARD DECLARATIONS
-//=============================================================================================================
 
 
 //=============================================================================================================
