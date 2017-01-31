@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
 * @file     epidetecttoolbox.h
-* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+* @author   Louis Eichhorst <louis.eichhorst@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     January, 2016
+* @date     January, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017, Louis Eichhorst and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -54,17 +54,11 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE EpidetectToolboxPlugin
+// DEFINE NAMESPACE EPIDETECTPLUGIN
 //=============================================================================================================
 
 namespace EPIDETECTPLUGIN
 {
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
 
 
 //=============================================================================================================
