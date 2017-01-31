@@ -42,9 +42,10 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_epidetectsetup.h"
+#include "../ui_epidetectabout.h"
 #include "epidetectaboutwidget.h"
 #include "../epidetect.h"
+#include "../ui_epidetectsetup.h"
 
 
 //*************************************************************************************************************
@@ -60,7 +61,7 @@
 // DEFINE NAMESPACE EpidetectToolboxPlugin
 //=============================================================================================================
 
-namespace EpidetectPlugin
+namespace EPIDETECTPLUGIN
 {
 
 

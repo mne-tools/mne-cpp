@@ -57,7 +57,7 @@
 // DEFINE NAMESPACE EpidetectToolboxPlugin
 //=============================================================================================================
 
-namespace EpidetectPlugin
+namespace EPIDETECTPLUGIN
 {
 
 
@@ -96,23 +96,30 @@ public:
     EpidetectWidget(int dimOld, double rOld, int nOld, double marginOld, double threshold1Old, double threshold2Old, int listLengthOld, int fuzzyStepOld, int chWheightOld, QWidget *parent = 0);
 
 
-    int dimVal;
-    double rVal;
-    int nVal;
-    double marginVal;
-    double threshold1Val;
-    double threshold2Val;
-    int listLengthVal;
-    int fuzzyEnStepVal;
-    int chWheight;
+
+    double      m_dRVal;                  /**< Holds the r value inside the GUI. */
+    double      m_dMarginVal;             /**< Holds the margin value inside the GUI. */
+    double      m_dThreshold1Val;         /**< Holds the threshold1 value inside the GUI. */
+    double      m_dThreshold2Val;         /**< Holds the threshold2 value inside the GUI. */
+
+    int         m_iDimVal;                /**< Holds the dim value inside the GUI. */
+    int         m_iNVal;                  /**< Holds the n value inside the GUI. */
+    int         m_iListLengthVal;         /**< Holds the history length value inside the GUI. */
+    int         m_iFuzzyEnStepVal;        /**< Holds the FuzzyEnStep value inside the GUI. */
+    int         m_iChWeight;              /**< Holds the channel weight value inside the GUI. */
 
 
 private:
     Ui::EpidetectToolbarWidget* ui;        /**< The UI class specified in the designer. */
+
+    //=========================================================================================================
+    /**
+    * Updates the parameters if changed in the GUI
+    */
     void updateValues();
 
 signals:
-    void newValues();
+    void newValues();                       /**< Emmited if values are changed in the GUI. */
 };
 
 #endif // EPIDETECTWIDGET_H

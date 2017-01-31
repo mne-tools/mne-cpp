@@ -46,7 +46,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace EpidetectPlugin;
+using namespace EPIDETECTPLUGIN;
 
 
 //*************************************************************************************************************
@@ -70,34 +70,34 @@ EpidetectWidget::EpidetectWidget(int dimOld, double rOld, int nOld, double margi
 , ui(new Ui::EpidetectToolbarWidget)
 {
     ui->setupUi(this);
-    dimVal = dimOld;
-    rVal = rOld;
-    nVal = nOld;
-    marginVal = marginOld;
-    threshold1Val = threshold1Old;
-    threshold2Val = threshold2Old;
-    listLengthVal = listLengthOld;
-    fuzzyEnStepVal = fuzzyStepOld;
-    chWheight = chWheightOld;
+    m_iDimVal = dimOld;
+    m_dRVal = rOld;
+    m_iNVal = nOld;
+    m_dMarginVal = marginOld;
+    m_dThreshold1Val = threshold1Old;
+    m_dThreshold2Val = threshold2Old;
+    m_iListLengthVal = listLengthOld;
+    m_iFuzzyEnStepVal = fuzzyStepOld;
+    m_iChWeight = chWheightOld;
 
-    this->ui->dim->setValue(dimVal);
-    this->ui->r->setValue(rVal);
-    this->ui->n->setValue(nVal);
-    this->ui->margin->setValue(marginVal);
-    this->ui->threshold1->setValue(threshold1Val);
-    this->ui->threshold2->setValue(threshold2Val);
-    this->ui->listlength->setValue(listLengthVal);
-    this->ui->FuzzyStep->setValue(fuzzyEnStepVal);
-    this->ui->chwheight->setValue(chWheight);
-    connect(ui->dim, &QAbstractSpinBox::editingFinished, this, &EpidetectWidget::updateValues);
-    connect(ui->r, &QAbstractSpinBox::editingFinished, this, &EpidetectWidget::updateValues);
-    connect(ui->n, &QAbstractSpinBox::editingFinished, this, &EpidetectWidget::updateValues);
-    connect(ui->margin, &QAbstractSpinBox::editingFinished, this, &EpidetectWidget::updateValues);
-    connect(ui->threshold1, &QAbstractSpinBox::editingFinished, this, &EpidetectWidget::updateValues);
-    connect(ui->threshold2, &QAbstractSpinBox::editingFinished, this, &EpidetectWidget::updateValues);
-    connect(ui->listlength, &QAbstractSpinBox::editingFinished, this, &EpidetectWidget::updateValues);
-    connect(ui->FuzzyStep, &QAbstractSpinBox::editingFinished, this, &EpidetectWidget::updateValues);
-    connect(ui->chwheight, &QAbstractSpinBox::editingFinished, this, &EpidetectWidget::updateValues);
+    this->ui->m_iDim->setValue(m_iDimVal);
+    this->ui->m_dR->setValue(m_dRVal);
+    this->ui->m_iN->setValue(m_iNVal);
+    this->ui->m_dMargin->setValue(m_dMarginVal);
+    this->ui->m_dThreshold1->setValue(m_dThreshold1Val);
+    this->ui->m_dThreshold2->setValue(m_dThreshold2Val);
+    this->ui->m_iListlength->setValue(m_iListLengthVal);
+    this->ui->m_iFuzzyStep->setValue(m_iFuzzyEnStepVal);
+    this->ui->m_iChweight->setValue(m_iChWeight);
+    connect(ui->m_iDim, &QAbstractSpinBox::editingFinished, this, &EpidetectWidget::updateValues);
+    connect(ui->m_dR, &QAbstractSpinBox::editingFinished, this, &EpidetectWidget::updateValues);
+    connect(ui->m_iN, &QAbstractSpinBox::editingFinished, this, &EpidetectWidget::updateValues);
+    connect(ui->m_dMargin, &QAbstractSpinBox::editingFinished, this, &EpidetectWidget::updateValues);
+    connect(ui->m_dThreshold1, &QAbstractSpinBox::editingFinished, this, &EpidetectWidget::updateValues);
+    connect(ui->m_dThreshold2, &QAbstractSpinBox::editingFinished, this, &EpidetectWidget::updateValues);
+    connect(ui->m_iListlength, &QAbstractSpinBox::editingFinished, this, &EpidetectWidget::updateValues);
+    connect(ui->m_iFuzzyStep, &QAbstractSpinBox::editingFinished, this, &EpidetectWidget::updateValues);
+    connect(ui->m_iChweight, &QAbstractSpinBox::editingFinished, this, &EpidetectWidget::updateValues);
 
 }
 
@@ -114,15 +114,15 @@ EpidetectWidget::~EpidetectWidget()
 
 void EpidetectWidget::updateValues()
 {
-    dimVal = this->ui->dim->value();
-    rVal = this->ui->r->value();
-    nVal = this->ui->n->value();
-    marginVal = this->ui->margin->value();
-    threshold1Val = this->ui->threshold1->value();
-    threshold2Val = this->ui->threshold2->value();
-    listLengthVal = this->ui->listlength->value();
-    fuzzyEnStepVal = this->ui->FuzzyStep->value();
-    chWheight = this->ui->chwheight->value();
+    m_iDimVal = this->ui->m_iDim->value();
+    m_dRVal = this->ui->m_dR->value();
+    m_iNVal = this->ui->m_iN->value();
+    m_dMarginVal = this->ui->m_dMargin->value();
+    m_dThreshold1Val = this->ui->m_dThreshold1->value();
+    m_dThreshold2Val = this->ui->m_dThreshold2->value();
+    m_iListLengthVal = this->ui->m_iListlength->value();
+    m_iFuzzyEnStepVal = this->ui->m_iFuzzyStep->value();
+    m_iChWeight = this->ui->m_iChweight->value();
 
     emit newValues();
 

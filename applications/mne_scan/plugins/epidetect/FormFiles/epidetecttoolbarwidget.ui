@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <widget class="QDoubleSpinBox" name="margin">
+  <widget class="QDoubleSpinBox" name="m_dMargin">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -35,7 +35,7 @@
     <double>1.200000000000000</double>
    </property>
   </widget>
-  <widget class="QSpinBox" name="listlength">
+  <widget class="QSpinBox" name="m_iListlength">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -54,7 +54,7 @@
     <number>20</number>
    </property>
   </widget>
-  <widget class="QDoubleSpinBox" name="threshold1">
+  <widget class="QDoubleSpinBox" name="m_dThreshold1">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -73,7 +73,7 @@
     <double>0.300000000000000</double>
    </property>
   </widget>
-  <widget class="QSpinBox" name="FuzzyStep">
+  <widget class="QSpinBox" name="m_iFuzzyStep">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -89,7 +89,7 @@
     <number>12</number>
    </property>
   </widget>
-  <widget class="QSpinBox" name="dim">
+  <widget class="QSpinBox" name="m_iDim">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -108,7 +108,7 @@
     <number>3</number>
    </property>
   </widget>
-  <widget class="QSpinBox" name="n">
+  <widget class="QSpinBox" name="m_iN">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -127,7 +127,7 @@
     <number>3</number>
    </property>
   </widget>
-  <widget class="QDoubleSpinBox" name="r">
+  <widget class="QDoubleSpinBox" name="m_dR">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -300,7 +300,7 @@
     <string>Channel settings</string>
    </property>
   </widget>
-  <widget class="QSpinBox" name="chwheight">
+  <widget class="QSpinBox" name="m_iChweight">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -329,7 +329,7 @@
     <string>Channel Weight</string>
    </property>
   </widget>
-  <widget class="QDoubleSpinBox" name="threshold2">
+  <widget class="QDoubleSpinBox" name="m_dThreshold2">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -362,7 +362,7 @@
  <resources/>
  <connections>
   <connection>
-   <sender>FuzzyStep</sender>
+   <sender>m_iFuzzyStep</sender>
    <signal>valueChanged(int)</signal>
    <receiver>EpidetectToolbarWidget</receiver>
    <slot>update()</slot>

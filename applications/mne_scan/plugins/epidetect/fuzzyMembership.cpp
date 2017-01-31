@@ -86,6 +86,9 @@ fuzzyMembership::fuzzyMembership()
 
 }
 
+
+//*************************************************************************************************************
+
 Eigen::VectorXd fuzzyMembership::getMembership(const Eigen::MatrixXd valHistory, const Eigen::MatrixXd valHistoryOld, const Eigen::VectorXd current, const Eigen::VectorXd epiHistory,  double margin, char type)
 {
 //TODO: Add different treatment for max/min/meanvalues, if a seizure was detected
@@ -98,31 +101,18 @@ Eigen::VectorXd fuzzyMembership::getMembership(const Eigen::MatrixXd valHistory,
 
     for(int i=0; i < current.rows(); i++)
     {
-        //std::cout << "current: " << current(i) << "\n";
-        //std::cout << "min: " << m_dvecMinVal(i) << "\n";
-        //std::cout << "mean: " << m_dvecMeanVal(i) << "\n";
-        //std::cout << "max: " << m_dvecMaxVal(i) << "\n";
-
         if (current(i) == m_dvecMeanVal(i))
             m_dvecMuChannel(i) = 0;
         else if ((current(i) < m_dvecMeanVal(i)) && ((type == 'l') || (type == 'm')))
         {
             m_dvecMuChannel(i) = 1-((current(i)/(margin*m_dvecMeanVal(i)-margin*m_dvecMinVal(i)))-(m_dvecMeanVal(i)/(margin*m_dvecMeanVal(i)-margin*m_dvecMinVal(i)))+1);
-            //double sigma = (m_dvecMeanVal(i) - m_dvecMinVal(i))*margin/2;
-            //std::cout << "sigma: " << sigma << "\n";
-            //m_dvecMuChannel(i) = 1 - exp((-pow((current(i)-m_dvecMeanVal(i)), 2)/(2*pow(sigma, 2))));
         }
         else if ((current(i) > m_dvecMeanVal(i)) && ((type == 'r') || (type == 'm')))
         {
             m_dvecMuChannel(i) = 1-((current(i)/(margin*m_dvecMeanVal(i)-margin*m_dvecMaxVal(i)))-(m_dvecMeanVal(i)/(margin*m_dvecMeanVal(i)-margin*m_dvecMaxVal(i)))+1);
-            //double sigma = (m_dvecMaxVal(i)-m_dvecMeanVal(i))*margin/2;
-            //std::cout << "sigma: " << sigma << "\n";
-            //m_dvecMuChannel(i) = 1 - exp((-pow((current(i)-m_dvecMeanVal(i)), 2)/(2*pow(sigma, 2))));
         }
         else
             m_dvecMuChannel(i) = 0;
-
-        //std::cout << "mu: " << m_dvecMuChannel(i) << "\n";
 
         if (m_dvecMuChannel(i) > 1)
             m_dvecMuChannel(i) = 1;
@@ -131,16 +121,6 @@ Eigen::VectorXd fuzzyMembership::getMembership(const Eigen::MatrixXd valHistory,
             m_dvecMuChannel(i) = 0;
 
     }
-
-
-
-   /*
-    vector<double> val(current.data(), current.data() + current.rows() * current.cols());
-    vector<double> min(m_dvecMinVal.data(), m_dvecMinVal.data() + m_dvecMinVal.rows() * m_dvecMinVal.cols());
-    vector<double> max(m_dvecMaxVal.data(), m_dvecMaxVal.data() + m_dvecMaxVal.rows() * m_dvecMaxVal.cols());
-    vector<double> mean(m_dvecMeanVal.data(), m_dvecMeanVal.data() + m_dvecMeanVal.rows() * m_dvecMeanVal.cols());
-    vector<double> mu(m_dvecMuChannel.data(), m_dvecMuChannel.data() + m_dvecMuChannel.rows() * m_dvecMuChannel.cols());
-    */
 
     return m_dvecMuChannel;
 }

@@ -83,9 +83,9 @@
 
 //=============================================================================================================
 /**
-* Description of what this class is intended to do (in detail).
+* DECLARE CLASS CalcMetric
 *
-* @brief Brief description of this class.
+* @brief Brief calculates all necessairy measurements for the detection algorithm
 */
 
 class CalcMetric
@@ -100,61 +100,136 @@ public:
     * Constructs a CalcMetric object.
     */
     CalcMetric();
-
-    bool calcEn;
-    bool historyReady;
-
-    int m_iListLength;
-    int m_iFuzzyEnStep;
-
+    //=========================================================================================================
+    /**
+    * Handles new input data
+    *
+    * @param [in] input matrix containing the newest dataset.
+    */
     void setData(Eigen::MatrixXd input);
-    void CalcAll(Eigen::MatrixXd input, int dim, double r, double n);
-    void CalcP2P();
-    void CalcKurtosis(int start, int end);
-    //void CalcFuzzyEn(int start, int step, int end, int dim, double r, double n);
 
+    //=========================================================================================================
+    /**
+    * Handles calculation of measurements and multithreading.
+    *
+    * @param [in] input matrix containing the newest dataset.
+    * @param [in] dim embedding dimension of fuzzy entropy.
+    * @param [in] r width of fuzzy exponential function.
+    * @param [in] n step of fuzzy exponential function.
+    */
+    void calcAll(Eigen::MatrixXd input, int dim, double r, double n);
+
+    //=========================================================================================================
+    /**
+    * Calculates peak-to-peak-magnitude
+    *
+    */
+    void calcP2P();
+
+    //=========================================================================================================
+    /**
+    * Calculates kurtosis
+    *
+    * @param [in] start index of the channel where calculation starts.
+    * @param [in] start index of the channel where calculation ends.
+    */
+    void calcKurtosis(int start, int end);
+
+    //=========================================================================================================
+    /**
+    * Called whenever a seizure is suspected to take place. Calculates the Fuzzy Entropy for every channel in the list.
+    *
+    * @param [in] dim embedding dimension of fuzzy entropy.
+    * @param [in] r width of fuzzy exponential function.
+    * @param [in] n step of fuzzy exponential function.
+    * @param [in] checkChs list of channels in which a seizure is suspected.
+    * @param [out] returns a matrix with the Fuzzy Entropy for all channels.
+    */
     Eigen::VectorXd onSeizureDetection(int dim, double r, double n, QList<int> checkChs);
 
+    //=========================================================================================================
+    /**
+    * Returns the the value m_dvecKurtosis.
+    *
+    * @param [out] contains the current Kurtosis values.
+    */
     Eigen::VectorXd getKurtosis();
+
+    //=========================================================================================================
+    /**
+    * Returns the the value m_dvecP2P.
+    *
+    * @param [out] contains the current peak-to-peak-magnitude values.
+    */
     Eigen::VectorXd getP2P();
+
+    //=========================================================================================================
+    /**
+    * Returns the the value m_dvecFuzzyEn.
+    *
+    * @param [out] contains the current Fuzzy Entropy values.
+    */
     Eigen::VectorXd getFuzzyEn();
 
+
+    //=========================================================================================================
+    /**
+    * Returns the the value m_dvecKurtosisHistory.
+    *
+    * @param [out] contains Kurtosis value history.
+    */
     Eigen::MatrixXd getKurtosisHistory();
+
+    //=========================================================================================================
+    /**
+    * Returns the the value m_dvecP2PHistory.
+    *
+    * @param [out] contains the peak-to-peak-magnitude value history.
+    */
     Eigen::MatrixXd getP2PHistory();
+
+    //=========================================================================================================
+    /**
+    * Returns the the value m_dvecFuzzyEnHistory.
+    *
+    * @param [out] contains the Fuzzy Entropy value history.
+    */
     Eigen::MatrixXd getFuzzyEnHistory();
 
-protected:
+    bool                                    historyReady;               /**< True if m_dvecFuzzyEnHistory has no undefined values.*/
+    int                                     m_iListLength;              /**< Number of values inside the history matrices for each channel.*/
+    int                                     m_iFuzzyEnStep;             /**< Number of channels which are skipped after every calculation of FuzzyEn.*/
 
 private:
 
-    Eigen::MatrixXd m_dmatData;
-    Eigen::Matrix<bool, Eigen::Dynamic, 1> m_bFuzzyEnCalc;
-    int m_iChannelCount;
-    int m_iDataLength;
-    int m_iKurtosisHistoryPosition;
-    int m_iP2PHistoryPosition;
-    int m_iFuzzyEnHistoryPosition;
-    int m_iFuzzyEnStart;
+    Eigen::MatrixXd                         m_dmatData;                 /**< The currently used data-set.*/
+    Eigen::Matrix<bool, Eigen::Dynamic, 1>  m_bFuzzyEnCalc;             /**< Contains information for each channel whether or not FuzzyEn has been calculated.*/
 
-    bool setNewP2P;
-    bool setNewKurtosis;
-    bool setNewFuzzyEn;
+    int                                     m_iChannelCount;            /**< Number of channels.*/
+    int                                     m_iDataLength;              /**< Length of data.*/
 
-    QList<int> fuzzyEnUsedChs;
+    int                                     m_iKurtosisHistoryPosition; /**< Position inside the history matrix where the next next Kurtosis value is to be stored.*/
+    int                                     m_iP2PHistoryPosition;      /**< Position inside the history matrix where the next next peak-to-peak magnitude value is to be stored.*/
+    int                                     m_iFuzzyEnHistoryPosition;  /**< Position inside the history matrix where the next next Fuzzy Entropy value is to be stored.*/
 
-    Eigen::VectorXd m_dvecP2P;
-    Eigen::VectorXd m_dvecKurtosis;
-    Eigen::VectorXd m_dvecFuzzyEn;
+    int                                     m_iFuzzyEnStart;            /**< FuzzyEn calculation begins at this position.*/
 
-    Eigen::MatrixXd m_dmatP2PHistory;
-    Eigen::MatrixXd m_dmatKurtosisHistory;
-    Eigen::MatrixXd m_dmatFuzzyEnHistory;
+    bool                                    setNewP2P;                  /**< True if there is a new P2P value to be stored inside m_dmatP2PHistory.*/
+    bool                                    setNewKurtosis;             /**< True if there is a new Kurtosis value to be stored inside m_dmatKurtosisHistory.*/
+    bool                                    setNewFuzzyEn;              /**< True if there is a new FuzzyEn value to be stored inside m_dmatFuzzyEnHistory.*/
 
-    Eigen::VectorXd m_dvecStdDev;
-    Eigen::VectorXd m_dvecMean;
+    QList<int>                              fuzzyEnUsedChs;             /**< List containing the indizes for all the channels for which FuzzyEn has been calculated.*/
 
-signals:
+    Eigen::VectorXd                         m_dvecP2P;                  /**< Contains the current peak-to-peak magnitude value for each channel.*/
+    Eigen::VectorXd                         m_dvecKurtosis;             /**< Contains the current Kurtosis value for each channel.*/
+    Eigen::VectorXd                         m_dvecFuzzyEn;              /**< Contains the current Fuzzy Entropy value for each channel.*/
 
+    Eigen::MatrixXd                         m_dmatP2PHistory;           /**< Contains the history of peak-to-peak magnitude values for each channel.*/
+    Eigen::MatrixXd                         m_dmatKurtosisHistory;      /**< Contains the history of Kurtosis magnitude values for each channel.*/
+    Eigen::MatrixXd                         m_dmatFuzzyEnHistory;       /**< Contains the history of Fuzzy Entropy values for each channel.*/
+
+    Eigen::VectorXd                         m_dvecStdDev;               /**< Contains the standard deviation for each channel.*/
+    Eigen::VectorXd                         m_dvecMean;                 /**< Contains the mean value for each channel.*/
 
 };
 
