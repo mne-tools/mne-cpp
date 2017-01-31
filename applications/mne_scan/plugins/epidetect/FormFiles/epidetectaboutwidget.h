@@ -58,7 +58,7 @@
 // DEFINE NAMESPACE EpidetectToolboxPlugin
 //=============================================================================================================
 
-namespace EpidetectPlugin
+namespace EPIDETECTPLUGIN
 {
 
 

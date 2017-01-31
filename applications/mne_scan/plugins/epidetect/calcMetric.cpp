@@ -103,6 +103,9 @@ CalcMetric::CalcMetric()
 
 }
 
+
+//*************************************************************************************************************
+
 QPair<RowVectorXd, QPair<QList<double>, int>> createInputList(RowVectorXd input, int dim, double r, double n, double mean, double stdDev)
 {
     QPair<RowVectorXd, QPair<QList<double>, int>> funcInput;
@@ -120,7 +123,10 @@ QPair<RowVectorXd, QPair<QList<double>, int>> createInputList(RowVectorXd input,
 
 }
 
-double CalcFuzzyEn(QPair<RowVectorXd, QPair<QList<double>, int>> input)//RowVectorXd data, double mean, double stdDev, int dim, double r, double n)
+
+//*************************************************************************************************************
+
+double calcFuzzyEn(QPair<RowVectorXd, QPair<QList<double>, int>> input)//RowVectorXd data, double mean, double stdDev, int dim, double r, double n)
 {
     RowVectorXd data = input.first;
     QPair<QList<double>, int> inputValues = input.second;
@@ -130,21 +136,10 @@ double CalcFuzzyEn(QPair<RowVectorXd, QPair<QList<double>, int>> input)//RowVect
     double stdDev = doubleInputValues[1];
     double r = doubleInputValues[2];
     double n = doubleInputValues[3];
-
     int length = data.cols();
-
     double fuzzyEn;
-
-
     ArrayXd arDataNorm = (data.array()- mean).array()/(stdDev);
     VectorXd dataNorm = arDataNorm;
-
-        //cout << "mean: " << "\n" << m_dvecMean(k) << "\n" << "\n";
-
-        //cout << "std: " << "\n" << m_dvecStdDev(k) << "\n" << "\n";
-
-        //cout << "DataNorm: " << "\n" << dataNorm << "\n" << "\n";
-
     Vector2d phi;
 
     for(int j=0; j<2; j++)
@@ -162,13 +157,8 @@ double CalcFuzzyEn(QPair<RowVectorXd, QPair<QList<double>, int>> input)//RowVect
 
         }
 
-            //cout << "patterns: \n" << patterns << "\n" << "\n";
-
         VectorXd patternsMean = patterns.colwise().mean();
         patterns = patterns.rowwise() - patternsMean.transpose(); //check whether correct
-
-            //cout << "patternsMean: \n" << patterns << "\n" << "\n";
-
         VectorXd aux;
         aux.resize(length-m+1);
 
@@ -188,8 +178,6 @@ double CalcFuzzyEn(QPair<RowVectorXd, QPair<QList<double>, int>> input)//RowVect
 
         }
 
-            //cout << "aux: " << "\n" << aux <<  "\n";
-
         phi[j] = (aux.sum()/(length-m));
 
     }
@@ -201,20 +189,32 @@ double CalcFuzzyEn(QPair<RowVectorXd, QPair<QList<double>, int>> input)//RowVect
 
 }
 
+
+//*************************************************************************************************************
+
 VectorXd CalcMetric::getFuzzyEn()
 {  
     return m_dvecFuzzyEn;
 }
+
+
+//*************************************************************************************************************
 
 VectorXd CalcMetric::getP2P()
 {
     return m_dvecP2P;
 }
 
+
+//*************************************************************************************************************
+
 VectorXd CalcMetric::getKurtosis()
 {
     return m_dvecKurtosis;
 }
+
+
+//*************************************************************************************************************
 
 MatrixXd CalcMetric::getFuzzyEnHistory()
 {
@@ -222,17 +222,23 @@ MatrixXd CalcMetric::getFuzzyEnHistory()
 }
 
 
+//*************************************************************************************************************
+
 MatrixXd CalcMetric::getKurtosisHistory()
 {
     return m_dmatKurtosisHistory;
 }
 
 
+//*************************************************************************************************************
+
 MatrixXd CalcMetric::getP2PHistory()
 {
     return m_dmatP2PHistory;
 }
 
+
+//*************************************************************************************************************
 
 void CalcMetric::setData(Eigen::MatrixXd input)
 {
@@ -252,6 +258,9 @@ void CalcMetric::setData(Eigen::MatrixXd input)
     }
 }
 
+
+//*************************************************************************************************************
+
 VectorXd CalcMetric::onSeizureDetection(int dim, double r, double n, QList<int> checkChs)
 {
     qSort(fuzzyEnUsedChs);
@@ -267,7 +276,7 @@ VectorXd CalcMetric::onSeizureDetection(int dim, double r, double n, QList<int> 
     }
 
     QList<double> fuzzyEnResults;
-    QFuture<double> fuzzyEnFuture = mapped(inputList, CalcFuzzyEn);
+    QFuture<double> fuzzyEnFuture = mapped(inputList, calcFuzzyEn);
     fuzzyEnFuture.waitForFinished();
     QFutureIterator<double> futureResult(fuzzyEnFuture);
     while (futureResult.hasNext())
@@ -288,7 +297,10 @@ VectorXd CalcMetric::onSeizureDetection(int dim, double r, double n, QList<int> 
     return m_dvecFuzzyEn;
 }
 
-VectorXd CalcP2P(MatrixXd data)
+
+//*************************************************************************************************************
+
+VectorXd calcP2P(MatrixXd data)
 {
     VectorXd max = data.rowwise().maxCoeff();
     VectorXd min = data.rowwise().minCoeff();
@@ -297,7 +309,9 @@ VectorXd CalcP2P(MatrixXd data)
 }
 
 
-void CalcMetric::CalcP2P()
+//*************************************************************************************************************
+
+void CalcMetric::calcP2P()
 {
 
     if (setNewP2P)
@@ -317,7 +331,10 @@ void CalcMetric::CalcP2P()
     setNewP2P = true;
 }
 
-QPair<VectorXd, VectorXd> CalcKurtosis(MatrixXd data, VectorXd mean, int start, int end)
+
+//*************************************************************************************************************
+
+QPair<VectorXd, VectorXd> calcKurtosis(MatrixXd data, VectorXd mean, int start, int end)
 {
     if (end > data.rows())
         end=data.rows();
@@ -360,7 +377,10 @@ QPair<VectorXd, VectorXd> CalcKurtosis(MatrixXd data, VectorXd mean, int start, 
 
 }
 
-void CalcMetric::CalcKurtosis(int start, int end)
+
+//*************************************************************************************************************
+
+void CalcMetric::calcKurtosis(int start, int end)
 {
     if (end > m_iChannelCount)
         end=m_iChannelCount;
@@ -395,7 +415,6 @@ void CalcMetric::CalcKurtosis(int start, int end)
             }
         }
 
-
         m_dvecStdDev(i) = m_dvecStdDev(i)/(m_iDataLength-1);
         m_dvecStdDev(i) = sqrt(m_dvecStdDev(i));
         m_dvecKurtosis(i)=(m_dvecKurtosis(i))/((m_iDataLength)*pow((m_dvecStdDev(i)*sqrt(m_iDataLength-1))/sqrt(m_iDataLength),4));
@@ -407,106 +426,13 @@ void CalcMetric::CalcKurtosis(int start, int end)
 }
 
 
+//*************************************************************************************************************
 
-/*
-void CalcMetric::CalcFuzzyEn(int start, int step, int end, int dim, double r, double n)
-{
-    if (end > m_iChannelCount)
-        end = m_iChannelCount;
-
-
-    if (setNewFuzzyEn) //wrong
-    {
-        m_dmatFuzzyEnHistory.col(m_iFuzzyEnHistoryPosition) = m_dvecFuzzyEn;
-        setNewFuzzyEn = false;
-        m_iFuzzyEnHistoryPosition++;
-        if (m_iFuzzyEnHistoryPosition>(m_iListLength-1))
-            m_iFuzzyEnHistoryPosition = 0;
-    }
-
-    //ArrayXd arDataNorm = (m_dmatData-m_dvecMean).array().rowwise()/m_dvecStdDev.transpose().array();
-    //MatrixXd dataNorm = arDataNorm;
-
-    for(int k=start; k < end; k=k+step)
-    {
-        ArrayXd arDataNorm = (m_dmatData.array().row(k)- m_dvecMean(k)).array()/(m_dvecStdDev(k));
-        VectorXd dataNorm = arDataNorm;
-
-        //cout << "mean: " << "\n" << m_dvecMean(k) << "\n" << "\n";
-
-        //cout << "std: " << "\n" << m_dvecStdDev(k) << "\n" << "\n";
-
-        //cout << "DataNorm: " << "\n" << dataNorm << "\n" << "\n";
-
-        Vector2d phi;
-        for(int j=0; j<2; j++)
-        {
-            int m = dim+j;
-            MatrixXd patterns;
-            patterns.resize(m, m_iDataLength-m+1);
-
-            if (m==1)
-                patterns = dataNorm.row(k);
-            else
-            {
-                for(int i=0; i<m; i++)
-                {
-                    patterns.row(i)=dataNorm.segment(i,m_iDataLength-m+1);
-                }
-            }
-
-            //cout << "patterns: \n" << patterns << "\n" << "\n";
-
-            VectorXd patternsMean = patterns.colwise().mean();
-            patterns = patterns.rowwise() - patternsMean.transpose(); //check whether correct
-
-            //cout << "patternsMean: \n" << patterns << "\n" << "\n";
-
-            VectorXd aux;
-            aux.resize(m_iDataLength-m+1);
-
-            for (int i = 0; i< m_iDataLength-m+1; i++)
-            {
-                MatrixXd column;
-                column.resize(patterns.rows(),patterns.cols());
-                    for (int l= 0; l < patterns.cols(); l++)
-                        column.col(l) = patterns.col(i);
-
-                VectorXd distance = ((patterns.array()-column.array()).abs()).colwise().maxCoeff();
-                //cout <<  "dist " << i << ": " << distance << "\n";
-                VectorXd similarty = (((-1)*(distance.array().pow(n)))/r).exp();
-                //cout << "simi " << i << ": " << similarty << "\n";
-
-                aux(i) = ((similarty.sum()-1)/(m_iDataLength-m-1));
-
-            }
-
-            //cout << "aux: " << "\n" << aux <<  "\n";
-
-            phi[j] = (aux.sum()/(m_iDataLength-m));
-
-        }
-
-        m_dvecFuzzyEn[k] = log(phi[0])-log(phi[1]);
-    }
-
-    if (m_iFuzzyEnStart < m_iFuzzyEnStep-1)
-        m_iFuzzyEnStart++;
-    else
-    {
-        m_iFuzzyEnStart = 0;
-        setNewFuzzyEn = true;
-    }
-
-}
-*/
-
-void CalcMetric::CalcAll(Eigen::MatrixXd input, int dim, double r, double n)
+void CalcMetric::calcAll(Eigen::MatrixXd input, int dim, double r, double n)
 {
     this->setData(input);
-    this->CalcP2P();
-    this->CalcKurtosis(0,1000);
-
+    this->calcP2P();
+    this->calcKurtosis(0,1000);
     fuzzyEnUsedChs.clear();
 
     if (m_iFuzzyEnStart == m_iFuzzyEnStep-1)
@@ -531,7 +457,7 @@ void CalcMetric::CalcAll(Eigen::MatrixXd input, int dim, double r, double n)
     }
 
     QList<double> fuzzyEnResults;
-    QFuture<double> fuzzyEnFuture = mapped(inputList, CalcFuzzyEn);
+    QFuture<double> fuzzyEnFuture = mapped(inputList, calcFuzzyEn);
     fuzzyEnFuture.waitForFinished();
     QFutureIterator<double> futureResult(fuzzyEnFuture);
     while (futureResult.hasNext())
@@ -550,21 +476,4 @@ void CalcMetric::CalcAll(Eigen::MatrixXd input, int dim, double r, double n)
     else
         m_iFuzzyEnStart = 0;
 
-
-
-
-
-
-    //thread fuzzyCalc1(&CalcMetric::CalcFuzzyEn,this, 0,4,dim,r,n);
-    //thread fuzzyCalc2(&CalcMetric::CalcFuzzyEn,this, 1,4,dim,r,n);
-    //thread fuzzyCalc3(&CalcMetric::CalcFuzzyEn,this, 2,4,dim,r,n);
-    //thread fuzzyCalc4(&CalcMetric::CalcFuzzyEn,this, 3,4,dim,r,n);
-
-    //fuzzyCalc1.join();
-    //fuzzyCalc2.join();
-    //fuzzyCalc3.join();
-    //fuzzyCalc4.join();
-    //cout << m_iFuzzyEnHistoryPosition;
-
-    //this->CalcFuzzyEn(m_iFuzzyEnStart, m_iFuzzyEnStep, dim, r, n);
 }

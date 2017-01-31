@@ -70,7 +70,7 @@
 // DEFINE NAMESPACE EpidetectPlugin
 //=============================================================================================================
 
-namespace EpidetectPlugin
+namespace EPIDETECTPLUGIN
 {
 
 
@@ -145,41 +145,54 @@ protected:
     void showWidget();
 
 private:
-    bool                                            m_bIsRunning;           /**< Flag whether thread is running.*/
-
-    FIFFLIB::FiffInfo::SPtr                         m_pFiffInfo;            /**< Fiff measurement info.*/
-    QSharedPointer<EpidetectWidget>                 m_pWidget;          /**< flag whether thread is running.*/
-    QAction*                                        m_pActionShowWidget;/**< flag whether thread is running.*/
-
-    IOBUFFER::CircularMatrixBuffer<double>::SPtr    m_pEpidetectBuffer;         /**< Holds incoming data.*/
-
-    PluginInputData<SCMEASLIB::NewRealTimeMultiSampleArray>::SPtr      m_pEpidetectInput;      /**< The NewRealTimeMultiSampleArray of the Epidetect input.*/
-    PluginOutputData<SCMEASLIB::NewRealTimeMultiSampleArray>::SPtr     m_pEpidetectOutput;     /**< The NewRealTimeMultiSampleArray of the Epidetect output.*/
-
-    Eigen::VectorXd epiHistory;
-    Eigen::VectorXd muP2P;
-    Eigen::VectorXd muKurtosis;
-    Eigen::VectorXd muFuzzyEn;
-    Eigen::VectorXd muMin;
-    Eigen::VectorXd muMax;
-    Eigen::VectorXd muMean;
-    Eigen::VectorXd muGesVec;
-
+    //=========================================================================================================
+    /**
+    * Removes all unused channels and creates a list of stim channel indices.
+    *
+    * @param[in] mat unprocessed data-set
+    * @param[out] QPair containing the data-set without all unwanted channels and a QList containing the channel indices.
+    */
     QPair<Eigen::MatrixXd, QList<int>> prepareData(Eigen::MatrixXd mat);
 
-    double muGes;
-
-    int dim;
-    double r;
-    int n;
-    double margin;
-    double threshold1;
-    double threshold2;
-    int listLength;
-    int fuzzyEnStep;
-    int chWheight;
+    //=========================================================================================================
+    /**
+    * Updates all parameters if changed by the user via the GUI.
+    *
+    */
     void updateValues();
-    QList<int> outputLocation;
+
+    bool                                                               m_bIsRunning;        /**< Flag whether thread is running.*/
+
+    FIFFLIB::FiffInfo::SPtr                                            m_pFiffInfo;         /**< Fiff measurement info.*/
+    QSharedPointer<EpidetectWidget>                                    m_pWidget;           /**< flag whether thread is running.*/
+    QAction*                                                           m_pActionShowWidget; /**< flag whether thread is running.*/
+
+    IOBUFFER::CircularMatrixBuffer<double>::SPtr                       m_pEpidetectBuffer;  /**< Holds incoming data.*/
+
+    PluginInputData<SCMEASLIB::NewRealTimeMultiSampleArray>::SPtr      m_pEpidetectInput;   /**< The NewRealTimeMultiSampleArray of the Epidetect input.*/
+    PluginOutputData<SCMEASLIB::NewRealTimeMultiSampleArray>::SPtr     m_pEpidetectOutput;  /**< The NewRealTimeMultiSampleArray of the Epidetect output.*/
+
+    Eigen::VectorXd                                                    m_dvecEpiHistory;    /**< Contains seizure-detection history.*/
+    Eigen::VectorXd                                                    m_dvecMuP2P;         /**< Contains membership-values for peak-to-peak magnitude.*/
+    Eigen::VectorXd                                                    m_dvecMuKurtosis;    /**< Contains membership-values for Kurtosis.*/
+    Eigen::VectorXd                                                    m_dvecMuFuzzyEn;     /**< Contains membership-values for Fuzzy Entropy.*/
+    Eigen::VectorXd                                                    m_dvecMuMin;         /**< Contains smallest membership value for each channel.*/
+    Eigen::VectorXd                                                    m_dvecMuMax;         /**< Contains largest membership value for each channel.*/
+    Eigen::VectorXd                                                    m_dvecMuMean;        /**< Contains mean membership value for each channel.*/
+    Eigen::VectorXd                                                    m_dvecMuGesVec;      /**< Contains all membership values for each channel.*/
+
+
+    int                                                                 m_iDim;             /**< FuzzyEn emmbeding dimension as set through the GUI.*/
+    int                                                                 m_iN;               /**< Step of the FuzzyEn exponential function as set through the GUI.*/
+    int                                                                 m_iListLength;      /**< Length of the history matrices as set through the GUI.*/
+    int                                                                 m_iFuzzyEnStep;     /**< Number of channels to skip after each FuzzyEn calculation as set through the GUI.*/
+    int                                                                 m_iChWeight;        /**< Weight of inividual channels as set through the GUI.*/
+
+    double                                                              m_dMargin;          /**< Margin for the membership function as set through the GUI.*/
+    double                                                              m_dThreshold1;      /**< Smallest requiered value for first stage detection.*/
+    double                                                              m_dThreshold2;      /**< Smallest requiered value for second stage detection.*/
+    double                                                              m_dMuGes;           /**< Overall membership.*/
+    double                                                              m_dR;               /**< Width of FuzzyEn exponential function as set through the GUI.*/
 
 signals:
     //=========================================================================================================

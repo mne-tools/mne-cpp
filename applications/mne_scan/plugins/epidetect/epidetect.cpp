@@ -47,7 +47,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace EpidetectPlugin;
+using namespace EPIDETECTPLUGIN;
 using namespace SCSHAREDLIB;
 using namespace SCMEASLIB;
 using namespace IOBUFFER;
@@ -71,15 +71,15 @@ Epidetect::Epidetect()
     connect(m_pActionShowWidget, &QAction::triggered,
             this, &Epidetect::showWidget);
     addPluginAction(m_pActionShowWidget);
-    dim = 3;
-    r = 0.3;
-    n = 3;
-    margin = 2;
-    threshold1 = 0.75;
-    threshold2 = 0.6;
-    listLength = 20;
-    fuzzyEnStep = 12;
-    chWheight = 15;
+    m_iDim = 3;
+    m_dR = 0.3;
+    m_iN = 3;
+    m_dMargin = 2;
+    m_dThreshold1 = 0.75;
+    m_dThreshold2 = 0.6;
+    m_iListLength = 20;
+    m_iFuzzyEnStep = 12;
+    m_iChWeight = 15;
 }
 
 
@@ -271,9 +271,7 @@ void Epidetect::run()
     fuzzyMembership P2P;
     fuzzyMembership Kurtosis;
     fuzzyMembership FuzzyEn;
-    //
-    // Wait for Fiff Info
-    //    
+
     while(!m_pFiffInfo)
         msleep(10);// Wait for fiff Info
 
@@ -292,7 +290,7 @@ void Epidetect::run()
         QElapsedTimer timer;
         QPair<MatrixXd,QList<int>> data;
 
-        muGes = 0;
+        m_dMuGes = 0;
 
         //Dispatch the inputs
         if (!overlap)
@@ -306,10 +304,7 @@ void Epidetect::run()
         }
 
         timer.start();
-
-
         MatrixXd window;
-
 
         if (!overlap)
         {
@@ -335,27 +330,24 @@ void Epidetect::run()
             FuzzyEnHistoryValues.conservativeResize(window.rows(), 3);
         }
 
-        calculator.m_iListLength = listLength;
-        calculator.m_iFuzzyEnStep = fuzzyEnStep;
-        calculator.CalcAll(window, dim, r , n);
-
+        calculator.m_iListLength = m_iListLength;
+        calculator.m_iFuzzyEnStep = m_iFuzzyEnStep;
+        calculator.calcAll(window, m_iDim, m_dR , m_iN);
         MatrixXd mu;
-
         MatrixXd p2pHistory =calculator.getP2PHistory();
         MatrixXd kurtosisHistory = calculator.getKurtosisHistory();
         MatrixXd fuzzyEnHistory = calculator.getFuzzyEnHistory();
-
         VectorXd newP2PVal = calculator.getP2P();
         VectorXd newKurtosisVal = calculator.getKurtosis();
 
-        if (counter = fuzzyEnStep*listLength-1)
+        if (counter = m_iFuzzyEnStep*m_iListLength-1)
         {
             FuzzyEnHistoryValues.col(0) = fuzzyEnHistory.rowwise().minCoeff();
             FuzzyEnHistoryValues.col(1) = fuzzyEnHistory.rowwise().mean();
             FuzzyEnHistoryValues.col(2) = fuzzyEnHistory.rowwise().maxCoeff();
         }
 
-        if (counter % listLength == listLength - 1)
+        if (counter % m_iListLength == m_iListLength - 1)
         {
             KurtosisHistoryValues.col(0) = kurtosisHistory.rowwise().minCoeff();
             KurtosisHistoryValues.col(1) = kurtosisHistory.rowwise().mean();
@@ -369,76 +361,50 @@ void Epidetect::run()
 
         if (calculator.historyReady)
         {
-            muP2P = P2P.getMembership(p2pHistory, P2PHistoryValues, newP2PVal, epiHistory, margin, 'r');
-            muKurtosis = Kurtosis.getMembership(kurtosisHistory, KurtosisHistoryValues, newKurtosisVal, epiHistory, margin, 'm'); //TODO: check whether it really is 'm'
-
+            m_dvecMuP2P = P2P.getMembership(p2pHistory, P2PHistoryValues, newP2PVal, m_dvecEpiHistory, m_dMargin, 'r');
+            m_dvecMuKurtosis = Kurtosis.getMembership(kurtosisHistory, KurtosisHistoryValues, newKurtosisVal, m_dvecEpiHistory, m_dMargin, 'm'); //TODO: check whether it really is 'm'
             mu.resize(0,0);
             mu.resize(window.rows(),2);
-            mu.col(0)=muP2P;
-            mu.col(1)=muKurtosis;
+            mu.col(0)=m_dvecMuP2P;
+            mu.col(1)=m_dvecMuKurtosis;
+            m_dvecMuMin = mu.rowwise().minCoeff();
 
-            muMin = mu.rowwise().minCoeff();
-
-            //std::cout << "rows " << muMin.rows() << "\n";
-
-            std::cout << "min Coeff: " << muMin.maxCoeff() << "\n";
-
-            if (muMin.maxCoeff() > threshold1)
+            if (m_dvecMuMin.maxCoeff() > m_dThreshold1)
             {
                 QList<int> checkChs;
-                for (int i= 0; i < muMin.rows(); i++)
+                for (int i= 0; i < m_dvecMuMin.rows(); i++)
                 {
-                    if (muMin(i) > threshold1)
+                    if (m_dvecMuMin(i) > m_dThreshold1)
                         checkChs << i;
                 }
-                VectorXd newFuzzyEnVal = calculator.onSeizureDetection(dim ,r ,n, checkChs);
-                muFuzzyEn = FuzzyEn.getMembership(fuzzyEnHistory, FuzzyEnHistoryValues, newFuzzyEnVal, epiHistory,  margin, 'l' );
+
+                VectorXd newFuzzyEnVal = calculator.onSeizureDetection(m_iDim ,m_dR, m_iN, checkChs);
+                m_dvecMuFuzzyEn = FuzzyEn.getMembership(fuzzyEnHistory, FuzzyEnHistoryValues, newFuzzyEnVal, m_dvecEpiHistory,  m_dMargin, 'l' );
                 mu.col(0)= mu.rowwise().mean();
-                mu.col(1)= muFuzzyEn;
-
-                /*
-                muMin = mu.rowwise().minCoeff();
-                muMax = mu.rowwise().maxCoeff();
-                muMean = (muKurtosis + muP2P + 1.5*muFuzzyEn)/3.5;
-                muGesVec = (1.5*(muMin.array()*muMean.array())+0.75*(muMax.array()*muMean.array()))/2.25;
-                muGes = (muGesVec.sum())/muGesVec.rows();
-                */
-
-                std::cout << "chs: " << checkChs.length() << "\n";
-
+                mu.col(1)= m_dvecMuFuzzyEn;
 
                 for(int i = 0; i < checkChs.length(); i++)
                 {
-                    muGes = muGes + (muFuzzyEn(checkChs[i]));
+                    m_dMuGes = m_dMuGes + (m_dvecMuFuzzyEn(checkChs[i]));
                 }
 
-                muGes = muGes/(checkChs.length() + chWheight);
+                m_dMuGes = m_dMuGes/(checkChs.length() + m_iChWeight);
 
-                if (muGes < threshold2)
-                    muGes = 0;
+                if (m_dMuGes < m_dThreshold2)
+                    m_dMuGes = 0;
 
                 if (overlap)
                 {
-                    t_mat(stimChs[0], 1) =  muGes;
-                    //t_mat.block(stimChs[0], 1, 1, (t_mat.cols()/2)) = t_mat.block(stimChs[0], 0, 1, (t_mat.cols()/2)) * muGes;
+                    t_mat(stimChs[0], 1) =  m_dMuGes;
 
                 }
                 else
                 {
-                    t_mat(stimChs[0], (t_mat.cols()/2)) = muGes;
-                    //t_mat.block(stimChs[0], (t_mat.cols()/2), 1, (t_mat.cols()/2)).setOnes();
-                    //t_mat.block(stimChs[0], (t_mat.cols()/2), 1, (t_mat.cols()/2)) = t_mat.block(stimChs[0], (t_mat.cols()/2), 1, (t_mat.cols()/2)-1) * muGes;
+                    t_mat(stimChs[0], (t_mat.cols()/2)) = m_dMuGes;
                 }
-
-                std::cout << "muGes: " << muGes << "\n";
             }
         }
 
-        //ToDo: Implement  algorithm here
-
-        //Send the data to the connected plugins and the online display
-        //Unocmment this if you also uncommented the m_pEpidetectOutput in the constructor above
-        //std::cout << timer.elapsed() << " ms \n";
         if (overlap)
             m_pEpidetectOutput->data()->setValue(t_mat);
         std::cout << timer.elapsed() << " ms \n";
@@ -450,7 +416,7 @@ void Epidetect::run()
 
 void Epidetect::showWidget()
 {
-    m_pWidget = EpidetectWidget::SPtr(new EpidetectWidget(dim, r, n, margin, threshold1, threshold2, listLength, fuzzyEnStep, chWheight));
+    m_pWidget = EpidetectWidget::SPtr(new EpidetectWidget(m_iDim, m_dR, m_iN, m_dMargin, m_dThreshold1, m_dThreshold2, m_iListLength, m_iFuzzyEnStep, m_iChWeight));
 
     connect(m_pWidget.data(), &EpidetectWidget::newValues, this, &Epidetect::updateValues);
 
@@ -462,14 +428,14 @@ void Epidetect::showWidget()
 
 void Epidetect::updateValues()
 {
-    dim = m_pWidget->dimVal;
-    r = m_pWidget->rVal;
-    n = m_pWidget->nVal;
-    margin = m_pWidget->marginVal;
-    threshold1 = m_pWidget->threshold1Val;
-    threshold2 = m_pWidget->threshold2Val;
-    listLength = m_pWidget->listLengthVal;
-    fuzzyEnStep = m_pWidget->fuzzyEnStepVal;
-    chWheight = m_pWidget->chWheight;
+    m_iDim = m_pWidget->m_iDimVal;
+    m_dR = m_pWidget->m_dRVal;
+    m_iN = m_pWidget->m_iNVal;
+    m_dMargin = m_pWidget->m_dMarginVal;
+    m_dThreshold1 = m_pWidget->m_dThreshold1Val;
+    m_dThreshold2 = m_pWidget->m_dThreshold2Val;
+    m_iListLength = m_pWidget->m_iListLengthVal;
+    m_iFuzzyEnStep = m_pWidget->m_iFuzzyEnStepVal;
+    m_iChWeight = m_pWidget->m_iChWeight;
 
 }

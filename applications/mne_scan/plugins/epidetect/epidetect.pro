@@ -39,7 +39,7 @@ TEMPLATE = lib
 
 CONFIG += plugin
 
-DEFINES += epidetect_LIBRARY
+DEFINES += EPIDETECT_LIBRARY
 
 QT += core widgets concurrent
 
