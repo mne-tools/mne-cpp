@@ -683,6 +683,8 @@ int mne_decompose_eigen (double *mat,
         dmat[k] = mat[k]*scale;
 //    dspev(compz,uplo,&dim,dmat,w,z,&dim,work,&info);
 
+
+// dspev workaround begin
     MatrixXd dmat_tmp = MatrixXd::Zero(dim,dim);
     int idx = 0;
     for (int i = 0; i < dim; ++i) {
@@ -700,10 +702,11 @@ int mne_decompose_eigen (double *mat,
     idx = 0;
     for ( int j = 0; j < dim; ++j ) {
         for( int i = 0; i < dim; ++i ) {
-            z[idx] = es.eigenvectors()(i,j) * es.eigenvectors()(i,j); // Column Major
+            z[idx] = es.eigenvectors()(i,j);// Column Major
             ++idx;
         }
     }
+// dspev workaround end
 
     info = 0;
 

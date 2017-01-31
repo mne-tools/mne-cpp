@@ -525,8 +525,8 @@ ECDSet DipoleFit::calculateFit() const
             }
         printf("\tChannel selection created.\n");
         /*
-            * Let's be a little generous here
-            */
+        * Let's be a little generous here
+        */
         t1 = raw->first_samp/raw->info->sfreq;
         t2 = (raw->first_samp+raw->nsamp-1)/raw->info->sfreq;
         if (settings->tmin < t1 + settings->integ)
