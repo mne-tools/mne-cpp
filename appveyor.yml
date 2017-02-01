@@ -6,8 +6,8 @@ pull_requests:
 
 environment:
    matrix:
-     - BUILD: "windows_release"
-     - BUILD: "windows_tests"
+     - BUILD: windows_release
+     - BUILD: windows_tests
 
 os: Visual Studio 2015
 platform: x64
@@ -30,9 +30,7 @@ build_script:
     - call .\tools\appveyor\%BUILD%\build.bat
 
 after_build:
-    - call .\tools\appveyor\compress_binaries.bat %APPVEYOR_REPO_BRANCH%
-    - call .\tools\appveyor\build_installer.bat %APPVEYOR_REPO_BRANCH%
-    - dir
+    - call .\tools\appveyor\%BUILD%\after_build.bat
 
 artifacts:
   - path: mne-cpp-windows-x86_64-$(APPVEYOR_REPO_BRANCH).exe
@@ -53,7 +51,7 @@ deploy:
     artifact: installer,bin_archive
     on:
       branch: master
-      build: "windows_release"
+       build: windows_release
 
   # 1.0.0
   - provider: FTP
@@ -67,7 +65,7 @@ deploy:
     artifact: installer,bin_archive
     on:
       branch: 1.0.0
-      build: "windows_release"
+       build: windows_release
 
 notifications: 
   - provider: Email 
