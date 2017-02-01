@@ -42,6 +42,32 @@
 #include "mne_sss_data.h"
 #include <fiff/fiff_file.h>
 #include <fiff/fiff_constants.h>
+#include <fiff/fiff_stream.h>
+#include <fiff/fiff_tag.h>
+
+
+
+//============================= dot.h =============================
+
+#define X 0
+#define Y 1
+#define Z 2
+
+#define VEC_COPY(to,from) {\
+    (to)[X] = (from)[X];\
+    (to)[Y] = (from)[Y];\
+    (to)[Z] = (from)[Z];\
+    }
+
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Qt INCLUDES
+//=============================================================================================================
+
+#include <QFile>
+
 
 
 //*************************************************************************************************************
@@ -104,6 +130,106 @@ MneSssData::~MneSssData()
 {
     if ((char *)(comp_info) != NULL)
         free((char *)(comp_info));
+}
+
+
+//*************************************************************************************************************
+
+MneSssData *MneSssData::read_sss_data(const QString &name)
+{
+    QFile file(name);
+    FiffStream::SPtr stream(new FiffStream(&file));
+
+    MneSssData* s  = NULL;
+
+    if(stream->open())
+        s = read_sss_data_from_node(stream,stream->tree());
+
+    stream->close();
+    return s;
+}
+
+
+//*************************************************************************************************************
+
+MneSssData *MneSssData::read_sss_data_from_node(QSharedPointer<FiffStream> &stream, const QSharedPointer<FiffDirNode> &start)
+{
+    MneSssData* s  = new MneSssData();
+    QList<FiffDirNode::SPtr> sss;
+    FiffDirNode::SPtr node;
+    FiffTag::SPtr t_pTag;
+    float       *r0;
+    int j,p,q,n;
+    /*
+        * Locate the SSS information
+        */
+    sss = start->dir_tree_find(FIFFB_SSS_INFO);
+    if (sss.size() > 0) {
+        node = sss[0];
+        /*
+            * Read the SSS information, require all tags to be present
+            */
+        if (!node->find_tag(stream, FIFF_SSS_JOB, t_pTag))
+            goto bad;
+        s->job = *t_pTag->toInt();
+
+        if (!node->find_tag(stream, FIFF_SSS_FRAME, t_pTag))
+            goto bad;
+        s->coord_frame = *t_pTag->toInt();
+
+        if (!node->find_tag(stream, FIFF_SSS_ORIGIN, t_pTag))
+            goto bad;
+        r0 = t_pTag->toFloat();
+        VEC_COPY(s->origin,r0);
+
+        if (!node->find_tag(stream, FIFF_SSS_ORD_IN, t_pTag))
+            goto bad;
+        s->in_order = *t_pTag->toInt();
+
+        if (!node->find_tag(stream, FIFF_SSS_ORD_OUT, t_pTag))
+            goto bad;
+        s->out_order = *t_pTag->toInt();
+
+        if (!node->find_tag(stream, FIFF_SSS_NMAG, t_pTag))
+            goto bad;
+        s->nchan = *t_pTag->toInt();
+
+        if (!node->find_tag(stream, FIFF_SSS_COMPONENTS, t_pTag))
+            goto bad;
+        qDebug() << "ToDo: Check whether comp_info contains the right stuff!!! - use VectorXi instead";
+        s->comp_info = t_pTag->toInt();
+        s->ncomp     = t_pTag->size()/sizeof(fiff_int_t);
+
+        if (s->ncomp != (s->in_order*(2+s->in_order) + s->out_order*(2+s->out_order))) {
+            printf("Number of SSS components does not match the expansion orders listed in the file");
+            goto bad;
+        }
+        /*
+            * Count the components in use
+            */
+        for (j = 0, n = 3, p = 0; j < s->in_order; j++, n = n + 2) {
+            for (q = 0; q < n; q++, p++)
+                if (s->comp_info[p])
+                    s->in_nuse++;
+        }
+        for (j = 0, n = 3; j < s->out_order; j++, n = n + 2) {
+            for (q = 0; q < n; q++, p++)
+                s->out_nuse++;
+        }
+    }
+    /*
+        * There it is!
+        */
+    return s;
+
+bad : {
+        /*
+            * Not entirely happy
+            */
+        if (s)
+            delete s;
+        return NULL;
+    }
 }
 
 
