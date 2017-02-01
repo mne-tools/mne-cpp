@@ -72,23 +72,23 @@ SOURCES += \
         epidetect.cpp \
         FormFiles/epidetectsetupwidget.cpp \
         FormFiles/epidetectaboutwidget.cpp \
-    FormFiles/epidetectwidget.cpp \
-    calcMetric.cpp \
-    fuzzyMembership.cpp
+        FormFiles/epidetectwidget.cpp \
+        calcMetric.cpp \
+        fuzzyMembership.cpp
 
 HEADERS += \
         epidetect.h\
         epidetect_global.h \
         FormFiles/epidetectsetupwidget.h \
         FormFiles/epidetectaboutwidget.h \
-    FormFiles/epidetectwidget.h \
-    calcMetric.h \
-    fuzzyMembership.h
+        FormFiles/epidetectwidget.h \
+        calcMetric.h \
+        fuzzyMembership.h
 
 FORMS += \
         FormFiles/epidetectsetup.ui \
         FormFiles/epidetectabout.ui \
-    FormFiles/epidetecttoolbarwidget.ui
+        FormFiles/epidetecttoolbarwidget.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

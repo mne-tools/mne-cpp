@@ -178,7 +178,7 @@ public:
     */
     Eigen::MatrixXd getFuzzyEnHistory();
 
-    bool                                    historyReady;               /**< True if m_dvecFuzzyEnHistory has no undefined values.*/
+    bool                                    m_bHistoryReady;            /**< True if m_dvecFuzzyEnHistory has no undefined values.*/
     int                                     m_iListLength;              /**< Number of values inside the history matrices for each channel.*/
     int                                     m_iFuzzyEnStep;             /**< Number of channels which are skipped after every calculation of FuzzyEn.*/
 
@@ -196,11 +196,11 @@ private:
 
     int                                     m_iFuzzyEnStart;            /**< FuzzyEn calculation begins at this position.*/
 
-    bool                                    setNewP2P;                  /**< True if there is a new P2P value to be stored inside m_dmatP2PHistory.*/
-    bool                                    setNewKurtosis;             /**< True if there is a new Kurtosis value to be stored inside m_dmatKurtosisHistory.*/
-    bool                                    setNewFuzzyEn;              /**< True if there is a new FuzzyEn value to be stored inside m_dmatFuzzyEnHistory.*/
+    bool                                    m_bSetNewP2P;               /**< True if there is a new P2P value to be stored inside m_dmatP2PHistory.*/
+    bool                                    m_bSetNewKurtosis;          /**< True if there is a new Kurtosis value to be stored inside m_dmatKurtosisHistory.*/
+    bool                                    m_bSetNewFuzzyEn;           /**< True if there is a new FuzzyEn value to be stored inside m_dmatFuzzyEnHistory.*/
 
-    QList<int>                              fuzzyEnUsedChs;             /**< List containing the indizes for all the channels for which FuzzyEn has been calculated.*/
+    QList<int>                              m_lFuzzyEnUsedChs;          /**< List containing the indizes for all the channels for which FuzzyEn has been calculated.*/
 
     Eigen::VectorXd                         m_dvecP2P;                  /**< Contains the current peak-to-peak magnitude value for each channel.*/
     Eigen::VectorXd                         m_dvecKurtosis;             /**< Contains the current Kurtosis value for each channel.*/
@@ -212,7 +212,6 @@ private:
 
     Eigen::VectorXd                         m_dvecStdDev;               /**< Contains the standard deviation for each channel.*/
     Eigen::VectorXd                         m_dvecMean;                 /**< Contains the mean value for each channel.*/
-
 };
 
 

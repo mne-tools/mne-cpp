@@ -89,8 +89,6 @@ public:
     ~EpidetectWidget();
     EpidetectWidget(int dimOld, double rOld, int nOld, double marginOld, double threshold1Old, double threshold2Old, int listLengthOld, int fuzzyStepOld, int chWheightOld, QWidget *parent = 0);
 
-
-
     double      m_dRVal;                  /**< Holds the r value inside the GUI. */
     double      m_dMarginVal;             /**< Holds the margin value inside the GUI. */
     double      m_dThreshold1Val;         /**< Holds the threshold1 value inside the GUI. */

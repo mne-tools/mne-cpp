@@ -58,7 +58,6 @@ EpidetectWidget::EpidetectWidget(QWidget *parent)
 : QWidget(parent)
 , ui(new Ui::EpidetectToolbarWidget)
 {
-    //EpidetectWidget(2, 0.3, 2, 1.2, 0.3, 10, 10, 0, 2);
 
 }
 
