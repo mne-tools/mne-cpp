@@ -75,13 +75,15 @@ public:
 
 private slots:
     void initTestCase();
-    void compareFit();
+    void dipoleFitSimple();
+    void dipoleFitAdvanced();
     void cleanupTestCase();
 
 private:
+    void compareFit();
+
     double epsilon;
 
-    DipoleFitSettings m_settings;
     ECDSet m_ECDSet;
     ECDSet m_refECDSet;
 };
@@ -99,16 +101,16 @@ TestDipoleFit::TestDipoleFit()
 
 void TestDipoleFit::initTestCase()
 {
-    //*********************************************************************************************************
-    // Load reference Dipole Set
-    //*********************************************************************************************************
 
-    printf(">>>>>>>>>>>>>>>>>>>>>>>>> Load Dipole Fit Reference Set >>>>>>>>>>>>>>>>>>>>>>>>>\n");
+}
+
+
+//*************************************************************************************************************
+
+void TestDipoleFit::dipoleFitSimple()
+{
     QString refFileName(QDir::currentPath()+"/mne-cpp-test-data/Result/ref_dip_fit.dat");
-    m_refECDSet = ECDSet::read_dipoles_dip(refFileName);
-
-    printf("<<<<<<<<<<<<<<<<<<<<<<<<< Dipole Fit Reference Set Loaded <<<<<<<<<<<<<<<<<<<<<<<<<\n");
-
+    QFile testFile;
 
     //*********************************************************************************************************
     // Dipole Fit Settings
@@ -117,18 +119,20 @@ void TestDipoleFit::initTestCase()
     printf(">>>>>>>>>>>>>>>>>>>>>>>>> Dipole Fit Settings >>>>>>>>>>>>>>>>>>>>>>>>>\n");
 
     //Following is equivalent to: --meas ./mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif --set 1 --meg --eeg --tmin 32 --tmax 148 --bmin -100 --bmax 0 --dip ./mne-cpp-test-data/Result/dip_fit.dat
-    m_settings.measname = QDir::currentPath()+"/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif";
-    m_settings.is_raw = false;
-    m_settings.setno = 1;
-    m_settings.include_meg = true;
-    m_settings.include_eeg = true;
-    m_settings.tmin = 32.0f/1000.0f;
-    m_settings.tmax = 148.0f/1000.0f;
-    m_settings.bmin = -100.0f/1000.0f;
-    m_settings.bmax = 0.0f/1000.0f;
-    m_settings.dipname = QDir::currentPath()+"/mne-cpp-test-data/Result/dip_fit.dat";
+    DipoleFitSettings settings;
+    testFile.setFileName(QDir::currentPath()+"/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif"); QVERIFY( testFile.exists() );
+    settings.measname = testFile.fileName();
+    settings.is_raw = false;
+    settings.setno = 1;
+    settings.include_meg = true;
+    settings.include_eeg = true;
+    settings.tmin = 32.0f/1000.0f;
+    settings.tmax = 148.0f/1000.0f;
+    settings.bmin = -100.0f/1000.0f;
+    settings.bmax = 0.0f/1000.0f;
+    settings.dipname = QDir::currentPath()+"/mne-cpp-test-data/Result/dip_fit.dat";
 
-    m_settings.checkIntegrity();
+    settings.checkIntegrity();
 
     printf("<<<<<<<<<<<<<<<<<<<<<<<<< Dipole Fit Settings Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
 
@@ -139,7 +143,7 @@ void TestDipoleFit::initTestCase()
 
     printf(">>>>>>>>>>>>>>>>>>>>>>>>> Compute Dipole Fit >>>>>>>>>>>>>>>>>>>>>>>>>\n");
 
-    DipoleFit dipFit(&m_settings);
+    DipoleFit dipFit(&settings);
     ECDSet set = dipFit.calculateFit();
 
     printf("<<<<<<<<<<<<<<<<<<<<<<<<< Compute Dipole Fit Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
@@ -151,11 +155,122 @@ void TestDipoleFit::initTestCase()
 
     printf(">>>>>>>>>>>>>>>>>>>>>>>>> Write Read Dipole Fit >>>>>>>>>>>>>>>>>>>>>>>>>\n");
 
-    set.save_dipoles_dip(m_settings.dipname);
-    m_ECDSet = ECDSet::read_dipoles_dip(m_settings.dipname);
+    set.save_dipoles_dip(settings.dipname);
+    m_ECDSet = ECDSet::read_dipoles_dip(settings.dipname);
 
     printf("<<<<<<<<<<<<<<<<<<<<<<<<< Write Read Dipole Fit Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
 
+
+    //*********************************************************************************************************
+    // Load reference Dipole Set
+    //*********************************************************************************************************
+
+    printf(">>>>>>>>>>>>>>>>>>>>>>>>> Load Dipole Fit Reference Set >>>>>>>>>>>>>>>>>>>>>>>>>\n");
+    m_refECDSet = ECDSet::read_dipoles_dip(refFileName);
+
+    printf("<<<<<<<<<<<<<<<<<<<<<<<<< Dipole Fit Reference Set Loaded <<<<<<<<<<<<<<<<<<<<<<<<<\n");
+
+
+    //*********************************************************************************************************
+    // Compare Fit
+    //*********************************************************************************************************
+
+    compareFit();
+}
+
+
+//*************************************************************************************************************
+
+void TestDipoleFit::dipoleFitAdvanced()
+{
+    QString refFileName(QDir::currentPath()+"/mne-cpp-test-data/Result/ref_dip-5120-bem-result.dat");
+    QFile testFile;
+
+    //*********************************************************************************************************
+    // Dipole Fit Settings
+    //*********************************************************************************************************
+
+    printf(">>>>>>>>>>>>>>>>>>>>>>>>> Dipole Fit Settings >>>>>>>>>>>>>>>>>>>>>>>>>\n");
+
+    //Following is equivalent to: --meas ./mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif --set 1 --noise ./mne-cpp-test-data/MEG/sample/sample_audvis-cov.fif --bem ./mne-cpp-test-data/subjects/sample/bem/sample-5120-bem.fif --mri ./mne-cpp-test-data/MEG/sample/all-trans.fif --meg --tmin 150 --tmax 250 --tstep 10 --dip ./mne-cpp-test-data/Result/dip-5120-bem-result_new.dat --mindist 0 --guessrad 100
+    DipoleFitSettings settings;
+
+    testFile.setFileName(QDir::currentPath()+"/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif"); QVERIFY( testFile.exists() );
+    settings.measname = testFile.fileName();
+
+    settings.is_raw = false;
+    settings.setno = 1;
+    settings.include_meg = true;
+    settings.include_eeg = false;
+    settings.tmin = 0.15f;
+    settings.tmax = 0.25f;
+    settings.tstep = 0.01f;
+
+    testFile.setFileName(QDir::currentPath()+"/mne-cpp-test-data/subjects/sample/bem/sample-5120-bem.fif"); QVERIFY( testFile.exists() );
+    settings.bemname = testFile.fileName();
+
+    settings.bmin = 1000000.0f;
+    settings.bmax = 1000000.0f;
+
+    testFile.setFileName(QDir::currentPath()+"/mne-cpp-test-data/Result/dip-5120-bem_fit.dat"); QVERIFY( testFile.exists() );
+    settings.dipname = testFile.fileName();
+
+    settings.guess_mindist = 0.0f;
+    settings.guess_rad = 0.1f;
+
+    testFile.setFileName(QDir::currentPath()+"/mne-cpp-test-data/MEG/sample/all-trans.fif"); QVERIFY( testFile.exists() );
+    settings.mriname = testFile.fileName();
+
+    testFile.setFileName(QDir::currentPath()+"/mne-cpp-test-data/MEG/sample/sample_audvis-cov.fif"); QVERIFY( testFile.exists() );
+    settings.noisename = testFile.fileName();
+
+    testFile.setFileName(QDir::currentPath()+"/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif"); QVERIFY( testFile.exists() );
+    settings.projnames.append(testFile.fileName());
+
+    settings.checkIntegrity();
+
+    printf("<<<<<<<<<<<<<<<<<<<<<<<<< Dipole Fit Settings Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
+
+
+    //*********************************************************************************************************
+    // Compute Dipole Fit
+    //*********************************************************************************************************
+
+    printf(">>>>>>>>>>>>>>>>>>>>>>>>> Compute Dipole Fit >>>>>>>>>>>>>>>>>>>>>>>>>\n");
+
+    DipoleFit dipFit(&settings);
+    ECDSet set = dipFit.calculateFit();
+
+    printf("<<<<<<<<<<<<<<<<<<<<<<<<< Compute Dipole Fit Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
+
+
+    //*********************************************************************************************************
+    // Write Read Dipole Fit
+    //*********************************************************************************************************
+
+    printf(">>>>>>>>>>>>>>>>>>>>>>>>> Write Read Dipole Fit >>>>>>>>>>>>>>>>>>>>>>>>>\n");
+
+    set.save_dipoles_dip(settings.dipname);
+    m_ECDSet = ECDSet::read_dipoles_dip(settings.dipname);
+
+    printf("<<<<<<<<<<<<<<<<<<<<<<<<< Write Read Dipole Fit Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
+
+
+    //*********************************************************************************************************
+    // Load reference Dipole Set
+    //*********************************************************************************************************
+
+    printf(">>>>>>>>>>>>>>>>>>>>>>>>> Load Dipole Fit Reference Set >>>>>>>>>>>>>>>>>>>>>>>>>\n");
+    m_refECDSet = ECDSet::read_dipoles_dip(refFileName);
+
+    printf("<<<<<<<<<<<<<<<<<<<<<<<<< Dipole Fit Reference Set Loaded <<<<<<<<<<<<<<<<<<<<<<<<<\n");
+
+
+    //*********************************************************************************************************
+    // Compare Fit
+    //*********************************************************************************************************
+
+    compareFit();
 }
 
 

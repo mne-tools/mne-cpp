@@ -9,9 +9,12 @@
 
 #include "ecd_set.h"
 #include "mne_sss_data.h"
+#include "mne_meas_data_set.h"
+#include "mne_deriv.h"
+#include "mne_deriv_set.h"
+#include "mne_surface_or_volume.h"
 #include <iostream>
 #include <vector>
-#include <Eigen/Core>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -20,6 +23,9 @@
 
 #include <fiff/fiff_constants.h>
 #include <fiff/fiff_file.h>
+#include <fiff/fiff_stream.h>
+#include <fiff/fiff_tag.h>
+#include <fiff/fiff_types.h>
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -27,7 +33,9 @@
 
 #include <time.h>
 
+#include <Eigen/Core>
 #include <Eigen/Dense>
+#include <Eigen/Eigenvalues>
 #include <unsupported/Eigen/FFT>
 
 
@@ -155,13 +163,6 @@ using namespace FIFFLIB;
 
 
 
-//============================= mne_fiff.h =============================
-
-#define FIFF_MNE_SOURCE_SPACE_NNEIGHBORS    3594    /* Number of neighbors for each source space point (used for volume source spaces) */
-#define FIFF_MNE_SOURCE_SPACE_NEIGHBORS     3595    /* Neighbors for each source space point (used for volume source spaces) */
-
-#define FIFFV_MNE_COORD_SURFACE_RAS   FIFFV_COORD_MRI    /* The surface RAS coordinates */
-
 
 //============================= ctf_types.h =============================
 
@@ -190,61 +191,6 @@ using namespace FIFFLIB;
 #define ALLOC_ICMATRIX(x,y) mne_imatrix((x),(y))
 #define FREE_ICMATRIX(m) mne_free_icmatrix((m))
 #define ICMATRIX ALLOC_ICMATRIX
-
-
-
-//============================= Refactoring helpers =============================
-
-//float
-Eigen::MatrixXf toFloatEigenMatrix(float **mat, const int m, const int n)
-{
-    Eigen::MatrixXf eigen_mat(m,n);
-
-    for ( int i = 0; i < m; ++i)
-        for ( int j = 0; j < n; ++j)
-            eigen_mat(i,j) = mat[i][j];
-
-    return eigen_mat;
-}
-
-void fromFloatEigenMatrix(const Eigen::MatrixXf& from_mat, float **to_mat, const int m, const int n)
-{
-    for ( int i = 0; i < m; ++i)
-        for ( int j = 0; j < n; ++j)
-            to_mat[i][j] = from_mat(i,j);
-}
-
-void fromFloatEigenMatrix(const Eigen::MatrixXf& from_mat, float **to_mat)
-{
-    fromFloatEigenMatrix(from_mat, to_mat, from_mat.rows(), from_mat.cols());
-}
-
-
-void fromFloatEigenVector(const Eigen::VectorXf& from_vec, float *to_vec, const int n)
-{
-    for ( int i = 0; i < n; ++i)
-        to_vec[i] = from_vec[i];
-}
-
-void fromFloatEigenVector(const Eigen::VectorXf& from_vec, float *to_vec)
-{
-    fromFloatEigenVector(from_vec, to_vec, from_vec.size());
-}
-
-
-
-//double
-//Eigen::MatrixXd toDoubleEigenMatrix(double **mat, const int m, const int n)
-//{
-//    Eigen::MatrixXd eigen_mat(m,n);
-
-//    for ( int i = 0; i < m; ++i)
-//        for ( int j = 0; j < n; ++j)
-//            eigen_mat(i,j) = mat[i][j];
-
-//    return eigen_mat;
-//}
-
 
 
 //============================= mne_allocs.h =============================
@@ -371,12 +317,68 @@ void mne_free_dcmatrix (double **m)
 #define FREE_CMATRIX(m) mne_free_cmatrix((m))
 
 
+//============================= Refactoring helpers =============================
+
+//float
+Eigen::MatrixXf toFloatEigenMatrix(float **mat, const int m, const int n)
+{
+    Eigen::MatrixXf eigen_mat(m,n);
+
+    for ( int i = 0; i < m; ++i)
+        for ( int j = 0; j < n; ++j)
+            eigen_mat(i,j) = mat[i][j];
+
+    return eigen_mat;
+}
+
+void fromFloatEigenMatrix(const Eigen::MatrixXf& from_mat, float **& to_mat, const int m, const int n)
+{
+    for ( int i = 0; i < m; ++i)
+        for ( int j = 0; j < n; ++j)
+            to_mat[i][j] = from_mat(i,j);
+}
+
+void fromFloatEigenMatrix(const Eigen::MatrixXf& from_mat, float **& to_mat)
+{
+    fromFloatEigenMatrix(from_mat, to_mat, from_mat.rows(), from_mat.cols());
+}
+
+
+void fromFloatEigenVector(const Eigen::VectorXf& from_vec, float *&to_vec, const int n)
+{
+    if(to_vec == NULL) {
+        to_vec = ALLOC_FLOAT(n);
+    }
+
+    for ( int i = 0; i < n; ++i)
+        to_vec[i] = from_vec[i];
+}
+
+void fromFloatEigenVector(const Eigen::VectorXf& from_vec, float *&to_vec)
+{
+    fromFloatEigenVector(from_vec, to_vec, from_vec.size());
+}
+
+
+//int
+
+void fromIntEigenMatrix(const Eigen::MatrixXi& from_mat, int **&to_mat, const int m, const int n)
+{
+    for ( int i = 0; i < m; ++i)
+        for ( int j = 0; j < n; ++j)
+            to_mat[i][j] = from_mat(i,j);
+}
+
+void fromIntEigenMatrix(const Eigen::MatrixXi& from_mat, int **&to_mat)
+{
+    fromIntEigenMatrix(from_mat, to_mat, from_mat.rows(), from_mat.cols());
+}
+
+
+
 #include <fiff/fiff_types.h>
 #include "mne_types.h"
 #include "analyze_types.h"
-
-
-
 
 
 //============================= data.c =============================
@@ -403,10 +405,6 @@ int is_selected_in_data(mshMegEegData d, char *ch_name)
         }
     return issel;
 }
-
-
-
-
 
 
 //============================= mne_matop.c =============================
@@ -497,7 +495,6 @@ void mne_add_scaled_vector_to(float *v1,float scale, float *v2,int nn)
 #endif
     return;
 }
-
 
 
 void mne_mat_vec_mult2 (float **m,float *v,float *result, int d1,int d2)
@@ -641,1274 +638,7 @@ double **mne_dmatt_dmat_mult2 (double **m1,double **m2, int d1,int d2,int d3)
 }
 
 
-
-
-//============================= fiff_type_spec.h =============================
-
-/*
- * These return information about a fiff type.
- */
-
-fiff_int_t fiff_type_base(fiff_int_t type)
-{
-    return type & FIFFTS_BASE_MASK;
-}
-
-
-fiff_int_t fiff_type_fundamental(fiff_int_t type)
-{
-    return type & FIFFTS_FS_MASK;
-}
-
-
-fiff_int_t fiff_type_matrix_coding(fiff_int_t type)
-{
-    return type & FIFFTS_MC_MASK;
-}
-
-
-
-
-//============================= fiff_combat.c =============================
-
-static short swap_short (fiff_short_t source)
-
-{
-    unsigned char *csource = (unsigned char *)(&source);
-    fiff_short_t result;
-    unsigned char *cresult =  (unsigned char *)(&result);
-
-    cresult[0] = csource[1];
-    cresult[1] = csource[0];
-    return (result);
-}
-
-
-static fiff_int_t swap_int (fiff_int_t source)
-
-{
-    unsigned char *csource =  (unsigned char *)(&source);
-    fiff_int_t result;
-    unsigned char *cresult =  (unsigned char *)(&result);
-
-    cresult[0] = csource[3];
-    cresult[1] = csource[2];
-    cresult[2] = csource[1];
-    cresult[3] = csource[0];
-    return (result);
-}
-
-static fiff_long_t swap_long (fiff_long_t source)
-
-{
-    unsigned char *csource =  (unsigned char *)(&source);
-    fiff_long_t    result;
-    unsigned char *cresult =  (unsigned char *)(&result);
-
-    cresult[0] = csource[7];
-    cresult[1] = csource[6];
-    cresult[2] = csource[5];
-    cresult[3] = csource[4];
-    cresult[4] = csource[3];
-    cresult[5] = csource[2];
-    cresult[6] = csource[1];
-    cresult[7] = csource[0];
-    return (result);
-}
-
-static void swap_longp (fiff_long_t *source)
-
-{
-    unsigned char *csource =  (unsigned char *)(source);
-    unsigned char c;
-
-    c = csource[0];
-    csource[0] = csource[7];
-    csource[7] = c;
-
-    c = csource[1];
-    csource[1] = csource[6];
-    csource[6] = c;
-
-    c = csource[2];
-    csource[2] = csource[5];
-    csource[5] = c;
-
-    c = csource[3];
-    csource[3] = csource[4];
-    csource[4] = c;
-
-    return;
-}
-
-static void swap_intp (fiff_int_t *source)
-
-{
-    unsigned char *csource =  (unsigned char *)(source);
-
-    unsigned char c;
-
-    c = csource[3];
-    csource[3] = csource[0];
-    csource[0] = c;
-    c = csource[2];
-    csource[2] = csource[1];
-    csource[1] = c;
-
-    return;
-}
-
-
-static void swap_floatp (float *source)
-
-{
-    unsigned char *csource =  (unsigned char *)(source);
-    unsigned char c;
-
-    c = csource[3];
-    csource[3] = csource[0];
-    csource[0] = c;
-    c = csource[2];
-    csource[2] = csource[1];
-    csource[1] = c;
-
-    return;
-}
-
-static void swap_doublep(double *source)
-
-{
-    unsigned char *csource =  (unsigned char *)(source);
-    unsigned char c;
-
-    c = csource[7];
-    csource[7] = csource[0];
-    csource[0] = c;
-
-    c = csource[6];
-    csource[6] = csource[1];
-    csource[1] = c;
-
-    c = csource[5];
-    csource[5] = csource[2];
-    csource[2] = c;
-
-    c = csource[4];
-    csource[4] = csource[3];
-    csource[3] = c;
-
-    return;
-}
-
-
-static void convert_ch_pos(fiffChPos pos)
-
-{
-    int k;
-    pos->coil_type  = swap_int(pos->coil_type);
-    for (k = 0; k < 3; k++) {
-        swap_floatp(&pos->r0[k]);
-        swap_floatp(&pos->ex[k]);
-        swap_floatp(&pos->ey[k]);
-        swap_floatp(&pos->ez[k]);
-    }
-    return;
-}
-
-
-
-
-
-/*! Machine dependent data type conversions (tag info only)
- */
-
-void fiff_convert_tag_info(fiffTag tag)
-
-{
-    tag->kind = swap_int(tag->kind);
-    tag->type = swap_int(tag->type);
-    tag->size = swap_int(tag->size);
-    tag->next = swap_int(tag->next);
-    return;
-}
-
-
-
-
-static void convert_matrix_from_file_data(fiffTag tag)
-/*
- * Assumes that the input is in the non-native byte order and needs to be swapped to the other one
- */
-{
-    int ndim;
-    int k;
-    int *dimp,*data,kind,np,nz;
-    float *fdata;
-    double *ddata;
-    unsigned int tsize = tag->size;
-
-    if (fiff_type_fundamental(tag->type) != FIFFTS_FS_MATRIX)
-        return;
-    if (tag->data == NULL)
-        return;
-    if (tsize < sizeof(fiff_int_t))
-        return;
-
-    dimp = ((fiff_int_t *)(((char *)tag->data)+tag->size-sizeof(fiff_int_t)));
-    swap_intp(dimp);
-    ndim = *dimp;
-    if (fiff_type_matrix_coding(tag->type) == FIFFTS_MC_DENSE) {
-        if (tsize < (ndim+1)*sizeof(fiff_int_t))
-            return;
-        dimp = dimp - ndim;
-        for (k = 0, np = 1; k < ndim; k++) {
-            swap_intp(dimp+k);
-            np = np*dimp[k];
-        }
-    }
-    else {
-        if (tsize < (ndim+2)*sizeof(fiff_int_t))
-            return;
-        if (ndim > 2)		/* Not quite sure what to do */
-            return;
-        dimp = dimp - ndim - 1;
-        for (k = 0; k < ndim+1; k++)
-            swap_intp(dimp+k);
-        nz = dimp[0];
-        if (fiff_type_matrix_coding(tag->type) == FIFFTS_MC_CCS)
-            np = nz + dimp[2] + 1; /* nz + n + 1 */
-        else if (fiff_type_matrix_coding(tag->type) == FIFFTS_MC_RCS)
-            np = nz + dimp[1] + 1; /* nz + m + 1 */
-        else
-            return;			/* Don't know what to do */
-        /*
-     * Take care of the indices
-     */
-        for (data = (int *)(tag->data)+nz, k = 0; k < np; k++)
-            swap_intp(data+k);
-        np = nz;
-    }
-    /*
-   * Now convert data...
-   */
-    kind = fiff_type_base(tag->type);
-    if (kind == FIFFT_INT) {
-        for (data = (int *)(tag->data), k = 0; k < np; k++)
-            swap_intp(data+k);
-    }
-    else if (kind == FIFFT_FLOAT) {
-        for (fdata = (float *)(tag->data), k = 0; k < np; k++)
-            swap_floatp(fdata+k);
-    }
-    else if (kind == FIFFT_DOUBLE) {
-        for (ddata = (double *)(tag->data), k = 0; k < np; k++)
-            swap_doublep(ddata+k);
-    }
-    return;
-}
-
-
-static void convert_matrix_to_file_data(fiffTag tag)
-/*
- * Assumes that the input is in the NATIVE_ENDIAN byte order and needs to be swapped to the other one
- */
-{
-    int ndim;
-    int k;
-    int *dimp,*data,kind,np;
-    float *fdata;
-    double *ddata;
-    unsigned int tsize = tag->size;
-
-    if (fiff_type_fundamental(tag->type) != FIFFTS_FS_MATRIX)
-        return;
-    if (tag->data == NULL)
-        return;
-    if (tsize < sizeof(fiff_int_t))
-        return;
-
-    dimp = ((fiff_int_t *)(((char *)tag->data)+tag->size-sizeof(fiff_int_t)));
-    ndim = *dimp;
-    swap_intp(dimp);
-
-    if (fiff_type_matrix_coding(tag->type) == FIFFTS_MC_DENSE) {
-        if (tsize < (ndim+1)*sizeof(fiff_int_t))
-            return;
-        dimp = dimp - ndim;
-        for (k = 0, np = 1; k < ndim; k++) {
-            np = np*dimp[k];
-            swap_intp(dimp+k);
-        }
-    }
-    else {
-        if (tsize < (ndim+2)*sizeof(fiff_int_t))
-            return;
-        if (ndim > 2)		/* Not quite sure what to do */
-            return;
-        dimp = dimp - ndim - 1;
-        if (fiff_type_matrix_coding(tag->type) == FIFFTS_MC_CCS)
-            np = dimp[0] + dimp[2] + 1; /* nz + n + 1 */
-        else if (fiff_type_matrix_coding(tag->type) == FIFFTS_MC_RCS)
-            np = dimp[0] + dimp[1] + 1; /* nz + m + 1 */
-        else
-            return;			/* Don't know what to do */
-        for (k = 0; k < ndim+1; k++)
-            swap_intp(dimp+k);
-    }
-    /*
-   * Now convert data...
-   */
-    kind = fiff_type_base(tag->type);
-    if (kind == FIFFT_INT) {
-        for (data = (int *)(tag->data), k = 0; k < np; k++)
-            swap_intp(data+k);
-    }
-    else if (kind == FIFFT_FLOAT) {
-        for (fdata = (float *)(tag->data), k = 0; k < np; k++)
-            swap_floatp(fdata+k);
-    }
-    else if (kind == FIFFT_DOUBLE) {
-        for (ddata = (double *)(tag->data), k = 0; k < np; k++)
-            swap_doublep(ddata+k);
-    }
-    else if (kind == FIFFT_COMPLEX_FLOAT) {
-        for (fdata = (float *)(tag->data), k = 0; k < 2*np; k++)
-            swap_floatp(fdata+k);
-    }
-    else if (kind == FIFFT_COMPLEX_DOUBLE) {
-        for (ddata = (double *)(tag->data), k = 0; k < 2*np; k++)
-            swap_doublep(ddata+k);
-    }
-    return;
-}
-
-
-/*
- * Data type conversions for the little endian systems.
- */
-
-/*! Machine dependent data type conversions (tag info only)
- *
- * from_endian defines the byte order of the input
- * to_endian   defines the byte order of the output
- *
- * Either of these may be specified as FIFFV_LITTLE_ENDIAN, FIFFV_BIG_ENDIAN, or FIFFV_NATIVE_ENDIAN.
- * The last choice means that the native byte order value will be substituted here before proceeding
- */
-
-void fiff_convert_tag_data(fiffTag tag, int from_endian, int to_endian)
-
-{
-    int            np;
-    int            k,r,c;
-    fiff_int_t     *ithis;
-    fiff_short_t   *sthis;
-    fiff_long_t    *lthis;
-    float          *fthis;
-    double         *dthis;
-    fiffDirEntry   dethis;
-    fiffId         idthis;
-    fiffChInfo     chthis;
-    fiffChPos      cpthis;
-    fiffCoordTrans ctthis;
-    fiffDigPoint   dpthis;
-    fiffDataRef    drthis;
-
-    if (tag->data == NULL || tag->size == 0)
-        return;
-
-    if (from_endian == FIFFV_NATIVE_ENDIAN)
-        from_endian = NATIVE_ENDIAN;
-    if (to_endian == FIFFV_NATIVE_ENDIAN)
-        to_endian = NATIVE_ENDIAN;
-
-    if (from_endian == to_endian)
-        return;
-
-    if (fiff_type_fundamental(tag->type) == FIFFTS_FS_MATRIX) {
-        if (from_endian == NATIVE_ENDIAN)
-            convert_matrix_to_file_data(tag);
-        else
-            convert_matrix_from_file_data(tag);
-        return;
-    }
-
-    switch (tag->type) {
-
-    case FIFFT_INT :
-    case FIFFT_JULIAN :
-    case FIFFT_UINT :
-        np = tag->size/sizeof(fiff_int_t);
-        for (ithis = (fiff_int_t *)tag->data, k = 0; k < np; k++, ithis++)
-            swap_intp(ithis);
-        break;
-
-    case FIFFT_LONG :
-    case FIFFT_ULONG :
-        np = tag->size/sizeof(fiff_long_t);
-        for (lthis = (fiff_long_t *)tag->data, k = 0; k < np; k++, lthis++)
-            swap_longp(lthis);
-        break;
-
-    case FIFFT_SHORT :
-    case FIFFT_DAU_PACK16 :
-    case FIFFT_USHORT :
-        np = tag->size/sizeof(fiff_short_t);
-        for (sthis = (fiff_short_t *)tag->data, k = 0; k < np; k++, sthis++)
-            *sthis = swap_short(*sthis);
-        break;
-
-    case FIFFT_FLOAT :
-    case FIFFT_COMPLEX_FLOAT :
-        np = tag->size/sizeof(fiff_float_t);
-        for (fthis = (fiff_float_t *)tag->data, k = 0; k < np; k++, fthis++)
-            swap_floatp(fthis);
-        break;
-
-    case FIFFT_DOUBLE :
-    case FIFFT_COMPLEX_DOUBLE :
-        np = tag->size/sizeof(fiff_double_t);
-        for (dthis = (fiff_double_t *)tag->data, k = 0; k < np; k++, dthis++)
-            swap_doublep(dthis);
-        break;
-
-
-    case FIFFT_OLD_PACK :
-        fthis = (float *)tag->data;
-        /*
-     * Offset and scale...
-     */
-        swap_floatp(fthis+0);
-        swap_floatp(fthis+1);
-        sthis = (short *)(fthis+2);
-        np = (tag->size - 2*sizeof(float))/sizeof(short);
-        for (k = 0; k < np; k++,sthis++)
-            *sthis = swap_short(*sthis);
-        break;
-
-    case FIFFT_DIR_ENTRY_STRUCT :
-        np = tag->size/sizeof(fiffDirEntryRec);
-        for (dethis = (fiffDirEntry)tag->data, k = 0; k < np; k++, dethis++) {
-            dethis->kind = swap_int(dethis->kind);
-            dethis->type = swap_int(dethis->type);
-            dethis->size = swap_int(dethis->size);
-            dethis->pos  = swap_int(dethis->pos);
-        }
-        break;
-
-    case FIFFT_ID_STRUCT :
-        np = tag->size/sizeof(fiffIdRec);
-        for (idthis = (fiffId)tag->data, k = 0; k < np; k++, idthis++) {
-            idthis->version = swap_int(idthis->version);
-            idthis->machid[0] = swap_int(idthis->machid[0]);
-            idthis->machid[1] = swap_int(idthis->machid[1]);
-            idthis->time.secs  = swap_int(idthis->time.secs);
-            idthis->time.usecs = swap_int(idthis->time.usecs);
-        }
-        break;
-
-    case FIFFT_CH_INFO_STRUCT :
-        np = tag->size/sizeof(fiffChInfoRec);
-        for (chthis = (fiffChInfo)tag->data, k = 0; k < np; k++, chthis++) {
-            chthis->scanNo    = swap_int(chthis->scanNo);
-            chthis->logNo     = swap_int(chthis->logNo);
-            chthis->kind      = swap_int(chthis->kind);
-            swap_floatp(&chthis->range);
-            swap_floatp(&chthis->cal);
-            chthis->unit      = swap_int(chthis->unit);
-            chthis->unit_mul  = swap_int(chthis->unit_mul);
-            convert_ch_pos(&(chthis->chpos));
-        }
-        break;
-
-    case FIFFT_CH_POS_STRUCT :
-        np = tag->size/sizeof(fiffChPosRec);
-        for (cpthis = (fiffChPos)tag->data, k = 0; k < np; k++, cpthis++)
-            convert_ch_pos(cpthis);
-        break;
-
-    case FIFFT_DIG_POINT_STRUCT :
-        np = tag->size/sizeof(fiffDigPointRec);
-        for (dpthis = (fiffDigPoint)tag->data, k = 0; k < np; k++, dpthis++) {
-            dpthis->kind = swap_int(dpthis->kind);
-            dpthis->ident = swap_int(dpthis->ident);
-            for (r = 0; r < 3; r++)
-                swap_floatp(&dpthis->r[r]);
-        }
-        break;
-
-    case FIFFT_COORD_TRANS_STRUCT :
-        np = tag->size/sizeof(fiffCoordTransRec);
-        for (ctthis = (fiffCoordTrans)tag->data, k = 0; k < np; k++, ctthis++) {
-            ctthis->from = swap_int(ctthis->from);
-            ctthis->to   = swap_int(ctthis->to);
-            for (r = 0; r < 3; r++) {
-                swap_floatp(&ctthis->move[r]);
-                swap_floatp(&ctthis->invmove[r]);
-                for (c = 0; c < 3; c++) {
-                    swap_floatp(&ctthis->rot[r][c]);
-                    swap_floatp(&ctthis->invrot[r][c]);
-                }
-            }
-        }
-        break;
-
-    case FIFFT_DATA_REF_STRUCT :
-        np = tag->size/sizeof(fiffDataRefRec);
-        for (drthis = (fiffDataRef)tag->data, k = 0; k < np; k++, drthis++) {
-            drthis->type   = swap_int(drthis->type);
-            drthis->endian = swap_int(drthis->endian);
-            drthis->size   = swap_long(drthis->size);
-            drthis->offset = swap_long(drthis->offset);
-        }
-        break;
-
-    default :
-        break;
-    }
-    return;
-}
-
-
-
-
-
-
-//============================= fiff_ext_data.c =============================
-
-
-void *fiff_ext_read_data(fiffFile    file,
-                         fiffDataRef ref)
-
-{
-    printf("external data : type = %d endian = %d size = %ld offset = %ld\n",
-           ref->type,ref->endian,(long)ref->size,(long)ref->offset);
-    qCritical("Cannot read external data yet");
-    return NULL;
-}
-
-
-
-//============================= fiff_io.c =============================
-
-
-typedef struct {		/* One channel is described here */
-    fiff_int_t scanNo;		/* Scanning order # */
-    fiff_int_t logNo;		/* Logical channel # */
-    fiff_int_t kind;		/* Kind of channel:
-                 * 1 = magnetic
-                 * 2 = electric
-                 * 3 = stimulus */
-    fiff_float_t range;		/* Voltmeter range (-1 = auto ranging) */
-    fiff_float_t cal;		/* Calibration from volts to... */
-    fiff_float_t loc[9];		/* Location for a magnetic channel */
-} oldChInfoRec,*oldChInfo;
-
-
-static void convert_loc (float oldloc[9], /*!< These are the old magic numbers */
-float r0[3],     /*!< Coil coordinate system origin */
-float *ex,       /*!< Coil coordinate system unit x-vector */
-float *ey,       /*!< Coil coordinate system unit y-vector */
-float *ez)       /*!< Coil coordinate system unit z-vector */
-/*
-      * Convert the traditional location
-      * information to new format...
-      */
-{
-    float len;
-    int j;
-    VEC_DIFF(oldloc+3,oldloc,ex);	/* From - coil to + coil */
-    len = VEC_LEN(ex);
-    for (j = 0; j < 3; j++) {
-        ex[j] = ex[j]/len;		/* Normalize ex */
-        ez[j] = oldloc[j+6];	/* ez along coil normal */
-    }
-    CROSS_PRODUCT(ez,ex,ey);	/* ey is defined by the other two */
-    len = VEC_LEN(ey);
-    for (j = 0; j < 3; j++) {
-        ey[j] = ey[j]/len;		/* Normalize ey */
-        r0[j] = (oldloc[j] + oldloc[j+3])/2.0;
-        /* Origin lies halfway between the coils */
-    }
-    return;
-}
-
-
-static void fix_ch_info (fiffTag tag)
-/*
-      * Fiddle around a little bit...
-      */
-{
-    fiff_ch_info_t *ch;
-    fiff_byte_t *help;
-    oldChInfo old;
-    fiff_ch_pos_t  *pos;
-
-    if (tag->type == FIFFT_CH_INFO_STRUCT) {
-        if (tag->size < (int)sizeof(fiff_ch_info_t)) { /* Old structure */
-            help = (fiff_byte_t *)malloc(sizeof(fiff_ch_info_t));
-            old = (oldChInfo)tag->data;
-            tag->data = (fiff_data_t*) help;
-            ch = (fiff_ch_info_t *)(tag->data);
-            pos = &(ch->chpos);
-            /*
-       * Set up the new structure
-       */
-            ch->scanNo = old->scanNo;
-            ch->logNo  = old->logNo;
-            ch->kind   = old->kind;
-            ch->range  = old->range;
-            ch->cal    = old->cal;
-            if (ch->kind == FIFFV_MAGN_CH) {
-                pos->coil_type = FIFFV_COIL_NM_122;
-                convert_loc (old->loc,pos->r0,pos->ex,pos->ey,pos->ez);
-                sprintf(ch->ch_name,"MEG %03d",ch->logNo % 1000);
-                ch->unit = FIFF_UNIT_T_M;
-            }
-            else if (ch->kind == FIFFV_EL_CH) {
-                pos->coil_type = FIFFV_COIL_EEG;
-                pos->r0[X] = old->loc[X];
-                pos->r0[Y] = old->loc[Y];
-                pos->r0[Z] = old->loc[Z];
-                sprintf(ch->ch_name,"EEG %03d",ch->logNo);
-                ch->unit = FIFF_UNIT_V;
-            }
-            else {
-                pos->coil_type = FIFFV_COIL_NONE;
-                sprintf(ch->ch_name,"STI %03d",ch->logNo);
-                ch->unit = FIFF_UNIT_V;
-            }
-            FREE(old);
-            ch->unit_mul = FIFF_UNITM_NONE;
-        }
-    }
-
-}
-
-int fiff_read_tag_info (FILE *in,fiffTag tag)
-/*
-      * Read next tag from file
-      * Do not read data
-      */
-{
-    long pos = ftell(in);
-
-    tag->data = NULL;
-    if (fread (tag,FIFFC_TAG_INFO_SIZE,1,in) != 1)
-        return (-1);
-    fiff_convert_tag_info(tag);
-    if (tag->next > 0) {
-        if (fseek(in,tag->next,SEEK_SET) == -1) {
-            qCritical ("fseek");
-            pos = -1;
-        }
-    }
-    else if (tag->size > 0 && tag->next == 0)
-        if (fseek(in,tag->size,SEEK_CUR) == -1) {
-            qCritical ("fseek");
-            pos = -1;
-        }
-    return (pos);
-}
-
-int fiff_read_tag (FILE  *in,
-                   fiffTag tag)	/* Note: data member must be initialized
-                 * to NULL on first call.
-                 * This routine automatically reallocs
-                 * the needed space */
-/*
-      * Read next tag including its data from file
-      */
-{
-    long pos = ftell(in);
-
-    if (fread (tag,FIFFC_TAG_INFO_SIZE,1,in) != 1) {
-        qCritical("Failed to read tag info (pos = %d)",pos);
-        return (-1);
-    }
-    fiff_convert_tag_info(tag);
-    if (tag->size > 0) {
-        if (tag->data == NULL)
-            tag->data = (fiff_data_t*)malloc(tag->size + ((tag->type == FIFFT_STRING) ? 1 : 0));
-        else
-            tag->data = (fiff_data_t*)realloc(tag->data,tag->size +
-                                              ((tag->type == FIFFT_STRING) ? 1 : 0));
-        if (tag->data == NULL) {
-            qCritical("fiff_read_tag: memory allocation failed.");
-            return -1;
-        }
-        if (fread (tag->data,tag->size,1,in) != 1) {
-            qCritical("Failed to read tag data (pos = %d kind = %d size = %d)",pos,tag->kind,tag->size);
-            return(-1);
-        }
-        if (tag->type == FIFFT_STRING)  /* Null-terminated strings */
-            ((char *)tag->data)[tag->size] = '\0';
-        else if (tag->type == FIFFT_CH_INFO_STRUCT)
-            fix_ch_info (tag);
-    }
-    if (tag->next > 0)
-        if (fseek(in,tag->next,SEEK_SET) == -1) {
-            qCritical ("fseek");
-            pos = -1;
-        }
-    fiff_convert_tag_data(tag,FIFFV_BIG_ENDIAN,FIFFV_NATIVE_ENDIAN);
-    return (pos);
-}
-
-
-
-
-int fiff_read_tag_ext (fiffFile file,
-                       fiffTag  tag)	/* Note: data member must be initialized
-                     * to NULL on first call.
-                     * This routine automatically reallocs
-                     * the needed space */
-/*
-      * Read next tag including its data from file
-      */
-{
-    long pos = ftell(file->fd);
-
-    if (fread (tag,FIFFC_TAG_INFO_SIZE,1,file->fd) != 1) {
-        printf("Failed to read tag info (pos = %d)",pos);
-        return (-1);
-    }
-    fiff_convert_tag_info(tag);
-    if (tag->size > 0) {
-        if (tag->data == NULL)
-            tag->data = (fiff_data_t *)malloc(tag->size + ((tag->type == FIFFT_STRING) ? 1 : 0));
-        else
-            tag->data = (fiff_data_t *)realloc(tag->data,tag->size + ((tag->type == FIFFT_STRING) ? 1 : 0));
-        if (tag->data == NULL) {
-            qCritical("fiff_read_tag: memory allocation failed.");
-            return -1;
-        }
-        if (fread (tag->data,tag->size,1,file->fd) != 1) {
-            printf("Failed to read tag data (pos = %d kind = %d size = %d)",pos,tag->kind,tag->size);
-            return(-1);
-        }
-        if (tag->type == FIFFT_STRING)  /* Null-terminated strings */
-            ((char *)tag->data)[tag->size] = '\0';
-        else if (tag->type == FIFFT_CH_INFO_STRUCT)
-            fix_ch_info (tag);
-        fiff_convert_tag_data(tag,FIFFV_BIG_ENDIAN,FIFFV_NATIVE_ENDIAN);
-    }
-    if (tag->next > 0)
-        if (fseek(file->fd,tag->next,SEEK_SET) == -1) {
-            printf("fseek");
-            pos = -1;
-        }
-    /*
-   * Does the data actually refer to an external file
-   */
-    if (tag->type == FIFFT_DATA_REF_STRUCT) {
-        fiffDataRef ref = (fiffDataRef)tag->data;
-        tag->data = (fiff_data_t *)fiff_ext_read_data(file,ref);
-        FREE(ref);
-        if (!tag->data)
-            pos = -1;
-    }
-    return (pos);
-}
-
-
-
-
-int fiff_read_this_tag (FILE *in,		/* Read from here */
-                        long pos,		/* File position from beginning */
-                        fiffTag tag)		/* Result goes here */
-/*
-      * Read tag from specified position
-      */
-{
-    if (fseek(in,pos,SEEK_SET) == -1) {
-        qCritical ("fseek");
-        return (-1);
-    }
-    else
-        return (fiff_read_tag(in,tag));
-}
-
-int fiff_read_this_tag_ext (fiffFile file,	/* Read from here */
-                            long     pos,	/* File position from beginning */
-                            fiffTag  tag)	/* Result goes here */
-/*
- * Read tag from specified position
- */
-{
-    if (fseek(file->fd,pos,SEEK_SET) == -1) {
-        qCritical ("fseek");
-        return (-1);
-    }
-    else
-        return (fiff_read_tag_ext(file,tag));
-}
-
-
-
-
-
-
 #include <fiff/fiff_dir_node.h>
-
-
-//============================= fiff_dir_tree.c =============================
-
-/*
- * Take care of directory trees
- */
-
-void fiff_dir_tree_free(fiffDirNode node)
-
-{
-    int k;
-    if (node == NULL)
-        return;
-    FREE(node->dir);
-    FREE(node->id);
-    for (k = 0; k < node->nchild; k++)
-        fiff_dir_tree_free(node->children[k]);
-    FREE(node);
-}
-
-
-
-
-
-static fiffDirNode make_subtree(fiffFile file,fiffDirEntry dentry)
-
-{
-    fiffDirNode node = (fiffDirNode)malloc(sizeof(fiffDirNodeRec));
-    fiffDirNode child;
-    fiffTagRec tag;
-    int        k;
-    int        level;
-    fiffDirEntry dir;
-    int          nent;
-
-    dir  = node->dir  = MALLOC(file->nent,fiffDirEntryRec);
-    nent = node->nent = 0;
-    node->dir_tree    = dentry;
-    node->nent_tree   = 1;
-    node->parent      = NULL;
-    node->children    = NULL;
-    node->nchild      = 0;
-    node->id          = NULL;
-    tag.data = NULL;
-
-    node->type = FIFFB_ROOT;
-    if (dentry->kind == FIFF_BLOCK_START) {
-        if (fiff_read_this_tag (file->fd,dentry->pos,&tag) == -1)
-            goto bad;
-        else
-            node->type = *(int *)tag.data;
-    }
-    else {
-        node->id   = (fiffId)malloc(sizeof(fiffIdRec));
-        memcpy(node->id,file->id,sizeof(fiffIdRec));
-    }
-    dentry++;
-
-    for (level = 0,k = dentry-file->dir; k < file->nent; k++,dentry++) {
-        node->nent_tree = node->nent_tree + 1;
-        if (dentry->kind == FIFF_BLOCK_START) {
-            level++;
-            if (level == 1) {
-                if ((child = make_subtree(file,dentry)) == NULL)
-                    goto bad;
-                child->parent = node;
-                node->children = REALLOC(node->children,node->nchild+1,fiffDirNode);
-                node->children[node->nchild++] = child;
-            }
-        }
-        else if (dentry->kind == FIFF_BLOCK_END) {
-            level--;
-            if (level < 0)
-                break;
-        }
-        else if (dentry->kind == -1)
-            break;
-        else if (level == 0) {
-            /*
-       * Take the node id from the parent block id,
-       * block id, or file id. Let the block id
-       * take precedence over parent block id and file id
-       */
-            if (((dentry->kind == FIFF_PARENT_BLOCK_ID || dentry->kind == FIFF_FILE_ID)
-                 && node->id == NULL) ||
-                    dentry->kind == FIFF_BLOCK_ID) {
-                FREE(node->id);
-                node->id = NULL;
-                if (fiff_read_this_tag (file->fd,dentry->pos,&tag) == -1)
-                    goto bad;
-                node->id = (fiffId)tag.data;
-                tag.data = NULL;
-            }
-            memcpy(dir+nent,dentry,sizeof(fiffDirEntryRec));
-            nent++;
-        }
-    }
-    /*
-   * Strip unused entries
-   */
-    node->nent = nent;
-    node->dir = REALLOC(node->dir,node->nent,fiffDirEntryRec);
-    FREE(tag.data);
-    return (node);
-
-bad :
-    fiff_dir_tree_free(node);
-    return (NULL);
-}
-
-
-int fiff_dir_tree_create(fiffFile file)
-/*
-      * Make a directory tree
-      */
-{
-    fiff_dir_tree_free(file->dirtree);
-    file->dirtree = NULL;
-    if (file->fd == NULL)
-        return (FIFF_FAIL);
-    if ((file->dirtree = make_subtree(file,file->dir)) == NULL)
-        return (FIFF_FAIL);
-    else {
-        file->dirtree->parent = NULL;
-        return (FIFF_OK);
-    }
-}
-
-
-
-int fiff_dir_tree_count(fiffDirNode tree)
-/*
-      * Find the number of nodes
-      */
-{
-    int res,k;
-    if (tree == NULL)
-        res = 0;
-    else {
-        res = 1;
-        for (k = 0; k < tree->nchild; k++)
-            res = res + fiff_dir_tree_count(tree->children[k]);
-    }
-    return (res);
-}
-
-
-
-
-
-static fiffDirNode *found = NULL;
-static int count = 0;
-
-static void find_nodes (fiffDirNode tree,int kind)
-
-{
-    int k;
-    if (tree->type == kind) {
-        found[count++] = tree;
-        found[count] = NULL;
-    }
-    for (k = 0; k < tree->nchild; k++)
-        find_nodes(tree->children[k],kind);
-    return;
-}
-
-fiffDirNode *fiff_dir_tree_find(fiffDirNode tree,
-                                int kind)
-
-{
-    /*
-   * Make room for all nodes
-   */
-    found = MALLOC(fiff_dir_tree_count(tree)+1,fiffDirNode);
-    count = 0;
-    found[count] = NULL;
-    find_nodes(tree,kind);
-    /*
-   * Shrink the size
-   */
-    found = REALLOC(found,count+1,fiffDirNode);
-    return (found);
-}
-
-
-
-fiffTag fiff_dir_tree_get_tag(fiffFile file,fiffDirNode node,int kind)
-/*
-      * Scan a dir node for a tag and read it
-      */
-{
-    fiffTag tag;
-    int k;
-    fiffDirEntry dir;
-
-    for (k = 0, dir = node->dir; k < node->nent; k++,dir++)
-        if (dir->kind == kind) {
-            tag = MALLOC(1,fiffTagRec);
-            tag->data = NULL;
-            if (fiff_read_this_tag_ext(file,dir->pos,tag) == -1) {
-                FREE(tag->data);
-                FREE(tag);
-                return (NULL);
-            }
-            else
-                return (tag);
-        }
-    qWarning("Desired tag (%s [%d]) not found",
-             FIFFLIB::FiffDirNode::get_tag_explanation(kind),kind);
-    return (NULL);
-}
-
-
-
-//============================= fiff_dir.c =============================
-
-#define ALLOC_SIZE 100		/* Allocate this many entries at once */
-
-
-fiffDirEntry fiff_make_dir (FILE *fd)
-/*
-      * Scan the tag list to create a directory
-      */
-{
-    fiffTagRec tag;
-    fiffDirEntry dir = NULL;
-    int nent = 0;
-    int still_free= 0;
-    fiff_int_t pos;
-    /*
-   * Start from the very beginning...
-   */
-    if (fseek(fd,0L,SEEK_SET) == -1)
-        return (NULL);
-    tag.data = NULL;
-    while ((pos = fiff_read_tag_info(fd,&tag)) != -1) {
-        /*
-     * Check that we haven't run into the directory
-     */
-        if (tag.kind == FIFF_DIR)
-            break;
-        /*
-     * Alloc in chunks for better performance...
-     */
-        if (still_free < 1) {
-            dir = REALLOC(dir,nent+ALLOC_SIZE,fiffDirEntryRec);
-            still_free = ALLOC_SIZE;
-        }
-        /*
-     * Put in the new entry
-     */
-        dir[nent].kind = tag.kind;
-        dir[nent].type = tag.type;
-        dir[nent].size = tag.size;
-        dir[nent].pos = pos;
-        nent++; still_free--;
-        if (tag.next < 0)
-            break;
-    }
-    if (ferror(fd)) {
-        FREE(dir);
-        return (NULL);
-    }
-    else {
-        /*
-     * Put in the new the terminating entry
-     */
-        if (still_free < 1) {
-            dir = REALLOC(dir,nent+ALLOC_SIZE,fiffDirEntryRec);
-            still_free = ALLOC_SIZE;
-        }
-        dir[nent].kind = -1;
-        dir[nent].type = -1;
-        dir[nent].size = -1;
-        dir[nent].pos  = -1;
-        nent++; still_free--;
-        /*
-     * Possibly shrink a little bit
-     */
-        if (still_free > 0)
-            dir = REALLOC(dir,nent,fiffDirEntryRec);
-        return (dir);
-    }
-}
-
-
-int fiff_how_many_entries (fiffDirEntry dir)
-/*
-      * Count directory entries
-      */
-{
-    int nent = 0;
-    if (dir != NULL)
-        for (nent = 1; dir->kind != -1; nent++,dir++)
-            ;
-    return (nent);
-}
-
-
-
-
-//============================= fiff_open.c =============================
-
-
-/*! Check that the file starts properly!
- */
-
-static int check_beginning (FILE *in, const char *name)
-
-{
-    fiffTagRec tag;
-    if (fread (&tag,FIFFC_TAG_INFO_SIZE,1,in) != 1)
-        return -1;
-    fiff_convert_tag_info(&tag);
-    if (tag.kind != FIFF_FILE_ID ||
-            tag.type != FIFFT_ID_STRUCT ||
-            tag.size != sizeof(fiff_id_t)) {
-        printf("File %s does not start properly!",name);
-        return -1;
-    }
-    rewind(in);
-    return 0;
-}
-
-/*! Close file, free structures
- *
- * \param file File to be closed
- */
-
-void fiff_close (fiffFile file)
-
-{
-    if (file == NULL)
-        return;
-    if (file->fd != NULL)
-        (void)fclose(file->fd);
-    FREE(file->file_name);
-    FREE(file->dir);
-    FREE(file->id);
-    FREE(file->ext_file_name);
-    if (file->ext_fd)
-        (void)fclose(file->ext_fd);
-    /*
-   * Destroy the directory tree
-   */
-    fiff_dir_tree_free(file->dirtree);
-    FREE(file);
-}
-
-
-/*
- * This is the same for both update open
- * and read-only open
- */
-
-static fiffFile open_file (const char *name, const char *mode)
-
-{
-    //  void fiff_close();
-    fiffFile file = MALLOC(1,fiffFileRec);
-    fiffTagRec tag;
-    long dirpos;
-    /*
-   * Clean fiff file descriptor
-   */
-    file->fd = NULL;
-    file->file_name = NULL;
-    file->id = NULL;
-    file->dir = NULL;
-    file->nent = 0;
-    file->dirtree = NULL;
-    file->ext_file_name = NULL;
-    file->ext_fd        = NULL;
-    /*
-   * Try to open...
-   */
-    if ((file->fd = fopen(name,mode)) == NULL) {
-        qCritical((char *)name);
-        fiff_close(file);
-        return (NULL);
-    }
-    file->file_name = MALLOC(strlen(name)+1,char);
-    strcpy(file->file_name,name);
-    tag.data = NULL;
-
-    if (check_beginning(file->fd,name) == -1)
-        goto bad;
-    /*
-   * Read id and directory pointer
-   */
-    if (fiff_read_tag(file->fd,&tag) == -1)
-        goto bad;
-    if (tag.kind != FIFF_FILE_ID) {
-        qCritical("FIFF file should start with FIFF_FILE_ID!");
-        goto bad;
-    }
-    file->id = (fiffId)tag.data;
-    tag.data = NULL;
-    if (fiff_read_tag(file->fd,&tag) == -1)
-        goto bad;
-    if (tag.kind != FIFF_DIR_POINTER) {
-        qCritical("FIFF_DIR_POINTER should follow FIFF_FILE_ID!");
-        goto bad;
-    }
-    /*
-   * Do we have a directory or not?
-   */
-    dirpos = *(fiff_int_t *)(tag.data);
-    FREE(tag.data); tag.data = NULL;
-    if (dirpos <= 0) {		/* Must do it in the hard way... */
-        if ((file->dir = fiff_make_dir (file->fd)) == NULL) {
-            qCritical ("Could not create tag directory!");
-            goto bad;
-        }
-    }
-    else {			/* Just read the directory */
-        if (fiff_read_this_tag(file->fd,dirpos,&tag) == -1) {
-            qCritical ("Could not read the tag directory (file probably damaged)!");
-            goto bad;
-        }
-        file->dir = (fiffDirEntry)tag.data;
-    }
-    file->nent = fiff_how_many_entries(file->dir);
-    /*
-   * Check for a mistake
-   */
-    if (file->dir[file->nent-2].kind == FIFF_DIR) {
-        file->nent--;
-        file->dir[file->nent-1].kind = -1;
-        file->dir[file->nent-1].type = -1;
-        file->dir[file->nent-1].size = -1;
-        file->dir[file->nent-1].pos  = -1;
-    }
-    if (fiff_dir_tree_create(file) == -1)
-        goto bad;
-    (void)fseek(file->fd,0L,SEEK_SET);
-    return (file);
-
-bad : {
-        fiff_close(file);
-        return(NULL);
-    }
-}
-
-
-/*! Open fiff file for reading
- *
- * \param name File to open
- * \return Function returns a fiffFile object representing the
- * open file.
- */
-
-fiffFile fiff_open (const char *name)
-{
-    fiffFile res = open_file(name,"rb");
-
-    return (res);
-}
 
 
 //============================= mne_decompose.c =============================
@@ -1939,14 +669,49 @@ int mne_decompose_eigen (double *mat,
     int    maxi;
     double scale;
 
-    maxi = 0;//idamax(&np,mat,&one);
-    printf("################### DEBUG ToDo: idamax(&np,mat,&one);");
-    scale = 1.0/mat[maxi-1];
+//    maxi = idamax(&np,mat,&one);
+// idamax workaround begin
+    maxi = 0;
+    for(int i = 0; i < np; ++i)
+        if (fabs(mat[i]) > fabs(mat[maxi]))
+            maxi = i;
+// idamax workaround end
+
+    scale = 1.0/mat[maxi];//scale = 1.0/mat[maxi-1];
 
     for (k = 0; k < np; k++)
         dmat[k] = mat[k]*scale;
-    //  dspev(compz,uplo,&dim,dmat,w,z,&dim,work,&info);
-    printf("################### DEBUG ToDo: dspev(compz,uplo,&dim,dmat,w,z,&dim,work,&info);");
+//    dspev(compz,uplo,&dim,dmat,w,z,&dim,work,&info);
+
+
+// dspev workaround begin
+    MatrixXd dmat_tmp = MatrixXd::Zero(dim,dim);
+    int idx = 0;
+    for (int i = 0; i < dim; ++i) {
+        for(int j = 0; j <= i; ++j) {
+            dmat_tmp(i,j) = dmat[idx];
+            dmat_tmp(j,i) = dmat[idx];
+            ++idx;
+        }
+    }
+    SelfAdjointEigenSolver<MatrixXd> es;
+    es.compute(dmat_tmp);
+    for ( int i = 0; i < dim; ++i )
+        w[i] = es.eigenvalues()[i];
+
+    idx = 0;
+    for ( int j = 0; j < dim; ++j ) {
+        for( int i = 0; i < dim; ++i ) {
+            z[idx] = es.eigenvectors()(i,j);// Column Major
+            ++idx;
+        }
+    }
+// dspev workaround end
+
+    info = 0;
+
+    qDebug() << "!!!DEBUG ToDo: dspev(compz,uplo,&dim,dmat,w,z,&dim,work,&info);";
+
     FREE(work);
     if (info != 0)
         printf("Eigenvalue decomposition failed (LAPACK info = %d)",info);
@@ -1969,14 +734,7 @@ int mne_decompose_eigen (double *mat,
 
 
 
-
-
-
-
 //============================= mne_read_forward_solution.c =============================
-
-
-
 
 int mne_read_meg_comp_eeg_ch_info(const QString& name,
                                   fiffChInfo     *megp,	 /* MEG channels */
@@ -1992,6 +750,10 @@ int mne_read_meg_comp_eeg_ch_info(const QString& name,
       * one for MEG, one for MEG compensation channels, and one for EEG
       */
 {
+    QFile file(name);
+    FiffStream::SPtr stream(new FiffStream(&file));
+
+
     fiffChInfo chs   = NULL;
     int        nchan = 0;
     fiffChInfo meg   = NULL;
@@ -2001,39 +763,37 @@ int mne_read_meg_comp_eeg_ch_info(const QString& name,
     fiffChInfo eeg   = NULL;
     int        neeg  = 0;
     fiffId     id    = NULL;
-    fiffDirNode *nodes = NULL;
-    fiffDirNode info = NULL;
-    fiffDirEntry this_ent;
-    fiffTagRec   tag;
-    fiffChInfo   this_ch;
-    fiffFile     in = NULL;
+    QList<FiffDirNode::SPtr> nodes;
+    FiffDirNode::SPtr info;
+    FiffTag::SPtr t_pTag;
+    fiffChInfo   this_ch = NULL;
     fiffCoordTrans t = NULL;
+    fiff_int_t kind, pos;
     int j,k,to_find;
     extern fiffCoordTrans mne_read_meas_transform(const QString& name);
 
-    tag.data = NULL;
-
-    if ((in = fiff_open(name.toLatin1().data())) == NULL)
+    if(!stream->open())
         goto bad;
 
-    nodes = fiff_dir_tree_find(in->dirtree,FIFFB_MNE_PARENT_MEAS_FILE);
-    if (nodes[0] == NULL) {
-        FREE(nodes);
-        nodes = fiff_dir_tree_find(in->dirtree,FIFFB_MEAS_INFO);
-        if (nodes[0] == NULL) {
+    nodes = stream->tree()->dir_tree_find(FIFFB_MNE_PARENT_MEAS_FILE);
+
+    if (nodes.size() == 0) {
+        nodes = stream->tree()->dir_tree_find(FIFFB_MEAS_INFO);
+        if (nodes.size() == 0) {
             qCritical ("Could not find the channel information.");
             goto bad;
         }
     }
-    info = nodes[0]; FREE(nodes);
+    info = nodes[0];
     to_find = 0;
-    for (k = 0,this_ent = info->dir; k < info->nent; k++,this_ent++) {
-        switch (this_ent->kind) {
-
+    for (k = 0; k < info->nent; k++) {
+        kind = info->dir[k]->kind;
+        pos  = info->dir[k]->pos;
+        switch (kind) {
         case FIFF_NCHAN :
-            if (fiff_read_this_tag (in->fd,this_ent->pos,&tag) == FIFF_FAIL)
+            if (!FiffTag::read_tag(stream,t_pTag,pos))
                 goto bad;
-            nchan = *(int *)(tag.data);
+            nchan = *t_pTag->toInt();
             chs = MALLOC(nchan,fiffChInfoRec);
             for (j = 0; j < nchan; j++)
                 chs[j].scanNo = -1;
@@ -2041,27 +801,28 @@ int mne_read_meg_comp_eeg_ch_info(const QString& name,
             break;
 
         case FIFF_PARENT_BLOCK_ID :
-            if (fiff_read_this_tag (in->fd,this_ent->pos,&tag) == FIFF_FAIL)
+            if(!FiffTag::read_tag(stream, t_pTag, pos))
                 goto bad;
-            id = MALLOC(1,fiffIdRec);
-            *id = *(fiffId)tag.data;
+//            id = t_pTag->toFiffID();
+            *id = *(fiffId)t_pTag->data();
             break;
 
         case FIFF_COORD_TRANS :
-            if (fiff_read_this_tag (in->fd,this_ent->pos,&tag) == FIFF_FAIL)
+            if(!FiffTag::read_tag(stream, t_pTag, pos))
                 goto bad;
-            t = (fiffCoordTrans)tag.data;
-            if (t->from != FIFFV_COORD_DEVICE ||
-                    t->to   != FIFFV_COORD_HEAD)
+//            t = t_pTag->toCoordTrans();
+            t = (fiffCoordTrans)malloc(sizeof(fiffCoordTransRec));
+            *t = *(fiffCoordTrans)t_pTag->data();
+            if (t->from != FIFFV_COORD_DEVICE || t->to   != FIFFV_COORD_HEAD)
                 t = NULL;
-            else
-                tag.data = NULL;
             break;
 
-        case FIFF_CH_INFO :		/* Information about one channel */
-            if (fiff_read_this_tag (in->fd,this_ent->pos,&tag) == FIFF_FAIL)
+        case FIFF_CH_INFO : /* Information about one channel */
+            if(!FiffTag::read_tag(stream, t_pTag, pos))
                 goto bad;
-            this_ch = (fiffChInfo)(tag.data);
+//            this_ch = t_pTag->toChInfo();
+            this_ch = (fiffChInfo)malloc(sizeof(fiffChInfoRec));
+            *this_ch = *(fiffChInfo)(t_pTag->data());
             if (this_ch->scanNo <= 0 || this_ch->scanNo > nchan) {
                 printf ("FIFF_CH_INFO : scan # out of range %d (%d)!",this_ch->scanNo,nchan);
                 goto bad;
@@ -2110,7 +871,8 @@ int mne_read_meg_comp_eeg_ch_info(const QString& name,
             meg_comp[nmeg_comp++] = chs[k];
         else if (chs[k].kind == FIFFV_EEG_CH)
             eeg[neeg++] = chs[k];
-    fiff_close(in);
+//    fiff_close(in);
+    stream->close();
     FREE(chs);
     if (megp) {
         *megp  = meg;
@@ -2144,25 +906,20 @@ int mne_read_meg_comp_eeg_ch_info(const QString& name,
     return FIFF_OK;
 
 bad : {
-        fiff_close(in);
+//        fiff_close(in);
+        stream->close();
         FREE(chs);
         FREE(meg);
         FREE(eeg);
         FREE(id);
-        FREE(tag.data);
+//        FREE(tag.data);
         FREE(t);
         return FIFF_FAIL;
     }
 }
 
 
-
-
-
-
-
 //============================= mne_read_process_forward_solution.c =============================
-
 
 void mne_merge_channels(fiffChInfo chs1, int nch1,
                         fiffChInfo chs2, int nch2,
@@ -2181,50 +938,47 @@ void mne_merge_channels(fiffChInfo chs1, int nch1,
 }
 
 
-
-
-
-
-
-
-
-
-
 //============================= read_ch_info.c =============================
 
-static fiffDirNode find_meas (fiffDirNode node)
+static FiffDirNode::SPtr find_meas (const FiffDirNode::SPtr& node)
 /*
       * Find corresponding meas node
       */
 {
-    while (node->type != FIFFB_MEAS) {
-        if (node->parent == NULL)
-            return (NULL);
-        node = node->parent;
+    FiffDirNode::SPtr empty_node;
+    FiffDirNode::SPtr tmp_node = node;
+
+    while (tmp_node->type != FIFFB_MEAS) {
+        if (tmp_node->parent == NULL)
+            return empty_node;//(NULL);
+        tmp_node = tmp_node->parent;
     }
-    return (node);
+    return (tmp_node);
 }
 
-static fiffDirNode find_meas_info (fiffDirNode node)
+static FiffDirNode::SPtr find_meas_info (const FiffDirNode::SPtr& node)
 /*
       * Find corresponding meas info node
       */
 {
     int k;
+    FiffDirNode::SPtr empty_node;
+    FiffDirNode::SPtr tmp_node = node;
 
-    while (node->type != FIFFB_MEAS) {
-        if (node->parent == NULL)
-            return (NULL);
-        node = node->parent;
+    while (tmp_node->type != FIFFB_MEAS) {
+        if (tmp_node->parent == NULL)
+            return empty_node;
+        tmp_node = tmp_node->parent;
     }
-    for (k = 0; k < node->nchild; k++)
-        if (node->children[k]->type == FIFFB_MEAS_INFO)
-            return (node->children[k]);
-    return (NULL);
+    for (k = 0; k < tmp_node->nchild; k++)
+        if (tmp_node->children[k]->type == FIFFB_MEAS_INFO)
+            return (tmp_node->children[k]);
+    return empty_node;
 }
 
-static int get_all_chs (fiffFile file,	        /* The file we are reading */
-                        fiffDirNode node,	/* The directory node containing our data */
+static int get_all_chs (//fiffFile file,	        /* The file we are reading */
+                        FiffStream::SPtr& stream,
+                        const FiffDirNode::SPtr& p_node,	/* The directory node containing our data */
                         fiffId *id,		/* The block id from the nearest FIFFB_MEAS
                                                    parent */
                         fiffChInfo *chp,	/* Channel descriptions */
@@ -2235,56 +989,62 @@ static int get_all_chs (fiffFile file,	        /* The file we are reading */
       * node.
       */
 {
-    fiffTagRec tag;
-    fiffDirEntry this_entry;
     fiffChInfo ch;
-    fiffChInfo this_ch;
+    fiffChInfo this_ch = NULL;
     int j,k;
     int to_find = 0;
-    fiffDirNode meas;
+    FiffDirNode::SPtr meas;
+    FiffDirNode::SPtr meas_info;
+    fiff_int_t kind, pos;
+    FiffTag::SPtr t_pTag;
 
-    tag.data = NULL;
     *chp     = NULL;
     ch       = NULL;
     *id      = NULL;
     /*
-   * Find desired parents
-   */
-    if ((meas = find_meas(node)) == NULL) {
+    * Find desired parents
+    */
+    if (!(meas = find_meas(p_node))) {
         qCritical ("Meas. block not found!");
         goto bad;
     }
-    if ((node = find_meas_info(node)) == NULL) {
+
+    if (!(meas_info = find_meas_info(p_node))) {
         qCritical ("Meas. info not found!");
         goto bad;
     }
     /*
-   * Is there a block id is in the FIFFB_MEAS node?
-   */
-    if (meas->id != NULL) {
+    * Is there a block id is in the FIFFB_MEAS node?
+    */
+    if (!meas->id.isEmpty()) {
         *id = MALLOC(1,fiffIdRec);
-        memcpy (*id,meas->id,sizeof(fiffIdRec));
+        (*id)->version = meas->id.version;
+        (*id)->machid[0] = meas->id.machid[0];
+        (*id)->machid[1] = meas->id.machid[1];
+        (*id)->time = meas->id.time;
     }
     /*
-   * Others from FIFFB_MEAS_INFO
-   */
-    for (k = 0,this_entry = node->dir; k < node->nent; k++,this_entry++)
-        switch (this_entry->kind) {
-
+    * Others from FIFFB_MEAS_INFO
+    */
+    for (k = 0; k < meas_info->nent; k++) {
+        kind = meas_info->dir[k]->kind;
+        pos  = meas_info->dir[k]->pos;
+        switch (kind) {
         case FIFF_NCHAN :
-            if (fiff_read_this_tag (file->fd,this_entry->pos,&tag) == -1)
+            if (!FiffTag::read_tag(stream,t_pTag,pos))
                 goto bad;
-            *nchan = *(int *)(tag.data);
+            *nchan = *t_pTag->toInt();
             ch = MALLOC(*nchan,fiffChInfoRec);
             for (j = 0; j < *nchan; j++)
                 ch[j].scanNo = -1;
             to_find = to_find + *nchan - 1;
             break;
 
-        case FIFF_CH_INFO :		/* Information about one channel */
-            if (fiff_read_this_tag (file->fd,this_entry->pos,&tag) == -1)
+        case FIFF_CH_INFO : /* Information about one channel */
+            if (!FiffTag::read_tag(stream,t_pTag,pos))
                 goto bad;
-            this_ch = (fiffChInfo)(tag.data);
+            this_ch = (fiffChInfo)malloc(sizeof(fiffChInfoRec));
+            *this_ch = *(fiffChInfo)t_pTag->data();
             if (this_ch->scanNo <= 0 || this_ch->scanNo > *nchan) {
                 qCritical ("FIFF_CH_INFO : scan # out of range!");
                 goto bad;
@@ -2295,13 +1055,12 @@ static int get_all_chs (fiffFile file,	        /* The file we are reading */
             to_find--;
             break;
         }
-    FREE (tag.data);
+    }
     *chp = ch;
     return FIFF_OK;
 
 bad : {
         FREE (ch);
-        FREE (tag.data);
         return FIFF_FAIL;
     }
 }
@@ -2312,40 +1071,40 @@ static int read_ch_info(const QString&  name,
                         int             *nchanp,
                         fiffId          *idp)
 /*
-      * Read channel information from a measurement file
-      */
+* Read channel information from a measurement file
+*/
 {
+    QFile file(name);
+    FiffStream::SPtr stream(new FiffStream(&file));
+
     fiffChInfo chs = NULL;
     int        nchan = 0;
     fiffId     id = NULL;
 
-    fiffFile       in = NULL;
-    fiffTagRec     tag;
-    fiffDirNode    *meas = NULL;
-    fiffDirNode    node;
+    QList<FiffDirNode::SPtr> meas;
+    FiffDirNode::SPtr    node;
 
-    tag.data = NULL;
-    if ((in = fiff_open(name.toLatin1().data())) == NULL)
+    if(!stream->open())
         goto bad;
-    meas = fiff_dir_tree_find(in->dirtree,FIFFB_MEAS);
-    if (meas[0] == NULL) {
+
+    meas = stream->tree()->dir_tree_find(FIFFB_MEAS);
+    if (meas.size() == 0) {
         qCritical ("%s : no MEG data available here",name.toLatin1().data());
         goto bad;
     }
-    node = meas[0]; FREE(meas);
-    if (get_all_chs (in,node,&id,&chs,&nchan) == FIFF_FAIL)
+    node = meas[0];
+    if (get_all_chs (stream,node,&id,&chs,&nchan) == FIFF_FAIL)
         goto bad;
     *chsp   = chs;
     *nchanp = nchan;
     *idp = id;
-    fiff_close(in);
+    stream->close();
     return FIFF_OK;
 
 bad : {
-        FREE(tag.data);
         FREE(chs);
         FREE(id);
-        fiff_close(in);
+        stream->close();
         return FIFF_FAIL;
     }
 }
@@ -2620,23 +1379,6 @@ void fiff_coord_trans (float r[3],fiffCoordTrans t,int do_move)
 }
 
 
-void fiff_coord_trans_inv (float r[3],fiffCoordTrans t,int do_move)
-/*
-      * Apply inverse coordinate transformation
-      */
-{
-    int j,k;
-    float res[3];
-
-    for (j = 0; j < 3; j++) {
-        res[j] = (do_move ? t->invmove[j] :  0.0);
-        for (k = 0; k < 3; k++)
-            res[j] += t->invrot[j][k]*r[k];
-    }
-    for (j = 0; j < 3; j++)
-        r[j] = res[j];
-}
-
 
 fiffCoordTrans fiff_dup_transform (fiffCoordTrans t)
 /*
@@ -2720,63 +1462,44 @@ void mne_print_coord_transform(FILE *log, fiffCoordTrans t)
 }
 
 
-fiffCoordTrans mne_read_transform_from_node(fiffFile in, fiffDirNode node,int from, int to)
-/*
-      * Read the specified coordinate transformation
-      */
-{
-    fiffCoordTrans res = NULL;
-    fiffTagRec     tag;
-    fiffDirEntry   dir;
-    int k;
-
-    tag.data = NULL;
-    for (k = 0, dir = node->dir; k < node->nent; k++,dir++)
-        if (dir->kind == FIFF_COORD_TRANS) {
-            if (fiff_read_this_tag (in->fd,dir->pos,&tag) == FIFF_FAIL)
-                goto out;
-            res = (fiffCoordTrans)tag.data;
-            if (res->from == from && res->to == to) {
-                tag.data = NULL;
-                goto out;
-            }
-            else if (res->from == to && res->to == from) {
-                res = fiff_invert_transform(res);
-                goto out;
-            }
-            res = NULL;
-        }
-    printf("No suitable coordinate transformation found");
-    goto out;
-
-out : {
-        FREE(tag.data);
-        return res;
-    }
-}
-
 
 fiffCoordTrans mne_read_transform(const QString& name,int from, int to)
 /*
       * Read the specified coordinate transformation
       */
 {
+    QFile file(name);
+    FiffStream::SPtr stream(new FiffStream(&file));
+
+
     fiffCoordTrans res = NULL;
-    fiffFile       in = NULL;
-    fiffTagRec     tag;
-    fiffDirEntry   dir;
+//    fiffFile       in = NULL;
+    FiffTag::SPtr t_pTag;
+//    fiffTagRec     tag;
+//    fiffDirEntry   dir;
+    fiff_int_t kind, pos;
     int k;
 
-    tag.data = NULL;
-    if ((in = fiff_open(name.toLatin1().data())) == NULL)
+//    tag.data = NULL;
+//    if ((in = fiff_open(name.toLatin1().data())) == NULL)
+//        goto out;
+    if(!stream->open())
         goto out;
-    for (k = 0, dir = in->dir; k < in->nent; k++,dir++)
-        if (dir->kind == FIFF_COORD_TRANS) {
-            if (fiff_read_this_tag (in->fd,dir->pos,&tag) == FIFF_FAIL)
+
+    for (k = 0; k < stream->dir().size(); k++) {
+        kind = stream->dir()[k]->kind;
+        pos  = stream->dir()[k]->pos;
+        if (kind == FIFF_COORD_TRANS) {
+//            if (fiff_read_this_tag (in->fd,dir->pos,&tag) == FIFF_FAIL)
+//                goto out;
+//            res = (fiffCoordTrans)tag.data;
+            if (!FiffTag::read_tag(stream,t_pTag,pos))
                 goto out;
-            res = (fiffCoordTrans)tag.data;
+
+            res = (fiffCoordTrans)malloc(sizeof(fiffCoordTransRec));
+            *res = *(fiffCoordTrans)t_pTag->data();
             if (res->from == from && res->to == to) {
-                tag.data = NULL;
+//                tag.data = NULL;
                 goto out;
             }
             else if (res->from == to && res->to == from) {
@@ -2785,12 +1508,14 @@ fiffCoordTrans mne_read_transform(const QString& name,int from, int to)
             }
             res = NULL;
         }
+    }
     qCritical("No suitable coordinate transformation found in %s.",name.toLatin1().data());
     goto out;
 
 out : {
-        FREE(tag.data);
-        fiff_close(in);
+//        FREE(tag.data);
+//        fiff_close(in);
+        stream->close();
         return res;
     }
 
@@ -2818,870 +1543,13 @@ fiffCoordTrans mne_read_meas_transform(const QString& name)
 
 
 
-//============================= fwd_coil_def.c =============================
-
-#define MAXWORD 1000
-
-#define BIG 0.5
-
-
-
-
-
-int fwd_is_axial_coil(FwdCoil* coil)
-
-{
-    return (coil->coil_class == FWD_COILC_MAG ||
-            coil->coil_class == FWD_COILC_AXIAL_GRAD ||
-            coil->coil_class == FWD_COILC_AXIAL_GRAD2);
-}
-
-int fwd_is_magnetometer_coil(FwdCoil* coil)
-
-{
-    return coil->coil_class == FWD_COILC_MAG;
-}
-
-int fwd_is_planar_coil(FwdCoil* coil)
-
-{
-    return coil->coil_class == FWD_COILC_PLANAR_GRAD;
-}
-
-int fwd_is_eeg_electrode(FwdCoil* coil)
-
-{
-    return coil->coil_class == FWD_COILC_EEG;
-}
-
-int fwd_is_planar_coil_type(int type,            /* This is the coil type we are interested in */
-                            FwdCoilSet* set)	 /* Set of templates */
-
-{
-    int k;
-
-    if (type == FIFFV_COIL_EEG)
-        return FALSE;
-    if (!set)
-        return FALSE;
-    for (k = 0; k < set->ncoil; k++)
-        if (set->coils[k]->type == type)
-            return set->coils[k]->coil_class == FWD_COILC_PLANAR_GRAD;
-    return FALSE;
-}
-
-
-int fwd_is_axial_coil_type(int type,             /* This is the coil type we are interested in */
-                           FwdCoilSet* set)	 /* Set of templates */
-
-{
-    int k;
-
-    if (type == FIFFV_COIL_EEG)
-        return FALSE;
-    if (!set)
-        return FALSE;
-    for (k = 0; k < set->ncoil; k++)
-        if (set->coils[k]->type == type)
-            return (set->coils[k]->coil_class == FWD_COILC_MAG ||
-                    set->coils[k]->coil_class == FWD_COILC_AXIAL_GRAD ||
-                    set->coils[k]->coil_class == FWD_COILC_AXIAL_GRAD2);
-    return FALSE;
-}
-
-int fwd_is_magnetometer_coil_type(int type,             /* This is the coil type we are interested in */
-                                  FwdCoilSet* set)	/* Set of templates */
-
-{
-    int k;
-
-    if (type == FIFFV_COIL_EEG)
-        return FALSE;
-    if (!set)
-        return FALSE;
-    for (k = 0; k < set->ncoil; k++)
-        if (set->coils[k]->type == type)
-            return set->coils[k]->coil_class == FWD_COILC_MAG;
-    return FALSE;
-}
-
-int fwd_is_eeg_electrode_type(int type,		 /*  */
-                              FwdCoilSet* set)	 /* Templates are included for symmetry */
-
-{
-    return type == FIFFV_COIL_EEG;
-}
-
-
-static void normalize(float *rr)
-/*
-      * Scale vector to unit length
-      */
-{
-    float ll = VEC_LEN(rr);
-    int k;
-    if (ll > 0) {
-        for (k = 0; k < 3; k++)
-            rr[k] = rr[k]/ll;
-    }
-    return;
-}
-
-static FwdCoil* fwd_add_coil_to_set(FwdCoilSet* set,
-                                   int type, int coil_class, int acc, int np, float size, float base, char *desc)
-
-{
-    FwdCoil* def;
-
-    if (set == NULL) {
-        qWarning ("No coil definition set to augment.");
-        return NULL;
-    }
-    if (np <= 0) {
-        qWarning("Number of integration points should be positive (type = %d acc = %d)",type,acc);
-        return NULL;
-    }
-    if (! (acc == FWD_COIL_ACCURACY_POINT ||
-           acc == FWD_COIL_ACCURACY_NORMAL ||
-           acc == FWD_COIL_ACCURACY_ACCURATE) ) {
-        qWarning("Illegal accuracy (type = %d acc = %d)",type,acc);
-        return NULL;
-    }
-    if (! (coil_class == FWD_COILC_MAG ||
-           coil_class == FWD_COILC_AXIAL_GRAD ||
-           coil_class == FWD_COILC_PLANAR_GRAD ||
-           coil_class == FWD_COILC_AXIAL_GRAD2) ) {
-        qWarning("Illegal coil class (type = %d acc = %d class = %d)",type,acc,coil_class);
-        return NULL;
-    }
-
-    set->coils = REALLOC(set->coils,set->ncoil+1,FwdCoil*);
-    def = set->coils[set->ncoil++] = new FwdCoil(np);
-
-    def->type       = type;
-    def->coil_class = coil_class;
-    def->accuracy   = acc;
-    def->np         = np;
-    def->base       = size;
-    def->base       = base;
-    if (desc)
-        def->desc = mne_strdup(desc);
-    return def;
-}
-
-
-
-static void skip_comments(FILE *in)
-
-{
-    int c;
-
-    while (1) {
-        c = fgetc(in);
-        if (c == '#') {
-            for (c = fgetc(in); c != EOF && c != '\n'; c = fgetc(in))
-                ;
-        }
-        else {
-            ungetc(c,in);
-            return;
-        }
-    }
-}
-
-static int whitespace(int c)
-
-{
-    if (c == '\t' || c == '\n' || c == ' ')
-        return TRUE;
-    else
-        return FALSE;
-}
-
-static int whitespace_quote(int c, int inquote)
-
-{
-    if (inquote)
-        return (c == '"');
-    else
-        return (c == '\t' || c == '\n' || c == ' ');
-}
-
-static char *next_word(FILE *in)
-
-{
-    char *next = MALLOC(MAXWORD,char);
-    int c;
-    int  p,k;
-    int  inquote;
-
-    skip_comments(in);
-
-    inquote = FALSE;
-    for (k = 0, p = 0, c = fgetc(in); c != EOF && !whitespace_quote(c,inquote) ; c = fgetc(in), k++) {
-        if (k == 0 && c == '"')
-            inquote = TRUE;
-        else
-            next[p++] = c;
-    }
-    if (c == EOF && k == 0) {
-        FREE(next);
-        return NULL;
-    }
-    else
-        next[p] = '\0';
-    if (c != EOF) {
-        for (k = 0, c = fgetc(in); whitespace(c) ; c = fgetc(in), k++)
-            ;
-        if (c != EOF)
-            ungetc(c,in);
-    }
-#ifdef DEBUG
-    if (next)
-        printf("<%s>\n",next);
-#endif
-    return next;
-}
-
-static int get_ival(FILE *in, int *ival)
-
-{
-    char *next = next_word(in);
-    if (next == NULL) {
-        qWarning("missing integer");
-        return FAIL;
-    }
-    else if (sscanf(next,"%d",ival) != 1) {
-        qWarning("bad integer : %s",next);
-        FREE(next);
-        return FAIL;
-    }
-    FREE(next);
-    return OK;
-}
-
-static int get_fval(FILE *in, float *fval)
-
-{
-    char *next = next_word(in);
-    if (next == NULL) {
-        qWarning("bad integer");
-        return FAIL;
-    }
-    else if (sscanf(next,"%g",fval) != 1) {
-        qWarning("bad floating point number : %s",next);
-        FREE(next);
-        return FAIL;
-    }
-    FREE(next);
-    return OK;
-}
-
-
-
-
-
-
-FwdCoilSet* fwd_read_coil_defs(const char *name)
-/*
-      * Read a coil definition file
-      */
-{
-    FILE    *in = fopen(name,"r");
-    char    *desc = NULL;
-    int     type,coil_class,acc,np;
-    int     p;
-    float   size,base;
-    FwdCoilSet* res = NULL;
-    FwdCoil* def;
-
-    if (in == NULL) {
-        qWarning(name);
-        goto bad;
-    }
-
-    res = new FwdCoilSet();
-    while (1) {
-        /*
-     * Read basic info
-     */
-        if (get_ival(in,&coil_class) != OK)
-            break;
-        if (get_ival(in,&type) != OK)
-            goto bad;
-        if (get_ival(in,&acc) != OK)
-            goto bad;
-        if (get_ival(in,&np) != OK)
-            goto bad;
-        if (get_fval(in,&size) != OK)
-            goto bad;
-        if (get_fval(in,&base) != OK)
-            goto bad;
-        desc = next_word(in);
-        if (!desc)
-            goto bad;
-
-        def = fwd_add_coil_to_set(res,type,coil_class,acc,np,size,base,desc);
-        if (!def)
-            goto bad;
-        FREE(desc); desc = NULL;
-
-        for (p = 0; p < def->np; p++) {
-            /*
-       * Read and verify data for each integration point
-       */
-            if (get_fval(in,def->w+p) != OK)
-                goto bad;
-            if (get_fval(in,def->rmag[p]+X) != OK)
-                goto bad;
-            if (get_fval(in,def->rmag[p]+Y) != OK)
-                goto bad;
-            if (get_fval(in,def->rmag[p]+Z) != OK)
-                goto bad;
-            if (get_fval(in,def->cosmag[p]+X) != OK)
-                goto bad;
-            if (get_fval(in,def->cosmag[p]+Y) != OK)
-                goto bad;
-            if (get_fval(in,def->cosmag[p]+Z) != OK)
-                goto bad;
-
-            if (VEC_LEN(def->rmag[p]) > BIG) {
-                qWarning("Unreasonable integration point: %f %f %f mm (coil type = %d acc = %d)", 1000*def->rmag[p][X],1000*def->rmag[p][Y],1000*def->rmag[p][Z], def->type,def->accuracy);
-                goto bad;
-            }
-            size = VEC_LEN(def->cosmag[p]);
-            if (size <= 0) {
-                qWarning("Unreasonable normal: %f %f %f (coil type = %d acc = %d)", def->cosmag[p][X],def->cosmag[p][Y],def->cosmag[p][Z], def->type,def->accuracy);
-                goto bad;
-            }
-            normalize(def->cosmag[p]);
-        }
-    }
-    printf("%d coil definitions read\n",res->ncoil);
-    return res;
-
-bad : {
-        delete res;
-        FREE(desc);
-        return NULL;
-    }
-}
-
-
-
-
-FwdCoil* fwd_create_meg_coil(FwdCoilSet*     set,      /* These are the available coil definitions */
-                            fiffChInfo     ch,       /* Channel information to use */
-                            int            acc,	     /* Required accuracy */
-                            fiffCoordTrans t)	     /* Transform the points using this */
-/*
-      * Create a MEG coil definition using a database of templates
-      * Change the coordinate frame if so desired
-      */
-{
-    int        k,p,c;
-    FwdCoil*    def;
-    FwdCoil*    res = NULL;
-
-    if (ch->kind != FIFFV_MEG_CH && ch->kind != FIFFV_REF_MEG_CH) {
-        printf("%s is not a MEG channel. Cannot create a coil definition.",ch->ch_name);
-        goto bad;
-    }
-    /*
-   * Simple linear search from the coil definitions
-   */
-    for (k = 0, def = NULL; k < set->ncoil; k++) {
-        if ((set->coils[k]->type == (ch->chpos.coil_type & 0xFFFF)) &&
-                set->coils[k]->accuracy == acc) {
-            def = set->coils[k];
-        }
-    }
-    if (!def) {
-        printf("Desired coil definition not found (type = %d acc = %d)",ch->chpos.coil_type,acc);
-        goto bad;
-    }
-    /*
-   * Create the result
-   */
-    res = new FwdCoil(def->np);
-
-    res->chname   = mne_strdup(ch->ch_name);
-    if (def->desc)
-        res->desc   = mne_strdup(def->desc);
-    res->coil_class = def->coil_class;
-    res->accuracy   = def->accuracy;
-    res->base       = def->base;
-    res->size       = def->size;
-    res->type       = ch->chpos.coil_type;
-
-    VEC_COPY(res->r0,ch->chpos.r0);
-    VEC_COPY(res->ex,ch->chpos.ex);
-    VEC_COPY(res->ey,ch->chpos.ey);
-    VEC_COPY(res->ez,ch->chpos.ez);
-    /*
-   * Apply a coordinate transformation if so desired
-   */
-    if (t) {
-        fiff_coord_trans(res->r0,t,FIFFV_MOVE);
-        fiff_coord_trans(res->ex,t,FIFFV_NO_MOVE);
-        fiff_coord_trans(res->ey,t,FIFFV_NO_MOVE);
-        fiff_coord_trans(res->ez,t,FIFFV_NO_MOVE);
-        res->coord_frame = t->to;
-    }
-    else
-        res->coord_frame = FIFFV_COORD_DEVICE;
-
-    for (p = 0; p < res->np; p++) {
-        res->w[p] = def->w[p];
-        for (c = 0; c < 3; c++) {
-            res->rmag[p][c]   = res->r0[c] + def->rmag[p][X]*res->ex[c] + def->rmag[p][Y]*res->ey[c] + def->rmag[p][Z]*res->ez[c];
-            res->cosmag[p][c] = def->cosmag[p][X]*res->ex[c] + def->cosmag[p][Y]*res->ey[c] + def->cosmag[p][Z]*res->ez[c];
-        }
-    }
-    return res;
-
-bad : {
-        return NULL;
-    }
-}
-
-
-
-
-FwdCoilSet* fwd_create_meg_coils(FwdCoilSet*      set,      /* These are the available coil definitions */
-                                fiffChInfo      chs,      /* Channel information to use */
-                                int             nch,
-                                int             acc,	  /* Required accuracy */
-                                fiffCoordTrans t)	  /* Transform the points using this */
-
-{
-    FwdCoilSet* res = new FwdCoilSet();
-    FwdCoil*    next;
-    int        k;
-
-    for (k = 0; k < nch; k++) {
-        if ((next = fwd_create_meg_coil(set,chs+k,acc,t)) == NULL)
-            goto bad;
-        res->coils = REALLOC(res->coils,res->ncoil+1,FwdCoil*);
-        res->coils[res->ncoil++] = next;
-    }
-    if (t)
-        res->coord_frame = t->to;
-    return res;
-
-bad : {
-        delete res;
-        return NULL;
-    }
-}
-
-
-
-FwdCoil* fwd_create_eeg_el(fiffChInfo     ch,         /* Channel information to use */
-                          fiffCoordTrans t)	     /* Transform the points using this */
-/*
-      * Create an electrode definition. Transform coordinate frame if so desired.
-      */
-{
-    FwdCoil*    res = NULL;
-    int        c;
-
-    if (ch->kind != FIFFV_EEG_CH) {
-        printf("%s is not an EEG channel. Cannot create an electrode definition.",ch->ch_name);
-        goto bad;
-    }
-    if (t && t->from != FIFFV_COORD_HEAD) {
-        printf("Inappropriate coordinate transformation in fwd_create_eeg_el");
-        goto bad;
-    }
-
-    if (VEC_LEN(ch->chpos.ex) < 1e-4)
-        res = new FwdCoil(1);	             /* No reference electrode */
-    else
-        res = new FwdCoil(2);		     /* Reference electrode present */
-
-    res->chname     = mne_strdup(ch->ch_name);
-    res->desc       = mne_strdup("EEG electrode");
-    res->coil_class = FWD_COILC_EEG;
-    res->accuracy   = FWD_COIL_ACCURACY_NORMAL;
-    res->type       = ch->chpos.coil_type;
-    VEC_COPY(res->r0,ch->chpos.r0);
-    VEC_COPY(res->ex,ch->chpos.ex);
-    /*
-   * Optional coordinate transformation
-   */
-    if (t) {
-        fiff_coord_trans(res->r0,t,FIFFV_MOVE);
-        fiff_coord_trans(res->ex,t,FIFFV_MOVE);
-        res->coord_frame = t->to;
-    }
-    else
-        res->coord_frame = FIFFV_COORD_HEAD;
-    /*
-   * The electrode location
-   */
-    for (c = 0; c < 3; c++)
-        res->rmag[0][c] = res->cosmag[0][c] = res->r0[c];
-    normalize(res->cosmag[0]);
-    res->w[0] = 1.0;
-    /*
-   * Add the reference electrode, if appropriate
-   */
-    if (res->np == 2) {
-        for (c = 0; c < 3; c++)
-            res->rmag[1][c] = res->cosmag[1][c] = res->ex[c];
-        normalize(res->cosmag[1]);
-        res->w[1] = -1.0;
-    }
-    return res;
-
-bad : {
-        return NULL;
-    }
-}
-
-
-FwdCoilSet* fwd_create_eeg_els(fiffChInfo      chs,      /* Channel information to use */
-                              int             nch,
-                              fiffCoordTrans t)	 /* Transform the points using this */
-
-{
-    FwdCoilSet* res = new FwdCoilSet();
-    FwdCoil*    next;
-    int        k;
-
-    for (k = 0; k < nch; k++) {
-        if ((next = fwd_create_eeg_el(chs+k,t)) == NULL)
-            goto bad;
-        res->coils = REALLOC(res->coils,res->ncoil+1,FwdCoil*);
-        res->coils[res->ncoil++] = next;
-    }
-    if (t)
-        res->coord_frame = t->to;
-    return res;
-
-bad : {
-        delete res;
-        return NULL;
-    }
-}
-
-
-
-
-
-FwdCoilSet* fwd_dup_coil_set(FwdCoilSet* s,
-                            fiffCoordTrans t)
-/*
- * Make a duplicate
- */
-{
-    FwdCoilSet* res;
-    FwdCoil*    coil;
-    int k,p;
-
-    if (!s) {
-        qWarning("No coils to duplicate");
-        return NULL;
-    }
-    if (t) {
-        if (s->coord_frame != t->from) {
-            qWarning("Coordinate frame of the transformation does not match the coil set in fwd_dup_coil_set");
-            return NULL;
-        }
-    }
-    res = new FwdCoilSet();
-    if (t)
-        res->coord_frame = t->to;
-    else
-        res->coord_frame = s->coord_frame;
-
-    res->coils = MALLOC(s->ncoil,FwdCoil*);
-    res->ncoil = s->ncoil;
-
-    for (k = 0; k < s->ncoil; k++) {
-        coil = res->coils[k] = new FwdCoil(*(s->coils[k]));
-        /*
-     * Optional coordinate transformation
-     */
-        if (t) {
-            fiff_coord_trans(coil->r0,t,FIFFV_MOVE);
-            fiff_coord_trans(coil->ex,t,FIFFV_NO_MOVE);
-            fiff_coord_trans(coil->ey,t,FIFFV_NO_MOVE);
-            fiff_coord_trans(coil->ez,t,FIFFV_NO_MOVE);
-
-            for (p = 0; p < coil->np; p++) {
-                fiff_coord_trans(coil->rmag[p],t,FIFFV_MOVE);
-                fiff_coord_trans(coil->cosmag[p],t,FIFFV_NO_MOVE);
-            }
-            coil->coord_frame = t->to;
-        }
-    }
-    return res;
-}
-
-
-
-
-
-//============================= fiff_matrix.c =============================
-
-
-int *fiff_get_matrix_dims(fiffTag tag)
-/*
-      * Interpret dimensions from matrix data (dense and sparse)
-      */
-{
-    int ndim;
-    int *dims;
-    int *res,k;
-    unsigned int tsize = tag->size;
-    /*
-   * Initial checks
-   */
-    if (tag->data == NULL) {
-        qCritical("fiff_get_matrix_dims: no data available!");
-        return NULL;
-    }
-    if (fiff_type_fundamental(tag->type) != FIFFTS_FS_MATRIX) {
-        qCritical("fiff_get_matrix_dims: tag does not contain a matrix!");
-        return NULL;
-    }
-    if (tsize < sizeof(fiff_int_t)) {
-        qCritical("fiff_get_matrix_dims: too small matrix data!");
-        return NULL;
-    }
-    /*
-   * Get the number of dimensions and check
-   */
-    ndim = *((fiff_int_t *)((fiff_byte_t *)(tag->data)+tag->size-sizeof(fiff_int_t)));
-    if (ndim <= 0 || ndim > FIFFC_MATRIX_MAX_DIM) {
-        qCritical("fiff_get_matrix_dims: unreasonable # of dimensions!");
-        return NULL;
-    }
-    if (fiff_type_matrix_coding(tag->type) == FIFFTS_MC_DENSE) {
-        if (tsize < (ndim+1)*sizeof(fiff_int_t)) {
-            qCritical("fiff_get_matrix_dims: too small matrix data!");
-            return NULL;
-        }
-        res = MALLOC(ndim+1,int);
-        res[0] = ndim;
-        dims = ((fiff_int_t *)((fiff_byte_t *)(tag->data)+tag->size)) - ndim - 1;
-        for (k = 0; k < ndim; k++)
-            res[k+1] = dims[k];
-    }
-    else if (fiff_type_matrix_coding(tag->type) == FIFFTS_MC_CCS ||
-             fiff_type_matrix_coding(tag->type) == FIFFTS_MC_RCS) {
-        if (tsize < (ndim+2)*sizeof(fiff_int_t)) {
-            qCritical("fiff_get_matrix_sparse_dims: too small matrix data!");
-            return NULL; }
-
-        res = MALLOC(ndim+2,int);
-        res[0] = ndim;
-        dims = ((fiff_int_t *)((fiff_byte_t *)(tag->data)+tag->size)) - ndim - 1;
-        for (k = 0; k < ndim; k++)
-            res[k+1] = dims[k];
-        res[ndim+1] = dims[-1];
-    }
-    else {
-        qCritical("fiff_get_matrix_dims: unknown matrix coding.");
-        return NULL;
-    }
-    return res;
-}
-
-
-int **fiff_get_int_matrix(fiffTag tag)
-/*
-      * Conversion into the standard
-      * representation
-      */
-{
-    int *dims;
-    int k;
-    int **res;
-    int *data;
-    unsigned int tsize = tag->size;
-    /*
-   * Checks first!
-   */
-    if ( fiff_type_fundamental(tag->type)   != FIFFT_MATRIX ||
-         fiff_type_base(tag->type)          != FIFFT_INT ||
-         fiff_type_matrix_coding(tag->type) != FIFFTS_MC_DENSE) {
-        printf("fiff_get_int_matrix: wrong data type!");
-        return NULL;
-    }
-    if ((dims = fiff_get_matrix_dims(tag)) == NULL)
-        return NULL;
-    if (dims[0] != 2) {
-        printf("fiff_get_int_matrix: wrong # of dimensions!");
-        return NULL;
-    }
-    if (tsize != dims[1]*dims[2]*sizeof(fiff_int_t) +
-            3*sizeof(fiff_int_t)) {
-        printf("fiff_get_int_matrix: wrong data size!");
-        FREE(dims);
-        return NULL;
-    }
-    /*
-   * Set up pointers
-   */
-    res = MALLOC(dims[2],int *);
-    data = (int *)(tag->data);
-    for (k = 0; k < dims[2]; k++)
-        res[k] = data+k*dims[1];
-    /*
-   * Free unnecessary data and exit
-   */
-    FREE(dims);
-    tag->data = NULL;
-    return res;
-}
-
-float **fiff_get_float_matrix(fiffTag tag)
-/*
-      * Conversion into the standard
-      * representation
-      */
-{
-    int *dims;
-    int k;
-    float **res;
-    float *data;
-    unsigned int tsize = tag->size;
-    /*
-   * Checks first!
-   */
-    if ( fiff_type_fundamental(tag->type)   != FIFFT_MATRIX ||
-         fiff_type_base(tag->type)          != FIFFT_FLOAT ||
-         fiff_type_matrix_coding(tag->type) != FIFFTS_MC_DENSE) {
-        qCritical("fiff_get_float_matrix: wrong data type!");
-        return NULL;
-    }
-    if ((dims = fiff_get_matrix_dims(tag)) == NULL)
-        return NULL;
-    if (dims[0] != 2) {
-        qCritical("fiff_get_float_matrix: wrong # of dimensions!");
-        return NULL;
-    }
-    if (tsize != dims[1]*dims[2]*sizeof(fiff_float_t) +
-            3*sizeof(fiff_int_t)) {
-        qCritical("fiff_get_float_matrix: wrong data size!");
-        FREE(dims);
-        return NULL;
-    }
-    /*
-   * Set up pointers
-   */
-    res = MALLOC(dims[2],float *);
-    data = (float *)(tag->data);
-    for (k = 0; k < dims[2]; k++)
-        res[k] = data+k*dims[1];
-    /*
-   * Free unnecessary data and exit
-   */
-    FREE(dims);
-    tag->data = NULL;
-    return res;
-}
-
-
-
-
-
-
-
-
-
-//============================= fiff_sparse.c =============================
-
-
-
-fiff_int_t *fiff_get_matrix_sparse_dims(fiffTag tag)
-/*
-   * Interpret dimensions and nz from matrix data
-   */
-{
-    return fiff_get_matrix_dims(tag);
-}
-
-
-
-
-fiff_sparse_matrix_t *fiff_get_float_sparse_matrix(fiffTag tag)
-/*
-   * Conversion into the standard representation
-   */
-{
-    int *dims;
-    fiff_sparse_matrix_t *res = NULL;
-    int   m,n,nz;
-    int   coding,correct_size;
-
-    if ( fiff_type_fundamental(tag->type)   != FIFFT_MATRIX ||
-         fiff_type_base(tag->type)          != FIFFT_FLOAT ||
-         (fiff_type_matrix_coding(tag->type) != FIFFTS_MC_CCS &&
-          fiff_type_matrix_coding(tag->type) != FIFFTS_MC_RCS) ) {
-        printf("fiff_get_float_ccs_matrix: wrong data type!");
-        return NULL;
-    }
-
-    if ((dims = fiff_get_matrix_sparse_dims(tag)) == NULL)
-        return NULL;
-
-    if (dims[0] != 2) {
-        printf("fiff_get_float_sparse_matrix: wrong # of dimensions!");
-        return NULL;
-    }
-
-    m   = dims[1];
-    n   = dims[2];
-    nz  = dims[3];
-
-    coding = fiff_type_matrix_coding(tag->type);
-    if (coding == FIFFTS_MC_CCS)
-        correct_size = nz*(sizeof(fiff_float_t) + sizeof(fiff_int_t)) +
-                (n+1+dims[0]+2)*(sizeof(fiff_int_t));
-    else if (coding == FIFFTS_MC_RCS)
-        correct_size = nz*(sizeof(fiff_float_t) + sizeof(fiff_int_t)) +
-                (m+1+dims[0]+2)*(sizeof(fiff_int_t));
-    else {
-        printf("fiff_get_float_sparse_matrix: Incomprehensible sparse matrix coding");
-        return NULL;
-    }
-    if (tag->size != correct_size) {
-        printf("fiff_get_float_sparse_matrix: wrong data size!");
-        FREE(dims);
-        return NULL;
-    }
-    /*
-   * Set up structure
-   */
-    res = MALLOC(1,fiff_sparse_matrix_t);
-    res->m      = m;
-    res->n      = n;
-    res->nz     = nz;
-    res->data   = (float *)(tag->data);  tag->data = NULL;
-    res->coding = coding;
-    res->inds   = (int *)(res->data + res->nz);
-    res->ptrs   = res->inds + res->nz;
-
-    FREE(dims);
-
-    return res;
-}
-
-
-
-
 
 //============================= mne_named_vector.c =============================
 
-
 int mne_pick_from_named_vector(mneNamedVector vec, char **names, int nnames, int require_all, float *res)
 /*
-      * Pick the desired elements from the named vector
-      */
+* Pick the desired elements from the named vector
+*/
 {
     int found;
     int k,p;
@@ -3716,71 +1584,23 @@ int mne_pick_from_named_vector(mneNamedVector vec, char **names, int nnames, int
 
 //============================= mne_sparse_matop.c =============================
 
-void mne_free_sparse(mneSparseMatrix mat)
-
-{
-    if (mat) {
-        FREE(mat->data);
-        FREE(mat);
-    }
-}
 
 
-
-
-mneSparseMatrix mne_dup_sparse_matrix(mneSparseMatrix mat)
-
-{
-    mneSparseMatrix res;
-    int             size;
-
-    if (!mat)
-        return NULL;
-
-    res = MALLOC(1,mneSparseMatrixRec);
-    res->coding = mat->coding;
-    res->m      = mat->m;
-    res->n      = mat->n;
-    res->nz     = mat->nz;
-
-    if (mat->coding == FIFFTS_MC_CCS) {
-        size = mat->nz*(sizeof(fiff_float_t) + sizeof(fiff_int_t)) +
-                (mat->n+1)*(sizeof(fiff_int_t));
-    }
-    if (mat->coding == FIFFTS_MC_RCS) {
-        size = mat->nz*(sizeof(fiff_float_t) + sizeof(fiff_int_t)) +
-                (mat->m+1)*(sizeof(fiff_int_t));
-    }
-    else {
-        printf("Illegal sparse matrix storage type: %d",mat->coding);
-        FREE(res);
-        return NULL;
-    }
-    res->data   = (float *)malloc(size);
-    res->inds   = (int *)(res->data+res->nz);
-    res->ptrs   = res->inds+res->nz;
-    memcpy(res->data,mat->data,size);
-
-    return res;
-}
-
-
-
-mneSparseMatrix mne_convert_to_sparse(float **dense,        /* The dense matrix to be converted */
+INVERSELIB::FiffSparseMatrix* mne_convert_to_sparse(float **dense,        /* The dense matrix to be converted */
                                       int   nrow,           /* Number of rows in the dense matrix */
                                       int   ncol,           /* Number of columns in the dense matrix */
                                       int   stor_type,      /* Either FIFFTS_MC_CCS or FIFFTS_MC_RCS */
                                       float small)          /* How small elements should be ignored? */
 /*
-      * Create the compressed row or column storage sparse matrix representation
-      * including a vector containing the nonzero matrix element values,
-      * the row or column pointer vector and the appropriate index vector(s).
-      */
+* Create the compressed row or column storage sparse matrix representation
+* including a vector containing the nonzero matrix element values,
+* the row or column pointer vector and the appropriate index vector(s).
+*/
 {
     int j,k;
     int nz;
     int ptr;
-    mneSparseMatrix sparse = NULL;
+    INVERSELIB::FiffSparseMatrix* sparse = NULL;
     int size;
 
     if (small < 0) {		/* Automatic scaling */
@@ -3820,7 +1640,7 @@ mneSparseMatrix mne_convert_to_sparse(float **dense,        /* The dense matrix 
         printf("Unknown sparse matrix storage type: %d",stor_type);
         return NULL;
     }
-    sparse = MALLOC(1,mneSparseMatrixRec);
+    sparse = new INVERSELIB::FiffSparseMatrix;
     sparse->coding = stor_type;
     sparse->m      = nrow;
     sparse->n      = ncol;
@@ -3869,75 +1689,7 @@ mneSparseMatrix mne_convert_to_sparse(float **dense,        /* The dense matrix 
 
 
 
-
-mneSparseMatrix mne_create_sparse_rcs(int nrow,              /* Number of rows */
-                                      int ncol, 	     /* Number of columns */
-                                      int *nnz, 	     /* Number of non-zero elements on each row */
-                                      int **colindex, 	     /* Column indices of non-zero elements on each row */
-                                      float **vals) 	     /* The nonzero elements on each row
-                                                              * If null, the matrix will be all zeroes */
-
-{
-    mneSparseMatrix sparse = NULL;
-    int j,k,nz,ptr,size,ind;
-    int stor_type = FIFFTS_MC_RCS;
-
-    for (j = 0, nz = 0; j < nrow; j++)
-        nz = nz + nnz[j];
-
-    if (nz <= 0) {
-        printf("No nonzero elements specified.");
-        return NULL;
-    }
-    if (stor_type == FIFFTS_MC_RCS) {
-        size = nz*(sizeof(fiff_float_t) + sizeof(fiff_int_t)) +
-                (nrow+1)*(sizeof(fiff_int_t));
-    }
-    else {
-        printf("Illegal sparse matrix storage type: %d",stor_type);
-        return NULL;
-    }
-    sparse = MALLOC(1,mneSparseMatrixRec);
-    sparse->coding = stor_type;
-    sparse->m      = nrow;
-    sparse->n      = ncol;
-    sparse->nz     = nz;
-    sparse->data   = (float *)malloc(size);
-    sparse->inds   = (int *)(sparse->data+nz);
-    sparse->ptrs   = sparse->inds+nz;
-
-    for (j = 0, nz = 0; j < nrow; j++) {
-        ptr = -1;
-        for (k = 0; k < nnz[j]; k++) {
-            if (ptr < 0)
-                ptr = nz;
-            ind = sparse->inds[nz] = colindex[j][k];
-            if (ind < 0 || ind >= ncol) {
-                printf("Column index out of range in mne_create_sparse_rcs");
-                goto bad;
-            }
-            if (vals)
-                sparse->data[nz] = vals[j][k];
-            else
-                sparse->data[nz] = 0.0;
-            nz++;
-        }
-        sparse->ptrs[j] = ptr;
-    }
-    sparse->ptrs[nrow] = nz;
-    for (j = nrow-1; j >= 0; j--) /* Take care of the empty rows */
-        if (sparse->ptrs[j] < 0)
-            sparse->ptrs[j] = sparse->ptrs[j+1];
-    return sparse;
-
-bad : {
-        mne_free_sparse(sparse);
-        return NULL;
-    }
-}
-
-
-int  mne_sparse_vec_mult2(mneSparseMatrix mat,     /* The sparse matrix */
+int  mne_sparse_vec_mult2(INVERSELIB::FiffSparseMatrix* mat,     /* The sparse matrix */
                           float           *vector, /* Vector to be multiplied */
                           float           *res)    /* Result of the multiplication */
 /*
@@ -3969,7 +1721,7 @@ int  mne_sparse_vec_mult2(mneSparseMatrix mat,     /* The sparse matrix */
 }
 
 
-float *mne_sparse_vec_mult(mneSparseMatrix mat,
+float *mne_sparse_vec_mult(INVERSELIB::FiffSparseMatrix* mat,
                            float *vector)
 
 {
@@ -3983,7 +1735,7 @@ float *mne_sparse_vec_mult(mneSparseMatrix mat,
 }
 
 
-int  mne_sparse_mat_mult2(mneSparseMatrix mat,     /* The sparse matrix */
+int  mne_sparse_mat_mult2(INVERSELIB::FiffSparseMatrix* mat,     /* The sparse matrix */
                           float           **mult,  /* Matrix to be multiplied */
                           int             ncol,	   /* How many columns in the above */
                           float           **res)   /* Result of the multiplication */
@@ -4022,97 +1774,12 @@ int  mne_sparse_mat_mult2(mneSparseMatrix mat,     /* The sparse matrix */
 
 
 
-mneSparseMatrix mne_add_upper_triangle_rcs(mneSparseMatrix mat)
-/*
- * Fill in upper triangle with the lower triangle values
- */
-{
-    int *nnz       = NULL;
-    int **colindex = NULL;
-    float **vals   = NULL;
-    mneSparseMatrix res = NULL;
-    int i,j,k,row;
-    int *nadd = NULL;
-
-    if (mat->coding != FIFFTS_MC_RCS) {
-        printf("The input matrix to mne_add_upper_triangle_rcs must be in RCS format");
-        goto out;
-    }
-    if (mat->m != mat->n) {
-        printf("The input matrix to mne_add_upper_triangle_rcs must be square");
-        goto out;
-    }
-    nnz      = MALLOC(mat->m,int);
-    colindex = MALLOC(mat->m,int *);
-    vals     = MALLOC(mat->m,float *);
-    for (i = 0; i < mat->m; i++) {
-        nnz[i]      = mat->ptrs[i+1] - mat->ptrs[i];
-        if (nnz[i] > 0) {
-            colindex[i] = MALLOC(nnz[i],int);
-            vals[i]   = MALLOC(nnz[i],float);
-            for (j = mat->ptrs[i], k = 0; j < mat->ptrs[i+1]; j++, k++) {
-                vals[i][k] = mat->data[j];
-                colindex[i][k] = mat->inds[j];
-            }
-        }
-        else {
-            colindex[i] = NULL;
-            vals[i] = NULL;
-        }
-    }
-    /*
-   * Add the elements
-   */
-    nadd = MALLOC(mat->m,int);
-    for (i = 0; i < mat->m; i++)
-        nadd[i] = 0;
-    for (i = 0; i < mat->m; i++)
-        for (j = mat->ptrs[i]; j < mat->ptrs[i+1]; j++)
-            nadd[mat->inds[j]]++;
-    for (i = 0; i < mat->m; i++) {
-        colindex[i] = REALLOC(colindex[i],nnz[i]+nadd[i],int);
-        vals[i]     = REALLOC(vals[i],nnz[i]+nadd[i],float);
-    }
-    for (i = 0; i < mat->m; i++)
-        for (j = mat->ptrs[i]; j < mat->ptrs[i+1]; j++) {
-            row = mat->inds[j];
-            colindex[row][nnz[row]] = i;
-            vals[row][nnz[row]]     = mat->data[j];
-            nnz[row]++;
-        }
-    res = mne_create_sparse_rcs(mat->m,mat->n,nnz,colindex,vals);
-
-out : {
-        for (i = 0; i < mat->m; i++) {
-            FREE(colindex[i]);
-            FREE(vals[i]);
-        }
-        FREE(nnz);
-        FREE(vals);
-        FREE(colindex);
-        FREE(nadd);
-        return res;
-    }
-}
-
-
-
-
 //============================= mne_named_matrix.c =============================
-
-#define TAG_FREE(x) if (x) {\
-    free(x->data);\
-    free(x);\
-    }
-
-
-
-
 
 void mne_free_name_list(char **list, int nlist)
 /*
-      * Free a name list array
-      */
+* Free a name list array
+*/
 {
     int k;
     if (list == NULL || nlist == 0)
@@ -4128,8 +1795,6 @@ void mne_free_name_list(char **list, int nlist)
 }
 
 
-
-
 void mne_free_sparse_named_matrix(mneSparseNamedMatrix mat)
 /*
       * Free the matrix and all the data from within
@@ -4139,7 +1804,8 @@ void mne_free_sparse_named_matrix(mneSparseNamedMatrix mat)
         return;
     mne_free_name_list(mat->rowlist,mat->nrow);
     mne_free_name_list(mat->collist,mat->ncol);
-    mne_free_sparse(mat->data);
+    if(mat->data)
+        delete mat->data;
     FREE(mat);
     return;
 }
@@ -4148,24 +1814,6 @@ void mne_free_sparse_named_matrix(mneSparseNamedMatrix mat)
 /*
  * Handle matrices whose rows and/or columns are named with a list
  */
-mneNamedMatrix mne_build_named_matrix(int  nrow,        /* Number of rows */
-                                      int  ncol,        /* Number of columns */
-                                      char **rowlist,   /* List of row (channel) names */
-                                      char **collist,   /* List of column (channel) names */
-                                      float **data)
-/*
-      * Build a named matrix from the ingredients
-      */
-{
-    mneNamedMatrix mat = MALLOC(1,mneNamedMatrixRec);
-    mat->nrow    = nrow;
-    mat->ncol    = ncol;
-    mat->rowlist = rowlist;
-    mat->collist = collist;
-    mat->data    = data;
-    return mat;
-}
-
 
 
 
@@ -4189,22 +1837,6 @@ int mne_name_list_match(char **list1, int nlist1,
 }
 
 
-void mne_free_named_matrix(mneNamedMatrix mat)
-/*
-      * Free the matrix and all the data from within
-      */
-{
-
-    if (!mat)
-        return;
-    mne_free_name_list(mat->rowlist,mat->nrow);
-    mne_free_name_list(mat->collist,mat->ncol);
-    FREE_CMATRIX(mat->data);
-    FREE(mat);
-    return;
-}
-
-
 char **mne_dup_name_list(char **list, int nlist)
 /*
  * Duplicate a name list
@@ -4220,24 +1852,6 @@ char **mne_dup_name_list(char **list, int nlist)
         res[k] = mne_strdup(list[k]);
     return res;
 }
-
-
-mneNamedMatrix mne_dup_named_matrix(mneNamedMatrix mat)
-/*
- * Duplicate a named matrix
- */
-{
-    float **data = ALLOC_CMATRIX(mat->nrow,mat->ncol);
-    int   j,k;
-
-    for (j = 0; j < mat->nrow; j++)
-        for (k = 0; k < mat->ncol; k++)
-            data[j][k] = mat->data[j][k];
-    return mne_build_named_matrix(mat->nrow,mat->ncol,
-                                  mne_dup_name_list(mat->rowlist,mat->nrow),
-                                  mne_dup_name_list(mat->collist,mat->ncol),data);
-}
-
 
 void mne_string_to_name_list(char *s,char ***listp,int *nlistp)
 /*
@@ -4269,12 +1883,10 @@ void mne_string_to_name_list(char *s,char ***listp,int *nlistp)
 }
 
 
-
-
 char *mne_name_list_to_string(char **list,int nlist)
 /*
-      * Convert a string array to a colon-separated string
-      */
+* Convert a string array to a colon-separated string
+*/
 {
     int k,len;
     char *res;
@@ -4293,11 +1905,10 @@ char *mne_name_list_to_string(char **list,int nlist)
 }
 
 
-
 char *mne_channel_names_to_string(fiffChInfo chs, int nch)
 /*
-      * Make a colon-separated string out of channel names
-      */
+* Make a colon-separated string out of channel names
+*/
 {
     char **names = MALLOC(nch,char *);
     char *res;
@@ -4313,7 +1924,6 @@ char *mne_channel_names_to_string(fiffChInfo chs, int nch)
 }
 
 
-
 void mne_channel_names_to_name_list(fiffChInfo chs, int nch,
                                     char ***listp, int *nlistp)
 
@@ -4325,224 +1935,7 @@ void mne_channel_names_to_name_list(fiffChInfo chs, int nch,
 }
 
 
-mneNamedMatrix mne_read_named_matrix(fiffFile in,fiffDirNode node,int kind)
-/*
-      * Read a named matrix from the specified node
-      */
-{
-    char **colnames = NULL;
-    char **rownames = NULL;
-    int  ncol = 0;
-    int  nrow = 0;
-    int  *dims = NULL;
-    float **data = NULL;
-    int  val;
-    char *s;
-    fiffTag tag;
-    int     k;
-    /*
-   * If the node is a named-matrix mode, use it.
-   * Otherwise, look in first-generation children
-   */
-    if (node->type == FIFFB_MNE_NAMED_MATRIX) {
-        if ((tag = fiff_dir_tree_get_tag(in,node,kind)) == NULL)
-            goto bad;
-        if ((dims = fiff_get_matrix_dims(tag)) == NULL)
-            goto bad;
-        if (dims[0] != 2) {
-            qCritical("mne_read_named_matrix only works with two-dimensional matrices");
-            goto bad;
-        }
-        if ((data = fiff_get_float_matrix(tag)) == NULL) {
-            TAG_FREE(tag);
-            goto bad;
-        }
-    }
-    else {
-        for (k = 0; k < node->nchild; k++) {
-            if (node->children[k]->type == FIFFB_MNE_NAMED_MATRIX) {
-                if ((tag = fiff_dir_tree_get_tag(in,node->children[k],kind)) != NULL) {
-                    if ((dims = fiff_get_matrix_dims(tag)) == NULL)
-                        goto bad;
-                    if (dims[0] != 2) {
-                        qCritical("mne_read_named_matrix only works with two-dimensional matrices");
-                        goto bad;
-                    }
-                    if ((data = fiff_get_float_matrix(tag)) == NULL) {
-                        TAG_FREE(tag);
-                        goto bad;
-                    }
-                    FREE(tag);
-                    node = node->children[k];
-                    break;
-                }
-            }
-        }
-        if (!data)
-            goto bad;
-    }
-    /*
-   * Separate FIFF_MNE_NROW is now optional
-   */
-    if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_NROW)) == NULL)
-        nrow = dims[2];
-    else {
-        nrow = *(int *)(tag->data);
-        if (nrow != dims[2]) {
-            qCritical("Number of rows in the FIFF_MNE_NROW tag and in the matrix data conflict.");
-            goto bad;
-        }
-    }
-    TAG_FREE(tag);
-    /*
-   * Separate FIFF_MNE_NCOL is now optional
-   */
-    if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_NCOL)) == NULL)
-        ncol = dims[1];
-    else {
-        ncol = *(int *)(tag->data);
-        if (ncol != dims[1]) {
-            qCritical("Number of columns in the FIFF_MNE_NCOL tag and in the matrix data conflict.");
-            goto bad;
-        }
-    }
-    TAG_FREE(tag);
 
-    if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_ROW_NAMES)) != NULL) {
-        s = (char *)(tag->data);
-        mne_string_to_name_list(s,&rownames,&val);
-        TAG_FREE(tag);
-        if (val != nrow) {
-            qCritical("Incorrect number of entries in the row name list");
-            nrow = val;
-            goto bad;
-        }
-    }
-    if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_COL_NAMES)) != NULL) {
-        s = (char *)(tag->data);
-        mne_string_to_name_list(s,&colnames,&val);
-        TAG_FREE(tag);
-        if (val != ncol) {
-            qCritical("Incorrect number of entries in the column name list");
-            ncol = val;
-            goto bad;
-        }
-    }
-    FREE(dims);
-    return mne_build_named_matrix(nrow,ncol,rownames,colnames,data);
-
-bad : {
-        mne_free_name_list(rownames,nrow);
-        mne_free_name_list(colnames,ncol);
-        FREE_CMATRIX(data);
-        FREE(dims);
-        return NULL;
-    }
-}
-
-mneNamedMatrix mne_pick_from_named_matrix(mneNamedMatrix mat,
-                                          char           **pickrowlist,
-                                          int            picknrow,
-                                          char           **pickcollist,
-                                          int            pickncol)
-/*
-      * Pick appropriate rows and columns and build a new matrix
-      */
-{
-    int *pick_row = NULL;
-    int *pick_col = NULL;
-    char **my_pickrowlist = NULL;
-    char **my_pickcollist = NULL;
-    float **pickdata = NULL;
-    float **data;
-    int   row,j,k;
-    char  *one;
-
-    if (pickcollist && !mat->collist) {
-        printf("Cannot pick columns: no names for columns in original.");
-        return NULL;
-    }
-    if (pickcollist && !mat->collist) {
-        printf("Cannot pick columns: no names for columns in original.");
-        return NULL;
-    }
-    if (!pickrowlist)
-        picknrow = mat->nrow;
-    if (!pickcollist)
-        pickncol = mat->ncol;
-    pick_row = MALLOC(picknrow,int);
-    pick_col = MALLOC(pickncol,int);
-    /*
-   * Decide what to pick
-   */
-    if (pickrowlist) {
-        for (j = 0; j < picknrow; j++) {
-            one = pickrowlist[j];
-            pick_row[j] = -1;
-            for (k = 0; k < mat->nrow; k++) {
-                if (strcmp(one,mat->rowlist[k]) == 0) {
-                    pick_row[j] = k;
-                    break;
-                }
-            }
-            if (pick_row[j] == -1) {
-                printf("Row called %s not found in original matrix",one);
-                goto bad;
-            }
-            my_pickrowlist = mne_dup_name_list(pickrowlist,picknrow);
-        }
-    }
-    else {
-        for (k = 0; k < picknrow; k++)
-            pick_row[k] = k;
-        my_pickrowlist = mne_dup_name_list(mat->rowlist,mat->nrow);
-    }
-    if (pickcollist) {
-        for (j = 0; j < pickncol; j++) {
-            one = pickcollist[j];
-            pick_col[j] = -1;
-            for (k = 0; k < mat->ncol; k++) {
-                if (strcmp(one,mat->collist[k]) == 0) {
-                    pick_col[j] = k;
-                    break;
-                }
-            }
-            if (pick_col[j] == -1) {
-                printf("Column called %s not found in original matrix",one);
-                goto bad;
-            }
-            my_pickcollist = mne_dup_name_list(pickcollist,pickncol);
-        }
-    }
-    else {
-        for (k = 0; k < pickncol; k++)
-            pick_col[k] = k;
-        my_pickcollist = mne_dup_name_list(mat->collist,mat->ncol);
-    }
-    /*
-   * Do the picking of the data accordingly
-   */
-    pickdata = ALLOC_CMATRIX(picknrow,pickncol);
-
-    data = mat->data;
-    for (j = 0; j < picknrow; j++) {
-        row = pick_row[j];
-        for (k = 0; k < pickncol; k++)
-            pickdata[j][k] = data[row][pick_col[k]];
-    }
-
-    FREE(pick_col);
-    FREE(pick_row);
-    return mne_build_named_matrix(picknrow,pickncol,my_pickrowlist,my_pickcollist,pickdata);
-
-bad : {
-        FREE(pick_col);
-        FREE(pick_row);
-        mne_free_name_list(my_pickrowlist,picknrow);
-        mne_free_name_list(my_pickcollist,pickncol);
-        return NULL;
-    }
-}
 
 
 //============================= mne_read_evoked.c =============================
@@ -4550,47 +1943,52 @@ bad : {
 #define MAXDATE 100
 
 
-static fiffDirNode find_evoked (fiffDirNode node)
+static FiffDirNode::SPtr find_evoked (const FiffDirNode::SPtr& node)
 /*
-      * Find corresponding FIFFB_EVOKED node
-      */
+* Find corresponding FIFFB_EVOKED node
+*/
 {
-    while (node->type != FIFFB_EVOKED) {
-        if (node->parent == NULL)
-            return (NULL);
-        node = node->parent;
+    FiffDirNode::SPtr empty_node;
+    FiffDirNode::SPtr tmp_node = node;
+    while (tmp_node->type != FIFFB_EVOKED) {
+        if (tmp_node->parent == NULL)
+            return empty_node;
+        tmp_node = tmp_node->parent;
     }
-    return (node);
+    return (tmp_node);
 }
 
-static char *get_comment (fiffFile file,fiffDirNode start)
+static char *get_comment (  FiffStream::SPtr& stream,
+                            const FiffDirNode::SPtr& start)
 
 {
     int k;
-    fiffTagRec tag;
-    fiffDirEntry ent = start->dir;
-    tag.data = NULL;
-    for (k = 0; k < start->nent; ent++,k++)
-        if (ent->kind == FIFF_COMMENT)
-            if (fiff_read_this_tag (file->fd,ent->pos,&tag) != -1)
-                return ((char *)tag.data);
+    FiffTag::SPtr t_pTag;
+    QList<FiffDirEntry::SPtr> ent = start->dir;
+    for (k = 0; k < start->nent; k++)
+        if (ent[k]->kind == FIFF_COMMENT) {
+            if (FiffTag::read_tag(stream,t_pTag,ent[k]->pos)) {
+                return (mne_strdup((char *)t_pTag->data()));
+            }
+        }
     return (mne_strdup("No comment"));
 }
 
-static void get_aspect_name_type(fiffFile file,fiffDirNode start, char **namep, int *typep)
+static void get_aspect_name_type(   FiffStream::SPtr& stream,
+                                    const FiffDirNode::SPtr& start,
+                                    char **namep, int *typep)
 
 {
     int k;
-    fiffTagRec tag;
-    fiffDirEntry ent;
+    FiffTag::SPtr t_pTag;
+    QList<FiffDirEntry::SPtr> ent = start->dir;
     const char *res = "unknown";
     int  type = -1;
 
-    tag.data = NULL;
-    for (k = 0, ent = start->dir; k < start->nent; ent++,k++)
-        if (ent->kind == FIFF_ASPECT_KIND) {
-            if (fiff_read_this_tag (file->fd,ent->pos,&tag) != -1) {
-                type = *(int *)(tag.data);
+    for (k = 0; k < start->nent; k++)
+        if (ent[k]->kind == FIFF_ASPECT_KIND) {
+            if (FiffTag::read_tag(stream,t_pTag,ent[k]->pos)) {
+                type = *t_pTag->toInt();
                 switch (type) {
                 case FIFFV_ASPECT_AVERAGE :
                     res = "average";
@@ -4620,7 +2018,6 @@ static void get_aspect_name_type(fiffFile file,fiffDirNode start, char **namep, 
             }
             break;
         }
-    FREE(tag.data);
     if (namep)
         *namep = mne_strdup(res);
     if (typep)
@@ -4629,21 +2026,24 @@ static void get_aspect_name_type(fiffFile file,fiffDirNode start, char **namep, 
 }
 
 
-static char *get_meas_date (fiffFile file,fiffDirNode node)
-
+static char *get_meas_date (    FiffStream::SPtr& stream,const FiffDirNode::SPtr& node  )
 {
     int k;
-    fiffTagRec tag;
-    fiffDirEntry ent;
+    FiffTag::SPtr t_pTag;
     char *res = NULL;
+    fiff_int_t kind, pos;
+    FiffDirNode::SPtr meas_info;
 
-    if ((node = find_meas_info(node)) == NULL)
+    if (!(meas_info = find_meas_info(node))) {
         return res;
-    tag.data = NULL;
-    for (k = 0, ent = node->dir; k < node->nent; ent++,k++)
-        if (ent->kind == FIFF_MEAS_DATE)
-            if (fiff_read_this_tag (file->fd,ent->pos,&tag) != -1) {
-                fiffTime meas_date = (fiffTime)tag.data;
+    }
+    for (k = 0; k < meas_info->nent;k++) {
+        kind = meas_info->dir[k]->kind;
+        pos  = meas_info->dir[k]->pos;
+        if (kind == FIFF_MEAS_DATE)
+        {
+            if (FiffTag::read_tag(stream,t_pTag,pos)) {
+                fiffTime meas_date = (fiffTime)t_pTag->data();
                 time_t   time = meas_date->secs;
                 struct   tm *ltime;
 
@@ -4652,60 +2052,64 @@ static char *get_meas_date (fiffFile file,fiffDirNode node)
                 (void)strftime(res,MAXDATE,"%x %X",ltime);
                 break;
             }
-    FREE(tag.data);
+        }
+    }
     return res;
 }
 
-int mne_find_evoked_types_comments (fiffFile    file,
-                                    fiffDirNode **nodesp,
-                                    int         **aspect_typesp,
-                                    char        ***commentsp)
+
+int mne_find_evoked_types_comments (    FiffStream::SPtr& stream,
+                                        QList<FiffDirNode::SPtr>& nodesp,
+                                        int         **aspect_typesp,
+                                        char        ***commentsp)
 /*
-      * Find all data we are able to process
-      */
+* Find all data we are able to process
+*/
 {
-    fiffDirNode *evoked;
-    fiffDirNode *meas;
-    fiffDirNode *nodes = NULL;
+    QList<FiffDirNode::SPtr> evoked;
+    QList<FiffDirNode::SPtr> meas;
+    QList<FiffDirNode::SPtr> nodes;
     int         evoked_count,count;
     char        *part,*type,*meas_date;
     char        **comments = NULL;
     int         *types = NULL;
     int         j,k,p;
 
-    if (file == NULL)
+    if (stream == NULL)
         return 0;
     /*
-   * First find all measurements
-   */
-    meas = fiff_dir_tree_find(file->dirtree,FIFFB_MEAS);
+    * First find all measurements
+    */
+    meas = stream->tree()->dir_tree_find(FIFFB_MEAS);
     /*
-   * Process each measurement
-   */
-    for (count = 0,p = 0; meas[p] != NULL; p++) {
-        evoked = fiff_dir_tree_find(meas[p],FIFFB_EVOKED);
+    * Process each measurement
+    */
+    for (count = 0,p = 0; p < meas.size(); p++) {
+        evoked = meas[p]->dir_tree_find(FIFFB_EVOKED);
         /*
-     * Count the entries
-     */
-        for (evoked_count = 0, j = 0; evoked[j] != NULL; j++)
-            for (k = 0; k < evoked[j]->nchild; k++)
-                if (evoked[j]->children[k]->type == FIFFB_ASPECT)
+        * Count the entries
+        */
+        for (evoked_count = 0, j = 0; j < evoked.size(); j++) {
+            for (k = 0; k < evoked[j]->nchild; k++) {
+                if (evoked[j]->children[k]->type == FIFFB_ASPECT) {
                     evoked_count++;
+                }
+            }
+        }
         /*
-     * Enlarge tables
-     */
+        * Enlarge tables
+        */
         comments = REALLOC(comments,count+evoked_count+1,char *);
         types    = REALLOC(types,count+evoked_count+1,int);
-        nodes    = REALLOC(nodes,count+evoked_count+1,fiffDirNode);
         /*
-     * Insert node references and compile associated comments...
-     */
-        for (j = 0; evoked[j] != NULL; j++)	/* Evoked data */
+        * Insert node references and compile associated comments...
+        */
+        for (j = 0; j < evoked.size(); j++)	/* Evoked data */
             for (k = 0; k < evoked[j]->nchild; k++)
                 if (evoked[j]->children[k]->type == FIFFB_ASPECT) {
-                    meas_date = get_meas_date(file,evoked[j]);
-                    part      = get_comment(file,evoked[j]);
-                    get_aspect_name_type(file,evoked[j]->children[k],&type,types+count);
+                    meas_date = get_meas_date(stream,evoked[j]);
+                    part      = get_comment(stream,evoked[j]);
+                    get_aspect_name_type(stream,evoked[j]->children[k],&type,types+count);
                     if (meas_date) {
                         comments[count] = MALLOC(strlen(part)+strlen(type)+strlen(meas_date)+10,char);
                         sprintf(comments[count],"%s>%s>%s",meas_date,part,type);
@@ -4714,30 +2118,23 @@ int mne_find_evoked_types_comments (fiffFile    file,
                         comments[count] = MALLOC(strlen(part)+strlen(type)+10,char);
                         sprintf(comments[count],"%s>%s",part,type);
                     }
-                    nodes[count] = evoked[j]->children[k];
+                    nodes.append(evoked[j]->children[k]);
                     count++;
                 }
     }
-    FREE(meas);
-    if (count == 0) {		/* Nothing to report */
-        FREE(nodes);
+    if (count == 0) {   /* Nothing to report */
         FREE(comments);
-        if (nodesp)
-            *nodesp = NULL;
+        nodesp.clear();
         if (commentsp)
             *commentsp = NULL;
         if (aspect_typesp)
             *aspect_typesp = NULL;
         return 0;
     }
-    else {			/* Return the appropriate variables */
-        nodes[count]   = NULL;
+    else {              /* Return the appropriate variables */
         comments[count] = NULL;
         types[count]    = -1;
-        if (nodesp)
-            *nodesp = nodes;
-        else
-            FREE(nodes);
+         nodesp = nodes;
         if (commentsp)
             *commentsp = comments;
         else
@@ -4751,86 +2148,81 @@ int mne_find_evoked_types_comments (fiffFile    file,
 }
 
 
-fiffDirNode *mne_find_evoked (fiffFile file,
-                              char ***commentsp)  /* Optionally return the compiled
-                                                     comments here */
-
+QList<FiffDirNode::SPtr> mne_find_evoked ( FiffStream::SPtr& stream, char ***commentsp)
+/* Optionally return the compiled comments here */
 {
-    fiffDirNode *evoked;
-    mne_find_evoked_types_comments(file,&evoked,NULL,commentsp);
+    QList<FiffDirNode::SPtr> evoked;
+    mne_find_evoked_types_comments(stream,evoked,NULL,commentsp);
     return evoked;
 }
 
 
-
-
-
-
-
-
-
-static int get_meas_info (fiffFile file,	 /* The file we are reading */
-                          fiffDirNode node,	 /* The directory node containing our data */
-                          fiffId *id,		 /* The block id from the nearest FIFFB_MEAS
-                                                                              parent */
-                          fiffTime *meas_date,   /* Measurement date */
-                          int *nchan,		 /* Number of channels */
-                          float *sfreq,		 /* Sampling frequency */
-                          float *highpass,	 /* Highpass filter setting */
-                          float *lowpass,        /* Lowpass filter setting */
-                          fiffChInfo *chp,	 /* Channel descriptions */
-                          fiffCoordTrans *trans) /* Coordinate transformation
-                                                    (head <-> device) */
+static int get_meas_info (  FiffStream::SPtr& stream,       /* The stream we are reading */
+                            const FiffDirNode::SPtr& node,  /* The directory node containing our data */
+                            fiffId *id,                     /* The block id from the nearest FIFFB_MEAS parent */
+                            fiffTime *meas_date,            /* Measurement date */
+                            int *nchan,                     /* Number of channels */
+                            float *sfreq,                   /* Sampling frequency */
+                            float *highpass,                /* Highpass filter setting */
+                            float *lowpass,                 /* Lowpass filter setting */
+                            fiffChInfo *chp,                /* Channel descriptions */
+                            fiffCoordTrans *trans)          /* Coordinate transformation (head <-> device) */
 /*
-      * Find channel information from
-      * nearest FIFFB_MEAS_INFO parent of
-      * node.
-      */
+* Find channel information from
+* nearest FIFFB_MEAS_INFO parent of
+* node.
+*/
 {
-    fiffTagRec tag;
-    fiffDirEntry this_ent;
     fiffChInfo ch;
     fiffChInfo this_ch;
     fiffCoordTrans t;
     int j,k;
     int to_find = 4;
-    fiffDirNode *hpi,meas;
+    QList<FiffDirNode::SPtr> hpi;
+    FiffDirNode::SPtr meas;
+    FiffDirNode::SPtr meas_info;
+    fiff_int_t kind, pos;
+    FiffTag::SPtr t_pTag;
 
-    tag.data = NULL;
     *chp     = NULL;
     ch       = NULL;
     *trans   = NULL;
     *id      = NULL;
     /*
-   * Find desired parents
-   */
-    if ((meas = find_meas(node)) == NULL) {
+    * Find desired parents
+    */
+    if (!(meas = find_meas(node))) {
         printf ("Meas. block not found!");
         goto bad;
     }
-    if ((node = find_meas_info(node)) == NULL) {
+    if (!(meas_info = find_meas_info(node))) {
         printf ("Meas. info not found!");
         goto bad;
     }
     /*
-   * Is there a block id is in the FIFFB_MEAS node?
-   */
-    if (meas->id != NULL) {
+    * Is there a block id is in the FIFFB_MEAS node?
+    */
+    if (!meas->id.isEmpty()) {
         *id = MALLOC(1,fiffIdRec);
-        memcpy (*id,meas->id,sizeof(fiffIdRec));
+        (*id)->version = meas->id.version;
+        (*id)->machid[0] = meas->id.machid[0];
+        (*id)->machid[1] = meas->id.machid[1];
+        (*id)->time = meas->id.time;
     }
     /*
-   * Others from FIFFB_MEAS_INFO
-   */
+    * Others from FIFFB_MEAS_INFO
+    */
     *lowpass = -1;
     *highpass = -1;
-    for (k = 0,this_ent = node->dir; k < node->nent; k++,this_ent++)
-        switch (this_ent->kind) {
+    for (k = 0; k < meas_info->nent; k++) {
+        kind = meas_info->dir[k]->kind;
+        pos  = meas_info->dir[k]->pos;
+        switch (kind) {
 
         case FIFF_NCHAN :
-            if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
+            if (!FiffTag::read_tag(stream,t_pTag,pos))
                 goto bad;
-            *nchan = *(int *)(tag.data);
+            *nchan = *t_pTag->toInt();
             ch = MALLOC(*nchan,fiffChInfoRec);
             for (j = 0; j < *nchan; j++)
                 ch[j].scanNo = -1;
@@ -4838,81 +2230,83 @@ static int get_meas_info (fiffFile file,	 /* The file we are reading */
             break;
 
         case FIFF_SFREQ :
-            if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
+            if (!FiffTag::read_tag(stream,t_pTag,pos))
                 goto bad;
-            *sfreq = *(float *)(tag.data);
+            *sfreq = *t_pTag->toFloat();
             to_find--;
             break;
 
         case FIFF_MEAS_DATE :
-            if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
+            if (!FiffTag::read_tag(stream,t_pTag,pos))
                 goto bad;
             if (*meas_date)
                 FREE(*meas_date);
-            *meas_date = (fiffTime)tag.data;
-            tag.data = NULL;
+            *meas_date = MALLOC(1,fiffTimeRec);
+            **meas_date = *(fiffTime)t_pTag->data();
             break;
 
         case FIFF_LOWPASS :
-            if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
+            if (!FiffTag::read_tag(stream,t_pTag,pos))
                 goto bad;
-            *lowpass = *(float *)(tag.data);
+            *lowpass = *t_pTag->toFloat();
             to_find--;
             break;
 
         case FIFF_HIGHPASS :
-            if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
+            if (!FiffTag::read_tag(stream,t_pTag,pos))
                 goto bad;
-            *highpass = *(float *)(tag.data);
+            *highpass = *t_pTag->toFloat();
             to_find--;
             break;
 
-        case FIFF_CH_INFO :		/* Information about one channel */
-            if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
+        case FIFF_CH_INFO : /* Information about one channel */
+
+            if (!FiffTag::read_tag(stream,t_pTag,pos))
                 goto bad;
-            this_ch = (fiffChInfo)(tag.data);
+            this_ch = (fiffChInfo)t_pTag->data();
             if (this_ch->scanNo <= 0 || this_ch->scanNo > *nchan) {
-                printf ("FIFF_CH_INFO : scan # out of range!");
+                qCritical ("FIFF_CH_INFO : scan # out of range!");
                 goto bad;
             }
             else
-                memcpy(ch+this_ch->scanNo-1,this_ch,
-                       sizeof(fiffChInfoRec));
+                memcpy(ch+this_ch->scanNo-1,this_ch,sizeof(fiffChInfoRec));
             to_find--;
             break;
 
         case FIFF_COORD_TRANS :
-            if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
+            if (!FiffTag::read_tag(stream,t_pTag,pos))
                 goto bad;
-            t = (fiffCoordTrans)tag.data;
+            t = (fiffCoordTrans)malloc(sizeof(fiffCoordTransRec));
+            *t = *(fiffCoordTrans)t_pTag->data();
             /*
-       * Require this particular transform!
-       */
+            * Require this particular transform!
+            */
             if (t->from == FIFFV_COORD_DEVICE && t->to == FIFFV_COORD_HEAD) {
                 *trans = t;
-                tag.data = NULL;
                 break;
             }
         }
+    }
     /*
-   * Search for the coordinate transformation from
-   * HPI_RESULT block if it was not previously found
-   */
-    hpi = fiff_dir_tree_find(node,FIFFB_HPI_RESULT);
-    node = hpi[0];
-    FREE(hpi);
-    if (node != NULL && *trans == NULL)
-        for (k = 0,this_ent = node->dir; k < node->nent; k++,this_ent++)
-            if (this_ent->kind ==  FIFF_COORD_TRANS) {
-                if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
+    * Search for the coordinate transformation from
+    * HPI_RESULT block if it was not previously found
+    */
+
+    hpi = meas_info->dir_tree_find(FIFFB_HPI_RESULT);
+
+    if (hpi.size() > 0 && *trans == NULL)
+        for (k = 0; k < hpi[0]->nent; k++)
+            if (hpi[0]->dir[k]->kind ==  FIFF_COORD_TRANS) {
+                if (!FiffTag::read_tag(stream,t_pTag,hpi[0]->dir[k]->pos))
                     goto bad;
-                t = (fiffCoordTrans)tag.data;
+                t = (fiffCoordTrans)malloc(sizeof(fiffCoordTransRec));
+                *t = *(fiffCoordTrans)t_pTag->data();
+
                 /*
-         * Require this particular transform!
-         */
+                * Require this particular transform!
+                */
                 if (t->from == FIFFV_COORD_DEVICE && t->to == FIFFV_COORD_HEAD) {
                     *trans = t;
-                    tag.data = NULL;
                     break;
                 }
             }
@@ -4928,47 +2322,52 @@ static int get_meas_info (fiffFile file,	 /* The file we are reading */
         printf ("Not all essential tags were found!");
         goto bad;
     }
-    FREE (tag.data);
     *chp = ch;
     return (0);
 
 bad : {
         FREE (ch);
-        FREE (tag.data);
         return (-1);
     }
 }
 
 
-
-static int find_between (fiffFile in,
-                         fiffDirNode low_node,
-                         fiffDirNode high_node,
-                         int kind,
-                         fiff_byte_t **data)
-
+static int find_between (   FiffStream::SPtr& stream,
+                            const FiffDirNode::SPtr& low_node,
+                            const FiffDirNode::SPtr& high_node,
+                            int kind,
+                            fiff_byte_t **data)
 {
-    fiffTagRec tag;
-    fiffDirNode node;
+    FiffTag::SPtr t_pTag;
+    FiffDirNode::SPtr node;
     fiffDirEntry dir;
+    fiff_int_t kind_1, pos;
     int k;
 
-    tag.data = NULL;
     *data = NULL;
     node = low_node;
     while (node != NULL) {
-        for (k = 0, dir = node->dir; k < node->nent; k++,dir++)
-            if (dir->kind == kind) {
+        for (k = 0; k < node->nent; k++)
+        {
+            kind_1 = node->dir[k]->kind;
+            pos  = node->dir[k]->pos;
+            if (kind_1 == kind) {
                 FREE (*data);
-                if (fiff_read_this_tag (in->fd,dir->pos,&tag) == -1) {
-                    FREE(tag.data);
+                if (!FiffTag::read_tag(stream,t_pTag,pos)) {
                     return (FIFF_FAIL);
                 }
                 else {
-                    *data = (fiff_byte_t *)tag.data;
+                    fiff_byte_t* tmp =  MALLOC(t_pTag->size(),fiff_byte_t);
+                    fiff_byte_t* tmp_current = (fiff_byte_t *)t_pTag->data();
+
+                    for( int k = 0; k < t_pTag->size(); ++k )
+                        tmp[k] = tmp_current[k];
+
+                    *data = tmp;
                     return (FIFF_OK);
                 }
             }
+        }
         if (node == high_node)
             break;
         node = node->parent;
@@ -4976,114 +2375,116 @@ static int find_between (fiffFile in,
     return (FIFF_OK);
 }
 
-static int get_evoked_essentials (fiffFile file,	/* This is our file */
-                                  fiffDirNode node,	/* The interesting node */
-                                  float *sfreq,		/* Sampling frequency
-                                                                                           * The value pointed by this is not
-                                                                                           * modified if individual sampling
-                                                                                           * frequency is found */
-                                  float *tmin,          /* Time scale minimum */
-                                  int *nsamp,		/* Number of samples */
-                                  int *nave,		/* Number of averaged responses */
-                                  int *akind,		/* Aspect type */
-                                  int **artefs,		/* Artefact removal parameters */
-                                  int *nartef)
+static int get_evoked_essentials (FiffStream::SPtr& stream,         /* This is our file */
+                                  const FiffDirNode::SPtr& node,    /* The interesting node */
+                                  float& sfreq,                     /* Sampling frequency
+                                                                     * The value pointed by this is not
+                                                                     * modified if individual sampling
+                                                                     * frequency is found */
+                                  float& tmin,                      /* Time scale minimum */
+                                  int& nsamp,                       /* Number of samples */
+                                  int& nave,                        /* Number of averaged responses */
+                                  int& akind,                       /* Aspect type */
+                                  int *& artefs,                /* Artefact removal parameters */
+                                  int& nartef)
 /*
       * Get the essential info for
       * given evoked response data
       */
 {
-    fiffTagRec tag;
+    FiffTag::SPtr t_pTag;
     int k;
     int to_find = 2;
-    fiffDirEntry start;
-    int   *first = NULL;
-    int   *last  = NULL;
-    int   *my_nsamp = NULL;
-    float *my_tmin  = NULL;
+    int   first = -1;
+    int   last = -1;
+    int   my_nsamp = -1;
+    float my_tmin = -1;
     int   res = -1;
+    fiff_int_t kind, pos;
 
     fiff_byte_t *tempb;
+
+    FiffDirNode::SPtr tmp_node = node;
+
     /*
-   * This is rather difficult...
-   */
-    if (find_between (file,node,node->parent,FIFF_NAVE,&tempb) == FIFF_FAIL)
+    * This is rather difficult...
+    */
+    if (find_between (stream,tmp_node,tmp_node->parent,FIFF_NAVE,&tempb) == FIFF_FAIL)
         return res;
     if (tempb)
-        *nave = *(int *)tempb;
+        nave = *(int *)tempb;
     FREE(tempb);
-    if (find_between (file,node,node->parent,
+    if (find_between (stream,tmp_node,tmp_node->parent,
                       FIFF_SFREQ,&tempb) == FIFF_FAIL)
         return res;
     if (tempb)
-        *sfreq = *(float *)tempb;
+        sfreq = *(float *)tempb;
     FREE(tempb);
 
-    if (find_between (file,node,node->parent,
+    if (find_between (stream,tmp_node,tmp_node->parent,
                       FIFF_ASPECT_KIND,&tempb) == FIFF_FAIL)
         return res;
     if (tempb)
-        *akind = *(int *)tempb;
+        akind = *(int *)tempb;
     else
-        *akind = FIFFV_ASPECT_AVERAGE; /* Just a guess */
+        akind = FIFFV_ASPECT_AVERAGE; /* Just a guess */
     FREE(tempb);
     /*
    * Find evoked response descriptive data
    */
-    node = node->parent;
-    tag.data = NULL;
-    for (k = 0, start = node->dir; k < node->nent; k++,start++)
-        switch (start->kind) {
+    tmp_node = tmp_node->parent;
+
+//    tag.data = NULL;
+    for (k = 0; k < tmp_node->dir_tree.size(); k++) {
+        kind = tmp_node->dir_tree[k]->kind;
+        pos  = tmp_node->dir_tree[k]->pos;
+        switch (kind) {
 
         case FIFF_FIRST_SAMPLE :
-            if (fiff_read_this_tag (file->fd,start->pos,&tag) == -1)
+            if (!FiffTag::read_tag(stream,t_pTag,pos))
                 goto out;
-            first = (int *)tag.data; to_find--;
-            tag.data = NULL;
+            first = *t_pTag->toInt(); to_find--;
             break;
 
         case FIFF_LAST_SAMPLE :
-            if (fiff_read_this_tag (file->fd,start->pos,&tag) == -1)
+            if (!FiffTag::read_tag(stream,t_pTag,pos))
                 goto out;
-            last = (int *)tag.data; to_find--;
-            tag.data = NULL;
+            last = *t_pTag->toInt(); to_find--;
             break;
 
         case FIFF_NO_SAMPLES :
-            if (fiff_read_this_tag (file->fd,start->pos,&tag) == -1)
+            if (!FiffTag::read_tag(stream,t_pTag,pos))
                 goto out;
-            my_nsamp = (int *)tag.data; to_find--;
-            tag.data = NULL;
+            my_nsamp = *t_pTag->toInt(); to_find--;
             break;
 
         case FIFF_FIRST_TIME :
-            if (fiff_read_this_tag (file->fd,start->pos,&tag) == -1)
+            if (!FiffTag::read_tag(stream,t_pTag,pos))
                 goto out;
-            my_tmin = (float *)tag.data; to_find--;
-            tag.data = NULL;
+            my_tmin = *t_pTag->toFloat(); to_find--;
             break;
 
 
         case FIFF_ARTEF_REMOVAL :
-            if (fiff_read_this_tag (file->fd,start->pos,&tag) == -1)
+            if (!FiffTag::read_tag(stream,t_pTag,pos))
                 goto out;
-            *artefs = (int *)tag.data;
-            *nartef = tag.size/(3*sizeof(int));
-            tag.data = NULL;
+            qDebug() << "TODO: check whether artefs contains the right stuff -> use MatrixXi instead";
+            artefs = t_pTag->toInt();
+            nartef = t_pTag->size()/(3*sizeof(int));
             break;
         }
-    FREE (tag.data); tag.data = NULL;
+    }
     if (to_find > 0) {
         printf ("Not all essential tags were found!");
         goto out;
     }
-    if (first != NULL && last != NULL) {
-        *nsamp = (*last)-(*first)+1;
-        *tmin  = (*first)/(*sfreq);
+    if (first != -1 && last != -1) {
+        nsamp = (last)-(first)+1;
+        tmin  = (first)/(sfreq);
     }
-    else if (my_tmin != NULL && my_nsamp != NULL) {
-        *tmin = *my_tmin;
-        *nsamp = *my_nsamp;
+    else if (my_tmin != -1 && my_nsamp != -1) {
+        tmin = my_tmin;
+        nsamp = my_nsamp;
     }
     else {
         printf("Not enough data for time scale definition!");
@@ -5092,55 +2493,51 @@ static int get_evoked_essentials (fiffFile file,	/* This is our file */
     res = 0;
 
 out : {
-        FREE(my_tmin);
-        FREE(my_nsamp);
-        FREE(last); FREE(first);
-        FREE(tag.data);
         return res;
     }
 }
 
 
-static int get_evoked_optional(fiffFile file,	 /* The file we are reading */
-                               fiffDirNode node, /* The directory node containing our data */
-                               int *nchan,	 /* Number of channels */
-                               fiffChInfo *chp)	 /* Channel descriptions */
+static int get_evoked_optional( FiffStream::SPtr& stream,
+                                const FiffDirNode::SPtr& node, /* The directory node containing our data */
+                                int *nchan,	 /* Number of channels */
+                                fiffChInfo *chp)	 /* Channel descriptions */
 /*
-      * The channel info may have been modified
-      */
+* The channel info may have been modified
+*/
 {
     int res = FIFF_FAIL;
-    fiffDirEntry this_ent;
     fiffChInfo   new_ch = NULL;
     int          new_nchan = *nchan;
     int          k,to_find;
-    fiffTagRec   tag;
-    fiffTag      tagp;
+    FiffTag::SPtr t_pTag;
+    fiff_int_t kind, pos;
     fiffChInfo   this_ch;
+    FiffDirNode::SPtr evoked_node;
 
-    tag.data = NULL;
-    if ((node = find_evoked(node)) == NULL) {
+    if (!(evoked_node = find_evoked(node))) {
         res = FIFF_OK;
         goto out;
     }
 
     to_find = 0;
-    if ((tagp = fiff_dir_tree_get_tag(file,node,FIFF_NCHAN)) != NULL) {
-        new_nchan = *(int *)tagp->data;
-        FREE(tagp->data);
-        FREE(tagp);
-    }
+    if(evoked_node->find_tag(stream, FIFF_NCHAN, t_pTag))
+        new_nchan = *t_pTag->toInt();
     else
         new_nchan = *nchan;
-    for (k = 0,this_ent = node->dir; k < node->nent; k++,this_ent++)
-        if (this_ent->kind == FIFF_CH_INFO) {	/* Information about one channel */
+
+    for (k = 0; k < evoked_node->nent; k++) {
+        kind = evoked_node->dir[k]->kind;
+        pos  = evoked_node->dir[k]->pos;
+        if (kind == FIFF_CH_INFO) {     /* Information about one channel */
             if (new_ch == NULL) {
                 new_ch = MALLOC(new_nchan,fiffChInfoRec);
                 to_find = new_nchan;
             }
-            if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
+            if (!FiffTag::read_tag(stream,t_pTag,pos))
                 goto out;
-            this_ch = (fiffChInfo)(tag.data);
+            this_ch = MALLOC(1,fiffChInfoRec);
+            this_ch = (fiffChInfo)t_pTag->data();
             if (this_ch->scanNo <= 0 || this_ch->scanNo > new_nchan) {
                 printf ("FIFF_CH_INFO : scan # out of range!");
                 goto out;
@@ -5149,6 +2546,7 @@ static int get_evoked_optional(fiffFile file,	 /* The file we are reading */
                 new_ch[this_ch->scanNo-1] = *this_ch;
             to_find--;
         }
+    }
     if (to_find != 0) {
         printf("All channels were not specified "
                "at the FIFFB_EVOKED level.");
@@ -5167,7 +2565,6 @@ out : {
             }
         }
         FREE(new_ch);
-        FREE(tag.data);
         return res;
     }
 }
@@ -5191,75 +2588,76 @@ static void unpack_data(double offset,
 }
 
 
-static float **get_epochs (fiffFile file,	/* This is our file */
-                           fiffDirNode node,	/* The interesting node */
-                           int nchan,
-                           int nsamp)	        /* Number of channels and
-                                                 * number of samples to be expected */
+static float **get_epochs ( FiffStream::SPtr& stream,       /* This is our file */
+                            const FiffDirNode::SPtr& node,  /* The interesting node */
+                           int nchan, int nsamp)            /* Number of channels and number of samples to be expected */
 /*
-      * Get the evoked response epochs
-      */
+* Get the evoked response epochs
+*/
 {
-    fiffTagRec tag;
+    fiff_int_t kind, pos;
+    FiffTag::SPtr t_pTag;
     int k;
     int ch;
     float **epochs = NULL;
     float offset,scale;
     short *packed;
-    fiffDirEntry start;
-    int *dims;
 
-    tag.data = NULL;
-    for (k = 0, ch = 0, start = node->dir;
-         k < node->nent && ch < nchan; k++,start++)
-        if (start->kind == FIFF_EPOCH) {
-            if (fiff_read_this_tag (file->fd,start->pos,&tag) == -1)
+    for (k = 0, ch = 0; k < node->nent && ch < nchan; k++) {
+        kind = node->dir[k]->kind;
+        pos  = node->dir[k]->pos;
+        if (kind == FIFF_EPOCH) {
+            if (!FiffTag::read_tag(stream,t_pTag,pos))
                 goto bad;
-            if (tag.type & FIFFT_MATRIX) {
-                if ((tag.type & ~FIFFT_MATRIX) != FIFFT_FLOAT) {
+            if (t_pTag->type & FIFFT_MATRIX) {
+                if ((t_pTag->type & ~FIFFT_MATRIX) != FIFFT_FLOAT) {
                     printf("Epochs in matrix should be floats!");
                     goto bad;
                 }
-                dims = fiff_get_matrix_dims(&tag);
-                if (dims[0] != 2) {
+
+                qint32 ndim;
+                QVector<qint32> dims;
+                t_pTag->getMatrixDimensions(ndim, dims);
+
+                if (ndim != 2) {
                     printf("Data matrix dimension should be two!");
                     goto bad;
                 }
-                if (dims[1] != nsamp) {
+                if (dims[0] != nsamp) {
                     printf("Incorrect number of samples in data matrix!");
                     goto bad;
                 }
-                if (dims[2] != nchan) {
+                if (dims[1] != nchan) {
                     printf("Incorrect number of channels in data matrix!");
                     goto bad;
                 }
-                FREE(dims);
-                if ((epochs = fiff_get_float_matrix(&tag)) == NULL)
-                    goto bad;
+                MatrixXf tmp_epochs = t_pTag->toFloatMatrix().transpose();
+                epochs = ALLOC_CMATRIX(tmp_epochs.rows(),tmp_epochs.cols());
+                fromFloatEigenMatrix(tmp_epochs, epochs);
                 ch = nchan;
-                break;			/* We have the data */
+                break;  /* We have the data */
             }
-            else {			/* Individual epochs */
+            else {      /* Individual epochs */
                 if (epochs == NULL)
                     epochs = ALLOC_CMATRIX(nchan,nsamp);
-                if (tag.type == FIFFT_OLD_PACK) {
-                    offset = ((float *)tag.data)[0];
-                    scale  = ((float *)tag.data)[1];
-                    packed = (short *)(((float *)tag.data)+2);
+                if (t_pTag->type == FIFFT_OLD_PACK) {
+                    offset = ((float *)t_pTag->data())[0];
+                    scale  = ((float *)t_pTag->data())[1];
+                    packed = (short *)(((float *)t_pTag->data())+2);
                     unpack_data(offset,scale,packed,nsamp,epochs[ch++]);
                 }
-                else if (tag.type == FIFFT_FLOAT)
-                    memcpy(epochs[ch++],tag.data,nsamp*sizeof(float));
+                else if (t_pTag->type == FIFFT_FLOAT)
+                    memcpy(epochs[ch++],t_pTag->data(),nsamp*sizeof(float));
                 else {
                     printf ("Unknown data packing type!");
                     FREE_CMATRIX (epochs);
-                    FREE(tag.data);
                     return (NULL);
                 }
             }
             if (ch == nchan)
                 return (epochs);
         }
+    }
     if (ch < nchan) {
         printf ("All epochs were not found!");
         goto bad;
@@ -5268,22 +2666,9 @@ static float **get_epochs (fiffFile file,	/* This is our file */
 
 bad : {
         FREE_CMATRIX (epochs);
-        FREE(tag.data);
         return (NULL);
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -5292,8 +2677,8 @@ static void remove_artefacts (float *resp,
                               int   *artefs,
                               int   nartef)
 /*
-      * Apply the artefact removal
-      */
+* Apply the artefact removal
+*/
 {
     int   start,end;
     int   j,k;
@@ -5305,15 +2690,15 @@ static void remove_artefacts (float *resp,
             continue;
         remove_jump = (artefs[3*k] == FIFFV_ARTEF_NOJUMP);
         /*
-     * Find out the indices for the start and end times
-     */
+        * Find out the indices for the start and end times
+        */
         start = artefs[3*k+1];
         end   = artefs[3*k+2];
         start = MAX(0,MIN(start,nsamp));
         end   = MAX(0,MIN(end,nsamp));
         /*
-     * Replace the artefact region with a straight line
-     */
+        * Replace the artefact region with a straight line
+        */
         if (start < end) {
             if (remove_jump) {	/* Remove jump... */
                 a = resp[end] - resp[start];
@@ -5334,50 +2719,52 @@ static void remove_artefacts (float *resp,
 }
 
 
-int mne_read_evoked(const QString& name,           /* Name of the file */
-                    int        setno,		/* Which data set */
-                    int        *nchanp,		/* How many channels */
-                    int        *nsampp,		/* Number of time points */
-                    float      *tminp,		/* First time point */
-                    float      *sfreqp,		/* Sampling frequency */
-                    fiffChInfo *chsp,		/* Channel info (this is now optional as well) */
-                    float      ***epochsp,	/* Data, channel by channel */
+int mne_read_evoked(const QString& name,        /* Name of the file */
+                    int        setno,           /* Which data set */
+                    int        *nchanp,         /* How many channels */
+                    int        *nsampp,         /* Number of time points */
+                    float      *tminp,          /* First time point */
+                    float      *sfreqp,         /* Sampling frequency */
+                    fiffChInfo *chsp,           /* Channel info (this is now optional as well) */
+                    float      ***epochsp,      /* Data, channel by channel */
                     /*
-                                         * Optional items follow
-                                         */
-                    char       **commentp,	/* Comment for these data */
-                    float      *highpassp,	/* Highpass frequency */
-                    float      *lowpassp,	/* Lowpass frequency */
-                    int        *navep,		/* How many averages */
-                    int        *aspect_kindp,	/* What kind of an evoked data */
-                    fiffCoordTrans *transp,	/* Coordinate transformation */
-                    fiffId         *idp,	/* Measurement id */
+                    * Optional items follow
+                    */
+                    char       **commentp,      /* Comment for these data */
+                    float      *highpassp,      /* Highpass frequency */
+                    float      *lowpassp,       /* Lowpass frequency */
+                    int        *navep,          /* How many averages */
+                    int        *aspect_kindp,   /* What kind of an evoked data */
+                    fiffCoordTrans *transp,     /* Coordinate transformation */
+                    fiffId         *idp,        /* Measurement id */
                     fiffTime       *meas_datep) /* Measurement date */
 /*
-      * Load evoked-response data from a fif file
-      */
+* Load evoked-response data from a fif file
+*/
 {
-    fiffFile    in      = NULL;
-    fiffDirNode *evoked = NULL;			/* The evoked data nodes */
+    QFile file(name);
+    FiffStream::SPtr stream(new FiffStream(&file));
+
+    QList<FiffDirNode::SPtr> evoked;    /* The evoked data nodes */
     int         nset    = 0;
-    int         nchan   = 0;		        /* How many channels */
-    char        **comments = NULL;	        /* The associated comments */
-    float       sfreq = 0.0;		        /* What sampling frequency */
-    fiffDirNode start;
-    fiffChInfo   chs     = NULL;			/* Channel info */
-    int          *artefs = NULL;			/* Artefact limits */
-    int           nartef = 0;			/* How many */
-    float       **epochs = NULL;		        /* The averaged epochs */
-    fiffCoordTrans trans = NULL;	                /* The coordinate transformation */
-    fiffId            id = NULL;			/* Measurement id */
-    fiffTime          meas_date = NULL;           /* Measurement date */
-    int             nave = 1;	                /* Number of averaged responses */
-    float           tmin = 0;		        /* Time scale minimum */
-    float           lowpass;		        /* Lowpass filter frequency */
-    float           highpass = 0.0;		/* Highpass filter frequency */
-    int             nsamp = 0;			/* Samples in epoch */
-    int             aspect_kind;			/* What kind of data */
-    int             res = FAIL;			/* A little bit of pessimism */
+    int         nchan   = 0;            /* How many channels */
+    char        **comments = NULL;      /* The associated comments */
+    float       sfreq = 0.0;            /* What sampling frequency */
+    FiffDirNode::SPtr start;
+    fiffChInfo   chs     = NULL;        /* Channel info */
+    int          *artefs = NULL;        /* Artefact limits */
+    int           nartef = 0;           /* How many */
+    float       **epochs = NULL;        /* The averaged epochs */
+    fiffCoordTrans trans = NULL;        /* The coordinate transformation */
+    fiffId            id = NULL;        /* Measurement id */
+    fiffTime          meas_date = NULL; /* Measurement date */
+    int             nave = 1;           /* Number of averaged responses */
+    float           tmin = 0;           /* Time scale minimum */
+    float           lowpass;            /* Lowpass filter frequency */
+    float           highpass = 0.0;     /* Highpass filter frequency */
+    int             nsamp = 0;          /* Samples in epoch */
+    int             aspect_kind;        /* What kind of data */
+    int             res = FAIL;         /* A little bit of pessimism */
 
     float *epoch;
     int   j,k;
@@ -5386,56 +2773,58 @@ int mne_read_evoked(const QString& name,           /* Name of the file */
         printf ("Evoked response selector must be positive!");
         goto out;
     }
-    if ((in = fiff_open(name.toLatin1().data())) == NULL)
+
+    if(!stream->open())
         goto out;
+
     /*
-   * Select correct data set
-   */
-    evoked = mne_find_evoked(in,(commentp == NULL) ? NULL : &comments);
-    if (evoked == NULL) {
+    * Select correct data set
+    */
+    evoked = mne_find_evoked(stream,(commentp == NULL) ? NULL : &comments);
+    if (!evoked.size()) {
         printf ("No evoked response data available here");
         goto out;
     }
-    for (k = 0, nset = 0; evoked[k] != NULL; k++)
-        nset++;
+
+    nset = evoked.size();
+
     if (setno < nset) {
         start = evoked[setno];
-        FREE(evoked);
     }
     else {
         printf ("Too few evoked response data sets (how come?)");
-        FREE (evoked);
         goto out;
     }
     /*
-   * Get various things...
-   */
-    if (get_meas_info (in,start,&id,&meas_date,&nchan,&sfreq,&highpass,&lowpass,
-                       &chs,&trans) == -1)
+    * Get various things...
+    */
+    if (get_meas_info (stream,start,&id,&meas_date,&nchan,&sfreq,&highpass,&lowpass,&chs,&trans) == -1)
+        goto out;
+
+    /*
+    * sfreq is listed here again because
+    * there might be an individual one in the
+    * evoked-response data
+    */
+    if (get_evoked_essentials(stream,start,sfreq,
+                              tmin,nsamp,nave,aspect_kind,
+                              artefs,nartef) == -1)
         goto out;
     /*
-   * sfreq is listed here again because
-   * there might be an individual one in the
-   * evoked-response data
-   */
-    if (get_evoked_essentials(in,start,&sfreq,
-                              &tmin,&nsamp,&nave,&aspect_kind,
-                              &artefs,&nartef) == -1)
+    * Some things may be redefined at a lower level
+    */
+    if (get_evoked_optional(stream,start,&nchan,&chs) == -1)
         goto out;
     /*
-   * Some things may be redefined at a lower level
-   */
-    if (get_evoked_optional(in,start,&nchan,&chs) == -1)
+    * Omit nonmagnetic channels
+    */
+    if ((epochs = get_epochs(stream,start,nchan,nsamp)) == NULL)
         goto out;
     /*
-   * Omit nonmagnetic channels
-   */
-    if ((epochs = get_epochs(in,start,nchan,nsamp)) == NULL)
-        goto out;
-    /*
-   * Change artefact limits to start from 0
-   */
+    * Change artefact limits to start from 0
+    */
     for (k = 0; k < nartef; k++) {
+        qDebug() << "TODO: Artefact Vectors do not contain the right stuff!";
         artefs[2*k+1] = artefs[2*k+1] - sfreq*tmin;
         artefs[2*k+2] = artefs[2*k+2] - sfreq*tmin;
     }
@@ -5485,8 +2874,8 @@ int mne_read_evoked(const QString& name,           /* Name of the file */
     }
     res = OK;
     /*
-   * FREE all allocated data on exit
-   */
+    * FREE all allocated data on exit
+    */
 out : {
         mne_free_name_list(comments,nset);
         FREE (chs);
@@ -5495,7 +2884,7 @@ out : {
         FREE (id);
         FREE (meas_date);
         FREE_CMATRIX(epochs);
-        fiff_close(in);
+        stream->close();
         return res;
     }
 }
@@ -5520,13 +2909,6 @@ char *mne_format_file_id (fiffId id)
     sprintf(s,"%d.%d 0x%x%x %s",id->version>>16,id->version & 0xFFFF,id->machid[0],id->machid[1],buf);
     return s;
 }
-
-
-
-
-
-
-
 
 
 //============================= mne_lin_proj.c =============================
@@ -5568,9 +2950,6 @@ mneProjItem mne_new_proj_op_item()
 }
 
 
-
-
-
 void mne_free_proj_op_proj(mneProjOp op)
 
 {
@@ -5595,7 +2974,9 @@ void mne_free_proj_op_item(mneProjItem it)
     if (it == NULL)
         return;
 
-    mne_free_named_matrix(it->vecs);
+    if(it->vecs)
+        delete it->vecs;
+
     FREE(it->desc);
     FREE(it);
     return;
@@ -5621,12 +3002,10 @@ void mne_free_proj_op(mneProjOp op)
 }
 
 
-
-
-void mne_proj_op_add_item_act(mneProjOp op, mneNamedMatrix vecs, int kind, const char *desc, int is_active)
+void mne_proj_op_add_item_act(mneProjOp op, MneNamedMatrix* vecs, int kind, const char *desc, int is_active)
 /*
-      * Add a new item to an existing projection operator
-      */
+* Add a new item to an existing projection operator
+*/
 {
     mneProjItem new_item;
     int         k;
@@ -5636,7 +3015,7 @@ void mne_proj_op_add_item_act(mneProjOp op, mneNamedMatrix vecs, int kind, const
     op->items[op->nitems] = new_item = mne_new_proj_op_item();
 
     new_item->active      = is_active;
-    new_item->vecs        = mne_dup_named_matrix(vecs);
+    new_item->vecs        = new MneNamedMatrix(*vecs);
 
     if (kind == FIFFV_MNE_PROJ_ITEM_EEG_AVREF) {
         new_item->has_meg = FALSE;
@@ -5665,25 +3044,22 @@ void mne_proj_op_add_item_act(mneProjOp op, mneNamedMatrix vecs, int kind, const
 
     op->nitems++;
 
-    mne_free_proj_op_proj(op);	/* These data are not valid any more */
+    mne_free_proj_op_proj(op);  /* These data are not valid any more */
     return;
 }
 
 
-
-void mne_proj_op_add_item(mneProjOp op, mneNamedMatrix vecs, int kind, const char *desc)
+void mne_proj_op_add_item(mneProjOp op, MneNamedMatrix* vecs, int kind, const char *desc)
 
 {
     mne_proj_op_add_item_act(op, vecs, kind, desc, TRUE);
 }
 
 
-
-
 mneProjOp mne_dup_proj_op(mneProjOp op)
 /*
-      * Provide a duplicate (item data only)
-      */
+* Provide a duplicate (item data only)
+*/
 {
     mneProjOp dup = mne_new_proj_op();
     mneProjItem it;
@@ -5727,7 +3103,7 @@ int mne_proj_op_chs(mneProjOp op, char **list, int nlist)
     if (op == NULL)
         return OK;
 
-    mne_free_proj_op_proj(op);	/* These data are not valid any more */
+    mne_free_proj_op_proj(op);  /* These data are not valid any more */
 
     if (nlist == 0)
         return OK;
@@ -5742,12 +3118,12 @@ int mne_proj_op_chs(mneProjOp op, char **list, int nlist)
 void mne_proj_op_report_data(FILE *out,const char *tag, mneProjOp op, int list_data,
                              char **exclude, int nexclude)
 /*
-      * Output info about the projection operator
-      */
+* Output info about the projection operator
+*/
 {
     int j,k,p,q;
     mneProjItem it;
-    mneNamedMatrix vecs;
+    MneNamedMatrix* vecs;
     int found;
 
     if (out == NULL)
@@ -5798,7 +3174,6 @@ void mne_proj_op_report_data(FILE *out,const char *tag, mneProjOp op, int list_d
 
 
 void mne_proj_op_report(FILE *out,const char *tag, mneProjOp op)
-
 {
     mne_proj_op_report_data(out,tag,op, FALSE, NULL, 0);
 }
@@ -5806,8 +3181,8 @@ void mne_proj_op_report(FILE *out,const char *tag, mneProjOp op)
 
 int mne_proj_item_affect(mneProjItem it, char **list, int nlist)
 /*
-      * Does this projection item affect this list of channels?
-      */
+* Does this projection item affect this list of channels?
+*/
 {
     int k,p,q;
 
@@ -5825,6 +3200,7 @@ int mne_proj_item_affect(mneProjItem it, char **list, int nlist)
     return FALSE;
 }
 
+
 int mne_proj_op_affect(mneProjOp op, char **list, int nlist)
 
 {
@@ -5841,6 +3217,7 @@ int mne_proj_op_affect(mneProjOp op, char **list, int nlist)
     return naff;
 }
 
+
 static void clear_these(float *data, char **names, int nnames, const char *start)
 
 {
@@ -5851,9 +3228,7 @@ static void clear_these(float *data, char **names, int nnames, const char *start
 }
 
 
-
 int mne_proj_op_affect_chs(mneProjOp op, fiffChInfo chs, int nch)
-
 {
     char *ch_string;
     int  res;
@@ -5872,13 +3247,11 @@ int mne_proj_op_affect_chs(mneProjOp op, fiffChInfo chs, int nch)
 }
 
 
-
-
 int mne_proj_op_proj_dvector(mneProjOp op, double *vec, int nch, int do_complement)
 /*
-      * Apply projection operator to a vector (doubles)
-      * Assume that all dimension checking etc. has been done before
-      */
+* Apply projection operator to a vector (doubles)
+* Assume that all dimension checking etc. has been done before
+*/
 {
     float *pvec;
     double w;
@@ -5920,8 +3293,8 @@ int mne_proj_op_proj_dvector(mneProjOp op, double *vec, int nch, int do_compleme
 
 int mne_proj_op_apply_cov(mneProjOp op, mneCovMatrix& c)
 /*
-      * Apply the projection operator to a covariance matrix
-      */
+* Apply the projection operator to a covariance matrix
+*/
 {
     double **dcov = NULL;
     int j,k,p;
@@ -5937,14 +3310,14 @@ int mne_proj_op_apply_cov(mneProjOp op, mneCovMatrix& c)
 
     dcov = ALLOC_DCMATRIX(c->ncov,c->ncov);
     /*
-   * Return the appropriate result
-   */
-    if (c->cov_diag) {		/* Pick the diagonals */
+    * Return the appropriate result
+    */
+    if (c->cov_diag) {  /* Pick the diagonals */
         for (j = 0, p = 0; j < c->ncov; j++)
             for (k = 0; k < c->ncov; k++)
                 dcov[j][k] = (j == k) ? c->cov_diag[j] : 0;
     }
-    else {			/* Return full matrix */
+    else {              /* Return full matrix */
         for (j = 0, p = 0; j < c->ncov; j++)
             for (k = 0; k <= j; k++)
                 dcov[j][k] = c->cov[p++];
@@ -5953,10 +3326,9 @@ int mne_proj_op_apply_cov(mneProjOp op, mneCovMatrix& c)
                 dcov[j][k] = dcov[k][j];
     }
 
-
     /*
-   * Project from front and behind
-   */
+    * Project from front and behind
+    */
     for (k = 0; k < c->ncov; k++) {
         if (mne_proj_op_proj_dvector(op,dcov[k],c->ncov,do_complement) != OK)
             return FAIL;
@@ -5969,15 +3341,15 @@ int mne_proj_op_apply_cov(mneProjOp op, mneCovMatrix& c)
             return FAIL;
 
     /*
-   * Return the result
-   */
-    if (c->cov_diag) {		/* Pick the diagonal elements */
+    * Return the result
+    */
+    if (c->cov_diag) {  /* Pick the diagonal elements */
         for (j = 0; j < c->ncov; j++) {
             c->cov_diag[j] = dcov[j][j];
         }
         FREE(c->cov); c->cov = NULL;
     }
-    else {			/* Put everything back */
+    else {              /* Put everything back */
         for (j = 0, p = 0; j < c->ncov; j++)
             for (k = 0; k <= j; k++)
                 c->cov[p++] = dcov[j][k];
@@ -5990,17 +3362,16 @@ int mne_proj_op_apply_cov(mneProjOp op, mneCovMatrix& c)
 }
 
 
-
 #define USE_LIMIT   1e-5
 #define SMALL_VALUE 1e-4
 
 int mne_proj_op_make_proj_bad(mneProjOp op, char **bad, int nbad)
 /*
-      * Do the channel picking and SVD
-      * Include a bad list at this phase
-      * Input to the projection can include the bad channels
-      * but they are not affected
-      */
+* Do the channel picking and SVD
+* Include a bad list at this phase
+* Input to the projection can include the bad channels
+* but they are not affected
+*/
 {
     int   k,p,q,r,nvec;
     float **vv_meg  = NULL;
@@ -6068,8 +3439,8 @@ int mne_proj_op_make_proj_bad(mneProjOp op, char **bad, int nbad)
         }
     }
     /*
-   * Replace bad channel entries with zeroes
-   */
+    * Replace bad channel entries with zeroes
+    */
     for (q = 0; q < nbad; q++)
         for (r = 0; r < op->nch; r++)
             if (strcmp(op->names[r],bad[q]) == 0) {
@@ -6079,8 +3450,8 @@ int mne_proj_op_make_proj_bad(mneProjOp op, char **bad, int nbad)
                     mat_eeg[p][r] = 0.0;
             }
     /*
-   * Scale the rows so that detection of linear dependence becomes easy
-   */
+    * Scale the rows so that detection of linear dependence becomes easy
+    */
     for (p = 0, nzero = 0; p < nvec_meg; p++) {
         size = sqrt(mne_dot_vectors(mat_meg[p],mat_meg[p],op->nch));
         if (size > 0) {
@@ -6110,8 +3481,8 @@ int mne_proj_op_make_proj_bad(mneProjOp op, char **bad, int nbad)
         return OK;
     }
     /*
-   * Proceed to SVD
-   */
+    * Proceed to SVD
+    */
 #ifdef DEBUG
     fprintf(stdout,"Before SVD:\n");
 #endif
@@ -6144,8 +3515,8 @@ int mne_proj_op_make_proj_bad(mneProjOp op, char **bad, int nbad)
             goto bad;
     }
     /*
-   * Check for linearly dependent vectors
-   */
+    * Check for linearly dependent vectors
+    */
     for (p = 0, op->nvec = 0; p < nvec_meg; p++, op->nvec++)
         if (sing_meg[p]/sing_meg[0] < USE_LIMIT)
             break;
@@ -6164,16 +3535,16 @@ int mne_proj_op_make_proj_bad(mneProjOp op, char **bad, int nbad)
             break;
         for (k = 0; k < op->nch; k++) {
             /*
-       * Avoid crosstalk between MEG/EEG
-       */
+            * Avoid crosstalk between MEG/EEG
+            */
             if (fabs(vv_meg[p][k]) < SMALL_VALUE)
                 op->proj_data[op->nvec][k] = 0.0;
             else
                 op->proj_data[op->nvec][k] = vv_meg[p][k];
 
             /*
-       * If the above did not work, this will (provided that EEG channels are called EEG*)
-       */
+            * If the above did not work, this will (provided that EEG channels are called EEG*)
+            */
             clear_these(op->proj_data[op->nvec],op->names,op->nch,"EEG");
         }
 #ifdef DEBUG
@@ -6186,15 +3557,15 @@ int mne_proj_op_make_proj_bad(mneProjOp op, char **bad, int nbad)
             break;
         for (k = 0; k < op->nch; k++) {
             /*
-       * Avoid crosstalk between MEG/EEG
-       */
+            * Avoid crosstalk between MEG/EEG
+            */
             if (fabs(vv_eeg[p][k]) < SMALL_VALUE)
                 op->proj_data[op->nvec][k] = 0.0;
             else
                 op->proj_data[op->nvec][k] = vv_eeg[p][k];
             /*
-       * If the above did not work, this will (provided that MEG channels are called MEG*)
-       */
+            * If the above did not work, this will (provided that MEG channels are called MEG*)
+            */
             clear_these(op->proj_data[op->nvec],op->names,op->nch,"MEG");
         }
 #ifdef DEBUG
@@ -6234,8 +3605,8 @@ bad : {
 
 int mne_proj_op_make_proj(mneProjOp op)
 /*
-      * Do the channel picking and SVD
-      */
+* Do the channel picking and SVD
+*/
 {
     return mne_proj_op_make_proj_bad(op,NULL,0);
 }
@@ -6243,9 +3614,9 @@ int mne_proj_op_make_proj(mneProjOp op)
 
 int mne_proj_op_proj_vector(mneProjOp op, float *vec, int nvec, int do_complement)
 /*
-      * Apply projection operator to a vector (floats)
-      * Assume that all dimension checking etc. has been done before
-      */
+* Apply projection operator to a vector (floats)
+* Assume that all dimension checking etc. has been done before
+*/
 {
     static float *res = NULL;
     int    res_size   = 0;
@@ -6289,8 +3660,8 @@ int mne_proj_op_proj_vector(mneProjOp op, float *vec, int nvec, int do_complemen
 
 mneProjOp mne_proj_op_combine(mneProjOp to, mneProjOp from)
 /*
-      * Copy items from 'from' operator to 'to' operator
-      */
+* Copy items from 'from' operator to 'to' operator
+*/
 {
     int k;
     mneProjItem it;
@@ -6311,14 +3682,14 @@ mneProjOp mne_proj_op_combine(mneProjOp to, mneProjOp from)
 mneProjOp mne_proj_op_average_eeg_ref(fiffChInfo chs,
                                       int nch)
 /*
-      * Make the projection operator for average electrode reference
-      */
+* Make the projection operator for average electrode reference
+*/
 {
     int eegcount = 0;
     int k;
     float       **vec_data;
     char        **names;
-    mneNamedMatrix vecs;
+    MneNamedMatrix* vecs;
     mneProjOp      op;
 
     for (k = 0; k < nch; k++)
@@ -6339,7 +3710,7 @@ mneProjOp mne_proj_op_average_eeg_ref(fiffChInfo chs,
     for (k = 0; k < eegcount; k++)
         vec_data[0][k] = 1.0/sqrt((double)eegcount);
 
-    vecs = mne_build_named_matrix(1,eegcount,NULL,names,vec_data);
+    vecs = MneNamedMatrix::build_named_matrix(1,eegcount,NULL,names,vec_data);
 
     op = mne_new_proj_op();
     mne_proj_op_add_item(op,vecs,FIFFV_MNE_PROJ_ITEM_EEG_AVREF,"Average EEG reference");
@@ -6348,156 +3719,147 @@ mneProjOp mne_proj_op_average_eeg_ref(fiffChInfo chs,
 }
 
 
-
-
-
 //============================= mne_lin_proj_io.c =============================
 
-
-mneProjOp mne_read_proj_op_from_node(fiffFile in, fiffDirNode start)
+mneProjOp mne_read_proj_op_from_node(//fiffFile in,
+                                     FiffStream::SPtr& stream,
+                                     const FiffDirNode::SPtr& start)
 /*
-      * Load all the linear projection data
-      */
+* Load all the linear projection data
+*/
 {
     mneProjOp   op     = NULL;
-    fiffDirNode *proj  = NULL;
-    fiffDirNode *items = NULL;
-    fiffDirNode node;
-    fiffTag     tag;
+    QList<FiffDirNode::SPtr> proj;
+    FiffDirNode::SPtr start_node;
+    QList<FiffDirNode::SPtr> items;
+    FiffDirNode::SPtr node;
     int         k;
     char        *item_desc,*desc_tag,*lf;
     int         global_nchan,item_nchan,nlist;
     char        **item_names;
     int         item_kind;
-    float       **item_vectors;
+    float       **item_vectors = NULL;
     int         item_nvec;
     int         item_active;
-    mneNamedMatrix item;
+    MneNamedMatrix* item;
+    FiffTag::SPtr t_pTag;
 
-    if (!in) {
+    if (!stream) {
         qCritical("File not open mne_read_proj_op_from_node");
         goto bad;
     }
-    if (!start)
-        start = in->dirtree;
+
+    if (!start || start->isEmpty())
+        start_node = stream->tree();
+    else
+        start_node = start;
 
     op = mne_new_proj_op();
-    proj = fiff_dir_tree_find(start,FIFFB_PROJ);
-    if (proj == NULL || proj[0] == NULL)   /* The caller must recognize an empty projection */
+    proj = start_node->dir_tree_find(FIFFB_PROJ);
+    if (proj.size() == 0 || proj[0]->isEmpty())   /* The caller must recognize an empty projection */
         goto out;
     /*
-   * Only the first projection block is recognized
-   */
-    items = fiff_dir_tree_find(proj[0],FIFFB_PROJ_ITEM);
-    if (items == NULL || items[0] == NULL)   /* The caller must recognize an empty projection */
+    * Only the first projection block is recognized
+    */
+    items = proj[0]->dir_tree_find(FIFFB_PROJ_ITEM);
+    if (items.size() == 0 || items[0]->isEmpty())   /* The caller must recognize an empty projection */
         goto out;
     /*
-   * Get a common number of channels
-   */
+    * Get a common number of channels
+    */
     node = proj[0];
-    if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_NCHAN)) == NULL)
+    if(!node->find_tag(stream, FIFF_NCHAN, t_pTag))
         global_nchan = 0;
     else {
-        global_nchan = *(int *)tag->data;
-        TAG_FREE(tag);
+        global_nchan = *t_pTag->toInt();
+//        TAG_FREE(tag);
     }
     /*
    * Proceess each item
    */
-    for (node = items[0],k = 0; node != NULL; k++, node = items[k]) {
+    for (k = 0; k < items.size(); k++) {
+        node = items[k];
         /*
-     * Complicated procedure for getting the description
-     */
+        * Complicated procedure for getting the description
+        */
         item_desc = NULL;
-        if ((tag = fiff_dir_tree_get_tag(in,node,
-                                         FIFF_NAME)) != NULL) {
-            item_desc = add_string(item_desc,(char *)tag->data);
+
+        if (node->find_tag(stream, FIFF_NAME, t_pTag)) {
+            item_desc = add_string(item_desc,(char *)t_pTag->data());
         }
-        FREE(tag);
+
         /*
-     * Take the first line of description if it exists
-     */
-        if ((tag = fiff_dir_tree_get_tag(in,node,
-                                         FIFF_DESCRIPTION)) != NULL) {
-            desc_tag = (char *)tag->data;
+        * Take the first line of description if it exists
+        */
+        if (node->find_tag(stream, FIFF_DESCRIPTION, t_pTag)) {
+            desc_tag = (char *)t_pTag->data();
             if ((lf = strchr(desc_tag,'\n')) != NULL)
                 *lf = '\0';
-            //      if (item_desc != NULL)
-            //        item_desc = add_string(item_desc," ");
             printf("###################DEBUG ToDo: item_desc = add_string(item_desc," ");");
             item_desc = add_string(item_desc,(char *)desc_tag);
             FREE(desc_tag);
         }
-        FREE(tag);
         /*
-     * Possibility to override number of channels here
-     */
-        if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_NCHAN)) == NULL)
+        * Possibility to override number of channels here
+        */
+        if (!node->find_tag(stream, FIFF_NCHAN, t_pTag)) {
             item_nchan = global_nchan;
+        }
         else {
-            item_nchan = *(int *)tag->data;
-            TAG_FREE(tag); tag = NULL;
+            item_nchan = *t_pTag->toInt();
         }
         if (item_nchan <= 0) {
             qCritical("Number of channels incorrectly specified for one of the projection items.");
             goto bad;
         }
         /*
-     * Take care of the channel names
-     */
-        if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_PROJ_ITEM_CH_NAME_LIST)) == NULL)
+        * Take care of the channel names
+        */
+        if (!node->find_tag(stream, FIFF_PROJ_ITEM_CH_NAME_LIST, t_pTag))
             goto bad;
-        mne_string_to_name_list((char *)(tag->data),&item_names,&nlist);
+
+        mne_string_to_name_list((char *)(t_pTag->data()),&item_names,&nlist);
         if (nlist != item_nchan) {
             printf("Channel name list incorrectly specified for proj item # %d",k+1);
             mne_free_name_list(item_names,nlist);
-            TAG_FREE(tag);
             goto bad;
         }
-        TAG_FREE(tag);
         /*
-     * Kind of item
-     */
-        if ((tag = fiff_dir_tree_get_tag(in,node,
-                                         FIFF_PROJ_ITEM_KIND)) == NULL)
+        * Kind of item
+        */
+        if (!node->find_tag(stream, FIFF_PROJ_ITEM_KIND, t_pTag))
             goto bad;
-        item_kind = *(int *)tag->data;
-        TAG_FREE(tag);
+        item_kind = *t_pTag->toInt();
         /*
-     * How many vectors
-     */
-        if ((tag = fiff_dir_tree_get_tag(in,node,
-                                         FIFF_PROJ_ITEM_NVEC)) == NULL)
+        * How many vectors
+        */
+        if (!node->find_tag(stream,FIFF_PROJ_ITEM_NVEC, t_pTag))
             goto bad;
-        item_nvec = *(int *)tag->data;
-        TAG_FREE(tag);
+        item_nvec = *t_pTag->toInt();
         /*
-     * The projection data
-     */
-        if ((tag = fiff_dir_tree_get_tag(in,node,
-                                         FIFF_PROJ_ITEM_VECTORS)) == NULL)
+        * The projection data
+        */
+        if (!node->find_tag(stream,FIFF_PROJ_ITEM_VECTORS, t_pTag))
             goto bad;
-        if ((item_vectors = fiff_get_float_matrix(tag)) == NULL) {
-            TAG_FREE(tag);
-            goto bad;
-        }
-        FREE(tag); tag = NULL;
+
+        MatrixXf tmp_item_vectors = t_pTag->toFloatMatrix().transpose();
+        item_vectors = ALLOC_CMATRIX(tmp_item_vectors.rows(),tmp_item_vectors.cols());
+        fromFloatEigenMatrix(tmp_item_vectors, item_vectors);
+
         /*
-     * Is this item active?
-     */
-        if ((tag = fiff_dir_tree_get_tag(in,node,
-                                         FIFF_MNE_PROJ_ITEM_ACTIVE)) != NULL) {
-            item_active = *(int *)tag->data;
-            TAG_FREE(tag);
+        * Is this item active?
+        */
+        if (node->find_tag(stream, FIFF_MNE_PROJ_ITEM_ACTIVE, t_pTag)) {
+            item_active = *t_pTag->toInt();
         }
         else
             item_active = FALSE;
         /*
-     * Ready to add
-     */
-        item = mne_build_named_matrix(item_nvec,item_nchan,NULL,item_names,item_vectors);
+        * Ready to add
+        */
+        item = MneNamedMatrix::build_named_matrix(item_nvec,item_nchan,NULL,item_names,item_vectors);
         mne_proj_op_add_item_act(op,item,item_kind,item_desc,item_active);
-        mne_free_named_matrix(item);
+        delete item;
         op->items[op->nitems-1]->active_file = item_active;
     }
 
@@ -6513,35 +3875,21 @@ bad : {
 mneProjOp mne_read_proj_op(const QString& name)
 
 {
-    fiffFile    in  = fiff_open(name.toLatin1().data());
-    mneProjOp   res = NULL;
+    QFile file(name);
+    FiffStream::SPtr stream(new FiffStream(&file));
 
-    if (in == NULL)
+    if(!stream->open())
         return NULL;
 
-    res = mne_read_proj_op_from_node(in,NULL);
+    mneProjOp   res = NULL;
 
-    fiff_close(in);
+    FiffDirNode::SPtr t_default;
+    res = mne_read_proj_op_from_node(stream,t_default);
+
+    stream->close();
 
     return res;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 //============================= mne_ctf_comp.c =============================
@@ -6568,7 +3916,6 @@ static struct {
  * Allocation and freeing of the data structures
  */
 mneCTFcompData mne_new_ctf_comp_data()
-
 {
     mneCTFcompData res = MALLOC(1,mneCTFcompDataRec);
     res->kind          = MNE_CTFV_COMP_UNKNOWN;
@@ -6585,7 +3932,6 @@ mneCTFcompData mne_new_ctf_comp_data()
 }
 
 mneCTFcompDataSet mne_new_ctf_comp_data_set()
-
 {
     mneCTFcompDataSet res = MALLOC(1,mneCTFcompDataSetRec);
 
@@ -6606,17 +3952,18 @@ void mne_free_ctf_comp_data(mneCTFcompData comp)
     if (!comp)
         return;
 
-    mne_free_named_matrix(comp->data);
-    mne_free_sparse(comp->presel);
-    mne_free_sparse(comp->postsel);
+    if(comp->data)
+        delete comp->data;
+    if(comp->presel)
+        delete comp->presel;
+    if(comp->postsel)
+        delete comp->postsel;
     FREE(comp->presel_data);
     FREE(comp->postsel_data);
     FREE(comp->comp_data);
     FREE(comp);
     return;
 }
-
-
 
 
 void mne_free_ctf_comp_data_set(mneCTFcompDataSet set)
@@ -6637,9 +3984,7 @@ void mne_free_ctf_comp_data_set(mneCTFcompDataSet set)
 }
 
 
-
 mneCTFcompData mne_dup_ctf_comp_data(mneCTFcompData data)
-
 {
     mneCTFcompData res;
 
@@ -6651,11 +3996,10 @@ mneCTFcompData mne_dup_ctf_comp_data(mneCTFcompData data)
     res->kind       = data->kind;
     res->mne_kind   = data->mne_kind;
     res->calibrated = data->calibrated;
-    res->data       = mne_dup_named_matrix(data->data);
+    res->data       = new MneNamedMatrix(*data->data);
 
-    res->presel     = mne_dup_sparse_matrix(data->presel);
-    res->postsel    = mne_dup_sparse_matrix(data->postsel);
-
+    res->presel     = new FiffSparseMatrix(*data->presel);
+    res->postsel    = new FiffSparseMatrix(*data->postsel);
 
     return res;
 }
@@ -6663,8 +4007,8 @@ mneCTFcompData mne_dup_ctf_comp_data(mneCTFcompData data)
 
 mneCTFcompDataSet mne_dup_ctf_comp_data_set(mneCTFcompDataSet set)
 /*
-      * Make a verbatim copy of a data set
-      */
+* Make a verbatim copy of a data set
+*/
 {
     mneCTFcompDataSet res;
     int  k;
@@ -6686,8 +4030,6 @@ mneCTFcompDataSet mne_dup_ctf_comp_data_set(mneCTFcompDataSet set)
 }
 
 
-
-
 int mne_apply_ctf_comp(mneCTFcompDataSet set,		  /* The compensation data */
                        int               do_it,
                        float             *data,           /* The data to process */
@@ -6695,8 +4037,8 @@ int mne_apply_ctf_comp(mneCTFcompDataSet set,		  /* The compensation data */
                        float             *compdata,       /* Data containing the compensation channels */
                        int               ncompdata)
 /*
- * Apply compensation or revert to uncompensated data
- */
+* Apply compensation or revert to uncompensated data
+*/
 {
     mneCTFcompData this_comp;
     float *presel,*comp;
@@ -6737,8 +4079,8 @@ int mne_apply_ctf_comp(mneCTFcompDataSet set,		  /* The compensation data */
         return FAIL;
     }
     /*
-   * Preselection is optional
-   */
+    * Preselection is optional
+    */
     if (this_comp->presel) {
         if (!this_comp->presel_data)
             this_comp->presel_data = MALLOC(this_comp->presel->m,float);
@@ -6749,14 +4091,14 @@ int mne_apply_ctf_comp(mneCTFcompDataSet set,		  /* The compensation data */
     else
         presel = compdata;
     /*
-   * This always happens
-   */
+    * This always happens
+    */
     if (!this_comp->comp_data)
         this_comp->comp_data = MALLOC(this_comp->data->nrow,float);
     mne_mat_vec_mult2(this_comp->data->data,presel,this_comp->comp_data,this_comp->data->nrow,this_comp->data->ncol);
     /*
-   * Optional postselection
-   */
+    * Optional postselection
+    */
     if (!this_comp->postsel)
         comp = this_comp->comp_data;
     else {
@@ -6768,8 +4110,8 @@ int mne_apply_ctf_comp(mneCTFcompDataSet set,		  /* The compensation data */
         comp = this_comp->postsel_data;
     }
     /*
-   * Compensate or revert compensation?
-   */
+    * Compensate or revert compensation?
+    */
     if (do_it) {
         for (k = 0; k < ndata; k++)
             data[k] = data[k] - comp[k];
@@ -6782,9 +4124,7 @@ int mne_apply_ctf_comp(mneCTFcompDataSet set,		  /* The compensation data */
 }
 
 
-
 const char *mne_explain_ctf_comp(int kind)
-
 {
     static struct {
         int kind;
@@ -6823,8 +4163,8 @@ static int mne_calibrate_ctf_comp(mneCTFcompData one,
                                   int            nch,
                                   int            do_it)
 /*
- * Calibrate or decalibrate a compensation data set
- */
+* Calibrate or decalibrate a compensation data set
+*/
 {
     float *col_cals,*row_cals;
     int   j,k,p,found;
@@ -6882,29 +4222,28 @@ static int mne_calibrate_ctf_comp(mneCTFcompData one,
 }
 
 
-
-
-
 mneCTFcompDataSet mne_read_ctf_comp_data(const QString& name)
 /*
- * Read all CTF compensation data from a given file
- */
+* Read all CTF compensation data from a given file
+*/
 {
-    fiffFile          in = NULL;
+    QFile file(name);
+    FiffStream::SPtr stream(new FiffStream(&file));
+
     mneCTFcompDataSet set = NULL;
     mneCTFcompData    one;
-    fiffDirNode       *nodes = NULL;
-    fiffDirNode       *comps = NULL;
+    QList<FiffDirNode::SPtr> nodes;
+    QList<FiffDirNode::SPtr> comps;
     int               ncomp;
-    mneNamedMatrix    mat = NULL;
+    MneNamedMatrix*    mat = NULL;
     int               kind,k;
-    fiffTag           tag;
+    FiffTag::SPtr t_pTag;
     fiffChInfo        chs = NULL;
     int               nch = 0;
     int               calibrated;
     /*
-   * Read the channel information
-   */
+    * Read the channel information
+    */
     {
         fiffChInfo        comp_chs = NULL;
         int               ncompch = 0;
@@ -6920,52 +4259,48 @@ mneCTFcompDataSet mne_read_ctf_comp_data(const QString& name)
         }
     }
     /*
-   * Read the rest of the stuff
-   */
-    if ((in = fiff_open(name.toLatin1().data())) == NULL)
+    * Read the rest of the stuff
+    */
+    if(!stream->open())
         goto bad;
     set = mne_new_ctf_comp_data_set();
     /*
-   * Locate the compensation data sets
-   */
-    nodes = fiff_dir_tree_find(in->dirtree,FIFFB_MNE_CTF_COMP);
-    if (!nodes || !nodes[0])
-        goto good;			/* Nothing more to do */
-    comps = fiff_dir_tree_find(nodes[0],FIFFB_MNE_CTF_COMP_DATA);
-    if (!comps || !comps[0])
+    * Locate the compensation data sets
+    */
+    nodes = stream->tree()->dir_tree_find(FIFFB_MNE_CTF_COMP);
+    if (nodes.size() == 0)
+        goto good;      /* Nothing more to do */
+    comps = nodes[0]->dir_tree_find(FIFFB_MNE_CTF_COMP_DATA);
+    if (comps.size() == 0)
         goto good;
-    for (ncomp = 0; comps[ncomp] != NULL; ncomp++)
-        ;
-    FREE(nodes); nodes = NULL;
+    ncomp = comps.size();
     /*
-   * Set the channel info
-   */
+    * Set the channel info
+    */
     set->chs = chs; chs = NULL;
     set->nch = nch;
     /*
-   * Read each data set
-   */
+    * Read each data set
+    */
     for (k = 0; k < ncomp; k++) {
-        mat = mne_read_named_matrix(in,comps[k],FIFF_MNE_CTF_COMP_DATA);
+        mat = MneNamedMatrix::read_named_matrix(stream,comps[k],FIFF_MNE_CTF_COMP_DATA);
         if (!mat)
             goto bad;
-        tag = fiff_dir_tree_get_tag(in,comps[k],FIFF_MNE_CTF_COMP_KIND);
-        if (tag) {
-            kind = *(int *)tag->data;
-            TAG_FREE(tag);
+        comps[k]->find_tag(stream, FIFF_MNE_CTF_COMP_KIND, t_pTag);
+        if (t_pTag) {
+            kind = *t_pTag->toInt();
         }
         else
             goto bad;
-        tag = fiff_dir_tree_get_tag(in,comps[k],FIFF_MNE_CTF_COMP_CALIBRATED);
-        if (tag) {
-            calibrated = *(int *)tag->data;
-            TAG_FREE(tag);
+        comps[k]->find_tag(stream, FIFF_MNE_CTF_COMP_CALIBRATED, t_pTag);
+        if (t_pTag) {
+            calibrated = *t_pTag->toInt();
         }
         else
             calibrated = FALSE;
         /*
-     * Add these data to the set
-     */
+        * Add these data to the set
+        */
         one = mne_new_ctf_comp_data();
         one->data = mat; mat = NULL;
         one->kind                = kind;
@@ -6987,25 +4322,19 @@ mneCTFcompDataSet mne_read_ctf_comp_data(const QString& name)
     goto good;
 
 bad : {
-        mne_free_named_matrix(mat);
-        FREE(nodes);
-        FREE(comps);
-        fiff_close(in);
+        if(mat)
+            delete mat;
+        stream->close();
         mne_free_ctf_comp_data_set(set);
         return NULL;
     }
 
 good : {
         FREE(chs);
-        FREE(nodes);
-        FREE(comps);
-        fiff_close(in);
+        stream->close();
         return set;
     }
 }
-
-
-
 
 
 /*
@@ -7025,14 +4354,7 @@ int mne_map_ctf_comp_kind(int grad)
 }
 
 
-
-
-
-
-
-int mne_get_ctf_comp(fiffChInfo chs,
-                     int        nch)
-
+int mne_get_ctf_comp(fiffChInfo chs,int nch)
 {
     int res = MNE_CTFV_NOGRAD;
     int first_comp,comp;
@@ -7055,25 +4377,14 @@ int mne_get_ctf_comp(fiffChInfo chs,
 }
 
 
-
-
-
-
-
-
-
-int mne_make_ctf_comp(mneCTFcompDataSet set,         /* The available compensation data */
-                      fiffChInfo        chs,	     /* Channels to compensate
-                                                                            * These may contain channels other than those
-                                                                            * requiring compensation */
-                      int               nch,	     /* How many of these */
-                      fiffChInfo        compchs,     /* The compensation input channels
-                                                                            * These may contain channels other than
-                                                                            * the MEG compensation channels */
-                      int               ncomp)	     /* How many of these */
+int mne_make_ctf_comp(mneCTFcompDataSet set,        /* The available compensation data */
+                      fiffChInfo        chs,        /* Channels to compensate These may contain channels other than those requiring compensation */
+                      int               nch,        /* How many of these */
+                      fiffChInfo        compchs,    /* The compensation input channels These may contain channels other than the MEG compensation channels */
+                      int               ncomp)      /* How many of these */
 /*
- * Make compensation data to apply to a set of channels to yield (or uncompensated) compensated data
- */
+* Make compensation data to apply to a set of channels to yield (or uncompensated) compensated data
+*/
 {
     int *comps = NULL;
     int need_comp;
@@ -7084,9 +4395,9 @@ int mne_make_ctf_comp(mneCTFcompDataSet set,         /* The available compensati
     char *name;
     int  j,k,p;
 
-    mneSparseMatrix presel  = NULL;
-    mneSparseMatrix postsel = NULL;
-    mneNamedMatrix  data    = NULL;
+    INVERSELIB::FiffSparseMatrix* presel  = NULL;
+    INVERSELIB::FiffSparseMatrix* postsel = NULL;
+    MneNamedMatrix*  data    = NULL;
 
     if (!compchs) {
         compchs = chs;
@@ -7129,8 +4440,8 @@ int mne_make_ctf_comp(mneCTFcompDataSet set,         /* The available compensati
         return FAIL;
     }
     /*
-   * Find the desired compensation data matrix
-   */
+    * Find the desired compensation data matrix
+    */
     for (k = 0, this_comp = NULL; k < set->ncomp; k++) {
         if (set->comps[k]->mne_kind == first_comp) {
             this_comp = set->comps[k];
@@ -7144,8 +4455,8 @@ int mne_make_ctf_comp(mneCTFcompDataSet set,         /* The available compensati
     }
     fprintf(stderr,"\tDesired compensation data (%s) found.\n",mne_explain_ctf_comp(mne_map_ctf_comp_kind(first_comp)));
     /*
-   * Find the compensation channels
-   */
+    * Find the compensation channels
+    */
     comp_sel = MALLOC(this_comp->data->ncol,int);
     for (k = 0; k < this_comp->data->ncol; k++) {
         comp_sel[k] = -1;
@@ -7162,8 +4473,8 @@ int mne_make_ctf_comp(mneCTFcompDataSet set,         /* The available compensati
     }
     fprintf(stderr,"\tAll compensation channels found.\n");
     /*
-   * Create the preselector
-   */
+    * Create the preselector
+    */
     {
         float **sel = ALLOC_CMATRIX(this_comp->data->ncol,ncomp);
         for (j = 0; j < this_comp->data->ncol; j++) {
@@ -7179,19 +4490,19 @@ int mne_make_ctf_comp(mneCTFcompDataSet set,         /* The available compensati
         fprintf(stderr,"\tPreselector created.\n");
     }
     /*
-   * Pick the desired channels
-   */
+    * Pick the desired channels
+    */
     names = MALLOC(need_comp,char *);
     for (k = 0, p = 0; k < nch; k++) {
         if (comps[k] != MNE_CTFV_COMP_NONE)
             names[p++] = chs[k].ch_name;
     }
-    if ((data = mne_pick_from_named_matrix(this_comp->data,names,need_comp,NULL,0)) == NULL)
+    if ((data = this_comp->data->pick_from_named_matrix(names,need_comp,NULL,0)) == NULL)
         goto bad;
     fprintf(stderr,"\tCompensation data matrix created.\n");
     /*
-   * Create the postselector
-   */
+    * Create the postselector
+    */
     {
         float **sel = ALLOC_CMATRIX(nch,data->nrow);
         for (j = 0, p = 0; j < nch; j++) {
@@ -7223,9 +4534,12 @@ int mne_make_ctf_comp(mneCTFcompDataSet set,         /* The available compensati
     return OK;
 
 bad : {
-        mne_free_sparse(presel);
-        mne_free_sparse(postsel);
-        mne_free_named_matrix(data);
+        if(presel)
+            delete presel;
+        if(postsel)
+            delete postsel;
+        if(data)
+            delete data;
         FREE(names);
         FREE(comps);
         FREE(comp_sel);
@@ -7238,8 +4552,8 @@ int mne_set_ctf_comp(fiffChInfo chs,
                      int        nch,
                      int        comp)
 /*
- * Set the compensation bits to the desired value
- */
+* Set the compensation bits to the desired value
+*/
 {
     int k;
     int nset;
@@ -7257,14 +4571,14 @@ int mne_set_ctf_comp(fiffChInfo chs,
 
 
 
-int mne_apply_ctf_comp_t(mneCTFcompDataSet set,		    /* The compensation data */
+int mne_apply_ctf_comp_t(mneCTFcompDataSet set,     /* The compensation data */
                          int               do_it,
-                         float             **data,          /* The data to process (channel by channel) */
+                         float             **data,  /* The data to process (channel by channel) */
                          int               ndata,
-                         int               ns)              /* Number of samples */
+                         int               ns)      /* Number of samples */
 /*
- * Apply compensation or revert to uncompensated data
- */
+* Apply compensation or revert to uncompensated data
+*/
 {
     mneCTFcompData this_comp;
     float **presel,**comp;
@@ -7276,8 +4590,8 @@ int mne_apply_ctf_comp_t(mneCTFcompDataSet set,		    /* The compensation data */
         return OK;
     this_comp = set->current;
     /*
-   * Dimension checks
-   */
+    * Dimension checks
+    */
     if (this_comp->presel) {
         if (this_comp->presel->n != ncompdata) {
             printf("Compensation data dimension mismatch. Expected %d, got %d channels.",
@@ -7303,8 +4617,8 @@ int mne_apply_ctf_comp_t(mneCTFcompDataSet set,		    /* The compensation data */
         return FAIL;
     }
     /*
-   * Preselection is optional
-   */
+    * Preselection is optional
+    */
     if (this_comp->presel) {
         presel = ALLOC_CMATRIX(this_comp->presel->m,ns);
         if (mne_sparse_mat_mult2(this_comp->presel,compdata,ns,presel) != OK) {
@@ -7315,14 +4629,14 @@ int mne_apply_ctf_comp_t(mneCTFcompDataSet set,		    /* The compensation data */
     else
         presel = data;
     /*
-   * This always happens
-   */
+    * This always happens
+    */
     comp = mne_mat_mat_mult(this_comp->data->data,presel,this_comp->data->nrow,this_comp->data->ncol,ns);
     if (this_comp->presel)
         FREE_CMATRIX(presel);
     /*
-   * Optional postselection
-   */
+    * Optional postselection
+    */
     if (this_comp->postsel) {
         float **postsel = ALLOC_CMATRIX(this_comp->postsel->m,ns);
         if (mne_sparse_mat_mult2(this_comp->postsel,comp,ns,postsel) != OK) {
@@ -7333,8 +4647,8 @@ int mne_apply_ctf_comp_t(mneCTFcompDataSet set,		    /* The compensation data */
         comp = postsel;
     }
     /*
-   * Compensate or revert compensation?
-   */
+    * Compensate or revert compensation?
+    */
     if (do_it) {
         for (k = 0; k < ndata; k++)
             for (p = 0; p < ns; p++)
@@ -7360,8 +4674,8 @@ int mne_ctf_compensate_to(mneCTFcompDataSet set,            /* The compensation 
                           float             **comp_data,    /* The compensation data in a np x ncomp_chan matrix, defaults to data */
                           int               np)             /* How many time points */
 /*
- * Make data which has the third-order gradient compensation applied
- */
+* Make data which has the third-order gradient compensation applied
+*/
 {
     int k;
     int have_comp_chs;
@@ -7385,8 +4699,8 @@ int mne_ctf_compensate_to(mneCTFcompDataSet set,            /* The compensation 
         return FAIL;
     }
     /*
-   * Update the 'current' field in 'set' to reflect the compensation possibly present in the data now
-   */
+    * Update the 'current' field in 'set' to reflect the compensation possibly present in the data now
+    */
     if (mne_make_ctf_comp(set,chs,nchan,comp_chs,ncomp_chan) == FAIL)
         goto bad;
     /*
@@ -7397,16 +4711,16 @@ int mne_ctf_compensate_to(mneCTFcompDataSet set,            /* The compensation 
         return OK;
     }
     /*
-   * Undo any previous compensation
-   */
+    * Undo any previous compensation
+    */
     for (k = 0; k < np; k++)
         if (mne_apply_ctf_comp(set,FALSE,data[k],nchan,comp_data[k],ncomp_chan) == FAIL)
             goto bad;
     if (set->current)
         fprintf(stderr,"The previous compensation (%s) is now undone\n",mne_explain_ctf_comp(set->current->kind));
     /*
-   * Set to new gradient compensation
-   */
+    * Set to new gradient compensation
+    */
     if (compensate_to == MNE_CTFV_NOGRAD) {
         mne_set_ctf_comp(chs,nchan,compensate_to);
         fprintf(stderr,"No compensation was requested. Original data have been restored.\n");
@@ -7431,7 +4745,6 @@ int mne_ctf_compensate_to(mneCTFcompDataSet set,            /* The compensation 
     }
     return OK;
 
-
 bad : {
         if (comp_was != MNE_CTFV_COMP_UNKNOWN)
             mne_set_ctf_comp(chs,nchan,comp_was);
@@ -7447,8 +4760,8 @@ int mne_ctf_set_compensation(mneCTFcompDataSet set,            /* The compensati
                              fiffChInfo        comp_chs,       /* Maybe a different set, defaults to the same */
                              int               ncomp_chan)     /* How many */
 /*
- * Make data which has the third-order gradient compensation applied
- */
+* Make data which has the third-order gradient compensation applied
+*/
 {
     int k;
     int have_comp_chs;
@@ -7478,13 +4791,13 @@ int mne_ctf_set_compensation(mneCTFcompDataSet set,            /* The compensati
         return FAIL;
     }
     /*
-   * Update the 'current' field in 'set' to reflect the compensation possibly present in the data now
-   */
+    * Update the 'current' field in 'set' to reflect the compensation possibly present in the data now
+    */
     if (mne_make_ctf_comp(set,chs,nchan,comp_chs,ncomp_chan) == FAIL)
         goto bad;
     /*
-   * Are we there already?
-   */
+    * Are we there already?
+    */
     if (set->current && set->current->mne_kind == compensate_to) {
         fprintf(stderr,"No further compensation necessary (comp = %s)\n",mne_explain_ctf_comp(set->current->kind));
         mne_free_ctf_comp_data(set->current); set->current = NULL;
@@ -7510,7 +4823,6 @@ int mne_ctf_set_compensation(mneCTFcompDataSet set,            /* The compensati
     }
     return OK;
 
-
 bad : {
         if (comp_was != MNE_CTFV_COMP_UNKNOWN)
             mne_set_ctf_comp(chs,nchan,comp_was);
@@ -7519,11 +4831,7 @@ bad : {
 }
 
 
-
-
-
 //============================= mne_process_bads.c =============================
-
 
 static int whitespace(char *text)
 
@@ -7537,7 +4845,6 @@ static int whitespace(char *text)
 
 
 static char *next_line(char *line, int n, FILE *in)
-
 {
     char *res;
 
@@ -7552,8 +4859,8 @@ static char *next_line(char *line, int n, FILE *in)
 
 int mne_read_bad_channels(const QString& name, char ***listp, int *nlistp)
 /*
-      * Read bad channel names
-      */
+* Read bad channel names
+*/
 {
     FILE *in = NULL;
     char **list = NULL;
@@ -7596,28 +4903,29 @@ bad : {
 
 
 
-int mne_read_bad_channel_list_from_node(fiffFile in, fiffDirNode node, char ***listp, int *nlistp)
-
+int mne_read_bad_channel_list_from_node(FiffStream::SPtr& stream,
+                                        const FiffDirNode::SPtr& pNode, char ***listp, int *nlistp)
 {
-    fiffDirNode bad,*temp;
+    FiffDirNode::SPtr node,bad;
+    QList<FiffDirNode::SPtr> temp;
     char **list = NULL;
     int  nlist  = 0;
-    fiffTag tag;
+    FiffTag::SPtr t_pTag;
     char *names;
 
-    if (!node)
-        node = in->dirtree;
+    if (pNode->isEmpty())
+        node = stream->tree();
+    else
+        node = pNode;
 
-    temp = fiff_dir_tree_find(node,FIFFB_MNE_BAD_CHANNELS);
-    if (temp && temp[0]) {
+    temp = node->dir_tree_find(FIFFB_MNE_BAD_CHANNELS);
+    if (temp.size() > 0) {
         bad = temp[0];
-        FREE(temp);
 
-        if ((tag = fiff_dir_tree_get_tag(in,bad,FIFF_MNE_CH_NAME_LIST)) != NULL) {
-            names = (char *)tag->data;
-            FREE(tag);
+        bad->find_tag(stream, FIFF_MNE_CH_NAME_LIST, t_pTag);
+        if (t_pTag) {
+            names = (char *)t_pTag->data();
             mne_string_to_name_list(names,&list,&nlist);
-            FREE(names);
         }
     }
     *listp = list;
@@ -7628,154 +4936,56 @@ int mne_read_bad_channel_list_from_node(fiffFile in, fiffDirNode node, char ***l
 int mne_read_bad_channel_list(const QString& name, char ***listp, int *nlistp)
 
 {
-    fiffFile in = fiff_open(name.toLatin1().data());
+    QFile file(name);
+    FiffStream::SPtr stream(new FiffStream(&file));
+
     int res;
 
-    if (in == NULL)
+    if(!stream->open())
         return FAIL;
 
-    res = mne_read_bad_channel_list_from_node(in,in->dirtree,listp,nlistp);
+    res = mne_read_bad_channel_list_from_node(stream,stream->tree(),listp,nlistp);
 
-    fiff_close(in);
+    stream->close();
 
     return res;
 }
 
 
-
-
-//============================= mne_sss_data.c =============================
-
-
-
-MneSssData* mne_read_sss_data_from_node(fiffFile in, fiffDirNode start)
-/*
- * Read the SSS data from the given node of an open file
- */
-{
-    MneSssData* s  = new MneSssData();
-    fiffDirNode *sss = NULL;
-    fiffDirNode node;
-    fiffTag     tag;
-    float       *r0;
-    int j,p,q,n;
-    /*
-   * Locate the SSS information
-   */
-    sss = fiff_dir_tree_find(start,FIFFB_SSS_INFO);
-    if (sss && sss[0]) {
-        node = sss[0]; FREE(sss);
-        /*
-     * Read the SSS information, require all tags to be present
-     */
-        if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_SSS_JOB)) == NULL)
-            goto bad;
-        s->job = *(fiff_int_t *)tag->data;
-        TAG_FREE(tag);
-
-        if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_SSS_FRAME)) == NULL)
-            goto bad;
-        s->coord_frame = *(fiff_int_t *)tag->data;
-        TAG_FREE(tag);
-
-        if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_SSS_ORIGIN)) == NULL)
-            goto bad;
-        r0 = (float *)tag->data;
-        VEC_COPY(s->origin,r0);
-        TAG_FREE(tag);
-
-        if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_SSS_ORD_IN)) == NULL)
-            goto bad;
-        s->in_order = *(fiff_int_t *)tag->data;
-        TAG_FREE(tag);
-
-        if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_SSS_ORD_OUT)) == NULL)
-            goto bad;
-        s->out_order = *(fiff_int_t *)tag->data;
-        TAG_FREE(tag);
-
-        if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_SSS_NMAG)) == NULL)
-            goto bad;
-        s->nchan = *(fiff_int_t *)tag->data;
-        TAG_FREE(tag);
-
-        if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_SSS_COMPONENTS)) == NULL)
-            goto bad;
-        s->comp_info = (fiff_int_t *)tag->data; tag->data = NULL;
-        s->ncomp     = tag->size/sizeof(fiff_int_t);
-        TAG_FREE(tag);
-
-        if (s->ncomp != (s->in_order*(2+s->in_order) + s->out_order*(2+s->out_order))) {
-            printf("Number of SSS components does not match the expansion orders listed in the file");
-            goto bad;
-        }
-        /*
-     * Count the components in use
-     */
-        for (j = 0, n = 3, p = 0; j < s->in_order; j++, n = n + 2) {
-            for (q = 0; q < n; q++, p++)
-                if (s->comp_info[p])
-                    s->in_nuse++;
-        }
-        for (j = 0, n = 3; j < s->out_order; j++, n = n + 2) {
-            for (q = 0; q < n; q++, p++)
-                s->out_nuse++;
-        }
-    }
-    /*
-   * There it is!
-   */
-    return s;
-
-bad : {
-        /*
-     * Not entirely happy
-     */
-        if (s)
-            delete s;
-        return NULL;
-    }
-}
-
-
-
-
-
 //============================= mne_cov_matrix.c =============================
 
 /*
- * Routines for handling the covariance matrices
- */
-
+* Routines for handling the covariance matrices
+*/
 static mneCovMatrix new_cov(int    kind,
                             int    ncov,
                             char   **names,
                             double *cov,
                             double *cov_diag,
-                            mneSparseMatrix cov_sparse)
+                            INVERSELIB::FiffSparseMatrix* cov_sparse)
 /*
-      * Put it together from ingredients
-      */
+* Put it together from ingredients
+*/
 {
-    mneCovMatrix new_cov = MALLOC(1,mneCovMatrixRec);
-    new_cov->kind       = kind;
-    new_cov->ncov       = ncov;
-    new_cov->nproj      = 0;
-    new_cov->nzero      = 0;
-    new_cov->names      = names;
-    new_cov->cov        = cov;
-    new_cov->cov_diag   = cov_diag;
-    new_cov->cov_sparse = cov_sparse;
-    new_cov->eigen      = NULL;
-    new_cov->lambda     = NULL;
-    new_cov->chol       = NULL;
-    new_cov->inv_lambda = NULL;
-    new_cov->nfree      = 1;
-    new_cov->ch_class   = NULL;
-    new_cov->proj       = NULL;
-    new_cov->sss        = NULL;
-    new_cov->bads       = NULL;
-    new_cov->nbad       = 0;
+    mneCovMatrix new_cov    = MALLOC(1,mneCovMatrixRec);
+    new_cov->kind           = kind;
+    new_cov->ncov           = ncov;
+    new_cov->nproj          = 0;
+    new_cov->nzero          = 0;
+    new_cov->names          = names;
+    new_cov->cov            = cov;
+    new_cov->cov_diag       = cov_diag;
+    new_cov->cov_sparse     = cov_sparse;
+    new_cov->eigen          = NULL;
+    new_cov->lambda         = NULL;
+    new_cov->chol           = NULL;
+    new_cov->inv_lambda     = NULL;
+    new_cov->nfree          = 1;
+    new_cov->ch_class       = NULL;
+    new_cov->proj           = NULL;
+    new_cov->sss            = NULL;
+    new_cov->bads           = NULL;
+    new_cov->nbad           = 0;
     return new_cov;
 }
 
@@ -7813,8 +5023,7 @@ mneCovMatrix mne_new_cov_diag(int    kind,
 mneCovMatrix mne_new_cov_sparse(int             kind,
                                 int             ncov,
                                 char            **names,
-                                mneSparseMatrix cov_sparse)
-
+                                INVERSELIB::FiffSparseMatrix* cov_sparse)
 {
     return new_cov(kind,ncov,names,NULL,NULL,cov_sparse);
 }
@@ -7831,7 +5040,6 @@ static int mne_lt_packed_index(int j, int k)
 
 
 mneCovMatrix mne_dup_cov(mneCovMatrix c)
-
 {
     double       *vals;
     int          nval;
@@ -7855,8 +5063,8 @@ mneCovMatrix mne_dup_cov(mneCovMatrix c)
         res = mne_new_cov(c->kind,c->ncov,mne_dup_name_list(c->names,c->ncov),vals,NULL);
     }
     /*
-   * Duplicate additional items
-   */
+    * Duplicate additional items
+    */
     if (c->ch_class) {
         res->ch_class = MALLOC(c->ncov,int);
         for (k = 0; k < c->ncov; k++)
@@ -7871,17 +5079,17 @@ mneCovMatrix mne_dup_cov(mneCovMatrix c)
 }
 
 
-
 void mne_free_cov(mneCovMatrix c)
 /*
-      * Free a covariance matrix and all its data
-      */
+* Free a covariance matrix and all its data
+*/
 {
     if (c == NULL)
         return;
     FREE(c->cov);
     FREE(c->cov_diag);
-    mne_free_sparse(c->cov_sparse);
+    if(c->cov_sparse)
+        delete c->cov_sparse;
     mne_free_name_list(c->names,c->ncov);
     FREE_CMATRIX(c->eigen);
     FREE(c->lambda);
@@ -7925,21 +5133,24 @@ static int check_cov_data(double *vals, int nval)
 
 mneCovMatrix mne_read_cov(const QString& name,int kind)
 /*
-      * Read a covariance matrix from a fiff
-      */
+* Read a covariance matrix from a fiff
+*/
 {
-    fiffFile       in = NULL;
-    fiffTag        tag;
-    fiffDirNode    *nodes = NULL;
-    fiffDirNode    covnode;
+    QFile file(name);
+    FiffStream::SPtr stream(new FiffStream(&file));
+
+    FiffTag::SPtr t_pTag;
+    QList<FiffDirNode::SPtr> nodes;
+    FiffDirNode::SPtr    covnode;
 
     char            **names    = NULL;	/* Optional channel name list */
     int             nnames     = 0;
     double          *cov       = NULL;
     double          *cov_diag  = NULL;
-    mneSparseMatrix cov_sparse = NULL;
+    INVERSELIB::FiffSparseMatrix* cov_sparse = NULL;
     double          *lambda    = NULL;
     float           **eigen    = NULL;
+    MatrixXf        tmp_eigen;
     char            **bads     = NULL;
     int             nbad       = 0;
     int             ncov       = 0;
@@ -7948,120 +5159,123 @@ mneCovMatrix mne_read_cov(const QString& name,int kind)
 
     int            k,p,nn;
     float          *f;
+    double         *d;
     mneProjOp      op = NULL;
     MneSssData*     sss = NULL;
 
-
-    if ((in = fiff_open(name.toLatin1().data())) == NULL)
+    if(!stream->open())
         goto out;
-    nodes = fiff_dir_tree_find(in->dirtree,FIFFB_MNE_COV);
-    if (nodes[0] == NULL) {
+
+    nodes = stream->tree()->dir_tree_find(FIFFB_MNE_COV);
+
+    if (nodes.size() == 0) {
         printf("No covariance matrix available in %s",name.toLatin1().data());
         goto out;
     }
     /*
-   * Locate the desired matrix
-   */
-    for (covnode = NULL, k = 0 ; nodes[k] != NULL; k++) {
-        if ((tag = fiff_dir_tree_get_tag(in,nodes[k],FIFF_MNE_COV_KIND)) == NULL)
+    * Locate the desired matrix
+    */
+    for (k = 0 ; k < nodes.size(); ++k) {
+        if (!nodes[k]->find_tag(stream, FIFF_MNE_COV_KIND, t_pTag))
             continue;
-        if (*(int *)tag->data == kind) {
+
+        if (*t_pTag->toInt() == kind) {
             covnode = nodes[k];
-            TAG_FREE(tag);
             break;
         }
-        TAG_FREE(tag);
     }
-    if (covnode == NULL) {
+    if (covnode->isEmpty()) {
         printf("Desired covariance matrix not found from %s",name.toLatin1().data());
         goto out;
     }
     /*
-   * Read the data
-   */
-    if ((tag = fiff_dir_tree_get_tag(in,nodes[k],FIFF_MNE_COV_DIM)) == NULL)
+    * Read the data
+    */
+    if (!nodes[k]->find_tag(stream, FIFF_MNE_COV_DIM, t_pTag))
         goto out;
-    ncov = *(int *)(tag->data);
-    TAG_FREE(tag);
+    ncov = *t_pTag->toInt();
 
-    if ((tag = fiff_dir_tree_get_tag(in,nodes[k],FIFF_MNE_COV_NFREE)) != NULL) {
-        nfree = *(int *)(tag->data);
-        TAG_FREE(tag);
+    if (nodes[k]->find_tag(stream, FIFF_MNE_COV_NFREE, t_pTag)) {
+        nfree = *t_pTag->toInt();
     }
-    if ((tag = fiff_dir_tree_get_tag(in,covnode,FIFF_MNE_ROW_NAMES)) != NULL) {
-        mne_string_to_name_list((char *)(tag->data),&names,&nnames);
-        TAG_FREE(tag);
+    if (covnode->find_tag(stream, FIFF_MNE_ROW_NAMES, t_pTag)) {
+        mne_string_to_name_list((char *)(t_pTag->data()),&names,&nnames);
         if (nnames != ncov) {
             qCritical("Incorrect number of channel names for a covariance matrix");
             goto out;
         }
     }
-    if ((tag = fiff_dir_tree_get_tag(in,nodes[k],FIFF_MNE_COV)) == NULL) {
-        if ((tag = fiff_dir_tree_get_tag(in,nodes[k],FIFF_MNE_COV_DIAG)) == NULL)
+    if (!nodes[k]->find_tag(stream, FIFF_MNE_COV, t_pTag)) {
+        if (!nodes[k]->find_tag(stream, FIFF_MNE_COV_DIAG, t_pTag))
             goto out;
         else {
-            if (tag->type == FIFFT_DOUBLE) {
-                cov_diag = (double *)(tag->data);
+            if (t_pTag->getType() == FIFFT_DOUBLE) {
+                cov_diag = MALLOC(ncov,double);
+                qDebug() << "ToDo: Check whether cov_diag contains the right stuff!!! - use VectorXd instead";
+                d = t_pTag->toDouble();
+                for (p = 0; p < ncov; p++)
+                    cov_diag[p] = d[p];
                 if (check_cov_data(cov_diag,ncov) != OK)
                     goto out;
             }
-            else if (tag->type == FIFFT_FLOAT) {
+            else if (t_pTag->getType() == FIFFT_FLOAT) {
                 cov_diag = MALLOC(ncov,double);
-                f = (float *)(tag->data);
+                qDebug() << "ToDo: Check whether f contains the right stuff!!! - use VectorXf instead";
+                f = t_pTag->toFloat();
                 for (p = 0; p < ncov; p++)
                     cov_diag[p] = f[p];
-                FREE(tag->data);
             }
             else {
                 printf("Illegal data type for covariance matrix");
                 goto out;
             }
-            FREE(tag);
         }
     }
     else {
         nn = ncov*(ncov+1)/2;
-        if (tag->type == FIFFT_DOUBLE) {
-            cov = (double *)(tag->data);
+        if (t_pTag->getType() == FIFFT_DOUBLE) {
+            qDebug() << "ToDo: Check whether cov contains the right stuff!!! - use VectorXd instead";
+//            qDebug() << t_pTag->size() / sizeof(double);
+            cov = MALLOC(nn,double);
+            d = t_pTag->toDouble();
+            for (p = 0; p < nn; p++)
+                cov[p] = d[p];
             if (check_cov_data(cov,nn) != OK)
                 goto out;
         }
-        else if (tag->type == FIFFT_FLOAT) {
+        else if (t_pTag->getType() == FIFFT_FLOAT) {
             cov = MALLOC(nn,double);
-            f = (float *)(tag->data);
+            f = t_pTag->toFloat();
             for (p = 0; p < nn; p++)
                 cov[p] = f[p];
-            FREE(tag->data);
         }
-        else if ((cov_sparse = fiff_get_float_sparse_matrix(tag)) == NULL) {
-            TAG_FREE(tag);
+        else if ((cov_sparse = FiffSparseMatrix::fiff_get_float_sparse_matrix(t_pTag)) == NULL) {
             goto out;
         }
-        FREE(tag);
-        if ((tag = fiff_dir_tree_get_tag(in,nodes[k],FIFF_MNE_COV_EIGENVALUES)) != NULL) {
-            lambda = (double *)tag->data;
-            FREE(tag);
-            if ((tag = fiff_dir_tree_get_tag(in,nodes[k],FIFF_MNE_COV_EIGENVECTORS)) == NULL)
+
+        if (nodes[k]->find_tag(stream, FIFF_MNE_COV_EIGENVALUES, t_pTag)) {
+            lambda = (double *)t_pTag->toDouble();
+            if (nodes[k]->find_tag(stream, FIFF_MNE_COV_EIGENVECTORS, t_pTag))
                 goto out;
-            if ((eigen = fiff_get_float_matrix(tag)) == NULL) {
-                TAG_FREE(tag);
-                goto out;
-            }
+
+            tmp_eigen = t_pTag->toFloatMatrix().transpose();
+            eigen = ALLOC_CMATRIX(tmp_eigen.rows(),tmp_eigen.cols());
+            fromFloatEigenMatrix(tmp_eigen, eigen);
         }
         /*
-     * Read the optional projection operator
-     */
-        if ((op = mne_read_proj_op_from_node(in,nodes[k])) == NULL)
+        * Read the optional projection operator
+        */
+        if ((op = mne_read_proj_op_from_node(stream,nodes[k])) == NULL)
             goto out;
         /*
-     * Read the optional SSS data
-     */
-        if ((sss = mne_read_sss_data_from_node(in,nodes[k])) == NULL)
+        * Read the optional SSS data
+        */
+        if ((sss = MneSssData::read_sss_data_from_node(stream,nodes[k])) == NULL)
             goto out;
         /*
-     * Read the optional bad channel list
-     */
-        if (mne_read_bad_channel_list_from_node(in,nodes[k],&bads,&nbad) == FAIL)
+        * Read the optional bad channel list
+        */
+        if (mne_read_bad_channel_list_from_node(stream,nodes[k],&bads,&nbad) == FAIL)
             goto out;
     }
     if (cov_sparse)
@@ -8083,8 +5297,8 @@ mneCovMatrix mne_read_cov(const QString& name,int kind)
     res->bads   = bads;
     res->nbad   = nbad;
     /*
-   * Count the non-zero eigenvalues
-   */
+    * Count the non-zero eigenvalues
+    */
     if (res->lambda) {
         res->nzero = 0;
         for (k = 0; k < res->ncov; k++, res->nzero++)
@@ -8102,7 +5316,7 @@ mneCovMatrix mne_read_cov(const QString& name,int kind)
     }
 
 out : {
-        fiff_close(in);
+        stream->close();
         mne_free_proj_op(op);
         if(sss)
             delete sss;
@@ -8112,9 +5326,9 @@ out : {
             mne_free_name_list(bads,nbad);
             FREE(cov);
             FREE(cov_diag);
-            mne_free_sparse(cov_sparse);
+            if(cov_sparse)
+                delete cov_sparse;
         }
-        FREE(nodes);
         return res;
     }
 
@@ -8126,8 +5340,8 @@ out : {
 
 mneCovMatrix mne_pick_chs_cov_omit(mneCovMatrix c, char **new_names, int ncov, int omit_meg_eeg, fiffChInfo chs)
 /*
-      * Pick designated channels from a covariance matrix, optionally omit MEG/EEG correlations
-      */
+* Pick designated channels from a covariance matrix, optionally omit MEG/EEG correlations
+*/
 {
     int j,k;
     int *pick = NULL;
@@ -8230,8 +5444,8 @@ mneCovMatrix mne_pick_chs_cov_omit(mneCovMatrix c, char **new_names, int ncov, i
 
 void mne_revert_to_diag_cov(mneCovMatrix c)
 /*
-      * Pick the diagonal elements of the full covariance matrix
-      */
+* Pick the diagonal elements of the full covariance matrix
+*/
 {
     int k,p;
     if (c->cov == NULL)
@@ -8476,15 +5690,6 @@ static int condition_cov(mneCovMatrix c, float rank_threshold, int use_rank)
 }
 
 
-
-
-
-
-
-
-
-
-
 static int mne_decompose_eigen_cov_small(mneCovMatrix c,float small, int use_rank)
 /*
       * Do the eigenvalue decomposition
@@ -8563,9 +5768,6 @@ int mne_decompose_eigen_cov(mneCovMatrix c)
 }
 
 
-
-
-
 void mne_regularize_cov(mneCovMatrix c,       /* The matrix to regularize */
                         float        *regs)   /* Regularization values to apply (fractions of the
                            * average diagonal values for each class */
@@ -8619,62 +5821,6 @@ void mne_regularize_cov(mneCovMatrix c,       /* The matrix to regularize */
 
 
 
-//============================= mne_mgh_mri_io.c =============================
-
-
-/*
- * The tag types are private to this module
- */
-typedef struct {
-    int           tag;
-    long long     len;
-    unsigned char *data;
-} *mneMGHtag,mneMGHtagRec;
-
-typedef struct {
-    int        ntags;
-    mneMGHtag  *tags;
-} *mneMGHtagGroup,mneMGHtagGroupRec;
-
-
-
-void mne_free_vol_geom(mneVolGeom g)
-{
-    if (!g)
-        return;
-    FREE(g->filename);
-    FREE(g);
-    return;
-}
-
-
-static void mne_free_mgh_tag(mneMGHtag t)
-{
-    if (!t)
-        return;
-    FREE(t->data);
-    FREE(t);
-    return;
-}
-
-
-void mne_free_mgh_tag_group(void *gp)
-
-{
-    int k;
-    mneMGHtagGroup g = (mneMGHtagGroup)gp;
-
-    if (!g)
-        return;
-    for (k = 0; k < g->ntags; k++)
-        mne_free_mgh_tag(g->tags[k]);
-    FREE(g->tags);
-    FREE(g);
-
-    return;
-}
-
-
 //============================= mne_source_space.c =============================
 
 void mne_free_patch(mnePatchInfo p)
@@ -8685,1194 +5831,6 @@ void mne_free_patch(mnePatchInfo p)
     FREE(p->memb_vert);
     FREE(p);
     return;
-}
-
-
-void mne_free_source_space(mneSourceSpace sp)
-/*
-      * Free a source space and all associated data
-      */
-{
-    int k;
-    if (sp == NULL)
-        return;
-    FREE_CMATRIX(sp->rr);
-    FREE_CMATRIX(sp->nn);
-    FREE(sp->inuse);
-    FREE(sp->vertno);
-    FREE(sp->tris);
-    FREE_ICMATRIX(sp->itris);
-
-    FREE(sp->use_tris);
-    FREE_ICMATRIX(sp->use_itris);
-    if (sp->neighbor_tri) {
-        for (k = 0; k < sp->np; k++)
-            FREE(sp->neighbor_tri[k]);
-        FREE(sp->neighbor_tri);
-    }
-    FREE(sp->nneighbor_tri);
-    FREE(sp->curv);
-
-    if (sp->neighbor_vert) {
-        for (k = 0; k < sp->np; k++)
-            FREE(sp->neighbor_vert[k]);
-        FREE(sp->neighbor_vert);
-    }
-    FREE(sp->nneighbor_vert);
-    if (sp->vert_dist) {
-        for (k = 0; k < sp->np; k++)
-            FREE(sp->vert_dist[k]);
-        FREE(sp->vert_dist);
-    }
-    FREE(sp->nearest);
-    if (sp->patches) {
-        for (k = 0; k < sp->npatch; k++)
-            mne_free_patch(sp->patches[k]);
-        FREE(sp->patches);
-    }
-    mne_free_sparse(sp->dist);
-    FREE(sp->voxel_surf_RAS_t);
-    FREE(sp->MRI_voxel_surf_RAS_t);
-    FREE(sp->MRI_surf_RAS_RAS_t);
-    mne_free_sparse(sp->interpolator);
-    FREE(sp->MRI_volume);
-
-    mne_free_vol_geom(sp->vol_geom);
-    mne_free_mgh_tag_group(sp->mgh_tags);
-
-    if (sp->user_data && sp->user_data_free)
-        sp->user_data_free(sp->user_data);
-
-    FREE(sp);
-
-    return;
-}
-
-
-
-mneSourceSpace mne_new_source_space(int np)
-/*
-      * Create a new source space and all associated data
-      */
-{
-    mneSourceSpace res = MALLOC(1,mneSourceSpaceRec);
-    res->np      = np;
-    if (np > 0) {
-        res->rr      = ALLOC_CMATRIX(np,3);
-        res->nn      = ALLOC_CMATRIX(np,3);
-        res->inuse   = ALLOC_INT(np);
-        res->vertno  = ALLOC_INT(np);
-    }
-    else {
-        res->rr      = NULL;
-        res->nn      = NULL;
-        res->inuse   = NULL;
-        res->vertno  = NULL;
-    }
-    res->nuse     = 0;
-    res->ntri     = 0;
-    res->tris     = NULL;
-    res->itris    = NULL;
-    res->tot_area = 0.0;
-
-    res->nuse_tri  = 0;
-    res->use_tris  = NULL;
-    res->use_itris = NULL;
-
-    res->neighbor_tri = NULL;
-    res->nneighbor_tri = NULL;
-    res->curv = NULL;
-    res->val  = NULL;
-
-    res->neighbor_vert = NULL;
-    res->nneighbor_vert = NULL;
-    res->vert_dist = NULL;
-
-    res->coord_frame = FIFFV_COORD_MRI;
-    res->id          = FIFFV_MNE_SURF_UNKNOWN;
-    res->subject     = NULL;
-    res->type        = FIFFV_MNE_SPACE_SURFACE;
-
-    res->nearest = NULL;
-    res->patches = NULL;
-    res->npatch  = 0;
-
-    res->dist       = NULL;
-    res->dist_limit = -1.0;
-
-    res->voxel_surf_RAS_t     = NULL;
-    res->vol_dims[0] = res->vol_dims[1] = res->vol_dims[2] = 0;
-
-    res->MRI_volume           = NULL;
-    res->MRI_surf_RAS_RAS_t   = NULL;
-    res->MRI_voxel_surf_RAS_t = NULL;
-    res->MRI_vol_dims[0] = res->MRI_vol_dims[1] = res->MRI_vol_dims[2] = 0;
-    res->interpolator         = NULL;
-
-    res->vol_geom         = NULL;
-    res->mgh_tags         = NULL;
-    res->user_data        = NULL;
-    res->user_data_free   = NULL;
-
-    res->cm[X] = res->cm[Y] = res->cm[Z] = 0.0;
-
-    return res;
-}
-
-
-
-
-int mne_read_source_spaces(const QString& name,               /* Read from here */
-                           mneSourceSpace **spacesp, /* These are the results */
-                           int            *nspacep)
-/*
-      * Read source spaces from a FIFF file
-      */
-{
-    fiffFile       in = NULL;
-    int            nspace = 0;
-    mneSourceSpace *spaces = NULL;
-    mneSourceSpace  new_space = NULL;
-    fiffDirNode     *sources = NULL;
-    fiffDirNode     node;
-    fiffTag         tag = NULL;
-    int             j,k,p,q;
-    int             ntri;
-    int             *nearest = NULL;
-    float           *nearest_dist = NULL;
-    int             *nneighbors = NULL;
-    int             *neighbors  = NULL;
-    int             *vol_dims = NULL;
-
-    extern void mne_add_triangle_data(mneSourceSpace s);
-
-    if ((in = fiff_open(name.toLatin1().data())) == NULL)
-        goto bad;
-
-    sources = fiff_dir_tree_find(in->dirtree,FIFFB_MNE_SOURCE_SPACE);
-    if (sources[0] == NULL) {
-        printf("No source spaces available here");
-        goto bad;
-    }
-    for (j = 0; sources[j] != NULL; j++) {
-        new_space = mne_new_source_space(0);
-        node = sources[j];
-        /*
-     * Get the mandatory data first
-     */
-        if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_SOURCE_SPACE_NPOINTS)) == NULL) {
-            TAG_FREE(tag);
-            goto bad;
-        }
-        new_space->np = *(int *)tag->data;
-        TAG_FREE(tag);
-        if (new_space->np == 0) {
-            printf("No points in this source space");
-            goto bad;
-        }
-        if ((tag = fiff_dir_tree_get_tag(in,node,
-                                         FIFF_MNE_SOURCE_SPACE_POINTS)) == NULL)
-            goto bad;
-        if ((new_space->rr = fiff_get_float_matrix(tag)) == NULL) {
-            TAG_FREE(tag);
-            goto bad;
-        }
-        FREE(tag);
-        if ((tag = fiff_dir_tree_get_tag(in,node,
-                                         FIFF_MNE_SOURCE_SPACE_NORMALS)) == NULL)
-            goto bad;
-        if ((new_space->nn = fiff_get_float_matrix(tag)) == NULL) {
-            TAG_FREE(tag);
-            goto bad;
-        }
-        FREE(tag);
-
-        if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_COORD_FRAME)) == NULL) {
-            new_space->coord_frame = FIFFV_COORD_MRI;
-        }
-        else {
-            new_space->coord_frame = *(int *)tag->data;
-            TAG_FREE(tag);
-        }
-        if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_SOURCE_SPACE_ID)) != NULL) {
-            new_space->id = *(int *)tag->data;
-            TAG_FREE(tag);
-        }
-        if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_SUBJ_HIS_ID)) != NULL) {
-            new_space->subject = (char *)tag->data;
-            FREE(tag);
-        }
-        if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_SOURCE_SPACE_TYPE)) != NULL) {
-            new_space->type = *(int *)tag->data;
-            TAG_FREE(tag);
-        }
-        ntri = 0;
-        if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_BEM_SURF_NTRI))) {
-            ntri = *(int *)tag->data;
-            TAG_FREE(tag);
-        }
-        else if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_SOURCE_SPACE_NTRI))) {
-            ntri = *(int *)tag->data;
-            TAG_FREE(tag);
-        }
-        if (ntri > 0) {
-            int **itris = NULL;
-
-            if ((tag = fiff_dir_tree_get_tag(in,node,
-                                             FIFF_BEM_SURF_TRIANGLES)) == NULL) {
-                if ((tag = fiff_dir_tree_get_tag(in,node,
-                                                 FIFF_MNE_SOURCE_SPACE_TRIANGLES)) == NULL)
-                    goto bad;
-            }
-            if ((itris = fiff_get_int_matrix(tag)) == NULL) {
-                TAG_FREE(tag);
-                goto bad;
-            }
-            FREE(tag);
-            for (p = 0; p < ntri; p++) { /* Adjust the numbering */
-                itris[p][X]--;
-                itris[p][Y]--;
-                itris[p][Z]--;
-            }
-            new_space->itris = itris; itris = NULL;
-            new_space->ntri = ntri;
-        }
-        if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_SOURCE_SPACE_NUSE)) == NULL) {
-            if (new_space->type == FIFFV_MNE_SPACE_VOLUME) {
-                /*
-         * Use all
-         */
-                new_space->nuse   = new_space->np;
-                new_space->inuse  = MALLOC(new_space->nuse,int);
-                new_space->vertno = MALLOC(new_space->nuse,int);
-                for (k = 0; k < new_space->nuse; k++) {
-                    new_space->inuse[k]  = TRUE;
-                    new_space->vertno[k] = k;
-                }
-            }
-            else {
-                /*
-         * None in use
-         * NOTE: The consequences of this change have to be evaluated carefully
-         */
-                new_space->nuse   = 0;
-                new_space->inuse  = MALLOC(new_space->np,int);
-                new_space->vertno = NULL;
-                for (k = 0; k < new_space->np; k++)
-                    new_space->inuse[k]  = FALSE;
-            }
-        }
-        else {
-            new_space->nuse = *(int *)tag->data;
-            TAG_FREE(tag);
-            if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_SOURCE_SPACE_SELECTION)) == NULL) {
-                TAG_FREE(tag);
-                goto bad;
-            }
-            new_space->inuse  = (int *)tag->data;
-            if (new_space->nuse > 0) {
-                new_space->vertno = MALLOC(new_space->nuse,int);
-                FREE(tag);
-                for (k = 0, p = 0; k < new_space->np; k++)
-                    if (new_space->inuse[k])
-                        new_space->vertno[p++] = k;
-            }
-            else {
-                FREE(new_space->vertno);
-                new_space->vertno = NULL;
-            }
-            /*
-       * Selection triangulation
-       */
-            ntri = 0;
-            if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_SOURCE_SPACE_NUSE_TRI))) {
-                ntri = *(int *)tag->data;
-                TAG_FREE(tag);
-            }
-            if (ntri > 0) {
-                int **itris = NULL;
-
-                if ((tag = fiff_dir_tree_get_tag(in,node,
-                                                 FIFF_MNE_SOURCE_SPACE_USE_TRIANGLES)) == NULL)
-                    goto bad;
-
-                if ((itris = fiff_get_int_matrix(tag)) == NULL) {
-                    TAG_FREE(tag);
-                    goto bad;
-                }
-                FREE(tag);
-                for (p = 0; p < ntri; p++) { /* Adjust the numbering */
-                    itris[p][X]--;
-                    itris[p][Y]--;
-                    itris[p][Z]--;
-                }
-                new_space->use_itris = itris; itris = NULL;
-                new_space->nuse_tri = ntri;
-            }
-            /*
-       * The patch information becomes relevant here
-       */
-            if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_SOURCE_SPACE_NEAREST)) != NULL) {
-                nearest  = (int *)tag->data;
-                FREE(tag);
-                if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_SOURCE_SPACE_NEAREST_DIST)) == NULL) {
-                    TAG_FREE(tag);
-                    goto bad;
-                }
-                nearest_dist = (float *)tag->data;
-                FREE(tag);
-                new_space->nearest = MALLOC(new_space->np,mneNearestRec);
-                for (k = 0; k < new_space->np; k++) {
-                    new_space->nearest[k].vert = k;
-                    new_space->nearest[k].nearest = nearest[k];
-                    new_space->nearest[k].dist = nearest_dist[k];
-                    new_space->nearest[k].patch = NULL;
-                }
-                FREE(nearest); nearest = NULL;
-                FREE(nearest_dist); nearest_dist = NULL;
-            }
-            /*
-       * We may have the distance matrix
-       */
-            if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_SOURCE_SPACE_DIST_LIMIT)) != NULL) {
-                new_space->dist_limit = *(int *)tag->data;
-                TAG_FREE(tag);
-                if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_SOURCE_SPACE_DIST)) != NULL) {
-                    mneSparseMatrix dist = fiff_get_float_sparse_matrix(tag);
-                    new_space->dist = mne_add_upper_triangle_rcs(dist);
-                    mne_free_sparse(dist);
-                    TAG_FREE(tag);
-                    if (!new_space->dist)
-                        goto bad;
-                }
-                else
-                    new_space->dist_limit = 0.0;
-            }
-        }
-        /*
-     * For volume source spaces we might have the neighborhood information
-     */
-        if (new_space->type == FIFFV_MNE_SPACE_VOLUME) {
-            int ntot,nvert,ntot_count,nneigh;
-            int *neigh;
-
-            nneighbors = neighbors = NULL;
-            ntot = nvert = 0;
-            if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_SOURCE_SPACE_NEIGHBORS)) != NULL) {
-                neighbors = (int *)tag->data;
-                ntot      = tag->size/sizeof(fiff_int_t);
-                FREE(tag);
-            }
-            if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_SOURCE_SPACE_NNEIGHBORS)) != NULL) {
-                nneighbors = (int *)tag->data;
-                nvert      = tag->size/sizeof(fiff_int_t);
-                FREE(tag);
-            }
-            if (neighbors && nneighbors) {
-                if (nvert != new_space->np) {
-                    printf("Inconsistent neighborhood data in file.");
-                    goto bad;
-                }
-                for (k = 0, ntot_count = 0; k < nvert; k++)
-                    ntot_count += nneighbors[k];
-                if (ntot_count != ntot) {
-                    printf("Inconsistent neighborhood data in file.");
-                    goto bad;
-                }
-                new_space->nneighbor_vert = MALLOC(nvert,int);
-                new_space->neighbor_vert  = MALLOC(nvert,int *);
-                for (k = 0, q = 0; k < nvert; k++) {
-                    new_space->nneighbor_vert[k] = nneigh = nneighbors[k];
-                    new_space->neighbor_vert[k] = neigh = MALLOC(nneigh,int);
-                    for (p = 0; p < nneigh; p++,q++)
-                        neigh[p] = neighbors[q];
-                }
-            }
-            FREE(neighbors);
-            FREE(nneighbors);
-            nneighbors = neighbors = NULL;
-            /*
-       * There might be a coordinate transformation and dimensions
-       */
-            new_space->voxel_surf_RAS_t   = mne_read_transform_from_node(in, node, FIFFV_MNE_COORD_MRI_VOXEL, FIFFV_MNE_COORD_SURFACE_RAS);
-            if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_SOURCE_SPACE_VOXEL_DIMS)) != NULL) {
-                vol_dims = (int *)tag->data;
-                FREE(tag);
-            }
-            if (vol_dims)
-                VEC_COPY(new_space->vol_dims,vol_dims);
-            {
-                fiffDirNode     *mris = fiff_dir_tree_find(node,FIFFB_MNE_PARENT_MRI_FILE);
-
-                if (!mris || mris[0] == NULL) { /* The old way */
-                    new_space->MRI_surf_RAS_RAS_t = mne_read_transform_from_node(in, node, FIFFV_MNE_COORD_SURFACE_RAS, FIFFV_MNE_COORD_RAS);
-                    if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_SOURCE_SPACE_MRI_FILE)) != NULL) {
-                        new_space->MRI_volume = (char *)tag->data;
-                        FREE(tag);
-                    }
-                    if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_SOURCE_SPACE_INTERPOLATOR)) != NULL) {
-                        new_space->interpolator = fiff_get_float_sparse_matrix(tag);
-                        TAG_FREE(tag);
-                    }
-                }
-                else {
-                    if ((tag = fiff_dir_tree_get_tag(in,mris[0],FIFF_MNE_FILE_NAME)) != NULL) {
-                        new_space->MRI_volume = (char *)tag->data;
-                        FREE(tag);
-                    }
-                    new_space->MRI_surf_RAS_RAS_t = mne_read_transform_from_node(in, mris[0], FIFFV_MNE_COORD_SURFACE_RAS, FIFFV_MNE_COORD_RAS);
-                    new_space->MRI_voxel_surf_RAS_t   = mne_read_transform_from_node(in, mris[0], FIFFV_MNE_COORD_MRI_VOXEL, FIFFV_MNE_COORD_SURFACE_RAS);
-                    if ((tag = fiff_dir_tree_get_tag(in,mris[0],FIFF_MNE_SOURCE_SPACE_INTERPOLATOR)) != NULL) {
-                        new_space->interpolator = fiff_get_float_sparse_matrix(tag);
-                        TAG_FREE(tag);
-                    }
-                    if ((tag = fiff_dir_tree_get_tag(in,mris[0],FIFF_MRI_WIDTH))) {
-                        new_space->MRI_vol_dims[0] = *(int *)tag->data;
-                        TAG_FREE(tag);
-                    }
-                    if ((tag = fiff_dir_tree_get_tag(in,mris[0],FIFF_MRI_HEIGHT))) {
-                        new_space->MRI_vol_dims[1] = *(int *)tag->data;
-                        TAG_FREE(tag);
-                    }
-                    if ((tag = fiff_dir_tree_get_tag(in,mris[0],FIFF_MRI_DEPTH))) {
-                        new_space->MRI_vol_dims[2] = *(int *)tag->data;
-                        TAG_FREE(tag);
-                    }
-                }
-                FREE(mris);
-            }
-        }
-        mne_add_triangle_data(new_space);
-        spaces = REALLOC(spaces,nspace+1,mneSourceSpace);
-        spaces[nspace++] = new_space;
-        new_space = NULL;
-    }
-    fiff_close(in);
-
-    *spacesp = spaces;
-    *nspacep = nspace;
-
-    FREE(sources);
-    return FIFF_OK;
-
-
-bad : {
-        fiff_close(in);
-        mne_free_source_space(new_space);
-        for (k = 0; k < nspace; k++)
-            mne_free_source_space(spaces[k]);
-        FREE(spaces);
-        FREE(sources);
-        FREE(nearest);
-        FREE(nearest_dist);
-        FREE(neighbors);
-        FREE(nneighbors);
-        FREE(vol_dims);
-
-        return FIFF_FAIL;
-    }
-}
-
-
-int mne_transform_source_space(mneSourceSpace ss,
-                               fiffCoordTrans t)
-/*
-      * Transform source space data into another coordinate frame
-      */
-{
-    int k;
-    if (ss == NULL)
-        return OK;
-    if (ss->coord_frame == t->to)
-        return OK;
-    if (ss->coord_frame != t->from) {
-        printf("Coordinate transformation does not match with the source space coordinate system.");
-        return FAIL;
-    }
-    for (k = 0; k < ss->np; k++) {
-        fiff_coord_trans(ss->rr[k],t,FIFFV_MOVE);
-        fiff_coord_trans(ss->nn[k],t,FIFFV_NO_MOVE);
-    }
-    if (ss->tris) {
-        for (k = 0; k < ss->ntri; k++)
-            fiff_coord_trans(ss->tris[k].nn,t,FIFFV_NO_MOVE);
-    }
-    ss->coord_frame = t->to;
-    return OK;
-}
-
-
-int mne_transform_source_spaces_to(int            coord_frame,   /* Which coord frame do we want? */
-                                   fiffCoordTrans t,             /* The coordinate transformation */
-                                   mneSourceSpace *spaces,       /* A list of source spaces */
-                                   int            nspace)
-/*
-      * Facilitate the transformation of the source spaces
-      */
-{
-    mneSourceSpace s;
-    int k;
-    fiffCoordTrans my_t;
-
-    for (k = 0; k < nspace; k++) {
-        s = spaces[k];
-        if (s->coord_frame != coord_frame) {
-            if (t) {
-                if (s->coord_frame == t->from && t->to == coord_frame) {
-                    if (mne_transform_source_space(s,t) != OK)
-                        return FAIL;
-                }
-                else if (s->coord_frame == t->to && t->from == coord_frame) {
-                    my_t = fiff_invert_transform(t);
-                    if (mne_transform_source_space(s,my_t) != OK) {
-                        FREE(my_t);
-                        return FAIL;
-                    }
-                    FREE(my_t);
-                }
-                else {
-                    printf("Could not transform a source space because of transformation incompatibility.");
-                    return FAIL;
-                }
-            }
-            else {
-                printf("Could not transform a source space because of missing coordinate transformation.");
-                return FAIL;
-            }
-        }
-    }
-    return OK;
-}
-
-
-
-
-
-
-
-
-
-
-
-//============================= mne_add_geometry_info.c =============================
-
-
-static void add_triangle_data(mneTriangle tri)
-/*
-      * Normal vector of a triangle and other stuff
-      */
-{
-    float size,sizey;
-    int   c;
-
-    VEC_DIFF (tri->r1,tri->r2,tri->r12);
-    VEC_DIFF (tri->r1,tri->r3,tri->r13);
-    CROSS_PRODUCT (tri->r12,tri->r13,tri->nn);
-    size = VEC_LEN(tri->nn);
-    /*
-   * Possibly zero area triangles
-   */
-    if (size > 0) {
-        tri->nn[X] = tri->nn[X]/size;
-        tri->nn[Y] = tri->nn[Y]/size;
-        tri->nn[Z] = tri->nn[Z]/size;
-    }
-    tri->area = size/2.0;
-    sizey = VEC_LEN(tri->r13);
-    if (sizey <= 0)
-        sizey = 1.0;
-
-    for (c = 0; c < 3; c++) {
-        tri->ey[c] = tri->r13[c]/sizey;
-        tri->cent[c] = (tri->r1[c]+tri->r2[c]+tri->r3[c])/3.0;
-    }
-    CROSS_PRODUCT(tri->ey,tri->nn,tri->ex);
-
-    return;
-}
-
-void mne_add_triangle_data(mneSourceSpace s)
-/*
- * Add the triangle data structures
- */
-{
-    int k;
-    mneTriangle tri;
-
-    if (!s || s->type != MNE_SOURCE_SPACE_SURFACE)
-        return;
-
-    FREE(s->tris);     s->tris = NULL;
-    FREE(s->use_tris); s->use_tris = NULL;
-    /*
-   * Add information for the complete triangulation
-   */
-    if (s->itris && s->ntri > 0) {
-        s->tris = MALLOC(s->ntri,mneTriangleRec);
-        s->tot_area = 0.0;
-        for (k = 0, tri = s->tris; k < s->ntri; k++, tri++) {
-            tri->vert = s->itris[k];
-            tri->r1   = s->rr[tri->vert[0]];
-            tri->r2   = s->rr[tri->vert[1]];
-            tri->r3   = s->rr[tri->vert[2]];
-            add_triangle_data(tri);
-            s->tot_area += tri->area;
-        }
-#ifdef TRIANGLE_SIZE_WARNING
-        for (k = 0, tri = s->tris; k < s->ntri; k++, tri++)
-            if (tri->area < 1e-5*s->tot_area/s->ntri)
-                fprintf(stderr,"Warning: Triangle area is only %g um^2 (%.5f %% of expected average)\n",
-                        1e12*tri->area,100*s->ntri*tri->area/s->tot_area);
-#endif
-    }
-#ifdef DEBUG
-    fprintf(stderr,"\ttotal area = %-.1f cm^2\n",1e4*s->tot_area);
-#endif
-    /*
-   * Add information for the selected subset if applicable
-   */
-    if (s->use_itris && s->nuse_tri > 0) {
-        s->use_tris = MALLOC(s->nuse_tri,mneTriangleRec);
-        for (k = 0, tri = s->use_tris; k < s->nuse_tri; k++, tri++) {
-            tri->vert = s->use_itris[k];
-            tri->r1   = s->rr[tri->vert[0]];
-            tri->r2   = s->rr[tri->vert[1]];
-            tri->r3   = s->rr[tri->vert[2]];
-            add_triangle_data(tri);
-        }
-    }
-    return;
-}
-
-
-void mne_compute_cm(float **rr, int np, float *cm)
-/*
- * Compute the center of mass of a set of points
- */
-{
-    int q;
-    cm[0] = cm[1] = cm[2] = 0.0;
-    for (q = 0; q < np; q++) {
-        cm[0] += rr[q][0];
-        cm[1] += rr[q][1];
-        cm[2] += rr[q][2];
-    }
-    if (np > 0) {
-        cm[0] = cm[0]/np;
-        cm[1] = cm[1]/np;
-        cm[2] = cm[2]/np;
-    }
-    return;
-}
-
-
-void mne_compute_surface_cm(mneSurface s)
-/*
- * Compute the center of mass of a surface
- */
-{
-    if (!s)
-        return;
-
-    mne_compute_cm(s->rr,s->np,s->cm);
-    return;
-}
-
-static void calculate_vertex_distances(mneSourceSpace s)
-
-{
-    int   k,p,ndist;
-    float *dist,diff[3];
-    int   *neigh, nneigh;
-
-    if (!s->neighbor_vert || !s->nneighbor_vert)
-        return;
-
-    if (s->vert_dist) {
-        for (k = 0; k < s->np; k++)
-            FREE(s->vert_dist[k]);
-        FREE(s->vert_dist);
-    }
-    s->vert_dist = MALLOC(s->np,float *);
-    fprintf(stderr,"\tDistances between neighboring vertices...");
-    for (k = 0, ndist = 0; k < s->np; k++) {
-        s->vert_dist[k]  = dist = MALLOC(s->nneighbor_vert[k],float);
-        neigh  = s->neighbor_vert[k];
-        nneigh = s->nneighbor_vert[k];
-        for (p = 0; p < nneigh; p++) {
-            if (neigh[p] >= 0) {
-                VEC_DIFF(s->rr[k],s->rr[neigh[p]],diff);
-                dist[p] = VEC_LEN(diff);
-            }
-            else
-                dist[p] = -1.0;
-            ndist++;
-        }
-    }
-    fprintf(stderr,"[%d distances done]\n",ndist);
-    return;
-}
-
-
-static int add_geometry_info(mneSourceSpace s, int do_normals, int *border, int check_too_many_neighbors)
-/*
-      * Add vertex normals and neighbourhood information
-      */
-{
-    int k,c,p,q;
-    int vert;
-    int *ii;
-    int *neighbors,nneighbors;
-    float w,size;
-    int   found;
-    int   nfix_distinct,nfix_no_neighbors,nfix_defect;
-    mneTriangle tri;
-
-    if (!s)
-        return OK;
-
-    if (s->type == MNE_SOURCE_SPACE_VOLUME) {
-        calculate_vertex_distances(s);
-        return OK;
-    }
-    if (s->type != MNE_SOURCE_SPACE_SURFACE)
-        return OK;
-    /*
-   * Reallocate the stuff and initialize
-   */
-    if (do_normals) {
-        FREE_CMATRIX(s->nn);
-        s->nn = ALLOC_CMATRIX(s->np,3);
-    }
-    if (s->neighbor_tri) {
-        for (k = 0; k < s->np; k++)
-            FREE(s->neighbor_tri[k]);
-        FREE(s->neighbor_tri);
-    }
-    FREE(s->nneighbor_tri);
-    s->neighbor_tri = MALLOC(s->np,int *);
-    s->nneighbor_tri = MALLOC(s->np,int);
-
-    for (k = 0; k < s->np; k++) {
-        s->neighbor_tri[k] = NULL;
-        s->nneighbor_tri[k] = 0;
-        if (do_normals)
-            s->nn[k][X] = s->nn[k][Y] = s->nn[k][Z] = 0.0;
-    }
-    /*
-   * One pass through the triangles will do it
-   */
-    mne_add_triangle_data(s);
-    for (p = 0, tri = s->tris; p < s->ntri; p++, tri++)
-        if (tri->area == 0)
-            fprintf(stderr,"\tWarning : zero size triangle # %d\n",p);
-    fprintf(stderr,"\tTriangle ");
-    if (do_normals)
-        fprintf(stderr,"and vertex ");
-    fprintf(stderr,"normals and neighboring triangles...");
-    for (p = 0, tri = s->tris; p < s->ntri; p++, tri++) {
-        ii = tri->vert;
-        w = 1.0;			/* This should be related to the triangle size */
-        for (k = 0; k < 3; k++) {
-            /*
-       * Then the vertex normals
-       */
-            if (do_normals)
-                for (c = 0; c < 3; c++)
-                    s->nn[ii[k]][c] += w*tri->nn[c];
-            /*
-       * Add to the list of neighbors
-       */
-            s->neighbor_tri[ii[k]] = REALLOC(s->neighbor_tri[ii[k]],
-                    s->nneighbor_tri[ii[k]]+1,int);
-            s->neighbor_tri[ii[k]][s->nneighbor_tri[ii[k]]] = p;
-            s->nneighbor_tri[ii[k]]++;
-        }
-    }
-    nfix_no_neighbors = 0;
-    nfix_defect = 0;
-    for (k = 0; k < s->np; k++) {
-        if (s->nneighbor_tri[k] <= 0) {
-            if (!border || !border[k]) {
-#ifdef STRICT_ERROR
-                err_printf_set_error("Vertex %d does not have any neighboring triangles!",k);
-                return FAIL;
-#else
-#ifdef REPORT_WARNINGS
-                fprintf(stderr,"Warning: Vertex %d does not have any neighboring triangles!\n",k);
-#endif
-#endif
-                nfix_no_neighbors++;
-            }
-        }
-        else if (s->nneighbor_tri[k] < 3 && !border) {
-#ifdef REPORT_WARNINGS
-            fprintf(stderr,"\n\tTopological defect: Vertex %d has only %d neighboring triangle%s Vertex omitted.\n\t",
-                    k,s->nneighbor_tri[k],s->nneighbor_tri[k] > 1 ? "s." : ".");
-#endif
-            nfix_defect++;
-            s->nneighbor_tri[k] = 0;
-            FREE(s->neighbor_tri[k]);
-            s->neighbor_tri[k] = NULL;
-        }
-    }
-    /*
-   * Scale the vertex normals to unit length
-   */
-    for (k = 0; k < s->np; k++)
-        if (s->nneighbor_tri[k] > 0) {
-            size = VEC_LEN(s->nn[k]);
-            if (size > 0.0)
-                for (c = 0; c < 3; c++)
-                    s->nn[k][c] = s->nn[k][c]/size;
-        }
-    fprintf(stderr,"[done]\n");
-    /*
-   * Determine the neighboring vertices
-   */
-    fprintf(stderr,"\tVertex neighbors...");
-    if (s->neighbor_vert) {
-        for (k = 0; k < s->np; k++)
-            FREE(s->neighbor_vert[k]);
-        FREE(s->neighbor_vert);
-    }
-    FREE(s->nneighbor_vert);
-    s->neighbor_vert = MALLOC(s->np,int *);
-    s->nneighbor_vert = MALLOC(s->np,int);
-    /*
-   * We know the number of neighbors beforehand
-   */
-    if (border) {
-        for (k = 0; k < s->np; k++) {
-            if (s->nneighbor_tri[k] > 0) {
-                if (border[k]) {
-                    s->neighbor_vert[k]  = MALLOC(s->nneighbor_tri[k]+1,int);
-                    s->nneighbor_vert[k] = s->nneighbor_tri[k]+1;
-                }
-                else {
-                    s->neighbor_vert[k]  = MALLOC(s->nneighbor_tri[k],int);
-                    s->nneighbor_vert[k] = s->nneighbor_tri[k];
-                }
-            }
-            else {
-                s->neighbor_vert[k]  = NULL;
-                s->nneighbor_vert[k] = 0;
-            }
-        }
-    }
-    else {
-        for (k = 0; k < s->np; k++) {
-            if (s->nneighbor_tri[k] > 0) {
-                s->neighbor_vert[k]  = MALLOC(s->nneighbor_tri[k],int);
-                s->nneighbor_vert[k] = s->nneighbor_tri[k];
-            }
-            else {
-                s->neighbor_vert[k]  = NULL;
-                s->nneighbor_vert[k] = 0;
-            }
-        }
-    }
-    nfix_distinct = 0;
-    for (k = 0; k < s->np; k++) {
-        neighbors  = s->neighbor_vert[k];
-        nneighbors = 0;
-        for (p = 0; p < s->nneighbor_tri[k]; p++) {
-            /*
-       * Fit in the other vertices of the neighboring triangle
-       */
-            for (c = 0; c < 3; c++) {
-                vert = s->tris[s->neighbor_tri[k][p]].vert[c];
-                if (vert != k) {
-                    for (q = 0, found = FALSE; q < nneighbors; q++) {
-                        if (neighbors[q] == vert) {
-                            found = TRUE;
-                            break;
-                        }
-                    }
-                    if (!found) {
-                        if (nneighbors < s->nneighbor_vert[k])
-                            neighbors[nneighbors++] = vert;
-                        else if (!border || !border[k]) {
-                            if (check_too_many_neighbors) {
-                                printf("Too many neighbors for vertex %d.",k);
-                                return FAIL;
-                            }
-                            else
-                                fprintf(stderr,"\tWarning: Too many neighbors for vertex %d\n",k);
-                        }
-                    }
-                }
-            }
-        }
-        if (nneighbors != s->nneighbor_vert[k]) {
-#ifdef REPORT_WARNINGS
-            fprintf(stderr,"\n\tIncorrect number of distinct neighbors for vertex %d (%d instead of %d) [fixed].",
-                    k,nneighbors,s->nneighbor_vert[k]);
-#endif
-            nfix_distinct++;
-            s->nneighbor_vert[k] = nneighbors;
-        }
-    }
-    fprintf(stderr,"[done]\n");
-    /*
-   * Distance calculation follows
-   */
-    calculate_vertex_distances(s);
-    mne_compute_surface_cm(s);
-    /*
-   * Summarize the defects
-   */
-    if (nfix_defect > 0)
-        fprintf(stderr,"\tWarning: %d topological defects were fixed.\n",nfix_defect);
-    if (nfix_distinct > 0)
-        fprintf(stderr,"\tWarning: %d vertices had incorrect number of distinct neighbors (fixed).\n",nfix_distinct);
-    if (nfix_no_neighbors > 0)
-        fprintf(stderr,"\tWarning: %d vertices did not have any neighboring triangles (fixed)\n",nfix_no_neighbors);
-#ifdef DEBUG
-    for (k = 0; k < s->np; k++) {
-        if (s->nneighbor_vert[k] <= 0)
-            fprintf(stderr,"No neighbors for vertex %d\n",k);
-        if (s->nneighbor_tri[k] <= 0)
-            fprintf(stderr,"No neighbor tris for vertex %d\n",k);
-    }
-#endif
-    return OK;
-}
-
-int mne_source_space_add_geometry_info(mneSourceSpace s, int do_normals)
-{
-    return add_geometry_info(s,do_normals,NULL,TRUE);
-}
-
-int mne_source_space_add_geometry_info2(mneSourceSpace s, int do_normals)
-
-{
-    return add_geometry_info(s,do_normals,NULL,FALSE);
-}
-
-int mne_add_vertex_normals(mneSourceSpace s)
-
-
-{
-    int k,c,p;
-    int *ii;
-    float w,size;
-    mneTriangle tri;
-
-    if (!s || s->type != MNE_SOURCE_SPACE_SURFACE)
-        return OK;
-    /*
-   * Reallocate the stuff and initialize
-   */
-    FREE_CMATRIX(s->nn);
-    s->nn = ALLOC_CMATRIX(s->np,3);
-
-    for (k = 0; k < s->np; k++) {
-        s->nn[k][X] = s->nn[k][Y] = s->nn[k][Z] = 0.0;
-    }
-    /*
-   * One pass through the triangles will do it
-   */
-    mne_add_triangle_data(s);
-    for (p = 0, tri = s->tris; p < s->ntri; p++, tri++) {
-        ii = tri->vert;
-        w = 1.0;			/* This should be related to the triangle size */
-        /*
-     * Then the vertex normals
-     */
-        for (k = 0; k < 3; k++)
-            for (c = 0; c < 3; c++)
-                s->nn[ii[k]][c] += w*tri->nn[c];
-    }
-    for (k = 0; k < s->np; k++) {
-        size = VEC_LEN(s->nn[k]);
-        if (size > 0.0)
-            for (c = 0; c < 3; c++)
-                s->nn[k][c] = s->nn[k][c]/size;
-    }
-    mne_compute_surface_cm(s);
-    return OK;
-}
-
-
-
-
-//============================= mne_bem_surface_io.c =============================
-
-
-static mneSurface read_bem_surface( const QString& name,    /* Filename */
-                                    int  which,             /* Which surface are we looking for (-1 loads the first one)*/
-                                    int  add_geometry,      /* Add the geometry information */
-                                    float *sigmap,          /* Conductivity? */
-                                    int   check_too_many_neighbors)
-/*
- * Read a Neuromag-style BEM surface description
- */
-{
-    fiffFile in = NULL;
-    fiffDirNode *surfs;
-    fiffDirNode *bems;
-    fiffDirNode node;
-    fiffTag tag = NULL;
-    int     id = -1;
-    float   **nodes        = NULL;
-    float   **node_normals = NULL;
-    int     **triangles    = NULL;
-    int     nnode,ntri;
-    mneSurface s = NULL;
-    int k;
-    int coord_frame = FIFFV_COORD_MRI;
-    float sigma = -1.0;
-
-    if ((in = fiff_open(name.toLatin1().data())) == NULL)
-        goto bad;
-    /*
-   * Check for the existence of BEM coord frame
-   */
-    bems = fiff_dir_tree_find(in->dirtree,FIFFB_BEM);
-    if (bems != NULL && bems[0] != NULL) {
-        node = bems[0];
-        FREE(bems);
-        if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_BEM_COORD_FRAME)) != NULL) {
-            coord_frame = *(int *)tag->data;
-            TAG_FREE(tag);
-        }
-    }
-    surfs = fiff_dir_tree_find(in->dirtree,FIFFB_BEM_SURF);
-    if (surfs == NULL || surfs[0] == NULL) {
-        printf ("No BEM surfaces found in %s",name.toLatin1().constData());
-        goto bad;
-    }
-    if (which >= 0) {
-        for (k = 0; surfs[k] != NULL; k++) {
-            node = surfs[k];
-            /*
-       * Read the data from this node
-       */
-            tag = fiff_dir_tree_get_tag(in,node,FIFF_BEM_SURF_ID);
-            if (tag != NULL) {
-                id = *(int *)tag->data;
-                FREE(tag->data);
-                FREE(tag);
-                if (id == which)
-                    break;
-            }
-        }
-        if (id != which) {
-            printf("Desired surface not found in %s",name.toLatin1().constData());
-            goto bad;
-        }
-    }
-    else
-        node = surfs[0];
-    /*
-   * Get the compulsory tags
-   */
-    if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_BEM_SURF_NNODE)) == NULL)
-        goto bad;
-    nnode = *(int *)tag->data;
-    TAG_FREE(tag);
-
-    if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_BEM_SURF_NTRI)) == NULL)
-        goto bad;
-    ntri = *(int *)tag->data;
-    TAG_FREE(tag);
-
-    if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_BEM_SURF_NODES)) == NULL)
-        goto bad;
-    if ((nodes = fiff_get_float_matrix(tag)) == NULL)
-        goto bad;
-    FREE(tag);
-
-    if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_BEM_SURF_NORMALS)) != NULL) {
-        if ((node_normals = fiff_get_float_matrix(tag)) == NULL)
-            goto bad;
-        FREE(tag);
-    }
-
-    if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_BEM_SURF_TRIANGLES)) == NULL)
-        goto bad;
-    if ((triangles = fiff_get_int_matrix(tag)) == NULL)
-        goto bad;
-    FREE(tag);
-
-    if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_MNE_COORD_FRAME)) != NULL) {
-        coord_frame = *(int *)tag->data;
-        TAG_FREE(tag);
-    }
-    else if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_BEM_COORD_FRAME)) != NULL) {
-        coord_frame = *(int *)tag->data;
-        TAG_FREE(tag);
-    }
-    if ((tag = fiff_dir_tree_get_tag(in,node,FIFF_BEM_SIGMA)) != NULL) {
-        sigma = *(float *)tag->data;
-        TAG_FREE(tag);
-    }
-
-    fiff_close(in); in = NULL;
-
-    s = mne_new_source_space(0);
-    for (k = 0; k < ntri; k++) {
-        triangles[k][0]--;
-        triangles[k][1]--;
-        triangles[k][2]--;
-    }
-    s->itris       = triangles;
-    s->id          = which;
-    s->coord_frame = coord_frame;
-    s->rr          = nodes;      nodes = NULL;
-    s->nn          = node_normals; node_normals = NULL;
-    s->ntri        = ntri;
-    s->np          = nnode;
-    s->curv        = NULL;
-    s->val         = NULL;
-
-    if (add_geometry) {
-        if (check_too_many_neighbors) {
-            if (mne_source_space_add_geometry_info(s,!s->nn) != OK)
-                goto bad;
-        }
-        else {
-            if (mne_source_space_add_geometry_info2(s,!s->nn) != OK)
-                goto bad;
-        }
-    }
-    else if (s->nn == NULL) {       /* Normals only */
-        if (mne_add_vertex_normals(s) != OK)
-            goto bad;
-    }
-    else
-        mne_add_triangle_data(s);
-
-    s->nuse   = s->np;
-    s->inuse  = MALLOC(s->np,int);
-    s->vertno = MALLOC(s->np,int);
-    for (k = 0; k < s->np; k++) {
-        s->inuse[k]  = TRUE;
-        s->vertno[k] = k;
-    }
-    if (sigmap)
-        *sigmap = sigma;
-
-    return s;
-
-bad : {
-        FREE_CMATRIX(nodes);
-        FREE_CMATRIX(node_normals);
-        FREE_ICMATRIX(triangles);
-        fiff_close(in);
-        return NULL;
-    }
-}
-
-mneSurface mne_read_bem_surface(const QString&  name,   /* Filename */
-                                int  which,             /* Which surface are we looking for (-1 loads the first one)*/
-                                int  add_geometry,      /* Add the geometry information */
-                                float *sigmap)          /* Conductivity? */
-
-
-{
-    return read_bem_surface(name,which,add_geometry,sigmap,TRUE);
 }
 
 
@@ -9905,440 +5863,6 @@ static double solid_angle (float       *from,	/* From this point... */
 
     return (2.0*atan2(triple,s));
 }
-
-static double sum_solids(float *from, mneSurface surf)
-
-{
-    int k;
-    double tot_angle, angle;
-    for (k = 0, tot_angle = 0.0; k < surf->ntri; k++) {
-        angle = solid_angle(from,surf->tris+k);
-        tot_angle += angle;
-    }
-    return tot_angle;
-}
-
-
-int mne_filter_source_spaces(mneSurface surf,             /* The bounding surface must be provided */
-                             float limit,                 /* Minimum allowed distance from the surface */
-                             fiffCoordTrans mri_head_t,   /* Coordinate transformation (may not be needed) */
-                             mneSourceSpace *spaces,      /* The source spaces  */
-                             int nspace,
-                             FILE *filtered)	          /* Provide a list of filtered points here */
-/*
-      * Remove all source space points closer to the surface than a given limit
-      */
-{
-    mneSourceSpace s;
-    int k,p1,p2;
-    float r1[3];
-    float mindist,dist,diff[3];
-    int   minnode;
-    int   omit,omit_outside;
-    double tot_angle;
-
-    if (surf == NULL)
-        return OK;
-    if (spaces[0]->coord_frame == FIFFV_COORD_HEAD && mri_head_t == NULL) {
-        printf("Source spaces are in head coordinates and no coordinate transform was provided!");
-        return FAIL;
-    }
-    /*
-   * How close are the source points to the surface?
-   */
-    fprintf(stderr,"Source spaces are in ");
-    if (spaces[0]->coord_frame == FIFFV_COORD_HEAD)
-        fprintf(stderr,"head coordinates.\n");
-    else if (spaces[0]->coord_frame == FIFFV_COORD_MRI)
-        fprintf(stderr,"MRI coordinates.\n");
-    else
-        fprintf(stderr,"unknown (%d) coordinates.\n",spaces[0]->coord_frame);
-    fprintf(stderr,"Checking that the sources are inside the bounding surface ");
-    if (limit > 0.0)
-        fprintf(stderr,"and at least %6.1f mm away",1000*limit);
-    fprintf(stderr," (will take a few...)\n");
-    omit         = 0;
-    omit_outside = 0;
-    for (k = 0; k < nspace; k++) {
-        s = spaces[k];
-        for (p1 = 0; p1 < s->np; p1++)
-            if (s->inuse[p1]) {
-                VEC_COPY(r1,s->rr[p1]);	/* Transform the point to MRI coordinates */
-                if (s->coord_frame == FIFFV_COORD_HEAD)
-                    fiff_coord_trans_inv(r1,mri_head_t,FIFFV_MOVE);
-                /*
-         * Check that the source is inside the inner skull surface
-         */
-                tot_angle = sum_solids(r1,surf)/(4*M_PI);
-                if (fabs(tot_angle-1.0) > 1e-5) {
-                    omit_outside++;
-                    s->inuse[p1] = FALSE;
-                    s->nuse--;
-                    if (filtered)
-                        fprintf(filtered,"%10.3f %10.3f %10.3f\n",
-                                1000*r1[X],1000*r1[Y],1000*r1[Z]);
-                }
-                else if (limit > 0.0) {
-                    /*
-           * Check the distance limit
-           */
-                    mindist = 1.0;
-                    minnode = 0;
-                    for (p2 = 0; p2 < surf->np; p2++) {
-                        VEC_DIFF(r1,surf->rr[p2],diff);
-                        dist = VEC_LEN(diff);
-                        if (dist < mindist) {
-                            mindist = dist;
-                            minnode = p2;
-                        }
-                    }
-                    if (mindist < limit) {
-                        omit++;
-                        s->inuse[p1] = FALSE;
-                        s->nuse--;
-                        if (filtered)
-                            fprintf(filtered,"%10.3f %10.3f %10.3f\n",
-                                    1000*r1[X],1000*r1[Y],1000*r1[Z]);
-                    }
-                }
-            }
-    }
-    if (omit_outside > 0)
-        fprintf(stderr,"%d source space points omitted because they are outside the inner skull surface.\n",
-                omit_outside);
-    if (omit > 0)
-        fprintf(stderr,"%d source space points omitted because of the %6.1f-mm distance limit.\n",
-                omit,1000*limit);
-    fprintf(stderr,"Thank you for waiting.\n");
-    return OK;
-}
-
-
-
-
-//============================= make_volume_source_space.c =============================
-
-static fiffCoordTrans fiff_make_transform2 (int from,int to,float rot[3][3],float move[3])
-/*
-      * Compose the coordinate transformation structure
-      * from a known forward transform
-      */
-{
-    fiffCoordTrans t = (fiffCoordTrans)malloc(sizeof(fiffCoordTransRec));
-    int j,k;
-
-    t->from = from;
-    t->to   = to;
-
-    for (j = 0; j < 3; j++) {
-        t->move[j] = move[j];
-        for (k = 0; k < 3; k++)
-            t->rot[j][k] = rot[j][k];
-    }
-    if (add_inverse(t) == FAIL) {
-        printf("Failed to add the inverse coordinate transformation");
-        FREE(t);
-        return NULL;
-    }
-    return (t);
-}
-
-static fiffCoordTrans make_voxel_ras_trans(float *r0,
-                                           float *x_ras,
-                                           float *y_ras,
-                                           float *z_ras,
-                                           float *voxel_size)
-
-{
-    fiffCoordTrans t;
-    float rot[3][3],move[3];
-    int   j,k;
-
-    VEC_COPY(move,r0);
-
-    for (j = 0; j < 3; j++) {
-        rot[j][0] = x_ras[j];
-        rot[j][1] = y_ras[j];
-        rot[j][2] = z_ras[j];
-    }
-    for (j = 0; j < 3; j++)
-        for (k = 0; k < 3; k++)
-            rot[j][k]    = voxel_size[k]*rot[j][k];
-    t = fiff_make_transform2(FIFFV_MNE_COORD_MRI_VOXEL,FIFFV_COORD_MRI,rot,move);
-
-    return t;
-}
-
-#define NNEIGHBORS 26
-
-mneSourceSpace make_volume_source_space(mneSurface surf,
-                                        float grid,
-                                        float exclude,
-                                        float mindist)
-/*
-      * Make a source space which covers the volume bounded by surf
-      */
-{
-    float min[3],max[3],cm[3];
-    int   minn[3],maxn[3];
-    float *node,maxdist,dist,diff[3];
-    int   k,c;
-    mneSourceSpace sp = NULL;
-    int np,nplane,nrow;
-    int *neigh,nneigh;
-    int x,y,z;
-    /*
-   * Figure out the grid size
-   */
-    cm[X] = cm[Y] = cm[Z] = 0.0;
-    node = surf->rr[0];
-    for (c = 0; c < 3; c++)
-        min[c] = max[c] = node[c];
-
-    for (k = 0; k < surf->np; k++) {
-        node = surf->rr[k];
-        for (c = 0; c < 3; c++) {
-            cm[c] += node[c];
-            if (node[c] < min[c])
-                min[c] = node[c];
-            if (node[c] > max[c])
-                max[c] = node[c];
-        }
-    }
-    for (c = 0; c < 3; c++)
-        cm[c] = cm[c]/surf->np;
-    /*
-   * Define the sphere which fits the surface
-   */
-    maxdist = 0.0;
-    for (k = 0; k < surf->np; k++) {
-        VEC_DIFF(cm,surf->rr[k],diff);
-        dist = VEC_LEN(diff);
-        if (dist > maxdist)
-            maxdist = dist;
-    }
-    fprintf(stderr,"Surface CM = (%6.1f %6.1f %6.1f) mm\n",
-            1000*cm[X], 1000*cm[Y], 1000*cm[Z]);
-    fprintf(stderr,"Surface fits inside a sphere with radius %6.1f mm\n",1000*maxdist);
-    fprintf(stderr,"Surface extent:\n"
-                   "\tx = %6.1f ... %6.1f mm\n"
-                   "\ty = %6.1f ... %6.1f mm\n"
-                   "\tz = %6.1f ... %6.1f mm\n",
-            1000*min[X],1000*max[X],
-            1000*min[Y],1000*max[Y],
-            1000*min[Z],1000*max[Z]);
-    for (c = 0; c < 3; c++) {
-        if (max[c] > 0)
-            maxn[c] = floor(fabs(max[c])/grid)+1;
-        else
-            maxn[c] = -floor(fabs(max[c])/grid)-1;
-        if (min[c] > 0)
-            minn[c] = floor(fabs(min[c])/grid)+1;
-        else
-            minn[c] = -floor(fabs(min[c])/grid)-1;
-    }
-    fprintf(stderr,"Grid extent:\n"
-                   "\tx = %6.1f ... %6.1f mm\n"
-                   "\ty = %6.1f ... %6.1f mm\n"
-                   "\tz = %6.1f ... %6.1f mm\n",
-            1000*(minn[X]*grid),1000*(maxn[X]*grid),
-            1000*(minn[Y]*grid),1000*(maxn[Y]*grid),
-            1000*(minn[Z]*grid),1000*(maxn[Z]*grid));
-    /*
-   * Now make the initial grid
-   */
-    np = 1;
-    for (c = 0; c < 3; c++)
-        np = np*(maxn[c]-minn[c]+1);
-    nplane = (maxn[X]-minn[X]+1)*(maxn[Y]-minn[Y]+1);
-    nrow   = (maxn[X]-minn[X]+1);
-    sp = mne_new_source_space(np);
-    sp->type = MNE_SOURCE_SPACE_VOLUME;
-    sp->nneighbor_vert = MALLOC(sp->np,int);
-    sp->neighbor_vert = MALLOC(sp->np,int *);
-    for (k = 0; k < sp->np; k++) {
-        sp->inuse[k]  = TRUE;
-        sp->vertno[k] = k;
-        sp->nn[k][X] = sp->nn[k][Y] = 0.0; /* Source orientation is immaterial */
-        sp->nn[k][Z] = 1.0;
-        sp->neighbor_vert[k]  = neigh  = MALLOC(NNEIGHBORS,int);
-        sp->nneighbor_vert[k] = nneigh = NNEIGHBORS;
-        for (c = 0; c < nneigh; c++)
-            neigh[c] = -1;
-        sp->nuse++;
-    }
-    for (k = 0, z = minn[Z]; z <= maxn[Z]; z++) {
-        for (y = minn[Y]; y <= maxn[Y]; y++) {
-            for (x = minn[X]; x <= maxn[X]; x++, k++) {
-                sp->rr[k][X] = x*grid;
-                sp->rr[k][Y] = y*grid;
-                sp->rr[k][Z] = z*grid;
-                /*
-         * Figure out the neighborhood:
-         * 6-neighborhood first
-         */
-                neigh = sp->neighbor_vert[k];
-                if (z > minn[Z])
-                    neigh[0]  = k - nplane;
-                if (x < maxn[X])
-                    neigh[1] = k + 1;
-                if (y < maxn[Y])
-                    neigh[2] = k + nrow;
-                if (x > minn[X])
-                    neigh[3] = k - 1;
-                if (y > minn[Y])
-                    neigh[4] = k - nrow;
-                if (z < maxn[Z])
-                    neigh[5] = k + nplane;
-                /*
-         * Then the rest to complete the 26-neighborhood
-         * First the plane below
-         */
-                if (z > minn[Z]) {
-                    if (x < maxn[X]) {
-                        neigh[6] = k + 1 - nplane;
-                        if (y < maxn[Y])
-                            neigh[7] = k + 1 + nrow - nplane;
-                    }
-                    if (y < maxn[Y])
-                        neigh[8] = k + nrow - nplane;
-                    if (x > minn[X]) {
-                        if (y < maxn[Y])
-                            neigh[9] = k - 1 + nrow - nplane;
-                        neigh[10] = k - 1 - nplane;
-                        if (y > minn[Y])
-                            neigh[11] = k - 1 - nrow - nplane;
-                    }
-                    if (y > minn[Y]) {
-                        neigh[12] = k - nrow - nplane;
-                        if (x < maxn[X])
-                            neigh[13] = k + 1 - nrow - nplane;
-                    }
-                }
-                /*
-         * Then the same plane
-         */
-                if (x < maxn[X] && y < maxn[Y])
-                    neigh[14] = k + 1 + nrow;
-                if (x > minn[X]) {
-                    if (y < maxn[Y])
-                        neigh[15] = k - 1 + nrow;
-                    if (y > minn[Y])
-                        neigh[16] = k - 1 - nrow;
-                }
-                if (y > minn[Y] && x < maxn[X])
-                    neigh[17] = k + 1 - nrow - nplane;
-                /*
-         * Finally one plane above
-         */
-                if (z < maxn[Z]) {
-                    if (x < maxn[X]) {
-                        neigh[18] = k + 1 + nplane;
-                        if (y < maxn[Y])
-                            neigh[19] = k + 1 + nrow + nplane;
-                    }
-                    if (y < maxn[Y])
-                        neigh[20] = k + nrow + nplane;
-                    if (x > minn[X]) {
-                        if (y < maxn[Y])
-                            neigh[21] = k - 1 + nrow + nplane;
-                        neigh[22] = k - 1 + nplane;
-                        if (y > minn[Y])
-                            neigh[23] = k - 1 - nrow + nplane;
-                    }
-                    if (y > minn[Y]) {
-                        neigh[24] = k - nrow + nplane;
-                        if (x < maxn[X])
-                            neigh[25] = k + 1 - nrow + nplane;
-                    }
-                }
-            }
-        }
-    }
-    fprintf(stderr,"%d sources before omitting any.\n",sp->nuse);
-    /*
-   * Exclude infeasible points
-   */
-    for (k = 0; k < sp->np; k++) {
-        VEC_DIFF(cm,sp->rr[k],diff);
-        dist = VEC_LEN(diff);
-        if (dist < exclude || dist > maxdist) {
-            sp->inuse[k] = FALSE;
-            sp->nuse--;
-        }
-    }
-    fprintf(stderr,"%d sources after omitting infeasible sources.\n",sp->nuse);
-    if (mne_filter_source_spaces(surf,mindist,NULL,&sp,1,NULL) != OK)
-        goto bad;
-    fprintf(stderr,"%d sources remaining after excluding the sources outside the surface and less than %6.1f mm inside.\n",sp->nuse,1000*mindist);
-    /*
-   * Omit unused vertices from the neighborhoods
-   */
-    fprintf(stderr,"Adjusting the neighborhood info...");
-    for (k = 0; k < sp->np; k++) {
-        neigh  = sp->neighbor_vert[k];
-        nneigh = sp->nneighbor_vert[k];
-        if (sp->inuse[k]) {
-            for (c = 0; c < nneigh; c++)
-                if (!sp->inuse[neigh[c]])
-                    neigh[c] = -1;
-        }
-        else {
-            for (c = 0; c < nneigh; c++)
-                neigh[c] = -1;
-        }
-    }
-    fprintf(stderr,"[done]\n");
-    /*
-   * Set up the volume data (needed for creating the interpolation matrix)
-   */
-    {
-        float r0[3],voxel_size[3],x_ras[3],y_ras[3],z_ras[3];
-        int   width,height,depth;
-
-        r0[X] = minn[X]*grid;
-        r0[Y] = minn[Y]*grid;
-        r0[Z] = minn[Z]*grid;
-
-        voxel_size[0] = grid;
-        voxel_size[1] = grid;
-        voxel_size[2] = grid;
-
-        width  = (maxn[X]-minn[X]+1);
-        height = (maxn[Y]-minn[Y]+1);
-        depth  = (maxn[Z]-minn[Z]+1);
-
-        for (k = 0; k < 3; k++)
-            x_ras[k] = y_ras[k] = z_ras[k] = 0.0;
-        x_ras[0] = 1.0;
-        y_ras[1] = 1.0;
-        z_ras[2] = 1.0;
-
-        if ((sp->voxel_surf_RAS_t = make_voxel_ras_trans(r0,x_ras,y_ras,z_ras,voxel_size)) == NULL)
-            goto bad;
-        sp->vol_dims[0] = width;
-        sp->vol_dims[1] = height;
-        sp->vol_dims[2] = depth;
-        VEC_COPY(sp->voxel_size,voxel_size);
-    }
-    return sp;
-
-bad : {
-        mne_free_source_space(sp);
-        return NULL;
-    }
-}
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -10436,7 +5960,7 @@ void fwd_bem_free_model(fwdBemModel m)
 
     FREE(m->surf_name);
     for (k = 0; k < m->nsurf; k++)
-        mne_free_source_space(m->surfs[k]);
+        delete m->surfs[k];
     FREE(m->surfs);
     FREE(m->ntri);
     FREE(m->np);
@@ -10742,7 +6266,7 @@ static void lin_pot_coeff (float  *from,	/* Origin */
 
 
 
-static void correct_auto_elements (mneSurface surf,
+static void correct_auto_elements (MneSurfaceOrVolume::MneCSurface* surf,
                                    float      **mat)
 /*
       * Improve auto-element approximation...
@@ -10813,7 +6337,7 @@ static void correct_auto_elements (mneSurface surf,
 }
 
 
-static float **fwd_bem_lin_pot_coeff (mneSurface *surfs,int nsurf)
+static float **fwd_bem_lin_pot_coeff (MneSurfaceOrVolume::MneCSurface* *surfs,int nsurf)
 /*
       * Calculate the coefficients for linear collocation approach
       */
@@ -10827,7 +6351,8 @@ static float **fwd_bem_lin_pot_coeff (mneSurface *surfs,int nsurf)
     double *row = NULL;
     int    j,k,p,q,c;
     int    joff,koff;
-    mneSurface surf1,surf2;
+    MneSurfaceOrVolume::MneCSurface* surf1;
+    MneSurfaceOrVolume::MneCSurface* surf2;
 
     for (p = 0, np_tot = np_max = 0; p < nsurf; p++) {
         np_tot += surfs[p]->np;
@@ -10985,12 +6510,13 @@ static int fwd_bem_check_solids (float **angles,int ntri1,int ntri2, float desir
 }
 
 
-static float **fwd_bem_solid_angles (mneSurface *surfs, int nsurf)
+static float **fwd_bem_solid_angles (MneSurfaceOrVolume::MneCSurface* *surfs, int nsurf)
 /*
       * Compute the solid angle matrix
       */
 {
-    mneSurface surf1,surf2;
+    MneSurfaceOrVolume::MneCSurface* surf1;
+    MneSurfaceOrVolume::MneCSurface* surf2;
     mneTriangle tri;
     int ntri1,ntri2,ntri_tot;
     int j,k,p,q;
@@ -11117,7 +6643,7 @@ const char *fwd_bem_explain_method(int method)
     return method_expl[k].name;
 }
 
-mneSurface fwd_bem_find_surface(fwdBemModel model, int kind)
+MneSurfaceOrVolume::MneCSurface* fwd_bem_find_surface(fwdBemModel model, int kind)
 /*
  * Return a pointer to a specific surface in a BEM
  */
@@ -11142,7 +6668,7 @@ fwdBemModel fwd_bem_load_surfaces(char *name,
  * Load a set of surfaces
  */
 {
-    mneSurface *surfs = NULL;
+    MneSurfaceOrVolume::MneCSurface* *surfs = NULL;
     float      *sigma = NULL;
     float      *sigma1;
     fwdBemModel m = NULL;
@@ -11153,13 +6679,13 @@ fwdBemModel fwd_bem_load_surfaces(char *name,
         return NULL;
     }
 
-    surfs = MALLOC(nkind,mneSurface);
+    surfs = MALLOC(nkind,MneSurfaceOrVolume::MneCSurface*);
     sigma = MALLOC(nkind,float);
     for (k = 0; k < nkind; k++)
         surfs[k] = NULL;
 
     for (k = 0; k < nkind; k++) {
-        if ((surfs[k] = mne_read_bem_surface(name,kinds[k],TRUE,sigma+k)) == NULL)
+        if ((surfs[k] = MneSurfaceOrVolume::MneCSurface::read_bem_surface(name,kinds[k],TRUE,sigma+k)) == NULL)
             goto bad;
         if (sigma[k] < 0.0) {
             printf("No conductivity available for surface %s",fwd_bem_explain_surface(kinds[k]));
@@ -11207,7 +6733,7 @@ fwdBemModel fwd_bem_load_surfaces(char *name,
 bad : {
         FREE(sigma);
         for (k = 0; k < nkind; k++)
-            mne_free_source_space(surfs[k]);
+            delete surfs[k];
         FREE(surfs);
         return NULL;
     }
@@ -11235,22 +6761,18 @@ fwdBemModel fwd_bem_load_three_layer_surfaces(char *name)
     return fwd_bem_load_surfaces(name,kinds,nkind);
 }
 
-static int get_int(fiffFile in,fiffDirNode node,int what,int *res)
+static int get_int( FiffStream::SPtr& stream, const FiffDirNode::SPtr& node,int what,int *res)
 /*
-      * Wrapper to get int's
-      */
+* Wrapper to get int's
+*/
 {
-    fiffTag tag;
-    if ((tag = fiff_dir_tree_get_tag(in,node,what)) != NULL) {
-        if (tag->type != FIFFT_INT) {
-            printf("Expected an integer tag : %d (found data type %d instead)\n",what,tag->type);
-            FREE(tag->data);
-            FREE(tag);
+    FiffTag::SPtr t_pTag;
+    if(node->find_tag(stream, what, t_pTag)) {
+        if (t_pTag->getType() != FIFFT_INT) {
+            printf("Expected an integer tag : %d (found data type %d instead)\n",what,t_pTag->getType() );
             return FAIL;
         }
-        *res = *(int *)tag->data;
-        FREE(tag->data);
-        FREE(tag);
+        *res = *t_pTag->toInt();
         return OK;
     }
     return FAIL;
@@ -11259,43 +6781,44 @@ static int get_int(fiffFile in,fiffDirNode node,int what,int *res)
 
 int fwd_bem_load_solution(char *name, int bem_method, fwdBemModel m)
 /*
- * Load the potential solution matrix and attach it to the model:
- *
- * return values:
- *
- *       TRUE   found a suitable solution
- *       FALSE  did not find a suitable solution
- *       FAIL   error in reading the solution
- *
- */
+* Load the potential solution matrix and attach it to the model:
+*
+* return values:
+*
+*       TRUE   found a suitable solution
+*       FALSE  did not find a suitable solution
+*       FAIL   error in reading the solution
+*
+*/
 {
-    fiffFile    in = fiff_open(name);
+    QFile file(name);
+    FiffStream::SPtr stream(new FiffStream(&file));
+
     float       **sol = NULL;
-    fiffDirNode bem_node;
+    FiffDirNode::SPtr bem_node;
     int         method;
-    fiffTag     tag = NULL;
+    FiffTag::SPtr t_pTag;
     int         nsol;
 
-    if (!in)
+    if(!stream->open())
         goto not_found;
 
     /*
    * Find the BEM data
    */
     {
-        fiffDirNode *nodes = fiff_dir_tree_find(in->dirtree,FIFFB_BEM);
+        QList<FiffDirNode::SPtr> nodes = stream->tree()->dir_tree_find(FIFFB_BEM);
 
-        if (nodes == NULL || nodes[0] == NULL) {
+        if (nodes.size() == 0) {
             printf ("No BEM data in %s",name);
-            FREE(nodes);
             goto not_found;
         }
-        bem_node = nodes[0]; FREE(nodes);
+        bem_node = nodes[0];
     }
     /*
-   * Approximation method
-   */
-    if (get_int(in,bem_node,FIFF_BEM_APPROX,&method) != OK)
+    * Approximation method
+    */
+    if (get_int(stream,bem_node,FIFF_BEM_APPROX,&method) != OK)
         goto not_found;
     if (method == FIFFV_BEM_APPROX_CONST)
         method = FWD_BEM_CONSTANT_COLL;
@@ -11310,57 +6833,47 @@ int fwd_bem_load_solution(char *name, int bem_method, fwdBemModel m)
         goto not_found;
     }
     {
-        int         *dims;
         int         dim,k;
 
-        if ((tag = fiff_dir_tree_get_tag(in,bem_node,
-                                         FIFF_BEM_POT_SOLUTION)) == NULL)
+        if (!bem_node->find_tag(stream, FIFF_BEM_POT_SOLUTION, t_pTag))
             goto bad;
-        if ((dims = fiff_get_matrix_dims(tag)) == NULL)
-            goto bad;
-        if (dims[0] != 2) {
-            printf("Expected a two-dimensional solution matrix instead of a %d dimensional one",dims[0]);
+        qint32 ndim;
+        QVector<qint32> dims;
+        t_pTag->getMatrixDimensions(ndim, dims);
+
+        if (ndim != 2) {
+            printf("Expected a two-dimensional solution matrix instead of a %d dimensional one",ndim);
             goto bad;
         }
         for (k = 0, dim = 0; k < m->nsurf; k++)
             dim = dim + ((method == FWD_BEM_LINEAR_COLL) ? m->surfs[k]->np : m->surfs[k]->ntri);
-        if (dims[1] != dim || dims[2] != dim) {
-            printf("Expected a %d x %d solution matrix instead of a %d x %d  one",dim,dim,dims[2],dims[1]);
+        if (dims[0] != dim || dims[1] != dim) {
+            printf("Expected a %d x %d solution matrix instead of a %d x %d  one",dim,dim,dims[0],dims[1]);
             goto not_found;
         }
-        if ((sol = fiff_get_float_matrix(tag)) == NULL) {
-            printf("Could not read potential solution.");
-            goto bad;
-        }
+
+        MatrixXf tmp_sol = t_pTag->toFloatMatrix().transpose();
+        sol = ALLOC_CMATRIX(tmp_sol.rows(),tmp_sol.cols());
+        fromFloatEigenMatrix(tmp_sol, sol);
         nsol = dims[1];
-        FREE(tag); tag = NULL;
-        FREE(dims);
     }
     fwd_bem_free_solution(m);
     m->sol_name = mne_strdup(name);
     m->solution = sol;
     m->nsol     = nsol;
     m->bem_method = method;
-    fiff_close(in);
+    stream->close();
 
     return TRUE;
 
 bad : {
-        fiff_close(in);
-        if (tag) {
-            FREE(tag->data);
-            FREE(tag);
-        }
+        stream->close();
         FREE_CMATRIX(sol);
         return FAIL;
     }
 
 not_found : {
-        fiff_close(in);
-        if (tag) {
-            FREE(tag->data);
-            FREE(tag);
-        }
+        stream->close();
         FREE_CMATRIX(sol);
         return FALSE;
     }
@@ -11370,12 +6883,12 @@ not_found : {
 int fwd_bem_compute_solution(fwdBemModel m,
                              int         bem_method)
 /*
- * Compute the solution
- */
+* Compute the solution
+*/
 {
     /*
-   * Compute the solution
-   */
+    * Compute the solution
+    */
     if (bem_method == FWD_BEM_LINEAR_COLL)
         return fwd_bem_linear_collocation_solution(m);
     else if (bem_method == FWD_BEM_CONSTANT_COLL)
@@ -11391,8 +6904,8 @@ int fwd_bem_load_recompute_solution(char        *name,
                                     int         force_recompute,
                                     fwdBemModel m)
 /*
- * Load or recompute the potential solution matrix
- */
+* Load or recompute the potential solution matrix
+*/
 {
     int solres;
 
@@ -11422,8 +6935,8 @@ int fwd_bem_load_recompute_solution(char        *name,
 
 int fwd_bem_set_head_mri_t(fwdBemModel m, fiffCoordTrans t)
 /*
- * Set the coordinate transformation
- */
+* Set the coordinate transformation
+*/
 {
     if (t->from == FIFFV_COORD_HEAD && t->to == FIFFV_COORD_MRI) {
         FREE(m->head_mri_t);
@@ -11442,12 +6955,12 @@ int fwd_bem_set_head_mri_t(fwdBemModel m, fiffCoordTrans t)
 }
 
 /*
- * Some filename utilities follow
- */
+* Some filename utilities follow
+*/
 static char *ends_with(char *s, char *suffix)
 /*
-      * Does a string end with the given suffix?
-      */
+* Does a string end with the given suffix?
+*/
 {
     char *p;
 
@@ -11519,95 +7032,6 @@ char *fwd_bem_make_bem_sol_name(char *name)
 
 
 
-
-
-//============================= simplex_minimize.c =============================
-
-
-
-
-
-//============================= dipole_fit_guesses.c =============================
-
-mneSurface make_guesses(mneSurface guess_surf,     /* Predefined boundary for the guesses */
-                        float guessrad,		   /* Radius for the spherical boundary if the
-                                                                            * above is missing */
-                        float *guess_r0,           /* Origin for the spherical boundary */
-                        float grid,		   /* Spacing between guess points */
-                        float exclude,		   /* Exclude points
-                                                                              closer than this to the CM of the
-                                                                              guess boundary surface */
-                        float mindist)		   /* Exclude points closer than this to
-                                                    * the guess boundary surface */
-/*
- * Make a guess space inside a sphere
- */
-{
-    char *bemname     = NULL;
-    mneSurface sphere = NULL;
-    mneSurface res    = NULL;
-    int        k;
-    float      dist;
-    float      r0[] = { 0.0, 0.0, 0.0 };
-
-    if (!guess_r0)
-        guess_r0 = r0;
-
-    if (!guess_surf) {
-        fprintf(stderr,"Making a spherical guess space with radius %7.1f mm...\n",1000*guessrad);
-        //#ifdef USE_SHARE_PATH
-        //    if ((bemname = mne_compose_mne_name("share/mne","icos.fif")) == NULL)
-        //#else
-        //    if ((bemname = mne_compose_mne_name("setup/mne","icos.fif")) == NULL)
-        //#endif
-        //      goto out;
-
-        //    QFile bemFile("/usr/pubsw/packages/mne/stable/share/mne/icos.fif");
-
-        QFile bemFile(QString("./resources/surf2bem/icos.fif"));
-        if ( !QCoreApplication::startingUp() )
-            bemFile.setFileName(QCoreApplication::applicationDirPath() + QString("/resources/surf2bem/icos.fif"));
-        else if (!bemFile.exists())
-            bemFile.setFileName("./bin/resources/surf2bem/icos.fif");
-
-        if( !bemFile.exists () ){
-            qDebug() << bemFile.fileName() << "does not exists.";
-            goto out;
-        }
-
-        bemname = MALLOC(strlen(bemFile.fileName().toLatin1().data())+1,char);
-        strcpy(bemname,bemFile.fileName().toLatin1().data());
-
-        if ((sphere = mne_read_bem_surface(bemname,9003,FALSE,NULL)) == NULL)
-            goto out;
-
-        for (k = 0; k < sphere->np; k++) {
-            dist = VEC_LEN(sphere->rr[k]);
-            sphere->rr[k][X] = guessrad*sphere->rr[k][X]/dist + guess_r0[X];
-            sphere->rr[k][Y] = guessrad*sphere->rr[k][Y]/dist + guess_r0[Y];
-            sphere->rr[k][Z] = guessrad*sphere->rr[k][Z]/dist + guess_r0[Z];
-        }
-        if (mne_source_space_add_geometry_info(sphere,TRUE) == FAIL)
-            goto out;
-        guess_surf = sphere;
-    }
-    else {
-        fprintf(stderr,"Guess surface (%d = %s) is in %s coordinates\n",
-                guess_surf->id,fwd_bem_explain_surface(guess_surf->id),
-                mne_coord_frame_name(guess_surf->coord_frame));
-    }
-    fprintf(stderr,"Filtering (grid = %6.f mm)...\n",1000*grid);
-    res = make_volume_source_space(guess_surf,grid,exclude,mindist);
-
-out : {
-        FREE(bemname);
-        mne_free_source_space(sphere);
-        return res;
-    }
-}
-
-
-
 //============================= mne_project_to_surface.c =============================
 
 
@@ -11623,7 +7047,7 @@ typedef struct {
 
 
 void mne_triangle_coords(float       *r,       /* Location of a point */
-                         mneSurface  s,	       /* The surface */
+                         MneSurfaceOrVolume::MneCSurface*  s,	       /* The surface */
                          int         tri,      /* Which triangle */
                          float       *x,       /* Coordinates of the point on the triangle */
                          float       *y,
@@ -11658,7 +7082,7 @@ void mne_triangle_coords(float       *r,       /* Location of a point */
 
 
 static int nearest_triangle_point(float       *r,    /* Location of a point */
-                                  mneSurface  s,     /* The surface */
+                                  MneSurfaceOrVolume::MneCSurface*  s,     /* The surface */
                                   void        *user, /* Something precomputed */
                                   int         tri,   /* Which triangle */
                                   float       *x,    /* Coordinates of the point on the triangle */
@@ -11775,7 +7199,7 @@ static int nearest_triangle_point(float       *r,    /* Location of a point */
     return TRUE;
 }
 
-static void project_to_triangle(mneSurface s,
+static void project_to_triangle(MneSurfaceOrVolume::MneCSurface* s,
                                 int        tri,
                                 float      p,
                                 float      q,
@@ -11794,7 +7218,7 @@ static void project_to_triangle(mneSurface s,
 }
 
 int mne_nearest_triangle_point(float       *r,    /* Location of a point */
-                               mneSurface  s,     /* The surface */
+                               MneSurfaceOrVolume::MneCSurface*  s,     /* The surface */
                                int         tri,   /* Which triangle */
                                float       *x,    /* Coordinates of the point on the triangle */
                                float       *y,
@@ -11808,7 +7232,7 @@ int mne_nearest_triangle_point(float       *r,    /* Location of a point */
 
 
 
-int mne_project_to_surface(mneSurface s, void *proj_data, float *r, int project_it, float *distp)
+int mne_project_to_surface(MneSurfaceOrVolume::MneCSurface* s, void *proj_data, float *r, int project_it, float *distp)
 /*
       * Project the point onto the closest point on the surface
       */
@@ -11890,7 +7314,7 @@ int fwd_bem_specify_els(fwdBemModel m,
  */
 {
     FwdCoil*     el;
-    mneSurface  scalp;
+    MneSurfaceOrVolume::MneCSurface*  scalp;
     int         k,p,q,v;
     float       *one_sol,*pick_sol;
     float       r[3],w[3],dist;
@@ -12354,7 +7778,7 @@ float **fwd_bem_field_coeff(fwdBemModel m,	/* The model */
  * Compute the weighting factors to obtain the magnetic field
  */
 {
-    mneSurface     surf;
+    MneSurfaceOrVolume::MneCSurface*     surf;
     mneTriangle    tri;
     FwdCoil*        coil;
     FwdCoilSet*     tcoils = NULL;
@@ -12379,10 +7803,14 @@ float **fwd_bem_field_coeff(fwdBemModel m,	/* The model */
                 return NULL;
             }
             else {
+                if (!coils) {
+                    qWarning("No coils to duplicate");
+                    return NULL;
+                }
                 /*
-         * Make a transformed duplicate
-         */
-                if ((tcoils = fwd_dup_coil_set(coils,m->head_mri_t)) == NULL)
+                * Make a transformed duplicate
+                */
+                if ((tcoils = coils->dup_coil_set(m->head_mri_t)) == NULL)
                     return NULL;
                 coils = tcoils;
             }
@@ -12590,7 +8018,7 @@ float **fwd_bem_lin_field_coeff (fwdBemModel m,	        /* The model */
       * in the linear potential approximation
       */
 {
-    mneSurface  surf;
+    MneSurfaceOrVolume::MneCSurface*  surf;
     mneTriangle tri;
     FwdCoil*     coil;
     FwdCoilSet*  tcoils = NULL;
@@ -12616,10 +8044,14 @@ float **fwd_bem_lin_field_coeff (fwdBemModel m,	        /* The model */
                 return NULL;
             }
             else {
+                if (!coils) {
+                    qWarning("No coils to duplicate");
+                    return NULL;
+                }
                 /*
-         * Make a transformed duplicate
-         */
-                if ((tcoils = fwd_dup_coil_set(coils,m->head_mri_t)) == NULL)
+                * Make a transformed duplicate
+                */
+                if ((tcoils = coils->dup_coil_set(m->head_mri_t)) == NULL)
                     return NULL;
                 coils = tcoils;
             }
@@ -12698,7 +8130,8 @@ int fwd_bem_specify_coils(fwdBemModel m,
         printf("Solution not computed in fwd_bem_specify_coils");
         goto bad;
     }
-    coils->fwd_free_coil_set_user_data();
+    if(coils)
+        coils->fwd_free_coil_set_user_data();
     if (!coils || coils->ncoil == 0)
         return OK;
     if (m->bem_method == FWD_BEM_CONSTANT_COLL)
@@ -13054,8 +8487,15 @@ fwdCompData fwd_make_comp_data(mneCTFcompDataSet set,           /* The CTF compe
 {
     fwdCompData comp = fwd_new_comp_data();
 
-    comp->set         = mne_dup_ctf_comp_data_set(set);
-    comp->comp_coils  = fwd_dup_coil_set(comp_coils,NULL);
+    comp->set = mne_dup_ctf_comp_data_set(set);
+
+    if (comp_coils) {
+        comp->comp_coils = comp_coils->dup_coil_set(NULL);
+    }
+    else {
+        qWarning("No coils to duplicate");
+        comp->comp_coils = NULL;
+    }
     comp->field       = field;
     comp->vec_field   = vec_field;
     comp->field_grad  = field_grad;
@@ -13835,49 +9275,6 @@ int fwd_mag_dipole_field_vec(float        *rm,	        /* The dipole location */
 //============================= dipole_fit_setup.c =============================
 
 
-GuessData* new_guess_data()
-
-{
-    GuessData* res = MALLOC(1,GuessData);
-
-    res->rr        = NULL;
-    res->guess_fwd = NULL;
-    res->nguess    = 0;
-    return res;
-}
-
-
-void free_dipole_forward_2 ( DipoleForward* f )
-{
-    if (!f)
-        return;
-    FREE_CMATRIX(f->rd);
-    FREE_CMATRIX(f->fwd);
-    FREE_CMATRIX(f->uu);
-    FREE_CMATRIX(f->vv);
-    FREE(f->sing);
-    FREE(f->scales);
-    FREE(f);
-    return;
-}
-
-void free_guess_data(GuessData* g)
-
-{
-    int k;
-    if (!g)
-        return;
-
-    FREE_CMATRIX(g->rr);
-    if (g->guess_fwd) {
-        for (k = 0; k < g->nguess; k++)
-            free_dipole_forward_2(g->guess_fwd[k]);
-        FREE(g->guess_fwd);
-    }
-    FREE(g);
-    return;
-}
-
 static dipoleFitFuncs new_dipole_fit_funcs()
 
 {
@@ -13965,7 +9362,8 @@ void free_dipole_fit_data(DipoleFitData* d)
     mne_free_cov(d->noise);
     mne_free_cov(d->noise_orig);
     mne_free_name_list(d->ch_names,d->nmeg+d->neeg);
-    mne_free_sparse(d->pick);
+    if(d->pick)
+        d->pick;
     fwd_bem_free_model(d->bem_model);
     delete d->eeg_model;
     if (d->user_free)
@@ -14025,7 +9423,7 @@ static int setup_forward_model(DipoleFitData* d, mneCTFcompDataSet comp_data, Fw
      * Find the best-fitting sphere
      */
         if (fit_sphere_to_bem) {
-            mneSurface inner_skull;
+            MneSurfaceOrVolume::MneCSurface* inner_skull;
             float      simplex_size = 2e-2;
             float      R;
 
@@ -14170,7 +9568,7 @@ static mneCovMatrix ad_hoc_noise(FwdCoilSet* meg,          /* Channel name lists
     n = 0;
     if (meg) {
         for (k = 0; k < meg->ncoil; k++, n++) {
-            if (fwd_is_axial_coil(meg->coils[k])) {
+            if (meg->coils[k]->is_axial_coil()) {
                 stds[n] = mag_std*mag_std;
 #ifdef TEST_REF
                 if (meg->coils[k]->type == FIFFV_COIL_CTF_REF_MAG ||
@@ -14259,30 +9657,6 @@ static int make_projection(const QList<QString>& projnames,
 bad :
     return FAIL;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -14636,16 +10010,16 @@ DipoleFitData* setup_dipole_fit_data(   const QString& mriname,         /**< Thi
 
         if (!coilfile)
             goto bad;
-        if ((templates = fwd_read_coil_defs(coilfile)) == NULL) {
+        if ((templates = FwdCoilSet::read_coil_defs(coilfile)) == NULL) {
             FREE(coilfile);
             goto bad;
         }
 
-        if ((res->meg_coils = fwd_create_meg_coils(templates,res->chs,res->nmeg,
+        if ((res->meg_coils = templates->create_meg_coils(res->chs,res->nmeg,
                                                    accurate_coils ? FWD_COIL_ACCURACY_ACCURATE : FWD_COIL_ACCURACY_NORMAL,
                                                    res->meg_head_t)) == NULL)
             goto bad;
-        if ((res->eeg_els = fwd_create_eeg_els(res->chs+res->nmeg,res->neeg,NULL)) == NULL)
+        if ((res->eeg_els = FwdCoilSet::create_eeg_els(res->chs+res->nmeg,res->neeg,NULL)) == NULL)
             goto bad;
         printf("Head coordinate coil definitions created.\n");
     }
@@ -14676,7 +10050,7 @@ DipoleFitData* setup_dipole_fit_data(   const QString& mriname,         /**< Thi
         if (mne_read_meg_comp_eeg_ch_info(measname,NULL,0,&comp_chs,&ncomp,NULL,NULL,NULL,NULL) == FAIL)
             goto bad;
         if (ncomp > 0) {
-            if ((comp_coils = fwd_create_meg_coils(templates,comp_chs,ncomp,
+            if ((comp_coils = templates->create_meg_coils(comp_chs,ncomp,
                                                    FWD_COIL_ACCURACY_NORMAL,res->meg_head_t)) == NULL) {
                 FREE(comp_chs);
                 goto bad;
@@ -14820,277 +10194,6 @@ bad : {
 }
 
 
-
-
-
-
-
-
-GuessData* make_guess_data( const QString& guessname, const QString& guess_surfname, float mindist, float exclude, float grid, DipoleFitData* f, char *guess_save_name)
-{
-    mneSourceSpace *sp = NULL;
-    int             nsp = 0;
-    GuessData*      res = NULL;
-    int             k,p;
-    float           guessrad = 0.080f;
-    mneSourceSpace  guesses = NULL;
-
-    if (!guessname.isEmpty()) {
-        /*
-     * Read the guesses and transform to the appropriate coordinate frame
-     */
-        if (mne_read_source_spaces(guessname,&sp,&nsp) == FIFF_FAIL)
-            goto bad;
-        if (nsp != 1) {
-            qCritical("Incorrect number of source spaces in guess file");
-            for (k = 0; k < nsp; k++)
-                mne_free_source_space(sp[k]);
-            FREE(sp);
-            goto bad;
-        }
-        printf("Read guesses from %s\n",guessname.toLatin1().constData());
-        guesses = sp[0]; FREE(sp);
-    }
-    else {
-        mneSurface     inner_skull = NULL;
-        int            free_inner_skull = FALSE;
-        float          r0[3];
-
-        VEC_COPY(r0,f->r0);
-        fiff_coord_trans_inv(r0,f->mri_head_t,TRUE);
-        if (f->bem_model) {
-            printf("Using inner skull surface from the BEM (%s)...\n",f->bemname);
-            if ((inner_skull = fwd_bem_find_surface(f->bem_model,FIFFV_BEM_SURF_ID_BRAIN)) == NULL)
-                goto bad;
-        }
-        else if (!guess_surfname.isEmpty()) {
-            printf("Reading inner skull surface from %s...\n",guess_surfname.toLatin1().data());
-            if ((inner_skull = mne_read_bem_surface(guess_surfname,FIFFV_BEM_SURF_ID_BRAIN,TRUE,NULL)) == NULL)
-                goto bad;
-            free_inner_skull = TRUE;
-        }
-        if ((guesses = make_guesses(inner_skull,guessrad,r0,grid,exclude,mindist)) == NULL)
-            goto bad;
-        if (free_inner_skull)
-            mne_free_source_space(inner_skull);
-    }
-    /*
-   * Save the guesses for future use
-   */
-    if (guesses->nuse == 0) {
-        qCritical("No active guess locations remaining.");
-        goto bad;
-    }
-    if (guess_save_name) {
-        printf("###################DEBUG writing source spaces not yet implemented.");
-        //    if (mne_write_source_spaces(guess_save_name,&guesses,1,FALSE) != OK)
-        //      goto bad;
-        //    printf("Wrote guess locations to %s\n",guess_save_name);
-    }
-    /*
-   * Transform the guess locations to the appropriate coordinate frame
-   */
-    if (mne_transform_source_spaces_to(f->coord_frame,f->mri_head_t,&guesses,1) != OK)
-        goto bad;
-    printf("Guess locations are now in %s coordinates.\n",mne_coord_frame_name(f->coord_frame));
-
-    res = new_guess_data();
-    res->nguess  = guesses->nuse;
-    res->rr      = ALLOC_CMATRIX(guesses->nuse,3);
-    for (k = 0, p = 0; k < guesses->np; k++)
-        if (guesses->inuse[k]) {
-            VEC_COPY(res->rr[p],guesses->rr[k]);
-            p++;
-        }
-    mne_free_source_space(guesses); guesses = NULL;
-
-    res->guess_fwd = MALLOC(res->nguess,DipoleForward*);
-    for (k = 0; k < res->nguess; k++)
-        res->guess_fwd[k] = NULL;
-    /*
-    * Compute the guesses using the sphere model for speed
-    */
-    if (!res->compute_guess_fields(f))
-        goto bad;
-
-    return res;
-
-bad : {
-        mne_free_source_space(guesses);
-        free_guess_data(res);
-        return NULL;
-    }
-}
-
-
-
-//============================= setup.c =============================
-
-GuessData* make_guess_data( const QString& guessname,
-                            const QString& guess_surfname,
-                            float         mindist,
-                            float         exclude,
-                            float         grid,
-                            DipoleFitData* f)
-
-{
-    mneSourceSpace *sp = NULL;
-    int            nsp = 0;
-    GuessData*      res = new_guess_data();
-    int            k,p;
-    float          guessrad = 0.080;
-    mneSourceSpace guesses = NULL;
-    dipoleFitFuncs orig;
-
-    if (!guessname.isEmpty()) {
-        /*
-        * Read the guesses and transform to the appropriate coordinate frame
-        */
-        if (mne_read_source_spaces(guessname,&sp,&nsp) == FAIL)
-            goto bad;
-        if (nsp != 1) {
-            printf("Incorrect number of source spaces in guess file");
-            for (k = 0; k < nsp; k++)
-                mne_free_source_space(sp[k]);
-            FREE(sp);
-            goto bad;
-        }
-        fprintf(stderr,"Read guesses from %s\n",guessname.toLatin1().constData());
-        guesses = sp[0]; FREE(sp);
-    }
-    else {
-        mneSurface     inner_skull = NULL;
-        int            free_inner_skull = FALSE;
-        float          r0[3];
-
-        VEC_COPY(r0,f->r0);
-        fiff_coord_trans_inv(r0,f->mri_head_t,TRUE);
-        if (f->bem_model) {
-            fprintf(stderr,"Using inner skull surface from the BEM (%s)...\n",f->bemname);
-            if ((inner_skull = fwd_bem_find_surface(f->bem_model,FIFFV_BEM_SURF_ID_BRAIN)) == NULL)
-                goto bad;
-        }
-        else if (!guess_surfname.isEmpty()) {
-            fprintf(stderr,"Reading inner skull surface from %s...\n",guess_surfname.toLatin1().data());
-            if ((inner_skull = mne_read_bem_surface(guess_surfname,FIFFV_BEM_SURF_ID_BRAIN,TRUE,NULL)) == NULL)
-                goto bad;
-            free_inner_skull = TRUE;
-        }
-        if ((guesses = make_guesses(inner_skull,guessrad,r0,grid,exclude,mindist)) == NULL)
-            goto bad;
-        if (free_inner_skull)
-            mne_free_source_space(inner_skull);
-    }
-    if (mne_transform_source_spaces_to(f->coord_frame,f->mri_head_t,&guesses,1) != OK)
-        goto bad;
-    fprintf(stderr,"Guess locations are now in %s coordinates.\n",mne_coord_frame_name(f->coord_frame));
-    res->nguess  = guesses->nuse;
-    res->rr      = ALLOC_CMATRIX(guesses->nuse,3);
-    for (k = 0, p = 0; k < guesses->np; k++)
-        if (guesses->inuse[k]) {
-            VEC_COPY(res->rr[p],guesses->rr[k]);
-            p++;
-        }
-    mne_free_source_space(guesses); guesses = NULL;
-
-    fprintf(stderr,"Go through all guess source locations...");
-    res->guess_fwd = MALLOC(res->nguess,DipoleForward*);
-    for (k = 0; k < res->nguess; k++)
-        res->guess_fwd[k] = NULL;
-    /*
-    * Compute the guesses using the sphere model for speed
-    */
-    orig = f->funcs;
-    if (f->fit_mag_dipoles)
-        f->funcs = f->mag_dipole_funcs;
-    else
-        f->funcs = f->sphere_funcs;
-
-    for (k = 0; k < res->nguess; k++) {
-        if ((res->guess_fwd[k] = DipoleFitData::dipole_forward_one(f,res->rr[k],NULL)) == NULL)
-            goto bad;
-#ifdef DEBUG
-        sing = res->guess_fwd[k]->sing;
-        printf("%f %f %f\n",sing[0],sing[1],sing[2]);
-#endif
-    }
-    f->funcs = orig;
-
-    fprintf(stderr,"[done %d sources]\n",p);
-
-    return res;
-
-bad : {
-        mne_free_source_space(guesses);
-        free_guess_data(res);
-        return NULL;
-    }
-}
-
-
-//============================= mne_apply_baselines.c =============================
-
-void mne_adjust_baselines(mneMeasData meas, float bmin, float bmax)
-/*
-      * Change the baseline setting in the current data set
-      */
-{
-    int b1,b2;
-    float sfreq,tmin,tmax;
-    float **data;
-    float ave;
-    int s,c;
-
-    if (!meas || !meas->current)
-        return;
-
-    sfreq = 1.0/meas->current->tstep;
-    tmin  = meas->current->tmin;
-    tmax  = meas->current->tmin + (meas->current->np-1)/sfreq;
-
-    if (bmin < tmin)
-        b1 = 0;
-    else if (bmin > tmax)
-        b1 = meas->current->np;
-    else {
-        for (b1 = 0; b1/sfreq + tmin < bmin; b1++)
-            ;
-        if (b1 < 0)
-            b1 = 0;
-        else if (b1 > meas->current->np)
-            b1 = meas->current->np;
-    }
-    if (bmax < tmin)
-        b2 = 0;
-    else if (bmax > tmax)
-        b2 = meas->current->np;
-    else {
-        for (b2 = meas->current->np; b2/sfreq + tmin > bmax; b2--)
-            ;
-        if (b2 < 0)
-            b2 = 0;
-        else if (b2 > meas->current->np)
-            b2 = meas->current->np;
-    }
-    data = meas->current->data;
-    if (b2 > b1) {
-        for (c = 0; c < meas->nchan; c++) {
-            for (s = b1, ave = 0.0; s < b2; s++)
-                ave += data[s][c];
-            ave = ave/(b2-b1);
-            meas->current->baselines[c] += ave;
-            for (s = 0; s < meas->current->np; s++)
-                data[s][c] = data[s][c] - ave;
-        }
-        fprintf(stderr,"\t%s : using baseline %7.1f ... %7.1f ms\n",
-                meas->current->comment ? meas->current->comment : "unknown",
-                1000*(tmin+b1/sfreq),
-                1000*(tmin+b2/sfreq));
-    }
-    return;
-}
-
-
 //============================= mne_ringbuffer.c =============================
 
 typedef struct {
@@ -15193,24 +10296,26 @@ void mne_free_raw_info(mneRawInfo info)
     FREE(info->filename);
     FREE(info->chInfo);
     FREE(info->trans);
-    FREE(info->rawDir);
+//    FREE(info->rawDir);
     FREE(info->id);
     FREE(info);
     return;
 }
 
 
-int mne_read_raw_buffer_t(fiffFile     in,	    /* Input file */
-                          fiffDirEntry ent,	    /* The directory entry to read */
+int mne_read_raw_buffer_t(//fiffFile     in,        /* Input file */
+                          FiffStream::SPtr& stream,
+                          const FiffDirEntry::SPtr& ent,         /* The directory entry to read */
                           float        **data,      /* Allocated for npick x nsamp samples */
                           int          nchan,       /* Number of channels in the data */
-                          int          nsamp,	    /* Expected number of samples */
+                          int          nsamp,       /* Expected number of samples */
                           fiffChInfo   chs,         /* Channel info for ALL channels */
                           int          *pickno,     /* Which channels to pick */
-                          int          npick)	    /* How many */
+                          int          npick)       /* How many */
 
 {
-    fiffTagRec   tag;
+    FiffTag::SPtr t_pTag;
+//    fiffTagRec   tag;
     fiff_short_t *this_samples;
     fiff_float_t *this_samplef;
     fiff_int_t   *this_sample;
@@ -15219,7 +10324,7 @@ int mne_read_raw_buffer_t(fiffFile     in,	    /* Input file */
     int do_all;
     float *mult;
 
-    tag.data = NULL;
+//    tag.data = NULL;
 
     if (npick == 0) {
         pickno = MALLOC(nchan, int);
@@ -15235,37 +10340,42 @@ int mne_read_raw_buffer_t(fiffFile     in,	    /* Input file */
     for (c = 0; c < npick; c++)
         mult[c] = chs[pickno[c]].cal*chs[pickno[c]].range;
 
-    if (fiff_read_this_tag(in->fd,ent->pos,&tag) ==  FIFF_FAIL)
+//    if (fiff_read_this_tag(in->fd,ent->pos,&tag) ==  FIFF_FAIL)
+//        goto bad;
+    if (!FiffTag::read_tag(stream,t_pTag,ent->pos))
         goto bad;
 
     if (ent->type == FIFFT_FLOAT) {
-        if ((int)(tag.size/(sizeof(fiff_float_t)*nchan)) != nsamp) {
+        if ((int)(t_pTag->size()/(sizeof(fiff_float_t)*nchan)) != nsamp) {
             printf("Incorrect number of samples in buffer.");
             goto bad;
         }
-        this_samplef = (fiff_float_t *)tag.data;
+        qDebug() << "ToDo: Check whether this_samplef contains the right stuff!!! - use VectorXf instead";
+        this_samplef = t_pTag->toFloat();
         for (s = 0; s < nsamp; s++, this_samplef += nchan) {
             for (c = 0; c < npick; c++)
                 data[c][s] = mult[c]*this_samplef[pickno[c]];
         }
     }
     else if (ent->type == FIFFT_SHORT || ent->type == FIFFT_DAU_PACK16) {
-        if ((int)(tag.size/(sizeof(fiff_short_t)*nchan)) != nsamp) {
+        if ((int)(t_pTag->size()/(sizeof(fiff_short_t)*nchan)) != nsamp) {
             printf("Incorrect number of samples in buffer.");
             goto bad;
         }
-        this_samples = (fiff_short_t *)tag.data;
+        qDebug() << "ToDo: Check whether this_samples contains the right stuff!!! - use VectorXi instead";
+        this_samples = (fiff_short_t *)t_pTag->data();
         for (s = 0; s < nsamp; s++, this_samples += nchan) {
             for (c = 0; c < npick; c++)
                 data[c][s] = mult[c]*this_samples[pickno[c]];
         }
     }
     else if (ent->type == FIFFT_INT) {
-        if ((int)(tag.size/(sizeof(fiff_int_t)*nchan)) != nsamp) {
+        if ((int)(t_pTag->size()/(sizeof(fiff_int_t)*nchan)) != nsamp) {
             printf("Incorrect number of samples in buffer.");
             goto bad;
         }
-        this_sample = (fiff_int_t *)tag.data;
+        qDebug() << "ToDo: Check whether this_sample contains the right stuff!!! - use VectorXi instead";
+        this_sample = t_pTag->toInt();
         for (s = 0; s < nsamp; s++, this_sample += nchan) {
             for (c = 0; c < npick; c++)
                 data[c][s] = mult[c]*this_sample[pickno[c]];
@@ -15278,13 +10388,13 @@ int mne_read_raw_buffer_t(fiffFile     in,	    /* Input file */
     if (do_all)
         FREE(pickno);
     FREE(mult);
-    FREE(tag.data);
+//    FREE(tag.data);
     return OK;
 
 bad : {
         if (do_all)
             FREE(pickno);
-        FREE(tag.data);
+//        FREE(tag.data);
         return FAIL;
     }
 }
@@ -15592,43 +10702,40 @@ int mne_apply_filter(mneFilterDef filter, void *datap, float *data, int ns, int 
 
 //============================= mne_raw_routines.c =============================
 
-static fiffDirNode find_raw (fiffDirNode node)
+static FiffDirNode::SPtr find_raw (const FiffDirNode::SPtr& node)
 /*
       * Find the raw data
       */
 {
-    fiffDirNode raw,*temp;
-    temp = fiff_dir_tree_find(node,FIFFB_RAW_DATA);
-    if (temp == NULL || temp[0] == NULL) {
-        temp = fiff_dir_tree_find(node,FIFFB_CONTINUOUS_DATA);
-        if (temp == NULL || temp[0] == NULL)
-            raw = NULL;
-        else
+    FiffDirNode::SPtr raw;
+    QList<FiffDirNode::SPtr> temp;
+    temp = node->dir_tree_find(FIFFB_RAW_DATA);
+    if (temp.size() == 0) {
+        temp = node->dir_tree_find(FIFFB_CONTINUOUS_DATA);
+        if (temp.size() > 0)
             raw = temp[0];
     }
     else
         raw = temp[0];
-    FREE(temp);
-    return (raw);
+    return raw;
 }
 
 
-static fiffDirNode find_maxshield (fiffDirNode node)
+static FiffDirNode::SPtr find_maxshield (const FiffDirNode::SPtr& node)
 
 {
-    fiffDirNode raw,*temp;
-    temp = fiff_dir_tree_find(node,FIFFB_SMSH_RAW_DATA);
-    if (temp == NULL || temp[0] == NULL)
-        raw = NULL;
-    else
+    FiffDirNode::SPtr raw;
+    QList<FiffDirNode::SPtr> temp;
+    temp = node->dir_tree_find(FIFFB_SMSH_RAW_DATA);
+    if (temp.size() > 0)
         raw = temp[0];
-    FREE(temp);
     return (raw);
 }
 
 
-static int get_meas_info (fiffFile file,	 /* The file we are reading */
-                          fiffDirNode node,	 /* The directory node containing our data */
+static int get_meas_info (//fiffFile file,	 /* The file we are reading */
+                          FiffStream::SPtr& stream,
+                          FiffDirNode::SPtr& node,	 /* The directory node containing our data */
                           fiffId *id,	         /* The block id from the nearest FIFFB_MEAS
                                                                               parent */
                           int *nchan,	         /* Number of channels */
@@ -15645,51 +10752,69 @@ static int get_meas_info (fiffFile file,	 /* The file we are reading */
       * node.
       */
 {
-    fiffTagRec tag;
-    fiffDirEntry this_ent;
+    FiffTag::SPtr t_pTag;
+//    fiffTagRec tag;
+//    fiffDirEntry this_ent;
     fiffChInfo ch;
     fiffChInfo this_ch;
     fiffCoordTrans t;
     int j,k;
     int to_find = 4;
-    fiffDirNode *hpi,meas;
+    QList<FiffDirNode::SPtr> hpi;
+    FiffDirNode::SPtr meas;
+    fiff_int_t kind, pos;
 
-    tag.data    = NULL;
+//    tag.data    = NULL;
     *chp        = NULL;
     ch          = NULL;
     *trans      = NULL;
     *id         = NULL;
     *start_time = NULL;
     /*
-   * Find desired parents
-   */
-    if ((meas = find_meas(node)) == NULL) {
+    * Find desired parents
+    */
+//    meas = node->dir_tree_find(FIFFB_MEAS);
+    if (!(meas = find_meas(node))) {
+//    if (meas.size() == 0) {
         printf ("Meas. block not found!");
         goto bad;
     }
-    if ((node = find_meas_info(node)) == NULL) {
+
+//    meas_info = node->dir_tree_find(FIFFB_MEAS_INFO);
+    if (!(node = find_meas_info(node))) {
+//    if (meas_info.count() == 0) {
         printf ("Meas. info not found!");
         goto bad;
     }
     /*
    * Is there a block id is in the FIFFB_MEAS node?
    */
-    if (meas->id != NULL) {
+//    if (meas->id != NULL) {
+    if (!meas->id.isEmpty()) {
         *id = MALLOC(1,fiffIdRec);
-        memcpy (*id,meas->id,sizeof(fiffIdRec));
+//        memcpy (*id,meas[0]->id,sizeof(fiffIdRec));
+        (*id)->version = meas->id.version;
+        (*id)->machid[0] = meas->id.machid[0];
+        (*id)->machid[1] = meas->id.machid[1];
+        (*id)->time = meas->id.time;
     }
     /*
    * Others from FIFFB_MEAS_INFO
    */
     *lowpass  = -1;
     *highpass = -1;
-    for (k = 0,this_ent = node->dir; k < node->nent; k++,this_ent++) {
-        switch (this_ent->kind) {
+    for (k = 0; k < node->nent; k++) {
+        kind = node->dir[k]->kind;
+        pos  = node->dir[k]->pos;
+        switch (kind) {
 
         case FIFF_NCHAN :
-            if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
+//            if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
+//                goto bad;
+//            *nchan = *(int *)(tag.data);
+            if (!FiffTag::read_tag(stream,t_pTag,pos))
                 goto bad;
-            *nchan = *(int *)(tag.data);
+            *nchan = *t_pTag->toInt();
             ch = MALLOC(*nchan,fiffChInfoRec);
             for (j = 0; j < *nchan; j++)
                 ch[j].scanNo = -1;
@@ -15697,32 +10822,44 @@ static int get_meas_info (fiffFile file,	 /* The file we are reading */
             break;
 
         case FIFF_SFREQ :
-            if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
+//            if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
+//                goto bad;
+//            *sfreq = *(float *)(tag.data);
+            if (!FiffTag::read_tag(stream,t_pTag,pos))
                 goto bad;
-            *sfreq = *(float *)(tag.data);
+            *sfreq = *t_pTag->toFloat();
             to_find--;
             break;
 
         case FIFF_LOWPASS :
-            if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
+//            if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
+//                goto bad;
+//            *lowpass = *(float *)(tag.data);
+            if (!FiffTag::read_tag(stream,t_pTag,pos))
                 goto bad;
-            *lowpass = *(float *)(tag.data);
+            *lowpass = *t_pTag->toFloat();
             to_find--;
             break;
 
         case FIFF_HIGHPASS :
-            if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
+//            if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
+//                goto bad;
+//            *highpass = *(float *)(tag.data);
+            if (!FiffTag::read_tag(stream,t_pTag,pos))
                 goto bad;
-            *highpass = *(float *)(tag.data);
+            *highpass = *t_pTag->toFloat();
             to_find--;
             break;
 
         case FIFF_CH_INFO :		/* Information about one channel */
-            if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
+//            if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
+//                goto bad;
+//            this_ch = (fiffChInfo)(tag.data);
+            if (!FiffTag::read_tag(stream,t_pTag,pos))
                 goto bad;
-            this_ch = (fiffChInfo)(tag.data);
+            this_ch = (fiffChInfo)t_pTag->data();
             if (this_ch->scanNo <= 0 || this_ch->scanNo > *nchan) {
-                printf ("FIFF_CH_INFO : scan # out of range!");
+                qCritical ("FIFF_CH_INFO : scan # out of range!");
                 goto bad;
             }
             else
@@ -15732,47 +10869,63 @@ static int get_meas_info (fiffFile file,	 /* The file we are reading */
             break;
 
         case FIFF_MEAS_DATE :
-            if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
+//            if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
+//                goto bad;
+            if (!FiffTag::read_tag(stream,t_pTag,pos))
                 goto bad;
             if (*start_time)
                 FREE(*start_time);
-            *start_time = (fiffTime)tag.data;
-            tag.data = NULL;
+//            *start_time = (fiffTime)tag.data;
+            *start_time = (fiffTime)t_pTag->data();
+//            tag.data = NULL;
             break;
 
         case FIFF_COORD_TRANS :
-            if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
+//            if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
+//                goto bad;
+//            t = (fiffCoordTrans)tag.data;
+            if (!FiffTag::read_tag(stream,t_pTag,pos))
                 goto bad;
-            t = (fiffCoordTrans)tag.data;
+            t = (fiffCoordTrans)malloc(sizeof(fiffCoordTransRec));
+            *t = *(fiffCoordTrans)t_pTag->data();
             /*
-       * Require this particular transform!
-       */
+            * Require this particular transform!
+            */
             if (t->from == FIFFV_COORD_DEVICE && t->to == FIFFV_COORD_HEAD) {
                 *trans = t;
-                tag.data = NULL;
+//                tag.data = NULL;
                 break;
             }
         }
     }
     /*
-   * Search for the coordinate transformation from
-   * HPI_RESULT block if it was not previously found
-   */
-    hpi = fiff_dir_tree_find(node,FIFFB_HPI_RESULT);
+    * Search for the coordinate transformation from
+    * HPI_RESULT block if it was not previously found
+    */
+//    hpi = fiff_dir_tree_find(node,FIFFB_HPI_RESULT);
+//    node = hpi[0];
+
+    hpi = node->dir_tree_find(FIFFB_HPI_RESULT);
     node = hpi[0];
-    FREE(hpi);
-    if (node != NULL && *trans == NULL)
-        for (k = 0,this_ent = node->dir; k < node->nent; k++,this_ent++)
-            if (this_ent->kind ==  FIFF_COORD_TRANS) {
-                if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
+
+//    FREE(hpi);
+    if (hpi.size() > 0 && *trans == NULL)
+        for (k = 0; k < hpi[0]->nent; k++)
+            if (hpi[0]->dir[k]->kind ==  FIFF_COORD_TRANS) {
+//                if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
+//                    goto bad;
+//                t = (fiffCoordTrans)tag.data;
+                if (!FiffTag::read_tag(stream,t_pTag,hpi[0]->dir[k]->pos))
                     goto bad;
-                t = (fiffCoordTrans)tag.data;
+                t = (fiffCoordTrans)malloc(sizeof(fiffCoordTransRec));
+                *t = *(fiffCoordTrans)t_pTag->data();
+
                 /*
-         * Require this particular transform!
-         */
+                * Require this particular transform!
+                */
                 if (t->from == FIFFV_COORD_DEVICE && t->to == FIFFV_COORD_HEAD) {
                     *trans = t;
-                    tag.data = NULL;
+//                    tag.data = NULL;
                     break;
                 }
             }
@@ -15790,13 +10943,13 @@ static int get_meas_info (fiffFile file,	 /* The file we are reading */
         printf ("Not all essential tags were found!");
         goto bad;
     }
-    FREE (tag.data);
+//    FREE (tag.data);
     *chp = ch;
     return (0);
 
 bad : {
         FREE (ch);
-        FREE (tag.data);
+//        FREE (tag.data);
         return (-1);
     }
 }
@@ -15807,30 +10960,38 @@ int mne_load_raw_info(char *name,int allow_maxshield,mneRawInfo *infop)
       * Load raw data information from a fiff file
       */
 {
-    fiffFile       in       = NULL;
+    QFile file(name);
+    FiffStream::SPtr stream(new FiffStream(&file));
+
+//    fiffFile       in       = NULL;
+
     int            res      = FIFF_FAIL;
     fiffChInfo     chs      = NULL;	/* Channel info */
     fiffCoordTrans trans    = NULL;	/* The coordinate transformation */
     fiffId         id       = NULL;	/* Measurement id */
-    fiffDirEntry   rawDir   = NULL;	/* Directory of raw data tags */
+    QList<FiffDirEntry::SPtr>   rawDir;	/* Directory of raw data tags */
     mneRawInfo     info     = NULL;
     int            nchan    = 0;		/* Number of channels */
     float          sfreq    = 0.0;	/* Sampling frequency */
     float          highpass;		/* Highpass filter frequency */
     float          lowpass;		/* Lowpass filter frequency */
-    fiffDirNode    raw;
-    fiffDirEntry   one;
+    FiffDirNode::SPtr    raw;
+//    FiffDirEntry   one;
     fiffTime       start_time = NULL;
     int            k;
     int            maxshield_data = FALSE;
     /*
    * Open file
    */
-    if ((in = fiff_open(name)) == NULL)
+//    if ((in = fiff_open(name)) == NULL)
+//        goto out;
+    if(!stream->open())
         goto out;
-    if ((raw = find_raw(in->dirtree)) == NULL) {
+    raw = find_raw(stream->tree());
+    if (raw->isEmpty()) {
         if (allow_maxshield) {
-            if ((raw = find_maxshield(in->dirtree)) == NULL) {
+            raw = find_maxshield(stream->tree());
+            if (raw->isEmpty()) {
                 printf("No raw data in this file.");
                 goto out;
             }
@@ -15844,14 +11005,14 @@ int mne_load_raw_info(char *name,int allow_maxshield,mneRawInfo *infop)
     /*
    * Get the essential measurement information
    */
-    if (get_meas_info (in,raw,&id,&nchan,&sfreq,&highpass,&lowpass,
-                       &chs,&trans,&start_time) < 0)
+    if (get_meas_info (stream,raw,&id,&nchan,&sfreq,&highpass,&lowpass,&chs,&trans,&start_time) < 0)
         goto out;
     /*
-   * Get the raw directory
-   */
-    rawDir = MALLOC(raw->nent,fiffDirEntryRec);
-    memcpy(rawDir,raw->dir,raw->nent*sizeof(fiffDirEntryRec));
+    * Get the raw directory
+    */
+//    rawDir = MALLOC(raw->nent,fiffDirEntryRec);
+//    memcpy(rawDir,raw->dir,raw->nent*sizeof(fiffDirEntryRec));
+    rawDir = raw->dir;
     /*
    * Ready to put everything together
    */
@@ -15864,7 +11025,7 @@ int mne_load_raw_info(char *name,int allow_maxshield,mneRawInfo *infop)
     info->sfreq          = sfreq;
     info->lowpass        = lowpass;
     info->highpass       = highpass;
-    info->rawDir         = NULL;
+//    info->rawDir         = NULL;
     info->maxshield_data = maxshield_data;
     if (id) {
         info->id           = MALLOC(1,fiffIdRec);
@@ -15886,16 +11047,20 @@ int mne_load_raw_info(char *name,int allow_maxshield,mneRawInfo *infop)
         }
     }
     info->buf_size   = 0;
-    for (k = 0, one = raw->dir; k < raw->nent; k++, one++) {
-        if (one->kind == FIFF_DATA_BUFFER) {
-            if (one->type == FIFFT_DAU_PACK16 || one->type == FIFFT_SHORT)
-                info->buf_size = one->size/(nchan*sizeof(fiff_short_t));
-            else if (one->type == FIFFT_FLOAT)
-                info->buf_size = one->size/(nchan*sizeof(fiff_float_t));
-            else if (one->type == FIFFT_INT)
-                info->buf_size = one->size/(nchan*sizeof(fiff_int_t));
+//    for (k = 0, one = raw->dir; k < raw->nent; k++, one++) {
+    for (k = 0; k < raw->nent; k++) {
+//        raw->dir[k]->kind
+//                raw->dir[k]->type
+//                raw->dir[k].size
+        if (raw->dir[k]->kind == FIFF_DATA_BUFFER) {
+            if (raw->dir[k]->type == FIFFT_DAU_PACK16 || raw->dir[k]->type == FIFFT_SHORT)
+                info->buf_size = raw->dir[k]->size/(nchan*sizeof(fiff_short_t));
+            else if (raw->dir[k]->type == FIFFT_FLOAT)
+                info->buf_size = raw->dir[k]->size/(nchan*sizeof(fiff_float_t));
+            else if (raw->dir[k]->type == FIFFT_INT)
+                info->buf_size = raw->dir[k]->size/(nchan*sizeof(fiff_int_t));
             else {
-                printf("We are not prepared to handle raw data type: %d",one->type);
+                printf("We are not prepared to handle raw data type: %d",raw->dir[k]->type);
                 goto out;
             }
             break;
@@ -15914,18 +11079,19 @@ out : {
         if (res != FIFF_OK) {
             FREE(chs);
             FREE(trans);
-            FREE(rawDir);
+//            FREE(rawDir);
             FREE(info);
         }
         FREE(id);
-        fiff_close(in);
+//        fiff_close(in);
+        stream->close();
         return (res);
     }
 }
 
 
-
 //============================= mne_events.c =============================
+
 
 void mne_free_event(mneEvent e)
 {
@@ -15951,67 +11117,6 @@ void mne_free_event_list(mneEventList list)
 }
 
 
-//============================= mne_derivations.c =============================
-
-void mne_free_deriv(mneDeriv d)
-
-{
-    if (!d)
-        return;
-    FREE(d->filename);
-    FREE(d->shortname);
-    mne_free_sparse_named_matrix(d->deriv_data);
-    FREE(d->in_use);
-    FREE(d->valid);
-    FREE(d->chs);
-    FREE(d);
-    return;
-}
-
-void mne_free_deriv_set(mneDerivSet s)
-
-{
-    int k;
-
-    if (!s)
-        return;
-
-    for (k = 0; k < s->nderiv; k++)
-        mne_free_deriv(s->derivs[k]);
-    FREE(s->derivs);
-    FREE(s);
-    return;
-}
-
-
-
-//============================= mne_sss_data.c =============================
-
-//TODO: move to MneSssData
-MneSssData* mne_read_sss_data(char *name)
-/*
- * Read SSS data from anywhere in a file
- */
-{
-    fiffFile   in = fiff_open(name);
-    MneSssData* s  = NULL;
-
-    if (!in)
-        goto out;
-    s = mne_read_sss_data_from_node(in,in->dirtree);
-    goto out;
-
-out : {
-        fiff_close(in);
-        return s;
-    }
-
-}
-
-
-
-
-
 
 
 //============================= mne_raw_data.c =============================
@@ -16027,7 +11132,7 @@ static mneRawData new_raw_data()
 {
     mneRawData new_data        = MALLOC(1,mneRawDataRec);
     new_data->filename         = NULL;
-    new_data->file             = NULL;
+//    new_data->file             = NULL;
     new_data->info             = NULL;
     new_data->bufs             = NULL;
     new_data->nbuf             = 0;
@@ -16085,7 +11190,8 @@ void mne_raw_free_data(mneRawData d)
 {
     if (!d)
         return;
-    fiff_close(d->file);
+//    fiff_close(d->file);
+    d->stream->close();
     FREE(d->filename);
     mne_free_name_list(d->ch_names,d->info->nchan);
 
@@ -16113,8 +11219,8 @@ void mne_raw_free_data(mneRawData d)
 
     mne_free_raw_info(d->info);
 
-    mne_free_deriv_set(d->deriv);
-    mne_free_deriv(d->deriv_matched);
+    delete d->deriv;
+    delete d->deriv_matched;
     FREE(d->deriv_offsets);
 
     FREE(d);
@@ -16190,7 +11296,7 @@ static void setup_filter_bufs(mneRawData data)
         bufs[k].ns          = filter->size + 2*filter->taper_size;
         bufs[k].firsts      = firstsamp;
         bufs[k].lasts       = firstsamp + bufs[k].ns - 1;
-        bufs[k].ent         = NULL;
+//        bufs[k].ent         = NULL;
         bufs[k].nchan       = data->info->nchan;
         bufs[k].is_skip     = FALSE;
         bufs[k].vals        = NULL;
@@ -16232,7 +11338,7 @@ static int load_one_buffer(mneRawData data, mneRawBufDef buf)
     fprintf(stderr,"Read buffer %d .. %d\n",buf->firsts,buf->lasts);
 #endif
 
-    if (mne_read_raw_buffer_t(data->file,
+    if (mne_read_raw_buffer_t(data->stream,
                               buf->ent,
                               buf->vals,
                               buf->nchan,
@@ -16723,7 +11829,7 @@ int mne_raw_pick_data_filt(mneRawData     data,
        * Also check channels included in derivations if they are used
        */
             if (sel->nderiv > 0 && data->deriv_matched) {
-                mneDeriv der = data->deriv_matched;
+                MneDeriv* der = data->deriv_matched;
                 for (c = 0; c < der->deriv_data->ncol; c++) {
                     if (der->in_use[c] > 0 &&
                             !this_buf->ch_filtered[c]) {
@@ -16852,14 +11958,21 @@ mneRawData mne_raw_open_file_comp(char *name, int omit_skip, int allow_maxshield
 {
     mneRawInfo         info  = NULL;
     mneRawData         data  = NULL;
-    fiffFile           in    = NULL;
-    fiffDirEntry dir,dir0;
-    fiffTagRec   tag;
+
+    QFile file(name);
+    FiffStream::SPtr stream(new FiffStream(&file));
+//    fiffFile           in    = NULL;
+
+    FiffDirEntry::SPtr dir;
+    QList<FiffDirEntry::SPtr> dir0;
+//    fiffTagRec   tag;
+    FiffTag::SPtr t_pTag;
     fiffChInfo   ch;
     mneRawBufDef bufs;
     int k, b, nbuf, ndir, nnames;
+    int current_dir0 = 0;
 
-    tag.data = NULL;
+//    tag.data = NULL;
 
     if (mne_load_raw_info(name,allow_maxshield,&info) == FAIL)
         goto bad;
@@ -16881,12 +11994,14 @@ mneRawData mne_raw_open_file_comp(char *name, int omit_skip, int allow_maxshield
             ch->unit_mul = 0;
         }
     }
-    if ((in = fiff_open(name)) == NULL)
+//    if ((in = fiff_open(name)) == NULL)
+//        goto bad;
+    if(!stream->open())
         goto bad;
 
     data           = new_raw_data();
     data->filename = mne_strdup(name);
-    data->file     = in;
+    data->stream   = stream;
     data->info     = info;
     /*
    * Add the channel name list
@@ -16921,7 +12036,7 @@ mneRawData mne_raw_open_file_comp(char *name, int omit_skip, int allow_maxshield
     /*
    * SSS data
    */
-    data->sss = mne_read_sss_data(data->filename);
+    data->sss = MneSssData::read_sss_data(data->filename);
     if (data->sss && data->sss->job != FIFFV_SSS_JOB_NOTHING && data->sss->ncomp > 0) {
         fprintf(stderr,"SSS data read from %s :\n",data->filename);
         data->sss->print(stderr);
@@ -16940,26 +12055,32 @@ mneRawData mne_raw_open_file_comp(char *name, int omit_skip, int allow_maxshield
     /*
    * Take into account the first sample
    */
-    if (dir0->kind == FIFF_FIRST_SAMPLE) {
-        if (fiff_read_this_tag(in->fd,dir0->pos,&tag) == FIFF_FAIL)
+    if (dir0[current_dir0]->kind == FIFF_FIRST_SAMPLE) {
+//        if (fiff_read_this_tag(in->fd,dir0->pos,&tag) == FIFF_FAIL)
+//            goto bad;
+        if (!FiffTag::read_tag(stream,t_pTag,dir0[current_dir0]->pos))
             goto bad;
-        data->first_samp = *(int *)tag.data;
-        dir0++;
+        data->first_samp = *t_pTag->toInt();
+        current_dir0++;
         ndir--;
     }
-    if (dir0->kind == FIFF_DATA_SKIP) {
+    if (dir0[current_dir0]->kind == FIFF_DATA_SKIP) {
         int nsamp_skip;
-        if (fiff_read_this_tag(in->fd,dir0->pos,&tag) == FIFF_FAIL)
+//        if (fiff_read_this_tag(in->fd,dir0->pos,&tag) == FIFF_FAIL)
+//            goto bad;
+        if (!FiffTag::read_tag(stream,t_pTag,dir0[current_dir0]->pos))
             goto bad;
-        nsamp_skip = data->info->buf_size*(*(int  *)tag.data);
+        nsamp_skip = data->info->buf_size*(*t_pTag->toInt());
         fprintf(stderr,"Data skip of %d samples in the beginning\n",nsamp_skip);
-        dir0++;
+        current_dir0++;
         ndir--;
-        if (dir0->kind == FIFF_FIRST_SAMPLE) {
-            if (fiff_read_this_tag(in->fd,dir0->pos,&tag) == FIFF_FAIL)
+        if (dir0[current_dir0]->kind == FIFF_FIRST_SAMPLE) {
+//            if (fiff_read_this_tag(in->fd,dir0->pos,&tag) == FIFF_FAIL)
+//                goto bad;
+            if (!FiffTag::read_tag(stream,t_pTag,dir0[current_dir0]->pos))
                 goto bad;
-            data->first_samp += *(int *)tag.data;
-            dir0++;
+            data->first_samp += *t_pTag->toInt();
+            current_dir0++;
             ndir--;
         }
         if (omit_skip) {
@@ -16981,19 +12102,21 @@ mneRawData mne_raw_open_file_comp(char *name, int omit_skip, int allow_maxshield
     /*
    * Figure out the buffers
    */
-    for (k = 0, dir = dir0, nbuf = 0; k < ndir; k++, dir++)
-        if (dir->kind == FIFF_DATA_BUFFER ||
-                dir->kind == FIFF_DATA_SKIP)
+//    for (k = 0, dir = dir0, nbuf = 0; k < ndir; k++, dir++)
+    for (k = 0, nbuf = 0; k < ndir; k++)
+        if (dir0[k]->kind == FIFF_DATA_BUFFER ||
+                dir0[k]->kind == FIFF_DATA_SKIP)
             nbuf++;
     bufs = MALLOC(nbuf,mneRawBufDefRec);
 
-    for (k = 0, nbuf = 0, dir = dir0; k < ndir; k++, dir++)
-        if (dir->kind == FIFF_DATA_BUFFER ||
-                dir->kind == FIFF_DATA_SKIP) {
+//    for (k = 0, nbuf = 0, dir = dir0; k < ndir; k++, dir++)
+    for (k = 0, nbuf = 0; k < ndir; k++)
+        if (dir0[k]->kind == FIFF_DATA_BUFFER ||
+                dir0[k]->kind == FIFF_DATA_SKIP) {
             bufs[nbuf].ns          = 0;
-            bufs[nbuf].ent         = dir;
+            bufs[nbuf].ent         = dir0[k];
             bufs[nbuf].nchan       = data->info->nchan;
-            bufs[nbuf].is_skip     = dir->kind == FIFF_DATA_SKIP;
+            bufs[nbuf].is_skip     = dir0[k]->kind == FIFF_DATA_SKIP;
             bufs[nbuf].vals        = NULL;
             bufs[nbuf].valid       = FALSE;
             bufs[nbuf].ch_filtered = NULL;
@@ -17018,15 +12141,17 @@ mneRawData mne_raw_open_file_comp(char *name, int omit_skip, int allow_maxshield
             }
         }
         else if (dir->kind == FIFF_DATA_SKIP) {
-            if (fiff_read_this_tag(in->fd,dir->pos,&tag) == FIFF_FAIL)
+//            if (fiff_read_this_tag(in->fd,dir->pos,&tag) == FIFF_FAIL)
+//                goto bad;
+            if (!FiffTag::read_tag(stream,t_pTag,dir->pos))
                 goto bad;
-            bufs[k].ns = data->info->buf_size*(*(int  *)tag.data);
+            bufs[k].ns = data->info->buf_size*(*t_pTag->toInt());
         }
         bufs[k].firsts = k == 0 ? data->first_samp : bufs[k-1].lasts + 1;
         bufs[k].lasts  = bufs[k].firsts + bufs[k].ns - 1;
         data->nsamp += bufs[k].ns;
     }
-    FREE(tag.data);
+//    FREE(tag.data);
     /*
    * Set up the first sample values
    */
@@ -17037,8 +12162,8 @@ mneRawData mne_raw_open_file_comp(char *name, int omit_skip, int allow_maxshield
         data->offsets[k] = 0.0;
     }
     /*
-   * Th bad channel stuff
-   */
+    * Th bad channel stuff
+    */
     {
         if (mne_read_bad_channel_list(name,&data->badlist,&data->nbad) == OK) {
             for (b = 0; b < data->nbad; b++) {
@@ -17107,397 +12232,16 @@ mneRawData mne_raw_open_file(char *name, int omit_skip, int allow_maxshield, mne
 }
 
 
-//============================= mne_inverse_util.c =============================
-
-void mne_free_mne_data(mneMneData m)
-
-{
-    if (!m)
-        return;
-
-    FREE_CMATRIX(m->datap);
-    FREE_CMATRIX(m->predicted);
-
-    FREE(m->SNR);
-    FREE(m->lambda2_est);
-    FREE(m->lambda2);
-
-    FREE(m);
-
-    return;
-}
-
-
-
-
-
-//============================= mne_ch_selections.c =============================
-
-/*
- * Mandatory allocation functions
- */
-static mneChSelection new_ch_selection()
-
-{
-    mneChSelection newsel = MALLOC(1,mneChSelectionRec);
-
-    newsel->name    = NULL;
-    newsel->chdef   = NULL;
-    newsel->chspick = NULL;
-    newsel->chspick_nospace = NULL;
-    newsel->pick    = NULL;
-    newsel->pick_deriv = NULL;
-    newsel->ch_kind = NULL;
-    newsel->ndef    = 0;
-    newsel->nchan   = 0;
-    newsel->kind    = MNE_CH_SELECTION_UNKNOWN;
-    return newsel;
-}
-
-
-void mne_ch_selection_free(mneChSelection s)
-
-{
-    if (!s)
-        return;
-    FREE(s->name);
-    FREE(s->pick);
-    FREE(s->pick_deriv);
-    FREE(s->ch_kind);
-    mne_free_name_list(s->chspick,s->nchan);
-    mne_free_name_list(s->chspick_nospace,s->nchan);
-    mne_free_name_list(s->chdef,s->ndef);
-    FREE(s);
-    return;
-}
-
-
-mneChSelection mne_ch_selection_these(const char *selname, char **names, int nch)
-/*
- * Give an explicit list of interesting channels
- */
-{
-    int c;
-    mneChSelection sel;
-
-    sel        = new_ch_selection();
-    sel->name  = mne_strdup(selname);
-    sel->chdef = MALLOC(nch,char *);
-    sel->ndef  = nch;
-    sel->kind  = MNE_CH_SELECTION_USER;
-
-    for (c = 0; c < nch; c++)
-        sel->chdef[c]  = mne_strdup(names[c]);
-
-    return sel;
-}
-
-
-
-
-
-
-static void omit_spaces(char **names, int nnames)
-
-{
-    char *c,*cc;
-    int  k;
-
-    for (k = 0; k < nnames; k++) {
-        for (c = cc = names[k]; *c != '\0'; c++)
-            if (*c != ' ')
-                *cc++ = *c;
-        *cc = '\0';
-    }
-    return;
-}
-
-
-
-
-
-int mne_ch_selection_assign_chs(mneChSelection sel,
-                                mneRawData     data)
-/*
-      * Make the channel picking real easy
-      */
-{
-    int c,rc,d;
-    mneRawInfo  info;
-    int nch;
-    char *dash;
-
-    if (!sel || !data)
-        return 0;
-
-    info = data->info;
-    mne_free_name_list(sel->chspick,sel->nchan);
-    mne_free_name_list(sel->chspick_nospace,sel->nchan);
-    /*
-   * Expansion of possible regular expressions must be added eventually
-   */
-    sel->chspick         = mne_dup_name_list(sel->chdef,sel->ndef);
-    sel->chspick_nospace = mne_dup_name_list(sel->chdef,sel->ndef);
-    omit_spaces(sel->chspick_nospace,sel->ndef);
-    sel->nchan           = sel->ndef;
-
-    sel->pick        = REALLOC(sel->pick,sel->nchan,int);        /* Just in case */
-    sel->pick_deriv  = REALLOC(sel->pick_deriv,sel->nchan,int);
-    sel->ch_kind     = REALLOC(sel->ch_kind,sel->nchan,int);
-
-    for (c = 0; c < sel->nchan; c++) {
-        sel->pick[c]       = -1;
-        sel->pick_deriv[c] = -1;
-        sel->ch_kind[c]    = -1;
-        for (rc = 0; rc < info->nchan; rc++) {
-            if (strcasecmp(sel->chspick[c],info->chInfo[rc].ch_name) == 0 ||
-                    strcasecmp(sel->chspick_nospace[c],info->chInfo[rc].ch_name) == 0) {
-                sel->pick[c]    = rc;
-                sel->ch_kind[c] = info->chInfo[rc].kind;
-                break;
-            }
-        }
-    }
-    /*
-   * Maybe the derivations will help
-   */
-    sel->nderiv = 0;
-    if (data->deriv_matched) {
-        char **deriv_names = data->deriv_matched->deriv_data->rowlist;
-        int  nderiv        = data->deriv_matched->deriv_data->nrow;
-
-        for (c = 0; c < sel->nchan; c++) {
-            if (sel->pick[c] == -1) {
-                for (d = 0; d < nderiv; d++) {
-                    if (strcasecmp(sel->chspick[c],deriv_names[d]) == 0 &&
-                            data->deriv_matched->valid && data->deriv_matched->valid[d]) {
-                        sel->pick_deriv[c] = d;
-                        sel->ch_kind[c]    = data->deriv_matched->chs[d].kind;
-                        sel->nderiv++;
-                        break;
-                    }
-                }
-            }
-        }
-    }
-    /*
-   * Try simple channels again without the part after dashes
-   */
-    for (c = 0; c < sel->nchan; c++) {
-        if (sel->pick[c] == -1 && sel->pick_deriv[c] == -1) {
-            for (rc = 0; rc < info->nchan; rc++) {
-                dash = strchr(info->chInfo[rc].ch_name,'-');
-                if (dash) {
-                    *dash = '\0';
-                    if (strcasecmp(sel->chspick[c],info->chInfo[rc].ch_name) == 0 ||
-                            strcasecmp(sel->chspick_nospace[c],info->chInfo[rc].ch_name) == 0) {
-                        *dash = '-';
-                        sel->pick[c] = rc;
-                        sel->ch_kind[c] = info->chInfo[rc].kind;
-                        break;
-                    }
-                    *dash = '-';
-                }
-            }
-        }
-    }
-    for (c = 0, nch = 0; c < sel->nchan; c++) {
-        if (sel->pick[c] >= 0)
-            nch++;
-    }
-    if (sel->nderiv > 0)
-        fprintf(stderr,"Selection %c%s%c has %d matched derived channels.\n",'"',sel->name,'"',sel->nderiv);
-    return nch;
-}
-
-
-
-
-
-
-
-int mne_ch_selection_assign_chs_info(mneChSelection sel,
-                                     fiffChInfo     chs,
-                                     int            nchan)
-/*
-      * Make the channel picking real easy
-      */
-{
-    int c,rc,nch;
-    char *dash;
-
-    if (!sel || !chs || nchan ==  0)
-        return 0;
-
-    mne_free_name_list(sel->chspick,sel->nchan);
-    mne_free_name_list(sel->chspick_nospace,sel->nchan);
-    /*
-   * Expansion of possible regular expressions must be added eventually
-   */
-    sel->chspick         = mne_dup_name_list(sel->chdef,sel->ndef);
-    sel->chspick_nospace = mne_dup_name_list(sel->chdef,sel->ndef);
-    omit_spaces(sel->chspick_nospace,sel->ndef);
-    sel->nchan           = sel->ndef;
-
-    sel->pick        = REALLOC(sel->pick,sel->nchan,int);        /* Just in case */
-    sel->pick_deriv  = REALLOC(sel->pick_deriv,sel->nchan,int);
-    sel->ch_kind     = REALLOC(sel->ch_kind,sel->nchan,int);
-
-    for (c = 0; c < sel->nchan; c++) {
-        sel->pick[c]       = -1;
-        sel->pick_deriv[c] = -1;
-        sel->ch_kind[c]    = -1;
-        for (rc = 0; rc < nchan; rc++) {
-            if (strcasecmp(sel->chspick[c],chs[rc].ch_name) == 0 ||
-                    strcasecmp(sel->chspick_nospace[c],chs[rc].ch_name) == 0) {
-                sel->pick[c]    = rc;
-                sel->ch_kind[c] = chs[rc].kind;
-                break;
-            }
-        }
-    }
-    /*
-   * Try simple channels again without the part after dashes
-   */
-    for (c = 0; c < sel->nchan; c++) {
-        if (sel->pick[c] == -1) {
-            for (rc = 0; rc < nchan; rc++) {
-                dash = strchr(chs[rc].ch_name,'-');
-                if (dash) {
-                    *dash = '\0';
-                    if (strcasecmp(sel->chspick[c],chs[rc].ch_name) == 0 ||
-                            strcasecmp(sel->chspick_nospace[c],chs[rc].ch_name) == 0) {
-                        *dash = '-';
-                        sel->pick[c] = rc;
-                        sel->ch_kind[c] = chs[rc].kind;
-                        break;
-                    }
-                    *dash = '-';
-                }
-            }
-        }
-    }
-    for (c = 0, nch = 0; c < sel->nchan; c++) {
-        if (sel->pick[c] >= 0)
-            nch++;
-    }
-    return nch;
-}
-
-
-
-
 
 //============================= mne_read_data.c =============================
 
-mneMeasDataSet mne_new_meas_data_set()
-
-{
-    mneMeasDataSet s = MALLOC(1,mneMeasDataSetRec);
-
-    s->data        = NULL;
-    s->data_filt   = NULL;
-    s->data_proj   = NULL;
-    s->data_white  = NULL;
-    s->stim14      = NULL;
-    s->first       = 0;
-    s->np          = 0;
-    s->nave        = 1;
-    s->kind        = FIFFV_ASPECT_AVERAGE;
-    s->comment     = NULL;
-    s->baselines   = NULL;
-    s->mne         = NULL;
-    s->user_data   = NULL;
-    s->user_data_free = NULL;
-    return s;
-}
-
-void mne_free_meas_data_set(mneMeasDataSet s)
-
-{
-    if (!s)
-        return;
-    FREE_CMATRIX(s->data);
-    FREE_CMATRIX(s->data_proj);
-    FREE_CMATRIX(s->data_filt);
-    FREE_CMATRIX(s->data_white);
-    FREE(s->stim14);
-    FREE(s->comment);
-    FREE(s->baselines);
-    mne_free_mne_data(s->mne);
-    if (s->user_data && s->user_data_free)
-        s->user_data_free(s->user_data);
-    FREE(s);
-    return;
-}
-
-mneMeasData mne_new_meas_data()
-
-{
-    mneMeasData m = MALLOC(1,mneMeasDataRec);
-    m->filename   = NULL;
-    m->meas_id    = NULL;
-    m->meas_date.secs = 0;
-    m->meas_date.usecs = 0;
-    m->current    = NULL;
-    m->ch_major   = FALSE;
-    m->sets       = NULL;
-    m->nset       = 0;
-    m->nchan      = 0;
-    m->op         = NULL;
-    m->fwd        = NULL;
-    m->meg_head_t = NULL;
-    m->mri_head_t = NULL;
-    m->chs        = NULL;
-    m->proj       = NULL;
-    m->comp       = NULL;
-    m->raw        = NULL;
-    m->chsel      = NULL;
-    m->bad        = NULL;
-    m->nbad       = 0;
-    m->badlist    = NULL;
-    return m;
-}
-
-
-void mne_free_meas_data(mneMeasData m)
-/*
-      * NOTE: The inverse operator attached must be free'd separately
-      */
-{
-    int k;
-
-    if (!m)
-        return;
-    FREE(m->filename);
-    FREE(m->meas_id);
-    FREE(m->chs);
-    FREE(m->meg_head_t);
-    FREE(m->mri_head_t);
-    mne_free_proj_op(m->proj);
-    mne_free_ctf_comp_data_set(m->comp);
-    FREE(m->bad);
-    mne_free_name_list(m->badlist,m->nbad);
-
-    for (k = 0; k < m->nset; k++)
-        mne_free_meas_data_set(m->sets[k]);
-    FREE(m->sets);
-
-    mne_raw_free_data(m->raw);
-    mne_ch_selection_free(m->chsel);
-
-    FREE(m);
-    return;
-}
-
-
-mneMeasData mne_read_meas_data_add(const QString&       name,       /* Name of the measurement file */
+MneMeasData* mne_read_meas_data_add(const QString&       name,       /* Name of the measurement file */
                                    int                  set,        /* Which data set */
                                    mneInverseOperator   op,         /* For consistency checks */
-                                   mneNamedMatrix       fwd,        /* Another option for consistency checks */
+                                   MneNamedMatrix*       fwd,        /* Another option for consistency checks */
                                    char                 **namesp,   /* Yet another option: explicit name list */
                                    int                  nnamesp,
-                                   mneMeasData          add_to)     /* Add to this */
+                                   MneMeasData*          add_to)     /* Add to this */
 /*
       * Read an evoked-response data file
       */
@@ -17532,9 +12276,9 @@ mneMeasData mne_read_meas_data_add(const QString&       name,       /* Name of t
    */
     float       *source,tmin,tmax;
     int         k,p,c,np,n1,n2;
-    mneMeasData    res = NULL;
-    mneMeasData    new_data = add_to;
-    mneMeasDataSet dataset = NULL;
+    MneMeasData*    res = NULL;
+    MneMeasData*    new_data = add_to;
+    MneMeasDataSet* dataset = NULL;
 
     stim14_name = getenv(MNE_ENV_TRIGGER_CH);
     if (!stim14_name || strlen(stim14_name) == 0)
@@ -17565,6 +12309,7 @@ mneMeasData mne_read_meas_data_add(const QString&       name,       /* Name of t
                         &nchan_file,&nsamp,&dtmin,&sfreq,&chs,&data,
                         &comment,&highpass,&lowpass,&nave,&aspect_kind,&t,&id,&meas_date) == FAIL)
         goto out;
+
     if (id)
         printf("\tMeasurement file id: %s\n",mne_format_file_id(id));
 
@@ -17627,7 +12372,7 @@ mneMeasData mne_read_meas_data_add(const QString&       name,       /* Name of t
    * Just put it together
    */
     if (!new_data) {			/* We need a new meas data structure */
-        new_data     = mne_new_meas_data();
+        new_data     = new MneMeasData;
         new_data->filename  = mne_strdup(name.toLatin1().data());
         new_data->meas_id   = id; id = NULL;
         /*
@@ -17713,7 +12458,7 @@ mneMeasData mne_read_meas_data_add(const QString&       name,       /* Name of t
     /*
    * New data set is created anyway
    */
-    dataset = mne_new_meas_data_set();
+    dataset = new MneMeasDataSet;
     dataset->tmin      = tmin;
     dataset->tstep     = 1.0/sfreq;
     dataset->first     = n1;
@@ -17744,8 +12489,8 @@ mneMeasData mne_read_meas_data_add(const QString&       name,       /* Name of t
         for (p = 0; p < np; p++) 	/* Copy the data and correct for the possible non-unit calibration */
             dataset->stim14[p] = source[p+n1]/chs[stim14].cal;
     }
-    new_data->sets    = REALLOC(new_data->sets,new_data->nset+1,mneMeasDataSet);
-    new_data->sets[new_data->nset++] = dataset; dataset = NULL;
+    new_data->sets.append(dataset); dataset = NULL;
+    new_data->nset++;
     if (!add_to)
         new_data->current = new_data->sets[0];
     res = new_data;
@@ -17761,7 +12506,7 @@ out : {
         FREE(t);
         FREE(id);
         if (res == NULL && !add_to)
-            mne_free_meas_data(new_data);
+            delete new_data;
         if (add_to)
             mne_free_name_list(names,nchan);
         return res;
@@ -17769,10 +12514,10 @@ out : {
 }
 
 
-mneMeasData mne_read_meas_data(const QString&       name,       /* Name of the measurement file */
+MneMeasData* mne_read_meas_data(const QString&       name,       /* Name of the measurement file */
                                int                  set,        /* Which data set */
                                mneInverseOperator   op,         /* For consistency checks */
-                               mneNamedMatrix       fwd,        /* Another option for consistency checks */
+                               MneNamedMatrix*       fwd,        /* Another option for consistency checks */
                                char                 **namesp,   /* Yet another option: explicit name list */
                                int                  nnamesp)
 
@@ -17781,245 +12526,5 @@ mneMeasData mne_read_meas_data(const QString&       name,       /* Name of the m
 }
 
 
-//============================= mne_get_values.c =============================
-
-#define EPS 0.05
-
-int mne_get_values_from_data (float time,         /* Interesting time point */
-                              float integ,	  /* Time integration */
-                              float **data,	  /* The data values (time by time) */
-                              int   nsamp,	  /* How many time points? */
-                              int   nch,          /* How many channels */
-                              float tmin,	  /* Time of first sample */
-                              float sfreq,	  /* Sampling frequency */
-                              int   use_abs,      /* Use absolute values */
-                              float *value)	  /* The picked values */
-/*
-      * Pick a signal value using linear interpolation
-      */
-{
-    int   n1,n2,k;
-    float s1,s2;
-    float f1,f2;
-    float sum;
-    float width;
-    int   ch;
-
-    for (ch = 0; ch < nch; ch++) {
-        /*
-     * Find out the correct samples
-     */
-        if (fabs(sfreq*integ) < EPS) { /* This is the single-sample case */
-            s1 = sfreq*(time - tmin);
-            n1 = floor(s1);
-            f1 = 1.0 + n1 - s1;
-            if (n1 < 0 || n1 > nsamp-1) {
-                printf("Sample value out of range %d (0..%d)",n1,nsamp-1);
-                return(-1);
-            }
-            /*
-       * Avoid rounding error
-       */
-            if (n1 == nsamp-1) {
-                if (fabs(f1-1.0) < 1e-3)
-                    f1 = 1.0;
-            }
-            if (f1 < 1.0 && n1 > nsamp-2) {
-                printf("Sample value out of range %d (0..%d) %.4f",n1,nsamp-1,f1);
-                return(-1);
-            }
-            if (f1 < 1.0) {
-                if (use_abs)
-                    sum = f1*fabs(data[n1][ch]) + (1.0-f1)*fabs(data[n1+1][ch]);
-                else
-                    sum = f1*data[n1][ch] + (1.0-f1)*data[n1+1][ch];
-            }
-            else {
-                if (use_abs)
-                    sum = fabs(data[n1][ch]);
-                else
-                    sum = data[n1][ch];
-            }
-        }
-        else {			/* Multiple samples */
-            s1 = sfreq*(time - 0.5*integ - tmin);
-            s2 = sfreq*(time + 0.5*integ - tmin);
-            n1 = ceil(s1); n2 = floor(s2);
-            if (n2 < n1) {		/* We are within one sample interval */
-                n1 = floor(s1);
-                if (n1 < 0 || n1 > nsamp-2)
-                    return (-1);
-                f1 = s1 - n1;
-                f2 = s2 - n1;
-                if (use_abs)
-                    sum = 0.5*((f1+f2)*fabs(data[n1+1][ch]) + (2.0-f1-f2)*fabs(data[n1][ch]));
-                else
-                    sum = 0.5*((f1+f2)*data[n1+1][ch] + (2.0-f1-f2)*data[n1][ch]);
-            }
-            else {
-                f1 = n1 - s1;
-                f2 = s2 - n2;
-                if (n1 < 0 || n1 > nsamp-1) {
-                    printf("Sample value out of range %d (0..%d)",n1,nsamp-1);
-                    return(-1);
-                }
-                if (n2 < 0 || n2 > nsamp-1) {
-                    printf("Sample value out of range %d (0..%d)",n2,nsamp-1);
-                    return(-1);
-                }
-                if (f1 != 0.0 && n1 < 1)
-                    return(-1);
-                if (f2 != 0.0 && n2 > nsamp-2)
-                    return(-1);
-                sum = 0.0;
-                width = 0.0;
-                if (n2 > n1) {		/* Do the whole intervals */
-                    if (use_abs) {
-                        sum = 0.5*fabs(data[n1][ch]);
-                        for (k = n1+1; k < n2; k++)
-                            sum = sum + fabs(data[k][ch]);
-                        sum = sum + 0.5*fabs(data[n2][ch]);
-                    }
-                    else {
-                        sum = 0.5*data[n1][ch];
-                        for (k = n1+1; k < n2; k++)
-                            sum = sum + data[k][ch];
-                        sum = sum + 0.5*data[n2][ch];
-                    }
-                    width = n2 - n1;
-                }
-                /*
-         * Add tails
-         */
-                if (use_abs) {
-                    if (f1 != 0.0)
-                        sum = sum + 0.5*f1*(f1*fabs(data[n1-1][ch]) + (2.0-f1)*fabs(data[n1][ch]));
-                    if (f2 != 0.0)
-                        sum = sum + 0.5*f2*(f2*fabs(data[n2+1][ch]) + (2.0-f2)*fabs(data[n2][ch]));
-                }
-                else {
-                    if (f1 != 0.0)
-                        sum = sum + 0.5*f1*(f1*data[n1-1][ch] + (2.0-f1)*data[n1][ch]);
-                    if (f2 != 0.0)
-                        sum = sum + 0.5*f2*(f2*data[n2+1][ch] + (2.0-f2)*data[n2][ch]);
-                }
-                width = width + f1 + f2;
-                sum = sum/width;
-            }
-        }
-        value[ch] = sum;
-    }
-    return (0);
-}
-
-int mne_get_values_from_data_ch (float time,      /* Interesting time point */
-                                 float integ,	  /* Time integration */
-                                 float **data,	  /* The data values (channel by channel) */
-                                 int   nsamp,	  /* How many time points? */
-                                 int   nch,       /* How many channels */
-                                 float tmin,	  /* Time of first sample */
-                                 float sfreq,	  /* Sampling frequency */
-                                 int   use_abs,   /* Use absolute values */
-                                 float *value)	  /* The picked values */
-/*
-      * Pick a signal value using linear interpolation
-      */
-{
-    int   n1,n2,k;
-    float s1,s2;
-    float f1,f2;
-    float sum;
-    float width;
-    int   ch;
-
-    for (ch = 0; ch < nch; ch++) {
-        /*
-     * Find out the correct samples
-     */
-        if (fabs(sfreq*integ) < EPS) { /* This is the single-sample case */
-            s1 = sfreq*(time - tmin);
-            n1 = floor(s1);
-            f1 = 1.0 + n1 - s1;
-            if (n1 < 0 || n1 > nsamp-1)
-                return(-1);
-            if (f1 < 1.0 && n1 > nsamp-2)
-                return(-1);
-            if (f1 < 1.0) {
-                if (use_abs)
-                    sum = f1*fabs(data[ch][n1]) + (1.0-f1)*fabs(data[ch][n1+1]);
-                else
-                    sum = f1*data[ch][n1] + (1.0-f1)*data[ch][n1+1];
-            }
-            else {
-                if (use_abs)
-                    sum = fabs(data[ch][n1]);
-                else
-                    sum = data[ch][n1];
-            }
-        }
-        else {			/* Multiple samples */
-            s1 = sfreq*(time - 0.5*integ - tmin);
-            s2 = sfreq*(time + 0.5*integ - tmin);
-            n1 = ceil(s1); n2 = floor(s2);
-            if (n2 < n1) {		/* We are within one sample interval */
-                n1 = floor(s1);
-                if (n1 < 0 || n1 > nsamp-2)
-                    return (-1);
-                f1 = s1 - n1;
-                f2 = s2 - n1;
-                if (use_abs)
-                    sum = 0.5*((f1+f2)*fabs(data[ch][n1+1]) + (2.0-f1-f2)*fabs(data[ch][n1]));
-                else
-                    sum = 0.5*((f1+f2)*data[ch][n1+1] + (2.0-f1-f2)*data[ch][n1]);
-            }
-            else {
-                f1 = n1 - s1;
-                f2 = s2 - n2;
-                if (n1 < 0 || n1 > nsamp-1 || n2 < 0 || n2 > nsamp-1)
-                    return(-1);
-                if (f1 != 0.0 && n1 < 1)
-                    return(-1);
-                if (f2 != 0.0 && n2 > nsamp-2)
-                    return(-1);
-                sum = 0.0;
-                width = 0.0;
-                if (n2 > n1) {		/* Do the whole intervals */
-                    if (use_abs) {
-                        sum = 0.5*fabs(data[ch][n1]);
-                        for (k = n1+1; k < n2; k++)
-                            sum = sum + fabs(data[ch][k]);
-                        sum = sum + 0.5*fabs(data[ch][n2]);
-                    }
-                    else {
-                        sum = 0.5*data[ch][n1];
-                        for (k = n1+1; k < n2; k++)
-                            sum = sum + data[ch][k];
-                        sum = sum + 0.5*data[ch][n2];
-                    }
-                    width = n2 - n1;
-                }
-                /*
-         * Add tails
-         */
-                if (use_abs) {
-                    if (f1 != 0.0)
-                        sum = sum + 0.5*f1*(f1*fabs(data[ch][n1-1]) + (2.0-f1)*fabs(data[ch][n1]));
-                    if (f2 != 0.0)
-                        sum = sum + 0.5*f2*(f2*fabs(data[ch][n2+1]) + (2.0-f2)*fabs(data[ch][n2]));
-                }
-                else {
-                    if (f1 != 0.0)
-                        sum = sum + 0.5*f1*(f1*data[ch][n1-1]+ (2.0-f1)*data[ch][n1]);
-                    if (f2 != 0.0)
-                        sum = sum + 0.5*f2*(f2*data[ch][n2+1] + (2.0-f2)*data[ch][n2]);
-                }
-                width = width + f1 + f2;
-                sum = sum/width;
-            }
-        }
-        value[ch] = sum;
-    }
-    return (0);
-}
 
 #endif // DIPOLEFITHELPERS_H

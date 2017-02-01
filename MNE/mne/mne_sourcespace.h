@@ -321,7 +321,7 @@ private:
     *
     * @return true if succeeded, false otherwise
     */
-    static bool read_source_space(FiffStream* p_pStream, const FiffDirNode& p_Tree, MNEHemisphere& p_Hemisphere);
+    static bool read_source_space(FiffStream::SPtr& p_pStream, const FiffDirNode::SPtr& p_Tree, MNEHemisphere& p_Hemisphere);
 
 private:
     QList<MNEHemisphere> m_qListHemispheres;    /**< List of the hemispheres containing the source space information. */

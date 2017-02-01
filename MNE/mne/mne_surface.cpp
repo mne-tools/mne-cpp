@@ -85,7 +85,7 @@ bool MNESurface::read(QIODevice& p_IODevice, QList<MNESurface::SPtr>& surfaces)
 
 //*************************************************************************************************************
 
-bool MNESurface::read(FiffStream::SPtr& p_pStream, bool add_geom, const FiffDirNode& p_Tree, QList<MNESurface::SPtr>& surfaces)
+bool MNESurface::read(FiffStream::SPtr& p_pStream, bool add_geom, const FiffDirNode::SPtr& p_Tree, QList<MNESurface::SPtr>& surfaces)
 {
     if(add_geom)
     {
@@ -93,14 +93,14 @@ bool MNESurface::read(FiffStream::SPtr& p_pStream, bool add_geom, const FiffDirN
         qWarning() << "add_geom flag is not yet implemented!";
     }
 
-    QList<FiffDirNode>bem = p_Tree.dir_tree_find(FIFFB_BEM);
+    QList<FiffDirNode::SPtr>bem = p_Tree->dir_tree_find(FIFFB_BEM);
     if(bem.isEmpty())
     {
         qCritical() << "No BEM block found!";
         return false;
     }
 
-    QList<FiffDirNode>bemsurf = p_Tree.dir_tree_find(FIFFB_BEM_SURF);
+    QList<FiffDirNode::SPtr>bemsurf = p_Tree->dir_tree_find(FIFFB_BEM_SURF);
     if(bemsurf.isEmpty())
     {
         qCritical() << "No BEM surfaces found!";
@@ -109,7 +109,7 @@ bool MNESurface::read(FiffStream::SPtr& p_pStream, bool add_geom, const FiffDirN
 
     FiffTag::SPtr tag(new FiffTag());
     fiff_int_t coord_frame;
-    if(bem.at(0).find_tag(p_pStream.data(), FIFF_BEM_COORD_FRAME, tag))
+    if(bem[0]->find_tag(p_pStream, FIFF_BEM_COORD_FRAME, tag))
     {
         coord_frame = *tag->toInt();
     }else
@@ -118,11 +118,11 @@ bool MNESurface::read(FiffStream::SPtr& p_pStream, bool add_geom, const FiffDirN
         coord_frame = FIFFV_COORD_MRI;
     }
 
-    QList<FiffDirNode>::Iterator itBemsurf;
+    QList<FiffDirNode::SPtr>::Iterator itBemsurf;
     for(itBemsurf = bemsurf.begin(); itBemsurf != bemsurf.end(); ++itBemsurf)
     {
         MNESurface::SPtr surf;
-        if(read(p_pStream.data(), *itBemsurf, coord_frame, surf))
+        if(read(p_pStream, *itBemsurf, coord_frame, surf))
         {
             surfaces.append(surf);
         }else
@@ -136,8 +136,8 @@ bool MNESurface::read(FiffStream::SPtr& p_pStream, bool add_geom, const FiffDirN
 
 //*************************************************************************************************************
 
-bool MNESurface::read(FIFFLIB::FiffStream* fiffStream,
-        const FIFFLIB::FiffDirNode& dir, const fiff_int_t def_coord_frame,
+bool MNESurface::read(FIFFLIB::FiffStream::SPtr& fiffStream,
+        const FIFFLIB::FiffDirNode::SPtr& dir, const fiff_int_t def_coord_frame,
         MNESurface::SPtr& surf)
 {
     surf.reset(new MNESurface);
@@ -146,7 +146,7 @@ bool MNESurface::read(FIFFLIB::FiffStream* fiffStream,
     // Read attributes //
     //-----------------//
 
-    if(dir.find_tag(fiffStream, FIFF_BEM_SURF_ID, tag))
+    if(dir->find_tag(fiffStream, FIFF_BEM_SURF_ID, tag))
     {
         surf->id = *tag->toInt();
     }else
@@ -155,7 +155,7 @@ bool MNESurface::read(FIFFLIB::FiffStream* fiffStream,
         qWarning() << "ID not found! Default: " << surf->id;
     }
 
-    if(dir.find_tag(fiffStream, FIFF_BEM_SIGMA, tag))
+    if(dir->find_tag(fiffStream, FIFF_BEM_SIGMA, tag))
     {
         surf->sigma = *tag->toFloat();
     }else
@@ -164,7 +164,7 @@ bool MNESurface::read(FIFFLIB::FiffStream* fiffStream,
         qWarning() << "sigma not found! Default: " << surf->sigma;
     }
 
-    if(dir.find_tag(fiffStream, FIFF_BEM_SURF_NNODE, tag))
+    if(dir->find_tag(fiffStream, FIFF_BEM_SURF_NNODE, tag))
     {
         surf->np = *tag->toInt();
     }else
@@ -173,7 +173,7 @@ bool MNESurface::read(FIFFLIB::FiffStream* fiffStream,
         return false;
     }
 
-    if(dir.find_tag(fiffStream, FIFF_BEM_SURF_NTRI, tag))
+    if(dir->find_tag(fiffStream, FIFF_BEM_SURF_NTRI, tag))
     {
         surf->ntri = *tag->toInt();
     }else
@@ -182,14 +182,14 @@ bool MNESurface::read(FIFFLIB::FiffStream* fiffStream,
         return false;
     }
 
-    if(dir.find_tag(fiffStream, FIFF_MNE_COORD_FRAME, tag))
+    if(dir->find_tag(fiffStream, FIFF_MNE_COORD_FRAME, tag))
     {
         surf->coord_frame = *tag->toInt();
     }else
     {
         qWarning()
                 << "FIFF_MNE_COORD_FRAME not found, trying FIFF_BEM_COORD_FRAME.";
-        if(dir.find_tag(fiffStream, FIFF_BEM_COORD_FRAME, tag))
+        if(dir->find_tag(fiffStream, FIFF_BEM_COORD_FRAME, tag))
         {
             surf->coord_frame = *tag->toInt();
         }else
@@ -203,7 +203,7 @@ bool MNESurface::read(FIFFLIB::FiffStream* fiffStream,
     // Read data //
     //-----------//
 
-    if(dir.find_tag(fiffStream, FIFF_BEM_SURF_NODES, tag) && surf->np > 0)
+    if(dir->find_tag(fiffStream, FIFF_BEM_SURF_NODES, tag) && surf->np > 0)
     {
         //ToDo: rows, cols are exchanged - usually 3 cols -> ToDo: transpose
         surf->rr.resize(3, surf->np);
@@ -214,7 +214,7 @@ bool MNESurface::read(FIFFLIB::FiffStream* fiffStream,
         return false;
     }
 
-    if(dir.find_tag(fiffStream, FIFF_MNE_SOURCE_SPACE_NORMALS, tag)
+    if(dir->find_tag(fiffStream, FIFF_MNE_SOURCE_SPACE_NORMALS, tag)
             && surf->np > 0)
     {
         //ToDo: rows, cols are exchanged - usually 3 cols -> ToDo: transpose
@@ -225,7 +225,7 @@ bool MNESurface::read(FIFFLIB::FiffStream* fiffStream,
         qWarning() << "Vertex normals not found!";
     }
 
-    if(dir.find_tag(fiffStream, FIFF_BEM_SURF_TRIANGLES, tag) && surf->ntri > 0)
+    if(dir->find_tag(fiffStream, FIFF_BEM_SURF_TRIANGLES, tag) && surf->ntri > 0)
     {
         //ToDo: rows, cols are exchanged - usually 3 cols -> ToDo: transpose
         surf->tris.resize(3, surf->ntri);

@@ -2,6 +2,8 @@
 
 #include "dipole_fit_data.h"
 #include "guess_data.h"
+#include "mne_meas_data.h"
+#include "mne_meas_data_set.h"
 #include "ecd.h"
 
 #include <Eigen/Dense>
@@ -606,7 +608,7 @@ void print_fields(float       *rd,
                   float       time,
                   float       integ,
                   DipoleFitData* fit,
-                  mneMeasData data)
+                  MneMeasData* data)
 
 {
     float *one = MALLOC_3(data->nchan,float);
