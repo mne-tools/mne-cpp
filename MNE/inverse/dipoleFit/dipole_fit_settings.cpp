@@ -231,7 +231,8 @@ void DipoleFitSettings::usage(char *name)
     printf("\nFitting parameters:\n\n");
     printf("\t--guess name      The source space of initial guesses.\n");
     printf("\t                  If not present, the values below are used to generate the guess grid.\n");
-    printf("\t--gsurf   name    Read the inner skull surface from this fif file to generate the guesses.\n");
+    printf("\t--guesssurf name  Read the inner skull surface from this fif file to generate the guesses.\n");
+    printf("\t--guessrad value  Radius of a spherical guess volume if neither of the above is present (default : %.1f mm)\n",1000*guess_rad);
     printf("\t--exclude dist/mm Exclude points which are closer than this distance from the CM of the inner skull surface (default =  %6.1f mm).\n",1000*guess_exclude);
     printf("\t--mindist dist/mm Exclude points which are closer than this distance from the inner skull surface  (default = %6.1f mm).\n",1000*guess_mindist);
     printf("\t--grid    dist/mm Source space grid size (default = %6.1f mm).\n",1000*guess_grid);
@@ -296,6 +297,30 @@ bool DipoleFitSettings::check_args (int *argc,char **argv)
                 return false;
             }
             guess_surfname = strdup(argv[k+1]);
+        }
+        else if (strcmp(argv[k],"--guesssurf") == 0) {
+            found = 2;
+            if (k == *argc - 1) {
+                qCritical ("--guesssurf: argument required.");
+                return false;
+            }
+            guess_surfname = strdup(argv[k+1]);
+        }
+        else if (strcmp(argv[k],"--guessrad") == 0) {
+            found = 2;
+            if (k == *argc - 1) {
+                qCritical ("--guessrad: argument required.");
+                return false;
+            }
+            if (sscanf(argv[k+1],"%f",&fval) != 1) {
+                qCritical ("Could not interpret the radius.");
+                return false;
+            }
+            if (fval <= 0.0) {
+                qCritical ("Radius should be positive");
+                return false;
+            }
+            guess_rad = fval/1000.0;
         }
         else if (strcmp(argv[k],"--mindist") == 0) {
             found = 2;

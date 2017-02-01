@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     main.cpp
+* @file     mne_mne_data.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     July, 2012
+* @date     January, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,80 +29,94 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implements the main() application function.
+* @brief    MNE MNE Data (MneMneData) class declaration.
 *
 */
+
+#ifndef MNEMNEDATA_H
+#define MNEMNEDATA_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include <disp3D/view3D.h>
-#include <disp3D/control/control3dwidget.h>
-
-#include "mainwindow.h"
-
-#include <mne/mne_forwardsolution.h>
+#include "../inverse_global.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// Eigen INCLUDES
 //=============================================================================================================
 
-#include <QApplication>
+#include <Eigen/Core>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// Qt INCLUDES
 //=============================================================================================================
 
-using namespace MNELIB;
-using namespace DISP3DLIB;
-using namespace MNELIB;
+#include <QSharedPointer>
+#include <QDebug>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// MAIN
+// DEFINE NAMESPACE INVERSELIB
 //=============================================================================================================
+
+namespace INVERSELIB
+{
+
 
 //=============================================================================================================
 /**
-* The function main marks the entry point of the program.
-* By default, main has the storage class extern.
+* Implements MNE Mne Data (Replaces *mneMneData,mneMneDataRec; struct of MNE-C mne_types.h).
 *
-* @param [in] argc (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
-* @param [in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
-* @return the value that was set to exit() (which is 0 if exit() is called via quit()).
+* @brief Data associated with MNE computations for each mneMeasDataSet
 */
-int main(int argc, char *argv[])
+class INVERSESHARED_EXPORT MneMneData
 {
-//    QGuiApplication app(argc, argv);
-    QApplication app(argc, argv);
+public:
+    typedef QSharedPointer<MneMneData> SPtr;              /**< Shared pointer type for MneMneData. */
+    typedef QSharedPointer<const MneMneData> ConstSPtr;   /**< Const shared pointer type for MneMneData. */
 
-    MainWindow w;
-    w.show();
+    //=========================================================================================================
+    /**
+    * Constructs the MNE Mne Data
+    */
+    MneMneData();
 
-    QFile t_File("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
-    MNEForwardSolution t_forwardSolution(t_File);
+    //=========================================================================================================
+    /**
+    * Destroys the MNE Mne Data description
+    * Refactored: mne_free_mne_data (mne_inverse_util.c)
+    */
+    ~MneMneData();
 
-    View3D::SPtr testWindow = View3D::SPtr(new View3D());
-    testWindow->addBrainData("Subject01", "ForwardSolution", t_forwardSolution);
+public:
+    float **datap;          /* Projection of the whitened data onto the field eigenvectors */
+    float **predicted;      /* The predicted data */
+    float *SNR;             /* Estimated power SNR as a function of time */
+    float *lambda2_est;     /* Regularization parameter estimated from available data */
+    float *lambda2;         /* Regularization parameter to be used (as a function of time) */
 
-    Control3DWidget::SPtr control3DWidget = Control3DWidget::SPtr(new Control3DWidget());
-    control3DWidget->setView3D(testWindow);
-    control3DWidget->show();
+// ### OLD STRUCT ###
+//typedef struct {        /* Data associated with MNE computations for each mneMeasDataSet */
+//    float **datap;          /* Projection of the whitened data onto the field eigenvectors */
+//    float **predicted;      /* The predicted data */
+//    float *SNR;             /* Estimated power SNR as a function of time */
+//    float *lambda2_est;     /* Regularization parameter estimated from available data */
+//    float *lambda2;             /* Regularization parameter to be used (as a function of time) */
+//} *mneMneData,mneMneDataRec;
+};
 
-    QWidget *container = QWidget::createWindowContainer(testWindow.data());
-//    container->setMinimumSize(...);
-//    container->setMaximumSize(...);
-    container->setFocusPolicy(Qt::TabFocus);
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
 
-    w.setCentralWidget(container);
-//    widgetLayout->addWidget(container);
+} // NAMESPACE INVERSELIB
 
-    return app.exec();
-}
+#endif // MNEMNEDATA_H
