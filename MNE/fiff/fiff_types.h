@@ -149,17 +149,17 @@ typedef struct _fiffTimeRec {
 
 /** Structure for sparse matrices */
 
-typedef struct _fiff_sparse_matrix {
- fiff_int_t   coding;          /**< coding (storage) type of the sparse matrix */
- fiff_int_t   m;	        /**< m rows */
- fiff_int_t   n;               /**< n columns */
- fiff_int_t   nz;              /**< nz nonzeros */
- fiff_float_t *data;           /**< owns the data */
- fiff_int_t   *inds;           /**< index list, points into data, no dealloc! */
- fiff_int_t   *ptrs;           /**< pointer list, points into data, no dealloc! */
-} *fiffSparseMatrix, fiffSparseMatrixRec;
+//typedef struct _fiff_sparse_matrix {
+// fiff_int_t   coding;          /**< coding (storage) type of the sparse matrix */
+// fiff_int_t   m;	        /**< m rows */
+// fiff_int_t   n;               /**< n columns */
+// fiff_int_t   nz;              /**< nz nonzeros */
+// fiff_float_t *data;           /**< owns the data */
+// fiff_int_t   *inds;           /**< index list, points into data, no dealloc! */
+// fiff_int_t   *ptrs;           /**< pointer list, points into data, no dealloc! */
+//} *fiffSparseMatrix, fiffSparseMatrixRec;
 
-typedef fiffSparseMatrixRec  fiff_sparse_matrix_t;
+//typedef fiffSparseMatrixRec  fiff_sparse_matrix_t;
 
 /** Structure for event bits */
 
