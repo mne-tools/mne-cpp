@@ -25,10 +25,9 @@ build:
 
 before_build:
     - call .\tools\appveyor\%BUILD%\before_build.bat
-    - qmake mne-cpp.pro -r MNECPP_CONFIG+=noTests
 
 build_script:
-    - jom
+    - call .\tools\appveyor\%BUILD%\build.bat
 
 after_build:
     - call .\tools\appveyor\compress_binaries.bat %APPVEYOR_REPO_BRANCH%
