@@ -58,6 +58,8 @@
 
 #include <fiff/fiff_types.h>
 #include "fwd_coil_set.h"
+#include "mne_meas_data.h"
+#include "mne_surface_or_volume.h"
 
 
 
@@ -129,7 +131,7 @@ typedef struct {
 
 typedef struct {		                     /* This is used for field mapping with help of the sphere-model MNE */
   int          kind;				     /* Either FIELD_MAP_MEG or FIELD_MAP_EEG */
-  mneSurface   surf;		                     /* The surface on which we are mapping */
+  INVERSELIB::MneSurfaceOrVolume::MneCSurface*   surf;		                     /* The surface on which we are mapping */
   char         *surfname;	                     /* The name of the file where the above surface came from */
   int          *surface_sel;			     /* We may calculate the interpolation only in a subset of vertices */
   int          nsurface_sel;			     /* How many points in the above */
@@ -168,11 +170,11 @@ typedef struct {		                     /* The digitizer data will be loaded from
 } *digitizerData,digitizerDataRec;
 
 typedef struct {
-  char          *meas_file;	                     /* The measurement file */
-  char          *inv_file;			     /* Inverse operator file */
-  char          *mri_trans_file;		     /* Where does the MRI transform come from */
-  int           nave;			             /* If nave < 0 use nave from the measurement data? */
-  mneMeasData   meas;		                     /* The measurement */
+  char          *meas_file;                     /* The measurement file */
+  char          *inv_file;                      /* Inverse operator file */
+  char          *mri_trans_file;                /* Where does the MRI transform come from */
+  int           nave;                           /* If nave < 0 use nave from the measurement data? */
+  INVERSELIB::MneMeasData*  meas;               /* The measurement */
   float         raw_tmin,raw_tmax;		     /* Time range for raw data segments */
   int           sample;				     /* Which channel is the sample */
   int           firstp;		                     /* First data point in the current time range selection */
@@ -193,7 +195,7 @@ typedef struct {
 
   mnePref             mne_prefs;		     /* MNE calculation preferences */
   float               *cur_vals;                     /* Current values */
-  mneSparseMatrix     nn_vals;			     /* Noise normalization values */
+  INVERSELIB::FiffSparseMatrix* nn_vals;			     /* Noise normalization values */
   mshColorScaleDefRec scale;	                     /* Scale presently used for display */
 
   digitizerData    dig;                              /* These are the Polhemus data */
