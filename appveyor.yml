@@ -4,6 +4,11 @@ version: 1.0.0-{build}
 pull_requests:
   do_not_increment_build_number: true
 
+environment:
+   matrix:
+     - BUILD: "windows_release"
+     - BUILD: "windows_tests"
+
 os: Visual Studio 2015
 platform: x64
 configuration: Release
@@ -19,6 +24,7 @@ build:
   verbosity: detailed 
 
 before_build:
+    - call .\tools\appveyor\%BUILD%\before_build.bat
     - qmake mne-cpp.pro -r MNECPP_CONFIG+=noTests
 
 build_script:
@@ -48,6 +54,7 @@ deploy:
     artifact: installer,bin_archive
     on:
       branch: master
+      build: "windows_release"
 
   # 1.0.0
   - provider: FTP
@@ -61,6 +68,7 @@ deploy:
     artifact: installer,bin_archive
     on:
       branch: 1.0.0
+      build: "windows_release"
 
 notifications: 
   - provider: Email 
