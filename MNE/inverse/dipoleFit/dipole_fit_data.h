@@ -170,13 +170,13 @@ public:
       FIFFLIB::fiffCoordTrans    mri_head_t;         /**< MRI <-> head coordinate transformation */
       FIFFLIB::fiffCoordTrans    meg_head_t;         /**< MEG <-> head coordinate transformation */
       int               coord_frame;        /**< Common coordinate frame */
-      FIFFLIB::fiffChInfo        chs;                /**< Channels */
+      FIFFLIB::fiffChInfo        chs;       /**< Channels */
       int               nmeg;               /**< How many MEG */
       int               neeg;               /**< How many EEG */
       char              **ch_names;         /**< List of all channel names */
-      mneSparseMatrix   pick;               /**< Matrix to pick data from the full data set which may contain channels we are not interested in */
-      FwdCoilSet*        meg_coils;          /**< MEG coil definitions */
-      FwdCoilSet*        eeg_els;            /**< EEG electrode definitions */
+      INVERSELIB::FiffSparseMatrix* pick;   /**< Matrix to pick data from the full data set which may contain channels we are not interested in */
+      FwdCoilSet*        meg_coils;         /**< MEG coil definitions */
+      FwdCoilSet*        eeg_els;           /**< EEG electrode definitions */
       float             r0[3];              /**< Sphere model origin */
       char              *bemname;           /**< Using a BEM? */
 

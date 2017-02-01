@@ -1031,7 +1031,7 @@ bool BabyMEG::readProjectors()
     m_pFiffInfo->projs = q_ListProj;
 
     //garbage collecting
-    t_pStream->device()->close();
+    t_pStream->close();
 
     return true;
 }
@@ -1065,7 +1065,7 @@ bool BabyMEG::readCompensators()
     m_pFiffInfo->comps = q_ListComp;
 
     //garbage collecting
-    t_pStream->device()->close();
+    t_pStream->close();
 
     return true;
 }
