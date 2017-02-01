@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     fuzzyMembership.h
+* @file     fuzzymembership.h
 * @author   Louis Eichhorst <louis.eichhorst@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     fuzzyMembership class declaration.
+* @brief     FuzzyMembership class declaration.
 *
 */
 
@@ -55,39 +55,36 @@
 
 //=============================================================================================================
 /**
-* Description of what this class is intended to do (in detail).
 *
-* @brief Brief description of this class.
+* @brief Calculates membership of the current value in relation to the value history.
 */
 
-class fuzzyMembership
+class FuzzyMembership
 {
 
 public:
-    typedef QSharedPointer<fuzzyMembership> SPtr;            /**< Shared pointer type for fuzzyMembership. */
-    typedef QSharedPointer<const fuzzyMembership> ConstSPtr; /**< Const shared pointer type for fuzzyMembership. */
+    typedef QSharedPointer<FuzzyMembership> SPtr;            /**< Shared pointer type for FuzzyMembership. */
+    typedef QSharedPointer<const FuzzyMembership> ConstSPtr; /**< Const shared pointer type for FuzzyMembership. */
 
     //=========================================================================================================
     /**
-    * Constructs a fuzzyMembership object.
+    * Constructs a FuzzyMembership object.
     */
-    fuzzyMembership();
+    FuzzyMembership();
+
+    //=========================================================================================================
+    /**
+    * Returns membershipvalues.
+    */
     Eigen::VectorXd getMembership(const Eigen::MatrixXd valHistory, const Eigen::MatrixXd valHistoryOld, const Eigen::VectorXd current, const Eigen::VectorXd epiHistory,  double margin, char type);
-
-
-protected:
 
 private:
 
-    Eigen::MatrixXd m_dmatValHistory;
-    Eigen::VectorXd m_dvecMaxVal;
-    Eigen::VectorXd m_dvecMinVal;
-    Eigen::VectorXd m_dvecMeanVal;
-    Eigen::VectorXd m_dvecMuChannel;
-
-signals:
-
-
+    Eigen::MatrixXd m_dmatValHistory;   /**< Contains previous values for each channel. */
+    Eigen::VectorXd m_dvecMaxVal;       /**< Contains the maximum value for each channel. */
+    Eigen::VectorXd m_dvecMinVal;       /**< Contains the minimum value for each channel. */
+    Eigen::VectorXd m_dvecMeanVal;      /**< Contains the mean value for each channel. */
+    Eigen::VectorXd m_dvecMuChannel;    /**< Contains the membership value for each channel. */
 };
 
 

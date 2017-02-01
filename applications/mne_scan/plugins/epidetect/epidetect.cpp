@@ -117,7 +117,9 @@ void Epidetect::init()
 
     //Delete Buffer - will be initailzed with first incoming data
     if(!m_pEpidetectBuffer.isNull())
+    {
         m_pEpidetectBuffer = CircularMatrixBuffer<double>::SPtr();
+    }
 }
 
 
@@ -135,7 +137,9 @@ bool Epidetect::start()
 {
     //Check if the thread is already or still running. This can happen if the start button is pressed immediately after the stop button was pressed. In this case the stopping process is not finished yet but the start process is initiated.
     if(this->isRunning())
+    {
         QThread::wait();
+    }
 
     m_bIsRunning = true;
 
@@ -268,9 +272,9 @@ void Epidetect::run()
 {
     bool overlap = false;
     CalcMetric calculator;
-    fuzzyMembership P2P;
-    fuzzyMembership Kurtosis;
-    fuzzyMembership FuzzyEn;
+    FuzzyMembership P2P;
+    FuzzyMembership Kurtosis;
+    FuzzyMembership FuzzyEn;
 
     while(!m_pFiffInfo)
         msleep(10);// Wait for fiff Info
@@ -359,7 +363,7 @@ void Epidetect::run()
 
         }
 
-        if (calculator.historyReady)
+        if (calculator.m_bHistoryReady)
         {
             m_dvecMuP2P = P2P.getMembership(p2pHistory, P2PHistoryValues, newP2PVal, m_dvecEpiHistory, m_dMargin, 'r');
             m_dvecMuKurtosis = Kurtosis.getMembership(kurtosisHistory, KurtosisHistoryValues, newKurtosisVal, m_dvecEpiHistory, m_dMargin, 'm'); //TODO: check whether it really is 'm'

@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     fuzzyMembership.cpp
+* @file     fuzzymembership.cpp
 * @author   Louis Eichhorst <louis.eichhorst@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    fuzzyMembership class definition.
+* @brief   FuzzyMembership class definition.
 *
 */
 
@@ -39,7 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "fuzzyMembership.h"
+#include "fuzzymembership.h"
 #include <iostream>
 
 
@@ -57,7 +57,7 @@ using namespace std;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-fuzzyMembership::fuzzyMembership()
+FuzzyMembership::FuzzyMembership()
 {
 
 }
@@ -65,7 +65,7 @@ fuzzyMembership::fuzzyMembership()
 
 //*************************************************************************************************************
 
-Eigen::VectorXd fuzzyMembership::getMembership(const Eigen::MatrixXd valHistory, const Eigen::MatrixXd valHistoryOld, const Eigen::VectorXd current, const Eigen::VectorXd epiHistory,  double margin, char type)
+Eigen::VectorXd FuzzyMembership::getMembership(const Eigen::MatrixXd valHistory, const Eigen::MatrixXd valHistoryOld, const Eigen::VectorXd current, const Eigen::VectorXd epiHistory,  double margin, char type)
 {
 //TODO: Add different treatment for max/min/meanvalues, if a seizure was detected
 //TODO: Add adjustment for the old history values

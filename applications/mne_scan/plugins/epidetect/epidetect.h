@@ -49,8 +49,8 @@
 #include <scMeas/newrealtimemultisamplearray.h>
 #include "FormFiles/epidetectsetupwidget.h"
 #include "FormFiles/epidetectwidget.h"
-#include "calcMetric.h"
-#include "fuzzyMembership.h"
+#include "calcmetric.h"
+#include "fuzzymembership.h"
 
 
 //*************************************************************************************************************
@@ -174,7 +174,6 @@ private:
     Eigen::VectorXd                                                    m_dvecMuMax;         /**< Contains largest membership value for each channel.*/
     Eigen::VectorXd                                                    m_dvecMuMean;        /**< Contains mean membership value for each channel.*/
     Eigen::VectorXd                                                    m_dvecMuGesVec;      /**< Contains all membership values for each channel.*/
-
 
     int                                                                 m_iDim;             /**< FuzzyEn emmbeding dimension as set through the GUI.*/
     int                                                                 m_iN;               /**< Step of the FuzzyEn exponential function as set through the GUI.*/

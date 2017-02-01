@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     calcMetric.cpp
+* @file     calcmetric.cpp
 * @author   Louis Eichhorst <louis.eichhorst@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -39,7 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "calcMetric.h"
+#include "calcmetric.h"
 #include <thread>
 
 
@@ -84,10 +84,10 @@ CalcMetric::CalcMetric()
     m_iFuzzyEnHistoryPosition = 0;
     m_iFuzzyEnStart = 0;
     m_iFuzzyEnStep = 10;
-    setNewP2P = false;
-    setNewFuzzyEn = false;
-    setNewKurtosis = false;
-    historyReady=false;
+    m_bSetNewP2P = false;
+    m_bSetNewFuzzyEn = false;
+    m_bSetNewKurtosis = false;
+    m_bHistoryReady=false;
 
 }
 
@@ -251,12 +251,12 @@ void CalcMetric::setData(Eigen::MatrixXd input)
 
 VectorXd CalcMetric::onSeizureDetection(int dim, double r, double n, QList<int> checkChs)
 {
-    qSort(fuzzyEnUsedChs);
+    qSort(m_lFuzzyEnUsedChs);
     QList<QPair<RowVectorXd, QPair<QList<double>, int>>> inputList;
 
     for (int i = 0; i < checkChs.length(); i++)
     {
-        if (!fuzzyEnUsedChs.contains(checkChs[i]))
+        if (!m_lFuzzyEnUsedChs.contains(checkChs[i]))
         {
             QPair<RowVectorXd, QPair<QList<double>, int>> funcInput = createInputList(m_dmatData.row(checkChs[i]), dim, r, n, m_dvecMean(checkChs[i]), m_dvecStdDev(checkChs[i]));
             inputList << funcInput;
@@ -274,7 +274,7 @@ VectorXd CalcMetric::onSeizureDetection(int dim, double r, double n, QList<int> 
 
     for (int i = 0; i < checkChs.length(); i++)
     {
-        if (!fuzzyEnUsedChs.contains(checkChs[i]))
+        if (!m_lFuzzyEnUsedChs.contains(checkChs[i]))
         {
             m_dvecFuzzyEn(checkChs[i]) = fuzzyEnResults[j];
             j++;
@@ -302,10 +302,10 @@ VectorXd calcP2P(MatrixXd data)
 void CalcMetric::calcP2P()
 {
 
-    if (setNewP2P)
+    if (m_bSetNewP2P)
     {
         m_dmatP2PHistory.col(m_iP2PHistoryPosition) = m_dvecP2P;
-        setNewP2P = false;
+        m_bSetNewP2P = false;
         m_iP2PHistoryPosition++;
         if (m_iP2PHistoryPosition>(m_iListLength-1))
         {
@@ -316,7 +316,7 @@ void CalcMetric::calcP2P()
     VectorXd max = m_dmatData.rowwise().maxCoeff();
     VectorXd min = m_dmatData.rowwise().minCoeff();
     m_dvecP2P = max-min;
-    setNewP2P = true;
+    m_bSetNewP2P = true;
 }
 
 
@@ -373,10 +373,10 @@ void CalcMetric::calcKurtosis(int start, int end)
     if (end > m_iChannelCount)
         end=m_iChannelCount;
 
-    if (setNewKurtosis)
+    if (m_bSetNewKurtosis)
     {
         m_dmatKurtosisHistory.col(m_iKurtosisHistoryPosition) = m_dvecKurtosis;
-        setNewKurtosis = false;
+        m_bSetNewKurtosis = false;
         m_iKurtosisHistoryPosition++;
         if (m_iKurtosisHistoryPosition>(m_iListLength-1))
             m_iKurtosisHistoryPosition = 0;
@@ -409,7 +409,7 @@ void CalcMetric::calcKurtosis(int start, int end)
 
     }
 
-    setNewKurtosis = true;
+    m_bSetNewKurtosis = true;
 
 }
 
@@ -421,7 +421,7 @@ void CalcMetric::calcAll(Eigen::MatrixXd input, int dim, double r, double n)
     this->setData(input);
     this->calcP2P();
     this->calcKurtosis(0,1000);
-    fuzzyEnUsedChs.clear();
+    m_lFuzzyEnUsedChs.clear();
 
     if (m_iFuzzyEnStart == m_iFuzzyEnStep-1)
     {
@@ -431,7 +431,7 @@ void CalcMetric::calcAll(Eigen::MatrixXd input, int dim, double r, double n)
         else
         {
             m_iFuzzyEnHistoryPosition = 0;
-            historyReady = true;
+            m_bHistoryReady = true;
         }
     }
 
@@ -439,7 +439,7 @@ void CalcMetric::calcAll(Eigen::MatrixXd input, int dim, double r, double n)
 
     for (int i = m_iFuzzyEnStart; i< m_iChannelCount; i=i+m_iFuzzyEnStep)
     {
-        fuzzyEnUsedChs << i;
+        m_lFuzzyEnUsedChs << i;
         QPair<RowVectorXd, QPair<QList<double>, int>> funcInput = createInputList(input.row(i), dim, r, n, m_dvecMean(i), m_dvecStdDev(i));
         inputList << funcInput;
     }
