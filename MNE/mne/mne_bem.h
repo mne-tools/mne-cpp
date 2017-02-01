@@ -244,7 +244,7 @@ protected:
     *
     * @return true if succeeded, false otherwise
     */
-    static bool readBemSurface(FiffStream* p_pStream, const FiffDirNode& p_Tree, MNEBemSurface& p_BemSurface);
+    static bool readBemSurface(FiffStream::SPtr& p_pStream, const FiffDirNode::SPtr& p_Tree, MNEBemSurface& p_BemSurface);
 
 private:
     QList<MNEBemSurface> m_qListBemSurface;    /**< List of the BEM Surfaces. */

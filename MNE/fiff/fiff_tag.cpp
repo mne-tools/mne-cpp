@@ -75,11 +75,11 @@ using namespace FIFFLIB;
 //=============================================================================================================
 
 FiffTag::FiffTag()
-: m_pComplexFloatData(NULL)
-, m_pComplexDoubleData(NULL)
-, kind(0)
+: kind(0)
 , type(0)
 , next(0)
+//, m_pComplexFloatData(NULL)
+//, m_pComplexDoubleData(NULL)
 {
 }
 
@@ -92,15 +92,15 @@ FiffTag::FiffTag(const FiffTag* p_pFiffTag)
 , type(p_pFiffTag->type)
 , next(p_pFiffTag->next)
 {
-    if(p_pFiffTag->m_pComplexFloatData)
-        this->toComplexFloat();
-    else
-        m_pComplexFloatData = NULL;
+//    if(p_pFiffTag->m_pComplexFloatData)
+//        this->toComplexFloat();
+//    else
+//        m_pComplexFloatData = NULL;
 
-    if(p_pFiffTag->m_pComplexDoubleData)
-        this->toComplexDouble();
-    else
-        m_pComplexDoubleData = NULL;
+//    if(p_pFiffTag->m_pComplexDoubleData)
+//        this->toComplexDouble();
+//    else
+//        m_pComplexDoubleData = NULL;
 }
 
 
@@ -108,10 +108,10 @@ FiffTag::FiffTag(const FiffTag* p_pFiffTag)
 
 FiffTag::~FiffTag()
 {
-    if(this->m_pComplexFloatData)
-        delete this->m_pComplexFloatData;
-    if(this->m_pComplexDoubleData)
-        delete this->m_pComplexDoubleData;
+//    if(this->m_pComplexFloatData)
+//        delete this->m_pComplexFloatData;
+//    if(this->m_pComplexDoubleData)
+//        delete this->m_pComplexDoubleData;
 }
 
 
