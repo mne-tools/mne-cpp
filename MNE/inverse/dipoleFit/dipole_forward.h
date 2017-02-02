@@ -100,6 +100,7 @@ public:
     //=========================================================================================================
     /**
     * Destroys the Dipole Forward description
+    * Refactored: free_dipole_forward_2 (dipole_fit_setup.c)
     */
     ~DipoleForward();
 
