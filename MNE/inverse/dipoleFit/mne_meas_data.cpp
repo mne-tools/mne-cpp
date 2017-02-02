@@ -400,8 +400,10 @@ MneMeasData::~MneMeasData()
     FREE_9(filename);
     FREE_9(meas_id);
     FREE_9(chs);
-    FREE_9(meg_head_t);
-    FREE_9(mri_head_t);
+    if(meg_head_t)
+        delete meg_head_t;
+    if(mri_head_t)
+        delete mri_head_t;
     mne_free_proj_op_9(proj);
     mne_free_ctf_comp_data_set_9(comp);
     FREE_9(bad);

@@ -122,8 +122,8 @@ public:
     FIFFLIB::fiffId         meas_id;    /* The id from the measurement file */
     FIFFLIB::fiffTimeRec    meas_date;  /* The measurement date from the file */
     FIFFLIB::fiffChInfo     chs;        /* The channel information */
-    FIFFLIB::fiffCoordTrans meg_head_t; /* MEG device <-> head coordinate transformation */
-    FIFFLIB::fiffCoordTrans mri_head_t; /* MRI device <-> head coordinate transformation (duplicated from the inverse operator or loaded separately) */
+    INVERSELIB::FiffCoordTransOld* meg_head_t; /* MEG device <-> head coordinate transformation */
+    INVERSELIB::FiffCoordTransOld* mri_head_t; /* MRI device <-> head coordinate transformation (duplicated from the inverse operator or loaded separately) */
     float               sfreq;      /* Sampling frequency */
     int                 nchan;      /* Number of channels */
     float               highpass;   /* Highpass filter setting */
@@ -154,8 +154,8 @@ public:
 //    FIFFLIB::fiffId         meas_id;    /* The id from the measurement file */
 //    FIFFLIB::fiffTimeRec    meas_date;  /* The measurement date from the file */
 //    FIFFLIB::fiffChInfo     chs;        /* The channel information */
-//    FIFFLIB::fiffCoordTrans meg_head_t; /* MEG device <-> head coordinate transformation */
-//    FIFFLIB::fiffCoordTrans mri_head_t; /* MRI device <-> head coordinate transformation (duplicated from the inverse operator or loaded separately) */
+//    INVERSELIB::FiffCoordTransOld* meg_head_t; /* MEG device <-> head coordinate transformation */
+//    INVERSELIB::FiffCoordTransOld* mri_head_t; /* MRI device <-> head coordinate transformation (duplicated from the inverse operator or loaded separately) */
 //    float               sfreq;      /* Sampling frequency */
 //    int                 nchan;      /* Number of channels */
 //    float               highpass;   /* Highpass filter setting */

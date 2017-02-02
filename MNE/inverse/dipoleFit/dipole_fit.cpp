@@ -559,7 +559,7 @@ ECDSet DipoleFit::calculateFit() const
                settings->setno,settings->measname.toLatin1().data(),fit_data->nmeg,fit_data->neeg);
         if (!settings->noisename.isEmpty()) {
             printf("\nScaling the noise covariance...\n");
-            if (scale_noise_cov(fit_data,data->current->nave) == FAIL)
+            if (DipoleFitData::scale_noise_cov(fit_data,data->current->nave) == FAIL)
                 goto out;
         }
     }
