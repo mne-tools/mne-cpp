@@ -73,8 +73,8 @@ SOURCES += \
         FormFiles/epidetectsetupwidget.cpp \
         FormFiles/epidetectaboutwidget.cpp \
         FormFiles/epidetectwidget.cpp \
-        calcMetric.cpp \
-        fuzzyMembership.cpp
+        calcmetric.cpp \
+        fuzzymembership.cpp
 
 HEADERS += \
         epidetect.h\
@@ -82,8 +82,8 @@ HEADERS += \
         FormFiles/epidetectsetupwidget.h \
         FormFiles/epidetectaboutwidget.h \
         FormFiles/epidetectwidget.h \
-        calcMetric.h \
-        fuzzyMembership.h
+        calcmetric.h \
+        fuzzymembership.h
 
 FORMS += \
         FormFiles/epidetectsetup.ui \

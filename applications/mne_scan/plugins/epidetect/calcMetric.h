@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     calcMetric.h
+* @file     calcmetric.h
 * @author   Louis Eichhorst <louis.eichhorst@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     calcMetric class declaration.
+* @brief     CalcMetric class declaration.
 *
 */
 
@@ -51,7 +51,6 @@
 #include <QSharedPointer>
 #include <QFuture>
 #include <QList>
-//#include <generics/circularmatrixbuffer.h>
 
 
 //*************************************************************************************************************
