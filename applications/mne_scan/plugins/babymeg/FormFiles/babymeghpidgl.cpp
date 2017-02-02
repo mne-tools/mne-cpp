@@ -266,7 +266,7 @@ QList<FiffDigPoint> BabyMEGHPIDgl::readPolhemusDig(QString fileName)
     QVector<double> vGof;
     vGof << 0.0 << 0.0 << 0.0 << 0.0;
 
-    this->setDigitizerDataToView3D(t_digSet, vGof);
+    this->setDigitizerDataToView3D(t_digSet, FiffDigPointSet(), vGof);
 
     //Set loaded number of digitizers
     ui->m_label_numberLoadedCoils->setNum(numHPI);
@@ -299,7 +299,7 @@ QList<FiffDigPoint> BabyMEGHPIDgl::readPolhemusDig(QString fileName)
 
 //*************************************************************************************************************
 
-void BabyMEGHPIDgl::setDigitizerDataToView3D(const FiffDigPointSet& digPointSet, const QVector<double>& vGof, bool bSortOutAdditionalDigitizer)
+void BabyMEGHPIDgl::setDigitizerDataToView3D(const FiffDigPointSet& digPointSet, const FiffDigPointSet& fittedPointSet, const QVector<double>& vGof, bool bSortOutAdditionalDigitizer)
 {
     if(bSortOutAdditionalDigitizer) {
         FiffDigPointSet t_digSetWithoutAdditional;
@@ -322,6 +322,18 @@ void BabyMEGHPIDgl::setDigitizerDataToView3D(const FiffDigPointSet& digPointSet,
         }
 
         m_pData3DModel->addDigitizerData("Head", "Digitizer", t_digSetWithoutAdditional);
+
+        t_digSetWithoutAdditional.clear();
+        for(int i = 0; i < fittedPointSet.size(); ++i) {
+            switch(fittedPointSet[i].kind)
+            {
+                case FIFFV_POINT_EEG:
+                    t_digSetWithoutAdditional << fittedPointSet[i];
+                    break;
+            }
+        }
+
+        m_pData3DModel->addDigitizerData("Head", "Fitted", t_digSetWithoutAdditional);
 
         //Update gof labels and transform from m to mm
         QString sGof("0mm");
@@ -346,6 +358,7 @@ void BabyMEGHPIDgl::setDigitizerDataToView3D(const FiffDigPointSet& digPointSet,
         }
     } else {
         m_pData3DModel->addDigitizerData("Head", "Digitizer", digPointSet);
+        m_pData3DModel->addDigitizerData("Head", "Fitted", fittedPointSet);
     }
 }
 

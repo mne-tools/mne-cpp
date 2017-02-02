@@ -465,12 +465,17 @@ void BabyMEG::performHPIFitting(const QVector<int>& vFreqs)
 
             //Perform actual fitting
             QVector<double> vGof;
+            FiffDigPointSet t_fittedSet;
             RtHPIS::SPtr pRtHpis = RtHPIS::SPtr(new RtHPIS(m_pFiffInfo));
             FiffCoordTrans transDevHead;
             transDevHead.from = 1;
             transDevHead.to = 4;
 
-            pRtHpis->singleHPIFit(matProj * matComp * this->calibrate(m_matValue), transDevHead, vFreqs, vGof);
+            pRtHpis->singleHPIFit(matProj * matComp * this->calibrate(m_matValue),
+                                  transDevHead,
+                                  vFreqs,
+                                  vGof,
+                                  t_fittedSet);
 
             //Set newly calculated transforamtion amtrix to fiff info
             m_mutex.lock();
@@ -497,7 +502,7 @@ void BabyMEG::performHPIFitting(const QVector<int>& vFreqs)
                 t_digSet << digPoint;
             }
 
-            m_pHPIDlg->setDigitizerDataToView3D(t_digSet, vGof);
+            m_pHPIDlg->setDigitizerDataToView3D(t_digSet, t_fittedSet, vGof);
         }
     }
 }

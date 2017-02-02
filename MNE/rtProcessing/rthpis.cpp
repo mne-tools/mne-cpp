@@ -44,6 +44,8 @@
 
 #include "rthpis.h"
 
+#include <fiff/fiff_dig_point_set.h>
+
 #include <utils/ioutils.h>
 
 #include <iostream>
@@ -479,7 +481,7 @@ RtHPIS::~RtHPIS()
 
 //*************************************************************************************************************
 
-void RtHPIS::singleHPIFit(const MatrixXd& t_mat, FiffCoordTrans& transDevHead, const QVector<int>& vFreqs, QVector<double>& vGof)
+void RtHPIS::singleHPIFit(const MatrixXd& t_mat, FiffCoordTrans& transDevHead, const QVector<int>& vFreqs, QVector<double>& vGof, FiffDigPointSet& fittedPointSet)
 {
     vGof.clear();
 
@@ -713,6 +715,18 @@ void RtHPIS::singleHPIFit(const MatrixXd& t_mat, FiffCoordTrans& transDevHead, c
 
     for(int i = 0; i < diffPos.cols(); ++i) {
         vGof.append(diffPos.col(i).norm());
+    }
+
+    //Generate final fitted points and store in digitizer set
+    for(int i = 0; i < coil.pos.rows(); ++i) {
+        FiffDigPoint digPoint;
+        digPoint.kind = FIFFV_POINT_EEG;
+        digPoint.ident = i;
+        digPoint.r[0] = coil.pos(i,0);
+        digPoint.r[1] = coil.pos(i,1);
+        digPoint.r[2] = coil.pos(i,2);
+
+        fittedPointSet << digPoint;
     }
 
     // DEBUG HPI fitting and write debug results
