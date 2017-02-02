@@ -159,6 +159,41 @@ public:
 
 
 
+
+
+
+    //============================= mne_coord_transforms.c =============================
+
+    static const char *mne_coord_frame_name(int frame);
+
+
+    static void mne_print_coord_transform_label(FILE *log,char *label, FiffCoordTransOld* t);
+
+    static void mne_print_coord_transform(FILE *log, FiffCoordTransOld* t);
+
+
+
+
+
+
+
+
+
+
+
+
+
+    static FiffCoordTransOld* mne_read_transform(const QString& name,int from, int to);
+
+    static FiffCoordTransOld* mne_read_mri_transform(const QString& name);
+
+
+    static FiffCoordTransOld* mne_read_meas_transform(const QString& name);
+
+
+
+
+
     //*************************************************************************************************************
     //TODO: remove later on
     static FiffCoordTransOld* read_helper( QSharedPointer<FIFFLIB::FiffTag>& tag );

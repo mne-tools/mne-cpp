@@ -12,6 +12,8 @@
 
 
 #include <QFile>
+#include <QCoreApplication>
+#include <QDebug>
 
 
 
@@ -78,8 +80,80 @@ using namespace FIFFLIB;
 
 
 
+#define ALLOC_DCMATRIX_3(x,y) mne_dmatrix_3((x),(y))
 #define ALLOC_CMATRIX_3(x,y) mne_cmatrix_3((x),(y))
 #define FREE_CMATRIX_3(m) mne_free_cmatrix_3((m))
+#define FREE_DCMATRIX_3(m) mne_free_dcmatrix_3((m))
+
+
+
+
+static void matrix_error_3(int kind, int nr, int nc)
+
+{
+    if (kind == 1)
+        printf("Failed to allocate memory pointers for a %d x %d matrix\n",nr,nc);
+    else if (kind == 2)
+        printf("Failed to allocate memory for a %d x %d matrix\n",nr,nc);
+    else
+        printf("Allocation error for a %d x %d matrix\n",nr,nc);
+    if (sizeof(void *) == 4) {
+        printf("This is probably because you seem to be using a computer with 32-bit architecture.\n");
+        printf("Please consider moving to a 64-bit platform.");
+    }
+    printf("Cannot continue. Sorry.\n");
+    exit(1);
+}
+
+
+
+float **mne_cmatrix_3 (int nr,int nc)
+
+{
+    int i;
+    float **m;
+    float *whole;
+
+    m = MALLOC_3(nr,float *);
+    if (!m) matrix_error_3(1,nr,nc);
+    whole = MALLOC_3(nr*nc,float);
+    if (!whole) matrix_error_3(2,nr,nc);
+
+    for(i=0;i<nr;i++)
+        m[i] = whole + i*nc;
+    return m;
+}
+
+
+
+
+double **mne_dmatrix_3(int nr, int nc)
+
+{
+    int i;
+    double **m;
+    double *whole;
+
+    m = MALLOC_3(nr,double *);
+    if (!m) matrix_error_3(1,nr,nc);
+    whole = MALLOC_3(nr*nc,double);
+    if (!whole) matrix_error_3(2,nr,nc);
+
+    for(i=0;i<nr;i++)
+        m[i] = whole + i*nc;
+    return m;
+}
+
+
+
+void mne_free_dcmatrix_3 (double **m)
+
+{
+    if (m) {
+        FREE_3(*m);
+        FREE_3(m);
+    }
+}
 
 
 /*
@@ -181,6 +255,381 @@ void mne_add_scaled_vector_to_3(float *v1,float scale, float *v2,int nn)
 #endif
     return;
 }
+
+
+
+
+
+
+
+double **mne_dmatt_dmat_mult2_3 (double **m1,double **m2, int d1,int d2,int d3)
+/* Matrix multiplication
+      * result(d1 x d3) = m1(d2 x d1)^T * m2(d2 x d3) */
+
+{
+    double **result = ALLOC_DCMATRIX_3(d1,d3);
+#ifdef BLAS
+    char  *transa = "N";
+    char  *transb = "T";
+    double zero = 0.0;
+    double one  = 1.0;
+
+    dgemm (transa,transb,&d3,&d1,&d2,
+           &one,m2[0],&d3,m1[0],&d1,&zero,result[0],&d3);
+
+    return result;
+#else
+    int j,k,p;
+    double sum;
+
+    for (j = 0; j < d1; j++)
+        for (k = 0; k < d3; k++) {
+            sum = 0.0;
+            for (p = 0; p < d2; p++)
+                sum = sum + m1[p][j]*m2[p][k];
+            result[j][k] = sum;
+        }
+    return result;
+#endif
+}
+
+
+
+
+
+
+
+float **mne_mat_mat_mult_3 (float **m1,float **m2,int d1,int d2,int d3)
+/* Matrix multiplication
+      * result(d1 x d3) = m1(d1 x d2) * m2(d2 x d3) */
+
+{
+#ifdef BLAS
+    float **result = ALLOC_CMATRIX_3(d1,d3);
+    char  *transa = "N";
+    char  *transb = "N";
+    float zero = 0.0;
+    float one  = 1.0;
+    sgemm (transa,transb,&d3,&d1,&d2,
+           &one,m2[0],&d3,m1[0],&d2,&zero,result[0],&d3);
+    return (result);
+#else
+    float **result = ALLOC_CMATRIX_3(d1,d3);
+    int j,k,p;
+    float sum;
+
+    for (j = 0; j < d1; j++)
+        for (k = 0; k < d3; k++) {
+            sum = 0.0;
+            for (p = 0; p < d2; p++)
+                sum = sum + m1[j][p]*m2[p][k];
+            result[j][k] = sum;
+        }
+    return (result);
+#endif
+}
+
+
+
+
+
+void mne_mat_vec_mult2_3(float **m,float *v,float *result, int d1,int d2)
+/*
+      * Matrix multiplication
+      * result(d1) = m(d1 x d2) * v(d2)
+      */
+
+{
+    int j;
+
+    for (j = 0; j < d1; j++)
+        result[j] = mne_dot_vectors_3(m[j],v,d2);
+    return;
+}
+
+
+//============================= misc_util.c =============================
+
+char *mne_strdup_3(const char *s)
+{
+    char *res;
+    if (s == NULL)
+        return NULL;
+    res = (char*) malloc(strlen(s)+1);
+    strcpy(res,s);
+    return res;
+}
+
+
+
+//============================= mne_named_matrix.c =============================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+char **mne_dup_name_list_3(char **list, int nlist)
+/*
+ * Duplicate a name list
+ */
+{
+    char **res;
+    int  k;
+    if (list == NULL || nlist == 0)
+        return NULL;
+    res = MALLOC_3(nlist,char *);
+
+    for (k = 0; k < nlist; k++)
+        res[k] = mne_strdup_3(list[k]);
+    return res;
+}
+
+
+
+char *mne_name_list_to_string_3(char **list,int nlist)
+/*
+* Convert a string array to a colon-separated string
+*/
+{
+    int k,len;
+    char *res;
+    if (nlist == 0 || list == NULL)
+        return NULL;
+    for (k = len = 0; k < nlist; k++)
+        len += strlen(list[k])+1;
+    res = MALLOC_3(len,char);
+    res[0] = '\0';
+    for (k = len = 0; k < nlist-1; k++) {
+        strcat(res,list[k]);
+        strcat(res,":");
+    }
+    strcat(res,list[nlist-1]);
+    return res;
+}
+
+
+char *mne_channel_names_to_string_3(fiffChInfo chs, int nch)
+/*
+* Make a colon-separated string out of channel names
+*/
+{
+    char **names = MALLOC_3(nch,char *);
+    char *res;
+    int  k;
+
+    if (nch <= 0)
+        return NULL;
+    for (k = 0; k < nch; k++)
+        names[k] = chs[k].ch_name;
+    res = mne_name_list_to_string_3(names,nch);
+    FREE_3(names);
+    return res;
+}
+
+
+void mne_string_to_name_list_3(char *s,char ***listp,int *nlistp)
+/*
+      * Convert a colon-separated list into a string array
+      */
+{
+    char **list = NULL;
+    int  nlist  = 0;
+    char *one,*now=NULL;
+
+    if (s != NULL && strlen(s) > 0) {
+        s = mne_strdup_3(s);
+        //strtok_r linux variant; strtok_s windows varainat
+#ifdef __linux__
+        for (one = strtok_r(s,":",&now); one != NULL; one = strtok_r(NULL,":",&now)) {
+#elif _WIN32
+        for (one = strtok_s(s,":",&now); one != NULL; one = strtok_s(NULL,":",&now)) {
+#else
+        for (one = strtok_r(s,":",&now); one != NULL; one = strtok_r(NULL,":",&now)) {
+#endif
+            list = REALLOC_3(list,nlist+1,char *);
+            list[nlist++] = mne_strdup_3(one);
+        }
+        FREE_3(s);
+    }
+    *listp  = list;
+    *nlistp = nlist;
+    return;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//============================= mne_sparse_matop.c =============================
+
+
+
+
+
+
+INVERSELIB::FiffSparseMatrix* mne_convert_to_sparse_3(float **dense,        /* The dense matrix to be converted */
+                                      int   nrow,           /* Number of rows in the dense matrix */
+                                      int   ncol,           /* Number of columns in the dense matrix */
+                                      int   stor_type,      /* Either FIFFTS_MC_CCS or FIFFTS_MC_RCS */
+                                      float small)          /* How small elements should be ignored? */
+/*
+* Create the compressed row or column storage sparse matrix representation
+* including a vector containing the nonzero matrix element values,
+* the row or column pointer vector and the appropriate index vector(s).
+*/
+{
+    int j,k;
+    int nz;
+    int ptr;
+    INVERSELIB::FiffSparseMatrix* sparse = NULL;
+    int size;
+
+    if (small < 0) {		/* Automatic scaling */
+        float maxval = 0.0;
+        float val;
+
+        for (j = 0; j < nrow; j++)
+            for (k = 0; k < ncol; k++) {
+                val = fabs(dense[j][k]);
+                if (val > maxval)
+                    maxval = val;
+            }
+        if (maxval > 0)
+            small = maxval*fabs(small);
+        else
+            small = fabs(small);
+    }
+    for (j = 0, nz = 0; j < nrow; j++)
+        for (k = 0; k < ncol; k++) {
+            if (fabs(dense[j][k]) > small)
+                nz++;
+        }
+
+    if (nz <= 0) {
+        printf("No nonzero elements found.");
+        return NULL;
+    }
+    if (stor_type == FIFFTS_MC_CCS) {
+        size = nz*(sizeof(fiff_float_t) + sizeof(fiff_int_t)) +
+                (ncol+1)*(sizeof(fiff_int_t));
+    }
+    else if (stor_type == FIFFTS_MC_RCS) {
+        size = nz*(sizeof(fiff_float_t) + sizeof(fiff_int_t)) +
+                (nrow+1)*(sizeof(fiff_int_t));
+    }
+    else {
+        printf("Unknown sparse matrix storage type: %d",stor_type);
+        return NULL;
+    }
+    sparse = new INVERSELIB::FiffSparseMatrix;
+    sparse->coding = stor_type;
+    sparse->m      = nrow;
+    sparse->n      = ncol;
+    sparse->nz     = nz;
+    sparse->data   = (float *)malloc(size);
+    sparse->inds   = (int *)(sparse->data+nz);
+    sparse->ptrs   = sparse->inds+nz;
+
+    if (stor_type == FIFFTS_MC_RCS) {
+        for (j = 0, nz = 0; j < nrow; j++) {
+            ptr = -1;
+            for (k = 0; k < ncol; k++)
+                if (fabs(dense[j][k]) > small) {
+                    sparse->data[nz] = dense[j][k];
+                    if (ptr < 0)
+                        ptr = nz;
+                    sparse->inds[nz++] = k;
+                }
+            sparse->ptrs[j] = ptr;
+        }
+        sparse->ptrs[nrow] = nz;
+        for (j = nrow - 1; j >= 0; j--) /* Take care of the empty rows */
+            if (sparse->ptrs[j] < 0)
+                sparse->ptrs[j] = sparse->ptrs[j+1];
+    }
+    else if (stor_type == FIFFTS_MC_CCS) {
+        for (k = 0, nz = 0; k < ncol; k++) {
+            ptr = -1;
+            for (j = 0; j < nrow; j++)
+                if (fabs(dense[j][k]) > small) {
+                    sparse->data[nz] = dense[j][k];
+                    if (ptr < 0)
+                        ptr = nz;
+                    sparse->inds[nz++] = j;
+                }
+            sparse->ptrs[k] = ptr;
+        }
+        sparse->ptrs[ncol] = nz;
+        for (k = ncol-1; k >= 0; k--) /* Take care of the empty columns */
+            if (sparse->ptrs[k] < 0)
+                sparse->ptrs[k] = sparse->ptrs[k+1];
+    }
+    return sparse;
+}
+
+
+
+
+int  mne_sparse_vec_mult2_3(INVERSELIB::FiffSparseMatrix* mat,     /* The sparse matrix */
+                          float           *vector, /* Vector to be multiplied */
+                          float           *res)    /* Result of the multiplication */
+/*
+      * Multiply a vector by a sparse matrix.
+      */
+{
+    int i,j;
+
+    if (mat->coding == FIFFTS_MC_RCS) {
+        for (i = 0; i < mat->m; i++) {
+            res[i] = 0.0;
+            for (j = mat->ptrs[i]; j < mat->ptrs[i+1]; j++)
+                res[i] += mat->data[j]*vector[mat->inds[j]];
+        }
+        return 0;
+    }
+    else if (mat->coding == FIFFTS_MC_CCS) {
+        for (i = 0; i < mat->m; i++)
+            res[i] = 0.0;
+        for (i = 0; i < mat->n; i++)
+            for (j = mat->ptrs[i]; j < mat->ptrs[i+1]; j++)
+                res[mat->inds[j]] += mat->data[j]*vector[i];
+        return 0;
+    }
+    else {
+        printf("mne_sparse_vec_mult2: unknown sparse matrix storage type: %d",mat->coding);
+        return -1;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -296,43 +745,6 @@ float **mne_lu_invert_3(float **mat,int dim)
 
 
 
-
-
-static void matrix_error_3(int kind, int nr, int nc)
-
-{
-    if (kind == 1)
-        printf("Failed to allocate memory pointers for a %d x %d matrix\n",nr,nc);
-    else if (kind == 2)
-        printf("Failed to allocate memory for a %d x %d matrix\n",nr,nc);
-    else
-        printf("Allocation error for a %d x %d matrix\n",nr,nc);
-    if (sizeof(void *) == 4) {
-        printf("This is probably because you seem to be using a computer with 32-bit architecture.\n");
-        printf("Please consider moving to a 64-bit platform.");
-    }
-    printf("Cannot continue. Sorry.\n");
-    exit(1);
-}
-
-
-
-float **mne_cmatrix_3 (int nr,int nc)
-
-{
-    int i;
-    float **m;
-    float *whole;
-
-    m = MALLOC_3(nr,float *);
-    if (!m) matrix_error_3(1,nr,nc);
-    whole = MALLOC_3(nr*nc,float);
-    if (!whole) matrix_error_3(2,nr,nc);
-
-    for(i=0;i<nr;i++)
-        m[i] = whole + i*nc;
-    return m;
-}
 
 
 
@@ -705,6 +1117,718 @@ int mne_proj_op_proj_vector_3(mneProjOp op, float *vec, int nvec, int do_complem
 
 
 
+//============================= mne_decompose.c =============================
+
+
+int mne_decompose_eigen_3(double *mat,
+                         double *lambda,
+                         float  **vectors, /* Eigenvectors fit into floats easily */
+                         int    dim)
+/*
+      * Compute the eigenvalue decomposition of
+      * a symmetric matrix using the LAPACK routines
+      *
+      * 'mat' contains the lower triangle of the matrix
+      */
+{
+    int    np  =   dim*(dim+1)/2;
+    double *w    = MALLOC_3(dim,double);
+    double *z    = MALLOC_3(dim*dim,double);
+    double *work = MALLOC_3(3*dim,double);
+    double *dmat = MALLOC_3(np,double);
+    float  *vecp = vectors[0];
+
+    const char   *uplo  = "U";
+    const char   *compz = "V";
+    int    info,k;
+    int    one = 1;
+    int    maxi;
+    double scale;
+
+//    maxi = idamax(&np,mat,&one);
+// idamax workaround begin
+    maxi = 0;
+    for(int i = 0; i < np; ++i)
+        if (fabs(mat[i]) > fabs(mat[maxi]))
+            maxi = i;
+// idamax workaround end
+
+    scale = 1.0/mat[maxi];//scale = 1.0/mat[maxi-1];
+
+    for (k = 0; k < np; k++)
+        dmat[k] = mat[k]*scale;
+//    dspev(compz,uplo,&dim,dmat,w,z,&dim,work,&info);
+
+
+// dspev workaround begin
+    MatrixXd dmat_tmp = MatrixXd::Zero(dim,dim);
+    int idx = 0;
+    for (int i = 0; i < dim; ++i) {
+        for(int j = 0; j <= i; ++j) {
+            dmat_tmp(i,j) = dmat[idx];
+            dmat_tmp(j,i) = dmat[idx];
+            ++idx;
+        }
+    }
+    SelfAdjointEigenSolver<MatrixXd> es;
+    es.compute(dmat_tmp);
+    for ( int i = 0; i < dim; ++i )
+        w[i] = es.eigenvalues()[i];
+
+    idx = 0;
+    for ( int j = 0; j < dim; ++j ) {
+        for( int i = 0; i < dim; ++i ) {
+            z[idx] = es.eigenvectors()(i,j);// Column Major
+            ++idx;
+        }
+    }
+// dspev workaround end
+
+    info = 0;
+
+    qDebug() << "!!!DEBUG ToDo: dspev(compz,uplo,&dim,dmat,w,z,&dim,work,&info);";
+
+    FREE_3(work);
+    if (info != 0)
+        printf("Eigenvalue decomposition failed (LAPACK info = %d)",info);
+    else {
+        scale = 1.0/scale;
+        for (k = 0; k < dim; k++)
+            lambda[k] = scale*w[k];
+        for (k = 0; k < dim*dim; k++)
+            vecp[k] = z[k];
+    }
+    FREE_3(w);
+    FREE_3(z);
+    if (info == 0)
+        return 0;
+    else
+        return -1;
+}
+
+
+
+
+
+//============================= mne_cov_matrix.c =============================
+
+
+
+
+
+
+/*
+* Routines for handling the covariance matrices
+*/
+static mneCovMatrix new_cov_3(int    kind,
+                            int    ncov,
+                            char   **names,
+                            double *cov,
+                            double *cov_diag,
+                            INVERSELIB::FiffSparseMatrix* cov_sparse)
+/*
+* Put it together from ingredients
+*/
+{
+    mneCovMatrix new_cov    = MALLOC_3(1,mneCovMatrixRec);
+    new_cov->kind           = kind;
+    new_cov->ncov           = ncov;
+    new_cov->nproj          = 0;
+    new_cov->nzero          = 0;
+    new_cov->names          = names;
+    new_cov->cov            = cov;
+    new_cov->cov_diag       = cov_diag;
+    new_cov->cov_sparse     = cov_sparse;
+    new_cov->eigen          = NULL;
+    new_cov->lambda         = NULL;
+    new_cov->chol           = NULL;
+    new_cov->inv_lambda     = NULL;
+    new_cov->nfree          = 1;
+    new_cov->ch_class       = NULL;
+    new_cov->proj           = NULL;
+    new_cov->sss            = NULL;
+    new_cov->bads           = NULL;
+    new_cov->nbad           = 0;
+    return new_cov;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+mneCovMatrix mne_new_cov_dense(int    kind,
+                               int    ncov,
+                               char   **names,
+                               double *cov)
+
+{
+    return new_cov_3(kind,ncov,names,cov,NULL,NULL);
+}
+
+
+mneCovMatrix mne_new_cov_diag(int    kind,
+                              int    ncov,
+                              char   **names,
+                              double *cov_diag)
+
+{
+    return new_cov_3(kind,ncov,names,NULL,cov_diag,NULL);
+}
+
+
+mneCovMatrix mne_new_cov_sparse(int             kind,
+                                int             ncov,
+                                char            **names,
+                                INVERSELIB::FiffSparseMatrix* cov_sparse)
+{
+    return new_cov_3(kind,ncov,names,NULL,NULL,cov_sparse);
+}
+
+
+
+
+
+
+
+
+
+mneCovMatrix mne_new_cov_3(int    kind,
+                         int    ncov,
+                         char   **names,
+                         double *cov,
+                         double *cov_diag)
+
+{
+    return new_cov_3(kind,ncov,names,cov,cov_diag,NULL);
+}
+
+
+
+static int mne_lt_packed_index_3(int j, int k)
+
+{
+    if (j >= k)
+        return k + j*(j+1)/2;
+    else
+        return j + k*(k+1)/2;
+}
+
+
+
+
+
+
+/*
+* Handle the linear projection operators
+*/
+mneProjOp mne_new_proj_op_3()
+
+{
+    mneProjOp new_proj_op = MALLOC_3(1,mneProjOpRec);
+
+    new_proj_op->items     = NULL;
+    new_proj_op->nitems    = 0;
+    new_proj_op->names     = NULL;
+    new_proj_op->nch       = 0;
+    new_proj_op->nvec      = 0;
+    new_proj_op->proj_data = NULL;
+    return new_proj_op;
+}
+
+
+
+mneProjItem mne_new_proj_op_item_3()
+
+{
+    mneProjItem new_proj_item = MALLOC_3(1,mneProjItemRec);
+
+    new_proj_item->vecs        = NULL;
+    new_proj_item->kind        = FIFFV_PROJ_ITEM_NONE;
+    new_proj_item->desc        = NULL;
+    new_proj_item->nvec        = 0;
+    new_proj_item->active      = TRUE;
+    new_proj_item->active_file = FALSE;
+    new_proj_item->has_meg     = FALSE;
+    new_proj_item->has_eeg     = FALSE;
+    return new_proj_item;
+}
+
+
+
+
+
+
+
+
+
+
+
+void mne_proj_op_add_item_act_3(mneProjOp op, MneNamedMatrix* vecs, int kind, const char *desc, int is_active)
+/*
+* Add a new item to an existing projection operator
+*/
+{
+    mneProjItem new_item;
+    int         k;
+
+    op->items = REALLOC_3(op->items,op->nitems+1,mneProjItem);
+
+    op->items[op->nitems] = new_item = mne_new_proj_op_item_3();
+
+    new_item->active      = is_active;
+    new_item->vecs        = new MneNamedMatrix(*vecs);
+
+    if (kind == FIFFV_MNE_PROJ_ITEM_EEG_AVREF) {
+        new_item->has_meg = FALSE;
+        new_item->has_eeg = TRUE;
+    }
+    else {
+        for (k = 0; k < vecs->ncol; k++) {
+            if (strstr(vecs->collist[k],"EEG") == vecs->collist[k])
+                new_item->has_eeg = TRUE;
+            if (strstr(vecs->collist[k],"MEG") == vecs->collist[k])
+                new_item->has_meg = TRUE;
+        }
+        if (!new_item->has_meg && !new_item->has_eeg) {
+            new_item->has_meg = TRUE;
+            new_item->has_eeg = FALSE;
+        }
+        else if (new_item->has_meg && new_item->has_eeg) {
+            new_item->has_meg = TRUE;
+            new_item->has_eeg = FALSE;
+        }
+    }
+    if (desc != NULL)
+        new_item->desc = mne_strdup_3(desc);
+    new_item->kind = kind;
+    new_item->nvec = new_item->vecs->nrow;
+
+    op->nitems++;
+
+    mne_free_proj_op_proj_3(op);  /* These data are not valid any more */
+    return;
+}
+
+
+void mne_proj_op_add_item_3(mneProjOp op, MneNamedMatrix* vecs, int kind, const char *desc)
+
+{
+    mne_proj_op_add_item_act_3(op, vecs, kind, desc, TRUE);
+}
+
+
+
+
+
+
+mneProjOp mne_dup_proj_op_3(mneProjOp op)
+/*
+* Provide a duplicate (item data only)
+*/
+{
+    mneProjOp dup = mne_new_proj_op_3();
+    mneProjItem it;
+    int k;
+
+    if (!op)
+        return NULL;
+
+    for (k = 0; k < op->nitems; k++) {
+        it = op->items[k];
+        mne_proj_op_add_item_act_3(dup,it->vecs,it->kind,it->desc,it->active);
+        dup->items[k]->active_file = it->active_file;
+    }
+    return dup;
+}
+
+
+
+
+
+
+
+
+mneCovMatrix mne_dup_cov_3(mneCovMatrix c)
+{
+    double       *vals;
+    int          nval;
+    int          k;
+    mneCovMatrix res;
+
+    if (c->cov_diag)
+        nval = c->ncov;
+    else
+        nval = (c->ncov*(c->ncov+1))/2;
+
+    vals = MALLOC_3(nval,double);
+    if (c->cov_diag) {
+        for (k = 0; k < nval; k++)
+            vals[k] = c->cov_diag[k];
+        res = mne_new_cov_3(c->kind,c->ncov,mne_dup_name_list_3(c->names,c->ncov),NULL,vals);
+    }
+    else {
+        for (k = 0; k < nval; k++)
+            vals[k] = c->cov[k];
+        res = mne_new_cov_3(c->kind,c->ncov,mne_dup_name_list_3(c->names,c->ncov),vals,NULL);
+    }
+    /*
+    * Duplicate additional items
+    */
+    if (c->ch_class) {
+        res->ch_class = MALLOC_3(c->ncov,int);
+        for (k = 0; k < c->ncov; k++)
+            res->ch_class[k] = c->ch_class[k];
+    }
+    res->bads = mne_dup_name_list_3(c->bads,c->nbad);
+    res->nbad = c->nbad;
+    res->proj = mne_dup_proj_op_3(c->proj);
+    res->sss  = new MneSssData(*(c->sss));
+
+    return res;
+}
+
+
+
+int mne_add_inv_cov_3(mneCovMatrix c)
+/*
+      * Calculate the inverse square roots for whitening
+      */
+{
+    double *src = c->lambda ? c->lambda : c->cov_diag;
+    int k;
+
+    if (src == NULL) {
+        qCritical("Covariance matrix is not diagonal or not decomposed.");
+        return FAIL;
+    }
+    c->inv_lambda = REALLOC_3(c->inv_lambda,c->ncov,double);
+    for (k = 0; k < c->ncov; k++) {
+        if (src[k] <= 0.0)
+            c->inv_lambda[k] = 0.0;
+        else
+            c->inv_lambda[k] = 1.0/sqrt(src[k]);
+    }
+    return OK;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+static int condition_cov_3(mneCovMatrix c, float rank_threshold, int use_rank)
+
+{
+    double *scale  = NULL;
+    double *cov    = NULL;
+    double *lambda = NULL;
+    float  **eigen = NULL;
+    double **data1 = NULL;
+    double **data2 = NULL;
+    double magscale,gradscale,eegscale;
+    int    nmag,ngrad,neeg,nok;
+    int    j,k;
+    int    res = FAIL;
+
+    if (c->cov_diag)
+        return OK;
+    if (!c->ch_class) {
+        qCritical("Channels not classified. Rank cannot be determined.");
+        return FAIL;
+    }
+    magscale = gradscale = eegscale = 0.0;
+    nmag = ngrad = neeg = 0;
+    for (k = 0; k < c->ncov; k++) {
+        if (c->ch_class[k] == MNE_COV_CH_MEG_MAG) {
+            magscale += c->cov[mne_lt_packed_index_3(k,k)]; nmag++;
+        }
+        else if (c->ch_class[k] == MNE_COV_CH_MEG_GRAD) {
+            gradscale += c->cov[mne_lt_packed_index_3(k,k)]; ngrad++;
+        }
+        else if (c->ch_class[k] == MNE_COV_CH_EEG) {
+            eegscale += c->cov[mne_lt_packed_index_3(k,k)]; neeg++;
+        }
+#ifdef DEBUG
+        fprintf(stdout,"%d ",c->ch_class[k]);
+#endif
+    }
+#ifdef DEBUG
+    fprintf(stdout,"\n");
+#endif
+    if (nmag > 0)
+        magscale = magscale > 0.0 ? sqrt(nmag/magscale) : 0.0;
+    if (ngrad > 0)
+        gradscale = gradscale > 0.0 ? sqrt(ngrad/gradscale) : 0.0;
+    if (neeg > 0)
+        eegscale = eegscale > 0.0 ? sqrt(neeg/eegscale) : 0.0;
+#ifdef DEBUG
+    fprintf(stdout,"%d %g\n",nmag,magscale);
+    fprintf(stdout,"%d %g\n",ngrad,gradscale);
+    fprintf(stdout,"%d %g\n",neeg,eegscale);
+#endif
+    scale = MALLOC_3(c->ncov,double);
+    for (k = 0; k < c->ncov; k++) {
+        if (c->ch_class[k] == MNE_COV_CH_MEG_MAG)
+            scale[k] = magscale;
+        else if (c->ch_class[k] == MNE_COV_CH_MEG_GRAD)
+            scale[k] = gradscale;
+        else if (c->ch_class[k] == MNE_COV_CH_EEG)
+            scale[k] = eegscale;
+        else
+            scale[k] = 1.0;
+    }
+    cov    = MALLOC_3(c->ncov*(c->ncov+1)/2.0,double);
+    lambda = MALLOC_3(c->ncov,double);
+    eigen  = ALLOC_CMATRIX_3(c->ncov,c->ncov);
+    for (j = 0; j < c->ncov; j++)
+        for (k = 0; k <= j; k++)
+            cov[mne_lt_packed_index_3(j,k)] = c->cov[mne_lt_packed_index_3(j,k)]*scale[j]*scale[k];
+    if (mne_decompose_eigen_3(cov,lambda,eigen,c->ncov) == 0) {
+#ifdef DEBUG
+        for (k = 0; k < c->ncov; k++)
+            fprintf(stdout,"%g ",lambda[k]/lambda[c->ncov-1]);
+        fprintf(stdout,"\n");
+#endif
+        nok = 0;
+        for (k = c->ncov-1; k >= 0; k--) {
+            if (lambda[k] >= rank_threshold*lambda[c->ncov-1])
+                nok++;
+            else
+                break;
+        }
+        printf("\n\tEstimated covariance matrix rank = %d (%g)\n",nok,lambda[c->ncov-nok]/lambda[c->ncov-1]);
+        if (use_rank > 0 && use_rank < nok) {
+            nok = use_rank;
+            fprintf(stderr,"\tUser-selected covariance matrix rank = %d (%g)\n",nok,lambda[c->ncov-nok]/lambda[c->ncov-1]);
+        }
+        /*
+     * Put it back together
+     */
+        for (j = 0; j < c->ncov-nok; j++)
+            lambda[j] = 0.0;
+        data1 = ALLOC_DCMATRIX_3(c->ncov,c->ncov);
+        for (j = 0; j < c->ncov; j++) {
+#ifdef DEBUG
+            mne_print_vector(stdout,NULL,eigen[j],c->ncov);
+#endif
+            for (k = 0; k < c->ncov; k++)
+                data1[j][k] = sqrt(lambda[j])*eigen[j][k];
+        }
+        data2 = mne_dmatt_dmat_mult2_3(data1,data1,c->ncov,c->ncov,c->ncov);
+#ifdef DEBUG
+        printf(">>>\n");
+        for (j = 0; j < c->ncov; j++)
+            mne_print_dvector(stdout,NULL,data2[j],c->ncov);
+        printf(">>>\n");
+#endif
+        /*
+     * Scale back
+     */
+        for (k = 0; k < c->ncov; k++)
+            if (scale[k] > 0.0)
+                scale[k] = 1.0/scale[k];
+        for (j = 0; j < c->ncov; j++)
+            for (k = 0; k <= j; k++)
+                if (c->cov[mne_lt_packed_index_3(j,k)] != 0.0)
+                    c->cov[mne_lt_packed_index_3(j,k)] = scale[j]*scale[k]*data2[j][k];
+        res = nok;
+    }
+    FREE_3(cov);
+    FREE_3(lambda);
+    FREE_CMATRIX_3(eigen);
+    FREE_DCMATRIX_3(data1);
+    FREE_DCMATRIX_3(data2);
+    return res;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+static int check_cov_data(double *vals, int nval)
+
+{
+    int    k;
+    double sum;
+
+    for (k = 0, sum = 0.0; k < nval; k++)
+        sum += vals[k];
+    if (sum == 0.0) {
+        qCritical("Sum of covariance matrix elements is zero!");
+        return FAIL;
+    }
+    return OK;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+int mne_classify_channels_cov(mneCovMatrix cov, fiffChInfo chs, int nchan)
+/*
+ * Assign channel classes in a covariance matrix with help of channel infos
+ */
+{
+    int k,p;
+    fiffChInfo ch;
+
+    if (!chs) {
+        qCritical("Channel information not available in mne_classify_channels_cov");
+        goto bad;
+    }
+    cov->ch_class = REALLOC_3(cov->ch_class,cov->ncov,int);
+    for (k = 0; k < cov->ncov; k++) {
+        cov->ch_class[k] = MNE_COV_CH_UNKNOWN;
+        for (p = 0, ch = NULL; p < nchan; p++) {
+            if (strcmp(chs[p].ch_name,cov->names[k]) == 0) {
+                ch = chs+p;
+                if (ch->kind == FIFFV_MEG_CH) {
+                    if (ch->unit == FIFF_UNIT_T)
+                        cov->ch_class[k] = MNE_COV_CH_MEG_MAG;
+                    else
+                        cov->ch_class[k] = MNE_COV_CH_MEG_GRAD;
+                }
+                else if (ch->kind == FIFFV_EEG_CH)
+                    cov->ch_class[k] = MNE_COV_CH_EEG;
+                break;
+            }
+        }
+        if (!ch) {
+            printf("Could not find channel info for channel %s in mne_classify_channels_cov",cov->names[k]);
+            goto bad;
+        }
+    }
+    return OK;
+
+bad : {
+        FREE_3(cov->ch_class);
+        cov->ch_class = NULL;
+        return FAIL;
+    }
+}
+
+
+
+
+
+
+
+static int mne_decompose_eigen_cov_small_3(mneCovMatrix c,float small, int use_rank)
+/*
+      * Do the eigenvalue decomposition
+      */
+{
+    int   np,k,p,rank;
+    float rank_threshold = 1e-6;
+
+    if (small < 0)
+        small = 1.0;
+
+    if (!c)
+        return OK;
+    if (c->cov_diag)
+        return mne_add_inv_cov_3(c);
+    if (c->lambda && c->eigen) {
+        fprintf(stderr,"\n\tEigenvalue decomposition had been precomputed.\n");
+        c->nzero = 0;
+        for (k = 0; k < c->ncov; k++, c->nzero++)
+            if (c->lambda[k] > 0)
+                break;
+    }
+    else {
+        FREE_3(c->lambda); c->lambda = NULL;
+        FREE_CMATRIX_3(c->eigen); c->eigen = NULL;
+
+        if ((rank = condition_cov_3(c,rank_threshold,use_rank)) < 0)
+            return FAIL;
+
+        np = c->ncov*(c->ncov+1)/2;
+        c->lambda = MALLOC_3(c->ncov,double);
+        c->eigen  = ALLOC_CMATRIX_3(c->ncov,c->ncov);
+        if (mne_decompose_eigen_3(c->cov,c->lambda,c->eigen,c->ncov) != 0)
+            goto bad;
+        c->nzero = c->ncov - rank;
+        for (k = 0; k < c->nzero; k++)
+            c->lambda[k] = 0.0;
+        /*
+     * Find which eigenvectors correspond to EEG/MEG
+     */
+        {
+            float meglike,eeglike;
+            int   nmeg,neeg;
+
+            nmeg = neeg = 0;
+            for (k = c->nzero; k < c->ncov; k++) {
+                meglike = eeglike = 0.0;
+                for (p = 0; p < c->ncov; p++)  {
+                    if (c->ch_class[p] == MNE_COV_CH_EEG)
+                        eeglike += fabs(c->eigen[k][p]);
+                    else if (c->ch_class[p] == MNE_COV_CH_MEG_MAG || c->ch_class[p] == MNE_COV_CH_MEG_GRAD)
+                        meglike += fabs(c->eigen[k][p]);
+                }
+                if (meglike > eeglike)
+                    nmeg++;
+                else
+                    neeg++;
+            }
+            printf("\t%d MEG and %d EEG-like channels remain in the whitened data\n",nmeg,neeg);
+        }
+    }
+    return mne_add_inv_cov_3(c);
+
+bad : {
+        FREE_3(c->lambda); c->lambda = NULL;
+        FREE_CMATRIX_3(c->eigen); c->eigen = NULL;
+        return FAIL;
+    }
+}
+
+
+int mne_decompose_eigen_cov_3(mneCovMatrix c)
+
+{
+    return mne_decompose_eigen_cov_small_3(c,-1.0,-1);
+}
+
+
+
+
 
 
 //============================= mne_whiten.c =============================
@@ -800,38 +1924,6 @@ static void free_dipole_fit_funcs(dipoleFitFuncs f)
 
 
 
-//============================= mne_cov_matrix.c =============================
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-static int mne_lt_packed_index_3(int j, int k)
-
-{
-    if (j >= k)
-        return k + j*(j+1)/2;
-    else
-        return j + k*(k+1)/2;
-}
-
-
-
 
 
 //static void regularize_cov(mneCovMatrix c,       /* The matrix to regularize */
@@ -859,7 +1951,7 @@ static int mne_lt_packed_index_3(int j, int k)
 //    for (j = 0; j < c->ncov; j++) {
 //        if (c->ch_class[j] >= 0) {
 //            if (!active || active[j]) {
-//                sums[c->ch_class[j]] += c->cov[mne_lt_packed_index(j,j)];
+//                sums[c->ch_class[j]] += c->cov[mne_lt_packed_index_3(j,j)];
 //                nn[c->ch_class[j]]++;
 //            }
 //        }
@@ -882,7 +1974,7 @@ static int mne_lt_packed_index_3(int j, int k)
 //   */
 //    for (j = 0; j < c->ncov; j++)
 //        if (c->ch_class[j] >= 0)
-//            c->cov[mne_lt_packed_index(j,j)] += sums[c->ch_class[j]];
+//            c->cov[mne_lt_packed_index_3(j,j)] += sums[c->ch_class[j]];
 
 //    printf("Noise-covariance regularized as requested.\n");
 //    return;
@@ -962,32 +2054,6 @@ static dipoleFitFuncs new_dipole_fit_funcs()
 
     return f;
 }
-
-
-
-
-
-
-//============================= misc_util.c =============================
-
-char *mne_strdup_3(const char *s)
-{
-    char *res;
-    if (s == NULL)
-        return NULL;
-    res = (char*) malloc(strlen(s)+1);
-    strcpy(res,s);
-    return res;
-}
-
-
-
-
-
-
-
-
-
 
 
 
@@ -1111,7 +2177,35 @@ void fwd_bem_free_solution_3(fwdBemModel m)
 
 
 
-void fwd_bem_free_model_3(fwdBemModel m)
+void fwd_bem_free_coil_solution(void *user)
+
+{
+    fwdBemSolution sol = (fwdBemSolution)user;
+
+    if (!sol)
+        return;
+    FREE_CMATRIX_3(sol->solution);
+    FREE_3(sol);
+    return;
+}
+
+fwdBemSolution fwd_bem_new_coil_solution()
+
+{
+    fwdBemSolution sol = MALLOC_3(1,fwdBemSolutionRec);
+
+    sol->solution = NULL;
+    sol->ncoil    = 0;
+    sol->np       = 0;
+
+    return sol;
+}
+
+
+
+
+
+void fwd_bem_free_model(fwdBemModel m)
 
 {
     int k;
@@ -1771,22 +2865,22 @@ static void lin_pot_coeff (float  *from,	/* Origin */
    *
    * omega1 + omega2 + omega3 = solid
    */
-    rel1 = (solid + omega[X]+omega[Y]+omega[Z])/solid;
+    rel1 = (solid + omega[X_3]+omega[Y_3]+omega[Z_3])/solid;
     /*
    * The other way of evaluating...
    */
     for (j = 0; j < 3; j++)
         check[j] = 0;
     for (k = 0; k < 3; k++) {
-        CROSS_PRODUCT (to->nn[to],yy[k],z);
+        CROSS_PRODUCT_3(to->nn[to],yy[k],z);
         for (j = 0; j < 3; j++)
             check[j] = check[j] + omega[k]*z[j];
     }
     for (j = 0; j < 3; j++)
         check[j] = -area2*check[j]/triple;
     fprintf (stderr,"(%g,%g,%g) =? (%g,%g,%g)\n",
-             check[X],check[Y],check[Z],
-             vec_omega[X],vec_omega[Y],vec_omega[Z]);
+             check[X_3],check[Y_3],check[Z_3],
+             vec_omega[X_3],vec_omega[Y_3],vec_omega[Z_3]);
     for (j = 0; j < 3; j++)
         check[j] = check[j] - vec_omega[j];
     rel2 = sqrt(VEC_DOT_3(check,check)/VEC_DOT_3(vec_omega,vec_omega));
@@ -2402,6 +3496,280 @@ int mne_simplex_minimize(float **p,		                              /* The initia
 
 
 
+
+
+
+
+
+//============================= mne_project_to_surface.c =============================
+
+
+typedef struct {
+    float *a;
+    float *b;
+    float *c;
+    int   *act;
+    int   nactive;
+} *projData,projDataRec;
+
+
+
+
+void mne_triangle_coords(float       *r,       /* Location of a point */
+                         MneSurfaceOrVolume::MneCSurface*  s,	       /* The surface */
+                         int         tri,      /* Which triangle */
+                         float       *x,       /* Coordinates of the point on the triangle */
+                         float       *y,
+                         float       *z)
+/*
+      * Compute the coordinates of a point within a triangle
+      */
+{
+    double rr[3];			/* Vector from triangle corner #1 to r */
+    double a,b,c,v1,v2,det;
+    mneTriangle this_tri;
+
+    this_tri = s->tris+tri;
+
+    VEC_DIFF_3(this_tri->r1,r,rr);
+    *z = VEC_DOT_3(rr,this_tri->nn);
+
+    a =  VEC_DOT_3(this_tri->r12,this_tri->r12);
+    b =  VEC_DOT_3(this_tri->r13,this_tri->r13);
+    c =  VEC_DOT_3(this_tri->r12,this_tri->r13);
+
+    v1 = VEC_DOT_3(rr,this_tri->r12);
+    v2 = VEC_DOT_3(rr,this_tri->r13);
+
+    det = a*b - c*c;
+
+    *x = (b*v1 - c*v2)/det;
+    *y = (a*v2 - c*v1)/det;
+
+    return;
+}
+
+
+
+
+
+//============================= mne_project_to_surface.c =============================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+static int nearest_triangle_point(float       *r,    /* Location of a point */
+                                  MneSurfaceOrVolume::MneCSurface*  s,     /* The surface */
+                                  void        *user, /* Something precomputed */
+                                  int         tri,   /* Which triangle */
+                                  float       *x,    /* Coordinates of the point on the triangle */
+                                  float       *y,
+                                  float       *z)
+/*
+      * Find the nearest point from a triangle
+      */
+{
+
+    double p,q,p0,q0,t0;
+    double rr[3];			/* Vector from triangle corner #1 to r */
+    double a,b,c,v1,v2,det;
+    double best,dist,dist0;
+    projData    pd = (projData)user;
+    mneTriangle this_tri;
+
+    this_tri = s->tris+tri;
+    VEC_DIFF_3(this_tri->r1,r,rr);
+    dist  = VEC_DOT_3(rr,this_tri->nn);
+
+    if (pd) {
+        if (!pd->act[tri])
+            return FALSE;
+        a = pd->a[tri];
+        b = pd->b[tri];
+        c = pd->c[tri];
+    }
+    else {
+        a =  VEC_DOT_3(this_tri->r12,this_tri->r12);
+        b =  VEC_DOT_3(this_tri->r13,this_tri->r13);
+        c =  VEC_DOT_3(this_tri->r12,this_tri->r13);
+    }
+
+    v1 = VEC_DOT_3(rr,this_tri->r12);
+    v2 = VEC_DOT_3(rr,this_tri->r13);
+
+    det = a*b - c*c;
+
+    p = (b*v1 - c*v2)/det;
+    q = (a*v2 - c*v1)/det;
+    /*
+   * If the point projects into the triangle we are done
+   */
+    if (p >= 0.0 && p <= 1.0 &&
+            q >= 0.0 && q <= 1.0 &&
+            q <= 1.0 - p) {
+        *x = p;
+        *y = q;
+        *z = dist;
+        return TRUE;
+    }
+    /*
+   * Tough: must investigate the sides
+   * We might do something intelligent here. However, for now it is ok
+   * to do it in the hard way
+   */
+    /*
+   * Side 1 -> 2
+   */
+    p0 = p + 0.5*(q * c)/a;
+    if (p0 < 0.0)
+        p0 = 0.0;
+    else if (p0 > 1.0)
+        p0 = 1.0;
+    q0 = 0.0;
+    dist0 = sqrt((p-p0)*(p-p0)*a +
+                 (q-q0)*(q-q0)*b +
+                 (p-p0)*(q-q0)*c +
+                 dist*dist);
+    best = dist0;
+    *x = p0;
+    *y = q0;
+    *z = dist0;
+    /*
+   * Side 2 -> 3
+   */
+    t0 = 0.5*((2.0*a-c)*(1.0-p) + (2.0*b-c)*q)/(a+b-c);
+    if (t0 < 0.0)
+        t0 = 0.0;
+    else if (t0 > 1.0)
+        t0 = 1.0;
+    p0 = 1.0 - t0;
+    q0 = t0;
+    dist0 = sqrt((p-p0)*(p-p0)*a +
+                 (q-q0)*(q-q0)*b +
+                 (p-p0)*(q-q0)*c +
+                 dist*dist);
+    if (dist0 < best) {
+        best = dist0;
+        *x = p0;
+        *y = q0;
+        *z = dist0;
+    }
+    /*
+   * Side 1 -> 3
+   */
+    p0 = 0.0;
+    q0 = q + 0.5*(p * c)/b;
+    if (q0 < 0.0)
+        q0 = 0.0;
+    else if (q0 > 1.0)
+        q0 = 1.0;
+    dist0 = sqrt((p-p0)*(p-p0)*a +
+                 (q-q0)*(q-q0)*b +
+                 (p-p0)*(q-q0)*c +
+                 dist*dist);
+    if (dist0 < best) {
+        best = dist0;
+        *x = p0;
+        *y = q0;
+        *z = dist0;
+    }
+    return TRUE;
+}
+
+static void project_to_triangle(MneSurfaceOrVolume::MneCSurface* s,
+                                int        tri,
+                                float      p,
+                                float      q,
+                                float      *r)
+
+{
+    int   k;
+    mneTriangle this_tri;
+
+    this_tri = s->tris+tri;
+
+    for (k = 0; k < 3; k++)
+        r[k] = this_tri->r1[k] + p*this_tri->r12[k] + q*this_tri->r13[k];
+
+    return;
+}
+
+int mne_nearest_triangle_point(float       *r,    /* Location of a point */
+                               MneSurfaceOrVolume::MneCSurface*  s,     /* The surface */
+                               int         tri,   /* Which triangle */
+                               float       *x,    /* Coordinates of the point on the triangle */
+                               float       *y,
+                               float       *z)
+/*
+ * This is for external use
+ */
+{
+    return nearest_triangle_point(r,s,NULL,tri,x,y,z);
+}
+
+
+
+
+
+int mne_project_to_surface(MneSurfaceOrVolume::MneCSurface* s, void *proj_data, float *r, int project_it, float *distp)
+/*
+      * Project the point onto the closest point on the surface
+      */
+{
+    float dist;			/* Distance to the triangle */
+    float p,q;			/* Coordinates on the triangle */
+    float p0,q0,dist0;
+    int   best;
+    int   k;
+
+    p0 = q0 = 0.0;
+    dist0 = 0.0;
+    for (best = -1, k = 0; k < s->ntri; k++) {
+        if (nearest_triangle_point(r,s,proj_data,k,&p,&q,&dist)) {
+            if (best < 0 || fabs(dist) < fabs(dist0)) {
+                dist0 = dist;
+                best = k;
+                p0 = p;
+                q0 = q;
+            }
+        }
+    }
+    if (best >= 0 && project_it)
+        project_to_triangle(s,best,p0,q0,r);
+    if (distp)
+        *distp = dist0;
+    return best;
+}
+
+
+
+
+
+
+
+
 //============================= fit_sphere.c =============================
 
 
@@ -2593,6 +3961,4347 @@ out : {
 
 
 
+//============================= fwd_bem_pot.c =============================
+
+static float fwd_bem_inf_field(float *rd,      /* Dipole position */
+                               float *Q,       /* Dipole moment */
+                               float *rp,      /* Field point */
+                               float *dir)     /* Which field component */
+/*
+ * Infinite-medium magnetic field
+ * (without \mu_0/4\pi)
+ */
+{
+    float diff[3],diff2,cross[3];
+
+    VEC_DIFF_3(rd,rp,diff);
+    diff2 = VEC_DOT_3(diff,diff);
+    CROSS_PRODUCT_3(Q,diff,cross);
+
+    return (VEC_DOT_3(cross,dir)/(diff2*sqrt(diff2)));
+}
+
+
+float fwd_bem_inf_pot (float *rd,	/* Dipole position */
+                       float *Q,	/* Dipole moment */
+                       float *rp)	/* Potential point */
+/*
+ * The infinite medium potential
+ */
+{
+    float diff[3];
+    float diff2;
+    VEC_DIFF_3(rd,rp,diff);
+    diff2 = VEC_DOT_3(diff,diff);
+    return (VEC_DOT_3(Q,diff)/(4.0*M_PI*diff2*sqrt(diff2)));
+}
+
+
+
+
+int fwd_bem_specify_els(fwdBemModel m,
+                        FwdCoilSet*  els)
+/*
+ * Set up for computing the solution at a set of electrodes
+ */
+{
+    FwdCoil*     el;
+    MneSurfaceOrVolume::MneCSurface*  scalp;
+    int         k,p,q,v;
+    float       *one_sol,*pick_sol;
+    float       r[3],w[3],dist;
+    int         best;
+    mneTriangle tri;
+    float       x,y,z;
+    fwdBemSolution sol;
+
+    extern fwdBemSolution fwd_bem_new_coil_solution();
+    extern void fwd_bem_free_coil_solution(void *user);
+
+    if (!m) {
+        printf("Model missing in fwd_bem_specify_els");
+        goto bad;
+    }
+    if (!m->solution) {
+        printf("Solution not computed in fwd_bem_specify_els");
+        goto bad;
+    }
+    if (!els || els->ncoil == 0)
+        return OK;
+    els->fwd_free_coil_set_user_data();
+    /*
+   * Hard work follows
+   */
+    els->user_data = sol = fwd_bem_new_coil_solution();
+    els->user_data_free = fwd_bem_free_coil_solution;
+
+    sol->ncoil = els->ncoil;
+    sol->np    = m->nsol;
+    sol->solution  = ALLOC_CMATRIX_3(sol->ncoil,sol->np);
+    /*
+   * Go through all coils
+   */
+    for (k = 0; k < els->ncoil; k++) {
+        el = els->coils[k];
+        one_sol = sol->solution[k];
+        for (q = 0; q < m->nsol; q++)
+            one_sol[q] = 0.0;
+        scalp = m->surfs[0];
+        /*
+     * Go through all 'integration points'
+     */
+        for (p = 0; p < el->np; p++) {
+            VEC_COPY_3(r,el->rmag[p]);
+            if (m->head_mri_t != NULL)
+                FiffCoordTransOld::fiff_coord_trans(r,m->head_mri_t,FIFFV_MOVE);
+            best = mne_project_to_surface(scalp,NULL,r,FALSE,&dist);
+            if (best < 0) {
+                printf("One of the electrodes could not be projected onto the scalp surface. How come?");
+                goto bad;
+            }
+            if (m->bem_method == FWD_BEM_CONSTANT_COLL) {
+                /*
+         * Simply pick the value at the triangle
+         */
+                pick_sol = m->solution[best];
+                for (q = 0; q < m->nsol; q++)
+                    one_sol[q] += el->w[p]*pick_sol[q];
+            }
+            else if (m->bem_method == FWD_BEM_LINEAR_COLL) {
+                /*
+         * Calculate a linear interpolation between the vertex values
+         */
+                tri = scalp->tris+best;
+                mne_triangle_coords(r,scalp,best,&x,&y,&z);
+
+                w[X_3] = el->w[p]*(1.0 - x - y);
+                w[Y_3] = el->w[p]*x;
+                w[Z_3] = el->w[p]*y;
+                for (v = 0; v < 3; v++) {
+                    pick_sol = m->solution[tri->vert[v]];
+                    for (q = 0; q < m->nsol; q++)
+                        one_sol[q] += w[v]*pick_sol[q];
+                }
+            }
+            else {
+                printf("Unknown BEM approximation method : %d\n",m->bem_method);
+                goto bad;
+            }
+        }
+    }
+    return OK;
+
+bad : {
+        els->fwd_free_coil_set_user_data();
+        return FAIL;
+    }
+}
+
+
+
+
+static void fwd_bem_lin_pot_calc (float       *rd,		/* Dipole position */
+                                  float       *Q,		/* Dipole orientation */
+                                  fwdBemModel m,		/* The model */
+                                  FwdCoilSet*  els,              /* Use this electrode set if available */
+                                  int         all_surfs,	/* Compute on all surfaces? */
+                                  float      *pot)              /* Put the result here */
+/*
+      * Compute the potentials due to a current dipole
+      * using the linear potential approximation
+      */
+{
+    float **rr;
+    int   np;
+    int   s,k,p,nsol;
+    float mult,mri_rd[3],mri_Q[3];
+
+    float *v0;
+    float **solution;
+
+    if (!m->v0)
+        m->v0 = MALLOC_3(m->nsol,float);
+    v0 = m->v0;
+
+    VEC_COPY_3(mri_rd,rd);
+    VEC_COPY_3(mri_Q,Q);
+    if (m->head_mri_t) {
+        FiffCoordTransOld::fiff_coord_trans(mri_rd,m->head_mri_t,FIFFV_MOVE);
+        FiffCoordTransOld::fiff_coord_trans(mri_Q,m->head_mri_t,FIFFV_NO_MOVE);
+    }
+    for (s = 0, p = 0; s < m->nsurf; s++) {
+        np     = m->surfs[s]->np;
+        rr     = m->surfs[s]->rr;
+        mult   = m->source_mult[s];
+        for (k = 0; k < np; k++)
+            v0[p++] = mult*fwd_bem_inf_pot(mri_rd,mri_Q,rr[k]);
+    }
+    if (els) {
+        fwdBemSolution sol = (fwdBemSolution)els->user_data;
+        solution = sol->solution;
+        nsol     = sol->ncoil;
+    }
+    else {
+        solution = m->solution;
+        nsol     = all_surfs ? m->nsol : m->surfs[0]->np;
+    }
+    for (k = 0; k < nsol; k++)
+        pot[k] = mne_dot_vectors_3(solution[k],v0,m->nsol);
+    return;
+}
+
+
+
+static void fwd_bem_pot_calc (float       *rd,	     /* Dipole position */
+                              float       *Q,        /* Dipole orientation */
+                              fwdBemModel m,	     /* The model */
+                              FwdCoilSet*  els,       /* Use this electrode set if available */
+                              int         all_surfs, /* Compute solution on all surfaces? */
+                              float       *pot)
+/*
+      * Compute the potentials due to a current dipole
+      */
+{
+    mneTriangle tri;
+    int         ntri;
+    int         s,k,p,nsol;
+    float       mult;
+    float       *v0;
+    float       **solution;
+    float       mri_rd[3],mri_Q[3];
+
+    if (!m->v0)
+        m->v0 = MALLOC_3(m->nsol,float);
+    v0 = m->v0;
+
+    VEC_COPY_3(mri_rd,rd);
+    VEC_COPY_3(mri_Q,Q);
+    if (m->head_mri_t) {
+        FiffCoordTransOld::fiff_coord_trans(mri_rd,m->head_mri_t,FIFFV_MOVE);
+        FiffCoordTransOld::fiff_coord_trans(mri_Q,m->head_mri_t,FIFFV_NO_MOVE);
+    }
+    for (s = 0, p = 0; s < m->nsurf; s++) {
+        ntri = m->surfs[s]->ntri;
+        tri  = m->surfs[s]->tris;
+        mult = m->source_mult[s];
+        for (k = 0; k < ntri; k++, tri++)
+            v0[p++] = mult*fwd_bem_inf_pot(mri_rd,mri_Q,tri->cent);
+    }
+    if (els) {
+        fwdBemSolution sol = (fwdBemSolution)els->user_data;
+        solution = sol->solution;
+        nsol     = sol->ncoil;
+    }
+    else {
+        solution = m->solution;
+        nsol     = all_surfs ? m->nsol : m->surfs[0]->ntri;
+    }
+    for (k = 0; k < nsol; k++)
+        pot[k] = mne_dot_vectors_3(solution[k],v0,m->nsol);
+    return;
+}
+
+
+int fwd_bem_pot_els (float       *rd,	  /* Dipole position */
+                     float       *Q,	  /* Dipole orientation */
+                     FwdCoilSet*  els,     /* Electrode descriptors */
+                     float       *pot,    /* Result */
+                     void        *client) /* The model */
+/*
+ * This version calculates the potential on all surfaces
+ */
+{
+    fwdBemModel    m = (fwdBemModel)client;
+    fwdBemSolution sol = (fwdBemSolution)els->user_data;
+
+    if (!m) {
+        printf("No BEM model specified to fwd_bem_pot_els");
+        return FAIL;
+    }
+    if (!m->solution) {
+        printf("No solution available for fwd_bem_pot_els");
+        return FAIL;
+    }
+    if (!sol || sol->ncoil != els->ncoil) {
+        printf("No appropriate electrode-specific data available in fwd_bem_pot_coils");
+        return FAIL;
+    }
+    if (m->bem_method == FWD_BEM_CONSTANT_COLL)
+        fwd_bem_pot_calc(rd,Q,m,els,FALSE,pot);
+    else if (m->bem_method == FWD_BEM_LINEAR_COLL)
+        fwd_bem_lin_pot_calc(rd,Q,m,els,FALSE,pot);
+    else {
+        printf("Unknown BEM method : %d",m->bem_method);
+        return FAIL;
+    }
+    return OK;
+}
+
+
+
+
+
+
+
+
+//============================= fwd_bem_field.c =============================
+
+
+/*
+ * These are some of the integration formulas listed in
+ *
+ * L. Urankar, Common compact analytical formulas for computation of
+ * geometry integrals on a basic Cartesian sub-domain in boundary and
+ * volume integral methods, Engineering Analysis with Boundary Elements,
+ * 7 (3), 1990, 124 - 129.
+ *
+ */
+#define ARSINH(x) log((x) + sqrt(1.0+(x)*(x)))
+
+
+static void calc_f (double *xx,
+                    double *yy,		/* Corner coordinates */
+                    double *f0,
+                    double *fx,
+                    double *fy)	        /* The weights in the linear approximation */
+
+{
+    double det = -xx[Y_3]*yy[X_3] + xx[Z_3]*yy[X_3] +
+            xx[X_3]*yy[Y_3] - xx[Z_3]*yy[Y_3] - xx[X_3]*yy[Z_3] + xx[Y_3]*yy[Z_3];
+    int k;
+
+    f0[X_3] = -xx[Z_3]*yy[Y_3] + xx[Y_3]*yy[Z_3];
+    f0[Y_3] = xx[Z_3]*yy[X_3] - xx[X_3]*yy[Z_3];
+    f0[Z_3] = -xx[Y_3]*yy[X_3] + xx[X_3]*yy[Y_3];
+
+    fx[X_3] =  yy[Y_3] - yy[Z_3];
+    fx[Y_3] = -yy[X_3] + yy[Z_3];
+    fx[Z_3] = yy[X_3] - yy[Y_3];
+
+    fy[X_3] = -xx[Y_3] + xx[Z_3];
+    fy[Y_3] = xx[X_3] - xx[Z_3];
+    fy[Z_3] = -xx[X_3] + xx[Y_3];
+
+    for (k = 0; k < 3; k++) {
+        f0[k] = f0[k]/det;
+        fx[k] = fx[k]/det;
+        fy[k] = fy[k]/det;
+    }
+}
+
+
+
+static void calc_magic (double u,double z,
+                        double A,
+                        double B,
+                        double *beta,
+                        double *D)
+/*
+      * Calculate Urankar's magic numbers
+      */
+{
+    double B2 = 1.0 + B*B;
+    double ABu = A + B*u;
+    *D = sqrt(u*u + z*z + ABu*ABu);
+    beta[0] = ABu/sqrt(u*u + z*z);
+    beta[1] = (A*B + B2*u)/sqrt(A*A + B2*z*z);
+    beta[2] = (B*z*z - A*u)/(z*(*D));
+}
+
+
+static void field_integrals (float *from,
+                             mneTriangle to,
+                             double *I1p,
+                             double *T,double *S1,double *S2,
+                             double *f0,double *fx,double *fy)
+
+{
+    double y1[3],y2[3],y3[3];
+    double xx[4],yy[4];
+    double A,B,z,dx;
+    double beta[3],I1,Tx,Ty,Txx,Tyy,Sxx,mult;
+    double S1x,S1y,S2x,S2y;
+    double D1,B2;
+    int k;
+    /*
+   * Preliminaries...
+   *
+   * 1. Move origin to viewpoint...
+   *
+   */
+    VEC_DIFF_3(from,to->r1,y1);
+    VEC_DIFF_3(from,to->r2,y2);
+    VEC_DIFF_3(from,to->r3,y3);
+    /*
+   * 2. Calculate local xy coordinates...
+   */
+    xx[0] = VEC_DOT_3(y1,to->ex);
+    xx[1] = VEC_DOT_3(y2,to->ex);
+    xx[2] = VEC_DOT_3(y3,to->ex);
+    xx[3] = xx[0];
+
+    yy[0] = VEC_DOT_3(y1,to->ey);
+    yy[1] = VEC_DOT_3(y2,to->ey);
+    yy[2] = VEC_DOT_3(y3,to->ey);
+    yy[3] = yy[0];
+
+    calc_f (xx,yy,f0,fx,fy);
+    /*
+   * 3. Distance of the plane from origin...
+   */
+    z = VEC_DOT_3(y1,to->nn);
+    /*
+   * Put together the line integral...
+   * We use the convention where the local y-axis
+   * is parallel to the last side and, therefore, dx = 0
+   * on that side. We can thus omit the last side from this
+   * computation in some cases.
+   */
+    I1 = 0.0;
+    Tx = 0.0;
+    Ty = 0.0;
+    S1x = 0.0;
+    S1y = 0.0;
+    S2x = 0.0;
+    S2y = 0.0;
+    for (k = 0; k < 2; k++) {
+        dx = xx[k+1] - xx[k];
+        A = (yy[k]*xx[k+1] - yy[k+1]*xx[k])/dx;
+        B = (yy[k+1]-yy[k])/dx;
+        B2 = (1.0 + B*B);
+        /*
+     * Upper limit
+     */
+        calc_magic (xx[k+1],z,A,B,beta,&D1);
+        I1 = I1 - xx[k+1]*ARSINH(beta[0]) - (A/sqrt(1.0+B*B))*ARSINH(beta[1])
+                - z*atan(beta[2]);
+        Txx = ARSINH(beta[1])/sqrt(B2);
+        Tx = Tx + Txx;
+        Ty = Ty + B*Txx;
+        Sxx = (D1 - A*B*Txx)/B2;
+        S1x = S1x + Sxx;
+        S1y = S1y + B*Sxx;
+        Sxx = (B*D1 + A*Txx)/B2;
+        S2x = S2x + Sxx;
+        /*
+     * Lower limit
+     */
+        calc_magic (xx[k],z,A,B,beta,&D1);
+        I1 = I1 + xx[k]*ARSINH(beta[0]) + (A/sqrt(1.0+B*B))*ARSINH(beta[1])
+                + z*atan(beta[2]);
+        Txx = ARSINH(beta[1])/sqrt(B2);
+        Tx = Tx - Txx;
+        Ty = Ty - B*Txx;
+        Sxx = (D1 - A*B*Txx)/B2;
+        S1x = S1x - Sxx;
+        S1y = S1y - B*Sxx;
+        Sxx = (B*D1 + A*Txx)/B2;
+        S2x = S2x - Sxx;
+    }
+    /*
+   * Handle last side (dx = 0) in a special way;
+   */
+    mult = 1.0/sqrt(xx[k]*xx[k]+z*z);
+    /*
+   * Upper...
+   */
+    Tyy = ARSINH(mult*yy[k+1]);
+    Ty = Ty + Tyy;
+    S1y = S1y + xx[k]*Tyy;
+    /*
+   * Lower...
+   */
+    Tyy = ARSINH(mult*yy[k]);
+    Ty = Ty - Tyy;
+    S1y = S1y - xx[k]*Tyy;
+    /*
+   * Set return values
+   */
+    *I1p = I1;
+    T[X_3] = Tx;
+    T[Y_3] = Ty;
+    S1[X_3] = S1x;
+    S1[Y_3] = S1y;
+    S2[X_3] = S2x;
+    S2[Y_3] = -S1x;
+    return;
+}
+
+
+static double one_field_coeff (float       *dest,	/* The destination field point */
+                               float       *normal,	/* The field direction we are interested in */
+                               mneTriangle tri)
+/*
+ * Compute the integral over one triangle.
+ * This looks magical but it is not.
+ */
+{
+    double *yy[4];
+    double y1[3],y2[3],y3[3];
+    double beta[3];
+    double bbeta[3];
+    double coeff[3];
+    int   j,k;
+
+    yy[0] = y1;
+    yy[1] = y2;
+    yy[2] = y3;
+    yy[3] = y1;
+    VEC_DIFF_3(dest,tri->r1,y1);
+    VEC_DIFF_3(dest,tri->r2,y2);
+    VEC_DIFF_3(dest,tri->r3,y3);
+    for (j = 0; j < 3; j++)
+        beta[j] = calc_beta(yy[j],yy[j+1]);
+    bbeta[0] = beta[2] - beta[0];
+    bbeta[1] = beta[0] - beta[1];
+    bbeta[2] = beta[1] - beta[2];
+
+    for (j = 0; j < 3; j++)
+        coeff[j] = 0.0;
+    for (j = 0; j < 3; j++)
+        for (k = 0; k < 3; k++)
+            coeff[k] = coeff[k] + yy[j][k]*bbeta[j];
+    return (VEC_DOT_3(coeff,normal));
+}
+
+
+
+float **fwd_bem_field_coeff(fwdBemModel m,	/* The model */
+                            FwdCoilSet*  coils)	/* Gradiometer coil positions */
+/*
+ * Compute the weighting factors to obtain the magnetic field
+ */
+{
+    MneSurfaceOrVolume::MneCSurface*     surf;
+    mneTriangle    tri;
+    FwdCoil*        coil;
+    FwdCoilSet*     tcoils = NULL;
+    int            ntri;
+    float          **coeff = NULL;
+    int            j,k,p,s,off;
+    double         res;
+    double         mult;
+
+    if (m->solution == NULL) {
+        printf("Solution matrix missing in fwd_bem_field_coeff");
+        return NULL;
+    }
+    if (m->bem_method != FWD_BEM_CONSTANT_COLL) {
+        printf("BEM method should be constant collocation for fwd_bem_field_coeff");
+        return NULL;
+    }
+    if (coils->coord_frame != FIFFV_COORD_MRI) {
+        if (coils->coord_frame == FIFFV_COORD_HEAD) {
+            if (!m->head_mri_t) {
+                printf("head -> mri coordinate transform missing in fwd_bem_field_coeff");
+                return NULL;
+            }
+            else {
+                if (!coils) {
+                    qWarning("No coils to duplicate");
+                    return NULL;
+                }
+                /*
+                * Make a transformed duplicate
+                */
+                if ((tcoils = coils->dup_coil_set(m->head_mri_t)) == NULL)
+                    return NULL;
+                coils = tcoils;
+            }
+        }
+        else {
+            printf("Incompatible coil coordinate frame %d for fwd_bem_field_coeff",coils->coord_frame);
+            return NULL;
+        }
+    }
+    ntri  = m->nsol;
+    coeff = ALLOC_CMATRIX_3(coils->ncoil,ntri);
+
+    for (s = 0, off = 0; s < m->nsurf; s++) {
+        surf = m->surfs[s];
+        ntri = surf->ntri;
+        tri  = surf->tris;
+        mult = m->field_mult[s];
+
+        for (k = 0; k < ntri; k++,tri++) {
+            for (j = 0; j < coils->ncoil; j++) {
+                coil = coils->coils[j];
+                res = 0.0;
+                for (p = 0; p < coil->np; p++)
+                    res = res + coil->w[p]*one_field_coeff(coil->rmag[p],coil->cosmag[p],tri);
+                coeff[j][k+off] = mult*res;
+            }
+        }
+        off = off + ntri;
+    }
+    delete tcoils;
+    return coeff;
+}
+
+
+
+/*
+ * These are the formulas from Ferguson et al
+ * A Complete Linear Discretization for Calculating the Magnetic Field
+ * Using the Boundary-Element Method, IEEE Trans. Biomed. Eng., submitted
+ */
+
+static double calc_gamma (double *rk,double *rk1)
+
+{
+    double rkk1[3];
+    double size;
+    double res;
+
+    VEC_DIFF_3(rk,rk1,rkk1);
+    size = VEC_LEN_3(rkk1);
+
+    res = log((VEC_LEN_3(rk1)*size + VEC_DOT_3(rk1,rkk1))/
+              (VEC_LEN_3(rk)*size + VEC_DOT_3(rk,rkk1)))/size;
+    return (res);
+}
+
+
+
+
+void fwd_bem_one_lin_field_coeff_ferg (float *dest,	/* The field point */
+                                       float *dir,	/* The interesting direction */
+                                       mneTriangle tri,	/* The destination triangle */
+                                       double *res)	/* The results */
+
+{
+    double c[3];			/* Component of dest vector normal to
+                                 * the triangle plane */
+    double A[3];			/* Projection of dest onto the triangle */
+    double c1[3],c2[3],c3[3];
+    double y1[3],y2[3],y3[3];
+    double *yy[4],*cc[4];
+    double rjk[3][3];
+    double cross[3],triple,l1,l2,l3,solid,clen;
+    double common,sum,beta,gamma;
+    int    k;
+
+    yy[0] = y1;   cc[0] = c1;
+    yy[1] = y2;   cc[1] = c2;
+    yy[2] = y3;   cc[2] = c3;
+    yy[3] = y1;   cc[3] = c1;
+
+    VEC_DIFF_3(tri->r2,tri->r3,rjk[0]);
+    VEC_DIFF_3(tri->r3,tri->r1,rjk[1]);
+    VEC_DIFF_3(tri->r1,tri->r2,rjk[2]);
+
+    for (k = 0; k < 3; k++) {
+        y1[k] = tri->r1[k] - dest[k];
+        y2[k] = tri->r2[k] - dest[k];
+        y3[k] = tri->r3[k] - dest[k];
+    }
+    clen  = VEC_DOT_3(y1,tri->nn);
+    for (k = 0; k < 3; k++) {
+        c[k]  = clen*tri->nn[k];
+        A[k]  = dest[k] + c[k];
+        c1[k] = tri->r1[k] - A[k];
+        c2[k] = tri->r2[k] - A[k];
+        c3[k] = tri->r3[k] - A[k];
+    }
+    /*
+   * beta and gamma...
+   */
+    for (sum = 0.0, k = 0; k < 3; k++) {
+        CROSS_PRODUCT_3(cc[k],cc[k+1],cross);
+        beta  = VEC_DOT_3(cross,tri->nn);
+        gamma = calc_gamma (yy[k],yy[k+1]);
+        sum = sum + beta*gamma;
+    }
+    /*
+   * Solid angle...
+   */
+    CROSS_PRODUCT_3(y1,y2,cross);
+    triple = VEC_DOT_3(cross,y3);
+
+    l1 = VEC_LEN_3(y1);
+    l2 = VEC_LEN_3(y2);
+    l3 = VEC_LEN_3(y3);
+    solid = 2.0*atan2(triple,
+                      (l1*l2*l3+
+                       VEC_DOT_3(y1,y2)*l3+
+                       VEC_DOT_3(y1,y3)*l2+
+                       VEC_DOT_3(y2,y3)*l1));
+    /*
+   * Now we are ready to assemble it all together
+   */
+    common = (sum-clen*solid)/(2.0*tri->area);
+    for (k = 0; k < 3; k++)
+        res[k] = -VEC_DOT_3(rjk[k],dir)*common;
+    return;
+}
+
+
+
+
+
+void fwd_bem_one_lin_field_coeff_uran(float *dest,	/* The field point */
+                                      float *dir,	/* The interesting direction */
+                                      mneTriangle tri,	/* The destination triangle */
+                                      double *res)	/* The results */
+
+{
+    double      I1,T[2],S1[2],S2[2];
+    double      f0[3],fx[3],fy[3];
+    double      res_x,res_y;
+    double      x_fac,y_fac;
+    int         k;
+    double      len;
+    /*
+   * Compute the component integrals
+   */
+    field_integrals (dest,tri,&I1,T,S1,S2,f0,fx,fy);
+    /*
+   * Compute the coefficient for each node...
+   */
+    len = VEC_LEN_3(dir);
+    dir[X_3] = dir[X_3]/len;
+    dir[Y_3] = dir[Y_3]/len;
+    dir[Z_3] = dir[Z_3]/len;
+
+    x_fac = -VEC_DOT_3(dir,tri->ex);
+    y_fac = -VEC_DOT_3(dir,tri->ey);
+    for (k = 0; k < 3; k++) {
+        res_x = f0[k]*T[X_3] + fx[k]*S1[X_3] + fy[k]*S2[X_3] + fy[k]*I1;
+        res_y = f0[k]*T[Y_3] + fx[k]*S1[Y_3] + fy[k]*S2[Y_3] - fx[k]*I1;
+        res[k] = x_fac*res_x + y_fac*res_y;
+    }
+    return;
+}
+
+
+void fwd_bem_one_lin_field_coeff_simple (float       *dest,    /* The destination field point */
+                                         float       *normal,  /* The field direction we are interested in */
+                                         mneTriangle source,   /* The source triangle */
+                                         double      *res)     /* The result for each triangle node */
+/*
+      * Simple version...
+      */
+{
+    float diff[3];
+    float vec_result[3];
+    float dl;
+    int   k;
+    float *rr[3];
+
+
+    rr[0] = source->r1;
+    rr[1] = source->r2;
+    rr[2] = source->r3;
+
+    for (k = 0; k < 3; k++) {
+        VEC_DIFF_3(rr[k],dest,diff);
+        dl = VEC_DOT_3(diff,diff);
+        CROSS_PRODUCT_3(diff,source->nn,vec_result);
+        res[k] = source->area*VEC_DOT_3(vec_result,normal)/(3.0*dl*sqrt(dl));
+    }
+    return;
+}
+
+typedef void (* linFieldIntFunc)(float *dest,float *dir,mneTriangle tri, double *res);
+
+float **fwd_bem_lin_field_coeff (fwdBemModel m,	        /* The model */
+                                 FwdCoilSet*  coils,	/* Coil information */
+                                 int         method)	/* Which integration formula to use */
+/*
+      * Compute the weighting factors to obtain the magnetic field
+      * in the linear potential approximation
+      */
+{
+    MneSurfaceOrVolume::MneCSurface*  surf;
+    mneTriangle tri;
+    FwdCoil*     coil;
+    FwdCoilSet*  tcoils = NULL;
+    int         ntri;
+    float       **coeff  = NULL;
+    int         j,k,p,pp,off,s;
+    double      res[3],one[3];
+    float       mult;
+    linFieldIntFunc func;
+
+    if (m->solution == NULL) {
+        printf("Solution matrix missing in fwd_bem_lin_field_coeff");
+        return NULL;
+    }
+    if (m->bem_method != FWD_BEM_LINEAR_COLL) {
+        printf("BEM method should be linear collocation for fwd_bem_lin_field_coeff");
+        return NULL;
+    }
+    if (coils->coord_frame != FIFFV_COORD_MRI) {
+        if (coils->coord_frame == FIFFV_COORD_HEAD) {
+            if (!m->head_mri_t) {
+                printf("head -> mri coordinate transform missing in fwd_bem_lin_field_coeff");
+                return NULL;
+            }
+            else {
+                if (!coils) {
+                    qWarning("No coils to duplicate");
+                    return NULL;
+                }
+                /*
+                * Make a transformed duplicate
+                */
+                if ((tcoils = coils->dup_coil_set(m->head_mri_t)) == NULL)
+                    return NULL;
+                coils = tcoils;
+            }
+        }
+        else {
+            printf("Incompatible coil coordinate frame %d for fwd_bem_field_coeff",coils->coord_frame);
+            return NULL;
+        }
+    }
+    if (method == FWD_BEM_LIN_FIELD_FERGUSON)
+        func = fwd_bem_one_lin_field_coeff_ferg;
+    else if (method == FWD_BEM_LIN_FIELD_URANKAR)
+        func = fwd_bem_one_lin_field_coeff_uran;
+    else
+        func = fwd_bem_one_lin_field_coeff_simple;
+
+    coeff = ALLOC_CMATRIX_3(coils->ncoil,m->nsol);
+    for (k = 0; k < m->nsol; k++)
+        for (j = 0; j < coils->ncoil; j++)
+            coeff[j][k] = 0.0;
+    /*
+   * Process each of the surfaces
+   */
+    for (s = 0, off = 0; s < m->nsurf; s++) {
+        surf = m->surfs[s];
+        ntri = surf->ntri;
+        tri  = surf->tris;
+        mult = m->field_mult[s];
+
+        for (k = 0; k < ntri; k++,tri++) {
+            for (j = 0; j < coils->ncoil; j++) {
+                coil = coils->coils[j];
+                for (pp = 0; pp < 3; pp++)
+                    res[pp] = 0;
+                /*
+         * Accumulate the coefficients for each triangle node...
+         */
+                for (p = 0; p < coil->np; p++) {
+                    func(coil->rmag[p],coil->cosmag[p],tri,one);
+                    for (pp = 0; pp < 3; pp++)
+                        res[pp] = res[pp] + coil->w[p]*one[pp];
+                }
+                /*
+         * Add these to the corresponding coefficient matrix
+         * elements...
+         */
+                for (pp = 0; pp < 3; pp++)
+                    coeff[j][tri->vert[pp]+off] = coeff[j][tri->vert[pp]+off] + mult*res[pp];
+            }
+        }
+        off = off + surf->np;
+    }
+    /*
+   * Discard the duplicate
+   */
+    delete tcoils;
+    return (coeff);
+}
+
+
+
+int fwd_bem_specify_coils(fwdBemModel m,
+                          FwdCoilSet*  coils)
+/*
+ * Set up for computing the solution at a set of coils
+  */
+{
+    float **sol = NULL;
+    fwdBemSolution csol;
+
+    if (!m) {
+        printf("Model missing in fwd_bem_specify_coils");
+        goto bad;
+    }
+    if (!m->solution) {
+        printf("Solution not computed in fwd_bem_specify_coils");
+        goto bad;
+    }
+    if(coils)
+        coils->fwd_free_coil_set_user_data();
+    if (!coils || coils->ncoil == 0)
+        return OK;
+    if (m->bem_method == FWD_BEM_CONSTANT_COLL)
+        sol = fwd_bem_field_coeff(m,coils);
+    else if (m->bem_method == FWD_BEM_LINEAR_COLL)
+        sol = fwd_bem_lin_field_coeff(m,coils,FWD_BEM_LIN_FIELD_SIMPLE);
+    else {
+        printf("Unknown BEM method in fwd_bem_specify_coils : %d",m->bem_method);
+        goto bad;
+    }
+    coils->user_data = csol = fwd_bem_new_coil_solution();
+    coils->user_data_free   = fwd_bem_free_coil_solution;
+
+    csol->ncoil     = coils->ncoil;
+    csol->np        = m->nsol;
+    csol->solution  = mne_mat_mat_mult_3(sol,m->solution,coils->ncoil,m->nsol,m->nsol);
+
+    FREE_CMATRIX_3(sol);
+    return OK;
+
+bad : {
+        FREE_CMATRIX_3(sol);
+        return FAIL;
+
+    }
+}
+
+
+
+
+#define MAG_FACTOR 1e-7		/* \mu_0/4\pi */
+
+
+
+
+static void fwd_bem_lin_field_calc(float       *rd,
+                                   float       *Q,
+                                   FwdCoilSet*  coils,
+                                   fwdBemModel m,
+                                   float       *B)
+/*
+ * Calculate the magnetic field in a set of coils
+ */
+{
+    float *v0;
+    int   s,k,p,np;
+    FwdCoil* coil;
+    float  mult;
+    float  **rr;
+    float  my_rd[3],my_Q[3];
+    fwdBemSolution sol = (fwdBemSolution)coils->user_data;
+    /*
+   * Infinite-medium potentials
+   */
+    if (!m->v0)
+        m->v0 = MALLOC_3(m->nsol,float);
+    v0 = m->v0;
+    /*
+   * The dipole location and orientation must be transformed
+   */
+    VEC_COPY_3(my_rd,rd);
+    VEC_COPY_3(my_Q,Q);
+    if (m->head_mri_t) {
+        FiffCoordTransOld::fiff_coord_trans(my_rd,m->head_mri_t,FIFFV_MOVE);
+        FiffCoordTransOld::fiff_coord_trans(my_Q,m->head_mri_t,FIFFV_NO_MOVE);
+    }
+    /*
+   * Compute the inifinite-medium potentials at the vertices
+   */
+    for (s = 0, p = 0; s < m->nsurf; s++) {
+        np     = m->surfs[s]->np;
+        rr     = m->surfs[s]->rr;
+        mult   = m->source_mult[s];
+        for (k = 0; k < np; k++)
+            v0[p++] = mult*fwd_bem_inf_pot(my_rd,my_Q,rr[k]);
+    }
+    /*
+   * Primary current contribution
+   * (can be calculated in the coil/dipole coordinates)
+   */
+    for (k = 0; k < coils->ncoil; k++) {
+        coil = coils->coils[k];
+        B[k] = 0.0;
+        for (p = 0; p < coil->np; p++)
+            B[k] = B[k] + coil->w[p]*fwd_bem_inf_field(rd,Q,coil->rmag[p],coil->cosmag[p]);
+    }
+    /*
+   * Volume current contribution
+   */
+    for (k = 0; k < coils->ncoil; k++)
+        B[k] = B[k] + mne_dot_vectors_3(sol->solution[k],v0,m->nsol);
+    /*
+   * Scale correctly
+   */
+    for (k = 0; k < coils->ncoil; k++)
+        B[k] = MAG_FACTOR*B[k];
+    return;
+}
+
+
+static void fwd_bem_field_calc(float       *rd,
+                               float       *Q,
+                               FwdCoilSet*  coils,
+                               fwdBemModel m,
+                               float       *B)
+/*
+ * Calculate the magnetic field in a set of coils
+ */
+{
+    float *v0;
+    int   s,k,p,ntri;
+    FwdCoil* coil;
+    mneTriangle tri;
+    float   mult;
+    float  my_rd[3],my_Q[3];
+    fwdBemSolution sol = (fwdBemSolution)coils->user_data;
+    /*
+   * Infinite-medium potentials
+   */
+    if (!m->v0)
+        m->v0 = MALLOC_3(m->nsol,float);
+    v0 = m->v0;
+    /*
+   * The dipole location and orientation must be transformed
+   */
+    VEC_COPY_3(my_rd,rd);
+    VEC_COPY_3(my_Q,Q);
+    if (m->head_mri_t) {
+        FiffCoordTransOld::fiff_coord_trans(my_rd,m->head_mri_t,FIFFV_MOVE);
+        FiffCoordTransOld::fiff_coord_trans(my_Q,m->head_mri_t,FIFFV_NO_MOVE);
+    }
+    /*
+   * Compute the inifinite-medium potentials at the centers of the triangles
+   */
+    for (s = 0, p = 0; s < m->nsurf; s++) {
+        ntri = m->surfs[s]->ntri;
+        tri  = m->surfs[s]->tris;
+        mult = m->source_mult[s];
+        for (k = 0; k < ntri; k++, tri++)
+            v0[p++] = mult*fwd_bem_inf_pot(my_rd,my_Q,tri->cent);
+    }
+    /*
+   * Primary current contribution
+   * (can be calculated in the coil/dipole coordinates)
+   */
+    for (k = 0; k < coils->ncoil; k++) {
+        coil = coils->coils[k];
+        B[k] = 0.0;
+        for (p = 0; p < coil->np; p++)
+            B[k] = B[k] + coil->w[p]*fwd_bem_inf_field(rd,Q,coil->rmag[p],coil->cosmag[p]);
+    }
+    /*
+   * Volume current contribution
+   */
+    for (k = 0; k < coils->ncoil; k++)
+        B[k] = B[k] + mne_dot_vectors_3(sol->solution[k],v0,m->nsol);
+    /*
+   * Scale correctly
+   */
+    for (k = 0; k < coils->ncoil; k++)
+        B[k] = MAG_FACTOR*B[k];
+    return;
+}
+
+
+
+
+int fwd_bem_field(float       *rd,	/* Dipole position */
+                  float       *Q,	/* Dipole orientation */
+                  FwdCoilSet*  coils,    /* Coil descriptors */
+                  float       *B,       /* Result */
+                  void        *client)  /* The model */
+/*
+ * This version calculates the magnetic field in a set of coils
+ * Call fwd_bem_specify_coils first to establish the coil-specific
+ * solution matrix
+ */
+{
+    fwdBemModel m = (fwdBemModel)client;
+    fwdBemSolution sol = (fwdBemSolution)coils->user_data;
+
+    if (!m) {
+        printf("No BEM model specified to fwd_bem_field");
+        return FAIL;
+    }
+    if (!sol || !sol->solution || sol->ncoil != coils->ncoil) {
+        printf("No appropriate coil-specific data available in fwd_bem_field");
+        return FAIL;
+    }
+    if (m->bem_method == FWD_BEM_CONSTANT_COLL)
+        fwd_bem_field_calc(rd,Q,coils,m,B);
+    else if (m->bem_method == FWD_BEM_LINEAR_COLL)
+        fwd_bem_lin_field_calc(rd,Q,coils,m,B);
+    else {
+        printf("Unknown BEM method : %d",m->bem_method);
+        return FAIL;
+    }
+    return OK;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//============================= mne_lin_proj.c =============================
+
+
+
+
+
+
+
+
+
+
+
+static char *add_string_3(char *old,char *add)
+
+{
+    char *news = NULL;
+    if (!old) {
+        if (add || strlen(add) > 0)
+            news = mne_strdup_3(add);
+    }
+    else {
+        old = REALLOC_3(old,strlen(old) + strlen(add) + 1,char);
+        strcat(old,add);
+        news = old;
+    }
+    return news;
+}
+
+
+
+
+void mne_proj_op_report_data_3(FILE *out,const char *tag, mneProjOp op, int list_data,
+                             char **exclude, int nexclude)
+/*
+* Output info about the projection operator
+*/
+{
+    int j,k,p,q;
+    mneProjItem it;
+    MneNamedMatrix* vecs;
+    int found;
+
+    if (out == NULL)
+        return;
+    if (op == NULL)
+        return;
+    if (op->nitems <= 0) {
+        fprintf(out,"Empty operator\n");
+        return;
+    }
+
+    for (k = 0; k < op->nitems; k++) {
+        it = op->items[k];
+        if (list_data && tag)
+            fprintf(out,"%s\n",tag);
+        if (tag)
+            fprintf(out,"%s",tag);
+        fprintf(out,"# %d : %s : %d vecs : %d chs %s %s\n",
+                k+1,it->desc,it->nvec,it->vecs->ncol,
+                it->has_meg ? "MEG" : "EEG",
+                it->active ? "active" : "idle");
+        if (list_data && tag)
+            fprintf(out,"%s\n",tag);
+        if (list_data) {
+            vecs = op->items[k]->vecs;
+
+            for (q = 0; q < vecs->ncol; q++) {
+                fprintf(out,"%-10s",vecs->collist[q]);
+                fprintf(out,q < vecs->ncol-1 ? " " : "\n");
+            }
+            for (p = 0; p < vecs->nrow; p++)
+                for (q = 0; q < vecs->ncol; q++) {
+                    for (j = 0, found  = 0; j < nexclude; j++) {
+                        if (strcmp(exclude[j],vecs->collist[q]) == 0) {
+                            found = 1;
+                            break;
+                        }
+                    }
+                    fprintf(out,"%10.5g ",found ? 0.0 : vecs->data[p][q]);
+                    fprintf(out,q < vecs->ncol-1 ? " " : "\n");
+                }
+            if (list_data && tag)
+                fprintf(out,"%s\n",tag);
+        }
+    }
+    return;
+}
+
+
+void mne_proj_op_report_3(FILE *out,const char *tag, mneProjOp op)
+{
+    mne_proj_op_report_data_3(out,tag,op, FALSE, NULL, 0);
+}
+
+
+
+
+
+
+
+
+mneProjOp mne_proj_op_combine_3(mneProjOp to, mneProjOp from)
+/*
+* Copy items from 'from' operator to 'to' operator
+*/
+{
+    int k;
+    mneProjItem it;
+
+    if (to == NULL)
+        to = mne_new_proj_op_3();
+    if (from) {
+        for (k = 0; k < from->nitems; k++) {
+            it = from->items[k];
+            mne_proj_op_add_item_3(to,it->vecs,it->kind,it->desc);
+            to->items[to->nitems-1]->active_file = it->active_file;
+        }
+    }
+    return to;
+}
+
+
+
+
+
+
+
+mneProjOp mne_proj_op_average_eeg_ref_3(fiffChInfo chs,
+                                      int nch)
+/*
+* Make the projection operator for average electrode reference
+*/
+{
+    int eegcount = 0;
+    int k;
+    float       **vec_data;
+    char        **names;
+    MneNamedMatrix* vecs;
+    mneProjOp      op;
+
+    for (k = 0; k < nch; k++)
+        if (chs[k].kind == FIFFV_EEG_CH)
+            eegcount++;
+    if (eegcount == 0) {
+        qCritical("No EEG channels specified for average reference.");
+        return NULL;
+    }
+
+    vec_data = ALLOC_CMATRIX_3(1,eegcount);
+    names    = MALLOC_3(eegcount,char *);
+
+    for (k = 0, eegcount = 0; k < nch; k++)
+        if (chs[k].kind == FIFFV_EEG_CH)
+            names[eegcount++] = mne_strdup_3(chs[k].ch_name);
+
+    for (k = 0; k < eegcount; k++)
+        vec_data[0][k] = 1.0/sqrt((double)eegcount);
+
+    vecs = MneNamedMatrix::build_named_matrix(1,eegcount,NULL,names,vec_data);
+
+    op = mne_new_proj_op_3();
+    mne_proj_op_add_item_3(op,vecs,FIFFV_MNE_PROJ_ITEM_EEG_AVREF,"Average EEG reference");
+
+    return op;
+}
+
+
+
+int mne_proj_item_affect_3(mneProjItem it, char **list, int nlist)
+/*
+* Does this projection item affect this list of channels?
+*/
+{
+    int k,p,q;
+
+    if (it == NULL || it->vecs == NULL || it->nvec == 0)
+        return FALSE;
+
+    for (k = 0; k < nlist; k++)
+        for (p = 0; p < it->vecs->ncol; p++)
+            if (strcmp(it->vecs->collist[p],list[k]) == 0) {
+                for (q = 0; q < it->vecs->nrow; q++) {
+                    if (it->vecs->data[q][p] != 0.0)
+                        return TRUE;
+                }
+            }
+    return FALSE;
+}
+
+
+
+int mne_proj_op_affect_3(mneProjOp op, char **list, int nlist)
+
+{
+    int k;
+    int naff;
+
+    if (!op)
+        return 0;
+
+    for (k = 0, naff = 0; k < op->nitems; k++)
+        if (op->items[k]->active && mne_proj_item_affect_3(op->items[k],list,nlist))
+            naff += op->items[k]->nvec;
+
+    return naff;
+}
+
+int mne_proj_op_affect_chs_3(mneProjOp op, fiffChInfo chs, int nch)
+{
+    char *ch_string;
+    int  res;
+    char **list;
+    int  nlist;
+
+
+    if (nch == 0)
+        return FALSE;
+    ch_string = mne_channel_names_to_string_3(chs,nch);
+    mne_string_to_name_list_3(ch_string,&list,&nlist);
+    FREE_3(ch_string);
+    res = mne_proj_op_affect_3(op,list,nlist);
+    mne_free_name_list_3(list,nlist);
+    return res;
+}
+
+
+
+
+
+//============================= mne_named_vector.c =============================
+
+int mne_pick_from_named_vector_3(mneNamedVector vec, char **names, int nnames, int require_all, float *res)
+/*
+* Pick the desired elements from the named vector
+*/
+{
+    int found;
+    int k,p;
+
+    if (vec->names == 0) {
+        qCritical("No names present in vector. Cannot pick.");
+        return FAIL;
+    }
+
+    for (k = 0; k < nnames; k++)
+        res[k] = 0.0;
+
+    for (k = 0; k < nnames; k++) {
+        found = 0;
+        for (p = 0; p < vec->nvec; p++) {
+            if (strcmp(vec->names[p],names[k]) == 0) {
+                res[k] = vec->data[p];
+                found = TRUE;
+                break;
+            }
+        }
+        if (!found && require_all) {
+            qCritical("All required elements not found in named vector.");
+            return FAIL;
+        }
+    }
+    return OK;
+}
+
+
+//============================= mne_lin_proj_io.c =============================
+
+mneProjOp mne_read_proj_op_from_node_3(//fiffFile in,
+                                     FiffStream::SPtr& stream,
+                                     const FiffDirNode::SPtr& start)
+/*
+* Load all the linear projection data
+*/
+{
+    mneProjOp   op     = NULL;
+    QList<FiffDirNode::SPtr> proj;
+    FiffDirNode::SPtr start_node;
+    QList<FiffDirNode::SPtr> items;
+    FiffDirNode::SPtr node;
+    int         k;
+    char        *item_desc,*desc_tag,*lf;
+    int         global_nchan,item_nchan,nlist;
+    char        **item_names;
+    int         item_kind;
+    float       **item_vectors = NULL;
+    int         item_nvec;
+    int         item_active;
+    MneNamedMatrix* item;
+    FiffTag::SPtr t_pTag;
+
+    if (!stream) {
+        qCritical("File not open mne_read_proj_op_from_node");
+        goto bad;
+    }
+
+    if (!start || start->isEmpty())
+        start_node = stream->tree();
+    else
+        start_node = start;
+
+    op = mne_new_proj_op_3();
+    proj = start_node->dir_tree_find(FIFFB_PROJ);
+    if (proj.size() == 0 || proj[0]->isEmpty())   /* The caller must recognize an empty projection */
+        goto out;
+    /*
+    * Only the first projection block is recognized
+    */
+    items = proj[0]->dir_tree_find(FIFFB_PROJ_ITEM);
+    if (items.size() == 0 || items[0]->isEmpty())   /* The caller must recognize an empty projection */
+        goto out;
+    /*
+    * Get a common number of channels
+    */
+    node = proj[0];
+    if(!node->find_tag(stream, FIFF_NCHAN, t_pTag))
+        global_nchan = 0;
+    else {
+        global_nchan = *t_pTag->toInt();
+//        TAG_FREE_3(tag);
+    }
+    /*
+   * Proceess each item
+   */
+    for (k = 0; k < items.size(); k++) {
+        node = items[k];
+        /*
+        * Complicated procedure for getting the description
+        */
+        item_desc = NULL;
+
+        if (node->find_tag(stream, FIFF_NAME, t_pTag)) {
+            item_desc = add_string_3(item_desc,(char *)t_pTag->data());
+        }
+
+        /*
+        * Take the first line of description if it exists
+        */
+        if (node->find_tag(stream, FIFF_DESCRIPTION, t_pTag)) {
+            desc_tag = (char *)t_pTag->data();
+            if ((lf = strchr(desc_tag,'\n')) != NULL)
+                *lf = '\0';
+            printf("###################DEBUG ToDo: item_desc = add_string_3(item_desc," ");");
+            item_desc = add_string_3(item_desc,(char *)desc_tag);
+            FREE_3(desc_tag);
+        }
+        /*
+        * Possibility to override number of channels here
+        */
+        if (!node->find_tag(stream, FIFF_NCHAN, t_pTag)) {
+            item_nchan = global_nchan;
+        }
+        else {
+            item_nchan = *t_pTag->toInt();
+        }
+        if (item_nchan <= 0) {
+            qCritical("Number of channels incorrectly specified for one of the projection items.");
+            goto bad;
+        }
+        /*
+        * Take care of the channel names
+        */
+        if (!node->find_tag(stream, FIFF_PROJ_ITEM_CH_NAME_LIST, t_pTag))
+            goto bad;
+
+        mne_string_to_name_list_3((char *)(t_pTag->data()),&item_names,&nlist);
+        if (nlist != item_nchan) {
+            printf("Channel name list incorrectly specified for proj item # %d",k+1);
+            mne_free_name_list_3(item_names,nlist);
+            goto bad;
+        }
+        /*
+        * Kind of item
+        */
+        if (!node->find_tag(stream, FIFF_PROJ_ITEM_KIND, t_pTag))
+            goto bad;
+        item_kind = *t_pTag->toInt();
+        /*
+        * How many vectors
+        */
+        if (!node->find_tag(stream,FIFF_PROJ_ITEM_NVEC, t_pTag))
+            goto bad;
+        item_nvec = *t_pTag->toInt();
+        /*
+        * The projection data
+        */
+        if (!node->find_tag(stream,FIFF_PROJ_ITEM_VECTORS, t_pTag))
+            goto bad;
+
+        MatrixXf tmp_item_vectors = t_pTag->toFloatMatrix().transpose();
+        item_vectors = ALLOC_CMATRIX_3(tmp_item_vectors.rows(),tmp_item_vectors.cols());
+        fromFloatEigenMatrix_3(tmp_item_vectors, item_vectors);
+
+        /*
+        * Is this item active?
+        */
+        if (node->find_tag(stream, FIFF_MNE_PROJ_ITEM_ACTIVE, t_pTag)) {
+            item_active = *t_pTag->toInt();
+        }
+        else
+            item_active = FALSE;
+        /*
+        * Ready to add
+        */
+        item = MneNamedMatrix::build_named_matrix(item_nvec,item_nchan,NULL,item_names,item_vectors);
+        mne_proj_op_add_item_act_3(op,item,item_kind,item_desc,item_active);
+        delete item;
+        op->items[op->nitems-1]->active_file = item_active;
+    }
+
+out :
+    return op;
+
+bad : {
+        mne_free_proj_op_3(op);
+        return NULL;
+    }
+}
+
+
+
+
+mneProjOp mne_read_proj_op_3(const QString& name)
+
+{
+    QFile file(name);
+    FiffStream::SPtr stream(new FiffStream(&file));
+
+    if(!stream->open())
+        return NULL;
+
+    mneProjOp   res = NULL;
+
+    FiffDirNode::SPtr t_default;
+    res = mne_read_proj_op_from_node_3(stream,t_default);
+
+    stream->close();
+
+    return res;
+}
+
+
+
+
+
+
+
+int mne_proj_op_chs_3(mneProjOp op, char **list, int nlist)
+
+{
+    if (op == NULL)
+        return OK;
+
+    mne_free_proj_op_proj_3(op);  /* These data are not valid any more */
+
+    if (nlist == 0)
+        return OK;
+
+    op->names = mne_dup_name_list_3(list,nlist);
+    op->nch   = nlist;
+
+    return OK;
+}
+
+
+
+
+
+
+static void clear_these(float *data, char **names, int nnames, const char *start)
+
+{
+    int k;
+    for (k = 0; k < nnames; k++)
+        if (strstr(names[k],start) == names[k])
+            data[k] = 0.0;
+}
+
+
+
+#define USE_LIMIT   1e-5
+#define SMALL_VALUE 1e-4
+
+int mne_proj_op_make_proj_bad(mneProjOp op, char **bad, int nbad)
+/*
+* Do the channel picking and SVD
+* Include a bad list at this phase
+* Input to the projection can include the bad channels
+* but they are not affected
+*/
+{
+    int   k,p,q,r,nvec;
+    float **vv_meg  = NULL;
+    float *sing_meg = NULL;
+    float **vv_eeg  = NULL;
+    float *sing_eeg = NULL;
+    float **mat_meg = NULL;
+    float **mat_eeg = NULL;
+    int   nvec_meg;
+    int   nvec_eeg;
+    mneNamedVectorRec vec;
+    float size;
+    int   nzero;
+#ifdef DEBUG
+    char  name[20];
+#endif
+
+    FREE_CMATRIX_3(op->proj_data);
+    op->proj_data = NULL;
+    op->nvec      = 0;
+
+    if (op->nch <= 0)
+        return OK;
+    if (op->nitems <= 0)
+        return OK;
+
+    nvec = mne_proj_op_affect_3(op,op->names,op->nch);
+    if (nvec == 0)
+        return OK;
+
+    mat_meg = ALLOC_CMATRIX_3(nvec, op->nch);
+    mat_eeg = ALLOC_CMATRIX_3(nvec, op->nch);
+
+#ifdef DEBUG
+    fprintf(stdout,"mne_proj_op_make_proj_bad\n");
+#endif
+    for (k = 0, nvec_meg = nvec_eeg = 0; k < op->nitems; k++) {
+        if (op->items[k]->active && mne_proj_item_affect_3(op->items[k],op->names,op->nch)) {
+            vec.nvec  = op->items[k]->vecs->ncol;
+            vec.names = op->items[k]->vecs->collist;
+            if (op->items[k]->has_meg) {
+                for (p = 0; p < op->items[k]->nvec; p++, nvec_meg++) {
+                    vec.data = op->items[k]->vecs->data[p];
+                    if (mne_pick_from_named_vector_3(&vec,op->names,op->nch,FALSE,mat_meg[nvec_meg]) == FAIL)
+                        goto bad;
+#ifdef DEBUG
+                    fprintf(stdout,"Original MEG:\n");
+                    mne_print_vector(stdout,op->items[k]->desc,mat_meg[nvec_meg],op->nch);
+                    fflush(stdout);
+#endif
+                }
+            }
+            else if (op->items[k]->has_eeg) {
+                for (p = 0; p < op->items[k]->nvec; p++, nvec_eeg++) {
+                    vec.data = op->items[k]->vecs->data[p];
+                    if (mne_pick_from_named_vector_3(&vec,op->names,op->nch,FALSE,mat_eeg[nvec_eeg]) == FAIL)
+                        goto bad;
+#ifdef DEBUG
+                    fprintf (stdout,"Original EEG:\n");
+                    mne_print_vector(stdout,op->items[k]->desc,mat_eeg[nvec_eeg],op->nch);
+                    fflush(stdout);
+#endif
+                }
+            }
+        }
+    }
+    /*
+    * Replace bad channel entries with zeroes
+    */
+    for (q = 0; q < nbad; q++)
+        for (r = 0; r < op->nch; r++)
+            if (strcmp(op->names[r],bad[q]) == 0) {
+                for (p = 0; p < nvec_meg; p++)
+                    mat_meg[p][r] = 0.0;
+                for (p = 0; p < nvec_eeg; p++)
+                    mat_eeg[p][r] = 0.0;
+            }
+    /*
+    * Scale the rows so that detection of linear dependence becomes easy
+    */
+    for (p = 0, nzero = 0; p < nvec_meg; p++) {
+        size = sqrt(mne_dot_vectors_3(mat_meg[p],mat_meg[p],op->nch));
+        if (size > 0) {
+            for (k = 0; k < op->nch; k++)
+                mat_meg[p][k] = mat_meg[p][k]/size;
+        }
+        else
+            nzero++;
+    }
+    if (nzero == nvec_meg) {
+        FREE_CMATRIX_3(mat_meg); mat_meg = NULL; nvec_meg = 0;
+    }
+    for (p = 0, nzero = 0; p < nvec_eeg; p++) {
+        size = sqrt(mne_dot_vectors_3(mat_eeg[p],mat_eeg[p],op->nch));
+        if (size > 0) {
+            for (k = 0; k < op->nch; k++)
+                mat_eeg[p][k] = mat_eeg[p][k]/size;
+        }
+        else
+            nzero++;
+    }
+    if (nzero == nvec_eeg) {
+        FREE_CMATRIX_3(mat_eeg); mat_eeg = NULL; nvec_eeg = 0;
+    }
+    if (nvec_meg + nvec_eeg == 0) {
+        fprintf(stderr,"No projection remains after excluding bad channels. Omitting projection.\n");
+        return OK;
+    }
+    /*
+    * Proceed to SVD
+    */
+#ifdef DEBUG
+    fprintf(stdout,"Before SVD:\n");
+#endif
+    if (nvec_meg > 0) {
+#ifdef DEBUG
+        fprintf(stdout,"---->>\n");
+        for (p = 0; p < nvec_meg; p++) {
+            sprintf(name,"MEG %02d",p+1);
+            mne_print_vector(stdout,name,mat_meg[p],op->nch);
+        }
+        fprintf(stdout,"---->>\n");
+#endif
+        sing_meg = MALLOC_3(nvec_meg+1,float);
+        vv_meg   = ALLOC_CMATRIX_3(nvec_meg,op->nch);
+        if (mne_svd_3(mat_meg,nvec_meg,op->nch,sing_meg,NULL,vv_meg) != OK)
+            goto bad;
+    }
+    if (nvec_eeg > 0) {
+#ifdef DEBUG
+        fprintf(stdout,"---->>\n");
+        for (p = 0; p < nvec_eeg; p++) {
+            sprintf(name,"EEG %02d",p+1);
+            mne_print_vector(stdout,name,mat_eeg[p],op->nch);
+        }
+        fprintf(stdout,"---->>\n");
+#endif
+        sing_eeg = MALLOC_3(nvec_eeg+1,float);
+        vv_eeg   = ALLOC_CMATRIX_3(nvec_eeg,op->nch);
+        if (mne_svd_3(mat_eeg,nvec_eeg,op->nch,sing_eeg,NULL,vv_eeg) != OK)
+            goto bad;
+    }
+    /*
+    * Check for linearly dependent vectors
+    */
+    for (p = 0, op->nvec = 0; p < nvec_meg; p++, op->nvec++)
+        if (sing_meg[p]/sing_meg[0] < USE_LIMIT)
+            break;
+    for (p = 0; p < nvec_eeg; p++, op->nvec++)
+        if (sing_eeg[p]/sing_eeg[0] < USE_LIMIT)
+            break;
+#ifdef DEBUG
+    fprintf(stderr,"Number of linearly independent vectors = %d\n",op->nvec);
+#endif
+    op->proj_data = ALLOC_CMATRIX_3(op->nvec,op->nch);
+#ifdef DEBUG
+    fprintf(stdout,"Final projection data:\n");
+#endif
+    for (p = 0, op->nvec = 0; p < nvec_meg; p++, op->nvec++) {
+        if (sing_meg[p]/sing_meg[0] < USE_LIMIT)
+            break;
+        for (k = 0; k < op->nch; k++) {
+            /*
+            * Avoid crosstalk between MEG/EEG
+            */
+            if (fabs(vv_meg[p][k]) < SMALL_VALUE)
+                op->proj_data[op->nvec][k] = 0.0;
+            else
+                op->proj_data[op->nvec][k] = vv_meg[p][k];
+
+            /*
+            * If the above did not work, this will (provided that EEG channels are called EEG*)
+            */
+            clear_these(op->proj_data[op->nvec],op->names,op->nch,"EEG");
+        }
+#ifdef DEBUG
+        sprintf(name,"MEG %02d",p+1);
+        mne_print_vector(stdout,name,op->proj_data[op->nvec],op->nch);
+#endif
+    }
+    for (p = 0; p < nvec_eeg; p++, op->nvec++) {
+        if (sing_eeg[p]/sing_eeg[0] < USE_LIMIT)
+            break;
+        for (k = 0; k < op->nch; k++) {
+            /*
+            * Avoid crosstalk between MEG/EEG
+            */
+            if (fabs(vv_eeg[p][k]) < SMALL_VALUE)
+                op->proj_data[op->nvec][k] = 0.0;
+            else
+                op->proj_data[op->nvec][k] = vv_eeg[p][k];
+            /*
+            * If the above did not work, this will (provided that MEG channels are called MEG*)
+            */
+            clear_these(op->proj_data[op->nvec],op->names,op->nch,"MEG");
+        }
+#ifdef DEBUG
+        sprintf(name,"EEG %02d",p+1);
+        mne_print_vector(stdout,name,op->proj_data[op->nvec],op->nch);
+        fflush(stdout);
+#endif
+    }
+    FREE_3(sing_meg);
+    FREE_CMATRIX_3(vv_meg);
+    FREE_CMATRIX_3(mat_meg);
+    FREE_3(sing_eeg);
+    FREE_CMATRIX_3(vv_eeg);
+    FREE_CMATRIX_3(mat_eeg);
+    /*
+     * Make sure that the stimulus channels are not modified
+     */
+    for (k = 0; k < op->nch; k++)
+        if (strstr(op->names[k],"STI") == op->names[k]) {
+            for (p = 0; p < op->nvec; p++)
+                op->proj_data[p][k] = 0.0;
+        }
+
+    return OK;
+
+bad : {
+        FREE_3(sing_meg);
+        FREE_CMATRIX_3(vv_meg);
+        FREE_CMATRIX_3(mat_meg);
+        FREE_3(sing_eeg);
+        FREE_CMATRIX_3(vv_eeg);
+        FREE_CMATRIX_3(mat_eeg);
+        return FAIL;
+    }
+}
+
+
+int mne_proj_op_make_proj(mneProjOp op)
+/*
+* Do the channel picking and SVD
+*/
+{
+    return mne_proj_op_make_proj_bad(op,NULL,0);
+}
+
+
+
+
+
+
+
+//============================= mne_read_forward_solution.c =============================
+
+int mne_read_meg_comp_eeg_ch_info_3(const QString& name,
+                                  fiffChInfo     *megp,	 /* MEG channels */
+                                  int            *nmegp,
+                                  fiffChInfo     *meg_compp,
+                                  int            *nmeg_compp,
+                                  fiffChInfo     *eegp,	 /* EEG channels */
+                                  int            *neegp,
+                                  FiffCoordTransOld* *meg_head_t,
+                                  fiffId         *idp)	 /* The measurement ID */
+/*
+      * Read the channel information and split it into three arrays,
+      * one for MEG, one for MEG compensation channels, and one for EEG
+      */
+{
+    QFile file(name);
+    FiffStream::SPtr stream(new FiffStream(&file));
+
+
+    fiffChInfo chs   = NULL;
+    int        nchan = 0;
+    fiffChInfo meg   = NULL;
+    int        nmeg  = 0;
+    fiffChInfo meg_comp = NULL;
+    int        nmeg_comp = 0;
+    fiffChInfo eeg   = NULL;
+    int        neeg  = 0;
+    fiffId     id    = NULL;
+    QList<FiffDirNode::SPtr> nodes;
+    FiffDirNode::SPtr info;
+    FiffTag::SPtr t_pTag;
+    fiffChInfo   this_ch = NULL;
+    FiffCoordTransOld* t = NULL;
+    fiff_int_t kind, pos;
+    int j,k,to_find;
+
+    if(!stream->open())
+        goto bad;
+
+    nodes = stream->tree()->dir_tree_find(FIFFB_MNE_PARENT_MEAS_FILE);
+
+    if (nodes.size() == 0) {
+        nodes = stream->tree()->dir_tree_find(FIFFB_MEAS_INFO);
+        if (nodes.size() == 0) {
+            qCritical ("Could not find the channel information.");
+            goto bad;
+        }
+    }
+    info = nodes[0];
+    to_find = 0;
+    for (k = 0; k < info->nent; k++) {
+        kind = info->dir[k]->kind;
+        pos  = info->dir[k]->pos;
+        switch (kind) {
+        case FIFF_NCHAN :
+            if (!FiffTag::read_tag(stream,t_pTag,pos))
+                goto bad;
+            nchan = *t_pTag->toInt();
+            chs = MALLOC_3(nchan,fiffChInfoRec);
+            for (j = 0; j < nchan; j++)
+                chs[j].scanNo = -1;
+            to_find = nchan;
+            break;
+
+        case FIFF_PARENT_BLOCK_ID :
+            if(!FiffTag::read_tag(stream, t_pTag, pos))
+                goto bad;
+//            id = t_pTag->toFiffID();
+            *id = *(fiffId)t_pTag->data();
+            break;
+
+        case FIFF_COORD_TRANS :
+            if(!FiffTag::read_tag(stream, t_pTag, pos))
+                goto bad;
+//            t = t_pTag->toCoordTrans();
+            t = FiffCoordTransOld::read_helper( t_pTag );
+            if (t->from != FIFFV_COORD_DEVICE || t->to   != FIFFV_COORD_HEAD)
+                t = NULL;
+            break;
+
+        case FIFF_CH_INFO : /* Information about one channel */
+            if(!FiffTag::read_tag(stream, t_pTag, pos))
+                goto bad;
+//            this_ch = t_pTag->toChInfo();
+            this_ch = (fiffChInfo)malloc(sizeof(fiffChInfoRec));
+            *this_ch = *(fiffChInfo)(t_pTag->data());
+            if (this_ch->scanNo <= 0 || this_ch->scanNo > nchan) {
+                printf ("FIFF_CH_INFO : scan # out of range %d (%d)!",this_ch->scanNo,nchan);
+                goto bad;
+            }
+            else
+                chs[this_ch->scanNo-1] = *this_ch;
+            to_find--;
+            break;
+        }
+    }
+    if (to_find != 0) {
+        qCritical("Some of the channel information was missing.");
+        goto bad;
+    }
+    if (t == NULL && meg_head_t != NULL) {
+        /*
+     * Try again in a more general fashion
+     */
+        if ((t = FiffCoordTransOld::mne_read_meas_transform(name)) == NULL) {
+            qCritical("MEG -> head coordinate transformation not found.");
+            goto bad;
+        }
+    }
+    /*
+   * Sort out the channels
+   */
+    for (k = 0; k < nchan; k++)
+        if (chs[k].kind == FIFFV_MEG_CH)
+            nmeg++;
+        else if (chs[k].kind == FIFFV_REF_MEG_CH)
+            nmeg_comp++;
+        else if (chs[k].kind == FIFFV_EEG_CH)
+            neeg++;
+    if (nmeg > 0)
+        meg = MALLOC_3(nmeg,fiffChInfoRec);
+    if (neeg > 0)
+        eeg = MALLOC_3(neeg,fiffChInfoRec);
+    if (nmeg_comp > 0)
+        meg_comp = MALLOC_3(nmeg_comp,fiffChInfoRec);
+    neeg = nmeg = nmeg_comp = 0;
+
+    for (k = 0; k < nchan; k++)
+        if (chs[k].kind == FIFFV_MEG_CH)
+            meg[nmeg++] = chs[k];
+        else if (chs[k].kind == FIFFV_REF_MEG_CH)
+            meg_comp[nmeg_comp++] = chs[k];
+        else if (chs[k].kind == FIFFV_EEG_CH)
+            eeg[neeg++] = chs[k];
+//    fiff_close(in);
+    stream->close();
+    FREE_3(chs);
+    if (megp) {
+        *megp  = meg;
+        *nmegp = nmeg;
+    }
+    else
+        FREE_3(meg);
+    if (meg_compp) {
+        *meg_compp = meg_comp;
+        *nmeg_compp = nmeg_comp;
+    }
+    else
+        FREE_3(meg_comp);
+    if (eegp) {
+        *eegp  = eeg;
+        *neegp = neeg;
+    }
+    else
+        FREE_3(eeg);
+    if (idp == NULL) {
+        FREE_3(id);
+    }
+    else
+        *idp   = id;
+    if (meg_head_t == NULL) {
+        FREE_3(t);
+    }
+    else
+        *meg_head_t = t;
+
+    return FIFF_OK;
+
+bad : {
+//        fiff_close(in);
+        stream->close();
+        FREE_3(chs);
+        FREE_3(meg);
+        FREE_3(eeg);
+        FREE_3(id);
+//        FREE_3(tag.data);
+        FREE_3(t);
+        return FIFF_FAIL;
+    }
+}
+
+
+
+
+
+//============================= mne_ctf_comp.c =============================
+
+
+#define MNE_CTFV_COMP_UNKNOWN -1
+#define MNE_CTFV_COMP_NONE    0
+#define MNE_CTFV_COMP_G1BR    0x47314252
+#define MNE_CTFV_COMP_G2BR    0x47324252
+#define MNE_CTFV_COMP_G3BR    0x47334252
+#define MNE_CTFV_COMP_G2OI    0x47324f49
+#define MNE_CTFV_COMP_G3OI    0x47334f49
+
+static struct {
+    int grad_comp;
+    int ctf_comp;
+} compMap_3[] = { { MNE_CTFV_NOGRAD,       MNE_CTFV_COMP_NONE },
+{ MNE_CTFV_GRAD1,        MNE_CTFV_COMP_G1BR },
+{ MNE_CTFV_GRAD2,        MNE_CTFV_COMP_G2BR },
+{ MNE_CTFV_GRAD3,        MNE_CTFV_COMP_G3BR },
+{ MNE_4DV_COMP1,         MNE_4DV_COMP1 },             /* One-to-one mapping for 4D data */
+{ MNE_CTFV_COMP_UNKNOWN, MNE_CTFV_COMP_UNKNOWN }};
+
+
+
+
+
+
+
+
+
+
+
+
+int mne_unmap_ctf_comp_kind_3(int ctf_comp)
+
+{
+    int k;
+
+    for (k = 0; compMap_3[k].grad_comp >= 0; k++)
+        if (ctf_comp == compMap_3[k].ctf_comp)
+            return compMap_3[k].grad_comp;
+    return ctf_comp;
+}
+
+
+
+
+
+
+
+
+/*
+ * Allocation and freeing of the data structures
+ */
+mneCTFcompData mne_new_ctf_comp_data_3()
+{
+    mneCTFcompData res = MALLOC_3(1,mneCTFcompDataRec);
+    res->kind          = MNE_CTFV_COMP_UNKNOWN;
+    res->mne_kind      = MNE_CTFV_COMP_UNKNOWN;
+    res->calibrated    = FALSE;
+    res->data          = NULL;
+    res->presel        = NULL;
+    res->postsel       = NULL;
+    res->presel_data   = NULL;
+    res->comp_data     = NULL;
+    res->postsel_data  = NULL;
+
+    return res;
+}
+
+
+
+
+
+
+mneCTFcompDataSet mne_new_ctf_comp_data_set_3()
+{
+    mneCTFcompDataSet res = MALLOC_3(1,mneCTFcompDataSetRec);
+
+    res->comps   = NULL;
+    res->ncomp   = 0;
+    res->chs     = NULL;
+    res->nch     = 0;
+    res->current = NULL;
+    res->undo    = NULL;
+    return res;
+}
+
+
+
+
+
+
+
+void mne_free_ctf_comp_data_3(mneCTFcompData comp)
+
+{
+    if (!comp)
+        return;
+
+    if(comp->data)
+        delete comp->data;
+    if(comp->presel)
+        delete comp->presel;
+    if(comp->postsel)
+        delete comp->postsel;
+    FREE_3(comp->presel_data);
+    FREE_3(comp->postsel_data);
+    FREE_3(comp->comp_data);
+    FREE_3(comp);
+    return;
+}
+
+
+void mne_free_ctf_comp_data_set_3(mneCTFcompDataSet set)
+
+{
+    int k;
+
+    if (!set)
+        return;
+
+    for (k = 0; k < set->ncomp; k++)
+        mne_free_ctf_comp_data_3(set->comps[k]);
+    FREE_3(set->comps);
+    FREE_3(set->chs);
+    mne_free_ctf_comp_data_3(set->current);
+    FREE_3(set);
+    return;
+}
+
+
+
+
+
+
+
+
+/*
+ * Mapping from simple integer orders to the mysterious CTF compensation numbers
+ */
+int mne_map_ctf_comp_kind_3(int grad)
+/*
+ * Simple mapping
+ */
+{
+    int k;
+
+    for (k = 0; compMap_3[k].grad_comp >= 0; k++)
+        if (grad == compMap_3[k].grad_comp)
+            return compMap_3[k].ctf_comp;
+    return grad;
+}
+
+
+
+
+
+
+const char *mne_explain_ctf_comp_3(int kind)
+{
+    static struct {
+        int kind;
+        const char *expl;
+    } explain[] = { { MNE_CTFV_COMP_NONE,    "uncompensated" },
+    { MNE_CTFV_COMP_G1BR,    "first order gradiometer" },
+    { MNE_CTFV_COMP_G2BR,    "second order gradiometer" },
+    { MNE_CTFV_COMP_G3BR,    "third order gradiometer" },
+    { MNE_4DV_COMP1,         "4D comp 1" },
+    { MNE_CTFV_COMP_UNKNOWN, "unknown" } };
+    int k;
+
+    for (k = 0; explain[k].kind != MNE_CTFV_COMP_UNKNOWN; k++)
+        if (explain[k].kind == kind)
+            return explain[k].expl;
+    return explain[k].expl;
+}
+
+
+
+
+static int mne_calibrate_ctf_comp_3(mneCTFcompData one,
+                                  fiffChInfo     chs,
+                                  int            nch,
+                                  int            do_it)
+/*
+* Calibrate or decalibrate a compensation data set
+*/
+{
+    float *col_cals,*row_cals;
+    int   j,k,p,found;
+    char  *name;
+    float **data;
+
+    if (!one)
+        return OK;
+    if (one->calibrated)
+        return OK;
+
+    row_cals = MALLOC_3(one->data->nrow,float);
+    col_cals = MALLOC_3(one->data->ncol,float);
+
+    for (j = 0; j < one->data->nrow; j++) {
+        name = one->data->rowlist[j];
+        found = FALSE;
+        for (p = 0; p < nch; p++)
+            if (strcmp(name,chs[p].ch_name) == 0) {
+                row_cals[j] = chs[p].range*chs[p].cal;
+                found = TRUE;
+                break;
+            }
+        if (!found) {
+            printf("Channel %s not found. Cannot calibrate the compensation matrix.",name);
+            return FAIL;
+        }
+    }
+    for (k = 0; k < one->data->ncol; k++) {
+        name = one->data->collist[k];
+        found = FALSE;
+        for (p = 0; p < nch; p++)
+            if (strcmp(name,chs[p].ch_name) == 0) {
+                col_cals[k] = chs[p].range*chs[p].cal;
+                found = TRUE;
+                break;
+            }
+        if (!found) {
+            printf("Channel %s not found. Cannot calibrate the compensation matrix.",name);
+            return FAIL;
+        }
+    }
+    data = one->data->data;
+    if (do_it) {
+        for (j = 0; j < one->data->nrow; j++)
+            for (k = 0; k < one->data->ncol; k++)
+                data[j][k] = row_cals[j]*data[j][k]/col_cals[k];
+    }
+    else {
+        for (j = 0; j < one->data->nrow; j++)
+            for (k = 0; k < one->data->ncol; k++)
+                data[j][k] = col_cals[k]*data[j][k]/row_cals[j];
+    }
+    return OK;
+}
+
+
+
+
+
+int mne_make_ctf_comp_3(mneCTFcompDataSet set,        /* The available compensation data */
+                      fiffChInfo        chs,        /* Channels to compensate These may contain channels other than those requiring compensation */
+                      int               nch,        /* How many of these */
+                      fiffChInfo        compchs,    /* The compensation input channels These may contain channels other than the MEG compensation channels */
+                      int               ncomp)      /* How many of these */
+/*
+* Make compensation data to apply to a set of channels to yield (or uncompensated) compensated data
+*/
+{
+    int *comps = NULL;
+    int need_comp;
+    int first_comp;
+    mneCTFcompData this_comp;
+    int  *comp_sel = NULL;
+    char **names   = NULL;
+    char *name;
+    int  j,k,p;
+
+    INVERSELIB::FiffSparseMatrix* presel  = NULL;
+    INVERSELIB::FiffSparseMatrix* postsel = NULL;
+    MneNamedMatrix*  data    = NULL;
+
+    if (!compchs) {
+        compchs = chs;
+        ncomp   = nch;
+    }
+    fprintf(stderr,"Setting up compensation data...\n");
+    if (nch == 0)
+        return OK;
+    if (set) {
+        mne_free_ctf_comp_data_3(set->current);
+        set->current = NULL;
+    }
+    comps = MALLOC_3(nch,int);
+    for (k = 0, need_comp = 0, first_comp = MNE_CTFV_COMP_NONE; k < nch; k++) {
+        if (chs[k].kind == FIFFV_MEG_CH) {
+            comps[k] = chs[k].chpos.coil_type >> 16;
+            if (comps[k] != MNE_CTFV_COMP_NONE) {
+                if (first_comp == MNE_CTFV_COMP_NONE)
+                    first_comp = comps[k];
+                else {
+                    if (comps[k] != first_comp) {
+                        printf("We do not support nonuniform compensation yet.");
+                        goto bad;
+                    }
+                }
+                need_comp++;
+            }
+        }
+        else
+            comps[k] = MNE_CTFV_COMP_NONE;
+    }
+    if (need_comp == 0) {
+        fprintf(stderr,"\tNo compensation set. Nothing more to do.\n");
+        FREE_3(comps);
+        return OK;
+    }
+    fprintf(stderr,"\t%d out of %d channels have the compensation set.\n",need_comp,nch);
+    if (!set) {
+        printf("No compensation data available for the required compensation.");
+        return FAIL;
+    }
+    /*
+    * Find the desired compensation data matrix
+    */
+    for (k = 0, this_comp = NULL; k < set->ncomp; k++) {
+        if (set->comps[k]->mne_kind == first_comp) {
+            this_comp = set->comps[k];
+            break;
+        }
+    }
+    if (!this_comp) {
+        printf("Did not find the desired compensation data : %s",
+               mne_explain_ctf_comp_3(mne_map_ctf_comp_kind_3(first_comp)));
+        goto bad;
+    }
+    fprintf(stderr,"\tDesired compensation data (%s) found.\n",mne_explain_ctf_comp_3(mne_map_ctf_comp_kind_3(first_comp)));
+    /*
+    * Find the compensation channels
+    */
+    comp_sel = MALLOC_3(this_comp->data->ncol,int);
+    for (k = 0; k < this_comp->data->ncol; k++) {
+        comp_sel[k] = -1;
+        name = this_comp->data->collist[k];
+        for (p = 0; p < ncomp; p++)
+            if (strcmp(name,compchs[p].ch_name) == 0) {
+                comp_sel[k] = p;
+                break;
+            }
+        if (comp_sel[k] < 0) {
+            printf("Compensation channel %s not found",name);
+            goto bad;
+        }
+    }
+    fprintf(stderr,"\tAll compensation channels found.\n");
+    /*
+    * Create the preselector
+    */
+    {
+        float **sel = ALLOC_CMATRIX_3(this_comp->data->ncol,ncomp);
+        for (j = 0; j < this_comp->data->ncol; j++) {
+            for (k = 0; k < ncomp; k++)
+                sel[j][k] = 0.0;
+            sel[j][comp_sel[j]] = 1.0;
+        }
+        if ((presel = mne_convert_to_sparse_3(sel,this_comp->data->ncol,ncomp,FIFFTS_MC_RCS,1e-30)) == NULL) {
+            FREE_CMATRIX_3(sel);
+            goto bad;
+        }
+        FREE_CMATRIX_3(sel);
+        fprintf(stderr,"\tPreselector created.\n");
+    }
+    /*
+    * Pick the desired channels
+    */
+    names = MALLOC_3(need_comp,char *);
+    for (k = 0, p = 0; k < nch; k++) {
+        if (comps[k] != MNE_CTFV_COMP_NONE)
+            names[p++] = chs[k].ch_name;
+    }
+    if ((data = this_comp->data->pick_from_named_matrix(names,need_comp,NULL,0)) == NULL)
+        goto bad;
+    fprintf(stderr,"\tCompensation data matrix created.\n");
+    /*
+    * Create the postselector
+    */
+    {
+        float **sel = ALLOC_CMATRIX_3(nch,data->nrow);
+        for (j = 0, p = 0; j < nch; j++) {
+            for (k = 0; k < data->nrow; k++)
+                sel[j][k] = 0.0;
+            if (comps[j] != MNE_CTFV_COMP_NONE)
+                sel[j][p++] = 1.0;
+        }
+        if ((postsel = mne_convert_to_sparse_3(sel,nch,data->nrow,FIFFTS_MC_RCS,1e-30)) == NULL) {
+            FREE_CMATRIX_3(sel);
+            goto bad;
+        }
+        FREE_CMATRIX_3(sel);
+        fprintf(stderr,"\tPostselector created.\n");
+    }
+    set->current           = mne_new_ctf_comp_data_3();
+    set->current->kind     = this_comp->kind;
+    set->current->mne_kind = this_comp->mne_kind;
+    set->current->data     = data;
+    set->current->presel   = presel;
+    set->current->postsel  = postsel;
+
+    fprintf(stderr,"\tCompensation set up.\n");
+
+    FREE_3(names);
+    FREE_3(comps);
+    FREE_3(comp_sel);
+
+    return OK;
+
+bad : {
+        if(presel)
+            delete presel;
+        if(postsel)
+            delete postsel;
+        if(data)
+            delete data;
+        FREE_3(names);
+        FREE_3(comps);
+        FREE_3(comp_sel);
+        return FAIL;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+int mne_apply_ctf_comp_3(mneCTFcompDataSet set,		  /* The compensation data */
+                       int               do_it,
+                       float             *data,           /* The data to process */
+                       int               ndata,
+                       float             *compdata,       /* Data containing the compensation channels */
+                       int               ncompdata)
+/*
+* Apply compensation or revert to uncompensated data
+*/
+{
+    mneCTFcompData this_comp;
+    float *presel,*comp;
+    int   k;
+
+    if (compdata == NULL) {
+        compdata  = data;
+        ncompdata = ndata;
+    }
+    if (!set || !set->current)
+        return OK;
+    this_comp = set->current;
+    /*
+   * Dimension checks
+   */
+    if (this_comp->presel) {
+        if (this_comp->presel->n != ncompdata) {
+            printf("Compensation data dimension mismatch. Expected %d, got %d channels.",
+                   this_comp->presel->n,ncompdata);
+            return FAIL;
+        }
+    }
+    else if (this_comp->data->ncol != ncompdata) {
+        printf("Compensation data dimension mismatch. Expected %d, got %d channels.",
+               this_comp->data->ncol,ncompdata);
+        return FAIL;
+    }
+    if (this_comp->postsel) {
+        if (this_comp->postsel->m != ndata) {
+            printf("Data dimension mismatch. Expected %d, got %d channels.",
+                   this_comp->postsel->m,ndata);
+            return FAIL;
+        }
+    }
+    else if (this_comp->data->nrow != ndata) {
+        printf("Data dimension mismatch. Expected %d, got %d channels.",
+               this_comp->data->nrow,ndata);
+        return FAIL;
+    }
+    /*
+    * Preselection is optional
+    */
+    if (this_comp->presel) {
+        if (!this_comp->presel_data)
+            this_comp->presel_data = MALLOC_3(this_comp->presel->m,float);
+        if (mne_sparse_vec_mult2_3(this_comp->presel,compdata,this_comp->presel_data) != OK)
+            return FAIL;
+        presel = this_comp->presel_data;
+    }
+    else
+        presel = compdata;
+    /*
+    * This always happens
+    */
+    if (!this_comp->comp_data)
+        this_comp->comp_data = MALLOC_3(this_comp->data->nrow,float);
+    mne_mat_vec_mult2_3(this_comp->data->data,presel,this_comp->comp_data,this_comp->data->nrow,this_comp->data->ncol);
+    /*
+    * Optional postselection
+    */
+    if (!this_comp->postsel)
+        comp = this_comp->comp_data;
+    else {
+        if (!this_comp->postsel_data) {
+            this_comp->postsel_data = MALLOC_3(this_comp->postsel->m,float);
+        }
+        if (mne_sparse_vec_mult2_3(this_comp->postsel,this_comp->comp_data,this_comp->postsel_data) != OK)
+            return FAIL;
+        comp = this_comp->postsel_data;
+    }
+    /*
+    * Compensate or revert compensation?
+    */
+    if (do_it) {
+        for (k = 0; k < ndata; k++)
+            data[k] = data[k] - comp[k];
+    }
+    else {
+        for (k = 0; k < ndata; k++)
+            data[k] = data[k] + comp[k];
+    }
+    return OK;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+mneCTFcompDataSet mne_read_ctf_comp_data_3(const QString& name)
+/*
+* Read all CTF compensation data from a given file
+*/
+{
+    QFile file(name);
+    FiffStream::SPtr stream(new FiffStream(&file));
+
+    mneCTFcompDataSet set = NULL;
+    mneCTFcompData    one;
+    QList<FiffDirNode::SPtr> nodes;
+    QList<FiffDirNode::SPtr> comps;
+    int               ncomp;
+    MneNamedMatrix*    mat = NULL;
+    int               kind,k;
+    FiffTag::SPtr t_pTag;
+    fiffChInfo        chs = NULL;
+    int               nch = 0;
+    int               calibrated;
+    /*
+    * Read the channel information
+    */
+    {
+        fiffChInfo        comp_chs = NULL;
+        int               ncompch = 0;
+
+        if (mne_read_meg_comp_eeg_ch_info_3(name,&chs,&nch,&comp_chs,&ncompch,NULL,NULL,NULL,NULL) == FAIL)
+            goto bad;
+        if (ncompch > 0) {
+            chs = REALLOC_3(chs,nch+ncompch,fiffChInfoRec);
+            for (k = 0; k < ncompch; k++)
+                chs[k+nch] = comp_chs[k];
+            nch = nch + ncompch;
+            FREE_3(comp_chs);
+        }
+    }
+    /*
+    * Read the rest of the stuff
+    */
+    if(!stream->open())
+        goto bad;
+    set = mne_new_ctf_comp_data_set_3();
+    /*
+    * Locate the compensation data sets
+    */
+    nodes = stream->tree()->dir_tree_find(FIFFB_MNE_CTF_COMP);
+    if (nodes.size() == 0)
+        goto good;      /* Nothing more to do */
+    comps = nodes[0]->dir_tree_find(FIFFB_MNE_CTF_COMP_DATA);
+    if (comps.size() == 0)
+        goto good;
+    ncomp = comps.size();
+    /*
+    * Set the channel info
+    */
+    set->chs = chs; chs = NULL;
+    set->nch = nch;
+    /*
+    * Read each data set
+    */
+    for (k = 0; k < ncomp; k++) {
+        mat = MneNamedMatrix::read_named_matrix(stream,comps[k],FIFF_MNE_CTF_COMP_DATA);
+        if (!mat)
+            goto bad;
+        comps[k]->find_tag(stream, FIFF_MNE_CTF_COMP_KIND, t_pTag);
+        if (t_pTag) {
+            kind = *t_pTag->toInt();
+        }
+        else
+            goto bad;
+        comps[k]->find_tag(stream, FIFF_MNE_CTF_COMP_CALIBRATED, t_pTag);
+        if (t_pTag) {
+            calibrated = *t_pTag->toInt();
+        }
+        else
+            calibrated = FALSE;
+        /*
+        * Add these data to the set
+        */
+        one = mne_new_ctf_comp_data_3();
+        one->data = mat; mat = NULL;
+        one->kind                = kind;
+        one->mne_kind            = mne_unmap_ctf_comp_kind_3(one->kind);
+        one->calibrated          = calibrated;
+
+        if (mne_calibrate_ctf_comp_3(one,set->chs,set->nch,TRUE) == FAIL) {
+            printf("Warning: Compensation data for '%s' omitted\n", mne_explain_ctf_comp_3(one->kind));//,err_get_error(),mne_explain_ctf_comp(one->kind));
+            mne_free_ctf_comp_data_3(one);
+        }
+        else {
+            set->comps               = REALLOC_3(set->comps,set->ncomp+1,mneCTFcompData);
+            set->comps[set->ncomp++] = one;
+        }
+    }
+#ifdef DEBUG
+    fprintf(stderr,"%d CTF compensation data sets read from %s\n",set->ncomp,name);
+#endif
+    goto good;
+
+bad : {
+        if(mat)
+            delete mat;
+        stream->close();
+        mne_free_ctf_comp_data_set_3(set);
+        return NULL;
+    }
+
+good : {
+        FREE_3(chs);
+        stream->close();
+        return set;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//============================= fwd_comp.c =============================
+
+
+
+
+int fwd_comp_field(float *rd,float *Q, FwdCoilSet* coils, float *res, void *client)
+/*
+      * Calculate the compensated field (one dipole component)
+      */
+{
+    fwdCompData comp = (fwdCompData)client;
+
+    if (!comp->field) {
+        printf("Field computation function is missing in fwd_comp_field_vec");
+        return FAIL;
+    }
+    /*
+   * First compute the field in the primary set of coils
+   */
+    if (comp->field(rd,Q,coils,res,comp->client) == FAIL)
+        return FAIL;
+    /*
+   * Compensation needed?
+   */
+    if (!comp->comp_coils || comp->comp_coils->ncoil <= 0 || !comp->set || !comp->set->current)
+        return OK;
+    /*
+   * Workspace needed?
+   */
+    if (!comp->work)
+        comp->work = MALLOC_3(comp->comp_coils->ncoil,float);
+    /*
+   * Compute the field in the compensation coils
+   */
+    if (comp->field(rd,Q,comp->comp_coils,comp->work,comp->client) == FAIL)
+        return FAIL;
+    /*
+   * Compute the compensated field
+   */
+    return mne_apply_ctf_comp_3(comp->set,TRUE,res,coils->ncoil,comp->work,comp->comp_coils->ncoil);
+}
+
+
+
+/*
+ * Routines to implement the reference channel compensation in field computations
+ */
+
+void fwd_free_comp_data(void *d)
+
+{
+    fwdCompData comp = (fwdCompData)d;
+
+    if (!comp)
+        return;
+    delete comp->comp_coils;
+    mne_free_ctf_comp_data_set_3(comp->set);
+    FREE_3(comp->work);
+    FREE_CMATRIX_3(comp->vec_work);
+
+    if (comp->client_free && comp->client)
+        comp->client_free(comp->client);
+
+    FREE_3(comp);
+    return;
+}
+
+
+
+
+fwdCompData fwd_new_comp_data()
+
+{
+    fwdCompData comp = MALLOC_3(1,fwdCompDataRec);
+
+    comp->comp_coils  = NULL;
+    comp->field       = NULL;
+    comp->vec_field   = NULL;
+    comp->field_grad  = NULL;
+    comp->client      = NULL;
+    comp->client_free = NULL;
+    comp->set         = NULL;
+    comp->work        = NULL;
+    comp->vec_work    = NULL;
+    return comp;
+}
+
+
+
+
+static int fwd_make_ctf_comp_coils(mneCTFcompDataSet set,          /* The available compensation data */
+                                   FwdCoilSet*        coils,        /* The main coil set */
+                                   FwdCoilSet*        comp_coils)   /* The compensation coil set */
+/*
+      * Call mne_make_ctf_comp using the information in the coil sets
+      */
+{
+    fiffChInfo chs     = NULL;
+    fiffChInfo compchs = NULL;
+    int        nchan   = 0;
+    int        ncomp   = 0;
+    FwdCoil* coil;
+    int k,res;
+
+    if (!coils || coils->ncoil <= 0) {
+        printf("Coil data missing in fwd_make_ctf_comp_coils");
+        return FAIL;
+    }
+    /*
+   * Create the fake channel info which contain just enough information
+   * for mne_make_ctf_comp
+   */
+    chs = MALLOC_3(coils->ncoil,fiffChInfoRec);
+    for (k = 0; k < coils->ncoil; k++) {
+        coil = coils->coils[k];
+        strcpy(chs[k].ch_name,coil->chname);
+        chs[k].chpos.coil_type = coil->type;
+        chs[k].kind = (coil->coil_class == FWD_COILC_EEG) ? FIFFV_EEG_CH : FIFFV_MEG_CH;
+    }
+    nchan = coils->ncoil;
+    if (comp_coils && comp_coils->ncoil > 0) {
+        compchs = MALLOC_3(comp_coils->ncoil,fiffChInfoRec);
+        for (k = 0; k < comp_coils->ncoil; k++) {
+            coil = comp_coils->coils[k];
+            strcpy(compchs[k].ch_name,coil->chname);
+            compchs[k].chpos.coil_type = coil->type;
+            compchs[k].kind = (coil->coil_class == FWD_COILC_EEG) ? FIFFV_EEG_CH : FIFFV_MEG_CH;
+        }
+        ncomp = comp_coils->ncoil;
+    }
+    res = mne_make_ctf_comp_3(set,chs,nchan,compchs,ncomp);
+
+    FREE_3(chs);
+    FREE_3(compchs);
+
+    return res;
+}
+
+
+
+
+
+
+
+mneCTFcompData mne_dup_ctf_comp_data_3(mneCTFcompData data)
+{
+    mneCTFcompData res;
+
+    if (!data)
+        return NULL;
+
+    res = mne_new_ctf_comp_data_3();
+
+    res->kind       = data->kind;
+    res->mne_kind   = data->mne_kind;
+    res->calibrated = data->calibrated;
+    res->data       = new MneNamedMatrix(*data->data);
+
+    res->presel     = new FiffSparseMatrix(*data->presel);
+    res->postsel    = new FiffSparseMatrix(*data->postsel);
+
+    return res;
+}
+
+
+
+
+mneCTFcompDataSet mne_dup_ctf_comp_data_set_3(mneCTFcompDataSet set)
+/*
+* Make a verbatim copy of a data set
+*/
+{
+    mneCTFcompDataSet res;
+    int  k;
+
+    if (!set)
+        return NULL;
+
+    res = mne_new_ctf_comp_data_set_3();
+
+    if (set->ncomp > 0) {
+        res->comps = MALLOC_3(set->ncomp,mneCTFcompData);
+        res->ncomp = set->ncomp;
+        for (k = 0; k < res->ncomp; k++)
+            res->comps[k] = mne_dup_ctf_comp_data_3(set->comps[k]);
+    }
+    res->current = mne_dup_ctf_comp_data_3(set->current);
+
+    return res;
+}
+
+
+
+
+
+fwdCompData fwd_make_comp_data(mneCTFcompDataSet set,           /* The CTF compensation data read from the file */
+                               FwdCoilSet*        coils,         /* The principal set of coils */
+                               FwdCoilSet*        comp_coils,    /* The compensation coils */
+                               fwdFieldFunc      field,	        /* The field computation functions */
+                               fwdVecFieldFunc   vec_field,
+                               fwdFieldGradFunc  field_grad,    /* The field and gradient computation function */
+                               void              *client,       /* Client data to be passed to the above */
+                               fwdUserFreeFunc   client_free)
+/*
+      * Compose a compensation data set
+      */
+{
+    fwdCompData comp = fwd_new_comp_data();
+
+    comp->set = mne_dup_ctf_comp_data_set_3(set);
+
+    if (comp_coils) {
+        comp->comp_coils = comp_coils->dup_coil_set(NULL);
+    }
+    else {
+        qWarning("No coils to duplicate");
+        comp->comp_coils = NULL;
+    }
+    comp->field       = field;
+    comp->vec_field   = vec_field;
+    comp->field_grad  = field_grad;
+    comp->client      = client;
+    comp->client_free = client_free;
+
+    if (fwd_make_ctf_comp_coils(comp->set,
+                                coils,
+                                comp->comp_coils) != OK) {
+        fwd_free_comp_data(comp);
+        return NULL;
+    }
+    else {
+        return comp;
+    }
+}
+
+
+
+int fwd_comp_field_vec(float *rd, FwdCoilSet* coils, float **res, void *client)
+/*
+      * Calculate the compensated field (all dipole components)
+      */
+{
+    fwdCompData comp = (fwdCompData)client;
+    int k;
+
+    if (!comp->vec_field) {
+        printf("Field computation function is missing in fwd_comp_field_vec");
+        return FAIL;
+    }
+    /*
+   * First compute the field in the primary set of coils
+   */
+    if (comp->vec_field(rd,coils,res,comp->client) == FAIL)
+        return FAIL;
+    /*
+   * Compensation needed?
+   */
+    if (!comp->comp_coils || comp->comp_coils->ncoil <= 0 || !comp->set || !comp->set->current)
+        return OK;
+    /*
+   * Need workspace?
+   */
+    if (!comp->vec_work)
+        comp->vec_work = ALLOC_CMATRIX_3(3,comp->comp_coils->ncoil);
+    /*
+   * Compute the field at the compensation sensors
+   */
+    if (comp->vec_field(rd,comp->comp_coils,comp->vec_work,comp->client) == FAIL)
+        return FAIL;
+    /*
+   * Compute the compensated field of three orthogonal dipoles
+   */
+    for (k = 0; k < 3; k++) {
+        if (mne_apply_ctf_comp_3(comp->set,TRUE,res[k],coils->ncoil,comp->vec_work[k],comp->comp_coils->ncoil) == FAIL)
+            return FAIL;
+    }
+    return OK;
+}
+
+
+
+
+
+//============================= fwd_spherefield.c =============================
+
+#define EPS   1e-5		/* Points closer to origin than this many
+    meters are considered to be at the
+    origin */
+#define CEPS       1e-5
+
+
+
+
+int fwd_sphere_field(float        *rd,	        /* The dipole location */
+                     float        Q[],	        /* The dipole components (xyz) */
+                     FwdCoilSet*   coils,	/* The coil definitions */
+                     float        Bval[],	/* Results */
+                     void         *client)	/* Client data will be the sphere model origin */
+
+{
+    /* This version uses Jukka Sarvas' field computation
+     for details, see
+
+     Jukka Sarvas:
+
+     Basic mathematical and electromagnetic concepts
+     of the biomagnetic inverse problem,
+
+     Phys. Med. Biol. 1987, Vol. 32, 1, 11-22
+
+     The formulas have been manipulated for efficient computation
+     by Matti Hamalainen, February 1990
+
+  */
+    float *r0 = (float *)client;      /* The sphere model origin */
+    float v[3],a_vec[3];
+    float a,a2,r,r2;
+    float ar,ar0,rr0;
+    float vr,ve,re,r0e;
+    float F,g0,gr,result,sum;
+    int   j,k,p;
+    FwdCoil* this_coil;
+    float *this_pos,*this_dir;	/* These point to the coil structure! */
+    int   np;
+    float myrd[3];
+    float pos[3];
+    /*
+   * Shift to the sphere model coordinates
+   */
+    for (p = 0; p < 3; p++)
+        myrd[p] = rd[p] - r0[p];
+    rd = myrd;
+    /*
+   * Check for a dipole at the origin
+   */
+    for (k = 0 ; k < coils->ncoil ; k++)
+        if (FWD_IS_MEG_COIL(coils->coils[k]->coil_class))
+            Bval[k] = 0.0;
+    r = VEC_LEN_3(rd);
+    if (r > EPS)	{		/* The hard job */
+
+        CROSS_PRODUCT_3(Q,rd,v);
+
+        for (k = 0; k < coils->ncoil; k++) {
+            this_coil = coils->coils[k];
+            if (FWD_IS_MEG_COIL(this_coil->type)) {
+
+                np = this_coil->np;
+
+                for (j = 0, sum = 0.0; j < np; j++) {
+
+                    this_pos = this_coil->rmag[j];
+                    this_dir = this_coil->cosmag[j];
+
+                    for (p = 0; p < 3; p++)
+                        pos[p] = this_pos[p] - r0[p];
+                    this_pos = pos;
+                    result = 0.0;
+
+                    /* Vector from dipole to the field point */
+
+                    VEC_DIFF_3(rd,this_pos,a_vec);
+
+                    /* Compute the dot products needed */
+
+                    a2  = VEC_DOT_3(a_vec,a_vec);       a = sqrt(a2);
+
+                    if (a > 0.0) {
+                        r2  = VEC_DOT_3(this_pos,this_pos); r = sqrt(r2);
+                        if (r > 0.0) {
+                            rr0 = VEC_DOT_3(this_pos,rd);
+                            ar = (r2-rr0);
+                            if (fabs(ar/(a*r)+1.0) > CEPS) { /* There is a problem on the negative 'z' axis if the dipole location
+                                                * and the field point are on the same line */
+                                ar0  = ar/a;
+
+                                ve = VEC_DOT_3(v,this_dir); vr = VEC_DOT_3(v,this_pos);
+                                re = VEC_DOT_3(this_pos,this_dir); r0e = VEC_DOT_3(rd,this_dir);
+
+                                /* The main ingredients */
+
+                                F  = a*(r*a + ar);
+                                gr = a2/r + ar0 + 2.0*(a+r);
+                                g0 = a + 2*r + ar0;
+
+                                /* Mix them together... */
+
+                                sum = sum + this_coil->w[j]*(ve*F + vr*(g0*r0e - gr*re))/(F*F);
+                            }
+                        }
+                    }
+                }				/* All points done */
+                Bval[k] = MAG_FACTOR*sum;
+            }
+        }
+    }
+    return OK;			/* Happy conclusion: this works always */
+}
+
+
+int fwd_sphere_field_vec(float        *rd,	/* The dipole location */
+                         FwdCoilSet*   coils,	/* The coil definitions */
+                         float        **Bval,  /* Results: rows are the fields of the x,y, and z direction dipoles */
+                         void         *client)	/* Client data will be the sphere model origin */
+
+{
+    /* This version uses Jukka Sarvas' field computation
+     for details, see
+
+     Jukka Sarvas:
+
+     Basic mathematical and electromagnetic concepts
+     of the biomagnetic inverse problem,
+
+     Phys. Med. Biol. 1987, Vol. 32, 1, 11-22
+
+     The formulas have been manipulated for efficient computation
+     by Matti Hamalainen, February 1990
+
+     The idea of matrix kernels is from
+
+     Mosher, Leahy, and Lewis: EEG and MEG: Forward Solutions for Inverse Methods
+
+     which has been simplified here using standard vector notation
+
+  */
+    float *r0 = (float *)client;      /* The sphere model origin */
+    float a_vec[3],v1[3],v2[3];
+    float a,a2,r,r2;
+    float ar,ar0,rr0;
+    float re,r0e;
+    float F,g0,gr,g,sum[3];
+    int   j,k,p;
+    FwdCoil* this_coil;
+    float *this_pos,*this_dir;	/* These point to the coil structure! */
+    int   np;
+    float myrd[3];
+    float pos[3];
+    /*
+   * Shift to the sphere model coordinates
+   */
+    for (p = 0; p < 3; p++)
+        myrd[p] = rd[p] - r0[p];
+    rd = myrd;
+    /*
+   * Check for a dipole at the origin
+   */
+    r = VEC_LEN_3(rd);
+    for (k = 0; k < coils->ncoil; k++) {
+        this_coil = coils->coils[k];
+        if (FWD_IS_MEG_COIL(this_coil->coil_class)) {
+            if (r < EPS) {
+                Bval[0][k] = Bval[1][k] = Bval[2][k] = 0.0;
+            }
+            else { 	/* The hard job */
+
+                np = this_coil->np;
+                sum[0] = sum[1] = sum[2] = 0.0;
+
+                for (j = 0; j < np; j++) {
+
+                    this_pos = this_coil->rmag[j];
+                    this_dir = this_coil->cosmag[j];
+
+                    for (p = 0; p < 3; p++)
+                        pos[p] = this_pos[p] - r0[p];
+                    this_pos = pos;
+
+                    /* Vector from dipole to the field point */
+
+                    VEC_DIFF_3(rd,this_pos,a_vec);
+
+                    /* Compute the dot products needed */
+
+                    a2  = VEC_DOT_3(a_vec,a_vec);       a = sqrt(a2);
+
+                    if (a > 0.0) {
+                        r2  = VEC_DOT_3(this_pos,this_pos); r = sqrt(r2);
+                        if (r > 0.0) {
+                            rr0 = VEC_DOT_3(this_pos,rd);
+                            ar = (r2-rr0);
+                            if (fabs(ar/(a*r)+1.0) > CEPS) { /* There is a problem on the negative 'z' axis if the dipole location
+                                                * and the field point are on the same line */
+
+                                /* The main ingredients */
+
+                                ar0  = ar/a;
+                                F  = a*(r*a + ar);
+                                gr = a2/r + ar0 + 2.0*(a+r);
+                                g0 = a + 2*r + ar0;
+
+                                re = VEC_DOT_3(this_pos,this_dir); r0e = VEC_DOT_3(rd,this_dir);
+                                CROSS_PRODUCT_3(rd,this_dir,v1);
+                                CROSS_PRODUCT_3(rd,this_pos,v2);
+
+                                g = (g0*r0e - gr*re)/(F*F);
+                                /*
+                 * Mix them together...
+                 */
+                                for (p = 0; p < 3; p++)
+                                    sum[p] = sum[p] + this_coil->w[j]*(v1[p]/F + v2[p]*g);
+                            }
+                        }
+                    }
+                }				/* All points done */
+                for (p = 0; p < 3; p++)
+                    Bval[p][k] = MAG_FACTOR*sum[p];
+            }
+        }
+    }
+    return OK;			/* Happy conclusion: this works always */
+}
+
+
+
+
+
+//============================= fwd_mag_dipole_field.c =============================
+
+
+#define EPS 1e-5
+
+#ifndef OK
+#define OK 0
+#endif
+
+/*
+ * Compute the field of a magnetic dipole
+ */
+
+
+int fwd_mag_dipole_field(float        *rm,      /* The dipole location in the same coordinate system as the coils */
+                         float        M[],	/* The dipole components (xyz) */
+                         FwdCoilSet*   coils,	/* The coil definitions */
+                         float        Bval[],	/* Results */
+                         void         *client)	/* Client data will be the sphere model origin */
+/*
+ * This is for a specific dipole component
+ */
+{
+    int     j,k,np;
+    FwdCoil* this_coil;
+    float   sum,diff[3],dist,dist2,dist5,*dir;
+
+
+    for (k = 0; k < coils->ncoil; k++) {
+        this_coil = coils->coils[k];
+        if (FWD_IS_MEG_COIL(this_coil->type)) {
+            np = this_coil->np;
+            /*
+       * Go through all points
+       */
+            for (j = 0, sum = 0.0; j < np; j++) {
+                dir = this_coil->cosmag[j];
+                VEC_DIFF_3(rm,this_coil->rmag[j],diff);
+                dist = VEC_LEN_3(diff);
+                if (dist > EPS) {
+                    dist2 = dist*dist;
+                    dist5 = dist2*dist2*dist;
+                    sum = sum + this_coil->w[j]*(3*VEC_DOT_3(M,diff)*VEC_DOT_3(diff,dir) - dist2*VEC_DOT_3(M,dir))/dist5;
+                }
+            }				/* All points done */
+            Bval[k] = MAG_FACTOR*sum;
+        }
+        else if (this_coil->type == FWD_COILC_EEG)
+            Bval[k] = 0.0;
+    }
+    return OK;
+}
+
+int fwd_mag_dipole_field_vec(float        *rm,	        /* The dipole location */
+                             FwdCoilSet*   coils,	/* The coil definitions */
+                             float        **Bval,       /* Results: rows are the fields of the x,y, and z direction dipoles */
+                             void         *client)	/* Client data will be the sphere model origin */
+/*
+ * This is for all dipole components
+ * For EEG this produces a zero result
+ */
+{
+    int     j,k,p,np;
+    FwdCoil* this_coil;
+    float   sum[3],diff[3],dist,dist2,dist5,*dir;
+
+
+    for (k = 0; k < coils->ncoil; k++) {
+        this_coil = coils->coils[k];
+        if (FWD_IS_MEG_COIL(this_coil->type)) {
+            np = this_coil->np;
+            sum[0] = sum[1] = sum[2] = 0.0;
+            /*
+       * Go through all points
+       */
+            for (j = 0; j < np; j++) {
+                dir = this_coil->cosmag[j];
+                VEC_DIFF_3(rm,this_coil->rmag[j],diff);
+                dist = VEC_LEN_3(diff);
+                if (dist > EPS) {
+                    dist2 = dist*dist;
+                    dist5 = dist2*dist2*dist;
+                    for (p = 0; p < 3; p++)
+                        sum[p] = sum[p] + this_coil->w[j]*(3*diff[p]*VEC_DOT_3(diff,dir) - dist2*dir[p])/dist5;
+                }
+            }				/* All points done */
+            for (p = 0; p < 3; p++)
+                Bval[p][k] = MAG_FACTOR*sum[p];
+        }
+        else if (this_coil->type == FWD_COILC_EEG) {
+            for (p = 0; p < 3; p++)
+                Bval[p][k] = 0.0;
+        }
+    }
+    return OK;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//============================= data.c =============================
+
+#if defined(_WIN32) || defined(_WIN64)
+#define snprintf _snprintf
+#define vsnprintf _vsnprintf
+#define strcasecmp _stricmp
+#define strncasecmp _strnicmp
+#endif
+
+int is_selected_in_data(mshMegEegData d, char *ch_name)
+/*
+ * Is this channel selected in data
+ */
+{
+    int issel = FALSE;
+    int k;
+
+    for (k = 0; k < d->meas->nchan; k++)
+        if (strcasecmp(ch_name,d->meas->chs[k].ch_name) == 0) {
+            issel = d->sels[k];
+            break;
+        }
+    return issel;
+}
+
+
+
+
+
+
+
+
+
+
+
+//============================= mne_process_bads.c =============================
+
+static int whitespace_3(char *text)
+
+{
+    if (text == NULL || strlen(text) == 0)
+        return TRUE;
+    if (strspn(text," \t\n\r") == strlen(text))
+        return TRUE;
+    return FALSE;
+}
+
+
+static char *next_line_3(char *line, int n, FILE *in)
+{
+    char *res;
+
+    for (res = fgets(line,n,in); res != NULL; res = fgets(line,n,in))
+        if (!whitespace_3(res))
+            if (res[0] != '#')
+                break;
+    return res;
+}
+
+#define MAXLINE 500
+
+int mne_read_bad_channels_3(const QString& name, char ***listp, int *nlistp)
+/*
+* Read bad channel names
+*/
+{
+    FILE *in = NULL;
+    char **list = NULL;
+    int  nlist  = 0;
+    char line[MAXLINE+1];
+    char *next;
+
+
+    if (name.isEmpty())
+        return OK;
+
+    if ((in = fopen(name.toLatin1().data(),"r")) == NULL) {
+        qCritical() << name;
+        goto bad;
+    }
+    while ((next = next_line_3(line,MAXLINE,in)) != NULL) {
+        if (strlen(next) > 0) {
+            if (next[strlen(next)-1] == '\n')
+                next[strlen(next)-1] = '\0';
+            list = REALLOC_3(list,nlist+1,char *);
+            list[nlist++] = mne_strdup_3(next);
+        }
+    }
+    if (ferror(in))
+        goto bad;
+
+    *listp  = list;
+    *nlistp = nlist;
+
+    return OK;
+
+bad : {
+        mne_free_name_list_3(list,nlist);
+        if (in != NULL)
+            fclose(in);
+        return FAIL;
+    }
+}
+
+
+
+
+int mne_read_bad_channel_list_from_node_3(FiffStream::SPtr& stream,
+                                        const FiffDirNode::SPtr& pNode, char ***listp, int *nlistp)
+{
+    FiffDirNode::SPtr node,bad;
+    QList<FiffDirNode::SPtr> temp;
+    char **list = NULL;
+    int  nlist  = 0;
+    FiffTag::SPtr t_pTag;
+    char *names;
+
+    if (pNode->isEmpty())
+        node = stream->tree();
+    else
+        node = pNode;
+
+    temp = node->dir_tree_find(FIFFB_MNE_BAD_CHANNELS);
+    if (temp.size() > 0) {
+        bad = temp[0];
+
+        bad->find_tag(stream, FIFF_MNE_CH_NAME_LIST, t_pTag);
+        if (t_pTag) {
+            names = (char *)t_pTag->data();
+            mne_string_to_name_list_3(names,&list,&nlist);
+        }
+    }
+    *listp = list;
+    *nlistp = nlist;
+    return OK;
+}
+
+int mne_read_bad_channel_list_3(const QString& name, char ***listp, int *nlistp)
+
+{
+    QFile file(name);
+    FiffStream::SPtr stream(new FiffStream(&file));
+
+    int res;
+
+    if(!stream->open())
+        return FAIL;
+
+    res = mne_read_bad_channel_list_from_node_3(stream,stream->tree(),listp,nlistp);
+
+    stream->close();
+
+    return res;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+mneCovMatrix mne_read_cov(const QString& name,int kind)
+/*
+* Read a covariance matrix from a fiff
+*/
+{
+    QFile file(name);
+    FiffStream::SPtr stream(new FiffStream(&file));
+
+    FiffTag::SPtr t_pTag;
+    QList<FiffDirNode::SPtr> nodes;
+    FiffDirNode::SPtr    covnode;
+
+    char            **names    = NULL;	/* Optional channel name list */
+    int             nnames     = 0;
+    double          *cov       = NULL;
+    double          *cov_diag  = NULL;
+    INVERSELIB::FiffSparseMatrix* cov_sparse = NULL;
+    double          *lambda    = NULL;
+    float           **eigen    = NULL;
+    MatrixXf        tmp_eigen;
+    char            **bads     = NULL;
+    int             nbad       = 0;
+    int             ncov       = 0;
+    int             nfree      = 1;
+    mneCovMatrix    res        = NULL;
+
+    int            k,p,nn;
+    float          *f;
+    double         *d;
+    mneProjOp      op = NULL;
+    MneSssData*     sss = NULL;
+
+    if(!stream->open())
+        goto out;
+
+    nodes = stream->tree()->dir_tree_find(FIFFB_MNE_COV);
+
+    if (nodes.size() == 0) {
+        printf("No covariance matrix available in %s",name.toLatin1().data());
+        goto out;
+    }
+    /*
+    * Locate the desired matrix
+    */
+    for (k = 0 ; k < nodes.size(); ++k) {
+        if (!nodes[k]->find_tag(stream, FIFF_MNE_COV_KIND, t_pTag))
+            continue;
+
+        if (*t_pTag->toInt() == kind) {
+            covnode = nodes[k];
+            break;
+        }
+    }
+    if (covnode->isEmpty()) {
+        printf("Desired covariance matrix not found from %s",name.toLatin1().data());
+        goto out;
+    }
+    /*
+    * Read the data
+    */
+    if (!nodes[k]->find_tag(stream, FIFF_MNE_COV_DIM, t_pTag))
+        goto out;
+    ncov = *t_pTag->toInt();
+
+    if (nodes[k]->find_tag(stream, FIFF_MNE_COV_NFREE, t_pTag)) {
+        nfree = *t_pTag->toInt();
+    }
+    if (covnode->find_tag(stream, FIFF_MNE_ROW_NAMES, t_pTag)) {
+        mne_string_to_name_list_3((char *)(t_pTag->data()),&names,&nnames);
+        if (nnames != ncov) {
+            qCritical("Incorrect number of channel names for a covariance matrix");
+            goto out;
+        }
+    }
+    if (!nodes[k]->find_tag(stream, FIFF_MNE_COV, t_pTag)) {
+        if (!nodes[k]->find_tag(stream, FIFF_MNE_COV_DIAG, t_pTag))
+            goto out;
+        else {
+            if (t_pTag->getType() == FIFFT_DOUBLE) {
+                cov_diag = MALLOC_3(ncov,double);
+                qDebug() << "ToDo: Check whether cov_diag contains the right stuff!!! - use VectorXd instead";
+                d = t_pTag->toDouble();
+                for (p = 0; p < ncov; p++)
+                    cov_diag[p] = d[p];
+                if (check_cov_data(cov_diag,ncov) != OK)
+                    goto out;
+            }
+            else if (t_pTag->getType() == FIFFT_FLOAT) {
+                cov_diag = MALLOC_3(ncov,double);
+                qDebug() << "ToDo: Check whether f contains the right stuff!!! - use VectorXf instead";
+                f = t_pTag->toFloat();
+                for (p = 0; p < ncov; p++)
+                    cov_diag[p] = f[p];
+            }
+            else {
+                printf("Illegal data type for covariance matrix");
+                goto out;
+            }
+        }
+    }
+    else {
+        nn = ncov*(ncov+1)/2;
+        if (t_pTag->getType() == FIFFT_DOUBLE) {
+            qDebug() << "ToDo: Check whether cov contains the right stuff!!! - use VectorXd instead";
+//            qDebug() << t_pTag->size() / sizeof(double);
+            cov = MALLOC_3(nn,double);
+            d = t_pTag->toDouble();
+            for (p = 0; p < nn; p++)
+                cov[p] = d[p];
+            if (check_cov_data(cov,nn) != OK)
+                goto out;
+        }
+        else if (t_pTag->getType() == FIFFT_FLOAT) {
+            cov = MALLOC_3(nn,double);
+            f = t_pTag->toFloat();
+            for (p = 0; p < nn; p++)
+                cov[p] = f[p];
+        }
+        else if ((cov_sparse = FiffSparseMatrix::fiff_get_float_sparse_matrix(t_pTag)) == NULL) {
+            goto out;
+        }
+
+        if (nodes[k]->find_tag(stream, FIFF_MNE_COV_EIGENVALUES, t_pTag)) {
+            lambda = (double *)t_pTag->toDouble();
+            if (nodes[k]->find_tag(stream, FIFF_MNE_COV_EIGENVECTORS, t_pTag))
+                goto out;
+
+            tmp_eigen = t_pTag->toFloatMatrix().transpose();
+            eigen = ALLOC_CMATRIX_3(tmp_eigen.rows(),tmp_eigen.cols());
+            fromFloatEigenMatrix_3(tmp_eigen, eigen);
+        }
+        /*
+        * Read the optional projection operator
+        */
+        if ((op = mne_read_proj_op_from_node_3(stream,nodes[k])) == NULL)
+            goto out;
+        /*
+        * Read the optional SSS data
+        */
+        if ((sss = MneSssData::read_sss_data_from_node(stream,nodes[k])) == NULL)
+            goto out;
+        /*
+        * Read the optional bad channel list
+        */
+        if (mne_read_bad_channel_list_from_node_3(stream,nodes[k],&bads,&nbad) == FAIL)
+            goto out;
+    }
+    if (cov_sparse)
+        res = mne_new_cov_sparse(kind,ncov,names,cov_sparse);
+    else if (cov)
+        res = mne_new_cov_dense(kind,ncov,names,cov);
+    else if (cov_diag)
+        res = mne_new_cov_diag(kind,ncov,names,cov_diag);
+    else {
+        qCritical("mne_read_cov : covariance matrix data is not defined. How come?");
+        goto out;
+    }
+    cov         = NULL;
+    cov_diag    = NULL;
+    cov_sparse  = NULL;
+    res->eigen  = eigen;
+    res->lambda = lambda;
+    res->nfree  = nfree;
+    res->bads   = bads;
+    res->nbad   = nbad;
+    /*
+    * Count the non-zero eigenvalues
+    */
+    if (res->lambda) {
+        res->nzero = 0;
+        for (k = 0; k < res->ncov; k++, res->nzero++)
+            if (res->lambda[k] > 0)
+                break;
+    }
+
+    if (op && op->nitems > 0) {
+        res->proj = op;
+        op = NULL;
+    }
+    if (sss && sss->ncomp > 0 && sss->job != FIFFV_SSS_JOB_NOTHING) {
+        res->sss = sss;
+        sss = NULL;
+    }
+
+out : {
+        stream->close();
+        mne_free_proj_op_3(op);
+        if(sss)
+            delete sss;
+
+        if (!res) {
+            mne_free_name_list_3(names,nnames);
+            mne_free_name_list_3(bads,nbad);
+            FREE_3(cov);
+            FREE_3(cov_diag);
+            if(cov_sparse)
+                delete cov_sparse;
+        }
+        return res;
+    }
+
+}
+
+
+
+
+
+
+
+
+//============================= mne_coord_transforms.c =============================
+
+typedef struct {
+    int frame;
+    const char *name;
+} frameNameRec_3;
+
+
+const char *mne_coord_frame_name_3(int frame)
+
+{
+    static frameNameRec_3 frames[] = {
+        {FIFFV_COORD_UNKNOWN,"unknown"},
+        {FIFFV_COORD_DEVICE,"MEG device"},
+        {FIFFV_COORD_ISOTRAK,"isotrak"},
+        {FIFFV_COORD_HPI,"hpi"},
+        {FIFFV_COORD_HEAD,"head"},
+        {FIFFV_COORD_MRI,"MRI (surface RAS)"},
+        {FIFFV_MNE_COORD_MRI_VOXEL, "MRI voxel"},
+        {FIFFV_COORD_MRI_SLICE,"MRI slice"},
+        {FIFFV_COORD_MRI_DISPLAY,"MRI display"},
+        {FIFFV_MNE_COORD_CTF_DEVICE,"CTF MEG device"},
+        {FIFFV_MNE_COORD_CTF_HEAD,"CTF/4D/KIT head"},
+        {FIFFV_MNE_COORD_RAS,"RAS (non-zero origin)"},
+        {FIFFV_MNE_COORD_MNI_TAL,"MNI Talairach"},
+        {FIFFV_MNE_COORD_FS_TAL_GTZ,"Talairach (MNI z > 0)"},
+        {FIFFV_MNE_COORD_FS_TAL_LTZ,"Talairach (MNI z < 0)"},
+        {-1,"unknown"}
+    };
+    int k;
+    for (k = 0; frames[k].frame != -1; k++) {
+        if (frame == frames[k].frame)
+            return frames[k].name;
+    }
+    return frames[k].name;
+}
+
+
+
+
+//============================= mne_read_process_forward_solution.c =============================
+
+void mne_merge_channels(fiffChInfo chs1, int nch1,
+                        fiffChInfo chs2, int nch2,
+                        fiffChInfo *resp, int *nresp)
+
+{
+    fiffChInfo res = MALLOC_3(nch1+nch2,fiffChInfoRec);
+    int k,p;
+    for (p = 0, k = 0; k < nch1; k++)
+        res[p++] = chs1[k];
+    for (k = 0; k < nch2;k++)
+        res[p++] = chs2[k];
+    *resp = res;
+    *nresp = nch1+nch2;
+    return;
+}
+
+
+//============================= read_ch_info.c =============================
+
+
+
+
+static FiffDirNode::SPtr find_meas_3 (const FiffDirNode::SPtr& node)
+/*
+      * Find corresponding meas node
+      */
+{
+    FiffDirNode::SPtr empty_node;
+    FiffDirNode::SPtr tmp_node = node;
+
+    while (tmp_node->type != FIFFB_MEAS) {
+        if (tmp_node->parent == NULL)
+            return empty_node;//(NULL);
+        tmp_node = tmp_node->parent;
+    }
+    return (tmp_node);
+}
+
+
+
+static FiffDirNode::SPtr find_meas_info_3 (const FiffDirNode::SPtr& node)
+/*
+      * Find corresponding meas info node
+      */
+{
+    int k;
+    FiffDirNode::SPtr empty_node;
+    FiffDirNode::SPtr tmp_node = node;
+
+    while (tmp_node->type != FIFFB_MEAS) {
+        if (tmp_node->parent == NULL)
+            return empty_node;
+        tmp_node = tmp_node->parent;
+    }
+    for (k = 0; k < tmp_node->nchild; k++)
+        if (tmp_node->children[k]->type == FIFFB_MEAS_INFO)
+            return (tmp_node->children[k]);
+    return empty_node;
+}
+
+
+
+static int get_all_chs (//fiffFile file,	        /* The file we are reading */
+                        FiffStream::SPtr& stream,
+                        const FiffDirNode::SPtr& p_node,	/* The directory node containing our data */
+                        fiffId *id,		/* The block id from the nearest FIFFB_MEAS
+                                                   parent */
+                        fiffChInfo *chp,	/* Channel descriptions */
+                        int *nchan)		/* Number of channels */
+/*
+      * Find channel information from
+      * nearest FIFFB_MEAS_INFO parent of
+      * node.
+      */
+{
+    fiffChInfo ch;
+    fiffChInfo this_ch = NULL;
+    int j,k;
+    int to_find = 0;
+    FiffDirNode::SPtr meas;
+    FiffDirNode::SPtr meas_info;
+    fiff_int_t kind, pos;
+    FiffTag::SPtr t_pTag;
+
+    *chp     = NULL;
+    ch       = NULL;
+    *id      = NULL;
+    /*
+    * Find desired parents
+    */
+    if (!(meas = find_meas_3(p_node))) {
+        qCritical("Meas. block not found!");
+        goto bad;
+    }
+
+    if (!(meas_info = find_meas_info_3(p_node))) {
+        qCritical ("Meas. info not found!");
+        goto bad;
+    }
+    /*
+    * Is there a block id is in the FIFFB_MEAS node?
+    */
+    if (!meas->id.isEmpty()) {
+        *id = MALLOC_3(1,fiffIdRec);
+        (*id)->version = meas->id.version;
+        (*id)->machid[0] = meas->id.machid[0];
+        (*id)->machid[1] = meas->id.machid[1];
+        (*id)->time = meas->id.time;
+    }
+    /*
+    * Others from FIFFB_MEAS_INFO
+    */
+    for (k = 0; k < meas_info->nent; k++) {
+        kind = meas_info->dir[k]->kind;
+        pos  = meas_info->dir[k]->pos;
+        switch (kind) {
+        case FIFF_NCHAN :
+            if (!FiffTag::read_tag(stream,t_pTag,pos))
+                goto bad;
+            *nchan = *t_pTag->toInt();
+            ch = MALLOC_3(*nchan,fiffChInfoRec);
+            for (j = 0; j < *nchan; j++)
+                ch[j].scanNo = -1;
+            to_find = to_find + *nchan - 1;
+            break;
+
+        case FIFF_CH_INFO : /* Information about one channel */
+            if (!FiffTag::read_tag(stream,t_pTag,pos))
+                goto bad;
+            this_ch = (fiffChInfo)malloc(sizeof(fiffChInfoRec));
+            *this_ch = *(fiffChInfo)t_pTag->data();
+            if (this_ch->scanNo <= 0 || this_ch->scanNo > *nchan) {
+                qCritical ("FIFF_CH_INFO : scan # out of range!");
+                goto bad;
+            }
+            else
+                memcpy(ch+this_ch->scanNo-1,this_ch,
+                       sizeof(fiffChInfoRec));
+            to_find--;
+            break;
+        }
+    }
+    *chp = ch;
+    return FIFF_OK;
+
+bad : {
+        FREE_3(ch);
+        return FIFF_FAIL;
+    }
+}
+
+
+
+
+static int read_ch_info(const QString&  name,
+                        fiffChInfo      *chsp,
+                        int             *nchanp,
+                        fiffId          *idp)
+/*
+* Read channel information from a measurement file
+*/
+{
+    QFile file(name);
+    FiffStream::SPtr stream(new FiffStream(&file));
+
+    fiffChInfo chs = NULL;
+    int        nchan = 0;
+    fiffId     id = NULL;
+
+    QList<FiffDirNode::SPtr> meas;
+    FiffDirNode::SPtr    node;
+
+    if(!stream->open())
+        goto bad;
+
+    meas = stream->tree()->dir_tree_find(FIFFB_MEAS);
+    if (meas.size() == 0) {
+        qCritical ("%s : no MEG data available here",name.toLatin1().data());
+        goto bad;
+    }
+    node = meas[0];
+    if (get_all_chs (stream,node,&id,&chs,&nchan) == FIFF_FAIL)
+        goto bad;
+    *chsp   = chs;
+    *nchanp = nchan;
+    *idp = id;
+    stream->close();
+    return FIFF_OK;
+
+bad : {
+        FREE_3(chs);
+        FREE_3(id);
+        stream->close();
+        return FIFF_FAIL;
+    }
+}
+
+
+
+
+#define TOO_CLOSE 1e-4
+
+static int at_origin (float *rr)
+
+{
+    return (VEC_LEN_3(rr) < TOO_CLOSE);
+}
+
+
+
+
+static int is_valid_eeg_ch(fiffChInfo ch)
+/*
+      * Is the electrode position information present?
+      */
+{
+    if (ch->kind == FIFFV_EEG_CH) {
+        if (at_origin(ch->chpos.r0) ||
+                ch->chpos.coil_type == FIFFV_COIL_NONE)
+            return FALSE;
+        else
+            return TRUE;
+    }
+    return FALSE;
+}
+
+
+
+
+
+
+
+static int accept_ch(fiffChInfo ch,
+                     char       **bads,
+                     int        nbad)
+
+{
+    int k;
+    for (k = 0; k < nbad; k++)
+        if (strcmp(ch->ch_name,bads[k]) == 0)
+            return FALSE;
+    return TRUE;
+}
+
+
+
+
+
+
+
+
+int read_meg_eeg_ch_info(const QString& name,       /* Input file */
+                         int        do_meg,	 /* Use MEG */
+                         int        do_eeg,	 /* Use EEG */
+                         char       **bads,	 /* List of bad channels */
+                         int        nbad,
+                         fiffChInfo *chsp,	 /* MEG + EEG channels */
+                         int        *nmegp,	 /* Count of each */
+                         int        *neegp)
+/*
+      * Read the channel information and split it into two arrays,
+      * one for MEG and one for EEG
+      */
+{
+    fiffChInfo chs   = NULL;
+    int        nchan = 0;
+    fiffChInfo meg   = NULL;
+    int        nmeg  = 0;
+    fiffChInfo eeg   = NULL;
+    int        neeg  = 0;
+    fiffId     id    = NULL;
+    int        nch;
+
+    int k;
+
+    if (read_ch_info(name,&chs,&nchan,&id) != FIFF_OK)
+        goto bad;
+    /*
+   * Sort out the channels
+   */
+    for (k = 0; k < nchan; k++)
+        if (chs[k].kind == FIFFV_MEG_CH)
+            nmeg++;
+        else if (chs[k].kind == FIFFV_EEG_CH && is_valid_eeg_ch(chs+k))
+            neeg++;
+    if (nmeg > 0)
+        meg = MALLOC_3(nmeg,fiffChInfoRec);
+    if (neeg > 0)
+        eeg = MALLOC_3(neeg,fiffChInfoRec);
+    neeg = nmeg = 0;
+    for (k = 0; k < nchan; k++)
+        if (accept_ch(chs+k,bads,nbad)) {
+            if (do_meg && chs[k].kind == FIFFV_MEG_CH)
+                meg[nmeg++] = chs[k];
+            else if (do_eeg && chs[k].kind == FIFFV_EEG_CH && is_valid_eeg_ch(chs+k))
+                eeg[neeg++] = chs[k];
+        }
+    FREE_3(chs);
+    mne_merge_channels(meg,nmeg,eeg,neeg,chsp,&nch);
+    FREE_3(meg);
+    FREE_3(eeg);
+    *nmegp = nmeg;
+    *neegp = neeg;
+    FREE_3(id);
+    return FIFF_OK;
+
+bad : {
+        FREE_3(chs);
+        FREE_3(meg);
+        FREE_3(eeg);
+        FREE_3(id);
+        return FIFF_FAIL;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+void mne_revert_to_diag_cov(mneCovMatrix c)
+/*
+* Pick the diagonal elements of the full covariance matrix
+*/
+{
+    int k,p;
+    if (c->cov == NULL)
+        return;
+#define REALLY_REVERT
+#ifdef REALLY_REVERT
+    c->cov_diag = REALLOC_3(c->cov_diag,c->ncov,double);
+
+    for (k = p = 0; k < c->ncov; k++) {
+        c->cov_diag[k] = c->cov[p];
+        p = p + k + 2;
+    }
+    FREE_3(c->cov);  c->cov = NULL;
+#else
+    for (j = 0, p = 0; j < c->ncov; j++)
+        for (k = 0; k <= j; k++, p++)
+            if (j != k)
+                c->cov[p] = 0.0;
+            else
+#endif
+                FREE_3(c->lambda); c->lambda = NULL;
+    FREE_CMATRIX_3(c->eigen); c->eigen = NULL;
+    return;
+
+}
+
+
+
+
+
+
+mneCovMatrix mne_pick_chs_cov_omit(mneCovMatrix c, char **new_names, int ncov, int omit_meg_eeg, fiffChInfo chs)
+/*
+* Pick designated channels from a covariance matrix, optionally omit MEG/EEG correlations
+*/
+{
+    int j,k;
+    int *pick = NULL;
+    double *cov = NULL;
+    double *cov_diag = NULL;
+    char  **names = NULL;
+    int   *is_meg = NULL;
+    int   from,to;
+    mneCovMatrix res;
+
+    if (ncov == 0) {
+        qCritical("No channels specified for picking in mne_pick_chs_cov_omit");
+        return NULL;
+    }
+    if (c->names == NULL) {
+        qCritical("No names in covariance matrix. Cannot do picking.");
+        return NULL;
+    }
+    pick = MALLOC_3(ncov,int);
+    for (j = 0; j < ncov; j++)
+        pick[j] = -1;
+    for (j = 0; j < ncov; j++)
+        for (k = 0; k < c->ncov; k++)
+            if (strcmp(c->names[k],new_names[j]) == 0) {
+                pick[j] = k;
+                break;
+            }
+    for (j = 0; j < ncov; j++) {
+        if (pick[j] < 0) {
+            printf("All desired channels not found in the covariance matrix (at least missing %s).", new_names[j]);
+            FREE_3(pick);
+            return NULL;
+        }
+    }
+    if (omit_meg_eeg) {
+        is_meg = MALLOC_3(ncov,int);
+        if (chs) {
+            for (j = 0; j < ncov; j++)
+                if (chs[j].kind == FIFFV_MEG_CH)
+                    is_meg[j] = TRUE;
+                else
+                    is_meg[j] = FALSE;
+        }
+        else {
+            for (j = 0; j < ncov; j++)
+                if (strncmp(new_names[j],"MEG",3) == 0)
+                    is_meg[j] = TRUE;
+                else
+                    is_meg[j] = FALSE;
+        }
+    }
+    names = MALLOC_3(ncov,char *);
+    if (c->cov_diag) {
+        cov_diag = MALLOC_3(ncov,double);
+        for (j = 0; j < ncov; j++) {
+            cov_diag[j] = c->cov_diag[pick[j]];
+            names[j] = mne_strdup_3(c->names[pick[j]]);
+        }
+    }
+    else {
+        cov = MALLOC_3(ncov*(ncov+1)/2,double);
+        for (j = 0; j < ncov; j++) {
+            names[j] = mne_strdup_3(c->names[pick[j]]);
+            for (k = 0; k <= j; k++) {
+                from = mne_lt_packed_index_3(pick[j],pick[k]);
+                to   = mne_lt_packed_index_3(j,k);
+                if (to < 0 || to > ncov*(ncov+1)/2-1) {
+                    printf("Wrong destination index in mne_pick_chs_cov : %d %d %d\n",j,k,to);
+                    exit(1);
+                }
+                if (from < 0 || from > c->ncov*(c->ncov+1)/2-1) {
+                    printf("Wrong source index in mne_pick_chs_cov : %d %d %d\n",pick[j],pick[k],from);
+                    exit(1);
+                }
+                cov[to] = c->cov[from];
+                if (omit_meg_eeg)
+                    if (is_meg[j] != is_meg[k])
+                        cov[to] = 0.0;
+            }
+        }
+    }
+
+    res = mne_new_cov_3(c->kind,ncov,names,cov,cov_diag);
+
+    res->bads = mne_dup_name_list_3(c->bads,c->nbad);
+    res->nbad = c->nbad;
+    res->proj = mne_dup_proj_op_3(c->proj);
+    res->sss  = c->sss ? new MneSssData(*(c->sss)) : NULL;
+
+    if (c->ch_class) {
+        res->ch_class = MALLOC_3(res->ncov,int);
+        for (k = 0; k < res->ncov; k++)
+            res->ch_class[k] = c->ch_class[pick[k]];
+    }
+    FREE_3(pick);
+    FREE_3(is_meg);
+    return res;
+}
+
+
+
+
+
+int mne_proj_op_proj_dvector(mneProjOp op, double *vec, int nch, int do_complement)
+/*
+* Apply projection operator to a vector (doubles)
+* Assume that all dimension checking etc. has been done before
+*/
+{
+    float *pvec;
+    double w;
+    int k,p;
+
+    if (op->nvec <= 0)
+        return OK;
+
+    if (op->nch != nch) {
+        qCritical("Data vector size does not match projection operator");
+        return FAIL;
+    }
+
+    Eigen::VectorXd res = Eigen::VectorXd::Zero(op->nch);
+
+    for (p = 0; p < op->nvec; p++) {
+        pvec = op->proj_data[p];
+        w = 0.0;
+        for (k = 0; k < op->nch; k++)
+            w += vec[k]*pvec[k];
+        for (k = 0; k < op->nch; k++)
+            res[k] = res[k] + w*pvec[k];
+    }
+
+    if (do_complement) {
+        for (k = 0; k < op->nch; k++)
+            vec[k] = vec[k] - res[k];
+    }
+    else {
+        for (k = 0; k < op->nch; k++)
+            vec[k] = res[k];
+    }
+
+    return OK;
+}
+
+
+
+
+
+int mne_name_list_match(char **list1, int nlist1,
+                        char **list2, int nlist2)
+/*
+ * Check whether two name lists are identical
+ */
+{
+    int k;
+    if (list1 == NULL && list2 == NULL)
+        return 0;
+    if (list1 == NULL || list2 == NULL)
+        return 1;
+    if (nlist1 != nlist2)
+        return 1;
+    for (k = 0; k < nlist1; k++)
+        if (strcmp(list1[k],list2[k]) != 0)
+            return 1;
+    return 0;
+}
+
+
+
+void mne_transpose_dsquare(double **mat, int n)
+/*
+      * In-place transpose of a square matrix
+      */
+{
+    int j,k;
+    double val;
+
+    for (j = 1; j < n; j++)
+        for (k = 0; k < j; k++) {
+            val = mat[j][k];
+            mat[j][k] = mat[k][j];
+            mat[k][j] = val;
+        }
+    return;
+}
+
+
+
+int mne_proj_op_apply_cov(mneProjOp op, mneCovMatrix& c)
+/*
+* Apply the projection operator to a covariance matrix
+*/
+{
+    double **dcov = NULL;
+    int j,k,p;
+    int do_complement = TRUE;
+
+    if (op == NULL || op->nitems == 0)
+        return OK;
+
+    if (mne_name_list_match(op->names,op->nch,c->names,c->ncov) != OK) {
+        qCritical("Incompatible data in mne_proj_op_apply_cov");
+        return FAIL;
+    }
+
+    dcov = ALLOC_DCMATRIX_3(c->ncov,c->ncov);
+    /*
+    * Return the appropriate result
+    */
+    if (c->cov_diag) {  /* Pick the diagonals */
+        for (j = 0, p = 0; j < c->ncov; j++)
+            for (k = 0; k < c->ncov; k++)
+                dcov[j][k] = (j == k) ? c->cov_diag[j] : 0;
+    }
+    else {              /* Return full matrix */
+        for (j = 0, p = 0; j < c->ncov; j++)
+            for (k = 0; k <= j; k++)
+                dcov[j][k] = c->cov[p++];
+        for (j = 0; j < c->ncov; j++)
+            for (k = j+1; k < c->ncov; k++)
+                dcov[j][k] = dcov[k][j];
+    }
+
+    /*
+    * Project from front and behind
+    */
+    for (k = 0; k < c->ncov; k++) {
+        if (mne_proj_op_proj_dvector(op,dcov[k],c->ncov,do_complement) != OK)
+            return FAIL;
+    }
+
+    mne_transpose_dsquare(dcov,c->ncov);
+
+    for (k = 0; k < c->ncov; k++)
+        if (mne_proj_op_proj_dvector(op,dcov[k],c->ncov,do_complement) != OK)
+            return FAIL;
+
+    /*
+    * Return the result
+    */
+    if (c->cov_diag) {  /* Pick the diagonal elements */
+        for (j = 0; j < c->ncov; j++) {
+            c->cov_diag[j] = dcov[j][j];
+        }
+        FREE_3(c->cov); c->cov = NULL;
+    }
+    else {              /* Put everything back */
+        for (j = 0, p = 0; j < c->ncov; j++)
+            for (k = 0; k <= j; k++)
+                c->cov[p++] = dcov[j][k];
+    }
+
+    FREE_DCMATRIX_3(dcov);
+
+    c->nproj = mne_proj_op_affect_3(op,c->names,c->ncov);
+    return OK;
+}
+
+
+
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -2655,7 +8364,7 @@ DipoleFitData::~DipoleFitData()
 
     if(pick)
         delete pick;
-    fwd_bem_free_model_3(bem_model);
+    fwd_bem_free_model(bem_model);
 
     if(eeg_model)
         delete eeg_model;
@@ -2877,9 +8586,9 @@ mneCovMatrix DipoleFitData::ad_hoc_noise(FwdCoilSet *meg, FwdCoilSet *eeg, float
             ch_names[n] = eeg->coils[k]->chname;
         }
     }
-    names = mne_dup_name_list(ch_names,nchan);
+    names = mne_dup_name_list_3(ch_names,nchan);
     FREE_3(ch_names);
-    return mne_new_cov(FIFFV_MNE_NOISE_COV,nchan,names,NULL,stds);
+    return mne_new_cov_3(FIFFV_MNE_NOISE_COV,nchan,names,NULL,stds);
 }
 
 
@@ -2903,17 +8612,17 @@ int DipoleFitData::make_projection(const QList<QString> &projnames, fiffChInfo c
         return OK;
 
     for (k = 0; k < projnames.size(); k++) {
-        if ((one = mne_read_proj_op(projnames[k])) == NULL)
+        if ((one = mne_read_proj_op_3(projnames[k])) == NULL)
             goto bad;
         if (one->nitems == 0) {
             printf("No linear projection information in %s.\n",projnames[k].toLatin1().data());
-            mne_free_proj_op(one); one = NULL;
+            mne_free_proj_op_3(one); one = NULL;
         }
         else {
             printf("Loaded projection from %s:\n",projnames[k].toLatin1().data());
-            mne_proj_op_report(stderr,"\t",one);
-            all = mne_proj_op_combine(all,one);
-            mne_free_proj_op(one); one = NULL;
+            mne_proj_op_report_3(stderr,"\t",one);
+            all = mne_proj_op_combine_3(all,one);
+            mne_free_proj_op_3(one); one = NULL;
         }
     }
 
@@ -2927,17 +8636,17 @@ int DipoleFitData::make_projection(const QList<QString> &projnames, fiffChInfo c
                 }
         }
         if (!found) {
-            if ((one = mne_proj_op_average_eeg_ref(chs,nch)) != NULL) {
+            if ((one = mne_proj_op_average_eeg_ref_3(chs,nch)) != NULL) {
                 printf("Average EEG reference projection added:\n");
-                mne_proj_op_report(stderr,"\t",one);
-                all = mne_proj_op_combine(all,one);
-                mne_free_proj_op(one); one = NULL;
+                mne_proj_op_report_3(stderr,"\t",one);
+                all = mne_proj_op_combine_3(all,one);
+                mne_free_proj_op_3(one); one = NULL;
             }
         }
     }
-    if (all && mne_proj_op_affect_chs(all,chs,nch) == 0) {
+    if (all && mne_proj_op_affect_chs_3(all,chs,nch) == 0) {
         printf("Projection will not have any effect on selected channels. Projection omitted.\n");
-        mne_free_proj_op(all);
+        mne_free_proj_op_3(all);
         all = NULL;
     }
     *res = all;
@@ -2960,7 +8669,7 @@ int DipoleFitData::scale_noise_cov(DipoleFitData *f, int nave)
 
     if (f->noise->cov != NULL) {
         fprintf(stderr,"Decomposing the sensor noise covariance matrix...\n");
-        if (mne_decompose_eigen_cov(f->noise) == FAIL)
+        if (mne_decompose_eigen_cov_3(f->noise) == FAIL)
             goto bad;
 
         for (k = 0; k < f->noise->ncov*(f->noise->ncov+1)/2; k++)
@@ -2970,14 +8679,14 @@ int DipoleFitData::scale_noise_cov(DipoleFitData *f, int nave)
             if (f->noise->lambda[k] < 0.0)
                 f->noise->lambda[k] = 0.0;
         }
-        if (mne_add_inv_cov(f->noise) == FAIL)
+        if (mne_add_inv_cov_3(f->noise) == FAIL)
             goto bad;
     }
     else {
         for (k = 0; k < f->noise->ncov; k++)
             f->noise->cov_diag[k] = nave_ratio*f->noise->cov_diag[k];
         fprintf(stderr,"Decomposition not needed for a diagonal noise covariance matrix.\n");
-        if (mne_add_inv_cov(f->noise) == FAIL)
+        if (mne_add_inv_cov_3(f->noise) == FAIL)
             goto bad;
     }
     fprintf(stderr,"Effective nave is now %d\n",nave);
@@ -3007,7 +8716,7 @@ int DipoleFitData::scale_dipole_fit_noise_cov(DipoleFitData *f, int nave)
          */
         fprintf(stderr,"Decomposing the noise covariance...");
         if (f->noise->cov) {
-            if (mne_decompose_eigen_cov(f->noise) == FAIL)
+            if (mne_decompose_eigen_cov_3(f->noise) == FAIL)
                 goto bad;
             for (k = 0; k < f->noise->ncov; k++) {
                 if (f->noise->lambda[k] < 0.0)
@@ -3021,14 +8730,14 @@ int DipoleFitData::scale_dipole_fit_noise_cov(DipoleFitData *f, int nave)
             if (f->noise->lambda[k] < 0.0)
                 f->noise->lambda[k] = 0.0;
         }
-        if (mne_add_inv_cov(f->noise) == FAIL)
+        if (mne_add_inv_cov_3(f->noise) == FAIL)
             goto bad;
     }
     else {
         for (k = 0; k < f->noise->ncov; k++)
             f->noise->cov_diag[k] = nave_ratio*f->noise->cov_diag[k];
         fprintf(stderr,"Decomposition not needed for a diagonal noise covariance matrix.\n");
-        if (mne_add_inv_cov(f->noise) == FAIL)
+        if (mne_add_inv_cov_3(f->noise) == FAIL)
             goto bad;
     }
     fprintf(stderr,"Effective nave is now %d\n",nave);
@@ -3086,7 +8795,7 @@ int DipoleFitData::select_dipole_fit_noise_cov(DipoleFitData *f, mshMegEegData d
                     nomit_meg++;
             }
         }
-        mne_free_cov(f->noise); f->noise = NULL;
+        mne_free_cov_3(f->noise); f->noise = NULL;
         if (nmeg > 0 && nmeg-nomit_meg > 0 && nmeg-nomit_meg < min_nchan) {
             qCritical("Too few MEG channels remaining");
             return FAIL;
@@ -3095,12 +8804,12 @@ int DipoleFitData::select_dipole_fit_noise_cov(DipoleFitData *f, mshMegEegData d
             qCritical("Too few EEG channels remaining");
             return FAIL;
         }
-        f->noise = mne_dup_cov(f->noise_orig);
+        f->noise = mne_dup_cov_3(f->noise_orig);
         if (nomit_meg+nomit_eeg > 0) {
             if (f->noise->cov) {
                 for (j = 0; j < f->noise->ncov; j++)
                     for (k = 0; k <= j; k++) {
-                        val = f->noise->cov+mne_lt_packed_index(j,k);
+                        val = f->noise->cov+mne_lt_packed_index_3(j,k);
                         *val = w[j]*w[k]*(*val);
                     }
             }
@@ -3116,7 +8825,7 @@ int DipoleFitData::select_dipole_fit_noise_cov(DipoleFitData *f, mshMegEegData d
     else {
         if (f->noise && f->nave == nave)
             return OK;
-        f->noise = mne_dup_cov(f->noise_orig);
+        f->noise = mne_dup_cov_3(f->noise_orig);
     }
 
     return scale_dipole_fit_noise_cov(f,nave);
@@ -3146,7 +8855,7 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname, cons
        * Read the coordinate transformations
        */
     if (!mriname.isEmpty()) {
-        if ((res->mri_head_t = mne_read_mri_transform(mriname)) == NULL)
+        if ((res->mri_head_t = FiffCoordTransOld::mne_read_mri_transform(mriname)) == NULL)
             goto bad;
     }
     else if (bemname) {
@@ -3158,22 +8867,22 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname, cons
         float rot[3][3] = { { 1.0, 0.0, 0.0 },
                             { 0.0, 1.0, 0.0 },
                             { 0.0, 0.0, 1.0 } };
-        res->mri_head_t = fiff_make_transform(FIFFV_COORD_MRI,FIFFV_COORD_HEAD,rot,move);
+        res->mri_head_t = new FiffCoordTransOld(FIFFV_COORD_MRI,FIFFV_COORD_HEAD,rot,move);
     }
 
-    mne_print_coord_transform(stderr,res->mri_head_t);
-    if ((res->meg_head_t = mne_read_meas_transform(measname)) == NULL)
+    FiffCoordTransOld::mne_print_coord_transform(stderr,res->mri_head_t);
+    if ((res->meg_head_t = FiffCoordTransOld::mne_read_meas_transform(measname)) == NULL)
         goto bad;
-    mne_print_coord_transform(stderr,res->meg_head_t);
+    FiffCoordTransOld::mne_print_coord_transform(stderr,res->meg_head_t);
     /*
        * Read the bad channel lists
        */
     if (!badname.isEmpty()) {
-        if (mne_read_bad_channels(badname,&badlist,&nbad) != OK)
+        if (mne_read_bad_channels_3(badname,&badlist,&nbad) != OK)
             goto bad;
         printf("%d bad channels read from %s.\n",nbad,badname.toLatin1().data());
     }
-    if (mne_read_bad_channel_list(measname,&file_bads,&file_nbad) == OK && file_nbad > 0) {
+    if (mne_read_bad_channel_list_3(measname,&file_bads,&file_nbad) == OK && file_nbad > 0) {
         if (!badlist)
             nbad = 0;
         badlist = REALLOC_3(badlist,nbad+file_nbad,char *);
@@ -3195,9 +8904,9 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname, cons
     if (res->neeg > 0)
         printf("Will use %3d EEG channels from %s\n",res->neeg,measname.toLatin1().data());
     {
-        char *s = mne_channel_names_to_string(res->chs,res->nmeg+res->neeg);
+        char *s = mne_channel_names_to_string_3(res->chs,res->nmeg+res->neeg);
         int  n;
-        mne_string_to_name_list(s,&res->ch_names,&n);
+        mne_string_to_name_list_3(s,&res->ch_names,&n);
     }
     /*
        * Make coil definitions
@@ -3240,7 +8949,7 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname, cons
         printf("Head coordinate coil definitions created.\n");
     }
     else {
-        qWarning("Cannot handle computations in %s coordinates",mne_coord_frame_name(coord_frame));
+        qWarning("Cannot handle computations in %s coordinates",mne_coord_frame_name_3(coord_frame));
         goto bad;
     }
     /*
@@ -3256,14 +8965,14 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname, cons
     /*
        * Compensation data
        */
-    if ((comp_data = mne_read_ctf_comp_data(measname)) == NULL)
+    if ((comp_data = mne_read_ctf_comp_data_3(measname)) == NULL)
         goto bad;
     if (comp_data->ncomp > 0) {	/* Compensation channel information may be needed */
         fiffChInfo comp_chs = NULL;
         int        ncomp    = 0;
 
         printf("%d compensation data sets in %s\n",comp_data->ncomp,measname.toLatin1().data());
-        if (mne_read_meg_comp_eeg_ch_info(measname,NULL,0,&comp_chs,&ncomp,NULL,NULL,NULL,NULL) == FAIL)
+        if (mne_read_meg_comp_eeg_ch_info_3(measname,NULL,0,&comp_chs,&ncomp,NULL,NULL,NULL,NULL) == FAIL)
             goto bad;
         if (ncomp > 0) {
             if ((comp_coils = templates->create_meg_coils(comp_chs,ncomp,
@@ -3276,7 +8985,7 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname, cons
         FREE_3(comp_chs);
     }
     else {			/* Get rid of the empty data set */
-        mne_free_ctf_comp_data_set(comp_data);
+        mne_free_ctf_comp_data_set_3(comp_data);
         comp_data = NULL;
     }
     /*
@@ -3292,9 +9001,9 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname, cons
         goto bad;
     if (res->proj && res->proj->nitems > 0) {
         fprintf(stderr,"Final projection operator is:\n");
-        mne_proj_op_report(stderr,"\t",res->proj);
+        mne_proj_op_report_3(stderr,"\t",res->proj);
 
-        if (mne_proj_op_chs(res->proj,res->ch_names,res->nmeg+res->neeg) == FAIL)
+        if (mne_proj_op_chs_3(res->proj,res->ch_names,res->nmeg+res->neeg) == FAIL)
             goto bad;
         if (mne_proj_op_make_proj(res->proj) == FAIL)
             goto bad;
@@ -3317,12 +9026,12 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname, cons
     }
     res->noise = mne_pick_chs_cov_omit(cov,res->ch_names,res->nmeg+res->neeg,TRUE,res->chs);
     if (res->noise == NULL) {
-        mne_free_cov(cov);
+        mne_free_cov_3(cov);
         goto bad;
     }
 
     printf("Picked appropriate channels from the noise-covariance matrix.\n");
-    mne_free_cov(cov);
+    mne_free_cov_3(cov);
 
     /*
        * Apply the projection operator to the noise-covariance matrix
@@ -3378,7 +9087,7 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname, cons
        */
     fprintf(stderr,"Decomposing the noise covariance...\n");
     if (res->noise->cov) {
-        if (mne_decompose_eigen_cov(res->noise) == FAIL)
+        if (mne_decompose_eigen_cov_3(res->noise) == FAIL)
             goto bad;
         fprintf(stderr,"Eigenvalue decomposition done.\n");
         for (k = 0; k < res->noise->ncov; k++) {
@@ -3388,22 +9097,22 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname, cons
     }
     else {
         printf("Decomposition not needed for a diagonal covariance matrix.\n");
-        if (mne_add_inv_cov(res->noise) == FAIL)
+        if (mne_add_inv_cov_3(res->noise) == FAIL)
             goto bad;
     }
 
-    mne_free_name_list(badlist,nbad);
+    mne_free_name_list_3(badlist,nbad);
     delete templates;
     delete comp_coils;
-    mne_free_ctf_comp_data_set(comp_data);
+    mne_free_ctf_comp_data_set_3(comp_data);
     return res;
 
 
 bad : {
-        mne_free_name_list(badlist,nbad);
+        mne_free_name_list_3(badlist,nbad);
         delete templates;
         delete comp_coils;
-        mne_free_ctf_comp_data_set(comp_data);
+        mne_free_ctf_comp_data_set_3(comp_data);
         if(res)
             delete res;
         return NULL;
@@ -4127,7 +9836,7 @@ int DipoleFitData::compute_dipole_field(DipoleFitData* d, float *rd, int whiten,
 #ifdef DEBUG
     fprintf(stdout,"orig : ");
     for (k = 0; k < 3; k++)
-        fprintf(stdout,"%g ",sqrt(mne_dot_vectors(fwd[k],fwd[k],d->nmeg+d->neeg)));
+        fprintf(stdout,"%g ",sqrt(mne_dot_vectors_3(fwd[k],fwd[k],d->nmeg+d->neeg)));
     fprintf(stdout,"\n");
 #endif
 
@@ -4138,7 +9847,7 @@ int DipoleFitData::compute_dipole_field(DipoleFitData* d, float *rd, int whiten,
 #ifdef DEBUG
     fprintf(stdout,"proj : ");
     for (k = 0; k < 3; k++)
-        fprintf(stdout,"%g ",sqrt(mne_dot_vectors(fwd[k],fwd[k],d->nmeg+d->neeg)));
+        fprintf(stdout,"%g ",sqrt(mne_dot_vectors_3(fwd[k],fwd[k],d->nmeg+d->neeg)));
     fprintf(stdout,"\n");
 #endif
 
@@ -4153,7 +9862,7 @@ int DipoleFitData::compute_dipole_field(DipoleFitData* d, float *rd, int whiten,
 #ifdef DEBUG
     fprintf(stdout,"white : ");
     for (k = 0; k < 3; k++)
-        fprintf(stdout,"%g ",sqrt(mne_dot_vectors(fwd[k],fwd[k],d->nmeg+d->neeg)));
+        fprintf(stdout,"%g ",sqrt(mne_dot_vectors_3(fwd[k],fwd[k],d->nmeg+d->neeg)));
     fprintf(stdout,"\n");
 #endif
 

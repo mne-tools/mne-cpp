@@ -42,6 +42,12 @@
 #include "fiff_coord_trans_old.h"
 
 #include <fiff/fiff_tag.h>
+#include <fiff/fiff_stream.h>
+
+#include <QFile>
+
+
+#include <Eigen/Dense>
 
 
 //*************************************************************************************************************
@@ -50,6 +56,7 @@
 //=============================================================================================================
 
 using namespace Eigen;
+using namespace FIFFLIB;
 using namespace INVERSELIB;
 
 
@@ -63,6 +70,12 @@ using namespace INVERSELIB;
 #ifndef OK
 #define OK 0
 #endif
+
+
+
+#define X_20 0
+#define Y_20 1
+#define Z_20 2
 
 
 
@@ -298,6 +311,161 @@ void FiffCoordTransOld::fiff_coord_trans(float r[], FiffCoordTransOld *t, int do
     }
     for (j = 0; j < 3; j++)
         r[j] = res[j];
+}
+
+
+//*************************************************************************************************************
+
+typedef struct {
+    int frame;
+    const char *name;
+} frameNameRec;
+
+const char *FiffCoordTransOld::mne_coord_frame_name(int frame)
+{
+    static frameNameRec frames[] = {
+        {FIFFV_COORD_UNKNOWN,"unknown"},
+        {FIFFV_COORD_DEVICE,"MEG device"},
+        {FIFFV_COORD_ISOTRAK,"isotrak"},
+        {FIFFV_COORD_HPI,"hpi"},
+        {FIFFV_COORD_HEAD,"head"},
+        {FIFFV_COORD_MRI,"MRI (surface RAS)"},
+        {FIFFV_MNE_COORD_MRI_VOXEL, "MRI voxel"},
+        {FIFFV_COORD_MRI_SLICE,"MRI slice"},
+        {FIFFV_COORD_MRI_DISPLAY,"MRI display"},
+        {FIFFV_MNE_COORD_CTF_DEVICE,"CTF MEG device"},
+        {FIFFV_MNE_COORD_CTF_HEAD,"CTF/4D/KIT head"},
+        {FIFFV_MNE_COORD_RAS,"RAS (non-zero origin)"},
+        {FIFFV_MNE_COORD_MNI_TAL,"MNI Talairach"},
+        {FIFFV_MNE_COORD_FS_TAL_GTZ,"Talairach (MNI z > 0)"},
+        {FIFFV_MNE_COORD_FS_TAL_LTZ,"Talairach (MNI z < 0)"},
+        {-1,"unknown"}
+    };
+    int k;
+    for (k = 0; frames[k].frame != -1; k++) {
+        if (frame == frames[k].frame)
+            return frames[k].name;
+    }
+    return frames[k].name;
+}
+
+
+//*************************************************************************************************************
+
+void FiffCoordTransOld::mne_print_coord_transform_label(FILE *log, char *label, FiffCoordTransOld *t)
+{
+    int k,p;
+    int frame;
+    if (!label || strlen(label) == 0)
+        fprintf(log,"Coordinate transformation: ");
+    else
+        fprintf(log,"%s",label);
+    for (frame = t->from, k = 0; k < 2; k++) {
+        if (k == 0) {
+            fprintf(log,"%s -> ",mne_coord_frame_name(frame));
+            frame = t->to;
+        }
+        else {
+            fprintf(log,"%s\n",mne_coord_frame_name(frame));
+            for (p = 0; p < 3; p++)
+                fprintf(log,"\t% 8.6f % 8.6f % 8.6f\t% 7.2f mm\n",
+                        t->rot[p][X_20],t->rot[p][Y_20],t->rot[p][Z_20],1000*t->move[p]);
+            fprintf(log,"\t% 8.6f % 8.6f % 8.6f  % 7.2f\n",0.0,0.0,0.0,1.0);
+        }
+    }
+}
+
+
+//*************************************************************************************************************
+
+void FiffCoordTransOld::mne_print_coord_transform(FILE *log, FiffCoordTransOld *t)
+{
+    mne_print_coord_transform_label(log,NULL,t);
+}
+
+
+//*************************************************************************************************************
+
+FiffCoordTransOld *FiffCoordTransOld::mne_read_transform(const QString &name, int from, int to)
+/*
+          * Read the specified coordinate transformation
+          */
+{
+    QFile file(name);
+    FiffStream::SPtr stream(new FiffStream(&file));
+
+
+    FiffCoordTransOld* res = NULL;
+    //    fiffFile       in = NULL;
+    FiffTag::SPtr t_pTag;
+    //    fiffTagRec     tag;
+    //    fiffDirEntry   dir;
+    fiff_int_t kind, pos;
+    int k;
+
+    //    tag.data = NULL;
+    //    if ((in = fiff_open(name.toLatin1().data())) == NULL)
+    //        goto out;
+    if(!stream->open())
+        goto out;
+
+    for (k = 0; k < stream->dir().size(); k++) {
+        kind = stream->dir()[k]->kind;
+        pos  = stream->dir()[k]->pos;
+        if (kind == FIFF_COORD_TRANS) {
+            //            if (fiff_read_this_tag (in->fd,dir->pos,&tag) == FIFF_FAIL)
+            //                goto out;
+            //            res = (fiffCoordTrans)tag.data;
+            if (!FiffTag::read_tag(stream,t_pTag,pos))
+                goto out;
+
+            res = FiffCoordTransOld::read_helper( t_pTag );
+            if (res->from == from && res->to == to) {
+                //                tag.data = NULL;
+                goto out;
+            }
+            else if (res->from == to && res->to == from) {
+                FiffCoordTransOld* tmp_res = res;
+                res = tmp_res->fiff_invert_transform();//Memory leak here!!
+                delete tmp_res;
+                goto out;
+            }
+            res = NULL;
+        }
+    }
+    qCritical("No suitable coordinate transformation found in %s.",name.toLatin1().data());
+    goto out;
+
+out : {
+        //        FREE(tag.data);
+        //        fiff_close(in);
+        stream->close();
+        return res;
+    }
+
+    return res;
+}
+
+
+//*************************************************************************************************************
+
+FiffCoordTransOld *FiffCoordTransOld::mne_read_mri_transform(const QString &name)
+/*
+          * Read the MRI -> HEAD coordinate transformation
+          */
+{
+    return mne_read_transform(name,FIFFV_COORD_MRI,FIFFV_COORD_HEAD);
+}
+
+
+//*************************************************************************************************************
+
+FiffCoordTransOld *FiffCoordTransOld::mne_read_meas_transform(const QString &name)
+/*
+          * Read the MEG device -> HEAD coordinate transformation
+          */
+{
+    return mne_read_transform(name,FIFFV_COORD_DEVICE,FIFFV_COORD_HEAD);
 }
 
 

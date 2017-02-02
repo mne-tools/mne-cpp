@@ -494,15 +494,15 @@ ECDSet DipoleFit::calculateFit() const
             goto out;
     }
 
-    if ((fit_data = setup_dipole_fit_data(settings->mriname,
-                                          settings->measname,
-                                          settings->bemname.isEmpty() ? NULL : settings->bemname.toLatin1().data(),
-                                          &settings->r0,eeg_model,settings->accurate,
-                                          settings->badname,
-                                          settings->noisename,
-                                          settings->grad_std,settings->mag_std,settings->eeg_std,
-                                          settings->mag_reg,settings->grad_reg,settings->eeg_reg,
-                                          settings->diagnoise,settings->projnames,settings->include_meg,settings->include_eeg)) == NULL)
+    if ((fit_data = DipoleFitData::setup_dipole_fit_data(   settings->mriname,
+                                                            settings->measname,
+                                                            settings->bemname.isEmpty() ? NULL : settings->bemname.toLatin1().data(),
+                                                            &settings->r0,eeg_model,settings->accurate,
+                                                            settings->badname,
+                                                            settings->noisename,
+                                                            settings->grad_std,settings->mag_std,settings->eeg_std,
+                                                            settings->mag_reg,settings->grad_reg,settings->eeg_reg,
+                                                            settings->diagnoise,settings->projnames,settings->include_meg,settings->include_eeg)) == NULL   )
         goto out;
 
     fit_data->fit_mag_dipoles = settings->fit_mag_dipoles;
