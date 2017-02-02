@@ -112,7 +112,7 @@ int main(int argc, char *argv[])
     parser.setApplicationDescription("Disp3D Example");
     parser.addHelpOption();
 
-    QCommandLineOption surfOption("surfType", "Surface type <type>.", "type", "inflated");
+    QCommandLineOption surfOption("surfType", "Surface type <type>.", "type", "pial");
     QCommandLineOption annotOption("annotType", "Annotation type <type>.", "type", "aparc.a2009s");
     QCommandLineOption hemiOption("hemi", "Selected hemisphere <hemi>.", "hemi", "2");
     QCommandLineOption subjectOption("subject", "Selected subject <subject>.", "subject", "sample");
@@ -279,7 +279,7 @@ int main(int argc, char *argv[])
     if(bAddRtSourceLoc) {
         //Add rt source loc data and init some visualization values
         if(MneEstimateTreeItem* pRTDataItem = p3DDataModel->addSourceData(parser.value(subjectOption), evoked.comment, sourceEstimate, t_clusteredFwd)) {
-            pRTDataItem->setLoopState(true);
+            pRTDataItem->setLoopState(false);
             pRTDataItem->setTimeInterval(17);
             pRTDataItem->setNumberAverages(1);
             pRTDataItem->setStreamingActive(true);

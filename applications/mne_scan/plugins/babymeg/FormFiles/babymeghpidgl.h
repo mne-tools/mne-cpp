@@ -117,10 +117,14 @@ public:
     * Set new digitizer data to View3D.
     *
     * @param[in] digPointSet                    The new digitizer set.
+    * @param[in] fittedPointSet                 The new fitted dipoles set.
     * @param[in] vGof                           The goodness of fit in mm for each fitted HPI coil.
     * @param[in] bSortOutAdditionalDigitizer    Whether additional or extra digitized points dhould be sorted out. Too many points could lead to 3D performance issues.
     */
-    void setDigitizerDataToView3D(const FIFFLIB::FiffDigPointSet& digPointSet, const QVector<double>& vGof, bool bSortOutAdditionalDigitizer = true);
+    void setDigitizerDataToView3D(const FIFFLIB::FiffDigPointSet& digPointSet,
+                                  const FIFFLIB::FiffDigPointSet& fittedPointSet,
+                                  const QVector<double>& vGof,
+                                  bool bSortOutAdditionalDigitizer = true);
 
     //=========================================================================================================
     /**
