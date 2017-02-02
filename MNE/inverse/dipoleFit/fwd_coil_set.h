@@ -43,6 +43,7 @@
 
 #include "../inverse_global.h"
 #include "fwd_coil.h"
+#include <fiff/fiff_types.h>
 
 
 //*************************************************************************************************************
@@ -116,7 +117,114 @@ public:
         user_data = NULL;
     }
 
+    //=========================================================================================================
+    /**
+    * Create a MEG coil definition using a database of templates
+    * Change the coordinate frame if so desired
+    * Refactored: fwd_create_meg_coil (fwd_coil_def.c)
+    *
+    * @param[in] ch     Channel information to use
+    * @param[in] acc    Required accuracy
+    * @param[in] t      Transform the points using this
+    *
+    * @return   The created meg coil.
+    */
+    FwdCoil* create_meg_coil( FIFFLIB::fiffChInfo ch, int acc, FIFFLIB::fiffCoordTrans t);
 
+    //=========================================================================================================
+    /**
+    * Create a MEG coil set definition using a database of templates
+    * Change the coordinate frame if so desired
+    * Refactored: fwd_create_meg_coils (fwd_coil_def.c)
+    *
+    * @param[in] ch     Channel information to use
+    * @param[in] nch    Number of channels
+    * @param[in] acc    Required accuracy
+    * @param[in] t      Transform the points using this
+    *
+    * @return   The created meg coil set.
+    */
+    FwdCoilSet* create_meg_coils(FIFFLIB::fiffChInfo chs,  int nch, int acc, FIFFLIB::fiffCoordTrans t);
+
+    //=========================================================================================================
+    /**
+    * Create a EEG coil set definition using a channel information
+    * Change the coordinate frame if so desired
+    * Refactored: fwd_create_eeg_els (fwd_coil_def.c)
+    *
+    * @param[in] ch     Channel information to use
+    * @param[in] nch    Number of channels
+    * @param[in] t      Transform the points using this
+    *
+    * @return   The created meg coil set.
+    */
+    static FwdCoilSet* create_eeg_els(FIFFLIB::fiffChInfo chs, int nch, FIFFLIB::fiffCoordTrans t);
+
+    //=========================================================================================================
+    /**
+    * Read a coil definitions from file
+    * Refactored: fwd_read_coil_defs (fwd_coil_def.c)
+    *
+    * @param[in] name   File name to read from
+    *
+    * @return   The read meg coil set.
+    */
+    static FwdCoilSet* read_coil_defs(const QString& name);
+
+    //=========================================================================================================
+    /**
+    * Make a coil set duplicate
+    * Refactored: fwd_dup_coil_set (fwd_coil_def.c)
+    *
+    * @param[in] t      Transformation which should be applied to the duplicate
+    *
+    * @return   The duplicated coil set.
+    */
+    FwdCoilSet* dup_coil_set(const FIFFLIB::fiffCoordTrans t) const;
+
+    //=========================================================================================================
+    /**
+    * Checks if a set of templates contains a planar coil of a specified type.
+    * Refactored: fwd_is_planar_coil_type (fwd_coil_def.c)
+    *
+    * @param[in] type   This is the coil type we are interested in
+    *
+    * @return   True if set contains a planar coil of specified type, false otherwise
+    */
+    bool is_planar_coil_type(int type) const;
+
+    //=========================================================================================================
+    /**
+    * Checks if a set of templates contains an axial coil of a specified type.
+    * Refactored: fwd_is_axial_coil_type (fwd_coil_def.c)
+    *
+    * @param[in] type   This is the coil type we are interested in
+    *
+    * @return   True if set contains an axial coil of specified type, false otherwise
+    */
+    bool is_axial_coil_type(int type) const;
+
+    //=========================================================================================================
+    /**
+    * Checks if a set of templates contains a magnetometer of a specified type.
+    * Refactored: fwd_is_magnetometer_coil_type (fwd_coil_def.c)
+    *
+    * @param[in] type   This is the coil type we are interested in
+    *
+    * @return   True if set contains a magnetometer of specified type, false otherwise
+    */
+    bool is_magnetometer_coil_type(int type) const;
+
+    //=========================================================================================================
+    /**
+    * Checks if a set of templates contains an EEG electrode of a specified type.
+    * Refactored: fwd_is_eeg_electrode_type (fwd_coil_def.c)
+    *
+    * @param[in] type   This is the coil type we are interested in
+    *
+    * @return   True if set contains an EEG electrode of specified type, false otherwise
+    */
+    bool is_eeg_electrode_type(int type) const;
 
 public:
     FwdCoil **coils;                 /* The coil or electrode positions */
