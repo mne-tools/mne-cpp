@@ -424,7 +424,7 @@ bool Neuromag::readHeader()
         m_pFiffInfo->projs[k].active = true;
 
     //garbage collecting
-    t_pStream->device()->close();
+    t_pStream->close();
 
     return true;
 }

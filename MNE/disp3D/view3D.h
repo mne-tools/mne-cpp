@@ -71,8 +71,8 @@ namespace Qt3DCore {
 }
 
 namespace Qt3DRender {
-    class QPointLight;
     class QDirectionalLight;
+    class QPointLight;
 }
 
 namespace Qt3DExtras {
@@ -233,7 +233,7 @@ protected:
     QVector3D                           m_vecCameraRotationOld;         /**< The camera old rotation vector. */
 
     QList<QPointer<QPropertyAnimation> >  m_lPropertyAnimations;        /**< The animations for each 3D object. */
-    QList<QPair<QPointer<Qt3DRender::QDirectionalLight> , QPointer<Qt3DExtras::QPhongMaterial> > >  m_lLightSources;        /**< The light sources. */
+    QList<QPair<QPointer<Qt3DRender::QPointLight> , QPointer<Qt3DExtras::QPhongMaterial> > >  m_lLightSources;        /**< The light sources. */
 };
 
 } // NAMESPACE

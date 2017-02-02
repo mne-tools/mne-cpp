@@ -346,7 +346,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    inline static bool read_cov(FiffStream* p_pStream, FiffDirNode& p_Node, fiff_int_t cov_kind, FiffCov& p_covData)
+    inline static bool read_cov(FiffStream::SPtr& p_pStream, const FiffDirNode::SPtr& p_Node, fiff_int_t cov_kind, FiffCov& p_covData)
     {
         return p_pStream->read_cov(p_Node, cov_kind, p_covData);
     }
@@ -435,7 +435,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    static bool read_bem_surface(FiffStream::SPtr& p_pStream, bool add_geom, FiffDirNode& p_Tree, QList<MNESurface::SPtr>& p_Surfaces)
+    static bool read_bem_surface(FiffStream::SPtr& p_pStream, bool add_geom, FiffDirNode::SPtr& p_Tree, QList<MNESurface::SPtr>& p_Surfaces)
     {
         return MNESurface::read(p_pStream, add_geom, p_Tree, p_Surfaces);
     }
@@ -479,9 +479,9 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    static inline bool transform_source_space_to(MNESourceSpace* p_pMNESourceSpace, fiff_int_t dest, FiffCoordTrans& trans)
+    static inline bool transform_source_space_to(MNESourceSpace& p_pMNESourceSpace, fiff_int_t dest, FiffCoordTrans& trans)
     {
-        return p_pMNESourceSpace->transform_source_space_to(dest, trans);
+        return p_pMNESourceSpace.transform_source_space_to(dest, trans);
     }
 
     //=========================================================================================================
@@ -497,9 +497,9 @@ public:
     * @param[in, out] mat FiffNamedMatrix which shoul be transposed.
     *
     */
-    static inline void transpose_named_matrix(FiffNamedMatrix* mat)
+    static inline void transpose_named_matrix(FiffNamedMatrix& mat)
     {
-        mat->transpose_named_matrix();
+        mat.transpose_named_matrix();
     }
 };
 

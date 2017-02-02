@@ -112,7 +112,15 @@ SOURCES += \
     rapMusic/dipole.cpp \
     dipoleFit/dipole_fit_settings.cpp \
     dipoleFit/dipole_fit.cpp \
-    dipoleFit/mne_sss_data.cpp
+    dipoleFit/mne_sss_data.cpp \
+    dipoleFit/mne_mne_data.cpp \
+    dipoleFit/mne_meas_data_set.cpp \
+    dipoleFit/mne_meas_data.cpp \
+    dipoleFit/mne_named_matrix.cpp \
+    dipoleFit/mne_deriv.cpp \
+    dipoleFit/mne_deriv_set.cpp \
+    dipoleFit/mne_surface_or_volume.cpp \
+    dipoleFit/fiff_sparse_matrix.cpp
 
 HEADERS +=\
     inverse_global.h \
@@ -138,7 +146,15 @@ HEADERS +=\
     dipoleFit/dipole_fit_settings.h \
     dipoleFit/dipole_fit.h \
     dipoleFit/dipolefit_helpers.h \
-    dipoleFit/mne_sss_data.h
+    dipoleFit/mne_sss_data.h \
+    dipoleFit/mne_mne_data.h \
+    dipoleFit/mne_meas_data_set.h \
+    dipoleFit/mne_meas_data.h \
+    dipoleFit/mne_named_matrix.h \
+    dipoleFit/mne_deriv.h \
+    dipoleFit/mne_deriv_set.h \
+    dipoleFit/mne_surface_or_volume.h \
+    dipoleFit/fiff_sparse_matrix.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
@@ -175,3 +191,6 @@ win32 {
     #  warning($${DEPLOY_COMMAND} $${DEPLOY_TARGET})
     QMAKE_POST_LINK += $${DEPLOY_COMMAND} $${DEPLOY_TARGET}
 }
+
+DISTFILES += \
+    dipoleFit/dipolefit_helpers_bak.txt
