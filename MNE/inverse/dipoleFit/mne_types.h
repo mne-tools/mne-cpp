@@ -115,6 +115,7 @@
 #include "mne_named_matrix.h"
 #include "mne_deriv_set.h"
 #include "fiff_sparse_matrix.h"
+#include "fiff_coord_trans_old.h"
 
 
 #if defined(__cplusplus) 
@@ -250,15 +251,15 @@ typedef struct {
 //  /*
 //   * These are for volumes only
 //   */
-//  FIFFLIB::fiffCoordTrans   voxel_surf_RAS_t;/* Transform from voxel coordinate to the surface RAS (MRI) coordinates */
+//  INVERSELIB::FiffCoordTransOld*   voxel_surf_RAS_t;/* Transform from voxel coordinate to the surface RAS (MRI) coordinates */
 //  int              vol_dims[3];     /* Dimensions of the volume grid (width x height x depth)
 //				     * NOTE: This will be present only if the source space is a complete
 //				     * rectangular grid with unused vertices included */
 //  float            voxel_size[3];   /* Derived from the above */
 //  mneSparseMatrix  interpolator;    /* Matrix to interpolate into an MRI volume */
 //  char             *MRI_volume;     /* The name of the file the above interpolator is based on */
-//  FIFFLIB::fiffCoordTrans   MRI_voxel_surf_RAS_t;
-//  FIFFLIB::fiffCoordTrans   MRI_surf_RAS_RAS_t;  /* Transform from surface RAS to RAS coordinates in the associated MRI volume */
+//  INVERSELIB::FiffCoordTransOld*   MRI_voxel_surf_RAS_t;
+//  INVERSELIB::FiffCoordTransOld*   MRI_surf_RAS_RAS_t;  /* Transform from surface RAS to RAS coordinates in the associated MRI volume */
 //  int              MRI_vol_dims[3];     /* Dimensions of the MRI volume (width x height x depth) */
 //  /*
 //   * Possibility to add user-defined data
@@ -409,8 +410,8 @@ typedef struct {		          /* An inverse operator */
   FIFFLIB::fiffId         meas_id;                  /* The assosiated measurement ID */
   INVERSELIB::MneCSourceSpace* *spaces;               /* The source spaces */
   int            nspace;	          /* Number of source spaces */
-  FIFFLIB::fiffCoordTrans meg_head_t;              /* MEG device <-> head coordinate transformation */
-  FIFFLIB::fiffCoordTrans mri_head_t;	          /* MRI device <-> head coordinate transformation */
+  INVERSELIB::FiffCoordTransOld* meg_head_t;              /* MEG device <-> head coordinate transformation */
+  INVERSELIB::FiffCoordTransOld* mri_head_t;	          /* MRI device <-> head coordinate transformation */
   int            methods;	          /* EEG, MEG or EEG+MEG (see mne_fiff.h) */
   int            nchan;		          /* Number of measurement channels */
   int            nsource;	          /* Number of source points */
@@ -465,7 +466,7 @@ typedef struct {		/* Information about raw data in fiff file */
 				 * Which coordinate frame are the
 				 * positions defined in? 
 				 */
-  FIFFLIB::fiffCoordTrans trans;	        /* This is the coordinate transformation
+  INVERSELIB::FiffCoordTransOld* trans;	        /* This is the coordinate transformation
 				 * FIFF_COORD_HEAD <--> FIFF_COORD_DEVICE
 				 */
   float         sfreq;		/* Sampling frequency */
@@ -725,8 +726,8 @@ typedef struct {			/* A comprehensive raw data structure */
 //  FIFFLIB::fiffId             meas_id;	 /* The id from the measurement file */
 //  FIFFLIB::fiffTimeRec        meas_date;	 /* The measurement date from the file */
 //  FIFFLIB::fiffChInfo         chs;	 /* The channel information */
-//  FIFFLIB::fiffCoordTrans     meg_head_t; /* MEG device <-> head coordinate transformation */
-//  FIFFLIB::fiffCoordTrans     mri_head_t; /* MRI device <-> head coordinate transformation
+//  INVERSELIB::FiffCoordTransOld*     meg_head_t; /* MEG device <-> head coordinate transformation */
+//  INVERSELIB::FiffCoordTransOld*     mri_head_t; /* MRI device <-> head coordinate transformation
 //				    (duplicated from the inverse operator or loaded separately) */
 //  float              sfreq;	 /* Sampling frequency */
 //  int                nchan;	 /* Number of channels */
