@@ -321,7 +321,7 @@ void BabyMEGHPIDgl::setDigitizerDataToView3D(const FiffDigPointSet& digPointSet,
             }
         }
 
-        m_pData3DModel->addDigitizerData("Head", "Digitizer", t_digSetWithoutAdditional);
+        m_pData3DModel->addDigitizerData("Head", "HPI", t_digSetWithoutAdditional);
 
         t_digSetWithoutAdditional.clear();
         for(int i = 0; i < fittedPointSet.size(); ++i) {
@@ -333,7 +333,7 @@ void BabyMEGHPIDgl::setDigitizerDataToView3D(const FiffDigPointSet& digPointSet,
             }
         }
 
-        m_pData3DModel->addDigitizerData("Head", "Fitted", t_digSetWithoutAdditional);
+        m_pData3DModel->addDigitizerData("Head", "HPI", t_digSetWithoutAdditional);
 
         //Update gof labels and transform from m to mm
         QString sGof("0mm");
@@ -357,8 +357,8 @@ void BabyMEGHPIDgl::setDigitizerDataToView3D(const FiffDigPointSet& digPointSet,
             ui->m_label_gofCoil4->setText(sGof);
         }
     } else {
-        m_pData3DModel->addDigitizerData("Head", "Digitizer", digPointSet);
-        m_pData3DModel->addDigitizerData("Head", "Fitted", fittedPointSet);
+        m_pData3DModel->addDigitizerData("Head", "HPI", digPointSet);
+        m_pData3DModel->addDigitizerData("Head", "HPI", fittedPointSet);
     }
 }
 
