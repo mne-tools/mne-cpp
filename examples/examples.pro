@@ -69,6 +69,7 @@ SUBDIRS += \
             stClusteredInversePwlRapMusic  \
             roiClusteredInversePwlRapMusic \
             fsSurface \
+            ex_disp \
             disp3DTutorial \
             histogram \
             connectivityTutorial \

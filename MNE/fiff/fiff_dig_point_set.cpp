@@ -110,7 +110,7 @@ FiffDigPointSet::FiffDigPointSet(QIODevice &p_IODevice)   //const FiffDigPointSe
 
     if(!FiffDigPointSet::readFromStream(t_pStream, *this))
     {
-        t_pStream->device()->close();
+        t_pStream->close();
         qDebug() << "Could not read the FiffDigPointSet\n"; // ToDo throw error
     }
     qDebug("%i digitizer Points read in file.", this->size());
@@ -156,7 +156,7 @@ bool FiffDigPointSet::readFromStream(FiffStream::SPtr &p_Stream, FiffDigPointSet
     //
     //   Locate the Electrodes
     //
-    QList<FiffDirNode> isotrak = p_Stream->tree().dir_tree_find(FIFFB_ISOTRAK);
+    QList<FiffDirNode::SPtr> isotrak = p_Stream->tree()->dir_tree_find(FIFFB_ISOTRAK);
 
     fiff_int_t coord_frame = FIFFV_COORD_HEAD;
     FiffCoordTrans dig_trans;
@@ -164,26 +164,26 @@ bool FiffDigPointSet::readFromStream(FiffStream::SPtr &p_Stream, FiffDigPointSet
 
     if (isotrak.size() == 1)
     {
-        for (k = 0; k < isotrak[0].nent; ++k)
+        for (k = 0; k < isotrak[0]->nent; ++k)
         {
-            kind = isotrak[0].dir[k].kind;
-            pos  = isotrak[0].dir[k].pos;
+            kind = isotrak[0]->dir[k]->kind;
+            pos  = isotrak[0]->dir[k]->pos;
             if (kind == FIFF_DIG_POINT)
             {
-                FiffTag::read_tag(p_Stream.data(), t_pTag, pos);
+                FiffTag::read_tag(p_Stream, t_pTag, pos);
                 p_Dig.m_qListDigPoint.append(t_pTag->toDigPoint());
             }
             else
             {
                 if (kind == FIFF_MNE_COORD_FRAME)
                 {
-                    FiffTag::read_tag(p_Stream.data(), t_pTag, pos);
+                    FiffTag::read_tag(p_Stream, t_pTag, pos);
                     qDebug() << "NEEDS To BE DEBBUGED: FIFF_MNE_COORD_FRAME" << t_pTag->getType();
                     coord_frame = *t_pTag->toInt();
                 }
                 else if (kind == FIFF_COORD_TRANS)
                 {
-                    FiffTag::read_tag(p_Stream.data(), t_pTag, pos);
+                    FiffTag::read_tag(p_Stream, t_pTag, pos);
                     qDebug() << "NEEDS To BE DEBBUGED: FIFF_COORD_TRANS" << t_pTag->getType();
                     dig_trans = t_pTag->toCoordTrans();
                 }
@@ -200,7 +200,7 @@ bool FiffDigPointSet::readFromStream(FiffStream::SPtr &p_Stream, FiffDigPointSet
     //
     if(open_here)
     {
-        p_Stream->device()->close();
+        p_Stream->close();
     }
     return true;
 }
