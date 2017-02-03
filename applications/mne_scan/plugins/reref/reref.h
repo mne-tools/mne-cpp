@@ -1,14 +1,15 @@
 //=============================================================================================================
 /**
 * @file     reref.h
-* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+* @author   Viktor Klüber <viktor.klueber@tu-ilmenau.de>;
+*           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2016
+* @date     February, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Viktor Klüber, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -43,6 +44,7 @@
 //=============================================================================================================
 
 #include "reref_global.h"
+#include "FormFiles/rerefoption.h"
 
 #include <utils/ioutils.h>
 #include <utils/eegref.h>
@@ -91,6 +93,8 @@ using namespace SCSHAREDLIB;
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+class ReRefOption;
+
 
 //=============================================================================================================
 /**
@@ -133,12 +137,17 @@ public:
 
     //=========================================================================================================
     /**
-    * Udates the pugin with new (incoming) data.
+    * Updates the plugin with new (incoming) data.
     *
     * @param[in] pMeasurement    The incoming data in form of a generalized NewMeasurement.
     */
     void update(SCMEASLIB::NewMeasurement::SPtr pMeasurement);
 
+    //=========================================================================================================
+    /**
+    * creates a ReRefOption object and shows the widget.
+    */
+    void showReRefOption();
 
 protected:
     //=========================================================================================================
@@ -148,17 +157,21 @@ protected:
     virtual void run();
 
 private:
+    QSharedPointer<ReRefOption>     m_pReRefOption;             /**< pointer to the ReRefOption Widget class. */
+    QAction                        *m_pActionReRefOption;       /**< starts re-reference option feature via QAction bar item. */
+
     QMutex                          m_mutex;                    /**< The threads mutex.*/
 
     bool                            m_bIsRunning;               /**< Flag whether thread is running.*/
     bool                            m_bDisp;                    /**< Flag for displaying. */
     FIFFLIB::FiffInfo::SPtr         m_pFiffInfo;                /**< Fiff measurement info.*/
 
-    IOBUFFER::CircularMatrixBuffer<double>::SPtr    m_pReRefBuffer;    /**< Holds incoming data.*/
-    SCMEASLIB::NewRealTimeMultiSampleArray::SPtr    m_pRTMSA;        /**< the real time multi sample array object. */
+    IOBUFFER::CircularMatrixBuffer<double>::SPtr    m_pReRefBuffer;     /**< Holds incoming data.*/
+    SCMEASLIB::NewRealTimeMultiSampleArray::SPtr    m_pRTMSA;           /**< the real time multi sample array object. */
 
     PluginInputData<SCMEASLIB::NewRealTimeMultiSampleArray>::SPtr      m_pReRefInput;      /**< The NewRealTimeMultiSampleArray of the reref input.*/
     PluginOutputData<SCMEASLIB::NewRealTimeMultiSampleArray>::SPtr     m_pReRefOutput;     /**< The NewRealTimeMultiSampleArray of the reref output.*/
+
 
 };
 

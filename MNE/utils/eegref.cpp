@@ -115,7 +115,21 @@ MatrixXd EEGRef::applyCAR(MatrixXd &matIER, FIFFLIB::FiffInfo::SPtr &pFiffInfo)
 
     //detrmine centering matrix
     matCenter = matCenter - (1/double(numTrueCh))*matOnes;
-    IOUtils::write_eigen_matrix(matCenter, "matCENTERING.txt", "centering matrix");
 
-    return matCenter*matIER;
+//    // write centering matrix to a file
+//    IOUtils::write_eigen_matrix(matCenter, "matCENTERING.txt", "centering matrix");
+
+    // determine EEG CAR data matrix
+    MatrixXd matCAR = matCenter*matIER;
+
+    //add former excluded non-EEG channels to the EEG CAR data matrix
+    for(unsigned int i = 0; i < numCh; ++i)
+    {
+        if(!pFiffInfo->chs.at(i).ch_name.contains("EEG"))
+        {
+            matCAR.row(i) = matIER.row(i);
+        }
+    }
+
+    return matCAR;
 }

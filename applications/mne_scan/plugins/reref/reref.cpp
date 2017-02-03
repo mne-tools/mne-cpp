@@ -1,14 +1,15 @@
 //=============================================================================================================
 /**
 * @file     reref.cpp
-* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+* @author   Viktor Klüber <viktor.klueber@tu-ilmenau.de>
+*           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2016
+* @date     February, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Viktor Klüber, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -65,7 +66,14 @@ ReRef::ReRef()
 : m_bIsRunning(false)
 , m_pRTMSA(NewRealTimeMultiSampleArray::SPtr(new NewRealTimeMultiSampleArray()))
 , m_bDisp(true)
+, m_pReRefOption(QSharedPointer<ReRefOption>(new ReRefOption(this)))
 {
+    // Create ReRefOption action bar item/button
+    m_pActionReRefOption = new QAction(QIcon(":/images/options.png"),tr("Re-reference EEG option"),this);
+    m_pActionReRefOption->setStatusTip(tr("Re-reference EEG option"));
+    connect(m_pActionReRefOption, &QAction::triggered, this, &ReRef::showReRefOption);
+    addPluginAction(m_pActionReRefOption);
+
 }
 
 
@@ -105,8 +113,6 @@ void ReRef::init()
     //Delete Buffer - will be initailzed with first incoming data
     if(!m_pReRefBuffer.isNull())
         m_pReRefBuffer = CircularMatrixBuffer<double>::SPtr();
-
-
 }
 
 
@@ -114,7 +120,6 @@ void ReRef::init()
 
 void ReRef::unload()
 {
-
 }
 
 
@@ -160,7 +165,7 @@ IPlugin::PluginType ReRef::getType() const
 
 QString ReRef::getName() const
 {
-    return "ReRef";
+    return "Re-reference EEG";
 }
 
 
@@ -171,6 +176,21 @@ QWidget* ReRef::setupWidget()
     //widget is later distroyed by CentralWidget - so it has to be created everytime new
     ReRefSetupWidget* setupWidget = new ReRefSetupWidget(this);
     return setupWidget;
+}
+
+
+//*************************************************************************************************************
+
+void ReRef::showReRefOption()
+{
+    if(!m_pReRefOption->isVisible()){
+        m_pReRefOption->setWindowTitle("Re-reference - Options");
+        m_pReRefOption->show();
+        m_pReRefOption->raise();
+    }
+
+    //sets Window to the foreground and activates it for editing
+    m_pReRefOption->activateWindow();
 }
 
 
@@ -196,6 +216,11 @@ void ReRef::update(SCMEASLIB::NewMeasurement::SPtr pMeasurement)
             m_pReRefOutput->data()->initFromFiffInfo(m_pFiffInfo);
             m_pReRefOutput->data()->setMultiArraySize(1);
             m_pReRefOutput->data()->setVisibility(true);
+
+            //update ReRefOption widget
+            if(m_pReRefOption != NULL){
+                m_pReRefOption->updateChannels(m_pFiffInfo);
+            }
         }
 
         MatrixXd t_mat;
@@ -228,13 +253,14 @@ void ReRef::run()
 
         MatrixXd matCAR = EEGRef::applyCAR(t_mat, m_pFiffInfo);
 
-        if(m_bDisp){
+//        // write in- and output matrix to a file
+//        if(m_bDisp){
 
-            IOUtils::write_eigen_matrix(t_mat, "matIN.txt");
-            IOUtils::write_eigen_matrix(matCAR, "matOUT.txt");
+//            IOUtils::write_eigen_matrix(t_mat, "matIN.txt");
+//            IOUtils::write_eigen_matrix(matCAR, "matOUT.txt");
 
-            m_bDisp = false;
-        }
+//            m_bDisp = false;
+//        }
 
         m_mutex.unlock();
 
