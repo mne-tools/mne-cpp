@@ -115,6 +115,9 @@
 #include "mne_named_matrix.h"
 #include "mne_deriv_set.h"
 #include "fiff_sparse_matrix.h"
+#include "fiff_coord_trans_old.h"
+#include "mne_proj_item.h"
+#include "mne_proj_op.h"
 
 
 #if defined(__cplusplus) 
@@ -250,15 +253,15 @@ typedef struct {
 //  /*
 //   * These are for volumes only
 //   */
-//  FIFFLIB::fiffCoordTrans   voxel_surf_RAS_t;/* Transform from voxel coordinate to the surface RAS (MRI) coordinates */
+//  INVERSELIB::FiffCoordTransOld*   voxel_surf_RAS_t;/* Transform from voxel coordinate to the surface RAS (MRI) coordinates */
 //  int              vol_dims[3];     /* Dimensions of the volume grid (width x height x depth)
 //				     * NOTE: This will be present only if the source space is a complete
 //				     * rectangular grid with unused vertices included */
 //  float            voxel_size[3];   /* Derived from the above */
 //  mneSparseMatrix  interpolator;    /* Matrix to interpolate into an MRI volume */
 //  char             *MRI_volume;     /* The name of the file the above interpolator is based on */
-//  FIFFLIB::fiffCoordTrans   MRI_voxel_surf_RAS_t;
-//  FIFFLIB::fiffCoordTrans   MRI_surf_RAS_RAS_t;  /* Transform from surface RAS to RAS coordinates in the associated MRI volume */
+//  INVERSELIB::FiffCoordTransOld*   MRI_voxel_surf_RAS_t;
+//  INVERSELIB::FiffCoordTransOld*   MRI_surf_RAS_RAS_t;  /* Transform from surface RAS to RAS coordinates in the associated MRI volume */
 //  int              MRI_vol_dims[3];     /* Dimensions of the MRI volume (width x height x depth) */
 //  /*
 //   * Possibility to add user-defined data
@@ -315,25 +318,25 @@ typedef struct {		/* Vector specification with a channel list */
   float  *data;			/* The data itself */
 } *mneNamedVector,mneNamedVectorRec;
 
-typedef struct {		/* One linear projection item */
-  INVERSELIB::MneNamedMatrix* vecs;          /* The original projection vectors */
-  int            nvec;          /* Number of vectors = vecs->nrow */
-  char           *desc;	        /* Projection item description */
-  int            kind;          /* Projection item kind */
-  int            active;	/* Is this item active now? */
-  int            active_file;	/* Was this item active when loaded from file? */
-  int            has_meg;	/* Does it have MEG channels? */
-  int            has_eeg;	/* Does it have EEG channels? */
-} *mneProjItem,mneProjItemRec;
+//typedef struct {		/* One linear projection item */
+//  INVERSELIB::MneNamedMatrix* vecs;          /* The original projection vectors */
+//  int            nvec;          /* Number of vectors = vecs->nrow */
+//  char           *desc;	        /* Projection item description */
+//  int            kind;          /* Projection item kind */
+//  int            active;	/* Is this item active now? */
+//  int            active_file;	/* Was this item active when loaded from file? */
+//  int            has_meg;	/* Does it have MEG channels? */
+//  int            has_eeg;	/* Does it have EEG channels? */
+//} *mneProjItem,mneProjItemRec;
 
-typedef struct {		/* Collection of projection items and the projector itself */
-  mneProjItem    *items;        /* The projection items */
-  int            nitems;        /* Number of items */
-  char           **names;	/* Names of the channels in the final projector */
-  int            nch;	        /* Number of channels in the final projector */
-  int            nvec;          /* Number of vectors in the final projector */
-  float          **proj_data;	/* The orthogonalized projection vectors picked and orthogonalized from the original data */
-} *mneProjOp,mneProjOpRec;
+//typedef struct {                        /* Collection of projection items and the projector itself */
+//  QList<INVERSELIB::MneProjItem*> items;     /* The projection items */
+//  int            nitems;                /* Number of items */
+//  char           **names;               /* Names of the channels in the final projector */
+//  int            nch;           /* Number of channels in the final projector */
+//  int            nvec;          /* Number of vectors in the final projector */
+//  float          **proj_data;   /* The orthogonalized projection vectors picked and orthogonalized from the original data */
+//} *mneProjOp,mneProjOpRec;
 
 typedef struct {
   int   job;			/* Value of FIFF_SSS_JOB tag */
@@ -365,14 +368,13 @@ typedef struct {		/* Covariance matrix storage */
   char       **names;		/* Names of the entries (optional) */
   double     *cov;		/* Covariance matrix in packed representation (lower triangle) */
   double     *cov_diag;		/* Diagonal covariance matrix */
-  INVERSELIB::FiffSparseMatrix* cov_sparse;   /* A sparse covariance matrix
-				 * (Note: data are floats in this which is an inconsistency) */
-  double     *lambda;		/* Eigenvalues of cov */
-  double     *inv_lambda;	/* Inverses of the square roots of the eigenvalues of cov */
-  float      **eigen;		/* Eigenvectors of cov */
-  double     *chol;		/* Cholesky decomposition */
-  mneProjOp  proj;		/* The projection which was active when this matrix was computed */
-  INVERSELIB::MneSssData* sss;		/* The SSS data present in the associated raw data file */
+  INVERSELIB::FiffSparseMatrix* cov_sparse;   /* A sparse covariance matrix (Note: data are floats in this which is an inconsistency) */
+  double     *lambda;           /* Eigenvalues of cov */
+  double     *inv_lambda;       /* Inverses of the square roots of the eigenvalues of cov */
+  float      **eigen;           /* Eigenvectors of cov */
+  double     *chol;             /* Cholesky decomposition */
+  INVERSELIB::MneProjOp*  proj; /* The projection which was active when this matrix was computed */
+  INVERSELIB::MneSssData* sss;  /* The SSS data present in the associated raw data file */
   int        *ch_class;		/* This will allow grouping of channels for regularization (MEG [T/m], MEG [T], EEG [V] */
   char       **bads;		/* Which channels were designated bad when this noise covariance matrix was computed? */
   int        nbad;		/* How many of them */
@@ -409,8 +411,8 @@ typedef struct {		          /* An inverse operator */
   FIFFLIB::fiffId         meas_id;                  /* The assosiated measurement ID */
   INVERSELIB::MneCSourceSpace* *spaces;               /* The source spaces */
   int            nspace;	          /* Number of source spaces */
-  FIFFLIB::fiffCoordTrans meg_head_t;              /* MEG device <-> head coordinate transformation */
-  FIFFLIB::fiffCoordTrans mri_head_t;	          /* MRI device <-> head coordinate transformation */
+  INVERSELIB::FiffCoordTransOld* meg_head_t;              /* MEG device <-> head coordinate transformation */
+  INVERSELIB::FiffCoordTransOld* mri_head_t;	          /* MRI device <-> head coordinate transformation */
   int            methods;	          /* EEG, MEG or EEG+MEG (see mne_fiff.h) */
   int            nchan;		          /* Number of measurement channels */
   int            nsource;	          /* Number of source points */
@@ -419,20 +421,20 @@ typedef struct {		          /* An inverse operator */
   float          **nn_source;	          /* The source orientations 
 					   * (These are equal to the cortex normals 
 					   * in the fixed orientation case) */
-  int            coord_frame;             /* Which coordinates are the locations and orientations given in? */
-  mneCovMatrix   sensor_cov;	          /* Sensor covariance matrix */
-  int            nave;		          /* Number of averaged responses (affects scaling of the noise covariance) */
-  int            current_unit;		  /* This can be FIFF_UNIT_AM, FIFF_UNIT_AM_M2, FIFF_UNIT_AM_M3 */
-  mneCovMatrix   source_cov;	          /* Source covariance matrix */
-  mneCovMatrix   orient_prior;	          /* Orientation prior applied */
-  mneCovMatrix   depth_prior;	          /* Depth-weighting prior applied */
-  mneCovMatrix   fMRI_prior;	          /* fMRI prior applied */
-  float          *sing;		          /* Singular values of the inverse operator */
-  INVERSELIB::MneNamedMatrix* eigen_leads;	          /* The eigen leadfields */
-  int            eigen_leads_weighted;    /* Have the above been already weighted with R^0.5? */
-  INVERSELIB::MneNamedMatrix* eigen_fields;	          /* Associated field patterns */
-  float          trace_ratio;	          /* tr(GRG^T)/tr(C) */
-  mneProjOp      proj;		          /* The associated projection operator */
+  int            coord_frame;               /* Which coordinates are the locations and orientations given in? */
+  mneCovMatrix   sensor_cov;                /* Sensor covariance matrix */
+  int            nave;                      /* Number of averaged responses (affects scaling of the noise covariance) */
+  int            current_unit;              /* This can be FIFF_UNIT_AM, FIFF_UNIT_AM_M2, FIFF_UNIT_AM_M3 */
+  mneCovMatrix   source_cov;                /* Source covariance matrix */
+  mneCovMatrix   orient_prior;              /* Orientation prior applied */
+  mneCovMatrix   depth_prior;               /* Depth-weighting prior applied */
+  mneCovMatrix   fMRI_prior;                /* fMRI prior applied */
+  float          *sing;                     /* Singular values of the inverse operator */
+  INVERSELIB::MneNamedMatrix* eigen_leads;  /* The eigen leadfields */
+  int            eigen_leads_weighted;      /* Have the above been already weighted with R^0.5? */
+  INVERSELIB::MneNamedMatrix* eigen_fields; /* Associated field patterns */
+  float          trace_ratio;               /* tr(GRG^T)/tr(C) */
+  INVERSELIB::MneProjOp*    proj;           /* The associated projection operator */
 } *mneInverseOperator,mneInverseOperatorRec;
 
 
@@ -465,7 +467,7 @@ typedef struct {		/* Information about raw data in fiff file */
 				 * Which coordinate frame are the
 				 * positions defined in? 
 				 */
-  FIFFLIB::fiffCoordTrans trans;	        /* This is the coordinate transformation
+  INVERSELIB::FiffCoordTransOld* trans;	        /* This is the coordinate transformation
 				 * FIFF_COORD_HEAD <--> FIFF_COORD_DEVICE
 				 */
   float         sfreq;		/* Sampling frequency */
@@ -663,15 +665,15 @@ typedef struct {			/* A comprehensive raw data structure */
   int              omit_samp_old;       /* This is the value omit_samp would have in the old versions */
   int              nsamp;               /* How many samples in total? */
   float            *first_sample_val;   /* Values at the first sample (for dc offset correction before filtering) */
-  mneProjOp        proj;                /* Projection operator */
-  INVERSELIB::MneSssData* sss;        /* SSS data found in this file */
-  mneCTFcompDataSet comp;		/* Compensation data */
+  INVERSELIB::MneProjOp* proj;          /* Projection operator */
+  INVERSELIB::MneSssData* sss;          /* SSS data found in this file */
+  mneCTFcompDataSet comp;               /* Compensation data */
   int              comp_file;           /* Compensation status of these raw data in file */
   int              comp_now;            /* Compensation status of these raw data in file */
-  mneFilterDef     filter;		/* Filter definition */
+  mneFilterDef     filter;              /* Filter definition */
   void             *filter_data;        /* This can be whatever the filter needs */
   mneUserFreeFunc  filter_data_free;    /* Function to free the above */
-  mneEventList     event_list;		/* Trigger events */
+  mneEventList     event_list;          /* Trigger events */
   unsigned int     max_event;	        /* Maximum event number in usenest */
   char             *dig_trigger;        /* Name of the digital trigger channel */
   unsigned int     dig_trigger_mask;    /* Mask applied to digital trigger channel before considering it */
@@ -725,8 +727,8 @@ typedef struct {			/* A comprehensive raw data structure */
 //  FIFFLIB::fiffId             meas_id;	 /* The id from the measurement file */
 //  FIFFLIB::fiffTimeRec        meas_date;	 /* The measurement date from the file */
 //  FIFFLIB::fiffChInfo         chs;	 /* The channel information */
-//  FIFFLIB::fiffCoordTrans     meg_head_t; /* MEG device <-> head coordinate transformation */
-//  FIFFLIB::fiffCoordTrans     mri_head_t; /* MRI device <-> head coordinate transformation
+//  INVERSELIB::FiffCoordTransOld*     meg_head_t; /* MEG device <-> head coordinate transformation */
+//  INVERSELIB::FiffCoordTransOld*     mri_head_t; /* MRI device <-> head coordinate transformation
 //				    (duplicated from the inverse operator or loaded separately) */
 //  float              sfreq;	 /* Sampling frequency */
 //  int                nchan;	 /* Number of channels */
