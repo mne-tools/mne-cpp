@@ -116,6 +116,7 @@
 #include "mne_deriv_set.h"
 #include "fiff_sparse_matrix.h"
 #include "fiff_coord_trans_old.h"
+#include "mne_proj_item.h"
 
 
 #if defined(__cplusplus) 
@@ -316,24 +317,24 @@ typedef struct {		/* Vector specification with a channel list */
   float  *data;			/* The data itself */
 } *mneNamedVector,mneNamedVectorRec;
 
-typedef struct {		/* One linear projection item */
-  INVERSELIB::MneNamedMatrix* vecs;          /* The original projection vectors */
-  int            nvec;          /* Number of vectors = vecs->nrow */
-  char           *desc;	        /* Projection item description */
-  int            kind;          /* Projection item kind */
-  int            active;	/* Is this item active now? */
-  int            active_file;	/* Was this item active when loaded from file? */
-  int            has_meg;	/* Does it have MEG channels? */
-  int            has_eeg;	/* Does it have EEG channels? */
-} *mneProjItem,mneProjItemRec;
+//typedef struct {		/* One linear projection item */
+//  INVERSELIB::MneNamedMatrix* vecs;          /* The original projection vectors */
+//  int            nvec;          /* Number of vectors = vecs->nrow */
+//  char           *desc;	        /* Projection item description */
+//  int            kind;          /* Projection item kind */
+//  int            active;	/* Is this item active now? */
+//  int            active_file;	/* Was this item active when loaded from file? */
+//  int            has_meg;	/* Does it have MEG channels? */
+//  int            has_eeg;	/* Does it have EEG channels? */
+//} *mneProjItem,mneProjItemRec;
 
-typedef struct {		/* Collection of projection items and the projector itself */
-  mneProjItem    *items;        /* The projection items */
-  int            nitems;        /* Number of items */
-  char           **names;	/* Names of the channels in the final projector */
-  int            nch;	        /* Number of channels in the final projector */
+typedef struct {                        /* Collection of projection items and the projector itself */
+  QList<INVERSELIB::MneProjItem*> items;     /* The projection items */
+  int            nitems;                /* Number of items */
+  char           **names;               /* Names of the channels in the final projector */
+  int            nch;           /* Number of channels in the final projector */
   int            nvec;          /* Number of vectors in the final projector */
-  float          **proj_data;	/* The orthogonalized projection vectors picked and orthogonalized from the original data */
+  float          **proj_data;   /* The orthogonalized projection vectors picked and orthogonalized from the original data */
 } *mneProjOp,mneProjOpRec;
 
 typedef struct {

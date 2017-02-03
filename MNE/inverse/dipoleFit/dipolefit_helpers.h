@@ -2381,32 +2381,13 @@ mneProjOp mne_new_proj_op()
 {
     mneProjOp new_proj_op = MALLOC(1,mneProjOpRec);
 
-    new_proj_op->items     = NULL;
+//    new_proj_op->items     = NULL;
     new_proj_op->nitems    = 0;
     new_proj_op->names     = NULL;
     new_proj_op->nch       = 0;
     new_proj_op->nvec      = 0;
     new_proj_op->proj_data = NULL;
     return new_proj_op;
-}
-
-
-
-
-mneProjItem mne_new_proj_op_item()
-
-{
-    mneProjItem new_proj_item = MALLOC(1,mneProjItemRec);
-
-    new_proj_item->vecs        = NULL;
-    new_proj_item->kind        = FIFFV_PROJ_ITEM_NONE;
-    new_proj_item->desc        = NULL;
-    new_proj_item->nvec        = 0;
-    new_proj_item->active      = TRUE;
-    new_proj_item->active_file = FALSE;
-    new_proj_item->has_meg     = FALSE;
-    new_proj_item->has_eeg     = FALSE;
-    return new_proj_item;
 }
 
 
@@ -2428,20 +2409,6 @@ void mne_free_proj_op_proj(mneProjOp op)
 }
 
 
-void mne_free_proj_op_item(mneProjItem it)
-
-{
-    if (it == NULL)
-        return;
-
-    if(it->vecs)
-        delete it->vecs;
-
-    FREE(it->desc);
-    FREE(it);
-    return;
-}
-
 
 void mne_free_proj_op(mneProjOp op)
 
@@ -2452,8 +2419,9 @@ void mne_free_proj_op(mneProjOp op)
         return;
 
     for (k = 0; k < op->nitems; k++)
-        mne_free_proj_op_item(op->items[k]);
-    FREE(op->items);
+        if(op->items[k])
+            delete op->items[k];
+//    FREE(op->items);
 
     mne_free_proj_op_proj(op);
 
@@ -2467,12 +2435,14 @@ void mne_proj_op_add_item_act(mneProjOp op, MneNamedMatrix* vecs, int kind, cons
 * Add a new item to an existing projection operator
 */
 {
-    mneProjItem new_item;
+    MneProjItem* new_item;
     int         k;
 
-    op->items = REALLOC(op->items,op->nitems+1,mneProjItem);
+//    op->items = REALLOC(op->items,op->nitems+1,mneProjItem);
+//    op->items[op->nitems] = new_item = new MneProjItem();
 
-    op->items[op->nitems] = new_item = mne_new_proj_op_item();
+    new_item = new MneProjItem();
+    op->items.append(new_item);
 
     new_item->active      = is_active;
     new_item->vecs        = new MneNamedMatrix(*vecs);
@@ -2522,7 +2492,7 @@ mneProjOp mne_dup_proj_op(mneProjOp op)
 */
 {
     mneProjOp dup = mne_new_proj_op();
-    mneProjItem it;
+    MneProjItem* it;
     int k;
 
     if (!op)
@@ -2563,7 +2533,7 @@ void mne_proj_op_report_data(FILE *out,const char *tag, mneProjOp op, int list_d
 */
 {
     int j,k,p,q;
-    mneProjItem it;
+    MneProjItem* it;
     MneNamedMatrix* vecs;
     int found;
 
@@ -2620,7 +2590,7 @@ void mne_proj_op_report(FILE *out,const char *tag, mneProjOp op)
 }
 
 
-int mne_proj_item_affect(mneProjItem it, char **list, int nlist)
+int mne_proj_item_affect(MneProjItem* it, char **list, int nlist)
 /*
 * Does this projection item affect this list of channels?
 */
