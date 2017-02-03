@@ -129,7 +129,7 @@ public:
     *
     * @return   The created meg coil.
     */
-    FwdCoil* create_meg_coil( FIFFLIB::fiffChInfo ch, int acc, FIFFLIB::fiffCoordTrans t);
+    FwdCoil* create_meg_coil( FIFFLIB::fiffChInfo ch, int acc, const FiffCoordTransOld* t);
 
     //=========================================================================================================
     /**
@@ -144,7 +144,7 @@ public:
     *
     * @return   The created meg coil set.
     */
-    FwdCoilSet* create_meg_coils(FIFFLIB::fiffChInfo chs,  int nch, int acc, FIFFLIB::fiffCoordTrans t);
+    FwdCoilSet* create_meg_coils(FIFFLIB::fiffChInfo chs,  int nch, int acc, const FiffCoordTransOld* t);
 
     //=========================================================================================================
     /**
@@ -158,7 +158,7 @@ public:
     *
     * @return   The created meg coil set.
     */
-    static FwdCoilSet* create_eeg_els(FIFFLIB::fiffChInfo chs, int nch, FIFFLIB::fiffCoordTrans t);
+    static FwdCoilSet* create_eeg_els(FIFFLIB::fiffChInfo chs, int nch, const FiffCoordTransOld* t);
 
     //=========================================================================================================
     /**
@@ -180,7 +180,7 @@ public:
     *
     * @return   The duplicated coil set.
     */
-    FwdCoilSet* dup_coil_set(const FIFFLIB::fiffCoordTrans t) const;
+    FwdCoilSet* dup_coil_set(const FiffCoordTransOld* t) const;
 
     //=========================================================================================================
     /**

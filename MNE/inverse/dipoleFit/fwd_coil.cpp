@@ -135,7 +135,7 @@ void mne_free_cmatrix_5 (float **m)
 }
 
 
-void fiff_coord_trans_5 (float r[3],fiffCoordTrans t,int do_move)
+void fiff_coord_trans_5 (float r[3],const FiffCoordTransOld* t,int do_move)
 /*
       * Apply coordinate transformation
       */
@@ -247,7 +247,7 @@ FwdCoil::~FwdCoil()
 
 //*************************************************************************************************************
 
-FwdCoil *FwdCoil::create_eeg_el(FIFFLIB::fiffChInfo ch, FIFFLIB::fiffCoordTrans t)
+FwdCoil *FwdCoil::create_eeg_el(FIFFLIB::fiffChInfo ch, const FiffCoordTransOld* t)
 {
     FwdCoil*    res = NULL;
     int        c;

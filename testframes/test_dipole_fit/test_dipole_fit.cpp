@@ -212,8 +212,7 @@ void TestDipoleFit::dipoleFitAdvanced()
     settings.bmin = 1000000.0f;
     settings.bmax = 1000000.0f;
 
-    testFile.setFileName(QDir::currentPath()+"/mne-cpp-test-data/Result/dip-5120-bem_fit.dat"); QVERIFY( testFile.exists() );
-    settings.dipname = testFile.fileName();
+    settings.dipname = QDir::currentPath()+"/mne-cpp-test-data/Result/dip-5120-bem_fit.dat";
 
     settings.guess_mindist = 0.0f;
     settings.guess_rad = 0.1f;

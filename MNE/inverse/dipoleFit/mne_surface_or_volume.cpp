@@ -345,7 +345,7 @@ const char *mne_coord_frame_name_17(int frame)
 
 
 
-void fiff_coord_trans_inv (float r[3],fiffCoordTrans t,int do_move)
+void fiff_coord_trans_inv (float r[3],FiffCoordTransOld* t,int do_move)
 /*
       * Apply inverse coordinate transformation
       */
@@ -836,7 +836,7 @@ float **mne_lu_invert_17(float **mat,int dim)
 
 //============================= make_volume_source_space.c =============================
 
-static int add_inverse_17(fiffCoordTrans t)
+static int add_inverse_17(FiffCoordTransOld* t)
 /*
       * Add inverse transform to an existing one
       */
@@ -871,13 +871,13 @@ static int add_inverse_17(fiffCoordTrans t)
 
 //============================= make_volume_source_space.c =============================
 
-static fiffCoordTrans fiff_make_transform2 (int from,int to,float rot[3][3],float move[3])
+static FiffCoordTransOld* fiff_make_transform2 (int from,int to,float rot[3][3],float move[3])
 /*
       * Compose the coordinate transformation structure
       * from a known forward transform
       */
 {
-    fiffCoordTrans t = (fiffCoordTrans)malloc(sizeof(fiffCoordTransRec));
+    FiffCoordTransOld* t = new FiffCoordTransOld;
     int j,k;
 
     t->from = from;
@@ -898,14 +898,14 @@ static fiffCoordTrans fiff_make_transform2 (int from,int to,float rot[3][3],floa
     return (t);
 }
 
-static fiffCoordTrans make_voxel_ras_trans(float *r0,
+static FiffCoordTransOld* make_voxel_ras_trans(float *r0,
                                            float *x_ras,
                                            float *y_ras,
                                            float *z_ras,
                                            float *voxel_size)
 
 {
-    fiffCoordTrans t;
+    FiffCoordTransOld* t;
     float rot[3][3],move[3];
     int   j,k;
 
@@ -1072,7 +1072,7 @@ double MneSurfaceOrVolume::sum_solids(float *from, MneSurfaceOrVolume::MneCSurfa
 
 //*************************************************************************************************************
 
-int MneSurfaceOrVolume::mne_filter_source_spaces(MneSurfaceOrVolume::MneCSurface *surf, float limit, fiffCoordTrans mri_head_t, MneSurfaceOrVolume::MneCSourceSpace **spaces, int nspace, FILE *filtered)	          /* Provide a list of filtered points here */
+int MneSurfaceOrVolume::mne_filter_source_spaces(MneSurfaceOrVolume::MneCSurface *surf, float limit, FiffCoordTransOld* mri_head_t, MneSurfaceOrVolume::MneCSourceSpace **spaces, int nspace, FILE *filtered)	          /* Provide a list of filtered points here */
 /*
     * Remove all source space points closer to the surface than a given limit
     */
