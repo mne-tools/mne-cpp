@@ -47,6 +47,13 @@
 #endif
 
 
+#if defined(_WIN32) || defined(_WIN64)
+#define snprintf _snprintf
+#define vsnprintf _vsnprintf
+#define strcasecmp _stricmp
+#define strncasecmp _strnicmp
+#endif
+
 
 #include "fwd_eeg_sphere_model_set.h"
 #include "guess_data.h"
@@ -124,6 +131,10 @@ using namespace FIFFLIB;
 #ifdef  BIG_ENDIAN_ARCH
 #define NATIVE_ENDIAN    FIFFV_BIG_ENDIAN
 #endif
+
+
+
+
 
 
 
