@@ -116,7 +116,6 @@ public:
     */
     void adjust_baselines(float bmin, float bmax);
 
-
 public:
     char                    *filename;  /* The source file name */
     FIFFLIB::fiffId         meas_id;    /* The id from the measurement file */

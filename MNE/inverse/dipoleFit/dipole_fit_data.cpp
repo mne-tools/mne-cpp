@@ -6,6 +6,7 @@
 #include "guess_data.h"
 #include "mne_meas_data.h"
 #include "mne_meas_data_set.h"
+#include "mne_proj_item.h"
 #include "ecd.h"
 
 #include <Eigen/Dense>
@@ -853,20 +854,6 @@ void mne_free_proj_op_proj_3(mneProjOp op)
 }
 
 
-void mne_free_proj_op_item_3(mneProjItem it)
-
-{
-    if (it == NULL)
-        return;
-
-    if(it->vecs)
-        delete it->vecs;
-
-    FREE_3(it->desc);
-    FREE_3(it);
-    return;
-}
-
 
 void mne_free_proj_op_3(mneProjOp op)
 
@@ -877,8 +864,9 @@ void mne_free_proj_op_3(mneProjOp op)
         return;
 
     for (k = 0; k < op->nitems; k++)
-        mne_free_proj_op_item_3(op->items[k]);
-    FREE_3(op->items);
+        if(op->items[k])
+            delete op->items[k];
+//    FREE_3(op->items);
 
     mne_free_proj_op_proj_3(op);
 
@@ -1338,7 +1326,7 @@ mneProjOp mne_new_proj_op_3()
 {
     mneProjOp new_proj_op = MALLOC_3(1,mneProjOpRec);
 
-    new_proj_op->items     = NULL;
+//    new_proj_op->items     = NULL;
     new_proj_op->nitems    = 0;
     new_proj_op->names     = NULL;
     new_proj_op->nch       = 0;
@@ -1349,43 +1337,20 @@ mneProjOp mne_new_proj_op_3()
 
 
 
-mneProjItem mne_new_proj_op_item_3()
-
-{
-    mneProjItem new_proj_item = MALLOC_3(1,mneProjItemRec);
-
-    new_proj_item->vecs        = NULL;
-    new_proj_item->kind        = FIFFV_PROJ_ITEM_NONE;
-    new_proj_item->desc        = NULL;
-    new_proj_item->nvec        = 0;
-    new_proj_item->active      = TRUE;
-    new_proj_item->active_file = FALSE;
-    new_proj_item->has_meg     = FALSE;
-    new_proj_item->has_eeg     = FALSE;
-    return new_proj_item;
-}
-
-
-
-
-
-
-
-
-
-
 
 void mne_proj_op_add_item_act_3(mneProjOp op, MneNamedMatrix* vecs, int kind, const char *desc, int is_active)
 /*
 * Add a new item to an existing projection operator
 */
 {
-    mneProjItem new_item;
+    MneProjItem* new_item;
     int         k;
 
-    op->items = REALLOC_3(op->items,op->nitems+1,mneProjItem);
+//    op->items = REALLOC_3(op->items,op->nitems+1,mneProjItem);
 
-    op->items[op->nitems] = new_item = mne_new_proj_op_item_3();
+//    op->items[op->nitems] = new_item = new MneProjItem();
+    new_item = new MneProjItem();
+    op->items.append(new_item);
 
     new_item->active      = is_active;
     new_item->vecs        = new MneNamedMatrix(*vecs);
@@ -1439,7 +1404,7 @@ mneProjOp mne_dup_proj_op_3(mneProjOp op)
 */
 {
     mneProjOp dup = mne_new_proj_op_3();
-    mneProjItem it;
+    MneProjItem* it;
     int k;
 
     if (!op)
@@ -5079,7 +5044,7 @@ void mne_proj_op_report_data_3(FILE *out,const char *tag, mneProjOp op, int list
 */
 {
     int j,k,p,q;
-    mneProjItem it;
+    MneProjItem* it;
     MneNamedMatrix* vecs;
     int found;
 
@@ -5148,7 +5113,7 @@ mneProjOp mne_proj_op_combine_3(mneProjOp to, mneProjOp from)
 */
 {
     int k;
-    mneProjItem it;
+    MneProjItem* it;
 
     if (to == NULL)
         to = mne_new_proj_op_3();
@@ -5209,7 +5174,7 @@ mneProjOp mne_proj_op_average_eeg_ref_3(fiffChInfo chs,
 
 
 
-int mne_proj_item_affect_3(mneProjItem it, char **list, int nlist)
+int mne_proj_item_affect_3(MneProjItem* it, char **list, int nlist)
 /*
 * Does this projection item affect this list of channels?
 */

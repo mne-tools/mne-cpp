@@ -95,20 +95,6 @@ void mne_free_name_list_9(char **list, int nlist)
 }
 
 
-void mne_free_proj_op_item_9(mneProjItem it)
-
-{
-    if (it == NULL)
-        return;
-    if(it->vecs)
-        delete it->vecs;
-    FREE_9(it->desc);
-    FREE_9(it);
-    return;
-}
-
-
-
 
 void mne_free_proj_op_proj_9(mneProjOp op)
 
@@ -136,8 +122,9 @@ void mne_free_proj_op_9(mneProjOp op)
         return;
 
     for (k = 0; k < op->nitems; k++)
-        mne_free_proj_op_item_9(op->items[k]);
-    FREE_9(op->items);
+        if(op->items[k])
+            delete op->items[k];
+//    FREE_9(op->items);
 
     mne_free_proj_op_proj_9(op);
 
