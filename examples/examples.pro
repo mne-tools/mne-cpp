@@ -51,7 +51,6 @@ SUBDIRS += \
     findEvoked \
     evokedGradAmp \
     cancelNoise \
-#    dipoleFit \
     fiffIO \
     makeLayout \
     readBEM \
@@ -72,9 +71,7 @@ SUBDIRS += \
             ex_disp \
             disp3DTutorial \
             histogram \
-            connectivityTutorial \
-            projection \
-            cleanDig
+            connectivityTutorial
     } else {
         message("examples.pro - The Qt Charts module is missing. Please install to build the complete set of MNE-CPP features.")
     }
