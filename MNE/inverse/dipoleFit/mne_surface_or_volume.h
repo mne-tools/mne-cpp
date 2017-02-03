@@ -115,10 +115,10 @@ public:
     static double sum_solids(float *from, MneSurfaceOrVolume::MneCSurface* surf);
 
 
-    static int mne_filter_source_spaces(MneSurfaceOrVolume::MneCSurface* surf,             /* The bounding surface must be provided */
-                                 float limit,                 /* Minimum allowed distance from the surface */
-                                 FIFFLIB::fiffCoordTrans mri_head_t,   /* Coordinate transformation (may not be needed) */
-                                 MneSurfaceOrVolume::MneCSourceSpace* *spaces,      /* The source spaces  */
+    static int mne_filter_source_spaces(MneSurfaceOrVolume::MneCSurface* surf,  /* The bounding surface must be provided */
+                                 float limit,                                   /* Minimum allowed distance from the surface */
+                                 INVERSELIB::FiffCoordTransOld* mri_head_t,     /* Coordinate transformation (may not be needed) */
+                                 MneSurfaceOrVolume::MneCSourceSpace* *spaces,  /* The source spaces  */
                                  int nspace,
                                  FILE *filtered);
 
@@ -225,14 +225,14 @@ public:
     /*
     * These are for volumes only
     */
-    FIFFLIB::fiffCoordTrans   voxel_surf_RAS_t; /* Transform from voxel coordinate to the surface RAS (MRI) coordinates */
-    int              vol_dims[3];   /* Dimensions of the volume grid (width x height x depth) NOTE: This will be present only if the source space is a complete rectangular grid with unused vertices included */
-    float            voxel_size[3]; /* Derived from the above */
-    INVERSELIB::FiffSparseMatrix*  interpolator;  /* Matrix to interpolate into an MRI volume */
-    char             *MRI_volume;   /* The name of the file the above interpolator is based on */
-    FIFFLIB::fiffCoordTrans   MRI_voxel_surf_RAS_t;
-    FIFFLIB::fiffCoordTrans   MRI_surf_RAS_RAS_t;   /* Transform from surface RAS to RAS coordinates in the associated MRI volume */
-    int              MRI_vol_dims[3];               /* Dimensions of the MRI volume (width x height x depth) */
+    INVERSELIB::FiffCoordTransOld*  voxel_surf_RAS_t;   /* Transform from voxel coordinate to the surface RAS (MRI) coordinates */
+    int              vol_dims[3];                       /* Dimensions of the volume grid (width x height x depth) NOTE: This will be present only if the source space is a complete rectangular grid with unused vertices included */
+    float            voxel_size[3];                     /* Derived from the above */
+    INVERSELIB::FiffSparseMatrix*  interpolator;        /* Matrix to interpolate into an MRI volume */
+    char             *MRI_volume;                       /* The name of the file the above interpolator is based on */
+    INVERSELIB::FiffCoordTransOld*   MRI_voxel_surf_RAS_t;
+    INVERSELIB::FiffCoordTransOld*   MRI_surf_RAS_RAS_t;/* Transform from surface RAS to RAS coordinates in the associated MRI volume */
+    int              MRI_vol_dims[3];                   /* Dimensions of the MRI volume (width x height x depth) */
     /*
     * Possibility to add user-defined data
     */
@@ -292,13 +292,13 @@ public:
 //    /*
 //    * These are for volumes only
 //    */
-//    FIFFLIB::fiffCoordTrans   voxel_surf_RAS_t; /* Transform from voxel coordinate to the surface RAS (MRI) coordinates */
+//    INVERSELIB::FiffCoordTransOld*   voxel_surf_RAS_t; /* Transform from voxel coordinate to the surface RAS (MRI) coordinates */
 //    int              vol_dims[3];   /* Dimensions of the volume grid (width x height x depth) NOTE: This will be present only if the source space is a complete rectangular grid with unused vertices included */
 //    float            voxel_size[3]; /* Derived from the above */
 //    mneSparseMatrix  interpolator;  /* Matrix to interpolate into an MRI volume */
 //    char             *MRI_volume;   /* The name of the file the above interpolator is based on */
-//    FIFFLIB::fiffCoordTrans   MRI_voxel_surf_RAS_t;
-//    FIFFLIB::fiffCoordTrans   MRI_surf_RAS_RAS_t;   /* Transform from surface RAS to RAS coordinates in the associated MRI volume */
+//    INVERSELIB::FiffCoordTransOld*   MRI_voxel_surf_RAS_t;
+//    INVERSELIB::FiffCoordTransOld*   MRI_surf_RAS_RAS_t;   /* Transform from surface RAS to RAS coordinates in the associated MRI volume */
 //    int              MRI_vol_dims[3];               /* Dimensions of the MRI volume (width x height x depth) */
 //    /*
 //    * Possibility to add user-defined data
