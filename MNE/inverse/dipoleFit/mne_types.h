@@ -117,6 +117,7 @@
 #include "fiff_sparse_matrix.h"
 #include "fiff_coord_trans_old.h"
 #include "mne_proj_item.h"
+#include "mne_proj_op.h"
 
 
 #if defined(__cplusplus) 
@@ -328,14 +329,14 @@ typedef struct {		/* Vector specification with a channel list */
 //  int            has_eeg;	/* Does it have EEG channels? */
 //} *mneProjItem,mneProjItemRec;
 
-typedef struct {                        /* Collection of projection items and the projector itself */
-  QList<INVERSELIB::MneProjItem*> items;     /* The projection items */
-  int            nitems;                /* Number of items */
-  char           **names;               /* Names of the channels in the final projector */
-  int            nch;           /* Number of channels in the final projector */
-  int            nvec;          /* Number of vectors in the final projector */
-  float          **proj_data;   /* The orthogonalized projection vectors picked and orthogonalized from the original data */
-} *mneProjOp,mneProjOpRec;
+//typedef struct {                        /* Collection of projection items and the projector itself */
+//  QList<INVERSELIB::MneProjItem*> items;     /* The projection items */
+//  int            nitems;                /* Number of items */
+//  char           **names;               /* Names of the channels in the final projector */
+//  int            nch;           /* Number of channels in the final projector */
+//  int            nvec;          /* Number of vectors in the final projector */
+//  float          **proj_data;   /* The orthogonalized projection vectors picked and orthogonalized from the original data */
+//} *mneProjOp,mneProjOpRec;
 
 typedef struct {
   int   job;			/* Value of FIFF_SSS_JOB tag */
@@ -367,14 +368,13 @@ typedef struct {		/* Covariance matrix storage */
   char       **names;		/* Names of the entries (optional) */
   double     *cov;		/* Covariance matrix in packed representation (lower triangle) */
   double     *cov_diag;		/* Diagonal covariance matrix */
-  INVERSELIB::FiffSparseMatrix* cov_sparse;   /* A sparse covariance matrix
-				 * (Note: data are floats in this which is an inconsistency) */
-  double     *lambda;		/* Eigenvalues of cov */
-  double     *inv_lambda;	/* Inverses of the square roots of the eigenvalues of cov */
-  float      **eigen;		/* Eigenvectors of cov */
-  double     *chol;		/* Cholesky decomposition */
-  mneProjOp  proj;		/* The projection which was active when this matrix was computed */
-  INVERSELIB::MneSssData* sss;		/* The SSS data present in the associated raw data file */
+  INVERSELIB::FiffSparseMatrix* cov_sparse;   /* A sparse covariance matrix (Note: data are floats in this which is an inconsistency) */
+  double     *lambda;           /* Eigenvalues of cov */
+  double     *inv_lambda;       /* Inverses of the square roots of the eigenvalues of cov */
+  float      **eigen;           /* Eigenvectors of cov */
+  double     *chol;             /* Cholesky decomposition */
+  INVERSELIB::MneProjOp*  proj; /* The projection which was active when this matrix was computed */
+  INVERSELIB::MneSssData* sss;  /* The SSS data present in the associated raw data file */
   int        *ch_class;		/* This will allow grouping of channels for regularization (MEG [T/m], MEG [T], EEG [V] */
   char       **bads;		/* Which channels were designated bad when this noise covariance matrix was computed? */
   int        nbad;		/* How many of them */
@@ -421,20 +421,20 @@ typedef struct {		          /* An inverse operator */
   float          **nn_source;	          /* The source orientations 
 					   * (These are equal to the cortex normals 
 					   * in the fixed orientation case) */
-  int            coord_frame;             /* Which coordinates are the locations and orientations given in? */
-  mneCovMatrix   sensor_cov;	          /* Sensor covariance matrix */
-  int            nave;		          /* Number of averaged responses (affects scaling of the noise covariance) */
-  int            current_unit;		  /* This can be FIFF_UNIT_AM, FIFF_UNIT_AM_M2, FIFF_UNIT_AM_M3 */
-  mneCovMatrix   source_cov;	          /* Source covariance matrix */
-  mneCovMatrix   orient_prior;	          /* Orientation prior applied */
-  mneCovMatrix   depth_prior;	          /* Depth-weighting prior applied */
-  mneCovMatrix   fMRI_prior;	          /* fMRI prior applied */
-  float          *sing;		          /* Singular values of the inverse operator */
-  INVERSELIB::MneNamedMatrix* eigen_leads;	          /* The eigen leadfields */
-  int            eigen_leads_weighted;    /* Have the above been already weighted with R^0.5? */
-  INVERSELIB::MneNamedMatrix* eigen_fields;	          /* Associated field patterns */
-  float          trace_ratio;	          /* tr(GRG^T)/tr(C) */
-  mneProjOp      proj;		          /* The associated projection operator */
+  int            coord_frame;               /* Which coordinates are the locations and orientations given in? */
+  mneCovMatrix   sensor_cov;                /* Sensor covariance matrix */
+  int            nave;                      /* Number of averaged responses (affects scaling of the noise covariance) */
+  int            current_unit;              /* This can be FIFF_UNIT_AM, FIFF_UNIT_AM_M2, FIFF_UNIT_AM_M3 */
+  mneCovMatrix   source_cov;                /* Source covariance matrix */
+  mneCovMatrix   orient_prior;              /* Orientation prior applied */
+  mneCovMatrix   depth_prior;               /* Depth-weighting prior applied */
+  mneCovMatrix   fMRI_prior;                /* fMRI prior applied */
+  float          *sing;                     /* Singular values of the inverse operator */
+  INVERSELIB::MneNamedMatrix* eigen_leads;  /* The eigen leadfields */
+  int            eigen_leads_weighted;      /* Have the above been already weighted with R^0.5? */
+  INVERSELIB::MneNamedMatrix* eigen_fields; /* Associated field patterns */
+  float          trace_ratio;               /* tr(GRG^T)/tr(C) */
+  INVERSELIB::MneProjOp*    proj;           /* The associated projection operator */
 } *mneInverseOperator,mneInverseOperatorRec;
 
 
@@ -665,15 +665,15 @@ typedef struct {			/* A comprehensive raw data structure */
   int              omit_samp_old;       /* This is the value omit_samp would have in the old versions */
   int              nsamp;               /* How many samples in total? */
   float            *first_sample_val;   /* Values at the first sample (for dc offset correction before filtering) */
-  mneProjOp        proj;                /* Projection operator */
-  INVERSELIB::MneSssData* sss;        /* SSS data found in this file */
-  mneCTFcompDataSet comp;		/* Compensation data */
+  INVERSELIB::MneProjOp* proj;          /* Projection operator */
+  INVERSELIB::MneSssData* sss;          /* SSS data found in this file */
+  mneCTFcompDataSet comp;               /* Compensation data */
   int              comp_file;           /* Compensation status of these raw data in file */
   int              comp_now;            /* Compensation status of these raw data in file */
-  mneFilterDef     filter;		/* Filter definition */
+  mneFilterDef     filter;              /* Filter definition */
   void             *filter_data;        /* This can be whatever the filter needs */
   mneUserFreeFunc  filter_data_free;    /* Function to free the above */
-  mneEventList     event_list;		/* Trigger events */
+  mneEventList     event_list;          /* Trigger events */
   unsigned int     max_event;	        /* Maximum event number in usenest */
   char             *dig_trigger;        /* Name of the digital trigger channel */
   unsigned int     dig_trigger_mask;    /* Mask applied to digital trigger channel before considering it */

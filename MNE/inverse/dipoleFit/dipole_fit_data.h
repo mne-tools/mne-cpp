@@ -158,7 +158,7 @@ public:
     static int make_projection(const QList<QString>& projnames,
                                FIFFLIB::fiffChInfo chs,
                                int        nch,
-                               mneProjOp  *res);
+                               MneProjOp*  *res);
 
 
 
@@ -257,7 +257,7 @@ public:
       mneCovMatrix      noise_orig;         /**< Noise covariance matrix (original) */
       mneCovMatrix      noise;              /**< Noise covariance matrix (weighted to take the selection into account) */
       int               nave;               /**< How many averages does this correspond to? */
-      mneProjOp         proj;               /**< The projection operator to use */
+      MneProjOp*        proj;               /**< The projection operator to use */
       int               column_norm;        /**< What kind of column normalization to apply to the forward solution */
       int               fit_mag_dipoles;    /**< Fit magnetic dipoles? */
       void              *user;              /**< User data for anything we need */

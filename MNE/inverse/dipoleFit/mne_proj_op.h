@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     mne_proj_item.h
+* @file     mne_proj_op.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    MNEProjItem class declaration.
+* @brief    MNEProjOp class declaration.
 *
 */
 
-#ifndef MNEPROJITEM_H
-#define MNEPROJITEM_H
+#ifndef MNEPROJOP_H
+#define MNEPROJOP_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -58,6 +58,7 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
+#include <QList>
 
 
 //*************************************************************************************************************
@@ -73,56 +74,59 @@ namespace INVERSELIB
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class MneNamedMatrix;
-
+class MneProjItem;
 
 
 //=============================================================================================================
 /**
-* Implements an MNE Projection Item (Replaces *mneProjItem,mneProjItemRec; struct of MNE-C mne_types.h).
+* Implements an MNE Projection Operator (Replaces *mneProjOp,mneProjOpRec; struct of MNE-C mne_types.h).
 *
 * @brief One linear projection item
 */
-class INVERSESHARED_EXPORT MneProjItem
+class INVERSESHARED_EXPORT MneProjOp
 {
 public:
-    typedef QSharedPointer<MneProjItem> SPtr;              /**< Shared pointer type for MneDeriv. */
-    typedef QSharedPointer<const MneProjItem> ConstSPtr;   /**< Const shared pointer type for MneDeriv. */
+    typedef QSharedPointer<MneProjOp> SPtr;              /**< Shared pointer type for MneProjOp. */
+    typedef QSharedPointer<const MneProjOp> ConstSPtr;   /**< Const shared pointer type for MneProjOp. */
 
     //=========================================================================================================
     /**
-    * Constructs the MNE Projection Item
+    * Constructs the MNE Projection Operator
+    * Refactored: mne_new_proj_op (mne_lin_proj.c)
     */
-    MneProjItem();
+    MneProjOp();
 
     //=========================================================================================================
     /**
-    * Destroys the MNE Projection Item
-    * Refactored:  (.c)
+    * Destroys the MNE Projection Operator
+    * Refactored: mne_free_proj_op (mne_lin_proj.c)
     */
-    ~MneProjItem();
+    ~MneProjOp();
+
+    //=========================================================================================================
+    /**
+    * Free Substructure; TODO: Remove later on
+    * Refactored: ne_free_proj_op_proj (mne_lin_proj.c)
+    */
+    static void mne_free_proj_op_proj(MneProjOp* op);
 
 public:
-    MneNamedMatrix* vecs;   /**< The original projection vectors */
-    int            nvec;                /**< Number of vectors = vecs->nrow */
-    char           *desc;               /**< Projection item description */
-    int            kind;                /**< Projection item kind */
-    int            active;              /**< Is this item active now? */
-    int            active_file;         /**< Was this item active when loaded from file? */
-    int            has_meg;             /**< Does it have MEG channels? */
-    int            has_eeg;             /**< Does it have EEG channels? */
+    QList<INVERSELIB::MneProjItem*> items;  /* The projection items */
+    int     nitems;                 /* Number of items */
+    char    **names;                /* Names of the channels in the final projector */
+    int     nch;                    /* Number of channels in the final projector */
+    int     nvec;                   /* Number of vectors in the final projector */
+    float   **proj_data;            /* The orthogonalized projection vectors picked and orthogonalized from the original data */
 
-// ### OLD STRUCT ###
-//typedef struct {    /* One linear projection item */
-//    INVERSELIB::MneNamedMatrix* vecs;   /* The original projection vectors */
-//    int            nvec;                /* Number of vectors = vecs->nrow */
-//    char           *desc;               /* Projection item description */
-//    int            kind;                /* Projection item kind */
-//    int            active;              /* Is this item active now? */
-//    int            active_file;         /* Was this item active when loaded from file? */
-//    int            has_meg;             /* Does it have MEG channels? */
-//    int            has_eeg;             /* Does it have EEG channels? */
-//} *mneProjItem,mneProjItemRec;
+//// ### OLD STRUCT ###
+//typedef struct {                            /* Collection of projection items and the projector itself */
+//    QList<INVERSELIB::MneProjItem*> items;  /* The projection items */
+//    int            nitems;                  /* Number of items */
+//    char           **names;                 /* Names of the channels in the final projector */
+//    int            nch;                     /* Number of channels in the final projector */
+//    int            nvec;                    /* Number of vectors in the final projector */
+//    float          **proj_data;             /* The orthogonalized projection vectors picked and orthogonalized from the original data */
+//} *mneProjOp,mneProjOpRec;
 };
 
 //*************************************************************************************************************
@@ -132,4 +136,4 @@ public:
 
 } // NAMESPACE INVERSELIB
 
-#endif // MNEPROJITEM_H
+#endif // MNEPROJOP_H

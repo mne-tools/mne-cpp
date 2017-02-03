@@ -123,19 +123,19 @@ public:
     FIFFLIB::fiffChInfo     chs;        /* The channel information */
     INVERSELIB::FiffCoordTransOld* meg_head_t; /* MEG device <-> head coordinate transformation */
     INVERSELIB::FiffCoordTransOld* mri_head_t; /* MRI device <-> head coordinate transformation (duplicated from the inverse operator or loaded separately) */
-    float               sfreq;      /* Sampling frequency */
-    int                 nchan;      /* Number of channels */
-    float               highpass;   /* Highpass filter setting */
-    float               lowpass;    /* Lowpass filter setting */
-    mneProjOp           proj;       /* Associated projection operator (useful if inverse operator is not included) */
-    mneCTFcompDataSet   comp;       /* The software gradient compensation data */
-    mneInverseOperator  op;         /* Associated inverse operator */
-    MneNamedMatrix*     fwd;        /* Forward operator for dipole fitting */
-    mneRawData          raw;        /* This will be non-null if the data stems from a raw data file */
-    mneChSelection      chsel;      /* Channel selection for raw data */
-    char                **badlist;  /* Bad channel names */
-    int                 nbad;       /* How many? */
-    int                 *bad;       /* Which channels are bad? */
+    float                   sfreq;      /* Sampling frequency */
+    int                     nchan;      /* Number of channels */
+    float                   highpass;   /* Highpass filter setting */
+    float                   lowpass;    /* Lowpass filter setting */
+    INVERSELIB::MneProjOp*  proj;       /* Associated projection operator (useful if inverse operator is not included) */
+    mneCTFcompDataSet       comp;       /* The software gradient compensation data */
+    mneInverseOperator      op;         /* Associated inverse operator */
+    MneNamedMatrix*         fwd;        /* Forward operator for dipole fitting */
+    mneRawData              raw;        /* This will be non-null if the data stems from a raw data file */
+    mneChSelection          chsel;      /* Channel selection for raw data */
+    char                    **badlist;  /* Bad channel names */
+    int                     nbad;       /* How many? */
+    int                     *bad;       /* Which channels are bad? */
     /*
     * These are the data sets loaded
     */

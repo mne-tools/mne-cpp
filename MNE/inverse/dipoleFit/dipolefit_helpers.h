@@ -2376,61 +2376,8 @@ char *mne_format_file_id (fiffId id)
 /*
 * Handle the linear projection operators
 */
-mneProjOp mne_new_proj_op()
 
-{
-    mneProjOp new_proj_op = MALLOC(1,mneProjOpRec);
-
-//    new_proj_op->items     = NULL;
-    new_proj_op->nitems    = 0;
-    new_proj_op->names     = NULL;
-    new_proj_op->nch       = 0;
-    new_proj_op->nvec      = 0;
-    new_proj_op->proj_data = NULL;
-    return new_proj_op;
-}
-
-
-void mne_free_proj_op_proj(mneProjOp op)
-
-{
-    if (op == NULL)
-        return;
-
-    mne_free_name_list(op->names,op->nch);
-    FREE_CMATRIX(op->proj_data);
-
-    op->names  = NULL;
-    op->nch  = 0;
-    op->nvec = 0;
-    op->proj_data = NULL;
-
-    return;
-}
-
-
-
-void mne_free_proj_op(mneProjOp op)
-
-{
-    int k;
-
-    if (op == NULL)
-        return;
-
-    for (k = 0; k < op->nitems; k++)
-        if(op->items[k])
-            delete op->items[k];
-//    FREE(op->items);
-
-    mne_free_proj_op_proj(op);
-
-    FREE(op);
-    return;
-}
-
-
-void mne_proj_op_add_item_act(mneProjOp op, MneNamedMatrix* vecs, int kind, const char *desc, int is_active)
+void mne_proj_op_add_item_act(MneProjOp* op, MneNamedMatrix* vecs, int kind, const char *desc, int is_active)
 /*
 * Add a new item to an existing projection operator
 */
@@ -2474,24 +2421,24 @@ void mne_proj_op_add_item_act(mneProjOp op, MneNamedMatrix* vecs, int kind, cons
 
     op->nitems++;
 
-    mne_free_proj_op_proj(op);  /* These data are not valid any more */
+    MneProjOp::mne_free_proj_op_proj(op);  /* These data are not valid any more */
     return;
 }
 
 
-void mne_proj_op_add_item(mneProjOp op, MneNamedMatrix* vecs, int kind, const char *desc)
+void mne_proj_op_add_item(MneProjOp* op, MneNamedMatrix* vecs, int kind, const char *desc)
 
 {
     mne_proj_op_add_item_act(op, vecs, kind, desc, TRUE);
 }
 
 
-mneProjOp mne_dup_proj_op(mneProjOp op)
+MneProjOp* mne_dup_proj_op(MneProjOp* op)
 /*
 * Provide a duplicate (item data only)
 */
 {
-    mneProjOp dup = mne_new_proj_op();
+    MneProjOp* dup = new MneProjOp();
     MneProjItem* it;
     int k;
 
@@ -2526,7 +2473,7 @@ static char *add_string(char *old,char *add)
 
 
 
-void mne_proj_op_report_data(FILE *out,const char *tag, mneProjOp op, int list_data,
+void mne_proj_op_report_data(FILE *out,const char *tag, MneProjOp* op, int list_data,
                              char **exclude, int nexclude)
 /*
 * Output info about the projection operator
@@ -2584,7 +2531,7 @@ void mne_proj_op_report_data(FILE *out,const char *tag, mneProjOp op, int list_d
 }
 
 
-void mne_proj_op_report(FILE *out,const char *tag, mneProjOp op)
+void mne_proj_op_report(FILE *out,const char *tag, MneProjOp* op)
 {
     mne_proj_op_report_data(out,tag,op, FALSE, NULL, 0);
 }
@@ -2612,7 +2559,7 @@ int mne_proj_item_affect(MneProjItem* it, char **list, int nlist)
 }
 
 
-int mne_proj_op_affect(mneProjOp op, char **list, int nlist)
+int mne_proj_op_affect(MneProjOp* op, char **list, int nlist)
 
 {
     int k;
@@ -2636,7 +2583,7 @@ int mne_proj_op_affect(mneProjOp op, char **list, int nlist)
 
 
 
-int mne_proj_op_proj_vector(mneProjOp op, float *vec, int nvec, int do_complement)
+int mne_proj_op_proj_vector(MneProjOp* op, float *vec, int nvec, int do_complement)
 /*
 * Apply projection operator to a vector (floats)
 * Assume that all dimension checking etc. has been done before
@@ -2683,7 +2630,7 @@ int mne_proj_op_proj_vector(mneProjOp op, float *vec, int nvec, int do_complemen
 
 
 
-mneProjOp mne_proj_op_average_eeg_ref(fiffChInfo chs,
+MneProjOp* mne_proj_op_average_eeg_ref(fiffChInfo chs,
                                       int nch)
 /*
 * Make the projection operator for average electrode reference
@@ -2694,7 +2641,7 @@ mneProjOp mne_proj_op_average_eeg_ref(fiffChInfo chs,
     float       **vec_data;
     char        **names;
     MneNamedMatrix* vecs;
-    mneProjOp      op;
+    MneProjOp*      op;
 
     for (k = 0; k < nch; k++)
         if (chs[k].kind == FIFFV_EEG_CH)
@@ -2716,7 +2663,7 @@ mneProjOp mne_proj_op_average_eeg_ref(fiffChInfo chs,
 
     vecs = MneNamedMatrix::build_named_matrix(1,eegcount,NULL,names,vec_data);
 
-    op = mne_new_proj_op();
+    op = new MneProjOp();
     mne_proj_op_add_item(op,vecs,FIFFV_MNE_PROJ_ITEM_EEG_AVREF,"Average EEG reference");
 
     return op;
@@ -2725,14 +2672,14 @@ mneProjOp mne_proj_op_average_eeg_ref(fiffChInfo chs,
 
 //============================= mne_lin_proj_io.c =============================
 
-mneProjOp mne_read_proj_op_from_node(//fiffFile in,
+MneProjOp* mne_read_proj_op_from_node(//fiffFile in,
                                      FiffStream::SPtr& stream,
                                      const FiffDirNode::SPtr& start)
 /*
 * Load all the linear projection data
 */
 {
-    mneProjOp   op     = NULL;
+    MneProjOp*   op     = NULL;
     QList<FiffDirNode::SPtr> proj;
     FiffDirNode::SPtr start_node;
     QList<FiffDirNode::SPtr> items;
@@ -2758,7 +2705,7 @@ mneProjOp mne_read_proj_op_from_node(//fiffFile in,
     else
         start_node = start;
 
-    op = mne_new_proj_op();
+    op = new MneProjOp();
     proj = start_node->dir_tree_find(FIFFB_PROJ);
     if (proj.size() == 0 || proj[0]->isEmpty())   /* The caller must recognize an empty projection */
         goto out;
@@ -2871,13 +2818,13 @@ out :
     return op;
 
 bad : {
-        mne_free_proj_op(op);
+        if(op)
+            delete op;
         return NULL;
     }
 }
 
-mneProjOp mne_read_proj_op(const QString& name)
-
+MneProjOp* mne_read_proj_op(const QString& name)
 {
     QFile file(name);
     FiffStream::SPtr stream(new FiffStream(&file));
@@ -2885,7 +2832,7 @@ mneProjOp mne_read_proj_op(const QString& name)
     if(!stream->open())
         return NULL;
 
-    mneProjOp   res = NULL;
+    MneProjOp*  res = NULL;
 
     FiffDirNode::SPtr t_default;
     res = mne_read_proj_op_from_node(stream,t_default);
@@ -4075,7 +4022,8 @@ void mne_free_cov(mneCovMatrix c)
     FREE(c->inv_lambda);
     FREE(c->chol);
     FREE(c->ch_class);
-    mne_free_proj_op(c->proj);
+    if(c->proj)
+        delete c->proj;
     if (c->sss)
         delete c->sss;
     mne_free_name_list(c->bads,c->nbad);
@@ -5430,7 +5378,8 @@ void mne_raw_free_data(mneRawData d)
     free_bufs(d->filt_bufs,d->nfilt_buf);
     mne_free_ring_buffer(d->filt_ring);
 
-    mne_free_proj_op(d->proj);
+    if(d->proj)
+        delete d->proj;
     mne_free_name_list(d->badlist,d->nbad);
     FREE(d->first_sample_val);
     FREE(d->bad);
