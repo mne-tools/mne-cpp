@@ -3,6 +3,8 @@
 #include "dipole_fit.h"
 #include "dipolefit_helpers.h"
 
+#include <strings.h>
+
 
 
 using namespace INVERSELIB;
