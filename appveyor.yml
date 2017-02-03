@@ -25,12 +25,15 @@ build:
 
 before_build:
     - call .\tools\appveyor\%BUILD_CFG%\before_build.bat
-
 build_script:
     - call .\tools\appveyor\%BUILD_CFG%\build.bat
-
 after_build:
     - call .\tools\appveyor\%BUILD_CFG%\after_build.bat
+
+before_test:
+    - call .\tools\appveyor\%BUILD_CFG%\before_test.bat
+test_script:
+    - call .\tools\appveyor\%BUILD_CFG%\test.bat
 
 artifacts:
   - path: mne-cpp-windows-x86_64-$(APPVEYOR_REPO_BRANCH).exe
@@ -52,6 +55,7 @@ deploy:
     on:
       branch: master
       build_cfg: windows_release
+      is_not_pr: true
 
   # 1.0.0
   - provider: FTP
@@ -66,6 +70,7 @@ deploy:
     on:
       branch: 1.0.0
       build_cfg: windows_release
+      is_not_pr: true
 
 notifications: 
   - provider: Email 
