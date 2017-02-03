@@ -1,15 +1,14 @@
 //=============================================================================================================
 /**
-* @file     rerefaboutwidget.h
+* @file     rerefoption.h
 * @author   Viktor Klüber <viktor.klueber@tu-ilmenau.de>;
-*           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     February, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) 2017, Viktor Klüber, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017, Viktor Klüber and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the ReRefAboutWidget class.
+* @brief     ReRefOption class declaration.
 *
 */
 
-#ifndef REREFABOUTWIDGET_H
-#define REREFABOUTWIDGET_H
+#ifndef REREFOPTION_REREFOPTION_H
+#define REREFOPTION_REREFOPTION_H
 
 
 //*************************************************************************************************************
@@ -43,7 +42,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_rerefabout.h"
+#include "../ui_rerefoption.h"
+#include "reref.h"
+#include <fiff/fiff_info.h>
 
 
 //*************************************************************************************************************
@@ -51,50 +52,85 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtWidgets>
+#include <QSharedPointer>
+#include <QWidget>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE ReRefPlugin
+// Eigen INCLUDES
 //=============================================================================================================
 
-namespace REREFPLUGIN
-{
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+namespace Ui {
+class ReRefOptionWidget;
+}
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE REREFOPTION
+//=============================================================================================================
+
+namespace REREFPLUGIN{
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// REREFOPTION FORWARD DECLARATIONS
+//=============================================================================================================
+
+class ReRef;
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS ReRefAboutWidget
+* Description of what this class is intended to do (in detail).
 *
-* @brief The ReRefAboutWidget class provides the about dialog for the car.
+* @brief Brief description of this class.
 */
-class ReRefAboutWidget : public QDialog
+
+class ReRefOption : public QWidget
 {
     Q_OBJECT
 
 public:
+    typedef QSharedPointer<ReRefOption> SPtr;            /**< Shared pointer type for ReRefOption. */
+    typedef QSharedPointer<const ReRefOption> ConstSPtr; /**< Const shared pointer type for ReRefOption. */
 
     //=========================================================================================================
     /**
-    * Constructs a ReRefAboutWidget dialog which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new carAboutWidget becomes a window. If parent is another widget, carAboutWidget becomes a child window inside parent. carAboutWidget is deleted when its parent is deleted.
+    * Constructs a ReRefOption object.
     */
-    ReRefAboutWidget(QWidget *parent = 0);
+    explicit ReRefOption(ReRef *pReRef, QWidget *parent = 0);
 
+public slots:
     //=========================================================================================================
     /**
-    * Destroys the ReRefAboutWidget.
-    * All ReRefAboutWidget's children are deleted first. The application exits if carAboutWidget is the main widget.
+    * updates the channels and sets them to the QListWidget
     */
-    ~ReRefAboutWidget();
+    void updateChannels(FIFFLIB::FiffInfo::SPtr &pFiffInfo);
 
 private:
 
-    Ui::ReRefAboutWidgetClass ui;		/**< Holds the user interface for the carAboutWidget.*/
+    Ui::ReRefOptionWidget          *ui;     /**< Holds the user interface for the ReRefSetupWidget.*/
+
+    QSharedPointer<ReRef>           m_pReRef;       /**< pointer to the upper ReRef class. */
+
+
 };
 
-} // NAMESPACE
 
-#endif // REREFABOUTWIDGET_H
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+
+} // namespace REREFOPTION
+
+#endif // REREFOPTION_REREFOPTION_H

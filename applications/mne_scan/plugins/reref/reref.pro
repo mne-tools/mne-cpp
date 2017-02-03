@@ -82,16 +82,19 @@ SOURCES += \
         reref.cpp \
         FormFiles/rerefsetupwidget.cpp \
         FormFiles/rerefaboutwidget.cpp \
+    FormFiles/rerefoption.cpp
 
 HEADERS += \
         reref.h\
         reref_global.h \
         FormFiles/rerefsetupwidget.h \
         FormFiles/rerefaboutwidget.h \
+    FormFiles/rerefoption.h
 
 FORMS += \
         FormFiles/rerefsetup.ui \
         FormFiles/rerefabout.ui \
+    FormFiles/rerefoption.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

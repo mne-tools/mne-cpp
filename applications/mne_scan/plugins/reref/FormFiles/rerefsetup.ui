@@ -23,7 +23,7 @@
       </font>
      </property>
      <property name="text">
-      <string>Noise Reduction Configuration</string>
+      <string>Re-Reference plugin Configuration</string>
      </property>
     </widget>
    </item>

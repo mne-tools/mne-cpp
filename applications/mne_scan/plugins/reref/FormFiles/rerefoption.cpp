@@ -1,15 +1,14 @@
 //=============================================================================================================
 /**
-* @file     rerefaboutwidget.h
+* @file     rerefoption.cpp
 * @author   Viktor Klüber <viktor.klueber@tu-ilmenau.de>;
-*           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     February, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) 2017, Viktor Klüber, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017, Viktor Klüber and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,12 +29,9 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the ReRefAboutWidget class.
+* @brief    ReRefOption class definition.
 *
 */
-
-#ifndef REREFABOUTWIDGET_H
-#define REREFABOUTWIDGET_H
 
 
 //*************************************************************************************************************
@@ -43,7 +39,13 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_rerefabout.h"
+#include "rerefoption.h"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
 
 
 //*************************************************************************************************************
@@ -51,50 +53,50 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtWidgets>
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE ReRefPlugin
+// USED NAMESPACES
 //=============================================================================================================
 
-namespace REREFPLUGIN
-{
+using namespace REREFPLUGIN;
 
 
+//*************************************************************************************************************
 //=============================================================================================================
-/**
-* DECLARE CLASS ReRefAboutWidget
-*
-* @brief The ReRefAboutWidget class provides the about dialog for the car.
-*/
-class ReRefAboutWidget : public QDialog
+// DEFINE GLOBAL METHODS
+//=============================================================================================================
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+ReRefOption::ReRefOption(ReRef *pReRef, QWidget *parent)
+: QWidget(parent)
+, ui(new Ui::ReRefOptionWidget)
+, m_pReRef(QSharedPointer<ReRef>(pReRef))
 {
-    Q_OBJECT
+    ui->setupUi(this);
+}
 
-public:
 
-    //=========================================================================================================
-    /**
-    * Constructs a ReRefAboutWidget dialog which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new carAboutWidget becomes a window. If parent is another widget, carAboutWidget becomes a child window inside parent. carAboutWidget is deleted when its parent is deleted.
-    */
-    ReRefAboutWidget(QWidget *parent = 0);
+//*************************************************************************************************************
 
-    //=========================================================================================================
-    /**
-    * Destroys the ReRefAboutWidget.
-    * All ReRefAboutWidget's children are deleted first. The application exits if carAboutWidget is the main widget.
-    */
-    ~ReRefAboutWidget();
+void ReRefOption::updateChannels(FIFFLIB::FiffInfo::SPtr &pFiffInfo)
+{
+    ui->m_listWidget_ChannelList->clear();
 
-private:
-
-    Ui::ReRefAboutWidgetClass ui;		/**< Holds the user interface for the carAboutWidget.*/
-};
-
-} // NAMESPACE
-
-#endif // REREFABOUTWIDGET_H
+    for(int i = 0; i < pFiffInfo->chs.size(); i++){
+        if(pFiffInfo->chs.at(i).ch_name.contains("EEG")){
+            ui->m_listWidget_ChannelList->addItem(pFiffInfo->chs.at(i).ch_name);
+        }
+    }
+}
