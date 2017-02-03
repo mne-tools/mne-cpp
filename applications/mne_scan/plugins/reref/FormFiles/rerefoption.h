@@ -67,9 +67,7 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace Ui {
-class ReRefOptionWidget;
-}
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -89,7 +87,7 @@ class ReRef;
 
 //=============================================================================================================
 /**
-* Description of what this class is intended to do (in detail).
+* The ReRefOption class provides several feature configurations possibilities for the ReRef project.
 *
 * @brief Brief description of this class.
 */
