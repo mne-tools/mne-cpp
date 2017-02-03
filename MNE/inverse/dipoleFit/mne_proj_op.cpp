@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     mne_proj_item.cpp
+* @file     mne_proj_op.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the MNEProjItem Class.
+* @brief    Implementation of the MNEProjOp Class.
 *
 */
 
@@ -39,22 +39,40 @@
 // INCLUDES
 //=============================================================================================================
 
+#include "mne_proj_op.h"
 #include "mne_proj_item.h"
-#include "mne_types.h"
 
+#define FREE_23(x) if ((char *)(x) != NULL) free((char *)(x))
 
+#define FREE_CMATRIX_23(m) mne_free_cmatrix_23((m))
 
-#define FREE_21(x) if ((char *)(x) != NULL) free((char *)(x))
+void mne_free_cmatrix_23 (float **m)
+{
+    if (m) {
+        FREE_23(*m);
+        FREE_23(m);
+    }
+}
 
-#ifndef TRUE
-#define TRUE 1
+//============================= mne_named_matrix.c =============================
+
+void mne_free_name_list_23(char **list, int nlist)
+/*
+* Free a name list array
+*/
+{
+    int k;
+    if (list == NULL || nlist == 0)
+        return;
+    for (k = 0; k < nlist; k++) {
+#ifdef FOO
+        fprintf(stderr,"%d %s\n",k,list[k]);
 #endif
-
-#ifndef FALSE
-#define FALSE 0
-#endif
-
-
+        FREE_23(list[k]);
+    }
+    FREE_23(list);
+    return;
+}
 
 
 //*************************************************************************************************************
@@ -71,15 +89,12 @@ using namespace INVERSELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MneProjItem::MneProjItem()
-: vecs (NULL)
-, kind (FIFFV_PROJ_ITEM_NONE)
-, desc (NULL)
+MneProjOp::MneProjOp()
+: nitems (0)
+, names (NULL)
+, nch (0)
 , nvec (0)
-, active (TRUE)
-, active_file (FALSE)
-, has_meg (FALSE)
-, has_eeg (FALSE)
+, proj_data (NULL)
 {
 
 }
@@ -87,10 +102,32 @@ MneProjItem::MneProjItem()
 
 //*************************************************************************************************************
 
-MneProjItem::~MneProjItem()
+MneProjOp::~MneProjOp()
 {
-    if(vecs)
-        delete vecs;
-    FREE_21(desc);
+    // mne_free_proj_op
+    for (int k = 0; k < nitems; k++)
+        if(items[k])
+            delete items[k];
+
+    // mne_free_proj_op_proj
+
+}
+
+
+//*************************************************************************************************************
+
+void MneProjOp::mne_free_proj_op_proj(MneProjOp *op)
+{
+    if (op == NULL)
+        return;
+
+    mne_free_name_list_23(op->names,op->nch);
+    FREE_CMATRIX_23(op->proj_data);
+
+    op->names  = NULL;
+    op->nch  = 0;
+    op->nvec = 0;
+    op->proj_data = NULL;
+
     return;
 }

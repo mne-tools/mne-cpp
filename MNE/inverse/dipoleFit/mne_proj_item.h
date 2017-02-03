@@ -92,25 +92,26 @@ public:
     //=========================================================================================================
     /**
     * Constructs the MNE Projection Item
+    * Refactored: mne_new_proj_op_item (mne_lin_proj.c)
     */
     MneProjItem();
 
     //=========================================================================================================
     /**
     * Destroys the MNE Projection Item
-    * Refactored:  (.c)
+    * Refactored: mne_free_proj_op_item (mne_lin_proj.c)
     */
     ~MneProjItem();
 
 public:
-    MneNamedMatrix* vecs;   /**< The original projection vectors */
-    int            nvec;                /**< Number of vectors = vecs->nrow */
-    char           *desc;               /**< Projection item description */
-    int            kind;                /**< Projection item kind */
-    int            active;              /**< Is this item active now? */
-    int            active_file;         /**< Was this item active when loaded from file? */
-    int            has_meg;             /**< Does it have MEG channels? */
-    int            has_eeg;             /**< Does it have EEG channels? */
+    MneNamedMatrix* vecs;           /**< The original projection vectors */
+    int             nvec;           /**< Number of vectors = vecs->nrow */
+    char            *desc;          /**< Projection item description */
+    int             kind;           /**< Projection item kind */
+    int             active;         /**< Is this item active now? */
+    int             active_file;    /**< Was this item active when loaded from file? */
+    int             has_meg;        /**< Does it have MEG channels? */
+    int             has_eeg;        /**< Does it have EEG channels? */
 
 // ### OLD STRUCT ###
 //typedef struct {    /* One linear projection item */
