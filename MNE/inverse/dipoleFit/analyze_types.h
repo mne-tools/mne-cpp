@@ -57,6 +57,8 @@
 #define NOISE_NORMALIZED(e) ((e) == ESTIMATE_dSPM || (e) == ESTIMATE_sLORETA)
 
 #include <fiff/fiff_types.h>
+#include "fiff_coord_trans_old.h"
+#include "fwd_coil_set.h"
 #include "fwd_coil_set.h"
 #include "mne_meas_data.h"
 #include "mne_surface_or_volume.h"
@@ -64,15 +66,15 @@
 
 
 typedef struct {
-  float  megmin,megmax;				     /* MEG gradiometer vertical scale [T/m] */
-  float  megaxmult;				     /* Multiplier for the magnetometer scaling [m] */
-  float  eegmin,eegmax;				     /* EEG scale [V] */
-  float  tmin,tmax;				     /* Time limits [sec] */
-  float  full_range;		                     /* Use the full time range available */
-  float  basemin,basemax;			     /* Baseline limits [sec] */
-  int    use_baseline;		                     /* Baseline active */
-  int    show_stim;		                     /* Show the digital stimulus channel in the sample display? */
-  float  cursor_step;				     /* How much to step in time when using the keyboard to go back and forth [sec] */
+  float  megmin,megmax;             /* MEG gradiometer vertical scale [T/m] */
+  float  megaxmult;                 /* Multiplier for the magnetometer scaling [m] */
+  float  eegmin,eegmax;             /* EEG scale [V] */
+  float  tmin,tmax;                 /* Time limits [sec] */
+  float  full_range;                /* Use the full time range available */
+  float  basemin,basemax;           /* Baseline limits [sec] */
+  int    use_baseline;              /* Baseline active */
+  int    show_stim;                 /* Show the digital stimulus channel in the sample display? */
+  float  cursor_step;               /* How much to step in time when using the keyboard to go back and forth [sec] */
 } *mshScales,mshScalesRec;
 
 typedef struct {		                     /* The celebrated tksurfer-style values */
@@ -139,7 +141,7 @@ typedef struct {		                     /* This is used for field mapping with he
   float        **smooth_weights;                     /* The smoothing weights */
   int          nch;			             /* How many channels */
   int          *pick;		                     /* Which channels are of this modality in the original data */
-  FwdCoilSet*   coils;		                     /* Coils */
+  INVERSELIB::FwdCoilSet*   coils;		                     /* Coils */
   float        origin[3];		             /* Origin */
   float        miss;		                     /* Amount of unexplained variance */
   float        **self_dots;	                     /* Dot products between the original leads */
@@ -150,23 +152,23 @@ typedef struct {		                     /* This is used for field mapping with he
   float        **mapping_mat;		             /* The mapping matrix */
 } *fieldMappingData, fieldMappingDataRec;
 
-typedef struct {		                     /* The digitizer data will be loaded from the measurement file or elsewhere */
-  char           *filename;			     /* Where did these come from */
-  FIFFLIB::fiffCoordTrans head_mri_t;			     /* This is relevant for us */
-  FIFFLIB::fiffCoordTrans head_mri_t_adj;                     /* This is the adjusted transformation */
-  FIFFLIB::fiffDigPoint   points;			     /* The points */
-  int            coord_frame;	                     /* The coordinate frame of the above points */
-  int            *active;	                     /* Which are active */
-  int            *discard;	                     /* Which should be discarded? */
-  int            npoint;			     /* How many? */
-  FIFFLIB::fiffDigPoint   mri_fids;	                     /* MRI coordinate system fiducials picked here */
-  int            nfids;		                     /* How many? */
-  int            show;		                     /* Should the digitizer data be shown */
-  int            show_minimal;                       /* Show fiducials and coils only? */
-  float          *dist;		                     /* Distance of each point from the head surface */
-  int            *closest;			     /* Closest vertex # on the head surface */
-  float          **closest_point;		     /* Closest vertex locations on the head surface */
-  int            dist_valid;			     /* Are the above data valid at this point? */
+typedef struct {                            /* The digitizer data will be loaded from the measurement file or elsewhere */
+  char           *filename;                 /* Where did these come from */
+  INVERSELIB::FiffCoordTransOld* head_mri_t;            /* This is relevant for us */
+  INVERSELIB::FiffCoordTransOld* head_mri_t_adj;        /* This is the adjusted transformation */
+  FIFFLIB::fiffDigPoint   points;           /* The points */
+  int            coord_frame;               /* The coordinate frame of the above points */
+  int            *active;                   /* Which are active */
+  int            *discard;                  /* Which should be discarded? */
+  int            npoint;                    /* How many? */
+  FIFFLIB::fiffDigPoint   mri_fids;         /* MRI coordinate system fiducials picked here */
+  int            nfids;                     /* How many? */
+  int            show;                      /* Should the digitizer data be shown */
+  int            show_minimal;              /* Show fiducials and coils only? */
+  float          *dist;                     /* Distance of each point from the head surface */
+  int            *closest;                  /* Closest vertex # on the head surface */
+  float          **closest_point;           /* Closest vertex locations on the head surface */
+  int            dist_valid;                /* Are the above data valid at this point? */
 } *digitizerData,digitizerDataRec;
 
 typedef struct {

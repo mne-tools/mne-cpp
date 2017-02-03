@@ -95,58 +95,6 @@ void mne_free_name_list_9(char **list, int nlist)
 }
 
 
-void mne_free_proj_op_item_9(mneProjItem it)
-
-{
-    if (it == NULL)
-        return;
-    if(it->vecs)
-        delete it->vecs;
-    FREE_9(it->desc);
-    FREE_9(it);
-    return;
-}
-
-
-
-
-void mne_free_proj_op_proj_9(mneProjOp op)
-
-{
-    if (op == NULL)
-        return;
-
-    mne_free_name_list_9(op->names,op->nch);
-    FREE_CMATRIX_9(op->proj_data);
-
-    op->names  = NULL;
-    op->nch  = 0;
-    op->nvec = 0;
-    op->proj_data = NULL;
-
-    return;
-}
-
-void mne_free_proj_op_9(mneProjOp op)
-
-{
-    int k;
-
-    if (op == NULL)
-        return;
-
-    for (k = 0; k < op->nitems; k++)
-        mne_free_proj_op_item_9(op->items[k]);
-    FREE_9(op->items);
-
-    mne_free_proj_op_proj_9(op);
-
-    FREE_9(op);
-    return;
-}
-
-
-
 void mne_free_ctf_comp_data_9(mneCTFcompData comp)
 
 {
@@ -311,7 +259,8 @@ void mne_raw_free_data_9(mneRawData d)
     free_bufs_9(d->filt_bufs,d->nfilt_buf);
     mne_free_ring_buffer_9(d->filt_ring);
 
-    mne_free_proj_op_9(d->proj);
+    if(d->proj)
+        delete d->proj;
     mne_free_name_list_9(d->badlist,d->nbad);
     FREE_9(d->first_sample_val);
     FREE_9(d->bad);
@@ -400,9 +349,12 @@ MneMeasData::~MneMeasData()
     FREE_9(filename);
     FREE_9(meas_id);
     FREE_9(chs);
-    FREE_9(meg_head_t);
-    FREE_9(mri_head_t);
-    mne_free_proj_op_9(proj);
+    if(meg_head_t)
+        delete meg_head_t;
+    if(mri_head_t)
+        delete mri_head_t;
+    if(proj)
+        delete proj;
     mne_free_ctf_comp_data_set_9(comp);
     FREE_9(bad);
     mne_free_name_list_9(badlist,nbad);
