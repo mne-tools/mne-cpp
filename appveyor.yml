@@ -1,8 +1,6 @@
 # MNE-CPP AppVeyor CI for Windows
 
-version: 1.0.0-{build} 
-pull_requests:
-  do_not_increment_build_number: true
+version: 1.0.0-{build}
 
 environment:
    matrix:
