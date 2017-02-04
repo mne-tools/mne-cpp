@@ -2,14 +2,11 @@
 
 version: 1.0.0-{build}
 
-environment:
-   matrix:
-     - BUILD_CFG: windows_release
-     - BUILD_CFG: windows_tests
-
 os: Visual Studio 2015
 platform: x64
-configuration: Release
+configuration:
+    - windows_release
+    - windows_tests
 
 init:
     - ps: if(-not $env:APPVEYOR_PULL_REQUEST_NUMBER) { $env:is_not_pr = "true"; }
@@ -25,16 +22,16 @@ build:
   verbosity: detailed 
 
 before_build:
-    - call .\tools\appveyor\%BUILD_CFG%\before_build.bat
+    - call .\tools\appveyor\%CONFIGURATION%\before_build.bat
 build_script:
-    - call .\tools\appveyor\%BUILD_CFG%\build.bat
+    - call .\tools\appveyor\%CONFIGURATION%\build.bat
 after_build:
-    - call .\tools\appveyor\%BUILD_CFG%\after_build.bat
+    - call .\tools\appveyor\%CONFIGURATION%\after_build.bat
 
 before_test:
-    - call .\tools\appveyor\%BUILD_CFG%\before_test.bat
+    - call .\tools\appveyor\%CONFIGURATION%\before_test.bat
 test_script:
-    - call .\tools\appveyor\%BUILD_CFG%\test.bat
+    - call .\tools\appveyor\%CONFIGURATION%\test.bat
 
 artifacts:
   - path: mne-cpp-windows-x86_64-$(APPVEYOR_REPO_BRANCH).exe
@@ -55,7 +52,7 @@ deploy:
     artifact: installer,bin_archive
     on:
       branch: master
-      build_cfg: windows_release
+      configuration: windows_release
       is_not_pr: true
 
   # 1.0.0
@@ -70,7 +67,7 @@ deploy:
     artifact: installer,bin_archive
     on:
       branch: 1.0.0
-      build_cfg: windows_release
+      configuration: windows_release
       is_not_pr: true
 
 notifications: 
