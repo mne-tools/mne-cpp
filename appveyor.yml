@@ -12,6 +12,8 @@ init:
     - ps: if($env:APPVEYOR_PULL_REQUEST_TITLE) { $env:is_not_pr = "true"; }
 
 install:
+    - echo $(APPVEYOR_PULL_REQUEST_TITLE)
+    - echo $(is_not_pr)
     - set QTDIR=C:\Qt\5.7\msvc2015_64
     - set PATH=%PATH%;%QTDIR%\bin;C:\Qt\Tools\QtCreator\bin;C:\Qt\QtIFW2.0.1\bin
     - call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" amd64
