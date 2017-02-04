@@ -50,7 +50,6 @@ deploy:
     on:
       branch: master
       configuration: windows_release
-      appveyor_repo_tag: true
 
   # 1.0.0
   - provider: FTP
@@ -65,7 +64,6 @@ deploy:
     on:
       branch: 1.0.0
       configuration: windows_release
-      appveyor_repo_tag: true
 
 notifications: 
   - provider: Email 
