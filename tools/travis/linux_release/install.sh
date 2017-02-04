@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Install Qt 5.7 & Doxygen
-sudo apt-get install -qq qt57base qt573d qt57svg qt57serialport qt57charts-no-lgpl
+# Install Qt 5.8 & Doxygen
+sudo apt-get install -qq qt58base qt583d qt58svg qt58serialport qt58charts-no-lgpl
 
 # Setup Qt environment
-source /opt/qt57/bin/qt57-env.sh
+source /opt/qt58/bin/qt58-env.sh
