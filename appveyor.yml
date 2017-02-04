@@ -9,7 +9,7 @@ configuration:
     - windows_tests
 
 init:
-    - ps: if(-not $env:APPVEYOR_PULL_REQUEST_TITLE) { $env:is_not_pr = "true"; }
+    - ps: if($env:APPVEYOR_PULL_REQUEST_TITLE) { $env:is_not_pr = "true"; }
 
 install:
     - set QTDIR=C:\Qt\5.7\msvc2015_64
