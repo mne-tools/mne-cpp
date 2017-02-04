@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Install Qt 5.8 & Doxygen
+# Install Qt 5.8
 sudo apt-get install -qq qt58base qt583d qt58svg qt58serialport qt58charts-no-lgpl
 
 # Setup Qt environment

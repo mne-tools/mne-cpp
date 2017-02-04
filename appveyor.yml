@@ -8,11 +8,7 @@ configuration:
     - windows_release
     - windows_tests
 
-init:
-    - ps: if($env:APPVEYOR_PULL_REQUEST_TITLE) { $env:is_pr = "true"; } else { $env:is_pr = "false"; }
-
 install:
-    - echo %is_pr%
     - set QTDIR=C:\Qt\5.7\msvc2015_64
     - set PATH=%PATH%;%QTDIR%\bin;C:\Qt\Tools\QtCreator\bin;C:\Qt\QtIFW2.0.1\bin
     - call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" amd64
@@ -54,7 +50,7 @@ deploy:
     on:
       branch: master
       configuration: windows_release
-      is_pr: true
+      appveyor_repo_tag: true
 
   # 1.0.0
   - provider: FTP
@@ -69,7 +65,7 @@ deploy:
     on:
       branch: 1.0.0
       configuration: windows_release
-      is_pr: true
+      appveyor_repo_tag: true
 
 notifications: 
   - provider: Email 
