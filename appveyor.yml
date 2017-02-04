@@ -9,7 +9,7 @@ configuration:
     - windows_tests
 
 init:
-    - ps: if($env:APPVEYOR_PULL_REQUEST_TITLE) { $env:is_not_pr = "true"; }
+    - ps: if(-Not $env:APPVEYOR_PULL_REQUEST_TITLE) { $env:is_not_pr = "true"; }
 
 install:
     - echo %APPVEYOR_PULL_REQUEST_TITLE%
