@@ -658,7 +658,7 @@ typedef struct {
 
 
 
-int mne_is_diag_cov_3(mneCovMatrix c)
+int mne_is_diag_cov_3(MneCovMatrix* c)
 
 {
     return c->cov_diag != NULL;
@@ -838,7 +838,7 @@ void mne_free_name_list_3(char **list, int nlist)
 
 
 
-void mne_free_cov_3(mneCovMatrix c)
+void mne_free_cov_3(MneCovMatrix* c)
 /*
 * Free a covariance matrix and all its data
 */
@@ -1169,37 +1169,6 @@ int mne_decompose_eigen_3(double *mat,
 /*
 * Routines for handling the covariance matrices
 */
-static mneCovMatrix new_cov_3(int    kind,
-                            int    ncov,
-                            char   **names,
-                            double *cov,
-                            double *cov_diag,
-                            INVERSELIB::FiffSparseMatrix* cov_sparse)
-/*
-* Put it together from ingredients
-*/
-{
-    mneCovMatrix new_cov    = MALLOC_3(1,mneCovMatrixRec);
-    new_cov->kind           = kind;
-    new_cov->ncov           = ncov;
-    new_cov->nproj          = 0;
-    new_cov->nzero          = 0;
-    new_cov->names          = names;
-    new_cov->cov            = cov;
-    new_cov->cov_diag       = cov_diag;
-    new_cov->cov_sparse     = cov_sparse;
-    new_cov->eigen          = NULL;
-    new_cov->lambda         = NULL;
-    new_cov->chol           = NULL;
-    new_cov->inv_lambda     = NULL;
-    new_cov->nfree          = 1;
-    new_cov->ch_class       = NULL;
-    new_cov->proj           = NULL;
-    new_cov->sss            = NULL;
-    new_cov->bads           = NULL;
-    new_cov->nbad           = 0;
-    return new_cov;
-}
 
 
 
@@ -1210,58 +1179,6 @@ static mneCovMatrix new_cov_3(int    kind,
 
 
 
-
-
-
-
-
-
-
-mneCovMatrix mne_new_cov_dense(int    kind,
-                               int    ncov,
-                               char   **names,
-                               double *cov)
-
-{
-    return new_cov_3(kind,ncov,names,cov,NULL,NULL);
-}
-
-
-mneCovMatrix mne_new_cov_diag(int    kind,
-                              int    ncov,
-                              char   **names,
-                              double *cov_diag)
-
-{
-    return new_cov_3(kind,ncov,names,NULL,cov_diag,NULL);
-}
-
-
-mneCovMatrix mne_new_cov_sparse(int             kind,
-                                int             ncov,
-                                char            **names,
-                                INVERSELIB::FiffSparseMatrix* cov_sparse)
-{
-    return new_cov_3(kind,ncov,names,NULL,NULL,cov_sparse);
-}
-
-
-
-
-
-
-
-
-
-mneCovMatrix mne_new_cov_3(int    kind,
-                         int    ncov,
-                         char   **names,
-                         double *cov,
-                         double *cov_diag)
-
-{
-    return new_cov_3(kind,ncov,names,cov,cov_diag,NULL);
-}
 
 
 
@@ -1285,85 +1202,6 @@ static int mne_lt_packed_index_3(int j, int k)
 
 
 
-void mne_proj_op_add_item_act_3(MneProjOp* op, MneNamedMatrix* vecs, int kind, const char *desc, int is_active)
-/*
-* Add a new item to an existing projection operator
-*/
-{
-    MneProjItem* new_item;
-    int         k;
-
-//    op->items = REALLOC_3(op->items,op->nitems+1,mneProjItem);
-
-//    op->items[op->nitems] = new_item = new MneProjItem();
-    new_item = new MneProjItem();
-    op->items.append(new_item);
-
-    new_item->active      = is_active;
-    new_item->vecs        = new MneNamedMatrix(*vecs);
-
-    if (kind == FIFFV_MNE_PROJ_ITEM_EEG_AVREF) {
-        new_item->has_meg = FALSE;
-        new_item->has_eeg = TRUE;
-    }
-    else {
-        for (k = 0; k < vecs->ncol; k++) {
-            if (strstr(vecs->collist[k],"EEG") == vecs->collist[k])
-                new_item->has_eeg = TRUE;
-            if (strstr(vecs->collist[k],"MEG") == vecs->collist[k])
-                new_item->has_meg = TRUE;
-        }
-        if (!new_item->has_meg && !new_item->has_eeg) {
-            new_item->has_meg = TRUE;
-            new_item->has_eeg = FALSE;
-        }
-        else if (new_item->has_meg && new_item->has_eeg) {
-            new_item->has_meg = TRUE;
-            new_item->has_eeg = FALSE;
-        }
-    }
-    if (desc != NULL)
-        new_item->desc = mne_strdup_3(desc);
-    new_item->kind = kind;
-    new_item->nvec = new_item->vecs->nrow;
-
-    op->nitems++;
-
-    MneProjOp::mne_free_proj_op_proj(op);  /* These data are not valid any more */
-    return;
-}
-
-
-void mne_proj_op_add_item_3(MneProjOp* op, MneNamedMatrix* vecs, int kind, const char *desc)
-
-{
-    mne_proj_op_add_item_act_3(op, vecs, kind, desc, TRUE);
-}
-
-
-
-
-
-
-MneProjOp* mne_dup_proj_op_3(MneProjOp* op)
-/*
-* Provide a duplicate (item data only)
-*/
-{
-    MneProjOp* dup = new MneProjOp();
-    MneProjItem* it;
-    int k;
-
-    if (!op)
-        return NULL;
-
-    for (k = 0; k < op->nitems; k++) {
-        it = op->items[k];
-        mne_proj_op_add_item_act_3(dup,it->vecs,it->kind,it->desc,it->active);
-        dup->items[k]->active_file = it->active_file;
-    }
-    return dup;
-}
 
 
 
@@ -1372,48 +1210,8 @@ MneProjOp* mne_dup_proj_op_3(MneProjOp* op)
 
 
 
-mneCovMatrix mne_dup_cov_3(mneCovMatrix c)
-{
-    double       *vals;
-    int          nval;
-    int          k;
-    mneCovMatrix res;
 
-    if (c->cov_diag)
-        nval = c->ncov;
-    else
-        nval = (c->ncov*(c->ncov+1))/2;
-
-    vals = MALLOC_3(nval,double);
-    if (c->cov_diag) {
-        for (k = 0; k < nval; k++)
-            vals[k] = c->cov_diag[k];
-        res = mne_new_cov_3(c->kind,c->ncov,mne_dup_name_list_3(c->names,c->ncov),NULL,vals);
-    }
-    else {
-        for (k = 0; k < nval; k++)
-            vals[k] = c->cov[k];
-        res = mne_new_cov_3(c->kind,c->ncov,mne_dup_name_list_3(c->names,c->ncov),vals,NULL);
-    }
-    /*
-    * Duplicate additional items
-    */
-    if (c->ch_class) {
-        res->ch_class = MALLOC_3(c->ncov,int);
-        for (k = 0; k < c->ncov; k++)
-            res->ch_class[k] = c->ch_class[k];
-    }
-    res->bads = mne_dup_name_list_3(c->bads,c->nbad);
-    res->nbad = c->nbad;
-    res->proj = mne_dup_proj_op_3(c->proj);
-    res->sss  = new MneSssData(*(c->sss));
-
-    return res;
-}
-
-
-
-int mne_add_inv_cov_3(mneCovMatrix c)
+int mne_add_inv_cov_3(MneCovMatrix* c)
 /*
       * Calculate the inverse square roots for whitening
       */
@@ -1447,7 +1245,7 @@ int mne_add_inv_cov_3(mneCovMatrix c)
 
 
 
-static int condition_cov_3(mneCovMatrix c, float rank_threshold, int use_rank)
+static int condition_cov_3(MneCovMatrix* c, float rank_threshold, int use_rank)
 
 {
     double *scale  = NULL;
@@ -1612,7 +1410,7 @@ static int check_cov_data(double *vals, int nval)
 
 
 
-int mne_classify_channels_cov(mneCovMatrix cov, fiffChInfo chs, int nchan)
+int mne_classify_channels_cov(MneCovMatrix* cov, fiffChInfo chs, int nchan)
 /*
  * Assign channel classes in a covariance matrix with help of channel infos
  */
@@ -1661,7 +1459,7 @@ bad : {
 
 
 
-static int mne_decompose_eigen_cov_small_3(mneCovMatrix c,float small, int use_rank)
+static int mne_decompose_eigen_cov_small_3(MneCovMatrix* c,float small, int use_rank)
 /*
       * Do the eigenvalue decomposition
       */
@@ -1732,7 +1530,7 @@ bad : {
 }
 
 
-int mne_decompose_eigen_cov_3(mneCovMatrix c)
+int mne_decompose_eigen_cov_3(MneCovMatrix* c)
 
 {
     return mne_decompose_eigen_cov_small_3(c,-1.0,-1);
@@ -1745,7 +1543,7 @@ int mne_decompose_eigen_cov_3(mneCovMatrix c)
 
 //============================= mne_whiten.c =============================
 
-int mne_whiten_data(float **data, float **whitened_data, int np, int nchan, mneCovMatrix C)
+int mne_whiten_data(float **data, float **whitened_data, int np, int nchan, MneCovMatrix* C)
 /*
       * Apply the whitening operation
       */
@@ -1792,7 +1590,7 @@ int mne_whiten_data(float **data, float **whitened_data, int np, int nchan, mneC
 }
 
 
-int mne_whiten_one_data(float *data, float *whitened_data, int nchan, mneCovMatrix C)
+int mne_whiten_one_data(float *data, float *whitened_data, int nchan, MneCovMatrix* C)
 
 {
     float *datap[1];
@@ -1838,7 +1636,7 @@ static void free_dipole_fit_funcs(dipoleFitFuncs f)
 
 
 
-//static void regularize_cov(mneCovMatrix c,       /* The matrix to regularize */
+//static void regularize_cov(MneCovMatrix* c,       /* The matrix to regularize */
 //                           float        *regs,   /* Regularization values to apply (fractions of the
 //                                                     * average diagonal values for each class */
 //                           int          *active) /* Which of the channels are 'active' */
@@ -1893,7 +1691,7 @@ static void free_dipole_fit_funcs(dipoleFitFuncs f)
 //}
 
 
-void mne_regularize_cov(mneCovMatrix c,       /* The matrix to regularize */
+void mne_regularize_cov(MneCovMatrix* c,       /* The matrix to regularize */
                         float        *regs)   /* Regularization values to apply (fractions of the
                            * average diagonal values for each class */
 /*
@@ -5054,25 +4852,6 @@ void mne_proj_op_report_3(FILE *out,const char *tag, MneProjOp* op)
 
 
 
-MneProjOp* mne_proj_op_combine_3(MneProjOp* to, MneProjOp* from)
-/*
-* Copy items from 'from' operator to 'to' operator
-*/
-{
-    int k;
-    MneProjItem* it;
-
-    if (to == NULL)
-        to = new MneProjOp();
-    if (from) {
-        for (k = 0; k < from->nitems; k++) {
-            it = from->items[k];
-            mne_proj_op_add_item_3(to,it->vecs,it->kind,it->desc);
-            to->items[to->nitems-1]->active_file = it->active_file;
-        }
-    }
-    return to;
-}
 
 
 
@@ -5080,103 +4859,14 @@ MneProjOp* mne_proj_op_combine_3(MneProjOp* to, MneProjOp* from)
 
 
 
-MneProjOp* mne_proj_op_average_eeg_ref_3(fiffChInfo chs,
-                                      int nch)
-/*
-* Make the projection operator for average electrode reference
-*/
-{
-    int eegcount = 0;
-    int k;
-    float       **vec_data;
-    char        **names;
-    MneNamedMatrix* vecs;
-    MneProjOp*      op;
-
-    for (k = 0; k < nch; k++)
-        if (chs[k].kind == FIFFV_EEG_CH)
-            eegcount++;
-    if (eegcount == 0) {
-        qCritical("No EEG channels specified for average reference.");
-        return NULL;
-    }
-
-    vec_data = ALLOC_CMATRIX_3(1,eegcount);
-    names    = MALLOC_3(eegcount,char *);
-
-    for (k = 0, eegcount = 0; k < nch; k++)
-        if (chs[k].kind == FIFFV_EEG_CH)
-            names[eegcount++] = mne_strdup_3(chs[k].ch_name);
-
-    for (k = 0; k < eegcount; k++)
-        vec_data[0][k] = 1.0/sqrt((double)eegcount);
-
-    vecs = MneNamedMatrix::build_named_matrix(1,eegcount,NULL,names,vec_data);
-
-    op = new MneProjOp();
-    mne_proj_op_add_item_3(op,vecs,FIFFV_MNE_PROJ_ITEM_EEG_AVREF,"Average EEG reference");
-
-    return op;
-}
 
 
 
-int mne_proj_item_affect_3(MneProjItem* it, char **list, int nlist)
-/*
-* Does this projection item affect this list of channels?
-*/
-{
-    int k,p,q;
-
-    if (it == NULL || it->vecs == NULL || it->nvec == 0)
-        return FALSE;
-
-    for (k = 0; k < nlist; k++)
-        for (p = 0; p < it->vecs->ncol; p++)
-            if (strcmp(it->vecs->collist[p],list[k]) == 0) {
-                for (q = 0; q < it->vecs->nrow; q++) {
-                    if (it->vecs->data[q][p] != 0.0)
-                        return TRUE;
-                }
-            }
-    return FALSE;
-}
 
 
 
-int mne_proj_op_affect_3(MneProjOp* op, char **list, int nlist)
-
-{
-    int k;
-    int naff;
-
-    if (!op)
-        return 0;
-
-    for (k = 0, naff = 0; k < op->nitems; k++)
-        if (op->items[k]->active && mne_proj_item_affect_3(op->items[k],list,nlist))
-            naff += op->items[k]->nvec;
-
-    return naff;
-}
-
-int mne_proj_op_affect_chs_3(MneProjOp* op, fiffChInfo chs, int nch)
-{
-    char *ch_string;
-    int  res;
-    char **list;
-    int  nlist;
 
 
-    if (nch == 0)
-        return FALSE;
-    ch_string = mne_channel_names_to_string_3(chs,nch);
-    mne_string_to_name_list_3(ch_string,&list,&nlist);
-    FREE_3(ch_string);
-    res = mne_proj_op_affect_3(op,list,nlist);
-    mne_free_name_list_3(list,nlist);
-    return res;
-}
 
 
 
@@ -5357,7 +5047,7 @@ MneProjOp* mne_read_proj_op_from_node_3(//fiffFile in,
         * Ready to add
         */
         item = MneNamedMatrix::build_named_matrix(item_nvec,item_nchan,NULL,item_names,item_vectors);
-        mne_proj_op_add_item_act_3(op,item,item_kind,item_desc,item_active);
+        MneProjOp::mne_proj_op_add_item_act(op,item,item_kind,item_desc,item_active);
         delete item;
         op->items[op->nitems-1]->active_file = item_active;
     }
@@ -5469,7 +5159,7 @@ int mne_proj_op_make_proj_bad(MneProjOp* op, char **bad, int nbad)
     if (op->nitems <= 0)
         return OK;
 
-    nvec = mne_proj_op_affect_3(op,op->names,op->nch);
+    nvec = MneProjOp::mne_proj_op_affect(op,op->names,op->nch);
     if (nvec == 0)
         return OK;
 
@@ -5480,7 +5170,7 @@ int mne_proj_op_make_proj_bad(MneProjOp* op, char **bad, int nbad)
     fprintf(stdout,"mne_proj_op_make_proj_bad\n");
 #endif
     for (k = 0, nvec_meg = nvec_eeg = 0; k < op->nitems; k++) {
-        if (op->items[k]->active && mne_proj_item_affect_3(op->items[k],op->names,op->nch)) {
+        if (op->items[k]->active && MneProjItem::mne_proj_item_affect(op->items[k],op->names,op->nch)) {
             vec.nvec  = op->items[k]->vecs->ncol;
             vec.names = op->items[k]->vecs->collist;
             if (op->items[k]->has_meg) {
@@ -7339,7 +7029,7 @@ int mne_read_bad_channel_list_3(const QString& name, char ***listp, int *nlistp)
 
 
 
-mneCovMatrix mne_read_cov(const QString& name,int kind)
+MneCovMatrix* mne_read_cov(const QString& name,int kind)
 /*
 * Read a covariance matrix from a fiff
 */
@@ -7363,7 +7053,7 @@ mneCovMatrix mne_read_cov(const QString& name,int kind)
     int             nbad       = 0;
     int             ncov       = 0;
     int             nfree      = 1;
-    mneCovMatrix    res        = NULL;
+    MneCovMatrix*    res        = NULL;
 
     int            k,p,nn;
     float          *f;
@@ -7487,11 +7177,11 @@ mneCovMatrix mne_read_cov(const QString& name,int kind)
             goto out;
     }
     if (cov_sparse)
-        res = mne_new_cov_sparse(kind,ncov,names,cov_sparse);
+        res = MneCovMatrix::mne_new_cov_sparse(kind,ncov,names,cov_sparse);
     else if (cov)
-        res = mne_new_cov_dense(kind,ncov,names,cov);
+        res = MneCovMatrix::mne_new_cov_dense(kind,ncov,names,cov);
     else if (cov_diag)
-        res = mne_new_cov_diag(kind,ncov,names,cov_diag);
+        res = MneCovMatrix::mne_new_cov_diag(kind,ncov,names,cov_diag);
     else {
         qCritical("mne_read_cov : covariance matrix data is not defined. How come?");
         goto out;
@@ -7917,7 +7607,7 @@ bad : {
 
 
 
-void mne_revert_to_diag_cov(mneCovMatrix c)
+void mne_revert_to_diag_cov(MneCovMatrix* c)
 /*
 * Pick the diagonal elements of the full covariance matrix
 */
@@ -7952,7 +7642,7 @@ void mne_revert_to_diag_cov(mneCovMatrix c)
 
 
 
-mneCovMatrix mne_pick_chs_cov_omit(mneCovMatrix c, char **new_names, int ncov, int omit_meg_eeg, fiffChInfo chs)
+MneCovMatrix* mne_pick_chs_cov_omit(MneCovMatrix* c, char **new_names, int ncov, int omit_meg_eeg, fiffChInfo chs)
 /*
 * Pick designated channels from a covariance matrix, optionally omit MEG/EEG correlations
 */
@@ -7964,7 +7654,7 @@ mneCovMatrix mne_pick_chs_cov_omit(mneCovMatrix c, char **new_names, int ncov, i
     char  **names = NULL;
     int   *is_meg = NULL;
     int   from,to;
-    mneCovMatrix res;
+    MneCovMatrix* res;
 
     if (ncov == 0) {
         qCritical("No channels specified for picking in mne_pick_chs_cov_omit");
@@ -8038,11 +7728,11 @@ mneCovMatrix mne_pick_chs_cov_omit(mneCovMatrix c, char **new_names, int ncov, i
         }
     }
 
-    res = mne_new_cov_3(c->kind,ncov,names,cov,cov_diag);
+    res = MneCovMatrix::mne_new_cov(c->kind,ncov,names,cov,cov_diag);
 
     res->bads = mne_dup_name_list_3(c->bads,c->nbad);
     res->nbad = c->nbad;
-    res->proj = mne_dup_proj_op_3(c->proj);
+    res->proj = MneProjOp::mne_dup_proj_op(c->proj);
     res->sss  = c->sss ? new MneSssData(*(c->sss)) : NULL;
 
     if (c->ch_class) {
@@ -8144,7 +7834,7 @@ void mne_transpose_dsquare(double **mat, int n)
 
 
 
-int mne_proj_op_apply_cov(MneProjOp* op, mneCovMatrix& c)
+int mne_proj_op_apply_cov(MneProjOp* op, MneCovMatrix*& c)
 /*
 * Apply the projection operator to a covariance matrix
 */
@@ -8210,7 +7900,7 @@ int mne_proj_op_apply_cov(MneProjOp* op, mneCovMatrix& c)
 
     FREE_DCMATRIX_3(dcov);
 
-    c->nproj = mne_proj_op_affect_3(op,c->names,c->ncov);
+    c->nproj = MneProjOp::mne_proj_op_affect(op,c->names,c->ncov);
     return OK;
 }
 
@@ -8455,7 +8145,7 @@ out :
 
 //*************************************************************************************************************
 
-mneCovMatrix DipoleFitData::ad_hoc_noise(FwdCoilSet *meg, FwdCoilSet *eeg, float grad_std, float mag_std, float eeg_std)
+MneCovMatrix* DipoleFitData::ad_hoc_noise(FwdCoilSet *meg, FwdCoilSet *eeg, float grad_std, float mag_std, float eeg_std)
 /*
      * Specify constant noise values
      */
@@ -8503,7 +8193,7 @@ mneCovMatrix DipoleFitData::ad_hoc_noise(FwdCoilSet *meg, FwdCoilSet *eeg, float
     }
     names = mne_dup_name_list_3(ch_names,nchan);
     FREE_3(ch_names);
-    return mne_new_cov_3(FIFFV_MNE_NOISE_COV,nchan,names,NULL,stds);
+    return MneCovMatrix::mne_new_cov(FIFFV_MNE_NOISE_COV,nchan,names,NULL,stds);
 }
 
 
@@ -8538,7 +8228,7 @@ int DipoleFitData::make_projection(const QList<QString> &projnames, fiffChInfo c
         else {
             printf("Loaded projection from %s:\n",projnames[k].toLatin1().data());
             mne_proj_op_report_3(stderr,"\t",one);
-            all = mne_proj_op_combine_3(all,one);
+            all = MneProjOp::mne_proj_op_combine(all,one);
             if(one)
                 delete one;
             one = NULL;
@@ -8555,17 +8245,17 @@ int DipoleFitData::make_projection(const QList<QString> &projnames, fiffChInfo c
                 }
         }
         if (!found) {
-            if ((one = mne_proj_op_average_eeg_ref_3(chs,nch)) != NULL) {
+            if ((one = MneProjOp::mne_proj_op_average_eeg_ref(chs,nch)) != NULL) {
                 printf("Average EEG reference projection added:\n");
                 mne_proj_op_report_3(stderr,"\t",one);
-                all = mne_proj_op_combine_3(all,one);
+                all = MneProjOp::mne_proj_op_combine(all,one);
                 if(one)
                     delete one;
                 one = NULL;
             }
         }
     }
-    if (all && mne_proj_op_affect_chs_3(all,chs,nch) == 0) {
+    if (all && MneProjOp::mne_proj_op_affect_chs(all,chs,nch) == 0) {
         printf("Projection will not have any effect on selected channels. Projection omitted.\n");
         if(all)
             delete all;
@@ -8726,7 +8416,7 @@ int DipoleFitData::select_dipole_fit_noise_cov(DipoleFitData *f, mshMegEegData d
             qCritical("Too few EEG channels remaining");
             return FAIL;
         }
-        f->noise = mne_dup_cov_3(f->noise_orig);
+        f->noise = MneCovMatrix::mne_dup_cov(f->noise_orig);
         if (nomit_meg+nomit_eeg > 0) {
             if (f->noise->cov) {
                 for (j = 0; j < f->noise->ncov; j++)
@@ -8747,7 +8437,7 @@ int DipoleFitData::select_dipole_fit_noise_cov(DipoleFitData *f, mshMegEegData d
     else {
         if (f->noise && f->nave == nave)
             return OK;
-        f->noise = mne_dup_cov_3(f->noise_orig);
+        f->noise = MneCovMatrix::mne_dup_cov(f->noise_orig);
     }
 
     return scale_dipole_fit_noise_cov(f,nave);
@@ -8768,7 +8458,7 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname, cons
     char           **file_bads;
     int            file_nbad;
     int            coord_frame = FIFFV_COORD_HEAD;
-    mneCovMatrix cov;
+    MneCovMatrix* cov;
     FwdCoilSet*     templates = NULL;
     mneCTFcompDataSet comp_data  = NULL;
     FwdCoilSet*        comp_coils = NULL;
