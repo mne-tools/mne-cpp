@@ -118,6 +118,7 @@
 #include "fiff_coord_trans_old.h"
 #include "mne_proj_item.h"
 #include "mne_proj_op.h"
+#include "mne_cov_matrix.h"
 
 
 #if defined(__cplusplus) 
@@ -338,47 +339,47 @@ typedef struct {		/* Vector specification with a channel list */
 //  float          **proj_data;   /* The orthogonalized projection vectors picked and orthogonalized from the original data */
 //} *mneProjOp,mneProjOpRec;
 
-typedef struct {
-  int   job;			/* Value of FIFF_SSS_JOB tag */
-  int   coord_frame;		/* Coordinate frame */
-  float origin[3];		/* The expansion origin */
-  int   nchan;			/* How many channels */
-  int   out_order;		/* Order of the outside expansion */
-  int   in_order;		/* Order of the inside expansion */
-  int   *comp_info;		/* Which components are included */
-  int   ncomp;			/* How many entries in the above */
-  int   in_nuse;		/* How many components included in the inside expansion */
-  int   out_nuse;		/* How many components included in the outside expansion */
-} *mneSssData,mneSssDataRec;	/* Essential information about SSS */
+//typedef struct {
+//  int   job;			/* Value of FIFF_SSS_JOB tag */
+//  int   coord_frame;		/* Coordinate frame */
+//  float origin[3];		/* The expansion origin */
+//  int   nchan;			/* How many channels */
+//  int   out_order;		/* Order of the outside expansion */
+//  int   in_order;		/* Order of the inside expansion */
+//  int   *comp_info;		/* Which components are included */
+//  int   ncomp;			/* How many entries in the above */
+//  int   in_nuse;		/* How many components included in the inside expansion */
+//  int   out_nuse;		/* How many components included in the outside expansion */
+//} *mneSssData,mneSssDataRec;	/* Essential information about SSS */
 
 /*
- * The class field in mneCovMatrix can have these values
+ * The class field in INVERSELIB::MneCovMatrix* can have these values
  */
-#define MNE_COV_CH_UNKNOWN  -1	/* No idea */
-#define MNE_COV_CH_MEG_MAG   0  /* Axial gradiometer or magnetometer [T] */
-#define MNE_COV_CH_MEG_GRAD  1  /* Planar gradiometer [T/m] */
-#define MNE_COV_CH_EEG       2  /* EEG [V] */
+//#define MNE_COV_CH_UNKNOWN  -1	/* No idea */
+//#define MNE_COV_CH_MEG_MAG   0  /* Axial gradiometer or magnetometer [T] */
+//#define MNE_COV_CH_MEG_GRAD  1  /* Planar gradiometer [T/m] */
+//#define MNE_COV_CH_EEG       2  /* EEG [V] */
 
-typedef struct {		/* Covariance matrix storage */
-  int        kind;		/* Sensor or source covariance */
-  int        ncov;		/* Dimension */
-  int        nfree;		/* Number of degrees of freedom */
-  int        nproj;		/* Number of dimensions projected out */
-  int        nzero;		/* Number of zero or small eigenvalues */
-  char       **names;		/* Names of the entries (optional) */
-  double     *cov;		/* Covariance matrix in packed representation (lower triangle) */
-  double     *cov_diag;		/* Diagonal covariance matrix */
-  INVERSELIB::FiffSparseMatrix* cov_sparse;   /* A sparse covariance matrix (Note: data are floats in this which is an inconsistency) */
-  double     *lambda;           /* Eigenvalues of cov */
-  double     *inv_lambda;       /* Inverses of the square roots of the eigenvalues of cov */
-  float      **eigen;           /* Eigenvectors of cov */
-  double     *chol;             /* Cholesky decomposition */
-  INVERSELIB::MneProjOp*  proj; /* The projection which was active when this matrix was computed */
-  INVERSELIB::MneSssData* sss;  /* The SSS data present in the associated raw data file */
-  int        *ch_class;		/* This will allow grouping of channels for regularization (MEG [T/m], MEG [T], EEG [V] */
-  char       **bads;		/* Which channels were designated bad when this noise covariance matrix was computed? */
-  int        nbad;		/* How many of them */
-} *mneCovMatrix,mneCovMatrixRec;
+//typedef struct {		/* Covariance matrix storage */
+//  int        kind;		/* Sensor or source covariance */
+//  int        ncov;		/* Dimension */
+//  int        nfree;		/* Number of degrees of freedom */
+//  int        nproj;		/* Number of dimensions projected out */
+//  int        nzero;		/* Number of zero or small eigenvalues */
+//  char       **names;		/* Names of the entries (optional) */
+//  double     *cov;		/* Covariance matrix in packed representation (lower triangle) */
+//  double     *cov_diag;		/* Diagonal covariance matrix */
+//  INVERSELIB::FiffSparseMatrix* cov_sparse;   /* A sparse covariance matrix (Note: data are floats in this which is an inconsistency) */
+//  double     *lambda;           /* Eigenvalues of cov */
+//  double     *inv_lambda;       /* Inverses of the square roots of the eigenvalues of cov */
+//  float      **eigen;           /* Eigenvectors of cov */
+//  double     *chol;             /* Cholesky decomposition */
+//  INVERSELIB::MneProjOp*  proj; /* The projection which was active when this matrix was computed */
+//  INVERSELIB::MneSssData* sss;  /* The SSS data present in the associated raw data file */
+//  int        *ch_class;		/* This will allow grouping of channels for regularization (MEG [T/m], MEG [T], EEG [V] */
+//  char       **bads;		/* Which channels were designated bad when this noise covariance matrix was computed? */
+//  int        nbad;		/* How many of them */
+//} *INVERSELIB::MneCovMatrix*,INVERSELIB::MneCovMatrix*Rec;
 
 //typedef struct {		/* A forward solution */
 //  char           *fwdname;	/* Name of the file this was loaded from */
@@ -403,7 +404,7 @@ typedef struct {		/* Covariance matrix storage */
 //				 * applied to the field fwd itself */
 //  float          *patch_areas;  /* Contains the patch areas if the CSD transformation has been applied */
 //  int            fwd_whitened;	/* Has the noise covariance been applied to the field fwd? */
-//  mneCovMatrix   noise_cov;	/* The noise covariance matrix employed in whitening */
+//  INVERSELIB::MneCovMatrix*   noise_cov;	/* The noise covariance matrix employed in whitening */
 //  mneProjOp      proj;		/* Associated projection operator */
 //} *mneForwardSolution,mneForwardSolutionRec;
 
@@ -422,13 +423,13 @@ typedef struct {		          /* An inverse operator */
 					   * (These are equal to the cortex normals 
 					   * in the fixed orientation case) */
   int            coord_frame;               /* Which coordinates are the locations and orientations given in? */
-  mneCovMatrix   sensor_cov;                /* Sensor covariance matrix */
+  INVERSELIB::MneCovMatrix*   sensor_cov;                /* Sensor covariance matrix */
   int            nave;                      /* Number of averaged responses (affects scaling of the noise covariance) */
   int            current_unit;              /* This can be FIFF_UNIT_AM, FIFF_UNIT_AM_M2, FIFF_UNIT_AM_M3 */
-  mneCovMatrix   source_cov;                /* Source covariance matrix */
-  mneCovMatrix   orient_prior;              /* Orientation prior applied */
-  mneCovMatrix   depth_prior;               /* Depth-weighting prior applied */
-  mneCovMatrix   fMRI_prior;                /* fMRI prior applied */
+  INVERSELIB::MneCovMatrix*   source_cov;                /* Source covariance matrix */
+  INVERSELIB::MneCovMatrix*   orient_prior;              /* Orientation prior applied */
+  INVERSELIB::MneCovMatrix*   depth_prior;               /* Depth-weighting prior applied */
+  INVERSELIB::MneCovMatrix*   fMRI_prior;                /* fMRI prior applied */
   float          *sing;                     /* Singular values of the inverse operator */
   INVERSELIB::MneNamedMatrix* eigen_leads;  /* The eigen leadfields */
   int            eigen_leads_weighted;      /* Have the above been already weighted with R^0.5? */

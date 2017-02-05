@@ -103,6 +103,12 @@ public:
     */
     ~MneProjItem();
 
+
+
+    static int mne_proj_item_affect(MneProjItem* it, char **list, int nlist);
+
+
+
 public:
     MneNamedMatrix* vecs;           /**< The original projection vectors */
     int             nvec;           /**< Number of vectors = vecs->nrow */

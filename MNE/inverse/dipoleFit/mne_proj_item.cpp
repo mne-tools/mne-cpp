@@ -94,3 +94,27 @@ MneProjItem::~MneProjItem()
     FREE_21(desc);
     return;
 }
+
+
+//*************************************************************************************************************
+
+int MneProjItem::mne_proj_item_affect(MneProjItem *it, char **list, int nlist)
+/*
+    * Does this projection item affect this list of channels?
+    */
+{
+    int k,p,q;
+
+    if (it == NULL || it->vecs == NULL || it->nvec == 0)
+        return FALSE;
+
+    for (k = 0; k < nlist; k++)
+        for (p = 0; p < it->vecs->ncol; p++)
+            if (strcmp(it->vecs->collist[p],list[k]) == 0) {
+                for (q = 0; q < it->vecs->nrow; q++) {
+                    if (it->vecs->data[q][p] != 0.0)
+                        return TRUE;
+                }
+            }
+    return FALSE;
+}
