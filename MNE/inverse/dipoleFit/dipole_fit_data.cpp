@@ -1014,58 +1014,6 @@ int mne_get_values_from_data_3 (float time,         /* Interesting time point */
 
 
 
-
-
-int mne_proj_op_proj_vector_3(MneProjOp* op, float *vec, int nvec, int do_complement)
-/*
-      * Apply projection operator to a vector (floats)
-      * Assume that all dimension checking etc. has been done before
-      */
-{
-    static float *res = NULL;
-    int    res_size   = 0;
-    float *pvec;
-    float  w;
-    int k,p;
-
-    if (!op || op->nitems <= 0 || op->nvec <= 0)
-        return OK;
-
-    if (op->nch != nvec) {
-        printf("Data vector size does not match projection operator");
-        return FAIL;
-    }
-
-    if (op->nch > res_size) {
-        res = REALLOC_3(res,op->nch,float);
-        res_size = op->nch;
-    }
-
-    for (k = 0; k < op->nch; k++)
-        res[k] = 0.0;
-
-    for (p = 0; p < op->nvec; p++) {
-        pvec = op->proj_data[p];
-        w = mne_dot_vectors_3(pvec,vec,op->nch);
-        for (k = 0; k < op->nch; k++)
-            res[k] = res[k] + w*pvec[k];
-    }
-    if (do_complement) {
-        for (k = 0; k < op->nch; k++)
-            vec[k] = vec[k] - res[k];
-    }
-    else {
-        for (k = 0; k < op->nch; k++)
-            vec[k] = res[k];
-    }
-    return OK;
-}
-
-
-
-
-
-
 //============================= mne_decompose.c =============================
 
 
@@ -9284,7 +9232,7 @@ bool DipoleFitData::fit_one(DipoleFitData* fit,	            /* Precomputed fitti
     nchan = fit->nmeg+fit->neeg;
     user.fwd = NULL;
 
-    if (mne_proj_op_proj_vector_3(fit->proj,B,nchan,TRUE) == FAIL)
+    if (MneProjOp::mne_proj_op_proj_vector(fit->proj,B,nchan,TRUE) == FAIL)
         goto bad;
 
     if (mne_whiten_one_data(B,B,nchan,fit->noise) == FAIL)
@@ -9453,7 +9401,7 @@ int DipoleFitData::compute_dipole_field(DipoleFitData* d, float *rd, int whiten,
 #endif
 
     for (k = 0; k < 3; k++)
-        if (mne_proj_op_proj_vector_3(d->proj,fwd[k],d->nmeg+d->neeg,TRUE) == FAIL)
+        if (MneProjOp::mne_proj_op_proj_vector(d->proj,fwd[k],d->nmeg+d->neeg,TRUE) == FAIL)
             goto bad;
 
 #ifdef DEBUG

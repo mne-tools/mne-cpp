@@ -60,6 +60,19 @@
 #endif
 
 
+
+
+#ifndef FAIL
+#define FAIL -1
+#endif
+
+#ifndef OK
+#define OK 0
+#endif
+
+
+
+
 #define MALLOC_23(x,t) (t *)malloc((x)*sizeof(t))
 
 #define REALLOC_23(x,y,t) (t *)((x == NULL) ? malloc((y)*sizeof(t)) : realloc((x),(y)*sizeof(t)))
@@ -119,6 +132,30 @@ float **mne_cmatrix_23(int nr,int nc)
     return m;
 }
 
+
+
+
+
+
+
+float mne_dot_vectors_23 (float *v1,
+                       float *v2,
+                       int   nn)
+
+{
+#ifdef BLAS
+    int one = 1;
+    float res = sdot(&nn,v1,&one,v2,&one);
+    return res;
+#else
+    float res = 0.0;
+    int   k;
+
+    for (k = 0; k < nn; k++)
+        res = res + v1[k]*v2[k];
+    return res;
+#endif
+}
 
 
 
@@ -510,6 +547,54 @@ int MneProjOp::mne_proj_op_affect_chs(MneProjOp *op, fiffChInfo chs, int nch)
     res = mne_proj_op_affect(op,list,nlist);
     mne_free_name_list_23(list,nlist);
     return res;
+}
+
+
+//*************************************************************************************************************
+
+int MneProjOp::mne_proj_op_proj_vector(MneProjOp *op, float *vec, int nvec, int do_complement)
+/*
+    * Apply projection operator to a vector (floats)
+    * Assume that all dimension checking etc. has been done before
+    */
+{
+    static float *res = NULL;
+    int    res_size   = 0;
+    float *pvec;
+    float  w;
+    int k,p;
+
+    if (!op || op->nitems <= 0 || op->nvec <= 0)
+        return OK;
+
+    if (op->nch != nvec) {
+        printf("Data vector size does not match projection operator");
+        return FAIL;
+    }
+
+    if (op->nch > res_size) {
+        res = REALLOC_23(res,op->nch,float);
+        res_size = op->nch;
+    }
+
+    for (k = 0; k < op->nch; k++)
+        res[k] = 0.0;
+
+    for (p = 0; p < op->nvec; p++) {
+        pvec = op->proj_data[p];
+        w = mne_dot_vectors_23(pvec,vec,op->nch);
+        for (k = 0; k < op->nch; k++)
+            res[k] = res[k] + w*pvec[k];
+    }
+    if (do_complement) {
+        for (k = 0; k < op->nch; k++)
+            vec[k] = vec[k] - res[k];
+    }
+    else {
+        for (k = 0; k < op->nch; k++)
+            vec[k] = res[k];
+    }
+    return OK;
 }
 
 
