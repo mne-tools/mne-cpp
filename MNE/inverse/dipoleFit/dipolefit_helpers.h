@@ -1189,54 +1189,18 @@ static struct {
 /*
  * Allocation and freeing of the data structures
  */
-mneCTFcompData mne_new_ctf_comp_data()
-{
-    mneCTFcompData res = MALLOC(1,mneCTFcompDataRec);
-    res->kind          = MNE_CTFV_COMP_UNKNOWN;
-    res->mne_kind      = MNE_CTFV_COMP_UNKNOWN;
-    res->calibrated    = FALSE;
-    res->data          = NULL;
-    res->presel        = NULL;
-    res->postsel       = NULL;
-    res->presel_data   = NULL;
-    res->comp_data     = NULL;
-    res->postsel_data  = NULL;
-
-    return res;
-}
 
 mneCTFcompDataSet mne_new_ctf_comp_data_set()
 {
     mneCTFcompDataSet res = MALLOC(1,mneCTFcompDataSetRec);
 
-    res->comps   = NULL;
+//    res->comps   = NULL;
     res->ncomp   = 0;
     res->chs     = NULL;
     res->nch     = 0;
     res->current = NULL;
     res->undo    = NULL;
     return res;
-}
-
-
-
-void mne_free_ctf_comp_data(mneCTFcompData comp)
-
-{
-    if (!comp)
-        return;
-
-    if(comp->data)
-        delete comp->data;
-    if(comp->presel)
-        delete comp->presel;
-    if(comp->postsel)
-        delete comp->postsel;
-    FREE(comp->presel_data);
-    FREE(comp->postsel_data);
-    FREE(comp->comp_data);
-    FREE(comp);
-    return;
 }
 
 
@@ -1249,33 +1213,15 @@ void mne_free_ctf_comp_data_set(mneCTFcompDataSet set)
         return;
 
     for (k = 0; k < set->ncomp; k++)
-        mne_free_ctf_comp_data(set->comps[k]);
-    FREE(set->comps);
+        if(set->comps[k])
+            delete set->comps[k];
+//    FREE(set->comps);
+    set->comps.clear();
     FREE(set->chs);
-    mne_free_ctf_comp_data(set->current);
+    if(set->current)
+        delete set->current;
     FREE(set);
     return;
-}
-
-
-mneCTFcompData mne_dup_ctf_comp_data(mneCTFcompData data)
-{
-    mneCTFcompData res;
-
-    if (!data)
-        return NULL;
-
-    res = mne_new_ctf_comp_data();
-
-    res->kind       = data->kind;
-    res->mne_kind   = data->mne_kind;
-    res->calibrated = data->calibrated;
-    res->data       = new MneNamedMatrix(*data->data);
-
-    res->presel     = new FiffSparseMatrix(*data->presel);
-    res->postsel    = new FiffSparseMatrix(*data->postsel);
-
-    return res;
 }
 
 
@@ -1293,12 +1239,15 @@ mneCTFcompDataSet mne_dup_ctf_comp_data_set(mneCTFcompDataSet set)
     res = mne_new_ctf_comp_data_set();
 
     if (set->ncomp > 0) {
-        res->comps = MALLOC(set->ncomp,mneCTFcompData);
+//        res->comps = MALLOC(set->ncomp,mneCTFcompData);
         res->ncomp = set->ncomp;
         for (k = 0; k < res->ncomp; k++)
-            res->comps[k] = mne_dup_ctf_comp_data(set->comps[k]);
+            if(set->comps[k])
+                res->comps.append(new MneCTFCompData(*set->comps[k]));
     }
-    res->current = mne_dup_ctf_comp_data(set->current);
+
+    if(set->current)
+        res->current = new MneCTFCompData(*set->current);
 
     return res;
 }
@@ -1314,7 +1263,7 @@ int mne_apply_ctf_comp(mneCTFcompDataSet set,		  /* The compensation data */
 * Apply compensation or revert to uncompensated data
 */
 {
-    mneCTFcompData this_comp;
+    MneCTFCompData* this_comp;
     float *presel,*comp;
     int   k;
 
@@ -1432,69 +1381,6 @@ int mne_unmap_ctf_comp_kind(int ctf_comp)
 }
 
 
-static int mne_calibrate_ctf_comp(mneCTFcompData one,
-                                  fiffChInfo     chs,
-                                  int            nch,
-                                  int            do_it)
-/*
-* Calibrate or decalibrate a compensation data set
-*/
-{
-    float *col_cals,*row_cals;
-    int   j,k,p,found;
-    char  *name;
-    float **data;
-
-    if (!one)
-        return OK;
-    if (one->calibrated)
-        return OK;
-
-    row_cals = MALLOC(one->data->nrow,float);
-    col_cals = MALLOC(one->data->ncol,float);
-
-    for (j = 0; j < one->data->nrow; j++) {
-        name = one->data->rowlist[j];
-        found = FALSE;
-        for (p = 0; p < nch; p++)
-            if (strcmp(name,chs[p].ch_name) == 0) {
-                row_cals[j] = chs[p].range*chs[p].cal;
-                found = TRUE;
-                break;
-            }
-        if (!found) {
-            printf("Channel %s not found. Cannot calibrate the compensation matrix.",name);
-            return FAIL;
-        }
-    }
-    for (k = 0; k < one->data->ncol; k++) {
-        name = one->data->collist[k];
-        found = FALSE;
-        for (p = 0; p < nch; p++)
-            if (strcmp(name,chs[p].ch_name) == 0) {
-                col_cals[k] = chs[p].range*chs[p].cal;
-                found = TRUE;
-                break;
-            }
-        if (!found) {
-            printf("Channel %s not found. Cannot calibrate the compensation matrix.",name);
-            return FAIL;
-        }
-    }
-    data = one->data->data;
-    if (do_it) {
-        for (j = 0; j < one->data->nrow; j++)
-            for (k = 0; k < one->data->ncol; k++)
-                data[j][k] = row_cals[j]*data[j][k]/col_cals[k];
-    }
-    else {
-        for (j = 0; j < one->data->nrow; j++)
-            for (k = 0; k < one->data->ncol; k++)
-                data[j][k] = col_cals[k]*data[j][k]/row_cals[j];
-    }
-    return OK;
-}
-
 
 mneCTFcompDataSet mne_read_ctf_comp_data(const QString& name)
 /*
@@ -1505,7 +1391,7 @@ mneCTFcompDataSet mne_read_ctf_comp_data(const QString& name)
     FiffStream::SPtr stream(new FiffStream(&file));
 
     mneCTFcompDataSet set = NULL;
-    mneCTFcompData    one;
+    MneCTFCompData*    one;
     QList<FiffDirNode::SPtr> nodes;
     QList<FiffDirNode::SPtr> comps;
     int               ncomp;
@@ -1575,19 +1461,22 @@ mneCTFcompDataSet mne_read_ctf_comp_data(const QString& name)
         /*
         * Add these data to the set
         */
-        one = mne_new_ctf_comp_data();
+        one = new MneCTFCompData;
         one->data = mat; mat = NULL;
         one->kind                = kind;
         one->mne_kind            = mne_unmap_ctf_comp_kind(one->kind);
         one->calibrated          = calibrated;
 
-        if (mne_calibrate_ctf_comp(one,set->chs,set->nch,TRUE) == FAIL) {
+        if (MneCTFCompData::mne_calibrate_ctf_comp(one,set->chs,set->nch,TRUE) == FAIL) {
             printf("Warning: Compensation data for '%s' omitted\n", mne_explain_ctf_comp(one->kind));//,err_get_error(),mne_explain_ctf_comp(one->kind));
-            mne_free_ctf_comp_data(one);
+            if(one)
+                delete one;
         }
         else {
-            set->comps               = REALLOC(set->comps,set->ncomp+1,mneCTFcompData);
-            set->comps[set->ncomp++] = one;
+//            set->comps               = REALLOC(set->comps,set->ncomp+1,mneCTFcompData);
+//            set->comps[set->ncomp++] = one;
+            set->comps.append(one);
+            set->ncomp++;
         }
     }
 #ifdef DEBUG
@@ -1663,7 +1552,7 @@ int mne_make_ctf_comp(mneCTFcompDataSet set,        /* The available compensatio
     int *comps = NULL;
     int need_comp;
     int first_comp;
-    mneCTFcompData this_comp;
+    MneCTFCompData* this_comp;
     int  *comp_sel = NULL;
     char **names   = NULL;
     char *name;
@@ -1681,7 +1570,8 @@ int mne_make_ctf_comp(mneCTFcompDataSet set,        /* The available compensatio
     if (nch == 0)
         return OK;
     if (set) {
-        mne_free_ctf_comp_data(set->current);
+        if(set->current)
+            delete set->current;
         set->current = NULL;
     }
     comps = MALLOC(nch,int);
@@ -1792,7 +1682,7 @@ int mne_make_ctf_comp(mneCTFcompDataSet set,        /* The available compensatio
         FREE_CMATRIX(sel);
         fprintf(stderr,"\tPostselector created.\n");
     }
-    set->current           = mne_new_ctf_comp_data();
+    set->current           = new MneCTFCompData();
     set->current->kind     = this_comp->kind;
     set->current->mne_kind = this_comp->mne_kind;
     set->current->data     = data;
@@ -1854,7 +1744,7 @@ int mne_apply_ctf_comp_t(mneCTFcompDataSet set,     /* The compensation data */
 * Apply compensation or revert to uncompensated data
 */
 {
-    mneCTFcompData this_comp;
+    MneCTFCompData* this_comp;
     float **presel,**comp;
     float **compdata = data;
     int   ncompdata  = ndata;
@@ -2054,8 +1944,12 @@ int mne_ctf_set_compensation(mneCTFcompDataSet set,            /* The compensati
         ncomp_chan = nchan;
     }
     if (set) {
-        mne_free_ctf_comp_data(set->undo); set->undo = NULL;
-        mne_free_ctf_comp_data(set->current); set->current = NULL;
+        if(set->undo)
+            delete set->undo;
+        set->undo = NULL;
+        if(set->current)
+            delete set->current;
+        set->current = NULL;
     }
     for (k = 0, have_comp_chs = 0; k < ncomp_chan; k++)
         if (comp_chs[k].kind == FIFFV_REF_MEG_CH)
@@ -2074,7 +1968,9 @@ int mne_ctf_set_compensation(mneCTFcompDataSet set,            /* The compensati
     */
     if (set->current && set->current->mne_kind == compensate_to) {
         fprintf(stderr,"No further compensation necessary (comp = %s)\n",mne_explain_ctf_comp(set->current->kind));
-        mne_free_ctf_comp_data(set->current); set->current = NULL;
+        if(set->current)
+            delete set->current;
+        set->current = NULL;
         return OK;
     }
     set->undo    = set->current;
@@ -3318,7 +3214,7 @@ static int compensate_buffer(mneRawData data, mneRawBufDef buf)
  * Apply compensation channels
  */
 {
-    mneCTFcompData temp;
+    MneCTFCompData* temp;
 
     if (!data->comp)
         return OK;
