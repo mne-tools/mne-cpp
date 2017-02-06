@@ -46,6 +46,7 @@
 
 #include <fiff/fiff_types.h>
 
+#include <time.h>
 
 #include <QFile>
 
@@ -77,6 +78,15 @@ using namespace INVERSELIB;
 
 #ifndef OK
 #define OK 0
+#endif
+
+
+
+#if defined(_WIN32) || defined(_WIN64)
+#define snprintf _snprintf
+#define vsnprintf _vsnprintf
+#define strcasecmp _stricmp
+#define strncasecmp _strnicmp
 #endif
 
 
