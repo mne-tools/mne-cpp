@@ -196,26 +196,6 @@ void mne_free_name_list_9(char **list, int nlist)
 }
 
 
-void mne_free_ctf_comp_data_9(mneCTFcompData comp)
-
-{
-    if (!comp)
-        return;
-
-    if(comp->data)
-        delete comp->data;
-    if(comp->presel)
-        delete comp->presel;
-    if(comp->postsel)
-        delete comp->postsel;
-    FREE_9(comp->presel_data);
-    FREE_9(comp->postsel_data);
-    FREE_9(comp->comp_data);
-    FREE_9(comp);
-    return;
-}
-
-
 void mne_free_ctf_comp_data_set_9(mneCTFcompDataSet set)
 
 {
@@ -225,10 +205,12 @@ void mne_free_ctf_comp_data_set_9(mneCTFcompDataSet set)
         return;
 
     for (k = 0; k < set->ncomp; k++)
-        mne_free_ctf_comp_data_9(set->comps[k]);
-    FREE_9(set->comps);
+        if(set->comps[k])
+            delete set->comps[k];
+    set->comps.clear();
     FREE_9(set->chs);
-    mne_free_ctf_comp_data_9(set->current);
+    if(set->current)
+        delete set->current;
     FREE_9(set);
     return;
 }
@@ -1595,28 +1577,11 @@ int mne_unmap_ctf_comp_kind_9(int ctf_comp)
 
 
 
-
-mneCTFcompData mne_new_ctf_comp_data_9()
-{
-    mneCTFcompData res = MALLOC_9(1,mneCTFcompDataRec);
-    res->kind          = MNE_CTFV_COMP_UNKNOWN;
-    res->mne_kind      = MNE_CTFV_COMP_UNKNOWN;
-    res->calibrated    = FALSE;
-    res->data          = NULL;
-    res->presel        = NULL;
-    res->postsel       = NULL;
-    res->presel_data   = NULL;
-    res->comp_data     = NULL;
-    res->postsel_data  = NULL;
-
-    return res;
-}
-
 mneCTFcompDataSet mne_new_ctf_comp_data_set_9()
 {
     mneCTFcompDataSet res = MALLOC_9(1,mneCTFcompDataSetRec);
 
-    res->comps   = NULL;
+//    res->comps   = NULL;
     res->ncomp   = 0;
     res->chs     = NULL;
     res->nch     = 0;
@@ -1837,73 +1802,6 @@ const char *mne_explain_ctf_comp_9(int kind)
 
 
 
-static int mne_calibrate_ctf_comp_9(mneCTFcompData one,
-                                  fiffChInfo     chs,
-                                  int            nch,
-                                  int            do_it)
-/*
-* Calibrate or decalibrate a compensation data set
-*/
-{
-    float *col_cals,*row_cals;
-    int   j,k,p,found;
-    char  *name;
-    float **data;
-
-    if (!one)
-        return OK;
-    if (one->calibrated)
-        return OK;
-
-    row_cals = MALLOC_9(one->data->nrow,float);
-    col_cals = MALLOC_9(one->data->ncol,float);
-
-    for (j = 0; j < one->data->nrow; j++) {
-        name = one->data->rowlist[j];
-        found = FALSE;
-        for (p = 0; p < nch; p++)
-            if (strcmp(name,chs[p].ch_name) == 0) {
-                row_cals[j] = chs[p].range*chs[p].cal;
-                found = TRUE;
-                break;
-            }
-        if (!found) {
-            printf("Channel %s not found. Cannot calibrate the compensation matrix.",name);
-            return FAIL;
-        }
-    }
-    for (k = 0; k < one->data->ncol; k++) {
-        name = one->data->collist[k];
-        found = FALSE;
-        for (p = 0; p < nch; p++)
-            if (strcmp(name,chs[p].ch_name) == 0) {
-                col_cals[k] = chs[p].range*chs[p].cal;
-                found = TRUE;
-                break;
-            }
-        if (!found) {
-            printf("Channel %s not found. Cannot calibrate the compensation matrix.",name);
-            return FAIL;
-        }
-    }
-    data = one->data->data;
-    if (do_it) {
-        for (j = 0; j < one->data->nrow; j++)
-            for (k = 0; k < one->data->ncol; k++)
-                data[j][k] = row_cals[j]*data[j][k]/col_cals[k];
-    }
-    else {
-        for (j = 0; j < one->data->nrow; j++)
-            for (k = 0; k < one->data->ncol; k++)
-                data[j][k] = col_cals[k]*data[j][k]/row_cals[j];
-    }
-    return OK;
-}
-
-
-
-
-
 
 mneCTFcompDataSet mne_read_ctf_comp_data_9(const QString& name)
 /*
@@ -1914,7 +1812,7 @@ mneCTFcompDataSet mne_read_ctf_comp_data_9(const QString& name)
     FiffStream::SPtr stream(new FiffStream(&file));
 
     mneCTFcompDataSet set = NULL;
-    mneCTFcompData    one;
+    MneCTFCompData*   one;
     QList<FiffDirNode::SPtr> nodes;
     QList<FiffDirNode::SPtr> comps;
     int               ncomp;
@@ -1984,19 +1882,22 @@ mneCTFcompDataSet mne_read_ctf_comp_data_9(const QString& name)
         /*
         * Add these data to the set
         */
-        one = mne_new_ctf_comp_data_9();
+        one = new MneCTFCompData;
         one->data = mat; mat = NULL;
         one->kind                = kind;
         one->mne_kind            = mne_unmap_ctf_comp_kind_9(one->kind);
         one->calibrated          = calibrated;
 
-        if (mne_calibrate_ctf_comp_9(one,set->chs,set->nch,TRUE) == FAIL) {
+        if (MneCTFCompData::mne_calibrate_ctf_comp(one,set->chs,set->nch,TRUE) == FAIL) {
             printf("Warning: Compensation data for '%s' omitted\n", mne_explain_ctf_comp_9(one->kind));//,err_get_error(),mne_explain_ctf_comp(one->kind));
-            mne_free_ctf_comp_data_9(one);
+            if(one)
+                delete one;
         }
         else {
-            set->comps               = REALLOC_9(set->comps,set->ncomp+1,mneCTFcompData);
-            set->comps[set->ncomp++] = one;
+//            set->comps               = REALLOC_9(set->comps,set->ncomp+1,mneCTFcompData);
+//            set->comps[set->ncomp++] = one;
+            set->comps.append(one);
+            set->ncomp++;
         }
     }
 #ifdef DEBUG

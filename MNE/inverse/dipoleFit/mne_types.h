@@ -119,6 +119,7 @@
 #include "mne_proj_item.h"
 #include "mne_proj_op.h"
 #include "mne_cov_matrix.h"
+#include "mne_ctf_comp_data.h"
 
 
 #if defined(__cplusplus) 
@@ -608,26 +609,25 @@ typedef struct {
  */
 #define MNE_4DV_COMP1           101
 
-typedef struct {
-  int             kind;		     /* The compensation kind (CTF) */
-  int             mne_kind;	     /* Our kind */
-  int             calibrated;	     /* Are the coefficients in the file calibrated already? */
-  INVERSELIB::MneNamedMatrix*  data;	             /* The compensation data */
-  INVERSELIB::FiffSparseMatrix* presel;            /* Apply this selector prior to compensation */
-  INVERSELIB::FiffSparseMatrix* postsel;	     /* Apply this selector after compensation */
-  float           *presel_data;	     /* These are used for the intermediate results in the calculations */
-  float           *comp_data;
-  float           *postsel_data;
-} *mneCTFcompData,mneCTFcompDataRec;
+//typedef struct {
+//  int             kind;		     /* The compensation kind (CTF) */
+//  int             mne_kind;	     /* Our kind */
+//  int             calibrated;	     /* Are the coefficients in the file calibrated already? */
+//  INVERSELIB::MneNamedMatrix*  data;	             /* The compensation data */
+//  INVERSELIB::FiffSparseMatrix* presel;            /* Apply this selector prior to compensation */
+//  INVERSELIB::FiffSparseMatrix* postsel;	     /* Apply this selector after compensation */
+//  float           *presel_data;	     /* These are used for the intermediate results in the calculations */
+//  float           *comp_data;
+//  float           *postsel_data;
+//} *mneCTFcompData,mneCTFcompDataRec;
 
 typedef struct {
-  mneCTFcompData *comps;	/* All available compensation data sets */
-  int            ncomp;		/* How many? */
-  FIFFLIB::fiffChInfo     chs;		/* Channel information */
-  int            nch;		/* How many of the above */
-  mneCTFcompData undo;		/* Compensation data to undo the current compensation before applying current */
-  mneCTFcompData current;	/* The current compensation data composed from the above 
-				 * taking into account channels presently available */
+    QList<INVERSELIB::MneCTFCompData*> comps;   /* All available compensation data sets */
+    int            ncomp;                       /* How many? */
+    FIFFLIB::fiffChInfo     chs;                /* Channel information */
+    int            nch;                         /* How many of the above */
+    INVERSELIB::MneCTFCompData* undo;           /* Compensation data to undo the current compensation before applying current */
+    INVERSELIB::MneCTFCompData* current;        /* The current compensation data composed from the above taking into account channels presently available */
 } *mneCTFcompDataSet,mneCTFcompDataSetRec;
 
 //typedef struct {		        /* One item in a derivation data set */
