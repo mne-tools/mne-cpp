@@ -139,6 +139,7 @@ public:
     static int mne_proj_op_affect_chs(MneProjOp* op, FIFFLIB::fiffChInfo chs, int nch);
 
 
+    static int mne_proj_op_proj_vector(MneProjOp* op, float *vec, int nvec, int do_complement);
 
 
 
@@ -149,7 +150,6 @@ public:
                                          const FIFFLIB::FiffDirNode::SPtr& start);
 
     static MneProjOp* mne_read_proj_op(const QString& name);
-
 
 
     static void mne_proj_op_report_data(FILE *out,const char *tag, MneProjOp* op, int list_data, char **exclude, int nexclude);

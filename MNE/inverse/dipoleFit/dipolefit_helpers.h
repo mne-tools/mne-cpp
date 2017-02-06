@@ -27,6 +27,9 @@
 #include <fiff/fiff_tag.h>
 #include <fiff/fiff_types.h>
 
+#include <fiff/fiff_dir_node.h>
+
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -230,10 +233,7 @@ using namespace FIFFLIB;
 /*
  * double matrices
  */
-#define ALLOC_DCMATRIX(x,y) mne_dmatrix((x),(y))
 #define ALLOC_COMPLEX_DCMATRIX(x,y) mne_complex_dmatrix((x),(y))
-#define FREE_DCMATRIX(m) mne_free_dcmatrix((m))
-#define FREE_COMPLEX_DCMATRIX(m) mne_free_dcmatrix((m))
 
 
 //============================= mne_allocs.c =============================
@@ -274,24 +274,6 @@ float **mne_cmatrix(int nr,int nc)
 
 
 
-double **mne_dmatrix(int nr, int nc)
-
-{
-    int i;
-    double **m;
-    double *whole;
-
-    m = MALLOC(nr,double *);
-    if (!m) matrix_error(1,nr,nc);
-    whole = MALLOC(nr*nc,double);
-    if (!whole) matrix_error(2,nr,nc);
-
-    for(i=0;i<nr;i++)
-        m[i] = whole + i*nc;
-    return m;
-}
-
-
 
 void mne_free_cmatrix (float **m)
 {
@@ -311,15 +293,6 @@ void mne_free_icmatrix (int **m)
     }
 }
 
-
-void mne_free_dcmatrix (double **m)
-
-{
-    if (m) {
-        FREE(*m);
-        FREE(m);
-    }
-}
 
 /*
  * float matrices
@@ -571,15 +544,6 @@ int mne_svd(float **mat,	/* The matrix */
     return 0;
     //  return info;
 }
-
-
-
-
-
-
-#include <fiff/fiff_dir_node.h>
-
-
 
 
 
@@ -861,92 +825,6 @@ char *mne_strdup(const char *s)
     strcpy(res,s);
     return res;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//============================= mne_coord_transforms.c =============================
-
-typedef struct {
-    int frame;
-    const char *name;
-} frameNameRec;
-
-
-const char *mne_coord_frame_name(int frame)
-
-{
-    static frameNameRec frames[] = {
-        {FIFFV_COORD_UNKNOWN,"unknown"},
-        {FIFFV_COORD_DEVICE,"MEG device"},
-        {FIFFV_COORD_ISOTRAK,"isotrak"},
-        {FIFFV_COORD_HPI,"hpi"},
-        {FIFFV_COORD_HEAD,"head"},
-        {FIFFV_COORD_MRI,"MRI (surface RAS)"},
-        {FIFFV_MNE_COORD_MRI_VOXEL, "MRI voxel"},
-        {FIFFV_COORD_MRI_SLICE,"MRI slice"},
-        {FIFFV_COORD_MRI_DISPLAY,"MRI display"},
-        {FIFFV_MNE_COORD_CTF_DEVICE,"CTF MEG device"},
-        {FIFFV_MNE_COORD_CTF_HEAD,"CTF/4D/KIT head"},
-        {FIFFV_MNE_COORD_RAS,"RAS (non-zero origin)"},
-        {FIFFV_MNE_COORD_MNI_TAL,"MNI Talairach"},
-        {FIFFV_MNE_COORD_FS_TAL_GTZ,"Talairach (MNI z > 0)"},
-        {FIFFV_MNE_COORD_FS_TAL_LTZ,"Talairach (MNI z < 0)"},
-        {-1,"unknown"}
-    };
-    int k;
-    for (k = 0; frames[k].frame != -1; k++) {
-        if (frame == frames[k].frame)
-            return frames[k].name;
-    }
-    return frames[k].name;
-}
-
-
-void mne_print_coord_transform_label(FILE *log,char *label, FiffCoordTransOld* t)
-
-{
-    int k,p;
-    int frame;
-    if (!label || strlen(label) == 0)
-        fprintf(log,"Coordinate transformation: ");
-    else
-        fprintf(log,"%s",label);
-    for (frame = t->from, k = 0; k < 2; k++) {
-        if (k == 0) {
-            fprintf(log,"%s -> ",mne_coord_frame_name(frame));
-            frame = t->to;
-        }
-        else {
-            fprintf(log,"%s\n",mne_coord_frame_name(frame));
-            for (p = 0; p < 3; p++)
-                fprintf(log,"\t% 8.6f % 8.6f % 8.6f\t% 7.2f mm\n",
-                        t->rot[p][X],t->rot[p][Y],t->rot[p][Z],1000*t->move[p]);
-            fprintf(log,"\t% 8.6f % 8.6f % 8.6f  % 7.2f\n",0.0,0.0,0.0,1.0);
-        }
-    }
-}
-
-void mne_print_coord_transform(FILE *log, FiffCoordTransOld* t)
-{
-    mne_print_coord_transform_label(log,NULL,t);
-}
-
-
-
-
-
-
 
 
 
@@ -1284,128 +1162,6 @@ void mne_channel_names_to_name_list(fiffChInfo chs, int nch,
     mne_string_to_name_list(s,listp,nlistp);
     FREE(s);
     return;
-}
-
-
-
-//============================= mne_lin_proj.c =============================
-
-/*
-* Handle the linear projection operators
-*/
-
-
-
-
-
-
-static char *add_string(char *old,char *add)
-
-{
-    char *news = NULL;
-    if (!old) {
-        if (add || strlen(add) > 0)
-            news = mne_strdup(add);
-    }
-    else {
-        old = REALLOC(old,strlen(old) + strlen(add) + 1,char);
-        strcat(old,add);
-        news = old;
-    }
-    return news;
-}
-
-
-
-int mne_proj_item_affect(MneProjItem* it, char **list, int nlist)
-/*
-* Does this projection item affect this list of channels?
-*/
-{
-    int k,p,q;
-
-    if (it == NULL || it->vecs == NULL || it->nvec == 0)
-        return FALSE;
-
-    for (k = 0; k < nlist; k++)
-        for (p = 0; p < it->vecs->ncol; p++)
-            if (strcmp(it->vecs->collist[p],list[k]) == 0) {
-                for (q = 0; q < it->vecs->nrow; q++) {
-                    if (it->vecs->data[q][p] != 0.0)
-                        return TRUE;
-                }
-            }
-    return FALSE;
-}
-
-
-int mne_proj_op_affect(MneProjOp* op, char **list, int nlist)
-
-{
-    int k;
-    int naff;
-
-    if (!op)
-        return 0;
-
-    for (k = 0, naff = 0; k < op->nitems; k++)
-        if (op->items[k]->active && mne_proj_item_affect(op->items[k],list,nlist))
-            naff += op->items[k]->nvec;
-
-    return naff;
-}
-
-
-
-
-
-
-
-
-
-int mne_proj_op_proj_vector(MneProjOp* op, float *vec, int nvec, int do_complement)
-/*
-* Apply projection operator to a vector (floats)
-* Assume that all dimension checking etc. has been done before
-*/
-{
-    static float *res = NULL;
-    int    res_size   = 0;
-    float *pvec;
-    float  w;
-    int k,p;
-
-    if (!op || op->nitems <= 0 || op->nvec <= 0)
-        return OK;
-
-    if (op->nch != nvec) {
-        printf("Data vector size does not match projection operator");
-        return FAIL;
-    }
-
-    if (op->nch > res_size) {
-        res = REALLOC(res,op->nch,float);
-        res_size = op->nch;
-    }
-
-    for (k = 0; k < op->nch; k++)
-        res[k] = 0.0;
-
-    for (p = 0; p < op->nvec; p++) {
-        pvec = op->proj_data[p];
-        w = mne_dot_vectors(pvec,vec,op->nch);
-        for (k = 0; k < op->nch; k++)
-            res[k] = res[k] + w*pvec[k];
-    }
-    if (do_complement) {
-        for (k = 0; k < op->nch; k++)
-            vec[k] = vec[k] - res[k];
-    }
-    else {
-        for (k = 0; k < op->nch; k++)
-            vec[k] = res[k];
-    }
-    return OK;
 }
 
 
@@ -2351,76 +2107,6 @@ bad : {
 
 //============================= mne_process_bads.c =============================
 
-static int whitespace(char *text)
-
-{
-    if (text == NULL || strlen(text) == 0)
-        return TRUE;
-    if (strspn(text," \t\n\r") == strlen(text))
-        return TRUE;
-    return FALSE;
-}
-
-
-static char *next_line(char *line, int n, FILE *in)
-{
-    char *res;
-
-    for (res = fgets(line,n,in); res != NULL; res = fgets(line,n,in))
-        if (!whitespace(res))
-            if (res[0] != '#')
-                break;
-    return res;
-}
-
-#define MAXLINE 500
-
-int mne_read_bad_channels(const QString& name, char ***listp, int *nlistp)
-/*
-* Read bad channel names
-*/
-{
-    FILE *in = NULL;
-    char **list = NULL;
-    int  nlist  = 0;
-    char line[MAXLINE+1];
-    char *next;
-
-
-    if (name.isEmpty())
-        return OK;
-
-    if ((in = fopen(name.toLatin1().data(),"r")) == NULL) {
-        qCritical() << name;
-        goto bad;
-    }
-    while ((next = next_line(line,MAXLINE,in)) != NULL) {
-        if (strlen(next) > 0) {
-            if (next[strlen(next)-1] == '\n')
-                next[strlen(next)-1] = '\0';
-            list = REALLOC(list,nlist+1,char *);
-            list[nlist++] = mne_strdup(next);
-        }
-    }
-    if (ferror(in))
-        goto bad;
-
-    *listp  = list;
-    *nlistp = nlist;
-
-    return OK;
-
-bad : {
-        mne_free_name_list(list,nlist);
-        if (in != NULL)
-            fclose(in);
-        return FAIL;
-    }
-}
-
-
-
-
 int mne_read_bad_channel_list_from_node(FiffStream::SPtr& stream,
                                         const FiffDirNode::SPtr& pNode, char ***listp, int *nlistp)
 {
@@ -2468,138 +2154,6 @@ int mne_read_bad_channel_list(const QString& name, char ***listp, int *nlistp)
 
     return res;
 }
-
-
-//============================= mne_cov_matrix.c =============================
-
-/*
-* Routines for handling the covariance matrices
-*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#define SMALL      1e-29
-#define MEG_SMALL  1e-29
-#define EEG_SMALL  1e-18
-
-typedef struct {
-    double lambda;
-    int    no;
-} *covSort,covSortRec;
-
-static int comp_cov(const void *v1, const void *v2)
-
-{
-    covSort s1 = (covSort)v1;
-    covSort s2 = (covSort)v2;
-    if (s1->lambda < s2->lambda)
-        return -1;
-    if (s1->lambda > s2->lambda)
-        return 1;
-    return 0;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-//============================= mne_source_space.c =============================
-
-void mne_free_patch(mnePatchInfo p)
-
-{
-    if (!p)
-        return;
-    FREE(p->memb_vert);
-    FREE(p);
-    return;
-}
-
-
-
-
-
-
-
-
-//============================= fwd_fit_berg_scherg.c =============================
-
-
-
-
-
-//============================= fwd_eeg_sphere_models.c =============================
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#define SEP ":\n\r"
-
-#ifndef R_OK
-#define R_OK    4       /* Test for read permission.  */
-#endif
-
-#ifndef W_OK
-#define W_OK    2       /* Test for write permission.  */
-#endif
-//#define   X_OK    1       /* execute permission - unsupported in windows*/
-#ifndef F_OK
-#define F_OK    0       /* Test for existence.  */
-#endif
-
-
-
-
-
-
-
-
-#define MAG_FACTOR 1e-7
-
-
-
-
-
-
-
-
-
-
-
 
 
 //============================= mne_ringbuffer.c =============================
@@ -3981,7 +3535,7 @@ int mne_raw_pick_data_proj(mneRawData     data,
     float        *pvalues;
     float        *deriv_pvalues = NULL;
 
-    if (!data->proj || (sel && !mne_proj_op_affect(data->proj,sel->chspick,sel->nchan) && !mne_proj_op_affect(data->proj,sel->chspick_nospace,sel->nchan)))
+    if (!data->proj || (sel && !MneProjOp::mne_proj_op_affect(data->proj,sel->chspick,sel->nchan) && !MneProjOp::mne_proj_op_affect(data->proj,sel->chspick_nospace,sel->nchan)))
         return mne_raw_pick_data(data,sel,firsts,ns,picked);
 
     if (firsts < data->first_samp) {
@@ -4037,7 +3591,7 @@ int mne_raw_pick_data_proj(mneRawData     data,
                 for (p = start; p < this_buf->ns && ns > 0; p++, ns--, s++) {
                     for (c = 0; c < data->info->nchan; c++)
                         pvalues[c] = values[c][p];
-                    if (mne_proj_op_proj_vector(data->proj,pvalues,data->info->nchan,TRUE) != OK)
+                    if (MneProjOp::mne_proj_op_proj_vector(data->proj,pvalues,data->info->nchan,TRUE) != OK)
                         qWarning()<<"Error";
                     if (sel) {
                         if (sel->nderiv > 0 && data->deriv_matched) {
@@ -4186,7 +3740,7 @@ int mne_raw_pick_data_filt(mneRawData     data,
             if (mne_apply_ctf_comp(data->comp,TRUE,dc,data->info->nchan,NULL,0) != OK)
                 goto bad;
         if (data->proj)
-            if (mne_proj_op_proj_vector(data->proj,dc,data->info->nchan,TRUE) != OK)
+            if (MneProjOp::mne_proj_op_proj_vector(data->proj,dc,data->info->nchan,TRUE) != OK)
                 goto bad;
     }
     filter_was = data->filter->filter_on;
