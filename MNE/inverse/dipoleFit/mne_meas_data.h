@@ -116,6 +116,28 @@ public:
     */
     void adjust_baselines(float bmin, float bmax);
 
+
+    //============================= mne_read_data.c =============================
+
+    static MneMeasData* mne_read_meas_data_add(const QString&       name,       /* Name of the measurement file */
+                                       int                  set,        /* Which data set */
+                                       mneInverseOperator   op,         /* For consistency checks */
+                                       MneNamedMatrix*       fwd,        /* Another option for consistency checks */
+                                       char                 **namesp,   /* Yet another option: explicit name list */
+                                       int                  nnamesp,
+                                       MneMeasData*          add_to);
+
+
+    static MneMeasData* mne_read_meas_data(const QString&       name,       /* Name of the measurement file */
+                                   int                  set,        /* Which data set */
+                                   mneInverseOperator   op,         /* For consistency checks */
+                                   MneNamedMatrix*       fwd,        /* Another option for consistency checks */
+                                   char                 **namesp,   /* Yet another option: explicit name list */
+                                   int                  nnamesp);
+
+
+
+
 public:
     char                    *filename;  /* The source file name */
     FIFFLIB::fiffId         meas_id;    /* The id from the measurement file */

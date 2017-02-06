@@ -152,6 +152,18 @@ public:
 
 
 
+    static void mne_proj_op_report_data(FILE *out,const char *tag, MneProjOp* op, int list_data, char **exclude, int nexclude);
+
+
+    static void mne_proj_op_report(FILE *out,const char *tag, MneProjOp* op);
+
+
+
+
+
+
+
+
 
 
 

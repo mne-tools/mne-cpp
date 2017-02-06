@@ -685,3 +685,70 @@ MneProjOp *MneProjOp::mne_read_proj_op(const QString &name)
 
     return res;
 }
+
+
+//*************************************************************************************************************
+
+void MneProjOp::mne_proj_op_report_data(FILE *out, const char *tag, MneProjOp *op, int list_data, char **exclude, int nexclude)
+/*
+    * Output info about the projection operator
+    */
+{
+    int j,k,p,q;
+    MneProjItem* it;
+    MneNamedMatrix* vecs;
+    int found;
+
+    if (out == NULL)
+        return;
+    if (op == NULL)
+        return;
+    if (op->nitems <= 0) {
+        fprintf(out,"Empty operator\n");
+        return;
+    }
+
+    for (k = 0; k < op->nitems; k++) {
+        it = op->items[k];
+        if (list_data && tag)
+            fprintf(out,"%s\n",tag);
+        if (tag)
+            fprintf(out,"%s",tag);
+        fprintf(out,"# %d : %s : %d vecs : %d chs %s %s\n",
+                k+1,it->desc,it->nvec,it->vecs->ncol,
+                it->has_meg ? "MEG" : "EEG",
+                it->active ? "active" : "idle");
+        if (list_data && tag)
+            fprintf(out,"%s\n",tag);
+        if (list_data) {
+            vecs = op->items[k]->vecs;
+
+            for (q = 0; q < vecs->ncol; q++) {
+                fprintf(out,"%-10s",vecs->collist[q]);
+                fprintf(out,q < vecs->ncol-1 ? " " : "\n");
+            }
+            for (p = 0; p < vecs->nrow; p++)
+                for (q = 0; q < vecs->ncol; q++) {
+                    for (j = 0, found  = 0; j < nexclude; j++) {
+                        if (strcmp(exclude[j],vecs->collist[q]) == 0) {
+                            found = 1;
+                            break;
+                        }
+                    }
+                    fprintf(out,"%10.5g ",found ? 0.0 : vecs->data[p][q]);
+                    fprintf(out,q < vecs->ncol-1 ? " " : "\n");
+                }
+            if (list_data && tag)
+                fprintf(out,"%s\n",tag);
+        }
+    }
+    return;
+}
+
+
+//*************************************************************************************************************
+
+void MneProjOp::mne_proj_op_report(FILE *out, const char *tag, MneProjOp *op)
+{
+    mne_proj_op_report_data(out,tag,op, FALSE, NULL, 0);
+}
