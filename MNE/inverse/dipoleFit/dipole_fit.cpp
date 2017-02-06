@@ -552,7 +552,7 @@ ECDSet DipoleFit::calculateFit() const
     }
     else {
         printf("\n---- Reading data...\n\n");
-        if ((data = mne_read_meas_data(settings->measname,settings->setno,NULL,NULL,
+        if ((data = MneMeasData::mne_read_meas_data(settings->measname,settings->setno,NULL,NULL,
                                        fit_data->ch_names,fit_data->nmeg+fit_data->neeg)) == NULL)
             goto out;
         if (settings->do_baseline)
