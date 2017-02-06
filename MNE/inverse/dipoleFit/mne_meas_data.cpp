@@ -217,7 +217,7 @@ void mne_free_ctf_comp_data_set_9(mneCTFcompDataSet set)
     for (k = 0; k < set->ncomp; k++)
         if(set->comps[k])
             delete set->comps[k];
-    set->comps.clear();
+//    set->comps.clear();
     FREE_9(set->chs);
     if(set->current)
         delete set->current;
