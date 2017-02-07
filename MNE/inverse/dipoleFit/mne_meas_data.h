@@ -150,7 +150,7 @@ public:
     float                   highpass;   /* Highpass filter setting */
     float                   lowpass;    /* Lowpass filter setting */
     INVERSELIB::MneProjOp*  proj;       /* Associated projection operator (useful if inverse operator is not included) */
-    mneCTFcompDataSet       comp;       /* The software gradient compensation data */
+    MneCTFCompDataSet*      comp;       /* The software gradient compensation data */
     mneInverseOperator      op;         /* Associated inverse operator */
     MneNamedMatrix*         fwd;        /* Forward operator for dipole fitting */
     mneRawData              raw;        /* This will be non-null if the data stems from a raw data file */
