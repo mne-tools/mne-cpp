@@ -142,7 +142,7 @@ public:
     //============================= dipole_fit_setup.c =============================
 
 
-    static int setup_forward_model(DipoleFitData* d, mneCTFcompDataSet comp_data, FwdCoilSet* comp_coils);
+    static int setup_forward_model(DipoleFitData* d, MneCTFCompDataSet* comp_data, FwdCoilSet* comp_coils);
 
 
 

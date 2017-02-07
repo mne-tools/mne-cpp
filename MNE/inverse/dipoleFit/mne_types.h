@@ -120,6 +120,7 @@
 #include "mne_proj_op.h"
 #include "mne_cov_matrix.h"
 #include "mne_ctf_comp_data.h"
+#include "mne_ctf_comp_data_set.h"
 
 
 #if defined(__cplusplus) 
@@ -621,14 +622,14 @@ typedef struct {
 //  float           *postsel_data;
 //} *mneCTFcompData,mneCTFcompDataRec;
 
-typedef struct {
-    QList<INVERSELIB::MneCTFCompData*> comps;   /* All available compensation data sets */
-    int            ncomp;                       /* How many? */
-    FIFFLIB::fiffChInfo     chs;                /* Channel information */
-    int            nch;                         /* How many of the above */
-    INVERSELIB::MneCTFCompData* undo;           /* Compensation data to undo the current compensation before applying current */
-    INVERSELIB::MneCTFCompData* current;        /* The current compensation data composed from the above taking into account channels presently available */
-} *mneCTFcompDataSet,mneCTFcompDataSetRec;
+//typedef struct {
+//    QList<INVERSELIB::MneCTFCompData*> comps;   /* All available compensation data sets */
+//    int            ncomp;                       /* How many? */
+//    FIFFLIB::fiffChInfo     chs;                /* Channel information */
+//    int            nch;                         /* How many of the above */
+//    INVERSELIB::MneCTFCompData* undo;           /* Compensation data to undo the current compensation before applying current */
+//    INVERSELIB::MneCTFCompData* current;        /* The current compensation data composed from the above taking into account channels presently available */
+//} *mneCTFcompDataSet,mneCTFcompDataSetRec;
 
 //typedef struct {		        /* One item in a derivation data set */
 //  char                 *filename;       /* Source file name */
@@ -668,7 +669,7 @@ typedef struct {			/* A comprehensive raw data structure */
   float            *first_sample_val;   /* Values at the first sample (for dc offset correction before filtering) */
   INVERSELIB::MneProjOp* proj;          /* Projection operator */
   INVERSELIB::MneSssData* sss;          /* SSS data found in this file */
-  mneCTFcompDataSet comp;               /* Compensation data */
+  INVERSELIB::MneCTFCompDataSet* comp;               /* Compensation data */
   int              comp_file;           /* Compensation status of these raw data in file */
   int              comp_now;            /* Compensation status of these raw data in file */
   mneFilterDef     filter;              /* Filter definition */

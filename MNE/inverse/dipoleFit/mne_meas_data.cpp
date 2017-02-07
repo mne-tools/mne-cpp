@@ -206,26 +206,6 @@ void mne_free_name_list_9(char **list, int nlist)
 }
 
 
-void mne_free_ctf_comp_data_set_9(mneCTFcompDataSet set)
-
-{
-    int k;
-
-    if (!set)
-        return;
-
-    for (k = 0; k < set->ncomp; k++)
-        if(set->comps[k])
-            delete set->comps[k];
-//    set->comps.clear();
-    FREE_9(set->chs);
-    if(set->current)
-        delete set->current;
-    FREE_9(set);
-    return;
-}
-
-
 typedef struct {
     int   size;		        /* Size of this buffer in floats */
     float *data;			/* The allocated buffer */
@@ -358,7 +338,8 @@ void mne_raw_free_data_9(mneRawData d)
     FREE_9(d->first_sample_val);
     FREE_9(d->bad);
     FREE_9(d->offsets);
-    mne_free_ctf_comp_data_set_9(d->comp);
+    if(d->comp)
+        delete d->comp;
     if(d->sss)
         delete d->sss;
 
@@ -1551,54 +1532,8 @@ char *mne_format_file_id (fiffId id)
 
 
 
-#define MNE_CTFV_COMP_UNKNOWN -1
-#define MNE_CTFV_COMP_NONE    0
-#define MNE_CTFV_COMP_G1BR    0x47314252
-#define MNE_CTFV_COMP_G2BR    0x47324252
-#define MNE_CTFV_COMP_G3BR    0x47334252
-#define MNE_CTFV_COMP_G2OI    0x47324f49
-#define MNE_CTFV_COMP_G3OI    0x47334f49
-
-static struct {
-    int grad_comp;
-    int ctf_comp;
-} compMap_9[] = { { MNE_CTFV_NOGRAD,       MNE_CTFV_COMP_NONE },
-{ MNE_CTFV_GRAD1,        MNE_CTFV_COMP_G1BR },
-{ MNE_CTFV_GRAD2,        MNE_CTFV_COMP_G2BR },
-{ MNE_CTFV_GRAD3,        MNE_CTFV_COMP_G3BR },
-{ MNE_4DV_COMP1,         MNE_4DV_COMP1 },             /* One-to-one mapping for 4D data */
-{ MNE_CTFV_COMP_UNKNOWN, MNE_CTFV_COMP_UNKNOWN }};
 
 
-
-
-int mne_unmap_ctf_comp_kind_9(int ctf_comp)
-
-{
-    int k;
-
-    for (k = 0; compMap_9[k].grad_comp >= 0; k++)
-        if (ctf_comp == compMap_9[k].ctf_comp)
-            return compMap_9[k].grad_comp;
-    return ctf_comp;
-}
-
-
-
-
-
-mneCTFcompDataSet mne_new_ctf_comp_data_set_9()
-{
-    mneCTFcompDataSet res = MALLOC_9(1,mneCTFcompDataSetRec);
-
-//    res->comps   = NULL;
-    res->ncomp   = 0;
-    res->chs     = NULL;
-    res->nch     = 0;
-    res->current = NULL;
-    res->undo    = NULL;
-    return res;
-}
 
 
 
@@ -1787,157 +1722,6 @@ bad : {
 
 
 
-
-
-const char *mne_explain_ctf_comp_9(int kind)
-{
-    static struct {
-        int kind;
-        const char *expl;
-    } explain[] = { { MNE_CTFV_COMP_NONE,    "uncompensated" },
-    { MNE_CTFV_COMP_G1BR,    "first order gradiometer" },
-    { MNE_CTFV_COMP_G2BR,    "second order gradiometer" },
-    { MNE_CTFV_COMP_G3BR,    "third order gradiometer" },
-    { MNE_4DV_COMP1,         "4D comp 1" },
-    { MNE_CTFV_COMP_UNKNOWN, "unknown" } };
-    int k;
-
-    for (k = 0; explain[k].kind != MNE_CTFV_COMP_UNKNOWN; k++)
-        if (explain[k].kind == kind)
-            return explain[k].expl;
-    return explain[k].expl;
-}
-
-
-
-
-
-
-mneCTFcompDataSet mne_read_ctf_comp_data_9(const QString& name)
-/*
-* Read all CTF compensation data from a given file
-*/
-{
-    QFile file(name);
-    FiffStream::SPtr stream(new FiffStream(&file));
-
-    mneCTFcompDataSet set = NULL;
-    MneCTFCompData*   one;
-    QList<FiffDirNode::SPtr> nodes;
-    QList<FiffDirNode::SPtr> comps;
-    int               ncomp;
-    MneNamedMatrix*    mat = NULL;
-    int               kind,k;
-    FiffTag::SPtr t_pTag;
-    fiffChInfo        chs = NULL;
-    int               nch = 0;
-    int               calibrated;
-    /*
-    * Read the channel information
-    */
-    {
-        fiffChInfo        comp_chs = NULL;
-        int               ncompch = 0;
-
-        if (mne_read_meg_comp_eeg_ch_info_9(name,&chs,&nch,&comp_chs,&ncompch,NULL,NULL,NULL,NULL) == FAIL)
-            goto bad;
-        if (ncompch > 0) {
-            chs = REALLOC_9(chs,nch+ncompch,fiffChInfoRec);
-            for (k = 0; k < ncompch; k++)
-                chs[k+nch] = comp_chs[k];
-            nch = nch + ncompch;
-            FREE_9(comp_chs);
-        }
-    }
-    /*
-    * Read the rest of the stuff
-    */
-    if(!stream->open())
-        goto bad;
-    set = mne_new_ctf_comp_data_set_9();
-    /*
-    * Locate the compensation data sets
-    */
-    nodes = stream->tree()->dir_tree_find(FIFFB_MNE_CTF_COMP);
-    if (nodes.size() == 0)
-        goto good;      /* Nothing more to do */
-    comps = nodes[0]->dir_tree_find(FIFFB_MNE_CTF_COMP_DATA);
-    if (comps.size() == 0)
-        goto good;
-    ncomp = comps.size();
-    /*
-    * Set the channel info
-    */
-    set->chs = chs; chs = NULL;
-    set->nch = nch;
-    /*
-    * Read each data set
-    */
-    for (k = 0; k < ncomp; k++) {
-        mat = MneNamedMatrix::read_named_matrix(stream,comps[k],FIFF_MNE_CTF_COMP_DATA);
-        if (!mat)
-            goto bad;
-        comps[k]->find_tag(stream, FIFF_MNE_CTF_COMP_KIND, t_pTag);
-        if (t_pTag) {
-            kind = *t_pTag->toInt();
-        }
-        else
-            goto bad;
-        comps[k]->find_tag(stream, FIFF_MNE_CTF_COMP_CALIBRATED, t_pTag);
-        if (t_pTag) {
-            calibrated = *t_pTag->toInt();
-        }
-        else
-            calibrated = FALSE;
-        /*
-        * Add these data to the set
-        */
-        one = new MneCTFCompData;
-        one->data = mat; mat = NULL;
-        one->kind                = kind;
-        one->mne_kind            = mne_unmap_ctf_comp_kind_9(one->kind);
-        one->calibrated          = calibrated;
-
-        if (MneCTFCompData::mne_calibrate_ctf_comp(one,set->chs,set->nch,TRUE) == FAIL) {
-            printf("Warning: Compensation data for '%s' omitted\n", mne_explain_ctf_comp_9(one->kind));//,err_get_error(),mne_explain_ctf_comp(one->kind));
-            if(one)
-                delete one;
-        }
-        else {
-//            set->comps               = REALLOC_9(set->comps,set->ncomp+1,mneCTFcompData);
-//            set->comps[set->ncomp++] = one;
-            set->comps.append(one);
-            set->ncomp++;
-        }
-    }
-#ifdef DEBUG
-    fprintf(stderr,"%d CTF compensation data sets read from %s\n",set->ncomp,name);
-#endif
-    goto good;
-
-bad : {
-        if(mat)
-            delete mat;
-        stream->close();
-        mne_free_ctf_comp_data_set_9(set);
-        return NULL;
-    }
-
-good : {
-        FREE_9(chs);
-        stream->close();
-        return set;
-    }
-}
-
-
-
-
-
-
-
-
-
 int mne_read_bad_channel_list_from_node_9(FiffStream::SPtr& stream,
                                         const FiffDirNode::SPtr& pNode, char ***listp, int *nlistp)
 {
@@ -2038,7 +1822,8 @@ MneMeasData::~MneMeasData()
         delete mri_head_t;
     if(proj)
         delete proj;
-    mne_free_ctf_comp_data_set_9(comp);
+    if(comp)
+        delete comp;
     FREE_9(bad);
     mne_free_name_list_9(badlist,nbad);
 
@@ -2295,7 +2080,7 @@ MneMeasData *MneMeasData::mne_read_meas_data_add(const QString &name, int set, m
                 fprintf(stderr,"\tLoaded projection from %s:\n",name.toLatin1().data());
                 MneProjOp::mne_proj_op_report(stderr,"\t\t",new_data->proj);
             }
-            new_data->comp = mne_read_ctf_comp_data_9(name);
+            new_data->comp = MneCTFCompDataSet::mne_read_ctf_comp_data(name);
             if (new_data->comp == NULL)
                 goto out;
             if (new_data->comp->ncomp > 0)

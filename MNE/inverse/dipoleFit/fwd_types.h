@@ -10,6 +10,8 @@
 
 #include "fwd_coil_set.h"
 
+#include "mne_ctf_comp_data_set.h"
+
 
 typedef void (*fwdUserFreeFunc)(void *);  /* General purpose */
 
@@ -63,7 +65,7 @@ typedef struct {
 } *fwdBemModel,fwdBemModelRec;	/* Holds the BEM model definition */
 
 typedef struct {
-  mneCTFcompDataSet set;	         /* The compensation data set */
+  INVERSELIB::MneCTFCompDataSet* set;	         /* The compensation data set */
   INVERSELIB::FwdCoilSet*        comp_coils;	         /* The compensation coil definitions */
   fwdFieldFunc      field;	         /* Computes the field of given direction dipole */
   fwdVecFieldFunc   vec_field;	         /* Computes the fields of all three dipole components  */
