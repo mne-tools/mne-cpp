@@ -1074,168 +1074,9 @@ void mne_channel_names_to_name_list(fiffChInfo chs, int nch,
 #define MNE_CTFV_COMP_G2OI    0x47324f49
 #define MNE_CTFV_COMP_G3OI    0x47334f49
 
-static struct {
-    int grad_comp;
-    int ctf_comp;
-} compMap[] = { { MNE_CTFV_NOGRAD,       MNE_CTFV_COMP_NONE },
-{ MNE_CTFV_GRAD1,        MNE_CTFV_COMP_G1BR },
-{ MNE_CTFV_GRAD2,        MNE_CTFV_COMP_G2BR },
-{ MNE_CTFV_GRAD3,        MNE_CTFV_COMP_G3BR },
-{ MNE_4DV_COMP1,         MNE_4DV_COMP1 },             /* One-to-one mapping for 4D data */
-{ MNE_CTFV_COMP_UNKNOWN, MNE_CTFV_COMP_UNKNOWN }};
-
-/*
- * Allocation and freeing of the data structures
- */
-
-
-int mne_apply_ctf_comp(MneCTFCompDataSet* set,		  /* The compensation data */
-                       int               do_it,
-                       float             *data,           /* The data to process */
-                       int               ndata,
-                       float             *compdata,       /* Data containing the compensation channels */
-                       int               ncompdata)
-/*
-* Apply compensation or revert to uncompensated data
-*/
-{
-    MneCTFCompData* this_comp;
-    float *presel,*comp;
-    int   k;
-
-    if (compdata == NULL) {
-        compdata  = data;
-        ncompdata = ndata;
-    }
-    if (!set || !set->current)
-        return OK;
-    this_comp = set->current;
-    /*
-   * Dimension checks
-   */
-    if (this_comp->presel) {
-        if (this_comp->presel->n != ncompdata) {
-            printf("Compensation data dimension mismatch. Expected %d, got %d channels.",
-                   this_comp->presel->n,ncompdata);
-            return FAIL;
-        }
-    }
-    else if (this_comp->data->ncol != ncompdata) {
-        printf("Compensation data dimension mismatch. Expected %d, got %d channels.",
-               this_comp->data->ncol,ncompdata);
-        return FAIL;
-    }
-    if (this_comp->postsel) {
-        if (this_comp->postsel->m != ndata) {
-            printf("Data dimension mismatch. Expected %d, got %d channels.",
-                   this_comp->postsel->m,ndata);
-            return FAIL;
-        }
-    }
-    else if (this_comp->data->nrow != ndata) {
-        printf("Data dimension mismatch. Expected %d, got %d channels.",
-               this_comp->data->nrow,ndata);
-        return FAIL;
-    }
-    /*
-    * Preselection is optional
-    */
-    if (this_comp->presel) {
-        if (!this_comp->presel_data)
-            this_comp->presel_data = MALLOC(this_comp->presel->m,float);
-        if (mne_sparse_vec_mult2(this_comp->presel,compdata,this_comp->presel_data) != OK)
-            return FAIL;
-        presel = this_comp->presel_data;
-    }
-    else
-        presel = compdata;
-    /*
-    * This always happens
-    */
-    if (!this_comp->comp_data)
-        this_comp->comp_data = MALLOC(this_comp->data->nrow,float);
-    mne_mat_vec_mult2(this_comp->data->data,presel,this_comp->comp_data,this_comp->data->nrow,this_comp->data->ncol);
-    /*
-    * Optional postselection
-    */
-    if (!this_comp->postsel)
-        comp = this_comp->comp_data;
-    else {
-        if (!this_comp->postsel_data) {
-            this_comp->postsel_data = MALLOC(this_comp->postsel->m,float);
-        }
-        if (mne_sparse_vec_mult2(this_comp->postsel,this_comp->comp_data,this_comp->postsel_data) != OK)
-            return FAIL;
-        comp = this_comp->postsel_data;
-    }
-    /*
-    * Compensate or revert compensation?
-    */
-    if (do_it) {
-        for (k = 0; k < ndata; k++)
-            data[k] = data[k] - comp[k];
-    }
-    else {
-        for (k = 0; k < ndata; k++)
-            data[k] = data[k] + comp[k];
-    }
-    return OK;
-}
 
 
 
-
-int mne_unmap_ctf_comp_kind(int ctf_comp)
-
-{
-    int k;
-
-    for (k = 0; compMap[k].grad_comp >= 0; k++)
-        if (ctf_comp == compMap[k].ctf_comp)
-            return compMap[k].grad_comp;
-    return ctf_comp;
-}
-
-
-
-/*
- * Mapping from simple integer orders to the mysterious CTF compensation numbers
- */
-int mne_map_ctf_comp_kind(int grad)
-/*
- * Simple mapping
- */
-{
-    int k;
-
-    for (k = 0; compMap[k].grad_comp >= 0; k++)
-        if (grad == compMap[k].grad_comp)
-            return compMap[k].ctf_comp;
-    return grad;
-}
-
-
-int mne_get_ctf_comp(fiffChInfo chs,int nch)
-{
-    int res = MNE_CTFV_NOGRAD;
-    int first_comp,comp;
-    int k;
-
-    for (k = 0, first_comp = -1; k < nch; k++) {
-        if (chs[k].kind == FIFFV_MEG_CH) {
-            comp = chs[k].chpos.coil_type >> 16;
-            if (first_comp < 0)
-                first_comp = comp;
-            else if (first_comp != comp) {
-                printf("Non uniform compensation not supported.");
-                return FAIL;
-            }
-        }
-    }
-    if (first_comp >= 0)
-        res = first_comp;
-    return res;
-}
 
 
 
@@ -2305,7 +2146,8 @@ void mne_raw_free_data(mneRawData d)
     FREE(d->first_sample_val);
     FREE(d->bad);
     FREE(d->offsets);
-    mne_free_ctf_comp_data_set(d->comp);
+    if(d->comp)
+        delete d->comp;
     if(d->sss)
         delete d->sss;
 
@@ -2477,7 +2319,7 @@ static int compensate_buffer(mneRawData data, mneRawBufDef buf)
         /*
      * Undo the previous compensation
      */
-        if (mne_apply_ctf_comp_t(data->comp,FALSE,buf->vals,data->info->nchan,buf->ns) != OK) {
+        if (MneCTFCompDataSet::mne_apply_ctf_comp_t(data->comp,FALSE,buf->vals,data->info->nchan,buf->ns) != OK) {
             temp                = data->comp->undo;
             data->comp->undo    = data->comp->current;
             data->comp->current = temp;
@@ -2491,7 +2333,7 @@ static int compensate_buffer(mneRawData data, mneRawBufDef buf)
         /*
      * Apply new compensation
      */
-        if (mne_apply_ctf_comp_t(data->comp,TRUE,buf->vals,data->info->nchan,buf->ns) != OK)
+        if (MneCTFCompDataSet::mne_apply_ctf_comp_t(data->comp,TRUE,buf->vals,data->info->nchan,buf->ns) != OK)
             goto bad;
     }
     buf->comp_status = data->comp_now;
@@ -2876,7 +2718,7 @@ int mne_raw_pick_data_filt(mneRawData     data,
      * Is this correct??
      */
         if (data->comp && data->comp->current)
-            if (mne_apply_ctf_comp(data->comp,TRUE,dc,data->info->nchan,NULL,0) != OK)
+            if (MneCTFCompDataSet::mne_apply_ctf_comp(data->comp,TRUE,dc,data->info->nchan,NULL,0) != OK)
                 goto bad;
         if (data->proj)
             if (MneProjOp::mne_proj_op_proj_vector(data->proj,dc,data->info->nchan,TRUE) != OK)
@@ -3113,7 +2955,7 @@ mneRawData mne_raw_open_file_comp(char *name, int omit_skip, int allow_maxshield
     /*
    * Compensation data
    */
-    data->comp = mne_read_ctf_comp_data(data->filename);
+    data->comp = MneCTFCompDataSet::mne_read_ctf_comp_data(data->filename);
     if (data->comp) {
         if (data->comp->ncomp > 0)
             fprintf(stderr,"Read %d compensation data sets from %s\n",data->comp->ncomp,data->filename);
@@ -3122,15 +2964,15 @@ mneRawData mne_raw_open_file_comp(char *name, int omit_skip, int allow_maxshield
     }
     else
         qWarning() << "err_print_error()";
-    if ((data->comp_file = mne_get_ctf_comp(data->info->chInfo,data->info->nchan)) == FAIL)
+    if ((data->comp_file = MneCTFCompDataSet::mne_get_ctf_comp(data->info->chInfo,data->info->nchan)) == FAIL)
         goto bad;
-    fprintf(stderr,"Compensation in file : %s\n",mne_explain_ctf_comp(mne_map_ctf_comp_kind(data->comp_file)));
+    fprintf(stderr,"Compensation in file : %s\n",MneCTFCompDataSet::mne_explain_ctf_comp(MneCTFCompDataSet::mne_map_ctf_comp_kind(data->comp_file)));
     if (comp_set < 0)
         data->comp_now = data->comp_file;
     else
         data->comp_now = comp_set;
 
-    if (mne_ctf_set_compensation(data->comp,data->comp_now,data->info->chInfo,data->info->nchan,NULL,0) == FAIL)
+    if (MneCTFCompDataSet::mne_ctf_set_compensation(data->comp,data->comp_now,data->info->chInfo,data->info->nchan,NULL,0) == FAIL)
         goto bad;
     /*
    * SSS data

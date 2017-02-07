@@ -382,45 +382,11 @@ int mne_unmap_ctf_comp_kind(int ctf_comp)
 }
 
 
-/*
- * Mapping from simple integer orders to the mysterious CTF compensation numbers
- */
-int mne_map_ctf_comp_kind(int grad)
-/*
- * Simple mapping
- */
-{
-    int k;
-
-    for (k = 0; compMap[k].grad_comp >= 0; k++)
-        if (grad == compMap[k].grad_comp)
-            return compMap[k].ctf_comp;
-    return grad;
-}
 
 
 
 
 
-
-const char *mne_explain_ctf_comp(int kind)
-{
-    static struct {
-        int kind;
-        const char *expl;
-    } explain[] = { { MNE_CTFV_COMP_NONE,    "uncompensated" },
-    { MNE_CTFV_COMP_G1BR,    "first order gradiometer" },
-    { MNE_CTFV_COMP_G2BR,    "second order gradiometer" },
-    { MNE_CTFV_COMP_G3BR,    "third order gradiometer" },
-    { MNE_4DV_COMP1,         "4D comp 1" },
-    { MNE_CTFV_COMP_UNKNOWN, "unknown" } };
-    int k;
-
-    for (k = 0; explain[k].kind != MNE_CTFV_COMP_UNKNOWN; k++)
-        if (explain[k].kind == kind)
-            return explain[k].expl;
-    return explain[k].expl;
-}
 
 
 
@@ -530,6 +496,152 @@ INVERSELIB::FiffSparseMatrix* mne_convert_to_sparse(float **dense,        /* The
 
 
 
+
+
+int  mne_sparse_mat_mult2_32(INVERSELIB::FiffSparseMatrix* mat,     /* The sparse matrix */
+                          float           **mult,  /* Matrix to be multiplied */
+                          int             ncol,	   /* How many columns in the above */
+                          float           **res)   /* Result of the multiplication */
+/*
+      * Multiply a dense matrix by a sparse matrix.
+      */
+{
+    int i,j,k;
+    float val;
+
+    if (mat->coding == FIFFTS_MC_RCS) {
+        for (i = 0; i < mat->m; i++) {
+            for (k = 0; k < ncol; k++) {
+                val = 0.0;
+                for (j = mat->ptrs[i]; j < mat->ptrs[i+1]; j++)
+                    val += mat->data[j]*mult[mat->inds[j]][k];
+                res[i][k] = val;
+            }
+        }
+    }
+    else if (mat->coding == FIFFTS_MC_CCS) {
+        for (k = 0; k < ncol; k++) {
+            for (i = 0; i < mat->m; i++)
+                res[i][k] = 0.0;
+            for (i = 0; i < mat->n; i++)
+                for (j = mat->ptrs[i]; j < mat->ptrs[i+1]; j++)
+                    res[mat->inds[j]][k] += mat->data[j]*mult[i][k];
+        }
+    }
+    else {
+        printf("mne_sparse_mat_mult2: unknown sparse matrix storage type: %d",mat->coding);
+        return -1;
+    }
+    return 0;
+}
+
+
+
+
+
+
+float **mne_mat_mat_mult_32 (float **m1,float **m2,int d1,int d2,int d3)
+/* Matrix multiplication
+      * result(d1 x d3) = m1(d1 x d2) * m2(d2 x d3) */
+
+{
+#ifdef BLAS
+    float **result = ALLOC_CMATRIX_3(d1,d3);
+    char  *transa = "N";
+    char  *transb = "N";
+    float zero = 0.0;
+    float one  = 1.0;
+    sgemm (transa,transb,&d3,&d1,&d2,
+           &one,m2[0],&d3,m1[0],&d2,&zero,result[0],&d3);
+    return (result);
+#else
+    float **result = ALLOC_CMATRIX_32(d1,d3);
+    int j,k,p;
+    float sum;
+
+    for (j = 0; j < d1; j++)
+        for (k = 0; k < d3; k++) {
+            sum = 0.0;
+            for (p = 0; p < d2; p++)
+                sum = sum + m1[j][p]*m2[p][k];
+            result[j][k] = sum;
+        }
+    return (result);
+#endif
+}
+
+
+
+
+
+int  mne_sparse_vec_mult2_32(INVERSELIB::FiffSparseMatrix* mat,     /* The sparse matrix */
+                          float           *vector, /* Vector to be multiplied */
+                          float           *res)    /* Result of the multiplication */
+/*
+      * Multiply a vector by a sparse matrix.
+      */
+{
+    int i,j;
+
+    if (mat->coding == FIFFTS_MC_RCS) {
+        for (i = 0; i < mat->m; i++) {
+            res[i] = 0.0;
+            for (j = mat->ptrs[i]; j < mat->ptrs[i+1]; j++)
+                res[i] += mat->data[j]*vector[mat->inds[j]];
+        }
+        return 0;
+    }
+    else if (mat->coding == FIFFTS_MC_CCS) {
+        for (i = 0; i < mat->m; i++)
+            res[i] = 0.0;
+        for (i = 0; i < mat->n; i++)
+            for (j = mat->ptrs[i]; j < mat->ptrs[i+1]; j++)
+                res[mat->inds[j]] += mat->data[j]*vector[i];
+        return 0;
+    }
+    else {
+        printf("mne_sparse_vec_mult2: unknown sparse matrix storage type: %d",mat->coding);
+        return -1;
+    }
+}
+
+
+
+float mne_dot_vectors_32 (float *v1,
+                       float *v2,
+                       int   nn)
+
+{
+#ifdef BLAS
+    int one = 1;
+    float res = sdot(&nn,v1,&one,v2,&one);
+    return res;
+#else
+    float res = 0.0;
+    int   k;
+
+    for (k = 0; k < nn; k++)
+        res = res + v1[k]*v2[k];
+    return res;
+#endif
+}
+
+
+
+
+void mne_mat_vec_mult2_32 (float **m,float *v,float *result, int d1,int d2)
+/*
+      * Matrix multiplication
+      * result(d1) = m(d1 x d2) * v(d2)
+      */
+
+{
+    int j;
+
+    for (j = 0; j < d1; j++)
+        result[j] = mne_dot_vectors_32 (m[j],v,d2);
+    return;
+}
 
 
 
@@ -899,6 +1011,97 @@ int MneCTFCompDataSet::mne_set_ctf_comp(fiffChInfo chs, int nch, int comp)
 
 //*************************************************************************************************************
 
+int MneCTFCompDataSet::mne_apply_ctf_comp(MneCTFCompDataSet *set, int do_it, float *data, int ndata, float *compdata, int ncompdata)
+/*
+    * Apply compensation or revert to uncompensated data
+    */
+{
+    MneCTFCompData* this_comp;
+    float *presel,*comp;
+    int   k;
+
+    if (compdata == NULL) {
+        compdata  = data;
+        ncompdata = ndata;
+    }
+    if (!set || !set->current)
+        return OK;
+    this_comp = set->current;
+    /*
+       * Dimension checks
+       */
+    if (this_comp->presel) {
+        if (this_comp->presel->n != ncompdata) {
+            printf("Compensation data dimension mismatch. Expected %d, got %d channels.",
+                   this_comp->presel->n,ncompdata);
+            return FAIL;
+        }
+    }
+    else if (this_comp->data->ncol != ncompdata) {
+        printf("Compensation data dimension mismatch. Expected %d, got %d channels.",
+               this_comp->data->ncol,ncompdata);
+        return FAIL;
+    }
+    if (this_comp->postsel) {
+        if (this_comp->postsel->m != ndata) {
+            printf("Data dimension mismatch. Expected %d, got %d channels.",
+                   this_comp->postsel->m,ndata);
+            return FAIL;
+        }
+    }
+    else if (this_comp->data->nrow != ndata) {
+        printf("Data dimension mismatch. Expected %d, got %d channels.",
+               this_comp->data->nrow,ndata);
+        return FAIL;
+    }
+    /*
+        * Preselection is optional
+        */
+    if (this_comp->presel) {
+        if (!this_comp->presel_data)
+            this_comp->presel_data = MALLOC_32(this_comp->presel->m,float);
+        if (mne_sparse_vec_mult2_32(this_comp->presel,compdata,this_comp->presel_data) != OK)
+            return FAIL;
+        presel = this_comp->presel_data;
+    }
+    else
+        presel = compdata;
+    /*
+        * This always happens
+        */
+    if (!this_comp->comp_data)
+        this_comp->comp_data = MALLOC_32(this_comp->data->nrow,float);
+    mne_mat_vec_mult2_32(this_comp->data->data,presel,this_comp->comp_data,this_comp->data->nrow,this_comp->data->ncol);
+    /*
+        * Optional postselection
+        */
+    if (!this_comp->postsel)
+        comp = this_comp->comp_data;
+    else {
+        if (!this_comp->postsel_data) {
+            this_comp->postsel_data = MALLOC_32(this_comp->postsel->m,float);
+        }
+        if (mne_sparse_vec_mult2_32(this_comp->postsel,this_comp->comp_data,this_comp->postsel_data) != OK)
+            return FAIL;
+        comp = this_comp->postsel_data;
+    }
+    /*
+        * Compensate or revert compensation?
+        */
+    if (do_it) {
+        for (k = 0; k < ndata; k++)
+            data[k] = data[k] - comp[k];
+    }
+    else {
+        for (k = 0; k < ndata; k++)
+            data[k] = data[k] + comp[k];
+    }
+    return OK;
+}
+
+
+//*************************************************************************************************************
+
 int MneCTFCompDataSet::mne_apply_ctf_comp_t(MneCTFCompDataSet *set, int do_it, float **data, int ndata, int ns)      /* Number of samples */
 /*
     * Apply compensation or revert to uncompensated data
@@ -945,7 +1148,7 @@ int MneCTFCompDataSet::mne_apply_ctf_comp_t(MneCTFCompDataSet *set, int do_it, f
         */
     if (this_comp->presel) {
         presel = ALLOC_CMATRIX_32(this_comp->presel->m,ns);
-        if (mne_sparse_mat_mult2(this_comp->presel,compdata,ns,presel) != OK) {
+        if (mne_sparse_mat_mult2_32(this_comp->presel,compdata,ns,presel) != OK) {
             FREE_CMATRIX_32(presel);
             return FAIL;
         }
@@ -955,7 +1158,7 @@ int MneCTFCompDataSet::mne_apply_ctf_comp_t(MneCTFCompDataSet *set, int do_it, f
     /*
         * This always happens
         */
-    comp = mne_mat_mat_mult(this_comp->data->data,presel,this_comp->data->nrow,this_comp->data->ncol,ns);
+    comp = mne_mat_mat_mult_32(this_comp->data->data,presel,this_comp->data->nrow,this_comp->data->ncol,ns);
     if (this_comp->presel)
         FREE_CMATRIX_32(presel);
     /*
@@ -963,7 +1166,7 @@ int MneCTFCompDataSet::mne_apply_ctf_comp_t(MneCTFCompDataSet *set, int do_it, f
         */
     if (this_comp->postsel) {
         float **postsel = ALLOC_CMATRIX_32(this_comp->postsel->m,ns);
-        if (mne_sparse_mat_mult2(this_comp->postsel,comp,ns,postsel) != OK) {
+        if (mne_sparse_mat_mult2_32(this_comp->postsel,comp,ns,postsel) != OK) {
             FREE_CMATRIX_32(postsel);
             return FAIL;
         }
@@ -985,6 +1188,69 @@ int MneCTFCompDataSet::mne_apply_ctf_comp_t(MneCTFCompDataSet *set, int do_it, f
     }
     FREE_CMATRIX_32(comp);
     return OK;
+}
+
+
+//*************************************************************************************************************
+
+int MneCTFCompDataSet::mne_get_ctf_comp(fiffChInfo chs, int nch)
+{
+    int res = MNE_CTFV_NOGRAD;
+    int first_comp,comp;
+    int k;
+
+    for (k = 0, first_comp = -1; k < nch; k++) {
+        if (chs[k].kind == FIFFV_MEG_CH) {
+            comp = chs[k].chpos.coil_type >> 16;
+            if (first_comp < 0)
+                first_comp = comp;
+            else if (first_comp != comp) {
+                printf("Non uniform compensation not supported.");
+                return FAIL;
+            }
+        }
+    }
+    if (first_comp >= 0)
+        res = first_comp;
+    return res;
+}
+
+
+//*************************************************************************************************************
+
+int MneCTFCompDataSet::mne_map_ctf_comp_kind(int grad)
+/*
+     * Simple mapping
+     */
+{
+    int k;
+
+    for (k = 0; compMap[k].grad_comp >= 0; k++)
+        if (grad == compMap[k].grad_comp)
+            return compMap[k].ctf_comp;
+    return grad;
+}
+
+
+//*************************************************************************************************************
+
+const char *MneCTFCompDataSet::mne_explain_ctf_comp(int kind)
+{
+    static struct {
+        int kind;
+        const char *expl;
+    } explain[] = { { MNE_CTFV_COMP_NONE,    "uncompensated" },
+    { MNE_CTFV_COMP_G1BR,    "first order gradiometer" },
+    { MNE_CTFV_COMP_G2BR,    "second order gradiometer" },
+    { MNE_CTFV_COMP_G3BR,    "third order gradiometer" },
+    { MNE_4DV_COMP1,         "4D comp 1" },
+    { MNE_CTFV_COMP_UNKNOWN, "unknown" } };
+    int k;
+
+    for (k = 0; explain[k].kind != MNE_CTFV_COMP_UNKNOWN; k++)
+        if (explain[k].kind == kind)
+            return explain[k].expl;
+    return explain[k].expl;
 }
 
 
