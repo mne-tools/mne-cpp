@@ -594,38 +594,6 @@ INVERSELIB::FiffSparseMatrix* mne_convert_to_sparse_3(float **dense,        /* T
 
 
 
-int  mne_sparse_vec_mult2_3(INVERSELIB::FiffSparseMatrix* mat,     /* The sparse matrix */
-                          float           *vector, /* Vector to be multiplied */
-                          float           *res)    /* Result of the multiplication */
-/*
-      * Multiply a vector by a sparse matrix.
-      */
-{
-    int i,j;
-
-    if (mat->coding == FIFFTS_MC_RCS) {
-        for (i = 0; i < mat->m; i++) {
-            res[i] = 0.0;
-            for (j = mat->ptrs[i]; j < mat->ptrs[i+1]; j++)
-                res[i] += mat->data[j]*vector[mat->inds[j]];
-        }
-        return 0;
-    }
-    else if (mat->coding == FIFFTS_MC_CCS) {
-        for (i = 0; i < mat->m; i++)
-            res[i] = 0.0;
-        for (i = 0; i < mat->n; i++)
-            for (j = mat->ptrs[i]; j < mat->ptrs[i+1]; j++)
-                res[mat->inds[j]] += mat->data[j]*vector[i];
-        return 0;
-    }
-    else {
-        printf("mne_sparse_vec_mult2: unknown sparse matrix storage type: %d",mat->coding);
-        return -1;
-    }
-}
-
-
 
 
 
@@ -5512,264 +5480,6 @@ bad : {
 
 
 
-//============================= mne_ctf_comp.c =============================
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-int mne_apply_ctf_comp_3(mneCTFcompDataSet set,		  /* The compensation data */
-                       int               do_it,
-                       float             *data,           /* The data to process */
-                       int               ndata,
-                       float             *compdata,       /* Data containing the compensation channels */
-                       int               ncompdata)
-/*
-* Apply compensation or revert to uncompensated data
-*/
-{
-    MneCTFCompData* this_comp;
-    float *presel,*comp;
-    int   k;
-
-    if (compdata == NULL) {
-        compdata  = data;
-        ncompdata = ndata;
-    }
-    if (!set || !set->current)
-        return OK;
-    this_comp = set->current;
-    /*
-   * Dimension checks
-   */
-    if (this_comp->presel) {
-        if (this_comp->presel->n != ncompdata) {
-            printf("Compensation data dimension mismatch. Expected %d, got %d channels.",
-                   this_comp->presel->n,ncompdata);
-            return FAIL;
-        }
-    }
-    else if (this_comp->data->ncol != ncompdata) {
-        printf("Compensation data dimension mismatch. Expected %d, got %d channels.",
-               this_comp->data->ncol,ncompdata);
-        return FAIL;
-    }
-    if (this_comp->postsel) {
-        if (this_comp->postsel->m != ndata) {
-            printf("Data dimension mismatch. Expected %d, got %d channels.",
-                   this_comp->postsel->m,ndata);
-            return FAIL;
-        }
-    }
-    else if (this_comp->data->nrow != ndata) {
-        printf("Data dimension mismatch. Expected %d, got %d channels.",
-               this_comp->data->nrow,ndata);
-        return FAIL;
-    }
-    /*
-    * Preselection is optional
-    */
-    if (this_comp->presel) {
-        if (!this_comp->presel_data)
-            this_comp->presel_data = MALLOC_3(this_comp->presel->m,float);
-        if (mne_sparse_vec_mult2_3(this_comp->presel,compdata,this_comp->presel_data) != OK)
-            return FAIL;
-        presel = this_comp->presel_data;
-    }
-    else
-        presel = compdata;
-    /*
-    * This always happens
-    */
-    if (!this_comp->comp_data)
-        this_comp->comp_data = MALLOC_3(this_comp->data->nrow,float);
-    mne_mat_vec_mult2_3(this_comp->data->data,presel,this_comp->comp_data,this_comp->data->nrow,this_comp->data->ncol);
-    /*
-    * Optional postselection
-    */
-    if (!this_comp->postsel)
-        comp = this_comp->comp_data;
-    else {
-        if (!this_comp->postsel_data) {
-            this_comp->postsel_data = MALLOC_3(this_comp->postsel->m,float);
-        }
-        if (mne_sparse_vec_mult2_3(this_comp->postsel,this_comp->comp_data,this_comp->postsel_data) != OK)
-            return FAIL;
-        comp = this_comp->postsel_data;
-    }
-    /*
-    * Compensate or revert compensation?
-    */
-    if (do_it) {
-        for (k = 0; k < ndata; k++)
-            data[k] = data[k] - comp[k];
-    }
-    else {
-        for (k = 0; k < ndata; k++)
-            data[k] = data[k] + comp[k];
-    }
-    return OK;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-mneCTFcompDataSet mne_read_ctf_comp_data_3(const QString& name)
-/*
-* Read all CTF compensation data from a given file
-*/
-{
-    QFile file(name);
-    FiffStream::SPtr stream(new FiffStream(&file));
-
-    mneCTFcompDataSet set = NULL;
-    MneCTFCompData*   one;
-    QList<FiffDirNode::SPtr> nodes;
-    QList<FiffDirNode::SPtr> comps;
-    int               ncomp;
-    MneNamedMatrix*    mat = NULL;
-    int               kind,k;
-    FiffTag::SPtr t_pTag;
-    fiffChInfo        chs = NULL;
-    int               nch = 0;
-    int               calibrated;
-    /*
-    * Read the channel information
-    */
-    {
-        fiffChInfo        comp_chs = NULL;
-        int               ncompch = 0;
-
-        if (mne_read_meg_comp_eeg_ch_info_3(name,&chs,&nch,&comp_chs,&ncompch,NULL,NULL,NULL,NULL) == FAIL)
-            goto bad;
-        if (ncompch > 0) {
-            chs = REALLOC_3(chs,nch+ncompch,fiffChInfoRec);
-            for (k = 0; k < ncompch; k++)
-                chs[k+nch] = comp_chs[k];
-            nch = nch + ncompch;
-            FREE_3(comp_chs);
-        }
-    }
-    /*
-    * Read the rest of the stuff
-    */
-    if(!stream->open())
-        goto bad;
-    set = mne_new_ctf_comp_data_set_3();
-    /*
-    * Locate the compensation data sets
-    */
-    nodes = stream->tree()->dir_tree_find(FIFFB_MNE_CTF_COMP);
-    if (nodes.size() == 0)
-        goto good;      /* Nothing more to do */
-    comps = nodes[0]->dir_tree_find(FIFFB_MNE_CTF_COMP_DATA);
-    if (comps.size() == 0)
-        goto good;
-    ncomp = comps.size();
-    /*
-    * Set the channel info
-    */
-    set->chs = chs; chs = NULL;
-    set->nch = nch;
-    /*
-    * Read each data set
-    */
-    for (k = 0; k < ncomp; k++) {
-        mat = MneNamedMatrix::read_named_matrix(stream,comps[k],FIFF_MNE_CTF_COMP_DATA);
-        if (!mat)
-            goto bad;
-        comps[k]->find_tag(stream, FIFF_MNE_CTF_COMP_KIND, t_pTag);
-        if (t_pTag) {
-            kind = *t_pTag->toInt();
-        }
-        else
-            goto bad;
-        comps[k]->find_tag(stream, FIFF_MNE_CTF_COMP_CALIBRATED, t_pTag);
-        if (t_pTag) {
-            calibrated = *t_pTag->toInt();
-        }
-        else
-            calibrated = FALSE;
-        /*
-        * Add these data to the set
-        */
-        one = new MneCTFCompData();
-        one->data = mat; mat = NULL;
-        one->kind                = kind;
-        one->mne_kind            = mne_unmap_ctf_comp_kind_3(one->kind);
-        one->calibrated          = calibrated;
-
-        if (MneCTFCompData::mne_calibrate_ctf_comp(one,set->chs,set->nch,TRUE) == FAIL) {
-            printf("Warning: Compensation data for '%s' omitted\n", mne_explain_ctf_comp_3(one->kind));//,err_get_error(),mne_explain_ctf_comp(one->kind));
-            if(one)
-                delete one;
-        }
-        else {
-//            set->comps               = REALLOC_3(set->comps,set->ncomp+1,mneCTFcompData);
-//            set->comps[set->ncomp++] = one;
-            set->comps.append(one);
-            set->ncomp++;
-        }
-    }
-#ifdef DEBUG
-    fprintf(stderr,"%d CTF compensation data sets read from %s\n",set->ncomp,name);
-#endif
-    goto good;
-
-bad : {
-        if(mat)
-            delete mat;
-        stream->close();
-        mne_free_ctf_comp_data_set_3(set);
-        return NULL;
-    }
-
-good : {
-        FREE_3(chs);
-        stream->close();
-        return set;
-    }
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 //============================= fwd_comp.c =============================
 
@@ -5810,7 +5520,7 @@ int fwd_comp_field(float *rd,float *Q, FwdCoilSet* coils, float *res, void *clie
     /*
    * Compute the compensated field
    */
-    return mne_apply_ctf_comp_3(comp->set,TRUE,res,coils->ncoil,comp->work,comp->comp_coils->ncoil);
+    return MneCTFCompDataSet::mne_apply_ctf_comp(comp->set,TRUE,res,coils->ncoil,comp->work,comp->comp_coils->ncoil);
 }
 
 
@@ -5827,7 +5537,8 @@ void fwd_free_comp_data(void *d)
     if (!comp)
         return;
     delete comp->comp_coils;
-    mne_free_ctf_comp_data_set_3(comp->set);
+    if(comp->set)
+        delete comp->set;
     FREE_3(comp->work);
     FREE_CMATRIX_3(comp->vec_work);
 
@@ -5861,7 +5572,7 @@ fwdCompData fwd_new_comp_data()
 
 
 
-static int fwd_make_ctf_comp_coils(mneCTFcompDataSet set,          /* The available compensation data */
+static int fwd_make_ctf_comp_coils(MneCTFCompDataSet* set,          /* The available compensation data */
                                    FwdCoilSet*        coils,        /* The main coil set */
                                    FwdCoilSet*        comp_coils)   /* The compensation coil set */
 /*
@@ -5901,7 +5612,7 @@ static int fwd_make_ctf_comp_coils(mneCTFcompDataSet set,          /* The availa
         }
         ncomp = comp_coils->ncoil;
     }
-    res = mne_make_ctf_comp_3(set,chs,nchan,compchs,ncomp);
+    res = MneCTFCompDataSet::mne_make_ctf_comp(set,chs,nchan,compchs,ncomp);
 
     FREE_3(chs);
     FREE_3(compchs);
@@ -5912,36 +5623,7 @@ static int fwd_make_ctf_comp_coils(mneCTFcompDataSet set,          /* The availa
 
 
 
-mneCTFcompDataSet mne_dup_ctf_comp_data_set_3(mneCTFcompDataSet set)
-/*
-* Make a verbatim copy of a data set
-*/
-{
-    mneCTFcompDataSet res;
-    int  k;
-
-    if (!set)
-        return NULL;
-
-    res = mne_new_ctf_comp_data_set_3();
-
-    if (set->ncomp > 0) {
-//        res->comps = MALLOC_3(set->ncomp,mneCTFcompData);
-        res->ncomp = set->ncomp;
-        for (k = 0; k < res->ncomp; k++)
-            if(set->comps[k])
-                res->comps.append(new MneCTFCompData(*set->comps[k]));
-    }
-    res->current = new MneCTFCompData(*set->current);
-
-    return res;
-}
-
-
-
-
-
-fwdCompData fwd_make_comp_data(mneCTFcompDataSet set,           /* The CTF compensation data read from the file */
+fwdCompData fwd_make_comp_data(MneCTFCompDataSet* set,           /* The CTF compensation data read from the file */
                                FwdCoilSet*        coils,         /* The principal set of coils */
                                FwdCoilSet*        comp_coils,    /* The compensation coils */
                                fwdFieldFunc      field,	        /* The field computation functions */
@@ -5955,7 +5637,10 @@ fwdCompData fwd_make_comp_data(mneCTFcompDataSet set,           /* The CTF compe
 {
     fwdCompData comp = fwd_new_comp_data();
 
-    comp->set = mne_dup_ctf_comp_data_set_3(set);
+    if(set)
+        comp->set = new MneCTFCompDataSet(*set);
+    else
+        comp->set = NULL;
 
     if (comp_coils) {
         comp->comp_coils = comp_coils->dup_coil_set(NULL);
@@ -6019,7 +5704,7 @@ int fwd_comp_field_vec(float *rd, FwdCoilSet* coils, float **res, void *client)
    * Compute the compensated field of three orthogonal dipoles
    */
     for (k = 0; k < 3; k++) {
-        if (mne_apply_ctf_comp_3(comp->set,TRUE,res[k],coils->ncoil,comp->vec_work[k],comp->comp_coils->ncoil) == FAIL)
+        if (MneCTFCompDataSet::mne_apply_ctf_comp(comp->set,TRUE,res[k],coils->ncoil,comp->vec_work[k],comp->comp_coils->ncoil) == FAIL)
             return FAIL;
     }
     return OK;
@@ -7976,7 +7661,7 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname, cons
     int            coord_frame = FIFFV_COORD_HEAD;
     MneCovMatrix* cov;
     FwdCoilSet*     templates = NULL;
-    mneCTFcompDataSet comp_data  = NULL;
+    MneCTFCompDataSet* comp_data  = NULL;
     FwdCoilSet*        comp_coils = NULL;
 
     /*
@@ -8093,7 +7778,7 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname, cons
     /*
        * Compensation data
        */
-    if ((comp_data = mne_read_ctf_comp_data_3(measname)) == NULL)
+    if ((comp_data = MneCTFCompDataSet::mne_read_ctf_comp_data(measname)) == NULL)
         goto bad;
     if (comp_data->ncomp > 0) {	/* Compensation channel information may be needed */
         fiffChInfo comp_chs = NULL;
@@ -8112,8 +7797,9 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname, cons
         }
         FREE_3(comp_chs);
     }
-    else {			/* Get rid of the empty data set */
-        mne_free_ctf_comp_data_set_3(comp_data);
+    else {          /* Get rid of the empty data set */
+        if(comp_data)
+            delete comp_data;
         comp_data = NULL;
     }
     /*
@@ -8232,7 +7918,8 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname, cons
     mne_free_name_list_3(badlist,nbad);
     delete templates;
     delete comp_coils;
-    mne_free_ctf_comp_data_set_3(comp_data);
+    if(comp_data)
+        delete comp_data;
     return res;
 
 
@@ -8240,7 +7927,8 @@ bad : {
         mne_free_name_list_3(badlist,nbad);
         delete templates;
         delete comp_coils;
-        mne_free_ctf_comp_data_set_3(comp_data);
+        if(comp_data)
+            delete comp_data;
         if(res)
             delete res;
         return NULL;
@@ -8414,7 +8102,7 @@ static float fit_eval(float *rd,int npar,void *user)
     double        Bm2,one;
     int           ncomp,c;
 
-    fwd   = fuser->fwd = DipoleFitData::dipole_forward_one(fit,rd,fuser->fwd);
+    fwd = fuser->fwd = DipoleFitData::dipole_forward_one(fit,rd,fuser->fwd);
     ncomp = fwd->sing[2]/fwd->sing[0] > fuser->limit ? 3 : 2;
     if (fuser->report_dim)
         fprintf(stderr,"ncomp = %d\n",ncomp);

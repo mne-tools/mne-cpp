@@ -133,11 +133,44 @@ public:
 
 
 
+
+
+    static int mne_apply_ctf_comp(MneCTFCompDataSet*   set,        /* The compensation data */
+                           int                  do_it,
+                           float                *data,      /* The data to process */
+                           int                  ndata,
+                           float                *compdata,  /* Data containing the compensation channels */
+                           int                  ncompdata);
+
+
+
+
+
+
+
+
     static int mne_apply_ctf_comp_t(MneCTFCompDataSet* set,     /* The compensation data */
                              int               do_it,
                              float             **data,  /* The data to process (channel by channel) */
                              int               ndata,
                              int               ns);
+
+
+
+    static int mne_get_ctf_comp(FIFFLIB::fiffChInfo chs,int nch);
+
+
+
+
+    /*
+     * Mapping from simple integer orders to the mysterious CTF compensation numbers
+     */
+    static int mne_map_ctf_comp_kind(int grad);
+
+
+
+    static const char *mne_explain_ctf_comp(int kind);
+
 
 
 
@@ -230,7 +263,7 @@ public:
     //}
 
 
-    int mne_ctf_set_compensation(MneCTFCompDataSet* set,            /* The compensation data */
+    static int mne_ctf_set_compensation(MneCTFCompDataSet* set,            /* The compensation data */
                                  int               compensate_to,  /* What is the desired compensation to achieve */
                                  FIFFLIB::fiffChInfo        chs,            /* The channels to compensate */
                                  int               nchan,          /* How many? */
