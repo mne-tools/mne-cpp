@@ -47,6 +47,11 @@
 
 
 
+#define _USE_MATH_DEFINES
+#include <math.h>
+
+
+
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
@@ -83,6 +88,16 @@ using namespace INVERSELIB;
 
 
 #define ALLOC_CMATRIX_36(x,y) mne_cmatrix_36((x),(y))
+
+
+
+#if defined(_WIN32) || defined(_WIN64)
+#define snprintf _snprintf
+#define vsnprintf _vsnprintf
+#define strcasecmp _stricmp
+#define strncasecmp _strnicmp
+#endif
+
 
 
 
