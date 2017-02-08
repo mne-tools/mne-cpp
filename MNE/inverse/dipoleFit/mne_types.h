@@ -122,6 +122,7 @@
 #include "mne_ctf_comp_data.h"
 #include "mne_ctf_comp_data_set.h"
 #include "mne_raw_info.h"
+#include "mne_raw_buf_def.h"
 
 
 #if defined(__cplusplus) 
@@ -585,18 +586,18 @@ typedef struct {
 } *mneFilterDef,mneFilterDefRec;
 #endif
 
-typedef struct {
-  FIFFLIB::FiffDirEntry::SPtr ent;		/* Where is this in the file (file bufs only, pointer to info) */
-  int   firsts,lasts;		/* First and last sample */
-  int   ntaper;			/* For filtered buffers: taper length */
-  int   ns;			/* Number of samples (last - first + 1) */
-  int   nchan;			/* Number of channels */
-  int   is_skip;		/* Is this a skip? */
-  float **vals;			/* Values (null if not in memory) */
-  int   valid;			/* Are the data meaningful? */
-  int   *ch_filtered;		/* For filtered buffers: has this channel filtered already */
-  int   comp_status;		/* For raw buffers: compensation status */
-} *mneRawBufDef,mneRawBufDefRec;
+//typedef struct {
+//  FIFFLIB::FiffDirEntry::SPtr ent;		/* Where is this in the file (file bufs only, pointer to info) */
+//  int   firsts,lasts;		/* First and last sample */
+//  int   ntaper;			/* For filtered buffers: taper length */
+//  int   ns;			/* Number of samples (last - first + 1) */
+//  int   nchan;			/* Number of channels */
+//  int   is_skip;		/* Is this a skip? */
+//  float **vals;			/* Values (null if not in memory) */
+//  int   valid;			/* Are the data meaningful? */
+//  int   *ch_filtered;		/* For filtered buffers: has this channel filtered already */
+//  int   comp_status;		/* For raw buffers: compensation status */
+//} *mneRawBufDef,mneRawBufDefRec;
 
 
 /*
@@ -658,9 +659,9 @@ typedef struct {			/* A comprehensive raw data structure */
   char             **badlist;		/* Bad channel names */
   int              nbad;		/* How many? */
   int              *bad;		/* Which channels are bad? */
-  mneRawBufDef     bufs;		/* These are the data */
+  INVERSELIB::MneRawBufDef* bufs;		/* These are the data */
   int              nbuf;		/* How many? */
-  mneRawBufDef     filt_bufs;	        /* These are the filtered ones */
+  INVERSELIB::MneRawBufDef* filt_bufs;	        /* These are the filtered ones */
   int              nfilt_buf;
   int              first_samp;          /* First sample? */
   int              omit_samp;           /* How many samples of skip omitted in the beginning */

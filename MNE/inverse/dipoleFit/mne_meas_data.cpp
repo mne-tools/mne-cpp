@@ -236,21 +236,6 @@ void mne_free_ring_buffer_9(void *thisp)
 }
 
 
-static void free_bufs_9(mneRawBufDef bufs, int nbuf)
-
-{
-    int k;
-    for (k = 0; k < nbuf; k++) {
-        FREE_9(bufs[k].ch_filtered);
-        /*
-     * Clear the pointers only, not the data which are in the ringbuffer
-     */
-        FREE_9(bufs[k].vals);
-    }
-    FREE_9(bufs);
-}
-
-
 
 //============================= mne_events.c =============================
 
@@ -312,10 +297,10 @@ void mne_raw_free_data_9(mneRawData d)
     FREE_9(d->filename);
     mne_free_name_list_9(d->ch_names,d->info->nchan);
 
-    free_bufs_9(d->bufs,d->nbuf);
+    MneRawBufDef::free_bufs(d->bufs,d->nbuf);
     mne_free_ring_buffer_9(d->ring);
 
-    free_bufs_9(d->filt_bufs,d->nfilt_buf);
+    MneRawBufDef::free_bufs(d->filt_bufs,d->nfilt_buf);
     mne_free_ring_buffer_9(d->filt_ring);
 
     if(d->proj)
