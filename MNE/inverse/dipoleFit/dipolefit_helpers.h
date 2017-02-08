@@ -1230,19 +1230,6 @@ void mne_allocate_from_ring(void *ringp, int nrow, int ncol, float ***res)
 
 //============================= mne_raw_routines.c =============================
 
-void mne_free_raw_info(mneRawInfo info)
-
-{
-    if (!info)
-        return;
-    FREE(info->filename);
-    FREE(info->chInfo);
-    FREE(info->trans);
-//    FREE(info->rawDir);
-    FREE(info->id);
-    FREE(info);
-    return;
-}
 
 
 int mne_read_raw_buffer_t(//fiffFile     in,        /* Input file */
@@ -1894,7 +1881,7 @@ bad : {
 }
 
 
-int mne_load_raw_info(char *name,int allow_maxshield,mneRawInfo *infop)
+int mne_load_raw_info(char *name,int allow_maxshield,MneRawInfo* *infop)
 /*
       * Load raw data information from a fiff file
       */
@@ -1909,7 +1896,7 @@ int mne_load_raw_info(char *name,int allow_maxshield,mneRawInfo *infop)
     FiffCoordTransOld* trans    = NULL;	/* The coordinate transformation */
     fiffId         id       = NULL;	/* Measurement id */
     QList<FiffDirEntry::SPtr>   rawDir;	/* Directory of raw data tags */
-    mneRawInfo     info     = NULL;
+    MneRawInfo*    info     = NULL;
     int            nchan    = 0;		/* Number of channels */
     float          sfreq    = 0.0;	/* Sampling frequency */
     float          highpass;		/* Highpass filter frequency */
@@ -1955,7 +1942,7 @@ int mne_load_raw_info(char *name,int allow_maxshield,mneRawInfo *infop)
     /*
    * Ready to put everything together
    */
-    info = MALLOC(1,mneRawInfoRec);
+    info = new MneRawInfo();
     info->filename       = mne_strdup(name);
     info->nchan          = nchan;
     info->chInfo         = chs;
@@ -2158,7 +2145,8 @@ void mne_raw_free_data(mneRawData d)
     FREE(d->dig_trigger);
     mne_free_event_list(d->event_list);
 
-    mne_free_raw_info(d->info);
+    if(d->info)
+        delete d->info;
 
     delete d->deriv;
     delete d->deriv_matched;
@@ -2897,7 +2885,7 @@ mneRawData mne_raw_open_file_comp(char *name, int omit_skip, int allow_maxshield
  * Open a raw data file
  */
 {
-    mneRawInfo         info  = NULL;
+    MneRawInfo*        info  = NULL;
     mneRawData         data  = NULL;
 
     QFile file(name);
@@ -3158,7 +3146,8 @@ bad : {
         if (data)
             mne_raw_free_data(data);
         else
-            mne_free_raw_info(info);
+            if(info)
+                delete info;
 
         return NULL;
     }

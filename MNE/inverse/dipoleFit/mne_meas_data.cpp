@@ -301,20 +301,6 @@ void mne_free_sparse_named_matrix_9(mneSparseNamedMatrix mat)
 
 //============================= mne_raw_routines.c =============================
 
-void mne_free_raw_info_9(mneRawInfo info)
-
-{
-    if (!info)
-        return;
-    FREE_9(info->filename);
-    FREE_9(info->chInfo);
-    FREE_9(info->trans);
-//    FREE_9(info->rawDir);
-    FREE_9(info->id);
-    FREE_9(info);
-    return;
-}
-
 
 void mne_raw_free_data_9(mneRawData d)
 
@@ -350,7 +336,8 @@ void mne_raw_free_data_9(mneRawData d)
     FREE_9(d->dig_trigger);
     mne_free_event_list_9(d->event_list);
 
-    mne_free_raw_info_9(d->info);
+    if(d->info)
+        delete d->info;
 
     delete d->deriv;
     delete d->deriv_matched;
