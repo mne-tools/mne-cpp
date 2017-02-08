@@ -60,6 +60,75 @@ using namespace INVERSELIB;
 //=============================================================================================================
 
 
+#define ALLOC_CMATRIX(x,y) mne_cmatrix((x),(y))
+
+#define FREE_CMATRIX(m) mne_free_cmatrix((m))
+
+
+static void matrix_error(int kind, int nr, int nc)
+
+{
+    if (kind == 1)
+        printf("Failed to allocate memory pointers for a %d x %d matrix\n",nr,nc);
+    else if (kind == 2)
+        printf("Failed to allocate memory for a %d x %d matrix\n",nr,nc);
+    else
+        printf("Allocation error for a %d x %d matrix\n",nr,nc);
+    if (sizeof(void *) == 4) {
+        printf("This is probably because you seem to be using a computer with 32-bit architecture.\n");
+        printf("Please consider moving to a 64-bit platform.");
+    }
+    printf("Cannot continue. Sorry.\n");
+    exit(1);
+}
+
+
+
+float **mne_cmatrix (int nr,int nc)
+
+{
+    int i;
+    float **m;
+    float *whole;
+
+    m = MALLOC(nr,float *);
+    if (!m) matrix_error(1,nr,nc);
+    whole = MALLOC(nr*nc,float);
+    if (!whole) matrix_error(2,nr,nc);
+
+    for(i=0;i<nr;i++)
+        m[i] = whole + i*nc;
+    return m;
+}
+
+
+
+void mne_free_cmatrix (float **m)
+{
+    if (m) {
+        FREE(*m);
+        FREE(m);
+    }
+}
+
+
+
+
+//============================= misc_util.c =============================
+
+char *mne_strdup(const char *s)
+{
+    char *res;
+    if (s == NULL)
+        return NULL;
+    res = (char*) malloc(strlen(s)+1);
+    strcpy(res,s);
+    return res;
+}
+
+
+
+
 //============================= mne_ch_selections.c =============================
 
 /*
@@ -106,6 +175,21 @@ mneChSelection mne_ch_selection_these(const char *selname, char **names, int nch
 
 
 
+char **mne_dup_name_list(char **list, int nlist)
+/*
+ * Duplicate a name list
+ */
+{
+    char **res;
+    int  k;
+    if (list == NULL || nlist == 0)
+        return NULL;
+    res = MALLOC(nlist,char *);
+
+    for (k = 0; k < nlist; k++)
+        res[k] = mne_strdup(list[k]);
+    return res;
+}
 
 
 
@@ -522,7 +606,7 @@ ECDSet DipoleFit::calculateFit() const
         float t1,t2;
 
         printf("\n---- Opening a raw data file...\n\n");
-        if ((raw = mne_raw_open_file(settings->measname.isEmpty() ? NULL : settings->measname.toLatin1().data(),TRUE,FALSE,&(settings->filter))) == NULL)
+        if ((raw = MneRawData::mne_raw_open_file(settings->measname.isEmpty() ? NULL : settings->measname.toLatin1().data(),TRUE,FALSE,&(settings->filter))) == NULL)
             goto out;
         /*
         * A channel selection is needed to access the data
@@ -674,14 +758,14 @@ int DipoleFit::fit_dipoles_raw(const QString& dataname, MneRawData* raw, mneChSe
    * Load the initial data segment
    */
     stime = start/sfreq;
-    if (mne_raw_pick_data_filt(raw,sel,start,length,data) == FAIL)
+    if (MneRawData::mne_raw_pick_data_filt(raw,sel,start,length,data) == FAIL)
         goto bad;
     fprintf(stderr,"Fitting...%c",verbose ? '\n' : '\0');
     for (s = 0, time = tmin; time < tmax; s++, time = tmin  + s*tstep) {
         picks = time*sfreq - start;
         if (picks > stepo) {		/* Need a new data segment? */
             start = start + step;
-            if (mne_raw_pick_data_filt(raw,sel,start,length,data) == FAIL)
+            if (MneRawData::mne_raw_pick_data_filt(raw,sel,start,length,data) == FAIL)
                 goto bad;
             picks = time*sfreq - start;
             stime = start/sfreq;

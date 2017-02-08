@@ -50,6 +50,7 @@
 #include "mne_proj_op.h"
 #include "mne_sss_data.h"
 #include "mne_ctf_comp_data_set.h"
+#include "mne_deriv.h"
 #include "mne_types.h"
 
 
@@ -110,6 +111,56 @@ public:
     * Refactored: mne_raw_free_data (mne_raw_data.c)
     */
     ~MneRawData();
+
+
+
+
+
+    static void mne_raw_add_filter_response(MneRawData* data, int *highpass_effective);
+
+
+
+    static void setup_filter_bufs(MneRawData* data);
+
+
+
+
+    static int load_one_buffer(MneRawData* data, MneRawBufDef* buf);
+
+
+
+    static int compensate_buffer(MneRawData* data, MneRawBufDef* buf);
+
+
+    static int mne_raw_pick_data(MneRawData*    data,
+                          mneChSelection sel,
+                          int            firsts,
+                          int            ns,
+                          float          **picked);
+
+
+    static int mne_raw_pick_data_proj(MneRawData*    data,
+                               mneChSelection sel,
+                               int            firsts,
+                               int            ns,
+                               float          **picked);
+
+    static int load_one_filt_buf(MneRawData* data, MneRawBufDef* buf);
+
+
+
+    static int mne_raw_pick_data_filt(MneRawData*    data,
+                               mneChSelection sel,
+                               int            firsts,
+                               int            ns,
+                               float          **picked);
+
+
+    static MneRawData* mne_raw_open_file_comp(char *name, int omit_skip, int allow_maxshield, mneFilterDef filter, int comp_set);
+
+
+    static MneRawData* mne_raw_open_file(char *name, int omit_skip, int allow_maxshield, mneFilterDef filter);
+
 
 public:
     char             *filename;             /* This is our file */

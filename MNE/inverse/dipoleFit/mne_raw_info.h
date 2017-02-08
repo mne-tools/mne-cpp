@@ -45,6 +45,7 @@
 #include "fiff_coord_trans_old.h"
 
 #include <fiff/fiff_dir_node.h>
+#include <fiff/fiff_stream.h>
 
 
 //*************************************************************************************************************
@@ -103,6 +104,51 @@ public:
     * Refactored: mne_free_raw_info (mne_raw_routines.c)
     */
     ~MneRawInfo();
+
+
+
+
+    //============================= read_ch_info.c =============================
+
+    static FIFFLIB::FiffDirNode::SPtr find_meas (const FIFFLIB::FiffDirNode::SPtr& node);
+
+    static FIFFLIB::FiffDirNode::SPtr find_meas_info (const FIFFLIB::FiffDirNode::SPtr& node);
+
+    static FIFFLIB::FiffDirNode::SPtr find_raw (const FIFFLIB::FiffDirNode::SPtr& node);
+
+    static FIFFLIB::FiffDirNode::SPtr find_maxshield (const FIFFLIB::FiffDirNode::SPtr& node);
+
+
+
+
+    static int get_meas_info (//fiffFile file,	 /* The file we are reading */
+                              FIFFLIB::FiffStream::SPtr& stream,
+                              FIFFLIB::FiffDirNode::SPtr& node,	 /* The directory node containing our data */
+                              FIFFLIB::fiffId *id,	         /* The block id from the nearest FIFFB_MEAS
+                                                                                  parent */
+                              int *nchan,	         /* Number of channels */
+                              float *sfreq,	         /* Sampling frequency */
+                              float *highpass,       /* Highpass filter freq. */
+                              float *lowpass,        /* Lowpass filter setting */
+                              FIFFLIB::fiffChInfo *chp,	 /* Channel descriptions */
+                              FiffCoordTransOld* *trans, /* Coordinate transformation
+                                                                                  (head <-> device) */
+                              FIFFLIB::fiffTime *start_time);
+
+
+    static int mne_load_raw_info(char *name,int allow_maxshield,MneRawInfo* *infop);
+
+
+
+
+
+
+
+
+
+
+
+
 
 public:
     char                *filename;      /**< The name of the file this comes from */
