@@ -153,7 +153,6 @@ HEADERS +=\
     rapMusic/dipole.h \
     dipoleFit/dipole_fit_settings.h \
     dipoleFit/dipole_fit.h \
-    dipoleFit/dipolefit_helpers.h \
     dipoleFit/mne_sss_data.h \
     dipoleFit/mne_mne_data.h \
     dipoleFit/mne_meas_data_set.h \
