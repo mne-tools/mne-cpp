@@ -2096,20 +2096,6 @@ static mneRawData new_raw_data()
 }
 
 
-static void free_bufs(mneRawBufDef bufs, int nbuf)
-
-{
-    int k;
-    for (k = 0; k < nbuf; k++) {
-        FREE(bufs[k].ch_filtered);
-        /*
-     * Clear the pointers only, not the data which are in the ringbuffer
-     */
-        FREE(bufs[k].vals);
-    }
-    FREE(bufs);
-}
-
 
 void mne_raw_free_data(mneRawData d)
 
@@ -2121,10 +2107,10 @@ void mne_raw_free_data(mneRawData d)
     FREE(d->filename);
     mne_free_name_list(d->ch_names,d->info->nchan);
 
-    free_bufs(d->bufs,d->nbuf);
+    MneRawBufDef::free_bufs(d->bufs,d->nbuf);
     mne_free_ring_buffer(d->ring);
 
-    free_bufs(d->filt_bufs,d->nfilt_buf);
+    MneRawBufDef::free_bufs(d->filt_bufs,d->nfilt_buf);
     mne_free_ring_buffer(d->filt_ring);
 
     if(d->proj)
@@ -2196,13 +2182,13 @@ static void setup_filter_bufs(mneRawData data)
 {
     mneFilterDef filter;
     int       nfilt_buf;
-    mneRawBufDef bufs;
+    MneRawBufDef* bufs;
     int       j,k;
     int       firstsamp;
     int       nring_buf;
     int       highpass_effective;
 
-    free_bufs(data->filt_bufs,data->nfilt_buf);
+    MneRawBufDef::free_bufs(data->filt_bufs,data->nfilt_buf);
     data->filt_bufs = NULL;
     data->nfilt_buf = 0;
     mne_free_ring_buffer(data->filt_ring);
@@ -2219,7 +2205,7 @@ static void setup_filter_bufs(mneRawData data)
 #ifdef DEBUG
     fprintf(stderr,"%d filter buffers needed\n",nfilt_buf);
 #endif
-    bufs = MALLOC(nfilt_buf,mneRawBufDefRec);
+    bufs = MALLOC(nfilt_buf,MneRawBufDef);
     for (k = 0, firstsamp = data->first_samp-filter->taper_size; k < nfilt_buf; k++,
          firstsamp = firstsamp + filter->size) {
         bufs[k].ns          = filter->size + 2*filter->taper_size;
@@ -2247,7 +2233,7 @@ static void setup_filter_bufs(mneRawData data)
 }
 
 
-static int load_one_buffer(mneRawData data, mneRawBufDef buf)
+static int load_one_buffer(mneRawData data, MneRawBufDef* buf)
 /*
  * load just one
  */
@@ -2282,7 +2268,7 @@ static int load_one_buffer(mneRawData data, mneRawBufDef buf)
     return OK;
 }
 
-static int compensate_buffer(mneRawData data, mneRawBufDef buf)
+static int compensate_buffer(mneRawData data, MneRawBufDef* buf)
 /*
  * Apply compensation channels
  */
@@ -2345,7 +2331,7 @@ int mne_raw_pick_data(mneRawData     data,
 {
     int          k,s,p,start,c,fills;
     int          ns2,s2;
-    mneRawBufDef this_buf;
+    MneRawBufDef* this_buf;
     float        *values;
     int          need_some;
 
@@ -2499,7 +2485,7 @@ int mne_raw_pick_data_proj(mneRawData     data,
  */
 {
     int          k,s,p,start,c,fills;
-    mneRawBufDef this_buf;
+    MneRawBufDef* this_buf;
     float        **values;
     float        *pvalues;
     float        *deriv_pvalues = NULL;
@@ -2622,7 +2608,7 @@ int mne_raw_pick_data_proj(mneRawData     data,
 
 
 
-static int load_one_filt_buf(mneRawData data, mneRawBufDef buf)
+static int load_one_filt_buf(mneRawData data, MneRawBufDef* buf)
 /*
  * Load and filter one buffer
  */
@@ -2671,7 +2657,7 @@ int mne_raw_pick_data_filt(mneRawData     data,
 {
     int          k,s,bs,c;
     int          bs1,bs2,s1,s2,lasts;
-    mneRawBufDef this_buf;
+    MneRawBufDef* this_buf;
     float        *values;
     float        **deriv_vals = NULL;
     float        *dc          = NULL;
@@ -2897,7 +2883,7 @@ mneRawData mne_raw_open_file_comp(char *name, int omit_skip, int allow_maxshield
 //    fiffTagRec   tag;
     FiffTag::SPtr t_pTag;
     fiffChInfo   ch;
-    mneRawBufDef bufs;
+    MneRawBufDef* bufs;
     int k, b, nbuf, ndir, nnames;
     int current_dir0 = 0;
 
@@ -3036,7 +3022,7 @@ mneRawData mne_raw_open_file_comp(char *name, int omit_skip, int allow_maxshield
         if (dir0[k]->kind == FIFF_DATA_BUFFER ||
                 dir0[k]->kind == FIFF_DATA_SKIP)
             nbuf++;
-    bufs = MALLOC(nbuf,mneRawBufDefRec);
+    bufs = MALLOC(nbuf,MneRawBufDef);
 
 //    for (k = 0, nbuf = 0, dir = dir0; k < ndir; k++, dir++)
     for (k = 0, nbuf = 0; k < ndir; k++)

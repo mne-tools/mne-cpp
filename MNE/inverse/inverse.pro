@@ -127,7 +127,8 @@ SOURCES += \
     dipoleFit/mne_cov_matrix.cpp \
     dipoleFit/mne_ctf_comp_data.cpp \
     dipoleFit/mne_ctf_comp_data_set.cpp \
-    dipoleFit/mne_raw_info.cpp
+    dipoleFit/mne_raw_info.cpp \
+    dipoleFit/mne_raw_buf_def.cpp
 
 HEADERS +=\
     inverse_global.h \
@@ -167,7 +168,8 @@ HEADERS +=\
     dipoleFit/mne_cov_matrix.h \
     dipoleFit/mne_ctf_comp_data.h \
     dipoleFit/mne_ctf_comp_data_set.h \
-    dipoleFit/mne_raw_info.h
+    dipoleFit/mne_raw_info.h \
+    dipoleFit/mne_raw_buf_def.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
