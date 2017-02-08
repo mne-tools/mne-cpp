@@ -287,53 +287,6 @@ void mne_free_sparse_named_matrix_9(mneSparseNamedMatrix mat)
 //============================= mne_raw_routines.c =============================
 
 
-void mne_raw_free_data_9(mneRawData d)
-
-{
-    if (!d)
-        return;
-//    fiff_close(d->file);
-    d->stream->close();
-    FREE_9(d->filename);
-    mne_free_name_list_9(d->ch_names,d->info->nchan);
-
-    MneRawBufDef::free_bufs(d->bufs,d->nbuf);
-    mne_free_ring_buffer_9(d->ring);
-
-    MneRawBufDef::free_bufs(d->filt_bufs,d->nfilt_buf);
-    mne_free_ring_buffer_9(d->filt_ring);
-
-    if(d->proj)
-        delete d->proj;
-    mne_free_name_list_9(d->badlist,d->nbad);
-    FREE_9(d->first_sample_val);
-    FREE_9(d->bad);
-    FREE_9(d->offsets);
-    if(d->comp)
-        delete d->comp;
-    if(d->sss)
-        delete d->sss;
-
-    if (d->filter_data_free)
-        d->filter_data_free(d->filter_data);
-    if (d->user_free)
-        d->user_free(d->user);
-    FREE_9(d->dig_trigger);
-    mne_free_event_list_9(d->event_list);
-
-    if(d->info)
-        delete d->info;
-
-    delete d->deriv;
-    delete d->deriv_matched;
-    FREE_9(d->deriv_offsets);
-
-    FREE_9(d);
-    return;
-}
-
-
-
 
 
 void mne_ch_selection_free_9(mneChSelection s)
@@ -1802,7 +1755,8 @@ MneMeasData::~MneMeasData()
     for (k = 0; k < nset; k++)
         delete sets[k];
 
-    mne_raw_free_data_9(raw);
+    if(raw)
+        delete raw;
     mne_ch_selection_free_9(chsel);
 
     return;

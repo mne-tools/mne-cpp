@@ -129,7 +129,7 @@ static void omit_spaces(char **names, int nnames)
 
 
 int mne_ch_selection_assign_chs(mneChSelection sel,
-                                mneRawData     data)
+                                MneRawData*     data)
 /*
       * Make the channel picking real easy
       */
@@ -496,7 +496,7 @@ ECDSet DipoleFit::calculateFit() const
     FwdEegSphereModel*  eeg_model = NULL;
     DipoleFitData*      fit_data = NULL;
     MneMeasData*        data     = NULL;
-    mneRawData          raw      = NULL;
+    MneRawData*         raw      = NULL;
     mneChSelection      sel      = NULL;
 
     printf("---- Setting up...\n\n");
@@ -651,7 +651,7 @@ int DipoleFit::fit_dipoles( const QString& dataname, MneMeasData* data, DipoleFi
 
 //*************************************************************************************************************
 
-int DipoleFit::fit_dipoles_raw(const QString& dataname, mneRawData raw, mneChSelection sel, DipoleFitData* fit, GuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose, ECDSet& p_set)
+int DipoleFit::fit_dipoles_raw(const QString& dataname, MneRawData* raw, mneChSelection sel, DipoleFitData* fit, GuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose, ECDSet& p_set)
 {
     float *one    = MALLOC(sel->nchan,float);
     float sfreq   = raw->info->sfreq;
@@ -725,7 +725,7 @@ bad : {
 
 //*************************************************************************************************************
 
-int DipoleFit::fit_dipoles_raw(const QString& dataname, mneRawData raw, mneChSelection sel, DipoleFitData* fit, GuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose)
+int DipoleFit::fit_dipoles_raw(const QString& dataname, MneRawData* raw, mneChSelection sel, DipoleFitData* fit, GuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose)
 {
     ECDSet set;
     return fit_dipoles_raw(dataname, raw, sel, fit, guess, tmin, tmax, tstep, integ, verbose, set);

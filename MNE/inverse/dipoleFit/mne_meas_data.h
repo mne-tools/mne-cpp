@@ -45,6 +45,7 @@
 #include <fiff/fiff_types.h>
 
 #include "mne_types.h"
+#include "mne_raw_data.h"
 
 
 //*************************************************************************************************************
@@ -153,7 +154,7 @@ public:
     MneCTFCompDataSet*      comp;       /* The software gradient compensation data */
     mneInverseOperator      op;         /* Associated inverse operator */
     MneNamedMatrix*         fwd;        /* Forward operator for dipole fitting */
-    mneRawData              raw;        /* This will be non-null if the data stems from a raw data file */
+    MneRawData*             raw;        /* This will be non-null if the data stems from a raw data file */
     mneChSelection          chsel;      /* Channel selection for raw data */
     char                    **badlist;  /* Bad channel names */
     int                     nbad;       /* How many? */
