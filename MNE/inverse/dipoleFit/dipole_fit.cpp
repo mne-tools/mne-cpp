@@ -135,7 +135,7 @@ int mne_ch_selection_assign_chs(mneChSelection sel,
       */
 {
     int c,rc,d;
-    mneRawInfo  info;
+    MneRawInfo*  info;
     int nch;
     char *dash;
 

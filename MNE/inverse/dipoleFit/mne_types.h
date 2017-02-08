@@ -121,6 +121,7 @@
 #include "mne_cov_matrix.h"
 #include "mne_ctf_comp_data.h"
 #include "mne_ctf_comp_data_set.h"
+#include "mne_raw_info.h"
 
 
 #if defined(__cplusplus) 
@@ -461,37 +462,37 @@ typedef struct {		          /* An inverse operator */
 //  float **data;			/* The data, time by time */
 //} *mneStcData,mneStcDataRec;
 
-typedef struct {		/* Information about raw data in fiff file */
-  char          *filename;	/* The name of the file this comes from */
-  FIFFLIB::fiffId        id;		/* Measurement id from the file */
-  int           nchan;		/* Number of channels */
-  FIFFLIB::fiffChInfo    chInfo;		/* Channel info data  */
-  int           coord_frame;	/* 
-				 * Which coordinate frame are the
-				 * positions defined in? 
-				 */
-  INVERSELIB::FiffCoordTransOld* trans;	        /* This is the coordinate transformation
-				 * FIFF_COORD_HEAD <--> FIFF_COORD_DEVICE
-				 */
-  float         sfreq;		/* Sampling frequency */
-  float         lowpass;	/* Lowpass filter setting */
-  float         highpass;       /* Highpass filter setting */
-  FIFFLIB::fiffTimeRec   start_time;	/* Starting time of the acquisition
-				 * taken from the meas date 
-				 * or the meas block id
-				 * whence it may be inaccurate. */
-  int           buf_size;                       /**< Buffer size in samples */
-  int           maxshield_data;                 /**< Are these unprocessed MaxShield data */
-  QList<FIFFLIB::FiffDirEntry::SPtr> rawDir;    /**< Directory of raw data tags
-				 * These may be of type
-				 *       FIFF_DATA_BUFFER
-				 *       FIFF_DATA_SKIP
-				 *       FIFF_DATA_SKIP_SAMP
-				 *       FIFF_NOP
-				 */
-  int           ndir;		/* Number of tags in the above
-				 * directory */
-} mneRawInfoRec, *mneRawInfo;
+//typedef struct {                    /* Information about raw data in fiff file */
+//  char          *filename;          /* The name of the file this comes from */
+//  FIFFLIB::fiffId        id;        /* Measurement id from the file */
+//  int           nchan;              /* Number of channels */
+//  FIFFLIB::fiffChInfo    chInfo;    /* Channel info data  */
+//  int           coord_frame;    /*
+//                                 * Which coordinate frame are the
+//                                 * positions defined in?
+//                                 */
+//  INVERSELIB::FiffCoordTransOld* trans; /* This is the coordinate transformation
+//                                         * FIFF_COORD_HEAD <--> FIFF_COORD_DEVICE
+//                                         */
+//  float         sfreq;          /* Sampling frequency */
+//  float         lowpass;        /* Lowpass filter setting */
+//  float         highpass;       /* Highpass filter setting */
+//  FIFFLIB::fiffTimeRec   start_time;    /* Starting time of the acquisition
+//                                         * taken from the meas date
+//                                         * or the meas block id
+//                                         * whence it may be inaccurate. */
+//  int           buf_size;                       /**< Buffer size in samples */
+//  int           maxshield_data;                 /**< Are these unprocessed MaxShield data */
+//  QList<FIFFLIB::FiffDirEntry::SPtr> rawDir;    /**< Directory of raw data tags
+//                                                     * These may be of type
+//                                                     *       FIFF_DATA_BUFFER
+//                                                     *       FIFF_DATA_SKIP
+//                                                     *       FIFF_DATA_SKIP_SAMP
+//                                                     *       FIFF_NOP
+//                                                     */
+//  int           ndir;       /* Number of tags in the above
+//                             * directory */
+//} mneRawInfoRec, *mneRawInfo;
 
 
 //typedef struct {		/* Spatiotemporal map */
@@ -652,7 +653,7 @@ typedef struct {			/* A comprehensive raw data structure */
   char             *filename;           /* This is our file */
 //  FIFFLIB::fiffFile         file;
   FIFFLIB::FiffStream::SPtr stream;
-  mneRawInfo       info;	        /* Loaded using the mne routines */
+  INVERSELIB::MneRawInfo*      info;	        /* Loaded using the mne routines */
   char             **ch_names;		/* Useful to have the channel names as a single list */
   char             **badlist;		/* Bad channel names */
   int              nbad;		/* How many? */
