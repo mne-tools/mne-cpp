@@ -1,12 +1,12 @@
 # MNE-CPP AppVeyor CI for Windows
 
-version: 1.0.0-{build} 
-pull_requests:
-  do_not_increment_build_number: true
+version: 1.0.0-{build}
 
 os: Visual Studio 2015
 platform: x64
-configuration: Release
+configuration:
+    - windows_release
+    - windows_tests
 
 install:
     - set QTDIR=C:\Qt\5.7\msvc2015_64
@@ -19,15 +19,16 @@ build:
   verbosity: detailed 
 
 before_build:
-    - qmake mne-cpp.pro -r MNECPP_CONFIG+=noTests
-
+    - call .\tools\appveyor\%CONFIGURATION%\before_build.bat
 build_script:
-    - jom
-
+    - call .\tools\appveyor\%CONFIGURATION%\build.bat
 after_build:
-    - call .\tools\appveyor\compress_binaries.bat %APPVEYOR_REPO_BRANCH%
-    - call .\tools\appveyor\build_installer.bat %APPVEYOR_REPO_BRANCH%
-    - dir
+    - call .\tools\appveyor\%CONFIGURATION%\after_build.bat
+
+before_test:
+    - call .\tools\appveyor\%CONFIGURATION%\before_test.bat
+test_script:
+    - call .\tools\appveyor\%CONFIGURATION%\test.bat
 
 artifacts:
   - path: mne-cpp-windows-x86_64-$(APPVEYOR_REPO_BRANCH).exe
