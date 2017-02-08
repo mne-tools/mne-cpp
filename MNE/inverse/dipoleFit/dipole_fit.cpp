@@ -1,7 +1,8 @@
 
 
 #include "dipole_fit.h"
-#include "dipolefit_helpers.h"
+#include "mne_meas_data_set.h"
+#include "guess_data.h"
 
 #include <string.h>
 
@@ -60,6 +61,10 @@ using namespace INVERSELIB;
 //=============================================================================================================
 
 
+#define MALLOC(x,t) (t *)malloc((x)*sizeof(t))
+#define REALLOC(x,y,t) (t *)((x == NULL) ? malloc((y)*sizeof(t)) : realloc((x),(y)*sizeof(t)))
+#define FREE(x) if ((char *)(x) != NULL) free((char *)(x))
+
 #define ALLOC_CMATRIX(x,y) mne_cmatrix((x),(y))
 
 #define FREE_CMATRIX(m) mne_free_cmatrix((m))
@@ -114,6 +119,46 @@ void mne_free_cmatrix (float **m)
 
 
 
+
+
+
+
+//char *mne_compose_mne_name(const char *path, const char *filename)
+///*
+//      * Compose a filename under the "$MNE_ROOT" directory
+//      */
+//{
+//    char *res;
+//    char *mne_root;
+
+//    if (filename == NULL) {
+//        qCritical("No file name specified to mne_compose_mne_name");
+//        return NULL;
+//    }
+//    mne_root = getenv(MNE_ENV_ROOT);
+//    if (mne_root == NULL || strlen(mne_root) == 0) {
+//        qCritical("Environment variable MNE_ROOT not set");
+//        return NULL;
+//    }
+//    if (path == NULL || strlen(path) == 0) {
+//        res = MALLOC(strlen(mne_root)+strlen(filename)+2,char);
+//        strcpy(res,mne_root);
+//        strcat(res,"/");
+//        strcat(res,filename);
+//    }
+//    else {
+//        res = MALLOC(strlen(mne_root)+strlen(filename)+strlen(path)+3,char);
+//        strcpy(res,mne_root);
+//        strcat(res,"/");
+//        strcat(res,path);
+//        strcat(res,"/");
+//        strcat(res,filename);
+//    }
+//    return res;
+//}
+
+
+
 //============================= misc_util.c =============================
 
 char *mne_strdup(const char *s)
@@ -127,6 +172,26 @@ char *mne_strdup(const char *s)
 }
 
 
+
+//============================= mne_named_matrix.c =============================
+
+void mne_free_name_list(char **list, int nlist)
+/*
+* Free a name list array
+*/
+{
+    int k;
+    if (list == NULL || nlist == 0)
+        return;
+    for (k = 0; k < nlist; k++) {
+#ifdef FOO
+        fprintf(stderr,"%d %s\n",k,list[k]);
+#endif
+        FREE(list[k]);
+    }
+    FREE(list);
+    return;
+}
 
 
 //============================= mne_ch_selections.c =============================
