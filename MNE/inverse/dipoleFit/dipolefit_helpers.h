@@ -1567,98 +1567,9 @@ static int approx_ring_buf_size = APPROX_RING_BUF_SIZE;
 
 
 
-static mneRawData new_raw_data()
-
-{
-    mneRawData new_data        = MALLOC(1,mneRawDataRec);
-    new_data->filename         = NULL;
-//    new_data->file             = NULL;
-    new_data->info             = NULL;
-    new_data->bufs             = NULL;
-    new_data->nbuf             = 0;
-    new_data->proj             = NULL;
-    new_data->ch_names         = NULL;
-    new_data->bad              = NULL;
-    new_data->badlist          = NULL;
-    new_data->nbad             = 0;
-    new_data->first_samp       = 0;
-    new_data->omit_samp        = 0;
-    new_data->omit_samp_old    = 0;
-    new_data->event_list       = NULL;
-    new_data->max_event        = 0;
-    new_data->dig_trigger      = NULL;
-    new_data->dig_trigger_mask = 0;
-    new_data->ring             = NULL;
-    new_data->filt_ring        = NULL;
-    new_data->filt_bufs        = NULL;
-    new_data->nfilt_buf        = 0;
-    new_data->first_sample_val = NULL;
-    new_data->filter           = NULL;
-    new_data->filter_data      = NULL;
-    new_data->filter_data_free = NULL;
-    new_data->offsets          = NULL;
-    new_data->deriv            = NULL;
-    new_data->deriv_matched    = NULL;
-    new_data->deriv_offsets    = NULL;
-    new_data->user             = NULL;
-    new_data->user_free        = NULL;
-    new_data->comp             = NULL;
-    new_data->comp_file        = MNE_CTFV_NOGRAD;
-    new_data->comp_now         = MNE_CTFV_NOGRAD;
-    new_data->sss              = NULL;
-    return new_data;
-}
 
 
-
-void mne_raw_free_data(mneRawData d)
-
-{
-    if (!d)
-        return;
-//    fiff_close(d->file);
-    d->stream->close();
-    FREE(d->filename);
-    mne_free_name_list(d->ch_names,d->info->nchan);
-
-    MneRawBufDef::free_bufs(d->bufs,d->nbuf);
-    mne_free_ring_buffer(d->ring);
-
-    MneRawBufDef::free_bufs(d->filt_bufs,d->nfilt_buf);
-    mne_free_ring_buffer(d->filt_ring);
-
-    if(d->proj)
-        delete d->proj;
-    mne_free_name_list(d->badlist,d->nbad);
-    FREE(d->first_sample_val);
-    FREE(d->bad);
-    FREE(d->offsets);
-    if(d->comp)
-        delete d->comp;
-    if(d->sss)
-        delete d->sss;
-
-    if (d->filter_data_free)
-        d->filter_data_free(d->filter_data);
-    if (d->user_free)
-        d->user_free(d->user);
-    FREE(d->dig_trigger);
-    mne_free_event_list(d->event_list);
-
-    if(d->info)
-        delete d->info;
-
-    delete d->deriv;
-    delete d->deriv_matched;
-    FREE(d->deriv_offsets);
-
-    FREE(d);
-    return;
-}
-
-
-
-void mne_raw_add_filter_response(mneRawData data, int *highpass_effective)
+void mne_raw_add_filter_response(MneRawData* data, int *highpass_effective)
 /*
       * Add the standard filter frequency response function
       */
@@ -1689,7 +1600,7 @@ void mne_raw_add_filter_response(mneRawData data, int *highpass_effective)
 
 
 
-static void setup_filter_bufs(mneRawData data)
+static void setup_filter_bufs(MneRawData* data)
 /*
  * These will hold the filtered data
  */
@@ -1747,7 +1658,7 @@ static void setup_filter_bufs(mneRawData data)
 }
 
 
-static int load_one_buffer(mneRawData data, MneRawBufDef* buf)
+static int load_one_buffer(MneRawData* data, MneRawBufDef* buf)
 /*
  * load just one
  */
@@ -1782,7 +1693,7 @@ static int load_one_buffer(mneRawData data, MneRawBufDef* buf)
     return OK;
 }
 
-static int compensate_buffer(mneRawData data, MneRawBufDef* buf)
+static int compensate_buffer(MneRawData* data, MneRawBufDef* buf)
 /*
  * Apply compensation channels
  */
@@ -1834,7 +1745,7 @@ bad :
 
 
 
-int mne_raw_pick_data(mneRawData     data,
+int mne_raw_pick_data(MneRawData*    data,
                       mneChSelection sel,
                       int            firsts,
                       int            ns,
@@ -1989,7 +1900,7 @@ int mne_raw_pick_data(mneRawData     data,
 }
 
 
-int mne_raw_pick_data_proj(mneRawData     data,
+int mne_raw_pick_data_proj(MneRawData*    data,
                            mneChSelection sel,
                            int            firsts,
                            int            ns,
@@ -2122,7 +2033,7 @@ int mne_raw_pick_data_proj(mneRawData     data,
 
 
 
-static int load_one_filt_buf(mneRawData data, MneRawBufDef* buf)
+static int load_one_filt_buf(MneRawData* data, MneRawBufDef* buf)
 /*
  * Load and filter one buffer
  */
@@ -2160,7 +2071,7 @@ static int load_one_filt_buf(mneRawData data, MneRawBufDef* buf)
 
 
 
-int mne_raw_pick_data_filt(mneRawData     data,
+int mne_raw_pick_data_filt(MneRawData*    data,
                            mneChSelection sel,
                            int            firsts,
                            int            ns,
@@ -2380,13 +2291,13 @@ bad : {
     }
 }
 
-mneRawData mne_raw_open_file_comp(char *name, int omit_skip, int allow_maxshield, mneFilterDef filter, int comp_set)
+MneRawData* mne_raw_open_file_comp(char *name, int omit_skip, int allow_maxshield, mneFilterDef filter, int comp_set)
 /*
  * Open a raw data file
  */
 {
     MneRawInfo*        info  = NULL;
-    mneRawData         data  = NULL;
+    MneRawData*        data  = NULL;
 
     QFile file(name);
     FiffStream::SPtr stream(new FiffStream(&file));
@@ -2428,7 +2339,7 @@ mneRawData mne_raw_open_file_comp(char *name, int omit_skip, int allow_maxshield
     if(!stream->open())
         goto bad;
 
-    data           = new_raw_data();
+    data           = new MneRawData;
     data->filename = mne_strdup(name);
     data->stream   = stream;
     data->info     = info;
@@ -2644,7 +2555,7 @@ mneRawData mne_raw_open_file_comp(char *name, int omit_skip, int allow_maxshield
 
 bad : {
         if (data)
-            mne_raw_free_data(data);
+            delete(data);
         else
             if(info)
                 delete info;
@@ -2653,7 +2564,7 @@ bad : {
     }
 }
 
-mneRawData mne_raw_open_file(char *name, int omit_skip, int allow_maxshield, mneFilterDef filter)
+MneRawData* mne_raw_open_file(char *name, int omit_skip, int allow_maxshield, mneFilterDef filter)
 /*
  * Wrapper for mne_raw_open_file to work as before
  */

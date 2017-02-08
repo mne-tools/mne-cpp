@@ -121,8 +121,6 @@
 #include "mne_cov_matrix.h"
 #include "mne_ctf_comp_data.h"
 #include "mne_ctf_comp_data_set.h"
-#include "mne_raw_info.h"
-#include "mne_raw_buf_def.h"
 
 
 #if defined(__cplusplus) 
@@ -463,37 +461,37 @@ typedef struct {		          /* An inverse operator */
 //  float **data;			/* The data, time by time */
 //} *mneStcData,mneStcDataRec;
 
-//typedef struct {                    /* Information about raw data in fiff file */
-//  char          *filename;          /* The name of the file this comes from */
-//  FIFFLIB::fiffId        id;        /* Measurement id from the file */
-//  int           nchan;              /* Number of channels */
-//  FIFFLIB::fiffChInfo    chInfo;    /* Channel info data  */
-//  int           coord_frame;    /*
-//                                 * Which coordinate frame are the
-//                                 * positions defined in?
-//                                 */
-//  INVERSELIB::FiffCoordTransOld* trans; /* This is the coordinate transformation
-//                                         * FIFF_COORD_HEAD <--> FIFF_COORD_DEVICE
-//                                         */
-//  float         sfreq;          /* Sampling frequency */
-//  float         lowpass;        /* Lowpass filter setting */
-//  float         highpass;       /* Highpass filter setting */
-//  FIFFLIB::fiffTimeRec   start_time;    /* Starting time of the acquisition
-//                                         * taken from the meas date
-//                                         * or the meas block id
-//                                         * whence it may be inaccurate. */
-//  int           buf_size;                       /**< Buffer size in samples */
-//  int           maxshield_data;                 /**< Are these unprocessed MaxShield data */
-//  QList<FIFFLIB::FiffDirEntry::SPtr> rawDir;    /**< Directory of raw data tags
-//                                                     * These may be of type
-//                                                     *       FIFF_DATA_BUFFER
-//                                                     *       FIFF_DATA_SKIP
-//                                                     *       FIFF_DATA_SKIP_SAMP
-//                                                     *       FIFF_NOP
-//                                                     */
-//  int           ndir;       /* Number of tags in the above
-//                             * directory */
-//} mneRawInfoRec, *mneRawInfo;
+typedef struct {		/* Information about raw data in fiff file */
+  char          *filename;	/* The name of the file this comes from */
+  FIFFLIB::fiffId        id;		/* Measurement id from the file */
+  int           nchan;		/* Number of channels */
+  FIFFLIB::fiffChInfo    chInfo;		/* Channel info data  */
+  int           coord_frame;	/* 
+				 * Which coordinate frame are the
+				 * positions defined in? 
+				 */
+  INVERSELIB::FiffCoordTransOld* trans;	        /* This is the coordinate transformation
+				 * FIFF_COORD_HEAD <--> FIFF_COORD_DEVICE
+				 */
+  float         sfreq;		/* Sampling frequency */
+  float         lowpass;	/* Lowpass filter setting */
+  float         highpass;       /* Highpass filter setting */
+  FIFFLIB::fiffTimeRec   start_time;	/* Starting time of the acquisition
+				 * taken from the meas date 
+				 * or the meas block id
+				 * whence it may be inaccurate. */
+  int           buf_size;                       /**< Buffer size in samples */
+  int           maxshield_data;                 /**< Are these unprocessed MaxShield data */
+  QList<FIFFLIB::FiffDirEntry::SPtr> rawDir;    /**< Directory of raw data tags
+				 * These may be of type
+				 *       FIFF_DATA_BUFFER
+				 *       FIFF_DATA_SKIP
+				 *       FIFF_DATA_SKIP_SAMP
+				 *       FIFF_NOP
+				 */
+  int           ndir;		/* Number of tags in the above
+				 * directory */
+} mneRawInfoRec, *mneRawInfo;
 
 
 //typedef struct {		/* Spatiotemporal map */
@@ -586,18 +584,18 @@ typedef struct {
 } *mneFilterDef,mneFilterDefRec;
 #endif
 
-//typedef struct {
-//  FIFFLIB::FiffDirEntry::SPtr ent;		/* Where is this in the file (file bufs only, pointer to info) */
-//  int   firsts,lasts;		/* First and last sample */
-//  int   ntaper;			/* For filtered buffers: taper length */
-//  int   ns;			/* Number of samples (last - first + 1) */
-//  int   nchan;			/* Number of channels */
-//  int   is_skip;		/* Is this a skip? */
-//  float **vals;			/* Values (null if not in memory) */
-//  int   valid;			/* Are the data meaningful? */
-//  int   *ch_filtered;		/* For filtered buffers: has this channel filtered already */
-//  int   comp_status;		/* For raw buffers: compensation status */
-//} *mneRawBufDef,mneRawBufDefRec;
+typedef struct {
+  FIFFLIB::FiffDirEntry::SPtr ent;		/* Where is this in the file (file bufs only, pointer to info) */
+  int   firsts,lasts;		/* First and last sample */
+  int   ntaper;			/* For filtered buffers: taper length */
+  int   ns;			/* Number of samples (last - first + 1) */
+  int   nchan;			/* Number of channels */
+  int   is_skip;		/* Is this a skip? */
+  float **vals;			/* Values (null if not in memory) */
+  int   valid;			/* Are the data meaningful? */
+  int   *ch_filtered;		/* For filtered buffers: has this channel filtered already */
+  int   comp_status;		/* For raw buffers: compensation status */
+} *mneRawBufDef,mneRawBufDefRec;
 
 
 /*
@@ -650,48 +648,48 @@ typedef struct {
 //} *mneDerivSet,mneDerivSetRec;
 
 
-typedef struct {			/* A comprehensive raw data structure */
-  char             *filename;           /* This is our file */
-//  FIFFLIB::fiffFile         file;
-  FIFFLIB::FiffStream::SPtr stream;
-  INVERSELIB::MneRawInfo*      info;	        /* Loaded using the mne routines */
-  char             **ch_names;		/* Useful to have the channel names as a single list */
-  char             **badlist;		/* Bad channel names */
-  int              nbad;		/* How many? */
-  int              *bad;		/* Which channels are bad? */
-  INVERSELIB::MneRawBufDef* bufs;		/* These are the data */
-  int              nbuf;		/* How many? */
-  INVERSELIB::MneRawBufDef* filt_bufs;	        /* These are the filtered ones */
-  int              nfilt_buf;
-  int              first_samp;          /* First sample? */
-  int              omit_samp;           /* How many samples of skip omitted in the beginning */
-  int              first_samp_old;      /* This is the value first_samp would have in the old versions */
-  int              omit_samp_old;       /* This is the value omit_samp would have in the old versions */
-  int              nsamp;               /* How many samples in total? */
-  float            *first_sample_val;   /* Values at the first sample (for dc offset correction before filtering) */
-  INVERSELIB::MneProjOp* proj;          /* Projection operator */
-  INVERSELIB::MneSssData* sss;          /* SSS data found in this file */
-  INVERSELIB::MneCTFCompDataSet* comp;               /* Compensation data */
-  int              comp_file;           /* Compensation status of these raw data in file */
-  int              comp_now;            /* Compensation status of these raw data in file */
-  mneFilterDef     filter;              /* Filter definition */
-  void             *filter_data;        /* This can be whatever the filter needs */
-  mneUserFreeFunc  filter_data_free;    /* Function to free the above */
-  mneEventList     event_list;          /* Trigger events */
-  unsigned int     max_event;	        /* Maximum event number in usenest */
-  char             *dig_trigger;        /* Name of the digital trigger channel */
-  unsigned int     dig_trigger_mask;    /* Mask applied to digital trigger channel before considering it */
-  float            *offsets;		/* Dc offset corrections for display */
-  void             *ring;	        /* The ringbuffer (structure is of no
-					 * interest to us) */
-  void             *filt_ring;          /* Separate ring buffer for filtered data */
-  INVERSELIB::MneDerivSet*  deriv;	        /* Derivation data */
-  INVERSELIB::MneDeriv*     deriv_matched;	/* Derivation data matched to this raw data and
-					 * collected into a single item */
-  float            *deriv_offsets;	/* Dc offset corrections for display of the derived channels */
-  void             *user;	        /* Whatever */
-  mneUserFreeFunc  user_free;		/* How this is freed */
-} *mneRawData,mneRawDataRec;		
+//typedef struct {			/* A comprehensive raw data structure */
+//  char             *filename;           /* This is our file */
+////  FIFFLIB::fiffFile         file;
+//  FIFFLIB::FiffStream::SPtr stream;
+//  mneRawInfo       info;	        /* Loaded using the mne routines */
+//  char             **ch_names;		/* Useful to have the channel names as a single list */
+//  char             **badlist;		/* Bad channel names */
+//  int              nbad;		/* How many? */
+//  int              *bad;		/* Which channels are bad? */
+//  mneRawBufDef     bufs;		/* These are the data */
+//  int              nbuf;		/* How many? */
+//  mneRawBufDef     filt_bufs;	        /* These are the filtered ones */
+//  int              nfilt_buf;
+//  int              first_samp;          /* First sample? */
+//  int              omit_samp;           /* How many samples of skip omitted in the beginning */
+//  int              first_samp_old;      /* This is the value first_samp would have in the old versions */
+//  int              omit_samp_old;       /* This is the value omit_samp would have in the old versions */
+//  int              nsamp;               /* How many samples in total? */
+//  float            *first_sample_val;   /* Values at the first sample (for dc offset correction before filtering) */
+//  INVERSELIB::MneProjOp* proj;          /* Projection operator */
+//  INVERSELIB::MneSssData* sss;          /* SSS data found in this file */
+//  INVERSELIB::MneCTFCompDataSet* comp;               /* Compensation data */
+//  int              comp_file;           /* Compensation status of these raw data in file */
+//  int              comp_now;            /* Compensation status of these raw data in file */
+//  mneFilterDef     filter;              /* Filter definition */
+//  void             *filter_data;        /* This can be whatever the filter needs */
+//  mneUserFreeFunc  filter_data_free;    /* Function to free the above */
+//  mneEventList     event_list;          /* Trigger events */
+//  unsigned int     max_event;	        /* Maximum event number in usenest */
+//  char             *dig_trigger;        /* Name of the digital trigger channel */
+//  unsigned int     dig_trigger_mask;    /* Mask applied to digital trigger channel before considering it */
+//  float            *offsets;		/* Dc offset corrections for display */
+//  void             *ring;	        /* The ringbuffer (structure is of no
+//					 * interest to us) */
+//  void             *filt_ring;          /* Separate ring buffer for filtered data */
+//  INVERSELIB::MneDerivSet*  deriv;	        /* Derivation data */
+//  INVERSELIB::MneDeriv*     deriv_matched;	/* Derivation data matched to this raw data and
+//					 * collected into a single item */
+//  float            *deriv_offsets;	/* Dc offset corrections for display of the derived channels */
+//  void             *user;	        /* Whatever */
+//  mneUserFreeFunc  user_free;		/* How this is freed */
+//} *mneRawData,mneRawDataRec;
 
 //typedef struct {		 /* Data associated with MNE computations for each mneMeasDataSet */
 //  float **datap;		 /* Projection of the whitened data onto the field eigenvectors */

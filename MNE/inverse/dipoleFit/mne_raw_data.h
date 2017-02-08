@@ -44,6 +44,14 @@
 #include "../inverse_global.h"
 
 #include <fiff/fiff_dir_node.h>
+#include <fiff/fiff_stream.h>
+#include "mne_raw_info.h"
+#include "mne_raw_buf_def.h"
+#include "mne_proj_op.h"
+#include "mne_sss_data.h"
+#include "mne_ctf_comp_data_set.h"
+#include "mne_types.h"
+
 
 
 //*************************************************************************************************************
@@ -99,7 +107,7 @@ public:
     //=========================================================================================================
     /**
     * Destroys the MNE Raw Data
-    * Refactored:  (.c)
+    * Refactored: mne_raw_free_data (mne_raw_data.c)
     */
     ~MneRawData();
 
