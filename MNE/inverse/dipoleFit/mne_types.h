@@ -118,6 +118,9 @@
 #include "fiff_coord_trans_old.h"
 #include "mne_proj_item.h"
 #include "mne_proj_op.h"
+#include "mne_cov_matrix.h"
+#include "mne_ctf_comp_data.h"
+#include "mne_ctf_comp_data_set.h"
 
 
 #if defined(__cplusplus) 
@@ -338,47 +341,47 @@ typedef struct {		/* Vector specification with a channel list */
 //  float          **proj_data;   /* The orthogonalized projection vectors picked and orthogonalized from the original data */
 //} *mneProjOp,mneProjOpRec;
 
-typedef struct {
-  int   job;			/* Value of FIFF_SSS_JOB tag */
-  int   coord_frame;		/* Coordinate frame */
-  float origin[3];		/* The expansion origin */
-  int   nchan;			/* How many channels */
-  int   out_order;		/* Order of the outside expansion */
-  int   in_order;		/* Order of the inside expansion */
-  int   *comp_info;		/* Which components are included */
-  int   ncomp;			/* How many entries in the above */
-  int   in_nuse;		/* How many components included in the inside expansion */
-  int   out_nuse;		/* How many components included in the outside expansion */
-} *mneSssData,mneSssDataRec;	/* Essential information about SSS */
+//typedef struct {
+//  int   job;			/* Value of FIFF_SSS_JOB tag */
+//  int   coord_frame;		/* Coordinate frame */
+//  float origin[3];		/* The expansion origin */
+//  int   nchan;			/* How many channels */
+//  int   out_order;		/* Order of the outside expansion */
+//  int   in_order;		/* Order of the inside expansion */
+//  int   *comp_info;		/* Which components are included */
+//  int   ncomp;			/* How many entries in the above */
+//  int   in_nuse;		/* How many components included in the inside expansion */
+//  int   out_nuse;		/* How many components included in the outside expansion */
+//} *mneSssData,mneSssDataRec;	/* Essential information about SSS */
 
 /*
- * The class field in mneCovMatrix can have these values
+ * The class field in INVERSELIB::MneCovMatrix* can have these values
  */
-#define MNE_COV_CH_UNKNOWN  -1	/* No idea */
-#define MNE_COV_CH_MEG_MAG   0  /* Axial gradiometer or magnetometer [T] */
-#define MNE_COV_CH_MEG_GRAD  1  /* Planar gradiometer [T/m] */
-#define MNE_COV_CH_EEG       2  /* EEG [V] */
+//#define MNE_COV_CH_UNKNOWN  -1	/* No idea */
+//#define MNE_COV_CH_MEG_MAG   0  /* Axial gradiometer or magnetometer [T] */
+//#define MNE_COV_CH_MEG_GRAD  1  /* Planar gradiometer [T/m] */
+//#define MNE_COV_CH_EEG       2  /* EEG [V] */
 
-typedef struct {		/* Covariance matrix storage */
-  int        kind;		/* Sensor or source covariance */
-  int        ncov;		/* Dimension */
-  int        nfree;		/* Number of degrees of freedom */
-  int        nproj;		/* Number of dimensions projected out */
-  int        nzero;		/* Number of zero or small eigenvalues */
-  char       **names;		/* Names of the entries (optional) */
-  double     *cov;		/* Covariance matrix in packed representation (lower triangle) */
-  double     *cov_diag;		/* Diagonal covariance matrix */
-  INVERSELIB::FiffSparseMatrix* cov_sparse;   /* A sparse covariance matrix (Note: data are floats in this which is an inconsistency) */
-  double     *lambda;           /* Eigenvalues of cov */
-  double     *inv_lambda;       /* Inverses of the square roots of the eigenvalues of cov */
-  float      **eigen;           /* Eigenvectors of cov */
-  double     *chol;             /* Cholesky decomposition */
-  INVERSELIB::MneProjOp*  proj; /* The projection which was active when this matrix was computed */
-  INVERSELIB::MneSssData* sss;  /* The SSS data present in the associated raw data file */
-  int        *ch_class;		/* This will allow grouping of channels for regularization (MEG [T/m], MEG [T], EEG [V] */
-  char       **bads;		/* Which channels were designated bad when this noise covariance matrix was computed? */
-  int        nbad;		/* How many of them */
-} *mneCovMatrix,mneCovMatrixRec;
+//typedef struct {		/* Covariance matrix storage */
+//  int        kind;		/* Sensor or source covariance */
+//  int        ncov;		/* Dimension */
+//  int        nfree;		/* Number of degrees of freedom */
+//  int        nproj;		/* Number of dimensions projected out */
+//  int        nzero;		/* Number of zero or small eigenvalues */
+//  char       **names;		/* Names of the entries (optional) */
+//  double     *cov;		/* Covariance matrix in packed representation (lower triangle) */
+//  double     *cov_diag;		/* Diagonal covariance matrix */
+//  INVERSELIB::FiffSparseMatrix* cov_sparse;   /* A sparse covariance matrix (Note: data are floats in this which is an inconsistency) */
+//  double     *lambda;           /* Eigenvalues of cov */
+//  double     *inv_lambda;       /* Inverses of the square roots of the eigenvalues of cov */
+//  float      **eigen;           /* Eigenvectors of cov */
+//  double     *chol;             /* Cholesky decomposition */
+//  INVERSELIB::MneProjOp*  proj; /* The projection which was active when this matrix was computed */
+//  INVERSELIB::MneSssData* sss;  /* The SSS data present in the associated raw data file */
+//  int        *ch_class;		/* This will allow grouping of channels for regularization (MEG [T/m], MEG [T], EEG [V] */
+//  char       **bads;		/* Which channels were designated bad when this noise covariance matrix was computed? */
+//  int        nbad;		/* How many of them */
+//} *INVERSELIB::MneCovMatrix*,INVERSELIB::MneCovMatrix*Rec;
 
 //typedef struct {		/* A forward solution */
 //  char           *fwdname;	/* Name of the file this was loaded from */
@@ -403,7 +406,7 @@ typedef struct {		/* Covariance matrix storage */
 //				 * applied to the field fwd itself */
 //  float          *patch_areas;  /* Contains the patch areas if the CSD transformation has been applied */
 //  int            fwd_whitened;	/* Has the noise covariance been applied to the field fwd? */
-//  mneCovMatrix   noise_cov;	/* The noise covariance matrix employed in whitening */
+//  INVERSELIB::MneCovMatrix*   noise_cov;	/* The noise covariance matrix employed in whitening */
 //  mneProjOp      proj;		/* Associated projection operator */
 //} *mneForwardSolution,mneForwardSolutionRec;
 
@@ -422,13 +425,13 @@ typedef struct {		          /* An inverse operator */
 					   * (These are equal to the cortex normals 
 					   * in the fixed orientation case) */
   int            coord_frame;               /* Which coordinates are the locations and orientations given in? */
-  mneCovMatrix   sensor_cov;                /* Sensor covariance matrix */
+  INVERSELIB::MneCovMatrix*   sensor_cov;                /* Sensor covariance matrix */
   int            nave;                      /* Number of averaged responses (affects scaling of the noise covariance) */
   int            current_unit;              /* This can be FIFF_UNIT_AM, FIFF_UNIT_AM_M2, FIFF_UNIT_AM_M3 */
-  mneCovMatrix   source_cov;                /* Source covariance matrix */
-  mneCovMatrix   orient_prior;              /* Orientation prior applied */
-  mneCovMatrix   depth_prior;               /* Depth-weighting prior applied */
-  mneCovMatrix   fMRI_prior;                /* fMRI prior applied */
+  INVERSELIB::MneCovMatrix*   source_cov;                /* Source covariance matrix */
+  INVERSELIB::MneCovMatrix*   orient_prior;              /* Orientation prior applied */
+  INVERSELIB::MneCovMatrix*   depth_prior;               /* Depth-weighting prior applied */
+  INVERSELIB::MneCovMatrix*   fMRI_prior;                /* fMRI prior applied */
   float          *sing;                     /* Singular values of the inverse operator */
   INVERSELIB::MneNamedMatrix* eigen_leads;  /* The eigen leadfields */
   int            eigen_leads_weighted;      /* Have the above been already weighted with R^0.5? */
@@ -607,27 +610,26 @@ typedef struct {
  */
 #define MNE_4DV_COMP1           101
 
-typedef struct {
-  int             kind;		     /* The compensation kind (CTF) */
-  int             mne_kind;	     /* Our kind */
-  int             calibrated;	     /* Are the coefficients in the file calibrated already? */
-  INVERSELIB::MneNamedMatrix*  data;	             /* The compensation data */
-  INVERSELIB::FiffSparseMatrix* presel;            /* Apply this selector prior to compensation */
-  INVERSELIB::FiffSparseMatrix* postsel;	     /* Apply this selector after compensation */
-  float           *presel_data;	     /* These are used for the intermediate results in the calculations */
-  float           *comp_data;
-  float           *postsel_data;
-} *mneCTFcompData,mneCTFcompDataRec;
+//typedef struct {
+//  int             kind;		     /* The compensation kind (CTF) */
+//  int             mne_kind;	     /* Our kind */
+//  int             calibrated;	     /* Are the coefficients in the file calibrated already? */
+//  INVERSELIB::MneNamedMatrix*  data;	             /* The compensation data */
+//  INVERSELIB::FiffSparseMatrix* presel;            /* Apply this selector prior to compensation */
+//  INVERSELIB::FiffSparseMatrix* postsel;	     /* Apply this selector after compensation */
+//  float           *presel_data;	     /* These are used for the intermediate results in the calculations */
+//  float           *comp_data;
+//  float           *postsel_data;
+//} *mneCTFcompData,mneCTFcompDataRec;
 
-typedef struct {
-  mneCTFcompData *comps;	/* All available compensation data sets */
-  int            ncomp;		/* How many? */
-  FIFFLIB::fiffChInfo     chs;		/* Channel information */
-  int            nch;		/* How many of the above */
-  mneCTFcompData undo;		/* Compensation data to undo the current compensation before applying current */
-  mneCTFcompData current;	/* The current compensation data composed from the above 
-				 * taking into account channels presently available */
-} *mneCTFcompDataSet,mneCTFcompDataSetRec;
+//typedef struct {
+//    QList<INVERSELIB::MneCTFCompData*> comps;   /* All available compensation data sets */
+//    int            ncomp;                       /* How many? */
+//    FIFFLIB::fiffChInfo     chs;                /* Channel information */
+//    int            nch;                         /* How many of the above */
+//    INVERSELIB::MneCTFCompData* undo;           /* Compensation data to undo the current compensation before applying current */
+//    INVERSELIB::MneCTFCompData* current;        /* The current compensation data composed from the above taking into account channels presently available */
+//} *mneCTFcompDataSet,mneCTFcompDataSetRec;
 
 //typedef struct {		        /* One item in a derivation data set */
 //  char                 *filename;       /* Source file name */
@@ -646,48 +648,48 @@ typedef struct {
 //} *mneDerivSet,mneDerivSetRec;
 
 
-typedef struct {			/* A comprehensive raw data structure */
-  char             *filename;           /* This is our file */
-//  FIFFLIB::fiffFile         file;
-  FIFFLIB::FiffStream::SPtr stream;
-  mneRawInfo       info;	        /* Loaded using the mne routines */
-  char             **ch_names;		/* Useful to have the channel names as a single list */
-  char             **badlist;		/* Bad channel names */
-  int              nbad;		/* How many? */
-  int              *bad;		/* Which channels are bad? */
-  mneRawBufDef     bufs;		/* These are the data */
-  int              nbuf;		/* How many? */
-  mneRawBufDef     filt_bufs;	        /* These are the filtered ones */
-  int              nfilt_buf;
-  int              first_samp;          /* First sample? */
-  int              omit_samp;           /* How many samples of skip omitted in the beginning */
-  int              first_samp_old;      /* This is the value first_samp would have in the old versions */
-  int              omit_samp_old;       /* This is the value omit_samp would have in the old versions */
-  int              nsamp;               /* How many samples in total? */
-  float            *first_sample_val;   /* Values at the first sample (for dc offset correction before filtering) */
-  INVERSELIB::MneProjOp* proj;          /* Projection operator */
-  INVERSELIB::MneSssData* sss;          /* SSS data found in this file */
-  mneCTFcompDataSet comp;               /* Compensation data */
-  int              comp_file;           /* Compensation status of these raw data in file */
-  int              comp_now;            /* Compensation status of these raw data in file */
-  mneFilterDef     filter;              /* Filter definition */
-  void             *filter_data;        /* This can be whatever the filter needs */
-  mneUserFreeFunc  filter_data_free;    /* Function to free the above */
-  mneEventList     event_list;          /* Trigger events */
-  unsigned int     max_event;	        /* Maximum event number in usenest */
-  char             *dig_trigger;        /* Name of the digital trigger channel */
-  unsigned int     dig_trigger_mask;    /* Mask applied to digital trigger channel before considering it */
-  float            *offsets;		/* Dc offset corrections for display */
-  void             *ring;	        /* The ringbuffer (structure is of no
-					 * interest to us) */
-  void             *filt_ring;          /* Separate ring buffer for filtered data */
-  INVERSELIB::MneDerivSet*  deriv;	        /* Derivation data */
-  INVERSELIB::MneDeriv*     deriv_matched;	/* Derivation data matched to this raw data and
-					 * collected into a single item */
-  float            *deriv_offsets;	/* Dc offset corrections for display of the derived channels */
-  void             *user;	        /* Whatever */
-  mneUserFreeFunc  user_free;		/* How this is freed */
-} *mneRawData,mneRawDataRec;		
+//typedef struct {			/* A comprehensive raw data structure */
+//  char             *filename;           /* This is our file */
+////  FIFFLIB::fiffFile         file;
+//  FIFFLIB::FiffStream::SPtr stream;
+//  mneRawInfo       info;	        /* Loaded using the mne routines */
+//  char             **ch_names;		/* Useful to have the channel names as a single list */
+//  char             **badlist;		/* Bad channel names */
+//  int              nbad;		/* How many? */
+//  int              *bad;		/* Which channels are bad? */
+//  mneRawBufDef     bufs;		/* These are the data */
+//  int              nbuf;		/* How many? */
+//  mneRawBufDef     filt_bufs;	        /* These are the filtered ones */
+//  int              nfilt_buf;
+//  int              first_samp;          /* First sample? */
+//  int              omit_samp;           /* How many samples of skip omitted in the beginning */
+//  int              first_samp_old;      /* This is the value first_samp would have in the old versions */
+//  int              omit_samp_old;       /* This is the value omit_samp would have in the old versions */
+//  int              nsamp;               /* How many samples in total? */
+//  float            *first_sample_val;   /* Values at the first sample (for dc offset correction before filtering) */
+//  INVERSELIB::MneProjOp* proj;          /* Projection operator */
+//  INVERSELIB::MneSssData* sss;          /* SSS data found in this file */
+//  INVERSELIB::MneCTFCompDataSet* comp;               /* Compensation data */
+//  int              comp_file;           /* Compensation status of these raw data in file */
+//  int              comp_now;            /* Compensation status of these raw data in file */
+//  mneFilterDef     filter;              /* Filter definition */
+//  void             *filter_data;        /* This can be whatever the filter needs */
+//  mneUserFreeFunc  filter_data_free;    /* Function to free the above */
+//  mneEventList     event_list;          /* Trigger events */
+//  unsigned int     max_event;	        /* Maximum event number in usenest */
+//  char             *dig_trigger;        /* Name of the digital trigger channel */
+//  unsigned int     dig_trigger_mask;    /* Mask applied to digital trigger channel before considering it */
+//  float            *offsets;		/* Dc offset corrections for display */
+//  void             *ring;	        /* The ringbuffer (structure is of no
+//					 * interest to us) */
+//  void             *filt_ring;          /* Separate ring buffer for filtered data */
+//  INVERSELIB::MneDerivSet*  deriv;	        /* Derivation data */
+//  INVERSELIB::MneDeriv*     deriv_matched;	/* Derivation data matched to this raw data and
+//					 * collected into a single item */
+//  float            *deriv_offsets;	/* Dc offset corrections for display of the derived channels */
+//  void             *user;	        /* Whatever */
+//  mneUserFreeFunc  user_free;		/* How this is freed */
+//} *mneRawData,mneRawDataRec;
 
 //typedef struct {		 /* Data associated with MNE computations for each mneMeasDataSet */
 //  float **datap;		 /* Projection of the whitened data onto the field eigenvectors */

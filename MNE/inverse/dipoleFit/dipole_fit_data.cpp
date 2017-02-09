@@ -594,38 +594,6 @@ INVERSELIB::FiffSparseMatrix* mne_convert_to_sparse_3(float **dense,        /* T
 
 
 
-int  mne_sparse_vec_mult2_3(INVERSELIB::FiffSparseMatrix* mat,     /* The sparse matrix */
-                          float           *vector, /* Vector to be multiplied */
-                          float           *res)    /* Result of the multiplication */
-/*
-      * Multiply a vector by a sparse matrix.
-      */
-{
-    int i,j;
-
-    if (mat->coding == FIFFTS_MC_RCS) {
-        for (i = 0; i < mat->m; i++) {
-            res[i] = 0.0;
-            for (j = mat->ptrs[i]; j < mat->ptrs[i+1]; j++)
-                res[i] += mat->data[j]*vector[mat->inds[j]];
-        }
-        return 0;
-    }
-    else if (mat->coding == FIFFTS_MC_CCS) {
-        for (i = 0; i < mat->m; i++)
-            res[i] = 0.0;
-        for (i = 0; i < mat->n; i++)
-            for (j = mat->ptrs[i]; j < mat->ptrs[i+1]; j++)
-                res[mat->inds[j]] += mat->data[j]*vector[i];
-        return 0;
-    }
-    else {
-        printf("mne_sparse_vec_mult2: unknown sparse matrix storage type: %d",mat->coding);
-        return -1;
-    }
-}
-
-
 
 
 
@@ -658,7 +626,7 @@ typedef struct {
 
 
 
-int mne_is_diag_cov_3(mneCovMatrix c)
+int mne_is_diag_cov_3(MneCovMatrix* c)
 
 {
     return c->cov_diag != NULL;
@@ -838,7 +806,7 @@ void mne_free_name_list_3(char **list, int nlist)
 
 
 
-void mne_free_cov_3(mneCovMatrix c)
+void mne_free_cov_3(MneCovMatrix* c)
 /*
 * Free a covariance matrix and all its data
 */
@@ -1014,58 +982,6 @@ int mne_get_values_from_data_3 (float time,         /* Interesting time point */
 
 
 
-
-
-int mne_proj_op_proj_vector_3(MneProjOp* op, float *vec, int nvec, int do_complement)
-/*
-      * Apply projection operator to a vector (floats)
-      * Assume that all dimension checking etc. has been done before
-      */
-{
-    static float *res = NULL;
-    int    res_size   = 0;
-    float *pvec;
-    float  w;
-    int k,p;
-
-    if (!op || op->nitems <= 0 || op->nvec <= 0)
-        return OK;
-
-    if (op->nch != nvec) {
-        printf("Data vector size does not match projection operator");
-        return FAIL;
-    }
-
-    if (op->nch > res_size) {
-        res = REALLOC_3(res,op->nch,float);
-        res_size = op->nch;
-    }
-
-    for (k = 0; k < op->nch; k++)
-        res[k] = 0.0;
-
-    for (p = 0; p < op->nvec; p++) {
-        pvec = op->proj_data[p];
-        w = mne_dot_vectors_3(pvec,vec,op->nch);
-        for (k = 0; k < op->nch; k++)
-            res[k] = res[k] + w*pvec[k];
-    }
-    if (do_complement) {
-        for (k = 0; k < op->nch; k++)
-            vec[k] = vec[k] - res[k];
-    }
-    else {
-        for (k = 0; k < op->nch; k++)
-            vec[k] = res[k];
-    }
-    return OK;
-}
-
-
-
-
-
-
 //============================= mne_decompose.c =============================
 
 
@@ -1169,37 +1085,6 @@ int mne_decompose_eigen_3(double *mat,
 /*
 * Routines for handling the covariance matrices
 */
-static mneCovMatrix new_cov_3(int    kind,
-                            int    ncov,
-                            char   **names,
-                            double *cov,
-                            double *cov_diag,
-                            INVERSELIB::FiffSparseMatrix* cov_sparse)
-/*
-* Put it together from ingredients
-*/
-{
-    mneCovMatrix new_cov    = MALLOC_3(1,mneCovMatrixRec);
-    new_cov->kind           = kind;
-    new_cov->ncov           = ncov;
-    new_cov->nproj          = 0;
-    new_cov->nzero          = 0;
-    new_cov->names          = names;
-    new_cov->cov            = cov;
-    new_cov->cov_diag       = cov_diag;
-    new_cov->cov_sparse     = cov_sparse;
-    new_cov->eigen          = NULL;
-    new_cov->lambda         = NULL;
-    new_cov->chol           = NULL;
-    new_cov->inv_lambda     = NULL;
-    new_cov->nfree          = 1;
-    new_cov->ch_class       = NULL;
-    new_cov->proj           = NULL;
-    new_cov->sss            = NULL;
-    new_cov->bads           = NULL;
-    new_cov->nbad           = 0;
-    return new_cov;
-}
 
 
 
@@ -1210,58 +1095,6 @@ static mneCovMatrix new_cov_3(int    kind,
 
 
 
-
-
-
-
-
-
-
-mneCovMatrix mne_new_cov_dense(int    kind,
-                               int    ncov,
-                               char   **names,
-                               double *cov)
-
-{
-    return new_cov_3(kind,ncov,names,cov,NULL,NULL);
-}
-
-
-mneCovMatrix mne_new_cov_diag(int    kind,
-                              int    ncov,
-                              char   **names,
-                              double *cov_diag)
-
-{
-    return new_cov_3(kind,ncov,names,NULL,cov_diag,NULL);
-}
-
-
-mneCovMatrix mne_new_cov_sparse(int             kind,
-                                int             ncov,
-                                char            **names,
-                                INVERSELIB::FiffSparseMatrix* cov_sparse)
-{
-    return new_cov_3(kind,ncov,names,NULL,NULL,cov_sparse);
-}
-
-
-
-
-
-
-
-
-
-mneCovMatrix mne_new_cov_3(int    kind,
-                         int    ncov,
-                         char   **names,
-                         double *cov,
-                         double *cov_diag)
-
-{
-    return new_cov_3(kind,ncov,names,cov,cov_diag,NULL);
-}
 
 
 
@@ -1285,85 +1118,6 @@ static int mne_lt_packed_index_3(int j, int k)
 
 
 
-void mne_proj_op_add_item_act_3(MneProjOp* op, MneNamedMatrix* vecs, int kind, const char *desc, int is_active)
-/*
-* Add a new item to an existing projection operator
-*/
-{
-    MneProjItem* new_item;
-    int         k;
-
-//    op->items = REALLOC_3(op->items,op->nitems+1,mneProjItem);
-
-//    op->items[op->nitems] = new_item = new MneProjItem();
-    new_item = new MneProjItem();
-    op->items.append(new_item);
-
-    new_item->active      = is_active;
-    new_item->vecs        = new MneNamedMatrix(*vecs);
-
-    if (kind == FIFFV_MNE_PROJ_ITEM_EEG_AVREF) {
-        new_item->has_meg = FALSE;
-        new_item->has_eeg = TRUE;
-    }
-    else {
-        for (k = 0; k < vecs->ncol; k++) {
-            if (strstr(vecs->collist[k],"EEG") == vecs->collist[k])
-                new_item->has_eeg = TRUE;
-            if (strstr(vecs->collist[k],"MEG") == vecs->collist[k])
-                new_item->has_meg = TRUE;
-        }
-        if (!new_item->has_meg && !new_item->has_eeg) {
-            new_item->has_meg = TRUE;
-            new_item->has_eeg = FALSE;
-        }
-        else if (new_item->has_meg && new_item->has_eeg) {
-            new_item->has_meg = TRUE;
-            new_item->has_eeg = FALSE;
-        }
-    }
-    if (desc != NULL)
-        new_item->desc = mne_strdup_3(desc);
-    new_item->kind = kind;
-    new_item->nvec = new_item->vecs->nrow;
-
-    op->nitems++;
-
-    MneProjOp::mne_free_proj_op_proj(op);  /* These data are not valid any more */
-    return;
-}
-
-
-void mne_proj_op_add_item_3(MneProjOp* op, MneNamedMatrix* vecs, int kind, const char *desc)
-
-{
-    mne_proj_op_add_item_act_3(op, vecs, kind, desc, TRUE);
-}
-
-
-
-
-
-
-MneProjOp* mne_dup_proj_op_3(MneProjOp* op)
-/*
-* Provide a duplicate (item data only)
-*/
-{
-    MneProjOp* dup = new MneProjOp();
-    MneProjItem* it;
-    int k;
-
-    if (!op)
-        return NULL;
-
-    for (k = 0; k < op->nitems; k++) {
-        it = op->items[k];
-        mne_proj_op_add_item_act_3(dup,it->vecs,it->kind,it->desc,it->active);
-        dup->items[k]->active_file = it->active_file;
-    }
-    return dup;
-}
 
 
 
@@ -1372,48 +1126,8 @@ MneProjOp* mne_dup_proj_op_3(MneProjOp* op)
 
 
 
-mneCovMatrix mne_dup_cov_3(mneCovMatrix c)
-{
-    double       *vals;
-    int          nval;
-    int          k;
-    mneCovMatrix res;
 
-    if (c->cov_diag)
-        nval = c->ncov;
-    else
-        nval = (c->ncov*(c->ncov+1))/2;
-
-    vals = MALLOC_3(nval,double);
-    if (c->cov_diag) {
-        for (k = 0; k < nval; k++)
-            vals[k] = c->cov_diag[k];
-        res = mne_new_cov_3(c->kind,c->ncov,mne_dup_name_list_3(c->names,c->ncov),NULL,vals);
-    }
-    else {
-        for (k = 0; k < nval; k++)
-            vals[k] = c->cov[k];
-        res = mne_new_cov_3(c->kind,c->ncov,mne_dup_name_list_3(c->names,c->ncov),vals,NULL);
-    }
-    /*
-    * Duplicate additional items
-    */
-    if (c->ch_class) {
-        res->ch_class = MALLOC_3(c->ncov,int);
-        for (k = 0; k < c->ncov; k++)
-            res->ch_class[k] = c->ch_class[k];
-    }
-    res->bads = mne_dup_name_list_3(c->bads,c->nbad);
-    res->nbad = c->nbad;
-    res->proj = mne_dup_proj_op_3(c->proj);
-    res->sss  = new MneSssData(*(c->sss));
-
-    return res;
-}
-
-
-
-int mne_add_inv_cov_3(mneCovMatrix c)
+int mne_add_inv_cov_3(MneCovMatrix* c)
 /*
       * Calculate the inverse square roots for whitening
       */
@@ -1447,7 +1161,7 @@ int mne_add_inv_cov_3(mneCovMatrix c)
 
 
 
-static int condition_cov_3(mneCovMatrix c, float rank_threshold, int use_rank)
+static int condition_cov_3(MneCovMatrix* c, float rank_threshold, int use_rank)
 
 {
     double *scale  = NULL;
@@ -1612,7 +1326,7 @@ static int check_cov_data(double *vals, int nval)
 
 
 
-int mne_classify_channels_cov(mneCovMatrix cov, fiffChInfo chs, int nchan)
+int mne_classify_channels_cov(MneCovMatrix* cov, fiffChInfo chs, int nchan)
 /*
  * Assign channel classes in a covariance matrix with help of channel infos
  */
@@ -1661,7 +1375,7 @@ bad : {
 
 
 
-static int mne_decompose_eigen_cov_small_3(mneCovMatrix c,float small, int use_rank)
+static int mne_decompose_eigen_cov_small_3(MneCovMatrix* c,float small, int use_rank)
 /*
       * Do the eigenvalue decomposition
       */
@@ -1732,7 +1446,7 @@ bad : {
 }
 
 
-int mne_decompose_eigen_cov_3(mneCovMatrix c)
+int mne_decompose_eigen_cov_3(MneCovMatrix* c)
 
 {
     return mne_decompose_eigen_cov_small_3(c,-1.0,-1);
@@ -1745,7 +1459,7 @@ int mne_decompose_eigen_cov_3(mneCovMatrix c)
 
 //============================= mne_whiten.c =============================
 
-int mne_whiten_data(float **data, float **whitened_data, int np, int nchan, mneCovMatrix C)
+int mne_whiten_data(float **data, float **whitened_data, int np, int nchan, MneCovMatrix* C)
 /*
       * Apply the whitening operation
       */
@@ -1792,7 +1506,7 @@ int mne_whiten_data(float **data, float **whitened_data, int np, int nchan, mneC
 }
 
 
-int mne_whiten_one_data(float *data, float *whitened_data, int nchan, mneCovMatrix C)
+int mne_whiten_one_data(float *data, float *whitened_data, int nchan, MneCovMatrix* C)
 
 {
     float *datap[1];
@@ -1838,7 +1552,7 @@ static void free_dipole_fit_funcs(dipoleFitFuncs f)
 
 
 
-//static void regularize_cov(mneCovMatrix c,       /* The matrix to regularize */
+//static void regularize_cov(MneCovMatrix* c,       /* The matrix to regularize */
 //                           float        *regs,   /* Regularization values to apply (fractions of the
 //                                                     * average diagonal values for each class */
 //                           int          *active) /* Which of the channels are 'active' */
@@ -1893,7 +1607,7 @@ static void free_dipole_fit_funcs(dipoleFitFuncs f)
 //}
 
 
-void mne_regularize_cov(mneCovMatrix c,       /* The matrix to regularize */
+void mne_regularize_cov(MneCovMatrix* c,       /* The matrix to regularize */
                         float        *regs)   /* Regularization values to apply (fractions of the
                            * average diagonal values for each class */
 /*
@@ -5054,25 +4768,6 @@ void mne_proj_op_report_3(FILE *out,const char *tag, MneProjOp* op)
 
 
 
-MneProjOp* mne_proj_op_combine_3(MneProjOp* to, MneProjOp* from)
-/*
-* Copy items from 'from' operator to 'to' operator
-*/
-{
-    int k;
-    MneProjItem* it;
-
-    if (to == NULL)
-        to = new MneProjOp();
-    if (from) {
-        for (k = 0; k < from->nitems; k++) {
-            it = from->items[k];
-            mne_proj_op_add_item_3(to,it->vecs,it->kind,it->desc);
-            to->items[to->nitems-1]->active_file = it->active_file;
-        }
-    }
-    return to;
-}
 
 
 
@@ -5080,103 +4775,14 @@ MneProjOp* mne_proj_op_combine_3(MneProjOp* to, MneProjOp* from)
 
 
 
-MneProjOp* mne_proj_op_average_eeg_ref_3(fiffChInfo chs,
-                                      int nch)
-/*
-* Make the projection operator for average electrode reference
-*/
-{
-    int eegcount = 0;
-    int k;
-    float       **vec_data;
-    char        **names;
-    MneNamedMatrix* vecs;
-    MneProjOp*      op;
-
-    for (k = 0; k < nch; k++)
-        if (chs[k].kind == FIFFV_EEG_CH)
-            eegcount++;
-    if (eegcount == 0) {
-        qCritical("No EEG channels specified for average reference.");
-        return NULL;
-    }
-
-    vec_data = ALLOC_CMATRIX_3(1,eegcount);
-    names    = MALLOC_3(eegcount,char *);
-
-    for (k = 0, eegcount = 0; k < nch; k++)
-        if (chs[k].kind == FIFFV_EEG_CH)
-            names[eegcount++] = mne_strdup_3(chs[k].ch_name);
-
-    for (k = 0; k < eegcount; k++)
-        vec_data[0][k] = 1.0/sqrt((double)eegcount);
-
-    vecs = MneNamedMatrix::build_named_matrix(1,eegcount,NULL,names,vec_data);
-
-    op = new MneProjOp();
-    mne_proj_op_add_item_3(op,vecs,FIFFV_MNE_PROJ_ITEM_EEG_AVREF,"Average EEG reference");
-
-    return op;
-}
 
 
 
-int mne_proj_item_affect_3(MneProjItem* it, char **list, int nlist)
-/*
-* Does this projection item affect this list of channels?
-*/
-{
-    int k,p,q;
-
-    if (it == NULL || it->vecs == NULL || it->nvec == 0)
-        return FALSE;
-
-    for (k = 0; k < nlist; k++)
-        for (p = 0; p < it->vecs->ncol; p++)
-            if (strcmp(it->vecs->collist[p],list[k]) == 0) {
-                for (q = 0; q < it->vecs->nrow; q++) {
-                    if (it->vecs->data[q][p] != 0.0)
-                        return TRUE;
-                }
-            }
-    return FALSE;
-}
 
 
 
-int mne_proj_op_affect_3(MneProjOp* op, char **list, int nlist)
-
-{
-    int k;
-    int naff;
-
-    if (!op)
-        return 0;
-
-    for (k = 0, naff = 0; k < op->nitems; k++)
-        if (op->items[k]->active && mne_proj_item_affect_3(op->items[k],list,nlist))
-            naff += op->items[k]->nvec;
-
-    return naff;
-}
-
-int mne_proj_op_affect_chs_3(MneProjOp* op, fiffChInfo chs, int nch)
-{
-    char *ch_string;
-    int  res;
-    char **list;
-    int  nlist;
 
 
-    if (nch == 0)
-        return FALSE;
-    ch_string = mne_channel_names_to_string_3(chs,nch);
-    mne_string_to_name_list_3(ch_string,&list,&nlist);
-    FREE_3(ch_string);
-    res = mne_proj_op_affect_3(op,list,nlist);
-    mne_free_name_list_3(list,nlist);
-    return res;
-}
 
 
 
@@ -5357,7 +4963,7 @@ MneProjOp* mne_read_proj_op_from_node_3(//fiffFile in,
         * Ready to add
         */
         item = MneNamedMatrix::build_named_matrix(item_nvec,item_nchan,NULL,item_names,item_vectors);
-        mne_proj_op_add_item_act_3(op,item,item_kind,item_desc,item_active);
+        MneProjOp::mne_proj_op_add_item_act(op,item,item_kind,item_desc,item_active);
         delete item;
         op->items[op->nitems-1]->active_file = item_active;
     }
@@ -5469,7 +5075,7 @@ int mne_proj_op_make_proj_bad(MneProjOp* op, char **bad, int nbad)
     if (op->nitems <= 0)
         return OK;
 
-    nvec = mne_proj_op_affect_3(op,op->names,op->nch);
+    nvec = MneProjOp::mne_proj_op_affect(op,op->names,op->nch);
     if (nvec == 0)
         return OK;
 
@@ -5480,7 +5086,7 @@ int mne_proj_op_make_proj_bad(MneProjOp* op, char **bad, int nbad)
     fprintf(stdout,"mne_proj_op_make_proj_bad\n");
 #endif
     for (k = 0, nvec_meg = nvec_eeg = 0; k < op->nitems; k++) {
-        if (op->items[k]->active && mne_proj_item_affect_3(op->items[k],op->names,op->nch)) {
+        if (op->items[k]->active && MneProjItem::mne_proj_item_affect(op->items[k],op->names,op->nch)) {
             vec.nvec  = op->items[k]->vecs->ncol;
             vec.names = op->items[k]->vecs->collist;
             if (op->items[k]->has_meg) {
@@ -5874,671 +5480,6 @@ bad : {
 
 
 
-//============================= mne_ctf_comp.c =============================
-
-
-#define MNE_CTFV_COMP_UNKNOWN -1
-#define MNE_CTFV_COMP_NONE    0
-#define MNE_CTFV_COMP_G1BR    0x47314252
-#define MNE_CTFV_COMP_G2BR    0x47324252
-#define MNE_CTFV_COMP_G3BR    0x47334252
-#define MNE_CTFV_COMP_G2OI    0x47324f49
-#define MNE_CTFV_COMP_G3OI    0x47334f49
-
-static struct {
-    int grad_comp;
-    int ctf_comp;
-} compMap_3[] = { { MNE_CTFV_NOGRAD,       MNE_CTFV_COMP_NONE },
-{ MNE_CTFV_GRAD1,        MNE_CTFV_COMP_G1BR },
-{ MNE_CTFV_GRAD2,        MNE_CTFV_COMP_G2BR },
-{ MNE_CTFV_GRAD3,        MNE_CTFV_COMP_G3BR },
-{ MNE_4DV_COMP1,         MNE_4DV_COMP1 },             /* One-to-one mapping for 4D data */
-{ MNE_CTFV_COMP_UNKNOWN, MNE_CTFV_COMP_UNKNOWN }};
-
-
-
-
-
-
-
-
-
-
-
-
-int mne_unmap_ctf_comp_kind_3(int ctf_comp)
-
-{
-    int k;
-
-    for (k = 0; compMap_3[k].grad_comp >= 0; k++)
-        if (ctf_comp == compMap_3[k].ctf_comp)
-            return compMap_3[k].grad_comp;
-    return ctf_comp;
-}
-
-
-
-
-
-
-
-
-/*
- * Allocation and freeing of the data structures
- */
-mneCTFcompData mne_new_ctf_comp_data_3()
-{
-    mneCTFcompData res = MALLOC_3(1,mneCTFcompDataRec);
-    res->kind          = MNE_CTFV_COMP_UNKNOWN;
-    res->mne_kind      = MNE_CTFV_COMP_UNKNOWN;
-    res->calibrated    = FALSE;
-    res->data          = NULL;
-    res->presel        = NULL;
-    res->postsel       = NULL;
-    res->presel_data   = NULL;
-    res->comp_data     = NULL;
-    res->postsel_data  = NULL;
-
-    return res;
-}
-
-
-
-
-
-
-mneCTFcompDataSet mne_new_ctf_comp_data_set_3()
-{
-    mneCTFcompDataSet res = MALLOC_3(1,mneCTFcompDataSetRec);
-
-    res->comps   = NULL;
-    res->ncomp   = 0;
-    res->chs     = NULL;
-    res->nch     = 0;
-    res->current = NULL;
-    res->undo    = NULL;
-    return res;
-}
-
-
-
-
-
-
-
-void mne_free_ctf_comp_data_3(mneCTFcompData comp)
-
-{
-    if (!comp)
-        return;
-
-    if(comp->data)
-        delete comp->data;
-    if(comp->presel)
-        delete comp->presel;
-    if(comp->postsel)
-        delete comp->postsel;
-    FREE_3(comp->presel_data);
-    FREE_3(comp->postsel_data);
-    FREE_3(comp->comp_data);
-    FREE_3(comp);
-    return;
-}
-
-
-void mne_free_ctf_comp_data_set_3(mneCTFcompDataSet set)
-
-{
-    int k;
-
-    if (!set)
-        return;
-
-    for (k = 0; k < set->ncomp; k++)
-        mne_free_ctf_comp_data_3(set->comps[k]);
-    FREE_3(set->comps);
-    FREE_3(set->chs);
-    mne_free_ctf_comp_data_3(set->current);
-    FREE_3(set);
-    return;
-}
-
-
-
-
-
-
-
-
-/*
- * Mapping from simple integer orders to the mysterious CTF compensation numbers
- */
-int mne_map_ctf_comp_kind_3(int grad)
-/*
- * Simple mapping
- */
-{
-    int k;
-
-    for (k = 0; compMap_3[k].grad_comp >= 0; k++)
-        if (grad == compMap_3[k].grad_comp)
-            return compMap_3[k].ctf_comp;
-    return grad;
-}
-
-
-
-
-
-
-const char *mne_explain_ctf_comp_3(int kind)
-{
-    static struct {
-        int kind;
-        const char *expl;
-    } explain[] = { { MNE_CTFV_COMP_NONE,    "uncompensated" },
-    { MNE_CTFV_COMP_G1BR,    "first order gradiometer" },
-    { MNE_CTFV_COMP_G2BR,    "second order gradiometer" },
-    { MNE_CTFV_COMP_G3BR,    "third order gradiometer" },
-    { MNE_4DV_COMP1,         "4D comp 1" },
-    { MNE_CTFV_COMP_UNKNOWN, "unknown" } };
-    int k;
-
-    for (k = 0; explain[k].kind != MNE_CTFV_COMP_UNKNOWN; k++)
-        if (explain[k].kind == kind)
-            return explain[k].expl;
-    return explain[k].expl;
-}
-
-
-
-
-static int mne_calibrate_ctf_comp_3(mneCTFcompData one,
-                                  fiffChInfo     chs,
-                                  int            nch,
-                                  int            do_it)
-/*
-* Calibrate or decalibrate a compensation data set
-*/
-{
-    float *col_cals,*row_cals;
-    int   j,k,p,found;
-    char  *name;
-    float **data;
-
-    if (!one)
-        return OK;
-    if (one->calibrated)
-        return OK;
-
-    row_cals = MALLOC_3(one->data->nrow,float);
-    col_cals = MALLOC_3(one->data->ncol,float);
-
-    for (j = 0; j < one->data->nrow; j++) {
-        name = one->data->rowlist[j];
-        found = FALSE;
-        for (p = 0; p < nch; p++)
-            if (strcmp(name,chs[p].ch_name) == 0) {
-                row_cals[j] = chs[p].range*chs[p].cal;
-                found = TRUE;
-                break;
-            }
-        if (!found) {
-            printf("Channel %s not found. Cannot calibrate the compensation matrix.",name);
-            return FAIL;
-        }
-    }
-    for (k = 0; k < one->data->ncol; k++) {
-        name = one->data->collist[k];
-        found = FALSE;
-        for (p = 0; p < nch; p++)
-            if (strcmp(name,chs[p].ch_name) == 0) {
-                col_cals[k] = chs[p].range*chs[p].cal;
-                found = TRUE;
-                break;
-            }
-        if (!found) {
-            printf("Channel %s not found. Cannot calibrate the compensation matrix.",name);
-            return FAIL;
-        }
-    }
-    data = one->data->data;
-    if (do_it) {
-        for (j = 0; j < one->data->nrow; j++)
-            for (k = 0; k < one->data->ncol; k++)
-                data[j][k] = row_cals[j]*data[j][k]/col_cals[k];
-    }
-    else {
-        for (j = 0; j < one->data->nrow; j++)
-            for (k = 0; k < one->data->ncol; k++)
-                data[j][k] = col_cals[k]*data[j][k]/row_cals[j];
-    }
-    return OK;
-}
-
-
-
-
-
-int mne_make_ctf_comp_3(mneCTFcompDataSet set,        /* The available compensation data */
-                      fiffChInfo        chs,        /* Channels to compensate These may contain channels other than those requiring compensation */
-                      int               nch,        /* How many of these */
-                      fiffChInfo        compchs,    /* The compensation input channels These may contain channels other than the MEG compensation channels */
-                      int               ncomp)      /* How many of these */
-/*
-* Make compensation data to apply to a set of channels to yield (or uncompensated) compensated data
-*/
-{
-    int *comps = NULL;
-    int need_comp;
-    int first_comp;
-    mneCTFcompData this_comp;
-    int  *comp_sel = NULL;
-    char **names   = NULL;
-    char *name;
-    int  j,k,p;
-
-    INVERSELIB::FiffSparseMatrix* presel  = NULL;
-    INVERSELIB::FiffSparseMatrix* postsel = NULL;
-    MneNamedMatrix*  data    = NULL;
-
-    if (!compchs) {
-        compchs = chs;
-        ncomp   = nch;
-    }
-    fprintf(stderr,"Setting up compensation data...\n");
-    if (nch == 0)
-        return OK;
-    if (set) {
-        mne_free_ctf_comp_data_3(set->current);
-        set->current = NULL;
-    }
-    comps = MALLOC_3(nch,int);
-    for (k = 0, need_comp = 0, first_comp = MNE_CTFV_COMP_NONE; k < nch; k++) {
-        if (chs[k].kind == FIFFV_MEG_CH) {
-            comps[k] = chs[k].chpos.coil_type >> 16;
-            if (comps[k] != MNE_CTFV_COMP_NONE) {
-                if (first_comp == MNE_CTFV_COMP_NONE)
-                    first_comp = comps[k];
-                else {
-                    if (comps[k] != first_comp) {
-                        printf("We do not support nonuniform compensation yet.");
-                        goto bad;
-                    }
-                }
-                need_comp++;
-            }
-        }
-        else
-            comps[k] = MNE_CTFV_COMP_NONE;
-    }
-    if (need_comp == 0) {
-        fprintf(stderr,"\tNo compensation set. Nothing more to do.\n");
-        FREE_3(comps);
-        return OK;
-    }
-    fprintf(stderr,"\t%d out of %d channels have the compensation set.\n",need_comp,nch);
-    if (!set) {
-        printf("No compensation data available for the required compensation.");
-        return FAIL;
-    }
-    /*
-    * Find the desired compensation data matrix
-    */
-    for (k = 0, this_comp = NULL; k < set->ncomp; k++) {
-        if (set->comps[k]->mne_kind == first_comp) {
-            this_comp = set->comps[k];
-            break;
-        }
-    }
-    if (!this_comp) {
-        printf("Did not find the desired compensation data : %s",
-               mne_explain_ctf_comp_3(mne_map_ctf_comp_kind_3(first_comp)));
-        goto bad;
-    }
-    fprintf(stderr,"\tDesired compensation data (%s) found.\n",mne_explain_ctf_comp_3(mne_map_ctf_comp_kind_3(first_comp)));
-    /*
-    * Find the compensation channels
-    */
-    comp_sel = MALLOC_3(this_comp->data->ncol,int);
-    for (k = 0; k < this_comp->data->ncol; k++) {
-        comp_sel[k] = -1;
-        name = this_comp->data->collist[k];
-        for (p = 0; p < ncomp; p++)
-            if (strcmp(name,compchs[p].ch_name) == 0) {
-                comp_sel[k] = p;
-                break;
-            }
-        if (comp_sel[k] < 0) {
-            printf("Compensation channel %s not found",name);
-            goto bad;
-        }
-    }
-    fprintf(stderr,"\tAll compensation channels found.\n");
-    /*
-    * Create the preselector
-    */
-    {
-        float **sel = ALLOC_CMATRIX_3(this_comp->data->ncol,ncomp);
-        for (j = 0; j < this_comp->data->ncol; j++) {
-            for (k = 0; k < ncomp; k++)
-                sel[j][k] = 0.0;
-            sel[j][comp_sel[j]] = 1.0;
-        }
-        if ((presel = mne_convert_to_sparse_3(sel,this_comp->data->ncol,ncomp,FIFFTS_MC_RCS,1e-30)) == NULL) {
-            FREE_CMATRIX_3(sel);
-            goto bad;
-        }
-        FREE_CMATRIX_3(sel);
-        fprintf(stderr,"\tPreselector created.\n");
-    }
-    /*
-    * Pick the desired channels
-    */
-    names = MALLOC_3(need_comp,char *);
-    for (k = 0, p = 0; k < nch; k++) {
-        if (comps[k] != MNE_CTFV_COMP_NONE)
-            names[p++] = chs[k].ch_name;
-    }
-    if ((data = this_comp->data->pick_from_named_matrix(names,need_comp,NULL,0)) == NULL)
-        goto bad;
-    fprintf(stderr,"\tCompensation data matrix created.\n");
-    /*
-    * Create the postselector
-    */
-    {
-        float **sel = ALLOC_CMATRIX_3(nch,data->nrow);
-        for (j = 0, p = 0; j < nch; j++) {
-            for (k = 0; k < data->nrow; k++)
-                sel[j][k] = 0.0;
-            if (comps[j] != MNE_CTFV_COMP_NONE)
-                sel[j][p++] = 1.0;
-        }
-        if ((postsel = mne_convert_to_sparse_3(sel,nch,data->nrow,FIFFTS_MC_RCS,1e-30)) == NULL) {
-            FREE_CMATRIX_3(sel);
-            goto bad;
-        }
-        FREE_CMATRIX_3(sel);
-        fprintf(stderr,"\tPostselector created.\n");
-    }
-    set->current           = mne_new_ctf_comp_data_3();
-    set->current->kind     = this_comp->kind;
-    set->current->mne_kind = this_comp->mne_kind;
-    set->current->data     = data;
-    set->current->presel   = presel;
-    set->current->postsel  = postsel;
-
-    fprintf(stderr,"\tCompensation set up.\n");
-
-    FREE_3(names);
-    FREE_3(comps);
-    FREE_3(comp_sel);
-
-    return OK;
-
-bad : {
-        if(presel)
-            delete presel;
-        if(postsel)
-            delete postsel;
-        if(data)
-            delete data;
-        FREE_3(names);
-        FREE_3(comps);
-        FREE_3(comp_sel);
-        return FAIL;
-    }
-}
-
-
-
-
-
-
-
-
-
-
-
-int mne_apply_ctf_comp_3(mneCTFcompDataSet set,		  /* The compensation data */
-                       int               do_it,
-                       float             *data,           /* The data to process */
-                       int               ndata,
-                       float             *compdata,       /* Data containing the compensation channels */
-                       int               ncompdata)
-/*
-* Apply compensation or revert to uncompensated data
-*/
-{
-    mneCTFcompData this_comp;
-    float *presel,*comp;
-    int   k;
-
-    if (compdata == NULL) {
-        compdata  = data;
-        ncompdata = ndata;
-    }
-    if (!set || !set->current)
-        return OK;
-    this_comp = set->current;
-    /*
-   * Dimension checks
-   */
-    if (this_comp->presel) {
-        if (this_comp->presel->n != ncompdata) {
-            printf("Compensation data dimension mismatch. Expected %d, got %d channels.",
-                   this_comp->presel->n,ncompdata);
-            return FAIL;
-        }
-    }
-    else if (this_comp->data->ncol != ncompdata) {
-        printf("Compensation data dimension mismatch. Expected %d, got %d channels.",
-               this_comp->data->ncol,ncompdata);
-        return FAIL;
-    }
-    if (this_comp->postsel) {
-        if (this_comp->postsel->m != ndata) {
-            printf("Data dimension mismatch. Expected %d, got %d channels.",
-                   this_comp->postsel->m,ndata);
-            return FAIL;
-        }
-    }
-    else if (this_comp->data->nrow != ndata) {
-        printf("Data dimension mismatch. Expected %d, got %d channels.",
-               this_comp->data->nrow,ndata);
-        return FAIL;
-    }
-    /*
-    * Preselection is optional
-    */
-    if (this_comp->presel) {
-        if (!this_comp->presel_data)
-            this_comp->presel_data = MALLOC_3(this_comp->presel->m,float);
-        if (mne_sparse_vec_mult2_3(this_comp->presel,compdata,this_comp->presel_data) != OK)
-            return FAIL;
-        presel = this_comp->presel_data;
-    }
-    else
-        presel = compdata;
-    /*
-    * This always happens
-    */
-    if (!this_comp->comp_data)
-        this_comp->comp_data = MALLOC_3(this_comp->data->nrow,float);
-    mne_mat_vec_mult2_3(this_comp->data->data,presel,this_comp->comp_data,this_comp->data->nrow,this_comp->data->ncol);
-    /*
-    * Optional postselection
-    */
-    if (!this_comp->postsel)
-        comp = this_comp->comp_data;
-    else {
-        if (!this_comp->postsel_data) {
-            this_comp->postsel_data = MALLOC_3(this_comp->postsel->m,float);
-        }
-        if (mne_sparse_vec_mult2_3(this_comp->postsel,this_comp->comp_data,this_comp->postsel_data) != OK)
-            return FAIL;
-        comp = this_comp->postsel_data;
-    }
-    /*
-    * Compensate or revert compensation?
-    */
-    if (do_it) {
-        for (k = 0; k < ndata; k++)
-            data[k] = data[k] - comp[k];
-    }
-    else {
-        for (k = 0; k < ndata; k++)
-            data[k] = data[k] + comp[k];
-    }
-    return OK;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-mneCTFcompDataSet mne_read_ctf_comp_data_3(const QString& name)
-/*
-* Read all CTF compensation data from a given file
-*/
-{
-    QFile file(name);
-    FiffStream::SPtr stream(new FiffStream(&file));
-
-    mneCTFcompDataSet set = NULL;
-    mneCTFcompData    one;
-    QList<FiffDirNode::SPtr> nodes;
-    QList<FiffDirNode::SPtr> comps;
-    int               ncomp;
-    MneNamedMatrix*    mat = NULL;
-    int               kind,k;
-    FiffTag::SPtr t_pTag;
-    fiffChInfo        chs = NULL;
-    int               nch = 0;
-    int               calibrated;
-    /*
-    * Read the channel information
-    */
-    {
-        fiffChInfo        comp_chs = NULL;
-        int               ncompch = 0;
-
-        if (mne_read_meg_comp_eeg_ch_info_3(name,&chs,&nch,&comp_chs,&ncompch,NULL,NULL,NULL,NULL) == FAIL)
-            goto bad;
-        if (ncompch > 0) {
-            chs = REALLOC_3(chs,nch+ncompch,fiffChInfoRec);
-            for (k = 0; k < ncompch; k++)
-                chs[k+nch] = comp_chs[k];
-            nch = nch + ncompch;
-            FREE_3(comp_chs);
-        }
-    }
-    /*
-    * Read the rest of the stuff
-    */
-    if(!stream->open())
-        goto bad;
-    set = mne_new_ctf_comp_data_set_3();
-    /*
-    * Locate the compensation data sets
-    */
-    nodes = stream->tree()->dir_tree_find(FIFFB_MNE_CTF_COMP);
-    if (nodes.size() == 0)
-        goto good;      /* Nothing more to do */
-    comps = nodes[0]->dir_tree_find(FIFFB_MNE_CTF_COMP_DATA);
-    if (comps.size() == 0)
-        goto good;
-    ncomp = comps.size();
-    /*
-    * Set the channel info
-    */
-    set->chs = chs; chs = NULL;
-    set->nch = nch;
-    /*
-    * Read each data set
-    */
-    for (k = 0; k < ncomp; k++) {
-        mat = MneNamedMatrix::read_named_matrix(stream,comps[k],FIFF_MNE_CTF_COMP_DATA);
-        if (!mat)
-            goto bad;
-        comps[k]->find_tag(stream, FIFF_MNE_CTF_COMP_KIND, t_pTag);
-        if (t_pTag) {
-            kind = *t_pTag->toInt();
-        }
-        else
-            goto bad;
-        comps[k]->find_tag(stream, FIFF_MNE_CTF_COMP_CALIBRATED, t_pTag);
-        if (t_pTag) {
-            calibrated = *t_pTag->toInt();
-        }
-        else
-            calibrated = FALSE;
-        /*
-        * Add these data to the set
-        */
-        one = mne_new_ctf_comp_data_3();
-        one->data = mat; mat = NULL;
-        one->kind                = kind;
-        one->mne_kind            = mne_unmap_ctf_comp_kind_3(one->kind);
-        one->calibrated          = calibrated;
-
-        if (mne_calibrate_ctf_comp_3(one,set->chs,set->nch,TRUE) == FAIL) {
-            printf("Warning: Compensation data for '%s' omitted\n", mne_explain_ctf_comp_3(one->kind));//,err_get_error(),mne_explain_ctf_comp(one->kind));
-            mne_free_ctf_comp_data_3(one);
-        }
-        else {
-            set->comps               = REALLOC_3(set->comps,set->ncomp+1,mneCTFcompData);
-            set->comps[set->ncomp++] = one;
-        }
-    }
-#ifdef DEBUG
-    fprintf(stderr,"%d CTF compensation data sets read from %s\n",set->ncomp,name);
-#endif
-    goto good;
-
-bad : {
-        if(mat)
-            delete mat;
-        stream->close();
-        mne_free_ctf_comp_data_set_3(set);
-        return NULL;
-    }
-
-good : {
-        FREE_3(chs);
-        stream->close();
-        return set;
-    }
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 //============================= fwd_comp.c =============================
 
@@ -6579,7 +5520,7 @@ int fwd_comp_field(float *rd,float *Q, FwdCoilSet* coils, float *res, void *clie
     /*
    * Compute the compensated field
    */
-    return mne_apply_ctf_comp_3(comp->set,TRUE,res,coils->ncoil,comp->work,comp->comp_coils->ncoil);
+    return MneCTFCompDataSet::mne_apply_ctf_comp(comp->set,TRUE,res,coils->ncoil,comp->work,comp->comp_coils->ncoil);
 }
 
 
@@ -6596,7 +5537,8 @@ void fwd_free_comp_data(void *d)
     if (!comp)
         return;
     delete comp->comp_coils;
-    mne_free_ctf_comp_data_set_3(comp->set);
+    if(comp->set)
+        delete comp->set;
     FREE_3(comp->work);
     FREE_CMATRIX_3(comp->vec_work);
 
@@ -6630,7 +5572,7 @@ fwdCompData fwd_new_comp_data()
 
 
 
-static int fwd_make_ctf_comp_coils(mneCTFcompDataSet set,          /* The available compensation data */
+static int fwd_make_ctf_comp_coils(MneCTFCompDataSet* set,          /* The available compensation data */
                                    FwdCoilSet*        coils,        /* The main coil set */
                                    FwdCoilSet*        comp_coils)   /* The compensation coil set */
 /*
@@ -6670,7 +5612,7 @@ static int fwd_make_ctf_comp_coils(mneCTFcompDataSet set,          /* The availa
         }
         ncomp = comp_coils->ncoil;
     }
-    res = mne_make_ctf_comp_3(set,chs,nchan,compchs,ncomp);
+    res = MneCTFCompDataSet::mne_make_ctf_comp(set,chs,nchan,compchs,ncomp);
 
     FREE_3(chs);
     FREE_3(compchs);
@@ -6681,61 +5623,7 @@ static int fwd_make_ctf_comp_coils(mneCTFcompDataSet set,          /* The availa
 
 
 
-
-
-
-mneCTFcompData mne_dup_ctf_comp_data_3(mneCTFcompData data)
-{
-    mneCTFcompData res;
-
-    if (!data)
-        return NULL;
-
-    res = mne_new_ctf_comp_data_3();
-
-    res->kind       = data->kind;
-    res->mne_kind   = data->mne_kind;
-    res->calibrated = data->calibrated;
-    res->data       = new MneNamedMatrix(*data->data);
-
-    res->presel     = new FiffSparseMatrix(*data->presel);
-    res->postsel    = new FiffSparseMatrix(*data->postsel);
-
-    return res;
-}
-
-
-
-
-mneCTFcompDataSet mne_dup_ctf_comp_data_set_3(mneCTFcompDataSet set)
-/*
-* Make a verbatim copy of a data set
-*/
-{
-    mneCTFcompDataSet res;
-    int  k;
-
-    if (!set)
-        return NULL;
-
-    res = mne_new_ctf_comp_data_set_3();
-
-    if (set->ncomp > 0) {
-        res->comps = MALLOC_3(set->ncomp,mneCTFcompData);
-        res->ncomp = set->ncomp;
-        for (k = 0; k < res->ncomp; k++)
-            res->comps[k] = mne_dup_ctf_comp_data_3(set->comps[k]);
-    }
-    res->current = mne_dup_ctf_comp_data_3(set->current);
-
-    return res;
-}
-
-
-
-
-
-fwdCompData fwd_make_comp_data(mneCTFcompDataSet set,           /* The CTF compensation data read from the file */
+fwdCompData fwd_make_comp_data(MneCTFCompDataSet* set,           /* The CTF compensation data read from the file */
                                FwdCoilSet*        coils,         /* The principal set of coils */
                                FwdCoilSet*        comp_coils,    /* The compensation coils */
                                fwdFieldFunc      field,	        /* The field computation functions */
@@ -6749,7 +5637,10 @@ fwdCompData fwd_make_comp_data(mneCTFcompDataSet set,           /* The CTF compe
 {
     fwdCompData comp = fwd_new_comp_data();
 
-    comp->set = mne_dup_ctf_comp_data_set_3(set);
+    if(set)
+        comp->set = new MneCTFCompDataSet(*set);
+    else
+        comp->set = NULL;
 
     if (comp_coils) {
         comp->comp_coils = comp_coils->dup_coil_set(NULL);
@@ -6813,7 +5704,7 @@ int fwd_comp_field_vec(float *rd, FwdCoilSet* coils, float **res, void *client)
    * Compute the compensated field of three orthogonal dipoles
    */
     for (k = 0; k < 3; k++) {
-        if (mne_apply_ctf_comp_3(comp->set,TRUE,res[k],coils->ncoil,comp->vec_work[k],comp->comp_coils->ncoil) == FAIL)
+        if (MneCTFCompDataSet::mne_apply_ctf_comp(comp->set,TRUE,res[k],coils->ncoil,comp->vec_work[k],comp->comp_coils->ncoil) == FAIL)
             return FAIL;
     }
     return OK;
@@ -7339,7 +6230,7 @@ int mne_read_bad_channel_list_3(const QString& name, char ***listp, int *nlistp)
 
 
 
-mneCovMatrix mne_read_cov(const QString& name,int kind)
+MneCovMatrix* mne_read_cov(const QString& name,int kind)
 /*
 * Read a covariance matrix from a fiff
 */
@@ -7363,7 +6254,7 @@ mneCovMatrix mne_read_cov(const QString& name,int kind)
     int             nbad       = 0;
     int             ncov       = 0;
     int             nfree      = 1;
-    mneCovMatrix    res        = NULL;
+    MneCovMatrix*    res        = NULL;
 
     int            k,p,nn;
     float          *f;
@@ -7487,11 +6378,11 @@ mneCovMatrix mne_read_cov(const QString& name,int kind)
             goto out;
     }
     if (cov_sparse)
-        res = mne_new_cov_sparse(kind,ncov,names,cov_sparse);
+        res = MneCovMatrix::mne_new_cov_sparse(kind,ncov,names,cov_sparse);
     else if (cov)
-        res = mne_new_cov_dense(kind,ncov,names,cov);
+        res = MneCovMatrix::mne_new_cov_dense(kind,ncov,names,cov);
     else if (cov_diag)
-        res = mne_new_cov_diag(kind,ncov,names,cov_diag);
+        res = MneCovMatrix::mne_new_cov_diag(kind,ncov,names,cov_diag);
     else {
         qCritical("mne_read_cov : covariance matrix data is not defined. How come?");
         goto out;
@@ -7917,7 +6808,7 @@ bad : {
 
 
 
-void mne_revert_to_diag_cov(mneCovMatrix c)
+void mne_revert_to_diag_cov(MneCovMatrix* c)
 /*
 * Pick the diagonal elements of the full covariance matrix
 */
@@ -7952,7 +6843,7 @@ void mne_revert_to_diag_cov(mneCovMatrix c)
 
 
 
-mneCovMatrix mne_pick_chs_cov_omit(mneCovMatrix c, char **new_names, int ncov, int omit_meg_eeg, fiffChInfo chs)
+MneCovMatrix* mne_pick_chs_cov_omit(MneCovMatrix* c, char **new_names, int ncov, int omit_meg_eeg, fiffChInfo chs)
 /*
 * Pick designated channels from a covariance matrix, optionally omit MEG/EEG correlations
 */
@@ -7964,7 +6855,7 @@ mneCovMatrix mne_pick_chs_cov_omit(mneCovMatrix c, char **new_names, int ncov, i
     char  **names = NULL;
     int   *is_meg = NULL;
     int   from,to;
-    mneCovMatrix res;
+    MneCovMatrix* res;
 
     if (ncov == 0) {
         qCritical("No channels specified for picking in mne_pick_chs_cov_omit");
@@ -8038,11 +6929,11 @@ mneCovMatrix mne_pick_chs_cov_omit(mneCovMatrix c, char **new_names, int ncov, i
         }
     }
 
-    res = mne_new_cov_3(c->kind,ncov,names,cov,cov_diag);
+    res = MneCovMatrix::mne_new_cov(c->kind,ncov,names,cov,cov_diag);
 
     res->bads = mne_dup_name_list_3(c->bads,c->nbad);
     res->nbad = c->nbad;
-    res->proj = mne_dup_proj_op_3(c->proj);
+    res->proj = MneProjOp::mne_dup_proj_op(c->proj);
     res->sss  = c->sss ? new MneSssData(*(c->sss)) : NULL;
 
     if (c->ch_class) {
@@ -8144,7 +7035,7 @@ void mne_transpose_dsquare(double **mat, int n)
 
 
 
-int mne_proj_op_apply_cov(MneProjOp* op, mneCovMatrix& c)
+int mne_proj_op_apply_cov(MneProjOp* op, MneCovMatrix*& c)
 /*
 * Apply the projection operator to a covariance matrix
 */
@@ -8210,7 +7101,7 @@ int mne_proj_op_apply_cov(MneProjOp* op, mneCovMatrix& c)
 
     FREE_DCMATRIX_3(dcov);
 
-    c->nproj = mne_proj_op_affect_3(op,c->names,c->ncov);
+    c->nproj = MneProjOp::mne_proj_op_affect(op,c->names,c->ncov);
     return OK;
 }
 
@@ -8296,7 +7187,7 @@ DipoleFitData::~DipoleFitData()
 
 //*************************************************************************************************************
 
-int DipoleFitData::setup_forward_model(DipoleFitData *d, mneCTFcompDataSet comp_data, FwdCoilSet *comp_coils)
+int DipoleFitData::setup_forward_model(DipoleFitData *d, MneCTFCompDataSet* comp_data, FwdCoilSet *comp_coils)
 /*
      * Take care of some hairy details
      */
@@ -8455,7 +7346,7 @@ out :
 
 //*************************************************************************************************************
 
-mneCovMatrix DipoleFitData::ad_hoc_noise(FwdCoilSet *meg, FwdCoilSet *eeg, float grad_std, float mag_std, float eeg_std)
+MneCovMatrix* DipoleFitData::ad_hoc_noise(FwdCoilSet *meg, FwdCoilSet *eeg, float grad_std, float mag_std, float eeg_std)
 /*
      * Specify constant noise values
      */
@@ -8503,7 +7394,7 @@ mneCovMatrix DipoleFitData::ad_hoc_noise(FwdCoilSet *meg, FwdCoilSet *eeg, float
     }
     names = mne_dup_name_list_3(ch_names,nchan);
     FREE_3(ch_names);
-    return mne_new_cov_3(FIFFV_MNE_NOISE_COV,nchan,names,NULL,stds);
+    return MneCovMatrix::mne_new_cov(FIFFV_MNE_NOISE_COV,nchan,names,NULL,stds);
 }
 
 
@@ -8538,7 +7429,7 @@ int DipoleFitData::make_projection(const QList<QString> &projnames, fiffChInfo c
         else {
             printf("Loaded projection from %s:\n",projnames[k].toLatin1().data());
             mne_proj_op_report_3(stderr,"\t",one);
-            all = mne_proj_op_combine_3(all,one);
+            all = MneProjOp::mne_proj_op_combine(all,one);
             if(one)
                 delete one;
             one = NULL;
@@ -8555,17 +7446,17 @@ int DipoleFitData::make_projection(const QList<QString> &projnames, fiffChInfo c
                 }
         }
         if (!found) {
-            if ((one = mne_proj_op_average_eeg_ref_3(chs,nch)) != NULL) {
+            if ((one = MneProjOp::mne_proj_op_average_eeg_ref(chs,nch)) != NULL) {
                 printf("Average EEG reference projection added:\n");
                 mne_proj_op_report_3(stderr,"\t",one);
-                all = mne_proj_op_combine_3(all,one);
+                all = MneProjOp::mne_proj_op_combine(all,one);
                 if(one)
                     delete one;
                 one = NULL;
             }
         }
     }
-    if (all && mne_proj_op_affect_chs_3(all,chs,nch) == 0) {
+    if (all && MneProjOp::mne_proj_op_affect_chs(all,chs,nch) == 0) {
         printf("Projection will not have any effect on selected channels. Projection omitted.\n");
         if(all)
             delete all;
@@ -8726,7 +7617,7 @@ int DipoleFitData::select_dipole_fit_noise_cov(DipoleFitData *f, mshMegEegData d
             qCritical("Too few EEG channels remaining");
             return FAIL;
         }
-        f->noise = mne_dup_cov_3(f->noise_orig);
+        f->noise = MneCovMatrix::mne_dup_cov(f->noise_orig);
         if (nomit_meg+nomit_eeg > 0) {
             if (f->noise->cov) {
                 for (j = 0; j < f->noise->ncov; j++)
@@ -8747,7 +7638,7 @@ int DipoleFitData::select_dipole_fit_noise_cov(DipoleFitData *f, mshMegEegData d
     else {
         if (f->noise && f->nave == nave)
             return OK;
-        f->noise = mne_dup_cov_3(f->noise_orig);
+        f->noise = MneCovMatrix::mne_dup_cov(f->noise_orig);
     }
 
     return scale_dipole_fit_noise_cov(f,nave);
@@ -8768,9 +7659,9 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname, cons
     char           **file_bads;
     int            file_nbad;
     int            coord_frame = FIFFV_COORD_HEAD;
-    mneCovMatrix cov;
+    MneCovMatrix* cov;
     FwdCoilSet*     templates = NULL;
-    mneCTFcompDataSet comp_data  = NULL;
+    MneCTFCompDataSet* comp_data  = NULL;
     FwdCoilSet*        comp_coils = NULL;
 
     /*
@@ -8887,7 +7778,7 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname, cons
     /*
        * Compensation data
        */
-    if ((comp_data = mne_read_ctf_comp_data_3(measname)) == NULL)
+    if ((comp_data = MneCTFCompDataSet::mne_read_ctf_comp_data(measname)) == NULL)
         goto bad;
     if (comp_data->ncomp > 0) {	/* Compensation channel information may be needed */
         fiffChInfo comp_chs = NULL;
@@ -8906,8 +7797,9 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname, cons
         }
         FREE_3(comp_chs);
     }
-    else {			/* Get rid of the empty data set */
-        mne_free_ctf_comp_data_set_3(comp_data);
+    else {          /* Get rid of the empty data set */
+        if(comp_data)
+            delete comp_data;
         comp_data = NULL;
     }
     /*
@@ -9026,7 +7918,8 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname, cons
     mne_free_name_list_3(badlist,nbad);
     delete templates;
     delete comp_coils;
-    mne_free_ctf_comp_data_set_3(comp_data);
+    if(comp_data)
+        delete comp_data;
     return res;
 
 
@@ -9034,7 +7927,8 @@ bad : {
         mne_free_name_list_3(badlist,nbad);
         delete templates;
         delete comp_coils;
-        mne_free_ctf_comp_data_set_3(comp_data);
+        if(comp_data)
+            delete comp_data;
         if(res)
             delete res;
         return NULL;
@@ -9208,7 +8102,7 @@ static float fit_eval(float *rd,int npar,void *user)
     double        Bm2,one;
     int           ncomp,c;
 
-    fwd   = fuser->fwd = DipoleFitData::dipole_forward_one(fit,rd,fuser->fwd);
+    fwd = fuser->fwd = DipoleFitData::dipole_forward_one(fit,rd,fuser->fwd);
     ncomp = fwd->sing[2]/fwd->sing[0] > fuser->limit ? 3 : 2;
     if (fuser->report_dim)
         fprintf(stderr,"ncomp = %d\n",ncomp);
@@ -9594,7 +8488,7 @@ bool DipoleFitData::fit_one(DipoleFitData* fit,	            /* Precomputed fitti
     nchan = fit->nmeg+fit->neeg;
     user.fwd = NULL;
 
-    if (mne_proj_op_proj_vector_3(fit->proj,B,nchan,TRUE) == FAIL)
+    if (MneProjOp::mne_proj_op_proj_vector(fit->proj,B,nchan,TRUE) == FAIL)
         goto bad;
 
     if (mne_whiten_one_data(B,B,nchan,fit->noise) == FAIL)
@@ -9763,7 +8657,7 @@ int DipoleFitData::compute_dipole_field(DipoleFitData* d, float *rd, int whiten,
 #endif
 
     for (k = 0; k < 3; k++)
-        if (mne_proj_op_proj_vector_3(d->proj,fwd[k],d->nmeg+d->neeg,TRUE) == FAIL)
+        if (MneProjOp::mne_proj_op_proj_vector(d->proj,fwd[k],d->nmeg+d->neeg,TRUE) == FAIL)
             goto bad;
 
 #ifdef DEBUG

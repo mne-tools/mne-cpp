@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     mne_proj_item.h
+* @file     mne_raw_buf_def.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    MNEProjItem class declaration.
+* @brief    MneRawBufDef class declaration.
 *
 */
 
-#ifndef MNEPROJITEM_H
-#define MNEPROJITEM_H
+#ifndef MNERAWBUFDEF_H
+#define MNERAWBUFDEF_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -42,6 +42,8 @@
 //=============================================================================================================
 
 #include "../inverse_global.h"
+
+#include <fiff/fiff_dir_node.h>
 
 
 //*************************************************************************************************************
@@ -58,6 +60,7 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
+#include <QList>
 
 
 //*************************************************************************************************************
@@ -73,63 +76,62 @@ namespace INVERSELIB
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class MneNamedMatrix;
-
-
 
 //=============================================================================================================
 /**
-* Implements an MNE Projection Item (Replaces *mneProjItem,mneProjItemRec; struct of MNE-C mne_types.h).
+* Implements the MNE Raw Information (Replaces *mneRawBufDef,mneRawBufDefRec; struct of MNE-C mne_types.h).
 *
-* @brief One linear projection item
+* @brief Information about raw data in fiff file
 */
-class INVERSESHARED_EXPORT MneProjItem
+class INVERSESHARED_EXPORT MneRawBufDef
 {
 public:
-    typedef QSharedPointer<MneProjItem> SPtr;              /**< Shared pointer type for MneDeriv. */
-    typedef QSharedPointer<const MneProjItem> ConstSPtr;   /**< Const shared pointer type for MneDeriv. */
+    typedef QSharedPointer<MneRawBufDef> SPtr;              /**< Shared pointer type for MneRawBufDef. */
+    typedef QSharedPointer<const MneRawBufDef> ConstSPtr;   /**< Const shared pointer type for MneRawBufDef. */
 
     //=========================================================================================================
     /**
-    * Constructs the MNE Projection Item
-    * Refactored: mne_new_proj_op_item (mne_lin_proj.c)
+    * Constructs the MNE Raw Buffer Definition
+    * Refactored:  (.c)
     */
-    MneProjItem();
+    MneRawBufDef();
 
     //=========================================================================================================
     /**
-    * Destroys the MNE Projection Item
-    * Refactored: mne_free_proj_op_item (mne_lin_proj.c)
+    * Destroys the MNE Raw Buffer Definition
+    * Refactored:  (.c)
     */
-    ~MneProjItem();
+    ~MneRawBufDef();
 
 
-
-    static int mne_proj_item_affect(MneProjItem* it, char **list, int nlist);
-
-
+    static void free_bufs(MneRawBufDef* bufs, int nbuf);
 
 public:
-    MneNamedMatrix* vecs;           /**< The original projection vectors */
-    int             nvec;           /**< Number of vectors = vecs->nrow */
-    char            *desc;          /**< Projection item description */
-    int             kind;           /**< Projection item kind */
-    int             active;         /**< Is this item active now? */
-    int             active_file;    /**< Was this item active when loaded from file? */
-    int             has_meg;        /**< Does it have MEG channels? */
-    int             has_eeg;        /**< Does it have EEG channels? */
+    FIFFLIB::FiffDirEntry::SPtr ent;    /* Where is this in the file (file bufs only, pointer to info) */
+    int   firsts,lasts;     /* First and last sample */
+    int   ntaper;           /* For filtered buffers: taper length */
+    int   ns;               /* Number of samples (last - first + 1) */
+    int   nchan;            /* Number of channels */
+    int   is_skip;          /* Is this a skip? */
+    float **vals;           /* Values (null if not in memory) */
+    int   valid;            /* Are the data meaningful? */
+    int   *ch_filtered;     /* For filtered buffers: has this channel filtered already */
+    int   comp_status;      /* For raw buffers: compensation status */
 
-// ### OLD STRUCT ###
-//typedef struct {    /* One linear projection item */
-//    INVERSELIB::MneNamedMatrix* vecs;   /* The original projection vectors */
-//    int            nvec;                /* Number of vectors = vecs->nrow */
-//    char           *desc;               /* Projection item description */
-//    int            kind;                /* Projection item kind */
-//    int            active;              /* Is this item active now? */
-//    int            active_file;         /* Was this item active when loaded from file? */
-//    int            has_meg;             /* Does it have MEG channels? */
-//    int            has_eeg;             /* Does it have EEG channels? */
-//} *mneProjItem,mneProjItemRec;
+
+//// ### OLD STRUCT ###
+//typedef struct {
+//    FIFFLIB::FiffDirEntry::SPtr ent;    /* Where is this in the file (file bufs only, pointer to info) */
+//    int   firsts,lasts;     /* First and last sample */
+//    int   ntaper;           /* For filtered buffers: taper length */
+//    int   ns;               /* Number of samples (last - first + 1) */
+//    int   nchan;            /* Number of channels */
+//    int   is_skip;          /* Is this a skip? */
+//    float **vals;           /* Values (null if not in memory) */
+//    int   valid;            /* Are the data meaningful? */
+//    int   *ch_filtered;     /* For filtered buffers: has this channel filtered already */
+//    int   comp_status;      /* For raw buffers: compensation status */
+//} *mneRawBufDef,mneRawBufDefRec;
 };
 
 //*************************************************************************************************************
@@ -139,4 +141,4 @@ public:
 
 } // NAMESPACE INVERSELIB
 
-#endif // MNEPROJITEM_H
+#endif // MNERAWBUFDEF_H
