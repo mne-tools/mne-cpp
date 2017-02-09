@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     mne_proj_item.h
+* @file     mne_ctf_comp_data.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    MNEProjItem class declaration.
+* @brief    MneCTFCompData class declaration.
 *
 */
 
-#ifndef MNEPROJITEM_H
-#define MNEPROJITEM_H
+#ifndef MNECTFCOMPDATA_H
+#define MNECTFCOMPDATA_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -42,6 +42,9 @@
 //=============================================================================================================
 
 #include "../inverse_global.h"
+
+#include "mne_named_matrix.h"
+#include "fiff_sparse_matrix.h"
 
 
 //*************************************************************************************************************
@@ -58,6 +61,7 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
+#include <QList>
 
 
 //*************************************************************************************************************
@@ -73,63 +77,77 @@ namespace INVERSELIB
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class MneNamedMatrix;
-
-
 
 //=============================================================================================================
 /**
-* Implements an MNE Projection Item (Replaces *mneProjItem,mneProjItemRec; struct of MNE-C mne_types.h).
+* Implements an MNE CTF Compensation Data (Replaces *mneCTFcompData,mneCTFcompDataRec; struct of MNE-C mne_types.h).
 *
-* @brief One linear projection item
+* @brief One MNE CTF compensation description
 */
-class INVERSESHARED_EXPORT MneProjItem
+class INVERSESHARED_EXPORT MneCTFCompData
 {
 public:
-    typedef QSharedPointer<MneProjItem> SPtr;              /**< Shared pointer type for MneDeriv. */
-    typedef QSharedPointer<const MneProjItem> ConstSPtr;   /**< Const shared pointer type for MneDeriv. */
+    typedef QSharedPointer<MneCTFCompData> SPtr;              /**< Shared pointer type for MneCTFCompData. */
+    typedef QSharedPointer<const MneCTFCompData> ConstSPtr;   /**< Const shared pointer type for MneCTFCompData. */
 
     //=========================================================================================================
     /**
-    * Constructs the MNE Projection Item
-    * Refactored: mne_new_proj_op_item (mne_lin_proj.c)
+    * Constructs the MNE CTF Comepnsation Data
+    * Refactored: mne_new_ctf_comp_data (mne_ctf_comp.c)
     */
-    MneProjItem();
+    MneCTFCompData();
 
     //=========================================================================================================
     /**
-    * Destroys the MNE Projection Item
-    * Refactored: mne_free_proj_op_item (mne_lin_proj.c)
+    * Copies MNE CTF Comepnsation Data
+    * Refactored: mne_dup_ctf_comp_data (mne_ctf_comp.c)
     */
-    ~MneProjItem();
+    MneCTFCompData(const MneCTFCompData& comp);
+
+    //=========================================================================================================
+    /**
+    * Destroys the MNE CTF Comepnsation Data
+    * Refactored: mne_free_ctf_comp_data (mne_ctf_comp.c)
+    */
+    ~MneCTFCompData();
 
 
 
-    static int mne_proj_item_affect(MneProjItem* it, char **list, int nlist);
+
+    static int mne_calibrate_ctf_comp(MneCTFCompData*       one,
+                                      FIFFLIB::fiffChInfo   chs,
+                                      int            nch,
+                                      int            do_it);
+
+
+
+
 
 
 
 public:
-    MneNamedMatrix* vecs;           /**< The original projection vectors */
-    int             nvec;           /**< Number of vectors = vecs->nrow */
-    char            *desc;          /**< Projection item description */
-    int             kind;           /**< Projection item kind */
-    int             active;         /**< Is this item active now? */
-    int             active_file;    /**< Was this item active when loaded from file? */
-    int             has_meg;        /**< Does it have MEG channels? */
-    int             has_eeg;        /**< Does it have EEG channels? */
+    int             kind;                   /* The compensation kind (CTF) */
+    int             mne_kind;               /* Our kind */
+    int             calibrated;             /* Are the coefficients in the file calibrated already? */
+    INVERSELIB::MneNamedMatrix*  data;      /* The compensation data */
+    INVERSELIB::FiffSparseMatrix* presel;   /* Apply this selector prior to compensation */
+    INVERSELIB::FiffSparseMatrix* postsel;  /* Apply this selector after compensation */
+    float           *presel_data;           /* These are used for the intermediate results in the calculations */
+    float           *comp_data;
+    float           *postsel_data;
 
-// ### OLD STRUCT ###
-//typedef struct {    /* One linear projection item */
-//    INVERSELIB::MneNamedMatrix* vecs;   /* The original projection vectors */
-//    int            nvec;                /* Number of vectors = vecs->nrow */
-//    char           *desc;               /* Projection item description */
-//    int            kind;                /* Projection item kind */
-//    int            active;              /* Is this item active now? */
-//    int            active_file;         /* Was this item active when loaded from file? */
-//    int            has_meg;             /* Does it have MEG channels? */
-//    int            has_eeg;             /* Does it have EEG channels? */
-//} *mneProjItem,mneProjItemRec;
+//// ### OLD STRUCT ###
+//typedef struct {
+//    int             kind;                   /* The compensation kind (CTF) */
+//    int             mne_kind;               /* Our kind */
+//    int             calibrated;             /* Are the coefficients in the file calibrated already? */
+//    INVERSELIB::MneNamedMatrix*  data;      /* The compensation data */
+//    INVERSELIB::FiffSparseMatrix* presel;   /* Apply this selector prior to compensation */
+//    INVERSELIB::FiffSparseMatrix* postsel;  /* Apply this selector after compensation */
+//    float           *presel_data;           /* These are used for the intermediate results in the calculations */
+//    float           *comp_data;
+//    float           *postsel_data;
+//} *mneCTFcompData,mneCTFcompDataRec;
 };
 
 //*************************************************************************************************************
@@ -139,4 +157,4 @@ public:
 
 } // NAMESPACE INVERSELIB
 
-#endif // MNEPROJITEM_H
+#endif // MNECTFCOMPDATA_H

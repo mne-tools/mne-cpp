@@ -42,6 +42,11 @@
 //=============================================================================================================
 
 #include "../inverse_global.h"
+#include "mne_named_matrix.h"
+
+#include <fiff/fiff_types.h>
+#include <fiff/fiff_stream.h>
+#include <fiff/fiff_dir_node.h>
 
 
 //*************************************************************************************************************
@@ -109,6 +114,58 @@ public:
     * Refactored: ne_free_proj_op_proj (mne_lin_proj.c)
     */
     static void mne_free_proj_op_proj(MneProjOp* op);
+
+
+
+    // mne_lin_proj.c
+    static MneProjOp* mne_proj_op_combine(MneProjOp* to, MneProjOp* from);
+
+    // mne_lin_proj.c
+    static void mne_proj_op_add_item_act(MneProjOp* op, MneNamedMatrix* vecs, int kind, const char *desc, int is_active);
+
+    // mne_lin_proj.c
+    static void mne_proj_op_add_item(MneProjOp* op, MneNamedMatrix* vecs, int kind, const char *desc);
+
+    // mne_lin_proj.c
+    static MneProjOp* mne_dup_proj_op(MneProjOp* op);
+
+    // mne_lin_proj.c
+    static MneProjOp* mne_proj_op_average_eeg_ref(FIFFLIB::fiffChInfo chs, int nch);
+
+
+    static int mne_proj_op_affect(MneProjOp* op, char **list, int nlist);
+
+
+    static int mne_proj_op_affect_chs(MneProjOp* op, FIFFLIB::fiffChInfo chs, int nch);
+
+
+    static int mne_proj_op_proj_vector(MneProjOp* op, float *vec, int nvec, int do_complement);
+
+
+
+    //============================= mne_lin_proj_io.c =============================
+
+    static MneProjOp* mne_read_proj_op_from_node(//fiffFile in,
+                                         FIFFLIB::FiffStream::SPtr& stream,
+                                         const FIFFLIB::FiffDirNode::SPtr& start);
+
+    static MneProjOp* mne_read_proj_op(const QString& name);
+
+
+    static void mne_proj_op_report_data(FILE *out,const char *tag, MneProjOp* op, int list_data, char **exclude, int nexclude);
+
+
+    static void mne_proj_op_report(FILE *out,const char *tag, MneProjOp* op);
+
+
+
+
+
+
+
+
+
+
 
 public:
     QList<INVERSELIB::MneProjItem*> items;  /* The projection items */

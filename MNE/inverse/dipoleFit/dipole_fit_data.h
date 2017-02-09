@@ -142,12 +142,12 @@ public:
     //============================= dipole_fit_setup.c =============================
 
 
-    static int setup_forward_model(DipoleFitData* d, mneCTFcompDataSet comp_data, FwdCoilSet* comp_coils);
+    static int setup_forward_model(DipoleFitData* d, MneCTFCompDataSet* comp_data, FwdCoilSet* comp_coils);
 
 
 
 
-    static mneCovMatrix ad_hoc_noise(FwdCoilSet* meg,          /* Channel name lists to define which channels are gradiometers */
+    static MneCovMatrix* ad_hoc_noise(FwdCoilSet* meg,          /* Channel name lists to define which channels are gradiometers */
                                      FwdCoilSet* eeg,
                                      float      grad_std,
                                      float      mag_std,
@@ -254,8 +254,8 @@ public:
       dipoleFitFuncs    mag_dipole_funcs;   /**< Functions to fit a magnetic dipole */
 
       int               fixed_noise;        /**< Were fixed noise values used rather than a noise-covariance matrix read from a file */
-      mneCovMatrix      noise_orig;         /**< Noise covariance matrix (original) */
-      mneCovMatrix      noise;              /**< Noise covariance matrix (weighted to take the selection into account) */
+      MneCovMatrix*      noise_orig;         /**< Noise covariance matrix (original) */
+      MneCovMatrix*      noise;              /**< Noise covariance matrix (weighted to take the selection into account) */
       int               nave;               /**< How many averages does this correspond to? */
       MneProjOp*        proj;               /**< The projection operator to use */
       int               column_norm;        /**< What kind of column normalization to apply to the forward solution */
@@ -290,8 +290,8 @@ public:
 
 //      int               fixed_noise;      /* Were fixed noise values used rather than a noise-covariance
 //                           * matrix read from a file */
-//      mneCovMatrix      noise_orig;	      /* Noise covariance matrix (original) */
-//      mneCovMatrix      noise;	      /* Noise covariance matrix (weighted to take the selection into account) */
+//      MneCovMatrix*      noise_orig;	      /* Noise covariance matrix (original) */
+//      MneCovMatrix*      noise;	      /* Noise covariance matrix (weighted to take the selection into account) */
 //      int               nave;	      /* How many averages does this correspond to? */
 //      mneProjOp         proj;	      /* The projection operator to use */
 //      int               column_norm;      /* What kind of column normalization to apply to the forward solution */
