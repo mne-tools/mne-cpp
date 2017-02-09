@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     mne_proj_item.cpp
+* @file     mne_raw_buf_def.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,32 +29,21 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the MNEProjItem Class.
+* @brief    Implementation of the MneRawBufDef Class.
 *
 */
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "mne_proj_item.h"
-#include "mne_types.h"
+#include "mne_raw_buf_def.h"
 
 
+#include <Eigen/Core>
 
-#define FREE_21(x) if ((char *)(x) != NULL) free((char *)(x))
-
-#ifndef TRUE
-#define TRUE 1
-#endif
-
-#ifndef FALSE
-#define FALSE 0
-#endif
-
-
+#define FREE_34(x) if ((char *)(x) != NULL) free((char *)(x))
 
 
 //*************************************************************************************************************
@@ -63,6 +52,7 @@
 //=============================================================================================================
 
 using namespace Eigen;
+using namespace FIFFLIB;
 using namespace INVERSELIB;
 
 
@@ -71,15 +61,7 @@ using namespace INVERSELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MneProjItem::MneProjItem()
-: vecs (NULL)
-, kind (FIFFV_PROJ_ITEM_NONE)
-, desc (NULL)
-, nvec (0)
-, active (TRUE)
-, active_file (FALSE)
-, has_meg (FALSE)
-, has_eeg (FALSE)
+MneRawBufDef::MneRawBufDef()
 {
 
 }
@@ -87,34 +69,23 @@ MneProjItem::MneProjItem()
 
 //*************************************************************************************************************
 
-MneProjItem::~MneProjItem()
+MneRawBufDef::~MneRawBufDef()
 {
-    if(vecs)
-        delete vecs;
-    FREE_21(desc);
-    return;
 }
 
 
 //*************************************************************************************************************
 
-int MneProjItem::mne_proj_item_affect(MneProjItem *it, char **list, int nlist)
-/*
-    * Does this projection item affect this list of channels?
-    */
+void MneRawBufDef::free_bufs(MneRawBufDef *bufs, int nbuf)
+
 {
-    int k,p,q;
-
-    if (it == NULL || it->vecs == NULL || it->nvec == 0)
-        return FALSE;
-
-    for (k = 0; k < nlist; k++)
-        for (p = 0; p < it->vecs->ncol; p++)
-            if (strcmp(it->vecs->collist[p],list[k]) == 0) {
-                for (q = 0; q < it->vecs->nrow; q++) {
-                    if (it->vecs->data[q][p] != 0.0)
-                        return TRUE;
-                }
-            }
-    return FALSE;
+    int k;
+    for (k = 0; k < nbuf; k++) {
+        FREE_34(bufs[k].ch_filtered);
+        /*
+         * Clear the pointers only, not the data which are in the ringbuffer
+         */
+        FREE_34(bufs[k].vals);
+    }
+    FREE_34(bufs);
 }
