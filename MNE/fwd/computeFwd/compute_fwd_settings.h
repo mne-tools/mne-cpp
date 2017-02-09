@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     main.cpp
+* @file     compute_fwd_settings.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,19 +29,26 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implements the mne_dipole_fit application.
+* @brief    Compute Forward Setting class declaration.
 *
 */
 
+#ifndef COMPUTEFWDSETTINGS_H
+#define COMPUTEFWDSETTINGS_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include <fwd/computeFwd/compute_fwd_settings.h>
+#include "../fwd_global.h"
 
-#include <iostream>
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
 
 
 //*************************************************************************************************************
@@ -49,36 +56,79 @@
 // Qt INCLUDES
 //=============================================================================================================
 
-#include <QApplication>
+#include <QSharedPointer>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// DEFINE NAMESPACE FWDLIB
 //=============================================================================================================
 
-using namespace FWDLIB;
-
+namespace FWDLIB
+{
 
 //*************************************************************************************************************
 //=============================================================================================================
-// MAIN
+// FORWARD DECLARATIONS
 //=============================================================================================================
+
 
 //=============================================================================================================
 /**
-* The function main marks the entry point of the mne_dipole_fit application.
-* By default, main has the storage class extern.
+* Implements the compute forward setting parser
 *
-* @param [in] argc  (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
-* @param [in] argv  (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
-* @return the value that was set to exit() (which is 0 if exit() is called via quit()).
+* @brief Compute Forward setting implementation
 */
-int main(int argc, char *argv[])
+class FWDSHARED_EXPORT ComputeFwdSettings
 {
-    QApplication app(argc, argv);
+public:
+    typedef QSharedPointer<ComputeFwdSettings> SPtr;             /**< Shared pointer type for ComputeFwdSettings. */
+    typedef QSharedPointer<const ComputeFwdSettings> ConstSPtr;  /**< Const shared pointer type for ComputeFwdSettings. */
 
-    ComputeFwdSettings settings(&argc,argv);
+    //=========================================================================================================
+    /**
+    * Default Constructor
+    */
+    explicit ComputeFwdSettings();
 
-    return app.exec();
-}
+    //=========================================================================================================
+    /**
+    * Constructs Compute Forward Settings
+    *
+    * @param [in] argc (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
+    * @param [in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
+    */
+    explicit ComputeFwdSettings(int *argc,char **argv);
+
+    //=========================================================================================================
+    /**
+    * Destructs the Compute Forward Settings
+    */
+    virtual ~ComputeFwdSettings();
+
+    //=========================================================================================================
+    /**
+    * Check whether Compute Forward Settings are correctly set.
+    */
+    void checkIntegrity();
+
+public:
+
+
+private:
+    void initMembers();
+    void usage(char *name);
+    bool check_unrecognized_args(int argc, char **argv);
+    bool check_args (int *argc,char **argv);
+
+};
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+
+} //NAMESPACE
+
+#endif // COMPUTEFWDSETTINGS_H

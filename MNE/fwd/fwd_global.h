@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     main.cpp
+* @file     fwd_global.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,56 +29,38 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implements the mne_dipole_fit application.
+* @brief    forward library export/import macros.
 *
 */
 
+#ifndef FWD_GLOBAL_H
+#define FWD_GLOBAL_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include <fwd/computeFwd/compute_fwd_settings.h>
-
-#include <iostream>
+#include <QtCore/qglobal.h>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// DEFINES
 //=============================================================================================================
 
-#include <QApplication>
+#if defined(BUILD_MNECPP_STATIC_LIB)
+#  define FWDSHARED_EXPORT
+#elif defined(FWD_LIBRARY)
+#  define FWDSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+#else
+#  define FWDSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+#endif
 
+//#if defined(INVERSE_LIBRARY)
+//#  define INVERSESHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+//#else
+//#  define INVERSESHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+//#endif
 
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace FWDLIB;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// MAIN
-//=============================================================================================================
-
-//=============================================================================================================
-/**
-* The function main marks the entry point of the mne_dipole_fit application.
-* By default, main has the storage class extern.
-*
-* @param [in] argc  (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
-* @param [in] argv  (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
-* @return the value that was set to exit() (which is 0 if exit() is called via quit()).
-*/
-int main(int argc, char *argv[])
-{
-    QApplication app(argc, argv);
-
-    ComputeFwdSettings settings(&argc,argv);
-
-    return app.exec();
-}
+#endif // FWD_GLOBAL_H

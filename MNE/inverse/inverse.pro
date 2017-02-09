@@ -179,6 +179,9 @@ INCLUDEPATH += $${MNE_INCLUDE_DIR}
 header_files.files = ./*.h
 header_files.path = $${MNE_INCLUDE_DIR}/inverse
 
+header_files_dipole_fit.files = ./dipoleFit/*.h
+header_files_dipole_fit.path = $${MNE_INCLUDE_DIR}/inverse/dipoleFit
+
 header_files_minimum_norm.files = ./minimumNorm/*.h
 header_files_minimum_norm.path = $${MNE_INCLUDE_DIR}/inverse/minimumNorm
 
@@ -186,6 +189,7 @@ header_files_rap_music.files = ./rapMusic/*.h
 header_files_rap_music.path = $${MNE_INCLUDE_DIR}/inverse/rapMusic
 
 INSTALLS += header_files
+INSTALLS += header_files_dipole_fit
 INSTALLS += header_files_minimum_norm
 INSTALLS += header_files_rap_music
 
@@ -207,6 +211,3 @@ win32 {
     #  warning($${DEPLOY_COMMAND} $${DEPLOY_TARGET})
     QMAKE_POST_LINK += $${DEPLOY_COMMAND} $${DEPLOY_TARGET}
 }
-
-DISTFILES += \
-    dipoleFit/dipolefit_helpers_bak.txt
