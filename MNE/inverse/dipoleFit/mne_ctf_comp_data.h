@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     dipole_fit.h
+* @file     mne_ctf_comp_data.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     December, 2016
+* @date     January, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) 2016, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Dipole Fit class declaration.
+* @brief    MneCTFCompData class declaration.
 *
 */
 
-#ifndef DIPOLEFIT_H
-#define DIPOLEFIT_H
+#ifndef MNECTFCOMPDATA_H
+#define MNECTFCOMPDATA_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -42,14 +42,17 @@
 //=============================================================================================================
 
 #include "../inverse_global.h"
-#include "ecd_set.h"
-#include "dipole_fit_settings.h"
-#include "dipole_fit_data.h"
-#include "mne_meas_data.h"
 
-#include "mne_types.h"
+#include "mne_named_matrix.h"
+#include "fiff_sparse_matrix.h"
 
 
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
 
 
 //*************************************************************************************************************
@@ -58,7 +61,7 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
-
+#include <QList>
 
 
 //*************************************************************************************************************
@@ -74,104 +77,77 @@ namespace INVERSELIB
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-//class DipoleFitData;
-//class GuessData;
-//class MneMeasData
-
 
 //=============================================================================================================
 /**
-* Implements all required dipole fitting routines
+* Implements an MNE CTF Compensation Data (Replaces *mneCTFcompData,mneCTFcompDataRec; struct of MNE-C mne_types.h).
 *
-* @brief Dipole Fit implementation
+* @brief One MNE CTF compensation description
 */
-class INVERSESHARED_EXPORT DipoleFit
+class INVERSESHARED_EXPORT MneCTFCompData
 {
 public:
-    typedef QSharedPointer<DipoleFit> SPtr;             /**< Shared pointer type for DipoleFit. */
-    typedef QSharedPointer<const DipoleFit> ConstSPtr;  /**< Const shared pointer type for DipoleFit. */
+    typedef QSharedPointer<MneCTFCompData> SPtr;              /**< Shared pointer type for MneCTFCompData. */
+    typedef QSharedPointer<const MneCTFCompData> ConstSPtr;   /**< Const shared pointer type for MneCTFCompData. */
 
     //=========================================================================================================
     /**
-    * Constructs Dipole Fit algorithm
+    * Constructs the MNE CTF Comepnsation Data
+    * Refactored: mne_new_ctf_comp_data (mne_ctf_comp.c)
     */
-    explicit DipoleFit(DipoleFitSettings* p_settings);
+    MneCTFCompData();
 
-    virtual ~DipoleFit(){}
+    //=========================================================================================================
+    /**
+    * Copies MNE CTF Comepnsation Data
+    * Refactored: mne_dup_ctf_comp_data (mne_ctf_comp.c)
+    */
+    MneCTFCompData(const MneCTFCompData& comp);
 
-    //ToDo split this function into init (with settings as parameter) and teh actual fit function
-    ECDSet calculateFit() const;
-//    virtual const char* getName() const;
+    //=========================================================================================================
+    /**
+    * Destroys the MNE CTF Comepnsation Data
+    * Refactored: mne_free_ctf_comp_data (mne_ctf_comp.c)
+    */
+    ~MneCTFCompData();
+
+
+
+
+    static int mne_calibrate_ctf_comp(MneCTFCompData*       one,
+                                      FIFFLIB::fiffChInfo   chs,
+                                      int            nch,
+                                      int            do_it);
+
+
+
+
+
+
 
 public:
+    int             kind;                   /* The compensation kind (CTF) */
+    int             mne_kind;               /* Our kind */
+    int             calibrated;             /* Are the coefficients in the file calibrated already? */
+    INVERSELIB::MneNamedMatrix*  data;      /* The compensation data */
+    INVERSELIB::FiffSparseMatrix* presel;   /* Apply this selector prior to compensation */
+    INVERSELIB::FiffSparseMatrix* postsel;  /* Apply this selector after compensation */
+    float           *presel_data;           /* These are used for the intermediate results in the calculations */
+    float           *comp_data;
+    float           *postsel_data;
 
-    //=========================================================================================================
-    /**
-    *
-    * Fit a single dipole to each time point of the data
-    * Refactored: fit_dipoles (fit_dipoles.c)
-    *
-    * @param[in] dataname
-    * @param[in] data       The measured data
-    * @param[in] fit        Precomputed fitting data
-    * @param[in] guess      The initial guesses
-    * @param[in] tmin       Time range
-    * @param[in] tmax
-    * @param[in] tstep      Time step to use
-    * @param[in] integ      Integration time
-    * @param[in] verbose    Verbose output?
-    * @param[out] p_set     the fitted ECD Set
-    *
-    * @return true when successful
-    */
-    static int fit_dipoles( const QString& dataname, MneMeasData* data, DipoleFitData* fit, GuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose, ECDSet& p_set);
-
-    //=========================================================================================================
-    /**
-    *
-    * Fit a single dipole to each time point of the data
-    * Refactored: fit_dipoles_raw (fit_dipoles.c)
-    *
-    * @param[in] dataname
-    * @param[in] raw        The raw data description
-    * @param[in] sel        Channel selection to use
-    * @param[in] fit        Precomputed fitting data
-    * @param[in] guess      The initial guesses
-    * @param[in] tmin       Time range
-    * @param[in] tmax
-    * @param[in] tstep      Time step to use
-    * @param[in] integ      Integration time
-    * @param[in] verbose    Verbose output?
-    * @param[out] p_set     Return all results here. Warning: for large data files this may take a lot of memory
-    *
-    * @return true when successful
-    */
-    static int fit_dipoles_raw(const QString& dataname, MneRawData* raw, mneChSelection sel, DipoleFitData* fit, GuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose, ECDSet& p_set);
-
-    //=========================================================================================================
-    /**
-    *
-    * Fit a single dipole to each time point of the data
-    * Refactored: fit_dipoles_raw (fit_dipoles.c)
-    *
-    * @param[in] dataname
-    * @param[in] raw        The raw data description
-    * @param[in] sel        Channel selection to use
-    * @param[in] fit        Precomputed fitting data
-    * @param[in] guess      The initial guesses
-    * @param[in] tmin       Time range
-    * @param[in] tmax
-    * @param[in] tstep      Time step to use
-    * @param[in] integ      Integration time
-    * @param[in] verbose    Verbose output?
-    *
-    * @return true when successful
-    */
-    static int fit_dipoles_raw(const QString& dataname, MneRawData* raw, mneChSelection sel, DipoleFitData* fit, GuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose);
-
-private:
-    DipoleFitSettings* settings;
-
+//// ### OLD STRUCT ###
+//typedef struct {
+//    int             kind;                   /* The compensation kind (CTF) */
+//    int             mne_kind;               /* Our kind */
+//    int             calibrated;             /* Are the coefficients in the file calibrated already? */
+//    INVERSELIB::MneNamedMatrix*  data;      /* The compensation data */
+//    INVERSELIB::FiffSparseMatrix* presel;   /* Apply this selector prior to compensation */
+//    INVERSELIB::FiffSparseMatrix* postsel;  /* Apply this selector after compensation */
+//    float           *presel_data;           /* These are used for the intermediate results in the calculations */
+//    float           *comp_data;
+//    float           *postsel_data;
+//} *mneCTFcompData,mneCTFcompDataRec;
 };
 
 //*************************************************************************************************************
@@ -179,7 +155,6 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
+} // NAMESPACE INVERSELIB
 
-} //NAMESPACE
-
-#endif // DIPOLEFIT_H
+#endif // MNECTFCOMPDATA_H
