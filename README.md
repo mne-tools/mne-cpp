@@ -49,7 +49,7 @@ Mailing List: http://mail.nmr.mgh.harvard.edu/mailman/listinfo/mne_analysis
 Releases
 --------
 
-Get the latest Release from the [MNE-CPP Releases page](https://github.com/mne-tools/mne-cpp/releases).
+Get the latest Release Code from the [MNE-CPP Releases page](https://github.com/mne-tools/mne-cpp/releases) or the Binaries from the [MNE-CPP Download page](http://www.mne-cpp.org/index.php/download/).
 
 
 License
