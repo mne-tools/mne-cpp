@@ -62,6 +62,7 @@
 #include "fwd_coil_set.h"
 #include "mne_meas_data.h"
 #include "mne_surface_or_volume.h"
+#include "mne_cov_matrix.h"
 
 
 
@@ -147,7 +148,7 @@ typedef struct {		                     /* This is used for field mapping with he
   float        **self_dots;	                     /* Dot products between the original leads */
   float        **surface_dots;			     /* Dot products from the original leads to the virtual leads */
   float        intrad;		                     /* The integration radius used */
-  mneCovMatrix noise;				     /* Noise-covariance matrix to use */
+  INVERSELIB::MneCovMatrix* noise;				     /* Noise-covariance matrix to use */
   int          nest;	                             /* How many singular values to include? */
   float        **mapping_mat;		             /* The mapping matrix */
 } *fieldMappingData, fieldMappingDataRec;
