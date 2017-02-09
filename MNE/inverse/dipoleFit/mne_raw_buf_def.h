@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     dipole_fit.h
+* @file     mne_raw_buf_def.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     December, 2016
+* @date     January, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) 2016, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Dipole Fit class declaration.
+* @brief    MneRawBufDef class declaration.
 *
 */
 
-#ifndef DIPOLEFIT_H
-#define DIPOLEFIT_H
+#ifndef MNERAWBUFDEF_H
+#define MNERAWBUFDEF_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -42,14 +42,16 @@
 //=============================================================================================================
 
 #include "../inverse_global.h"
-#include "ecd_set.h"
-#include "dipole_fit_settings.h"
-#include "dipole_fit_data.h"
-#include "mne_meas_data.h"
 
-#include "mne_types.h"
+#include <fiff/fiff_dir_node.h>
 
 
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
 
 
 //*************************************************************************************************************
@@ -58,7 +60,7 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
-
+#include <QList>
 
 
 //*************************************************************************************************************
@@ -74,104 +76,62 @@ namespace INVERSELIB
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-//class DipoleFitData;
-//class GuessData;
-//class MneMeasData
-
 
 //=============================================================================================================
 /**
-* Implements all required dipole fitting routines
+* Implements the MNE Raw Information (Replaces *mneRawBufDef,mneRawBufDefRec; struct of MNE-C mne_types.h).
 *
-* @brief Dipole Fit implementation
+* @brief Information about raw data in fiff file
 */
-class INVERSESHARED_EXPORT DipoleFit
+class INVERSESHARED_EXPORT MneRawBufDef
 {
 public:
-    typedef QSharedPointer<DipoleFit> SPtr;             /**< Shared pointer type for DipoleFit. */
-    typedef QSharedPointer<const DipoleFit> ConstSPtr;  /**< Const shared pointer type for DipoleFit. */
+    typedef QSharedPointer<MneRawBufDef> SPtr;              /**< Shared pointer type for MneRawBufDef. */
+    typedef QSharedPointer<const MneRawBufDef> ConstSPtr;   /**< Const shared pointer type for MneRawBufDef. */
 
     //=========================================================================================================
     /**
-    * Constructs Dipole Fit algorithm
+    * Constructs the MNE Raw Buffer Definition
+    * Refactored:  (.c)
     */
-    explicit DipoleFit(DipoleFitSettings* p_settings);
+    MneRawBufDef();
 
-    virtual ~DipoleFit(){}
+    //=========================================================================================================
+    /**
+    * Destroys the MNE Raw Buffer Definition
+    * Refactored:  (.c)
+    */
+    ~MneRawBufDef();
 
-    //ToDo split this function into init (with settings as parameter) and teh actual fit function
-    ECDSet calculateFit() const;
-//    virtual const char* getName() const;
+
+    static void free_bufs(MneRawBufDef* bufs, int nbuf);
 
 public:
+    FIFFLIB::FiffDirEntry::SPtr ent;    /* Where is this in the file (file bufs only, pointer to info) */
+    int   firsts,lasts;     /* First and last sample */
+    int   ntaper;           /* For filtered buffers: taper length */
+    int   ns;               /* Number of samples (last - first + 1) */
+    int   nchan;            /* Number of channels */
+    int   is_skip;          /* Is this a skip? */
+    float **vals;           /* Values (null if not in memory) */
+    int   valid;            /* Are the data meaningful? */
+    int   *ch_filtered;     /* For filtered buffers: has this channel filtered already */
+    int   comp_status;      /* For raw buffers: compensation status */
 
-    //=========================================================================================================
-    /**
-    *
-    * Fit a single dipole to each time point of the data
-    * Refactored: fit_dipoles (fit_dipoles.c)
-    *
-    * @param[in] dataname
-    * @param[in] data       The measured data
-    * @param[in] fit        Precomputed fitting data
-    * @param[in] guess      The initial guesses
-    * @param[in] tmin       Time range
-    * @param[in] tmax
-    * @param[in] tstep      Time step to use
-    * @param[in] integ      Integration time
-    * @param[in] verbose    Verbose output?
-    * @param[out] p_set     the fitted ECD Set
-    *
-    * @return true when successful
-    */
-    static int fit_dipoles( const QString& dataname, MneMeasData* data, DipoleFitData* fit, GuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose, ECDSet& p_set);
 
-    //=========================================================================================================
-    /**
-    *
-    * Fit a single dipole to each time point of the data
-    * Refactored: fit_dipoles_raw (fit_dipoles.c)
-    *
-    * @param[in] dataname
-    * @param[in] raw        The raw data description
-    * @param[in] sel        Channel selection to use
-    * @param[in] fit        Precomputed fitting data
-    * @param[in] guess      The initial guesses
-    * @param[in] tmin       Time range
-    * @param[in] tmax
-    * @param[in] tstep      Time step to use
-    * @param[in] integ      Integration time
-    * @param[in] verbose    Verbose output?
-    * @param[out] p_set     Return all results here. Warning: for large data files this may take a lot of memory
-    *
-    * @return true when successful
-    */
-    static int fit_dipoles_raw(const QString& dataname, MneRawData* raw, mneChSelection sel, DipoleFitData* fit, GuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose, ECDSet& p_set);
-
-    //=========================================================================================================
-    /**
-    *
-    * Fit a single dipole to each time point of the data
-    * Refactored: fit_dipoles_raw (fit_dipoles.c)
-    *
-    * @param[in] dataname
-    * @param[in] raw        The raw data description
-    * @param[in] sel        Channel selection to use
-    * @param[in] fit        Precomputed fitting data
-    * @param[in] guess      The initial guesses
-    * @param[in] tmin       Time range
-    * @param[in] tmax
-    * @param[in] tstep      Time step to use
-    * @param[in] integ      Integration time
-    * @param[in] verbose    Verbose output?
-    *
-    * @return true when successful
-    */
-    static int fit_dipoles_raw(const QString& dataname, MneRawData* raw, mneChSelection sel, DipoleFitData* fit, GuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose);
-
-private:
-    DipoleFitSettings* settings;
-
+//// ### OLD STRUCT ###
+//typedef struct {
+//    FIFFLIB::FiffDirEntry::SPtr ent;    /* Where is this in the file (file bufs only, pointer to info) */
+//    int   firsts,lasts;     /* First and last sample */
+//    int   ntaper;           /* For filtered buffers: taper length */
+//    int   ns;               /* Number of samples (last - first + 1) */
+//    int   nchan;            /* Number of channels */
+//    int   is_skip;          /* Is this a skip? */
+//    float **vals;           /* Values (null if not in memory) */
+//    int   valid;            /* Are the data meaningful? */
+//    int   *ch_filtered;     /* For filtered buffers: has this channel filtered already */
+//    int   comp_status;      /* For raw buffers: compensation status */
+//} *mneRawBufDef,mneRawBufDefRec;
 };
 
 //*************************************************************************************************************
@@ -179,7 +139,6 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
+} // NAMESPACE INVERSELIB
 
-} //NAMESPACE
-
-#endif // DIPOLEFIT_H
+#endif // MNERAWBUFDEF_H
