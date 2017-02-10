@@ -49,7 +49,9 @@ ComputeFwdSettings::ComputeFwdSettings(int *argc,char **argv)
         return;
 
 //    mne_print_version_info(stderr,argv[0],PROGRAM_VERSION,__DATE__,__TIME__);
-//    printf("%s version %s compiled at %s %s\n",argv[0],PROGRAM_VERSION,__DATE__,__TIME__);
+    printf("%s version %s compiled at %s %s\n",argv[0],PROGRAM_VERSION,__DATE__,__TIME__);
+
+    checkIntegrity();
 }
 
 
@@ -58,6 +60,35 @@ ComputeFwdSettings::ComputeFwdSettings(int *argc,char **argv)
 ComputeFwdSettings::~ComputeFwdSettings()
 {
     //ToDo Garbage collection
+}
+
+
+//*************************************************************************************************************
+
+void ComputeFwdSettings::checkIntegrity()
+{
+    if (srcname.isEmpty()) {
+        qCritical("Source space name is missing. Use the --src option to specify it.");
+        return;
+    }
+    if (!mri_head_ident) {
+        if (mriname.isEmpty() && transname.isEmpty()) {
+            qCritical("MRI <-> head coordinate transformation is missing. Use the --mri or --trans option to specify it.");
+            return;
+        }
+    }
+    if (measname.isEmpty()) {
+        qCritical("Source of coil and electrode locations is missing. Use the --meas option to specify it.");
+        return;
+    }
+    if (solname.isEmpty()) {
+        qCritical("Solution name is missing. Use the --fwd option to specify it.");
+        return;
+    }
+    if (! (include_meg || include_eeg)) {
+        qCritical("Employ the --meg and --eeg options to select MEG and/or EEG");
+        return;
+    }
 }
 
 
