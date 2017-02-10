@@ -39,6 +39,7 @@
 //=============================================================================================================
 
 #include "fwd_coil.h"
+#include <fiff/fiff_types.h>
 
 
 //*************************************************************************************************************
@@ -47,6 +48,7 @@
 //=============================================================================================================
 
 using namespace Eigen;
+using namespace FIFFLIB;
 using namespace INVERSELIB;
 
 
@@ -62,6 +64,11 @@ using namespace INVERSELIB;
 #define X_5 0
 #define Y_5 1
 #define Z_5 2
+
+
+#define VEC_DOT_5(x,y) ((x)[X_5]*(y)[X_5] + (x)[Y_5]*(y)[Y_5] + (x)[Z_5]*(y)[Z_5])
+#define VEC_LEN_5(x) sqrt(VEC_DOT_5(x,x))
+
 
 #define VEC_COPY_5(to,from) {\
     (to)[X_5] = (from)[X_5];\
@@ -128,6 +135,39 @@ void mne_free_cmatrix_5 (float **m)
 }
 
 
+void fiff_coord_trans_5 (float r[3],const FiffCoordTransOld* t,int do_move)
+/*
+      * Apply coordinate transformation
+      */
+{
+    int j,k;
+    float res[3];
+
+    for (j = 0; j < 3; j++) {
+        res[j] = (do_move ? t->move[j] :  0.0);
+        for (k = 0; k < 3; k++)
+            res[j] += t->rot[j][k]*r[k];
+    }
+    for (j = 0; j < 3; j++)
+        r[j] = res[j];
+}
+
+
+static void normalize_5(float *rr)
+/*
+      * Scale vector to unit length
+      */
+{
+    float ll = VEC_LEN_5(rr);
+    int k;
+    if (ll > 0) {
+        for (k = 0; k < 3; k++)
+            rr[k] = rr[k]/ll;
+    }
+    return;
+}
+
+
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -172,7 +212,12 @@ FwdCoil::FwdCoil(const FwdCoil& p_FwdCoil)
     this->accuracy   = p_FwdCoil.accuracy;
     this->base       = p_FwdCoil.base;
     this->size       = p_FwdCoil.size;
+    this->np         = p_FwdCoil.np;
     this->type       = p_FwdCoil.type;
+
+    rmag       = ALLOC_CMATRIX_5(this->np,3);
+    cosmag     = ALLOC_CMATRIX_5(this->np,3);
+    w          = MALLOC_5(this->np,float);
 
     VEC_COPY_5(this->r0,p_FwdCoil.r0);
     VEC_COPY_5(this->ex,p_FwdCoil.ex);
@@ -197,4 +242,100 @@ FwdCoil::~FwdCoil()
     FREE_CMATRIX_5(rmag);
     FREE_CMATRIX_5(cosmag);
     FREE_5(w);
+}
+
+
+//*************************************************************************************************************
+
+FwdCoil *FwdCoil::create_eeg_el(FIFFLIB::fiffChInfo ch, const FiffCoordTransOld* t)
+{
+    FwdCoil*    res = NULL;
+    int        c;
+
+    if (ch->kind != FIFFV_EEG_CH) {
+        printf("%s is not an EEG channel. Cannot create an electrode definition.",ch->ch_name);
+        goto bad;
+    }
+    if (t && t->from != FIFFV_COORD_HEAD) {
+        printf("Inappropriate coordinate transformation in fwd_create_eeg_el");
+        goto bad;
+    }
+
+    if (VEC_LEN_5(ch->chpos.ex) < 1e-4)
+        res = new FwdCoil(1);	             /* No reference electrode */
+    else
+        res = new FwdCoil(2);		     /* Reference electrode present */
+
+    res->chname     = mne_strdup_5(ch->ch_name);
+    res->desc       = mne_strdup_5("EEG electrode");
+    res->coil_class = FWD_COILC_EEG;
+    res->accuracy   = FWD_COIL_ACCURACY_NORMAL;
+    res->type       = ch->chpos.coil_type;
+    VEC_COPY_5(res->r0,ch->chpos.r0);
+    VEC_COPY_5(res->ex,ch->chpos.ex);
+    /*
+       * Optional coordinate transformation
+       */
+    if (t) {
+        fiff_coord_trans_5(res->r0,t,FIFFV_MOVE);
+        fiff_coord_trans_5(res->ex,t,FIFFV_MOVE);
+        res->coord_frame = t->to;
+    }
+    else
+        res->coord_frame = FIFFV_COORD_HEAD;
+    /*
+       * The electrode location
+       */
+    for (c = 0; c < 3; c++)
+        res->rmag[0][c] = res->cosmag[0][c] = res->r0[c];
+    normalize_5(res->cosmag[0]);
+    res->w[0] = 1.0;
+    /*
+       * Add the reference electrode, if appropriate
+       */
+    if (res->np == 2) {
+        for (c = 0; c < 3; c++)
+            res->rmag[1][c] = res->cosmag[1][c] = res->ex[c];
+        normalize_5(res->cosmag[1]);
+        res->w[1] = -1.0;
+    }
+    return res;
+
+bad : {
+        return NULL;
+    }
+}
+
+
+//*************************************************************************************************************
+
+bool FwdCoil::is_axial_coil() const
+{
+    return (this->coil_class == FWD_COILC_MAG ||
+            this->coil_class == FWD_COILC_AXIAL_GRAD ||
+            this->coil_class == FWD_COILC_AXIAL_GRAD2);
+}
+
+
+//*************************************************************************************************************
+
+bool FwdCoil::is_magnetometer_coil() const
+{
+    return this->coil_class == FWD_COILC_MAG;
+}
+
+
+//*************************************************************************************************************
+
+bool FwdCoil::is_planar_coil() const
+{
+    return this->coil_class == FWD_COILC_PLANAR_GRAD;
+}
+
+
+//*************************************************************************************************************
+
+bool FwdCoil::is_eeg_electrode() const
+{
+    return this->coil_class == FWD_COILC_EEG;
 }

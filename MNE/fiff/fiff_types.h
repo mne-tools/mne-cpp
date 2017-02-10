@@ -149,17 +149,17 @@ typedef struct _fiffTimeRec {
 
 /** Structure for sparse matrices */
 
-typedef struct _fiff_sparse_matrix {
- fiff_int_t   coding;          /**< coding (storage) type of the sparse matrix */
- fiff_int_t   m;	        /**< m rows */
- fiff_int_t   n;               /**< n columns */
- fiff_int_t   nz;              /**< nz nonzeros */
- fiff_float_t *data;           /**< owns the data */
- fiff_int_t   *inds;           /**< index list, points into data, no dealloc! */
- fiff_int_t   *ptrs;           /**< pointer list, points into data, no dealloc! */
-} *fiffSparseMatrix, fiffSparseMatrixRec;
+//typedef struct _fiff_sparse_matrix {
+// fiff_int_t   coding;          /**< coding (storage) type of the sparse matrix */
+// fiff_int_t   m;	        /**< m rows */
+// fiff_int_t   n;               /**< n columns */
+// fiff_int_t   nz;              /**< nz nonzeros */
+// fiff_float_t *data;           /**< owns the data */
+// fiff_int_t   *inds;           /**< index list, points into data, no dealloc! */
+// fiff_int_t   *ptrs;           /**< pointer list, points into data, no dealloc! */
+//} *fiffSparseMatrix, fiffSparseMatrixRec;
 
-typedef fiffSparseMatrixRec  fiff_sparse_matrix_t;
+//typedef fiffSparseMatrixRec  fiff_sparse_matrix_t;
 
 /** Structure for event bits */
 
@@ -332,14 +332,14 @@ typedef struct _fiffFileRec {
 /// ToDo Old implementation use new fiff_coord_trans.h instead
 /** Coordinate transformation descriptor */
 
-typedef struct _fiffCoordTransRec {
- fiff_int_t   from;		      /**< Source coordinate system. */
- fiff_int_t   to;		      /**< Destination coordinate system. */
- fiff_float_t rot[3][3];	      /**< The forward transform (rotation part) */
- fiff_float_t move[3];		      /**< The forward transform (translation part) */
- fiff_float_t invrot[3][3];	      /**< The inverse transform (rotation part) */
- fiff_float_t invmove[3];            /**< The inverse transform (translation part) */
-} *fiffCoordTrans, fiffCoordTransRec; /**< Coordinate transformation descriptor */
+//typedef struct _fiffCoordTransRec {
+// fiff_int_t   from;		      /**< Source coordinate system. */
+// fiff_int_t   to;		      /**< Destination coordinate system. */
+// fiff_float_t rot[3][3];	      /**< The forward transform (rotation part) */
+// fiff_float_t move[3];		      /**< The forward transform (translation part) */
+// fiff_float_t invrot[3][3];	      /**< The inverse transform (rotation part) */
+// fiff_float_t invmove[3];            /**< The inverse transform (translation part) */
+//} *fiffCoordTrans, fiffCoordTransRec; /**< Coordinate transformation descriptor */
 
 //typedef fiffCoordTransRec fiff_coord_trans_t;
 

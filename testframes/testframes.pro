@@ -40,23 +40,9 @@ TEMPLATE = subdirs
 SUBDIRS += \
     test_codecov \
     test_fiff_rwr \
+	test_fiff_mne_types_io \
     test_dipole_fit \
-#    test_mne_libs \
-#    test_mne_rt \
-#    mne_x_plugin_com \
-#    test_mne_future \
-#    test_ssp \
 
-#!contains(MNECPP_CONFIG, minimalVersion) {
-    SUBDIRS += \
-#        test_mne_graph
-#        test_mne_cluster_eval \
-#        test_rap_cluster_eval \
-#        test_rtc_eval \
-#        test_rap_eval \
-#        test_orig_rap_cluster_eval \
-#        mne_3d_widget \
-#        test_mne_cluster \
-#        test_mne_surface \
-#        test_mne_stc \
-#}
+!contains(MNECPP_CONFIG, minimalVersion) {
+#    SUBDIRS += \
+}

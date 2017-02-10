@@ -43,6 +43,8 @@
 
 #include "../inverse_global.h"
 
+#include "fiff_coord_trans_old.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -78,6 +80,8 @@
 
 
 
+
+
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE NAMESPACE INVERSELIB
@@ -85,7 +89,6 @@
 
 namespace INVERSELIB
 {
-
 
 //=============================================================================================================
 /**
@@ -102,14 +105,14 @@ public:
     //=========================================================================================================
     /**
     * Constructs the Forward Coil
-    * Refactored: fwd_new_coil
+    * Refactored: fwd_new_coil (fwd_coil_def.c)
     */
     FwdCoil(int p_np);
 
     //=========================================================================================================
     /**
     * Copy constructor.
-    * Refactored: fwd_dup_coil
+    * Refactored: fwd_dup_coil (fwd_coil_def.c)
     *
     * @param[in] p_FwdCoil      FwdCoil which should be copied
     */
@@ -121,6 +124,54 @@ public:
     * Refactored: fwd_free_coil
     */
     ~FwdCoil();
+
+    //=========================================================================================================
+    /**
+    * Create an electrode definition. Transform coordinate frame if so desired.
+    * Refactored: fwd_create_eeg_el (fwd_coil_def.c)
+    *
+    * @param[in] ch     Channel information to use
+    * @param[in] t      Transform the points using this
+    *
+    * @return   The created coil.
+    */
+    static FwdCoil* create_eeg_el( FIFFLIB::fiffChInfo ch,const FiffCoordTransOld* t);
+
+    //=========================================================================================================
+    /**
+    * Checks if this is an axial coil.
+    * Refactored: fwd_is_axial_coil (fwd_coil_def.c)
+    *
+    * @return   True if axial coil, false otherwise
+    */
+    bool is_axial_coil() const;
+
+    //=========================================================================================================
+    /**
+    * Checks if this is an magnetometer.
+    * Refactored: fwd_is_magnetometer_coil (fwd_coil_def.c)
+    *
+    * @return   True if magnetometer, false otherwise
+    */
+    bool is_magnetometer_coil() const;
+
+    //=========================================================================================================
+    /**
+    * Checks if this is an planar coil.
+    * Refactored: fwd_is_planar_coil (fwd_coil_def.c)
+    *
+    * @return   True if planar coil, false otherwise
+    */
+    bool is_planar_coil() const;
+
+    //=========================================================================================================
+    /**
+    * Checks if this is an EEG electrode.
+    * Refactored: fwd_is_eeg_electrode (fwd_coil_def.c)
+    *
+    * @return   True if EEG electrode, false otherwise
+    */
+    bool is_eeg_electrode() const;
 
 public:
     char    *chname;        /**< Name of this channel */

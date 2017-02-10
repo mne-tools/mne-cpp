@@ -2,89 +2,65 @@
  *
  * \section intro_sec Introduction
  *
- * Fast MNE Qt 5 based C++ library (beta)
+ * Cross-platform medical (real-time) applications for EEG and MEG data analysis.
+ * For more information please visit http://www.mne-cpp.org.
  *
- * \section get_the_code_sec Getting the latest code
  *
- * To get the latest code using git, simply type:
+ * \section build_sec Get and build the latest code
  *
- *    git clone git://github.com/mne-tools/mne-cpp.git
+ * To get the latest code and build it follow this <a href="http://wiki.mne-cpp.org/index.php/Step_by_Step_Setup_Guide"><b>guide</b></a>.
  *
- * If you don't have git installed, you can download a zip or tarball
- * of the latest code: <a href="https://github.com/mne-tools/mne-cpp"><b>https://github.com/mne-tools/mne-cpp</b></a>
  *
- * \section building_sec Building
+ * \section contribute_sec Get involved
  *
- * To build the mne libraries <a href="http://qt-project.org/downloads/"><b>Qt5</b></a> is required.
- *
- * Build and install Qt5.
- *
- * To build the whole mne-cpp librarie, do the following steps:
- * Generate the Makefiles using qmake:
- * 	qmake -recursive
- * Make the libraries and examples by running:
- *	make
- *
- * Tip: It's convinient to use the Qt Creator of the <a href="http://qt-project.org/downloads/"><b>QtSDK</b></a> to build the libraries.
+ * If you want to contribute to MNE-CPP you can find all necessary information <a href="http://wiki.mne-cpp.org/index.php/Portal:Contribute"><b>here</b></a>.
  *
  *
  * \section dependencies_sec Dependencies
  *
- * <a href="http://qt-project.org/downloads/"><b>Qt5</b></a>
+ * <a href="http://download.qt.io/official_releases/qt/"><b>>= Qt 5.7.1</b></a>
  * 
  * 
- * \section mailing_list_sec Mailing list
+ * \section contact_sec Contact
  * 
- * <a href="http://mail.nmr.mgh.harvard.edu/mailman/listinfo/mne_analysis"><b>http://mail.nmr.mgh.harvard.edu/mailman/listinfo/mne_analysis</b></a>
+ * A list of contact persons can be found <a href="http://www.mne-cpp.org/index.php/contact/"><b>here</b></a>.
+ *
+ * Mailing List: <a href="http://mail.nmr.mgh.harvard.edu/mailman/listinfo/mne_analysis"><b>http://mail.nmr.mgh.harvard.edu/mailman/listinfo/mne_analysis</b></a>
  *
  *
- * \section workflow_contribute_sec Workflow to contribute
+ * \section license_sec License
  *
- * To contribute to MNE-CPP, first create an account on <a href="http://github.com"><b>github</b></a>.
- * Once this is done, fork the <a href="http://github.com/mne-tools/mne-cpp"><b>MNE-CPP repository</b></a>
- * to have you own repository,
- * clone it using 'git clone' on the computers where you want to work. Make
- * your changes in your clone, push them to your github account, test them
- * on several computer, and when you are happy with them, send a pull
- * request to the main repository.
- * 
+ * MNE-CPP is available under the <i>BSD-3-Clause</i> open source license:
  *
- * \section licensing_sec Licensing
- *
- * MNE-CPP is <i>BSD-licenced</i> (3 clause):
- *
- *  This software is OSI Certified Open Source Software.
- *  OSI Certified is a certification mark of the Open Source Initiative.
- *
- *  Copyright (C) 2010-2016, \ref authors_sec of MNE-CPP.
+ *  Copyright (C) 2010-2017, \ref authors_sec of MNE-CPP.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *
- *  \li Redistributions of source code must retain the above copyright notice, 
+ *  \li Redistributions of source code must retain the above copyright notice,
  *  this list of conditions and the following disclaimer.
  *
  *  \li Redistributions in binary form must reproduce the above copyright notice,
  *  this list of conditions and the following disclaimer in the documentation
  *  and/or other materials provided with the distribution.
  *
- *   \li Neither the names of MNE-Python authors nor the names of any
- *    contributors may be used to endorse or promote products derived from
- *    this software without specific prior written permission.
+ *  \li Neither the name of the MNE-CPP authors nor the names of its contributors
+ *  may be used to endorse or promote products derived from this software
+ *  without specific prior written permission.
  *
  *  <i>This software is provided by the copyright holders and contributors
  *  "as is" and any express or implied warranties, including, but not
  *  limited to, the implied warranties of merchantability and fitness for
  *  a particular purpose are disclaimed. In no event shall the copyright
- *  owner or contributors be liable for any direct, indirect, incidental,
+ *  holder or contributors be liable for any direct, indirect, incidental,
  *  special, exemplary, or consequential damages (including, but not
  *  limited to, procurement of substitute goods or services; loss of use,
  *  data, or profits; or business interruption) however caused and on any
  *  theory of liability, whether in contract, strict liability, or tort
  *  (including negligence or otherwise) arising in any way out of the use
- *  of this software, even if advised of the possibility of such
- *  damage.</i>
+ *  of this software, even if advised of the possibility of such damage.</i>
+ *
  *
  * \section authors_sec Authors
  *

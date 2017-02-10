@@ -54,6 +54,8 @@
 /bin/mne_future_testd
 /bin/mne_graph_test
 /bin/mne_graph_testd
+/bin/mne_dipole_fit
+/bin/mne_dipole_fitd
 /bin/mne_lib_testsd
 /bin/mne_rt_serverd
 /bin/mne_rt_testsd
@@ -75,6 +77,8 @@
 /bin/readFwdd
 /bin/readRawd
 /bin/readWriteRawd
+/bin/test_fiff_mne_types_io
+/bin/test_fiff_mne_types_iod
 /bin/computeInversePwlRapMusicd
 /bin/matchingPursuitd
 /bin/rawClusteredInversePwlRapMusicd
