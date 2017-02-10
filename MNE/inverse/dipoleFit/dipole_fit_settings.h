@@ -58,6 +58,7 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
+#include <QStringList>
 
 
 
@@ -169,7 +170,7 @@ public:
     int   setno        = 1;             /**< Which data set */
     bool  verbose      = false;
     mneFilterDefRec     filter;
-    QList<QString> projnames;           /**< Projection file names */
+    QStringList projnames;              /**< Projection file names */
     bool omit_data_proj = false;
 
     QString eeg_model_file;                 /* File of EEG sphere model specifications */

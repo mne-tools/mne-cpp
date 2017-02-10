@@ -137,6 +137,7 @@
 /bin/mne_lib_tests
 /bin/mne_rt_server
 /bin/mne_rt_tests
+/bin/mne_forward_solution
 /bin/plotSurfaces
 /bin/readFwdDisp3D
 /bin/mne_scan.app/Contents/MacOS/mne_scan
