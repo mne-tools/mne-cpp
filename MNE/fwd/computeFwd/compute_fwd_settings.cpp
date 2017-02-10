@@ -3,14 +3,29 @@
 #include "compute_fwd_settings.h"
 
 
+
+
 using namespace Eigen;
 using namespace FWDLIB;
+
+
+
+#define X 0
+#define Y 1
+#define Z 2
+
+
+#ifndef PROGRAM_VERSION
+#define PROGRAM_VERSION     "2.10"
+#endif
 
 
 //*************************************************************************************************************
 //=============================================================================================================
 // STATIC DEFINITIONS
 //=============================================================================================================
+
+
 
 
 //*************************************************************************************************************
@@ -35,8 +50,6 @@ ComputeFwdSettings::ComputeFwdSettings(int *argc,char **argv)
 
 //    mne_print_version_info(stderr,argv[0],PROGRAM_VERSION,__DATE__,__TIME__);
 //    printf("%s version %s compiled at %s %s\n",argv[0],PROGRAM_VERSION,__DATE__,__TIME__);
-
-    checkIntegrity();
 }
 
 
@@ -52,13 +65,8 @@ ComputeFwdSettings::~ComputeFwdSettings()
 
 void ComputeFwdSettings::initMembers()
 {
-}
-
-
-//*************************************************************************************************************
-
-void ComputeFwdSettings::checkIntegrity()
-{
+    // Init origin
+    r0 << 0.0f,0.0f,0.04f;
 
 }
 
@@ -67,7 +75,47 @@ void ComputeFwdSettings::checkIntegrity()
 
 void ComputeFwdSettings::usage(char *name)
 {
+    fprintf(stderr,"usage : %s [options]\n",name);
+    fprintf(stderr,"\t--meg             to compute the MEG forward solution\n");
+    fprintf(stderr,"\t--eeg             to compute the EEG forward solution\n");
+    fprintf(stderr,"\t--grad            compute the gradient of the field with respect to the dipole coordinates as well\n");
+    fprintf(stderr,"\t--fixed           to calculate only for the source orientation given by the surface normals\n");
+    fprintf(stderr,"\t--mricoord        do calculations in MRI coordinates instead of head coordinates\n");
+    fprintf(stderr,"\t--accurate        use more accurate coil definitions in MEG forward computation\n");
+    fprintf(stderr,"\t--src name        specify the source space\n");
+    fprintf(stderr,"\t--label name      label file to select the sources (can have multiple of these)\n");
+    fprintf(stderr,"\t--mri name        take head/MRI coordinate transform from here (Neuromag MRI description file)\n");
+    fprintf(stderr,"\t--trans name      take head/MRI coordinate transform from here (text file)\n");
+    fprintf(stderr,"\t--notrans         head and MRI coordinate systems are identical.\n");
+    fprintf(stderr,"\t--meas name       take MEG sensor and EEG electrode locations from here\n");
+    fprintf(stderr,"\t--bem  name       BEM model name\n");
+    fprintf(stderr,"\t--origin x:y:z/mm use a sphere model with this origin (head coordinates/mm)\n");
+    fprintf(stderr,"\t--eegscalp        scale the electrode locations to the surface of the scalp when using a sphere model\n");
+    fprintf(stderr,"\t--eegmodels name  read EEG sphere model specifications from here.\n");
+    fprintf(stderr,"\t--eegmodel  name  name of the EEG sphere model to use (default : Default)\n");
+    fprintf(stderr,"\t--eegrad rad/mm   radius of the scalp surface to use in EEG sphere model (default : %7.1f mm)\n",1000*eeg_sphere_rad);
+    fprintf(stderr,"\t--mindist dist/mm minimum allowable distance of the sources from the inner skull surface.\n");
+    fprintf(stderr,"\t--mindistout name Output the omitted source space points here.\n");
+    fprintf(stderr,"\t--includeall      Omit all source space checks\n");
+    fprintf(stderr,"\t--all             calculate forward solution in all nodes instead the selected ones only.\n");
+    fprintf(stderr,"\t--fwd  name       save the solution here\n");
+    fprintf(stderr,"\t--help            print this info.\n");
+    fprintf(stderr,"\t--version         print version info.\n\n");
+    exit(1);
+}
 
+
+//*************************************************************************************************************
+
+QString ComputeFwdSettings::build_command_line(QString old, QString new_item)
+{
+    if (!new_item.isEmpty() && new_item.size() > 0) {
+        if (!old.isEmpty()) {
+            old += " ";
+        }
+        old += new_item;
+    }
+    return old;
 }
 
 
@@ -75,6 +123,16 @@ void ComputeFwdSettings::usage(char *name)
 
 bool ComputeFwdSettings::check_unrecognized_args(int argc, char **argv)
 {
+    int k;
+
+    if (argc > 1) {
+        fprintf(stderr,"Unrecognized arguments : ");
+        for (k = 1; k < argc; k++)
+            fprintf(stderr,"%s ",argv[k]);
+        fprintf(stderr,"\n");
+        qCritical("Check the command line.");
+        return false;
+    }
     return true;
 }
 
@@ -83,5 +141,203 @@ bool ComputeFwdSettings::check_unrecognized_args(int argc, char **argv)
 
 bool ComputeFwdSettings::check_args (int *argc,char **argv)
 {
+    int found;
+    char *last;
+
+    if ((last = strrchr(argv[0],'/')) == NULL)
+        last = argv[0];
+    else
+        last++;
+    command = build_command_line(command,last);
+    for (int k = 0; k < *argc; k++) {
+        found = 0;
+        if (strcmp(argv[k],"--version") == 0) {
+            printf("%s version %s compiled at %s %s\n", argv[0],PROGRAM_VERSION,__DATE__,__TIME__);
+            exit(0);
+        }
+        else if (strcmp(argv[k],"--help") == 0) {
+            usage(argv[0]);
+            exit(1);
+        }
+        else if (strcmp(argv[k],"--meg") == 0) {
+            found = 1;
+            include_meg = true;
+        }
+        else if (strcmp(argv[k],"--eeg") == 0) {
+            found = 1;
+            include_eeg = true;
+        }
+        else if (strcmp(argv[k],"--grad") == 0) {
+            found = 1;
+            compute_grad = true;
+        }
+        else if (strcmp(argv[k],"--all") == 0) {
+            found = 1;
+            do_all = true;
+        }
+        else if (strcmp(argv[k],"--accurate") == 0) {
+            found = 1;
+            accurate = true;
+        }
+        else if (strcmp(argv[k],"--fixed") == 0) {
+            found = 1;
+            fixed_ori = true;
+        }
+        else if (strcmp(argv[k],"--src") == 0) {
+            found = 2;
+            if (k == *argc - 1) {
+                qCritical("--src: argument required.");
+                return false;
+            }
+            srcname = QString(argv[k+1]);
+        }
+        else if (strcmp(argv[k],"--mri") == 0) {
+            found = 2;
+            if (k == *argc - 1) {
+                qCritical("--mri: argument required.");
+                return false;
+            }
+            mri_head_ident = false;
+            mriname = QString(argv[k+1]);
+            transname.clear();
+        }
+        else if (strcmp(argv[k],"--trans") == 0) {
+            found = 2;
+            if (k == *argc - 1) {
+                qCritical("--trans: argument required.");
+                return false;
+            }
+            mri_head_ident = false;
+            transname = QString(argv[k+1]);
+            mriname.clear();
+        }
+        else if (strcmp(argv[k],"--notrans") == 0) {
+            found = 1;
+            mri_head_ident = true;
+            mriname.clear();
+            transname.clear();
+        }
+        else if (strcmp(argv[k],"--meas") == 0) {
+            found = 2;
+            if (k == *argc - 1) {
+                qCritical("--meas: argument required.");
+                return false;
+            }
+            measname = QString(argv[k+1]);
+        }
+        else if (strcmp(argv[k],"--bem") == 0) {
+            found = 2;
+            if (k == *argc - 1) {
+                qCritical("--bem: argument required.");
+                return false;
+            }
+            bemname = QString(argv[k+1]);
+        }
+        else if (strcmp(argv[k],"--origin") == 0) {
+            found = 2;
+            if (k == *argc - 1) {
+                qCritical("--origin: argument required.");
+                return false;
+            }
+            if (sscanf(argv[k+1],"%f:%f:%f",r0[X],r0[Y],r0[Z]) != 3) {
+                qCritical("Could not interpret the origin.");
+                return false;
+            }
+            r0[X] = r0[X]/1000.0f;
+            r0[Y] = r0[Y]/1000.0f;
+            r0[Z] = r0[Z]/1000.0f;
+        }
+        else if (strcmp(argv[k],"--eegrad") == 0) {
+            found = 2;
+            if (k == *argc - 1) {
+                qCritical("--eegrad: argument required.");
+                return false;
+            }
+            if (sscanf(argv[k+1],"%g",&eeg_sphere_rad) != 1) {
+                qCritical("Incomprehensible radius : %s",argv[k+1]);
+                return false;
+            }
+            if (eeg_sphere_rad <= 0) {
+                qCritical("Radius must be positive");
+                return false;
+            }
+            eeg_sphere_rad = eeg_sphere_rad/1000.0f;
+        }
+        else if (strcmp(argv[k],"--eegmodels") == 0) {
+            found = 2;
+            if (k == *argc - 1) {
+                qCritical("--eegmodels: argument required.");
+                return false;
+            }
+            eeg_model_file = QString(argv[k+1]);
+        }
+        else if (strcmp(argv[k],"--eegmodel") == 0) {
+            found = 2;
+            if (k == *argc - 1) {
+                qCritical("--eegmodel: argument required.");
+                return false;
+            }
+            eeg_model_name = QString(argv[k+1]);
+        }
+        else if (strcmp(argv[k],"--eegscalp") == 0) {
+            found         = 1;
+            scale_eeg_pos = true;
+        }
+        else if (strcmp(argv[k],"--mindist") == 0) {
+            found = 2;
+            if (k == *argc - 1) {
+                qCritical("--mindist: argument required.");
+                return false;
+            }
+            if (sscanf(argv[k+1],"%f",&mindist) != 1) {
+                qCritical("Could not interpret the distance.");
+                return false;
+            }
+            if (mindist <= 0.0)
+                mindist = 0.0f;
+            mindist = mindist/1000.0f;
+        }
+        else if (strcmp(argv[k],"--includeall") == 0) {
+            found = 1;
+            filter_spaces = false;
+        }
+        else if (strcmp(argv[k],"--mindistout") == 0) {
+            found = 2;
+            if (k == *argc - 1) {
+                qCritical("--mindistout: argument required.");
+                return false;
+            }
+            mindistoutname = QString(argv[k+1]);
+        }
+        else if (strcmp(argv[k],"--mricoord") == 0) {
+            found = 1;
+            coord_frame = FIFFV_COORD_MRI;
+        }
+        else if (strcmp(argv[k],"--fwd") == 0) {
+            found = 2;
+            if (k == *argc - 1) {
+                qCritical("--fwd: argument required.");
+                return false;
+            }
+            solname = QString(argv[k+1]);
+        }
+        else if (strcmp(argv[k],"--label") == 0) {
+            found = 2;
+            if (k == *argc - 1) {
+                qCritical("--label: argument required.");
+                return false;
+            }
+            labels.append(QString(argv[k+1]));
+            nlabel++;
+        }
+        if (found) {
+            for (int p = k; p < k + found; p++)
+                command = build_command_line(command,argv[p]);
+            for (int p = k; p < *argc-found; p++)
+                argv[p] = argv[p+found];
+            *argc = *argc - found;
+            k = k - found;
+        }
+    }
     return check_unrecognized_args(*argc,argv);
 }

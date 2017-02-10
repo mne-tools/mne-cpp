@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     compute_fwd_settings.h
+* @file     compute_fwd.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -33,8 +33,8 @@
 *
 */
 
-#ifndef COMPUTEFWDSETTINGS_H
-#define COMPUTEFWDSETTINGS_H
+#ifndef COMPUTEFWD_H
+#define COMPUTEFWD_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -42,7 +42,7 @@
 //=============================================================================================================
 
 #include "../fwd_global.h"
-#include <fiff/fiff_constants.h>
+#include "compute_fwd_settings.h"
 
 
 //*************************************************************************************************************
@@ -78,75 +78,34 @@ namespace FWDLIB
 
 //=============================================================================================================
 /**
-* Implements the compute forward setting parser
+* Implements the compute forward solution
 *
-* @brief Compute Forward setting implementation
+* @brief Compute Forward implementation
 */
-class FWDSHARED_EXPORT ComputeFwdSettings
+class FWDSHARED_EXPORT ComputeFwd
 {
 public:
-    typedef QSharedPointer<ComputeFwdSettings> SPtr;             /**< Shared pointer type for ComputeFwdSettings. */
-    typedef QSharedPointer<const ComputeFwdSettings> ConstSPtr;  /**< Const shared pointer type for ComputeFwdSettings. */
+    typedef QSharedPointer<ComputeFwd> SPtr;             /**< Shared pointer type for ComputeFwd. */
+    typedef QSharedPointer<const ComputeFwd> ConstSPtr;  /**< Const shared pointer type for ComputeFwd. */
 
     //=========================================================================================================
     /**
     * Default Constructor
     */
-    explicit ComputeFwdSettings();
+    explicit ComputeFwd(ComputeFwdSettings* p_settings);
 
     //=========================================================================================================
     /**
-    * Constructs Compute Forward Settings
-    *
-    * @param [in] argc (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
-    * @param [in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
+    * Destructs the Compute Forward solution class
     */
-    explicit ComputeFwdSettings(int *argc,char **argv);
-
-    //=========================================================================================================
-    /**
-    * Destructs the Compute Forward Settings
-    */
-    virtual ~ComputeFwdSettings();
+    virtual ~ComputeFwd();
 
 public:
-    QString srcname;            /**< Source space */
-    QString measname;           /**< Measurement file */
-    QString mriname;            /**< MRI file for head <-> MRI transformation */
-    QString transname;          /**< head2mri transformation file */
-    bool mri_head_ident;        /**< Are the head and MRI coordinates the same? */
-    QString bemname;            /**< BEM model file */
-    QString solname;            /**< Solution file */
-    QString mindistoutname;     /**< Output file for omitted source space points */
-    bool filter_spaces = true;  /**< Filter the source space points */
-    Eigen::Vector3f r0;         /**< Sphere model origin  */
-    bool accurate = false;      /**< Use accurate calculations */
-    bool fixed_ori = false;     /**< Fixed-orientation dipoles? */
-    bool include_meg = false;
-    bool include_eeg = false;
-    bool compute_grad = false;
-    QString command;            /**< Saves the recognized command line for future use */
-    float mindist = 0.0f;       /**< Minimum allowed distance of the sources from the inner skull surface */
-    int coord_frame = FIFFV_COORD_HEAD; /**< Can be changed with the --mricoord option */
-    bool do_all = false;
-    QStringList labels;         /**< Compute the solution only for these labels */
-    int nlabel = 0;
+    QString dummySetting;
 
-    QString eeg_model_file;     /**< File of EEG sphere model specifications */
-    QString eeg_model_name;     /**< Name of the EEG model to use */
-    float eeg_sphere_rad = 0.09f;   /**< Scalp radius to use in EEG sphere model */
-    bool scale_eeg_pos = false;     /**< Scale the electrode locations to scalp in the sphere model */
-    bool use_equiv_eeg = true;      /**< Use the equivalent source approach for the EEG sphere model */
-    bool use_threads = true;        /**< Parallelize? */
 
 private:
-    void initMembers();
-    void usage(char *name);
-
-    static QString build_command_line(QString old, QString new_item);
-
-    bool check_unrecognized_args(int argc, char **argv);
-    bool check_args (int *argc,char **argv);
+    ComputeFwdSettings* settings;
 
 };
 

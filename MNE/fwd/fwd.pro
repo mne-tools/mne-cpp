@@ -98,11 +98,13 @@ else {
 }
 
 SOURCES += \
-    computeFwd/compute_fwd_settings.cpp
+    computeFwd/compute_fwd_settings.cpp \
+    computeFwd/compute_fwd.cpp
 
 HEADERS +=\
     fwd_global.h \
-    computeFwd/compute_fwd_settings.h
+    computeFwd/compute_fwd_settings.h \
+    computeFwd/compute_fwd.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

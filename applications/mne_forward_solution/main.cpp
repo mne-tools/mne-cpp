@@ -40,6 +40,7 @@
 //=============================================================================================================
 
 #include <fwd/computeFwd/compute_fwd_settings.h>
+#include <fwd/computeFwd/compute_fwd.h>
 
 #include <iostream>
 
@@ -79,6 +80,7 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
 
     ComputeFwdSettings settings(&argc,argv);
+    ComputeFwd cmpFwd(&settings);
 
     return app.exec();
 }
