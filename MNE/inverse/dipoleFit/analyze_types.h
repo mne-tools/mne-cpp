@@ -57,20 +57,25 @@
 #define NOISE_NORMALIZED(e) ((e) == ESTIMATE_dSPM || (e) == ESTIMATE_sLORETA)
 
 #include <fiff/fiff_types.h>
+#include "fiff_coord_trans_old.h"
 #include "fwd_coil_set.h"
+#include "fwd_coil_set.h"
+#include "mne_meas_data.h"
+#include "mne_surface_or_volume.h"
+#include "mne_cov_matrix.h"
 
 
 
 typedef struct {
-  float  megmin,megmax;				     /* MEG gradiometer vertical scale [T/m] */
-  float  megaxmult;				     /* Multiplier for the magnetometer scaling [m] */
-  float  eegmin,eegmax;				     /* EEG scale [V] */
-  float  tmin,tmax;				     /* Time limits [sec] */
-  float  full_range;		                     /* Use the full time range available */
-  float  basemin,basemax;			     /* Baseline limits [sec] */
-  int    use_baseline;		                     /* Baseline active */
-  int    show_stim;		                     /* Show the digital stimulus channel in the sample display? */
-  float  cursor_step;				     /* How much to step in time when using the keyboard to go back and forth [sec] */
+  float  megmin,megmax;             /* MEG gradiometer vertical scale [T/m] */
+  float  megaxmult;                 /* Multiplier for the magnetometer scaling [m] */
+  float  eegmin,eegmax;             /* EEG scale [V] */
+  float  tmin,tmax;                 /* Time limits [sec] */
+  float  full_range;                /* Use the full time range available */
+  float  basemin,basemax;           /* Baseline limits [sec] */
+  int    use_baseline;              /* Baseline active */
+  int    show_stim;                 /* Show the digital stimulus channel in the sample display? */
+  float  cursor_step;               /* How much to step in time when using the keyboard to go back and forth [sec] */
 } *mshScales,mshScalesRec;
 
 typedef struct {		                     /* The celebrated tksurfer-style values */
@@ -129,7 +134,7 @@ typedef struct {
 
 typedef struct {		                     /* This is used for field mapping with help of the sphere-model MNE */
   int          kind;				     /* Either FIELD_MAP_MEG or FIELD_MAP_EEG */
-  mneSurface   surf;		                     /* The surface on which we are mapping */
+  INVERSELIB::MneSurfaceOrVolume::MneCSurface*   surf;		                     /* The surface on which we are mapping */
   char         *surfname;	                     /* The name of the file where the above surface came from */
   int          *surface_sel;			     /* We may calculate the interpolation only in a subset of vertices */
   int          nsurface_sel;			     /* How many points in the above */
@@ -137,42 +142,42 @@ typedef struct {		                     /* This is used for field mapping with he
   float        **smooth_weights;                     /* The smoothing weights */
   int          nch;			             /* How many channels */
   int          *pick;		                     /* Which channels are of this modality in the original data */
-  FwdCoilSet*   coils;		                     /* Coils */
+  INVERSELIB::FwdCoilSet*   coils;		                     /* Coils */
   float        origin[3];		             /* Origin */
   float        miss;		                     /* Amount of unexplained variance */
   float        **self_dots;	                     /* Dot products between the original leads */
   float        **surface_dots;			     /* Dot products from the original leads to the virtual leads */
   float        intrad;		                     /* The integration radius used */
-  mneCovMatrix noise;				     /* Noise-covariance matrix to use */
+  INVERSELIB::MneCovMatrix* noise;				     /* Noise-covariance matrix to use */
   int          nest;	                             /* How many singular values to include? */
   float        **mapping_mat;		             /* The mapping matrix */
 } *fieldMappingData, fieldMappingDataRec;
 
-typedef struct {		                     /* The digitizer data will be loaded from the measurement file or elsewhere */
-  char           *filename;			     /* Where did these come from */
-  FIFFLIB::fiffCoordTrans head_mri_t;			     /* This is relevant for us */
-  FIFFLIB::fiffCoordTrans head_mri_t_adj;                     /* This is the adjusted transformation */
-  FIFFLIB::fiffDigPoint   points;			     /* The points */
-  int            coord_frame;	                     /* The coordinate frame of the above points */
-  int            *active;	                     /* Which are active */
-  int            *discard;	                     /* Which should be discarded? */
-  int            npoint;			     /* How many? */
-  FIFFLIB::fiffDigPoint   mri_fids;	                     /* MRI coordinate system fiducials picked here */
-  int            nfids;		                     /* How many? */
-  int            show;		                     /* Should the digitizer data be shown */
-  int            show_minimal;                       /* Show fiducials and coils only? */
-  float          *dist;		                     /* Distance of each point from the head surface */
-  int            *closest;			     /* Closest vertex # on the head surface */
-  float          **closest_point;		     /* Closest vertex locations on the head surface */
-  int            dist_valid;			     /* Are the above data valid at this point? */
+typedef struct {                            /* The digitizer data will be loaded from the measurement file or elsewhere */
+  char           *filename;                 /* Where did these come from */
+  INVERSELIB::FiffCoordTransOld* head_mri_t;            /* This is relevant for us */
+  INVERSELIB::FiffCoordTransOld* head_mri_t_adj;        /* This is the adjusted transformation */
+  FIFFLIB::fiffDigPoint   points;           /* The points */
+  int            coord_frame;               /* The coordinate frame of the above points */
+  int            *active;                   /* Which are active */
+  int            *discard;                  /* Which should be discarded? */
+  int            npoint;                    /* How many? */
+  FIFFLIB::fiffDigPoint   mri_fids;         /* MRI coordinate system fiducials picked here */
+  int            nfids;                     /* How many? */
+  int            show;                      /* Should the digitizer data be shown */
+  int            show_minimal;              /* Show fiducials and coils only? */
+  float          *dist;                     /* Distance of each point from the head surface */
+  int            *closest;                  /* Closest vertex # on the head surface */
+  float          **closest_point;           /* Closest vertex locations on the head surface */
+  int            dist_valid;                /* Are the above data valid at this point? */
 } *digitizerData,digitizerDataRec;
 
 typedef struct {
-  char          *meas_file;	                     /* The measurement file */
-  char          *inv_file;			     /* Inverse operator file */
-  char          *mri_trans_file;		     /* Where does the MRI transform come from */
-  int           nave;			             /* If nave < 0 use nave from the measurement data? */
-  mneMeasData   meas;		                     /* The measurement */
+  char          *meas_file;                     /* The measurement file */
+  char          *inv_file;                      /* Inverse operator file */
+  char          *mri_trans_file;                /* Where does the MRI transform come from */
+  int           nave;                           /* If nave < 0 use nave from the measurement data? */
+  INVERSELIB::MneMeasData*  meas;               /* The measurement */
   float         raw_tmin,raw_tmax;		     /* Time range for raw data segments */
   int           sample;				     /* Which channel is the sample */
   int           firstp;		                     /* First data point in the current time range selection */
@@ -193,7 +198,7 @@ typedef struct {
 
   mnePref             mne_prefs;		     /* MNE calculation preferences */
   float               *cur_vals;                     /* Current values */
-  mneSparseMatrix     nn_vals;			     /* Noise normalization values */
+  INVERSELIB::FiffSparseMatrix* nn_vals;			     /* Noise normalization values */
   mshColorScaleDefRec scale;	                     /* Scale presently used for display */
 
   digitizerData    dig;                              /* These are the Polhemus data */

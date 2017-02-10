@@ -155,6 +155,9 @@ void BemSurfaceTreeItem::addData(const MNEBemSurface& tBemSurface, Qt3DCore::QEn
     data.setValue(arrayVertColor);
     this->setData(data, Data3DTreeModelItemRoles::SurfaceCurrentColorVert);
 
+    data.setValue(tBemSurface.rr);
+    this->setData(data, Data3DTreeModelItemRoles::SurfaceVert);
+
     //Add surface meta information as item children
     QList<QStandardItem*> list;
 

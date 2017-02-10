@@ -169,15 +169,15 @@ Qt::ItemFlags Data3DTreeModel::flags(const QModelIndex &index) const
 
 //*************************************************************************************************************
 
-QList<FsSurfaceTreeItem*> Data3DTreeModel::addSurfaceSet(const QString& subject, const QString& set, const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet)
+QList<FsSurfaceTreeItem*> Data3DTreeModel::addSurfaceSet(const QString& subject, const QString& sMriSetName, const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet)
 {
     QList<FsSurfaceTreeItem*> returnItemList;
 
     for(int i = 0; i < tSurfaceSet.size(); ++i) {
         if(i < tAnnotationSet.size()) {
-            returnItemList.append(addSurface(subject, set, tSurfaceSet[i], tAnnotationSet[i]));
+            returnItemList.append(addSurface(subject, sMriSetName, tSurfaceSet[i], tAnnotationSet[i]));
         } else {
-            returnItemList.append(addSurface(subject, set,tSurfaceSet[i], Annotation()));
+            returnItemList.append(addSurface(subject, sMriSetName,tSurfaceSet[i], Annotation()));
         }
     }
 
@@ -187,7 +187,7 @@ QList<FsSurfaceTreeItem*> Data3DTreeModel::addSurfaceSet(const QString& subject,
 
 //*************************************************************************************************************
 
-FsSurfaceTreeItem* Data3DTreeModel::addSurface(const QString& subject, const QString& set, const Surface& tSurface, const Annotation &tAnnotation)
+FsSurfaceTreeItem* Data3DTreeModel::addSurface(const QString& subject, const QString& sMriSetName, const Surface& tSurface, const Annotation &tAnnotation)
 {
     FsSurfaceTreeItem* pReturnItem = Q_NULLPTR;
 
@@ -195,13 +195,13 @@ FsSurfaceTreeItem* Data3DTreeModel::addSurface(const QString& subject, const QSt
     SubjectTreeItem* pSubjectItem = addSubject(subject);
 
     //Find already existing MRI items and add the new data to the first search result
-    QList<QStandardItem*> itemList = pSubjectItem->findChildren(Data3DTreeModelItemTypes::MriItem);
+    QList<QStandardItem*> itemList = pSubjectItem->findChildren(sMriSetName);
 
     if(!itemList.isEmpty()) {
         MriTreeItem* pMriItem = dynamic_cast<MriTreeItem*>(itemList.first());
         pReturnItem = pMriItem->addData(tSurface, tAnnotation, m_pModelEntity);
     } else {
-        MriTreeItem* pMriItem = new MriTreeItem(Data3DTreeModelItemTypes::MriItem, set);
+        MriTreeItem* pMriItem = new MriTreeItem(Data3DTreeModelItemTypes::MriItem, sMriSetName);
         addItemWithDescription(pSubjectItem, pMriItem);
         pReturnItem = pMriItem->addData(tSurface, tAnnotation, m_pModelEntity);
     }
@@ -212,7 +212,7 @@ FsSurfaceTreeItem* Data3DTreeModel::addSurface(const QString& subject, const QSt
 
 //*************************************************************************************************************
 
-SourceSpaceTreeItem* Data3DTreeModel::addSourceSpace(const QString& subject, const QString& set, const MNESourceSpace& tSourceSpace)
+SourceSpaceTreeItem* Data3DTreeModel::addSourceSpace(const QString& subject, const QString& sMeasurementSetName, const MNESourceSpace& tSourceSpace)
 {
     SourceSpaceTreeItem* pReturnItem = Q_NULLPTR;
 
@@ -220,13 +220,13 @@ SourceSpaceTreeItem* Data3DTreeModel::addSourceSpace(const QString& subject, con
     SubjectTreeItem* pSubjectItem = addSubject(subject);
 
     //Find already existing surface items and add the new data to the first search result
-    QList<QStandardItem*> itemList = pSubjectItem->findChildren(set);
+    QList<QStandardItem*> itemList = pSubjectItem->findChildren(sMeasurementSetName);
 
     if(!itemList.isEmpty()) {
         MeasurementTreeItem* pMeasurementItem = dynamic_cast<MeasurementTreeItem*>(itemList.first());
         pReturnItem = pMeasurementItem->addData(tSourceSpace, m_pModelEntity);
     } else {
-        MeasurementTreeItem* pMeasurementItem = new MeasurementTreeItem(Data3DTreeModelItemTypes::MeasurementItem, set);
+        MeasurementTreeItem* pMeasurementItem = new MeasurementTreeItem(Data3DTreeModelItemTypes::MeasurementItem, sMeasurementSetName);
         addItemWithDescription(pSubjectItem, pMeasurementItem);
         pReturnItem = pMeasurementItem->addData(tSourceSpace, m_pModelEntity);
     }
@@ -237,15 +237,15 @@ SourceSpaceTreeItem* Data3DTreeModel::addSourceSpace(const QString& subject, con
 
 //*************************************************************************************************************
 
-SourceSpaceTreeItem* Data3DTreeModel::addForwardSolution(const QString& subject, const QString& set, const MNEForwardSolution& tForwardSolution)
+SourceSpaceTreeItem* Data3DTreeModel::addForwardSolution(const QString& subject, const QString& sMeasurementSetName, const MNEForwardSolution& tForwardSolution)
 {
-    return this->addSourceSpace(subject, set, tForwardSolution.src);
+    return this->addSourceSpace(subject, sMeasurementSetName, tForwardSolution.src);
 }
 
 
 //*************************************************************************************************************
 
-MneEstimateTreeItem* Data3DTreeModel::addSourceData(const QString& subject, const QString& set, const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution)
+MneEstimateTreeItem* Data3DTreeModel::addSourceData(const QString& subject, const QString& sMeasurementSetName, const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution)
 {
     MneEstimateTreeItem* pReturnItem = Q_NULLPTR;
 
@@ -253,7 +253,7 @@ MneEstimateTreeItem* Data3DTreeModel::addSourceData(const QString& subject, cons
     SubjectTreeItem* pSubjectItem = addSubject(subject);
 
     //Find already existing surface items and add the new data to the first search result
-    QList<QStandardItem*> itemList = pSubjectItem->findChildren(set);
+    QList<QStandardItem*> itemList = pSubjectItem->findChildren(sMeasurementSetName);
 
     //Find the "set" items and add the dipole fits as items
     if(!itemList.isEmpty() && (itemList.first()->type() == Data3DTreeModelItemTypes::MeasurementItem)) {
@@ -266,7 +266,7 @@ MneEstimateTreeItem* Data3DTreeModel::addSourceData(const QString& subject, cons
             pReturnItem = pMeasurementItem->addData(tSourceEstimate, tForwardSolution);
         }
     } else {
-        MeasurementTreeItem* pMeasurementItem = new MeasurementTreeItem(Data3DTreeModelItemTypes::MeasurementItem, set);
+        MeasurementTreeItem* pMeasurementItem = new MeasurementTreeItem(Data3DTreeModelItemTypes::MeasurementItem, sMeasurementSetName);
         addItemWithDescription(pSubjectItem, pMeasurementItem);
         pReturnItem = pMeasurementItem->addData(tSourceEstimate, tForwardSolution);
 
@@ -279,7 +279,7 @@ MneEstimateTreeItem* Data3DTreeModel::addSourceData(const QString& subject, cons
 
 //*************************************************************************************************************
 
-EcdDataTreeItem* Data3DTreeModel::addDipoleFitData(const QString& subject, const QString& set, INVERSELIB::ECDSet::SPtr& pECDSet)
+EcdDataTreeItem* Data3DTreeModel::addDipoleFitData(const QString& subject, const QString& sMeasurementSetName, INVERSELIB::ECDSet::SPtr& pECDSet)
 {
     EcdDataTreeItem* pReturnItem = Q_NULLPTR;
 
@@ -287,7 +287,7 @@ EcdDataTreeItem* Data3DTreeModel::addDipoleFitData(const QString& subject, const
     SubjectTreeItem* pSubjectItem = addSubject(subject);
 
     //Find already existing surface items and add the new data to the first search result
-    QList<QStandardItem*> itemList = pSubjectItem->findChildren(set);
+    QList<QStandardItem*> itemList = pSubjectItem->findChildren(sMeasurementSetName);
 
     //Find the "set" items and add the dipole fits as items
     if(!itemList.isEmpty() && (itemList.first()->type() == Data3DTreeModelItemTypes::MeasurementItem)) {
@@ -295,7 +295,7 @@ EcdDataTreeItem* Data3DTreeModel::addDipoleFitData(const QString& subject, const
             pReturnItem = pMeasurementItem->addData(pECDSet, m_pModelEntity);
         }
     } else {
-        MeasurementTreeItem* pMeasurementItem = new MeasurementTreeItem(Data3DTreeModelItemTypes::MeasurementItem, set);
+        MeasurementTreeItem* pMeasurementItem = new MeasurementTreeItem(Data3DTreeModelItemTypes::MeasurementItem, sMeasurementSetName);
         addItemWithDescription(pSubjectItem, pMeasurementItem);
         pReturnItem = pMeasurementItem->addData(pECDSet, m_pModelEntity);
     }
@@ -306,7 +306,7 @@ EcdDataTreeItem* Data3DTreeModel::addDipoleFitData(const QString& subject, const
 
 //*************************************************************************************************************
 
-NetworkTreeItem* Data3DTreeModel::addConnectivityData(const QString& subject, const QString& set, Network::SPtr pNetworkData)
+NetworkTreeItem* Data3DTreeModel::addConnectivityData(const QString& subject, const QString& sMeasurementSetName, Network::SPtr pNetworkData)
 {
     NetworkTreeItem* pReturnItem = Q_NULLPTR;
 
@@ -314,14 +314,14 @@ NetworkTreeItem* Data3DTreeModel::addConnectivityData(const QString& subject, co
     SubjectTreeItem* pSubjectItem = addSubject(subject);
 
     //Find already existing surface items and add the new data to the first search result
-    QList<QStandardItem*> itemList = pSubjectItem->findChildren(set);
+    QList<QStandardItem*> itemList = pSubjectItem->findChildren(sMeasurementSetName);
 
     if(!itemList.isEmpty() && (itemList.first()->type() == Data3DTreeModelItemTypes::MeasurementItem)) {
         if(MeasurementTreeItem* pMeasurementItem = dynamic_cast<MeasurementTreeItem*>(itemList.first())) {
             pReturnItem = pMeasurementItem->addData(pNetworkData, m_pModelEntity);
         }
     } else {
-        MeasurementTreeItem* pMeasurementItem = new MeasurementTreeItem(Data3DTreeModelItemTypes::MeasurementItem, set);
+        MeasurementTreeItem* pMeasurementItem = new MeasurementTreeItem(Data3DTreeModelItemTypes::MeasurementItem, sMeasurementSetName);
         addItemWithDescription(pSubjectItem, pMeasurementItem);
         pReturnItem = pMeasurementItem->addData(pNetworkData, m_pModelEntity);
     }
@@ -332,7 +332,7 @@ NetworkTreeItem* Data3DTreeModel::addConnectivityData(const QString& subject, co
 
 //*************************************************************************************************************
 
-BemTreeItem* Data3DTreeModel::addBemData(const QString& subject, const QString& set, const MNELIB::MNEBem& tBem)
+BemTreeItem* Data3DTreeModel::addBemData(const QString& subject, const QString& sBemSetName, const MNELIB::MNEBem& tBem)
 {
     BemTreeItem* pReturnItem = Q_NULLPTR;
 
@@ -340,13 +340,13 @@ BemTreeItem* Data3DTreeModel::addBemData(const QString& subject, const QString& 
     SubjectTreeItem* pSubjectItem = addSubject(subject);
 
     //Find already existing surface items and add the new data to the first search result
-    QList<QStandardItem*> itemList = pSubjectItem->findChildren(set);
+    QList<QStandardItem*> itemList = pSubjectItem->findChildren(sBemSetName);
 
     if(!itemList.isEmpty() && (itemList.first()->type() == Data3DTreeModelItemTypes::BemItem)) {
         pReturnItem = dynamic_cast<BemTreeItem*>(itemList.first());
         pReturnItem->addData(tBem, m_pModelEntity);
     } else {
-        pReturnItem = new BemTreeItem(Data3DTreeModelItemTypes::BemItem, set);
+        pReturnItem = new BemTreeItem(Data3DTreeModelItemTypes::BemItem, sBemSetName);
         addItemWithDescription(pSubjectItem, pReturnItem);
         pReturnItem->addData(tBem, m_pModelEntity);
     }
@@ -357,7 +357,7 @@ BemTreeItem* Data3DTreeModel::addBemData(const QString& subject, const QString& 
 
 //*************************************************************************************************************
 
-DigitizerSetTreeItem* Data3DTreeModel::addDigitizerData(const QString& subject, const QString& set, const FIFFLIB::FiffDigPointSet& tDigitizer)
+DigitizerSetTreeItem* Data3DTreeModel::addDigitizerData(const QString& subject, const QString& sMeasurementSetName, const FIFFLIB::FiffDigPointSet& tDigitizer)
 {
     DigitizerSetTreeItem* pReturnItem = Q_NULLPTR;
 
@@ -365,13 +365,13 @@ DigitizerSetTreeItem* Data3DTreeModel::addDigitizerData(const QString& subject, 
     SubjectTreeItem* pSubjectItem = addSubject(subject);
 
     //Find already existing set items and add the new data to the first search result
-    QList<QStandardItem*> itemList = pSubjectItem->findChildren(set);
+    QList<QStandardItem*> itemList = pSubjectItem->findChildren(sMeasurementSetName);
 
     if(!itemList.isEmpty() && (itemList.first()->type() == Data3DTreeModelItemTypes::MeasurementItem)) {
         MeasurementTreeItem* pMeasurementItem = dynamic_cast<MeasurementTreeItem*>(itemList.first());
         pReturnItem = pMeasurementItem->addData(tDigitizer, m_pModelEntity);
     } else {
-        MeasurementTreeItem* pMeasurementItem = new MeasurementTreeItem(Data3DTreeModelItemTypes::MeasurementItem, set);
+        MeasurementTreeItem* pMeasurementItem = new MeasurementTreeItem(Data3DTreeModelItemTypes::MeasurementItem, sMeasurementSetName);
         addItemWithDescription(pSubjectItem, pMeasurementItem);
         pReturnItem = pMeasurementItem->addData(tDigitizer, m_pModelEntity);
     }

@@ -112,7 +112,7 @@ int main(int argc, char *argv[])
     parser.setApplicationDescription("Disp3D Example");
     parser.addHelpOption();
 
-    QCommandLineOption surfOption("surfType", "Surface type <type>.", "type", "orig");
+    QCommandLineOption surfOption("surfType", "Surface type <type>.", "type", "inflated");
     QCommandLineOption annotOption("annotType", "Annotation type <type>.", "type", "aparc.a2009s");
     QCommandLineOption hemiOption("hemi", "Selected hemisphere <hemi>.", "hemi", "2");
     QCommandLineOption subjectOption("subject", "Selected subject <subject>.", "subject", "sample");
@@ -125,7 +125,7 @@ int main(int argc, char *argv[])
     QCommandLineOption evokedFileOption("ave", "Path to the evoked/average <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
     QCommandLineOption methodOption("method", "Inverse estimation <method>, i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM");//"MNE" | "dSPM" | "sLORETA"
     QCommandLineOption snrOption("snr", "The SNR value used for computation <snr>.", "snr", "3.0");//3.0f;//0.1f;//3.0f;
-    QCommandLineOption evokedIndexOption("aveIdx", "The average <index> to choose from the average file.", "index", "0");
+    QCommandLineOption evokedIndexOption("aveIdx", "The average <index> to choose from the average file.", "index", "3");
 
     parser.addOption(surfOption);
     parser.addOption(annotOption);
@@ -262,7 +262,7 @@ int main(int argc, char *argv[])
     p3DDataModel->addSurfaceSet(parser.value(subjectOption), "MRI", tSurfSet, tAnnotSet);
 
 //    //Read and show BEM
-//    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif");
+//    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-head.fif");
 //    MNEBem t_Bem(t_fileBem);
 //    p3DDataModel->addBemData(parser.value(subjectOption), "BEM", t_Bem);
 
@@ -283,8 +283,8 @@ int main(int argc, char *argv[])
             pRTDataItem->setTimeInterval(17);
             pRTDataItem->setNumberAverages(1);
             pRTDataItem->setStreamingActive(true);
-            pRTDataItem->setNormalization(QVector3D(0.3,0.5,10.0));
-            pRTDataItem->setVisualizationType("Annotation based");
+            pRTDataItem->setNormalization(QVector3D(0.0,0.5,10.0));
+            pRTDataItem->setVisualizationType("Smoothing based");
             pRTDataItem->setColortable("Hot");
         }
     }
