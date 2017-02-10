@@ -109,6 +109,13 @@ public:
     */
     virtual ~ComputeFwdSettings();
 
+    //=========================================================================================================
+    /**
+    * Check whether Compute Forward Settings are correctly set.
+    */
+    void checkIntegrity();
+
+
 public:
     QString srcname;            /**< Source space */
     QString measname;           /**< Measurement file */

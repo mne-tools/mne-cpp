@@ -99,7 +99,7 @@ public:
 
     virtual ~DipoleFit(){}
 
-    //ToDo split this function into init (with settings as parameter) and teh actual fit function
+    //ToDo split this function into init (with settings as parameter) and the actual fit function
     ECDSet calculateFit() const;
 //    virtual const char* getName() const;
 
