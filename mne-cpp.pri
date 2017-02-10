@@ -63,6 +63,30 @@ EIGEN_INCLUDE_DIR = $$EIGEN_INCLUDE_DIR
 isEmpty(EIGEN_INCLUDE_DIR) {
     EIGEN_INCLUDE_DIR = $${PWD}/include/3rdParty/eigen3
 }
+
+#CNTK
+CNTK_INCLUDE_DIR = $$CNTK_INCLUDE_DIR
+isEmpty( CNTK_INCLUDE_DIR ) {
+    # Check CNTK Path options
+    exists($$(CNTKPATH)/cntk/Include/Eval.h) {
+        CNTK_TEST_DIR = $$(CNTKPATH)/cntk
+    }
+    exists($$(CNTKPATH)/Include/Eval.h) {
+        CNTK_TEST_DIR = $$(CNTKPATH)
+    }
+    exists($$(MYCNTKPATH)/cntk/Include/Eval.h) {
+        CNTK_TEST_DIR = $$(MYCNTKPATH)/cntk
+    }
+    exists($$(MYCNTKPATH)/Include/Eval.h) {
+        CNTK_TEST_DIR = $$(MYCNTKPATH)
+    }
+    # Set CNTK path variables
+    !isEmpty( CNTK_TEST_DIR ) {
+        CNTK_INCLUDE_DIR = $${CNTK_TEST_DIR}/Include
+        CNTK_LIBRARY_DIR = $${CNTK_TEST_DIR}/cntk
+    }
+}
+
 # include
 MNE_INCLUDE_DIR = $$MNE_INCLUDE_DIR
 isEmpty( MNE_INCLUDE_DIR ) {
@@ -71,12 +95,6 @@ isEmpty( MNE_INCLUDE_DIR ) {
 MNE_SCAN_INCLUDE_DIR = $$MNE_SCAN_INCLUDE_DIR
 isEmpty( MNE_SCAN_INCLUDE_DIR ) {
     MNE_SCAN_INCLUDE_DIR = $${PWD}/applications/mne_scan/libs
-}
-contains(MNECPP_CONFIG, buildDeep) {
-    CNTK_INCLUDE_DIR = $$MNE_INCLUDE_DIR
-    isEmpty( CNTK_INCLUDE_DIR ) {
-        CNTK_INCLUDE_DIR = C:/local/cntk/Include
-    }
 }
 
 # lib
