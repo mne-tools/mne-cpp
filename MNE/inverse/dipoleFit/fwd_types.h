@@ -41,28 +41,28 @@ typedef struct {		      /* Space to store a solution matrix */
   int   np;		              /* Number of potential solution points */
 } *fwdBemSolution,fwdBemSolutionRec;  /* Mapping from infinite medium potentials to a particular set of coils or electrodes */
 
-typedef struct {
-  char       *surf_name;	/* Name of the file where surfaces were loaded from */
-  INVERSELIB::MneCSurface* *surfs;   /* The interface surfaces from outside towards inside */
-  int        *ntri;		/* Number of triangles on each surface */
-  int        *np;		/* Number of vertices on each surface */
-  int        nsurf;		/* How many */
-  float      *sigma;		/* The conductivities */
-  float      **gamma;		/* The gamma factors */
-  float      *source_mult;	/* These multiply the infinite medium potentials */
-  float      *field_mult;	/* Multipliers for the magnetic field */
-  int        bem_method;	/* Which approximation method is used */
-  char       *sol_name;		/* Name of the file where the solution was loaded from */
+//typedef struct {
+//  char       *surf_name;	/* Name of the file where surfaces were loaded from */
+//  INVERSELIB::MneCSurface* *surfs;   /* The interface surfaces from outside towards inside */
+//  int        *ntri;		/* Number of triangles on each surface */
+//  int        *np;		/* Number of vertices on each surface */
+//  int        nsurf;		/* How many */
+//  float      *sigma;		/* The conductivities */
+//  float      **gamma;		/* The gamma factors */
+//  float      *source_mult;	/* These multiply the infinite medium potentials */
+//  float      *field_mult;	/* Multipliers for the magnetic field */
+//  int        bem_method;	/* Which approximation method is used */
+//  char       *sol_name;		/* Name of the file where the solution was loaded from */
 
-  float      **solution;	/* The potential solution matrix */
-  float      *v0;		/* Space for the infinite-medium potentials */
-  int        nsol;		/* Size of the solution matrix */
+//  float      **solution;	/* The potential solution matrix */
+//  float      *v0;		/* Space for the infinite-medium potentials */
+//  int        nsol;		/* Size of the solution matrix */
 
-  INVERSELIB::FiffCoordTransOld* head_mri_t;	/* Coordinate transformation from head to MRI coordinates */
+//  INVERSELIB::FiffCoordTransOld* head_mri_t;	/* Coordinate transformation from head to MRI coordinates */
 
-  float      ip_approach_limit;	/* Controls whether we need to use the isolated problem approach */
-  int        use_ip_approach;	/* Do we need it */
-} *fwdBemModel,fwdBemModelRec;	/* Holds the BEM model definition */
+//  float      ip_approach_limit;	/* Controls whether we need to use the isolated problem approach */
+//  int        use_ip_approach;	/* Do we need it */
+//} *fwdBemModel,fwdBemModelRec;	/* Holds the BEM model definition */
 
 typedef struct {
   INVERSELIB::MneCTFCompDataSet* set;	         /* The compensation data set */

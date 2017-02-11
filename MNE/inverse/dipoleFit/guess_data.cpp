@@ -684,48 +684,6 @@ void fiff_coord_trans_inv_16 (float r[3],FiffCoordTransOld* t,int do_move)
 
 
 
-//============================= fwd_bem_model.c =============================
-
-
-static struct {
-    int  kind;
-    const char *name;
-} surf_expl_16[] = { { FIFFV_BEM_SURF_ID_BRAIN , "inner skull" },
-{ FIFFV_BEM_SURF_ID_SKULL , "outer skull" },
-{ FIFFV_BEM_SURF_ID_HEAD  , "scalp" },
-{ -1                      , "unknown" } };
-
-
-const char *fwd_bem_explain_surface_16(int kind)
-
-{
-    int k;
-
-    for (k = 0; surf_expl_16[k].kind >= 0; k++)
-        if (surf_expl_16[k].kind == kind)
-            return surf_expl_16[k].name;
-
-    return surf_expl_16[k].name;
-}
-
-
-MneSurfaceOrVolume::MneCSurface* fwd_bem_find_surface_16(fwdBemModel model, int kind)
-/*
- * Return a pointer to a specific surface in a BEM
- */
-{
-    int k;
-    if (!model) {
-        printf("No model specified for fwd_bem_find_surface");
-        return NULL;
-    }
-    for (k = 0; k < model->nsurf; k++)
-        if (model->surfs[k]->id == kind)
-            return model->surfs[k];
-    printf("Desired surface (%d = %s) not found.",
-           kind,fwd_bem_explain_surface_16(kind));
-    return NULL;
-}
 
 
 
@@ -869,7 +827,7 @@ GuessData::GuessData(const QString &guessname, const QString &guess_surfname, fl
         fiff_coord_trans_inv_16(r0,f->mri_head_t,TRUE);
         if (f->bem_model) {
             fprintf(stderr,"Using inner skull surface from the BEM (%s)...\n",f->bemname);
-            if ((inner_skull = fwd_bem_find_surface_16(f->bem_model,FIFFV_BEM_SURF_ID_BRAIN)) == NULL)
+            if ((inner_skull = f->bem_model->fwd_bem_find_surface(FIFFV_BEM_SURF_ID_BRAIN)) == NULL)
                 goto bad;
         }
         else if (!guess_surfname.isEmpty()) {
@@ -969,7 +927,7 @@ GuessData::GuessData(const QString &guessname, const QString &guess_surfname, fl
         fiff_coord_trans_inv_16(r0,f->mri_head_t,TRUE);
         if (f->bem_model) {
             printf("Using inner skull surface from the BEM (%s)...\n",f->bemname);
-            if ((inner_skull = fwd_bem_find_surface_16(f->bem_model,FIFFV_BEM_SURF_ID_BRAIN)) == NULL)
+            if ((inner_skull = f->bem_model->fwd_bem_find_surface(FIFFV_BEM_SURF_ID_BRAIN)) == NULL)
                 goto bad;
         }
         else if (!guess_surfname.isEmpty()) {
