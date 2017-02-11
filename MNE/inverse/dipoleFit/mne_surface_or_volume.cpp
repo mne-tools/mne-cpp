@@ -40,6 +40,7 @@
 //=============================================================================================================
 
 #include "mne_surface_or_volume.h"
+#include "fwd_bem_model.h"
 
 #include <fiff/fiff_stream.h>
 
@@ -927,39 +928,6 @@ static FiffCoordTransOld* make_voxel_ras_trans(float *r0,
 }
 
 
-
-
-
-
-
-
-
-//============================= fwd_bem_model.c =============================
-
-static struct {
-    int  kind;
-    const char *name;
-} surf_expl_17[] = { { FIFFV_BEM_SURF_ID_BRAIN , "inner skull" },
-{ FIFFV_BEM_SURF_ID_SKULL , "outer skull" },
-{ FIFFV_BEM_SURF_ID_HEAD  , "scalp" },
-{ -1                      , "unknown" } };
-
-
-const char *fwd_bem_explain_surface_17(int kind)
-
-{
-    int k;
-
-    for (k = 0; surf_expl_17[k].kind >= 0; k++)
-        if (surf_expl_17[k].kind == kind)
-            return surf_expl_17[k].name;
-
-    return surf_expl_17[k].name;
-}
-
-
-
-
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -1557,7 +1525,7 @@ MneSurfaceOrVolume::MneCSurface *MneSurfaceOrVolume::make_guesses(MneSurfaceOrVo
     }
     else {
         fprintf(stderr,"Guess surface (%d = %s) is in %s coordinates\n",
-                guess_surf->id,fwd_bem_explain_surface_17(guess_surf->id),
+                guess_surf->id,FwdBemModel::fwd_bem_explain_surface(guess_surf->id),
                 mne_coord_frame_name_17(guess_surf->coord_frame));
     }
     fprintf(stderr,"Filtering (grid = %6.f mm)...\n",1000*grid);
