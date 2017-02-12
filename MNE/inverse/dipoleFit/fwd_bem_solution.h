@@ -96,6 +96,12 @@ public:
     */
     ~FwdBemSolution();
 
+    //============================= fwd_bem_model.c =============================
+    //TODO Remove later on use delete instead
+    static void fwd_bem_free_coil_solution(void *user);
+
+
+
 public:
     float **solution;                   /* The solution matrix */
     int   ncoil;                        /* Number of sensors */

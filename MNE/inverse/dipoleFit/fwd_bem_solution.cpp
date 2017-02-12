@@ -41,6 +41,26 @@
 #include "fwd_bem_solution.h"
 
 
+#define MALLOC_41(x,t) (t *)malloc((x)*sizeof(t))
+
+#define FREE_41(x) if ((char *)(x) != NULL) free((char *)(x))
+
+#define FREE_CMATRIX_41(m) mne_free_cmatrix_41((m))
+
+
+
+
+void mne_free_cmatrix_41(float **m)
+{
+    if (m) {
+        FREE_41(*m);
+        FREE_41(m);
+    }
+}
+
+
+
+
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
@@ -68,5 +88,23 @@ FwdBemSolution::FwdBemSolution()
 
 FwdBemSolution::~FwdBemSolution()
 {
+    FREE_CMATRIX_41(solution);
+}
 
+
+//*************************************************************************************************************
+
+void FwdBemSolution::fwd_bem_free_coil_solution(void *user)
+{
+    FwdBemSolution* sol = (FwdBemSolution*)user;
+
+    if (!sol)
+        return;
+
+//    FREE_CMATRIX_3(sol->solution);
+//    FREE_3(sol);
+
+    delete sol;
+
+    return;
 }

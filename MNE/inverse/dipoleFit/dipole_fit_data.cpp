@@ -1704,19 +1704,6 @@ static dipoleFitFuncs new_dipole_fit_funcs()
 
 
 
-//============================= fwd_bem_model.c =============================
-
-void fwd_bem_free_coil_solution(void *user)
-
-{
-    fwdBemSolution sol = (fwdBemSolution)user;
-
-    if (!sol)
-        return;
-    FREE_CMATRIX_3(sol->solution);
-    FREE_3(sol);
-    return;
-}
 
 
 
