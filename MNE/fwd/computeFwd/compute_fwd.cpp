@@ -20,6 +20,25 @@ using namespace FIFFLIB;
 using namespace FWDLIB;
 
 
+
+#define X_41 0
+#define Y_41 1
+#define Z_41 2
+
+
+#define FREE_41(x) if ((char *)(x) != NULL) free((char *)(x))
+
+
+#define VEC_COPY_41(to,from) {\
+    (to)[X_41] = (from)[X_41];\
+    (to)[Y_41] = (from)[Y_41];\
+    (to)[Z_41] = (from)[Z_41];\
+    }
+
+
+
+
+
 //*************************************************************************************************************
 //=============================================================================================================
 // STATIC DEFINITIONS
@@ -83,50 +102,51 @@ void ComputeFwd::calculateFwd() const
     FwdEegSphereModel* eeg_model = NULL;
     FwdBemModel*       bem_model = NULL;
 
-
-//    /*
-//    * Report the setup
-//    */
-////    fprintf(stderr,"\n");
-////    mne_print_version_info(stderr,argv[0],PROGRAM_VERSION,__DATE__,__TIME__);
+    /*
+    * Report the setup
+    */
 //    fprintf(stderr,"\n");
-//    fprintf(stderr,"Source space                 : %s\n",srcname);
-//    if (transname || mriname)
-//        fprintf(stderr,"MRI -> head transform source : %s\n",mriname ? mriname : transname);
-//    else
-//        fprintf(stderr,"MRI and head coordinates are assumed to be identical.\n");
-//    fprintf(stderr,"Measurement data             : %s\n",measname);
-//    if (bemname != NULL)
-//        fprintf(stderr,"BEM model                    : %s\n",bemname);
-//    else {
-//        fprintf(stderr,"Sphere model                 : origin at (% 7.2f % 7.2f % 7.2f) mm\n",
-//                1000*r0[X],1000*r0[Y],1000*r0[Z]);
-//        if (include_eeg) {
-//            fprintf(stderr,"\n");
+//    mne_print_version_info(stderr,argv[0],PROGRAM_VERSION,__DATE__,__TIME__);
+    printf("\n");
+    printf("Source space                 : %s\n",settings->srcname.toLatin1().constData());
+    if (!(settings->transname.isEmpty()) || !(settings->mriname.isEmpty()))
+        printf("MRI -> head transform source : %s\n",!(settings->mriname.isEmpty()) ? settings->mriname.toLatin1().constData() : settings->transname.toLatin1().constData());
+    else
+        printf("MRI and head coordinates are assumed to be identical.\n");
+    printf("Measurement data             : %s\n",settings->measname.toLatin1().constData());
+    if (!settings->bemname.isEmpty())
+        printf("BEM model                    : %s\n",settings->bemname.toLatin1().constData());
+    else {
+        printf("Sphere model                 : origin at (% 7.2f % 7.2f % 7.2f) mm\n",
+               1000*settings->r0[X_41],1000*settings->r0[Y_41],1000*settings->r0[Z_41]);
+        if (settings->include_eeg) {
+            printf("\n");
 
-//            if (!eeg_model_file)
-//                eeg_model_file = default_eeg_model_file();
-//            eeg_models = fwd_load_eeg_sphere_models(eeg_model_file,eeg_models);
-//            fwd_list_eeg_sphere_models(stderr,eeg_models);
+            if (settings->eeg_model_file.isEmpty()) {
+                qCritical("!!!!!!!!!!TODO: default_eeg_model_file();");
+//                settings->eeg_model_file = default_eeg_model_file();
+            }
+            eeg_models = FwdEegSphereModelSet::fwd_load_eeg_sphere_models(settings->eeg_model_file,eeg_models);
+            eeg_models->fwd_list_eeg_sphere_models(stderr);
 
-//            if (!eeg_model_name)
-//                eeg_model_name = mne_strdup("Default");
-//            if ((eeg_model = fwd_select_eeg_sphere_model(eeg_model_name,eeg_models)) == NULL)
-//                goto out;
+            if (settings->eeg_model_name.isEmpty())
+                settings->eeg_model_name = QString("Default");
+            if ((eeg_model = eeg_models->fwd_select_eeg_sphere_model(settings->eeg_model_name)) == NULL)
+                goto out;
 
-//            if (fwd_setup_eeg_sphere_model(eeg_model,eeg_sphere_rad,use_equiv_eeg,3) == FAIL)
-//                goto out;
+            if (!eeg_model->fwd_setup_eeg_sphere_model(settings->eeg_sphere_rad,settings->use_equiv_eeg,3))
+                goto out;
 
-//            fprintf(stderr,"Using EEG sphere model \"%s\" with scalp radius %7.1f mm\n",
-//                    eeg_model_name,1000*eeg_sphere_rad);
-//            fprintf(stderr,"%s the electrode locations to scalp\n",scale_eeg_pos ? "Scale" : "Do not scale");
+            printf("Using EEG sphere model \"%s\" with scalp radius %7.1f mm\n",
+                   settings->eeg_model_name.toLatin1().constData(),1000*settings->eeg_sphere_rad);
+            printf("%s the electrode locations to scalp\n",settings->scale_eeg_pos ? "Scale" : "Do not scale");
 
-//            eeg_model->scale_pos = scale_eeg_pos;
-//            VEC_COPY(eeg_model->r0,r0);
+            eeg_model->scale_pos = settings->scale_eeg_pos;
+            VEC_COPY_41(eeg_model->r0,settings->r0);
 
-//            fprintf(stderr,"\n");
-//        }
-//    }
+            printf("\n");
+        }
+    }
 //    fprintf(stderr,"%s field computations\n",accurate ? "Accurate" : "Standard");
 //    fprintf(stderr,"Do computations in %s coordinates.\n",mne_coord_frame_name(coord_frame));
 //    fprintf(stderr,"%s source orientations\n",fixed_ori ? "Fixed" : "Free");
@@ -379,29 +399,38 @@ void ComputeFwd::calculateFwd() const
 //    res = OK;
 //    fprintf(stderr,"\nFinished.\n");
 
-//out : {
+out : {
 //        if (out)
 //            fclose(out);
-//        for (k = 0; k < nspace; k++)
-//            mne_free_source_space(spaces[k]);
-//        FREE(mri_head_t);
-//        FREE(meg_head_t);
-//        FREE(megchs);
-//        FREE(eegchs);
-//        fwd_free_coil_set(megcoils);
-//        fwd_free_coil_set(eegels);
+        for (k = 0; k < nspace; k++)
+            if(spaces[k])
+                delete spaces[k];
+        if(mri_head_t)
+            delete mri_head_t;
+        if(meg_head_t)
+            delete meg_head_t;
+        FREE_41(megchs);
+        FREE_41(eegchs);
+        if(megcoils)
+            delete megcoils;
+        if(eegels)
+            delete eegels;
 
-//        mne_free_named_matrix(meg_forward);
-//        mne_free_named_matrix(eeg_forward);
-//        mne_free_named_matrix(meg_forward_grad);
-//        mne_free_named_matrix(eeg_forward_grad);
+        if(meg_forward)
+            delete meg_forward;
+        if(eeg_forward)
+            delete eeg_forward;
+        if(meg_forward_grad)
+            delete meg_forward_grad;
+        if(eeg_forward_grad)
+            delete eeg_forward_grad;
 
-//        if (res == FAIL)
-//            err_print_error();
-//        if (res == OK)
-//            exit(0);
-//        else
-//            exit(1);
-//    }
+        if (!res)
+            qCritical("err_print_error();");//err_print_error();
+        if (res)
+            exit(0);
+        else
+            exit(1);
+    }
 }
 
