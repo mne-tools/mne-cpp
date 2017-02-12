@@ -171,6 +171,49 @@ public:
 
 
 
+    //============================= mne_project_to_surface.c =============================
+
+    typedef struct {
+        float *a;
+        float *b;
+        float *c;
+        int   *act;
+        int   nactive;
+    } *projData,projDataRec;
+
+
+    static void mne_triangle_coords(float       *r,       /* Location of a point */
+                             MneSurfaceOrVolume::MneCSurface*  s,	       /* The surface */
+                             int         tri,      /* Which triangle */
+                             float       *x,       /* Coordinates of the point on the triangle */
+                             float       *y,
+                             float       *z);
+
+
+
+
+    static int nearest_triangle_point(float       *r,    /* Location of a point */
+                                      MneSurfaceOrVolume::MneCSurface*  s,     /* The surface */
+                                      void        *user, /* Something precomputed */
+                                      int         tri,   /* Which triangle */
+                                      float       *x,    /* Coordinates of the point on the triangle */
+                                      float       *y,
+                                      float       *z);
+
+    static void project_to_triangle(MneSurfaceOrVolume::MneCSurface* s,
+                                    int        tri,
+                                    float      p,
+                                    float      q,
+                                    float      *r);
+
+    static int mne_nearest_triangle_point(float       *r,    /* Location of a point */
+                                   MneSurfaceOrVolume::MneCSurface*  s,     /* The surface */
+                                   int         tri,   /* Which triangle */
+                                   float       *x,    /* Coordinates of the point on the triangle */
+                                   float       *y,
+                                   float       *z);
+
+    static int mne_project_to_surface(MneSurfaceOrVolume::MneCSurface* s, void *proj_data, float *r, int project_it, float *distp);
 
 
 public:
