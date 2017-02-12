@@ -43,6 +43,9 @@
 #include "mne_surface_or_volume.h"
 
 
+#include "fwd_bem_solution.h"
+
+
 #include <fiff/fiff_stream.h>
 
 #include <QFile>
@@ -1392,9 +1395,8 @@ int FwdBemModel::fwd_bem_specify_els(FwdBemModel* m, FwdCoilSet *els)
     int         best;
     mneTriangle tri;
     float       x,y,z;
-    fwdBemSolution* sol;
+    FwdBemSolution* sol;
 
-    extern fwdBemSolution fwd_bem_new_coil_solution();
     extern void fwd_bem_free_coil_solution(void *user);
 
     if (!m) {
@@ -1411,7 +1413,7 @@ int FwdBemModel::fwd_bem_specify_els(FwdBemModel* m, FwdCoilSet *els)
     /*
        * Hard work follows
        */
-    els->user_data = sol = fwd_bem_new_coil_solution();
+    els->user_data = sol = new FwdBemSolution;
     els->user_data_free = fwd_bem_free_coil_solution;
 
     sol->ncoil = els->ncoil;

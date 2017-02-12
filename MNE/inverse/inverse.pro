@@ -130,7 +130,8 @@ SOURCES += \
     dipoleFit/mne_raw_info.cpp \
     dipoleFit/mne_raw_buf_def.cpp \
     dipoleFit/mne_raw_data.cpp \
-    dipoleFit/fwd_bem_model.cpp
+    dipoleFit/fwd_bem_model.cpp \
+    dipoleFit/fwd_bem_solution.cpp
 
 HEADERS +=\
     inverse_global.h \
@@ -172,7 +173,8 @@ HEADERS +=\
     dipoleFit/mne_raw_info.h \
     dipoleFit/mne_raw_buf_def.h \
     dipoleFit/mne_raw_data.h \
-    dipoleFit/fwd_bem_model.h
+    dipoleFit/fwd_bem_model.h \
+    dipoleFit/fwd_bem_solution.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
