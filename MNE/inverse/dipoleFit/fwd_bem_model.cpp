@@ -1435,7 +1435,7 @@ int FwdBemModel::fwd_bem_specify_els(FwdBemModel* m, FwdCoilSet *els)
             VEC_COPY_40(r,el->rmag[p]);
             if (m->head_mri_t != NULL)
                 FiffCoordTransOld::fiff_coord_trans(r,m->head_mri_t,FIFFV_MOVE);
-            best = mne_project_to_surface(scalp,NULL,r,FALSE,&dist);
+            best = MneSurfaceOrVolume::mne_project_to_surface(scalp,NULL,r,FALSE,&dist);
             if (best < 0) {
                 printf("One of the electrodes could not be projected onto the scalp surface. How come?");
                 goto bad;
@@ -1453,7 +1453,7 @@ int FwdBemModel::fwd_bem_specify_els(FwdBemModel* m, FwdCoilSet *els)
              * Calculate a linear interpolation between the vertex values
              */
                 tri = scalp->tris+best;
-                mne_triangle_coords(r,scalp,best,&x,&y,&z);
+                MneSurfaceOrVolume::mne_triangle_coords(r,scalp,best,&x,&y,&z);
 
                 w[X_40] = el->w[p]*(1.0 - x - y);
                 w[Y_40] = el->w[p]*x;
@@ -1513,7 +1513,7 @@ void FwdBemModel::fwd_bem_lin_pot_calc(float *rd, float *Q, FwdBemModel *m, FwdC
             v0[p++] = mult*fwd_bem_inf_pot(mri_rd,mri_Q,rr[k]);
     }
     if (els) {
-        fwdBemSolution sol = (fwdBemSolution)els->user_data;
+        FwdBemSolution* sol = (FwdBemSolution*)els->user_data;
         solution = sol->solution;
         nsol     = sol->ncoil;
     }
@@ -1560,7 +1560,7 @@ void FwdBemModel::fwd_bem_pot_calc(float *rd, float *Q, FwdBemModel *m, FwdCoilS
             v0[p++] = mult*fwd_bem_inf_pot(mri_rd,mri_Q,tri->cent);
     }
     if (els) {
-        fwdBemSolution sol = (fwdBemSolution)els->user_data;
+        FwdBemSolution* sol = (FwdBemSolution*)els->user_data;
         solution = sol->solution;
         nsol     = sol->ncoil;
     }
@@ -1581,8 +1581,8 @@ int FwdBemModel::fwd_bem_pot_els(float *rd, float *Q, FwdCoilSet *els, float *po
      * This version calculates the potential on all surfaces
      */
 {
-    fwdBemModel    m = (fwdBemModel)client;
-    fwdBemSolution sol = (fwdBemSolution)els->user_data;
+    FwdBemModel*    m = (FwdBemModel*)client;
+    FwdBemSolution* sol = (FwdBemSolution*)els->user_data;
 
     if (!m) {
         printf("No BEM model specified to fwd_bem_pot_els");
@@ -2139,7 +2139,7 @@ int FwdBemModel::fwd_bem_specify_coils(FwdBemModel *m, FwdCoilSet *coils)
       */
 {
     float **sol = NULL;
-    fwdBemSolution csol;
+    FwdBemSolution* csol;
 
     if (!m) {
         printf("Model missing in fwd_bem_specify_coils");
@@ -2192,7 +2192,7 @@ void FwdBemModel::fwd_bem_lin_field_calc(float *rd, float *Q, FwdCoilSet *coils,
     float  mult;
     float  **rr;
     float  my_rd[3],my_Q[3];
-    fwdBemSolution sol = (fwdBemSolution)coils->user_data;
+    FwdBemSolution* sol = (FwdBemSolution*)coils->user_data;
     /*
        * Infinite-medium potentials
        */
@@ -2255,7 +2255,7 @@ void FwdBemModel::fwd_bem_field_calc(float *rd, float *Q, FwdCoilSet *coils, Fwd
     mneTriangle tri;
     float   mult;
     float  my_rd[3],my_Q[3];
-    fwdBemSolution sol = (fwdBemSolution)coils->user_data;
+    FwdBemSolution* sol = (FwdBemSolution*)coils->user_data;
     /*
        * Infinite-medium potentials
        */
@@ -2315,7 +2315,7 @@ int FwdBemModel::fwd_bem_field(float *rd, float *Q, FwdCoilSet *coils, float *B,
      */
 {
     FwdBemModel* m = (FwdBemModel*)client;
-    fwdBemSolution sol = (fwdBemSolution)coils->user_data;
+    FwdBemSolution* sol = (FwdBemSolution*)coils->user_data;
 
     if (!m) {
         printf("No BEM model specified to fwd_bem_field");

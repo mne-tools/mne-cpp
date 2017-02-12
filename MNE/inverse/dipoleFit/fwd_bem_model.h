@@ -299,7 +299,7 @@ public:
                                    float       *normal,	/* The field direction we are interested in */
                                    mneTriangle tri);
 
-    float **fwd_bem_field_coeff(FwdBemModel* m,	/* The model */
+    static float **fwd_bem_field_coeff(FwdBemModel* m,	/* The model */
                                 FwdCoilSet*  coils);
 
     /*
