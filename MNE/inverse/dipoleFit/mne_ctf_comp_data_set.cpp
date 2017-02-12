@@ -546,7 +546,7 @@ float **mne_mat_mat_mult_32 (float **m1,float **m2,int d1,int d2,int d3)
 
 {
 #ifdef BLAS
-    float **result = ALLOC_CMATRIX_3(d1,d3);
+    float **result = ALLOC_CMATRIX_32(d1,d3);
     char  *transa = "N";
     char  *transb = "N";
     float zero = 0.0;

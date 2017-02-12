@@ -289,6 +289,46 @@ void mne_scale_vector_40(double scale,float *v,int   nn)
 }
 
 
+float **mne_mat_mat_mult_40 (float **m1,float **m2,int d1,int d2,int d3)
+/* Matrix multiplication
+      * result(d1 x d3) = m1(d1 x d2) * m2(d2 x d3) */
+
+{
+#ifdef BLAS
+    float **result = ALLOC_CMATRIX_40(d1,d3);
+    char  *transa = "N";
+    char  *transb = "N";
+    float zero = 0.0;
+    float one  = 1.0;
+    sgemm (transa,transb,&d3,&d1,&d2,
+           &one,m2[0],&d3,m1[0],&d2,&zero,result[0],&d3);
+    return (result);
+#else
+    float **result = ALLOC_CMATRIX_40(d1,d3);
+    int j,k,p;
+    float sum;
+
+    for (j = 0; j < d1; j++)
+        for (k = 0; k < d3; k++) {
+            sum = 0.0;
+            for (p = 0; p < d2; p++)
+                sum = sum + m1[j][p]*m2[p][k];
+            result[j][k] = sum;
+        }
+    return (result);
+#endif
+}
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1397,8 +1437,6 @@ int FwdBemModel::fwd_bem_specify_els(FwdBemModel* m, FwdCoilSet *els)
     float       x,y,z;
     FwdBemSolution* sol;
 
-    extern void fwd_bem_free_coil_solution(void *user);
-
     if (!m) {
         printf("Model missing in fwd_bem_specify_els");
         goto bad;
@@ -1413,8 +1451,8 @@ int FwdBemModel::fwd_bem_specify_els(FwdBemModel* m, FwdCoilSet *els)
     /*
        * Hard work follows
        */
-    els->user_data = sol = new FwdBemSolution;
-    els->user_data_free = fwd_bem_free_coil_solution;
+    els->user_data = sol = new FwdBemSolution();
+    els->user_data_free = FwdBemSolution::fwd_bem_free_coil_solution;
 
     sol->ncoil = els->ncoil;
     sol->np    = m->nsol;
@@ -2161,12 +2199,12 @@ int FwdBemModel::fwd_bem_specify_coils(FwdBemModel *m, FwdCoilSet *coils)
         printf("Unknown BEM method in fwd_bem_specify_coils : %d",m->bem_method);
         goto bad;
     }
-    coils->user_data = csol = fwd_bem_new_coil_solution();
-    coils->user_data_free   = fwd_bem_free_coil_solution;
+    coils->user_data = csol = new FwdBemSolution();
+    coils->user_data_free   = FwdBemSolution::fwd_bem_free_coil_solution;
 
     csol->ncoil     = coils->ncoil;
     csol->np        = m->nsol;
-    csol->solution  = mne_mat_mat_mult_3(sol,m->solution,coils->ncoil,m->nsol,m->nsol);
+    csol->solution  = mne_mat_mat_mult_40(sol,m->solution,coils->ncoil,m->nsol,m->nsol);
 
     FREE_CMATRIX_40(sol);
     return OK;
