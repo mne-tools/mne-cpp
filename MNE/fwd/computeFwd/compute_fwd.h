@@ -103,10 +103,6 @@ public:
     //ToDo split this function into init (with settings as parameter) and the actual fit function
     void calculateFwd() const;
 
-public:
-    QString dummySetting;
-
-
 private:
     ComputeFwdSettings* settings;
 
