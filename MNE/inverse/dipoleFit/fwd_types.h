@@ -25,21 +25,21 @@ typedef int (*fwdFieldGradFunc)(float *rd,float *Q,INVERSELIB::FwdCoilSet* coils
 
 
 
-#define FWD_BEM_UNKNOWN           -1
-#define FWD_BEM_CONSTANT_COLL     1
-#define FWD_BEM_LINEAR_COLL       2
+//#define FWD_BEM_UNKNOWN           -1
+//#define FWD_BEM_CONSTANT_COLL     1
+//#define FWD_BEM_LINEAR_COLL       2
 
-#define FWD_BEM_IP_APPROACH_LIMIT 0.1
+//#define FWD_BEM_IP_APPROACH_LIMIT 0.1
 
-#define FWD_BEM_LIN_FIELD_SIMPLE    1
-#define FWD_BEM_LIN_FIELD_FERGUSON  2
-#define FWD_BEM_LIN_FIELD_URANKAR   3
+//#define FWD_BEM_LIN_FIELD_SIMPLE    1
+//#define FWD_BEM_LIN_FIELD_FERGUSON  2
+//#define FWD_BEM_LIN_FIELD_URANKAR   3
 
-typedef struct {		      /* Space to store a solution matrix */
-  float **solution;		      /* The solution matrix */
-  int   ncoil;			      /* Number of sensors */
-  int   np;		              /* Number of potential solution points */
-} *fwdBemSolution,fwdBemSolutionRec;  /* Mapping from infinite medium potentials to a particular set of coils or electrodes */
+//typedef struct {		      /* Space to store a solution matrix */
+//  float **solution;		      /* The solution matrix */
+//  int   ncoil;			      /* Number of sensors */
+//  int   np;		              /* Number of potential solution points */
+//} *fwdBemSolution,fwdBemSolutionRec;  /* Mapping from infinite medium potentials to a particular set of coils or electrodes */
 
 //typedef struct {
 //  char       *surf_name;	/* Name of the file where surfaces were loaded from */

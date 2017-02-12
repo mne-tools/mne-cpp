@@ -1718,17 +1718,6 @@ void fwd_bem_free_coil_solution(void *user)
     return;
 }
 
-fwdBemSolution fwd_bem_new_coil_solution()
-
-{
-    fwdBemSolution sol = MALLOC_3(1,fwdBemSolutionRec);
-
-    sol->solution = NULL;
-    sol->ncoil    = 0;
-    sol->np       = 0;
-
-    return sol;
-}
 
 
 
