@@ -1817,8 +1817,6 @@ int MneSurfaceOrVolume::mne_read_source_spaces(const QString &name, MneSourceSpa
     int             *neighbors  = NULL;
     int             *vol_dims = NULL;
 
-    extern void mne_add_triangle_data(MneSourceSpaceOld* s);
-
     if(!stream->open())
         goto bad;
 
