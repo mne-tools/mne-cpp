@@ -2,7 +2,7 @@
 
 #include "compute_fwd.h"
 
-#include <inverse/dipoleFit/mne_surface_or_volume.h>
+#include <inverse/dipoleFit/mne_source_space_old.h>
 #include <inverse/dipoleFit/fiff_coord_trans_old.h>
 #include <inverse/dipoleFit/fwd_coil_set.h>
 #include <inverse/dipoleFit/mne_ctf_comp_data_set.h>
@@ -316,7 +316,7 @@ ComputeFwd::~ComputeFwd()
 void ComputeFwd::calculateFwd() const
 {
     bool                res = false;
-    MneCSourceSpace*   *spaces = NULL;  /* The source spaces */
+    MneSourceSpaceOld*   *spaces = NULL;  /* The source spaces */
     int                 nspace  = 0;
     int                 nsource = 0;     /* Number of source space points */
 
@@ -612,7 +612,11 @@ void ComputeFwd::calculateFwd() const
             }
             printf("Omitted source space points will be output to : %s\n",settings->mindistoutname.toLatin1().constData());
         }
-        if (MneSurfaceOrVolume::filter_source_spaces(settings->mindist,settings->bemname.toLatin1().data(),mri_head_t,spaces,nspace,out,settings->use_threads) == FAIL)
+        if (MneSurfaceOrVolume::filter_source_spaces(settings->mindist,
+                                                     settings->bemname.toLatin1().data(),
+                                                     mri_head_t,
+                                                     spaces,
+                                                     nspace,out,settings->use_threads) == FAIL)
             goto out;
         if (out) {
             fclose(out);

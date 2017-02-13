@@ -44,6 +44,14 @@
 #include "mne_triangle.h"
 
 
+#define X_43 0
+#define Y_43 1
+#define Z_43 2
+
+
+#define VEC_DOT_43(x,y) ((x)[X_43]*(y)[X_43] + (x)[Y_43]*(y)[Y_43] + (x)[Z_43]*(y)[Z_43])
+
+
 #define FREE_43(x) if ((char *)(x) != NULL) free((char *)(x))
 
 
@@ -62,11 +70,11 @@ using namespace INVERSELIB;
 //=============================================================================================================
 
 MnePatchInfo::MnePatchInfo()
-:vert (-1)
-,memb_vert (NULL)
-,nmemb (0)
-,area (0)
-,dev_nn (0)
+    :vert (-1)
+    ,memb_vert (NULL)
+    ,nmemb (0)
+    ,area (0)
+    ,dev_nn (0)
 {
 
 }
@@ -95,4 +103,40 @@ void MnePatchInfo::calculate_patch_area(MneSourceSpaceOld* s, MnePatchInfo *p)
         for (q = 0; q < nneigh; q++)
             p->area += s->tris[neigh[q]].area/3.0;
     }
+}
+
+
+//*************************************************************************************************************
+
+void MnePatchInfo::calculate_normal_stats(MneSourceSpaceOld *s, MnePatchInfo *p)
+{
+    int k;
+    float cos_theta,size;
+
+    p->ave_nn[X_43] = 0.0;
+    p->ave_nn[Y_43] = 0.0;
+    p->ave_nn[Z_43] = 0.0;
+
+    for (k = 0; k < p->nmemb; k++) {
+        p->ave_nn[X_43] += s->nn[p->memb_vert[k]][X_43];
+        p->ave_nn[Y_43] += s->nn[p->memb_vert[k]][Y_43];
+        p->ave_nn[Z_43] += s->nn[p->memb_vert[k]][Z_43];
+    }
+    size = sqrt(VEC_DOT_43(p->ave_nn,p->ave_nn));
+    p->ave_nn[X_43] = p->ave_nn[X_43]/size;
+    p->ave_nn[Y_43] = p->ave_nn[Y_43]/size;
+    p->ave_nn[Z_43] = p->ave_nn[Z_43]/size;
+
+    p->dev_nn = 0.0;
+    for (k = 0; k < p->nmemb; k++) {
+        cos_theta = VEC_DOT_43(s->nn[p->memb_vert[k]],p->ave_nn);
+        if (cos_theta < -1.0)
+            cos_theta = -1.0;
+        else if (cos_theta > 1.0)
+            cos_theta = 1.0;
+        p->dev_nn += acos(cos_theta);
+    }
+    p->dev_nn = p->dev_nn/p->nmemb;
+
+    return;
 }

@@ -52,6 +52,9 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
+#include <Eigen/Dense>
+
+
 
 #ifndef TRUE
 #define TRUE 1
