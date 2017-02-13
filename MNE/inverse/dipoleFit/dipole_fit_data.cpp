@@ -10,6 +10,7 @@
 #include "ecd.h"
 
 #include "fwd_bem_model.h"
+#include "mne_surface_old.h"
 
 #include <Eigen/Dense>
 
@@ -4605,7 +4606,7 @@ int DipoleFitData::setup_forward_model(DipoleFitData *d, MneCTFCompDataSet* comp
          * Find the best-fitting sphere
          */
         if (fit_sphere_to_bem) {
-            MneSurfaceOrVolume::MneCSurface* inner_skull;
+            MneSurfaceOld* inner_skull;
             float      simplex_size = 2e-2;
             float      R;
 

@@ -333,6 +333,30 @@ public:
                               float *areap);
 
 
+
+    //============================= mne_add_geometry_info.c =============================
+
+    static void mne_add_triangle_data(MneSourceSpaceOld* s);
+
+
+
+    //============================= mne_add_geometry_info.c =============================
+
+
+    static void mne_compute_cm(float **rr, int np, float *cm);
+
+    static void mne_compute_surface_cm(MneSurfaceOld* s);
+
+    static void calculate_vertex_distances(MneSourceSpaceOld* s);
+
+    static int mne_add_vertex_normals(MneSourceSpaceOld* s);
+
+    static int add_geometry_info(MneSourceSpaceOld* s, int do_normals, int *border, int check_too_many_neighbors);
+
+    static int mne_source_space_add_geometry_info(MneSourceSpaceOld* s, int do_normals);
+
+    static int mne_source_space_add_geometry_info2(MneSourceSpaceOld* s, int do_normals);
+
 public:
     int              type;          /* Is this a volume or a surface */
     char             *subject;      /* Name (id) of the subject */

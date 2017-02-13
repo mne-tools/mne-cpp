@@ -40,6 +40,9 @@
 //=============================================================================================================
 
 #include "mne_surface_or_volume.h"
+#include "mne_surface_old.h"
+#include "mne_source_space_old.h"
+#include "mne_triangle.h"
 #include "fwd_bem_model.h"
 
 #include <fiff/fiff_stream.h>
@@ -208,16 +211,6 @@ typedef struct {
 } *mneMGHtagGroup,mneMGHtagGroupRec;
 
 
-void mne_free_vol_geom(mneVolGeom g)
-{
-    if (!g)
-        return;
-    FREE_17(g->filename);
-    FREE_17(g);
-    return;
-}
-
-
 static void mne_free_mgh_tag(mneMGHtag t)
 {
     if (!t)
@@ -324,452 +317,6 @@ const char *mne_coord_frame_name_17(int frame)
             return frames[k].name;
     }
     return frames[k].name;
-}
-
-
-
-
-//============================= mne_add_geometry_info.c =============================
-
-
-static void add_triangle_data(mneTriangle tri)
-/*
-* Normal vector of a triangle and other stuff
-*/
-{
-    float size,sizey;
-    int   c;
-    VEC_DIFF_17 (tri->r1,tri->r2,tri->r12);
-    VEC_DIFF_17 (tri->r1,tri->r3,tri->r13);
-    CROSS_PRODUCT_17 (tri->r12,tri->r13,tri->nn);
-    size = VEC_LEN_17(tri->nn);
-    /*
-    * Possibly zero area triangles
-    */
-    if (size > 0) {
-        tri->nn[X_17] = tri->nn[X_17]/size;
-        tri->nn[Y_17] = tri->nn[Y_17]/size;
-        tri->nn[Z_17] = tri->nn[Z_17]/size;
-    }
-    tri->area = size/2.0;
-    sizey = VEC_LEN_17(tri->r13);
-    if (sizey <= 0)
-        sizey = 1.0;
-
-    for (c = 0; c < 3; c++) {
-        tri->ey[c] = tri->r13[c]/sizey;
-        tri->cent[c] = (tri->r1[c]+tri->r2[c]+tri->r3[c])/3.0;
-    }
-    CROSS_PRODUCT_17(tri->ey,tri->nn,tri->ex);
-
-    return;
-}
-
-void mne_add_triangle_data(MneSourceSpaceOld* s)
-/*
-* Add the triangle data structures
-*/
-{
-    int k;
-    mneTriangle tri;
-
-    if (!s || s->type != MNE_SOURCE_SPACE_SURFACE)
-        return;
-
-    FREE_17(s->tris);     s->tris = NULL;
-    FREE_17(s->use_tris); s->use_tris = NULL;
-    /*
-    * Add information for the complete triangulation
-    */
-    if (s->itris && s->ntri > 0) {
-        s->tris = MALLOC_17(s->ntri,mneTriangleRec);
-        s->tot_area = 0.0;
-        for (k = 0, tri = s->tris; k < s->ntri; k++, tri++) {
-            tri->vert = s->itris[k];
-            tri->r1   = s->rr[tri->vert[0]];
-            tri->r2   = s->rr[tri->vert[1]];
-            tri->r3   = s->rr[tri->vert[2]];
-            add_triangle_data(tri);
-            s->tot_area += tri->area;
-        }
-#ifdef TRIANGLE_SIZE_WARNING
-        for (k = 0, tri = s->tris; k < s->ntri; k++, tri++)
-            if (tri->area < 1e-5*s->tot_area/s->ntri)
-                printf("Warning: Triangle area is only %g um^2 (%.5f %% of expected average)\n",
-                       1e12*tri->area,100*s->ntri*tri->area/s->tot_area);
-#endif
-    }
-#ifdef DEBUG
-    printf("\ttotal area = %-.1f cm^2\n",1e4*s->tot_area);
-#endif
-    /*
-   * Add information for the selected subset if applicable
-   */
-    if (s->use_itris && s->nuse_tri > 0) {
-        s->use_tris = MALLOC_17(s->nuse_tri,mneTriangleRec);
-        for (k = 0, tri = s->use_tris; k < s->nuse_tri; k++, tri++) {
-            tri->vert = s->use_itris[k];
-            tri->r1   = s->rr[tri->vert[0]];
-            tri->r2   = s->rr[tri->vert[1]];
-            tri->r3   = s->rr[tri->vert[2]];
-            add_triangle_data(tri);
-        }
-    }
-    return;
-}
-
-
-void mne_compute_cm(float **rr, int np, float *cm)
-/*
- * Compute the center of mass of a set of points
- */
-{
-    int q;
-    cm[0] = cm[1] = cm[2] = 0.0;
-    for (q = 0; q < np; q++) {
-        cm[0] += rr[q][0];
-        cm[1] += rr[q][1];
-        cm[2] += rr[q][2];
-    }
-    if (np > 0) {
-        cm[0] = cm[0]/np;
-        cm[1] = cm[1]/np;
-        cm[2] = cm[2]/np;
-    }
-    return;
-}
-
-
-void mne_compute_surface_cm(MneSurfaceOld* s)
-/*
- * Compute the center of mass of a surface
- */
-{
-    if (!s)
-        return;
-
-    mne_compute_cm(s->rr,s->np,s->cm);
-    return;
-}
-
-static void calculate_vertex_distances(MneSourceSpaceOld* s)
-
-{
-    int   k,p,ndist;
-    float *dist,diff[3];
-    int   *neigh, nneigh;
-
-    if (!s->neighbor_vert || !s->nneighbor_vert)
-        return;
-
-    if (s->vert_dist) {
-        for (k = 0; k < s->np; k++)
-            FREE_17(s->vert_dist[k]);
-        FREE_17(s->vert_dist);
-    }
-    s->vert_dist = MALLOC_17(s->np,float *);
-    printf("\tDistances between neighboring vertices...");
-    for (k = 0, ndist = 0; k < s->np; k++) {
-        s->vert_dist[k]  = dist = MALLOC_17(s->nneighbor_vert[k],float);
-        neigh  = s->neighbor_vert[k];
-        nneigh = s->nneighbor_vert[k];
-        for (p = 0; p < nneigh; p++) {
-            if (neigh[p] >= 0) {
-                VEC_DIFF_17(s->rr[k],s->rr[neigh[p]],diff);
-                dist[p] = VEC_LEN_17(diff);
-            }
-            else
-                dist[p] = -1.0;
-            ndist++;
-        }
-    }
-    printf("[%d distances done]\n",ndist);
-    return;
-}
-
-
-int mne_add_vertex_normals(MneSourceSpaceOld* s)
-
-
-{
-    int k,c,p;
-    int *ii;
-    float w,size;
-    mneTriangle tri;
-
-    if (!s || s->type != MNE_SOURCE_SPACE_SURFACE)
-        return OK;
-    /*
-   * Reallocate the stuff and initialize
-   */
-    FREE_CMATRIX_17(s->nn);
-    s->nn = ALLOC_CMATRIX_17(s->np,3);
-
-    for (k = 0; k < s->np; k++) {
-        s->nn[k][X_17] = s->nn[k][Y_17] = s->nn[k][Z_17] = 0.0;
-    }
-    /*
-   * One pass through the triangles will do it
-   */
-    mne_add_triangle_data(s);
-    for (p = 0, tri = s->tris; p < s->ntri; p++, tri++) {
-        ii = tri->vert;
-        w = 1.0;			/* This should be related to the triangle size */
-        /*
-     * Then the vertex normals
-     */
-        for (k = 0; k < 3; k++)
-            for (c = 0; c < 3; c++)
-                s->nn[ii[k]][c] += w*tri->nn[c];
-    }
-    for (k = 0; k < s->np; k++) {
-        size = VEC_LEN_17(s->nn[k]);
-        if (size > 0.0)
-            for (c = 0; c < 3; c++)
-                s->nn[k][c] = s->nn[k][c]/size;
-    }
-    mne_compute_surface_cm(s);
-    return OK;
-}
-
-
-
-
-
-static int add_geometry_info(MneSourceSpaceOld* s, int do_normals, int *border, int check_too_many_neighbors)
-/*
-      * Add vertex normals and neighbourhood information
-      */
-{
-    int k,c,p,q;
-    int vert;
-    int *ii;
-    int *neighbors,nneighbors;
-    float w,size;
-    int   found;
-    int   nfix_distinct,nfix_no_neighbors,nfix_defect;
-    mneTriangle tri;
-
-    if (!s)
-        return OK;
-
-    if (s->type == MNE_SOURCE_SPACE_VOLUME) {
-        calculate_vertex_distances(s);
-        return OK;
-    }
-    if (s->type != MNE_SOURCE_SPACE_SURFACE)
-        return OK;
-    /*
-   * Reallocate the stuff and initialize
-   */
-    if (do_normals) {
-        FREE_CMATRIX_17(s->nn);
-        s->nn = ALLOC_CMATRIX_17(s->np,3);
-    }
-    if (s->neighbor_tri) {
-        for (k = 0; k < s->np; k++)
-            FREE_17(s->neighbor_tri[k]);
-        FREE_17(s->neighbor_tri);
-    }
-    FREE_17(s->nneighbor_tri);
-    s->neighbor_tri = MALLOC_17(s->np,int *);
-    s->nneighbor_tri = MALLOC_17(s->np,int);
-
-    for (k = 0; k < s->np; k++) {
-        s->neighbor_tri[k] = NULL;
-        s->nneighbor_tri[k] = 0;
-        if (do_normals)
-            s->nn[k][X_17] = s->nn[k][Y_17] = s->nn[k][Z_17] = 0.0;
-    }
-    /*
-   * One pass through the triangles will do it
-   */
-    mne_add_triangle_data(s);
-    for (p = 0, tri = s->tris; p < s->ntri; p++, tri++)
-        if (tri->area == 0)
-            printf("\tWarning : zero size triangle # %d\n",p);
-    printf("\tTriangle ");
-    if (do_normals)
-        printf("and vertex ");
-    printf("normals and neighboring triangles...");
-    for (p = 0, tri = s->tris; p < s->ntri; p++, tri++) {
-        ii = tri->vert;
-        w = 1.0;			/* This should be related to the triangle size */
-        for (k = 0; k < 3; k++) {
-            /*
-       * Then the vertex normals
-       */
-            if (do_normals)
-                for (c = 0; c < 3; c++)
-                    s->nn[ii[k]][c] += w*tri->nn[c];
-            /*
-       * Add to the list of neighbors
-       */
-            s->neighbor_tri[ii[k]] = REALLOC_17(s->neighbor_tri[ii[k]],
-                    s->nneighbor_tri[ii[k]]+1,int);
-            s->neighbor_tri[ii[k]][s->nneighbor_tri[ii[k]]] = p;
-            s->nneighbor_tri[ii[k]]++;
-        }
-    }
-    nfix_no_neighbors = 0;
-    nfix_defect = 0;
-    for (k = 0; k < s->np; k++) {
-        if (s->nneighbor_tri[k] <= 0) {
-            if (!border || !border[k]) {
-#ifdef STRICT_ERROR
-                err_printf_set_error("Vertex %d does not have any neighboring triangles!",k);
-                return FAIL;
-#else
-#ifdef REPORT_WARNINGS
-                printf("Warning: Vertex %d does not have any neighboring triangles!\n",k);
-#endif
-#endif
-                nfix_no_neighbors++;
-            }
-        }
-        else if (s->nneighbor_tri[k] < 3 && !border) {
-#ifdef REPORT_WARNINGS
-            printf("\n\tTopological defect: Vertex %d has only %d neighboring triangle%s Vertex omitted.\n\t",
-                   k,s->nneighbor_tri[k],s->nneighbor_tri[k] > 1 ? "s." : ".");
-#endif
-            nfix_defect++;
-            s->nneighbor_tri[k] = 0;
-            FREE_17(s->neighbor_tri[k]);
-            s->neighbor_tri[k] = NULL;
-        }
-    }
-    /*
-   * Scale the vertex normals to unit length
-   */
-    for (k = 0; k < s->np; k++)
-        if (s->nneighbor_tri[k] > 0) {
-            size = VEC_LEN_17(s->nn[k]);
-            if (size > 0.0)
-                for (c = 0; c < 3; c++)
-                    s->nn[k][c] = s->nn[k][c]/size;
-        }
-    printf("[done]\n");
-    /*
-   * Determine the neighboring vertices
-   */
-    printf("\tVertex neighbors...");
-    if (s->neighbor_vert) {
-        for (k = 0; k < s->np; k++)
-            FREE_17(s->neighbor_vert[k]);
-        FREE_17(s->neighbor_vert);
-    }
-    FREE_17(s->nneighbor_vert);
-    s->neighbor_vert = MALLOC_17(s->np,int *);
-    s->nneighbor_vert = MALLOC_17(s->np,int);
-    /*
-   * We know the number of neighbors beforehand
-   */
-    if (border) {
-        for (k = 0; k < s->np; k++) {
-            if (s->nneighbor_tri[k] > 0) {
-                if (border[k]) {
-                    s->neighbor_vert[k]  = MALLOC_17(s->nneighbor_tri[k]+1,int);
-                    s->nneighbor_vert[k] = s->nneighbor_tri[k]+1;
-                }
-                else {
-                    s->neighbor_vert[k]  = MALLOC_17(s->nneighbor_tri[k],int);
-                    s->nneighbor_vert[k] = s->nneighbor_tri[k];
-                }
-            }
-            else {
-                s->neighbor_vert[k]  = NULL;
-                s->nneighbor_vert[k] = 0;
-            }
-        }
-    }
-    else {
-        for (k = 0; k < s->np; k++) {
-            if (s->nneighbor_tri[k] > 0) {
-                s->neighbor_vert[k]  = MALLOC_17(s->nneighbor_tri[k],int);
-                s->nneighbor_vert[k] = s->nneighbor_tri[k];
-            }
-            else {
-                s->neighbor_vert[k]  = NULL;
-                s->nneighbor_vert[k] = 0;
-            }
-        }
-    }
-    nfix_distinct = 0;
-    for (k = 0; k < s->np; k++) {
-        neighbors  = s->neighbor_vert[k];
-        nneighbors = 0;
-        for (p = 0; p < s->nneighbor_tri[k]; p++) {
-            /*
-       * Fit in the other vertices of the neighboring triangle
-       */
-            for (c = 0; c < 3; c++) {
-                vert = s->tris[s->neighbor_tri[k][p]].vert[c];
-                if (vert != k) {
-                    for (q = 0, found = FALSE; q < nneighbors; q++) {
-                        if (neighbors[q] == vert) {
-                            found = TRUE;
-                            break;
-                        }
-                    }
-                    if (!found) {
-                        if (nneighbors < s->nneighbor_vert[k])
-                            neighbors[nneighbors++] = vert;
-                        else if (!border || !border[k]) {
-                            if (check_too_many_neighbors) {
-                                printf("Too many neighbors for vertex %d.",k);
-                                return FAIL;
-                            }
-                            else
-                                printf("\tWarning: Too many neighbors for vertex %d\n",k);
-                        }
-                    }
-                }
-            }
-        }
-        if (nneighbors != s->nneighbor_vert[k]) {
-#ifdef REPORT_WARNINGS
-            printf("\n\tIncorrect number of distinct neighbors for vertex %d (%d instead of %d) [fixed].",
-                   k,nneighbors,s->nneighbor_vert[k]);
-#endif
-            nfix_distinct++;
-            s->nneighbor_vert[k] = nneighbors;
-        }
-    }
-    printf("[done]\n");
-    /*
-   * Distance calculation follows
-   */
-    calculate_vertex_distances(s);
-    mne_compute_surface_cm(s);
-    /*
-   * Summarize the defects
-   */
-    if (nfix_defect > 0)
-        printf("\tWarning: %d topological defects were fixed.\n",nfix_defect);
-    if (nfix_distinct > 0)
-        printf("\tWarning: %d vertices had incorrect number of distinct neighbors (fixed).\n",nfix_distinct);
-    if (nfix_no_neighbors > 0)
-        printf("\tWarning: %d vertices did not have any neighboring triangles (fixed)\n",nfix_no_neighbors);
-#ifdef DEBUG
-    for (k = 0; k < s->np; k++) {
-        if (s->nneighbor_vert[k] <= 0)
-            printf("No neighbors for vertex %d\n",k);
-        if (s->nneighbor_tri[k] <= 0)
-            printf("No neighbor tris for vertex %d\n",k);
-    }
-#endif
-    return OK;
-}
-
-int mne_source_space_add_geometry_info(MneSourceSpaceOld* s, int do_normals)
-{
-    return add_geometry_info(s,do_normals,NULL,TRUE);
-}
-
-int mne_source_space_add_geometry_info2(MneSourceSpaceOld* s, int do_normals)
-
-{
-    return add_geometry_info(s,do_normals,NULL,FALSE);
 }
 
 
@@ -1038,7 +585,7 @@ MneSurfaceOrVolume::~MneSurfaceOrVolume()
 
 //*************************************************************************************************************
 
-double MneSurfaceOrVolume::solid_angle(float *from, mneTriangle tri)	/* ...to this triangle */
+double MneSurfaceOrVolume::solid_angle(float *from, MneTriangle* tri)	/* ...to this triangle */
 /*
      * Compute the solid angle according to van Oosterom's
      * formula
@@ -2037,7 +1584,7 @@ void MneSurfaceOrVolume::mne_triangle_coords(float *r, MneSurfaceOrVolume::MneCS
 {
     double rr[3];			/* Vector from triangle corner #1 to r */
     double a,b,c,v1,v2,det;
-    mneTriangle this_tri;
+    MneTriangle* this_tri;
 
     this_tri = s->tris+tri;
 
@@ -2073,7 +1620,7 @@ int MneSurfaceOrVolume::nearest_triangle_point(float *r, MneSurfaceOrVolume::Mne
     double a,b,c,v1,v2,det;
     double best,dist,dist0;
     projData    pd = (projData)user;
-    mneTriangle this_tri;
+    MneTriangle* this_tri;
 
     this_tri = s->tris+tri;
     VEC_DIFF_17(this_tri->r1,r,rr);
@@ -2180,7 +1727,7 @@ int MneSurfaceOrVolume::nearest_triangle_point(float *r, MneSurfaceOrVolume::Mne
 void MneSurfaceOrVolume::project_to_triangle(MneSurfaceOrVolume::MneCSurface *s, int tri, float p, float q, float *r)
 {
     int   k;
-    mneTriangle this_tri;
+    MneTriangle* this_tri;
 
     this_tri = s->tris+tri;
 
@@ -2979,6 +2526,427 @@ out : {
             unlink(label);
         return res;
     }
+}
+
+
+//*************************************************************************************************************
+
+void MneSurfaceOrVolume::mne_add_triangle_data(MneSourceSpaceOld *s)
+/*
+    * Add the triangle data structures
+    */
+{
+    int k;
+    MneTriangle* tri;
+
+    if (!s || s->type != MNE_SOURCE_SPACE_SURFACE)
+        return;
+
+    FREE_17(s->tris);     s->tris = NULL;
+    FREE_17(s->use_tris); s->use_tris = NULL;
+    /*
+        * Add information for the complete triangulation
+        */
+    if (s->itris && s->ntri > 0) {
+        s->tris = MALLOC_17(s->ntri,MneTriangle*Rec);
+        s->tot_area = 0.0;
+        for (k = 0, tri = s->tris; k < s->ntri; k++, tri++) {
+            tri->vert = s->itris[k];
+            tri->r1   = s->rr[tri->vert[0]];
+            tri->r2   = s->rr[tri->vert[1]];
+            tri->r3   = s->rr[tri->vert[2]];
+            add_triangle_data(tri);
+            s->tot_area += tri->area;
+        }
+#ifdef TRIANGLE_SIZE_WARNING
+        for (k = 0, tri = s->tris; k < s->ntri; k++, tri++)
+            if (tri->area < 1e-5*s->tot_area/s->ntri)
+                printf("Warning: Triangle area is only %g um^2 (%.5f %% of expected average)\n",
+                       1e12*tri->area,100*s->ntri*tri->area/s->tot_area);
+#endif
+    }
+#ifdef DEBUG
+    printf("\ttotal area = %-.1f cm^2\n",1e4*s->tot_area);
+#endif
+    /*
+       * Add information for the selected subset if applicable
+       */
+    if (s->use_itris && s->nuse_tri > 0) {
+        s->use_tris = MALLOC_17(s->nuse_tri,MneTriangle*Rec);
+        for (k = 0, tri = s->use_tris; k < s->nuse_tri; k++, tri++) {
+            tri->vert = s->use_itris[k];
+            tri->r1   = s->rr[tri->vert[0]];
+            tri->r2   = s->rr[tri->vert[1]];
+            tri->r3   = s->rr[tri->vert[2]];
+            add_triangle_data(tri);
+        }
+    }
+    return;
+}
+
+
+//*************************************************************************************************************
+
+void MneSurfaceOrVolume::mne_compute_cm(float **rr, int np, float *cm)
+/*
+* Compute the center of mass of a set of points
+*/
+{
+    int q;
+    cm[0] = cm[1] = cm[2] = 0.0;
+    for (q = 0; q < np; q++) {
+        cm[0] += rr[q][0];
+        cm[1] += rr[q][1];
+        cm[2] += rr[q][2];
+    }
+    if (np > 0) {
+        cm[0] = cm[0]/np;
+        cm[1] = cm[1]/np;
+        cm[2] = cm[2]/np;
+    }
+    return;
+}
+
+
+//*************************************************************************************************************
+
+void MneSurfaceOrVolume::mne_compute_surface_cm(MneSurfaceOld *s)
+/*
+     * Compute the center of mass of a surface
+     */
+{
+    if (!s)
+        return;
+
+    mne_compute_cm(s->rr,s->np,s->cm);
+    return;
+}
+
+
+//*************************************************************************************************************
+
+void MneSurfaceOrVolume::calculate_vertex_distances(MneSourceSpaceOld *s)
+{
+    int   k,p,ndist;
+    float *dist,diff[3];
+    int   *neigh, nneigh;
+
+    if (!s->neighbor_vert || !s->nneighbor_vert)
+        return;
+
+    if (s->vert_dist) {
+        for (k = 0; k < s->np; k++)
+            FREE_17(s->vert_dist[k]);
+        FREE_17(s->vert_dist);
+    }
+    s->vert_dist = MALLOC_17(s->np,float *);
+    printf("\tDistances between neighboring vertices...");
+    for (k = 0, ndist = 0; k < s->np; k++) {
+        s->vert_dist[k]  = dist = MALLOC_17(s->nneighbor_vert[k],float);
+        neigh  = s->neighbor_vert[k];
+        nneigh = s->nneighbor_vert[k];
+        for (p = 0; p < nneigh; p++) {
+            if (neigh[p] >= 0) {
+                VEC_DIFF_17(s->rr[k],s->rr[neigh[p]],diff);
+                dist[p] = VEC_LEN_17(diff);
+            }
+            else
+                dist[p] = -1.0;
+            ndist++;
+        }
+    }
+    printf("[%d distances done]\n",ndist);
+    return;
+}
+
+
+//*************************************************************************************************************
+
+int MneSurfaceOrVolume::mne_add_vertex_normals(MneSourceSpaceOld *s)
+{
+    int k,c,p;
+    int *ii;
+    float w,size;
+    MneTriangle* tri;
+
+    if (!s || s->type != MNE_SOURCE_SPACE_SURFACE)
+        return OK;
+    /*
+       * Reallocate the stuff and initialize
+       */
+    FREE_CMATRIX_17(s->nn);
+    s->nn = ALLOC_CMATRIX_17(s->np,3);
+
+    for (k = 0; k < s->np; k++) {
+        s->nn[k][X_17] = s->nn[k][Y_17] = s->nn[k][Z_17] = 0.0;
+    }
+    /*
+       * One pass through the triangles will do it
+       */
+    MneSurfaceOrVolume::mne_add_triangle_data(s);
+    for (p = 0, tri = s->tris; p < s->ntri; p++, tri++) {
+        ii = tri->vert;
+        w = 1.0;			/* This should be related to the triangle size */
+        /*
+         * Then the vertex normals
+         */
+        for (k = 0; k < 3; k++)
+            for (c = 0; c < 3; c++)
+                s->nn[ii[k]][c] += w*tri->nn[c];
+    }
+    for (k = 0; k < s->np; k++) {
+        size = VEC_LEN_17(s->nn[k]);
+        if (size > 0.0)
+            for (c = 0; c < 3; c++)
+                s->nn[k][c] = s->nn[k][c]/size;
+    }
+    mne_compute_surface_cm(s);
+    return OK;
+}
+
+
+//*************************************************************************************************************
+
+int MneSurfaceOrVolume::add_geometry_info(MneSourceSpaceOld *s, int do_normals, int *border, int check_too_many_neighbors)
+/*
+          * Add vertex normals and neighbourhood information
+          */
+{
+    int k,c,p,q;
+    int vert;
+    int *ii;
+    int *neighbors,nneighbors;
+    float w,size;
+    int   found;
+    int   nfix_distinct,nfix_no_neighbors,nfix_defect;
+    MneTriangle* tri;
+
+    if (!s)
+        return OK;
+
+    if (s->type == MNE_SOURCE_SPACE_VOLUME) {
+        calculate_vertex_distances(s);
+        return OK;
+    }
+    if (s->type != MNE_SOURCE_SPACE_SURFACE)
+        return OK;
+    /*
+       * Reallocate the stuff and initialize
+       */
+    if (do_normals) {
+        FREE_CMATRIX_17(s->nn);
+        s->nn = ALLOC_CMATRIX_17(s->np,3);
+    }
+    if (s->neighbor_tri) {
+        for (k = 0; k < s->np; k++)
+            FREE_17(s->neighbor_tri[k]);
+        FREE_17(s->neighbor_tri);
+    }
+    FREE_17(s->nneighbor_tri);
+    s->neighbor_tri = MALLOC_17(s->np,int *);
+    s->nneighbor_tri = MALLOC_17(s->np,int);
+
+    for (k = 0; k < s->np; k++) {
+        s->neighbor_tri[k] = NULL;
+        s->nneighbor_tri[k] = 0;
+        if (do_normals)
+            s->nn[k][X_17] = s->nn[k][Y_17] = s->nn[k][Z_17] = 0.0;
+    }
+    /*
+       * One pass through the triangles will do it
+       */
+    mne_add_triangle_data(s);
+    for (p = 0, tri = s->tris; p < s->ntri; p++, tri++)
+        if (tri->area == 0)
+            printf("\tWarning : zero size triangle # %d\n",p);
+    printf("\tTriangle ");
+    if (do_normals)
+        printf("and vertex ");
+    printf("normals and neighboring triangles...");
+    for (p = 0, tri = s->tris; p < s->ntri; p++, tri++) {
+        ii = tri->vert;
+        w = 1.0;			/* This should be related to the triangle size */
+        for (k = 0; k < 3; k++) {
+            /*
+           * Then the vertex normals
+           */
+            if (do_normals)
+                for (c = 0; c < 3; c++)
+                    s->nn[ii[k]][c] += w*tri->nn[c];
+            /*
+           * Add to the list of neighbors
+           */
+            s->neighbor_tri[ii[k]] = REALLOC_17(s->neighbor_tri[ii[k]],
+                    s->nneighbor_tri[ii[k]]+1,int);
+            s->neighbor_tri[ii[k]][s->nneighbor_tri[ii[k]]] = p;
+            s->nneighbor_tri[ii[k]]++;
+        }
+    }
+    nfix_no_neighbors = 0;
+    nfix_defect = 0;
+    for (k = 0; k < s->np; k++) {
+        if (s->nneighbor_tri[k] <= 0) {
+            if (!border || !border[k]) {
+#ifdef STRICT_ERROR
+                err_printf_set_error("Vertex %d does not have any neighboring triangles!",k);
+                return FAIL;
+#else
+#ifdef REPORT_WARNINGS
+                printf("Warning: Vertex %d does not have any neighboring triangles!\n",k);
+#endif
+#endif
+                nfix_no_neighbors++;
+            }
+        }
+        else if (s->nneighbor_tri[k] < 3 && !border) {
+#ifdef REPORT_WARNINGS
+            printf("\n\tTopological defect: Vertex %d has only %d neighboring triangle%s Vertex omitted.\n\t",
+                   k,s->nneighbor_tri[k],s->nneighbor_tri[k] > 1 ? "s." : ".");
+#endif
+            nfix_defect++;
+            s->nneighbor_tri[k] = 0;
+            FREE_17(s->neighbor_tri[k]);
+            s->neighbor_tri[k] = NULL;
+        }
+    }
+    /*
+       * Scale the vertex normals to unit length
+       */
+    for (k = 0; k < s->np; k++)
+        if (s->nneighbor_tri[k] > 0) {
+            size = VEC_LEN_17(s->nn[k]);
+            if (size > 0.0)
+                for (c = 0; c < 3; c++)
+                    s->nn[k][c] = s->nn[k][c]/size;
+        }
+    printf("[done]\n");
+    /*
+       * Determine the neighboring vertices
+       */
+    printf("\tVertex neighbors...");
+    if (s->neighbor_vert) {
+        for (k = 0; k < s->np; k++)
+            FREE_17(s->neighbor_vert[k]);
+        FREE_17(s->neighbor_vert);
+    }
+    FREE_17(s->nneighbor_vert);
+    s->neighbor_vert = MALLOC_17(s->np,int *);
+    s->nneighbor_vert = MALLOC_17(s->np,int);
+    /*
+       * We know the number of neighbors beforehand
+       */
+    if (border) {
+        for (k = 0; k < s->np; k++) {
+            if (s->nneighbor_tri[k] > 0) {
+                if (border[k]) {
+                    s->neighbor_vert[k]  = MALLOC_17(s->nneighbor_tri[k]+1,int);
+                    s->nneighbor_vert[k] = s->nneighbor_tri[k]+1;
+                }
+                else {
+                    s->neighbor_vert[k]  = MALLOC_17(s->nneighbor_tri[k],int);
+                    s->nneighbor_vert[k] = s->nneighbor_tri[k];
+                }
+            }
+            else {
+                s->neighbor_vert[k]  = NULL;
+                s->nneighbor_vert[k] = 0;
+            }
+        }
+    }
+    else {
+        for (k = 0; k < s->np; k++) {
+            if (s->nneighbor_tri[k] > 0) {
+                s->neighbor_vert[k]  = MALLOC_17(s->nneighbor_tri[k],int);
+                s->nneighbor_vert[k] = s->nneighbor_tri[k];
+            }
+            else {
+                s->neighbor_vert[k]  = NULL;
+                s->nneighbor_vert[k] = 0;
+            }
+        }
+    }
+    nfix_distinct = 0;
+    for (k = 0; k < s->np; k++) {
+        neighbors  = s->neighbor_vert[k];
+        nneighbors = 0;
+        for (p = 0; p < s->nneighbor_tri[k]; p++) {
+            /*
+           * Fit in the other vertices of the neighboring triangle
+           */
+            for (c = 0; c < 3; c++) {
+                vert = s->tris[s->neighbor_tri[k][p]].vert[c];
+                if (vert != k) {
+                    for (q = 0, found = FALSE; q < nneighbors; q++) {
+                        if (neighbors[q] == vert) {
+                            found = TRUE;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        if (nneighbors < s->nneighbor_vert[k])
+                            neighbors[nneighbors++] = vert;
+                        else if (!border || !border[k]) {
+                            if (check_too_many_neighbors) {
+                                printf("Too many neighbors for vertex %d.",k);
+                                return FAIL;
+                            }
+                            else
+                                printf("\tWarning: Too many neighbors for vertex %d\n",k);
+                        }
+                    }
+                }
+            }
+        }
+        if (nneighbors != s->nneighbor_vert[k]) {
+#ifdef REPORT_WARNINGS
+            printf("\n\tIncorrect number of distinct neighbors for vertex %d (%d instead of %d) [fixed].",
+                   k,nneighbors,s->nneighbor_vert[k]);
+#endif
+            nfix_distinct++;
+            s->nneighbor_vert[k] = nneighbors;
+        }
+    }
+    printf("[done]\n");
+    /*
+       * Distance calculation follows
+       */
+    calculate_vertex_distances(s);
+    mne_compute_surface_cm(s);
+    /*
+       * Summarize the defects
+       */
+    if (nfix_defect > 0)
+        printf("\tWarning: %d topological defects were fixed.\n",nfix_defect);
+    if (nfix_distinct > 0)
+        printf("\tWarning: %d vertices had incorrect number of distinct neighbors (fixed).\n",nfix_distinct);
+    if (nfix_no_neighbors > 0)
+        printf("\tWarning: %d vertices did not have any neighboring triangles (fixed)\n",nfix_no_neighbors);
+#ifdef DEBUG
+    for (k = 0; k < s->np; k++) {
+        if (s->nneighbor_vert[k] <= 0)
+            printf("No neighbors for vertex %d\n",k);
+        if (s->nneighbor_tri[k] <= 0)
+            printf("No neighbor tris for vertex %d\n",k);
+    }
+#endif
+    return OK;
+}
+
+
+//*************************************************************************************************************
+
+int MneSurfaceOrVolume::mne_source_space_add_geometry_info(MneSourceSpaceOld *s, int do_normals)
+{
+    return add_geometry_info(s,do_normals,NULL,TRUE);
+}
+
+
+//*************************************************************************************************************
+
+int MneSurfaceOrVolume::mne_source_space_add_geometry_info2(MneSourceSpaceOld *s, int do_normals)
+
+{
+    return add_geometry_info(s,do_normals,NULL,FALSE);
 }
 
 

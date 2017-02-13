@@ -42,6 +42,30 @@
 #include "mne_triangle.h"
 
 
+#define X_50 0
+#define Y_50 1
+#define Z_50 2
+
+
+#define VEC_DOT_50(x,y) ((x)[X_50]*(y)[X_50] + (x)[Y_50]*(y)[Y_50] + (x)[Z_50]*(y)[Z_50])
+#define VEC_LEN_50(x) sqrt(VEC_DOT_50(x,x))
+
+
+#define VEC_DIFF_50(from,to,diff) {\
+    (diff)[X_50] = (to)[X_50] - (from)[X_50];\
+    (diff)[Y_50] = (to)[Y_50] - (from)[Y_50];\
+    (diff)[Z_50] = (to)[Z_50] - (from)[Z_50];\
+    }
+
+
+#define CROSS_PRODUCT_50(x,y,xy) {\
+    (xy)[X_50] =   (x)[Y_50]*(y)[Z_50]-(y)[Y_50]*(x)[Z_50];\
+    (xy)[Y_50] = -((x)[X_50]*(y)[Z_50]-(y)[X_50]*(x)[Z_50]);\
+    (xy)[Z_50] =   (x)[X_50]*(y)[Y_50]-(y)[X_50]*(x)[Y_50];\
+    }
+
+
+
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
@@ -67,4 +91,40 @@ MneTriangle::MneTriangle()
 MneTriangle::~MneTriangle()
 {
 
+}
+
+
+//*************************************************************************************************************
+
+void MneTriangle::add_triangle_data(MneTriangle *tri)
+/*
+* Normal vector of a triangle and other stuff
+*/
+{
+    float size,sizey;
+    int   c;
+    VEC_DIFF_50 (tri->r1,tri->r2,tri->r12);
+    VEC_DIFF_50 (tri->r1,tri->r3,tri->r13);
+    CROSS_PRODUCT_50 (tri->r12,tri->r13,tri->nn);
+    size = VEC_LEN_50(tri->nn);
+    /*
+        * Possibly zero area triangles
+        */
+    if (size > 0) {
+        tri->nn[X_50] = tri->nn[X_50]/size;
+        tri->nn[Y_50] = tri->nn[Y_50]/size;
+        tri->nn[Z_50] = tri->nn[Z_50]/size;
+    }
+    tri->area = size/2.0;
+    sizey = VEC_LEN_50(tri->r13);
+    if (sizey <= 0)
+        sizey = 1.0;
+
+    for (c = 0; c < 3; c++) {
+        tri->ey[c] = tri->r13[c]/sizey;
+        tri->cent[c] = (tri->r1[c]+tri->r2[c]+tri->r3[c])/3.0;
+    }
+    CROSS_PRODUCT_50(tri->ey,tri->nn,tri->ex);
+
+    return;
 }
