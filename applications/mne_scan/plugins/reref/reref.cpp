@@ -40,7 +40,6 @@
 //=============================================================================================================
 
 #include "reref.h"
-#include "FormFiles/rerefsetupwidget.h"
 
 
 //*************************************************************************************************************
@@ -251,6 +250,7 @@ void ReRef::run()
 
         m_mutex.lock();
 
+        // apply common average reference
         MatrixXd matCAR = EEGRef::applyCAR(t_mat, m_pFiffInfo);
 
 //        // write in- and output matrix to a file
