@@ -365,7 +365,7 @@ static void add_triangle_data(mneTriangle tri)
     return;
 }
 
-void mne_add_triangle_data(MneSurfaceOrVolume::MneCSourceSpace* s)
+void mne_add_triangle_data(MneSourceSpaceOld* s)
 /*
 * Add the triangle data structures
 */
@@ -440,7 +440,7 @@ void mne_compute_cm(float **rr, int np, float *cm)
 }
 
 
-void mne_compute_surface_cm(MneSurfaceOrVolume::MneCSurface* s)
+void mne_compute_surface_cm(MneSurfaceOld* s)
 /*
  * Compute the center of mass of a surface
  */
@@ -452,7 +452,7 @@ void mne_compute_surface_cm(MneSurfaceOrVolume::MneCSurface* s)
     return;
 }
 
-static void calculate_vertex_distances(MneSurfaceOrVolume::MneCSourceSpace* s)
+static void calculate_vertex_distances(MneSourceSpaceOld* s)
 
 {
     int   k,p,ndist;
@@ -488,7 +488,7 @@ static void calculate_vertex_distances(MneSurfaceOrVolume::MneCSourceSpace* s)
 }
 
 
-int mne_add_vertex_normals(MneSurfaceOrVolume::MneCSourceSpace* s)
+int mne_add_vertex_normals(MneSourceSpaceOld* s)
 
 
 {
@@ -536,7 +536,7 @@ int mne_add_vertex_normals(MneSurfaceOrVolume::MneCSourceSpace* s)
 
 
 
-static int add_geometry_info(MneSurfaceOrVolume::MneCSourceSpace* s, int do_normals, int *border, int check_too_many_neighbors)
+static int add_geometry_info(MneSourceSpaceOld* s, int do_normals, int *border, int check_too_many_neighbors)
 /*
       * Add vertex normals and neighbourhood information
       */
@@ -761,12 +761,12 @@ static int add_geometry_info(MneSurfaceOrVolume::MneCSourceSpace* s, int do_norm
     return OK;
 }
 
-int mne_source_space_add_geometry_info(MneSurfaceOrVolume::MneCSourceSpace* s, int do_normals)
+int mne_source_space_add_geometry_info(MneSourceSpaceOld* s, int do_normals)
 {
     return add_geometry_info(s,do_normals,NULL,TRUE);
 }
 
-int mne_source_space_add_geometry_info2(MneSurfaceOrVolume::MneCSourceSpace* s, int do_normals)
+int mne_source_space_add_geometry_info2(MneSourceSpaceOld* s, int do_normals)
 
 {
     return add_geometry_info(s,do_normals,NULL,FALSE);
@@ -1085,7 +1085,7 @@ int MneSurfaceOrVolume::mne_filter_source_spaces(MneSurfaceOrVolume::MneCSurface
     * Remove all source space points closer to the surface than a given limit
     */
 {
-    MneSurfaceOrVolume::MneCSourceSpace* s;
+    MneSourceSpaceOld* s;
     int k,p1,p2;
     float r1[3];
     float mindist,dist,diff[3];
@@ -1460,7 +1460,7 @@ MneSurfaceOrVolume::MneCSourceSpace *MneSurfaceOrVolume::make_volume_source_spac
     int   minn[3],maxn[3];
     float *node,maxdist,dist,diff[3];
     int   k,c;
-    MneSurfaceOrVolume::MneCSourceSpace* sp = NULL;
+    MneSourceSpaceOld* sp = NULL;
     int np,nplane,nrow;
     int *neigh,nneigh;
     int x,y,z;
@@ -1795,8 +1795,8 @@ MneSurfaceOrVolume::MneCSurface *MneSurfaceOrVolume::make_guesses(MneSurfaceOrVo
      */
 {
     char *bemname     = NULL;
-    MneSurfaceOrVolume::MneCSurface* sphere = NULL;
-    MneSurfaceOrVolume::MneCSurface* res    = NULL;
+    MneSurfaceOld* sphere = NULL;
+    MneSurfaceOld* res    = NULL;
     int        k;
     float      dist;
     float      r0[] = { 0.0, 0.0, 0.0 };
@@ -1887,7 +1887,7 @@ MneSurfaceOrVolume::MneCSurface *MneSurfaceOrVolume::read_bem_surface(const QStr
     float   **node_normals = NULL;
     int     **triangles    = NULL;
     int     nnode,ntri;
-    MneSurfaceOrVolume::MneCSurface* s = NULL;
+    MneSurfaceOld* s = NULL;
     int k;
     int coord_frame = FIFFV_COORD_MRI;
     float sigma = -1.0;
@@ -2246,8 +2246,8 @@ int MneSurfaceOrVolume::mne_read_source_spaces(const QString &name, MneSurfaceOr
     FiffStream::SPtr stream(new FiffStream(&file));
 
     int            nspace = 0;
-    MneSurfaceOrVolume::MneCSourceSpace* *spaces = NULL;
-    MneSurfaceOrVolume::MneCSourceSpace*  new_space = NULL;
+    MneSourceSpaceOld* *spaces = NULL;
+    MneSourceSpaceOld*  new_space = NULL;
     QList<FiffDirNode::SPtr> sources;
     FiffDirNode::SPtr     node;
     FiffTag::SPtr t_pTag;
@@ -2259,7 +2259,7 @@ int MneSurfaceOrVolume::mne_read_source_spaces(const QString &name, MneSurfaceOr
     int             *neighbors  = NULL;
     int             *vol_dims = NULL;
 
-    extern void mne_add_triangle_data(MneSurfaceOrVolume::MneCSourceSpace* s);
+    extern void mne_add_triangle_data(MneSourceSpaceOld* s);
 
     if(!stream->open())
         goto bad;
@@ -2530,7 +2530,7 @@ int MneSurfaceOrVolume::mne_read_source_spaces(const QString &name, MneSurfaceOr
             }
         }
         mne_add_triangle_data(new_space);
-        spaces = REALLOC_17(spaces,nspace+1,MneSurfaceOrVolume::MneCSourceSpace*);
+        spaces = REALLOC_17(spaces,nspace+1,MneSourceSpaceOld*);
         spaces[nspace++] = new_space;
         new_space = NULL;
     }
@@ -2646,7 +2646,7 @@ int MneSurfaceOrVolume::mne_transform_source_spaces_to(int coord_frame, FiffCoor
 * Facilitate the transformation of the source spaces
 */
 {
-    MneSurfaceOrVolume::MneCSourceSpace* s;
+    MneSourceSpaceOld* s;
     int k;
     FiffCoordTransOld* my_t;
 

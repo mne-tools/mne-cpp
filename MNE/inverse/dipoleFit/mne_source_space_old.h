@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     mne_patch_info.h
+* @file     mne_source_space_old.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    MNE Patch Information (MnePatchInfo) class declaration.
+* @brief    MneSourceSpaceOld class declaration.
 *
 */
 
-#ifndef MNEPATCHINFO_H
-#define MNEPATCHINFO_H
+#ifndef MNESOURCESPACEOLD_H
+#define MNESOURCESPACEOLD_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -42,6 +42,7 @@
 //=============================================================================================================
 
 #include "../inverse_global.h"
+#include "mne_surface_or_volume.h"
 
 
 //*************************************************************************************************************
@@ -70,63 +71,39 @@ namespace INVERSELIB
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Forward Declarations
+// FORWARD DECLARATIONS
 //=============================================================================================================
-
-class MneSourceSpaceOld;
 
 
 //=============================================================================================================
 /**
-* Implements an MNE Patch Information (Replaces *mnePatchInfo,mnePatchInfoRec; struct of MNE-C mne_types.h).
+* Implements the MNE Source Space (Replaces typedef mneSurfaceOrVolume mneSourceSpace; struct of MNE-C mne_types.h).
 *
-* @brief One item in a derivation data set
+* @brief This defines a source space
 */
-class INVERSESHARED_EXPORT MnePatchInfo
+class INVERSESHARED_EXPORT MneSourceSpaceOld : public MneSurfaceOrVolume
 {
 public:
-    typedef QSharedPointer<MnePatchInfo> SPtr;              /**< Shared pointer type for MnePatchInfo. */
-    typedef QSharedPointer<const MnePatchInfo> ConstSPtr;   /**< Const shared pointer type for MnePatchInfo. */
+    typedef QSharedPointer<MneSourceSpaceOld> SPtr;              /**< Shared pointer type for MneSourceSpaceOld. */
+    typedef QSharedPointer<const MneSourceSpaceOld> ConstSPtr;   /**< Const shared pointer type for MneSourceSpaceOld. */
 
     //=========================================================================================================
     /**
-    * Constructs the MNE Patch Information
-    * Refactored: mne_new_patch (mne_source_space.c)
+    * Constructs the MNE Source Space
     */
-    MnePatchInfo();
+    MneSourceSpaceOld();
 
     //=========================================================================================================
     /**
-    * Destroys the MNE Patch Information
-    * Refactored: mne_free_patch (mne_source_space.c)
+    * Destroys the MNE Source Space
+    * Refactored:  (.c)
     */
-    ~MnePatchInfo();
-
-
-    //=========================================================================================================
-    /**
-    * Destroys the MNE Patch Information
-    * Refactored: calculate_patch_area (mne_patches.c)
-    */
-    static void calculate_patch_area(MneSourceSpaceOld* s, MnePatchInfo* p);
+    ~MneSourceSpaceOld();
 
 public:
-    int   vert;         /* Which vertex does this apply to */
-    int   *memb_vert;   /* Which vertices constitute the patch? */
-    int   nmemb;        /* How many? */
-    float area;         /* Area of the patch */
-    float ave_nn[3];    /* Average normal */
-    float dev_nn;       /* Average deviation of the patch normals from the average normal */
 
 // ### OLD STRUCT ###
-//typedef struct {
-//    int   vert;             /* Which vertex does this apply to */
-//    int   *memb_vert;       /* Which vertices constitute the patch? */
-//    int   nmemb;            /* How many? */
-//    float area;             /* Area of the patch */
-//    float ave_nn[3];        /* Average normal */
-//    float dev_nn;           /* Average deviation of the patch normals from the average normal */
-//} *mnePatchInfo,mnePatchInfoRec;
+
 };
 
 //*************************************************************************************************************
@@ -136,4 +113,4 @@ public:
 
 } // NAMESPACE INVERSELIB
 
-#endif // MNEPATCHINFO_H
+#endif // MNESOURCESPACEOLD_H

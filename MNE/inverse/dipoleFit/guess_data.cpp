@@ -40,10 +40,9 @@
 
 #include "guess_data.h"
 #include "dipole_fit_data.h"
-
 #include "dipole_forward.h"
-
-#include "mne_surface_or_volume.h"
+#include "mne_surface_old.h"
+#include "mne_source_space_old.h"
 
 #include <fiff/fiff_stream.h>
 #include <fiff/fiff_tag.h>
@@ -212,12 +211,12 @@ GuessData::GuessData()
 
 GuessData::GuessData(const QString &guessname, const QString &guess_surfname, float mindist, float exclude, float grid, DipoleFitData *f)
 {
-    MneSurfaceOrVolume::MneCSourceSpace* *sp = NULL;
+    MneSourceSpaceOld* *sp = NULL;
     int            nsp = 0;
 //    GuessData*      res = new GuessData();
     int            k,p;
     float          guessrad = 0.080;
-    MneSurfaceOrVolume::MneCSourceSpace* guesses = NULL;
+    MneSourceSpaceOld* guesses = NULL;
     dipoleFitFuncs orig;
 
     if (!guessname.isEmpty()) {
@@ -237,7 +236,7 @@ GuessData::GuessData(const QString &guessname, const QString &guess_surfname, fl
         guesses = sp[0]; FREE_16(sp);
     }
     else {
-        MneSurfaceOrVolume::MneCSurface*    inner_skull = NULL;
+        MneSurfaceOld*    inner_skull = NULL;
         int            free_inner_skull = FALSE;
         float          r0[3];
 
@@ -254,7 +253,7 @@ GuessData::GuessData(const QString &guessname, const QString &guess_surfname, fl
                 goto bad;
             free_inner_skull = TRUE;
         }
-        if ((guesses = MneSurfaceOrVolume::MneCSurface::make_guesses(inner_skull,guessrad,r0,grid,exclude,mindist)) == NULL)
+        if ((guesses = (MneSourceSpaceOld*)MneSurfaceOld::make_guesses(inner_skull,guessrad,r0,grid,exclude,mindist)) == NULL)
             goto bad;
         if (free_inner_skull)
             delete inner_skull;
@@ -313,12 +312,12 @@ bad : {
 
 GuessData::GuessData(const QString &guessname, const QString &guess_surfname, float mindist, float exclude, float grid, DipoleFitData *f, char *guess_save_name)
 {
-    MneSurfaceOrVolume::MneCSourceSpace* *sp = NULL;
+    MneSourceSpaceOld* *sp = NULL;
     int             nsp = 0;
     GuessData*      res = NULL;
     int             k,p;
     float           guessrad = 0.080f;
-    MneSurfaceOrVolume::MneCSourceSpace*  guesses = NULL;
+    MneSourceSpaceOld*  guesses = NULL;
 
     if (!guessname.isEmpty()) {
         /*
@@ -337,7 +336,7 @@ GuessData::GuessData(const QString &guessname, const QString &guess_surfname, fl
         guesses = sp[0]; FREE_16(sp);
     }
     else {
-        MneSurfaceOrVolume::MneCSurface*     inner_skull = NULL;
+        MneSurfaceOld*     inner_skull = NULL;
         int            free_inner_skull = FALSE;
         float          r0[3];
 
@@ -354,7 +353,7 @@ GuessData::GuessData(const QString &guessname, const QString &guess_surfname, fl
                 goto bad;
             free_inner_skull = TRUE;
         }
-        if ((guesses = MneSurfaceOrVolume::MneCSurface::make_guesses(inner_skull,guessrad,r0,grid,exclude,mindist)) == NULL)
+        if ((guesses = (MneSourceSpaceOld*)MneSurfaceOld::make_guesses(inner_skull,guessrad,r0,grid,exclude,mindist)) == NULL)
             goto bad;
         if (free_inner_skull)
             delete inner_skull;

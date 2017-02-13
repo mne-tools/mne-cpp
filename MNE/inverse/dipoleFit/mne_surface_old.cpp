@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     mne_patch_info.cpp
+* @file     mne_surface_old.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the MNE Patch Information (MnePatchInfo) Class.
+* @brief    Implementation of the MneSurfaceOld Class.
 *
 */
 
@@ -39,12 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "mne_patch_info.h"
-#include "mne_source_space_old.h"
-#include "mne_triangle.h"
-
-
-#define FREE_43(x) if ((char *)(x) != NULL) free((char *)(x))
+#include "mne_surface_old.h"
 
 
 //*************************************************************************************************************
@@ -61,12 +56,7 @@ using namespace INVERSELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MnePatchInfo::MnePatchInfo()
-:vert (-1)
-,memb_vert (NULL)
-,nmemb (0)
-,area (0)
-,dev_nn (0)
+MneSurfaceOld::MneSurfaceOld()
 {
 
 }
@@ -74,25 +64,7 @@ MnePatchInfo::MnePatchInfo()
 
 //*************************************************************************************************************
 
-MnePatchInfo::~MnePatchInfo()
+MneSurfaceOld::~MneSurfaceOld()
 {
-    FREE_43(memb_vert);
-}
 
-
-//*************************************************************************************************************
-
-void MnePatchInfo::calculate_patch_area(MneSourceSpaceOld* s, MnePatchInfo *p)
-{
-    int k,q;
-    int nneigh;
-    int *neigh;
-
-    p->area = 0.0;
-    for (k = 0; k < p->nmemb; k++) {
-        nneigh = s->nneighbor_tri[p->memb_vert[k]];
-        neigh  = s->neighbor_tri[p->memb_vert[k]];
-        for (q = 0; q < nneigh; q++)
-            p->area += s->tris[neigh[q]].area/3.0;
-    }
 }
