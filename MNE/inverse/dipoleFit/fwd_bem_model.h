@@ -119,10 +119,15 @@ public:
     //=========================================================================================================
     /**
     * Destroys the BEM Model
-    * Refactored: fwd_bem_free_solution (fwd_bem_model.c)
+    * Refactored: fwd_bem_free_model (fwd_bem_free_model.c)
     */
     virtual ~FwdBemModel();
 
+    //=========================================================================================================
+    /**
+    * Refactored: fwd_bem_free_solution (fwd_bem_model.c)
+    */
+    void fwd_bem_free_solution();
 
 
 
@@ -212,7 +217,7 @@ public:
     static void correct_auto_elements (MneSurfaceOld* surf,
                                        float      **mat);
 
-    static float **fwd_bem_lin_pot_coeff (MneSurfaceOld* *surfs,int nsurf);
+    static float **fwd_bem_lin_pot_coeff (const QList<MneSurfaceOld*>& surfs);
 
     static int fwd_bem_linear_collocation_solution(FwdBemModel* m);
 
@@ -241,7 +246,7 @@ public:
 
     static int fwd_bem_check_solids (float **angles,int ntri1,int ntri2, float desired);
 
-    static float **fwd_bem_solid_angles (MneSurfaceOld* *surfs, int nsurf);
+    static float **fwd_bem_solid_angles (const QList<MneSurfaceOld*>& surfs);
 
     static int fwd_bem_constant_collocation_solution(FwdBemModel* m);
 
@@ -366,7 +371,7 @@ public:
                               FwdCoilSet*  coils);
 
 
-    #define MAG_FACTOR 1e-7		/* \mu_0/4\pi */
+    #define MAG_FACTOR 1e-7         /* \mu_0/4\pi */
 
     static void fwd_bem_lin_field_calc(float       *rd,
                                        float       *Q,
@@ -389,7 +394,7 @@ public:
 
 public:
     QString     surf_name;      /* Name of the file where surfaces were loaded from */
-    MneSurfaceOld* *surfs;      /* The interface surfaces from outside towards inside */
+    QList<MneSurfaceOld*> surfs;      /* The interface surfaces from outside towards inside */
     int        *ntri;           /* Number of triangles on each surface */
     int        *np;             /* Number of vertices on each surface */
     int        nsurf;           /* How many */
