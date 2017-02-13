@@ -58,6 +58,7 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
+#include <QString>
 
 
 //*************************************************************************************************************
@@ -95,7 +96,7 @@ public:
     //=========================================================================================================
     /**
     * Destroys the MNE Volume Geometry
-    * Refactored:  (.c)
+    * Refactored: mne_free_vol_geom (mne_mgh_mri_io.c)
     */
     ~MneVolGeom();
 
@@ -105,7 +106,7 @@ public:
     float   xsize,ysize,zsize;           /* Increments in the three voxel directions */
     float   x_ras[3],y_ras[3],z_ras[3];  /* Directions of the coordinate axes */
     float   c_ras[3];                    /* Center of the RAS coordinates */
-    char    *filename;                   /* Name of the MRI data file */
+    QString filename;                   /* Name of the MRI data file */
 
 // ### OLD STRUCT ###
 //typedef struct {
