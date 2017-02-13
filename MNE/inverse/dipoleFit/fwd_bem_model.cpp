@@ -47,6 +47,7 @@
 #include <fiff/fiff_stream.h>
 
 #include <QFile>
+#include <QList>
 
 
 #define _USE_MATH_DEFINES
@@ -412,8 +413,7 @@ using namespace INVERSELIB;
 //=============================================================================================================
 
 FwdBemModel::FwdBemModel()
-:surfs      (NULL)
-,ntri       (NULL)
+:ntri       (NULL)
 ,np         (NULL)
 ,nsurf      (0)
 ,sigma      (NULL)
@@ -436,11 +436,31 @@ FwdBemModel::FwdBemModel()
 
 FwdBemModel::~FwdBemModel()
 {
+    for (int k = 0; k < this->nsurf; k++)
+        delete this->surfs[k];
+    FREE_40(this->ntri);
+    FREE_40(this->np);
+    FREE_40(this->sigma);
+    FREE_40(this->source_mult);
+    FREE_40(this->field_mult);
+    FREE_CMATRIX_40(this->gamma);
+    if(this->head_mri_t)
+        delete this->head_mri_t;
+    this->fwd_bem_free_solution();
+}
+
+
+//*************************************************************************************************************
+
+void FwdBemModel::fwd_bem_free_solution()
+{
     FREE_CMATRIX_40(this->solution); this->solution = NULL;
-//    FREE_40(this->sol_name); this->sol_name = NULL;
+    this->sol_name.clear();
     FREE_40(this->v0); this->v0 = NULL;
     this->bem_method = FWD_BEM_UNKNOWN;
     this->nsol       = 0;
+
+    return;
 }
 
 
@@ -537,7 +557,7 @@ FwdBemModel *FwdBemModel::fwd_bem_load_surfaces(const QString &name, int *kinds,
 * Load a set of surfaces
 */
 {
-    MneSurfaceOld* *surfs = NULL;
+    QList<MneSurfaceOld*> surfs;// = NULL;
     float      *sigma = NULL;
     float      *sigma1;
     FwdBemModel *m = NULL;
@@ -548,12 +568,15 @@ FwdBemModel *FwdBemModel::fwd_bem_load_surfaces(const QString &name, int *kinds,
         return NULL;
     }
 
-    surfs = MALLOC_40(nkind,MneSurfaceOld*);
+//    surfs = MALLOC_40(nkind,MneSurfaceOld*);
     sigma = MALLOC_40(nkind,float);
-    for (k = 0; k < nkind; k++)
-        surfs[k] = NULL;
+//    for (k = 0; k < nkind; k++)
+//        surfs[k] = NULL;
 
     for (k = 0; k < nkind; k++) {
+        surfs.append(MneSurfaceOld::read_bem_surface(name,kinds[k],TRUE,sigma+k));
+        if (surfs[k] == NULL)
+            goto bad;
         if ((surfs[k] = MneSurfaceOld::read_bem_surface(name,kinds[k],TRUE,sigma+k)) == NULL)
             goto bad;
         if (sigma[k] < 0.0) {
@@ -601,9 +624,10 @@ FwdBemModel *FwdBemModel::fwd_bem_load_surfaces(const QString &name, int *kinds,
 
 bad : {
         FREE_40(sigma);
-        for (k = 0; k < nkind; k++)
+        for (k = 0; k < surfs.size(); k++)
             delete surfs[k];
-        FREE_40(surfs);
+//        FREE_40(surfs);
+        surfs.clear();
         return NULL;
     }
 }
@@ -718,7 +742,7 @@ int FwdBemModel::fwd_bem_load_solution(const QString &name, int bem_method, FwdB
         nsol = dims[1];
     }
     if(m)
-        delete m;
+        m->fwd_bem_free_solution();
     m->sol_name = name;
     m->solution = sol;
     m->nsol     = nsol;
@@ -967,10 +991,10 @@ void FwdBemModel::correct_auto_elements(MneSurfaceOld *surf, float **mat)
 
 //*************************************************************************************************************
 
-float **FwdBemModel::fwd_bem_lin_pot_coeff(MneSurfaceOld **surfs, int nsurf)
+float **FwdBemModel::fwd_bem_lin_pot_coeff(const QList<MneSurfaceOld*>& surfs)
 /*
-          * Calculate the coefficients for linear collocation approach
-          */
+* Calculate the coefficients for linear collocation approach
+*/
 {
     float **mat = NULL;
     float **sub_mat = NULL;
@@ -984,7 +1008,7 @@ float **FwdBemModel::fwd_bem_lin_pot_coeff(MneSurfaceOld **surfs, int nsurf)
     MneSurfaceOld* surf1;
     MneSurfaceOld* surf2;
 
-    for (p = 0, np_tot = np_max = 0; p < nsurf; p++) {
+    for (p = 0, np_tot = np_max = 0; p < surfs.size(); p++) {
         np_tot += surfs[p]->np;
         if (surfs[p]->np > np_max)
             np_max = surfs[p]->np;
@@ -996,11 +1020,11 @@ float **FwdBemModel::fwd_bem_lin_pot_coeff(MneSurfaceOld **surfs, int nsurf)
             mat[j][k] = 0.0;
     row        = MALLOC_40(np_max,double);
     sub_mat = MALLOC_40(np_max,float *);
-    for (p = 0, joff = 0; p < nsurf; p++, joff = joff + np1) {
+    for (p = 0, joff = 0; p < surfs.size(); p++, joff = joff + np1) {
         surf1 = surfs[p];
         np1   = surf1->np;
         nodes = surf1->rr;
-        for (q = 0, koff = 0; q < nsurf; q++, koff = koff + np2) {
+        for (q = 0, koff = 0; q < surfs.size(); q++, koff = koff + np2) {
             surf2 = surfs[q];
             np2   = surf2->np;
             ntri  = surf2->ntri;
@@ -1055,11 +1079,11 @@ int FwdBemModel::fwd_bem_linear_collocation_solution(FwdBemModel *m)
     int k;
 
     if(m)
-        delete m;
+        m->fwd_bem_free_solution();
 
     fprintf(stderr,"\nComputing the linear collocation solution...\n");
     fprintf (stderr,"\tMatrix coefficients...\n");
-    if ((coeff = fwd_bem_lin_pot_coeff (m->surfs,m->nsurf)) == NULL)
+    if ((coeff = fwd_bem_lin_pot_coeff (m->surfs)) == NULL)
         goto bad;
 
     for (k = 0, m->nsol = 0; k < m->nsurf; k++)
@@ -1079,7 +1103,9 @@ int FwdBemModel::fwd_bem_linear_collocation_solution(FwdBemModel *m)
         fprintf (stderr,"IP approach required...\n");
 
         fprintf (stderr,"\tMatrix coefficients (homog)...\n");
-        if ((coeff = fwd_bem_lin_pot_coeff (m->surfs+m->nsurf-1,1)) == NULL)
+        QList<MneSurfaceOld*> last_surfs;
+        last_surfs << m->surfs.last();
+        if ((coeff = fwd_bem_lin_pot_coeff(last_surfs))== NULL)//m->surfs+m->nsurf-1,1)) == NULL)
             goto bad;
 
         fprintf (stderr,"\tInverting the coefficient matrix (homog)...\n");
@@ -1098,7 +1124,7 @@ int FwdBemModel::fwd_bem_linear_collocation_solution(FwdBemModel *m)
 
 bad : {
         if(m)
-            delete m;
+            m->fwd_bem_free_solution();
         FREE_CMATRIX_40(coeff);
         return FAIL;
     }
@@ -1275,7 +1301,7 @@ int FwdBemModel::fwd_bem_check_solids(float **angles, int ntri1, int ntri2, floa
 
 //*************************************************************************************************************
 
-float **FwdBemModel::fwd_bem_solid_angles(MneSurfaceOld **surfs, int nsurf)
+float **FwdBemModel::fwd_bem_solid_angles(const QList<MneSurfaceOld*>& surfs)
 /*
           * Compute the solid angle matrix
           */
@@ -1291,15 +1317,15 @@ float **FwdBemModel::fwd_bem_solid_angles(MneSurfaceOld **surfs, int nsurf)
     float **sub_solids = NULL;
     float desired;
 
-    for (p = 0,ntri_tot = 0; p < nsurf; p++)
+    for (p = 0,ntri_tot = 0; p < surfs.size(); p++)
         ntri_tot += surfs[p]->ntri;
 
     sub_solids = MALLOC_40(ntri_tot,float *);
     solids = ALLOC_CMATRIX_40(ntri_tot,ntri_tot);
-    for (p = 0, joff = 0; p < nsurf; p++, joff = joff + ntri1) {
+    for (p = 0, joff = 0; p < surfs.size(); p++, joff = joff + ntri1) {
         surf1 = surfs[p];
         ntri1 = surf1->ntri;
-        for (q = 0, koff = 0; q < nsurf; q++, koff = koff + ntri2) {
+        for (q = 0, koff = 0; q < surfs.size(); q++, koff = koff + ntri2) {
             surf2 = surfs[q];
             ntri2 = surf2->ntri;
             fprintf(stderr,"\t\t%s (%d) -> %s (%d) ... ",fwd_bem_explain_surface(surf1->id),ntri1,fwd_bem_explain_surface(surf2->id),ntri2);
@@ -1344,11 +1370,11 @@ int FwdBemModel::fwd_bem_constant_collocation_solution(FwdBemModel *m)
     float  ip_mult;
 
     if(m)
-        delete m;
+        m->fwd_bem_free_solution();
 
     fprintf(stderr,"\nComputing the constant collocation solution...\n");
     fprintf(stderr,"\tSolid angles...\n");
-    if ((solids = fwd_bem_solid_angles(m->surfs,m->nsurf)) == NULL)
+    if ((solids = fwd_bem_solid_angles(m->surfs)) == NULL)
         goto bad;
 
     for (k = 0, m->nsol = 0; k < m->nsurf; k++)
@@ -1367,7 +1393,9 @@ int FwdBemModel::fwd_bem_constant_collocation_solution(FwdBemModel *m)
         fprintf (stderr,"IP approach required...\n");
 
         fprintf (stderr,"\tSolid angles (homog)...\n");
-        if ((solids = fwd_bem_solid_angles (m->surfs+m->nsurf-1,1)) == NULL)
+        QList<MneSurfaceOld*> last_surfs;
+        last_surfs << m->surfs.last();
+        if ((solids = fwd_bem_solid_angles (last_surfs)) == NULL)//m->surfs+m->nsurf-1,1)) == NULL)
             goto bad;
 
         fprintf (stderr,"\tInverting the coefficient matrix (homog)...\n");
@@ -1385,7 +1413,7 @@ int FwdBemModel::fwd_bem_constant_collocation_solution(FwdBemModel *m)
 
 bad : {
         if(m)
-            delete m;
+            m->fwd_bem_free_solution();
         FREE_CMATRIX_40(solids);
         return FAIL;
     }
@@ -1408,7 +1436,7 @@ int FwdBemModel::fwd_bem_compute_solution(FwdBemModel *m, int bem_method)
         return fwd_bem_constant_collocation_solution(m);
 
     if(m)
-        delete m;
+        m->fwd_bem_free_solution();
     printf ("Unknown BEM method: %d\n",bem_method);
     return FAIL;
 }
@@ -1430,7 +1458,7 @@ int FwdBemModel::fwd_bem_load_recompute_solution(char *name, int bem_method, int
 
     if (!force_recompute) {
         if(m)
-            delete m;
+            m->fwd_bem_free_solution();
         solres = fwd_bem_load_solution(name,bem_method,m);
         if (solres == TRUE) {
             fprintf(stderr,"\nLoaded %s BEM solution from %s\n",fwd_bem_explain_method(m->bem_method),name);
