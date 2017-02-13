@@ -175,16 +175,6 @@ void mne_free_cmatrix_17 (float **m)
     }
 }
 
-void mne_free_patch_17(mnePatchInfo p)
-
-{
-    if (!p)
-        return;
-    FREE_17(p->memb_vert);
-    FREE_17(p);
-    return;
-}
-
 void mne_free_icmatrix_17 (int **m)
 
 {
@@ -1024,7 +1014,8 @@ MneSurfaceOrVolume::~MneSurfaceOrVolume()
     FREE_17(this->nearest);
     if (this->patches) {
         for (k = 0; k < this->npatch; k++)
-            mne_free_patch_17(this->patches[k]);
+            if(this->patches[k])
+                delete this->patches[k];
         FREE_17(this->patches);
     }
     if(this->dist)
@@ -1185,7 +1176,7 @@ int MneSurfaceOrVolume::mne_add_patch_stats(MneSurfaceOrVolume::MneCSourceSpace 
 {
     mneNearest nearest = s->nearest;
     mneNearest this_patch;
-    mnePatchInfo *pinfo = MALLOC_17(s->nuse,mnePatchInfo);
+    MnePatchInfo* *pinfo = MALLOC_17(s->nuse,MnePatchInfo*);
     int        nave,p,q,k;
 
     fprintf(stderr,"Computing patch statistics...\n");
@@ -1217,7 +1208,7 @@ int MneSurfaceOrVolume::mne_add_patch_stats(MneSurfaceOrVolume::MneCSourceSpace 
             }
             if (s->vertno[q] == nearest[p-1].nearest) { /* Some source space points may have been omitted since
                                * the patch information was computed */
-                pinfo[q] = mne_new_patch();
+                pinfo[q] = new MnePatchInfo();
                 pinfo[q]->vert = nearest[p-1].nearest;
                 this_patch = nearest+p-nave;
                 pinfo[q]->memb_vert = MALLOC_17(nave,int);
@@ -1239,7 +1230,7 @@ int MneSurfaceOrVolume::mne_add_patch_stats(MneSurfaceOrVolume::MneCSourceSpace 
         goto bad;
     }
     if (s->vertno[q] == nearest[p-1].nearest) {
-        pinfo[q]       = mne_new_patch();
+        pinfo[q]       = new MnePatchInfo;
         pinfo[q]->vert = nearest[p-1].nearest;
         this_patch = nearest+p-nave;
         pinfo[q]->memb_vert = MALLOC_17(nave,int);
