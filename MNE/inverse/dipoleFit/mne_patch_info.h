@@ -105,10 +105,18 @@ public:
 
     //=========================================================================================================
     /**
-    * Destroys the MNE Patch Information
     * Refactored: calculate_patch_area (mne_patches.c)
     */
     static void calculate_patch_area(MneSourceSpaceOld* s, MnePatchInfo* p);
+
+
+    //=========================================================================================================
+    /**
+    * Refactored: calculate_normal_stats (mne_patches.c)
+    */
+    static void calculate_normal_stats(MneSourceSpaceOld* s, MnePatchInfo* p);
+
+
 
 public:
     int   vert;         /* Which vertex does this apply to */

@@ -137,7 +137,7 @@ public:
 
     static int mne_filter_source_spaces(MneSurfaceOld* surf,  /* The bounding surface must be provided */
                                         float limit,                                   /* Minimum allowed distance from the surface */
-                                        INVERSELIB::FiffCoordTransOld* mri_head_t,     /* Coordinate transformation (may not be needed) */
+                                        FiffCoordTransOld* mri_head_t,     /* Coordinate transformation (may not be needed) */
                                         MneSourceSpaceOld* *spaces,  /* The source spaces  */
                                         int nspace,
                                         FILE *filtered);
@@ -158,7 +158,7 @@ public:
 
     static void *filter_source_space(void *arg);
 
-    int filter_source_spaces(float          limit,              /* Omit vertices which are closer than this to the inner skull */
+    static int filter_source_spaces(float          limit,              /* Omit vertices which are closer than this to the inner skull */
                              char           *bemfile,                       /* Take the inner skull surface from here */
                              FiffCoordTransOld* mri_head_t,                 /* Coordinate transformation is needed */
                              MneSourceSpaceOld* *spaces,  /* The source spaces */
