@@ -323,6 +323,30 @@ FiffCoordTransOld::FiffCoordTransOld(const FiffCoordTransOld &p_FiffCoordTransOl
 
 //*************************************************************************************************************
 
+FiffCoordTransOld *FiffCoordTransOld::catenate(FiffCoordTransOld *t1, FiffCoordTransOld *t2)
+{
+    FiffCoordTransOld* t = new FiffCoordTransOld;
+    int j,k,p;
+
+    t->to   = t1->to;
+    t->from = t2->from;
+
+    for (j = 0; j < 3; j++) {
+        t->move[j] = t1->move[j];
+        for (k = 0; k < 3; k++) {
+            t->rot[j][k] = 0.0;
+            t->move[j] += t1->rot[j][k]*t2->move[k];
+            for (p = 0; p < 3; p++)
+                t->rot[j][k] += t1->rot[j][p]*t2->rot[p][k];
+        }
+    }
+    add_inverse(t);
+    return (t);
+}
+
+
+//*************************************************************************************************************
+
 FiffCoordTransOld::FiffCoordTransOld(int from, int to, float rot[3][3], float move[3])
 {
     int j,k;
@@ -401,8 +425,8 @@ FiffCoordTransOld *FiffCoordTransOld::fiff_invert_transform() const
 
 void FiffCoordTransOld::fiff_coord_trans(float r[], FiffCoordTransOld *t, int do_move)
 /*
-          * Apply coordinate transformation
-          */
+* Apply coordinate transformation
+*/
 {
     int j,k;
     float res[3];
@@ -411,6 +435,92 @@ void FiffCoordTransOld::fiff_coord_trans(float r[], FiffCoordTransOld *t, int do
         res[j] = (do_move ? t->move[j] :  0.0);
         for (k = 0; k < 3; k++)
             res[j] += t->rot[j][k]*r[k];
+    }
+    for (j = 0; j < 3; j++)
+        r[j] = res[j];
+}
+
+
+//*************************************************************************************************************
+
+FiffCoordTransOld *FiffCoordTransOld::fiff_combine_transforms(int from, int to, FiffCoordTransOld *t1, FiffCoordTransOld *t2)
+/*
+* Combine two coordinate transformations
+* to yield a transform from 'from' system
+* to 'to' system.
+*
+* Return NULL if this fails
+*
+*/
+{
+    FiffCoordTransOld* t = NULL;
+    int swapped = 0;
+    FiffCoordTransOld* temp;
+    /*
+       * We have a total of eight possibilities:
+       * four without swapping and four with
+       */
+    while (1) {
+        if (t1->to == to && t2->from == from) {
+            t1 = new FiffCoordTransOld(*t1);
+            t2 = new FiffCoordTransOld(*t2);
+            break;
+        }
+        else if (t1->from == to && t2->from == from) {
+            FiffCoordTransOld* tmp_t1 = t1;
+            t1 = tmp_t1->fiff_invert_transform();//Memory leak here!!
+            delete tmp_t1;
+            t2 = new FiffCoordTransOld(*t2);
+            break;
+        }
+        else if (t1->to == to && t2->to == from) {
+            t1 = new FiffCoordTransOld(*t1);
+            FiffCoordTransOld* tmp_t2 = t2;
+            t2 = tmp_t2->fiff_invert_transform();//Memory leak here!!
+            delete tmp_t2;
+            break;
+        }
+        else if (t1->from == to && t2->to == from) {
+            FiffCoordTransOld* tmp_t1 = t1;
+            t1 = tmp_t1->fiff_invert_transform();//Memory leak here!!
+            delete tmp_t1;
+            FiffCoordTransOld* tmp_t2 = t2;
+            t2 = tmp_t2->fiff_invert_transform();//Memory leak here!!
+            delete tmp_t2;
+            break;
+        }
+        if (swapped) {  /* Already swapped and not found */
+            qCritical("Cannot combine coordinate transforms");
+            return (t);
+        }
+        temp = t1;      /* Try it swapped as well */
+        t1 = t2;
+        t2 = temp;
+        swapped = 1;
+    }
+    if (t1->from  != t2->to)    /* Transforms must match on the other side as well */
+        qCritical ("Cannot combine coordinate transforms");
+    else                        /* We can do it directly */
+        t = catenate(t1,t2);
+    FREE_20(t1); FREE_20(t2);
+    return (t);
+}
+
+
+//*************************************************************************************************************
+
+void FiffCoordTransOld::fiff_coord_trans_inv(float r[], FiffCoordTransOld *t, int do_move)
+/*
+* Apply inverse coordinate transformation
+*/
+{
+    int j,k;
+    float res[3];
+
+    for (j = 0; j < 3; j++) {
+        res[j] = (do_move ? t->invmove[j] :  0.0);
+        for (k = 0; k < 3; k++)
+            res[j] += t->invrot[j][k]*r[k];
     }
     for (j = 0; j < 3; j++)
         r[j] = res[j];

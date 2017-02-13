@@ -339,39 +339,6 @@ const char *mne_coord_frame_name_17(int frame)
 
 
 
-
-//============================= fiff_trans.c =============================
-
-
-
-
-
-void fiff_coord_trans_inv (float r[3],FiffCoordTransOld* t,int do_move)
-/*
-      * Apply inverse coordinate transformation
-      */
-{
-    int j,k;
-    float res[3];
-
-    for (j = 0; j < 3; j++) {
-        res[j] = (do_move ? t->invmove[j] :  0.0);
-        for (k = 0; k < 3; k++)
-            res[j] += t->invrot[j][k]*r[k];
-    }
-    for (j = 0; j < 3; j++)
-        r[j] = res[j];
-}
-
-
-
-
-
-
-
-
-
-
 //============================= mne_add_geometry_info.c =============================
 
 
@@ -439,7 +406,7 @@ void mne_add_triangle_data(MneSurfaceOrVolume::MneCSourceSpace* s)
         for (k = 0, tri = s->tris; k < s->ntri; k++, tri++)
             if (tri->area < 1e-5*s->tot_area/s->ntri)
                 printf("Warning: Triangle area is only %g um^2 (%.5f %% of expected average)\n",
-                        1e12*tri->area,100*s->ntri*tri->area/s->tot_area);
+                       1e12*tri->area,100*s->ntri*tri->area/s->tot_area);
 #endif
     }
 #ifdef DEBUG
@@ -673,7 +640,7 @@ static int add_geometry_info(MneSurfaceOrVolume::MneCSourceSpace* s, int do_norm
         else if (s->nneighbor_tri[k] < 3 && !border) {
 #ifdef REPORT_WARNINGS
             printf("\n\tTopological defect: Vertex %d has only %d neighboring triangle%s Vertex omitted.\n\t",
-                    k,s->nneighbor_tri[k],s->nneighbor_tri[k] > 1 ? "s." : ".");
+                   k,s->nneighbor_tri[k],s->nneighbor_tri[k] > 1 ? "s." : ".");
 #endif
             nfix_defect++;
             s->nneighbor_tri[k] = 0;
@@ -772,7 +739,7 @@ static int add_geometry_info(MneSurfaceOrVolume::MneCSourceSpace* s, int do_norm
         if (nneighbors != s->nneighbor_vert[k]) {
 #ifdef REPORT_WARNINGS
             printf("\n\tIncorrect number of distinct neighbors for vertex %d (%d instead of %d) [fixed].",
-                    k,nneighbors,s->nneighbor_vert[k]);
+                   k,nneighbors,s->nneighbor_vert[k]);
 #endif
             nfix_distinct++;
             s->nneighbor_vert[k] = nneighbors;
@@ -900,10 +867,10 @@ static FiffCoordTransOld* fiff_make_transform2 (int from,int to,float rot[3][3],
 }
 
 static FiffCoordTransOld* make_voxel_ras_trans(float *r0,
-                                           float *x_ras,
-                                           float *y_ras,
-                                           float *z_ras,
-                                           float *voxel_size)
+                                               float *x_ras,
+                                               float *y_ras,
+                                               float *z_ras,
+                                               float *voxel_size)
 
 {
     FiffCoordTransOld* t;
@@ -926,6 +893,88 @@ static FiffCoordTransOld* make_voxel_ras_trans(float *r0,
 
     return t;
 }
+
+
+
+
+
+
+
+typedef struct {
+    MneCSourceSpace* s;       /* The source space to process */
+    FiffCoordTransOld* mri_head_t;    /* Coordinate transformation */
+    MneCSurface*   surf;      /* The inner skull surface */
+    float          limit;     /* Distance limit */
+    FILE           *filtered; /* Log omitted point locations here */
+    int            stat;      /* How was it? */
+} *filterThreadArg,filterThreadArgRec;
+
+static filterThreadArg new_filter_thread_arg()
+
+{
+    filterThreadArg a = MALLOC_17(1,filterThreadArgRec);
+    a->s = NULL;
+    a->mri_head_t = NULL;
+    a->surf       = NULL;
+    a->limit      = -1;
+    a->filtered   = NULL;
+    a->stat       = FAIL;
+    return a;
+}
+
+static void free_filter_thread_arg(filterThreadArg a)
+
+{
+    FREE_17(a);
+    return;
+}
+
+
+
+
+
+
+
+
+
+
+static int comp_points1(const void *vp1,const void *vp2)
+
+{
+  mneNearest v1 = (mneNearest)vp1;
+  mneNearest v2 = (mneNearest)vp2;
+
+  if (v1->nearest > v2->nearest)
+    return 1;
+  else if (v1->nearest == v2->nearest)
+    return 0;
+  else
+    return -1;
+}
+
+static int comp_points2(const void *vp1,const void *vp2)
+
+{
+  mneNearest v1 = (mneNearest)vp1;
+  mneNearest v2 = (mneNearest)vp2;
+
+  if (v1->vert > v2->vert)
+    return 1;
+  else if (v1->vert == v2->vert)
+    return 0;
+  else
+    return -1;
+}
+
+void mne_sort_nearest_by_nearest(mneNearest points, int npoint)
+
+{
+  if (npoint > 1 && points != NULL)
+    qsort(points,npoint,sizeof(mneNearestRec),comp_points1);
+  return;
+}
+
+
 
 
 //*************************************************************************************************************
@@ -1081,10 +1130,10 @@ int MneSurfaceOrVolume::mne_filter_source_spaces(MneSurfaceOrVolume::MneCSurface
             if (s->inuse[p1]) {
                 VEC_COPY_17(r1,s->rr[p1]);	/* Transform the point to MRI coordinates */
                 if (s->coord_frame == FIFFV_COORD_HEAD)
-                    fiff_coord_trans_inv(r1,mri_head_t,FIFFV_MOVE);
+                    FiffCoordTransOld::fiff_coord_trans_inv(r1,mri_head_t,FIFFV_MOVE);
                 /*
-                    * Check that the source is inside the inner skull surface
-                    */
+                * Check that the source is inside the inner skull surface
+                */
                 tot_angle = sum_solids(r1,surf)/(4*M_PI);
                 if (fabs(tot_angle-1.0) > 1e-5) {
                     omit_outside++;
@@ -1121,11 +1170,290 @@ int MneSurfaceOrVolume::mne_filter_source_spaces(MneSurfaceOrVolume::MneCSurface
     }
     if (omit_outside > 0)
         printf("%d source space points omitted because they are outside the inner skull surface.\n",
-                omit_outside);
+               omit_outside);
     if (omit > 0)
         printf("%d source space points omitted because of the %6.1f-mm distance limit.\n",
-                omit,1000*limit);
+               omit,1000*limit);
     printf("Thank you for waiting.\n");
+    return OK;
+}
+
+
+//*************************************************************************************************************
+
+int MneSurfaceOrVolume::mne_add_patch_stats(MneSurfaceOrVolume::MneCSourceSpace *s)
+{
+    mneNearest nearest = s->nearest;
+    mneNearest this_patch;
+    mnePatchInfo *pinfo = MALLOC_17(s->nuse,mnePatchInfo);
+    int        nave,p,q,k;
+
+    fprintf(stderr,"Computing patch statistics...\n");
+    if (!s->neighbor_tri)
+        if (mne_source_space_add_geometry_info(s,FALSE) != OK)
+            goto bad;
+
+    if (s->nearest == NULL) {
+        qCritical("The patch information is not available.");
+        goto bad;
+    }
+    if (s->nuse == 0) {
+        FREE_17(s->patches);
+        s->patches = NULL;
+        s->npatch  = 0;
+        return OK;
+    }
+    /*
+       * Calculate the average normals and the patch areas
+       */
+    fprintf(stderr,"\tareas, average normals, and mean deviations...");
+    mne_sort_nearest_by_nearest(nearest,s->np);
+    nave = 1;
+    for (p = 1, q = 0; p < s->np; p++) {
+        if (nearest[p].nearest != nearest[p-1].nearest) {
+            if (nave == 0) {
+                qCritical("No vertices belong to the patch of vertex %d",nearest[p-1].nearest);
+                goto bad;
+            }
+            if (s->vertno[q] == nearest[p-1].nearest) { /* Some source space points may have been omitted since
+                               * the patch information was computed */
+                pinfo[q] = mne_new_patch();
+                pinfo[q]->vert = nearest[p-1].nearest;
+                this_patch = nearest+p-nave;
+                pinfo[q]->memb_vert = MALLOC_17(nave,int);
+                pinfo[q]->nmemb     = nave;
+                for (k = 0; k < nave; k++) {
+                    pinfo[q]->memb_vert[k] = this_patch[k].vert;
+                    this_patch[k].patch    = pinfo[q];
+                }
+                calculate_patch_area(s,pinfo[q]);
+                calculate_normal_stats(s,pinfo[q]);
+                q++;
+            }
+            nave = 0;
+        }
+        nave++;
+    }
+    if (nave == 0) {
+        qCritical("No vertices belong to the patch of vertex %d",nearest[p-1].nearest);
+        goto bad;
+    }
+    if (s->vertno[q] == nearest[p-1].nearest) {
+        pinfo[q]       = mne_new_patch();
+        pinfo[q]->vert = nearest[p-1].nearest;
+        this_patch = nearest+p-nave;
+        pinfo[q]->memb_vert = MALLOC_17(nave,int);
+        pinfo[q]->nmemb = nave;
+        for (k = 0; k < nave; k++) {
+            pinfo[q]->memb_vert[k] = this_patch[k].vert;
+            this_patch[k].patch = pinfo[q];
+        }
+        calculate_patch_area(s,pinfo[q]);
+        calculate_normal_stats(s,pinfo[q]);
+        q++;
+    }
+    fprintf(stderr," %d/%d [done]\n",q,s->nuse);
+
+    if (s->patches) {
+        for (k = 0; k < s->npatch; k++)
+            mne_free_patch(s->patches[k]);
+        FREE_17(s->patches);
+    }
+    s->patches = pinfo;
+    s->npatch  = s->nuse;
+
+    return OK;
+
+bad : {
+        FREE_17(pinfo);
+        return FAIL;
+    }
+}
+
+
+//*************************************************************************************************************
+
+void MneSurfaceOrVolume::rearrange_source_space(MneSurfaceOrVolume::MneCSourceSpace *s)
+{
+    int k,p;
+
+    for (k = 0, s->nuse = 0; k < s->np; k++)
+        if (s->inuse[k])
+            s->nuse++;
+
+    if (s->nuse == 0) {
+        FREE_17(s->vertno);
+        s->vertno = NULL;
+    }
+    else {
+        s->vertno = REALLOC_17(s->vertno,s->nuse,int);
+        for (k = 0, p = 0; k < s->np; k++)
+            if (s->inuse[k])
+                s->vertno[p++] = k;
+    }
+    if (s->nearest)
+        mne_add_patch_stats(s);
+    return;
+}
+
+
+//*************************************************************************************************************
+
+void *MneSurfaceOrVolume::filter_source_space(void *arg)
+{
+    filterThreadArg a = (filterThreadArg)arg;
+    int    p1,p2;
+    double tot_angle;
+    int    omit,omit_outside;
+    float  r1[3];
+    float  mindist,dist,diff[3];
+    int    minnode;
+
+    omit         = 0;
+    omit_outside = 0;
+
+    for (p1 = 0; p1 < a->s->np; p1++) {
+        if (a->s->inuse[p1]) {
+            VEC_COPY_17(r1,a->s->rr[p1]);	/* Transform the point to MRI coordinates */
+            if (a->s->coord_frame == FIFFV_COORD_HEAD)
+                FiffCoordTransOld::fiff_coord_trans_inv(r1,a->mri_head_t,FIFFV_MOVE);
+            /*
+           * Check that the source is inside the inner skull surface
+           */
+            tot_angle = sum_solids(r1,a->surf)/(4*M_PI);
+            if (fabs(tot_angle-1.0) > 1e-5) {
+                omit_outside++;
+                a->s->inuse[p1] = FALSE;
+                a->s->nuse--;
+                if (a->filtered)
+                    fprintf(a->filtered,"%10.3f %10.3f %10.3f\n",
+                            1000*r1[X_17],1000*r1[Y_17],1000*r1[Z_17]);
+            }
+            else if (a->limit > 0.0) {
+                /*
+         * Check the distance limit
+         */
+                mindist = 1.0;
+                minnode = 0;
+                for (p2 = 0; p2 < a->surf->np; p2++) {
+                    VEC_DIFF_17(r1,a->surf->rr[p2],diff);
+                    dist = VEC_LEN_17(diff);
+                    if (dist < mindist) {
+                        mindist = dist;
+                        minnode = p2;
+                    }
+                }
+                if (mindist < a->limit) {
+                    omit++;
+                    a->s->inuse[p1] = FALSE;
+                    a->s->nuse--;
+                    if (a->filtered)
+                        fprintf(a->filtered,"%10.3f %10.3f %10.3f\n",
+                                1000*r1[X_17],1000*r1[Y_17],1000*r1[Z_17]);
+                }
+            }
+        }
+    }
+    if (omit_outside > 0)
+        fprintf(stderr,"%d source space points omitted because they are outside the inner skull surface.\n",
+                omit_outside);
+    if (omit > 0)
+        fprintf(stderr,"%d source space points omitted because of the %6.1f-mm distance limit.\n",
+                omit,1000*a->limit);
+    a->stat = OK;
+    return NULL;
+}
+
+
+//*************************************************************************************************************
+
+int MneSurfaceOrVolume::filter_source_spaces(float limit, char *bemfile, FiffCoordTransOld *mri_head_t, MneSurfaceOrVolume::MneCSourceSpace **spaces, int nspace, FILE *filtered, bool use_threads)                    /* Use multiple threads if possible? */
+/*
+          * Remove all source space points closer to the surface than a given limit
+          */
+{
+    MneCSurface*    surf = NULL;
+    int             k;
+//    int             nproc = mne_get_processor_count();
+    filterThreadArg a;
+
+    if (!bemfile)
+        return OK;
+
+    if ((surf = MneCSurface::read_bem_surface(bemfile,FIFFV_BEM_SURF_ID_BRAIN,FALSE,NULL)) == NULL) {
+        qCritical("BEM model does not have the inner skull triangulation!");
+        return FAIL;
+    }
+    /*
+       * How close are the source points to the surface?
+       */
+    fprintf(stderr,"Source spaces are in ");
+    if (spaces[0]->coord_frame == FIFFV_COORD_HEAD)
+        fprintf(stderr,"head coordinates.\n");
+    else if (spaces[0]->coord_frame == FIFFV_COORD_MRI)
+        fprintf(stderr,"MRI coordinates.\n");
+    else
+        fprintf(stderr,"unknown (%d) coordinates.\n",spaces[0]->coord_frame);
+    fprintf(stderr,"Checking that the sources are inside the inner skull ");
+    if (limit > 0.0)
+        fprintf(stderr,"and at least %6.1f mm away",1000*limit);
+    fprintf(stderr," (will take a few...)\n");
+//    if (nproc < 2 || nspace == 1 || !use_threads) {
+        /*
+         * This is the conventional calculation
+         */
+        for (k = 0; k < nspace; k++) {
+            a = new_filter_thread_arg();
+            a->s = spaces[k];
+            a->mri_head_t = mri_head_t;
+            a->surf = surf;
+            a->limit = limit;
+            a->filtered = filtered;
+            filter_source_space(a);
+            free_filter_thread_arg(a);
+            rearrange_source_space(spaces[k]);
+        }
+//    }
+//    else {
+        qDebug() << "!!!! TODO !!!! Implement thread version using QtConcurrent";
+//        /*
+//         * Calculate all (both) source spaces simultaneously
+//         */
+//        filterThreadArg *args = MALLOC_17(nspace,filterThreadArg);
+//        pthread_t      *threads = MALLOC_17(nspace,pthread_t);
+//        pthread_attr_t pthread_custom_attr;
+
+//        for (k = 0; k < nspace; k++) {
+//            args[k] = a = new_filter_thread_arg();
+//            a->s = spaces[k];
+//            a->mri_head_t = mri_head_t;
+//            a->surf = surf;
+//            a->limit = limit;
+//            a->filtered = filtered;
+//        }
+//        /*
+//         * Ready to start the threads
+//         */
+//        pthread_attr_init(&pthread_custom_attr);
+//        for (k = 0; k < nspace; k++)
+//            pthread_create(threads+k,&pthread_custom_attr,filter_source_space,args[k]);
+//        /*
+//         * Wait for them to complete
+//         */
+//        for (k = 0; k < nspace; k++)
+//            pthread_join(threads[k],NULL);
+
+//        for (k = 0; k < nspace; k++) {
+//            rearrange_source_space(spaces[k]);
+//            free_filter_thread_arg(args[k]);
+//        }
+//        FREE_17(threads);
+//        FREE_17(args);
+//    }
+    if(surf)
+        delete surf;
+    printf("Thank you for waiting.\n\n");
+
     return OK;
 }
 
@@ -1176,15 +1504,15 @@ MneSurfaceOrVolume::MneCSourceSpace *MneSurfaceOrVolume::make_volume_source_spac
             maxdist = dist;
     }
     printf("Surface CM = (%6.1f %6.1f %6.1f) mm\n",
-            1000*cm[X_17], 1000*cm[Y_17], 1000*cm[Z_17]);
+           1000*cm[X_17], 1000*cm[Y_17], 1000*cm[Z_17]);
     printf("Surface fits inside a sphere with radius %6.1f mm\n",1000*maxdist);
     printf("Surface extent:\n"
-                   "\tx = %6.1f ... %6.1f mm\n"
-                   "\ty = %6.1f ... %6.1f mm\n"
-                   "\tz = %6.1f ... %6.1f mm\n",
-            1000*min[X_17],1000*max[X_17],
-            1000*min[Y_17],1000*max[Y_17],
-            1000*min[Z_17],1000*max[Z_17]);
+           "\tx = %6.1f ... %6.1f mm\n"
+           "\ty = %6.1f ... %6.1f mm\n"
+           "\tz = %6.1f ... %6.1f mm\n",
+           1000*min[X_17],1000*max[X_17],
+           1000*min[Y_17],1000*max[Y_17],
+           1000*min[Z_17],1000*max[Z_17]);
     for (c = 0; c < 3; c++) {
         if (max[c] > 0)
             maxn[c] = floor(fabs(max[c])/grid)+1;
@@ -1196,12 +1524,12 @@ MneSurfaceOrVolume::MneCSourceSpace *MneSurfaceOrVolume::make_volume_source_spac
             minn[c] = -floor(fabs(min[c])/grid)-1;
     }
     printf("Grid extent:\n"
-                   "\tx = %6.1f ... %6.1f mm\n"
-                   "\ty = %6.1f ... %6.1f mm\n"
-                   "\tz = %6.1f ... %6.1f mm\n",
-            1000*(minn[X_17]*grid),1000*(maxn[X_17]*grid),
-            1000*(minn[Y_17]*grid),1000*(maxn[Y_17]*grid),
-            1000*(minn[Z_17]*grid),1000*(maxn[Z_17]*grid));
+           "\tx = %6.1f ... %6.1f mm\n"
+           "\ty = %6.1f ... %6.1f mm\n"
+           "\tz = %6.1f ... %6.1f mm\n",
+           1000*(minn[X_17]*grid),1000*(maxn[X_17]*grid),
+           1000*(minn[Y_17]*grid),1000*(maxn[Y_17]*grid),
+           1000*(minn[Z_17]*grid),1000*(maxn[Z_17]*grid));
     /*
        * Now make the initial grid
        */
@@ -1525,8 +1853,8 @@ MneSurfaceOrVolume::MneCSurface *MneSurfaceOrVolume::make_guesses(MneSurfaceOrVo
     }
     else {
         printf("Guess surface (%d = %s) is in %s coordinates\n",
-                guess_surf->id,FwdBemModel::fwd_bem_explain_surface(guess_surf->id),
-                mne_coord_frame_name_17(guess_surf->coord_frame));
+               guess_surf->id,FwdBemModel::fwd_bem_explain_surface(guess_surf->id),
+               mne_coord_frame_name_17(guess_surf->coord_frame));
     }
     printf("Filtering (grid = %6.f mm)...\n",1000*grid);
     res = make_volume_source_space(guess_surf,grid,exclude,mindist);
@@ -2293,6 +2621,77 @@ int MneSurfaceOrVolume::mne_is_left_hemi_source_space(MneSurfaceOrVolume::MneCSo
 
 //*************************************************************************************************************
 
+int MneSurfaceOrVolume::mne_transform_source_space(MneSurfaceOrVolume::MneCSourceSpace *ss, FiffCoordTransOld *t)
+/*
+    * Transform source space data into another coordinate frame
+    */
+{
+    int k;
+    if (ss == NULL)
+        return OK;
+    if (ss->coord_frame == t->to)
+        return OK;
+    if (ss->coord_frame != t->from) {
+        printf("Coordinate transformation does not match with the source space coordinate system.");
+        return FAIL;
+    }
+    for (k = 0; k < ss->np; k++) {
+        FiffCoordTransOld::fiff_coord_trans(ss->rr[k],t,FIFFV_MOVE);
+        FiffCoordTransOld::fiff_coord_trans(ss->nn[k],t,FIFFV_NO_MOVE);
+    }
+    if (ss->tris) {
+        for (k = 0; k < ss->ntri; k++)
+            FiffCoordTransOld::fiff_coord_trans(ss->tris[k].nn,t,FIFFV_NO_MOVE);
+    }
+    ss->coord_frame = t->to;
+    return OK;
+}
+
+
+//*************************************************************************************************************
+
+int MneSurfaceOrVolume::mne_transform_source_spaces_to(int coord_frame, FiffCoordTransOld *t, MneSurfaceOrVolume::MneCSourceSpace **spaces, int nspace)
+/*
+* Facilitate the transformation of the source spaces
+*/
+{
+    MneSurfaceOrVolume::MneCSourceSpace* s;
+    int k;
+    FiffCoordTransOld* my_t;
+
+    for (k = 0; k < nspace; k++) {
+        s = spaces[k];
+        if (s->coord_frame != coord_frame) {
+            if (t) {
+                if (s->coord_frame == t->from && t->to == coord_frame) {
+                    if (mne_transform_source_space(s,t) != OK)
+                        return FAIL;
+                }
+                else if (s->coord_frame == t->to && t->from == coord_frame) {
+                    my_t = t->fiff_invert_transform();
+                    if (mne_transform_source_space(s,my_t) != OK) {
+                        FREE_17(my_t);
+                        return FAIL;
+                    }
+                    FREE_17(my_t);
+                }
+                else {
+                    printf("Could not transform a source space because of transformation incompatibility.");
+                    return FAIL;
+                }
+            }
+            else {
+                printf("Could not transform a source space because of missing coordinate transformation.");
+                return FAIL;
+            }
+        }
+    }
+    return OK;
+}
+
+
+//*************************************************************************************************************
+
 void MneSurfaceOrVolume::enable_all_sources(MneSurfaceOrVolume::MneCSourceSpace *s)
 {
     int k;
@@ -2370,7 +2769,7 @@ int MneSurfaceOrVolume::restrict_sources_to_labels(MneCSourceSpace* *spaces, int
                     inuse[sel[p]] = sp->inuse[sel[p]];
                 else
                     printf("vertex number out of range in %s (%d vs %d)\n",
-                            labels[k].toLatin1().constData(),sel[p],sp->np);
+                           labels[k].toLatin1().constData(),sel[p],sp->np);
             }
             FREE_17(sel); sel = NULL;
             printf("Processed label file %s\n",labels[k].toLatin1().constData());

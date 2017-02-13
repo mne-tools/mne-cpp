@@ -322,20 +322,6 @@ float **mne_mat_mat_mult_40 (float **m1,float **m2,int d1,int d2,int d3)
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 static struct {
     int  kind;
     const char *name;
@@ -353,6 +339,60 @@ static struct {
 { -1                    , "unknown" } };
 
 
+#define BEM_SUFFIX     "-bem.fif"
+#define BEM_SOL_SUFFIX "-bem-sol.fif"
+
+
+
+//============================= misc_util.c =============================
+
+char *mne_strdup_40(const char *s)
+{
+    char *res;
+    if (s == NULL)
+        return NULL;
+    res = (char*) malloc(strlen(s)+1);
+    strcpy(res,s);
+    return res;
+}
+
+
+/*
+* Some filename utilities follow
+*/
+static char *ends_with(char *s, char *suffix)
+/*
+* Does a string end with the given suffix?
+*/
+{
+    char *p;
+
+    if (!s)
+        return NULL;
+
+    for (p = strstr(s,suffix); p ; s = p + strlen(suffix), p = strstr(s,suffix))
+        if (p == s + strlen(s) - strlen(suffix))
+            return p;
+    return NULL;
+}
+
+
+static char *strip_from(char *s, char *suffix)
+{
+    char *p = ends_with(s,suffix);
+    char c;
+    char *res;
+
+    if (p) {
+        c = *p;
+        *p = '\0';
+        res = mne_strdup_40(s);
+        *p = c;
+    }
+    else
+        res = mne_strdup_40(s);
+    return res;
+}
 
 
 //*************************************************************************************************************
@@ -400,6 +440,27 @@ FwdBemModel::~FwdBemModel()
     FREE_40(this->v0); this->v0 = NULL;
     this->bem_method = FWD_BEM_UNKNOWN;
     this->nsol       = 0;
+}
+
+
+//*************************************************************************************************************
+
+char *FwdBemModel::fwd_bem_make_bem_sol_name(char *name)
+/*
+    * Make a standard BEM solution file name
+    */
+{
+    char *s1,*s2;
+
+    s1 = strip_from(name,(char*)(".fif"));
+    s2 = strip_from(s1,(char*)("-sol"));
+    FREE_40(s1);
+    s1 = strip_from(s2,(char*)("-bem"));
+    FREE_40(s2);
+    s2 = MALLOC_40(strlen(s1)+strlen(BEM_SOL_SUFFIX)+1,char);
+    sprintf(s2,"%s%s",s1,BEM_SOL_SUFFIX);
+    FREE_40(s1);
+    return s2;
 }
 
 
