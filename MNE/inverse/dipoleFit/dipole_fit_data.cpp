@@ -4705,7 +4705,7 @@ int DipoleFitData::setup_forward_model(DipoleFitData *d, MneCTFCompDataSet* comp
         printf("Employing the head->MRI coordinate transform with the BEM model.\n");
         if (FwdBemModel::fwd_bem_set_head_mri_t(d->bem_model,d->mri_head_t) == FAIL)
             goto out;
-        printf("BEM model %s is now set up\n",d->bem_model->sol_name);
+        printf("BEM model %s is now set up\n",d->bem_model->sol_name.toLatin1().constData());
         /*
          * Find the best-fitting sphere
          */

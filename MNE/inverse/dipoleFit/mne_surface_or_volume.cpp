@@ -438,12 +438,12 @@ void mne_add_triangle_data(MneSurfaceOrVolume::MneCSourceSpace* s)
 #ifdef TRIANGLE_SIZE_WARNING
         for (k = 0, tri = s->tris; k < s->ntri; k++, tri++)
             if (tri->area < 1e-5*s->tot_area/s->ntri)
-                fprintf(stderr,"Warning: Triangle area is only %g um^2 (%.5f %% of expected average)\n",
+                printf("Warning: Triangle area is only %g um^2 (%.5f %% of expected average)\n",
                         1e12*tri->area,100*s->ntri*tri->area/s->tot_area);
 #endif
     }
 #ifdef DEBUG
-    fprintf(stderr,"\ttotal area = %-.1f cm^2\n",1e4*s->tot_area);
+    printf("\ttotal area = %-.1f cm^2\n",1e4*s->tot_area);
 #endif
     /*
    * Add information for the selected subset if applicable
@@ -511,7 +511,7 @@ static void calculate_vertex_distances(MneSurfaceOrVolume::MneCSourceSpace* s)
         FREE_17(s->vert_dist);
     }
     s->vert_dist = MALLOC_17(s->np,float *);
-    fprintf(stderr,"\tDistances between neighboring vertices...");
+    printf("\tDistances between neighboring vertices...");
     for (k = 0, ndist = 0; k < s->np; k++) {
         s->vert_dist[k]  = dist = MALLOC_17(s->nneighbor_vert[k],float);
         neigh  = s->neighbor_vert[k];
@@ -526,7 +526,7 @@ static void calculate_vertex_distances(MneSurfaceOrVolume::MneCSourceSpace* s)
             ndist++;
         }
     }
-    fprintf(stderr,"[%d distances done]\n",ndist);
+    printf("[%d distances done]\n",ndist);
     return;
 }
 
@@ -630,11 +630,11 @@ static int add_geometry_info(MneSurfaceOrVolume::MneCSourceSpace* s, int do_norm
     mne_add_triangle_data(s);
     for (p = 0, tri = s->tris; p < s->ntri; p++, tri++)
         if (tri->area == 0)
-            fprintf(stderr,"\tWarning : zero size triangle # %d\n",p);
-    fprintf(stderr,"\tTriangle ");
+            printf("\tWarning : zero size triangle # %d\n",p);
+    printf("\tTriangle ");
     if (do_normals)
-        fprintf(stderr,"and vertex ");
-    fprintf(stderr,"normals and neighboring triangles...");
+        printf("and vertex ");
+    printf("normals and neighboring triangles...");
     for (p = 0, tri = s->tris; p < s->ntri; p++, tri++) {
         ii = tri->vert;
         w = 1.0;			/* This should be related to the triangle size */
@@ -664,7 +664,7 @@ static int add_geometry_info(MneSurfaceOrVolume::MneCSourceSpace* s, int do_norm
                 return FAIL;
 #else
 #ifdef REPORT_WARNINGS
-                fprintf(stderr,"Warning: Vertex %d does not have any neighboring triangles!\n",k);
+                printf("Warning: Vertex %d does not have any neighboring triangles!\n",k);
 #endif
 #endif
                 nfix_no_neighbors++;
@@ -672,7 +672,7 @@ static int add_geometry_info(MneSurfaceOrVolume::MneCSourceSpace* s, int do_norm
         }
         else if (s->nneighbor_tri[k] < 3 && !border) {
 #ifdef REPORT_WARNINGS
-            fprintf(stderr,"\n\tTopological defect: Vertex %d has only %d neighboring triangle%s Vertex omitted.\n\t",
+            printf("\n\tTopological defect: Vertex %d has only %d neighboring triangle%s Vertex omitted.\n\t",
                     k,s->nneighbor_tri[k],s->nneighbor_tri[k] > 1 ? "s." : ".");
 #endif
             nfix_defect++;
@@ -691,11 +691,11 @@ static int add_geometry_info(MneSurfaceOrVolume::MneCSourceSpace* s, int do_norm
                 for (c = 0; c < 3; c++)
                     s->nn[k][c] = s->nn[k][c]/size;
         }
-    fprintf(stderr,"[done]\n");
+    printf("[done]\n");
     /*
    * Determine the neighboring vertices
    */
-    fprintf(stderr,"\tVertex neighbors...");
+    printf("\tVertex neighbors...");
     if (s->neighbor_vert) {
         for (k = 0; k < s->np; k++)
             FREE_17(s->neighbor_vert[k]);
@@ -763,7 +763,7 @@ static int add_geometry_info(MneSurfaceOrVolume::MneCSourceSpace* s, int do_norm
                                 return FAIL;
                             }
                             else
-                                fprintf(stderr,"\tWarning: Too many neighbors for vertex %d\n",k);
+                                printf("\tWarning: Too many neighbors for vertex %d\n",k);
                         }
                     }
                 }
@@ -771,14 +771,14 @@ static int add_geometry_info(MneSurfaceOrVolume::MneCSourceSpace* s, int do_norm
         }
         if (nneighbors != s->nneighbor_vert[k]) {
 #ifdef REPORT_WARNINGS
-            fprintf(stderr,"\n\tIncorrect number of distinct neighbors for vertex %d (%d instead of %d) [fixed].",
+            printf("\n\tIncorrect number of distinct neighbors for vertex %d (%d instead of %d) [fixed].",
                     k,nneighbors,s->nneighbor_vert[k]);
 #endif
             nfix_distinct++;
             s->nneighbor_vert[k] = nneighbors;
         }
     }
-    fprintf(stderr,"[done]\n");
+    printf("[done]\n");
     /*
    * Distance calculation follows
    */
@@ -788,17 +788,17 @@ static int add_geometry_info(MneSurfaceOrVolume::MneCSourceSpace* s, int do_norm
    * Summarize the defects
    */
     if (nfix_defect > 0)
-        fprintf(stderr,"\tWarning: %d topological defects were fixed.\n",nfix_defect);
+        printf("\tWarning: %d topological defects were fixed.\n",nfix_defect);
     if (nfix_distinct > 0)
-        fprintf(stderr,"\tWarning: %d vertices had incorrect number of distinct neighbors (fixed).\n",nfix_distinct);
+        printf("\tWarning: %d vertices had incorrect number of distinct neighbors (fixed).\n",nfix_distinct);
     if (nfix_no_neighbors > 0)
-        fprintf(stderr,"\tWarning: %d vertices did not have any neighboring triangles (fixed)\n",nfix_no_neighbors);
+        printf("\tWarning: %d vertices did not have any neighboring triangles (fixed)\n",nfix_no_neighbors);
 #ifdef DEBUG
     for (k = 0; k < s->np; k++) {
         if (s->nneighbor_vert[k] <= 0)
-            fprintf(stderr,"No neighbors for vertex %d\n",k);
+            printf("No neighbors for vertex %d\n",k);
         if (s->nneighbor_tri[k] <= 0)
-            fprintf(stderr,"No neighbor tris for vertex %d\n",k);
+            printf("No neighbor tris for vertex %d\n",k);
     }
 #endif
     return OK;
@@ -1062,17 +1062,17 @@ int MneSurfaceOrVolume::mne_filter_source_spaces(MneSurfaceOrVolume::MneCSurface
     /*
         * How close are the source points to the surface?
         */
-    fprintf(stderr,"Source spaces are in ");
+    printf("Source spaces are in ");
     if (spaces[0]->coord_frame == FIFFV_COORD_HEAD)
-        fprintf(stderr,"head coordinates.\n");
+        printf("head coordinates.\n");
     else if (spaces[0]->coord_frame == FIFFV_COORD_MRI)
-        fprintf(stderr,"MRI coordinates.\n");
+        printf("MRI coordinates.\n");
     else
-        fprintf(stderr,"unknown (%d) coordinates.\n",spaces[0]->coord_frame);
-    fprintf(stderr,"Checking that the sources are inside the bounding surface ");
+        printf("unknown (%d) coordinates.\n",spaces[0]->coord_frame);
+    printf("Checking that the sources are inside the bounding surface ");
     if (limit > 0.0)
-        fprintf(stderr,"and at least %6.1f mm away",1000*limit);
-    fprintf(stderr," (will take a few...)\n");
+        printf("and at least %6.1f mm away",1000*limit);
+    printf(" (will take a few...)\n");
     omit         = 0;
     omit_outside = 0;
     for (k = 0; k < nspace; k++) {
@@ -1120,12 +1120,12 @@ int MneSurfaceOrVolume::mne_filter_source_spaces(MneSurfaceOrVolume::MneCSurface
             }
     }
     if (omit_outside > 0)
-        fprintf(stderr,"%d source space points omitted because they are outside the inner skull surface.\n",
+        printf("%d source space points omitted because they are outside the inner skull surface.\n",
                 omit_outside);
     if (omit > 0)
-        fprintf(stderr,"%d source space points omitted because of the %6.1f-mm distance limit.\n",
+        printf("%d source space points omitted because of the %6.1f-mm distance limit.\n",
                 omit,1000*limit);
-    fprintf(stderr,"Thank you for waiting.\n");
+    printf("Thank you for waiting.\n");
     return OK;
 }
 
@@ -1175,10 +1175,10 @@ MneSurfaceOrVolume::MneCSourceSpace *MneSurfaceOrVolume::make_volume_source_spac
         if (dist > maxdist)
             maxdist = dist;
     }
-    fprintf(stderr,"Surface CM = (%6.1f %6.1f %6.1f) mm\n",
+    printf("Surface CM = (%6.1f %6.1f %6.1f) mm\n",
             1000*cm[X_17], 1000*cm[Y_17], 1000*cm[Z_17]);
-    fprintf(stderr,"Surface fits inside a sphere with radius %6.1f mm\n",1000*maxdist);
-    fprintf(stderr,"Surface extent:\n"
+    printf("Surface fits inside a sphere with radius %6.1f mm\n",1000*maxdist);
+    printf("Surface extent:\n"
                    "\tx = %6.1f ... %6.1f mm\n"
                    "\ty = %6.1f ... %6.1f mm\n"
                    "\tz = %6.1f ... %6.1f mm\n",
@@ -1195,7 +1195,7 @@ MneSurfaceOrVolume::MneCSourceSpace *MneSurfaceOrVolume::make_volume_source_spac
         else
             minn[c] = -floor(fabs(min[c])/grid)-1;
     }
-    fprintf(stderr,"Grid extent:\n"
+    printf("Grid extent:\n"
                    "\tx = %6.1f ... %6.1f mm\n"
                    "\ty = %6.1f ... %6.1f mm\n"
                    "\tz = %6.1f ... %6.1f mm\n",
@@ -1313,7 +1313,7 @@ MneSurfaceOrVolume::MneCSourceSpace *MneSurfaceOrVolume::make_volume_source_spac
             }
         }
     }
-    fprintf(stderr,"%d sources before omitting any.\n",sp->nuse);
+    printf("%d sources before omitting any.\n",sp->nuse);
     /*
        * Exclude infeasible points
        */
@@ -1325,14 +1325,14 @@ MneSurfaceOrVolume::MneCSourceSpace *MneSurfaceOrVolume::make_volume_source_spac
             sp->nuse--;
         }
     }
-    fprintf(stderr,"%d sources after omitting infeasible sources.\n",sp->nuse);
+    printf("%d sources after omitting infeasible sources.\n",sp->nuse);
     if (mne_filter_source_spaces(surf,mindist,NULL,&sp,1,NULL) != OK)
         goto bad;
-    fprintf(stderr,"%d sources remaining after excluding the sources outside the surface and less than %6.1f mm inside.\n",sp->nuse,1000*mindist);
+    printf("%d sources remaining after excluding the sources outside the surface and less than %6.1f mm inside.\n",sp->nuse,1000*mindist);
     /*
        * Omit unused vertices from the neighborhoods
        */
-    fprintf(stderr,"Adjusting the neighborhood info...");
+    printf("Adjusting the neighborhood info...");
     for (k = 0; k < sp->np; k++) {
         neigh  = sp->neighbor_vert[k];
         nneigh = sp->nneighbor_vert[k];
@@ -1346,7 +1346,7 @@ MneSurfaceOrVolume::MneCSourceSpace *MneSurfaceOrVolume::make_volume_source_spac
                 neigh[c] = -1;
         }
     }
-    fprintf(stderr,"[done]\n");
+    printf("[done]\n");
     /*
     * Set up the volume data (needed for creating the interpolation matrix)
     */
@@ -1486,7 +1486,7 @@ MneSurfaceOrVolume::MneCSurface *MneSurfaceOrVolume::make_guesses(MneSurfaceOrVo
         guess_r0 = r0;
 
     if (!guess_surf) {
-        fprintf(stderr,"Making a spherical guess space with radius %7.1f mm...\n",1000*guessrad);
+        printf("Making a spherical guess space with radius %7.1f mm...\n",1000*guessrad);
         //#ifdef USE_SHARE_PATH
         //    if ((bemname = mne_compose_mne_name("share/mne","icos.fif")) == NULL)
         //#else
@@ -1524,11 +1524,11 @@ MneSurfaceOrVolume::MneCSurface *MneSurfaceOrVolume::make_guesses(MneSurfaceOrVo
         guess_surf = sphere;
     }
     else {
-        fprintf(stderr,"Guess surface (%d = %s) is in %s coordinates\n",
+        printf("Guess surface (%d = %s) is in %s coordinates\n",
                 guess_surf->id,FwdBemModel::fwd_bem_explain_surface(guess_surf->id),
                 mne_coord_frame_name_17(guess_surf->coord_frame));
     }
-    fprintf(stderr,"Filtering (grid = %6.f mm)...\n",1000*grid);
+    printf("Filtering (grid = %6.f mm)...\n",1000*grid);
     res = make_volume_source_space(guess_surf,grid,exclude,mindist);
 
 out : {
@@ -1913,4 +1913,721 @@ int MneSurfaceOrVolume::mne_project_to_surface(MneSurfaceOrVolume::MneCSurface *
     if (distp)
         *distp = dist0;
     return best;
+}
+
+
+//*************************************************************************************************************
+
+int MneSurfaceOrVolume::mne_read_source_spaces(const QString &name, MneSurfaceOrVolume::MneCSourceSpace ***spacesp, int *nspacep)
+/*
+* Read source spaces from a FIFF file
+*/
+{
+    QFile file(name);
+    FiffStream::SPtr stream(new FiffStream(&file));
+
+    int            nspace = 0;
+    MneSurfaceOrVolume::MneCSourceSpace* *spaces = NULL;
+    MneSurfaceOrVolume::MneCSourceSpace*  new_space = NULL;
+    QList<FiffDirNode::SPtr> sources;
+    FiffDirNode::SPtr     node;
+    FiffTag::SPtr t_pTag;
+    int             j,k,p,q;
+    int             ntri;
+    int             *nearest = NULL;
+    float           *nearest_dist = NULL;
+    int             *nneighbors = NULL;
+    int             *neighbors  = NULL;
+    int             *vol_dims = NULL;
+
+    extern void mne_add_triangle_data(MneSurfaceOrVolume::MneCSourceSpace* s);
+
+    if(!stream->open())
+        goto bad;
+
+    sources = stream->tree()->dir_tree_find(FIFFB_MNE_SOURCE_SPACE);
+    if (sources.size() == 0) {
+        printf("No source spaces available here");
+        goto bad;
+    }
+    for (j = 0; j < sources.size(); j++) {
+        new_space = MneSurfaceOrVolume::mne_new_source_space(0);
+        node = sources[j];
+        /*
+            * Get the mandatory data first
+            */
+        if (!node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_NPOINTS, t_pTag)) {
+            goto bad;
+        }
+        new_space->np = *t_pTag->toInt();
+        if (new_space->np == 0) {
+            printf("No points in this source space");
+            goto bad;
+        }
+        if (!node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_POINTS, t_pTag))
+            goto bad;
+        MatrixXf tmp_rr = t_pTag->toFloatMatrix().transpose();
+        new_space->rr = ALLOC_CMATRIX_17(tmp_rr.rows(),tmp_rr.cols());
+        fromFloatEigenMatrix_17(tmp_rr,new_space->rr);
+        if (!node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_NORMALS, t_pTag))
+            goto bad;
+        MatrixXf tmp_nn = t_pTag->toFloatMatrix().transpose();
+        new_space->nn = ALLOC_CMATRIX_17(tmp_nn.rows(),tmp_nn.cols());
+        fromFloatEigenMatrix_17(tmp_nn,new_space->nn);
+        if (!node->find_tag(stream, FIFF_MNE_COORD_FRAME, t_pTag)) {
+            new_space->coord_frame = FIFFV_COORD_MRI;
+        }
+        else {
+            new_space->coord_frame = *t_pTag->toInt();
+        }
+        if (node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_ID, t_pTag)) {
+            new_space->id = *t_pTag->toInt();
+        }
+        if (node->find_tag(stream, FIFF_SUBJ_HIS_ID, t_pTag)) {
+            new_space->subject = (char *)t_pTag->data();
+        }
+        if (node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_TYPE, t_pTag)) {
+            new_space->type = *t_pTag->toInt();
+        }
+        ntri = 0;
+        if (node->find_tag(stream, FIFF_BEM_SURF_NTRI, t_pTag)) {
+            ntri = *t_pTag->toInt();
+        }
+        else if (node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_NTRI, t_pTag)) {
+            ntri = *t_pTag->toInt();
+        }
+        if (ntri > 0) {
+            int **itris = NULL;
+
+            if (!node->find_tag(stream, FIFF_BEM_SURF_TRIANGLES, t_pTag)) {
+                if (node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_TRIANGLES, t_pTag))
+                    goto bad;
+            }
+
+            MatrixXi tmp_itris = t_pTag->toIntMatrix().transpose();
+            itris = (int **)malloc(tmp_itris.rows() * sizeof(int *));
+            for (int i = 0; i < tmp_itris.rows(); ++i)
+                itris[i] = (int *)malloc(tmp_itris.cols() * sizeof(int));
+            fromIntEigenMatrix_17(tmp_itris, itris);
+
+            for (p = 0; p < ntri; p++) { /* Adjust the numbering */
+                itris[p][X_17]--;
+                itris[p][Y_17]--;
+                itris[p][Z_17]--;
+            }
+            new_space->itris = itris; itris = NULL;
+            new_space->ntri = ntri;
+        }
+        if (!node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_NUSE, t_pTag)) {
+            if (new_space->type == FIFFV_MNE_SPACE_VOLUME) {
+                /*
+                    * Use all
+                    */
+                new_space->nuse   = new_space->np;
+                new_space->inuse  = MALLOC_17(new_space->nuse,int);
+                new_space->vertno = MALLOC_17(new_space->nuse,int);
+                for (k = 0; k < new_space->nuse; k++) {
+                    new_space->inuse[k]  = TRUE;
+                    new_space->vertno[k] = k;
+                }
+            }
+            else {
+                /*
+                    * None in use
+                    * NOTE: The consequences of this change have to be evaluated carefully
+                    */
+                new_space->nuse   = 0;
+                new_space->inuse  = MALLOC_17(new_space->np,int);
+                new_space->vertno = NULL;
+                for (k = 0; k < new_space->np; k++)
+                    new_space->inuse[k]  = FALSE;
+            }
+        }
+        else {
+            new_space->nuse = *t_pTag->toInt();
+            if (!node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_SELECTION, t_pTag)) {
+                goto bad;
+            }
+
+            qDebug() << "ToDo: Check whether new_space->inuse contains the right stuff!!! - use VectorXi instead";
+            new_space->inuse  = t_pTag->toInt();
+            if (new_space->nuse > 0) {
+                new_space->vertno = MALLOC_17(new_space->nuse,int);
+                for (k = 0, p = 0; k < new_space->np; k++)
+                    if (new_space->inuse[k])
+                        new_space->vertno[p++] = k;
+            }
+            else {
+                FREE_17(new_space->vertno);
+                new_space->vertno = NULL;
+            }
+            /*
+                * Selection triangulation
+                */
+            ntri = 0;
+            if (node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_NUSE_TRI, t_pTag)) {
+                ntri = *t_pTag->toInt();
+            }
+            if (ntri > 0) {
+                int **itris = NULL;
+
+                if (!node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_USE_TRIANGLES, t_pTag))
+                    goto bad;
+
+                MatrixXi tmp_itris = t_pTag->toIntMatrix().transpose();
+                itris = (int **)malloc(tmp_itris.rows() * sizeof(int *));
+                for (int i = 0; i < tmp_itris.rows(); ++i)
+                    itris[i] = (int *)malloc(tmp_itris.cols() * sizeof(int));
+                fromIntEigenMatrix_17(tmp_itris, itris);
+                for (p = 0; p < ntri; p++) { /* Adjust the numbering */
+                    itris[p][X_17]--;
+                    itris[p][Y_17]--;
+                    itris[p][Z_17]--;
+                }
+                new_space->use_itris = itris; itris = NULL;
+                new_space->nuse_tri = ntri;
+            }
+            /*
+                * The patch information becomes relevant here
+                */
+            if (node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_NEAREST, t_pTag)) {
+                nearest  = t_pTag->toInt();
+                if (!node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_NEAREST_DIST, t_pTag)) {
+                    goto bad;
+                }
+                qDebug() << "ToDo: Check whether nearest_dist contains the right stuff!!! - use VectorXf instead";
+                nearest_dist = t_pTag->toFloat();
+                new_space->nearest = MALLOC_17(new_space->np,mneNearestRec);
+                for (k = 0; k < new_space->np; k++) {
+                    new_space->nearest[k].vert = k;
+                    new_space->nearest[k].nearest = nearest[k];
+                    new_space->nearest[k].dist = nearest_dist[k];
+                    new_space->nearest[k].patch = NULL;
+                }
+                FREE_17(nearest); nearest = NULL;
+                FREE_17(nearest_dist); nearest_dist = NULL;
+            }
+            /*
+                * We may have the distance matrix
+                */
+            if (node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_DIST_LIMIT, t_pTag)) {
+                new_space->dist_limit = *t_pTag->toInt();
+                if (node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_DIST, t_pTag)) {
+                    INVERSELIB::FiffSparseMatrix* dist = INVERSELIB::FiffSparseMatrix::fiff_get_float_sparse_matrix(t_pTag);
+                    new_space->dist = dist->mne_add_upper_triangle_rcs();
+                    delete dist;
+                    if (!new_space->dist)
+                        goto bad;
+                }
+                else
+                    new_space->dist_limit = 0.0;
+            }
+        }
+        /*
+            * For volume source spaces we might have the neighborhood information
+            */
+        if (new_space->type == FIFFV_MNE_SPACE_VOLUME) {
+            int ntot,nvert,ntot_count,nneigh;
+            int *neigh;
+
+            nneighbors = neighbors = NULL;
+            ntot = nvert = 0;
+            if (node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_NEIGHBORS, t_pTag)) {
+                qDebug() << "ToDo: Check whether neighbors contains the right stuff!!! - use VectorXi instead";
+                neighbors = t_pTag->toInt();
+                ntot      = t_pTag->size()/sizeof(fiff_int_t);
+            }
+            if (node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_NNEIGHBORS, t_pTag)) {
+                qDebug() << "ToDo: Check whether nneighbors contains the right stuff!!! - use VectorXi instead";
+                nneighbors = t_pTag->toInt();
+                nvert      = t_pTag->size()/sizeof(fiff_int_t);
+            }
+            if (neighbors && nneighbors) {
+                if (nvert != new_space->np) {
+                    printf("Inconsistent neighborhood data in file.");
+                    goto bad;
+                }
+                for (k = 0, ntot_count = 0; k < nvert; k++)
+                    ntot_count += nneighbors[k];
+                if (ntot_count != ntot) {
+                    printf("Inconsistent neighborhood data in file.");
+                    goto bad;
+                }
+                new_space->nneighbor_vert = MALLOC_17(nvert,int);
+                new_space->neighbor_vert  = MALLOC_17(nvert,int *);
+                for (k = 0, q = 0; k < nvert; k++) {
+                    new_space->nneighbor_vert[k] = nneigh = nneighbors[k];
+                    new_space->neighbor_vert[k] = neigh = MALLOC_17(nneigh,int);
+                    for (p = 0; p < nneigh; p++,q++)
+                        neigh[p] = neighbors[q];
+                }
+            }
+            FREE_17(neighbors);
+            FREE_17(nneighbors);
+            nneighbors = neighbors = NULL;
+            /*
+                * There might be a coordinate transformation and dimensions
+                */
+            new_space->voxel_surf_RAS_t   = FiffCoordTransOld::mne_read_transform_from_node(stream, node, FIFFV_MNE_COORD_MRI_VOXEL, FIFFV_MNE_COORD_SURFACE_RAS);
+            if (!node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_VOXEL_DIMS, t_pTag)) {
+                qDebug() << "ToDo: Check whether vol_dims contains the right stuff!!! - use VectorXi instead";
+                vol_dims = t_pTag->toInt();
+            }
+            if (vol_dims)
+                VEC_COPY_17(new_space->vol_dims,vol_dims);
+            {
+                QList<FiffDirNode::SPtr>  mris = node->dir_tree_find(FIFFB_MNE_PARENT_MRI_FILE);
+
+                if (mris.size() == 0) { /* The old way */
+                    new_space->MRI_surf_RAS_RAS_t = FiffCoordTransOld::mne_read_transform_from_node(stream, node, FIFFV_MNE_COORD_SURFACE_RAS, FIFFV_MNE_COORD_RAS);
+                    if (node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_MRI_FILE, t_pTag)) {
+                        qDebug() << "ToDo: Check whether new_space->MRI_volume  contains the right stuff!!! - use QString instead";
+                        new_space->MRI_volume = (char *)t_pTag->data();
+                    }
+                    if (node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_INTERPOLATOR, t_pTag)) {
+                        new_space->interpolator = INVERSELIB::FiffSparseMatrix::fiff_get_float_sparse_matrix(t_pTag);
+                    }
+                }
+                else {
+                    if (node->find_tag(stream, FIFF_MNE_FILE_NAME, t_pTag)) {
+                        new_space->MRI_volume = (char *)t_pTag->data();
+                    }
+                    new_space->MRI_surf_RAS_RAS_t = FiffCoordTransOld::mne_read_transform_from_node(stream, mris[0], FIFFV_MNE_COORD_SURFACE_RAS, FIFFV_MNE_COORD_RAS);
+                    new_space->MRI_voxel_surf_RAS_t   = FiffCoordTransOld::mne_read_transform_from_node(stream, mris[0], FIFFV_MNE_COORD_MRI_VOXEL, FIFFV_MNE_COORD_SURFACE_RAS);
+
+                    if (mris[0]->find_tag(stream, FIFF_MNE_SOURCE_SPACE_INTERPOLATOR, t_pTag)) {
+                        new_space->interpolator = INVERSELIB::FiffSparseMatrix::fiff_get_float_sparse_matrix(t_pTag);
+                    }
+                    if (mris[0]->find_tag(stream, FIFF_MRI_WIDTH, t_pTag)) {
+                        new_space->MRI_vol_dims[0] = *t_pTag->toInt();
+                    }
+                    if (mris[0]->find_tag(stream, FIFF_MRI_HEIGHT, t_pTag)) {
+                        new_space->MRI_vol_dims[1] = *t_pTag->toInt();
+                    }
+                    if (mris[0]->find_tag(stream, FIFF_MRI_DEPTH, t_pTag)) {
+                        new_space->MRI_vol_dims[2] = *t_pTag->toInt();
+                    }
+                }
+            }
+        }
+        mne_add_triangle_data(new_space);
+        spaces = REALLOC_17(spaces,nspace+1,MneSurfaceOrVolume::MneCSourceSpace*);
+        spaces[nspace++] = new_space;
+        new_space = NULL;
+    }
+    stream->close();
+
+    *spacesp = spaces;
+    *nspacep = nspace;
+
+    return FIFF_OK;
+
+bad : {
+        stream->close();
+        delete new_space;
+        for (k = 0; k < nspace; k++)
+            delete spaces[k];
+        FREE_17(spaces);
+        FREE_17(nearest);
+        FREE_17(nearest_dist);
+        FREE_17(neighbors);
+        FREE_17(nneighbors);
+        FREE_17(vol_dims);
+
+        return FIFF_FAIL;
+    }
+}
+
+
+//*************************************************************************************************************
+
+void MneSurfaceOrVolume::mne_source_space_update_inuse(MneSurfaceOrVolume::MneCSourceSpace *s, int *new_inuse)
+/*
+* Update the active vertices
+*/
+{
+    int k,p,nuse;
+
+    if (!s)
+        return;
+
+    FREE_17(s->inuse); s->inuse = new_inuse;
+
+    for (k = 0, nuse = 0; k < s->np; k++)
+        if (s->inuse[k])
+            nuse++;
+
+    s->nuse   = nuse;
+    if (s->nuse > 0) {
+        s->vertno = REALLOC_17(s->vertno,s->nuse,int);
+        for (k = 0, p = 0; k < s->np; k++)
+            if (s->inuse[k])
+                s->vertno[p++] = k;
+    }
+    else {
+        FREE_17(s->vertno);
+        s->vertno = NULL;
+    }
+    return;
+}
+
+
+//*************************************************************************************************************
+
+int MneSurfaceOrVolume::mne_is_left_hemi_source_space(MneSurfaceOrVolume::MneCSourceSpace *s)
+/*
+* Left or right hemisphere?
+*/
+{
+    int k;
+    float xave;
+
+    for (k = 0, xave = 0.0; k < s->np; k++)
+        xave += s->rr[k][0];
+    if (xave < 0.0)
+        return TRUE;
+    else
+        return FALSE;
+}
+
+
+//*************************************************************************************************************
+
+void MneSurfaceOrVolume::enable_all_sources(MneSurfaceOrVolume::MneCSourceSpace *s)
+{
+    int k;
+    for (k = 0; k < s->np; k++)
+        s->inuse[k] = TRUE;
+    s->nuse = s->np;
+    return;
+}
+
+
+//*************************************************************************************************************
+
+#define LH_LABEL_TAG "-lh.label"
+#define RH_LABEL_TAG "-rh.label"
+
+int MneSurfaceOrVolume::restrict_sources_to_labels(MneCSourceSpace* *spaces, int nspace, const QStringList& labels, int nlabel)
+/*
+* Pick only sources within a label
+*/
+{
+    MneCSourceSpace* lh = NULL;
+    MneCSourceSpace* rh = NULL;
+    MneCSourceSpace* sp;
+    int            *lh_inuse = NULL;
+    int            *rh_inuse = NULL;
+    int            *sel = NULL;
+    int            nsel;
+    int            *inuse;
+    int            k,p;
+
+    if (nlabel == 0)
+        return OK;
+
+
+    for (k = 0; k < nspace; k++) {
+        if (mne_is_left_hemi_source_space(spaces[k])) {
+            lh = spaces[k];
+            FREE_17(lh_inuse);
+            lh_inuse = MALLOC_17(lh->np,int);
+            for (p = 0; p < lh->np; p++)
+                lh_inuse[p] = 0;
+        }
+        else {
+            rh = spaces[k];
+            FREE_17(rh_inuse);
+            rh_inuse = MALLOC_17(rh->np,int);
+            for (p = 0; p < rh->np; p++)
+                rh_inuse[p] = 0;
+        }
+    }
+    /*
+       * Go through each label file
+       */
+    for (k = 0; k < nlabel; k++) {
+        /*
+         * Which hemi?
+         */
+        if (labels[k].contains(LH_LABEL_TAG)){ //strstr(labels[k],LH_LABEL_TAG) != NULL) {
+            sp = lh;
+            inuse = lh_inuse;
+        }
+        else if (labels[k].contains(RH_LABEL_TAG)){ //strstr(labels[k],RH_LABEL_TAG) != NULL) {
+            sp = rh;
+            inuse = rh_inuse;
+        }
+        else {
+            printf("\tWarning: cannot assign label file %s to a hemisphere.\n",labels[k].toLatin1().constData());
+            continue;
+        }
+        if (sp) {
+            if (mne_read_label(labels[k],NULL,&sel,&nsel) == FAIL)
+                goto bad;
+            for (p = 0; p < nsel; p++) {
+                if (sel[p] >= 0 && sel[p] < sp->np)
+                    inuse[sel[p]] = sp->inuse[sel[p]];
+                else
+                    printf("vertex number out of range in %s (%d vs %d)\n",
+                            labels[k].toLatin1().constData(),sel[p],sp->np);
+            }
+            FREE_17(sel); sel = NULL;
+            printf("Processed label file %s\n",labels[k].toLatin1().constData());
+        }
+    }
+    mne_source_space_update_inuse(lh,lh_inuse);
+    mne_source_space_update_inuse(rh,rh_inuse);
+    return OK;
+
+
+bad : {
+        FREE_17(lh_inuse);
+        FREE_17(rh_inuse);
+        FREE_17(sel);
+        return FAIL;
+    }
+}
+
+
+//*************************************************************************************************************
+
+int MneSurfaceOrVolume::mne_find_sources_in_label(char *label, MneSurfaceOrVolume::MneCSourceSpace *s, int off, int **selp, int *nselp)	    /* How many selected? */
+/*
+* Find the source points within a label
+*/
+{
+    FILE *in = NULL;
+    int  res = FAIL;
+
+    int  nsel = 0;
+    int  *sel = NULL;
+
+    int k,p,pp,nlabel,q;
+    char c;
+    float fdum;
+    /*
+       * Read the label file
+       */
+    if ((in = fopen(label,"r")) == NULL) {
+        qCritical(label);//err_set_sys_error(label);
+        goto out;
+    }
+    c = fgetc(in);
+    if (c !='#') {
+        qCritical("Label file does not start correctly.");
+        goto out;
+    }
+    for (c = fgetc(in); c != '\n'; c = fgetc(in))
+        ;
+    if (fscanf(in,"%d",&nlabel) != 1) {
+        qCritical("Could not read the number of labelled points.");
+        goto out;
+    }
+#ifdef DEBUG
+    printf("\t%d points in label %s\n",nlabel,label);
+#endif
+    for (k = 0; k < nlabel; k++) {
+        if (fscanf(in,"%d %g %g %g %g",&p,
+                   &fdum, &fdum, &fdum, &fdum) != 5) {
+            qCritical("Could not read label point # %d",k+1);
+            goto out;
+        }
+        if (p < 0 || p >= s->np) {
+            qCritical("Source index out of range %d (range 0..%d)\n",p,s->np-1);
+            goto out;
+        }
+        if (s->inuse[p]) {
+            for (pp = 0, q = 0; pp < p; pp++) {
+                if (s->inuse[pp])
+                    q++;
+            }
+            sel = REALLOC_17(sel,nsel+1,int);
+            sel[nsel++] = q + off;
+        }
+    }
+    *nselp = nsel;
+    *selp  = sel;
+    res = OK;
+
+out : {
+        if (in)
+            fclose(in);
+        if (res != OK) {
+            FREE_17(sel);
+            *selp = NULL;
+            *nselp = 0;
+        }
+        return res;
+    }
+
+}
+
+
+//*************************************************************************************************************
+
+int MneSurfaceOrVolume::mne_read_label(const QString& label, char **commentp, int **selp, int *nselp)	    /* How many? */
+/*
+          * Find the source points within a label
+          */
+{
+    FILE *in = NULL;
+    int  res = FAIL;
+
+    int  nsel = 0;
+    int  *sel = NULL;
+
+    int k,p,nlabel;
+    char c;
+    char *comment = NULL;
+    float fdum;
+    /*
+       * Read the label file
+       */
+    if ((in = fopen(label.toLatin1().constData(),"r")) == NULL) {
+        qCritical() << label;//err_set_sys_error(label);
+        goto out;
+    }
+    for (k = 0; k < 2; k++) {
+        rewind(in);
+        c = fgetc(in);
+        if (c !='#') {
+            qCritical("Label file does not start correctly.");
+            goto out;
+        }
+        for (c = fgetc(in); c == ' ' && c != '\n'; c = fgetc(in))
+            ;
+        ungetc(c,in);
+        if (k == 0) {
+            for (c = fgetc(in), p = 0; c != '\n'; c = fgetc(in), p++)
+                ;
+        }
+        else {
+            for (c = fgetc(in); c != '\n'; c = fgetc(in))
+                *comment++ = c;
+            *comment = '\0';
+        }
+        if (!commentp)
+            break;
+        if (p == 0) {
+            *commentp = NULL;
+            break;
+        }
+        if (k == 0)
+            *commentp = comment = MALLOC_17(p+1,char);
+    }
+    if (fscanf(in,"%d",&nlabel) != 1) {
+        qCritical("Could not read the number of labelled points.");
+        goto out;
+    }
+    for (k = 0; k < nlabel; k++) {
+        if (fscanf(in,"%d %g %g %g %g",&p,
+                   &fdum, &fdum, &fdum, &fdum) != 5) {
+            qCritical("Could not read label point # %d",k+1);
+            goto out;
+        }
+        sel = REALLOC_17(sel,nsel+1,int);
+        sel[nsel++] = p;
+    }
+    *nselp = nsel;
+    *selp  = sel;
+    res = OK;
+
+out : {
+        if (in)
+            fclose(in);
+        if (res != OK) {
+            FREE_17(sel);
+            *selp = NULL;
+            *nselp = 0;
+        }
+        return res;
+    }
+
+}
+
+
+//*************************************************************************************************************
+
+int MneSurfaceOrVolume::mne_write_label(char *label, char *comment, int *sel, int nsel, float **rr)	    /* Locations of the nodes in MRI coords */
+/*
+          * Find the source points within a label
+          */
+{
+    FILE  *out = NULL;
+    int   res = FAIL;
+    int   k;
+    float fdum = 0.0;
+    /*
+       * Read the label file
+       */
+    if ((out = fopen(label,"w")) == NULL) {
+        qCritical(label);//err_set_sys_error(label);
+        goto out;
+    }
+    if (comment == NULL)
+        fprintf(out,"# Label file created by the MNE software\n");
+    else
+        fprintf(out,"# %s\n",comment);
+
+    fprintf(out,"%d\n",nsel);
+    if (rr != NULL)
+        for (k = 0; k < nsel; k++)
+            fprintf(out,"%d %.2f %.2f %.2f %g\n",sel[k],
+                    1000*rr[sel[k]][0],
+                    1000*rr[sel[k]][1],
+                    1000*rr[sel[k]][2],fdum);
+    else
+        for (k = 0; k < nsel; k++)
+            fprintf(out,"%d %.2f %.2f %.2f %g\n",sel[k],fdum,fdum,fdum,fdum);
+    res = OK;
+
+out : {
+        if (out)
+            fclose(out);
+        if (res != OK)
+            unlink(label);
+        return res;
+    }
+}
+
+
+//*************************************************************************************************************
+
+int MneSurfaceOrVolume::mne_label_area(char *label, MneSurfaceOrVolume::MneCSourceSpace *s, float *areap)     /* Return the area here */
+/*
+     * Calculate the area of the label
+     */
+{
+    int *sel = NULL;
+    int nsel = 0;
+    float area;
+    int   k,q,nneigh,*neigh;
+
+    if (!s) {
+        qCritical("Source space not specified for mne_label_area");
+        goto bad;
+    }
+    if (mne_read_label(label,NULL,&sel,&nsel))
+        goto bad;
+
+    area = 0.0;
+    for (k = 0; k < nsel; k++) {
+        if (sel[k] < 0 || sel[k] >= s->np) {
+            qCritical("Label vertex index out of range in mne_label_area");
+            goto bad;
+        }
+        nneigh = s->nneighbor_tri[sel[k]];
+        neigh  = s->neighbor_tri[sel[k]];
+        for (q = 0; q < nneigh; q++)
+            area += s->tris[neigh[q]].area/3.0;
+    }
+    FREE_17(sel);
+    *areap = area;
+    return OK;
+
+bad : {
+        FREE_17(sel);
+        return FAIL;
+    }
 }

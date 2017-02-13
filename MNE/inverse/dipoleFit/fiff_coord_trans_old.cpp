@@ -42,7 +42,6 @@
 #include "fiff_coord_trans_old.h"
 
 #include <fiff/fiff_tag.h>
-#include <fiff/fiff_stream.h>
 
 #include <QFile>
 
@@ -61,6 +60,14 @@ using namespace INVERSELIB;
 
 
 
+
+#ifndef TRUE
+#define TRUE 1
+#endif
+
+#ifndef FALSE
+#define FALSE 0
+#endif
 
 
 #ifndef FAIL
@@ -184,6 +191,102 @@ float **mne_lu_invert_20(float **mat,int dim)
     Eigen::MatrixXf eigen_mat_inv = eigen_mat.inverse();
     fromFloatEigenMatrix_20(eigen_mat_inv, mat);
     return mat;
+}
+
+
+
+#define MAXWORD 1000
+
+
+static void skip_comments(FILE *in)
+
+{
+    int c;
+
+    while (1) {
+        c = fgetc(in);
+        if (c == '#') {
+            for (c = fgetc(in); c != EOF && c != '\n'; c = fgetc(in))
+                ;
+        }
+        else {
+            ungetc(c,in);
+            return;
+        }
+    }
+}
+
+
+static int whitespace(int c)
+
+{
+    if (c == '\t' || c == '\n' || c == ' ')
+        return TRUE;
+    else
+        return FALSE;
+}
+
+static int whitespace_quote(int c, int inquote)
+
+{
+    if (inquote)
+        return (c == '"');
+    else
+        return (c == '\t' || c == '\n' || c == ' ');
+}
+
+
+static char *next_word_20(FILE *in)
+
+{
+    char *next = MALLOC_20(MAXWORD,char);
+    int c;
+    int  p,k;
+    int  inquote;
+
+    skip_comments(in);
+
+    inquote = FALSE;
+    for (k = 0, p = 0, c = fgetc(in); c != EOF && !whitespace_quote(c,inquote) ; c = fgetc(in), k++) {
+        if (k == 0 && c == '"')
+            inquote = TRUE;
+        else
+            next[p++] = c;
+    }
+    if (c == EOF && k == 0) {
+        FREE_20(next);
+        return NULL;
+    }
+    else
+        next[p] = '\0';
+    if (c != EOF) {
+        for (k = 0, c = fgetc(in); whitespace(c) ; c = fgetc(in), k++)
+            ;
+        if (c != EOF)
+            ungetc(c,in);
+    }
+#ifdef DEBUG
+    if (next)
+        printf("<%s>\n",next);
+#endif
+    return next;
+}
+
+
+static int get_fval_20(FILE *in, float *fval)
+{
+    char *next = next_word_20(in);
+    if (next == NULL) {
+        qWarning("bad integer");
+        return FAIL;
+    }
+    else if (sscanf(next,"%g",fval) != 1) {
+        qWarning("bad floating point number : %s",next);
+        FREE_20(next);
+        return FAIL;
+    }
+    FREE_20(next);
+    return OK;
 }
 
 
@@ -449,6 +552,53 @@ out : {
 
 //*************************************************************************************************************
 
+FiffCoordTransOld *FiffCoordTransOld::mne_read_transform_from_node(FiffStream::SPtr &stream, const FiffDirNode::SPtr &node, int from, int to)
+/*
+* Read the specified coordinate transformation
+*/
+{
+    FiffCoordTransOld* res = NULL;
+    FiffTag::SPtr t_pTag;
+    //    fiffTagRec     tag;
+    //    fiffDirEntry   dir;
+    fiff_int_t kind, pos;
+    int k;
+
+    //    tag.data = NULL;
+    for (k = 0; k < node->nent; k++)
+        kind = node->dir[k]->kind;
+    pos  = node->dir[k]->pos;
+    if (kind == FIFF_COORD_TRANS) {
+        //            if (fiff_read_this_tag (in->fd,dir->pos,&tag) == FIFF_FAIL)
+        //                goto out;
+        //            res = (fiffCoordTrans)tag.data;
+        if (!FiffTag::read_tag(stream,t_pTag,pos))
+            goto out;
+        res = FiffCoordTransOld::read_helper( t_pTag );
+        if (res->from == from && res->to == to) {
+            //                tag.data = NULL;
+            goto out;
+        }
+        else if (res->from == to && res->to == from) {
+            FiffCoordTransOld* tmp_res = res;
+            res = tmp_res->fiff_invert_transform();//Memory leak here!!
+            delete tmp_res;
+            goto out;
+        }
+        res = NULL;
+    }
+    printf("No suitable coordinate transformation found");
+    goto out;
+
+out : {
+        //        FREE(tag.data);
+        return res;
+    }
+}
+
+
+//*************************************************************************************************************
+
 FiffCoordTransOld *FiffCoordTransOld::mne_read_mri_transform(const QString &name)
 /*
           * Read the MRI -> HEAD coordinate transformation
@@ -462,10 +612,83 @@ FiffCoordTransOld *FiffCoordTransOld::mne_read_mri_transform(const QString &name
 
 FiffCoordTransOld *FiffCoordTransOld::mne_read_meas_transform(const QString &name)
 /*
-          * Read the MEG device -> HEAD coordinate transformation
-          */
+* Read the MEG device -> HEAD coordinate transformation
+*/
 {
     return mne_read_transform(name,FIFFV_COORD_DEVICE,FIFFV_COORD_HEAD);
+}
+
+
+//*************************************************************************************************************
+
+FiffCoordTransOld *FiffCoordTransOld::mne_read_transform_ascii(char *name, int from, int to)
+/*
+* Read the Neuromag -> FreeSurfer transformation matrix
+*/
+{
+    FILE *in = NULL;
+    FiffCoordTransOld* t = NULL;
+    float rot[3][3];
+    float move[3];
+    int   k;
+    float dum;
+
+    if ((in = fopen(name,"r")) == NULL) {
+        qCritical(name);
+        goto bad;
+    }
+    for (k = 0; k < 3; k++) {
+        if (get_fval_20(in,rot[k]+X_20) == FAIL)
+            goto noread;
+        if (get_fval_20(in,rot[k]+Y_20) == FAIL)
+            goto noread;
+        if (get_fval_20(in,rot[k]+Z_20) == FAIL)
+            goto noread;
+        if (get_fval_20(in,move+k) == FAIL)
+            goto noread;
+    }
+    for (k = 0; k < 4; k++) {
+        if (get_fval_20(in,&dum) == FAIL)
+            goto noread;
+    }
+    fclose(in);
+    for (k = 0; k < 3; k++)
+        move[k] = move[k]/1000.0;
+    t  = new FiffCoordTransOld(from, to, rot, move );
+    return t;
+
+noread : {
+        qCritical("Cannot read the coordinate transformation");
+        goto bad;
+    }
+
+bad : {
+        if(t)
+            delete t;
+        if (in != NULL)
+            fclose(in);
+        return NULL;
+    }
+}
+
+
+//*************************************************************************************************************
+
+FiffCoordTransOld *FiffCoordTransOld::mne_read_FShead2mri_transform(char *name)
+{
+    return mne_read_transform_ascii(name,FIFFV_COORD_HEAD,FIFFV_COORD_MRI);
+}
+
+
+//*************************************************************************************************************
+
+FiffCoordTransOld *FiffCoordTransOld::mne_identity_transform(int from, int to)
+{
+    float rot[3][3] = { { 1.0, 0.0, 0.0 },
+                        { 0.0, 1.0, 0.0 },
+                        { 0.0, 0.0, 1.0 } };
+    float move[] = { 0.0, 0.0, 0.0 };
+    return new FiffCoordTransOld(from,to,rot,move);
 }
 
 

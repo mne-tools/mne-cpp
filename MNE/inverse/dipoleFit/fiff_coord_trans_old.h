@@ -44,6 +44,8 @@
 #include "../inverse_global.h"
 
 #include <fiff/fiff_types.h>
+#include <fiff/fiff_stream.h>
+#include <fiff/fiff_dir_node.h>
 
 
 //*************************************************************************************************************
@@ -64,7 +66,7 @@
 
 namespace FIFFLIB
 {
-    class FiffTag;
+class FiffTag;
 }
 
 
@@ -185,6 +187,13 @@ public:
 
     static FiffCoordTransOld* mne_read_transform(const QString& name,int from, int to);
 
+
+    static FiffCoordTransOld* mne_read_transform_from_node(//fiffFile in,
+                                                           FIFFLIB::FiffStream::SPtr& stream,
+                                                           const FIFFLIB::FiffDirNode::SPtr& node,
+                                                           int from, int to);
+
+
     static FiffCoordTransOld* mne_read_mri_transform(const QString& name);
 
 
@@ -192,12 +201,18 @@ public:
 
 
 
+    static FiffCoordTransOld* mne_read_transform_ascii(char *name, int from, int to);
 
+
+    static FiffCoordTransOld* mne_read_FShead2mri_transform(char *name);
+
+
+
+    static FiffCoordTransOld* mne_identity_transform(int from, int to);
 
     //*************************************************************************************************************
     //TODO: remove later on
     static FiffCoordTransOld* read_helper( QSharedPointer<FIFFLIB::FiffTag>& tag );
-
 
 public:
     FIFFLIB::fiff_int_t   from;             /**< Source coordinate system. */
@@ -207,15 +222,15 @@ public:
     FIFFLIB::fiff_float_t invrot[3][3];     /**< The inverse transform (rotation part) */
     FIFFLIB::fiff_float_t invmove[3];       /**< The inverse transform (translation part) */
 
-// ### OLD STRUCT ###
-//typedef struct _fiffCoordTransRec {
-//    fiff_int_t   from;                  /**< Source coordinate system. */
-//    fiff_int_t   to;                    /**< Destination coordinate system. */
-//    fiff_float_t rot[3][3];             /**< The forward transform (rotation part) */
-//    fiff_float_t move[3];               /**< The forward transform (translation part) */
-//    fiff_float_t invrot[3][3];          /**< The inverse transform (rotation part) */
-//    fiff_float_t invmove[3];            /**< The inverse transform (translation part) */
-//} *fiffCoordTrans, fiffCoordTransRec;   /**< Coordinate transformation descriptor */
+    // ### OLD STRUCT ###
+    //typedef struct _fiffCoordTransRec {
+    //    fiff_int_t   from;                  /**< Source coordinate system. */
+    //    fiff_int_t   to;                    /**< Destination coordinate system. */
+    //    fiff_float_t rot[3][3];             /**< The forward transform (rotation part) */
+    //    fiff_float_t move[3];               /**< The forward transform (translation part) */
+    //    fiff_float_t invrot[3][3];          /**< The inverse transform (rotation part) */
+    //    fiff_float_t invmove[3];            /**< The inverse transform (translation part) */
+    //} *fiffCoordTrans, fiffCoordTransRec;   /**< Coordinate transformation descriptor */
 };
 
 //*************************************************************************************************************
