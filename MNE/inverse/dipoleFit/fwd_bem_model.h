@@ -119,6 +119,31 @@ public:
 
 
 
+
+
+//char *fwd_bem_make_bem_name(char *name)
+///*
+// * Make a standard BEM file name
+// */
+//{
+//    char *s1,*s2;
+
+//    s1 = strip_from(name,(char*)(".fif"));
+//    s2 = strip_from(s1,(char*)("-sol"));
+//    FREE_3(s1);
+//    s1 = strip_from(s2,(char*)("-bem"));
+//    FREE_3(s2);
+//    s2 = MALLOC_3(strlen(s1)+strlen(BEM_SUFFIX)+1,char);
+//    sprintf(s2,"%s%s",s1,BEM_SUFFIX);
+//    FREE_3(s1);
+//    return s2;
+//}
+
+
+    static char *fwd_bem_make_bem_sol_name(char *name);
+
+
+
     //============================= fwd_bem_model.c =============================
 
     static const char *fwd_bem_explain_surface(int kind);

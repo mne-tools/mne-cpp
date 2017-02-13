@@ -134,6 +134,37 @@ public:
 
 
 
+
+
+
+
+
+    //============================= mne_patches.c =============================
+
+    static int mne_add_patch_stats(MneSurfaceOrVolume::MneCSourceSpace* s);
+
+
+    //============================= filter_source_sapces.c =============================
+
+
+    static void rearrange_source_space(MneSurfaceOrVolume::MneCSourceSpace* s);
+
+
+    static void *filter_source_space(void *arg);
+
+    int filter_source_spaces(float          limit,              /* Omit vertices which are closer than this to the inner skull */
+                             char           *bemfile,                       /* Take the inner skull surface from here */
+                             FiffCoordTransOld* mri_head_t,                 /* Coordinate transformation is needed */
+                             MneSurfaceOrVolume::MneCSourceSpace* *spaces,  /* The source spaces */
+                             int            nspace,                         /* How many? */
+                             FILE           *filtered,                      /* Output the coordinates of the filtered points here */
+                             bool           use_threads);
+
+
+
+
+
+
     //============================= make_volume_source_space.c =============================
 
 
@@ -243,6 +274,21 @@ public:
 
 
 
+    //============================= mne_source_space.c =============================
+
+
+
+    static int mne_transform_source_space(MneSurfaceOrVolume::MneCSourceSpace* ss, FiffCoordTransOld* t);
+
+
+    static int mne_transform_source_spaces_to(int            coord_frame,   /* Which coord frame do we want? */
+                                              FiffCoordTransOld* t,             /* The coordinate transformation */
+                                              MneSurfaceOrVolume::MneCSourceSpace* *spaces,       /* A list of source spaces */
+                                              int            nspace);
+
+
+
+
 
     //============================= mne_forward_solution.c =============================
 
@@ -260,25 +306,25 @@ public:
     //============================= mne_labels.c =============================
     //TODO Move to separate label class
     static int mne_find_sources_in_label(char *label,          /* The label file */
-                                  MneSurfaceOrVolume::MneCSourceSpace* s,	    /* The corresponding source space hemisphere */
-                                  int  off,		    /* Offset to the complete source space */
-                                  int  **selp,	    /* Sources selected */
-                                  int  *nselp);
+                                         MneSurfaceOrVolume::MneCSourceSpace* s,	    /* The corresponding source space hemisphere */
+                                         int  off,		    /* Offset to the complete source space */
+                                         int  **selp,	    /* Sources selected */
+                                         int  *nselp);
 
     static int mne_read_label(const QString& label,	    /* The label file */
-                       char **commentp, /* The comment in the file */
-                       int  **selp,	    /* Points in label */
-                       int  *nselp);
+                              char **commentp, /* The comment in the file */
+                              int  **selp,	    /* Points in label */
+                              int  *nselp);
 
     static int mne_write_label(char *label,    /* The label file */
-                        char *comment,
-                        int  *sel,	    /* Points in label */
-                        int  nsel,	    /* How many? */
-                        float **rr);
+                               char *comment,
+                               int  *sel,	    /* Points in label */
+                               int  nsel,	    /* How many? */
+                               float **rr);
 
     static int mne_label_area(char *label,      /* The label file */
-                       MneSurfaceOrVolume::MneCSourceSpace* s, /* The associated source space */
-                       float *areap);
+                              MneSurfaceOrVolume::MneCSourceSpace* s, /* The associated source space */
+                              float *areap);
 
 
 public:

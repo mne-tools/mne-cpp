@@ -110,6 +110,10 @@ public:
 
 
 
+    static FiffCoordTransOld* catenate(FiffCoordTransOld* t1,FiffCoordTransOld* t2);
+
+
+
 
     //=========================================================================================================
     /**
@@ -120,20 +124,12 @@ public:
     FiffCoordTransOld(int from,int to,float rot[3][3],float move[3]);
 
 
-
-
-
-
-
-
     //=========================================================================================================
     /**
     * Destroys the FiffCoordTransOld
     * Refactored:  (.c)
     */
     ~FiffCoordTransOld();
-
-
 
 
 
@@ -146,22 +142,17 @@ public:
     static int add_inverse(FiffCoordTransOld* t);
 
 
-
-
-
     //============================= fiff_trans.c =============================
     FiffCoordTransOld* fiff_invert_transform () const;
-
-
 
 
     static void fiff_coord_trans (float r[3],FiffCoordTransOld* t,int do_move);
 
 
+    static FiffCoordTransOld* fiff_combine_transforms (int from,int to,FiffCoordTransOld* t1,FiffCoordTransOld* t2);
 
 
-
-
+    static void fiff_coord_trans_inv (float r[3],FiffCoordTransOld* t,int do_move);
 
 
     //============================= mne_coord_transforms.c =============================
@@ -172,14 +163,6 @@ public:
     static void mne_print_coord_transform_label(FILE *log,char *label, FiffCoordTransOld* t);
 
     static void mne_print_coord_transform(FILE *log, FiffCoordTransOld* t);
-
-
-
-
-
-
-
-
 
 
 

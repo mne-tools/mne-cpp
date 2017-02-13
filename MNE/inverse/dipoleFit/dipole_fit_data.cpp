@@ -1686,111 +1686,6 @@ static dipoleFitFuncs new_dipole_fit_funcs()
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*
-* Some filename utilities follow
-*/
-static char *ends_with(char *s, char *suffix)
-/*
-* Does a string end with the given suffix?
-*/
-{
-    char *p;
-
-    if (!s)
-        return NULL;
-
-    for (p = strstr(s,suffix); p ; s = p + strlen(suffix), p = strstr(s,suffix))
-        if (p == s + strlen(s) - strlen(suffix))
-            return p;
-    return NULL;
-}
-
-static char *strip_from(char *s, char *suffix)
-
-{
-    char *p = ends_with(s,suffix);
-    char c;
-    char *res;
-
-    if (p) {
-        c = *p;
-        *p = '\0';
-        res = mne_strdup_3(s);
-        *p = c;
-    }
-    else
-        res = mne_strdup_3(s);
-    return res;
-}
-
-#define BEM_SUFFIX     "-bem.fif"
-#define BEM_SOL_SUFFIX "-bem-sol.fif"
-
-//char *fwd_bem_make_bem_name(char *name)
-///*
-// * Make a standard BEM file name
-// */
-//{
-//    char *s1,*s2;
-
-//    s1 = strip_from(name,(char*)(".fif"));
-//    s2 = strip_from(s1,(char*)("-sol"));
-//    FREE_3(s1);
-//    s1 = strip_from(s2,(char*)("-bem"));
-//    FREE_3(s2);
-//    s2 = MALLOC_3(strlen(s1)+strlen(BEM_SUFFIX)+1,char);
-//    sprintf(s2,"%s%s",s1,BEM_SUFFIX);
-//    FREE_3(s1);
-//    return s2;
-//}
-
-char *fwd_bem_make_bem_sol_name(char *name)
-/*
- * Make a standard BEM solution file name
- */
-{
-    char *s1,*s2;
-
-    s1 = strip_from(name,(char*)(".fif"));
-    s2 = strip_from(s1,(char*)("-sol"));
-    FREE_3(s1);
-    s1 = strip_from(s2,(char*)("-bem"));
-    FREE_3(s2);
-    s2 = MALLOC_3(strlen(s1)+strlen(BEM_SOL_SUFFIX)+1,char);
-    sprintf(s2,"%s%s",s1,BEM_SOL_SUFFIX);
-    FREE_3(s1);
-    return s2;
-}
-
-
-
-
-
-
 //============================= mne_simplex_fit.c =============================
 
 /*
@@ -4680,7 +4575,7 @@ int DipoleFitData::setup_forward_model(DipoleFitData *d, MneCTFCompDataSet* comp
         /*
          * Set up the boundary-element model
          */
-        char *bemsolname = fwd_bem_make_bem_sol_name(d->bemname);
+        char *bemsolname = FwdBemModel::fwd_bem_make_bem_sol_name(d->bemname);
         FREE_3(d->bemname); d->bemname = bemsolname;
 
         printf("\nSetting up the BEM model using %s...\n",d->bemname);
