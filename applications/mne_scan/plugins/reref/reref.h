@@ -45,6 +45,7 @@
 
 #include "reref_global.h"
 #include "FormFiles/rerefoption.h"
+#include "FormFiles/rerefsetupwidget.h"
 
 #include <utils/ioutils.h>
 #include <utils/eegref.h>
