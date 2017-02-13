@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     mne_mne_data.h
+* @file     mne_surface_or_volume.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -79,6 +79,17 @@
 namespace INVERSELIB
 {
 
+//*************************************************************************************************************
+//=============================================================================================================
+// Forward Declarations
+//=============================================================================================================
+
+class MneTriangle;
+class MneNearest;
+class MneVolGeom;
+class MnePatchInfo;
+
+
 //=============================================================================================================
 /**
 * Implements MNE Surface or Volume (Replaces *mneSurfaceOrVolume,mneSurfaceOrVolumeRec; struct of MNE-C mne_types.h).
@@ -114,12 +125,10 @@ public:
     ~MneSurfaceOrVolume();
 
 
-
-
     //============================= make_filter_source_sapces.c =============================
 
     static double solid_angle (float       *from,	/* From this point... */
-                               mneTriangle tri);
+                               MneTriangle* tri);
 
     static double sum_solids(float *from, MneSurfaceOrVolume::MneCSurface* surf);
 
@@ -335,7 +344,7 @@ public:
     /*
     * These relate to the FreeSurfer way
     */
-    mneVolGeom       vol_geom;      /* MRI volume geometry information as FreeSurfer likes it */
+    MneVolGeom       *vol_geom;     /* MRI volume geometry information as FreeSurfer likes it */
     void             *mgh_tags;     /* Tags listed in the file */
     /*
     * These are meaningful for both surfaces and volumes
@@ -356,22 +365,22 @@ public:
     * These are for surfaces only
     */
     int              ntri;      /* Number of triangles */
-    mneTriangle      tris;      /* The triangulation information */
+    MneTriangle*      tris;      /* The triangulation information */
     int              **itris;   /* The vertex numbers */
     float            tot_area;  /* Total area of the surface, computed from the triangles */
 
     int              nuse_tri;      /* The triangulation corresponding to the vertices in use */
-    mneTriangle      use_tris;      /* The triangulation information for the vertices in use */
+    MneTriangle*      use_tris;      /* The triangulation information for the vertices in use */
     int              **use_itris;   /* The vertex numbers for the 'use' triangulation */
 
     int              **neighbor_tri;    /* Neighboring triangles for each vertex Note: number of entries varies for vertex to vertex */
     int              *nneighbor_tri;    /* Number of neighboring triangles for each vertex */
 
-    mneNearest       nearest;   /* Nearest inuse vertex info (number of these is the same as the number vertices) */
-    mnePatchInfo     *patches;  /* Patch information (number of these is the same as the number of points in use) */
+    MneNearest*      nearest;   /* Nearest inuse vertex info (number of these is the same as the number vertices) */
+    MnePatchInfo*    *patches;  /* Patch information (number of these is the same as the number of points in use) */
     int              npatch;    /* How many (should be same as nuse) */
 
-    INVERSELIB::FiffSparseMatrix*  dist;          /* Distances between the (used) vertices (along the surface). */
+    FiffSparseMatrix* dist;         /* Distances between the (used) vertices (along the surface). */
     float            dist_limit;    /* Distances above this (in volume) have not been calculated. If negative, only used vertices have been considered */
 
     float            *curv; /* The FreeSurfer curvature values */
@@ -379,87 +388,87 @@ public:
     /*
     * These are for volumes only
     */
-    INVERSELIB::FiffCoordTransOld*  voxel_surf_RAS_t;   /* Transform from voxel coordinate to the surface RAS (MRI) coordinates */
-    int              vol_dims[3];                       /* Dimensions of the volume grid (width x height x depth) NOTE: This will be present only if the source space is a complete rectangular grid with unused vertices included */
-    float            voxel_size[3];                     /* Derived from the above */
-    INVERSELIB::FiffSparseMatrix*  interpolator;        /* Matrix to interpolate into an MRI volume */
-    char             *MRI_volume;                       /* The name of the file the above interpolator is based on */
-    INVERSELIB::FiffCoordTransOld*   MRI_voxel_surf_RAS_t;
-    INVERSELIB::FiffCoordTransOld*   MRI_surf_RAS_RAS_t;/* Transform from surface RAS to RAS coordinates in the associated MRI volume */
-    int              MRI_vol_dims[3];                   /* Dimensions of the MRI volume (width x height x depth) */
+    FiffCoordTransOld*  voxel_surf_RAS_t;   /* Transform from voxel coordinate to the surface RAS (MRI) coordinates */
+    int                 vol_dims[3];        /* Dimensions of the volume grid (width x height x depth) NOTE: This will be present only if the source space is a complete rectangular grid with unused vertices included */
+    float               voxel_size[3];      /* Derived from the above */
+    FiffSparseMatrix*   interpolator;       /* Matrix to interpolate into an MRI volume */
+    char*               MRI_volume;         /* The name of the file the above interpolator is based on */
+    FiffCoordTransOld*  MRI_voxel_surf_RAS_t;
+    FiffCoordTransOld*  MRI_surf_RAS_RAS_t; /* Transform from surface RAS to RAS coordinates in the associated MRI volume */
+    int              MRI_vol_dims[3];       /* Dimensions of the MRI volume (width x height x depth) */
     /*
     * Possibility to add user-defined data
     */
     void             *user_data;        /* Anything else we want */
     mneUserFreeFunc  user_data_free;    /* Function to set the above free */
 
-    // ### OLD STRUCT ###
-    //typedef struct {                /* This defines a source space or a surface */
-    //    int              type;          /* Is this a volume or a surface */
-    //    char             *subject;      /* Name (id) of the subject */
-    //    int              id;            /* Surface id */
-    //    int              coord_frame;   /* Which coordinate system are the data in now */
-    //    /*
-    //    * These relate to the FreeSurfer way
-    //    */
-    //    mneVolGeom       vol_geom;      /* MRI volume geometry information as FreeSurfer likes it */
-    //    void             *mgh_tags;     /* Tags listed in the file */
-    //    /*
-    //    * These are meaningful for both surfaces and volumes
-    //    */
-    //    int              np;        /* Number of vertices */
-    //    float            **rr;      /* The vertex locations */
-    //    float            **nn;      /* Surface normals at these points */
-    //    float            cm[3];     /* Center of mass */
+// ### OLD STRUCT ###
+//typedef struct {                /* This defines a source space or a surface */
+//    int              type;          /* Is this a volume or a surface */
+//    char             *subject;      /* Name (id) of the subject */
+//    int              id;            /* Surface id */
+//    int              coord_frame;   /* Which coordinate system are the data in now */
+//    /*
+//    * These relate to the FreeSurfer way
+//    */
+//    mneVolGeom       vol_geom;      /* MRI volume geometry information as FreeSurfer likes it */
+//    void             *mgh_tags;     /* Tags listed in the file */
+//    /*
+//    * These are meaningful for both surfaces and volumes
+//    */
+//    int              np;        /* Number of vertices */
+//    float            **rr;      /* The vertex locations */
+//    float            **nn;      /* Surface normals at these points */
+//    float            cm[3];     /* Center of mass */
 
-    //    int              *inuse;    /* Is this point in use in the source space */
-    //    int              *vertno;   /* Vertex numbers of the used vertices in the full source space */
-    //    int              nuse;      /* Number of points in use */
+//    int              *inuse;    /* Is this point in use in the source space */
+//    int              *vertno;   /* Vertex numbers of the used vertices in the full source space */
+//    int              nuse;      /* Number of points in use */
 
-    //    int              **neighbor_vert; /* Vertices neighboring each vertex */
-    //    int              *nneighbor_vert; /* Number of vertices neighboring each vertex */
-    //    float            **vert_dist;     /* Distances between neigboring vertices */
-    //    /*
-    //    * These are for surfaces only
-    //    */
-    //    int              ntri;      /* Number of triangles */
-    //    mneTriangle      tris;      /* The triangulation information */
-    //    int              **itris;   /* The vertex numbers */
-    //    float            tot_area;  /* Total area of the surface, computed from the triangles */
+//    int              **neighbor_vert; /* Vertices neighboring each vertex */
+//    int              *nneighbor_vert; /* Number of vertices neighboring each vertex */
+//    float            **vert_dist;     /* Distances between neigboring vertices */
+//    /*
+//    * These are for surfaces only
+//    */
+//    int              ntri;      /* Number of triangles */
+//    MneTriangle*      tris;      /* The triangulation information */
+//    int              **itris;   /* The vertex numbers */
+//    float            tot_area;  /* Total area of the surface, computed from the triangles */
 
-    //    int              nuse_tri;      /* The triangulation corresponding to the vertices in use */
-    //    mneTriangle      use_tris;      /* The triangulation information for the vertices in use */
-    //    int              **use_itris;   /* The vertex numbers for the 'use' triangulation */
+//    int              nuse_tri;      /* The triangulation corresponding to the vertices in use */
+//    MneTriangle*      use_tris;      /* The triangulation information for the vertices in use */
+//    int              **use_itris;   /* The vertex numbers for the 'use' triangulation */
 
-    //    int              **neighbor_tri;    /* Neighboring triangles for each vertex Note: number of entries varies for vertex to vertex */
-    //    int              *nneighbor_tri;    /* Number of neighboring triangles for each vertex */
+//    int              **neighbor_tri;    /* Neighboring triangles for each vertex Note: number of entries varies for vertex to vertex */
+//    int              *nneighbor_tri;    /* Number of neighboring triangles for each vertex */
 
-    //    mneNearest       nearest;   /* Nearest inuse vertex info (number of these is the same as the number vertices) */
-    //    mnePatchInfo     *patches;  /* Patch information (number of these is the same as the number of points in use) */
-    //    int              npatch;    /* How many (should be same as nuse) */
+//    mneNearest       nearest;   /* Nearest inuse vertex info (number of these is the same as the number vertices) */
+//    mnePatchInfo     *patches;  /* Patch information (number of these is the same as the number of points in use) */
+//    int              npatch;    /* How many (should be same as nuse) */
 
-    //    mneSparseMatrix  dist;          /* Distances between the (used) vertices (along the surface). */
-    //    float            dist_limit;    /* Distances above this (in volume) have not been calculated. If negative, only used vertices have been considered */
+//    mneSparseMatrix  dist;          /* Distances between the (used) vertices (along the surface). */
+//    float            dist_limit;    /* Distances above this (in volume) have not been calculated. If negative, only used vertices have been considered */
 
-    //    float            *curv; /* The FreeSurfer curvature values */
-    //    float            *val;  /* Some other values associated with the vertices */
-    //    /*
-    //    * These are for volumes only
-    //    */
-    //    INVERSELIB::FiffCoordTransOld*   voxel_surf_RAS_t; /* Transform from voxel coordinate to the surface RAS (MRI) coordinates */
-    //    int              vol_dims[3];   /* Dimensions of the volume grid (width x height x depth) NOTE: This will be present only if the source space is a complete rectangular grid with unused vertices included */
-    //    float            voxel_size[3]; /* Derived from the above */
-    //    mneSparseMatrix  interpolator;  /* Matrix to interpolate into an MRI volume */
-    //    char             *MRI_volume;   /* The name of the file the above interpolator is based on */
-    //    INVERSELIB::FiffCoordTransOld*   MRI_voxel_surf_RAS_t;
-    //    INVERSELIB::FiffCoordTransOld*   MRI_surf_RAS_RAS_t;   /* Transform from surface RAS to RAS coordinates in the associated MRI volume */
-    //    int              MRI_vol_dims[3];               /* Dimensions of the MRI volume (width x height x depth) */
-    //    /*
-    //    * Possibility to add user-defined data
-    //    */
-    //    void             *user_data;        /* Anything else we want */
-    //    mneUserFreeFunc  user_data_free;    /* Function to set the above free */
-    //} *mneSurfaceOrVolume,mneSurfaceOrVolumeRec;
+//    float            *curv; /* The FreeSurfer curvature values */
+//    float            *val;  /* Some other values associated with the vertices */
+//    /*
+//    * These are for volumes only
+//    */
+//    INVERSELIB::FiffCoordTransOld*   voxel_surf_RAS_t; /* Transform from voxel coordinate to the surface RAS (MRI) coordinates */
+//    int              vol_dims[3];   /* Dimensions of the volume grid (width x height x depth) NOTE: This will be present only if the source space is a complete rectangular grid with unused vertices included */
+//    float            voxel_size[3]; /* Derived from the above */
+//    mneSparseMatrix  interpolator;  /* Matrix to interpolate into an MRI volume */
+//    char             *MRI_volume;   /* The name of the file the above interpolator is based on */
+//    INVERSELIB::FiffCoordTransOld*   MRI_voxel_surf_RAS_t;
+//    INVERSELIB::FiffCoordTransOld*   MRI_surf_RAS_RAS_t;   /* Transform from surface RAS to RAS coordinates in the associated MRI volume */
+//    int              MRI_vol_dims[3];               /* Dimensions of the MRI volume (width x height x depth) */
+//    /*
+//    * Possibility to add user-defined data
+//    */
+//    void             *user_data;        /* Anything else we want */
+//    mneUserFreeFunc  user_data_free;    /* Function to set the above free */
+//} *mneSurfaceOrVolume,mneSurfaceOrVolumeRec;
 };
 
 //*************************************************************************************************************

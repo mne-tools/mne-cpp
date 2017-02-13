@@ -88,6 +88,13 @@
 namespace INVERSELIB
 {
 
+//*************************************************************************************************************
+//=============================================================================================================
+// Forward Declarations
+//=============================================================================================================
+
+class MneTriangle;
+
 
 //=============================================================================================================
 /**
@@ -199,7 +206,7 @@ public:
     static double calc_beta (double *rk,double *rk1);
 
     static void lin_pot_coeff (float  *from,	/* Origin */
-                               mneTriangle to,	/* The destination triangle */
+                               MneTriangle* to,	/* The destination triangle */
                                double omega[3]);
 
     static void correct_auto_elements (MneSurfaceOrVolume::MneCSurface* surf,
@@ -315,14 +322,14 @@ public:
                             double *D);
 
     static void field_integrals (float *from,
-                                 mneTriangle to,
+                                 MneTriangle* to,
                                  double *I1p,
                                  double *T,double *S1,double *S2,
                                  double *f0,double *fx,double *fy);
 
     static double one_field_coeff (float       *dest,	/* The destination field point */
                                    float       *normal,	/* The field direction we are interested in */
-                                   mneTriangle tri);
+                                   MneTriangle* tri);
 
     static float **fwd_bem_field_coeff(FwdBemModel* m,	/* The model */
                                 FwdCoilSet*  coils);
@@ -336,20 +343,20 @@ public:
 
     static void fwd_bem_one_lin_field_coeff_ferg (float *dest,	/* The field point */
                                            float *dir,	/* The interesting direction */
-                                           mneTriangle tri,	/* The destination triangle */
+                                           MneTriangle* tri,	/* The destination triangle */
                                            double *res);
 
     static void fwd_bem_one_lin_field_coeff_uran(float *dest,	/* The field point */
                                           float *dir,	/* The interesting direction */
-                                          mneTriangle tri,	/* The destination triangle */
+                                          MneTriangle* tri,	/* The destination triangle */
                                           double *res);
 
     static void fwd_bem_one_lin_field_coeff_simple (float       *dest,    /* The destination field point */
                                              float       *normal,  /* The field direction we are interested in */
-                                             mneTriangle source,   /* The source triangle */
+                                             MneTriangle* source,   /* The source triangle */
                                              double      *res);
 
-    typedef void (* linFieldIntFunc)(float *dest,float *dir,mneTriangle tri, double *res);
+    typedef void (* linFieldIntFunc)(float *dest,float *dir,MneTriangle* tri, double *res);
 
     static float **fwd_bem_lin_field_coeff (FwdBemModel* m,        /* The model */
                                      FwdCoilSet*  coils,    /* Coil information */
