@@ -299,7 +299,10 @@ QList<FiffDigPoint> BabyMEGHPIDgl::readPolhemusDig(QString fileName)
 
 //*************************************************************************************************************
 
-void BabyMEGHPIDgl::setDigitizerDataToView3D(const FiffDigPointSet& digPointSet, const FiffDigPointSet& fittedPointSet, const QVector<double>& vGof, bool bSortOutAdditionalDigitizer)
+void BabyMEGHPIDgl::setDigitizerDataToView3D(const FiffDigPointSet& digPointSet,
+                                             const FiffDigPointSet& fittedPointSet,
+                                             const QVector<double>& vGof,
+                                             bool bSortOutAdditionalDigitizer)
 {
     if(bSortOutAdditionalDigitizer) {
         FiffDigPointSet t_digSetWithoutAdditional;
