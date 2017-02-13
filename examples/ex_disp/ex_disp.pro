@@ -40,6 +40,8 @@ TEMPLATE = app
 QT += core gui
 QT += widgets
 
+CONFIG   += console
+
 TARGET = ex_disp
 
 CONFIG(debug, debug|release) {
