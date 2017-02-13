@@ -88,6 +88,8 @@ class MneTriangle;
 class MneNearest;
 class MneVolGeom;
 class MnePatchInfo;
+class MneSourceSpaceOld;
+class MneSurfaceOld;
 
 
 //=============================================================================================================
@@ -105,9 +107,9 @@ public:
     /*
      * These are the aliases
      */
-    typedef MneSurfaceOrVolume MneCSourceSpace; //TODO create a derived class
+//    typedef MneSurfaceOrVolume MneCSourceSpace; //TODO create a derived class
     //typedef mneSurfaceOrVolume mneSourceVolume;
-    typedef MneSurfaceOrVolume MneCSurface; //TODO create a derived class
+//    typedef MneSurfaceOrVolume MneCSurface; //TODO create a derived class
     //typedef mneSurfaceOrVolume mneVolume;
 
 
@@ -122,7 +124,7 @@ public:
     * Destroys the MNE Surface or Volume description
     * Refactored: mne_free_source_space (mne_source_space.c)
     */
-    ~MneSurfaceOrVolume();
+    virtual ~MneSurfaceOrVolume();
 
 
     //============================= make_filter_source_sapces.c =============================
@@ -130,33 +132,28 @@ public:
     static double solid_angle (float       *from,	/* From this point... */
                                MneTriangle* tri);
 
-    static double sum_solids(float *from, MneSurfaceOrVolume::MneCSurface* surf);
+    static double sum_solids(float *from, MneSurfaceOld* surf);
 
 
-    static int mne_filter_source_spaces(MneSurfaceOrVolume::MneCSurface* surf,  /* The bounding surface must be provided */
+    static int mne_filter_source_spaces(MneSurfaceOld* surf,  /* The bounding surface must be provided */
                                         float limit,                                   /* Minimum allowed distance from the surface */
                                         INVERSELIB::FiffCoordTransOld* mri_head_t,     /* Coordinate transformation (may not be needed) */
-                                        MneSurfaceOrVolume::MneCSourceSpace* *spaces,  /* The source spaces  */
+                                        MneSourceSpaceOld* *spaces,  /* The source spaces  */
                                         int nspace,
                                         FILE *filtered);
 
 
 
 
-
-
-
-
-
     //============================= mne_patches.c =============================
 
-    static int mne_add_patch_stats(MneSurfaceOrVolume::MneCSourceSpace* s);
+    static int mne_add_patch_stats(MneSourceSpaceOld* s);
 
 
     //============================= filter_source_sapces.c =============================
 
 
-    static void rearrange_source_space(MneSurfaceOrVolume::MneCSourceSpace* s);
+    static void rearrange_source_space(MneSourceSpaceOld* s);
 
 
     static void *filter_source_space(void *arg);
@@ -164,7 +161,7 @@ public:
     int filter_source_spaces(float          limit,              /* Omit vertices which are closer than this to the inner skull */
                              char           *bemfile,                       /* Take the inner skull surface from here */
                              FiffCoordTransOld* mri_head_t,                 /* Coordinate transformation is needed */
-                             MneSurfaceOrVolume::MneCSourceSpace* *spaces,  /* The source spaces */
+                             MneSourceSpaceOld* *spaces,  /* The source spaces */
                              int            nspace,                         /* How many? */
                              FILE           *filtered,                      /* Output the coordinates of the filtered points here */
                              bool           use_threads);
@@ -178,21 +175,21 @@ public:
 
 
 
-    static MneSurfaceOrVolume::MneCSourceSpace* make_volume_source_space(MneSurfaceOrVolume::MneCSurface* surf,
+    static MneSourceSpaceOld* make_volume_source_space(MneSurfaceOld* surf,
                                                                          float grid,
                                                                          float exclude,
                                                                          float mindist);
 
 
     //============================= mne_source_space.c =============================
-    static MneCSourceSpace* mne_new_source_space(int np);
+    static MneSourceSpaceOld* mne_new_source_space(int np);
 
 
 
 
     //============================= dipole_fit_guesses.c =============================
 
-    static MneCSurface* make_guesses(MneSurfaceOrVolume::MneCSurface* guess_surf, /* Predefined boundary for the guesses */
+    static MneSurfaceOld* make_guesses(MneSurfaceOld* guess_surf, /* Predefined boundary for the guesses */
                                      float guessrad,     /* Radius for the spherical boundary if the above is missing */
                                      float *guess_r0,    /* Origin for the spherical boundary */
                                      float grid,         /* Spacing between guess points */
@@ -205,14 +202,14 @@ public:
     //============================= mne_bem_surface_io.c =============================
 
     //Refactored: mne_read_bem_surface (mne_bem_surface_io.c)
-    static MneCSurface* read_bem_surface(const QString&  name,   /* Filename */
+    static MneSurfaceOld* read_bem_surface(const QString&  name,   /* Filename */
                                          int  which,             /* Which surface are we looking for (-1 loads the first one)*/
                                          int  add_geometry,      /* Add the geometry information */
                                          float *sigmap);
 
 
     //Refactored: read_bem_surface (mne_bem_surface_io.c)
-    static MneCSurface* read_bem_surface( const QString& name,    /* Filename */
+    static MneSurfaceOld* read_bem_surface( const QString& name,    /* Filename */
                                           int  which,             /* Which surface are we looking for (-1 loads the first one)*/
                                           int  add_geometry,      /* Add the geometry information */
                                           float *sigmap,          /* Conductivity? */
@@ -232,7 +229,7 @@ public:
 
 
     static void mne_triangle_coords(float       *r,       /* Location of a point */
-                                    MneSurfaceOrVolume::MneCSurface*  s,	       /* The surface */
+                                    MneSurfaceOld*  s,	       /* The surface */
                                     int         tri,      /* Which triangle */
                                     float       *x,       /* Coordinates of the point on the triangle */
                                     float       *y,
@@ -242,41 +239,41 @@ public:
 
 
     static int nearest_triangle_point(float       *r,    /* Location of a point */
-                                      MneSurfaceOrVolume::MneCSurface*  s,     /* The surface */
+                                      MneSurfaceOld*  s,     /* The surface */
                                       void        *user, /* Something precomputed */
                                       int         tri,   /* Which triangle */
                                       float       *x,    /* Coordinates of the point on the triangle */
                                       float       *y,
                                       float       *z);
 
-    static void project_to_triangle(MneSurfaceOrVolume::MneCSurface* s,
+    static void project_to_triangle(MneSurfaceOld* s,
                                     int        tri,
                                     float      p,
                                     float      q,
                                     float      *r);
 
     static int mne_nearest_triangle_point(float       *r,    /* Location of a point */
-                                          MneSurfaceOrVolume::MneCSurface*  s,     /* The surface */
+                                          MneSurfaceOld*  s,     /* The surface */
                                           int         tri,   /* Which triangle */
                                           float       *x,    /* Coordinates of the point on the triangle */
                                           float       *y,
                                           float       *z);
 
-    static int mne_project_to_surface(MneSurfaceOrVolume::MneCSurface* s, void *proj_data, float *r, int project_it, float *distp);
+    static int mne_project_to_surface(MneSurfaceOld* s, void *proj_data, float *r, int project_it, float *distp);
 
 
     //============================= mne_source_space.c =============================
 
     static int mne_read_source_spaces(const QString& name,               /* Read from here */
-                                      MneSurfaceOrVolume::MneCSourceSpace* **spacesp, /* These are the results */
+                                      MneSourceSpaceOld* **spacesp, /* These are the results */
                                       int            *nspacep);
 
 
-    static void mne_source_space_update_inuse(MneSurfaceOrVolume::MneCSourceSpace* s,
+    static void mne_source_space_update_inuse(MneSourceSpaceOld* s,
                                               int *new_inuse);
 
 
-    static int mne_is_left_hemi_source_space(MneSurfaceOrVolume::MneCSourceSpace* s);
+    static int mne_is_left_hemi_source_space(MneSourceSpaceOld* s);
 
 
 
@@ -287,12 +284,12 @@ public:
 
 
 
-    static int mne_transform_source_space(MneSurfaceOrVolume::MneCSourceSpace* ss, FiffCoordTransOld* t);
+    static int mne_transform_source_space(MneSourceSpaceOld* ss, FiffCoordTransOld* t);
 
 
     static int mne_transform_source_spaces_to(int            coord_frame,   /* Which coord frame do we want? */
                                               FiffCoordTransOld* t,             /* The coordinate transformation */
-                                              MneSurfaceOrVolume::MneCSourceSpace* *spaces,       /* A list of source spaces */
+                                              MneSourceSpaceOld* *spaces,       /* A list of source spaces */
                                               int            nspace);
 
 
@@ -301,12 +298,12 @@ public:
 
     //============================= mne_forward_solution.c =============================
 
-    static void enable_all_sources(MneSurfaceOrVolume::MneCSourceSpace* s);
+    static void enable_all_sources(MneSourceSpaceOld* s);
 
 
     //============================= resrict_sources.c =============================
 
-    static int restrict_sources_to_labels(MneSurfaceOrVolume::MneCSourceSpace* *spaces,
+    static int restrict_sources_to_labels(MneSourceSpaceOld* *spaces,
                                           int            nspace,
                                           const QStringList& labels,
                                           int            nlabel);
@@ -315,7 +312,7 @@ public:
     //============================= mne_labels.c =============================
     //TODO Move to separate label class
     static int mne_find_sources_in_label(char *label,          /* The label file */
-                                         MneSurfaceOrVolume::MneCSourceSpace* s,	    /* The corresponding source space hemisphere */
+                                         MneSourceSpaceOld* s,	    /* The corresponding source space hemisphere */
                                          int  off,		    /* Offset to the complete source space */
                                          int  **selp,	    /* Sources selected */
                                          int  *nselp);
@@ -332,7 +329,7 @@ public:
                                float **rr);
 
     static int mne_label_area(char *label,      /* The label file */
-                              MneSurfaceOrVolume::MneCSourceSpace* s, /* The associated source space */
+                              MneSourceSpaceOld* s, /* The associated source space */
                               float *areap);
 
 

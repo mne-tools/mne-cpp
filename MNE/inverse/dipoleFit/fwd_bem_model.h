@@ -171,7 +171,7 @@ public:
     * Return a pointer to a specific surface in a BEM
     */
     // Refactored: fwd_bem_find_surface (fwd_bem_model.c)
-    MneSurfaceOrVolume::MneCSurface* fwd_bem_find_surface(int kind);
+    MneSurfaceOld* fwd_bem_find_surface(int kind);
 
 
     static FwdBemModel* fwd_bem_load_surfaces(const QString& name,
@@ -209,10 +209,10 @@ public:
                                MneTriangle* to,	/* The destination triangle */
                                double omega[3]);
 
-    static void correct_auto_elements (MneSurfaceOrVolume::MneCSurface* surf,
+    static void correct_auto_elements (MneSurfaceOld* surf,
                                        float      **mat);
 
-    static float **fwd_bem_lin_pot_coeff (MneSurfaceOrVolume::MneCSurface* *surfs,int nsurf);
+    static float **fwd_bem_lin_pot_coeff (MneSurfaceOld* *surfs,int nsurf);
 
     static int fwd_bem_linear_collocation_solution(FwdBemModel* m);
 
@@ -241,7 +241,7 @@ public:
 
     static int fwd_bem_check_solids (float **angles,int ntri1,int ntri2, float desired);
 
-    static float **fwd_bem_solid_angles (MneSurfaceOrVolume::MneCSurface* *surfs, int nsurf);
+    static float **fwd_bem_solid_angles (MneSurfaceOld* *surfs, int nsurf);
 
     static int fwd_bem_constant_collocation_solution(FwdBemModel* m);
 
@@ -389,7 +389,7 @@ public:
 
 public:
     QString     surf_name;      /* Name of the file where surfaces were loaded from */
-    MneCSurface* *surfs;        /* The interface surfaces from outside towards inside */
+    MneSurfaceOld* *surfs;      /* The interface surfaces from outside towards inside */
     int        *ntri;           /* Number of triangles on each surface */
     int        *np;             /* Number of vertices on each surface */
     int        nsurf;           /* How many */
@@ -412,7 +412,7 @@ public:
 // ### OLD STRUCT ###
 //typedef struct {
 //    char       *surf_name;              /* Name of the file where surfaces were loaded from */
-//    INVERSELIB::MneCSurface* *surfs;    /* The interface surfaces from outside towards inside */
+//    INVERSELIB::MneSurfaceOld* *surfs;    /* The interface surfaces from outside towards inside */
 //    int        *ntri;                   /* Number of triangles on each surface */
 //    int        *np;                 /* Number of vertices on each surface */
 //    int        nsurf;               /* How many */

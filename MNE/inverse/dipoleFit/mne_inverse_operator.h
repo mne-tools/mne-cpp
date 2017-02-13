@@ -108,9 +108,9 @@ public:
     ~MneInverseOperator();
 
 public:
-    FIFFLIB::fiffId         meas_id;                            /* The assosiated measurement ID */
-    MneSurfaceOrVolume::MneCSourceSpace* *spaces;   /* The source spaces */
-    int            nspace;                      /* Number of source spaces */
+    FIFFLIB::fiffId meas_id;        /* The assosiated measurement ID */
+    MneSourceSpaceOld* *spaces;     /* The source spaces */
+    int            nspace;          /* Number of source spaces */
     FiffCoordTransOld* meg_head_t;  /* MEG device <-> head coordinate transformation */
     FiffCoordTransOld* mri_head_t;  /* MRI device <-> head coordinate transformation */
     int            methods;         /* EEG, MEG or EEG+MEG (see mne_fiff.h) */
@@ -138,7 +138,7 @@ public:
 // ### OLD STRUCT ###
 //typedef struct {                    /* An inverse operator */
 //    FIFFLIB::fiffId         meas_id;                            /* The assosiated measurement ID */
-//    INVERSELIB::MneSurfaceOrVolume::MneCSourceSpace* *spaces;   /* The source spaces */
+//    INVERSELIB::MneSourceSpaceOld* *spaces;   /* The source spaces */
 //    int            nspace;                      /* Number of source spaces */
 //    INVERSELIB::FiffCoordTransOld* meg_head_t;  /* MEG device <-> head coordinate transformation */
 //    INVERSELIB::FiffCoordTransOld* mri_head_t;  /* MRI device <-> head coordinate transformation */

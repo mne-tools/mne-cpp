@@ -41,6 +41,7 @@
 
 #include "mne_meas_data.h"
 #include "mne_meas_data_set.h"
+#include "mne_inverse_operator.h"
 
 #include "mne_types.h"
 
@@ -1826,7 +1827,7 @@ void MneMeasData::adjust_baselines(float bmin, float bmax)
 
 //*************************************************************************************************************
 
-MneMeasData *MneMeasData::mne_read_meas_data_add(const QString &name, int set, mneInverseOperator op, MneNamedMatrix *fwd, char **namesp, int nnamesp, MneMeasData *add_to)     /* Add to this */
+MneMeasData *MneMeasData::mne_read_meas_data_add(const QString &name, int set, MneInverseOperator* op, MneNamedMatrix *fwd, char **namesp, int nnamesp, MneMeasData *add_to)     /* Add to this */
 /*
           * Read an evoked-response data file
           */
@@ -2101,7 +2102,7 @@ out : {
 
 //*************************************************************************************************************
 
-MneMeasData *MneMeasData::mne_read_meas_data(const QString &name, int set, mneInverseOperator op, MneNamedMatrix *fwd, char **namesp, int nnamesp)
+MneMeasData *MneMeasData::mne_read_meas_data(const QString &name, int set, MneInverseOperator* op, MneNamedMatrix *fwd, char **namesp, int nnamesp)
 
 {
     return mne_read_meas_data_add(name,set,op,fwd,namesp,nnamesp,NULL);
