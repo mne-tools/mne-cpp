@@ -56,6 +56,7 @@
 #include <math.h>
 
 #include <Eigen/Dense>
+#include <Eigen/Sparse>
 
 
 //ToDo don't use access and unlink -> use QT stuff instead
@@ -1839,13 +1840,15 @@ int MneSurfaceOrVolume::mne_read_source_spaces(const QString &name, MneSourceSpa
             printf("No points in this source space");
             goto bad;
         }
-        if (!node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_POINTS, t_pTag))
+        if (!node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_POINTS, t_pTag)) {
             goto bad;
+        }
         MatrixXf tmp_rr = t_pTag->toFloatMatrix().transpose();
         new_space->rr = ALLOC_CMATRIX_17(tmp_rr.rows(),tmp_rr.cols());
         fromFloatEigenMatrix_17(tmp_rr,new_space->rr);
-        if (!node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_NORMALS, t_pTag))
+        if (!node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_NORMALS, t_pTag)) {
             goto bad;
+        }
         MatrixXf tmp_nn = t_pTag->toFloatMatrix().transpose();
         new_space->nn = ALLOC_CMATRIX_17(tmp_nn.rows(),tmp_nn.cols());
         fromFloatEigenMatrix_17(tmp_nn,new_space->nn);
@@ -1875,8 +1878,9 @@ int MneSurfaceOrVolume::mne_read_source_spaces(const QString &name, MneSourceSpa
             int **itris = NULL;
 
             if (!node->find_tag(stream, FIFF_BEM_SURF_TRIANGLES, t_pTag)) {
-                if (node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_TRIANGLES, t_pTag))
+                if (!node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_TRIANGLES, t_pTag)) {
                     goto bad;
+                }
             }
 
             MatrixXi tmp_itris = t_pTag->toIntMatrix().transpose();
@@ -1946,8 +1950,9 @@ int MneSurfaceOrVolume::mne_read_source_spaces(const QString &name, MneSourceSpa
             if (ntri > 0) {
                 int **itris = NULL;
 
-                if (!node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_USE_TRIANGLES, t_pTag))
+                if (!node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_USE_TRIANGLES, t_pTag)) {
                     goto bad;
+                }
 
                 MatrixXi tmp_itris = t_pTag->toIntMatrix().transpose();
                 itris = (int **)malloc(tmp_itris.rows() * sizeof(int *));
@@ -1967,32 +1972,37 @@ int MneSurfaceOrVolume::mne_read_source_spaces(const QString &name, MneSourceSpa
                 */
             if (node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_NEAREST, t_pTag)) {
                 nearest  = t_pTag->toInt();
+                new_space->nearest = MALLOC_17(new_space->np,MneNearest);
+                for (k = 0; k < new_space->np; k++) {
+                    new_space->nearest[k].vert = k;
+                    new_space->nearest[k].nearest = nearest[k];
+                    new_space->nearest[k].patch = NULL;
+                }
+
                 if (!node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_NEAREST_DIST, t_pTag)) {
                     goto bad;
                 }
                 qDebug() << "ToDo: Check whether nearest_dist contains the right stuff!!! - use VectorXf instead";
                 nearest_dist = t_pTag->toFloat();
-                new_space->nearest = MALLOC_17(new_space->np,MneNearest);
                 for (k = 0; k < new_space->np; k++) {
-                    new_space->nearest[k].vert = k;
-                    new_space->nearest[k].nearest = nearest[k];
                     new_space->nearest[k].dist = nearest_dist[k];
-                    new_space->nearest[k].patch = NULL;
                 }
-                FREE_17(nearest); nearest = NULL;
-                FREE_17(nearest_dist); nearest_dist = NULL;
+//                FREE_17(nearest); nearest = NULL;
+//                FREE_17(nearest_dist); nearest_dist = NULL;
             }
             /*
                 * We may have the distance matrix
                 */
             if (node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_DIST_LIMIT, t_pTag)) {
-                new_space->dist_limit = *t_pTag->toInt();
+                new_space->dist_limit = *t_pTag->toFloat();
                 if (node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_DIST, t_pTag)) {
+//                    SparseMatrix<double> tmpSparse = t_pTag->toSparseFloatMatrix();
                     INVERSELIB::FiffSparseMatrix* dist = INVERSELIB::FiffSparseMatrix::fiff_get_float_sparse_matrix(t_pTag);
                     new_space->dist = dist->mne_add_upper_triangle_rcs();
                     delete dist;
-                    if (!new_space->dist)
+                    if (!new_space->dist) {
                         goto bad;
+                    }
                 }
                 else
                     new_space->dist_limit = 0.0;
