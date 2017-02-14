@@ -1991,8 +1991,8 @@ int MneSurfaceOrVolume::mne_read_source_spaces(const QString &name, MneSourceSpa
 //                FREE_17(nearest_dist); nearest_dist = NULL;
             }
             /*
-                * We may have the distance matrix
-                */
+            * We may have the distance matrix
+            */
             if (node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_DIST_LIMIT, t_pTag)) {
                 new_space->dist_limit = *t_pTag->toFloat();
                 if (node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_DIST, t_pTag)) {

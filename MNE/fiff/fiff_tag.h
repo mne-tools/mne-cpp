@@ -93,6 +93,8 @@
 #include "fiff_tag.h"
 #include "fiff_dig_point.h"
 
+#include <iostream>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -142,11 +144,17 @@ using namespace Eigen;
 //
 //   The magic hexadecimal values
 //
-const fiff_int_t IS_MATRIX           = 4294901760; /**< Is Matrix encoding. ffff0000 */
-const fiff_int_t MATRIX_CODING_DENSE = 16384;      /**< MATRIX_CODING_DENSE encoding. 4000 */
-const fiff_int_t MATRIX_CODING_CCS   = 16400;      /**< MATRIX_CODING_CCS encoding. 4010 */
-const fiff_int_t MATRIX_CODING_RCS   = 16416;      /**< MATRIX_CODING_RCS encoding. 4020 */
-const fiff_int_t DATA_TYPE           = 65535;      /**< DATA_TYPE encoding. ffff */
+#define IS_MATRIX               0xFFFF0000          /**< Is Matrix encoding. ffff0000 */
+#define MATRIX_CODING_DENSE     0x00004000          /**< MATRIX_CODING_DENSE encoding. 4000 */
+#define MATRIX_CODING_CCS       0x00004010          /**< MATRIX_CODING_CCS encoding. 4010 */
+#define MATRIX_CODING_RCS       0x00004020          /**< MATRIX_CODING_RCS encoding. 4020 */
+#define DATA_TYPE               0x0000FFFF          /**< DATA_TYPE encoding 0000ffff */
+
+//const fiff_int_t IS_MATRIX           = 4294901760; /**< Is Matrix encoding. ffff0000 */
+//const fiff_int_t MATRIX_CODING_DENSE = 16384;       /**< MATRIX_CODING_DENSE encoding. 4000 */
+//const fiff_int_t MATRIX_CODING_CCS   = 16400;       /**< MATRIX_CODING_CCS encoding. 4010 */
+//const fiff_int_t MATRIX_CODING_RCS   = 16416;       /**< MATRIX_CODING_RCS encoding. 4020 */
+//const fiff_int_t DATA_TYPE           = 65535;       /**< DATA_TYPE encoding. ffff */
 
 //=============================================================================================================
 /**
@@ -1102,10 +1110,9 @@ inline MatrixXf FiffTag::toFloatMatrix() const
 
 //*************************************************************************************************************
 
+
 inline SparseMatrix<double> FiffTag::toSparseFloatMatrix() const
 {
-    qDebug() << "!!! inline SparseMatrix<double> FiffTag::toSparseFloatMatrix() const - needs to be debugged";
-
     if(!this->isMatrix() || this->getType() != FIFFT_FLOAT || this->data() == NULL)
         return SparseMatrix<double>();//NULL;
 
@@ -1143,8 +1150,6 @@ inline SparseMatrix<double> FiffTag::toSparseFloatMatrix() const
         //    CCS
         //
         qWarning("Warning in FiffTag::toSparseFloatMatrix(): CCS has to be debugged - never done before.");
-//        for(qint32 i = 0; i < nnz; ++i)
-//            tripletList.push_back(T(t_pInt[offset1+i], 0, (double)(t_pFloat[i])));
         qint32 p = 0;
         for(qint32 j = 0; j < ncol; ++j)
         {
@@ -1161,8 +1166,6 @@ inline SparseMatrix<double> FiffTag::toSparseFloatMatrix() const
         //
         //    RCS
         //
-//        for(qint32 i = 0; i < nnz; ++i)
-//            tripletList.push_back(T(0, t_pInt[offset1+i], (double)(t_pFloat[i])));
         qint32 p = 0;
         for(qint32 j = 0; j < nrow; ++j)
         {
@@ -1180,11 +1183,8 @@ inline SparseMatrix<double> FiffTag::toSparseFloatMatrix() const
 //    for(qint32 i = 0; i < 10; ++i)
 //        std::cout << std::endl << tripletList[offsetTest + i].row() << " " << tripletList[offsetTest + i].col() << " " << tripletList[offsetTest + i].value();
 
-
     SparseMatrix<double> p_Matrix(nrow, ncol);
     p_Matrix.setFromTriplets(tripletList.begin(), tripletList.end());
-
-    p_Matrix.insert(nrow-1, ncol-1) = 0.0;
 
     return p_Matrix;
 }
