@@ -293,8 +293,8 @@ FiffSparseMatrix *FiffSparseMatrix::fiff_get_float_sparse_matrix(FiffTag::SPtr &
     res->m      = m;
     res->n      = n;
     res->nz     = nz;
-    qDebug() << "ToDo: Check if data are correctly set!" << tag->size() << sizeof(fiff_float_t) << tag->size()/sizeof(fiff_float_t);
-    res->data   = tag->toFloat();
+    res->data   = MALLOC_18(correct_size,float);
+    memcpy (res->data,(float*)tag->data(),correct_size*sizeof(float));
     res->coding = coding;
     res->inds   = (int *)(res->data + res->nz);
     res->ptrs   = res->inds + res->nz;
