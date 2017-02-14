@@ -1104,6 +1104,8 @@ inline MatrixXf FiffTag::toFloatMatrix() const
 
 inline SparseMatrix<double> FiffTag::toSparseFloatMatrix() const
 {
+    qDebug() << "!!! inline SparseMatrix<double> FiffTag::toSparseFloatMatrix() const - needs to be debugged";
+
     if(!this->isMatrix() || this->getType() != FIFFT_FLOAT || this->data() == NULL)
         return SparseMatrix<double>();//NULL;
 
