@@ -264,7 +264,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data, MatrixXd& times, fiff_int_t f
         //
         if (thisRawDir.last > from)
         {
-            if (thisRawDir.ent.kind == -1)
+            if (thisRawDir.ent->kind == -1)
             {
                 //
                 //  Take the easy route: skip is translated to zeros
@@ -281,7 +281,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data, MatrixXd& times, fiff_int_t f
             else
             {
                 FiffTag::SPtr t_pTag;
-                FiffTag::read_tag(fid.data(), t_pTag, thisRawDir.ent.pos);
+                FiffTag::read_tag(fid, t_pTag, thisRawDir.ent->pos);
                 //
                 //   Depending on the state of the projection and selection
                 //   we proceed a little bit differently
@@ -581,7 +581,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data, MatrixXd& times, SparseMatrix
         //
         if (thisRawDir.last > from)
         {
-            if (thisRawDir.ent.kind == -1)
+            if (thisRawDir.ent->kind == -1)
             {
                 //
                 //  Take the easy route: skip is translated to zeros
@@ -598,7 +598,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data, MatrixXd& times, SparseMatrix
             else
             {
                 FiffTag::SPtr t_pTag;
-                FiffTag::read_tag(fid.data(), t_pTag, thisRawDir.ent.pos);
+                FiffTag::read_tag(fid, t_pTag, thisRawDir.ent->pos);
                 //
                 //   Depending on the state of the projection and selection
                 //   we proceed a little bit differently

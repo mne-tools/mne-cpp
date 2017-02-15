@@ -42,18 +42,18 @@
 #include <inverse/dipoleFit/dipole_fit_settings.h>
 #include <inverse/dipoleFit/dipole_fit.h>
 
-//#include <mne/mne_bem.h>
+#include <mne/mne_bem.h>
 
-//#include <disp3D/view3D.h>
-//#include <disp3D/control/control3dwidget.h>
-//#include <disp3D/model/items/sourceactivity/ecddatatreeitem.h>
-//#include <disp3D/model/data3Dtreemodel.h>
+#include <disp3D/view3D.h>
+#include <disp3D/control/control3dwidget.h>
+#include <disp3D/model/items/sourceactivity/ecddatatreeitem.h>
+#include <disp3D/model/data3Dtreemodel.h>
 
-//#include <fs/label.h>
-//#include <fs/surfaceset.h>
-//#include <fs/annotationset.h>
+#include <fs/label.h>
+#include <fs/surfaceset.h>
+#include <fs/annotationset.h>
 
-//#include <iostream>
+#include <iostream>
 
 
 //*************************************************************************************************************
@@ -70,9 +70,9 @@
 //=============================================================================================================
 
 using namespace INVERSELIB;
-//using namespace DISP3DLIB;
-//using namespace FSLIB;
-//using namespace MNELIB;
+using namespace DISP3DLIB;
+using namespace FSLIB;
+using namespace MNELIB;
 
 
 //*************************************************************************************************************
@@ -97,6 +97,23 @@ int main(int argc, char *argv[])
     DipoleFit dipFit(&settings);
     ECDSet set = dipFit.calculateFit();
 
+    /*
+    * Saving...
+    */
+    if (!set.save_dipoles_dip(settings.dipname))
+        printf("Dipoles could not be safed to %s.",settings.dipname.toLatin1().data());
+    if (!set.save_dipoles_bdip(settings.bdipname))
+        printf("Dipoles could not be safed to %s.",settings.bdipname.toLatin1().data());
+
+    /*
+    * Test - Reading again
+    */
+    ECDSet::read_dipoles_dip(settings.dipname);
+
+
+//    //=========================================================================================================
+//    // Visualization Part
+//    //=========================================================================================================
 //    /*
 //    * Perform Head->MRI coord. transformation
 //    */
@@ -158,19 +175,6 @@ int main(int argc, char *argv[])
 //    Control3DWidget::SPtr control3DWidget = Control3DWidget::SPtr(new Control3DWidget());
 //    control3DWidget->init(p3DDataModel, testWindow);
 //    control3DWidget->show();
-
-    /*
-    * Saving...
-    */
-    if (!set.save_dipoles_dip(settings.dipname))
-        printf("Dipoles could not be safed to %s.",settings.dipname.toLatin1().data());
-    if (!set.save_dipoles_bdip(settings.bdipname))
-        printf("Dipoles could not be safed to %s.",settings.bdipname.toLatin1().data());
-
-    /*
-    * Reading again - Test
-    */
-    ECDSet::read_dipoles_dip(settings.dipname);
 
     return app.exec();
 }
