@@ -164,9 +164,9 @@ bool FiffCoordTrans::read(QIODevice& p_IODevice, FiffCoordTrans& p_Trans)
     //
     for ( qint32 k = 0; k < t_pStream->dir().size(); ++k )
     {
-        if ( t_pStream->dir()[k].kind == FIFF_COORD_TRANS )
+        if ( t_pStream->dir()[k]->kind == FIFF_COORD_TRANS )
         {
-            FiffTag::read_tag(t_pStream.data(),t_pTag,t_pStream->dir()[k].pos);
+            FiffTag::read_tag(t_pStream,t_pTag,t_pStream->dir()[k]->pos);
             p_Trans = t_pTag->toCoordTrans();
             success = true;
         }
