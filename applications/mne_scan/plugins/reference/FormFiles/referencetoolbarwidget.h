@@ -1,15 +1,14 @@
 //=============================================================================================================
 /**
-* @file     rerefsetupwidget.cpp
-* @author   Viktor Klüber <viktor.klueber@tu-ilmenau.de>;
-*           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+* @file     reference.h
+* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2017
+* @date     January, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2017, Viktor Klüber, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,16 +29,23 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the ReRefSetupWidget class.
+* @brief    Contains the declaration of the DummyYourWidget class.
 *
 */
+
+#ifndef REFERENCETOOLBARWIDGET_H
+#define REFERENCETOOLBARWIDGET_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "rerefsetupwidget.h"
+#include "reference_global.h"
+#include "../reference.h"
+#include "../ui_referencetoolbar.h"
+
+#include <fiff/fiff_info.h>
 
 
 //*************************************************************************************************************
@@ -47,43 +53,65 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QDebug>
+#include <QWidget>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// DEFINE NAMESPACE REFERENCEPLUGIN
 //=============================================================================================================
 
-using namespace REREFPLUGIN;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE MEMBER METHODS
-//=============================================================================================================
-
-ReRefSetupWidget::ReRefSetupWidget(ReRef* toolbox, QWidget *parent)
-: QWidget(parent)
-, m_pReRef(toolbox)
+namespace REFERENCEPLUGIN
 {
-    ui.setupUi(this);
-
-    connect(ui.m_qPushButton_About, SIGNAL(released()), this, SLOT(showAboutDialog()));
-}
 
 
 //*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
 
-ReRefSetupWidget::~ReRefSetupWidget()
+class Reference;
+
+//=============================================================================================================
+/**
+* DECLARE CLASS ReferenceToolbarWidget
+*
+* @brief The ReferenceToolbarWidget class provides a dummy toolbar widget structure.
+*/
+
+class REFERENCESHARED_EXPORT ReferenceToolbarWidget : public QWidget
 {
-}
+    Q_OBJECT
 
+public:
+    typedef QSharedPointer<ReferenceToolbarWidget> SPtr;         /**< Shared pointer type for DummyYourWidget. */
+    typedef QSharedPointer<ReferenceToolbarWidget> ConstSPtr;    /**< Const shared pointer type for DummyYourWidget. */
 
-//*************************************************************************************************************
+    //=========================================================================================================
+    /**
+    * Constructs a ReferenceToolbarWidget.
+    */
+    explicit ReferenceToolbarWidget(REFERENCEPLUGIN::Reference *pRef, QWidget *parent = 0);
 
-void ReRefSetupWidget::showAboutDialog()
-{
-    ReRefAboutWidget aboutDialog(this);
-    aboutDialog.exec();
-}
+    //=========================================================================================================
+    /**
+    * Destroys the ReferenceToolbarWidget.
+    */
+    ~ReferenceToolbarWidget();
+
+public slots:
+    //=========================================================================================================
+    /**
+    * updates the channels and sets them to the QListWidget
+    */
+    void updateChannels(FIFFLIB::FiffInfo::SPtr &pFiffInfo);
+
+private:
+    Ui::ReferenceToolbarWidget*         ui;         /**< The UI class specified in the designer. */
+
+    QSharedPointer<Reference>           m_pRef;     /**< pointer to the Reference object */
+};
+
+} //REFERENCEPLUGIN
+
+#endif // REFERENCETOOLBARWIDGET_H

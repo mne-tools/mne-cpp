@@ -1,15 +1,14 @@
 //=============================================================================================================
 /**
-* @file     reref.cpp
-* @author   Viktor Klüber <viktor.klueber@tu-ilmenau.de>
-*           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+* @file     reference.cpp
+* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2017
+* @date     February, 2013
 *
 * @section  LICENSE
 *
-* Copyright (C) 2017, Viktor Klüber, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the reref class.
+* @brief    Contains the implementation of the Reference class.
 *
 */
 
@@ -39,7 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "reref.h"
+#include "reference.h"
 
 
 //*************************************************************************************************************
@@ -47,13 +46,11 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace REREFPLUGIN;
+using namespace REFERENCEPLUGIN;
 using namespace SCSHAREDLIB;
 using namespace SCMEASLIB;
 using namespace UTILSLIB;
 using namespace IOBUFFER;
-using namespace std;
-using namespace Eigen;
 
 
 //*************************************************************************************************************
@@ -61,70 +58,71 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ReRef::ReRef()
+Reference::Reference()
 : m_bIsRunning(false)
-, m_pRTMSA(NewRealTimeMultiSampleArray::SPtr(new NewRealTimeMultiSampleArray()))
-, m_bDisp(true)
-, m_pReRefOption(QSharedPointer<ReRefOption>(new ReRefOption(this)))
+, m_pRefInput(NULL)
+, m_pRefOutput(NULL)
+, m_pRefBuffer(CircularMatrixBuffer<double>::SPtr())
 {
-    // Create ReRefOption action bar item/button
-    m_pActionReRefOption = new QAction(QIcon(":/images/options.png"),tr("Re-reference EEG option"),this);
-    m_pActionReRefOption->setStatusTip(tr("Re-reference EEG option"));
-    connect(m_pActionReRefOption, &QAction::triggered, this, &ReRef::showReRefOption);
-    addPluginAction(m_pActionReRefOption);
-
+    //Add action which will be visible in the plugin's toolbar
+    m_pActionRefToolbarWidget = new QAction(QIcon(":/images/options.png"), tr("Reference Toolbar"),this);
+    m_pActionRefToolbarWidget->setShortcut(tr("F12"));
+    m_pActionRefToolbarWidget->setStatusTip(tr("Reference Toolbar"));
+    connect(m_pActionRefToolbarWidget, &QAction::triggered,
+            this, &Reference::showRefToolbarWidget);
+    addPluginAction(m_pActionRefToolbarWidget);
 }
 
 
 //*************************************************************************************************************
 
-ReRef::~ReRef()
+Reference::~Reference()
 {
-    if(this->isRunning()) {
+    if(this->isRunning())
         stop();
-    }
 }
 
 
 //*************************************************************************************************************
 
-QSharedPointer<IPlugin> ReRef::clone() const
+QSharedPointer<IPlugin> Reference::clone() const
 {
-    QSharedPointer<ReRef> pReRefClone(new ReRef);
-    return pReRefClone;
+    QSharedPointer<Reference> pRefClone(new Reference);
+    return pRefClone;
 }
 
 
 //*************************************************************************************************************
 
-void ReRef::init()
+void Reference::init()
 {
     // Input
-    m_pReRefInput = PluginInputData<NewRealTimeMultiSampleArray>::create(this, "ReRefIn", "ReRef input data");
-    connect(m_pReRefInput.data(), &PluginInputConnector::notify,
-            this, &ReRef::update, Qt::DirectConnection);
-    m_inputConnectors.append(m_pReRefInput);
+    m_pRefInput = PluginInputData<NewRealTimeMultiSampleArray>::create(this, "ReferenceIn", "Reference input data");
+    connect(m_pRefInput.data(), &PluginInputConnector::notify, this, &Reference::update, Qt::DirectConnection);
+    m_inputConnectors.append(m_pRefInput);
 
     // Output - Uncomment this if you don't want to send processed data (in form of a matrix) to other plugins.
-    m_pReRefOutput = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "ReRefOut", "ReRef output data");
-    m_outputConnectors.append(m_pReRefOutput);
+    // Also, this output stream will generate an online display in your plugin
+    m_pRefOutput = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "ReferenceOut", "Reference output data");
+    m_outputConnectors.append(m_pRefOutput);
 
     //Delete Buffer - will be initailzed with first incoming data
-    if(!m_pReRefBuffer.isNull())
-        m_pReRefBuffer = CircularMatrixBuffer<double>::SPtr();
+    if(!m_pRefBuffer.isNull())
+        m_pRefBuffer = CircularMatrixBuffer<double>::SPtr();
 }
 
 
 //*************************************************************************************************************
 
-void ReRef::unload()
+void Reference::unload()
 {
+
 }
 
 
 //*************************************************************************************************************
 
-bool ReRef::start()
+bool Reference::start()
 {
     //Check if the thread is already or still running. This can happen if the start button is pressed immediately after the stop button was pressed. In this case the stopping process is not finished yet but the start process is initiated.
     if(this->isRunning())
@@ -141,12 +139,14 @@ bool ReRef::start()
 
 //*************************************************************************************************************
 
-bool ReRef::stop()
+bool Reference::stop()
 {
     m_bIsRunning = false;
 
-    m_pReRefBuffer->releaseFromPop();
-    m_pReRefBuffer->clear();
+    m_pRefBuffer->releaseFromPop();
+    m_pRefBuffer->releaseFromPush();
+
+    m_pRefBuffer->clear();
 
     return true;
 }
@@ -154,7 +154,7 @@ bool ReRef::stop()
 
 //*************************************************************************************************************
 
-IPlugin::PluginType ReRef::getType() const
+IPlugin::PluginType Reference::getType() const
 {
     return _IAlgorithm;
 }
@@ -162,93 +162,68 @@ IPlugin::PluginType ReRef::getType() const
 
 //*************************************************************************************************************
 
-QString ReRef::getName() const
+QString Reference::getName() const
 {
-    return "Re-reference EEG";
+    return "EEG Reference";
 }
 
 
 //*************************************************************************************************************
 
-QWidget* ReRef::setupWidget()
+QWidget* Reference::setupWidget()
 {
-    //widget is later distroyed by CentralWidget - so it has to be created everytime new
-    ReRefSetupWidget* setupWidget = new ReRefSetupWidget(this);
+    ReferenceSetupWidget* setupWidget = new ReferenceSetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
     return setupWidget;
 }
 
 
 //*************************************************************************************************************
 
-void ReRef::showReRefOption()
+void Reference::update(SCMEASLIB::NewMeasurement::SPtr pMeasurement)
 {
-    if(!m_pReRefOption->isVisible()){
-        m_pReRefOption->setWindowTitle("Re-reference - Options");
-        m_pReRefOption->show();
-        m_pReRefOption->raise();
-    }
+    QSharedPointer<NewRealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<NewRealTimeMultiSampleArray>();
 
-    //sets Window to the foreground and activates it for editing
-    m_pReRefOption->activateWindow();
-}
-
-
-//*************************************************************************************************************
-
-void ReRef::update(SCMEASLIB::NewMeasurement::SPtr pMeasurement)
-{
-//    QSharedPointer<NewRealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<NewRealTimeMultiSampleArray>();
-
-    m_pRTMSA = pMeasurement.dynamicCast<NewRealTimeMultiSampleArray>();
-
-    if(m_pRTMSA) {
+    if(pRTMSA) {
         //Check if buffer initialized
-        if(!m_pReRefBuffer) {
-            m_pReRefBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, m_pRTMSA->getNumChannels(), m_pRTMSA->getMultiSampleArray()[0].cols()));
+        if(!m_pRefBuffer) {
+            m_pRefBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, pRTMSA->getNumChannels(), pRTMSA->getMultiSampleArray()[0].cols()));
         }
 
         //Fiff information
         if(!m_pFiffInfo) {
-            m_pFiffInfo = m_pRTMSA->info();
+            m_pFiffInfo = pRTMSA->info();
 
-            //Init output - Unocmment this if you also uncommented the m_pReRefOutput in the constructor above
-            m_pReRefOutput->data()->initFromFiffInfo(m_pFiffInfo);
-            m_pReRefOutput->data()->setMultiArraySize(1);
-            m_pReRefOutput->data()->setVisibility(true);
-
-            //update ReRefOption widget
-            if(m_pReRefOption != NULL){
-                m_pReRefOption->updateChannels(m_pFiffInfo);
-            }
+            //Init output - Unocmment this if you also uncommented the m_pRefOutput in the constructor above
+            m_pRefOutput->data()->initFromFiffInfo(m_pFiffInfo);
+            m_pRefOutput->data()->setMultiArraySize(1);
+            m_pRefOutput->data()->setVisibility(true);
         }
 
         MatrixXd t_mat;
 
-        for(unsigned char i = 0; i < m_pRTMSA->getMultiArraySize(); ++i) {
-            t_mat = m_pRTMSA->getMultiSampleArray()[i];
-            m_pReRefBuffer->push(&t_mat);
+        for(unsigned char i = 0; i < pRTMSA->getMultiArraySize(); ++i) {
+            t_mat = pRTMSA->getMultiSampleArray()[i];
+            m_pRefBuffer->push(&t_mat);
         }
     }
 }
 
 
+
 //*************************************************************************************************************
 
-void ReRef::run()
+void Reference::run()
 {
     //
     // Wait for Fiff Info
     //
-    while(!m_pFiffInfo) {
+    while(!m_pFiffInfo)
         msleep(10);// Wait for fiff Info
-    }
 
     while(m_bIsRunning)
     {
         //Dispatch the inputs
-        MatrixXd t_mat = m_pReRefBuffer->pop();
-
-        m_mutex.lock();
+        MatrixXd t_mat = m_pRefBuffer->pop();
 
         // apply common average reference
         MatrixXd matCAR = EEGRef::applyCAR(t_mat, m_pFiffInfo);
@@ -262,9 +237,16 @@ void ReRef::run()
 //            m_bDisp = false;
 //        }
 
-        m_mutex.unlock();
-
         //Send the data to the connected plugins and the online display
-        m_pReRefOutput->data()->setValue(matCAR);
+        m_pRefOutput->data()->setValue(matCAR);
     }
+}
+
+
+//*************************************************************************************************************
+
+void Reference::showRefToolbarWidget()
+{
+    m_pRefToolbarWidget = ReferenceToolbarWidget::SPtr(new ReferenceToolbarWidget(this));
+    m_pRefToolbarWidget->show();
 }

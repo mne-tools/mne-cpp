@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     rerefoption.cpp
-* @author   Viktor Klüber <viktor.klueber@tu-ilmenau.de>;
+* @file     referencetoolbarwidget.cpp
+* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2017
+* @date     February, 2013
 *
 * @section  LICENSE
 *
-* Copyright (C) 2017, Viktor Klüber and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,35 +29,16 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    ReRefOption class definition.
+* @brief    Contains the implementation of the ReferenceToolbarWidget class.
 *
 */
 
-
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "rerefoption.h"
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// INCLUDES
-//=============================================================================================================
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Eigen INCLUDES
-//=============================================================================================================
+#include "referencetoolbarwidget.h"
 
 
 //*************************************************************************************************************
@@ -65,13 +46,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace REREFPLUGIN;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE GLOBAL METHODS
-//=============================================================================================================
+using namespace REFERENCEPLUGIN;
 
 
 //*************************************************************************************************************
@@ -79,10 +54,9 @@ using namespace REREFPLUGIN;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ReRefOption::ReRefOption(ReRef *pReRef, QWidget *parent)
-: QWidget(parent)
-, ui(new Ui::ReRefOptionWidget)
-, m_pReRef(QSharedPointer<ReRef>(pReRef))
+ReferenceToolbarWidget::ReferenceToolbarWidget(REFERENCEPLUGIN::Reference *pRef, QWidget *parent)
+: ui(new Ui::ReferenceToolbarWidget)
+, m_pRef(QSharedPointer<Reference>(pRef))
 {
     ui->setupUi(this);
 }
@@ -90,7 +64,15 @@ ReRefOption::ReRefOption(ReRef *pReRef, QWidget *parent)
 
 //*************************************************************************************************************
 
-void ReRefOption::updateChannels(FIFFLIB::FiffInfo::SPtr &pFiffInfo)
+ReferenceToolbarWidget::~ReferenceToolbarWidget()
+{
+    delete ui;
+}
+
+
+//*************************************************************************************************************
+
+void ReferenceToolbarWidget::updateChannels(FIFFLIB::FiffInfo::SPtr &pFiffInfo)
 {
     ui->m_listWidget_ChannelList->clear();
 

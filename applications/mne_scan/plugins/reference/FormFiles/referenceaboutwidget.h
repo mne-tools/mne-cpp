@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     rerefoption.h
-* @author   Viktor Klüber <viktor.klueber@tu-ilmenau.de>;
+* @file     referenceaboutwidget.h
+* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2017
+* @date     February, 2013
 *
 * @section  LICENSE
 *
-* Copyright (C) 2017, Viktor Klüber and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     ReRefOption class declaration.
+* @brief    Contains the declaration of the ReferenceAboutWidget class.
 *
 */
 
-#ifndef REREFOPTION_REREFOPTION_H
-#define REREFOPTION_REREFOPTION_H
+#ifndef REFERENCEABOUTWIDGET_H
+#define REFERENCEABOUTWIDGET_H
 
 
 //*************************************************************************************************************
@@ -42,9 +42,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_rerefoption.h"
-#include "reref.h"
-#include <fiff/fiff_info.h>
+#include "reference_global.h"
+#include "../ui_referenceabout.h"
 
 
 //*************************************************************************************************************
@@ -52,83 +51,51 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QSharedPointer>
-#include <QWidget>
+#include <QtWidgets>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Eigen INCLUDES
+// DEFINE NAMESPACE REFERENCEPLUGIN
 //=============================================================================================================
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE REREFOPTION
-//=============================================================================================================
-
-namespace REREFPLUGIN{
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// REREFOPTION FORWARD DECLARATIONS
-//=============================================================================================================
-
-class ReRef;
+namespace REFERENCEPLUGIN
+{
 
 
 //=============================================================================================================
 /**
-* The ReRefOption class provides several feature configurations possibilities for the ReRef project.
+* DECLARE CLASS ReferenceAboutWidget
 *
-* @brief Brief description of this class.
+* @brief The ReferenceAboutWidget class provides the about dialog for the Reference class.
 */
-
-class ReRefOption : public QWidget
+class REFERENCESHARED_EXPORT ReferenceAboutWidget : public QDialog
 {
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<ReRefOption> SPtr;            /**< Shared pointer type for ReRefOption. */
-    typedef QSharedPointer<const ReRefOption> ConstSPtr; /**< Const shared pointer type for ReRefOption. */
 
     //=========================================================================================================
     /**
-    * Constructs a ReRefOption object.
+    * Constructs a ReferenceAboutWidget dialog which is a child of parent.
+    *
+    * @param [in] parent pointer to parent widget; If parent is 0, the new ReferenceAboutWidget becomes a window. If parent is another widget, ReferenceAboutWidget becomes a child window inside parent. ReferenceAboutWidget is deleted when its parent is deleted.
     */
-    explicit ReRefOption(ReRef *pReRef, QWidget *parent = 0);
+    ReferenceAboutWidget(QWidget *parent = 0);
 
-public slots:
     //=========================================================================================================
     /**
-    * updates the channels and sets them to the QListWidget
+    * Destroys the ReferenceAboutWidget.
+    * All ReferenceAboutWidget's children are deleted first. The application exits if ReferenceAboutWidget is the main widget.
     */
-    void updateChannels(FIFFLIB::FiffInfo::SPtr &pFiffInfo);
+    ~ReferenceAboutWidget();
 
 private:
 
-    Ui::ReRefOptionWidget          *ui;     /**< Holds the user interface for the ReRefSetupWidget.*/
-
-    QSharedPointer<ReRef>           m_pReRef;       /**< pointer to the upper ReRef class. */
-
+    Ui::ReferenceAboutWidget ui;		/**< Holds the user interface for the ReferenceAboutWidget.*/
 
 };
 
+} // NAMESPACE
 
-//*************************************************************************************************************
-//=============================================================================================================
-// INLINE DEFINITIONS
-//=============================================================================================================
-
-
-} // namespace REREFOPTION
-
-#endif // REREFOPTION_REREFOPTION_H
+#endif // REFERENCEABOUTWIDGET_H

@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     reref_global.h
-* @author   Viktor Klüber <viktor.klueber@tu-ilmenau.de>;
+* @file     referencesetupwidget.cpp
+* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     January, 2017
+* @date     February, 2013
 *
 * @section  LICENSE
 *
-* Copyright (C) 2017, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,12 +29,16 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the reref library export/import macros.
+* @brief    Contains the implementation of the ECGSetupWidget class.
 *
 */
 
-#ifndef REREF_GLOBAL_H
-#define REREF_GLOBAL_H
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "referencesetupwidget.h"
 
 
 //*************************************************************************************************************
@@ -42,18 +46,45 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtCore/qglobal.h>
+#include <QDebug>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// PREPROCESSOR DEFINES
+// USED NAMESPACES
 //=============================================================================================================
 
-#if defined(REREF_LIBRARY)
-#  define REREFSHARED_EXPORT Q_DECL_EXPORT   /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
-#else
-#  define REREFSHARED_EXPORT Q_DECL_IMPORT   /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
-#endif
+using namespace REFERENCEPLUGIN;
 
-#endif // REREF_GLOBAL_H
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+ReferenceSetupWidget::ReferenceSetupWidget(Reference* pRef, QWidget *parent)
+: QWidget(parent)
+, m_pRef(pRef)
+{
+    ui.setupUi(this);
+
+    //Always connect GUI elemts after ui.setpUi has been called
+    connect(ui.m_qPushButton_About, SIGNAL(released()), this, SLOT(showAboutDialog()));
+}
+
+
+//*************************************************************************************************************
+
+ReferenceSetupWidget::~ReferenceSetupWidget()
+{
+
+}
+
+
+//*************************************************************************************************************
+
+void ReferenceSetupWidget::showAboutDialog()
+{
+    ReferenceAboutWidget aboutDialog(this);
+    aboutDialog.exec();
+}
