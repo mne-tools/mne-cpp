@@ -10,6 +10,8 @@
 
 #include "fwd_coil_set.h"
 
+#include "mne_ctf_comp_data_set.h"
+
 
 typedef void (*fwdUserFreeFunc)(void *);  /* General purpose */
 
@@ -56,14 +58,14 @@ typedef struct {
   float      *v0;		/* Space for the infinite-medium potentials */
   int        nsol;		/* Size of the solution matrix */
 
-  FIFFLIB::fiffCoordTrans head_mri_t;	/* Coordinate transformation from head to MRI coordinates */
+  INVERSELIB::FiffCoordTransOld* head_mri_t;	/* Coordinate transformation from head to MRI coordinates */
 
   float      ip_approach_limit;	/* Controls whether we need to use the isolated problem approach */
   int        use_ip_approach;	/* Do we need it */
 } *fwdBemModel,fwdBemModelRec;	/* Holds the BEM model definition */
 
 typedef struct {
-  mneCTFcompDataSet set;	         /* The compensation data set */
+  INVERSELIB::MneCTFCompDataSet* set;	         /* The compensation data set */
   INVERSELIB::FwdCoilSet*        comp_coils;	         /* The compensation coil definitions */
   fwdFieldFunc      field;	         /* Computes the field of given direction dipole */
   fwdVecFieldFunc   vec_field;	         /* Computes the fields of all three dipole components  */

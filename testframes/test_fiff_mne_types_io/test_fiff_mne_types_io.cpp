@@ -40,7 +40,7 @@
 //=============================================================================================================
 
 #include <fiff/fiff.h>
-
+#include "fiff_types_ref.h"
 #include <iostream>
 
 
@@ -115,7 +115,7 @@ void TestFiffMneTypesIO::checkFiffCoordTrans()
         QFAIL("Failed to open data file.");
 
     FiffTag::SPtr t_pTag;
-    fiffCoordTransRec reference_trans;
+    fiffCoordTransRec_REF reference_trans;
     FiffCoordTrans test_trans;
 
     bool trans_found = false;
@@ -124,7 +124,7 @@ void TestFiffMneTypesIO::checkFiffCoordTrans()
         if(stream->dir()[k]->kind == FIFF_COORD_TRANS) {
             if(!FiffTag::read_tag(stream, t_pTag, stream->dir()[k]->pos))
                 QFAIL("Failed to read FIFF_COORD_TRANS tag.");
-            reference_trans = *(fiffCoordTrans)t_pTag->data();
+            reference_trans = *(fiffCoordTrans_REF)t_pTag->data();
             test_trans = t_pTag->toCoordTrans();
 
             //CHECKS

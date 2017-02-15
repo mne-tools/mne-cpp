@@ -332,14 +332,14 @@ typedef struct _fiffFileRec {
 /// ToDo Old implementation use new fiff_coord_trans.h instead
 /** Coordinate transformation descriptor */
 
-typedef struct _fiffCoordTransRec {
- fiff_int_t   from;		      /**< Source coordinate system. */
- fiff_int_t   to;		      /**< Destination coordinate system. */
- fiff_float_t rot[3][3];	      /**< The forward transform (rotation part) */
- fiff_float_t move[3];		      /**< The forward transform (translation part) */
- fiff_float_t invrot[3][3];	      /**< The inverse transform (rotation part) */
- fiff_float_t invmove[3];            /**< The inverse transform (translation part) */
-} *fiffCoordTrans, fiffCoordTransRec; /**< Coordinate transformation descriptor */
+//typedef struct _fiffCoordTransRec {
+// fiff_int_t   from;		      /**< Source coordinate system. */
+// fiff_int_t   to;		      /**< Destination coordinate system. */
+// fiff_float_t rot[3][3];	      /**< The forward transform (rotation part) */
+// fiff_float_t move[3];		      /**< The forward transform (translation part) */
+// fiff_float_t invrot[3][3];	      /**< The inverse transform (rotation part) */
+// fiff_float_t invmove[3];            /**< The inverse transform (translation part) */
+//} *fiffCoordTrans, fiffCoordTransRec; /**< Coordinate transformation descriptor */
 
 //typedef fiffCoordTransRec fiff_coord_trans_t;
 
