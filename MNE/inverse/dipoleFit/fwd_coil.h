@@ -42,7 +42,8 @@
 //=============================================================================================================
 
 #include "../inverse_global.h"
-#include <fiff/fiff_types.h>
+
+#include "fiff_coord_trans_old.h"
 
 
 //*************************************************************************************************************
@@ -134,7 +135,7 @@ public:
     *
     * @return   The created coil.
     */
-    static FwdCoil* create_eeg_el( FIFFLIB::fiffChInfo ch,FIFFLIB::fiffCoordTrans t);
+    static FwdCoil* create_eeg_el( FIFFLIB::fiffChInfo ch,const FiffCoordTransOld* t);
 
     //=========================================================================================================
     /**

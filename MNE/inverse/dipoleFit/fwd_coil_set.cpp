@@ -124,7 +124,7 @@ char *mne_strdup_6(const char *s)
 
 
 
-void fiff_coord_trans_6 (float r[3],fiffCoordTrans t,int do_move)
+void fiff_coord_trans_6 (float r[3],const FiffCoordTransOld* t,int do_move)
 /*
       * Apply coordinate transformation
       */
@@ -355,7 +355,7 @@ FwdCoilSet::~FwdCoilSet()
 
 //*************************************************************************************************************
 
-FwdCoil *FwdCoilSet::create_meg_coil(fiffChInfo ch, int acc, fiffCoordTrans t)
+FwdCoil *FwdCoilSet::create_meg_coil(fiffChInfo ch, int acc, const FiffCoordTransOld* t)
 {
     int        k,p,c;
     FwdCoil*    def;
@@ -426,7 +426,7 @@ bad : {
 
 //*************************************************************************************************************
 
-FwdCoilSet *FwdCoilSet::create_meg_coils(FIFFLIB::fiffChInfo chs, int nch, int acc, FIFFLIB::fiffCoordTrans t)
+FwdCoilSet *FwdCoilSet::create_meg_coils(FIFFLIB::fiffChInfo chs, int nch, int acc, const FiffCoordTransOld* t)
 {
     FwdCoilSet* res = new FwdCoilSet();
     FwdCoil*    next;
@@ -451,7 +451,7 @@ bad : {
 
 //*************************************************************************************************************
 
-FwdCoilSet *FwdCoilSet::create_eeg_els(fiffChInfo chs, int nch, fiffCoordTrans t)
+FwdCoilSet *FwdCoilSet::create_eeg_els(fiffChInfo chs, int nch, const FiffCoordTransOld* t)
 {
     FwdCoilSet* res = new FwdCoilSet();
     FwdCoil*    next;
@@ -564,7 +564,7 @@ bad : {
 
 //*************************************************************************************************************
 
-FwdCoilSet* FwdCoilSet::dup_coil_set(const fiffCoordTrans t) const
+FwdCoilSet* FwdCoilSet::dup_coil_set(const FiffCoordTransOld* t) const
 {
     FwdCoilSet* res;
     FwdCoil*    coil;

@@ -248,10 +248,10 @@ const char *mne_coord_frame_name_16(int frame)
 
 
 
-fiffCoordTrans fiff_invert_transform_16 (fiffCoordTrans t)
+FiffCoordTransOld* fiff_invert_transform_16 (FiffCoordTransOld* t)
 
 {
-    fiffCoordTrans ti = (fiffCoordTrans)malloc(sizeof(fiffCoordTransRec));
+    FiffCoordTransOld* ti = new FiffCoordTransOld;
     int j,k;
 
     for (j = 0; j < 3; j++) {
@@ -269,7 +269,7 @@ fiffCoordTrans fiff_invert_transform_16 (fiffCoordTrans t)
 
 
 
-fiffCoordTrans mne_read_transform_from_node(//fiffFile in,
+FiffCoordTransOld* mne_read_transform_from_node(//fiffFile in,
                                             FiffStream::SPtr& stream,
                                             const FiffDirNode::SPtr& node,
                                             int from, int to)
@@ -277,7 +277,7 @@ fiffCoordTrans mne_read_transform_from_node(//fiffFile in,
       * Read the specified coordinate transformation
       */
 {
-    fiffCoordTrans res = NULL;
+    FiffCoordTransOld* res = NULL;
     FiffTag::SPtr t_pTag;
 //    fiffTagRec     tag;
 //    fiffDirEntry   dir;
@@ -294,8 +294,7 @@ fiffCoordTrans mne_read_transform_from_node(//fiffFile in,
 //            res = (fiffCoordTrans)tag.data;
             if (!FiffTag::read_tag(stream,t_pTag,pos))
                 goto out;
-            res = (fiffCoordTrans)malloc(sizeof(fiffCoordTransRec));
-            *res = *(fiffCoordTrans)t_pTag->data();
+            res = FiffCoordTransOld::read_helper( t_pTag );
             if (res->from == from && res->to == to) {
 //                tag.data = NULL;
                 goto out;
@@ -648,7 +647,7 @@ bad : {
 
 //============================= fiff_trans.c =============================
 
-void fiff_coord_trans_16 (float r[3],fiffCoordTrans t,int do_move)
+void fiff_coord_trans_16 (float r[3],FiffCoordTransOld* t,int do_move)
 /*
       * Apply coordinate transformation
       */
@@ -666,7 +665,7 @@ void fiff_coord_trans_16 (float r[3],fiffCoordTrans t,int do_move)
 }
 
 
-void fiff_coord_trans_inv_16 (float r[3],fiffCoordTrans t,int do_move)
+void fiff_coord_trans_inv_16 (float r[3],FiffCoordTransOld* t,int do_move)
 /*
       * Apply inverse coordinate transformation
       */
@@ -737,7 +736,7 @@ MneSurfaceOrVolume::MneCSurface* fwd_bem_find_surface_16(fwdBemModel model, int 
 
 
 
-int mne_transform_source_space(MneSurfaceOrVolume::MneCSourceSpace* ss, fiffCoordTrans t)
+int mne_transform_source_space(MneSurfaceOrVolume::MneCSourceSpace* ss, FiffCoordTransOld* t)
 /*
 * Transform source space data into another coordinate frame
 */
@@ -766,7 +765,7 @@ int mne_transform_source_space(MneSurfaceOrVolume::MneCSourceSpace* ss, fiffCoor
 
 
 int mne_transform_source_spaces_to(int            coord_frame,   /* Which coord frame do we want? */
-                                   fiffCoordTrans t,             /* The coordinate transformation */
+                                   FiffCoordTransOld* t,             /* The coordinate transformation */
                                    MneSurfaceOrVolume::MneCSourceSpace* *spaces,       /* A list of source spaces */
                                    int            nspace)
 /*
@@ -775,7 +774,7 @@ int mne_transform_source_spaces_to(int            coord_frame,   /* Which coord 
 {
     MneSurfaceOrVolume::MneCSourceSpace* s;
     int k;
-    fiffCoordTrans my_t;
+    FiffCoordTransOld* my_t;
 
     for (k = 0; k < nspace; k++) {
         s = spaces[k];
