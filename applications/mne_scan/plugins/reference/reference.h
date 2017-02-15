@@ -1,15 +1,14 @@
 //=============================================================================================================
 /**
-* @file     reref.h
-* @author   Viktor Klüber <viktor.klueber@tu-ilmenau.de>;
-*           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+* @file     reference.h
+* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2017
+* @date     February, 2013
 *
 * @section  LICENSE
 *
-* Copyright (C) 2016, Viktor Klüber, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the reref class.
+* @brief    Contains the declaration of the Reference class.
 *
 */
 
-#ifndef REREF_H
-#define REREF_H
+#ifndef REFERENCE_H
+#define REFERENCE_H
 
 
 //*************************************************************************************************************
@@ -43,17 +42,15 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "reref_global.h"
-#include "FormFiles/rerefoption.h"
-#include "FormFiles/rerefsetupwidget.h"
-
-#include <utils/ioutils.h>
-#include <utils/eegref.h>
-#include <iostream>
+#include "reference_global.h"
 
 #include <scShared/Interfaces/IAlgorithm.h>
 #include <generics/circularmatrixbuffer.h>
 #include <scMeas/newrealtimemultisamplearray.h>
+#include <utils/eegref.h>
+
+#include "FormFiles/referencesetupwidget.h"
+#include "FormFiles/referencetoolbarwidget.h"
 
 
 //*************************************************************************************************************
@@ -62,66 +59,50 @@
 //=============================================================================================================
 
 #include <QtWidgets>
+#include <QtCore/QtPlugin>
+#include <QDebug>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Eigen INCLUDES
+// DEFINE NAMESPACE ReferencePlugin
 //=============================================================================================================
 
-#include <Eigen/SparseCore>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE ReRefPlugin
-//=============================================================================================================
-
-namespace REREFPLUGIN
+namespace REFERENCEPLUGIN
 {
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace SCSHAREDLIB;
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class ReRefOption;
-
+class ReferenceToolbarWidget;
 
 //=============================================================================================================
 /**
-* DECLARE CLASS ReRef
+* DECLARE CLASS Reference
 *
-* @brief The ReRef class provides a reref algorithm structure.
+* @brief The Reference class provides a Reference algorithm structure.
 */
-class REREFSHARED_EXPORT ReRef : public IAlgorithm
+class REFERENCESHARED_EXPORT Reference : public SCSHAREDLIB::IAlgorithm
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "reref.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "reference.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
     Q_INTERFACES(SCSHAREDLIB::IAlgorithm)
 
 public:
     //=========================================================================================================
     /**
-    * Constructs a reref.
+    * Constructs a Reference.
     */
-    ReRef();
+    Reference();
 
     //=========================================================================================================
     /**
-    * Destroys the reref.
+    * Destroys the Reference.
     */
-    ~ReRef();
+    ~Reference();
 
     //=========================================================================================================
     /**
@@ -138,17 +119,11 @@ public:
 
     //=========================================================================================================
     /**
-    * Updates the plugin with new (incoming) data.
+    * Udates the pugin with new (incoming) data.
     *
     * @param[in] pMeasurement    The incoming data in form of a generalized NewMeasurement.
     */
     void update(SCMEASLIB::NewMeasurement::SPtr pMeasurement);
-
-    //=========================================================================================================
-    /**
-    * creates a ReRefOption object and shows the widget.
-    */
-    void showReRefOption();
 
 protected:
     //=========================================================================================================
@@ -157,25 +132,34 @@ protected:
     */
     virtual void run();
 
+
+    //=========================================================================================================
+    /**
+    * Shows the toolbar widget
+    */
+    void showRefToolbarWidget();
+
 private:
-    QSharedPointer<ReRefOption>     m_pReRefOption;             /**< pointer to the ReRefOption Widget class. */
-    QAction                        *m_pActionReRefOption;       /**< starts re-reference option feature via QAction bar item. */
+    bool                                            m_bIsRunning;           /**< Flag whether thread is running.*/
 
-    QMutex                          m_mutex;                    /**< The threads mutex.*/
+    FIFFLIB::FiffInfo::SPtr                         m_pFiffInfo;            /**< Fiff measurement info.*/
 
-    bool                            m_bIsRunning;               /**< Flag whether thread is running.*/
-    bool                            m_bDisp;                    /**< Flag for displaying. */
-    FIFFLIB::FiffInfo::SPtr         m_pFiffInfo;                /**< Fiff measurement info.*/
+    QSharedPointer<ReferenceToolbarWidget>             m_pRefToolbarWidget;            /**< flag whether thread is running.*/
+    QAction*                                           m_pActionRefToolbarWidget;      /**< flag whether thread is running.*/
 
-    IOBUFFER::CircularMatrixBuffer<double>::SPtr    m_pReRefBuffer;     /**< Holds incoming data.*/
-    SCMEASLIB::NewRealTimeMultiSampleArray::SPtr    m_pRTMSA;           /**< the real time multi sample array object. */
+    IOBUFFER::CircularMatrixBuffer<double>::SPtr    m_pRefBuffer;         /**< Holds incoming data.*/
 
-    PluginInputData<SCMEASLIB::NewRealTimeMultiSampleArray>::SPtr      m_pReRefInput;      /**< The NewRealTimeMultiSampleArray of the reref input.*/
-    PluginOutputData<SCMEASLIB::NewRealTimeMultiSampleArray>::SPtr     m_pReRefOutput;     /**< The NewRealTimeMultiSampleArray of the reref output.*/
+    SCSHAREDLIB::PluginInputData<SCMEASLIB::NewRealTimeMultiSampleArray>::SPtr      m_pRefInput;      /**< The NewRealTimeMultiSampleArray of the Reference input.*/
+    SCSHAREDLIB::PluginOutputData<SCMEASLIB::NewRealTimeMultiSampleArray>::SPtr     m_pRefOutput;     /**< The NewRealTimeMultiSampleArray of the Reference output.*/
 
-
+signals:
+    //=========================================================================================================
+    /**
+    * Emitted when fiffInfo is available
+    */
+    void fiffInfoAvailable();
 };
 
 } // NAMESPACE
 
-#endif // REREF_H
+#endif // REFERENCE_H

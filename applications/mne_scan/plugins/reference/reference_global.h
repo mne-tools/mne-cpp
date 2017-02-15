@@ -1,15 +1,14 @@
 //=============================================================================================================
 /**
-* @file     rerefaboutwidget.cpp
-* @author   Viktor Klüber <viktor.klueber@tu-ilmenau.de>;
-*           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+* @file     reference_global.h
+* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2017
+* @date     February, 2013
 *
 * @section  LICENSE
 *
-* Copyright (C) 2017, Viktor Klüber, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,41 +29,31 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the ReRefAboutWidget class.
+* @brief    Contains the Reference library export/import macros.
 *
 */
 
-//*************************************************************************************************************
-//=============================================================================================================
-// INCLUDES
-//=============================================================================================================
-
-#include "rerefaboutwidget.h"
+#ifndef REFERENCE_GLOBAL_H
+#define REFERENCE_GLOBAL_H
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// QT INCLUDES
 //=============================================================================================================
 
-using namespace REREFPLUGIN;
+#include <QtCore/qglobal.h>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE MEMBER METHODS
+// PREPROCESSOR DEFINES
 //=============================================================================================================
 
-ReRefAboutWidget::ReRefAboutWidget(QWidget *parent)
-    : QDialog(parent)
-{
-    ui.setupUi(this);
-}
+#if defined(REFERENCE_LIBRARY)
+#define REFERENCESHARED_EXPORT Q_DECL_EXPORT   /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+#else
+#define REFERENCESHARED_EXPORT Q_DECL_IMPORT   /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+#endif
 
-
-//*************************************************************************************************************
-
-ReRefAboutWidget::~ReRefAboutWidget()
-{
-
-}
+#endif // REFERENCE_GLOBAL_H

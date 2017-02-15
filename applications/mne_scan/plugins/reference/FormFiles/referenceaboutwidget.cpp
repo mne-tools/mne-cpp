@@ -1,15 +1,14 @@
 //=============================================================================================================
 /**
-* @file     rerefsetupwidget.h
-* @author   Viktor Klüber <viktor.klueber@tu-ilmenau.de>;
-*           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+* @file     referenceaboutwidget.cpp
+* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2017
+* @date     February, 2013
 *
 * @section  LICENSE
 *
-* Copyright (C) 2017, Viktor Klüber, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,93 +29,41 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the ReRefSetupWidget class.
+* @brief    Contains the implementation of the ReferenceAboutWidget class.
 *
 */
-
-#ifndef REREFSETUPWIDGET_H
-#define REREFSETUPWIDGET_H
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_rerefsetup.h"
-#include "rerefaboutwidget.h"
-#include "../reref.h"
+#include "referenceaboutwidget.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// USED NAMESPACES
 //=============================================================================================================
 
-#include <QtWidgets>
+using namespace REFERENCEPLUGIN;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE REREFPLUGIN
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-namespace REREFPLUGIN
+ReferenceAboutWidget::ReferenceAboutWidget(QWidget *parent)
+    : QDialog(parent)
+{
+    ui.setupUi(this);
+}
+
+
+//*************************************************************************************************************
+
+ReferenceAboutWidget::~ReferenceAboutWidget()
 {
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-class ReRef;
-
-
-//=============================================================================================================
-/**
-* DECLARE CLASS ReRefSetupWidget
-*
-* @brief The ReRefSetupWidget class provides the ReRef configuration window.
-*/
-class ReRefSetupWidget : public QWidget
-{
-    Q_OBJECT
-
-public:
-
-    //=========================================================================================================
-    /**
-    * Constructs a ReRefSetupWidget which is a child of parent.
-    *
-    * @param [in] toolbox a pointer to the corresponding ReRef.
-    * @param [in] parent pointer to parent widget; If parent is 0, the new ReRefSetupWidget becomes a window. If parent is another widget, ReRefSetupWidget becomes a child window inside parent. ReRefSetupWidget is deleted when its parent is deleted.
-    */
-    ReRefSetupWidget(ReRef* toolbox, QWidget *parent = 0);
-
-    //=========================================================================================================
-    /**
-    * Destroys the ReRefSetupWidget.
-    * All ReRefSetupWidget's children are deleted first. The application exits if ReRefSetupWidget is the main widget.
-    */
-    ~ReRefSetupWidget();
-
-
-private slots:
-    //=========================================================================================================
-    /**
-    * Shows the About Dialog
-    *
-    */
-    void showAboutDialog();
-
-private:
-
-    ReRef* m_pReRef;	/**< Holds a pointer to corresponding ReRef.*/
-
-    Ui::ReRefSetupWidgetClass ui;	/**< Holds the user interface for the ReRefSetupWidget.*/
-};
-
-} // NAMESPACE
-
-#endif // REREFSETUPWIDGET_H
+}
