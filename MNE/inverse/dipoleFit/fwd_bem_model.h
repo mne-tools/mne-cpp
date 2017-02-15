@@ -94,11 +94,12 @@ namespace INVERSELIB
 //=============================================================================================================
 
 class MneTriangle;
+class FwdEegSphereModel;
 
 
 //=============================================================================================================
 /**
-* Implements FwdBemModel (Replaces *fwdBemModel,fwdBemModelRec struct of MNE-C fwd_types.h).
+* Implements FwdBemModel (Replaces *FwdBemModel*,FwdBemModel*Rec struct of MNE-C fwd_types.h).
 *
 * @brief Holds the BEM model definition
 */
@@ -385,11 +386,131 @@ public:
                                    FwdBemModel* m,
                                    float       *B);
 
+    static void fwd_bem_field_grad_calc(float       *rd,
+                        float       *Q,
+                        FwdCoilSet  *coils,
+                        FwdBemModel *m,
+                        float       *xgrad,
+                        float       *ygrad,
+                        float       *zgrad);
+
+
+    static float fwd_bem_inf_field_der(float *rd,      /* Dipole position */
+                       float *Q,	   /* Dipole moment */
+                       float *rp,	   /* Field point */
+                       float *dir,     /* Which field component */
+                       float *comp);
+
+
+    static float fwd_bem_inf_pot_der (float *rd,   /* Dipole position */
+                               float *Q,    /* Dipole moment */
+                               float *rp,   /* Potential point */
+                               float *comp);
+
+
+    static void fwd_bem_lin_field_grad_calc(float       *rd,
+                                            float       *Q,
+                                            FwdCoilSet  *coils,
+                                            FwdBemModel *m,
+                                            float       *xgrad,
+                                            float       *ygrad,
+                                            float       *zgrad);
+
+
     static int fwd_bem_field(float       *rd,	/* Dipole position */
                       float       *Q,	/* Dipole orientation */
                       FwdCoilSet*  coils,    /* Coil descriptors */
                       float       *B,       /* Result */
                       void        *client);
+
+    static int fwd_bem_field_grad(float        *rd,      /* The dipole location */
+                   float        Q[],      /* The dipole components (xyz) */
+                   FwdCoilSet*  coils,    /* The coil definitions */
+                   float        Bval[],   /* Results */
+                   float        xgrad[],  /* The derivatives with respect to */
+                   float        ygrad[],  /* the dipole position coordinates */
+                   float        zgrad[],
+                   void         *client);
+
+
+
+
+
+
+
+
+    //============================= compute_forward.c =============================
+
+
+    static int compute_forward_meg( MneSourceSpaceOld*    *spaces,     /* Source spaces */
+                                    int               nspace,      /* How many? */
+                                    FwdCoilSet*        coils,
+                                    FwdCoilSet*        comp_coils,
+                                    MneCTFCompDataSet* comp_data,
+                                    bool               fixed_ori,   /* Use fixed-orientation dipoles */
+                                    FwdBemModel*       bem_model,   /* BEM model definition */
+                                    float             *r0,         /* Sphere model origin */
+                                    bool               use_threads, /* Parallelize with threads? */
+                                    MneNamedMatrix*    *resp,       /* The results */
+                                    MneNamedMatrix*    *resp_grad);
+
+    static int compute_forward_eeg( MneSourceSpaceOld*    *spaces,     /* Source spaces */
+                                    int               nspace,      /* How many? */
+                                    FwdCoilSet*        els,         /* Electrode locations */
+                                    bool               fixed_ori,   /* Use fixed-orientation dipoles */
+                                    FwdBemModel*       bem_model,   /* BEM model definition */
+                                    FwdEegSphereModel* m,           /* Sphere model definition */
+                                    bool               use_threads, /* Parallelize with threads? */
+                                    MneNamedMatrix*    *resp,       /* The results */
+                                    MneNamedMatrix*    *resp_grad);
+
+
+    //============================= fwd_spherefield.c =============================
+    // TODO location of these functions need to be checked -> evtl moving to mor suitable space
+    static int fwd_sphere_field(float        *rd,	        /* The dipole location */
+                         float        Q[],	        /* The dipole components (xyz) */
+                         FwdCoilSet*   coils,	/* The coil definitions */
+                         float        Bval[],	/* Results */
+                         void         *client);
+
+
+    static int fwd_sphere_field_vec(float        *rd,	/* The dipole location */
+                             FwdCoilSet*   coils,	/* The coil definitions */
+                             float        **Bval,  /* Results: rows are the fields of the x,y, and z direction dipoles */
+                             void         *client);
+
+
+
+
+    static int fwd_sphere_field_grad(float        *rd,	 /* The dipole location */
+                  float        Q[],      /* The dipole components (xyz) */
+                  FwdCoilSet*  coils,    /* The coil definitions */
+                  float        Bval[],   /* Results */
+                  float        xgrad[],  /* The derivatives with respect to */
+                  float        ygrad[],  /* the dipole position coordinates */
+                  float        zgrad[],
+                  void         *client);
+
+
+
+    //============================= fwd_mag_dipole_field.c =============================
+    // TODO location of these functions need to be checked -> evtl moving to mor suitable space
+    /*
+     * Compute the field of a magnetic dipole
+     */
+    static int fwd_mag_dipole_field( float        *rm,      /* The dipole location in the same coordinate system as the coils */
+                                     float        M[],	/* The dipole components (xyz) */
+                                     FwdCoilSet*   coils,	/* The coil definitions */
+                                     float        Bval[],	/* Results */
+                                     void         *client);
+
+    static int fwd_mag_dipole_field_vec( float        *rm,	        /* The dipole location */
+                                         FwdCoilSet*   coils,	/* The coil definitions */
+                                         float        **Bval,       /* Results: rows are the fields of the x,y, and z direction dipoles */
+                                         void         *client);
+
+
+
 
 
 public:
@@ -436,7 +557,7 @@ public:
 
 //    float      ip_approach_limit;   /* Controls whether we need to use the isolated problem approach */
 //    int        use_ip_approach;     /* Do we need it */
-//} *fwdBemModel,fwdBemModelRec;      /* Holds the BEM model definition */
+//} *FwdBemModel*,FwdBemModel*Rec;      /* Holds the BEM model definition */
 };
 
 

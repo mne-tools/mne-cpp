@@ -623,50 +623,50 @@ void ComputeFwd::calculateFwd() const
             out = NULL;
         }
     }
-    //    /*
-    //     * Do the actual computation
-    //     */
-    //    if (!bem_model)
-    //        use_threads = FALSE;
-    //    if (nmeg > 0)
-    //        if ((compute_forward_meg(spaces,nspace,megcoils,compcoils,comp_data,
-    //                                 fixed_ori,bem_model,r0,use_threads,&meg_forward,
-    //                                 compute_grad ? &meg_forward_grad : NULL)) == FAIL)
-    //            goto out;
-    //    if (neeg > 0)
-    //        if ((compute_forward_eeg(spaces,nspace,eegels,
-    //                                 fixed_ori,bem_model,eeg_model,use_threads,&eeg_forward,
-    //                                 compute_grad ? &eeg_forward_grad : NULL)) == FAIL)
-    //            goto out;
-    //    /*
-    //     * Transform the source spaces back into MRI coordinates
-    //     */
-    //    if (mne_transform_source_spaces_to(FIFFV_COORD_MRI,mri_head_t,spaces,nspace) != OK)
-    //        goto out;
-    //    /*
-    //     * We are ready to spill it out
-    //     */
-    //    fprintf (stderr,"\nwriting %s...",solname);
-    //    if (write_solution(solname,	                /* Destination file */
-    //                       spaces,			/* The source spaces */
-    //                       nspace,
-    //                       mriname,mri_id,		/* MRI file and data obtained from there */
-    //                       mri_head_t,
-    //                       measname,meas_id,		/* MEG file and data obtained from there */
-    //                       meg_head_t,
-    //                       megchs, nmeg,
-    //                       eegchs, neeg,
-    //                       fixed_ori,			/* Fixed orientation dipoles? */
-    //                       coord_frame,               /* Coordinate frame */
-    //                       meg_forward, eeg_forward,
-    //                       meg_forward_grad, eeg_forward_grad) == FIFF_FAIL)
+    /*
+    * Do the actual computation
+    */
+    if (!bem_model)
+        settings->use_threads = false;
+    if (nmeg > 0)
+        if ((compute_forward_meg(spaces,nspace,megcoils,compcoils,comp_data,
+                                 settings->fixed_ori,bem_model,settings->r0,settings->use_threads,&meg_forward,
+                                 settings->compute_grad ? &meg_forward_grad : NULL)) == FAIL)
+            goto out;
+//    if (neeg > 0)
+//        if ((compute_forward_eeg(spaces,nspace,eegels,
+//                                 fixed_ori,bem_model,eeg_model,use_threads,&eeg_forward,
+//                                 compute_grad ? &eeg_forward_grad : NULL)) == FAIL)
+//            goto out;
+//    /*
+//     * Transform the source spaces back into MRI coordinates
+//     */
+//    if (mne_transform_source_spaces_to(FIFFV_COORD_MRI,mri_head_t,spaces,nspace) != OK)
+//        goto out;
+//    /*
+//     * We are ready to spill it out
+//     */
+//    fprintf (stderr,"\nwriting %s...",solname);
+//    if (write_solution(solname,	                /* Destination file */
+//                       spaces,			/* The source spaces */
+//                       nspace,
+//                       mriname,mri_id,		/* MRI file and data obtained from there */
+//                       mri_head_t,
+//                       measname,meas_id,		/* MEG file and data obtained from there */
+//                       meg_head_t,
+//                       megchs, nmeg,
+//                       eegchs, neeg,
+//                       fixed_ori,			/* Fixed orientation dipoles? */
+//                       coord_frame,               /* Coordinate frame */
+//                       meg_forward, eeg_forward,
+//                       meg_forward_grad, eeg_forward_grad) == FIFF_FAIL)
 
-    //        goto out;
-    //    if (mne_attach_env(solname,command) == FIFF_FAIL)
-    //        goto out;
-    //    printf("done\n");
-    //    res = OK;
-    //    printf("\nFinished.\n");
+//        goto out;
+//    if (mne_attach_env(solname,command) == FIFF_FAIL)
+//        goto out;
+//    printf("done\n");
+//    res = OK;
+//    printf("\nFinished.\n");
 
 out : {
         //        if (out)
