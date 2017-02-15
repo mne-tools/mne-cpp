@@ -280,12 +280,30 @@ public:
     static int fwd_bem_specify_els(FwdBemModel* m,
                             FwdCoilSet*  els);
 
+    static void fwd_bem_pot_grad_calc (float *rd,   /* Dipole position */
+                       float        *Q,             /* Dipole orientation */
+                       FwdBemModel* m,              /* The model */
+                       FwdCoilSet*  els,            /* Use this electrode set if available */
+                       int          all_surfs,      /* Compute solution on all surfaces? */
+                       float        *xgrad,
+                       float        *ygrad,
+                       float        *zgrad);
+
     static void fwd_bem_lin_pot_calc (float       *rd,		/* Dipole position */
                                       float       *Q,		/* Dipole orientation */
                                       FwdBemModel* m,		/* The model */
                                       FwdCoilSet*  els,              /* Use this electrode set if available */
                                       int         all_surfs,	/* Compute on all surfaces? */
                                       float      *pot);
+
+    static void fwd_bem_lin_pot_grad_calc (float       *rd,		/* Dipole position */
+                           float       *Q,		/* Dipole orientation */
+                           FwdBemModel* m,		/* The model */
+                           FwdCoilSet* els,         /* Use this electrode set if available */
+                           int         all_surfs,	/* Compute on all surfaces? */
+                           float       *xgrad,
+                           float       *ygrad,
+                           float       *zgrad);
 
     static void fwd_bem_pot_calc (float       *rd,	     /* Dipole position */
                                   float       *Q,        /* Dipole orientation */
@@ -299,6 +317,15 @@ public:
                          FwdCoilSet*  els,     /* Electrode descriptors */
                          float       *pot,    /* Result */
                          void        *client);
+
+    static int fwd_bem_pot_grad_els (float       *rd,     /* Dipole position */
+                  float       *Q,      /* Dipole orientation */
+                  FwdCoilSet* els,     /* Electrode descriptors */
+                  float       *pot,    /* Potentials */
+                  float       *xgrad,  /* Derivatives with respect to dipole position */
+                  float       *ygrad,
+                  float       *zgrad,
+                  void        *client);
 
 
 
@@ -441,28 +468,30 @@ public:
 
     //============================= compute_forward.c =============================
 
+    static void *meg_eeg_fwd_one_source_space(void *arg);
 
+    // TODO check if this is the correct class or move
     static int compute_forward_meg( MneSourceSpaceOld*    *spaces,     /* Source spaces */
-                                    int               nspace,      /* How many? */
-                                    FwdCoilSet*        coils,
-                                    FwdCoilSet*        comp_coils,
-                                    MneCTFCompDataSet* comp_data,
-                                    bool               fixed_ori,   /* Use fixed-orientation dipoles */
-                                    FwdBemModel*       bem_model,   /* BEM model definition */
-                                    float             *r0,         /* Sphere model origin */
-                                    bool               use_threads, /* Parallelize with threads? */
-                                    MneNamedMatrix*    *resp,       /* The results */
-                                    MneNamedMatrix*    *resp_grad);
+                                    int                 nspace,      /* How many? */
+                                    FwdCoilSet*         coils,
+                                    FwdCoilSet*         comp_coils,
+                                    MneCTFCompDataSet*  comp_data,
+                                    bool                fixed_ori,   /* Use fixed-orientation dipoles */
+                                    FwdBemModel*        bem_model,   /* BEM model definition */
+                                    Eigen::Vector3f*    r0,         /* Sphere model origin */
+                                    bool                use_threads, /* Parallelize with threads? */
+                                    MneNamedMatrix*     *resp,       /* The results */
+                                    MneNamedMatrix*     *resp_grad);
 
-    static int compute_forward_eeg( MneSourceSpaceOld*    *spaces,     /* Source spaces */
-                                    int               nspace,      /* How many? */
-                                    FwdCoilSet*        els,         /* Electrode locations */
-                                    bool               fixed_ori,   /* Use fixed-orientation dipoles */
-                                    FwdBemModel*       bem_model,   /* BEM model definition */
-                                    FwdEegSphereModel* m,           /* Sphere model definition */
-                                    bool               use_threads, /* Parallelize with threads? */
-                                    MneNamedMatrix*    *resp,       /* The results */
-                                    MneNamedMatrix*    *resp_grad);
+    static int compute_forward_eeg( MneSourceSpaceOld*  *spaces,     /* Source spaces */
+                                    int                 nspace,      /* How many? */
+                                    FwdCoilSet*         els,         /* Electrode locations */
+                                    bool                fixed_ori,   /* Use fixed-orientation dipoles */
+                                    FwdBemModel*        bem_model,   /* BEM model definition */
+                                    FwdEegSphereModel*  m,           /* Sphere model definition */
+                                    bool                use_threads, /* Parallelize with threads? */
+                                    MneNamedMatrix*     *resp,       /* The results */
+                                    MneNamedMatrix*     *resp_grad);
 
 
     //============================= fwd_spherefield.c =============================

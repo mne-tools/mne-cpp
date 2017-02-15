@@ -629,8 +629,8 @@ void ComputeFwd::calculateFwd() const
     if (!bem_model)
         settings->use_threads = false;
     if (nmeg > 0)
-        if ((compute_forward_meg(spaces,nspace,megcoils,compcoils,comp_data,
-                                 settings->fixed_ori,bem_model,settings->r0,settings->use_threads,&meg_forward,
+        if ((FwdBemModel::compute_forward_meg(spaces,nspace,megcoils,compcoils,comp_data,
+                                 settings->fixed_ori,bem_model,&settings->r0,settings->use_threads,&meg_forward,
                                  settings->compute_grad ? &meg_forward_grad : NULL)) == FAIL)
             goto out;
 //    if (neeg > 0)
