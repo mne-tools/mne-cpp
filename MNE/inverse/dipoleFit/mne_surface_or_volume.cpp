@@ -914,14 +914,15 @@ int MneSurfaceOrVolume::filter_source_spaces(float limit, char *bemfile, FiffCoo
          * This is the conventional calculation
          */
         for (k = 0; k < nspace; k++) {
-            a = new_filter_thread_arg();
+            a = new FilterThreadArg();
             a->s = spaces[k];
             a->mri_head_t = mri_head_t;
             a->surf = surf;
             a->limit = limit;
             a->filtered = filtered;
             filter_source_space(a);
-            free_filter_thread_arg(a);
+            if(a)
+                delete a;
             rearrange_source_space(spaces[k]);
         }
 //    }

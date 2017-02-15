@@ -40,6 +40,7 @@
 
 #include "fwd_bem_model.h"
 #include "fwd_bem_solution.h"
+#include "fwd_eeg_sphere_model.h"
 #include "mne_surface_old.h"
 #include "mne_triangle.h"
 #include "mne_source_space_old.h"
@@ -60,6 +61,10 @@
 
 #include <Eigen/Dense>
 
+
+static float Qx[] = {1.0,0.0,0.0};
+static float Qy[] = {0.0,1.0,0.0};
+static float Qz[] = {0.0,0.0,1.0};
 
 
 #ifndef TRUE
@@ -400,6 +405,27 @@ static char *strip_from(char *s, char *suffix)
         res = mne_strdup_40(s);
     return res;
 }
+
+
+
+char **mne_dup_name_list_40(char **list, int nlist)
+/*
+ * Duplicate a name list
+ */
+{
+    char **res;
+    int  k;
+    if (list == NULL || nlist == 0)
+        return NULL;
+    res = MALLOC_40(nlist,char *);
+
+    for (k = 0; k < nlist; k++)
+        res[k] = mne_strdup_40(list[k]);
+    return res;
+}
+
+
+
 
 
 //*************************************************************************************************************
@@ -1614,11 +1640,74 @@ bad : {
 
 //*************************************************************************************************************
 
+void FwdBemModel::fwd_bem_pot_grad_calc(float *rd, float *Q, FwdBemModel* m, FwdCoilSet* els, int all_surfs, float *xgrad, float *ygrad, float *zgrad)
+/*
+* Compute the potentials due to a current dipole
+*/
+{
+    MneTriangle* tri;
+    int         ntri;
+    int         s,k,p,nsol,pp;
+    float       mult;
+    float       *v0,ee[3];
+    float       **solution;
+    float       mri_rd[3],mri_Q[3];
+
+    float  *grads[3];
+    float  *grad;
+
+    grads[0] = xgrad;
+    grads[1] = ygrad;
+    grads[2] = zgrad;
+
+    if (!m->v0)
+        m->v0 = MALLOC_40(m->nsol,float);
+    v0 = m->v0;
+
+    VEC_COPY_40(mri_rd,rd);
+    VEC_COPY_40(mri_Q,Q);
+    if (m->head_mri_t) {
+        FiffCoordTransOld::fiff_coord_trans(mri_rd,m->head_mri_t,FIFFV_MOVE);
+        FiffCoordTransOld::fiff_coord_trans(mri_Q,m->head_mri_t,FIFFV_NO_MOVE);
+    }
+    for (pp = 0; pp < 3; pp++) {
+        grad = grads[pp];
+
+        for (p = 0; p < 3; p++)
+            ee[p] = p == pp ? 1.0 : 0.0;
+        if (m->head_mri_t)
+            FiffCoordTransOld::fiff_coord_trans(ee,m->head_mri_t,FIFFV_NO_MOVE);
+
+        for (s = 0, p = 0; s < m->nsurf; s++) {
+            ntri = m->surfs[s]->ntri;
+            tri  = m->surfs[s]->tris;
+            mult = m->source_mult[s];
+            for (k = 0; k < ntri; k++, tri++)
+                v0[p++] = mult*fwd_bem_inf_pot_der(mri_rd,mri_Q,tri->cent,ee);
+        }
+        if (els) {
+            FwdBemSolution* sol = (FwdBemSolution*)els->user_data;
+            solution = sol->solution;
+            nsol     = sol->ncoil;
+        }
+        else {
+            solution = m->solution;
+            nsol     = all_surfs ? m->nsol : m->surfs[0]->ntri;
+        }
+        for (k = 0; k < nsol; k++)
+            grad[k] = mne_dot_vectors_40(solution[k],v0,m->nsol);
+    }
+    return;
+}
+
+
+//*************************************************************************************************************
+
 void FwdBemModel::fwd_bem_lin_pot_calc(float *rd, float *Q, FwdBemModel *m, FwdCoilSet *els, int all_surfs, float *pot)              /* Put the result here */
 /*
-          * Compute the potentials due to a current dipole
-          * using the linear potential approximation
-          */
+* Compute the potentials due to a current dipole
+* using the linear potential approximation
+*/
 {
     float **rr;
     int   np;
@@ -1656,6 +1745,70 @@ void FwdBemModel::fwd_bem_lin_pot_calc(float *rd, float *Q, FwdBemModel *m, FwdC
     }
     for (k = 0; k < nsol; k++)
         pot[k] = mne_dot_vectors_40(solution[k],v0,m->nsol);
+    return;
+}
+
+
+//*************************************************************************************************************
+
+void FwdBemModel::fwd_bem_lin_pot_grad_calc(float *rd, float *Q, FwdBemModel *m, FwdCoilSet *els, int all_surfs, float *xgrad, float *ygrad, float *zgrad)
+/*
+* Compute the derivaties of potentials due to a current dipole with respect to the dipole position
+* using the linear potential approximation
+*/
+{
+    float **rr;
+    int   np;
+    int   s,k,p,nsol,pp;
+    float mult,mri_rd[3],mri_Q[3];
+
+    float *v0,ee[3];
+    float **solution;
+
+    float  *grads[3];
+    float  *grad;
+
+    grads[0] = xgrad;
+    grads[1] = ygrad;
+    grads[2] = zgrad;
+
+    if (!m->v0)
+        m->v0 = MALLOC_40(m->nsol,float);
+    v0 = m->v0;
+
+    VEC_COPY_40(mri_rd,rd);
+    VEC_COPY_40(mri_Q,Q);
+    if (m->head_mri_t) {
+        FiffCoordTransOld::fiff_coord_trans(mri_rd,m->head_mri_t,FIFFV_MOVE);
+        FiffCoordTransOld::fiff_coord_trans(mri_Q,m->head_mri_t,FIFFV_NO_MOVE);
+    }
+    for (pp = 0; pp < 3; pp++) {
+        grad = grads[pp];
+
+        for (p = 0; p < 3; p++)
+            ee[p] = p == pp ? 1.0 : 0.0;
+        if (m->head_mri_t)
+            FiffCoordTransOld::fiff_coord_trans(ee,m->head_mri_t,FIFFV_NO_MOVE);
+
+        for (s = 0, p = 0; s < m->nsurf; s++) {
+            np     = m->surfs[s]->np;
+            rr     = m->surfs[s]->rr;
+            mult   = m->source_mult[s];
+            for (k = 0; k < np; k++)
+                v0[p++] = mult*fwd_bem_inf_pot_der(mri_rd,mri_Q,rr[k],ee);
+        }
+        if (els) {
+            FwdBemSolution* sol = (FwdBemSolution*)els->user_data;
+            solution = sol->solution;
+            nsol     = sol->ncoil;
+        }
+        else {
+            solution = m->solution;
+            nsol     = all_surfs ? m->nsol : m->surfs[0]->np;
+        }
+        for (k = 0; k < nsol; k++)
+            grad[k] = mne_dot_vectors_40(solution[k],v0,m->nsol);
+    }
     return;
 }
 
@@ -1735,6 +1888,46 @@ int FwdBemModel::fwd_bem_pot_els(float *rd, float *Q, FwdCoilSet *els, float *po
         fwd_bem_lin_pot_calc(rd,Q,m,els,FALSE,pot);
     else {
         printf("Unknown BEM method : %d",m->bem_method);
+        return FAIL;
+    }
+    return OK;
+}
+
+
+//*************************************************************************************************************
+
+int FwdBemModel::fwd_bem_pot_grad_els(float *rd, float *Q, FwdCoilSet *els, float *pot, float *xgrad, float *ygrad, float *zgrad, void *client) /* The model */
+/*
+     * This version calculates the potential on all surfaces
+     */
+{
+    FwdBemModel*    m = (FwdBemModel*)client;
+    FwdBemSolution* sol = (FwdBemSolution*)els->user_data;
+
+    if (!m) {
+        qCritical("No BEM model specified to fwd_bem_pot_els");
+        return FAIL;
+    }
+    if (!m->solution) {
+        qCritical("No solution available for fwd_bem_pot_els");
+        return FAIL;
+    }
+    if (!sol || sol->ncoil != els->ncoil) {
+        qCritical("No appropriate electrode-specific data available in fwd_bem_pot_coils");
+        return FAIL;
+    }
+    if (m->bem_method == FWD_BEM_CONSTANT_COLL) {
+        if (pot)
+            fwd_bem_pot_calc(rd,Q,m,els,FALSE,pot);
+        fwd_bem_pot_grad_calc(rd,Q,m,els,FALSE,xgrad,ygrad,zgrad);
+    }
+    else if (m->bem_method == FWD_BEM_LINEAR_COLL) {
+        if (pot)
+            fwd_bem_lin_pot_calc(rd,Q,m,els,FALSE,pot);
+        fwd_bem_lin_pot_grad_calc(rd,Q,m,els,FALSE,xgrad,ygrad,zgrad);
+    }
+    else {
+        qCritical("Unknown BEM method : %d",m->bem_method);
         return FAIL;
     }
     return OK;
@@ -2674,6 +2867,9 @@ int FwdBemModel::fwd_bem_field(float *rd, float *Q, FwdCoilSet *coils, float *B,
     return OK;
 }
 
+
+//*************************************************************************************************************
+
 int FwdBemModel::fwd_bem_field_grad(float *rd, float Q[], FwdCoilSet *coils, float Bval[], float xgrad[], float ygrad[], float zgrad[], void *client)  /* Client data to be passed to some foward modelling routines */
 {
     FwdBemModel* m = (FwdBemModel*)client;
@@ -2708,7 +2904,142 @@ int FwdBemModel::fwd_bem_field_grad(float *rd, float Q[], FwdCoilSet *coils, flo
 
 //*************************************************************************************************************
 
-int FwdBemModel::compute_forward_meg(MneSourceSpaceOld **spaces, int nspace, FwdCoilSet *coils, FwdCoilSet *comp_coils, MneCTFCompDataSet *comp_data, bool fixed_ori, FwdBemModel *bem_model, float *r0, bool use_threads, MneNamedMatrix **resp, MneNamedMatrix **resp_grad)
+void *FwdBemModel::meg_eeg_fwd_one_source_space(void *arg)
+/*
+* Compute the MEG or EEG forward solution for one source space
+* and possibly for only one source component
+*/
+{
+    FwdThreadArg* a = (FwdThreadArg*)arg;
+    MneSourceSpaceOld* s = a->s;
+    int            j,p,q;
+    float          *xyz[3];
+
+    p = a->off;
+    q = 3*a->off;
+    if (a->fixed_ori) {					  /* The normal source component only */
+        if (a->field_pot_grad && a->res_grad) {                   /* Gradient requested? */
+            for (j = 0; j < s->np; j++)
+                if (s->inuse[j]) {
+                    if (a->field_pot_grad(s->rr[j],s->nn[j],a->coils_els,a->res[p],
+                                          a->res_grad[q],a->res_grad[q+1],a->res_grad[q+2],
+                                          a->client) != OK)
+                        goto bad;
+                    q = q + 3;
+                    p++;
+                }
+        }
+        else {
+            for (j = 0; j < s->np; j++)
+                if (s->inuse[j])
+                    if (a->field_pot(s->rr[j],s->nn[j],a->coils_els,a->res[p++],a->client) != OK)
+                        goto bad;
+        }
+    }
+    else {						  /* All source components */
+        if (a->field_pot_grad && a->res_grad) {               /* Gradient requested? */
+            for (j = 0; j < s->np; j++) {
+                if (s->inuse[j]) {
+                    if (a->comp < 0) {				  /* Compute all components */
+                        if (a->field_pot_grad(s->rr[j],Qx,a->coils_els,a->res[p],
+                                              a->res_grad[q],a->res_grad[q+1],a->res_grad[q+2],
+                                              a->client) != OK)
+                            goto bad;
+                        q = q + 3; p++;
+                        if (a->field_pot_grad(s->rr[j],Qy,a->coils_els,a->res[p],
+                                              a->res_grad[q],a->res_grad[q+1],a->res_grad[q+2],
+                                              a->client) != OK)
+                            goto bad;
+                        q = q + 3; p++;
+                        if (a->field_pot_grad(s->rr[j],Qz,a->coils_els,a->res[p],
+                                              a->res_grad[q],a->res_grad[q+1],a->res_grad[q+2],
+                                              a->client) != OK)
+                            goto bad;
+                        q = q + 3; p++;
+                    }
+                    else if (a->comp == 0) {			  /* Compute x component */
+                        if (a->field_pot_grad(s->rr[j],Qx,a->coils_els,a->res[p],
+                                              a->res_grad[q],a->res_grad[q+1],a->res_grad[q+2],
+                                              a->client) != OK)
+                            goto bad;
+                        q = q + 3; p++;
+                        q = q + 3; p++;
+                        q = q + 3; p++;
+                    }
+                    else if (a->comp == 1) {			  /* Compute y component */
+                        q = q + 3; p++;
+                        if (a->field_pot_grad(s->rr[j],Qy,a->coils_els,a->res[p],
+                                              a->res_grad[q],a->res_grad[q+1],a->res_grad[q+2],
+                                              a->client) != OK)
+                            goto bad;
+                        q = q + 3; p++;
+                        q = q + 3; p++;
+                    }
+                    else if (a->comp == 2) {			  /* Compute z component */
+                        q = q + 3; p++;
+                        q = q + 3; p++;
+                        if (a->field_pot_grad(s->rr[j],Qz,a->coils_els,a->res[p],
+                                              a->res_grad[q],a->res_grad[q+1],a->res_grad[q+2],
+                                              a->client) != OK)
+                            goto bad;
+                        q = q + 3; p++;
+                    }
+                }
+            }
+        }
+        else {
+            for (j = 0; j < s->np; j++) {
+                if (s->inuse[j]) {
+                    if (a->vec_field_pot) {
+                        xyz[0] = a->res[p++];
+                        xyz[1] = a->res[p++];
+                        xyz[2] = a->res[p++];
+                        if (a->vec_field_pot(s->rr[j],a->coils_els,xyz,a->client) != OK)
+                            goto bad;
+                    }
+                    else {
+                        if (a->comp < 0) {				  /* Compute all components here */
+                            if (a->field_pot(s->rr[j],Qx,a->coils_els,a->res[p++],a->client) != OK)
+                                goto bad;
+                            if (a->field_pot(s->rr[j],Qy,a->coils_els,a->res[p++],a->client) != OK)
+                                goto bad;
+                            if (a->field_pot(s->rr[j],Qz,a->coils_els,a->res[p++],a->client) != OK)
+                                goto bad;
+                        }
+                        else if (a->comp == 0) {			  /* Compute x component */
+                            if (a->field_pot(s->rr[j],Qx,a->coils_els,a->res[p++],a->client) != OK)
+                                goto bad;
+                            p++; p++;
+                        }
+                        else if (a->comp == 1) {			  /* Compute y component */
+                            p++;
+                            if (a->field_pot(s->rr[j],Qy,a->coils_els,a->res[p++],a->client) != OK)
+                                goto bad;
+                            p++;
+                        }
+                        else if (a->comp == 2) {			  /* Compute z component */
+                            p++; p++;
+                            if (a->field_pot(s->rr[j],Qz,a->coils_els,a->res[p++],a->client) != OK)
+                                goto bad;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    a->stat = OK;
+    return NULL;
+
+bad : {
+        a->stat = FAIL;
+        return NULL;
+    }
+}
+
+
+//*************************************************************************************************************
+
+int FwdBemModel::compute_forward_meg(MneSourceSpaceOld **spaces, int nspace, FwdCoilSet *coils, FwdCoilSet *comp_coils, MneCTFCompDataSet *comp_data, bool fixed_ori, FwdBemModel *bem_model, Vector3f *r0, bool use_threads, MneNamedMatrix **resp, MneNamedMatrix **resp_grad)
 /*
 * Compute the MEG forward solution
 * Use either the sphere model or BEM in the calculations
@@ -2727,7 +3058,7 @@ int FwdBemModel::compute_forward_meg(MneSourceSpaceOld **spaces, int nspace, Fwd
     char             **names;		  /* Channel names */
     void             *client;
     FwdThreadArg*    one_arg = NULL;
-//    int              nproc = mne_get_processor_count();
+    //    int              nproc = mne_get_processor_count();
 
     if (bem_model) {
         /*
@@ -2737,10 +3068,10 @@ int FwdBemModel::compute_forward_meg(MneSourceSpaceOld **spaces, int nspace, Fwd
 #ifdef TEST
         fprintf(stderr,"Using differences.\n");
         comp = FwdCompData::fwd_make_comp_data(comp_data,coils,comp_coils,
-                                  FwdBemModel::fwd_bem_field,NULL,my_bem_field_grad,bem_model,NULL);
+                                               FwdBemModel::fwd_bem_field,NULL,my_bem_field_grad,bem_model,NULL);
 #else
         comp = FwdCompData::fwd_make_comp_data(comp_data,coils,comp_coils,
-                                  FwdBemModel::fwd_bem_field,NULL,FwdBemModel::fwd_bem_field_grad,bem_model,NULL);
+                                               FwdBemModel::fwd_bem_field,NULL,FwdBemModel::fwd_bem_field_grad,bem_model,NULL);
 #endif
         if (!comp)
             goto bad;
@@ -2771,16 +3102,16 @@ int FwdBemModel::compute_forward_meg(MneSourceSpaceOld **spaces, int nspace, Fwd
 #ifdef TEST
         fprintf(stderr,"Using differences.\n");
         comp = FwdCompData::fwd_make_comp_data(comp_data,coils,comp_coils,
-                                  fwd_sphere_field,
-                                  fwd_sphere_field_vec,
-                                  my_sphere_field_grad,
-                                  r0,NULL);
+                                               fwd_sphere_field,
+                                               fwd_sphere_field_vec,
+                                               my_sphere_field_grad,
+                                               r0,NULL);
 #else
         comp = FwdCompData::fwd_make_comp_data(comp_data,coils,comp_coils,
-                                  fwd_sphere_field,
-                                  fwd_sphere_field_vec,
-                                  fwd_sphere_field_grad,
-                                  r0,NULL);
+                                               fwd_sphere_field,
+                                               fwd_sphere_field_vec,
+                                               fwd_sphere_field_grad,
+                                               r0,NULL);
 #endif
         if (!comp)
             goto bad;
@@ -2904,22 +3235,25 @@ int FwdBemModel::compute_forward_meg(MneSourceSpaceOld **spaces, int nspace, Fwd
         char **orig_names = MALLOC_40(nmeg,char *);
         for (k = 0; k < nmeg; k++)
             orig_names[k] = coils->coils[k]->chname;
-        names = mne_dup_name_list(orig_names,nmeg);
+        names = mne_dup_name_list_40(orig_names,nmeg);
         FREE_40(orig_names);
     }
     if(one_arg)
         delete one_arg;
-    fwd_free_comp_data(comp);
-    *resp = mne_build_named_matrix(fixed_ori ? nsource : 3*nsource,nmeg,NULL,names,res);
+    if(comp)
+        delete comp;
+
+    *resp = MneNamedMatrix::build_named_matrix(fixed_ori ? nsource : 3*nsource,nmeg,NULL,names,res);
     if (resp_grad && res_grad)
-        *resp_grad = mne_build_named_matrix(fixed_ori ? 3*nsource : 3*3*nsource,nmeg,NULL,
-                                            mne_dup_name_list(names,nmeg),res_grad);
+        *resp_grad = MneNamedMatrix::build_named_matrix(fixed_ori ? 3*nsource : 3*3*nsource,nmeg,NULL,
+                                            mne_dup_name_list_40(names,nmeg),res_grad);
     return OK;
 
 bad : {
         if(one_arg)
             delete one_arg;
-        fwd_free_comp_data(comp);
+        if(comp)
+            delete comp;
         FREE_CMATRIX_40(res);
         FREE_CMATRIX_40(res_grad);
         return FAIL;
@@ -2970,15 +3304,15 @@ int FwdBemModel::compute_forward_eeg(MneSourceSpaceOld **spaces, int nspace, Fwd
     else {
         if (m->nfit == 0) {
             fprintf(stderr,"Using the standard series expansion for a multilayer sphere model for EEG\n");
-            pot      = fwd_eeg_multi_spherepot_coil1;
+            pot      = FwdEegSphereModel::fwd_eeg_multi_spherepot_coil1;
             vec_pot  = NULL;
             pot_grad = NULL;
         }
         else {
             fprintf(stderr,"Using the equivalent source approach in the homogeneous sphere for EEG\n");
-            pot      = fwd_eeg_spherepot_coil;
-            vec_pot  = fwd_eeg_spherepot_coil_vec;
-            pot_grad = fwd_eeg_spherepot_grad_coil;
+            pot      = FwdEegSphereModel::fwd_eeg_spherepot_coil;
+            vec_pot  = FwdEegSphereModel::fwd_eeg_spherepot_coil_vec;
+            pot_grad = FwdEegSphereModel::fwd_eeg_spherepot_grad_coil;
         }
         client   = m;
     }
@@ -2991,7 +3325,7 @@ int FwdBemModel::compute_forward_eeg(MneSourceSpaceOld **spaces, int nspace, Fwd
         res = ALLOC_CMATRIX_40(3*nsource,neeg);
     if (resp_grad) {
         if (!pot_grad) {
-            err_set_error("EEG gradient calculation function not available");
+            qCritical("EEG gradient calculation function not available");
             goto bad;
         }
         if (fixed_ori)
@@ -3095,15 +3429,15 @@ int FwdBemModel::compute_forward_eeg(MneSourceSpaceOld **spaces, int nspace, Fwd
         char **orig_names = MALLOC_40(neeg,char *);
         for (k = 0; k < neeg; k++)
             orig_names[k] = els->coils[k]->chname;
-        names = mne_dup_name_list(orig_names,neeg);
+        names = mne_dup_name_list_40(orig_names,neeg);
         FREE_40(orig_names);
     }
     if(one_arg)
         delete one_arg;
-    *resp = mne_build_named_matrix(fixed_ori ? nsource : 3*nsource,neeg,NULL,names,res);
+    *resp = MneNamedMatrix::build_named_matrix(fixed_ori ? nsource : 3*nsource,neeg,NULL,names,res);
     if (resp_grad && res_grad)
-        *resp_grad = mne_build_named_matrix(fixed_ori ? 3*nsource : 3*3*nsource,neeg,NULL,
-                                            mne_dup_name_list(names,neeg),res_grad);
+        *resp_grad = MneNamedMatrix::build_named_matrix(fixed_ori ? 3*nsource : 3*3*nsource,neeg,NULL,
+                                            mne_dup_name_list_40(names,neeg),res_grad);
     return OK;
 
 bad : {

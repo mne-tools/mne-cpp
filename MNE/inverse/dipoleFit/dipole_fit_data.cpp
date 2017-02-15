@@ -12,6 +12,8 @@
 #include "fwd_bem_model.h"
 #include "mne_surface_old.h"
 
+#include "fwd_comp_data.h"
+
 #include <Eigen/Dense>
 
 
@@ -3980,7 +3982,7 @@ int DipoleFitData::setup_forward_model(DipoleFitData *d, MneCTFCompDataSet* comp
      * Take care of some hairy details
      */
 {
-    fwdCompData comp;
+    FwdCompData* comp;
     dipoleFitFuncs f;
     int fit_sphere_to_bem = TRUE;
 
@@ -4038,7 +4040,7 @@ int DipoleFitData::setup_forward_model(DipoleFitData *d, MneCTFCompDataSet* comp
            * Use the new compensated field computation
            * It works the same way independent of whether or not the compensation is in effect
            */
-            comp = fwd_make_comp_data(comp_data,d->meg_coils,comp_coils,
+            comp = FwdCompData::fwd_make_comp_data(comp_data,d->meg_coils,comp_coils,
                                       FwdBemModel::fwd_bem_field,NULL,NULL,d->bem_model,NULL);
             if (!comp)
                 goto out;
@@ -4051,10 +4053,10 @@ int DipoleFitData::setup_forward_model(DipoleFitData *d, MneCTFCompDataSet* comp
                 goto out;
             printf("[done]\n");
 
-            f->meg_field       = fwd_comp_field;
+            f->meg_field       = FwdCompData::fwd_comp_field;
             f->meg_vec_field   = NULL;
             f->meg_client      = comp;
-            f->meg_client_free = fwd_free_comp_data;
+            f->meg_client_free = FwdCompData::fwd_free_comp_data;
         }
         if (d->neeg > 0) {
             printf("\tEEG solution matrix...");
@@ -4082,17 +4084,17 @@ int DipoleFitData::setup_forward_model(DipoleFitData *d, MneCTFCompDataSet* comp
          * Use the new compensated field computation
          * It works the same way independent of whether or not the compensation is in effect
          */
-        comp = fwd_make_comp_data(comp_data,d->meg_coils,comp_coils,
-                                  fwd_sphere_field,
-                                  fwd_sphere_field_vec,
+        comp = FwdCompData::fwd_make_comp_data(comp_data,d->meg_coils,comp_coils,
+                                  FwdBemModel::fwd_sphere_field,
+                                  FwdBemModel::fwd_sphere_field_vec,
                                   NULL,
                                   d->r0,NULL);
         if (!comp)
             goto out;
-        f->meg_field       = fwd_comp_field;
-        f->meg_vec_field   = fwd_comp_field_vec;
+        f->meg_field       = FwdCompData::fwd_comp_field;
+        f->meg_vec_field   = FwdCompData::fwd_comp_field_vec;
         f->meg_client      = comp;
-        f->meg_client_free = fwd_free_comp_data;
+        f->meg_client_free = FwdCompData::fwd_free_comp_data;
     }
     printf("Sphere model origin : %6.1f %6.1f %6.1f mm.\n",
            1000*d->r0[X_3],1000*d->r0[Y_3],1000*d->r0[Z_3]);
@@ -4105,20 +4107,20 @@ int DipoleFitData::setup_forward_model(DipoleFitData *d, MneCTFCompDataSet* comp
          * Use the new compensated field computation
          * It works the same way independent of whether or not the compensation is in effect
          */
-        comp = fwd_make_comp_data(comp_data,d->meg_coils,comp_coils,
-                                  fwd_mag_dipole_field,
-                                  fwd_mag_dipole_field_vec,
+        comp = FwdCompData::fwd_make_comp_data(comp_data,d->meg_coils,comp_coils,
+                                  FwdBemModel::fwd_mag_dipole_field,
+                                  FwdBemModel::fwd_mag_dipole_field_vec,
                                   NULL,
                                   NULL,NULL);
         if (!comp)
             goto out;
-        f->meg_field       = fwd_comp_field;
-        f->meg_vec_field   = fwd_comp_field_vec;
+        f->meg_field       = FwdCompData::fwd_comp_field;
+        f->meg_vec_field   = FwdCompData::fwd_comp_field_vec;
         f->meg_client      = comp;
-        f->meg_client_free = fwd_free_comp_data;
+        f->meg_client_free = FwdCompData::fwd_free_comp_data;
     }
-    f->eeg_pot     = fwd_mag_dipole_field;
-    f->eeg_vec_pot = fwd_mag_dipole_field_vec;
+    f->eeg_pot     = FwdBemModel::fwd_mag_dipole_field;
+    f->eeg_vec_pot = FwdBemModel::fwd_mag_dipole_field_vec;
     /*
         * Select the appropriate fitting function
         */
