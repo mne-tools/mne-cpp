@@ -674,8 +674,13 @@ void RtSourceLocDataWorker::run()
             m_qMutex.unlock();
         }
 
+        //Sleep specified amount of time - also take into account processing time from before
+        int iTimerElapsed = timer.elapsed();
         //qDebug() << "RtSourceLocDataWorker::run()" << timer.elapsed() << "msecs";
-        QThread::msleep(m_iMSecIntervall);
+
+        if(m_iMSecIntervall-iTimerElapsed > 0) {
+            QThread::msleep(m_iMSecIntervall-iTimerElapsed);
+        }
     }
 }
 
