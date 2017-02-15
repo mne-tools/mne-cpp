@@ -138,7 +138,10 @@ SOURCES += \
     dipoleFit/mne_triangle.cpp \
     dipoleFit/mne_vol_geom.cpp \
     dipoleFit/mne_source_space_old.cpp \
-    dipoleFit/mne_surface_old.cpp
+    dipoleFit/mne_surface_old.cpp \
+    dipoleFit/fwd_comp_data.cpp \
+    dipoleFit/filter_thread_arg.cpp \
+    dipoleFit/fwd_thread_arg.cpp
 
 HEADERS +=\
     inverse_global.h \
@@ -188,7 +191,10 @@ HEADERS +=\
     dipoleFit/mne_triangle.h \
     dipoleFit/mne_vol_geom.h \
     dipoleFit/mne_source_space_old.h \
-    dipoleFit/mne_surface_old.h
+    dipoleFit/mne_surface_old.h \
+    dipoleFit/fwd_comp_data.h \
+    dipoleFit/filter_thread_arg.h \
+    dipoleFit/fwd_thread_arg.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

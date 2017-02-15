@@ -21,7 +21,7 @@ typedef void (*fwdUserFreeFunc)(void *);  /* General purpose */
 typedef int (*fwdFieldFunc)(float *rd,float *Q,INVERSELIB::FwdCoilSet* coils,float *res,void *client);
 typedef int (*fwdVecFieldFunc)(float *rd,INVERSELIB::FwdCoilSet* coils,float **res,void *client);
 typedef int (*fwdFieldGradFunc)(float *rd,float *Q,INVERSELIB::FwdCoilSet* coils, float *res,
-				float *xgrad, float *ygrad, float *zgrad, void *client);
+                                float *xgrad, float *ygrad, float *zgrad, void *client);
 
 
 
@@ -64,16 +64,16 @@ typedef int (*fwdFieldGradFunc)(float *rd,float *Q,INVERSELIB::FwdCoilSet* coils
 //  int        use_ip_approach;	/* Do we need it */
 //} *fwdBemModel,fwdBemModelRec;	/* Holds the BEM model definition */
 
-typedef struct {
-  INVERSELIB::MneCTFCompDataSet* set;	         /* The compensation data set */
-  INVERSELIB::FwdCoilSet*        comp_coils;	         /* The compensation coil definitions */
-  fwdFieldFunc      field;	         /* Computes the field of given direction dipole */
-  fwdVecFieldFunc   vec_field;	         /* Computes the fields of all three dipole components  */
-  fwdFieldGradFunc  field_grad;	         /* Computes the field and gradient of one dipole direction */
-  void              *client;	         /* Client data to pass to the above functions */
-  fwdUserFreeFunc   client_free;
-  float             *work;	         /* The work areas */
-  float             **vec_work;
-} *fwdCompData,fwdCompDataRec;	         /* This structure is used in the compensated field calculations */
+//typedef struct {
+//  INVERSELIB::MneCTFCompDataSet* set;	         /* The compensation data set */
+//  INVERSELIB::FwdCoilSet*        comp_coils;	         /* The compensation coil definitions */
+//  fwdFieldFunc      field;	         /* Computes the field of given direction dipole */
+//  fwdVecFieldFunc   vec_field;	         /* Computes the fields of all three dipole components  */
+//  fwdFieldGradFunc  field_grad;	         /* Computes the field and gradient of one dipole direction */
+//  void              *client;	         /* Client data to pass to the above functions */
+//  fwdUserFreeFunc   client_free;
+//  float             *work;	         /* The work areas */
+//  float             **vec_work;
+//} *fwdCompData,fwdCompDataRec;	         /* This structure is used in the compensated field calculations */
 
 #endif

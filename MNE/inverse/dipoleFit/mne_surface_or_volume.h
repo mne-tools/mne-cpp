@@ -357,6 +357,8 @@ public:
 
     static int mne_source_space_add_geometry_info2(MneSourceSpaceOld* s, int do_normals);
 
+
+
 public:
     int              type;          /* Is this a volume or a surface */
     char             *subject;      /* Name (id) of the subject */

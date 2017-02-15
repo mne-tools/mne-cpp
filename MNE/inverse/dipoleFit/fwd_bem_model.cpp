@@ -42,7 +42,12 @@
 #include "fwd_bem_solution.h"
 #include "mne_surface_old.h"
 #include "mne_triangle.h"
+#include "mne_source_space_old.h"
 
+#include "fwd_comp_data.h"
+#include "fwd_bem_model.h"
+
+#include "fwd_thread_arg.h"
 
 #include <fiff/fiff_stream.h>
 
@@ -2435,6 +2440,211 @@ void FwdBemModel::fwd_bem_field_calc(float *rd, float *Q, FwdCoilSet *coils, Fwd
 
 //*************************************************************************************************************
 
+void FwdBemModel::fwd_bem_field_grad_calc(float *rd, float *Q, FwdCoilSet* coils, FwdBemModel* m, float *xgrad, float *ygrad, float *zgrad)
+/*
+* Calculate the magnetic field in a set of coils
+*/
+{
+    FwdBemSolution* sol = (FwdBemSolution*)coils->user_data;
+    float          *v0;
+    int            s,k,p,ntri,pp;
+    FwdCoil*       coil;
+    MneTriangle*   tri;
+    float          mult;
+    float          *grads[3],ee[3],mri_ee[3],mri_rd[3],mri_Q[3];
+    float          *grad;
+
+    grads[0] = xgrad;
+    grads[1] = ygrad;
+    grads[2] = zgrad;
+    /*
+       * Infinite-medium potentials
+       */
+    if (!m->v0)
+        m->v0 = MALLOC_40(m->nsol,float);
+    v0 = m->v0;
+    /*
+       * The dipole location and orientation must be transformed
+       */
+    VEC_COPY_40(mri_rd,rd);
+    VEC_COPY_40(mri_Q,Q);
+    if (m->head_mri_t) {
+        FiffCoordTransOld::fiff_coord_trans(mri_rd,m->head_mri_t,FIFFV_MOVE);
+        FiffCoordTransOld::fiff_coord_trans(mri_Q,m->head_mri_t,FIFFV_NO_MOVE);
+    }
+    for (pp = 0; pp < 3; pp++) {
+        grad = grads[pp];
+        /*
+         * Select the correct gradient component
+         */
+        for (p = 0; p < 3; p++)
+            ee[p] = p == pp ? 1.0 : 0.0;
+        VEC_COPY_40(mri_ee,ee);
+        if (m->head_mri_t)
+            FiffCoordTransOld::fiff_coord_trans(mri_ee,m->head_mri_t,FIFFV_NO_MOVE);
+        /*
+         * Compute the inifinite-medium potential derivatives at the centers of the triangles
+         */
+        for (s = 0, p = 0; s < m->nsurf; s++) {
+            ntri = m->surfs[s]->ntri;
+            tri  = m->surfs[s]->tris;
+            mult = m->source_mult[s];
+            for (k = 0; k < ntri; k++, tri++) {
+                v0[p++] = mult*fwd_bem_inf_pot_der(mri_rd,mri_Q,tri->cent,mri_ee);
+            }
+        }
+        /*
+         * Primary current contribution
+         * (can be calculated in the coil/dipole coordinates)
+         */
+        for (k = 0; k < coils->ncoil; k++) {
+            coil = coils->coils[k];
+            grad[k] = 0.0;
+            for (p = 0; p < coil->np; p++)
+                grad[k] = grad[k] + coil->w[p]*fwd_bem_inf_field_der(rd,Q,coil->rmag[p],coil->cosmag[p],ee);
+        }
+        /*
+         * Volume current contribution
+         */
+        for (k = 0; k < coils->ncoil; k++)
+            grad[k] = grad[k] + mne_dot_vectors_40(sol->solution[k],v0,m->nsol);
+        /*
+         * Scale correctly
+         */
+        for (k = 0; k < coils->ncoil; k++)
+            grad[k] = MAG_FACTOR*grad[k];
+    }
+    return;
+}
+
+
+//*************************************************************************************************************
+
+float FwdBemModel::fwd_bem_inf_field_der(float *rd, float *Q, float *rp, float *dir, float *comp)	   /* Which gradient component */
+/*
+* Derivative of the infinite-medium magnetic field with respect to
+* one of the dipole position coordinates (without \mu_0/4\pi)
+*/
+{
+    float diff[3],diff2,diff3,diff5,cross[3],crossn[3],res;
+
+    VEC_DIFF_40(rd,rp,diff);
+    diff2 = VEC_DOT_40(diff,diff);
+    diff3 = sqrt(diff2)*diff2;
+    diff5 = diff3*diff2;
+    CROSS_PRODUCT_40(Q,diff,cross);
+    CROSS_PRODUCT_40(dir,Q,crossn);
+
+    res = 3*VEC_DOT_40(cross,dir)*VEC_DOT_40(comp,diff)/diff5 - VEC_DOT_40(comp,crossn)/diff3;
+    return res;
+}
+
+
+//*************************************************************************************************************
+
+float FwdBemModel::fwd_bem_inf_pot_der(float *rd, float *Q, float *rp, float *comp) /* Which gradient component */
+/*
+* Derivative of the infinite-medium potential with respect to one of
+* the dipole position coordinates
+*/
+{
+    float diff[3];
+    float diff2,diff5,diff3;
+    float res;
+
+    VEC_DIFF_40(rd,rp,diff);
+    diff2 = VEC_DOT_40(diff,diff);
+    diff3 = sqrt(diff2)*diff2;
+    diff5 = diff3*diff2;
+
+    res = 3*VEC_DOT_40(Q,diff)*VEC_DOT_40(comp,diff)/diff5 - VEC_DOT_40(comp,Q)/diff3;
+    return (res/(4.0*M_PI));
+}
+
+
+//*************************************************************************************************************
+
+void FwdBemModel::fwd_bem_lin_field_grad_calc(float *rd, float *Q, FwdCoilSet *coils, FwdBemModel *m, float *xgrad, float *ygrad, float *zgrad)
+/*
+     * Calculate the gradient with respect to dipole position coordinates in a set of coils
+     */
+{
+    FwdBemSolution* sol = (FwdBemSolution*)coils->user_data;
+
+    float   *v0;
+    int     s,k,p,np,pp;
+    FwdCoil *coil;
+    float   mult;
+    float   **rr,ee[3],mri_ee[3],mri_rd[3],mri_Q[3];
+    float   *grads[3];
+    float   *grad;
+
+    grads[0] = xgrad;
+    grads[1] = ygrad;
+    grads[2] = zgrad;
+    /*
+       * Space for infinite-medium potentials
+       */
+    if (!m->v0)
+        m->v0 = MALLOC_40(m->nsol,float);
+    v0 = m->v0;
+    /*
+       * The dipole location and orientation must be transformed
+       */
+    VEC_COPY_40(mri_rd,rd);
+    VEC_COPY_40(mri_Q,Q);
+    if (m->head_mri_t) {
+        FiffCoordTransOld::fiff_coord_trans(mri_rd,m->head_mri_t,FIFFV_MOVE);
+        FiffCoordTransOld::fiff_coord_trans(mri_Q,m->head_mri_t,FIFFV_NO_MOVE);
+    }
+    for (pp = 0; pp < 3; pp++) {
+        grad = grads[pp];
+        /*
+         * Select the correct gradient component
+         */
+        for (p = 0; p < 3; p++)
+            ee[p] = p == pp ? 1.0 : 0.0;
+        VEC_COPY_40(mri_ee,ee);
+        if (m->head_mri_t)
+            FiffCoordTransOld::fiff_coord_trans(mri_ee,m->head_mri_t,FIFFV_NO_MOVE);
+        /*
+         * Compute the inifinite-medium potentials at the vertices
+         */
+        for (s = 0, p = 0; s < m->nsurf; s++) {
+            np     = m->surfs[s]->np;
+            rr     = m->surfs[s]->rr;
+            mult   = m->source_mult[s];
+
+            for (k = 0; k < np; k++)
+                v0[p++] = mult*fwd_bem_inf_pot_der(mri_rd,mri_Q,rr[k],mri_ee);
+        }
+        /*
+         * Primary current contribution
+         * (can be calculated in the coil/dipole coordinates)
+         */
+        for (k = 0; k < coils->ncoil; k++) {
+            coil = coils->coils[k];
+            grad[k] = 0.0;
+            for (p = 0; p < coil->np; p++)
+                grad[k] = grad[k] + coil->w[p]*fwd_bem_inf_field_der(rd,Q,coil->rmag[p],coil->cosmag[p],ee);
+        }
+        /*
+         * Volume current contribution
+         */
+        for (k = 0; k < coils->ncoil; k++)
+            grad[k] = grad[k] + mne_dot_vectors_40(sol->solution[k],v0,m->nsol);
+        /*
+         * Scale correctly
+         */
+        for (k = 0; k < coils->ncoil; k++)
+            grad[k] = MAG_FACTOR*grad[k];
+    }
+    return;
+}
+
+
+//*************************************************************************************************************
+
 int FwdBemModel::fwd_bem_field(float *rd, float *Q, FwdCoilSet *coils, float *B, void *client)  /* The model */
 /*
      * This version calculates the magnetic field in a set of coils
@@ -2460,6 +2670,913 @@ int FwdBemModel::fwd_bem_field(float *rd, float *Q, FwdCoilSet *coils, float *B,
     else {
         printf("Unknown BEM method : %d",m->bem_method);
         return FAIL;
+    }
+    return OK;
+}
+
+int FwdBemModel::fwd_bem_field_grad(float *rd, float Q[], FwdCoilSet *coils, float Bval[], float xgrad[], float ygrad[], float zgrad[], void *client)  /* Client data to be passed to some foward modelling routines */
+{
+    FwdBemModel* m = (FwdBemModel*)client;
+    FwdBemSolution* sol = (FwdBemSolution*)coils->user_data;
+
+    if (!m) {
+        qCritical("No BEM model specified to fwd_bem_field");
+        return FAIL;
+    }
+    if (!sol || !sol->solution || sol->ncoil != coils->ncoil) {
+        qCritical("No appropriate coil-specific data available in fwd_bem_field");
+        return FAIL;
+    }
+    if (m->bem_method == FWD_BEM_CONSTANT_COLL) {
+        if (Bval)
+            fwd_bem_field_calc(rd,Q,coils,m,Bval);
+        fwd_bem_field_grad_calc(rd,Q,coils,m,xgrad,ygrad,zgrad);
+    }
+    else if (m->bem_method == FWD_BEM_LINEAR_COLL) {
+        if (Bval)
+            fwd_bem_lin_field_calc(rd,Q,coils,m,Bval);
+        fwd_bem_lin_field_grad_calc(rd,Q,coils,m,xgrad,ygrad,zgrad);
+    }
+    else {
+        qCritical("Unknown BEM method : %d",m->bem_method);
+        return FAIL;
+    }
+    return OK;
+
+}
+
+
+//*************************************************************************************************************
+
+int FwdBemModel::compute_forward_meg(MneSourceSpaceOld **spaces, int nspace, FwdCoilSet *coils, FwdCoilSet *comp_coils, MneCTFCompDataSet *comp_data, bool fixed_ori, FwdBemModel *bem_model, float *r0, bool use_threads, MneNamedMatrix **resp, MneNamedMatrix **resp_grad)
+/*
+* Compute the MEG forward solution
+* Use either the sphere model or BEM in the calculations
+*/
+{
+    float            **res = NULL;	  /* The forward solution matrix */
+    float            **res_grad = NULL;	  /* The gradient with respect to the dipole position */
+    FwdCompData      *comp = NULL;
+    fwdFieldFunc     field;	          /* Computes the field for one dipole orientation */
+    fwdVecFieldFunc  vec_field;		  /* Computes the field for all dipole orientations */
+    fwdFieldGradFunc field_grad;		  /* Computes the field and gradient with respect to dipole position
+                           * for one dipole orientation */
+    int              nmeg = coils->ncoil;	  /* Number of channels */
+    int              nsource;		  /* Total number of sources */
+    int              k,p,q,off;
+    char             **names;		  /* Channel names */
+    void             *client;
+    FwdThreadArg*    one_arg = NULL;
+//    int              nproc = mne_get_processor_count();
+
+    if (bem_model) {
+        /*
+         * Use the new compensated field computation
+         * It works the same way independent of whether or not the compensation is in effect
+         */
+#ifdef TEST
+        fprintf(stderr,"Using differences.\n");
+        comp = FwdCompData::fwd_make_comp_data(comp_data,coils,comp_coils,
+                                  FwdBemModel::fwd_bem_field,NULL,my_bem_field_grad,bem_model,NULL);
+#else
+        comp = FwdCompData::fwd_make_comp_data(comp_data,coils,comp_coils,
+                                  FwdBemModel::fwd_bem_field,NULL,FwdBemModel::fwd_bem_field_grad,bem_model,NULL);
+#endif
+        if (!comp)
+            goto bad;
+        /*
+         * Field computation matrices...
+         */
+        fprintf(stderr,"Composing the field computation matrix...");
+        if (fwd_bem_specify_coils(bem_model,coils) == FAIL)
+            goto bad;
+        fprintf(stderr,"[done]\n");
+
+        if (comp->set && comp->set->current) { /* Test just to specify confusing output */
+            fprintf(stderr,"Composing the field computation matrix (compensation coils)...");
+            if (fwd_bem_specify_coils(bem_model,comp->comp_coils) == FAIL)
+                goto bad;
+            fprintf(stderr,"[done]\n");
+        }
+        field      = FwdCompData::fwd_comp_field;
+        vec_field  = NULL;
+        field_grad = FwdCompData::fwd_comp_field_grad;
+        client     = comp;
+    }
+    else {
+        /*
+         * Use the new compensated field computation
+         * It works the same way independent of whether or not the compensation is in effect
+         */
+#ifdef TEST
+        fprintf(stderr,"Using differences.\n");
+        comp = FwdCompData::fwd_make_comp_data(comp_data,coils,comp_coils,
+                                  fwd_sphere_field,
+                                  fwd_sphere_field_vec,
+                                  my_sphere_field_grad,
+                                  r0,NULL);
+#else
+        comp = FwdCompData::fwd_make_comp_data(comp_data,coils,comp_coils,
+                                  fwd_sphere_field,
+                                  fwd_sphere_field_vec,
+                                  fwd_sphere_field_grad,
+                                  r0,NULL);
+#endif
+        if (!comp)
+            goto bad;
+        field       = FwdCompData::fwd_comp_field;
+        vec_field   = FwdCompData::fwd_comp_field_vec;
+        field_grad  = FwdCompData::fwd_comp_field_grad;
+        client      = comp;
+    }
+    /*
+       * Count the sources
+       */
+    for (k = 0, nsource = 0; k < nspace; k++)
+        nsource += spaces[k]->nuse;
+    /*
+       * Allocate space for the solution
+       */
+    if (fixed_ori)
+        res = ALLOC_CMATRIX_40(nsource,nmeg);
+    else
+        res = ALLOC_CMATRIX_40(3*nsource,nmeg);
+    if (resp_grad) {
+        if (fixed_ori)
+            res_grad = ALLOC_CMATRIX_40(3*nsource,nmeg);
+        else
+            res_grad = ALLOC_CMATRIX_40(3*3*nsource,nmeg);
+    }
+    /*
+       * Set up the argument for the field computation
+       */
+    one_arg = new FwdThreadArg();
+    one_arg->res            = res;
+    one_arg->res_grad       = res_grad;
+    one_arg->off            = 0;
+    one_arg->coils_els      = coils;
+    one_arg->client         = client;
+    one_arg->s              = NULL;
+    one_arg->fixed_ori      = fixed_ori;
+    one_arg->field_pot      = field;
+    one_arg->vec_field_pot  = vec_field;
+    one_arg->field_pot_grad = field_grad;
+
+//    if (nproc < 2)
+//        use_threads = false;
+
+//    if (use_threads) {
+    qDebug() << "!!!! TODO !!!! Implement thread version using QtConcurrent";
+//        int            nthread  = (fixed_ori || vec_field || nproc < 6) ? nspace : 3*nspace;
+//        pthread_t      *threads = MALLOC_40(nthread,pthread_t);
+//        fwdThreadArg   *args    = MALLOC_40(nthread,fwdThreadArg);
+//        pthread_attr_t pthread_custom_attr;
+//        int            stat;
+//        /*
+//         * We need copies to allocate separate workspace for each thread
+//         */
+//        if (fixed_ori || vec_field || nproc < 6) {
+//            for (k = 0, off = 0; k < nthread; k++) {
+//                args[k]      = create_meg_multi_thread_duplicate(one_arg,bem_model != NULL);
+//                args[k]->s   = spaces[k];
+//                args[k]->off = off;
+//                off = fixed_ori ? off + spaces[k]->nuse : off + 3*spaces[k]->nuse;
+//            }
+//            fprintf(stderr,"%d processors. I will use one thread for each of the %d source spaces.\n",
+//                    nproc,nspace);
+//        }
+//        else {
+//            for (k = 0, off = 0, q = 0; k < nspace; k++) {
+//                for (p = 0; p < 3; p++,q++) {
+//                    args[q]       = create_meg_multi_thread_duplicate(one_arg,bem_model != NULL);
+//                    args[q]->s    = spaces[k];
+//                    args[q]->off  = off;
+//                    args[q]->comp = p;
+//                }
+//                off = fixed_ori ? off + spaces[k]->nuse : off + 3*spaces[k]->nuse;
+//            }
+//            fprintf(stderr,"%d processors. I will use %d threads : %d source spaces x 3 source components.\n",
+//                    nproc,nthread,nspace);
+//        }
+//        fprintf(stderr,"Computing MEG at %d source locations (%s orientations)...",
+//                nsource,fixed_ori ? "fixed" : "free");
+//        /*
+//         * Ready to start the threads
+//         */
+//        pthread_attr_init(&pthread_custom_attr);
+//        for (k = 0; k < nthread; k++)
+//            pthread_create(threads+k,&pthread_custom_attr,meg_eeg_fwd_one_source_space,args[k]);
+//        /*
+//         * Wait for them to complete
+//         */
+//        for (k = 0; k < nthread; k++)
+//            pthread_join(threads[k],NULL);
+//        /*
+//         * Check the results
+//         */
+//        for (k = 0, stat = OK; k < nthread; k++)
+//            if (args[k]->stat != OK) {
+//                stat = FAIL;
+//                break;
+//            }
+//        for (k = 0; k < nthread; k++)
+//            free_meg_multi_thread_duplicate(args[k],bem_model != NULL);
+//        FREE_40(args);
+//        FREE_40(threads);
+//        if (stat != OK)
+//            goto bad;
+
+//    }
+//    else {
+        fprintf(stderr,"Computing MEG at %d source locations (%s orientations, no threads)...",
+                nsource,fixed_ori ? "fixed" : "free");
+        for (k = 0, off = 0; k < nspace; k++) {
+            one_arg->s   = spaces[k];
+            one_arg->off = off;
+            meg_eeg_fwd_one_source_space(one_arg);
+            if (one_arg->stat != OK)
+                goto bad;
+            off = fixed_ori ? off + one_arg->s->nuse : off + 3*one_arg->s->nuse;
+        }
+//    }
+    fprintf(stderr,"done.\n");
+    {
+        char **orig_names = MALLOC_40(nmeg,char *);
+        for (k = 0; k < nmeg; k++)
+            orig_names[k] = coils->coils[k]->chname;
+        names = mne_dup_name_list(orig_names,nmeg);
+        FREE_40(orig_names);
+    }
+    if(one_arg)
+        delete one_arg;
+    fwd_free_comp_data(comp);
+    *resp = mne_build_named_matrix(fixed_ori ? nsource : 3*nsource,nmeg,NULL,names,res);
+    if (resp_grad && res_grad)
+        *resp_grad = mne_build_named_matrix(fixed_ori ? 3*nsource : 3*3*nsource,nmeg,NULL,
+                                            mne_dup_name_list(names,nmeg),res_grad);
+    return OK;
+
+bad : {
+        if(one_arg)
+            delete one_arg;
+        fwd_free_comp_data(comp);
+        FREE_CMATRIX_40(res);
+        FREE_CMATRIX_40(res_grad);
+        return FAIL;
+    }
+}
+
+
+//*************************************************************************************************************
+
+int FwdBemModel::compute_forward_eeg(MneSourceSpaceOld **spaces, int nspace, FwdCoilSet *els, bool fixed_ori, FwdBemModel *bem_model, FwdEegSphereModel *m, bool use_threads, MneNamedMatrix **resp, MneNamedMatrix **resp_grad)
+/*
+    * Compute the EEG forward solution
+    * Use either the sphere model or BEM in the calculations
+    */
+{
+    float            **res = NULL;	  /* The forward solution matrix */
+    float            **res_grad = NULL;	  /* The gradient with respect to the dipole position */
+    fwdFieldFunc     pot;                   /* Computes the potentials for one dipole orientation */
+    fwdVecFieldFunc  vec_pot;		  /* Computes the potentials for all dipole orientations */
+    fwdFieldGradFunc pot_grad;	          /* Computes the potential and gradient with respect to dipole position
+                           * for one dipole orientation */
+    int             nsource;		  /* Total number of sources */
+    int             neeg = els->ncoil;	  /* Number of channels */
+    int             k,p,q,off;
+    char            **names;		  /* Channel names */
+    void            *client;
+    FwdThreadArg*   one_arg = NULL;
+//    int             nproc = mne_get_processor_count();
+    /*
+       * Count the sources
+       */
+    for (k = 0, nsource = 0; k < nspace; k++)
+        nsource += spaces[k]->nuse;
+
+    if (bem_model) {
+        if (fwd_bem_specify_els(bem_model,els) == FAIL)
+            goto bad;
+        client   = bem_model;
+        pot      = fwd_bem_pot_els;
+        vec_pot  = NULL;
+#ifdef TEST
+        fprintf(stderr,"Using differences.\n");
+        pot_grad = my_bem_pot_grad;
+#else
+        pot_grad = fwd_bem_pot_grad_els;
+#endif
+    }
+    else {
+        if (m->nfit == 0) {
+            fprintf(stderr,"Using the standard series expansion for a multilayer sphere model for EEG\n");
+            pot      = fwd_eeg_multi_spherepot_coil1;
+            vec_pot  = NULL;
+            pot_grad = NULL;
+        }
+        else {
+            fprintf(stderr,"Using the equivalent source approach in the homogeneous sphere for EEG\n");
+            pot      = fwd_eeg_spherepot_coil;
+            vec_pot  = fwd_eeg_spherepot_coil_vec;
+            pot_grad = fwd_eeg_spherepot_grad_coil;
+        }
+        client   = m;
+    }
+    /*
+       * Allocate space for the solution
+       */
+    if (fixed_ori)
+        res = ALLOC_CMATRIX_40(nsource,neeg);
+    else
+        res = ALLOC_CMATRIX_40(3*nsource,neeg);
+    if (resp_grad) {
+        if (!pot_grad) {
+            err_set_error("EEG gradient calculation function not available");
+            goto bad;
+        }
+        if (fixed_ori)
+            res_grad = ALLOC_CMATRIX_40(3*nsource,neeg);
+        else
+            res_grad = ALLOC_CMATRIX_40(3*3*nsource,neeg);
+    }
+    /*
+       * Set up the argument for the field computation
+       */
+    one_arg = new FwdThreadArg();
+    one_arg->res            = res;
+    one_arg->res_grad       = res_grad;
+    one_arg->off            = 0;
+    one_arg->coils_els      = els;
+    one_arg->client         = client;
+    one_arg->s              = NULL;
+    one_arg->fixed_ori      = fixed_ori;
+    one_arg->field_pot      = pot;
+    one_arg->vec_field_pot  = vec_pot;
+    one_arg->field_pot_grad = pot_grad;
+
+//    if (nproc < 2)
+//        use_threads = false;
+
+//    if (use_threads) {
+    qDebug() << "!!!! TODO !!!! Implement thread version using QtConcurrent";
+//        int            nthread  = (fixed_ori || vec_pot || nproc < 6) ? nspace : 3*nspace;
+//        pthread_t      *threads = MALLOC_40(nthread,pthread_t);
+//        fwdThreadArg   *args    = MALLOC_40(nthread,fwdThreadArg);
+//        pthread_attr_t pthread_custom_attr;
+//        int            stat;
+//        /*
+//         * We need copies to allocate separate workspace for each thread
+//         */
+//        if (fixed_ori || vec_pot || nproc < 6) {
+//            for (k = 0, off = 0; k < nthread; k++) {
+//                args[k]      = create_eeg_multi_thread_duplicate(one_arg,bem_model != NULL);
+//                args[k]->s   = spaces[k];
+//                args[k]->off = off;
+//                off = fixed_ori ? off + spaces[k]->nuse : off + 3*spaces[k]->nuse;
+//            }
+//            fprintf(stderr,"%d processors. I will use one thread for each of the %d source spaces.\n",
+//                    nproc,nspace);
+//        }
+//        else {
+//            for (k = 0, off = 0, q = 0; k < nspace; k++) {
+//                for (p = 0; p < 3; p++,q++) {
+//                    args[q]       = create_eeg_multi_thread_duplicate(one_arg,bem_model != NULL);
+//                    args[q]->s    = spaces[k];
+//                    args[q]->off  = off;
+//                    args[q]->comp = p;
+//                }
+//                off = fixed_ori ? off + spaces[k]->nuse : off + 3*spaces[k]->nuse;
+//            }
+//            fprintf(stderr,"%d processors. I will use %d threads : %d source spaces x 3 source components.\n",
+//                    nproc,nthread,nspace);
+//        }
+//        fprintf(stderr,"Computing EEG at %d source locations (%s orientations)...",
+//                nsource,fixed_ori ? "fixed" : "free");
+//        /*
+//         * Ready to start the threads
+//         */
+//        pthread_attr_init(&pthread_custom_attr);
+//        for (k = 0; k < nthread; k++)
+//            pthread_create(threads+k,&pthread_custom_attr,meg_eeg_fwd_one_source_space,args[k]);
+//        /*
+//         * Wait for them to complete
+//         */
+//        for (k = 0; k < nthread; k++)
+//            pthread_join(threads[k],NULL);
+//        /*
+//         * Check the results
+//         */
+//        for (k = 0, stat = OK; k < nthread; k++)
+//            if (args[k]->stat != OK) {
+//                stat = FAIL;
+//                break;
+//            }
+//        for (k = 0; k < nthread; k++)
+//            free_eeg_multi_thread_duplicate(args[k],bem_model != NULL);
+//        FREE_40(args);
+//        FREE_40(threads);
+//        if (stat != OK)
+//            goto bad;
+//    }
+//    else {
+        fprintf(stderr,"Computing EEG at %d source locations (%s orientations, no threads)...",
+                nsource,fixed_ori ? "fixed" : "free");
+        for (k = 0, off = 0; k < nspace; k++) {
+            one_arg->s   = spaces[k];
+            one_arg->off = off;
+            meg_eeg_fwd_one_source_space(one_arg);
+            if (one_arg->stat != OK)
+                goto bad;
+            off = fixed_ori ? off + one_arg->s->nuse : off + 3*one_arg->s->nuse;
+        }
+//    }
+    fprintf(stderr,"done.\n");
+    {
+        char **orig_names = MALLOC_40(neeg,char *);
+        for (k = 0; k < neeg; k++)
+            orig_names[k] = els->coils[k]->chname;
+        names = mne_dup_name_list(orig_names,neeg);
+        FREE_40(orig_names);
+    }
+    if(one_arg)
+        delete one_arg;
+    *resp = mne_build_named_matrix(fixed_ori ? nsource : 3*nsource,neeg,NULL,names,res);
+    if (resp_grad && res_grad)
+        *resp_grad = mne_build_named_matrix(fixed_ori ? 3*nsource : 3*3*nsource,neeg,NULL,
+                                            mne_dup_name_list(names,neeg),res_grad);
+    return OK;
+
+bad : {
+        if(one_arg)
+            delete one_arg;
+        FREE_CMATRIX_40(res);
+        FREE_CMATRIX_40(res_grad);
+        return FAIL;
+    }
+}
+
+
+//*************************************************************************************************************
+
+#define EPS   1e-5   /* Points closer to origin than this many
+                        meters are considered to be at the
+                        origin */
+#define CEPS       1e-5
+
+int FwdBemModel::fwd_sphere_field(float *rd, float Q[], FwdCoilSet *coils, float Bval[], void *client)	/* Client data will be the sphere model origin */
+{
+    /* This version uses Jukka Sarvas' field computation
+         for details, see
+
+         Jukka Sarvas:
+
+         Basic mathematical and electromagnetic concepts
+         of the biomagnetic inverse problem,
+
+         Phys. Med. Biol. 1987, Vol. 32, 1, 11-22
+
+         The formulas have been manipulated for efficient computation
+         by Matti Hamalainen, February 1990
+
+      */
+    float *r0 = (float *)client;      /* The sphere model origin */
+    float v[3],a_vec[3];
+    float a,a2,r,r2;
+    float ar,ar0,rr0;
+    float vr,ve,re,r0e;
+    float F,g0,gr,result,sum;
+    int   j,k,p;
+    FwdCoil* this_coil;
+    float *this_pos,*this_dir;	/* These point to the coil structure! */
+    int   np;
+    float myrd[3];
+    float pos[3];
+    /*
+       * Shift to the sphere model coordinates
+       */
+    for (p = 0; p < 3; p++)
+        myrd[p] = rd[p] - r0[p];
+    rd = myrd;
+    /*
+       * Check for a dipole at the origin
+       */
+    for (k = 0 ; k < coils->ncoil ; k++)
+        if (FWD_IS_MEG_COIL(coils->coils[k]->coil_class))
+            Bval[k] = 0.0;
+    r = VEC_LEN_40(rd);
+    if (r > EPS)	{		/* The hard job */
+
+        CROSS_PRODUCT_40(Q,rd,v);
+
+        for (k = 0; k < coils->ncoil; k++) {
+            this_coil = coils->coils[k];
+            if (FWD_IS_MEG_COIL(this_coil->type)) {
+
+                np = this_coil->np;
+
+                for (j = 0, sum = 0.0; j < np; j++) {
+
+                    this_pos = this_coil->rmag[j];
+                    this_dir = this_coil->cosmag[j];
+
+                    for (p = 0; p < 3; p++)
+                        pos[p] = this_pos[p] - r0[p];
+                    this_pos = pos;
+                    result = 0.0;
+
+                    /* Vector from dipole to the field point */
+
+                    VEC_DIFF_40(rd,this_pos,a_vec);
+
+                    /* Compute the dot products needed */
+
+                    a2  = VEC_DOT_40(a_vec,a_vec);       a = sqrt(a2);
+
+                    if (a > 0.0) {
+                        r2  = VEC_DOT_40(this_pos,this_pos); r = sqrt(r2);
+                        if (r > 0.0) {
+                            rr0 = VEC_DOT_40(this_pos,rd);
+                            ar = (r2-rr0);
+                            if (fabs(ar/(a*r)+1.0) > CEPS) { /* There is a problem on the negative 'z' axis if the dipole location
+                                                    * and the field point are on the same line */
+                                ar0  = ar/a;
+
+                                ve = VEC_DOT_40(v,this_dir); vr = VEC_DOT_40(v,this_pos);
+                                re = VEC_DOT_40(this_pos,this_dir); r0e = VEC_DOT_40(rd,this_dir);
+
+                                /* The main ingredients */
+
+                                F  = a*(r*a + ar);
+                                gr = a2/r + ar0 + 2.0*(a+r);
+                                g0 = a + 2*r + ar0;
+
+                                /* Mix them together... */
+
+                                sum = sum + this_coil->w[j]*(ve*F + vr*(g0*r0e - gr*re))/(F*F);
+                            }
+                        }
+                    }
+                }				/* All points done */
+                Bval[k] = MAG_FACTOR*sum;
+            }
+        }
+    }
+    return OK;          /* Happy conclusion: this works always */
+}
+
+
+//*************************************************************************************************************
+
+int FwdBemModel::fwd_sphere_field_vec(float *rd, FwdCoilSet *coils, float **Bval, void *client)	/* Client data will be the sphere model origin */
+{
+    /* This version uses Jukka Sarvas' field computation
+         for details, see
+
+         Jukka Sarvas:
+
+         Basic mathematical and electromagnetic concepts
+         of the biomagnetic inverse problem,
+
+         Phys. Med. Biol. 1987, Vol. 32, 1, 11-22
+
+         The formulas have been manipulated for efficient computation
+         by Matti Hamalainen, February 1990
+
+         The idea of matrix kernels is from
+
+         Mosher, Leahy, and Lewis: EEG and MEG: Forward Solutions for Inverse Methods
+
+         which has been simplified here using standard vector notation
+
+      */
+    float *r0 = (float *)client;      /* The sphere model origin */
+    float a_vec[3],v1[3],v2[3];
+    float a,a2,r,r2;
+    float ar,ar0,rr0;
+    float re,r0e;
+    float F,g0,gr,g,sum[3];
+    int   j,k,p;
+    FwdCoil* this_coil;
+    float *this_pos,*this_dir;	/* These point to the coil structure! */
+    int   np;
+    float myrd[3];
+    float pos[3];
+    /*
+       * Shift to the sphere model coordinates
+       */
+    for (p = 0; p < 3; p++)
+        myrd[p] = rd[p] - r0[p];
+    rd = myrd;
+    /*
+       * Check for a dipole at the origin
+       */
+    r = VEC_LEN_40(rd);
+    for (k = 0; k < coils->ncoil; k++) {
+        this_coil = coils->coils[k];
+        if (FWD_IS_MEG_COIL(this_coil->coil_class)) {
+            if (r < EPS) {
+                Bval[0][k] = Bval[1][k] = Bval[2][k] = 0.0;
+            }
+            else { 	/* The hard job */
+
+                np = this_coil->np;
+                sum[0] = sum[1] = sum[2] = 0.0;
+
+                for (j = 0; j < np; j++) {
+
+                    this_pos = this_coil->rmag[j];
+                    this_dir = this_coil->cosmag[j];
+
+                    for (p = 0; p < 3; p++)
+                        pos[p] = this_pos[p] - r0[p];
+                    this_pos = pos;
+
+                    /* Vector from dipole to the field point */
+
+                    VEC_DIFF_40(rd,this_pos,a_vec);
+
+                    /* Compute the dot products needed */
+
+                    a2  = VEC_DOT_40(a_vec,a_vec);       a = sqrt(a2);
+
+                    if (a > 0.0) {
+                        r2  = VEC_DOT_40(this_pos,this_pos); r = sqrt(r2);
+                        if (r > 0.0) {
+                            rr0 = VEC_DOT_40(this_pos,rd);
+                            ar = (r2-rr0);
+                            if (fabs(ar/(a*r)+1.0) > CEPS) { /* There is a problem on the negative 'z' axis if the dipole location
+                                                    * and the field point are on the same line */
+
+                                /* The main ingredients */
+
+                                ar0  = ar/a;
+                                F  = a*(r*a + ar);
+                                gr = a2/r + ar0 + 2.0*(a+r);
+                                g0 = a + 2*r + ar0;
+
+                                re = VEC_DOT_40(this_pos,this_dir); r0e = VEC_DOT_40(rd,this_dir);
+                                CROSS_PRODUCT_40(rd,this_dir,v1);
+                                CROSS_PRODUCT_40(rd,this_pos,v2);
+
+                                g = (g0*r0e - gr*re)/(F*F);
+                                /*
+                     * Mix them together...
+                     */
+                                for (p = 0; p < 3; p++)
+                                    sum[p] = sum[p] + this_coil->w[j]*(v1[p]/F + v2[p]*g);
+                            }
+                        }
+                    }
+                }				/* All points done */
+                for (p = 0; p < 3; p++)
+                    Bval[p][k] = MAG_FACTOR*sum[p];
+            }
+        }
+    }
+    return OK;			/* Happy conclusion: this works always */
+}
+
+
+//*************************************************************************************************************
+
+int FwdBemModel::fwd_sphere_field_grad(float *rd, float Q[], FwdCoilSet *coils, float Bval[], float xgrad[], float ygrad[], float zgrad[], void *client)  /* Client data to be passed to some foward modelling routines */
+/*
+* Compute the derivatives of the sphere model field with respect to
+* dipole coordinates
+*/
+{
+    /* This version uses Jukka Sarvas' field computation
+         for details, see
+
+         Jukka Sarvas:
+
+         Basic mathematical and electromagnetic concepts
+         of the biomagnetic inverse problem,
+
+         Phys. Med. Biol. 1987, Vol. 32, 1, 11-22
+
+         The formulas have been manipulated for efficient computation
+         by Matti Hamalainen, February 1990
+
+         */
+
+    float v[3],a_vec[3];
+    float a,a2,r,r2;
+    float ar,rr0;
+    float vr,ve,re,r0e;
+    float F,g0,gr,result,G,F2;
+
+    int   j,k,p;
+    float huu;
+    float ggr[3],gg0[3];		/* Gradient of gr & g0 */
+    float ga[3];			/* Grapdient of a */
+    float gar[3];			/* Gradient of ar */
+    float gFF[3];			/* Gradient of F divided by F */
+    float gresult[3];
+    float eQ[3],rQ[3];		/* e x Q and r x Q */
+    int   do_field = 0;
+    FwdCoil* this_coil;
+    float *this_pos,*this_dir;
+    int   np;
+    float myrd[3];
+    float pos[3];
+    float *r0 = (float *)client;      /* The sphere model origin */
+    /*
+       * Shift to the sphere model coordinates
+       */
+    for (p = 0; p < 3; p++)
+        myrd[p] = rd[p] - r0[p];
+    rd = myrd;
+
+    if (Bval)
+        do_field = 1;
+
+    /* Check for a dipole at the origin */
+
+    r = VEC_LEN_40(rd);
+    for (k = 0; k < coils->ncoil ; k++) {
+        if (FWD_IS_MEG_COIL(coils->coils[k]->coil_class)) {
+            if (do_field)
+                Bval[k] = 0.0;
+            xgrad[k] = 0.0;
+            ygrad[k] = 0.0;
+            zgrad[k] = 0.0;
+        }
+    }
+    if (r > EPS) {		/* The hard job */
+
+        v[X_40] = Q[Y_40]*rd[Z_40] - Q[Z_40]*rd[Y_40];
+        v[Y_40] = -Q[X_40]*rd[Z_40] + Q[Z_40]*rd[X_40];
+        v[Z_40] = Q[X_40]*rd[Y_40] - Q[Y_40]*rd[X_40];
+
+        for (k = 0 ; k < coils->ncoil ; k++) {
+
+            this_coil = coils->coils[k];
+
+            if (FWD_IS_MEG_COIL(this_coil->type)) {
+
+                np = this_coil->np;
+
+                for (j = 0; j < np; j++) {
+
+                    this_pos = this_coil->rmag[j];
+                    /*
+           * Shift to the sphere model coordinates
+           */
+                    for (p = 0; p < 3; p++)
+                        pos[p] = this_pos[p] - r0[p];
+                    this_pos = pos;
+
+                    this_dir = this_coil->cosmag[j];
+
+                    /* Vector from dipole to the field point */
+
+                    a_vec[X_40] = this_pos[X_40] - rd[X_40];
+                    a_vec[Y_40] = this_pos[Y_40] - rd[Y_40];
+                    a_vec[Z_40] = this_pos[Z_40] - rd[Z_40];
+
+                    /* Compute the dot and cross products needed */
+
+                    a2  = VEC_DOT_40(a_vec,a_vec);       a = sqrt(a2);
+                    r2  = VEC_DOT_40(this_pos,this_pos); r = sqrt(r2);
+                    rr0 = VEC_DOT_40(this_pos,rd);
+                    ar  = (r2 - rr0)/a;
+
+                    ve = VEC_DOT_40(v,this_dir); vr = VEC_DOT_40(v,this_pos);
+                    re = VEC_DOT_40(this_pos,this_dir); r0e = VEC_DOT_40(rd,this_dir);
+
+                    /* eQ = this_dir x Q */
+
+                    eQ[X_40] = this_dir[Y_40]*Q[Z_40] - this_dir[Z_40]*Q[Y_40];
+                    eQ[Y_40] = -this_dir[X_40]*Q[Z_40] + this_dir[Z_40]*Q[X_40];
+                    eQ[Z_40] = this_dir[X_40]*Q[Y_40] - this_dir[Y_40]*Q[X_40];
+
+                    /* rQ = this_pos x Q */
+
+                    rQ[X_40] = this_pos[Y_40]*Q[Z_40] - this_pos[Z_40]*Q[Y_40];
+                    rQ[Y_40] = -this_pos[X_40]*Q[Z_40] + this_pos[Z_40]*Q[X_40];
+                    rQ[Z_40] = this_pos[X_40]*Q[Y_40] - this_pos[Y_40]*Q[X_40];
+
+                    /* The main ingredients */
+
+                    F  = a*(r*a + r2 - rr0);
+                    F2 = F*F;
+                    gr = a2/r + ar + 2.0*(a+r);
+                    g0 = a + 2.0*r + ar;
+                    G = g0*r0e - gr*re;
+
+                    /* Mix them together... */
+
+                    result = (ve*F + vr*G)/F2;
+
+                    /* The computation of the gradient... */
+
+                    huu = 2.0 + 2.0*a/r;
+                    for (p = X_40; p <= Z_40; p++) {
+                        ga[p] = -a_vec[p]/a;
+                        gar[p] = -(ga[p]*ar + this_pos[p])/a;
+                        gg0[p] = ga[p] + gar[p];
+                        ggr[p] = huu*ga[p] + gar[p];
+                        gFF[p] = ga[p]/a - (r*a_vec[p] + a*this_pos[p])/F;
+                        gresult[p] = -2.0*result*gFF[p] + (eQ[p]+gFF[p]*ve)/F +
+                                (rQ[p]*G + vr*(gg0[p]*r0e + g0*this_dir[p] - ggr[p]*re))/F2;
+                    }
+
+                    if (do_field)
+                        Bval[k] = Bval[k] + this_coil->w[j]*result;
+                    xgrad[k] = xgrad[k] + this_coil->w[j]*gresult[X_40];
+                    ygrad[k] = ygrad[k] + this_coil->w[j]*gresult[Y_40];
+                    zgrad[k] = zgrad[k] + this_coil->w[j]*gresult[Z_40];
+                }
+                if (do_field)
+                    Bval[k] = MAG_FACTOR*Bval[k];
+                xgrad[k] = MAG_FACTOR*xgrad[k];
+                ygrad[k] = MAG_FACTOR*ygrad[k];
+                zgrad[k] = MAG_FACTOR*zgrad[k];
+            }
+        }
+    }
+    return OK;			/* Happy conclusion: this works always */
+}
+
+
+//*************************************************************************************************************
+
+int FwdBemModel::fwd_mag_dipole_field(float *rm, float M[], FwdCoilSet *coils, float Bval[], void *client)	/* Client data will be the sphere model origin */
+/*
+* This is for a specific dipole component
+*/
+{
+    int     j,k,np;
+    FwdCoil* this_coil;
+    float   sum,diff[3],dist,dist2,dist5,*dir;
+
+
+    for (k = 0; k < coils->ncoil; k++) {
+        this_coil = coils->coils[k];
+        if (FWD_IS_MEG_COIL(this_coil->type)) {
+            np = this_coil->np;
+            /*
+           * Go through all points
+           */
+            for (j = 0, sum = 0.0; j < np; j++) {
+                dir = this_coil->cosmag[j];
+                VEC_DIFF_40(rm,this_coil->rmag[j],diff);
+                dist = VEC_LEN_40(diff);
+                if (dist > EPS) {
+                    dist2 = dist*dist;
+                    dist5 = dist2*dist2*dist;
+                    sum = sum + this_coil->w[j]*(3*VEC_DOT_40(M,diff)*VEC_DOT_40(diff,dir) - dist2*VEC_DOT_40(M,dir))/dist5;
+                }
+            }				/* All points done */
+            Bval[k] = MAG_FACTOR*sum;
+        }
+        else if (this_coil->type == FWD_COILC_EEG)
+            Bval[k] = 0.0;
+    }
+    return OK;
+}
+
+
+//*************************************************************************************************************
+
+int FwdBemModel::fwd_mag_dipole_field_vec(float *rm, FwdCoilSet *coils, float **Bval, void *client)     /* Client data will be the sphere model origin */
+/*
+* This is for all dipole components
+* For EEG this produces a zero result
+*/
+{
+    int     j,k,p,np;
+    FwdCoil* this_coil;
+    float   sum[3],diff[3],dist,dist2,dist5,*dir;
+
+
+    for (k = 0; k < coils->ncoil; k++) {
+        this_coil = coils->coils[k];
+        if (FWD_IS_MEG_COIL(this_coil->type)) {
+            np = this_coil->np;
+            sum[0] = sum[1] = sum[2] = 0.0;
+            /*
+           * Go through all points
+           */
+            for (j = 0; j < np; j++) {
+                dir = this_coil->cosmag[j];
+                VEC_DIFF_40(rm,this_coil->rmag[j],diff);
+                dist = VEC_LEN_40(diff);
+                if (dist > EPS) {
+                    dist2 = dist*dist;
+                    dist5 = dist2*dist2*dist;
+                    for (p = 0; p < 3; p++)
+                        sum[p] = sum[p] + this_coil->w[j]*(3*diff[p]*VEC_DOT_40(diff,dir) - dist2*dir[p])/dist5;
+                }
+            }           /* All points done */
+            for (p = 0; p < 3; p++)
+                Bval[p][k] = MAG_FACTOR*sum[p];
+        }
+        else if (this_coil->type == FWD_COILC_EEG) {
+            for (p = 0; p < 3; p++)
+                Bval[p][k] = 0.0;
+        }
     }
     return OK;
 }

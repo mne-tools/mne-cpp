@@ -45,6 +45,7 @@
 #include "mne_triangle.h"
 #include "mne_nearest.h"
 #include "fwd_bem_model.h"
+#include "filter_thread_arg.h"
 
 #include <fiff/fiff_stream.h>
 
@@ -445,46 +446,6 @@ static FiffCoordTransOld* make_voxel_ras_trans(float *r0,
 
 
 
-
-
-typedef struct {
-    MneSourceSpaceOld* s;       /* The source space to process */
-    FiffCoordTransOld* mri_head_t;    /* Coordinate transformation */
-    MneSurfaceOld*   surf;      /* The inner skull surface */
-    float          limit;     /* Distance limit */
-    FILE           *filtered; /* Log omitted point locations here */
-    int            stat;      /* How was it? */
-} *filterThreadArg,filterThreadArgRec;
-
-static filterThreadArg new_filter_thread_arg()
-
-{
-    filterThreadArg a = MALLOC_17(1,filterThreadArgRec);
-    a->s = NULL;
-    a->mri_head_t = NULL;
-    a->surf       = NULL;
-    a->limit      = -1;
-    a->filtered   = NULL;
-    a->stat       = FAIL;
-    return a;
-}
-
-static void free_filter_thread_arg(filterThreadArg a)
-
-{
-    FREE_17(a);
-    return;
-}
-
-
-
-
-
-
-
-
-
-
 static int comp_points1(const void *vp1,const void *vp2)
 
 {
@@ -851,7 +812,7 @@ void MneSurfaceOrVolume::rearrange_source_space(MneSourceSpaceOld* s)
 
 void *MneSurfaceOrVolume::filter_source_space(void *arg)
 {
-    filterThreadArg a = (filterThreadArg)arg;
+    FilterThreadArg* a = (FilterThreadArg*)arg;
     int    p1,p2;
     double tot_angle;
     int    omit,omit_outside;
@@ -925,7 +886,7 @@ int MneSurfaceOrVolume::filter_source_spaces(float limit, char *bemfile, FiffCoo
     MneSurfaceOld*    surf = NULL;
     int             k;
 //    int             nproc = mne_get_processor_count();
-    filterThreadArg a;
+    FilterThreadArg* a;
 
     if (!bemfile)
         return OK;
@@ -1929,12 +1890,15 @@ int MneSurfaceOrVolume::mne_read_source_spaces(const QString &name, MneSourceSpa
             }
 
             qDebug() << "ToDo: Check whether new_space->inuse contains the right stuff!!! - use VectorXi instead";
-            new_space->inuse  = t_pTag->toInt();
+//            new_space->inuse  = t_pTag->toInt();
+            new_space->inuse = MALLOC_17(new_space->np,int); //DEBUG
             if (new_space->nuse > 0) {
                 new_space->vertno = MALLOC_17(new_space->nuse,int);
-                for (k = 0, p = 0; k < new_space->np; k++)
+                for (k = 0, p = 0; k < new_space->np; k++) {
+                    new_space->inuse[k] = t_pTag->toInt()[k]; //DEBUG
                     if (new_space->inuse[k])
                         new_space->vertno[p++] = k;
+                }
             }
             else {
                 FREE_17(new_space->vertno);
