@@ -65,7 +65,7 @@ Reference::Reference()
 , m_pRefBuffer(CircularMatrixBuffer<double>::SPtr())
 {
     //Add action which will be visible in the plugin's toolbar
-    m_pActionRefToolbarWidget = new QAction(QIcon(":/images/options.png"), tr("Reference Toolbar"),this);
+    m_pActionRefToolbarWidget = new QAction(QIcon(":/icons/options.png"), tr("Reference Toolbar"),this);
     m_pActionRefToolbarWidget->setShortcut(tr("F12"));
     m_pActionRefToolbarWidget->setStatusTip(tr("Reference Toolbar"));
     connect(m_pActionRefToolbarWidget, &QAction::triggered,
