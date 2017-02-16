@@ -286,6 +286,198 @@ int mne_check_chinfo(fiffChInfo chs,
 }
 
 
+
+//============================= write_solution.c =============================
+
+int write_solution(const QString& name,         /* Destination file */
+                   MneSourceSpaceOld* *spaces,  /* The source spaces */
+                   int            nspace,
+                   const QString& mri_file,     /* MRI file and data obtained from there */
+                   fiffId         mri_id,
+                   FiffCoordTransOld* mri_head_t,
+
+                   const QString& meas_file,    /* MEG file and data obtained from there */
+                   fiffId         meas_id,
+                   FiffCoordTransOld* meg_head_t,
+                   fiffChInfo     meg_chs,
+                   int            nmeg,
+                   fiffChInfo     eeg_chs,
+                   int            neeg,
+                   int            fixed_ori,    /* Fixed orientation dipoles? */
+                   int            coord_frame,  /* Coordinate frame employed in the forward calculations */
+                   MneNamedMatrix* meg_solution,
+                   MneNamedMatrix* eeg_solution,
+                   MneNamedMatrix* meg_solution_grad,
+                   MneNamedMatrix* eeg_solution_grad)
+
+{
+    // New Stuff
+    QFile file(name);
+
+    //
+    //   Open the file, create directory
+    //
+
+    // Create the file and save the essentials
+    FiffStream::SPtr t_pStream = FiffStream::start_file(file);
+
+    t_pStream->start_block(FIFFB_MNE);
+
+    /*
+    * Information from the MRI file
+    */
+    {
+        t_pStream->start_block(FIFFB_MNE_PARENT_MRI_FILE);
+
+        t_pStream->write_string(FIFF_MNE_FILE_NAME, mri_file);
+//        if (mri_id != NULL)
+//            t_pStream->write_id(FIFF_PARENT_FILE_ID, mri_id);
+//        t_pStream->write_coord_trans(mri_head_t);
+
+        t_pStream->end_block(FIFFB_MNE_PARENT_MRI_FILE);
+    }
+
+    /*
+    * Information from the MEG file
+    */
+    {
+        char **file_bads = NULL;
+        int  file_nbad   = 0;
+
+        t_pStream->start_block(FIFFB_MNE_PARENT_MEAS_FILE);
+
+        t_pStream->write_string(FIFF_MNE_FILE_NAME, meas_file);
+//        if (meas_id != NULL)
+//            t_pStream->write_id(FIFF_PARENT_BLOCK_ID, meas_id);
+//        t_pStream->write_coord_trans(meg_head_t);
+
+        int nchan = nmeg+neeg;
+        t_pStream->write_int(FIFF_NCHAN,&nchan);
+
+
+
+//        tag.next = 0;
+//        tag.kind = FIFF_CH_INFO;
+//        tag.type = FIFFT_CH_INFO_STRUCT;
+//        tag.size = sizeof(fiffChInfoRec);
+//        for (k = 0, p = 0; k < nmeg; k++) {
+//            meg_chs[k].scanNo = ++p;
+//            tag.data = (fiff_byte_t *)(meg_chs+k);
+//            if (fiff_write_tag(out,&tag) == FIFF_FAIL)
+//                goto bad;
+//        }
+//        for (k = 0; k < neeg; k++) {
+//            eeg_chs[k].scanNo = ++p;
+//            tag.data = (fiff_byte_t *)(eeg_chs+k);
+//            if (fiff_write_tag(out,&tag) == FIFF_FAIL)
+//                goto bad;
+//        }
+//        /*
+//     * Copy the bad channel list from the measurement file
+//     */
+//        if (mne_read_bad_channel_list(meas_file,&file_bads,&file_nbad) == OK && file_nbad > 0) {
+//            if (mne_write_bad_channel_list(out,file_bads,file_nbad) != OK) {
+//                mne_free_name_list(file_bads,file_nbad);
+//                goto bad;
+//            }
+//        }
+//        mne_free_name_list(file_bads,file_nbad);
+
+        t_pStream->end_block(FIFFB_MNE_PARENT_MEAS_FILE);
+    }
+
+
+
+
+
+//    /*
+//    * Write the source spaces (again)
+//    */
+//    for (k = 0, nvert = 0; k < nspace; k++) {
+//        if (mne_write_one_source_space(out,spaces[k],FALSE) == FIFF_FAIL)
+//            goto bad;
+//        nvert += spaces[k]->nuse;
+//    }
+//    /*
+//    * MEG forward solution
+//    */
+//    if (nmeg > 0) {
+//        if (fiff_start_block (out,FIFFB_MNE_FORWARD_SOLUTION) == FIFF_FAIL)
+//            goto bad;
+//        if (fiff_write_int_tag (out,FIFF_MNE_INCLUDED_METHODS,FIFFV_MNE_MEG) == FIFF_FAIL)
+//            goto bad;
+//        if (fiff_write_int_tag (out,FIFF_MNE_COORD_FRAME,coord_frame) == FIFF_FAIL)
+//            goto bad;
+//        if (fiff_write_int_tag (out,FIFF_MNE_SOURCE_ORIENTATION,
+//                                fixed_ori ? FIFFV_MNE_FIXED_ORI : FIFFV_MNE_FREE_ORI) == FIFF_FAIL)
+//            goto bad;
+//        if (fiff_write_int_tag (out,FIFF_MNE_SOURCE_SPACE_NPOINTS,nvert) == FIFF_FAIL)
+//            goto bad;
+//        if (fiff_write_int_tag (out,FIFF_NCHAN,nmeg) == FIFF_FAIL)
+//            goto bad;
+//        if (mne_write_named_matrix(out,FIFF_MNE_FORWARD_SOLUTION,meg_solution) == FIFF_FAIL)
+//            goto bad;
+//        if (meg_solution_grad)
+//            if (mne_write_named_matrix(out,FIFF_MNE_FORWARD_SOLUTION_GRAD,meg_solution_grad) == FIFF_FAIL)
+//                goto bad;
+//        if (fiff_end_block (out,FIFFB_MNE_FORWARD_SOLUTION) == FIFF_FAIL)
+//            goto bad;
+//    }
+//    /*
+//    * EEG forward solution
+//    */
+//    if (neeg > 0) {
+//        if (fiff_start_block (out,FIFFB_MNE_FORWARD_SOLUTION) == FIFF_FAIL)
+//            goto bad;
+//        if (fiff_write_int_tag (out,FIFF_MNE_INCLUDED_METHODS,FIFFV_MNE_EEG) == FIFF_FAIL)
+//            goto bad;
+//        if (fiff_write_int_tag (out,FIFF_MNE_COORD_FRAME,coord_frame) == FIFF_FAIL)
+//            goto bad;
+//        if (fiff_write_int_tag (out,FIFF_MNE_SOURCE_ORIENTATION,
+//                                fixed_ori ? FIFFV_MNE_FIXED_ORI : FIFFV_MNE_FREE_ORI) == FIFF_FAIL)
+//            goto bad;
+//        if (fiff_write_int_tag (out,FIFF_NCHAN,neeg) == FIFF_FAIL)
+//            goto bad;
+//        if (fiff_write_int_tag (out,FIFF_MNE_SOURCE_SPACE_NPOINTS,nvert) == FIFF_FAIL)
+//            goto bad;
+//        if (mne_write_named_matrix(out,FIFF_MNE_FORWARD_SOLUTION,eeg_solution) == FIFF_FAIL)
+//            goto bad;
+//        if (eeg_solution_grad)
+//            if (mne_write_named_matrix(out,FIFF_MNE_FORWARD_SOLUTION_GRAD,eeg_solution_grad) == FIFF_FAIL)
+//                goto bad;
+//        if (fiff_end_block (out,FIFFB_MNE_FORWARD_SOLUTION) == FIFF_FAIL)
+//            goto bad;
+//    }
+//    if (fiff_end_block (out,FIFFB_MNE) == FIFF_FAIL)
+//        goto bad;
+//    if (fiff_end_file (out) == FIFF_FAIL)
+//        goto bad;
+//    (void)fclose(out); out = NULL;
+
+//    /*
+//    * Add directory
+//    */
+//    if ((in = fiff_open_update(name)) == NULL)
+//        goto bad;
+//    if (fiff_put_dir(in->fd,in->dir) == FIFF_FAIL)
+//        goto bad;
+//    fiff_close(in); in = NULL;
+
+//    return FIFF_OK;
+
+//bad : {
+//        if (out != NULL)
+//            fclose(out);
+//        fiff_close(in);
+
+//        return FIFF_FAIL;
+//    }
+}
+
+
+
+
+
 //*************************************************************************************************************
 //=============================================================================================================
 // STATIC DEFINITIONS
@@ -434,10 +626,10 @@ void ComputeFwd::calculateFwd() const
     if (!settings->mriname.isEmpty()) {
         if ((mri_head_t = FiffCoordTransOld::mne_read_mri_transform(settings->mriname)) == NULL)
             goto out;
-//        if ((mri_id = get_file_id(settings->mriname)) == NULL) {
-//            qCritical("Couln't read MRI file id (How come?)");
-//            goto out;
-//        }
+        //        if ((mri_id = get_file_id(settings->mriname)) == NULL) {
+        //            qCritical("Couln't read MRI file id (How come?)");
+        //            goto out;
+        //        }
     }
     else if (!settings->transname.isEmpty()) {
         FiffCoordTransOld* t;
@@ -545,12 +737,12 @@ void ComputeFwd::calculateFwd() const
     }
     else {
         if ((megcoils = templates->create_meg_coils(megchs,nmeg,
-                                             settings->accurate ? FWD_COIL_ACCURACY_ACCURATE : FWD_COIL_ACCURACY_NORMAL,
-                                             meg_head_t)) == NULL)
+                                                    settings->accurate ? FWD_COIL_ACCURACY_ACCURATE : FWD_COIL_ACCURACY_NORMAL,
+                                                    meg_head_t)) == NULL)
             goto out;
         if (ncomp > 0) {
             if ((compcoils = templates->create_meg_coils(compchs,ncomp,
-                                                  FWD_COIL_ACCURACY_NORMAL,meg_head_t)) == NULL)
+                                                         FWD_COIL_ACCURACY_NORMAL,meg_head_t)) == NULL)
                 goto out;
         }
         if ((eegels = FwdCoilSet::create_eeg_els(eegchs,neeg,NULL)) == NULL)
@@ -568,7 +760,7 @@ void ComputeFwd::calculateFwd() const
     */
     if (!settings->bemname.isEmpty()) {
         char *bemsolname = FwdBemModel::fwd_bem_make_bem_sol_name(settings->bemname.toLatin1().data());
-//        FREE(bemname);
+        //        FREE(bemname);
         settings->bemname = QString(bemsolname);
 
         printf("\nSetting up the BEM model using %s...\n",settings->bemname.toLatin1().constData());
@@ -630,13 +822,13 @@ void ComputeFwd::calculateFwd() const
         settings->use_threads = false;
     if (nmeg > 0)
         if ((FwdBemModel::compute_forward_meg(spaces,nspace,megcoils,compcoils,comp_data,
-                                 settings->fixed_ori,bem_model,&settings->r0,settings->use_threads,&meg_forward,
-                                 settings->compute_grad ? &meg_forward_grad : NULL)) == FAIL)
+                                              settings->fixed_ori,bem_model,&settings->r0,settings->use_threads,&meg_forward,
+                                              settings->compute_grad ? &meg_forward_grad : NULL)) == FAIL)
             goto out;
     if (neeg > 0)
         if ((FwdBemModel::compute_forward_eeg(spaces,nspace,eegels,
-                                            settings->fixed_ori,bem_model,eeg_model,settings->use_threads,&eeg_forward,
-                                            settings->compute_grad ? &eeg_forward_grad : NULL)) == FAIL)
+                                              settings->fixed_ori,bem_model,eeg_model,settings->use_threads,&eeg_forward,
+                                              settings->compute_grad ? &eeg_forward_grad : NULL)) == FAIL)
             goto out;
     /*
     * Transform the source spaces back into MRI coordinates
@@ -647,24 +839,24 @@ void ComputeFwd::calculateFwd() const
     * We are ready to spill it out
     */
     printf("\nwriting %s...",settings->solname);
-//    if (write_solution(solname,	                /* Destination file */
-//                       spaces,			/* The source spaces */
-//                       nspace,
-//                       mriname,mri_id,		/* MRI file and data obtained from there */
-//                       mri_head_t,
-//                       measname,meas_id,		/* MEG file and data obtained from there */
-//                       meg_head_t,
-//                       megchs, nmeg,
-//                       eegchs, neeg,
-//                       fixed_ori,			/* Fixed orientation dipoles? */
-//                       coord_frame,               /* Coordinate frame */
-//                       meg_forward, eeg_forward,
-//                       meg_forward_grad, eeg_forward_grad) == FIFF_FAIL)
+    if (write_solution(settings->solname,                 /* Destination file */
+                       spaces,                  /* The source spaces */
+                       nspace,
+                       settings->mriname,mri_id,          /* MRI file and data obtained from there */
+                       mri_head_t,
+                       settings->measname,meas_id,        /* MEG file and data obtained from there */
+                       meg_head_t,
+                       megchs, nmeg,
+                       eegchs, neeg,
+                       settings->fixed_ori,               /* Fixed orientation dipoles? */
+                       settings->coord_frame,             /* Coordinate frame */
+                       meg_forward, eeg_forward,
+                       meg_forward_grad, eeg_forward_grad) == FIFF_FAIL)
 
-//        goto out;
-//    if (mne_attach_env(solname,command) == FIFF_FAIL)
-//        goto out;
-    printf("done\n");
+        //        goto out;
+        //    if (mne_attach_env(solname,command) == FIFF_FAIL)
+        //        goto out;
+        printf("done\n");
     res = OK;
     printf("\nFinished.\n");
 
