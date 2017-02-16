@@ -1,14 +1,15 @@
 //=============================================================================================================
 /**
 * @file     reference.cpp
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @author   Viktor Klüber <viktor.klueber@tu-ilmenau.de>;
+*           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     February, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017, Viktor Klüber, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -63,6 +64,7 @@ Reference::Reference()
 , m_pRefInput(NULL)
 , m_pRefOutput(NULL)
 , m_pRefBuffer(CircularMatrixBuffer<double>::SPtr())
+, m_pRefToolbarWidget(QSharedPointer<ReferenceToolbarWidget>(new ReferenceToolbarWidget(this)))
 {
     //Add action which will be visible in the plugin's toolbar
     m_pActionRefToolbarWidget = new QAction(QIcon(":/icons/options.png"), tr("Reference Toolbar"),this);
@@ -197,6 +199,8 @@ void Reference::update(SCMEASLIB::NewMeasurement::SPtr pMeasurement)
             m_pRefOutput->data()->initFromFiffInfo(m_pFiffInfo);
             m_pRefOutput->data()->setMultiArraySize(1);
             m_pRefOutput->data()->setVisibility(true);
+
+            m_pRefToolbarWidget->updateChannels(m_pFiffInfo);
         }
 
         MatrixXd t_mat;
@@ -247,6 +251,15 @@ void Reference::run()
 
 void Reference::showRefToolbarWidget()
 {
-    m_pRefToolbarWidget = ReferenceToolbarWidget::SPtr(new ReferenceToolbarWidget(this));
-    m_pRefToolbarWidget->show();
+    if(m_pRefToolbarWidget == NULL){
+        m_pRefToolbarWidget = QSharedPointer<ReferenceToolbarWidget>( new ReferenceToolbarWidget(this));
+    }
+
+    if(!m_pRefToolbarWidget->isVisible()){
+        m_pRefToolbarWidget->setWindowTitle("EEG Reference options");
+        m_pRefToolbarWidget->show();
+        m_pRefToolbarWidget->raise();
+    }
+
+    m_pRefToolbarWidget->activateWindow();
 }

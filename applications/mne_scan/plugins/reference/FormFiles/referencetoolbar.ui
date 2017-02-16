@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
+    <width>404</width>
     <height>300</height>
    </rect>
   </property>
@@ -45,7 +45,7 @@
          </font>
         </property>
         <property name="text">
-         <string>Re-reference EEG options</string>
+         <string>EEG Reference options</string>
         </property>
        </widget>
       </item>
