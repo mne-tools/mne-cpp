@@ -372,13 +372,8 @@ public:
 
     //=========================================================================================================
     /**
-    * fiff_start_block
-    *
-    * ### MNE toolbox root function ###
-    *
-    * Wrapper for the FiffStream start_block member function
-    *
     * Writes a FIFF_BLOCK_START tag
+    * Refactored: fiff_start_block (MNE-C); fiff_start_block (MNE-MATLAB)
     *
     * @param[in] kind       The block kind to start
     */
@@ -440,11 +435,8 @@ public:
 
     //=========================================================================================================
     /**
-    * fiff_write_coord_trans
-    *
-    * ### MNE toolbox root function ###
-    *
     * Writes a coordinate transformation structure
+    * Refactored: fiff_write_coord_trans (MNE-C); fiff_write_coord_trans (MNE-MATLAB)
     *
     * @param[in] trans  The coordinate transfomation structure
     */
@@ -486,11 +478,8 @@ public:
 
     //=========================================================================================================
     /**
-    * fiff_write_double
-    *
-    * ### MNE toolbox root function ###
-    *
     * Writes a double-precision floating point tag to a fif file
+    * Refactored: fiff_write_double (MNE-MATLAB)
     *
     * @param[in] kind       Tag kind
     * @param[in] data       The float data pointer
@@ -500,14 +489,9 @@ public:
 
     //=========================================================================================================
     /**
-    * fiff_write_id
-    *
-    * ### MNE toolbox root function ###
-    *
-    * Wrapper for the FiffStream write_id member function
-    *
     * Writes fiff id
     * If the id argument is missing it will be generated here
+    * Refactored: fiff_write_this_id (MNE-C); fiff_write_id (MNE-MATLAB)
     *
     * @param[in] kind       The tag kind
     * @param[in] id         The id to write
@@ -524,11 +508,8 @@ public:
 
     //=========================================================================================================
     /**
-    * fiff_write_int
-    *
-    * ### MNE toolbox root function ###
-    *
     * Writes a 32-bit integer tag to a fif file
+    * Refactored: fiff_write_int_tag (MNE-C); fiff_write_int (MNE-MATLAB)
     *
     * @param[in] kind       Tag kind
     * @param[in] data       The integer data pointer
@@ -685,11 +666,8 @@ public:
 
     //=========================================================================================================
     /**
-    * fiff_write_string
-    *
-    * ### MNE toolbox root function ###
-    *
     * Writes a string tag
+    * Refactored: fiff_write_string_tag (MNE-C); fiff_write_string (MNE-MATLAB)
     *
     * @param[in] kind       The tag kind
     * @param[in] data       The string data to write
