@@ -45,8 +45,6 @@
 #include "FormFiles/eegosportssetupwidget.h"
 #include "FormFiles/eegosportssetupprojectwidget.h"
 
-#include <iostream>
-
 #include <utils/layoutloader.h>
 #include <utils/layoutmaker.h>
 
@@ -59,15 +57,6 @@
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
-
-#include <QtCore/QtPlugin>
-#include <QtCore/QTextStream>
-#include <QDebug>
-#include <QScreen>
-#include <QtWidgets>
-#include <QVector>
-#include <QTime>
-#include <QtConcurrent/QtConcurrent>
 
 
 //*************************************************************************************************************

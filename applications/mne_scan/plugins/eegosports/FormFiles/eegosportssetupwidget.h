@@ -79,6 +79,7 @@ class EEGoSports;
 class EEGoSportsSetupWidget : public QWidget
 {
     Q_OBJECT
+
 public:
 
     //=========================================================================================================
