@@ -66,6 +66,8 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QFile>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -90,6 +92,11 @@ namespace FIFFLIB {
 namespace EEGOSPORTSPLUGIN
 {
 
+typedef unsigned long DWORD;
+
+#ifndef M_PI
+#define M_PI    3.14159265358979323846f
+#endif
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -153,13 +160,13 @@ public:
 
     //=========================================================================================================
     /**
-    * Starts the EEGoSports by starting the tmsi's thread.
+    * Starts the EEGoSports by starting the thread.
     */
     virtual bool start();
 
     //=========================================================================================================
     /**
-    * Stops the EEGoSports by stopping the tmsi's thread.
+    * Stops the EEGoSports by stopping the thread.
     */
     virtual bool stop();
 
@@ -258,17 +265,17 @@ private:
 
     QSharedPointer<IOBUFFER::RawMatrixBuffer>     m_pRawMatrixBuffer_In;    /**< Holds incoming raw data.*/
 
-    QSharedPointer<EEGoSportsProducer>  m_pEEGoSportsProducer;              /**< the EEGoSportsProducer.*/
+    QSharedPointer<EEGoSportsProducer>  m_pEEGoSportsProducer;              /**< The EEGoSportsProducer.*/
 
     QMutex                              m_mutex;                            /**< Holds the threads mutex.*/
 
-    QAction*                            m_pActionSetupProject;              /**< shows setup project dialog */
-    QAction*                            m_pActionStartRecording;            /**< starts to record data */
+    QAction*                            m_pActionSetupProject;              /**< Shows setup project dialog */
+    QAction*                            m_pActionStartRecording;            /**< Starts to record data */
 
-    QSharedPointer<QTimer>              m_pTimerRecordingChange;            /**< timer to control blinking of the recording icon */
-    qint16                              m_iBlinkStatus;                     /**< flag for recording icon blinking */
+    QSharedPointer<QTimer>              m_pTimerRecordingChange;            /**< Timer to control blinking of the recording icon */
+    qint16                              m_iBlinkStatus;                     /**< Flag for recording icon blinking */
 
-    QList<Eigen::MatrixXd>              m_qListReceivedSamples;             /**< list with alle the received samples in form of differentley sized matrices. */
+    QList<Eigen::MatrixXd>              m_qListReceivedSamples;             /**< List with alle the received samples in form of differentley sized matrices. */
 
 };
 
