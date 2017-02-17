@@ -628,44 +628,6 @@ void EEGoSports::onUpdateCardinalPoints(const QString& sLPA, double dLPA, const 
 }
 
 
-//*************************************************************************************************************
-
-void EEGoSports::run()
-{
-    while(m_bIsRunning) {
-        if(m_pEEGoSportsProducer->isRunning()) {
-            m_mutex.lock();
-
-            if(m_qListReceivedSamples.isEmpty() == false) {
-                MatrixXd matValue;
-                matValue = m_qListReceivedSamples.first();
-                m_qListReceivedSamples.removeFirst();
-
-                //Write raw data to fif file
-                if(m_bWriteToFile) {
-                    m_pOutfid->write_raw_buffer(matValue, m_cals);
-                }
-
-                //emit values to real time multi sample array
-                //qDebug()<<"EEGoSports::run() - mat size"<<matValue.rows()<<"x"<<matValue.cols();
-                m_pRMTSA_EEGoSports->data()->setValue(matValue);
-            }
-
-            m_mutex.unlock();            
-        }
-    }
-
-    //Close the fif output stream
-    if(m_bWriteToFile) {
-        m_pOutfid->finish_writing_raw();
-        m_bWriteToFile = false;
-        m_pTimerRecordingChange->stop();
-        m_pActionStartRecording->setIcon(QIcon(":/images/record.png"));
-    }
-
-    //std::cout<<"EXITING - EEGoSports::run()"<<std::endl;
-}
-
 
 //*************************************************************************************************************
 
@@ -680,7 +642,7 @@ void EEGoSports::showSetupProjectDialog()
     }
 
     if(!m_pEEGoSportsSetupProjectWidget->isVisible()) {
-        m_pEEGoSportsSetupProjectWidget->setWindowTitle("EEGoSports EEG Connector - Setup project");        
+        m_pEEGoSportsSetupProjectWidget->setWindowTitle("EEGoSports EEG Connector - Setup project");
         m_pEEGoSportsSetupProjectWidget->show();
         m_pEEGoSportsSetupProjectWidget->raise();
     }
@@ -779,4 +741,43 @@ bool EEGoSports::dirExists(const std::string& dirName_in)
     return false;    // this is not a directory!
 }
 
+
+//*************************************************************************************************************
+
+void EEGoSports::run()
+{
+    MatrixXd matValue;
+
+    while(m_bIsRunning) {
+        if(m_pEEGoSportsProducer->isRunning()) {
+            m_mutex.lock();
+
+            if(m_qListReceivedSamples.isEmpty() == false) {
+
+                matValue = m_qListReceivedSamples.takeFirst();
+
+                //Write raw data to fif file
+                if(m_bWriteToFile) {
+                    m_pOutfid->write_raw_buffer(matValue, m_cals);
+                }
+
+                //emit values to real time multi sample array
+                //qDebug()<<"EEGoSports::run() - mat size"<<matValue.rows()<<"x"<<matValue.cols();
+                m_pRMTSA_EEGoSports->data()->setValue(matValue);
+            }
+
+            m_mutex.unlock();            
+        }
+    }
+
+    //Close the fif output stream
+    if(m_bWriteToFile) {
+        m_pOutfid->finish_writing_raw();
+        m_bWriteToFile = false;
+        m_pTimerRecordingChange->stop();
+        m_pActionStartRecording->setIcon(QIcon(":/images/record.png"));
+    }
+
+    //std::cout<<"EXITING - EEGoSports::run()"<<std::endl;
+}
 

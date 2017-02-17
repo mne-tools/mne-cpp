@@ -98,6 +98,7 @@ typedef unsigned long DWORD;
 #define M_PI    3.14159265358979323846f
 #endif
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -198,14 +199,6 @@ protected slots:
 protected:
     //=========================================================================================================
     /**
-    * The starting point for the thread. After calling start(), the newly created thread calls this function.
-    * Returning from this method will end the execution of the thread.
-    * Pure virtual method inherited by QThread.
-    */
-    virtual void run();
-
-    //=========================================================================================================
-    /**
     * Opens a dialog to setup the project to check the impedance values
     */
     void showSetupProjectDialog();
@@ -227,6 +220,14 @@ protected:
     * Checks if a dir exists
     */
     bool dirExists(const std::string& dirName_in);
+
+    //=========================================================================================================
+    /**
+    * The starting point for the thread. After calling start(), the newly created thread calls this function.
+    * Returning from this method will end the execution of the thread.
+    * Pure virtual method inherited by QThread.
+    */
+    virtual void run();
 
 private:
     SCSHAREDLIB::PluginOutputData<SCMEASLIB::NewRealTimeMultiSampleArray>::SPtr m_pRMTSA_EEGoSports;                    /**< The RealTimeSampleArray to provide the EEG data.*/

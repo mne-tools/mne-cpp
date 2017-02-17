@@ -191,30 +191,37 @@ bool EEGoSportsDriver::getSampleMatrixValue(Eigen::MatrixXd &sampleMatrix)
         return false;
     }
 
-    sampleMatrix = MatrixXd(90, m_uiSamplesPerBlock);
-    sampleMatrix.setZero(); // Clear matrix - set all elements to zero
+    sampleMatrix = MatrixXd::Zero(90, m_uiSamplesPerBlock);
 
     uint iSamplesWrittenToMatrix = 0;
     int sampleMax = 0;
     int sampleIterator = 0;
+    int iReceivedSamples = 0;
+    int iChannelCount = 0;
+    uint j = 0;
+    int i = 0;
+
+    buffer buf;
+    actualSamplesWritten = 0;
+    VectorXd vec;
 
     //get samples from device until the complete matrix is filled, i.e. the samples per block size is met
     while(iSamplesWrittenToMatrix < m_uiSamplesPerBlock) {
         //Get sample block from device
-        buffer buf = m_pDataStream->getData();
+        buf = m_pDataStream->getData();
 
-        int iReceivedSamples = buf.getSampleCount();
-        int iChannelCount = buf.getChannelCount();
+        iReceivedSamples = buf.getSampleCount();
+        iChannelCount = buf.getChannelCount();
 
         //Only do the next steps if there was at least one sample received, otherwise skip and wait until at least one sample was received
         if(iReceivedSamples > 0) {
-            int actualSamplesWritten = 0; //Holds the number of samples which are actually written to the matrix in this while procedure
+            actualSamplesWritten = 0; //Holds the number of samples which are actually written to the matrix in this while procedure
 
             //Write the received samples to an extra buffer, so that they are not getting lost if too many samples were received. These are then written to the next matrix (block)
-            for(int i=0; i<iReceivedSamples; i++) {
-                VectorXd vec(iChannelCount);
+            for(i = 0; i < iReceivedSamples; ++i) {
+                vec.resize(iChannelCount);
 
-                for(uint j=0; j<iChannelCount; j++) {
+                for(j = 0; j < iChannelCount; ++j) {
                     vec(j) = buf.getSample(j,i);
                     //std::cout<<vec(j)<<std::endl;
                 }
@@ -232,8 +239,7 @@ bool EEGoSportsDriver::getSampleMatrixValue(Eigen::MatrixXd &sampleMatrix)
 
             //Read the needed number of samples from the vector buffer to store them in the matrix
             for(; sampleIterator < sampleMax; sampleIterator++) {
-                sampleMatrix.col(sampleIterator) = m_vecSampleBlockBuffer.first();
-                m_vecSampleBlockBuffer.pop_front();
+                sampleMatrix.col(sampleIterator) = m_vecSampleBlockBuffer.takeFirst();
 
                 actualSamplesWritten ++;
             }
