@@ -10,6 +10,8 @@
 #include <inverse/dipoleFit/fwd_bem_model.h>
 #include <inverse/dipoleFit/mne_named_matrix.h>
 
+#include <inverse/dipoleFit/mne_nearest.h>
+
 #include <fiff/fiff_types.h>
 
 #include <time.h>
@@ -48,6 +50,8 @@ using namespace FWDLIB;
 #define Z_41 2
 
 
+#define ALLOC_ICMATRIX_41(x,y) mne_imatrix_41((x),(y))
+
 #define MALLOC_41(x,t) (t *)malloc((x)*sizeof(t))
 #define REALLOC_41(x,y,t) (t *)((x == NULL) ? malloc((y)*sizeof(t)) : realloc((x),(y)*sizeof(t)))
 
@@ -69,7 +73,7 @@ using namespace FWDLIB;
 
 #define ALLOC_CMATRIX_41(x,y) mne_cmatrix_41((x),(y))
 #define FREE_CMATRIX_41(m) mne_free_cmatrix_41((m))
-
+#define FREE_ICMATRIX_41(m) mne_free_icmatrix_41((m))
 
 static void matrix_error_41(int kind, int nr, int nc)
 
@@ -107,9 +111,20 @@ float **mne_cmatrix_41(int nr,int nc)
 }
 
 
+int **mne_imatrix_41(int nr,int nc)
 
+{
+  int i,**m;
+  int *whole;
 
-
+  m = MALLOC_41(nr,int *);
+  if (!m) matrix_error_41(1,nr,nc);
+  whole = MALLOC_41(nr*nc,int);
+  if (!whole) matrix_error_41(2,nr,nc);
+  for(i=0;i<nr;i++)
+    m[i] = whole + i*nc;
+  return m;
+}
 
 
 
@@ -121,6 +136,15 @@ void mne_free_cmatrix_41 (float **m)
     }
 }
 
+
+void mne_free_icmatrix_41 (int **m)
+
+{
+  if (m) {
+    FREE_41(*m);
+    FREE_41(m);
+  }
+}
 
 
 
@@ -446,6 +470,24 @@ void write_coord_trans_old(FiffStream::SPtr& t_pStream, const FiffCoordTransOld*
 
 
 
+static int **make_file_triangle_list_41(int **tris, int ntri)
+     /*
+      * In the file the numbering starts from one
+      */
+{
+  int **res = ALLOC_ICMATRIX_41(ntri,3);
+  int j,k;
+
+  for (j = 0; j < ntri; j++)
+    for (k = 0; k < 3; k++)
+      res[j][k] = tris[j][k]+1;
+  return res;
+}
+
+
+
+
+
 
 
 
@@ -497,6 +539,181 @@ void mne_write_bad_channel_list_new(FiffStream::SPtr& t_pStream, const QStringLi
 
 
 
+void fiff_write_float_matrix_old (  FiffStream::SPtr& t_pStream,    /* Destination file name */
+                                int          kind,              /* What kind of tag */
+                                fiff_float_t **data,            /* The data to write */
+                                int          rows,
+                                int          cols)              /* Number of rows and columns */
+/*
+* Write out a 2D floating-point matrix
+*/
+{
+    MatrixXf mat(rows,cols);
+
+    for (int i = 0; i < rows; ++i) {
+        for(int j = 0; j < cols; ++j) {
+            mat(i,j) = data[i][j];
+        }
+    }
+
+    t_pStream->write_float_matrix(kind, mat);
+
+//  int res,*dims;
+//  fiffTagRec tag;
+//#ifdef INTEL_X86_ARCH
+//  int c;
+//#endif
+//  int k;
+//  int rowsize;
+
+//  tag.kind = kind;
+//  tag.type = FIFFT_FLOAT | FIFFT_MATRIX;
+//  tag.size = rows*cols*sizeof(fiff_float_t) + 3*sizeof(fiff_int_t);
+//  tag.data = NULL;
+//  tag.next = FIFFV_NEXT_SEQ;
+
+//  if ((res = fiff_write_tag_info(out,&tag)) == -1)
+//    return FIFF_FAIL;
+
+//  rowsize = cols*sizeof(fiff_float_t);
+//  for (k = 0; k < rows; k++) {
+//#ifdef INTEL_X86_ARCH
+//    for (c = 0; c < cols; c++)
+//      swap_float(data[k]+c);
+//#endif
+//    if (fwrite (data[k],rowsize,1,out) != 1) {
+//      if (ferror(out))
+//    err_set_sys_error("fwrite");
+//      else
+//    err_set_error("fwrite failed");
+//#ifdef INTEL_X86_ARCH
+//      for (c = 0; c < cols; c++)
+//    swap_float(data[k]+c);
+//#endif
+//      return FIFF_FAIL;
+//    }
+//#ifdef INTEL_X86_ARCH
+//    for (c = 0; c < cols; c++)
+//      swap_float(data[k]+c);
+//#endif
+//  }
+//  dims = MALLOC(3,fiff_int_t);
+//  dims[0] = swap_int(cols);
+//  dims[1] = swap_int(rows);
+//  dims[2] = swap_int(2);
+//  if (fwrite (dims,3*sizeof(fiff_int_t),1,out) != 1) {
+//    if (ferror(out))
+//      err_set_sys_error("fwrite");
+//    else
+//      err_set_error("fwrite failed");
+//    FREE(dims);
+//    return FIFF_FAIL;
+//  }
+//  FREE(dims);
+//  return res;
+}
+
+
+void fiff_write_int_matrix_old (    FiffStream::SPtr& t_pStream,
+                                    int        kind,        /* What kind of tag */
+                                    fiff_int_t **data,      /* The data to write */
+                                    int        rows,
+                                    int        cols)        /* Number of rows and columns */
+     /*
+      * Write out a 2D integer matrix
+      */
+{
+    MatrixXi mat(rows,cols);
+
+    for (int i = 0; i < rows; ++i) {
+        for(int j = 0; j < cols; ++j) {
+            mat(i,j) = data[i][j];
+        }
+    }
+
+    t_pStream->write_int_matrix(kind, mat);
+
+
+//  int res,*dims;
+//  fiffTagRec tag;
+//#ifdef INTEL_X86_ARCH
+//  int c;
+//#endif
+//  int k;
+//  int rowsize;
+
+//  tag.kind = kind;
+//  tag.type = FIFFT_INT | FIFFT_MATRIX;
+//  tag.size = rows*cols*sizeof(fiff_int_t) + 3*sizeof(fiff_int_t);
+//  tag.data = NULL;
+//  tag.next = FIFFV_NEXT_SEQ;
+
+//  if ((res = fiff_write_tag_info(out,&tag)) == -1)
+//    return -1;
+
+//  rowsize = cols*sizeof(fiff_int_t);
+//  for (k = 0; k < rows; k++) {
+//#ifdef INTEL_X86_ARCH
+//    for (c = 0; c < cols; c++)
+//      data[k][c] = swap_int(data[k][c]);
+//#endif
+//    if (fwrite (data[k],rowsize,1,out) != 1) {
+//      if (ferror(out))
+//    err_set_sys_error("fwrite");
+//      else
+//    err_set_error("fwrite failed");
+//      return -1;
+//#ifdef INTEL_X86_ARCH
+//      for (c = 0; c < cols; c++)
+//    data[k][c] = swap_int(data[k][c]);
+//#endif
+//    }
+//#ifdef INTEL_X86_ARCH
+//    for (c = 0; c < cols; c++)
+//      data[k][c] = swap_int(data[k][c]);
+//#endif
+//  }
+//  dims    = MALLOC(3,fiff_int_t);
+//  dims[0] = swap_int(cols);
+//  dims[1] = swap_int(rows);
+//  dims[2] = swap_int(2);
+//  if (fwrite (dims,3*sizeof(fiff_int_t),1,out) != 1) {
+//    if (ferror(out))
+//      err_set_sys_error("fwrite");
+//    else
+//      err_set_error("fwrite failed");
+//    FREE(dims);
+//    return -1;
+//  }
+//  FREE(dims);
+//  return res;
+}
+
+
+static int comp_points2(const void *vp1,const void *vp2)
+
+{
+  MneNearest* v1 = (MneNearest*)vp1;
+  MneNearest* v2 = (MneNearest*)vp2;
+
+  if (v1->vert > v2->vert)
+    return 1;
+  else if (v1->vert == v2->vert)
+    return 0;
+  else
+    return -1;
+}
+
+void mne_sort_nearest_by_vertex(MneNearest* points, int npoint)
+
+{
+    if (npoint > 1 && points != NULL)
+        qsort(points,npoint,sizeof(MneNearest),comp_points2);
+    return;
+}
+
+
+
 int mne_write_one_source_space(FiffStream::SPtr& t_pStream, MneSourceSpaceOld* ss,bool selected_only)
 {
     float **sel = NULL;
@@ -533,24 +750,25 @@ int mne_write_one_source_space(FiffStream::SPtr& t_pStream, MneSourceSpaceOld* s
         }
         sel = ALLOC_CMATRIX_41(ss->nuse,3);
         t_pStream->write_int(FIFF_MNE_SOURCE_SPACE_NPOINTS,&ss->nuse);
-        for (p = 0, pp = 0; p < ss->np; p++)
+        for (p = 0, pp = 0; p < ss->np; p++) {
             if (ss->inuse[p]) {
                 sel[pp][X_41] = ss->rr[p][X_41];
                 sel[pp][Y_41] = ss->rr[p][Y_41];
                 sel[pp][Z_41] = ss->rr[p][Z_41];
                 pp++;
             }
-//        if (fiff_write_float_matrix (out, FIFF_MNE_SOURCE_SPACE_POINTS,sel,ss->nuse,3) == FIFF_FAIL)
-//            goto bad;
-//        for (p = 0, pp = 0; p < ss->np; p++)
-//            if (ss->inuse[p]) {
-//                sel[pp][X_41] = ss->nn[p][X_41];
-//                sel[pp][Y_41] = ss->nn[p][Y_41];
-//                sel[pp][Z_41] = ss->nn[p][Z_41];
-//                pp++;
-//            }
-//        if (fiff_write_float_matrix (out, FIFF_MNE_SOURCE_SPACE_NORMALS,sel, ss->nuse, 3) == FIFF_FAIL)
-//            goto bad;
+        }
+        fiff_write_float_matrix_old(t_pStream, FIFF_MNE_SOURCE_SPACE_POINTS, sel,ss->nuse,3);
+
+        for (p = 0, pp = 0; p < ss->np; p++) {
+            if (ss->inuse[p]) {
+                sel[pp][X_41] = ss->nn[p][X_41];
+                sel[pp][Y_41] = ss->nn[p][Y_41];
+                sel[pp][Z_41] = ss->nn[p][Z_41];
+                pp++;
+            }
+        }
+        fiff_write_float_matrix_old(t_pStream, FIFF_MNE_SOURCE_SPACE_NORMALS, sel,ss->nuse,3);
         FREE_CMATRIX_41(sel); sel = NULL;
 #ifdef WRONG
         /*
@@ -578,13 +796,14 @@ int mne_write_one_source_space(FiffStream::SPtr& t_pStream, MneSourceSpaceOld* s
     }
     else {
 //        fiffTagRec tag;
-//        t_pStream->write_int(FIFF_MNE_SOURCE_SPACE_NPOINTS,&ss->np);
-//        if (fiff_write_float_matrix (out, FIFF_MNE_SOURCE_SPACE_POINTS,ss->rr, ss->np, 3) == FIFF_FAIL)
-//            goto bad;
-//        if (fiff_write_float_matrix (out, FIFF_MNE_SOURCE_SPACE_NORMALS,ss->nn, ss->np, 3) == FIFF_FAIL)
-//            goto bad;
+        t_pStream->write_int(FIFF_MNE_SOURCE_SPACE_NPOINTS,&ss->np);
 
-//        if (ss->nuse > 0 && ss->inuse) {
+        fiff_write_float_matrix_old(t_pStream, FIFF_MNE_SOURCE_SPACE_POINTS, ss->rr, ss->np, 3);
+
+        fiff_write_float_matrix_old(t_pStream, FIFF_MNE_SOURCE_SPACE_NORMALS, ss->nn, ss->np, 3);
+
+        if (ss->nuse > 0 && ss->inuse) {
+            t_pStream->write_int(FIFF_MNE_SOURCE_SPACE_SELECTION,ss->inuse,ss->np);
 //            tag.next = 0;
 //            tag.kind = FIFF_MNE_SOURCE_SPACE_SELECTION;
 //            tag.type = FIFFT_INT;
@@ -592,38 +811,45 @@ int mne_write_one_source_space(FiffStream::SPtr& t_pStream, MneSourceSpaceOld* s
 //            tag.data = (fiff_byte_t *)(ss->inuse);
 //            if (fiff_write_tag(out,&tag) == FIFF_FAIL)
 //                goto bad;
-
+            t_pStream->write_int(FIFF_MNE_SOURCE_SPACE_NUSE,&ss->nuse);
 //            if (fiff_write_int_tag (out, FIFF_MNE_SOURCE_SPACE_NUSE,ss->nuse) == FIFF_FAIL)
 //                goto bad;
-//        }
-//        if (ss->ntri > 0) {		/* Write the triangulation information */
+        }
+        if (ss->ntri > 0) { /* Write the triangulation information */
+            t_pStream->write_int(FIFF_MNE_SOURCE_SPACE_NTRI,&ss->ntri);
 //            if (fiff_write_int_tag(out,FIFF_MNE_SOURCE_SPACE_NTRI,ss->ntri) == FIFF_FAIL)
 //                goto bad;
-//            tris = make_file_triangle_list(ss->itris,ss->ntri);
+            tris = make_file_triangle_list_41(ss->itris,ss->ntri);
+
+            fiff_write_int_matrix_old(t_pStream, FIFF_MNE_SOURCE_SPACE_TRIANGLES, tris, ss->ntri, 3);
 //            if (fiff_write_int_matrix(out,FIFF_MNE_SOURCE_SPACE_TRIANGLES,tris,
 //                                      ss->ntri,3) == FIFF_FAIL)
 //                goto bad;
-//            FREE_ICMATRIX(tris); tris = NULL;
-//        }
-//        if (ss->nuse_tri > 0) {		/* Write the triangulation information for the vertices in use */
+            FREE_ICMATRIX_41(tris); tris = NULL;
+        }
+        if (ss->nuse_tri > 0) { /* Write the triangulation information for the vertices in use */
+            t_pStream->write_int(FIFF_MNE_SOURCE_SPACE_NUSE_TRI,&ss->nuse_tri);
 //            if (fiff_write_int_tag(out,FIFF_MNE_SOURCE_SPACE_NUSE_TRI,ss->nuse_tri) == FIFF_FAIL)
 //                goto bad;
-//            tris = make_file_triangle_list(ss->use_itris,ss->nuse_tri);
+            tris = make_file_triangle_list_41(ss->use_itris,ss->nuse_tri);
+
+            fiff_write_int_matrix_old(t_pStream, FIFF_MNE_SOURCE_SPACE_USE_TRIANGLES, tris, ss->nuse_tri, 3);
 //            if (fiff_write_int_matrix(out,FIFF_MNE_SOURCE_SPACE_USE_TRIANGLES,tris,
 //                                      ss->nuse_tri,3) == FIFF_FAIL)
 //                goto bad;
-//            FREE_ICMATRIX(tris); tris = NULL;
-//        }
-//        if (ss->nearest) {		/* Write the patch information */
-//            nearest = MALLOC(ss->np,int);
-//            nearest_dist = MALLOC(ss->np,float);
+            FREE_ICMATRIX_41(tris); tris = NULL;
+        }
+        if (ss->nearest) {    /* Write the patch information */
+            nearest = MALLOC_41(ss->np,int);
+            nearest_dist = MALLOC_41(ss->np,float);
 
-//            mne_sort_nearest_by_vertex(ss->nearest,ss->np);
-//            for (p = 0; p < ss->np; p++) {
-//                nearest[p] = ss->nearest[p].nearest;
-//                nearest_dist[p] = ss->nearest[p].dist;
-//            }
+            mne_sort_nearest_by_vertex(ss->nearest,ss->np);
+            for (p = 0; p < ss->np; p++) {
+                nearest[p] = ss->nearest[p].nearest;
+                nearest_dist[p] = ss->nearest[p].dist;
+            }
 
+            t_pStream->write_int(FIFF_MNE_SOURCE_SPACE_NEAREST,nearest,ss->np);
 //            tag.next = FIFFV_NEXT_SEQ;
 //            tag.kind = FIFF_MNE_SOURCE_SPACE_NEAREST;
 //            tag.type = FIFFT_INT;
@@ -632,6 +858,7 @@ int mne_write_one_source_space(FiffStream::SPtr& t_pStream, MneSourceSpaceOld* s
 //            if (fiff_write_tag(out,&tag) == FIFF_FAIL)
 //                goto bad;
 
+            t_pStream->write_float(FIFF_MNE_SOURCE_SPACE_NEAREST_DIST,nearest_dist,ss->np);
 //            tag.next = FIFFV_NEXT_SEQ;
 //            tag.kind = FIFF_MNE_SOURCE_SPACE_NEAREST_DIST;
 //            tag.type = FIFFT_FLOAT;
@@ -640,10 +867,10 @@ int mne_write_one_source_space(FiffStream::SPtr& t_pStream, MneSourceSpaceOld* s
 //            if (fiff_write_tag(out,&tag) == FIFF_FAIL)
 //                goto bad;
 
-//            FREE_41(nearest); nearest = NULL;
-//            FREE_41(nearest_dist); nearest_dist = NULL;
-//        }
-//        if (ss->dist) {		/* Distance information */
+            FREE_41(nearest); nearest = NULL;
+            FREE_41(nearest_dist); nearest_dist = NULL;
+        }
+        if (ss->dist) {     /* Distance information */
 //            mneSparseMatrix m = mne_pick_lower_triangle_rcs(ss->dist);
 //            if (!m)
 //                goto bad;
@@ -653,8 +880,8 @@ int mne_write_one_source_space(FiffStream::SPtr& t_pStream, MneSourceSpaceOld* s
 //            }
 //            mne_free_sparse(m);
 
-//            t_pStream->write_float(FIFF_MNE_SOURCE_SPACE_DIST_LIMIT,&ss->dist_limit);
-//        }
+            t_pStream->write_float(FIFF_MNE_SOURCE_SPACE_DIST_LIMIT,&ss->dist_limit);
+        }
     }
     /*
     * Volume source spaces have additional information
@@ -666,7 +893,7 @@ int mne_write_one_source_space(FiffStream::SPtr& t_pStream, MneSourceSpaceOld* s
     return FIFF_OK;
 
 bad : {
-//        FREE_ICMATRIX_41(tris);
+        FREE_ICMATRIX_41(tris);
         FREE_CMATRIX_41(sel);
         FREE_41(nearest);
         FREE_41(nearest_dist);
@@ -832,8 +1059,8 @@ int write_solution(const QString& name,         /* Destination file */
     * Write the source spaces (again)
     */
     for (k = 0, nvert = 0; k < nspace; k++) {
-//        if (mne_write_one_source_space(out,spaces[k],FALSE) == FIFF_FAIL)
-//            goto bad;
+        if (mne_write_one_source_space(t_pStream,spaces[k],FALSE) == FIFF_FAIL)
+            goto bad;
         nvert += spaces[k]->nuse;
     }
 //    /*
@@ -903,13 +1130,13 @@ int write_solution(const QString& name,         /* Destination file */
 
     return FIFF_OK;
 
-//bad : {
+bad : {
 //        if (out != NULL)
 //            fclose(out);
 //        fiff_close(in);
 
-//        return FIFF_FAIL;
-//    }
+        return FIFF_FAIL;
+    }
 }
 
 
