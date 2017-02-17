@@ -161,6 +161,6 @@ signals:
     void fiffInfoAvailable();
 };
 
-} // NAMESPACE
+} // namespace
 
 #endif // REFERENCE_H
