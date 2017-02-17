@@ -340,47 +340,47 @@ void BabyMEGInfo::MGH_LM_Parse_Para(QByteArray cmdstr)
             t_ch.kind = FIFFV_MEG_CH;
             t_ch.unit = FIFF_UNIT_T;
             t_ch.unit_mul = FIFF_UNITM_NONE;
-            t_ch.coil_type = FIFFV_COIL_BABY_MAG;
+            t_ch.chpos.coil_type = FIFFV_COIL_BABY_MAG;
             break;
         case 2: // outer layer meg sensors
             t_ch.kind = FIFFV_REF_MEG_CH;
             t_ch.unit = FIFF_UNIT_T;
             t_ch.unit_mul = FIFF_UNITM_NONE;
-            t_ch.coil_type = FIFFV_COIL_BABY_REF_MAG;
+            t_ch.chpos.coil_type = FIFFV_COIL_BABY_REF_MAG;
 
             break;
         case 3: // reference meg sensors
             t_ch.kind = FIFFV_REF_MEG_CH;
             t_ch.unit = FIFF_UNIT_T;
             t_ch.unit_mul = FIFF_UNITM_NONE;
-            t_ch.coil_type = FIFFV_COIL_BABY_REF_MAG2;
+            t_ch.chpos.coil_type = FIFFV_COIL_BABY_REF_MAG2;
 
             break;
         case 4: // trigger lines
             t_ch.kind = FIFFV_STIM_CH;
             t_ch.unit = FIFF_UNIT_V;
             t_ch.unit_mul = FIFF_UNITM_NONE;
-            t_ch.coil_type = FIFFV_STIM_CH;
+            t_ch.chpos.coil_type = FIFFV_STIM_CH;
             break;
         case 5: // EEG channels
             t_ch.kind = FIFFV_EEG_CH;
             t_ch.unit = FIFF_UNIT_V;
             t_ch.unit_mul = FIFF_UNITM_NONE;
-            t_ch.coil_type = FIFFV_COIL_EEG;
+            t_ch.chpos.coil_type = FIFFV_COIL_EEG;
 
             break;
         case 6: // HPI channels
             t_ch.kind = type;
             t_ch.unit = FIFF_UNIT_V;
             t_ch.unit_mul = FIFF_UNITM_NONE;
-            t_ch.coil_type = FIFFV_COIL_NONE;
+            t_ch.chpos.coil_type = FIFFV_COIL_NONE;
 
             break;
         case 7: // HPI G channels
             t_ch.kind = FIFFV_HPI_G;
             t_ch.unit = FIFF_UNIT_V;
             t_ch.unit_mul = FIFF_UNITM_NONE;
-            t_ch.coil_type = FIFFV_COIL_NONE;
+            t_ch.chpos.coil_type = FIFFV_COIL_NONE;
 
             break;
 
@@ -388,7 +388,7 @@ void BabyMEGInfo::MGH_LM_Parse_Para(QByteArray cmdstr)
             t_ch.kind = FIFFV_MEG_CH;
             t_ch.unit = FIFF_UNIT_T;
             t_ch.unit_mul = FIFF_UNITM_NONE;
-            t_ch.coil_type = FIFFV_COIL_NONE;
+            t_ch.chpos.coil_type = FIFFV_COIL_NONE;
 
             break;
         }

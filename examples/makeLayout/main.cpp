@@ -125,7 +125,7 @@ int main(int argc, char *argv[])
         int chKind = parser.value(chKindOption).toInt();
 
         for(int i = 0; i<fiffInfo.ch_names.size(); i++) {
-            int type = fiffInfo.chs.at(i).coil_type;
+            int type = fiffInfo.chs.at(i).chpos.coil_type;
 
             if(type == chKind) {
                 QVector<float> temp;

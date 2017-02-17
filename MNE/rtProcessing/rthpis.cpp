@@ -578,7 +578,7 @@ void RtHPIS::singleHPIFit(const MatrixXd& t_mat, FiffCoordTrans& transDevHead, c
     // Get the indices of inner layer channels and exclude bad channels
     QVector<int> innerind(0);
     for (int i = 0; i < numCh; ++i) {
-        if(m_pFiffInfo->chs[i].coil_type == 7002) {
+        if(m_pFiffInfo->chs[i].chpos.coil_type == 7002) {
             // Check if the sensor is bad, if not append to innerind
             if(!(m_pFiffInfo->bads.contains(m_pFiffInfo->ch_names.at(i)))) {
                 innerind.append(i);
@@ -947,7 +947,7 @@ void RtHPIS::run()
         // Get the indices of inner layer channels
         QVector<int> innerind(0);
         for (int i = 0;i < numCh;i++) {
-            if(m_pFiffInfo->chs[i].coil_type == 7002) {
+            if(m_pFiffInfo->chs[i].chpos.coil_type == 7002) {
                 // Check if the sensor is bad, if not append to innerind
                 if(!(m_pFiffInfo->bads.contains(m_pFiffInfo->ch_names.at(i)))) innerind.append(i);
             }

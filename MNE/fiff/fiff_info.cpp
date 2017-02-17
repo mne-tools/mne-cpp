@@ -136,7 +136,7 @@ qint32 FiffInfo::get_current_comp()
     {
         if (this->chs[k].kind == FIFFV_MEG_CH)
         {
-            comp = this->chs[k].coil_type >> 16;
+            comp = this->chs[k].chpos.coil_type >> 16;
             if (first_comp < 0)
                 first_comp = comp;
             else if (comp != first_comp)
@@ -341,8 +341,8 @@ QList<FiffChInfo> FiffInfo::set_current_comp(QList<FiffChInfo>& chs, fiff_int_t 
     {
         if (chs[k].kind == FIFFV_MEG_CH)
         {
-            coil_type = chs[k].coil_type & lower_half;
-            new_chs[k].coil_type = (coil_type | (value << 16));
+            coil_type = chs[k].chpos.coil_type & lower_half;
+            new_chs[k].chpos.coil_type = (coil_type | (value << 16));
         }
     }
     return new_chs;

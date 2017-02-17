@@ -469,7 +469,7 @@ int write_solution(const QString& name,         /* Destination file */
             chInfo.kind = meg_chs[k].kind;
             chInfo.range = meg_chs[k].range;
             chInfo.cal = meg_chs[k].cal;
-            chInfo.coil_type = meg_chs[k].chpos.coil_type;
+            chInfo.chpos.coil_type = meg_chs[k].chpos.coil_type;
             chInfo.chpos.r0[0] = meg_chs[k].chpos.r0[0];
             chInfo.chpos.r0[1] = meg_chs[k].chpos.r0[1];
             chInfo.chpos.r0[2] = meg_chs[k].chpos.r0[2];
@@ -482,6 +482,10 @@ int write_solution(const QString& name,         /* Destination file */
             chInfo.chpos.ez[0] = meg_chs[k].chpos.ez[0];
             chInfo.chpos.ez[1] = meg_chs[k].chpos.ez[1];
             chInfo.chpos.ez[2] = meg_chs[k].chpos.ez[2];
+            chInfo.unit = meg_chs[k].unit;
+            chInfo.unit_mul = meg_chs[k].unit_mul;
+            chInfo.ch_name = QString(meg_chs[k].ch_name);
+
 
 
 //            tag.data = (fiff_byte_t *)(meg_chs+k);

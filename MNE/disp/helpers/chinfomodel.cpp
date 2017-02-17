@@ -433,11 +433,11 @@ QVariant ChInfoModel::data(const QModelIndex &index, int role) const
 
             switch(role) {
                 case Qt::DisplayRole:
-                    v.setValue(QString("%1").arg(m_pFiffInfo->chs.at(index.row()).coil_type));
+                    v.setValue(QString("%1").arg(m_pFiffInfo->chs.at(index.row()).chpos.coil_type));
                     return v;
 
                 case ChInfoModelRoles::GetChCoilType:
-                    v.setValue(m_pFiffInfo->chs.at(index.row()).coil_type);
+                    v.setValue(m_pFiffInfo->chs.at(index.row()).chpos.coil_type);
                     return v;
 
                 case Qt::TextAlignmentRole:

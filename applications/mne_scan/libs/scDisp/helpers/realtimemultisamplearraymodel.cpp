@@ -247,13 +247,13 @@ void RealTimeMultiSampleArrayModel::initSphara()
 
     for(int r = 0; r < m_pFiffInfo->chs.size(); ++r) {
         //Find GRADIOMETERS
-        if(m_pFiffInfo->chs.at(r).coil_type == 3012) {
+        if(m_pFiffInfo->chs.at(r).chpos.coil_type == 3012) {
             m_vecIndicesFirstVV.conservativeResize(m_vecIndicesFirstVV.rows()+1);
             m_vecIndicesFirstVV(m_vecIndicesFirstVV.rows()-1) = r;
         }
 
         //Find Magnetometers
-        if(m_pFiffInfo->chs.at(r).coil_type == 3024) {
+        if(m_pFiffInfo->chs.at(r).chpos.coil_type == 3024) {
             m_vecIndicesSecondVV.conservativeResize(m_vecIndicesSecondVV.rows()+1);
             m_vecIndicesSecondVV(m_vecIndicesSecondVV.rows()-1) = r;
         }
@@ -263,7 +263,7 @@ void RealTimeMultiSampleArrayModel::initSphara()
     m_vecIndicesFirstBabyMEG.resize(0);
     for(int r = 0; r < m_pFiffInfo->chs.size(); ++r) {
         //Find INNER LAYER
-        if(m_pFiffInfo->chs.at(r).coil_type == 7002) {
+        if(m_pFiffInfo->chs.at(r).chpos.coil_type == 7002) {
             m_vecIndicesFirstBabyMEG.conservativeResize(m_vecIndicesFirstBabyMEG.rows()+1);
             m_vecIndicesFirstBabyMEG(m_vecIndicesFirstBabyMEG.rows()-1) = r;
         }
