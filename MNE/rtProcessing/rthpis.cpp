@@ -761,6 +761,7 @@ void RtHPIS::singleHPIFit(const MatrixXd& t_mat, FiffCoordTrans& transDevHead, c
 
     UTILSLIB::IOUtils::write_eigen_matrix(diffPos, QString("C:/Users/MEG measurement/BabyMEGData/TestProject/TestSubject/%1_diffPos_mat").arg(sTimeStamp));
 
+    UTILSLIB::IOUtils::write_eigen_matrix(amp, QString("C:/Users/MEG measurement/BabyMEGData/TestProject/TestSubject/%1_amp_mat").arg(sTimeStamp));
 }
 
 
