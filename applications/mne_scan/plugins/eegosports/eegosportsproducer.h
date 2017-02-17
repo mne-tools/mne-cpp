@@ -43,8 +43,6 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "eegosports_global.h"
-
 #include <generics/circularbuffer.h>
 #include <Eigen/Eigen>
 
@@ -81,7 +79,7 @@ class EEGoSportsDriver;
 *
 * @brief The EEGoSportsProducer class provides a EEG data producer for a given sampling rate.
 */
-class EEGOSPORTSSHARED_EXPORT EEGoSportsProducer : public QThread
+class EEGoSportsProducer : public QThread
 {
 
 public:

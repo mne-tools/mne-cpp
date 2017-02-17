@@ -43,8 +43,6 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "eegosports_global.h"
-
 #include "../ui_eegosportsabout.h"
 
 
@@ -77,7 +75,7 @@ namespace EEGOSPORTSPLUGIN
 *
 * @brief The EEGoSportsAboutWidget class provides the about dialog for the EEGoSports.
 */
-class EEGOSPORTSSHARED_EXPORT EEGoSportsAboutWidget : public QDialog
+class EEGoSportsAboutWidget : public QDialog
 {
     Q_OBJECT
 
