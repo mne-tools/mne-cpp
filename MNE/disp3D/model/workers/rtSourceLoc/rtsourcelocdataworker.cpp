@@ -175,7 +175,7 @@ void transformDataToColor(const VectorXd& data, QByteArray& arrayFinalVertColor,
     //timer.start();
 
     if(data.rows() != arrayFinalVertColor.size()/(3*sizeof(float))) {
-        qDebug() << "RtSourceLocDataWorker::transformDataToColor - Sizes of input vectors do not match. Returning ...";
+        qDebug() << "RtSourceLocDataWorker::transformDataToColor - Sizes of input data (" <<data.rows() <<") do not match color byte array("<< arrayFinalVertColor.size()/(3*sizeof(float)) <<"). Returning ...";
     }
 
     float *rawArrayColors = reinterpret_cast<float *>(arrayFinalVertColor.data());
@@ -775,7 +775,7 @@ void RtSourceLocDataWorker::createSmoothingOperator(const MatrixX3f& matVertPosL
     leftHemi.vecVertNo = m_lVisualizationInfo[0].vVertNo;
     leftHemi.matVertPos = matVertPosLeftHemi;
     leftHemi.iDistPow = 3;
-    leftHemi.dThresholdDistance = 0.03;
+    leftHemi.dThresholdDistance = 0.003;
     inputData.append(leftHemi);
 
     SmoothOperatorInfo rightHemi;
@@ -784,7 +784,7 @@ void RtSourceLocDataWorker::createSmoothingOperator(const MatrixX3f& matVertPosL
     rightHemi.vecVertNo = m_lVisualizationInfo[1].vVertNo;
     rightHemi.matVertPos = matVertPosRightHemi;
     rightHemi.iDistPow = 3;
-    rightHemi.dThresholdDistance = 0.03;
+    rightHemi.dThresholdDistance = 0.003;
     inputData.append(rightHemi);
 
     QFuture<void> future = QtConcurrent::map(inputData, generateSmoothOperator);
