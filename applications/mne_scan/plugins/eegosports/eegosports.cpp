@@ -60,6 +60,12 @@
 //=============================================================================================================
 
 using namespace EEGOSPORTSPLUGIN;
+using namespace SCSHAREDLIB;
+using namespace SCMEASLIB;
+using namespace IOBUFFER;
+using namespace FIFFLIB;
+using namespace UTILSLIB;
+using namespace Eigen;
 
 
 //*************************************************************************************************************
@@ -99,11 +105,10 @@ EEGoSports::EEGoSports()
 
 EEGoSports::~EEGoSports()
 {
-    //std::cout << "EEGoSports::~EEGoSports() " << std::endl;
-
     //If the program is closed while the sampling is in process
-    if(this->isRunning())
+    if(this->isRunning()) {
         this->stop();    
+    }
 
     //Store settings for next use
     QSettings settings;
@@ -193,8 +198,6 @@ void EEGoSports::setUpFiffInfo()
     //
     m_pFiffInfo->nchan = m_iNumberOfChannels;
     m_pFiffInfo->sfreq = m_iSamplingFreq;
-    m_pFiffInfo->highpass = (float)0.001;
-    m_pFiffInfo->lowpass = m_iSamplingFreq/2;
 
     //
     //Read electrode positions from .elc file
@@ -286,9 +289,9 @@ void EEGoSports::setUpFiffInfo()
         cardinals3D[i][2] = point_rot[2];
     }
 
-    qDebug()<<"cardinals3D"<<cardinals3D;
-    qDebug()<<"cardinals2D"<<cardinals2D;
-    qDebug()<<"cardinalNames"<<cardinalNames;
+//    qDebug()<<"cardinals3D"<<cardinals3D;
+//    qDebug()<<"cardinals2D"<<cardinals2D;
+//    qDebug()<<"cardinalNames"<<cardinalNames;
 
     //Append LAP value to digitizer data.
     FiffDigPoint digPoint;
@@ -357,8 +360,7 @@ void EEGoSports::setUpFiffInfo()
         digPoint.r[2] = cardinals3D[indexRPA][2]*0.001;
         digitizerInfo.push_back(digPoint);
     } else if(m_bUseElectrodeShiftMode) {
-        if(indexRPA != -1)
-        {
+        if(indexRPA != -1) {
             digPoint.r[0] = elcLocation3D[indexRPA][0]*0.001;
             digPoint.r[1] = elcLocation3D[indexRPA][1]*0.001;
             digPoint.r[2] = (elcLocation3D[indexRPA][2]-m_dRPAShift*10)*0.001;
@@ -392,15 +394,13 @@ void EEGoSports::setUpFiffInfo()
     QStringList QSLChNames;
     m_pFiffInfo->chs.clear();
 
-    for(int i=0; i<m_iNumberOfChannels; i++)
-    {
+    for(int i=0; i<m_iNumberOfChannels; i++) {
         //Create information for each channel
         QString sChType;
         FiffChInfo fChInfo;
 
         //EEG Channels
-        if(i<=numberEEGCh-1)
-        {
+        if(i<=numberEEGCh-1) {
             //Set channel name
             if(!elcChannelNames.empty() && i<elcChannelNames.size()) {
                 sChType = QString("EEG ");
@@ -464,8 +464,7 @@ void EEGoSports::setUpFiffInfo()
         }
 
         //Bipolar channels
-        if(i>=64 && i<=87)
-        {
+        if(i>=64 && i<=87) {
             //Set channel type
             fChInfo.kind = FIFFV_MISC_CH;
 
@@ -474,8 +473,7 @@ void EEGoSports::setUpFiffInfo()
         }
 
         //Digital input channel
-        if(i==88)
-        {
+        if(i==88) {
             //Set channel type
             fChInfo.kind = FIFFV_STIM_CH;
 
@@ -484,8 +482,7 @@ void EEGoSports::setUpFiffInfo()
         }
 
         //Internally generated test signal - ramp signal
-        if(i==89)
-        {
+        if(i==89) {
             //Set channel type
             fChInfo.kind = FIFFV_MISC_CH;
 
@@ -516,15 +513,16 @@ void EEGoSports::setUpFiffInfo()
 bool EEGoSports::start()
 {
     //Check if the thread is already or still running. This can happen if the start button is pressed immediately after the stop button was pressed. In this case the stopping process is not finished yet but the start process is initiated.
-    if(this->isRunning())
+    if(this->isRunning()) {
         QThread::wait();
+    }
 
     //Setup fiff info
     setUpFiffInfo();
 
     //Set the channel size of the RMTSA - this needs to be done here and NOT in the init() function because the user can change the number of channels during runtime
     m_pRMTSA_EEGoSports->data()->initFromFiffInfo(m_pFiffInfo);
-    m_pRMTSA_EEGoSports->data()->setMultiArraySize(1);//m_iSamplesPerBlock);
+    m_pRMTSA_EEGoSports->data()->setMultiArraySize(1);
     m_pRMTSA_EEGoSports->data()->setSamplingRate(m_iSamplingFreq);
 
     //Buffer
@@ -538,14 +536,12 @@ bool EEGoSports::start()
                        m_sOutputFilePath,
                        m_bCheckImpedances);
 
-    if(m_pEEGoSportsProducer->isRunning())
-    {
+    if(m_pEEGoSportsProducer->isRunning()) {
         m_bIsRunning = true;
         QThread::start();
         return true;
     }
-    else
-    {
+    else {
         qWarning() << "Plugin EEGoSports - ERROR - EEGoSportsProducer thread could not be started - Either the device is turned off (check your OS device manager) or the driver DLL (EEGO-SDK.dll) is not installed in one of the monitored dll path." << endl;
         return false;
     }
@@ -638,8 +634,7 @@ void EEGoSports::run()
         {
             m_mutex.lock();
 
-            if(m_qListReceivedSamples.isEmpty() == false)
-            {
+            if(m_qListReceivedSamples.isEmpty() == false) {
                 MatrixXd matValue;
                 matValue = m_qListReceivedSamples.first();
                 m_qListReceivedSamples.removeFirst();
@@ -659,8 +654,7 @@ void EEGoSports::run()
     }
 
     //Close the fif output stream
-    if(m_bWriteToFile)
-    {
+    if(m_bWriteToFile) {
         m_pOutfid->finish_writing_raw();
         m_bWriteToFile = false;
         m_pTimerRecordingChange->stop();
@@ -683,8 +677,7 @@ void EEGoSports::showSetupProjectDialog()
                 this, &EEGoSports::onUpdateCardinalPoints);
     }
 
-    if(!m_pEEGoSportsSetupProjectWidget->isVisible())
-    {
+    if(!m_pEEGoSportsSetupProjectWidget->isVisible()) {
         m_pEEGoSportsSetupProjectWidget->setWindowTitle("EEGoSports EEG Connector - Setup project");        
         m_pEEGoSportsSetupProjectWidget->show();
         m_pEEGoSportsSetupProjectWidget->raise();
@@ -697,25 +690,21 @@ void EEGoSports::showSetupProjectDialog()
 void EEGoSports::showStartRecording()
 {
     //Setup writing to file
-    if(m_bWriteToFile)
-    {
+    if(m_bWriteToFile) {
         m_pOutfid->finish_writing_raw();
         m_bWriteToFile = false;
         m_pTimerRecordingChange->stop();
         m_pActionStartRecording->setIcon(QIcon(":/images/record.png"));
     }
-    else
-    {
-        if(!m_bIsRunning)
-        {
+    else {
+        if(!m_bIsRunning) {
             QMessageBox msgBox;
             msgBox.setText("Start data acquisition first!");
             msgBox.exec();
             return;
         }
 
-        if(!m_pFiffInfo)
-        {
+        if(!m_pFiffInfo) {
             QMessageBox msgBox;
             msgBox.setText("FiffInfo missing!");
             msgBox.exec();
@@ -724,8 +713,7 @@ void EEGoSports::showStartRecording()
 
         //Initiate the stream for writing to the fif file
         m_fileOut.setFileName(m_sOutputFilePath);
-        if(m_fileOut.exists())
-        {
+        if(m_fileOut.exists()) {
             QMessageBox msgBox;
             msgBox.setText("The file you want to write already exists.");
             msgBox.setInformativeText("Do you want to overwrite this file?");
@@ -740,8 +728,7 @@ void EEGoSports::showStartRecording()
         list.removeLast(); // remove file name
         QString fileDir = list.join("/");
 
-        if(!dirExists(fileDir.toStdString()))
-        {
+        if(!dirExists(fileDir.toStdString())) {
             QDir dir;
             dir.mkpath(fileDir);
         }
@@ -763,13 +750,11 @@ void EEGoSports::showStartRecording()
 
 void EEGoSports::changeRecordingButton()
 {
-    if(m_iBlinkStatus == 0)
-    {
+    if(m_iBlinkStatus == 0) {
         m_pActionStartRecording->setIcon(QIcon(":/images/record.png"));
         m_iBlinkStatus = 1;
     }
-    else
-    {
+    else {
         m_pActionStartRecording->setIcon(QIcon(":/images/record_active.png"));
         m_iBlinkStatus = 0;
     }
@@ -781,11 +766,13 @@ void EEGoSports::changeRecordingButton()
 bool EEGoSports::dirExists(const std::string& dirName_in)
 {
     DWORD ftyp = GetFileAttributesA(dirName_in.c_str());
-    if (ftyp == INVALID_FILE_ATTRIBUTES)
+    if (ftyp == INVALID_FILE_ATTRIBUTES) {
         return false;  //something is wrong with your path!
+    }
 
-    if (ftyp & FILE_ATTRIBUTE_DIRECTORY)
+    if (ftyp & FILE_ATTRIBUTE_DIRECTORY) {
         return true;   // this is a directory!
+    }
 
     return false;    // this is not a directory!
 }
