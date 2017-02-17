@@ -12,6 +12,8 @@
 
 #include <fiff/fiff_types.h>
 
+#include <time.h>
+
 #include <QCoreApplication>
 #include <QFile>
 
@@ -594,7 +596,7 @@ int write_solution(const QString& name,         /* Destination file */
 //        goto bad;
 //    fiff_close(in); in = NULL;
 
-//    return FIFF_OK;
+    return FIFF_OK;
 
 //bad : {
 //        if (out != NULL)

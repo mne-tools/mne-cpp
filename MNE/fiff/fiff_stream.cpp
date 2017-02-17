@@ -1837,16 +1837,16 @@ void FiffStream::write_ch_pos(const FiffChPos &chpos)
     qint32 i;
     // r0
     for(i = 0; i < 3; ++i)
-        *this << (float)chpos.r0[i];
+        *this << chpos.r0[i];
     // ex
     for(i = 0; i < 3; ++i)
-        *this << (float)chpos.ex[i];
+        *this << chpos.ex[i];
     // ey
     for(i = 0; i < 3; ++i)
-        *this << (float)chpos.ey[i];
+        *this << chpos.ey[i];
     // ez
     for(i = 0; i < 3; ++i)
-        *this << (float)chpos.ez[i];
+        *this << chpos.ez[i];
 }
 
 
