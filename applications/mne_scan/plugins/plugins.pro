@@ -57,8 +57,7 @@ contains(MNECPP_CONFIG, BuildBasicMNESCANVersion) {
         triggercontrol \
         # gusbamp \
         # eegosports \
-        eegosports \
-        brainamp \
+        # brainamp \
 
     #Algorithms
     SUBDIRS += \
