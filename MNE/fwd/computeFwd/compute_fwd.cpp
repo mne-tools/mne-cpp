@@ -458,8 +458,6 @@ int write_solution(const QString& name,         /* Destination file */
         int nchan = nmeg+neeg;
         t_pStream->write_int(FIFF_NCHAN,&nchan);
 
-
-
         FiffChInfo chInfo;
         int k, p;
         for (k = 0, p = 0; k < nmeg; k++) {
@@ -486,23 +484,10 @@ int write_solution(const QString& name,         /* Destination file */
             chInfo.unit_mul = meg_chs[k].unit_mul;
             chInfo.ch_name = QString(meg_chs[k].ch_name);
 
-
-
-//            tag.data = (fiff_byte_t *)(meg_chs+k);
-//            if (fiff_write_tag(out,&tag) == FIFF_FAIL)
-//                goto bad;
+            t_pStream->write_ch_info(chInfo);
         }
 
-//        tag.next = 0;
-//        tag.kind = FIFF_CH_INFO;
-//        tag.type = FIFFT_CH_INFO_STRUCT;
-//        tag.size = sizeof(fiffChInfoRec);
-//        for (k = 0, p = 0; k < nmeg; k++) {
-//            meg_chs[k].scanNo = ++p;
-//            tag.data = (fiff_byte_t *)(meg_chs+k);
-//            if (fiff_write_tag(out,&tag) == FIFF_FAIL)
-//                goto bad;
-//        }
+
 //        for (k = 0; k < neeg; k++) {
 //            eeg_chs[k].scanNo = ++p;
 //            tag.data = (fiff_byte_t *)(eeg_chs+k);
@@ -510,8 +495,8 @@ int write_solution(const QString& name,         /* Destination file */
 //                goto bad;
 //        }
 //        /*
-//     * Copy the bad channel list from the measurement file
-//     */
+//        * Copy the bad channel list from the measurement file
+//        */
 //        if (mne_read_bad_channel_list(meas_file,&file_bads,&file_nbad) == OK && file_nbad > 0) {
 //            if (mne_write_bad_channel_list(out,file_bads,file_nbad) != OK) {
 //                mne_free_name_list(file_bads,file_nbad);
@@ -522,10 +507,6 @@ int write_solution(const QString& name,         /* Destination file */
 
         t_pStream->end_block(FIFFB_MNE_PARENT_MEAS_FILE);
     }
-
-
-
-
 
 //    /*
 //    * Write the source spaces (again)
