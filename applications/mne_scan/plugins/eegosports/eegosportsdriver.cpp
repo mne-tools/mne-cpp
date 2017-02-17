@@ -121,7 +121,7 @@ bool EEGoSportsDriver::initDevice(int iNumberOfChannels,
         } else {            
             //reference_range the range, in volt, for the referential channels. Valid values are: 1, 0.75, 0.15
             //bipolar_range the range, in volt, for the bipolar channels. Valid values are: 4, 1.5, 0.7, 0.35
-            double reference_range = 1; //0.15;
+            double reference_range = 0.75;
             double bipolar_range = 4;
 
             m_pDataStream = m_pAmplifier->OpenEegStream(m_uiSamplingFrequency, reference_range, bipolar_range);
