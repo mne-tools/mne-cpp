@@ -130,10 +130,10 @@ void EEGoSportsProducer::stop()
 
 void EEGoSportsProducer::run()
 {
-    while(m_bIsRunning) {
-        //Get the TMSi EEG data out of the device buffer and write received data to a QList
-        MatrixXd matRawBuffer;
+    MatrixXd matRawBuffer;
 
+    while(m_bIsRunning) {
+        //Get the EEG data out of the device buffer and send it to main thread
         if(m_pEEGoSportsDriver->getSampleMatrixValue(matRawBuffer)) {
             m_pEEGoSports->setSampleData(matRawBuffer);
         }
