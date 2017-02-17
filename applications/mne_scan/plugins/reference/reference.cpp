@@ -213,7 +213,6 @@ void Reference::update(SCMEASLIB::NewMeasurement::SPtr pMeasurement)
 }
 
 
-
 //*************************************************************************************************************
 
 void Reference::run()
