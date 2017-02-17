@@ -111,9 +111,9 @@ int main(int argc, char *argv[])
         return 0;
     }
 
-    QList<QVector<double> > inputPoints;
-    QList<QVector<double> > outputPoints;
-    QList<QVector<double> > channel2DData;
+    QList<QVector<float> > inputPoints;
+    QList<QVector<float> > outputPoints;
+    QList<QVector<float> > channel2DData;
     QStringList names;
 
     if(parser.value(inputOption).contains(".fif")) {
@@ -128,10 +128,10 @@ int main(int argc, char *argv[])
             int type = fiffInfo.chs.at(i).coil_type;
 
             if(type == chKind) {
-                QVector<double> temp;
-                double x = fiffInfo.chs.at(i).loc(0,0) * 100;
-                double y = fiffInfo.chs.at(i).loc(1,0) * 100;
-                double z = fiffInfo.chs.at(i).loc(2,0) * 100;
+                QVector<float> temp;
+                float x = fiffInfo.chs.at(i).chpos.r0[0] * 100.0f;
+                float y = fiffInfo.chs.at(i).chpos.r0[1] * 100.0f;
+                float z = fiffInfo.chs.at(i).chpos.r0[2] * 100.0f;
 
                 temp.append(x);
                 temp.append(y);

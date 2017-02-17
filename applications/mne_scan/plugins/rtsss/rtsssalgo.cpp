@@ -315,7 +315,7 @@ void RtSssAlgo::setMEGInfo(FiffInfo::SPtr fiffInfo, RowVectorXi pickedChannels)
 
     for (qint32 i=0; i<NumCoil; ++i)
     {
-        CoilT.append(fiffInfo->chs[pickedChannels(i)].coil_trans);
+        CoilT.append(fiffInfo->chs[pickedChannels(i)].coil_trans.cast <double>());
 
 //                std::cout << "PickedChID: " << pickedChannels(i) << ", ";
 //                std::cout <<  fiffInfo->chs[pickedChannels(i)].coil_trans << std::endl;
@@ -1407,7 +1407,7 @@ void RtSssAlgo::getCoilInfoVectorView()
             CoilName.append(QString::number(raw.info.chs[i].coil_type));
 //            std::cout << "coil no[" << nmegcoil <<"] "<< CoilName[nmegcoil].toStdString() << "   ";
 
-            CoilT.append(raw.info.chs[i].coil_trans);
+            CoilT.append(raw.info.chs[i].coil_trans.cast<double>());
 
             if (raw.info.chs[i].coil_type == 3012)  CoilGrad(nmegcoil) = 1;
             else    CoilGrad(nmegcoil) = 0;

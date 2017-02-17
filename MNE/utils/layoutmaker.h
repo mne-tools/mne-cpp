@@ -124,8 +124,8 @@ public:
     *
     * @return true if making layout was successful, false otherwise.
     */
-    static bool makeLayout(const QList<QVector<double> > &inputPoints,
-                           QList<QVector<double> > &outputPoints,
+    static bool makeLayout(const QList<QVector<float> > &inputPoints,
+                           QList<QVector<float> > &outputPoints,
                            const QStringList &names,
                            QFile &outFile,
                            bool do_fit,
