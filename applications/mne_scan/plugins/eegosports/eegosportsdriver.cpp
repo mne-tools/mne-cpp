@@ -43,6 +43,13 @@
 #include "eegosportsproducer.h"
 
 #include <eemagine/sdk/wrapper.cc> // Wrapper code to be compiled.
+#include <eemagine/sdk/factory.h> // SDK header
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
 
 
 //*************************************************************************************************************
@@ -52,6 +59,7 @@
 
 using namespace EEGOSPORTSPLUGIN;
 using namespace eemagine::sdk;
+using namespace Eigen;
 
 
 //*************************************************************************************************************
@@ -67,7 +75,7 @@ EEGoSportsDriver::EEGoSportsDriver(EEGoSportsProducer* pEEGoSportsProducer)
 , m_uiSamplingFrequency(512)
 , m_uiSamplesPerBlock(100)
 , m_bWriteDriverDebugToFile(false)
-, m_sOutputFilePath("/mne_x_plugins/resources/eegosports")
+, m_sOutputFilePath("/mne_scan_plugins/resources/eegosports")
 , m_bMeasureImpedances(false)
 {
     m_bDllLoaded = true;
@@ -78,7 +86,6 @@ EEGoSportsDriver::EEGoSportsDriver(EEGoSportsProducer* pEEGoSportsProducer)
 
 EEGoSportsDriver::~EEGoSportsDriver()
 {
-    //cout << "EEGoSportsDriver::~EEGoSportsDriver()" << endl;
 }
 
 
