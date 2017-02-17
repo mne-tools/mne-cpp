@@ -952,7 +952,7 @@ inline FiffChInfo FiffTag::toChInfo() const
         float* t_pFloat = (float*)this->data();
         p_FiffChInfo.range = t_pFloat[3];
         p_FiffChInfo.cal = t_pFloat[4];
-        p_FiffChInfo.coil_type = t_pInt32[5];
+        p_FiffChInfo.chpos.coil_type = t_pInt32[5];
 
         //
         //   Read the coil coordinate system definition

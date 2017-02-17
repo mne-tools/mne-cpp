@@ -108,7 +108,7 @@ public:
     inline static qint32 storageSize();
 
 public:
-    fiff_int_t   coil_type; /**< The kind of the coil. */
+    fiff_int_t   coil_type; /**< What kind of coil. */
     Eigen::Vector3f r0;     /**< Coil coordinate system origin */
     Eigen::Vector3f ex;     /**< Coil coordinate system x-axis unit vector */
     Eigen::Vector3f ey;     /**< Coil coordinate system y-axis unit vector */
