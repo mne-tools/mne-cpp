@@ -80,7 +80,6 @@ EEGoSportsProducer::EEGoSportsProducer(EEGoSports* pEEGoSports)
 
 EEGoSportsProducer::~EEGoSportsProducer()
 {
-    //cout << "EEGoSportsProducer::~EEGoSportsProducer()" << endl;
 }
 
 
@@ -99,13 +98,12 @@ void EEGoSportsProducer::start(int iNumberOfChannels,
                                 iSamplingFrequency,
                                 bWriteDriverDebugToFile,
                                 sOutputFilePath,
-                                bMeasureImpedance))
-    {
+                                bMeasureImpedance)) {
         m_bIsRunning = true;
         QThread::start();
-    }
-    else
+    } else {
         m_bIsRunning = false;
+    }
 }
 
 
@@ -119,8 +117,9 @@ void EEGoSportsProducer::stop()
     //In case the semaphore blocks the thread -> Release the QSemaphore and let it exit from the push function (acquire statement)
     m_pEEGoSports->m_pRawMatrixBuffer_In->releaseFromPush();
 
-    while(this->isRunning())
+    while(this->isRunning()) {
         m_bIsRunning = false;
+    }
 
     //Unitialise device only after the thread stopped
     m_pEEGoSportsDriver->uninitDevice();
@@ -131,17 +130,14 @@ void EEGoSportsProducer::stop()
 
 void EEGoSportsProducer::run()
 {
-    while(m_bIsRunning)
-    {
-        //std::cout<<"EEGoSportsProducer::run()"<<std::endl;
+    while(m_bIsRunning) {
         //Get the TMSi EEG data out of the device buffer and write received data to a QList
         MatrixXd matRawBuffer;
 
-        if(m_pEEGoSportsDriver->getSampleMatrixValue(matRawBuffer))
+        if(m_pEEGoSportsDriver->getSampleMatrixValue(matRawBuffer)) {
             m_pEEGoSports->setSampleData(matRawBuffer);
+        }
     }
-
-    std::cout<<"EXITING - EEGoSportsProducer::run()"<<std::endl;
 }
 
 

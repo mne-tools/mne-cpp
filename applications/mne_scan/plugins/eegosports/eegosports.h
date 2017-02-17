@@ -99,9 +99,9 @@ namespace EEGOSPORTSPLUGIN
 
 //=============================================================================================================
 /**
-* EEGoSports...
+* EEGoSports.
 *
-* @brief The EEGoSports class provides a EEG connector. In order for this plugin to work properly the driver dll "RTINST.dll" must be installed in the system directory. This dll is automatically copied in the system directory during the driver installtion of the TMSi Refa device.
+* @brief The EEGoSports class provides an EEG connector.
 */
 class EEGOSPORTSSHARED_EXPORT EEGoSports : public SCSHAREDLIB::ISensor
 {

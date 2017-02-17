@@ -131,7 +131,7 @@ protected:
 
 private:
     EEGoSports*                         m_pEEGoSports;              /**< A pointer to the corresponding EEGoSports class.*/
-    QSharedPointer<EEGoSportsDriver>    m_pEEGoSportsDriver;        /**< A pointer to the corresponding EEGoSports driver class.*/
+    QSharedPointer<EEGoSportsDriver>    m_pEEGoSportsDriver;        /**< A pointer to the corresponding EEGoSportsDriver class.*/
 
     bool                                m_bIsRunning;               /**< Whether EEGoSportsProducer is running.*/
 };
