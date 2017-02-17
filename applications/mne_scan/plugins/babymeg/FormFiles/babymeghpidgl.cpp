@@ -135,7 +135,7 @@ BabyMEGHPIDgl::BabyMEGHPIDgl(BabyMEG* p_pBabyMEG,QWidget *parent)
     //this->setWindowFlags(this->windowFlags() | Qt::WindowStaysOnTopHint);
 
     //Init coil freqs
-    m_vCoilFreqs << 155 << 165 << 190 << 200;
+    m_vCoilFreqs << 155 << 165 << 190 << 220;
 }
 
 
@@ -290,7 +290,7 @@ QList<FiffDigPoint> BabyMEGHPIDgl::readPolhemusDig(QString fileName)
         ui->m_spinBox_freqCoil4->show();
 
         m_vCoilFreqs.clear();
-        m_vCoilFreqs << 155 << 165 << 190 << 200;
+        m_vCoilFreqs << 155 << 165 << 190 << 220;
     }
 
     return lDigPoints;
@@ -299,7 +299,10 @@ QList<FiffDigPoint> BabyMEGHPIDgl::readPolhemusDig(QString fileName)
 
 //*************************************************************************************************************
 
-void BabyMEGHPIDgl::setDigitizerDataToView3D(const FiffDigPointSet& digPointSet, const FiffDigPointSet& fittedPointSet, const QVector<double>& vGof, bool bSortOutAdditionalDigitizer)
+void BabyMEGHPIDgl::setDigitizerDataToView3D(const FiffDigPointSet& digPointSet,
+                                             const FiffDigPointSet& fittedPointSet,
+                                             const QVector<double>& vGof,
+                                             bool bSortOutAdditionalDigitizer)
 {
     if(bSortOutAdditionalDigitizer) {
         FiffDigPointSet t_digSetWithoutAdditional;
