@@ -42,35 +42,21 @@
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
-#include <iostream>
-#include <fstream>
-#include <direct.h>
 
 #include "eegosports_global.h"
 
-#include <scShared/Interfaces/ISensor.h>
-#include <generics/circularmatrixbuffer.h>
-#include <scMeas/newrealtimemultisamplearray.h>
-
-#include <utils/layoutloader.h>
-#include <utils/layoutmaker.h>
-
-#include <fiff/fiff.h>
-
 #include "FormFiles/eegosportssetupwidget.h"
 #include "FormFiles/eegosportssetupprojectwidget.h"
+
+#include <scShared/Interfaces/ISensor.h>
+#include <generics/circularmatrixbuffer.h>
+#include <fstream>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
-
-#include <QtWidgets>
-#include <QVector>
-#include <QTime>
-#include <QtConcurrent/QtConcurrent>
-
 
 
 //*************************************************************************************************************
@@ -80,6 +66,21 @@
 
 #include <unsupported/Eigen/FFT>
 #include <Eigen/Geometry>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+namespace SCMEASLIB {
+    class NewRealTimeMultiSampleArray;
+}
+
+namespace FIFFLIB {
+    class FiffStream;
+    class FiffInfo;
+}
 
 
 //*************************************************************************************************************
@@ -116,8 +117,6 @@ class EEGOSPORTSSHARED_EXPORT EEGoSports : public SCSHAREDLIB::ISensor
     friend class EEGoSportsSetupWidget;
     friend class EEGoSportsImpedanceWidget;
     friend class EEGoSportsSetupProjectWidget;
-    friend class EEGoSportsSetupStimulusWidget;
-    friend class ssvepBCISetupStimulusWidget;
 
 public:
     //=========================================================================================================
@@ -257,7 +256,7 @@ private:
     QString                             m_sNasion;                          /**< The electrode to take to function as the Nasion.*/
 
     QFile                               m_fileOut;                          /**< QFile for writing to fif file.*/
-    FIFFLIB::FiffStream::SPtr           m_pOutfid;                          /**< QFile for writing to fif file.*/
+    QSharedPointer<FIFFLIB::FiffStream> m_pOutfid;                          /**< QFile for writing to fif file.*/
     QSharedPointer<FIFFLIB::FiffInfo>   m_pFiffInfo;                        /**< Fiff measurement info.*/
     Eigen::RowVectorXd                  m_cals;
 
