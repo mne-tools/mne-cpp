@@ -342,9 +342,9 @@ QVariant ChInfoModel::data(const QModelIndex &index, int role) const
         if(index.column()==8) {
             QVariant v;
 
-            QVector3D point3D(m_pFiffInfo->chs.at(index.row()).loc(0,0) * 100, //convert to cm
-                            m_pFiffInfo->chs.at(index.row()).loc(1,0) * 100,
-                            m_pFiffInfo->chs.at(index.row()).loc(2,0) * 100);
+            QVector3D point3D(  m_pFiffInfo->chs.at(index.row()).chpos.r0[0] * 100, //convert to cm
+                                m_pFiffInfo->chs.at(index.row()).chpos.r0[1] * 100,
+                                m_pFiffInfo->chs.at(index.row()).chpos.r0[2] * 100  );
 
             switch(role) {
                 case Qt::DisplayRole:

@@ -946,8 +946,8 @@ inline FiffChInfo FiffTag::toChInfo() const
     else
     {
         qint32* t_pInt32 = (qint32*)this->data();
-        p_FiffChInfo.scanno = t_pInt32[0];
-        p_FiffChInfo.logno = t_pInt32[1];
+        p_FiffChInfo.scanNo = t_pInt32[0];
+        p_FiffChInfo.logNo = t_pInt32[1];
         p_FiffChInfo.kind = t_pInt32[2];
         float* t_pFloat = (float*)this->data();
         p_FiffChInfo.range = t_pFloat[3];
@@ -959,9 +959,18 @@ inline FiffChInfo FiffTag::toChInfo() const
         //
         qint32 count = 0;
         qint32 r, c;
-        for (r = 0; r < 12; ++r) {
-            p_FiffChInfo.loc(r,0) = t_pFloat[6+r];
-        }
+        // r0
+        for (r = 0; r < 3; ++r)
+            p_FiffChInfo.chpos.r0[r] = t_pFloat[6+r];
+        // ex
+        for (r = 0; r < 3; ++r)
+            p_FiffChInfo.chpos.ex[r] = t_pFloat[6+3+r];
+        // ey
+        for (r = 0; r < 3; ++r)
+            p_FiffChInfo.chpos.ey[r] = t_pFloat[6+6+r];
+        // ez
+        for (r = 0; r < 3; ++r)
+            p_FiffChInfo.chpos.ez[r] = t_pFloat[6+9+r];
 
         p_FiffChInfo.coord_frame = FIFFV_COORD_UNKNOWN;
 
@@ -971,25 +980,29 @@ inline FiffChInfo FiffTag::toChInfo() const
         if (p_FiffChInfo.kind == FIFFV_MEG_CH || p_FiffChInfo.kind == FIFFV_REF_MEG_CH)
         {
             p_FiffChInfo.coil_trans.setIdentity(4,4);
-            for (r = 0; r < 3; ++r) {
-                p_FiffChInfo.coil_trans(r,3) = p_FiffChInfo.loc(r,0);
-                for (c = 0; c < 3; ++c) {
-                    p_FiffChInfo.coil_trans(c,r) = p_FiffChInfo.loc(3+count,0);//its transposed stored (r and c are exchanged)
-                    ++count;
-                }
-            }
+            // r0
+            for (r = 0; r < 3; ++r)
+                p_FiffChInfo.coil_trans(r,3) = p_FiffChInfo.chpos.r0[r];
+            // ex
+            for (r = 0; r < 3; ++r)
+                p_FiffChInfo.coil_trans(r,0) = p_FiffChInfo.chpos.ex[r];
+            // ey
+            for (r = 0; r < 3; ++r)
+                p_FiffChInfo.coil_trans(r,1) = p_FiffChInfo.chpos.ey[r];
+            // ez
+            for (r = 0; r < 3; ++r)
+                p_FiffChInfo.coil_trans(r,2) = p_FiffChInfo.chpos.ez[r];
+
             p_FiffChInfo.coord_frame = FIFFV_COORD_DEVICE;
         }
         else if (p_FiffChInfo.kind == FIFFV_EEG_CH)
         {
-            if (p_FiffChInfo.loc.block(3,0,3,1).norm() > 0)
-            {
-                p_FiffChInfo.eeg_loc.block(0,0,3,1) = p_FiffChInfo.loc.block(0,0,3,1);
-                p_FiffChInfo.eeg_loc.block(0,1,3,1) = p_FiffChInfo.loc.block(3,0,3,1);
+            if (p_FiffChInfo.chpos.ex.norm() > 0) {
+                p_FiffChInfo.eeg_loc.block(0,0,3,1) = p_FiffChInfo.chpos.r0.block(0,0,3,1);
+                p_FiffChInfo.eeg_loc.block(0,1,3,1) = p_FiffChInfo.chpos.ex.block(0,0,3,1);
             }
-            else
-            {
-                p_FiffChInfo.eeg_loc.block(0,0,3,1) = p_FiffChInfo.loc.block(0,0,3,1);
+            else {
+                p_FiffChInfo.eeg_loc.block(0,0,3,1) = p_FiffChInfo.chpos.r0.block(0,0,3,1);
             }
             p_FiffChInfo.coord_frame = FIFFV_COORD_HEAD;
         }

@@ -97,6 +97,7 @@ class FiffProj;
 class FiffNamedMatrix;
 class FiffDigPoint;
 class FiffChInfo;
+class FiffChPos;
 class FiffCoordTrans;
 
 static FiffId defaultFiffId;
@@ -421,17 +422,22 @@ public:
 
     //=========================================================================================================
     /**
-    * fiff_write_ch_info
-    *
-    * ### MNE toolbox root function ###
-    *
     * Writes a channel information record to a fif file
     * The type, cal, unit, and pos members are explained in Table 9.5
     * of the MNE manual
+    * Refactored: fiff_write_ch_info (MNE-C); fiff_write_ch_info (MNE-MATLAB)
     *
     * @param[in] ch     The channel information structure to write
     */
-    void write_ch_info(FiffChInfo* ch);
+    void write_ch_info(const FiffChInfo& ch);
+
+    //=========================================================================================================
+    /**
+    * Writes a channel position to a fif file
+    *
+    * @param[in] chpos      Channel position structure to write
+    */
+    void write_ch_pos(const FiffChPos& chpos);
 
     //=========================================================================================================
     /**

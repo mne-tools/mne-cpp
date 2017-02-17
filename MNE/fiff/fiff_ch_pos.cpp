@@ -59,10 +59,10 @@ FiffChPos::FiffChPos()
 {
     for(qint32 i = 0; i < 3; ++i)
     {
-        r0[i] = -1;
-        ex[i] = -1;
-        ey[i] = -1;
-        ey[i] = -1;
+        r0[i] = 0.0f;
+        ex[i] = 0.0f;
+        ey[i] = 0.0f;
+        ey[i] = 0.0f;
     }
 }
 

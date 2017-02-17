@@ -730,7 +730,7 @@ public:
     * @param[in] p_pStream  An open fif file
     * @param[in] ch         The channel information structure to write
     */
-    inline static void write_ch_info(FiffStream* p_pStream, FiffChInfo* ch)
+    inline static void write_ch_info(FiffStream* p_pStream, const FiffChInfo& ch)
     {
         p_pStream->write_ch_info(ch);
     }

@@ -357,7 +357,7 @@ void TMSI::setUpFiffInfo()
             fChInfo.coil_type = FIFFV_COIL_EEG;
 
             //Set logno
-            fChInfo.logno = i;
+            fChInfo.logNo = i;
 
             //Set coord frame
             fChInfo.coord_frame = FIFFV_COORD_HEAD;
