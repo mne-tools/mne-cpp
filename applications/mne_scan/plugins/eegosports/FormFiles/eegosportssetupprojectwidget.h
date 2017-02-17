@@ -42,8 +42,6 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "eegosports_global.h"
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -86,7 +84,7 @@ class EEGoSports;
 *
 * @brief The EEGoSportsSetupProjectWidget class provides the EEGoSportsSetupProjectWidget configuration window.
 */
-class EEGOSPORTSSHARED_EXPORT EEGoSportsSetupProjectWidget : public QWidget
+class EEGoSportsSetupProjectWidget : public QWidget
 {
     Q_OBJECT
 

@@ -43,8 +43,6 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "eegosports_global.h"
-
 #include <fstream>
 
 
@@ -109,7 +107,7 @@ class EEGoSportsProducer;
 *
 * @brief The EEGoSportsDriver class provides real time data acquisition of EEG data with a EEGoSports device.
 */
-class EEGOSPORTSSHARED_EXPORT EEGoSportsDriver
+class EEGoSportsDriver
 {
 
 public:
