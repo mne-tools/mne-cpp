@@ -42,6 +42,18 @@
 #include "eegosports.h"
 #include "eegosportsproducer.h"
 
+#include "FormFiles/eegosportssetupwidget.h"
+#include "FormFiles/eegosportssetupprojectwidget.h"
+
+#include <iostream>
+
+#include <utils/layoutloader.h>
+#include <utils/layoutmaker.h>
+
+#include <scMeas/newrealtimemultisamplearray.h>
+
+#include <fiff/fiff.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -52,6 +64,10 @@
 #include <QtCore/QTextStream>
 #include <QDebug>
 #include <QScreen>
+#include <QtWidgets>
+#include <QVector>
+#include <QTime>
+#include <QtConcurrent/QtConcurrent>
 
 
 //*************************************************************************************************************
