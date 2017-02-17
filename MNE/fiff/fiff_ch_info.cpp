@@ -55,8 +55,8 @@ using namespace FIFFLIB;
 //=============================================================================================================
 
 FiffChInfo::FiffChInfo()
-: scanno(0)
-, logno(0)
+: scanNo(0)
+, logNo(0)
 , kind(0)
 , range(-1)
 , cal(1.0f)
@@ -73,13 +73,13 @@ FiffChInfo::FiffChInfo()
 //*************************************************************************************************************
 
 FiffChInfo::FiffChInfo(const FiffChInfo &p_FiffChInfo)
-: scanno(p_FiffChInfo.scanno)
-, logno(p_FiffChInfo.logno)
+: scanNo(p_FiffChInfo.scanNo)
+, logNo(p_FiffChInfo.logNo)
 , kind(p_FiffChInfo.kind)
 , range(p_FiffChInfo.range)
 , cal(p_FiffChInfo.cal)
 , coil_type(p_FiffChInfo.coil_type)
-, loc(p_FiffChInfo.loc)
+, chpos(p_FiffChInfo.chpos)
 , coil_trans(p_FiffChInfo.coil_trans)
 , eeg_loc(p_FiffChInfo.eeg_loc)
 , coord_frame(p_FiffChInfo.coord_frame)

@@ -43,6 +43,7 @@
 
 #include "fiff_global.h"
 #include "fiff_types.h"
+#include "fiff_ch_pos.h"
 
 
 //*************************************************************************************************************
@@ -119,21 +120,25 @@ public:
     inline static qint32 storageSize();
 
 public:
-    fiff_int_t    scanno;       /**< Scanning order number 1*/
-    fiff_int_t    logno;        /**< Logical channel # 1*/
+    fiff_int_t    scanNo;       /**< Scanning order number 1*/
+    fiff_int_t    logNo;        /**< Logical channel # 1*/
     fiff_int_t    kind;         /**< Kind of channel 1*/
     fiff_float_t  range;        /**< Voltmeter range (-1 = auto ranging) 1*/
     fiff_float_t  cal;          /**< Calibration from volts to units used 1*/
 
     fiff_int_t coil_type;       /**< What kind of coil. */
 
-    Matrix<double,12,1, DontAlign>  loc;            /**< Channel (MEG) location:
-                                                     *   3x Coil coordinate system origin;
-                                                     *   3x Coil coordinate system x-axis unit vector;
-                                                     *   3x Coil coordinate system y-axis unit vector;
-                                                     *   3x Coil coordinate system z-axis unit vector*/
-    Matrix<double,4,4, DontAlign>   coil_trans;     /**< Coil coordinate system transformation */
-    Matrix<double,3,2, DontAlign>   eeg_loc;        /**< Channel location */
+    //TODO: change this fiff_ch_pos_t
+//    Matrix<double,12,1, DontAlign>  loc;            /**< Channel (MEG) location:
+//                                                     *   3x Coil coordinate system origin;
+//                                                     *   3x Coil coordinate system x-axis unit vector;
+//                                                     *   3x Coil coordinate system y-axis unit vector;
+//                                                     *   3x Coil coordinate system z-axis unit vector*/
+
+    FiffChPos chpos;            /**< Channel location */
+
+    Matrix<double,4,4, DontAlign>    coil_trans;     /**< Coil coordinate system transformation */
+    Matrix<double,3,2, DontAlign>    eeg_loc;        /**< Channel location */
     fiff_int_t                      coord_frame;    /**< Coordinate Frame */
 
 

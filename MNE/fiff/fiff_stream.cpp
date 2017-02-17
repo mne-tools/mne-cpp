@@ -48,6 +48,7 @@
 #include "fiff_cov.h"
 #include "fiff_coord_trans.h"
 #include "fiff_ch_info.h"
+#include "fiff_ch_pos.h"
 #include "fiff_dig_point.h"
 
 #include <utils/mnemath.h>
@@ -1707,10 +1708,10 @@ FiffStream::SPtr FiffStream::start_writing_raw(QIODevice &p_IODevice, const Fiff
             //
             //    Scan numbers may have been messed up
             //
-            chs[k].scanno = k+1;//+1 because
+            chs[k].scanNo = k+1;//+1 because
             chs[k].range  = 1.0f;//Why? -> cause its already calibrated through reading
             cals[k] = chs[k].cal;
-            t_pStream->write_ch_info(&chs[k]);
+            t_pStream->write_ch_info(chs[k]);
         }
     } else {
         for(k = 0; k < nchan; ++k)
@@ -1718,9 +1719,9 @@ FiffStream::SPtr FiffStream::start_writing_raw(QIODevice &p_IODevice, const Fiff
             //
             //    Scan numbers may have been messed up
             //
-            chs[k].scanno = k+1;//+1 because
+            chs[k].scanNo = k+1;//+1 because
             cals[k] = chs[k].cal;
-            t_pStream->write_ch_info(&chs[k]);
+            t_pStream->write_ch_info(chs[k]);
         }
     }
     //
@@ -1752,7 +1753,7 @@ QString FiffStream::streamName()
 
 //*************************************************************************************************************
 
-void FiffStream::write_ch_info(FiffChInfo* ch)
+void FiffStream::write_ch_info(const FiffChInfo& ch)
 {
     //typedef struct _fiffChPosRec {
     //  fiff_int_t   coil_type;          /*!< What kind of coil. */
@@ -1784,47 +1785,68 @@ void FiffStream::write_ch_info(FiffChInfo* ch)
     //
     //   Start writing fiffChInfoRec
     //
-    *this << (qint32)ch->scanno;
-    *this << (qint32)ch->logno;
-    *this << (qint32)ch->kind;
+    *this << (qint32)ch.scanNo;
+    *this << (qint32)ch.logNo;
+    *this << (qint32)ch.kind;
 
-    *this << ch->range;
-    *this << ch->cal;
+    *this << ch.range;
+    *this << ch.cal;
 
     //
-    //   fiffChPosRec follows
+    //   FiffChPos follows
     //
-    *this << (qint32)ch->coil_type;
-    qint32 i;
-    for(i = 0; i < 12; ++i)
-        *this << ch->loc(i,0);
+    write_ch_pos(ch.chpos);
 
     //
     //   unit and unit multiplier
     //
-    *this << (qint32)ch->unit;
-    *this << (qint32)ch->unit_mul;
+    *this << (qint32)ch.unit;
+    *this << (qint32)ch.unit_mul;
 
     //
     //   Finally channel name
     //
-    fiff_int_t len = ch->ch_name.size();
+    fiff_int_t len = ch.ch_name.size();
     QString ch_name;
     if(len > 15)
-        ch_name = ch->ch_name.mid(0, 15);
+        ch_name = ch.ch_name.mid(0, 15);
     else
-        ch_name = ch->ch_name;
+        ch_name = ch.ch_name;
 
     len = ch_name.size();
 
     this->writeRawData(ch_name.toUtf8().constData(),len);
 
-    if (len < 16)
-    {
+    if (len < 16) {
         const char* chNull = "";
-        for(i = 0; i < 16-len; ++i)
+        for(qint32 i = 0; i < 16-len; ++i)
             this->writeRawData(chNull,1);
     }
+}
+
+
+//*************************************************************************************************************
+
+void FiffStream::write_ch_pos(const FiffChPos &chpos)
+{
+    //
+    //   FiffChPos
+    //
+    *this << (qint32)chpos.coil_type;
+
+    qint32 i;
+    // r0
+    for(i = 0; i < 3; ++i)
+        *this << (float)chpos.r0[i];
+    // ex
+    for(i = 0; i < 3; ++i)
+        *this << (float)chpos.ex[i];
+    // ey
+    for(i = 0; i < 3; ++i)
+        *this << (float)chpos.ey[i];
+    // ez
+    for(i = 0; i < 3; ++i)
+        *this << (float)chpos.ez[i];
 }
 
 
@@ -2333,9 +2355,9 @@ void FiffStream::write_info_base(const FiffInfoBase & p_FiffInfoBase)
         //
         //    Scan numbers may have been messed up
         //
-        chs[k].scanno = k+1;//+1 because
+        chs[k].scanNo = k+1;//+1 because
         chs[k].range  = 1.0f;//Why? -> cause its already calibrated through reading
-        this->write_ch_info(&chs[k]);
+        this->write_ch_info(chs[k]);
     }
 
     //

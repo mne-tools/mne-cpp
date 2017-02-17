@@ -287,6 +287,108 @@ int mne_check_chinfo(fiffChInfo chs,
 
 
 
+
+
+
+
+
+//*************************************************************************************************************
+// Temporary Helpers
+//*************************************************************************************************************
+
+void write_id_old(FiffStream::SPtr& t_pStream, fiff_int_t kind, fiffId id)
+{
+    fiffId t_id = id;
+    if(t_id->version == -1)
+    {
+        /* initialize random seed: */
+        srand ( time(NULL) );
+        double rand_1 = (double)(rand() % 100);rand_1 /= 100;
+        double rand_2 = (double)(rand() % 100);rand_2 /= 100;
+
+        time_t seconds;
+        seconds = time (NULL);
+
+        //fiff_int_t timezone = 5;      //   Matlab does not know the timezone
+        t_id->version   = (1 << 16) | 2;   //   Version (1 << 16) | 2
+        t_id->machid[0] = 65536*rand_1;    //   Machine id is random for now
+        t_id->machid[1] = 65536*rand_2;    //   Machine id is random for now
+        t_id->time.secs = (int)seconds;    //seconds since January 1, 1970 //3600*(24*(now-datenum(1970,1,1,0,0,0))+timezone);
+        t_id->time.usecs = 0;              //   Do not know how we could get this
+    }
+
+    //
+    //
+    fiff_int_t datasize = 5*4;                       //   The id comprises five integers
+
+    *t_pStream << (qint32)kind;
+    *t_pStream << (qint32)FIFFT_ID_STRUCT;
+    *t_pStream << (qint32)datasize;
+    *t_pStream << (qint32)FIFFV_NEXT_SEQ;
+    //
+    // Collect the bits together for one write
+    //
+    qint32 data[5];
+    data[0] = t_id->version;
+    data[1] = t_id->machid[0];
+    data[2] = t_id->machid[1];
+    data[3] = t_id->time.secs;
+    data[4] = t_id->time.usecs;
+
+    for(qint32 i = 0; i < 5; ++i)
+        *t_pStream << data[i];
+}
+
+
+//*************************************************************************************************************
+
+void write_coord_trans_old(FiffStream::SPtr& t_pStream, const FiffCoordTransOld* trans)
+{
+    //?typedef struct _fiffCoordTransRec {
+    //  fiff_int_t   from;                   /*!< Source coordinate system. */
+    //  fiff_int_t   to;                     /*!< Destination coordinate system. */
+    //  fiff_float_t rot[3][3];              /*!< The forward transform (rotation part) */
+    //  fiff_float_t move[3];                /*!< The forward transform (translation part) */
+    //  fiff_float_t invrot[3][3];           /*!< The inverse transform (rotation part) */
+    //  fiff_float_t invmove[3];             /*!< The inverse transform (translation part) */
+    //} *fiffCoordTrans, fiffCoordTransRec;  /*!< Coordinate transformation descriptor */
+    fiff_int_t datasize = 4*2*12 + 4*2;
+
+    *t_pStream << (qint32)FIFF_COORD_TRANS;
+    *t_pStream << (qint32)FIFFT_COORD_TRANS_STRUCT;
+    *t_pStream << (qint32)datasize;
+    *t_pStream << (qint32)FIFFV_NEXT_SEQ;
+
+    //
+    //   Start writing fiffCoordTransRec
+    //
+    *t_pStream << (qint32)trans->from;
+    *t_pStream << (qint32)trans->to;
+
+    //
+    //   The transform...
+    //
+    qint32 r, c;
+    for (r = 0; r < 3; ++r)
+        for (c = 0; c < 3; ++c)
+            *t_pStream << (float)trans->rot[r][c];
+    for (r = 0; r < 3; ++r)
+        *t_pStream << (float)trans->move[r];
+
+    //
+    //   ...and its inverse
+    //
+    for (r = 0; r < 3; ++r)
+        for (c = 0; c < 3; ++c)
+            *t_pStream << (float)trans->invrot[r][c];
+    for (r = 0; r < 3; ++r)
+        *t_pStream << (float)trans->invmove[r];
+}
+
+
+
+
+
 //============================= write_solution.c =============================
 
 int write_solution(const QString& name,         /* Destination file */
@@ -330,9 +432,9 @@ int write_solution(const QString& name,         /* Destination file */
         t_pStream->start_block(FIFFB_MNE_PARENT_MRI_FILE);
 
         t_pStream->write_string(FIFF_MNE_FILE_NAME, mri_file);
-//        if (mri_id != NULL)
-//            t_pStream->write_id(FIFF_PARENT_FILE_ID, mri_id);
-//        t_pStream->write_coord_trans(mri_head_t);
+        if (mri_id != NULL)
+            write_id_old(t_pStream, FIFF_PARENT_FILE_ID, mri_id);//t_pStream->write_id(FIFF_PARENT_FILE_ID, mri_id);
+        write_coord_trans_old(t_pStream, mri_head_t);//t_pStream->write_coord_trans(mri_head_t);
 
         t_pStream->end_block(FIFFB_MNE_PARENT_MRI_FILE);
     }
@@ -347,14 +449,43 @@ int write_solution(const QString& name,         /* Destination file */
         t_pStream->start_block(FIFFB_MNE_PARENT_MEAS_FILE);
 
         t_pStream->write_string(FIFF_MNE_FILE_NAME, meas_file);
-//        if (meas_id != NULL)
-//            t_pStream->write_id(FIFF_PARENT_BLOCK_ID, meas_id);
-//        t_pStream->write_coord_trans(meg_head_t);
+        if (meas_id != NULL)
+            write_id_old(t_pStream, FIFF_PARENT_BLOCK_ID, meas_id);//t_pStream->write_id(FIFF_PARENT_BLOCK_ID, meas_id);
+        write_coord_trans_old(t_pStream, meg_head_t);//t_pStream->write_coord_trans(meg_head_t);
 
         int nchan = nmeg+neeg;
         t_pStream->write_int(FIFF_NCHAN,&nchan);
 
 
+
+        FiffChInfo chInfo;
+        int k, p;
+        for (k = 0, p = 0; k < nmeg; k++) {
+            meg_chs[k].scanNo = ++p;
+            chInfo.scanNo = meg_chs[k].scanNo;
+            chInfo.logNo = meg_chs[k].logNo;
+            chInfo.kind = meg_chs[k].kind;
+            chInfo.range = meg_chs[k].range;
+            chInfo.cal = meg_chs[k].cal;
+            chInfo.coil_type = meg_chs[k].chpos.coil_type;
+            chInfo.chpos.r0[0] = meg_chs[k].chpos.r0[0];
+            chInfo.chpos.r0[1] = meg_chs[k].chpos.r0[1];
+            chInfo.chpos.r0[2] = meg_chs[k].chpos.r0[2];
+            chInfo.chpos.ex[0] = meg_chs[k].chpos.ex[0];
+            chInfo.chpos.ex[1] = meg_chs[k].chpos.ex[1];
+            chInfo.chpos.ex[2] = meg_chs[k].chpos.ex[2];
+            chInfo.chpos.ey[0] = meg_chs[k].chpos.ey[0];
+            chInfo.chpos.ey[1] = meg_chs[k].chpos.ey[1];
+            chInfo.chpos.ey[2] = meg_chs[k].chpos.ey[2];
+            chInfo.chpos.ez[0] = meg_chs[k].chpos.ez[0];
+            chInfo.chpos.ez[1] = meg_chs[k].chpos.ez[1];
+            chInfo.chpos.ez[2] = meg_chs[k].chpos.ez[2];
+
+
+//            tag.data = (fiff_byte_t *)(meg_chs+k);
+//            if (fiff_write_tag(out,&tag) == FIFF_FAIL)
+//                goto bad;
+        }
 
 //        tag.next = 0;
 //        tag.kind = FIFF_CH_INFO;
