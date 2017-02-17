@@ -104,8 +104,9 @@ bool EEGoSportsDriver::initDevice(int iNumberOfChannels,
     m_bMeasureImpedances = bMeasureImpedance;
 
     //Open debug file to write to
-    if(m_bWriteDriverDebugToFile)
-        m_outputFileStream.open("mne_x_plugins/resources/eegosports/EEGoSports_Driver_Debug.txt", std::ios::trunc); //ios::trunc deletes old file data
+    if(m_bWriteDriverDebugToFile) {
+        m_outputFileStream.open("./mne_scan_plugins/resources/eegosports/EEGoSports_Driver_Debug.txt", std::ios::trunc); //ios::trunc deletes old file data
+    }
 
     try {
         // Get device handler
