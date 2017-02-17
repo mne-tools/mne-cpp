@@ -193,16 +193,11 @@ bool EEGoSportsDriver::getSampleMatrixValue(Eigen::MatrixXd &sampleMatrix)
 
     sampleMatrix = MatrixXd::Zero(90, m_uiSamplesPerBlock);
 
-    uint iSamplesWrittenToMatrix = 0;
-    int sampleMax = 0;
-    int sampleIterator = 0;
-    int iReceivedSamples = 0;
-    int iChannelCount = 0;
-    uint j = 0;
-    int i = 0;
+    uint iSamplesWrittenToMatrix, iSampleMax, iSampleIterator, iActualSamplesWritten, iReceivedSamples, iChannelCount, i, j;
+
+    iSampleIterator = iActualSamplesWritten = 0;
 
     buffer buf;
-    actualSamplesWritten = 0;
     VectorXd vec;
 
     //get samples from device until the complete matrix is filled, i.e. the samples per block size is met
@@ -215,7 +210,7 @@ bool EEGoSportsDriver::getSampleMatrixValue(Eigen::MatrixXd &sampleMatrix)
 
         //Only do the next steps if there was at least one sample received, otherwise skip and wait until at least one sample was received
         if(iReceivedSamples > 0) {
-            actualSamplesWritten = 0; //Holds the number of samples which are actually written to the matrix in this while procedure
+            iActualSamplesWritten = 0; //Holds the number of samples which are actually written to the matrix in this while procedure
 
             //Write the received samples to an extra buffer, so that they are not getting lost if too many samples were received. These are then written to the next matrix (block)
             for(i = 0; i < iReceivedSamples; ++i) {
@@ -232,27 +227,27 @@ bool EEGoSportsDriver::getSampleMatrixValue(Eigen::MatrixXd &sampleMatrix)
             //If the number of the samples which were already written to the matrix plus the last received number of samples is larger then the defined block size
             //-> only fill until the matrix is completeley filled with samples. The other (unused) samples are still stored in the vector buffer m_vSampleBlockBuffer and will be used in the next matrix which is to be sent to the circular buffer
             if(iSamplesWrittenToMatrix + iReceivedSamples > m_uiSamplesPerBlock) {
-                sampleMax = m_uiSamplesPerBlock - iSamplesWrittenToMatrix + sampleIterator;
+                iSampleMax = m_uiSamplesPerBlock - iSamplesWrittenToMatrix + iSampleIterator;
             } else {
-                sampleMax = iReceivedSamples + sampleIterator;
+                iSampleMax = iReceivedSamples + iSampleIterator;
             }
 
             //Read the needed number of samples from the vector buffer to store them in the matrix
-            for(; sampleIterator < sampleMax; sampleIterator++) {
-                sampleMatrix.col(sampleIterator) = m_vecSampleBlockBuffer.takeFirst();
+            for(; iSampleIterator < iSampleMax; iSampleIterator++) {
+                sampleMatrix.col(iSampleIterator) = m_vecSampleBlockBuffer.takeFirst();
 
-                actualSamplesWritten ++;
+                iActualSamplesWritten ++;
             }
 
-            iSamplesWrittenToMatrix = iSamplesWrittenToMatrix + actualSamplesWritten;
+            iSamplesWrittenToMatrix = iSamplesWrittenToMatrix + iActualSamplesWritten;
         }
 
 //        std::cout << "buf.getSampleCount(): " << buf.getSampleCount() << std::endl;
 //        std::cout << "buf.getChannelCount(): " << buf.getChannelCount() << std::endl;
 //        std::cout << "buf.size(): " << buf.size() << std::endl;
 //        std::cout << "iReceivedSamples: " << iReceivedSamples << std::endl;
-//        std::cout << "sampleMax: " << sampleMax << std::endl;
-//        std::cout << "sampleIterator: " << sampleIterator << std::endl;
+//        std::cout << "iSampleMax: " << iSampleMax << std::endl;
+//        std::cout << "iSampleIterator: " << iSampleIterator << std::endl;
 //        std::cout << "iSamplesWrittenToMatrix: " << iSamplesWrittenToMatrix << std::endl;
 //        std::cout << "m_uiSamplesPerBlock: " << m_uiSamplesPerBlock << std::endl;
 //        std::cout << "m_uiSamplesPerBlock: " << m_uiSamplesPerBlock << std::endl << std::endl;
@@ -262,8 +257,8 @@ bool EEGoSportsDriver::getSampleMatrixValue(Eigen::MatrixXd &sampleMatrix)
             m_outputFileStream << "buf.getChannelCount(): " << buf.getChannelCount() << std::endl;
             m_outputFileStream << "buf.size(): " << buf.size() << std::endl;
             m_outputFileStream << "iReceivedSamples: " << iReceivedSamples << std::endl;
-            m_outputFileStream << "sampleMax: " << sampleMax << std::endl;
-            m_outputFileStream << "sampleIterator: " << sampleIterator << std::endl;
+            m_outputFileStream << "iSampleMax: " << iSampleMax << std::endl;
+            m_outputFileStream << "iSampleIterator: " << iSampleIterator << std::endl;
             m_outputFileStream << "iSamplesWrittenToMatrix: " << iSamplesWrittenToMatrix << std::endl << std::endl;
             m_outputFileStream << "m_vecSampleBlockBuffer.size(): " << m_vecSampleBlockBuffer.size() << std::endl;
         }
