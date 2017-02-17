@@ -354,7 +354,7 @@ void TMSI::setUpFiffInfo()
             fChInfo.kind = FIFFV_EEG_CH;
 
             //Set coil type
-            fChInfo.coil_type = FIFFV_COIL_EEG;
+            fChInfo.chpos.coil_type = FIFFV_COIL_EEG;
 
             //Set logno
             fChInfo.logNo = i;
@@ -377,21 +377,21 @@ void TMSI::setUpFiffInfo()
             fChInfo.eeg_loc(2,1) = center_pos.z()*0.001;
 
             //Also write the eeg electrode locations into the meg loc variable (mne_ex_read_raw() matlab function wants this)
-            fChInfo.loc(0,0) = elcLocation3D[i][0]*0.001;
-            fChInfo.loc(1,0) = elcLocation3D[i][1]*0.001;
-            fChInfo.loc(2,0) = elcLocation3D[i][2]*0.001;
+            fChInfo.chpos.r0[0] = elcLocation3D[i][0]*0.001;
+            fChInfo.chpos.r0[1] = elcLocation3D[i][1]*0.001;
+            fChInfo.chpos.r0[2] = elcLocation3D[i][2]*0.001;
 
-            fChInfo.loc(3,0) = center_pos.x()*0.001;
-            fChInfo.loc(4,0) = center_pos.y()*0.001;
-            fChInfo.loc(5,0) = center_pos.z()*0.001;
+            fChInfo.chpos.ex[0] = center_pos.x()*0.001;
+            fChInfo.chpos.ex[1] = center_pos.y()*0.001;
+            fChInfo.chpos.ex[2] = center_pos.z()*0.001;
 
-            fChInfo.loc(6,0) = 0;
-            fChInfo.loc(7,0) = 1;
-            fChInfo.loc(8,0) = 0;
+            fChInfo.chpos.ey[0] = 0;
+            fChInfo.chpos.ey[1] = 1;
+            fChInfo.chpos.ey[2] = 0;
 
-            fChInfo.loc(9,0) = 0;
-            fChInfo.loc(10,0) = 0;
-            fChInfo.loc(11,0) = 1;
+            fChInfo.chpos.ez[0] = 0;
+            fChInfo.chpos.ez[1] = 0;
+            fChInfo.chpos.ez[2] = 1;
 
             //cout<<i<<endl<<fChInfo.eeg_loc<<endl;
         }
