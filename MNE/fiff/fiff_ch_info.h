@@ -137,8 +137,8 @@ public:
 
     FiffChPos chpos;            /**< Channel location */
 
-    Matrix<double,4,4, DontAlign>    coil_trans;     /**< Coil coordinate system transformation */
-    Matrix<double,3,2, DontAlign>    eeg_loc;        /**< Channel location */
+    Matrix<float,4,4, DontAlign>    coil_trans;     /**< Coil coordinate system transformation */
+    Matrix<float,3,2, DontAlign>    eeg_loc;        /**< Channel location */
     fiff_int_t                      coord_frame;    /**< Coordinate Frame */
 
 
