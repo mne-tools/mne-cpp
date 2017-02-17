@@ -538,11 +538,8 @@ public:
 
     //=========================================================================================================
     /**
-    * fiff_write_float
-    *
-    * ### MNE toolbox root function ###
-    *
     * Writes a single-precision floating point tag to a fif file
+    * Refactored: fiff_write_float_tag (MNE-C); fiff_write_float (MNE-MATLAB)
     *
     * @param[in] kind       Tag kind
     * @param[in] data       The float data pointer

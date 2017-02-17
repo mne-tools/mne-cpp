@@ -49,6 +49,8 @@ using namespace FWDLIB;
 
 
 #define MALLOC_41(x,t) (t *)malloc((x)*sizeof(t))
+#define REALLOC_41(x,y,t) (t *)((x == NULL) ? malloc((y)*sizeof(t)) : realloc((x),(y)*sizeof(t)))
+
 
 #define FREE_41(x) if ((char *)(x) != NULL) free((char *)(x))
 
@@ -64,6 +66,63 @@ using namespace FWDLIB;
 #define VEC_DOT_41(x,y) ((x)[X_41]*(y)[X_41] + (x)[Y_41]*(y)[Y_41] + (x)[Z_41]*(y)[Z_41])
 
 #define VEC_LEN_41(x) sqrt(VEC_DOT_41(x,x))
+
+#define ALLOC_CMATRIX_41(x,y) mne_cmatrix_41((x),(y))
+#define FREE_CMATRIX_41(m) mne_free_cmatrix_41((m))
+
+
+static void matrix_error_41(int kind, int nr, int nc)
+
+{
+    if (kind == 1)
+        printf("Failed to allocate memory pointers for a %d x %d matrix\n",nr,nc);
+    else if (kind == 2)
+        printf("Failed to allocate memory for a %d x %d matrix\n",nr,nc);
+    else
+        printf("Allocation error for a %d x %d matrix\n",nr,nc);
+    if (sizeof(void *) == 4) {
+        printf("This is probably because you seem to be using a computer with 32-bit architecture.\n");
+        printf("Please consider moving to a 64-bit platform.");
+    }
+    printf("Cannot continue. Sorry.\n");
+    exit(1);
+}
+
+
+float **mne_cmatrix_41(int nr,int nc)
+
+{
+    int i;
+    float **m;
+    float *whole;
+
+    m = MALLOC_41(nr,float *);
+    if (!m) matrix_error_41(1,nr,nc);
+    whole = MALLOC_41(nr*nc,float);
+    if (!whole) matrix_error_41(2,nr,nc);
+
+    for(i=0;i<nr;i++)
+        m[i] = whole + i*nc;
+    return m;
+}
+
+
+
+
+
+
+
+
+void mne_free_cmatrix_41 (float **m)
+{
+    if (m) {
+        FREE_41(*m);
+        FREE_41(m);
+    }
+}
+
+
+
 
 
 
@@ -288,12 +347,6 @@ int mne_check_chinfo(fiffChInfo chs,
 }
 
 
-
-
-
-
-
-
 //*************************************************************************************************************
 // Temporary Helpers
 //*************************************************************************************************************
@@ -391,6 +444,243 @@ void write_coord_trans_old(FiffStream::SPtr& t_pStream, const FiffCoordTransOld*
 
 
 
+
+
+
+
+
+
+
+
+
+void mne_write_bad_channel_list_new(FiffStream::SPtr& t_pStream, const QStringList& t_badList)//FILE *out, char **list, int nlist)
+{
+
+     t_pStream->start_block(FIFFB_MNE_BAD_CHANNELS);
+     t_pStream->write_name_list(FIFF_MNE_CH_NAME_LIST,t_badList);
+     t_pStream->end_block(FIFFB_MNE_BAD_CHANNELS);
+
+
+     /////////////////////////////////////////////////////////
+
+//    fiff_int_t  bad_channel_block = FIFFB_MNE_BAD_CHANNELS;
+//    fiffTagRec  bad_channel_block_tags[] = {
+//        { FIFF_BLOCK_START,      FIFFT_INT,    0, FIFFV_NEXT_SEQ, NULL },
+//        { FIFF_MNE_CH_NAME_LIST, FIFFT_STRING, 0, FIFFV_NEXT_SEQ, NULL },
+//        { FIFF_BLOCK_END,        FIFFT_INT,    0, FIFFV_NEXT_SEQ, NULL }};
+//    int         nbad_channel_block_tags = 3;
+//    char        *names = NULL;
+//    int         k;
+
+//    if (nlist <= 0)
+//        return OK;
+
+//    names = mne_name_list_to_string(list,nlist);
+//    bad_channel_block_tags[0].size = sizeof(fiff_int_t);
+//    bad_channel_block_tags[0].data = &bad_channel_block;
+
+//    bad_channel_block_tags[1].size = strlen(names);
+//    bad_channel_block_tags[1].data = names;
+
+//    bad_channel_block_tags[2].size = sizeof(fiff_int_t);
+//    bad_channel_block_tags[2].data = &bad_channel_block;
+
+//    for (k = 0; k < nbad_channel_block_tags; k++)
+//        if (fiff_write_tag(out,bad_channel_block_tags+k) == FIFF_FAIL) {
+//            FREE(names);
+//            return FAIL;
+//        }
+//    FREE(names);
+//    return OK;
+}
+
+
+
+
+int mne_write_one_source_space(FiffStream::SPtr& t_pStream, MneSourceSpaceOld* ss,bool selected_only)
+{
+    float **sel = NULL;
+    int   **tris = NULL;
+    int   *nearest = NULL;
+    float *nearest_dist = NULL;
+    int   p,pp;
+
+    if (ss->np <= 0) {
+        qCritical("No points in the source space being saved");
+        goto bad;
+    }
+
+    t_pStream->start_block(FIFFB_MNE_SOURCE_SPACE);
+
+    /*
+    * General information
+    */
+    if (ss->type != FIFFV_MNE_SPACE_UNKNOWN)
+        t_pStream->write_int(FIFF_MNE_SOURCE_SPACE_TYPE,&ss->type);
+    if (ss->id != FIFFV_MNE_SURF_UNKNOWN)
+        t_pStream->write_int(FIFF_MNE_SOURCE_SPACE_ID,&ss->id);
+    if (ss->subject && strlen(ss->subject) > 0) {
+        QString subj(ss->subject);
+        t_pStream->write_string(FIFF_SUBJ_HIS_ID,subj);
+    }
+
+    t_pStream->write_int(FIFF_MNE_COORD_FRAME,&ss->coord_frame);
+
+    if (selected_only) {
+        if (ss->nuse == 0) {
+            qCritical("No vertices in use. Cannot write active-only vertices from this source space");
+            goto bad;
+        }
+        sel = ALLOC_CMATRIX_41(ss->nuse,3);
+        t_pStream->write_int(FIFF_MNE_SOURCE_SPACE_NPOINTS,&ss->nuse);
+        for (p = 0, pp = 0; p < ss->np; p++)
+            if (ss->inuse[p]) {
+                sel[pp][X_41] = ss->rr[p][X_41];
+                sel[pp][Y_41] = ss->rr[p][Y_41];
+                sel[pp][Z_41] = ss->rr[p][Z_41];
+                pp++;
+            }
+//        if (fiff_write_float_matrix (out, FIFF_MNE_SOURCE_SPACE_POINTS,sel,ss->nuse,3) == FIFF_FAIL)
+//            goto bad;
+//        for (p = 0, pp = 0; p < ss->np; p++)
+//            if (ss->inuse[p]) {
+//                sel[pp][X_41] = ss->nn[p][X_41];
+//                sel[pp][Y_41] = ss->nn[p][Y_41];
+//                sel[pp][Z_41] = ss->nn[p][Z_41];
+//                pp++;
+//            }
+//        if (fiff_write_float_matrix (out, FIFF_MNE_SOURCE_SPACE_NORMALS,sel, ss->nuse, 3) == FIFF_FAIL)
+//            goto bad;
+        FREE_CMATRIX_41(sel); sel = NULL;
+#ifdef WRONG
+        /*
+     * This code is incorrect because the numbering in the nuse triangulation refers to the complete source space
+     */
+        if (ss->nuse_tri > 0) {		/* Write the triangulation information */
+            /*
+       * The 'use' triangulation is identical to the complete one
+       */
+            if (fiff_write_int_tag(out,FIFF_MNE_SOURCE_SPACE_NTRI,ss->nuse_tri) == FIFF_FAIL)
+                goto bad;
+            tris = make_file_triangle_list(ss->use_itris,ss->nuse_tri);
+            if (fiff_write_int_matrix(out,FIFF_MNE_SOURCE_SPACE_TRIANGLES,tris,
+                                      ss->nuse_tri,3) == FIFF_FAIL)
+                goto bad;
+
+            if (fiff_write_int_tag(out,FIFF_MNE_SOURCE_SPACE_NUSE_TRI,ss->nuse_tri) == FIFF_FAIL)
+                goto bad;
+            if (fiff_write_int_matrix(out,FIFF_MNE_SOURCE_SPACE_USE_TRIANGLES,tris,
+                                      ss->nuse_tri,3) == FIFF_FAIL)
+                goto bad;
+            FREE_ICMATRIX(tris); tris = NULL;
+        }
+#endif
+    }
+    else {
+//        fiffTagRec tag;
+//        t_pStream->write_int(FIFF_MNE_SOURCE_SPACE_NPOINTS,&ss->np);
+//        if (fiff_write_float_matrix (out, FIFF_MNE_SOURCE_SPACE_POINTS,ss->rr, ss->np, 3) == FIFF_FAIL)
+//            goto bad;
+//        if (fiff_write_float_matrix (out, FIFF_MNE_SOURCE_SPACE_NORMALS,ss->nn, ss->np, 3) == FIFF_FAIL)
+//            goto bad;
+
+//        if (ss->nuse > 0 && ss->inuse) {
+//            tag.next = 0;
+//            tag.kind = FIFF_MNE_SOURCE_SPACE_SELECTION;
+//            tag.type = FIFFT_INT;
+//            tag.size = (ss->np)*sizeof(fiff_int_t);
+//            tag.data = (fiff_byte_t *)(ss->inuse);
+//            if (fiff_write_tag(out,&tag) == FIFF_FAIL)
+//                goto bad;
+
+//            if (fiff_write_int_tag (out, FIFF_MNE_SOURCE_SPACE_NUSE,ss->nuse) == FIFF_FAIL)
+//                goto bad;
+//        }
+//        if (ss->ntri > 0) {		/* Write the triangulation information */
+//            if (fiff_write_int_tag(out,FIFF_MNE_SOURCE_SPACE_NTRI,ss->ntri) == FIFF_FAIL)
+//                goto bad;
+//            tris = make_file_triangle_list(ss->itris,ss->ntri);
+//            if (fiff_write_int_matrix(out,FIFF_MNE_SOURCE_SPACE_TRIANGLES,tris,
+//                                      ss->ntri,3) == FIFF_FAIL)
+//                goto bad;
+//            FREE_ICMATRIX(tris); tris = NULL;
+//        }
+//        if (ss->nuse_tri > 0) {		/* Write the triangulation information for the vertices in use */
+//            if (fiff_write_int_tag(out,FIFF_MNE_SOURCE_SPACE_NUSE_TRI,ss->nuse_tri) == FIFF_FAIL)
+//                goto bad;
+//            tris = make_file_triangle_list(ss->use_itris,ss->nuse_tri);
+//            if (fiff_write_int_matrix(out,FIFF_MNE_SOURCE_SPACE_USE_TRIANGLES,tris,
+//                                      ss->nuse_tri,3) == FIFF_FAIL)
+//                goto bad;
+//            FREE_ICMATRIX(tris); tris = NULL;
+//        }
+//        if (ss->nearest) {		/* Write the patch information */
+//            nearest = MALLOC(ss->np,int);
+//            nearest_dist = MALLOC(ss->np,float);
+
+//            mne_sort_nearest_by_vertex(ss->nearest,ss->np);
+//            for (p = 0; p < ss->np; p++) {
+//                nearest[p] = ss->nearest[p].nearest;
+//                nearest_dist[p] = ss->nearest[p].dist;
+//            }
+
+//            tag.next = FIFFV_NEXT_SEQ;
+//            tag.kind = FIFF_MNE_SOURCE_SPACE_NEAREST;
+//            tag.type = FIFFT_INT;
+//            tag.size = (ss->np)*sizeof(fiff_int_t);
+//            tag.data = (fiff_byte_t *)(nearest);
+//            if (fiff_write_tag(out,&tag) == FIFF_FAIL)
+//                goto bad;
+
+//            tag.next = FIFFV_NEXT_SEQ;
+//            tag.kind = FIFF_MNE_SOURCE_SPACE_NEAREST_DIST;
+//            tag.type = FIFFT_FLOAT;
+//            tag.size = (ss->np)*sizeof(fiff_float_t);
+//            tag.data = (fiff_byte_t *)(nearest_dist);
+//            if (fiff_write_tag(out,&tag) == FIFF_FAIL)
+//                goto bad;
+
+//            FREE_41(nearest); nearest = NULL;
+//            FREE_41(nearest_dist); nearest_dist = NULL;
+//        }
+//        if (ss->dist) {		/* Distance information */
+//            mneSparseMatrix m = mne_pick_lower_triangle_rcs(ss->dist);
+//            if (!m)
+//                goto bad;
+//            if (fiff_write_float_sparse_matrix(out,FIFF_MNE_SOURCE_SPACE_DIST,m) == FIFF_FAIL) {
+//                mne_free_sparse(m);
+//                goto bad;
+//            }
+//            mne_free_sparse(m);
+
+//            t_pStream->write_float(FIFF_MNE_SOURCE_SPACE_DIST_LIMIT,&ss->dist_limit);
+//        }
+    }
+    /*
+    * Volume source spaces have additional information
+    */
+//    if (write_volume_space_info(out,ss,selected_only) == FIFF_FAIL)
+//        goto bad;
+
+    t_pStream->end_block(FIFFB_MNE_SOURCE_SPACE);
+    return FIFF_OK;
+
+bad : {
+//        FREE_ICMATRIX_41(tris);
+        FREE_CMATRIX_41(sel);
+        FREE_41(nearest);
+        FREE_41(nearest_dist);
+        return FIFF_FAIL;
+    }
+}
+
+
+
+
+
+
+
+
 //============================= write_solution.c =============================
 
 int write_solution(const QString& name,         /* Destination file */
@@ -417,6 +707,9 @@ int write_solution(const QString& name,         /* Destination file */
 {
     // New Stuff
     QFile file(name);
+
+    int nvert;
+    int k,p;
 
     //
     //   Open the file, create directory
@@ -445,7 +738,7 @@ int write_solution(const QString& name,         /* Destination file */
     * Information from the MEG file
     */
     {
-        char **file_bads = NULL;
+        QStringList file_bads;
         int  file_nbad   = 0;
 
         t_pStream->start_block(FIFFB_MNE_PARENT_MEAS_FILE);
@@ -487,35 +780,62 @@ int write_solution(const QString& name,         /* Destination file */
             t_pStream->write_ch_info(chInfo);
         }
 
+        for (k = 0; k < neeg; k++) {
+            eeg_chs[k].scanNo = ++p;
+            chInfo.scanNo = eeg_chs[k].scanNo;
+            chInfo.logNo = eeg_chs[k].logNo;
+            chInfo.kind = eeg_chs[k].kind;
+            chInfo.range = eeg_chs[k].range;
+            chInfo.cal = eeg_chs[k].cal;
+            chInfo.chpos.coil_type = eeg_chs[k].chpos.coil_type;
+            chInfo.chpos.r0[0] = eeg_chs[k].chpos.r0[0];
+            chInfo.chpos.r0[1] = eeg_chs[k].chpos.r0[1];
+            chInfo.chpos.r0[2] = eeg_chs[k].chpos.r0[2];
+            chInfo.chpos.ex[0] = eeg_chs[k].chpos.ex[0];
+            chInfo.chpos.ex[1] = eeg_chs[k].chpos.ex[1];
+            chInfo.chpos.ex[2] = eeg_chs[k].chpos.ex[2];
+            chInfo.chpos.ey[0] = eeg_chs[k].chpos.ey[0];
+            chInfo.chpos.ey[1] = eeg_chs[k].chpos.ey[1];
+            chInfo.chpos.ey[2] = eeg_chs[k].chpos.ey[2];
+            chInfo.chpos.ez[0] = eeg_chs[k].chpos.ez[0];
+            chInfo.chpos.ez[1] = eeg_chs[k].chpos.ez[1];
+            chInfo.chpos.ez[2] = eeg_chs[k].chpos.ez[2];
+            chInfo.unit = eeg_chs[k].unit;
+            chInfo.unit_mul = eeg_chs[k].unit_mul;
+            chInfo.ch_name = QString(eeg_chs[k].ch_name);
 
-//        for (k = 0; k < neeg; k++) {
-//            eeg_chs[k].scanNo = ++p;
-//            tag.data = (fiff_byte_t *)(eeg_chs+k);
-//            if (fiff_write_tag(out,&tag) == FIFF_FAIL)
-//                goto bad;
-//        }
-//        /*
-//        * Copy the bad channel list from the measurement file
-//        */
-//        if (mne_read_bad_channel_list(meas_file,&file_bads,&file_nbad) == OK && file_nbad > 0) {
-//            if (mne_write_bad_channel_list(out,file_bads,file_nbad) != OK) {
-//                mne_free_name_list(file_bads,file_nbad);
-//                goto bad;
-//            }
-//        }
-//        mne_free_name_list(file_bads,file_nbad);
+            t_pStream->write_ch_info(chInfo);
+        }
+        /*
+        * Copy the bad channel list from the measurement file
+        */
+
+        //
+        // mne_read_bad_channel_list replacement
+        //
+        QFile fileBad(meas_file);
+        FiffStream::SPtr t_pStreamBads(new FiffStream(&fileBad));
+        if(!t_pStreamBads->open())
+            return false;
+        file_bads  = t_pStreamBads->read_bad_channels(t_pStreamBads->tree());
+
+        //
+        // mne_write_bad_channel_list replacement
+        //
+        mne_write_bad_channel_list_new(t_pStream,file_bads);
+
 
         t_pStream->end_block(FIFFB_MNE_PARENT_MEAS_FILE);
     }
 
-//    /*
-//    * Write the source spaces (again)
-//    */
-//    for (k = 0, nvert = 0; k < nspace; k++) {
+    /*
+    * Write the source spaces (again)
+    */
+    for (k = 0, nvert = 0; k < nspace; k++) {
 //        if (mne_write_one_source_space(out,spaces[k],FALSE) == FIFF_FAIL)
 //            goto bad;
-//        nvert += spaces[k]->nuse;
-//    }
+        nvert += spaces[k]->nuse;
+    }
 //    /*
 //    * MEG forward solution
 //    */
@@ -956,7 +1276,7 @@ void ComputeFwd::calculateFwd() const
     /*
     * We are ready to spill it out
     */
-    printf("\nwriting %s...",settings->solname);
+    printf("\nwriting %s...",settings->solname.toLatin1().constData());
     if (write_solution(settings->solname,                 /* Destination file */
                        spaces,                  /* The source spaces */
                        nspace,
