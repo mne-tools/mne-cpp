@@ -43,14 +43,15 @@
 // INCLUDES
 //=============================================================================================================
 
+#include "eegosports_global.h"
+
+#include "../ui_eegosportssetup.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
-
-#include <QtWidgets>
-#include "../ui_eegosportssetup.h"
 
 
 //*************************************************************************************************************
@@ -76,7 +77,7 @@ class EEGoSports;
 *
 * @brief The EEGoSportsSetupWidget class provides the EEGoSports configuration window.
 */
-class EEGoSportsSetupWidget : public QWidget
+class EEGOSPORTSSHARED_EXPORT EEGoSportsSetupWidget : public QWidget
 {
     Q_OBJECT
 
