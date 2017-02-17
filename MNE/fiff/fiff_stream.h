@@ -549,11 +549,8 @@ public:
 
     //=========================================================================================================
     /**
-    * fiff_write_float_matrix
-    *
-    * ### MNE toolbox root function ###
-    *
     * Writes a single-precision floating-point matrix tag
+    * Refactored: fiff_write_float_matrix (MNE-C); fiff_write_float_matrix (MNE-MATLAB)
     *
     * @param[in] kind       The tag kind
     * @param[in] mat        The data matrix
