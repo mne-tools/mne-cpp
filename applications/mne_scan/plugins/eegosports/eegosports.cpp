@@ -80,7 +80,7 @@ using namespace Eigen;
 
 EEGoSports::EEGoSports()
 : m_pRMTSA_EEGoSports(0)
-, m_qStringResourcePath(qApp->applicationDirPath()+"/mne_x_plugins/resources/eegosports/")
+, m_qStringResourcePath(qApp->applicationDirPath()+"/mne_scan_plugins/resources/eegosports/")
 , m_pRawMatrixBuffer_In(0)
 , m_pEEGoSportsProducer(new EEGoSportsProducer(this))
 , m_dLPAShift(0.01)
@@ -225,8 +225,7 @@ void EEGoSports::setUpFiffInfo()
     rotation_z = AngleAxisf((float)M_PI/2, Vector3f::UnitZ()); //M_PI/2 = 90°
     QVector3D center_pos;
 
-    for(int i = 0; i<elcLocation3D.size(); i++)
-    {
+    for(int i = 0; i<elcLocation3D.size(); i++) {
         Vector3f point;
         point << elcLocation3D[i][0], elcLocation3D[i][1] , elcLocation3D[i][2];
         Vector3f point_rot = rotation_z * point;
@@ -257,14 +256,13 @@ void EEGoSports::setUpFiffInfo()
     int numberEEGCh = 64;
 
     //Check if channel size by user corresponds with read channel informations from the elc file. If not append zeros and string 'unknown' until the size matches.
-    if(numberEEGCh > elcLocation3D.size())
-    {
+    if(numberEEGCh > elcLocation3D.size()) {
         qDebug()<<"Warning: setUpFiffInfo() - Not enough positions read from the elc file. Filling missing channel names and positions with zeroes and 'unknown' strings.";
         QVector<double> tempA(3, 0.0);
         QVector<double> tempB(2, 0.0);
         int size = numberEEGCh-elcLocation3D.size();
-        for(int i = 0; i<size; i++)
-        {
+
+        for(int i = 0; i<size; i++) {
             elcLocation3D.push_back(tempA);
             elcLocation2D.push_back(tempB);
             elcChannelNames.append(QString("Unknown"));
@@ -283,8 +281,7 @@ void EEGoSports::setUpFiffInfo()
     }
 
     //Rotate cardinal points
-    for(int i = 0; i < cardinals3D.size(); i++)
-    {
+    for(int i = 0; i < cardinals3D.size(); i++) {
         Vector3f point;
         point << cardinals3D[i][0], cardinals3D[i][1] , cardinals3D[i][2];
         Vector3f point_rot = rotation_z * point;
@@ -313,14 +310,12 @@ void EEGoSports::setUpFiffInfo()
         digPoint.r[2] = cardinals3D[indexLPA][2]*0.001;
         digitizerInfo.push_back(digPoint);
     } else if(m_bUseElectrodeShiftMode) {
-        if(indexLPA != -1)
-        {
+        if(indexLPA != -1) {
             digPoint.r[0] = elcLocation3D[indexLPA][0]*0.001;
             digPoint.r[1] = elcLocation3D[indexLPA][1]*0.001;
             digPoint.r[2] = (elcLocation3D[indexLPA][2]-m_dLPAShift*10)*0.001;
             digitizerInfo.push_back(digPoint);
-        }
-        else {
+        } else {
             qDebug() << "Plugin EEGOSPORTS - ERROR creating LPA - " << m_sLPA << " not found. Check loaded layout.";
         }
     }
@@ -339,14 +334,12 @@ void EEGoSports::setUpFiffInfo()
         digPoint.r[2] = cardinals3D[indexNasion][2]*0.001;
         digitizerInfo.push_back(digPoint);
     } else if(m_bUseElectrodeShiftMode) {
-        if(indexNasion != -1)
-        {
+        if(indexNasion != -1) {
             digPoint.r[0] = elcLocation3D[indexNasion][0]*0.001;
             digPoint.r[1] = elcLocation3D[indexNasion][1]*0.001;
             digPoint.r[2] = (elcLocation3D[indexNasion][2]-m_dNasionShift*10)*0.001;
             digitizerInfo.push_back(digPoint);
-        }
-        else {
+        } else {
             qDebug() << "Plugin EEGOSPORTS - ERROR creating Nasion - " << m_sNasion << " not found. Check loaded layout.";
         }
     }
@@ -370,15 +363,13 @@ void EEGoSports::setUpFiffInfo()
             digPoint.r[1] = elcLocation3D[indexRPA][1]*0.001;
             digPoint.r[2] = (elcLocation3D[indexRPA][2]-m_dRPAShift*10)*0.001;
             digitizerInfo.push_back(digPoint);
-        }
-        else {
+        } else {
             qDebug() << "Plugin EEGOSPORTS - ERROR creating RPA - " << m_sRPA << " not found. Check loaded layout.";
         }
     }
 
     //Add EEG electrode positions as digitizers
-    for(int i=0; i<numberEEGCh; i++)
-    {
+    for(int i=0; i<numberEEGCh; i++) {
         FiffDigPoint digPoint;
         digPoint.kind = FIFFV_POINT_EEG;
         digPoint.ident = i;
@@ -545,8 +536,7 @@ bool EEGoSports::start()
         m_bIsRunning = true;
         QThread::start();
         return true;
-    }
-    else {
+    } else {
         qWarning() << "Plugin EEGoSports - ERROR - EEGoSportsProducer thread could not be started - Either the device is turned off (check your OS device manager) or the driver DLL (EEGO-SDK.dll) is not installed in one of the monitored dll path." << endl;
         return false;
     }
@@ -581,7 +571,7 @@ bool EEGoSports::stop()
 void EEGoSports::setSampleData(MatrixXd &matRawBuffer)
 {
     m_mutex.lock();
-        m_qListReceivedSamples.append(matRawBuffer);
+    m_qListReceivedSamples.append(matRawBuffer);
     m_mutex.unlock();
 }
 
@@ -633,10 +623,8 @@ void EEGoSports::onUpdateCardinalPoints(const QString& sLPA, double dLPA, const 
 
 void EEGoSports::run()
 {
-    while(m_bIsRunning)
-    {
-        if(m_pEEGoSportsProducer->isRunning())
-        {
+    while(m_bIsRunning) {
+        if(m_pEEGoSportsProducer->isRunning()) {
             m_mutex.lock();
 
             if(m_qListReceivedSamples.isEmpty() == false) {
@@ -700,8 +688,7 @@ void EEGoSports::showStartRecording()
         m_bWriteToFile = false;
         m_pTimerRecordingChange->stop();
         m_pActionStartRecording->setIcon(QIcon(":/images/record.png"));
-    }
-    else {
+    } else {
         if(!m_bIsRunning) {
             QMessageBox msgBox;
             msgBox.setText("Start data acquisition first!");
@@ -718,6 +705,7 @@ void EEGoSports::showStartRecording()
 
         //Initiate the stream for writing to the fif file
         m_fileOut.setFileName(m_sOutputFilePath);
+
         if(m_fileOut.exists()) {
             QMessageBox msgBox;
             msgBox.setText("The file you want to write already exists.");
@@ -758,8 +746,7 @@ void EEGoSports::changeRecordingButton()
     if(m_iBlinkStatus == 0) {
         m_pActionStartRecording->setIcon(QIcon(":/images/record.png"));
         m_iBlinkStatus = 1;
-    }
-    else {
+    } else {
         m_pActionStartRecording->setIcon(QIcon(":/images/record_active.png"));
         m_iBlinkStatus = 0;
     }
@@ -771,6 +758,7 @@ void EEGoSports::changeRecordingButton()
 bool EEGoSports::dirExists(const std::string& dirName_in)
 {
     DWORD ftyp = GetFileAttributesA(dirName_in.c_str());
+
     if (ftyp == INVALID_FILE_ATTRIBUTES) {
         return false;  //something is wrong with your path!
     }

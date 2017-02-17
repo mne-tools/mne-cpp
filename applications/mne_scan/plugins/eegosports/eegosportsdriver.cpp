@@ -99,8 +99,9 @@ bool EEGoSportsDriver::initDevice(int iNumberOfChannels,
                             bool bMeasureImpedance)
 {
     //Check if the driver DLL was loaded
-    if(!m_bDllLoaded)
+    if(!m_bDllLoaded) {
         return false;
+    }
 
     //Set global variables
     m_uiNumberOfChannels = iNumberOfChannels;
@@ -154,22 +155,19 @@ bool EEGoSportsDriver::initDevice(int iNumberOfChannels,
 bool EEGoSportsDriver::uninitDevice()
 {
     //Check if the device was initialised
-    if(!m_bInitDeviceSuccess)
-    {
+    if(!m_bInitDeviceSuccess) {
         std::cout << "Plugin EEGoSports - ERROR - uninitDevice() - Device was not initialised - therefore can not be uninitialised" << std::endl;
         return false;
     }
 
     //Check if the driver DLL was loaded
-    if(!m_bDllLoaded)
-    {
+    if(!m_bDllLoaded) {
         std::cout << "Plugin EEGoSports - ERROR - uninitDevice() - Driver DLL was not loaded" << std::endl;
         return false;
     }
 
     //Close the output stream/file
-    if(m_outputFileStream.is_open() && m_bWriteDriverDebugToFile)
-    {
+    if(m_outputFileStream.is_open() && m_bWriteDriverDebugToFile) {
         m_outputFileStream.close();
         m_outputFileStream.clear();
     }
@@ -178,6 +176,7 @@ bool EEGoSportsDriver::uninitDevice()
     delete m_pAmplifier;
 
     std::cout << "Plugin EEGoSports - INFO - uninitDevice() - Successfully uninitialised the device" << std::endl;
+
     return true;
 }
 
@@ -187,8 +186,7 @@ bool EEGoSportsDriver::uninitDevice()
 bool EEGoSportsDriver::getSampleMatrixValue(Eigen::MatrixXd &sampleMatrix)
 {
     //Check if device was initialised and connected correctly
-    if(!m_bInitDeviceSuccess)
-    {
+    if(!m_bInitDeviceSuccess) {
         std::cout << "Plugin EEGoSports - ERROR - getSampleMatrixValue() - Cannot start to get samples from device because device was not initialised correctly" << std::endl;
         return false;
     }
@@ -201,8 +199,7 @@ bool EEGoSportsDriver::getSampleMatrixValue(Eigen::MatrixXd &sampleMatrix)
     int sampleIterator = 0;
 
     //get samples from device until the complete matrix is filled, i.e. the samples per block size is met
-    while(iSamplesWrittenToMatrix < m_uiSamplesPerBlock)
-    {
+    while(iSamplesWrittenToMatrix < m_uiSamplesPerBlock) {
         //Get sample block from device
         buffer buf = m_pDataStream->getData();
 
@@ -210,8 +207,7 @@ bool EEGoSportsDriver::getSampleMatrixValue(Eigen::MatrixXd &sampleMatrix)
         int iChannelCount = buf.getChannelCount();
 
         //Only do the next steps if there was at least one sample received, otherwise skip and wait until at least one sample was received
-        if(iReceivedSamples > 0)
-        {
+        if(iReceivedSamples > 0) {
             int actualSamplesWritten = 0; //Holds the number of samples which are actually written to the matrix in this while procedure
 
             //Write the received samples to an extra buffer, so that they are not getting lost if too many samples were received. These are then written to the next matrix (block)
@@ -228,14 +224,14 @@ bool EEGoSportsDriver::getSampleMatrixValue(Eigen::MatrixXd &sampleMatrix)
 
             //If the number of the samples which were already written to the matrix plus the last received number of samples is larger then the defined block size
             //-> only fill until the matrix is completeley filled with samples. The other (unused) samples are still stored in the vector buffer m_vSampleBlockBuffer and will be used in the next matrix which is to be sent to the circular buffer
-            if(iSamplesWrittenToMatrix + iReceivedSamples > m_uiSamplesPerBlock)
+            if(iSamplesWrittenToMatrix + iReceivedSamples > m_uiSamplesPerBlock) {
                 sampleMax = m_uiSamplesPerBlock - iSamplesWrittenToMatrix + sampleIterator;
-            else
+            } else {
                 sampleMax = iReceivedSamples + sampleIterator;
+            }
 
             //Read the needed number of samples from the vector buffer to store them in the matrix
-            for(; sampleIterator < sampleMax; sampleIterator++)
-            {
+            for(; sampleIterator < sampleMax; sampleIterator++) {
                 sampleMatrix.col(sampleIterator) = m_vecSampleBlockBuffer.first();
                 m_vecSampleBlockBuffer.pop_front();
 
@@ -255,8 +251,7 @@ bool EEGoSportsDriver::getSampleMatrixValue(Eigen::MatrixXd &sampleMatrix)
 //        std::cout << "m_uiSamplesPerBlock: " << m_uiSamplesPerBlock << std::endl;
 //        std::cout << "m_uiSamplesPerBlock: " << m_uiSamplesPerBlock << std::endl << std::endl;
 
-        if(m_outputFileStream.is_open() && m_bWriteDriverDebugToFile)
-        {
+        if(m_outputFileStream.is_open() && m_bWriteDriverDebugToFile) {
             m_outputFileStream << "buf.getSampleCount(): " << buf.getSampleCount() << std::endl;
             m_outputFileStream << "buf.getChannelCount(): " << buf.getChannelCount() << std::endl;
             m_outputFileStream << "buf.size(): " << buf.size() << std::endl;
@@ -267,8 +262,6 @@ bool EEGoSportsDriver::getSampleMatrixValue(Eigen::MatrixXd &sampleMatrix)
             m_outputFileStream << "m_vecSampleBlockBuffer.size(): " << m_vecSampleBlockBuffer.size() << std::endl;
         }
     }
-
-    Sleep(100);
 
     return true;
 }

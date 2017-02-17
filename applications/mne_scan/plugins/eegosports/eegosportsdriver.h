@@ -105,7 +105,7 @@ class EEGoSportsProducer;
 /**
 * EEGoSportsDriver
 *
-* @brief The EEGoSportsDriver class provides real time data acquisition of EEG data with a TMSi Refa device.
+* @brief The EEGoSportsDriver class provides real time data acquisition of EEG data with a EEGoSports device.
 */
 class EEGoSportsDriver
 {
