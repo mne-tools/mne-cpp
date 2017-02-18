@@ -714,6 +714,145 @@ void mne_sort_nearest_by_vertex(MneNearest* points, int npoint)
 
 
 
+
+
+
+
+FiffSparseMatrix* mne_create_sparse_rcs(int nrow,           /* Number of rows */
+                                        int ncol,           /* Number of columns */
+                                        int *nnz,           /* Number of non-zero elements on each row */
+                                        int **colindex,     /* Column indices of non-zero elements on each row */
+                                        float **vals)       /* The nonzero elements on each row
+                                                     * If null, the matrix will be all zeroes */
+
+{
+    FiffSparseMatrix* sparse = NULL;
+    int j,k,nz,ptr,size,ind;
+    int stor_type = FIFFTS_MC_RCS;
+
+    for (j = 0, nz = 0; j < nrow; j++)
+        nz = nz + nnz[j];
+
+    if (nz <= 0) {
+        qCritical("No nonzero elements specified.");
+        return NULL;
+    }
+    if (stor_type == FIFFTS_MC_RCS) {
+        size = nz*(sizeof(fiff_float_t) + sizeof(fiff_int_t)) +
+                (nrow+1)*(sizeof(fiff_int_t));
+    }
+    else {
+        qCritical("Illegal sparse matrix storage type: %d",stor_type);
+        return NULL;
+    }
+    sparse = new FiffSparseMatrix;
+    sparse->coding = stor_type;
+    sparse->m      = nrow;
+    sparse->n      = ncol;
+    sparse->nz     = nz;
+    sparse->data   = (float *)malloc(size);
+    sparse->inds   = (int *)(sparse->data+nz);
+    sparse->ptrs   = sparse->inds+nz;
+
+    for (j = 0, nz = 0; j < nrow; j++) {
+        ptr = -1;
+        for (k = 0; k < nnz[j]; k++) {
+            if (ptr < 0)
+                ptr = nz;
+            ind = sparse->inds[nz] = colindex[j][k];
+            if (ind < 0 || ind >= ncol) {
+                qCritical("Column index out of range in mne_create_sparse_rcs");
+                goto bad;
+            }
+            if (vals)
+                sparse->data[nz] = vals[j][k];
+            else
+                sparse->data[nz] = 0.0;
+            nz++;
+        }
+        sparse->ptrs[j] = ptr;
+    }
+    sparse->ptrs[nrow] = nz;
+    for (j = nrow-1; j >= 0; j--) /* Take care of the empty rows */
+        if (sparse->ptrs[j] < 0)
+            sparse->ptrs[j] = sparse->ptrs[j+1];
+    return sparse;
+
+bad : {
+        if(sparse)
+            delete sparse;
+        return NULL;
+    }
+}
+
+
+
+FiffSparseMatrix* mne_pick_lower_triangle_rcs(FiffSparseMatrix* mat)
+/*
+* Fill in upper triangle with the lower triangle values
+*/
+{
+    int             *nnz       = NULL;
+    int             **colindex = NULL;
+    float           **vals     = NULL;
+    FiffSparseMatrix* res = NULL;
+    int             i,j,k;
+
+    if (mat->coding != FIFFTS_MC_RCS) {
+        qCritical("The input matrix to mne_add_upper_triangle_rcs must be in RCS format");
+        goto out;
+    }
+    if (mat->m != mat->n) {
+        qCritical("The input matrix to mne_pick_lower_triangle_rcs must be square");
+        goto out;
+    }
+    /*
+   * Pick the lower triangle elements
+   */
+    nnz      = MALLOC_41(mat->m,int);
+    colindex = MALLOC_41(mat->m,int *);
+    vals     = MALLOC_41(mat->m,float *);
+    for (i = 0; i < mat->m; i++) {
+        nnz[i]      = mat->ptrs[i+1] - mat->ptrs[i];
+        if (nnz[i] > 0) {
+            colindex[i] = MALLOC_41(nnz[i],int);
+            vals[i]   = MALLOC_41(nnz[i],float);
+            for (j = mat->ptrs[i], k = 0; j < mat->ptrs[i+1]; j++) {
+                if (mat->inds[j] <= i) {
+                    vals[i][k] = mat->data[j];
+                    colindex[i][k] = mat->inds[j];
+                    k++;
+                }
+            }
+            nnz[i] = k;
+        }
+        else {
+            colindex[i] = NULL;
+            vals[i] = NULL;
+        }
+    }
+    /*
+   * Assemble the matrix
+   */
+    res = mne_create_sparse_rcs(mat->m,mat->n,nnz,colindex,vals);
+
+out : {
+        for (i = 0; i < mat->m; i++) {
+            FREE_41(colindex[i]);
+            FREE_41(vals[i]);
+        }
+        FREE_41(nnz);
+        FREE_41(vals);
+        FREE_41(colindex);
+        return res;
+    }
+}
+
+
+
+
+
+
 int mne_write_one_source_space(FiffStream::SPtr& t_pStream, MneSourceSpaceOld* ss,bool selected_only)
 {
     float **sel = NULL;
@@ -871,9 +1010,9 @@ int mne_write_one_source_space(FiffStream::SPtr& t_pStream, MneSourceSpaceOld* s
             FREE_41(nearest_dist); nearest_dist = NULL;
         }
         if (ss->dist) {     /* Distance information */
-//            mneSparseMatrix m = mne_pick_lower_triangle_rcs(ss->dist);
-//            if (!m)
-//                goto bad;
+            FiffSparseMatrix* m = mne_pick_lower_triangle_rcs(ss->dist);
+            if (!m)
+                goto bad;
 //            if (fiff_write_float_sparse_matrix(out,FIFF_MNE_SOURCE_SPACE_DIST,m) == FIFF_FAIL) {
 //                mne_free_sparse(m);
 //                goto bad;
