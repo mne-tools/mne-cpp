@@ -156,7 +156,17 @@ FwdCompData::FwdCompData()
 
 FwdCompData::~FwdCompData()
 {
-    fwd_free_comp_data((void *)this);
+//    fwd_free_comp_data((void *)this);
+    if(this->comp_coils)
+        delete this->comp_coils;
+    if(this->set)
+        delete this->set;
+    FREE_60(this->work);
+    FREE_CMATRIX_60(this->vec_work);
+
+    if (this->client_free && this->client)
+        this->client_free(this->client);
+
 }
 
 
@@ -219,7 +229,8 @@ void FwdCompData::fwd_free_comp_data(void *d)
     if (comp->client_free && comp->client)
         comp->client_free(comp->client);
 
-    delete(comp);
+    if(comp)
+        delete(comp);
     return;
 }
 

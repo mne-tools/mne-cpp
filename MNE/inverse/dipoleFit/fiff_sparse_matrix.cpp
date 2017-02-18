@@ -294,7 +294,7 @@ FiffSparseMatrix *FiffSparseMatrix::fiff_get_float_sparse_matrix(FiffTag::SPtr &
     res->n      = n;
     res->nz     = nz;
     res->data   = MALLOC_18(correct_size,float);
-    memcpy (res->data,(float*)tag->data(),correct_size*sizeof(float));
+    memcpy (res->data,(float*)tag->data(),correct_size);
     res->coding = coding;
     res->inds   = (int *)(res->data + res->nz);
     res->ptrs   = res->inds + res->nz;
