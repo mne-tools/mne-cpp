@@ -10,6 +10,8 @@
 #include <inverse/dipoleFit/fwd_bem_model.h>
 #include <inverse/dipoleFit/mne_named_matrix.h>
 
+#include <inverse/dipoleFit/fiff_sparse_matrix.h>
+
 #include <inverse/dipoleFit/mne_nearest.h>
 
 #include <fiff/fiff_types.h>
@@ -157,7 +159,7 @@ void mne_free_icmatrix_41 (int **m)
 //    if (in == NULL)
 //        return NULL;
 //    else {
-//        id = MALLOC(1,fiffIdRec);
+//        id = MALLOC_41(1,fiffIdRec);
 //        *id = *(in->id);
 //        fiff_close(in);
 //        return id;
@@ -597,7 +599,7 @@ void fiff_write_float_matrix_old (  FiffStream::SPtr& t_pStream,    /* Destinati
 //      swap_float(data[k]+c);
 //#endif
 //  }
-//  dims = MALLOC(3,fiff_int_t);
+//  dims = MALLOC_41(3,fiff_int_t);
 //  dims[0] = swap_int(cols);
 //  dims[1] = swap_int(rows);
 //  dims[2] = swap_int(2);
@@ -673,7 +675,7 @@ void fiff_write_int_matrix_old (    FiffStream::SPtr& t_pStream,
 //      data[k][c] = swap_int(data[k][c]);
 //#endif
 //  }
-//  dims    = MALLOC(3,fiff_int_t);
+//  dims    = MALLOC_41(3,fiff_int_t);
 //  dims[0] = swap_int(cols);
 //  dims[1] = swap_int(rows);
 //  dims[2] = swap_int(2);
@@ -688,6 +690,26 @@ void fiff_write_int_matrix_old (    FiffStream::SPtr& t_pStream,
 //  FREE(dims);
 //  return res;
 }
+
+
+int fiff_write_float_sparse_matrix_old(FiffStream::SPtr& t_pStream, int kind, FiffSparseMatrix* mat)
+/*
+* Write a sparse matrix
+*/
+{
+    if (mat->coding == FIFFTS_MC_CCS)
+        qDebug() << "TODO write CCS - use eigen";
+    else if (mat->coding == FIFFTS_MC_RCS)
+        qDebug() << "TODO write RCS - use eigen";
+    else {
+        qCritical("Incomprehensible sparse matrix coding");
+        return FIFF_FAIL;
+    }
+    return FIFF_OK;
+}
+
+
+
 
 
 static int comp_points2(const void *vp1,const void *vp2)
@@ -847,6 +869,140 @@ out : {
         return res;
     }
 }
+
+
+
+
+
+
+static int write_volume_space_info(FiffStream::SPtr& t_pStream, MneSourceSpaceOld* ss, int selected_only)
+/*
+* Write the vertex neighbors and other information for a volume source space
+*/
+{
+    int ntot,nvert;
+    int *nneighbors = NULL;
+    int *neighbors = NULL;
+    int *inuse_map = NULL;
+    int nneigh,*neigh;
+    int k,p;
+    fiffTagRec tag;
+    int res = FAIL;
+
+    if (ss->type != FIFFV_MNE_SPACE_VOLUME)
+        return OK;
+    if (!ss->neighbor_vert || !ss->nneighbor_vert)
+        return OK;
+    if (selected_only) {
+        inuse_map = MALLOC_41(ss->np,int);
+        for (k = 0,p = 0, ntot = 0; k < ss->np; k++) {
+            if (ss->inuse[k]) {
+                ntot += ss->nneighbor_vert[k];
+                inuse_map[k] = p++;
+            }
+            else
+                inuse_map[k] = -1;
+        }
+        nneighbors = MALLOC_41(ss->nuse,int);
+        neighbors = MALLOC_41(ntot,int);
+        /*
+        * Pick the neighbors and fix the vertex numbering to refer
+        * to the vertices in use only
+        */
+        for (k = 0, nvert = 0, ntot = 0; k < ss->np; k++) {
+            if (ss->inuse[k]) {
+                neigh  = ss->neighbor_vert[k];
+                nneigh = ss->nneighbor_vert[k];
+                nneighbors[nvert++] = nneigh;
+                for (p = 0; p < nneigh; p++)
+                    neighbors[ntot++] = neigh[p] < 0 ? -1 : inuse_map[neigh[p]];
+            }
+        }
+    }
+    else {
+        for (k = 0, ntot = 0; k < ss->np; k++)
+            ntot += ss->nneighbor_vert[k];
+        nneighbors = MALLOC_41(ss->np,int);
+        neighbors = MALLOC_41(ntot,int);
+        nvert     = ss->np;
+        for (k = 0, ntot = 0; k < ss->np; k++) {
+            neigh  = ss->neighbor_vert[k];
+            nneigh = ss->nneighbor_vert[k];
+            nneighbors[k] = nneigh;
+            for (p = 0; p < nneigh; p++)
+                neighbors[ntot++] = neigh[p];
+        }
+    }
+
+    t_pStream->write_int(FIFF_MNE_SOURCE_SPACE_NNEIGHBORS,nneighbors,nvert);
+//    tag.next = FIFFV_NEXT_SEQ;
+//    tag.kind = FIFF_MNE_SOURCE_SPACE_NNEIGHBORS;
+//    tag.type = FIFFT_INT;
+//    tag.size = nvert*sizeof(fiff_int_t);
+//    tag.data = (fiff_byte_t *)nneighbors;
+//    if (fiff_write_tag(out,&tag) == FIFF_FAIL)
+//        goto out;
+
+    t_pStream->write_int(FIFF_MNE_SOURCE_SPACE_NEIGHBORS,neighbors,ntot);
+//    tag.next = FIFFV_NEXT_SEQ;
+//    tag.kind = FIFF_MNE_SOURCE_SPACE_NEIGHBORS;
+//    tag.type = FIFFT_INT;
+//    tag.size = ntot*sizeof(fiff_int_t);
+//    tag.data = (fiff_byte_t *)neighbors;
+//    if (fiff_write_tag(out,&tag) == FIFF_FAIL)
+//        goto out;
+
+    /*
+    * Write some additional stuff
+    */
+    if (!selected_only) {
+        if (ss->voxel_surf_RAS_t) {
+            write_coord_trans_old(t_pStream, ss->voxel_surf_RAS_t);//t_pStream->write_coord_trans(ss->voxel_surf_RAS_t);
+
+            t_pStream->write_int(FIFF_MNE_SOURCE_SPACE_VOXEL_DIMS,ss->vol_dims,3);
+//            tag.next = FIFFV_NEXT_SEQ;
+//            tag.kind = FIFF_MNE_SOURCE_SPACE_VOXEL_DIMS;
+//            tag.type = FIFFT_INT;
+//            tag.size = 3*sizeof(fiff_int_t);
+//            tag.data = (fiff_byte_t *)ss->vol_dims;
+//            if (fiff_write_tag(out,&tag) == FIFF_FAIL)
+//                goto out;
+        }
+        if (ss->interpolator && ss->MRI_volume) {
+            t_pStream->start_block(FIFFB_MNE_PARENT_MRI_FILE);
+            if (ss->MRI_surf_RAS_RAS_t)
+                write_coord_trans_old(t_pStream, ss->MRI_surf_RAS_RAS_t);//t_pStream->write_coord_trans(ss->MRI_surf_RAS_RAS_t);
+            if (ss->MRI_voxel_surf_RAS_t)
+                write_coord_trans_old(t_pStream, ss->MRI_voxel_surf_RAS_t);//t_pStream->write_coord_trans(ss->MRI_voxel_surf_RAS_t);
+            t_pStream->write_string(FIFF_MNE_FILE_NAME,ss->MRI_volume);
+            if (ss->interpolator)
+                fiff_write_float_sparse_matrix_old(t_pStream,FIFF_MNE_SOURCE_SPACE_INTERPOLATOR,ss->interpolator);
+            if (ss->MRI_vol_dims[0] > 0 && ss->MRI_vol_dims[1] > 0 && ss->MRI_vol_dims[2] > 0) {
+                t_pStream->write_int(FIFF_MRI_WIDTH,&ss->MRI_vol_dims[0]);
+                t_pStream->write_int(FIFF_MRI_HEIGHT,&ss->MRI_vol_dims[1]);
+                t_pStream->write_int(FIFF_MRI_DEPTH,&ss->MRI_vol_dims[2]);
+            }
+            t_pStream->end_block(FIFFB_MNE_PARENT_MRI_FILE);
+        }
+    }
+    else {
+        if (ss->interpolator && ss->MRI_volume) {
+            t_pStream->write_string(FIFF_MNE_SOURCE_SPACE_MRI_FILE,ss->MRI_volume);
+            qCritical("Cannot write the interpolator for selection yet");
+            goto out;
+        }
+    }
+    res = OK;
+    goto out;
+
+out : {
+        FREE_41(inuse_map);
+        FREE_41(nneighbors);
+        FREE_41(neighbors);
+        return res;
+    }
+}
+
 
 
 
@@ -1013,11 +1169,13 @@ int mne_write_one_source_space(FiffStream::SPtr& t_pStream, MneSourceSpaceOld* s
             FiffSparseMatrix* m = mne_pick_lower_triangle_rcs(ss->dist);
             if (!m)
                 goto bad;
-//            if (fiff_write_float_sparse_matrix(out,FIFF_MNE_SOURCE_SPACE_DIST,m) == FIFF_FAIL) {
-//                mne_free_sparse(m);
-//                goto bad;
-//            }
-//            mne_free_sparse(m);
+            if (fiff_write_float_sparse_matrix_old(t_pStream,FIFF_MNE_SOURCE_SPACE_DIST,m) == FIFF_FAIL) {
+                if(m)
+                    delete m;
+                goto bad;
+            }
+            if(m)
+                delete m;
 
             t_pStream->write_float(FIFF_MNE_SOURCE_SPACE_DIST_LIMIT,&ss->dist_limit);
         }
