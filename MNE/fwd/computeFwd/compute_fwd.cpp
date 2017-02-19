@@ -1814,17 +1814,16 @@ void ComputeFwd::calculateFwd() const
                        settings->coord_frame,             /* Coordinate frame */
                        meg_forward, eeg_forward,
                        meg_forward_grad, eeg_forward_grad) == FIFF_FAIL)
-
-        //        goto out;
-        //    if (mne_attach_env(solname,command) == FIFF_FAIL)
-        //        goto out;
-        printf("done\n");
-    res = OK;
+        goto out;
+//    if (mne_attach_env(solname,command) == FIFF_FAIL)
+//        goto out;
+    printf("done\n");
+    res = true;
     printf("\nFinished.\n");
 
 out : {
-        //        if (out)
-        //            fclose(out);
+//        if (out)
+//            fclose(out);
         for (k = 0; k < nspace; k++)
             if(spaces[k])
                 delete spaces[k];

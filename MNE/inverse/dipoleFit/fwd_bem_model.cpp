@@ -54,7 +54,8 @@
 
 #include <QFile>
 #include <QList>
-
+#include <QThread>
+#include <QtConcurrent>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -3058,7 +3059,7 @@ int FwdBemModel::compute_forward_meg(MneSourceSpaceOld **spaces, int nspace, Fwd
     char             **names;		  /* Channel names */
     void             *client;
     FwdThreadArg*    one_arg = NULL;
-    //    int              nproc = mne_get_processor_count();
+    int              nproc = QThread::idealThreadCount();
 
     if (bem_model) {
         /*
@@ -3139,8 +3140,8 @@ int FwdBemModel::compute_forward_meg(MneSourceSpaceOld **spaces, int nspace, Fwd
             res_grad = ALLOC_CMATRIX_40(3*3*nsource,nmeg);
     }
     /*
-       * Set up the argument for the field computation
-       */
+    * Set up the argument for the field computation
+    */
     one_arg = new FwdThreadArg();
     one_arg->res            = res;
     one_arg->res_grad       = res_grad;
@@ -3153,72 +3154,61 @@ int FwdBemModel::compute_forward_meg(MneSourceSpaceOld **spaces, int nspace, Fwd
     one_arg->vec_field_pot  = vec_field;
     one_arg->field_pot_grad = field_grad;
 
-//    if (nproc < 2)
-//        use_threads = false;
+    if (nproc < 2)
+        use_threads = false;
 
-//    if (use_threads) {
-    qDebug() << "!!!! TODO !!!! Implement thread version using QtConcurrent";
-//        int            nthread  = (fixed_ori || vec_field || nproc < 6) ? nspace : 3*nspace;
-//        pthread_t      *threads = MALLOC_40(nthread,pthread_t);
-//        fwdThreadArg   *args    = MALLOC_40(nthread,fwdThreadArg);
-//        pthread_attr_t pthread_custom_attr;
-//        int            stat;
-//        /*
-//         * We need copies to allocate separate workspace for each thread
-//         */
-//        if (fixed_ori || vec_field || nproc < 6) {
-//            for (k = 0, off = 0; k < nthread; k++) {
-//                args[k]      = create_meg_multi_thread_duplicate(one_arg,bem_model != NULL);
-//                args[k]->s   = spaces[k];
-//                args[k]->off = off;
-//                off = fixed_ori ? off + spaces[k]->nuse : off + 3*spaces[k]->nuse;
-//            }
-//            fprintf(stderr,"%d processors. I will use one thread for each of the %d source spaces.\n",
-//                    nproc,nspace);
-//        }
-//        else {
-//            for (k = 0, off = 0, q = 0; k < nspace; k++) {
-//                for (p = 0; p < 3; p++,q++) {
-//                    args[q]       = create_meg_multi_thread_duplicate(one_arg,bem_model != NULL);
-//                    args[q]->s    = spaces[k];
-//                    args[q]->off  = off;
-//                    args[q]->comp = p;
-//                }
-//                off = fixed_ori ? off + spaces[k]->nuse : off + 3*spaces[k]->nuse;
-//            }
-//            fprintf(stderr,"%d processors. I will use %d threads : %d source spaces x 3 source components.\n",
-//                    nproc,nthread,nspace);
-//        }
-//        fprintf(stderr,"Computing MEG at %d source locations (%s orientations)...",
-//                nsource,fixed_ori ? "fixed" : "free");
-//        /*
-//         * Ready to start the threads
-//         */
-//        pthread_attr_init(&pthread_custom_attr);
-//        for (k = 0; k < nthread; k++)
-//            pthread_create(threads+k,&pthread_custom_attr,meg_eeg_fwd_one_source_space,args[k]);
-//        /*
-//         * Wait for them to complete
-//         */
-//        for (k = 0; k < nthread; k++)
-//            pthread_join(threads[k],NULL);
-//        /*
-//         * Check the results
-//         */
-//        for (k = 0, stat = OK; k < nthread; k++)
-//            if (args[k]->stat != OK) {
-//                stat = FAIL;
-//                break;
-//            }
-//        for (k = 0; k < nthread; k++)
-//            free_meg_multi_thread_duplicate(args[k],bem_model != NULL);
-//        FREE_40(args);
-//        FREE_40(threads);
-//        if (stat != OK)
-//            goto bad;
-
-//    }
-//    else {
+    if (use_threads) {
+        int            nthread  = (fixed_ori || vec_field || nproc < 6) ? nspace : 3*nspace;
+        QList <FwdThreadArg*> args; //fwdThreadArg   *args    = MALLOC_40(nthread,fwdThreadArg);
+        int            stat;
+        /*
+        * We need copies to allocate separate workspace for each thread
+        */
+        if (fixed_ori || vec_field || nproc < 6) {
+            for (k = 0, off = 0; k < nthread; k++) {
+                FwdThreadArg* t_arg = FwdThreadArg::create_meg_multi_thread_duplicate(one_arg,bem_model != NULL);
+                t_arg->s   = spaces[k];
+                t_arg->off = off;
+                off = fixed_ori ? off + spaces[k]->nuse : off + 3*spaces[k]->nuse;
+                args.append(t_arg);
+            }
+            fprintf(stderr,"%d processors. I will use one thread for each of the %d source spaces.\n",
+                    nproc,nspace);
+        }
+        else {
+            for (k = 0, off = 0, q = 0; k < nspace; k++) {
+                for (p = 0; p < 3; p++,q++) {
+                    FwdThreadArg* t_arg = FwdThreadArg::create_meg_multi_thread_duplicate(one_arg,bem_model != NULL);
+                    t_arg->s    = spaces[k];
+                    t_arg->off  = off;
+                    t_arg->comp = p;
+                    args.append(t_arg);
+                }
+                off = fixed_ori ? off + spaces[k]->nuse : off + 3*spaces[k]->nuse;
+            }
+            fprintf(stderr,"%d processors. I will use %d threads : %d source spaces x 3 source components.\n",
+                    nproc,nthread,nspace);
+        }
+        fprintf(stderr,"Computing MEG at %d source locations (%s orientations)...",
+                nsource,fixed_ori ? "fixed" : "free");
+        /*
+        * Ready to start the threads
+        */
+        QtConcurrent::blockingMap(args, meg_eeg_fwd_one_source_space);
+        /*
+        * Check the results
+        */
+        for (k = 0, stat = OK; k < nthread; k++)
+            if (args[k]->stat != OK) {
+                stat = FAIL;
+                break;
+            }
+        for (k = 0; k < args.size(); k++)//nthread == args.size()
+            FwdThreadArg::free_meg_multi_thread_duplicate(args[k],bem_model != NULL);
+        if (stat != OK)
+            goto bad;
+    }
+    else {
         fprintf(stderr,"Computing MEG at %d source locations (%s orientations, no threads)...",
                 nsource,fixed_ori ? "fixed" : "free");
         for (k = 0, off = 0; k < nspace; k++) {
@@ -3229,7 +3219,7 @@ int FwdBemModel::compute_forward_meg(MneSourceSpaceOld **spaces, int nspace, Fwd
                 goto bad;
             off = fixed_ori ? off + one_arg->s->nuse : off + 3*one_arg->s->nuse;
         }
-//    }
+    }
     fprintf(stderr,"done.\n");
     {
         char **orig_names = MALLOC_40(nmeg,char *);
@@ -3281,7 +3271,7 @@ int FwdBemModel::compute_forward_eeg(MneSourceSpaceOld **spaces, int nspace, Fwd
     char            **names;		  /* Channel names */
     void            *client;
     FwdThreadArg*   one_arg = NULL;
-//    int             nproc = mne_get_processor_count();
+    int             nproc = QThread::idealThreadCount();
     /*
        * Count the sources
        */
@@ -3317,8 +3307,8 @@ int FwdBemModel::compute_forward_eeg(MneSourceSpaceOld **spaces, int nspace, Fwd
         client   = m;
     }
     /*
-       * Allocate space for the solution
-       */
+    * Allocate space for the solution
+    */
     if (fixed_ori)
         res = ALLOC_CMATRIX_40(nsource,neeg);
     else
@@ -3348,71 +3338,59 @@ int FwdBemModel::compute_forward_eeg(MneSourceSpaceOld **spaces, int nspace, Fwd
     one_arg->vec_field_pot  = vec_pot;
     one_arg->field_pot_grad = pot_grad;
 
-//    if (nproc < 2)
-//        use_threads = false;
+    if (nproc < 2)
+        use_threads = false;
 
-//    if (use_threads) {
-    qDebug() << "!!!! TODO !!!! Implement thread version using QtConcurrent";
-//        int            nthread  = (fixed_ori || vec_pot || nproc < 6) ? nspace : 3*nspace;
-//        pthread_t      *threads = MALLOC_40(nthread,pthread_t);
-//        fwdThreadArg   *args    = MALLOC_40(nthread,fwdThreadArg);
-//        pthread_attr_t pthread_custom_attr;
-//        int            stat;
-//        /*
-//         * We need copies to allocate separate workspace for each thread
-//         */
-//        if (fixed_ori || vec_pot || nproc < 6) {
-//            for (k = 0, off = 0; k < nthread; k++) {
-//                args[k]      = create_eeg_multi_thread_duplicate(one_arg,bem_model != NULL);
-//                args[k]->s   = spaces[k];
-//                args[k]->off = off;
-//                off = fixed_ori ? off + spaces[k]->nuse : off + 3*spaces[k]->nuse;
-//            }
-//            fprintf(stderr,"%d processors. I will use one thread for each of the %d source spaces.\n",
-//                    nproc,nspace);
-//        }
-//        else {
-//            for (k = 0, off = 0, q = 0; k < nspace; k++) {
-//                for (p = 0; p < 3; p++,q++) {
-//                    args[q]       = create_eeg_multi_thread_duplicate(one_arg,bem_model != NULL);
-//                    args[q]->s    = spaces[k];
-//                    args[q]->off  = off;
-//                    args[q]->comp = p;
-//                }
-//                off = fixed_ori ? off + spaces[k]->nuse : off + 3*spaces[k]->nuse;
-//            }
-//            fprintf(stderr,"%d processors. I will use %d threads : %d source spaces x 3 source components.\n",
-//                    nproc,nthread,nspace);
-//        }
-//        fprintf(stderr,"Computing EEG at %d source locations (%s orientations)...",
-//                nsource,fixed_ori ? "fixed" : "free");
-//        /*
-//         * Ready to start the threads
-//         */
-//        pthread_attr_init(&pthread_custom_attr);
-//        for (k = 0; k < nthread; k++)
-//            pthread_create(threads+k,&pthread_custom_attr,meg_eeg_fwd_one_source_space,args[k]);
-//        /*
-//         * Wait for them to complete
-//         */
-//        for (k = 0; k < nthread; k++)
-//            pthread_join(threads[k],NULL);
-//        /*
-//         * Check the results
-//         */
-//        for (k = 0, stat = OK; k < nthread; k++)
-//            if (args[k]->stat != OK) {
-//                stat = FAIL;
-//                break;
-//            }
-//        for (k = 0; k < nthread; k++)
-//            free_eeg_multi_thread_duplicate(args[k],bem_model != NULL);
-//        FREE_40(args);
-//        FREE_40(threads);
-//        if (stat != OK)
-//            goto bad;
-//    }
-//    else {
+    if (use_threads) {
+        int            nthread  = (fixed_ori || vec_pot || nproc < 6) ? nspace : 3*nspace;
+        QList <FwdThreadArg*> args; //FwdThreadArg*   *args    = MALLOC_40(nthread,FwdThreadArg*);
+        int            stat;
+        /*
+        * We need copies to allocate separate workspace for each thread
+        */
+        if (fixed_ori || vec_pot || nproc < 6) {
+            for (k = 0, off = 0; k < nthread; k++) {
+                FwdThreadArg* t_arg = FwdThreadArg::create_eeg_multi_thread_duplicate(one_arg,bem_model != NULL);
+                t_arg->s   = spaces[k];
+                t_arg->off = off;
+                off = fixed_ori ? off + spaces[k]->nuse : off + 3*spaces[k]->nuse;
+                args.append(t_arg);
+            }
+            printf("%d processors. I will use one thread for each of the %d source spaces.\n",nproc,nspace);
+        }
+        else {
+            for (k = 0, off = 0, q = 0; k < nspace; k++) {
+                for (p = 0; p < 3; p++,q++) {
+                    FwdThreadArg* t_arg = FwdThreadArg::create_eeg_multi_thread_duplicate(one_arg,bem_model != NULL);
+                    t_arg->s    = spaces[k];
+                    t_arg->off  = off;
+                    t_arg->comp = p;
+                    args.append(t_arg);
+                }
+                off = fixed_ori ? off + spaces[k]->nuse : off + 3*spaces[k]->nuse;
+            }
+            printf("%d processors. I will use %d threads : %d source spaces x 3 source components.\n",nproc,nthread,nspace);
+        }
+        printf("Computing EEG at %d source locations (%s orientations)...",
+                nsource,fixed_ori ? "fixed" : "free");
+        /*
+        * Ready to start the threads
+        */
+        QtConcurrent::blockingMap(args, meg_eeg_fwd_one_source_space);
+        /*
+        * Check the results
+        */
+        for (k = 0, stat = OK; k < nthread; k++)
+            if (args[k]->stat != OK) {
+                stat = FAIL;
+                break;
+            }
+        for (k = 0; k < args.size(); k++)//nthread == args.size()
+            FwdThreadArg::free_eeg_multi_thread_duplicate(args[k],bem_model != NULL);
+        if (stat != OK)
+            goto bad;
+    }
+    else {
         fprintf(stderr,"Computing EEG at %d source locations (%s orientations, no threads)...",
                 nsource,fixed_ori ? "fixed" : "free");
         for (k = 0, off = 0; k < nspace; k++) {
@@ -3423,7 +3401,7 @@ int FwdBemModel::compute_forward_eeg(MneSourceSpaceOld **spaces, int nspace, Fwd
                 goto bad;
             off = fixed_ori ? off + one_arg->s->nuse : off + 3*one_arg->s->nuse;
         }
-//    }
+    }
     fprintf(stderr,"done.\n");
     {
         char **orig_names = MALLOC_40(neeg,char *);
