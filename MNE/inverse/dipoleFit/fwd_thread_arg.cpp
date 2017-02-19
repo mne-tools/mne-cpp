@@ -41,6 +41,8 @@
 #include "fwd_thread_arg.h"
 #include "mne_source_space_old.h"
 #include "fwd_coil_set.h"
+#include "fwd_bem_model.h"
+#include "fwd_comp_data.h"
 
 
 #ifndef TRUE
@@ -58,6 +60,22 @@
 #ifndef OK
 #define OK 0
 #endif
+
+
+#define FREE_80(x) if ((char *)(x) != NULL) free((char *)(x))
+
+
+#define FREE_CMATRIX_80(m) mne_free_cmatrix_80((m))
+
+
+void mne_free_cmatrix_80 (float **m)
+{
+    if (m) {
+        FREE_80(*m);
+        FREE_80(m);
+    }
+}
+
 
 
 //*************************************************************************************************************
@@ -97,4 +115,97 @@ FwdThreadArg::FwdThreadArg()
 FwdThreadArg::~FwdThreadArg()
 {
 
+}
+
+
+//*************************************************************************************************************
+
+FwdThreadArg *FwdThreadArg::create_eeg_multi_thread_duplicate(FwdThreadArg *one, bool bem_model)
+/*
+          * Create a duplicate to make the data structure thread safe
+          * Do not duplicate read-only parts of the relevant structures
+          */
+{
+    FwdThreadArg* res  = new FwdThreadArg;
+
+    *res = *one;
+    if (bem_model) {
+        FwdBemModel*   new_bem  = new FwdBemModel;
+        FwdBemModel*   orig_bem = (FwdBemModel*)res->client;
+
+        *new_bem    = *orig_bem;
+        new_bem->v0 = NULL;
+        res->client = new_bem;
+    }
+    return res;
+}
+
+
+//*************************************************************************************************************
+
+void FwdThreadArg::free_eeg_multi_thread_duplicate(FwdThreadArg *one, bool bem_model)
+{
+    if (bem_model) {
+        FwdBemModel*    bem = (FwdBemModel*) one->client;
+        FREE_80(bem->v0);
+        FREE_80(bem);
+    }
+    one->client = NULL;
+    if(one)
+        delete one;
+}
+
+
+//*************************************************************************************************************
+
+FwdThreadArg *FwdThreadArg::create_meg_multi_thread_duplicate(FwdThreadArg* one, bool bem_model)
+/*
+* Create a duplicate to make the data structure thread safe
+* Do not duplicate read-only parts of the relevant structures
+*/
+{
+    FwdThreadArg* res  = new FwdThreadArg;
+    FwdCompData*  orig = (FwdCompData*)one->client;
+    FwdCompData*  comp = NULL;
+
+    *res = *one;
+    res->client = comp = new FwdCompData;
+    *comp = *orig;
+    comp->work     = NULL;
+    comp->vec_work = NULL;
+    comp->set      = new MneCTFCompDataSet(*(orig->set));
+
+    if (bem_model) {
+        FwdBemModel*   new_bem  = new FwdBemModel();
+        FwdBemModel*   orig_bem = (FwdBemModel*)comp->client;
+
+        *new_bem     = *orig_bem;
+        new_bem->v0  = NULL;
+        comp->client = new_bem;
+    }
+    return res;
+}
+
+
+//*************************************************************************************************************
+
+void FwdThreadArg::free_meg_multi_thread_duplicate(FwdThreadArg *one, bool bem_model)
+
+{
+    FwdCompData* comp = (FwdCompData*)one->client;
+
+    FREE_80(comp->work);
+    FREE_CMATRIX_80(comp->vec_work);
+    if(comp->set)
+        delete comp->set;
+
+    if (bem_model) {
+        FwdBemModel*    bem = (FwdBemModel*)comp->client;
+        FREE_80(bem->v0);
+        FREE_80(bem);
+    }
+    FREE_80(comp);
+    one->client = NULL;
+    if(one)
+        delete one;
 }
