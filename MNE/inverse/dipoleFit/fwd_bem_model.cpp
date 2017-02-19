@@ -2493,7 +2493,7 @@ int FwdBemModel::fwd_bem_specify_coils(FwdBemModel *m, FwdCoilSet *coils)
 
     csol->ncoil     = coils->ncoil;
     csol->np        = m->nsol;
-    csol->solution  = mne_mat_mat_mult_40(sol,m->solution,coils->ncoil,m->nsol,m->nsol);
+    csol->solution  = mne_mat_mat_mult_40(sol,m->solution,coils->ncoil,m->nsol,m->nsol);//TODO: Suspicion, that this is slow - use Eigen
 
     FREE_CMATRIX_40(sol);
     return OK;
@@ -3077,9 +3077,10 @@ int FwdBemModel::compute_forward_meg(MneSourceSpaceOld **spaces, int nspace, Fwd
         if (!comp)
             goto bad;
         /*
-         * Field computation matrices...
-         */
-        fprintf(stderr,"Composing the field computation matrix...");
+        * Field computation matrices...
+        */
+        qDebug() << "!!!TODO Speed the following with Eigen up!";
+        printf("Composing the field computation matrix...");
         if (fwd_bem_specify_coils(bem_model,coils) == FAIL)
             goto bad;
         fprintf(stderr,"[done]\n");
@@ -3192,7 +3193,7 @@ int FwdBemModel::compute_forward_meg(MneSourceSpaceOld **spaces, int nspace, Fwd
         fprintf(stderr,"Computing MEG at %d source locations (%s orientations)...",
                 nsource,fixed_ori ? "fixed" : "free");
         /*
-        * Ready to start the threads
+        * Ready to start the threads & Wait for them to complete
         */
         QtConcurrent::blockingMap(args, meg_eeg_fwd_one_source_space);
         /*
@@ -3374,7 +3375,7 @@ int FwdBemModel::compute_forward_eeg(MneSourceSpaceOld **spaces, int nspace, Fwd
         printf("Computing EEG at %d source locations (%s orientations)...",
                 nsource,fixed_ori ? "fixed" : "free");
         /*
-        * Ready to start the threads
+        * Ready to start the threads & Wait for them to complete
         */
         QtConcurrent::blockingMap(args, meg_eeg_fwd_one_source_space);
         /*

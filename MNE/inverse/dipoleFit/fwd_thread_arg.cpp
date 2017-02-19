@@ -173,7 +173,7 @@ FwdThreadArg *FwdThreadArg::create_meg_multi_thread_duplicate(FwdThreadArg* one,
     *comp = *orig;
     comp->work     = NULL;
     comp->vec_work = NULL;
-    comp->set      = new MneCTFCompDataSet(*(orig->set));
+    comp->set      = orig->set ? new MneCTFCompDataSet(*(orig->set)) : NULL;
 
     if (bem_model) {
         FwdBemModel*   new_bem  = new FwdBemModel();
