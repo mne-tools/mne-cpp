@@ -145,10 +145,10 @@ private:
 
     FIFFLIB::FiffInfo::SPtr                         m_pFiffInfo;            /**< Fiff measurement info.*/
 
-    QSharedPointer<ReferenceToolbarWidget>             m_pRefToolbarWidget;            /**< flag whether thread is running.*/
-    QAction*                                           m_pActionRefToolbarWidget;      /**< flag whether thread is running.*/
+    QSharedPointer<ReferenceToolbarWidget>              m_pRefToolbarWidget;            /**< flag whether thread is running.*/
+    QAction*                                            m_pActionRefToolbarWidget;      /**< flag whether thread is running.*/
 
-    IOBUFFER::CircularMatrixBuffer<double>::SPtr    m_pRefBuffer;         /**< Holds incoming data.*/
+    IOBUFFER::CircularMatrixBuffer<double>::SPtr        m_pRefBuffer;                   /**< Holds incoming data.*/
 
     SCSHAREDLIB::PluginInputData<SCMEASLIB::NewRealTimeMultiSampleArray>::SPtr      m_pRefInput;      /**< The NewRealTimeMultiSampleArray of the Reference input.*/
     SCSHAREDLIB::PluginOutputData<SCMEASLIB::NewRealTimeMultiSampleArray>::SPtr     m_pRefOutput;     /**< The NewRealTimeMultiSampleArray of the Reference output.*/
