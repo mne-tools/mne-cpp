@@ -52,6 +52,7 @@
 
 #include <QFile>
 #include <QCoreApplication>
+#include <QtConcurrent>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -885,7 +886,7 @@ int MneSurfaceOrVolume::filter_source_spaces(float limit, char *bemfile, FiffCoo
 {
     MneSurfaceOld*    surf = NULL;
     int             k;
-//    int             nproc = mne_get_processor_count();
+    int             nproc = QThread::idealThreadCount();
     FilterThreadArg* a;
 
     if (!bemfile)
@@ -896,8 +897,8 @@ int MneSurfaceOrVolume::filter_source_spaces(float limit, char *bemfile, FiffCoo
         return FAIL;
     }
     /*
-       * How close are the source points to the surface?
-       */
+    * How close are the source points to the surface?
+    */
     fprintf(stderr,"Source spaces are in ");
     if (spaces[0]->coord_frame == FIFFV_COORD_HEAD)
         fprintf(stderr,"head coordinates.\n");
@@ -909,10 +910,10 @@ int MneSurfaceOrVolume::filter_source_spaces(float limit, char *bemfile, FiffCoo
     if (limit > 0.0)
         fprintf(stderr,"and at least %6.1f mm away",1000*limit);
     fprintf(stderr," (will take a few...)\n");
-//    if (nproc < 2 || nspace == 1 || !use_threads) {
+    if (nproc < 2 || nspace == 1 || !use_threads) {
         /*
-         * This is the conventional calculation
-         */
+        * This is the conventional calculation
+        */
         for (k = 0; k < nspace; k++) {
             a = new FilterThreadArg();
             a->s = spaces[k];
@@ -925,43 +926,33 @@ int MneSurfaceOrVolume::filter_source_spaces(float limit, char *bemfile, FiffCoo
                 delete a;
             rearrange_source_space(spaces[k]);
         }
-//    }
-//    else {
-        qDebug() << "!!!! TODO !!!! Implement thread version using QtConcurrent";
-//        /*
-//         * Calculate all (both) source spaces simultaneously
-//         */
-//        filterThreadArg *args = MALLOC_17(nspace,filterThreadArg);
-//        pthread_t      *threads = MALLOC_17(nspace,pthread_t);
-//        pthread_attr_t pthread_custom_attr;
+    }
+    else {
+        /*
+        * Calculate all (both) source spaces simultaneously
+        */
+        QList<FilterThreadArg*> args;//filterThreadArg *args = MALLOC_17(nspace,filterThreadArg);
 
-//        for (k = 0; k < nspace; k++) {
-//            args[k] = a = new_filter_thread_arg();
-//            a->s = spaces[k];
-//            a->mri_head_t = mri_head_t;
-//            a->surf = surf;
-//            a->limit = limit;
-//            a->filtered = filtered;
-//        }
-//        /*
-//         * Ready to start the threads
-//         */
-//        pthread_attr_init(&pthread_custom_attr);
-//        for (k = 0; k < nspace; k++)
-//            pthread_create(threads+k,&pthread_custom_attr,filter_source_space,args[k]);
-//        /*
-//         * Wait for them to complete
-//         */
-//        for (k = 0; k < nspace; k++)
-//            pthread_join(threads[k],NULL);
+        for (k = 0; k < nspace; k++) {
+            a = new FilterThreadArg();
+            a->s = spaces[k];
+            a->mri_head_t = mri_head_t;
+            a->surf = surf;
+            a->limit = limit;
+            a->filtered = filtered;
+            args.append(a);
+        }
+        /*
+        * Ready to start the threads & Wait for them to complete
+        */
+        QtConcurrent::blockingMap(args, filter_source_space);
 
-//        for (k = 0; k < nspace; k++) {
-//            rearrange_source_space(spaces[k]);
-//            free_filter_thread_arg(args[k]);
-//        }
-//        FREE_17(threads);
-//        FREE_17(args);
-//    }
+        for (k = 0; k < nspace; k++) {
+            rearrange_source_space(spaces[k]);
+            if(args[k])
+                delete args[k];
+        }
+    }
     if(surf)
         delete surf;
     printf("Thank you for waiting.\n\n");

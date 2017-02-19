@@ -1849,10 +1849,6 @@ out : {
 
         if (!res)
             qCritical("err_print_error();");//err_print_error();
-        if (res)
-            exit(0);
-        else
-            exit(1);
     }
 }
 
