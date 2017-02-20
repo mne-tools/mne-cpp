@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     reference.h
+* @file     referencetoolbarwidget.h
 * @author   Viktor Klüber <viktor.klueber@tu-ilmenau.de>;
 *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the DummyYourWidget class.
+* @brief    Contains the declaration of the ReferenceToolbarWidget class.
 *
 */
 
@@ -73,6 +73,7 @@ namespace REFERENCEPLUGIN
 
 class Reference;
 
+
 //=============================================================================================================
 /**
 * DECLARE CLASS ReferenceToolbarWidget
@@ -85,8 +86,8 @@ class REFERENCESHARED_EXPORT ReferenceToolbarWidget : public QWidget
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<ReferenceToolbarWidget> SPtr;         /**< Shared pointer type for DummyYourWidget. */
-    typedef QSharedPointer<ReferenceToolbarWidget> ConstSPtr;    /**< Const shared pointer type for DummyYourWidget. */
+    typedef QSharedPointer<ReferenceToolbarWidget> SPtr;         /**< Shared pointer type for ReferenceToolbarWidget object. */
+    typedef QSharedPointer<ReferenceToolbarWidget> ConstSPtr;    /**< Const shared pointer type for ReferenceToolbarWidget object. */
 
     //=========================================================================================================
     /**
