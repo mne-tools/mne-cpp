@@ -43,16 +43,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <iostream>
 #include <fstream>
-#include <cmath>
-#include <cstring>
-#include <vector>
-#include <map>
-#include <tchar.h>
-#include <string.h>
-#include <windows.h>
-#include <eemagine/sdk/factory.h> // SDK header
 
 
 //*************************************************************************************************************
@@ -68,25 +59,30 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QSharedPointer>
-#include <qapplication.h>
+#include <QString>
 #include <QVector>
-#include <QSysInfo>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE TMSIPlugin
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+namespace eemagine {
+    namespace sdk {
+        class stream;
+        class amplifier;
+    }
+}
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE EEGOSPORTSPLUGIN
 //=============================================================================================================
 
 namespace EEGOSPORTSPLUGIN
 {
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
 
 
 //*************************************************************************************************************
@@ -109,16 +105,17 @@ class EEGoSportsProducer;
 /**
 * EEGoSportsDriver
 *
-* @brief The EEGoSportsDriver class provides real time data acquisition of EEG data with a TMSi Refa device.
+* @brief The EEGoSportsDriver class provides real time data acquisition of EEG data with a EEGoSports device.
 */
 class EEGoSportsDriver
 {
+
 public:
     //=========================================================================================================
     /**
     * Constructs a EEGoSportsDriver.
     *
-    * @param [in] pEEGoSportsProducer a pointer to the corresponding EEGoSports Producer class.
+    * @param [in] pEEGoSportsProducer a pointer to the corresponding EEGoSportsProducer class.
     */
     EEGoSportsDriver(EEGoSportsProducer* pEEGoSportsProducer);
 
@@ -173,7 +170,7 @@ private:
     QString                     m_sOutputFilePath;              /**< Holds the path for the output file. Defined by the user via the GUI.*/
     bool                        m_bMeasureImpedances;           /**< Flag for impedance measuring mode.*/
 
-    QVector<Eigen::VectorXd>    m_vecSampleBlockBuffer;         /**< Buffer to store all the incoming smaples. This is the buffer which is getting read from.*/
+    QList<Eigen::VectorXd>      m_lSampleBlockBuffer;           /**< Buffer to store all the incoming smaples. This is the buffer which is getting read from.*/
 
     eemagine::sdk::stream*      m_pDataStream;                  /**< The EEG/Impedance data stream.*/
     eemagine::sdk::amplifier*   m_pAmplifier;                   /**< Interface to the amplifier.*/
