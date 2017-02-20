@@ -20,13 +20,14 @@
 
 #include <QCoreApplication>
 #include <QFile>
-
+#include <QDir>
+#include <QDateTime>
+//#include <QNetworkInterface>
 
 using namespace Eigen;
 using namespace INVERSELIB;
 using namespace FIFFLIB;
 using namespace FWDLIB;
-
 
 #ifndef TRUE
 #define TRUE 1
@@ -116,16 +117,16 @@ float **mne_cmatrix_41(int nr,int nc)
 int **mne_imatrix_41(int nr,int nc)
 
 {
-  int i,**m;
-  int *whole;
+    int i,**m;
+    int *whole;
 
-  m = MALLOC_41(nr,int *);
-  if (!m) matrix_error_41(1,nr,nc);
-  whole = MALLOC_41(nr*nc,int);
-  if (!whole) matrix_error_41(2,nr,nc);
-  for(i=0;i<nr;i++)
-    m[i] = whole + i*nc;
-  return m;
+    m = MALLOC_41(nr,int *);
+    if (!m) matrix_error_41(1,nr,nc);
+    whole = MALLOC_41(nr*nc,int);
+    if (!whole) matrix_error_41(2,nr,nc);
+    for(i=0;i<nr;i++)
+        m[i] = whole + i*nc;
+    return m;
 }
 
 
@@ -142,10 +143,10 @@ void mne_free_cmatrix_41 (float **m)
 void mne_free_icmatrix_41 (int **m)
 
 {
-  if (m) {
-    FREE_41(*m);
-    FREE_41(m);
-  }
+    if (m) {
+        FREE_41(*m);
+        FREE_41(m);
+    }
 }
 
 
@@ -473,17 +474,17 @@ void write_coord_trans_old(FiffStream::SPtr& t_pStream, const FiffCoordTransOld*
 
 
 static int **make_file_triangle_list_41(int **tris, int ntri)
-     /*
+/*
       * In the file the numbering starts from one
       */
 {
-  int **res = ALLOC_ICMATRIX_41(ntri,3);
-  int j,k;
+    int **res = ALLOC_ICMATRIX_41(ntri,3);
+    int j,k;
 
-  for (j = 0; j < ntri; j++)
-    for (k = 0; k < 3; k++)
-      res[j][k] = tris[j][k]+1;
-  return res;
+    for (j = 0; j < ntri; j++)
+        for (k = 0; k < 3; k++)
+            res[j][k] = tris[j][k]+1;
+    return res;
 }
 
 
@@ -500,52 +501,52 @@ static int **make_file_triangle_list_41(int **tris, int ntri)
 void mne_write_bad_channel_list_new(FiffStream::SPtr& t_pStream, const QStringList& t_badList)//FILE *out, char **list, int nlist)
 {
 
-     t_pStream->start_block(FIFFB_MNE_BAD_CHANNELS);
-     t_pStream->write_name_list(FIFF_MNE_CH_NAME_LIST,t_badList);
-     t_pStream->end_block(FIFFB_MNE_BAD_CHANNELS);
+    t_pStream->start_block(FIFFB_MNE_BAD_CHANNELS);
+    t_pStream->write_name_list(FIFF_MNE_CH_NAME_LIST,t_badList);
+    t_pStream->end_block(FIFFB_MNE_BAD_CHANNELS);
 
 
-     /////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////
 
-//    fiff_int_t  bad_channel_block = FIFFB_MNE_BAD_CHANNELS;
-//    fiffTagRec  bad_channel_block_tags[] = {
-//        { FIFF_BLOCK_START,      FIFFT_INT,    0, FIFFV_NEXT_SEQ, NULL },
-//        { FIFF_MNE_CH_NAME_LIST, FIFFT_STRING, 0, FIFFV_NEXT_SEQ, NULL },
-//        { FIFF_BLOCK_END,        FIFFT_INT,    0, FIFFV_NEXT_SEQ, NULL }};
-//    int         nbad_channel_block_tags = 3;
-//    char        *names = NULL;
-//    int         k;
+    //    fiff_int_t  bad_channel_block = FIFFB_MNE_BAD_CHANNELS;
+    //    fiffTagRec  bad_channel_block_tags[] = {
+    //        { FIFF_BLOCK_START,      FIFFT_INT,    0, FIFFV_NEXT_SEQ, NULL },
+    //        { FIFF_MNE_CH_NAME_LIST, FIFFT_STRING, 0, FIFFV_NEXT_SEQ, NULL },
+    //        { FIFF_BLOCK_END,        FIFFT_INT,    0, FIFFV_NEXT_SEQ, NULL }};
+    //    int         nbad_channel_block_tags = 3;
+    //    char        *names = NULL;
+    //    int         k;
 
-//    if (nlist <= 0)
-//        return OK;
+    //    if (nlist <= 0)
+    //        return OK;
 
-//    names = mne_name_list_to_string(list,nlist);
-//    bad_channel_block_tags[0].size = sizeof(fiff_int_t);
-//    bad_channel_block_tags[0].data = &bad_channel_block;
+    //    names = mne_name_list_to_string(list,nlist);
+    //    bad_channel_block_tags[0].size = sizeof(fiff_int_t);
+    //    bad_channel_block_tags[0].data = &bad_channel_block;
 
-//    bad_channel_block_tags[1].size = strlen(names);
-//    bad_channel_block_tags[1].data = names;
+    //    bad_channel_block_tags[1].size = strlen(names);
+    //    bad_channel_block_tags[1].data = names;
 
-//    bad_channel_block_tags[2].size = sizeof(fiff_int_t);
-//    bad_channel_block_tags[2].data = &bad_channel_block;
+    //    bad_channel_block_tags[2].size = sizeof(fiff_int_t);
+    //    bad_channel_block_tags[2].data = &bad_channel_block;
 
-//    for (k = 0; k < nbad_channel_block_tags; k++)
-//        if (fiff_write_tag(out,bad_channel_block_tags+k) == FIFF_FAIL) {
-//            FREE(names);
-//            return FAIL;
-//        }
-//    FREE(names);
-//    return OK;
+    //    for (k = 0; k < nbad_channel_block_tags; k++)
+    //        if (fiff_write_tag(out,bad_channel_block_tags+k) == FIFF_FAIL) {
+    //            FREE(names);
+    //            return FAIL;
+    //        }
+    //    FREE(names);
+    //    return OK;
 }
 
 
 
 
 void fiff_write_float_matrix_old (  FiffStream::SPtr& t_pStream,    /* Destination file name */
-                                int          kind,              /* What kind of tag */
-                                fiff_float_t **data,            /* The data to write */
-                                int          rows,
-                                int          cols)              /* Number of rows and columns */
+                                    int          kind,              /* What kind of tag */
+                                    fiff_float_t **data,            /* The data to write */
+                                    int          rows,
+                                    int          cols)              /* Number of rows and columns */
 /*
 * Write out a 2D floating-point matrix
 */
@@ -560,59 +561,59 @@ void fiff_write_float_matrix_old (  FiffStream::SPtr& t_pStream,    /* Destinati
 
     t_pStream->write_float_matrix(kind, mat);
 
-//  int res,*dims;
-//  fiffTagRec tag;
-//#ifdef INTEL_X86_ARCH
-//  int c;
-//#endif
-//  int k;
-//  int rowsize;
+    //  int res,*dims;
+    //  fiffTagRec tag;
+    //#ifdef INTEL_X86_ARCH
+    //  int c;
+    //#endif
+    //  int k;
+    //  int rowsize;
 
-//  tag.kind = kind;
-//  tag.type = FIFFT_FLOAT | FIFFT_MATRIX;
-//  tag.size = rows*cols*sizeof(fiff_float_t) + 3*sizeof(fiff_int_t);
-//  tag.data = NULL;
-//  tag.next = FIFFV_NEXT_SEQ;
+    //  tag.kind = kind;
+    //  tag.type = FIFFT_FLOAT | FIFFT_MATRIX;
+    //  tag.size = rows*cols*sizeof(fiff_float_t) + 3*sizeof(fiff_int_t);
+    //  tag.data = NULL;
+    //  tag.next = FIFFV_NEXT_SEQ;
 
-//  if ((res = fiff_write_tag_info(out,&tag)) == -1)
-//    return FIFF_FAIL;
+    //  if ((res = fiff_write_tag_info(out,&tag)) == -1)
+    //    return FIFF_FAIL;
 
-//  rowsize = cols*sizeof(fiff_float_t);
-//  for (k = 0; k < rows; k++) {
-//#ifdef INTEL_X86_ARCH
-//    for (c = 0; c < cols; c++)
-//      swap_float(data[k]+c);
-//#endif
-//    if (fwrite (data[k],rowsize,1,out) != 1) {
-//      if (ferror(out))
-//    err_set_sys_error("fwrite");
-//      else
-//    err_set_error("fwrite failed");
-//#ifdef INTEL_X86_ARCH
-//      for (c = 0; c < cols; c++)
-//    swap_float(data[k]+c);
-//#endif
-//      return FIFF_FAIL;
-//    }
-//#ifdef INTEL_X86_ARCH
-//    for (c = 0; c < cols; c++)
-//      swap_float(data[k]+c);
-//#endif
-//  }
-//  dims = MALLOC_41(3,fiff_int_t);
-//  dims[0] = swap_int(cols);
-//  dims[1] = swap_int(rows);
-//  dims[2] = swap_int(2);
-//  if (fwrite (dims,3*sizeof(fiff_int_t),1,out) != 1) {
-//    if (ferror(out))
-//      err_set_sys_error("fwrite");
-//    else
-//      err_set_error("fwrite failed");
-//    FREE(dims);
-//    return FIFF_FAIL;
-//  }
-//  FREE(dims);
-//  return res;
+    //  rowsize = cols*sizeof(fiff_float_t);
+    //  for (k = 0; k < rows; k++) {
+    //#ifdef INTEL_X86_ARCH
+    //    for (c = 0; c < cols; c++)
+    //      swap_float(data[k]+c);
+    //#endif
+    //    if (fwrite (data[k],rowsize,1,out) != 1) {
+    //      if (ferror(out))
+    //    err_set_sys_error("fwrite");
+    //      else
+    //    err_set_error("fwrite failed");
+    //#ifdef INTEL_X86_ARCH
+    //      for (c = 0; c < cols; c++)
+    //    swap_float(data[k]+c);
+    //#endif
+    //      return FIFF_FAIL;
+    //    }
+    //#ifdef INTEL_X86_ARCH
+    //    for (c = 0; c < cols; c++)
+    //      swap_float(data[k]+c);
+    //#endif
+    //  }
+    //  dims = MALLOC_41(3,fiff_int_t);
+    //  dims[0] = swap_int(cols);
+    //  dims[1] = swap_int(rows);
+    //  dims[2] = swap_int(2);
+    //  if (fwrite (dims,3*sizeof(fiff_int_t),1,out) != 1) {
+    //    if (ferror(out))
+    //      err_set_sys_error("fwrite");
+    //    else
+    //      err_set_error("fwrite failed");
+    //    FREE(dims);
+    //    return FIFF_FAIL;
+    //  }
+    //  FREE(dims);
+    //  return res;
 }
 
 
@@ -621,7 +622,7 @@ void fiff_write_int_matrix_old (    FiffStream::SPtr& t_pStream,
                                     fiff_int_t **data,      /* The data to write */
                                     int        rows,
                                     int        cols)        /* Number of rows and columns */
-     /*
+/*
       * Write out a 2D integer matrix
       */
 {
@@ -636,59 +637,59 @@ void fiff_write_int_matrix_old (    FiffStream::SPtr& t_pStream,
     t_pStream->write_int_matrix(kind, mat);
 
 
-//  int res,*dims;
-//  fiffTagRec tag;
-//#ifdef INTEL_X86_ARCH
-//  int c;
-//#endif
-//  int k;
-//  int rowsize;
+    //  int res,*dims;
+    //  fiffTagRec tag;
+    //#ifdef INTEL_X86_ARCH
+    //  int c;
+    //#endif
+    //  int k;
+    //  int rowsize;
 
-//  tag.kind = kind;
-//  tag.type = FIFFT_INT | FIFFT_MATRIX;
-//  tag.size = rows*cols*sizeof(fiff_int_t) + 3*sizeof(fiff_int_t);
-//  tag.data = NULL;
-//  tag.next = FIFFV_NEXT_SEQ;
+    //  tag.kind = kind;
+    //  tag.type = FIFFT_INT | FIFFT_MATRIX;
+    //  tag.size = rows*cols*sizeof(fiff_int_t) + 3*sizeof(fiff_int_t);
+    //  tag.data = NULL;
+    //  tag.next = FIFFV_NEXT_SEQ;
 
-//  if ((res = fiff_write_tag_info(out,&tag)) == -1)
-//    return -1;
+    //  if ((res = fiff_write_tag_info(out,&tag)) == -1)
+    //    return -1;
 
-//  rowsize = cols*sizeof(fiff_int_t);
-//  for (k = 0; k < rows; k++) {
-//#ifdef INTEL_X86_ARCH
-//    for (c = 0; c < cols; c++)
-//      data[k][c] = swap_int(data[k][c]);
-//#endif
-//    if (fwrite (data[k],rowsize,1,out) != 1) {
-//      if (ferror(out))
-//    err_set_sys_error("fwrite");
-//      else
-//    err_set_error("fwrite failed");
-//      return -1;
-//#ifdef INTEL_X86_ARCH
-//      for (c = 0; c < cols; c++)
-//    data[k][c] = swap_int(data[k][c]);
-//#endif
-//    }
-//#ifdef INTEL_X86_ARCH
-//    for (c = 0; c < cols; c++)
-//      data[k][c] = swap_int(data[k][c]);
-//#endif
-//  }
-//  dims    = MALLOC_41(3,fiff_int_t);
-//  dims[0] = swap_int(cols);
-//  dims[1] = swap_int(rows);
-//  dims[2] = swap_int(2);
-//  if (fwrite (dims,3*sizeof(fiff_int_t),1,out) != 1) {
-//    if (ferror(out))
-//      err_set_sys_error("fwrite");
-//    else
-//      err_set_error("fwrite failed");
-//    FREE(dims);
-//    return -1;
-//  }
-//  FREE(dims);
-//  return res;
+    //  rowsize = cols*sizeof(fiff_int_t);
+    //  for (k = 0; k < rows; k++) {
+    //#ifdef INTEL_X86_ARCH
+    //    for (c = 0; c < cols; c++)
+    //      data[k][c] = swap_int(data[k][c]);
+    //#endif
+    //    if (fwrite (data[k],rowsize,1,out) != 1) {
+    //      if (ferror(out))
+    //    err_set_sys_error("fwrite");
+    //      else
+    //    err_set_error("fwrite failed");
+    //      return -1;
+    //#ifdef INTEL_X86_ARCH
+    //      for (c = 0; c < cols; c++)
+    //    data[k][c] = swap_int(data[k][c]);
+    //#endif
+    //    }
+    //#ifdef INTEL_X86_ARCH
+    //    for (c = 0; c < cols; c++)
+    //      data[k][c] = swap_int(data[k][c]);
+    //#endif
+    //  }
+    //  dims    = MALLOC_41(3,fiff_int_t);
+    //  dims[0] = swap_int(cols);
+    //  dims[1] = swap_int(rows);
+    //  dims[2] = swap_int(2);
+    //  if (fwrite (dims,3*sizeof(fiff_int_t),1,out) != 1) {
+    //    if (ferror(out))
+    //      err_set_sys_error("fwrite");
+    //    else
+    //      err_set_error("fwrite failed");
+    //    FREE(dims);
+    //    return -1;
+    //  }
+    //  FREE(dims);
+    //  return res;
 }
 
 
@@ -715,15 +716,15 @@ int fiff_write_float_sparse_matrix_old(FiffStream::SPtr& t_pStream, int kind, Fi
 static int comp_points2(const void *vp1,const void *vp2)
 
 {
-  MneNearest* v1 = (MneNearest*)vp1;
-  MneNearest* v2 = (MneNearest*)vp2;
+    MneNearest* v1 = (MneNearest*)vp1;
+    MneNearest* v2 = (MneNearest*)vp2;
 
-  if (v1->vert > v2->vert)
-    return 1;
-  else if (v1->vert == v2->vert)
-    return 0;
-  else
-    return -1;
+    if (v1->vert > v2->vert)
+        return 1;
+    else if (v1->vert == v2->vert)
+        return 0;
+    else
+        return -1;
 }
 
 void mne_sort_nearest_by_vertex(MneNearest* points, int npoint)
@@ -935,22 +936,22 @@ static int write_volume_space_info(FiffStream::SPtr& t_pStream, MneSourceSpaceOl
     }
 
     t_pStream->write_int(FIFF_MNE_SOURCE_SPACE_NNEIGHBORS,nneighbors,nvert);
-//    tag.next = FIFFV_NEXT_SEQ;
-//    tag.kind = FIFF_MNE_SOURCE_SPACE_NNEIGHBORS;
-//    tag.type = FIFFT_INT;
-//    tag.size = nvert*sizeof(fiff_int_t);
-//    tag.data = (fiff_byte_t *)nneighbors;
-//    if (fiff_write_tag(out,&tag) == FIFF_FAIL)
-//        goto out;
+    //    tag.next = FIFFV_NEXT_SEQ;
+    //    tag.kind = FIFF_MNE_SOURCE_SPACE_NNEIGHBORS;
+    //    tag.type = FIFFT_INT;
+    //    tag.size = nvert*sizeof(fiff_int_t);
+    //    tag.data = (fiff_byte_t *)nneighbors;
+    //    if (fiff_write_tag(out,&tag) == FIFF_FAIL)
+    //        goto out;
 
     t_pStream->write_int(FIFF_MNE_SOURCE_SPACE_NEIGHBORS,neighbors,ntot);
-//    tag.next = FIFFV_NEXT_SEQ;
-//    tag.kind = FIFF_MNE_SOURCE_SPACE_NEIGHBORS;
-//    tag.type = FIFFT_INT;
-//    tag.size = ntot*sizeof(fiff_int_t);
-//    tag.data = (fiff_byte_t *)neighbors;
-//    if (fiff_write_tag(out,&tag) == FIFF_FAIL)
-//        goto out;
+    //    tag.next = FIFFV_NEXT_SEQ;
+    //    tag.kind = FIFF_MNE_SOURCE_SPACE_NEIGHBORS;
+    //    tag.type = FIFFT_INT;
+    //    tag.size = ntot*sizeof(fiff_int_t);
+    //    tag.data = (fiff_byte_t *)neighbors;
+    //    if (fiff_write_tag(out,&tag) == FIFF_FAIL)
+    //        goto out;
 
     /*
     * Write some additional stuff
@@ -960,13 +961,13 @@ static int write_volume_space_info(FiffStream::SPtr& t_pStream, MneSourceSpaceOl
             write_coord_trans_old(t_pStream, ss->voxel_surf_RAS_t);//t_pStream->write_coord_trans(ss->voxel_surf_RAS_t);
 
             t_pStream->write_int(FIFF_MNE_SOURCE_SPACE_VOXEL_DIMS,ss->vol_dims,3);
-//            tag.next = FIFFV_NEXT_SEQ;
-//            tag.kind = FIFF_MNE_SOURCE_SPACE_VOXEL_DIMS;
-//            tag.type = FIFFT_INT;
-//            tag.size = 3*sizeof(fiff_int_t);
-//            tag.data = (fiff_byte_t *)ss->vol_dims;
-//            if (fiff_write_tag(out,&tag) == FIFF_FAIL)
-//                goto out;
+            //            tag.next = FIFFV_NEXT_SEQ;
+            //            tag.kind = FIFF_MNE_SOURCE_SPACE_VOXEL_DIMS;
+            //            tag.type = FIFFT_INT;
+            //            tag.size = 3*sizeof(fiff_int_t);
+            //            tag.data = (fiff_byte_t *)ss->vol_dims;
+            //            if (fiff_write_tag(out,&tag) == FIFF_FAIL)
+            //                goto out;
         }
         if (ss->interpolator && ss->MRI_volume) {
             t_pStream->start_block(FIFFB_MNE_PARENT_MRI_FILE);
@@ -1090,7 +1091,7 @@ int mne_write_one_source_space(FiffStream::SPtr& t_pStream, MneSourceSpaceOld* s
 #endif
     }
     else {
-//        fiffTagRec tag;
+        //        fiffTagRec tag;
         t_pStream->write_int(FIFF_MNE_SOURCE_SPACE_NPOINTS,&ss->np);
 
         fiff_write_float_matrix_old(t_pStream, FIFF_MNE_SOURCE_SPACE_POINTS, ss->rr, ss->np, 3);
@@ -1099,39 +1100,39 @@ int mne_write_one_source_space(FiffStream::SPtr& t_pStream, MneSourceSpaceOld* s
 
         if (ss->nuse > 0 && ss->inuse) {
             t_pStream->write_int(FIFF_MNE_SOURCE_SPACE_SELECTION,ss->inuse,ss->np);
-//            tag.next = 0;
-//            tag.kind = FIFF_MNE_SOURCE_SPACE_SELECTION;
-//            tag.type = FIFFT_INT;
-//            tag.size = (ss->np)*sizeof(fiff_int_t);
-//            tag.data = (fiff_byte_t *)(ss->inuse);
-//            if (fiff_write_tag(out,&tag) == FIFF_FAIL)
-//                goto bad;
+            //            tag.next = 0;
+            //            tag.kind = FIFF_MNE_SOURCE_SPACE_SELECTION;
+            //            tag.type = FIFFT_INT;
+            //            tag.size = (ss->np)*sizeof(fiff_int_t);
+            //            tag.data = (fiff_byte_t *)(ss->inuse);
+            //            if (fiff_write_tag(out,&tag) == FIFF_FAIL)
+            //                goto bad;
             t_pStream->write_int(FIFF_MNE_SOURCE_SPACE_NUSE,&ss->nuse);
-//            if (fiff_write_int_tag (out, FIFF_MNE_SOURCE_SPACE_NUSE,ss->nuse) == FIFF_FAIL)
-//                goto bad;
+            //            if (fiff_write_int_tag (out, FIFF_MNE_SOURCE_SPACE_NUSE,ss->nuse) == FIFF_FAIL)
+            //                goto bad;
         }
         if (ss->ntri > 0) { /* Write the triangulation information */
             t_pStream->write_int(FIFF_MNE_SOURCE_SPACE_NTRI,&ss->ntri);
-//            if (fiff_write_int_tag(out,FIFF_MNE_SOURCE_SPACE_NTRI,ss->ntri) == FIFF_FAIL)
-//                goto bad;
+            //            if (fiff_write_int_tag(out,FIFF_MNE_SOURCE_SPACE_NTRI,ss->ntri) == FIFF_FAIL)
+            //                goto bad;
             tris = make_file_triangle_list_41(ss->itris,ss->ntri);
 
             fiff_write_int_matrix_old(t_pStream, FIFF_MNE_SOURCE_SPACE_TRIANGLES, tris, ss->ntri, 3);
-//            if (fiff_write_int_matrix(out,FIFF_MNE_SOURCE_SPACE_TRIANGLES,tris,
-//                                      ss->ntri,3) == FIFF_FAIL)
-//                goto bad;
+            //            if (fiff_write_int_matrix(out,FIFF_MNE_SOURCE_SPACE_TRIANGLES,tris,
+            //                                      ss->ntri,3) == FIFF_FAIL)
+            //                goto bad;
             FREE_ICMATRIX_41(tris); tris = NULL;
         }
         if (ss->nuse_tri > 0) { /* Write the triangulation information for the vertices in use */
             t_pStream->write_int(FIFF_MNE_SOURCE_SPACE_NUSE_TRI,&ss->nuse_tri);
-//            if (fiff_write_int_tag(out,FIFF_MNE_SOURCE_SPACE_NUSE_TRI,ss->nuse_tri) == FIFF_FAIL)
-//                goto bad;
+            //            if (fiff_write_int_tag(out,FIFF_MNE_SOURCE_SPACE_NUSE_TRI,ss->nuse_tri) == FIFF_FAIL)
+            //                goto bad;
             tris = make_file_triangle_list_41(ss->use_itris,ss->nuse_tri);
 
             fiff_write_int_matrix_old(t_pStream, FIFF_MNE_SOURCE_SPACE_USE_TRIANGLES, tris, ss->nuse_tri, 3);
-//            if (fiff_write_int_matrix(out,FIFF_MNE_SOURCE_SPACE_USE_TRIANGLES,tris,
-//                                      ss->nuse_tri,3) == FIFF_FAIL)
-//                goto bad;
+            //            if (fiff_write_int_matrix(out,FIFF_MNE_SOURCE_SPACE_USE_TRIANGLES,tris,
+            //                                      ss->nuse_tri,3) == FIFF_FAIL)
+            //                goto bad;
             FREE_ICMATRIX_41(tris); tris = NULL;
         }
         if (ss->nearest) {    /* Write the patch information */
@@ -1145,22 +1146,22 @@ int mne_write_one_source_space(FiffStream::SPtr& t_pStream, MneSourceSpaceOld* s
             }
 
             t_pStream->write_int(FIFF_MNE_SOURCE_SPACE_NEAREST,nearest,ss->np);
-//            tag.next = FIFFV_NEXT_SEQ;
-//            tag.kind = FIFF_MNE_SOURCE_SPACE_NEAREST;
-//            tag.type = FIFFT_INT;
-//            tag.size = (ss->np)*sizeof(fiff_int_t);
-//            tag.data = (fiff_byte_t *)(nearest);
-//            if (fiff_write_tag(out,&tag) == FIFF_FAIL)
-//                goto bad;
+            //            tag.next = FIFFV_NEXT_SEQ;
+            //            tag.kind = FIFF_MNE_SOURCE_SPACE_NEAREST;
+            //            tag.type = FIFFT_INT;
+            //            tag.size = (ss->np)*sizeof(fiff_int_t);
+            //            tag.data = (fiff_byte_t *)(nearest);
+            //            if (fiff_write_tag(out,&tag) == FIFF_FAIL)
+            //                goto bad;
 
             t_pStream->write_float(FIFF_MNE_SOURCE_SPACE_NEAREST_DIST,nearest_dist,ss->np);
-//            tag.next = FIFFV_NEXT_SEQ;
-//            tag.kind = FIFF_MNE_SOURCE_SPACE_NEAREST_DIST;
-//            tag.type = FIFFT_FLOAT;
-//            tag.size = (ss->np)*sizeof(fiff_float_t);
-//            tag.data = (fiff_byte_t *)(nearest_dist);
-//            if (fiff_write_tag(out,&tag) == FIFF_FAIL)
-//                goto bad;
+            //            tag.next = FIFFV_NEXT_SEQ;
+            //            tag.kind = FIFF_MNE_SOURCE_SPACE_NEAREST_DIST;
+            //            tag.type = FIFFT_FLOAT;
+            //            tag.size = (ss->np)*sizeof(fiff_float_t);
+            //            tag.data = (fiff_byte_t *)(nearest_dist);
+            //            if (fiff_write_tag(out,&tag) == FIFF_FAIL)
+            //                goto bad;
 
             FREE_41(nearest); nearest = NULL;
             FREE_41(nearest_dist); nearest_dist = NULL;
@@ -1183,8 +1184,8 @@ int mne_write_one_source_space(FiffStream::SPtr& t_pStream, MneSourceSpaceOld* s
     /*
     * Volume source spaces have additional information
     */
-//    if (write_volume_space_info(out,ss,selected_only) == FIFF_FAIL)
-//        goto bad;
+    //    if (write_volume_space_info(out,ss,selected_only) == FIFF_FAIL)
+    //        goto bad;
 
     t_pStream->end_block(FIFFB_MNE_SOURCE_SPACE);
     return FIFF_OK;
@@ -1360,77 +1361,77 @@ int write_solution(const QString& name,         /* Destination file */
             goto bad;
         nvert += spaces[k]->nuse;
     }
-//    /*
-//    * MEG forward solution
-//    */
-//    if (nmeg > 0) {
-//        if (fiff_start_block (out,FIFFB_MNE_FORWARD_SOLUTION) == FIFF_FAIL)
-//            goto bad;
-//        if (fiff_write_int_tag (out,FIFF_MNE_INCLUDED_METHODS,FIFFV_MNE_MEG) == FIFF_FAIL)
-//            goto bad;
-//        if (fiff_write_int_tag (out,FIFF_MNE_COORD_FRAME,coord_frame) == FIFF_FAIL)
-//            goto bad;
-//        if (fiff_write_int_tag (out,FIFF_MNE_SOURCE_ORIENTATION,
-//                                fixed_ori ? FIFFV_MNE_FIXED_ORI : FIFFV_MNE_FREE_ORI) == FIFF_FAIL)
-//            goto bad;
-//        if (fiff_write_int_tag (out,FIFF_MNE_SOURCE_SPACE_NPOINTS,nvert) == FIFF_FAIL)
-//            goto bad;
-//        if (fiff_write_int_tag (out,FIFF_NCHAN,nmeg) == FIFF_FAIL)
-//            goto bad;
-//        if (mne_write_named_matrix(out,FIFF_MNE_FORWARD_SOLUTION,meg_solution) == FIFF_FAIL)
-//            goto bad;
-//        if (meg_solution_grad)
-//            if (mne_write_named_matrix(out,FIFF_MNE_FORWARD_SOLUTION_GRAD,meg_solution_grad) == FIFF_FAIL)
-//                goto bad;
-//        if (fiff_end_block (out,FIFFB_MNE_FORWARD_SOLUTION) == FIFF_FAIL)
-//            goto bad;
-//    }
-//    /*
-//    * EEG forward solution
-//    */
-//    if (neeg > 0) {
-//        if (fiff_start_block (out,FIFFB_MNE_FORWARD_SOLUTION) == FIFF_FAIL)
-//            goto bad;
-//        if (fiff_write_int_tag (out,FIFF_MNE_INCLUDED_METHODS,FIFFV_MNE_EEG) == FIFF_FAIL)
-//            goto bad;
-//        if (fiff_write_int_tag (out,FIFF_MNE_COORD_FRAME,coord_frame) == FIFF_FAIL)
-//            goto bad;
-//        if (fiff_write_int_tag (out,FIFF_MNE_SOURCE_ORIENTATION,
-//                                fixed_ori ? FIFFV_MNE_FIXED_ORI : FIFFV_MNE_FREE_ORI) == FIFF_FAIL)
-//            goto bad;
-//        if (fiff_write_int_tag (out,FIFF_NCHAN,neeg) == FIFF_FAIL)
-//            goto bad;
-//        if (fiff_write_int_tag (out,FIFF_MNE_SOURCE_SPACE_NPOINTS,nvert) == FIFF_FAIL)
-//            goto bad;
-//        if (mne_write_named_matrix(out,FIFF_MNE_FORWARD_SOLUTION,eeg_solution) == FIFF_FAIL)
-//            goto bad;
-//        if (eeg_solution_grad)
-//            if (mne_write_named_matrix(out,FIFF_MNE_FORWARD_SOLUTION_GRAD,eeg_solution_grad) == FIFF_FAIL)
-//                goto bad;
-//        if (fiff_end_block (out,FIFFB_MNE_FORWARD_SOLUTION) == FIFF_FAIL)
-//            goto bad;
-//    }
-//    if (fiff_end_block (out,FIFFB_MNE) == FIFF_FAIL)
-//        goto bad;
-//    if (fiff_end_file (out) == FIFF_FAIL)
-//        goto bad;
-//    (void)fclose(out); out = NULL;
+    //    /*
+    //    * MEG forward solution
+    //    */
+    //    if (nmeg > 0) {
+    //        if (fiff_start_block (out,FIFFB_MNE_FORWARD_SOLUTION) == FIFF_FAIL)
+    //            goto bad;
+    //        if (fiff_write_int_tag (out,FIFF_MNE_INCLUDED_METHODS,FIFFV_MNE_MEG) == FIFF_FAIL)
+    //            goto bad;
+    //        if (fiff_write_int_tag (out,FIFF_MNE_COORD_FRAME,coord_frame) == FIFF_FAIL)
+    //            goto bad;
+    //        if (fiff_write_int_tag (out,FIFF_MNE_SOURCE_ORIENTATION,
+    //                                fixed_ori ? FIFFV_MNE_FIXED_ORI : FIFFV_MNE_FREE_ORI) == FIFF_FAIL)
+    //            goto bad;
+    //        if (fiff_write_int_tag (out,FIFF_MNE_SOURCE_SPACE_NPOINTS,nvert) == FIFF_FAIL)
+    //            goto bad;
+    //        if (fiff_write_int_tag (out,FIFF_NCHAN,nmeg) == FIFF_FAIL)
+    //            goto bad;
+    //        if (mne_write_named_matrix(out,FIFF_MNE_FORWARD_SOLUTION,meg_solution) == FIFF_FAIL)
+    //            goto bad;
+    //        if (meg_solution_grad)
+    //            if (mne_write_named_matrix(out,FIFF_MNE_FORWARD_SOLUTION_GRAD,meg_solution_grad) == FIFF_FAIL)
+    //                goto bad;
+    //        if (fiff_end_block (out,FIFFB_MNE_FORWARD_SOLUTION) == FIFF_FAIL)
+    //            goto bad;
+    //    }
+    //    /*
+    //    * EEG forward solution
+    //    */
+    //    if (neeg > 0) {
+    //        if (fiff_start_block (out,FIFFB_MNE_FORWARD_SOLUTION) == FIFF_FAIL)
+    //            goto bad;
+    //        if (fiff_write_int_tag (out,FIFF_MNE_INCLUDED_METHODS,FIFFV_MNE_EEG) == FIFF_FAIL)
+    //            goto bad;
+    //        if (fiff_write_int_tag (out,FIFF_MNE_COORD_FRAME,coord_frame) == FIFF_FAIL)
+    //            goto bad;
+    //        if (fiff_write_int_tag (out,FIFF_MNE_SOURCE_ORIENTATION,
+    //                                fixed_ori ? FIFFV_MNE_FIXED_ORI : FIFFV_MNE_FREE_ORI) == FIFF_FAIL)
+    //            goto bad;
+    //        if (fiff_write_int_tag (out,FIFF_NCHAN,neeg) == FIFF_FAIL)
+    //            goto bad;
+    //        if (fiff_write_int_tag (out,FIFF_MNE_SOURCE_SPACE_NPOINTS,nvert) == FIFF_FAIL)
+    //            goto bad;
+    //        if (mne_write_named_matrix(out,FIFF_MNE_FORWARD_SOLUTION,eeg_solution) == FIFF_FAIL)
+    //            goto bad;
+    //        if (eeg_solution_grad)
+    //            if (mne_write_named_matrix(out,FIFF_MNE_FORWARD_SOLUTION_GRAD,eeg_solution_grad) == FIFF_FAIL)
+    //                goto bad;
+    //        if (fiff_end_block (out,FIFFB_MNE_FORWARD_SOLUTION) == FIFF_FAIL)
+    //            goto bad;
+    //    }
+    //    if (fiff_end_block (out,FIFFB_MNE) == FIFF_FAIL)
+    //        goto bad;
+    //    if (fiff_end_file (out) == FIFF_FAIL)
+    //        goto bad;
+    //    (void)fclose(out); out = NULL;
 
-//    /*
-//    * Add directory
-//    */
-//    if ((in = fiff_open_update(name)) == NULL)
-//        goto bad;
-//    if (fiff_put_dir(in->fd,in->dir) == FIFF_FAIL)
-//        goto bad;
-//    fiff_close(in); in = NULL;
+    //    /*
+    //    * Add directory
+    //    */
+    //    if ((in = fiff_open_update(name)) == NULL)
+    //        goto bad;
+    //    if (fiff_put_dir(in->fd,in->dir) == FIFF_FAIL)
+    //        goto bad;
+    //    fiff_close(in); in = NULL;
 
     return FIFF_OK;
 
 bad : {
-//        if (out != NULL)
-//            fclose(out);
-//        fiff_close(in);
+        //        if (out != NULL)
+        //            fclose(out);
+        //        fiff_close(in);
 
         return FIFF_FAIL;
     }
@@ -1438,6 +1439,190 @@ bad : {
 
 
 
+
+#define FIFFC_MAJOR_VERSION 1L
+#define FIFFC_MINOR_VERSION 1L
+
+#define FIFFC_VERSION (FIFFC_MAJOR_VERSION<<16 | FIFFC_MINOR_VERSION)
+
+
+int fiff_get_machid(int *fixed_id)
+{
+    qDebug() << "TODO fiff_get_machid: resemble QNetworkInterface::hardwareAddress()";
+    fixed_id[0] = 0;//QNetworkInterface::hardwareAddress(); //gethostid();
+    fixed_id[1] = 0;
+
+    return FIFF_OK;
+}
+
+
+int fiff_new_file_id (fiffId id)
+/*
+* Return a (hopefully) unique file id
+*/
+{
+    int fixed_id[2];
+
+    fixed_id[0] = fixed_id[1] = 0;
+    if (fiff_get_machid(fixed_id) == FIFF_FAIL) {
+        /*
+        * Never mind...
+        */
+        fixed_id[0] = fixed_id[1] = 0;
+    }
+    /*
+   * Internet address in the first two words
+   */
+    id->machid[0] = fixed_id[0];
+    id->machid[1] = fixed_id[1];
+    /*
+   * Time in the third and fourth words
+   */
+    /*
+   * Time in the third and fourth words
+   * Since practically no system gives times in
+   * true micro seconds, the last three digits
+   * are randomized to insure uniqueness.
+   */
+    {
+//        long secs,usecs;
+//        if (fiff_get_time(&secs, &usecs) == FIFF_FAIL) //
+//            return FIFF_FAIL;
+        id->time.secs  = QDateTime::currentSecsSinceEpoch();
+        id->time.usecs = rand() % 1000;
+    }
+    id->version = FIFFC_VERSION;
+    return FIFF_OK;
+}
+
+
+
+/*
+ * Process the environment information
+ */
+#define MAX_WD 1024
+
+
+int mne_attach_env(const QString& name, const QString& command)
+/*
+* Add the environment info for future reference
+*/
+{
+    int  insert_blocks[]  = { FIFFB_MNE , FIFFB_MEAS, FIFFB_MRI, FIFFB_BEM, -1 };
+    QString cwd = QDir::currentPath();
+    fiffIdRec id;
+    fiffFile  file = NULL;
+    int       b,k, insert;
+    fiffDirEntry ent;
+    fiffTagRec   tag;
+    fiffTag      tags = NULL,this_tag;
+    int          ntag = 0;
+    int          res = FIFF_FAIL;
+    QFile t_file(name);
+
+    tag.data = NULL;
+
+//    if (fiff_new_file_id(&id) == FIFF_FAIL)
+//        goto out;
+//#ifdef DEBUG
+//    fprintf(stderr,"\n");
+//    fprintf(stderr,"cwd   = %s\n",cwd);
+//    fprintf(stderr,"com   = %s\n",command);
+//    fprintf(stderr,"envid = %s\n",mne_format_file_id(&id));
+//#endif
+
+
+//    if (!t_file.exists()) {
+//        qCritical("File %s does not exist. Cannot attach env info.",name.toLatin1().constData());
+//        goto out;
+//    }
+//    if (!t_file.isWritable()) {
+//        qCritical("File %s is not writable. Cannot attach env info.",name.toLatin1().constData());
+//        goto out;
+//    }
+//    /*
+//   * Open the file to modify
+//   */
+//    if ((file = fiff_open_update(name)) == NULL)
+//        goto out;
+//    /*
+//   * Find an appropriate position to insert
+//   */
+//    for (insert = -1, b = 0; insert_blocks[b] >= 0; b++) {
+//        for (ent = file->dir, k = 0; k < file->nent; k++, ent++) {
+//            if (ent->kind == FIFF_BLOCK_START) {
+//                if (fiff_read_this_tag (file->fd,ent->pos,&tag) == -1)
+//                    goto out;
+//                if (*(int *)tag.data == insert_blocks[b]) {
+//                    insert = k;
+//                    break;
+//                }
+//            }
+//        }
+//        if (insert >= 0)
+//            break;
+//    }
+//    if (insert < 0) {
+//        qCritical("Suitable place for environment insertion not found.");
+//        goto out;
+//    }
+//    /*
+//   * Build the list of tags to insert
+//   */
+//    ntag = 5;
+//    tags = MALLOC(ntag,fiffTagRec);
+//    for (k = 0; k < ntag; k++) {
+//        tags[k].next = FIFFV_NEXT_SEQ;
+//        tags[k].data = NULL;
+//        tags[k].size = 0;
+//    }
+//    this_tag = tags;
+//    this_tag->kind = FIFF_BLOCK_START;
+//    this_tag->type = FIFFT_INT;
+//    this_tag->size = sizeof(fiff_int_t);
+//    this_tag->data = malloc(sizeof(fiff_int_t));
+//    *(fiff_int_t *)this_tag->data = FIFFB_MNE_ENV;
+//    this_tag++;
+
+//    this_tag->kind = FIFF_BLOCK_ID;
+//    this_tag->type = FIFFT_ID_STRUCT;
+//    this_tag->size = sizeof(fiffIdRec);
+//    this_tag->data = malloc(sizeof(fiffIdRec));
+//    *(fiffId)this_tag->data = id;
+//    this_tag++;
+
+//    this_tag->kind = FIFF_MNE_ENV_WORKING_DIR;
+//    this_tag->type = FIFFT_STRING;
+//    this_tag->size = strlen(cwd);
+//    this_tag->data = (fiff_byte_t *)strdup(cwd);
+//    this_tag++;
+
+//    this_tag->kind = FIFF_MNE_ENV_COMMAND_LINE;
+//    this_tag->type = FIFFT_STRING;
+//    this_tag->size = strlen(command);
+//    this_tag->data = (fiff_byte_t *)strdup(command);
+//    this_tag++;
+
+//    this_tag->kind = FIFF_BLOCK_END;
+//    this_tag->type = FIFFT_INT;
+//    this_tag->size = sizeof(fiff_int_t);
+//    this_tag->data = malloc(sizeof(fiff_int_t));
+//    *(fiff_int_t *)this_tag->data = FIFFB_MNE_ENV;
+
+//    if (fiff_insert_after (file,insert,tags,ntag) == FIFF_FAIL)
+//        goto out;
+    res = FIFF_OK;
+
+//out : {
+//        for (k = 0; k < ntag; k++)
+//            FREE_41(tags[k].data);
+//        FREE_41(tags);
+//        FREE_41(tag.data);
+//        fiff_close(file);
+//        FREE_41(cwd);
+        return res;
+//    }
+}
 
 
 //*************************************************************************************************************
@@ -1801,29 +1986,29 @@ void ComputeFwd::calculateFwd() const
     * We are ready to spill it out
     */
     printf("\nwriting %s...",settings->solname.toLatin1().constData());
-    if (write_solution(settings->solname,                 /* Destination file */
-                       spaces,                  /* The source spaces */
+    if (write_solution(settings->solname,               /* Destination file */
+                       spaces,                          /* The source spaces */
                        nspace,
-                       settings->mriname,mri_id,          /* MRI file and data obtained from there */
+                       settings->mriname,mri_id,        /* MRI file and data obtained from there */
                        mri_head_t,
-                       settings->measname,meas_id,        /* MEG file and data obtained from there */
+                       settings->measname,meas_id,      /* MEG file and data obtained from there */
                        meg_head_t,
                        megchs, nmeg,
                        eegchs, neeg,
-                       settings->fixed_ori,               /* Fixed orientation dipoles? */
-                       settings->coord_frame,             /* Coordinate frame */
+                       settings->fixed_ori,             /* Fixed orientation dipoles? */
+                       settings->coord_frame,           /* Coordinate frame */
                        meg_forward, eeg_forward,
                        meg_forward_grad, eeg_forward_grad) == FIFF_FAIL)
         goto out;
-//    if (mne_attach_env(solname,command) == FIFF_FAIL)
-//        goto out;
+    if (mne_attach_env(settings->solname,settings->command) == FIFF_FAIL)
+        goto out;
     printf("done\n");
     res = true;
     printf("\nFinished.\n");
 
 out : {
-//        if (out)
-//            fclose(out);
+        //        if (out)
+        //            fclose(out);
         for (k = 0; k < nspace; k++)
             if(spaces[k])
                 delete spaces[k];
