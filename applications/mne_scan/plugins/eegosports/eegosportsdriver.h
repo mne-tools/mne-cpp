@@ -170,7 +170,7 @@ private:
     QString                     m_sOutputFilePath;              /**< Holds the path for the output file. Defined by the user via the GUI.*/
     bool                        m_bMeasureImpedances;           /**< Flag for impedance measuring mode.*/
 
-    QVector<Eigen::VectorXd>    m_vecSampleBlockBuffer;         /**< Buffer to store all the incoming smaples. This is the buffer which is getting read from.*/
+    QList<Eigen::VectorXd>      m_lSampleBlockBuffer;           /**< Buffer to store all the incoming smaples. This is the buffer which is getting read from.*/
 
     eemagine::sdk::stream*      m_pDataStream;                  /**< The EEG/Impedance data stream.*/
     eemagine::sdk::amplifier*   m_pAmplifier;                   /**< Interface to the amplifier.*/
