@@ -222,7 +222,7 @@ int mne_read_meg_comp_eeg_ch_info_32(const QString& name,
         pos  = info->dir[k]->pos;
         switch (kind) {
         case FIFF_NCHAN :
-            if (!FiffTag::read_tag(stream,t_pTag,pos))
+            if (!stream->read_tag(t_pTag,pos))
                 goto bad;
             nchan = *t_pTag->toInt();
             chs = MALLOC_32(nchan,fiffChInfoRec);
@@ -232,14 +232,14 @@ int mne_read_meg_comp_eeg_ch_info_32(const QString& name,
             break;
 
         case FIFF_PARENT_BLOCK_ID :
-            if(!FiffTag::read_tag(stream, t_pTag, pos))
+            if(!stream->read_tag(t_pTag, pos))
                 goto bad;
 //            id = t_pTag->toFiffID();
             *id = *(fiffId)t_pTag->data();
             break;
 
         case FIFF_COORD_TRANS :
-            if(!FiffTag::read_tag(stream, t_pTag, pos))
+            if(!stream->read_tag(t_pTag, pos))
                 goto bad;
 //            t = t_pTag->toCoordTrans();
             t = FiffCoordTransOld::read_helper( t_pTag );
@@ -248,7 +248,7 @@ int mne_read_meg_comp_eeg_ch_info_32(const QString& name,
             break;
 
         case FIFF_CH_INFO : /* Information about one channel */
-            if(!FiffTag::read_tag(stream, t_pTag, pos))
+            if(!stream->read_tag(t_pTag, pos))
                 goto bad;
 //            this_ch = t_pTag->toChInfo();
             this_ch = (fiffChInfo)malloc(sizeof(fiffChInfoRec));

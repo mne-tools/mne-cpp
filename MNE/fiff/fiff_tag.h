@@ -88,7 +88,6 @@
 #include "fiff_coord_trans.h"
 #include "fiff_ch_info.h"
 #include "fiff_ch_pos.h"
-#include "fiff_stream.h"
 #include "fiff_dir_entry.h"
 #include "fiff_tag.h"
 #include "fiff_dig_point.h"
@@ -184,120 +183,6 @@ public:
     * Destroys the FiffTag.
     */
     virtual ~FiffTag();
-
-    //=========================================================================================================
-    /**
-    * ### MNE toolbox root function ###: Implementation of the fiff_read_tag function
-    *
-    * Read tag data from a fif file.
-    * if pos is not provided, reading starts from the current file position
-    *
-    * @param[in] p_pStream opened fif file
-    * @param[out] p_pTag the read tag
-    * @param[in] pos position of the tag inside the fif file
-    *
-    * @return true if succeeded, false otherwise
-    */
-    inline static bool read_tag_data(FiffStream::SPtr& p_pStream, FiffTag::SPtr& p_pTag, qint64 pos = -1);
-
-    //=========================================================================================================
-    /**
-    * ### MNE toolbox root function ###: Implementation of the fiff_read_tag function
-    *
-    * Read tag data from a fif file.
-    * if pos is not provided, reading starts from the current file position
-    *
-    * @param[in] p_pStream opened fif file
-    * @param[out] p_pTag the read tag
-    * @param[in] pos position of the tag inside the fif file
-    *
-    * @return true if succeeded, false otherwise
-    */
-    static bool read_tag_data(FiffStream* p_pStream, FiffTag::SPtr& p_pTag, qint64 pos = -1);
-
-    //=========================================================================================================
-    /**
-    * ### MNE toolbox root function ###: Implementation of the fiff_read_tag_info function
-    *
-    * Read tag information of one tag from a fif file.
-    * if pos is not provided, reading starts from the current file position
-    *
-    * @param[in] p_pStream opened fif file
-    * @param[out] p_pTag the read tag info
-    * @param[in] p_bDoSkip if true it skips the data of the tag (optional, default = true)
-    *
-    * @return true if succeeded, false otherwise
-    */
-    inline static bool read_tag_info(FiffStream::SPtr& p_pStream, FiffTag::SPtr& p_pTag, bool p_bDoSkip = true);
-
-    //=========================================================================================================
-    /**
-    * ### MNE toolbox root function ###: Implementation of the fiff_read_tag_info function
-    *
-    * Read tag information of one tag from a fif file.
-    * if pos is not provided, reading starts from the current file position
-    *
-    * @param[in] p_pStream opened fif file
-    * @param[out] p_pTag the read tag info
-    * @param[in] p_bDoSkip if true it skips the data of the tag (optional, default = true)
-    *
-    * @return true if succeeded, false otherwise
-    */
-    static bool read_tag_info(FiffStream* p_pStream, FiffTag::SPtr& p_pTag, bool p_bDoSkip = true);
-
-    //=========================================================================================================
-    /**
-    * Read one tag from a fif real-time stream.
-    * difference to the other read tag functions is: that this function has blocking behaviour (waitForReadyRead)
-    *
-    * @param[in] p_pStream opened fif file
-    * @param[out] p_pTag the read tag
-    *
-    * @return true if succeeded, false otherwise
-    */
-    inline static bool read_rt_tag(FiffStream::SPtr& p_pStream, FiffTag::SPtr& p_pTag);
-
-    //=========================================================================================================
-    /**
-    * Read one tag from a fif real-time stream.
-    * difference to the other read tag functions is: that this function has blocking behaviour (waitForReadyRead)
-    *
-    * @param[in] p_pStream opened fif file
-    * @param[out] p_pTag the read tag
-    *
-    * @return true if succeeded, false otherwise
-    */
-    static bool read_rt_tag(FiffStream* p_pStream, FiffTag::SPtr& p_pTag);
-
-    //=========================================================================================================
-    /**
-    * ### MNE toolbox root function ###: Implementation of the fiff_read_tag function
-    *
-    * Read one tag from a fif file.
-    * if pos is not provided, reading starts from the current file position
-    *
-    * @param[in] p_pStream opened fif file
-    * @param[out] p_pTag the read tag
-    * @param[in] pos position of the tag inside the fif file
-    *
-    * @return true if succeeded, false otherwise
-    */
-    inline static bool read_tag(FiffStream::SPtr& p_pStream, FiffTag::SPtr& p_pTag, qint64 pos = -1);
-
-    //=========================================================================================================
-    /**
-    * ### MNE toolbox root function ###: Implementation of the fiff_read_tag function
-    *
-    * Read one tag from a fif file.
-    * if pos is not provided, reading starts from the current file position
-    *
-    * @param[in] p_pStream opened fif file
-    * @param[out] p_pTag the read tag
-    * @param[in] pos position of the tag inside the fif file
-    *
-    * @return true if succeeded, false otherwise
-    */
-    static bool read_tag(FiffStream* p_pStream, FiffTag::SPtr& p_pTag, qint64 pos = -1);
 
     //=========================================================================================================
     /**
@@ -672,35 +557,6 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline bool FiffTag::read_tag_data(FiffStream::SPtr &p_pStream, FiffTag::SPtr &p_pTag, qint64 pos)
-{
-    return read_tag_data(p_pStream.data(), p_pTag, pos);
-}
-
-
-//*************************************************************************************************************
-
-inline bool FiffTag::read_tag_info(FiffStream::SPtr &p_pStream, FiffTag::SPtr &p_pTag, bool p_bDoSkip)
-{
-    return read_tag_info(p_pStream.data(), p_pTag, p_bDoSkip);
-}
-
-
-//*************************************************************************************************************
-
-inline bool FiffTag::read_rt_tag(FiffStream::SPtr &p_pStream, FiffTag::SPtr &p_pTag)
-{
-    return read_rt_tag(p_pStream.data(), p_pTag);
-}
-
-
-//*************************************************************************************************************
-
-bool FiffTag::read_tag(FiffStream::SPtr &p_pStream, FiffTag::SPtr &p_pTag, qint64 pos)
-{
-    return read_tag(p_pStream.data(), p_pTag, pos);
-}
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -957,8 +813,7 @@ inline FiffChInfo FiffTag::toChInfo() const
         //
         //   Read the coil coordinate system definition
         //
-        qint32 count = 0;
-        qint32 r, c;
+        qint32 r;
         // r0
         for (r = 0; r < 3; ++r)
             p_FiffChInfo.chpos.r0[r] = t_pFloat[6+r];

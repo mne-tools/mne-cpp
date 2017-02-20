@@ -122,7 +122,7 @@ void TestFiffMneTypesIO::checkFiffCoordTrans()
 
     for (int k = 0; k < stream->dir().size(); k++) {
         if(stream->dir()[k]->kind == FIFF_COORD_TRANS) {
-            if(!FiffTag::read_tag(stream, t_pTag, stream->dir()[k]->pos))
+            if(!stream->read_tag(t_pTag, stream->dir()[k]->pos))
                 QFAIL("Failed to read FIFF_COORD_TRANS tag.");
             reference_trans = *(fiffCoordTrans_REF)t_pTag->data();
             test_trans = t_pTag->toCoordTrans();

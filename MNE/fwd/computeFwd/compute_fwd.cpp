@@ -224,7 +224,7 @@ int mne_read_meg_comp_eeg_ch_info_41(const QString& name,
         pos  = info->dir[k]->pos;
         switch (kind) {
         case FIFF_NCHAN :
-            if (!FiffTag::read_tag(stream,t_pTag,pos))
+            if (!stream->read_tag(t_pTag,pos))
                 goto bad;
             nchan = *t_pTag->toInt();
             chs = MALLOC_41(nchan,fiffChInfoRec);
@@ -234,14 +234,14 @@ int mne_read_meg_comp_eeg_ch_info_41(const QString& name,
             break;
 
         case FIFF_PARENT_BLOCK_ID :
-            if(!FiffTag::read_tag(stream, t_pTag, pos))
+            if(!stream->read_tag(t_pTag, pos))
                 goto bad;
             //            id = t_pTag->toFiffID();
             *id = *(fiffId)t_pTag->data();
             break;
 
         case FIFF_COORD_TRANS :
-            if(!FiffTag::read_tag(stream, t_pTag, pos))
+            if(!stream->read_tag(t_pTag, pos))
                 goto bad;
             //            t = t_pTag->toCoordTrans();
             t = FiffCoordTransOld::read_helper( t_pTag );
@@ -250,7 +250,7 @@ int mne_read_meg_comp_eeg_ch_info_41(const QString& name,
             break;
 
         case FIFF_CH_INFO : /* Information about one channel */
-            if(!FiffTag::read_tag(stream, t_pTag, pos))
+            if(!stream->read_tag(t_pTag, pos))
                 goto bad;
             //            this_ch = t_pTag->toChInfo();
             this_ch = (fiffChInfo)malloc(sizeof(fiffChInfoRec));
@@ -1497,6 +1497,18 @@ int fiff_new_file_id (fiffId id)
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
 /*
  * Process the environment information
  */
@@ -1522,8 +1534,8 @@ int mne_attach_env(const QString& name, const QString& command)
 
     tag.data = NULL;
 
-//    if (fiff_new_file_id(&id) == FIFF_FAIL)
-//        goto out;
+    if (fiff_new_file_id(&id) == FIFF_FAIL)
+        goto out;
 //#ifdef DEBUG
 //    fprintf(stderr,"\n");
 //    fprintf(stderr,"cwd   = %s\n",cwd);
@@ -1613,7 +1625,7 @@ int mne_attach_env(const QString& name, const QString& command)
 //        goto out;
     res = FIFF_OK;
 
-//out : {
+out : {
 //        for (k = 0; k < ntag; k++)
 //            FREE_41(tags[k].data);
 //        FREE_41(tags);
@@ -1621,7 +1633,7 @@ int mne_attach_env(const QString& name, const QString& command)
 //        fiff_close(file);
 //        FREE_41(cwd);
         return res;
-//    }
+    }
 }
 
 

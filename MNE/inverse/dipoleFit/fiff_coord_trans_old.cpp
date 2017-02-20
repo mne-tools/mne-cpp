@@ -629,7 +629,7 @@ FiffCoordTransOld *FiffCoordTransOld::mne_read_transform(const QString &name, in
             //            if (fiff_read_this_tag (in->fd,dir->pos,&tag) == FIFF_FAIL)
             //                goto out;
             //            res = (fiffCoordTrans)tag.data;
-            if (!FiffTag::read_tag(stream,t_pTag,pos))
+            if (!stream->read_tag(t_pTag,pos))
                 goto out;
 
             res = FiffCoordTransOld::read_helper( t_pTag );
@@ -682,7 +682,7 @@ FiffCoordTransOld *FiffCoordTransOld::mne_read_transform_from_node(FiffStream::S
         //            if (fiff_read_this_tag (in->fd,dir->pos,&tag) == FIFF_FAIL)
         //                goto out;
         //            res = (fiffCoordTrans)tag.data;
-        if (!FiffTag::read_tag(stream,t_pTag,pos))
+        if (!stream->read_tag(t_pTag,pos))
             goto out;
         res = FiffCoordTransOld::read_helper( t_pTag );
         if (res->from == from && res->to == to) {

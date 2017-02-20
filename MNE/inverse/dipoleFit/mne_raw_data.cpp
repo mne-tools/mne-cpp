@@ -810,7 +810,7 @@ int mne_read_raw_buffer_t(//fiffFile     in,        /* Input file */
 
 //    if (fiff_read_this_tag(in->fd,ent->pos,&tag) ==  FIFF_FAIL)
 //        goto bad;
-    if (!FiffTag::read_tag(stream,t_pTag,ent->pos))
+    if (!stream->read_tag(t_pTag,ent->pos))
         goto bad;
 
     if (ent->type == FIFFT_FLOAT) {
@@ -1935,7 +1935,7 @@ MneRawData *MneRawData::mne_raw_open_file_comp(char *name, int omit_skip, int al
     if (dir0[current_dir0]->kind == FIFF_FIRST_SAMPLE) {
         //        if (fiff_read_this_tag(in->fd,dir0->pos,&tag) == FIFF_FAIL)
         //            goto bad;
-        if (!FiffTag::read_tag(stream,t_pTag,dir0[current_dir0]->pos))
+        if (!stream->read_tag(t_pTag,dir0[current_dir0]->pos))
             goto bad;
         data->first_samp = *t_pTag->toInt();
         current_dir0++;
@@ -1945,7 +1945,7 @@ MneRawData *MneRawData::mne_raw_open_file_comp(char *name, int omit_skip, int al
         int nsamp_skip;
         //        if (fiff_read_this_tag(in->fd,dir0->pos,&tag) == FIFF_FAIL)
         //            goto bad;
-        if (!FiffTag::read_tag(stream,t_pTag,dir0[current_dir0]->pos))
+        if (!stream->read_tag(t_pTag,dir0[current_dir0]->pos))
             goto bad;
         nsamp_skip = data->info->buf_size*(*t_pTag->toInt());
         fprintf(stderr,"Data skip of %d samples in the beginning\n",nsamp_skip);
@@ -1954,7 +1954,7 @@ MneRawData *MneRawData::mne_raw_open_file_comp(char *name, int omit_skip, int al
         if (dir0[current_dir0]->kind == FIFF_FIRST_SAMPLE) {
             //            if (fiff_read_this_tag(in->fd,dir0->pos,&tag) == FIFF_FAIL)
             //                goto bad;
-            if (!FiffTag::read_tag(stream,t_pTag,dir0[current_dir0]->pos))
+            if (!stream->read_tag(t_pTag,dir0[current_dir0]->pos))
                 goto bad;
             data->first_samp += *t_pTag->toInt();
             current_dir0++;
@@ -2020,7 +2020,7 @@ MneRawData *MneRawData::mne_raw_open_file_comp(char *name, int omit_skip, int al
         else if (dir->kind == FIFF_DATA_SKIP) {
             //            if (fiff_read_this_tag(in->fd,dir->pos,&tag) == FIFF_FAIL)
             //                goto bad;
-            if (!FiffTag::read_tag(stream,t_pTag,dir->pos))
+            if (!stream->read_tag(t_pTag,dir->pos))
                 goto bad;
             bufs[k].ns = data->info->buf_size*(*t_pTag->toInt());
         }
