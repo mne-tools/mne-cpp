@@ -1824,7 +1824,7 @@ FiffStream::SPtr FiffStream::open_update(QIODevice &p_IODevice)
     */
     if(!t_pStream->open(QIODevice::Append)) {
         qCritical("Cannot open %s\n", t_sFileName.toUtf8().constData());//consider throw
-        return NULL;
+        return FiffStream::SPtr();
     }
 
 //    fiffFile file = open_file(name,"r+b");
@@ -1842,7 +1842,7 @@ FiffStream::SPtr FiffStream::open_update(QIODevice &p_IODevice)
 
     if(!t_pStream->read_tag(t_pTag,t_pStream->dir()[t_pStream->nent()-2]->pos)){
         qCritical("Could not read last tag in the directory list!");
-        return NULL;
+        return FiffStream::SPtr();
     }
 //    if (fiff_read_this_tag(file->fd,file->dir[file->nent-2].pos,&tag) == FIFF_FAIL) {
 //        err_set_error("Could not read last tag in the directory list!");
