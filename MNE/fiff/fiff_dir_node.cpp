@@ -212,7 +212,7 @@ qint32 FiffDirNode::make_subtree(FiffStream* p_pStream, QList<FiffDirEntry::SPtr
     qint32 block;
     if(p_Dir[start]->kind == FIFF_BLOCK_START)
     {
-        FiffTag::read_tag(p_pStream, t_pTag, p_Dir[start]->pos);
+        p_pStream->read_tag(t_pTag, p_Dir[start]->pos);
         block = *t_pTag->toInt();
     }
     else
@@ -247,7 +247,7 @@ qint32 FiffDirNode::make_subtree(FiffStream* p_pStream, QList<FiffDirEntry::SPtr
         }
         else if(p_Dir[current]->kind == FIFF_BLOCK_END)
         {
-            FiffTag::read_tag(p_pStream, t_pTag, p_Dir[start]->pos);
+            p_pStream->read_tag(t_pTag, p_Dir[start]->pos);
             if (*t_pTag->toInt() == p_pTree->type)
                 break;
         }
@@ -263,7 +263,7 @@ qint32 FiffDirNode::make_subtree(FiffStream* p_pStream, QList<FiffDirEntry::SPtr
             {
                 if (p_Dir[current]->kind == FIFF_FILE_ID)
                 {
-                    FiffTag::read_tag(p_pStream, t_pTag, p_Dir[current]->pos);
+                    p_pStream->read_tag(t_pTag, p_Dir[current]->pos);
                     p_pTree->id = t_pTag->toFiffID();
                 }
             }
@@ -271,12 +271,12 @@ qint32 FiffDirNode::make_subtree(FiffStream* p_pStream, QList<FiffDirEntry::SPtr
             {
                 if (p_Dir[current]->kind == FIFF_BLOCK_ID)
                 {
-                    FiffTag::read_tag(p_pStream, t_pTag, p_Dir[current]->pos);
+                    p_pStream->read_tag(t_pTag, p_Dir[current]->pos);
                     p_pTree->id = t_pTag->toFiffID();
                 }
                 else if (p_Dir[current]->kind == FIFF_PARENT_BLOCK_ID)
                 {
-                    FiffTag::read_tag(p_pStream, t_pTag, p_Dir[current]->pos);
+                    p_pStream->read_tag(t_pTag, p_Dir[current]->pos);
                     p_pTree->parent_id = t_pTag->toFiffID();
                 }
             }
@@ -321,7 +321,7 @@ bool FiffDirNode::find_tag(FiffStream* p_pStream, fiff_int_t findkind, FiffTag::
     {
         if (this->dir[p]->kind == findkind)
         {
-            FiffTag::read_tag(p_pStream,p_pTag,this->dir[p]->pos);
+            p_pStream->read_tag(p_pTag,this->dir[p]->pos);
             return true;
         }
     }

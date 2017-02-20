@@ -592,7 +592,7 @@ public:
     */
     inline static bool read_tag(FiffStream::SPtr& p_pStream, FiffTag::SPtr& p_pTag, qint64 pos = -1)
     {
-        return FiffTag::read_tag(p_pStream, p_pTag, pos);
+        return p_pStream->read_tag(p_pTag, pos);
     }
 
     //=========================================================================================================
@@ -613,7 +613,7 @@ public:
     */
     static inline bool read_tag_info(FiffStream::SPtr& p_pStream, FiffTag::SPtr& p_pTag)
     {
-        return FiffTag::read_tag_info(p_pStream, p_pTag);
+        return p_pStream->read_tag_info(p_pTag);
     }
 
     //=========================================================================================================

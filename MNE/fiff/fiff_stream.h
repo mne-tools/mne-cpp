@@ -150,6 +150,14 @@ public:
     * @return the directory
     */
     const QList<FiffDirEntry::SPtr>& dir() const;
+    
+    //=========================================================================================================
+    /**
+    * How many entries?
+    *
+    * @return The number of directory entries.
+    */
+    int nent() const;
 
     //=========================================================================================================
     /**
@@ -211,16 +219,14 @@ public:
 
     //=========================================================================================================
     /**
-    * fiff_open
-    *
-    * ### MNE toolbox root function ###
+    * Opens a fif file and provides the directory of tags
     * Refactored: open_file (fiff_open.c)
     *
-    * Opens a fif file and provides the directory of tags
+    * @param [in] mode      The open mode (Default = ReadOnly)
     *
     * @return true if succeeded, false otherwise
     */
-    bool open();
+    bool open(QIODevice::OpenModeFlag mode = QIODevice::ReadOnly);
 
     //=========================================================================================================
     /**
@@ -327,19 +333,64 @@ public:
 
     //=========================================================================================================
     /**
-    * fiff_read_proj
-    *
-    * ### MNE toolbox root function ###
-    *
-    * [ projdata ] = fiff_read_proj(fid,node)
-    *
     * Read the SSP data under a given directory node
+    * Refactored: fiff_read_proj (MNE-MATLAB)
     *
     * @param[in] p_Node    The node of interest
     *
     * @return a list of SSP projectors
     */
     QList<FiffProj> read_proj(const FiffDirNode::SPtr& p_Node);
+
+    //=========================================================================================================
+    /**
+    * Read tag data from a fif file.
+    * if pos is not provided, reading starts from the current file position
+    * Refactored: fiff_read_tag (MNE-MATLAB)
+    *
+    * @param[out] p_pTag the read tag
+    * @param[in] pos position of the tag inside the fif file
+    *
+    * @return true if succeeded, false otherwise
+    */
+    bool read_tag_data(QSharedPointer<FiffTag>& p_pTag, qint64 pos = -1);
+
+    //=========================================================================================================
+    /**
+    * Read tag information of one tag from a fif file.
+    * if pos is not provided, reading starts from the current file position
+    * Refactored: fiff_read_tag_info (MNE-MATLAB)
+    *
+    * @param[out] p_pTag the read tag info
+    * @param[in] p_bDoSkip if true it skips the data of the tag (optional, default = true)
+    *
+    * @return true if succeeded, false otherwise
+    */
+    bool read_tag_info(QSharedPointer<FiffTag>& p_pTag, bool p_bDoSkip = true);
+
+    //=========================================================================================================
+    /**
+    * Read one tag from a fif real-time stream.
+    * difference to the other read tag functions is: that this function has blocking behaviour (waitForReadyRead)
+    *
+    * @param[out] p_pTag the read tag
+    *
+    * @return true if succeeded, false otherwise
+    */
+    bool read_rt_tag(QSharedPointer<FiffTag>& p_pTag);
+
+    //=========================================================================================================
+    /**
+    * Read one tag from a fif file.
+    * if pos is not provided, reading starts from the current file position
+    * Refactored: fiff_read_tag (MNE-MATLAB)
+    *
+    * @param[out] p_pTag the read tag
+    * @param[in] pos position of the tag inside the fif file
+    *
+    * @return true if succeeded, false otherwise
+    */
+    bool read_tag(QSharedPointer<FiffTag>& p_pTag, qint64 pos = -1);
 
     //=========================================================================================================
     /**
@@ -382,17 +433,25 @@ public:
 
     //=========================================================================================================
     /**
-    * fiff_start_file
-    *
-    * ### MNE toolbox root function ###
-    *
     * Opens a fiff file for writing and writes the compulsory header tags
+    * Refactored: fiff_start_files (MNE-C); fiff_start_file (MNE-MATLAB)
     *
     * @param[in] p_IODevice    The IODevice (like QFile or QTCPSocket) to open. It is recommended that the name ends with .fif
     *
     * @return The opened file.
     */
     static FiffStream::SPtr start_file(QIODevice& p_IODevice);
+
+    //=========================================================================================================
+    /**
+    * Open fiff file for update
+    * Refactored: fiff_start_files (MNE-C)
+    *
+    * @param[in] p_IODevice    The IODevice (like QFile or QTCPSocket) to open. It is recommended that the name ends with .fif
+    *
+    * @return The opened file stream.
+    */
+    static FiffStream::SPtr open_update(QIODevice& p_IODevice);
 
     //=========================================================================================================
     /**
@@ -698,19 +757,20 @@ private:
     QList<FiffDirEntry::SPtr> m_dir; /**< This is the directory. If no directory exists, open automatically scans the file to create one. */
     FiffDirNode::SPtr m_tree;        /**< Directory compiled into a tree */
 
-//    /** FIFF file handle returned by fiff_open(). */
-//    typedef struct _fiffFileRec {
-//      char         *file_name;	/**< Name of the file */
-//      FILE         *fd;		/**< The normal file descriptor */
-//      fiffId       id;		/**< The file identifier */
-//      fiffDirEntry dir;		/**< This is the directory.
-//                     * If no directory exists, fiff_open
-//                     * automatically scans the file to create one. */
-//      int         nent;	        /**< How many entries? */
-//      fiffDirNode dirtree;		/**< Directory compiled into a tree */
-//      char        *ext_file_name;	/**< Name of the file holding the external data */
-//      FILE        *ext_fd;		/**< The file descriptor of the above file if open  */
-//    } *fiffFile,fiffFileRec;	/**< FIFF file handle. fiff_open() returns this. */
+// ### OLD STRUCT ###
+// /** FIFF file handle returned by fiff_open(). */
+//typedef struct _fiffFileRec {
+//    char         *file_name;    /**< Name of the file */
+//    FILE         *fd;           /**< The normal file descriptor */
+//    fiffId       id;            /**< The file identifier */
+//    fiffDirEntry dir;           /**< This is the directory.
+//                                   * If no directory exists, fiff_open
+//                                   * automatically scans the file to create one. */
+//    int         nent;           /**< How many entries? */
+//    fiffDirNode dirtree;        /**< Directory compiled into a tree */
+//    char        *ext_file_name; /**< Name of the file holding the external data */
+//    FILE        *ext_fd;        /**< The file descriptor of the above file if open  */
+//} *fiffFile,fiffFileRec;        /**< FIFF file handle. fiff_open() returns this. */
 
 };
 

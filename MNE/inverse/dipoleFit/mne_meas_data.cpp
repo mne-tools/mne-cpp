@@ -484,7 +484,7 @@ static char *get_comment (  FiffStream::SPtr& stream,
     QList<FiffDirEntry::SPtr> ent = start->dir;
     for (k = 0; k < start->nent; k++)
         if (ent[k]->kind == FIFF_COMMENT) {
-            if (FiffTag::read_tag(stream,t_pTag,ent[k]->pos)) {
+            if (stream->read_tag(t_pTag,ent[k]->pos)) {
                 return (mne_strdup_9((char *)t_pTag->data()));
             }
         }
@@ -504,7 +504,7 @@ static void get_aspect_name_type(   FiffStream::SPtr& stream,
 
     for (k = 0; k < start->nent; k++)
         if (ent[k]->kind == FIFF_ASPECT_KIND) {
-            if (FiffTag::read_tag(stream,t_pTag,ent[k]->pos)) {
+            if (stream->read_tag(t_pTag,ent[k]->pos)) {
                 type = *t_pTag->toInt();
                 switch (type) {
                 case FIFFV_ASPECT_AVERAGE :
@@ -558,7 +558,7 @@ static char *get_meas_date (    FiffStream::SPtr& stream,const FiffDirNode::SPtr
         pos  = meas_info->dir[k]->pos;
         if (kind == FIFF_MEAS_DATE)
         {
-            if (FiffTag::read_tag(stream,t_pTag,pos)) {
+            if (stream->read_tag(t_pTag,pos)) {
                 fiffTime meas_date = (fiffTime)t_pTag->data();
                 time_t   time = meas_date->secs;
                 struct   tm *ltime;
@@ -640,7 +640,7 @@ static int get_meas_info (  FiffStream::SPtr& stream,       /* The stream we are
         switch (kind) {
 
         case FIFF_NCHAN :
-            if (!FiffTag::read_tag(stream,t_pTag,pos))
+            if (!stream->read_tag(t_pTag,pos))
                 goto bad;
             *nchan = *t_pTag->toInt();
             ch = MALLOC_9(*nchan,fiffChInfoRec);
@@ -650,14 +650,14 @@ static int get_meas_info (  FiffStream::SPtr& stream,       /* The stream we are
             break;
 
         case FIFF_SFREQ :
-            if (!FiffTag::read_tag(stream,t_pTag,pos))
+            if (!stream->read_tag(t_pTag,pos))
                 goto bad;
             *sfreq = *t_pTag->toFloat();
             to_find--;
             break;
 
         case FIFF_MEAS_DATE :
-            if (!FiffTag::read_tag(stream,t_pTag,pos))
+            if (!stream->read_tag(t_pTag,pos))
                 goto bad;
             if (*meas_date)
                 FREE_9(*meas_date);
@@ -666,14 +666,14 @@ static int get_meas_info (  FiffStream::SPtr& stream,       /* The stream we are
             break;
 
         case FIFF_LOWPASS :
-            if (!FiffTag::read_tag(stream,t_pTag,pos))
+            if (!stream->read_tag(t_pTag,pos))
                 goto bad;
             *lowpass = *t_pTag->toFloat();
             to_find--;
             break;
 
         case FIFF_HIGHPASS :
-            if (!FiffTag::read_tag(stream,t_pTag,pos))
+            if (!stream->read_tag(t_pTag,pos))
                 goto bad;
             *highpass = *t_pTag->toFloat();
             to_find--;
@@ -681,7 +681,7 @@ static int get_meas_info (  FiffStream::SPtr& stream,       /* The stream we are
 
         case FIFF_CH_INFO : /* Information about one channel */
 
-            if (!FiffTag::read_tag(stream,t_pTag,pos))
+            if (!stream->read_tag(t_pTag,pos))
                 goto bad;
             this_ch = (fiffChInfo)t_pTag->data();
             if (this_ch->scanNo <= 0 || this_ch->scanNo > *nchan) {
@@ -694,7 +694,7 @@ static int get_meas_info (  FiffStream::SPtr& stream,       /* The stream we are
             break;
 
         case FIFF_COORD_TRANS :
-            if (!FiffTag::read_tag(stream,t_pTag,pos))
+            if (!stream->read_tag(t_pTag,pos))
                 goto bad;
             t = FiffCoordTransOld::read_helper( t_pTag );
             /*
@@ -716,7 +716,7 @@ static int get_meas_info (  FiffStream::SPtr& stream,       /* The stream we are
     if (hpi.size() > 0 && *trans == NULL)
         for (k = 0; k < hpi[0]->nent; k++)
             if (hpi[0]->dir[k]->kind ==  FIFF_COORD_TRANS) {
-                if (!FiffTag::read_tag(stream,t_pTag,hpi[0]->dir[k]->pos))
+                if (!stream->read_tag(t_pTag,hpi[0]->dir[k]->pos))
                     goto bad;
                 t = FiffCoordTransOld::read_helper( t_pTag );
 
@@ -773,7 +773,7 @@ static int find_between (   FiffStream::SPtr& stream,
             pos  = node->dir[k]->pos;
             if (kind_1 == kind) {
                 FREE_9(*data);
-                if (!FiffTag::read_tag(stream,t_pTag,pos)) {
+                if (!stream->read_tag(t_pTag,pos)) {
                     return (FIFF_FAIL);
                 }
                 else {
@@ -867,32 +867,30 @@ static int get_evoked_essentials (FiffStream::SPtr& stream,         /* This is o
         switch (kind) {
 
         case FIFF_FIRST_SAMPLE :
-            if (!FiffTag::read_tag(stream,t_pTag,pos))
+            if (!stream->read_tag(t_pTag,pos))
                 goto out;
             first = *t_pTag->toInt(); to_find--;
             break;
 
         case FIFF_LAST_SAMPLE :
-            if (!FiffTag::read_tag(stream,t_pTag,pos))
+            if (!stream->read_tag(t_pTag,pos))
                 goto out;
             last = *t_pTag->toInt(); to_find--;
             break;
 
         case FIFF_NO_SAMPLES :
-            if (!FiffTag::read_tag(stream,t_pTag,pos))
+            if (!stream->read_tag(t_pTag,pos))
                 goto out;
             my_nsamp = *t_pTag->toInt(); to_find--;
             break;
 
         case FIFF_FIRST_TIME :
-            if (!FiffTag::read_tag(stream,t_pTag,pos))
+            if (!stream->read_tag(t_pTag,pos))
                 goto out;
             my_tmin = *t_pTag->toFloat(); to_find--;
             break;
-
-
         case FIFF_ARTEF_REMOVAL :
-            if (!FiffTag::read_tag(stream,t_pTag,pos))
+            if (!stream->read_tag(t_pTag,pos))
                 goto out;
             qDebug() << "TODO: check whether artefs contains the right stuff -> use MatrixXi instead";
             artefs = t_pTag->toInt();
@@ -960,7 +958,7 @@ static int get_evoked_optional( FiffStream::SPtr& stream,
                 new_ch = MALLOC_9(new_nchan,fiffChInfoRec);
                 to_find = new_nchan;
             }
-            if (!FiffTag::read_tag(stream,t_pTag,pos))
+            if (!stream->read_tag(t_pTag,pos))
                 goto out;
             this_ch = MALLOC_9(1,fiffChInfoRec);
             this_ch = (fiffChInfo)t_pTag->data();
@@ -1032,7 +1030,7 @@ static float **get_epochs ( FiffStream::SPtr& stream,       /* This is our file 
         kind = node->dir[k]->kind;
         pos  = node->dir[k]->pos;
         if (kind == FIFF_EPOCH) {
-            if (!FiffTag::read_tag(stream,t_pTag,pos))
+            if (!stream->read_tag(t_pTag,pos))
                 goto bad;
             if (t_pTag->type & FIFFT_MATRIX) {
                 if ((t_pTag->type & ~FIFFT_MATRIX) != FIFFT_FLOAT) {
@@ -1518,7 +1516,7 @@ int mne_read_meg_comp_eeg_ch_info_9(const QString& name,
         pos  = info->dir[k]->pos;
         switch (kind) {
         case FIFF_NCHAN :
-            if (!FiffTag::read_tag(stream,t_pTag,pos))
+            if (!stream->read_tag(t_pTag,pos))
                 goto bad;
             nchan = *t_pTag->toInt();
             chs = MALLOC_9(nchan,fiffChInfoRec);
@@ -1528,14 +1526,14 @@ int mne_read_meg_comp_eeg_ch_info_9(const QString& name,
             break;
 
         case FIFF_PARENT_BLOCK_ID :
-            if(!FiffTag::read_tag(stream, t_pTag, pos))
+            if(!stream->read_tag(t_pTag, pos))
                 goto bad;
 //            id = t_pTag->toFiffID();
             *id = *(fiffId)t_pTag->data();
             break;
 
         case FIFF_COORD_TRANS :
-            if(!FiffTag::read_tag(stream, t_pTag, pos))
+            if(!stream->read_tag(t_pTag, pos))
                 goto bad;
 //            t = t_pTag->toCoordTrans();
             t = FiffCoordTransOld::read_helper( t_pTag );
@@ -1544,7 +1542,7 @@ int mne_read_meg_comp_eeg_ch_info_9(const QString& name,
             break;
 
         case FIFF_CH_INFO : /* Information about one channel */
-            if(!FiffTag::read_tag(stream, t_pTag, pos))
+            if(!stream->read_tag(t_pTag, pos))
                 goto bad;
 //            this_ch = t_pTag->toChInfo();
             this_ch = (fiffChInfo)malloc(sizeof(fiffChInfoRec));

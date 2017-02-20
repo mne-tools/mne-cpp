@@ -42,6 +42,7 @@
 #include "fiff_evoked_set.h"
 #include "fiff_tag.h"
 #include "fiff_dir_node.h"
+#include "fiff_stream.h"
 
 
 //*************************************************************************************************************

@@ -262,7 +262,7 @@ int MneRawInfo::get_meas_info(FiffStream::SPtr &stream, FiffDirNode::SPtr &node,
             //            if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
             //                goto bad;
             //            *nchan = *(int *)(tag.data);
-            if (!FiffTag::read_tag(stream,t_pTag,pos))
+            if (!stream->read_tag(t_pTag,pos))
                 goto bad;
             *nchan = *t_pTag->toInt();
             ch = MALLOC_33(*nchan,fiffChInfoRec);
@@ -275,7 +275,7 @@ int MneRawInfo::get_meas_info(FiffStream::SPtr &stream, FiffDirNode::SPtr &node,
             //            if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
             //                goto bad;
             //            *sfreq = *(float *)(tag.data);
-            if (!FiffTag::read_tag(stream,t_pTag,pos))
+            if (!stream->read_tag(t_pTag,pos))
                 goto bad;
             *sfreq = *t_pTag->toFloat();
             to_find--;
@@ -285,7 +285,7 @@ int MneRawInfo::get_meas_info(FiffStream::SPtr &stream, FiffDirNode::SPtr &node,
             //            if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
             //                goto bad;
             //            *lowpass = *(float *)(tag.data);
-            if (!FiffTag::read_tag(stream,t_pTag,pos))
+            if (!stream->read_tag(t_pTag,pos))
                 goto bad;
             *lowpass = *t_pTag->toFloat();
             to_find--;
@@ -295,7 +295,7 @@ int MneRawInfo::get_meas_info(FiffStream::SPtr &stream, FiffDirNode::SPtr &node,
             //            if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
             //                goto bad;
             //            *highpass = *(float *)(tag.data);
-            if (!FiffTag::read_tag(stream,t_pTag,pos))
+            if (!stream->read_tag(t_pTag,pos))
                 goto bad;
             *highpass = *t_pTag->toFloat();
             to_find--;
@@ -305,7 +305,7 @@ int MneRawInfo::get_meas_info(FiffStream::SPtr &stream, FiffDirNode::SPtr &node,
             //            if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
             //                goto bad;
             //            this_ch = (fiffChInfo)(tag.data);
-            if (!FiffTag::read_tag(stream,t_pTag,pos))
+            if (!stream->read_tag(t_pTag,pos))
                 goto bad;
             this_ch = (fiffChInfo)t_pTag->data();
             if (this_ch->scanNo <= 0 || this_ch->scanNo > *nchan) {
@@ -321,7 +321,7 @@ int MneRawInfo::get_meas_info(FiffStream::SPtr &stream, FiffDirNode::SPtr &node,
         case FIFF_MEAS_DATE :
             //            if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
             //                goto bad;
-            if (!FiffTag::read_tag(stream,t_pTag,pos))
+            if (!stream->read_tag(t_pTag,pos))
                 goto bad;
             if (*start_time)
                 FREE_33(*start_time);
@@ -334,7 +334,7 @@ int MneRawInfo::get_meas_info(FiffStream::SPtr &stream, FiffDirNode::SPtr &node,
             //            if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
             //                goto bad;
             //            t = (fiffCoordTrans)tag.data;
-            if (!FiffTag::read_tag(stream,t_pTag,pos))
+            if (!stream->read_tag(t_pTag,pos))
                 goto bad;
             t = FiffCoordTransOld::read_helper( t_pTag );
             /*
@@ -364,7 +364,7 @@ int MneRawInfo::get_meas_info(FiffStream::SPtr &stream, FiffDirNode::SPtr &node,
                 //                if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
                 //                    goto bad;
                 //                t = (fiffCoordTrans)tag.data;
-                if (!FiffTag::read_tag(stream,t_pTag,hpi[0]->dir[k]->pos))
+                if (!stream->read_tag(t_pTag,hpi[0]->dir[k]->pos))
                     goto bad;
                 t = FiffCoordTransOld::read_helper( t_pTag );
                 /*
