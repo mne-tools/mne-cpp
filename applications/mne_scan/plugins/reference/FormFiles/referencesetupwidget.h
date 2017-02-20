@@ -102,7 +102,6 @@ public:
     */
     ~ReferenceSetupWidget();
 
-
 private slots:
     //=========================================================================================================
     /**
@@ -112,7 +111,6 @@ private slots:
     void showAboutDialog();
 
 private:
-
     Reference* m_pRef;	/**< Holds a pointer to corresponding Reference object.*/
 
     Ui::ReferenceSetupWidget ui;	/**< Holds the user interface for the ReferenceSetupWidget.*/

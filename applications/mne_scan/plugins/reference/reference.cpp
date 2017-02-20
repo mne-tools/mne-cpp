@@ -231,15 +231,6 @@ void Reference::run()
         // apply common average reference
         MatrixXd matCAR = EEGRef::applyCAR(t_mat, m_pFiffInfo);
 
-//        // write in- and output matrix to a file
-//        if(m_bDisp){
-
-//            IOUtils::write_eigen_matrix(t_mat, "matIN.txt");
-//            IOUtils::write_eigen_matrix(matCAR, "matOUT.txt");
-
-//            m_bDisp = false;
-//        }
-
         //Send the data to the connected plugins and the online display
         m_pRefOutput->data()->setValue(matCAR);
     }
