@@ -62,6 +62,7 @@
 
 #include <QDebug>
 #include <QFile>
+#include <QList>
 
 
 //*************************************************************************************************************
@@ -87,15 +88,15 @@ MatrixXf Warp::calculate(const MatrixXf &sLm, const MatrixXf &dLm, const MatrixX
 
 //*************************************************************************************************************
 
-void Warp::calculate(const MatrixXf & sLm, const MatrixXf &dLm, MatrixXf & vertA, MatrixXf & vertB, MatrixXf & vertC)
+void Warp::calculate(const MatrixXf & sLm, const MatrixXf &dLm, QList<MatrixXf> & vertList)
 {
     MatrixXf warpWeight, polWeight;
     calcWeighting(sLm, dLm, warpWeight, polWeight);
 
-    vertA = warpVertices(vertA, sLm, warpWeight, polWeight);
-    vertB = warpVertices(vertB, sLm, warpWeight, polWeight);
-    vertC = warpVertices(vertC, sLm, warpWeight, polWeight);
-
+    for (int i=0; i<vertList.size(); i++)
+    {
+        vertList.replace(i,warpVertices(vertList.at(i), sLm, warpWeight, polWeight));
+    }
     return;
 }
 

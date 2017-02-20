@@ -457,16 +457,19 @@ MNEBem &MNEBem::operator<<(const MNEBemSurface *surf)
 
 void MNEBem::warp(const MatrixXf & sLm, const MatrixXf &dLm)
 {
-    Warp test;
-    MatrixXf vertA = this->m_qListBemSurface[0].rr;
-    MatrixXf vertB = this->m_qListBemSurface[1].rr;
-    MatrixXf vertC = this->m_qListBemSurface[2].rr;
+    Warp help;
+    QList<MatrixXf> vertList;
+    for (int i=0; i<this->m_qListBemSurface.size(); i++)
+    {
+        vertList.append(this->m_qListBemSurface[i].rr);
+    }
 
-    test.calculate(sLm, dLm, vertA , vertB, vertC);
+    help.calculate(sLm, dLm, vertList);
 
-    this->m_qListBemSurface[0].rr = vertA;
-    this->m_qListBemSurface[1].rr = vertB;
-    this->m_qListBemSurface[2].rr = vertC;
+    for (int i=0; i<this->m_qListBemSurface.size(); i++)
+    {
+        this->m_qListBemSurface[i].rr = vertList.at(i);
+    }
     return;
 }
 
@@ -475,17 +478,13 @@ void MNEBem::warp(const MatrixXf & sLm, const MatrixXf &dLm)
 
 void MNEBem::transform(const FiffCoordTrans trans)
 {
-    MatrixX3f vertA = this->m_qListBemSurface[0].rr;
-    MatrixX3f vertB = this->m_qListBemSurface[1].rr;
-    MatrixX3f vertC = this->m_qListBemSurface[2].rr;
-
-    vertA = trans.apply_trans(vertA );
-    vertB = trans.apply_trans(vertB);
-    vertC = trans.apply_trans(vertC);
-
-    this->m_qListBemSurface[0].rr = vertA;
-    this->m_qListBemSurface[1].rr = vertB;
-    this->m_qListBemSurface[2].rr = vertC;
+    MatrixX3f vert;
+    for (int i=0; i<this->m_qListBemSurface.size(); i++)
+    {
+        vert = this->m_qListBemSurface[i].rr;
+        vert = trans.apply_trans(vert);
+        this->m_qListBemSurface[i].rr = vert;
+    }
     return;
 }
 
@@ -494,16 +493,12 @@ void MNEBem::transform(const FiffCoordTrans trans)
 
 void MNEBem::invtransform(const FiffCoordTrans trans)
 {
-    MatrixX3f vertA = this->m_qListBemSurface[0].rr;
-    MatrixX3f vertB = this->m_qListBemSurface[1].rr;
-    MatrixX3f vertC = this->m_qListBemSurface[2].rr;
-
-    vertA = trans.apply_inverse_trans(vertA );
-    vertB = trans.apply_inverse_trans(vertB);
-    vertC = trans.apply_inverse_trans(vertC);
-
-    this->m_qListBemSurface[0].rr = vertA;
-    this->m_qListBemSurface[1].rr = vertB;
-    this->m_qListBemSurface[2].rr = vertC;
+    MatrixX3f vert;
+    for (int i=0; i<this->m_qListBemSurface.size(); i++)
+    {
+        vert = this->m_qListBemSurface[i].rr;
+        vert = trans.apply_inverse_trans(vert);
+        this->m_qListBemSurface[i].rr = vert;
+    }
     return;
 }

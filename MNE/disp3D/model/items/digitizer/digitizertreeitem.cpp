@@ -182,7 +182,7 @@ bool DigitizerTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer, 
         case FIFFV_POINT_CARDINAL:
             switch (tDigitizer[i].ident) {
             case 1:
-            colDefault = Qt::blue;
+            colDefault = Qt::green;
             material->setAmbient(colDefault);
             break;
             case 2:
@@ -190,11 +190,11 @@ bool DigitizerTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer, 
             material->setAmbient(colDefault);
             break;
             case 3:
-            colDefault = Qt::green;
+            colDefault = Qt::darkGreen;
             material->setAmbient(colDefault);
             break;
             default:
-            colDefault = Qt::red;
+            colDefault = Qt::white;
             material->setAmbient(colDefault);
             break;
             }
@@ -208,15 +208,15 @@ bool DigitizerTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer, 
             material->setAmbient(colDefault);
             break;
         case FIFFV_POINT_EEG:
-            colDefault = Qt::red;
+            colDefault = Qt::cyan;
             material->setAmbient(colDefault);
             break;
         case FIFFV_POINT_EXTRA:
-            colDefault = Qt::red;
+            colDefault = Qt::magenta;
             material->setAmbient(colDefault);
             break;
         default:
-            colDefault = Qt::red;
+            colDefault = Qt::white;
             material->setAmbient(colDefault);
             break;
         }
