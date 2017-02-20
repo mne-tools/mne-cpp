@@ -344,7 +344,6 @@ void MneEstimateTreeItem::setTimeInterval(int iMSec)
 
     for(int i = 0; i < lItems.size(); i++) {
         if(MetaTreeItem* pAbstractItem = dynamic_cast<MetaTreeItem*>(lItems.at(i))) {
-            qDebug() << "MneEstimateTreeItem::setTimeInterval";
             QVariant data;
             data.setValue(iMSec);
             pAbstractItem->setData(data, MetaTreeItemRoles::StreamingTimeInterval);
@@ -439,10 +438,8 @@ void MneEstimateTreeItem::setColorOrigin(const QByteArray& arrayVertColorLeftHem
 void MneEstimateTreeItem::onCheckStateWorkerChanged(const Qt::CheckState& checkState)
 {
     if(checkState == Qt::Checked) {
-        qDebug() << "Start stc worker";
         m_pSourceLocRtDataWorker->start();
     } else if(checkState == Qt::Unchecked) {
-        qDebug() << "Stop stc worker";
         m_pSourceLocRtDataWorker->stop();
     }    
 }
@@ -503,10 +500,8 @@ void MneEstimateTreeItem::onVisualizationTypeChanged(const QString& sVisType)
 void MneEstimateTreeItem::onCheckStateLoopedStateChanged(const Qt::CheckState& checkState)
 {
     if(checkState == Qt::Checked) {
-        qDebug() << "Looped streaming active";
         m_pSourceLocRtDataWorker->setLoop(true);
     } else if(checkState == Qt::Unchecked) {
-        qDebug() << "Looped streaming inactive";
         m_pSourceLocRtDataWorker->setLoop(false);
     }
 }
