@@ -1,14 +1,15 @@
 //=============================================================================================================
 /**
-* @file     dummysetupwidget.h
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     reference.h
+* @author   Viktor Klüber <viktor.klueber@tu-ilmenau.de>;
+*           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     February, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017, Viktor Klüber, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,12 +30,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the DummySetupWidget class.
+* @brief    Contains the declaration of the Reference class.
 *
 */
 
-#ifndef DUMMYSETUPWIDGET_H
-#define DUMMYSETUPWIDGET_H
+#ifndef REFERENCE_H
+#define REFERENCE_H
 
 
 //*************************************************************************************************************
@@ -42,9 +43,15 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_dummysetup.h"
-#include "dummyaboutwidget.h"
-#include "../dummytoolbox.h"
+#include "reference_global.h"
+
+#include <scShared/Interfaces/IAlgorithm.h>
+#include <generics/circularmatrixbuffer.h>
+#include <scMeas/newrealtimemultisamplearray.h>
+#include <utils/eegref.h>
+
+#include "FormFiles/referencesetupwidget.h"
+#include "FormFiles/referencetoolbarwidget.h"
 
 
 //*************************************************************************************************************
@@ -53,69 +60,106 @@
 //=============================================================================================================
 
 #include <QtWidgets>
+#include <QtCore/QtPlugin>
+#include <QDebug>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE DummyToolboxPlugin
+// DEFINE NAMESPACE ReferencePlugin
 //=============================================================================================================
 
-namespace DUMMYTOOLBOXPLUGIN
+namespace REFERENCEPLUGIN
 {
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class DummyToolbox;
-
+class ReferenceToolbarWidget;
 
 //=============================================================================================================
 /**
-* DECLARE CLASS DummySetupWidget
+* DECLARE CLASS Reference
 *
-* @brief The DummySetupWidget class provides the DummyToolbox configuration window.
+* @brief The Reference class provides a Reference algorithm structure.
 */
-class DummySetupWidget : public QWidget
+class REFERENCESHARED_EXPORT Reference : public SCSHAREDLIB::IAlgorithm
 {
     Q_OBJECT
+    Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "reference.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
+    Q_INTERFACES(SCSHAREDLIB::IAlgorithm)
 
 public:
+    //=========================================================================================================
+    /**
+    * Constructs a Reference.
+    */
+    Reference();
 
     //=========================================================================================================
     /**
-    * Constructs a DummySetupWidget which is a child of parent.
+    * Destroys the Reference.
+    */
+    ~Reference();
+
+    //=========================================================================================================
+    /**
+    * IAlgorithm functions
+    */
+    virtual QSharedPointer<IPlugin> clone() const;
+    virtual void init();
+    virtual void unload();
+    virtual bool start();
+    virtual bool stop();
+    virtual IPlugin::PluginType getType() const;
+    virtual QString getName() const;
+    virtual QWidget* setupWidget();
+
+    //=========================================================================================================
+    /**
+    * Udates the pugin with new (incoming) data.
     *
-    * @param [in] toolbox a pointer to the corresponding DummyToolbox.
-    * @param [in] parent pointer to parent widget; If parent is 0, the new DummySetupWidget becomes a window. If parent is another widget, DummySetupWidget becomes a child window inside parent. DummySetupWidget is deleted when its parent is deleted.
+    * @param[in] pMeasurement    The incoming data in form of a generalized NewMeasurement.
     */
-    DummySetupWidget(DummyToolbox* toolbox, QWidget *parent = 0);
+    void update(SCMEASLIB::NewMeasurement::SPtr pMeasurement);
+
+protected:
+    //=========================================================================================================
+    /**
+    * IAlgorithm function
+    */
+    virtual void run();
 
     //=========================================================================================================
     /**
-    * Destroys the DummySetupWidget.
-    * All DummySetupWidget's children are deleted first. The application exits if DummySetupWidget is the main widget.
+    * Shows the toolbar widget
     */
-    ~DummySetupWidget();
-
-
-private slots:
-    //=========================================================================================================
-    /**
-    * Shows the About Dialog
-    *
-    */
-    void showAboutDialog();
+    void showRefToolbarWidget();
 
 private:
+    bool                                            m_bIsRunning;           /**< Flag whether thread is running.*/
 
-    DummyToolbox* m_pDummyToolbox;	/**< Holds a pointer to corresponding DummyToolbox.*/
+    FIFFLIB::FiffInfo::SPtr                         m_pFiffInfo;            /**< Fiff measurement info.*/
 
-    Ui::DummySetupWidgetClass ui;	/**< Holds the user interface for the DummySetupWidget.*/
+    QSharedPointer<ReferenceToolbarWidget>              m_pRefToolbarWidget;            /**< flag whether thread is running.*/
+    QAction*                                            m_pActionRefToolbarWidget;      /**< flag whether thread is running.*/
+
+    IOBUFFER::CircularMatrixBuffer<double>::SPtr        m_pRefBuffer;                   /**< Holds incoming data.*/
+
+    SCSHAREDLIB::PluginInputData<SCMEASLIB::NewRealTimeMultiSampleArray>::SPtr      m_pRefInput;      /**< The NewRealTimeMultiSampleArray of the Reference input.*/
+    SCSHAREDLIB::PluginOutputData<SCMEASLIB::NewRealTimeMultiSampleArray>::SPtr     m_pRefOutput;     /**< The NewRealTimeMultiSampleArray of the Reference output.*/
+
+signals:
+    //=========================================================================================================
+    /**
+    * Emitted when fiffInfo is available
+    */
+    void fiffInfoAvailable();
 };
 
-} // NAMESPACE
+} // namespace
 
-#endif // DUMMYSETUPWIDGET_H
+#endif // REFERENCE_H
