@@ -1488,7 +1488,7 @@ int fiff_new_file_id (fiffId id)
 //        long secs,usecs;
 //        if (fiff_get_time(&secs, &usecs) == FIFF_FAIL) //
 //            return FIFF_FAIL;
-        id->time.secs  = QDateTime::currentSecsSinceEpoch();
+        id->time.secs  = QDateTime::currentMSecsSinceEpoch()/1000;
         id->time.usecs = rand() % 1000;
     }
     id->version = FIFFC_VERSION;
