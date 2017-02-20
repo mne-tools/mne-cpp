@@ -33,8 +33,8 @@
 *
 */
 
-#ifndef FIFF_DIR_TREE_H
-#define FIFF_DIR_TREE_H
+#ifndef FIFF_DIR_NODE_H
+#define FIFF_DIR_NODE_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -321,4 +321,4 @@ inline bool FiffDirNode::find_tag(QSharedPointer<FiffStream> &p_pStream, fiff_in
 
 } // NAMESPACE
 
-#endif // FIFF_DIR_TREE_H
+#endif // FIFF_DIR_NODE_H
