@@ -1,14 +1,15 @@
 //=============================================================================================================
 /**
-* @file     dummytoolbox.cpp
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     reference.cpp
+* @author   Viktor Klüber <viktor.klueber@tu-ilmenau.de>;
+*           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     February, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017, Viktor Klüber, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the DummyToolbox class.
+* @brief    Contains the implementation of the Reference class.
 *
 */
 
@@ -38,7 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "dummytoolbox.h"
+#include "reference.h"
 
 
 //*************************************************************************************************************
@@ -46,9 +47,10 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DUMMYTOOLBOXPLUGIN;
+using namespace REFERENCEPLUGIN;
 using namespace SCSHAREDLIB;
 using namespace SCMEASLIB;
+using namespace UTILSLIB;
 using namespace IOBUFFER;
 
 
@@ -57,25 +59,26 @@ using namespace IOBUFFER;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-DummyToolbox::DummyToolbox()
+Reference::Reference()
 : m_bIsRunning(false)
-, m_pDummyInput(NULL)
-, m_pDummyOutput(NULL)
-, m_pDummyBuffer(CircularMatrixBuffer<double>::SPtr())
+, m_pRefInput(NULL)
+, m_pRefOutput(NULL)
+, m_pRefBuffer(CircularMatrixBuffer<double>::SPtr())
+, m_pRefToolbarWidget(QSharedPointer<ReferenceToolbarWidget>(new ReferenceToolbarWidget(this)))
 {
     //Add action which will be visible in the plugin's toolbar
-    m_pActionShowYourWidget = new QAction(QIcon(":/images/options.png"), tr("Your Toolbar Widget"),this);
-    m_pActionShowYourWidget->setShortcut(tr("F12"));
-    m_pActionShowYourWidget->setStatusTip(tr("Your Toolbar Widget"));
-    connect(m_pActionShowYourWidget, &QAction::triggered,
-            this, &DummyToolbox::showYourWidget);
-    addPluginAction(m_pActionShowYourWidget);
+    m_pActionRefToolbarWidget = new QAction(QIcon(":/icons/options.png"), tr("Reference Toolbar"),this);
+    m_pActionRefToolbarWidget->setShortcut(tr("F12"));
+    m_pActionRefToolbarWidget->setStatusTip(tr("Reference Toolbar"));
+    connect(m_pActionRefToolbarWidget, &QAction::triggered,
+            this, &Reference::showRefToolbarWidget);
+    addPluginAction(m_pActionRefToolbarWidget);
 }
 
 
 //*************************************************************************************************************
 
-DummyToolbox::~DummyToolbox()
+Reference::~Reference()
 {
     if(this->isRunning())
         stop();
@@ -84,36 +87,36 @@ DummyToolbox::~DummyToolbox()
 
 //*************************************************************************************************************
 
-QSharedPointer<IPlugin> DummyToolbox::clone() const
+QSharedPointer<IPlugin> Reference::clone() const
 {
-    QSharedPointer<DummyToolbox> pDummyToolboxClone(new DummyToolbox);
-    return pDummyToolboxClone;
+    QSharedPointer<Reference> pRefClone(new Reference);
+    return pRefClone;
 }
 
 
 //*************************************************************************************************************
 
-void DummyToolbox::init()
+void Reference::init()
 {
     // Input
-    m_pDummyInput = PluginInputData<NewRealTimeMultiSampleArray>::create(this, "DummyIn", "Dummy input data");
-    connect(m_pDummyInput.data(), &PluginInputConnector::notify, this, &DummyToolbox::update, Qt::DirectConnection);
-    m_inputConnectors.append(m_pDummyInput);
+    m_pRefInput = PluginInputData<NewRealTimeMultiSampleArray>::create(this, "ReferenceIn", "Reference input data");
+    connect(m_pRefInput.data(), &PluginInputConnector::notify, this, &Reference::update, Qt::DirectConnection);
+    m_inputConnectors.append(m_pRefInput);
 
     // Output - Uncomment this if you don't want to send processed data (in form of a matrix) to other plugins.
     // Also, this output stream will generate an online display in your plugin
-    m_pDummyOutput = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "DummyOut", "Dummy output data");
-    m_outputConnectors.append(m_pDummyOutput);
+    m_pRefOutput = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "ReferenceOut", "Reference output data");
+    m_outputConnectors.append(m_pRefOutput);
 
     //Delete Buffer - will be initailzed with first incoming data
-    if(!m_pDummyBuffer.isNull())
-        m_pDummyBuffer = CircularMatrixBuffer<double>::SPtr();
+    if(!m_pRefBuffer.isNull())
+        m_pRefBuffer = CircularMatrixBuffer<double>::SPtr();
 }
 
 
 //*************************************************************************************************************
 
-void DummyToolbox::unload()
+void Reference::unload()
 {
 
 }
@@ -121,7 +124,7 @@ void DummyToolbox::unload()
 
 //*************************************************************************************************************
 
-bool DummyToolbox::start()
+bool Reference::start()
 {
     //Check if the thread is already or still running. This can happen if the start button is pressed immediately after the stop button was pressed. In this case the stopping process is not finished yet but the start process is initiated.
     if(this->isRunning())
@@ -138,14 +141,14 @@ bool DummyToolbox::start()
 
 //*************************************************************************************************************
 
-bool DummyToolbox::stop()
+bool Reference::stop()
 {
     m_bIsRunning = false;
 
-    m_pDummyBuffer->releaseFromPop();
-    m_pDummyBuffer->releaseFromPush();
+    m_pRefBuffer->releaseFromPop();
+    m_pRefBuffer->releaseFromPush();
 
-    m_pDummyBuffer->clear();
+    m_pRefBuffer->clear();
 
     return true;
 }
@@ -153,7 +156,7 @@ bool DummyToolbox::stop()
 
 //*************************************************************************************************************
 
-IPlugin::PluginType DummyToolbox::getType() const
+IPlugin::PluginType Reference::getType() const
 {
     return _IAlgorithm;
 }
@@ -161,57 +164,58 @@ IPlugin::PluginType DummyToolbox::getType() const
 
 //*************************************************************************************************************
 
-QString DummyToolbox::getName() const
+QString Reference::getName() const
 {
-    return "Dummy Toolbox";
+    return "EEG Reference";
 }
 
 
 //*************************************************************************************************************
 
-QWidget* DummyToolbox::setupWidget()
+QWidget* Reference::setupWidget()
 {
-    DummySetupWidget* setupWidget = new DummySetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
+    ReferenceSetupWidget* setupWidget = new ReferenceSetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
     return setupWidget;
 }
 
 
 //*************************************************************************************************************
 
-void DummyToolbox::update(SCMEASLIB::NewMeasurement::SPtr pMeasurement)
+void Reference::update(SCMEASLIB::NewMeasurement::SPtr pMeasurement)
 {
     QSharedPointer<NewRealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<NewRealTimeMultiSampleArray>();
 
     if(pRTMSA) {
         //Check if buffer initialized
-        if(!m_pDummyBuffer) {
-            m_pDummyBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, pRTMSA->getNumChannels(), pRTMSA->getMultiSampleArray()[0].cols()));
+        if(!m_pRefBuffer) {
+            m_pRefBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, pRTMSA->getNumChannels(), pRTMSA->getMultiSampleArray()[0].cols()));
         }
 
         //Fiff information
         if(!m_pFiffInfo) {
             m_pFiffInfo = pRTMSA->info();
 
-            //Init output - Unocmment this if you also uncommented the m_pDummyOutput in the constructor above
-            m_pDummyOutput->data()->initFromFiffInfo(m_pFiffInfo);
-            m_pDummyOutput->data()->setMultiArraySize(1);
-            m_pDummyOutput->data()->setVisibility(true);
+            //Init output - Unocmment this if you also uncommented the m_pRefOutput in the constructor above
+            m_pRefOutput->data()->initFromFiffInfo(m_pFiffInfo);
+            m_pRefOutput->data()->setMultiArraySize(1);
+            m_pRefOutput->data()->setVisibility(true);
+
+            m_pRefToolbarWidget->updateChannels(m_pFiffInfo);
         }
 
         MatrixXd t_mat;
 
         for(unsigned char i = 0; i < pRTMSA->getMultiArraySize(); ++i) {
             t_mat = pRTMSA->getMultiSampleArray()[i];
-            m_pDummyBuffer->push(&t_mat);
+            m_pRefBuffer->push(&t_mat);
         }
     }
 }
 
 
-
 //*************************************************************************************************************
 
-void DummyToolbox::run()
+void Reference::run()
 {
     //
     // Wait for Fiff Info
@@ -222,21 +226,30 @@ void DummyToolbox::run()
     while(m_bIsRunning)
     {
         //Dispatch the inputs
-        MatrixXd t_mat = m_pDummyBuffer->pop();
+        MatrixXd t_mat = m_pRefBuffer->pop();
 
-        //ToDo: Implement your algorithm here
+        // apply common average reference
+        MatrixXd matCAR = EEGRef::applyCAR(t_mat, m_pFiffInfo);
 
         //Send the data to the connected plugins and the online display
-        //Unocmment this if you also uncommented the m_pDummyOutput in the constructor above
-        m_pDummyOutput->data()->setValue(t_mat);
+        m_pRefOutput->data()->setValue(matCAR);
     }
 }
 
 
 //*************************************************************************************************************
 
-void DummyToolbox::showYourWidget()
+void Reference::showRefToolbarWidget()
 {
-    m_pYourWidget = DummyYourWidget::SPtr(new DummyYourWidget());
-    m_pYourWidget->show();
+    if(m_pRefToolbarWidget == NULL){
+        m_pRefToolbarWidget = QSharedPointer<ReferenceToolbarWidget>( new ReferenceToolbarWidget(this));
+    }
+
+    if(!m_pRefToolbarWidget->isVisible()){
+        m_pRefToolbarWidget->setWindowTitle("EEG Reference options");
+        m_pRefToolbarWidget->show();
+        m_pRefToolbarWidget->raise();
+    }
+
+    m_pRefToolbarWidget->activateWindow();
 }
