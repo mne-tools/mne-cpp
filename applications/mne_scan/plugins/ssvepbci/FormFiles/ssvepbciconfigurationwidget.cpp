@@ -238,7 +238,7 @@ void SsvepBciConfigurationWidget::initSelectedChannelsSensor()
     // Read electrode pinnig scheme from file and initialise List and store in QMap in BCI object
     QString path;
     path.prepend(m_pSsvepBci->getSsvepBciResourcePath());
-    path.append("Brain_Amp_presentation.txt"); //Pinning_Scheme_Duke_Dry_64.txt
+    path.append("Pinning_Scheme_Duke_Dry_64.txt"); //Brain_Amp_presentation.txt
     QFile file(path);
     if(!file.open(QIODevice::ReadOnly | QIODevice::Text)){
         return;
@@ -531,7 +531,6 @@ void SsvepBciConfigurationWidget::classificationListSizeChanged(int arg1)
 
 void SsvepBciConfigurationWidget::showCurrentTime()
 {
-
     m_iElapsedSeconds++;
     QString time = QString::number(m_iElapsedSeconds);
     ui->m_label_ElapsedTime->setText(time);
@@ -543,4 +542,12 @@ void SsvepBciConfigurationWidget::showCurrentTime()
 void SsvepBciConfigurationWidget::stopMeasurement()
 {
     m_qTimer->stop();
+
+    QDateTime dateTime = QDateTime::currentDateTime();
+
+    QFile file(m_pSsvepBci->getSsvepBciResourcePath()+"/AccuracyResults.txt");
+    file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append);
+    QTextStream out(&file);   // serialize the data into the file
+    out << endl << dateTime.toString(Qt::TextDate) + "\t" + ui->m_lineEdit_subjectName->text() + ":" << endl << "Wrong commands:" << m_iWrongCommands  << "\tCorrect commands:" << m_iCorrectCommands << endl;   // serialize a string
+    file.close();
 }
