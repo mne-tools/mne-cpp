@@ -108,15 +108,13 @@ public:
 
     //=========================================================================================================
     /**
-    * Calculates the TPS Warp of given setup for a Bem
+    * Calculates the TPS Warp of a given setup for a List of vertices
     *
     * @param[in]  sLm       3D Landmarks of the source geometry
     * @param[in]  dLm       3D Landmarks of the destination geometry
-    * @param[in/out] vertA  Vertices A of the source geometry that are warped to the destination
-    * @param[in/out] vertB  Vertices B of the source geometry that are warped to the destination
-    * @param[in/out] vertC  Vertices C of the source geometry that are warped to the destination
+    * @param[in/out] vertList  List of Vertices of the source geometry that are warped to the destination
     */
-    void calculate(const MatrixXf & sLm, const MatrixXf &dLm, MatrixXf & vertA, MatrixXf & vertB, MatrixXf & vertC);
+    void calculate(const MatrixXf & sLm, const MatrixXf &dLm, QList<MatrixXf> & vertList);
 
     //=========================================================================================================
     /**
