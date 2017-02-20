@@ -180,10 +180,8 @@ public:
 
     //=========================================================================================================
     /**
-    * ### MNE toolbox root function ###: Implementation of the fiff_end_file function
-    *
     * Writes the closing tags to a fif file and closes the file
-    *
+    * Refactored: fiff_end_file (MNE-C); fiff_end_file (MNE-MATLAB)
     */
     void end_file();
 
