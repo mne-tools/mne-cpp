@@ -1,14 +1,15 @@
 //=============================================================================================================
 /**
-* @file     dummysetupwidget.h
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     eegref.h
+* @author   Viktor Klüber <v.klueber@gmx.net>;
+*           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     January, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017, Viktor Klüber, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,12 +30,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the DummySetupWidget class.
+* @brief     EEGRef class declaration.
 *
 */
 
-#ifndef DUMMYSETUPWIDGET_H
-#define DUMMYSETUPWIDGET_H
+#ifndef EEGREF_H
+#define EEGREF_H
 
 
 //*************************************************************************************************************
@@ -42,9 +43,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_dummysetup.h"
-#include "dummyaboutwidget.h"
-#include "../dummytoolbox.h"
+#include "utils_global.h"
+#include <fiff/fiff_info.h>
+#include <utils/ioutils.h>
 
 
 //*************************************************************************************************************
@@ -52,70 +53,60 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtWidgets>
+#include <QSharedPointer>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE DummyToolboxPlugin
+// Eigen INCLUDES
 //=============================================================================================================
 
-namespace DUMMYTOOLBOXPLUGIN
-{
+#include <Eigen/Dense>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// DEFINE NAMESPACE UTILSLIB
 //=============================================================================================================
 
-class DummyToolbox;
+namespace UTILSLIB {
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS DummySetupWidget
+* This class provides transformations for EEG reference operations.
 *
-* @brief The DummySetupWidget class provides the DummyToolbox configuration window.
+* @brief This class provides transformations for EEG reference operations.
 */
-class DummySetupWidget : public QWidget
+
+class UTILSSHARED_EXPORT EEGRef
 {
-    Q_OBJECT
 
 public:
+    typedef QSharedPointer<EEGRef> SPtr;            /**< Shared pointer type for EEGRef. */
+    typedef QSharedPointer<const EEGRef> ConstSPtr; /**< Const shared pointer type for EEGRef. */
 
     //=========================================================================================================
     /**
-    * Constructs a DummySetupWidget which is a child of parent.
+    * Constructs a EEGRef object.
+    */
+    EEGRef();
+
+    //=========================================================================================================
+    /**
+    * transforms the EEG data matrix with indifferent electrode reference to an EEG data matrix with common average reference. Bad channels are set to zero.
     *
-    * @param [in] toolbox a pointer to the corresponding DummyToolbox.
-    * @param [in] parent pointer to parent widget; If parent is 0, the new DummySetupWidget becomes a window. If parent is another widget, DummySetupWidget becomes a child window inside parent. DummySetupWidget is deleted when its parent is deleted.
-    */
-    DummySetupWidget(DummyToolbox* toolbox, QWidget *parent = 0);
-
-    //=========================================================================================================
-    /**
-    * Destroys the DummySetupWidget.
-    * All DummySetupWidget's children are deleted first. The application exits if DummySetupWidget is the main widget.
-    */
-    ~DummySetupWidget();
-
-
-private slots:
-    //=========================================================================================================
-    /**
-    * Shows the About Dialog
+    * @param[in] matIER         EEG data matrix with indifferent electrode reference
+    * @param[in] pFiffInfo      pointer to the corresponding Fiff-Info of the EEG data stream
     *
+    * @return EEG data matrix with common average reference
     */
-    void showAboutDialog();
+    static Eigen::MatrixXd applyCAR(Eigen::MatrixXd& matIER, FIFFLIB::FiffInfo::SPtr &pFiffInfo);
 
-private:
 
-    DummyToolbox* m_pDummyToolbox;	/**< Holds a pointer to corresponding DummyToolbox.*/
-
-    Ui::DummySetupWidgetClass ui;	/**< Holds the user interface for the DummySetupWidget.*/
 };
 
-} // NAMESPACE
 
-#endif // DUMMYSETUPWIDGET_H
+} // namespace UTILSLIB
+
+#endif // EEGREF_H
