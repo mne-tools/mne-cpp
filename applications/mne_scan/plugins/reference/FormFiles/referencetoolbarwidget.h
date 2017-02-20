@@ -1,14 +1,15 @@
 //=============================================================================================================
 /**
-* @file     dummysetupwidget.h
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     referencetoolbarwidget.h
+* @author   Viktor Klüber <viktor.klueber@tu-ilmenau.de>;
+*           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     February, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017, Viktor Klüber, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,22 +30,23 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the DummySetupWidget class.
+* @brief    Contains the declaration of the ReferenceToolbarWidget class.
 *
 */
 
-#ifndef DUMMYSETUPWIDGET_H
-#define DUMMYSETUPWIDGET_H
-
+#ifndef REFERENCETOOLBARWIDGET_H
+#define REFERENCETOOLBARWIDGET_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_dummysetup.h"
-#include "dummyaboutwidget.h"
-#include "../dummytoolbox.h"
+#include "reference_global.h"
+#include "../reference.h"
+#include "../ui_referencetoolbar.h"
+
+#include <fiff/fiff_info.h>
 
 
 //*************************************************************************************************************
@@ -52,15 +54,15 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtWidgets>
+#include <QWidget>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE DummyToolboxPlugin
+// DEFINE NAMESPACE REFERENCEPLUGIN
 //=============================================================================================================
 
-namespace DUMMYTOOLBOXPLUGIN
+namespace REFERENCEPLUGIN
 {
 
 
@@ -69,53 +71,49 @@ namespace DUMMYTOOLBOXPLUGIN
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class DummyToolbox;
+class Reference;
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS DummySetupWidget
+* DECLARE CLASS ReferenceToolbarWidget
 *
-* @brief The DummySetupWidget class provides the DummyToolbox configuration window.
+* @brief The ReferenceToolbarWidget class provides a dummy toolbar widget structure.
 */
-class DummySetupWidget : public QWidget
+
+class REFERENCESHARED_EXPORT ReferenceToolbarWidget : public QWidget
 {
     Q_OBJECT
 
 public:
+    typedef QSharedPointer<ReferenceToolbarWidget> SPtr;         /**< Shared pointer type for ReferenceToolbarWidget object. */
+    typedef QSharedPointer<ReferenceToolbarWidget> ConstSPtr;    /**< Const shared pointer type for ReferenceToolbarWidget object. */
 
     //=========================================================================================================
     /**
-    * Constructs a DummySetupWidget which is a child of parent.
-    *
-    * @param [in] toolbox a pointer to the corresponding DummyToolbox.
-    * @param [in] parent pointer to parent widget; If parent is 0, the new DummySetupWidget becomes a window. If parent is another widget, DummySetupWidget becomes a child window inside parent. DummySetupWidget is deleted when its parent is deleted.
+    * Constructs a ReferenceToolbarWidget.
     */
-    DummySetupWidget(DummyToolbox* toolbox, QWidget *parent = 0);
+    explicit ReferenceToolbarWidget(REFERENCEPLUGIN::Reference *pRef, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the DummySetupWidget.
-    * All DummySetupWidget's children are deleted first. The application exits if DummySetupWidget is the main widget.
+    * Destroys the ReferenceToolbarWidget.
     */
-    ~DummySetupWidget();
+    ~ReferenceToolbarWidget();
 
-
-private slots:
+public slots:
     //=========================================================================================================
     /**
-    * Shows the About Dialog
-    *
+    * updates the channels and sets them to the QListWidget
     */
-    void showAboutDialog();
+    void updateChannels(FIFFLIB::FiffInfo::SPtr &pFiffInfo);
 
 private:
+    Ui::ReferenceToolbarWidget*         ui;         /**< The UI class specified in the designer. */
 
-    DummyToolbox* m_pDummyToolbox;	/**< Holds a pointer to corresponding DummyToolbox.*/
-
-    Ui::DummySetupWidgetClass ui;	/**< Holds the user interface for the DummySetupWidget.*/
+    QSharedPointer<Reference>           m_pRef;     /**< pointer to the Reference object */
 };
 
-} // NAMESPACE
+} //REFERENCEPLUGIN
 
-#endif // DUMMYSETUPWIDGET_H
+#endif // REFERENCETOOLBARWIDGET_H
