@@ -348,7 +348,7 @@
          <string/>
         </property>
         <property name="pixmap">
-         <pixmap resource="../../eegosports/eegosports.qrc">:/logos/logos.png</pixmap>
+         <pixmap resource="../ssvepbci.qrc">:/logos/logos.png</pixmap>
         </property>
        </widget>
       </item>
@@ -1447,52 +1447,6 @@
             <string>Accuracy Feature</string>
            </property>
            <layout class="QGridLayout" name="gridLayout_14">
-            <item row="0" column="1">
-             <widget class="QLabel" name="m_label_WrongCommands">
-              <property name="maximumSize">
-               <size>
-                <width>35</width>
-                <height>16777215</height>
-               </size>
-              </property>
-              <property name="text">
-               <string>-</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="0">
-             <widget class="QLabel" name="label_6">
-              <property name="text">
-               <string>Number of correct commands:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="0">
-             <widget class="QLabel" name="label_5">
-              <property name="text">
-               <string>Number of wrong commands:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="1">
-             <widget class="QLabel" name="m_label_CorrectCommands">
-              <property name="maximumSize">
-               <size>
-                <width>35</width>
-                <height>16777215</height>
-               </size>
-              </property>
-              <property name="text">
-               <string>-</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-              </property>
-             </widget>
-            </item>
             <item row="3" column="0" colspan="2">
              <widget class="QFrame" name="m_frame_StartStopMeasurement">
               <property name="frameShape">
@@ -1519,10 +1473,56 @@
               </layout>
              </widget>
             </item>
+            <item row="1" column="1">
+             <widget class="QLabel" name="m_label_CorrectCommands">
+              <property name="maximumSize">
+               <size>
+                <width>35</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>-</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="label_6">
+              <property name="text">
+               <string>Number of correct commands:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QLabel" name="m_label_WrongCommands">
+              <property name="maximumSize">
+               <size>
+                <width>35</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>-</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+             </widget>
+            </item>
             <item row="2" column="0">
              <widget class="QLabel" name="label_7">
               <property name="text">
                <string>Time:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="0">
+             <widget class="QLabel" name="label_5">
+              <property name="text">
+               <string>Number of wrong commands:</string>
               </property>
              </widget>
             </item>
@@ -1533,6 +1533,16 @@
               </property>
               <property name="alignment">
                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item row="5" column="0" colspan="2">
+             <widget class="QLineEdit" name="m_lineEdit_subjectName"/>
+            </item>
+            <item row="4" column="0">
+             <widget class="QLabel" name="label_9">
+              <property name="text">
+               <string>Subjectname:</string>
               </property>
              </widget>
             </item>
@@ -1561,7 +1571,7 @@
   </layout>
  </widget>
  <resources>
-  <include location="../../eegosports/eegosports.qrc"/>
+  <include location="../ssvepbci.qrc"/>
  </resources>
  <connections/>
 </ui>
