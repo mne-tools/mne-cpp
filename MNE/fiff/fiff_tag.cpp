@@ -327,7 +327,6 @@ void FiffTag::convert_ch_pos(FiffChPos* pos)
 {
     int k;
     pos->coil_type  = IOUtils::swap_int(pos->coil_type);
-    float fValue;
     for (k = 0; k < 3; k++) {
         IOUtils::swap_floatp(&pos->r0[k]);
         IOUtils::swap_floatp(&pos->ex[k]);
