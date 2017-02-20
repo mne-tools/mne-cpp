@@ -1202,7 +1202,60 @@ bad : {
 
 
 
+char *mne_name_list_to_string_41(char **list,int nlist)
+/*
+* Convert a string array to a colon-separated string
+*/
+{
+    int k,len;
+    char *res;
+    if (nlist == 0 || list == NULL)
+        return NULL;
+    for (k = len = 0; k < nlist; k++)
+        len += strlen(list[k])+1;
+    res = MALLOC_41(len,char);
+    res[0] = '\0';
+    for (k = len = 0; k < nlist-1; k++) {
+        strcat(res,list[k]);
+        strcat(res,":");
+    }
+    strcat(res,list[nlist-1]);
+    return res;
+}
 
+
+int mne_write_named_matrix( FiffStream::SPtr& t_pStream,
+                            int  kind,
+                            MneNamedMatrix* mat)
+/*
+* Write a block which contains information about one named matrix
+*/
+{
+    char *names;
+
+    t_pStream->start_block(FIFFB_MNE_NAMED_MATRIX);
+
+    t_pStream->write_int(FIFF_MNE_NROW,&mat->nrow);
+    t_pStream->write_int(FIFF_MNE_NCOL,&mat->ncol);
+    if (mat->rowlist) {
+        names = mne_name_list_to_string_41(mat->rowlist,mat->nrow);
+        t_pStream->write_string(FIFF_MNE_ROW_NAMES,names);
+        FREE_41(names);
+    }
+    if (mat->collist) {
+        names = mne_name_list_to_string_41(mat->collist,mat->ncol);
+        t_pStream->write_string(FIFF_MNE_COL_NAMES,names);
+        FREE_41(names);
+    }
+    fiff_write_float_matrix_old (t_pStream,kind,mat->data,mat->nrow,mat->ncol);
+
+    t_pStream->end_block(FIFFB_MNE_NAMED_MATRIX);
+
+    return FIFF_OK;
+
+bad :
+    return FIFF_FAIL;
+}
 
 
 
@@ -1361,70 +1414,64 @@ int write_solution(const QString& name,         /* Destination file */
             goto bad;
         nvert += spaces[k]->nuse;
     }
-    //    /*
-    //    * MEG forward solution
-    //    */
-    //    if (nmeg > 0) {
-    //        if (fiff_start_block (out,FIFFB_MNE_FORWARD_SOLUTION) == FIFF_FAIL)
-    //            goto bad;
-    //        if (fiff_write_int_tag (out,FIFF_MNE_INCLUDED_METHODS,FIFFV_MNE_MEG) == FIFF_FAIL)
-    //            goto bad;
-    //        if (fiff_write_int_tag (out,FIFF_MNE_COORD_FRAME,coord_frame) == FIFF_FAIL)
-    //            goto bad;
-    //        if (fiff_write_int_tag (out,FIFF_MNE_SOURCE_ORIENTATION,
-    //                                fixed_ori ? FIFFV_MNE_FIXED_ORI : FIFFV_MNE_FREE_ORI) == FIFF_FAIL)
-    //            goto bad;
-    //        if (fiff_write_int_tag (out,FIFF_MNE_SOURCE_SPACE_NPOINTS,nvert) == FIFF_FAIL)
-    //            goto bad;
-    //        if (fiff_write_int_tag (out,FIFF_NCHAN,nmeg) == FIFF_FAIL)
-    //            goto bad;
-    //        if (mne_write_named_matrix(out,FIFF_MNE_FORWARD_SOLUTION,meg_solution) == FIFF_FAIL)
-    //            goto bad;
-    //        if (meg_solution_grad)
-    //            if (mne_write_named_matrix(out,FIFF_MNE_FORWARD_SOLUTION_GRAD,meg_solution_grad) == FIFF_FAIL)
-    //                goto bad;
-    //        if (fiff_end_block (out,FIFFB_MNE_FORWARD_SOLUTION) == FIFF_FAIL)
-    //            goto bad;
-    //    }
-    //    /*
-    //    * EEG forward solution
-    //    */
-    //    if (neeg > 0) {
-    //        if (fiff_start_block (out,FIFFB_MNE_FORWARD_SOLUTION) == FIFF_FAIL)
-    //            goto bad;
-    //        if (fiff_write_int_tag (out,FIFF_MNE_INCLUDED_METHODS,FIFFV_MNE_EEG) == FIFF_FAIL)
-    //            goto bad;
-    //        if (fiff_write_int_tag (out,FIFF_MNE_COORD_FRAME,coord_frame) == FIFF_FAIL)
-    //            goto bad;
-    //        if (fiff_write_int_tag (out,FIFF_MNE_SOURCE_ORIENTATION,
-    //                                fixed_ori ? FIFFV_MNE_FIXED_ORI : FIFFV_MNE_FREE_ORI) == FIFF_FAIL)
-    //            goto bad;
-    //        if (fiff_write_int_tag (out,FIFF_NCHAN,neeg) == FIFF_FAIL)
-    //            goto bad;
-    //        if (fiff_write_int_tag (out,FIFF_MNE_SOURCE_SPACE_NPOINTS,nvert) == FIFF_FAIL)
-    //            goto bad;
-    //        if (mne_write_named_matrix(out,FIFF_MNE_FORWARD_SOLUTION,eeg_solution) == FIFF_FAIL)
-    //            goto bad;
-    //        if (eeg_solution_grad)
-    //            if (mne_write_named_matrix(out,FIFF_MNE_FORWARD_SOLUTION_GRAD,eeg_solution_grad) == FIFF_FAIL)
-    //                goto bad;
-    //        if (fiff_end_block (out,FIFFB_MNE_FORWARD_SOLUTION) == FIFF_FAIL)
-    //            goto bad;
-    //    }
-    //    if (fiff_end_block (out,FIFFB_MNE) == FIFF_FAIL)
-    //        goto bad;
-    //    if (fiff_end_file (out) == FIFF_FAIL)
-    //        goto bad;
-    //    (void)fclose(out); out = NULL;
 
-    //    /*
-    //    * Add directory
-    //    */
-    //    if ((in = fiff_open_update(name)) == NULL)
-    //        goto bad;
-    //    if (fiff_put_dir(in->fd,in->dir) == FIFF_FAIL)
-    //        goto bad;
-    //    fiff_close(in); in = NULL;
+    /*
+    * MEG forward solution
+    */
+    if (nmeg > 0) {
+        t_pStream->start_block(FIFFB_MNE_FORWARD_SOLUTION);
+
+        int val = FIFFV_MNE_MEG;
+        t_pStream->write_int(FIFF_MNE_INCLUDED_METHODS,&val);
+        t_pStream->write_int(FIFF_MNE_COORD_FRAME,&coord_frame);
+        val = fixed_ori ? FIFFV_MNE_FIXED_ORI : FIFFV_MNE_FREE_ORI;
+        t_pStream->write_int(FIFF_MNE_SOURCE_ORIENTATION,&val);
+        t_pStream->write_int(FIFF_MNE_SOURCE_SPACE_NPOINTS,&nvert);
+        t_pStream->write_int(FIFF_NCHAN,&nmeg);
+        if (mne_write_named_matrix(t_pStream,FIFF_MNE_FORWARD_SOLUTION,meg_solution) == FIFF_FAIL)
+            goto bad;
+        if (meg_solution_grad)
+            if (mne_write_named_matrix(t_pStream,FIFF_MNE_FORWARD_SOLUTION_GRAD,meg_solution_grad) == FIFF_FAIL)
+                goto bad;
+
+        t_pStream->end_block(FIFFB_MNE_FORWARD_SOLUTION);
+    }
+    /*
+    * EEG forward solution
+    */
+    if (neeg > 0) {
+        t_pStream->start_block(FIFFB_MNE_FORWARD_SOLUTION);
+
+        int val = FIFFV_MNE_EEG;
+        t_pStream->write_int(FIFF_MNE_INCLUDED_METHODS,&val);
+        t_pStream->write_int(FIFF_MNE_COORD_FRAME,&coord_frame);
+        val = fixed_ori ? FIFFV_MNE_FIXED_ORI : FIFFV_MNE_FREE_ORI;
+        t_pStream->write_int(FIFF_MNE_SOURCE_ORIENTATION,&val);
+        t_pStream->write_int(FIFF_NCHAN,&neeg);
+        t_pStream->write_int(FIFF_MNE_SOURCE_SPACE_NPOINTS,&nvert);
+        if (mne_write_named_matrix(t_pStream,FIFF_MNE_FORWARD_SOLUTION,eeg_solution) == FIFF_FAIL)
+            goto bad;
+        if (eeg_solution_grad)
+            if (mne_write_named_matrix(t_pStream,FIFF_MNE_FORWARD_SOLUTION_GRAD,eeg_solution_grad) == FIFF_FAIL)
+                goto bad;
+
+        t_pStream->end_block(FIFFB_MNE_FORWARD_SOLUTION);
+    }
+
+    t_pStream->end_block(FIFFB_MNE);
+
+    t_pStream->end_file();
+
+    t_pStream->close();
+
+//    /*
+//    * Add directory
+//    */
+//    if ((in = fiff_open_update(name)) == NULL)
+//        goto bad;
+//    if (fiff_put_dir(in->fd,in->dir) == FIFF_FAIL)
+//        goto bad;
+//    fiff_close(in); in = NULL;
 
     return FIFF_OK;
 
