@@ -1543,18 +1543,17 @@ int mne_attach_env(const QString& name, const QString& command)
 //    fprintf(stderr,"envid = %s\n",mne_format_file_id(&id));
 //#endif
 
-
-//    if (!t_file.exists()) {
-//        qCritical("File %s does not exist. Cannot attach env info.",name.toLatin1().constData());
-//        goto out;
-//    }
-//    if (!t_file.isWritable()) {
-//        qCritical("File %s is not writable. Cannot attach env info.",name.toLatin1().constData());
-//        goto out;
-//    }
-//    /*
-//   * Open the file to modify
-//   */
+    if (!t_file.exists()) {
+        qCritical("File %s does not exist. Cannot attach env info.",name.toLatin1().constData());
+        goto out;
+    }
+    if (!t_file.isWritable()) {
+        qCritical("File %s is not writable. Cannot attach env info.",name.toLatin1().constData());
+        goto out;
+    }
+    /*
+    * Open the file to modify
+    */
 //    if ((file = fiff_open_update(name)) == NULL)
 //        goto out;
 //    /*

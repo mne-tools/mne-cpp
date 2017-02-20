@@ -445,7 +445,7 @@ public:
     //=========================================================================================================
     /**
     * Open fiff file for update
-    * Refactored: fiff_start_files (MNE-C)
+    * Refactored: fiff_open_update (MNE-C)
     *
     * @param[in] p_IODevice    The IODevice (like QFile or QTCPSocket) to open. It is recommended that the name ends with .fif
     *
