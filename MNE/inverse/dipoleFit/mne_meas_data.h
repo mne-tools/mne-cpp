@@ -45,6 +45,7 @@
 #include <fiff/fiff_types.h>
 
 #include "mne_types.h"
+#include "mne_raw_data.h"
 
 
 //*************************************************************************************************************
@@ -116,6 +117,28 @@ public:
     */
     void adjust_baselines(float bmin, float bmax);
 
+
+    //============================= mne_read_data.c =============================
+
+    static MneMeasData* mne_read_meas_data_add(const QString&       name,       /* Name of the measurement file */
+                                       int                  set,        /* Which data set */
+                                       mneInverseOperator   op,         /* For consistency checks */
+                                       MneNamedMatrix*       fwd,        /* Another option for consistency checks */
+                                       char                 **namesp,   /* Yet another option: explicit name list */
+                                       int                  nnamesp,
+                                       MneMeasData*          add_to);
+
+
+    static MneMeasData* mne_read_meas_data(const QString&       name,       /* Name of the measurement file */
+                                   int                  set,        /* Which data set */
+                                   mneInverseOperator   op,         /* For consistency checks */
+                                   MneNamedMatrix*       fwd,        /* Another option for consistency checks */
+                                   char                 **namesp,   /* Yet another option: explicit name list */
+                                   int                  nnamesp);
+
+
+
+
 public:
     char                    *filename;  /* The source file name */
     FIFFLIB::fiffId         meas_id;    /* The id from the measurement file */
@@ -128,10 +151,10 @@ public:
     float                   highpass;   /* Highpass filter setting */
     float                   lowpass;    /* Lowpass filter setting */
     INVERSELIB::MneProjOp*  proj;       /* Associated projection operator (useful if inverse operator is not included) */
-    mneCTFcompDataSet       comp;       /* The software gradient compensation data */
+    MneCTFCompDataSet*      comp;       /* The software gradient compensation data */
     mneInverseOperator      op;         /* Associated inverse operator */
     MneNamedMatrix*         fwd;        /* Forward operator for dipole fitting */
-    mneRawData              raw;        /* This will be non-null if the data stems from a raw data file */
+    MneRawData*             raw;        /* This will be non-null if the data stems from a raw data file */
     mneChSelection          chsel;      /* Channel selection for raw data */
     char                    **badlist;  /* Bad channel names */
     int                     nbad;       /* How many? */

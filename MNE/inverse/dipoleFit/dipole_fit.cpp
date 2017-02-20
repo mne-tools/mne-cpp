@@ -1,7 +1,8 @@
 
 
 #include "dipole_fit.h"
-#include "dipolefit_helpers.h"
+#include "mne_meas_data_set.h"
+#include "guess_data.h"
 
 #include <string.h>
 
@@ -60,6 +61,139 @@ using namespace INVERSELIB;
 //=============================================================================================================
 
 
+#define MALLOC(x,t) (t *)malloc((x)*sizeof(t))
+#define REALLOC(x,y,t) (t *)((x == NULL) ? malloc((y)*sizeof(t)) : realloc((x),(y)*sizeof(t)))
+#define FREE(x) if ((char *)(x) != NULL) free((char *)(x))
+
+#define ALLOC_CMATRIX(x,y) mne_cmatrix((x),(y))
+
+#define FREE_CMATRIX(m) mne_free_cmatrix((m))
+
+
+static void matrix_error(int kind, int nr, int nc)
+
+{
+    if (kind == 1)
+        printf("Failed to allocate memory pointers for a %d x %d matrix\n",nr,nc);
+    else if (kind == 2)
+        printf("Failed to allocate memory for a %d x %d matrix\n",nr,nc);
+    else
+        printf("Allocation error for a %d x %d matrix\n",nr,nc);
+    if (sizeof(void *) == 4) {
+        printf("This is probably because you seem to be using a computer with 32-bit architecture.\n");
+        printf("Please consider moving to a 64-bit platform.");
+    }
+    printf("Cannot continue. Sorry.\n");
+    exit(1);
+}
+
+
+
+float **mne_cmatrix (int nr,int nc)
+
+{
+    int i;
+    float **m;
+    float *whole;
+
+    m = MALLOC(nr,float *);
+    if (!m) matrix_error(1,nr,nc);
+    whole = MALLOC(nr*nc,float);
+    if (!whole) matrix_error(2,nr,nc);
+
+    for(i=0;i<nr;i++)
+        m[i] = whole + i*nc;
+    return m;
+}
+
+
+
+void mne_free_cmatrix (float **m)
+{
+    if (m) {
+        FREE(*m);
+        FREE(m);
+    }
+}
+
+
+
+
+
+
+
+
+//char *mne_compose_mne_name(const char *path, const char *filename)
+///*
+//      * Compose a filename under the "$MNE_ROOT" directory
+//      */
+//{
+//    char *res;
+//    char *mne_root;
+
+//    if (filename == NULL) {
+//        qCritical("No file name specified to mne_compose_mne_name");
+//        return NULL;
+//    }
+//    mne_root = getenv(MNE_ENV_ROOT);
+//    if (mne_root == NULL || strlen(mne_root) == 0) {
+//        qCritical("Environment variable MNE_ROOT not set");
+//        return NULL;
+//    }
+//    if (path == NULL || strlen(path) == 0) {
+//        res = MALLOC(strlen(mne_root)+strlen(filename)+2,char);
+//        strcpy(res,mne_root);
+//        strcat(res,"/");
+//        strcat(res,filename);
+//    }
+//    else {
+//        res = MALLOC(strlen(mne_root)+strlen(filename)+strlen(path)+3,char);
+//        strcpy(res,mne_root);
+//        strcat(res,"/");
+//        strcat(res,path);
+//        strcat(res,"/");
+//        strcat(res,filename);
+//    }
+//    return res;
+//}
+
+
+
+//============================= misc_util.c =============================
+
+char *mne_strdup(const char *s)
+{
+    char *res;
+    if (s == NULL)
+        return NULL;
+    res = (char*) malloc(strlen(s)+1);
+    strcpy(res,s);
+    return res;
+}
+
+
+
+//============================= mne_named_matrix.c =============================
+
+void mne_free_name_list(char **list, int nlist)
+/*
+* Free a name list array
+*/
+{
+    int k;
+    if (list == NULL || nlist == 0)
+        return;
+    for (k = 0; k < nlist; k++) {
+#ifdef FOO
+        fprintf(stderr,"%d %s\n",k,list[k]);
+#endif
+        FREE(list[k]);
+    }
+    FREE(list);
+    return;
+}
+
+
 //============================= mne_ch_selections.c =============================
 
 /*
@@ -106,6 +240,21 @@ mneChSelection mne_ch_selection_these(const char *selname, char **names, int nch
 
 
 
+char **mne_dup_name_list(char **list, int nlist)
+/*
+ * Duplicate a name list
+ */
+{
+    char **res;
+    int  k;
+    if (list == NULL || nlist == 0)
+        return NULL;
+    res = MALLOC(nlist,char *);
+
+    for (k = 0; k < nlist; k++)
+        res[k] = mne_strdup(list[k]);
+    return res;
+}
 
 
 
@@ -129,13 +278,13 @@ static void omit_spaces(char **names, int nnames)
 
 
 int mne_ch_selection_assign_chs(mneChSelection sel,
-                                mneRawData     data)
+                                MneRawData*     data)
 /*
       * Make the channel picking real easy
       */
 {
     int c,rc,d;
-    mneRawInfo  info;
+    MneRawInfo*  info;
     int nch;
     char *dash;
 
@@ -496,7 +645,7 @@ ECDSet DipoleFit::calculateFit() const
     FwdEegSphereModel*  eeg_model = NULL;
     DipoleFitData*      fit_data = NULL;
     MneMeasData*        data     = NULL;
-    mneRawData          raw      = NULL;
+    MneRawData*         raw      = NULL;
     mneChSelection      sel      = NULL;
 
     printf("---- Setting up...\n\n");
@@ -522,7 +671,7 @@ ECDSet DipoleFit::calculateFit() const
         float t1,t2;
 
         printf("\n---- Opening a raw data file...\n\n");
-        if ((raw = mne_raw_open_file(settings->measname.isEmpty() ? NULL : settings->measname.toLatin1().data(),TRUE,FALSE,&(settings->filter))) == NULL)
+        if ((raw = MneRawData::mne_raw_open_file(settings->measname.isEmpty() ? NULL : settings->measname.toLatin1().data(),TRUE,FALSE,&(settings->filter))) == NULL)
             goto out;
         /*
         * A channel selection is needed to access the data
@@ -552,7 +701,7 @@ ECDSet DipoleFit::calculateFit() const
     }
     else {
         printf("\n---- Reading data...\n\n");
-        if ((data = mne_read_meas_data(settings->measname,settings->setno,NULL,NULL,
+        if ((data = MneMeasData::mne_read_meas_data(settings->measname,settings->setno,NULL,NULL,
                                        fit_data->ch_names,fit_data->nmeg+fit_data->neeg)) == NULL)
             goto out;
         if (settings->do_baseline)
@@ -651,7 +800,7 @@ int DipoleFit::fit_dipoles( const QString& dataname, MneMeasData* data, DipoleFi
 
 //*************************************************************************************************************
 
-int DipoleFit::fit_dipoles_raw(const QString& dataname, mneRawData raw, mneChSelection sel, DipoleFitData* fit, GuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose, ECDSet& p_set)
+int DipoleFit::fit_dipoles_raw(const QString& dataname, MneRawData* raw, mneChSelection sel, DipoleFitData* fit, GuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose, ECDSet& p_set)
 {
     float *one    = MALLOC(sel->nchan,float);
     float sfreq   = raw->info->sfreq;
@@ -674,14 +823,14 @@ int DipoleFit::fit_dipoles_raw(const QString& dataname, mneRawData raw, mneChSel
    * Load the initial data segment
    */
     stime = start/sfreq;
-    if (mne_raw_pick_data_filt(raw,sel,start,length,data) == FAIL)
+    if (MneRawData::mne_raw_pick_data_filt(raw,sel,start,length,data) == FAIL)
         goto bad;
     fprintf(stderr,"Fitting...%c",verbose ? '\n' : '\0');
     for (s = 0, time = tmin; time < tmax; s++, time = tmin  + s*tstep) {
         picks = time*sfreq - start;
         if (picks > stepo) {		/* Need a new data segment? */
             start = start + step;
-            if (mne_raw_pick_data_filt(raw,sel,start,length,data) == FAIL)
+            if (MneRawData::mne_raw_pick_data_filt(raw,sel,start,length,data) == FAIL)
                 goto bad;
             picks = time*sfreq - start;
             stime = start/sfreq;
@@ -725,7 +874,7 @@ bad : {
 
 //*************************************************************************************************************
 
-int DipoleFit::fit_dipoles_raw(const QString& dataname, mneRawData raw, mneChSelection sel, DipoleFitData* fit, GuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose)
+int DipoleFit::fit_dipoles_raw(const QString& dataname, MneRawData* raw, mneChSelection sel, DipoleFitData* fit, GuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose)
 {
     ECDSet set;
     return fit_dipoles_raw(dataname, raw, sel, fit, guess, tmin, tmax, tstep, integ, verbose, set);

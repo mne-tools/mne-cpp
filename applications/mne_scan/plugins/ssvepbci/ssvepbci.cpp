@@ -101,10 +101,10 @@ SsvepBci::SsvepBci()
 
 
     // Intitalise BCI data
-    //m_slChosenChannelsSensor << "9Z" << "8Z" << "7Z" << "6Z" << "9L" << "8L" << "9R" << "8R"; //<< "TEST";
-    m_slChosenChannelsSensor << "24" << "25" << "26" << "28" << "29" << "30" << "31" << "32";
-    //m_lElectrodeNumbers << 33 << 34 << 35 << 36 << 40 << 41 << 42 << 43;
-    m_lElectrodeNumbers << 24 << 25 << 26 << 28 << 29 << 30 << 31 << 32;
+    m_slChosenChannelsSensor << "9Z" << "8Z" << "7Z" << "6Z" << "9L" << "8L" << "9R" << "8R"; //<< "TEST";
+    //m_slChosenChannelsSensor << "24" << "25" << "26" << "28" << "29" << "30" << "31" << "32";
+    m_lElectrodeNumbers << 33 << 34 << 35 << 36 << 40 << 41 << 42 << 43;
+    //m_lElectrodeNumbers << 24 << 25 << 26 << 28 << 29 << 30 << 31 << 32;
     m_lDesFrequencies << 6.66 << 7.5 <<8.57 << 10 << 12;
     m_lThresholdValues << 0.12 << 0.12 << 0.12 << 0.12 << 0.12;
     setFrequencyList(m_lDesFrequencies);
