@@ -1,14 +1,15 @@
 //=============================================================================================================
 /**
-* @file     dummysetupwidget.h
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     eegref.cpp
+* @author   Viktor Klüber <v.klueber@gmx.net>;
+*           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     January, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017, Viktor Klüber, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,12 +30,9 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the DummySetupWidget class.
+* @brief    EEGRef class definition.
 *
 */
-
-#ifndef DUMMYSETUPWIDGET_H
-#define DUMMYSETUPWIDGET_H
 
 
 //*************************************************************************************************************
@@ -42,80 +40,76 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_dummysetup.h"
-#include "dummyaboutwidget.h"
-#include "../dummytoolbox.h"
+#include "eegref.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// INCLUDES
 //=============================================================================================================
 
-#include <QtWidgets>
+#include <Eigen/Dense>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE DummyToolboxPlugin
+// USED NAMESPACES
 //=============================================================================================================
 
-namespace DUMMYTOOLBOXPLUGIN
+using namespace UTILSLIB;
+using namespace Eigen;
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+EEGRef::EEGRef()
 {
+}
 
 
 //*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
 
-class DummyToolbox;
-
-
-//=============================================================================================================
-/**
-* DECLARE CLASS DummySetupWidget
-*
-* @brief The DummySetupWidget class provides the DummyToolbox configuration window.
-*/
-class DummySetupWidget : public QWidget
+MatrixXd EEGRef::applyCAR(MatrixXd &matIER, FIFFLIB::FiffInfo::SPtr &pFiffInfo)
 {
-    Q_OBJECT
+    unsigned int numTrueCh  = 0;
+    unsigned int numCh      = pFiffInfo->chs.size();
+    MatrixXd matOnes        = MatrixXd::Ones(numCh, numCh);
+    MatrixXd matCenter      = MatrixXd::Identity(numCh, numCh);
 
-public:
+    //determine the number of true channels
+    for(unsigned int i = 0; i < numCh; ++i)
+    {
+        if(pFiffInfo->chs.at(i).ch_name.contains("EEG") && !pFiffInfo->bads.contains(pFiffInfo->chs.at(i).ch_name))
+        {
+            numTrueCh++;
+        }
+        else
+        {
+            // excluding non-EEG channels from the centering matrix
+            matOnes.row(i).setZero();
+            matOnes.col(i).setZero();
+            matCenter.row(i).setZero();
+            matCenter.col(i).setZero();
+        }
+    }
 
-    //=========================================================================================================
-    /**
-    * Constructs a DummySetupWidget which is a child of parent.
-    *
-    * @param [in] toolbox a pointer to the corresponding DummyToolbox.
-    * @param [in] parent pointer to parent widget; If parent is 0, the new DummySetupWidget becomes a window. If parent is another widget, DummySetupWidget becomes a child window inside parent. DummySetupWidget is deleted when its parent is deleted.
-    */
-    DummySetupWidget(DummyToolbox* toolbox, QWidget *parent = 0);
+    //detrmine centering matrix
+    matCenter = matCenter - (1/double(numTrueCh))*matOnes;
 
-    //=========================================================================================================
-    /**
-    * Destroys the DummySetupWidget.
-    * All DummySetupWidget's children are deleted first. The application exits if DummySetupWidget is the main widget.
-    */
-    ~DummySetupWidget();
+    // determine EEG CAR data matrix
+    MatrixXd matCAR = matCenter*matIER;
 
+    //add former excluded non-EEG channels to the EEG CAR data matrix
+    for(unsigned int i = 0; i < numCh; ++i)
+    {
+        if(!pFiffInfo->chs.at(i).ch_name.contains("EEG"))
+        {
+            matCAR.row(i) = matIER.row(i);
+        }
+    }
 
-private slots:
-    //=========================================================================================================
-    /**
-    * Shows the About Dialog
-    *
-    */
-    void showAboutDialog();
-
-private:
-
-    DummyToolbox* m_pDummyToolbox;	/**< Holds a pointer to corresponding DummyToolbox.*/
-
-    Ui::DummySetupWidgetClass ui;	/**< Holds the user interface for the DummySetupWidget.*/
-};
-
-} // NAMESPACE
-
-#endif // DUMMYSETUPWIDGET_H
+    return matCAR;
+}

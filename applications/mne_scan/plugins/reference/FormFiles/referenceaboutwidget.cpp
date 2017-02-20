@@ -1,14 +1,15 @@
 //=============================================================================================================
 /**
-* @file     dummysetupwidget.h
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     referenceaboutwidget.cpp
+* @author   Viktor Klüber <viktor.klueber@tu-ilmenau.de>;
+*           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     February, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017, Viktor Klüber, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,93 +30,41 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the DummySetupWidget class.
+* @brief    Contains the implementation of the ReferenceAboutWidget class.
 *
 */
-
-#ifndef DUMMYSETUPWIDGET_H
-#define DUMMYSETUPWIDGET_H
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_dummysetup.h"
-#include "dummyaboutwidget.h"
-#include "../dummytoolbox.h"
+#include "referenceaboutwidget.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// USED NAMESPACES
 //=============================================================================================================
 
-#include <QtWidgets>
+using namespace REFERENCEPLUGIN;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE DummyToolboxPlugin
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-namespace DUMMYTOOLBOXPLUGIN
+ReferenceAboutWidget::ReferenceAboutWidget(QWidget *parent)
+    : QDialog(parent)
+{
+    ui.setupUi(this);
+}
+
+
+//*************************************************************************************************************
+
+ReferenceAboutWidget::~ReferenceAboutWidget()
 {
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-class DummyToolbox;
-
-
-//=============================================================================================================
-/**
-* DECLARE CLASS DummySetupWidget
-*
-* @brief The DummySetupWidget class provides the DummyToolbox configuration window.
-*/
-class DummySetupWidget : public QWidget
-{
-    Q_OBJECT
-
-public:
-
-    //=========================================================================================================
-    /**
-    * Constructs a DummySetupWidget which is a child of parent.
-    *
-    * @param [in] toolbox a pointer to the corresponding DummyToolbox.
-    * @param [in] parent pointer to parent widget; If parent is 0, the new DummySetupWidget becomes a window. If parent is another widget, DummySetupWidget becomes a child window inside parent. DummySetupWidget is deleted when its parent is deleted.
-    */
-    DummySetupWidget(DummyToolbox* toolbox, QWidget *parent = 0);
-
-    //=========================================================================================================
-    /**
-    * Destroys the DummySetupWidget.
-    * All DummySetupWidget's children are deleted first. The application exits if DummySetupWidget is the main widget.
-    */
-    ~DummySetupWidget();
-
-
-private slots:
-    //=========================================================================================================
-    /**
-    * Shows the About Dialog
-    *
-    */
-    void showAboutDialog();
-
-private:
-
-    DummyToolbox* m_pDummyToolbox;	/**< Holds a pointer to corresponding DummyToolbox.*/
-
-    Ui::DummySetupWidgetClass ui;	/**< Holds the user interface for the DummySetupWidget.*/
-};
-
-} // NAMESPACE
-
-#endif // DUMMYSETUPWIDGET_H
+}
