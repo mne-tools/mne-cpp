@@ -99,9 +99,6 @@ MatrixXd EEGRef::applyCAR(MatrixXd &matIER, FIFFLIB::FiffInfo::SPtr &pFiffInfo)
     //detrmine centering matrix
     matCenter = matCenter - (1/double(numTrueCh))*matOnes;
 
-//    // write centering matrix to a file
-//    IOUtils::write_eigen_matrix(matCenter, "matCENTERING.txt", "centering matrix");
-
     // determine EEG CAR data matrix
     MatrixXd matCAR = matCenter*matIER;
 
