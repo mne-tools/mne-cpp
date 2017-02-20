@@ -146,7 +146,7 @@ public:
     *
     * @return true when successful
     */
-    static int fit_dipoles_raw(const QString& dataname, mneRawData raw, mneChSelection sel, DipoleFitData* fit, GuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose, ECDSet& p_set);
+    static int fit_dipoles_raw(const QString& dataname, MneRawData* raw, mneChSelection sel, DipoleFitData* fit, GuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose, ECDSet& p_set);
 
     //=========================================================================================================
     /**
@@ -167,7 +167,7 @@ public:
     *
     * @return true when successful
     */
-    static int fit_dipoles_raw(const QString& dataname, mneRawData raw, mneChSelection sel, DipoleFitData* fit, GuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose);
+    static int fit_dipoles_raw(const QString& dataname, MneRawData* raw, mneChSelection sel, DipoleFitData* fit, GuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose);
 
 private:
     DipoleFitSettings* settings;

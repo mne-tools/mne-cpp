@@ -90,7 +90,8 @@ SOURCES += \
     spectrogram.cpp \
     warp.cpp \
     filterTools/sphara.cpp \
-    sphere.cpp
+    sphere.cpp \
+    eegref.cpp
 
 HEADERS += \
     kmeans.h\
@@ -113,7 +114,8 @@ HEADERS += \
     warp.h \
     filterTools/sphara.h \
     sphere.h \
-    simplex_algorithm.h
+    simplex_algorithm.h \
+    eegref.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
