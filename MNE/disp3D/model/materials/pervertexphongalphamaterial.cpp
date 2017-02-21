@@ -129,15 +129,15 @@ void PerVertexPhongAlphaMaterial::init()
     m_pVertexGL3Technique->graphicsApiFilter()->setMinorVersion(0);
     m_pVertexGL3Technique->graphicsApiFilter()->setProfile(QGraphicsApiFilter::CoreProfile);
 
-        m_pVertexGL3Technique->graphicsApiFilter()->setApi(QGraphicsApiFilter::OpenGL);
-    m_pVertexGL3Technique->graphicsApiFilter()->setMajorVersion(2);
-    m_pVertexGL3Technique->graphicsApiFilter()->setMinorVersion(0);
-    m_pVertexGL3Technique->graphicsApiFilter()->setProfile(QGraphicsApiFilter::NoProfile);
+    m_pVertexGL2Technique->graphicsApiFilter()->setApi(QGraphicsApiFilter::OpenGL);
+    m_pVertexGL2Technique->graphicsApiFilter()->setMajorVersion(2);
+    m_pVertexGL2Technique->graphicsApiFilter()->setMinorVersion(0);
+    m_pVertexGL2Technique->graphicsApiFilter()->setProfile(QGraphicsApiFilter::NoProfile);
 
-    m_pVertexGL3Technique->graphicsApiFilter()->setApi(QGraphicsApiFilter::OpenGLES);
-    m_pVertexGL3Technique->graphicsApiFilter()->setMajorVersion(2);
-    m_pVertexGL3Technique->graphicsApiFilter()->setMinorVersion(0);
-    m_pVertexGL3Technique->graphicsApiFilter()->setProfile(QGraphicsApiFilter::NoProfile);
+    m_pVertexES2Technique->graphicsApiFilter()->setApi(QGraphicsApiFilter::OpenGLES);
+    m_pVertexES2Technique->graphicsApiFilter()->setMajorVersion(2);
+    m_pVertexES2Technique->graphicsApiFilter()->setMinorVersion(0);
+    m_pVertexES2Technique->graphicsApiFilter()->setProfile(QGraphicsApiFilter::NoProfile);
 
     //Setup transparency
     m_pBlendState->setSourceRgb(QBlendEquationArguments::SourceAlpha);
