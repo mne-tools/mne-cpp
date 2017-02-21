@@ -1,4 +1,4 @@
-#version 320 core
+#version 400 core
 
 #pragma include light.inc.frag
 

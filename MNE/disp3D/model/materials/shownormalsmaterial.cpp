@@ -121,7 +121,7 @@ void ShowNormalsMaterial::init()
 
     //Set OpenGL version
     m_pVertexGL3Technique->graphicsApiFilter()->setApi(QGraphicsApiFilter::OpenGL);
-    m_pVertexGL3Technique->graphicsApiFilter()->setMajorVersion(4);
+    m_pVertexGL3Technique->graphicsApiFilter()->setMajorVersion(2);
     m_pVertexGL3Technique->graphicsApiFilter()->setMinorVersion(0);
     m_pVertexGL3Technique->graphicsApiFilter()->setProfile(QGraphicsApiFilter::CoreProfile);
 
