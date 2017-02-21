@@ -14,5 +14,10 @@
         <file>model/materials/shaders/gl3/pervertextessphongalpha.vert</file>
         <file>model/materials/shaders/gl3/pervertextessphongalpha_pn_triangles.tes</file>
         <file>model/materials/shaders/gl3/pervertextessphongalpha_simple.tes</file>
+        <file>model/materials/shaders/es2/light.inc.frag</file>
+        <file>model/materials/shaders/es2/network.frag</file>
+        <file>model/materials/shaders/es2/network.vert</file>
+        <file>model/materials/shaders/es2/pervertexphongalpha.frag</file>
+        <file>model/materials/shaders/es2/pervertexphongalpha.vert</file>
     </qresource>
 </RCC>
