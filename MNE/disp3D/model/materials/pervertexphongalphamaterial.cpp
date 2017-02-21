@@ -116,12 +116,13 @@ void PerVertexPhongAlphaMaterial::init()
     //Set shader
     m_pVertexGL3Shader->setVertexShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl3/pervertexphongalpha.vert"))));
     m_pVertexGL3Shader->setFragmentShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl3/pervertexphongalpha.frag"))));
+
     m_pVertexES2Shader->setVertexShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/materials/shaders/es2/pervertexphongalpha.vert"))));
     m_pVertexES2Shader->setFragmentShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/materials/shaders/es2/pervertexphongalpha.frag"))));
 
     m_pVertexGL3RenderPass->setShaderProgram(m_pVertexGL3Shader);
-    m_pVertexGL3RenderPass->setShaderProgram(m_pVertexES2Shader);
-    m_pVertexGL3RenderPass->setShaderProgram(m_pVertexES2Shader);
+    m_pVertexGL2RenderPass->setShaderProgram(m_pVertexES2Shader);
+    m_pVertexES2RenderPass->setShaderProgram(m_pVertexES2Shader);
 
     //Set OpenGL version
     m_pVertexGL3Technique->graphicsApiFilter()->setApi(QGraphicsApiFilter::OpenGL);
