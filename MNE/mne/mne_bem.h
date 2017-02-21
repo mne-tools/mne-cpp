@@ -232,6 +232,31 @@ public:
     */
     MNEBem& operator<< (const MNEBemSurface* surf);
 
+    //=========================================================================================================
+    /**
+    * Warp the Bem
+    *
+    * @param[in]  sLm       3D Landmarks of the source geometry
+    * @param[in]  dLm       3D Landmarks of the destination geometry
+    */
+    void warp(const MatrixXf &sLm, const MatrixXf &dLm);
+
+    //=========================================================================================================
+    /**
+    * Transform the Bem
+    *
+    * @param[in]  trans     The Transformation Matrix
+    */
+    void transform(const FiffCoordTrans trans);
+
+    //=========================================================================================================
+    /**
+    * Transform the Bem using the inverse
+    *
+    * @param[in]  trans     The Transformation Matrix
+    */
+    void invtransform(const FiffCoordTrans trans);
+
 protected:
     //=========================================================================================================
     /**
