@@ -1,4 +1,4 @@
-#version 320 core
+#version 400 core
 
 uniform mat4 projectionMatrix;
 uniform mat4 modelViewProjection;
