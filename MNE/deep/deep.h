@@ -109,6 +109,13 @@ public:
     */
     virtual ~Deep();
 
+
+    const QString& getModelFilename() const;
+
+    void setModelFilename(const QString &ModelFilename);
+
+    void performTest();
+
 private:
     QString m_ModelFilename;
 

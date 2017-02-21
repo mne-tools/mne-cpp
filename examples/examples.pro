@@ -72,6 +72,11 @@ SUBDIRS += \
             disp3DTutorial \
             histogram \
             connectivityTutorial
+
+        !isEmpty( CNTK_INCLUDE_DIR ) {
+            SUBDIRS += \
+                ex_deep
+        }
     } else {
         message("examples.pro - The Qt Charts module is missing. Please install to build the complete set of MNE-CPP features.")
     }
