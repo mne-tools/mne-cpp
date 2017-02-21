@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     deep.cpp
+* @file     main.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -18,7 +18,7 @@
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
 *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
-* 
+*
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
 * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Deep class implementation.
+* @brief    Implements the main() application function.
 *
 */
 
@@ -38,27 +38,23 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "deep.h"
-#include <Eval.h>
 
-#ifdef _WIN32
-#include <Windows.h>
-#endif
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen
+//=============================================================================================================
+
+#include <Eigen/Core>
+
+#include <deep/deep.h>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// STL INCLUDES
+// QT INCLUDES
 //=============================================================================================================
 
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Qt INCLUDES
-//=============================================================================================================
-
-#include <QFile>
+#include <QApplication>
 
 
 //*************************************************************************************************************
@@ -66,108 +62,32 @@
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace Eigen;
 using namespace DEEPLIB;
-using namespace Microsoft::MSR::CNTK;
-
-
-// Used for retrieving the model appropriate for the element type (float / double)
-template<typename ElemType>
-using GetEvalProc = void(*)(IEvaluateModel<ElemType>**);
-
-
-typedef std::pair<std::wstring, std::vector<float>*> MapEntry;
-typedef std::map<std::wstring, std::vector<float>*> Layer;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE MEMBER METHODS
+// MAIN
 //=============================================================================================================
 
-Deep::Deep()
+//=============================================================================================================
+/**
+* The function main marks the entry point of the program.
+* By default, main has the storage class extern.
+*
+* @param [in] argc (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
+* @param [in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
+* @return the value that was set to exit() (which is 0 if exit() is called via quit()).
+*/
+int main(int argc, char *argv[])
 {
+    QApplication a(argc, argv);
+
+    Deep deepTest;
+
+    deepTest.performTest();
+
+
+    return a.exec();
 }
-
-
-//*************************************************************************************************************
-
-Deep::~Deep()
-{
-
-}
-
-
-//*************************************************************************************************************
-
-const QString& Deep::getModelFilename() const
-{
-    return m_ModelFilename;
-}
-
-
-//*************************************************************************************************************
-
-void Deep::setModelFilename(const QString &ModelFilename)
-{
-    m_ModelFilename = ModelFilename;
-}
-
-//*************************************************************************************************************
-
-void Deep::performTest()
-{
-
-    const std::string modelFile = "C:/local/CNTK-2-0-beta11-0-Windows-64bit-CPU-Only/cntk/Examples/Image/GettingStarted/01_OneHidden.cntk";
-
-    IEvaluateModel<float> *model;
-
-    GetEvalF(&model);
-
-    // Load model with desired outputs
-    std::string networkConfiguration;
-    // Uncomment the following line to re-define the outputs (include h1.z AND the output ol.z)
-    // When specifying outputNodeNames in the configuration, it will REPLACE the list of output nodes
-    // with the ones specified.
-    //networkConfiguration += "outputNodeNames=\"h1.z:ol.z\"\n";
-    networkConfiguration += "modelPath=\"" + modelFile + "\"";
-    model->CreateNetwork(networkConfiguration);
-
-    // get the model's layers dimensions
-    std::map<std::wstring, size_t> inDims;
-    std::map<std::wstring, size_t> outDims;
-    model->GetNodeDimensions(inDims, NodeGroup::nodeInput);
-    model->GetNodeDimensions(outDims, NodeGroup::nodeOutput);
-
-    // Generate dummy input values in the appropriate structure and size
-    auto inputLayerName = inDims.begin()->first;
-    std::vector<float> inputs;
-    for (int i = 0; i < inDims[inputLayerName]; i++)
-    {
-        inputs.push_back(static_cast<float>(i % 255));
-    }
-
-    // Allocate the output values layer
-    std::vector<float> outputs;
-
-    // Setup the maps for inputs and output
-    Layer inputLayer;
-    inputLayer.insert(MapEntry(inputLayerName, &inputs));
-    Layer outputLayer;
-    auto outputLayerName = outDims.begin()->first;
-    outputLayer.insert(MapEntry(outputLayerName, &outputs));
-
-    // We can call the evaluate method and get back the results (single layer)...
-    model->Evaluate(inputLayer, outputLayer);
-
-    // Output the results
-    fprintf(stderr, "Layer '%ls' output:\n", outputLayerName.c_str());
-    for (auto& value : outputs)
-    {
-        fprintf(stderr, "%f\n", value);
-    }
-
-    // This pattern is used by End2EndTests to check whether the program runs to complete.
-    fprintf(stderr, "Evaluation complete.\n");
-
-}
-
