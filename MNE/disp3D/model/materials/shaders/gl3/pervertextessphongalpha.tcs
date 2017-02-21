@@ -1,4 +1,4 @@
-#version 400 core
+#version 320 core
 
 uniform float innerTess;
 uniform float outerTess;
