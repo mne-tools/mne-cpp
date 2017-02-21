@@ -119,9 +119,9 @@ void ShowNormalsMaterial::init()
     m_pVertexGL3RenderPass->addRenderState(m_pNoDepthMask);
     m_pVertexGL3RenderPass->addRenderState(m_pBlendState);
 
-    //Set OpenGL version
+    //Set OpenGL version - This material can only be used with opengl 4.0 or higher since it is using geometry shaders
     m_pVertexGL3Technique->graphicsApiFilter()->setApi(QGraphicsApiFilter::OpenGL);
-    m_pVertexGL3Technique->graphicsApiFilter()->setMajorVersion(2);
+    m_pVertexGL3Technique->graphicsApiFilter()->setMajorVersion(4);
     m_pVertexGL3Technique->graphicsApiFilter()->setMinorVersion(0);
     m_pVertexGL3Technique->graphicsApiFilter()->setProfile(QGraphicsApiFilter::CoreProfile);
 

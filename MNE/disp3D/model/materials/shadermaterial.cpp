@@ -105,7 +105,7 @@ ShaderMaterial::~ShaderMaterial()
 
 void ShaderMaterial::init()
 {
-    //Set OpenGL version
+    //Set OpenGL version - This material can only be used with opengl 4.0 or higher since it might be using something like tesselation
     m_pVertexGL3Technique->graphicsApiFilter()->setApi(QGraphicsApiFilter::OpenGL);
     m_pVertexGL3Technique->graphicsApiFilter()->setMajorVersion(4);
     m_pVertexGL3Technique->graphicsApiFilter()->setMinorVersion(0);
