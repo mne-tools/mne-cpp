@@ -1,14 +1,15 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     projection.pro
-# @author   Jana Kiesel <jana.kiesel@tu-ilmenau.de>;
+# @file     reference.pro
+# @author   Viktor Klüber <viktor.klueber@tu-ilmenau.de>;
+#           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
-# @date     August, 2016
+# @date     February, 2017
 #
 # @section  LICENSE
 #
-# Copyright (C) 2016, Jana Kiesel and Matti Hamalainen. All rights reserved.
+# Copyright (C) 2017, Viktor Klüber, Lorenz Esch and Matti Hamalainen. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -29,22 +30,21 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    Example to project points on a surface
+# @brief    This project file generates the makefile for the reference plug-in.
+#
 #--------------------------------------------------------------------------------------------------------------
-include(../../mne-cpp.pri)
 
-TEMPLATE = app
+include(../../../../mne-cpp.pri)
 
-VERSION = $${MNE_CPP_VERSION}
+TEMPLATE = lib
 
-QT += widgets 3dextras
-#QT -= gui
+CONFIG += plugin
 
-CONFIG += console
-CONFIG -= app_bundle
+DEFINES += REFERENCE_LIBRARY
 
-TARGET = projection
+QT += core widgets
 
+TARGET = reference
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
@@ -53,33 +53,53 @@ LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
             -lMNE$${MNE_LIB_VERSION}Utilsd \
-            -lMNE$${MNE_LIB_VERSION}Fsd \
-            -lMNE$${MNE_LIB_VERSION}Fiffd \
-            -lMNE$${MNE_LIB_VERSION}Mned \
-            -lMNE$${MNE_LIB_VERSION}Inversed \
-            -lMNE$${MNE_LIB_VERSION}Dispd \
-            -lMNE$${MNE_LIB_VERSION}DispChartsd \
-            -lMNE$${MNE_LIB_VERSION}Disp3Dd
+            -lscMeasd \
+            -lscDispd \
+            -lscSharedd
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
             -lMNE$${MNE_LIB_VERSION}Utils \
-            -lMNE$${MNE_LIB_VERSION}Fs \
-            -lMNE$${MNE_LIB_VERSION}Fiff \
-            -lMNE$${MNE_LIB_VERSION}Mne \
-            -lMNE$${MNE_LIB_VERSION}Inverse \
-            -lMNE$${MNE_LIB_VERSION}Disp \
-            -lMNE$${MNE_LIB_VERSION}DispCharts \
-            -lMNE$${MNE_LIB_VERSION}Disp3D
+            -lscMeas \
+            -lscDisp \
+            -lscShared
 }
 
-DESTDIR =  $${MNE_BINARY_DIR}
+DESTDIR = $${MNE_BINARY_DIR}/mne_scan_plugins
 
-SOURCES += main.cpp \
+SOURCES += \
+        reference.cpp \
+        FormFiles/referencesetupwidget.cpp \
+        FormFiles/referenceaboutwidget.cpp \
+        FormFiles/referencetoolbarwidget.cpp
 
 HEADERS += \
+        reference.h\
+        reference_global.h \
+        FormFiles/referencesetupwidget.h \
+        FormFiles/referenceaboutwidget.h \
+        FormFiles/referencetoolbarwidget.h
+
+FORMS += \
+        FormFiles/referencesetup.ui \
+        FormFiles/referenceabout.ui \
+        FormFiles/referencetoolbar.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
+INCLUDEPATH += $${MNE_SCAN_INCLUDE_DIR}
+
+RESOURCES += \
+        reference.qrc
+
+OTHER_FILES += reference.json
+
+# Put generated form headers into the origin --> cause other src is pointing at them
+UI_DIR = $$PWD
 
 unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
+
+# suppress visibility warnings
+unix: QMAKE_CXXFLAGS += -Wno-attributes
+
+DISTFILES +=
