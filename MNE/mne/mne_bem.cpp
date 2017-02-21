@@ -42,6 +42,7 @@
 #include "mne_bem.h"
 
 #include <utils/mnemath.h>
+#include <utils/warp.h>
 #include <fs/label.h>
 
 
@@ -449,4 +450,55 @@ MNEBem &MNEBem::operator<<(const MNEBemSurface *surf)
 {
     this->m_qListBemSurface.append(*surf);
     return *this;
+}
+
+
+//*************************************************************************************************************
+
+void MNEBem::warp(const MatrixXf & sLm, const MatrixXf &dLm)
+{
+    Warp help;
+    QList<MatrixXf> vertList;
+    for (int i=0; i<this->m_qListBemSurface.size(); i++)
+    {
+        vertList.append(this->m_qListBemSurface[i].rr);
+    }
+
+    help.calculate(sLm, dLm, vertList);
+
+    for (int i=0; i<this->m_qListBemSurface.size(); i++)
+    {
+        this->m_qListBemSurface[i].rr = vertList.at(i);
+    }
+    return;
+}
+
+
+//*************************************************************************************************************
+
+void MNEBem::transform(const FiffCoordTrans trans)
+{
+    MatrixX3f vert;
+    for (int i=0; i<this->m_qListBemSurface.size(); i++)
+    {
+        vert = this->m_qListBemSurface[i].rr;
+        vert = trans.apply_trans(vert);
+        this->m_qListBemSurface[i].rr = vert;
+    }
+    return;
+}
+
+
+//*************************************************************************************************************
+
+void MNEBem::invtransform(const FiffCoordTrans trans)
+{
+    MatrixX3f vert;
+    for (int i=0; i<this->m_qListBemSurface.size(); i++)
+    {
+        vert = this->m_qListBemSurface[i].rr;
+        vert = trans.apply_inverse_trans(vert);
+        this->m_qListBemSurface[i].rr = vert;
+    }
+    return;
 }
