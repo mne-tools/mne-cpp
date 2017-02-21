@@ -41,7 +41,7 @@
 #include "fssurfacetreeitem.h"
 #include "../common/metatreeitem.h"
 #include "../../3dhelpers/renderable3Dentity.h"
-#include "../../materials/pervertextessphongalphamaterial.h"
+#include "../../materials/pervertexphongalphamaterial.h"
 #include "../../materials/shownormalsmaterial.h"
 
 #include <fs/label.h>
@@ -154,11 +154,11 @@ void FsSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* pare
     QByteArray arrayCurvatureColor = createCurvatureVertColor(tSurface.curv());
 
     //Set renderable 3D entity mesh and color data
-    m_pRenderable3DEntity->setMeshData(tSurface.rr(), tSurface.nn(), tSurface.tris(), arrayCurvatureColor, Qt3DRender::QGeometryRenderer::Patches);
+    m_pRenderable3DEntity->setMeshData(tSurface.rr(), tSurface.nn(), tSurface.tris(), arrayCurvatureColor, Qt3DRender::QGeometryRenderer::Triangles);
 
     //Set shaders
-    PerVertexTessPhongAlphaMaterial* pPerVertexTessPhongAlphaMaterial = new PerVertexTessPhongAlphaMaterial();
-    m_pRenderable3DEntity->addComponent(pPerVertexTessPhongAlphaMaterial);
+    PerVertexPhongAlphaMaterial* pPerVertexPhongAlphaMaterial = new PerVertexPhongAlphaMaterial();
+    m_pRenderable3DEntity->addComponent(pPerVertexPhongAlphaMaterial);
 
 //    //Render normals
 //    m_pRenderable3DEntityNormals = new Renderable3DEntity(m_pRenderable3DEntity);
