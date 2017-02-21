@@ -1,14 +1,15 @@
 //=============================================================================================================
 /**
-* @file     dummytoolbox.h
-* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+* @file     reference_global.h
+* @author   Viktor Klüber <viktor.klueber@tu-ilmenau.de>;
+*           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     January, 2016
+* @date     February, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017, Viktor Klüber, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,19 +30,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the DummyYourWidget class.
+* @brief    Contains the Reference library export/import macros.
 *
 */
 
-#ifndef DUMMYYOURWIDGET_H
-#define DUMMYYOURWIDGET_H
-
-//*************************************************************************************************************
-//=============================================================================================================
-// INCLUDES
-//=============================================================================================================
-
-#include "../ui_dummyyourtoolbarwidget.h"
+#ifndef REFERENCE_GLOBAL_H
+#define REFERENCE_GLOBAL_H
 
 
 //*************************************************************************************************************
@@ -49,54 +43,18 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QWidget>
+#include <QtCore/qglobal.h>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE DummyToolboxPlugin
+// PREPROCESSOR DEFINES
 //=============================================================================================================
 
-namespace DUMMYTOOLBOXPLUGIN
-{
+#if defined(REFERENCE_LIBRARY)
+#define REFERENCESHARED_EXPORT Q_DECL_EXPORT   /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+#else
+#define REFERENCESHARED_EXPORT Q_DECL_IMPORT   /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+#endif
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-
-//=============================================================================================================
-/**
-* DECLARE CLASS DummyYourWidget
-*
-* @brief The DummyToolbox class provides a dummy toolbar widget structure.
-*/
-class DummyYourWidget : public QWidget
-{
-    Q_OBJECT
-
-public:
-    typedef QSharedPointer<DummyYourWidget> SPtr;         /**< Shared pointer type for DummyYourWidget. */
-    typedef QSharedPointer<DummyYourWidget> ConstSPtr;    /**< Const shared pointer type for DummyYourWidget. */
-
-    //=========================================================================================================
-    /**
-    * Constructs a DummyToolbox.
-    */
-    explicit DummyYourWidget(QWidget *parent = 0);
-
-    //=========================================================================================================
-    /**
-    * Destroys the DummyToolbox.
-    */
-    ~DummyYourWidget();
-
-private:
-    Ui::DummyYourToolbarWidget* ui;        /**< The UI class specified in the designer. */
-};
-
-}   //namespace
-
-#endif // DUMMYYOURWIDGET_H
+#endif // REFERENCE_GLOBAL_H
