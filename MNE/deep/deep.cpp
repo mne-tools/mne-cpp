@@ -91,6 +91,15 @@ Deep::Deep()
 
 //*************************************************************************************************************
 
+Deep::Deep(const QString &sModelFilename)
+: m_sModelFilename(sModelFilename)
+{
+
+}
+
+
+//*************************************************************************************************************
+
 Deep::~Deep()
 {
 
@@ -101,23 +110,33 @@ Deep::~Deep()
 
 const QString& Deep::getModelFilename() const
 {
-    return m_ModelFilename;
+    return m_sModelFilename;
 }
 
 
 //*************************************************************************************************************
 
-void Deep::setModelFilename(const QString &ModelFilename)
+void Deep::setModelFilename(const QString &sModelFilename)
 {
-    m_ModelFilename = ModelFilename;
+    m_sModelFilename = sModelFilename;
 }
 
 //*************************************************************************************************************
 
-void Deep::performTest()
+bool Deep::evalModel()
 {
+    QFile file(m_sModelFilename);
+    if(!file.exists()) {
+        qCritical("Model filename (%s) does not exist.", m_sModelFilename.toUtf8().constData());
+        return false;
+    }
+    if(!file.isReadable()) {
+        qCritical("Model filename (%s) is not readable.", m_sModelFilename.toUtf8().constData());
+        return false;
+    }
 
-    const std::string modelFile = "C:/local/CNTK-2-0-beta11-0-Windows-64bit-CPU-Only/cntk/Examples/Image/GettingStarted/01_OneHidden.cntk";
+    const std::string modelFile = m_sModelFilename.toUtf8().constData();
+    //"C:/local/CNTK-2-0-beta11-0-Windows-64bit-CPU-Only/cntk/Examples/Image/GettingStarted/Output/Models/01_OneHidden";
 
     IEvaluateModel<float> *model;
 
@@ -169,5 +188,6 @@ void Deep::performTest()
     // This pattern is used by End2EndTests to check whether the program runs to complete.
     fprintf(stderr, "Evaluation complete.\n");
 
+    return true;
 }
 

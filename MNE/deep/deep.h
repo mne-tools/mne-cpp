@@ -105,6 +105,12 @@ public:
 
     //=========================================================================================================
     /**
+    * Constructor
+    */
+    Deep(const QString &sModelFilename);
+
+    //=========================================================================================================
+    /**
     * Destructs Deep
     */
     virtual ~Deep();
@@ -112,12 +118,12 @@ public:
 
     const QString& getModelFilename() const;
 
-    void setModelFilename(const QString &ModelFilename);
+    void setModelFilename(const QString &sModelFilename);
 
-    void performTest();
+    bool evalModel();
 
 private:
-    QString m_ModelFilename;
+    QString m_sModelFilename;
 
 };
 
