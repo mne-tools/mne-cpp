@@ -143,10 +143,11 @@ HEADERS += \
     model/items/mri/mritreeitem.h \
     model/items/common/abstracttreeitem.h \
     model/items/common/metatreeitem.h \
+    model/items/common/types.h \
     model/workers/rtSourceLoc/rtsourcelocdataworker.h \
     model/3dhelpers/renderable3Dentity.h \
     model/3dhelpers/custommesh.h \
-    model/common/types.h \
+    model/items/common/types.h \
     model/materials/pervertexphongalphamaterial.h \
     model/materials/pervertextessphongalphamaterial.h \
     model/materials/shadermaterial.h \
