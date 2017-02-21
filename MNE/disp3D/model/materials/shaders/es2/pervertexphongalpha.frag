@@ -7,9 +7,9 @@ uniform FP float alpha;
 
 uniform FP vec3 eyePosition;
 
-varying vec3 FP worldPosition;
-varying vec3 FP worldNormal;
-varying vec3 FP color;
+varying FP vec3 worldPosition;
+varying FP vec3 worldNormal;
+varying FP vec3 color;
 
 #pragma include light.inc.frag
 
