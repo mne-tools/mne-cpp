@@ -479,6 +479,17 @@ public:
 
     //=========================================================================================================
     /**
+    * Write one tag to file including its data
+    * Data is not written if it is NULL
+    * Refactored: fiff_write_tag, fiff_write_this_tag (MNE-C)
+    *
+    * @param[in] p_pTag     Tag to write;
+    * @param[in] pos position of the tag inside the fif file
+    */
+    void write_tag(const QSharedPointer<FiffTag>& p_pTag, qint64 pos = -1);
+
+    //=========================================================================================================
+    /**
     * Writes a channel information record to a fif file
     * The type, cal, unit, and pos members are explained in Table 9.5
     * of the MNE manual

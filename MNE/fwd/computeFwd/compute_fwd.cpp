@@ -1259,6 +1259,66 @@ bad :
 
 
 
+
+
+
+//int fiff_put_dir (FILE *fd, fiffDirEntry dir)
+///*
+//      * Put in new directory
+//      */
+//{
+//    int nent = fiff_how_many_entries (dir);
+//    int k;
+//    fiffTagRec tag;
+//    fiffTagRec dirtag;
+//    fiff_int_t dirpos;
+
+//    tag.data = NULL;
+//    for (k = 0; k < nent; k++) {
+//        if (dir[k].kind == FIFF_DIR_POINTER) {
+//            /*
+//       * Read current value of directory pointer
+//       */
+//            if (fiff_read_this_tag(fd,dir[k].pos,&tag) == -1) {
+//                fprintf (stderr,"Could not read FIFF_DIR_POINTER!\n");
+//                return (-1);
+//            }
+//            /*
+//       * If there is no directory, append the new one
+//       */
+//            dirpos = *(fiff_int_t *)(tag.data);
+//            FREE(tag.data);
+//            if (dirpos <= 0)
+//                dirpos = -1;
+//            /*
+//       * Put together the directory tag
+//       */
+//            dirtag.kind = FIFF_DIR;
+//            dirtag.type = FIFFT_DIR_ENTRY_STRUCT;
+//            dirtag.size = nent*sizeof(fiff_dir_entry_t);
+//            dirtag.next = -1;
+//            dirtag.data = (fiff_byte_t *)dir;
+//            dirpos = fiff_write_this_tag(fd,-1L,&dirtag);
+//            if (dirpos < 0)
+//                fprintf (stderr,"Could not update directory!\n");
+//            else {
+//                tag.data = (fiff_byte_t *)(&dirpos);
+//                if (fiff_write_this_tag(fd,dir[k].pos,&tag) == -1) {
+//                    fprintf (stderr,"Could not update directory pointer!\n");
+//                    return (-1);
+//                }
+//            }
+//            return (0);
+//        }
+//    }
+//    fprintf (stderr,"Could not find place for directory!\n");
+//    return (-1);
+//}
+
+
+
+
+
 //============================= write_solution.c =============================
 
 int write_solution(const QString& name,         /* Destination file */
@@ -1286,8 +1346,11 @@ int write_solution(const QString& name,         /* Destination file */
     // New Stuff
     QFile file(name);
 
+    QFile fileIn(name);
+    FiffStream::SPtr t_pStreamIn;
+
     int nvert;
-    int k,p;
+    int k;
 
     //
     //   Open the file, create directory
@@ -1295,6 +1358,7 @@ int write_solution(const QString& name,         /* Destination file */
 
     // Create the file and save the essentials
     FiffStream::SPtr t_pStream = FiffStream::start_file(file);
+
 
     t_pStream->start_block(FIFFB_MNE);
 
@@ -1464,21 +1528,21 @@ int write_solution(const QString& name,         /* Destination file */
 
     t_pStream->close();
 
-//    /*
-//    * Add directory
-//    */
-//    if ((in = fiff_open_update(name)) == NULL)
-//        goto bad;
+    /*
+    * Add directory
+    */
+    t_pStreamIn = FiffStream::open_update(fileIn);
+
+    qDebug() << "TODO fiff_put_dir";
 //    if (fiff_put_dir(in->fd,in->dir) == FIFF_FAIL)
 //        goto bad;
-//    fiff_close(in); in = NULL;
+    t_pStreamIn->close();
 
     return FIFF_OK;
 
 bad : {
-        //        if (out != NULL)
-        //            fclose(out);
-        //        fiff_close(in);
+        t_pStream->close();
+        t_pStreamIn->close();
 
         return FIFF_FAIL;
     }
@@ -1541,17 +1605,6 @@ int fiff_new_file_id (fiffId id)
     id->version = FIFFC_VERSION;
     return FIFF_OK;
 }
-
-
-
-
-
-
-
-
-
-
-
 
 
 
