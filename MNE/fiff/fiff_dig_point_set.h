@@ -161,6 +161,20 @@ public:
 
     //=========================================================================================================
     /**
+     * @brief write
+     * @param p_IODevice
+     */
+    void write(QIODevice &p_IODevice);
+
+    //=========================================================================================================
+    /**
+     * @brief writeToStream
+     * @param p_pStream
+     */
+    void writeToStream(FiffStream* p_pStream);
+
+    //=========================================================================================================
+    /**
     * Subscript operator [] to access FiffDigPoint by index
     *
     * @param[in] idx    the FiffDigPoint index.
