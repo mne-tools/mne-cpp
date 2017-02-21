@@ -1536,14 +1536,16 @@ int write_solution(const QString& name,         /* Destination file */
     qDebug() << "TODO fiff_put_dir";
 //    if (fiff_put_dir(in->fd,in->dir) == FIFF_FAIL)
 //        goto bad;
-    t_pStreamIn->close();
+    if(t_pStreamIn)
+        t_pStreamIn->close();
 
     return FIFF_OK;
 
 bad : {
-        t_pStream->close();
-        t_pStreamIn->close();
-
+        if(t_pStream)
+            t_pStream->close();
+        if(t_pStreamIn)
+            t_pStreamIn->close();
         return FIFF_FAIL;
     }
 }
