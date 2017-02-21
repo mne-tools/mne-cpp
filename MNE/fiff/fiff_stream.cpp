@@ -1442,8 +1442,7 @@ bool FiffStream::read_rt_tag(FiffTag::SPtr &p_pTag)
 
 bool FiffStream::read_tag(FiffTag::SPtr &p_pTag, qint64 pos)
 {
-    if (pos >= 0)
-    {
+    if (pos >= 0) {
         this->device()->seek(pos);
     }
 
@@ -1717,102 +1716,6 @@ FiffStream::SPtr FiffStream::start_file(QIODevice& p_IODevice)
 
 //*************************************************************************************************************
 
-/*
- * This is the same for both update open
- * and read-only open
- */
-
-//static fiffFile open_file (const char *name, const char *mode)
-//{
-//  void fiff_close();
-//  fiffFile file = MALLOC(1,fiffFileRec);
-//  fiffTagRec tag;
-//  long dirpos;
-//  /*
-//   * Clean fiff file descriptor
-//   */
-//  file->fd = NULL;
-//  file->file_name = NULL;
-//  file->id = NULL;
-//  file->dir = NULL;
-//  file->nent = 0;
-//  file->dirtree = NULL;
-//  file->ext_file_name = NULL;
-//  file->ext_fd        = NULL;
-//  /*
-//   * Try to open...
-//   */
-//  if ((file->fd = fopen(name,mode)) == NULL) {
-//    err_set_sys_error ((char *)name);
-//    fiff_close(file);
-//    return (NULL);
-//  }
-//  file->file_name = MALLOC(strlen(name)+1,char);
-//  strcpy(file->file_name,name);
-//  tag.data = NULL;
-
-//  if (check_beginning(file->fd,name) == -1)
-//    goto bad;
-//  /*
-//   * Read id and directory pointer
-//   */
-//  if (fiff_read_tag(file->fd,&tag) == -1)
-//    goto bad;
-//  if (tag.kind != FIFF_FILE_ID) {
-//    err_set_error ("FIFF file should start with FIFF_FILE_ID!");
-//    goto bad;
-//  }
-//  file->id = (fiffId)tag.data;
-//  tag.data = NULL;
-//  if (fiff_read_tag(file->fd,&tag) == -1)
-//    goto bad;
-//  if (tag.kind != FIFF_DIR_POINTER) {
-//    err_set_error ("FIFF_DIR_POINTER should follow FIFF_FILE_ID!");
-//    goto bad;
-//  }
-//  /*
-//   * Do we have a directory or not?
-//   */
-//  dirpos = *(fiff_int_t *)(tag.data);
-//  FREE(tag.data); tag.data = NULL;
-//  if (dirpos <= 0) {		/* Must do it in the hard way... */
-//    if ((file->dir = fiff_make_dir (file->fd)) == NULL) {
-//      err_set_error ("Could not create tag directory!");
-//      goto bad;
-//    }
-//  }
-//  else {			/* Just read the directory */
-//    if (fiff_read_this_tag(file->fd,dirpos,&tag) == -1) {
-//      err_set_error ("Could not read the tag directory (file probably damaged)!");
-//      goto bad;
-//    }
-//    file->dir = (fiffDirEntry)tag.data;
-//  }
-//  file->nent = fiff_how_many_entries(file->dir);
-//  /*
-//   * Check for a mistake
-//   */
-//  if (file->dir[file->nent-2].kind == FIFF_DIR) {
-//    file->nent--;
-//    file->dir[file->nent-1].kind = -1;
-//    file->dir[file->nent-1].type = -1;
-//    file->dir[file->nent-1].size = -1;
-//    file->dir[file->nent-1].pos  = -1;
-//  }
-//  if (fiff_dir_tree_create(file) == -1)
-//    goto bad;
-//  (void)fseek(file->fd,0L,SEEK_SET);
-//  return (file);
-
-//  bad : {
-//    fiff_close(file);
-//    return(NULL);
-//  }
-//}
-
-
-//*************************************************************************************************************
-
 FiffStream::SPtr FiffStream::open_update(QIODevice &p_IODevice)
 {
 
@@ -1827,84 +1730,54 @@ FiffStream::SPtr FiffStream::open_update(QIODevice &p_IODevice)
         return FiffStream::SPtr();
     }
 
-//    fiffFile file = open_file(name,"r+b");
-//    fiffTagRec tag;
     FiffTag::SPtr t_pTag;
-//    long dirpos,pointerpos;
+    long dirpos,pointerpos;
 
-//    tag.data = NULL;
-//    if (file != NULL) {
-    /*
-    * Ensure that the last tag in the directory has next set to FIFF_NEXT_NONE
-    */
+    QFile *file = qobject_cast<QFile *>(t_pStream->device());
 
-    qDebug() << "t_pStream->dir().size()" << t_pStream->nent();
-
-    if(!t_pStream->read_tag(t_pTag,t_pStream->dir()[t_pStream->nent()-2]->pos)){
-        qCritical("Could not read last tag in the directory list!");
-        return FiffStream::SPtr();
+    if (file != NULL) {
+        /*
+        * Ensure that the last tag in the directory has next set to FIFF_NEXT_NONE
+        */
+        pointerpos = t_pStream->dir()[t_pStream->nent()-2]->pos;
+        if(!t_pStream->read_tag(t_pTag,pointerpos)){
+            qCritical("Could not read last tag in the directory list!");
+            t_pStream->close();
+            return FiffStream::SPtr();
+        }
+        if (t_pTag->next != FIFFV_NEXT_NONE) {
+            t_pTag->next = FIFFV_NEXT_NONE;
+            t_pStream->write_tag(t_pTag,pointerpos);
+        }
+        /*
+        * Read directory pointer
+        */
+        pointerpos = t_pStream->dir()[1]->pos;
+        if(!t_pStream->read_tag(t_pTag,pointerpos)){
+            qCritical("Could not read directory pointer!");
+            t_pStream->close();
+            return FiffStream::SPtr();
+        }
+        /*
+        * Do we have a directory?
+        */
+        dirpos = *t_pTag->toInt();
+        if (dirpos > 0) {
+            /*
+            * Yes! We will ignore it.
+            */
+            t_pTag->setNum(-1);
+            t_pStream->write_tag(t_pTag,pointerpos);
+            /*
+            * Clean up the trailing end
+            */
+            file->resize(dirpos);//truncate file to new size
+        }
+        /*
+        * Seek to end for writing
+        */
+        t_pStream->device()->seek(file->size());//SEEK_END
     }
-//    if (fiff_read_this_tag(file->fd,file->dir[file->nent-2].pos,&tag) == FIFF_FAIL) {
-//        err_set_error("Could not read last tag in the directory list!");
-//        fiff_close(file);
-//        return NULL;
-//    }
-
-    if (t_pTag->next != FIFFV_NEXT_NONE) {
-        t_pTag->next = FIFFV_NEXT_NONE;
-
-//        t_pStream->wr
-    }
-
-
-
-
-//        if (tag.next != FIFFV_NEXT_NONE) {
-//            tag.next = FIFFV_NEXT_NONE;
-//            if (fiff_write_this_tag(file->fd,file->dir[file->nent-2].pos,&tag) == FIFF_FAIL) {
-//                err_set_error("Could not update the last tag in the directory list!");
-//                fiff_close(file);
-//                return NULL;
-//            }
-//        }
-//        /*
-//            * Read directory pointer
-//            */
-//        pointerpos = (file->dir)[1].pos;
-//        if (fiff_read_this_tag (file->fd,pointerpos,&tag) == -1) {
-//            err_set_error ("Could not read directory pointer!");
-//            fiff_close(file);
-//            return (NULL);
-//        }
-//        /*
-//            * Do we have a directory?
-//            */
-//        dirpos = *(int *)(tag.data);
-//        if (dirpos > 0) {
-//            /*
-//                * Yes! We will ignore it.
-//                */
-//            *(int *)(tag.data) = -1;
-//            if (fiff_write_this_tag (file->fd,pointerpos,&tag) == -1) {
-//                err_set_error ("Could not update directory pointer!\n");
-//                fiff_close (file);
-//                return (NULL);
-//            }
-//            /*
-//                * Clean up the trailing end
-//                */
-//            (void) fiff_truncate_file(fileno(file->fd), (off_t) dirpos);
-//        }
-//        /*
-//            * Seek to end for writing
-//            */
-//        (void)fseek(file->fd,0L,SEEK_END);
-//    }
-
-//    return (file);
-    //
-    //   Ready for more
-    //
     return t_pStream;
 }
 
@@ -2090,6 +1963,41 @@ QString FiffStream::streamName()
         p_sFileName = QString("TCPSocket");
 
     return p_sFileName;
+}
+
+
+//*************************************************************************************************************
+
+void FiffStream::write_tag(const QSharedPointer<FiffTag> &p_pTag, qint64 pos)
+{
+    /*
+    * Write tag to specified position
+    */
+    if (pos >= 0) {
+        this->device()->seek(pos);
+    }
+    else { //SEEK_END
+        QFile* file = qobject_cast<QFile*> (this->device());
+        if(file)
+            this->device()->seek(file->size());
+    }
+
+    fiff_int_t datasize = p_pTag->size();
+
+    *this << (qint32)p_pTag->kind;
+    *this << (qint32)p_pTag->type;
+    *this << (qint32)datasize;
+    *this << (qint32)p_pTag->next;
+
+    /*
+    * Do we have data?
+    */
+    if (datasize > 0) {
+        /*
+        * Data exists...
+        */
+        this->writeRawData(p_pTag->data(),datasize);
+    }
 }
 
 
