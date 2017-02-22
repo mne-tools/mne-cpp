@@ -84,7 +84,7 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    Deep deepTest("C:/local/CNTK-2-0-beta11-0-Windows-64bit-CPU-Only/cntk/Examples/Image/GettingStarted/Output/Models/01_OneHidden");
+    Deep deepTest(QApplication::applicationDirPath() + "/mne_deep_models/examples/Output/Models/ex_deep_one_hidden");
     deepTest.evalModel();
 
     return a.exec();
