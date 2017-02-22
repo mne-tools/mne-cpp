@@ -7,11 +7,11 @@ command = trainNetwork:testNetwork
 
 precision = "float"; traceLevel = 1 ; deviceId = "auto"
 
-rootDir = ".." ; dataDir = "$rootDir$/DataSets/MNIST" ;
+rootDir = "C:/local/CNTK-2-0-beta11-0-Windows-64bit-CPU-Only/cntk/Examples/Image" ; dataDir = "$rootDir$/DataSets/MNIST" ;
 outputDir = "./Output" ;
 
-modelPath = "$outputDir$/Models/01_OneHidden"
-#stderr = "$outputDir$/01_OneHidden_bs_out"
+modelPath = "$outputDir$/Models/ex_deep_one_hidden"
+#stderr = "$outputDir$/ex_deep_one_hidden_bs_out"
 
 # TRAINING CONFIG
 trainNetwork = {

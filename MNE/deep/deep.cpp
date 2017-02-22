@@ -127,16 +127,13 @@ bool Deep::evalModel()
 {
     QFile file(m_sModelFilename);
     if(!file.exists()) {
-        qCritical("Model filename (%s) does not exist.", m_sModelFilename.toUtf8().constData());
-        return false;
-    }
-    if(!file.isReadable()) {
-        qCritical("Model filename (%s) is not readable.", m_sModelFilename.toUtf8().constData());
+        qCritical("Model filename (%s) does not exist.\n", m_sModelFilename.toUtf8().constData());
         return false;
     }
 
+    printf("Evaluating Model %s\n", m_sModelFilename.toUtf8().constData());
+
     const std::string modelFile = m_sModelFilename.toUtf8().constData();
-    //"C:/local/CNTK-2-0-beta11-0-Windows-64bit-CPU-Only/cntk/Examples/Image/GettingStarted/Output/Models/01_OneHidden";
 
     IEvaluateModel<float> *model;
 
