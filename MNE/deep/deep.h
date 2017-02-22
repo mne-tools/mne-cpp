@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Deep class declaration.
+* @brief    Mne Deep class declaration.
 *
 */
 
@@ -87,9 +87,9 @@ namespace DEEPLIB
 
 //=============================================================================================================
 /**
-* BEM descritpion
+* MNE Deep cntk wrapper descritpion
 *
-* @brief BEM descritpion
+* @brief MNE Deep cntk wrapper to evaluate pretrained models
 */
 class DEEPSHARED_EXPORT Deep
 {
@@ -106,6 +106,8 @@ public:
     //=========================================================================================================
     /**
     * Constructor
+    *
+    * @param [in] sModelFilename    The model filename to set
     */
     Deep(const QString &sModelFilename);
 
@@ -116,10 +118,28 @@ public:
     virtual ~Deep();
 
 
+    //=========================================================================================================
+    /**
+    * Returns the current set model file name
+    *
+    * @return the current model file name
+    */
     const QString& getModelFilename() const;
 
+    //=========================================================================================================
+    /**
+    * Set the model filename
+    *
+    * @param [in] sModelFilename    The model filename to set
+    */
     void setModelFilename(const QString &sModelFilename);
 
+    //=========================================================================================================
+    /**
+    * Evaluate the MNE Deep Model set by the model file name
+    *
+    * @return true when MNE Deep model was sucessfully evaluated.
+    */
     bool evalModel();
 
 private:
