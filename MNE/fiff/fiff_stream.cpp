@@ -117,6 +117,29 @@ FiffStream::FiffStream(QByteArray * a, QIODevice::OpenMode mode)
 
 //*************************************************************************************************************
 
+QString FiffStream::streamName()
+{
+    QFile* t_pFile = qobject_cast<QFile*>(this->device());
+    QString p_sFileName;
+    if(t_pFile)
+        p_sFileName = t_pFile->fileName();
+    else
+        p_sFileName = QString("TCPSocket");
+
+    return p_sFileName;
+}
+
+
+//*************************************************************************************************************
+
+const FiffId &FiffStream::id() const
+{
+    return m_id;
+}
+
+
+//*************************************************************************************************************
+
 const QList<FiffDirEntry::SPtr>& FiffStream::dir() const
 {
     return m_dir;
@@ -234,6 +257,7 @@ bool FiffStream::get_evoked_entries(const QList<FiffDirNode::SPtr> &evoked_node,
 bool FiffStream::open(QIODevice::OpenModeFlag mode)
 {
     QString t_sFileName = this->streamName();
+    FiffTag::SPtr t_pTag;
 
     if (!this->device()->open(mode))
     {
@@ -241,15 +265,23 @@ bool FiffStream::open(QIODevice::OpenModeFlag mode)
         return false;
     }
 
-    if(!check_beginning())
+    if(!check_beginning(t_pTag)) // Supposed to get the id already in the beginning - read once approach - for TCP/IP support
         return false;
 
-    FiffTag::SPtr t_pTag;
-    this->read_tag(t_pTag);
+    /*
+    * Read id and directory pointer
+    */
+    if (t_pTag->kind != FIFF_FILE_ID) {
+        printf("FIFF file should start with FIFF_FILE_ID!");//consider throw
+        this->device()->close();
+        return false;
+    }
+    m_id = t_pTag->toFiffID();
 
-    if (t_pTag->kind != FIFF_DIR_POINTER)
-    {
+    this->read_tag(t_pTag);
+    if (t_pTag->kind != FIFF_DIR_POINTER) {
         printf("Fiff::open: file does have a directory pointer");//consider throw
+        this->device()->close();
         return false;
     }
 
@@ -287,6 +319,18 @@ bool FiffStream::open(QIODevice::OpenModeFlag mode)
             m_dir.append(t_pFiffDirEntry);
         }
     }
+
+    /*
+    * Check for a mistake
+    */
+    if (m_dir[m_dir.size()-2]->kind == FIFF_DIR) {
+        m_dir.removeLast();
+        m_dir[m_dir.size()-1]->kind = -1;
+        m_dir[m_dir.size()-1]->type = -1;
+        m_dir[m_dir.size()-1]->size = -1;
+        m_dir[m_dir.size()-1]->pos  = -1;
+    }
+
     //
     //   Create the directory tree structure
     //
@@ -1704,9 +1748,9 @@ FiffStream::SPtr FiffStream::start_file(QIODevice& p_IODevice)
     //   Write the compulsory items
     //
     p_pStream->write_id(FIFF_FILE_ID);//1
-    qint32 data = -1;
-    p_pStream->write_int(FIFF_DIR_POINTER,&data);//2
-    p_pStream->write_int(FIFF_FREE_LIST,&data);//3
+    int null_pointer = FIFFV_NEXT_NONE;
+    p_pStream->write_int(FIFF_DIR_POINTER,&null_pointer);//2
+    p_pStream->write_int(FIFF_FREE_LIST,&null_pointer);//3
     //
     //   Ready for more
     //
@@ -1951,21 +1995,6 @@ FiffStream::SPtr FiffStream::start_writing_raw(QIODevice &p_IODevice, const Fiff
     t_pStream->start_block(FIFFB_RAW_DATA);
 
     return t_pStream;
-}
-
-
-//*************************************************************************************************************
-
-QString FiffStream::streamName()
-{
-    QFile* t_pFile = qobject_cast<QFile*>(this->device());
-    QString p_sFileName;
-    if(t_pFile)
-        p_sFileName = t_pFile->fileName();
-    else
-        p_sFileName = QString("TCPSocket");
-
-    return p_sFileName;
 }
 
 
@@ -2834,28 +2863,26 @@ void FiffStream::write_rt_command(fiff_int_t command, const QString& data)
 
 //*************************************************************************************************************
 
-bool FiffStream::check_beginning()
+bool FiffStream::check_beginning(FiffTag::SPtr &p_pTag)
 {
-    FiffTag::SPtr t_pTag;
-    this->read_tag_info(t_pTag);
+    this->read_tag(p_pTag);
 
-    if (t_pTag->kind != FIFF_FILE_ID)
+    if (p_pTag->kind != FIFF_FILE_ID)
     {
         printf("Fiff::open: file does not start with a file id tag");//consider throw
         return false;
     }
 
-    if (t_pTag->type != FIFFT_ID_STRUCT)
+    if (p_pTag->type != FIFFT_ID_STRUCT)
     {
         printf("Fiff::open: file does not start with a file id tag");//consider throw
         return false;
     }
-    if (t_pTag->size() != 20)
+    if (p_pTag->size() != 20)
     {
         printf("Fiff::open: file does not start with a file id tag");//consider throw
         return false;
     }
-
+    //do not rewind since the data is contained in the returned tag; -> done for TCP IP reasosn, no rewind possible there
     return true;
 }
-
