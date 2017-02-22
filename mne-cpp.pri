@@ -49,8 +49,8 @@ QMAKE_TARGET_COPYRIGHT = Copyright (C) 2016 Authors of mne-cpp. All rights reser
 ## Build MNE-CPP Deep library
 MNECPP_CONFIG += buildDeep
 
-#Build minimalVersion for qt versions <5.7.0
-!minQtVersion(5, 7, 0) {
+#Build minimalVersion for qt versions <5.7.1
+!minQtVersion(5, 7, 1) {
     message("Building minimal version due to Qt version $${QT_VERSION}.")
     MNECPP_CONFIG += minimalVersion
 }
