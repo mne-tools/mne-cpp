@@ -1528,6 +1528,8 @@ int write_solution(const QString& name,         /* Destination file */
 
     t_pStream->close();
 
+    t_pStream.clear();
+
     /*
     * Add directory
     */

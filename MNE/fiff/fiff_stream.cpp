@@ -1725,7 +1725,7 @@ FiffStream::SPtr FiffStream::open_update(QIODevice &p_IODevice)
     /*
     * Try to open...
     */
-    if(!t_pStream->open(QIODevice::Append)) {
+    if(!t_pStream->open(QIODevice::ReadWrite)) {
         qCritical("Cannot open %s\n", t_sFileName.toUtf8().constData());//consider throw
         return FiffStream::SPtr();
     }
@@ -1736,6 +1736,9 @@ FiffStream::SPtr FiffStream::open_update(QIODevice &p_IODevice)
     QFile *file = qobject_cast<QFile *>(t_pStream->device());
 
     if (file != NULL) {
+
+        t_pStream->tree()->print(4);
+
         /*
         * Ensure that the last tag in the directory has next set to FIFF_NEXT_NONE
         */
