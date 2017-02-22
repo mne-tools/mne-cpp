@@ -144,6 +144,22 @@ public:
 
     //=========================================================================================================
     /**
+    * Get the stream name
+    *
+    * @return the name of the current stream
+    */
+    QString streamName();
+
+    //=========================================================================================================
+    /**
+    * Returns the file identifier
+    *
+    * @return The file identifier
+    */
+    const FiffId& id() const;
+
+    //=========================================================================================================
+    /**
     * Returns the directory compiled into a tree
     * dir is set when open() was called.
     *
@@ -471,14 +487,6 @@ public:
 
     //=========================================================================================================
     /**
-    * Get the stream name
-    *
-    * @return the name of the current stream
-    */
-    QString streamName();
-
-    //=========================================================================================================
-    /**
     * Write one tag to file including its data
     * Data is not written if it is NULL
     * Refactored: fiff_write_tag, fiff_write_this_tag (MNE-C)
@@ -755,21 +763,23 @@ private:
     //=========================================================================================================
     /**
     * Check that the file starts properly.
-    *
     * Refactored: check_beginning (fiff_open.c)
+    *
+    * @param[out] p_pTag     The tag containing the beginning
     *
     * @return true if beginning is correct, false otherwise
     */
-    bool check_beginning();
+    bool check_beginning(QSharedPointer<FiffTag>& p_pTag);
 
 private:
-    QList<FiffDirEntry::SPtr> m_dir; /**< This is the directory. If no directory exists, open automatically scans the file to create one. */
-    FiffDirNode::SPtr m_tree;        /**< Directory compiled into a tree */
+    FiffId                      m_id;   /**< The file identifier */
+    QList<FiffDirEntry::SPtr>   m_dir;  /**< This is the directory. If no directory exists, open automatically scans the file to create one. */
+    FiffDirNode::SPtr           m_tree; /**< Directory compiled into a tree */
 
 // ### OLD STRUCT ###
 // /** FIFF file handle returned by fiff_open(). */
 //typedef struct _fiffFileRec {
-//    char         *file_name;    /**< Name of the file */
+//    char         *file_name;    /**< Name of the file */ -> part of the Parent class of the QIODevice, wrapped by streamName function
 //    FILE         *fd;           /**< The normal file descriptor */
 //    fiffId       id;            /**< The file identifier */
 //    fiffDirEntry dir;           /**< This is the directory.

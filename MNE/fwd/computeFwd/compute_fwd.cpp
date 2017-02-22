@@ -153,19 +153,26 @@ void mne_free_icmatrix_41 (int **m)
 
 
 
-//fiffId get_file_id(char *name)
-//{
-//    fiffFile in = fiff_open(name);
-//    fiffId   id;
-//    if (in == NULL)
-//        return NULL;
-//    else {
-//        id = MALLOC_41(1,fiffIdRec);
-//        *id = *(in->id);
-//        fiff_close(in);
-//        return id;
-//    }
-//}
+fiffId get_file_id(const QString& name)
+{
+    QFile file(name);
+    FiffStream::SPtr stream(new FiffStream(&file));
+    fiffId   id;
+    if(!stream->open())
+        return NULL;
+    else {
+        id = MALLOC_41(1,fiffIdRec);
+        FiffId id_new = stream->id();
+
+        id->version = id_new.version;       /**< File version */
+        id->machid[0] = id_new.machid[0];   /**< Unique machine ID */
+        id->machid[1] = id_new.machid[1];
+        id->time = id_new.time;             /**< Time of the ID creation */
+
+        stream->close();
+        return id;
+    }
+}
 
 
 //============================= mne_read_forward_solution.c =============================
@@ -1888,10 +1895,10 @@ void ComputeFwd::calculateFwd() const
     if (!settings->mriname.isEmpty()) {
         if ((mri_head_t = FiffCoordTransOld::mne_read_mri_transform(settings->mriname)) == NULL)
             goto out;
-        //        if ((mri_id = get_file_id(settings->mriname)) == NULL) {
-        //            qCritical("Couln't read MRI file id (How come?)");
-        //            goto out;
-        //        }
+        if ((mri_id = get_file_id(settings->mriname)) == NULL) {
+            qCritical("Couln't read MRI file id (How come?)");
+            goto out;
+        }
     }
     else if (!settings->transname.isEmpty()) {
         FiffCoordTransOld* t;
