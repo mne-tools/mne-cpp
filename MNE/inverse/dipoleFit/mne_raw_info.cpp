@@ -151,7 +151,7 @@ FiffDirNode::SPtr MneRawInfo::find_meas_info(const FiffDirNode::SPtr &node)
             return empty_node;
         tmp_node = tmp_node->parent;
     }
-    for (k = 0; k < tmp_node->nchild; k++)
+    for (k = 0; k < tmp_node->nchild(); k++)
         if (tmp_node->children[k]->type == FIFFB_MEAS_INFO)
             return (tmp_node->children[k]);
     return empty_node;
@@ -240,20 +240,20 @@ int MneRawInfo::get_meas_info(FiffStream::SPtr &stream, FiffDirNode::SPtr &node,
        * Is there a block id is in the FIFFB_MEAS node?
        */
     //    if (meas->id != NULL) {
-    if (!meas->id.isEmpty()) {
+    if (!meas->id) {
         *id = MALLOC_33(1,fiffIdRec);
         //        memcpy (*id,meas[0]->id,sizeof(fiffIdRec));
-        (*id)->version = meas->id.version;
-        (*id)->machid[0] = meas->id.machid[0];
-        (*id)->machid[1] = meas->id.machid[1];
-        (*id)->time = meas->id.time;
+        (*id)->version = meas->id->version;
+        (*id)->machid[0] = meas->id->machid[0];
+        (*id)->machid[1] = meas->id->machid[1];
+        (*id)->time = meas->id->time;
     }
     /*
        * Others from FIFFB_MEAS_INFO
        */
     *lowpass  = -1;
     *highpass = -1;
-    for (k = 0; k < node->nent; k++) {
+    for (k = 0; k < node->nent(); k++) {
         kind = node->dir[k]->kind;
         pos  = node->dir[k]->pos;
         switch (kind) {
@@ -359,7 +359,7 @@ int MneRawInfo::get_meas_info(FiffStream::SPtr &stream, FiffDirNode::SPtr &node,
 
     //    FREE_33(hpi);
     if (hpi.size() > 0 && *trans == NULL)
-        for (k = 0; k < hpi[0]->nent; k++)
+        for (k = 0; k < hpi[0]->nent(); k++)
             if (hpi[0]->dir[k]->kind ==  FIFF_COORD_TRANS) {
                 //                if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
                 //                    goto bad;
@@ -497,7 +497,7 @@ int MneRawInfo::mne_load_raw_info(char *name, int allow_maxshield, MneRawInfo **
     }
     info->buf_size   = 0;
     //    for (k = 0, one = raw->dir; k < raw->nent; k++, one++) {
-    for (k = 0; k < raw->nent; k++) {
+    for (k = 0; k < raw->nent(); k++) {
         //        raw->dir[k]->kind
         //                raw->dir[k]->type
         //                raw->dir[k].size
@@ -520,7 +520,7 @@ int MneRawInfo::mne_load_raw_info(char *name, int allow_maxshield, MneRawInfo **
         goto out;
     }
     info->rawDir     = rawDir;
-    info->ndir       = raw->nent;
+    info->ndir       = raw->nent();
     *infop = info;
     res = FIFF_OK;
 

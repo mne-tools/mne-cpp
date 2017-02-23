@@ -136,7 +136,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    inline static bool copy_tree(FiffStream::SPtr p_pStreamIn, const FiffId& in_id, const QList<FiffDirNode::SPtr>& p_Nodes, FiffStream::SPtr& p_pStreamOut)
+    inline static bool copy_tree(FiffStream::SPtr p_pStreamIn, const FiffId::SPtr in_id, const QList<FiffDirNode::SPtr>& p_Nodes, FiffStream::SPtr& p_pStreamOut)
     {
         return FiffDirNode::copy_tree(p_pStreamIn, in_id, p_Nodes, p_pStreamOut);
     }
@@ -230,26 +230,6 @@ public:
     inline static bool invert_transform(FiffCoordTrans& p_Transform)
     {
         return p_Transform.invert_transform();
-    }
-
-    //=========================================================================================================
-    /**
-    * fiff_make_dir_tree
-    *
-    * ### MNE toolbox root function ###
-    *
-    * Wrapper for the FiffCoordTrans::make_dir_tree static function
-    *
-    * @param[in] p_pStream the opened fiff file
-    * @param[in] p_Dir the dir entries of which the tree should be constructed
-    * @param[out] p_Tree the created dir tree
-    * @param[in] start dir entry to start (optional, by default 0)
-    *
-    * @return index of the last read dir entry
-    */
-    inline static qint32 make_dir_tree(FiffStream::SPtr& p_pStream, QList<FiffDirEntry::SPtr>& p_Dir, FiffDirNode::SPtr& p_Tree, qint32 start = 0)
-    {
-        return FiffDirNode::make_subtree(p_pStream, p_Dir, p_Tree, start);
     }
 
     //=========================================================================================================

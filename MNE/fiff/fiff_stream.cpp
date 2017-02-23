@@ -50,6 +50,7 @@
 #include "fiff_ch_info.h"
 #include "fiff_ch_pos.h"
 #include "fiff_dig_point.h"
+#include "fiff_id.h"
 
 #include <utils/mnemath.h>
 
@@ -132,7 +133,15 @@ QString FiffStream::streamName()
 
 //*************************************************************************************************************
 
-const FiffId &FiffStream::id() const
+FiffId::SPtr FiffStream::id()
+{
+    return m_id;
+}
+
+
+//*************************************************************************************************************
+
+const FiffId::SPtr FiffStream::id() const
 {
     return m_id;
 }
@@ -207,7 +216,7 @@ bool FiffStream::get_evoked_entries(const QList<FiffDirNode::SPtr> &evoked_node,
 
     for(ev = evoked_node.begin(); ev != evoked_node.end(); ++ev)
     {
-        for(k = 0; k < (*ev)->nent; ++k)
+        for(k = 0; k < (*ev)->nent(); ++k)
         {
             kind = (*ev)->dir[k]->kind;
             pos = (*ev)->dir[k]->pos;
@@ -218,7 +227,7 @@ bool FiffStream::get_evoked_entries(const QList<FiffDirNode::SPtr> &evoked_node,
             }
         }
         FiffDirNode::SPtr my_aspect = (*ev)->dir_tree_find(FIFFB_ASPECT)[0];
-        for(k = 0; k < my_aspect->nent; ++k)
+        for(k = 0; k < my_aspect->nent(); ++k)
         {
             kind = my_aspect->dir[k]->kind;
             pos = my_aspect->dir[k]->pos;
@@ -334,7 +343,7 @@ bool FiffStream::open(QIODevice::OpenModeFlag mode)
     //
     //   Create the directory tree structure
     //
-    FiffDirNode::make_subtree(this, m_dir, m_tree);
+    this->m_tree = FiffDirNode::make_subtree_new(this, m_dir);
 
     printf("[done]\n");
 
@@ -612,7 +621,7 @@ QList<FiffCtfComp> FiffStream::read_ctf_comp(const FiffDirNode::SPtr& p_Node, co
         //
         FiffNamedMatrix::SDPtr mat(new FiffNamedMatrix());
         this->read_named_matrix(node, FIFF_MNE_CTF_COMP_DATA, *mat.data());
-        for(p = 0; p < node->nent; ++p)
+        for(p = 0; p < node->nent(); ++p)
         {
             kind = node->dir[p]->kind;
             pos  = node->dir[p]->pos;
@@ -649,7 +658,7 @@ QList<FiffCtfComp> FiffStream::read_ctf_comp(const FiffDirNode::SPtr& p_Node, co
         else
             one.kind = one.ctfkind;
 
-        for (p = 0; p < node->nent; ++p)
+        for (p = 0; p < node->nent(); ++p)
         {
             kind = node->dir[p]->kind;
             pos  = node->dir[p]->pos;
@@ -775,7 +784,7 @@ bool FiffStream::read_meas_info_base(const FiffDirNode::SPtr& p_Node, FiffInfoBa
     fiff_int_t kind = -1;
     fiff_int_t pos = -1;
 
-    for (qint32 k = 0; k < parent_meg[0]->nent; ++k)
+    for (qint32 k = 0; k < parent_meg[0]->nent(); ++k)
     {
         kind = parent_meg[0]->dir[k]->kind;
         pos  = parent_meg[0]->dir[k]->pos;
@@ -869,7 +878,7 @@ bool FiffStream::read_meas_info(const FiffDirNode::SPtr& p_Node, FiffInfo& info,
     fiff_int_t kind = -1;
     fiff_int_t pos = -1;
 
-    for (qint32 k = 0; k < meas_info[0]->nent; ++k)
+    for (qint32 k = 0; k < meas_info[0]->nent(); ++k)
     {
         kind = meas_info[0]->dir[k]->kind;
         pos  = meas_info[0]->dir[k]->pos;
@@ -940,7 +949,7 @@ bool FiffStream::read_meas_info(const FiffDirNode::SPtr& p_Node, FiffInfo& info,
         QList<FiffDirNode::SPtr> hpi_result = meas_info[0]->dir_tree_find(FIFFB_HPI_RESULT);
         if (hpi_result.size() == 1)
         {
-            for( qint32 k = 0; k < hpi_result[0]->nent; ++k)
+            for( qint32 k = 0; k < hpi_result[0]->nent(); ++k)
             {
                 kind = hpi_result[0]->dir[k]->kind;
                 pos  = hpi_result[0]->dir[k]->pos;
@@ -968,7 +977,7 @@ bool FiffStream::read_meas_info(const FiffDirNode::SPtr& p_Node, FiffInfo& info,
 
     if (isotrak.size() == 1)
     {
-        for (k = 0; k < isotrak[0]->nent; ++k)
+        for (k = 0; k < isotrak[0]->nent(); ++k)
         {
             kind = isotrak[0]->dir[k]->kind;
             pos  = isotrak[0]->dir[k]->pos;
@@ -1009,7 +1018,7 @@ bool FiffStream::read_meas_info(const FiffDirNode::SPtr& p_Node, FiffInfo& info,
     QString acq_stim;
     if (acqpars.size() == 1)
     {
-        for( k = 0; k < acqpars[0]->nent; ++k)
+        for( k = 0; k < acqpars[0]->nent(); ++k)
         {
             kind = acqpars[0]->dir[k]->kind;
             pos  = acqpars[0]->dir[k]->pos;
@@ -1041,30 +1050,30 @@ bool FiffStream::read_meas_info(const FiffDirNode::SPtr& p_Node, FiffInfo& info,
     //   Put the data together
     //
 //    info = new FiffInfo();
-    if (p_Node->id.version != -1)
+    if (p_Node->id->version != -1)
         info.file_id = p_Node->id;
     else
-        info.file_id.version = -1;
+        info.file_id->version = -1;
 
     //
     //  Make the most appropriate selection for the measurement id
     //
     if (meas_info[0]->parent_id.version == -1)
     {
-        if (meas_info[0]->id.version == -1)
+        if (meas_info[0]->id->version == -1)
         {
-            if (meas[0]->id.version == -1)
+            if (meas[0]->id->version == -1)
             {
                 if (meas[0]->parent_id.version == -1)
-                    info.meas_id = info.file_id;
+                    info.meas_id = *info.file_id;
                 else
                     info.meas_id = meas[0]->parent_id;
             }
             else
-                info.meas_id = meas[0]->id;
+                info.meas_id = *meas[0]->id;
         }
         else
-            info.meas_id = meas_info[0]->id;
+            info.meas_id = *meas_info[0]->id;
     }
     else
         info.meas_id = meas_info[0]->parent_id;
@@ -1146,7 +1155,7 @@ bool FiffStream::read_named_matrix(const FiffDirNode::SPtr& p_Node, fiff_int_t m
     bool found_it = false;
     if (node->type != FIFFB_MNE_NAMED_MATRIX)
     {
-        for (int k = 0; k < node->nchild; ++k)
+        for (int k = 0; k < node->nchild(); ++k)
         {
             if (node->children[k]->type == FIFFB_MNE_NAMED_MATRIX)
             {
@@ -1586,7 +1595,7 @@ bool FiffStream::setup_read_raw(QIODevice &p_IODevice, FiffRawData& data, bool a
     //
 
     QList<FiffDirEntry::SPtr> dir = raw[0]->dir;
-    fiff_int_t nent = raw[0]->nent;
+    fiff_int_t nent = raw[0]->nent();
     fiff_int_t nchan = info.nchan;
     fiff_int_t first = 0;
     fiff_int_t first_samp = 0;

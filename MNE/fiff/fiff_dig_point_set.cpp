@@ -164,7 +164,7 @@ bool FiffDigPointSet::readFromStream(FiffStream::SPtr &p_pStream, FiffDigPointSe
 
     if (isotrak.size() == 1)
     {
-        for (k = 0; k < isotrak[0]->nent; ++k)
+        for (k = 0; k < isotrak[0]->nent(); ++k)
         {
             kind = isotrak[0]->dir[k]->kind;
             pos  = isotrak[0]->dir[k]->pos;

@@ -158,16 +158,16 @@ fiffId get_file_id(const QString& name)
     QFile file(name);
     FiffStream::SPtr stream(new FiffStream(&file));
     fiffId   id;
-    if(!stream->open())
+    if(!stream->open()) {
+        stream->close();
         return NULL;
+    }
     else {
         id = MALLOC_41(1,fiffIdRec);
-        FiffId id_new = stream->id();
-
-        id->version = id_new.version;       /**< File version */
-        id->machid[0] = id_new.machid[0];   /**< Unique machine ID */
-        id->machid[1] = id_new.machid[1];
-        id->time = id_new.time;             /**< Time of the ID creation */
+        id->version = stream->id()->version;       /**< File version */
+        id->machid[0] = stream->id()->machid[0];   /**< Unique machine ID */
+        id->machid[1] = stream->id()->machid[1];
+        id->time = stream->id()->time;             /**< Time of the ID creation */
 
         stream->close();
         return id;
@@ -226,7 +226,7 @@ int mne_read_meg_comp_eeg_ch_info_41(const QString& name,
     }
     info = nodes[0];
     to_find = 0;
-    for (k = 0; k < info->nent; k++) {
+    for (k = 0; k < info->nent(); k++) {
         kind = info->dir[k]->kind;
         pos  = info->dir[k]->pos;
         switch (kind) {

@@ -156,7 +156,15 @@ public:
     *
     * @return The file identifier
     */
-    const FiffId& id() const;
+    FiffId::SPtr id();
+
+    //=========================================================================================================
+    /**
+    * Returns the file identifier
+    *
+    * @return The file identifier
+    */
+    const FiffId::SPtr id() const;
 
     //=========================================================================================================
     /**
@@ -772,9 +780,15 @@ private:
     bool check_beginning(QSharedPointer<FiffTag>& p_pTag);
 
 private:
-    FiffId                      m_id;   /**< The file identifier */
+
+//    char         *file_name;    /**< Name of the file */ -> Use streamName() instead
+//    FILE         *fd;           /**< The normal file descriptor */ -> file descitpion is part of the stream: stream->device()
+    FiffId::SPtr                m_id;   /**< The file identifier */
     QList<FiffDirEntry::SPtr>   m_dir;  /**< This is the directory. If no directory exists, open automatically scans the file to create one. */
+//    int         nent;           /**< How many entries? */ -> Use nent() instead
     FiffDirNode::SPtr           m_tree; /**< Directory compiled into a tree */
+//    char        *ext_file_name; /**< Name of the file holding the external data */
+//    FILE        *ext_fd;        /**< The file descriptor of the above file if open  */
 
 // ### OLD STRUCT ###
 // /** FIFF file handle returned by fiff_open(). */

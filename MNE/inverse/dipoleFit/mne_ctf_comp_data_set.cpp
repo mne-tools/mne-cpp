@@ -217,7 +217,7 @@ int mne_read_meg_comp_eeg_ch_info_32(const QString& name,
     }
     info = nodes[0];
     to_find = 0;
-    for (k = 0; k < info->nent; k++) {
+    for (k = 0; k < info->nent(); k++) {
         kind = info->dir[k]->kind;
         pos  = info->dir[k]->pos;
         switch (kind) {
