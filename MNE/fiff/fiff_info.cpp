@@ -109,7 +109,7 @@ FiffInfo::~FiffInfo()
 void FiffInfo::clear()
 {
     FiffInfoBase::clear();
-    file_id.clear();
+    file_id = FiffId();
     meas_date[0] = -1;
     sfreq = -1.0;
     highpass = -1.0;

@@ -104,12 +104,6 @@ public:
 
     //=========================================================================================================
     /**
-    * Initializes directory tree structure.
-    */
-    void clear();
-
-    //=========================================================================================================
-    /**
     * ### MNE toolbox root function ###: Implementation of the fiff_copy_tree function
     *
     * Copies directory subtrees from fidin to fidout

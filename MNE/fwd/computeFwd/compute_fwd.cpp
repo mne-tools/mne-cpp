@@ -21,8 +21,6 @@
 #include <QCoreApplication>
 #include <QFile>
 #include <QDir>
-#include <QDateTime>
-//#include <QNetworkInterface>
 
 using namespace Eigen;
 using namespace INVERSELIB;
@@ -715,8 +713,6 @@ int fiff_write_float_sparse_matrix_old(FiffStream::SPtr& t_pStream, int kind, Fi
     }
     return FIFF_OK;
 }
-
-
 
 
 
@@ -1562,20 +1558,6 @@ bad : {
 
 
 
-#define FIFFC_MAJOR_VERSION 1L
-#define FIFFC_MINOR_VERSION 1L
-
-#define FIFFC_VERSION (FIFFC_MAJOR_VERSION<<16 | FIFFC_MINOR_VERSION)
-
-
-int fiff_get_machid(int *fixed_id)
-{
-    qDebug() << "TODO fiff_get_machid: resemble QNetworkInterface::hardwareAddress()";
-    fixed_id[0] = 0;//QNetworkInterface::hardwareAddress(); //gethostid();
-    fixed_id[1] = 0;
-
-    return FIFF_OK;
-}
 
 
 int fiff_new_file_id (fiffId id)
@@ -1583,35 +1565,24 @@ int fiff_new_file_id (fiffId id)
 * Return a (hopefully) unique file id
 */
 {
-    int fixed_id[2];
-
-    fixed_id[0] = fixed_id[1] = 0;
-    if (fiff_get_machid(fixed_id) == FIFF_FAIL) {
-        /*
-        * Never mind...
-        */
-        fixed_id[0] = fixed_id[1] = 0;
-    }
+    FiffId new_id = FiffId::new_file_id();
     /*
-   * Internet address in the first two words
-   */
-    id->machid[0] = fixed_id[0];
-    id->machid[1] = fixed_id[1];
+    * Internet address in the first two words
+    */
+    id->machid[0] = new_id.machid[0];
+    id->machid[1] = new_id.machid[1];
     /*
-   * Time in the third and fourth words
-   */
+    * Time in the third and fourth words
+    */
     /*
-   * Time in the third and fourth words
-   * Since practically no system gives times in
-   * true micro seconds, the last three digits
-   * are randomized to insure uniqueness.
-   */
+    * Time in the third and fourth words
+    * Since practically no system gives times in
+    * true micro seconds, the last three digits
+    * are randomized to insure uniqueness.
+    */
     {
-//        long secs,usecs;
-//        if (fiff_get_time(&secs, &usecs) == FIFF_FAIL) //
-//            return FIFF_FAIL;
-        id->time.secs  = QDateTime::currentMSecsSinceEpoch()/1000;
-        id->time.usecs = rand() % 1000;
+        id->time.secs  = new_id.time.secs;
+        id->time.usecs = new_id.time.usecs;
     }
     id->version = FIFFC_VERSION;
     return FIFF_OK;

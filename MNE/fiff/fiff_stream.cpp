@@ -1844,6 +1844,10 @@ FiffStream::SPtr FiffStream::open_update(QIODevice &p_IODevice)
         return FiffStream::SPtr();
     }
 
+
+    t_pStream->dirtree()->print(4);
+
+
     FiffTag::SPtr t_pTag;
     long dirpos,pointerpos;
 
@@ -2636,22 +2640,12 @@ void FiffStream::write_float_sparse_rcs(fiff_int_t kind, const SparseMatrix<floa
 void FiffStream::write_id(fiff_int_t kind, const FiffId& id)
 {
     FiffId t_id = id;
-    if(t_id.version == -1)
-    {
-        /* initialize random seed: */
-        srand ( time(NULL) );
-        double rand_1 = (double)(rand() % 100);rand_1 /= 100;
-        double rand_2 = (double)(rand() % 100);rand_2 /= 100;
 
-        time_t seconds;
-        seconds = time (NULL);
-
-        //fiff_int_t timezone = 5;      //   Matlab does not know the timezone
-        t_id.version   = (1 << 16) | 2;   //   Version (1 << 16) | 2
-        t_id.machid[0] = 65536*rand_1;    //   Machine id is random for now
-        t_id.machid[1] = 65536*rand_2;    //   Machine id is random for now
-        t_id.time.secs = (int)seconds;    //seconds since January 1, 1970 //3600*(24*(now-datenum(1970,1,1,0,0,0))+timezone);
-        t_id.time.usecs = 0;              //   Do not know how we could get this
+    if(t_id.isEmpty()) {
+        //
+        // Create a new one
+        //
+        t_id = FiffId::new_file_id();
     }
 
     //

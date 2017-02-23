@@ -95,20 +95,6 @@ FiffDirNode::~FiffDirNode()
 
 //*************************************************************************************************************
 
-void FiffDirNode::clear()
-{
-    type = -1;
-    id.clear();
-    parent_id.clear();
-    dir.clear();
-    nent_tree = -1;
-    parent.clear();
-    children.clear();
-}
-
-
-//*************************************************************************************************************
-
 bool FiffDirNode::copy_tree(FiffStream::SPtr& p_pStreamIn, const FiffId& in_id, const QList<FiffDirNode::SPtr>& p_Nodes, FiffStream::SPtr& p_pStreamOut)
 {
     if(p_Nodes.size() <= 0)
