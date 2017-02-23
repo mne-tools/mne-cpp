@@ -79,7 +79,7 @@ bool MNE::read_events(QIODevice &p_IODevice, MatrixXi& eventlist)
     //
     //   Find the desired block
     //
-    QList<FiffDirNode::SPtr> events = t_pStream->tree()->dir_tree_find(FIFFB_MNE_EVENTS);
+    QList<FiffDirNode::SPtr> events = t_pStream->dirtree()->dir_tree_find(FIFFB_MNE_EVENTS);
 
     if (events.size() == 0)
     {

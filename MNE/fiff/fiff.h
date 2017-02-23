@@ -136,7 +136,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    inline static bool copy_tree(FiffStream::SPtr p_pStreamIn, const FiffId::SPtr in_id, const QList<FiffDirNode::SPtr>& p_Nodes, FiffStream::SPtr& p_pStreamOut)
+    inline static bool copy_tree(FiffStream::SPtr p_pStreamIn, const FiffId& in_id, const QList<FiffDirNode::SPtr>& p_Nodes, FiffStream::SPtr& p_pStreamOut)
     {
         return FiffDirNode::copy_tree(p_pStreamIn, in_id, p_Nodes, p_pStreamOut);
     }

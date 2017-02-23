@@ -338,7 +338,7 @@ public:
     *
     * @return Fiff universially unique identifier
     */
-    inline FiffId::SPtr toFiffID() const;
+    inline FiffId toFiffID() const;
 
     //=========================================================================================================
     /**
@@ -700,22 +700,20 @@ inline qint16* FiffTag::toDauPack16()
 // Structures
 //=============================================================================================================
 
-inline FiffId::SPtr FiffTag::toFiffID() const
+inline FiffId FiffTag::toFiffID() const
 {
-    FiffId::SPtr p_fiffID;
+    FiffId p_fiffID;
     if(this->isMatrix() || this->getType() != FIFFT_ID_STRUCT || this->data() == NULL)
         return p_fiffID;
     else
     {
-        p_fiffID = FiffId::SPtr(new FiffId);
-
         const qint32* t_pInt32 = (qint32*)this->data();
 
-        p_fiffID->version = t_pInt32[0];
-        p_fiffID->machid[0] = t_pInt32[1];
-        p_fiffID->machid[1] = t_pInt32[2];
-        p_fiffID->time.secs = t_pInt32[3];
-        p_fiffID->time.usecs = t_pInt32[4];
+        p_fiffID.version = t_pInt32[0];
+        p_fiffID.machid[0] = t_pInt32[1];
+        p_fiffID.machid[1] = t_pInt32[2];
+        p_fiffID.time.secs = t_pInt32[3];
+        p_fiffID.time.usecs = t_pInt32[4];
 
         return p_fiffID;
     }

@@ -72,7 +72,7 @@ FiffInfo::FiffInfo()
 
 FiffInfo::FiffInfo(const FiffInfo& p_FiffInfo)
 : FiffInfoBase(p_FiffInfo)
-, file_id(new FiffId(*p_FiffInfo.file_id))
+, file_id(p_FiffInfo.file_id)
 , sfreq(p_FiffInfo.sfreq)
 , highpass(p_FiffInfo.highpass)
 , lowpass(p_FiffInfo.lowpass)

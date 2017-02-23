@@ -627,7 +627,7 @@ MneProjOp *MneProjOp::mne_read_proj_op_from_node(FiffStream::SPtr &stream, const
     }
 
     if (!start || start->isEmpty())
-        start_node = stream->tree();
+        start_node = stream->dirtree();
     else
         start_node = start;
 

@@ -1113,7 +1113,7 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
     //
     //   Find all inverse operators
     //
-    QList <FiffDirNode::SPtr> invs_list = t_pStream->tree()->dir_tree_find(FIFFB_MNE_INVERSE_SOLUTION);
+    QList <FiffDirNode::SPtr> invs_list = t_pStream->dirtree()->dir_tree_find(FIFFB_MNE_INVERSE_SOLUTION);
     if ( invs_list.size()== 0)
     {
         printf("No inverse solutions in %s\n", t_pStream->streamName().toUtf8().constData());
@@ -1123,7 +1123,7 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
     //
     //   Parent MRI data
     //
-    QList <FiffDirNode::SPtr> parent_mri = t_pStream->tree()->dir_tree_find(FIFFB_MNE_PARENT_MRI_FILE);
+    QList <FiffDirNode::SPtr> parent_mri = t_pStream->dirtree()->dir_tree_find(FIFFB_MNE_PARENT_MRI_FILE);
     if (parent_mri.size() == 0)
     {
         printf("No parent MRI information in %s", t_pStream->streamName().toUtf8().constData());
@@ -1306,7 +1306,7 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
     //
     // get parent MEG info
     //
-    t_pStream->read_meas_info_base(t_pStream->tree(), inv.info);
+    t_pStream->read_meas_info_base(t_pStream->dirtree(), inv.info);
 
     //
     //   Transform the source spaces to the correct coordinate frame
@@ -1321,7 +1321,7 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
     //
     //  We also need the SSP operator
     //
-    inv.projs     = t_pStream->read_proj(t_pStream->tree());
+    inv.projs     = t_pStream->read_proj(t_pStream->dirtree());
     //
     //  Some empty fields to be filled in later
     //

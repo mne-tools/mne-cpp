@@ -2232,7 +2232,7 @@ MneProjOp* mne_read_proj_op_from_node_3(//fiffFile in,
     }
 
     if (!start || start->isEmpty())
-        start_node = stream->tree();
+        start_node = stream->dirtree();
     else
         start_node = start;
 
@@ -2711,10 +2711,10 @@ int mne_read_meg_comp_eeg_ch_info_3(const QString& name,
     if(!stream->open())
         goto bad;
 
-    nodes = stream->tree()->dir_tree_find(FIFFB_MNE_PARENT_MEAS_FILE);
+    nodes = stream->dirtree()->dir_tree_find(FIFFB_MNE_PARENT_MEAS_FILE);
 
     if (nodes.size() == 0) {
-        nodes = stream->tree()->dir_tree_find(FIFFB_MEAS_INFO);
+        nodes = stream->dirtree()->dir_tree_find(FIFFB_MEAS_INFO);
         if (nodes.size() == 0) {
             qCritical ("Could not find the channel information.");
             goto bad;
@@ -2968,7 +2968,7 @@ int mne_read_bad_channel_list_from_node_3(FiffStream::SPtr& stream,
     char *names;
 
     if (pNode->isEmpty())
-        node = stream->tree();
+        node = stream->dirtree();
     else
         node = pNode;
 
@@ -2998,7 +2998,7 @@ int mne_read_bad_channel_list_3(const QString& name, char ***listp, int *nlistp)
     if(!stream->open())
         return FAIL;
 
-    res = mne_read_bad_channel_list_from_node_3(stream,stream->tree(),listp,nlistp);
+    res = mne_read_bad_channel_list_from_node_3(stream,stream->dirtree(),listp,nlistp);
 
     stream->close();
 
@@ -3054,7 +3054,7 @@ MneCovMatrix* mne_read_cov(const QString& name,int kind)
     if(!stream->open())
         goto out;
 
-    nodes = stream->tree()->dir_tree_find(FIFFB_MNE_COV);
+    nodes = stream->dirtree()->dir_tree_find(FIFFB_MNE_COV);
 
     if (nodes.size() == 0) {
         printf("No covariance matrix available in %s",name.toLatin1().data());
@@ -3374,12 +3374,12 @@ static int get_all_chs (//fiffFile file,	        /* The file we are reading */
     /*
     * Is there a block id is in the FIFFB_MEAS node?
     */
-    if (!meas->id) {
+    if (!meas->id.isEmpty()) {
         *id = MALLOC_3(1,fiffIdRec);
-        (*id)->version = meas->id->version;
-        (*id)->machid[0] = meas->id->machid[0];
-        (*id)->machid[1] = meas->id->machid[1];
-        (*id)->time = meas->id->time;
+        (*id)->version = meas->id.version;
+        (*id)->machid[0] = meas->id.machid[0];
+        (*id)->machid[1] = meas->id.machid[1];
+        (*id)->time = meas->id.time;
     }
     /*
     * Others from FIFFB_MEAS_INFO
@@ -3447,7 +3447,7 @@ static int read_ch_info(const QString&  name,
     if(!stream->open())
         goto bad;
 
-    meas = stream->tree()->dir_tree_find(FIFFB_MEAS);
+    meas = stream->dirtree()->dir_tree_find(FIFFB_MEAS);
     if (meas.size() == 0) {
         qCritical ("%s : no MEG data available here",name.toLatin1().data());
         goto bad;

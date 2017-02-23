@@ -133,15 +133,7 @@ QString FiffStream::streamName()
 
 //*************************************************************************************************************
 
-FiffId::SPtr FiffStream::id()
-{
-    return m_id;
-}
-
-
-//*************************************************************************************************************
-
-const FiffId::SPtr FiffStream::id() const
+FiffId FiffStream::id() const
 {
     return m_id;
 }
@@ -165,9 +157,9 @@ int FiffStream::nent() const
 
 //*************************************************************************************************************
 
-const FiffDirNode::SPtr& FiffStream::tree() const
+const FiffDirNode::SPtr& FiffStream::dirtree() const
 {
-    return m_tree;
+    return m_dirtree;
 }
 
 
@@ -343,7 +335,7 @@ bool FiffStream::open(QIODevice::OpenModeFlag mode)
     //
     //   Create the directory tree structure
     //
-    this->m_tree = FiffDirNode::make_subtree_new(this, m_dir);
+    this->m_dirtree = this->make_subtree(m_dir);
 
     printf("[done]\n");
 
@@ -363,6 +355,75 @@ bool FiffStream::close()
         this->device()->close();
 
     return true;
+}
+
+
+//*************************************************************************************************************
+
+FiffDirNode::SPtr FiffStream::make_subtree(QList<FiffDirEntry::SPtr> &dentry)
+{
+    FiffDirNode::SPtr defaultNode;
+    FiffDirNode::SPtr node = FiffDirNode::SPtr(new FiffDirNode);
+    FiffDirNode::SPtr child;
+    FiffTag::SPtr t_pTag;
+    QList<FiffDirEntry::SPtr> dir;
+    qint32 current = 0;
+
+    node->dir_tree    = dentry;
+    node->nent_tree   = 1;
+    node->parent      = NULL;
+    node->type = FIFFB_ROOT;
+
+    if (dentry[current]->kind == FIFF_BLOCK_START) {
+        if (!this->read_tag(t_pTag,dentry[current]->pos))
+            return defaultNode;
+        else
+            node->type = *t_pTag->toInt();
+    }
+    else {
+        node->id = this->id();
+    }
+
+    ++current;
+    int level = 0;
+    for (; current < dentry.size(); ++current) {
+        ++node->nent_tree;
+        if (dentry[current]->kind == FIFF_BLOCK_START) {
+            level++;
+            if (level == 1) {
+                QList<FiffDirEntry::SPtr> sub_dentry = dentry.mid(current);
+                if (!(child = this->make_subtree(sub_dentry)))
+                    return defaultNode;
+                child->parent = node;
+                node->children.append(child);
+            }
+        }
+        else if (dentry[current]->kind == FIFF_BLOCK_END) {
+            level--;
+            if (level < 0)
+                break;
+        }
+        else if (dentry[current]->kind == -1)
+            break;
+        else if (level == 0) {
+            /*
+            * Take the node id from the parent block id,
+            * block id, or file id. Let the block id
+            * take precedence over parent block id and file id
+            */
+            if (((dentry[current]->kind == FIFF_PARENT_BLOCK_ID || dentry[current]->kind == FIFF_FILE_ID) && node->id.isEmpty()) || dentry[current]->kind == FIFF_BLOCK_ID) {
+                if (!this->read_tag(t_pTag,dentry[current]->pos))
+                    return defaultNode;
+                node->id = t_pTag->toFiffID();
+            }
+            dir.append(FiffDirEntry::SPtr(new FiffDirEntry(*dentry[current])));//Memcopy necessary here - or is a pointer fine?
+        }
+    }
+    /*
+    * Strip unused entries
+    */
+    node->dir = dir;
+    return node;
 }
 
 
@@ -1050,30 +1111,30 @@ bool FiffStream::read_meas_info(const FiffDirNode::SPtr& p_Node, FiffInfo& info,
     //   Put the data together
     //
 //    info = new FiffInfo();
-    if (p_Node->id->version != -1)
+    if (p_Node->id.version != -1)
         info.file_id = p_Node->id;
     else
-        info.file_id->version = -1;
+        info.file_id.version = -1;
 
     //
     //  Make the most appropriate selection for the measurement id
     //
     if (meas_info[0]->parent_id.version == -1)
     {
-        if (meas_info[0]->id->version == -1)
+        if (meas_info[0]->id.version == -1)
         {
-            if (meas[0]->id->version == -1)
+            if (meas[0]->id.version == -1)
             {
                 if (meas[0]->parent_id.version == -1)
-                    info.meas_id = *info.file_id;
+                    info.meas_id = info.file_id;
                 else
                     info.meas_id = meas[0]->parent_id;
             }
             else
-                info.meas_id = *meas[0]->id;
+                info.meas_id = meas[0]->id;
         }
         else
-            info.meas_id = *meas_info[0]->id;
+            info.meas_id = meas_info[0]->id;
     }
     else
         info.meas_id = meas_info[0]->parent_id;
@@ -1549,7 +1610,7 @@ bool FiffStream::setup_read_raw(QIODevice &p_IODevice, FiffRawData& data, bool a
     //
     FiffInfo info;// = NULL;
     FiffDirNode::SPtr meas;
-    if(!t_pStream->read_meas_info(t_pStream->tree(), info, meas))
+    if(!t_pStream->read_meas_info(t_pStream->dirtree(), info, meas))
         return false;
 
     //
@@ -1790,7 +1851,7 @@ FiffStream::SPtr FiffStream::open_update(QIODevice &p_IODevice)
 
     if (file != NULL) {
 
-        t_pStream->tree()->print(4);
+        t_pStream->dirtree()->print(4);
 
         /*
         * Ensure that the last tag in the directory has next set to FIFF_NEXT_NONE
@@ -1893,8 +1954,8 @@ FiffStream::SPtr FiffStream::start_writing_raw(QIODevice &p_IODevice, const Fiff
 
         for(qint32 k = 0; k < blocks.size(); ++k)
         {
-            QList<FiffDirNode::SPtr> nodes = t_pStream2->tree()->dir_tree_find(blocks[k]);
-            FiffDirNode::copy_tree(t_pStream2,t_pStream2->tree()->id,nodes,t_pStream);
+            QList<FiffDirNode::SPtr> nodes = t_pStream2->dirtree()->dir_tree_find(blocks[k]);
+            FiffDirNode::copy_tree(t_pStream2,t_pStream2->dirtree()->id,nodes,t_pStream);
             if(blocks[k] == FIFFB_HPI_RESULT && nodes.size() > 0)
                 have_hpi_result = true;
 
