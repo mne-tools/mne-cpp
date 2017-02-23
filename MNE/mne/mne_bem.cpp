@@ -155,7 +155,7 @@ bool MNEBem::readFromStream(FiffStream::SPtr& p_pStream, bool add_geom, MNEBem& 
     //
 
 
-    QList<FiffDirNode::SPtr> bem = p_pStream->tree()->dir_tree_find(FIFFB_BEM);
+    QList<FiffDirNode::SPtr> bem = p_pStream->dirtree()->dir_tree_find(FIFFB_BEM);
     if(bem.isEmpty())
     {
         qCritical() << "No BEM block found!";
@@ -166,7 +166,7 @@ bool MNEBem::readFromStream(FiffStream::SPtr& p_pStream, bool add_geom, MNEBem& 
         return false;
     }
 
-    QList<FiffDirNode::SPtr> bemsurf = p_pStream->tree()->dir_tree_find(FIFFB_BEM_SURF);
+    QList<FiffDirNode::SPtr> bemsurf = p_pStream->dirtree()->dir_tree_find(FIFFB_BEM_SURF);
     if(bemsurf.isEmpty())
     {
         qCritical() << "No BEM surfaces found!";

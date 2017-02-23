@@ -240,13 +240,13 @@ int MneRawInfo::get_meas_info(FiffStream::SPtr &stream, FiffDirNode::SPtr &node,
        * Is there a block id is in the FIFFB_MEAS node?
        */
     //    if (meas->id != NULL) {
-    if (!meas->id) {
+    if (!meas->id.isEmpty()) {
         *id = MALLOC_33(1,fiffIdRec);
         //        memcpy (*id,meas[0]->id,sizeof(fiffIdRec));
-        (*id)->version = meas->id->version;
-        (*id)->machid[0] = meas->id->machid[0];
-        (*id)->machid[1] = meas->id->machid[1];
-        (*id)->time = meas->id->time;
+        (*id)->version = meas->id.version;
+        (*id)->machid[0] = meas->id.machid[0];
+        (*id)->machid[1] = meas->id.machid[1];
+        (*id)->time = meas->id.time;
     }
     /*
        * Others from FIFFB_MEAS_INFO
@@ -436,10 +436,10 @@ int MneRawInfo::mne_load_raw_info(char *name, int allow_maxshield, MneRawInfo **
     //        goto out;
     if(!stream->open())
         goto out;
-    raw = find_raw(stream->tree());
+    raw = find_raw(stream->dirtree());
     if (raw->isEmpty()) {
         if (allow_maxshield) {
-            raw = find_maxshield(stream->tree());
+            raw = find_maxshield(stream->dirtree());
             if (raw->isEmpty()) {
                 printf("No raw data in this file.");
                 goto out;

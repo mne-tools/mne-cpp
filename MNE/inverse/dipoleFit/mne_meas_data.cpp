@@ -622,12 +622,12 @@ static int get_meas_info (  FiffStream::SPtr& stream,       /* The stream we are
     /*
     * Is there a block id is in the FIFFB_MEAS node?
     */
-    if (!meas->id) {
+    if (!meas->id.isEmpty()) {
         *id = MALLOC_9(1,fiffIdRec);
-        (*id)->version = meas->id->version;
-        (*id)->machid[0] = meas->id->machid[0];
-        (*id)->machid[1] = meas->id->machid[1];
-        (*id)->time = meas->id->time;
+        (*id)->version = meas->id.version;
+        (*id)->machid[0] = meas->id.machid[0];
+        (*id)->machid[1] = meas->id.machid[1];
+        (*id)->time = meas->id.time;
     }
     /*
     * Others from FIFFB_MEAS_INFO
@@ -1129,7 +1129,7 @@ int mne_find_evoked_types_comments (    FiffStream::SPtr& stream,
     /*
     * First find all measurements
     */
-    meas = stream->tree()->dir_tree_find(FIFFB_MEAS);
+    meas = stream->dirtree()->dir_tree_find(FIFFB_MEAS);
     /*
     * Process each measurement
     */
@@ -1500,10 +1500,10 @@ int mne_read_meg_comp_eeg_ch_info_9(const QString& name,
     if(!stream->open())
         goto bad;
 
-    nodes = stream->tree()->dir_tree_find(FIFFB_MNE_PARENT_MEAS_FILE);
+    nodes = stream->dirtree()->dir_tree_find(FIFFB_MNE_PARENT_MEAS_FILE);
 
     if (nodes.size() == 0) {
-        nodes = stream->tree()->dir_tree_find(FIFFB_MEAS_INFO);
+        nodes = stream->dirtree()->dir_tree_find(FIFFB_MEAS_INFO);
         if (nodes.size() == 0) {
             qCritical ("Could not find the channel information.");
             goto bad;
@@ -1657,7 +1657,7 @@ int mne_read_bad_channel_list_from_node_9(FiffStream::SPtr& stream,
     char *names;
 
     if (pNode->isEmpty())
-        node = stream->tree();
+        node = stream->dirtree();
     else
         node = pNode;
 
@@ -1687,7 +1687,7 @@ int mne_read_bad_channel_list_9(const QString& name, char ***listp, int *nlistp)
     if(!stream->open())
         return FAIL;
 
-    res = mne_read_bad_channel_list_from_node_9(stream,stream->tree(),listp,nlistp);
+    res = mne_read_bad_channel_list_from_node_9(stream,stream->dirtree(),listp,nlistp);
 
     stream->close();
 

@@ -1411,14 +1411,14 @@ MneSurfaceOld* MneSurfaceOrVolume::read_bem_surface(const QString &name, int whi
     /*
         * Check for the existence of BEM coord frame
         */
-    bems = stream->tree()->dir_tree_find(FIFFB_BEM);
+    bems = stream->dirtree()->dir_tree_find(FIFFB_BEM);
     if (bems.size() > 0) {
         node = bems[0];
         if (node->find_tag(stream, FIFF_BEM_COORD_FRAME, t_pTag)) {
             coord_frame = *t_pTag->toInt();
         }
     }
-    surfs = stream->tree()->dir_tree_find(FIFFB_BEM_SURF);
+    surfs = stream->dirtree()->dir_tree_find(FIFFB_BEM_SURF);
     if (surfs.size() == 0) {
         printf ("No BEM surfaces found in %s",name.toLatin1().constData());
         goto bad;
@@ -1774,7 +1774,7 @@ int MneSurfaceOrVolume::mne_read_source_spaces(const QString &name, MneSourceSpa
     if(!stream->open())
         goto bad;
 
-    sources = stream->tree()->dir_tree_find(FIFFB_MNE_SOURCE_SPACE);
+    sources = stream->dirtree()->dir_tree_find(FIFFB_MNE_SOURCE_SPACE);
     if (sources.size() == 0) {
         printf("No source spaces available here");
         goto bad;

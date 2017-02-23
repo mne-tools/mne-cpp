@@ -121,7 +121,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    static bool copy_tree(QSharedPointer<FiffStream>& p_pStreamIn, const FiffId::SPtr& in_id, const QList< QSharedPointer<FiffDirNode> >& p_Nodes, QSharedPointer<FiffStream>& p_pStreamOut);
+    static bool copy_tree(QSharedPointer<FiffStream>& p_pStreamIn, const FiffId& in_id, const QList< QSharedPointer<FiffDirNode> >& p_Nodes, QSharedPointer<FiffStream>& p_pStreamOut);
 
     //=========================================================================================================
     /**
@@ -133,19 +133,6 @@ public:
     {
         return this->type < 0;
     }
-
-    //=========================================================================================================
-    /**
-    * Create the directory tree structure
-    * Refactored: make_subtree (fiff_dir_tree.c), fiff_make_dir_tree (MATLAB)
-    *
-    * @param[in] p_pStream the opened fiff file
-    * @param[in] p_Dir the dir entries of which the tree should be constructed
-    * @param[in] start dir entry to start (default 0)
-    *
-    * @return The created dir tree
-    */
-    static FiffDirNode::SPtr make_subtree_new(FiffStream* file, QList<FiffDirEntry::SPtr>& dentry, qint32 start = 0);
 
     //=========================================================================================================
     /**
@@ -268,7 +255,7 @@ public:
 
 public:
     fiff_int_t                  type;       /**< Block type for this directory */
-    FiffId::SPtr                id;         /**< Id of this block if any */
+    FiffId                      id;         /**< Id of this block if any */
     QList<FiffDirEntry::SPtr>   dir;        /**< Directory of tags in this node */
 //    fiff_int_t                  nent;       /**< Number of entries in this node */
     QList<FiffDirEntry::SPtr>   dir_tree;   /**< Directory of tags within this node subtrees

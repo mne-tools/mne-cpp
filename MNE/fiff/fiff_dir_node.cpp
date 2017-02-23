@@ -109,7 +109,7 @@ void FiffDirNode::clear()
 
 //*************************************************************************************************************
 
-bool FiffDirNode::copy_tree(FiffStream::SPtr& p_pStreamIn, const FiffId::SPtr& in_id, const QList<FiffDirNode::SPtr>& p_Nodes, FiffStream::SPtr& p_pStreamOut)
+bool FiffDirNode::copy_tree(FiffStream::SPtr& p_pStreamIn, const FiffId& in_id, const QList<FiffDirNode::SPtr>& p_Nodes, FiffStream::SPtr& p_pStreamOut)
 {
     if(p_Nodes.size() <= 0)
         return false;
@@ -119,13 +119,13 @@ bool FiffDirNode::copy_tree(FiffStream::SPtr& p_pStreamIn, const FiffId::SPtr& i
     for(k = 0; k < p_Nodes.size(); ++k)
     {
         p_pStreamOut->start_block(p_Nodes[k]->type);//8
-        if (p_Nodes[k]->id->version != -1)
+        if (p_Nodes[k]->id.version != -1)
         {
-            if (in_id->version != -1)
-                p_pStreamOut->write_id(FIFF_PARENT_FILE_ID, *in_id);//9
+            if (in_id.version != -1)
+                p_pStreamOut->write_id(FIFF_PARENT_FILE_ID, in_id);//9
 
             p_pStreamOut->write_id(FIFF_BLOCK_ID);//10
-            p_pStreamOut->write_id(FIFF_PARENT_BLOCK_ID, *p_Nodes[k]->id);//11
+            p_pStreamOut->write_id(FIFF_PARENT_BLOCK_ID, p_Nodes[k]->id);//11
         }
         for (p = 0; p < p_Nodes[k]->nent(); ++p)
         {
@@ -189,90 +189,6 @@ bool FiffDirNode::copy_tree(FiffStream::SPtr& p_pStreamIn, const FiffId::SPtr& i
         p_pStreamOut->end_block(p_Nodes[k]->type);
     }
     return true;
-}
-
-
-//*************************************************************************************************************
-
-FiffDirNode::SPtr FiffDirNode::make_subtree_new(FiffStream *file, QList<FiffDirEntry::SPtr>&dentry, qint32 start)
-{
-    FiffDirNode::SPtr node = FiffDirNode::SPtr(new FiffDirNode);
-    FiffDirNode::SPtr child;
-    fiffTagRec tag;
-    int        k;
-    int        level;
-    QList<FiffDirEntry::SPtr> dir;
-    int          nent;
-    FiffTag::SPtr t_pTag;
-
-
-    qint32 current = start;
-//    dir  = node->dir  = MALLOC(file->nent,fiffDirEntryRec);
-    nent = 0;//nent = node->nent = 0;
-    node->dir_tree    = dentry.mid(start);
-    node->nent_tree   = 1;
-    node->parent      = NULL;
-//    node->children    = NULL;
-//    node->nchild      = 0;
-//    node->id          = NULL;
-//    tag.data = NULL;
-
-    node->type = FIFFB_ROOT;
-    if (dentry[current]->kind == FIFF_BLOCK_START) {
-        if (!file->read_tag(t_pTag,dentry[current]->pos))
-            goto bad;
-        else
-            node->type = *t_pTag->toInt();
-    }
-    else {
-        node->id = file->id();
-    }
-
-    ++current;
-
-    for (level = 0,k = current; k < file->nent(); k++,current++) {
-        ++node->nent_tree;
-        if (dentry[current]->kind == FIFF_BLOCK_START) {
-            level++;
-            if (level == 1) {
-                if ((child = make_subtree_new(file,dentry,current)) == NULL)
-                    goto bad;
-                child->parent = node;
-                node->children.append(child);
-            }
-        }
-        else if (dentry[current]->kind == FIFF_BLOCK_END) {
-            level--;
-            if (level < 0)
-                break;
-        }
-        else if (dentry[current]->kind == -1)
-            break;
-        else if (level == 0) {
-            /*
-            * Take the node id from the parent block id,
-            * block id, or file id. Let the block id
-            * take precedence over parent block id and file id
-            */
-            if (((dentry[current]->kind == FIFF_PARENT_BLOCK_ID || dentry[current]->kind == FIFF_FILE_ID) && node->id == NULL) || dentry[current]->kind == FIFF_BLOCK_ID) {
-                if (!file->read_tag(t_pTag,dentry[current]->pos))
-                    goto bad;
-                node->id = t_pTag->toFiffID();
-                tag.data = NULL;
-            }
-            dir.append(dentry[current]);
-//            memcpy(dir+nent,dentry,sizeof(fiffDirEntryRec));//Memcopy necessary here - or is apointer fine?
-            nent++;
-        }
-    }
-    /*
-    * Strip unused entries
-    */
-    node->dir = dir;//REALLOC(node->dir,node->nent,fiffDirEntryRec);
-    return (node);
-
-bad :
-    return (NULL);
 }
 
 
@@ -349,8 +265,8 @@ void FiffDirNode::print(int indent) const
         putchar(' ');
     explain_block (this->type);
     printf (" { ");
-    if (!this->id->isEmpty())
-        this->id->print();
+    if (!this->id.isEmpty())
+        this->id.print();
     printf ("\n");
 
     for (j = 0, prev_kind = -1, count = 0; j < this->nent(); j++) {

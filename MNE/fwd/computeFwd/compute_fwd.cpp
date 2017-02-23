@@ -164,10 +164,10 @@ fiffId get_file_id(const QString& name)
     }
     else {
         id = MALLOC_41(1,fiffIdRec);
-        id->version = stream->id()->version;       /**< File version */
-        id->machid[0] = stream->id()->machid[0];   /**< Unique machine ID */
-        id->machid[1] = stream->id()->machid[1];
-        id->time = stream->id()->time;             /**< Time of the ID creation */
+        id->version = stream->id().version;       /**< File version */
+        id->machid[0] = stream->id().machid[0];   /**< Unique machine ID */
+        id->machid[1] = stream->id().machid[1];
+        id->time = stream->id().time;             /**< Time of the ID creation */
 
         stream->close();
         return id;
@@ -215,10 +215,10 @@ int mne_read_meg_comp_eeg_ch_info_41(const QString& name,
     if(!stream->open())
         goto bad;
 
-    nodes = stream->tree()->dir_tree_find(FIFFB_MNE_PARENT_MEAS_FILE);
+    nodes = stream->dirtree()->dir_tree_find(FIFFB_MNE_PARENT_MEAS_FILE);
 
     if (nodes.size() == 0) {
-        nodes = stream->tree()->dir_tree_find(FIFFB_MEAS_INFO);
+        nodes = stream->dirtree()->dir_tree_find(FIFFB_MEAS_INFO);
         if (nodes.size() == 0) {
             qCritical ("Could not find the channel information.");
             goto bad;
@@ -1466,7 +1466,7 @@ int write_solution(const QString& name,         /* Destination file */
         FiffStream::SPtr t_pStreamBads(new FiffStream(&fileBad));
         if(!t_pStreamBads->open())
             return false;
-        file_bads  = t_pStreamBads->read_bad_channels(t_pStreamBads->tree());
+        file_bads  = t_pStreamBads->read_bad_channels(t_pStreamBads->dirtree());
 
         //
         // mne_write_bad_channel_list replacement

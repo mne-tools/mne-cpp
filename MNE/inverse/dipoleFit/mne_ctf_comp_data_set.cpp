@@ -206,10 +206,10 @@ int mne_read_meg_comp_eeg_ch_info_32(const QString& name,
     if(!stream->open())
         goto bad;
 
-    nodes = stream->tree()->dir_tree_find(FIFFB_MNE_PARENT_MEAS_FILE);
+    nodes = stream->dirtree()->dir_tree_find(FIFFB_MNE_PARENT_MEAS_FILE);
 
     if (nodes.size() == 0) {
-        nodes = stream->tree()->dir_tree_find(FIFFB_MEAS_INFO);
+        nodes = stream->dirtree()->dir_tree_find(FIFFB_MEAS_INFO);
         if (nodes.size() == 0) {
             qCritical ("Could not find the channel information.");
             goto bad;
@@ -744,7 +744,7 @@ MneCTFCompDataSet *MneCTFCompDataSet::mne_read_ctf_comp_data(const QString &name
     /*
         * Locate the compensation data sets
         */
-    nodes = stream->tree()->dir_tree_find(FIFFB_MNE_CTF_COMP);
+    nodes = stream->dirtree()->dir_tree_find(FIFFB_MNE_CTF_COMP);
     if (nodes.size() == 0)
         goto good;      /* Nothing more to do */
     comps = nodes[0]->dir_tree_find(FIFFB_MNE_CTF_COMP_DATA);

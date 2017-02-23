@@ -156,7 +156,7 @@ bool FiffDigPointSet::readFromStream(FiffStream::SPtr &p_pStream, FiffDigPointSe
     //
     //   Locate the Electrodes
     //
-    QList<FiffDirNode::SPtr> isotrak = p_pStream->tree()->dir_tree_find(FIFFB_ISOTRAK);
+    QList<FiffDirNode::SPtr> isotrak = p_pStream->dirtree()->dir_tree_find(FIFFB_ISOTRAK);
 
     fiff_int_t coord_frame = FIFFV_COORD_HEAD;
     FiffCoordTrans dig_trans;

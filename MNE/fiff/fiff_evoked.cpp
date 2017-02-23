@@ -186,7 +186,7 @@ bool FiffEvoked::read(QIODevice& p_IODevice, FiffEvoked& p_FiffEvoked, QVariant 
     //
     FiffInfo info;
     FiffDirNode::SPtr meas;
-    if(!t_pStream->read_meas_info(t_pStream->tree(), info, meas))
+    if(!t_pStream->read_meas_info(t_pStream->dirtree(), info, meas))
         return false;
     info.filename = t_sFileName; //move fname storage to read_meas_info member function
     //

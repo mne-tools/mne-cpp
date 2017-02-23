@@ -156,15 +156,7 @@ public:
     *
     * @return The file identifier
     */
-    FiffId::SPtr id();
-
-    //=========================================================================================================
-    /**
-    * Returns the file identifier
-    *
-    * @return The file identifier
-    */
-    const FiffId::SPtr id() const;
+    FiffId id() const;
 
     //=========================================================================================================
     /**
@@ -190,7 +182,7 @@ public:
     *
     * @return the compiled directory
     */
-    const FiffDirNode::SPtr& tree() const;
+    const FiffDirNode::SPtr& dirtree() const;
 
     //=========================================================================================================
     /**
@@ -259,6 +251,17 @@ public:
     * @return true if succeeded, false otherwise
     */
     bool close();
+
+    //=========================================================================================================
+    /**
+    * Create the directory tree structure
+    * Refactored: make_subtree (fiff_dir_tree.c), fiff_make_dir_tree (MATLAB)
+    *
+    * @param[in] dentry     The dir entries of which the tree should be constructed
+    *
+    * @return The created dir tree
+    */
+    FiffDirNode::SPtr make_subtree(QList<FiffDirEntry::SPtr>& dentry);
 
     //=========================================================================================================
     /**
@@ -783,10 +786,10 @@ private:
 
 //    char         *file_name;    /**< Name of the file */ -> Use streamName() instead
 //    FILE         *fd;           /**< The normal file descriptor */ -> file descitpion is part of the stream: stream->device()
-    FiffId::SPtr                m_id;   /**< The file identifier */
+    FiffId                      m_id;   /**< The file identifier */
     QList<FiffDirEntry::SPtr>   m_dir;  /**< This is the directory. If no directory exists, open automatically scans the file to create one. */
 //    int         nent;           /**< How many entries? */ -> Use nent() instead
-    FiffDirNode::SPtr           m_tree; /**< Directory compiled into a tree */
+    FiffDirNode::SPtr           m_dirtree; /**< Directory compiled into a tree */
 //    char        *ext_file_name; /**< Name of the file holding the external data */
 //    FILE        *ext_fd;        /**< The file descriptor of the above file if open  */
 

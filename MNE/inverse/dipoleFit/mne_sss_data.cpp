@@ -143,7 +143,7 @@ MneSssData *MneSssData::read_sss_data(const QString &name)
     MneSssData* s  = NULL;
 
     if(stream->open())
-        s = read_sss_data_from_node(stream,stream->tree());
+        s = read_sss_data_from_node(stream,stream->dirtree());
 
     stream->close();
     return s;

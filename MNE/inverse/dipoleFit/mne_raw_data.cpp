@@ -886,7 +886,7 @@ int mne_read_bad_channel_list_from_node(FiffStream::SPtr& stream,
     char *names;
 
     if (pNode->isEmpty())
-        node = stream->tree();
+        node = stream->dirtree();
     else
         node = pNode;
 
@@ -916,7 +916,7 @@ int mne_read_bad_channel_list(const QString& name, char ***listp, int *nlistp)
     if(!stream->open())
         return FAIL;
 
-    res = mne_read_bad_channel_list_from_node(stream,stream->tree(),listp,nlistp);
+    res = mne_read_bad_channel_list_from_node(stream,stream->dirtree(),listp,nlistp);
 
     stream->close();
 
