@@ -263,7 +263,7 @@ void BabyMEGInfo::MGH_LM_Parse_Para(QByteArray cmdstr)
     }
 
     // Parameters
-    m_FiffInfo.file_id.version = 0; //ToDo
+    m_FiffInfo.file_id = FiffId::new_file_id();
 
     m_FiffInfo.meas_date[0] = 0;
     m_FiffInfo.meas_date[1] = 0;
@@ -273,7 +273,7 @@ void BabyMEGInfo::MGH_LM_Parse_Para(QByteArray cmdstr)
     m_FiffInfo.acq_pars = QString("BabyMEG");
     m_FiffInfo.acq_stim = QString("");
     m_FiffInfo.filename = QString("");
-    m_FiffInfo.meas_id.version = 1;
+    m_FiffInfo.meas_id = FiffId::new_file_id();
     m_FiffInfo.nchan = chnNum; //464;
     m_FiffInfo.dev_head_t.from =FIFFV_COORD_DEVICE;//1;  //* should be from dev to head 7/18/2016 Limin
     m_FiffInfo.dev_head_t.to =FIFFV_COORD_HEAD;//4;
