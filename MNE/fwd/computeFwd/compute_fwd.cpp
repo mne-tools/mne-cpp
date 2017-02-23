@@ -1267,8 +1267,8 @@ bad :
 
 //int fiff_put_dir (FILE *fd, fiffDirEntry dir)
 ///*
-//      * Put in new directory
-//      */
+//* Put in new directory
+//*/
 //{
 //    int nent = fiff_how_many_entries (dir);
 //    int k;
@@ -1526,11 +1526,8 @@ int write_solution(const QString& name,         /* Destination file */
     }
 
     t_pStream->end_block(FIFFB_MNE);
-
     t_pStream->end_file();
-
     t_pStream->close();
-
     t_pStream.clear();
 
     /*

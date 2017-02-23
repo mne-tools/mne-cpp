@@ -335,7 +335,10 @@ bool FiffStream::open(QIODevice::OpenModeFlag mode)
     //
     //   Create the directory tree structure
     //
-    this->m_dirtree = this->make_subtree(m_dir);
+    if((this->m_dirtree = this->make_subtree(m_dir)) == NULL)
+        return false;
+    else
+        this->m_dirtree->parent.clear();
 
     printf("[done]\n");
 
@@ -1843,10 +1846,6 @@ FiffStream::SPtr FiffStream::open_update(QIODevice &p_IODevice)
         qCritical("Cannot open %s\n", t_sFileName.toUtf8().constData());//consider throw
         return FiffStream::SPtr();
     }
-
-
-    t_pStream->dirtree()->print(4);
-
 
     FiffTag::SPtr t_pTag;
     long dirpos,pointerpos;
