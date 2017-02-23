@@ -93,7 +93,7 @@ bool MNE::read_events(QIODevice &p_IODevice, MatrixXi& eventlist)
     quint32* serial_eventlist_uint = NULL;
     qint32* serial_eventlist_int = NULL;
 
-    for(k = 0; k < events[0]->nent; ++k)
+    for(k = 0; k < events[0]->nent(); ++k)
     {
         kind = events[0]->dir[k]->kind;
         pos  = events[0]->dir[k]->pos;

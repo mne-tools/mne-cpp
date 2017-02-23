@@ -675,7 +675,7 @@ FiffCoordTransOld *FiffCoordTransOld::mne_read_transform_from_node(FiffStream::S
     int k;
 
     //    tag.data = NULL;
-    for (k = 0; k < node->nent; k++)
+    for (k = 0; k < node->nent(); k++)
         kind = node->dir[k]->kind;
     pos  = node->dir[k]->pos;
     if (kind == FIFF_COORD_TRANS) {

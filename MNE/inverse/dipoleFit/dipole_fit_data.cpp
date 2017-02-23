@@ -2722,7 +2722,7 @@ int mne_read_meg_comp_eeg_ch_info_3(const QString& name,
     }
     info = nodes[0];
     to_find = 0;
-    for (k = 0; k < info->nent; k++) {
+    for (k = 0; k < info->nent(); k++) {
         kind = info->dir[k]->kind;
         pos  = info->dir[k]->pos;
         switch (kind) {
@@ -3326,7 +3326,7 @@ static FiffDirNode::SPtr find_meas_info_3 (const FiffDirNode::SPtr& node)
             return empty_node;
         tmp_node = tmp_node->parent;
     }
-    for (k = 0; k < tmp_node->nchild; k++)
+    for (k = 0; k < tmp_node->nchild(); k++)
         if (tmp_node->children[k]->type == FIFFB_MEAS_INFO)
             return (tmp_node->children[k]);
     return empty_node;
@@ -3374,17 +3374,17 @@ static int get_all_chs (//fiffFile file,	        /* The file we are reading */
     /*
     * Is there a block id is in the FIFFB_MEAS node?
     */
-    if (!meas->id.isEmpty()) {
+    if (!meas->id) {
         *id = MALLOC_3(1,fiffIdRec);
-        (*id)->version = meas->id.version;
-        (*id)->machid[0] = meas->id.machid[0];
-        (*id)->machid[1] = meas->id.machid[1];
-        (*id)->time = meas->id.time;
+        (*id)->version = meas->id->version;
+        (*id)->machid[0] = meas->id->machid[0];
+        (*id)->machid[1] = meas->id->machid[1];
+        (*id)->time = meas->id->time;
     }
     /*
     * Others from FIFFB_MEAS_INFO
     */
-    for (k = 0; k < meas_info->nent; k++) {
+    for (k = 0; k < meas_info->nent(); k++) {
         kind = meas_info->dir[k]->kind;
         pos  = meas_info->dir[k]->pos;
         switch (kind) {

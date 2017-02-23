@@ -263,7 +263,7 @@ void BabyMEGInfo::MGH_LM_Parse_Para(QByteArray cmdstr)
     }
 
     // Parameters
-    m_FiffInfo.file_id.version = 0; //ToDo
+    m_FiffInfo.file_id->version = 0; //ToDo
 
     m_FiffInfo.meas_date[0] = 0;
     m_FiffInfo.meas_date[1] = 0;

@@ -286,7 +286,7 @@ bool FiffEvoked::read(QIODevice& p_IODevice, FiffEvoked& p_FiffEvoked, QVariant 
     FiffTag::SPtr t_pTag;
     QString comment("");
     qint32 k;
-    for (k = 0; k < my_evoked->nent; ++k)
+    for (k = 0; k < my_evoked->nent(); ++k)
     {
         kind = my_evoked->dir[k]->kind;
         pos  = my_evoked->dir[k]->pos;
@@ -354,7 +354,7 @@ bool FiffEvoked::read(QIODevice& p_IODevice, FiffEvoked& p_FiffEvoked, QVariant 
     fiff_int_t aspect_kind = -1;
     fiff_int_t nave = -1;
     QList<FiffTag> epoch;
-    for (k = 0; k < my_aspect->nent; ++k)
+    for (k = 0; k < my_aspect->nent(); ++k)
     {
         kind = my_aspect->dir[k]->kind;
         pos  = my_aspect->dir[k]->pos;

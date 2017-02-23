@@ -187,7 +187,7 @@ bool DacqServer::getMeasInfo(FiffInfo& p_fiffInfo)
                 break;
             case FIFFB_PROCESSED_DATA:
                 printf("Measurement ID... ");
-                p_fiffInfo.meas_id = t_pTag->toFiffID();
+                p_fiffInfo.meas_id = *t_pTag->toFiffID();
                 printf("[done]\r\n");  
                 break;
             case FIFF_MEAS_DATE:

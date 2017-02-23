@@ -443,7 +443,7 @@ static FiffDirNode::SPtr find_meas_info_9 (const FiffDirNode::SPtr& node)
             return empty_node;
         tmp_node = tmp_node->parent;
     }
-    for (k = 0; k < tmp_node->nchild; k++)
+    for (k = 0; k < tmp_node->nchild(); k++)
         if (tmp_node->children[k]->type == FIFFB_MEAS_INFO)
             return (tmp_node->children[k]);
     return empty_node;
@@ -482,7 +482,7 @@ static char *get_comment (  FiffStream::SPtr& stream,
     int k;
     FiffTag::SPtr t_pTag;
     QList<FiffDirEntry::SPtr> ent = start->dir;
-    for (k = 0; k < start->nent; k++)
+    for (k = 0; k < start->nent(); k++)
         if (ent[k]->kind == FIFF_COMMENT) {
             if (stream->read_tag(t_pTag,ent[k]->pos)) {
                 return (mne_strdup_9((char *)t_pTag->data()));
@@ -502,7 +502,7 @@ static void get_aspect_name_type(   FiffStream::SPtr& stream,
     const char *res = "unknown";
     int  type = -1;
 
-    for (k = 0; k < start->nent; k++)
+    for (k = 0; k < start->nent(); k++)
         if (ent[k]->kind == FIFF_ASPECT_KIND) {
             if (stream->read_tag(t_pTag,ent[k]->pos)) {
                 type = *t_pTag->toInt();
@@ -553,7 +553,7 @@ static char *get_meas_date (    FiffStream::SPtr& stream,const FiffDirNode::SPtr
     if (!(meas_info = find_meas_info_9(node))) {
         return res;
     }
-    for (k = 0; k < meas_info->nent;k++) {
+    for (k = 0; k < meas_info->nent();k++) {
         kind = meas_info->dir[k]->kind;
         pos  = meas_info->dir[k]->pos;
         if (kind == FIFF_MEAS_DATE)
@@ -622,19 +622,19 @@ static int get_meas_info (  FiffStream::SPtr& stream,       /* The stream we are
     /*
     * Is there a block id is in the FIFFB_MEAS node?
     */
-    if (!meas->id.isEmpty()) {
+    if (!meas->id) {
         *id = MALLOC_9(1,fiffIdRec);
-        (*id)->version = meas->id.version;
-        (*id)->machid[0] = meas->id.machid[0];
-        (*id)->machid[1] = meas->id.machid[1];
-        (*id)->time = meas->id.time;
+        (*id)->version = meas->id->version;
+        (*id)->machid[0] = meas->id->machid[0];
+        (*id)->machid[1] = meas->id->machid[1];
+        (*id)->time = meas->id->time;
     }
     /*
     * Others from FIFFB_MEAS_INFO
     */
     *lowpass = -1;
     *highpass = -1;
-    for (k = 0; k < meas_info->nent; k++) {
+    for (k = 0; k < meas_info->nent(); k++) {
         kind = meas_info->dir[k]->kind;
         pos  = meas_info->dir[k]->pos;
         switch (kind) {
@@ -714,7 +714,7 @@ static int get_meas_info (  FiffStream::SPtr& stream,       /* The stream we are
     hpi = meas_info->dir_tree_find(FIFFB_HPI_RESULT);
 
     if (hpi.size() > 0 && *trans == NULL)
-        for (k = 0; k < hpi[0]->nent; k++)
+        for (k = 0; k < hpi[0]->nent(); k++)
             if (hpi[0]->dir[k]->kind ==  FIFF_COORD_TRANS) {
                 if (!stream->read_tag(t_pTag,hpi[0]->dir[k]->pos))
                     goto bad;
@@ -767,7 +767,7 @@ static int find_between (   FiffStream::SPtr& stream,
     *data = NULL;
     node = low_node;
     while (node != NULL) {
-        for (k = 0; k < node->nent; k++)
+        for (k = 0; k < node->nent(); k++)
         {
             kind_1 = node->dir[k]->kind;
             pos  = node->dir[k]->pos;
@@ -950,7 +950,7 @@ static int get_evoked_optional( FiffStream::SPtr& stream,
     else
         new_nchan = *nchan;
 
-    for (k = 0; k < evoked_node->nent; k++) {
+    for (k = 0; k < evoked_node->nent(); k++) {
         kind = evoked_node->dir[k]->kind;
         pos  = evoked_node->dir[k]->pos;
         if (kind == FIFF_CH_INFO) {     /* Information about one channel */
@@ -1026,7 +1026,7 @@ static float **get_epochs ( FiffStream::SPtr& stream,       /* This is our file 
     float offset,scale;
     short *packed;
 
-    for (k = 0, ch = 0; k < node->nent && ch < nchan; k++) {
+    for (k = 0, ch = 0; k < node->nent() && ch < nchan; k++) {
         kind = node->dir[k]->kind;
         pos  = node->dir[k]->pos;
         if (kind == FIFF_EPOCH) {
@@ -1139,7 +1139,7 @@ int mne_find_evoked_types_comments (    FiffStream::SPtr& stream,
         * Count the entries
         */
         for (evoked_count = 0, j = 0; j < evoked.size(); j++) {
-            for (k = 0; k < evoked[j]->nchild; k++) {
+            for (k = 0; k < evoked[j]->nchild(); k++) {
                 if (evoked[j]->children[k]->type == FIFFB_ASPECT) {
                     evoked_count++;
                 }
@@ -1154,7 +1154,7 @@ int mne_find_evoked_types_comments (    FiffStream::SPtr& stream,
         * Insert node references and compile associated comments...
         */
         for (j = 0; j < evoked.size(); j++)	/* Evoked data */
-            for (k = 0; k < evoked[j]->nchild; k++)
+            for (k = 0; k < evoked[j]->nchild(); k++)
                 if (evoked[j]->children[k]->type == FIFFB_ASPECT) {
                     meas_date = get_meas_date(stream,evoked[j]);
                     part      = get_comment(stream,evoked[j]);
@@ -1511,7 +1511,7 @@ int mne_read_meg_comp_eeg_ch_info_9(const QString& name,
     }
     info = nodes[0];
     to_find = 0;
-    for (k = 0; k < info->nent; k++) {
+    for (k = 0; k < info->nent(); k++) {
         kind = info->dir[k]->kind;
         pos  = info->dir[k]->pos;
         switch (kind) {
