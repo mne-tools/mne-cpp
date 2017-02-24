@@ -1263,60 +1263,47 @@ bad :
 
 
 
+bool fiff_put_dir (FiffStream::SPtr& t_pStream, const QList<FiffDirEntry::SPtr>& dir)
+/*
+* Put in new directory
+*/
+{
+    int nent = dir.size();
+    int k;
+    FiffTag::SPtr t_pTag;
+    fiff_int_t dirpos;
 
-
-//int fiff_put_dir (FILE *fd, fiffDirEntry dir)
-///*
-//* Put in new directory
-//*/
-//{
-//    int nent = fiff_how_many_entries (dir);
-//    int k;
-//    fiffTagRec tag;
-//    fiffTagRec dirtag;
-//    fiff_int_t dirpos;
-
-//    tag.data = NULL;
-//    for (k = 0; k < nent; k++) {
-//        if (dir[k].kind == FIFF_DIR_POINTER) {
-//            /*
-//       * Read current value of directory pointer
-//       */
-//            if (fiff_read_this_tag(fd,dir[k].pos,&tag) == -1) {
-//                fprintf (stderr,"Could not read FIFF_DIR_POINTER!\n");
-//                return (-1);
-//            }
-//            /*
-//       * If there is no directory, append the new one
-//       */
-//            dirpos = *(fiff_int_t *)(tag.data);
-//            FREE(tag.data);
-//            if (dirpos <= 0)
-//                dirpos = -1;
-//            /*
-//       * Put together the directory tag
-//       */
-//            dirtag.kind = FIFF_DIR;
-//            dirtag.type = FIFFT_DIR_ENTRY_STRUCT;
-//            dirtag.size = nent*sizeof(fiff_dir_entry_t);
-//            dirtag.next = -1;
-//            dirtag.data = (fiff_byte_t *)dir;
-//            dirpos = fiff_write_this_tag(fd,-1L,&dirtag);
-//            if (dirpos < 0)
-//                fprintf (stderr,"Could not update directory!\n");
-//            else {
-//                tag.data = (fiff_byte_t *)(&dirpos);
-//                if (fiff_write_this_tag(fd,dir[k].pos,&tag) == -1) {
-//                    fprintf (stderr,"Could not update directory pointer!\n");
-//                    return (-1);
-//                }
-//            }
-//            return (0);
-//        }
-//    }
-//    fprintf (stderr,"Could not find place for directory!\n");
-//    return (-1);
-//}
+    for (k = 0; k < nent; k++) {
+        if (dir[k]->kind == FIFF_DIR_POINTER) {
+            /*
+            * Read current value of directory pointer
+            */
+            if (!t_pStream->read_tag(t_pTag,dir[k]->pos)) {
+                fprintf (stderr,"Could not read FIFF_DIR_POINTER!\n");
+                return false;
+            }
+            /*
+            * If there is no directory, append the new one
+            */
+            dirpos = *t_pTag->toInt();//2GB restriction
+            if (dirpos <= 0)
+                dirpos = -1;
+            /*
+            * Put together the directory tag
+            */
+            dirpos = (fiff_int_t)t_pStream->write_dir_entries(dir);//2GB restriction
+            if (dirpos < 0)
+                printf ("Could not update directory!\n");
+            else {
+                t_pTag->setNum(dirpos);
+                t_pStream->write_tag(t_pTag,dir[k]->pos);
+            }
+            return true;
+        }
+    }
+    printf ("Could not find place for directory!\n");
+    return false;
+}
 
 
 
@@ -1535,9 +1522,8 @@ int write_solution(const QString& name,         /* Destination file */
     */
     t_pStreamIn = FiffStream::open_update(fileIn);
 
-    qDebug() << "TODO fiff_put_dir";
-//    if (fiff_put_dir(in->fd,in->dir) == FIFF_FAIL)
-//        goto bad;
+    if (!fiff_put_dir(t_pStreamIn,t_pStreamIn->dir()))
+        goto bad;
     if(t_pStreamIn)
         t_pStreamIn->close();
 

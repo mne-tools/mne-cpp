@@ -374,7 +374,7 @@ FiffDirNode::SPtr FiffStream::make_subtree(QList<FiffDirEntry::SPtr> &dentry)
 
     node->dir_tree    = dentry;
     node->nent_tree   = 1;
-    node->parent      = NULL;
+    node->parent      = FiffDirNode::SPtr();
     node->type = FIFFB_ROOT;
 
     if (dentry[current]->kind == FIFF_BLOCK_START) {
@@ -2383,6 +2383,44 @@ void FiffStream::write_dig_point(const FiffDigPoint& dig)
     *this << (qint32)dig.ident;
     for(qint32 i = 0; i < 3; ++i)
         *this << dig.r[i];
+}
+
+
+//*************************************************************************************************************
+
+fiff_long_t FiffStream::write_dir_entries(const QList<FiffDirEntry::SPtr> &dir)
+{
+//    /** Directories are composed of these structures. *
+//     typedef struct _fiffDirEntryRec {
+//      fiff_int_t  kind;		/**< Tag number *
+//      fiff_int_t  type;		/**< Data type *
+//      fiff_int_t  size;		/**< How many bytes *
+//      fiff_int_t  pos;		/**< Location in file
+//                      * Note: the data is located at pos +
+//                      * FIFFC_DATA_OFFSET *
+//     } fiffDirEntryRec,*fiffDirEntry;/**< Directory is composed of these *
+
+    fiff_long_t pos = this->device()->pos();
+
+    fiff_int_t nent = dir.size();
+    fiff_int_t datasize = nent * (fiff_int_t)sizeof(FiffDirEntry);
+
+    *this << (qint32)FIFF_DIR;
+    *this << (qint32)FIFFT_DIR_ENTRY_STRUCT;
+    *this << (qint32)datasize;
+    *this << (qint32)FIFFV_NEXT_NONE;
+
+    //
+    //   Start writing FiffDirEntries
+    //
+    for(qint32 i = 0; i < nent; ++i) {
+        *this << (qint32)dir[i]->kind;
+        *this << (qint32)dir[i]->type;
+        *this << (qint32)dir[i]->size;
+        *this << (qint32)dir[i]->pos;
+    }
+
+    return pos;
 }
 
 
