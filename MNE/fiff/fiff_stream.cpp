@@ -1853,9 +1853,6 @@ FiffStream::SPtr FiffStream::open_update(QIODevice &p_IODevice)
     QFile *file = qobject_cast<QFile *>(t_pStream->device());
 
     if (file != NULL) {
-
-        t_pStream->dirtree()->print(4);
-
         /*
         * Ensure that the last tag in the directory has next set to FIFF_NEXT_NONE
         */
