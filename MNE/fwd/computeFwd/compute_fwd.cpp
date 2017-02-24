@@ -1543,33 +1543,33 @@ bad : {
 
 
 
-int fiff_new_file_id (fiffId id)
-/*
-* Return a (hopefully) unique file id
-*/
-{
-    FiffId new_id = FiffId::new_file_id();
-    /*
-    * Internet address in the first two words
-    */
-    id->machid[0] = new_id.machid[0];
-    id->machid[1] = new_id.machid[1];
-    /*
-    * Time in the third and fourth words
-    */
-    /*
-    * Time in the third and fourth words
-    * Since practically no system gives times in
-    * true micro seconds, the last three digits
-    * are randomized to insure uniqueness.
-    */
-    {
-        id->time.secs  = new_id.time.secs;
-        id->time.usecs = new_id.time.usecs;
-    }
-    id->version = FIFFC_VERSION;
-    return FIFF_OK;
-}
+//int fiff_new_file_id (fiffId id)
+///*
+//* Return a (hopefully) unique file id
+//*/
+//{
+//    FiffId new_id = FiffId::new_file_id();
+//    /*
+//    * Internet address in the first two words
+//    */
+//    id->machid[0] = new_id.machid[0];
+//    id->machid[1] = new_id.machid[1];
+//    /*
+//    * Time in the third and fourth words
+//    */
+//    /*
+//    * Time in the third and fourth words
+//    * Since practically no system gives times in
+//    * true micro seconds, the last three digits
+//    * are randomized to insure uniqueness.
+//    */
+//    {
+//        id->time.secs  = new_id.time.secs;
+//        id->time.usecs = new_id.time.usecs;
+//    }
+//    id->version = FIFFC_VERSION;
+//    return FIFF_OK;
+//}
 
 
 
@@ -1684,7 +1684,7 @@ bool mne_attach_env(const QString& name, const QString& command)
 {
     int  insert_blocks[]  = { FIFFB_MNE , FIFFB_MEAS, FIFFB_MRI, FIFFB_BEM, -1 };
     QString cwd = QDir::currentPath();
-    fiffIdRec id;
+    FiffId id;
     int     b,k, insert;
     FiffTag::SPtr t_pTag;
     QList<FiffTag::SPtr> tags;
@@ -1693,8 +1693,10 @@ bool mne_attach_env(const QString& name, const QString& command)
     int     ntag = 0;
 
 
-    if (fiff_new_file_id(&id) == FIFF_FAIL)
-        return false;
+//    if (fiff_new_file_id(&id) == FIFF_FAIL)
+//        return false;
+    id = FiffId::new_file_id();
+
 //#ifdef DEBUG
 //    fprintf(stderr,"\n");
 //    fprintf(stderr,"cwd   = %s\n",cwd);
@@ -1736,25 +1738,24 @@ bool mne_attach_env(const QString& name, const QString& command)
         qCritical("Suitable place for environment insertion not found.");
         return false;
     }
-    /*
-    * Build the list of tags to insert
-    */
-    ntag = 5;
+//    /*
+//    * Build the list of tags to insert
+//    */
+//    ntag = 5;
 //    tags = MALLOC(ntag,fiffTagRec);
-    for (k = 0; k < ntag; k++) {
-        FiffTag::SPtr tag(new FiffTag);
-        tag->next = FIFFV_NEXT_SEQ;
+//    for (k = 0; k < ntag; k++) {
+//        FiffTag::SPtr tag(new FiffTag);
+//        tag->next = FIFFV_NEXT_SEQ;
 //        tag->data = NULL;
 //        tag->size = 0;
-        tags.append(tag);
-    }
+//        tags.append(tag);
+//    }
 //    this_tag = tags;
 //    this_tag->kind = FIFF_BLOCK_START;
 //    this_tag->type = FIFFT_INT;
 //    this_tag->size = sizeof(fiff_int_t);
 //    this_tag->data = malloc(sizeof(fiff_int_t));
 //    *(fiff_int_t *)this_tag->data = FIFFB_MNE_ENV;
-
 
 //    this_tag->kind = FIFF_BLOCK_ID;
 //    this_tag->type = FIFFT_ID_STRUCT;
@@ -1786,17 +1787,19 @@ bool mne_attach_env(const QString& name, const QString& command)
 
 
     // Modified of fiff_insert_after
-
+    int where = insert;
     /*
     * Insert new tags into a file
     * The directory information in dest is updated
     */
-    if (insert < 0 || insert >= t_pStreamInOut->nent()-1) {
+    if (where < 0 || where >= t_pStreamInOut->nent()-1) {
         qCritical("illegal insertion point in fiff_insert_after!");
         return false;
     }
 
-    QList<FiffDirEntry::SPtr> this_ent = t_pStreamInOut->dir().mid(insert);//this_ent = old_dir + where;
+
+    QList<FiffDirEntry::SPtr> old_dir = t_pStreamInOut->dir();
+    QList<FiffDirEntry::SPtr> this_ent = old_dir.mid(where);//this_ent = old_dir + where;
 
     if (!t_pStreamInOut->read_tag(t_pTag, this_ent[0]->pos))
         return false;
@@ -1812,19 +1815,71 @@ bool mne_attach_env(const QString& name, const QString& command)
 //    * Allocate new directory
 //    */
 //    new_dir = MALLOC(ntag+dest->nent,fiffDirEntryRec);
-//    /*
-//    * Copy the beginning of old directory
-//    */
+    /*
+    * Copy the beginning of old directory
+    */
 //    memcpy(new_dir,old_dir,(where+1)*sizeof(fiffDirEntryRec));
+
+    QList<FiffDirEntry::SPtr> new_dir = old_dir.mid(0,where+1);
+
     /*
     * Save the old size for future purposes
     */
     qint64 old_end = t_pStreamInOut->device()->pos();
+    /*
+    * Write tags, check for errors
+    */
+//Don't use the for loop here instead do it explicitly for specific tags
+    FiffDirEntry::SPtr new_this;
 
 
+    new_this = FiffDirEntry::SPtr(new FiffDirEntry);
+    new_this->kind = FIFF_BLOCK_START;
+    new_this->type = FIFFT_INT;
+    new_this->size = 1 * 4;
+    new_this->pos = t_pStreamInOut->start_block(FIFFB_MNE_ENV);
+    new_dir.append(new_this);
+
+    new_this = FiffDirEntry::SPtr(new FiffDirEntry);
+    new_this->kind = FIFF_BLOCK_ID;
+    new_this->type = FIFFT_ID_STRUCT;
+    new_this->size =  5 * 4;
+    new_this->pos = t_pStreamInOut->write_id(FIFF_BLOCK_ID,id);
+    new_dir.append(new_this);
+
+    new_this = FiffDirEntry::SPtr(new FiffDirEntry);
+    new_this->kind = FIFF_MNE_ENV_WORKING_DIR;
+    new_this->type = FIFFT_STRING;
+    new_this->size =  cwd.size();
+    new_this->pos = t_pStreamInOut->write_string(FIFF_MNE_ENV_WORKING_DIR,cwd);
+    new_dir.append(new_this);
+
+    new_this = FiffDirEntry::SPtr(new FiffDirEntry);
+    new_this->kind = FIFF_MNE_ENV_COMMAND_LINE;
+    new_this->type = FIFFT_STRING;
+    new_this->size =  command.size();
+    new_this->pos = t_pStreamInOut->write_string(FIFF_MNE_ENV_COMMAND_LINE,command);
+    new_dir.append(new_this);
+
+    new_this = FiffDirEntry::SPtr(new FiffDirEntry);
+    new_this->kind = FIFF_BLOCK_END;
+    new_this->type = FIFFT_INT;
+    new_this->size =  1 * 4;
+    new_this->pos = t_pStreamInOut->end_block(FIFFB_MNE_ENV);
+    new_dir.append(new_this);
+
+    /*
+    * Copy the rest of the old directory
+    */
+    new_dir.append(old_dir.mid(where+1));
+    /*
+    * Now, it is time to update the braching tag
+    * If something goes wrong here, we cannot be sure that
+    * the file is readable. Let's hope for the best...
+    */
 
 
-
+    //TODO
 
 
 
