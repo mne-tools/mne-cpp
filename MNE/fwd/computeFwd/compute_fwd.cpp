@@ -1580,10 +1580,10 @@ int fiff_new_file_id (fiffId id)
 #define MAX_WD 1024
 
 
-//int fiff_insert_after (fiffFile dest,       /* Insert to this file */
-//                       int      where,      /* After this tag */
-//                       fiffTag  tags,       /* These tags */
-//                       int      ntag)       /* How many */
+//int fiff_insert_after (FiffStream::SPtr& dest,    /* Insert to this file */
+//                       int      where,            /* After this tag */
+//                       fiffTag  tags,             /* These tags */
+//                       int      ntag  )           /* How many */
 ///*
 //* Insert new tags into a file
 //* The directory information in dest is updated
@@ -1685,17 +1685,16 @@ bool mne_attach_env(const QString& name, const QString& command)
     int  insert_blocks[]  = { FIFFB_MNE , FIFFB_MEAS, FIFFB_MRI, FIFFB_BEM, -1 };
     QString cwd = QDir::currentPath();
     fiffIdRec id;
-    fiffFile  file = NULL;
-    int       b,k, insert;
+    int     b,k, insert;
     FiffTag::SPtr t_pTag;
-    int          ntag = 0;
-    bool          res = false;
+    QList<FiffTag::SPtr> tags;
     QFile fileInOut(name);
     FiffStream::SPtr t_pStreamInOut;
+    int     ntag = 0;
 
 
     if (fiff_new_file_id(&id) == FIFF_FAIL)
-        goto out;
+        return false;
 //#ifdef DEBUG
 //    fprintf(stderr,"\n");
 //    fprintf(stderr,"cwd   = %s\n",cwd);
@@ -1705,7 +1704,7 @@ bool mne_attach_env(const QString& name, const QString& command)
 
     if (!fileInOut.exists()) {
         qCritical("File %s does not exist. Cannot attach env info.",name.toLatin1().constData());
-        goto out;
+        return false;
     }
 //    if (!fileInOut.isWritable()) {
 //        qCritical("File %s is not writable. Cannot attach env info.",name.toLatin1().constData());
@@ -1715,7 +1714,7 @@ bool mne_attach_env(const QString& name, const QString& command)
     * Open the file to modify
     */
     if ((t_pStreamInOut = FiffStream::open_update(fileInOut)) == NULL)
-        goto out;
+        return false;
     /*
     * Find an appropriate position to insert
     */
@@ -1723,11 +1722,11 @@ bool mne_attach_env(const QString& name, const QString& command)
         for (k = 0; k < t_pStreamInOut->nent(); k++) {
             if (t_pStreamInOut->dir()[k]->kind == FIFF_BLOCK_START) {
                 if (!t_pStreamInOut->read_tag(t_pTag, t_pStreamInOut->dir()[k]->pos))
-                    goto out;
-//                if (*(int *)tag.data == insert_blocks[b]) {
-//                    insert = k;
-//                    break;
-//                }
+                    return false;
+                if (*(t_pTag->toInt()) == insert_blocks[b]) {
+                    insert = k;
+                    break;
+                }
             }
         }
         if (insert >= 0)
@@ -1735,25 +1734,27 @@ bool mne_attach_env(const QString& name, const QString& command)
     }
     if (insert < 0) {
         qCritical("Suitable place for environment insertion not found.");
-        goto out;
+        return false;
     }
     /*
     * Build the list of tags to insert
     */
-//    ntag = 5;
+    ntag = 5;
 //    tags = MALLOC(ntag,fiffTagRec);
-//    for (k = 0; k < ntag; k++) {
-//        tags[k].next = FIFFV_NEXT_SEQ;
-//        tags[k].data = NULL;
-//        tags[k].size = 0;
-//    }
+    for (k = 0; k < ntag; k++) {
+        FiffTag::SPtr tag(new FiffTag);
+        tag->next = FIFFV_NEXT_SEQ;
+//        tag->data = NULL;
+//        tag->size = 0;
+        tags.append(tag);
+    }
 //    this_tag = tags;
 //    this_tag->kind = FIFF_BLOCK_START;
 //    this_tag->type = FIFFT_INT;
 //    this_tag->size = sizeof(fiff_int_t);
 //    this_tag->data = malloc(sizeof(fiff_int_t));
 //    *(fiff_int_t *)this_tag->data = FIFFB_MNE_ENV;
-//    this_tag++;
+
 
 //    this_tag->kind = FIFF_BLOCK_ID;
 //    this_tag->type = FIFFT_ID_STRUCT;
@@ -1780,19 +1781,64 @@ bool mne_attach_env(const QString& name, const QString& command)
 //    this_tag->data = malloc(sizeof(fiff_int_t));
 //    *(fiff_int_t *)this_tag->data = FIFFB_MNE_ENV;
 
-//    if (fiff_insert_after (file,insert,tags,ntag) == FIFF_FAIL)
+//    if (fiff_insert_after (t_pStreamInOut,insert,tags,ntag) == FIFF_FAIL)
 //        goto out;
-    res = true;
 
-out : {
+
+    // Modified of fiff_insert_after
+
+    /*
+    * Insert new tags into a file
+    * The directory information in dest is updated
+    */
+    if (insert < 0 || insert >= t_pStreamInOut->nent()-1) {
+        qCritical("illegal insertion point in fiff_insert_after!");
+        return false;
+    }
+
+    QList<FiffDirEntry::SPtr> this_ent = t_pStreamInOut->dir().mid(insert);//this_ent = old_dir + where;
+
+    if (!t_pStreamInOut->read_tag(t_pTag, this_ent[0]->pos))
+        return false;
+    /*
+    * Update next info to be sequential
+    */
+    qint64 next_tmp = t_pStreamInOut->device()->pos();
+    /*
+    * Go to the end of the file
+    */
+    t_pStreamInOut->device()->seek(fileInOut.size());//SEEK_END
+//    /*
+//    * Allocate new directory
+//    */
+//    new_dir = MALLOC(ntag+dest->nent,fiffDirEntryRec);
+//    /*
+//    * Copy the beginning of old directory
+//    */
+//    memcpy(new_dir,old_dir,(where+1)*sizeof(fiffDirEntryRec));
+    /*
+    * Save the old size for future purposes
+    */
+    qint64 old_end = t_pStreamInOut->device()->pos();
+
+
+
+
+
+
+
+
+    return true;
+
+//out : {
 //        for (k = 0; k < ntag; k++)
 //            FREE_41(tags[k].data);
 //        FREE_41(tags);
 //        FREE_41(tag.data);
 //        fiff_close(file);
 //        FREE_41(cwd);
-        return res;
-    }
+//        return res;
+//    }
 }
 
 
