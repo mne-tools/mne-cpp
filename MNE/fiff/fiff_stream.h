@@ -571,6 +571,17 @@ public:
 
     //=========================================================================================================
     /**
+    * Writes a list of dir entries to a fif file, as a FIFFT_DIR_ENTRY_STRUCT
+    * Returns the postion where the structure was written to.
+    *
+    * @param[in] dir        The dir entries to write
+    *
+    * @return the position where the directory struct was written to
+    */
+    fiff_long_t write_dir_entries(const QList<FiffDirEntry::SPtr>& dir);
+
+    //=========================================================================================================
+    /**
     * Writes a double-precision floating point tag to a fif file
     * Refactored: fiff_write_double (MNE-MATLAB)
     *
