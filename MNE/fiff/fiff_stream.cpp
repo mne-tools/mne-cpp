@@ -165,9 +165,9 @@ const FiffDirNode::SPtr& FiffStream::dirtree() const
 
 //*************************************************************************************************************
 
-void FiffStream::end_block(fiff_int_t kind)
+fiff_long_t FiffStream::end_block(fiff_int_t kind)
 {
-    this->write_int(FIFF_BLOCK_END,&kind);
+    return this->write_int(FIFF_BLOCK_END,&kind);
 }
 
 
@@ -1797,9 +1797,9 @@ QStringList FiffStream::split_name_list(QString p_sNameList)
 
 //*************************************************************************************************************
 
-void FiffStream::start_block(fiff_int_t kind)
+fiff_long_t FiffStream::start_block(fiff_int_t kind)
 {
-    this->write_int(FIFF_BLOCK_START,&kind);
+    return this->write_int(FIFF_BLOCK_START,&kind);
 }
 
 
@@ -2070,7 +2070,7 @@ FiffStream::SPtr FiffStream::start_writing_raw(QIODevice &p_IODevice, const Fiff
 
 //*************************************************************************************************************
 
-void FiffStream::write_tag(const QSharedPointer<FiffTag> &p_pTag, qint64 pos)
+fiff_long_t FiffStream::write_tag(const QSharedPointer<FiffTag> &p_pTag, qint64 pos)
 {
     /*
     * Write tag to specified position
@@ -2083,6 +2083,7 @@ void FiffStream::write_tag(const QSharedPointer<FiffTag> &p_pTag, qint64 pos)
         if(file)
             this->device()->seek(file->size());
     }
+    pos = this->device()->pos();
 
     fiff_int_t datasize = p_pTag->size();
 
@@ -2100,13 +2101,17 @@ void FiffStream::write_tag(const QSharedPointer<FiffTag> &p_pTag, qint64 pos)
         */
         this->writeRawData(p_pTag->data(),datasize);
     }
+
+    return pos;
 }
 
 
 //*************************************************************************************************************
 
-void FiffStream::write_ch_info(const FiffChInfo& ch)
+fiff_long_t FiffStream::write_ch_info(const FiffChInfo& ch)
 {
+    fiff_long_t pos = this->device()->pos();
+
     //typedef struct _fiffChPosRec {
     //  fiff_int_t   coil_type;          /*!< What kind of coil. */
     //  fiff_float_t r0[3];              /*!< Coil coordinate system origin */
@@ -2174,13 +2179,17 @@ void FiffStream::write_ch_info(const FiffChInfo& ch)
         for(qint32 i = 0; i < 16-len; ++i)
             this->writeRawData(chNull,1);
     }
+
+    return pos;
 }
 
 
 //*************************************************************************************************************
 
-void FiffStream::write_ch_pos(const FiffChPos &chpos)
+fiff_long_t FiffStream::write_ch_pos(const FiffChPos &chpos)
 {
+    fiff_long_t pos = this->device()->pos();
+
     //
     //   FiffChPos
     //
@@ -2199,13 +2208,17 @@ void FiffStream::write_ch_pos(const FiffChPos &chpos)
     // ez
     for(i = 0; i < 3; ++i)
         *this << chpos.ez[i];
+
+    return pos;
 }
 
 
 //*************************************************************************************************************
 
-void FiffStream::write_coord_trans(const FiffCoordTrans& trans)
+fiff_long_t FiffStream::write_coord_trans(const FiffCoordTrans& trans)
 {
+    fiff_long_t pos = this->device()->pos();
+
     //?typedef struct _fiffCoordTransRec {
     //  fiff_int_t   from;                   /*!< Source coordinate system. */
     //  fiff_int_t   to;                     /*!< Destination coordinate system. */
@@ -2245,13 +2258,17 @@ void FiffStream::write_coord_trans(const FiffCoordTrans& trans)
             *this << (float)trans.invtrans(r,c);
     for (r = 0; r < 3; ++r)
         *this << (float)trans.invtrans(r,3);
+
+    return pos;
 }
 
 
 //*************************************************************************************************************
 
-void FiffStream::write_cov(const FiffCov &p_FiffCov)
+fiff_long_t FiffStream::write_cov(const FiffCov &p_FiffCov)
 {
+    fiff_long_t pos = this->device()->pos();
+
     this->start_block(FIFFB_MNE_COV);
 
     //
@@ -2315,15 +2332,19 @@ void FiffStream::write_cov(const FiffCov &p_FiffCov)
     //   Done!
     //
     this->end_block(FIFFB_MNE_COV);
+
+    return pos;
 }
 
 
 //*************************************************************************************************************
 
-void FiffStream::write_ctf_comp(const QList<FiffCtfComp>& comps)
+fiff_long_t FiffStream::write_ctf_comp(const QList<FiffCtfComp>& comps)
 {
+    fiff_long_t pos = this->device()->pos();
+
     if (comps.size() <= 0)
-        return;
+        return -1;
     //
     //  This is very simple in fact
     //
@@ -2351,14 +2372,16 @@ void FiffStream::write_ctf_comp(const QList<FiffCtfComp>& comps)
     }
     this->end_block(FIFFB_MNE_CTF_COMP);
 
-    return;
+    return pos;
 }
 
 
 //*************************************************************************************************************
 
-void FiffStream::write_dig_point(const FiffDigPoint& dig)
+fiff_long_t FiffStream::write_dig_point(const FiffDigPoint& dig)
 {
+    fiff_long_t pos = this->device()->pos();
+
     //?typedef struct _fiffDigPointRec {
     //  fiff_int_t kind;               /*!< FIFF_POINT_CARDINAL,
     //                                  *   FIFF_POINT_HPI, or
@@ -2380,6 +2403,8 @@ void FiffStream::write_dig_point(const FiffDigPoint& dig)
     *this << (qint32)dig.ident;
     for(qint32 i = 0; i < 3; ++i)
         *this << dig.r[i];
+
+    return pos;
 }
 
 
@@ -2423,8 +2448,10 @@ fiff_long_t FiffStream::write_dir_entries(const QList<FiffDirEntry::SPtr> &dir)
 
 //*************************************************************************************************************
 
-void FiffStream::write_double(fiff_int_t kind, const double* data, fiff_int_t nel)
+fiff_long_t FiffStream::write_double(fiff_int_t kind, const double* data, fiff_int_t nel)
 {
+    fiff_long_t pos = this->device()->pos();
+
     qint32 datasize = nel * 8;
 
     *this << (qint32)kind;
@@ -2436,13 +2463,17 @@ void FiffStream::write_double(fiff_int_t kind, const double* data, fiff_int_t ne
 
     for(qint32 i = 0; i < nel; ++i)
         *this << data[i];
+
+    return pos;
 }
 
 
 //*************************************************************************************************************
 
-void FiffStream::write_float(fiff_int_t kind, const float* data, fiff_int_t nel)
+fiff_long_t FiffStream::write_float(fiff_int_t kind, const float* data, fiff_int_t nel)
 {
+    fiff_long_t pos = this->device()->pos();
+
     qint32 datasize = nel * 4;
 
     *this << (qint32)kind;
@@ -2454,13 +2485,17 @@ void FiffStream::write_float(fiff_int_t kind, const float* data, fiff_int_t nel)
 
     for(qint32 i = 0; i < nel; ++i)
         *this << data[i];
+
+    return pos;
 }
 
 
 //*************************************************************************************************************
 
-void FiffStream::write_float_matrix(fiff_int_t kind, const MatrixXf& mat)
+fiff_long_t FiffStream::write_float_matrix(fiff_int_t kind, const MatrixXf& mat)
 {
+    fiff_long_t pos = this->device()->pos();
+
     qint32 numel = mat.rows() * mat.cols();
 
     fiff_int_t datasize = 4*numel + 4*3;
@@ -2483,13 +2518,17 @@ void FiffStream::write_float_matrix(fiff_int_t kind, const MatrixXf& mat)
 
     for(i = 0; i < 3; ++i)
         *this << dims[i];
+
+    return pos;
 }
 
 
 //*************************************************************************************************************
 
-void FiffStream::write_float_sparse_ccs(fiff_int_t kind, const SparseMatrix<float>& mat)
+fiff_long_t FiffStream::write_float_sparse_ccs(fiff_int_t kind, const SparseMatrix<float>& mat)
 {
+    fiff_long_t pos = this->device()->pos();
+
     //
     //   nnz values
     //   nnz row indices
@@ -2573,13 +2612,17 @@ void FiffStream::write_float_sparse_ccs(fiff_int_t kind, const SparseMatrix<floa
 
     for(i = 0; i < 4; ++i)
         *this << dims[i];
+
+    return pos;
 }
 
 
 //*************************************************************************************************************
 
-void FiffStream::write_float_sparse_rcs(fiff_int_t kind, const SparseMatrix<float>& mat)
+fiff_long_t FiffStream::write_float_sparse_rcs(fiff_int_t kind, const SparseMatrix<float>& mat)
 {
+    fiff_long_t pos = this->device()->pos();
+
     //
     //   nnz values
     //   nnz column indices
@@ -2666,13 +2709,17 @@ void FiffStream::write_float_sparse_rcs(fiff_int_t kind, const SparseMatrix<floa
 
     for(i = 0; i < 4; ++i)
         *this << dims[i];
+
+    return pos;
 }
 
 
 //*************************************************************************************************************
 
-void FiffStream::write_id(fiff_int_t kind, const FiffId& id)
+fiff_long_t FiffStream::write_id(fiff_int_t kind, const FiffId& id)
 {
+    fiff_long_t pos = this->device()->pos();
+
     FiffId t_id = id;
 
     if(t_id.isEmpty()) {
@@ -2702,13 +2749,17 @@ void FiffStream::write_id(fiff_int_t kind, const FiffId& id)
 
     for(qint32 i = 0; i < 5; ++i)
         *this << data[i];
+
+    return pos;
 }
 
 
 //*************************************************************************************************************
 
-void FiffStream::write_info_base(const FiffInfoBase & p_FiffInfoBase)
+fiff_long_t FiffStream::write_info_base(const FiffInfoBase & p_FiffInfoBase)
 {
+    fiff_long_t pos = this->device()->pos();
+
     //
     // Information from the MEG file
     //
@@ -2767,13 +2818,17 @@ void FiffStream::write_info_base(const FiffInfoBase & p_FiffInfoBase)
     }
 
     this->end_block(FIFFB_MNE_PARENT_MEAS_FILE);
+
+    return pos;
 }
 
 
 //*************************************************************************************************************
 
-void FiffStream::write_int(fiff_int_t kind, const fiff_int_t* data, fiff_int_t nel)
+fiff_long_t FiffStream::write_int(fiff_int_t kind, const fiff_int_t* data, fiff_int_t nel)
 {
+    fiff_long_t pos = this->device()->pos();
+
     fiff_int_t datasize = nel * 4;
 
     *this << (qint32)kind;
@@ -2783,13 +2838,17 @@ void FiffStream::write_int(fiff_int_t kind, const fiff_int_t* data, fiff_int_t n
 
     for(qint32 i = 0; i < nel; ++i)
         *this << data[i];
+
+    return pos;
 }
 
 
 //*************************************************************************************************************
 
-void FiffStream::write_int_matrix(fiff_int_t kind, const MatrixXi& mat)
+fiff_long_t FiffStream::write_int_matrix(fiff_int_t kind, const MatrixXi& mat)
 {
+    fiff_long_t pos = this->device()->pos();
+
 //    qint32 FIFFT_MATRIX = 1 << 30;
 //    qint32 FIFFT_MATRIX_INT = FIFFT_INT | FIFFT_MATRIX;
 
@@ -2815,22 +2874,26 @@ void FiffStream::write_int_matrix(fiff_int_t kind, const MatrixXi& mat)
 
     for(i = 0; i < 3; ++i)
         *this << dims[i];
+
+    return pos;
 }
 
 
 //*************************************************************************************************************
 
-void FiffStream::write_name_list(fiff_int_t kind, const QStringList& data)
+fiff_long_t FiffStream::write_name_list(fiff_int_t kind, const QStringList& data)
 {
     QString all = data.join(":");
-    this->write_string(kind,all);
+    return this->write_string(kind,all);
 }
 
 
 //*************************************************************************************************************
 
-void FiffStream::write_named_matrix(fiff_int_t kind, const FiffNamedMatrix& mat)
+fiff_long_t FiffStream::write_named_matrix(fiff_int_t kind, const FiffNamedMatrix& mat)
 {
+    fiff_long_t pos = this->device()->pos();
+
     this->start_block(FIFFB_MNE_NAMED_MATRIX);
     this->write_int(FIFF_MNE_NROW, &mat.nrow);
     this->write_int(FIFF_MNE_NCOL, &mat.ncol);
@@ -2840,15 +2903,19 @@ void FiffStream::write_named_matrix(fiff_int_t kind, const FiffNamedMatrix& mat)
        this->write_name_list(FIFF_MNE_COL_NAMES, mat.col_names);
     this->write_float_matrix(kind,mat.data.cast<float>());
     this->end_block(FIFFB_MNE_NAMED_MATRIX);
+
+    return pos;
 }
 
 
 //*************************************************************************************************************
 
-void FiffStream::write_proj(const QList<FiffProj>& projs)
+fiff_long_t FiffStream::write_proj(const QList<FiffProj>& projs)
 {
+    fiff_long_t pos = this->device()->pos();
+
     if (projs.size() <= 0)
-        return;
+        return -1;
 
     this->start_block(FIFFB_PROJ);
 
@@ -2872,6 +2939,8 @@ void FiffStream::write_proj(const QList<FiffProj>& projs)
         this->end_block(FIFFB_PROJ_ITEM);
     }
     this->end_block(FIFFB_PROJ);
+
+    return pos;
 }
 
 
@@ -2932,8 +3001,10 @@ bool FiffStream::write_raw_buffer(const MatrixXd& buf)
 
 //*************************************************************************************************************
 
-void FiffStream::write_string(fiff_int_t kind, const QString& data)
+fiff_long_t FiffStream::write_string(fiff_int_t kind, const QString& data)
 {
+    fiff_long_t pos = this->device()->pos();
+
     fiff_int_t datasize = data.size();
     *this << (qint32)kind;
     *this << (qint32)FIFFT_STRING;
@@ -2941,6 +3012,8 @@ void FiffStream::write_string(fiff_int_t kind, const QString& data)
     *this << (qint32)FIFFV_NEXT_SEQ;
 
     this->writeRawData(data.toUtf8().constData(),datasize);
+
+    return pos;
 }
 
 

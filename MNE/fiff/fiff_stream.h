@@ -191,8 +191,10 @@ public:
     * Writes a FIFF_BLOCK_END tag
     *
     * @param[in] kind The block kind to end
+    *
+    * @return the position where the end block struct was written to
     */
-    void end_block(fiff_int_t kind);
+    fiff_long_t end_block(fiff_int_t kind);
 
     //=========================================================================================================
     /**
@@ -453,8 +455,10 @@ public:
     * Refactored: fiff_start_block (MNE-C); fiff_start_block (MNE-MATLAB)
     *
     * @param[in] kind       The block kind to start
+    *
+    * @return the position where the start block struct was written to
     */
-    void start_block(fiff_int_t kind);
+    fiff_long_t start_block(fiff_int_t kind);
 
     //=========================================================================================================
     /**
@@ -504,8 +508,10 @@ public:
     *
     * @param[in] p_pTag     Tag to write;
     * @param[in] pos position of the tag inside the fif file
+    *
+    * @return the position where the tag struct was written to
     */
-    void write_tag(const QSharedPointer<FiffTag>& p_pTag, qint64 pos = -1);
+    fiff_long_t write_tag(const QSharedPointer<FiffTag>& p_pTag, qint64 pos = -1);
 
     //=========================================================================================================
     /**
@@ -515,16 +521,20 @@ public:
     * Refactored: fiff_write_ch_info (MNE-C); fiff_write_ch_info (MNE-MATLAB)
     *
     * @param[in] ch     The channel information structure to write
+    *
+    * @return the position where the channel info struct was written to
     */
-    void write_ch_info(const FiffChInfo& ch);
+    fiff_long_t write_ch_info(const FiffChInfo& ch);
 
     //=========================================================================================================
     /**
     * Writes a channel position to a fif file
     *
     * @param[in] chpos      Channel position structure to write
+    *
+    * @return the position where the channel position struct was written to
     */
-    void write_ch_pos(const FiffChPos& chpos);
+    fiff_long_t write_ch_pos(const FiffChPos& chpos);
 
     //=========================================================================================================
     /**
@@ -532,8 +542,10 @@ public:
     * Refactored: fiff_write_coord_trans (MNE-C); fiff_write_coord_trans (MNE-MATLAB)
     *
     * @param[in] trans  The coordinate transfomation structure
+    *
+    * @return the position where the coordinate transformation struct was written to
     */
-    void write_coord_trans(const FiffCoordTrans &trans);
+    fiff_long_t write_coord_trans(const FiffCoordTrans &trans);
 
     //=========================================================================================================
     /**
@@ -542,8 +554,10 @@ public:
     * ### MNE toolbox root function ###
     *
     * @param[in] p_FiffCov      The noise covariance matrix to write
+    *
+    * @return the position where the covaraince was written to
     */
-    void write_cov(const FiffCov &p_FiffCov);
+    fiff_long_t write_cov(const FiffCov &p_FiffCov);
 
     //=========================================================================================================
     /**
@@ -554,8 +568,10 @@ public:
     * Writes the CTF compensation data into a fif file
     *
     * @param[in] comps  The compensation data to write
+    *
+    * @return the position where the ctf compensators struct was written to
     */
-    void write_ctf_comp(const QList<FiffCtfComp>& comps);
+    fiff_long_t write_ctf_comp(const QList<FiffCtfComp>& comps);
 
     //=========================================================================================================
     /**
@@ -566,8 +582,10 @@ public:
     * Writes a digitizer data point into a fif file
     *
     * @param[in] dig        The point to write
+    *
+    * @return the position where the digitizer points struct was written to
     */
-    void write_dig_point(const FiffDigPoint& dig);
+    fiff_long_t write_dig_point(const FiffDigPoint& dig);
 
     //=========================================================================================================
     /**
@@ -577,6 +595,8 @@ public:
     * @param[in] dir        The dir entries to write
     *
     * @return the position where the directory struct was written to
+    *
+    * @return the position where the directory entries struct was written to
     */
     fiff_long_t write_dir_entries(const QList<FiffDirEntry::SPtr>& dir);
 
@@ -588,8 +608,10 @@ public:
     * @param[in] kind       Tag kind
     * @param[in] data       The float data pointer
     * @param[in] nel        Number of doubles to write (default = 1)
+    *
+    * @return the position where the double struct was written to
     */
-    void write_double(fiff_int_t kind, const double* data, fiff_int_t nel = 1);
+    fiff_long_t write_double(fiff_int_t kind, const double* data, fiff_int_t nel = 1);
 
     //=========================================================================================================
     /**
@@ -599,16 +621,20 @@ public:
     *
     * @param[in] kind       The tag kind
     * @param[in] id         The id to write
+    *
+    * @return the position where the file id struct was written to
     */
-    void write_id(fiff_int_t kind, const FiffId& id = defaultFiffId);
+    fiff_long_t write_id(fiff_int_t kind, const FiffId& id = defaultFiffId);
 
     //=========================================================================================================
     /**
     * Write measurement info stored in forward solution
     *
     * @param[in] p_FiffInfoBase     The measurement info.
+    *
+    * @return the position where the info base struct was written to
     */
-    void write_info_base(const FiffInfoBase & p_FiffInfoBase);
+    fiff_long_t write_info_base(const FiffInfoBase & p_FiffInfoBase);
 
     //=========================================================================================================
     /**
@@ -618,8 +644,10 @@ public:
     * @param[in] kind       Tag kind
     * @param[in] data       The integer data pointer
     * @param[in] nel        Number of integers to write (default = 1)
+    *
+    * @return the position where the int was written to
     */
-    void write_int(fiff_int_t kind, const fiff_int_t* data, fiff_int_t nel = 1);
+    fiff_long_t write_int(fiff_int_t kind, const fiff_int_t* data, fiff_int_t nel = 1);
 
     //=========================================================================================================
     /**
@@ -631,8 +659,10 @@ public:
     *
     * @param[in] kind       The tag kind
     * @param[in] mat        The data matrix
+    *
+    * @return the position where the write_int_matrix was written to
     */
-    void write_int_matrix(fiff_int_t kind, const MatrixXi& mat);
+    fiff_long_t write_int_matrix(fiff_int_t kind, const MatrixXi& mat);
 
     //=========================================================================================================
     /**
@@ -642,8 +672,10 @@ public:
     * @param[in] kind       Tag kind
     * @param[in] data       The float data pointer
     * @param[in] nel        Number of floats to write (default = 1)
+    *
+    * @return the position where the float struct was written to
     */
-    void write_float(fiff_int_t kind, const float* data, fiff_int_t nel = 1);
+    fiff_long_t write_float(fiff_int_t kind, const float* data, fiff_int_t nel = 1);
 
     //=========================================================================================================
     /**
@@ -652,8 +684,10 @@ public:
     *
     * @param[in] kind       The tag kind
     * @param[in] mat        The data matrix
+    *
+    * @return the position where the float matrix struct was written to
     */
-    void write_float_matrix(fiff_int_t kind, const MatrixXf& mat);
+    fiff_long_t write_float_matrix(fiff_int_t kind, const MatrixXf& mat);
 
     //=========================================================================================================
     /**
@@ -665,8 +699,10 @@ public:
     *
     * @param[in] kind       The tag kind
     * @param[in] mat        The data matrix
+    *
+    * @return the position where the float sparse ccs matrix struct was written to
     */
-    void write_float_sparse_ccs(fiff_int_t kind, const SparseMatrix<float>& mat);
+    fiff_long_t write_float_sparse_ccs(fiff_int_t kind, const SparseMatrix<float>& mat);
 
     //=========================================================================================================
     /**
@@ -678,8 +714,10 @@ public:
     *
     * @param[in] kind       The tag kind
     * @param[in] mat        The data matrix
+    *
+    * @return the position where the float sparse rcs matrix struct was written to
     */
-    void write_float_sparse_rcs(fiff_int_t kind, const SparseMatrix<float>& mat);
+    fiff_long_t write_float_sparse_rcs(fiff_int_t kind, const SparseMatrix<float>& mat);
 
     //=========================================================================================================
     /**
@@ -691,8 +729,10 @@ public:
     *
     * @param[in] kind       The tag kind
     * @param[in] data       An array of names to create the list from
+    *
+    * @return the position where the name list struct was written to
     */
-    void write_name_list(fiff_int_t kind, const QStringList& data);
+    fiff_long_t write_name_list(fiff_int_t kind, const QStringList& data);
 
     //=========================================================================================================
     /**
@@ -704,8 +744,10 @@ public:
     *
     * @param[in] kind       The tag kind to use for the data
     * @param[in] mat        The data matrix
+    *
+    * @return the position where the named matrix struct was written to
     */
-    void write_named_matrix(fiff_int_t kind, const FiffNamedMatrix& mat);
+    fiff_long_t write_named_matrix(fiff_int_t kind, const FiffNamedMatrix& mat);
 
     //=========================================================================================================
     /**
@@ -716,8 +758,10 @@ public:
     * Writes the projection data into a fif stream (file)
     *
     * @param[in] projs      The compensation data to write
+    *
+    * @return the position where the projector struct was written to
     */
-    void write_proj(const QList<FiffProj>& projs);
+    fiff_long_t write_proj(const QList<FiffProj>& projs);
 
     //=========================================================================================================
     /**
@@ -769,8 +813,10 @@ public:
     *
     * @param[in] kind       The tag kind
     * @param[in] data       The string data to write
+    *
+    * @return the position where the string struct was written to
     */
-    void write_string(fiff_int_t kind, const QString& data);
+    fiff_long_t write_string(fiff_int_t kind, const QString& data);
 
     //=========================================================================================================
     /**
