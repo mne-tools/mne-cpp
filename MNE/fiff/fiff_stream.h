@@ -165,8 +165,17 @@ public:
     *
     * @return the directory
     */
+    QList<FiffDirEntry::SPtr>& dir();
+
+    //=========================================================================================================
+    /**
+    * Returns the directory compiled into a tree
+    * dir is set when open() was called.
+    *
+    * @return the directory
+    */
     const QList<FiffDirEntry::SPtr>& dir() const;
-    
+
     //=========================================================================================================
     /**
     * How many entries?
@@ -190,11 +199,12 @@ public:
     *
     * Writes a FIFF_BLOCK_END tag
     *
-    * @param[in] kind The block kind to end
+    * @param[in] kind   The block kind to end
+    * @param[in] next   Position of the next tag (default = FIFFV_NEXT_SEQ)
     *
     * @return the position where the end block struct was written to
     */
-    fiff_long_t end_block(fiff_int_t kind);
+    fiff_long_t end_block(fiff_int_t kind, fiff_int_t next = FIFFV_NEXT_SEQ);
 
     //=========================================================================================================
     /**
@@ -644,10 +654,11 @@ public:
     * @param[in] kind       Tag kind
     * @param[in] data       The integer data pointer
     * @param[in] nel        Number of integers to write (default = 1)
+    * @param[in] next       Position of the next tag (default = FIFFV_NEXT_SEQ)
     *
     * @return the position where the int was written to
     */
-    fiff_long_t write_int(fiff_int_t kind, const fiff_int_t* data, fiff_int_t nel = 1);
+    fiff_long_t write_int(fiff_int_t kind, const fiff_int_t* data, fiff_int_t nel = 1, fiff_int_t next = FIFFV_NEXT_SEQ);
 
     //=========================================================================================================
     /**

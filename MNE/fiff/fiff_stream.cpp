@@ -141,6 +141,14 @@ FiffId FiffStream::id() const
 
 //*************************************************************************************************************
 
+QList<FiffDirEntry::SPtr>& FiffStream::dir()
+{
+    return m_dir;
+}
+
+
+//*************************************************************************************************************
+
 const QList<FiffDirEntry::SPtr>& FiffStream::dir() const
 {
     return m_dir;
@@ -165,9 +173,9 @@ const FiffDirNode::SPtr& FiffStream::dirtree() const
 
 //*************************************************************************************************************
 
-fiff_long_t FiffStream::end_block(fiff_int_t kind)
+fiff_long_t FiffStream::end_block(fiff_int_t kind, fiff_int_t next)
 {
-    return this->write_int(FIFF_BLOCK_END,&kind);
+    return this->write_int(FIFF_BLOCK_END,&kind,1,next);
 }
 
 
@@ -2825,7 +2833,7 @@ fiff_long_t FiffStream::write_info_base(const FiffInfoBase & p_FiffInfoBase)
 
 //*************************************************************************************************************
 
-fiff_long_t FiffStream::write_int(fiff_int_t kind, const fiff_int_t* data, fiff_int_t nel)
+fiff_long_t FiffStream::write_int(fiff_int_t kind, const fiff_int_t* data, fiff_int_t nel, fiff_int_t next)
 {
     fiff_long_t pos = this->device()->pos();
 
@@ -2834,7 +2842,7 @@ fiff_long_t FiffStream::write_int(fiff_int_t kind, const fiff_int_t* data, fiff_
     *this << (qint32)kind;
     *this << (qint32)FIFFT_INT;
     *this << (qint32)datasize;
-    *this << (qint32)FIFFV_NEXT_SEQ;
+    *this << (qint32)next;
 
     for(qint32 i = 0; i < nel; ++i)
         *this << data[i];

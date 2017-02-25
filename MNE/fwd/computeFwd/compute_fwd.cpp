@@ -1311,7 +1311,7 @@ bool fiff_put_dir (FiffStream::SPtr& t_pStream, const QList<FiffDirEntry::SPtr>&
 
 //============================= write_solution.c =============================
 
-int write_solution(const QString& name,         /* Destination file */
+bool write_solution(const QString& name,         /* Destination file */
                    MneSourceSpaceOld* *spaces,  /* The source spaces */
                    int            nspace,
                    const QString& mri_file,     /* MRI file and data obtained from there */
@@ -1527,14 +1527,14 @@ int write_solution(const QString& name,         /* Destination file */
     if(t_pStreamIn)
         t_pStreamIn->close();
 
-    return FIFF_OK;
+    return true;
 
 bad : {
         if(t_pStream)
             t_pStream->close();
         if(t_pStreamIn)
             t_pStreamIn->close();
-        return FIFF_FAIL;
+        return false;
     }
 }
 
@@ -1738,53 +1738,10 @@ bool mne_attach_env(const QString& name, const QString& command)
         qCritical("Suitable place for environment insertion not found.");
         return false;
     }
-//    /*
-//    * Build the list of tags to insert
-//    */
-//    ntag = 5;
-//    tags = MALLOC(ntag,fiffTagRec);
-//    for (k = 0; k < ntag; k++) {
-//        FiffTag::SPtr tag(new FiffTag);
-//        tag->next = FIFFV_NEXT_SEQ;
-//        tag->data = NULL;
-//        tag->size = 0;
-//        tags.append(tag);
-//    }
-//    this_tag = tags;
-//    this_tag->kind = FIFF_BLOCK_START;
-//    this_tag->type = FIFFT_INT;
-//    this_tag->size = sizeof(fiff_int_t);
-//    this_tag->data = malloc(sizeof(fiff_int_t));
-//    *(fiff_int_t *)this_tag->data = FIFFB_MNE_ENV;
 
-//    this_tag->kind = FIFF_BLOCK_ID;
-//    this_tag->type = FIFFT_ID_STRUCT;
-//    this_tag->size = sizeof(fiffIdRec);
-//    this_tag->data = malloc(sizeof(fiffIdRec));
-//    *(fiffId)this_tag->data = id;
-//    this_tag++;
-
-//    this_tag->kind = FIFF_MNE_ENV_WORKING_DIR;
-//    this_tag->type = FIFFT_STRING;
-//    this_tag->size = strlen(cwd);
-//    this_tag->data = (fiff_byte_t *)strdup(cwd);
-//    this_tag++;
-
-//    this_tag->kind = FIFF_MNE_ENV_COMMAND_LINE;
-//    this_tag->type = FIFFT_STRING;
-//    this_tag->size = strlen(command);
-//    this_tag->data = (fiff_byte_t *)strdup(command);
-//    this_tag++;
-
-//    this_tag->kind = FIFF_BLOCK_END;
-//    this_tag->type = FIFFT_INT;
-//    this_tag->size = sizeof(fiff_int_t);
-//    this_tag->data = malloc(sizeof(fiff_int_t));
-//    *(fiff_int_t *)this_tag->data = FIFFB_MNE_ENV;
-
-//    if (fiff_insert_after (t_pStreamInOut,insert,tags,ntag) == FIFF_FAIL)
-//        goto out;
-
+    /*
+    * Do not build the list of tags to insert -> Do insertion right away
+    */
 
     // Modified of fiff_insert_after
     int where = insert;
@@ -1797,11 +1754,11 @@ bool mne_attach_env(const QString& name, const QString& command)
         return false;
     }
 
-
+    FiffTag::SPtr t_pTagNext;
     QList<FiffDirEntry::SPtr> old_dir = t_pStreamInOut->dir();
     QList<FiffDirEntry::SPtr> this_ent = old_dir.mid(where);//this_ent = old_dir + where;
 
-    if (!t_pStreamInOut->read_tag(t_pTag, this_ent[0]->pos))
+    if (!t_pStreamInOut->read_tag(t_pTagNext, this_ent[0]->pos))
         return false;
     /*
     * Update next info to be sequential
@@ -1811,15 +1768,10 @@ bool mne_attach_env(const QString& name, const QString& command)
     * Go to the end of the file
     */
     t_pStreamInOut->device()->seek(fileInOut.size());//SEEK_END
-//    /*
-//    * Allocate new directory
-//    */
-//    new_dir = MALLOC(ntag+dest->nent,fiffDirEntryRec);
     /*
+    * Allocate new directory
     * Copy the beginning of old directory
     */
-//    memcpy(new_dir,old_dir,(where+1)*sizeof(fiffDirEntryRec));
-
     QList<FiffDirEntry::SPtr> new_dir = old_dir.mid(0,where+1);
 
     /*
@@ -1829,9 +1781,9 @@ bool mne_attach_env(const QString& name, const QString& command)
     /*
     * Write tags, check for errors
     */
-//Don't use the for loop here instead do it explicitly for specific tags
-    FiffDirEntry::SPtr new_this;
 
+    //Don't use the for loop here instead do it explicitly for specific tags
+    FiffDirEntry::SPtr new_this;
 
     new_this = FiffDirEntry::SPtr(new FiffDirEntry);
     new_this->kind = FIFF_BLOCK_START;
@@ -1865,7 +1817,8 @@ bool mne_attach_env(const QString& name, const QString& command)
     new_this->kind = FIFF_BLOCK_END;
     new_this->type = FIFFT_INT;
     new_this->size =  1 * 4;
-    new_this->pos = t_pStreamInOut->end_block(FIFFB_MNE_ENV);
+
+    new_this->pos = t_pStreamInOut->end_block(FIFFB_MNE_ENV,next_tmp);
     new_dir.append(new_this);
 
     /*
@@ -1877,23 +1830,17 @@ bool mne_attach_env(const QString& name, const QString& command)
     * If something goes wrong here, we cannot be sure that
     * the file is readable. Let's hope for the best...
     */
+    t_pTagNext->next = (qint32)old_end;//2GB cut of
+    t_pStreamInOut->write_tag(t_pTagNext,this_ent[0]->pos);
 
+    /*
+    * Update
+    */
+    t_pStreamInOut->dir() = new_dir;
 
-    //TODO
-
-
+    // Finished fiff_insert_after
 
     return true;
-
-//out : {
-//        for (k = 0; k < ntag; k++)
-//            FREE_41(tags[k].data);
-//        FREE_41(tags);
-//        FREE_41(tag.data);
-//        fiff_close(file);
-//        FREE_41(cwd);
-//        return res;
-//    }
 }
 
 
@@ -2258,7 +2205,7 @@ void ComputeFwd::calculateFwd() const
     * We are ready to spill it out
     */
     printf("\nwriting %s...",settings->solname.toLatin1().constData());
-    if (write_solution(settings->solname,               /* Destination file */
+    if (!write_solution(settings->solname,               /* Destination file */
                        spaces,                          /* The source spaces */
                        nspace,
                        settings->mriname,mri_id,        /* MRI file and data obtained from there */
@@ -2270,9 +2217,9 @@ void ComputeFwd::calculateFwd() const
                        settings->fixed_ori,             /* Fixed orientation dipoles? */
                        settings->coord_frame,           /* Coordinate frame */
                        meg_forward, eeg_forward,
-                       meg_forward_grad, eeg_forward_grad) == FIFF_FAIL)
+                       meg_forward_grad, eeg_forward_grad))
         goto out;
-    if (mne_attach_env(settings->solname,settings->command) == FIFF_FAIL)
+    if (!mne_attach_env(settings->solname,settings->command))
         goto out;
     printf("done\n");
     res = true;
