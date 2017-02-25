@@ -1710,12 +1710,12 @@ bool mne_attach_env(const QString& name, const QString& command)
     }
 //    if (!fileInOut.isWritable()) {
 //        qCritical("File %s is not writable. Cannot attach env info.",name.toLatin1().constData());
-//        goto out;
+//        return false;
 //    }
     /*
     * Open the file to modify
     */
-    if ((t_pStreamInOut = FiffStream::open_update(fileInOut)) == NULL)
+    if (!(t_pStreamInOut = FiffStream::open_update(fileInOut)))
         return false;
     /*
     * Find an appropriate position to insert
