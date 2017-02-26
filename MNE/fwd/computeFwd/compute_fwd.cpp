@@ -703,15 +703,162 @@ int fiff_write_float_sparse_matrix_old(FiffStream::SPtr& t_pStream, int kind, Fi
 * Write a sparse matrix
 */
 {
+    FiffTag::SPtr tag;
+    int     k;
+    int     type;
+    int     datasize,idxsize,ptrsize;
+    int     two = 2;
+    int     res;
+    int     val;
+
+    datasize = mat->nz * sizeof(fiff_float_t);
+    idxsize  = mat->nz * sizeof(fiff_int_t);
     if (mat->coding == FIFFTS_MC_CCS)
-        qDebug() << "TODO write CCS - use eigen";
+        ptrsize  = (mat->n+1) * sizeof(fiff_int_t);
     else if (mat->coding == FIFFTS_MC_RCS)
-        qDebug() << "TODO write RCS - use eigen";
+        ptrsize  = (mat->m+1) * sizeof(fiff_int_t);
     else {
         qCritical("Incomprehensible sparse matrix coding");
         return FIFF_FAIL;
     }
+
+    if (datasize <= 0 || idxsize <= 0 || ptrsize <= 0) {
+        qCritical("fiff_write_float_ccs_matrix: negative vector size(s) in sparse matrix!\n");
+        return FIFF_FAIL;
+    }
+
+
+//    tag.kind = kind;
+    if (mat->coding == FIFFTS_MC_CCS)
+        type = FIFFT_FLOAT | FIFFT_CCS_MATRIX;//tag.type = FIFFT_FLOAT | FIFFT_CCS_MATRIX;
+    else if (mat->coding == FIFFTS_MC_RCS)
+        type = FIFFT_FLOAT | FIFFT_RCS_MATRIX;//tag.type = FIFFT_FLOAT | FIFFT_RCS_MATRIX;
+    else {
+        qCritical("Incomprehensible sparse matrix coding");
+        return FIFF_FAIL;
+    }
+
+//    tag.size = datasize+idxsize+ptrsize+4*sizeof(fiff_int_t);
+//    tag.data = NULL;
+//    tag.next = FIFFV_NEXT_SEQ;
+
+    //Write Tag Info
+    *t_pStream << (qint32)kind;
+    *t_pStream << (qint32)type;
+    *t_pStream << (qint32)(datasize+idxsize+ptrsize+4*sizeof(fiff_int_t));
+    *t_pStream << (qint32)FIFFV_NEXT_SEQ;
+//    if (fiff_write_tag_info(out,&tag) == FIFF_FAIL)
+//        return FIFF_FAIL;
+
+
+    /*
+    * Write data
+    */
+    for(k = 0; k < datasize; ++k)
+        *t_pStream << mat->data+k;
+
+//    /*
+//    * Write data with swapping
+//    */
+//#ifdef INTEL_X86_ARCH
+//    for (k = 0; k < mat->nz; k++)
+//        swap_floatp(mat->data+k);
+//#endif
+//    res = fwrite (mat->data,datasize,1,out);
+//#ifdef INTEL_X86_ARCH
+//    for (k = 0; k < mat->nz; k++)
+//        swap_floatp(mat->data+k);
+//#endif
+//    if (res != 1)
+//        goto fwrite_error;
+
+
+    /*
+    * Write indexes
+    */
+    for(k = 0; k < idxsize; ++k)
+        *t_pStream << mat->inds+k;
+
+//    /*
+//    * Write indexes with swapping
+//    */
+//#ifdef INTEL_X86_ARCH
+//    for (k = 0; k < mat->nz; k++)
+//        swap_intp(mat->inds+k);
+//#endif
+//    res = fwrite (mat->inds,idxsize,1,out);
+//#ifdef INTEL_X86_ARCH
+//    for (k = 0; k < mat->nz; k++)
+//        swap_intp(mat->inds+k);
+//#endif
+//    if (res != 1)
+//        goto fwrite_error;
+
+    if (mat->coding == FIFFTS_MC_CCS) {
+
+        for(k = 0; k < ptrsize; ++k)
+            *t_pStream << mat->ptrs+k;
+
+//#ifdef INTEL_X86_ARCH
+//        for (k = 0; k < mat->n+1; k++)
+//            swap_intp(mat->ptrs+k);
+//#endif
+//        res = fwrite (mat->ptrs,ptrsize,1,out);
+//#ifdef INTEL_X86_ARCH
+//        for (k = 0; k < mat->n+1; k++)
+//            swap_intp(mat->ptrs+k);
+//#endif
+//        if (res != 1)
+//            goto fwrite_error;
+    }
+    else {      /* Row-compressed format */
+
+        for(k = 0; k < ptrsize; ++k)
+            *t_pStream << mat->ptrs+k;
+
+//#ifdef INTEL_X86_ARCH
+//        for (k = 0; k < mat->m+1; k++)
+//            swap_intp(mat->ptrs+k);
+//#endif
+//        res = fwrite (mat->ptrs,ptrsize,1,out);
+//#ifdef INTEL_X86_ARCH
+//        for (k = 0; k < mat->m+1; k++)
+//            swap_intp(mat->ptrs+k);
+//#endif
+//        if (res != 1)
+//            goto fwrite_error;
+    }
+    /*
+     * Write the dimensions
+     */
+    *t_pStream << (qint32)mat->nz;
+//    val = swap_int(mat->nz);
+//    if (fwrite (&val,sizeof(fiff_int_t),1,out) != 1)
+//        goto fwrite_error;
+
+    *t_pStream << (qint32)mat->m;
+//    val = swap_int(mat->m);
+//    if (fwrite (&val,sizeof(fiff_int_t),1,out) != 1)
+//        goto fwrite_error;
+
+    *t_pStream << (qint32)mat->n;
+//    val = swap_int(mat->n);
+//    if (fwrite (&val,sizeof(fiff_int_t),1,out) != 1)
+//        goto fwrite_error;
+
+    *t_pStream << (qint32)two;
+//    val = swap_int(two);
+//    if (fwrite (&val,sizeof(fiff_int_t),1,out) != 1)
+//        goto fwrite_error;
     return FIFF_OK;
+
+fwrite_error : {
+//        if (ferror(out))
+//            qCritical("fwrite");
+//        else
+//            err_set_error("fwrite failed");
+        return FIFF_FAIL;
+    }
 }
 
 

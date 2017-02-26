@@ -2668,6 +2668,9 @@ fiff_long_t FiffStream::write_float_sparse_rcs(fiff_int_t kind, const SparseMatr
         }
     }
 
+    //
+    // Write tag info header
+    //
     *this << (qint32)kind;
     *this << (qint32)FIFFT_RCS_MATRIX_FLOAT;
     *this << (qint32)datasize;
