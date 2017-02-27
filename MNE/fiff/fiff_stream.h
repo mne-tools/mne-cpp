@@ -401,9 +401,9 @@ public:
     * @param[out] p_pTag the read tag info
     * @param[in] p_bDoSkip if true it skips the data of the tag (optional, default = true)
     *
-    * @return true if succeeded, false otherwise
+    * @return the position where the tag info was read from
     */
-    bool read_tag_info(QSharedPointer<FiffTag>& p_pTag, bool p_bDoSkip = true);
+    fiff_long_t read_tag_info(QSharedPointer<FiffTag>& p_pTag, bool p_bDoSkip = true);
 
     //=========================================================================================================
     /**
@@ -849,6 +849,17 @@ private:
     * @return true if beginning is correct, false otherwise
     */
     bool check_beginning(QSharedPointer<FiffTag>& p_pTag);
+
+    //=========================================================================================================
+    /**
+    * Scan the tag list to create a directory
+    * Refactored: fiff_make_dir (fiff_dir.c)
+    *
+    * @param[out] ok    If a conversion error occurs, *ok is set to false; otherwise *ok is set to true.
+    *
+    * @return The created directory
+    */
+    QList<FiffDirEntry::SPtr> make_dir(bool *ok=Q_NULLPTR);
 
 private:
 
