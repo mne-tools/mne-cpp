@@ -268,9 +268,12 @@ bool FiffStream::open(QIODevice::OpenModeFlag mode)
     QString t_sFileName = this->streamName();
     FiffTag::SPtr t_pTag;
 
+    /*
+    * Try to open...
+    */
     if (!this->device()->open(mode))
     {
-        printf("Cannot open %s\n", t_sFileName.toUtf8().constData());//consider throw
+        qCritical("Cannot open %s\n", t_sFileName.toUtf8().constData());//consider throw
         return false;
     }
 
@@ -281,7 +284,7 @@ bool FiffStream::open(QIODevice::OpenModeFlag mode)
     * Read id and directory pointer
     */
     if (t_pTag->kind != FIFF_FILE_ID) {
-        printf("FIFF file should start with FIFF_FILE_ID!");//consider throw
+        qCritical("FIFF file should start with FIFF_FILE_ID!");//consider throw
         this->device()->close();
         return false;
     }
@@ -304,29 +307,20 @@ bool FiffStream::open(QIODevice::OpenModeFlag mode)
     /*
     * Do we have a directory or not?
     */
-    if (dirpos > 0)
-    {
-        /* Just read the directory */
-        this->read_tag(t_pTag, dirpos);
-        m_dir = t_pTag->toDirEntry();
-    }
-    else
-    {
-        /* Must do it in the hard way... */
-        qint32 k = 0;
-        this->device()->seek(0);//fseek(fid,0,'bof');
-        FiffDirEntry::SPtr t_pFiffDirEntry;
-        while (t_pTag->next >= 0)
-        {
-            t_pFiffDirEntry = FiffDirEntry::SPtr(new FiffDirEntry);
-            t_pFiffDirEntry->pos = this->device()->pos();//pos = ftell(fid);
-            this->read_tag_info(t_pTag);
-            ++k;
-            t_pFiffDirEntry->kind = t_pTag->kind;
-            t_pFiffDirEntry->type = t_pTag->type;
-            t_pFiffDirEntry->size = t_pTag->size();
-            m_dir.append(t_pFiffDirEntry);
+    if (dirpos <= 0) {  /* Must do it in the hard way... */
+        bool ok = false;
+        m_dir = this->make_dir(&ok);
+        if (!ok) {
+          qCritical ("Could not create tag directory!");
+          return false;
         }
+    }
+    else {              /* Just read the directory */
+        if(!this->read_tag(t_pTag, dirpos)) {
+            qCritical("Could not read the tag directory (file probably damaged)!");
+            return false;
+        }
+        m_dir = t_pTag->toDirEntry();
     }
 
     /*
@@ -1498,8 +1492,10 @@ bool FiffStream::read_tag_data(FiffTag::SPtr &p_pTag, qint64 pos)
 
 //*************************************************************************************************************
 
-bool FiffStream::read_tag_info(FiffTag::SPtr &p_pTag, bool p_bDoSkip)
+fiff_long_t FiffStream::read_tag_info(FiffTag::SPtr &p_pTag, bool p_bDoSkip)
 {
+    fiff_long_t pos = this->device()->pos();
+
     p_pTag = FiffTag::SPtr(new FiffTag());
 
     //Option 1
@@ -1528,18 +1524,23 @@ bool FiffStream::read_tag_info(FiffTag::SPtr &p_pTag, bool p_bDoSkip)
         }
         else
         {
-            if (p_pTag->next == FIFFV_NEXT_SEQ)
+            if (p_pTag->next > 0)
             {
-                this->device()->seek(this->device()->pos()+p_pTag->size()); //fseek(fid,tag.size,'cof');
+                if(!this->device()->seek(p_pTag->next)) {
+                    qCritical("fseek"); //fseek(fid,tag.next,'bof');
+                    pos = -1;
+                }
             }
-            else if (p_pTag->next > 0)
+            else if (p_pTag->size() > 0 && p_pTag->next == FIFFV_NEXT_SEQ)
             {
-                this->device()->seek(p_pTag->next); //fseek(fid,tag.next,'bof');
+                if(!this->device()->seek(this->device()->pos()+p_pTag->size())) {
+                    qCritical("fseek"); //fseek(fid,tag.size,'cof');
+                    pos = -1;
+                }
             }
         }
     }
-
-    return true;
+    return pos;
 }
 
 
@@ -1550,8 +1551,9 @@ bool FiffStream::read_rt_tag(FiffTag::SPtr &p_pTag)
     while(this->device()->bytesAvailable() < 16)
         this->device()->waitForReadyRead(10);
 
-    if(!this->read_tag_info(p_pTag, false))
-        return false;
+//    if(!this->read_tag_info(p_pTag, false))
+//        return false;
+    this->read_tag_info(p_pTag, false);
 
     while(this->device()->bytesAvailable() < p_pTag->size())
         this->device()->waitForReadyRead(10);
@@ -1854,6 +1856,13 @@ FiffStream::SPtr FiffStream::open_update(QIODevice &p_IODevice)
         qCritical("Cannot open %s\n", t_sFileName.toUtf8().constData());//consider throw
         return FiffStream::SPtr();
     }
+
+  //DEBUG
+    for(int i = 0; i < t_pStream->nent(); i++)
+    {
+        printf("\n%d: Kind: %d, Type: %d, Size: %d, Pos: %d",i, t_pStream->dir()[i]->kind,t_pStream->dir()[i]->type,t_pStream->dir()[i]->size,t_pStream->dir()[i]->pos);
+    }
+  //DEBUG
 
     FiffTag::SPtr t_pTag;
     long dirpos,pointerpos;
@@ -3040,6 +3049,53 @@ void FiffStream::write_rt_command(fiff_int_t command, const QString& data)
     *this << command;
 
     this->writeRawData(data.toUtf8().constData(),datasize);
+}
+
+
+//*************************************************************************************************************
+
+QList<FiffDirEntry::SPtr> FiffStream::make_dir(bool *ok)
+{
+    FiffTag::SPtr t_pTag;
+    QList<FiffDirEntry::SPtr> dir;
+    FiffDirEntry::SPtr t_pFiffDirEntry;
+    fiff_long_t pos;
+    if(ok) *ok = false;
+    /*
+    * Start from the very beginning...
+    */
+    if(!this->device()->seek(SEEK_SET))
+        return dir;
+    while ((pos = this->read_tag_info(t_pTag)) != -1) {
+        /*
+        * Check that we haven't run into the directory
+        */
+        if (t_pTag->kind == FIFF_DIR)
+            break;
+        /*
+        * Put in the new entry
+        */
+        t_pFiffDirEntry = FiffDirEntry::SPtr(new FiffDirEntry);
+        t_pFiffDirEntry->kind = t_pTag->kind;
+        t_pFiffDirEntry->type = t_pTag->type;
+        t_pFiffDirEntry->size = t_pTag->size();
+        t_pFiffDirEntry->pos = (fiff_long_t)pos;
+        dir.append(t_pFiffDirEntry);
+        if (t_pTag->next < 0)
+            break;
+    }
+    /*
+    * Put in the new the terminating entry
+    */
+    t_pFiffDirEntry = FiffDirEntry::SPtr(new FiffDirEntry);
+    t_pFiffDirEntry->kind = -1;
+    t_pFiffDirEntry->type = -1;
+    t_pFiffDirEntry->size = -1;
+    t_pFiffDirEntry->pos  = -1;
+    dir.append(t_pFiffDirEntry);
+
+    if(ok) *ok = true;
+    return dir;
 }
 
 
