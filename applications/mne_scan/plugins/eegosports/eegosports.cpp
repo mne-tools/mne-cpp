@@ -90,7 +90,6 @@ using namespace Eigen;
 EEGoSports::EEGoSports()
 : m_pRMTSA_EEGoSports(0)
 , m_qStringResourcePath(qApp->applicationDirPath()+"/mne_scan_plugins/resources/eegosports/")
-, m_pRawMatrixBuffer_In(0)
 , m_pEEGoSportsProducer(new EEGoSportsProducer(this))
 , m_dLPAShift(0.01)
 , m_dRPAShift(0.01)
@@ -531,7 +530,6 @@ bool EEGoSports::start()
     m_pRMTSA_EEGoSports->data()->setSamplingRate(m_iSamplingFreq);
 
     //Buffer
-    m_pRawMatrixBuffer_In = QSharedPointer<RawMatrixBuffer>(new RawMatrixBuffer(8, m_iNumberOfChannels, m_iSamplesPerBlock));
     m_qListReceivedSamples.clear();
 
     m_pEEGoSportsProducer->start(m_iNumberOfChannels,
@@ -561,11 +559,6 @@ bool EEGoSports::stop()
 
     //Wait until this thread (EEGoSports) is stopped
     m_bIsRunning = false;
-
-    //In case the semaphore blocks the thread -> Release the QSemaphore and let it exit from the pop function (acquire statement)
-    m_pRawMatrixBuffer_In->releaseFromPop();
-
-    m_pRawMatrixBuffer_In->clear();
 
     m_pRMTSA_EEGoSports->data()->clear();
 

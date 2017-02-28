@@ -114,9 +114,6 @@ void EEGoSportsProducer::stop()
     //Wait until this thread (EEGoSportsProducer) is stopped
     m_bIsRunning = false;
 
-    //In case the semaphore blocks the thread -> Release the QSemaphore and let it exit from the push function (acquire statement)
-    m_pEEGoSports->m_pRawMatrixBuffer_In->releaseFromPush();
-
     while(this->isRunning()) {
         m_bIsRunning = false;
     }
