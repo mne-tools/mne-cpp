@@ -53,6 +53,7 @@
 #include "fiff_id.h"
 
 #include <utils/mnemath.h>
+#include <utils/ioutils.h>
 
 
 //*************************************************************************************************************
@@ -1464,7 +1465,7 @@ QList<FiffProj> FiffStream::read_proj(const FiffDirNode::SPtr& p_Node)
 
 //*************************************************************************************************************
 
-bool FiffStream::read_tag_data(FiffTag::SPtr &p_pTag, qint64 pos)
+bool FiffStream::read_tag_data(FiffTag::SPtr &p_pTag, fiff_long_t pos)
 {
     if(pos >= 0)
     {
@@ -1567,7 +1568,7 @@ bool FiffStream::read_rt_tag(FiffTag::SPtr &p_pTag)
 
 //*************************************************************************************************************
 
-bool FiffStream::read_tag(FiffTag::SPtr &p_pTag, qint64 pos)
+bool FiffStream::read_tag(FiffTag::SPtr &p_pTag, fiff_long_t pos)
 {
     if (pos >= 0) {
         this->device()->seek(pos);
@@ -1857,13 +1858,6 @@ FiffStream::SPtr FiffStream::open_update(QIODevice &p_IODevice)
         return FiffStream::SPtr();
     }
 
-  //DEBUG
-    for(int i = 0; i < t_pStream->nent(); i++)
-    {
-        printf("\n%d: Kind: %d, Type: %d, Size: %d, Pos: %d",i, t_pStream->dir()[i]->kind,t_pStream->dir()[i]->type,t_pStream->dir()[i]->size,t_pStream->dir()[i]->pos);
-    }
-  //DEBUG
-
     FiffTag::SPtr t_pTag;
     long dirpos,pointerpos;
 
@@ -1900,8 +1894,7 @@ FiffStream::SPtr FiffStream::open_update(QIODevice &p_IODevice)
             /*
             * Yes! We will ignore it.
             */
-            t_pTag->setNum(-1);
-            t_pStream->write_tag(t_pTag,pointerpos);
+            t_pStream->write_dir_pointer(-1, pointerpos);
             /*
             * Clean up the trailing end
             */
@@ -2087,7 +2080,7 @@ FiffStream::SPtr FiffStream::start_writing_raw(QIODevice &p_IODevice, const Fiff
 
 //*************************************************************************************************************
 
-fiff_long_t FiffStream::write_tag(const QSharedPointer<FiffTag> &p_pTag, qint64 pos)
+fiff_long_t FiffStream::write_tag(const QSharedPointer<FiffTag> &p_pTag, fiff_long_t pos)
 {
     /*
     * Write tag to specified position
@@ -2427,7 +2420,37 @@ fiff_long_t FiffStream::write_dig_point(const FiffDigPoint& dig)
 
 //*************************************************************************************************************
 
-fiff_long_t FiffStream::write_dir_entries(const QList<FiffDirEntry::SPtr> &dir)
+fiff_long_t FiffStream::write_dir_pointer(fiff_int_t dirpos, fiff_long_t pos, fiff_int_t next)
+{
+    /*
+    * Write entires to specified position
+    */
+    if (pos >= 0) {
+        this->device()->seek(pos);
+    }
+    else { //SEEK_END
+        QFile* file = qobject_cast<QFile*> (this->device());
+        if(file)
+            this->device()->seek(file->size());
+    }
+    pos = this->device()->pos();
+
+    fiff_int_t datasize = 1 * 4;
+
+    *this << (qint32)FIFF_DIR_POINTER;
+    *this << (qint32)FIFFT_INT;
+    *this << (qint32)datasize;
+    *this << (qint32)next;
+
+    *this << dirpos;
+
+    return pos;
+}
+
+
+//*************************************************************************************************************
+
+fiff_long_t FiffStream::write_dir_entries(const QList<FiffDirEntry::SPtr> &dir, fiff_long_t pos)
 {
 //    /** Directories are composed of these structures. *
 //     typedef struct _fiffDirEntryRec {
@@ -2439,7 +2462,20 @@ fiff_long_t FiffStream::write_dir_entries(const QList<FiffDirEntry::SPtr> &dir)
 //                      * FIFFC_DATA_OFFSET *
 //     } fiffDirEntryRec,*fiffDirEntry;/**< Directory is composed of these *
 
-    fiff_long_t pos = this->device()->pos();
+    /*
+    * Write entires to specified position
+    */
+    if (pos >= 0) {
+        this->device()->seek(pos);
+    }
+    else { //SEEK_END
+        QFile* file = qobject_cast<QFile*> (this->device());
+        if(file)
+            this->device()->seek(file->size());
+    }
+
+
+    pos = this->device()->pos();
 
     fiff_int_t nent = dir.size();
     fiff_int_t datasize = nent * (fiff_int_t)sizeof(FiffDirEntry);

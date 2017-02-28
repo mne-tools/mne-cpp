@@ -380,34 +380,6 @@ public:
     inline QList< QSharedPointer<FiffDirEntry> > toDirEntry() const;
 
 
-//    if (this->isMatrix())
-//    {
-//        switch(this->getType())
-//        {
-//        case FIFFT_INT:
-//            t_qStringInfo = "Matrix of type FIFFT_INT";
-//            break;
-//        case FIFFT_JULIAN:
-//            t_qStringInfo = "Matrix of type FIFFT_JULIAN";
-//            break;
-//        case FIFFT_FLOAT:
-//            t_qStringInfo = "Matrix of type FIFFT_FLOAT";
-//            break;
-//        case FIFFT_DOUBLE:
-//            t_qStringInfo = "Matrix of type FIFFT_DOUBLE";
-//            break;
-//        case FIFFT_COMPLEX_FLOAT:
-//            t_qStringInfo = "Matrix of type FIFFT_COMPLEX_FLOAT";
-//            break;
-//        case FIFFT_COMPLEX_DOUBLE:
-//            t_qStringInfo = "Matrix of type FIFFT_COMPLEX_DOUBLE";
-//            break;
-//        default:
-//            t_qStringInfo = "Matrix of unknown type";
-//        }
-//    }
-
-
     //
     // MATRIX
     //

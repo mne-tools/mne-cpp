@@ -390,7 +390,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    bool read_tag_data(QSharedPointer<FiffTag>& p_pTag, qint64 pos = -1);
+    bool read_tag_data(QSharedPointer<FiffTag>& p_pTag, fiff_long_t pos = -1);
 
     //=========================================================================================================
     /**
@@ -427,7 +427,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    bool read_tag(QSharedPointer<FiffTag>& p_pTag, qint64 pos = -1);
+    bool read_tag(QSharedPointer<FiffTag>& p_pTag, fiff_long_t pos = -1);
 
     //=========================================================================================================
     /**
@@ -517,11 +517,11 @@ public:
     * Refactored: fiff_write_tag, fiff_write_this_tag (MNE-C)
     *
     * @param[in] p_pTag     Tag to write;
-    * @param[in] pos position of the tag inside the fif file
+    * @param[in] pos        the position where the entires should be written to (default -1, i.e. end of the file)
     *
     * @return the position where the tag struct was written to
     */
-    fiff_long_t write_tag(const QSharedPointer<FiffTag>& p_pTag, qint64 pos = -1);
+    fiff_long_t write_tag(const QSharedPointer<FiffTag>& p_pTag, fiff_long_t pos = -1);
 
     //=========================================================================================================
     /**
@@ -599,16 +599,28 @@ public:
 
     //=========================================================================================================
     /**
+    * Writes directory position pointer FIFF_DIR_POINTER
+    * Returns the postion where the structure was written to.
+    *
+    * @param[in] dirpos     The directory position pointer
+    * @param[in] pos        the position where the directory pointer should be written to (default -1, i.e. end of the file)
+    * @param[in] next       Position of the next tag (default = FIFFV_NEXT_SEQ)
+    *
+    * @return the position where the directory position pointer was written to
+    */
+    fiff_long_t write_dir_pointer(fiff_int_t dirpos, fiff_long_t pos = -1, fiff_int_t next = FIFFV_NEXT_SEQ);
+
+    //=========================================================================================================
+    /**
     * Writes a list of dir entries to a fif file, as a FIFFT_DIR_ENTRY_STRUCT
     * Returns the postion where the structure was written to.
     *
     * @param[in] dir        The dir entries to write
-    *
-    * @return the position where the directory struct was written to
+    * @param[in] pos        the position where the entires should be written to (default -1, i.e. end of the file)
     *
     * @return the position where the directory entries struct was written to
     */
-    fiff_long_t write_dir_entries(const QList<FiffDirEntry::SPtr>& dir);
+    fiff_long_t write_dir_entries(const QList<FiffDirEntry::SPtr>& dir, fiff_long_t pos = -1);
 
     //=========================================================================================================
     /**
