@@ -1692,7 +1692,7 @@ bool MNEForwardSolution::read_one(FiffStream::SPtr& p_pStream, const FiffDirNode
     //
     //   Read all interesting stuff for one forward solution
     //
-    if(p_Node->isEmpty())
+    if(!p_Node)
         return false;
 
     one.clear();
