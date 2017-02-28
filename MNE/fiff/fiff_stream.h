@@ -97,6 +97,7 @@ class FiffProj;
 class FiffNamedMatrix;
 class FiffDigPoint;
 class FiffChInfo;
+class FiffChPos;
 class FiffCoordTrans;
 
 static FiffId defaultFiffId;
@@ -143,6 +144,31 @@ public:
 
     //=========================================================================================================
     /**
+    * Get the stream name
+    *
+    * @return the name of the current stream
+    */
+    QString streamName();
+
+    //=========================================================================================================
+    /**
+    * Returns the file identifier
+    *
+    * @return The file identifier
+    */
+    FiffId id() const;
+
+    //=========================================================================================================
+    /**
+    * Returns the directory compiled into a tree
+    * dir is set when open() was called.
+    *
+    * @return the directory
+    */
+    QList<FiffDirEntry::SPtr>& dir();
+
+    //=========================================================================================================
+    /**
     * Returns the directory compiled into a tree
     * dir is set when open() was called.
     *
@@ -152,12 +178,20 @@ public:
 
     //=========================================================================================================
     /**
+    * How many entries?
+    *
+    * @return The number of directory entries.
+    */
+    int nent() const;
+
+    //=========================================================================================================
+    /**
     * Returns the directory compiled into a tree
     * tree is set when open() was called.
     *
     * @return the compiled directory
     */
-    const FiffDirNode::SPtr& tree() const;
+    const FiffDirNode::SPtr& dirtree() const;
 
     //=========================================================================================================
     /**
@@ -165,16 +199,17 @@ public:
     *
     * Writes a FIFF_BLOCK_END tag
     *
-    * @param[in] kind The block kind to end
+    * @param[in] kind   The block kind to end
+    * @param[in] next   Position of the next tag (default = FIFFV_NEXT_SEQ)
+    *
+    * @return the position where the end block struct was written to
     */
-    void end_block(fiff_int_t kind);
+    fiff_long_t end_block(fiff_int_t kind, fiff_int_t next = FIFFV_NEXT_SEQ);
 
     //=========================================================================================================
     /**
-    * ### MNE toolbox root function ###: Implementation of the fiff_end_file function
-    *
     * Writes the closing tags to a fif file and closes the file
-    *
+    * Refactored: fiff_end_file (MNE-C); fiff_end_file (MNE-MATLAB)
     */
     void end_file();
 
@@ -210,16 +245,14 @@ public:
 
     //=========================================================================================================
     /**
-    * fiff_open
-    *
-    * ### MNE toolbox root function ###
+    * Opens a fif file and provides the directory of tags
     * Refactored: open_file (fiff_open.c)
     *
-    * Opens a fif file and provides the directory of tags
+    * @param [in] mode      The open mode (Default = ReadOnly)
     *
     * @return true if succeeded, false otherwise
     */
-    bool open();
+    bool open(QIODevice::OpenModeFlag mode = QIODevice::ReadOnly);
 
     //=========================================================================================================
     /**
@@ -230,6 +263,17 @@ public:
     * @return true if succeeded, false otherwise
     */
     bool close();
+
+    //=========================================================================================================
+    /**
+    * Create the directory tree structure
+    * Refactored: make_subtree (fiff_dir_tree.c), fiff_make_dir_tree (MATLAB)
+    *
+    * @param[in] dentry     The dir entries of which the tree should be constructed
+    *
+    * @return The created dir tree
+    */
+    FiffDirNode::SPtr make_subtree(QList<FiffDirEntry::SPtr>& dentry);
 
     //=========================================================================================================
     /**
@@ -326,19 +370,64 @@ public:
 
     //=========================================================================================================
     /**
-    * fiff_read_proj
-    *
-    * ### MNE toolbox root function ###
-    *
-    * [ projdata ] = fiff_read_proj(fid,node)
-    *
     * Read the SSP data under a given directory node
+    * Refactored: fiff_read_proj (MNE-MATLAB)
     *
     * @param[in] p_Node    The node of interest
     *
     * @return a list of SSP projectors
     */
     QList<FiffProj> read_proj(const FiffDirNode::SPtr& p_Node);
+
+    //=========================================================================================================
+    /**
+    * Read tag data from a fif file.
+    * if pos is not provided, reading starts from the current file position
+    * Refactored: fiff_read_tag (MNE-MATLAB)
+    *
+    * @param[out] p_pTag the read tag
+    * @param[in] pos position of the tag inside the fif file
+    *
+    * @return true if succeeded, false otherwise
+    */
+    bool read_tag_data(QSharedPointer<FiffTag>& p_pTag, fiff_long_t pos = -1);
+
+    //=========================================================================================================
+    /**
+    * Read tag information of one tag from a fif file.
+    * if pos is not provided, reading starts from the current file position
+    * Refactored: fiff_read_tag_info (MNE-MATLAB)
+    *
+    * @param[out] p_pTag the read tag info
+    * @param[in] p_bDoSkip if true it skips the data of the tag (optional, default = true)
+    *
+    * @return the position where the tag info was read from
+    */
+    fiff_long_t read_tag_info(QSharedPointer<FiffTag>& p_pTag, bool p_bDoSkip = true);
+
+    //=========================================================================================================
+    /**
+    * Read one tag from a fif real-time stream.
+    * difference to the other read tag functions is: that this function has blocking behaviour (waitForReadyRead)
+    *
+    * @param[out] p_pTag the read tag
+    *
+    * @return true if succeeded, false otherwise
+    */
+    bool read_rt_tag(QSharedPointer<FiffTag>& p_pTag);
+
+    //=========================================================================================================
+    /**
+    * Read one tag from a fif file.
+    * if pos is not provided, reading starts from the current file position
+    * Refactored: fiff_read_tag (MNE-MATLAB)
+    *
+    * @param[out] p_pTag the read tag
+    * @param[in] pos position of the tag inside the fif file
+    *
+    * @return true if succeeded, false otherwise
+    */
+    bool read_tag(QSharedPointer<FiffTag>& p_pTag, fiff_long_t pos = -1);
 
     //=========================================================================================================
     /**
@@ -372,31 +461,36 @@ public:
 
     //=========================================================================================================
     /**
-    * fiff_start_block
-    *
-    * ### MNE toolbox root function ###
-    *
-    * Wrapper for the FiffStream start_block member function
-    *
     * Writes a FIFF_BLOCK_START tag
+    * Refactored: fiff_start_block (MNE-C); fiff_start_block (MNE-MATLAB)
     *
     * @param[in] kind       The block kind to start
+    *
+    * @return the position where the start block struct was written to
     */
-    void start_block(fiff_int_t kind);
+    fiff_long_t start_block(fiff_int_t kind);
 
     //=========================================================================================================
     /**
-    * fiff_start_file
-    *
-    * ### MNE toolbox root function ###
-    *
     * Opens a fiff file for writing and writes the compulsory header tags
+    * Refactored: fiff_start_files (MNE-C); fiff_start_file (MNE-MATLAB)
     *
     * @param[in] p_IODevice    The IODevice (like QFile or QTCPSocket) to open. It is recommended that the name ends with .fif
     *
     * @return The opened file.
     */
     static FiffStream::SPtr start_file(QIODevice& p_IODevice);
+
+    //=========================================================================================================
+    /**
+    * Open fiff file for update
+    * Refactored: fiff_open_update (MNE-C)
+    *
+    * @param[in] p_IODevice    The IODevice (like QFile or QTCPSocket) to open. It is recommended that the name ends with .fif
+    *
+    * @return The opened file stream.
+    */
+    static FiffStream::SPtr open_update(QIODevice& p_IODevice);
 
     //=========================================================================================================
     /**
@@ -418,37 +512,50 @@ public:
 
     //=========================================================================================================
     /**
-    * Get the stream name
+    * Write one tag to file including its data
+    * Data is not written if it is NULL
+    * Refactored: fiff_write_tag, fiff_write_this_tag (MNE-C)
     *
-    * @return the name of the current stream
+    * @param[in] p_pTag     Tag to write;
+    * @param[in] pos        the position where the entires should be written to (default -1, i.e. end of the file)
+    *
+    * @return the position where the tag struct was written to
     */
-    QString streamName();
+    fiff_long_t write_tag(const QSharedPointer<FiffTag>& p_pTag, fiff_long_t pos = -1);
 
     //=========================================================================================================
     /**
-    * fiff_write_ch_info
-    *
-    * ### MNE toolbox root function ###
-    *
     * Writes a channel information record to a fif file
     * The type, cal, unit, and pos members are explained in Table 9.5
     * of the MNE manual
+    * Refactored: fiff_write_ch_info (MNE-C); fiff_write_ch_info (MNE-MATLAB)
     *
     * @param[in] ch     The channel information structure to write
+    *
+    * @return the position where the channel info struct was written to
     */
-    void write_ch_info(FiffChInfo* ch);
+    fiff_long_t write_ch_info(const FiffChInfo& ch);
 
     //=========================================================================================================
     /**
-    * fiff_write_coord_trans
+    * Writes a channel position to a fif file
     *
-    * ### MNE toolbox root function ###
+    * @param[in] chpos      Channel position structure to write
     *
+    * @return the position where the channel position struct was written to
+    */
+    fiff_long_t write_ch_pos(const FiffChPos& chpos);
+
+    //=========================================================================================================
+    /**
     * Writes a coordinate transformation structure
+    * Refactored: fiff_write_coord_trans (MNE-C); fiff_write_coord_trans (MNE-MATLAB)
     *
     * @param[in] trans  The coordinate transfomation structure
+    *
+    * @return the position where the coordinate transformation struct was written to
     */
-    void write_coord_trans(const FiffCoordTrans &trans);
+    fiff_long_t write_coord_trans(const FiffCoordTrans &trans);
 
     //=========================================================================================================
     /**
@@ -457,8 +564,10 @@ public:
     * ### MNE toolbox root function ###
     *
     * @param[in] p_FiffCov      The noise covariance matrix to write
+    *
+    * @return the position where the covaraince was written to
     */
-    void write_cov(const FiffCov &p_FiffCov);
+    fiff_long_t write_cov(const FiffCov &p_FiffCov);
 
     //=========================================================================================================
     /**
@@ -469,8 +578,10 @@ public:
     * Writes the CTF compensation data into a fif file
     *
     * @param[in] comps  The compensation data to write
+    *
+    * @return the position where the ctf compensators struct was written to
     */
-    void write_ctf_comp(const QList<FiffCtfComp>& comps);
+    fiff_long_t write_ctf_comp(const QList<FiffCtfComp>& comps);
 
     //=========================================================================================================
     /**
@@ -481,60 +592,85 @@ public:
     * Writes a digitizer data point into a fif file
     *
     * @param[in] dig        The point to write
+    *
+    * @return the position where the digitizer points struct was written to
     */
-    void write_dig_point(const FiffDigPoint& dig);
+    fiff_long_t write_dig_point(const FiffDigPoint& dig);
 
     //=========================================================================================================
     /**
-    * fiff_write_double
+    * Writes directory position pointer FIFF_DIR_POINTER
+    * Returns the postion where the structure was written to.
     *
-    * ### MNE toolbox root function ###
+    * @param[in] dirpos     The directory position pointer
+    * @param[in] pos        the position where the directory pointer should be written to (default -1, i.e. end of the file)
+    * @param[in] next       Position of the next tag (default = FIFFV_NEXT_SEQ)
     *
+    * @return the position where the directory position pointer was written to
+    */
+    fiff_long_t write_dir_pointer(fiff_int_t dirpos, fiff_long_t pos = -1, fiff_int_t next = FIFFV_NEXT_SEQ);
+
+    //=========================================================================================================
+    /**
+    * Writes a list of dir entries to a fif file, as a FIFFT_DIR_ENTRY_STRUCT
+    * Returns the postion where the structure was written to.
+    *
+    * @param[in] dir        The dir entries to write
+    * @param[in] pos        the position where the entires should be written to (default -1, i.e. end of the file)
+    *
+    * @return the position where the directory entries struct was written to
+    */
+    fiff_long_t write_dir_entries(const QList<FiffDirEntry::SPtr>& dir, fiff_long_t pos = -1);
+
+    //=========================================================================================================
+    /**
     * Writes a double-precision floating point tag to a fif file
+    * Refactored: fiff_write_double (MNE-MATLAB)
     *
     * @param[in] kind       Tag kind
     * @param[in] data       The float data pointer
     * @param[in] nel        Number of doubles to write (default = 1)
+    *
+    * @return the position where the double struct was written to
     */
-    void write_double(fiff_int_t kind, const double* data, fiff_int_t nel = 1);
+    fiff_long_t write_double(fiff_int_t kind, const double* data, fiff_int_t nel = 1);
 
     //=========================================================================================================
     /**
-    * fiff_write_id
-    *
-    * ### MNE toolbox root function ###
-    *
-    * Wrapper for the FiffStream write_id member function
-    *
     * Writes fiff id
     * If the id argument is missing it will be generated here
+    * Refactored: fiff_write_this_id (MNE-C); fiff_write_id (MNE-MATLAB)
     *
     * @param[in] kind       The tag kind
     * @param[in] id         The id to write
+    *
+    * @return the position where the file id struct was written to
     */
-    void write_id(fiff_int_t kind, const FiffId& id = defaultFiffId);
+    fiff_long_t write_id(fiff_int_t kind, const FiffId& id = defaultFiffId);
 
     //=========================================================================================================
     /**
     * Write measurement info stored in forward solution
     *
     * @param[in] p_FiffInfoBase     The measurement info.
+    *
+    * @return the position where the info base struct was written to
     */
-    void write_info_base(const FiffInfoBase & p_FiffInfoBase);
+    fiff_long_t write_info_base(const FiffInfoBase & p_FiffInfoBase);
 
     //=========================================================================================================
     /**
-    * fiff_write_int
-    *
-    * ### MNE toolbox root function ###
-    *
     * Writes a 32-bit integer tag to a fif file
+    * Refactored: fiff_write_int_tag (MNE-C); fiff_write_int (MNE-MATLAB)
     *
     * @param[in] kind       Tag kind
     * @param[in] data       The integer data pointer
     * @param[in] nel        Number of integers to write (default = 1)
+    * @param[in] next       Position of the next tag (default = FIFFV_NEXT_SEQ)
+    *
+    * @return the position where the int was written to
     */
-    void write_int(fiff_int_t kind, const fiff_int_t* data, fiff_int_t nel = 1);
+    fiff_long_t write_int(fiff_int_t kind, const fiff_int_t* data, fiff_int_t nel = 1, fiff_int_t next = FIFFV_NEXT_SEQ);
 
     //=========================================================================================================
     /**
@@ -546,35 +682,35 @@ public:
     *
     * @param[in] kind       The tag kind
     * @param[in] mat        The data matrix
+    *
+    * @return the position where the write_int_matrix was written to
     */
-    void write_int_matrix(fiff_int_t kind, const MatrixXi& mat);
+    fiff_long_t write_int_matrix(fiff_int_t kind, const MatrixXi& mat);
 
     //=========================================================================================================
     /**
-    * fiff_write_float
-    *
-    * ### MNE toolbox root function ###
-    *
     * Writes a single-precision floating point tag to a fif file
+    * Refactored: fiff_write_float_tag (MNE-C); fiff_write_float (MNE-MATLAB)
     *
     * @param[in] kind       Tag kind
     * @param[in] data       The float data pointer
     * @param[in] nel        Number of floats to write (default = 1)
+    *
+    * @return the position where the float struct was written to
     */
-    void write_float(fiff_int_t kind, const float* data, fiff_int_t nel = 1);
+    fiff_long_t write_float(fiff_int_t kind, const float* data, fiff_int_t nel = 1);
 
     //=========================================================================================================
     /**
-    * fiff_write_float_matrix
-    *
-    * ### MNE toolbox root function ###
-    *
     * Writes a single-precision floating-point matrix tag
+    * Refactored: fiff_write_float_matrix (MNE-C); fiff_write_float_matrix (MNE-MATLAB)
     *
     * @param[in] kind       The tag kind
     * @param[in] mat        The data matrix
+    *
+    * @return the position where the float matrix struct was written to
     */
-    void write_float_matrix(fiff_int_t kind, const MatrixXf& mat);
+    fiff_long_t write_float_matrix(fiff_int_t kind, const MatrixXf& mat);
 
     //=========================================================================================================
     /**
@@ -586,8 +722,10 @@ public:
     *
     * @param[in] kind       The tag kind
     * @param[in] mat        The data matrix
+    *
+    * @return the position where the float sparse ccs matrix struct was written to
     */
-    void write_float_sparse_ccs(fiff_int_t kind, const SparseMatrix<float>& mat);
+    fiff_long_t write_float_sparse_ccs(fiff_int_t kind, const SparseMatrix<float>& mat);
 
     //=========================================================================================================
     /**
@@ -599,8 +737,10 @@ public:
     *
     * @param[in] kind       The tag kind
     * @param[in] mat        The data matrix
+    *
+    * @return the position where the float sparse rcs matrix struct was written to
     */
-    void write_float_sparse_rcs(fiff_int_t kind, const SparseMatrix<float>& mat);
+    fiff_long_t write_float_sparse_rcs(fiff_int_t kind, const SparseMatrix<float>& mat);
 
     //=========================================================================================================
     /**
@@ -612,8 +752,10 @@ public:
     *
     * @param[in] kind       The tag kind
     * @param[in] data       An array of names to create the list from
+    *
+    * @return the position where the name list struct was written to
     */
-    void write_name_list(fiff_int_t kind, const QStringList& data);
+    fiff_long_t write_name_list(fiff_int_t kind, const QStringList& data);
 
     //=========================================================================================================
     /**
@@ -625,8 +767,10 @@ public:
     *
     * @param[in] kind       The tag kind to use for the data
     * @param[in] mat        The data matrix
+    *
+    * @return the position where the named matrix struct was written to
     */
-    void write_named_matrix(fiff_int_t kind, const FiffNamedMatrix& mat);
+    fiff_long_t write_named_matrix(fiff_int_t kind, const FiffNamedMatrix& mat);
 
     //=========================================================================================================
     /**
@@ -637,8 +781,10 @@ public:
     * Writes the projection data into a fif stream (file)
     *
     * @param[in] projs      The compensation data to write
+    *
+    * @return the position where the projector struct was written to
     */
-    void write_proj(const QList<FiffProj>& projs);
+    fiff_long_t write_proj(const QList<FiffProj>& projs);
 
     //=========================================================================================================
     /**
@@ -685,16 +831,15 @@ public:
 
     //=========================================================================================================
     /**
-    * fiff_write_string
-    *
-    * ### MNE toolbox root function ###
-    *
     * Writes a string tag
+    * Refactored: fiff_write_string_tag (MNE-C); fiff_write_string (MNE-MATLAB)
     *
     * @param[in] kind       The tag kind
     * @param[in] data       The string data to write
+    *
+    * @return the position where the string struct was written to
     */
-    void write_string(fiff_int_t kind, const QString& data);
+    fiff_long_t write_string(fiff_int_t kind, const QString& data);
 
     //=========================================================================================================
     /**
@@ -709,30 +854,50 @@ private:
     //=========================================================================================================
     /**
     * Check that the file starts properly.
-    *
     * Refactored: check_beginning (fiff_open.c)
+    *
+    * @param[out] p_pTag     The tag containing the beginning
     *
     * @return true if beginning is correct, false otherwise
     */
-    bool check_beginning();
+    bool check_beginning(QSharedPointer<FiffTag>& p_pTag);
+
+    //=========================================================================================================
+    /**
+    * Scan the tag list to create a directory
+    * Refactored: fiff_make_dir (fiff_dir.c)
+    *
+    * @param[out] ok    If a conversion error occurs, *ok is set to false; otherwise *ok is set to true.
+    *
+    * @return The created directory
+    */
+    QList<FiffDirEntry::SPtr> make_dir(bool *ok=Q_NULLPTR);
 
 private:
-    QList<FiffDirEntry::SPtr> m_dir; /**< This is the directory. If no directory exists, open automatically scans the file to create one. */
-    FiffDirNode::SPtr m_tree;        /**< Directory compiled into a tree */
 
-//    /** FIFF file handle returned by fiff_open(). */
-//    typedef struct _fiffFileRec {
-//      char         *file_name;	/**< Name of the file */
-//      FILE         *fd;		/**< The normal file descriptor */
-//      fiffId       id;		/**< The file identifier */
-//      fiffDirEntry dir;		/**< This is the directory.
-//                     * If no directory exists, fiff_open
-//                     * automatically scans the file to create one. */
-//      int         nent;	        /**< How many entries? */
-//      fiffDirNode dirtree;		/**< Directory compiled into a tree */
-//      char        *ext_file_name;	/**< Name of the file holding the external data */
-//      FILE        *ext_fd;		/**< The file descriptor of the above file if open  */
-//    } *fiffFile,fiffFileRec;	/**< FIFF file handle. fiff_open() returns this. */
+//    char         *file_name;    /**< Name of the file */ -> Use streamName() instead
+//    FILE         *fd;           /**< The normal file descriptor */ -> file descitpion is part of the stream: stream->device()
+    FiffId                      m_id;   /**< The file identifier */
+    QList<FiffDirEntry::SPtr>   m_dir;  /**< This is the directory. If no directory exists, open automatically scans the file to create one. */
+//    int         nent;           /**< How many entries? */ -> Use nent() instead
+    FiffDirNode::SPtr           m_dirtree; /**< Directory compiled into a tree */
+//    char        *ext_file_name; /**< Name of the file holding the external data */
+//    FILE        *ext_fd;        /**< The file descriptor of the above file if open  */
+
+// ### OLD STRUCT ###
+// /** FIFF file handle returned by fiff_open(). */
+//typedef struct _fiffFileRec {
+//    char         *file_name;    /**< Name of the file */ -> part of the Parent class of the QIODevice, wrapped by streamName function
+//    FILE         *fd;           /**< The normal file descriptor */
+//    fiffId       id;            /**< The file identifier */
+//    fiffDirEntry dir;           /**< This is the directory.
+//                                   * If no directory exists, fiff_open
+//                                   * automatically scans the file to create one. */
+//    int         nent;           /**< How many entries? */
+//    fiffDirNode dirtree;        /**< Directory compiled into a tree */
+//    char        *ext_file_name; /**< Name of the file holding the external data */
+//    FILE        *ext_fd;        /**< The file descriptor of the above file if open  */
+//} *fiffFile,fiffFileRec;        /**< FIFF file handle. fiff_open() returns this. */
 
 };
 
