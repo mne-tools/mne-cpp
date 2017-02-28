@@ -38,6 +38,7 @@ include(../../mne-cpp.pri)
 TEMPLATE = lib
 
 QT       -= gui
+QT       += concurrent
 
 DEFINES += INVERSE_LIBRARY
 
@@ -129,7 +130,19 @@ SOURCES += \
     dipoleFit/mne_ctf_comp_data_set.cpp \
     dipoleFit/mne_raw_info.cpp \
     dipoleFit/mne_raw_buf_def.cpp \
-    dipoleFit/mne_raw_data.cpp
+    dipoleFit/mne_raw_data.cpp \
+    dipoleFit/fwd_bem_model.cpp \
+    dipoleFit/fwd_bem_solution.cpp \
+    dipoleFit/mne_patch_info.cpp \
+    dipoleFit/mne_inverse_operator.cpp \
+    dipoleFit/mne_nearest.cpp \
+    dipoleFit/mne_triangle.cpp \
+    dipoleFit/mne_vol_geom.cpp \
+    dipoleFit/mne_source_space_old.cpp \
+    dipoleFit/mne_surface_old.cpp \
+    dipoleFit/fwd_comp_data.cpp \
+    dipoleFit/filter_thread_arg.cpp \
+    dipoleFit/fwd_thread_arg.cpp
 
 HEADERS +=\
     inverse_global.h \
@@ -170,7 +183,19 @@ HEADERS +=\
     dipoleFit/mne_ctf_comp_data_set.h \
     dipoleFit/mne_raw_info.h \
     dipoleFit/mne_raw_buf_def.h \
-    dipoleFit/mne_raw_data.h
+    dipoleFit/mne_raw_data.h \
+    dipoleFit/fwd_bem_model.h \
+    dipoleFit/fwd_bem_solution.h \
+    dipoleFit/mne_patch_info.h \
+    dipoleFit/mne_inverse_operator.h \
+    dipoleFit/mne_nearest.h \
+    dipoleFit/mne_triangle.h \
+    dipoleFit/mne_vol_geom.h \
+    dipoleFit/mne_source_space_old.h \
+    dipoleFit/mne_surface_old.h \
+    dipoleFit/fwd_comp_data.h \
+    dipoleFit/filter_thread_arg.h \
+    dipoleFit/fwd_thread_arg.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
@@ -179,6 +204,9 @@ INCLUDEPATH += $${MNE_INCLUDE_DIR}
 header_files.files = ./*.h
 header_files.path = $${MNE_INCLUDE_DIR}/inverse
 
+header_files_dipole_fit.files = ./dipoleFit/*.h
+header_files_dipole_fit.path = $${MNE_INCLUDE_DIR}/inverse/dipoleFit
+
 header_files_minimum_norm.files = ./minimumNorm/*.h
 header_files_minimum_norm.path = $${MNE_INCLUDE_DIR}/inverse/minimumNorm
 
@@ -186,6 +214,7 @@ header_files_rap_music.files = ./rapMusic/*.h
 header_files_rap_music.path = $${MNE_INCLUDE_DIR}/inverse/rapMusic
 
 INSTALLS += header_files
+INSTALLS += header_files_dipole_fit
 INSTALLS += header_files_minimum_norm
 INSTALLS += header_files_rap_music
 
@@ -207,6 +236,3 @@ win32 {
     #  warning($${DEPLOY_COMMAND} $${DEPLOY_TARGET})
     QMAKE_POST_LINK += $${DEPLOY_COMMAND} $${DEPLOY_TARGET}
 }
-
-DISTFILES += \
-    dipoleFit/dipolefit_helpers_bak.txt

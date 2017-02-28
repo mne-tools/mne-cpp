@@ -1209,7 +1209,7 @@ bool MNEForwardSolution::read(QIODevice& p_IODevice, MNEForwardSolution& fwd, bo
     //
     //   Find all forward solutions
     //
-    QList<FiffDirNode::SPtr> fwds = t_pStream->tree()->dir_tree_find(FIFFB_MNE_FORWARD_SOLUTION);
+    QList<FiffDirNode::SPtr> fwds = t_pStream->dirtree()->dir_tree_find(FIFFB_MNE_FORWARD_SOLUTION);
 
     if (fwds.size() == 0)
     {
@@ -1220,7 +1220,7 @@ bool MNEForwardSolution::read(QIODevice& p_IODevice, MNEForwardSolution& fwd, bo
     //
     //   Parent MRI data
     //
-    QList<FiffDirNode::SPtr> parent_mri = t_pStream->tree()->dir_tree_find(FIFFB_MNE_PARENT_MRI_FILE);
+    QList<FiffDirNode::SPtr> parent_mri = t_pStream->dirtree()->dir_tree_find(FIFFB_MNE_PARENT_MRI_FILE);
     if (parent_mri.size() == 0)
     {
         t_pStream->close();
@@ -1246,7 +1246,7 @@ bool MNEForwardSolution::read(QIODevice& p_IODevice, MNEForwardSolution& fwd, bo
     QStringList bads;
     if(bExcludeBads)
     {
-        bads = t_pStream->read_bad_channels(t_pStream->tree());
+        bads = t_pStream->read_bad_channels(t_pStream->dirtree());
         if(bads.size() > 0)
         {
             printf("\t%d bad channels ( ",bads.size());
@@ -1373,7 +1373,7 @@ bool MNEForwardSolution::read(QIODevice& p_IODevice, MNEForwardSolution& fwd, bo
     //
     // get parent MEG info -> from python package
     //
-    t_pStream->read_meas_info_base(t_pStream->tree(), fwd.info);
+    t_pStream->read_meas_info_base(t_pStream->dirtree(), fwd.info);
 
 
     t_pStream->close();
@@ -1692,7 +1692,7 @@ bool MNEForwardSolution::read_one(FiffStream::SPtr& p_pStream, const FiffDirNode
     //
     //   Read all interesting stuff for one forward solution
     //
-    if(p_Node->isEmpty())
+    if(!p_Node)
         return false;
 
     one.clear();

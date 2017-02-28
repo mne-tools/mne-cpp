@@ -241,6 +241,7 @@ void DipoleFitSettings::usage(char *name)
     printf("\t--dip     name    xfit dip format output file name\n");
     printf("\t--bdip    name    xfit bdip format output file name\n");
     printf("\nGeneral:\n\n");
+    printf("\t--gui             Enables the gui.\n");
     printf("\t--help            print this info.\n");
     printf("\t--version         print version info.\n\n");
     return;
@@ -273,7 +274,11 @@ bool DipoleFitSettings::check_args (int *argc,char **argv)
 
     for (int k = 0; k < *argc; k++) {
         found = 0;
-        if (strcmp(argv[k],"--version") == 0) {
+        if (strcmp(argv[k],"--gui") == 0) {
+            found = 1;
+            gui = true;
+        }
+        else if (strcmp(argv[k],"--version") == 0) {
             printf("%s version %s compiled at %s %s\n",
                    argv[0],PROGRAM_VERSION,__DATE__,__TIME__);
             exit(0);
