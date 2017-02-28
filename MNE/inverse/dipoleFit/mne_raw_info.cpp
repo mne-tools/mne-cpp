@@ -151,7 +151,7 @@ FiffDirNode::SPtr MneRawInfo::find_meas_info(const FiffDirNode::SPtr &node)
             return empty_node;
         tmp_node = tmp_node->parent;
     }
-    for (k = 0; k < tmp_node->nchild; k++)
+    for (k = 0; k < tmp_node->nchild(); k++)
         if (tmp_node->children[k]->type == FIFFB_MEAS_INFO)
             return (tmp_node->children[k]);
     return empty_node;
@@ -253,7 +253,7 @@ int MneRawInfo::get_meas_info(FiffStream::SPtr &stream, FiffDirNode::SPtr &node,
        */
     *lowpass  = -1;
     *highpass = -1;
-    for (k = 0; k < node->nent; k++) {
+    for (k = 0; k < node->nent(); k++) {
         kind = node->dir[k]->kind;
         pos  = node->dir[k]->pos;
         switch (kind) {
@@ -262,7 +262,7 @@ int MneRawInfo::get_meas_info(FiffStream::SPtr &stream, FiffDirNode::SPtr &node,
             //            if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
             //                goto bad;
             //            *nchan = *(int *)(tag.data);
-            if (!FiffTag::read_tag(stream,t_pTag,pos))
+            if (!stream->read_tag(t_pTag,pos))
                 goto bad;
             *nchan = *t_pTag->toInt();
             ch = MALLOC_33(*nchan,fiffChInfoRec);
@@ -275,7 +275,7 @@ int MneRawInfo::get_meas_info(FiffStream::SPtr &stream, FiffDirNode::SPtr &node,
             //            if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
             //                goto bad;
             //            *sfreq = *(float *)(tag.data);
-            if (!FiffTag::read_tag(stream,t_pTag,pos))
+            if (!stream->read_tag(t_pTag,pos))
                 goto bad;
             *sfreq = *t_pTag->toFloat();
             to_find--;
@@ -285,7 +285,7 @@ int MneRawInfo::get_meas_info(FiffStream::SPtr &stream, FiffDirNode::SPtr &node,
             //            if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
             //                goto bad;
             //            *lowpass = *(float *)(tag.data);
-            if (!FiffTag::read_tag(stream,t_pTag,pos))
+            if (!stream->read_tag(t_pTag,pos))
                 goto bad;
             *lowpass = *t_pTag->toFloat();
             to_find--;
@@ -295,7 +295,7 @@ int MneRawInfo::get_meas_info(FiffStream::SPtr &stream, FiffDirNode::SPtr &node,
             //            if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
             //                goto bad;
             //            *highpass = *(float *)(tag.data);
-            if (!FiffTag::read_tag(stream,t_pTag,pos))
+            if (!stream->read_tag(t_pTag,pos))
                 goto bad;
             *highpass = *t_pTag->toFloat();
             to_find--;
@@ -305,7 +305,7 @@ int MneRawInfo::get_meas_info(FiffStream::SPtr &stream, FiffDirNode::SPtr &node,
             //            if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
             //                goto bad;
             //            this_ch = (fiffChInfo)(tag.data);
-            if (!FiffTag::read_tag(stream,t_pTag,pos))
+            if (!stream->read_tag(t_pTag,pos))
                 goto bad;
             this_ch = (fiffChInfo)t_pTag->data();
             if (this_ch->scanNo <= 0 || this_ch->scanNo > *nchan) {
@@ -321,7 +321,7 @@ int MneRawInfo::get_meas_info(FiffStream::SPtr &stream, FiffDirNode::SPtr &node,
         case FIFF_MEAS_DATE :
             //            if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
             //                goto bad;
-            if (!FiffTag::read_tag(stream,t_pTag,pos))
+            if (!stream->read_tag(t_pTag,pos))
                 goto bad;
             if (*start_time)
                 FREE_33(*start_time);
@@ -334,7 +334,7 @@ int MneRawInfo::get_meas_info(FiffStream::SPtr &stream, FiffDirNode::SPtr &node,
             //            if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
             //                goto bad;
             //            t = (fiffCoordTrans)tag.data;
-            if (!FiffTag::read_tag(stream,t_pTag,pos))
+            if (!stream->read_tag(t_pTag,pos))
                 goto bad;
             t = FiffCoordTransOld::read_helper( t_pTag );
             /*
@@ -359,12 +359,12 @@ int MneRawInfo::get_meas_info(FiffStream::SPtr &stream, FiffDirNode::SPtr &node,
 
     //    FREE_33(hpi);
     if (hpi.size() > 0 && *trans == NULL)
-        for (k = 0; k < hpi[0]->nent; k++)
+        for (k = 0; k < hpi[0]->nent(); k++)
             if (hpi[0]->dir[k]->kind ==  FIFF_COORD_TRANS) {
                 //                if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
                 //                    goto bad;
                 //                t = (fiffCoordTrans)tag.data;
-                if (!FiffTag::read_tag(stream,t_pTag,hpi[0]->dir[k]->pos))
+                if (!stream->read_tag(t_pTag,hpi[0]->dir[k]->pos))
                     goto bad;
                 t = FiffCoordTransOld::read_helper( t_pTag );
                 /*
@@ -436,10 +436,10 @@ int MneRawInfo::mne_load_raw_info(char *name, int allow_maxshield, MneRawInfo **
     //        goto out;
     if(!stream->open())
         goto out;
-    raw = find_raw(stream->tree());
+    raw = find_raw(stream->dirtree());
     if (raw->isEmpty()) {
         if (allow_maxshield) {
-            raw = find_maxshield(stream->tree());
+            raw = find_maxshield(stream->dirtree());
             if (raw->isEmpty()) {
                 printf("No raw data in this file.");
                 goto out;
@@ -497,7 +497,7 @@ int MneRawInfo::mne_load_raw_info(char *name, int allow_maxshield, MneRawInfo **
     }
     info->buf_size   = 0;
     //    for (k = 0, one = raw->dir; k < raw->nent; k++, one++) {
-    for (k = 0; k < raw->nent; k++) {
+    for (k = 0; k < raw->nent(); k++) {
         //        raw->dir[k]->kind
         //                raw->dir[k]->type
         //                raw->dir[k].size
@@ -520,7 +520,7 @@ int MneRawInfo::mne_load_raw_info(char *name, int allow_maxshield, MneRawInfo **
         goto out;
     }
     info->rawDir     = rawDir;
-    info->ndir       = raw->nent;
+    info->ndir       = raw->nent();
     *infop = info;
     res = FIFF_OK;
 

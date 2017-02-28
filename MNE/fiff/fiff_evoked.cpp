@@ -186,7 +186,7 @@ bool FiffEvoked::read(QIODevice& p_IODevice, FiffEvoked& p_FiffEvoked, QVariant 
     //
     FiffInfo info;
     FiffDirNode::SPtr meas;
-    if(!t_pStream->read_meas_info(t_pStream->tree(), info, meas))
+    if(!t_pStream->read_meas_info(t_pStream->dirtree(), info, meas))
         return false;
     info.filename = t_sFileName; //move fname storage to read_meas_info member function
     //
@@ -286,34 +286,34 @@ bool FiffEvoked::read(QIODevice& p_IODevice, FiffEvoked& p_FiffEvoked, QVariant 
     FiffTag::SPtr t_pTag;
     QString comment("");
     qint32 k;
-    for (k = 0; k < my_evoked->nent; ++k)
+    for (k = 0; k < my_evoked->nent(); ++k)
     {
         kind = my_evoked->dir[k]->kind;
         pos  = my_evoked->dir[k]->pos;
         switch (kind)
         {
             case FIFF_COMMENT:
-                FiffTag::read_tag(t_pStream,t_pTag,pos);
+                t_pStream->read_tag(t_pTag,pos);
                 comment = t_pTag->toString();
                 break;
             case FIFF_FIRST_SAMPLE:
-                FiffTag::read_tag(t_pStream,t_pTag,pos);
+                t_pStream->read_tag(t_pTag,pos);
                 first = *t_pTag->toInt();
                 break;
             case FIFF_LAST_SAMPLE:
-                FiffTag::read_tag(t_pStream,t_pTag,pos);
+                t_pStream->read_tag(t_pTag,pos);
                 last = *t_pTag->toInt();
                 break;
             case FIFF_NCHAN:
-                FiffTag::read_tag(t_pStream,t_pTag,pos);
+                t_pStream->read_tag(t_pTag,pos);
                 nchan = *t_pTag->toInt();
                 break;
             case FIFF_SFREQ:
-                FiffTag::read_tag(t_pStream,t_pTag,pos);
+                t_pStream->read_tag(t_pTag,pos);
                 sfreq = *t_pTag->toFloat();
                 break;
             case FIFF_CH_INFO:
-                FiffTag::read_tag(t_pStream, t_pTag, pos);
+                t_pStream->read_tag(t_pTag, pos);
                 chs.append( t_pTag->toChInfo() );
                 break;
         }
@@ -354,7 +354,7 @@ bool FiffEvoked::read(QIODevice& p_IODevice, FiffEvoked& p_FiffEvoked, QVariant 
     fiff_int_t aspect_kind = -1;
     fiff_int_t nave = -1;
     QList<FiffTag> epoch;
-    for (k = 0; k < my_aspect->nent; ++k)
+    for (k = 0; k < my_aspect->nent(); ++k)
     {
         kind = my_aspect->dir[k]->kind;
         pos  = my_aspect->dir[k]->pos;
@@ -362,19 +362,19 @@ bool FiffEvoked::read(QIODevice& p_IODevice, FiffEvoked& p_FiffEvoked, QVariant 
         switch (kind)
         {
             case FIFF_COMMENT:
-                FiffTag::read_tag(t_pStream, t_pTag, pos);
+                t_pStream->read_tag(t_pTag, pos);
                 comment = t_pTag->toString();
                 break;
             case FIFF_ASPECT_KIND:
-                FiffTag::read_tag(t_pStream, t_pTag, pos);
+                t_pStream->read_tag(t_pTag, pos);
                 aspect_kind = *t_pTag->toInt();
                 break;
             case FIFF_NAVE:
-                FiffTag::read_tag(t_pStream, t_pTag, pos);
+                t_pStream->read_tag(t_pTag, pos);
                 nave = *t_pTag->toInt();
                 break;
             case FIFF_EPOCH:
-                FiffTag::read_tag(t_pStream, t_pTag, pos);
+                t_pStream->read_tag(t_pTag, pos);
                 epoch.append(FiffTag(t_pTag.data()));
                 break;
         }

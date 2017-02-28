@@ -137,6 +137,7 @@
 /bin/mne_lib_tests
 /bin/mne_rt_server
 /bin/mne_rt_tests
+/bin/mne_forward_solution
 /bin/plotSurfaces
 /bin/readFwdDisp3D
 /bin/mne_scan.app/Contents/MacOS/mne_scan
@@ -177,6 +178,9 @@
 /bin/test_mne_rtd
 /bin/test_mne_stcd
 /bin/test_mne_surfaced
+/bin/ex_disp
+/bin/ex_dispd
+/bin/mne_forward_solutiond
 /bin/mne_scan_default.xml
 /bin/mne_scan_plugins/resources/babymeg/ERio_P8.fif.gz
 /bin/iconengines/*.dll

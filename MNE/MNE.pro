@@ -37,6 +37,7 @@ include(../mne-cpp.pri)
 
 TEMPLATE = subdirs
 
+# TBD change the dependency order - forward before inverse
 SUBDIRS += \
     generics \
     utils \
@@ -44,6 +45,7 @@ SUBDIRS += \
     fiff \
     mne \
     inverse \
+    fwd \
     connectivity \
     rtCommand \
     rtClient \

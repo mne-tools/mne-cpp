@@ -134,7 +134,7 @@ typedef struct {
 
 typedef struct {		                     /* This is used for field mapping with help of the sphere-model MNE */
   int          kind;				     /* Either FIELD_MAP_MEG or FIELD_MAP_EEG */
-  INVERSELIB::MneSurfaceOrVolume::MneCSurface*   surf;		                     /* The surface on which we are mapping */
+  INVERSELIB::MneSurfaceOld*   surf;		                     /* The surface on which we are mapping */
   char         *surfname;	                     /* The name of the file where the above surface came from */
   int          *surface_sel;			     /* We may calculate the interpolation only in a subset of vertices */
   int          nsurface_sel;			     /* How many points in the above */
