@@ -95,11 +95,10 @@ qint32 RtDataClient::getClientId()
         QString t_sCommand("");
         t_fiffStream.write_rt_command(1, t_sCommand);
 
-
         this->waitForReadyRead(100);
         // ID is send as answer
         FiffTag::SPtr t_pTag;
-        FiffTag::read_tag(&t_fiffStream, t_pTag);
+        t_fiffStream.read_tag(t_pTag);
         if (t_pTag->kind == FIFF_MNE_RT_CLIENT_ID)
             m_clientID = *t_pTag->toInt();
     }
@@ -123,7 +122,7 @@ FiffInfo::SPtr RtDataClient::readInfo()
     FiffTag::SPtr t_pTag;
     while(!t_bReadMeasBlockStart)
     {
-        FiffTag::read_rt_tag(&t_fiffStream, t_pTag);
+        t_fiffStream.read_rt_tag(t_pTag);
         if(t_pTag->kind == FIFF_BLOCK_START && *(t_pTag->toInt()) == FIFFB_MEAS_INFO)
         {
             printf("FIFF_BLOCK_START FIFFB_MEAS_INFO\n");
@@ -140,7 +139,7 @@ FiffInfo::SPtr RtDataClient::readInfo()
 
     while(!t_bReadMeasBlockEnd)
     {
-        FiffTag::read_rt_tag(&t_fiffStream, t_pTag);
+        t_fiffStream.read_rt_tag(t_pTag);
         //
         //  megacq parameters
         //
@@ -148,7 +147,7 @@ FiffInfo::SPtr RtDataClient::readInfo()
         {
             while(t_pTag->kind != FIFF_BLOCK_END || *(t_pTag->toInt()) != FIFFB_DACQ_PARS)
             {
-                FiffTag::read_rt_tag(&t_fiffStream, t_pTag);
+                t_fiffStream.read_rt_tag(t_pTag);
                 if(t_pTag->kind == FIFF_DACQ_PARS)
                     p_pFiffInfo->acq_pars = t_pTag->toString();
                 else if(t_pTag->kind == FIFF_DACQ_STIM)
@@ -178,7 +177,7 @@ FiffInfo::SPtr RtDataClient::readInfo()
         {
             while(t_pTag->kind != FIFF_BLOCK_END || *(t_pTag->toInt()) != FIFFB_ISOTRAK)
             {
-                FiffTag::read_rt_tag(&t_fiffStream, t_pTag);
+                t_fiffStream.read_rt_tag(t_pTag);
 
                 if(t_pTag->kind == FIFF_DIG_POINT)
                     p_pFiffInfo->dig.append(t_pTag->toDigPoint());
@@ -191,14 +190,14 @@ FiffInfo::SPtr RtDataClient::readInfo()
         {
             while(t_pTag->kind != FIFF_BLOCK_END || *(t_pTag->toInt()) != FIFFB_PROJ)
             {
-                FiffTag::read_rt_tag(&t_fiffStream, t_pTag);
+                t_fiffStream.read_rt_tag(t_pTag);
                 if(t_pTag->kind == FIFF_BLOCK_START && *(t_pTag->toInt()) == FIFFB_PROJ_ITEM)
                 {
                     FiffProj proj;
                     qint32 countProj = p_pFiffInfo->projs.size();
                     while(t_pTag->kind != FIFF_BLOCK_END || *(t_pTag->toInt()) != FIFFB_PROJ_ITEM)
                     {
-                        FiffTag::read_rt_tag(&t_fiffStream, t_pTag);
+                        t_fiffStream.read_rt_tag(t_pTag);
                         switch (t_pTag->kind)
                         {
                         case FIFF_NAME: // First proj -> Proj is created
@@ -244,14 +243,14 @@ FiffInfo::SPtr RtDataClient::readInfo()
         {
             while(t_pTag->kind != FIFF_BLOCK_END || *(t_pTag->toInt()) != FIFFB_MNE_CTF_COMP)
             {
-                FiffTag::read_rt_tag(&t_fiffStream, t_pTag);
+                t_fiffStream.read_rt_tag(t_pTag);
                 if(t_pTag->kind == FIFF_BLOCK_START && *(t_pTag->toInt()) == FIFFB_MNE_CTF_COMP_DATA)
                 {
                     FiffCtfComp comp;
                     qint32 countComp = p_pFiffInfo->comps.size();
                     while(t_pTag->kind != FIFF_BLOCK_END || *(t_pTag->toInt()) != FIFFB_MNE_CTF_COMP_DATA)
                     {
-                        FiffTag::read_rt_tag(&t_fiffStream, t_pTag);
+                        t_fiffStream.read_rt_tag(t_pTag);
                         switch (t_pTag->kind)
                         {
                         case FIFF_MNE_CTF_COMP_KIND: //First comp -> create comp
@@ -307,7 +306,7 @@ FiffInfo::SPtr RtDataClient::readInfo()
         {
             while(t_pTag->kind != FIFF_BLOCK_END || *(t_pTag->toInt()) != FIFFB_MNE_BAD_CHANNELS)
             {
-                FiffTag::read_rt_tag(&t_fiffStream, t_pTag);
+                t_fiffStream.read_rt_tag(t_pTag);
                 if(t_pTag->kind == FIFF_MNE_CH_NAME_LIST)
                     p_pFiffInfo->bads = FiffStream::split_name_list(t_pTag->data());
             }
@@ -369,7 +368,7 @@ void RtDataClient::readRawBuffer(qint32 p_nChannels, MatrixXf& data, fiff_int_t&
     //
     FiffTag::SPtr t_pTag;
 
-    FiffTag::read_rt_tag(&t_fiffStream, t_pTag);
+    t_fiffStream.read_rt_tag(t_pTag);
 
     kind = t_pTag->kind;
 

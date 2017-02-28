@@ -3,8 +3,8 @@
 </div>
 -----------------
 
-|  **`Windows`**   |  **`Linux / OS X`** | **`Dynamic Testing`** |  **`Static Testing`** |  **`Support`** |  **`Cite`** |
-|------------------|---------------------|-----------------------|-----------------------|----------------|-------------|
+| **`Windows`** | **`Linux / macOS`** | **`Dynamic Testing`** | **`Static Analysis`** | **`Support`** | **`Cite`** |
+|---------------|---------------------|-----------------------|-----------------------|---------------|------------|
 | [![AppVeyor](https://ci.appveyor.com/api/projects/status/b63nawx8mnmmr9rv?svg=true)](https://ci.appveyor.com/project/chdinh/mne-cpp) | [![Travis](https://api.travis-ci.org/mne-tools/mne-cpp.png?branch=master)](https://travis-ci.org/mne-tools/mne-cpp) | [![CodeCov](https://codecov.io/gh/mne-tools/mne-cpp/branch/master/graph/badge.svg)](https://codecov.io/gh/mne-tools/mne-cpp) | [![Coverity](https://scan.coverity.com/projects/8955/badge.svg)](https://scan.coverity.com/projects/mne-tools-mne-cpp) | [![Gitter](https://badges.gitter.im/mne-tools/mne-cpp.svg)](https://gitter.im/mne-tools/mne-cpp?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) | [![DOI](https://zenodo.org/badge/8729/mne-tools/mne-cpp.svg)](http://dx.doi.org/10.5281/zenodo.17216) |
 
 Cross-platform medical (real-time) applications for EEG and MEG data analysis.
@@ -27,17 +27,9 @@ If you want to contribute to MNE-CPP you can find all necessary information [her
 Requirements
 ------------
 
-**Windows**
-
-\>= MSVC 2015
-
-**Linux**
-
-\>= gcc 4.9.1
-
-**macOS**
-
-\>= Clang 3.5
+| **`Windows`** | **`Linux`** | **`macOS`** |
+|---------------|-------------|-------------|
+| [>= MSVC 2015](https://www.visualstudio.com/downloads/) | [>= GCC 4.9.1](https://gcc.gnu.org/releases.html) | [>= Clang 3.5](https://developer.apple.com/xcode/) |
 
 
 Dependencies
@@ -57,7 +49,7 @@ Mailing List: http://mail.nmr.mgh.harvard.edu/mailman/listinfo/mne_analysis
 Releases
 --------
 
-[1.0.0](http://wiki.mne-cpp.org/index.php/ChangeLog)
+Get the latest Release Code from the [MNE-CPP Releases page](https://github.com/mne-tools/mne-cpp/releases) or the Binaries from the [MNE-CPP Download page](http://www.mne-cpp.org/index.php/download/).
 
 
 License

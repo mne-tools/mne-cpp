@@ -103,7 +103,7 @@ FiffCov::FiffCov(QIODevice &p_IODevice)
         return;
     }
 
-    if(!t_pStream->read_cov(t_pStream->tree(), FIFFV_MNE_NOISE_COV, *this))
+    if(!t_pStream->read_cov(t_pStream->dirtree(), FIFFV_MNE_NOISE_COV, *this))
         printf("\tFiff covariance not found.\n");//ToDo Throw here
 }
 

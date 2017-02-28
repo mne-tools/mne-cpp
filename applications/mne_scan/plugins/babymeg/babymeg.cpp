@@ -1016,7 +1016,7 @@ bool BabyMEG::readProjectors()
     if(!t_pStream->open())
         return false;
 
-    QList<FiffProj> q_ListProj = t_pStream->read_proj(t_pStream->tree());
+    QList<FiffProj> q_ListProj = t_pStream->read_proj(t_pStream->dirtree());
 
     //Set all projectors to zero
     for(int i = 0; i<q_ListProj.size(); i++)
@@ -1054,7 +1054,7 @@ bool BabyMEG::readCompensators()
     if(!t_pStream->open())
         return false;
 
-    QList<FiffCtfComp> q_ListComp = t_pStream->read_ctf_comp(t_pStream->tree(), m_pFiffInfo->chs);
+    QList<FiffCtfComp> q_ListComp = t_pStream->read_ctf_comp(t_pStream->dirtree(), m_pFiffInfo->chs);
 
     if (q_ListComp.size() == 0)
     {
