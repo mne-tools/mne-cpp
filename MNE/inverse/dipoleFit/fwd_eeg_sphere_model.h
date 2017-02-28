@@ -140,9 +140,8 @@ public:
 
     //=========================================================================================================
     /**
-    * dipole_fit_setup.c
-    *
     * Set up the desired sphere model for EEG
+    * Refactored: setup_eeg_sphere_model (dipole_fit_setup.c)
     *
     * @param[in] eeg_model_file     Contains the model specifications
     * @param[in] eeg_model_name     Name of the model to use
@@ -163,17 +162,11 @@ public:
 
 
 
-
-
-
-
-
-
-
     //=========================================================================================================
     /**
     * fwd_multi_spherepot.c
     * Get the model depended weighting factor for n
+    * Refactored: fwd_eeg_get_multi_sphere_model_coeff (fwd_multi_spherepot.c)
     *
     * @param[in] n  coefficient to which the expansion shopuld be calculated
     *
@@ -182,10 +175,44 @@ public:
     double fwd_eeg_get_multi_sphere_model_coeff(int n);
 
 
+
+
+    static void next_legen (int n,
+                double x,
+                double *p0,         /* Input: P0(n-1) Output: P0(n) */
+                double *p01,        /* Input: P0(n-2) Output: P0(n-1) */
+                double *p1,	    /* Input: P1(n-1) Output: P1(n) */
+                double *p11);
+
+    static void calc_pot_components(double beta,   /* rd/r */
+                    double cgamma, /* Cosine of the angle between
+                            * the source and field points */
+                    double *Vrp,   /* Potential component for the radial dipole */
+                    double *Vtp,   /* Potential component for the tangential dipole */
+                    const Eigen::VectorXd& fn,
+                    int    nterms);
+
+    static int fwd_eeg_multi_spherepot(float   *rd,	          /* Dipole position */
+                       float   *Q,	          /* Dipole moment */
+                       float   **el,	  /* Electrode positions */
+                       int     neeg,	  /* Number of electrodes */
+                       float   *Vval,         /* The potential values */
+                       void    *client);
+
+
+
+
+    static int fwd_eeg_multi_spherepot_coil1(float *rd,    /* Dipole position */
+                      float      *Q,                /* Dipole moment */
+                      FwdCoilSet* els,              /* Electrode positions */
+                      float      *Vval,             /* The potential values */
+                      void       *client);
+
+
+
+
     //=========================================================================================================
     /**
-    * fwd_multi_spherepot.c
-    *
     * Compute the electric potentials in a set of electrodes in spherically
     * Symmetric head model. This routine calculates the fields for all
     * dipole directions.
@@ -198,6 +225,8 @@ public:
     *
     * This routine uses the acceleration with help of equivalent sources
     * in the homogeneous sphere.
+    *
+    * Refactored: fwd_eeg_spherepot_vec (fwd_multi_spherepot.c)
     *
     *
     * @param[in] rd         Dipole position
@@ -228,6 +257,22 @@ public:
     * @return true when successful
     */
     static int fwd_eeg_spherepot_coil_vec(float *rd, FwdCoilSet* els, float **Vval_vec, void *client);
+
+
+
+
+
+
+    static int fwd_eeg_spherepot_grad_coil( float        *rd,      /* The dipole location */
+                                            float        Q[],      /* The dipole components (xyz) */
+                                            FwdCoilSet*  coils,    /* The coil definitions */
+                                            float        Vval[],   /* Results */
+                                            float        xgrad[],  /* The derivatives with respect to */
+                                            float        ygrad[],  /* the dipole position coordinates */
+                                            float        zgrad[],
+                                            void         *client);
+
+
 
     //=========================================================================================================
     /**

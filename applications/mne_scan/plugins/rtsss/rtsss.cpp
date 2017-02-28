@@ -324,7 +324,7 @@ void RtSss::run()
     //Find index vector for wanted meg channels
     QStringList exclude;
     for(int i = 0; i < m_pFiffInfo->chs.size(); i++) {
-        if(m_pFiffInfo->chs.at(i).coil_type != FIFFV_COIL_BABY_MAG)
+        if(m_pFiffInfo->chs.at(i).chpos.coil_type != FIFFV_COIL_BABY_MAG)
             exclude<<m_pFiffInfo->chs.at(i).ch_name;
     }
 

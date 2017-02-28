@@ -129,8 +129,8 @@ int main(int argc, char *argv[])
 
     for(qint32 i=0; i < p_FiffEvokedSet.info.nchan-1; ++i) {
         //First check the coil types
-        coil1 = p_FiffEvokedSet.info.chs.at(i).coil_type;
-        coil2 = p_FiffEvokedSet.info.chs.at(i+1).coil_type;
+        coil1 = p_FiffEvokedSet.info.chs.at(i).chpos.coil_type;
+        coil2 = p_FiffEvokedSet.info.chs.at(i+1).chpos.coil_type;
         if (coil1 == coil2 && (coil1 == 2 || coil1 == 3012 || coil1 == 3013)) {
             one = p_FiffEvokedSet.info.ch_names[i];
             two = p_FiffEvokedSet.info.ch_names[i+1];

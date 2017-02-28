@@ -114,7 +114,7 @@ public:
     * @param [in] location2D holds the vector to which the read 2D positions are stored.
     * @return true if reading was successful, false otherwise.
     */
-    static bool readAsaElcFile(const QString &path, QStringList &channelNames, QList<QVector<double> > &location3D, QList<QVector<double> > &location2D, QString &unit);
+    static bool readAsaElcFile(const QString &path, QStringList &channelNames, QList<QVector<float> > &location3D, QList<QVector<float> > &location2D, QString &unit);
 
     //=========================================================================================================
     /**
