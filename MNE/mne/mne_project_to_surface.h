@@ -83,6 +83,7 @@ namespace MNELIB {
 class MNEBemSurface;
 class MNESurface;
 
+//TODO this needs to be removed - this has to be a function not a class!!!
 
 //=============================================================================================================
 /**

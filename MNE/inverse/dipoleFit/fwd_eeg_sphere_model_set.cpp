@@ -41,13 +41,6 @@
 
 #include "fwd_eeg_sphere_model_set.h"
 
-//ToDo don't use access and unlink -> use Qt stuff instead
-#if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
-#include <io.h>
-#else
-#include <unistd.h>
-#endif
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -55,6 +48,8 @@
 //=============================================================================================================
 
 #include <QString>
+#include <QFile>
+
 
 #include <Eigen/Core>
 
@@ -89,11 +84,6 @@ using namespace Eigen;
 
 
 #define SEP ":\n\r"
-
-#ifndef R_OK
-#define R_OK    4       /* Test for read permission.  */
-#endif
-
 
 
 char *mne_strdup_2(const char *s)
@@ -218,13 +208,10 @@ FwdEegSphereModelSet* FwdEegSphereModelSet::fwd_load_eeg_sphere_models(const QSt
     if (filename.isEmpty())
         return now;
 
-#if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
-    if (_access(filename.toLatin1().data(),R_OK) != OK)	/* Never mind about an unaccesible file */
+    QFile t_file(filename);
+    if (!t_file.isReadable())	/* Never mind about an unaccesible file */
         return now;
-#else
-    if (access(filename.toLatin1().data(),R_OK) != OK)	/* Never mind about an unaccesible file */
-        return now;
-#endif
+
 
     if ((fp = fopen(filename.toLatin1().data(),"r")) == NULL) {
         printf(filename.toLatin1().data());

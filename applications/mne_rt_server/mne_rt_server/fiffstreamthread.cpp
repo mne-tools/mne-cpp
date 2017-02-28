@@ -360,7 +360,7 @@ void FiffStreamThread::run()
         {
 //            qDebug() << "goes to read bytes " ;
             FiffTag::SPtr t_pTag;
-            FiffTag::read_tag_info(&t_FiffStreamIn, t_pTag, false);
+            t_FiffStreamIn.read_tag_info(t_pTag, false);
 
             //
             // wait until tag size data are available and read the data
@@ -369,7 +369,7 @@ void FiffStreamThread::run()
             {
                 t_qTcpSocket.waitForReadyRead(10);
             }
-            FiffTag::read_tag_data(&t_FiffStreamIn, t_pTag);
+            t_FiffStreamIn.read_tag_data(t_pTag);
 
             //
             // Parse the tag

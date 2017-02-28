@@ -216,6 +216,12 @@ namespace FIFFLIB
 * functions to test type properties.
 */
 
+
+#define FIFFC_MAJOR_VERSION 1L
+#define FIFFC_MINOR_VERSION 3L
+
+#define FIFFC_VERSION (FIFFC_MAJOR_VERSION<<16 | FIFFC_MINOR_VERSION)
+
 /*
 * Constants for types
 */

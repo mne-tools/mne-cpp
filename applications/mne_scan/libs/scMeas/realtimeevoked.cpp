@@ -113,7 +113,7 @@ void RealTimeEvoked::init(FiffInfo::SPtr p_fiffInfo)
         initChInfo.setKind(p_fiffInfo->chs[i].kind);
 
         // set channel coil
-        initChInfo.setCoil(p_fiffInfo->chs[i].coil_type);
+        initChInfo.setCoil(p_fiffInfo->chs[i].chpos.coil_type);
 
         m_qListChInfo.append(initChInfo);
     }
