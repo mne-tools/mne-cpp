@@ -121,6 +121,7 @@
 #include "mne_cov_matrix.h"
 #include "mne_ctf_comp_data.h"
 #include "mne_ctf_comp_data_set.h"
+#include "mne_patch_info.h"
 
 
 #if defined(__cplusplus) 
@@ -128,18 +129,18 @@ extern "C" {
 #endif
 
 
-namespace INVERSELIB {
-    class MneSurfaceOrVolume;
+//namespace INVERSELIB {
+//    class MneSurfaceOrVolume {
+//        /*
+//         * These are the aliases
+//         */
+//        typedef MneSurfaceOrVolume MneCSourceSpace;
+//        //typedef mneSurfaceOrVolume mneSourceVolume;
+//        typedef MneSurfaceOrVolume MneCSurface;
+//        //typedef mneSurfaceOrVolume mneVolume;
+//    }
 
-    /*
-     * These are the aliases
-     */
-    typedef MneSurfaceOrVolume MneCSourceSpace;
-    //typedef mneSurfaceOrVolume mneSourceVolume;
-    typedef MneSurfaceOrVolume MneCSurface;
-    //typedef mneSurfaceOrVolume mneVolume;
-
-}
+//}
 
 
 ///*
@@ -159,40 +160,40 @@ typedef void (*mneUserFreeFunc)(void *);  /* General purpose */
 //typedef FIFFLIB::fiffSparseMatrix mneSparseMatrix;
 //typedef FIFFLIB::fiffSparseMatrixRec mneSparseMatrixRec;
 
-typedef struct {
-  int   vert;			/* Which vertex does this apply to */
-  int   *memb_vert;		/* Which vertices constitute the patch? */
-  int   nmemb;			/* How many? */
-  float area;			/* Area of the patch */
-  float ave_nn[3];		/* Average normal */
-  float dev_nn;			/* Average deviation of the patch normals from the average normal */
-} *mnePatchInfo,mnePatchInfoRec;
+//typedef struct {
+//    int   vert;             /* Which vertex does this apply to */
+//    int   *memb_vert;       /* Which vertices constitute the patch? */
+//    int   nmemb;            /* How many? */
+//    float area;             /* Area of the patch */
+//    float ave_nn[3];        /* Average normal */
+//    float dev_nn;           /* Average deviation of the patch normals from the average normal */
+//} *mnePatchInfo,mnePatchInfoRec;
 
-typedef struct {		/* This is used in the patch definitions */
-  int   vert;			/* Number of this vertex (to enable sorting) */
-  int   nearest;		/* Nearest 'inuse' vertex */
-  float dist;	                /* Distance to the nearest 'inuse' vertex */
-  mnePatchInfo patch;           /* The patch information record for the patch this vertex belongs to */
-} *mneNearest,mneNearestRec;
+//typedef struct {        /* This is used in the patch definitions */
+//    int   vert;         /* Number of this vertex (to enable sorting) */
+//    int   nearest;      /* Nearest 'inuse' vertex */
+//    float dist;         /* Distance to the nearest 'inuse' vertex */
+//    INVERSELIB::MnePatchInfo* patch;    /* The patch information record for the patch this vertex belongs to */
+//} *mneNearest,mneNearestRec;
 
-typedef struct {
-  int   *vert;           	/* Triangle vertices (pointers to the itris member of the associated mneSurface) */
-  float *r1,*r2,*r3;           	/* Triangle vertex locations (pointers to the rr member of the associated mneSurface) */
-  float r12[3],r13[3];		/* Vectors along the sides */
-  float nn[3];			/* Normal vector */
-  float area;			/* Area */
-  float cent[3];		/* Centroid */
-  float ex[3],ey[3];		/* Other unit vectors (used by BEM calculations) */
-} *mneTriangle,mneTriangleRec;	/* Triangle data */
+//typedef struct {
+//  int   *vert;           	/* Triangle vertices (pointers to the itris member of the associated mneSurface) */
+//  float *r1,*r2,*r3;           	/* Triangle vertex locations (pointers to the rr member of the associated mneSurface) */
+//  float r12[3],r13[3];		/* Vectors along the sides */
+//  float nn[3];			/* Normal vector */
+//  float area;			/* Area */
+//  float cent[3];		/* Centroid */
+//  float ex[3],ey[3];		/* Other unit vectors (used by BEM calculations) */
+//} *mneTriangle,mneTriangleRec;	/* Triangle data */
 
-typedef struct {
-  int            valid;		             /* Is the information below valid */
-  int            width,height,depth;	     /* Size of the stack */
-  float          xsize,ysize,zsize;	     /* Increments in the three voxel directions */
-  float          x_ras[3],y_ras[3],z_ras[3]; /* Directions of the coordinate axes */
-  float          c_ras[3];                   /* Center of the RAS coordinates */
-  char           *filename;		     /* Name of the MRI data file */
-} *mneVolGeom,mneVolGeomRec;		     /* MRI data volume geometry information like FreeSurfer keeps it */
+//typedef struct {
+//  int            valid;		             /* Is the information below valid */
+//  int            width,height,depth;	     /* Size of the stack */
+//  float          xsize,ysize,zsize;	     /* Increments in the three voxel directions */
+//  float          x_ras[3],y_ras[3],z_ras[3]; /* Directions of the coordinate axes */
+//  float          c_ras[3];                   /* Center of the RAS coordinates */
+//  char           *filename;		     /* Name of the MRI data file */
+//} *mneVolGeom,mneVolGeomRec;		     /* MRI data volume geometry information like FreeSurfer keeps it */
   
 /*
  * Values of the type field in the mneVolumeOrSurface structure
@@ -410,35 +411,35 @@ typedef struct {		/* Vector specification with a channel list */
 //  mneProjOp      proj;		/* Associated projection operator */
 //} *mneForwardSolution,mneForwardSolutionRec;
 
-typedef struct {		          /* An inverse operator */
-  FIFFLIB::fiffId         meas_id;                  /* The assosiated measurement ID */
-  INVERSELIB::MneCSourceSpace* *spaces;               /* The source spaces */
-  int            nspace;	          /* Number of source spaces */
-  INVERSELIB::FiffCoordTransOld* meg_head_t;              /* MEG device <-> head coordinate transformation */
-  INVERSELIB::FiffCoordTransOld* mri_head_t;	          /* MRI device <-> head coordinate transformation */
-  int            methods;	          /* EEG, MEG or EEG+MEG (see mne_fiff.h) */
-  int            nchan;		          /* Number of measurement channels */
-  int            nsource;	          /* Number of source points */
-  int            fixed_ori;	          /* Fixed source orientations? */
-  float          **rr_source;	          /* The active source points */
-  float          **nn_source;	          /* The source orientations 
-					   * (These are equal to the cortex normals 
-					   * in the fixed orientation case) */
-  int            coord_frame;               /* Which coordinates are the locations and orientations given in? */
-  INVERSELIB::MneCovMatrix*   sensor_cov;                /* Sensor covariance matrix */
-  int            nave;                      /* Number of averaged responses (affects scaling of the noise covariance) */
-  int            current_unit;              /* This can be FIFF_UNIT_AM, FIFF_UNIT_AM_M2, FIFF_UNIT_AM_M3 */
-  INVERSELIB::MneCovMatrix*   source_cov;                /* Source covariance matrix */
-  INVERSELIB::MneCovMatrix*   orient_prior;              /* Orientation prior applied */
-  INVERSELIB::MneCovMatrix*   depth_prior;               /* Depth-weighting prior applied */
-  INVERSELIB::MneCovMatrix*   fMRI_prior;                /* fMRI prior applied */
-  float          *sing;                     /* Singular values of the inverse operator */
-  INVERSELIB::MneNamedMatrix* eigen_leads;  /* The eigen leadfields */
-  int            eigen_leads_weighted;      /* Have the above been already weighted with R^0.5? */
-  INVERSELIB::MneNamedMatrix* eigen_fields; /* Associated field patterns */
-  float          trace_ratio;               /* tr(GRG^T)/tr(C) */
-  INVERSELIB::MneProjOp*    proj;           /* The associated projection operator */
-} *mneInverseOperator,mneInverseOperatorRec;
+//typedef struct {		          /* An inverse operator */
+//  FIFFLIB::fiffId         meas_id;                  /* The assosiated measurement ID */
+//  INVERSELIB::MneSurfaceOrVolume::MneCSourceSpace* *spaces;               /* The source spaces */
+//  int            nspace;	          /* Number of source spaces */
+//  INVERSELIB::FiffCoordTransOld* meg_head_t;              /* MEG device <-> head coordinate transformation */
+//  INVERSELIB::FiffCoordTransOld* mri_head_t;	          /* MRI device <-> head coordinate transformation */
+//  int            methods;	          /* EEG, MEG or EEG+MEG (see mne_fiff.h) */
+//  int            nchan;		          /* Number of measurement channels */
+//  int            nsource;	          /* Number of source points */
+//  int            fixed_ori;	          /* Fixed source orientations? */
+//  float          **rr_source;	          /* The active source points */
+//  float          **nn_source;	          /* The source orientations
+//					   * (These are equal to the cortex normals
+//					   * in the fixed orientation case) */
+//  int            coord_frame;               /* Which coordinates are the locations and orientations given in? */
+//  INVERSELIB::MneCovMatrix*   sensor_cov;                /* Sensor covariance matrix */
+//  int            nave;                      /* Number of averaged responses (affects scaling of the noise covariance) */
+//  int            current_unit;              /* This can be FIFF_UNIT_AM, FIFF_UNIT_AM_M2, FIFF_UNIT_AM_M3 */
+//  INVERSELIB::MneCovMatrix*   source_cov;                /* Source covariance matrix */
+//  INVERSELIB::MneCovMatrix*   orient_prior;              /* Orientation prior applied */
+//  INVERSELIB::MneCovMatrix*   depth_prior;               /* Depth-weighting prior applied */
+//  INVERSELIB::MneCovMatrix*   fMRI_prior;                /* fMRI prior applied */
+//  float          *sing;                     /* Singular values of the inverse operator */
+//  INVERSELIB::MneNamedMatrix* eigen_leads;  /* The eigen leadfields */
+//  int            eigen_leads_weighted;      /* Have the above been already weighted with R^0.5? */
+//  INVERSELIB::MneNamedMatrix* eigen_fields; /* Associated field patterns */
+//  float          trace_ratio;               /* tr(GRG^T)/tr(C) */
+//  INVERSELIB::MneProjOp*    proj;           /* The associated projection operator */
+//} *mneInverseOperator,mneInverseOperatorRec;
 
 
 //typedef struct {		/* For storing the wdata */

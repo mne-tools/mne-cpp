@@ -73,7 +73,7 @@ LayoutLoader::LayoutLoader()
 
 //*************************************************************************************************************
 
-bool LayoutLoader::readAsaElcFile(const QString& path, QStringList &channelNames, QList<QVector<double> > &location3D, QList<QVector<double> > &location2D, QString &unit)
+bool LayoutLoader::readAsaElcFile(const QString& path, QStringList &channelNames, QList<QVector<float> > &location3D, QList<QVector<float> > &location2D, QString &unit)
 {
     //Open .elc file
     if(!path.contains(".elc"))
@@ -117,7 +117,7 @@ bool LayoutLoader::readAsaElcFile(const QString& path, QStringList &channelNames
             if(line.contains(":") && !read2D) //Read 3D positions
             {
                 channelNames.push_back(fields.at(0));
-                QVector<double> posTemp;
+                QVector<float> posTemp;
 
                 posTemp.push_back(fields.at(fields.size()-3).toDouble());    //x
                 posTemp.push_back(fields.at(fields.size()-2).toDouble());    //y
@@ -128,7 +128,7 @@ bool LayoutLoader::readAsaElcFile(const QString& path, QStringList &channelNames
 
             if(line.contains(":") && read2D) //Read 2D positions
             {
-                QVector<double> posTemp;
+                QVector<float> posTemp;
                 posTemp.push_back(fields.at(fields.size()-2).toDouble());    //x
                 posTemp.push_back(fields.at(fields.size()-1).toDouble());    //y
                 location2D.append(posTemp);

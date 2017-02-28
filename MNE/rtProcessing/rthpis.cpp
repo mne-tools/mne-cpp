@@ -578,7 +578,7 @@ void RtHPIS::singleHPIFit(const MatrixXd& t_mat, FiffCoordTrans& transDevHead, c
     // Get the indices of inner layer channels and exclude bad channels
     QVector<int> innerind(0);
     for (int i = 0; i < numCh; ++i) {
-        if(m_pFiffInfo->chs[i].coil_type == 7002) {
+        if(m_pFiffInfo->chs[i].chpos.coil_type == 7002) {
             // Check if the sensor is bad, if not append to innerind
             if(!(m_pFiffInfo->bads.contains(m_pFiffInfo->ch_names.at(i)))) {
                 innerind.append(i);
@@ -592,12 +592,12 @@ void RtHPIS::singleHPIFit(const MatrixXd& t_mat, FiffCoordTrans& transDevHead, c
     sensors.tra = Eigen::MatrixXd::Identity(innerind.size(),innerind.size());
 
     for(int i = 0; i < innerind.size(); i++) {
-        sensors.coilpos(i,0) = m_pFiffInfo->chs[innerind.at(i)].loc(0,0);
-        sensors.coilpos(i,1) = m_pFiffInfo->chs[innerind.at(i)].loc(1,0);
-        sensors.coilpos(i,2) = m_pFiffInfo->chs[innerind.at(i)].loc(2,0);
-        sensors.coilori(i,0) = m_pFiffInfo->chs[innerind.at(i)].loc(9,0);
-        sensors.coilori(i,1) = m_pFiffInfo->chs[innerind.at(i)].loc(10,0);
-        sensors.coilori(i,2) = m_pFiffInfo->chs[innerind.at(i)].loc(11,0);
+        sensors.coilpos(i,0) = m_pFiffInfo->chs[innerind.at(i)].chpos.r0[0];
+        sensors.coilpos(i,1) = m_pFiffInfo->chs[innerind.at(i)].chpos.r0[1];
+        sensors.coilpos(i,2) = m_pFiffInfo->chs[innerind.at(i)].chpos.r0[2];
+        sensors.coilori(i,0) = m_pFiffInfo->chs[innerind.at(i)].chpos.ez[0];
+        sensors.coilori(i,1) = m_pFiffInfo->chs[innerind.at(i)].chpos.ez[1];
+        sensors.coilori(i,2) = m_pFiffInfo->chs[innerind.at(i)].chpos.ez[2];
     }
 
     Eigen::MatrixXd topo(innerind.size(), numCoils*2);
@@ -660,13 +660,13 @@ void RtHPIS::singleHPIFit(const MatrixXd& t_mat, FiffCoordTrans& transDevHead, c
         int chIdx = chIdcs(j);
 
         if(chIdx < m_pFiffInfo->chs.size()) {
-            double x = m_pFiffInfo->chs.at(chIdcs(j)).loc(0,0);
-            double y = m_pFiffInfo->chs.at(chIdcs(j)).loc(1,0);
-            double z = m_pFiffInfo->chs.at(chIdcs(j)).loc(2,0);
+            double x = m_pFiffInfo->chs.at(chIdcs(j)).chpos.r0[0];
+            double y = m_pFiffInfo->chs.at(chIdcs(j)).chpos.r0[1];
+            double z = m_pFiffInfo->chs.at(chIdcs(j)).chpos.r0[2];
 
-            coilPos(j,0) = -1 * m_pFiffInfo->chs.at(chIdcs(j)).loc(9,0) * 0.03 + x;
-            coilPos(j,1) = -1 * m_pFiffInfo->chs.at(chIdcs(j)).loc(10,0) * 0.03 + y;
-            coilPos(j,2) = -1 * m_pFiffInfo->chs.at(chIdcs(j)).loc(11,0) * 0.03 + z;
+            coilPos(j,0) = -1 * m_pFiffInfo->chs.at(chIdcs(j)).chpos.ez[0] * 0.03 + x;
+            coilPos(j,1) = -1 * m_pFiffInfo->chs.at(chIdcs(j)).chpos.ez[1] * 0.03 + y;
+            coilPos(j,2) = -1 * m_pFiffInfo->chs.at(chIdcs(j)).chpos.ez[2] * 0.03 + z;
         }
 
         std::cout << "RtHPIS::singleHPIFit - Coil " << j << " max value index " << chIdx << std::endl;
@@ -947,7 +947,7 @@ void RtHPIS::run()
         // Get the indices of inner layer channels
         QVector<int> innerind(0);
         for (int i = 0;i < numCh;i++) {
-            if(m_pFiffInfo->chs[i].coil_type == 7002) {
+            if(m_pFiffInfo->chs[i].chpos.coil_type == 7002) {
                 // Check if the sensor is bad, if not append to innerind
                 if(!(m_pFiffInfo->bads.contains(m_pFiffInfo->ch_names.at(i)))) innerind.append(i);
             }
@@ -961,13 +961,13 @@ void RtHPIS::run()
         sensors.tra = Eigen::MatrixXd::Identity(innerind.size(),innerind.size());
 
         for(int i=0;i<innerind.size();i++) {
-            sensors.coilpos(i,0) = m_pFiffInfo->chs[innerind.at(i)].loc(0,0);
-            sensors.coilpos(i,1) = m_pFiffInfo->chs[innerind.at(i)].loc(1,0);
-            sensors.coilpos(i,2) = m_pFiffInfo->chs[innerind.at(i)].loc(2,0);
-            sensors.coilori(i,0) = m_pFiffInfo->chs[innerind.at(i)].loc(9,0);
-            sensors.coilori(i,1) = m_pFiffInfo->chs[innerind.at(i)].loc(10,0);
-            sensors.coilori(i,2) = m_pFiffInfo->chs[innerind.at(i)].loc(11,0);
-            }
+            sensors.coilpos(i,0) = m_pFiffInfo->chs[innerind.at(i)].chpos.r0[0];
+            sensors.coilpos(i,1) = m_pFiffInfo->chs[innerind.at(i)].chpos.r0[1];
+            sensors.coilpos(i,2) = m_pFiffInfo->chs[innerind.at(i)].chpos.r0[2];
+            sensors.coilori(i,0) = m_pFiffInfo->chs[innerind.at(i)].chpos.ez[0];
+            sensors.coilori(i,1) = m_pFiffInfo->chs[innerind.at(i)].chpos.ez[1];
+            sensors.coilori(i,2) = m_pFiffInfo->chs[innerind.at(i)].chpos.ez[2];
+        }
 
         Eigen::MatrixXd topo(innerind.size(),numCoils*2);
         Eigen::MatrixXd amp(innerind.size(),numCoils);

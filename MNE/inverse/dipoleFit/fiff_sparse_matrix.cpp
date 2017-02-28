@@ -125,7 +125,7 @@ int *fiff_get_matrix_dims(FiffTag::SPtr& tag)
         qCritical("fiff_get_matrix_dims: no data available!");
         return NULL;
     }
-    if (fiff_type_fundamental(tag->getType()) != FIFFTS_FS_MATRIX) {
+    if (fiff_type_fundamental(tag->type) != FIFFTS_FS_MATRIX) {
         qCritical("fiff_get_matrix_dims: tag does not contain a matrix!");
         return NULL;
     }
@@ -141,7 +141,7 @@ int *fiff_get_matrix_dims(FiffTag::SPtr& tag)
         qCritical("fiff_get_matrix_dims: unreasonable # of dimensions!");
         return NULL;
     }
-    if (fiff_type_matrix_coding(tag->getType()) == FIFFTS_MC_DENSE) {
+    if (fiff_type_matrix_coding(tag->type) == FIFFTS_MC_DENSE) {
         if (tsize < (ndim+1)*sizeof(fiff_int_t)) {
             qCritical("fiff_get_matrix_dims: too small matrix data!");
             return NULL;
@@ -152,8 +152,8 @@ int *fiff_get_matrix_dims(FiffTag::SPtr& tag)
         for (k = 0; k < ndim; k++)
             res[k+1] = dims[k];
     }
-    else if (fiff_type_matrix_coding(tag->getType()) == FIFFTS_MC_CCS ||
-             fiff_type_matrix_coding(tag->getType()) == FIFFTS_MC_RCS) {
+    else if (fiff_type_matrix_coding(tag->type) == FIFFTS_MC_CCS ||
+             fiff_type_matrix_coding(tag->type) == FIFFTS_MC_RCS) {
         if (tsize < (ndim+2)*sizeof(fiff_int_t)) {
             qCritical("fiff_get_matrix_sparse_dims: too small matrix data!");
             return NULL; }
@@ -250,10 +250,10 @@ FiffSparseMatrix *FiffSparseMatrix::fiff_get_float_sparse_matrix(FiffTag::SPtr &
     int   m,n,nz;
     int   coding,correct_size;
 
-    if ( fiff_type_fundamental(tag->getType())   != FIFFT_MATRIX ||
-         fiff_type_base(tag->getType())          != FIFFT_FLOAT ||
-         (fiff_type_matrix_coding(tag->getType()) != FIFFTS_MC_CCS &&
-          fiff_type_matrix_coding(tag->getType()) != FIFFTS_MC_RCS) ) {
+    if ( fiff_type_fundamental(tag->type)   != FIFFT_MATRIX ||
+         fiff_type_base(tag->type)          != FIFFT_FLOAT ||
+         (fiff_type_matrix_coding(tag->type) != FIFFTS_MC_CCS &&
+          fiff_type_matrix_coding(tag->type) != FIFFTS_MC_RCS) ) {
         printf("fiff_get_float_ccs_matrix: wrong data type!");
         return NULL;
     }
@@ -270,7 +270,7 @@ FiffSparseMatrix *FiffSparseMatrix::fiff_get_float_sparse_matrix(FiffTag::SPtr &
     n   = dims[2];
     nz  = dims[3];
 
-    coding = fiff_type_matrix_coding(tag->getType());
+    coding = fiff_type_matrix_coding(tag->type);
     if (coding == FIFFTS_MC_CCS)
         correct_size = nz*(sizeof(fiff_float_t) + sizeof(fiff_int_t)) +
                 (n+1+dims[0]+2)*(sizeof(fiff_int_t));
@@ -293,8 +293,8 @@ FiffSparseMatrix *FiffSparseMatrix::fiff_get_float_sparse_matrix(FiffTag::SPtr &
     res->m      = m;
     res->n      = n;
     res->nz     = nz;
-    qDebug() << "ToDo: Check if data are correctly set!";
-    res->data   = tag->toFloat();
+    res->data   = MALLOC_18(correct_size,float);
+    memcpy (res->data,(float*)tag->data(),correct_size);
     res->coding = coding;
     res->inds   = (int *)(res->data + res->nz);
     res->ptrs   = res->inds + res->nz;
