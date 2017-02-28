@@ -68,7 +68,7 @@ using namespace FWDLIB;
 
 //=============================================================================================================
 /**
-* The function main marks the entry point of the mne_dipole_fit application.
+* The function main marks the entry point of the mne_forward_solution application.
 * By default, main has the storage class extern.
 *
 * @param [in] argc  (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.

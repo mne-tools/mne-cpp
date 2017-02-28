@@ -852,13 +852,13 @@ int fiff_write_float_sparse_matrix_old(FiffStream::SPtr& t_pStream, int kind, Fi
 //        goto fwrite_error;
     return FIFF_OK;
 
-fwrite_error : {
-//        if (ferror(out))
-//            qCritical("fwrite");
-//        else
-//            err_set_error("fwrite failed");
-        return FIFF_FAIL;
-    }
+//fwrite_error : {
+////        if (ferror(out))
+////            qCritical("fwrite");
+////        else
+////            err_set_error("fwrite failed");
+//        return FIFF_FAIL;
+//    }
 }
 
 
@@ -1702,142 +1702,9 @@ bad : {
 
 
 
-
-
-
-//int fiff_new_file_id (fiffId id)
-///*
-//* Return a (hopefully) unique file id
-//*/
-//{
-//    FiffId new_id = FiffId::new_file_id();
-//    /*
-//    * Internet address in the first two words
-//    */
-//    id->machid[0] = new_id.machid[0];
-//    id->machid[1] = new_id.machid[1];
-//    /*
-//    * Time in the third and fourth words
-//    */
-//    /*
-//    * Time in the third and fourth words
-//    * Since practically no system gives times in
-//    * true micro seconds, the last three digits
-//    * are randomized to insure uniqueness.
-//    */
-//    {
-//        id->time.secs  = new_id.time.secs;
-//        id->time.usecs = new_id.time.usecs;
-//    }
-//    id->version = FIFFC_VERSION;
-//    return FIFF_OK;
-//}
-
-
-
-
 /*
  * Process the environment information
  */
-#define MAX_WD 1024
-
-
-//int fiff_insert_after (FiffStream::SPtr& dest,    /* Insert to this file */
-//                       int      where,            /* After this tag */
-//                       fiffTag  tags,             /* These tags */
-//                       int      ntag  )           /* How many */
-///*
-//* Insert new tags into a file
-//* The directory information in dest is updated
-//*/
-//{
-//    long pos;
-//    long old_end;
-//    int  p;
-//    fiffTagRec tag;
-//    fiffDirEntry this_ent;
-//    fiffDirEntry new_this;
-//    fiffDirEntry new_dir;
-//    fiffDirEntry old_dir = dest->dir;
-
-//    if (ntag <= 0)
-//        return FIFF_OK;
-//    if (where < 0 || where >= dest->nent-1) {
-//        err_set_error ("illegal insertion point in fiff_insert_after!");
-//        return FIFF_FAIL;
-//    }
-
-//    tag.data = NULL;
-//    this_ent = old_dir + where;
-//    if (fiff_read_this_tag (dest->fd,this_ent->pos,&tag) == -1)
-//        return FIFF_FAIL;
-//    /*
-//   * Update next info to be sequential
-//   */
-//    for (p = 0; p < ntag-1; p++)
-//        tags[p].next = 0;
-//    tags[p].next = ftell(dest->fd);
-//    /*
-//   * Go to the end of the file
-//   */
-//    if (fseek(dest->fd,0L,SEEK_END) == -1) {
-//        err_set_sys_error ("fseek");
-//        return FIFF_FAIL;
-//    }
-//    /*
-//   * Allocate new directory
-//   */
-//    new_dir = MALLOC(ntag+dest->nent,fiffDirEntryRec);
-//    /*
-//   * Copy the beginning of old directory
-//   */
-//    memcpy(new_dir,old_dir,(where+1)*sizeof(fiffDirEntryRec));
-//    /*
-//   * Save the old size for future purposes
-//   */
-//    old_end = ftell(dest->fd);
-//    /*
-//   * Write tags, check for errors
-//   */
-//    for (new_this = new_dir + where + 1, p = 0; p < ntag; p++, new_this++) {
-//        if ((pos = fiff_write_tag (dest->fd,tags+p)) == -1) {
-//            (void)fiff_truncate_file(fileno(dest->fd),(size_t)old_end);
-//            FREE(new_dir);
-//            return FIFF_FAIL;
-//        }
-//        /*
-//     * Add new directory entry
-//     */
-//        new_this->kind = tags[p].kind;
-//        new_this->type = tags[p].type;
-//        new_this->size = tags[p].size;
-//        new_this->pos  = pos;
-//    }
-//    /*
-//   * Copy the rest of the old directory
-//   */
-//    memcpy(new_this,old_dir+where+1,
-//           (dest->nent-where-1)*sizeof(fiffDirEntryRec));
-//    /*
-//   * Now, it is time to update the braching tag
-//   * If something goes wrong here, we cannot be sure that
-//   * the file is readable. Let's hope for the best...
-//   */
-//    tag.next = old_end;
-//    if (fiff_write_this_tag (dest->fd,this_ent->pos,&tag) == -1) {
-//        (void)fiff_truncate_file(fileno(dest->fd),(size_t)old_end);
-//        FREE(new_dir);
-//        return FIFF_FAIL;
-//    }
-//    /*
-//   * Update
-//   */
-//    dest->dir = new_dir;
-//    dest->nent = dest->nent + ntag;
-//    FREE(old_dir);
-//    return FIFF_OK;
-//}
-
 
 bool mne_attach_env(const QString& name, const QString& command)
 /*
@@ -1852,7 +1719,6 @@ bool mne_attach_env(const QString& name, const QString& command)
     QList<FiffTag::SPtr> tags;
     QFile fileInOut(name);
     FiffStream::SPtr t_pStreamInOut;
-    int     ntag = 0;
 
 
 //    if (fiff_new_file_id(&id) == FIFF_FAIL)
@@ -2036,7 +1902,7 @@ ComputeFwd::~ComputeFwd()
 void ComputeFwd::calculateFwd() const
 {
     bool                res = false;
-    MneSourceSpaceOld*   *spaces = NULL;  /* The source spaces */
+    MneSourceSpaceOld*  *spaces = NULL;  /* The source spaces */
     int                 nspace  = 0;
     int                 nsource = 0;     /* Number of source space points */
 
@@ -2089,7 +1955,7 @@ void ComputeFwd::calculateFwd() const
         printf("BEM model                    : %s\n",settings->bemname.toLatin1().constData());
     else {
         printf("Sphere model                 : origin at (% 7.2f % 7.2f % 7.2f) mm\n",
-               1000*settings->r0[X_41],1000*settings->r0[Y_41],1000*settings->r0[Z_41]);
+               1000.0f*settings->r0[X_41],1000.0f*settings->r0[Y_41],1000.0f*settings->r0[Z_41]);
         if (settings->include_eeg) {
             printf("\n");
 
