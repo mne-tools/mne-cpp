@@ -1443,7 +1443,22 @@ bool fiff_put_dir (FiffStream::SPtr& t_pStream, const QList<FiffDirEntry::SPtr>&
                 printf ("Could not update directory!\n");
             else {
                 t_pTag->setNum(dirpos);
-                t_pStream->write_tag(t_pTag,dir[k]->pos);
+//                t_pStream->write_tag(t_pTag,dir[k]->pos);
+
+                t_pStream->write_dir_pointer(dirpos, dir[k]->pos);
+
+//                t_pStream->device()->seek(dir[k]->pos);
+
+//                fiff_int_t datasize = 1 * 4;
+
+//                *t_pStream << (qint32)t_pTag->kind;
+//                *t_pStream << (qint32)t_pTag->type;
+//                *t_pStream << (qint32)datasize;
+//                *t_pStream << (qint32)t_pTag->next;
+
+//                *t_pStream << dirpos;
+
+
             }
             return true;
         }
