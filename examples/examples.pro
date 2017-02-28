@@ -40,39 +40,40 @@ include(../mne-cpp.pri)
 TEMPLATE = subdirs
 
 SUBDIRS += \
-    readRaw \
-    readWriteRaw \
-    readFwd \
-    readEpochs \
-    readEvoked \
-    computeInverse \
-    computeInverseRaw \
-    makeInverseOperator \
-    findEvoked \
-    evokedGradAmp \
-    cancelNoise \
-    fiffIO \
-    makeLayout \
-    readBEM \
+    ex_cancel_noise \
+    ex_compute_inverse \
+    ex_compute_inverse_raw \
+    ex_evoked_grad_amp \
+    ex_fiff_io \
+    ex_find_evoked \
+    ex_make_inverse_operator \
+    ex_make_layout \
+    ex_read_bem \
+    ex_read_epochs \
+    ex_read_evoked \
+    ex_read_fwd \
+    ex_read_raw \
+    ex_read_write_raw
 
 !contains(MNECPP_CONFIG, minimalVersion) {
     qtHaveModule(charts) {
         SUBDIRS += \
-            clusteredInverse \
-            rawClusteredInverse \
-            readFwdDisp3D \
-            computeInverseRapMusic \
-            rawClusteredInverseRapMusic \
-            computeInversePwlRapMusic \
-            rawClusteredInversePwlRapMusic \
-            stClusteredInversePwlRapMusic  \
-            roiClusteredInversePwlRapMusic \
-            fsSurface \
+            ex_clustered_inverse \
+            ex_compute_inverse_pwl_rap_music \
+            ex_compute_inverse_rap_music \
+            ex_connectivity_tutorial \
             ex_disp \
-            disp3DTutorial \
-            histogram \
-            connectivityTutorial
-    } else {
+            ex_disp_3D_tutorial \
+            ex_fs_surface \
+            ex_histogram \
+            ex_read_fwd_disp_3D \
+            ex_raw_clustered_inverse \
+            ex_raw_clustered_inverse_pwl_rap_music \
+            ex_raw_clustered_inverse_rap_music \
+            ex_roi_clustered_inverse_pwl_rap_music \
+            ex_st_clustered_inverse_pwl_rap_music
+    }
+    else {
         message("examples.pro - The Qt Charts module is missing. Please install to build the complete set of MNE-CPP features.")
     }
 }
