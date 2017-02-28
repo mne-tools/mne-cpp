@@ -47,6 +47,7 @@
 #include "analyze_types.h"
 #include "fwd_types.h"
 #include "fwd_eeg_sphere_model.h"
+#include "fwd_bem_model.h"
 #include "dipole_forward.h"
 
 
@@ -246,7 +247,7 @@ public:
       char              *bemname;           /**< Using a BEM? */
 
       FwdEegSphereModel *eeg_model;         /**< EEG sphere model definition */
-      fwdBemModel       bem_model;          /**< BEM model definition */
+      FwdBemModel       *bem_model;         /**< BEM model definition */
 
       dipoleFitFuncs    sphere_funcs;       /**< These are the sphere model forward functions */
       dipoleFitFuncs    bem_funcs;          /**< These are the BEM forward functions */

@@ -392,8 +392,8 @@ bool SelectionManagerWindow::loadLayout(QString path)
     bool state = LayoutLoader::readMNELoutFile(path, m_layoutMap);
 
     //if no layout for EEG is specified generate from digitizer points
-    QList<QVector<double> > inputPoints;
-    QList<QVector<double> > outputPoints;
+    QList<QVector<float> > inputPoints;
+    QList<QVector<float> > outputPoints;
     QStringList names;
     QFile out("manualLayout.lout");//(/*"./resources/selectionGroups/*/"manualLayout.lout");
 
@@ -408,7 +408,7 @@ bool SelectionManagerWindow::loadLayout(QString path)
         int kind = m_pChInfoModel->data(digIndex,ChInfoModelRoles::GetChKind).toInt();
 
         if(kind == FIFFV_EEG_CH) { //FIFFV_MEG_CH
-            QVector<double> temp;
+            QVector<float> temp;
             temp.append(channelDig.x());
             temp.append(channelDig.y());
             temp.append(-channelDig.z());

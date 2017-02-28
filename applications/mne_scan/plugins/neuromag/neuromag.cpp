@@ -407,7 +407,7 @@ bool Neuromag::readHeader()
     if(!t_pStream->open())
         return false;
 
-    QList<FiffProj> q_ListProj = t_pStream->read_proj(t_pStream->tree());
+    QList<FiffProj> q_ListProj = t_pStream->read_proj(t_pStream->dirtree());
 
     if (q_ListProj.size() == 0)
     {

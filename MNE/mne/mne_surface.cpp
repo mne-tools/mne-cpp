@@ -80,7 +80,7 @@ bool MNESurface::read(QIODevice& p_IODevice, QList<MNESurface::SPtr>& surfaces)
         return false;
     }
 
-    return read(fiffStream, false, fiffStream->tree(), surfaces);
+    return read(fiffStream, false, fiffStream->dirtree(), surfaces);
 }
 
 //*************************************************************************************************************

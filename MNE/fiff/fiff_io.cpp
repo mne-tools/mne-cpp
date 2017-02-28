@@ -99,7 +99,7 @@ bool FiffIO::setup_read(QIODevice& p_IODevice, FiffInfo& info, FiffDirNode::SPtr
         return false;
 
     //Read the measurement info
-    if(!p_pStream->read_meas_info(p_pStream->tree(), info, dirTree))
+    if(!p_pStream->read_meas_info(p_pStream->dirtree(), info, dirTree))
         return false;
 
     return true;

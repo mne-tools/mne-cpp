@@ -206,10 +206,10 @@ int mne_read_meg_comp_eeg_ch_info_32(const QString& name,
     if(!stream->open())
         goto bad;
 
-    nodes = stream->tree()->dir_tree_find(FIFFB_MNE_PARENT_MEAS_FILE);
+    nodes = stream->dirtree()->dir_tree_find(FIFFB_MNE_PARENT_MEAS_FILE);
 
     if (nodes.size() == 0) {
-        nodes = stream->tree()->dir_tree_find(FIFFB_MEAS_INFO);
+        nodes = stream->dirtree()->dir_tree_find(FIFFB_MEAS_INFO);
         if (nodes.size() == 0) {
             qCritical ("Could not find the channel information.");
             goto bad;
@@ -217,12 +217,12 @@ int mne_read_meg_comp_eeg_ch_info_32(const QString& name,
     }
     info = nodes[0];
     to_find = 0;
-    for (k = 0; k < info->nent; k++) {
+    for (k = 0; k < info->nent(); k++) {
         kind = info->dir[k]->kind;
         pos  = info->dir[k]->pos;
         switch (kind) {
         case FIFF_NCHAN :
-            if (!FiffTag::read_tag(stream,t_pTag,pos))
+            if (!stream->read_tag(t_pTag,pos))
                 goto bad;
             nchan = *t_pTag->toInt();
             chs = MALLOC_32(nchan,fiffChInfoRec);
@@ -232,14 +232,14 @@ int mne_read_meg_comp_eeg_ch_info_32(const QString& name,
             break;
 
         case FIFF_PARENT_BLOCK_ID :
-            if(!FiffTag::read_tag(stream, t_pTag, pos))
+            if(!stream->read_tag(t_pTag, pos))
                 goto bad;
 //            id = t_pTag->toFiffID();
             *id = *(fiffId)t_pTag->data();
             break;
 
         case FIFF_COORD_TRANS :
-            if(!FiffTag::read_tag(stream, t_pTag, pos))
+            if(!stream->read_tag(t_pTag, pos))
                 goto bad;
 //            t = t_pTag->toCoordTrans();
             t = FiffCoordTransOld::read_helper( t_pTag );
@@ -248,7 +248,7 @@ int mne_read_meg_comp_eeg_ch_info_32(const QString& name,
             break;
 
         case FIFF_CH_INFO : /* Information about one channel */
-            if(!FiffTag::read_tag(stream, t_pTag, pos))
+            if(!stream->read_tag(t_pTag, pos))
                 goto bad;
 //            this_ch = t_pTag->toChInfo();
             this_ch = (fiffChInfo)malloc(sizeof(fiffChInfoRec));
@@ -546,7 +546,7 @@ float **mne_mat_mat_mult_32 (float **m1,float **m2,int d1,int d2,int d3)
 
 {
 #ifdef BLAS
-    float **result = ALLOC_CMATRIX_3(d1,d3);
+    float **result = ALLOC_CMATRIX_32(d1,d3);
     char  *transa = "N";
     char  *transb = "N";
     float zero = 0.0;
@@ -744,7 +744,7 @@ MneCTFCompDataSet *MneCTFCompDataSet::mne_read_ctf_comp_data(const QString &name
     /*
         * Locate the compensation data sets
         */
-    nodes = stream->tree()->dir_tree_find(FIFFB_MNE_CTF_COMP);
+    nodes = stream->dirtree()->dir_tree_find(FIFFB_MNE_CTF_COMP);
     if (nodes.size() == 0)
         goto good;      /* Nothing more to do */
     comps = nodes[0]->dir_tree_find(FIFFB_MNE_CTF_COMP_DATA);
