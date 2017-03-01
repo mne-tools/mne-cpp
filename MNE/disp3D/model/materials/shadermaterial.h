@@ -159,9 +159,9 @@ private:
 
     QPointer<Qt3DRender::QFilterKey>        m_pFilterKey;
 
-    QPointer<Qt3DRender::QTechnique>        m_pVertexGL3Technique;
-    QPointer<Qt3DRender::QRenderPass>       m_pVertexGL3RenderPass;
-    QPointer<Qt3DRender::QShaderProgram>    m_pVertexGL3Shader;
+    QPointer<Qt3DRender::QTechnique>        m_pVertexGL4Technique;
+    QPointer<Qt3DRender::QRenderPass>       m_pVertexGL4RenderPass;
+    QPointer<Qt3DRender::QShaderProgram>    m_pVertexGL4Shader;
 
     QPointer<Qt3DRender::QNoDepthMask>                  m_pNoDepthMask;
     QPointer<Qt3DRender::QBlendEquationArguments>       m_pBlendState;
