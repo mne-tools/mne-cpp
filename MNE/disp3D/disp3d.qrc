@@ -19,5 +19,6 @@
         <file>model/materials/shaders/gl4/pervertextessphongalpha.vert</file>
         <file>model/materials/shaders/gl4/pervertextessphongalpha_pn_triangles.tes</file>
         <file>model/materials/shaders/gl4/pervertextessphongalpha_simple.tes</file>
+        <file>model/materials/shaders/gl4/light.inc.frag</file>
     </qresource>
 </RCC>
