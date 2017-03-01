@@ -719,7 +719,7 @@ QPair<QByteArray, QByteArray> RtSourceLocDataWorker::performVisualizationTypeCal
 
     //Cut out left and right hemisphere from source data
     m_lVisualizationInfo[0].vSourceColorSamples = vSourceColorSamples.segment(0, m_lVisualizationInfo[0].vVertNo.rows());
-    m_lVisualizationInfo[1].vSourceColorSamples = vSourceColorSamples.segment(m_lVisualizationInfo[0].vVertNo.rows()+1, m_lVisualizationInfo[1].vVertNo.rows());
+    m_lVisualizationInfo[1].vSourceColorSamples = vSourceColorSamples.segment(m_lVisualizationInfo[0].vVertNo.rows(), m_lVisualizationInfo[1].vVertNo.rows());
 
     //Reset to original color as default
     m_lVisualizationInfo[0].arrayFinalVertColor = m_lVisualizationInfo[0].arrayOriginalVertColor;
