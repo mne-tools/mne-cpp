@@ -88,6 +88,11 @@ PerVertexPhongAlphaMaterial::PerVertexPhongAlphaMaterial(QNode *parent)
 , m_pVertexGL3Technique(new QTechnique())
 , m_pVertexGL3RenderPass(new QRenderPass())
 , m_pVertexGL3Shader(new QShaderProgram())
+, m_pVertexGL2Technique(new QTechnique())
+, m_pVertexGL2RenderPass(new QRenderPass())
+, m_pVertexES2Technique(new QTechnique())
+, m_pVertexES2RenderPass(new QRenderPass())
+, m_pVertexES2Shader(new QShaderProgram())
 , m_pFilterKey(new QFilterKey)
 , m_pNoDepthMask(new QNoDepthMask())
 , m_pBlendState(new QBlendEquationArguments())
@@ -111,13 +116,29 @@ void PerVertexPhongAlphaMaterial::init()
     //Set shader
     m_pVertexGL3Shader->setVertexShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl3/pervertexphongalpha.vert"))));
     m_pVertexGL3Shader->setFragmentShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl3/pervertexphongalpha.frag"))));
+
+    m_pVertexES2Shader->setVertexShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/materials/shaders/es2/pervertexphongalpha.vert"))));
+    m_pVertexES2Shader->setFragmentShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/materials/shaders/es2/pervertexphongalpha.frag"))));
+
     m_pVertexGL3RenderPass->setShaderProgram(m_pVertexGL3Shader);
+    m_pVertexGL2RenderPass->setShaderProgram(m_pVertexES2Shader);
+    m_pVertexES2RenderPass->setShaderProgram(m_pVertexES2Shader);
 
     //Set OpenGL version
     m_pVertexGL3Technique->graphicsApiFilter()->setApi(QGraphicsApiFilter::OpenGL);
-    m_pVertexGL3Technique->graphicsApiFilter()->setMajorVersion(4);
-    m_pVertexGL3Technique->graphicsApiFilter()->setMinorVersion(0);
+    m_pVertexGL3Technique->graphicsApiFilter()->setMajorVersion(3);
+    m_pVertexGL3Technique->graphicsApiFilter()->setMinorVersion(2);
     m_pVertexGL3Technique->graphicsApiFilter()->setProfile(QGraphicsApiFilter::CoreProfile);
+
+    m_pVertexGL2Technique->graphicsApiFilter()->setApi(QGraphicsApiFilter::OpenGL);
+    m_pVertexGL2Technique->graphicsApiFilter()->setMajorVersion(2);
+    m_pVertexGL2Technique->graphicsApiFilter()->setMinorVersion(0);
+    m_pVertexGL2Technique->graphicsApiFilter()->setProfile(QGraphicsApiFilter::NoProfile);
+
+    m_pVertexES2Technique->graphicsApiFilter()->setApi(QGraphicsApiFilter::OpenGLES);
+    m_pVertexES2Technique->graphicsApiFilter()->setMajorVersion(2);
+    m_pVertexES2Technique->graphicsApiFilter()->setMinorVersion(0);
+    m_pVertexES2Technique->graphicsApiFilter()->setProfile(QGraphicsApiFilter::NoProfile);
 
     //Setup transparency
     m_pBlendState->setSourceRgb(QBlendEquationArguments::SourceAlpha);
@@ -125,16 +146,31 @@ void PerVertexPhongAlphaMaterial::init()
     m_pBlendEquation->setBlendFunction(QBlendEquation::Add);
 
     m_pVertexGL3RenderPass->addRenderState(m_pBlendEquation);
+    m_pVertexGL2RenderPass->addRenderState(m_pBlendEquation);
+    m_pVertexES2RenderPass->addRenderState(m_pBlendEquation);
+
     m_pVertexGL3RenderPass->addRenderState(m_pNoDepthMask);
+    m_pVertexGL2RenderPass->addRenderState(m_pNoDepthMask);
+    m_pVertexES2RenderPass->addRenderState(m_pNoDepthMask);
+
     m_pVertexGL3RenderPass->addRenderState(m_pBlendState);
+    m_pVertexGL2RenderPass->addRenderState(m_pBlendState);
+    m_pVertexES2RenderPass->addRenderState(m_pBlendState);
 
     m_pFilterKey->setName(QStringLiteral("renderingStyle"));
     m_pFilterKey->setValue(QStringLiteral("forward"));
+
     m_pVertexGL3Technique->addFilterKey(m_pFilterKey);
+    m_pVertexGL2Technique->addFilterKey(m_pFilterKey);
+    m_pVertexES2Technique->addFilterKey(m_pFilterKey);
 
     m_pVertexGL3Technique->addRenderPass(m_pVertexGL3RenderPass);
+    m_pVertexGL2Technique->addRenderPass(m_pVertexGL2RenderPass);
+    m_pVertexES2Technique->addRenderPass(m_pVertexES2RenderPass);
 
     m_pVertexEffect->addTechnique(m_pVertexGL3Technique);
+    m_pVertexEffect->addTechnique(m_pVertexGL2Technique);
+    m_pVertexEffect->addTechnique(m_pVertexES2Technique);
 
     m_pVertexEffect->addParameter(m_pDiffuseParameter);
     m_pVertexEffect->addParameter(m_pSpecularParameter);

@@ -175,7 +175,7 @@ void transformDataToColor(const VectorXd& data, QByteArray& arrayFinalVertColor,
     //timer.start();
 
     if(data.rows() != arrayFinalVertColor.size()/(3*sizeof(float))) {
-        qDebug() << "RtSourceLocDataWorker::transformDataToColor - Sizes of input vectors do not match. Returning ...";
+        qDebug() << "RtSourceLocDataWorker::transformDataToColor - Sizes of input data (" <<data.rows() <<") do not match color byte array("<< arrayFinalVertColor.size()/(3*sizeof(float)) <<"). Returning ...";
     }
 
     float *rawArrayColors = reinterpret_cast<float *>(arrayFinalVertColor.data());
@@ -238,7 +238,7 @@ void transformDataToColor(float fSample, QByteArray& arrayFinalVertColor, double
     }
 
     QRgb qRgb;
-    qRgb = qRgb = (functionHandlerColorMap)(fSample);
+    qRgb = (functionHandlerColorMap)(fSample);
 
     rawArrayColors[idxColor++] = (float)qRed(qRgb)/255.0f;
     rawArrayColors[idxColor++] = (float)qGreen(qRgb)/255.0f;
@@ -674,8 +674,13 @@ void RtSourceLocDataWorker::run()
             m_qMutex.unlock();
         }
 
+        //Sleep specified amount of time - also take into account processing time from before
+        int iTimerElapsed = timer.elapsed();
         //qDebug() << "RtSourceLocDataWorker::run()" << timer.elapsed() << "msecs";
-        QThread::msleep(m_iMSecIntervall);
+
+        if(m_iMSecIntervall-iTimerElapsed > 0) {
+            QThread::msleep(m_iMSecIntervall-iTimerElapsed);
+        }
     }
 }
 
@@ -714,7 +719,7 @@ QPair<QByteArray, QByteArray> RtSourceLocDataWorker::performVisualizationTypeCal
 
     //Cut out left and right hemisphere from source data
     m_lVisualizationInfo[0].vSourceColorSamples = vSourceColorSamples.segment(0, m_lVisualizationInfo[0].vVertNo.rows());
-    m_lVisualizationInfo[1].vSourceColorSamples = vSourceColorSamples.segment(m_lVisualizationInfo[0].vVertNo.rows()+1, m_lVisualizationInfo[1].vVertNo.rows());
+    m_lVisualizationInfo[1].vSourceColorSamples = vSourceColorSamples.segment(m_lVisualizationInfo[0].vVertNo.rows(), m_lVisualizationInfo[1].vVertNo.rows());
 
     //Reset to original color as default
     m_lVisualizationInfo[0].arrayFinalVertColor = m_lVisualizationInfo[0].arrayOriginalVertColor;
@@ -770,7 +775,7 @@ void RtSourceLocDataWorker::createSmoothingOperator(const MatrixX3f& matVertPosL
     leftHemi.vecVertNo = m_lVisualizationInfo[0].vVertNo;
     leftHemi.matVertPos = matVertPosLeftHemi;
     leftHemi.iDistPow = 3;
-    leftHemi.dThresholdDistance = 0.03;
+    leftHemi.dThresholdDistance = 0.003;
     inputData.append(leftHemi);
 
     SmoothOperatorInfo rightHemi;
@@ -779,7 +784,7 @@ void RtSourceLocDataWorker::createSmoothingOperator(const MatrixX3f& matVertPosL
     rightHemi.vecVertNo = m_lVisualizationInfo[1].vVertNo;
     rightHemi.matVertPos = matVertPosRightHemi;
     rightHemi.iDistPow = 3;
-    rightHemi.dThresholdDistance = 0.03;
+    rightHemi.dThresholdDistance = 0.003;
     inputData.append(rightHemi);
 
     QFuture<void> future = QtConcurrent::map(inputData, generateSmoothOperator);
