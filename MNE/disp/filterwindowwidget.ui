@@ -43,7 +43,7 @@
         <item row="0" column="0">
          <widget class="QLabel" name="m_label_applyFilterTo">
           <property name="text">
-           <string>Appl filter to:</string>
+           <string>Apply filter to:</string>
           </property>
          </widget>
         </item>
