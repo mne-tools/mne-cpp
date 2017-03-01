@@ -126,8 +126,8 @@ void PerVertexPhongAlphaMaterial::init()
 
     //Set OpenGL version
     m_pVertexGL3Technique->graphicsApiFilter()->setApi(QGraphicsApiFilter::OpenGL);
-    m_pVertexGL3Technique->graphicsApiFilter()->setMajorVersion(4);
-    m_pVertexGL3Technique->graphicsApiFilter()->setMinorVersion(0);
+    m_pVertexGL3Technique->graphicsApiFilter()->setMajorVersion(3);
+    m_pVertexGL3Technique->graphicsApiFilter()->setMinorVersion(2);
     m_pVertexGL3Technique->graphicsApiFilter()->setProfile(QGraphicsApiFilter::CoreProfile);
 
     m_pVertexGL2Technique->graphicsApiFilter()->setApi(QGraphicsApiFilter::OpenGL);

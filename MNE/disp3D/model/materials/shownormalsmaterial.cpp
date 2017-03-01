@@ -121,8 +121,8 @@ void ShowNormalsMaterial::init()
 
     //Set OpenGL version - This material can only be used with opengl 4.0 or higher since it is using geometry shaders
     m_pVertexGL3Technique->graphicsApiFilter()->setApi(QGraphicsApiFilter::OpenGL);
-    m_pVertexGL3Technique->graphicsApiFilter()->setMajorVersion(4);
-    m_pVertexGL3Technique->graphicsApiFilter()->setMinorVersion(0);
+    m_pVertexGL3Technique->graphicsApiFilter()->setMajorVersion(3);
+    m_pVertexGL3Technique->graphicsApiFilter()->setMinorVersion(2);
     m_pVertexGL3Technique->graphicsApiFilter()->setProfile(QGraphicsApiFilter::CoreProfile);
 
     m_pFilterKey->setName(QStringLiteral("renderingStyle"));
