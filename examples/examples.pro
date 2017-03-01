@@ -6,11 +6,11 @@
 #           Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
-# @date     July, 2012
+# @date     July, 2010
 #
 # @section  LICENSE
 #
-# Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+# Copyright (C) 2010, Christoph Dinh, Lorenz Esch, Florian Schlembach and Matti Hamalainen. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -41,11 +41,11 @@ TEMPLATE = subdirs
 
 SUBDIRS += \
     ex_cancel_noise \
-    ex_compute_inverse \
-    ex_compute_inverse_raw \
     ex_evoked_grad_amp \
     ex_fiff_io \
     ex_find_evoked \
+    ex_inverse_mne \
+    ex_inverse_mne_raw \
     ex_make_inverse_operator \
     ex_make_layout \
     ex_read_bem \
@@ -58,18 +58,18 @@ SUBDIRS += \
 !contains(MNECPP_CONFIG, minimalVersion) {
     qtHaveModule(charts) {
         SUBDIRS += \
-            ex_clustered_inverse \
-            ex_compute_inverse_pwl_rap_music \
-            ex_compute_inverse_rap_music \
+            ex_clustered_inverse_mne \
+            ex_clustered_inverse_mne_raw \
+            ex_clustered_inverse_pwl_rap_music_raw \
+            ex_clustered_inverse_rap_music_raw \
             ex_connectivity_tutorial \
             ex_disp \
-            ex_disp_3D_tutorial \
+            ex_disp_3D \
             ex_fs_surface \
             ex_histogram \
+            ex_inverse_pwl_rap_music \
+            ex_inverse_rap_music \
             ex_read_fwd_disp_3D \
-            ex_raw_clustered_inverse \
-            ex_raw_clustered_inverse_pwl_rap_music \
-            ex_raw_clustered_inverse_rap_music \
             ex_roi_clustered_inverse_pwl_rap_music \
             ex_st_clustered_inverse_pwl_rap_music
     }

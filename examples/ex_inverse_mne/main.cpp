@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Example of computing a L2 minimum-norm estimate or a dSPM solution
+* @brief    Example of a L2 minimum-norm estimate or a dSPM solution
 *
 */
 
@@ -97,7 +97,7 @@ int main(int argc, char *argv[])
 
     // Command Line Parser
     QCommandLineParser parser;
-    parser.setApplicationDescription("Compute Inverse Example");
+    parser.setApplicationDescription("Inverse MNE Example");
     parser.addHelpOption();
 
     QCommandLineOption evokedFileOption("ave", "Path to evoked <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");

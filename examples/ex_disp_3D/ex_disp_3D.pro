@@ -1,14 +1,14 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     ex_raw_clustered_inverse_pwl_rap_music.pro
-# @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+# @file     ex_disp_3D.pro
+# @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
-# @date     July, 2012
+# @date     February, 2015
 #
 # @section  LICENSE
 #
-# Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+# Copyright (C) 2015, Lorenz Esch and Matti Hamalainen. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -29,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    Builds example for clustered inverse rap music
+# @brief    Builds an example on how to use the new disp3D lib
 #
 #--------------------------------------------------------------------------------------------------------------
 
@@ -44,7 +44,7 @@ QT += widgets 3dextras
 CONFIG   += console
 CONFIG   -= app_bundle
 
-TARGET = ex_raw_clustered_inverse_pwl_rap_music
+TARGET = ex_disp_3D
 
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
