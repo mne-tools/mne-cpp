@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     ex_compute_inverse.pro
+# @file     ex_inverse_pwl_rap_music.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
@@ -29,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    Builds example for computing an inverse source estimation
+# @brief    Builds example for making an clustered inverse operator
 #
 #--------------------------------------------------------------------------------------------------------------
 
@@ -39,12 +39,12 @@ TEMPLATE = app
 
 VERSION = $${MNE_CPP_VERSION}
 
-QT -= gui
+QT += widgets 3dextras
 
 CONFIG   += console
 CONFIG   -= app_bundle
 
-TARGET = ex_compute_inverse
+TARGET = ex_inverse_pwl_rap_music
 
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
@@ -57,7 +57,11 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Fsd \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
             -lMNE$${MNE_LIB_VERSION}Mned \
+            -lMNE$${MNE_LIB_VERSION}Connectivityd \
             -lMNE$${MNE_LIB_VERSION}Inversed \
+            -lMNE$${MNE_LIB_VERSION}Dispd \
+            -lMNE$${MNE_LIB_VERSION}DispChartsd \
+            -lMNE$${MNE_LIB_VERSION}Disp3Dd
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
@@ -65,10 +69,14 @@ else {
             -lMNE$${MNE_LIB_VERSION}Fs \
             -lMNE$${MNE_LIB_VERSION}Fiff \
             -lMNE$${MNE_LIB_VERSION}Mne \
+            -lMNE$${MNE_LIB_VERSION}Connectivity \
             -lMNE$${MNE_LIB_VERSION}Inverse \
+            -lMNE$${MNE_LIB_VERSION}Disp \
+            -lMNE$${MNE_LIB_VERSION}DispCharts \
+            -lMNE$${MNE_LIB_VERSION}Disp3D
 }
 
-DESTDIR = $${MNE_BINARY_DIR}
+DESTDIR =  $${MNE_BINARY_DIR}
 
 SOURCES += \
         main.cpp \

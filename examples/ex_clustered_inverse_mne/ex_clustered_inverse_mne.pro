@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     ex_compute_inverse_pwl_rap_music.pro
+# @file     ex_clustered_inverse_mne.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
@@ -44,7 +44,7 @@ QT += widgets 3dextras
 CONFIG   += console
 CONFIG   -= app_bundle
 
-TARGET = ex_compute_inverse_pwl_rap_music
+TARGET = ex_clustered_inverse_mne
 
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)

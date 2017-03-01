@@ -44,7 +44,7 @@ QT += widgets 3dextras
 CONFIG   += console
 CONFIG   -= app_bundle
 
-TARGET = ex_compute_inverse_rap_music
+TARGET = ex_inverse_rap_music
 
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)

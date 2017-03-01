@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     ex_raw_clustered_inverse.pro
+# @file     ex_clustered_inverse_rap_music_raw.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
@@ -29,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    Builds example for making an clustered inverse operator
+# @brief    Builds example for clustered inverse rap music
 #
 #--------------------------------------------------------------------------------------------------------------
 
@@ -44,7 +44,7 @@ QT += widgets 3dextras
 CONFIG   += console
 CONFIG   -= app_bundle
 
-TARGET = ex_raw_clustered_inverse
+TARGET = ex_clustered_inverse_rap_music_raw
 
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)

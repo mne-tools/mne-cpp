@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     ex_compute_inverse_raw.pro
+# @file     ex_inverse_mne_raw.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
@@ -29,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    Builds example for computing an inverse source estimation from raw
+# @brief    Builds example for an inverse mne source estimation from raw
 #
 #--------------------------------------------------------------------------------------------------------------
 
@@ -44,7 +44,7 @@ QT -= gui
 CONFIG   += console
 CONFIG   -= app_bundle
 
-TARGET = ex_compute_inverse_raw
+TARGET = ex_inverse_mne_raw
 
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)

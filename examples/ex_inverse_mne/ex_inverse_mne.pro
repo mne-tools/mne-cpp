@@ -1,14 +1,14 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     ex_disp_3D_tutorial.pro
-# @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+# @file     ex_inverse_mne.pro
+# @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
-# @date     February, 2015
+# @date     July, 2012
 #
 # @section  LICENSE
 #
-# Copyright (C) 2015, Lorenz Esch and Matti Hamalainen. All rights reserved.
+# Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -29,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    Builds an example on how to use the new disp3D lib
+# @brief    Builds example for an inverse mne source estimation
 #
 #--------------------------------------------------------------------------------------------------------------
 
@@ -39,12 +39,12 @@ TEMPLATE = app
 
 VERSION = $${MNE_CPP_VERSION}
 
-QT += widgets 3dextras
+QT -= gui
 
 CONFIG   += console
 CONFIG   -= app_bundle
 
-TARGET = ex_disp_3D_tutorial
+TARGET = ex_inverse_mne
 
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
@@ -58,10 +58,6 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Fiffd \
             -lMNE$${MNE_LIB_VERSION}Mned \
             -lMNE$${MNE_LIB_VERSION}Inversed \
-            -lMNE$${MNE_LIB_VERSION}Connectivityd \
-            -lMNE$${MNE_LIB_VERSION}Dispd \
-            -lMNE$${MNE_LIB_VERSION}DispChartsd \
-            -lMNE$${MNE_LIB_VERSION}Disp3Dd
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
@@ -70,13 +66,9 @@ else {
             -lMNE$${MNE_LIB_VERSION}Fiff \
             -lMNE$${MNE_LIB_VERSION}Mne \
             -lMNE$${MNE_LIB_VERSION}Inverse \
-            -lMNE$${MNE_LIB_VERSION}Connectivity \
-            -lMNE$${MNE_LIB_VERSION}Disp \
-            -lMNE$${MNE_LIB_VERSION}DispCharts \
-            -lMNE$${MNE_LIB_VERSION}Disp3D
 }
 
-DESTDIR =  $${MNE_BINARY_DIR}
+DESTDIR = $${MNE_BINARY_DIR}
 
 SOURCES += \
         main.cpp \
