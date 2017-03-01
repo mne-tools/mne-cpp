@@ -1,4 +1,4 @@
-#version 150 core
+#version 140 core
 
 #pragma include light.inc.frag
 

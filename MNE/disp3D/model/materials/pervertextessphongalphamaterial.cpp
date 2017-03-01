@@ -112,16 +112,16 @@ PerVertexTessPhongAlphaMaterial::~PerVertexTessPhongAlphaMaterial()
 void PerVertexTessPhongAlphaMaterial::init()
 {
     //Set shader
-    m_pVertexGL3Shader->setVertexShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl3/pervertextessphongalpha.vert"))));
-    m_pVertexGL3Shader->setTessellationControlShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl3/pervertextessphongalpha.tcs"))));
-    //m_pVertexGL3Shader->setTessellationEvaluationShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl3/pervertextessphongalpha_simple.tes"))));
-    m_pVertexGL3Shader->setTessellationEvaluationShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl3/pervertextessphongalpha_pn_triangles.tes"))));
-    m_pVertexGL3Shader->setGeometryShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl3/pervertextessphongalpha.geom"))));
-    m_pVertexGL3Shader->setFragmentShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl3/pervertextessphongalpha.frag"))));
+    m_pVertexGL3Shader->setVertexShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl4/pervertextessphongalpha.vert"))));
+    m_pVertexGL3Shader->setTessellationControlShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl4/pervertextessphongalpha.tcs"))));
+    //m_pVertexGL3Shader->setTessellationEvaluationShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl4/pervertextessphongalpha_simple.tes"))));
+    m_pVertexGL3Shader->setTessellationEvaluationShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl4/pervertextessphongalpha_pn_triangles.tes"))));
+    m_pVertexGL3Shader->setGeometryShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl4/pervertextessphongalpha.geom"))));
+    m_pVertexGL3Shader->setFragmentShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl4/pervertextessphongalpha.frag"))));
 
     m_pVertexGL3RenderPass->setShaderProgram(m_pVertexGL3Shader);
 
-    //Set OpenGL version - This material can only be used with opengl 4.0 or higher sine it is using tesselation
+    //Set OpenGL version - This material can only be used with opengl 4.0 or higher since it is using tesselation
     m_pVertexGL3Technique->graphicsApiFilter()->setApi(QGraphicsApiFilter::OpenGL);
     m_pVertexGL3Technique->graphicsApiFilter()->setMajorVersion(4);
     m_pVertexGL3Technique->graphicsApiFilter()->setMinorVersion(0);
