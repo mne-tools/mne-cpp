@@ -30,7 +30,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    ToDo Documentation...
+# @brief    Example for read an evoked from fiff file.
 #
 #--------------------------------------------------------------------------------------------------------------
 

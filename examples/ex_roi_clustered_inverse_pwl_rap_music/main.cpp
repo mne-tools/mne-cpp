@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Example of the computation of a roi clustered inverse rap music
+* @brief    Example of the computation of a roi clustered inverse powell rap music
 *
 */
 

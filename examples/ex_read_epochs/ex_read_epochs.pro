@@ -29,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    ToDo Documentation...
+# @brief    Read epoch data from a raw data file
 #
 #--------------------------------------------------------------------------------------------------------------
 

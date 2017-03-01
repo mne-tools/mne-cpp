@@ -30,7 +30,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    ToDo Documentation...
+# @brief    Find all evoked data sets from a file
 #
 #--------------------------------------------------------------------------------------------------------------
 

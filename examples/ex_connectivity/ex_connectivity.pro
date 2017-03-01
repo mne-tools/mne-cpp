@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     ex_connectivity_tutorial.pro
+# @file     ex_connectivity.pro
 # @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
@@ -29,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    Builds an example on how to use the new disp3D lib
+# @brief    Builds an example on connectivity estimation
 #
 #--------------------------------------------------------------------------------------------------------------
 
@@ -44,7 +44,7 @@ QT += widgets 3dextras
 CONFIG   += console
 CONFIG   -= app_bundle
 
-TARGET = ex_connectivity_tutorial
+TARGET = ex_connectivity
 
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)

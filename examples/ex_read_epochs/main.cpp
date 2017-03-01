@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     	Read epoch data from a raw data file
+* @brief    Read epoch data from a raw data file
 *
 */
 
