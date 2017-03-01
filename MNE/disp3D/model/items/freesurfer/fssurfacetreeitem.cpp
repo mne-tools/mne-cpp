@@ -161,7 +161,7 @@ void FsSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* pare
     m_pRenderable3DEntity->addComponent(pPerVertexPhongAlphaMaterial);
 
 //    //Render normals
-//    m_pRenderable3DEntityNormals = new Renderable3DEntity(m_pRenderable3DEntity);
+//    m_pRenderable3DEntityNormals = new Renderable3DEntity(parent);
 //    m_pRenderable3DEntityNormals->setMeshData(tSurface.rr(), tSurface.nn(), tSurface.tris(), arrayCurvatureColor, Qt3DRender::QGeometryRenderer::Triangles);
 //    m_pRenderable3DEntityNormals->setPosition(QVector3D(-tSurface.offset()(0), -tSurface.offset()(1), -tSurface.offset()(2)));
 //    ShowNormalsMaterial* pShowNormalsMaterial = new ShowNormalsMaterial();
@@ -176,7 +176,7 @@ void FsSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* pare
 //        overlayAdds.row(i) = direction*0.0001;
 //    }
 
-//    m_pRenderable3DEntityNormals->setMeshData(tSurface.rr()+overlayAdds, tSurface.nn(), tSurface.tris(), -tSurface.offset(), matCurvatureColor);
+//    m_pRenderable3DEntityNormals->setMeshData(tSurface.rr()+overlayAdds, tSurface.nn(), tSurface.tris(), arrayCurvatureColor);
 
     //Add data which is held by this FsSurfaceTreeItem
     QVariant data;
