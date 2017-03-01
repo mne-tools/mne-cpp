@@ -159,6 +159,13 @@ private:
     QPointer<Qt3DRender::QRenderPass>       m_pVertexGL3RenderPass;
     QPointer<Qt3DRender::QShaderProgram>    m_pVertexGL3Shader;
 
+    QPointer<Qt3DRender::QTechnique>        m_pVertexGL2Technique;
+    QPointer<Qt3DRender::QRenderPass>       m_pVertexGL2RenderPass;
+
+    QPointer<Qt3DRender::QTechnique>        m_pVertexES2Technique;
+    QPointer<Qt3DRender::QRenderPass>       m_pVertexES2RenderPass;
+    QPointer<Qt3DRender::QShaderProgram>    m_pVertexES2Shader;
+
     QPointer<Qt3DRender::QNoDepthMask>                  m_pNoDepthMask;
     QPointer<Qt3DRender::QBlendEquationArguments>       m_pBlendState;
     QPointer<Qt3DRender::QBlendEquation>                m_pBlendEquation;

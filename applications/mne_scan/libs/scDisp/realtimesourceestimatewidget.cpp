@@ -162,7 +162,7 @@ void RealTimeSourceEstimateWidget::getData()
         //
         if(!m_pRtItem) {
             qDebug()<<"RealTimeSourceEstimateWidget::getData - Creating m_lRtItem list";
-            m_pRtItem = m_pData3DModel->addSourceData("Subject01", "HemiLRSet", *m_pRTSE->getValue(), *m_pRTSE->getFwdSolution());
+            m_pRtItem = m_pData3DModel->addSourceData("Subject", "Data", *m_pRTSE->getValue(), *m_pRTSE->getFwdSolution());
 
             m_pRtItem->setLoopState(false);
             m_pRtItem->setTimeInterval(17);
@@ -190,7 +190,7 @@ void RealTimeSourceEstimateWidget::getData()
             //
             // Add brain data
             //
-            m_pData3DModel->addSurfaceSet("Subject01", "HemiLRSet", *m_pRTSE->getSurfSet(), *m_pRTSE->getAnnotSet());
+            m_pData3DModel->addSurfaceSet("Subject", "MRI", *m_pRTSE->getSurfSet(), *m_pRTSE->getAnnotSet());
         }
     }
 }

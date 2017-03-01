@@ -45,22 +45,15 @@
 #include <disp3D/model/items/sourceactivity/mneestimatetreeitem.h>
 #include <disp3D/model/data3Dtreemodel.h>
 
-#include <fs/label.h>
 #include <fs/surfaceset.h>
 #include <fs/annotationset.h>
 
-#include <fiff/fiff_evoked.h>
-#include <fiff/fiff.h>
-#include <fiff/fiff_dig_point_set.h>
-#include <mne/mne.h>
-
-#include <mne/mne.h>
-#include <mne/mne_epoch_data_list.h>
 #include <mne/mne_sourceestimate.h>
+#include <mne/mne_bem.h>
+
+#include <fiff/fiff_dig_point_set.h>
 
 #include <inverse/minimumNorm/minimumnorm.h>
-
-#include <utils/mnemath.h>
 
 #include <iostream>
 
@@ -85,7 +78,6 @@ using namespace MNELIB;
 using namespace FSLIB;
 using namespace FIFFLIB;
 using namespace INVERSELIB;
-using namespace UTILSLIB;
 
 
 //*************************************************************************************************************
@@ -112,7 +104,7 @@ int main(int argc, char *argv[])
     parser.setApplicationDescription("Disp3D Example");
     parser.addHelpOption();
 
-    QCommandLineOption surfOption("surfType", "Surface type <type>.", "type", "inflated");
+    QCommandLineOption surfOption("surfType", "Surface type <type>.", "type", "pial");
     QCommandLineOption annotOption("annotType", "Annotation type <type>.", "type", "aparc.a2009s");
     QCommandLineOption hemiOption("hemi", "Selected hemisphere <hemi>.", "hemi", "2");
     QCommandLineOption subjectOption("subject", "Selected subject <subject>.", "subject", "sample");
@@ -261,20 +253,20 @@ int main(int argc, char *argv[])
     //Add fressurfer surface set including both hemispheres
     p3DDataModel->addSurfaceSet(parser.value(subjectOption), "MRI", tSurfSet, tAnnotSet);
 
-//    //Read and show BEM
-//    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-head.fif");
-//    MNEBem t_Bem(t_fileBem);
-//    p3DDataModel->addBemData(parser.value(subjectOption), "BEM", t_Bem);
+    //Read and show BEM
+    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-head.fif");
+    MNEBem t_Bem(t_fileBem);
+    p3DDataModel->addBemData(parser.value(subjectOption), "BEM", t_Bem);
 
-//    //Read and show sensor helmets
-//    QFile t_filesensorSurfaceVV("./resources/sensorSurfaces/306m_rt.fif");
-//    MNEBem t_sensorSurfaceVV(t_filesensorSurfaceVV);
-//    p3DDataModel->addBemData("Sensors", "VectorView", t_sensorSurfaceVV);
+    //Read and show sensor helmets
+    QFile t_filesensorSurfaceVV("./resources/sensorSurfaces/306m_rt.fif");
+    MNEBem t_sensorSurfaceVV(t_filesensorSurfaceVV);
+    p3DDataModel->addBemData("Sensors", "VectorView", t_sensorSurfaceVV);
 
-//    // Read & show digitizer points
-//    QFile t_fileDig("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
-//    FiffDigPointSet t_Dig(t_fileDig);
-//    p3DDataModel->addDigitizerData(parser.value(subjectOption), evoked.comment, t_Dig);
+    // Read & show digitizer points
+    QFile t_fileDig("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    FiffDigPointSet t_Dig(t_fileDig);
+    p3DDataModel->addDigitizerData(parser.value(subjectOption), evoked.comment, t_Dig);
 
     if(bAddRtSourceLoc) {
         //Add rt source loc data and init some visualization values
