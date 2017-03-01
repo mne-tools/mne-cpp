@@ -107,7 +107,7 @@ int main(int argc, char *argv[])
 
     // Command Line Parser
     QCommandLineParser parser;
-    parser.setApplicationDescription("Raw Clustered Inverse Rap Music Example");
+    parser.setApplicationDescription("Clustered Inverse Rap Music Raw Example");
     parser.addHelpOption();
 
     QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", "./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");

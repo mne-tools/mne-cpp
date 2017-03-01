@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     Example of reading forwardsolution data from a fiff file
+* @brief     Example of reading ForwardSolution data from a fiff file
 *
 */
 

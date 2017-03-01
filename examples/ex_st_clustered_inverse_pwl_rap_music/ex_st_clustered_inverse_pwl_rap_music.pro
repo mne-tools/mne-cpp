@@ -1,13 +1,14 @@
 #--------------------------------------------------------------------------------------------------------------
 #
 # @file     ex_st_clustered_inverse_pwl_rap_music.pro
-# @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
+# @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+#           Lorenz Esch <lorenz.esch@tu-ilmenau.de>
 # @version  1.0
 # @date     March, 2014
 #
 # @section  LICENSE
 #
-# Copyright (C) 2014, Christoph Dinh. All rights reserved.
+# Copyright (C) 2014, Christoph Dinh and Lorenz Esch. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:

@@ -30,7 +30,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    ToDo Documentation...
+# @brief    Example of the FiffIO interface class
 #
 #--------------------------------------------------------------------------------------------------------------
 

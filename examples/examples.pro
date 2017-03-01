@@ -62,7 +62,7 @@ SUBDIRS += \
             ex_clustered_inverse_mne_raw \
             ex_clustered_inverse_pwl_rap_music_raw \
             ex_clustered_inverse_rap_music_raw \
-            ex_connectivity_tutorial \
+            ex_connectivity \
             ex_disp \
             ex_disp_3D \
             ex_fs_surface \

@@ -29,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    Builds example for clustered inverse rap music
+# @brief    Builds example for clustered inverse rap music raw
 #
 #--------------------------------------------------------------------------------------------------------------
 

@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Example of the computation of a rawClusteredInverse
+* @brief    Example of the computation of a clustered inverse mne raw
 *
 */
 
@@ -110,7 +110,7 @@ int main(int argc, char *argv[])
 
     // Command Line Parser
     QCommandLineParser parser;
-    parser.setApplicationDescription("Raw Clustered Inverse Example");
+    parser.setApplicationDescription("Clustered Inverse Raw Example");
     parser.addHelpOption();
 
     QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", "./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");

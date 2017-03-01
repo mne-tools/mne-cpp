@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     histogram.cpp
+* @file     main.cpp
 * @author   Ricky Tjen <ricky270@student.sgu.ac.id>;
 *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
@@ -9,7 +9,7 @@
 *
 * @section  LICENSE
 *
-* Copyright (C) 2016, Ricky Tjen and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Ricky Tjen, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
