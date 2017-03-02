@@ -159,7 +159,7 @@ public:
     *
     * @return the Input dimensions
     */
-    int inputDimensions();
+    size_t inputDimensions();
 
     //=========================================================================================================
     /**
@@ -167,7 +167,7 @@ public:
     *
     * @return the Output dimensions
     */
-    int outputDimensions();
+    size_t outputDimensions();
 
 private:
     QString m_sModelFilename;                               /**< Model filename */

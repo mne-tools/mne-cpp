@@ -140,7 +140,7 @@ bool Deep::evalModel(std::vector<float>& inputs, std::vector<float>& outputs)
     std::wstring outputLayerName = outDims.begin()->first;
 
     if(inDims[inputLayerName] != inputs.size()) {
-        fprintf(stderr, "Input dimension does not fit %d != %d.\n", inputs.size(), inDims[inputLayerName]);
+        fprintf(stderr, "Input dimension does not fit %zu != %llu.\n", inputs.size(), inDims[inputLayerName]);
         return false;
     }
 
@@ -185,12 +185,13 @@ bool Deep::loadModel()
     networkConfiguration += "modelPath=\"" + modelFile + "\"";
     m_model->CreateNetwork(networkConfiguration);
 
+    return true;
 }
 
 
 //*************************************************************************************************************
 
-int Deep::inputDimensions()
+size_t Deep::inputDimensions()
 {
     if(m_model) {
         std::map<std::wstring, size_t> inDims;
@@ -207,7 +208,7 @@ int Deep::inputDimensions()
 
 //*************************************************************************************************************
 
-int Deep::outputDimensions()
+size_t Deep::outputDimensions()
 {
     if(m_model) {
         std::map<std::wstring, size_t> outDims;
