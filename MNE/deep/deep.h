@@ -43,11 +43,15 @@
 
 #include "deep_global.h"
 
+#include <Eval.h>
+//#include <CNTKLibrary.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // FIFF INCLUDES
 //=============================================================================================================
+
 
 
 //*************************************************************************************************************
@@ -139,10 +143,36 @@ public:
     *
     * @return true when MNE Deep model was sucessfully evaluated.
     */
-    bool evalModel();
+    bool evalModel(std::vector<float>& inputs, std::vector<float>& outputs);
+
+    //=========================================================================================================
+    /**
+    * Loads the MNE Deep Model set by the model file name
+    *
+    * @return true when MNE Deep model was sucessfully loaded.
+    */
+    bool loadModel();
+
+    //=========================================================================================================
+    /**
+    * Returns the Input Dimensions
+    *
+    * @return the Input dimensions
+    */
+    int inputDimensions();
+
+    //=========================================================================================================
+    /**
+    * Returns the Output Dimensions
+    *
+    * @return the Output dimensions
+    */
+    int outputDimensions();
 
 private:
-    QString m_sModelFilename;
+    QString m_sModelFilename;                               /**< Model filename */
+
+    Microsoft::MSR::CNTK::IEvaluateModel<float>* m_model;   /**< The loaded model */
 
 };
 
