@@ -427,7 +427,7 @@ MneNamedMatrix *MneNamedMatrix::read_named_matrix(FiffStream::SPtr &stream, cons
         fromFloatEigenMatrix_14(tmp_data, data);
     }
     else {
-        for (k = 0; k < tmp_node->nchild; k++) {
+        for (k = 0; k < tmp_node->nchild(); k++) {
             if (tmp_node->children[k]->type == FIFFB_MNE_NAMED_MATRIX) {
                 if(tmp_node->children[k]->find_tag(stream, kind, t_pTag)) {
                     t_pTag->getMatrixDimensions(ndim, dims);

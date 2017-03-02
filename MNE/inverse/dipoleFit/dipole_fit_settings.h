@@ -58,6 +58,7 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
+#include <QStringList>
 
 
 
@@ -169,20 +170,22 @@ public:
     int   setno        = 1;             /**< Which data set */
     bool  verbose      = false;
     mneFilterDefRec     filter;
-    QList<QString> projnames;           /**< Projection file names */
+    QStringList projnames;              /**< Projection file names */
     bool omit_data_proj = false;
 
-    QString eeg_model_file;                 /* File of EEG sphere model specifications */
-    QString eeg_model_name;                 /* Name of the EEG model to use */
-    float  eeg_sphere_rad = 0.09f;          /* Scalp radius to use in EEG sphere model */
-    bool    scale_eeg_pos  = false;         /* Scale the electrode locations to scalp in the sphere model */
-    float  mag_reg      = 0.1f;             /* Noise-covariance matrix regularization for MEG (magnetometers and axial gradiometers)  */
+    QString eeg_model_file;             /**< File of EEG sphere model specifications */
+    QString eeg_model_name;             /**< Name of the EEG model to use */
+    float  eeg_sphere_rad = 0.09f;      /**< Scalp radius to use in EEG sphere model */
+    bool    scale_eeg_pos  = false;     /**< Scale the electrode locations to scalp in the sphere model */
+    float  mag_reg      = 0.1f;         /**< Noise-covariance matrix regularization for MEG (magnetometers and axial gradiometers)  */
     bool   fit_mag_dipoles = false;
 
-    float  grad_reg     = 0.1f;              /* Noise-covariance matrix regularization for EEG (planar gradiometers) */
-    float  eeg_reg      = 0.1f;              /* Noise-covariance matrix regularization for EEG  */
-    QString dipname;              /* Output file in dip format */
-    QString bdipname;              /* Output file in bdip format */
+    float  grad_reg     = 0.1f;         /**< Noise-covariance matrix regularization for EEG (planar gradiometers) */
+    float  eeg_reg      = 0.1f;         /**< Noise-covariance matrix regularization for EEG  */
+    QString dipname;                    /**< Output file in dip format */
+    QString bdipname;                   /**< Output file in bdip format */
+
+    bool gui    = false;                /**< Should the gui been shown? */
 
 private:
     void initMembers();

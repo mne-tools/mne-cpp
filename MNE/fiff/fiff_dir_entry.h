@@ -112,7 +112,7 @@ public:
     fiff_int_t  kind;   /**< Tag number */
     fiff_int_t  type;   /**< Data type */
     fiff_int_t  size;   /**< How many bytes */
-    fiff_int_t  pos;    /**< Location in file; Note: the data is located at pos + FIFFC_DATA_OFFSET */
+    fiff_int_t  pos;    /**< Location in file; Note: the data is located at pos + FIFFC_DATA_OFFSET: 2GB restriction -> change this to fiff_long_t */
 
 // ### OLD STRUCT ###
 //    /** Directories are composed of these structures. *

@@ -42,6 +42,7 @@
 #include "fiff_evoked_set.h"
 #include "fiff_tag.h"
 #include "fiff_dir_node.h"
+#include "fiff_stream.h"
 
 
 //*************************************************************************************************************
@@ -236,7 +237,7 @@ bool FiffEvokedSet::read(QIODevice& p_IODevice, FiffEvokedSet& p_FiffEvokedSet, 
     //   Read the measurement info
     //
     FiffDirNode::SPtr meas;
-    if(!t_pStream->read_meas_info(t_pStream->tree(), p_FiffEvokedSet.info, meas))
+    if(!t_pStream->read_meas_info(t_pStream->dirtree(), p_FiffEvokedSet.info, meas))
         return false;
     p_FiffEvokedSet.info.filename = t_sFileName; //move fname storage to read_meas_info member function
     //

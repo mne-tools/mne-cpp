@@ -80,6 +80,8 @@ namespace INVERSELIB
 
 class MneMeasDataSet;
 class MneNamedMatrix;
+class MneInverseOperator;
+
 
 //=============================================================================================================
 /**
@@ -122,7 +124,7 @@ public:
 
     static MneMeasData* mne_read_meas_data_add(const QString&       name,       /* Name of the measurement file */
                                        int                  set,        /* Which data set */
-                                       mneInverseOperator   op,         /* For consistency checks */
+                                       MneInverseOperator*   op,         /* For consistency checks */
                                        MneNamedMatrix*       fwd,        /* Another option for consistency checks */
                                        char                 **namesp,   /* Yet another option: explicit name list */
                                        int                  nnamesp,
@@ -131,8 +133,8 @@ public:
 
     static MneMeasData* mne_read_meas_data(const QString&       name,       /* Name of the measurement file */
                                    int                  set,        /* Which data set */
-                                   mneInverseOperator   op,         /* For consistency checks */
-                                   MneNamedMatrix*       fwd,        /* Another option for consistency checks */
+                                   MneInverseOperator*  op,         /* For consistency checks */
+                                   MneNamedMatrix*      fwd,        /* Another option for consistency checks */
                                    char                 **namesp,   /* Yet another option: explicit name list */
                                    int                  nnamesp);
 
@@ -152,7 +154,7 @@ public:
     float                   lowpass;    /* Lowpass filter setting */
     INVERSELIB::MneProjOp*  proj;       /* Associated projection operator (useful if inverse operator is not included) */
     MneCTFCompDataSet*      comp;       /* The software gradient compensation data */
-    mneInverseOperator      op;         /* Associated inverse operator */
+    MneInverseOperator*     op;         /* Associated inverse operator */
     MneNamedMatrix*         fwd;        /* Forward operator for dipole fitting */
     MneRawData*             raw;        /* This will be non-null if the data stems from a raw data file */
     mneChSelection          chsel;      /* Channel selection for raw data */

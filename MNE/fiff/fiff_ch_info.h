@@ -43,6 +43,7 @@
 
 #include "fiff_global.h"
 #include "fiff_types.h"
+#include "fiff_ch_pos.h"
 
 
 //*************************************************************************************************************
@@ -119,55 +120,33 @@ public:
     inline static qint32 storageSize();
 
 public:
-    fiff_int_t    scanno;       /**< Scanning order number 1*/
-    fiff_int_t    logno;        /**< Logical channel # 1*/
+    fiff_int_t    scanNo;       /**< Scanning order number 1*/
+    fiff_int_t    logNo;        /**< Logical channel # 1*/
     fiff_int_t    kind;         /**< Kind of channel 1*/
     fiff_float_t  range;        /**< Voltmeter range (-1 = auto ranging) 1*/
     fiff_float_t  cal;          /**< Calibration from volts to units used 1*/
-
-    fiff_int_t coil_type;       /**< What kind of coil. */
-
-    Matrix<double,12,1, DontAlign>  loc;            /**< Channel (MEG) location:
-                                                     *   3x Coil coordinate system origin;
-                                                     *   3x Coil coordinate system x-axis unit vector;
-                                                     *   3x Coil coordinate system y-axis unit vector;
-                                                     *   3x Coil coordinate system z-axis unit vector*/
-    Matrix<double,4,4, DontAlign>   coil_trans;     /**< Coil coordinate system transformation */
-    Matrix<double,3,2, DontAlign>   eeg_loc;        /**< Channel location */
-    fiff_int_t                      coord_frame;    /**< Coordinate Frame */
-
-
-//    /** Measurement channel position and coil type. */
-//    typedef struct _fiffChPosRec {
-//     fiff_int_t   coil_type;   /**< What kind of coil. */
-//     fiff_float_t r0[3];       /**< Coil coordinate system origin */
-//     fiff_float_t ex[3];       /**< Coil coordinate system x-axis unit vector */
-//     fiff_float_t ey[3];       /**< Coil coordinate system y-axis unit vector */
-//     fiff_float_t ez[3];       /**< Coil coordinate system z-axis unit vector */
-//    } fiffChPosRec,*fiffChPos; /**< Measurement channel position and coil type */
-
-//    typedef fiffChPosRec fiff_ch_pos_t;
-
-
-//    fiff_ch_pos_t chpos;        /**< Channel location 15 -> ToDo: read in*/
-
-
+    FiffChPos     chpos;        /**< Channel location */
     fiff_int_t    unit;         /**< Unit of measurement 1*/
     fiff_int_t    unit_mul;     /**< Unit multiplier exponent 1*/
     QString       ch_name;      /**< Descriptive name for the channel 16*/
 
+    //Convinience members - MATLAB -
+    Matrix<float,4,4, DontAlign>    coil_trans;     /**< Coil coordinate system transformation */
+    Matrix<float,3,2, DontAlign>    eeg_loc;        /**< Channel location */
+    fiff_int_t    coord_frame;                      /**< Coordinate Frame */
+
 // ### OLD STRUCT ###
-// typedef struct _fiffChInfoRec {
-//     fiff_int_t    scanNo;		/**< Scanning order number *
-//     fiff_int_t    logNo;		/**< Logical channel # *
-//     fiff_int_t    kind;			/**< Kind of channel *
-//     fiff_float_t  range;		/**< Voltmeter range (-1 = auto ranging) *
-//     fiff_float_t  cal;			/**< Calibration from volts to units used *
-//     fiff_ch_pos_t chpos;		/**< Channel location *
-//     fiff_int_t    unit;			/**< Unit of measurement *
-//     fiff_int_t    unit_mul;		/**< Unit multiplier exponent *
-//     fiff_char_t   ch_name[16];	/**< Descriptive name for the channel *
-// } fiffChInfoRec,*fiffChInfo;	/**< Description of one channel *
+//typedef struct _fiffChInfoRec {
+//    fiff_int_t    scanNo;       /**< Scanning order number */
+//    fiff_int_t    logNo;        /**< Logical channel # */
+//    fiff_int_t    kind;         /**< Kind of channel */
+//    fiff_float_t  range;        /**< Voltmeter range (-1 = auto ranging) */
+//    fiff_float_t  cal;          /**< Calibration from volts to units used */
+//    fiff_ch_pos_t chpos;        /**< Channel location */
+//    fiff_int_t    unit;         /**< Unit of measurement */
+//    fiff_int_t    unit_mul;     /**< Unit multiplier exponent */
+//    fiff_char_t   ch_name[16];  /**< Descriptive name for the channel */
+//} fiffChInfoRec,*fiffChInfo;    /**< Description of one channel */
 
 // /** Alias for fiffChInfoRec *
 // typedef fiffChInfoRec fiff_ch_info_t;

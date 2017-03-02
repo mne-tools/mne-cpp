@@ -264,8 +264,6 @@ private:
     QSharedPointer<FIFFLIB::FiffInfo>   m_pFiffInfo;                        /**< Fiff measurement info.*/
     Eigen::RowVectorXd                  m_cals;
 
-    QSharedPointer<IOBUFFER::RawMatrixBuffer>     m_pRawMatrixBuffer_In;    /**< Holds incoming raw data.*/
-
     QSharedPointer<EEGoSportsProducer>  m_pEEGoSportsProducer;              /**< The EEGoSportsProducer.*/
 
     QMutex                              m_mutex;                            /**< Holds the threads mutex.*/

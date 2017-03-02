@@ -315,7 +315,7 @@ void RtSssAlgo::setMEGInfo(FiffInfo::SPtr fiffInfo, RowVectorXi pickedChannels)
 
     for (qint32 i=0; i<NumCoil; ++i)
     {
-        CoilT.append(fiffInfo->chs[pickedChannels(i)].coil_trans);
+        CoilT.append(fiffInfo->chs[pickedChannels(i)].coil_trans.cast <double>());
 
 //                std::cout << "PickedChID: " << pickedChannels(i) << ", ";
 //                std::cout <<  fiffInfo->chs[pickedChannels(i)].coil_trans << std::endl;
@@ -324,7 +324,7 @@ void RtSssAlgo::setMEGInfo(FiffInfo::SPtr fiffInfo, RowVectorXi pickedChannels)
 
         CoilName.append(fiffInfo->chs[pickedChannels(i)].ch_name);
 
-        switch (fiffInfo->chs[pickedChannels(i)].coil_type)
+        switch (fiffInfo->chs[pickedChannels(i)].chpos.coil_type)
         {
             case 3012:
                 qDebug() << " WARNING !!! Gradiometer is not supported for SSS !!!";
@@ -1402,14 +1402,14 @@ void RtSssAlgo::getCoilInfoVectorView()
     {
         // kind = 1(MEG), 2(EEG), 3(STI...)
         // coil_type = 3012(planar gradiometer),  3024(magnetometer)
-        if ((raw.info.chs[i].kind == 1 ) && ((raw.info.chs[i].coil_type == 3012) || (raw.info.chs[i].coil_type == 3024)))
+        if ((raw.info.chs[i].kind == 1 ) && ((raw.info.chs[i].chpos.coil_type == 3012) || (raw.info.chs[i].chpos.coil_type == 3024)))
         {
-            CoilName.append(QString::number(raw.info.chs[i].coil_type));
+            CoilName.append(QString::number(raw.info.chs[i].chpos.coil_type));
 //            std::cout << "coil no[" << nmegcoil <<"] "<< CoilName[nmegcoil].toStdString() << "   ";
 
-            CoilT.append(raw.info.chs[i].coil_trans);
+            CoilT.append(raw.info.chs[i].coil_trans.cast<double>());
 
-            if (raw.info.chs[i].coil_type == 3012)  CoilGrad(nmegcoil) = 1;
+            if (raw.info.chs[i].chpos.coil_type == 3012)  CoilGrad(nmegcoil) = 1;
             else    CoilGrad(nmegcoil) = 0;
 //            std::cout << CoilGrad(nmegcoil) << "   ,";
 
