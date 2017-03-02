@@ -42,7 +42,7 @@
 #include <QChartView>
 #include <QLineSeries>
 
-#include <deep/deep.h>
+#include <deep/deepeval.h>
 
 
 //*************************************************************************************************************
@@ -89,6 +89,39 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
+    DeepEval deepTest(QApplication::applicationDirPath() + "/mne_deep_models/examples/output/models/ex_deep_one_hidden");
+
+    //
+    // Generate dummy input values in the appropriate structure and size
+    //
+    std::vector<float> inputs, outputs;
+    for (int i = 0; i < deepTest.inputDimensions(); i++)
+        inputs.push_back(static_cast<float>(i % 255));
+
+    deepTest.evalModel(inputs, outputs);
+
+    //
+    // Output the results
+    //
+    for (auto& value : outputs)
+        fprintf(stderr, "%f\n", value);
+
+    //
+    // Visualize
+    //
+    QLineSeries *series = new QLineSeries();
+    for (int i = 0; i < outputs.size(); i++)
+        series->append(i,outputs[i]);
+
+    QChart *chart = new QChart();
+    chart->legend()->hide();
+    chart->addSeries(series);
+    chart->createDefaultAxes();
+    chart->setTitle("Simple line chart example");
+
+    QChartView *chartView = new QChartView(chart);
+    chartView->setRenderHint(QPainter::Antialiasing);
+    chartView->show();
 
     return a.exec();
 }
