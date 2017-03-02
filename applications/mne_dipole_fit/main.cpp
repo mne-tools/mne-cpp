@@ -170,7 +170,7 @@ int main(int argc, char *argv[])
         ECDSet::SPtr pSet = ECDSet::SPtr(new ECDSet(set));
         p3DDataModel->addBemData("sample", "BEM", t_Bem);
         p3DDataModel->addSurfaceSet("sample", "MRI", tSurfSet, tAnnotSet);
-        //p3DDataModel->addDipoleFitData("sample", "Dipole test", pSet);
+        p3DDataModel->addDipoleFitData("sample", "Dipole test", pSet);
 
         //Create the 3D view
         testWindow = View3D::SPtr(new View3D());
