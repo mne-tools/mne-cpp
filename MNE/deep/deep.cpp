@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     deepeval.cpp
+* @file     deep.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    DeepEval class implementation.
+* @brief    Deep class implementation.
 *
 */
 
@@ -38,7 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "deepeval.h"
+#include "deep.h"
 
 #ifdef _WIN32
 #include <Windows.h>
@@ -83,7 +83,7 @@ typedef std::map<std::wstring, std::vector<float>*> Layer;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-DeepEval::DeepEval()
+Deep::Deep()
 : m_model(NULL)
 {
 }
@@ -91,7 +91,7 @@ DeepEval::DeepEval()
 
 //*************************************************************************************************************
 
-DeepEval::DeepEval(const QString &sModelFilename)
+Deep::Deep(const QString &sModelFilename)
 : m_sModelFilename(sModelFilename)
 , m_model(NULL)
 {
@@ -101,7 +101,7 @@ DeepEval::DeepEval(const QString &sModelFilename)
 
 //*************************************************************************************************************
 
-DeepEval::~DeepEval()
+Deep::~Deep()
 {
 
 }
@@ -109,7 +109,7 @@ DeepEval::~DeepEval()
 
 //*************************************************************************************************************
 
-const QString& DeepEval::getModelFilename() const
+const QString& Deep::getModelFilename() const
 {
     return m_sModelFilename;
 }
@@ -117,7 +117,7 @@ const QString& DeepEval::getModelFilename() const
 
 //*************************************************************************************************************
 
-void DeepEval::setModelFilename(const QString &sModelFilename)
+void Deep::setModelFilename(const QString &sModelFilename)
 {
     m_sModelFilename = sModelFilename;
 }
@@ -125,7 +125,7 @@ void DeepEval::setModelFilename(const QString &sModelFilename)
 
 //*************************************************************************************************************
 
-bool DeepEval::evalModel(std::vector<float>& inputs, std::vector<float>& outputs)
+bool Deep::evalModel(std::vector<float>& inputs, std::vector<float>& outputs)
 {
     if( !m_model )
         return false;
@@ -162,7 +162,7 @@ bool DeepEval::evalModel(std::vector<float>& inputs, std::vector<float>& outputs
 
 //*************************************************************************************************************
 
-bool DeepEval::loadModel()
+bool Deep::loadModel()
 {
     QFile file(m_sModelFilename);
     if(!file.exists()) {
@@ -191,7 +191,7 @@ bool DeepEval::loadModel()
 
 //*************************************************************************************************************
 
-size_t DeepEval::inputDimensions()
+size_t Deep::inputDimensions()
 {
     if(m_model) {
         std::map<std::wstring, size_t> inDims;
@@ -205,7 +205,7 @@ size_t DeepEval::inputDimensions()
 
 //*************************************************************************************************************
 
-size_t DeepEval::outputDimensions()
+size_t Deep::outputDimensions()
 {
     if(m_model) {
         std::map<std::wstring, size_t> outDims;

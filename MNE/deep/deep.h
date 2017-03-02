@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     deepeval.h
+* @file     deep.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    DeepEval class declaration.
+* @brief    Deep class declaration.
 *
 */
 
-#ifndef DEEPEVAL_H
-#define DEEPEVAL_H
+#ifndef DEEP_H
+#define DEEP_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -91,21 +91,21 @@ namespace DEEPLIB
 
 //=============================================================================================================
 /**
-* DeepEval cntk wrapper descritpion
+* Deep cntk wrapper descritpion
 *
-* @brief DeepEval cntk wrapper to evaluate pretrained models
+* @brief Deep cntk wrapper to train and evaluate models
 */
-class DEEPSHARED_EXPORT DeepEval
+class DEEPSHARED_EXPORT Deep
 {
 public:
-    typedef QSharedPointer<DeepEval> SPtr;            /**< Shared pointer type for DeepEval. */
-    typedef QSharedPointer<const DeepEval> ConstSPtr; /**< Const shared pointer type for DeepEval. */
+    typedef QSharedPointer<Deep> SPtr;            /**< Shared pointer type for Deep. */
+    typedef QSharedPointer<const Deep> ConstSPtr; /**< Const shared pointer type for Deep. */
 
     //=========================================================================================================
     /**
     * Default constructor
     */
-    DeepEval();
+    Deep();
 
     //=========================================================================================================
     /**
@@ -113,13 +113,13 @@ public:
     *
     * @param [in] sModelFilename    The model filename to set
     */
-    DeepEval(const QString &sModelFilename);
+    Deep(const QString &sModelFilename);
 
     //=========================================================================================================
     /**
-    * Destructs DeepEval
+    * Destructs Deep
     */
-    virtual ~DeepEval();
+    virtual ~Deep();
 
     //=========================================================================================================
     /**
@@ -184,4 +184,4 @@ private:
 
 } // NAMESPACE
 
-#endif // DEEPEVAL_H
+#endif // DEEP_H
