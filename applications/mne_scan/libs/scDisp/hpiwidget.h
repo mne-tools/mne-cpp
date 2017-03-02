@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
 * @file     hpiwidget.h
-* @author   Limin Sun <liminsun@nmr.mgh.harvard.edu>
+* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     March, 2015
+* @date     March, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) 2015, Limin Sun and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    BabyMEGHPI class declaration.
+* @brief    HPIWidget class declaration.
 *
 */
 
@@ -109,7 +109,7 @@ class SCDISPSHARED_EXPORT HPIWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit HPIWidget(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo, QWidget *parent = 0);
+    HPIWidget(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo, QWidget *parent = 0);
     ~HPIWidget();
 
     //=========================================================================================================
@@ -181,7 +181,7 @@ protected:
     */
     void performHPIFitting(const QVector<int>& vFreqs);
 
-    Ui::HPIWidget*                          ui;                 /**< The HPI dialog. */
+    Ui::HPIWidget*                              ui;                 /**< The HPI dialog. */
 
     QVector<int>                                m_vCoilFreqs;       /**< Vector contains the HPI coil frequencies. */
 
