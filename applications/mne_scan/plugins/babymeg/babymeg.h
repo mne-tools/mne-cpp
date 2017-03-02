@@ -289,14 +289,6 @@ protected:
 
     //=========================================================================================================
     /**
-    * Receive HPI FiffInfo.
-    *
-    * @param[in] info   the new fiff info.
-    */
-    void recvHPIFiffInfo(const FIFFLIB::FiffInfo& info);
-
-    //=========================================================================================================
-    /**
     * Set the recording time in seconds.
     *
     * @param[in] time   the new recording time.
