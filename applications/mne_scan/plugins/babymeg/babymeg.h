@@ -144,33 +144,9 @@ public:
 
     //=========================================================================================================
     /**
-    * Clears the rt server
-    */
-    void clear();
-
-    //=========================================================================================================
-    /**
     * Clone the plugin
     */
     virtual QSharedPointer<SCSHAREDLIB::IPlugin> clone() const;
-
-    //=========================================================================================================
-    /**
-    * Returns the babyMEG file path which is to be written to.
-    *
-    * @param[in] currentTime    insert current time stamp.
-    *
-    * @return the storage filepath
-    */
-    QString getFilePath(bool currentTime = false) const;
-
-    //=========================================================================================================
-    /**
-    * Returns the path where the subjects folders are stored.
-    *
-    * @return the data path
-    */
-    QString getDataPath() const;
 
     //=========================================================================================================
     /**
@@ -183,6 +159,12 @@ public:
     * Is called when plugin is detached of the stage. Can be used to safe settings.
     */
     virtual void unload();
+
+    //=========================================================================================================
+    /**
+    * Clears the babymeg
+    */
+    void clear();
 
     //=========================================================================================================
     /**
@@ -223,6 +205,29 @@ public:
 protected:
     virtual void run();
 
+    //=========================================================================================================
+    /**
+    * Initialize the connector.
+    */
+    void initConnector();
+
+    //=========================================================================================================
+    /**
+    * Returns the babyMEG file path which is to be written to.
+    *
+    * @param[in] currentTime    insert current time stamp.
+    *
+    * @return the storage filepath
+    */
+    QString getFilePath(bool currentTime = false) const;
+
+    //=========================================================================================================
+    /**
+    * Returns the path where the subjects folders are stored.
+    *
+    * @return the data path
+    */
+    QString getDataPath() const;
 
     //=========================================================================================================
     /**
@@ -387,12 +392,6 @@ protected:
     * This function sends the current remaining recording time to the project window.
     */
     void onRecordingRemainingTimeChange();
-
-    //=========================================================================================================
-    /**
-    * Initialize the connector.
-    */
-    void initConnector();
 
     SCSHAREDLIB::PluginOutputData<SCMEASLIB::NewRealTimeMultiSampleArray>::SPtr m_pRTMSABabyMEG;    /**< The NewRealTimeMultiSampleArray to provide the rt_server Channels.*/
 

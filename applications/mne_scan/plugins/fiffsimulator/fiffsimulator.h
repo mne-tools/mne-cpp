@@ -72,6 +72,10 @@ namespace FIFFLIB {
     class FiffInfo;
 }
 
+namespace SCDISPLIB {
+    class HPIWidget;
+}
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -152,7 +156,15 @@ public:
 
     virtual QWidget* setupWidget();
 
-//slots:
+protected:
+    virtual void run();
+
+    //=========================================================================================================
+    /**
+    * Initialises the output connector.
+    */
+    void initConnector();
+
     //=========================================================================================================
     /**
     * Change connector
@@ -179,6 +191,45 @@ public:
     */
     void requestInfo();
 
+    //=========================================================================================================
+    /**
+    * Set HPI fiff information.
+    */
+    void showHPIDialog();
+
+    //=========================================================================================================
+    /**
+    * Sends the current data block to the HPI dialog.
+    */
+    void sendHPIData();
+
+    SCSHAREDLIB::PluginOutputData<SCMEASLIB::NewRealTimeMultiSampleArray>::SPtr m_pRTMSA_FiffSimulator;     /**< The NewRealTimeMultiSampleArray to provide the rt_server Channels.*/
+
+    QSharedPointer<FiffSimulatorProducer>       m_pFiffSimulatorProducer;   /**< Holds the FiffSimulatorProducer.*/
+    QSharedPointer<IOBUFFER::RawMatrixBuffer>   m_pRawMatrixBuffer_In;      /**< Holds incoming raw data. */
+    QSharedPointer<FIFFLIB::FiffInfo>           m_pFiffInfo;                /**< Fiff measurement info.*/
+    QSharedPointer<RTCLIENTLIB::RtCmdClient>    m_pRtCmdClient;             /**< The command client.*/
+    QSharedPointer<SCDISPLIB::HPIWidget>        m_pHPIWidget;                   /**< HPI widget. */
+
+    QAction*                m_pActionComputeHPI;            /**< Update HPI info into Fiff Info action */
+
+    bool                    m_bCmdClientIsConnected;        /**< If the command client is connected.*/
+    bool                    m_bIsRunning;                   /**< Whether FiffSimulator is running.*/
+
+    QString                 m_sFiffSimulatorIP;             /**< The IP Adress of mne_rt_server.*/
+    QString                 m_sFiffSimulatorClientAlias;    /**< The rt server client alias.*/
+
+    qint32                  m_iActiveConnectorId;           /**< The active connector.*/
+    qint32                  m_iBufferSize;                  /**< The raw data buffer size.*/
+
+    Eigen::MatrixXf         m_matValue;                     /**< The current data block.*/
+
+    QMap<qint32, QString>   m_qMapConnectors;               /**< Connector map.*/
+
+    QTimer                  m_cmdConnectionTimer;           /**< Timer for convinient command client connection. When timer times out a connection is tried to be established. */
+
+    QMutex                  m_qMutex;
+
 signals:
     //=========================================================================================================
     /**
@@ -193,44 +244,6 @@ signals:
     * Emitted when fiffInfo is available
     */
     void fiffInfoAvailable();
-
-protected:
-    virtual void run();
-
-private:
-    //=========================================================================================================
-    /**
-    * Initialises the output connector.
-    */
-    void initConnector();
-
-//    float           m_fSamplingRate;                /**< The sampling rate.*/
-//    int             m_iDownsamplingFactor;          /**< The down sampling factor.*/
-
-    SCSHAREDLIB::PluginOutputData<SCMEASLIB::NewRealTimeMultiSampleArray>::SPtr m_pRTMSA_FiffSimulator;     /**< The NewRealTimeMultiSampleArray to provide the rt_server Channels.*/
-
-    QSharedPointer<FiffSimulatorProducer>       m_pFiffSimulatorProducer;   /**< Holds the FiffSimulatorProducer.*/
-    QSharedPointer<IOBUFFER::RawMatrixBuffer>   m_pRawMatrixBuffer_In;      /**< Holds incoming raw data. */
-    QSharedPointer<FIFFLIB::FiffInfo>           m_pFiffInfo;                /**< Fiff measurement info.*/
-
-    QSharedPointer<RTCLIENTLIB::RtCmdClient>    m_pRtCmdClient;             /**< The command client.*/
-
-    QAction*                m_pActionComputeHPI;            /**< Update HPI info into Fiff Info action */
-
-    bool                    m_bCmdClientIsConnected;        /**< If the command client is connected.*/
-    bool                    m_bIsRunning;                   /**< Whether FiffSimulator is running.*/
-
-    QString                 m_sFiffSimulatorIP;             /**< The IP Adress of mne_rt_server.*/
-    QString                 m_sFiffSimulatorClientAlias;    /**< The rt server client alias.*/
-
-    qint32                  m_iActiveConnectorId;           /**< The active connector.*/
-    qint32                  m_iBufferSize;                  /**< The raw data buffer size.*/
-
-    QMap<qint32, QString>   m_qMapConnectors;               /**< Connector map.*/
-
-    QTimer                  m_cmdConnectionTimer;           /**< Timer for convinient command client connection. When timer times out a connection is tried to be established. */
-
-    QMutex                  m_qMutex;
 };
 
 } // NAMESPACE
