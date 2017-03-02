@@ -85,7 +85,19 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
 
     Deep deepTest(QApplication::applicationDirPath() + "/mne_deep_models/examples/Output/Models/ex_deep_one_hidden");
-    deepTest.evalModel();
+
+    // Generate dummy input values in the appropriate structure and size
+    std::vector<float> inputs, outputs;
+    for (int i = 0; i < deepTest.inputDimensions(); i++)
+        inputs.push_back(static_cast<float>(i % 255));
+
+    deepTest.evalModel(inputs, outputs);
+
+    // Output the results
+    for (auto& value : outputs)
+    {
+        fprintf(stderr, "%f\n", value);
+    }
 
     return a.exec();
 }

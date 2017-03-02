@@ -50,6 +50,7 @@ CONFIG(debug, debug|release) {
 }
 
 LIBS += -L$${MNE_LIBRARY_DIR}
+LIBS += -L$${CNTK_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
             -lMNE$${MNE_LIB_VERSION}Utilsd \
@@ -57,7 +58,8 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Fiffd \
             -lMNE$${MNE_LIB_VERSION}Mned \
             -lMNE$${MNE_LIB_VERSION}Inversed \
-            -lMNE$${MNE_LIB_VERSION}Deepd
+            -lMNE$${MNE_LIB_VERSION}Deepd \
+            -lEvalDll
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
@@ -66,7 +68,8 @@ else {
             -lMNE$${MNE_LIB_VERSION}Fiff \
             -lMNE$${MNE_LIB_VERSION}Mne \
             -lMNE$${MNE_LIB_VERSION}Inverse \
-            -lMNE$${MNE_LIB_VERSION}Deep
+            -lMNE$${MNE_LIB_VERSION}Deep \
+            -lEvalDll
 }
 
 DESTDIR = $${MNE_BINARY_DIR}
@@ -79,6 +82,7 @@ FORMS    +=
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
+INCLUDEPATH += $${CNTK_INCLUDE_DIR}
 
 # Put generated form headers into the origin --> cause other src is pointing at them
 UI_DIR = $$PWD

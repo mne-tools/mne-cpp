@@ -39,7 +39,6 @@
 //=============================================================================================================
 
 #include "deep.h"
-#include <Eval.h>
 
 #ifdef _WIN32
 #include <Windows.h>
@@ -85,6 +84,7 @@ typedef std::map<std::wstring, std::vector<float>*> Layer;
 //=============================================================================================================
 
 Deep::Deep()
+: m_model(NULL)
 {
 }
 
@@ -93,8 +93,9 @@ Deep::Deep()
 
 Deep::Deep(const QString &sModelFilename)
 : m_sModelFilename(sModelFilename)
+, m_model(NULL)
 {
-
+    loadModel();
 }
 
 
@@ -121,9 +122,49 @@ void Deep::setModelFilename(const QString &sModelFilename)
     m_sModelFilename = sModelFilename;
 }
 
+
 //*************************************************************************************************************
 
-bool Deep::evalModel()
+bool Deep::evalModel(std::vector<float>& inputs, std::vector<float>& outputs)
+{
+    if( !m_model )
+        return false;
+
+    // get the model's layers dimensions
+    std::map<std::wstring, size_t> inDims;
+    std::map<std::wstring, size_t> outDims;
+    m_model->GetNodeDimensions(inDims, NodeGroup::nodeInput);
+    m_model->GetNodeDimensions(outDims, NodeGroup::nodeOutput);
+
+    std::wstring inputLayerName = inDims.begin()->first;
+    std::wstring outputLayerName = outDims.begin()->first;
+
+    if(inDims[inputLayerName] != inputs.size()) {
+        fprintf(stderr, "Input dimension does not fit %d != %d.\n", inputs.size(), inDims[inputLayerName]);
+        return false;
+    }
+
+    // Setup the maps for inputs and output
+    Layer inputLayer;
+    inputLayer.insert(MapEntry(inputLayerName, &inputs));
+    Layer outputLayer;
+    outputLayer.insert(MapEntry(outputLayerName, &outputs));
+
+    // We can call the evaluate method and get back the results (single layer)...
+    m_model->Evaluate(inputLayer, outputLayer);
+
+    fprintf(stderr, "Layer '%ls' output.\n", outputLayerName.c_str());
+
+    // This pattern is used by End2EndTests to check whether the program runs to complete.
+    fprintf(stderr, "Evaluation complete.\n");
+
+    return true;
+}
+
+
+//*************************************************************************************************************
+
+bool Deep::loadModel()
 {
     QFile file(m_sModelFilename);
     if(!file.exists()) {
@@ -135,9 +176,7 @@ bool Deep::evalModel()
 
     const std::string modelFile = m_sModelFilename.toUtf8().constData();
 
-    IEvaluateModel<float> *model;
-
-    GetEvalF(&model);
+    GetEvalF(&m_model);
 
     // Load model with desired outputs
     std::string networkConfiguration;
@@ -146,45 +185,34 @@ bool Deep::evalModel()
     // with the ones specified.
     //networkConfiguration += "outputNodeNames=\"h1.z:ol.z\"\n";
     networkConfiguration += "modelPath=\"" + modelFile + "\"";
-    model->CreateNetwork(networkConfiguration);
+    m_model->CreateNetwork(networkConfiguration);
 
-    // get the model's layers dimensions
-    std::map<std::wstring, size_t> inDims;
-    std::map<std::wstring, size_t> outDims;
-    model->GetNodeDimensions(inDims, NodeGroup::nodeInput);
-    model->GetNodeDimensions(outDims, NodeGroup::nodeOutput);
-
-    // Generate dummy input values in the appropriate structure and size
-    auto inputLayerName = inDims.begin()->first;
-    std::vector<float> inputs;
-    for (int i = 0; i < inDims[inputLayerName]; i++)
-    {
-        inputs.push_back(static_cast<float>(i % 255));
-    }
-
-    // Allocate the output values layer
-    std::vector<float> outputs;
-
-    // Setup the maps for inputs and output
-    Layer inputLayer;
-    inputLayer.insert(MapEntry(inputLayerName, &inputs));
-    Layer outputLayer;
-    auto outputLayerName = outDims.begin()->first;
-    outputLayer.insert(MapEntry(outputLayerName, &outputs));
-
-    // We can call the evaluate method and get back the results (single layer)...
-    model->Evaluate(inputLayer, outputLayer);
-
-    // Output the results
-    fprintf(stderr, "Layer '%ls' output:\n", outputLayerName.c_str());
-    for (auto& value : outputs)
-    {
-        fprintf(stderr, "%f\n", value);
-    }
-
-    // This pattern is used by End2EndTests to check whether the program runs to complete.
-    fprintf(stderr, "Evaluation complete.\n");
-
-    return true;
 }
 
+
+//*************************************************************************************************************
+
+int Deep::inputDimensions()
+{
+    if(m_model) {
+        std::map<std::wstring, size_t> inDims;
+        m_model->GetNodeDimensions(inDims, NodeGroup::nodeInput);
+        std::wstring inputLayerName = inDims.begin()->first;
+        return inDims[inputLayerName];
+    }
+    return 0;
+}
+
+
+//*************************************************************************************************************
+
+int Deep::outputDimensions()
+{
+    if(m_model) {
+        std::map<std::wstring, size_t> outDims;
+        m_model->GetNodeDimensions(outDims, NodeGroup::nodeOutput);
+        std::wstring outputLayerName = outDims.begin()->first;
+        return outDims[outputLayerName];
+    }
+    return 0;
+}
