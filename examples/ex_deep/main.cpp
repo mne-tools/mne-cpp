@@ -88,7 +88,7 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    Deep deepTest(QApplication::applicationDirPath() + "/mne_deep_models/examples/Output/Models/ex_deep_one_hidden");
+    Deep deepTest(QApplication::applicationDirPath() + "/mne_deep_models/examples/output/models/ex_deep_one_hidden");
 
     // Generate dummy input values in the appropriate structure and size
     std::vector<float> inputs, outputs;
