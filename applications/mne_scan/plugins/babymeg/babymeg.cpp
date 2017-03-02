@@ -51,7 +51,6 @@
 #include <iostream>
 
 #include <utils/ioutils.h>
-#include <rtProcessing/rthpis.h>
 #include <utils/detecttrigger.h>
 #include <fiff/fiff_types.h>
 #include <fiff/fiff_dig_point_set.h>
@@ -89,7 +88,6 @@
 
 using namespace BABYMEGPLUGIN;
 using namespace UTILSLIB;
-using namespace RTPROCESSINGLIB;
 using namespace SCSHAREDLIB;
 using namespace IOBUFFER;
 using namespace SCMEASLIB;
@@ -385,14 +383,40 @@ void BabyMEG::SetFiffInfoForHPI()
         return;
     } else {
         qDebug()<<" Start to load Polhemus File";
-        if (m_pHPIDlg == NULL) {
-            m_pHPIDlg = QSharedPointer<BabyMEGHPIDgl>(new BabyMEGHPIDgl(this));
+        if (!m_pHPIDlg) {
+            m_pHPIDlg = QSharedPointer<BabyMEGHPIDgl>(new BabyMEGHPIDgl(m_pFiffInfo));
+
+            connect(m_pHPIDlg.data(), &BabyMEGHPIDgl::needData,
+                    this, &BabyMEG::sendHPIData);
         }
 
         if (!m_pHPIDlg->isVisible()) {
             m_pHPIDlg->show();
             m_pHPIDlg->raise();
         }
+    }
+}
+
+
+//*************************************************************************************************************
+
+void BabyMEG::sendHPIData()
+{
+    if(m_pFiffInfo && m_pHPIDlg) {
+        Eigen::MatrixXd matProj;
+        m_pFiffInfo->make_projector(matProj);
+
+        //set columns of matrix to zero depending on bad channels indexes
+        for(qint32 j = 0; j < m_pFiffInfo->bads.size(); ++j) {
+            matProj.col(m_pFiffInfo->ch_names.indexOf(m_pFiffInfo->bads.at(j))).setZero();
+        }
+
+        // Setup Comps
+        FiffCtfComp newComp;
+        m_pFiffInfo->make_compensator(0, 101, newComp);//Do this always from 0 since we always read new raw data, we never actually perform a multiplication on already existing data
+        Eigen::MatrixXd matComp = newComp.data->data;
+
+        m_pHPIDlg->setData(matProj * matComp * this->calibrate(m_matValue));
     }
 }
 
@@ -437,74 +461,6 @@ void BabyMEG::splitRecordingFile()
     m_pOutfid = FiffStream::start_writing_raw(m_qFileOut, *m_pFiffInfo, m_cals, defaultMatrixXi, false);
     fiff_int_t first = 0;
     m_pOutfid->write_int(FIFF_FIRST_SAMPLE, &first);
-}
-
-
-//*************************************************************************************************************
-
-void BabyMEG::performHPIFitting(const QVector<int>& vFreqs)
-{
-    //Generate/Update current dev/head transfomration. We do not need to make use of rtHPI plugin here since the fitting is only needed once here.
-    //rt head motion correction will be performed using the rtHPI plugin.
-    if(m_pFiffInfo && m_pHPIDlg) {
-        if(m_pHPIDlg->hpiLoaded()) {
-            // Setup SSP
-            //If a minimum of one projector is active set m_bProjActivated to true so that this model applies the ssp to the incoming data
-            Eigen::MatrixXd matProj;
-            m_pFiffInfo->make_projector(matProj);
-
-            //set columns of matrix to zero depending on bad channels indexes
-            for(qint32 j = 0; j < m_pFiffInfo->bads.size(); ++j) {
-                matProj.col(m_pFiffInfo->ch_names.indexOf(m_pFiffInfo->bads.at(j))).setZero();
-            }
-
-            // Setup Comps
-            FiffCtfComp newComp;
-            m_pFiffInfo->make_compensator(0, 101, newComp);//Do this always from 0 since we always read new raw data, we never actually perform a multiplication on already existing data
-            Eigen::MatrixXd matComp = newComp.data->data;
-
-            //Perform actual fitting
-            QVector<double> vGof;
-            FiffDigPointSet t_fittedSet;
-            RtHPIS::SPtr pRtHpis = RtHPIS::SPtr(new RtHPIS(m_pFiffInfo));
-            FiffCoordTrans transDevHead;
-            transDevHead.from = 1;
-            transDevHead.to = 4;
-
-            pRtHpis->singleHPIFit(matProj * matComp * this->calibrate(m_matValue),
-                                  transDevHead,
-                                  vFreqs,
-                                  vGof,
-                                  t_fittedSet);
-
-            //Set newly calculated transforamtion amtrix to fiff info
-            m_mutex.lock();
-            m_pFiffInfo->dev_head_t = transDevHead;
-            m_mutex.unlock();
-
-            //Apply new dev/head matrix to current digitizer and update in 3D view in HPI control widget
-            FiffDigPointSet t_digSet;
-
-            for(int i = 0; i < m_pFiffInfo->dig.size(); ++i) {
-                FiffDigPoint digPoint = m_pFiffInfo->dig.at(i);
-
-                MatrixX3f matPos(1,3);
-                matPos(0,0) = digPoint.r[0];
-                matPos(0,1) = digPoint.r[1];
-                matPos(0,2) = digPoint.r[2];
-
-                MatrixX3f matPosTrans = m_pFiffInfo->dev_head_t.apply_inverse_trans(matPos);
-
-                digPoint.r[0] = matPosTrans(0,0);
-                digPoint.r[1] = matPosTrans(0,1);
-                digPoint.r[2] = matPosTrans(0,2);
-
-                t_digSet << digPoint;
-            }
-
-            m_pHPIDlg->setDigitizerDataToView3D(t_digSet, t_fittedSet, vGof);
-        }
-    }
 }
 
 
@@ -605,12 +561,6 @@ void BabyMEG::setFiffData(QByteArray DATA)
 
         m_pRawMatrixBuffer->push(&rawData);
     }
-//    else
-//    {
-////        std::cout << "Data coming" << std::endl; //"first ten elements \n" << rawData.block(0,0,1,10) << std::endl;
-
-//        emit DataToSquidCtrlGUI(rawData);
-//    }
 
     emit DataToSquidCtrlGUI(rawData);
 }
@@ -956,15 +906,8 @@ void BabyMEG::updateHPI()
 void BabyMEG::createDigTrig(MatrixXf& data)
 {
     //Look for triggers in all trigger channels
-
     //m_qMapDetectedTrigger = DetectTrigger::detectTriggerFlanksMax(data.at(b), m_lTriggerChannelIndices, m_iCurrentSample-nCol, m_dTriggerThreshold, true);
     QMap<int,QList<QPair<int,double> > > qMapDetectedTrigger = DetectTrigger::detectTriggerFlanksGrad(data.cast<double>(), m_lTriggerChannelIndices, 0, 3.0, false, "Rising");
-
-//            //Update and write the HPI information to the current data block
-//            QTime timer;
-//            timer.start();
-//            updateHPI();
-//            qDebug() << "BabyMEG::run() - updateHPI() timing" << timer.elapsed() << "msecs";
 
     //Combine and write results into data block's digital trigger channel
     QMapIterator<int,QList<QPair<int,double> >> i(qMapDetectedTrigger);

@@ -202,14 +202,6 @@ public:
 
     //=========================================================================================================
     /**
-    * Perform a HPI fitting procedure.
-    *
-    * @param[in] vFreqs    the frequencies for each coil.
-    */
-    void performHPIFitting(const QVector<int>& vFreqs);
-
-    //=========================================================================================================
-    /**
     * Starts or stops a file recording depending on the current recording state.
     */
     void toggleRecordingFile();
@@ -301,6 +293,12 @@ public:
     * Set HPI fiff information.
     */
     void SetFiffInfoForHPI();
+
+    //=========================================================================================================
+    /**
+    * Sends the current data block to the HPI dialog.
+    */
+    void sendHPIData();
 
     //=========================================================================================================
     /**
