@@ -153,8 +153,6 @@ bool Deep::evalModel(std::vector<float>& inputs, std::vector<float>& outputs)
     // We can call the evaluate method and get back the results (single layer)...
     m_model->Evaluate(inputLayer, outputLayer);
 
-    fprintf(stderr, "Layer '%ls' output.\n", outputLayerName.c_str());
-
     // This pattern is used by End2EndTests to check whether the program runs to complete.
     fprintf(stderr, "Evaluation complete.\n");
 
@@ -198,6 +196,9 @@ int Deep::inputDimensions()
         std::map<std::wstring, size_t> inDims;
         m_model->GetNodeDimensions(inDims, NodeGroup::nodeInput);
         std::wstring inputLayerName = inDims.begin()->first;
+
+        fprintf(stderr, "Input Layer: '%ls'.\n", inputLayerName.c_str());
+
         return inDims[inputLayerName];
     }
     return 0;
@@ -212,6 +213,9 @@ int Deep::outputDimensions()
         std::map<std::wstring, size_t> outDims;
         m_model->GetNodeDimensions(outDims, NodeGroup::nodeOutput);
         std::wstring outputLayerName = outDims.begin()->first;
+
+        fprintf(stderr, "Output Layer: '%ls'.\n", outputLayerName.c_str());
+
         return outDims[outputLayerName];
     }
     return 0;
