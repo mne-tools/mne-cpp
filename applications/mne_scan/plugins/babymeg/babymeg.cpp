@@ -664,16 +664,6 @@ void BabyMEG::sendHPIData()
 
 //*************************************************************************************************************
 
-void BabyMEG::recvHPIFiffInfo(const FiffInfo& info)
-{
-    // show the HPI info
-    qDebug()<<"saved HPI" << m_pFiffInfo->dig.at(0).r[0];
-    qDebug()<<"HPI"<< info.dig.at(0).kind << info.dig.at(0).r[0];
-}
-
-
-//*************************************************************************************************************
-
 void BabyMEG::setRecordingTimerChanged(int timeMSecs)
 {
     //If the recording time is changed during the recording, change the timer

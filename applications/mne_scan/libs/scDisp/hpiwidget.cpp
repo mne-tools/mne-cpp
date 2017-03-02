@@ -425,12 +425,14 @@ void HPIWidget::performHPIFitting(const QVector<int>& vFreqs)
             transDevHead.from = 1;
             transDevHead.to = 4;
 
+            qDebug() << "HPIWidget::performHPIFitting - 0";
             pRtHpis->singleHPIFit(m_matValue,
                                   transDevHead,
                                   vFreqs,
                                   vGof,
                                   t_fittedSet);
 
+            qDebug() << "HPIWidget::performHPIFitting - 1";
             m_matValue.resize(0,0);
 
             //Set newly calculated transforamtion amtrix to fiff info
