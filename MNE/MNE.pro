@@ -51,9 +51,15 @@ SUBDIRS += \
     rtClient \
     rtProcessing \
 
+
 !contains(MNECPP_CONFIG, minimalVersion) {
     SUBDIRS += \
         disp \
+
+    !isEmpty( CNTK_INCLUDE_DIR ) {
+        SUBDIRS += \
+            deep \
+    }
 
     qtHaveModule(charts) {
         SUBDIRS += \

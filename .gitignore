@@ -173,6 +173,7 @@
 /bin/mne_x_plugins/*.dll
 /bin/mne_x_plugins/*.exp
 /bin/mne_x_plugins/*.lib
+/bin/mne_deep_models/examples/Output
 
 # Compiled Object files
 *.slo
