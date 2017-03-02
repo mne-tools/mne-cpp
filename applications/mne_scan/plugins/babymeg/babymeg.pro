@@ -58,7 +58,6 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Mned \
             -lMNE$${MNE_LIB_VERSION}Inversed \
             -lMNE$${MNE_LIB_VERSION}Connectivityd \
-            -lMNE$${MNE_LIB_VERSION}RtProcessingd \
             -lMNE$${MNE_LIB_VERSION}RtCommandd \
             -lMNE$${MNE_LIB_VERSION}RtClientd \
             -lMNE$${MNE_LIB_VERSION}Dispd \
@@ -76,7 +75,6 @@ else {
             -lMNE$${MNE_LIB_VERSION}Mne \
             -lMNE$${MNE_LIB_VERSION}Inverse \
             -lMNE$${MNE_LIB_VERSION}Connectivity \
-            -lMNE$${MNE_LIB_VERSION}RtProcessing \
             -lMNE$${MNE_LIB_VERSION}RtCommand \
             -lMNE$${MNE_LIB_VERSION}RtClient \
             -lMNE$${MNE_LIB_VERSION}Disp \
@@ -99,7 +97,6 @@ SOURCES += \
     FormFiles/globalobj.cpp \
     FormFiles/babymegprojectdialog.cpp \
     FormFiles/plotter.cpp \
-    FormFiles/babymeghpidgl.cpp \
 
 HEADERS += \
     babymeg.h \
@@ -112,14 +109,12 @@ HEADERS += \
     FormFiles/globalobj.h \
     FormFiles/babymegprojectdialog.h \
     FormFiles/plotter.h \
-    FormFiles/babymeghpidgl.h \
 
 FORMS += \
     FormFiles/babymegsetup.ui \
     FormFiles/babymegabout.ui \
     FormFiles/babymegsquidcontroldgl.ui \
     FormFiles/babymegprojectdialog.ui \
-    FormFiles/babymeghpidgl.ui \
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
