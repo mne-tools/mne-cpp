@@ -39,7 +39,7 @@ TEMPLATE = app
 
 VERSION = $${MNE_CPP_VERSION}
 
-QT += widgets
+QT += widgets charts
 
 CONFIG   += console
 

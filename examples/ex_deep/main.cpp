@@ -38,6 +38,10 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <QChart>
+#include <QChartView>
+#include <QLineSeries>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -45,7 +49,6 @@
 //=============================================================================================================
 
 #include <Eigen/Core>
-
 #include <deep/deep.h>
 
 
@@ -64,6 +67,7 @@
 
 using namespace Eigen;
 using namespace DEEPLIB;
+using namespace QtCharts;
 
 
 //*************************************************************************************************************
@@ -98,6 +102,23 @@ int main(int argc, char *argv[])
     {
         fprintf(stderr, "%f\n", value);
     }
+
+    //
+    // Visualize
+    //
+    QLineSeries *series = new QLineSeries();
+    for (int i = 0; i < 20; i++)
+        series->append(i,static_cast<float>(i % 255));
+
+    QChart *chart = new QChart();
+    chart->legend()->hide();
+    chart->addSeries(series);
+    chart->createDefaultAxes();
+    chart->setTitle("Simple line chart example");
+
+    QChartView *chartView = new QChartView(chart);
+    chartView->setRenderHint(QPainter::Antialiasing);
+    chartView->show();
 
     return a.exec();
 }
