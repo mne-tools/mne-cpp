@@ -644,6 +644,7 @@ void BabyMEG::showHPIDialog()
 void BabyMEG::sendHPIData()
 {
     if(m_pFiffInfo && m_pHPIWidget) {
+        // Use SSP + SGM + calibration
         Eigen::MatrixXd matProj;
         m_pFiffInfo->make_projector(matProj);
 
@@ -658,6 +659,9 @@ void BabyMEG::sendHPIData()
         Eigen::MatrixXd matComp = newComp.data->data;
 
         m_pHPIWidget->setData(matProj * matComp * this->calibrate(m_matValue));
+
+        // Only use calibration
+        //m_pHPIWidget->setData(this->calibrate(m_matValue));
     }
 }
 
