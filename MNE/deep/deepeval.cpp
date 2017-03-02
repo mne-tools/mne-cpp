@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     deep.cpp
+* @file     deepeval.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -38,7 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "deep.h"
+#include "deepeval.h"
 
 #ifdef _WIN32
 #include <Windows.h>
@@ -83,7 +83,7 @@ typedef std::map<std::wstring, std::vector<float>*> Layer;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Deep::Deep()
+DeepEval::DeepEval()
 : m_model(NULL)
 {
 }
@@ -91,7 +91,7 @@ Deep::Deep()
 
 //*************************************************************************************************************
 
-Deep::Deep(const QString &sModelFilename)
+DeepEval::DeepEval(const QString &sModelFilename)
 : m_sModelFilename(sModelFilename)
 , m_model(NULL)
 {
@@ -101,7 +101,7 @@ Deep::Deep(const QString &sModelFilename)
 
 //*************************************************************************************************************
 
-Deep::~Deep()
+DeepEval::~DeepEval()
 {
 
 }
@@ -109,7 +109,7 @@ Deep::~Deep()
 
 //*************************************************************************************************************
 
-const QString& Deep::getModelFilename() const
+const QString& DeepEval::getModelFilename() const
 {
     return m_sModelFilename;
 }
@@ -117,7 +117,7 @@ const QString& Deep::getModelFilename() const
 
 //*************************************************************************************************************
 
-void Deep::setModelFilename(const QString &sModelFilename)
+void DeepEval::setModelFilename(const QString &sModelFilename)
 {
     m_sModelFilename = sModelFilename;
 }
@@ -125,7 +125,7 @@ void Deep::setModelFilename(const QString &sModelFilename)
 
 //*************************************************************************************************************
 
-bool Deep::evalModel(std::vector<float>& inputs, std::vector<float>& outputs)
+bool DeepEval::evalModel(std::vector<float>& inputs, std::vector<float>& outputs)
 {
     if( !m_model )
         return false;
@@ -162,7 +162,7 @@ bool Deep::evalModel(std::vector<float>& inputs, std::vector<float>& outputs)
 
 //*************************************************************************************************************
 
-bool Deep::loadModel()
+bool DeepEval::loadModel()
 {
     QFile file(m_sModelFilename);
     if(!file.exists()) {
@@ -170,7 +170,7 @@ bool Deep::loadModel()
         return false;
     }
 
-    printf("Evaluating Model %s\n", m_sModelFilename.toUtf8().constData());
+    fprintf(stderr, "Evaluating Model %s\n", m_sModelFilename.toUtf8().constData());
 
     const std::string modelFile = m_sModelFilename.toUtf8().constData();
 
@@ -191,15 +191,12 @@ bool Deep::loadModel()
 
 //*************************************************************************************************************
 
-size_t Deep::inputDimensions()
+size_t DeepEval::inputDimensions()
 {
     if(m_model) {
         std::map<std::wstring, size_t> inDims;
         m_model->GetNodeDimensions(inDims, NodeGroup::nodeInput);
         std::wstring inputLayerName = inDims.begin()->first;
-
-        fprintf(stderr, "Input Layer: '%ls'.\n", inputLayerName.c_str());
-
         return inDims[inputLayerName];
     }
     return 0;
@@ -208,15 +205,12 @@ size_t Deep::inputDimensions()
 
 //*************************************************************************************************************
 
-size_t Deep::outputDimensions()
+size_t DeepEval::outputDimensions()
 {
     if(m_model) {
         std::map<std::wstring, size_t> outDims;
         m_model->GetNodeDimensions(outDims, NodeGroup::nodeOutput);
         std::wstring outputLayerName = outDims.begin()->first;
-
-        fprintf(stderr, "Output Layer: '%ls'.\n", outputLayerName.c_str());
-
         return outDims[outputLayerName];
     }
     return 0;

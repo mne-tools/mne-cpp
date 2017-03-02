@@ -99,11 +99,11 @@ else {
 }
 
 SOURCES += \
-    deep.cpp
+    deepeval.cpp
 
 HEADERS +=\
     deep_global.h \
-    deep.h
+    deepeval.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
