@@ -186,30 +186,6 @@ public:
 
     //=========================================================================================================
     /**
-    * Shows the project dialog/window.
-    */
-    void showProjectDialog();
-
-    //=========================================================================================================
-    /**
-    * Shows the project squid control dialog.
-    */
-    void showSqdCtrlDialog();
-
-    //=========================================================================================================
-    /**
-    * Determines current file. And starts a new one.
-    */
-    void splitRecordingFile();
-
-    //=========================================================================================================
-    /**
-    * Starts or stops a file recording depending on the current recording state.
-    */
-    void toggleRecordingFile();
-
-    //=========================================================================================================
-    /**
     * Start the thread.
     */
     virtual bool start();
@@ -243,6 +219,10 @@ public:
     * @return a QWidget pointer to the set up QWidget
     */
     virtual QWidget* setupWidget();
+
+protected:
+    virtual void run();
+
 
     //=========================================================================================================
     /**
@@ -288,7 +268,7 @@ public:
     /**
     * Update fiff information.
     */
-    void UpdateFiffInfo();
+    void updateFiffInfo();
 
     //=========================================================================================================
     /**
@@ -308,7 +288,7 @@ public:
     *
     * @param[in] info   the new fiff info.
     */
-    void RecvHPIFiffInfo(const FIFFLIB::FiffInfo& info);
+    void recvHPIFiffInfo(const FIFFLIB::FiffInfo& info);
 
     //=========================================================================================================
     /**
@@ -326,12 +306,30 @@ public:
     */
     void setRecordingTimerStateChanged(bool state);
 
-    double m_dSfreq;        /**< The current sampling frequency. */
+    //=========================================================================================================
+    /**
+    * Shows the project dialog/window.
+    */
+    void showProjectDialog();
 
-protected:
-    virtual void run();
+    //=========================================================================================================
+    /**
+    * Shows the project squid control dialog.
+    */
+    void showSqdCtrlDialog();
 
-private:    
+    //=========================================================================================================
+    /**
+    * Determines current file. And starts a new one.
+    */
+    void splitRecordingFile();
+
+    //=========================================================================================================
+    /**
+    * Starts or stops a file recording depending on the current recording state.
+    */
+    void toggleRecordingFile();
+
     //=========================================================================================================
     /**
     * Update HPI.

@@ -44,6 +44,8 @@
 #include "FormFiles/fiffsimulatorsetupwidget.h"
 
 #include <utils/ioutils.h>
+#include <fiff/fiff_info.h>
+#include <scMeas/newrealtimemultisamplearray.h>
 
 
 //*************************************************************************************************************
@@ -65,8 +67,12 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FiffSimulatorPlugin;
+using namespace FIFFSIMULATORPLUGIN;
 using namespace UTILSLIB;
+using namespace SCSHAREDLIB;
+using namespace IOBUFFER;
+using namespace SCMEASLIB;
+using namespace RTCLIENTLIB;
 
 
 //*************************************************************************************************************
@@ -85,7 +91,11 @@ FiffSimulator::FiffSimulator()
 , m_bIsRunning(false)
 , m_iActiveConnectorId(0)
 {
-
+    m_pActionComputeHPI = new QAction(QIcon(":/images/latestFiffInfoHPI.png"), tr("Compute HPI"),this);
+    m_pActionComputeHPI->setStatusTip(tr("Compute HPI"));
+    connect(m_pActionComputeHPI, &QAction::triggered,
+            this, &BabyMEG::showHPIDialog);
+    addPluginAction(m_pActionComputeHPI);
 }
 
 
