@@ -222,7 +222,7 @@ void NewRealTimeMultiSampleArray::initFromFiffInfo(FiffInfo::SPtr &p_pFiffInfo)
         initChInfo.setKind(p_pFiffInfo->chs[i].kind);
 
         // set channel coil
-        initChInfo.setCoil(p_pFiffInfo->chs[i].coil_type);
+        initChInfo.setCoil(p_pFiffInfo->chs[i].chpos.coil_type);
 
         m_qListChInfo.append(initChInfo);
     }

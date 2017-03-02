@@ -234,26 +234,6 @@ public:
 
     //=========================================================================================================
     /**
-    * fiff_make_dir_tree
-    *
-    * ### MNE toolbox root function ###
-    *
-    * Wrapper for the FiffCoordTrans::make_dir_tree static function
-    *
-    * @param[in] p_pStream the opened fiff file
-    * @param[in] p_Dir the dir entries of which the tree should be constructed
-    * @param[out] p_Tree the created dir tree
-    * @param[in] start dir entry to start (optional, by default 0)
-    *
-    * @return index of the last read dir entry
-    */
-    inline static qint32 make_dir_tree(FiffStream::SPtr& p_pStream, QList<FiffDirEntry::SPtr>& p_Dir, FiffDirNode::SPtr& p_Tree, qint32 start = 0)
-    {
-        return FiffDirNode::make_subtree(p_pStream, p_Dir, p_Tree, start);
-    }
-
-    //=========================================================================================================
-    /**
     * fiff_open
     *
     * ### MNE toolbox root function ###
@@ -592,7 +572,7 @@ public:
     */
     inline static bool read_tag(FiffStream::SPtr& p_pStream, FiffTag::SPtr& p_pTag, qint64 pos = -1)
     {
-        return FiffTag::read_tag(p_pStream, p_pTag, pos);
+        return p_pStream->read_tag(p_pTag, pos);
     }
 
     //=========================================================================================================
@@ -613,7 +593,7 @@ public:
     */
     static inline bool read_tag_info(FiffStream::SPtr& p_pStream, FiffTag::SPtr& p_pTag)
     {
-        return FiffTag::read_tag_info(p_pStream, p_pTag);
+        return p_pStream->read_tag_info(p_pTag);
     }
 
     //=========================================================================================================
@@ -730,7 +710,7 @@ public:
     * @param[in] p_pStream  An open fif file
     * @param[in] ch         The channel information structure to write
     */
-    inline static void write_ch_info(FiffStream* p_pStream, FiffChInfo* ch)
+    inline static void write_ch_info(FiffStream* p_pStream, const FiffChInfo& ch)
     {
         p_pStream->write_ch_info(ch);
     }

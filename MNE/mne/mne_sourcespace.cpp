@@ -297,7 +297,7 @@ bool MNESourceSpace::readFromStream(FiffStream::SPtr& p_pStream, bool add_geom, 
     //
     //   Find all source spaces
     //
-    QList<FiffDirNode::SPtr> spaces = p_pStream->tree()->dir_tree_find(FIFFB_MNE_SOURCE_SPACE);
+    QList<FiffDirNode::SPtr> spaces = p_pStream->dirtree()->dir_tree_find(FIFFB_MNE_SOURCE_SPACE);
     if (spaces.size() == 0)
     {
         if(open_here)

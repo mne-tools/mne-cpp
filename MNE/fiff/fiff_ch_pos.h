@@ -69,9 +69,9 @@ namespace FIFFLIB
 
 //=============================================================================================================
 /**
-* Coil position description replaces _fiffChPosRec struct.
+* Coil position description (Replaces fiffChPosRec,*fiffChPos; struct of MNE-C fiff_types.h).
 *
-* @brief Coil position.
+* @brief Measurement channel position and coil type.
 */
 class FIFFSHARED_EXPORT FiffChPos
 {
@@ -108,11 +108,11 @@ public:
     inline static qint32 storageSize();
 
 public:
-    fiff_int_t   coil_type;    /**< The kind of the coil. */
-    fiff_float_t r0[3];        /**< Coil coordinate system origin */
-    fiff_float_t ex[3];        /**< Coil coordinate system x-axis unit vector */
-    fiff_float_t ey[3];        /**< Coil coordinate system y-axis unit vector */
-    fiff_float_t ez[3];        /**< Coil coordinate system z-axis unit vector */
+    fiff_int_t   coil_type; /**< What kind of coil. */
+    Eigen::Vector3f r0;     /**< Coil coordinate system origin */
+    Eigen::Vector3f ex;     /**< Coil coordinate system x-axis unit vector */
+    Eigen::Vector3f ey;     /**< Coil coordinate system y-axis unit vector */
+    Eigen::Vector3f ez;     /**< Coil coordinate system z-axis unit vector */
 
 // ### OLD STRUCT ###
 // /** Measurement channel position and coil type. *
