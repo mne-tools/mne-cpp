@@ -45,24 +45,7 @@
 #include "fiffsimulator_global.h"
 
 #include <scShared/Interfaces/ISensor.h>
-#include <generics/circularbuffer_old.h>
 #include <generics/circularmatrixbuffer.h>
-#include <scMeas/newrealtimemultisamplearray.h>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FIFF INCLUDES
-//=============================================================================================================
-
-#include <fiff/fiff_info.h>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// MNE INCLUDES
-//=============================================================================================================
-
 #include <rtClient/rtcmdclient.h>
 
 
@@ -78,28 +61,30 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE FiffSimulatorPlugin
+// FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FiffSimulatorPlugin
+namespace SCMEASLIB {
+    class NewRealTimeMultiSampleArray;
+}
+
+namespace FIFFLIB {
+    class FiffInfo;
+}
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE FIFFSIMULATORPLUGIN
+//=============================================================================================================
+
+namespace FIFFSIMULATORPLUGIN
 {
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace SCSHAREDLIB;
-using namespace IOBUFFER;
-using namespace RTCLIENTLIB;
-using namespace FIFFLIB;
-using namespace SCMEASLIB;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
+// FORWARD DECLARATIONS FIFFSIMULATORPLUGIN
 //=============================================================================================================
 
 class FiffSimulatorProducer;
@@ -111,7 +96,7 @@ class FiffSimulatorProducer;
 *
 * @brief The FiffSimulator class provides a RT server connection.
 */
-class FIFFSIMULATORSHARED_EXPORT FiffSimulator : public ISensor
+class FIFFSIMULATORSHARED_EXPORT FiffSimulator : public SCSHAREDLIB::ISensor
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "fiffsimulator.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
@@ -219,37 +204,33 @@ private:
     */
     void initConnector();
 
-
-    QMutex m_qMutex;
-
-
-    QString m_sFiffSimulatorClientAlias;     /**< The rt server client alias.*/
-
 //    float           m_fSamplingRate;                /**< The sampling rate.*/
 //    int             m_iDownsamplingFactor;          /**< The down sampling factor.*/
 
-    PluginOutputData<NewRealTimeMultiSampleArray>::SPtr m_pRTMSA_FiffSimulator;     /**< The NewRealTimeMultiSampleArray to provide the rt_server Channels.*/
+    SCSHAREDLIB::PluginOutputData<SCMEASLIB::NewRealTimeMultiSampleArray>::SPtr m_pRTMSA_FiffSimulator;     /**< The NewRealTimeMultiSampleArray to provide the rt_server Channels.*/
 
-    QSharedPointer<RtCmdClient>                         m_pRtCmdClient;             /**< The command client.*/
-    bool                                                m_bCmdClientIsConnected;    /**< If the command client is connected.*/
+    QSharedPointer<FiffSimulatorProducer>       m_pFiffSimulatorProducer;   /**< Holds the FiffSimulatorProducer.*/
+    QSharedPointer<IOBUFFER::RawMatrixBuffer>   m_pRawMatrixBuffer_In;      /**< Holds incoming raw data. */
+    QSharedPointer<FIFFLIB::FiffInfo>           m_pFiffInfo;                /**< Fiff measurement info.*/
 
-    QString                                             m_sFiffSimulatorIP;         /**< The IP Adress of mne_rt_server.*/
-    QSharedPointer<FiffSimulatorProducer>               m_pFiffSimulatorProducer;   /**< Holds the FiffSimulatorProducer.*/
+    QSharedPointer<RTCLIENTLIB::RtCmdClient>    m_pRtCmdClient;             /**< The command client.*/
 
+    QAction*                m_pActionComputeHPI;            /**< Update HPI info into Fiff Info action */
+
+    bool                    m_bCmdClientIsConnected;        /**< If the command client is connected.*/
+    bool                    m_bIsRunning;                   /**< Whether FiffSimulator is running.*/
+
+    QString                 m_sFiffSimulatorIP;             /**< The IP Adress of mne_rt_server.*/
+    QString                 m_sFiffSimulatorClientAlias;    /**< The rt server client alias.*/
+
+    qint32                  m_iActiveConnectorId;           /**< The active connector.*/
+    qint32                  m_iBufferSize;                  /**< The raw data buffer size.*/
 
     QMap<qint32, QString>   m_qMapConnectors;               /**< Connector map.*/
-    qint32                  m_iActiveConnectorId;           /**< The active connector.*/
 
+    QTimer                  m_cmdConnectionTimer;           /**< Timer for convinient command client connection. When timer times out a connection is tried to be established. */
 
-    FiffInfo::SPtr  m_pFiffInfo;                            /**< Fiff measurement info.*/
-    qint32          m_iBufferSize;                          /**< The raw data buffer size.*/
-
-    QTimer          m_cmdConnectionTimer;                   /**< Timer for convinient command client connection. When timer times out a connection is tried to be established. */
-
-    QSharedPointer<RawMatrixBuffer> m_pRawMatrixBuffer_In;  /**< Holds incoming raw data. */
-
-    bool                            m_bIsRunning;           /**< Whether FiffSimulator is running.*/
-
+    QMutex                  m_qMutex;
 };
 
 } // NAMESPACE
