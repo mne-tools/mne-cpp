@@ -46,6 +46,7 @@
 #include <utils/ioutils.h>
 #include <fiff/fiff_info.h>
 #include <scMeas/newrealtimemultisamplearray.h>
+#include <scDisp/hpiwidget.h>
 
 
 //*************************************************************************************************************
@@ -73,6 +74,7 @@ using namespace SCSHAREDLIB;
 using namespace IOBUFFER;
 using namespace SCMEASLIB;
 using namespace RTCLIENTLIB;
+using namespace SCDISPLIB;
 
 
 //*************************************************************************************************************
@@ -94,7 +96,7 @@ FiffSimulator::FiffSimulator()
     m_pActionComputeHPI = new QAction(QIcon(":/images/latestFiffInfoHPI.png"), tr("Compute HPI"),this);
     m_pActionComputeHPI->setStatusTip(tr("Compute HPI"));
     connect(m_pActionComputeHPI, &QAction::triggered,
-            this, &BabyMEG::showHPIDialog);
+            this, &FiffSimulator::showHPIDialog);
     addPluginAction(m_pActionComputeHPI);
 }
 
@@ -105,6 +107,16 @@ FiffSimulator::~FiffSimulator()
 {
     if(m_pFiffSimulatorProducer->isRunning() || this->isRunning())
         stop();
+}
+
+
+//*************************************************************************************************************
+
+void FiffSimulator::clear()
+{
+    QMutexLocker locker(&m_qMutex);
+    m_pFiffInfo.reset();
+    m_iBufferSize = -1;
 }
 
 
@@ -145,9 +157,118 @@ void FiffSimulator::unload()
 
 
 //*************************************************************************************************************
-//=============================================================================================================
-// Create measurement instances and config them
-//=============================================================================================================
+
+bool FiffSimulator::start()
+{
+    //Check if the thread is already or still running. This can happen if the start button is pressed immediately after the stop button was pressed. In this case the stopping process is not finished yet but the start process is initiated.
+    if(this->isRunning())
+        QThread::wait();
+
+    if(m_bCmdClientIsConnected && m_pFiffInfo)
+    {
+        //Set buffer size
+        (*m_pRtCmdClient)["bufsize"].pValues()[0].setValue(m_iBufferSize);
+        (*m_pRtCmdClient)["bufsize"].send();
+
+        // Buffer
+        m_qMutex.lock();
+        m_pRawMatrixBuffer_In = QSharedPointer<RawMatrixBuffer>(new RawMatrixBuffer(8,m_pFiffInfo->nchan,m_iBufferSize));
+        m_bIsRunning = true;
+        m_qMutex.unlock();
+
+        // Start threads
+        QThread::start();
+
+        m_pFiffSimulatorProducer->start();
+
+        while(!m_pFiffSimulatorProducer->m_bFlagMeasuring)
+            msleep(1);
+
+        // Start Measurement at rt_Server
+        // start measurement
+        (*m_pRtCmdClient)["start"].pValues()[0].setValue(m_pFiffSimulatorProducer->m_iDataClientId);
+        (*m_pRtCmdClient)["start"].send();
+
+        return true;
+    }
+    else
+        return false;
+}
+
+
+//*************************************************************************************************************
+
+bool FiffSimulator::stop()
+{
+    if(m_pFiffSimulatorProducer->isRunning())
+        m_pFiffSimulatorProducer->stop();
+
+    //Wait until this thread is stopped
+    m_qMutex.lock();
+    m_bIsRunning = false;
+    m_qMutex.unlock();
+
+    if(this->isRunning())
+    {
+        //In case the semaphore blocks the thread -> Release the QSemaphore and let it exit from the pop function (acquire statement)
+        m_pRawMatrixBuffer_In->releaseFromPop();
+
+        m_pRawMatrixBuffer_In->clear();
+
+        m_pRTMSA_FiffSimulator->data()->clear();
+    }
+
+    return true;
+}
+
+
+//*************************************************************************************************************
+
+IPlugin::PluginType FiffSimulator::getType() const
+{
+    return _ISensor;
+}
+
+
+//*************************************************************************************************************
+
+QString FiffSimulator::getName() const
+{
+    return "Fiff Simulator";
+}
+
+
+//*************************************************************************************************************
+
+QWidget* FiffSimulator::setupWidget()
+{
+    FiffSimulatorSetupWidget* widget = new FiffSimulatorSetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
+
+    return widget;
+}
+
+
+//*************************************************************************************************************
+
+void FiffSimulator::run()
+{
+    while(true)
+    {
+        {
+            QMutexLocker locker(&m_qMutex);
+            if(!m_bIsRunning)
+                break;
+        }
+        //pop matrix
+        m_matValue = m_pRawMatrixBuffer_In->pop();
+
+        //emit values
+        m_pRTMSA_FiffSimulator->data()->setValue(m_matValue.cast<double>());
+    }
+}
+
+
+//*************************************************************************************************************
 
 void FiffSimulator::initConnector()
 {
@@ -198,16 +319,6 @@ void FiffSimulator::changeConnector(qint32 p_iNewConnectorId)
 
         emit cmdConnectionChanged(m_bCmdClientIsConnected);
     }
-}
-
-
-//*************************************************************************************************************
-
-void FiffSimulator::clear()
-{
-    QMutexLocker locker(&m_qMutex);
-    m_pFiffInfo.reset();
-    m_iBufferSize = -1;
 }
 
 
@@ -308,112 +419,35 @@ void FiffSimulator::requestInfo()
 
 //*************************************************************************************************************
 
-bool FiffSimulator::start()
+void FiffSimulator::showHPIDialog()
 {
-    //Check if the thread is already or still running. This can happen if the start button is pressed immediately after the stop button was pressed. In this case the stopping process is not finished yet but the start process is initiated.
-    if(this->isRunning())
-        QThread::wait();
+    if(!m_pFiffInfo) {
+        QMessageBox msgBox;
+        msgBox.setText("FiffInfo missing!");
+        msgBox.exec();
+        return;
+    } else {
+        qDebug()<<" Start to load Polhemus File";
+        if (!m_pHPIWidget) {
+            m_pHPIWidget = QSharedPointer<HPIWidget>(new HPIWidget(m_pFiffInfo));
 
-    if(m_bCmdClientIsConnected && m_pFiffInfo)
-    {
-        //Set buffer size
-        (*m_pRtCmdClient)["bufsize"].pValues()[0].setValue(m_iBufferSize);
-        (*m_pRtCmdClient)["bufsize"].send();
-
-        // Buffer
-        m_qMutex.lock();
-        m_pRawMatrixBuffer_In = QSharedPointer<RawMatrixBuffer>(new RawMatrixBuffer(8,m_pFiffInfo->nchan,m_iBufferSize));
-        m_bIsRunning = true;
-        m_qMutex.unlock();
-
-        // Start threads
-        QThread::start();
-
-        m_pFiffSimulatorProducer->start();
-
-        while(!m_pFiffSimulatorProducer->m_bFlagMeasuring)
-            msleep(1);
-
-        // Start Measurement at rt_Server
-        // start measurement
-        (*m_pRtCmdClient)["start"].pValues()[0].setValue(m_pFiffSimulatorProducer->m_iDataClientId);
-        (*m_pRtCmdClient)["start"].send();
-
-        return true;
-    }
-    else
-        return false;
-}
-
-
-//*************************************************************************************************************
-
-bool FiffSimulator::stop()
-{
-    if(m_pFiffSimulatorProducer->isRunning())
-        m_pFiffSimulatorProducer->stop();
-
-    //Wait until this thread is stopped
-    m_qMutex.lock();
-    m_bIsRunning = false;
-    m_qMutex.unlock();
-
-    if(this->isRunning())
-    {
-        //In case the semaphore blocks the thread -> Release the QSemaphore and let it exit from the pop function (acquire statement)
-        m_pRawMatrixBuffer_In->releaseFromPop();
-
-        m_pRawMatrixBuffer_In->clear();
-
-        m_pRTMSA_FiffSimulator->data()->clear();
-    }
-
-    return true;
-}
-
-
-//*************************************************************************************************************
-
-IPlugin::PluginType FiffSimulator::getType() const
-{
-    return _ISensor;
-}
-
-
-//*************************************************************************************************************
-
-QString FiffSimulator::getName() const
-{
-    return "Fiff Simulator";
-}
-
-
-//*************************************************************************************************************
-
-QWidget* FiffSimulator::setupWidget()
-{
-    FiffSimulatorSetupWidget* widget = new FiffSimulatorSetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
-
-    return widget;
-}
-
-
-//*************************************************************************************************************
-
-void FiffSimulator::run()
-{
-    MatrixXf matValue;
-    while(true)
-    {
-        {
-            QMutexLocker locker(&m_qMutex);
-            if(!m_bIsRunning)
-                break;
+            connect(m_pHPIWidget.data(), &HPIWidget::needData,
+                    this, &FiffSimulator::sendHPIData);
         }
-        //pop matrix
-        matValue = m_pRawMatrixBuffer_In->pop();
 
-        //emit values
-        m_pRTMSA_FiffSimulator->data()->setValue(matValue.cast<double>());
+        if (!m_pHPIWidget->isVisible()) {
+            m_pHPIWidget->show();
+            m_pHPIWidget->raise();
+        }
+    }
+}
+
+
+//*************************************************************************************************************
+
+void FiffSimulator::sendHPIData()
+{
+    if(m_pFiffInfo && m_pHPIWidget) {
+        m_pHPIWidget->setData(m_matValue.cast<double>());
     }
 }

@@ -200,36 +200,6 @@ QSharedPointer<IPlugin> BabyMEG::clone() const
 
 //*************************************************************************************************************
 
-QString BabyMEG::getFilePath(bool currentTime) const
-{
-    QString sFilePath = m_sBabyMEGDataPath + "/" + m_sCurrentProject + "/" + m_sCurrentSubject;
-
-    QString sTimeStamp;
-
-    if(currentTime)
-        sTimeStamp = QDateTime::currentDateTime().toString("yyMMdd_hhmmss");
-    else
-        sTimeStamp = "<YYMMDD_HMS>";
-
-    if(m_sCurrentParadigm.isEmpty())
-        sFilePath.append("/"+ sTimeStamp + "_" + m_sCurrentSubject + "_raw.fif");
-    else
-        sFilePath.append("/"+ sTimeStamp + "_" + m_sCurrentSubject + "_" + m_sCurrentParadigm + "_raw.fif");
-
-    return sFilePath;
-}
-
-
-//*************************************************************************************************************
-
-QString BabyMEG::getDataPath() const
-{
-    return m_sBabyMEGDataPath;
-}
-
-
-//*************************************************************************************************************
-
 void BabyMEG::init()
 {
     //BabyMEGData Path
@@ -287,94 +257,10 @@ void BabyMEG::unload()
 
 //*************************************************************************************************************
 
-void BabyMEG::initConnector()
-{
-    if(m_pFiffInfo)
-    {
-        m_pRTMSABabyMEG = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "BabyMEG Output", "BabyMEG");
-        m_pRTMSABabyMEG->data()->setName(this->getName());//Provide name to auto store widget settings
-
-        m_pRTMSABabyMEG->data()->initFromFiffInfo(m_pFiffInfo);
-        m_pRTMSABabyMEG->data()->setMultiArraySize(1);
-
-        m_pRTMSABabyMEG->data()->setSamplingRate(m_pFiffInfo->sfreq);
-
-        m_pRTMSABabyMEG->data()->setVisibility(true);
-
-        m_outputConnectors.append(m_pRTMSABabyMEG);
-
-        //Look for trigger channels and initialise detected trigger map
-        m_lTriggerChannelIndices.append(m_pFiffInfo->ch_names.indexOf("TRG001"));
-        m_lTriggerChannelIndices.append(m_pFiffInfo->ch_names.indexOf("TRG002"));
-        m_lTriggerChannelIndices.append(m_pFiffInfo->ch_names.indexOf("TRG003"));
-        m_lTriggerChannelIndices.append(m_pFiffInfo->ch_names.indexOf("TRG004"));
-        m_lTriggerChannelIndices.append(m_pFiffInfo->ch_names.indexOf("TRG005"));
-        m_lTriggerChannelIndices.append(m_pFiffInfo->ch_names.indexOf("TRG006"));
-        m_lTriggerChannelIndices.append(m_pFiffInfo->ch_names.indexOf("TRG007"));
-        m_lTriggerChannelIndices.append(m_pFiffInfo->ch_names.indexOf("TRG008"));
-    }
-}
-
-
-//*************************************************************************************************************
-
 void BabyMEG::clear()
 {
     m_pFiffInfo.reset();
     m_iBufferSize = -1;
-}
-
-
-//*************************************************************************************************************
-
-void BabyMEG::sendHPIData()
-{
-    if(m_pFiffInfo && m_pHPIWidget) {
-        Eigen::MatrixXd matProj;
-        m_pFiffInfo->make_projector(matProj);
-
-        //set columns of matrix to zero depending on bad channels indexes
-        for(qint32 j = 0; j < m_pFiffInfo->bads.size(); ++j) {
-            matProj.col(m_pFiffInfo->ch_names.indexOf(m_pFiffInfo->bads.at(j))).setZero();
-        }
-
-        // Setup Comps
-        FiffCtfComp newComp;
-        m_pFiffInfo->make_compensator(0, 101, newComp);//Do this always from 0 since we always read new raw data, we never actually perform a multiplication on already existing data
-        Eigen::MatrixXd matComp = newComp.data->data;
-
-        m_pHPIWidget->setData(matProj * matComp * this->calibrate(m_matValue));
-    }
-}
-
-
-//*************************************************************************************************************
-
-void BabyMEG::recvHPIFiffInfo(const FiffInfo& info)
-{
-    // show the HPI info
-    qDebug()<<"saved HPI" << m_pFiffInfo->dig.at(0).r[0];
-    qDebug()<<"HPI"<< info.dig.at(0).kind << info.dig.at(0).r[0];
-}
-
-
-//*************************************************************************************************************
-
-void BabyMEG::setRecordingTimerChanged(int timeMSecs)
-{
-    //If the recording time is changed during the recording, change the timer
-    if(m_bWriteToFile)
-        m_pRecordTimer->setInterval(timeMSecs-m_recordingStartedTime.elapsed());
-
-    m_iRecordingMSeconds = timeMSecs;
-}
-
-
-//*************************************************************************************************************
-
-void BabyMEG::setRecordingTimerStateChanged(bool state)
-{
-    m_bUseRecordTimer = state;
 }
 
 
@@ -510,6 +396,67 @@ void BabyMEG::run()
     {
         this->toggleRecordingFile();
     }
+}
+
+
+//*************************************************************************************************************
+
+void BabyMEG::initConnector()
+{
+    if(m_pFiffInfo)
+    {
+        m_pRTMSABabyMEG = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "BabyMEG Output", "BabyMEG");
+        m_pRTMSABabyMEG->data()->setName(this->getName());//Provide name to auto store widget settings
+
+        m_pRTMSABabyMEG->data()->initFromFiffInfo(m_pFiffInfo);
+        m_pRTMSABabyMEG->data()->setMultiArraySize(1);
+
+        m_pRTMSABabyMEG->data()->setSamplingRate(m_pFiffInfo->sfreq);
+
+        m_pRTMSABabyMEG->data()->setVisibility(true);
+
+        m_outputConnectors.append(m_pRTMSABabyMEG);
+
+        //Look for trigger channels and initialise detected trigger map
+        m_lTriggerChannelIndices.append(m_pFiffInfo->ch_names.indexOf("TRG001"));
+        m_lTriggerChannelIndices.append(m_pFiffInfo->ch_names.indexOf("TRG002"));
+        m_lTriggerChannelIndices.append(m_pFiffInfo->ch_names.indexOf("TRG003"));
+        m_lTriggerChannelIndices.append(m_pFiffInfo->ch_names.indexOf("TRG004"));
+        m_lTriggerChannelIndices.append(m_pFiffInfo->ch_names.indexOf("TRG005"));
+        m_lTriggerChannelIndices.append(m_pFiffInfo->ch_names.indexOf("TRG006"));
+        m_lTriggerChannelIndices.append(m_pFiffInfo->ch_names.indexOf("TRG007"));
+        m_lTriggerChannelIndices.append(m_pFiffInfo->ch_names.indexOf("TRG008"));
+    }
+}
+
+
+//*************************************************************************************************************
+
+QString BabyMEG::getFilePath(bool currentTime) const
+{
+    QString sFilePath = m_sBabyMEGDataPath + "/" + m_sCurrentProject + "/" + m_sCurrentSubject;
+
+    QString sTimeStamp;
+
+    if(currentTime)
+        sTimeStamp = QDateTime::currentDateTime().toString("yyMMdd_hhmmss");
+    else
+        sTimeStamp = "<YYMMDD_HMS>";
+
+    if(m_sCurrentParadigm.isEmpty())
+        sFilePath.append("/"+ sTimeStamp + "_" + m_sCurrentSubject + "_raw.fif");
+    else
+        sFilePath.append("/"+ sTimeStamp + "_" + m_sCurrentSubject + "_" + m_sCurrentParadigm + "_raw.fif");
+
+    return sFilePath;
+}
+
+
+//*************************************************************************************************************
+
+QString BabyMEG::getDataPath() const
+{
+    return m_sBabyMEGDataPath;
 }
 
 
@@ -689,6 +636,59 @@ void BabyMEG::showHPIDialog()
             m_pHPIWidget->raise();
         }
     }
+}
+
+
+//*************************************************************************************************************
+
+void BabyMEG::sendHPIData()
+{
+    if(m_pFiffInfo && m_pHPIWidget) {
+        Eigen::MatrixXd matProj;
+        m_pFiffInfo->make_projector(matProj);
+
+        //set columns of matrix to zero depending on bad channels indexes
+        for(qint32 j = 0; j < m_pFiffInfo->bads.size(); ++j) {
+            matProj.col(m_pFiffInfo->ch_names.indexOf(m_pFiffInfo->bads.at(j))).setZero();
+        }
+
+        // Setup Comps
+        FiffCtfComp newComp;
+        m_pFiffInfo->make_compensator(0, 101, newComp);//Do this always from 0 since we always read new raw data, we never actually perform a multiplication on already existing data
+        Eigen::MatrixXd matComp = newComp.data->data;
+
+        m_pHPIWidget->setData(matProj * matComp * this->calibrate(m_matValue));
+    }
+}
+
+
+//*************************************************************************************************************
+
+void BabyMEG::recvHPIFiffInfo(const FiffInfo& info)
+{
+    // show the HPI info
+    qDebug()<<"saved HPI" << m_pFiffInfo->dig.at(0).r[0];
+    qDebug()<<"HPI"<< info.dig.at(0).kind << info.dig.at(0).r[0];
+}
+
+
+//*************************************************************************************************************
+
+void BabyMEG::setRecordingTimerChanged(int timeMSecs)
+{
+    //If the recording time is changed during the recording, change the timer
+    if(m_bWriteToFile)
+        m_pRecordTimer->setInterval(timeMSecs-m_recordingStartedTime.elapsed());
+
+    m_iRecordingMSeconds = timeMSecs;
+}
+
+
+//*************************************************************************************************************
+
+void BabyMEG::setRecordingTimerStateChanged(bool state)
+{
+    m_bUseRecordTimer = state;
 }
 
 
