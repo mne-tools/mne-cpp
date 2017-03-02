@@ -125,7 +125,6 @@ class BABYMEGSHARED_EXPORT BabyMEG : public SCSHAREDLIB::ISensor
     friend class BabyMEGSetupWidget;
     friend class BabyMEGProjectDialog;
     friend class BabyMEGSQUIDControlDgl;
-    friend class BabyMEGHPIDgl;
 
 public:
     //=========================================================================================================
@@ -292,7 +291,7 @@ public:
     /**
     * Set HPI fiff information.
     */
-    void SetFiffInfoForHPI();
+    void showHPIDialog();
 
     //=========================================================================================================
     /**
@@ -442,7 +441,7 @@ private:
     QAction*                m_pActionRecordFile;            /**< start recording action */
     QAction*                m_pActionSqdCtrl;               /**< show squid control */
     QAction*                m_pActionUpdateFiffInfo;        /**< Update Fiff Info action */
-    QAction*                m_pActionUpdateFiffInfoForHPI;  /**< Update HPI info into Fiff Info action */
+    QAction*                m_pActionComputeHPI;            /**< Update HPI info into Fiff Info action */
 
 signals:
     //=========================================================================================================

@@ -140,11 +140,11 @@ BabyMEG::BabyMEG()
             this, &BabyMEG::UpdateFiffInfo);
     addPluginAction(m_pActionUpdateFiffInfo);
 
-    m_pActionUpdateFiffInfoForHPI = new QAction(QIcon(":/images/latestFiffInfoHPI.png"), tr("Update HPI to Fiff Info"),this);
-    m_pActionUpdateFiffInfoForHPI->setStatusTip(tr("Update HPI to Fiff Info"));
-    connect(m_pActionUpdateFiffInfoForHPI, &QAction::triggered,
-            this, &BabyMEG::SetFiffInfoForHPI);
-    addPluginAction(m_pActionUpdateFiffInfoForHPI);
+    m_pActionComputeHPI = new QAction(QIcon(":/images/latestFiffInfoHPI.png"), tr("Compute HPI"),this);
+    m_pActionComputeHPI->setStatusTip(tr("Compute HPI"));
+    connect(m_pActionComputeHPI, &QAction::triggered,
+            this, &BabyMEG::showHPIDialog);
+    addPluginAction(m_pActionComputeHPI);
 
     //Init timers
     if(!m_pRecordTimer) {
@@ -169,7 +169,7 @@ BabyMEG::BabyMEG()
     //If the basic MNE Scan version is to be build hide the HPI and squid control actions in the toolbar
     #ifdef BUILD_BASIC_MNESCAN_VERSION
     m_pActionSqdCtrl->setVisible(false);
-    m_pActionUpdateFiffInfoForHPI->setVisible(false);
+    m_pActionComputeHPI->setVisible(false);
     #endif
 }
 
@@ -345,7 +345,7 @@ void BabyMEG::showProjectDialog()
 
 void BabyMEG::showSqdCtrlDialog()
 {
-    // Start HPI control widget
+    // Start Squid control widget
     if (SQUIDCtrlDlg == NULL)
         SQUIDCtrlDlg = QSharedPointer<BabyMEGSQUIDControlDgl>(new BabyMEGSQUIDControlDgl(this));
 
@@ -374,7 +374,7 @@ void BabyMEG::UpdateFiffInfo()
 
 //*************************************************************************************************************
 
-void BabyMEG::SetFiffInfoForHPI()
+void BabyMEG::showHPIDialog()
 {
     if(!m_pFiffInfo) {
         QMessageBox msgBox;
