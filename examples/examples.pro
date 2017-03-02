@@ -6,11 +6,11 @@
 #           Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
-# @date     July, 2012
+# @date     July, 2010
 #
 # @section  LICENSE
 #
-# Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+# Copyright (C) 2010, Christoph Dinh, Lorenz Esch, Florian Schlembach and Matti Hamalainen. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -40,44 +40,40 @@ include(../mne-cpp.pri)
 TEMPLATE = subdirs
 
 SUBDIRS += \
-    readRaw \
-    readWriteRaw \
-    readFwd \
-    readEpochs \
-    readEvoked \
-    computeInverse \
-    computeInverseRaw \
-    makeInverseOperator \
-    findEvoked \
-    evokedGradAmp \
-    cancelNoise \
-    fiffIO \
-    makeLayout \
-    readBEM \
+    ex_cancel_noise \
+    ex_evoked_grad_amp \
+    ex_fiff_io \
+    ex_find_evoked \
+    ex_inverse_mne \
+    ex_inverse_mne_raw \
+    ex_make_inverse_operator \
+    ex_make_layout \
+    ex_read_bem \
+    ex_read_epochs \
+    ex_read_evoked \
+    ex_read_fwd \
+    ex_read_raw \
+    ex_read_write_raw
 
 !contains(MNECPP_CONFIG, minimalVersion) {
     qtHaveModule(charts) {
         SUBDIRS += \
-            clusteredInverse \
-            rawClusteredInverse \
-            readFwdDisp3D \
-            computeInverseRapMusic \
-            rawClusteredInverseRapMusic \
-            computeInversePwlRapMusic \
-            rawClusteredInversePwlRapMusic \
-            stClusteredInversePwlRapMusic  \
-            roiClusteredInversePwlRapMusic \
-            fsSurface \
+            ex_clustered_inverse_mne \
+            ex_clustered_inverse_mne_raw \
+            ex_clustered_inverse_pwl_rap_music_raw \
+            ex_clustered_inverse_rap_music_raw \
+            ex_connectivity \
             ex_disp \
-            disp3DTutorial \
-            histogram \
-            connectivityTutorial
-
-        !isEmpty( CNTK_INCLUDE_DIR ) {
-            SUBDIRS += \
-                ex_deep
-        }
-    } else {
+            ex_disp_3D \
+            ex_fs_surface \
+            ex_histogram \
+            ex_inverse_pwl_rap_music \
+            ex_inverse_rap_music \
+            ex_read_fwd_disp_3D \
+            ex_roi_clustered_inverse_pwl_rap_music \
+            ex_st_clustered_inverse_pwl_rap_music
+    }
+    else {
         message("examples.pro - The Qt Charts module is missing. Please install to build the complete set of MNE-CPP features.")
     }
 }
