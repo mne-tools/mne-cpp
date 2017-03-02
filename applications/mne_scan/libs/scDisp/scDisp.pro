@@ -59,6 +59,7 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Mned \
             -lMNE$${MNE_LIB_VERSION}Inversed \
             -lMNE$${MNE_LIB_VERSION}Connectivityd \
+            -lMNE$${MNE_LIB_VERSION}RtProcessingd \
             -lMNE$${MNE_LIB_VERSION}Dispd \
             -lMNE$${MNE_LIB_VERSION}DispChartsd \
             -lMNE$${MNE_LIB_VERSION}Disp3Dd \
@@ -72,6 +73,7 @@ else {
             -lMNE$${MNE_LIB_VERSION}Mne \
             -lMNE$${MNE_LIB_VERSION}Inverse \
             -lMNE$${MNE_LIB_VERSION}Connectivity \
+            -lMNE$${MNE_LIB_VERSION}RtProcessing \
             -lMNE$${MNE_LIB_VERSION}Disp \
             -lMNE$${MNE_LIB_VERSION}DispCharts \
             -lMNE$${MNE_LIB_VERSION}Disp3D \
@@ -112,7 +114,8 @@ SOURCES += \
     helpers/frequencyspectrumsettingswidget.cpp \
     helpers/quickcontrolwidget.cpp \
     realtimesourceestimatewidget.cpp \
-    realtimeconnectivityestimatewidget.cpp
+    realtimeconnectivityestimatewidget.cpp \
+    hpiwidget.cpp \
 
 HEADERS += \
     scdisp_global.h \
@@ -136,10 +139,12 @@ HEADERS += \
     helpers/quickcontrolwidget.h \
     realtimesourceestimatewidget.h \
     realtimeconnectivityestimatewidget.h \
+    hpiwidget.h \
 
 FORMS += \
-    realtimesamplearraywidget.ui \
-    helpers/quickcontrolwidget.ui
+    FormFiles/realtimesamplearraywidget.ui \
+    helpers/quickcontrolwidget.ui \
+    FormFiles/hpiwidget.ui
 
 RESOURCES += \
     scDisp.qrc

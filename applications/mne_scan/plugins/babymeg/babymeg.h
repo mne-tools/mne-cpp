@@ -82,6 +82,10 @@ namespace SCMEASLIB {
     class NewRealTimeMultiSampleArray;
 }
 
+namespace SCDISPLIB {
+    class HPIWidget;
+}
+
 #define MAX_DATA_LEN    2000000000L
 #define MAX_POS         2000000000L
 
@@ -103,7 +107,6 @@ namespace BABYMEGPLUGIN
 class BabyMEGProjectDialog;
 class BabyMEGClient;
 class BabyMEGInfo;
-class BabyMEGHPIDgl;
 class BabyMEGSetupWidget;
 class BabyMEGProjectDialog;
 class BabyMEGSQUIDControlDgl;
@@ -402,7 +405,7 @@ private:
     QSharedPointer<BabyMEGInfo>             pInfo;                          /**< Set up the babyMEG info. */
     QSharedPointer<BabyMEGProjectDialog>    m_pBabyMEGProjectDialog;        /**< Window to setup the recording tiem and fiel name. */
     QSharedPointer<BabyMEGSQUIDControlDgl>  SQUIDCtrlDlg;                   /**< Nonmodal dialog for squid control. */
-    QSharedPointer<BabyMEGHPIDgl>           m_pHPIDlg;                      /**< HPI dialog information. */
+    QSharedPointer<SCDISPLIB::HPIWidget>    m_pHPIWidget;                   /**< HPI widget. */
 
     QSharedPointer<QTimer>                  m_pUpdateTimeInfoTimer;         /**< timer to control remaining time. */
     QSharedPointer<QTimer>                  m_pBlinkingRecordButtonTimer;   /**< timer to control blinking recording button. */

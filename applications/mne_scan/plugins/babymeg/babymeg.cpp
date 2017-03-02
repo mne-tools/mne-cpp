@@ -44,7 +44,6 @@
 #include "FormFiles/babymegsetupwidget.h"
 #include "FormFiles/babymegprojectdialog.h"
 #include "FormFiles/babymegsquidcontroldgl.h"
-#include "FormFiles/babymeghpidgl.h"
 #include "babymegclient.h"
 #include "babymeginfo.h"
 
@@ -56,6 +55,7 @@
 #include <fiff/fiff_dig_point_set.h>
 #include <rtClient/rtcmdclient.h>
 #include <scMeas/newrealtimemultisamplearray.h>
+#include <scDisp/hpiwidget.h>
 
 
 //*************************************************************************************************************
@@ -91,6 +91,7 @@ using namespace UTILSLIB;
 using namespace SCSHAREDLIB;
 using namespace IOBUFFER;
 using namespace SCMEASLIB;
+using namespace SCDISPLIB;
 
 
 //*************************************************************************************************************
@@ -383,16 +384,16 @@ void BabyMEG::showHPIDialog()
         return;
     } else {
         qDebug()<<" Start to load Polhemus File";
-        if (!m_pHPIDlg) {
-            m_pHPIDlg = QSharedPointer<BabyMEGHPIDgl>(new BabyMEGHPIDgl(m_pFiffInfo));
+        if (!m_pHPIWidget) {
+            m_pHPIWidget = QSharedPointer<HPIWidget>(new HPIWidget(m_pFiffInfo));
 
-            connect(m_pHPIDlg.data(), &BabyMEGHPIDgl::needData,
+            connect(m_pHPIWidget.data(), &HPIWidget::needData,
                     this, &BabyMEG::sendHPIData);
         }
 
-        if (!m_pHPIDlg->isVisible()) {
-            m_pHPIDlg->show();
-            m_pHPIDlg->raise();
+        if (!m_pHPIWidget->isVisible()) {
+            m_pHPIWidget->show();
+            m_pHPIWidget->raise();
         }
     }
 }
@@ -402,7 +403,7 @@ void BabyMEG::showHPIDialog()
 
 void BabyMEG::sendHPIData()
 {
-    if(m_pFiffInfo && m_pHPIDlg) {
+    if(m_pFiffInfo && m_pHPIWidget) {
         Eigen::MatrixXd matProj;
         m_pFiffInfo->make_projector(matProj);
 
@@ -416,7 +417,7 @@ void BabyMEG::sendHPIData()
         m_pFiffInfo->make_compensator(0, 101, newComp);//Do this always from 0 since we always read new raw data, we never actually perform a multiplication on already existing data
         Eigen::MatrixXd matComp = newComp.data->data;
 
-        m_pHPIDlg->setData(matProj * matComp * this->calibrate(m_matValue));
+        m_pHPIWidget->setData(matProj * matComp * this->calibrate(m_matValue));
     }
 }
 
