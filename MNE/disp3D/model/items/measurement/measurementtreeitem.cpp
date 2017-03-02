@@ -205,7 +205,9 @@ MneEstimateTreeItem* MeasurementTreeItem::addData(const MNESourceEstimate& tSour
 
                     //Find MRI data set and hemisphere from parent item
                     //Option 1 - Choose first found MRI set
-                    pMriItem = dynamic_cast<MriTreeItem*>(lMRIChildren.first());
+                    if(!lMRIChildren.isEmpty()) {
+                        pMriItem = dynamic_cast<MriTreeItem*>(lMRIChildren.first());
+                    }
 
 //                    //Option 2 - Choose MRI set by its name
 //                    QString sMRISetName = "MRI";

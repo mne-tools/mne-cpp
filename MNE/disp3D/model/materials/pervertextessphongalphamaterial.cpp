@@ -88,9 +88,9 @@ PerVertexTessPhongAlphaMaterial::PerVertexTessPhongAlphaMaterial(QNode *parent)
 , m_pOuterTessParameter(new QParameter("outerTess", 1.0f))
 , m_pTriangleScaleParameter(new QParameter("triangleScale", 1.0f))
 , m_pAlphaParameter(new QParameter("alpha", 0.5f))
-, m_pVertexGL3Technique(new QTechnique())
-, m_pVertexGL3RenderPass(new QRenderPass())
-, m_pVertexGL3Shader(new QShaderProgram())
+, m_pVertexGL4Technique(new QTechnique())
+, m_pVertexGL4RenderPass(new QRenderPass())
+, m_pVertexGL4Shader(new QShaderProgram())
 , m_pFilterKey(new QFilterKey)
 , m_pNoDepthMask(new QNoDepthMask())
 , m_pBlendState(new QBlendEquationArguments())
@@ -112,37 +112,37 @@ PerVertexTessPhongAlphaMaterial::~PerVertexTessPhongAlphaMaterial()
 void PerVertexTessPhongAlphaMaterial::init()
 {
     //Set shader
-    m_pVertexGL3Shader->setVertexShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl3/pervertextessphongalpha.vert"))));
-    m_pVertexGL3Shader->setTessellationControlShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl3/pervertextessphongalpha.tcs"))));
-    //m_pVertexGL3Shader->setTessellationEvaluationShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl3/pervertextessphongalpha_simple.tes"))));
-    m_pVertexGL3Shader->setTessellationEvaluationShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl3/pervertextessphongalpha_pn_triangles.tes"))));
-    m_pVertexGL3Shader->setGeometryShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl3/pervertextessphongalpha.geom"))));
-    m_pVertexGL3Shader->setFragmentShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl3/pervertextessphongalpha.frag"))));
+    m_pVertexGL4Shader->setVertexShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl4/pervertextessphongalpha.vert"))));
+    m_pVertexGL4Shader->setTessellationControlShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl4/pervertextessphongalpha.tcs"))));
+    //m_pVertexGL4Shader->setTessellationEvaluationShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl4/pervertextessphongalpha_simple.tes"))));
+    m_pVertexGL4Shader->setTessellationEvaluationShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl4/pervertextessphongalpha_pn_triangles.tes"))));
+    m_pVertexGL4Shader->setGeometryShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl4/pervertextessphongalpha.geom"))));
+    m_pVertexGL4Shader->setFragmentShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/model/materials/shaders/gl4/pervertextessphongalpha.frag"))));
 
-    m_pVertexGL3RenderPass->setShaderProgram(m_pVertexGL3Shader);
+    m_pVertexGL4RenderPass->setShaderProgram(m_pVertexGL4Shader);
 
-    //Set OpenGL version
-    m_pVertexGL3Technique->graphicsApiFilter()->setApi(QGraphicsApiFilter::OpenGL);
-    m_pVertexGL3Technique->graphicsApiFilter()->setMajorVersion(4);
-    m_pVertexGL3Technique->graphicsApiFilter()->setMinorVersion(0);
-    m_pVertexGL3Technique->graphicsApiFilter()->setProfile(QGraphicsApiFilter::CoreProfile);
+    //Set OpenGL version - This material can only be used with opengl 4.0 or higher since it is using tesselation
+    m_pVertexGL4Technique->graphicsApiFilter()->setApi(QGraphicsApiFilter::OpenGL);
+    m_pVertexGL4Technique->graphicsApiFilter()->setMajorVersion(4);
+    m_pVertexGL4Technique->graphicsApiFilter()->setMinorVersion(0);
+    m_pVertexGL4Technique->graphicsApiFilter()->setProfile(QGraphicsApiFilter::CoreProfile);
 
 //    //Setup transparency
 //    m_pBlendState->setSourceRgb(QBlendEquationArguments::SourceAlpha);
 //    m_pBlendState->setDestinationRgb(QBlendEquationArguments::OneMinusSourceAlpha);
 //    m_pBlendEquation->setBlendFunction(QBlendEquation::Add);
 
-//    m_pVertexGL3RenderPass->addRenderState(m_pBlendEquation);
-//    m_pVertexGL3RenderPass->addRenderState(m_pNoDepthMask);
-//    m_pVertexGL3RenderPass->addRenderState(m_pBlendState);
+//    m_pVertexGL4RenderPass->addRenderState(m_pBlendEquation);
+//    m_pVertexGL4RenderPass->addRenderState(m_pNoDepthMask);
+//    m_pVertexGL4RenderPass->addRenderState(m_pBlendState);
 
     m_pFilterKey->setName(QStringLiteral("renderingStyle"));
     m_pFilterKey->setValue(QStringLiteral("forward"));
-    m_pVertexGL3Technique->addFilterKey(m_pFilterKey);
+    m_pVertexGL4Technique->addFilterKey(m_pFilterKey);
 
-    m_pVertexGL3Technique->addRenderPass(m_pVertexGL3RenderPass);
+    m_pVertexGL4Technique->addRenderPass(m_pVertexGL4RenderPass);
 
-    m_pVertexEffect->addTechnique(m_pVertexGL3Technique);
+    m_pVertexEffect->addTechnique(m_pVertexGL4Technique);
 
     m_pVertexEffect->addParameter(m_pDiffuseParameter);
     m_pVertexEffect->addParameter(m_pSpecularParameter);

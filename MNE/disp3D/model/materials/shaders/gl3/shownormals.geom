@@ -1,4 +1,4 @@
-#version 400 core
+#version 150 core
 
 uniform mat4 mvp;
 
