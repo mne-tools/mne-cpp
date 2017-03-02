@@ -42,9 +42,8 @@
 //=============================================================================================================
 
 #include "babymeg_global.h"
-#include "../babymeg.h"
 
-#include <fiff/fiff_info.h>
+#include <fiff/fiff_coord_trans.h>
 
 
 //*************************************************************************************************************
@@ -52,14 +51,15 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QDialog>
-#include <QAbstractButton>
+#include<QWidget>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
 // Eigen INCLUDES
 //=============================================================================================================
+
+#include <Eigen/SparseCore>
 
 
 //*************************************************************************************************************
@@ -78,6 +78,8 @@ namespace DISP3DLIB {
 
 namespace FIFFLIB {
     class FiffDigPointSet;
+    class FiffInfo;
+    class FiffDigPoint;
 }
 
 
@@ -109,8 +111,19 @@ class BABYMEGSHARED_EXPORT BabyMEGHPIDgl : public QWidget
     Q_OBJECT
 
 public:
-    explicit BabyMEGHPIDgl(BabyMEG* p_pBabyMEG, QWidget *parent = 0);
+    explicit BabyMEGHPIDgl(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo, QWidget *parent = 0);
     ~BabyMEGHPIDgl();
+
+    //=========================================================================================================
+    /**
+    * Set te data needed for fitting.
+    *
+    * @param[out] data  the data matrix
+    */
+    void setData(const Eigen::MatrixXd& data);
+
+protected:
+     virtual void closeEvent( QCloseEvent * event );
 
     //=========================================================================================================
     /**
@@ -133,13 +146,6 @@ public:
     * @return true  If any digitizers were loaded that correspond to HPI coils, false otherwise.
     */
     bool hpiLoaded();
-
-    BabyMEG*                m_pBabyMEG;
-
-protected:
-     virtual void closeEvent( QCloseEvent * event );
-
-private:
 
     //=========================================================================================================
     /**
@@ -169,15 +175,30 @@ private:
     */
     void onFreqsChanged();
 
+    //=========================================================================================================
+    /**
+    * Perform a HPI fitting procedure.
+    *
+    * @param[in] vFreqs    the frequencies for each coil.
+    */
+    void performHPIFitting(const QVector<int>& vFreqs);
+
     Ui::BabyMEGHPIDgl*                          ui;                 /**< The HPI dialog. */
 
     QVector<int>                                m_vCoilFreqs;       /**< Vector contains the HPI coil frequencies. */
 
+    Eigen::SparseMatrix<double>                 m_sparseMatCals;    /**< Sparse calibration matrix.*/
+
+    Eigen::MatrixXd                             m_matValue;         /**< The current data block.*/
+
     QSharedPointer<DISP3DLIB::View3D>           m_pView3D;          /**< The 3D view. */
     QSharedPointer<DISP3DLIB::Data3DTreeModel>  m_pData3DModel;     /**< The Disp3D model. */
+    QSharedPointer<FIFFLIB::FiffInfo>           m_pFiffInfo;        /**< The FiffInfo. */
 
 signals:
-    void SendHPIFiffInfo(FIFFLIB::FiffInfo);
+    void newHPIDevHeadTransAvailable(FIFFLIB::FiffCoordTrans &trans);
+
+    void needData();
 };
 } //NAMESPACE
 #endif // BABYMEGHPIDGL_H
