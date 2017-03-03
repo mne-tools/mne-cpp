@@ -238,7 +238,7 @@ public:
     *
     * @return type cast of the tag data pointer
     */
-    inline quint8* toByte();
+    inline quint8* toByte() const;
 
     //=========================================================================================================
     /**
@@ -247,7 +247,7 @@ public:
     *
     * @return type cast of the tag data pointer
     */
-    inline quint16* toUnsignedShort();
+    inline quint16* toUnsignedShort() const;
 
     //=========================================================================================================
     /**
@@ -256,7 +256,7 @@ public:
     *
     * @return type cast of the tag data pointer
     */
-    inline qint16* toShort();
+    inline qint16* toShort() const;
 
     //=========================================================================================================
     /**
@@ -265,7 +265,7 @@ public:
     *
     * @return type cast of the tag data pointer
     */
-    inline quint32* toUnsignedInt();
+    inline quint32* toUnsignedInt() const;
 
     //=========================================================================================================
     /**
@@ -274,7 +274,7 @@ public:
     *
     * @return type cast of the tag data pointer
     */
-    inline qint32* toInt();
+    inline qint32* toInt() const;
 
     //=========================================================================================================
     /**
@@ -283,7 +283,7 @@ public:
     *
     * @return type cast of the tag data pointer
     */
-    inline float* toFloat();
+    inline float* toFloat() const;
 
     //=========================================================================================================
     /**
@@ -292,7 +292,7 @@ public:
     *
     * @return type cast of the tag data pointer
     */
-    inline double* toDouble();
+    inline double* toDouble() const;
 
     //=========================================================================================================
     /**
@@ -300,7 +300,7 @@ public:
     *
     * @return converts data to a string
     */
-    inline QString toString();
+    inline QString toString() const;
 
     //=========================================================================================================
     /**
@@ -309,7 +309,7 @@ public:
     *
     * @return type cast of the tag data pointer
     */
-    inline qint16* toDauPack16();
+    inline qint16* toDauPack16() const;
 
     //=========================================================================================================
     /**
@@ -535,7 +535,7 @@ private:
 // Simple types
 //=============================================================================================================
 
-inline quint8* FiffTag::toByte()
+inline quint8* FiffTag::toByte() const
 {
     if(this->isMatrix() || this->getType() != FIFFT_BYTE)
         return NULL;
@@ -546,7 +546,7 @@ inline quint8* FiffTag::toByte()
 
 //*************************************************************************************************************
 
-inline quint16* FiffTag::toUnsignedShort()
+inline quint16* FiffTag::toUnsignedShort() const
 {
     if(this->isMatrix() || this->getType() != FIFFT_USHORT)
         return NULL;
@@ -557,7 +557,7 @@ inline quint16* FiffTag::toUnsignedShort()
 
 //*************************************************************************************************************
 
-inline qint16* FiffTag::toShort()
+inline qint16* FiffTag::toShort() const
 {
     if(this->isMatrix() || this->getType() != FIFFT_SHORT)
         return NULL;
@@ -568,7 +568,7 @@ inline qint16* FiffTag::toShort()
 
 //*************************************************************************************************************
 
-inline quint32* FiffTag::toUnsignedInt()
+inline quint32* FiffTag::toUnsignedInt() const
 {
     if(this->isMatrix() || this->getType() != FIFFT_UINT)
         return NULL;
@@ -579,7 +579,7 @@ inline quint32* FiffTag::toUnsignedInt()
 
 //*************************************************************************************************************
 
-inline qint32* FiffTag::toInt()
+inline qint32* FiffTag::toInt() const
 {
     if(this->isMatrix() || this->getType() != FIFFT_INT) {
         printf("Expected an integer tag : %d (found data type %d instead)\n",this->kind,this->getType());
@@ -592,7 +592,7 @@ inline qint32* FiffTag::toInt()
 
 //*************************************************************************************************************
 
-inline float* FiffTag::toFloat()
+inline float* FiffTag::toFloat() const
 {
     if(this->isMatrix() || this->getType() != FIFFT_FLOAT)
         return NULL;
@@ -603,7 +603,7 @@ inline float* FiffTag::toFloat()
 
 //*************************************************************************************************************
 
-inline double* FiffTag::toDouble()
+inline double* FiffTag::toDouble() const
 {
     if(this->isMatrix() || this->getType() != FIFFT_DOUBLE)
         return NULL;
@@ -614,7 +614,7 @@ inline double* FiffTag::toDouble()
 
 //*************************************************************************************************************
 
-inline QString FiffTag::toString()
+inline QString FiffTag::toString() const
 {
     if(this->isMatrix() || this->getType() != FIFFT_STRING)
         return NULL;
@@ -625,7 +625,7 @@ inline QString FiffTag::toString()
 
 //*************************************************************************************************************
 
-inline qint16* FiffTag::toDauPack16()
+inline qint16* FiffTag::toDauPack16() const
 {
     if(this->isMatrix() || this->getType() != FIFFT_DAU_PACK16)
         return NULL;
