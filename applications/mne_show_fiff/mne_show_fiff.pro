@@ -68,14 +68,14 @@ DESTDIR =  $${MNE_BINARY_DIR}
 
 SOURCES += \
     main.cpp \
-    show_fiff_settings.cpp \
     mne_fiff_exp.cpp \
-    mne_fiff_exp_set.cpp
+    mne_fiff_exp_set.cpp \
+    mne_show_fiff_settings.cpp
 
 HEADERS += \
-    show_fiff_settings.h \
     mne_fiff_exp.h \
-    mne_fiff_exp_set.h
+    mne_fiff_exp_set.h \
+    mne_show_fiff_settings.h
 
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}

@@ -1,15 +1,14 @@
 //=============================================================================================================
 /**
-* @file     filterwindow.cpp
-* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     mne_show_fiff_settings.cpp
+* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     August, 2014
+* @date     February, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the ShowFiffSettings class.
+* @brief    Contains the implementation of the MneShowFiffSettings class.
 *
 */
 
@@ -39,7 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "show_fiff_settings.h"
+#include "mne_show_fiff_settings.h"
 
 
 //*************************************************************************************************************
@@ -59,13 +58,15 @@ using namespace SHOWFIFF;
 #define PROGRAM_VERSION     "1.9"
 #endif
 
+#define DEFAULT_INDENT 3
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ShowFiffSettings::ShowFiffSettings()
+MneShowFiffSettings::MneShowFiffSettings()
 : indent(-1)
 , verbose(false)
 , long_strings(false)
@@ -77,7 +78,7 @@ ShowFiffSettings::ShowFiffSettings()
 
 //*************************************************************************************************************
 
-ShowFiffSettings::ShowFiffSettings(int *argc,char **argv)
+MneShowFiffSettings::MneShowFiffSettings(int *argc,char **argv)
 : indent(-1)
 , verbose(false)
 , long_strings(false)
@@ -88,12 +89,13 @@ ShowFiffSettings::ShowFiffSettings(int *argc,char **argv)
 
     fprintf(stderr,"%s version %s compiled at %s %s\n",argv[0],PROGRAM_VERSION,__DATE__,__TIME__);
 
+    checkIntegrity();
 }
 
 
 //*************************************************************************************************************
 
-ShowFiffSettings::~ShowFiffSettings()
+MneShowFiffSettings::~MneShowFiffSettings()
 {
     //ToDo Garbage collection
 }
@@ -101,7 +103,16 @@ ShowFiffSettings::~ShowFiffSettings()
 
 //*************************************************************************************************************
 
-void ShowFiffSettings::usage(char *name)
+void MneShowFiffSettings::checkIntegrity()
+{
+    if (this->indent < 0)
+        this->indent = this->verbose ? 0 : DEFAULT_INDENT;
+}
+
+
+//*************************************************************************************************************
+
+void MneShowFiffSettings::usage(char *name)
 {
     fprintf(stderr,"usage: %s [options]\n",name);
     fprintf(stderr,"List contents of a fif file to stdout\n");
@@ -119,7 +130,7 @@ void ShowFiffSettings::usage(char *name)
 
 //*************************************************************************************************************
 
-bool ShowFiffSettings::check_unrecognized_args(int argc, char **argv)
+bool MneShowFiffSettings::check_unrecognized_args(int argc, char **argv)
 {
     int k;
 
@@ -137,7 +148,7 @@ bool ShowFiffSettings::check_unrecognized_args(int argc, char **argv)
 
 //*************************************************************************************************************
 
-bool ShowFiffSettings::check_args (int *argc,char **argv)
+bool MneShowFiffSettings::check_args (int *argc,char **argv)
 {
     int k;
     int p;

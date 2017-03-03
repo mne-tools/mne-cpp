@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     show_fiff_settings.h
+* @file     mne_show_fiff_settings.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    ShowFiffSettings class declaration.
+* @brief    MneShowFiffSettings class declaration.
 *
 */
 
@@ -80,17 +80,17 @@ namespace SHOWFIFF
 *
 * @brief Show Fiff setting implementation
 */
-class ShowFiffSettings
+class MneShowFiffSettings
 {
 public:
-    typedef QSharedPointer<ShowFiffSettings> SPtr;             /**< Shared pointer type for ShowFiffSettings. */
-    typedef QSharedPointer<const ShowFiffSettings> ConstSPtr;  /**< Const shared pointer type for ShowFiffSettings. */
+    typedef QSharedPointer<MneShowFiffSettings> SPtr;             /**< Shared pointer type for MneShowFiffSettings. */
+    typedef QSharedPointer<const MneShowFiffSettings> ConstSPtr;  /**< Const shared pointer type for MneShowFiffSettings. */
 
     //=========================================================================================================
     /**
     * Default Constructor
     */
-    explicit ShowFiffSettings();
+    explicit MneShowFiffSettings();
 
     //=========================================================================================================
     /**
@@ -99,14 +99,19 @@ public:
     * @param [in] argc (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
     * @param [in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
     */
-    explicit ShowFiffSettings(int *argc,char **argv);
+    explicit MneShowFiffSettings(int *argc,char **argv);
 
     //=========================================================================================================
     /**
-    * Destructs the Compute Forward Settings
+    * Destructs the Show Fiff Settings
     */
-    virtual ~ShowFiffSettings();
+    virtual ~MneShowFiffSettings();
 
+    //=========================================================================================================
+    /**
+    * Check whether Show Fiff Settings are correctly set.
+    */
+    void checkIntegrity();
 
 public:
     QString     inname;         /**< The input file. */
@@ -118,7 +123,6 @@ public:
 
 private:
     void usage(char *name);
-
     bool check_unrecognized_args(int argc, char **argv);
     bool check_args (int *argc,char **argv);
 
@@ -130,6 +134,6 @@ private:
 //=============================================================================================================
 
 
-} //NAMESPACE
+} //NAMESPACE SHOWFIFF
 
 #endif // SHOWFIFFSETTINGS_H

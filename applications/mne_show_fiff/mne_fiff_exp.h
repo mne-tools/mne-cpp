@@ -72,7 +72,7 @@ namespace SHOWFIFF
 /**
 * Implements one Mne Fiff Explanation (Replaces *mneFiffExp,mneFiffExpRec struct of MNE-C mne_show_fiff.h).
 *
-* @brief EMne Fiff Explanation description
+* @brief Mne Fiff Explanation description
 */
 class MneFiffExp
 {
@@ -129,6 +129,6 @@ public:
 //=============================================================================================================
 
 
-} // NAMESPACE INVERSELIB
+} // NAMESPACE SHOWFIFF
 
-#endif // ECD_H
+#endif // MNEFIFFEXP_H
