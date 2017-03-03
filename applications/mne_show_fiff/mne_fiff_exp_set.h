@@ -76,8 +76,10 @@ namespace SHOWFIFF
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FIFFLIB FORWARD DECLARATIONS
+// FORWARD DECLARATIONS
 //=============================================================================================================
+
+class MneShowFiffSettings;
 
 
 //=============================================================================================================
@@ -178,10 +180,45 @@ public:
     * @param[in] exclass    explanation class to find
     * @param[in] kind       kind to find
     */
-    QList<MneFiffExp>::const_iterator mne_find_fiff_explanation(int exclass, int kind) const;
+    QList<MneFiffExp>::const_iterator find_fiff_explanation(int exclass, int kind) const;
+
+    //=========================================================================================================
+    /**
+    * Returns a const STL-style iterator pointing to the imaginary item after the last item in the list.
+    *
+    * @return const STL-style iterator pointing to the item after the last item
+    */
+    QList<MneFiffExp>::const_iterator constEnd() const;
+
+    //=========================================================================================================
+    /**
+    * Show contents of a fif file
+    *
+    * @param[in] out            Output file
+    * @param[in] settings       Show Fiff Settings object
+    *
+    * @return true if succeeded
+    */
+    bool show_fiff_contents (FILE *out, const MneShowFiffSettings& settings);
+
+    //=========================================================================================================
+    /**
+    * Show contents of a fif file
+    * Refactored: show_fiff_contents (mne_show_fiff.c)
+    *
+    * @param[in] out            Output file
+    * @param[in] name           Input file
+    * @param[in] verbose        Verbose output?
+    * @param[in] tags           Output these specific tags?
+    * @param[in] indent_step    Indentation step
+    * @param[in] long_strings   Print long strings in full?
+    * @param[in] blocks_only    Print blocks only?
+    *
+    * @return true if succeeded
+    */
+    bool show_fiff_contents (FILE *out, const QString& name, bool verbose, const QList<int>& tags, int indent_step, bool long_strings, bool blocks_only);
 
 private:
-
     //=========================================================================================================
     /**
     * Sort the fiff explanation set
