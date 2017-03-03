@@ -36,7 +36,6 @@
 #ifndef MNEFIFFEXPSET_H
 #define MNEFIFFEXPSET_H
 
-
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
@@ -171,23 +170,15 @@ public:
     */
     void list_fiff_explanations(FILE *out);
 
-
-//    mneFiffExp mne_find_fiff_explanation(mneFiffExpSet set,
-//                                         int exclass,
-//                         int kind)
-
-//    {
-//      MneFiffExp one;
-
-//      one.exclass = exclass;
-//      one.kind  = kind;
-//      one.text  = NULL;
-
-//      return bsearch(&one,set->exp,set->nexp,sizeof(mneFiffExpRec),comp_exp);
-
-//      qBinaryFind(vect.begin(), vect.end(), 6);
-
-//    }
+    //=========================================================================================================
+    /**
+    * Find fiff explanation
+    * Refactored: mne_find_fiff_explanation (explanation.c)
+    *
+    * @param[in] exclass    explanation class to find
+    * @param[in] kind       kind to find
+    */
+    QList<MneFiffExp>::const_iterator mne_find_fiff_explanation(int exclass, int kind) const;
 
 private:
 

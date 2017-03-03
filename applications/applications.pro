@@ -38,15 +38,15 @@ include(../mne-cpp.pri)
 TEMPLATE = subdirs
 
 SUBDIRS += \
-    mne_rt_server\
+    mne_rt_server \
+    mne_show_fiff
 
 !contains(MNECPP_CONFIG, minimalVersion) {
     SUBDIRS += \
         mne_browse \
         mne_forward_solution \
         mne_matching_pursuit \
-        mne_sample_set_downloader \
-        mne_show_fiff
+        mne_sample_set_downloader
 
         qtHaveModule(charts) {
         SUBDIRS += \

@@ -109,12 +109,12 @@ public:
 
 
 public:
-    QString     inname;                 /**< The input file. */
-    int         indent  = -1;           /**< Number of spaces to use in indentation (default %d in terse and 0 in verbose output). */
-    bool        verbose = false;        /**< Verbose output. */
-    QList<int>  tags;                   /**< Provide information about these tags (can have multiple of these). */
-    bool        long_strings = false;   /**< Print long strings in full? */
-    bool        blocks_only = false;    /**< Only list the blocks (the tree structure). */
+    QString     inname;         /**< The input file. */
+    int         indent;         /**< Number of spaces to use in indentation (default %d in terse and 0 in verbose output). */
+    bool        verbose;        /**< Verbose output. */
+    QList<int>  tags;           /**< Provide information about these tags (can have multiple of these). */
+    bool        long_strings;   /**< Print long strings in full? */
+    bool        blocks_only;    /**< Only list the blocks (the tree structure). */
 
 private:
     void usage(char *name);
