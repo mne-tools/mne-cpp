@@ -75,3 +75,24 @@ MneFiffExp::~MneFiffExp()
 {
 
 }
+
+
+//*************************************************************************************************************
+
+bool MneFiffExp::comp_exp(const MneFiffExp &ex1, const MneFiffExp &ex2)
+{
+    if (ex1.exclass == ex2.exclass) {
+        if (ex1.kind > ex2.kind)
+            return false;
+        else if (ex1.kind < ex2.kind)
+            return true;
+        else
+            return false;
+    }
+    else {
+        if (ex1.exclass > ex2.exclass)
+            return false;
+        else
+            return true;
+    }
+}
