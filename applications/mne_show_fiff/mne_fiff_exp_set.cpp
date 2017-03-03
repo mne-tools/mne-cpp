@@ -149,9 +149,6 @@ MneFiffExpSet MneFiffExpSet::read_fiff_explanations(const QString &name)
 
     MneFiffExpSet res;
 
-    int         nexp = 0;
-    int         chunk = 100;
-    int         nleft = 0;
     int         exclass,kind;
     QString     text;
 
@@ -200,11 +197,9 @@ MneFiffExpSet MneFiffExpSet::read_fiff_explanations(const QString &name)
         return res;
     }
 
-
-//    mne_sort_fiff_explanations(res);
+    res.sort_fiff_explanations();
 
     return res;
-
 }
 
 
@@ -214,4 +209,17 @@ void MneFiffExpSet::list_fiff_explanations(FILE *out)
 {
     for (int k = 0; k < this->size(); k++)
         fprintf(out,"%d %d \"%s\"\n",this->m_qListExp[k].exclass,this->m_qListExp[k].kind,this->m_qListExp[k].text.toUtf8().constData());
+}
+
+
+//*************************************************************************************************************
+
+void MneFiffExpSet::sort_fiff_explanations()
+{
+    if (this->size() == 0)
+        return;
+
+    qSort(this->m_qListExp.begin(), this->m_qListExp.end(), MneFiffExp::comp_exp);
+
+    return;
 }

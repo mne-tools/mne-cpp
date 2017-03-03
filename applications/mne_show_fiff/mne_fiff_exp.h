@@ -100,6 +100,12 @@ public:
     */
     ~MneFiffExp();
 
+    //=========================================================================================================
+    /**
+    * Compares if Explanation ex1 is smaller than ex2
+    */
+    static bool comp_exp(const MneFiffExp& ex1, const MneFiffExp& ex2);
+
 public:
     int  exclass;   /**< Class of this explanation */
     int  kind;      /**< Kind of object */

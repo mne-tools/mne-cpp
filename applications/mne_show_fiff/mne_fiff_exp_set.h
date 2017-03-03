@@ -172,11 +172,31 @@ public:
     void list_fiff_explanations(FILE *out);
 
 
-//    mne_sort_fiff_explanations(res);
+//    mneFiffExp mne_find_fiff_explanation(mneFiffExpSet set,
+//                                         int exclass,
+//                         int kind)
 
+//    {
+//      MneFiffExp one;
 
-public:
+//      one.exclass = exclass;
+//      one.kind  = kind;
+//      one.text  = NULL;
 
+//      return bsearch(&one,set->exp,set->nexp,sizeof(mneFiffExpRec),comp_exp);
+
+//      qBinaryFind(vect.begin(), vect.end(), 6);
+
+//    }
+
+private:
+
+    //=========================================================================================================
+    /**
+    * Sort the fiff explanation set
+    * Refactored: mne_sort_fiff_explanations (explanation.c)
+    */
+    void sort_fiff_explanations();
 
 private:
     QList<MneFiffExp> m_qListExp;     /**< List of Explanations. */
