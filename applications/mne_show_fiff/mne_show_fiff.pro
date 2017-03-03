@@ -1,14 +1,14 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     applications.pro
+# @file     mne_show_fiff.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
-# @date     May, 2013
+# @date     November, 2016
 #
 # @section  LICENSE
 #
-# Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+# Copyright (C) 2016, Christoph Dinh and Matti Hamalainen. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -29,34 +29,56 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file builds all applications.
+# @brief    Implements mne_show_fiff application of MNE-C
 #
 #--------------------------------------------------------------------------------------------------------------
 
-include(../mne-cpp.pri)
+include(../../mne-cpp.pri)
 
-TEMPLATE = subdirs
+TEMPLATE = app
 
-SUBDIRS += \
-    mne_rt_server\
+VERSION = $${MNE_CPP_VERSION}
 
-!contains(MNECPP_CONFIG, minimalVersion) {
-    SUBDIRS += \
-        mne_browse \
-        mne_forward_solution \
-        mne_matching_pursuit \
-        mne_sample_set_downloader \
-        mne_show_fiff
+CONFIG   += console
+CONFIG   -= app_bundle
 
-        qtHaveModule(charts) {
-        SUBDIRS += \
-            mne_analyze \
-            mne_dipole_fit \
-            mne_launch \
-            mne_scan
-        } else {
-            message("applications.pro - The Qt Charts module is missing. Please install to build the complete set of MNE-CPP features.")
-        }
+TARGET = mne_show_fiff
+
+CONFIG(debug, debug|release) {
+    TARGET = $$join(TARGET,,,d)
 }
 
-CONFIG += ordered
+LIBS += -L$${MNE_LIBRARY_DIR}
+CONFIG(debug, debug|release) {
+    LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
+            -lMNE$${MNE_LIB_VERSION}Utilsd \
+            -lMNE$${MNE_LIB_VERSION}Fsd \
+            -lMNE$${MNE_LIB_VERSION}Fiffd \
+            -lMNE$${MNE_LIB_VERSION}Mned
+}
+else {
+    LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
+            -lMNE$${MNE_LIB_VERSION}Utils \
+            -lMNE$${MNE_LIB_VERSION}Fs \
+            -lMNE$${MNE_LIB_VERSION}Fiff \
+            -lMNE$${MNE_LIB_VERSION}Mne
+}
+
+DESTDIR =  $${MNE_BINARY_DIR}
+
+SOURCES += \
+    main.cpp \
+    show_fiff_settings.cpp \
+    mne_fiff_exp.cpp \
+    mne_fiff_exp_set.cpp
+
+HEADERS += \
+    show_fiff_settings.h \
+    mne_fiff_exp.h \
+    mne_fiff_exp_set.h
+
+
+INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
+INCLUDEPATH += $${MNE_INCLUDE_DIR}
+
+unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR

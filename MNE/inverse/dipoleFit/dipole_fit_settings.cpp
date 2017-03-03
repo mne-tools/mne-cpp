@@ -57,7 +57,7 @@ DipoleFitSettings::DipoleFitSettings(int *argc,char **argv)
         return;
 
 //    mne_print_version_info(stderr,argv[0],PROGRAM_VERSION,__DATE__,__TIME__);
-    printf("%s version %s compiled at %s %s\n",argv[0],PROGRAM_VERSION,__DATE__,__TIME__);
+    fprintf(stderr,"%s version %s compiled at %s %s\n",argv[0],PROGRAM_VERSION,__DATE__,__TIME__);
 
     checkIntegrity();
 }
