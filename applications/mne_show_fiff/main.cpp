@@ -42,6 +42,9 @@
 #include "show_fiff_settings.h"
 #include "mne_fiff_exp_set.h"
 
+#include <fiff/fiff_tag.h>
+#include <fiff/fiff_stream.h>
+
 #include <iostream>
 
 
@@ -59,6 +62,7 @@
 //=============================================================================================================
 
 using namespace SHOWFIFF;
+using namespace FIFFLIB;
 
 
 //*************************************************************************************************************
@@ -68,7 +72,11 @@ using namespace SHOWFIFF;
 
 #define DEFAULT_INDENT 3
 
-
+#define CLASS_TAG     1
+#define CLASS_BLOCK   2
+#define CLASS_UNIT    3
+#define CLASS_UNITM   4
+#define CLASS_CH_KIND 5
 
 
 
@@ -95,49 +103,53 @@ bool show_fiff_contents (FILE *out,                  /* Output file */
 {
     int ntag = tags.size();
 
-//    fiffFile      in = fiff_open(name);
-//    fiffDirEntry  this;
-//    fiffTagRec    tag;
-//    int           day,month,year;
-//    int           block;
-//    int           count = 0;
-//    int           prev_kind;
-//    int           indent = 0;
-//    int           k;
-//    int           show_it;
-//    char          *c,*s;
-//    int           output_taginfo = FALSE;
-//    char          buf[MAXBUF];
-//    mneFiffExp    exp;
+    QFile file(name);
+    FiffStream::SPtr stream(new FiffStream(&file));
 
-//    tag.data = NULL;
-//    if (!in)
-//        return false;
-//    prev_kind = -1;
+    FiffDirEntry::SPtr this_ent;
+    FiffTag::SPtr   tag;
+    int             day,month,year;
+    int             block;
+    int             count = 0;
+    int             prev_kind;
+    int             indent = 0;
+    int             show_it;
+    QString         c,s;
+    bool            output_taginfo = false;
+//    char            buf[MAXBUF];
+    MneFiffExp      exp;
 
-//    if (blocks_only) {
-//        for (this = in->dir; this->kind != -1; this++)  {
-//            if (this->kind == FIFF_BLOCK_START || this->kind == FIFF_BLOCK_END) {
-//                if (this->kind == FIFF_BLOCK_END)
-//                    indent = indent - indent_step;
-//                if (this->kind == FIFF_BLOCK_START) {
-//                    for (k = 0; k < indent; k++)
-//                        fprintf(out," ");
-//                    if (fiff_read_this_tag (in->fd,this->pos,&tag) != FIFF_FAIL) {
-//                        block = *(int *)tag.data;
-//                        exp = mne_find_fiff_explanation(set,CLASS_BLOCK,block);
-//                        if (exp)
-//                            fprintf(out,"%-d = %-s\n",exp->kind,exp->text);
-//                        else
-//                            fprintf(out,"%-d = %-s\n",block,"Not explained");
-//                    }
-//                }
-//                if (this->kind == FIFF_BLOCK_START)
-//                    indent = indent + indent_step;
-//            }
-//        }
-//    }
-//    else {
+    if (!stream->open())
+        return false;
+    prev_kind = -1;
+
+    blocks_only = true;
+
+    if (blocks_only) {
+//        for (auto this_ent : stream->dir()) {//C++11
+        for (int i = 0; i < stream->dir().size(); ++i) {
+            this_ent = stream->dir()[i];
+            if (this_ent->kind == FIFF_BLOCK_START || this_ent->kind == FIFF_BLOCK_END) {
+                if (this_ent->kind == FIFF_BLOCK_END)
+                    indent = indent - indent_step;
+                if (this_ent->kind == FIFF_BLOCK_START) {
+                    for (int k = 0; k < indent; k++)
+                        fprintf(out," ");
+                    if ( stream->read_tag(tag, this_ent->pos) ) {
+                        block = *tag->toInt();//*(int *)tag.data;
+                        exp = *set.mne_find_fiff_explanation(CLASS_BLOCK,block);
+                        if (!exp.text.isEmpty())
+                            fprintf(out,"%-d = %-s\n",exp.kind,exp.text.toUtf8().constData());
+                        else
+                            fprintf(out,"%-d = %-s\n",block,"Not explained");
+                    }
+                }
+                if (this_ent->kind == FIFF_BLOCK_START)
+                    indent = indent + indent_step;
+            }
+        }
+    }
+    else {
 //        for (this = in->dir; this->kind != -1; this++)  {
 //            if (ntag == 0)
 //                show_it = TRUE;
@@ -349,21 +361,18 @@ bool show_fiff_contents (FILE *out,                  /* Output file */
 //            }
 //            prev_kind = this->kind;
 //        }
-//        if (!verbose) {
-//            if (count > 1)
-//                fprintf(out," [%d]\n",count);
-//            else
-//                fprintf(out,"\n");
-//        }
-//    }
-//    FREE(tag.data);
-//    fiff_close (in);
+        if (!verbose) {
+            if (count > 1)
+                fprintf(out," [%d]\n",count);
+            else
+                fprintf(out,"\n");
+        }
+    }
+
+    stream->close();
+
     return true;
 }
-
-
-
-
 
 
 //*************************************************************************************************************

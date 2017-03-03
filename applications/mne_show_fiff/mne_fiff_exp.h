@@ -102,7 +102,10 @@ public:
 
     //=========================================================================================================
     /**
-    * Compares if Explanation ex1 is smaller than ex2
+    * Compares if Explanation ex1 is lesser than ex2
+    *
+    * @param[in] ex1    MneFiffExp which should be checked wheter it is lesser than ex2.
+    * @param[in] ex2    MneFiffExp which should be checked wheter it is larger than ex1.
     */
     static bool comp_exp(const MneFiffExp& ex1, const MneFiffExp& ex2);
 

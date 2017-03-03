@@ -66,6 +66,10 @@ using namespace SHOWFIFF;
 //=============================================================================================================
 
 ShowFiffSettings::ShowFiffSettings()
+: indent(-1)
+, verbose(false)
+, long_strings(false)
+, blocks_only(false)
 {
 
 }
@@ -74,6 +78,10 @@ ShowFiffSettings::ShowFiffSettings()
 //*************************************************************************************************************
 
 ShowFiffSettings::ShowFiffSettings(int *argc,char **argv)
+: indent(-1)
+, verbose(false)
+, long_strings(false)
+, blocks_only(false)
 {
     if (!check_args(argc,argv))
         return;
@@ -106,7 +114,6 @@ void ShowFiffSettings::usage(char *name)
     fprintf(stderr,"\t--long            Print long strings in full?\n");
     fprintf(stderr,"\t--help            print this info.\n");
     fprintf(stderr,"\t--version         print version info.\n\n");
-    exit(1);
 }
 
 
@@ -117,12 +124,12 @@ bool ShowFiffSettings::check_unrecognized_args(int argc, char **argv)
     int k;
 
     if (argc > 1) {
-      fprintf(stderr,"Unrecognized arguments : ");
-      for (k = 1; k < argc; k++)
-        fprintf(stderr,"%s ",argv[k]);
-      fprintf(stderr,"\n");
-      qCritical("Check the command line.");
-      return false;
+        fprintf(stderr,"Unrecognized arguments : ");
+        for (k = 1; k < argc; k++)
+            fprintf(stderr,"%s ",argv[k]);
+        fprintf(stderr,"\n");
+        qCritical("Check the command line.");
+        return false;
     }
     return true;
 }
@@ -152,7 +159,7 @@ bool ShowFiffSettings::check_args (int *argc,char **argv)
                 qCritical("--in: argument required.");
                 return false;
             }
-            inname = strdup(argv[k+1]);
+            inname = QString(argv[k+1]);
         }
         else if (strcmp(argv[k],"--fif") == 0) {
             found = 2;
@@ -160,7 +167,7 @@ bool ShowFiffSettings::check_args (int *argc,char **argv)
                 qCritical("--fif: argument required.");
                 return false;
             }
-            inname = strdup(argv[k+1]);
+            inname = QString(argv[k+1]);
         }
         else if (strcmp(argv[k],"--tag") == 0) {
             found = 2;
