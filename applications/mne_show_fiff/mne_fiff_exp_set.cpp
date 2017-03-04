@@ -364,7 +364,8 @@ bool MneFiffExpSet::show_fiff_contents(FILE *out, const QString &name, bool verb
                                         fprintf(out,"\t%-d = %-s",block,"Not explained");
                                 }
                                 else if (this_ent->kind == FIFF_MEAS_DATE) {
-                                    QDateTime ltime = QDateTime::fromSecsSinceEpoch(tag->toInt()[0]);
+                                    QDateTime ltime;
+                                    ltime.setTime_t(tag->toInt()[0]);
                                     fprintf(out,"\t%s",ltime.toString().toUtf8().constData());
                                 }
                                 else if (tag->size() == sizeof(fiff_int_t))
