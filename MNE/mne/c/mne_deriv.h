@@ -70,7 +70,6 @@
 namespace MNELIB
 {
 
-
 //=============================================================================================================
 /**
 * Implements an MNE Derivation (Replaces *mneDeriv,mneDerivRec; struct of MNE-C mne_types.h).

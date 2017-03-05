@@ -42,7 +42,6 @@
 //=============================================================================================================
 
 #include "fwd_global.h"
-#include "mne_surface_or_volume.h"
 #include "fwd_coil_set.h"
 
 #include <fiff/c/fiff_coord_trans_old.h>
@@ -87,6 +86,10 @@
 namespace MNELIB
 {
     class MneTriangle;
+    class MneSurfaceOld;
+    class MneSourceSpaceOld;
+    class MneCTFCompDataSet;
+    class MneNamedMatrix;
 }
 
 //*************************************************************************************************************
@@ -185,7 +188,7 @@ public:
     * Return a pointer to a specific surface in a BEM
     */
     // Refactored: fwd_bem_find_surface (fwd_bem_model.c)
-    MneSurfaceOld* fwd_bem_find_surface(int kind);
+    MNELIB::MneSurfaceOld* fwd_bem_find_surface(int kind);
 
 
     static FwdBemModel* fwd_bem_load_surfaces(const QString& name,
@@ -205,6 +208,15 @@ public:
     static int fwd_bem_set_head_mri_t(FwdBemModel* m, FIFFLIB::FiffCoordTransOld* t);
 
 
+    //============================= dipole_fit_guesses.c =============================
+
+    static MNELIB::MneSurfaceOld* make_guesses(MNELIB::MneSurfaceOld* guess_surf, /* Predefined boundary for the guesses */
+                                     float guessrad,     /* Radius for the spherical boundary if the above is missing */
+                                     float *guess_r0,    /* Origin for the spherical boundary */
+                                     float grid,         /* Spacing between guess points */
+                                     float exclude,      /* Exclude points closer than this to the CM of the guess boundary surface */
+                                     float mindist);
+
 
 
     //============================= fwd_bem_linear_collocation.c =============================
@@ -223,10 +235,10 @@ public:
                                MNELIB::MneTriangle* to,	/* The destination triangle */
                                double omega[3]);
 
-    static void correct_auto_elements (MneSurfaceOld* surf,
+    static void correct_auto_elements (MNELIB::MneSurfaceOld* surf,
                                        float      **mat);
 
-    static float **fwd_bem_lin_pot_coeff (const QList<MneSurfaceOld*>& surfs);
+    static float **fwd_bem_lin_pot_coeff (const QList<MNELIB::MneSurfaceOld*>& surfs);
 
     static int fwd_bem_linear_collocation_solution(FwdBemModel* m);
 
@@ -255,7 +267,7 @@ public:
 
     static int fwd_bem_check_solids (float **angles,int ntri1,int ntri2, float desired);
 
-    static float **fwd_bem_solid_angles (const QList<MneSurfaceOld*>& surfs);
+    static float **fwd_bem_solid_angles (const QList<MNELIB::MneSurfaceOld*>& surfs);
 
     static int fwd_bem_constant_collocation_solution(FwdBemModel* m);
 
@@ -479,7 +491,7 @@ public:
     static void *meg_eeg_fwd_one_source_space(void *arg);
 
     // TODO check if this is the correct class or move
-    static int compute_forward_meg( MneSourceSpaceOld*    *spaces,     /* Source spaces */
+    static int compute_forward_meg( MNELIB::MneSourceSpaceOld*    *spaces,     /* Source spaces */
                                     int                 nspace,      /* How many? */
                                     FwdCoilSet*         coils,
                                     FwdCoilSet*         comp_coils,
@@ -491,7 +503,7 @@ public:
                                     MNELIB::MneNamedMatrix*     *resp,       /* The results */
                                     MNELIB::MneNamedMatrix*     *resp_grad);
 
-    static int compute_forward_eeg( MneSourceSpaceOld*  *spaces,     /* Source spaces */
+    static int compute_forward_eeg( MNELIB::MneSourceSpaceOld*  *spaces,     /* Source spaces */
                                     int                 nspace,      /* How many? */
                                     FwdCoilSet*         els,         /* Electrode locations */
                                     bool                fixed_ori,   /* Use fixed-orientation dipoles */
@@ -552,7 +564,7 @@ public:
 
 public:
     QString     surf_name;      /* Name of the file where surfaces were loaded from */
-    QList<MneSurfaceOld*> surfs;      /* The interface surfaces from outside towards inside */
+    QList<MNELIB::MneSurfaceOld*> surfs;      /* The interface surfaces from outside towards inside */
     int        *ntri;           /* Number of triangles on each surface */
     int        *np;             /* Number of vertices on each surface */
     int        nsurf;           /* How many */

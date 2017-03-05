@@ -11,7 +11,7 @@
 #include "ecd.h"
 
 #include <fwd/fwd_bem_model.h>
-#include <fwd/mne_surface_old.h>
+#include <mne/c/mne_surface_old.h>
 
 #include <fwd/fwd_comp_data.h>
 

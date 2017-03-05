@@ -2,17 +2,16 @@
 
 #include "compute_fwd.h"
 
-#include "../mne_source_space_old.h"
 #include <fiff/c/fiff_coord_trans_old.h>
 #include "../fwd_coil_set.h"
 #include <mne/c/mne_ctf_comp_data_set.h>
 #include "../fwd_eeg_sphere_model_set.h"
 #include "../fwd_bem_model.h"
 #include <mne/c/mne_named_matrix.h>
+#include <mne/c/mne_nearest.h>
+#include <mne/c/mne_source_space_old.h>
 
 #include <fiff/c/fiff_sparse_matrix.h>
-
-#include "../mne_nearest.h"
 
 #include <fiff/fiff_types.h>
 

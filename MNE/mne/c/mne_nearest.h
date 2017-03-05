@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     mne_surface_old.h
+* @file     mne_nearest.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,20 +29,19 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    MneSurfaceOld class declaration.
+* @brief    MneNearest class declaration.
 *
 */
 
-#ifndef MNESURFACEOLD_H
-#define MNESURFACEOLD_H
+#ifndef MNENEAREST_H
+#define MNENEAREST_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "fwd_global.h"
-#include "mne_surface_or_volume.h"
+#include "../mne_global.h"
 
 
 //*************************************************************************************************************
@@ -63,10 +62,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE FWDLIB
+// DEFINE NAMESPACE MNELIB
 //=============================================================================================================
 
-namespace FWDLIB
+namespace MNELIB
 {
 
 //*************************************************************************************************************
@@ -74,36 +73,47 @@ namespace FWDLIB
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+class MnePatchInfo;
+
 
 //=============================================================================================================
 /**
-* Implements the MNE Surface (Replaces typedef mneSurfaceOrVolume mneSurface; struct of MNE-C mne_types.h).
+* Implements the MNE Nearest description (Replaces *mneNearest,mneNearestRec; struct of MNE-C mne_types.h).
 *
-* @brief This defines a surface
+* @brief This is used in the patch definitions
 */
-class FWDSHARED_EXPORT MneSurfaceOld : public MneSurfaceOrVolume
+class MNESHARED_EXPORT MneNearest
 {
 public:
-    typedef QSharedPointer<MneSurfaceOld> SPtr;              /**< Shared pointer type for MneSurfaceOld. */
-    typedef QSharedPointer<const MneSurfaceOld> ConstSPtr;   /**< Const shared pointer type for MneSurfaceOld. */
+    typedef QSharedPointer<MneNearest> SPtr;              /**< Shared pointer type for MneNearest. */
+    typedef QSharedPointer<const MneNearest> ConstSPtr;   /**< Const shared pointer type for MneNearest. */
 
     //=========================================================================================================
     /**
-    * Constructs the MNE Surface
+    * Constructs the MNE Nearest
     */
-    MneSurfaceOld();
+    MneNearest();
 
     //=========================================================================================================
     /**
-    * Destroys the MNE Surface
+    * Destroys the MNE Nearest
     * Refactored:  (.c)
     */
-    ~MneSurfaceOld();
+    ~MneNearest();
 
 public:
+    int   vert;             /* Number of this vertex (to enable sorting) */
+    int   nearest;          /* Nearest 'inuse' vertex */
+    float dist;             /* Distance to the nearest 'inuse' vertex */
+    MnePatchInfo* patch;    /* The patch information record for the patch this vertex belongs to */
 
 // ### OLD STRUCT ###
-
+//typedef struct {                /* This is used in the patch definitions */
+//    int   vert;                 /* Number of this vertex (to enable sorting) */
+//    int   nearest;              /* Nearest 'inuse' vertex */
+//    float dist;                 /* Distance to the nearest 'inuse' vertex */
+//    MnePatchInfo* patch;        /* The patch information record for the patch this vertex belongs to */
+//} *mneNearest,mneNearestRec;
 };
 
 //*************************************************************************************************************
@@ -111,6 +121,6 @@ public:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-} // NAMESPACE FWDLIB
+} // NAMESPACE MNELIB
 
-#endif // MNESURFACEOLD_H
+#endif // MNENEAREST_H

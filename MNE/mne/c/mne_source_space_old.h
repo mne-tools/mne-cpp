@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     mne_nearest.h
+* @file     mne_source_space_old.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,19 +29,20 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    MneNearest class declaration.
+* @brief    MneSourceSpaceOld class declaration.
 *
 */
 
-#ifndef MNENEAREST_H
-#define MNENEAREST_H
+#ifndef MNESOURCESPACEOLD_H
+#define MNESOURCESPACEOLD_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "fwd_global.h"
+#include "../mne_global.h"
+#include "mne_surface_or_volume.h"
 
 
 //*************************************************************************************************************
@@ -62,10 +63,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE FWDLIB
+// DEFINE NAMESPACE MNELIB
 //=============================================================================================================
 
-namespace FWDLIB
+namespace MNELIB
 {
 
 //*************************************************************************************************************
@@ -73,47 +74,36 @@ namespace FWDLIB
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class MnePatchInfo;
-
 
 //=============================================================================================================
 /**
-* Implements the MNE Nearest description (Replaces *mneNearest,mneNearestRec; struct of MNE-C mne_types.h).
+* Implements the MNE Source Space (Replaces typedef mneSurfaceOrVolume mneSourceSpace; struct of MNE-C mne_types.h).
 *
-* @brief This is used in the patch definitions
+* @brief This defines a source space
 */
-class FWDSHARED_EXPORT MneNearest
+class MNESHARED_EXPORT MneSourceSpaceOld : public MneSurfaceOrVolume
 {
 public:
-    typedef QSharedPointer<MneNearest> SPtr;              /**< Shared pointer type for MneNearest. */
-    typedef QSharedPointer<const MneNearest> ConstSPtr;   /**< Const shared pointer type for MneNearest. */
+    typedef QSharedPointer<MneSourceSpaceOld> SPtr;              /**< Shared pointer type for MneSourceSpaceOld. */
+    typedef QSharedPointer<const MneSourceSpaceOld> ConstSPtr;   /**< Const shared pointer type for MneSourceSpaceOld. */
 
     //=========================================================================================================
     /**
-    * Constructs the MNE Nearest
+    * Constructs the MNE Source Space
     */
-    MneNearest();
+    MneSourceSpaceOld();
 
     //=========================================================================================================
     /**
-    * Destroys the MNE Nearest
+    * Destroys the MNE Source Space
     * Refactored:  (.c)
     */
-    ~MneNearest();
+    ~MneSourceSpaceOld();
 
 public:
-    int   vert;             /* Number of this vertex (to enable sorting) */
-    int   nearest;          /* Nearest 'inuse' vertex */
-    float dist;             /* Distance to the nearest 'inuse' vertex */
-    MnePatchInfo* patch;    /* The patch information record for the patch this vertex belongs to */
 
 // ### OLD STRUCT ###
-//typedef struct {                /* This is used in the patch definitions */
-//    int   vert;                 /* Number of this vertex (to enable sorting) */
-//    int   nearest;              /* Nearest 'inuse' vertex */
-//    float dist;                 /* Distance to the nearest 'inuse' vertex */
-//    MnePatchInfo* patch;        /* The patch information record for the patch this vertex belongs to */
-//} *mneNearest,mneNearestRec;
+
 };
 
 //*************************************************************************************************************
@@ -121,6 +111,6 @@ public:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-} // NAMESPACE FWDLIB
+} // NAMESPACE MNELIB
 
-#endif // MNENEAREST_H
+#endif // MNESOURCESPACEOLD_H

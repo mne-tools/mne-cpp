@@ -113,7 +113,13 @@ SOURCES += \
     c/mne_raw_info.cpp \
     c/mne_sss_data.cpp \
     c/mne_triangle.cpp \
-    c/mne_vol_geom.cpp
+    c/mne_vol_geom.cpp \
+    c/mne_nearest.cpp \
+    c/mne_patch_info.cpp \
+    c/mne_source_space_old.cpp \
+    c/mne_surface_old.cpp \
+    c/mne_surface_or_volume.cpp \
+    c/filter_thread_arg.cpp
 
 HEADERS += \
     mne.h \
@@ -147,7 +153,13 @@ HEADERS += \
     c/mne_triangle.h \
     c/mne_types.h \
     c/mne_types_mne-c.h \
-    c/mne_vol_geom.h
+    c/mne_vol_geom.h \
+    c/mne_nearest.h \
+    c/mne_patch_info.h \
+    c/mne_source_space_old.h \
+    c/mne_surface_old.h \
+    c/mne_surface_or_volume.h \
+    c/filter_thread_arg.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

@@ -107,13 +107,7 @@ SOURCES += \
     fwd_eeg_sphere_layer.cpp \
     fwd_eeg_sphere_model.cpp \
     fwd_eeg_sphere_model_set.cpp \
-    fwd_thread_arg.cpp \
-    filter_thread_arg.cpp \
-    mne_nearest.cpp \
-    mne_patch_info.cpp \
-    mne_source_space_old.cpp \
-    mne_surface_old.cpp \
-    mne_surface_or_volume.cpp
+    fwd_thread_arg.cpp
 
 HEADERS +=\
     fwd_global.h \
@@ -128,13 +122,7 @@ HEADERS +=\
     fwd_eeg_sphere_model.h \
     fwd_eeg_sphere_model_set.h \
     fwd_thread_arg.h \
-    fwd_types.h \
-    filter_thread_arg.h \
-    mne_nearest.h \
-    mne_patch_info.h \
-    mne_source_space_old.h \
-    mne_surface_old.h \
-    mne_surface_or_volume.h
+    fwd_types.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

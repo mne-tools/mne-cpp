@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     filter_thread_arg.h
+* @file     mne_surface_old.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,24 +29,20 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Filter Thread Argument (FilterThreadArg) class declaration.
+* @brief    MneSurfaceOld class declaration.
 *
 */
 
-#ifndef FILTERTHREADARG_H
-#define FILTERTHREADARG_H
+#ifndef MNESURFACEOLD_H
+#define MNESURFACEOLD_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "fwd_global.h"
-
-#include <fiff/c/fiff_coord_trans_old.h>
-
-#include "mne_source_space_old.h"
-#include "mne_surface_old.h"
+#include "../mne_global.h"
+#include "mne_surface_or_volume.h"
 
 
 //*************************************************************************************************************
@@ -67,56 +63,47 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE FWDLIB
+// DEFINE NAMESPACE MNELIB
 //=============================================================================================================
 
-namespace FWDLIB
+namespace MNELIB
 {
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
 
 
 //=============================================================================================================
 /**
-* Implements a Filter Thread Argument (Replaces *filterThreadArg,filterThreadArgRec; struct of MNE-C filter_source_space.c).
+* Implements the MNE Surface (Replaces typedef mneSurfaceOrVolume mneSurface; struct of MNE-C mne_types.h).
 *
-* @brief Filter Thread Argument Description
+* @brief This defines a surface
 */
-class FWDSHARED_EXPORT FilterThreadArg
+class MNESHARED_EXPORT MneSurfaceOld : public MneSurfaceOrVolume
 {
 public:
-    typedef QSharedPointer<FilterThreadArg> SPtr;              /**< Shared pointer type for FilterThreadArg. */
-    typedef QSharedPointer<const FilterThreadArg> ConstSPtr;   /**< Const shared pointer type for FilterThreadArg. */
+    typedef QSharedPointer<MneSurfaceOld> SPtr;              /**< Shared pointer type for MneSurfaceOld. */
+    typedef QSharedPointer<const MneSurfaceOld> ConstSPtr;   /**< Const shared pointer type for MneSurfaceOld. */
 
     //=========================================================================================================
     /**
-    * Constructs the Filter Thread Argument
-    * Refactored: new_filter_thread_arg (filter_source_space.c)
+    * Constructs the MNE Surface
     */
-    FilterThreadArg();
+    MneSurfaceOld();
 
     //=========================================================================================================
     /**
-    * Destroys the Filter Thread Argument
-    * Refactored: free_filter_thread_arg (filter_source_space.c)
+    * Destroys the MNE Surface
+    * Refactored:  (.c)
     */
-    ~FilterThreadArg();
+    ~MneSurfaceOld();
 
 public:
-    MneSourceSpaceOld* s;           /* The source space to process */
-    FIFFLIB::FiffCoordTransOld* mri_head_t;  /* Coordinate transformation */
-    MneSurfaceOld*   surf;          /* The inner skull surface */
-    float          limit;           /* Distance limit */
-    FILE           *filtered;       /* Log omitted point locations here */
-    int            stat;            /* How was it? */
 
 // ### OLD STRUCT ###
-//typedef struct {
-//    MneSourceSpaceOld* s;           /* The source space to process */
-//    FiffCoordTransOld* mri_head_t;  /* Coordinate transformation */
-//    MneSurfaceOld*   surf;          /* The inner skull surface */
-//    float          limit;           /* Distance limit */
-//    FILE           *filtered;       /* Log omitted point locations here */
-//    int            stat;            /* How was it? */
-//} *filterThreadArg,filterThreadArgRec;
+
 };
 
 //*************************************************************************************************************
@@ -124,6 +111,6 @@ public:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-} // NAMESPACE FWDLIB
+} // NAMESPACE MNELIB
 
-#endif // FILTERTHREADARG_H
+#endif // MNESURFACEOLD_H

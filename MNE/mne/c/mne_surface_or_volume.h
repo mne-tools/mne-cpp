@@ -41,7 +41,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "fwd_global.h"
+#include "../mne_global.h"
 #include <mne/c/mne_types.h>
 
 
@@ -73,28 +73,18 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Forward Declarations
+// DEFINE NAMESPACE MNELIB
 //=============================================================================================================
 
 namespace MNELIB
 {
-class MneTriangle;
-}
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE FWDLIB
-//=============================================================================================================
-
-namespace FWDLIB
-{
 
 //*************************************************************************************************************
 //=============================================================================================================
 // Forward Declarations
 //=============================================================================================================
 
+class MneTriangle;
 class MneNearest;
 class MneVolGeom;
 class MnePatchInfo;
@@ -108,7 +98,7 @@ class MneSurfaceOld;
 *
 * @brief This defines a source space or a surface
 */
-class FWDSHARED_EXPORT MneSurfaceOrVolume
+class MNESHARED_EXPORT MneSurfaceOrVolume
 {
 public:
     typedef QSharedPointer<MneSurfaceOrVolume> SPtr;              /**< Shared pointer type for MneSurfaceOrVolume. */
@@ -193,19 +183,6 @@ public:
 
     //============================= mne_source_space.c =============================
     static MneSourceSpaceOld* mne_new_source_space(int np);
-
-
-
-
-    //============================= dipole_fit_guesses.c =============================
-
-    static MneSurfaceOld* make_guesses(MneSurfaceOld* guess_surf, /* Predefined boundary for the guesses */
-                                     float guessrad,     /* Radius for the spherical boundary if the above is missing */
-                                     float *guess_r0,    /* Origin for the spherical boundary */
-                                     float grid,         /* Spacing between guess points */
-                                     float exclude,      /* Exclude points closer than this to the CM of the guess boundary surface */
-                                     float mindist);
-
 
 
 
@@ -398,12 +375,12 @@ public:
     * These are for surfaces only
     */
     int              ntri;      /* Number of triangles */
-    MNELIB::MneTriangle*      tris;      /* The triangulation information */
+    MneTriangle*     tris;      /* The triangulation information */
     int              **itris;   /* The vertex numbers */
     float            tot_area;  /* Total area of the surface, computed from the triangles */
 
     int              nuse_tri;      /* The triangulation corresponding to the vertices in use */
-    MNELIB::MneTriangle*      use_tris;      /* The triangulation information for the vertices in use */
+    MneTriangle*     use_tris;      /* The triangulation information for the vertices in use */
     int              **use_itris;   /* The vertex numbers for the 'use' triangulation */
 
     int              **neighbor_tri;    /* Neighboring triangles for each vertex Note: number of entries varies for vertex to vertex */
@@ -488,13 +465,13 @@ public:
 //    /*
 //    * These are for volumes only
 //    */
-//    FWDLIB::FiffCoordTransOld*   voxel_surf_RAS_t; /* Transform from voxel coordinate to the surface RAS (MRI) coordinates */
+//    MNELIB::FiffCoordTransOld*   voxel_surf_RAS_t; /* Transform from voxel coordinate to the surface RAS (MRI) coordinates */
 //    int              vol_dims[3];   /* Dimensions of the volume grid (width x height x depth) NOTE: This will be present only if the source space is a complete rectangular grid with unused vertices included */
 //    float            voxel_size[3]; /* Derived from the above */
 //    mneSparseMatrix  interpolator;  /* Matrix to interpolate into an MRI volume */
 //    char             *MRI_volume;   /* The name of the file the above interpolator is based on */
-//    FWDLIB::FiffCoordTransOld*   MRI_voxel_surf_RAS_t;
-//    FWDLIB::FiffCoordTransOld*   MRI_surf_RAS_RAS_t;   /* Transform from surface RAS to RAS coordinates in the associated MRI volume */
+//    MNELIB::FiffCoordTransOld*   MRI_voxel_surf_RAS_t;
+//    MNELIB::FiffCoordTransOld*   MRI_surf_RAS_RAS_t;   /* Transform from surface RAS to RAS coordinates in the associated MRI volume */
 //    int              MRI_vol_dims[3];               /* Dimensions of the MRI volume (width x height x depth) */
 //    /*
 //    * Possibility to add user-defined data
@@ -509,6 +486,6 @@ public:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-} // NAMESPACE FWDLIB
+} // NAMESPACE MNELIB
 
 #endif // MNESURFACEORVOLUME_H

@@ -60,7 +60,7 @@
 #include <fiff/c/fiff_coord_trans_old.h>
 #include <fwd/fwd_coil_set.h>
 #include "../c/mne_meas_data.h"
-#include <fwd/mne_surface_or_volume.h>
+#include <mne/c/mne_surface_or_volume.h>
 #include <mne/c/mne_cov_matrix.h>
 
 
@@ -133,7 +133,7 @@ typedef struct {
 
 typedef struct {		                     /* This is used for field mapping with help of the sphere-model MNE */
   int          kind;				     /* Either FIELD_MAP_MEG or FIELD_MAP_EEG */
-  FWDLIB::MneSurfaceOld*   surf;		                     /* The surface on which we are mapping */
+  MNELIB::MneSurfaceOld*   surf;		                     /* The surface on which we are mapping */
   char         *surfname;	                     /* The name of the file where the above surface came from */
   int          *surface_sel;			     /* We may calculate the interpolation only in a subset of vertices */
   int          nsurface_sel;			     /* How many points in the above */
