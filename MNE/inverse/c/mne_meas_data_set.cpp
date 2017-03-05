@@ -40,7 +40,7 @@
 //=============================================================================================================
 
 #include "mne_meas_data_set.h"
-#include "mne_mne_data.h"
+#include <mne/c/mne_mne_data.h>
 
 #include <fiff/fiff_file.h>
 
@@ -51,7 +51,7 @@
 //=============================================================================================================
 
 using namespace Eigen;
-using namespace MNELIB;
+using namespace INVERSELIB;
 using namespace FIFFLIB;
 
 

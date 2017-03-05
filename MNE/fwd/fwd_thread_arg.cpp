@@ -39,7 +39,7 @@
 //=============================================================================================================
 
 #include "fwd_thread_arg.h"
-#include <inverse/dipoleFit/mne_source_space_old.h>
+#include "mne_source_space_old.h"
 #include "fwd_coil_set.h"
 #include "fwd_bem_model.h"
 #include "fwd_comp_data.h"
@@ -85,7 +85,7 @@ void mne_free_cmatrix_80 (float **m)
 
 using namespace Eigen;
 using namespace FWDLIB;
-using namespace INVERSELIB;
+using namespace MNELIB;
 
 
 //*************************************************************************************************************

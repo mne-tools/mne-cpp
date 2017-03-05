@@ -25,7 +25,7 @@
 using namespace Eigen;
 using namespace FWDLIB;
 using namespace FIFFLIB;
-using namespace INVERSELIB;
+using namespace MNELIB;
 
 #ifndef TRUE
 #define TRUE 1

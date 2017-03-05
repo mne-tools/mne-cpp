@@ -57,7 +57,6 @@
 
 using namespace Eigen;
 using namespace FIFFLIB;
-using namespace INVERSELIB;
 using namespace FWDLIB;
 
 

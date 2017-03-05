@@ -54,14 +54,16 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Utilsd \
             -lMNE$${MNE_LIB_VERSION}Fsd \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
-            -lMNE$${MNE_LIB_VERSION}Mned
+            -lMNE$${MNE_LIB_VERSION}Mned \
+            -lMNE$${MNE_LIB_VERSION}Fwdd
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
             -lMNE$${MNE_LIB_VERSION}Utils \
             -lMNE$${MNE_LIB_VERSION}Fs \
             -lMNE$${MNE_LIB_VERSION}Fiff \
-            -lMNE$${MNE_LIB_VERSION}Mne
+            -lMNE$${MNE_LIB_VERSION}Mne \
+            -lMNE$${MNE_LIB_VERSION}Fwd
 }
 
 # OpenMP
@@ -97,86 +99,41 @@ else {
 }
 
 SOURCES += \
-    dipoleFit/ecd.cpp \
-    dipoleFit/ecd_set.cpp \
-    dipoleFit/guess_data.cpp \
-    dipoleFit/dipole_forward.cpp \
-    dipoleFit/dipole_fit_data.cpp \
     minimumNorm/minimumnorm.cpp \
     rapMusic/rapmusic.cpp \
     rapMusic/pwlrapmusic.cpp \
     rapMusic/dipole.cpp \
-    dipoleFit/dipole_fit_settings.cpp \
     dipoleFit/dipole_fit.cpp \
-    dipoleFit/mne_sss_data.cpp \
-    dipoleFit/mne_mne_data.cpp \
-    dipoleFit/mne_meas_data_set.cpp \
-    dipoleFit/mne_meas_data.cpp \
-    dipoleFit/mne_named_matrix.cpp \
-    dipoleFit/mne_deriv.cpp \
-    dipoleFit/mne_deriv_set.cpp \
-    dipoleFit/mne_surface_or_volume.cpp \
-    dipoleFit/fiff_sparse_matrix.cpp \
-    dipoleFit/fiff_coord_trans_old.cpp \
-    dipoleFit/mne_proj_item.cpp \
-    dipoleFit/mne_proj_op.cpp \
-    dipoleFit/mne_cov_matrix.cpp \
-    dipoleFit/mne_ctf_comp_data.cpp \
-    dipoleFit/mne_ctf_comp_data_set.cpp \
-    dipoleFit/mne_raw_info.cpp \
-    dipoleFit/mne_raw_buf_def.cpp \
-    dipoleFit/mne_raw_data.cpp \
-    dipoleFit/mne_patch_info.cpp \
-    dipoleFit/mne_inverse_operator.cpp \
-    dipoleFit/mne_nearest.cpp \
-    dipoleFit/mne_triangle.cpp \
-    dipoleFit/mne_vol_geom.cpp \
-    dipoleFit/mne_source_space_old.cpp \
-    dipoleFit/mne_surface_old.cpp \
-    dipoleFit/filter_thread_arg.cpp
+    dipoleFit/dipole_fit_data.cpp \
+    dipoleFit/dipole_fit_settings.cpp \
+    dipoleFit/dipole_forward.cpp \
+    dipoleFit/ecd.cpp \
+    dipoleFit/ecd_set.cpp \
+    dipoleFit/guess_data.cpp \
+    c/mne_inverse_operator.cpp \
+    c/mne_meas_data.cpp \
+    c/mne_meas_data_set.cpp
+
 
 HEADERS +=\
     inverse_global.h \
     IInverseAlgorithm.h \
-    dipoleFit/ecd.h \
-    dipoleFit/ecd_set.h \
-    dipoleFit/mne_types.h \
-    dipoleFit/analyze_types.h \
-    dipoleFit/guess_data.h \
-    dipoleFit/dipole_forward.h \
-    dipoleFit/dipole_fit_data.h \
     minimumNorm/minimumnorm.h \
     rapMusic/rapmusic.h \
     rapMusic/pwlrapmusic.h \
     rapMusic/dipole.h \
-    dipoleFit/dipole_fit_settings.h \
+    dipoleFit/analyze_types.h \
     dipoleFit/dipole_fit.h \
-    dipoleFit/mne_sss_data.h \
-    dipoleFit/mne_mne_data.h \
-    dipoleFit/mne_meas_data_set.h \
-    dipoleFit/mne_meas_data.h \
-    dipoleFit/mne_named_matrix.h \
-    dipoleFit/mne_deriv.h \
-    dipoleFit/mne_deriv_set.h \
-    dipoleFit/mne_surface_or_volume.h \
-    dipoleFit/fiff_sparse_matrix.h \
-    dipoleFit/fiff_coord_trans_old.h \
-    dipoleFit/mne_proj_item.h \
-    dipoleFit/mne_proj_op.h \
-    dipoleFit/mne_cov_matrix.h \
-    dipoleFit/mne_ctf_comp_data.h \
-    dipoleFit/mne_ctf_comp_data_set.h \
-    dipoleFit/mne_raw_info.h \
-    dipoleFit/mne_raw_buf_def.h \
-    dipoleFit/mne_raw_data.h \
-    dipoleFit/mne_patch_info.h \
-    dipoleFit/mne_inverse_operator.h \
-    dipoleFit/mne_nearest.h \
-    dipoleFit/mne_triangle.h \
-    dipoleFit/mne_vol_geom.h \
-    dipoleFit/mne_source_space_old.h \
-    dipoleFit/mne_surface_old.h \
-    dipoleFit/filter_thread_arg.h
+    dipoleFit/dipole_fit_data.h \
+    dipoleFit/dipole_fit_settings.h \
+    dipoleFit/dipole_forward.h \
+    dipoleFit/ecd.h \
+    dipoleFit/ecd_set.h \
+    dipoleFit/guess_data.h \
+    c/mne_inverse_operator.h \
+    c/mne_meas_data.h \
+    c/mne_meas_data_set.h
+
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
