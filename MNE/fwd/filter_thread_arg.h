@@ -41,7 +41,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../fwd_global.h"
+#include "fwd_global.h"
 
 #include <fiff/c/fiff_coord_trans_old.h>
 

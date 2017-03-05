@@ -41,9 +41,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../mne_global.h"
+#include "../inverse_global.h"
 #include <fiff/fiff_types.h>
-#include "mne_surface_or_volume.h"
+#include <fwd/mne_surface_or_volume.h>
 
 
 //*************************************************************************************************************
@@ -72,23 +72,26 @@ namespace FIFFLIB
     class FiffCoordTransOld;
 }
 
+namespace MNELIB
+{
+    class MneCovMatrix;
+    class MneNamedMatrix;
+    class MneProjOp;
+}
+
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MNELIB
+// DEFINE NAMESPACE INVERSELIB
 //=============================================================================================================
 
-namespace MNELIB
+namespace INVERSELIB
 {
 
 //*************************************************************************************************************
 //=============================================================================================================
 // Forward Declarations
 //=============================================================================================================
-
-class MneCovMatrix;
-class MneNamedMatrix;
-class MneProjOp;
 
 
 //=============================================================================================================
@@ -97,7 +100,7 @@ class MneProjOp;
 *
 * @brief An inverse operator
 */
-class MNESHARED_EXPORT MneInverseOperator
+class INVERSESHARED_EXPORT MneInverseOperator
 {
 public:
     typedef QSharedPointer<MneInverseOperator> SPtr;              /**< Shared pointer type for MneInverseOperator. */
@@ -118,9 +121,9 @@ public:
     ~MneInverseOperator();
 
 public:
-    FIFFLIB::fiffId meas_id;        /* The assosiated measurement ID */
-    MneSourceSpaceOld* *spaces;     /* The source spaces */
-    int            nspace;          /* Number of source spaces */
+    FIFFLIB::fiffId meas_id;            /* The assosiated measurement ID */
+    FWDLIB::MneSourceSpaceOld* *spaces; /* The source spaces */
+    int            nspace;              /* Number of source spaces */
     FIFFLIB::FiffCoordTransOld* meg_head_t;  /* MEG device <-> head coordinate transformation */
     FIFFLIB::FiffCoordTransOld* mri_head_t;  /* MRI device <-> head coordinate transformation */
     int            methods;         /* EEG, MEG or EEG+MEG (see mne_fiff.h) */
@@ -130,28 +133,28 @@ public:
     float          **rr_source;     /* The active source points */
     float          **nn_source;     /* The source orientations (These are equal to the cortex normals in the fixed orientation case) */
     int            coord_frame;             /* Which coordinates are the locations and orientations given in? */
-    MneCovMatrix*  sensor_cov; /* Sensor covariance matrix */
+    MNELIB::MneCovMatrix*  sensor_cov; /* Sensor covariance matrix */
     int            nave;                    /* Number of averaged responses (affects scaling of the noise covariance) */
     int            current_unit;            /* This can be FIFF_UNIT_AM, FIFF_UNIT_AM_M2, FIFF_UNIT_AM_M3 */
-    MneCovMatrix*   source_cov;     /* Source covariance matrix */
-    MneCovMatrix*   orient_prior;   /* Orientation prior applied */
-    MneCovMatrix*   depth_prior;    /* Depth-weighting prior applied */
-    MneCovMatrix*   fMRI_prior;     /* fMRI prior applied */
+    MNELIB::MneCovMatrix*   source_cov;     /* Source covariance matrix */
+    MNELIB::MneCovMatrix*   orient_prior;   /* Orientation prior applied */
+    MNELIB::MneCovMatrix*   depth_prior;    /* Depth-weighting prior applied */
+    MNELIB::MneCovMatrix*   fMRI_prior;     /* fMRI prior applied */
     float          *sing;                       /* Singular values of the inverse operator */
-    MneNamedMatrix* eigen_leads;    /* The eigen leadfields */
+    MNELIB::MneNamedMatrix* eigen_leads;    /* The eigen leadfields */
     int            eigen_leads_weighted;        /* Have the above been already weighted with R^0.5? */
-    MneNamedMatrix* eigen_fields;   /* Associated field patterns */
+    MNELIB::MneNamedMatrix* eigen_fields;   /* Associated field patterns */
     float          trace_ratio;                 /* tr(GRG^T)/tr(C) */
-    MneProjOp*    proj;             /* The associated projection operator */
+    MNELIB::MneProjOp*    proj;             /* The associated projection operator */
 
 
 // ### OLD STRUCT ###
 //typedef struct {                    /* An inverse operator */
 //    FIFFLIB::fiffId         meas_id;                            /* The assosiated measurement ID */
-//    MNELIB::MneSourceSpaceOld* *spaces;   /* The source spaces */
+//    INVERSELIB::MneSourceSpaceOld* *spaces;   /* The source spaces */
 //    int            nspace;                      /* Number of source spaces */
-//    MNELIB::FiffCoordTransOld* meg_head_t;  /* MEG device <-> head coordinate transformation */
-//    MNELIB::FiffCoordTransOld* mri_head_t;  /* MRI device <-> head coordinate transformation */
+//    INVERSELIB::FiffCoordTransOld* meg_head_t;  /* MEG device <-> head coordinate transformation */
+//    INVERSELIB::FiffCoordTransOld* mri_head_t;  /* MRI device <-> head coordinate transformation */
 //    int            methods;         /* EEG, MEG or EEG+MEG (see mne_fiff.h) */
 //    int            nchan;           /* Number of measurement channels */
 //    int            nsource;         /* Number of source points */
@@ -159,19 +162,19 @@ public:
 //    float          **rr_source;     /* The active source points */
 //    float          **nn_source;     /* The source orientations (These are equal to the cortex normals in the fixed orientation case) */
 //    int            coord_frame;             /* Which coordinates are the locations and orientations given in? */
-//    MNELIB::MneCovMatrix*   sensor_cov; /* Sensor covariance matrix */
+//    INVERSELIB::MneCovMatrix*   sensor_cov; /* Sensor covariance matrix */
 //    int            nave;                    /* Number of averaged responses (affects scaling of the noise covariance) */
 //    int            current_unit;            /* This can be FIFF_UNIT_AM, FIFF_UNIT_AM_M2, FIFF_UNIT_AM_M3 */
-//    MNELIB::MneCovMatrix*   source_cov;     /* Source covariance matrix */
-//    MNELIB::MneCovMatrix*   orient_prior;   /* Orientation prior applied */
-//    MNELIB::MneCovMatrix*   depth_prior;    /* Depth-weighting prior applied */
-//    MNELIB::MneCovMatrix*   fMRI_prior;     /* fMRI prior applied */
+//    INVERSELIB::MneCovMatrix*   source_cov;     /* Source covariance matrix */
+//    INVERSELIB::MneCovMatrix*   orient_prior;   /* Orientation prior applied */
+//    INVERSELIB::MneCovMatrix*   depth_prior;    /* Depth-weighting prior applied */
+//    INVERSELIB::MneCovMatrix*   fMRI_prior;     /* fMRI prior applied */
 //    float          *sing;                       /* Singular values of the inverse operator */
-//    MNELIB::MneNamedMatrix* eigen_leads;    /* The eigen leadfields */
+//    INVERSELIB::MneNamedMatrix* eigen_leads;    /* The eigen leadfields */
 //    int            eigen_leads_weighted;        /* Have the above been already weighted with R^0.5? */
-//    MNELIB::MneNamedMatrix* eigen_fields;   /* Associated field patterns */
+//    INVERSELIB::MneNamedMatrix* eigen_fields;   /* Associated field patterns */
 //    float          trace_ratio;                 /* tr(GRG^T)/tr(C) */
-//    MNELIB::MneProjOp*    proj;             /* The associated projection operator */
+//    INVERSELIB::MneProjOp*    proj;             /* The associated projection operator */
 //} *mneInverseOperator,mneInverseOperatorRec;
 };
 
@@ -180,6 +183,6 @@ public:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-} // NAMESPACE MNELIB
+} // NAMESPACE INVERSELIB
 
 #endif // MNEINVERSEOPERATOR_H

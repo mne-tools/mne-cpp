@@ -84,7 +84,7 @@
 // Forward Declarations
 //=============================================================================================================
 
-namespace INVERSELIB
+namespace MNELIB
 {
     class MneTriangle;
 }
@@ -220,7 +220,7 @@ public:
     static double calc_beta (double *rk,double *rk1);
 
     static void lin_pot_coeff (float  *from,	/* Origin */
-                               INVERSELIB::MneTriangle* to,	/* The destination triangle */
+                               MNELIB::MneTriangle* to,	/* The destination triangle */
                                double omega[3]);
 
     static void correct_auto_elements (MneSurfaceOld* surf,
@@ -363,14 +363,14 @@ public:
                             double *D);
 
     static void field_integrals (float *from,
-                                 INVERSELIB::MneTriangle* to,
+                                 MNELIB::MneTriangle* to,
                                  double *I1p,
                                  double *T,double *S1,double *S2,
                                  double *f0,double *fx,double *fy);
 
     static double one_field_coeff (float       *dest,	/* The destination field point */
                                    float       *normal,	/* The field direction we are interested in */
-                                   INVERSELIB::MneTriangle* tri);
+                                   MNELIB::MneTriangle* tri);
 
     static float **fwd_bem_field_coeff(FwdBemModel* m,	/* The model */
                                 FwdCoilSet*  coils);
@@ -384,20 +384,20 @@ public:
 
     static void fwd_bem_one_lin_field_coeff_ferg (float *dest,	/* The field point */
                                            float *dir,	/* The interesting direction */
-                                           INVERSELIB::MneTriangle* tri,	/* The destination triangle */
+                                           MNELIB::MneTriangle* tri,	/* The destination triangle */
                                            double *res);
 
     static void fwd_bem_one_lin_field_coeff_uran(float *dest,	/* The field point */
                                           float *dir,	/* The interesting direction */
-                                          INVERSELIB::MneTriangle* tri,	/* The destination triangle */
+                                          MNELIB::MneTriangle* tri,	/* The destination triangle */
                                           double *res);
 
     static void fwd_bem_one_lin_field_coeff_simple (float       *dest,    /* The destination field point */
                                              float       *normal,  /* The field direction we are interested in */
-                                             INVERSELIB::MneTriangle* source,   /* The source triangle */
+                                             MNELIB::MneTriangle* source,   /* The source triangle */
                                              double      *res);
 
-    typedef void (* linFieldIntFunc)(float *dest,float *dir,INVERSELIB::MneTriangle* tri, double *res);
+    typedef void (* linFieldIntFunc)(float *dest,float *dir,MNELIB::MneTriangle* tri, double *res);
 
     static float **fwd_bem_lin_field_coeff (FwdBemModel* m,        /* The model */
                                      FwdCoilSet*  coils,    /* Coil information */
@@ -552,7 +552,7 @@ public:
 
 public:
     QString     surf_name;      /* Name of the file where surfaces were loaded from */
-    QList<INVERSELIB::MneSurfaceOld*> surfs;      /* The interface surfaces from outside towards inside */
+    QList<MneSurfaceOld*> surfs;      /* The interface surfaces from outside towards inside */
     int        *ntri;           /* Number of triangles on each surface */
     int        *np;             /* Number of vertices on each surface */
     int        nsurf;           /* How many */
@@ -567,7 +567,7 @@ public:
     float      *v0;             /* Space for the infinite-medium potentials */
     int        nsol;            /* Size of the solution matrix */
 
-    INVERSELIB::FiffCoordTransOld* head_mri_t;  /* Coordinate transformation from head to MRI coordinates */
+    FIFFLIB::FiffCoordTransOld* head_mri_t;  /* Coordinate transformation from head to MRI coordinates */
 
     float      ip_approach_limit;   /* Controls whether we need to use the isolated problem approach */
     bool       use_ip_approach;     /* Do we need it */

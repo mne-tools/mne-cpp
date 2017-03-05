@@ -41,7 +41,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../mne_global.h"
+#include "../inverse_global.h"
 
 
 //*************************************************************************************************************
@@ -66,10 +66,10 @@ typedef void (*mneUserFreeFuncTmp_1)(void *);  /* General purpose */
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MNELIB
+// DEFINE NAMESPACE INVERSELIB
 //=============================================================================================================
 
-namespace MNELIB
+namespace INVERSELIB
 {
 
 //*************************************************************************************************************
@@ -86,7 +86,7 @@ class MneMneData;
 *
 * @brief One data set, used in mneMeasData
 */
-class MNESHARED_EXPORT MneMeasDataSet
+class INVERSESHARED_EXPORT MneMeasDataSet
 {
 public:
     typedef QSharedPointer<MneMeasDataSet> SPtr;              /**< Shared pointer type for MneMeasDataSet. */
@@ -145,7 +145,7 @@ public:
 //    float           tmin;           /* Starting time */
 //    float           tstep;          /* Time step */
 //    float           *baselines;     /* Baseline values currently applied to the data */
-//    MNELIB::MneMneData*   mne;  /* These are the data associated with MNE computations */
+//    INVERSELIB::MneMneData*   mne;  /* These are the data associated with MNE computations */
 //    void            *user_data;     /* Anything else we want */
 //    mneUserFreeFunc user_data_free; /* Function to set the above free */
 //} *mneMeasDataSet,mneMeasDataSetRec;
@@ -156,6 +156,6 @@ public:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-} // NAMESPACE MNELIB
+} // NAMESPACE INVERSELIB
 
 #endif // MNEMEASDATASET_H

@@ -41,9 +41,9 @@
 #include "fwd_bem_model.h"
 #include "fwd_bem_solution.h"
 #include "fwd_eeg_sphere_model.h"
-#include <inverse/dipoleFit/mne_surface_old.h>
-#include <inverse/dipoleFit/mne_triangle.h>
-#include <inverse/dipoleFit/mne_source_space_old.h>
+#include "mne_surface_old.h"
+#include <mne/c/mne_triangle.h>
+#include "mne_source_space_old.h"
 
 #include "fwd_comp_data.h"
 #include "fwd_bem_model.h"
@@ -436,7 +436,7 @@ char **mne_dup_name_list_40(char **list, int nlist)
 
 using namespace Eigen;
 using namespace FIFFLIB;
-using namespace INVERSELIB;
+using namespace MNELIB;
 using namespace FWDLIB;
 
 

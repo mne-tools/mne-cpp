@@ -41,7 +41,7 @@
 
 #include "mne_patch_info.h"
 #include "mne_source_space_old.h"
-#include "mne_triangle.h"
+#include <mne/c/mne_triangle.h>
 
 
 #define X_43 0

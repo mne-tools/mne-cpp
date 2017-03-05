@@ -42,7 +42,9 @@
 #include "mne_surface_or_volume.h"
 #include "mne_surface_old.h"
 #include "mne_source_space_old.h"
-#include "mne_triangle.h"
+#include "mne_patch_info.h"
+#include "fwd_bem_model.h"
+#include <mne/c/mne_triangle.h>
 #include "mne_nearest.h"
 #include "filter_thread_arg.h"
 
@@ -76,6 +78,7 @@
 
 using namespace Eigen;
 using namespace FIFFLIB;
+using namespace MNELIB;
 using namespace FWDLIB;
 
 
@@ -1952,7 +1955,7 @@ int MneSurfaceOrVolume::mne_read_source_spaces(const QString &name, MneSourceSpa
                 new_space->dist_limit = *t_pTag->toFloat();
                 if (node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_DIST, t_pTag)) {
 //                    SparseMatrix<double> tmpSparse = t_pTag->toSparseFloatMatrix();
-                    FWDLIB::FiffSparseMatrix* dist = FWDLIB::FiffSparseMatrix::fiff_get_float_sparse_matrix(t_pTag);
+                    FiffSparseMatrix* dist = FiffSparseMatrix::fiff_get_float_sparse_matrix(t_pTag);
                     new_space->dist = dist->mne_add_upper_triangle_rcs();
                     delete dist;
                     if (!new_space->dist) {
@@ -2025,7 +2028,7 @@ int MneSurfaceOrVolume::mne_read_source_spaces(const QString &name, MneSourceSpa
                         new_space->MRI_volume = (char *)t_pTag->data();
                     }
                     if (node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_INTERPOLATOR, t_pTag)) {
-                        new_space->interpolator = FWDLIB::FiffSparseMatrix::fiff_get_float_sparse_matrix(t_pTag);
+                        new_space->interpolator = FiffSparseMatrix::fiff_get_float_sparse_matrix(t_pTag);
                     }
                 }
                 else {
@@ -2036,7 +2039,7 @@ int MneSurfaceOrVolume::mne_read_source_spaces(const QString &name, MneSourceSpa
                     new_space->MRI_voxel_surf_RAS_t   = FiffCoordTransOld::mne_read_transform_from_node(stream, mris[0], FIFFV_MNE_COORD_MRI_VOXEL, FIFFV_MNE_COORD_SURFACE_RAS);
 
                     if (mris[0]->find_tag(stream, FIFF_MNE_SOURCE_SPACE_INTERPOLATOR, t_pTag)) {
-                        new_space->interpolator = FWDLIB::FiffSparseMatrix::fiff_get_float_sparse_matrix(t_pTag);
+                        new_space->interpolator = FiffSparseMatrix::fiff_get_float_sparse_matrix(t_pTag);
                     }
                     if (mris[0]->find_tag(stream, FIFF_MRI_WIDTH, t_pTag)) {
                         new_space->MRI_vol_dims[0] = *t_pTag->toInt();

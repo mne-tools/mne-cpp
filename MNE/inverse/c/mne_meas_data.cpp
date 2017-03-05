@@ -43,7 +43,7 @@
 #include "mne_meas_data_set.h"
 #include "mne_inverse_operator.h"
 
-#include "mne_types.h"
+#include <mne/c/mne_types.h>
 
 #include <fiff/fiff_types.h>
 
@@ -61,6 +61,7 @@
 using namespace Eigen;
 using namespace FIFFLIB;
 using namespace MNELIB;
+using namespace INVERSELIB;
 
 
 

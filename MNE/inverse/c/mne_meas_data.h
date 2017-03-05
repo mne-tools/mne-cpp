@@ -41,11 +41,11 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../mne_global.h"
+#include "../inverse_global.h"
 #include <fiff/fiff_types.h>
 
-#include "mne_types.h"
-#include "mne_raw_data.h"
+#include <mne/c/mne_types.h>
+#include <mne/c/mne_raw_data.h>
 
 
 //*************************************************************************************************************
@@ -67,10 +67,21 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MNELIB
+// FORWARD DECLARATIONS
 //=============================================================================================================
 
 namespace MNELIB
+{
+    class MneNamedMatrix;
+}
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE INVERSELIB
+//=============================================================================================================
+
+namespace INVERSELIB
 {
 
 //*************************************************************************************************************
@@ -78,10 +89,8 @@ namespace MNELIB
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class MneMeasDataSet;
-class MneNamedMatrix;
 class MneInverseOperator;
-
+class MneMeasDataSet;
 
 //=============================================================================================================
 /**
@@ -89,7 +98,7 @@ class MneInverseOperator;
 *
 * @brief easurement data representation in MNE calculations
 */
-class MNESHARED_EXPORT MneMeasData
+class INVERSESHARED_EXPORT MneMeasData
 {
 public:
     typedef QSharedPointer<MneMeasData> SPtr;              /**< Shared pointer type for MneMeasData. */
@@ -125,7 +134,7 @@ public:
     static MneMeasData* mne_read_meas_data_add(const QString&       name,       /* Name of the measurement file */
                                        int                  set,        /* Which data set */
                                        MneInverseOperator*   op,         /* For consistency checks */
-                                       MneNamedMatrix*       fwd,        /* Another option for consistency checks */
+                                       MNELIB::MneNamedMatrix*       fwd,        /* Another option for consistency checks */
                                        char                 **namesp,   /* Yet another option: explicit name list */
                                        int                  nnamesp,
                                        MneMeasData*          add_to);
@@ -134,7 +143,7 @@ public:
     static MneMeasData* mne_read_meas_data(const QString&       name,       /* Name of the measurement file */
                                    int                  set,        /* Which data set */
                                    MneInverseOperator*  op,         /* For consistency checks */
-                                   MneNamedMatrix*      fwd,        /* Another option for consistency checks */
+                                   MNELIB::MneNamedMatrix*      fwd,        /* Another option for consistency checks */
                                    char                 **namesp,   /* Yet another option: explicit name list */
                                    int                  nnamesp);
 
@@ -153,10 +162,10 @@ public:
     float                   highpass;   /* Highpass filter setting */
     float                   lowpass;    /* Lowpass filter setting */
     MNELIB::MneProjOp*  proj;       /* Associated projection operator (useful if inverse operator is not included) */
-    MneCTFCompDataSet*      comp;       /* The software gradient compensation data */
+    MNELIB::MneCTFCompDataSet*      comp;       /* The software gradient compensation data */
     MneInverseOperator*     op;         /* Associated inverse operator */
-    MneNamedMatrix*         fwd;        /* Forward operator for dipole fitting */
-    MneRawData*             raw;        /* This will be non-null if the data stems from a raw data file */
+    MNELIB::MneNamedMatrix*         fwd;        /* Forward operator for dipole fitting */
+    MNELIB::MneRawData*             raw;        /* This will be non-null if the data stems from a raw data file */
     mneChSelection          chsel;      /* Channel selection for raw data */
     char                    **badlist;  /* Bad channel names */
     int                     nbad;       /* How many? */
@@ -178,8 +187,8 @@ public:
 //    FIFFLIB::fiffId         meas_id;    /* The id from the measurement file */
 //    FIFFLIB::fiffTimeRec    meas_date;  /* The measurement date from the file */
 //    FIFFLIB::fiffChInfo     chs;        /* The channel information */
-//    MNELIB::FiffCoordTransOld* meg_head_t; /* MEG device <-> head coordinate transformation */
-//    MNELIB::FiffCoordTransOld* mri_head_t; /* MRI device <-> head coordinate transformation (duplicated from the inverse operator or loaded separately) */
+//    INVERSELIB::FiffCoordTransOld* meg_head_t; /* MEG device <-> head coordinate transformation */
+//    INVERSELIB::FiffCoordTransOld* mri_head_t; /* MRI device <-> head coordinate transformation (duplicated from the inverse operator or loaded separately) */
 //    float               sfreq;      /* Sampling frequency */
 //    int                 nchan;      /* Number of channels */
 //    float               highpass;   /* Highpass filter setting */
@@ -197,9 +206,9 @@ public:
 //    * These are the data sets loaded
 //    */
 //    int                ch_major;            /* Rows are channels rather than times */
-//    MNELIB::MneMeasDataSet* *sets;      /* All loaded data sets */
+//    INVERSELIB::MneMeasDataSet* *sets;      /* All loaded data sets */
 //    int                nset;                /* How many */
-//    MNELIB::MneMeasDataSet* current;    /* Which is the current one */
+//    INVERSELIB::MneMeasDataSet* current;    /* Which is the current one */
 //} *mneMeasData,mneMeasDataRec;
 };
 
@@ -208,6 +217,6 @@ public:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-} // NAMESPACE MNELIB
+} // NAMESPACE INVERSELIB
 
 #endif // MNEMEASDATA_H

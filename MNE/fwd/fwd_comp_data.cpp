@@ -41,7 +41,7 @@
 
 #include "fwd_comp_data.h"
 
-#include <inverse/dipoleFit/mne_ctf_comp_data_set.h>
+#include <mne/c/mne_ctf_comp_data_set.h>
 #include <fiff/fiff_types.h>
 
 #include <iostream>
@@ -130,8 +130,8 @@ float **mne_cmatrix_60 (int nr,int nc)
 
 using namespace Eigen;
 using namespace FIFFLIB;
+using namespace MNELIB;
 using namespace FWDLIB;
-using namespace INVERSELIB;
 
 
 //*************************************************************************************************************

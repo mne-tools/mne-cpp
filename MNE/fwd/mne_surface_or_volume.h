@@ -73,6 +73,17 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
+// Forward Declarations
+//=============================================================================================================
+
+namespace MNELIB
+{
+class MneTriangle;
+}
+
+
+//*************************************************************************************************************
+//=============================================================================================================
 // DEFINE NAMESPACE FWDLIB
 //=============================================================================================================
 
@@ -84,7 +95,6 @@ namespace FWDLIB
 // Forward Declarations
 //=============================================================================================================
 
-class MneTriangle;
 class MneNearest;
 class MneVolGeom;
 class MnePatchInfo;
@@ -130,7 +140,7 @@ public:
     //============================= make_filter_source_sapces.c =============================
 
     static double solid_angle (float       *from,	/* From this point... */
-                               MneTriangle* tri);
+                               MNELIB::MneTriangle* tri);
 
     static double sum_solids(float *from, MneSurfaceOld* surf);
 
@@ -388,12 +398,12 @@ public:
     * These are for surfaces only
     */
     int              ntri;      /* Number of triangles */
-    MneTriangle*      tris;      /* The triangulation information */
+    MNELIB::MneTriangle*      tris;      /* The triangulation information */
     int              **itris;   /* The vertex numbers */
     float            tot_area;  /* Total area of the surface, computed from the triangles */
 
     int              nuse_tri;      /* The triangulation corresponding to the vertices in use */
-    MneTriangle*      use_tris;      /* The triangulation information for the vertices in use */
+    MNELIB::MneTriangle*      use_tris;      /* The triangulation information for the vertices in use */
     int              **use_itris;   /* The vertex numbers for the 'use' triangulation */
 
     int              **neighbor_tri;    /* Neighboring triangles for each vertex Note: number of entries varies for vertex to vertex */

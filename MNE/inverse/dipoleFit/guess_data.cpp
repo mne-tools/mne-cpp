@@ -41,8 +41,8 @@
 #include "guess_data.h"
 #include "dipole_fit_data.h"
 #include "dipole_forward.h"
-#include "mne_surface_old.h"
-#include "mne_source_space_old.h"
+#include <fwd/mne_surface_old.h>
+#include <fwd/mne_source_space_old.h>
 
 #include <fiff/fiff_stream.h>
 #include <fiff/fiff_tag.h>
@@ -57,6 +57,7 @@
 
 using namespace Eigen;
 using namespace FIFFLIB;
+using namespace FWDLIB;
 using namespace INVERSELIB;
 
 
