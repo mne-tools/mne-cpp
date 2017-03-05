@@ -39,7 +39,7 @@
 //=============================================================================================================
 
 #include "fwd_thread_arg.h"
-#include "mne_source_space_old.h"
+#include <mne/c/mne_source_space_old.h>
 #include "fwd_coil_set.h"
 #include "fwd_bem_model.h"
 #include "fwd_comp_data.h"

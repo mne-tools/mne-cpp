@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     filter_thread_arg.cpp
+* @file     mne_surface_old.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,24 +29,17 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the MNE Derivation (MneDeriv) Class.
+* @brief    Implementation of the MneSurfaceOld Class.
 *
 */
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "filter_thread_arg.h"
-
-#ifndef FAIL
-#define FAIL -1
-#endif
-
-#ifndef OK
-#define OK 0
-#endif
+#include "mne_surface_old.h"
 
 
 //*************************************************************************************************************
@@ -55,7 +48,7 @@
 //=============================================================================================================
 
 using namespace Eigen;
-using namespace FWDLIB;
+using namespace MNELIB;
 
 
 //*************************************************************************************************************
@@ -63,13 +56,7 @@ using namespace FWDLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-FilterThreadArg::FilterThreadArg()
-:s          (NULL)
-,mri_head_t (NULL)
-,surf       (NULL)
-,limit      (-1)
-,filtered   (NULL)
-,stat       (FAIL)
+MneSurfaceOld::MneSurfaceOld()
 {
 
 }
@@ -77,7 +64,7 @@ FilterThreadArg::FilterThreadArg()
 
 //*************************************************************************************************************
 
-FilterThreadArg::~FilterThreadArg()
+MneSurfaceOld::~MneSurfaceOld()
 {
 
 }

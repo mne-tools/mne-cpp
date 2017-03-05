@@ -63,6 +63,16 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
+// Forward Declarations
+//=============================================================================================================
+
+namespace MNELIB
+{
+    class MneSourceSpaceOld;
+}
+
+//*************************************************************************************************************
+//=============================================================================================================
 // DEFINE NAMESPACE FWDLIB
 //=============================================================================================================
 
@@ -75,7 +85,6 @@ namespace FWDLIB
 //=============================================================================================================
 
 class FwdCoilSet;
-class MneSourceSpaceOld;
 
 
 //=============================================================================================================
@@ -126,7 +135,7 @@ public:
     fwdFieldGradFunc    field_pot_grad;    /* Computes the gradient of field or potential for one dipole orientation */
     FwdCoilSet          *coils_els;        /* The coil definitions */
     void                *client;           /* Client data for the field computation function */
-    MneSourceSpaceOld   *s;                 /* The source space to process */
+    MNELIB::MneSourceSpaceOld   *s;                 /* The source space to process */
     int                 fixed_ori;         /* Compute fixed orientation solution? */
     int                 comp;              /* Which component to compute for free orientations */
     int                 stat;

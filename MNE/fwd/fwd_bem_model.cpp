@@ -41,9 +41,9 @@
 #include "fwd_bem_model.h"
 #include "fwd_bem_solution.h"
 #include "fwd_eeg_sphere_model.h"
-#include "mne_surface_old.h"
+#include <mne/c/mne_surface_old.h>
 #include <mne/c/mne_triangle.h>
-#include "mne_source_space_old.h"
+#include <mne/c/mne_source_space_old.h>
 
 #include "fwd_comp_data.h"
 #include "fwd_bem_model.h"
@@ -423,6 +423,48 @@ char **mne_dup_name_list_40(char **list, int nlist)
     for (k = 0; k < nlist; k++)
         res[k] = mne_strdup_40(list[k]);
     return res;
+}
+
+
+
+
+
+
+//============================= mne_coord_transforms.c =============================
+
+typedef struct {
+    int frame;
+    const char *name;
+} frameNameRec_40;
+
+
+const char *mne_coord_frame_name_40(int frame)
+
+{
+    static frameNameRec_40 frames[] = {
+        {FIFFV_COORD_UNKNOWN,"unknown"},
+        {FIFFV_COORD_DEVICE,"MEG device"},
+        {FIFFV_COORD_ISOTRAK,"isotrak"},
+        {FIFFV_COORD_HPI,"hpi"},
+        {FIFFV_COORD_HEAD,"head"},
+        {FIFFV_COORD_MRI,"MRI (surface RAS)"},
+        {FIFFV_MNE_COORD_MRI_VOXEL, "MRI voxel"},
+        {FIFFV_COORD_MRI_SLICE,"MRI slice"},
+        {FIFFV_COORD_MRI_DISPLAY,"MRI display"},
+        {FIFFV_MNE_COORD_CTF_DEVICE,"CTF MEG device"},
+        {FIFFV_MNE_COORD_CTF_HEAD,"CTF/4D/KIT head"},
+        {FIFFV_MNE_COORD_RAS,"RAS (non-zero origin)"},
+        {FIFFV_MNE_COORD_MNI_TAL,"MNI Talairach"},
+        {FIFFV_MNE_COORD_FS_TAL_GTZ,"Talairach (MNI z > 0)"},
+        {FIFFV_MNE_COORD_FS_TAL_LTZ,"Talairach (MNI z < 0)"},
+        {-1,"unknown"}
+    };
+    int k;
+    for (k = 0; frames[k].frame != -1; k++) {
+        if (frame == frames[k].frame)
+            return frames[k].name;
+    }
+    return frames[k].name;
 }
 
 
@@ -820,6 +862,79 @@ int FwdBemModel::fwd_bem_set_head_mri_t(FwdBemModel *m, FiffCoordTransOld *t)
     else {
         printf ("Improper coordinate transform delivered to fwd_bem_set_head_mri_t");
         return FAIL;
+    }
+}
+
+
+//*************************************************************************************************************
+
+MneSurfaceOld* FwdBemModel::make_guesses(MneSurfaceOld* guess_surf, float guessrad, float *guess_r0, float grid, float exclude, float mindist)		   /* Exclude points closer than this to
+                                                        * the guess boundary surface */
+/*
+     * Make a guess space inside a sphere
+     */
+{
+    char *bemname     = NULL;
+    MneSurfaceOld* sphere = NULL;
+    MneSurfaceOld* res    = NULL;
+    int        k;
+    float      dist;
+    float      r0[] = { 0.0, 0.0, 0.0 };
+
+    if (!guess_r0)
+        guess_r0 = r0;
+
+    if (!guess_surf) {
+        printf("Making a spherical guess space with radius %7.1f mm...\n",1000*guessrad);
+        //#ifdef USE_SHARE_PATH
+        //    if ((bemname = mne_compose_mne_name("share/mne","icos.fif")) == NULL)
+        //#else
+        //    if ((bemname = mne_compose_mne_name("setup/mne","icos.fif")) == NULL)
+        //#endif
+        //      goto out;
+
+        //    QFile bemFile("/usr/pubsw/packages/mne/stable/share/mne/icos.fif");
+
+        QFile bemFile(QString("./resources/surf2bem/icos.fif"));
+        if ( !QCoreApplication::startingUp() )
+            bemFile.setFileName(QCoreApplication::applicationDirPath() + QString("/resources/surf2bem/icos.fif"));
+        else if (!bemFile.exists())
+            bemFile.setFileName("./bin/resources/surf2bem/icos.fif");
+
+        if( !bemFile.exists () ){
+            qDebug() << bemFile.fileName() << "does not exists.";
+            goto out;
+        }
+
+        bemname = MALLOC_40(strlen(bemFile.fileName().toLatin1().data())+1,char);
+        strcpy(bemname,bemFile.fileName().toLatin1().data());
+
+        if ((sphere = MneSourceSpaceOld::read_bem_surface(bemname,9003,FALSE,NULL)) == NULL)
+            goto out;
+
+        for (k = 0; k < sphere->np; k++) {
+            dist = VEC_LEN_40(sphere->rr[k]);
+            sphere->rr[k][X_40] = guessrad*sphere->rr[k][X_40]/dist + guess_r0[X_40];
+            sphere->rr[k][Y_40] = guessrad*sphere->rr[k][Y_40]/dist + guess_r0[Y_40];
+            sphere->rr[k][Z_40] = guessrad*sphere->rr[k][Z_40]/dist + guess_r0[Z_40];
+        }
+        if (MneSurfaceOrVolume::mne_source_space_add_geometry_info((MneSourceSpaceOld*)sphere,TRUE) == FAIL)
+            goto out;
+        guess_surf = sphere;
+    }
+    else {
+        printf("Guess surface (%d = %s) is in %s coordinates\n",
+               guess_surf->id,FwdBemModel::fwd_bem_explain_surface(guess_surf->id),
+               mne_coord_frame_name_40(guess_surf->coord_frame));
+    }
+    printf("Filtering (grid = %6.f mm)...\n",1000*grid);
+    res = (MneSurfaceOld*)MneSurfaceOrVolume::make_volume_source_space(guess_surf,grid,exclude,mindist);
+
+out : {
+        FREE_40(bemname);
+        if(sphere)
+            delete sphere;
+        return res;
     }
 }
 

@@ -43,7 +43,7 @@
 
 #include "../inverse_global.h"
 #include <fiff/fiff_types.h>
-#include <fwd/mne_surface_or_volume.h>
+#include <mne/c/mne_surface_or_volume.h>
 
 
 //*************************************************************************************************************
@@ -122,7 +122,7 @@ public:
 
 public:
     FIFFLIB::fiffId meas_id;            /* The assosiated measurement ID */
-    FWDLIB::MneSourceSpaceOld* *spaces; /* The source spaces */
+    MNELIB::MneSourceSpaceOld* *spaces; /* The source spaces */
     int            nspace;              /* Number of source spaces */
     FIFFLIB::FiffCoordTransOld* meg_head_t;  /* MEG device <-> head coordinate transformation */
     FIFFLIB::FiffCoordTransOld* mri_head_t;  /* MRI device <-> head coordinate transformation */

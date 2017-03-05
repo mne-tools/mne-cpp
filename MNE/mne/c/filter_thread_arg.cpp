@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     mne_nearest.cpp
+* @file     filter_thread_arg.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,17 +29,24 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the MneSourceSpaceOld Class.
+* @brief    Implementation of the MNE Derivation (MneDeriv) Class.
 *
 */
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "mne_source_space_old.h"
+#include "filter_thread_arg.h"
+
+#ifndef FAIL
+#define FAIL -1
+#endif
+
+#ifndef OK
+#define OK 0
+#endif
 
 
 //*************************************************************************************************************
@@ -48,7 +55,7 @@
 //=============================================================================================================
 
 using namespace Eigen;
-using namespace FWDLIB;
+using namespace MNELIB;
 
 
 //*************************************************************************************************************
@@ -56,7 +63,13 @@ using namespace FWDLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MneSourceSpaceOld::MneSourceSpaceOld()
+FilterThreadArg::FilterThreadArg()
+:s          (NULL)
+,mri_head_t (NULL)
+,surf       (NULL)
+,limit      (-1)
+,filtered   (NULL)
+,stat       (FAIL)
 {
 
 }
@@ -64,7 +77,7 @@ MneSourceSpaceOld::MneSourceSpaceOld()
 
 //*************************************************************************************************************
 
-MneSourceSpaceOld::~MneSourceSpaceOld()
+FilterThreadArg::~FilterThreadArg()
 {
 
 }
