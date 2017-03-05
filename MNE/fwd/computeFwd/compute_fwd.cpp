@@ -2,17 +2,17 @@
 
 #include "compute_fwd.h"
 
-#include <inverse/dipoleFit/mne_source_space_old.h>
-#include <inverse/dipoleFit/fiff_coord_trans_old.h>
-#include <inverse/dipoleFit/fwd_coil_set.h>
-#include <inverse/dipoleFit/mne_ctf_comp_data_set.h>
-#include <inverse/dipoleFit/fwd_eeg_sphere_model_set.h>
-#include <inverse/dipoleFit/fwd_bem_model.h>
-#include <inverse/dipoleFit/mne_named_matrix.h>
+#include "../mne_source_space_old.h"
+#include <fiff/c/fiff_coord_trans_old.h>
+#include "../fwd_coil_set.h"
+#include <mne/c/mne_ctf_comp_data_set.h>
+#include "../fwd_eeg_sphere_model_set.h"
+#include "../fwd_bem_model.h"
+#include <mne/c/mne_named_matrix.h>
 
-#include <inverse/dipoleFit/fiff_sparse_matrix.h>
+#include <fiff/c/fiff_sparse_matrix.h>
 
-#include <inverse/dipoleFit/mne_nearest.h>
+#include "../mne_nearest.h"
 
 #include <fiff/fiff_types.h>
 
@@ -23,9 +23,9 @@
 #include <QDir>
 
 using namespace Eigen;
-using namespace INVERSELIB;
-using namespace FIFFLIB;
 using namespace FWDLIB;
+using namespace FIFFLIB;
+using namespace INVERSELIB;
 
 #ifndef TRUE
 #define TRUE 1

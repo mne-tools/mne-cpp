@@ -1,10 +1,10 @@
 //=============================================================================================================
 /**
-* @file     fwd_global.h
+* @file     mne_mne_data.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2017
+* @date     January, 2017
 *
 * @section  LICENSE
 *
@@ -29,38 +29,68 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    forward library export/import macros.
+* @brief    Implementation of the MNE Mne Data (MneMneData) Class.
 *
 */
 
-#ifndef FWD_GLOBAL_H
-#define FWD_GLOBAL_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include <QtCore/qglobal.h>
+#include "mne_mne_data.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINES
+// USED NAMESPACES
 //=============================================================================================================
 
-#if defined(BUILD_MNECPP_STATIC_LIB)
-#  define FWDSHARED_EXPORT
-#elif defined(FWD_LIBRARY)
-#  define FWDSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
-#else
-#  define FWDSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
-#endif
+using namespace Eigen;
+using namespace MNELIB;
 
-//#if defined(INVERSE_LIBRARY)
-//#  define FWDSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
-//#else
-//#  define FWDSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
-//#endif
 
-#endif // FWD_GLOBAL_H
+
+#define FREE_7(x) if ((char *)(x) != NULL) free((char *)(x))
+
+#define FREE_CMATRIX_7(m) mne_free_cmatrix_7((m))
+
+
+void mne_free_cmatrix_7 (float **m)
+{
+    if (m) {
+        FREE_7(*m);
+        FREE_7(m);
+    }
+}
+
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+MneMneData::MneMneData()
+: datap(NULL)
+, predicted(NULL)
+, SNR(NULL)
+, lambda2_est(NULL)
+, lambda2(NULL)
+{
+
+}
+
+
+//*************************************************************************************************************
+
+MneMneData::~MneMneData()
+{
+    FREE_CMATRIX_7(this->datap);
+    FREE_CMATRIX_7(this->predicted);
+
+    FREE_7(this->SNR);
+    FREE_7(this->lambda2_est);
+    FREE_7(this->lambda2);
+}

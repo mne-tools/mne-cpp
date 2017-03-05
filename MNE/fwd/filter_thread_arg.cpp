@@ -1,10 +1,10 @@
 //=============================================================================================================
 /**
-* @file     fwd_global.h
+* @file     filter_thread_arg.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2017
+* @date     January, 2017
 *
 * @section  LICENSE
 *
@@ -29,38 +29,55 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    forward library export/import macros.
+* @brief    Implementation of the MNE Derivation (MneDeriv) Class.
 *
 */
-
-#ifndef FWD_GLOBAL_H
-#define FWD_GLOBAL_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include <QtCore/qglobal.h>
+#include "filter_thread_arg.h"
+
+#ifndef FAIL
+#define FAIL -1
+#endif
+
+#ifndef OK
+#define OK 0
+#endif
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINES
+// USED NAMESPACES
 //=============================================================================================================
 
-#if defined(BUILD_MNECPP_STATIC_LIB)
-#  define FWDSHARED_EXPORT
-#elif defined(FWD_LIBRARY)
-#  define FWDSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
-#else
-#  define FWDSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
-#endif
+using namespace Eigen;
+using namespace FWDLIB;
 
-//#if defined(INVERSE_LIBRARY)
-//#  define FWDSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
-//#else
-//#  define FWDSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
-//#endif
 
-#endif // FWD_GLOBAL_H
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+FilterThreadArg::FilterThreadArg()
+:s          (NULL)
+,mri_head_t (NULL)
+,surf       (NULL)
+,limit      (-1)
+,filtered   (NULL)
+,stat       (FAIL)
+{
+
+}
+
+
+//*************************************************************************************************************
+
+FilterThreadArg::~FilterThreadArg()
+{
+
+}

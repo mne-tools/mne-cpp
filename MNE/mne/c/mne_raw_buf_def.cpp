@@ -1,10 +1,10 @@
 //=============================================================================================================
 /**
-* @file     fwd_global.h
+* @file     mne_raw_buf_def.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2017
+* @date     January, 2017
 *
 * @section  LICENSE
 *
@@ -29,38 +29,63 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    forward library export/import macros.
+* @brief    Implementation of the MneRawBufDef Class.
 *
 */
-
-#ifndef FWD_GLOBAL_H
-#define FWD_GLOBAL_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include <QtCore/qglobal.h>
+#include "mne_raw_buf_def.h"
+
+
+#include <Eigen/Core>
+
+#define FREE_34(x) if ((char *)(x) != NULL) free((char *)(x))
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINES
+// USED NAMESPACES
 //=============================================================================================================
 
-#if defined(BUILD_MNECPP_STATIC_LIB)
-#  define FWDSHARED_EXPORT
-#elif defined(FWD_LIBRARY)
-#  define FWDSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
-#else
-#  define FWDSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
-#endif
+using namespace Eigen;
+using namespace FIFFLIB;
+using namespace MNELIB;
 
-//#if defined(INVERSE_LIBRARY)
-//#  define FWDSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
-//#else
-//#  define FWDSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
-//#endif
 
-#endif // FWD_GLOBAL_H
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+MneRawBufDef::MneRawBufDef()
+{
+
+}
+
+
+//*************************************************************************************************************
+
+MneRawBufDef::~MneRawBufDef()
+{
+}
+
+
+//*************************************************************************************************************
+
+void MneRawBufDef::free_bufs(MneRawBufDef *bufs, int nbuf)
+
+{
+    int k;
+    for (k = 0; k < nbuf; k++) {
+        FREE_34(bufs[k].ch_filtered);
+        /*
+         * Clear the pointers only, not the data which are in the ringbuffer
+         */
+        FREE_34(bufs[k].vals);
+    }
+    FREE_34(bufs);
+}

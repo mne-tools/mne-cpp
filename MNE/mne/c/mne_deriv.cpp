@@ -1,10 +1,10 @@
 //=============================================================================================================
 /**
-* @file     fwd_global.h
+* @file     mne_deriv.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2017
+* @date     January, 2017
 *
 * @section  LICENSE
 *
@@ -29,38 +29,94 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    forward library export/import macros.
+* @brief    Implementation of the MNE Derivation (MneDeriv) Class.
 *
 */
 
-#ifndef FWD_GLOBAL_H
-#define FWD_GLOBAL_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include <QtCore/qglobal.h>
+#include "mne_deriv.h"
+
+
+
+
+
+#define FREE_15(x) if ((char *)(x) != NULL) free((char *)(x))
+
+
+void mne_free_name_list_15(char **list, int nlist)
+/*
+* Free a name list array
+*/
+{
+    int k;
+    if (list == NULL || nlist == 0)
+        return;
+    for (k = 0; k < nlist; k++) {
+#ifdef FOO
+        fprintf(stderr,"%d %s\n",k,list[k]);
+#endif
+        FREE_15(list[k]);
+    }
+    FREE_15(list);
+    return;
+}
+
+
+void mne_free_sparse_named_matrix_15(mneSparseNamedMatrix mat)
+/*
+      * Free the matrix and all the data from within
+      */
+{
+    if (!mat)
+        return;
+    mne_free_name_list_15(mat->rowlist,mat->nrow);
+    mne_free_name_list_15(mat->collist,mat->ncol);
+    if(mat->data)
+        delete mat->data;
+    FREE_15(mat);
+    return;
+}
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINES
+// USED NAMESPACES
 //=============================================================================================================
 
-#if defined(BUILD_MNECPP_STATIC_LIB)
-#  define FWDSHARED_EXPORT
-#elif defined(FWD_LIBRARY)
-#  define FWDSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
-#else
-#  define FWDSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
-#endif
+using namespace Eigen;
+using namespace MNELIB;
 
-//#if defined(INVERSE_LIBRARY)
-//#  define FWDSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
-//#else
-//#  define FWDSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
-//#endif
 
-#endif // FWD_GLOBAL_H
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+MneDeriv::MneDeriv()
+: filename(NULL)
+, shortname(NULL)
+, deriv_data(NULL)
+, in_use(NULL)
+, valid(NULL)
+, chs(NULL)
+{
+
+}
+
+
+//*************************************************************************************************************
+
+MneDeriv::~MneDeriv()
+{
+    FREE_15(filename);
+    FREE_15(shortname);
+    mne_free_sparse_named_matrix_15(deriv_data);
+    FREE_15(in_use);
+    FREE_15(valid);
+    FREE_15(chs);
+}

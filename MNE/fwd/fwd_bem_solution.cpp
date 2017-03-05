@@ -1,10 +1,10 @@
 //=============================================================================================================
 /**
-* @file     fwd_global.h
+* @file     fwd_bem_solution.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2017
+* @date     January, 2017
 *
 * @section  LICENSE
 *
@@ -29,38 +29,82 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    forward library export/import macros.
+* @brief    Implementation of the FwdBemSolution Class.
 *
 */
-
-#ifndef FWD_GLOBAL_H
-#define FWD_GLOBAL_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include <QtCore/qglobal.h>
+#include "fwd_bem_solution.h"
+
+
+#define MALLOC_42(x,t) (t *)malloc((x)*sizeof(t))
+
+#define FREE_42(x) if ((char *)(x) != NULL) free((char *)(x))
+
+#define FREE_CMATRIX_42(m) mne_free_cmatrix_42((m))
+
+
+
+
+void mne_free_cmatrix_42(float **m)
+{
+    if (m) {
+        FREE_42(*m);
+        FREE_42(m);
+    }
+}
+
+
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINES
+// USED NAMESPACES
 //=============================================================================================================
 
-#if defined(BUILD_MNECPP_STATIC_LIB)
-#  define FWDSHARED_EXPORT
-#elif defined(FWD_LIBRARY)
-#  define FWDSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
-#else
-#  define FWDSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
-#endif
+using namespace Eigen;
+using namespace FWDLIB;
 
-//#if defined(INVERSE_LIBRARY)
-//#  define FWDSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
-//#else
-//#  define FWDSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
-//#endif
 
-#endif // FWD_GLOBAL_H
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+FwdBemSolution::FwdBemSolution()
+:solution(NULL)
+,ncoil(0)
+,np(0)
+{
+
+}
+
+
+//*************************************************************************************************************
+
+FwdBemSolution::~FwdBemSolution()
+{
+    FREE_CMATRIX_42(solution);
+}
+
+
+//*************************************************************************************************************
+
+void FwdBemSolution::fwd_bem_free_coil_solution(void *user)
+{
+    FwdBemSolution* sol = (FwdBemSolution*)user;
+
+    if (!sol)
+        return;
+
+//    FREE_CMATRIX_3(sol->solution);
+//    FREE_3(sol);
+
+    delete sol;
+
+    return;
+}

@@ -37,6 +37,7 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = lib
 
+QT       += concurrent
 QT       -= gui
 
 DEFINES += FWD_LIBRARY
@@ -99,12 +100,43 @@ else {
 
 SOURCES += \
     computeFwd/compute_fwd_settings.cpp \
-    computeFwd/compute_fwd.cpp
+    computeFwd/compute_fwd.cpp \
+    fwd_bem_model.cpp \
+    fwd_bem_solution.cpp \
+    fwd_coil.cpp \
+    fwd_coil_set.cpp \
+    fwd_comp_data.cpp \
+    fwd_eeg_sphere_layer.cpp \
+    fwd_eeg_sphere_model.cpp \
+    fwd_eeg_sphere_model_set.cpp \
+    fwd_thread_arg.cpp \
+    filter_thread_arg.cpp \
+    mne_nearest.cpp \
+    mne_patch_info.cpp \
+    mne_source_space_old.cpp \
+    mne_surface_old.cpp \
+    mne_surface_or_volume.cpp
 
 HEADERS +=\
     fwd_global.h \
     computeFwd/compute_fwd_settings.h \
-    computeFwd/compute_fwd.h
+    computeFwd/compute_fwd.h \
+    fwd_bem_model.h \
+    fwd_bem_solution.h \
+    fwd_coil.h \
+    fwd_coil_set.h \
+    fwd_comp_data.h \
+    fwd_eeg_sphere_layer.h \
+    fwd_eeg_sphere_model.h \
+    fwd_eeg_sphere_model_set.h \
+    fwd_thread_arg.h \
+    fwd_types.h \
+    filter_thread_arg.h \
+    mne_nearest.h \
+    mne_patch_info.h \
+    mne_source_space_old.h \
+    mne_surface_old.h \
+    mne_surface_or_volume.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
