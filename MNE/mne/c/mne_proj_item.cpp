@@ -1,10 +1,10 @@
 //=============================================================================================================
 /**
-* @file     fwd_global.h
+* @file     mne_proj_item.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2017
+* @date     January, 2017
 *
 * @section  LICENSE
 *
@@ -29,38 +29,92 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    forward library export/import macros.
+* @brief    Implementation of the MNEProjItem Class.
 *
 */
 
-#ifndef FWD_GLOBAL_H
-#define FWD_GLOBAL_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include <QtCore/qglobal.h>
+#include "mne_proj_item.h"
+#include "mne_types.h"
+
+
+
+#define FREE_21(x) if ((char *)(x) != NULL) free((char *)(x))
+
+#ifndef TRUE
+#define TRUE 1
+#endif
+
+#ifndef FALSE
+#define FALSE 0
+#endif
+
+
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINES
+// USED NAMESPACES
 //=============================================================================================================
 
-#if defined(BUILD_MNECPP_STATIC_LIB)
-#  define FWDSHARED_EXPORT
-#elif defined(FWD_LIBRARY)
-#  define FWDSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
-#else
-#  define FWDSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
-#endif
+using namespace Eigen;
+using namespace MNELIB;
 
-//#if defined(INVERSE_LIBRARY)
-//#  define FWDSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
-//#else
-//#  define FWDSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
-//#endif
 
-#endif // FWD_GLOBAL_H
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+MneProjItem::MneProjItem()
+: vecs (NULL)
+, kind (FIFFV_PROJ_ITEM_NONE)
+, desc (NULL)
+, nvec (0)
+, active (TRUE)
+, active_file (FALSE)
+, has_meg (FALSE)
+, has_eeg (FALSE)
+{
+
+}
+
+
+//*************************************************************************************************************
+
+MneProjItem::~MneProjItem()
+{
+    if(vecs)
+        delete vecs;
+    FREE_21(desc);
+    return;
+}
+
+
+//*************************************************************************************************************
+
+int MneProjItem::mne_proj_item_affect(MneProjItem *it, char **list, int nlist)
+/*
+    * Does this projection item affect this list of channels?
+    */
+{
+    int k,p,q;
+
+    if (it == NULL || it->vecs == NULL || it->nvec == 0)
+        return FALSE;
+
+    for (k = 0; k < nlist; k++)
+        for (p = 0; p < it->vecs->ncol; p++)
+            if (strcmp(it->vecs->collist[p],list[k]) == 0) {
+                for (q = 0; q < it->vecs->nrow; q++) {
+                    if (it->vecs->data[q][p] != 0.0)
+                        return TRUE;
+                }
+            }
+    return FALSE;
+}

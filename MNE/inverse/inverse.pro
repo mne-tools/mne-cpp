@@ -102,11 +102,6 @@ SOURCES += \
     dipoleFit/guess_data.cpp \
     dipoleFit/dipole_forward.cpp \
     dipoleFit/dipole_fit_data.cpp \
-    dipoleFit/fwd_eeg_sphere_layer.cpp \
-    dipoleFit/fwd_eeg_sphere_model.cpp \
-    dipoleFit/fwd_eeg_sphere_model_set.cpp \
-    dipoleFit/fwd_coil.cpp \
-    dipoleFit/fwd_coil_set.cpp \
     minimumNorm/minimumnorm.cpp \
     rapMusic/rapmusic.cpp \
     rapMusic/pwlrapmusic.cpp \
@@ -131,8 +126,6 @@ SOURCES += \
     dipoleFit/mne_raw_info.cpp \
     dipoleFit/mne_raw_buf_def.cpp \
     dipoleFit/mne_raw_data.cpp \
-    dipoleFit/fwd_bem_model.cpp \
-    dipoleFit/fwd_bem_solution.cpp \
     dipoleFit/mne_patch_info.cpp \
     dipoleFit/mne_inverse_operator.cpp \
     dipoleFit/mne_nearest.cpp \
@@ -140,9 +133,7 @@ SOURCES += \
     dipoleFit/mne_vol_geom.cpp \
     dipoleFit/mne_source_space_old.cpp \
     dipoleFit/mne_surface_old.cpp \
-    dipoleFit/fwd_comp_data.cpp \
-    dipoleFit/filter_thread_arg.cpp \
-    dipoleFit/fwd_thread_arg.cpp
+    dipoleFit/filter_thread_arg.cpp
 
 HEADERS +=\
     inverse_global.h \
@@ -150,16 +141,10 @@ HEADERS +=\
     dipoleFit/ecd.h \
     dipoleFit/ecd_set.h \
     dipoleFit/mne_types.h \
-    dipoleFit/fwd_types.h \
     dipoleFit/analyze_types.h \
     dipoleFit/guess_data.h \
     dipoleFit/dipole_forward.h \
     dipoleFit/dipole_fit_data.h \
-    dipoleFit/fwd_eeg_sphere_layer.h \
-    dipoleFit/fwd_eeg_sphere_model.h \
-    dipoleFit/fwd_eeg_sphere_model_set.h \
-    dipoleFit/fwd_coil.h \
-    dipoleFit/fwd_coil_set.h \
     minimumNorm/minimumnorm.h \
     rapMusic/rapmusic.h \
     rapMusic/pwlrapmusic.h \
@@ -184,8 +169,6 @@ HEADERS +=\
     dipoleFit/mne_raw_info.h \
     dipoleFit/mne_raw_buf_def.h \
     dipoleFit/mne_raw_data.h \
-    dipoleFit/fwd_bem_model.h \
-    dipoleFit/fwd_bem_solution.h \
     dipoleFit/mne_patch_info.h \
     dipoleFit/mne_inverse_operator.h \
     dipoleFit/mne_nearest.h \
@@ -193,9 +176,7 @@ HEADERS +=\
     dipoleFit/mne_vol_geom.h \
     dipoleFit/mne_source_space_old.h \
     dipoleFit/mne_surface_old.h \
-    dipoleFit/fwd_comp_data.h \
-    dipoleFit/filter_thread_arg.h \
-    dipoleFit/fwd_thread_arg.h
+    dipoleFit/filter_thread_arg.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

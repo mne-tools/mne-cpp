@@ -1,10 +1,10 @@
 //=============================================================================================================
 /**
-* @file     fwd_global.h
+* @file     mne_meas_data_set.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2017
+* @date     January, 2017
 *
 * @section  LICENSE
 *
@@ -29,38 +29,87 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    forward library export/import macros.
+* @brief    Implementation of the MNE Meas Data Set (MneMeasDataSet) Class.
 *
 */
 
-#ifndef FWD_GLOBAL_H
-#define FWD_GLOBAL_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include <QtCore/qglobal.h>
+#include "mne_meas_data_set.h"
+#include "mne_mne_data.h"
+
+#include <fiff/fiff_file.h>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINES
+// USED NAMESPACES
 //=============================================================================================================
 
-#if defined(BUILD_MNECPP_STATIC_LIB)
-#  define FWDSHARED_EXPORT
-#elif defined(FWD_LIBRARY)
-#  define FWDSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
-#else
-#  define FWDSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
-#endif
+using namespace Eigen;
+using namespace MNELIB;
+using namespace FIFFLIB;
 
-//#if defined(INVERSE_LIBRARY)
-//#  define FWDSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
-//#else
-//#  define FWDSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
-//#endif
 
-#endif // FWD_GLOBAL_H
+
+
+#define FREE_8(x) if ((char *)(x) != NULL) free((char *)(x))
+
+#define FREE_CMATRIX_8(m) mne_free_cmatrix_8((m))
+
+
+void mne_free_cmatrix_8 (float **m)
+{
+    if (m) {
+        FREE_8(*m);
+        FREE_8(m);
+    }
+}
+
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+MneMeasDataSet::MneMeasDataSet()
+:data(NULL)
+,data_filt(NULL)
+,data_proj(NULL)
+,data_white(NULL)
+,stim14(NULL)
+,first(0)
+,np(0)
+,nave(1)
+,kind(FIFFV_ASPECT_AVERAGE)
+,comment(NULL)
+,baselines(NULL)
+,mne(NULL)
+,user_data(NULL)
+,user_data_free(NULL)
+{
+
+}
+
+
+//*************************************************************************************************************
+
+MneMeasDataSet::~MneMeasDataSet()
+{
+    FREE_CMATRIX_8(data);
+    FREE_CMATRIX_8(data_proj);
+    FREE_CMATRIX_8(data_filt);
+    FREE_CMATRIX_8(data_white);
+    FREE_8(stim14);
+    FREE_8(comment);
+    FREE_8(baselines);
+    if(mne)
+        delete mne;
+    if (user_data && user_data_free)
+        user_data_free(user_data);
+}
