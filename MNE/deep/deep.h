@@ -49,8 +49,7 @@
 // CNTK INCLUDES
 //=============================================================================================================
 
-#include <Eval.h>
-//#include <CNTKLibrary.h>
+#include <CNTKLibrary.h>
 
 
 //*************************************************************************************************************
@@ -100,70 +99,11 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructor
-    *
-    * @param [in] sModelFilename    The model filename to set
-    */
-    Deep(const QString &sModelFilename);
-
-    //=========================================================================================================
-    /**
     * Destructs Deep
     */
     virtual ~Deep();
 
-    //=========================================================================================================
-    /**
-    * Returns the current set model file name
-    *
-    * @return the current model file name
-    */
-    const QString& getModelFilename() const;
-
-    //=========================================================================================================
-    /**
-    * Set the model filename
-    *
-    * @param [in] sModelFilename    The model filename to set
-    */
-    void setModelFilename(const QString &sModelFilename);
-
-    //=========================================================================================================
-    /**
-    * Evaluate the MNE Deep Model set by the model file name
-    *
-    * @return true when MNE Deep model was sucessfully evaluated.
-    */
-    bool evalModel(std::vector<float>& inputs, std::vector<float>& outputs);
-
-    //=========================================================================================================
-    /**
-    * Loads the Deep Model set by the model file name
-    *
-    * @return true when MNE Deep model was sucessfully loaded.
-    */
-    bool loadModel();
-
-    //=========================================================================================================
-    /**
-    * Returns the Input Dimensions
-    *
-    * @return the Input dimensions
-    */
-    size_t inputDimensions();
-
-    //=========================================================================================================
-    /**
-    * Returns the Output Dimensions
-    *
-    * @return the Output dimensions
-    */
-    size_t outputDimensions();
-
 private:
-    QString m_sModelFilename;                               /**< Model filename */
-
-    Microsoft::MSR::CNTK::IEvaluateModel<float>* m_model;   /**< The loaded model */
 
 };
 

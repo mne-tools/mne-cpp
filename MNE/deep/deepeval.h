@@ -54,6 +54,14 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
@@ -118,7 +126,21 @@ public:
 
     //=========================================================================================================
     /**
-    * Evaluate the MNE Deep Model set by the model file name
+    * Evaluate the MNE Deep Model specified by the model file name
+    *
+    * @param [in] inputs    The input vector
+    * @param [in] outputs   The ouptut vector
+    *
+    * @return true when MNE Deep model was sucessfully evaluated.
+    */
+    bool evalModel(const Eigen::VectorXf& inputs, Eigen::VectorXf& outputs);
+
+    //=========================================================================================================
+    /**
+    * Evaluate the MNE Deep Model specified by the model file name
+    *
+    * @param [in] inputs    The input vector
+    * @param [in] outputs   The ouptut vector
     *
     * @return true when MNE Deep model was sucessfully evaluated.
     */
