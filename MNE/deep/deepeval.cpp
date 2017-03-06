@@ -40,6 +40,12 @@
 
 #include "deepeval.h"
 
+
+//*************************************************************************************************************
+//=============================================================================================================
+// SYSTEM INCLUDES
+//=============================================================================================================
+
 #ifdef _WIN32
 #include <Windows.h>
 #endif
@@ -47,14 +53,7 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// STL INCLUDES
-//=============================================================================================================
-
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Qt INCLUDES
+// QT INCLUDES
 //=============================================================================================================
 
 #include <QFile>
@@ -84,7 +83,7 @@ typedef std::map<std::wstring, std::vector<float>*> Layer;
 //=============================================================================================================
 
 DeepEval::DeepEval()
-: m_model(NULL)
+: m_pModel(NULL)
 {
 }
 
@@ -93,7 +92,7 @@ DeepEval::DeepEval()
 
 DeepEval::DeepEval(const QString &sModelFilename)
 : m_sModelFilename(sModelFilename)
-, m_model(NULL)
+, m_pModel(NULL)
 {
     loadModel();
 }
@@ -127,14 +126,14 @@ void DeepEval::setModelFilename(const QString &sModelFilename)
 
 bool DeepEval::evalModel(std::vector<float>& inputs, std::vector<float>& outputs)
 {
-    if( !m_model )
+    if( !m_pModel )
         return false;
 
     // get the model's layers dimensions
     std::map<std::wstring, size_t> inDims;
     std::map<std::wstring, size_t> outDims;
-    m_model->GetNodeDimensions(inDims, NodeGroup::nodeInput);
-    m_model->GetNodeDimensions(outDims, NodeGroup::nodeOutput);
+    m_pModel->GetNodeDimensions(inDims, NodeGroup::nodeInput);
+    m_pModel->GetNodeDimensions(outDims, NodeGroup::nodeOutput);
 
     std::wstring inputLayerName = inDims.begin()->first;
     std::wstring outputLayerName = outDims.begin()->first;
@@ -151,7 +150,7 @@ bool DeepEval::evalModel(std::vector<float>& inputs, std::vector<float>& outputs
     outputLayer.insert(MapEntry(outputLayerName, &outputs));
 
     // We can call the evaluate method and get back the results (single layer)...
-    m_model->Evaluate(inputLayer, outputLayer);
+    m_pModel->Evaluate(inputLayer, outputLayer);
 
     // This pattern is used by End2EndTests to check whether the program runs to complete.
     fprintf(stderr, "Evaluation complete.\n");
@@ -174,7 +173,7 @@ bool DeepEval::loadModel()
 
     const std::string modelFile = m_sModelFilename.toUtf8().constData();
 
-    GetEvalF(&m_model);
+    GetEvalF(&m_pModel);
 
     // Load model with desired outputs
     std::string networkConfiguration;
@@ -183,7 +182,7 @@ bool DeepEval::loadModel()
     // with the ones specified.
     //networkConfiguration += "outputNodeNames=\"h1.z:ol.z\"\n";
     networkConfiguration += "modelPath=\"" + modelFile + "\"";
-    m_model->CreateNetwork(networkConfiguration);
+    m_pModel->CreateNetwork(networkConfiguration);
 
     return true;
 }
@@ -193,9 +192,9 @@ bool DeepEval::loadModel()
 
 size_t DeepEval::inputDimensions()
 {
-    if(m_model) {
+    if(m_pModel) {
         std::map<std::wstring, size_t> inDims;
-        m_model->GetNodeDimensions(inDims, NodeGroup::nodeInput);
+        m_pModel->GetNodeDimensions(inDims, NodeGroup::nodeInput);
         std::wstring inputLayerName = inDims.begin()->first;
         return inDims[inputLayerName];
     }
@@ -207,9 +206,9 @@ size_t DeepEval::inputDimensions()
 
 size_t DeepEval::outputDimensions()
 {
-    if(m_model) {
+    if(m_pModel) {
         std::map<std::wstring, size_t> outDims;
-        m_model->GetNodeDimensions(outDims, NodeGroup::nodeOutput);
+        m_pModel->GetNodeDimensions(outDims, NodeGroup::nodeOutput);
         std::wstring outputLayerName = outDims.begin()->first;
         return outDims[outputLayerName];
     }
