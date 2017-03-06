@@ -94,10 +94,9 @@ int main(int argc, char *argv[])
     DipoleFit dipFit(&settings);
     ECDSet set = dipFit.calculateFit();
 
-    ECDView ecdViewer;
+    ECDView ecdViewer(settings, set);
     if(settings.gui) {
-        ecdViewer = ECDECDView(settings, set);
-        ecdViewer->show();
+        ecdViewer.show();
     }
 
     /*
