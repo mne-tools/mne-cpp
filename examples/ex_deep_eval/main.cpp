@@ -38,9 +38,11 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <QLabel>
 #include <QChart>
 #include <QChartView>
-#include <QLineSeries>
+#include <QScatterSeries>
+#include <QCategoryAxis>
 
 #include <deep/deepeval.h>
 
@@ -98,7 +100,6 @@ int main(int argc, char *argv[])
     for (int i = 0; i < deepTest.inputDimensions(); i++) {
         inputs.push_back(static_cast<float>(i % 255));
     }
-
     deepTest.evalModel(inputs, outputs);
 
     //
@@ -111,16 +112,33 @@ int main(int argc, char *argv[])
     //
     // Visualize
     //
-    QLineSeries *series = new QLineSeries();
+
+    // Input
+    QImage inputImage(28,28,QImage::Format_RGB32);
+    for (int i = 0; i < inputs.size(); i++) {
+        int gray = inputs[i];
+        inputImage.setPixelColor(i/28, i%28, QColor(gray,gray,gray));
+    }
+    QLabel inputView; inputView.setPixmap(QPixmap::fromImage(inputImage));
+    inputView.show();
+
+    // Output
+    QScatterSeries *series = new QScatterSeries();
+    QCategoryAxis *axisX = new QCategoryAxis();
+    series->setMarkerShape(QScatterSeries::MarkerShapeCircle);
     for (int i = 0; i < outputs.size(); i++) {
+        axisX->append(QString("%1").arg(i), i);
         series->append(i,outputs[i]);
     }
+    axisX->setRange(0, 9);
+    axisX->setLabelsPosition(QCategoryAxis::AxisLabelsPositionOnValue);
 
     QChart *chart = new QChart();
     chart->legend()->hide();
     chart->addSeries(series);
     chart->createDefaultAxes();
-    chart->setTitle("Number Likelyhood");
+    chart->setTitle("Likelyhoods for Number [0-9]");
+    chart->setAxisX(axisX);
 
     QChartView *chartView = new QChartView(chart);
     chartView->setRenderHint(QPainter::Antialiasing);
