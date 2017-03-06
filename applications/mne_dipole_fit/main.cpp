@@ -44,10 +44,7 @@
 
 #include <mne/mne_bem.h>
 
-#include <disp3D/view3D.h>
-#include <disp3D/control/control3dwidget.h>
-#include <disp3D/model/items/sourceactivity/ecddatatreeitem.h>
-#include <disp3D/model/data3Dtreemodel.h>
+#include <disp3D/adapters/ecdview.h>
 
 #include <fs/label.h>
 #include <fs/surfaceset.h>
@@ -96,6 +93,7 @@ int main(int argc, char *argv[])
     DipoleFitSettings settings(&argc,argv);
     DipoleFit dipFit(&settings);
     ECDSet set = dipFit.calculateFit();
+    ECDView ecdViewer(settings, set);
 
     /*
     * Saving...
@@ -111,76 +109,78 @@ int main(int argc, char *argv[])
     ECDSet::read_dipoles_dip(settings.dipname);
 
 
-    //=========================================================================================================
-    // Visualization Part
-    //=========================================================================================================
-    View3D::SPtr testWindow;
-    Data3DTreeModel::SPtr p3DDataModel;
-    Control3DWidget::SPtr control3DWidget;
+//    qDebug() << "settings.bemname" << settings.bemname;
 
-    if( settings.gui ) {
-        /*
-        * Perform Head->MRI coord. transformation
-        */
-        QFile file("./MNE-sample-data/MEG/sample/sample_audvis_raw-trans.fif");
-        FiffCoordTrans coordTrans(file);
+//    //=========================================================================================================
+//    // Visualization Part
+//    //=========================================================================================================
+//    View3D::SPtr testWindow;
+//    Data3DTreeModel::SPtr p3DDataModel;
+//    Control3DWidget::SPtr control3DWidget;
 
-        std::cout << std::endl << "coordTrans" << coordTrans.trans;
-        std::cout << std::endl << "coordTransInv" << coordTrans.invtrans;
+//    if( settings.gui ) {
+//        /*
+//        * Perform Head->MRI coord. transformation
+//        */
+//        QFile file("./MNE-sample-data/MEG/sample/sample_audvis_raw-trans.fif");
+//        FiffCoordTrans coordTrans(file);
 
-        for(int i = 0; i < set.size() ; ++i) {
-            MatrixX3f dipoles(1, 3);
-            //transform location
-            dipoles(0,0) = set[i].rd(0);
-            dipoles(0,1) = set[i].rd(1);
-            dipoles(0,2) = set[i].rd(2);
+//        std::cout << std::endl << "coordTrans" << coordTrans.trans;
+//        std::cout << std::endl << "coordTransInv" << coordTrans.invtrans;
 
-            dipoles = coordTrans.apply_trans(dipoles);
+//        for(int i = 0; i < set.size() ; ++i) {
+//            MatrixX3f dipoles(1, 3);
+//            //transform location
+//            dipoles(0,0) = set[i].rd(0);
+//            dipoles(0,1) = set[i].rd(1);
+//            dipoles(0,2) = set[i].rd(2);
 
-            set[i].rd(0) = dipoles(0,0);
-            set[i].rd(1) = dipoles(0,1);
-            set[i].rd(2) = dipoles(0,2);
+//            dipoles = coordTrans.apply_trans(dipoles);
 
-            //transform orientation
-            dipoles(0,0) = set[i].Q(0);
-            dipoles(0,1) = set[i].Q(1);
-            dipoles(0,2) = set[i].Q(2);
+//            set[i].rd(0) = dipoles(0,0);
+//            set[i].rd(1) = dipoles(0,1);
+//            set[i].rd(2) = dipoles(0,2);
 
-            dipoles = coordTrans.apply_trans(dipoles);
+//            //transform orientation
+//            dipoles(0,0) = set[i].Q(0);
+//            dipoles(0,1) = set[i].Q(1);
+//            dipoles(0,2) = set[i].Q(2);
 
-            set[i].Q(0) = dipoles(0,0);
-            set[i].Q(1) = dipoles(0,1);
-            set[i].Q(2) = dipoles(0,2);
-        }
+//            dipoles = coordTrans.apply_trans(dipoles);
 
-        /*
-        * Visualize the dipoles
-        */
-        //Load FS set
-        SurfaceSet tSurfSet ("sample", 2, "orig", "./MNE-sample-data/subjects");
-        AnnotationSet tAnnotSet ("sample", 2, "orig", "./MNE-sample-data/subjects");
+//            set[i].Q(0) = dipoles(0,0);
+//            set[i].Q(1) = dipoles(0,1);
+//            set[i].Q(2) = dipoles(0,2);
+//        }
 
-        //Read and show BEM
-        QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif");
-        MNEBem t_Bem(t_fileBem);
+//        /*
+//        * Visualize the dipoles
+//        */
+//        //Load FS set
+//        SurfaceSet tSurfSet ("sample", 2, "orig", "./MNE-sample-data/subjects");
+//        AnnotationSet tAnnotSet ("sample", 2, "orig", "./MNE-sample-data/subjects");
 
-        //Create 3D data model and add data to model
-        p3DDataModel = Data3DTreeModel::SPtr(new Data3DTreeModel());
+//        //Read and show BEM
+//        QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif");
+//        MNEBem t_Bem(t_fileBem);
 
-        ECDSet::SPtr pSet = ECDSet::SPtr(new ECDSet(set));
-        p3DDataModel->addBemData("sample", "BEM", t_Bem);
-        p3DDataModel->addSurfaceSet("sample", "MRI", tSurfSet, tAnnotSet);
-        p3DDataModel->addDipoleFitData("sample", "Dipole test", pSet);
+//        //Create 3D data model and add data to model
+//        p3DDataModel = Data3DTreeModel::SPtr(new Data3DTreeModel());
 
-        //Create the 3D view
-        testWindow = View3D::SPtr(new View3D());
-        testWindow->setModel(p3DDataModel);
-        testWindow->show();
+//        ECDSet::SPtr pSet = ECDSet::SPtr(new ECDSet(set));
+//        p3DDataModel->addBemData("sample", "BEM", t_Bem);
+//        p3DDataModel->addSurfaceSet("sample", "MRI", tSurfSet, tAnnotSet);
+//        p3DDataModel->addDipoleFitData("sample", "Dipole test", pSet);
 
-        control3DWidget = Control3DWidget::SPtr(new Control3DWidget());
-        control3DWidget->init(p3DDataModel, testWindow);
-        control3DWidget->show();
-    }
+//        //Create the 3D view
+//        testWindow = View3D::SPtr(new View3D());
+//        testWindow->setModel(p3DDataModel);
+//        testWindow->show();
+
+//        control3DWidget = Control3DWidget::SPtr(new Control3DWidget());
+//        control3DWidget->init(p3DDataModel, testWindow);
+//        control3DWidget->show();
+//    }
 
     return app.exec();
 }
