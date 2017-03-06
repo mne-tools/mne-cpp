@@ -276,7 +276,7 @@ EcdDataTreeItem* MeasurementTreeItem::addData(INVERSELIB::ECDSet::SPtr &pECDSet,
     if(pECDSet->size() > 0) {
         //Add source estimation data as child
         if(this->findChildren(Data3DTreeModelItemTypes::ECDSetDataItem).size() == 0) {
-            //If rt data item does not exists yet, create it here!
+            //If ecd data item does not exists yet, create it here!
             m_EcdDataTreeItem = new EcdDataTreeItem();
 
             QList<QStandardItem*> list;

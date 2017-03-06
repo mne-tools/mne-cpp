@@ -91,9 +91,12 @@ using namespace DISP3DLIB;
 EcdDataTreeItem::EcdDataTreeItem(int iType, const QString &text)
 : AbstractTreeItem(iType, text)
 , m_bIsInit(false)
+, m_pRenderable3DEntity(new Renderable3DEntity())
 {
     this->setEditable(false);
-    this->setToolTip("Dipole fit source localization data");
+    this->setCheckable(true);
+    this->setCheckState(Qt::Checked);
+    this->setToolTip("Dipole fit data");
 }
 
 
@@ -133,7 +136,7 @@ void EcdDataTreeItem::setData(const QVariant& value, int role)
 bool EcdDataTreeItem::init(Qt3DCore::QEntity* parent)
 {      
     //Create renderable 3D entity
-    m_pRenderable3DEntity = new Renderable3DEntity(parent);
+    m_pRenderable3DEntity->setParent(parent);
 
     //Add meta information as item children
     QList<QStandardItem*> list;
@@ -150,9 +153,18 @@ bool EcdDataTreeItem::init(Qt3DCore::QEntity* parent)
 bool EcdDataTreeItem::addData(ECDSet::SPtr pECDSet)
 {
     if(!m_bIsInit) {
-        qDebug() << "NetworkTreeItem::updateData - NetworkTreeItem has not been initialized yet!";
+        qDebug() << "EcdDataTreeItem::addData - EcdDataTreeItem has not been initialized yet!";
         return false;
     }
+
+    //Add further infos as children
+    QList<QStandardItem*> list;
+    MetaTreeItem *pItemNumDipoles = new MetaTreeItem(MetaTreeItemTypes::NumberAverages, QString::number(pECDSet->size()));
+    pItemNumDipoles->setEditable(false);
+    list.clear();
+    list << pItemNumDipoles;
+    list << new QStandardItem(pItemNumDipoles->toolTip());
+    this->appendRow(list);
 
     //Add data which is held by this NetworkTreeItem
     QVariant data;
