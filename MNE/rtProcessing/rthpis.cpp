@@ -481,7 +481,11 @@ RtHPIS::~RtHPIS()
 
 //*************************************************************************************************************
 
-void RtHPIS::singleHPIFit(const MatrixXd& t_mat, FiffCoordTrans& transDevHead, const QVector<int>& vFreqs, QVector<double>& vGof, FiffDigPointSet& fittedPointSet)
+void RtHPIS::singleHPIFit(const MatrixXd& t_mat,
+                          FiffCoordTrans& transDevHead,
+                          const QVector<int>& vFreqs,
+                          QVector<double>& vGof,
+                          FiffDigPointSet& fittedPointSet)
 {
     vGof.clear();
 
