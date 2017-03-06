@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     main.cpp
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     ecdview.h
+* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     December, 2016
+* @date     March, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) 2016, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,89 +29,93 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implements the mne_dipole_fit application.
+* @brief    ECDView class declaration.
 *
 */
 
+#ifndef ECDVIEW_H
+#define ECDVIEW_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include <inverse/dipoleFit/dipole_fit_settings.h>
-#include <inverse/dipoleFit/dipole_fit.h>
-
-#include <mne/mne_bem.h>
-
-#include <disp3D/adapters/ecdview.h>
-
-#include <fs/label.h>
-#include <fs/surfaceset.h>
-#include <fs/annotationset.h>
-
-#include <iostream>
+#include "../disp3D_global.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// QT INCLUDES
 //=============================================================================================================
 
-#include <QApplication>
+#include <QSharedPointer>
+#include <QWidget>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// FORWARD DECLARATIONS
 //=============================================================================================================
 
-using namespace INVERSELIB;
-using namespace DISP3DLIB;
-using namespace FSLIB;
-using namespace MNELIB;
+namespace INVERSELIB {
+    class DipoleFitSettings;
+    class ECDSet;
+}
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// MAIN
+// DEFINE NAMESPACE DISP3DLIB
 //=============================================================================================================
+
+namespace DISP3DLIB
+{
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+class View3D;
+class Control3DWidget;
+class Data3DTreeModel;
+
 
 //=============================================================================================================
 /**
-* The function main marks the entry point of the mne_dipole_fit application.
-* By default, main has the storage class extern.
+* Adapter which provides visualization for ECD data and a control widget.
 *
-* @param [in] argc  (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
-* @param [in] argv  (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
-* @return the value that was set to exit() (which is 0 if exit() is called via quit()).
+* @brief Visualizes ECD data.
 */
-int main(int argc, char *argv[])
+class DISP3DNEWSHARED_EXPORT ECDView : public QWidget
 {
-    QApplication app(argc, argv);
+    Q_OBJECT
 
-    DipoleFitSettings settings(&argc,argv);
-    DipoleFit dipFit(&settings);
-    ECDSet set = dipFit.calculateFit();
+public:
+    typedef QSharedPointer<ECDView> SPtr;             /**< Shared pointer type for ECDView class. */
+    typedef QSharedPointer<const ECDView> ConstSPtr;  /**< Const shared pointer type for ECDView class. */
 
-    ECDView::SPtr pEcdViewer;
-    if(settings.gui) {
-        pEcdViewer = ECDView::SPtr(new ECDView(settings, set));
-        pEcdViewer->show();
-    }
-
-    /*
-    * Saving...
+    //=========================================================================================================
+    /**
+    * Default constructor
+    *
     */
-    if (!set.save_dipoles_dip(settings.dipname))
-        printf("Dipoles could not be safed to %s.",settings.dipname.toLatin1().data());
-    if (!set.save_dipoles_bdip(settings.bdipname))
-        printf("Dipoles could not be safed to %s.",settings.bdipname.toLatin1().data());
+    explicit ECDView(const INVERSELIB::DipoleFitSettings& dipFitSettings, const INVERSELIB::ECDSet& ecdSet, QWidget *parent = 0);
 
-    /*
-    * Test - Reading again
+    //=========================================================================================================
+    /**
+    * Default destructor
     */
-    ECDSet::read_dipoles_dip(settings.dipname);
+    ~ECDView();
 
-    return app.exec();
-}
+protected:
+    QSharedPointer<DISP3DLIB::View3D>                   m_p3DView;          /**< The Disp3D view. */
+    QSharedPointer<DISP3DLIB::Control3DWidget>          m_pControl3DView;   /**< The Disp3D control. */
+    QSharedPointer<DISP3DLIB::Data3DTreeModel>          m_pData3DModel;     /**< The Disp3D model. */
+};
+
+} // NAMESPACE
+
+#endif // ECDVIEW_H
