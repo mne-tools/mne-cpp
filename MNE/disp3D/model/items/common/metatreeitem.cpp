@@ -154,6 +154,9 @@ MetaTreeItem::MetaTreeItem(int iType, const QString& text)
         case MetaTreeItemTypes::NetworkMatrix:
             sToolTip = "The network distance matrix";
             break;
+        case MetaTreeItemTypes::NumberDipoles:
+            sToolTip = "The number of dipoles";
+            break;
         default: // do nothing;
             break;
     }
