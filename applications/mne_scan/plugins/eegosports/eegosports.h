@@ -42,43 +42,46 @@
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
-#include <iostream>
-#include <fstream>
-#include <direct.h>
 
 #include "eegosports_global.h"
-
-#include <scShared/Interfaces/ISensor.h>
-#include <generics/circularmatrixbuffer.h>
-#include <scMeas/newrealtimemultisamplearray.h>
-
-#include <utils/layoutloader.h>
-#include <utils/layoutmaker.h>
-
-#include <unsupported/Eigen/FFT>
-#include <Eigen/Geometry>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// QT STL INCLUDES
-//=============================================================================================================
-
-#include <QtWidgets>
-#include <QVector>
-#include <QTime>
-#include <QtConcurrent/QtConcurrent>
 
 #include "FormFiles/eegosportssetupwidget.h"
 #include "FormFiles/eegosportssetupprojectwidget.h"
 
+#include <scShared/Interfaces/ISensor.h>
+#include <generics/circularmatrixbuffer.h>
+#include <fstream>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FIFF INCLUDES
+// EIGEN INCLUDES
 //=============================================================================================================
 
-#include <fiff/fiff.h>
+#include <Eigen/Core>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QFile>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+namespace SCMEASLIB {
+    class NewRealTimeMultiSampleArray;
+}
+
+namespace FIFFLIB {
+    class FiffStream;
+    class FiffInfo;
+}
 
 
 //*************************************************************************************************************
@@ -89,19 +92,11 @@
 namespace EEGOSPORTSPLUGIN
 {
 
+typedef unsigned long DWORD;
 
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace SCSHAREDLIB;
-using namespace SCMEASLIB;
-using namespace IOBUFFER;
-using namespace FIFFLIB;
-using namespace std;
-using namespace UTILSLIB;
-using namespace Eigen;
+#ifndef M_PI
+#define M_PI    3.14159265358979323846f
+#endif
 
 
 //*************************************************************************************************************
@@ -109,16 +104,14 @@ using namespace Eigen;
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class EEGoSportsProducer;
-
 
 //=============================================================================================================
 /**
-* EEGoSports...
+* EEGoSports.
 *
-* @brief The EEGoSports class provides a EEG connector. In order for this plugin to work properly the driver dll "RTINST.dll" must be installed in the system directory. This dll is automatically copied in the system directory during the driver installtion of the TMSi Refa device.
+* @brief The EEGoSports class provides an EEG connector.
 */
-class EEGOSPORTSSHARED_EXPORT EEGoSports : public ISensor
+class EEGOSPORTSSHARED_EXPORT EEGoSports : public SCSHAREDLIB::ISensor
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "eegosports.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
@@ -127,10 +120,7 @@ class EEGOSPORTSSHARED_EXPORT EEGoSports : public ISensor
 
     friend class EEGoSportsProducer;
     friend class EEGoSportsSetupWidget;
-    friend class EEGoSportsImpedanceWidget;
     friend class EEGoSportsSetupProjectWidget;
-    friend class EEGoSportsSetupStimulusWidget;
-    friend class ssvepBCISetupStimulusWidget;
 
 public:
     //=========================================================================================================
@@ -171,13 +161,13 @@ public:
 
     //=========================================================================================================
     /**
-    * Starts the EEGoSports by starting the tmsi's thread.
+    * Starts the EEGoSports by starting the thread.
     */
     virtual bool start();
 
     //=========================================================================================================
     /**
-    * Stops the EEGoSports by stopping the tmsi's thread.
+    * Stops the EEGoSports by stopping the thread.
     */
     virtual bool stop();
 
@@ -185,7 +175,7 @@ public:
     /**
     * Set/Add received samples to a QList.
     */
-    void setSampleData(MatrixXd &matRawBuffer);
+    void setSampleData(Eigen::MatrixXd &matRawBuffer);
 
     virtual IPlugin::PluginType getType() const;
     virtual QString getName() const;
@@ -207,14 +197,6 @@ protected slots:
     void onUpdateCardinalPoints(const QString& sLPA, double dLPA, const QString& sRPA, double dRPA, const QString& sNasion, double dNasion);
 
 protected:
-    //=========================================================================================================
-    /**
-    * The starting point for the thread. After calling start(), the newly created thread calls this function.
-    * Returning from this method will end the execution of the thread.
-    * Pure virtual method inherited by QThread.
-    */
-    virtual void run();
-
     //=========================================================================================================
     /**
     * Opens a dialog to setup the project to check the impedance values
@@ -239,11 +221,17 @@ protected:
     */
     bool dirExists(const std::string& dirName_in);
 
+    //=========================================================================================================
+    /**
+    * The starting point for the thread. After calling start(), the newly created thread calls this function.
+    * Returning from this method will end the execution of the thread.
+    * Pure virtual method inherited by QThread.
+    */
+    virtual void run();
+
 private:
-    PluginOutputData<NewRealTimeMultiSampleArray>::SPtr m_pRMTSA_EEGoSports;      /**< The RealTimeSampleArray to provide the EEG data.*/
-    QSharedPointer<EEGoSportsSetupProjectWidget> m_pEEGoSportsSetupProjectWidget; /**< Widget for checking the impedances*/
-    QSharedPointer<EEGoSportsSetupStimulusWidget> m_pEEGoSportsSetupTimeStimulusWidget;     /**< Widget for time stimulus setup */
-    QSharedPointer<ssvepBCISetupStimulusWidget> m_pEEGoSportsSetupFrameStimulusWidget;    /**< Widget for frame stimulus setup */
+    SCSHAREDLIB::PluginOutputData<SCMEASLIB::NewRealTimeMultiSampleArray>::SPtr m_pRMTSA_EEGoSports;                    /**< The RealTimeSampleArray to provide the EEG data.*/
+    QSharedPointer<EEGoSportsSetupProjectWidget>                                m_pEEGoSportsSetupProjectWidget;        /**< Widget for checking the impedances*/
 
     QString                             m_qStringResourcePath;              /**< The path to the EEG resource directory.*/
 
@@ -262,7 +250,7 @@ private:
     bool                                m_bUseTrackedCardinalMode;          /**< Flag for using the tracked cardinal mode.*/
     bool                                m_bUseElectrodeShiftMode;           /**< Flag for using the electrode shift mode.*/
 
-    ofstream                            m_outputFileStream;                 /**< fstream for writing the samples values to txt file.*/
+    std::ofstream                       m_outputFileStream;                 /**< fstream for writing the samples values to txt file.*/
 
     QString                             m_sOutputFilePath;                  /**< Holds the path for the sample output file. Defined by the user via the GUI.*/
     QString                             m_sElcFilePath;                     /**< Holds the path for the .elc file (electrode positions). Defined by the user via the GUI.*/
@@ -272,26 +260,21 @@ private:
     QString                             m_sNasion;                          /**< The electrode to take to function as the Nasion.*/
 
     QFile                               m_fileOut;                          /**< QFile for writing to fif file.*/
-    FiffStream::SPtr                    m_pOutfid;                          /**< QFile for writing to fif file.*/
-    QSharedPointer<FiffInfo>            m_pFiffInfo;                        /**< Fiff measurement info.*/
-    RowVectorXd                         m_cals;
+    QSharedPointer<FIFFLIB::FiffStream> m_pOutfid;                          /**< QFile for writing to fif file.*/
+    QSharedPointer<FIFFLIB::FiffInfo>   m_pFiffInfo;                        /**< Fiff measurement info.*/
+    Eigen::RowVectorXd                  m_cals;
 
-    QSharedPointer<RawMatrixBuffer>     m_pRawMatrixBuffer_In;              /**< Holds incoming raw data.*/
+    QSharedPointer<EEGoSportsProducer>  m_pEEGoSportsProducer;              /**< The EEGoSportsProducer.*/
 
-    QSharedPointer<EEGoSportsProducer>  m_pEEGoSportsProducer;              /**< the EEGoSportsProducer.*/
+    QMutex                              m_mutex;                            /**< Holds the threads mutex.*/
 
-    QMutex                              m_qMutex;                           /**< Holds the threads mutex.*/
+    QAction*                            m_pActionSetupProject;              /**< Shows setup project dialog */
+    QAction*                            m_pActionStartRecording;            /**< Starts to record data */
 
-    QAction*                            m_pActionSetupProject;              /**< shows setup project dialog */
-    QAction*                            m_pActionStartRecording;            /**< starts to record data */
-    QAction*                            m_pActionSetupStimulus;             /**< starts stimulus feature */
+    QSharedPointer<QTimer>              m_pTimerRecordingChange;            /**< Timer to control blinking of the recording icon */
+    qint16                              m_iBlinkStatus;                     /**< Flag for recording icon blinking */
 
-    QSharedPointer<QTimer>              m_pTimerRecordingChange;            /**< timer to control blinking of the recording icon */
-    qint16                              m_iBlinkStatus;                     /**< flag for recording icon blinking */
-
-    QList<MatrixXd>                     m_qListReceivedSamples;             /**< list with alle the received samples in form of differentley sized matrices. */
-
-    QMutex                              m_mutex;
+    QList<Eigen::MatrixXd>              m_qListReceivedSamples;             /**< List with alle the received samples in form of differentley sized matrices. */
 
 };
 

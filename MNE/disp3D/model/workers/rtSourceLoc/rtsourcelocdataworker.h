@@ -60,6 +60,8 @@
 // Eigen INCLUDES
 //=============================================================================================================
 
+#include <Eigen/SparseCore>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -92,6 +94,38 @@ class DISP3DNEWSHARED_EXPORT RtSourceLocDataWorker : public QThread
 {
     Q_OBJECT
 public:
+    struct SmoothOperatorInfo {
+        VectorXi                vecVertNo;
+        SparseMatrix<double>    sparseSmoothMatrix;
+        MatrixX3f               matVertPos;
+        int                     iDistPow;
+        double                  dThresholdDistance;
+    };
+
+
+    struct SmoothVertexInfo {
+        int                                 iVertIdx;
+        QList<Eigen::Triplet<double> >      lTriplets;
+        QList<QVector3D>                    lSourcePos;
+        QVector3D                           vVertPos;
+        int                                 iDistPow;
+        double                              dThresholdDistance;
+    };
+
+    struct VisualizationInfo {
+        VectorXd                    vSourceColorSamples;
+        VectorXi                    vVertNo;
+        QList<FSLIB::Label>         lLabels;
+        QMap<qint32, qint32>        mapLabelIdSources;
+        QMap<int, QVector<int> >    mapVertexNeighbors;
+        SparseMatrix<double>        matWDistSmooth;
+        double                      dThresholdX;
+        double                      dThresholdZ;
+        QRgb (*functionHandlerColorMap)(double v);
+        QByteArray                  arrayOriginalVertColor;
+        QByteArray                  arrayFinalVertColor;
+    };
+
     typedef QSharedPointer<RtSourceLocDataWorker> SPtr;            /**< Shared pointer type for RtSourceLocDataWorker class. */
     typedef QSharedPointer<const RtSourceLocDataWorker> ConstSPtr; /**< Const shared pointer type for RtSourceLocDataWorker class. */
 
@@ -125,17 +159,31 @@ public:
 
     //=========================================================================================================
     /**
-    * Set surface data which the streamed data is plotted on.
+    * Set surface data.
+    *
+    * @param[in] vecVertNoLeftHemi                  The vertex indexes for the left hemipshere.
+    * @param[in] vecVertNoRightHemi                 The vertex indexes for the right hemipshere.
+    * @param[in] mapVertexNeighborsLeftHemi         The neighbor vertices for the left hemisphere.
+    * @param[in] mapVertexNeighborsRightHemi        The neighbor vertices for the right hemisphere.
+    * @param[in] matVertPosLeftHemi                 The surface vertices in 3D space for the left hemisphere.
+    * @param[in] matVertPosRightHemi                The surface vertices in 3D space for the right hemisphere.
+    */
+    void setSurfaceData(const Eigen::VectorXi& vecVertNoLeftHemi,
+                        const Eigen::VectorXi& vecVertNoRightHemi,
+                        const QMap<int, QVector<int> >& mapVertexNeighborsLeftHemi,
+                        const QMap<int, QVector<int> >& mapVertexNeighborsRightHemi,
+                        const MatrixX3f& matVertPosLeftHemi,
+                        const MatrixX3f& matVertPosRightHemi);
+
+    //=========================================================================================================
+    /**
+    * Set surface color data which the streamed data is plotted on.
     *
     * @param[in] arraySurfaceVertColorLeftHemi      The vertex colors for the left hemipshere surface where the data is to be plotted on.
     * @param[in] arraySurfaceVertColorRightHemi     The vertex colors for the right hemipshere surface where the data is to be plotted on.
-    * @param[in] vecVertNoLeftHemi                  The vertex indexes for the left hemipshere.
-    * @param[in] vecVertNoRightHemi                 The vertex indexes for the right hemipshere.
     */
-    void setSurfaceData(const QByteArray& arraySurfaceVertColorLeftHemi,
-                        const QByteArray& arraySurfaceVertColorRightHemi,
-                        const Eigen::VectorXi& vecVertNoLeftHemi,
-                        const Eigen::VectorXi& vecVertNoRightHemi);
+    void setSurfaceColor(const QByteArray& arraySurfaceVertColorLeftHemi,
+                        const QByteArray& arraySurfaceVertColorRightHemi);
 
     //=========================================================================================================
     /**
@@ -216,30 +264,24 @@ protected:
 private:
     //=========================================================================================================
     /**
-    * Perfrom the needed visualization type computations, such as smoothing, annoation coliring, etc..
+    * Perfrom the needed visualization type computations.
     *
-    * @param[in] sourceColorSamples         The color data for the sources.
+    * @param[in] vSourceColorSamples        The color data for the sources.
     *
     * @return                               Returns the final colors in form of a QByteArray for the left and right hemisphere.
     */
-    QPair<QByteArray, QByteArray> performVisualizationTypeCalculation(const Eigen::VectorXd& sourceColorSamples);
+    QPair<QByteArray, QByteArray> performVisualizationTypeCalculation(const Eigen::VectorXd& vSourceColorSamples);
 
     //=========================================================================================================
     /**
-    * Transform the data sample values to color values.
+    * Set the neighboring information for smoothing the activity.
     *
-    * @param[in] data               The data which is to be transformed.
-    *
-    * @return                       Returns the colors in form of a QByteArray.
+    * @param[in] matVertPosLeftHemi                 The surface vertices in 3D space for the left hemisphere.
+    * @param[in] matVertPosRightHemi                The surface vertices in 3D space for the right hemisphere.
     */
-    QByteArray transformDataToColor(const Eigen::VectorXd& data);
+    void createSmoothingOperator(const MatrixX3f& matVertPosLeftHemi, const MatrixX3f& matVertPosRightHemi);
 
     QMutex                  m_qMutex;                           /**< The thread's mutex. */
-
-    QByteArray              m_arraySurfaceVertColorLeftHemi;    /**< The vertex colors for the left hemisphere surface where the data is to be plotted on. */
-    QByteArray              m_arraySurfaceVertColorRightHemi;   /**< The vertex colors for the left hemisphere surface where the data is to be plotted on. */
-    VectorXi                m_vecVertNoLeftHemi;                /**< Vector with the source vertx indexes for the left hemisphere. */
-    VectorXi                m_vecVertNoRightHemi;               /**< Vector with the source vertx indexes for the right hemisphere. */
 
     QList<Eigen::VectorXd>  m_lData;                            /**< List that holds the fiff matrix data <n_channels x n_samples>. */
 
@@ -253,17 +295,7 @@ private:
     int                     m_iMSecIntervall;                   /**< Length in milli Seconds to wait inbetween data samples. */
     int                     m_iVisualizationType;               /**< The visualization type (single vertex, smoothing, annotation based). */
 
-    double                  m_dNormalization;                   /**< Normalization value. */
-    double                  m_dNormalizationMax;                /**< Value to normalize to. */
-
-    QString                 m_sColormap;                        /**< The type of colormap ("Hot", "Hot Negative 1", etc.). */
-
-    QVector3D               m_vecThresholds;                    /**< The threshold values used for normalizing the data. */
-
-    QList<FSLIB::Label>     m_lLabelsLeftHemi;                  /**< The list of current labels for the left hemisphere. */
-    QList<FSLIB::Label>     m_lLabelsRightHemi;                 /**< The list of current labels for the right hemisphere. */
-    QMap<qint32, qint32>    m_mapLabelIdSourcesLeftHemi;        /**< The sources mapped to their corresponding labels for the left hemisphere. */
-    QMap<qint32, qint32>    m_mapLabelIdSourcesRightHemi;       /**< The sources mapped to their corresponding labels for the right hemisphere. */
+    QList<VisualizationInfo>    m_lVisualizationInfo;           /**< The list holding all information needed to do the visualization for both hemispheres (0-left, 1-right). */
 
 signals:
     //=========================================================================================================

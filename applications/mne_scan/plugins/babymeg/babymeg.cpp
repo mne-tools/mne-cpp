@@ -54,7 +54,6 @@
 #include <rtProcessing/rthpis.h>
 #include <utils/detecttrigger.h>
 #include <fiff/fiff_types.h>
-#include <fiff/fiff_dir_tree.h>
 #include <fiff/fiff_dig_point_set.h>
 #include <rtClient/rtcmdclient.h>
 #include <scMeas/newrealtimemultisamplearray.h>
@@ -1014,13 +1013,10 @@ bool BabyMEG::readProjectors()
 
     printf("Opening header data %s...\n",t_sFileName.toUtf8().constData());
 
-    FiffDirTree t_Tree;
-    QList<FiffDirEntry> t_Dir;
-
-    if(!t_pStream->open(t_Tree, t_Dir))
+    if(!t_pStream->open())
         return false;
 
-    QList<FiffProj> q_ListProj = t_pStream->read_proj(t_Tree);
+    QList<FiffProj> q_ListProj = t_pStream->read_proj(t_pStream->dirtree());
 
     //Set all projectors to zero
     for(int i = 0; i<q_ListProj.size(); i++)
@@ -1035,7 +1031,7 @@ bool BabyMEG::readProjectors()
     m_pFiffInfo->projs = q_ListProj;
 
     //garbage collecting
-    t_pStream->device()->close();
+    t_pStream->close();
 
     return true;
 }
@@ -1055,13 +1051,10 @@ bool BabyMEG::readCompensators()
 
     printf("Opening compensator data %s...\n",t_sFileName.toUtf8().constData());
 
-    FiffDirTree t_Tree;
-    QList<FiffDirEntry> t_Dir;
-
-    if(!t_pStream->open(t_Tree, t_Dir))
+    if(!t_pStream->open())
         return false;
 
-    QList<FiffCtfComp> q_ListComp = t_pStream->read_ctf_comp(t_Tree, m_pFiffInfo->chs);
+    QList<FiffCtfComp> q_ListComp = t_pStream->read_ctf_comp(t_pStream->dirtree(), m_pFiffInfo->chs);
 
     if (q_ListComp.size() == 0)
     {
@@ -1072,7 +1065,7 @@ bool BabyMEG::readCompensators()
     m_pFiffInfo->comps = q_ListComp;
 
     //garbage collecting
-    t_pStream->device()->close();
+    t_pStream->close();
 
     return true;
 }

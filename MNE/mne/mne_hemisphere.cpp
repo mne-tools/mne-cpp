@@ -115,7 +115,6 @@ MNEHemisphere::MNEHemisphere(const MNEHemisphere& p_MNEHemisphere)
 , use_tri_area(p_MNEHemisphere.use_tri_area)
 , neighbor_tri(p_MNEHemisphere.neighbor_tri)
 , neighbor_vert(p_MNEHemisphere.neighbor_vert)
-, smoothOperatorList(p_MNEHemisphere.smoothOperatorList)
 , cluster_info(p_MNEHemisphere.cluster_info)
 , m_TriCoords(p_MNEHemisphere.m_TriCoords)
 {
@@ -140,37 +139,28 @@ bool MNEHemisphere::add_geometry_info()
 
     //Clear neighboring triangle list
     this->neighbor_tri.clear();
-    QVector<int> temp;
-    for(int i=0; i<this->tris.rows(); i++) {
-        QPair<int, QVector<int> > tempPair (i,temp);
-        this->neighbor_tri.append(tempPair);
-    }
 
     //Create neighbor_tri information
     for (p = 0; p < this->tris.rows(); p++)
         for (k = 0; k < 3; k++)
-            this->neighbor_tri[this->tris(p,k)].second.append(p);
+            this->neighbor_tri[this->tris(p,k)].append(p);
 
     //std::cout<<"MNESourceSpace::add_geometry_info() - this->neighbor_tri[100].size(): "<<this->neighbor_tri[100].size()<<std::endl;
 
-    //Determine the neighboring vertices and smooth operator
+    //Determine the neighboring vertices
     this->neighbor_vert.clear();
-    for(int i=0; i<this->np; i++) {
-        QPair<int, QVector<int> > tempPair (i,temp);
-        this->neighbor_vert.append(tempPair);
-    }
 
     for (k = 0; k < this->np; k++) {
-        for (p = 0; p < this->neighbor_tri[k].second.size(); p++) {
+        for (p = 0; p < this->neighbor_tri[k].size(); p++) {
             //Fit in the other vertices of the neighboring triangle
             for (c = 0; c < 3; c++) {
-                int vert = this->tris(this->neighbor_tri[k].second[p], c);
+                int vert = this->tris(this->neighbor_tri[k][p], c);
 
                 if (vert != k) {
                     found = false;
 
-                    for (q = 0; q < this->neighbor_vert[k].second.size(); q++) {
-                        if (this->neighbor_vert[k].second[q] == vert) {
+                    for (q = 0; q < this->neighbor_vert[k].size(); q++) {
+                        if (this->neighbor_vert[k][q] == vert) {
                             found = true;
                             break;
                         }
@@ -178,64 +168,12 @@ bool MNEHemisphere::add_geometry_info()
 
                     if(!found) {
 //                        std::cout<<"MNESourceSpace::add_geometry_info() - Found vert: "<<vert<<std::endl;
-                        this->neighbor_vert[k].second.append(vert);
+                        this->neighbor_vert[k].append(vert);
                     }
                 }
             }
         }
     }
-
-//    //Create smooth operators - This takes way too long, due to about 600000 element entries in the sparse matrix -> split into sub matrices
-//    std::cout<<"Creating smooth operator matrices "<<std::endl;
-//    this->smoothOperatorList.clear();
-
-//    SparseMatrix<double> sparseSmoothMatrix;
-//    int numberMatrix = 10000;
-//    int numberVerticesForMatrix;
-//    int matrixCount = numberMatrix;
-//    int last = this->np % 10;
-//    if(last!=0)
-//        matrixCount++;
-
-//    std::cout<<"last "<<last<<std::endl;
-//    std::cout<<"numberMatrix "<<numberMatrix<<std::endl;
-//    std::cout<<"numberVerticesForMatrix "<<numberVerticesForMatrix<<std::endl;
-//    std::cout<<"matrixCount "<<matrixCount<<std::endl;
-
-//    int vertexIndex = 0;
-
-//    for(int i=0; i<matrixCount; i++) {
-//        //std::cout<<"matrixCount "<<i<<std::endl;
-
-//        if(i==matrixCount-1 && last!=0)
-//            numberVerticesForMatrix = last;
-//        else
-//            numberVerticesForMatrix = this->np/numberMatrix;
-
-//        sparseSmoothMatrix = SparseMatrix<double>(numberVerticesForMatrix, this->np);
-
-//        //std::cout<<"before "<<std::endl;
-//        for(int r=0; r<numberVerticesForMatrix; r++)
-//            for(int v=0; v<this->neighbor_vert[r+vertexIndex].size(); v++)
-//                sparseSmoothMatrix.insert(r, this->neighbor_vert[r+vertexIndex][v]) = 1 / this->neighbor_vert[r+vertexIndex].size();
-//        //std::cout<<"after "<<std::endl;
-
-//        if(i==matrixCount-1 && last!=0)
-//            vertexIndex += last;
-//        else
-//            vertexIndex += this->np/numberMatrix;
-
-//        //std::cout<<"appending before "<<std::endl;
-//        this->smoothOperatorList.push_back(sparseSmoothMatrix);
-//        //std::cout<<"appending after "<<std::endl;
-//    }
-
-//    std::cout<<"size smooth operator list "<<this->smoothOperatorList.size()<<std::endl;
-//    std::cout<<"nonzero() "<<this->smoothOperatorList[0].nonZeros()<<std::endl;
-//    std::cout<<"rows() "<<this->smoothOperatorList[0].rows()<<std::endl;
-//    std::cout<<"cols() "<<this->smoothOperatorList[0].cols()<<std::endl;
-//    std::cout<<"innerSize() "<<this->smoothOperatorList.innerSize()<<std::endl;
-//    std::cout<<"outerSize() "<<this->smoothOperatorList.outerSize()<<std::endl;
 
     return true;
 }
@@ -271,8 +209,8 @@ void MNEHemisphere::clear()
     use_tri_nn = MatrixX3d::Zero(0,3);
     use_tri_area = VectorXd::Zero(0);
 
-    neighbor_tri = QList<QPair<int, QVector<int> > >();
-    neighbor_vert = QList<QPair<int, QVector<int> > >();
+    neighbor_tri = QMap<int, QVector<int> >();
+    neighbor_vert = QMap<int, QVector<int> >();
 
     cluster_info.clear();
 

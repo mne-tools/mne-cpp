@@ -1,10 +1,10 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     dipoleFit.pro
+# @file     mne_dipole_fit.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
-# @date     April, 2016
+# @date     November, 2016
 #
 # @section  LICENSE
 #
@@ -29,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    ToDo Documentation...
+# @brief    Implements mne_dipole_fit application of MNE-C
 #
 #--------------------------------------------------------------------------------------------------------------
 
@@ -44,7 +44,7 @@ QT += widgets 3dextras
 CONFIG   += console
 CONFIG   -= app_bundle
 
-TARGET = mne_dipole_fit_new
+TARGET = mne_dipole_fit
 
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)

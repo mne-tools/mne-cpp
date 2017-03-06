@@ -9,8 +9,8 @@ git clone https://github.com/mne-tools/mne-cpp-test-data.git mne-cpp-test-data
 export LD_LIBRARY_PATH=$(pwd)/lib:$LD_LIBRARY_PATH
 MNECPP_ROOT=$(pwd)
 
-# Tests to run - tbd: find required tests automatically with grep
-tests=( test_codecov test_fiff_rwr test_dipole_fit )
+# Tests to run - TODO: find required tests automatically with grep
+tests=( test_codecov test_fiff_rwr test_dipole_fit test_fiff_mne_types_io )
 
 for test in ${tests[*]};
 do

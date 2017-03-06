@@ -263,7 +263,7 @@ void BabyMEGInfo::MGH_LM_Parse_Para(QByteArray cmdstr)
     }
 
     // Parameters
-    m_FiffInfo.file_id.version = 0; //ToDo
+    m_FiffInfo.file_id = FiffId::new_file_id();
 
     m_FiffInfo.meas_date[0] = 0;
     m_FiffInfo.meas_date[1] = 0;
@@ -273,7 +273,7 @@ void BabyMEGInfo::MGH_LM_Parse_Para(QByteArray cmdstr)
     m_FiffInfo.acq_pars = QString("BabyMEG");
     m_FiffInfo.acq_stim = QString("");
     m_FiffInfo.filename = QString("");
-    m_FiffInfo.meas_id.version = 1;
+    m_FiffInfo.meas_id = FiffId::new_file_id();
     m_FiffInfo.nchan = chnNum; //464;
     m_FiffInfo.dev_head_t.from =FIFFV_COORD_DEVICE;//1;  //* should be from dev to head 7/18/2016 Limin
     m_FiffInfo.dev_head_t.to =FIFFV_COORD_HEAD;//4;
@@ -291,29 +291,28 @@ void BabyMEGInfo::MGH_LM_Parse_Para(QByteArray cmdstr)
 
         t_ch.ch_name = lm_ch_names.at(i); //QString("MEG%1").arg(i);
         //qDebug()<<t_ch.ch_name;
-        t_ch.scanno = i;
-        t_ch.logno = i+1;
+        t_ch.scanNo = i;
+        t_ch.logNo = i+1;
         t_ch.cal = lm_ch_calicoef.at(i).toDouble();
         t_ch.unit_mul = 1.0;//lm_ch_scales.at(i).toFloat();
         t_ch.range =1.0f/lm_ch_gain.at(i).toFloat();//1; // set gain
 
         //qDebug()<<i<<":="<<t_ch.ch_name<<","<<t_ch.range<<","<<t_ch.cal;
-
-        t_ch.loc.setZero(12,1);
+        //t_ch.loc.setZero(12,1);
 
         //set loc
-        t_ch.loc(0,0) = lm_ch_pos1.at(i).toDouble();
-        t_ch.loc(1,0) = lm_ch_pos2.at(i).toDouble();
-        t_ch.loc(2,0) = lm_ch_pos3.at(i).toDouble();
-        t_ch.loc(3,0) = lm_ch_pos4.at(i).toDouble();
-        t_ch.loc(4,0) = lm_ch_pos5.at(i).toDouble();
-        t_ch.loc(5,0) = lm_ch_pos6.at(i).toDouble();
-        t_ch.loc(6,0) = lm_ch_pos7.at(i).toDouble();
-        t_ch.loc(7,0) = lm_ch_pos8.at(i).toDouble();
-        t_ch.loc(8,0) = lm_ch_pos9.at(i).toDouble();
-        t_ch.loc(9,0) = lm_ch_pos10.at(i).toDouble();
-        t_ch.loc(10,0) = lm_ch_pos11.at(i).toDouble();
-        t_ch.loc(11,0) = lm_ch_pos12.at(i).toDouble();
+        t_ch.chpos.r0[0] = lm_ch_pos1.at(i).toDouble();
+        t_ch.chpos.r0[1] = lm_ch_pos2.at(i).toDouble();
+        t_ch.chpos.r0[2] = lm_ch_pos3.at(i).toDouble();
+        t_ch.chpos.ex[0] = lm_ch_pos4.at(i).toDouble();
+        t_ch.chpos.ex[1] = lm_ch_pos5.at(i).toDouble();
+        t_ch.chpos.ex[2] = lm_ch_pos6.at(i).toDouble();
+        t_ch.chpos.ey[0] = lm_ch_pos7.at(i).toDouble();
+        t_ch.chpos.ey[1] = lm_ch_pos8.at(i).toDouble();
+        t_ch.chpos.ey[2] = lm_ch_pos9.at(i).toDouble();
+        t_ch.chpos.ez[0] = lm_ch_pos10.at(i).toDouble();
+        t_ch.chpos.ez[1] = lm_ch_pos11.at(i).toDouble();
+        t_ch.chpos.ez[2] = lm_ch_pos12.at(i).toDouble();
 
         //qDebug()<<t_ch.loc(0,0)<<t_ch.loc(1,0)<<t_ch.loc(2,0);
 
@@ -341,47 +340,47 @@ void BabyMEGInfo::MGH_LM_Parse_Para(QByteArray cmdstr)
             t_ch.kind = FIFFV_MEG_CH;
             t_ch.unit = FIFF_UNIT_T;
             t_ch.unit_mul = FIFF_UNITM_NONE;
-            t_ch.coil_type = FIFFV_COIL_BABY_MAG;
+            t_ch.chpos.coil_type = FIFFV_COIL_BABY_MAG;
             break;
         case 2: // outer layer meg sensors
             t_ch.kind = FIFFV_REF_MEG_CH;
             t_ch.unit = FIFF_UNIT_T;
             t_ch.unit_mul = FIFF_UNITM_NONE;
-            t_ch.coil_type = FIFFV_COIL_BABY_REF_MAG;
+            t_ch.chpos.coil_type = FIFFV_COIL_BABY_REF_MAG;
 
             break;
         case 3: // reference meg sensors
             t_ch.kind = FIFFV_REF_MEG_CH;
             t_ch.unit = FIFF_UNIT_T;
             t_ch.unit_mul = FIFF_UNITM_NONE;
-            t_ch.coil_type = FIFFV_COIL_BABY_REF_MAG2;
+            t_ch.chpos.coil_type = FIFFV_COIL_BABY_REF_MAG2;
 
             break;
         case 4: // trigger lines
             t_ch.kind = FIFFV_STIM_CH;
             t_ch.unit = FIFF_UNIT_V;
             t_ch.unit_mul = FIFF_UNITM_NONE;
-            t_ch.coil_type = FIFFV_STIM_CH;
+            t_ch.chpos.coil_type = FIFFV_STIM_CH;
             break;
         case 5: // EEG channels
             t_ch.kind = FIFFV_EEG_CH;
             t_ch.unit = FIFF_UNIT_V;
             t_ch.unit_mul = FIFF_UNITM_NONE;
-            t_ch.coil_type = FIFFV_COIL_EEG;
+            t_ch.chpos.coil_type = FIFFV_COIL_EEG;
 
             break;
         case 6: // HPI channels
             t_ch.kind = type;
             t_ch.unit = FIFF_UNIT_V;
             t_ch.unit_mul = FIFF_UNITM_NONE;
-            t_ch.coil_type = FIFFV_COIL_NONE;
+            t_ch.chpos.coil_type = FIFFV_COIL_NONE;
 
             break;
         case 7: // HPI G channels
             t_ch.kind = FIFFV_HPI_G;
             t_ch.unit = FIFF_UNIT_V;
             t_ch.unit_mul = FIFF_UNITM_NONE;
-            t_ch.coil_type = FIFFV_COIL_NONE;
+            t_ch.chpos.coil_type = FIFFV_COIL_NONE;
 
             break;
 
@@ -389,7 +388,7 @@ void BabyMEGInfo::MGH_LM_Parse_Para(QByteArray cmdstr)
             t_ch.kind = FIFFV_MEG_CH;
             t_ch.unit = FIFF_UNIT_T;
             t_ch.unit_mul = FIFF_UNITM_NONE;
-            t_ch.coil_type = FIFFV_COIL_NONE;
+            t_ch.chpos.coil_type = FIFFV_COIL_NONE;
 
             break;
         }
@@ -397,21 +396,21 @@ void BabyMEGInfo::MGH_LM_Parse_Para(QByteArray cmdstr)
 
         /*  Add the coiltrans for each sensor */
         /* x-axis normal vector */
-        t_ch.coil_trans(0,0) = t_ch.loc(3,0);
-        t_ch.coil_trans(1,0) = t_ch.loc(4,0);
-        t_ch.coil_trans(2,0) = t_ch.loc(5,0);
+        t_ch.coil_trans(0,0) = t_ch.chpos.ex[0];
+        t_ch.coil_trans(1,0) = t_ch.chpos.ex[1];
+        t_ch.coil_trans(2,0) = t_ch.chpos.ex[2];
         /* y-axis normal vector */
-        t_ch.coil_trans(0,1) = t_ch.loc(6,0);
-        t_ch.coil_trans(1,1) = t_ch.loc(7,0);
-        t_ch.coil_trans(2,1) = t_ch.loc(8,0);
+        t_ch.coil_trans(0,1) = t_ch.chpos.ey[0];
+        t_ch.coil_trans(1,1) = t_ch.chpos.ey[1];
+        t_ch.coil_trans(2,1) = t_ch.chpos.ey[2];
         /* z-axis normal vector */
-        t_ch.coil_trans(0,2) = t_ch.loc(9,0);
-        t_ch.coil_trans(1,2) = t_ch.loc(10,0);
-        t_ch.coil_trans(2,2) = t_ch.loc(11,0);
+        t_ch.coil_trans(0,2) = t_ch.chpos.ez[0];
+        t_ch.coil_trans(1,2) = t_ch.chpos.ez[1];
+        t_ch.coil_trans(2,2) = t_ch.chpos.ez[2];
         /* x,y,z coordinates */
-        t_ch.coil_trans(0,3) = t_ch.loc(0,0);
-        t_ch.coil_trans(1,3) = t_ch.loc(1,0);
-        t_ch.coil_trans(2,3) = t_ch.loc(2,0);
+        t_ch.coil_trans(0,3) = t_ch.chpos.r0[0];
+        t_ch.coil_trans(1,3) = t_ch.chpos.r0[0];
+        t_ch.coil_trans(2,3) = t_ch.chpos.r0[0];
 
         /* 0 0 0 1 */
         t_ch.coil_trans(3,0) = 0.0;

@@ -41,7 +41,8 @@
 
 #include "fiff_evoked_set.h"
 #include "fiff_tag.h"
-#include "fiff_dir_tree.h"
+#include "fiff_dir_node.h"
+#include "fiff_stream.h"
 
 
 //*************************************************************************************************************
@@ -188,7 +189,7 @@ bool FiffEvokedSet::compensate_to(FiffEvokedSet& p_FiffEvokedSet, fiff_int_t to)
 
     for(qint16 i=0; i < p_FiffEvokedSet.evoked.size(); ++i)
     {
-        p_FiffEvokedSet.evoked[i].data = ctf_comp.data->data*p_FiffEvokedSet.evoked.at(i).data;
+        p_FiffEvokedSet.evoked[i].data = ctf_comp.data->data*p_FiffEvokedSet.evoked[i].data;
     }
 
     //Update the compensation info in the channel descriptors
@@ -229,29 +230,27 @@ bool FiffEvokedSet::read(QIODevice& p_IODevice, FiffEvokedSet& p_FiffEvokedSet, 
     QString t_sFileName = t_pStream->streamName();
 
     printf("Exploring %s ...\n",t_sFileName.toUtf8().constData());
-    FiffDirTree t_Tree;
-    QList<FiffDirEntry> t_Dir;
 
-    if(!t_pStream->open(t_Tree, t_Dir))
+    if(!t_pStream->open())
         return false;
     //
     //   Read the measurement info
     //
-    FiffDirTree meas;
-    if(!t_pStream->read_meas_info(t_Tree, p_FiffEvokedSet.info, meas))
+    FiffDirNode::SPtr meas;
+    if(!t_pStream->read_meas_info(t_pStream->dirtree(), p_FiffEvokedSet.info, meas))
         return false;
     p_FiffEvokedSet.info.filename = t_sFileName; //move fname storage to read_meas_info member function
     //
     //   Locate the data of interest
     //
-    QList<FiffDirTree> processed = meas.dir_tree_find(FIFFB_PROCESSED_DATA);
+    QList<FiffDirNode::SPtr> processed = meas->dir_tree_find(FIFFB_PROCESSED_DATA);
     if (processed.size() == 0)
     {
         qWarning("Could not find processed data");
         return false;
     }
     //
-    QList<FiffDirTree> evoked_node = meas.dir_tree_find(FIFFB_EVOKED);
+    QList<FiffDirNode::SPtr> evoked_node = meas->dir_tree_find(FIFFB_EVOKED);
     if (evoked_node.size() == 0)
     {
         qWarning("Could not find evoked data");
@@ -292,7 +291,7 @@ bool FiffEvokedSet::read(QIODevice& p_IODevice, FiffEvokedSet& p_FiffEvokedSet, 
 //    QString t_sFileName = t_pStream->streamName();
 
 //    printf("Reading %s ...\n",t_sFileName.toUtf8().constData());
-//    FiffDirTree t_Tree;
+//    FiffDirNode t_Tree;
 //    QList<FiffDirEntry> t_Dir;
 
 //    if(!t_pStream->open(t_Tree, t_Dir))
@@ -305,14 +304,14 @@ bool FiffEvokedSet::read(QIODevice& p_IODevice, FiffEvokedSet& p_FiffEvokedSet, 
 //    //   Read the measurement info
 //    //
 //    FiffInfo info;// = NULL;
-//    FiffDirTree meas;
+//    FiffDirNode meas;
 //    if(!t_pStream->read_meas_info(t_Tree, info, meas))
 //        return false;
 //    info.filename = t_sFileName; //move fname storage to read_meas_info member function
 //    //
 //    //   Locate the data of interest
 //    //
-//    QList<FiffDirTree> processed = meas.dir_tree_find(FIFFB_PROCESSED_DATA);
+//    QList<FiffDirNode> processed = meas.dir_tree_find(FIFFB_PROCESSED_DATA);
 //    if (processed.size() == 0)
 //    {
 //        if(t_pStream)
@@ -321,7 +320,7 @@ bool FiffEvokedSet::read(QIODevice& p_IODevice, FiffEvokedSet& p_FiffEvokedSet, 
 //        return false;
 //    }
 //    //
-//    QList<FiffDirTree> evoked = meas.dir_tree_find(FIFFB_EVOKED);
+//    QList<FiffDirNode> evoked = meas.dir_tree_find(FIFFB_EVOKED);
 //    if (evoked.size() == 0)
 //    {
 //        if(t_pStream)
@@ -336,9 +335,9 @@ bool FiffEvokedSet::read(QIODevice& p_IODevice, FiffEvokedSet& p_FiffEvokedSet, 
 //    fiff_int_t nsaspects = 0;
 //    qint32 oldsize = 0;
 //    MatrixXi is_smsh(1,0);
-//    QList< QList<FiffDirTree> > sets_aspects;
+//    QList< QList<FiffDirNode> > sets_aspects;
 //    QList< qint32 > sets_naspect;
-//    QList<FiffDirTree> saspects;
+//    QList<FiffDirNode> saspects;
 //    qint32 k;
 //    for (k = 0; k < evoked.size(); ++k)
 //    {
@@ -382,8 +381,8 @@ bool FiffEvokedSet::read(QIODevice& p_IODevice, FiffEvokedSet& p_FiffEvokedSet, 
 //    qint32 p = 0;
 //    qint32 a = 0;
 //    bool goon = true;
-//    FiffDirTree my_evoked;
-//    FiffDirTree my_aspect;
+//    FiffDirNode my_evoked;
+//    FiffDirNode my_aspect;
 //    for(k = 0; k < evoked.size(); ++k)
 //    {
 //        for (a = 0; a < sets_naspect[k]; ++a)
