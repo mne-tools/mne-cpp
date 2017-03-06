@@ -120,6 +120,8 @@ ECDView::ECDView(const DipoleFitSettings& dipFitSettings, const ECDSet& ecdSet, 
             ecdSetTrans[i].Q(1) = dipoles(0,1);
             ecdSetTrans[i].Q(2) = dipoles(0,2);
         }
+    } else {
+        qCritical("ECDView::ECDView - Cannot open FiffCoordTrans file");
     }
 
     //Add ECD data
@@ -132,6 +134,8 @@ ECDView::ECDView(const DipoleFitSettings& dipFitSettings, const ECDSet& ecdSet, 
     if(t_fileBem.exists()) {
         MNEBem t_Bem(t_fileBem);
         m_pData3DModel->addBemData("sample", "BEM", t_Bem);
+    } else {
+        qCritical("ECDView::ECDView - Cannot open MNEBem file");
     }
 
     //Create widget GUI
