@@ -108,7 +108,7 @@ public:
     * @param [in] slFlags    The flags indicating which tools to display. Scaling is displayed as default. Possible flags are: projections, compensators, view, filter, triggerdetection, modalities, scaling, sphara.
     * @param [in] type
     */
-    explicit Control3DWidget(QWidget* parent = 0, const QStringList& slFlags = QStringList() << "Minimize" << "Data" << "Window" << "View" << "Light", Qt::WindowType type = Qt::Window);
+    explicit Control3DWidget(QWidget* parent = 0, const QStringList& slFlags = QStringList() << "Minimize" << "Data" << "Window" << "View" << "Light", Qt::WindowType type = Qt::Widget);
 
     //=========================================================================================================
     /**
