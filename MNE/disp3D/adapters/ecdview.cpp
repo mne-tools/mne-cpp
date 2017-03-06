@@ -72,14 +72,18 @@ using namespace MNELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ECDView::ECDView(const DipoleFitSettings &dipFitSettings, const ECDSet &ecdSet, QWidget *parent)
+ECDView::ECDView(const DipoleFitSettings& dipFitSettings, const ECDSet& ecdSet, QWidget* parent)
 : QWidget(parent)
 , m_p3DView(View3D::SPtr(new View3D()))
-, m_pControl3DView(Control3DWidget::SPtr(new Control3DWidget(this)))
 , m_pData3DModel(Data3DTreeModel::SPtr(new Data3DTreeModel()))
 {
     //Init 3D View
     m_p3DView->setModel(m_pData3DModel);
+
+    QStringList slControlFlags;
+    slControlFlags << "Data" << "View" << "Light";
+    m_pControl3DView = Control3DWidget::SPtr(new Control3DWidget(this, slControlFlags));
+
     m_pControl3DView->init(m_pData3DModel, m_p3DView);
 
     //Read mri transform

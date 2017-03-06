@@ -91,10 +91,12 @@ using namespace DISP3DLIB;
 EcdDataTreeItem::EcdDataTreeItem(int iType, const QString &text)
 : AbstractTreeItem(iType, text)
 , m_bIsInit(false)
+, m_pRenderable3DEntity(new Renderable3DEntity())
 {
     this->setEditable(false);
     this->setCheckable(true);
-    this->setToolTip("Dipole fit source localization data");
+    this->setCheckState(Qt::Checked);
+    this->setToolTip("Dipole fit data");
 }
 
 
@@ -134,7 +136,7 @@ void EcdDataTreeItem::setData(const QVariant& value, int role)
 bool EcdDataTreeItem::init(Qt3DCore::QEntity* parent)
 {      
     //Create renderable 3D entity
-    m_pRenderable3DEntity = new Renderable3DEntity(parent);
+    m_pRenderable3DEntity->setParent(parent);
 
     //Add meta information as item children
     QList<QStandardItem*> list;
