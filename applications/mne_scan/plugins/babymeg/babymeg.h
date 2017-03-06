@@ -145,6 +145,8 @@ public:
     //=========================================================================================================
     /**
     * Clone the plugin
+    *
+    * @return Returns the cloned widget.
     */
     virtual QSharedPointer<SCSHAREDLIB::IPlugin> clone() const;
 

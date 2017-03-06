@@ -109,6 +109,13 @@ class SCDISPSHARED_EXPORT HPIWidget : public QWidget
     Q_OBJECT
 
 public:
+    //=========================================================================================================
+    /**
+    * Constructs a HPIWidget object.
+    *
+    * @param[in] pFiffInfo      The FiffInfo.
+    * @param[in] parent         The parent widget.
+    */
     HPIWidget(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo, QWidget *parent = 0);
     ~HPIWidget();
 
