@@ -124,7 +124,8 @@ namespace MetaTreeItemTypes
                     NetworkMatrix = QStandardItem::UserType + 122,
                     SurfaceTessInner = QStandardItem::UserType + 123,
                     SurfaceTessOuter = QStandardItem::UserType + 124,
-                    SurfaceTriangleScale = QStandardItem::UserType + 125};
+                    SurfaceTriangleScale = QStandardItem::UserType + 125,
+                    NumberDipoles = QStandardItem::UserType + 126};
 }
 
 // Model item roles
