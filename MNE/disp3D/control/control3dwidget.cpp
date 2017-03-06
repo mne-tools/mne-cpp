@@ -240,12 +240,14 @@ void Control3DWidget::onMinimizeWidget(bool state)
     if(!state) {
         ui->m_treeView_loadedData->hide();
         ui->m_groupBox_viewOptions->hide();
+        ui->m_groupBox_lightOptions->hide();
         ui->m_groupBox_windowOptions->hide();
         ui->m_pushButton_minimize->setText(QString("Maximize - %1").arg(this->windowTitle()));        
         this->resize(width(), ui->m_pushButton_minimize->height());
     }
     else {
         ui->m_treeView_loadedData->show();
+        ui->m_groupBox_lightOptions->show();
         ui->m_groupBox_viewOptions->show();
         ui->m_groupBox_windowOptions->show();
         ui->m_pushButton_minimize->setText(QString("Minimize - %1").arg(this->windowTitle()));
