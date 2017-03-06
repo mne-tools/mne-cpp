@@ -142,7 +142,6 @@ ECDView::ECDView(const DipoleFitSettings& dipFitSettings, const ECDSet& ecdSet, 
     mainLayoutView->addWidget(m_pControl3DView.data(),0,1);
 
     this->setLayout(mainLayoutView);
-    this->show();
 }
 
 
