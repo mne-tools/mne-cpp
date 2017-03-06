@@ -65,6 +65,7 @@
 //=============================================================================================================
 
 using namespace DEEPLIB;
+using namespace Eigen;
 using namespace Microsoft::MSR::CNTK;
 
 
@@ -119,6 +120,21 @@ const QString& DeepEval::getModelFilename() const
 void DeepEval::setModelFilename(const QString &sModelFilename)
 {
     m_sModelFilename = sModelFilename;
+}
+
+
+//*************************************************************************************************************
+
+bool DeepEval::evalModel(const VectorXf &inputs, VectorXf &outputs)
+{
+    std::vector<float> stdInputs(inputs.data(), inputs.data() + inputs.size());
+    std::vector<float> stdOutputs;
+
+    bool val = evalModel(stdInputs,stdOutputs);
+
+    outputs = VectorXf::Map(stdOutputs.data(), stdOutputs.size());
+
+    return val;
 }
 
 

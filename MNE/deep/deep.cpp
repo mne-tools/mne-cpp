@@ -68,33 +68,13 @@ using namespace DEEPLIB;
 using namespace Microsoft::MSR::CNTK;
 
 
-// Used for retrieving the model appropriate for the element type (float / double)
-template<typename ElemType>
-using GetEvalProc = void(*)(IEvaluateModel<ElemType>**);
-
-
-typedef std::pair<std::wstring, std::vector<float>*> MapEntry;
-typedef std::map<std::wstring, std::vector<float>*> Layer;
-
-
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
 Deep::Deep()
-: m_model(NULL)
 {
-}
-
-
-//*************************************************************************************************************
-
-Deep::Deep(const QString &sModelFilename)
-: m_sModelFilename(sModelFilename)
-, m_model(NULL)
-{
-    loadModel();
 }
 
 
@@ -103,114 +83,4 @@ Deep::Deep(const QString &sModelFilename)
 Deep::~Deep()
 {
 
-}
-
-
-//*************************************************************************************************************
-
-const QString& Deep::getModelFilename() const
-{
-    return m_sModelFilename;
-}
-
-
-//*************************************************************************************************************
-
-void Deep::setModelFilename(const QString &sModelFilename)
-{
-    m_sModelFilename = sModelFilename;
-}
-
-
-//*************************************************************************************************************
-
-bool Deep::evalModel(std::vector<float>& inputs, std::vector<float>& outputs)
-{
-    if( !m_model )
-        return false;
-
-    // get the model's layers dimensions
-    std::map<std::wstring, size_t> inDims;
-    std::map<std::wstring, size_t> outDims;
-    m_model->GetNodeDimensions(inDims, NodeGroup::nodeInput);
-    m_model->GetNodeDimensions(outDims, NodeGroup::nodeOutput);
-
-    std::wstring inputLayerName = inDims.begin()->first;
-    std::wstring outputLayerName = outDims.begin()->first;
-
-    if(inDims[inputLayerName] != inputs.size()) {
-        fprintf(stderr, "Input dimension does not fit %zu != %llu.\n", inputs.size(), inDims[inputLayerName]);
-        return false;
-    }
-
-    // Setup the maps for inputs and output
-    Layer inputLayer;
-    inputLayer.insert(MapEntry(inputLayerName, &inputs));
-    Layer outputLayer;
-    outputLayer.insert(MapEntry(outputLayerName, &outputs));
-
-    // We can call the evaluate method and get back the results (single layer)...
-    m_model->Evaluate(inputLayer, outputLayer);
-
-    // This pattern is used by End2EndTests to check whether the program runs to complete.
-    fprintf(stderr, "Evaluation complete.\n");
-
-    return true;
-}
-
-
-//*************************************************************************************************************
-
-bool Deep::loadModel()
-{
-    QFile file(m_sModelFilename);
-    if(!file.exists()) {
-        qCritical("Model filename (%s) does not exist.\n", m_sModelFilename.toUtf8().constData());
-        return false;
-    }
-
-    fprintf(stderr, "Evaluating Model %s\n", m_sModelFilename.toUtf8().constData());
-
-    const std::string modelFile = m_sModelFilename.toUtf8().constData();
-
-    GetEvalF(&m_model);
-
-    // Load model with desired outputs
-    std::string networkConfiguration;
-    // Uncomment the following line to re-define the outputs (include h1.z AND the output ol.z)
-    // When specifying outputNodeNames in the configuration, it will REPLACE the list of output nodes
-    // with the ones specified.
-    //networkConfiguration += "outputNodeNames=\"h1.z:ol.z\"\n";
-    networkConfiguration += "modelPath=\"" + modelFile + "\"";
-    m_model->CreateNetwork(networkConfiguration);
-
-    return true;
-}
-
-
-//*************************************************************************************************************
-
-size_t Deep::inputDimensions()
-{
-    if(m_model) {
-        std::map<std::wstring, size_t> inDims;
-        m_model->GetNodeDimensions(inDims, NodeGroup::nodeInput);
-        std::wstring inputLayerName = inDims.begin()->first;
-        return inDims[inputLayerName];
-    }
-    return 0;
-}
-
-
-//*************************************************************************************************************
-
-size_t Deep::outputDimensions()
-{
-    if(m_model) {
-        std::map<std::wstring, size_t> outDims;
-        m_model->GetNodeDimensions(outDims, NodeGroup::nodeOutput);
-        std::wstring outputLayerName = outDims.begin()->first;
-        return outDims[outputLayerName];
-    }
-    return 0;
 }

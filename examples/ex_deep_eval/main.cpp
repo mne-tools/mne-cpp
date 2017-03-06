@@ -100,6 +100,10 @@ int main(int argc, char *argv[])
     for (int i = 0; i < deepTest.inputDimensions(); i++) {
         inputs.push_back(static_cast<float>(i % 255));
     }
+
+    //
+    // Evaluate the model
+    //
     deepTest.evalModel(inputs, outputs);
 
     //
