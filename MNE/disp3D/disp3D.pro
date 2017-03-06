@@ -122,6 +122,7 @@ SOURCES += \
     model/materials/shownormalsmaterial.cpp \
     model/materials/networkmaterial.cpp \
     control/control3dwidget.cpp \
+    adapters/ecdview.cpp \
 
 HEADERS += \
     view3D.h \
@@ -154,6 +155,7 @@ HEADERS += \
     model/materials/shownormalsmaterial.h \
     model/materials/networkmaterial.h \
     control/control3dwidget.h \
+    adapters/ecdview.h \
     disp3D_global.h \
 
 FORMS += \
