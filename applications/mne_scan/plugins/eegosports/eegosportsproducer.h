@@ -43,7 +43,6 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <generics/circularbuffer.h>
 #include <Eigen/Eigen>
 
 
@@ -53,6 +52,7 @@
 //=============================================================================================================
 
 #include <QThread>
+#include <QSharedPointer>
 
 
 //*************************************************************************************************************
@@ -66,15 +66,6 @@ namespace EEGOSPORTSPLUGIN
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-//using namespace IOBuffer;
-using namespace Eigen;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
@@ -84,12 +75,13 @@ class EEGoSportsDriver;
 
 //=============================================================================================================
 /**
-* DECLARE CLASS EEGProducer
+* DECLARE CLASS EEGoSportsProducer
 *
-* @brief The EEGProducer class provides a EEG data producer for a given sampling rate.
+* @brief The EEGoSportsProducer class provides a EEG data producer for a given sampling rate.
 */
 class EEGoSportsProducer : public QThread
 {
+
 public:
     //=========================================================================================================
     /**
@@ -139,7 +131,7 @@ protected:
 
 private:
     EEGoSports*                         m_pEEGoSports;              /**< A pointer to the corresponding EEGoSports class.*/
-    QSharedPointer<EEGoSportsDriver>    m_pEEGoSportsDriver;        /**< A pointer to the corresponding EEGoSports driver class.*/
+    QSharedPointer<EEGoSportsDriver>    m_pEEGoSportsDriver;        /**< A pointer to the corresponding EEGoSportsDriver class.*/
 
     bool                                m_bIsRunning;               /**< Whether EEGoSportsProducer is running.*/
 };

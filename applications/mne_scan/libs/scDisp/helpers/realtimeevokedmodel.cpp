@@ -366,7 +366,7 @@ fiff_int_t RealTimeEvokedModel::getCoil(qint32 row) const
 {
     if(row < m_qMapIdxRowSelection.size()) {
         qint32 chRow = m_qMapIdxRowSelection[row];
-        return m_pRTE->info()->chs[chRow].coil_type;
+        return m_pRTE->info()->chs[chRow].chpos.coil_type;
     }
 
     return FIFFV_COIL_NONE;

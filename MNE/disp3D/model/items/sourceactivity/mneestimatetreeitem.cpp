@@ -263,10 +263,15 @@ void MneEstimateTreeItem::init(const MNEForwardSolution& tForwardSolution,
     pItemAveragedStreaming->setData(data, MetaTreeItemRoles::NumberAverages);
 
     //set rt data corresponding to the hemisphere
-    m_pSourceLocRtDataWorker->setSurfaceData(arraySurfaceVertColorLeftHemi,
-                                             arraySurfaceVertColorRightHemi,
-                                             this->data(Data3DTreeModelItemRoles::RTVertNoLeftHemi).value<VectorXi>(),
-                                             this->data(Data3DTreeModelItemRoles::RTVertNoRightHemi).value<VectorXi>());
+    m_pSourceLocRtDataWorker->setSurfaceData(this->data(Data3DTreeModelItemRoles::RTVertNoLeftHemi).value<VectorXi>(),
+                                             this->data(Data3DTreeModelItemRoles::RTVertNoRightHemi).value<VectorXi>(),
+                                             tForwardSolution.src[0].neighbor_vert,
+                                             tForwardSolution.src[1].neighbor_vert,
+                                             tForwardSolution.src[0].rr,
+                                             tForwardSolution.src[1].rr);
+
+    m_pSourceLocRtDataWorker->setSurfaceColor(arraySurfaceVertColorLeftHemi,
+                                             arraySurfaceVertColorRightHemi);
 
     m_pSourceLocRtDataWorker->setAnnotationData(vecLabelIdsLeftHemi,
                                                 vecLabelIdsRightHemi,
@@ -339,7 +344,6 @@ void MneEstimateTreeItem::setTimeInterval(int iMSec)
 
     for(int i = 0; i < lItems.size(); i++) {
         if(MetaTreeItem* pAbstractItem = dynamic_cast<MetaTreeItem*>(lItems.at(i))) {
-            qDebug() << "MneEstimateTreeItem::setTimeInterval";
             QVariant data;
             data.setValue(iMSec);
             pAbstractItem->setData(data, MetaTreeItemRoles::StreamingTimeInterval);
@@ -424,10 +428,8 @@ void MneEstimateTreeItem::setNormalization(const QVector3D& vecThresholds)
 
 void MneEstimateTreeItem::setColorOrigin(const QByteArray& arrayVertColorLeftHemisphere, const QByteArray& arrayVertColorRightHemisphere)
 {
-    m_pSourceLocRtDataWorker->setSurfaceData(arrayVertColorLeftHemisphere,
-                                             arrayVertColorRightHemisphere,
-                                             this->data(Data3DTreeModelItemRoles::RTVertNoLeftHemi).value<VectorXi>(),
-                                             this->data(Data3DTreeModelItemRoles::RTVertNoRightHemi).value<VectorXi>());
+    m_pSourceLocRtDataWorker->setSurfaceColor(arrayVertColorLeftHemisphere,
+                                             arrayVertColorRightHemisphere);
 }
 
 
@@ -436,10 +438,8 @@ void MneEstimateTreeItem::setColorOrigin(const QByteArray& arrayVertColorLeftHem
 void MneEstimateTreeItem::onCheckStateWorkerChanged(const Qt::CheckState& checkState)
 {
     if(checkState == Qt::Checked) {
-        qDebug() << "Start stc worker";
         m_pSourceLocRtDataWorker->start();
     } else if(checkState == Qt::Unchecked) {
-        qDebug() << "Stop stc worker";
         m_pSourceLocRtDataWorker->stop();
     }    
 }
@@ -500,10 +500,8 @@ void MneEstimateTreeItem::onVisualizationTypeChanged(const QString& sVisType)
 void MneEstimateTreeItem::onCheckStateLoopedStateChanged(const Qt::CheckState& checkState)
 {
     if(checkState == Qt::Checked) {
-        qDebug() << "Looped streaming active";
         m_pSourceLocRtDataWorker->setLoop(true);
     } else if(checkState == Qt::Unchecked) {
-        qDebug() << "Looped streaming inactive";
         m_pSourceLocRtDataWorker->setLoop(false);
     }
 }

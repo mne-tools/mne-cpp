@@ -103,9 +103,23 @@ public:
 
     //=========================================================================================================
     /**
-    * Initializes FIFF identifier.
+    * Constructs a (hopefully) unique file id
+    * Refactored: fiff_new_file_id (fiff_id.c)
+    */
+    static FiffId new_file_id();
+
+    //=========================================================================================================
+    /**
+    * Resets the File identifier.
     */
     void clear();
+
+    //=========================================================================================================
+    /**
+    * Returns the machine ID consisting of a two integer number
+    * Refactored: fiff_get_machid (fiff_get_machid.c)
+    */
+    static bool get_machid(int *fixed_id);
 
     //=========================================================================================================
     /**
@@ -136,13 +150,18 @@ public:
     fiffTimeRec time;       /**< Time of the ID creation */
 
 // ### OLD STRUCT ###
-// typedef struct _fiffIdRec {
-//  fiff_int_t version;     /**< File version *
-//  fiff_int_t machid[2];   /**< Unique machine ID *
-//  fiffTimeRec time;       /**< Time of the ID creation *
-//} fiffIdRec,*fiffId;     /**< This is the file identifier *
-
-// typedef fiffIdRec fiff_id_t;
+///**
+//* A file ID.
+//*
+//* These universially unique identifiers are also
+//* used to identify blocks within fthe files.
+//*/
+//typedef struct _fiffIdRec {
+//    fiff_int_t version;     /**< File version */
+//    fiff_int_t machid[2];   /**< Unique machine ID */
+//    fiffTimeRec time;       /**< Time of the ID creation */
+//} fiffIdRec,*fiffId;        /**< This is the file identifier */
+//typedef fiffIdRec fiff_id_t;
 };
 
 

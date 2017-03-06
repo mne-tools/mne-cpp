@@ -52,7 +52,7 @@
 //=============================================================================================================
 
 #include <fiff/fiff_types.h>
-#include <fiff/fiff_dir_tree.h>
+#include <fiff/fiff_dir_node.h>
 #include <fiff/fiff.h>
 
 
@@ -159,11 +159,10 @@ public:
     *
     * @param [in,out] p_pStream     The opened fif file
     * @param [in] add_geom          Add geometry information to the Bem Surface
-    * @param [in, out] p_Tree       Search for the bem surface here
     *
     * @return true if succeeded, false otherwise
     */
-    static bool readFromStream(FiffStream::SPtr& p_pStream, bool add_geom, FiffDirTree& p_Tree, MNEBem &p_Bem);
+    static bool readFromStream(FiffStream::SPtr& p_pStream, bool add_geom, MNEBem &p_Bem);
 
     //=========================================================================================================
     /**
@@ -233,6 +232,31 @@ public:
     */
     MNEBem& operator<< (const MNEBemSurface* surf);
 
+    //=========================================================================================================
+    /**
+    * Warp the Bem
+    *
+    * @param[in]  sLm       3D Landmarks of the source geometry
+    * @param[in]  dLm       3D Landmarks of the destination geometry
+    */
+    void warp(const MatrixXf &sLm, const MatrixXf &dLm);
+
+    //=========================================================================================================
+    /**
+    * Transform the Bem
+    *
+    * @param[in]  trans     The Transformation Matrix
+    */
+    void transform(const FiffCoordTrans trans);
+
+    //=========================================================================================================
+    /**
+    * Transform the Bem using the inverse
+    *
+    * @param[in]  trans     The Transformation Matrix
+    */
+    void invtransform(const FiffCoordTrans trans);
+
 protected:
     //=========================================================================================================
     /**
@@ -245,7 +269,7 @@ protected:
     *
     * @return true if succeeded, false otherwise
     */
-    static bool readBemSurface(FiffStream* p_pStream, const FiffDirTree& p_Tree, MNEBemSurface& p_BemSurface);
+    static bool readBemSurface(FiffStream::SPtr& p_pStream, const FiffDirNode::SPtr& p_Tree, MNEBemSurface& p_BemSurface);
 
 private:
     QList<MNEBemSurface> m_qListBemSurface;    /**< List of the BEM Surfaces. */

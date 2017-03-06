@@ -42,7 +42,7 @@
 
 #include "fiff_stream.h"
 #include "fiff_tag.h"
-#include "fiff_dir_tree.h"
+#include "fiff_dir_node.h"
 
 
 //*************************************************************************************************************
@@ -148,11 +148,9 @@ bool FiffCoordTrans::invert_transform()
 bool FiffCoordTrans::read(QIODevice& p_IODevice, FiffCoordTrans& p_Trans)
 {
     FiffStream::SPtr t_pStream(new FiffStream(&p_IODevice));
-    FiffDirTree t_Tree;
-    QList<FiffDirEntry> t_Dir;
 
     printf("Reading coordinate transform from %s...\n", t_pStream->streamName().toUtf8().constData());
-    if(!t_pStream->open(t_Tree, t_Dir))
+    if(!t_pStream->open())
         return false;
 
     //
@@ -164,11 +162,11 @@ bool FiffCoordTrans::read(QIODevice& p_IODevice, FiffCoordTrans& p_Trans)
     //
     //   Get the MRI <-> head coordinate transformation
     //
-    for ( qint32 k = 0; k < t_Dir.size(); ++k )
+    for ( qint32 k = 0; k < t_pStream->dir().size(); ++k )
     {
-        if ( t_Dir[k].kind == FIFF_COORD_TRANS )
+        if ( t_pStream->dir()[k]->kind == FIFF_COORD_TRANS )
         {
-            FiffTag::read_tag(t_pStream.data(),t_pTag,t_Dir[k].pos);
+            t_pStream->read_tag(t_pTag,t_pStream->dir()[k]->pos);
             p_Trans = t_pTag->toCoordTrans();
             success = true;
         }

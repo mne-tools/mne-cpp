@@ -92,8 +92,8 @@ LayoutMaker::LayoutMaker()
 
 //*************************************************************************************************************
 
-bool LayoutMaker::makeLayout(const QList<QVector<double> > &inputPoints,
-                             QList<QVector<double> > &outputPoints,
+bool LayoutMaker::makeLayout(const QList<QVector<float> > &inputPoints,
+                             QList<QVector<float> > &outputPoints,
                              const QStringList &names,
                              QFile &outFile,
                              bool do_fit,
@@ -189,7 +189,7 @@ bool LayoutMaker::makeLayout(const QList<QVector<double> > &inputPoints,
     /*
     * Compose the viewports
     */
-    QVector<double> point;
+    QVector<float> point;
     QTextStream out;
 
     if(writeFile) {

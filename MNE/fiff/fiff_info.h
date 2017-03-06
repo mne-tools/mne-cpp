@@ -255,8 +255,8 @@ private:
     bool make_compensator(fiff_int_t kind, MatrixXd& this_comp) const;
 
 public: //Public because it's a mne struct
-    FiffId      file_id;        /**< File ID. */
-    fiff_int_t  meas_date[2];   /**< Measurement date. */
+    FiffId file_id;             /**< File ID. */
+    fiff_int_t  meas_date[2];   /**< Measurement date. TODO: use fiffTime instead to be MNE-C consistent*/
     float sfreq;                /**< Sample frequency. */
     float highpass;             /**< Highpass frequency. */
     float lowpass;              /**< Lowpass frequency. */

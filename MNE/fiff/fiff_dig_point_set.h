@@ -83,7 +83,7 @@ namespace FIFFLIB {
 //=============================================================================================================
 
 class FiffDigPoint;
-class FiffDirTree;
+class FiffDirNode;
 
 
 //=============================================================================================================
@@ -130,12 +130,12 @@ public:
     /**
     * Reads FiffDigPointSet from a fif file
     *
-    * @param [in, out] p_pStream    The opened fif file
-    * @param [in, out] p_Tree       Search for the bem surface here
+    * @param [in, out] p_Stream     The opened fif file
+    * @param [out] p_Dig            The read digitizer point set
     *
     * @return true if succeeded, false otherwise
     */
-    static bool readFromStream(FiffStream::SPtr& p_pStream, FiffDirTree& p_Tree, FiffDigPointSet& p_Dig);
+    static bool readFromStream(FiffStream::SPtr& p_Stream, FiffDigPointSet& p_Dig);
 
     //=========================================================================================================
     /**
@@ -158,6 +158,20 @@ public:
     * @return number of stored FiffDigPoints
     */
     inline qint32 size() const;
+
+    //=========================================================================================================
+    /**
+     * @brief write
+     * @param p_IODevice
+     */
+    void write(QIODevice &p_IODevice);
+
+    //=========================================================================================================
+    /**
+     * @brief writeToStream
+     * @param p_pStream
+     */
+    void writeToStream(FiffStream* p_pStream);
 
     //=========================================================================================================
     /**

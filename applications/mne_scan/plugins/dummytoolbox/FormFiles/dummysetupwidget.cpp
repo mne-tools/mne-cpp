@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the ECGSetupWidget class.
+* @brief    Contains the implementation of the DummySetupWidget class.
 *
 */
 
@@ -54,7 +54,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DummyToolboxPlugin;
+using namespace DUMMYTOOLBOXPLUGIN;
 
 
 //*************************************************************************************************************

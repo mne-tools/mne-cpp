@@ -63,7 +63,7 @@
 #include <Qt3DExtras/QPerVertexColorMaterial>
 #include <Qt3DExtras/QFirstPersonCameraController>
 #include <Qt3DRender/QPointLight>
-#include <Qt3DRender/QDirectionalLight>
+#include <Qt3DRender/QPointLight>
 #include <Qt3DExtras/QCylinderMesh>
 #include <Qt3DExtras/QForwardRenderer>
 #include <Qt3DExtras/QSphereMesh>
@@ -116,7 +116,7 @@ View3D::~View3D()
 void View3D::init()
 {
     //Create the lights
-    //initLight();
+    initLight();
 
     // Camera
     m_pCameraEntity->lens()->setPerspectiveProjection(45.0f, 16.0f/9.0f, 0.0001f, 100000.0f);
@@ -169,9 +169,9 @@ void View3D::initLight()
 
         enitityLight->addComponent(transform);
 
-        Qt3DRender::QDirectionalLight *light1 = new Qt3DRender::QDirectionalLight(enitityLight);
+        Qt3DRender::QPointLight *light1 = new Qt3DRender::QPointLight(enitityLight);
         light1->setColor(lLightColor.at(i));
-        light1->setWorldDirection(lLightDirections.at(i));
+        //light1->setWorldDirection(lLightDirections.at(i));
         light1->setIntensity(lLightIntensities.at(i));
         enitityLight->addComponent(light1);
 
@@ -183,7 +183,7 @@ void View3D::initLight()
         material->setAmbient(lLightColor.at(i));
         enitityLight->addComponent(material);
 
-        QPair<Qt3DRender::QDirectionalLight*, Qt3DExtras::QPhongMaterial*> pair;
+        QPair<Qt3DRender::QPointLight*, Qt3DExtras::QPhongMaterial*> pair;
         pair.first = light1;
         pair.second = material;
         m_lLightSources.append(pair);

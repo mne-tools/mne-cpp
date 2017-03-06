@@ -60,7 +60,7 @@
 // DEFINE NAMESPACE DummyToolboxPlugin
 //=============================================================================================================
 
-namespace DummyToolboxPlugin
+namespace DUMMYTOOLBOXPLUGIN
 {
 
 

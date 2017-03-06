@@ -75,11 +75,11 @@ using namespace FIFFLIB;
 //=============================================================================================================
 
 FiffTag::FiffTag()
-: m_pComplexFloatData(NULL)
-, m_pComplexDoubleData(NULL)
-, kind(0)
+: kind(0)
 , type(0)
 , next(0)
+//, m_pComplexFloatData(NULL)
+//, m_pComplexDoubleData(NULL)
 {
 }
 
@@ -92,15 +92,15 @@ FiffTag::FiffTag(const FiffTag* p_pFiffTag)
 , type(p_pFiffTag->type)
 , next(p_pFiffTag->next)
 {
-    if(p_pFiffTag->m_pComplexFloatData)
-        this->toComplexFloat();
-    else
-        m_pComplexFloatData = NULL;
+//    if(p_pFiffTag->m_pComplexFloatData)
+//        this->toComplexFloat();
+//    else
+//        m_pComplexFloatData = NULL;
 
-    if(p_pFiffTag->m_pComplexDoubleData)
-        this->toComplexDouble();
-    else
-        m_pComplexDoubleData = NULL;
+//    if(p_pFiffTag->m_pComplexDoubleData)
+//        this->toComplexDouble();
+//    else
+//        m_pComplexDoubleData = NULL;
 }
 
 
@@ -108,144 +108,10 @@ FiffTag::FiffTag(const FiffTag* p_pFiffTag)
 
 FiffTag::~FiffTag()
 {
-    if(this->m_pComplexFloatData)
-        delete this->m_pComplexFloatData;
-    if(this->m_pComplexDoubleData)
-        delete this->m_pComplexDoubleData;
-}
-
-
-//*************************************************************************************************************
-
-bool FiffTag::read_tag_data(FiffStream* p_pStream, FiffTag::SPtr& p_pTag, qint64 pos)
-{
-    if(pos >= 0)
-    {
-        p_pStream->device()->seek(pos);
-    }
-
-    if(!p_pTag)
-        return false;
-
-    //
-    // Read data when available
-    //
-    if (p_pTag->size() > 0)
-    {
-        p_pStream->readRawData(p_pTag->data(), p_pTag->size());
-        FiffTag::convert_tag_data(p_pTag,FIFFV_BIG_ENDIAN,FIFFV_NATIVE_ENDIAN);
-    }
-
-    if (p_pTag->next != FIFFV_NEXT_SEQ)
-        p_pStream->device()->seek(p_pTag->next);//fseek(fid,tag.next,'bof');
-
-    return true;
-}
-
-
-//*************************************************************************************************************
-
-bool FiffTag::read_tag_info(FiffStream* p_pStream, FiffTag::SPtr &p_pTag, bool p_bDoSkip)
-{
-    p_pTag = FiffTag::SPtr(new FiffTag());
-
-    //Option 1
-//    t_DataStream.readRawData((char *)p_pTag, FIFFC_TAG_INFO_SIZE);
-//    p_pTag->kind = Fiff::swap_int(p_pTag->kind);
-//    p_pTag->type = Fiff::swap_int(p_pTag->type);
-//    p_pTag->size = Fiff::swap_int(p_pTag->size);
-//    p_pTag->next = Fiff::swap_int(p_pTag->next);
-
-    //Option 2
-    *p_pStream  >> p_pTag->kind;
-    *p_pStream  >> p_pTag->type;
-    qint32 size;
-    *p_pStream  >> size;
-    p_pTag->resize(size);
-    *p_pStream  >> p_pTag->next;
-
-//    qDebug() << "read_tag_info" << "  Kind:" << p_pTag->kind << "  Type:" << p_pTag->type << "  Size:" << p_pTag->size() << "  Next:" << p_pTag->next;
-
-    if (p_bDoSkip)
-    {
-        QTcpSocket* t_qTcpSocket = qobject_cast<QTcpSocket*>(p_pStream->device());
-        if(t_qTcpSocket)
-        {
-            p_pStream->skipRawData(p_pTag->size());
-        }
-        else
-        {
-            if (p_pTag->next == FIFFV_NEXT_SEQ)
-            {
-                p_pStream->device()->seek(p_pStream->device()->pos()+p_pTag->size()); //fseek(fid,tag.size,'cof');
-            }
-            else if (p_pTag->next > 0)
-            {
-                p_pStream->device()->seek(p_pTag->next); //fseek(fid,tag.next,'bof');
-            }
-        }
-    }
-
-    return true;
-}
-
-
-//*************************************************************************************************************
-
-bool FiffTag::read_rt_tag(FiffStream* p_pStream, FiffTag::SPtr& p_pTag)
-{
-    while(p_pStream->device()->bytesAvailable() < 16)
-        p_pStream->device()->waitForReadyRead(10);
-
-    if(!FiffTag::read_tag_info(p_pStream, p_pTag, false))
-        return false;
-
-    while(p_pStream->device()->bytesAvailable() < p_pTag->size())
-        p_pStream->device()->waitForReadyRead(10);
-
-    if(!FiffTag::read_tag_data(p_pStream, p_pTag))
-        return false;
-
-    return true;
-}
-
-
-//*************************************************************************************************************
-
-bool FiffTag::read_tag(FiffStream* p_pStream, FiffTag::SPtr& p_pTag, qint64 pos)
-{
-    if (pos >= 0)
-    {
-        p_pStream->device()->seek(pos);
-    }
-
-    p_pTag = FiffTag::SPtr(new FiffTag());
-
-    //
-    // Read fiff tag header from stream
-    //
-    *p_pStream  >> p_pTag->kind;
-    *p_pStream  >> p_pTag->type;
-    qint32 size;
-    *p_pStream  >> size;
-    p_pTag->resize(size);
-    *p_pStream  >> p_pTag->next;
-
-//    qDebug() << "read_tag" << "  Kind:" << p_pTag->kind << "  Type:" << p_pTag->type << "  Size:" << p_pTag->size() << "  Next:" << p_pTag->next;
-
-    //
-    // Read data when available
-    //
-    if (p_pTag->size() > 0)
-    {
-        p_pStream->readRawData(p_pTag->data(), p_pTag->size());
-        FiffTag::convert_tag_data(p_pTag,FIFFV_BIG_ENDIAN,FIFFV_NATIVE_ENDIAN);
-    }
-
-    if (p_pTag->next != FIFFV_NEXT_SEQ)
-        p_pStream->device()->seek(p_pTag->next);//fseek(fid,tag.next,'bof');
-
-    return true;
+//    if(this->m_pComplexFloatData)
+//        delete this->m_pComplexFloatData;
+//    if(this->m_pComplexDoubleData)
+//        delete this->m_pComplexDoubleData;
 }
 
 

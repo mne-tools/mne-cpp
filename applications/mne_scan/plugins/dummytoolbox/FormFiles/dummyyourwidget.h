@@ -57,7 +57,7 @@
 // DEFINE NAMESPACE DummyToolboxPlugin
 //=============================================================================================================
 
-namespace DummyToolboxPlugin
+namespace DUMMYTOOLBOXPLUGIN
 {
 
 
@@ -73,7 +73,6 @@ namespace DummyToolboxPlugin
 *
 * @brief The DummyToolbox class provides a dummy toolbar widget structure.
 */
-}
 class DummyYourWidget : public QWidget
 {
     Q_OBJECT
@@ -97,5 +96,7 @@ public:
 private:
     Ui::DummyYourToolbarWidget* ui;        /**< The UI class specified in the designer. */
 };
+
+}   //namespace
 
 #endif // DUMMYYOURWIDGET_H

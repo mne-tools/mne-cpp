@@ -162,7 +162,7 @@ void RealTimeConnectivityEstimateWidget::getData()
         //
         if(!m_pRtItem) {
             qDebug()<<"RealTimeConnectivityEstimateWidget::getData - Creating m_pRtItem list";
-            m_pRtItem = m_pData3DModel->addConnectivityData("Subject01", "HemiLRSet", m_pRTCE->getValue());
+            m_pRtItem = m_pData3DModel->addConnectivityData("Subject", "Data", m_pRTCE->getValue());
         } else {
             qDebug()<<"RealTimeConnectivityEstimateWidget::getData - Working with m_pRtItem list";
 
@@ -181,7 +181,7 @@ void RealTimeConnectivityEstimateWidget::getData()
             //
             // Add brain data
             //
-            m_pData3DModel->addSurfaceSet("Subject01", "HemiLRSet", *m_pRTCE->getSurfSet(), *m_pRTCE->getAnnotSet());
+            m_pData3DModel->addSurfaceSet("Subject", "MRI", *m_pRTCE->getSurfSet(), *m_pRTCE->getAnnotSet());
         }
     }
 }
