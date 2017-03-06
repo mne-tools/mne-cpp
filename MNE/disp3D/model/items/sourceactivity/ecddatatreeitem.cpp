@@ -93,6 +93,7 @@ EcdDataTreeItem::EcdDataTreeItem(int iType, const QString &text)
 , m_bIsInit(false)
 {
     this->setEditable(false);
+    this->setCheckable(true);
     this->setToolTip("Dipole fit source localization data");
 }
 
@@ -150,9 +151,18 @@ bool EcdDataTreeItem::init(Qt3DCore::QEntity* parent)
 bool EcdDataTreeItem::addData(ECDSet::SPtr pECDSet)
 {
     if(!m_bIsInit) {
-        qDebug() << "NetworkTreeItem::updateData - NetworkTreeItem has not been initialized yet!";
+        qDebug() << "EcdDataTreeItem::addData - EcdDataTreeItem has not been initialized yet!";
         return false;
     }
+
+    //Add further infos as children
+    QList<QStandardItem*> list;
+    MetaTreeItem *pItemNumDipoles = new MetaTreeItem(MetaTreeItemTypes::NumberAverages, QString::number(pECDSet->size()));
+    pItemNumDipoles->setEditable(false);
+    list.clear();
+    list << pItemNumDipoles;
+    list << new QStandardItem(pItemNumDipoles->toolTip());
+    this->appendRow(list);
 
     //Add data which is held by this NetworkTreeItem
     QVariant data;
