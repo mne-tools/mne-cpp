@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    View3D class declaration with new Qt3D support
+* @brief    View3D class declaration.
 *
 */
 
