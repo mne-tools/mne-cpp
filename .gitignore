@@ -17,6 +17,8 @@
 /bin/mne_sample_data_downloaderd
 /bin/mne_scan
 /bin/mne_scand
+/bin/mne_show_fiff
+/bin/mne_show_fiffd
 
 # Binaries Examples
 /bin/ex_cancel_noise
