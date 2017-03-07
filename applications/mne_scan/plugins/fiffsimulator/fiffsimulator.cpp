@@ -93,14 +93,13 @@ FiffSimulator::FiffSimulator()
 , m_bIsRunning(false)
 , m_iActiveConnectorId(0)
 {
-    //Create HPI action in toolbar
+    //Init HPI
     m_pActionComputeHPI = new QAction(QIcon(":/images/latestFiffInfoHPI.png"), tr("Compute HPI"),this);
     m_pActionComputeHPI->setStatusTip(tr("Compute HPI"));
     connect(m_pActionComputeHPI, &QAction::triggered,
             this, &FiffSimulator::showHPIDialog);
     addPluginAction(m_pActionComputeHPI);
 
-    //Set some HPI connects
     connect(this, &FiffSimulator::started,
             this, &FiffSimulator::sendStatusToHPI);
     connect(this, &FiffSimulator::finished,
