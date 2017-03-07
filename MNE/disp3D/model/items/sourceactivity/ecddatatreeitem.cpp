@@ -159,7 +159,7 @@ bool EcdDataTreeItem::addData(ECDSet::SPtr pECDSet)
 
     //Add further infos as children
     QList<QStandardItem*> list;
-    MetaTreeItem *pItemNumDipoles = new MetaTreeItem(MetaTreeItemTypes::NumberAverages, QString::number(pECDSet->size()));
+    MetaTreeItem *pItemNumDipoles = new MetaTreeItem(MetaTreeItemTypes::NumberDipoles, QString::number(pECDSet->size()));
     pItemNumDipoles->setEditable(false);
     list.clear();
     list << pItemNumDipoles;
