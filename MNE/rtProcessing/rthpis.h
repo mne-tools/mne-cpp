@@ -75,6 +75,7 @@
 namespace FIFFLIB{
     class FiffInfo;
     class FiffCoordTrans;
+    class FiffDigPointSet;
 }
 
 
@@ -146,12 +147,17 @@ public:
     /**
     * Inits the rt HPI processing and performs one single fit.
     *
-    * @param[in] t_mat          Data to estimate the HPI positions from
-    * @param[out] transDevHead  The final dev head transformation matrix
+    * @param[in] t_mat           Data to estimate the HPI positions from
+    * @param[out] transDevHead   The final dev head transformation matrix
     * @param[out] vGof           The goodness of fit in mm for each fitted HPI coil.
-    * @param[in] vFreqs         The frequencies for each coil.
+    * @param[in] vFreqs          The frequencies for each coil.
+    * @param[in] fittedPointSet  The final fitted positions in form of a digitizer set.
     */
-    void singleHPIFit(const Eigen::MatrixXd& t_mat, FIFFLIB::FiffCoordTrans &transDevHead, const QVector<int>& vFreqs, QVector<double> &vGof);
+    void singleHPIFit(const Eigen::MatrixXd& t_mat,
+                      FIFFLIB::FiffCoordTrans &transDevHead,
+                      const QVector<int>& vFreqs,
+                      QVector<double> &vGof,
+                      FIFFLIB::FiffDigPointSet& fittedPointSet);
 
     //=========================================================================================================
     /**

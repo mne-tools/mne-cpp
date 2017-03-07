@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     babymeghpidlg.h
-* @author   Limin Sun <liminsun@nmr.mgh.harvard.edu>
+* @file     hpiwidget.h
+* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     March, 2015
+* @date     March, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) 2015, Limin Sun and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,22 +29,21 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    BabyMEGHPI class declaration.
+* @brief    HPIWidget class declaration.
 *
 */
 
-#ifndef BABYMEGHPIDGL_H
-#define BABYMEGHPIDGL_H
+#ifndef HPIWIDGET_H
+#define HPIWIDGET_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "babymeg_global.h"
-#include "../babymeg.h"
+#include "scdisp_global.h"
 
-#include <fiff/fiff_info.h>
+#include <fiff/fiff_coord_trans.h>
 
 
 //*************************************************************************************************************
@@ -52,14 +51,15 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QDialog>
-#include <QAbstractButton>
+#include <QWidget>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
 // Eigen INCLUDES
 //=============================================================================================================
+
+#include <Eigen/SparseCore>
 
 
 //*************************************************************************************************************
@@ -68,7 +68,7 @@
 //=============================================================================================================
 
 namespace Ui {
-    class BabyMEGHPIDgl;
+    class HPIWidget;
 }
 
 namespace DISP3DLIB {
@@ -78,6 +78,8 @@ namespace DISP3DLIB {
 
 namespace FIFFLIB {
     class FiffDigPointSet;
+    class FiffInfo;
+    class FiffDigPoint;
 }
 
 
@@ -86,7 +88,7 @@ namespace FIFFLIB {
 // DEFINE NAMESPACE BABYMEGPLUGIN
 //=============================================================================================================
 
-namespace BABYMEGPLUGIN
+namespace SCDISPLIB
 {
 
 
@@ -95,32 +97,52 @@ namespace BABYMEGPLUGIN
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class BabyMEG;
-
 
 //=============================================================================================================
 /**
-* The BabyMEGHPIDgl class provides a QDialog for the HPI controls.
+* The HPIWidget class provides a QDialog for the HPI controls.
 *
-* @brief The BabyMEGHPIDgl class provides a QDialog for the HPI controls.
+* @brief The HPIWidget class provides a QDialog for the HPI controls.
 */
-class BABYMEGSHARED_EXPORT BabyMEGHPIDgl : public QWidget
+class SCDISPSHARED_EXPORT HPIWidget : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit BabyMEGHPIDgl(BabyMEG* p_pBabyMEG, QWidget *parent = 0);
-    ~BabyMEGHPIDgl();
+    //=========================================================================================================
+    /**
+    * Constructs a HPIWidget object.
+    *
+    * @param[in] pFiffInfo      The FiffInfo.
+    * @param[in] parent         The parent widget.
+    */
+    HPIWidget(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo, QWidget *parent = 0);
+    ~HPIWidget();
+
+    //=========================================================================================================
+    /**
+    * Set te data needed for fitting.
+    *
+    * @param[out] data  the data matrix
+    */
+    void setData(const Eigen::MatrixXd& data);
+
+protected:
+     virtual void closeEvent( QCloseEvent * event );
 
     //=========================================================================================================
     /**
     * Set new digitizer data to View3D.
     *
     * @param[in] digPointSet                    The new digitizer set.
+    * @param[in] fittedPointSet                 The new fitted dipoles set.
     * @param[in] vGof                           The goodness of fit in mm for each fitted HPI coil.
     * @param[in] bSortOutAdditionalDigitizer    Whether additional or extra digitized points dhould be sorted out. Too many points could lead to 3D performance issues.
     */
-    void setDigitizerDataToView3D(const FIFFLIB::FiffDigPointSet& digPointSet, const QVector<double>& vGof, bool bSortOutAdditionalDigitizer = true);
+    void setDigitizerDataToView3D(const FIFFLIB::FiffDigPointSet& digPointSet,
+                                  const FIFFLIB::FiffDigPointSet& fittedPointSet,
+                                  const QVector<double>& vGof,
+                                  bool bSortOutAdditionalDigitizer = true);
 
     //=========================================================================================================
     /**
@@ -129,13 +151,6 @@ public:
     * @return true  If any digitizers were loaded that correspond to HPI coils, false otherwise.
     */
     bool hpiLoaded();
-
-    BabyMEG*                m_pBabyMEG;
-
-protected:
-     virtual void closeEvent( QCloseEvent * event );
-
-private:
 
     //=========================================================================================================
     /**
@@ -165,15 +180,28 @@ private:
     */
     void onFreqsChanged();
 
-    Ui::BabyMEGHPIDgl*                          ui;                 /**< The HPI dialog. */
+    //=========================================================================================================
+    /**
+    * Perform a HPI fitting procedure.
+    *
+    * @param[in] vFreqs    the frequencies for each coil.
+    */
+    void performHPIFitting(const QVector<int>& vFreqs);
+
+    Ui::HPIWidget*                              ui;                 /**< The HPI dialog. */
 
     QVector<int>                                m_vCoilFreqs;       /**< Vector contains the HPI coil frequencies. */
 
+    Eigen::SparseMatrix<double>                 m_sparseMatCals;    /**< Sparse calibration matrix.*/
+
+    Eigen::MatrixXd                             m_matValue;         /**< The current data block.*/
+
     QSharedPointer<DISP3DLIB::View3D>           m_pView3D;          /**< The 3D view. */
     QSharedPointer<DISP3DLIB::Data3DTreeModel>  m_pData3DModel;     /**< The Disp3D model. */
+    QSharedPointer<FIFFLIB::FiffInfo>           m_pFiffInfo;        /**< The FiffInfo. */
 
 signals:
-    void SendHPIFiffInfo(FIFFLIB::FiffInfo);
+    void needData();
 };
 } //NAMESPACE
-#endif // BABYMEGHPIDGL_H
+#endif // HPIWIDGET_H
