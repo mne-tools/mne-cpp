@@ -45,11 +45,9 @@
 #include "ecd_set.h"
 #include "dipole_fit_settings.h"
 #include "dipole_fit_data.h"
-#include "mne_meas_data.h"
+#include "../c/mne_meas_data.h"
 
-#include "mne_types.h"
-
-
+#include <mne/c/mne_types.h>
 
 
 //*************************************************************************************************************
@@ -146,7 +144,7 @@ public:
     *
     * @return true when successful
     */
-    static int fit_dipoles_raw(const QString& dataname, MneRawData* raw, mneChSelection sel, DipoleFitData* fit, GuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose, ECDSet& p_set);
+    static int fit_dipoles_raw(const QString& dataname, MNELIB::MneRawData* raw, mneChSelection sel, DipoleFitData* fit, GuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose, ECDSet& p_set);
 
     //=========================================================================================================
     /**
@@ -167,7 +165,7 @@ public:
     *
     * @return true when successful
     */
-    static int fit_dipoles_raw(const QString& dataname, MneRawData* raw, mneChSelection sel, DipoleFitData* fit, GuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose);
+    static int fit_dipoles_raw(const QString& dataname, MNELIB::MneRawData* raw, mneChSelection sel, DipoleFitData* fit, GuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose);
 
 private:
     DipoleFitSettings* settings;

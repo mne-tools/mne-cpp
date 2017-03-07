@@ -102,7 +102,9 @@ SOURCES += fiff.cpp \
     fiff_evoked_set.cpp \
     fiff_io.cpp \
     fiff_dig_point_set.cpp \
-    fiff_dir_node.cpp
+    fiff_dir_node.cpp \
+    c/fiff_coord_trans_old.cpp \
+    c/fiff_sparse_matrix.cpp
 
 HEADERS += fiff.h \
     fiff_global.h \
@@ -130,7 +132,10 @@ HEADERS += fiff.h \
     fiff_evoked_set.h \
     fiff_io.h \
     fiff_dig_point_set.h \
-    fiff_dir_node.h
+    fiff_dir_node.h \
+    c/fiff_coord_trans_old.h \
+    c/fiff_sparse_matrix.h \
+    c/fiff_types_mne-c.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

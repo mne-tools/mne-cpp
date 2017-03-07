@@ -45,9 +45,9 @@
 
 #include <fiff/fiff_types.h>
 #include "analyze_types.h"
-#include "fwd_types.h"
-#include "fwd_eeg_sphere_model.h"
-#include "fwd_bem_model.h"
+#include <fwd/fwd_types.h>
+#include <fwd/fwd_eeg_sphere_model.h>
+#include <fwd/fwd_bem_model.h>
 #include "dipole_forward.h"
 
 
@@ -143,13 +143,13 @@ public:
     //============================= dipole_fit_setup.c =============================
 
 
-    static int setup_forward_model(DipoleFitData* d, MneCTFCompDataSet* comp_data, FwdCoilSet* comp_coils);
+    static int setup_forward_model(DipoleFitData* d, MNELIB::MneCTFCompDataSet* comp_data, FWDLIB::FwdCoilSet* comp_coils);
 
 
 
 
-    static MneCovMatrix* ad_hoc_noise(FwdCoilSet* meg,          /* Channel name lists to define which channels are gradiometers */
-                                     FwdCoilSet* eeg,
+    static MNELIB::MneCovMatrix* ad_hoc_noise(FWDLIB::FwdCoilSet* meg,          /* Channel name lists to define which channels are gradiometers */
+                                     FWDLIB::FwdCoilSet* eeg,
                                      float      grad_std,
                                      float      mag_std,
                                      float      eeg_std);
@@ -159,7 +159,7 @@ public:
     static int make_projection(const QList<QString>& projnames,
                                FIFFLIB::fiffChInfo chs,
                                int        nch,
-                               MneProjOp*  *res);
+                               MNELIB::MneProjOp*  *res);
 
 
 
@@ -183,7 +183,7 @@ public:
                                             const QString& measname,        /**< This gives the MEG/head transform and sensor locations */
                                             char  *bemname,                 /**< BEM model */
                                             Eigen::Vector3f *r0,            /**< Sphere model origin in head coordinates (optional) */
-                                            FwdEegSphereModel* eeg_model,   /**< EEG sphere model definition */
+                                            FWDLIB::FwdEegSphereModel* eeg_model,   /**< EEG sphere model definition */
                                             int   accurate_coils,           /**< Use accurate coil definitions? */
                                             const QString& badname,         /**< Bad channels list */
                                             const QString& noisename,               /**< Noise covariance matrix */
@@ -233,21 +233,21 @@ public:
 
 
 public:
-      INVERSELIB::FiffCoordTransOld*    mri_head_t; /**< MRI <-> head coordinate transformation */
-      INVERSELIB::FiffCoordTransOld*    meg_head_t; /**< MEG <-> head coordinate transformation */
+      FIFFLIB::FiffCoordTransOld*    mri_head_t; /**< MRI <-> head coordinate transformation */
+      FIFFLIB::FiffCoordTransOld*    meg_head_t; /**< MEG <-> head coordinate transformation */
       int               coord_frame;        /**< Common coordinate frame */
       FIFFLIB::fiffChInfo        chs;       /**< Channels */
       int               nmeg;               /**< How many MEG */
       int               neeg;               /**< How many EEG */
       char              **ch_names;         /**< List of all channel names */
-      INVERSELIB::FiffSparseMatrix* pick;   /**< Matrix to pick data from the full data set which may contain channels we are not interested in */
-      FwdCoilSet*        meg_coils;         /**< MEG coil definitions */
-      FwdCoilSet*        eeg_els;           /**< EEG electrode definitions */
+      FIFFLIB::FiffSparseMatrix* pick;   /**< Matrix to pick data from the full data set which may contain channels we are not interested in */
+      FWDLIB::FwdCoilSet*        meg_coils;         /**< MEG coil definitions */
+      FWDLIB::FwdCoilSet*        eeg_els;           /**< EEG electrode definitions */
       float             r0[3];              /**< Sphere model origin */
       char              *bemname;           /**< Using a BEM? */
 
-      FwdEegSphereModel *eeg_model;         /**< EEG sphere model definition */
-      FwdBemModel       *bem_model;         /**< BEM model definition */
+      FWDLIB::FwdEegSphereModel *eeg_model;         /**< EEG sphere model definition */
+      FWDLIB::FwdBemModel       *bem_model;         /**< BEM model definition */
 
       dipoleFitFuncs    sphere_funcs;       /**< These are the sphere model forward functions */
       dipoleFitFuncs    bem_funcs;          /**< These are the BEM forward functions */
@@ -255,10 +255,10 @@ public:
       dipoleFitFuncs    mag_dipole_funcs;   /**< Functions to fit a magnetic dipole */
 
       int               fixed_noise;        /**< Were fixed noise values used rather than a noise-covariance matrix read from a file */
-      MneCovMatrix*      noise_orig;         /**< Noise covariance matrix (original) */
-      MneCovMatrix*      noise;              /**< Noise covariance matrix (weighted to take the selection into account) */
+      MNELIB::MneCovMatrix*      noise_orig;         /**< Noise covariance matrix (original) */
+      MNELIB::MneCovMatrix*      noise;              /**< Noise covariance matrix (weighted to take the selection into account) */
       int               nave;               /**< How many averages does this correspond to? */
-      MneProjOp*        proj;               /**< The projection operator to use */
+      MNELIB::MneProjOp*        proj;               /**< The projection operator to use */
       int               column_norm;        /**< What kind of column normalization to apply to the forward solution */
       int               fit_mag_dipoles;    /**< Fit magnetic dipoles? */
       void              *user;              /**< User data for anything we need */
