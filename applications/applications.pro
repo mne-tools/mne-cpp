@@ -38,21 +38,22 @@ include(../mne-cpp.pri)
 TEMPLATE = subdirs
 
 SUBDIRS += \
-    mne_rt_server\
+    mne_rt_server \
+    mne_show_fiff
 
 !contains(MNECPP_CONFIG, minimalVersion) {
     SUBDIRS += \
-        mne_forward_solution \
         mne_browse \
+        mne_forward_solution \
         mne_matching_pursuit \
-        mne_sample_set_downloader \
+        mne_sample_set_downloader
 
         qtHaveModule(charts) {
         SUBDIRS += \
-            mne_launch \
-            mne_dipole_fit \
-            mne_scan \
             mne_analyze \
+            mne_dipole_fit \
+            mne_launch \
+            mne_scan
         } else {
             message("applications.pro - The Qt Charts module is missing. Please install to build the complete set of MNE-CPP features.")
         }

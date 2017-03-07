@@ -55,16 +55,22 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE FiffSimulatorPlugin
+// FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FiffSimulatorPlugin
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE FIFFSIMULATORPLUGIN
+//=============================================================================================================
+
+namespace FIFFSIMULATORPLUGIN
 {
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// FORWARD DECLARATIONS FIFFSIMULATORPLUGIN
 //=============================================================================================================
 
 class FiffSimulator;
@@ -132,9 +138,9 @@ private:
 
     FiffSimulator*   m_pFiffSimulator;      /**< a pointer to corresponding mne rt client.*/
 
-    Ui::FiffSimulatorSetupWidgetClass ui; /**< the user interface for the MneRtClientSetupWidget.*/
+    Ui::FiffSimulatorSetupWidgetClass ui;   /**< the user interface for the MneRtClientSetupWidget.*/
 
-    bool m_bIsInit;                     /**< false when gui is not initialized jet. Prevents gui from already interacting when not initialized */
+    bool m_bIsInit;                         /**< false when gui is not initialized jet. Prevents gui from already interacting when not initialized */
 
 };
 

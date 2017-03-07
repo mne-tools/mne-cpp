@@ -56,7 +56,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FiffSimulatorPlugin;
+using namespace FIFFSIMULATORPLUGIN;
 
 
 //*************************************************************************************************************
@@ -129,12 +129,10 @@ void FiffProducer::run()
 
     first = from;
 
-    qint32 nchan = m_pFiffSimulator->m_RawInfo.info.nchan;
-
-    MatrixXd cals(1,nchan);
-
+//    //Calibration - Is taken care of during read_raw_segment(...) later in the code
+//    qint32 nchan = m_pFiffSimulator->m_RawInfo.info.nchan;
+//    MatrixXd cals(1,nchan);
 //    SparseMatrix<double> inv_calsMat(nchan, nchan);
-
 //    for(qint32 i = 0; i < nchan; ++i)
 //        inv_calsMat.insert(i, i) = 1.0f/m_pFiffSimulator->m_RawInfo.info.chs[i].cal;
 

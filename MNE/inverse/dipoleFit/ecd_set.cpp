@@ -155,8 +155,8 @@ ECDSet::ECDSet()
 //*************************************************************************************************************
 
 ECDSet::ECDSet(const ECDSet &p_ECDSet)
-    : dataname(p_ECDSet.dataname)
-    , m_qListDips(p_ECDSet.m_qListDips)
+: dataname(p_ECDSet.dataname)
+, m_qListDips(p_ECDSet.m_qListDips)
 {
 
 }
