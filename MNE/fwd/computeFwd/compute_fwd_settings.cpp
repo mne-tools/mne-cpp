@@ -183,7 +183,7 @@ bool ComputeFwdSettings::check_args (int *argc,char **argv)
     for (int k = 0; k < *argc; k++) {
         found = 0;
         if (strcmp(argv[k],"--version") == 0) {
-            printf("%s version %s compiled at %s %s\n", argv[0],PROGRAM_VERSION,__DATE__,__TIME__);
+            fprintf(stderr,"%s version %s compiled at %s %s\n", argv[0],PROGRAM_VERSION,__DATE__,__TIME__);
             exit(0);
         }
         else if (strcmp(argv[k],"--help") == 0) {

@@ -85,7 +85,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FiffSimulatorPlugin;
+using namespace FIFFSIMULATORPLUGIN;
 using namespace FIFFLIB;
 using namespace MNELIB;
 

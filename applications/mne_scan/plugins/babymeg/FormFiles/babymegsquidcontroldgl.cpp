@@ -234,7 +234,7 @@ void BabyMEGSQUIDControlDgl::TuneGraphDispProc(MatrixXf tmp)
     settings.maxX = cols;
     settings.minY = mmin(tmp,chanIndx);
     settings.maxY = mmax(tmp,chanIndx);
-    settings.xlabel = QString("%1 samples/second").arg(m_pBabyMEG->m_dSfreq) ;
+    settings.xlabel = QString("%1 samples/second").arg(m_pBabyMEG->m_pFiffInfo->sfreq) ;
     settings.ylabel = QString("Amplitude [rel. unit]");
 
     d_timeplot->setPlotSettings(settings);

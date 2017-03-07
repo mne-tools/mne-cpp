@@ -9,7 +9,7 @@
 #
 # @section  LICENSE
 #
-# Copyright (C) 2012, Christoph Dinh, Lorenz Esch and Matti Hamalainen. All rights reserved.
+# Copyright (C) 2016, Christoph Dinh, Lorenz Esch and Matti Hamalainen. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -56,9 +56,9 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Fsd \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
             -lMNE$${MNE_LIB_VERSION}Mned \
+            -lMNE$${MNE_LIB_VERSION}Fwdd \
             -lMNE$${MNE_LIB_VERSION}Inversed \
             -lMNE$${MNE_LIB_VERSION}Connectivityd \
-            -lMNE$${MNE_LIB_VERSION}RtProcessingd \
             -lMNE$${MNE_LIB_VERSION}RtCommandd \
             -lMNE$${MNE_LIB_VERSION}RtClientd \
             -lMNE$${MNE_LIB_VERSION}Dispd \
@@ -74,9 +74,9 @@ else {
             -lMNE$${MNE_LIB_VERSION}Fs \
             -lMNE$${MNE_LIB_VERSION}Fiff \
             -lMNE$${MNE_LIB_VERSION}Mne \
+            -lMNE$${MNE_LIB_VERSION}Fwd \
             -lMNE$${MNE_LIB_VERSION}Inverse \
             -lMNE$${MNE_LIB_VERSION}Connectivity \
-            -lMNE$${MNE_LIB_VERSION}RtProcessing \
             -lMNE$${MNE_LIB_VERSION}RtCommand \
             -lMNE$${MNE_LIB_VERSION}RtClient \
             -lMNE$${MNE_LIB_VERSION}Disp \
@@ -99,7 +99,6 @@ SOURCES += \
     FormFiles/globalobj.cpp \
     FormFiles/babymegprojectdialog.cpp \
     FormFiles/plotter.cpp \
-    FormFiles/babymeghpidgl.cpp \
 
 HEADERS += \
     babymeg.h \
@@ -112,14 +111,12 @@ HEADERS += \
     FormFiles/globalobj.h \
     FormFiles/babymegprojectdialog.h \
     FormFiles/plotter.h \
-    FormFiles/babymeghpidgl.h \
 
 FORMS += \
     FormFiles/babymegsetup.ui \
     FormFiles/babymegabout.ui \
     FormFiles/babymegsquidcontroldgl.ui \
     FormFiles/babymegprojectdialog.ui \
-    FormFiles/babymeghpidgl.ui \
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

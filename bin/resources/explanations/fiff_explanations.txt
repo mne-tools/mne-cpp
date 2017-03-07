@@ -1,0 +1,434 @@
+#
+#
+#	This file contains explanations of items in a fif file
+#
+#	Copyright 2006
+#
+#	Matti Hamalainen
+# 	Athinoula A. Martinos Center for Biomedical Imaging
+# 	Charlestown, MA, USA
+#
+#	$Header$
+#	$Log$
+#	Revision 1.22  2009/03/01 22:19:00  msh
+#	Added some new tag numbers
+#
+#	Revision 1.21  2009/02/20 13:40:10  msh
+#	Added explanation for tag 3566
+#	
+#	Revision 1.20  2009/01/30 15:19:14  msh
+#	Explain unsigned int data correctly
+#	Version number incremented to 1.5
+#	Added explanation for the FIFF_MNE_EVENT_TRIGGER_MASK tag
+#	
+#	Revision 1.19  2008/09/30 09:22:06  msh
+#	Added Explanation for block 119 (MaxShield raw data)
+#	
+#	Revision 1.18  2008/06/07 13:38:53  msh
+#	Added explanation for FIFFB_REF (118)
+#	
+#	Revision 1.17  2008/06/04 19:16:24  msh
+#	Added tag number 3546
+#	
+#	Revision 1.16  2008/02/28 16:23:26  msh
+#	Added tag 3523
+#	
+#	Revision 1.15  2007/11/06 03:23:57  msh
+#	Added missing tags 3112 and 3113
+#	
+#	Revision 1.14  2007/02/27 14:22:50  msh
+#	Added missing tag definitions
+#	
+#	Revision 1.13  2006/11/24 20:58:17  msh
+#	Added missing tag numbers
+#	
+#	Revision 1.12  2006/11/08 13:13:23  msh
+#	Added SSS tags
+#	
+#	Revision 1.11  2006/10/14 01:29:38  msh
+#	Added explanations for derivations
+#	
+#	Revision 1.10  2006/09/26 10:45:09  msh
+#	Added missing tag numbers 3515 and 3516
+#	
+#	Revision 1.9  2006/09/20 22:02:19  msh
+#	Added Am to units
+#	
+#	Revision 1.8  2006/06/22 16:42:00  msh
+#	Added explanation for tag 3582
+#	
+#	Revision 1.7  2006/05/28 17:43:53  msh
+#	Added missing tag numbers to fiff_explanations.txt
+#	
+#	Revision 1.6  2006/05/11 16:42:09  msh
+#	Fixed unit multiplier processing.
+#	
+#	Revision 1.5  2006/05/09 17:42:53  msh
+#	Added tag 3560
+#	
+#	Revision 1.4  2006/04/29 12:12:29  msh
+#	Added more missing tags.
+#	
+#	Revision 1.3  2006/04/27 00:53:53  msh
+#	Added more missing explanations.
+#	
+#	Revision 1.2  2006/04/27 00:51:47  msh
+#	Added missing explanations.
+#	
+#	Revision 1.1.1.1  2006/04/19 15:15:32  msh
+#	Initial version
+#	
+#
+#
+#	Tag explanations
+#
+1  100 "file ID"
+1  101 "dir pointer"
+1  102 "directory"
+1  103 "block ID"
+1  104 "{"
+1  105 "}"
+1  106 "free list"
+1  107 "free block"
+1  108 "NOP"
+1  109 "parent FID"
+1  110 "parent BID"
+1  111 "block name"
+1  112 "block version"
+1  113 "creator"
+1  114 "modifier"
+1  115 "ref role"
+1  116 "ref file id"
+1  117 "ref file num"
+1  118 "ref file name"
+1  120 "ref block id"
+1  150 "acq. pars."
+1  151 "acq. stim seq."
+1  200 "nchan"
+1  201 "sfreq"
+1  202 "packing"
+1  203 "channel"
+1  204 "date"
+1  205 "subject"
+1  206 "comment"
+1  206 "comment"
+1  207 "nave"
+1  208 "firstsamp"
+1  209 "lastsamp"
+1  210 "aspect type"
+1  211 "ref. event"
+1  212 "scientist"
+1  213 "dig. point"
+1  214 "channel pos"
+1  215 "HPI slopes"
+1  216 "HPI # coils"
+1  217 "req. event"
+1  218 "req. limit"
+1  219 "lowpass"
+1  220 "bad chs"
+1  221 "artefacts"
+1  222 "transform"
+1  223 "highpass"
+1  224 "channel cals"
+1  225 "HPI bad chs"
+1  226 "HPI cor coef"
+1  227 "event comment"
+1  228 "nsamp"
+1  229 "time minimum"
+1  230 "subave size"
+1  231 "subave first"
+1  233 "block name"
+1  234 "dig. string"
+1  240 "HPI moments"
+1  241 "HPI g-values"
+1  242 "HPI fit accept"
+1  243 "HPI g limit"
+1  244 "HPI dist limit"
+1  245 "HPI coil no"
+1  263 "SSS coord frame"
+1  264 "SSS task"
+1  265 "SSS origin"
+1  266 "SSS in order"
+1  267 "SSS out order"
+1  268 "SSS nchan"
+1  269 "SSS components"
+1  270 "SSS cal chans"
+1  271 "SSS cal corrs"
+1  272 "SSS ST corr"
+1  300 "data buffer"
+1  301 "data skip"
+1  302 "epoch"
+1  400 "subject id"
+1  401 "first name"
+1  402 "middle name"
+1  403 "last name"
+1  404 "birthday"
+1  405 "sex"
+1  406 "handedness"
+1  407 "weight"
+1  408 "height"
+1  409 "comment"
+1  410 "subject HIS id"
+1  500 "project id"
+1  501 "proj. name"
+1  502 "project aim"
+1  503 "proj. pers."
+1  504 "proj. comm."
+1  600 "event ch #'s"
+1  601 "event list"
+1  701 "SQUID bias"
+1  702 "SQUID offset"
+1  703 "SQUID gate"
+1  800 "Decoupler matrix"
+1 1101 "MRI source"
+1 2002 "MRI src fmt"
+1 2003 "pixel type"
+1 2004 "pixel offset"
+1 2005 "pixel scale"
+1 2006 "pixel data"
+1 2007 "overlay type"
+1 2008 "overlay data"
+1 2010 "pixel width"
+1 2011 "real width"
+1 2012 "pixel height"
+1 2013 "real height"
+1 2014 "pixel depth"
+1 2015 "real depth"
+1 2016 "slice thickness"
+1 2020 "MRI orig source"
+1 2021 "MRI orig format"
+1 2022 "MRI opixel type"
+1 2023 "MRI opixel offs"
+1 3001 "sphere orig."
+1 3002 "sphere coord fr"
+1 3003 "sphere layers"
+1 3101 "surface id"
+1 3102 "surface name"
+1 3103 "surf.  nnode"
+1 3104 "surface ntri"
+1 3105 "surf.  nodes"
+1 3106 "surf. triang"
+1 3107 "surf. normals"
+1 3108 "surf. curv. vec"
+1 3109 "surf. curv. val"
+1 3110 "BEM pot. sol."
+1 3111 "BEM method"
+1 3112 "BEM coord frame"
+1 3113 "BEM conductivity"
+1 3201 "source dipole"
+1 3401 "xfit leadpro"
+1 3402 "xfit mapprod"
+1 3403 "xfit gmappro"
+1 3404 "xfit volint"
+1 3405 "xfit intrad"
+1 3411 "proj item kind"
+1 3412 "proj item time"
+1 3413 "proj item ign"
+1 3414 "proj nvec"
+1 3415 "proj item vect"
+1 3417 "proj item chs"
+1 3502 "MNE row names"
+1 3503 "MNE col names"
+1 3504 "MNE nrow"
+1 3505 "MNE ncol"
+1 3506 "MNE coordf"
+1 3507 "MNE ch name list"
+1 3508 "MNE file name"
+1 3510 "MNE src loc"
+1 3511 "MNE src norm"
+1 3512 "MNE src npoints"
+1 3513 "MNE src sel"
+1 3514 "MNE src nuse"
+1 3515 "MNE src nearest"
+1 3516 "MNE src nearest dist"
+1 3517 "MNE src id"
+1 3518 "MNE src space type"
+1 3519 "MNE src vertices"
+1 3590 "MNE src ntri"
+1 3591 "MNE src tri"
+1 3592 "MNE src nusetri"
+1 3593 "MNE src usetri"
+1 3594 "MNE src nneighbors"
+1 3595 "MNE src neighbors"
+1 3596 "MNE src voxel dims"
+1 3597 "MNE src interpolator"
+1 3598 "MNE src MRI volume"
+1 3520 "MNE fwd sol"
+1 3521 "MNE src ori"
+1 3522 "MNE methods"
+1 3523 "MNE fwd grad"
+1 3530 "MNE cov kind"
+1 3531 "MNE cov dim"
+1 3532 "MNE cov matrix"
+1 3533 "MNE cov diag"
+1 3534 "MNE cov eigenval"
+1 3535 "MNE cov eigenvec"
+1 3536 "MNE cov nfree"
+1 3540 "MNE inv leads"
+1 3541 "MNE inv fields"
+1 3542 "MNE inv sing"
+1 3543 "MNE inv priors"
+1 3544 "MNE inv full"
+1 3545 "MNE inv src ori"
+1 3546 "MNE inv leads weighted"
+1 3547 "MNE current unit"
+1 3550 "MNE env wd"
+1 3551 "MNE env command"
+1 3560 "MNE proj active"
+1 3561 "MNE event list"
+1 3562 "MNE hemisphere"
+1 3563 "MNE data skip nop"
+1 3565 "MNE trigger mask"
+1 3566 "MNE event comments"
+1 3570 "MNE morph map"
+1 3571 "MNE morph map from"
+1 3572 "MNE morph map to"
+1 3580 "MNE CTF comp kind"
+1 3581 "MNE CTF comp data"
+1 3582 "MNE CTF comp calib"
+1 3585 "MNE derivation data"
+1 3600 "MNE surface map data"
+1 3601 "MNE surface map kind"
+1 4001 "volume id"
+1 4002 "volume name"
+1 4003 "volume uid"
+1 4004 "volume uname"
+1 4005 "vol.  urname"
+1 4006 "volume type"
+1 4007 "volume host"
+1 4008 "volume rroot"
+1 4009 "volume sroot"
+1 4010 "volume mntpt"
+1 4011 "vol.  blocks"
+1 4012 "vol. fblocks"
+1 4013 "vol. ablocks"
+1 4014 "volume bsize"
+1 4015 "volume dir"
+1 5001 "index kind"
+1 5002 "index"
+#
+#	Block explanations
+#
+2  100 "measurement"
+2  101 "meas. info"
+2  102 "raw data"
+2  103 "proc. data"
+2  104 "evoked data"
+2  105 "data aspect"
+2  106 "subject"
+2  107 "isotrak"
+2  108 "HPI meas"
+2  109 "HPI result"
+2  110 "HPI coil"
+2  111 "project"
+2  112 "cont. data"
+2  114 "anything"
+2  115 "events"
+2  116 "index"
+2  117 "acq. pars."
+2  118 "file ref"
+2  119 "MaxShield raw data"
+2  200 "MRI data"
+2  201 "MRI set"
+2  202 "MRI slice"
+2  203 "MRI scenery"
+2  204 "MRI scene"
+2  300 "Sphere mod."
+2  310 "BEM data"
+2  311 "BEM surf"
+2  312 "xfit aux"
+2  313 "projection"
+2  314 "proj. item"
+2  350 "MNE"
+2  351 "MNE src space"
+2  352 "MNE fwd sol"
+2  353 "MNE parent MRI"
+2  354 "MNE parent MEG"
+2  355 "MNE cov matrix"
+2  356 "MNE inv sol"
+2  357 "MNE named mat"
+2  358 "MNE env"
+2  359 "MNE bad chs"
+2  360 "MNE vertex map"
+2  361 "MNE events"
+2  362 "MNE morph map"
+2  363 "MNE surface map"
+2  364 "MNE surface map group"
+2  370 "MNE CTF comp"
+2  371 "MNE CTF comp data"
+2  372 "MNE ch deriv"
+2  400 "volume info"
+2  501 "Channel decoupler"
+2  502 "SSS info"
+2  503 "SSS cal adjust"
+2  504 "SSS ST info"
+2  505 "SSS bases"
+2  510 "Smartshield"
+2  900 "Processing history"
+2  901 "Processing record"
+2  999 "root"
+#
+#	Unit explanations
+#
+3    -1 ""
+3    1 "m"
+3    2 "kg"
+3    3 "s"
+3    4 "A"
+3    5 "K"
+3    6 "mol"
+3    7 "rad"
+3    8 "sr"
+3  101 "Hz"
+3  102 "N"
+3  103 "Pa"
+3  104 "J"
+3  105 "W"
+3  106 "C"
+3  107 "V"
+3  108 "F"
+3  109 "ohm"
+3  110 "S"
+3  111 "Wb"
+3  112 "T"
+3  113 "H"
+3  114 "C"
+3  115 "lm"
+3  116 "lx"
+3  201 "T/m"
+3  202 "Am"
+3  203 "Am/m^2"
+3  204 "Am/m^3"
+#
+#	Unit multiplier explanations
+#
+4    0 ""
+4    1 "da"
+4    2 "h"
+4    3 "k"
+4    6 "M"
+4   12 "T"
+4   15 "P"
+4   18 "E"
+4   -1 "d"
+4   -2 "c"
+4   -3 "m"
+4   -6 "mu"
+4   -9 "n"
+4  -12 "p"
+4  -15 "f"
+4  -18 "a"
+#
+#	Channel kinds
+#	
+5    1		"MEG"
+5    2		"EEG"
+5    3		"STI"
+5    201	"MCG"
+5    201	"MEGREF"
+5    202	"EOG"
+5    302	"EMG"
+5    402	"ECG"
+5    502	"MISC"
+5    602	"RESP"
+
