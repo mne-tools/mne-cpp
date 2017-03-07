@@ -93,11 +93,18 @@ FiffSimulator::FiffSimulator()
 , m_bIsRunning(false)
 , m_iActiveConnectorId(0)
 {
+    //Create HPI action in toolbar
     m_pActionComputeHPI = new QAction(QIcon(":/images/latestFiffInfoHPI.png"), tr("Compute HPI"),this);
     m_pActionComputeHPI->setStatusTip(tr("Compute HPI"));
     connect(m_pActionComputeHPI, &QAction::triggered,
             this, &FiffSimulator::showHPIDialog);
     addPluginAction(m_pActionComputeHPI);
+
+    //Set some HPI connects
+    connect(this, &FiffSimulator::started,
+            this, &FiffSimulator::sendStatusToHPI);
+    connect(this, &FiffSimulator::finished,
+            this, &FiffSimulator::sendStatusToHPI);
 }
 
 
@@ -200,8 +207,9 @@ bool FiffSimulator::start()
 
 bool FiffSimulator::stop()
 {
-    if(m_pFiffSimulatorProducer->isRunning())
+    if(m_pFiffSimulatorProducer->isRunning()) {
         m_pFiffSimulatorProducer->stop();
+    }
 
     //Wait until this thread is stopped
     m_qMutex.lock();
@@ -399,11 +407,11 @@ void FiffSimulator::disconnectCmdClient()
 
 void FiffSimulator::requestInfo()
 {
-    while(!(m_pFiffSimulatorProducer->m_iDataClientId > -1 && m_bCmdClientIsConnected))
+    while(!(m_pFiffSimulatorProducer->m_iDataClientId > -1 && m_bCmdClientIsConnected)) {
         qWarning() << "FiffSimulatorProducer is not running! Retry...";
+    }
 
-    if(m_pFiffSimulatorProducer->m_iDataClientId > -1 && m_bCmdClientIsConnected)
-    {
+    if(m_pFiffSimulatorProducer->m_iDataClientId > -1 && m_bCmdClientIsConnected) {
         // read meas info
         (*m_pRtCmdClient)["measinfo"].pValues()[0].setValue(m_pFiffSimulatorProducer->m_iDataClientId);
         (*m_pRtCmdClient)["measinfo"].send();
@@ -411,9 +419,9 @@ void FiffSimulator::requestInfo()
         m_pFiffSimulatorProducer->producerMutex.lock();
         m_pFiffSimulatorProducer->m_bFlagInfoRequest = true;
         m_pFiffSimulatorProducer->producerMutex.unlock();
-    }
-    else
+    } else {
         qWarning() << "FiffSimulatorProducer is not connected!";
+    }
 }
 
 
@@ -427,7 +435,6 @@ void FiffSimulator::showHPIDialog()
         msgBox.exec();
         return;
     } else {
-        qDebug()<<" Start to load Polhemus File";
         if (!m_pHPIWidget) {
             m_pHPIWidget = QSharedPointer<HPIWidget>(new HPIWidget(m_pFiffInfo));
 
@@ -466,3 +473,19 @@ void FiffSimulator::sendHPIData()
         m_pHPIWidget->setData(m_matValue.cast<double>());
     }
 }
+
+
+//*************************************************************************************************************
+
+void FiffSimulator::sendStatusToHPI()
+{
+    if (!m_pHPIWidget) {
+        m_pHPIWidget = QSharedPointer<HPIWidget>(new HPIWidget(m_pFiffInfo));
+
+        connect(m_pHPIWidget.data(), &HPIWidget::needData,
+                this, &FiffSimulator::sendHPIData);
+    }
+
+    m_pHPIWidget->setIsRunning(this->isRunning());
+}
+

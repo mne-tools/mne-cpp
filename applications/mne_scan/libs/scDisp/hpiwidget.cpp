@@ -92,6 +92,7 @@ HPIWidget::HPIWidget(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo, QWidget *paren
 , m_pFiffInfo(pFiffInfo)
 , m_pView3D(View3D::SPtr(new View3D))
 , m_pData3DModel(Data3DTreeModel::SPtr(new Data3DTreeModel))
+, m_bIsRunning(false)
 {
     ui->setupUi(this);
 
@@ -156,6 +157,14 @@ HPIWidget::~HPIWidget()
 void HPIWidget::setData(const Eigen::MatrixXd& data)
 {
     m_matValue = data;
+}
+
+
+//*************************************************************************************************************
+
+void HPIWidget::setIsRunning(bool bStatus)
+{
+    m_bIsRunning = bStatus;
 }
 
 
@@ -289,7 +298,7 @@ QList<FiffDigPoint> HPIWidget::readPolhemusDig(QString fileName)
     QVector<double> vGof;
     vGof << 0.0 << 0.0 << 0.0 << 0.0;
 
-    //this->setDigitizerDataToView3D(t_digSet, FiffDigPointSet(), vGof);
+    this->setDigitizerDataToView3D(t_digSet, FiffDigPointSet(), vGof);
 
     //Set loaded number of digitizers
     ui->m_label_numberLoadedCoils->setNum(numHPI);
@@ -327,6 +336,13 @@ void HPIWidget::onBtnDoSingleFit()
     if(!this->hpiLoaded()) {
        QMessageBox msgBox;
        msgBox.setText("Please load a digitizer set with at lesat 3 HPI coils first!");
+       msgBox.exec();
+       return;
+    }
+
+    if(!m_bIsRunning) {
+       QMessageBox msgBox;
+       msgBox.setText("Please start the measurement first!");
        msgBox.exec();
        return;
     }
@@ -433,7 +449,7 @@ void HPIWidget::performHPIFitting(const QVector<int>& vFreqs)
 
             m_matValue.resize(0,0);
 
-            //Set newly calculated transforamtion amtrix to fiff info
+            //Set newly calculated transformation matrix to fiff info
             m_pFiffInfo->dev_head_t = transDevHead;
 
             //Apply new dev/head matrix to current digitizer and update in 3D view in HPI control widget

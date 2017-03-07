@@ -233,6 +233,8 @@ protected:
 
     bool                m_bIsRunning;                                   /**< Holds if real-time Covariance estimation is running.*/
 
+    QString             m_sHPIResourceDir;                              /**< Hold the resource folder to store the debug information in. */
+
     static std::vector <double>         base_arr;
     QSharedPointer<FIFFLIB::FiffInfo>   m_pFiffInfo;                    /**< Holds the fiff measurement information. */
 
