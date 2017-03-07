@@ -89,6 +89,10 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
+    Deep deepTest;
+
+    deepTest.test();
+
 
     return a.exec();
 }

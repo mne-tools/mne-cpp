@@ -103,7 +103,66 @@ public:
     */
     virtual ~Deep();
 
+    //=========================================================================================================
+    /**
+    * Whether the GPU should be used
+    *
+    * @param [in] useGPU    Flag if GPU should be used.
+    */
+    void setUseGPU(bool useGPU);
+
+    static void RunEvaluationClassifier(CNTK::FunctionPtr evalFunc, const CNTK::DeviceDescriptor& device);
+
+    static void OutputFunctionInfo(CNTK::FunctionPtr func);
+
+
+    inline static CNTK::FunctionPtr SetupFullyConnectedLinearLayer(CNTK::Variable input, size_t outputDim, const CNTK::DeviceDescriptor& device, const std::wstring& outputName = L"");
+
+
+    inline static CNTK::FunctionPtr SetupFullyConnectedDNNLayer(CNTK::Variable input, size_t outputDim, const CNTK::DeviceDescriptor& device, const std::function<CNTK::FunctionPtr(const CNTK::FunctionPtr&)>& nonLinearity);
+
+
+    /// <summary>
+    /// Shows how to use Clone() to share function parameters among multi evaluation threads.
+    /// </summary>
+    /// <description>
+    /// It first creates a new function with parameters, then spawns multi threads. Each thread uses Clone() to create a new
+    /// instance of function and then use this instance to do evaluation.
+    /// All cloned functions share the same parameters.
+    /// </description>
+    void MultiThreadsEvaluationWithClone(const CNTK::DeviceDescriptor& device, const int threadCount);
+
+
+    void test();
+
+
+
+
+protected:
+    static bool GetVariableByName(std::vector<CNTK::Variable> variableLists, std::wstring varName, CNTK::Variable& var)
+    {
+        for (std::vector<CNTK::Variable>::iterator it = variableLists.begin(); it != variableLists.end(); ++it)
+        {
+            if (it->Name().compare(varName) == 0)
+            {
+                var = *it;
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    inline static bool GetInputVariableByName(CNTK::FunctionPtr evalFunc, std::wstring varName, CNTK::Variable& var)
+    {
+        return GetVariableByName(evalFunc->Arguments(), varName, var);
+    }
+
+
+
 private:
+    bool m_bUseGPU = false;     /**< Should the GPU be used? */
+
 
 };
 
