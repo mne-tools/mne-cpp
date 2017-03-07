@@ -112,6 +112,12 @@ struct sens {
     Eigen::MatrixXd tra;
 };
 
+struct sortStruct {
+    double base_arr;
+    int idx;
+};
+
+
 
 //=============================================================================================================
 /**
@@ -191,29 +197,6 @@ public:
     */
     virtual bool stop();
 
-    coilParam dipfit(struct coilParam, struct sens, Eigen::MatrixXd, int numCoils);
-    Eigen::Matrix4d computeTransformation(Eigen::MatrixXd, Eigen::MatrixXd);
-    Eigen::MatrixXd fminsearch(Eigen::MatrixXd,int, int, int, Eigen::MatrixXd, struct sens);
-
-    //void test();
-
-    QMutex m_mutex;
-
-    bool SendDataToBuffer;
-
-    int simplex_numitr;
-
-    //MatrixXd SpecData;
-
-signals:
-    //=========================================================================================================
-    /**
-    * Signal which is emitted when a new data Matrix is estimated.
-    *
-    * @param[out]
-    */
-    void HPICalculated(Eigen::MatrixXd);
-
 protected:
     //=========================================================================================================
     /**
@@ -223,35 +206,21 @@ protected:
     */
     virtual void run();
 
-    IOBUFFER::CircularMatrixBuffer<double>::SPtr m_pRawMatrixBuffer;    /**< The Circular Raw Matrix Buffer. */
+    coilParam dipfit(struct coilParam, struct sens, Eigen::MatrixXd, int numCoils);
+    Eigen::Matrix4d computeTransformation(Eigen::MatrixXd, Eigen::MatrixXd);
 
-    QMutex              mutex;                                          /**< Provides access serialization between threads*/
+    IOBUFFER::CircularMatrixBuffer<double>::SPtr    m_pRawMatrixBuffer;    /**< The Circular Raw Matrix Buffer. */
+    QSharedPointer<FIFFLIB::FiffInfo>               m_pFiffInfo;           /**< Holds the fiff measurement information. */
 
-    int                 m_iMaxSamples;                                  /**< Maximal amount of samples received, before covariance is estimated.*/
-    int                 m_iNewMaxSamples;                               /**< New maximal amount of samples received, before covariance is estimated.*/
+    QMutex              m_mutex;
+
+    int                 m_iMaxSamples;          /**< Maximal amount of samples received, before covariance is estimated.*/
+    int                 m_iNewMaxSamples;       /**< New maximal amount of samples received, before covariance is estimated.*/
     int                 m_iCounter;
 
-    bool                m_bIsRunning;                                   /**< Holds if real-time Covariance estimation is running.*/
+    bool                m_bIsRunning;           /**< Holds if real-time Covariance estimation is running.*/
 
-    QString             m_sHPIResourceDir;                              /**< Hold the resource folder to store the debug information in. */
-
-    static std::vector <double>         base_arr;
-    QSharedPointer<FIFFLIB::FiffInfo>   m_pFiffInfo;                    /**< Holds the fiff measurement information. */
-
-    //QVector <float> m_fWin;
-
-    //double m_Fs;
-
-    //qint32 m_iFFTlength;
-    //qint32 m_dataLength;
-
-    //int NumOfBlocks;
-    //int BlockSize  ;
-    //int Sensors    ;
-    //int BlockIndex ;
-
-    //MatrixXd CircBuf;
-
+    QString             m_sHPIResourceDir;      /**< Hold the resource folder to store the debug information in. */
 };
 
 //*************************************************************************************************************
