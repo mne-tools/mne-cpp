@@ -469,7 +469,7 @@ void FiffSimulator::sendHPIData()
 
         m_pHPIWidget->setData(matProj * matComp * m_matValue.cast<double>());
 
-        m_pHPIWidget->setData(m_matValue.cast<double>());
+        //m_pHPIWidget->setData(m_matValue.cast<double>());
     }
 }
 
