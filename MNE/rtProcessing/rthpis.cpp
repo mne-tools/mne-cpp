@@ -582,10 +582,13 @@ void RtHPIS::singleHPIFit(const MatrixXd& t_mat,
 
     timerAll.start();
 
-    // Get the indices of inner layer channels and exclude bad channels
+    // Get the indices of inner layer channels and exclude bad channels. Only supports babymeg and vectorview magnetometers for hpi fitting.
     QVector<int> innerind(0);
     for (int i = 0; i < numCh; ++i) {
-        if(m_pFiffInfo->chs[i].chpos.coil_type == 7002) {
+        if(m_pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_BABY_MAG ||
+                m_pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_MAG_T1 ||
+                m_pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_MAG_T2 ||
+                m_pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_MAG_T3) {
             // Check if the sensor is bad, if not append to innerind
             if(!(m_pFiffInfo->bads.contains(m_pFiffInfo->ch_names.at(i)))) {
                 innerind.append(i);
