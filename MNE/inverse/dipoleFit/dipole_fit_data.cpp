@@ -1,18 +1,19 @@
 
-#include "fwd_types.h"
+#include <fwd/fwd_types.h>
 
 
 #include "dipole_fit_data.h"
 #include "guess_data.h"
-#include "mne_meas_data.h"
-#include "mne_meas_data_set.h"
-#include "mne_proj_item.h"
+#include "../c/mne_meas_data.h"
+#include "../c/mne_meas_data_set.h"
+#include <mne/c/mne_proj_item.h>
+#include <mne/c/mne_cov_matrix.h>
 #include "ecd.h"
 
-#include "fwd_bem_model.h"
-#include "mne_surface_old.h"
+#include <fwd/fwd_bem_model.h>
+#include <mne/c/mne_surface_old.h>
 
-#include "fwd_comp_data.h"
+#include <fwd/fwd_comp_data.h>
 
 #include <Eigen/Dense>
 
@@ -29,8 +30,10 @@
 
 
 using namespace Eigen;
-using namespace INVERSELIB;
 using namespace FIFFLIB;
+using namespace MNELIB;
+using namespace FWDLIB;
+using namespace INVERSELIB;
 
 
 
@@ -496,7 +499,7 @@ void mne_string_to_name_list_3(char *s,char ***listp,int *nlistp)
 
 
 
-INVERSELIB::FiffSparseMatrix* mne_convert_to_sparse_3(float **dense,        /* The dense matrix to be converted */
+FiffSparseMatrix* mne_convert_to_sparse_3(float **dense,        /* The dense matrix to be converted */
                                       int   nrow,           /* Number of rows in the dense matrix */
                                       int   ncol,           /* Number of columns in the dense matrix */
                                       int   stor_type,      /* Either FIFFTS_MC_CCS or FIFFTS_MC_RCS */
@@ -510,7 +513,7 @@ INVERSELIB::FiffSparseMatrix* mne_convert_to_sparse_3(float **dense,        /* T
     int j,k;
     int nz;
     int ptr;
-    INVERSELIB::FiffSparseMatrix* sparse = NULL;
+    FiffSparseMatrix* sparse = NULL;
     int size;
 
     if (small < 0) {		/* Automatic scaling */
@@ -550,7 +553,7 @@ INVERSELIB::FiffSparseMatrix* mne_convert_to_sparse_3(float **dense,        /* T
         printf("Unknown sparse matrix storage type: %d",stor_type);
         return NULL;
     }
-    sparse = new INVERSELIB::FiffSparseMatrix;
+    sparse = new FiffSparseMatrix;
     sparse->coding = stor_type;
     sparse->m      = nrow;
     sparse->n      = ncol;
@@ -3035,7 +3038,7 @@ MneCovMatrix* mne_read_cov(const QString& name,int kind)
     int             nnames     = 0;
     double          *cov       = NULL;
     double          *cov_diag  = NULL;
-    INVERSELIB::FiffSparseMatrix* cov_sparse = NULL;
+    FiffSparseMatrix* cov_sparse = NULL;
     double          *lambda    = NULL;
     float           **eigen    = NULL;
     MatrixXf        tmp_eigen;
