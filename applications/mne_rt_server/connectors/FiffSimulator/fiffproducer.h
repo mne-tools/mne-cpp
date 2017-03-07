@@ -58,7 +58,7 @@
 // DEFINE NAMESPACE FiffConnectorPlugin
 //=============================================================================================================
 
-namespace FiffSimulatorPlugin
+namespace FIFFSIMULATORPLUGIN
 {
 
 
