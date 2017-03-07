@@ -209,6 +209,12 @@ protected:
     */
     void sendHPIData();
 
+    //=========================================================================================================
+    /**
+    * Sends the current thread status to the HPI dialog.
+    */
+    void sendStatusToHPI();
+
     SCSHAREDLIB::PluginOutputData<SCMEASLIB::NewRealTimeMultiSampleArray>::SPtr m_pRTMSA_FiffSimulator;     /**< The NewRealTimeMultiSampleArray to provide the rt_server Channels.*/
 
     QSharedPointer<FiffSimulatorProducer>       m_pFiffSimulatorProducer;   /**< Holds the FiffSimulatorProducer.*/

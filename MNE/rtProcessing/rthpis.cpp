@@ -461,6 +461,7 @@ RtHPIS::RtHPIS(FiffInfo::SPtr p_pFiffInfo, QObject *parent)
 , m_iNewMaxSamples(0)
 , simplex_numitr(0)
 , m_iCounter(0)
+, m_sHPIResourceDir("./HPIFittingDebug")
 {
     qRegisterMetaType<Eigen::MatrixXd>("Eigen::MatrixXd");
     //qRegisterMetaType<QVector<double>>("QVector<double>");
@@ -746,26 +747,26 @@ void RtHPIS::singleHPIFit(const MatrixXd& t_mat,
 
     QString sTimeStamp = QDateTime::currentDateTime().toString("yyMMdd_hhmmss");
 
-    UTILSLIB::IOUtils::write_eigen_matrix(amp, QString("C:/Users/MEG measurement/BabyMEGData/TestProject/TestSubject/amp_mat"));
+    UTILSLIB::IOUtils::write_eigen_matrix(amp, QString("%1/amp_mat").arg(m_sHPIResourceDir));
 
-    UTILSLIB::IOUtils::write_eigen_matrix(coil.pos, QString("C:/Users/MEG measurement/BabyMEGData/TestProject/TestSubject/%1_coilPos_mat").arg(sTimeStamp));
+    UTILSLIB::IOUtils::write_eigen_matrix(coil.pos, QString("%1/%2_coilPos_mat").arg(m_sHPIResourceDir).arg(sTimeStamp));
 
-    UTILSLIB::IOUtils::write_eigen_matrix(headHPI, QString("C:/Users/MEG measurement/BabyMEGData/TestProject/TestSubject/%1_headHPI_mat").arg(sTimeStamp));
+    UTILSLIB::IOUtils::write_eigen_matrix(headHPI, QString("%1/%2_headHPI_mat").arg(m_sHPIResourceDir).arg(sTimeStamp));
 
     MatrixXd testPosCut = testPos.transpose();//block(0,0,3,4);
-    UTILSLIB::IOUtils::write_eigen_matrix(testPosCut, QString("C:/Users/MEG measurement/BabyMEGData/TestProject/TestSubject/%1_testPos_mat").arg(sTimeStamp));
+    UTILSLIB::IOUtils::write_eigen_matrix(testPosCut, QString("%1/%2_testPos_mat").arg(m_sHPIResourceDir).arg(sTimeStamp));
 
     MatrixXi idx_mat(chIdcs.rows(),1);
     idx_mat.col(0) = chIdcs;
-    UTILSLIB::IOUtils::write_eigen_matrix(idx_mat, QString("C:/Users/MEG measurement/BabyMEGData/TestProject/TestSubject/%1_idx_mat").arg(sTimeStamp));
+    UTILSLIB::IOUtils::write_eigen_matrix(idx_mat, QString("%1/%2_idx_mat").arg(m_sHPIResourceDir).arg(sTimeStamp));
 
     MatrixXd coilFreq_mat(coilfreq.rows(),1);
     coilFreq_mat.col(0) = coilfreq;
-    UTILSLIB::IOUtils::write_eigen_matrix(coilFreq_mat, QString("C:/Users/MEG measurement/BabyMEGData/TestProject/TestSubject/%1_coilFreq_mat").arg(sTimeStamp));
+    UTILSLIB::IOUtils::write_eigen_matrix(coilFreq_mat, QString("%1/%2_coilFreq_mat").arg(m_sHPIResourceDir).arg(sTimeStamp));
 
-    UTILSLIB::IOUtils::write_eigen_matrix(diffPos, QString("C:/Users/MEG measurement/BabyMEGData/TestProject/TestSubject/%1_diffPos_mat").arg(sTimeStamp));
+    UTILSLIB::IOUtils::write_eigen_matrix(diffPos, QString("%1/%2_diffPos_mat").arg(m_sHPIResourceDir).arg(sTimeStamp));
 
-    UTILSLIB::IOUtils::write_eigen_matrix(amp, QString("C:/Users/MEG measurement/BabyMEGData/TestProject/TestSubject/%1_amp_mat").arg(sTimeStamp));
+    UTILSLIB::IOUtils::write_eigen_matrix(amp, QString("%1/%2_amp_mat").arg(m_sHPIResourceDir).arg(sTimeStamp));
 }
 
 
