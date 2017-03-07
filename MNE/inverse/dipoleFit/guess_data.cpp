@@ -41,8 +41,8 @@
 #include "guess_data.h"
 #include "dipole_fit_data.h"
 #include "dipole_forward.h"
-#include "mne_surface_old.h"
-#include "mne_source_space_old.h"
+#include <mne/c/mne_surface_old.h>
+#include <mne/c/mne_source_space_old.h>
 
 #include <fiff/fiff_stream.h>
 #include <fiff/fiff_tag.h>
@@ -57,6 +57,8 @@
 
 using namespace Eigen;
 using namespace FIFFLIB;
+using namespace MNELIB;
+using namespace FWDLIB;
 using namespace INVERSELIB;
 
 
@@ -253,7 +255,7 @@ GuessData::GuessData(const QString &guessname, const QString &guess_surfname, fl
                 goto bad;
             free_inner_skull = TRUE;
         }
-        if ((guesses = (MneSourceSpaceOld*)MneSurfaceOld::make_guesses(inner_skull,guessrad,r0,grid,exclude,mindist)) == NULL)
+        if ((guesses = (MneSourceSpaceOld*)FwdBemModel::make_guesses(inner_skull,guessrad,r0,grid,exclude,mindist)) == NULL)
             goto bad;
         if (free_inner_skull)
             delete inner_skull;
@@ -353,7 +355,7 @@ GuessData::GuessData(const QString &guessname, const QString &guess_surfname, fl
                 goto bad;
             free_inner_skull = TRUE;
         }
-        if ((guesses = (MneSourceSpaceOld*)MneSurfaceOld::make_guesses(inner_skull,guessrad,r0,grid,exclude,mindist)) == NULL)
+        if ((guesses = (MneSourceSpaceOld*)FwdBemModel::make_guesses(inner_skull,guessrad,r0,grid,exclude,mindist)) == NULL)
             goto bad;
         if (free_inner_skull)
             delete inner_skull;

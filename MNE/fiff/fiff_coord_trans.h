@@ -223,9 +223,8 @@ public:
 
     //=========================================================================================================
     /**
-    * ### MNE C root function ###: Implementation of the mne_print_coord_transform & mne_print_coord_transform_label function
-    *
     * Prints the coordinate transform. TODO: overload stream operator
+    * Refactored: mne_print_coord_transform, mne_print_coord_transform_label (fiff_id.c)
     */
     void print() const;
 
