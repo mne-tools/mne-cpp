@@ -235,9 +235,4 @@ inline bool RtHPIS::isRunning()
 
 } // NAMESPACE
 
-#ifndef metatype_matrix
-#define metatype_matrix
-Q_DECLARE_METATYPE(Eigen::MatrixXd); /**< Provides QT META type declaration of the MatrixXd type. For signal/slot usage.*/
-#endif
-
 #endif // RTHPIS_H
