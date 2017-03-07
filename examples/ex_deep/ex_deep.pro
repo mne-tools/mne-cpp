@@ -1,14 +1,14 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     MNE.pro
+# @file     ex_deep.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
-# @date     July, 2012
+# @date     January, 2017
 #
 # @section  LICENSE
 #
-# Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+# Copyright (C) 2017, Christoph Dinh and Matti Hamalainen. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -18,7 +18,7 @@
 #       the following disclaimer in the documentation and/or other materials provided with the distribution.
 #     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 #       to endorse or promote products derived from this software without specific prior written permission.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 # WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
 # PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
@@ -29,45 +29,60 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file builds all MNE libraries.
+# @brief    This project file generates the makefile to build the MNE deep example.
 #
 #--------------------------------------------------------------------------------------------------------------
 
-include(../mne-cpp.pri)
+include(../../mne-cpp.pri)
 
-TEMPLATE = subdirs
+TEMPLATE = app
 
-# TBD change the dependency order - forward before inverse
-SUBDIRS += \
-    generics \
-    utils \
-    fs \
-    fiff \
-    mne \
-    fwd \
-    inverse \
-    connectivity \
-    rtCommand \
-    rtClient \
-    rtProcessing \
+VERSION = $${MNE_CPP_VERSION}
 
+QT += widgets charts
 
-!contains(MNECPP_CONFIG, minimalVersion) {
-    SUBDIRS += \
-        disp \
+CONFIG   += console
 
-    !isEmpty( CNTK_INCLUDE_DIR ) {
-        SUBDIRS += \
-            deep \
-    }
+TARGET = ex_deep
 
-    qtHaveModule(charts) {
-        SUBDIRS += \
-            dispCharts \
-            disp3D \
-    } else {
-        message("MNE.pro - The Qt Charts module is missing. Please install to build the complete set of MNE-CPP features.")
-    }
+CONFIG(debug, debug|release) {
+    TARGET = $$join(TARGET,,,d)
 }
 
-CONFIG += ordered
+LIBS += -L$${MNE_LIBRARY_DIR}
+LIBS += -L$${CNTK_LIBRARY_DIR}
+CONFIG(debug, debug|release) {
+    LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
+            -lMNE$${MNE_LIB_VERSION}Utilsd \
+            -lMNE$${MNE_LIB_VERSION}Fsd \
+            -lMNE$${MNE_LIB_VERSION}Fiffd \
+            -lMNE$${MNE_LIB_VERSION}Mned \
+            -lMNE$${MNE_LIB_VERSION}Inversed \
+            -lMNE$${MNE_LIB_VERSION}Deepd \
+            -lEvalDll
+}
+else {
+    LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
+            -lMNE$${MNE_LIB_VERSION}Utils \
+            -lMNE$${MNE_LIB_VERSION}Fs \
+            -lMNE$${MNE_LIB_VERSION}Fiff \
+            -lMNE$${MNE_LIB_VERSION}Mne \
+            -lMNE$${MNE_LIB_VERSION}Inverse \
+            -lMNE$${MNE_LIB_VERSION}Deep \
+            -lEvalDll
+}
+
+DESTDIR = $${MNE_BINARY_DIR}
+
+SOURCES += main.cpp
+
+HEADERS  +=
+
+FORMS    +=
+
+INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
+INCLUDEPATH += $${MNE_INCLUDE_DIR}
+INCLUDEPATH += $${CNTK_INCLUDE_DIR}
+
+# Put generated form headers into the origin --> cause other src is pointing at them
+UI_DIR = $$PWD
