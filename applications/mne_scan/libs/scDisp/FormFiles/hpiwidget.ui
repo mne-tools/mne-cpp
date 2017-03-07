@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>BabyMEGHPIDgl</class>
- <widget class="QWidget" name="BabyMEGHPIDgl">
+ <class>HPIWidget</class>
+ <widget class="QWidget" name="HPIWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -379,7 +379,7 @@
            <number>500</number>
           </property>
           <property name="value">
-           <number>200</number>
+           <number>220</number>
           </property>
          </widget>
         </item>

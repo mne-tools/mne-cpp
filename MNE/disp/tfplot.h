@@ -8,7 +8,7 @@
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Martin Henfling and Daniel Knobl. All rights reserved.
+* Copyright (C) 2015, Martin Henfling and Daniel Knobl. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -43,6 +43,7 @@
 #include "disp_global.h"
 #include <disp/helpers/colormap.h>
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // Qt INCLUDES
@@ -54,6 +55,7 @@
 #include <QGraphicsPixmapItem>
 #include <QGraphicsSceneResizeEvent>
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // Eigen INCLUDES
@@ -63,8 +65,10 @@
 #include <Eigen/SparseCore>
 #include <unsupported/Eigen/FFT>
 
+
 namespace DISPLIB
 {
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -73,7 +77,6 @@ namespace DISPLIB
 
 using namespace Eigen;
 //using namespace UTILSLIB;
-
 
 enum ColorMaps
 {
@@ -126,9 +129,7 @@ public:
     */
     TFplot(MatrixXd tf_matrix, qreal sample_rate, ColorMaps cmap);
 
-
 private:
-
     //=========================================================================================================
     /**
     * TFplot_calc_plot
