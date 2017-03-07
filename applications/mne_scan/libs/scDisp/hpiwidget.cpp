@@ -46,6 +46,7 @@
 #include <disp3D/view3D.h>
 #include <disp3D/control/control3dwidget.h>
 #include <disp3D/model/data3Dtreemodel.h>
+#include <disp3D/model/items/bem/bemtreeitem.h>
 
 #include <rtProcessing/rthpis.h>
 
@@ -129,9 +130,14 @@ HPIWidget::HPIWidget(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo, QWidget *paren
     ui->m_groupBox_3dControl->setLayout(gridLayout);
 
     //Add sensor surface
-    QFile t_fileSensorSurfaceBEM("./resources/sensorSurfaces/BabyMEG.fif");
-    MNEBem t_sensorSurfaceBEM(t_fileSensorSurfaceBEM);
-    m_pData3DModel->addBemData("Device", "BabyMEG", t_sensorSurfaceBEM);
+    QFile t_fileBabyMEGSensorSurfaceBEM("./resources/sensorSurfaces/BabyMEG.fif");
+    MNEBem t_babyMEGsensorSurfaceBEM(t_fileBabyMEGSensorSurfaceBEM);
+    m_pData3DModel->addBemData("Device", "BabyMEG", t_babyMEGsensorSurfaceBEM);
+
+    QFile t_fileVVSensorSurfaceBEM("./resources/sensorSurfaces/306m.fif");
+    MNEBem t_sensorVVSurfaceBEM(t_fileVVSensorSurfaceBEM);
+    BemTreeItem* pVVItem = m_pData3DModel->addBemData("Device", "VectorView", t_sensorVVSurfaceBEM);
+    pVVItem->setCheckState(Qt::Unchecked);
 
     //Always on top
     //this->setWindowFlags(this->windowFlags() | Qt::WindowStaysOnTopHint);
