@@ -87,7 +87,7 @@ using namespace UTILSLIB;
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
 
-void generateWeightsPerVertex(RtSourceLocDataWorker::SmoothVertexInfo& input)
+void generateWeightsPerVertex(SmoothVertexInfo& input)
 {
     QVector3D from = input.vVertPos;
     QVector3D to;
@@ -121,11 +121,11 @@ void generateWeightsPerVertex(RtSourceLocDataWorker::SmoothVertexInfo& input)
 
 //*************************************************************************************************************
 
-void generateSmoothOperator(RtSourceLocDataWorker::SmoothOperatorInfo& input)
+void generateSmoothOperator(SmoothOperatorInfo& input)
 {
     //Prepare data
-    QList<RtSourceLocDataWorker::SmoothVertexInfo> lInputData;
-    RtSourceLocDataWorker::SmoothVertexInfo vertInfo;
+    QList<SmoothVertexInfo> lInputData;
+    SmoothVertexInfo vertInfo;
     QList<QVector3D> lSourcePos;
     QVector3D vertPos;
 
@@ -248,7 +248,7 @@ void transformDataToColor(float fSample, QByteArray& arrayFinalVertColor, double
 
 //*************************************************************************************************************
 
-void generateColorsPerVertex(RtSourceLocDataWorker::VisualizationInfo& input)
+void generateColorsPerVertex(VisualizationInfo& input)
 {
     //Left hemisphere
     float *rawArrayCurrentVertColor = reinterpret_cast<float *>(input.arrayFinalVertColor.data());
@@ -271,7 +271,7 @@ void generateColorsPerVertex(RtSourceLocDataWorker::VisualizationInfo& input)
 
 //*************************************************************************************************************
 
-void generateColorsPerAnnotation(RtSourceLocDataWorker::VisualizationInfo& input)
+void generateColorsPerAnnotation(VisualizationInfo& input)
 {
     //Find maximum actiavtion for each label
     QMap<qint32, double> vecLabelActivation;
@@ -311,7 +311,7 @@ void generateColorsPerAnnotation(RtSourceLocDataWorker::VisualizationInfo& input
 
 //*************************************************************************************************************
 
-void generateSmoothedColors(RtSourceLocDataWorker::VisualizationInfo& input)
+void generateSmoothedColors(VisualizationInfo& input)
 {
     //QTime prodDataTimer;
     //prodDataTimer.start();

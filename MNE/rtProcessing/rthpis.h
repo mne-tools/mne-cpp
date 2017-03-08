@@ -92,7 +92,10 @@ namespace RTPROCESSINGLIB
 //=============================================================================================================
 // Declare all structures to be used
 //=============================================================================================================
-
+//=========================================================================================================
+/**
+* The strucut specifing the coil parameters.
+*/
 struct coilParam {
     Eigen::MatrixXd pos;
     Eigen::MatrixXd mom;
@@ -100,18 +103,34 @@ struct coilParam {
     Eigen::VectorXd dpfitnumitr;
 };
 
+//=========================================================================================================
+/**
+* The strucut specifing the dipole error.
+*/
 struct dipError {
     double error;
     Eigen::MatrixXd moment;
     int numIterations;
 };
 
+//=========================================================================================================
+/**
+* The strucut specifing the sensor parameters.
+*/
 struct sens {
     Eigen::MatrixXd coilpos;
     Eigen::MatrixXd coilori;
     Eigen::MatrixXd tra;
 };
 
+//=========================================================================================================
+/**
+* The strucut specifing the sorting parameters.
+*/
+struct sortStruct {
+    double base_arr;
+    int idx;
+};
 
 //=============================================================================================================
 /**
@@ -191,30 +210,31 @@ public:
     */
     virtual bool stop();
 
-    coilParam dipfit(struct coilParam, struct sens, Eigen::MatrixXd, int numCoils);
-    Eigen::Matrix4d computeTransformation(Eigen::MatrixXd, Eigen::MatrixXd);
-    Eigen::MatrixXd fminsearch(Eigen::MatrixXd,int, int, int, Eigen::MatrixXd, struct sens);
-
-    //void test();
-
-    QMutex m_mutex;
-
-    bool SendDataToBuffer;
-
-    int simplex_numitr;
-
-    //MatrixXd SpecData;
-
-signals:
+protected:
     //=========================================================================================================
     /**
-    * Signal which is emitted when a new data Matrix is estimated.
+    * Fits dipoles for the given coils and a given data set.
     *
-    * @param[out]
+    * @param[in] coilParam      The coil parameters.
+    * @param[in] sensors        The sensor information.
+    * @param[in] data           The data which used to fit the coils.
+    * @param[in] numCoils       The number of coils.
+    *
+    * @return Returns the coil parameters.
     */
-    void HPICalculated(Eigen::MatrixXd);
+    coilParam dipfit(struct coilParam coil, struct sens sensors, Eigen::MatrixXd data, int numCoils);
 
-protected:
+    //=========================================================================================================
+    /**
+    * Computes the transformation matrix between two sets of 3D points.
+    *
+    * @param[in] NH     The first set of input 3D points (row-wise order).
+    * @param[in] BT     The second set of input 3D points (row-wise order).
+    *
+    * @return Returns the transformation matrix.
+    */
+    Eigen::Matrix4d computeTransformation(Eigen::MatrixXd NH, Eigen::MatrixXd BT);
+
     //=========================================================================================================
     /**
     * The starting point for the thread. After calling start(), the newly created thread calls this function.
@@ -223,33 +243,14 @@ protected:
     */
     virtual void run();
 
-    IOBUFFER::CircularMatrixBuffer<double>::SPtr m_pRawMatrixBuffer;    /**< The Circular Raw Matrix Buffer. */
+    IOBUFFER::CircularMatrixBuffer<double>::SPtr    m_pRawMatrixBuffer;    /**< The Circular Raw Matrix Buffer. */
+    QSharedPointer<FIFFLIB::FiffInfo>               m_pFiffInfo;           /**< Holds the fiff measurement information. */
 
-    QMutex              mutex;                                          /**< Provides access serialization between threads*/
+    QMutex              m_mutex;                /**< The global mutex to provide thread safety.*/
 
-    int                 m_iMaxSamples;                                  /**< Maximal amount of samples received, before covariance is estimated.*/
-    int                 m_iNewMaxSamples;                               /**< New maximal amount of samples received, before covariance is estimated.*/
-    int                 m_iCounter;
+    bool                m_bIsRunning;           /**< Holds if real-time Covariance estimation is running.*/
 
-    bool                m_bIsRunning;                                   /**< Holds if real-time Covariance estimation is running.*/
-
-    static std::vector <double>         base_arr;
-    QSharedPointer<FIFFLIB::FiffInfo>   m_pFiffInfo;                    /**< Holds the fiff measurement information. */
-
-    //QVector <float> m_fWin;
-
-    //double m_Fs;
-
-    //qint32 m_iFFTlength;
-    //qint32 m_dataLength;
-
-    //int NumOfBlocks;
-    //int BlockSize  ;
-    //int Sensors    ;
-    //int BlockIndex ;
-
-    //MatrixXd CircBuf;
-
+    QString             m_sHPIResourceDir;      /**< Hold the resource folder to store the debug information in. */
 };
 
 //*************************************************************************************************************
@@ -263,10 +264,5 @@ inline bool RtHPIS::isRunning()
 }
 
 } // NAMESPACE
-
-#ifndef metatype_matrix
-#define metatype_matrix
-Q_DECLARE_METATYPE(Eigen::MatrixXd); /**< Provides QT META type declaration of the MatrixXd type. For signal/slot usage.*/
-#endif
 
 #endif // RTHPIS_H

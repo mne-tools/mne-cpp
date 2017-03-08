@@ -52,9 +52,6 @@
 #include <fiff/fiff_cov.h>
 #include <fstream>
 
-#define _USE_MATH_DEFINES
-#include <math.h>
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -62,7 +59,6 @@
 //=============================================================================================================
 
 #include <Eigen/Dense>
-#include <unsupported/Eigen/FFT>
 
 
 //*************************************************************************************************************
@@ -70,7 +66,6 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QElapsedTimer>
 #include <QDebug>
 #include <QFuture>
 #include <QtConcurrent/QtConcurrent>
@@ -92,7 +87,7 @@ using namespace IOBUFFER;
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
 
-std::vector <double> base_arr;
+std::vector <double> m_base_arr;
 
 Eigen::MatrixXd pinv(Eigen::MatrixXd a)
 {
@@ -211,9 +206,9 @@ dipError dipfitError(Eigen::MatrixXd pos, Eigen::MatrixXd data, struct sens sens
  * Compare function for sorting
  *********************************************************************************/
 
-bool compar (int a, int b)
+bool compare(sortStruct a, sortStruct b)
 {
-    return ((base_arr)[a] < (base_arr)[b]);
+    return (a.base_arr < b.base_arr);
 }
 
 
@@ -223,7 +218,13 @@ bool compar (int a, int b)
  * attempts to find a local minimizer
  *********************************************************************************/
 
-Eigen::MatrixXd fminsearch(Eigen::MatrixXd pos,int maxiter, int maxfun, int display, Eigen::MatrixXd data, struct sens sensors, int &simplex_numitr)
+Eigen::MatrixXd fminsearch(Eigen::MatrixXd pos,
+                           int maxiter,
+                           int maxfun,
+                           int display,
+                           Eigen::MatrixXd data,
+                           struct sens sensors,
+                           int &simplex_numitr)
 {
     double tolx, tolf, rho, chi, psi, sigma, func_evals, usual_delta, zero_term_delta, temp1, temp2;
     std::string header, how;
@@ -238,8 +239,7 @@ Eigen::MatrixXd fminsearch(Eigen::MatrixXd pos,int maxiter, int maxfun, int disp
     // Seok
     tolx = tolf = 1e-9;
 
-    switch(display)
-    {
+    switch(display) {
         case 0:
             prnt = 0;
             break;
@@ -262,15 +262,20 @@ Eigen::MatrixXd fminsearch(Eigen::MatrixXd pos,int maxiter, int maxfun, int disp
     }
 
     v = v1 = Eigen::MatrixXd::Zero(n, n+1);
-    fv.resize(n+1);idx.resize(n+1);fv1.resize(n+1);
+    fv.resize(n+1);
+    idx.resize(n+1);
+    fv1.resize(n+1);
 
-    for(int i = 0;i < n; i++) v(i,0) = pos(i);
+    for(int i = 0;i < n; i++) {
+        v(i,0) = pos(i);
+    }
 
     tempdip = dipfitError(pos, data, sensors);
     fv[0] = tempdip.error;
 
-
-    func_evals = 1;itercount = 0;how = "";
+    func_evals = 1;
+    itercount = 0;
+    how = "";
 
     // Continue setting up the initial simplex.
     // Following improvement suggested by L.Pfeffer at Stanford
@@ -281,8 +286,11 @@ Eigen::MatrixXd fminsearch(Eigen::MatrixXd pos,int maxiter, int maxfun, int disp
     for(int j = 0;j < n;j++) {
         y = xin;
 
-        if(y(j) != 0) y(j) = (1 + usual_delta) * y(j);
-        else y(j) = zero_term_delta;
+        if(y(j) != 0) {
+            y(j) = (1 + usual_delta) * y(j);
+        } else {
+            y(j) = zero_term_delta;
+        }
 
         v.col(j+1).array() = y;
         pos = y.transpose();
@@ -291,10 +299,20 @@ Eigen::MatrixXd fminsearch(Eigen::MatrixXd pos,int maxiter, int maxfun, int disp
     }
 
     // Sort elements of fv
-    base_arr = fv;
-    for (int i = 0; i < n+1; i++) idx[i] = i;
+    std::vector<sortStruct> vecSortStruct;
 
-    sort (idx.begin(), idx.end(), compar);
+    for (int i = 0; i < fv.size(); i++) {
+        sortStruct structTemp;
+        structTemp.base_arr = fv[i];
+        structTemp.idx = i;
+        vecSortStruct.push_back(structTemp);
+    }
+
+    sort (vecSortStruct.begin(), vecSortStruct.end(), compare);
+
+    for (int i = 0; i < vecSortStruct.size(); i++) {
+        idx[i] = vecSortStruct[i].idx;
+    }
 
     for (int i = 0;i < n+1;i++) {
         v1.col(i) = v.col(idx[i]);
@@ -310,18 +328,26 @@ Eigen::MatrixXd fminsearch(Eigen::MatrixXd pos,int maxiter, int maxfun, int disp
     tempX1 = Eigen::MatrixXd::Zero(1,n);
 
     while ((func_evals < maxfun) && (itercount < maxiter)) {
-        for (int i = 0;i < n;i++) tempX1(i) = abs(fv[0] - fv[i+1]);
+
+        for (int i = 0;i < n;i++) {
+            tempX1(i) = abs(fv[0] - fv[i+1]);
+        }
+
         temp1 = tempX1.maxCoeff();
 
         tempX2 = Eigen::MatrixXd::Zero(n,n);
 
-        for(int i = 0;i < n;i++) tempX2.col(i) = v.col(i+1) -  v.col(0);
+        for(int i = 0;i < n;i++) {
+            tempX2.col(i) = v.col(i+1) -  v.col(0);
+        }
 
         tempX2 = tempX2.array().abs();
 
         temp2 = tempX2.maxCoeff();
 
-        if((temp1 <= tolf) && (temp2 <= tolx)) break;
+        if((temp1 <= tolf) && (temp2 <= tolx)) {
+            break;
+        }
 
         xbar = v.block(0,0,n,n).rowwise().sum();
         xbar /= n;
@@ -403,15 +429,30 @@ Eigen::MatrixXd fminsearch(Eigen::MatrixXd pos,int maxiter, int maxfun, int disp
                 }
             }
         }
+
         // Sort elements of fv
-        base_arr = fv;
-        for (int i = 0; i < n+1; i++) idx[i] = i;
-        sort (idx.begin (), idx.end (), compar);
+        vecSortStruct.clear();
+
+        for (int i = 0; i < fv.size(); i++) {
+            sortStruct structTemp;
+            structTemp.base_arr = fv[i];
+            structTemp.idx = i;
+            vecSortStruct.push_back(structTemp);
+        }
+
+        sort (vecSortStruct.begin(), vecSortStruct.end(), compare);
+
+        for (int i = 0; i < vecSortStruct.size(); i++) {
+            idx[i] = vecSortStruct[i].idx;
+        }
+
         for (int i = 0;i < n+1;i++) {
             v1.col(i) = v.col(idx[i]);
             fv1[i] = fv[idx[i]];
         }
-        v = v1;fv = fv1;
+
+        v = v1;
+        fv = fv1;
         itercount = itercount + 1;
     } // end of while loop
 //    }while(dipfitError(x, data, sensors).error > 0.1);
@@ -441,7 +482,13 @@ void doDipfitConcurrent(QPair<QPair<Eigen::RowVectorXd, Eigen::VectorXd>, QPair<
     int maxiter = 500;
     int simplex_numitr = 0;
 
-    lCoilData.first.first = fminsearch(currentCoil, maxiter, 2 * maxiter * currentCoil.cols(), display, currentData, currentSensors, simplex_numitr);
+    lCoilData.first.first = fminsearch(currentCoil,
+                                       maxiter,
+                                       2 * maxiter * currentCoil.cols(),
+                                       display,
+                                       currentData,
+                                       currentSensors,
+                                       simplex_numitr);
 
     lCoilData.second.first = dipfitError(currentCoil, currentData, currentSensors);
     lCoilData.second.first.numIterations = simplex_numitr;
@@ -457,15 +504,8 @@ RtHPIS::RtHPIS(FiffInfo::SPtr p_pFiffInfo, QObject *parent)
 : QThread(parent)
 , m_pFiffInfo(p_pFiffInfo)
 , m_bIsRunning(false)
-, m_iMaxSamples(0)
-, m_iNewMaxSamples(0)
-, simplex_numitr(0)
-, m_iCounter(0)
+, m_sHPIResourceDir("./HPIFittingDebug")
 {
-    qRegisterMetaType<Eigen::MatrixXd>("Eigen::MatrixXd");
-    //qRegisterMetaType<QVector<double>>("QVector<double>");
-    SendDataToBuffer = true;
-
 }
 
 
@@ -508,8 +548,6 @@ void RtHPIS::singleHPIFit(const MatrixXd& t_mat,
 
     //Set coil frequencies
     Eigen::VectorXd coilfreq(numCoils);
-    qDebug()<< "RtHPIS::singleHPIFit - numCoils:" << numCoils;
-    qDebug()<< "RtHPIS::singleHPIFit - Coil frequencies:";
 
     if(vFreqs.size() >= numCoils) {
         for(int i = 0; i < numCoils; ++i) {
@@ -574,17 +612,13 @@ void RtHPIS::singleHPIFit(const MatrixXd& t_mat,
         qDebug() << "\n \n \n";
     }
 
-    //Setup timers
-    int itimerDipFit;
-    QElapsedTimer timerAll;
-    QElapsedTimer timerDipFit;
-
-    timerAll.start();
-
-    // Get the indices of inner layer channels and exclude bad channels
+    // Get the indices of inner layer channels and exclude bad channels. Only supports babymeg and vectorview magnetometers for hpi fitting.
     QVector<int> innerind(0);
     for (int i = 0; i < numCh; ++i) {
-        if(m_pFiffInfo->chs[i].chpos.coil_type == 7002) {
+        if(m_pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_BABY_MAG ||
+                m_pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_MAG_T1 ||
+                m_pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_MAG_T2 ||
+                m_pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_MAG_T3) {
             // Check if the sensor is bad, if not append to innerind
             if(!(m_pFiffInfo->bads.contains(m_pFiffInfo->ch_names.at(i)))) {
                 innerind.append(i);
@@ -679,12 +713,7 @@ void RtHPIS::singleHPIFit(const MatrixXd& t_mat,
     }
 
     coil.pos = coilPos;
-
-    timerDipFit.start();
-
     coil = dipfit(coil, sensors, amp, numCoils);
-
-    itimerDipFit = timerDipFit.elapsed();
 
     Eigen::Matrix4d trans = computeTransformation(headHPI,coil.pos);
 
@@ -701,11 +730,6 @@ void RtHPIS::singleHPIFit(const MatrixXd& t_mat,
 
     // Also store the inverse
     transDevHead.invtrans = transDevHead.trans.inverse();
-
-    qDebug() << "";
-    qDebug() << "RtHPIS::singleHPIFit - Timing All" << timerAll.elapsed() << "milliseconds";
-    qDebug() << "";
-    qDebug() << "RtHPIS::singleHPIFit - Timing itimerDipFit" << itimerDipFit << "milliseconds";
 
     //Calculate GOF
     MatrixXd temp = coil.pos;
@@ -734,38 +758,42 @@ void RtHPIS::singleHPIFit(const MatrixXd& t_mat,
     }
 
     // DEBUG HPI fitting and write debug results
-    std::cout << std::endl << std::endl << "RtHPIS::singleHPIFit - Initial seed point for HPI coils" << std::endl << coil.pos << std::endl;
+//    std::cout << std::endl << std::endl << "RtHPIS::singleHPIFit - Initial seed point for HPI coils" << std::endl << coil.pos << std::endl;
 
-    std::cout << std::endl << std::endl << "RtHPIS::singleHPIFit - temp" << std::endl << temp << std::endl;
+//    std::cout << std::endl << std::endl << "RtHPIS::singleHPIFit - temp" << std::endl << temp << std::endl;
 
-    std::cout << std::endl << std::endl << "RtHPIS::singleHPIFit - testPos" << std::endl << testPos << std::endl;
+//    std::cout << std::endl << std::endl << "RtHPIS::singleHPIFit - testPos" << std::endl << testPos << std::endl;
 
-    std::cout << std::endl << std::endl << "RtHPIS::singleHPIFit - Diff fitted - original" << std::endl << diffPos << std::endl;
+//    std::cout << std::endl << std::endl << "RtHPIS::singleHPIFit - Diff fitted - original" << std::endl << diffPos << std::endl;
 
-    std::cout << std::endl << std::endl << "RtHPIS::singleHPIFit - dev/head trans" << std::endl << trans << std::endl;
+//    std::cout << std::endl << std::endl << "RtHPIS::singleHPIFit - dev/head trans" << std::endl << trans << std::endl;
 
     QString sTimeStamp = QDateTime::currentDateTime().toString("yyMMdd_hhmmss");
 
-    UTILSLIB::IOUtils::write_eigen_matrix(amp, QString("C:/Users/MEG measurement/BabyMEGData/TestProject/TestSubject/amp_mat"));
+    if(!QDir(m_sHPIResourceDir).exists()) {
+        QDir().mkdir(m_sHPIResourceDir);
+    }
 
-    UTILSLIB::IOUtils::write_eigen_matrix(coil.pos, QString("C:/Users/MEG measurement/BabyMEGData/TestProject/TestSubject/%1_coilPos_mat").arg(sTimeStamp));
+    UTILSLIB::IOUtils::write_eigen_matrix(coilPos, QString("%1/%2_coilPosSeed_mat").arg(m_sHPIResourceDir).arg(sTimeStamp));
 
-    UTILSLIB::IOUtils::write_eigen_matrix(headHPI, QString("C:/Users/MEG measurement/BabyMEGData/TestProject/TestSubject/%1_headHPI_mat").arg(sTimeStamp));
+    UTILSLIB::IOUtils::write_eigen_matrix(coil.pos, QString("%1/%2_coilPos_mat").arg(m_sHPIResourceDir).arg(sTimeStamp));
+
+    UTILSLIB::IOUtils::write_eigen_matrix(headHPI, QString("%1/%2_headHPI_mat").arg(m_sHPIResourceDir).arg(sTimeStamp));
 
     MatrixXd testPosCut = testPos.transpose();//block(0,0,3,4);
-    UTILSLIB::IOUtils::write_eigen_matrix(testPosCut, QString("C:/Users/MEG measurement/BabyMEGData/TestProject/TestSubject/%1_testPos_mat").arg(sTimeStamp));
+    UTILSLIB::IOUtils::write_eigen_matrix(testPosCut, QString("%1/%2_testPos_mat").arg(m_sHPIResourceDir).arg(sTimeStamp));
 
     MatrixXi idx_mat(chIdcs.rows(),1);
     idx_mat.col(0) = chIdcs;
-    UTILSLIB::IOUtils::write_eigen_matrix(idx_mat, QString("C:/Users/MEG measurement/BabyMEGData/TestProject/TestSubject/%1_idx_mat").arg(sTimeStamp));
+    UTILSLIB::IOUtils::write_eigen_matrix(idx_mat, QString("%1/%2_idx_mat").arg(m_sHPIResourceDir).arg(sTimeStamp));
 
     MatrixXd coilFreq_mat(coilfreq.rows(),1);
     coilFreq_mat.col(0) = coilfreq;
-    UTILSLIB::IOUtils::write_eigen_matrix(coilFreq_mat, QString("C:/Users/MEG measurement/BabyMEGData/TestProject/TestSubject/%1_coilFreq_mat").arg(sTimeStamp));
+    UTILSLIB::IOUtils::write_eigen_matrix(coilFreq_mat, QString("%1/%2_coilFreq_mat").arg(m_sHPIResourceDir).arg(sTimeStamp));
 
-    UTILSLIB::IOUtils::write_eigen_matrix(diffPos, QString("C:/Users/MEG measurement/BabyMEGData/TestProject/TestSubject/%1_diffPos_mat").arg(sTimeStamp));
+    UTILSLIB::IOUtils::write_eigen_matrix(diffPos, QString("%1/%2_diffPos_mat").arg(m_sHPIResourceDir).arg(sTimeStamp));
 
-    UTILSLIB::IOUtils::write_eigen_matrix(amp, QString("C:/Users/MEG measurement/BabyMEGData/TestProject/TestSubject/%1_amp_mat").arg(sTimeStamp));
+    UTILSLIB::IOUtils::write_eigen_matrix(amp, QString("%1/%2_amp_mat").arg(m_sHPIResourceDir).arg(sTimeStamp));
 }
 
 
@@ -775,11 +803,11 @@ void RtHPIS::append(const MatrixXd &p_DataSegment)
 {
     m_mutex.lock();
 
-    if(!m_pRawMatrixBuffer)
+    if(!m_pRawMatrixBuffer) {
         m_pRawMatrixBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(8, p_DataSegment.rows(), p_DataSegment.cols()));
+    }
 
-    if (SendDataToBuffer)
-        m_pRawMatrixBuffer->push(&p_DataSegment);
+    m_pRawMatrixBuffer->push(&p_DataSegment);
 
     m_mutex.unlock();
 }
@@ -790,8 +818,9 @@ void RtHPIS::append(const MatrixXd &p_DataSegment)
 bool RtHPIS::start()
 {
     //Check if the thread is already or still running. This can happen if the start button is pressed immediately after the stop button was pressed. In this case the stopping process is not finished yet but the start process is initiated.
-    if(this->isRunning())
+    if(this->isRunning()) {
         QThread::wait();
+    }
 
     m_bIsRunning = true;
     QThread::start();
@@ -810,9 +839,110 @@ bool RtHPIS::stop()
 
     m_pRawMatrixBuffer->clear();
 
-    qDebug()<<" RtHPIS Thread is stopped.";
-
     return true;
+}
+
+
+//*************************************************************************************************************
+
+coilParam RtHPIS::dipfit(struct coilParam coil, struct sens sensors, Eigen::MatrixXd data, int numCoils)
+{
+    //Do this in conncurrent mode
+    //Generate QList structure which can be handled by the QConcurrent framework
+    QList<QPair<QPair<Eigen::RowVectorXd, Eigen::VectorXd>, QPair<dipError, sens> > > lCoilData;
+
+    for(qint32 i = 0; i < numCoils; ++i) {
+        QPair<QPair<Eigen::RowVectorXd, Eigen::VectorXd>, QPair<dipError, sens> >  coilPair;
+        coilPair.first.first = coil.pos.row(i);
+        coilPair.first.second = data.col(i);
+        coilPair.second.second = sensors;
+
+        lCoilData.append(coilPair);
+    }
+
+    //Do the concurrent filtering
+    if(!lCoilData.isEmpty()) {
+//        for(int l = 0; l < lCoilData.size(); ++l) {
+//            doDipfitConcurrent(lCoilData[l]);
+//        }
+
+        QFuture<void> future = QtConcurrent::map(lCoilData,
+                                             doDipfitConcurrent);
+        future.waitForFinished();
+
+        //Transform results to final coil information
+        for(qint32 i = 0; i < lCoilData.size(); ++i) {
+            coil.pos.row(i) = lCoilData.at(i).first.first;
+            coil.mom = lCoilData.at(i).second.first.moment.transpose();
+            coil.dpfiterror(i) = lCoilData.at(i).second.first.error;
+            coil.dpfitnumitr(i) = lCoilData.at(i).second.first.numIterations;
+
+            qDebug()<< "RtHPIS::dipfit - Itr steps for coil " << i << " =" <<coil.dpfitnumitr(i);
+        }
+    }
+
+    return coil;
+}
+
+
+//*************************************************************************************************************
+
+Eigen::Matrix4d RtHPIS::computeTransformation(Eigen::MatrixXd NH, Eigen::MatrixXd BT)
+{
+    Eigen::MatrixXd xdiff, ydiff, zdiff, C, Q;
+    Eigen::Matrix4d transFinal = Eigen::Matrix4d::Identity(4,4);
+    Eigen::Matrix4d Rot = Eigen::Matrix4d::Zero(4,4);
+    Eigen::Matrix4d Trans = Eigen::Matrix4d::Identity(4,4);
+    double meanx,meany,meanz,normf;
+
+    for(int i = 0; i < 15; ++i) {
+        // Calcualte translation
+        xdiff = NH.col(0) - BT.col(0);
+        ydiff = NH.col(1) - BT.col(1);
+        zdiff = NH.col(2) - BT.col(2);
+
+        meanx = xdiff.mean();
+        meany = ydiff.mean();
+        meanz = zdiff.mean();
+
+        // Apply translation
+        for (int j = 0; j < BT.rows(); ++j) {
+            BT(j,0) = BT(j,0) + meanx;
+            BT(j,1) = BT(j,1) + meany;
+            BT(j,2) = BT(j,2) + meanz;
+        }
+
+        // Estimate rotation component
+        C = BT.transpose() * NH;
+
+        Eigen::JacobiSVD< Eigen::MatrixXd > svd(C ,Eigen::ComputeThinU | Eigen::ComputeThinV);
+
+        Q = svd.matrixU() * svd.matrixV().transpose();
+
+        // Apply rotation on translated points
+        BT = BT * Q;
+
+        // Calculate GOF
+        normf = (NH.transpose()-BT.transpose()).norm();
+
+        // Store rotation part to transformation matrix
+        Rot(3,3) = 1;
+        for(int j = 0; j < 3; ++j) {
+            for(int k = 0; k < 3; ++k) {
+                Rot(j,k) = Q(k,j);
+            }
+        }
+
+        // Store translation part to transformation matrix
+        Trans(0,3) = meanx;
+        Trans(1,3) = meany;
+        Trans(2,3) = meanz;
+
+        // Safe rotation and translation to final amtrix for next iteration step
+        transFinal = Rot * Trans * transFinal;
+    }
+
+    return transFinal;
 }
 
 
@@ -995,7 +1125,7 @@ void RtHPIS::run()
         if(m_pRawMatrixBuffer)
         {
             //m_mutex.lock();
-            MatrixXd t_mat = m_pRawMatrixBuffer->pop();            
+            MatrixXd t_mat = m_pRawMatrixBuffer->pop();
             //m_mutex.unlock();
 
             buffer.append(t_mat);
@@ -1226,293 +1356,3 @@ y_k is the measured signal in channel k
 
 e_k = y_k - y’_k, the difference of y_k and the signal predicted by the model
 */
-
-
-coilParam RtHPIS::dipfit(struct coilParam coil, struct sens sensors, Eigen::MatrixXd data, int numCoils)
-{
-    //Do this in conncurrent mode
-    //Generate QList structure which can be handled by the QConcurrent framework
-    QList<QPair<QPair<Eigen::RowVectorXd, Eigen::VectorXd>, QPair<dipError, sens> > > lCoilData;
-
-    for(qint32 i = 0; i < numCoils; ++i) {
-        QPair<QPair<Eigen::RowVectorXd, Eigen::VectorXd>, QPair<dipError, sens> >  coilPair;
-        coilPair.first.first = coil.pos.row(i);
-        coilPair.first.second = data.col(i);
-        coilPair.second.second = sensors;
-
-        lCoilData.append(coilPair);
-    }
-
-    //Do the concurrent filtering
-    if(!lCoilData.isEmpty()) {
-        QFuture<void> future = QtConcurrent::map(lCoilData,
-                                             doDipfitConcurrent);
-        future.waitForFinished();
-
-        //Transform results to final coil information
-        for(qint32 i = 0; i < lCoilData.size(); ++i) {
-            coil.pos.row(i) = lCoilData.at(i).first.first;
-            coil.mom = lCoilData.at(i).second.first.moment.transpose();
-            coil.dpfiterror(i) = lCoilData.at(i).second.first.error;
-            coil.dpfitnumitr(i) = lCoilData.at(i).second.first.numIterations;
-
-            qDebug()<< "RtHPIS::dipfit - Itr steps for coil " << i << " =" <<coil.dpfitnumitr(i);
-        }
-    }
-
-    return coil;
-}
-
-
-Eigen::Matrix4d RtHPIS::computeTransformation(Eigen::MatrixXd NH, Eigen::MatrixXd BT)
-{
-    Eigen::MatrixXd xdiff, ydiff, zdiff, C, Q;
-    Eigen::Matrix4d transFinal = Eigen::Matrix4d::Identity(4,4);
-    Eigen::Matrix4d Rot = Eigen::Matrix4d::Zero(4,4);
-    Eigen::Matrix4d Trans = Eigen::Matrix4d::Identity(4,4);
-    double meanx,meany,meanz,normf;
-
-    for(int i = 0; i < 15; ++i) {
-        // Calcualte translation
-        xdiff = NH.col(0) - BT.col(0);
-        ydiff = NH.col(1) - BT.col(1);
-        zdiff = NH.col(2) - BT.col(2);
-
-        meanx = xdiff.mean();
-        meany = ydiff.mean();
-        meanz = zdiff.mean();
-
-        // Apply translation
-        for (int j = 0; j < BT.rows(); ++j) {
-            BT(j,0) = BT(j,0) + meanx;
-            BT(j,1) = BT(j,1) + meany;
-            BT(j,2) = BT(j,2) + meanz;
-        }
-
-        // Estimate rotation component
-        C = BT.transpose() * NH;
-
-        Eigen::JacobiSVD< Eigen::MatrixXd > svd(C ,Eigen::ComputeThinU | Eigen::ComputeThinV);
-
-        Q = svd.matrixU() * svd.matrixV().transpose();
-
-        // Apply rotation on translated points
-        BT = BT * Q;
-
-        // Calculate GOF
-        normf = (NH.transpose()-BT.transpose()).norm();
-
-        // Store rotation part to transformation matrix
-        Rot(3,3) = 1;
-        for(int j = 0; j < 3; ++j) {
-            for(int k = 0; k < 3; ++k) {
-                Rot(j,k) = Q(k,j);
-            }
-        }
-
-        // Store translation part to transformation matrix
-        Trans(0,3) = meanx;
-        Trans(1,3) = meany;
-        Trans(2,3) = meanz;
-
-        // Safe rotation and translation to final amtrix for next iteration step
-        transFinal = Rot * Trans * transFinal;
-    }
-
-    return transFinal;
-}
-
-
-//*************************************************************************************************************
-
-//void RtHPIS::test()
-//{
-
-//    struct sens sensors;
-//    struct coilParam coil;
-//    int numCoils = 4;
-//    int numCh = m_pFiffInfo->nchan;
-//    int samF = m_pFiffInfo->sfreq;
-//    int numLoc = 3, numBlock, samLoc; // numLoc : Number of times to localize in a second
-//    samLoc = samF/numLoc; // minimum samples required to localize numLoc times in a second
-//    Eigen::VectorXd coilfreq(numCoils);
-//    coilfreq[0] = 154;coilfreq[1] = 158;coilfreq[2] = 162;coilfreq[3] = 166;
-
-//    // Initialize HPI coils location and moment
-//    coil.pos = Eigen::MatrixXd::Zero(numCoils,3);
-//    coil.mom = Eigen::MatrixXd::Zero(numCoils,3);
-
-//    // Generate simulated data
-//    Eigen::MatrixXd simreal(numCoils,samLoc);
-//    Eigen::MatrixXd simimag(numCoils,samLoc);
-//    Eigen::VectorXd time(samLoc);
-
-//    for (int i = 0;i < samLoc;i++) time[i] = i*1.0/samF;
-
-//    double coilnorm;
-
-//    for(int i=0;i<numCoils;i++) {
-//        for(int j=0;j<samLoc;j++) {
-//            simreal(i,j) = cos(2*M_PI*coilfreq[i]*time[j]);
-//            simimag(i,j) = sin(2*M_PI*coilfreq[i]*time[j]);
-//        }
-//        coilnorm = sqrt((simreal.row(i).array().square() + simimag.row(i).array().square()).array().sum());
-//        simreal.row(i) = simreal.row(i) / coilnorm;
-//        simimag.row(i) = simimag.row(i) / coilnorm;
-//    }
-
-//    // Get the indices of reference channels
-//    QVector<int> refind(0);
-//    if (m_pFiffInfo->ch_names.indexOf("TRG013",0) >= 0) refind.append(m_pFiffInfo->ch_names.indexOf("TRG009",0)+1);
-//    if (m_pFiffInfo->ch_names.indexOf("TRG014",0) >= 0) refind.append(m_pFiffInfo->ch_names.indexOf("TRG010",0)+1);
-//    if (m_pFiffInfo->ch_names.indexOf("TRG015",0) >= 0) refind.append(m_pFiffInfo->ch_names.indexOf("TRG011",0)+1);
-//    if (m_pFiffInfo->ch_names.indexOf("TRG016",0) >= 0) refind.append(m_pFiffInfo->ch_names.indexOf("TRG012",0)+1);
-
-//    // Get the indices of inner layer channels
-//    QVector<int> innerind(0);
-//    for (int i = 0;i < numCh;i++) {
-//        if(m_pFiffInfo->chs[i].coil_type == 7002) {
-//            // Check if the sensor is bad, if not append to innerind
-//            if(!(m_pFiffInfo->bads.contains(m_pFiffInfo->ch_names.at(i)))) innerind.append(i);
-//        }
-//    }
-
-//    // Initialize inner layer sensors
-//    sensors.coilpos = Eigen::MatrixXd::Zero(innerind.size(),3);
-//    sensors.coilori = Eigen::MatrixXd::Zero(innerind.size(),3);
-//    sensors.tra = Eigen::MatrixXd::Identity(innerind.size(),innerind.size());
-
-//    for(int i=0;i<innerind.size();i++) {
-//        sensors.coilpos(i,0) = m_pFiffInfo->chs[innerind.at(i)].loc(0,0);
-//        sensors.coilpos(i,1) = m_pFiffInfo->chs[innerind.at(i)].loc(1,0);
-//        sensors.coilpos(i,2) = m_pFiffInfo->chs[innerind.at(i)].loc(2,0);
-//        sensors.coilori(i,0) = m_pFiffInfo->chs[innerind.at(i)].loc(9,0);
-//        sensors.coilori(i,1) = m_pFiffInfo->chs[innerind.at(i)].loc(10,0);
-//        sensors.coilori(i,2) = m_pFiffInfo->chs[innerind.at(i)].loc(11,0);
-//    }
-
-//    //load polhemus HPI
-//    Eigen::MatrixXd headHPI(numCoils,3);
-
-//    // check the m_pFiffInfo->dig information. If dig is empty, set the headHPI is 0;
-//    if (m_pFiffInfo->dig.size()>0)
-//    {
-//        for (int i=0;i<numCoils;i++) {
-//            headHPI(i,0) = m_pFiffInfo->dig.at(i+3).r[0];
-//            headHPI(i,1) = m_pFiffInfo->dig.at(i+3).r[1];
-//            headHPI(i,2) = m_pFiffInfo->dig.at(i+3).r[2];
-//        }
-//    }
-//    else
-//    {
-//        for (int i=0;i<numCoils;i++) {
-//            headHPI(i,0) = 0;
-//            headHPI(i,1) = 0;
-//            headHPI(i,2) = 0;
-//        }
-//        qDebug()<< "Forget to load polhemus HPI! Please stop running and load it again!";
-//    }
-
-//    Eigen::MatrixXd ampreal(innerind.size(),numCoils);
-//    Eigen::MatrixXd ampimag(innerind.size(),numCoils);
-//    Eigen::Matrix4d trans;
-//    Eigen::MatrixXd phasereal(1,samLoc);
-//    Eigen::MatrixXd phaseimag(1,samLoc);
-//    Eigen::MatrixXd ampl(1,samLoc);
-
-//    QVector<MatrixXd> buffer;
-
-
-//    while(m_bIsRunning)
-//    {
-//        if(m_pRawMatrixBuffer)
-//        {
-//            MatrixXd t_mat = m_pRawMatrixBuffer->pop();
-
-//            buffer.append(t_mat);
-
-//            if(buffer.size()*t_mat.cols() >= samLoc) {
-
-//                Eigen::MatrixXd alldata(t_mat.rows(),buffer.size()*t_mat.cols());
-
-//                // Concatenate data into a matrix
-//                for(int i=0;i<buffer.size();i++) alldata << buffer[i];
-
-
-//                // Get the data from inner layer channels
-//                Eigen::MatrixXd innerdata(innerind.size(),samLoc);
-//                Eigen::MatrixXd refdata(numCoils,samLoc);
-
-//                numBlock = alldata.cols()/samLoc;
-
-//                // Loop for localizing coils
-//                for(int i = 0;i<numBlock;i++) {
-
-//                    for(int j = 0;j < innerind.size();j++) {
-//                        std::cout << innerind[j] << std::endl;
-//                        innerdata.row(j) << alldata.block(innerind[j],i*samLoc,1,samLoc);
-//                    }
-
-//                    for(int j = 0;j < refind.size();j++)
-//                        refdata.row(j) << alldata.block(refind[j],i*samLoc,1,samLoc);
-
-//                    ampreal = innerdata*simreal.transpose();
-//                    ampimag = innerdata*simimag.transpose()*-1;
-
-//                    phasereal = (refdata.array() * simreal.array()).array().colwise().sum();
-//                    phaseimag = (refdata.array() * simimag.array()).array().colwise().sum();
-
-//                    ampl = sqrt(phasereal.array().square() + phaseimag.array().square());
-
-//                    phasereal = phasereal.array() / ampl.array();
-//                    phaseimag = phaseimag.array() / ampl.array();
-
-//                    for(int i = 0;i < numCoils;i++)
-//                        ampreal.col(i).array() = ampreal.col(i) * phasereal(i) - ampimag.col(i) * phaseimag(i);
-
-////                    for(int i = 0;i<innerdata.rows();i++) {
-////                        for(int j=0;j<4;j++) {
-////                            std::cout<<innerdata(i,j)<< "  ";
-
-////                        }
-////                        std::cout << std::endl;
-////                     }
-
-
-
-
-////                    std::cout << ampreal.rows() << std::endl;
-////                    std::cout << ampreal.cols() << std::endl;
-
-//                    coil = dipfit(coil, sensors, ampreal, numCoils);
-
-//                    qDebug()<<"HPI head "<<headHPI(0,0)<<" "<<headHPI(0,1)<<" "<<headHPI(0,2);
-//                    qDebug()<<"HPI head "<<headHPI(1,0)<<" "<<headHPI(1,1)<<" "<<headHPI(1,2);
-//                    qDebug()<<"HPI head "<<headHPI(2,0)<<" "<<headHPI(2,1)<<" "<<headHPI(2,2);
-//                    qDebug()<<"HPI head "<<headHPI(3,0)<<" "<<headHPI(3,1)<<" "<<headHPI(3,2);
-
-
-//                    qDebug()<<"HPI device "<<coil.pos(0,0)<<" "<<coil.pos(0,1)<<" "<<coil.pos(0,2);
-//                    qDebug()<<"HPI device "<<coil.pos(1,0)<<" "<<coil.pos(1,1)<<" "<<coil.pos(1,2);
-//                    qDebug()<<"HPI device "<<coil.pos(2,0)<<" "<<coil.pos(2,1)<<" "<<coil.pos(2,2);
-//                    qDebug()<<"HPI device "<<coil.pos(3,0)<<" "<<coil.pos(3,1)<<" "<<coil.pos(3,2);
-
-//                    trans = computeTransformation(coil.pos,headHPI);
-
-//                    for(int ti =0; ti<4;ti++)
-//                        for(int tj=0;tj<4;tj++)
-//                    m_pFiffInfo->dev_head_t.trans(ti,tj) = trans(ti,tj);
-
-//                }
-//                buffer.clear();
-//            }
-
-
-//        }//m_pRawMatrixBuffer
-
-
-
-//    } //m_bIsRunning
-
-//}
-

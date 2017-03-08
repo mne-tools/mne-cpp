@@ -80,6 +80,53 @@ namespace DISP3DLIB
 
 //*************************************************************************************************************
 //=============================================================================================================
+// Declare all structures to be used
+//=============================================================================================================
+//=========================================================================================================
+/**
+* The strucut specifing the smoothing operator info.
+*/
+struct SmoothOperatorInfo {
+    VectorXi                vecVertNo;
+    SparseMatrix<double>    sparseSmoothMatrix;
+    MatrixX3f               matVertPos;
+    int                     iDistPow;
+    double                  dThresholdDistance;
+};
+
+//=========================================================================================================
+/**
+* The strucut specifing the smoothing vertex info.
+*/
+struct SmoothVertexInfo {
+    int                                 iVertIdx;
+    QList<Eigen::Triplet<double> >      lTriplets;
+    QList<QVector3D>                    lSourcePos;
+    QVector3D                           vVertPos;
+    int                                 iDistPow;
+    double                              dThresholdDistance;
+};
+
+//=========================================================================================================
+/**
+* The strucut specifing the smoothing visualization info.
+*/
+struct VisualizationInfo {
+    VectorXd                    vSourceColorSamples;
+    VectorXi                    vVertNo;
+    QList<FSLIB::Label>         lLabels;
+    QMap<qint32, qint32>        mapLabelIdSources;
+    QMap<int, QVector<int> >    mapVertexNeighbors;
+    SparseMatrix<double>        matWDistSmooth;
+    double                      dThresholdX;
+    double                      dThresholdZ;
+    QRgb (*functionHandlerColorMap)(double v);
+    QByteArray                  arrayOriginalVertColor;
+    QByteArray                  arrayFinalVertColor;
+};
+
+//*************************************************************************************************************
+//=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
@@ -94,38 +141,6 @@ class DISP3DNEWSHARED_EXPORT RtSourceLocDataWorker : public QThread
 {
     Q_OBJECT
 public:
-    struct SmoothOperatorInfo {
-        VectorXi                vecVertNo;
-        SparseMatrix<double>    sparseSmoothMatrix;
-        MatrixX3f               matVertPos;
-        int                     iDistPow;
-        double                  dThresholdDistance;
-    };
-
-
-    struct SmoothVertexInfo {
-        int                                 iVertIdx;
-        QList<Eigen::Triplet<double> >      lTriplets;
-        QList<QVector3D>                    lSourcePos;
-        QVector3D                           vVertPos;
-        int                                 iDistPow;
-        double                              dThresholdDistance;
-    };
-
-    struct VisualizationInfo {
-        VectorXd                    vSourceColorSamples;
-        VectorXi                    vVertNo;
-        QList<FSLIB::Label>         lLabels;
-        QMap<qint32, qint32>        mapLabelIdSources;
-        QMap<int, QVector<int> >    mapVertexNeighbors;
-        SparseMatrix<double>        matWDistSmooth;
-        double                      dThresholdX;
-        double                      dThresholdZ;
-        QRgb (*functionHandlerColorMap)(double v);
-        QByteArray                  arrayOriginalVertColor;
-        QByteArray                  arrayFinalVertColor;
-    };
-
     typedef QSharedPointer<RtSourceLocDataWorker> SPtr;            /**< Shared pointer type for RtSourceLocDataWorker class. */
     typedef QSharedPointer<const RtSourceLocDataWorker> ConstSPtr; /**< Const shared pointer type for RtSourceLocDataWorker class. */
 
