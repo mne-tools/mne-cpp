@@ -135,7 +135,7 @@ public:
                                        int                  set,        /* Which data set */
                                        MneInverseOperator*   op,         /* For consistency checks */
                                        MNELIB::MneNamedMatrix*       fwd,        /* Another option for consistency checks */
-                                       char                 **namesp,   /* Yet another option: explicit name list */
+                                       const QStringList&   namesp,   /* Yet another option: explicit name list */
                                        int                  nnamesp,
                                        MneMeasData*          add_to);
 
@@ -144,14 +144,14 @@ public:
                                    int                  set,        /* Which data set */
                                    MneInverseOperator*  op,         /* For consistency checks */
                                    MNELIB::MneNamedMatrix*      fwd,        /* Another option for consistency checks */
-                                   char                 **namesp,   /* Yet another option: explicit name list */
+                                   const QStringList&   namesp,   /* Yet another option: explicit name list */
                                    int                  nnamesp);
 
 
 
 
 public:
-    char                    *filename;  /* The source file name */
+    QString                 filename;  /* The source file name */
     FIFFLIB::fiffId         meas_id;    /* The id from the measurement file */
     FIFFLIB::fiffTimeRec    meas_date;  /* The measurement date from the file */
     FIFFLIB::fiffChInfo     chs;        /* The channel information */
@@ -167,7 +167,7 @@ public:
     MNELIB::MneNamedMatrix*         fwd;        /* Forward operator for dipole fitting */
     MNELIB::MneRawData*             raw;        /* This will be non-null if the data stems from a raw data file */
     mneChSelection          chsel;      /* Channel selection for raw data */
-    char                    **badlist;  /* Bad channel names */
+    QStringList             badlist;  /* Bad channel names */
     int                     nbad;       /* How many? */
     int                     *bad;       /* Which channels are bad? */
     /*
