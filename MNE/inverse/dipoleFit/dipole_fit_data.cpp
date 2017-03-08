@@ -362,120 +362,58 @@ void mne_mat_vec_mult2_3(float **m,float *v,float *result, int d1,int d2)
 }
 
 
-//============================= misc_util.c =============================
-
-char *mne_strdup_3(const char *s)
-{
-    char *res;
-    if (s == NULL)
-        return NULL;
-    res = (char*) malloc(strlen(s)+1);
-    strcpy(res,s);
-    return res;
-}
-
-
-
 //============================= mne_named_matrix.c =============================
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-char **mne_dup_name_list_3(char **list, int nlist)
-/*
- * Duplicate a name list
- */
-{
-    char **res;
-    int  k;
-    if (list == NULL || nlist == 0)
-        return NULL;
-    res = MALLOC_3(nlist,char *);
-
-    for (k = 0; k < nlist; k++)
-        res[k] = mne_strdup_3(list[k]);
-    return res;
-}
-
-
-
-char *mne_name_list_to_string_3(char **list,int nlist)
+QString mne_name_list_to_string_3(const QStringList& list)
 /*
 * Convert a string array to a colon-separated string
 */
 {
-    int k,len;
-    char *res;
-    if (nlist == 0 || list == NULL)
-        return NULL;
-    for (k = len = 0; k < nlist; k++)
-        len += strlen(list[k])+1;
-    res = MALLOC_3(len,char);
-    res[0] = '\0';
-    for (k = len = 0; k < nlist-1; k++) {
-        strcat(res,list[k]);
-        strcat(res,":");
+    int nlist = list.size();
+    QString res;
+    if (nlist == 0 || list.isEmpty())
+        return res;
+//    res[0] = '\0';
+    for (int k = 0; k < nlist-1; k++) {
+        res += list[k];
+        res += ":";
     }
-    strcat(res,list[nlist-1]);
+    res += list[nlist-1];
     return res;
 }
 
 
-char *mne_channel_names_to_string_3(fiffChInfo chs, int nch)
+QString mne_channel_names_to_string_3(fiffChInfo chs, int nch)
 /*
 * Make a colon-separated string out of channel names
 */
 {
-    char **names = MALLOC_3(nch,char *);
-    char *res;
+    QStringList names;
+    QString res;
     int  k;
 
     if (nch <= 0)
         return NULL;
     for (k = 0; k < nch; k++)
-        names[k] = chs[k].ch_name;
-    res = mne_name_list_to_string_3(names,nch);
-    FREE_3(names);
+        names.append(chs[k].ch_name);
+    res = mne_name_list_to_string_3(names);
+    names.clear();
     return res;
 }
 
 
-void mne_string_to_name_list_3(char *s,char ***listp,int *nlistp)
+void mne_string_to_name_list_3(const QString& s, QStringList& listp,int &nlistp)
 /*
       * Convert a colon-separated list into a string array
       */
 {
-    char **list = NULL;
-    int  nlist  = 0;
-    char *one,*now=NULL;
+    QStringList list;
 
-    if (s != NULL && strlen(s) > 0) {
-        s = mne_strdup_3(s);
-        //strtok_r linux variant; strtok_s windows varainat
-#ifdef __linux__
-        for (one = strtok_r(s,":",&now); one != NULL; one = strtok_r(NULL,":",&now)) {
-#elif _WIN32
-        for (one = strtok_s(s,":",&now); one != NULL; one = strtok_s(NULL,":",&now)) {
-#else
-        for (one = strtok_r(s,":",&now); one != NULL; one = strtok_r(NULL,":",&now)) {
-#endif
-            list = REALLOC_3(list,nlist+1,char *);
-            list[nlist++] = mne_strdup_3(one);
-        }
-        FREE_3(s);
+    if (!s.isEmpty() && s.size() > 0) {
+        list = s.split(":");
     }
-    *listp  = list;
-    *nlistp = nlist;
+    listp  = list;
+    nlistp = list.size();
     return;
 }
 
@@ -792,28 +730,6 @@ int mne_svd_3(float **mat,	/* The matrix */
 
 
 
-
-void mne_free_name_list_3(char **list, int nlist)
-/*
-* Free a name list array
-*/
-{
-    int k;
-    if (list == NULL || nlist == 0)
-        return;
-    for (k = 0; k < nlist; k++) {
-#ifdef FOO
-        fprintf(stderr,"%d %s\n",k,list[k]);
-#endif
-        FREE_3(list[k]);
-    }
-    FREE_3(list);
-    return;
-}
-
-
-
-
 void mne_free_cov_3(MneCovMatrix* c)
 /*
 * Free a covariance matrix and all its data
@@ -825,7 +741,7 @@ void mne_free_cov_3(MneCovMatrix* c)
     FREE_3(c->cov_diag);
     if(c->cov_sparse)
         delete c->cov_sparse;
-    mne_free_name_list_3(c->names,c->ncov);
+    c->names.clear();
     FREE_CMATRIX_3(c->eigen);
     FREE_3(c->lambda);
     FREE_3(c->inv_lambda);
@@ -835,7 +751,7 @@ void mne_free_cov_3(MneCovMatrix* c)
         delete c->proj;
     if (c->sss)
         delete c->sss;
-    mne_free_name_list_3(c->bads,c->nbad);
+    c->bads.clear();
     FREE_3(c);
     return;
 }
@@ -1350,7 +1266,7 @@ int mne_classify_channels_cov(MneCovMatrix* cov, fiffChInfo chs, int nchan)
     for (k = 0; k < cov->ncov; k++) {
         cov->ch_class[k] = MNE_COV_CH_UNKNOWN;
         for (p = 0, ch = NULL; p < nchan; p++) {
-            if (strcmp(chs[p].ch_name,cov->names[k]) == 0) {
+            if (QString::compare(chs[p].ch_name,cov->names[k]) == 0) {
                 ch = chs+p;
                 if (ch->kind == FIFFV_MEG_CH) {
                     if (ch->unit == FIFF_UNIT_T)
@@ -1364,7 +1280,7 @@ int mne_classify_channels_cov(MneCovMatrix* cov, fiffChInfo chs, int nchan)
             }
         }
         if (!ch) {
-            printf("Could not find channel info for channel %s in mne_classify_channels_cov",cov->names[k]);
+            printf("Could not find channel info for channel %s in mne_classify_channels_cov",cov->names[k].toUtf8().constData());
             goto bad;
         }
     }
@@ -2027,56 +1943,7 @@ out : {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 //============================= mne_lin_proj.c =============================
-
-
-
-
-
-
-
-
-
-
-
-static char *add_string_3(char *old,char *add)
-
-{
-    char *news = NULL;
-    if (!old) {
-        if (add || strlen(add) > 0)
-            news = mne_strdup_3(add);
-    }
-    else {
-        old = REALLOC_3(old,strlen(old) + strlen(add) + 1,char);
-        strcat(old,add);
-        news = old;
-    }
-    return news;
-}
-
-
-
 
 void mne_proj_op_report_data_3(FILE *out,const char *tag, MneProjOp* op, int list_data,
                              char **exclude, int nexclude)
@@ -2120,7 +1987,7 @@ void mne_proj_op_report_data_3(FILE *out,const char *tag, MneProjOp* op, int lis
             for (p = 0; p < vecs->nrow; p++)
                 for (q = 0; q < vecs->ncol; q++) {
                     for (j = 0, found  = 0; j < nexclude; j++) {
-                        if (strcmp(exclude[j],vecs->collist[q]) == 0) {
+                        if (QString::compare(exclude[j],vecs->collist[q]) == 0) {
                             found = 1;
                             break;
                         }
@@ -2170,7 +2037,7 @@ void mne_proj_op_report_3(FILE *out,const char *tag, MneProjOp* op)
 
 //============================= mne_named_vector.c =============================
 
-int mne_pick_from_named_vector_3(mneNamedVector vec, char **names, int nnames, int require_all, float *res)
+int mne_pick_from_named_vector_3(mneNamedVector vec, const QStringList& names, int nnames, int require_all, float *res)
 /*
 * Pick the desired elements from the named vector
 */
@@ -2178,7 +2045,7 @@ int mne_pick_from_named_vector_3(mneNamedVector vec, char **names, int nnames, i
     int found;
     int k,p;
 
-    if (vec->names == 0) {
+    if (vec->names.size() == 0) {
         qCritical("No names present in vector. Cannot pick.");
         return FAIL;
     }
@@ -2189,7 +2056,7 @@ int mne_pick_from_named_vector_3(mneNamedVector vec, char **names, int nnames, i
     for (k = 0; k < nnames; k++) {
         found = 0;
         for (p = 0; p < vec->nvec; p++) {
-            if (strcmp(vec->names[p],names[k]) == 0) {
+            if (QString::compare(vec->names[p],names[k]) == 0) {
                 res[k] = vec->data[p];
                 found = TRUE;
                 break;
@@ -2219,15 +2086,17 @@ MneProjOp* mne_read_proj_op_from_node_3(//fiffFile in,
     QList<FiffDirNode::SPtr> items;
     FiffDirNode::SPtr node;
     int         k;
-    char        *item_desc,*desc_tag,*lf;
+    QString     item_desc, desc_tag;
     int         global_nchan,item_nchan,nlist;
-    char        **item_names;
+    QStringList item_names;
     int         item_kind;
     float       **item_vectors = NULL;
     int         item_nvec;
     int         item_active;
     MneNamedMatrix* item;
     FiffTag::SPtr t_pTag;
+    QStringList emptyList;
+    int pos;
 
     if (!stream) {
         qCritical("File not open mne_read_proj_op_from_node");
@@ -2267,22 +2136,22 @@ MneProjOp* mne_read_proj_op_from_node_3(//fiffFile in,
         /*
         * Complicated procedure for getting the description
         */
-        item_desc = NULL;
+        item_desc.clear();
 
         if (node->find_tag(stream, FIFF_NAME, t_pTag)) {
-            item_desc = add_string_3(item_desc,(char *)t_pTag->data());
+            item_desc += t_pTag->toString();
         }
 
         /*
         * Take the first line of description if it exists
         */
         if (node->find_tag(stream, FIFF_DESCRIPTION, t_pTag)) {
-            desc_tag = (char *)t_pTag->data();
-            if ((lf = strchr(desc_tag,'\n')) != NULL)
-                *lf = '\0';
-            printf("###################DEBUG ToDo: item_desc = add_string_3(item_desc," ");");
-            item_desc = add_string_3(item_desc,(char *)desc_tag);
-            FREE_3(desc_tag);
+            desc_tag = t_pTag->toString();
+            if((pos = desc_tag.indexOf("\n")) >= 0)
+                desc_tag.truncate(pos);
+            if (!item_desc.isEmpty())
+                item_desc += " ";
+            item_desc += desc_tag;
         }
         /*
         * Possibility to override number of channels here
@@ -2303,10 +2172,10 @@ MneProjOp* mne_read_proj_op_from_node_3(//fiffFile in,
         if (!node->find_tag(stream, FIFF_PROJ_ITEM_CH_NAME_LIST, t_pTag))
             goto bad;
 
-        mne_string_to_name_list_3((char *)(t_pTag->data()),&item_names,&nlist);
+        mne_string_to_name_list_3(t_pTag->toString(),item_names,nlist);
         if (nlist != item_nchan) {
             printf("Channel name list incorrectly specified for proj item # %d",k+1);
-            mne_free_name_list_3(item_names,nlist);
+            item_names.clear();
             goto bad;
         }
         /*
@@ -2342,7 +2211,7 @@ MneProjOp* mne_read_proj_op_from_node_3(//fiffFile in,
         /*
         * Ready to add
         */
-        item = MneNamedMatrix::build_named_matrix(item_nvec,item_nchan,NULL,item_names,item_vectors);
+        item = MneNamedMatrix::build_named_matrix(item_nvec,item_nchan,emptyList,item_names,item_vectors);
         MneProjOp::mne_proj_op_add_item_act(op,item,item_kind,item_desc,item_active);
         delete item;
         op->items[op->nitems-1]->active_file = item_active;
@@ -2386,7 +2255,7 @@ MneProjOp* mne_read_proj_op_3(const QString& name)
 
 
 
-int mne_proj_op_chs_3(MneProjOp* op, char **list, int nlist)
+int mne_proj_op_chs_3(MneProjOp* op, const QStringList& list, int nlist)
 
 {
     if (op == NULL)
@@ -2397,7 +2266,7 @@ int mne_proj_op_chs_3(MneProjOp* op, char **list, int nlist)
     if (nlist == 0)
         return OK;
 
-    op->names = mne_dup_name_list_3(list,nlist);
+    op->names = list;
     op->nch   = nlist;
 
     return OK;
@@ -2408,12 +2277,12 @@ int mne_proj_op_chs_3(MneProjOp* op, char **list, int nlist)
 
 
 
-static void clear_these(float *data, char **names, int nnames, const char *start)
+static void clear_these(float *data, const QStringList& names, int nnames, const QString& start)
 
 {
     int k;
     for (k = 0; k < nnames; k++)
-        if (strstr(names[k],start) == names[k])
+        if (names[k].contains(start))//strstr(names[k],start) == names[k])
             data[k] = 0.0;
 }
 
@@ -2500,7 +2369,7 @@ int mne_proj_op_make_proj_bad(MneProjOp* op, char **bad, int nbad)
     */
     for (q = 0; q < nbad; q++)
         for (r = 0; r < op->nch; r++)
-            if (strcmp(op->names[r],bad[q]) == 0) {
+            if (QString::compare(op->names[r],bad[q]) == 0) {
                 for (p = 0; p < nvec_meg; p++)
                     mat_meg[p][r] = 0.0;
                 for (p = 0; p < nvec_eeg; p++)
@@ -2641,7 +2510,7 @@ int mne_proj_op_make_proj_bad(MneProjOp* op, char **bad, int nbad)
      * Make sure that the stimulus channels are not modified
      */
     for (k = 0; k < op->nch; k++)
-        if (strstr(op->names[k],"STI") == op->names[k]) {
+        if (op->names[k].contains("STI")){ //strstr(op->names[k],"STI") == op->names[k]) {
             for (p = 0; p < op->nvec; p++)
                 op->proj_data[p][k] = 0.0;
         }
@@ -2867,7 +2736,7 @@ bad : {
 #define strncasecmp _strnicmp
 #endif
 
-int is_selected_in_data(mshMegEegData d, char *ch_name)
+int is_selected_in_data(mshMegEegData d, const QString& ch_name)
 /*
  * Is this channel selected in data
  */
@@ -2876,15 +2745,12 @@ int is_selected_in_data(mshMegEegData d, char *ch_name)
     int k;
 
     for (k = 0; k < d->meas->nchan; k++)
-        if (strcasecmp(ch_name,d->meas->chs[k].ch_name) == 0) {
+        if (QString::compare(ch_name,d->meas->chs[k].ch_name,Qt::CaseInsensitive) == 0) {
             issel = d->sels[k];
             break;
         }
     return issel;
 }
-
-
-
 
 
 
@@ -2914,14 +2780,13 @@ static char *next_line_3(char *line, int n, FILE *in)
 
 #define MAXLINE 500
 
-int mne_read_bad_channels_3(const QString& name, char ***listp, int *nlistp)
+int mne_read_bad_channels_3(const QString& name, QStringList& listp, int& nlistp)
 /*
 * Read bad channel names
 */
 {
     FILE *in = NULL;
-    char **list = NULL;
-    int  nlist  = 0;
+    QStringList list;
     char line[MAXLINE+1];
     char *next;
 
@@ -2937,20 +2802,19 @@ int mne_read_bad_channels_3(const QString& name, char ***listp, int *nlistp)
         if (strlen(next) > 0) {
             if (next[strlen(next)-1] == '\n')
                 next[strlen(next)-1] = '\0';
-            list = REALLOC_3(list,nlist+1,char *);
-            list[nlist++] = mne_strdup_3(next);
+            list.append(next);
         }
     }
     if (ferror(in))
         goto bad;
 
-    *listp  = list;
-    *nlistp = nlist;
+    listp  = list;
+    nlistp = list.size();
 
     return OK;
 
 bad : {
-        mne_free_name_list_3(list,nlist);
+        list.clear();
         if (in != NULL)
             fclose(in);
         return FAIL;
@@ -2961,14 +2825,14 @@ bad : {
 
 
 int mne_read_bad_channel_list_from_node_3(FiffStream::SPtr& stream,
-                                        const FiffDirNode::SPtr& pNode, char ***listp, int *nlistp)
+                                        const FiffDirNode::SPtr& pNode, QStringList& listp, int& nlistp)
 {
     FiffDirNode::SPtr node,bad;
     QList<FiffDirNode::SPtr> temp;
-    char **list = NULL;
+    QStringList list;
     int  nlist  = 0;
     FiffTag::SPtr t_pTag;
-    char *names;
+    QString names;
 
     if (pNode->isEmpty())
         node = stream->dirtree();
@@ -2981,16 +2845,16 @@ int mne_read_bad_channel_list_from_node_3(FiffStream::SPtr& stream,
 
         bad->find_tag(stream, FIFF_MNE_CH_NAME_LIST, t_pTag);
         if (t_pTag) {
-            names = (char *)t_pTag->data();
-            mne_string_to_name_list_3(names,&list,&nlist);
+            names = t_pTag->toString();
+            mne_string_to_name_list_3(names,list,nlist);
         }
     }
-    *listp = list;
-    *nlistp = nlist;
+    listp = list;
+    nlistp = nlist;
     return OK;
 }
 
-int mne_read_bad_channel_list_3(const QString& name, char ***listp, int *nlistp)
+int mne_read_bad_channel_list_3(const QString& name, QStringList& listp, int& nlistp)
 
 {
     QFile file(name);
@@ -3034,7 +2898,7 @@ MneCovMatrix* mne_read_cov(const QString& name,int kind)
     QList<FiffDirNode::SPtr> nodes;
     FiffDirNode::SPtr    covnode;
 
-    char            **names    = NULL;	/* Optional channel name list */
+    QStringList     names;	/* Optional channel name list */
     int             nnames     = 0;
     double          *cov       = NULL;
     double          *cov_diag  = NULL;
@@ -3042,7 +2906,7 @@ MneCovMatrix* mne_read_cov(const QString& name,int kind)
     double          *lambda    = NULL;
     float           **eigen    = NULL;
     MatrixXf        tmp_eigen;
-    char            **bads     = NULL;
+    QStringList     bads;
     int             nbad       = 0;
     int             ncov       = 0;
     int             nfree      = 1;
@@ -3090,7 +2954,7 @@ MneCovMatrix* mne_read_cov(const QString& name,int kind)
         nfree = *t_pTag->toInt();
     }
     if (covnode->find_tag(stream, FIFF_MNE_ROW_NAMES, t_pTag)) {
-        mne_string_to_name_list_3((char *)(t_pTag->data()),&names,&nnames);
+        mne_string_to_name_list_3(t_pTag->toString(),names,nnames);
         if (nnames != ncov) {
             qCritical("Incorrect number of channel names for a covariance matrix");
             goto out;
@@ -3166,7 +3030,7 @@ MneCovMatrix* mne_read_cov(const QString& name,int kind)
         /*
         * Read the optional bad channel list
         */
-        if (mne_read_bad_channel_list_from_node_3(stream,nodes[k],&bads,&nbad) == FAIL)
+        if (mne_read_bad_channel_list_from_node_3(stream,nodes[k],bads,nbad) == FAIL)
             goto out;
     }
     if (cov_sparse)
@@ -3214,8 +3078,8 @@ out : {
             delete sss;
 
         if (!res) {
-            mne_free_name_list_3(names,nnames);
-            mne_free_name_list_3(bads,nbad);
+            names.clear();
+            bads.clear();
             FREE_3(cov);
             FREE_3(cov_diag);
             if(cov_sparse)
@@ -3508,13 +3372,13 @@ static int is_valid_eeg_ch(fiffChInfo ch)
 
 
 static int accept_ch(fiffChInfo ch,
-                     char       **bads,
+                     const QStringList& bads,
                      int        nbad)
 
 {
     int k;
     for (k = 0; k < nbad; k++)
-        if (strcmp(ch->ch_name,bads[k]) == 0)
+        if (QString::compare(ch->ch_name,bads[k]) == 0)
             return FALSE;
     return TRUE;
 }
@@ -3527,12 +3391,12 @@ static int accept_ch(fiffChInfo ch,
 
 
 int read_meg_eeg_ch_info(const QString& name,       /* Input file */
-                         int        do_meg,	 /* Use MEG */
-                         int        do_eeg,	 /* Use EEG */
-                         char       **bads,	 /* List of bad channels */
+                         int        do_meg,         /* Use MEG */
+                         int        do_eeg,         /* Use EEG */
+                         const QStringList& bads,   /* List of bad channels */
                          int        nbad,
-                         fiffChInfo *chsp,	 /* MEG + EEG channels */
-                         int        *nmegp,	 /* Count of each */
+                         fiffChInfo *chsp,          /* MEG + EEG channels */
+                         int        *nmegp,         /* Count of each */
                          int        *neegp)
 /*
       * Read the channel information and split it into two arrays,
@@ -3635,7 +3499,7 @@ void mne_revert_to_diag_cov(MneCovMatrix* c)
 
 
 
-MneCovMatrix* mne_pick_chs_cov_omit(MneCovMatrix* c, char **new_names, int ncov, int omit_meg_eeg, fiffChInfo chs)
+MneCovMatrix* mne_pick_chs_cov_omit(MneCovMatrix* c, const QStringList& new_names, int ncov, int omit_meg_eeg, fiffChInfo chs)
 /*
 * Pick designated channels from a covariance matrix, optionally omit MEG/EEG correlations
 */
@@ -3644,7 +3508,7 @@ MneCovMatrix* mne_pick_chs_cov_omit(MneCovMatrix* c, char **new_names, int ncov,
     int *pick = NULL;
     double *cov = NULL;
     double *cov_diag = NULL;
-    char  **names = NULL;
+    QStringList names;
     int   *is_meg = NULL;
     int   from,to;
     MneCovMatrix* res;
@@ -3653,7 +3517,7 @@ MneCovMatrix* mne_pick_chs_cov_omit(MneCovMatrix* c, char **new_names, int ncov,
         qCritical("No channels specified for picking in mne_pick_chs_cov_omit");
         return NULL;
     }
-    if (c->names == NULL) {
+    if (c->names.isEmpty()) {
         qCritical("No names in covariance matrix. Cannot do picking.");
         return NULL;
     }
@@ -3662,13 +3526,13 @@ MneCovMatrix* mne_pick_chs_cov_omit(MneCovMatrix* c, char **new_names, int ncov,
         pick[j] = -1;
     for (j = 0; j < ncov; j++)
         for (k = 0; k < c->ncov; k++)
-            if (strcmp(c->names[k],new_names[j]) == 0) {
+            if (QString::compare(c->names[k],new_names[j]) == 0) {
                 pick[j] = k;
                 break;
             }
     for (j = 0; j < ncov; j++) {
         if (pick[j] < 0) {
-            printf("All desired channels not found in the covariance matrix (at least missing %s).", new_names[j]);
+            printf("All desired channels not found in the covariance matrix (at least missing %s).", new_names[j].toUtf8().constData());
             FREE_3(pick);
             return NULL;
         }
@@ -3684,24 +3548,23 @@ MneCovMatrix* mne_pick_chs_cov_omit(MneCovMatrix* c, char **new_names, int ncov,
         }
         else {
             for (j = 0; j < ncov; j++)
-                if (strncmp(new_names[j],"MEG",3) == 0)
+                if (new_names[j].startsWith("MEG"))
                     is_meg[j] = TRUE;
                 else
                     is_meg[j] = FALSE;
         }
     }
-    names = MALLOC_3(ncov,char *);
     if (c->cov_diag) {
         cov_diag = MALLOC_3(ncov,double);
         for (j = 0; j < ncov; j++) {
             cov_diag[j] = c->cov_diag[pick[j]];
-            names[j] = mne_strdup_3(c->names[pick[j]]);
+            names.append(c->names[pick[j]]);
         }
     }
     else {
         cov = MALLOC_3(ncov*(ncov+1)/2,double);
         for (j = 0; j < ncov; j++) {
-            names[j] = mne_strdup_3(c->names[pick[j]]);
+            names.append(c->names[pick[j]]);
             for (k = 0; k <= j; k++) {
                 from = mne_lt_packed_index_3(pick[j],pick[k]);
                 to   = mne_lt_packed_index_3(j,k);
@@ -3723,7 +3586,7 @@ MneCovMatrix* mne_pick_chs_cov_omit(MneCovMatrix* c, char **new_names, int ncov,
 
     res = MneCovMatrix::mne_new_cov(c->kind,ncov,names,cov,cov_diag);
 
-    res->bads = mne_dup_name_list_3(c->bads,c->nbad);
+    res->bads = c->bads;
     res->nbad = c->nbad;
     res->proj = MneProjOp::mne_dup_proj_op(c->proj);
     res->sss  = c->sss ? new MneSssData(*(c->sss)) : NULL;
@@ -3737,8 +3600,6 @@ MneCovMatrix* mne_pick_chs_cov_omit(MneCovMatrix* c, char **new_names, int ncov,
     FREE_3(is_meg);
     return res;
 }
-
-
 
 
 
@@ -3787,21 +3648,21 @@ int mne_proj_op_proj_dvector(MneProjOp* op, double *vec, int nch, int do_complem
 
 
 
-int mne_name_list_match(char **list1, int nlist1,
-                        char **list2, int nlist2)
+int mne_name_list_match(const QStringList& list1, int nlist1,
+                        const QStringList& list2, int nlist2)
 /*
  * Check whether two name lists are identical
  */
 {
     int k;
-    if (list1 == NULL && list2 == NULL)
+    if (list1.isEmpty() && list2.isEmpty())
         return 0;
-    if (list1 == NULL || list2 == NULL)
+    if (list1.isEmpty() || list2.isEmpty())
         return 1;
     if (nlist1 != nlist2)
         return 1;
     for (k = 0; k < nlist1; k++)
-        if (strcmp(list1[k],list2[k]) != 0)
+        if (QString::compare(list1[k],list2[k]) != 0)
             return 1;
     return 0;
 }
@@ -3914,7 +3775,6 @@ DipoleFitData::DipoleFitData()
 , neeg (0)
 , ch_names (NULL)
 , pick (NULL)
-, bemname (NULL)
 , bem_model (NULL)
 , eeg_model (NULL)
 , fixed_noise (FALSE)
@@ -3953,11 +3813,11 @@ DipoleFitData::~DipoleFitData()
     if(eeg_els)
         delete eeg_els;
 
-    FREE_3(bemname);
+    bemname.clear();
 
     mne_free_cov_3(noise);
     mne_free_cov_3(noise_orig);
-    mne_free_name_list_3(ch_names,nmeg+neeg);
+    ch_names.clear();
 
     if(pick)
         delete pick;
@@ -3989,14 +3849,14 @@ int DipoleFitData::setup_forward_model(DipoleFitData *d, MneCTFCompDataSet* comp
     dipoleFitFuncs f;
     int fit_sphere_to_bem = TRUE;
 
-    if (d->bemname) {
+    if (!d->bemname.isEmpty()) {
         /*
          * Set up the boundary-element model
          */
-        char *bemsolname = FwdBemModel::fwd_bem_make_bem_sol_name(d->bemname);
-        FREE_3(d->bemname); d->bemname = bemsolname;
+        QString bemsolname = FwdBemModel::fwd_bem_make_bem_sol_name(d->bemname);
+        d->bemname = bemsolname;
 
-        printf("\nSetting up the BEM model using %s...\n",d->bemname);
+        printf("\nSetting up the BEM model using %s...\n",d->bemname.toUtf8().constData());
         printf("\nLoading surfaces...\n");
         d->bem_model = FwdBemModel::fwd_bem_load_three_layer_surfaces(d->bemname);
         if (d->bem_model) {
@@ -4127,7 +3987,7 @@ int DipoleFitData::setup_forward_model(DipoleFitData *d, MneCTFCompDataSet* comp
     /*
         * Select the appropriate fitting function
         */
-    d->funcs = d->bemname ? d->bem_funcs : d->sphere_funcs;
+    d->funcs = !d->bemname.isEmpty() ? d->bem_funcs : d->sphere_funcs;
 
     fprintf (stderr,"\n");
     return OK;
@@ -4146,7 +4006,7 @@ MneCovMatrix* DipoleFitData::ad_hoc_noise(FwdCoilSet *meg, FwdCoilSet *eeg, floa
 {
     int    nchan;
     double *stds;
-    char  **names,**ch_names;
+    QStringList names, ch_names;
     int   k,n;
 
     printf("Using standard noise values "
@@ -4160,7 +4020,6 @@ MneCovMatrix* DipoleFitData::ad_hoc_noise(FwdCoilSet *meg, FwdCoilSet *eeg, floa
         nchan = nchan + eeg->ncoil;
 
     stds = MALLOC_3(nchan,double);
-    ch_names = MALLOC_3(nchan,char *);
 
     n = 0;
     if (meg) {
@@ -4176,17 +4035,16 @@ MneCovMatrix* DipoleFitData::ad_hoc_noise(FwdCoilSet *meg, FwdCoilSet *eeg, floa
             }
             else
                 stds[n] = grad_std*grad_std;
-            ch_names[n] = meg->coils[k]->chname;
+            ch_names.append(meg->coils[k]->chname);
         }
     }
     if (eeg) {
         for (k = 0; k < eeg->ncoil; k++, n++) {
             stds[n]     = eeg_std*eeg_std;
-            ch_names[n] = eeg->coils[k]->chname;
+            ch_names.append(eeg->coils[k]->chname);
         }
     }
-    names = mne_dup_name_list_3(ch_names,nchan);
-    FREE_3(ch_names);
+    names = ch_names;
     return MneCovMatrix::mne_new_cov(FIFFV_MNE_NOISE_COV,nchan,names,NULL,stds);
 }
 
@@ -4440,19 +4298,19 @@ int DipoleFitData::select_dipole_fit_noise_cov(DipoleFitData *f, mshMegEegData d
 
 //*************************************************************************************************************
 
-DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname, const QString &measname, char *bemname, Vector3f *r0, FwdEegSphereModel *eeg_model, int accurate_coils, const QString &badname, const QString &noisename, float grad_std, float mag_std, float eeg_std, float mag_reg, float grad_reg, float eeg_reg, int diagnoise, const QList<QString> &projnames, int include_meg, int include_eeg)              /**< Include EEG in the fitting? */
+DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname, const QString &measname, const QString& bemname, Vector3f *r0, FwdEegSphereModel *eeg_model, int accurate_coils, const QString &badname, const QString &noisename, float grad_std, float mag_std, float eeg_std, float mag_reg, float grad_reg, float eeg_reg, int diagnoise, const QList<QString> &projnames, int include_meg, int include_eeg)              /**< Include EEG in the fitting? */
 /*
           * Background work for modelling
           */
 {
     DipoleFitData*  res = new DipoleFitData;
-    int            k;
-    char           **badlist = NULL;
-    int            nbad      = 0;
-    char           **file_bads;
-    int            file_nbad;
-    int            coord_frame = FIFFV_COORD_HEAD;
-    MneCovMatrix* cov;
+    int             k;
+    QStringList     badlist;
+    int             nbad      = 0;
+    QStringList     file_bads;
+    int             file_nbad;
+    int             coord_frame = FIFFV_COORD_HEAD;
+    MneCovMatrix*   cov;
     FwdCoilSet*     templates = NULL;
     MneCTFCompDataSet* comp_data  = NULL;
     FwdCoilSet*        comp_coils = NULL;
@@ -4464,7 +4322,7 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname, cons
         if ((res->mri_head_t = FiffCoordTransOld::mne_read_mri_transform(mriname)) == NULL)
             goto bad;
     }
-    else if (bemname) {
+    else if (!bemname.isEmpty()) {
         qWarning("Source of MRI / head transform required for the BEM model is missing");
         goto bad;
     }
@@ -4484,17 +4342,18 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname, cons
        * Read the bad channel lists
        */
     if (!badname.isEmpty()) {
-        if (mne_read_bad_channels_3(badname,&badlist,&nbad) != OK)
+        if (mne_read_bad_channels_3(badname,badlist,nbad) != OK)
             goto bad;
         printf("%d bad channels read from %s.\n",nbad,badname.toLatin1().data());
     }
-    if (mne_read_bad_channel_list_3(measname,&file_bads,&file_nbad) == OK && file_nbad > 0) {
-        if (!badlist)
+    if (mne_read_bad_channel_list_3(measname,file_bads,file_nbad) == OK && file_nbad > 0) {
+        if (badlist.isEmpty())
             nbad = 0;
-        badlist = REALLOC_3(badlist,nbad+file_nbad,char *);
-        for (k = 0; k < file_nbad; k++)
-            badlist[nbad++] = file_bads[k];
-        FREE_3(file_bads);
+        for (k = 0; k < file_nbad; k++) {
+            badlist.append(file_bads[k]);
+            nbad++;
+        }
+        file_bads.clear();
         printf("%d bad channels read from the data file.\n",file_nbad);
     }
     printf("%d bad channels total.\n",nbad);
@@ -4510,9 +4369,9 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname, cons
     if (res->neeg > 0)
         printf("Will use %3d EEG channels from %s\n",res->neeg,measname.toLatin1().data());
     {
-        char *s = mne_channel_names_to_string_3(res->chs,res->nmeg+res->neeg);
+        QString s = mne_channel_names_to_string_3(res->chs,res->nmeg+res->neeg);
         int  n;
-        mne_string_to_name_list_3(s,&res->ch_names,&n);
+        mne_string_to_name_list_3(s,res->ch_names,n);
     }
     /*
        * Make coil definitions
@@ -4561,7 +4420,7 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname, cons
     /*
        * Forward model setup
        */
-    res->bemname   = mne_strdup_3(bemname);
+    res->bemname   = bemname;
     if (r0) {
         res->r0[0]     = (*r0)[0];
         res->r0[1]     = (*r0)[1];
@@ -4708,7 +4567,7 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname, cons
             goto bad;
     }
 
-    mne_free_name_list_3(badlist,nbad);
+    badlist.clear();
     delete templates;
     delete comp_coils;
     if(comp_data)
@@ -4717,7 +4576,7 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname, cons
 
 
 bad : {
-        mne_free_name_list_3(badlist,nbad);
+        badlist.clear();
         delete templates;
         delete comp_coils;
         if(comp_data)
@@ -5312,18 +5171,18 @@ bool DipoleFitData::fit_one(DipoleFitData* fit,	            /* Precomputed fitti
         if (k == 0)
             fit->funcs = fit->sphere_funcs;
         else
-            fit->funcs = fit->bemname ? fit->bem_funcs : fit->sphere_funcs;
+            fit->funcs = !fit->bemname.isEmpty() ? fit->bem_funcs : fit->sphere_funcs;
 
         simplex = make_initial_dipole_simplex(rd_guess,size);
         for (p = 0; p < 4; p++)
             vals[p] = fit_eval(simplex[p],3,fit);
         if (simplex_minimize(simplex,           /* The initial simplex */
                              vals,              /* Function values at the vertices */
-                             3,	            /* Number of variables */
+                             3,                 /* Number of variables */
                              ftol[k],           /* Relative convergence tolerance for the target function */
                              atol[k],           /* Absolute tolerance for the change in the parameters */
                              fit_eval,          /* The function to be evaluated */
-                             fit,	            /* Data to be passed to the above function in each evaluation */
+                             fit,               /* Data to be passed to the above function in each evaluation */
                              max_eval,          /* Maximum number of function evaluations */
                              &neval,            /* Number of function evaluations */
                              report_interval,   /* How often to report (-1 = no_reporting) */

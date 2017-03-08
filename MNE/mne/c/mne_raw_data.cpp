@@ -244,49 +244,20 @@ void mne_free_name_list_36(char **list, int nlist)
 
 //============================= misc_util.c =============================
 
-char *mne_strdup_36(const char *s)
-{
-    char *res;
-    if (s == NULL)
-        return NULL;
-    res = (char*) malloc(strlen(s)+1);
-    strcpy(res,s);
-    return res;
-}
 
 
-
-
-
-
-
-
-void mne_string_to_name_list(char *s,char ***listp,int *nlistp)
+void mne_string_to_name_list(const QString& s, QStringList& listp,int &nlistp)
 /*
-      * Convert a colon-separated list into a string array
-      */
+* Convert a colon-separated list into a string array
+*/
 {
-    char **list = NULL;
-    int  nlist  = 0;
-    char *one,*now=NULL;
+    QStringList list;
 
-    if (s != NULL && strlen(s) > 0) {
-        s = mne_strdup_36(s);
-        //strtok_r linux variant; strtok_s windows varainat
-#ifdef __linux__
-        for (one = strtok_r(s,":",&now); one != NULL; one = strtok_r(NULL,":",&now)) {
-#elif _WIN32
-        for (one = strtok_s(s,":",&now); one != NULL; one = strtok_s(NULL,":",&now)) {
-#else
-        for (one = strtok_r(s,":",&now); one != NULL; one = strtok_r(NULL,":",&now)) {
-#endif
-            list = REALLOC_36(list,nlist+1,char *);
-            list[nlist++] = mne_strdup_36(one);
-        }
-        FREE_36(s);
+    if (!s.isEmpty() && s.size() > 0) {
+        list = s.split(":");
     }
-    *listp  = list;
-    *nlistp = nlist;
+    listp  = list;
+    nlistp = list.size();
     return;
 }
 
@@ -298,55 +269,48 @@ void mne_string_to_name_list(char *s,char ***listp,int *nlistp)
 
 
 
-char *mne_name_list_to_string(char **list,int nlist)
+QString mne_name_list_to_string(const QStringList& list)
 /*
 * Convert a string array to a colon-separated string
 */
 {
-    int k,len;
-    char *res;
-    if (nlist == 0 || list == NULL)
-        return NULL;
-    for (k = len = 0; k < nlist; k++)
-        len += strlen(list[k])+1;
-    res = MALLOC_36(len,char);
-    res[0] = '\0';
-    for (k = len = 0; k < nlist-1; k++) {
-        strcat(res,list[k]);
-        strcat(res,":");
+    int nlist = list.size();
+    QString res;
+    if (nlist == 0 || list.isEmpty())
+        return res;
+//    res[0] = '\0';
+    for (int k = 0; k < nlist-1; k++) {
+        res += list[k];
+        res += ":";
     }
-    strcat(res,list[nlist-1]);
+    res += list[nlist-1];
     return res;
 }
 
 
-char *mne_channel_names_to_string(fiffChInfo chs, int nch)
+QString mne_channel_names_to_string(fiffChInfo chs, int nch)
 /*
 * Make a colon-separated string out of channel names
 */
 {
-    char **names = MALLOC_36(nch,char *);
-    char *res;
-    int  k;
-
+    QStringList names;
+    QString res;
     if (nch <= 0)
-        return NULL;
-    for (k = 0; k < nch; k++)
-        names[k] = chs[k].ch_name;
-    res = mne_name_list_to_string(names,nch);
-    FREE_36(names);
+        return res;
+    for (int k = 0; k < nch; k++)
+        names.append(chs[k].ch_name);
+    res = mne_name_list_to_string(names);
     return res;
 }
 
 
 
 void mne_channel_names_to_name_list(fiffChInfo chs, int nch,
-                                    char ***listp, int *nlistp)
+                                    QStringList& listp, int &nlistp)
 
 {
-    char *s = mne_channel_names_to_string(chs,nch);
+    QString s = mne_channel_names_to_string(chs,nch);
     mne_string_to_name_list(s,listp,nlistp);
-    FREE_36(s);
     return;
 }
 
@@ -876,14 +840,14 @@ bad : {
 //============================= mne_process_bads.c =============================
 
 int mne_read_bad_channel_list_from_node(FiffStream::SPtr& stream,
-                                        const FiffDirNode::SPtr& pNode, char ***listp, int *nlistp)
+                                        const FiffDirNode::SPtr& pNode, QStringList& listp, int& nlistp)
 {
     FiffDirNode::SPtr node,bad;
     QList<FiffDirNode::SPtr> temp;
-    char **list = NULL;
+    QStringList list;
     int  nlist  = 0;
     FiffTag::SPtr t_pTag;
-    char *names;
+    QString names;
 
     if (pNode->isEmpty())
         node = stream->dirtree();
@@ -896,16 +860,16 @@ int mne_read_bad_channel_list_from_node(FiffStream::SPtr& stream,
 
         bad->find_tag(stream, FIFF_MNE_CH_NAME_LIST, t_pTag);
         if (t_pTag) {
-            names = (char *)t_pTag->data();
-            mne_string_to_name_list(names,&list,&nlist);
+            names = t_pTag->toString();
+            mne_string_to_name_list(names,list,nlist);
         }
     }
-    *listp = list;
-    *nlistp = nlist;
+    listp = list;
+    nlistp = nlist;
     return OK;
 }
 
-int mne_read_bad_channel_list(const QString& name, char ***listp, int *nlistp)
+int mne_read_bad_channel_list(const QString& name, QStringList& listp, int& nlistp)
 
 {
     QFile file(name);
@@ -1022,21 +986,17 @@ static int approx_ring_buf_size = APPROX_RING_BUF_SIZE;
 //=============================================================================================================
 
 MneRawData::MneRawData()
-:filename(NULL)
-,info(NULL)
+:info(NULL)
 ,bufs(NULL)
 ,nbuf(0)
 ,proj(NULL)
-,ch_names(NULL)
 ,bad(NULL)
-,badlist(NULL)
 ,nbad(0)
 ,first_samp(0)
 ,omit_samp(0)
 ,omit_samp_old(0)
 ,event_list(NULL)
 ,max_event(0)
-,dig_trigger(NULL)
 ,dig_trigger_mask(0)
 ,ring(NULL)
 ,filt_ring(NULL)
@@ -1067,8 +1027,8 @@ MneRawData::~MneRawData()
 {
 //    fiff_close(this->file);
     this->stream->close();
-    FREE_36(this->filename);
-    mne_free_name_list_36(this->ch_names,this->info->nchan);
+    this->filename.clear();
+    this->ch_names.clear();
 
     MneRawBufDef::free_bufs(this->bufs,this->nbuf);
     mne_free_ring_buffer_36(this->ring);
@@ -1078,7 +1038,7 @@ MneRawData::~MneRawData()
 
     if(this->proj)
         delete this->proj;
-    mne_free_name_list_36(this->badlist,this->nbad);
+    this->badlist.clear();
     FREE_36(this->first_sample_val);
     FREE_36(this->bad);
     FREE_36(this->offsets);
@@ -1091,7 +1051,7 @@ MneRawData::~MneRawData()
         this->filter_data_free(this->filter_data);
     if (this->user_free)
         this->user_free(this->user);
-    FREE_36(this->dig_trigger);
+    this->dig_trigger.clear();
     mne_free_event_list_36(this->event_list);
 
     if(this->info)
@@ -1828,7 +1788,7 @@ bad : {
 
 //*************************************************************************************************************
 
-MneRawData *MneRawData::mne_raw_open_file_comp(char *name, int omit_skip, int allow_maxshield, mneFilterDef filter, int comp_set)
+MneRawData *MneRawData::mne_raw_open_file_comp(const QString& name, int omit_skip, int allow_maxshield, mneFilterDef filter, int comp_set)
 /*
      * Open a raw data file
      */
@@ -1856,7 +1816,7 @@ MneRawData *MneRawData::mne_raw_open_file_comp(char *name, int omit_skip, int al
 
     for (k = 0; k < info->nchan; k++) {
         ch = info->chInfo+k;
-        if (strcmp(ch->ch_name,MNE_DEFAULT_TRIGGER_CH) == 0) {
+        if (QString::compare(ch->ch_name,MNE_DEFAULT_TRIGGER_CH) == 0) {
             if (fabs(1.0-ch->range) > 1e-5) {
                 ch->range = 1.0;
                 fprintf(stderr,"%s range set to %f\n",MNE_DEFAULT_TRIGGER_CH,ch->range);
@@ -1867,7 +1827,7 @@ MneRawData *MneRawData::mne_raw_open_file_comp(char *name, int omit_skip, int al
          */
         if (ch->unit_mul != 0) {
             ch->cal = pow(10.0,(double)(ch->unit_mul))*ch->cal;
-            fprintf(stderr,"Ch %s unit multiplier %d -> 0\n",ch->ch_name,ch->unit_mul);
+            fprintf(stderr,"Ch %s unit multiplier %d -> 0\n",ch->ch_name.toUtf8().constData(),ch->unit_mul);
             ch->unit_mul = 0;
         }
     }
@@ -1877,13 +1837,13 @@ MneRawData *MneRawData::mne_raw_open_file_comp(char *name, int omit_skip, int al
         goto bad;
 
     data           = new MneRawData;
-    data->filename = mne_strdup_36(name);
+    data->filename = name;
     data->stream   = stream;
     data->info     = info;
     /*
        * Add the channel name list
        */
-    mne_channel_names_to_name_list(info->chInfo,info->nchan,&data->ch_names,&nnames);
+    mne_channel_names_to_name_list(info->chInfo,info->nchan,data->ch_names,nnames);
     if (nnames != info->nchan) {
         printf("Channel names were not translated correctly into a name list");
         goto bad;
@@ -1894,9 +1854,9 @@ MneRawData *MneRawData::mne_raw_open_file_comp(char *name, int omit_skip, int al
     data->comp = MneCTFCompDataSet::mne_read_ctf_comp_data(data->filename);
     if (data->comp) {
         if (data->comp->ncomp > 0)
-            fprintf(stderr,"Read %d compensation data sets from %s\n",data->comp->ncomp,data->filename);
+            fprintf(stderr,"Read %d compensation data sets from %s\n",data->comp->ncomp,data->filename.toUtf8().constData());
         else
-            fprintf(stderr,"No compensation data in %s\n",data->filename);
+            fprintf(stderr,"No compensation data in %s\n",data->filename.toUtf8().constData());
     }
     else
         qWarning() << "err_print_error()";
@@ -1915,11 +1875,11 @@ MneRawData *MneRawData::mne_raw_open_file_comp(char *name, int omit_skip, int al
        */
     data->sss = MneSssData::read_sss_data(data->filename);
     if (data->sss && data->sss->job != FIFFV_SSS_JOB_NOTHING && data->sss->ncomp > 0) {
-        fprintf(stderr,"SSS data read from %s :\n",data->filename);
+        fprintf(stderr,"SSS data read from %s :\n",data->filename.toUtf8().constData());
         data->sss->print(stderr);
     }
     else {
-        fprintf(stderr,"No SSS data in %s\n",data->filename);
+        fprintf(stderr,"No SSS data in %s\n",data->filename.toUtf8().constData());
         if(data->sss)
             delete data->sss;
         data->sss = NULL;
@@ -2042,10 +2002,10 @@ MneRawData *MneRawData::mne_raw_open_file_comp(char *name, int omit_skip, int al
         * Th bad channel stuff
         */
     {
-        if (mne_read_bad_channel_list(name,&data->badlist,&data->nbad) == OK) {
+        if (mne_read_bad_channel_list(name,data->badlist,data->nbad) == OK) {
             for (b = 0; b < data->nbad; b++) {
                 for (k = 0; k < data->info->nchan; k++) {
-                    if (strcasecmp(data->info->chInfo[k].ch_name,data->badlist[b]) == 0) {
+                    if (QString::compare(data->info->chInfo[k].ch_name,data->badlist[b],Qt::CaseInsensitive) == 0) {
                         data->bad[k] = TRUE;
                         break;
                     }
@@ -2055,7 +2015,7 @@ MneRawData *MneRawData::mne_raw_open_file_comp(char *name, int omit_skip, int al
             if (data->nbad > 0) {
                 fprintf(stderr,"\t");
                 for (k = 0; k < data->nbad; k++)
-                    fprintf(stderr,"%s%c",data->badlist[k],k < data->nbad-1 ? ' ' : '\n');
+                    fprintf(stderr,"%s%c",data->badlist[k].toUtf8().constData(),k < data->nbad-1 ? ' ' : '\n');
             }
         }
     }
@@ -2104,7 +2064,7 @@ bad : {
 
 //*************************************************************************************************************
 
-MneRawData *MneRawData::mne_raw_open_file(char *name, int omit_skip, int allow_maxshield, mneFilterDef filter)
+MneRawData *MneRawData::mne_raw_open_file(const QString& name, int omit_skip, int allow_maxshield, mneFilterDef filter)
 /*
      * Wrapper for mne_raw_open_file to work as before
      */

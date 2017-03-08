@@ -1118,7 +1118,7 @@ static int write_volume_space_info(FiffStream::SPtr& t_pStream, MneSourceSpaceOl
             //            if (fiff_write_tag(out,&tag) == FIFF_FAIL)
             //                goto out;
         }
-        if (ss->interpolator && ss->MRI_volume) {
+        if (ss->interpolator && !ss->MRI_volume.isEmpty()) {
             t_pStream->start_block(FIFFB_MNE_PARENT_MRI_FILE);
             if (ss->MRI_surf_RAS_RAS_t)
                 write_coord_trans_old(t_pStream, ss->MRI_surf_RAS_RAS_t);//t_pStream->write_coord_trans(ss->MRI_surf_RAS_RAS_t);
@@ -1136,7 +1136,7 @@ static int write_volume_space_info(FiffStream::SPtr& t_pStream, MneSourceSpaceOl
         }
     }
     else {
-        if (ss->interpolator && ss->MRI_volume) {
+        if (ss->interpolator && !ss->MRI_volume.isEmpty()) {
             t_pStream->write_string(FIFF_MNE_SOURCE_SPACE_MRI_FILE,ss->MRI_volume);
             qCritical("Cannot write the interpolator for selection yet");
             goto out;
@@ -1181,7 +1181,7 @@ int mne_write_one_source_space(FiffStream::SPtr& t_pStream, MneSourceSpaceOld* s
         t_pStream->write_int(FIFF_MNE_SOURCE_SPACE_TYPE,&ss->type);
     if (ss->id != FIFFV_MNE_SURF_UNKNOWN)
         t_pStream->write_int(FIFF_MNE_SOURCE_SPACE_ID,&ss->id);
-    if (ss->subject && strlen(ss->subject) > 0) {
+    if (!ss->subject.isEmpty() && ss->subject.size() > 0) {
         QString subj(ss->subject);
         t_pStream->write_string(FIFF_SUBJ_HIS_ID,subj);
     }
@@ -1351,24 +1351,21 @@ bad : {
 
 
 
-char *mne_name_list_to_string_41(char **list,int nlist)
+QString mne_name_list_to_string_41(const QStringList& list)
 /*
 * Convert a string array to a colon-separated string
 */
 {
-    int k,len;
-    char *res;
-    if (nlist == 0 || list == NULL)
-        return NULL;
-    for (k = len = 0; k < nlist; k++)
-        len += strlen(list[k])+1;
-    res = MALLOC_41(len,char);
-    res[0] = '\0';
-    for (k = len = 0; k < nlist-1; k++) {
-        strcat(res,list[k]);
-        strcat(res,":");
+    int nlist = list.size();
+    QString res;
+    if (nlist == 0 || list.isEmpty())
+        return res;
+//    res[0] = '\0';
+    for (int k = 0; k < nlist-1; k++) {
+        res += list[k];
+        res += ":";
     }
-    strcat(res,list[nlist-1]);
+    res += list[nlist-1];
     return res;
 }
 
@@ -1380,21 +1377,19 @@ int mne_write_named_matrix( FiffStream::SPtr& t_pStream,
 * Write a block which contains information about one named matrix
 */
 {
-    char *names;
+    QString names;
 
     t_pStream->start_block(FIFFB_MNE_NAMED_MATRIX);
 
     t_pStream->write_int(FIFF_MNE_NROW,&mat->nrow);
     t_pStream->write_int(FIFF_MNE_NCOL,&mat->ncol);
-    if (mat->rowlist) {
-        names = mne_name_list_to_string_41(mat->rowlist,mat->nrow);
+    if (!mat->rowlist.isEmpty()) {
+        names = mne_name_list_to_string_41(mat->rowlist);
         t_pStream->write_string(FIFF_MNE_ROW_NAMES,names);
-        FREE_41(names);
     }
-    if (mat->collist) {
-        names = mne_name_list_to_string_41(mat->collist,mat->ncol);
+    if (!mat->collist.isEmpty()) {
+        names = mne_name_list_to_string_41(mat->collist);
         t_pStream->write_string(FIFF_MNE_COL_NAMES,names);
-        FREE_41(names);
     }
     fiff_write_float_matrix_old (t_pStream,kind,mat->data,mat->nrow,mat->ncol);
 
@@ -2152,11 +2147,11 @@ void ComputeFwd::calculateFwd() const
     * Prepare the BEM model if necessary
     */
     if (!settings->bemname.isEmpty()) {
-        char *bemsolname = FwdBemModel::fwd_bem_make_bem_sol_name(settings->bemname.toLatin1().data());
+        QString bemsolname = FwdBemModel::fwd_bem_make_bem_sol_name(settings->bemname);
         //        FREE(bemname);
-        settings->bemname = QString(bemsolname);
+        settings->bemname = bemsolname;
 
-        printf("\nSetting up the BEM model using %s...\n",settings->bemname.toLatin1().constData());
+        printf("\nSetting up the BEM model using %s...\n",settings->bemname.toUtf8().constData());
         printf("\nLoading surfaces...\n");
         bem_model = FwdBemModel::fwd_bem_load_three_layer_surfaces(settings->bemname);
         if (bem_model) {

@@ -154,7 +154,7 @@ public:
     int   nchan;        /**< How many channels */
     int   out_order;    /**< Order of the outside expansion */
     int   in_order;     /**< Order of the inside expansion */
-    int* comp_info;     /**< Which components are included */
+    int*  comp_info;     /**< Which components are included */
     int   ncomp;        /**< How many entries in the above */
     int   in_nuse;      /**< How many components included in the inside expansion */
     int   out_nuse;     /**< How many components included in the outside expansion */

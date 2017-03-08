@@ -500,7 +500,7 @@ MneSurfaceOrVolume::~MneSurfaceOrVolume()
     FREE_17(this->MRI_surf_RAS_RAS_t);
     if(this->interpolator)
         delete this->interpolator;
-    FREE_17(this->MRI_volume);
+    this->MRI_volume.clear();
 
     if(this->vol_geom)
         delete this->vol_geom;
@@ -1224,7 +1224,7 @@ MneSourceSpaceOld* MneSurfaceOrVolume::mne_new_source_space(int np)
 
     res->coord_frame = FIFFV_COORD_MRI;
     res->id          = FIFFV_MNE_SURF_UNKNOWN;
-    res->subject     = NULL;
+    res->subject.clear();
     res->type        = FIFFV_MNE_SPACE_SURFACE;
 
     res->nearest = NULL;
@@ -1237,7 +1237,7 @@ MneSourceSpaceOld* MneSurfaceOrVolume::mne_new_source_space(int np)
     res->voxel_surf_RAS_t     = NULL;
     res->vol_dims[0] = res->vol_dims[1] = res->vol_dims[2] = 0;
 
-    res->MRI_volume           = NULL;
+    res->MRI_volume.clear();
     res->MRI_surf_RAS_RAS_t   = NULL;
     res->MRI_voxel_surf_RAS_t = NULL;
     res->MRI_vol_dims[0] = res->MRI_vol_dims[1] = res->MRI_vol_dims[2] = 0;

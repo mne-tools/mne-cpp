@@ -77,20 +77,6 @@ using namespace FWDLIB;
     }
 
 
-
-
-char *mne_strdup_5(const char *s)
-{
-    char *res;
-    if (s == NULL)
-        return NULL;
-    res = (char*) malloc(strlen(s)+1);
-    strcpy(res,s);
-    return res;
-}
-
-
-
 static void matrix_error_5(int kind, int nr, int nc)
 
 {
@@ -175,8 +161,8 @@ static void normalize_5(float *rr)
 
 FwdCoil::FwdCoil(int p_np)
 {
-    chname     = NULL;
-    desc       = NULL;
+    chname.clear();
+    desc.clear();
     coil_class = FWD_COILC_UNKNOWN;
     accuracy   = FWD_COIL_ACCURACY_POINT;
     base       = 0.0;
@@ -204,10 +190,10 @@ FwdCoil::FwdCoil(int p_np)
 
 FwdCoil::FwdCoil(const FwdCoil& p_FwdCoil)
 {
-    if (p_FwdCoil.chname)
-        this->chname   = mne_strdup_5(p_FwdCoil.chname);
-    if (p_FwdCoil.desc)
-        this->desc   = mne_strdup_5(p_FwdCoil.desc);
+    if (!p_FwdCoil.chname.isEmpty())
+        this->chname   = p_FwdCoil.chname;
+    if (!p_FwdCoil.desc.isEmpty())
+        this->desc   = p_FwdCoil.desc;
     this->coil_class = p_FwdCoil.coil_class;
     this->accuracy   = p_FwdCoil.accuracy;
     this->base       = p_FwdCoil.base;
@@ -237,8 +223,8 @@ FwdCoil::FwdCoil(const FwdCoil& p_FwdCoil)
 
 FwdCoil::~FwdCoil()
 {
-    FREE_5(chname);
-    FREE_5(desc);
+    chname.clear();
+    desc.clear();
     FREE_CMATRIX_5(rmag);
     FREE_CMATRIX_5(cosmag);
     FREE_5(w);
@@ -253,7 +239,7 @@ FwdCoil *FwdCoil::create_eeg_el(FIFFLIB::fiffChInfo ch, const FiffCoordTransOld*
     int        c;
 
     if (ch->kind != FIFFV_EEG_CH) {
-        printf("%s is not an EEG channel. Cannot create an electrode definition.",ch->ch_name);
+        printf("%s is not an EEG channel. Cannot create an electrode definition.",ch->ch_name.toUtf8().constData());
         goto bad;
     }
     if (t && t->from != FIFFV_COORD_HEAD) {
@@ -266,8 +252,8 @@ FwdCoil *FwdCoil::create_eeg_el(FIFFLIB::fiffChInfo ch, const FiffCoordTransOld*
     else
         res = new FwdCoil(2);		     /* Reference electrode present */
 
-    res->chname     = mne_strdup_5(ch->ch_name);
-    res->desc       = mne_strdup_5("EEG electrode");
+    res->chname     = ch->ch_name;
+    res->desc       = "EEG electrode";
     res->coil_class = FWD_COILC_EEG;
     res->accuracy   = FWD_COIL_ACCURACY_NORMAL;
     res->type       = ch->chpos.coil_type;
