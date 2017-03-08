@@ -213,14 +213,6 @@ public:
 protected:
     //=========================================================================================================
     /**
-    * The starting point for the thread. After calling start(), the newly created thread calls this function.
-    * Returning from this method will end the execution of the thread.
-    * Pure virtual method inherited by QThread.
-    */
-    virtual void run();
-
-    //=========================================================================================================
-    /**
     * Fits dipoles for the given coils and a given data set.
     *
     * @param[in] coilParam      The coil parameters.
@@ -242,6 +234,14 @@ protected:
     * @return Returns the transformation matrix.
     */
     Eigen::Matrix4d computeTransformation(Eigen::MatrixXd NH, Eigen::MatrixXd BT);
+
+    //=========================================================================================================
+    /**
+    * The starting point for the thread. After calling start(), the newly created thread calls this function.
+    * Returning from this method will end the execution of the thread.
+    * Pure virtual method inherited by QThread.
+    */
+    virtual void run();
 
     IOBUFFER::CircularMatrixBuffer<double>::SPtr    m_pRawMatrixBuffer;    /**< The Circular Raw Matrix Buffer. */
     QSharedPointer<FIFFLIB::FiffInfo>               m_pFiffInfo;           /**< Holds the fiff measurement information. */

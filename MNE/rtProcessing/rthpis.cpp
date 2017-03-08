@@ -845,6 +845,109 @@ bool RtHPIS::stop()
 
 //*************************************************************************************************************
 
+coilParam RtHPIS::dipfit(struct coilParam coil, struct sens sensors, Eigen::MatrixXd data, int numCoils)
+{
+    //Do this in conncurrent mode
+    //Generate QList structure which can be handled by the QConcurrent framework
+    QList<QPair<QPair<Eigen::RowVectorXd, Eigen::VectorXd>, QPair<dipError, sens> > > lCoilData;
+
+    for(qint32 i = 0; i < numCoils; ++i) {
+        QPair<QPair<Eigen::RowVectorXd, Eigen::VectorXd>, QPair<dipError, sens> >  coilPair;
+        coilPair.first.first = coil.pos.row(i);
+        coilPair.first.second = data.col(i);
+        coilPair.second.second = sensors;
+
+        lCoilData.append(coilPair);
+    }
+
+    //Do the concurrent filtering
+    if(!lCoilData.isEmpty()) {
+//        for(int l = 0; l < lCoilData.size(); ++l) {
+//            doDipfitConcurrent(lCoilData[l]);
+//        }
+
+        QFuture<void> future = QtConcurrent::map(lCoilData,
+                                             doDipfitConcurrent);
+        future.waitForFinished();
+
+        //Transform results to final coil information
+        for(qint32 i = 0; i < lCoilData.size(); ++i) {
+            coil.pos.row(i) = lCoilData.at(i).first.first;
+            coil.mom = lCoilData.at(i).second.first.moment.transpose();
+            coil.dpfiterror(i) = lCoilData.at(i).second.first.error;
+            coil.dpfitnumitr(i) = lCoilData.at(i).second.first.numIterations;
+
+            qDebug()<< "RtHPIS::dipfit - Itr steps for coil " << i << " =" <<coil.dpfitnumitr(i);
+        }
+    }
+
+    return coil;
+}
+
+
+//*************************************************************************************************************
+
+Eigen::Matrix4d RtHPIS::computeTransformation(Eigen::MatrixXd NH, Eigen::MatrixXd BT)
+{
+    Eigen::MatrixXd xdiff, ydiff, zdiff, C, Q;
+    Eigen::Matrix4d transFinal = Eigen::Matrix4d::Identity(4,4);
+    Eigen::Matrix4d Rot = Eigen::Matrix4d::Zero(4,4);
+    Eigen::Matrix4d Trans = Eigen::Matrix4d::Identity(4,4);
+    double meanx,meany,meanz,normf;
+
+    for(int i = 0; i < 15; ++i) {
+        // Calcualte translation
+        xdiff = NH.col(0) - BT.col(0);
+        ydiff = NH.col(1) - BT.col(1);
+        zdiff = NH.col(2) - BT.col(2);
+
+        meanx = xdiff.mean();
+        meany = ydiff.mean();
+        meanz = zdiff.mean();
+
+        // Apply translation
+        for (int j = 0; j < BT.rows(); ++j) {
+            BT(j,0) = BT(j,0) + meanx;
+            BT(j,1) = BT(j,1) + meany;
+            BT(j,2) = BT(j,2) + meanz;
+        }
+
+        // Estimate rotation component
+        C = BT.transpose() * NH;
+
+        Eigen::JacobiSVD< Eigen::MatrixXd > svd(C ,Eigen::ComputeThinU | Eigen::ComputeThinV);
+
+        Q = svd.matrixU() * svd.matrixV().transpose();
+
+        // Apply rotation on translated points
+        BT = BT * Q;
+
+        // Calculate GOF
+        normf = (NH.transpose()-BT.transpose()).norm();
+
+        // Store rotation part to transformation matrix
+        Rot(3,3) = 1;
+        for(int j = 0; j < 3; ++j) {
+            for(int k = 0; k < 3; ++k) {
+                Rot(j,k) = Q(k,j);
+            }
+        }
+
+        // Store translation part to transformation matrix
+        Trans(0,3) = meanx;
+        Trans(1,3) = meany;
+        Trans(2,3) = meanz;
+
+        // Safe rotation and translation to final amtrix for next iteration step
+        transFinal = Rot * Trans * transFinal;
+    }
+
+    return transFinal;
+}
+
+
+//*************************************************************************************************************
+
 void RtHPIS::run()
 {
     struct sens sensors;
@@ -1022,7 +1125,7 @@ void RtHPIS::run()
         if(m_pRawMatrixBuffer)
         {
             //m_mutex.lock();
-            MatrixXd t_mat = m_pRawMatrixBuffer->pop();            
+            MatrixXd t_mat = m_pRawMatrixBuffer->pop();
             //m_mutex.unlock();
 
             buffer.append(t_mat);
@@ -1253,102 +1356,3 @@ y_k is the measured signal in channel k
 
 e_k = y_k - y’_k, the difference of y_k and the signal predicted by the model
 */
-
-
-coilParam RtHPIS::dipfit(struct coilParam coil, struct sens sensors, Eigen::MatrixXd data, int numCoils)
-{
-    //Do this in conncurrent mode
-    //Generate QList structure which can be handled by the QConcurrent framework
-    QList<QPair<QPair<Eigen::RowVectorXd, Eigen::VectorXd>, QPair<dipError, sens> > > lCoilData;
-
-    for(qint32 i = 0; i < numCoils; ++i) {
-        QPair<QPair<Eigen::RowVectorXd, Eigen::VectorXd>, QPair<dipError, sens> >  coilPair;
-        coilPair.first.first = coil.pos.row(i);
-        coilPair.first.second = data.col(i);
-        coilPair.second.second = sensors;
-
-        lCoilData.append(coilPair);
-    }
-
-    //Do the concurrent filtering
-    if(!lCoilData.isEmpty()) {
-//        for(int l = 0; l < lCoilData.size(); ++l) {
-//            doDipfitConcurrent(lCoilData[l]);
-//        }
-
-        QFuture<void> future = QtConcurrent::map(lCoilData,
-                                             doDipfitConcurrent);
-        future.waitForFinished();
-
-        //Transform results to final coil information
-        for(qint32 i = 0; i < lCoilData.size(); ++i) {
-            coil.pos.row(i) = lCoilData.at(i).first.first;
-            coil.mom = lCoilData.at(i).second.first.moment.transpose();
-            coil.dpfiterror(i) = lCoilData.at(i).second.first.error;
-            coil.dpfitnumitr(i) = lCoilData.at(i).second.first.numIterations;
-
-            qDebug()<< "RtHPIS::dipfit - Itr steps for coil " << i << " =" <<coil.dpfitnumitr(i);
-        }
-    }
-
-    return coil;
-}
-
-
-Eigen::Matrix4d RtHPIS::computeTransformation(Eigen::MatrixXd NH, Eigen::MatrixXd BT)
-{
-    Eigen::MatrixXd xdiff, ydiff, zdiff, C, Q;
-    Eigen::Matrix4d transFinal = Eigen::Matrix4d::Identity(4,4);
-    Eigen::Matrix4d Rot = Eigen::Matrix4d::Zero(4,4);
-    Eigen::Matrix4d Trans = Eigen::Matrix4d::Identity(4,4);
-    double meanx,meany,meanz,normf;
-
-    for(int i = 0; i < 15; ++i) {
-        // Calcualte translation
-        xdiff = NH.col(0) - BT.col(0);
-        ydiff = NH.col(1) - BT.col(1);
-        zdiff = NH.col(2) - BT.col(2);
-
-        meanx = xdiff.mean();
-        meany = ydiff.mean();
-        meanz = zdiff.mean();
-
-        // Apply translation
-        for (int j = 0; j < BT.rows(); ++j) {
-            BT(j,0) = BT(j,0) + meanx;
-            BT(j,1) = BT(j,1) + meany;
-            BT(j,2) = BT(j,2) + meanz;
-        }
-
-        // Estimate rotation component
-        C = BT.transpose() * NH;
-
-        Eigen::JacobiSVD< Eigen::MatrixXd > svd(C ,Eigen::ComputeThinU | Eigen::ComputeThinV);
-
-        Q = svd.matrixU() * svd.matrixV().transpose();
-
-        // Apply rotation on translated points
-        BT = BT * Q;
-
-        // Calculate GOF
-        normf = (NH.transpose()-BT.transpose()).norm();
-
-        // Store rotation part to transformation matrix
-        Rot(3,3) = 1;
-        for(int j = 0; j < 3; ++j) {
-            for(int k = 0; k < 3; ++k) {
-                Rot(j,k) = Q(k,j);
-            }
-        }
-
-        // Store translation part to transformation matrix
-        Trans(0,3) = meanx;
-        Trans(1,3) = meany;
-        Trans(2,3) = meanz;
-
-        // Safe rotation and translation to final amtrix for next iteration step
-        transFinal = Rot * Trans * transFinal;
-    }
-
-    return transFinal;
-}
