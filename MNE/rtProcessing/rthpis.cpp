@@ -504,9 +504,6 @@ RtHPIS::RtHPIS(FiffInfo::SPtr p_pFiffInfo, QObject *parent)
 : QThread(parent)
 , m_pFiffInfo(p_pFiffInfo)
 , m_bIsRunning(false)
-, m_iMaxSamples(0)
-, m_iNewMaxSamples(0)
-, m_iCounter(0)
 , m_sHPIResourceDir("./HPIFittingDebug")
 {
 }
