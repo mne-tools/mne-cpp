@@ -1827,7 +1827,7 @@ MneRawData *MneRawData::mne_raw_open_file_comp(const QString& name, int omit_ski
          */
         if (ch->unit_mul != 0) {
             ch->cal = pow(10.0,(double)(ch->unit_mul))*ch->cal;
-            fprintf(stderr,"Ch %s unit multiplier %d -> 0\n",ch->ch_name.toUtf8().constData(),ch->unit_mul);
+            fprintf(stderr,"Ch %s unit multiplier %d -> 0\n",ch->ch_name,ch->unit_mul);
             ch->unit_mul = 0;
         }
     }

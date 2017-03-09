@@ -308,7 +308,7 @@ QString mne_name_list_to_string_9(const QStringList& list)
     QString res;
     if (nlist == 0 || list.isEmpty())
         return res;
-//    res[0] = '\0';
+    //    res[0] = '\0';
     for (int k = 0; k < nlist-1; k++) {
         res += list[k];
         res += ":";
@@ -414,7 +414,7 @@ static FiffDirNode::SPtr find_evoked (const FiffDirNode::SPtr& node)
 
 
 static QString get_comment (  FiffStream::SPtr& stream,
-                            const FiffDirNode::SPtr& start)
+                              const FiffDirNode::SPtr& start)
 
 {
     int k;
@@ -473,7 +473,7 @@ static void get_aspect_name_type(   FiffStream::SPtr& stream,
             }
             break;
         }
-//    if (namep)
+    //    if (namep)
     namep = res;
     if (typep)
         *typep = type;
@@ -742,9 +742,9 @@ static int find_between (   FiffStream::SPtr& stream,
 static int get_evoked_essentials (FiffStream::SPtr& stream,         /* This is our file */
                                   const FiffDirNode::SPtr& node,    /* The interesting node */
                                   float& sfreq,                     /* Sampling frequency
-                                                                     * The value pointed by this is not
-                                                                     * modified if individual sampling
-                                                                     * frequency is found */
+                                                                                                       * The value pointed by this is not
+                                                                                                       * modified if individual sampling
+                                                                                                       * frequency is found */
                                   float& tmin,                      /* Time scale minimum */
                                   int& nsamp,                       /* Number of samples */
                                   int& nave,                        /* Number of averaged responses */
@@ -798,7 +798,7 @@ static int get_evoked_essentials (FiffStream::SPtr& stream,         /* This is o
    */
     tmp_node = tmp_node->parent;
 
-//    tag.data = NULL;
+    //    tag.data = NULL;
     for (k = 0; k < tmp_node->dir_tree.size(); k++) {
         kind = tmp_node->dir_tree[k]->kind;
         pos  = tmp_node->dir_tree[k]->pos;
@@ -951,7 +951,7 @@ static void unpack_data(double offset,
 
 static float **get_epochs ( FiffStream::SPtr& stream,       /* This is our file */
                             const FiffDirNode::SPtr& node,  /* The interesting node */
-                           int nchan, int nsamp)            /* Number of channels and number of samples to be expected */
+                            int nchan, int nsamp)            /* Number of channels and number of samples to be expected */
 /*
 * Get the evoked response epochs
 */
@@ -1084,6 +1084,10 @@ int mne_find_evoked_types_comments (    FiffStream::SPtr& stream,
             }
         }
         /*
+        * Enlarge tables
+        */
+        types    = REALLOC_9(types,count+evoked_count+1,int);
+        /*
         * Insert node references and compile associated comments...
         */
         for (j = 0; j < evoked.size(); j++)	/* Evoked data */
@@ -1112,9 +1116,9 @@ int mne_find_evoked_types_comments (    FiffStream::SPtr& stream,
         return 0;
     }
     else {              /* Return the appropriate variables */
-        comments[count] = "";
+//        comments[count] = NULL;
         types[count]    = -1;
-         nodesp = nodes;
+        nodesp = nodes;
         if (commentsp)
             *commentsp = comments;
         else
@@ -1198,8 +1202,8 @@ int mne_read_evoked(const QString& name,        /* Name of the file */
                     fiffChInfo *chsp,           /* Channel info (this is now optional as well) */
                     float      ***epochsp,      /* Data, channel by channel */
                     /*
-                    * Optional items follow
-                    */
+                                        * Optional items follow
+                                        */
                     QString*    commentp,       /* Comment for these data */
                     float      *highpassp,      /* Highpass frequency */
                     float      *lowpassp,       /* Lowpass frequency */
@@ -1394,14 +1398,14 @@ char *mne_format_file_id (fiffId id)
 
 
 int mne_read_meg_comp_eeg_ch_info_9(const QString& name,
-                                  fiffChInfo     *megp,	 /* MEG channels */
-                                  int            *nmegp,
-                                  fiffChInfo     *meg_compp,
-                                  int            *nmeg_compp,
-                                  fiffChInfo     *eegp,	 /* EEG channels */
-                                  int            *neegp,
-                                  FiffCoordTransOld* *meg_head_t,
-                                  fiffId         *idp)	 /* The measurement ID */
+                                    fiffChInfo     *megp,	 /* MEG channels */
+                                    int            *nmegp,
+                                    fiffChInfo     *meg_compp,
+                                    int            *nmeg_compp,
+                                    fiffChInfo     *eegp,	 /* EEG channels */
+                                    int            *neegp,
+                                    FiffCoordTransOld* *meg_head_t,
+                                    fiffId         *idp)	 /* The measurement ID */
 /*
       * Read the channel information and split it into three arrays,
       * one for MEG, one for MEG compensation channels, and one for EEG
@@ -1459,14 +1463,14 @@ int mne_read_meg_comp_eeg_ch_info_9(const QString& name,
         case FIFF_PARENT_BLOCK_ID :
             if(!stream->read_tag(t_pTag, pos))
                 goto bad;
-//            id = t_pTag->toFiffID();
+            //            id = t_pTag->toFiffID();
             *id = *(fiffId)t_pTag->data();
             break;
 
         case FIFF_COORD_TRANS :
             if(!stream->read_tag(t_pTag, pos))
                 goto bad;
-//            t = t_pTag->toCoordTrans();
+            //            t = t_pTag->toCoordTrans();
             t = FiffCoordTransOld::read_helper( t_pTag );
             if (t->from != FIFFV_COORD_DEVICE || t->to   != FIFFV_COORD_HEAD)
                 t = NULL;
@@ -1475,7 +1479,7 @@ int mne_read_meg_comp_eeg_ch_info_9(const QString& name,
         case FIFF_CH_INFO : /* Information about one channel */
             if(!stream->read_tag(t_pTag, pos))
                 goto bad;
-//            this_ch = t_pTag->toChInfo();
+            //            this_ch = t_pTag->toChInfo();
             this_ch = (fiffChInfo)malloc(sizeof(fiffChInfoRec));
             *this_ch = *(fiffChInfo)(t_pTag->data());
             if (this_ch->scanNo <= 0 || this_ch->scanNo > nchan) {
@@ -1526,7 +1530,7 @@ int mne_read_meg_comp_eeg_ch_info_9(const QString& name,
             meg_comp[nmeg_comp++] = chs[k];
         else if (chs[k].kind == FIFFV_EEG_CH)
             eeg[neeg++] = chs[k];
-//    fiff_close(in);
+    //    fiff_close(in);
     stream->close();
     FREE_9(chs);
     if (megp) {
@@ -1561,13 +1565,13 @@ int mne_read_meg_comp_eeg_ch_info_9(const QString& name,
     return FIFF_OK;
 
 bad : {
-//        fiff_close(in);
+        //        fiff_close(in);
         stream->close();
         FREE_9(chs);
         FREE_9(meg);
         FREE_9(eeg);
         FREE_9(id);
-//        FREE(tag.data);
+        //        FREE(tag.data);
         FREE_9(t);
         return FIFF_FAIL;
     }
@@ -1638,23 +1642,23 @@ int mne_read_bad_channel_list_9(const QString& name, QStringList& listp, int& nl
 //=============================================================================================================
 
 MneMeasData::MneMeasData()
-:meas_id   (NULL)
-,current   (NULL)
-,ch_major  (FALSE)
-,nset      (0)
-,nchan     (0)
-,op        (NULL)
-,fwd       (NULL)
-,meg_head_t(NULL)
-,mri_head_t(NULL)
-,chs       (NULL)
-,proj      (NULL)
-,comp      (NULL)
-,raw       (NULL)
-,chsel     (NULL)
-,bad       (NULL)
-,nbad      (0)
-,badlist   (NULL)
+    :meas_id   (NULL)
+    ,current   (NULL)
+    ,ch_major  (FALSE)
+    ,nset      (0)
+    ,nchan     (0)
+    ,op        (NULL)
+    ,fwd       (NULL)
+    ,meg_head_t(NULL)
+    ,mri_head_t(NULL)
+    ,chs       (NULL)
+    ,proj      (NULL)
+    ,comp      (NULL)
+    ,raw       (NULL)
+    ,chsel     (NULL)
+    ,bad       (NULL)
+    ,nbad      (0)
+    ,badlist   (NULL)
 {
     meas_date.secs = 0;
     meas_date.usecs = 0;
@@ -1739,13 +1743,13 @@ void MneMeasData::adjust_baselines(float bmin, float bmax)
             for (s = b1, ave = 0.0; s < b2; s++)
                 ave += data[s][c];
             ave = ave/(b2-b1);
-             this->current->baselines[c] += ave;
+            this->current->baselines[c] += ave;
             for (s = 0; s <  this->current->np; s++)
                 data[s][c] = data[s][c] - ave;
         }
         qDebug() << "TODO: Check comments content";
         fprintf(stderr,"\t%s : using baseline %7.1f ... %7.1f ms\n",
-                 this->current->comment.toUtf8().constData() ?  this->current->comment.toUtf8().constData() : "unknown",
+                this->current->comment.toUtf8().constData() ?  this->current->comment.toUtf8().constData() : "unknown",
                 1000*(tmin+b1/sfreq),
                 1000*(tmin+b2/sfreq));
     }

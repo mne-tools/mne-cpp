@@ -161,8 +161,6 @@ static void normalize_5(float *rr)
 
 FwdCoil::FwdCoil(int p_np)
 {
-    chname.clear();
-    desc.clear();
     coil_class = FWD_COILC_UNKNOWN;
     accuracy   = FWD_COIL_ACCURACY_POINT;
     base       = 0.0;
@@ -223,8 +221,6 @@ FwdCoil::FwdCoil(const FwdCoil& p_FwdCoil)
 
 FwdCoil::~FwdCoil()
 {
-    chname.clear();
-    desc.clear();
     FREE_CMATRIX_5(rmag);
     FREE_CMATRIX_5(cosmag);
     FREE_5(w);
@@ -239,7 +235,7 @@ FwdCoil *FwdCoil::create_eeg_el(FIFFLIB::fiffChInfo ch, const FiffCoordTransOld*
     int        c;
 
     if (ch->kind != FIFFV_EEG_CH) {
-        printf("%s is not an EEG channel. Cannot create an electrode definition.",ch->ch_name.toUtf8().constData());
+        printf("%s is not an EEG channel. Cannot create an electrode definition.",ch->ch_name);
         goto bad;
     }
     if (t && t->from != FIFFV_COORD_HEAD) {

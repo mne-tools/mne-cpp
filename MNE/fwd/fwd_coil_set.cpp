@@ -294,7 +294,7 @@ static FwdCoil* fwd_add_coil_to_set(FwdCoilSet* set,
     def->np         = np;
     def->base       = size;
     def->base       = base;
-    if (desc.isEmpty())
+    if (!desc.isEmpty())
         def->desc = desc;
     return def;
 }
