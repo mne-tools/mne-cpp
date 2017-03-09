@@ -370,7 +370,7 @@ typedef struct _fiffChInfoRec {
     fiff_ch_pos_t chpos;        /**< Channel location */
     fiff_int_t    unit;         /**< Unit of measurement */
     fiff_int_t    unit_mul;     /**< Unit multiplier exponent */
-    QString       ch_name;      /**< Descriptive name for the channel */
+    fiff_char_t   ch_name[16];  /**< Descriptive name for the channel */
 } fiffChInfoRec,*fiffChInfo;    /**< Description of one channel */
 
 /** Alias for fiffChInfoRec */

@@ -319,7 +319,7 @@ int mne_ch_selection_assign_chs(mneChSelection sel,
     for (c = 0; c < sel->nchan; c++) {
         if (sel->pick[c] == -1 && sel->pick_deriv[c] == -1) {
             for (rc = 0; rc < info->nchan; rc++) {
-                dash = info->chInfo[rc].ch_name.mid(info->chInfo[rc].ch_name.indexOf("-")+1);// strchr(info->chInfo[rc].ch_name,'-');
+                dash = QString(info->chInfo[rc].ch_name).mid(QString(info->chInfo[rc].ch_name).indexOf("-")+1);// strchr(info->chInfo[rc].ch_name,'-');
                 if (!dash.isNull()) {
 //                    *dash = '\0';
                     if (QString::compare(sel->chspick[c],info->chInfo[rc].ch_name,Qt::CaseInsensitive) == 0 ||
