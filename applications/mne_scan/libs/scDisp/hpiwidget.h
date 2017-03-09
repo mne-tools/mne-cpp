@@ -121,11 +121,19 @@ public:
 
     //=========================================================================================================
     /**
-    * Set te data needed for fitting.
+    * Set the data needed for fitting.
     *
-    * @param[out] data  the data matrix
+    * @param[in] data  the data matrix
     */
     void setData(const Eigen::MatrixXd& data);
+
+    //=========================================================================================================
+    /**
+    * Set the isRunning flag.
+    *
+    * @param[in] bStatus  Whether data is streamed and the thread is running, which uses this hpi dialog.
+    */
+    void setIsRunning(bool bStatus);
 
 protected:
      virtual void closeEvent( QCloseEvent * event );
@@ -192,8 +200,9 @@ protected:
 
     QVector<int>                                m_vCoilFreqs;       /**< Vector contains the HPI coil frequencies. */
 
-    Eigen::SparseMatrix<double>                 m_sparseMatCals;    /**< Sparse calibration matrix.*/
+    bool                                        m_bIsRunning;         /**< Is the measurement running or not. Computed via first data received. */
 
+    Eigen::SparseMatrix<double>                 m_sparseMatCals;    /**< Sparse calibration matrix.*/
     Eigen::MatrixXd                             m_matValue;         /**< The current data block.*/
 
     QSharedPointer<DISP3DLIB::View3D>           m_pView3D;          /**< The 3D view. */
