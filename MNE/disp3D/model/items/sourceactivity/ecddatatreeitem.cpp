@@ -204,7 +204,7 @@ void EcdDataTreeItem::setVisible(bool state)
 void EcdDataTreeItem::plotDipoles(QSharedPointer<ECDSet> pECDSet)
 {
     //Plot dipoles
-    QVector3D pos,to,from;
+    QVector3D pos, to, from;
 
     for(int i = 0; i < pECDSet->size(); ++i) {
         pos.setX((*pECDSet)[i].rd(0));
@@ -216,11 +216,11 @@ void EcdDataTreeItem::plotDipoles(QSharedPointer<ECDSet> pECDSet)
         to.setZ((*pECDSet)[i].Q(2));
         //to.normalize();
 
+        //The Qt3D default cone orientation and the top of the cone lies in line with the positive y-axis.
+        from = QVector3D(0.0, 1.0, 0.0);
         qDebug()<<"EcdDataTreeItem::plotDipoles - from" << from;
         qDebug()<<"EcdDataTreeItem::plotDipoles - to" << to;
 
-        //The Qt3D default cone orientation and the top of the cone lies in line with the positive y-axis.
-        from = QVector3D(0.0, 1.0, 0.0);
         QQuaternion final = QQuaternion::rotationTo(from, to);
 
         Renderable3DEntity* dipoleEntity = new Renderable3DEntity(m_pRenderable3DEntity);
