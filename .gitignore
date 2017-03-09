@@ -87,6 +87,8 @@
 /bin/test_fiff_mne_types_iod
 /bin/test_fiff_rwr
 /bin/test_fiff_rwrd
+/bin/test_forward_solution
+/bin/test_forward_solutiond
 
 # Other files
 /bin/MNE-sample-data/MEG
