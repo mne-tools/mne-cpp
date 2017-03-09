@@ -206,20 +206,23 @@ void EcdDataTreeItem::plotDipoles(QSharedPointer<ECDSet> pECDSet)
     //Plot dipoles
     QVector3D pos, to, from;
 
+    //The Qt3D default cone orientation and the top of the cone lies in line with the positive y-axis.
+    from = QVector3D(0.0, 1.0, 0.0);
+    double norm;
+
     for(int i = 0; i < pECDSet->size(); ++i) {
         pos.setX((*pECDSet)[i].rd(0));
         pos.setY((*pECDSet)[i].rd(1));
         pos.setZ((*pECDSet)[i].rd(2));
 
-        to.setX((*pECDSet)[i].Q(0));
-        to.setY((*pECDSet)[i].Q(1));
-        to.setZ((*pECDSet)[i].Q(2));
-        //to.normalize();
+        norm = sqrt(pow((*pECDSet)[i].Q(0),2)+pow((*pECDSet)[i].Q(1),2)+pow((*pECDSet)[i].Q(2),2));
 
-        //The Qt3D default cone orientation and the top of the cone lies in line with the positive y-axis.
-        from = QVector3D(0.0, 1.0, 0.0);
-        qDebug()<<"EcdDataTreeItem::plotDipoles - from" << from;
-        qDebug()<<"EcdDataTreeItem::plotDipoles - to" << to;
+        to.setX((*pECDSet)[i].Q(0)/norm);
+        to.setY((*pECDSet)[i].Q(1)/norm);
+        to.setZ((*pECDSet)[i].Q(2)/norm);
+
+//        qDebug()<<"EcdDataTreeItem::plotDipoles - from" << from;
+//        qDebug()<<"EcdDataTreeItem::plotDipoles - to" << to;
 
         QQuaternion final = QQuaternion::rotationTo(from, to);
 
