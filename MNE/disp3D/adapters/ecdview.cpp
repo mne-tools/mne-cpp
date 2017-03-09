@@ -114,7 +114,7 @@ ECDView::ECDView(const DipoleFitSettings& dipFitSettings, const ECDSet& ecdSet, 
             dipoles(0,1) = ecdSet[i].Q(1);
             dipoles(0,2) = ecdSet[i].Q(2);
 
-            dipoles = coordTrans.apply_trans(dipoles);
+            dipoles = coordTrans.apply_trans(dipoles, false);
 
             ecdSetTrans[i].Q(0) = dipoles(0,0);
             ecdSetTrans[i].Q(1) = dipoles(0,1);
