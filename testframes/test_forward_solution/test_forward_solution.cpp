@@ -115,9 +115,23 @@ void TestForwardSolution::computeForward()
 
     printf(">>>>>>>>>>>>>>>>>>>>>>>>> Forward Solution Settings >>>>>>>>>>>>>>>>>>>>>>>>>\n");
 
-    //Following is equivalent to: --meas ./mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif --set 1 --meg --eeg --tmin 32 --tmax 148 --bmin -100 --bmax 0 --dip ./mne-cpp-test-data/Result/dip_fit.dat
+    //Following is equivalent to: --meg --accurate --src ./MNE-sample-data/subjects/sample/bem/sample-oct-6-src.fif
+    // --meas ./MNE-sample-data/MEG/sample/sample_audvis_raw.fif
+    // --mri ./MNE-sample-data/subjects/sample/mri/brain-neuromag/sets/COR.fif
+    // --bem ./MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif
+    // --mindist 5 --fwd ./MNE-sample-data/Result/sample_audvis-meg-oct-6-fwd.fif
     ComputeFwdSettings settings;
 
+    settings.include_meg = true;
+    settings.accurate = true;
+    settings.srcname = QDir::currentPath()+"./MNE-sample-data/subjects/sample/bem/sample-oct-6-src.fif";
+    settings.measname = QDir::currentPath()+"./MNE-sample-data/MEG/sample/sample_audvis_raw.fif";
+    settings.mriname = QDir::currentPath()+"./MNE-sample-data/subjects/sample/mri/brain-neuromag/sets/COR.fif";
+    settings.mri_head_ident = false;
+    settings.transname.clear();
+    settings.bemname = QDir::currentPath()+"./MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif";
+    settings.mindist = 5.0f/1000.0f;
+    settings.solname = QDir::currentPath()+"./mne-cpp-test-data/Result/sample_audvis-meg-oct-6-fwd.fif";
 
     settings.checkIntegrity();
 
@@ -128,9 +142,15 @@ void TestForwardSolution::computeForward()
     // Compute Forward Solution
     //*********************************************************************************************************
 
+    printf(">>>>>>>>>>>>>>>>>>>>>>>>> Compute Forward Solution >>>>>>>>>>>>>>>>>>>>>>>>>\n");
+
+    ComputeFwd cmpFwd(&settings);
+    cmpFwd.calculateFwd();
+
+    printf("<<<<<<<<<<<<<<<<<<<<<<<<< Compute Forward Solution Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
 
     //*********************************************************************************************************
-    // Write Read Dipole Fit
+    // Write Forward Solution
     //*********************************************************************************************************
 
 
