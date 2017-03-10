@@ -279,7 +279,7 @@ MneEstimateTreeItem* Data3DTreeModel::addSourceData(const QString& subject, cons
 
 //*************************************************************************************************************
 
-EcdDataTreeItem* Data3DTreeModel::addDipoleFitData(const QString& subject, const QString& sMeasurementSetName, const INVERSELIB::ECDSet& pECDSet)
+EcdDataTreeItem* Data3DTreeModel::addDipoleFitData(const QString& subject, const QString& sMeasurementSetName, const INVERSELIB::ECDSet& tECDSet)
 {
     EcdDataTreeItem* pReturnItem = Q_NULLPTR;
 
@@ -292,12 +292,12 @@ EcdDataTreeItem* Data3DTreeModel::addDipoleFitData(const QString& subject, const
     //Find the "set" items and add the dipole fits as items
     if(!itemList.isEmpty() && (itemList.first()->type() == Data3DTreeModelItemTypes::MeasurementItem)) {
         if(MeasurementTreeItem* pMeasurementItem = dynamic_cast<MeasurementTreeItem*>(itemList.first())) {
-            pReturnItem = pMeasurementItem->addData(pECDSet, m_pModelEntity);
+            pReturnItem = pMeasurementItem->addData(tECDSet, m_pModelEntity);
         }
     } else {
         MeasurementTreeItem* pMeasurementItem = new MeasurementTreeItem(Data3DTreeModelItemTypes::MeasurementItem, sMeasurementSetName);
         addItemWithDescription(pSubjectItem, pMeasurementItem);
-        pReturnItem = pMeasurementItem->addData(pECDSet, m_pModelEntity);
+        pReturnItem = pMeasurementItem->addData(tECDSet, m_pModelEntity);
     }
 
     return pReturnItem;
@@ -306,7 +306,7 @@ EcdDataTreeItem* Data3DTreeModel::addDipoleFitData(const QString& subject, const
 
 //*************************************************************************************************************
 
-NetworkTreeItem* Data3DTreeModel::addConnectivityData(const QString& subject, const QString& sMeasurementSetName, Network::SPtr pNetworkData)
+NetworkTreeItem* Data3DTreeModel::addConnectivityData(const QString& subject, const QString& sMeasurementSetName, const Network& tNetworkData)
 {
     NetworkTreeItem* pReturnItem = Q_NULLPTR;
 
@@ -318,12 +318,12 @@ NetworkTreeItem* Data3DTreeModel::addConnectivityData(const QString& subject, co
 
     if(!itemList.isEmpty() && (itemList.first()->type() == Data3DTreeModelItemTypes::MeasurementItem)) {
         if(MeasurementTreeItem* pMeasurementItem = dynamic_cast<MeasurementTreeItem*>(itemList.first())) {
-            pReturnItem = pMeasurementItem->addData(pNetworkData, m_pModelEntity);
+            pReturnItem = pMeasurementItem->addData(tNetworkData, m_pModelEntity);
         }
     } else {
         MeasurementTreeItem* pMeasurementItem = new MeasurementTreeItem(Data3DTreeModelItemTypes::MeasurementItem, sMeasurementSetName);
         addItemWithDescription(pSubjectItem, pMeasurementItem);
-        pReturnItem = pMeasurementItem->addData(pNetworkData, m_pModelEntity);
+        pReturnItem = pMeasurementItem->addData(tNetworkData, m_pModelEntity);
     }
 
     return pReturnItem;

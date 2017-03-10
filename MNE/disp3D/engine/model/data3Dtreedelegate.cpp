@@ -121,27 +121,36 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
             return pComboBox;
         }
 
-        case MetaTreeItemTypes::ThresholdValue: {
-            Spline* pSpline = new Spline("Spline Histogram", 0);
+        case MetaTreeItemTypes::DistributedSourceLocThreshold: {
+            Spline* pSpline = new Spline("Set Threshold", 0);
             connect(pSpline, static_cast<void (Spline::*)(double, double, double)>(&Spline::borderChanged),
             this, &Data3DTreeDelegate::onEditorEdited);
-            QStandardItem* pParentItem = static_cast<QStandardItem*>(pAbstractItem->QStandardItem::parent());
-            QModelIndex indexParent = pData3DTreeModel->indexFromItem(pParentItem);
-            MatrixXd matRTData = index.model()->data(indexParent, Data3DTreeModelItemRoles::RTData).value<MatrixXd>();
-            Eigen::VectorXd resultClassLimit;
-            Eigen::VectorXi resultFrequency;
-            MNEMath::histcounts(matRTData, false, 50, resultClassLimit, resultFrequency, 0.0, 0.0);
-            pSpline->setData(resultClassLimit, resultFrequency, 0);
-            QVector3D vecThresholdValues = index.model()->data(index, MetaTreeItemRoles::ThresholdValue).value<QVector3D>();
-            pSpline->setThreshold(vecThresholdValues);
-            AbstractTreeItem* pParentItemAbstract = static_cast<AbstractTreeItem*>(pParentItem);
-            QList<QStandardItem*> pColormapItem = pParentItemAbstract->findChildren(MetaTreeItemTypes::ColormapType);
-            for(int i = 0; i < pColormapItem.size(); ++i)
-            {
-                QModelIndex indexColormapItem = pData3DTreeModel->indexFromItem(pColormapItem.at(i));
-                QString colorMap = index.model()->data(indexColormapItem, MetaTreeItemRoles::ColormapType).value<QString>();
-                pSpline->setColorMap(colorMap);
+
+            //Find the parent and retreive rt source loc data to calcualte the histogram
+            if(AbstractTreeItem* pParentItem = static_cast<AbstractTreeItem*>(pAbstractItem->QStandardItem::parent())) {
+                QModelIndex indexParent = pData3DTreeModel->indexFromItem(pParentItem);
+
+                //Get data
+                MatrixXd matRTData = index.model()->data(indexParent, Data3DTreeModelItemRoles::RTData).value<MatrixXd>();
+
+                //Calcualte histogram
+                Eigen::VectorXd resultClassLimit;
+                Eigen::VectorXi resultFrequency;
+                MNEMath::histcounts(matRTData, false, 50, resultClassLimit, resultFrequency, 0.0, 0.0);
+
+                //Create histogram plot
+                pSpline->setData(resultClassLimit, resultFrequency, 0);
+                QVector3D vecThresholdValues = index.model()->data(index, MetaTreeItemRoles::DistributedSourceLocThreshold).value<QVector3D>();
+                pSpline->setThreshold(vecThresholdValues);
+
+                QList<QStandardItem*> pColormapItem = pParentItem->findChildren(MetaTreeItemTypes::ColormapType);
+                for(int i = 0; i < pColormapItem.size(); ++i) {
+                    QModelIndex indexColormapItem = pData3DTreeModel->indexFromItem(pColormapItem.at(i));
+                    QString colorMap = index.model()->data(indexColormapItem, MetaTreeItemRoles::ColormapType).value<QString>();
+                    pSpline->setColorMap(colorMap);
+                }
             }
+
             return pSpline;
         }
 
@@ -337,16 +346,14 @@ void Data3DTreeDelegate::setEditorData(QWidget* editor, const QModelIndex& index
             break;
         }
 
-        case MetaTreeItemTypes::ThresholdValue: {
+        case MetaTreeItemTypes::DistributedSourceLocThreshold: {
             Spline* pSpline = static_cast<Spline*>(editor);
+
             int width = pSpline->size().width();
             int height = pSpline->size().height();
-            if (pSpline->size().width() < 200 && pSpline->size().height() < 200)
-            {
+            if (pSpline->size().width() < 200 && pSpline->size().height() < 200) {
                 pSpline->resize(600,400);   //resize histogram to be readable with default size
-            }
-            else
-            {
+            } else {
                 width = pSpline->size().width();   //keeps the size of the histogram
                 height = pSpline->size().height();
                 pSpline->resize(width,height);
@@ -503,7 +510,7 @@ void Data3DTreeDelegate::setModelData(QWidget* editor, QAbstractItemModel* model
             return;
         }
 
-        case MetaTreeItemTypes::ThresholdValue: {
+        case MetaTreeItemTypes::DistributedSourceLocThreshold: {
             Spline* pSpline = static_cast<Spline*>(editor);
             QVector3D returnVector;
             returnVector = pSpline->getThreshold();
@@ -512,9 +519,9 @@ void Data3DTreeDelegate::setModelData(QWidget* editor, QAbstractItemModel* model
             displayThreshold = QString("%1,%2,%3").arg(returnVector.x()).arg(returnVector.y()).arg(returnVector.z());
             QVariant dataDisplay;
             dataDisplay.setValue(displayThreshold);
-            model->setData(index, dataDisplay, Qt::DisplayRole);
 
-            model->setData(index, returnVector, MetaTreeItemRoles::ThresholdValue);
+            model->setData(index, dataDisplay, Qt::DisplayRole);
+            model->setData(index, returnVector, MetaTreeItemRoles::DistributedSourceLocThreshold);
             return;
         }
 

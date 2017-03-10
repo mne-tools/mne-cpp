@@ -115,8 +115,8 @@ MetaTreeItem::MetaTreeItem(int iType, const QString& text)
         case MetaTreeItemTypes::NumberAverages:
             sToolTip = "The number of samples averaged together (downsampling)";
             break;
-        case MetaTreeItemTypes::ThresholdValue:
-            sToolTip = "The value to normalize the source localization result";
+        case MetaTreeItemTypes::DistributedSourceLocThreshold:
+            sToolTip = "The value to normalize the distributed source localization result";
             break;
         case MetaTreeItemTypes::VisualizationType:
             sToolTip = "The visualization type";
@@ -202,7 +202,7 @@ void  MetaTreeItem::setData(const QVariant& value, int role)
             break;
         }
 
-        case MetaTreeItemRoles::ThresholdValue: {
+        case MetaTreeItemRoles::DistributedSourceLocThreshold: {
             QVector3D vecTemp = value.value<QVector3D>();
             emit rtDataNormalizationValueChanged(vecTemp);
             break;

@@ -226,11 +226,11 @@ public:
     *
     * @param[in] subject                The name of the subject.
     * @param[in] sMeasurementSetName    The name of the measurement set to which the data is to be added. If it does not exist yet, it will be created.
-    * @param[in] pECDSet                The ECDSet dipole data.
+    * @param[in] tECDSet                The ECDSet dipole data.
     *
     * @return                           Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
-    EcdDataTreeItem* addDipoleFitData(const QString& subject, const QString& set, const INVERSELIB::ECDSet& pECDSet);
+    EcdDataTreeItem* addDipoleFitData(const QString& subject, const QString& set, const INVERSELIB::ECDSet& tECDSet);
 
     //=========================================================================================================
     /**
@@ -238,11 +238,11 @@ public:
     *
     * @param[in] subject                The name of the subject.
     * @param[in] sMeasurementSetName    The name of the measurement set to which the data is to be added. If it does not exist yet, it will be created.
-    * @param[in] pNetworkData           The connectivity data.
+    * @param[in] tNetworkData           The connectivity data.
     *
     * @return                           Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
-    NetworkTreeItem* addConnectivityData(const QString& subject, const QString& sMeasurementSetName, CONNECTIVITYLIB::Network::SPtr pNetworkData);
+    NetworkTreeItem* addConnectivityData(const QString& subject, const QString& sMeasurementSetName, const CONNECTIVITYLIB::Network& tNetworkData);
 
     //=========================================================================================================
     /**

@@ -201,7 +201,7 @@ void EcdDataTreeItem::setVisible(bool state)
 
 //*************************************************************************************************************
 
-void EcdDataTreeItem::plotDipoles(const ECDSet& pECDSet)
+void EcdDataTreeItem::plotDipoles(const ECDSet& tECDSet)
 {
     //Plot dipoles
     QVector3D pos, to, from;
@@ -210,16 +210,16 @@ void EcdDataTreeItem::plotDipoles(const ECDSet& pECDSet)
     from = QVector3D(0.0, 1.0, 0.0);
     double norm;
 
-    for(int i = 0; i < pECDSet.size(); ++i) {
-        pos.setX(pECDSet[i].rd(0));
-        pos.setY(pECDSet[i].rd(1));
-        pos.setZ(pECDSet[i].rd(2));
+    for(int i = 0; i < tECDSet.size(); ++i) {
+        pos.setX(tECDSet[i].rd(0));
+        pos.setY(tECDSet[i].rd(1));
+        pos.setZ(tECDSet[i].rd(2));
 
-        norm = sqrt(pow(pECDSet[i].Q(0),2)+pow(pECDSet[i].Q(1),2)+pow(pECDSet[i].Q(2),2));
+        norm = sqrt(pow(tECDSet[i].Q(0),2)+pow(tECDSet[i].Q(1),2)+pow(tECDSet[i].Q(2),2));
 
-        to.setX(pECDSet[i].Q(0)/norm);
-        to.setY(pECDSet[i].Q(1)/norm);
-        to.setZ(pECDSet[i].Q(2)/norm);
+        to.setX(tECDSet[i].Q(0)/norm);
+        to.setY(tECDSet[i].Q(1)/norm);
+        to.setZ(tECDSet[i].Q(2)/norm);
 
 //        qDebug()<<"EcdDataTreeItem::plotDipoles - from" << from;
 //        qDebug()<<"EcdDataTreeItem::plotDipoles - to" << to;

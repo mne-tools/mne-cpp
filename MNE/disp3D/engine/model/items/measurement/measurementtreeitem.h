@@ -180,7 +180,7 @@ public:
     *
     * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
-    EcdDataTreeItem* addData(const INVERSELIB::ECDSet& pECDSet, Qt3DCore::QEntity* p3DEntityParent = 0);
+    EcdDataTreeItem* addData(const INVERSELIB::ECDSet& tECDSet, Qt3DCore::QEntity* p3DEntityParent = 0);
 
     //=========================================================================================================
     /**
@@ -198,11 +198,11 @@ public:
     /**
     * Adds connectivity estimation data.
     *
-    * @param[in] pNetworkData       The connectivity data.
+    * @param[in] tNetworkData       The connectivity data.
     *
     * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
-    NetworkTreeItem* addData(CONNECTIVITYLIB::Network::SPtr pNetworkData, Qt3DCore::QEntity* p3DEntityParent = 0);
+    NetworkTreeItem* addData(const CONNECTIVITYLIB::Network& tNetworkData, Qt3DCore::QEntity* p3DEntityParent = 0);
 
     //=========================================================================================================
     /**

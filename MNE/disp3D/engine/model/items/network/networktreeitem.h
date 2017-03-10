@@ -149,11 +149,11 @@ public:
     /**
     * Adds actual rt connectivity data which is streamed by this item's worker thread item. In order for this function to worker, you must call init(...) beforehand.
     *
-    * @param[in] pNetworkData       The new connectivity data.
+    * @param[in] tNetworkData       The new connectivity data.
     *
     * @return                       Returns true if successful.
     */
-    bool addData(CONNECTIVITYLIB::Network::SPtr pNetworkData);
+    bool addData(const CONNECTIVITYLIB::Network& tNetworkData);
 
     //=========================================================================================================
     /**
@@ -192,10 +192,10 @@ private:
     /**
     * Call this function whenever you want to calculate the indices/tris for a network.
     *
-    * @param[in] pNetworkData     The network data.
+    * @param[in] tNetworkData     The network data.
     * @param[in] vecThreshold     The threshold data.
     */
-    void plotNetwork(QSharedPointer<CONNECTIVITYLIB::Network> pNetworkData, const QVector3D& vecThreshold);
+    void plotNetwork(const CONNECTIVITYLIB::Network& tNetworkData, const QVector3D& vecThreshold);
 
     bool                                        m_bIsInit;                      /**< The init flag. */
     bool                                        m_bNodesPlotted;                /**< Flag whether nodes were plotted. */
@@ -224,7 +224,7 @@ inline bool NetworkTreeItem::isInit() const
 
 #ifndef metatype_networksptr
 #define metatype_networksptr
-Q_DECLARE_METATYPE(CONNECTIVITYLIB::Network::SPtr);
+Q_DECLARE_METATYPE(CONNECTIVITYLIB::Network);
 #endif
 
 #endif // NETWORKTREEITEM_H

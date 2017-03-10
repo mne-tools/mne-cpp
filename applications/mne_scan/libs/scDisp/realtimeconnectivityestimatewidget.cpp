@@ -162,12 +162,12 @@ void RealTimeConnectivityEstimateWidget::getData()
         //
         if(!m_pRtItem) {
             qDebug()<<"RealTimeConnectivityEstimateWidget::getData - Creating m_pRtItem list";
-            m_pRtItem = m_pData3DModel->addConnectivityData("Subject", "Data", m_pRTCE->getValue());
+            m_pRtItem = m_pData3DModel->addConnectivityData("Subject", "Data", *(m_pRTCE->getValue().data()));
         } else {
             qDebug()<<"RealTimeConnectivityEstimateWidget::getData - Working with m_pRtItem list";
 
             if(m_pRtItem) {
-                m_pRtItem->addData(m_pRTCE->getValue());
+                m_pRtItem->addData(*(m_pRTCE->getValue().data()));
             }
         }
     }

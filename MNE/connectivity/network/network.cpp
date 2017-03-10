@@ -88,7 +88,7 @@ Network::Network(const QString& sConnectivityMethod)
 
 //*************************************************************************************************************
 
-MatrixXd Network::getConnectivityMatrix()
+const MatrixXd& Network::getConnectivityMatrix() const
 {
     return generateConnectMat();
 }
@@ -96,7 +96,7 @@ MatrixXd Network::getConnectivityMatrix()
 
 //*************************************************************************************************************
 
-QList<NetworkEdge::SPtr> Network::getEdges()
+const QList<NetworkEdge::SPtr>& Network::getEdges() const
 {
     return m_lEdges;
 }
@@ -104,7 +104,7 @@ QList<NetworkEdge::SPtr> Network::getEdges()
 
 //*************************************************************************************************************
 
-QList<NetworkNode::SPtr> Network::getNodes()
+const QList<NetworkNode::SPtr>& Network::getNodes() const
 {
     return m_lNodes;
 }
@@ -112,7 +112,23 @@ QList<NetworkNode::SPtr> Network::getNodes()
 
 //*************************************************************************************************************
 
-qint16 Network::getDistribution()
+NetworkEdge::SPtr Network::getEdgeAt(int i)
+{
+    return m_lEdges.at(i);
+}
+
+
+//*************************************************************************************************************
+
+NetworkNode::SPtr Network::getNodeAt(int i)
+{
+    return m_lNodes.at(i);
+}
+
+
+//*************************************************************************************************************
+
+qint16 Network::getDistribution() const
 {
     qint16 distribution = 0;
 
@@ -134,7 +150,7 @@ void Network::setConnectivityMethod(const QString& sConnectivityMethod)
 
 //*************************************************************************************************************
 
-QString Network::getConnectivityMethod()
+QString Network::getConnectivityMethod() const
 {
     return m_sConnectivityMethod;
 }
@@ -162,7 +178,7 @@ Network& Network::operator<<(NetworkNode::SPtr newNode)
 
 //*************************************************************************************************************
 
-MatrixXd Network::generateConnectMat()
+const MatrixXd& Network::generateConnectMat() const
 {
     MatrixXd matDist(m_lNodes.size(), m_lNodes.size());
     matDist.setZero();

@@ -42,6 +42,7 @@
 #include "../hemisphere/hemispheretreeitem.h"
 #include "../sourcespace/sourcespacetreeitem.h"
 #include "../sourceactivity/mneestimatetreeitem.h"
+#include "../sourceactivity/ecddatatreeitem.h"
 #include "../network/networktreeitem.h"
 #include "../freesurfer/fssurfacetreeitem.h"
 #include "../freesurfer/fsannotationtreeitem.h"
@@ -49,7 +50,6 @@
 #include "../digitizer/digitizertreeitem.h"
 #include "../mri/mritreeitem.h"
 #include "../subject/subjecttreeitem.h"
-#include "../sourceactivity/ecddatatreeitem.h"
 
 #include <fs/label.h>
 #include <fs/annotationset.h>
@@ -329,9 +329,9 @@ DigitizerSetTreeItem* MeasurementTreeItem::addData(const FiffDigPointSet& tDigit
 
 //*************************************************************************************************************
 
-NetworkTreeItem* MeasurementTreeItem::addData(Network::SPtr pNetworkData, Qt3DCore::QEntity* p3DEntityParent)
+NetworkTreeItem* MeasurementTreeItem::addData(const Network& tNetworkData, Qt3DCore::QEntity* p3DEntityParent)
 {
-    if(!pNetworkData->getNodes().isEmpty()) {
+    if(!tNetworkData.getNodes().isEmpty()) {
         //Add source estimation data as child
         if(this->findChildren(Data3DTreeModelItemTypes::RTConnectivityDataItem).size() == 0) {
             //If rt data item does not exists yet, create it here!
@@ -343,9 +343,9 @@ NetworkTreeItem* MeasurementTreeItem::addData(Network::SPtr pNetworkData, Qt3DCo
             this->appendRow(list);
 
             m_pNetworkTreeItem->init(p3DEntityParent);
-            m_pNetworkTreeItem->addData(pNetworkData);
+            m_pNetworkTreeItem->addData(tNetworkData);
         } else {
-            m_pNetworkTreeItem->addData(pNetworkData);
+            m_pNetworkTreeItem->addData(tNetworkData);
         }
 
         return m_pNetworkTreeItem;
