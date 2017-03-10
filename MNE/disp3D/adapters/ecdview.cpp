@@ -125,8 +125,7 @@ ECDView::ECDView(const DipoleFitSettings& dipFitSettings, const ECDSet& ecdSet, 
     }
 
     //Add ECD data
-    ECDSet::SPtr pEcdSetTrans = ECDSet::SPtr(new ECDSet(ecdSetTrans));
-    m_pData3DModel->addDipoleFitData("sample", QString("Set %1").arg(dipFitSettings.setno), pEcdSetTrans);
+    m_pData3DModel->addDipoleFitData("sample", QString("Set %1").arg(dipFitSettings.setno), ecdSetTrans);
 
     //Read and show BEM
     QFile t_fileBem(dipFitSettings.bemname);

@@ -230,7 +230,7 @@ public:
     *
     * @return                           Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
-    EcdDataTreeItem* addDipoleFitData(const QString& subject, const QString& set, QSharedPointer<INVERSELIB::ECDSet> &pECDSet);
+    EcdDataTreeItem* addDipoleFitData(const QString& subject, const QString& set, const INVERSELIB::ECDSet& pECDSet);
 
     //=========================================================================================================
     /**

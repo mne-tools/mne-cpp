@@ -40,7 +40,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "fs/label.h"
+#include <fs/label.h>
+#include <inverse/dipoleFit/ecd_set.h>
 
 
 //*************************************************************************************************************
@@ -93,7 +94,7 @@ namespace Data3DTreeModelItemTypes
                     BemSurfaceItem = QStandardItem::UserType + 10,
                     DigitizerSetItem = QStandardItem::UserType + 11,
                     DigitizerItem = QStandardItem::UserType + 12,
-                    ECDSetDataItem = QStandardItem::UserType + 13,
+                    ECDDataItem = QStandardItem::UserType + 13,
                     MriItem = QStandardItem::UserType + 14};
 }
 
@@ -248,6 +249,11 @@ Q_DECLARE_METATYPE(QByteArray);
 #ifndef metatype_labellist
 #define metatype_labellist
 Q_DECLARE_METATYPE(QList<FSLIB::Label>);
+#endif
+
+#ifndef metatype_ecddataset
+#define metatype_ecddataset
+Q_DECLARE_METATYPE(INVERSELIB::ECDSet);
 #endif
 
 #endif // TYPES_H

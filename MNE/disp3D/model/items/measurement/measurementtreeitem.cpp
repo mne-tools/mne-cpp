@@ -47,9 +47,9 @@
 #include "../freesurfer/fsannotationtreeitem.h"
 #include "../digitizer/digitizersettreeitem.h"
 #include "../digitizer/digitizertreeitem.h"
-#include "../sourceactivity/ecddatatreeitem.h"
 #include "../mri/mritreeitem.h"
 #include "../subject/subjecttreeitem.h"
+#include "../sourceactivity/ecddatatreeitem.h"
 
 #include <fs/label.h>
 #include <fs/annotationset.h>
@@ -105,7 +105,6 @@ MeasurementTreeItem::MeasurementTreeItem(int iType, const QString& text)
 : AbstractTreeItem(iType, text)
 , m_pMneEstimateTreeItem(new MneEstimateTreeItem())
 , m_pNetworkTreeItem(new NetworkTreeItem())
-, m_EcdDataTreeItem(new EcdDataTreeItem())
 {
     this->setEditable(false);
     this->setCheckable(true);
@@ -271,11 +270,11 @@ MneEstimateTreeItem* MeasurementTreeItem::addData(const MNESourceEstimate& tSour
 
 //*************************************************************************************************************
 
-EcdDataTreeItem* MeasurementTreeItem::addData(INVERSELIB::ECDSet::SPtr &pECDSet, Qt3DCore::QEntity* p3DEntityParent)
+EcdDataTreeItem* MeasurementTreeItem::addData(const ECDSet& pECDSet, Qt3DCore::QEntity* p3DEntityParent)
 {
-    if(pECDSet->size() > 0) {
+    if(pECDSet.size() > 0) {
         //Add source estimation data as child
-        if(this->findChildren(Data3DTreeModelItemTypes::ECDSetDataItem).size() == 0) {
+        if(this->findChildren(Data3DTreeModelItemTypes::ECDDataItem).size() == 0) {
             //If ecd data item does not exists yet, create it here!
             m_EcdDataTreeItem = new EcdDataTreeItem();
 
@@ -302,7 +301,7 @@ EcdDataTreeItem* MeasurementTreeItem::addData(INVERSELIB::ECDSet::SPtr &pECDSet,
 
 //*************************************************************************************************************
 
-DigitizerSetTreeItem* MeasurementTreeItem::addData(const FiffDigPointSet &tDigitizer, Qt3DCore::QEntity *p3DEntityParent)
+DigitizerSetTreeItem* MeasurementTreeItem::addData(const FiffDigPointSet& tDigitizer, Qt3DCore::QEntity *p3DEntityParent)
 {
     //Find the digitizer kind
     QList<QStandardItem*> itemDigitizerList = this->findChildren(Data3DTreeModelItemTypes::DigitizerSetItem);

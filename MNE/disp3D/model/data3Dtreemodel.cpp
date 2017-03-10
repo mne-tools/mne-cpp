@@ -279,7 +279,7 @@ MneEstimateTreeItem* Data3DTreeModel::addSourceData(const QString& subject, cons
 
 //*************************************************************************************************************
 
-EcdDataTreeItem* Data3DTreeModel::addDipoleFitData(const QString& subject, const QString& sMeasurementSetName, INVERSELIB::ECDSet::SPtr& pECDSet)
+EcdDataTreeItem* Data3DTreeModel::addDipoleFitData(const QString& subject, const QString& sMeasurementSetName, const INVERSELIB::ECDSet& pECDSet)
 {
     EcdDataTreeItem* pReturnItem = Q_NULLPTR;
 

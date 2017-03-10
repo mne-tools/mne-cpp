@@ -150,7 +150,7 @@ bool EcdDataTreeItem::init(Qt3DCore::QEntity* parent)
 
 //*************************************************************************************************************
 
-bool EcdDataTreeItem::addData(ECDSet::SPtr pECDSet)
+bool EcdDataTreeItem::addData(const ECDSet& pECDSet)
 {
     if(!m_bIsInit) {
         qDebug() << "EcdDataTreeItem::addData - EcdDataTreeItem has not been initialized yet!";
@@ -159,7 +159,7 @@ bool EcdDataTreeItem::addData(ECDSet::SPtr pECDSet)
 
     //Add further infos as children
     QList<QStandardItem*> list;
-    MetaTreeItem *pItemNumDipoles = new MetaTreeItem(MetaTreeItemTypes::NumberDipoles, QString::number(pECDSet->size()));
+    MetaTreeItem *pItemNumDipoles = new MetaTreeItem(MetaTreeItemTypes::NumberDipoles, QString::number(pECDSet.size()));
     pItemNumDipoles->setEditable(false);
     list.clear();
     list << pItemNumDipoles;
@@ -201,7 +201,7 @@ void EcdDataTreeItem::setVisible(bool state)
 
 //*************************************************************************************************************
 
-void EcdDataTreeItem::plotDipoles(QSharedPointer<ECDSet> pECDSet)
+void EcdDataTreeItem::plotDipoles(const ECDSet& pECDSet)
 {
     //Plot dipoles
     QVector3D pos, to, from;
@@ -210,16 +210,16 @@ void EcdDataTreeItem::plotDipoles(QSharedPointer<ECDSet> pECDSet)
     from = QVector3D(0.0, 1.0, 0.0);
     double norm;
 
-    for(int i = 0; i < pECDSet->size(); ++i) {
-        pos.setX((*pECDSet)[i].rd(0));
-        pos.setY((*pECDSet)[i].rd(1));
-        pos.setZ((*pECDSet)[i].rd(2));
+    for(int i = 0; i < pECDSet.size(); ++i) {
+        pos.setX(pECDSet[i].rd(0));
+        pos.setY(pECDSet[i].rd(1));
+        pos.setZ(pECDSet[i].rd(2));
 
-        norm = sqrt(pow((*pECDSet)[i].Q(0),2)+pow((*pECDSet)[i].Q(1),2)+pow((*pECDSet)[i].Q(2),2));
+        norm = sqrt(pow(pECDSet[i].Q(0),2)+pow(pECDSet[i].Q(1),2)+pow(pECDSet[i].Q(2),2));
 
-        to.setX((*pECDSet)[i].Q(0)/norm);
-        to.setY((*pECDSet)[i].Q(1)/norm);
-        to.setZ((*pECDSet)[i].Q(2)/norm);
+        to.setX(pECDSet[i].Q(0)/norm);
+        to.setY(pECDSet[i].Q(1)/norm);
+        to.setZ(pECDSet[i].Q(2)/norm);
 
 //        qDebug()<<"EcdDataTreeItem::plotDipoles - from" << from;
 //        qDebug()<<"EcdDataTreeItem::plotDipoles - to" << to;

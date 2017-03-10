@@ -111,7 +111,7 @@ public:
     * @param[in] iType      The type of the item. See types.h for declaration and definition.
     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
     */
-    explicit EcdDataTreeItem(int iType = Data3DTreeModelItemTypes::ECDSetDataItem, const QString& text = "Dipole fit data");
+    explicit EcdDataTreeItem(int iType = Data3DTreeModelItemTypes::ECDDataItem, const QString& text = "Dipole fit data");
 
     //=========================================================================================================
     /**
@@ -144,7 +144,7 @@ public:
     *
     * @return   Returns true if successful.
     */
-    bool addData(QSharedPointer<INVERSELIB::ECDSet> pECDSet);
+    bool addData(const INVERSELIB::ECDSet& pECDSet);
 
     //=========================================================================================================
     /**
@@ -177,7 +177,7 @@ private:
     *
     * @param[in] pECDSet     The dipole set data.
     */
-    void plotDipoles(QSharedPointer<INVERSELIB::ECDSet> pECDSet);
+    void plotDipoles(const INVERSELIB::ECDSet& pECDSet);
 
     bool                                    m_bIsInit;                      /**< The init flag. */
 
@@ -201,4 +201,4 @@ inline bool EcdDataTreeItem::isInit() const
 
 } //NAMESPACE DISP3DLIB
 
-#endif // EcdDataTreeItem_H
+#endif // ECDDATATREEITEM_H
