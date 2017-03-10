@@ -559,7 +559,7 @@ MneSurfaceOld *FwdBemModel::fwd_bem_find_surface(int kind)
     for (int k = 0; k < this->nsurf; k++)
         if (this->surfs[k]->id == kind)
             return this->surfs[k];
-    printf("Desired surface (%d = %s) not found.", kind,fwd_bem_explain_surface(kind));
+    printf("Desired surface (%d = %s) not found.", kind,fwd_bem_explain_surface(kind).toUtf8().constData());
     return NULL;
 }
 
@@ -578,7 +578,7 @@ FwdBemModel *FwdBemModel::fwd_bem_load_surfaces(const QString &name, int *kinds,
     int         j,k;
 
     if (nkind <= 0) {
-        printf("No surfaces specified to fwd_bem_load_surfaces");
+        qCritical("No surfaces specified to fwd_bem_load_surfaces");
         return NULL;
     }
 
@@ -594,11 +594,11 @@ FwdBemModel *FwdBemModel::fwd_bem_load_surfaces(const QString &name, int *kinds,
         if ((surfs[k] = MneSurfaceOld::read_bem_surface(name,kinds[k],TRUE,sigma+k)) == NULL)
             goto bad;
         if (sigma[k] < 0.0) {
-            printf("No conductivity available for surface %s",fwd_bem_explain_surface(kinds[k]));
+            qCritical("No conductivity available for surface %s",fwd_bem_explain_surface(kinds[k]).toUtf8().constData());
             goto bad;
         }
         if (surfs[k]->coord_frame != FIFFV_COORD_MRI) { /* We make our life much easier with this */
-            printf("Surface %s not specified in MRI coordinates.",fwd_bem_explain_surface(kinds[k]));
+            qCritical("Surface %s not specified in MRI coordinates.",fwd_bem_explain_surface(kinds[k]).toUtf8().constData());
             goto bad;
         }
     }
@@ -1117,8 +1117,8 @@ float **FwdBemModel::fwd_bem_lin_pot_coeff(const QList<MneSurfaceOld*>& surfs)
             ntri  = surf2->ntri;
 
             fprintf(stderr,"\t\t%s (%d) -> %s (%d) ... ",
-                    fwd_bem_explain_surface(surf1->id),np1,
-                    fwd_bem_explain_surface(surf2->id),np2);
+                    fwd_bem_explain_surface(surf1->id).toUtf8().constData(),np1,
+                    fwd_bem_explain_surface(surf2->id).toUtf8().constData(),np2);
 
             for (j = 0; j < np1; j++) {
                 for (k = 0; k < np2; k++)
@@ -1303,13 +1303,13 @@ void FwdBemModel::fwd_bem_ip_modify_solution(float **solution, float **ip_soluti
     for (s = 0, joff = 0; s < nsurf; s++) {
         fprintf(stderr,"%d3 ",s+1);
         /*
-         * Pick the correct submatrix
-         */
+        * Pick the correct submatrix
+        */
         for (j = 0; j < ntri[s]; j++)
             sub[j] = solution[j+joff]+koff;
         /*
-         * Multiply
-         */
+        * Multiply
+        */
 #ifdef OLD
         for (j = 0; j < ntri[s]; j++) {
             for (k = 0; k < nlast; k++) {
@@ -1334,14 +1334,14 @@ void FwdBemModel::fwd_bem_ip_modify_solution(float **solution, float **ip_soluti
 #endif
     fprintf(stderr,"33 ");
     /*
-       * The lower right corner is a special case
-       */
+    * The lower right corner is a special case
+    */
     for (j = 0; j < nlast; j++)
         for (k = 0; k < nlast; k++)
             sub[j][k] = sub[j][k] + mult*ip_solution[j][k];
     /*
-       * Final scaling
-       */
+    * Final scaling
+    */
     fprintf(stderr,"done.\n\t\tScaling...");
     mne_scale_vector_40(ip_mult,solution[0],ntot*ntot);
     fprintf(stderr,"done.\n");
@@ -1354,8 +1354,8 @@ void FwdBemModel::fwd_bem_ip_modify_solution(float **solution, float **ip_soluti
 
 int FwdBemModel::fwd_bem_check_solids(float **angles, int ntri1, int ntri2, float desired)
 /*
-     * Check the angle computations
-     */
+* Check the angle computations
+*/
 {
     float *sums = MALLOC_40(ntri1,float);
     float sum;
@@ -1370,11 +1370,11 @@ int FwdBemModel::fwd_bem_check_solids(float **angles, int ntri1, int ntri2, floa
     }
     for (j = 0; j < ntri1; j++)
         /*
-         * Three cases:
-         * same surface: sum = 2*pi
-         * to outer:     sum = 4*pi
-         * to inner:     sum = 0*pi;
-         */
+        * Three cases:
+        * same surface: sum = 2*pi
+        * to outer:     sum = 4*pi
+        * to inner:     sum = 0*pi;
+        */
         if (fabs(sums[j]-desired) > 1e-4) {
             printf("solid angle matrix: rowsum[%d] = 2PI*%g",
                    j+1,sums[j]);
@@ -1415,7 +1415,7 @@ float **FwdBemModel::fwd_bem_solid_angles(const QList<MneSurfaceOld*>& surfs)
         for (q = 0, koff = 0; q < surfs.size(); q++, koff = koff + ntri2) {
             surf2 = surfs[q];
             ntri2 = surf2->ntri;
-            fprintf(stderr,"\t\t%s (%d) -> %s (%d) ... ",fwd_bem_explain_surface(surf1->id),ntri1,fwd_bem_explain_surface(surf2->id),ntri2);
+            fprintf(stderr,"\t\t%s (%d) -> %s (%d) ... ",fwd_bem_explain_surface(surf1->id).toUtf8().constData(),ntri1,fwd_bem_explain_surface(surf2->id).toUtf8().constData(),ntri2);
             for (j = 0; j < ntri1; j++)
                 for (k = 0, tri = surf2->tris; k < ntri2; k++, tri++) {
                     if (p == q && j == k)
