@@ -739,11 +739,9 @@ void Data3DTreeDelegate::updateEditorGeometry(QWidget* editor, const QStyleOptio
 
 void Data3DTreeDelegate::onEditorEdited()
 {
-    qDebug() << "Data3DTreeDelegate::onEditorEdited() - 0";
     if(QWidget* editor = qobject_cast<QWidget*>(QObject::sender())) {
         emit commitData(editor);
     }
-    qDebug() << "Data3DTreeDelegate::onEditorEdited() - 1";
 }
 
 

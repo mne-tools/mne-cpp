@@ -131,11 +131,35 @@ public:
 
     //=========================================================================================================
     /**
-    * Update the vertices colors of the mesh.
+    * Set the vertices colors of the mesh.
     *
     * @param[in] tArrayColors     New color information for the vertices.
     */
-    void setVertColor(const QByteArray& tArrayColors);
+    void setColor(const QByteArray& tArrayColors);
+
+    //=========================================================================================================
+    /**
+    * Set the normals the mesh.
+    *
+    * @param[in] tMatNorm       Normals in form of a matrix.
+    */
+    void setNormals(const Eigen::MatrixX3f& tMatNorm);
+
+    //=========================================================================================================
+    /**
+    * Set the vertices the mesh.
+    *
+    * @param[in] tMatVert       Vertices in form of a matrix.
+    */
+    void setVertex(const Eigen::MatrixX3f& tMatVert);
+
+    //=========================================================================================================
+    /**
+    * Set the triangles/index of the mesh.
+    *
+    * @param[in] tMatTris       Tris/Faces in form of a matrix.
+    */
+    void setIndex(const Eigen::MatrixX3i& tMatTris);
 
     //=========================================================================================================
     /**
@@ -157,31 +181,23 @@ public:
 protected:
     //=========================================================================================================
     /**
-    * Creates the actual mesh from the set vertex, normals, tris and offset members.
-    *
-    * @param[in] tMatVert       Vertices in form of a matrix.
-    * @param[in] tMatNorm       Normals in form of a matrix.
-    * @param[in] tMatTris       Tris/Faces in form of a matrix.
-    * @param[in] tVecOffset     The offset which is to be used on all the vertices.
-    * @param[in] tArrayColors   The color info of all the vertices.
-    * @param[in] primitiveType  The primitive type of the mesh lines, triangles, etc.
-    *
-    * @return If successful returns true, false otherwise.
+    * Init the custom mesh.
     */
-    void createCustomMesh(const Eigen::MatrixX3f& tMatVert,
-                          const Eigen::MatrixX3f& tMatNorm,
-                          const Eigen::MatrixXi &tMatTris,
-                          const QByteArray& tArrayColors,
-                          Qt3DRender::QGeometryRenderer::PrimitiveType primitiveType);
+    void init();
 
-    QPointer<Qt3DRender::QBuffer>    m_pVertexDataBuffer;    /**< The vertex buffer. */
-    QPointer<Qt3DRender::QBuffer>    m_pNormalDataBuffer;    /**< The normal buffer. */
-    QPointer<Qt3DRender::QBuffer>    m_pColorDataBuffer;     /**< The color buffer. */
-    QPointer<Qt3DRender::QBuffer>    m_pIndexDataBuffer;     /**< The index buffer. */
+    QPointer<Qt3DRender::QBuffer>       m_pVertexDataBuffer;       /**< The vertex buffer. */
+    QPointer<Qt3DRender::QBuffer>       m_pNormalDataBuffer;       /**< The normal buffer. */
+    QPointer<Qt3DRender::QBuffer>       m_pColorDataBuffer;        /**< The color buffer. */
+    QPointer<Qt3DRender::QBuffer>       m_pIndexDataBuffer;        /**< The index buffer. */
 
-    QPointer<Qt3DRender::QGeometry>  m_pCustomGeometry;      /**< The custom geometry. */
+    QPointer<Qt3DRender::QGeometry>     m_pCustomGeometry;         /**< The custom geometry. */
 
-    int                     m_iNumVert;             /**< The total number of set vertices. */
+    QPointer<Qt3DRender::QAttribute>    m_pIndexAttribute;         /**< The index attribute. */
+    QPointer<Qt3DRender::QAttribute>    m_pVertexAttribute;      /**< The position attribute. */
+    QPointer<Qt3DRender::QAttribute>    m_pNormalAttribute;        /**< The normal attribute. */
+    QPointer<Qt3DRender::QAttribute>    m_pColorAttribute;         /**< The color attribute. */
+
+    int                                 m_iNumVert;                 /**< The total number of set vertices. */
 };
 
 } // NAMESPACE
