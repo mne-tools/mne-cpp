@@ -184,7 +184,7 @@ int main(int argc, char *argv[])
             return 1;
 
         std::cout << std::endl;
-        std::cout << "Evoked description: " << evoked.comment.toLatin1().constData() << std::endl;
+        std::cout << "Evoked description: " << evoked.comment.toUtf8().constData() << std::endl;
 
         if(t_Fwd.isEmpty())
             return 1;

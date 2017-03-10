@@ -468,7 +468,7 @@ FwdCoilSet *FwdCoilSet::read_coil_defs(const QString &name)
           * Read a coil definition file
           */
 {
-    FILE    *in = fopen(name.toLatin1().constData(),"r");
+    FILE    *in = fopen(name.toUtf8().constData(),"r");
     char    *desc = NULL;
     int     type,coil_class,acc,np;
     int     p;

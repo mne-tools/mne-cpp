@@ -291,7 +291,7 @@ qint32 RtCmdClient::requestConnectors(QMap<qint32, QString> &p_qMapConnectors)
         if(!p_qMapConnectors.contains(id))
             p_qMapConnectors.insert(id, t_qConnectorName);
         else
-            qWarning("Warning: CommandMap contains command %s already. Insertion skipped.\n", it.key().toLatin1().constData());
+            qWarning("Warning: CommandMap contains command %s already. Insertion skipped.\n", it.key().toUtf8().constData());
 
         //if connector is active indicate it
         if(it.value().toObject().value(QString("active")).toBool())

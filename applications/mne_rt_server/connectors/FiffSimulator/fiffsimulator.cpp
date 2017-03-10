@@ -340,7 +340,7 @@ void FiffSimulator::init()
                 if (t_qFileMeas.open(QIODevice::ReadOnly))
                 {
                     m_sResourceDataPath = sFileName;
-                    std::cout << "\tLoad simulation file: " << sFileName.toLatin1().constData() << std::endl;
+                    std::cout << "\tLoad simulation file: " << sFileName.toUtf8().constData() << std::endl;
                     t_qFileMeas.close();
                 }
             }

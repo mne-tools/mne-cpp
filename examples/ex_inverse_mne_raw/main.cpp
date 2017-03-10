@@ -140,7 +140,7 @@ int main(int argc, char *argv[])
     //
     for(qint32 setno = 0; setno < evokedSet.evoked.size(); ++setno)
     {
-        printf(">> Computing inverse for %s data set <<\n", evokedSet.evoked[setno].comment.toLatin1().constData());
+        printf(">> Computing inverse for %s data set <<\n", evokedSet.evoked[setno].comment.toUtf8().constData());
         //
         //   Set up the inverse according to the parameters
         //

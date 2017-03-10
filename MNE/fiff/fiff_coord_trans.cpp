@@ -255,7 +255,7 @@ bool FiffCoordTrans::addInverse(FiffCoordTrans &t)
 void FiffCoordTrans::print() const
 {
     std::cout << "Coordinate transformation: ";
-    std::cout << (QString("%1 -> %2\n").arg(frame_name(this->from)).arg(frame_name(this->to))).toLatin1().data();
+    std::cout << (QString("%1 -> %2\n").arg(frame_name(this->from)).arg(frame_name(this->to))).toUtf8().data();
 
     for (int p = 0; p < 3; p++)
         printf("\t% 8.6f % 8.6f % 8.6f\t% 7.2f mm\n", trans(p,0),trans(p,1),trans(p,2),1000*trans(p,3));

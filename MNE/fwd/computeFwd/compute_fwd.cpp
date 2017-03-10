@@ -1727,11 +1727,11 @@ bool mne_attach_env(const QString& name, const QString& command)
 //#endif
 
     if (!fileInOut.exists()) {
-        qCritical("File %s does not exist. Cannot attach env info.",name.toLatin1().constData());
+        qCritical("File %s does not exist. Cannot attach env info.",name.toUtf8().constData());
         return false;
     }
 //    if (!fileInOut.isWritable()) {
-//        qCritical("File %s is not writable. Cannot attach env info.",name.toLatin1().constData());
+//        qCritical("File %s is not writable. Cannot attach env info.",name.toUtf8().constData());
 //        return false;
 //    }
     /*
@@ -1939,14 +1939,14 @@ void ComputeFwd::calculateFwd() const
     //    printf("\n");
     //    mne_print_version_info(stderr,argv[0],PROGRAM_VERSION,__DATE__,__TIME__);
     printf("\n");
-    printf("Source space                 : %s\n",settings->srcname.toLatin1().constData());
+    printf("Source space                 : %s\n",settings->srcname.toUtf8().constData());
     if (!(settings->transname.isEmpty()) || !(settings->mriname.isEmpty()))
-        printf("MRI -> head transform source : %s\n",!(settings->mriname.isEmpty()) ? settings->mriname.toLatin1().constData() : settings->transname.toLatin1().constData());
+        printf("MRI -> head transform source : %s\n",!(settings->mriname.isEmpty()) ? settings->mriname.toUtf8().constData() : settings->transname.toUtf8().constData());
     else
         printf("MRI and head coordinates are assumed to be identical.\n");
-    printf("Measurement data             : %s\n",settings->measname.toLatin1().constData());
+    printf("Measurement data             : %s\n",settings->measname.toUtf8().constData());
     if (!settings->bemname.isEmpty())
-        printf("BEM model                    : %s\n",settings->bemname.toLatin1().constData());
+        printf("BEM model                    : %s\n",settings->bemname.toUtf8().constData());
     else {
         printf("Sphere model                 : origin at (% 7.2f % 7.2f % 7.2f) mm\n",
                1000.0f*settings->r0[X_41],1000.0f*settings->r0[Y_41],1000.0f*settings->r0[Z_41]);
@@ -1969,7 +1969,7 @@ void ComputeFwd::calculateFwd() const
                 goto out;
 
             printf("Using EEG sphere model \"%s\" with scalp radius %7.1f mm\n",
-                   settings->eeg_model_name.toLatin1().constData(),1000*settings->eeg_sphere_rad);
+                   settings->eeg_model_name.toUtf8().constData(),1000*settings->eeg_sphere_rad);
             printf("%s the electrode locations to scalp\n",settings->scale_eeg_pos ? "Scale" : "Do not scale");
 
             eeg_model->scale_pos = settings->scale_eeg_pos;
@@ -1983,7 +1983,7 @@ void ComputeFwd::calculateFwd() const
     printf("%s source orientations\n",settings->fixed_ori ? "Fixed" : "Free");
     if (settings->compute_grad)
         printf("Compute derivatives with respect to source location coordinates\n");
-    printf("Destination for the solution : %s\n",settings->solname.toLatin1().constData());
+    printf("Destination for the solution : %s\n",settings->solname.toUtf8().constData());
     if (settings->do_all)
         printf("Calculate solution for all source locations.\n");
     if (settings->nlabel > 0)
@@ -1992,7 +1992,7 @@ void ComputeFwd::calculateFwd() const
      * Read the source locations
      */
     printf("\n");
-    printf("Reading %s...\n",settings->srcname.toLatin1().constData());
+    printf("Reading %s...\n",settings->srcname.toUtf8().constData());
     if (MneSurfaceOrVolume::mne_read_source_spaces(settings->srcname,&spaces,&nspace) != OK)
         goto out;
     for (k = 0, nsource = 0; k < nspace; k++) {
@@ -2021,7 +2021,7 @@ void ComputeFwd::calculateFwd() const
     }
     else if (!settings->transname.isEmpty()) {
         FiffCoordTransOld* t;
-        if ((t = FiffCoordTransOld::mne_read_FShead2mri_transform(settings->transname.toLatin1().data())) == NULL)
+        if ((t = FiffCoordTransOld::mne_read_FShead2mri_transform(settings->transname.toUtf8().data())) == NULL)
             goto out;
         mri_head_t = t->fiff_invert_transform();
         if(t)
@@ -2038,11 +2038,11 @@ void ComputeFwd::calculateFwd() const
     if (mne_read_meg_comp_eeg_ch_info_41(settings->measname,&megchs,&nmeg,&compchs,&ncomp,&eegchs,&neeg,&meg_head_t,&meas_id) != OK)
         goto out;
     if (nmeg > 0)
-        printf("Read %3d MEG channels from %s\n",nmeg,settings->measname.toLatin1().constData());
+        printf("Read %3d MEG channels from %s\n",nmeg,settings->measname.toUtf8().constData());
     if (ncomp > 0)
-        printf("Read %3d MEG compensation channels from %s\n",ncomp,settings->measname.toLatin1().constData());
+        printf("Read %3d MEG compensation channels from %s\n",ncomp,settings->measname.toUtf8().constData());
     if (neeg > 0)
-        printf("Read %3d EEG channels from %s\n",neeg,settings->measname.toLatin1().constData());
+        printf("Read %3d EEG channels from %s\n",neeg,settings->measname.toUtf8().constData());
     if (!settings->include_meg) {
         printf("MEG not requested. MEG channels omitted.\n");
         FREE_41(megchs); megchs = NULL;
@@ -2077,8 +2077,8 @@ void ComputeFwd::calculateFwd() const
         else if (!file.exists())
             qPath = "./bin/resources/coilDefinitions/coil_def.dat";
 
-        char *coilfile = MALLOC_41(strlen(qPath.toLatin1().data())+1,char);
-        strcpy(coilfile,qPath.toLatin1().data());
+        char *coilfile = MALLOC_41(strlen(qPath.toUtf8().data())+1,char);
+        strcpy(coilfile,qPath.toUtf8().data());
 
         //#endif
 
@@ -2094,7 +2094,7 @@ void ComputeFwd::calculateFwd() const
         if ((comp_data = MneCTFCompDataSet::mne_read_ctf_comp_data(settings->measname)) == NULL)
             goto out;
         if (comp_data->ncomp > 0) /* Compensation channel information may be needed */
-            printf("%d compensation data sets in %s\n",comp_data->ncomp,settings->measname.toLatin1().constData());
+            printf("%d compensation data sets in %s\n",comp_data->ncomp,settings->measname.toUtf8().constData());
         else {
             FREE_41(compchs); compchs = NULL;
             ncomp = 0;
@@ -2168,14 +2168,14 @@ void ComputeFwd::calculateFwd() const
             goto out;
         }
         printf("\nLoading the solution matrix...\n");
-        if (FwdBemModel::fwd_bem_load_recompute_solution(settings->bemname.toLatin1().data(),FWD_BEM_UNKNOWN,FALSE,bem_model) == FAIL)
+        if (FwdBemModel::fwd_bem_load_recompute_solution(settings->bemname.toUtf8().data(),FWD_BEM_UNKNOWN,FALSE,bem_model) == FAIL)
             goto out;
         if (settings->coord_frame == FIFFV_COORD_HEAD) {
             printf("Employing the head->MRI coordinate transform with the BEM model.\n");
             if (FwdBemModel::fwd_bem_set_head_mri_t(bem_model,mri_head_t) == FAIL)
                 goto out;
         }
-        printf("BEM model %s is now set up\n",bem_model->sol_name.toLatin1().constData());
+        printf("BEM model %s is now set up\n",bem_model->sol_name.toUtf8().constData());
     }
     else
         printf("Using the sphere model.\n");
@@ -2185,15 +2185,15 @@ void ComputeFwd::calculateFwd() const
     */
     if (settings->filter_spaces) {
         if (!settings->mindistoutname.isEmpty()) {
-            out = fopen(settings->mindistoutname.toLatin1().constData(),"w");
+            out = fopen(settings->mindistoutname.toUtf8().constData(),"w");
             if (out == NULL) {
                 qCritical() << settings->mindistoutname;
                 goto out;
             }
-            printf("Omitted source space points will be output to : %s\n",settings->mindistoutname.toLatin1().constData());
+            printf("Omitted source space points will be output to : %s\n",settings->mindistoutname.toUtf8().constData());
         }
         if (MneSurfaceOrVolume::filter_source_spaces(settings->mindist,
-                                                     settings->bemname.toLatin1().data(),
+                                                     settings->bemname.toUtf8().data(),
                                                      mri_head_t,
                                                      spaces,
                                                      nspace,out,settings->use_threads) == FAIL)
@@ -2226,7 +2226,7 @@ void ComputeFwd::calculateFwd() const
     /*
     * We are ready to spill it out
     */
-    printf("\nwriting %s...",settings->solname.toLatin1().constData());
+    printf("\nwriting %s...",settings->solname.toUtf8().constData());
     if (!write_solution(settings->solname,               /* Destination file */
                        spaces,                          /* The source spaces */
                        nspace,

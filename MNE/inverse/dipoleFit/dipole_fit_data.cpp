@@ -2794,7 +2794,7 @@ int mne_read_bad_channels_3(const QString& name, QStringList& listp, int& nlistp
     if (name.isEmpty())
         return OK;
 
-    if ((in = fopen(name.toLatin1().data(),"r")) == NULL) {
+    if ((in = fopen(name.toUtf8().data(),"r")) == NULL) {
         qCritical() << name;
         goto bad;
     }
@@ -2924,7 +2924,7 @@ MneCovMatrix* mne_read_cov(const QString& name,int kind)
     nodes = stream->dirtree()->dir_tree_find(FIFFB_MNE_COV);
 
     if (nodes.size() == 0) {
-        printf("No covariance matrix available in %s",name.toLatin1().data());
+        printf("No covariance matrix available in %s",name.toUtf8().data());
         goto out;
     }
     /*
@@ -2940,7 +2940,7 @@ MneCovMatrix* mne_read_cov(const QString& name,int kind)
         }
     }
     if (covnode->isEmpty()) {
-        printf("Desired covariance matrix not found from %s",name.toLatin1().data());
+        printf("Desired covariance matrix not found from %s",name.toUtf8().data());
         goto out;
     }
     /*
@@ -3316,7 +3316,7 @@ static int read_ch_info(const QString&  name,
 
     meas = stream->dirtree()->dir_tree_find(FIFFB_MEAS);
     if (meas.size() == 0) {
-        qCritical ("%s : no MEG data available here",name.toLatin1().data());
+        qCritical ("%s : no MEG data available here",name.toUtf8().data());
         goto bad;
     }
     node = meas[0];
@@ -3878,7 +3878,7 @@ int DipoleFitData::setup_forward_model(DipoleFitData *d, MneCTFCompDataSet* comp
         printf("Employing the head->MRI coordinate transform with the BEM model.\n");
         if (FwdBemModel::fwd_bem_set_head_mri_t(d->bem_model,d->mri_head_t) == FAIL)
             goto out;
-        printf("BEM model %s is now set up\n",d->bem_model->sol_name.toLatin1().constData());
+        printf("BEM model %s is now set up\n",d->bem_model->sol_name.toUtf8().constData());
         /*
          * Find the best-fitting sphere
          */
@@ -4072,13 +4072,13 @@ int DipoleFitData::make_projection(const QList<QString> &projnames, fiffChInfo c
         if ((one = mne_read_proj_op_3(projnames[k])) == NULL)
             goto bad;
         if (one->nitems == 0) {
-            printf("No linear projection information in %s.\n",projnames[k].toLatin1().data());
+            printf("No linear projection information in %s.\n",projnames[k].toUtf8().data());
             if(one)
                 delete one;
             one = NULL;
         }
         else {
-            printf("Loaded projection from %s:\n",projnames[k].toLatin1().data());
+            printf("Loaded projection from %s:\n",projnames[k].toUtf8().data());
             mne_proj_op_report_3(stderr,"\t",one);
             all = MneProjOp::mne_proj_op_combine(all,one);
             if(one)
@@ -4344,7 +4344,7 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname, cons
     if (!badname.isEmpty()) {
         if (mne_read_bad_channels_3(badname,badlist,nbad) != OK)
             goto bad;
-        printf("%d bad channels read from %s.\n",nbad,badname.toLatin1().data());
+        printf("%d bad channels read from %s.\n",nbad,badname.toUtf8().data());
     }
     if (mne_read_bad_channel_list_3(measname,file_bads,file_nbad) == OK && file_nbad > 0) {
         if (badlist.isEmpty())
@@ -4365,9 +4365,9 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname, cons
         goto bad;
 
     if (res->nmeg > 0)
-        printf("Will use %3d MEG channels from %s\n",res->nmeg,measname.toLatin1().data());
+        printf("Will use %3d MEG channels from %s\n",res->nmeg,measname.toUtf8().data());
     if (res->neeg > 0)
-        printf("Will use %3d EEG channels from %s\n",res->neeg,measname.toLatin1().data());
+        printf("Will use %3d EEG channels from %s\n",res->neeg,measname.toUtf8().data());
     {
         QString s = mne_channel_names_to_string_3(res->chs,res->nmeg+res->neeg);
         int  n;
@@ -4394,8 +4394,8 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname, cons
         else if (!file.exists())
             qPath = "./bin/resources/coilDefinitions/coil_def.dat";
 
-        char *coilfile = MALLOC_3(strlen(qPath.toLatin1().data())+1,char);
-        strcpy(coilfile,qPath.toLatin1().data());
+        char *coilfile = MALLOC_3(strlen(qPath.toUtf8().data())+1,char);
+        strcpy(coilfile,qPath.toUtf8().data());
         //#endif
 
         if (!coilfile)
@@ -4436,7 +4436,7 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname, cons
         fiffChInfo comp_chs = NULL;
         int        ncomp    = 0;
 
-        printf("%d compensation data sets in %s\n",comp_data->ncomp,measname.toLatin1().data());
+        printf("%d compensation data sets in %s\n",comp_data->ncomp,measname.toUtf8().data());
         if (mne_read_meg_comp_eeg_ch_info_3(measname,NULL,0,&comp_chs,&ncomp,NULL,NULL,NULL,NULL) == FAIL)
             goto bad;
         if (ncomp > 0) {
@@ -4445,7 +4445,7 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname, cons
                 FREE_3(comp_chs);
                 goto bad;
             }
-            printf("%d compensation channels in %s\n",comp_coils->ncoil,measname.toLatin1().data());
+            printf("%d compensation channels in %s\n",comp_coils->ncoil,measname.toUtf8().data());
         }
         FREE_3(comp_chs);
     }
@@ -4484,7 +4484,7 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname, cons
         if ((cov = mne_read_cov(noisename,FIFFV_MNE_SENSOR_COV)) == NULL)
             goto bad;
         printf("Read a %s noise-covariance matrix from %s\n",
-               cov->cov_diag ? "diagonal" : "full", noisename.toLatin1().data());
+               cov->cov_diag ? "diagonal" : "full", noisename.toUtf8().data());
     }
     else {
         if ((cov = ad_hoc_noise(res->meg_coils,res->eeg_els,grad_std,mag_std,eeg_std)) == NULL)

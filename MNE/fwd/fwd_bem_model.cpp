@@ -708,7 +708,7 @@ int FwdBemModel::fwd_bem_load_solution(const QString &name, int bem_method, FwdB
         QList<FiffDirNode::SPtr> nodes = stream->dirtree()->dir_tree_find(FIFFB_BEM);
 
         if (nodes.size() == 0) {
-            printf ("No BEM data in %s",name.toLatin1().constData());
+            printf ("No BEM data in %s",name.toUtf8().constData());
             goto not_found;
         }
         bem_node = nodes[0];
@@ -845,8 +845,8 @@ MneSurfaceOld* FwdBemModel::make_guesses(MneSurfaceOld* guess_surf, float guessr
             goto out;
         }
 
-        bemname = MALLOC_40(strlen(bemFile.fileName().toLatin1().data())+1,char);
-        strcpy(bemname,bemFile.fileName().toLatin1().data());
+        bemname = MALLOC_40(strlen(bemFile.fileName().toUtf8().data())+1,char);
+        strcpy(bemname,bemFile.fileName().toUtf8().data());
 
         if ((sphere = MneSourceSpaceOld::read_bem_surface(bemname,9003,FALSE,NULL)) == NULL)
             goto out;
@@ -863,8 +863,8 @@ MneSurfaceOld* FwdBemModel::make_guesses(MneSurfaceOld* guess_surf, float guessr
     }
     else {
         printf("Guess surface (%d = %s) is in %s coordinates\n",
-               guess_surf->id,FwdBemModel::fwd_bem_explain_surface(guess_surf->id),
-               mne_coord_frame_name_40(guess_surf->coord_frame));
+               guess_surf->id,FwdBemModel::fwd_bem_explain_surface(guess_surf->id).toUtf8().constData(),
+               mne_coord_frame_name_40(guess_surf->coord_frame).toUtf8().constData());
     }
     printf("Filtering (grid = %6.f mm)...\n",1000*grid);
     res = (MneSurfaceOld*)MneSurfaceOrVolume::make_volume_source_space(guess_surf,grid,exclude,mindist);
