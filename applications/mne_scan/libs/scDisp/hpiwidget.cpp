@@ -43,10 +43,10 @@
 
 #include <fiff/fiff_dig_point_set.h>
 
-#include <disp3D/view3D.h>
-#include <disp3D/control/control3dwidget.h>
-#include <disp3D/model/data3Dtreemodel.h>
-#include <disp3D/model/items/bem/bemtreeitem.h>
+#include <disp3D/engine/view/view3D.h>
+#include <disp3D/engine/control/control3dwidget.h>
+#include <disp3D/engine/model/data3Dtreemodel.h>
+#include <disp3D/engine/model/items/bem/bemtreeitem.h>
 
 #include <rtProcessing/rthpis.h>
 
