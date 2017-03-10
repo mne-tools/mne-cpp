@@ -393,7 +393,7 @@ QPointer<Qt3DCore::QEntity> Data3DTreeModel::getRootEntity()
 void Data3DTreeModel::initMetatypes()
 {
     //Init metatypes
-    qRegisterMetaType<QPair<MatrixX3f, MatrixX3f> >();
+    qRegisterMetaType<QPair<MatrixX3f, MatrixX3f> >("QPair<MatrixX3f, MatrixX3f>");
 
     qRegisterMetaType<Eigen::MatrixX3i>();
     qRegisterMetaType<Eigen::MatrixXd>();
