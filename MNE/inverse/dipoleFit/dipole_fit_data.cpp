@@ -1972,7 +1972,7 @@ void mne_proj_op_report_data_3(FILE *out,const char *tag, MneProjOp* op, int lis
         if (tag)
             fprintf(out,"%s",tag);
         fprintf(out,"# %d : %s : %d vecs : %d chs %s %s\n",
-                k+1,it->desc,it->nvec,it->vecs->ncol,
+                k+1,it->desc.toUtf8().constData(),it->nvec,it->vecs->ncol,
                 it->has_meg ? "MEG" : "EEG",
                 it->active ? "active" : "idle");
         if (list_data && tag)

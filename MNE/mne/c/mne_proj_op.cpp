@@ -725,7 +725,7 @@ void MneProjOp::mne_proj_op_report_data(FILE *out, const char *tag, MneProjOp *o
         if (tag)
             fprintf(out,"%s",tag);
         fprintf(out,"# %d : %s : %d vecs : %d chs %s %s\n",
-                k+1,it->desc,it->nvec,it->vecs->ncol,
+                k+1,it->desc.toUtf8().constData(),it->nvec,it->vecs->ncol,
                 it->has_meg ? "MEG" : "EEG",
                 it->active ? "active" : "idle");
         if (list_data && tag)
@@ -734,7 +734,7 @@ void MneProjOp::mne_proj_op_report_data(FILE *out, const char *tag, MneProjOp *o
             vecs = op->items[k]->vecs;
 
             for (q = 0; q < vecs->ncol; q++) {
-                fprintf(out,"%-10s",vecs->collist[q]);
+                fprintf(out,"%-10s",vecs->collist[q].toUtf8().constData());
                 fprintf(out,q < vecs->ncol-1 ? " " : "\n");
             }
             for (p = 0; p < vecs->nrow; p++)
