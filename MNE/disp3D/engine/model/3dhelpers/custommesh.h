@@ -184,6 +184,8 @@ protected:
 //    QSharedPointer<Qt3DRender::QBuffer>    m_pColorDataBuffer;     /**< The color buffer. */
 //    QSharedPointer<Qt3DRender::QBuffer>    m_pIndexDataBuffer;     /**< The index buffer. */
 
+    Qt3DRender::QGeometry*  m_pCustomGeometry;      /**< The custom geometry. */
+
     int                     m_iNumVert;             /**< The total number of set vertices. */
 };
 

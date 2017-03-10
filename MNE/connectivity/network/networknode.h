@@ -108,14 +108,6 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns all edges(undirected gaph).
-    *
-    * @return   Returns the list with all edges beloning to the node.
-    */
-    const QList<QSharedPointer<NetworkEdge> >& getEdges() const;
-
-    //=========================================================================================================
-    /**
     * Returns the ingoing edges.
     *
     * @return   Returns the list with all ingoing edges.
@@ -129,6 +121,14 @@ public:
     * @return   Returns the list with all outgoing edges.
     */
     const QList<QSharedPointer<NetworkEdge>>& getEdgesOut() const;
+
+    //=========================================================================================================
+    /**
+    * Returns the number of all edges.
+    *
+    * @return   Returns the number of all edges.
+    */
+    int getNumberEdges() const;
 
     //=========================================================================================================
     /**

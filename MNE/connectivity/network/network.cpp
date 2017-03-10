@@ -88,7 +88,7 @@ Network::Network(const QString& sConnectivityMethod)
 
 //*************************************************************************************************************
 
-const MatrixXd& Network::getConnectivityMatrix() const
+MatrixXd Network::getConnectivityMatrix() const
 {
     return generateConnectMat();
 }
@@ -178,7 +178,7 @@ Network& Network::operator<<(NetworkNode::SPtr newNode)
 
 //*************************************************************************************************************
 
-const MatrixXd& Network::generateConnectMat() const
+MatrixXd Network::generateConnectMat() const
 {
     MatrixXd matDist(m_lNodes.size(), m_lNodes.size());
     matDist.setZero();

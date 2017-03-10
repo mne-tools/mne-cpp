@@ -281,19 +281,27 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
         }
 
         case MetaTreeItemTypes::NetworkThreshold: {
-            Spline* pSpline = new Spline("Spline Histogram", 0);
+            Spline* pSpline = new Spline("Set Threshold", 0);
             connect(pSpline, static_cast<void (Spline::*)(double, double, double)>(&Spline::borderChanged),
                 this, &Data3DTreeDelegate::onEditorEdited);
 
-            QStandardItem* pParentItem = static_cast<QStandardItem*>(pAbstractItem->QStandardItem::parent());
-            QModelIndex indexParent = pData3DTreeModel->indexFromItem(pParentItem);
-            MatrixXd matRTData = index.model()->data(indexParent, Data3DTreeModelItemRoles::NetworkDataMatrix).value<MatrixXd>();
-            Eigen::VectorXd resultClassLimit;
-            Eigen::VectorXi resultFrequency;
-            MNEMath::histcounts(matRTData, false, 50, resultClassLimit, resultFrequency, 0.0, 0.0);
-            pSpline->setData(resultClassLimit, resultFrequency, 0);
-            QVector3D vecThresholdValues = index.model()->data(index, MetaTreeItemRoles::NetworkThreshold).value<QVector3D>();
-            pSpline->setThreshold(vecThresholdValues);
+            //Find the parent and retreive network data to calcualte the histogram
+            if(AbstractTreeItem* pParentItem = static_cast<AbstractTreeItem*>(pAbstractItem->QStandardItem::parent())) {
+                QModelIndex indexParent = pData3DTreeModel->indexFromItem(pParentItem);
+
+                //Get data
+                MatrixXd matNetworkData = index.model()->data(indexParent, Data3DTreeModelItemRoles::NetworkDataMatrix).value<MatrixXd>();
+
+                //Calcualte histogram
+                Eigen::VectorXd resultClassLimit;
+                Eigen::VectorXi resultFrequency;
+                MNEMath::histcounts(matNetworkData, false, 50, resultClassLimit, resultFrequency, 0.0, 0.0);
+
+                //Create histogram plot
+                pSpline->setData(resultClassLimit, resultFrequency, 0);
+                QVector3D vecThresholdValues = index.model()->data(index, MetaTreeItemRoles::NetworkThreshold).value<QVector3D>();
+                pSpline->setThreshold(vecThresholdValues);
+            }
 
             return pSpline;
         }
@@ -472,19 +480,37 @@ void Data3DTreeDelegate::setEditorData(QWidget* editor, const QModelIndex& index
         }        
 
         case MetaTreeItemTypes::NetworkThreshold: {
-            Spline* pSpline = static_cast<Spline*>(editor);
-            int width = pSpline->size().width();
-            int height = pSpline->size().height();
-            if (pSpline->size().width() < 200 && pSpline->size().height() < 200)   //pSpline initializes with size (137,15)
-            {
-                pSpline->resize(800,600);   //resize histogram to be readable with default size
+            if(Spline* pSpline = static_cast<Spline*>(editor)) {
+                //Find the parent and retreive network data to calcualte the histogram
+                if(AbstractTreeItem* pParentItem = static_cast<AbstractTreeItem*>(pAbstractItem->QStandardItem::parent())) {
+                    QModelIndex indexParent = pData3DTreeModel->indexFromItem(pParentItem);
+
+                    //Get data
+                    MatrixXd matNetworkData = index.model()->data(indexParent, Data3DTreeModelItemRoles::NetworkDataMatrix).value<MatrixXd>();
+
+                    //Calcualte histogram
+                    Eigen::VectorXd resultClassLimit;
+                    Eigen::VectorXi resultFrequency;
+                    MNEMath::histcounts(matNetworkData, false, 50, resultClassLimit, resultFrequency, 0.0, 0.0);
+
+                    //Create histogram plot
+                    pSpline->setData(resultClassLimit, resultFrequency, 0);
+                    QVector3D vecThresholdValues = index.model()->data(index, MetaTreeItemRoles::NetworkThreshold).value<QVector3D>();
+                    pSpline->setThreshold(vecThresholdValues);
+                }
+
+                int width = pSpline->size().width();
+                int height = pSpline->size().height();
+                //pSpline initializes with size (137,15)
+                if (pSpline->size().width() < 200 && pSpline->size().height() < 200) {
+                    pSpline->resize(800,600);   //resize histogram to be readable with default size
+                } else {
+                    width = pSpline->size().width();   //keeps the size of the histogram
+                    height = pSpline->size().height();
+                    pSpline->resize(width,height);
+                }
             }
-            else
-            {
-                width = pSpline->size().width();   //keeps the size of the histogram
-                height = pSpline->size().height();
-                pSpline->resize(width,height);
-            }
+
             return;
         }
 
@@ -537,17 +563,18 @@ void Data3DTreeDelegate::setModelData(QWidget* editor, QAbstractItemModel* model
         }
 
         case MetaTreeItemTypes::DistributedSourceLocThreshold: {
-            Spline* pSpline = static_cast<Spline*>(editor);
-            QVector3D returnVector;
-            returnVector = pSpline->getThreshold();
+            if(Spline* pSpline = static_cast<Spline*>(editor)) {
+                QVector3D returnVector;
+                returnVector = pSpline->getThreshold();
 
-            QString displayThreshold;
-            displayThreshold = QString("%1,%2,%3").arg(returnVector.x()).arg(returnVector.y()).arg(returnVector.z());
-            QVariant dataDisplay;
-            dataDisplay.setValue(displayThreshold);
+                QString displayThreshold;
+                displayThreshold = QString("%1,%2,%3").arg(returnVector.x()).arg(returnVector.y()).arg(returnVector.z());
+                QVariant dataDisplay;
+                dataDisplay.setValue(displayThreshold);
 
-            model->setData(index, dataDisplay, Qt::DisplayRole);
-            model->setData(index, returnVector, MetaTreeItemRoles::DistributedSourceLocThreshold);
+                model->setData(index, dataDisplay, Qt::DisplayRole);
+                model->setData(index, returnVector, MetaTreeItemRoles::DistributedSourceLocThreshold);
+            }
             return;
         }
 
@@ -676,17 +703,19 @@ void Data3DTreeDelegate::setModelData(QWidget* editor, QAbstractItemModel* model
         }
 
         case MetaTreeItemTypes::NetworkThreshold: {
-            Spline* pSpline = static_cast<Spline*>(editor);
-            QVector3D returnVector;
-            returnVector = pSpline->getThreshold();
+            if(Spline* pSpline = static_cast<Spline*>(editor)) {
+                QVector3D returnVector;
+                returnVector = pSpline->getThreshold();
 
-            QString displayThreshold;
-            displayThreshold = QString("%1,%2,%3").arg(returnVector.x()).arg(returnVector.y()).arg(returnVector.z());
-            QVariant dataDisplay;
-            dataDisplay.setValue(displayThreshold);
-            model->setData(index, dataDisplay, Qt::DisplayRole);
+                QString displayThreshold;
+                displayThreshold = QString("%1,%2,%3").arg(returnVector.x()).arg(returnVector.y()).arg(returnVector.z());
+                QVariant dataDisplay;
+                dataDisplay.setValue(displayThreshold);
+                model->setData(index, dataDisplay, Qt::DisplayRole);
 
-            model->setData(index, returnVector, MetaTreeItemRoles::NetworkThreshold);
+                model->setData(index, returnVector, MetaTreeItemRoles::NetworkThreshold);
+            }
+
             return;
         }
 
@@ -710,8 +739,11 @@ void Data3DTreeDelegate::updateEditorGeometry(QWidget* editor, const QStyleOptio
 
 void Data3DTreeDelegate::onEditorEdited()
 {
-    QWidget* editor = qobject_cast<QWidget*>(QObject::sender());
-    emit commitData(editor);
+    qDebug() << "Data3DTreeDelegate::onEditorEdited() - 0";
+    if(QWidget* editor = qobject_cast<QWidget*>(QObject::sender())) {
+        emit commitData(editor);
+    }
+    qDebug() << "Data3DTreeDelegate::onEditorEdited() - 1";
 }
 
 
