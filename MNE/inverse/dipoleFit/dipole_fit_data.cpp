@@ -1981,7 +1981,7 @@ void mne_proj_op_report_data_3(FILE *out,const char *tag, MneProjOp* op, int lis
             vecs = op->items[k]->vecs;
 
             for (q = 0; q < vecs->ncol; q++) {
-                fprintf(out,"%-10s",vecs->collist[q]);
+                fprintf(out,"%-10s",vecs->collist[q].toUtf8().constData());
                 fprintf(out,q < vecs->ncol-1 ? " " : "\n");
             }
             for (p = 0; p < vecs->nrow; p++)
