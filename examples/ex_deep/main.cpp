@@ -91,7 +91,7 @@ int main(int argc, char *argv[])
 
     Deep deepTest;
 
-    deepTest.test();
+    deepTest.testClone();
 
 
     return a.exec();
