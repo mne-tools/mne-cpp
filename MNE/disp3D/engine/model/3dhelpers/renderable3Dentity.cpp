@@ -126,7 +126,7 @@ Renderable3DEntity::~Renderable3DEntity()
 void Renderable3DEntity::setVertColor(const QByteArray& tArrayColors)
 {
     if(m_pCustomMesh) {
-        m_pCustomMesh->setVertColor(tArrayColors);
+        m_pCustomMesh->setColor(tArrayColors);
     }
 }
 
