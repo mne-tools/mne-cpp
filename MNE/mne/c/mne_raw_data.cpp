@@ -2042,7 +2042,7 @@ MneRawData *MneRawData::mne_raw_open_file_comp(const QString& name, int omit_ski
         FREE_CMATRIX_36(vals);
         fprintf(stderr,"Initial dc offsets determined\n");
     }
-    fprintf(stderr,"Raw data file %s:\n",name);
+    fprintf(stderr,"Raw data file %s:\n",name.toUtf8().constData());
     fprintf(stderr,"\tnchan  = %d\n",data->info->nchan);
     fprintf(stderr,"\tnsamp  = %d\n",data->nsamp);
     fprintf(stderr,"\tsfreq  = %-8.3f Hz\n",data->info->sfreq);
