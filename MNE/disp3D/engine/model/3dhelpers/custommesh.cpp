@@ -86,7 +86,7 @@ CustomMesh::CustomMesh()
 
 CustomMesh::CustomMesh(const MatrixX3f& tMatVert,
                        const MatrixX3f& tMatNorm,
-                       const MatrixX3i& tMatTris,
+                       const MatrixXi& tMatTris,
                        const MatrixX3f& tMatColors,
                        Qt3DRender::QGeometryRenderer::PrimitiveType primitiveType)
 : Qt3DRender::QGeometryRenderer()
@@ -238,7 +238,7 @@ void CustomMesh::setVertex(const Eigen::MatrixX3f& tMatVert)
 
 //*************************************************************************************************************
 
-void CustomMesh::setIndex(const Eigen::MatrixX3i& tMatTris)
+void CustomMesh::setIndex(const Eigen::MatrixXi& tMatTris)
 {
     QByteArray indexBufferData;
     indexBufferData.resize(tMatTris.rows() * tMatTris.cols() * (int)sizeof(uint));

@@ -195,7 +195,8 @@ bool NetworkTreeItem::addData(const Network& tNetworkData)
     this->setData(data, Data3DTreeModelItemRoles::NetworkDataMatrix);
 
     //Plot network
-    plotNetwork(tNetworkData, m_pItemNetworkThreshold->data(MetaTreeItemRoles::NetworkThreshold).value<QVector3D>());
+    plotNetwork(tNetworkData,
+                m_pItemNetworkThreshold->data(MetaTreeItemRoles::NetworkThreshold).value<QVector3D>());
 
     return true;
 }
@@ -341,11 +342,15 @@ void NetworkTreeItem::plotNetwork(const Network& tNetworkData, const QVector3D& 
 
     for(int i = 0; i < matLineColor.rows(); ++i) {
         matLineColor(i,0) = 0.0f;
-        matLineColor(i,0) = 0.0f;
-        matLineColor(i,0) = 1.0f;
+        matLineColor(i,1) = 0.0f;
+        matLineColor(i,2) = 1.0f;
     }
 
-    m_pRenderable3DEntity->getCustomMesh()->setMeshData(tMatVert, tMatNorm, tMatLines, matLineColor, Qt3DRender::QGeometryRenderer::Lines);
+    m_pRenderable3DEntity->getCustomMesh()->setMeshData(tMatVert,
+                                                        tMatNorm,
+                                                        tMatLines,
+                                                        matLineColor,
+                                                        Qt3DRender::QGeometryRenderer::Lines);
 }
 
 
