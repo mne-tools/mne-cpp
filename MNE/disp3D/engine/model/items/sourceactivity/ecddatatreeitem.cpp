@@ -230,7 +230,12 @@ void EcdDataTreeItem::plotDipoles(const ECDSet& tECDSet)
 
         Qt3DExtras::QConeMesh* dipoleCone = new Qt3DExtras::QConeMesh();
         dipoleCone->setBottomRadius(0.001f);
-        dipoleCone->setLength(0.003f);
+
+        //Calculate cone length based on norm 0.1mm -> 1nAm
+        double cm = 0.001;
+        double scale = (pow(10,-9))/(cm*0.01);
+        dipoleCone->setLength(norm/scale);
+//        qDebug()<<"setLength"<<norm/scale;
 
         dipoleEntity->addComponent(dipoleCone);
 

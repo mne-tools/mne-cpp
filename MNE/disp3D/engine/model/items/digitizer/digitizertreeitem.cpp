@@ -135,7 +135,7 @@ void  DigitizerTreeItem::setData(const QVariant& value, int role)
     switch(role) {
     case Data3DTreeModelItemRoles::SurfaceCurrentColorVert:
         if(!m_pRenderable3DEntity.isNull()) {
-            m_pRenderable3DEntity->setVertColor(value.value<QByteArray>());
+            m_pRenderable3DEntity->getCustomMesh()->setColor(value.value<QByteArray>());
         }
         break;
     }

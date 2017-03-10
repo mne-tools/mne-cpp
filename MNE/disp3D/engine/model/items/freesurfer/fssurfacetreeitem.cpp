@@ -131,7 +131,7 @@ void FsSurfaceTreeItem::setData(const QVariant& value, int role)
 
     switch(role) {
         case Data3DTreeModelItemRoles::SurfaceCurrentColorVert:
-            m_pRenderable3DEntity->setVertColor(value.value<QByteArray>());
+            m_pRenderable3DEntity->getCustomMesh()->setColor(value.value<QByteArray>());
             break;
 
         default: // do nothing;
@@ -154,7 +154,7 @@ void FsSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* pare
     QByteArray arrayCurvatureColor = createCurvatureVertColor(tSurface.curv());
 
     //Set renderable 3D entity mesh and color data
-    m_pRenderable3DEntity->setMeshData(tSurface.rr(), tSurface.nn(), tSurface.tris(), arrayCurvatureColor, Qt3DRender::QGeometryRenderer::Triangles);
+    m_pRenderable3DEntity->getCustomMesh()->setMeshData(tSurface.rr(), tSurface.nn(), tSurface.tris(), arrayCurvatureColor, Qt3DRender::QGeometryRenderer::Triangles);
 
     //Set shaders
     PerVertexPhongAlphaMaterial* pPerVertexPhongAlphaMaterial = new PerVertexPhongAlphaMaterial();

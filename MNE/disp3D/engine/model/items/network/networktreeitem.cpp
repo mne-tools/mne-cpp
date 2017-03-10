@@ -348,7 +348,7 @@ void NetworkTreeItem::plotNetwork(const Network& tNetworkData, const QVector3D& 
         rawColorArray[idxColor++] = 1.0f;
     }
 
-    m_pRenderable3DEntity->setMeshData(tMatVert, tMatNorm, tMatLines, arrayLineColor, Qt3DRender::QGeometryRenderer::Lines);
+    m_pRenderable3DEntity->getCustomMesh()->setMeshData(tMatVert, tMatNorm, tMatLines, arrayLineColor, Qt3DRender::QGeometryRenderer::Lines);
 }
 
 
