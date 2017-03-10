@@ -115,7 +115,7 @@ NetworkTreeItem::~NetworkTreeItem()
         m_lNodes.at(i)->deleteLater();
     }
 
-    if(!m_pRenderable3DEntity.isNull()) {
+    if(m_pRenderable3DEntity) {
         m_pRenderable3DEntity->deleteLater();
     }
 }
@@ -142,7 +142,7 @@ void  NetworkTreeItem::setData(const QVariant& value, int role)
 bool NetworkTreeItem::init(Qt3DCore::QEntity* parent)
 {
     //Create renderable 3D entity
-    m_pRenderable3DEntity = new Renderable3DEntity(parent);
+    m_pRenderable3DEntity->setParent(parent);
 
     //Set shaders
     NetworkMaterial* pNetworkMaterial = new NetworkMaterial();
