@@ -105,11 +105,11 @@ FsSurfaceTreeItem::FsSurfaceTreeItem(int iType, const QString& text)
 FsSurfaceTreeItem::~FsSurfaceTreeItem()
 {
     //Schedule deletion/Decouple of all entities so that the SceneGraph is NOT plotting them anymore.
-    if(!m_pRenderable3DEntity) {
+    if(m_pRenderable3DEntity) {
         m_pRenderable3DEntity->deleteLater();
     }
 
-    if(!m_pRenderable3DEntityNormals) {
+    if(m_pRenderable3DEntityNormals) {
         m_pRenderable3DEntityNormals->deleteLater();
     }
 }
@@ -145,7 +145,7 @@ void FsSurfaceTreeItem::setData(const QVariant& value, int role)
 void FsSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* parent)
 {
     //Create renderable 3D entity
-    m_pRenderable3DEntity = new Renderable3DEntity(parent);
+    m_pRenderable3DEntity->setParent(parent);
 
     //Initial transformation also regarding the surface offset
     m_pRenderable3DEntity->setPosition(QVector3D(-tSurface.offset()(0), -tSurface.offset()(1), -tSurface.offset()(2)));

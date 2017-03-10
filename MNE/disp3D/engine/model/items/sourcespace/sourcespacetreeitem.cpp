@@ -107,7 +107,7 @@ SourceSpaceTreeItem::SourceSpaceTreeItem(int iType, const QString& text)
 SourceSpaceTreeItem::~SourceSpaceTreeItem()
 {
     //Schedule deletion/Decouple of all entities so that the SceneGraph is NOT plotting them anymore.
-    if(!m_pRenderable3DEntity.isNull()) {
+    if(m_pRenderable3DEntity) {
         m_pRenderable3DEntity->deleteLater();
     }
 }
@@ -140,7 +140,7 @@ void  SourceSpaceTreeItem::setData(const QVariant& value, int role)
 void SourceSpaceTreeItem::addData(const MNEHemisphere& tHemisphere, Qt3DCore::QEntity* parent)
 {
     //Create renderable 3D entity
-    m_pRenderable3DEntity = new Renderable3DEntity(parent);
+    m_pRenderable3DEntity->setParent(parent);
 
     //Create sources as small 3D spheres
     RowVector3f sourcePos;

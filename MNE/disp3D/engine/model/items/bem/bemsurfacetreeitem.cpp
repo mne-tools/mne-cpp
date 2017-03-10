@@ -99,9 +99,7 @@ BemSurfaceTreeItem::BemSurfaceTreeItem(int iType, const QString& text)
 BemSurfaceTreeItem::~BemSurfaceTreeItem()
 {
     //Schedule deletion/Decouple of all entities so that the SceneGraph is NOT plotting them anymore.
-    if(!m_pRenderable3DEntity.isNull()) {
-        m_pRenderable3DEntity->deleteLater();
-    }
+    m_pRenderable3DEntity->deleteLater();
 }
 
 
@@ -134,7 +132,7 @@ void  BemSurfaceTreeItem::setData(const QVariant& value, int role)
 void BemSurfaceTreeItem::addData(const MNEBemSurface& tBemSurface, Qt3DCore::QEntity* parent)
 {
     //Create renderable 3D entity
-    m_pRenderable3DEntity = new Renderable3DEntity(parent);
+    m_pRenderable3DEntity->setParent(parent);
 
     //Create color from curvature information with default gyri and sulcus colors
     MatrixX3f matVertColor = createVertColor(tBemSurface.rr);
