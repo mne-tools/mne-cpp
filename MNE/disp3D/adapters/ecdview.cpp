@@ -40,9 +40,7 @@
 
 #include "ecdview.h"
 
-#include "../engine/view/view3D.h"
 #include "../engine/model/data3Dtreemodel.h"
-#include "../engine/control/control3dwidget.h"
 
 #include <inverse/dipoleFit/dipole_fit_settings.h>
 #include <inverse/dipoleFit/ecd_set.h>
@@ -73,28 +71,14 @@ using namespace MNELIB;
 //=============================================================================================================
 
 ECDView::ECDView(const DipoleFitSettings& dipFitSettings, const ECDSet& ecdSet, QWidget* parent)
-: QWidget(parent)
-, m_p3DView(View3D::SPtr(new View3D()))
-, m_pData3DModel(Data3DTreeModel::SPtr(new Data3DTreeModel()))
+: AbstractView(parent)
 {
-    //Init 3D View
-    m_p3DView->setModel(m_pData3DModel);
-
-    QStringList slControlFlags;
-    slControlFlags << "Data" << "View" << "Light";
-    m_pControl3DView = Control3DWidget::SPtr(new Control3DWidget(this, slControlFlags));
-
-    m_pControl3DView->init(m_pData3DModel, m_p3DView);
-
     //Read mri transform
     QFile file(dipFitSettings.mriname);
     ECDSet ecdSetTrans = ecdSet;
 
     if(file.exists()) {
         FiffCoordTrans coordTrans(file);
-
-//        std::cout << std::endl << "coordTrans" << coordTrans.trans;
-//        std::cout << std::endl << "coordTransInv" << coordTrans.invtrans;
 
         for(int i = 0; i < ecdSet.size() ; ++i) {
             MatrixX3f dipoles(1, 3);
@@ -132,19 +116,10 @@ ECDView::ECDView(const DipoleFitSettings& dipFitSettings, const ECDSet& ecdSet, 
 
     if(t_fileBem.exists()) {
         MNEBem t_Bem(t_fileBem);
-        //m_pData3DModel->addBemData("sample", "BEM", t_Bem);
+        m_pData3DModel->addBemData("sample", "BEM", t_Bem);
     } else {
         qCritical("ECDView::ECDView - Cannot open MNEBem file");
-    }
-
-    //Create widget GUI
-    QGridLayout *mainLayoutView = new QGridLayout;
-    QWidget *pWidgetContainer = QWidget::createWindowContainer(m_p3DView.data());
-    pWidgetContainer->setMinimumSize(400,400);
-    mainLayoutView->addWidget(pWidgetContainer,0,0);
-    mainLayoutView->addWidget(m_pControl3DView.data(),0,1);
-
-    this->setLayout(mainLayoutView);
+    }   
 }
 
 

@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     ecdview.h
+* @file     abstractview.cpp
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,20 +29,24 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    ECDView class declaration.
+* @brief    AbstractView class definition.
 *
 */
-
-#ifndef ECDVIEW_H
-#define ECDVIEW_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../disp3D_global.h"
 #include "abstractview.h"
+
+#include "../engine/view/view3D.h"
+#include "../engine/model/data3Dtreemodel.h"
+#include "../engine/control/control3dwidget.h"
+
+#include <inverse/dipoleFit/dipole_fit_settings.h>
+#include <inverse/dipoleFit/ecd_set.h>
+#include <mne/mne_bem.h>
 
 
 //*************************************************************************************************************
@@ -50,65 +54,59 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QSharedPointer>
+#include <QGridLayout>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// USED NAMESPACES
 //=============================================================================================================
 
-namespace INVERSELIB {
-    class DipoleFitSettings;
-    class ECDSet;
+using namespace DISP3DLIB;
+using namespace INVERSELIB;
+using namespace MNELIB;
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+AbstractView::AbstractView(QWidget* parent)
+: QWidget(parent)
+, m_p3DView(View3D::SPtr(new View3D()))
+, m_pData3DModel(Data3DTreeModel::SPtr(new Data3DTreeModel()))
+{
+    //Init 3D View
+    m_p3DView->setModel(m_pData3DModel);
+
+    QStringList slControlFlags;
+    slControlFlags << "Data" << "View" << "Light";
+    m_pControl3DView = Control3DWidget::SPtr(new Control3DWidget(this, slControlFlags));
+
+    m_pControl3DView->init(m_pData3DModel, m_p3DView);
+
+    createGUI();
 }
 
 
 //*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE DISP3DLIB
-//=============================================================================================================
 
-namespace DISP3DLIB
+AbstractView::~AbstractView()
 {
+}
 
 
 //*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
 
-
-//=============================================================================================================
-/**
-* Adapter which provides visualization for ECD data and a control widget.
-*
-* @brief Visualizes ECD data.
-*/
-class DISP3DNEWSHARED_EXPORT ECDView : public AbstractView
+void AbstractView::createGUI()
 {
-    Q_OBJECT
+    //Create widget GUI
+    QGridLayout *mainLayoutView = new QGridLayout;
+    QWidget *pWidgetContainer = QWidget::createWindowContainer(m_p3DView.data());
+    pWidgetContainer->setMinimumSize(400,400);
+    mainLayoutView->addWidget(pWidgetContainer,0,0);
+    mainLayoutView->addWidget(m_pControl3DView.data(),0,1);
 
-public:
-    typedef QSharedPointer<ECDView> SPtr;             /**< Shared pointer type for ECDView class. */
-    typedef QSharedPointer<const ECDView> ConstSPtr;  /**< Const shared pointer type for ECDView class. */
-
-    //=========================================================================================================
-    /**
-    * Default constructor
-    *
-    */
-    explicit ECDView(const INVERSELIB::DipoleFitSettings& dipFitSettings, const INVERSELIB::ECDSet& ecdSet, QWidget *parent = 0);
-
-    //=========================================================================================================
-    /**
-    * Default destructor
-    */
-    ~ECDView();
-
-protected:
-};
-
-} // NAMESPACE
-
-#endif // ECDVIEW_H
+    this->setLayout(mainLayoutView);
+}
