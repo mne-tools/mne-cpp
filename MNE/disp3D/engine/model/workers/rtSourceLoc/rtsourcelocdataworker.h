@@ -121,8 +121,8 @@ struct VisualizationInfo {
     double                      dThresholdX;
     double                      dThresholdZ;
     QRgb (*functionHandlerColorMap)(double v);
-    QByteArray                  arrayOriginalVertColor;
-    QByteArray                  arrayFinalVertColor;
+    MatrixX3f                   matOriginalVertColor;
+    MatrixX3f                   matFinalVertColor;
 };
 
 //*************************************************************************************************************
@@ -194,11 +194,11 @@ public:
     /**
     * Set surface color data which the streamed data is plotted on.
     *
-    * @param[in] arraySurfaceVertColorLeftHemi      The vertex colors for the left hemipshere surface where the data is to be plotted on.
-    * @param[in] arraySurfaceVertColorRightHemi     The vertex colors for the right hemipshere surface where the data is to be plotted on.
+    * @param[in] matSurfaceVertColorLeftHemi      The vertex colors for the left hemipshere surface where the data is to be plotted on.
+    * @param[in] matSurfaceVertColorRightHemi     The vertex colors for the right hemipshere surface where the data is to be plotted on.
     */
-    void setSurfaceColor(const QByteArray& arraySurfaceVertColorLeftHemi,
-                        const QByteArray& arraySurfaceVertColorRightHemi);
+    void setSurfaceColor(const MatrixX3f &matSurfaceVertColorLeftHemi,
+                        const MatrixX3f &matSurfaceVertColorRightHemi);
 
     //=========================================================================================================
     /**
@@ -283,9 +283,9 @@ private:
     *
     * @param[in] vSourceColorSamples        The color data for the sources.
     *
-    * @return                               Returns the final colors in form of a QByteArray for the left and right hemisphere.
+    * @return                               Returns the final colors in for the left and right hemisphere.
     */
-    QPair<QByteArray, QByteArray> performVisualizationTypeCalculation(const Eigen::VectorXd& vSourceColorSamples);
+    QPair<MatrixX3f, MatrixX3f> performVisualizationTypeCalculation(const Eigen::VectorXd& vSourceColorSamples);
 
     //=========================================================================================================
     /**
@@ -317,9 +317,9 @@ signals:
     /**
     * Emit this signal whenever this item should send new colors to its listeners.
     *
-    * @param[in] colorPair     The samples data in form of a QPair rgb colors as QByteArray for each (left, right) hemisphere.
+    * @param[in] colorPair     The samples data in form of a QPair rgb colors for each (left, right) hemisphere.
     */
-    void newRtData(const QPair<QByteArray, QByteArray>& colorPair);
+    void newRtData(const QPair<MatrixX3f, MatrixX3f>& colorPair);
 };
 
 } // NAMESPACE

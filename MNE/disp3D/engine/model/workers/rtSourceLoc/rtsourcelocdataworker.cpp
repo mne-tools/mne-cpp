@@ -167,19 +167,17 @@ void generateSmoothOperator(SmoothOperatorInfo& input)
 
 //*************************************************************************************************************
 
-void transformDataToColor(const VectorXd& data, QByteArray& arrayFinalVertColor, double dTrehsoldX, double dTrehsoldZ, QRgb (*functionHandlerColorMap)(double v))
+void transformDataToColor(const VectorXd& data, MatrixX3f& matFinalVertColor, double dTrehsoldX, double dTrehsoldZ, QRgb (*functionHandlerColorMap)(double v))
 {
     //Note: This function needs to be implemented extremley efficient. That is why we have three if clauses.
     //      Otherwise we would have to check which color map to take for each vertex.
     //QElapsedTimer timer;
     //timer.start();
 
-    if(data.rows() != arrayFinalVertColor.size()/(3*sizeof(float))) {
-        qDebug() << "RtSourceLocDataWorker::transformDataToColor - Sizes of input data (" <<data.rows() <<") do not match color byte array("<< arrayFinalVertColor.size()/(3*sizeof(float)) <<"). Returning ...";
+    if(data.rows() != matFinalVertColor.rows()) {
+        qDebug() << "RtSourceLocDataWorker::transformDataToColor - Sizes of input data (" <<data.rows() <<") do not match output data ("<< matFinalVertColor.rows() <<"). Returning ...";
     }
 
-    float *rawArrayColors = reinterpret_cast<float *>(arrayFinalVertColor.data());
-    int idxColor = 0;
     float dSample;
     QRgb qRgb;
     double dTrehsoldDiff = dTrehsoldZ - dTrehsoldX;
@@ -199,11 +197,9 @@ void transformDataToColor(const VectorXd& data, QByteArray& arrayFinalVertColor,
 
             qRgb = functionHandlerColorMap(dSample);
 
-            rawArrayColors[idxColor++] = (float)qRed(qRgb)/255.0f;
-            rawArrayColors[idxColor++] = (float)qGreen(qRgb)/255.0f;
-            rawArrayColors[idxColor++] = (float)qBlue(qRgb)/255.0f;
-        } else {
-            idxColor += 3;
+            matFinalVertColor(r,0) = (float)qRed(qRgb)/255.0f;
+            matFinalVertColor(r,1) = (float)qGreen(qRgb)/255.0f;
+            matFinalVertColor(r,2) = (float)qBlue(qRgb)/255.0f;
         }
     }
 
@@ -214,18 +210,10 @@ void transformDataToColor(const VectorXd& data, QByteArray& arrayFinalVertColor,
 
 //*************************************************************************************************************
 
-void transformDataToColor(float fSample, QByteArray& arrayFinalVertColor, double dTrehsoldX, double dTrehsoldZ, QRgb (*functionHandlerColorMap)(double v))
+void transformDataToColor(float fSample, QColor& finalVertColor, double dTrehsoldX, double dTrehsoldZ, QRgb (*functionHandlerColorMap)(double v))
 {
     //Note: This function needs to be implemented extremley efficient. That is why we have three if clauses.
     //      Otherwise we would have to check which color map to take for each vertex.
-    if(arrayFinalVertColor.size()/(sizeof(float)) != 3) {
-        qDebug() << "RtSourceLocDataWorker::transformDataToColor - Sizes of input QByteArray must be 3. Returning ...";
-    }
-
-    int idxColor = 0;
-
-    float *rawArrayColors = reinterpret_cast<float *>(arrayFinalVertColor.data());
-
     double dTrehsoldDiff = dTrehsoldZ - dTrehsoldX;
 
     //Check lower and upper thresholds and normalize to one
@@ -240,9 +228,9 @@ void transformDataToColor(float fSample, QByteArray& arrayFinalVertColor, double
     QRgb qRgb;
     qRgb = (functionHandlerColorMap)(fSample);
 
-    rawArrayColors[idxColor++] = (float)qRed(qRgb)/255.0f;
-    rawArrayColors[idxColor++] = (float)qGreen(qRgb)/255.0f;
-    rawArrayColors[idxColor++] = (float)qBlue(qRgb)/255.0f;
+    finalVertColor.setRedF((float)qRed(qRgb)/255.0f);
+    finalVertColor.setGreenF((float)qGreen(qRgb)/255.0f);
+    finalVertColor.setBlueF((float)qBlue(qRgb)/255.0f);
 }
 
 
@@ -250,20 +238,16 @@ void transformDataToColor(float fSample, QByteArray& arrayFinalVertColor, double
 
 void generateColorsPerVertex(VisualizationInfo& input)
 {
-    //Left hemisphere
-    float *rawArrayCurrentVertColor = reinterpret_cast<float *>(input.arrayFinalVertColor.data());
-    QByteArray sourceColorSample;
-    sourceColorSample.resize(3 * sizeof(float));
+    QColor color;
 
     //Fill final QByteArray with colors based on the current anatomical information
     for(int i = 0; i < input.vVertNo.rows(); ++i) {
         if(input.vSourceColorSamples(i) >= input.dThresholdX) {
-            transformDataToColor(input.vSourceColorSamples(i), sourceColorSample, input.dThresholdX, input.dThresholdZ, input.functionHandlerColorMap);
-            const float *rawSourceColorSamplesColor = reinterpret_cast<const float *>(sourceColorSample.data());
+            transformDataToColor(input.vSourceColorSamples(i), color, input.dThresholdX, input.dThresholdZ, input.functionHandlerColorMap);
 
-            rawArrayCurrentVertColor[input.vVertNo(i)*3+0] = rawSourceColorSamplesColor[0];
-            rawArrayCurrentVertColor[input.vVertNo(i)*3+1] = rawSourceColorSamplesColor[1];
-            rawArrayCurrentVertColor[input.vVertNo(i)*3+2] = rawSourceColorSamplesColor[2];
+            input.matFinalVertColor(input.vVertNo(i),0) = color.redF();
+            input.matFinalVertColor(input.vVertNo(i),1) = color.greenF();
+            input.matFinalVertColor(input.vVertNo(i),2) = color.blueF();
         }
     }
 }
@@ -285,10 +269,7 @@ void generateColorsPerAnnotation(VisualizationInfo& input)
     }
 
     //Color all labels respectivley to their activation
-    QByteArray sourceColorSample;
-    sourceColorSample.resize(3 * sizeof(float));
-
-    float *rawArrayCurrentVertColor = reinterpret_cast<float *>(input.arrayFinalVertColor.data());
+    QColor color;
 
     for(int i = 0; i<input.lLabels.size(); i++) {
         FSLIB::Label label = input.lLabels.at(i);
@@ -296,13 +277,12 @@ void generateColorsPerAnnotation(VisualizationInfo& input)
         //Transform label activations to rgb colors
         //Check if value is bigger than lower threshold. If not, don't plot activation
         if(vecLabelActivation[label.label_id] >= input.dThresholdX) {
-            transformDataToColor(vecLabelActivation[label.label_id], sourceColorSample, input.dThresholdX, input.dThresholdZ, input.functionHandlerColorMap);
-            float *rawArrayLabelColors = reinterpret_cast<float *>(sourceColorSample.data());
+            transformDataToColor(vecLabelActivation[label.label_id], color, input.dThresholdX, input.dThresholdZ, input.functionHandlerColorMap);
 
             for(int j = 0; j<label.vertices.rows(); j++) {
-                rawArrayCurrentVertColor[label.vertices(j)*3+0] = rawArrayLabelColors[0];
-                rawArrayCurrentVertColor[label.vertices(j)*3+1] = rawArrayLabelColors[1];
-                rawArrayCurrentVertColor[label.vertices(j)*3+2] = rawArrayLabelColors[2];
+                input.matFinalVertColor(label.vertices(j),0) = color.redF();
+                input.matFinalVertColor(label.vertices(j),1) = color.greenF();
+                input.matFinalVertColor(label.vertices(j),2) = color.blueF();
             }
         }
     }
@@ -379,7 +359,7 @@ void generateSmoothedColors(VisualizationInfo& input)
     VectorXd smooth_val = input.matWDistSmooth * input.vSourceColorSamples;
 
     //Produce final color
-    transformDataToColor(smooth_val, input.arrayFinalVertColor, input.dThresholdX, input.dThresholdZ, input.functionHandlerColorMap);
+    transformDataToColor(smooth_val, input.matFinalVertColor, input.dThresholdX, input.dThresholdZ, input.functionHandlerColorMap);
 
     //int iAllTimer = allTimer.elapsed();
     //qDebug() << "All time" << iAllTimer;
@@ -470,18 +450,18 @@ void RtSourceLocDataWorker::setSurfaceData(const Eigen::VectorXi& vecVertNoLeftH
 
 //*************************************************************************************************************
 
-void RtSourceLocDataWorker::setSurfaceColor(const QByteArray& arraySurfaceVertColorLeftHemi,
-                                           const QByteArray& arraySurfaceVertColorRightHemi)
+void RtSourceLocDataWorker::setSurfaceColor(const MatrixX3f& matSurfaceVertColorLeftHemi,
+                                           const MatrixX3f& matSurfaceVertColorRightHemi)
 {
     QMutexLocker locker(&m_qMutex);
 
-    if(arraySurfaceVertColorLeftHemi.size() == 0 || arraySurfaceVertColorRightHemi.size() == 0) {
+    if(matSurfaceVertColorLeftHemi.size() == 0 || matSurfaceVertColorRightHemi.size() == 0) {
         qDebug() << "RtSourceLocDataWorker::setSurfaceColor - Surface color data is empty. Returning ...";
         return;
     }
 
-    m_lVisualizationInfo[0].arrayOriginalVertColor = arraySurfaceVertColorLeftHemi;
-    m_lVisualizationInfo[1].arrayOriginalVertColor = arraySurfaceVertColorRightHemi;
+    m_lVisualizationInfo[0].matOriginalVertColor = matSurfaceVertColorLeftHemi;
+    m_lVisualizationInfo[1].matOriginalVertColor = matSurfaceVertColorRightHemi;
 }
 
 
@@ -687,7 +667,7 @@ void RtSourceLocDataWorker::run()
 
 //*************************************************************************************************************
 
-QPair<QByteArray, QByteArray> RtSourceLocDataWorker::performVisualizationTypeCalculation(const VectorXd& vSourceColorSamples)
+QPair<MatrixX3f, MatrixX3f> RtSourceLocDataWorker::performVisualizationTypeCalculation(const VectorXd& vSourceColorSamples)
 {
     //NOTE: This function is called for every new sample point and therefore must be kept highly efficient!
 //    QTime allTimer;
@@ -695,25 +675,25 @@ QPair<QByteArray, QByteArray> RtSourceLocDataWorker::performVisualizationTypeCal
 
     if(vSourceColorSamples.rows() != m_lVisualizationInfo[0].vVertNo.rows() + m_lVisualizationInfo[1].vVertNo.rows()) {
         qDebug() << "RtSourceLocDataWorker::performVisualizationTypeCalculation - Number of new vertex colors (" << vSourceColorSamples.rows() << ") do not match with previously set number of vertices (" << m_lVisualizationInfo[0].vVertNo.rows() + m_lVisualizationInfo[1].vVertNo.rows() << "). Returning...";
-        QPair<QByteArray, QByteArray> colorPair;
-        colorPair.first =  m_lVisualizationInfo[0].arrayOriginalVertColor;
-        colorPair.second = m_lVisualizationInfo[1].arrayOriginalVertColor;
+        QPair<MatrixX3f, MatrixX3f> colorPair;
+        colorPair.first =  m_lVisualizationInfo[0].matOriginalVertColor;
+        colorPair.second = m_lVisualizationInfo[1].matOriginalVertColor;
         return colorPair;
     }
 
     if(!m_bSurfaceDataIsInit) {
         qDebug() << "RtSourceLocDataWorker::performVisualizationTypeCalculation - Surface data was not initialized. Returning ...";
-        QPair<QByteArray, QByteArray> colorPair;
-        colorPair.first =  m_lVisualizationInfo[0].arrayOriginalVertColor;
-        colorPair.second = m_lVisualizationInfo[1].arrayOriginalVertColor;
+        QPair<MatrixX3f, MatrixX3f> colorPair;
+        colorPair.first =  m_lVisualizationInfo[0].matOriginalVertColor;
+        colorPair.second = m_lVisualizationInfo[1].matOriginalVertColor;
         return colorPair;
     }
 
     if(!m_bAnnotationDataIsInit) {
         qDebug() << "RtSourceLocDataWorker::performVisualizationTypeCalculation - Annotation data was not initialized. Returning ...";
-        QPair<QByteArray, QByteArray> colorPair;
-        colorPair.first =  m_lVisualizationInfo[0].arrayOriginalVertColor;
-        colorPair.second = m_lVisualizationInfo[1].arrayOriginalVertColor;
+        QPair<MatrixX3f, MatrixX3f> colorPair;
+        colorPair.first =  m_lVisualizationInfo[0].matOriginalVertColor;
+        colorPair.second = m_lVisualizationInfo[1].matOriginalVertColor;
         return colorPair;
     }
 
@@ -722,8 +702,8 @@ QPair<QByteArray, QByteArray> RtSourceLocDataWorker::performVisualizationTypeCal
     m_lVisualizationInfo[1].vSourceColorSamples = vSourceColorSamples.segment(m_lVisualizationInfo[0].vVertNo.rows(), m_lVisualizationInfo[1].vVertNo.rows());
 
     //Reset to original color as default
-    m_lVisualizationInfo[0].arrayFinalVertColor = m_lVisualizationInfo[0].arrayOriginalVertColor;
-    m_lVisualizationInfo[1].arrayFinalVertColor = m_lVisualizationInfo[1].arrayOriginalVertColor;
+    m_lVisualizationInfo[0].matFinalVertColor = m_lVisualizationInfo[0].matOriginalVertColor;
+    m_lVisualizationInfo[1].matFinalVertColor = m_lVisualizationInfo[1].matOriginalVertColor;
 
     //Generate color data for vertices
     switch(m_iVisualizationType) {
@@ -752,9 +732,9 @@ QPair<QByteArray, QByteArray> RtSourceLocDataWorker::performVisualizationTypeCal
 //    int iAllTimer = allTimer.elapsed();
 //    qDebug() << "All time" << iAllTimer;
 
-    QPair<QByteArray, QByteArray> colorPair;
-    colorPair.first =  m_lVisualizationInfo[0].arrayFinalVertColor;
-    colorPair.second = m_lVisualizationInfo[1].arrayFinalVertColor;
+    QPair<MatrixX3f, MatrixX3f> colorPair;
+    colorPair.first =  m_lVisualizationInfo[0].matFinalVertColor;
+    colorPair.second = m_lVisualizationInfo[1].matFinalVertColor;
     return colorPair;
 }
 

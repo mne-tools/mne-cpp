@@ -129,7 +129,7 @@ void  SourceSpaceTreeItem::setData(const QVariant& value, int role)
 
     switch(role) {
     case Data3DTreeModelItemRoles::SurfaceCurrentColorVert:
-        m_pRenderable3DEntity->getCustomMesh()->setColor(value.value<QByteArray>());
+        m_pRenderable3DEntity->getCustomMesh()->setColor(value.value<MatrixX3f>());
         break;
     }
 }
@@ -191,10 +191,10 @@ void SourceSpaceTreeItem::addData(const MNEHemisphere& tHemisphere, Qt3DCore::QE
     }
 
     //Create color from curvature information with default gyri and sulcus colors
-    QByteArray arrayVertColor = createVertColor(tHemisphere.rr);
+    MatrixX3f matVertColor = createVertColor(tHemisphere.rr);
 
     //Set renderable 3D entity mesh and color data
-    m_pRenderable3DEntity->getCustomMesh()->setMeshData(tHemisphere.rr, tHemisphere.nn, tHemisphere.tris, arrayVertColor, Qt3DRender::QGeometryRenderer::Triangles);
+    m_pRenderable3DEntity->getCustomMesh()->setMeshData(tHemisphere.rr, tHemisphere.nn, tHemisphere.tris, matVertColor, Qt3DRender::QGeometryRenderer::Triangles);
 
     //Set shaders
     PerVertexPhongAlphaMaterial* pPerVertexPhongAlphaMaterial = new PerVertexPhongAlphaMaterial();
@@ -203,7 +203,7 @@ void SourceSpaceTreeItem::addData(const MNEHemisphere& tHemisphere, Qt3DCore::QE
     //Add data which is held by this SourceSpaceTreeItem
     QVariant data;
 
-    data.setValue(arrayVertColor);
+    data.setValue(matVertColor);
     this->setData(data, Data3DTreeModelItemRoles::SurfaceCurrentColorVert);
 
     data.setValue(tHemisphere.rr);
@@ -241,9 +241,9 @@ void SourceSpaceTreeItem::setVisible(bool state)
 void SourceSpaceTreeItem::onSurfaceColorChanged(const QColor& color)
 {
     QVariant data;
-    QByteArray arrayNewVertColor = createVertColor(this->data(Data3DTreeModelItemRoles::SurfaceVert).value<MatrixX3f>(), color);
+    MatrixX3f matNewVertColor = createVertColor(this->data(Data3DTreeModelItemRoles::SurfaceVert).value<MatrixX3f>(), color);
 
-    data.setValue(arrayNewVertColor);
+    data.setValue(matNewVertColor);
     this->setData(data, Data3DTreeModelItemRoles::SurfaceCurrentColorVert);
 }
 
@@ -258,18 +258,15 @@ void SourceSpaceTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
 
 //*************************************************************************************************************
 
-QByteArray SourceSpaceTreeItem::createVertColor(const MatrixXf& vertices, const QColor& color) const
+MatrixX3f SourceSpaceTreeItem::createVertColor(const MatrixXf& vertices, const QColor& color) const
 {
-    QByteArray arrayCurvatureColor;
-    arrayCurvatureColor.resize(vertices.rows() * 3 * (int)sizeof(float));
-    float *rawColorArray = reinterpret_cast<float *>(arrayCurvatureColor.data());
-    int idxColor = 0;
+    MatrixX3f matColor(vertices.rows(),3);
 
     for(int i = 0; i<vertices.rows(); i++) {
-        rawColorArray[idxColor++] = color.redF();
-        rawColorArray[idxColor++] = color.greenF();
-        rawColorArray[idxColor++] = color.blueF();
+        matColor(i,0) = color.redF();
+        matColor(i,1) = color.greenF();
+        matColor(i,2) = color.blueF();
     }
 
-    return arrayCurvatureColor;
+    return matColor;
 }

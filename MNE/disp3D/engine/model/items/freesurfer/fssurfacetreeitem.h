@@ -139,7 +139,7 @@ public:
     *
     * @param[in] sourceColorSamples     The color values for each estimated source.
     */
-    void setRtVertColor(const QByteArray& sourceColorSamples);
+    void setRtVertColor(const MatrixX3f &sourceColorSamples);
 
     //=========================================================================================================
     /**
@@ -235,8 +235,10 @@ private:
     * @param[in] curvature      The curvature information.
     * @param[in] colSulci       The sulci color information.
     * @param[in] colGyri        The gyri color information.
+    *
+    * @return The final colors per vertex (RGB).
     */
-    QByteArray createCurvatureVertColor(const Eigen::VectorXf& curvature, const QColor& colSulci = QColor(50,50,50), const QColor& colGyri = QColor(125,125,125));
+    MatrixX3f createCurvatureVertColor(const Eigen::VectorXf& curvature, const QColor& colSulci = QColor(50,50,50), const QColor& colGyri = QColor(125,125,125));
 
     QString                         m_sColorInfoOrigin;                         /**< The surface color origin. */
     QPointer<Renderable3DEntity>    m_pRenderable3DEntity;                      /**< The surface renderable 3D entity. */
