@@ -175,9 +175,9 @@ private:
     /**
     * Call this function whenever you want to plot the dipoles.
     *
-    * @param[in] pECDSet     The dipole set data.
+    * @param[in] tECDSet     The dipole set data.
     */
-    void plotDipoles(const INVERSELIB::ECDSet& pECDSet);
+    void plotDipoles(const INVERSELIB::ECDSet& tECDSet);
 
     bool                                    m_bIsInit;                      /**< The init flag. */
 

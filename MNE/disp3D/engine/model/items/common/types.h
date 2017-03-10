@@ -113,7 +113,7 @@ namespace MetaTreeItemTypes
                     StreamingTimeInterval = QStandardItem::UserType + 110,
                     LoopedStreaming = QStandardItem::UserType + 111,
                     NumberAverages = QStandardItem::UserType + 112,
-                    ThresholdValue = QStandardItem::UserType + 113,
+                    DistributedSourceLocThreshold = QStandardItem::UserType + 113,
                     VisualizationType = QStandardItem::UserType + 114,
                     SurfaceColor = QStandardItem::UserType + 115,
                     UnknownItem = QStandardItem::UserType + 116,
@@ -184,7 +184,7 @@ namespace MetaTreeItemRoles
                     StreamingTimeInterval = Qt::UserRole + 12,
                     LoopedStreaming = Qt::UserRole + 13,
                     NumberAverages = Qt::UserRole + 14,
-                    ThresholdValue = Qt::UserRole + 15,
+                    DistributedSourceLocThreshold = Qt::UserRole + 15,
                     VisualizationType = Qt::UserRole + 16,
                     SurfaceColor = Qt::UserRole + 17,
                     SurfaceTranslateX = Qt::UserRole + 18,
@@ -244,16 +244,6 @@ Q_DECLARE_METATYPE(Eigen::Vector3f);
 #ifndef metatype_qbytearray
 #define metatype_qbytearray
 Q_DECLARE_METATYPE(QByteArray);
-#endif
-
-#ifndef metatype_labellist
-#define metatype_labellist
-Q_DECLARE_METATYPE(QList<FSLIB::Label>);
-#endif
-
-#ifndef metatype_ecddataset
-#define metatype_ecddataset
-Q_DECLARE_METATYPE(INVERSELIB::ECDSet);
 #endif
 
 #endif // TYPES_H

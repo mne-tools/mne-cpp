@@ -177,7 +177,7 @@ bool NetworkTreeItem::init(Qt3DCore::QEntity* parent)
 
 //*************************************************************************************************************
 
-bool NetworkTreeItem::addData(Network::SPtr pNetworkData)
+bool NetworkTreeItem::addData(const Network& tNetworkData)
 {
     if(!m_bIsInit) {
         qDebug() << "NetworkTreeItem::updateData - NetworkTreeItem has not been initialized yet!";
@@ -187,16 +187,16 @@ bool NetworkTreeItem::addData(Network::SPtr pNetworkData)
     //Add data which is held by this NetworkTreeItem
     QVariant data;
 
-    data.setValue(pNetworkData);
+    data.setValue(tNetworkData);
     this->setData(data, Data3DTreeModelItemRoles::NetworkData);
 
-    MatrixXd matDist = pNetworkData->getConnectivityMatrix();
+    MatrixXd matDist = tNetworkData.getConnectivityMatrix();
     data.setValue(matDist);
     this->setData(data, Data3DTreeModelItemRoles::NetworkDataMatrix);
 
     //Plot network
     QVector3D vecThreshold = m_pItemNetworkThreshold->data(MetaTreeItemRoles::NetworkThreshold).value<QVector3D>();
-    plotNetwork(pNetworkData, vecThreshold);
+    plotNetwork(tNetworkData, vecThreshold);
 
     return true;
 }
@@ -226,15 +226,15 @@ void NetworkTreeItem::setVisible(bool state)
 
 void NetworkTreeItem::onNetworkThresholdChanged(const QVector3D& vecThresholds)
 {
-    Network::SPtr pNetwork = this->data(Data3DTreeModelItemRoles::NetworkData).value<Network::SPtr>();
+    Network tNetwork = this->data(Data3DTreeModelItemRoles::NetworkData).value<Network>();
 
-    plotNetwork(pNetwork, vecThresholds);
+    plotNetwork(tNetwork, vecThresholds);
 }
 
 
 //*************************************************************************************************************
 
-void NetworkTreeItem::plotNetwork(QSharedPointer<CONNECTIVITYLIB::Network> pNetworkData, const QVector3D& vecThreshold)
+void NetworkTreeItem::plotNetwork(const Network& tNetworkData, const QVector3D& vecThreshold)
 {
 //    // Delete all old renderable children
 //    Renderable3DEntity* pParentTemp = new Renderable3DEntity();
@@ -266,9 +266,9 @@ void NetworkTreeItem::plotNetwork(QSharedPointer<CONNECTIVITYLIB::Network> pNetw
 //    m_lNodes.clear();
 
     //Create network vertices and normals
-    QList<NetworkNode::SPtr> lNetworkNodes = pNetworkData->getNodes();
+    QList<NetworkNode::SPtr> lNetworkNodes = tNetworkData.getNodes();
 
-    MatrixX3f tMatVert(pNetworkData->getNodes().size(), 3);
+    MatrixX3f tMatVert(lNetworkNodes.size(), 3);
 
     for(int i = 0; i < lNetworkNodes.size(); ++i) {
         tMatVert(i,0) = lNetworkNodes.at(i)->getVert()(0);
@@ -276,7 +276,7 @@ void NetworkTreeItem::plotNetwork(QSharedPointer<CONNECTIVITYLIB::Network> pNetw
         tMatVert(i,2) = lNetworkNodes.at(i)->getVert()(2);
     }
 
-    MatrixX3f tMatNorm(pNetworkData->getNodes().size(), 3);
+    MatrixX3f tMatNorm(lNetworkNodes.size(), 3);
     tMatNorm.setZero();
 
     //Draw network nodes

@@ -222,7 +222,7 @@ void MneEstimateTreeItem::init(const MNEForwardSolution& tForwardSolution,
     data.setValue(QString("Hot Negative 2"));
     pItemColormapType->setData(data, MetaTreeItemRoles::ColormapType);
 
-    MetaTreeItem* pItemSourceLocNormValue = new MetaTreeItem(MetaTreeItemTypes::ThresholdValue, "0.0,5.5,15");
+    MetaTreeItem* pItemSourceLocNormValue = new MetaTreeItem(MetaTreeItemTypes::DistributedSourceLocThreshold, "0.0,5.5,15");
     connect(pItemSourceLocNormValue, &MetaTreeItem::rtDataNormalizationValueChanged,
             this, &MneEstimateTreeItem::onDataNormalizationValueChanged);
     list.clear();
@@ -230,7 +230,7 @@ void MneEstimateTreeItem::init(const MNEForwardSolution& tForwardSolution,
     list << new QStandardItem(pItemSourceLocNormValue->toolTip());
     this->appendRow(list);
     data.setValue(QVector3D(0.0,5.5,15));
-    pItemSourceLocNormValue->setData(data, MetaTreeItemRoles::ThresholdValue);
+    pItemSourceLocNormValue->setData(data, MetaTreeItemRoles::DistributedSourceLocThreshold);
 
     MetaTreeItem *pItemStreamingInterval = new MetaTreeItem(MetaTreeItemTypes::StreamingTimeInterval, "50");
     connect(pItemStreamingInterval, &MetaTreeItem::rtDataTimeIntervalChanged,
@@ -408,13 +408,13 @@ void MneEstimateTreeItem::setVisualizationType(const QString& sVisualizationType
 
 void MneEstimateTreeItem::setNormalization(const QVector3D& vecThresholds)
 {
-    QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::ThresholdValue);
+    QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::DistributedSourceLocThreshold);
 
     for(int i = 0; i < lItems.size(); i++) {
         if(MetaTreeItem* pAbstractItem = dynamic_cast<MetaTreeItem*>(lItems.at(i))) {
             QVariant data;
             data.setValue(vecThresholds);
-            pAbstractItem->setData(data, MetaTreeItemRoles::ThresholdValue);
+            pAbstractItem->setData(data, MetaTreeItemRoles::DistributedSourceLocThreshold);
 
             QString sTemp = QString("%1,%2,%3").arg(vecThresholds.x()).arg(vecThresholds.y()).arg(vecThresholds.z());
             data.setValue(sTemp);

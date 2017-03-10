@@ -112,7 +112,7 @@ public:
     *
     * @return               The connectivity information in form of a network structure.
     */
-    static Network::SPtr pearsonsCorrelationCoeff(const Eigen::MatrixXd& matData, const Eigen::MatrixX3f& matVert);
+    static Network pearsonsCorrelationCoeff(const Eigen::MatrixXd& matData, const Eigen::MatrixX3f& matVert);
 
     //=========================================================================================================
     /**
@@ -123,7 +123,7 @@ public:
     *
     * @return               The connectivity information in form of a network structure.
     */
-    static Network::SPtr crossCorrelation(const Eigen::MatrixXd& matData, const Eigen::MatrixX3f& matVert);
+    static Network crossCorrelation(const Eigen::MatrixXd& matData, const Eigen::MatrixX3f& matVert);
 
 protected:
     //=========================================================================================================
