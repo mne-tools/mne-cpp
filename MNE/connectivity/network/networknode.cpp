@@ -92,17 +92,6 @@ NetworkNode::NetworkNode(qint16 iId, const RowVectorXf& vecVert, QObject* parent
 
 //*************************************************************************************************************
 
-const QList<QSharedPointer<NetworkEdge> >& NetworkNode::getEdges() const
-{
-    QList<QSharedPointer<NetworkEdge> > returnList;
-    returnList << m_lEdgesIn << m_lEdgesOut;
-
-    return returnList;
-}
-
-
-//*************************************************************************************************************
-
 const QList<QSharedPointer<NetworkEdge> >& NetworkNode::getEdgesIn() const
 {
     return m_lEdgesIn;
@@ -114,6 +103,14 @@ const QList<QSharedPointer<NetworkEdge> >& NetworkNode::getEdgesIn() const
 const QList<QSharedPointer<NetworkEdge> >& NetworkNode::getEdgesOut() const
 {
     return m_lEdgesOut;
+}
+
+
+//*************************************************************************************************************
+
+int NetworkNode::getNumberEdges() const
+{
+    return m_lEdgesIn.size() + m_lEdgesOut.size();
 }
 
 

@@ -195,8 +195,7 @@ bool NetworkTreeItem::addData(const Network& tNetworkData)
     this->setData(data, Data3DTreeModelItemRoles::NetworkDataMatrix);
 
     //Plot network
-    QVector3D vecThreshold = m_pItemNetworkThreshold->data(MetaTreeItemRoles::NetworkThreshold).value<QVector3D>();
-    plotNetwork(tNetworkData, vecThreshold);
+    plotNetwork(tNetworkData, m_pItemNetworkThreshold->data(MetaTreeItemRoles::NetworkThreshold).value<QVector3D>());
 
     return true;
 }
@@ -265,6 +264,8 @@ void NetworkTreeItem::plotNetwork(const Network& tNetworkData, const QVector3D& 
 
 //    m_lNodes.clear();
 
+    qDebug()<<"NetworkTreeItem::plotNetwork - 0";
+
     //Create network vertices and normals
     QList<NetworkNode::SPtr> lNetworkNodes = tNetworkData.getNodes();
 
@@ -311,6 +312,7 @@ void NetworkTreeItem::plotNetwork(const Network& tNetworkData, const QVector3D& 
         m_bNodesPlotted = true;
     }
 
+    qDebug()<<"NetworkTreeItem::plotNetwork - 1";
     //Generate connection indices for Qt3D buffer
     MatrixXi tMatLines;
     int count = 0;
@@ -344,16 +346,19 @@ void NetworkTreeItem::plotNetwork(const Network& tNetworkData, const QVector3D& 
     int idxColor = 0;
 
     for(int i = 0; i < tMatVert.rows(); ++i) {
-        rawColorArray[idxColor] = 0.0f;
-        idxColor++;
-        rawColorArray[idxColor] = 0.0f;
-        idxColor++;
-        rawColorArray[idxColor] = 1.0f;
-        idxColor++;
+        rawColorArray[idxColor++] = 0.0f;
+        rawColorArray[idxColor++] = 0.0f;
+        rawColorArray[idxColor++] = 1.0f;
     }
+    qDebug()<<"NetworkTreeItem::plotNetwork - 2";
 
-    //Generate line primitive based network
+//    //Generate line primitive based network
+    qDebug()<<"NetworkTreeItem::plotNetwork - tMatVert.rows() x tMatVert.cols" << tMatVert.rows() << "x" <<tMatVert.cols();
+    qDebug()<<"NetworkTreeItem::plotNetwork - tMatNorm.rows() x tMatNorm.cols" << tMatNorm.rows() << "x" <<tMatNorm.cols();
+    qDebug()<<"NetworkTreeItem::plotNetwork - tMatLines.rows() x tMatLines.cols" << tMatLines.rows() << "x" <<tMatLines.cols();
+
     m_pRenderable3DEntity->setMeshData(tMatVert, tMatNorm, tMatLines, arrayLineColor, Qt3DRender::QGeometryRenderer::Lines);
+    qDebug()<<"NetworkTreeItem::plotNetwork - 3";
 }
 
 

@@ -125,7 +125,9 @@ Renderable3DEntity::~Renderable3DEntity()
 
 void Renderable3DEntity::setVertColor(const QByteArray& tArrayColors)
 {
-    m_pCustomMesh->setVertColor(tArrayColors);
+    if(m_pCustomMesh) {
+        m_pCustomMesh->setVertColor(tArrayColors);
+    }
 }
 
 
@@ -137,7 +139,7 @@ void Renderable3DEntity::setMeshData(const MatrixX3f& tMatVert,
                                      const QByteArray& tArrayColors,
                                      Qt3DRender::QGeometryRenderer::PrimitiveType primitiveType)
 {
-    if(!m_pCustomMesh.isNull()) {
+    if(m_pCustomMesh) {
         m_pCustomMesh->setMeshData(tMatVert, tMatNorm, tMatTris, tArrayColors, primitiveType);
     }
 }

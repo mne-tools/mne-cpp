@@ -112,7 +112,7 @@ public:
     *
     * @return    The connectivity matrix generated from the current network information.
     */
-    const Eigen::MatrixXd& getConnectivityMatrix() const;
+    Eigen::MatrixXd getConnectivityMatrix() const;
 
     //=========================================================================================================
     /**
@@ -191,10 +191,10 @@ public:
     Network &operator<<(NetworkNode::SPtr newNode);
 
 protected:
-
-private:
     QList<NetworkEdge::SPtr>    m_lEdges;                   /**< List with all edges of the network.*/
     QList<NetworkNode::SPtr>    m_lNodes;                   /**< List with all nodes of the network.*/
+
+    Eigen::MatrixXd             m_matDistMatrix;            /**< The distance matrix.*/
 
     QString                     m_sConnectivityMethod;      /**< The connectivity measure method used to create the data of this network structure.*/
 
@@ -204,7 +204,7 @@ private:
     *
     * @return    The connectivity matrix generated from the current network information.
     */
-    const Eigen::MatrixXd& generateConnectMat() const;
+    Eigen::MatrixXd generateConnectMat() const;
 
 };
 
