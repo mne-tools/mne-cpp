@@ -264,8 +264,6 @@ void NetworkTreeItem::plotNetwork(const Network& tNetworkData, const QVector3D& 
 
 //    m_lNodes.clear();
 
-    qDebug()<<"NetworkTreeItem::plotNetwork - 0";
-
     //Create network vertices and normals
     QList<NetworkNode::SPtr> lNetworkNodes = tNetworkData.getNodes();
 
@@ -312,7 +310,6 @@ void NetworkTreeItem::plotNetwork(const Network& tNetworkData, const QVector3D& 
         m_bNodesPlotted = true;
     }
 
-    qDebug()<<"NetworkTreeItem::plotNetwork - 1";
     //Generate connection indices for Qt3D buffer
     MatrixXi tMatLines;
     int count = 0;
@@ -350,15 +347,8 @@ void NetworkTreeItem::plotNetwork(const Network& tNetworkData, const QVector3D& 
         rawColorArray[idxColor++] = 0.0f;
         rawColorArray[idxColor++] = 1.0f;
     }
-    qDebug()<<"NetworkTreeItem::plotNetwork - 2";
-
-//    //Generate line primitive based network
-    qDebug()<<"NetworkTreeItem::plotNetwork - tMatVert.rows() x tMatVert.cols" << tMatVert.rows() << "x" <<tMatVert.cols();
-    qDebug()<<"NetworkTreeItem::plotNetwork - tMatNorm.rows() x tMatNorm.cols" << tMatNorm.rows() << "x" <<tMatNorm.cols();
-    qDebug()<<"NetworkTreeItem::plotNetwork - tMatLines.rows() x tMatLines.cols" << tMatLines.rows() << "x" <<tMatLines.cols();
 
     m_pRenderable3DEntity->setMeshData(tMatVert, tMatNorm, tMatLines, arrayLineColor, Qt3DRender::QGeometryRenderer::Lines);
-    qDebug()<<"NetworkTreeItem::plotNetwork - 3";
 }
 
 
