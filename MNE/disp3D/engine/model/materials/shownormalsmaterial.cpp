@@ -1,10 +1,10 @@
 //=============================================================================================================
 /**
-* @file     ecdview.cpp
+* @file     shownormalsmaterial.cpp
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     March, 2017
+* @date     January, 2017
 *
 * @section  LICENSE
 *
@@ -29,24 +29,16 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    ECDView class definition.
-*
+* @brief    ShowNormalsMaterial class definition
 */
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "ecdview.h"
-
-#include "../engine/view/view3D.h"
-#include "../engine/model/data3Dtreemodel.h"
-#include "../engine/control/control3dwidget.h"
-
-#include <inverse/dipoleFit/dipole_fit_settings.h>
-#include <inverse/dipoleFit/ecd_set.h>
-#include <mne/mne_bem.h>
+#include "shownormalsmaterial.h"
 
 
 //*************************************************************************************************************
@@ -54,7 +46,22 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QGridLayout>
+#include <QColor>
+#include <Qt3DRender/qeffect.h>
+#include <Qt3DRender/qtechnique.h>
+#include <Qt3DRender/qshaderprogram.h>
+#include <Qt3DRender/qparameter.h>
+#include <Qt3DRender/qrenderpass.h>
+#include <QFilterKey>
+#include <Qt3DRender/qdepthtest.h>
+#include <Qt3DRender/qblendequation.h>
+#include <Qt3DRender/qblendequationarguments.h>
+#include <Qt3DRender/qnodepthmask.h>
+#include <Qt3DRender/qgraphicsapifilter.h>
+
+#include <QUrl>
+#include <QVector3D>
+#include <QVector4D>
 
 
 //*************************************************************************************************************
@@ -63,8 +70,7 @@
 //=============================================================================================================
 
 using namespace DISP3DLIB;
-using namespace INVERSELIB;
-using namespace MNELIB;
+using namespace Qt3DRender;
 
 
 //*************************************************************************************************************
@@ -72,84 +78,60 @@ using namespace MNELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ECDView::ECDView(const DipoleFitSettings& dipFitSettings, const ECDSet& ecdSet, QWidget* parent)
-: QWidget(parent)
-, m_p3DView(View3D::SPtr(new View3D()))
-, m_pData3DModel(Data3DTreeModel::SPtr(new Data3DTreeModel()))
+ShowNormalsMaterial::ShowNormalsMaterial(QNode *parent)
+: QMaterial(parent)
+, m_pVertexEffect(new QEffect())
+, m_pVertexGL3Technique(new QTechnique())
+, m_pVertexGL3RenderPass(new QRenderPass())
+, m_pVertexGL3Shader(new QShaderProgram())
+, m_pFilterKey(new QFilterKey)
+, m_pNoDepthMask(new QNoDepthMask())
+, m_pBlendState(new QBlendEquationArguments())
+, m_pBlendEquation(new QBlendEquation())
 {
-    //Init 3D View
-    m_p3DView->setModel(m_pData3DModel);
-
-    QStringList slControlFlags;
-    slControlFlags << "Data" << "View" << "Light";
-    m_pControl3DView = Control3DWidget::SPtr(new Control3DWidget(this, slControlFlags));
-
-    m_pControl3DView->init(m_pData3DModel, m_p3DView);
-
-    //Read mri transform
-    QFile file(dipFitSettings.mriname);
-    ECDSet ecdSetTrans = ecdSet;
-
-    if(file.exists()) {
-        FiffCoordTrans coordTrans(file);
-
-        std::cout << std::endl << "coordTrans" << coordTrans.trans;
-        std::cout << std::endl << "coordTransInv" << coordTrans.invtrans;
-
-        for(int i = 0; i < ecdSet.size() ; ++i) {
-            MatrixX3f dipoles(1, 3);
-            //transform location
-            dipoles(0,0) = ecdSet[i].rd(0);
-            dipoles(0,1) = ecdSet[i].rd(1);
-            dipoles(0,2) = ecdSet[i].rd(2);
-
-            dipoles = coordTrans.apply_trans(dipoles);
-
-            ecdSetTrans[i].rd(0) = dipoles(0,0);
-            ecdSetTrans[i].rd(1) = dipoles(0,1);
-            ecdSetTrans[i].rd(2) = dipoles(0,2);
-
-            //transform orientation
-            dipoles(0,0) = ecdSet[i].Q(0);
-            dipoles(0,1) = ecdSet[i].Q(1);
-            dipoles(0,2) = ecdSet[i].Q(2);
-
-            dipoles = coordTrans.apply_trans(dipoles, false);
-
-            ecdSetTrans[i].Q(0) = dipoles(0,0);
-            ecdSetTrans[i].Q(1) = dipoles(0,1);
-            ecdSetTrans[i].Q(2) = dipoles(0,2);
-        }
-    } else {
-        qCritical("ECDView::ECDView - Cannot open FiffCoordTrans file");
-    }
-
-    //Add ECD data
-    m_pData3DModel->addDipoleFitData("sample", QString("Set %1").arg(dipFitSettings.setno), ecdSetTrans);
-
-    //Read and show BEM
-    QFile t_fileBem(dipFitSettings.bemname);
-
-    if(t_fileBem.exists()) {
-        MNEBem t_Bem(t_fileBem);
-        m_pData3DModel->addBemData("sample", "BEM", t_Bem);
-    } else {
-        qCritical("ECDView::ECDView - Cannot open MNEBem file");
-    }
-
-    //Create widget GUI
-    QGridLayout *mainLayoutView = new QGridLayout;
-    QWidget *pWidgetContainer = QWidget::createWindowContainer(m_p3DView.data());
-    pWidgetContainer->setMinimumSize(400,400);
-    mainLayoutView->addWidget(pWidgetContainer,0,0);
-    mainLayoutView->addWidget(m_pControl3DView.data(),0,1);
-
-    this->setLayout(mainLayoutView);
+    this->init();
 }
 
 
 //*************************************************************************************************************
 
-ECDView::~ECDView()
+ShowNormalsMaterial::~ShowNormalsMaterial()
 {
+}
+
+
+//*************************************************************************************************************
+
+void ShowNormalsMaterial::init()
+{
+    //Set shader
+    m_pVertexGL3Shader->setVertexShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/engine/model/materials/shaders/gl3/shownormals.vert"))));
+    m_pVertexGL3Shader->setGeometryShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/engine/model/materials/shaders/gl3/shownormals.geom"))));
+    m_pVertexGL3Shader->setFragmentShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/engine/model/materials/shaders/gl3/shownormals.frag"))));
+    m_pVertexGL3RenderPass->setShaderProgram(m_pVertexGL3Shader);
+
+    //Setup transparency
+    m_pBlendState->setSourceRgb(QBlendEquationArguments::SourceAlpha);
+    m_pBlendState->setDestinationRgb(QBlendEquationArguments::OneMinusSourceAlpha);
+    m_pBlendEquation->setBlendFunction(QBlendEquation::Add);
+
+    m_pVertexGL3RenderPass->addRenderState(m_pBlendEquation);
+    m_pVertexGL3RenderPass->addRenderState(m_pNoDepthMask);
+    m_pVertexGL3RenderPass->addRenderState(m_pBlendState);
+
+    //Set OpenGL version - This material can only be used with opengl 4.0 or higher since it is using geometry shaders
+    m_pVertexGL3Technique->graphicsApiFilter()->setApi(QGraphicsApiFilter::OpenGL);
+    m_pVertexGL3Technique->graphicsApiFilter()->setMajorVersion(3);
+    m_pVertexGL3Technique->graphicsApiFilter()->setMinorVersion(2);
+    m_pVertexGL3Technique->graphicsApiFilter()->setProfile(QGraphicsApiFilter::CoreProfile);
+
+    m_pFilterKey->setName(QStringLiteral("renderingStyle"));
+    m_pFilterKey->setValue(QStringLiteral("forward"));
+    m_pVertexGL3Technique->addFilterKey(m_pFilterKey);
+
+    m_pVertexGL3Technique->addRenderPass(m_pVertexGL3RenderPass);
+
+    m_pVertexEffect->addTechnique(m_pVertexGL3Technique);
+
+    this->setEffect(m_pVertexEffect);
 }
