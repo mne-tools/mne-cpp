@@ -345,7 +345,7 @@ GuessData::GuessData(const QString &guessname, const QString &guess_surfname, fl
         VEC_COPY_16(r0,f->r0);
         FiffCoordTransOld::fiff_coord_trans_inv(r0,f->mri_head_t,TRUE);
         if (f->bem_model) {
-            printf("Using inner skull surface from the BEM (%s)...\n",f->bemname);
+            printf("Using inner skull surface from the BEM (%s)...\n",f->bemname.toUtf8().constData());
             if ((inner_skull = f->bem_model->fwd_bem_find_surface(FIFFV_BEM_SURF_ID_BRAIN)) == NULL)
                 goto bad;
         }
