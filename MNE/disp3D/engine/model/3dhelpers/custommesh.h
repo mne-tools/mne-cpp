@@ -118,7 +118,7 @@ public:
     */
     CustomMesh(const Eigen::MatrixX3f& tMatVert,
                 const Eigen::MatrixX3f& tMatNorm,
-                const Eigen::MatrixX3i& tMatTris,
+                const Eigen::MatrixXi& tMatTris,
                 const Eigen::MatrixX3f& tMatColors,
                 Qt3DRender::QGeometryRenderer::PrimitiveType primitiveType = Qt3DRender::QGeometryRenderer::Triangles);
 
@@ -158,7 +158,7 @@ public:
     *
     * @param[in] tMatTris       Tris/Faces in form of a matrix.
     */
-    void setIndex(const Eigen::MatrixX3i& tMatTris);
+    void setIndex(const Eigen::MatrixXi &tMatTris);
 
     //=========================================================================================================
     /**

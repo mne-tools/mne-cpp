@@ -119,7 +119,7 @@ ECDView::ECDView(const DipoleFitSettings& dipFitSettings, const ECDSet& ecdSet, 
         m_pData3DModel->addBemData("sample", "BEM", t_Bem);
     } else {
         qCritical("ECDView::ECDView - Cannot open MNEBem file");
-    }   
+    }
 }
 
 
